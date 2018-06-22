@@ -508,7 +508,6 @@
     <ClInclude Include="..\pm_shared\pm_shared.h" />
     <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\basetypes.h" />
-    <ClInclude Include="..\public\commonmacros.h" />
     <ClInclude Include="..\public\MemPool.h" />
     <ClInclude Include="..\public\osconfig.h" />
     <ClInclude Include="..\public\protected_things.h" />

@@ -13,7 +13,6 @@
 
 #include "osconfig.h"
 #include "protected_things.h"
-#include "commonmacros.h"
 
 
 // For backward compatibilty only...

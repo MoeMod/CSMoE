@@ -465,9 +465,6 @@
     <ClInclude Include="..\public\protected_things.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\commonmacros.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\activity.h">
       <Filter>dlls</Filter>
     </ClInclude>
