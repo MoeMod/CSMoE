@@ -1,0 +1,173 @@
+#pragma once
+
+//AK47
+#define AK47_MAX_SPEED			221
+#define AK47_DAMAGE			36
+#define AK47_RANGE_MODIFER		0.98
+#define AK47_RELOAD_TIME		2.45
+
+//AUG
+#define AUG_MAX_SPEED			240
+#define AUG_DAMAGE			32
+#define AUG_RANGE_MODIFER		0.96
+#define AUG_RELOAD_TIME			3.3
+
+//AWP
+#define AWP_MAX_SPEED		210
+#define AWP_MAX_SPEED_ZOOM	150
+#define AWP_DAMAGE		115
+#define AWP_RANGE_MODIFER	0.99
+#define AWP_RELOAD_TIME		2.5
+
+//C4
+#define C4_MAX_AMMO		1
+#define C4_MAX_SPEED		250.0
+#define C4_ARMING_ON_TIME	3.0
+
+//Deagle
+#define DEAGLE_MAX_SPEED	250
+#define DEAGLE_DAMAGE		54
+#define DEAGLE_RANGE_MODIFER	0.81
+#define DEAGLE_RELOAD_TIME	2.2
+
+//Elites
+#define ELITE_MAX_SPEED		250
+#define ELITE_RELOAD_TIME	4.5
+#define ELITE_DAMAGE		36
+#define ELITE_RANGE_MODIFER	0.75
+
+//Famas
+#define FAMAS_MAX_SPEED		240
+#define FAMAS_RELOAD_TIME	3.3
+#define FAMAS_DAMAGE		30
+#define FAMAS_DAMAGE_BURST	34
+#define FAMAS_RANGE_MODIFER	0.96
+
+//Fiveseven
+#define FIVESEVEN_MAX_SPEED		250
+#define FIVESEVEN_DAMAGE		20
+#define FIVESEVEN_RANGE_MODIFER		0.885
+#define FIVESEVEN_RELOAD_TIME		2.7
+
+//Flashbang
+#define FLASHBANG_MAX_SPEED		250
+#define FLASHBANG_MAX_SPEED_SHIELD	180
+
+//g3sg1
+#define G3SG1_MAX_SPEED		210
+#define G3SG1_MAX_SPEED_ZOOM	150
+#define G3SG1_DAMAGE		80
+#define G3SG1_RANGE_MODIFER	0.98
+#define G3SG1_RELOAD_TIME	3.5
+
+//galil
+#define GALIL_MAX_SPEED			240
+#define GALIL_DAMAGE			30
+#define GALIL_RANGE_MODIFER		0.98
+#define GALIL_RELOAD_TIME		2.45
+
+//glock18
+#define GLOCK18_MAX_SPEED		250
+#define GLOCK18_DAMAGE			25
+#define GLOCK18_RANGE_MODIFER		0.75
+#define GLOCK18_RELOAD_TIME		2.2
+
+//hegrenade
+#define HEGRENADE_MAX_SPEED		250
+#define HEGRENADE_MAX_SPEED_SHIELD	180
+
+//knife
+#define KNIFE_BODYHIT_VOLUME		128
+#define KNIFE_WALLHIT_VOLUME		512
+#define KNIFE_MAX_SPEED			250
+#define KNIFE_MAX_SPEED_SHIELD		180
+
+//m3
+#define M3_MAX_SPEED		230
+#define M3_CONE_VECTOR		Vector(0.0675, 0.0675, 0.0)	// special shotgun spreads
+
+//m4a1
+#define M4A1_MAX_SPEED		230
+#define M4A1_DAMAGE		32
+#define M4A1_DAMAGE_SIL		33
+#define M4A1_RANGE_MODIFER      0.97
+#define M4A1_RANGE_MODIFER_SIL  0.95
+#define M4A1_RELOAD_TIME	3.05
+
+//m249
+#define M249_MAX_SPEED			220
+#define M249_DAMAGE			32
+#define M249_RANGE_MODIFER		0.97
+#define M249_RELOAD_TIME		4.7
+
+//mac10
+#define MAC10_MAX_SPEED			250
+#define MAC10_DAMAGE			29
+#define MAC10_RANGE_MODIFER		0.82
+#define MAC10_RELOAD_TIME		3.15
+
+//mp5navy
+#define MP5N_MAX_SPEED			250
+#define MP5N_DAMAGE			26
+#define MP5N_RANGE_MODIFER		0.84
+#define MP5N_RELOAD_TIME		2.63
+
+//p90
+#define P90_MAX_SPEED		245
+#define P90_DAMAGE		21
+#define P90_RANGE_MODIFER	0.885
+#define P90_RELOAD_TIME		3.4
+
+//p228
+#define P228_MAX_SPEED		250
+#define P228_DAMAGE		32
+#define P228_RANGE_MODIFER	0.8
+#define P228_RELOAD_TIME	2.7
+
+//scout
+#define SCOUT_MAX_SPEED			260
+#define SCOUT_MAX_SPEED_ZOOM		220
+#define SCOUT_DAMAGE			75
+#define SCOUT_RANGE_MODIFER		0.98
+#define SCOUT_RELOAD_TIME		2
+
+//sg550
+#define SG550_MAX_SPEED			210
+#define SG550_MAX_SPEED_ZOOM		150
+#define SG550_DAMAGE			70
+#define SG550_RANGE_MODIFER		0.98
+#define SG550_RELOAD_TIME		3.35
+
+//sg552
+#define SG552_MAX_SPEED			235
+#define SG552_MAX_SPEED_ZOOM		200
+#define SG552_DAMAGE			33
+#define SG552_RANGE_MODIFER		0.955
+#define SG552_RELOAD_TIME		3
+
+//smokegrenade
+#define SMOKEGRENADE_MAX_SPEED		250
+#define SMOKEGRENADE_MAX_SPEED_SHIELD	180
+
+//tmp
+#define TMP_MAX_SPEED			250
+#define TMP_DAMAGE			20
+#define TMP_RANGE_MODIFER		0.85
+#define TMP_RELOAD_TIME			2.12
+
+//ump45
+#define UMP45_MAX_SPEED			250
+#define UMP45_DAMAGE			30
+#define UMP45_RANGE_MODIFER		0.82
+#define UMP45_RELOAD_TIME		3.5
+
+//tmp
+#define USP_MAX_SPEED		250
+#define USP_DAMAGE		34
+#define USP_DAMAGE_SIL		30
+#define USP_RANGE_MODIFER	0.79
+#define USP_RELOAD_TIME		2.7
+
+//xm1014
+#define XM1014_MAX_SPEED	240
+#define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
