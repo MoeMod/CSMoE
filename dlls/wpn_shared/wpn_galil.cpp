@@ -17,6 +17,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "wpn_galil.h"
 
 enum galil_e
 {

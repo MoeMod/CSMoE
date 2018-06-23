@@ -17,6 +17,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "wpn_mp5navy.h"
 
 enum mp5n_e
 {

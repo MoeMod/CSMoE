@@ -17,6 +17,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "wpn_ak47.h"
 
 enum ak47_e
 {

@@ -17,6 +17,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "wpn_knife.h"
 
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512

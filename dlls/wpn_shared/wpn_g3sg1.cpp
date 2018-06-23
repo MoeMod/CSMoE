@@ -17,6 +17,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "wpn_g3sg1.h"
 
 enum g3sg1_e
 {

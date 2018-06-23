@@ -45,6 +45,8 @@ extern "C"
 #include "pm_shared.h"
 }
 
+#include "wpn_shared.h"
+
 #ifndef min
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif

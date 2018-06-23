@@ -19,6 +19,7 @@
 #include "weapons.h"
 #include "hltv.h"
 #include "gamerules.h"
+#include "wpn_c4.h"
 
 //#define C4MADNESS
 #ifdef CLIENT_DLL

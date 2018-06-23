@@ -77,6 +77,11 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+// weapons
+#include "wpn_shared/wpn_hegrenade.h"
+#include "wpn_shared/wpn_flashbang.h"
+#include "wpn_shared/wpn_smokegrenade.h"
+
 
 /*
 * Globals initialization
