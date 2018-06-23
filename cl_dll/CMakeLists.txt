@@ -214,7 +214,7 @@ set (CLDLL_SOURCES
 	./include/parsemsg.h
 	./include/rain.h
 	./include/tf_defs.h
-	./public/unicode_strtools.h
+	../public/unicode_strtools.h
 	./include/util_vector.h
 	./include/vgui_parser.h
 	./include/view.h

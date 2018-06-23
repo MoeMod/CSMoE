@@ -233,7 +233,6 @@ set(GAME_SHARED_SRCS
 
 set(PUBLIC_SRCS
 	../public/MemPool.cpp
-	../public/precompiled.cpp
     )
 
 set (SERVER_LIBRARY server)
@@ -259,8 +258,10 @@ include_directories (
 add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
 
 add_definitions( 
-	-DLINUX -D_LINUX -DCLIENT_WEAPONS -DCLIENT_DLL
+	-DLINUX -D_LINUX -DCLIENT_WEAPONS
 	-fpermissive -fno-strict-aliasing -DNDEBUG  -DGNUC
 	-D_stricmp=strcasecmp -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp  -D_snprintf=snprintf -D_vsnprintf=vsnprintf -D_strdup=strdup -D_write=write -D_close=close
 	-w -Wl,--no-undefined
 	-DQUIVER -DQUAKE2 -DVALVE_DLL -D_alloca=alloca -fno-exceptions -fexpensive-optimizations -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE -Werror=return-type)
+
+target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )

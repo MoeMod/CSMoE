@@ -4,7 +4,7 @@
 #pragma once
 #endif
 
-#include "utlmemory.h"
+#include "UtlMemory.h"
 
 template<class T>
 class CUtlVector
