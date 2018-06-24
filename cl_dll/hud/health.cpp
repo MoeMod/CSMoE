@@ -344,11 +344,11 @@ void CHudHealth::DrawPain(float flTime)
 			shade = a * max( m_fAttack[i], 0.5 );
 			DrawUtils::ScaleColors(r, g, b, shade);*/
 
-			a = max( m_fAttack[i], 0.5 );
+			a = max( m_fAttack[i], 0.5f );
 
 			SPR_Set( m_hSprite, 255 * a, 255 * a, 255 * a);
 			SPR_DrawAdditive( i, m_vAttackPos[i].x, m_vAttackPos[i].y, NULL );
-			m_fAttack[i] = max( 0, m_fAttack[i] - fFade );
+			m_fAttack[i] = max( 0.0f, m_fAttack[i] - fFade );
 		}
 		else
 			m_fAttack[i] = 0;

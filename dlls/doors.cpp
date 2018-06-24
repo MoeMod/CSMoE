@@ -1,9 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include "maintypes.h"
-#include "common.h"
-
-#include "pm_shared.h"
 
 #include "extdll.h"
 #include "util.h"
@@ -15,6 +11,7 @@
 #include "subs.h"
 #include "sound.h"
 
+#include "pm_shared.h"
 #include "utllinkedlist.h"
 
 // CSBOT and Nav

@@ -1,7 +1,3 @@
-#include "maintypes.h"
-#include "common.h"
-#include "pm_math.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -65,6 +61,10 @@
 
 // Fire our active weapon towards our current enemy
 // NOTE: Aiming our weapon is handled in RunBotUpkeep()
+
+#define PITCH	0	// up/down
+#define YAW	1	// left/right
+#define ROLL	2	// fall over
 
 void CCSBot::FireWeaponAtEnemy()
 {

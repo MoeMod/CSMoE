@@ -1,7 +1,3 @@
-#include "maintypes.h"
-#include "common.h"
-#include "debug.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -15,6 +11,8 @@
 #include "trains.h"
 #include "vehicle.h"
 #include "globals.h"
+
+#include "debug.h"
 
 #include "pm_shared.h"
 #include "utllinkedlist.h"

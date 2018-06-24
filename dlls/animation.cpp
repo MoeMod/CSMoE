@@ -1,9 +1,3 @@
-#include "maintypes.h"
-
-#include "common.h"
-
-#include "pm_math.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -12,6 +6,10 @@
 
 #include "scriptevent.h"
 #include "player.h"
+
+#define PITCH	0	// up/down
+#define YAW	1	// left/right
+#define ROLL	2	// fall over
 
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6

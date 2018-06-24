@@ -383,8 +383,8 @@ void CGameStudioModelRenderer::StudioEstimateGait(entity_state_t *pplayer)
 	vec3_t est_velocity;
 
 	dt = (m_clTime - m_clOldTime);
-	dt = max(0.0, dt);
-	dt = min(1.0, dt);
+	dt = max(0.0f, dt);
+	dt = min(1.0f, dt);
 
 	if (dt == 0 || m_pPlayerInfo->renderframe == m_nFrameCount)
 	{

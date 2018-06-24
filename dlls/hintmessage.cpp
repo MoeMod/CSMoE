@@ -1,13 +1,10 @@
-#include "maintypes.h"
-#include "common.h"
-
-#include "utlvector.h"
-#include "shared_util.h"
-
 #include "extdll.h"
+#include "utlvector.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
+
+#include "shared_util.h"
 
 CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, float duration)
 {

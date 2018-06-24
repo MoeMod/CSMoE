@@ -32,13 +32,7 @@
 #pragma once
 #endif
 
-#ifndef min
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef max
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#endif
+#include "minmax.h"
 
 #include "bot/cs_gamestate.h"
 #include "bot/cs_bot_manager.h"

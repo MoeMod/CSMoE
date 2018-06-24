@@ -33,7 +33,10 @@
 #pragma warning(disable : 4100)		// unreferenced formal parameter
 #endif
 
+#include "maintypes.h"
+#include "basetypes.h"
 #include "archtypes.h"     // DAL
+#include "common.h"
 
 // Prevent tons of unused windows definitions
 #ifdef _WIN32
@@ -59,12 +62,7 @@ typedef int BOOL;
 #include "stdlib.h"
 #include "math.h"
 
-#ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
+//#include "minmax.h"
 
 // Header file containing definition of globalvars_t and entvars_t
 //typedef unsigned int func_t;					//

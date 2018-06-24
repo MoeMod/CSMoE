@@ -538,6 +538,7 @@
     <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\basetypes.h" />
     <ClInclude Include="..\public\MemPool.h" />
+    <ClInclude Include="..\public\minmax.h" />
     <ClInclude Include="..\public\osconfig.h" />
     <ClInclude Include="..\public\protected_things.h" />
     <ClInclude Include="..\public\tier1\utlmemory.h" />

@@ -477,7 +477,7 @@ Vector CHudRadar::WorldToRadar(const Vector vPlayerOrigin, const Vector vObjectO
 	float flOffset = DEG2RAD( vAngles.y - RAD2DEG( atan2( diff.y, diff.x ) ) );
 
 	// this magic 32.0f just scales position on radar
-	float iRadius = min( diff.Length() / RADAR_SCALE, iMaxRadius );
+	float iRadius = min( diff.Length() / RADAR_SCALE, (float)iMaxRadius );
 
 	// transform origin difference to radar source
 	Vector ret( (float)(iRadius * sin(flOffset)),

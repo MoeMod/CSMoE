@@ -1,4 +1,3 @@
-#include "maintypes.h"
 
 #include "extdll.h"
 #include "util.h"

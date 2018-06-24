@@ -1,9 +1,3 @@
-#include "maintypes.h"
-
-#include "common.h"
-
-#include "pm_math.h"
-#include "pm_shared.h"
 
 #include "extdll.h"
 #include "util.h"
@@ -12,6 +6,7 @@
 #include "client.h"
 
 #include "game.h"
+#include "pm_shared.h"
 #include "utllinkedlist.h"
 
 // CSBOT and Nav

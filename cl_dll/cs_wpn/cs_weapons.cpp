@@ -47,13 +47,7 @@ extern "C"
 
 #include "wpn_shared.h"
 
-#ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
-
-#ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
+#include "minmax.h"
 
 extern globalvars_t *gpGlobals;
 extern int g_iUser1;

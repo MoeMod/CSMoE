@@ -1,7 +1,3 @@
-#include "maintypes.h"
-#include "common.h"
-#include "pm_math.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"

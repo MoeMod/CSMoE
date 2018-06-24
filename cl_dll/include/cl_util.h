@@ -126,8 +126,9 @@ inline void CenterPrint( const char *string )
 inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
-#define max(a, b)  (((a) > (b)) ? (a) : (b))
-#define min(a, b)  (((a) < (b)) ? (a) : (b))
+//#define max(a, b)  (((a) > (b)) ? (a) : (b))
+//#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#include "minmax.h"
 #ifndef __APPLE__
 #define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 #endif

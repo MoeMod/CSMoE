@@ -969,5 +969,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\minmax.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

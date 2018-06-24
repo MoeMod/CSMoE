@@ -1,6 +1,3 @@
-#include "maintypes.h"
-#include "basetypes.h"
-
 #include "common.h"
 
 #include "extdll.h"

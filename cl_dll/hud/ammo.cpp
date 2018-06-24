@@ -1137,7 +1137,7 @@ int CHudAmmo::Draw(float flTime)
 
 	AmmoWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
 
-	a = (int) max( MIN_ALPHA, m_fFade );
+	a = max( MIN_ALPHA, (int)m_fFade );
 
 	if (m_fFade > 0)
 		m_fFade -= (gHUD.m_flTimeDelta * 20);
@@ -1347,7 +1347,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	CalcCrosshairSize();
 
 	m_iAmmoLastCheck = g_iShotsFired;
-	m_flCrosshairDistance = max( m_flCrosshairDistance, iDistance );
+	m_flCrosshairDistance = max( m_flCrosshairDistance, (float)iDistance );
 	iLength = (m_flCrosshairDistance - iDistance) * 0.5 + 5;
 	
 	if ( m_iAlpha > 255 )
