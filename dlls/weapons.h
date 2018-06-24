@@ -243,7 +243,7 @@ public:
 	virtual int Save(CSave &save) { return 1; }
 	virtual int Restore(CRestore &restore) { return 1; }
 	virtual void SetObjectCollisionBox(void) { }
-	virtual CBaseEntity *Respawn() {}
+	virtual CBaseEntity *Respawn() { return this; }
 	virtual int AddToPlayer(CBasePlayer *pPlayer) { return false; }
 #else
 	virtual int Save(CSave &save);

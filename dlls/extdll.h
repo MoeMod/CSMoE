@@ -49,7 +49,11 @@
 #else // _WIN32
 typedef unsigned char BYTE;
 typedef int BOOL;
+
+#ifndef MAX_PATH
 #define MAX_PATH PATH_MAX
+#endif
+
 #include <limits.h>
 #include <stdarg.h>
 #include <string.h> // memset 
