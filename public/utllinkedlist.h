@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include "utlmemory.h"
+#include "UtlMemory.h"
 
 // define to enable asserts griping about things you shouldn't be doing with multilists
 // #define MULTILIST_PEDANTIC_ASSERTS 1 

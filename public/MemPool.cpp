@@ -7,6 +7,7 @@
 #include <malloc.h>
 #include "MemPool.h"
 #include "common.h"
+#include "minmax.h"
 
 /* <3fea40> ../public/MemPool.cpp:35 */
 CMemoryPool::CMemoryPool(int blockSize, int numElements)
