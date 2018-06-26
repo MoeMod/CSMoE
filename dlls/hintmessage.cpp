@@ -31,7 +31,7 @@ void CHintMessage::Send(CBaseEntity *client)
 {
 	UTIL_ShowMessageArgs(m_hintString, client, &m_args, m_isHint);
 }
-
+/*
 void CHintMessageQueue::Reset()
 {
 	m_tmMessageEnd = 0;
@@ -63,4 +63,4 @@ bool CHintMessageQueue::AddMessage(const char *message, float duration, bool isH
 	m_messages.AddToTail(msg);
 
 	return true;
-}
+}*/

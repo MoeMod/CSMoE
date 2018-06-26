@@ -33,7 +33,7 @@ private:
 	bool m_isHint;
 };
 
-class CHintMessageQueue
+/*class CHintMessageQueue
 {
 public:
 	void Reset(void);
@@ -44,4 +44,19 @@ public:
 private:
 	float m_tmMessageEnd;
 	CUtlVector<CHintMessage *> m_messages;
+};*/
+
+// TBD
+class CHintMessageQueue
+{
+public:
+	void Reset(void) {}
+	void Update(CBaseEntity *player) {}
+	bool AddMessage(const char *message, float duration, bool isHint, CUtlVector<const char *> *args) { return false; }
+	bool IsEmpty(void) { return true; }
+
+private:
+	float m_tmMessageEnd;
+	//CUtlVector<CHintMessage *> m_messages;
+	char placeholder[sizeof(CUtlVector<CHintMessage *>)];
 };
