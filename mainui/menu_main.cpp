@@ -539,6 +539,8 @@ static void UI_Main_Init( void )
 	UI_AddItem( &uiMain.menu, (void *)&uiMain.no );
 	UI_AddItem( &uiMain.menu, (void *)&uiMain.yes );
 	UI_AddItem( &uiMain.menu, (void *)&uiMain.ok );
+
+	UI_Main_ActivateFunc();
 }
 
 /*
