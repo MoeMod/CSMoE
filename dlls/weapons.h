@@ -486,6 +486,7 @@ public:
 	bool m_bIsBomb;
 };
 
+#ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {
 public:
@@ -503,6 +504,7 @@ public:
 	EHANDLE m_hEntToIgnoreTouchesFrom;
 	float m_flTimeToIgnoreTouches;
 };
+#endif // ENABLE_SHIELD
 
 //#include "wpn_shared.h"
 

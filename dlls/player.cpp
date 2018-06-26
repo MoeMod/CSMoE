@@ -2918,7 +2918,7 @@ BOOL CBasePlayer::IsOnLadder()
 	return pev->movetype == MOVETYPE_FLY;
 }
 
-NOXREF void CBasePlayer::ThrowWeapon(char *pszItemName)
+NOXREF void CBasePlayer::ThrowWeapon(const char *pszItemName)
 {
 	for (int i = 0; i < MAX_WEAPON_SLOTS; ++i)
 	{
@@ -2936,6 +2936,8 @@ NOXREF void CBasePlayer::ThrowWeapon(char *pszItemName)
 		}
 	}
 }
+
+#ifdef ENABLE_SHIELD
 
 LINK_ENTITY_TO_CLASS(weapon_shield, CWShield);
 
@@ -2989,8 +2991,11 @@ void CWShield::Touch(CBaseEntity *pOther)
 	}
 }
 
+#endif // ENABLE_SHIELD
+
 void CBasePlayer::GiveShield(bool bDeploy)
 {
+#ifdef ENABLE_SHIELD
 	m_bOwnsShield = true;
 	m_bHasPrimary = true;
 
@@ -3007,8 +3012,11 @@ void CBasePlayer::GiveShield(bool bDeploy)
 				pWeapon->RetireWeapon();
 		}
 	}
-
+	
 	pev->gamestate = 0;
+#else
+	assert(0 && "CBasePlayer::GiveShield called when ENABLE_SHIELD not set");
+#endif
 }
 
 void CBasePlayer::RemoveShield()
@@ -3028,7 +3036,7 @@ void CBasePlayer::DropShield(bool bDeploy)
 {
 	if (!HasShield())
 		return;
-
+#ifdef ENABLE_SHIELD
 	if (m_pActiveItem && !m_pActiveItem->CanHolster())
 		return;
 
@@ -3082,16 +3090,22 @@ void CBasePlayer::DropShield(bool bDeploy)
 	pShield->pev->nextthink = gpGlobals->time + 300;
 
 	pShield->SetCantBePickedUpByUser(this, 2.0);
+#endif // ENABLE_SHIELD
 }
 
 bool CBasePlayer::HasShield()
 {
+#ifdef ENABLE_SHIELD
 	return m_bOwnsShield;
+#else
+	assert(m_bOwnsShield == false);
+	return false;
+#endif
 }
 
 NOXREF void CBasePlayer::ThrowPrimary()
 {
-	ThrowWeapon("weapon_m249");
+	/*ThrowWeapon("weapon_m249");
 	ThrowWeapon("weapon_g3sg1");
 	ThrowWeapon("weapon_sg550");
 	ThrowWeapon("weapon_awp");
@@ -3104,7 +3118,14 @@ NOXREF void CBasePlayer::ThrowPrimary()
 	ThrowWeapon("weapon_sg552");
 	ThrowWeapon("weapon_scout");
 	ThrowWeapon("weapon_galil");
-	ThrowWeapon("weapon_famas");
+	ThrowWeapon("weapon_famas");*/
+
+	for (int i = 0; i < MAX_WEAPON_SLOTS; ++i)
+	{
+		CBasePlayerItem *pItem = m_rgpPlayerItems[i];
+		if (pItem->iItemSlot() == PRIMARY_WEAPON_SLOT)
+			ThrowWeapon(STRING(pItem->pev->classname));
+	}
 
 	DropShield();
 }

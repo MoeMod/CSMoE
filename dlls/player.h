@@ -468,7 +468,7 @@ public:
 	void Radio(const char *msg_id, const char *msg_verbose = NULL, short pitch = 100, bool showIcon = true);
 	CBasePlayer *GetNextRadioRecipient(CBasePlayer *pStartPlayer);
 	void SmartRadio();
-	void ThrowWeapon(char *pszItemName);
+	void ThrowWeapon(const char *pszItemName);
 	void ThrowPrimary();
 	void AddAccount(int amount, bool bTrackChange = true);
 	void Disappear();
