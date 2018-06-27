@@ -3853,6 +3853,41 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		}
 	}
 
+	// CSO Texture Load
+	if (name[0] == '#' || name[0] == '@')
+	{
+		int	gl_texturenum = 0;
+		do
+		{
+			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
+			if (FS_FileExists(texname, false))
+			{
+				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				break;
+			}
+			
+			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
+			if (FS_FileExists(texname, false))
+			{
+				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				break;
+			}
+
+		} while (0);
+
+		if (gl_texturenum)
+		{
+			gltexture_t *gltex = R_GetTexture(gl_texturenum);
+			if (gltex)
+			{
+				ptexture->index = gl_texturenum;
+				ptexture->width = gltex->width;
+				ptexture->height = gltex->height;
+				load_external = true; // sucessfully loaded
+			}
+		}
+	}
+
 	if( !load_external )
 	{
 		// NOTE: replace index with pointer to start of imagebuffer, ImageLib expected it

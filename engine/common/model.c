@@ -23,6 +23,9 @@ GNU General Public License for more details.
 #include "engine_features.h"
 #include "client.h"
 
+#include "mod_decryptor.h"
+#include "mod_loadseq.h"
+
 #define MAX_SIDE_VERTS		512	// per one polygon
 
 world_static_t	world;
@@ -3047,6 +3050,8 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	switch( LittleLong(*(uint *)buf) )
 	{
 	case IDSTUDIOHEADER:
+		Mod_DecryptModel(mod, buf);
+		Mod_LoadSeq(mod, buf);
 		Mod_LoadStudioModel( mod, buf, &loaded );
 		break;
 	case IDSPRITEHEADER:

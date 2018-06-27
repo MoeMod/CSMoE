@@ -41,6 +41,8 @@
     <ClInclude Include="..\engine\common\imagelib\imagelib.h" />
     <ClInclude Include="..\engine\common\library.h" />
     <ClInclude Include="..\engine\common\mathlib.h" />
+    <ClInclude Include="..\engine\common\mod_decryptor.h" />
+    <ClInclude Include="..\engine\common\mod_loadseq.h" />
     <ClInclude Include="..\engine\common\mod_local.h" />
     <ClInclude Include="..\engine\common\neon_mathfun.h" />
     <ClInclude Include="..\engine\common\netchan.h" />
@@ -63,6 +65,7 @@
     <ClInclude Include="..\engine\common\sse_mathfun.h" />
     <ClInclude Include="..\engine\common\stb\stb_sprintf.h" />
     <ClInclude Include="..\engine\common\system.h" />
+    <ClInclude Include="..\engine\common\util\IceKey.hpp" />
     <ClInclude Include="..\engine\common\world.h" />
     <ClInclude Include="..\engine\platform\sdl\events.h" />
     <ClInclude Include="..\engine\server\server.h" />
@@ -152,6 +155,8 @@
     <ClCompile Include="..\engine\common\mathlib.c" />
     <ClCompile Include="..\engine\common\matrixlib.c" />
     <ClCompile Include="..\engine\common\model.c" />
+    <ClCompile Include="..\engine\common\mod_decryptor.cpp" />
+    <ClCompile Include="..\engine\common\mod_loadseq.cpp" />
     <ClCompile Include="..\engine\common\mod_studio.c" />
     <ClCompile Include="..\engine\common\network.c" />
     <ClCompile Include="..\engine\common\net_buffer.c" />
@@ -181,6 +186,7 @@
     <ClCompile Include="..\engine\common\system.c" />
     <ClCompile Include="..\engine\common\sys_con.c" />
     <ClCompile Include="..\engine\common\titles.c" />
+    <ClCompile Include="..\engine\common\util\IceKey.cpp" />
     <ClCompile Include="..\engine\common\world.c" />
     <ClCompile Include="..\engine\common\zone.c" />
     <ClCompile Include="..\engine\platform\sdl\events.c" />
