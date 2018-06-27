@@ -195,7 +195,7 @@ void CC4::PrimaryAttack(void)
 				m_pPlayer->m_bHasC4 = false;
 
 				Broadcast("BOMBPL");
-#ifndef CLIENT_WEAPONS
+#ifndef CLIENT_DLL
 
 				if (pev->speed != 0 && g_pGameRules)
 					g_pGameRules->m_iC4Timer = (int)pev->speed;
@@ -320,7 +320,7 @@ void CC4::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, f
 		edict_t *target = pPlayer->m_pentCurBombTarget;
 		pPlayer->m_pentCurBombTarget = NULL;
 
-#ifndef CLIENT_WEAPONS
+#ifndef CLIENT_DLL
 		if (pev->speed != 0 && g_pGameRules)
 			g_pGameRules->m_iC4Timer = (int)pev->speed;
 #endif
