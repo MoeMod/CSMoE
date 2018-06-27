@@ -112,7 +112,6 @@ LOCAL_SRC_FILES := \
            common/mathlib.c \
            common/matrixlib.c \
 		   common/mod_decryptor.cpp \
-		   common/mod_loadseq.cpp \
            common/mod_studio.c \
            common/model.c \
            common/net_buffer.c \

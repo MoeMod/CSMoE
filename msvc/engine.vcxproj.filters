@@ -183,9 +183,6 @@
     <ClInclude Include="..\engine\common\mod_decryptor.h">
       <Filter>engine\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\engine\common\mod_loadseq.h">
-      <Filter>engine\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\engine\common\IceKey.hpp">
       <Filter>engine\common</Filter>
     </ClInclude>
@@ -585,9 +582,6 @@
       <Filter>engine\platform\sdl</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\common\mod_decryptor.cpp">
-      <Filter>engine\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\engine\common\mod_loadseq.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\common\IceKey.cpp">

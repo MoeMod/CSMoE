@@ -43,7 +43,6 @@
     <ClInclude Include="..\engine\common\library.h" />
     <ClInclude Include="..\engine\common\mathlib.h" />
     <ClInclude Include="..\engine\common\mod_decryptor.h" />
-    <ClInclude Include="..\engine\common\mod_loadseq.h" />
     <ClInclude Include="..\engine\common\mod_local.h" />
     <ClInclude Include="..\engine\common\neon_mathfun.h" />
     <ClInclude Include="..\engine\common\netchan.h" />
@@ -157,7 +156,6 @@
     <ClCompile Include="..\engine\common\matrixlib.c" />
     <ClCompile Include="..\engine\common\model.c" />
     <ClCompile Include="..\engine\common\mod_decryptor.cpp" />
-    <ClCompile Include="..\engine\common\mod_loadseq.cpp" />
     <ClCompile Include="..\engine\common\mod_studio.c" />
     <ClCompile Include="..\engine\common\network.c" />
     <ClCompile Include="..\engine\common\net_buffer.c" />
