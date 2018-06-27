@@ -1,6 +1,6 @@
 #include "mod_decryptor.h"
 #include "port.h"
-#include "util/IceKey.hpp"
+#include "IceKey.hpp"
 #include "studio.h"
 
 static const byte g_pDecryptorKey_20[32] =

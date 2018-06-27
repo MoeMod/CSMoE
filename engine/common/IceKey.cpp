@@ -6,23 +6,23 @@ struct TIceSubKey
 	DWORD dwValue[3];
 };
 
-static BOOL g_bIceSBoxesInitialised = FALSE;
+static bool g_bIceSBoxesInitialised = false;
 static DWORD g_pdwIceSBox[4][1024];
 
 static const int g_piIceSMod[4][4] =
 {
 	{ 333, 313, 505, 369 },
-	{ 379, 375, 319, 391 },
-	{ 361, 445, 451, 397 },
-	{ 397, 425, 395, 505 }
+{ 379, 375, 319, 391 },
+{ 361, 445, 451, 397 },
+{ 397, 425, 395, 505 }
 };
 
 static const int g_piIceSXor[4][4] =
 {
 	{ 0x83, 0x85, 0x9b, 0xcd },
-	{ 0xcc, 0xa7, 0xad, 0x41 },
-	{ 0x4b, 0x2e, 0xd4, 0x33 },
-	{ 0xea, 0xcb, 0x2e, 0x04 }
+{ 0xcc, 0xa7, 0xad, 0x41 },
+{ 0x4b, 0x2e, 0xd4, 0x33 },
+{ 0xea, 0xcb, 0x2e, 0x04 }
 };
 
 static const DWORD g_pdwIcePBox[32] =
@@ -168,10 +168,10 @@ CIceKey::~CIceKey(void)
 
 	m_iRounds = m_iSize = 0;
 
-	delete [] m_pKeySchedule;
+	delete[] m_pKeySchedule;
 }
 
-void CIceKey::BuildSchedule(USHORT *usKeyBuilder, int n, const int *cpiKeyRotation)
+void CIceKey::BuildSchedule(unsigned short *usKeyBuilder, int n, const int *cpiKeyRotation)
 {
 	int i, j, k;
 
@@ -189,8 +189,8 @@ void CIceKey::BuildSchedule(USHORT *usKeyBuilder, int n, const int *cpiKeyRotati
 
 			for (k = 0; k < 4; ++k)
 			{
-				USHORT *pusCurrentKeyBuilder = &usKeyBuilder[(iKeyRotation + k) & 3];
-				USHORT bit = *pusCurrentKeyBuilder & 1;
+				unsigned short *pusCurrentKeyBuilder = &usKeyBuilder[(iKeyRotation + k) & 3];
+				unsigned short bit = *pusCurrentKeyBuilder & 1;
 
 				*pdwCurrentSubKey = (*pdwCurrentSubKey << 1) | bit;
 				*pusCurrentKeyBuilder = (*pusCurrentKeyBuilder >> 1) | ((bit ^ 1) << 15);
@@ -199,10 +199,10 @@ void CIceKey::BuildSchedule(USHORT *usKeyBuilder, int n, const int *cpiKeyRotati
 	}
 }
 
-void CIceKey::SetKey(const BYTE *pKey)
+void CIceKey::SetKey(const byte *pKey)
 {
 	int i, j;
-	USHORT pusKeyBuilder[4];
+	unsigned short pusKeyBuilder[4];
 
 	if (m_iRounds == 8)
 	{
@@ -223,7 +223,7 @@ void CIceKey::SetKey(const BYTE *pKey)
 	}
 }
 
-void CIceKey::Encrypt(const BYTE pPlainText[8], BYTE pCipherText[8]) const
+void CIceKey::Encrypt(const byte pPlainText[8], byte pCipherText[8]) const
 {
 	int i;
 	DWORD l, r;
@@ -239,15 +239,15 @@ void CIceKey::Encrypt(const BYTE pPlainText[8], BYTE pCipherText[8]) const
 
 	for (i = 0; i < 4; ++i)
 	{
-		pCipherText[3 - i] = (BYTE)(r & 0xff);
-		pCipherText[7 - i] = (BYTE)(l & 0xff);
+		pCipherText[3 - i] = (byte)(r & 0xff);
+		pCipherText[7 - i] = (byte)(l & 0xff);
 
 		r >>= 8;
 		l >>= 8;
 	}
 }
 
-void CIceKey::Decrypt(const BYTE pCipherText[8], BYTE pPlainText[8]) const
+void CIceKey::Decrypt(const byte pCipherText[8], byte pPlainText[8]) const
 {
 	int i;
 	DWORD l, r;
@@ -263,8 +263,8 @@ void CIceKey::Decrypt(const BYTE pCipherText[8], BYTE pPlainText[8]) const
 
 	for (i = 0; i < 4; ++i)
 	{
-		pPlainText[3 - i] = (BYTE)(r & 0xff);
-		pPlainText[7 - i] = (BYTE)(l & 0xff);
+		pPlainText[3 - i] = (byte)(r & 0xff);
+		pPlainText[7 - i] = (byte)(l & 0xff);
 
 		r >>= 8;
 		l >>= 8;

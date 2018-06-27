@@ -29,7 +29,7 @@ extern "C" void Mod_LoadSeq(model_t *mod, byte *buffer)
 
 		g_hSequencePack[i] = FS_Open(filename, "rb", false);
 
-		if (g_hSequencePack[i] == nullptr)
+		if (g_hSequencePack[i] == NULL)
 			break;
 
 		g_nSequenceSize[i] = FS_FileLength(g_hSequencePack[i]);
@@ -82,7 +82,7 @@ extern "C" void Mod_LoadSeq(model_t *mod, byte *buffer)
 			if (FS_Eof(g_hSequencePack[i]))
 			{
 				FS_Close(g_hSequencePack[i]);
-				g_hSequencePack[i] = nullptr;
+				g_hSequencePack[i] = NULL;
 				continue;
 			}
 

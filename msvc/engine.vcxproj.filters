@@ -37,9 +37,6 @@
     <Filter Include="engine\platform\sdl">
       <UniqueIdentifier>{e1e4056c-fa78-4289-9042-877d1fe349a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="engine\common\util">
-      <UniqueIdentifier>{3a18924d-ead1-483e-acf8-ed4631ccad40}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\client\gl_vidnt.h">
@@ -186,10 +183,10 @@
     <ClInclude Include="..\engine\common\mod_decryptor.h">
       <Filter>engine\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\engine\common\util\IceKey.hpp">
-      <Filter>engine\common\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\engine\common\mod_loadseq.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\common\IceKey.hpp">
       <Filter>engine\common</Filter>
     </ClInclude>
   </ItemGroup>
@@ -590,10 +587,10 @@
     <ClCompile Include="..\engine\common\mod_decryptor.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\common\util\IceKey.cpp">
-      <Filter>engine\common\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\common\mod_loadseq.cpp">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\common\IceKey.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
   </ItemGroup>

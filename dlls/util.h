@@ -176,7 +176,7 @@ extern DLL_GLOBAL const Vector g_vecZero;
 	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
 #else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	static_assert(std::is_trivially_destructible<DLLClassName>::value, #DLLClassName##" should be TriviallyDestructible.");\
+	static_assert(std::is_trivially_destructible<DLLClassName>::value, #DLLClassName" should be TriviallyDestructible.");\
 	extern "C" void mapClassName(entvars_t *pev); \
 	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
 #endif
@@ -233,8 +233,8 @@ typedef struct hudtextparms_s
 	float x;
 	float y;
 	int effect;
-	byte r1,g1,b1,a1;
-	byte r2,g2,b2,a2;
+	byte r1, g1, b1, a1;
+	byte r2, g2, b2, a2;
 	float fadeinTime;
 	float fadeoutTime;
 	float holdTime;

@@ -18,6 +18,7 @@ XASH_COMMIT := $(firstword $(shell cd $(LOCAL_PATH)&&git rev-parse --short=6 HEA
 LOCAL_CFLAGS += -DXASH_BUILD_COMMIT=\"$(XASH_COMMIT)\"
 
 LOCAL_CONLYFLAGS += -std=c99
+LOCAL_CPPFLAGS += -std=c++11
 
 LOCAL_C_INCLUDES := \
 	$(NANOGL_PATH)/GL			    \
@@ -110,6 +111,8 @@ LOCAL_SRC_FILES := \
            common/masterlist.c \
            common/mathlib.c \
            common/matrixlib.c \
+		   common/mod_decryptor.cpp \
+		   common/mod_loadseq.cpp \
            common/mod_studio.c \
            common/model.c \
            common/net_buffer.c \
@@ -126,6 +129,7 @@ LOCAL_SRC_FILES := \
            common/world.c \
            common/zone.c \
            common/crashhandler.c \
+		   common/IceKey.cpp \
            server/sv_client.c \
            server/sv_cmds.c \
            server/sv_custom.c \

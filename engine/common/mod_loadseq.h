@@ -1,5 +1,5 @@
-#ifndef MOD_DECRYPTOR_H
-#define MOD_DECRYPTOR_H
+#ifndef MOD_LOADSEQ_H
+#define MOD_LOADSEQ_H
 
 #include "mod_local.h"
 
