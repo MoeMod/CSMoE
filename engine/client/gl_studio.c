@@ -3857,6 +3857,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 	if (name[0] == '#' || name[0] == '@')
 	{
 		int	gl_texturenum = 0;
+		int bLoop = 0;
 		do
 		{
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
@@ -3865,7 +3866,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
 				break;
 			}
-			
+
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
 			if (FS_FileExists(texname, false))
 			{
@@ -3873,7 +3874,15 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				break;
 			}
 
-		} while (0);
+			if (!bLoop)
+			{
+				char ch = '\0', *p = NULL;
+				for (char *p = name; (*p = tolower(*p)) != '\0'; ++p); // std::transform(std::begin(name), std::end(name), tolower)
+				bLoop = 1;
+				continue;
+			}
+			break;
+		} while (1);
 
 		if (gl_texturenum)
 		{
