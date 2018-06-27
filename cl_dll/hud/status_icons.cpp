@@ -26,6 +26,9 @@
 #include "event_api.h"
 #include "com_weapons.h"
 
+#include "draw_util.h"
+#include "triangleapi.h"
+
 DECLARE_MESSAGE( m_StatusIcons, StatusIcon )
 
 int CHudStatusIcons::Init( void )
@@ -36,11 +39,15 @@ int CHudStatusIcons::Init( void )
 
 	Reset();
 
+	m_tgaC4[0] = m_tgaC4[1] = 0;
+
 	return 1;
 }
 
 int CHudStatusIcons::VidInit( void )
 {
+	m_tgaC4[0] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_left_default", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	m_tgaC4[1] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_left_install", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
 	return 1;
 }
 
@@ -48,6 +55,12 @@ void CHudStatusIcons::Reset( void )
 {
 	memset( m_IconList, 0, sizeof m_IconList );
 	m_iFlags &= ~HUD_DRAW;
+}
+
+void CHudStatusIcons::Shutdown(void)
+{
+	for (int iTexture : m_tgaC4)
+		gRenderAPI.GL_FreeTexture(iTexture);
 }
 
 // Draw status icons along the left-hand side of the screen
@@ -66,10 +79,27 @@ int CHudStatusIcons::Draw( float flTime )
 		{
 			y -= ( m_IconList[i].rc.bottom - m_IconList[i].rc.top ) + 5;
 			
-			if( g_bInBombZone && !strcmp(m_IconList[i].szSpriteName, "c4") && ((int)(flTime * 10) % 2))
+			/*if( g_bInBombZone && !strcmp(m_IconList[i].szSpriteName, "c4") && ((int)(flTime * 10) % 2))
 				SPR_Set( m_IconList[i].spr, 255, 16, 16 );
-			else SPR_Set( m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b );
-			SPR_DrawAdditive( 0, x, y, &m_IconList[i].rc );
+			else SPR_Set( m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b );*/
+			if (!strcmp(m_IconList[i].szSpriteName, "c4"))
+			{
+				gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+				gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+				gRenderAPI.GL_SelectTexture(0);
+				if(g_bInBombZone && ((int)(flTime * 10) % 2))
+					gRenderAPI.GL_Bind(0, m_tgaC4[1]);
+				else
+					gRenderAPI.GL_Bind(0, m_tgaC4[0]);
+
+				DrawUtils::Draw2DQuad(x, y, x + 58, y + 55);
+			}
+			else
+			{
+				SPR_Set(m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b);
+				SPR_DrawAdditive(0, x, y, &m_IconList[i].rc);
+			}
+			
 		}
 	}
 	

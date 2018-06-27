@@ -679,6 +679,7 @@ public:
 	int Init( void );
 	int VidInit( void );
 	void Reset( void );
+	void Shutdown(void);
 	int Draw(float flTime);
 	CHudMsgFunc(StatusIcon);
 
@@ -708,6 +709,7 @@ private:
 	} icon_sprite_t;
 
 	icon_sprite_t m_IconList[MAX_ICONSPRITES];
+	int m_tgaC4[2];
 };
 
 

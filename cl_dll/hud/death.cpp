@@ -165,6 +165,7 @@ int CHudDeathNotice :: Draw( float flTime )
 				xMin -= (5 + DrawUtils::ConsoleStringLen(rgDeathNoticeList[i].szKiller));
 
 			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 
 			int *DrawBg = nullptr;
 			switch (rgDeathNoticeList[i].DrawBg)
