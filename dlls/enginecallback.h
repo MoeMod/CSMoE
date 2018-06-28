@@ -126,11 +126,12 @@ inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin = NUL
 #define ALERT				(*g_engfuncs.pfnAlertMessage)
 #define ENGINE_FPRINTF			(*g_engfuncs.pfnEngineFprintf)
 #define ALLOC_PRIVATE			(*g_engfuncs.pfnPvAllocEntPrivateData)
-inline void *GET_PRIVATE(edict_t *pent)
+template<class T = void>
+inline T *GET_PRIVATE(edict_t *pent)
 {
 	if (pent)
-		return pent->pvPrivateData;
-	return NULL;
+		return static_cast<T *>(pent->pvPrivateData);
+	return nullptr;
 }
 #define FREE_PRIVATE			(*g_engfuncs.pfnFreeEntPrivateData)
 //#define STRING			(*g_engfuncs.pfnSzFromIndex)

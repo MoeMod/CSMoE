@@ -9,11 +9,7 @@
 
 #include "h_cycler.h"
 
-#ifdef ARRAYSIZE
-#undef ARRAYSIZE
-#include <type_traits>
-#define ARRAYSIZE(x) (std::extent<decltype(x)>::value)
-#endif
+#include "arraysize.h"
 
 /*
 * Globals initialization
