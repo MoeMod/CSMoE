@@ -481,7 +481,7 @@ void CWorld::Precache()
 	// Set up game rules
 	if (g_pGameRules)
 	{
-		delete g_pGameRules;
+		delete g_pGameRules; // CS16ND/ReGameDll : NOT virtual destructor ??? Fuck it.
 	}
 
 	g_pGameRules = (CHalfLifeMultiplay *)InstallGameRules();

@@ -33,6 +33,9 @@
 #include "bot/bot_constants.h"
 #include "bot/cs_bot_manager.h"
 
+#include "cvardef.h"
+#include "gamemode/bte_mod.h"
+
 /*
 * Globals initialization
 */
@@ -146,5 +149,7 @@ CGameRules *InstallGameRules()
 	if (!gpGlobals->deathmatch)
 		return new CHalfLifeTraining;
 
-	return new CHalfLifeMultiplay;
+	//return new CHalfLifeMultiplay;
+	
+	return InstallBteMod(gamemode.string);
 }

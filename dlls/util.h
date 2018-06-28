@@ -167,16 +167,18 @@ extern DLL_GLOBAL const Vector g_vecZero;
 		PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
 
 #include <type_traits>
+#define CHECK_TRIVIALLYDESTRUCTIBLE(T) static_assert(std::is_trivially_destructible<T>::value, #T" should be TriviallyDestructible.")
+
 #ifdef CLIENT_DLL
 #define LINK_ENTITY_TO_CLASS( x, y )
 #elif defined(_WIN32)
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	static_assert(std::is_trivially_destructible<DLLClassName>::value, #DLLClassName##" should be TriviallyDestructible.");\
+	CHECK_TRIVIALLYDESTRUCTIBLE(DLLClassName);\
 	extern "C" EXPORT void mapClassName(entvars_t *pev); \
 	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
 #else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	static_assert(std::is_trivially_destructible<DLLClassName>::value, #DLLClassName" should be TriviallyDestructible.");\
+	CHECK_TRIVIALLYDESTRUCTIBLE(DLLClassName);\
 	extern "C" void mapClassName(entvars_t *pev); \
 	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
 #endif

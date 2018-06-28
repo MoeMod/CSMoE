@@ -47,6 +47,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="dlls\gamemode">
+      <UniqueIdentifier>{05781758-34ad-449d-9004-158d86af0488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -453,6 +456,12 @@
     </ClCompile>
     <ClCompile Include="..\public\unicode_strtools.cpp">
       <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_none.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\bte_mod.cpp">
+      <Filter>dlls\gamemode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -968,6 +977,12 @@
     </ClInclude>
     <ClInclude Include="..\public\arraysize.h">
       <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_none.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\bte_mod.h">
+      <Filter>dlls\gamemode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

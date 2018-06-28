@@ -253,6 +253,9 @@ public:
 	virtual void CheckMapConditions() {};
    
 public:
+	virtual ~CGameRules() {} // Added.
+
+public:
 	BOOL m_bFreezePeriod;
 	BOOL m_bBombDropped;
 };

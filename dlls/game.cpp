@@ -94,6 +94,8 @@ cvar_t sk_scientist_heal1 = { "sk_scientist_heal1", "0", 0, 0.0f, NULL };
 cvar_t sk_scientist_heal2 = { "sk_scientist_heal2", "0", 0, 0.0f, NULL };
 cvar_t sk_scientist_heal3 = { "sk_scientist_heal3", "0", 0, 0.0f, NULL };
 
+cvar_t gamemode = { "mp_gamemode", "none", FCVAR_SERVER, 0.0f, NULL };
+
 extern void Bot_RegisterCvars();
 extern void Tutor_RegisterCVars();
 extern void Hostage_RegisterCVars();
