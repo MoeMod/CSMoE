@@ -299,7 +299,7 @@ void LinkUserMessages()
 	gmsgScoreInfo = REG_USER_MSG("ScoreInfo", 9);
 	gmsgTeamInfo = REG_USER_MSG("TeamInfo", -1);
 	gmsgTeamScore = REG_USER_MSG("TeamScore", -1);
-	gmsgGameMode = REG_USER_MSG("GameMode", 1);
+	gmsgGameMode = REG_USER_MSG("GameMode", -1); // modified
 	gmsgMOTD = REG_USER_MSG("MOTD", -1);
 	gmsgServerName = REG_USER_MSG("ServerName", -1);
 	gmsgAmmoPickup = REG_USER_MSG("AmmoPickup", 2);

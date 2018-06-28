@@ -101,7 +101,35 @@ int CHud :: MsgFunc_InitHUD( const char *pszName, int iSize, void *pbuf )
 int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
-	m_Teamplay = reader.ReadByte();
+	//m_Teamplay = reader.ReadByte();
+	m_Teamplay = 1;
+
+	m_iModRunning = static_cast<GameMode_e>(reader.ReadByte());
+
+	reader.ReadByte();
+	m_Scoreboard.m_iTeamScore_Max = reader.ReadByte();
+	reader.ReadByte();
+
+	switch (m_iModRunning)
+	{
+	case MOD_NONE:
+	{
+		int iBombTargetsNum = reader.ReadByte();
+		iBombTargetsNum = min(iBombTargetsNum, 2);
+
+		m_FollowIcon.m_iBombTargetsNum = iBombTargetsNum;
+		for (int i = 0; i < iBombTargetsNum; ++i)
+		{
+			float x = reader.ReadCoord();
+			float y = reader.ReadCoord();
+			float z = reader.ReadCoord();
+			m_FollowIcon.m_vecBombTargets[i] = { x,y,z };
+		}
+		break;
+	}
+	default:
+		break;
+	}
 
 	return 1;
 }

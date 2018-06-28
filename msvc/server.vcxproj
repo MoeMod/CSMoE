@@ -422,6 +422,7 @@
     <ClInclude Include="..\dlls\func_tank.h" />
     <ClInclude Include="..\dlls\game.h" />
     <ClInclude Include="..\dlls\gamemode\bte_mod.h" />
+    <ClInclude Include="..\dlls\gamemode\bte_mod_const.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamerules.h" />
     <ClInclude Include="..\dlls\globals.h" />

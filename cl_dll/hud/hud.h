@@ -36,6 +36,8 @@
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
 
+#include "gamemode/bte_mod_const.h"
+
 #define MIN_ALPHA	 100	
 #define	HUDELEM_ACTIVE	1
 #define CHudMsgFunc(x) int MsgFunc_##x(const char *pszName, int iSize, void *buf)
@@ -115,6 +117,7 @@ struct HUDLIST {
 //
 //#include "voice_status.h"
 #include "hud_spectator.h"
+#include "followicon.h"
 
 
 //
@@ -337,8 +340,9 @@ private:
 	bool m_bShowscoresHeld;
 	cvar_t *cl_showpacketloss;
 
-private:
+public:
 	float m_flNextCache;
+	int m_iTeamScore_Max;
 	int m_iTeamScore_T, m_iTeamScore_CT;
 	int m_iTeamAlive_T, m_iTeamAlive_CT;
 
@@ -1018,6 +1022,7 @@ public:
 	CHudNVG         m_NVG;
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
+	CHudFollowIcon	m_FollowIcon;
 
 	// user messages
 	CHudMsgFunc(Damage);
@@ -1045,6 +1050,8 @@ public:
 	int m_HUD_number_0;
 
 	char m_szServerName[64];
+
+	GameMode_e m_iModRunning;
 
 private:
 	HUDLIST	*m_pHudList;

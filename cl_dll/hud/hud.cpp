@@ -250,6 +250,7 @@ void CHud :: Init( void )
 	m_StatusBar.Init();
 	m_DeathNotice.Init();
 	m_TextMessage.Init();
+	m_FollowIcon.Init();
 	m_MOTD.Init();
 
 	// all things that have own background and must be drawn last

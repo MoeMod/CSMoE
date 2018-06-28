@@ -23,6 +23,7 @@ public:
 	void UserCmd_HideRadar();
 	CClientSprite m_hRadar;
 	CClientSprite m_hRadarOpaque;
+	CClientSprite m_hRadarBombTarget[2];
 
 	int MsgFunc_BombDrop(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_BombPickup(const char *pszName, int iSize, void *pbuf);

@@ -134,6 +134,7 @@ int CHudScoreboard :: VidInit( void )
 {
 	m_iFlags |= HUD_ACTIVE;
 
+	m_iTeamScore_Max = 0;
 	m_iTeamScore_T = 0;
 	m_iTeamScore_CT = 0;
 	m_iTeamAlive_T = 0;
@@ -780,7 +781,7 @@ int CHudScoreboard::DrawTopScoreBoard(float flTime)
 
 	int textWidth_TAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_T);
 	int textWidth_CTAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_CT);
-	int roundNumber = m_iTeamScore_T + m_iTeamScore_CT + 1;
+	int roundNumber = m_iTeamScore_Max ? m_iTeamScore_Max : m_iTeamScore_T + m_iTeamScore_CT + 1;
 
 	if (roundNumber >= 1000)
 	{

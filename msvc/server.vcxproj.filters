@@ -984,5 +984,8 @@
     <ClInclude Include="..\dlls\gamemode\bte_mod.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\bte_mod_const.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

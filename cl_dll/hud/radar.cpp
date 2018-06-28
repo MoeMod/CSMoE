@@ -195,6 +195,8 @@ int CHudRadar::VidInit(void)
 
 	m_hRadar.SetSpriteByName( "radar" );
 	m_hRadarOpaque.SetSpriteByName( "radaropaque" );
+	m_hRadarBombTarget[0].SetSpriteByName("radar_a");
+	m_hRadarBombTarget[1].SetSpriteByName("radar_b");
 	iMaxRadius = (m_hRadar.rect.right - m_hRadar.rect.left) / 2.0f;
 	return 1;
 }
@@ -381,6 +383,15 @@ int CHudRadar::Draw(float flTime)
 				DrawZAxis( pos, 4, 25, 110, 255 );
 			}
 		}
+	}
+
+	// BombTarget
+	for (int i = 0; i < gHUD.m_FollowIcon.m_iBombTargetsNum; ++i)
+	{
+		Vector pos = WorldToRadar(gHUD.m_vecOrigin, gHUD.m_FollowIcon.m_vecBombTargets[i], gHUD.m_vecAngles);
+		SPR_Set(m_hRadarBombTarget[i].spr, 200, 200, 200);
+		float x = iMaxRadius + pos.x - (m_hRadarBombTarget[i].rect.right - m_hRadarBombTarget[i].rect.left) / 2.0f, y = iMaxRadius + pos.y - (m_hRadarBombTarget[i].rect.bottom - m_hRadarBombTarget[i].rect.top) / 2.0f;
+		SPR_DrawAdditive(0, x, y, &m_hRadarBombTarget[i].rect);
 	}
 
 	return 0;

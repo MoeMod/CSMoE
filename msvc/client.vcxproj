@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\cl_dll\calcscreen.cpp" />
     <ClCompile Include="..\cl_dll\cdll_int.cpp" />
     <ClCompile Include="..\cl_dll\com_weapons.cpp" />
     <ClCompile Include="..\cl_dll\cs_wpn\cs_baseentity.cpp" />
@@ -59,6 +60,7 @@
     <ClCompile Include="..\cl_dll\hud\battery.cpp" />
     <ClCompile Include="..\cl_dll\hud\death.cpp" />
     <ClCompile Include="..\cl_dll\hud\flashlight.cpp" />
+    <ClCompile Include="..\cl_dll\hud\followicon.cpp" />
     <ClCompile Include="..\cl_dll\hud\geiger.cpp" />
     <ClCompile Include="..\cl_dll\hud\health.cpp" />
     <ClCompile Include="..\cl_dll\hud\hud.cpp" />
@@ -131,34 +133,8 @@
     <ClCompile Include="..\public\unicode_strtools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\cl_dll\include\camera.h" />
-    <ClInclude Include="..\cl_dll\include\cl_dll.h" />
-    <ClInclude Include="..\cl_dll\include\cl_util.h" />
-    <ClInclude Include="..\cl_dll\include\com_weapons.h" />
-    <ClInclude Include="..\cl_dll\include\demo.h" />
-    <ClInclude Include="..\cl_dll\include\events.h" />
-    <ClInclude Include="..\cl_dll\include\eventscripts.h" />
-    <ClInclude Include="..\cl_dll\include\ev_hldm.h" />
-    <ClInclude Include="..\cl_dll\include\hud\ammo.h" />
-    <ClInclude Include="..\cl_dll\include\hud\ammohistory.h" />
-    <ClInclude Include="..\cl_dll\include\hud\health.h" />
-    <ClInclude Include="..\cl_dll\include\hud\hud.h" />
-    <ClInclude Include="..\cl_dll\include\hud\hud_iface.h" />
-    <ClInclude Include="..\cl_dll\include\hud\hud_spectator.h" />
-    <ClInclude Include="..\cl_dll\include\hud\radar.h" />
-    <ClInclude Include="..\cl_dll\include\in_defs.h" />
-    <ClInclude Include="..\cl_dll\include\kbutton.h" />
-    <ClInclude Include="..\cl_dll\include\overview.h" />
-    <ClInclude Include="..\cl_dll\include\parsemsg.h" />
-    <ClInclude Include="..\cl_dll\include\rain.h" />
-    <ClInclude Include="..\cl_dll\include\studio\GameStudioModelRenderer.h" />
-    <ClInclude Include="..\cl_dll\include\studio\StudioModelRenderer.h" />
-    <ClInclude Include="..\cl_dll\include\studio\studio_util.h" />
-    <ClInclude Include="..\cl_dll\include\tf_defs.h" />
-    <ClInclude Include="..\cl_dll\include\util_vector.h" />
-    <ClInclude Include="..\cl_dll\include\vgui_parser.h" />
-    <ClInclude Include="..\cl_dll\include\view.h" />
-    <ClInclude Include="..\cl_dll\include\wrect.h" />
+    <ClInclude Include="..\cl_dll\calcscreen.h" />
+    <ClInclude Include="..\cl_dll\hud\followicon.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
     <ClInclude Include="..\common\com_model.h" />
