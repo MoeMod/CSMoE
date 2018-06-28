@@ -135,10 +135,9 @@ SRCS := \
 DEFINES = -Wno-write-strings -DLINUX -D_LINUX -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -DCLIENT_WEAPONS -DCLIENT_DLL -Wl,--no-undefined
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH) \
-	$(LOCAL_PATH)/include \
-	$(LOCAL_PATH)/include/hud \
-	$(LOCAL_PATH)/include/studio \
-	$(LOCAL_PATH)/include/math \
+	$(LOCAL_PATH) \
+	$(LOCAL_PATH)/hud \
+	$(LOCAL_PATH)/studio \
 	$(LOCAL_PATH)/../common \
 	$(LOCAL_PATH)/../engine \
 	$(LOCAL_PATH)/../game_shared \

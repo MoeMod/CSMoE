@@ -230,10 +230,8 @@ set (CLDLL_SOURCES
 )
 
 include_directories (
-	include/
-	include/hud/
-	include/studio/
-	include/math/
+	hud/
+	studio/
 	../cl_dll/
 	../common/
 	../engine/
