@@ -34,7 +34,7 @@
 #include "bot/cs_bot_manager.h"
 
 #include "cvardef.h"
-#include "gamemode/bte_mod.h"
+#include "gamemode/mods.h"
 
 /*
 * Globals initialization
@@ -150,6 +150,6 @@ CGameRules *InstallGameRules()
 		return new CHalfLifeTraining;
 
 	//return new CHalfLifeMultiplay;
-	
-	return InstallBteMod(gamemode.string);
+	InstallBteMod(gamemode.string);
+	return g_pModRunning;
 }

@@ -33,16 +33,18 @@
 #endif
 
 #include "gamerules.h"
-#include "bte_mod_const.h"
+#include "mods_const.h"
 
 
 class IBaseMod : public CHalfLifeMultiplay
 {
 public:
 	virtual bool IsZBMode() = 0;
+	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) = 0;
 };
 
-IBaseMod *InstallBteMod(const char *name);
-IBaseMod *InstallBteMod(GameMode_e n);
+extern IBaseMod *g_pModRunning;
+
+void InstallBteMod(const char *name);
 
 #endif

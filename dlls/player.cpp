@@ -80,6 +80,9 @@
 #include "wpn_shared/wpn_smokegrenade.h"
 
 
+// gamemode
+#include "gamemode/mods.h"
+
 /*
 * Globals initialization
 */
@@ -4099,67 +4102,7 @@ bool CBasePlayer::CanPlayerBuy(bool display)
 		return CHalfLifeTraining::PlayerCanBuy(this);
 	}
 
-	// is the player alive?
-	if (pev->deadflag != DEAD_NO)
-	{
-		return false;
-	}
-
-	// is the player in a buy zone?
-	if (!(m_signals.GetState() & SIGNAL_BUY))
-	{
-		return false;
-	}
-
-	int buyTime = (int)(CVAR_GET_FLOAT("mp_buytime") * 60.0f);
-
-	if (buyTime < MIN_BUY_TIME)
-	{
-		buyTime = MIN_BUY_TIME;
-		CVAR_SET_FLOAT("mp_buytime", (MIN_BUY_TIME / 60.0f));
-	}
-
-	if (gpGlobals->time - mp->m_fRoundCount > buyTime)
-	{
-		if (display)
-		{
-			ClientPrint(pev, HUD_PRINTCENTER, "#Cant_buy", UTIL_dtos1(buyTime));
-		}
-
-		return false;
-	}
-
-	if (m_bIsVIP)
-	{
-		if (display)
-		{
-			ClientPrint(pev, HUD_PRINTCENTER, "#VIP_cant_buy");
-		}
-
-		return false;
-	}
-
-	if (mp->m_bCTCantBuy && m_iTeam == CT)
-	{
-		if (display)
-		{
-			ClientPrint(pev, HUD_PRINTCENTER, "#CT_cant_buy");
-		}
-
-		return false;
-	}
-
-	if (mp->m_bTCantBuy && m_iTeam == TERRORIST)
-	{
-		if (display)
-		{
-			ClientPrint(pev, HUD_PRINTCENTER, "#Terrorist_cant_buy");
-		}
-
-		return false;
-	}
-
-	return true;
+	return g_pModRunning->CanPlayerBuy(this, display); // rediected to IBaseMod.
 }
 
 void CBasePlayer::PreThink()

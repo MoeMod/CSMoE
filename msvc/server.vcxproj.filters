@@ -460,13 +460,13 @@
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\gamemode\bte_mod.cpp">
-      <Filter>dlls\gamemode</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\gamemode\mod_base.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mods.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
   </ItemGroup>
@@ -987,16 +987,16 @@
     <ClInclude Include="..\dlls\gamemode\mod_none.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\gamemode\bte_mod.h">
-      <Filter>dlls\gamemode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\gamemode\bte_mod_const.h">
-      <Filter>dlls\gamemode</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_base.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mods.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mods_const.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
   </ItemGroup>

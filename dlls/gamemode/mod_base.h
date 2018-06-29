@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-#include "bte_mod.h"
+#include "mods.h"
 
 class CBasePlayer; // player.h
 
@@ -15,6 +15,7 @@ public:
 	IBaseMod_RemoveObjects() {}
 
 public: // CHalfLifeMultiplay
+	BOOL IsAllowedToSpawn(CBaseEntity *pEntity);
 	void CheckMapConditions() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 

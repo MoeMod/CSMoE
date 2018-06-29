@@ -132,6 +132,7 @@ extern cvar_t sk_scientist_heal2;
 extern cvar_t sk_scientist_heal3;
 
 extern cvar_t gamemode;
+extern cvar_t maxkills;
 
 void GameDLLInit();
 

@@ -2,14 +2,15 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
-#include "bte_mod.h"
+#include "mods.h"
 
 #include <tuple>
 #include <type_traits>
 
 #include "mod_none.h"
+#include "mod_tdm.h"
 
-
+IBaseMod *g_pModRunning = nullptr;
 
 template<class T>
 IBaseMod *DefaultFactory()
@@ -20,22 +21,20 @@ IBaseMod *DefaultFactory()
 std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "", DefaultFactory<CMod_None> }, // default
 	{ "", DefaultFactory<CMod_None> }, // BTE_MOD_CS16
-	{ "none", DefaultFactory<CMod_None> } // BTE_MOD_NONE
+	{ "none", DefaultFactory<CMod_None> }, // BTE_MOD_NONE
+	{ "tdm", DefaultFactory<CMod_TeamDeathMatch> } // BTE_MOD_NONE
 };
 
-IBaseMod *InstallBteMod(const char *name)
+void InstallBteMod(const char *name)
 {
 	for (auto p : g_FindList)
 	{
 		if (!strcasecmp(name, p.first))
 		{
-			return p.second();
+			g_pModRunning = p.second();
+			return;
 		}
 	}
-	return g_FindList[0].second(); // default
-}
-
-IBaseMod *InstallBteMod(GameMode_e n)
-{
-	return g_FindList[n].second();
+	g_pModRunning = g_FindList[0].second(); // default
+	return;
 }

@@ -154,7 +154,7 @@
     <ClCompile Include="..\dlls\func_break.cpp" />
     <ClCompile Include="..\dlls\func_tank.cpp" />
     <ClCompile Include="..\dlls\game.cpp" />
-    <ClCompile Include="..\dlls\gamemode\bte_mod.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mods.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_base.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
@@ -423,8 +423,8 @@
     <ClInclude Include="..\dlls\func_break.h" />
     <ClInclude Include="..\dlls\func_tank.h" />
     <ClInclude Include="..\dlls\game.h" />
-    <ClInclude Include="..\dlls\gamemode\bte_mod.h" />
-    <ClInclude Include="..\dlls\gamemode\bte_mod_const.h" />
+    <ClInclude Include="..\dlls\gamemode\mods.h" />
+    <ClInclude Include="..\dlls\gamemode\mods_const.h" />
     <ClInclude Include="..\dlls\gamemode\mod_base.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />

@@ -127,6 +127,11 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		}
 		break;
 	}
+	case MOD_DM:
+	{
+		m_Scoreboard.m_iBGIndex = m_Scoreboard.m_iTeamDeathBG;
+		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
+	}
 	default:
 		break;
 	}

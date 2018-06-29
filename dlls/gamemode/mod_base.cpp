@@ -2,7 +2,6 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
-#include "bte_mod.h"
 #include "game.h"
 #include "enginecallback.h"
 
@@ -32,12 +31,37 @@ void IBaseMod_RemoveObjects::CheckMapConditions()
 	m_iMapHasVIPSafetyZone = MAP_HAVE_VIP_SAFETYZONE_NO;
 
 	// Hostage
-	CBaseEntity *hostage = nullptr;
+	/*CBaseEntity *hostage = nullptr;
 	while ((hostage = UTIL_FindEntityByClassname(hostage, "hostage_entity")) != nullptr)
 	{
 		// should be removed.
 		REMOVE_ENTITY(hostage->edict());
+	}*/
+}
+
+BOOL IBaseMod_RemoveObjects::IsAllowedToSpawn(CBaseEntity *pEntity)
+{
+	if(!Q_strcmp(STRING(pEntity->pev->classname), "func_bomb_target") || !Q_strcmp(STRING(pEntity->pev->classname), "info_bomb_target"))
+	{ 
+		return FALSE;
 	}
+	if (!Q_strcmp(STRING(pEntity->pev->classname), "func_hostage_rescue"))
+	{
+		return FALSE;
+	}
+	if (!Q_strcmp(STRING(pEntity->pev->classname), "func_escapezone"))
+	{
+		return FALSE;
+	}
+	if (!Q_strcmp(STRING(pEntity->pev->classname), "func_vip_safetyzone"))
+	{
+		return FALSE;
+	}
+	if (!Q_strcmp(STRING(pEntity->pev->classname), "hostage_entity"))
+	{
+		return FALSE;
+	}
+	return TRUE;
 }
 
 void IBaseMod_RemoveObjects::UpdateGameMode(CBasePlayer *pPlayer)

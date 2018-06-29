@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-#include "bte_mod.h"
+#include "mod_base.h"
 
 #include <vector>
 #include <utility>
@@ -21,6 +21,7 @@ public: // CHalfLifeMultiplay
 
 public:
 	bool IsZBMode() override { return false; }
+	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
 
 protected:
 	std::vector<std::pair<CBaseEntity *, Vector>> m_mapBombZones;

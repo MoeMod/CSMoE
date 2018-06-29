@@ -36,7 +36,7 @@
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
 
-#include "gamemode/bte_mod_const.h"
+#include "gamemode/mods_const.h"
 
 #define MIN_ALPHA	 100	
 #define	HUDELEM_ACTIVE	1
@@ -346,7 +346,7 @@ public:
 	int m_iTeamScore_T, m_iTeamScore_CT;
 	int m_iTeamAlive_T, m_iTeamAlive_CT;
 
-private:
+public:
 	int m_iBGIndex;
 	int m_iTextIndex;
 	int m_iTTextIndex, m_iCTTextIndex;

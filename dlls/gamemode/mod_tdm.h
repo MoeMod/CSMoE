@@ -18,19 +18,20 @@ public:
 	CMod_TeamDeathMatch();
 
 public: // CHalfLifeMultiplay
-	BOOL IsTeamplay(void) override;
+	BOOL IsTeamplay(void) override { return TRUE; }
 	void Think(void) override;
 	int PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarget) override;
 	void InitHUD(CBasePlayer *pl) override;
 	BOOL ClientCommand(CBasePlayer *pPlayer, const char *pcmd) override;
-	void DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pevInflictor) override;
 	BOOL FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker) override;
 	BOOL FPlayerCanRespawn(CBasePlayer *pPlayer) override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void CheckWinConditions() override {}
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
-
-private:
+	void PlayerSpawn(CBasePlayer *pPlayer) override;
+	bool CanPlayerBuy(CBasePlayer *player, bool display) override { return true; }
+public:
+	bool IsZBMode() override { return false; }
 };
 
 #endif

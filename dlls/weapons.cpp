@@ -2117,7 +2117,7 @@ void CArmoury::Spawn()
 
 void CArmoury::Restart()
 {
-	CHalfLifeMultiplay *mp = g_pGameRules;
+	auto &mp = g_pGameRules;
 
 	if (m_iItem == ARMOURY_FLASHBANG || m_iItem == ARMOURY_HEGRENADE)
 	{

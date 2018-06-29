@@ -36,7 +36,7 @@ void CHudFollowIcon::Reset(void)
 
 int CHudFollowIcon::Draw(float time)
 {
-	for (int i : {0,1})
+	for (int i = 0; i < m_iBombTargetsNum; ++i)
 	{
 		float xyScreen[2];
 		if (CalcScreen(m_vecBombTargets[i], xyScreen))
