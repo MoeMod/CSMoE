@@ -23,9 +23,9 @@ cvar_t fragsleft = { "mp_fragsleft", "0", FCVAR_SERVER | FCVAR_UNLOGGED, 0.0f, N
 cvar_t timeleft = { "mp_timeleft", "0", FCVAR_SERVER | FCVAR_UNLOGGED, 0.0f, NULL };
 cvar_t friendlyfire = { "mp_friendlyfire", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t allowmonsters = { "mp_allowmonsters", "0", FCVAR_SERVER, 0.0f, NULL };
-cvar_t roundtime = { "mp_roundtime", "5", FCVAR_SERVER, 0.0f, NULL };
+cvar_t roundtime = { "mp_roundtime", "3", FCVAR_SERVER, 0.0f, NULL };
 cvar_t buytime = { "mp_buytime", "1.5", FCVAR_SERVER, 0.0f, NULL };
-cvar_t freezetime = { "mp_freezetime", "6", FCVAR_SERVER, 0.0f, NULL };
+cvar_t freezetime = { "mp_freezetime", "3", FCVAR_SERVER, 0.0f, NULL };
 cvar_t c4timer = { "mp_c4timer", "45", FCVAR_SERVER, 0.0f, NULL };
 cvar_t ghostfrequency = { "mp_ghostfrequency", "0.1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t autokick = { "mp_autokick", "1", FCVAR_SERVER, 0.0f, NULL };
@@ -43,7 +43,7 @@ cvar_t forcechasecam = { "mp_forcechasecam", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t mapvoteratio = { "mp_mapvoteratio", "0.66", FCVAR_SERVER, 0.0f, NULL };
 cvar_t logdetail = { "mp_logdetail", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t startmoney = { "mp_startmoney", "800", FCVAR_SERVER, 0.0f, NULL };
-cvar_t maxrounds = { "mp_maxrounds", "0", FCVAR_SERVER, 0.0f, NULL };
+cvar_t maxrounds = { "mp_maxrounds", "13", FCVAR_SERVER, 0.0f, NULL };
 cvar_t winlimit = { "mp_winlimit", "0", FCVAR_SERVER, 0.0f, NULL };
 cvar_t windifference = { "mp_windifference", "1", FCVAR_SERVER, 0.0f, NULL };
 cvar_t playerid = { "mp_playerid", "0", FCVAR_SERVER, 0.0f, NULL };
@@ -95,6 +95,7 @@ cvar_t sk_scientist_heal2 = { "sk_scientist_heal2", "0", 0, 0.0f, NULL };
 cvar_t sk_scientist_heal3 = { "sk_scientist_heal3", "0", 0, 0.0f, NULL };
 
 cvar_t gamemode = { "mp_gamemode", "none", FCVAR_SERVER, 0.0f, NULL };
+cvar_t maxkills = { "mp_maxkills", "150", FCVAR_SERVER, 0.0f, NULL };
 
 extern void Bot_RegisterCvars();
 extern void Tutor_RegisterCVars();
@@ -151,6 +152,8 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&timeleft);
 	CVAR_REGISTER(&humans_join_team);
 
+	CVAR_REGISTER(&gamemode);
+	CVAR_REGISTER(&maxkills);
 
 	Bot_RegisterCvars();
 	Tutor_RegisterCVars();

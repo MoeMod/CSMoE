@@ -155,7 +155,9 @@
     <ClCompile Include="..\dlls\func_tank.cpp" />
     <ClCompile Include="..\dlls\game.cpp" />
     <ClCompile Include="..\dlls\gamemode\bte_mod.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_base.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamerules.cpp" />
     <ClCompile Include="..\dlls\ggrenade.cpp" />
     <ClCompile Include="..\dlls\globals.cpp" />
@@ -423,7 +425,9 @@
     <ClInclude Include="..\dlls\game.h" />
     <ClInclude Include="..\dlls\gamemode\bte_mod.h" />
     <ClInclude Include="..\dlls\gamemode\bte_mod_const.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_base.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamerules.h" />
     <ClInclude Include="..\dlls\globals.h" />
     <ClInclude Include="..\dlls\healthkit.h" />

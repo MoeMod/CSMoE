@@ -13,7 +13,7 @@
 
 void CMod_None::CheckMapConditions()
 {
-	CHalfLifeMultiplay::CheckMapConditions();
+	IBaseMod::CheckMapConditions();
 	if (m_bMapHasBombZone)
 	{
 		m_mapBombZones.clear();
@@ -40,7 +40,7 @@ void CMod_None::UpdateGameMode(CBasePlayer *pPlayer)
 	WRITE_BYTE(MOD_NONE);
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
 	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
-	WRITE_BYTE(13); // MaxTime (mp_roundlimit)
+	WRITE_BYTE(0); // Reserved. (MaxTime?)
 
 	if (m_bMapHasBombZone) // BombTarget Position (for followicon & radar)
 	{
