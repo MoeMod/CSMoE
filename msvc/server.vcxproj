@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\dlls\addons\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\airtank.cpp" />
     <ClCompile Include="..\dlls\ammo.cpp" />
     <ClCompile Include="..\dlls\animating.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="..\dlls\game.cpp" />
     <ClCompile Include="..\dlls\gamemode\mods.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_base.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_dm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamerules.cpp" />
@@ -381,6 +383,7 @@
     <ClInclude Include="..\common\winsani_in.h" />
     <ClInclude Include="..\common\winsani_out.h" />
     <ClInclude Include="..\dlls\activity.h" />
+    <ClInclude Include="..\dlls\addons\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\airtank.h" />
     <ClInclude Include="..\dlls\ammo.h" />
     <ClInclude Include="..\dlls\animation.h" />
@@ -426,6 +429,7 @@
     <ClInclude Include="..\dlls\gamemode\mods.h" />
     <ClInclude Include="..\dlls\gamemode\mods_const.h" />
     <ClInclude Include="..\dlls\gamemode\mod_base.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_dm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamerules.h" />

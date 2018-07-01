@@ -160,33 +160,6 @@ void CMod_TeamDeathMatch::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller,
 	// TODO: RespawnBar.
 }
 
-int CMod_TeamDeathMatch::PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarget)
-{
-	return IBaseMod::PlayerRelationship(pPlayer, pTarget);
-}
-
-BOOL CMod_TeamDeathMatch::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
-{
-	if (m_VoiceGameMgr.ClientCommand(pPlayer, pcmd))
-		return TRUE;
-
-	return FALSE;
-}
-
-void CMod_TeamDeathMatch::InitHUD(CBasePlayer *pl)
-{
-	IBaseMod::InitHUD(pl); // CHalfLifeMultiplay
-
-	if (g_fGameOver)
-	{
-		MESSAGE_BEGIN(MSG_ONE, SVC_INTERMISSION, NULL, pl->edict());
-		MESSAGE_END();
-	}
-
-	//CLIENT_COMMAND(pl->edict(), "spectate\n");
-
-}
-
 BOOL CMod_TeamDeathMatch::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
 {
 	if (pAttacker && PlayerRelationship(pPlayer, pAttacker) == GR_TEAMMATE)

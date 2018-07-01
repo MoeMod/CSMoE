@@ -8,6 +8,7 @@
 #include <type_traits>
 
 #include "mod_none.h"
+#include "mod_dm.h"
 #include "mod_tdm.h"
 
 IBaseMod *g_pModRunning = nullptr;
@@ -22,6 +23,7 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "", DefaultFactory<CMod_None> }, // default
 	{ "", DefaultFactory<CMod_None> }, // BTE_MOD_CS16
 	{ "none", DefaultFactory<CMod_None> }, // BTE_MOD_NONE
+	{ "dm", DefaultFactory<CMod_DeathMatch> }, // BTE_MOD_NONE
 	{ "tdm", DefaultFactory<CMod_TeamDeathMatch> } // BTE_MOD_NONE
 };
 

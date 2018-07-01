@@ -1076,12 +1076,12 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 				if (CVAR_GET_FLOAT("mp_friendlyfire"))
 				{
-					if (pGrenade->m_iTeam == m_iTeam)
+					if (g_pGameRules->IsTeamplay() && pGrenade->m_iTeam == m_iTeam)
 						teamAttack = TRUE;
 
 					pAttack = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pevAttacker));
 				}
-				else if (pGrenade->m_iTeam == m_iTeam && (&edict()->v != pevAttacker))
+				else if (g_pGameRules->IsTeamplay() && pGrenade->m_iTeam == m_iTeam && (&edict()->v != pevAttacker))
 				{
 					return 0;
 				}
@@ -1236,8 +1236,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	{
 		pAttack = GetClassPtr((CBasePlayer *)pevAttacker);
 
-		bool bAttackFFA = false;
-
+		bool bAttackFFA = !g_pGameRules->IsTeamplay();
 
 		// warn about team attacks
 		if (pAttack != this && pAttack->m_iTeam == m_iTeam && !bAttackFFA)

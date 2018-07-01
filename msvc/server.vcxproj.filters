@@ -50,6 +50,9 @@
     <Filter Include="dlls\gamemode">
       <UniqueIdentifier>{05781758-34ad-449d-9004-158d86af0488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\addons">
+      <UniqueIdentifier>{6d0bdb0b-532f-4797-b519-667aabb523c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -468,6 +471,12 @@
     </ClCompile>
     <ClCompile Include="..\dlls\gamemode\mods.cpp">
       <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_dm.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\addons\csdm_randomspawn.cpp">
+      <Filter>dlls\addons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -998,6 +1007,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mods_const.h">
       <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_dm.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\addons\csdm_randomspawn.h">
+      <Filter>dlls\addons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
