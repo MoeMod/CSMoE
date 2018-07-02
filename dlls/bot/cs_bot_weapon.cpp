@@ -940,7 +940,7 @@ bool CCSBot::IsFriendInLineOfFire()
 		{
 			CBasePlayer *player = static_cast<CBasePlayer *>(victim);
 
-			if (player->m_iTeam == m_iTeam)
+			if (g_pGameRules->IsTeamplay() && player->m_iTeam == m_iTeam)
 				return true;
 		}
 	}

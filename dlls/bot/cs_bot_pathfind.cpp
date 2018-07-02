@@ -1164,7 +1164,7 @@ bool CCSBot::IsFriendInTheWay(const Vector *goalPos) const
 		if (!player->IsAlive())
 			continue;
 
-		if (player->m_iTeam != m_iTeam)
+		if (!g_pGameRules->IsTeamplay() || player->m_iTeam != m_iTeam)
 			continue;
 
 		if (player == this)

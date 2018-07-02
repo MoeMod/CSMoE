@@ -743,7 +743,7 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 				continue;
 
 			// is it an enemy?
-			if (player->m_iTeam == m_iTeam)
+			if (g_pGameRules->IsTeamplay() && player->m_iTeam == m_iTeam)
 			{
 				TraceResult result;
 				UTIL_TraceLine(GetEyePosition(), player->pev->origin, ignore_monsters, ignore_glass, edict(), &result);

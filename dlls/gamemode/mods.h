@@ -34,15 +34,9 @@
 
 #include "gamerules.h"
 #include "mods_const.h"
+#include "mod_base.h" // IBaseMod
 
-
-class IBaseMod : public CHalfLifeMultiplay
-{
-public:
-	virtual bool IsZBMode() = 0;
-	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) = 0;
-};
-
+class IBaseMod;
 extern IBaseMod *g_pModRunning;
 
 void InstallBteMod(const char *name);

@@ -242,7 +242,7 @@ BOOL CMod_DeathMatch::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pA
 		}
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 BOOL CMod_DeathMatch::FPlayerCanRespawn(CBasePlayer *pPlayer)
@@ -283,6 +283,7 @@ void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 
+	pPlayer->m_signals.Signal(SIGNAL_BUY);
 }
 
 bool CMod_DeathMatch::CheckWinLimitDM()

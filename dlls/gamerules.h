@@ -182,6 +182,7 @@ enum
 };
 
 class CItem;
+class CBasePlayerAmmo;
 
 class CGameRules
 {

@@ -50,8 +50,8 @@
     <Filter Include="dlls\gamemode">
       <UniqueIdentifier>{05781758-34ad-449d-9004-158d86af0488}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dlls\addons">
-      <UniqueIdentifier>{6d0bdb0b-532f-4797-b519-667aabb523c2}</UniqueIdentifier>
+    <Filter Include="dlls\player">
+      <UniqueIdentifier>{7527e99f-2172-40a6-8acb-1d1efbc75db9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -245,9 +245,6 @@
       <Filter>dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\tutor_base_states.cpp">
-      <Filter>dlls</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dlls\hintmessage.cpp">
       <Filter>dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\globals.cpp">
@@ -475,8 +472,17 @@
     <ClCompile Include="..\dlls\gamemode\mod_dm.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\addons\csdm_randomspawn.cpp">
-      <Filter>dlls\addons</Filter>
+    <ClCompile Include="..\dlls\player\player_spawnpoint.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\player\hintmessage.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\player\player_msg.cpp">
+      <Filter>dlls\player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -556,9 +562,6 @@
       <Filter>dlls</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons.h">
-      <Filter>dlls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\hintmessage.h">
       <Filter>dlls</Filter>
     </ClInclude>
     <ClInclude Include="..\game_shared\bot\bot_util.h">
@@ -1011,8 +1014,23 @@
     <ClInclude Include="..\dlls\gamemode\mod_dm.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\addons\csdm_randomspawn.h">
-      <Filter>dlls\addons</Filter>
+    <ClInclude Include="..\dlls\player\csdm_randomspawn.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_spawnpoint.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_const.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_signal.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\hintmessage.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_msg.h">
+      <Filter>dlls\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

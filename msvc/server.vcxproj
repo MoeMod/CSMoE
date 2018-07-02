@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\dlls\addons\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\airtank.cpp" />
     <ClCompile Include="..\dlls\ammo.cpp" />
     <ClCompile Include="..\dlls\animating.cpp" />
@@ -164,7 +163,6 @@
     <ClCompile Include="..\dlls\ggrenade.cpp" />
     <ClCompile Include="..\dlls\globals.cpp" />
     <ClCompile Include="..\dlls\healthkit.cpp" />
-    <ClCompile Include="..\dlls\hintmessage.cpp" />
     <ClCompile Include="..\dlls\hostage\hostage.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -212,6 +210,10 @@
     <ClCompile Include="..\dlls\plane.cpp" />
     <ClCompile Include="..\dlls\plats.cpp" />
     <ClCompile Include="..\dlls\player.cpp" />
+    <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp" />
+    <ClCompile Include="..\dlls\player\hintmessage.cpp" />
+    <ClCompile Include="..\dlls\player\player_msg.cpp" />
+    <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />
     <ClCompile Include="..\dlls\sound.cpp" />
@@ -383,7 +385,6 @@
     <ClInclude Include="..\common\winsani_in.h" />
     <ClInclude Include="..\common\winsani_out.h" />
     <ClInclude Include="..\dlls\activity.h" />
-    <ClInclude Include="..\dlls\addons\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\airtank.h" />
     <ClInclude Include="..\dlls\ammo.h" />
     <ClInclude Include="..\dlls\animation.h" />
@@ -435,7 +436,6 @@
     <ClInclude Include="..\dlls\gamerules.h" />
     <ClInclude Include="..\dlls\globals.h" />
     <ClInclude Include="..\dlls\healthkit.h" />
-    <ClInclude Include="..\dlls\hintmessage.h" />
     <ClInclude Include="..\dlls\hostage\hostage.h" />
     <ClInclude Include="..\dlls\hostage\hostage_improv.h" />
     <ClInclude Include="..\dlls\hostage\hostage_localnav.h" />
@@ -458,6 +458,12 @@
     <ClInclude Include="..\dlls\plane.h" />
     <ClInclude Include="..\dlls\plats.h" />
     <ClInclude Include="..\dlls\player.h" />
+    <ClInclude Include="..\dlls\player\csdm_randomspawn.h" />
+    <ClInclude Include="..\dlls\player\hintmessage.h" />
+    <ClInclude Include="..\dlls\player\player_const.h" />
+    <ClInclude Include="..\dlls\player\player_msg.h" />
+    <ClInclude Include="..\dlls\player\player_signal.h" />
+    <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
     <ClInclude Include="..\dlls\schedule.h" />
     <ClInclude Include="..\dlls\scriptevent.h" />

@@ -367,6 +367,7 @@ public:
 	int m_iText_1st;
 	int m_iText_Kill;
 	int m_iText_Round;
+	bool m_bIsTeamplay;
 };
 
 //

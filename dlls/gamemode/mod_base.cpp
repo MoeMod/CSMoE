@@ -9,6 +9,8 @@
 
 #include "mod_base.h"
 
+#include "player/csdm_randomspawn.h"
+
 void IBaseMod_RemoveObjects::CheckMapConditions()
 {
 	//CHalfLifeMultiplay::CheckMapConditions();
@@ -73,4 +75,34 @@ void IBaseMod_RemoveObjects::UpdateGameMode(CBasePlayer *pPlayer)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 	// CAN BE EXTENDED.
 	MESSAGE_END();
+}
+
+edict_t *IBaseMod_RandomSpawn::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
+{
+	// completely rewrites it
+
+	// gat valid spawn point
+	edict_t *pentSpawnSpot = EntSelectSpawnPoint(pPlayer);
+
+	// Move the player to the place it said.
+	// Note that here has been modified
+	//pPlayer->pev->origin = VARS(pentSpawnSpot)->origin + Vector(0, 0, 1);
+	//pPlayer->pev->v_angle = g_vecZero;
+	//pPlayer->pev->velocity = g_vecZero;
+	//pPlayer->pev->angles = VARS(pentSpawnSpot)->angles;
+
+	CSDM_DoRandomSpawn(pPlayer);
+
+	pPlayer->pev->punchangle = g_vecZero;
+	pPlayer->pev->fixangle = 1;
+
+	if (IsMultiplayer())
+	{
+		if (pentSpawnSpot->v.target)
+		{
+			FireTargets(STRING(pentSpawnSpot->v.target), pPlayer, pPlayer, USE_TOGGLE, 0);
+		}
+	}
+
+	return pentSpawnSpot;
 }

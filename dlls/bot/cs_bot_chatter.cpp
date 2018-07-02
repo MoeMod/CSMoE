@@ -123,6 +123,10 @@ void BotMeme::Transmit(CCSBot *sender) const
 		if (sender->m_iTeam != player->m_iTeam)
 			continue;
 
+		// no teamplay chat what jb?
+		if(!g_pGameRules->IsTeamplay())
+			continue;
+
 		// if not a bot, fail the test
 		if (!player->IsBot())
 			continue;

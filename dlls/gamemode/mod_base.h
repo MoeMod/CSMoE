@@ -9,16 +9,30 @@
 
 class CBasePlayer; // player.h
 
-class IBaseMod_RemoveObjects : public IBaseMod
+#pragma warning(push)
+#pragma warning(disable:4250) // fuck diamond inhertance warning
+
+class IBaseMod : public CHalfLifeMultiplay
 {
 public:
-	IBaseMod_RemoveObjects() {}
+	virtual bool IsZBMode() = 0;
+	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) = 0;
+};
 
+class IBaseMod_RemoveObjects : virtual public IBaseMod
+{
 public: // CHalfLifeMultiplay
-	BOOL IsAllowedToSpawn(CBaseEntity *pEntity);
+	BOOL IsAllowedToSpawn(CBaseEntity *pEntity) override;
 	void CheckMapConditions() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
+};
+
+class IBaseMod_RandomSpawn : virtual public IBaseMod
+{
+public: // CHalfLifeMultiplay
+	edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer) override;
 
 };
+
 
 #endif

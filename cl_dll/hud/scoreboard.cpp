@@ -159,6 +159,7 @@ int CHudScoreboard :: VidInit( void )
 	m_iTextIndex = m_iText_Round;
 	m_iTTextIndex = m_iText_T;
 	m_iCTTextIndex = m_iText_CT;
+	m_bIsTeamplay = true;
 
 	BuildHudNumberRect(m_iNum_L, m_rcNumber_Large, 13, 13, 1, 1);
 	BuildHudNumberRect(m_iNum_S, m_rcNumber_Small, 10, 10, 1, 1);
@@ -408,6 +409,29 @@ int CHudScoreboard :: DrawTeams( float list_slot )
 	return 1;
 }
 
+int FindBestPlayer(const char *team = NULL)
+{
+	int best_player = 0;
+	int highest_frags = -99999;	int lowest_deaths = 99999;
+	for (int i = 1; i < MAX_PLAYERS; i++)
+	{
+		if (g_PlayerInfoList[i].name && g_PlayerExtraInfo[i].frags >= highest_frags)
+		{
+			if (!team || !stricmp(g_PlayerExtraInfo[i].teamname, team))  // make sure it is the specified team
+			{
+				extra_player_info_t *pl_info = &g_PlayerExtraInfo[i];
+				if (pl_info->frags > highest_frags || pl_info->deaths < lowest_deaths)
+				{
+					best_player = i;
+					lowest_deaths = pl_info->deaths;
+					highest_frags = pl_info->frags;
+				}
+			}
+		}
+	}
+	return best_player;
+}
+
 // returns the ypos where it finishes drawing
 int CHudScoreboard :: DrawPlayers( float list_slot, int nameoffset, const char *team )
 {
@@ -415,25 +439,8 @@ int CHudScoreboard :: DrawPlayers( float list_slot, int nameoffset, const char *
 	while ( 1 )
 	{
 		// Find the top ranking player
-		int highest_frags = -99999;	int lowest_deaths = 99999;
-		int best_player = 0;
-
-		for ( int i = 1; i < MAX_PLAYERS; i++ )
-		{
-			if ( g_PlayerInfoList[i].name && g_PlayerExtraInfo[i].frags >= highest_frags )
-			{
-				if ( !(team && stricmp(g_PlayerExtraInfo[i].teamname, team)) )  // make sure it is the specified team
-				{
-					extra_player_info_t *pl_info = &g_PlayerExtraInfo[i];
-					if ( pl_info->frags > highest_frags || pl_info->deaths < lowest_deaths )
-					{
-						best_player = i;
-						lowest_deaths = pl_info->deaths;
-						highest_frags = pl_info->frags;
-					}
-				}
-			}
-		}
+		
+		int best_player = FindBestPlayer(team);
 
 		if ( !best_player )
 			break;
@@ -783,6 +790,15 @@ int CHudScoreboard::DrawTopScoreBoard(float flTime)
 	int textWidth_CTAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_CT);
 	int roundNumber = m_iTeamScore_Max ? m_iTeamScore_Max : m_iTeamScore_T + m_iTeamScore_CT + 1;
 
+	if (!m_bIsTeamplay)
+	{
+		int best_player = FindBestPlayer();
+		m_iTeamScore_CT = g_PlayerExtraInfo[gEngfuncs.GetLocalPlayer()->index].frags;
+		m_iTeamScore_T = best_player ? g_PlayerExtraInfo[best_player].frags : 0;
+		
+		roundNumber = m_iTeamScore_Max ? m_iTeamScore_Max : 0;
+	}
+
 	if (roundNumber >= 1000)
 	{
 		int textWidth = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_4DIGITS | DHN_3DIGITS | DHN_2DIGITS | DHN_DRAWZERO, roundNumber);
@@ -849,11 +865,14 @@ int CHudScoreboard::DrawTopScoreBoard(float flTime)
 			DrawHudNumber(m_iNum_L, m_rcNumber_Large, ((ScreenWidth) / 2) + 73 - (textWidth_CT / 2), bgY + 10, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamScore_CT, 128, 128, 128);
 	}
 
-	if (textWidth_TAlive > 0)
-		DrawHudNumber(m_iNum_S, m_rcNumber_Small, (ScreenWidth) / 2 - 69, bgY + 30, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_T, 128, 128, 128);
+	if (m_bIsTeamplay)
+	{
+		if (textWidth_TAlive > 0)
+			DrawHudNumber(m_iNum_S, m_rcNumber_Small, (ScreenWidth) / 2 - 69, bgY + 30, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_T, 128, 128, 128);
 
-	if (textWidth_CTAlive > 0)
-		DrawHudNumber(m_iNum_S, m_rcNumber_Small, (ScreenWidth) / 2 + 47, bgY + 30, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_CT, 128, 128, 128);
+		if (textWidth_CTAlive > 0)
+			DrawHudNumber(m_iNum_S, m_rcNumber_Small, (ScreenWidth) / 2 + 47, bgY + 30, DHN_2DIGITS | DHN_DRAWZERO, m_iTeamAlive_CT, 128, 128, 128);
+	}
 
 	return 1;
 }

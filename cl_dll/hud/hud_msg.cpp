@@ -125,12 +125,17 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 			float z = reader.ReadCoord();
 			m_FollowIcon.m_vecBombTargets[i] = { x,y,z };
 		}
+		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
 		break;
 	}
 	case MOD_DM:
 	{
 		m_Scoreboard.m_iBGIndex = m_Scoreboard.m_iTeamDeathBG;
 		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
+		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_1st;
+		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_Kill;
+		m_Scoreboard.m_bIsTeamplay = false;
+		break;
 	}
 	default:
 		break;

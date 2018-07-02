@@ -16,6 +16,7 @@
 #include "world.h"
 #include "game.h"
 #include "gamemode/mods.h"
+#include "player/csdm_randomspawn.h"
 
 edict_t *g_pBodyQueueHead;
 CGlobalState gGlobalState;
@@ -486,6 +487,7 @@ void CWorld::Precache()
 		delete g_pGameRules; // CS16ND/ReGameDll : NOT virtual destructor ??? Fuck it.
 	}
 	g_pGameRules = (CHalfLifeMultiplay *)InstallGameRules();
+	CSDM_LoadSpawnPoints();
 	
 
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here

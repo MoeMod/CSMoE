@@ -147,6 +147,10 @@ LOCAL_SRC_FILES := \
 	wpn_shared/wpn_ump45.cpp \
 	wpn_shared/wpn_usp.cpp \
 	wpn_shared/wpn_xm1014.cpp \
+	gamemode/mods.cpp \
+	gamemode/mod_base.cpp \
+	gamemode/mod_none.cpp \
+	gamemode/mod_tdm.cpp \
 	../public/unicode_strtools.cpp \
 	../game_shared/bot/bot.cpp \
 	../game_shared/bot/bot_manager.cpp \

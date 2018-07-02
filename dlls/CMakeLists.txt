@@ -177,6 +177,10 @@ set(HLDLL_SRCS
 	./hostage/states/hostage_follow.cpp
 	./hostage/states/hostage_idle.cpp
 	./hostage/states/hostage_retreat.cpp
+	./gamemode/mods.cpp
+	./gamemode/mod_base.cpp
+	./gamemode/mod_none.cpp
+	./gamemode/mod_tdm.cpp
 	./../public/unicode_strtools.cpp
 	)
 

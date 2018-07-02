@@ -137,7 +137,7 @@ int CCSBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float fl
 	{
 		CBasePlayer *player = static_cast<CBasePlayer *>(attacker);
 
-		if (player->m_iTeam == m_iTeam && !player->IsBot())
+		if (g_pGameRules->IsTeamplay() && player->m_iTeam == m_iTeam && !player->IsBot())
 		{
 			GetChatter()->FriendlyFire();
 		}
@@ -732,7 +732,7 @@ CBasePlayer *CCSBot::GetImportantEnemy(bool checkVisibility) const
 			continue;
 
 		// skip friends
-		if (player->m_iTeam == m_iTeam)
+		if (g_pGameRules->IsTeamplay() && player->m_iTeam == m_iTeam)
 			continue;
 
 		// is it "important"

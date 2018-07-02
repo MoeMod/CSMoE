@@ -159,23 +159,13 @@ set (HUD_SRCS
 	./hud/death.cpp
 	./hud/saytext.cpp
 	./hud/spectator_gui.cpp
-	./include/hud/ammo.h
-	./include/hud/ammohistory.h
-	./include/hud/health.h
-	./include/hud/hud.h
-	./include/hud/hud_iface.h
-	./include/hud/hud_spectator.h
-	./include/hud/radar.h
+	./hud/followicon.cpp
 )
 
 set (STUDIORENDER_SRCS
 	./studio/GameStudioModelRenderer.cpp
 	./studio/StudioModelRenderer.cpp
 	./studio/studio_util.cpp
-
-	./include/studio/GameStudioModelRenderer.h
-	./include/studio/StudioModelRenderer.h
-	./include/studio/studio_util.h
 
 )
 
@@ -200,27 +190,7 @@ set (CLDLL_SOURCES
     ./vgui_parser.cpp
     ../public/unicode_strtools.cpp
 	./draw_util.cpp
-	./include/camera.h
-	./include/cl_dll.h
-	./include/cl_util.h
-	./include/com_weapons.h
-	./include/csprite.h
-	./include/demo.h
-	./include/draw_util.h
-	./include/eventscripts.h
-	./include/events.h
-	./include/ev_hldm.h
-	./include/overview.h
-	./include/parsemsg.h
-	./include/rain.h
-	./include/tf_defs.h
-	../public/unicode_strtools.h
-	./include/util_vector.h
-	./include/vgui_parser.h
-	./include/view.h
-	./include/wrect.h
-	./include/math/neon_mathfun.h
-	./include/math/sse_mathfun.h
+	./calcscreen.cpp
 
 	${PLAYERMOVE_SRCS}
 	${HUD_SRCS}

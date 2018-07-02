@@ -11,10 +11,12 @@ class CBaseEntity; // cbase.h
 class CBasePlayer; // player.h
 typedef struct entvars_s entvars_t; // progdefs.h
 
-class CMod_DeathMatch : public IBaseMod_RemoveObjects
+class CMod_DeathMatch : public IBaseMod_RemoveObjects, public IBaseMod_RandomSpawn
 {
 public:
 	CMod_DeathMatch();
+
+	using IBaseMod_RemoveObjects::IsAllowedToSpawn;
 
 public: // CHalfLifeMultiplay
 	BOOL IsTeamplay(void) override { return FALSE; }
@@ -33,6 +35,7 @@ public:
 public:
 	int CalcLeaderFrags();
 	bool CheckWinLimitDM();
+	void UpdateTeamScores();
 };
 
 #endif

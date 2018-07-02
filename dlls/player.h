@@ -33,7 +33,7 @@
 #endif
 
 #include "pm_materials.h"
-#include "hintmessage.h"
+#include "player/hintmessage.h"
 #include "weapons.h"
 
 #define MIN_BUY_TIME			15	// the minimum threshold values for cvar mp_buytime 15 sec's
@@ -113,34 +113,7 @@
 #define DHM_ROUND_CLEAR			(DHF_ROUND_STARTED | DHF_HOSTAGE_KILLED | DHF_FRIEND_KILLED | DHF_BOMB_RETRIEVED)
 #define DHM_CONNECT_CLEAR		(DHF_HOSTAGE_SEEN_FAR | DHF_HOSTAGE_SEEN_NEAR | DHF_HOSTAGE_USED | DHF_HOSTAGE_INJURED | DHF_FRIEND_SEEN | DHF_ENEMY_SEEN | DHF_FRIEND_INJURED | DHF_ENEMY_KILLED | DHF_AMMO_EXHAUSTED | DHF_IN_TARGET_ZONE | DHF_IN_RESCUE_ZONE | DHF_IN_ESCAPE_ZONE | DHF_IN_VIPSAFETY_ZONE | DHF_HOSTAGE_CTMOVE | DHF_SPEC_DUCK)
 
-#define SIGNAL_BUY			(1<<0)
-#define SIGNAL_BOMB			(1<<1)
-#define SIGNAL_RESCUE			(1<<2)
-#define SIGNAL_ESCAPE			(1<<3)
-#define SIGNAL_VIPSAFETY		(1<<4)
-
-class CUnifiedSignals
-{
-public:
-	CUnifiedSignals()
-	{
-		m_flSignal = 0;
-		m_flState = 0;
-	}
-public:
-	void Update()
-	{
-		m_flState = m_flSignal;
-		m_flSignal = 0;
-	}
-	void Signal(int flags) { m_flSignal |= flags; }
-	int GetSignal() const { return m_flSignal; }
-	int GetState() const { return m_flState; }
-
-private:
-	int m_flSignal;
-	int m_flState;
-};
+#include "player/player_signal.h"
 
 #define IGNOREMSG_NONE			0
 #define IGNOREMSG_ENEMY			1
@@ -181,135 +154,7 @@ private:
 #define SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
-typedef enum
-{
-	PLAYER_IDLE,
-	PLAYER_WALK,
-	PLAYER_JUMP,
-	PLAYER_SUPERJUMP,
-	PLAYER_DIE,
-	PLAYER_ATTACK1,
-	PLAYER_ATTACK2,
-	PLAYER_FLINCH,
-	PLAYER_LARGE_FLINCH,
-	PLAYER_RELOAD,
-	PLAYER_HOLDBOMB
-
-} PLAYER_ANIM;
-
-typedef enum
-{
-	Menu_OFF,
-	Menu_ChooseTeam,
-	Menu_IGChooseTeam,
-	Menu_ChooseAppearance,
-	Menu_Buy,
-	Menu_BuyPistol,
-	Menu_BuyRifle,
-	Menu_BuyMachineGun,
-	Menu_BuyShotgun,
-	Menu_BuySubMachineGun,
-	Menu_BuyItem,
-	Menu_Radio1,
-	Menu_Radio2,
-	Menu_Radio3,
-	Menu_ClientBuy
-
-} _Menu;
-
-typedef enum
-{
-	UNASSIGNED,
-	TERRORIST,
-	CT,
-	SPECTATOR,
-
-} TeamName;
-
-typedef enum
-{
-	MODEL_UNASSIGNED,
-	MODEL_URBAN,
-	MODEL_TERROR,
-	MODEL_LEET,
-	MODEL_ARCTIC,
-	MODEL_GSG9,
-	MODEL_GIGN,
-	MODEL_SAS,
-	MODEL_GUERILLA,
-	MODEL_VIP,
-	MODEL_MILITIA,
-	MODEL_SPETSNAZ
-
-} ModelName;
-
-typedef enum
-{
-	JOINED,
-	SHOWLTEXT,
-	READINGLTEXT,
-	SHOWTEAMSELECT,
-	PICKINGTEAM,
-	GETINTOGAME
-
-} JoinState;
-
-typedef enum
-{
-	CMD_SAY = 0,
-	CMD_SAYTEAM,
-	CMD_FULLUPDATE,
-	CMD_VOTE,
-	CMD_VOTEMAP,
-	CMD_LISTMAPS,
-	CMD_LISTPLAYERS,
-	CMD_NIGHTVISION,
-	COMMANDS_TO_TRACK,
-
-} TrackCommands;
-
-typedef struct
-{
-	int m_primaryWeapon;
-	int m_primaryAmmo;
-	int m_secondaryWeapon;
-	int m_secondaryAmmo;
-	int m_heGrenade;
-	int m_flashbang;
-	int m_smokeGrenade;
-	int m_defuser;
-	int m_nightVision;
-	int m_armor;
-
-} RebuyStruct;
-
-typedef enum
-{
-	THROW_NONE,
-	THROW_FORWARD,
-	THROW_BACKWARD,
-	THROW_HITVEL,
-	THROW_BOMB,
-	THROW_GRENADE,
-	THROW_HITVEL_MINUS_AIRVEL
-
-} ThrowDirection;
-
-enum sbar_data
-{
-	SBAR_ID_TARGETTYPE = 1,
-	SBAR_ID_TARGETNAME,
-	SBAR_ID_TARGETHEALTH,
-	SBAR_END
-};
-
-typedef enum
-{
-	SILENT,
-	CALM,
-	INTENSE
-
-} MusicState;
+#include "player/player_const.h"
 
 struct WeaponStruct
 {
@@ -830,87 +675,7 @@ extern CBaseEntity *g_pLastTerroristSpawn;
 extern BOOL gInitHUD;
 extern cvar_t *sv_aim;
 
-extern int giPrecacheGrunt;
-extern int gmsgWeapPickup;
-extern int gmsgHudText;
-extern int gmsgHudTextArgs;
-extern int gmsgShake;
-extern int gmsgFade;
-extern int gmsgFlashlight;
-extern int gmsgFlashBattery;
-extern int gmsgResetHUD;
-extern int gmsgInitHUD;
-extern int gmsgViewMode;
-extern int gmsgShowGameTitle;
-extern int gmsgCurWeapon;
-extern int gmsgHealth;
-extern int gmsgDamage;
-extern int gmsgBattery;
-extern int gmsgTrain;
-extern int gmsgLogo;
-extern int gmsgWeaponList;
-extern int gmsgAmmoX;
-extern int gmsgDeathMsg;
-extern int gmsgScoreAttrib;
-extern int gmsgScoreInfo;
-extern int gmsgTeamInfo;
-extern int gmsgTeamScore;
-extern int gmsgGameMode;
-extern int gmsgMOTD;
-extern int gmsgServerName;
-extern int gmsgAmmoPickup;
-extern int gmsgItemPickup;
-extern int gmsgHideWeapon;
-extern int gmsgSayText;
-extern int gmsgTextMsg;
-extern int gmsgSetFOV;
-extern int gmsgShowMenu;
-extern int gmsgSendAudio;
-extern int gmsgRoundTime;
-extern int gmsgMoney;
-extern int gmsgBlinkAcct;
-extern int gmsgArmorType;
-extern int gmsgStatusValue;
-extern int gmsgStatusText;
-extern int gmsgStatusIcon;
-extern int gmsgBarTime;
-extern int gmsgReloadSound;
-extern int gmsgCrosshair;
-extern int gmsgNVGToggle;
-extern int gmsgRadar;
-extern int gmsgSpectator;
-extern int gmsgVGUIMenu;
-extern int gmsgCZCareer;
-extern int gmsgCZCareerHUD;
-extern int gmsgTaskTime;
-extern int gmsgTutorText;
-extern int gmsgTutorLine;
-extern int gmsgShadowIdx;
-extern int gmsgTutorState;
-extern int gmsgTutorClose;
-extern int gmsgAllowSpec;
-extern int gmsgBombDrop;
-extern int gmsgBombPickup;
-extern int gmsgHostagePos;
-extern int gmsgHostageK;
-extern int gmsgGeigerRange;
-extern int gmsgSendCorpse;
-extern int gmsgHLTV;
-extern int gmsgSpecHealth;
-extern int gmsgForceCam;
-extern int gmsgADStop;
-extern int gmsgReceiveW;
-extern int gmsgScenarioIcon;
-extern int gmsgBotVoice;
-extern int gmsgBuyClose;
-extern int gmsgItemStatus;
-extern int gmsgLocation;
-extern int gmsgSpecHealth2;
-extern int gmsgBarTime2;
-extern int gmsgBotProgress;
-extern int gmsgBrass;
-extern int gmsgFog;
-extern int gmsgShowTimer;
+#include "player/player_msg.h"
 
 void OLD_CheckBuyZone(CBasePlayer *player);
 void OLD_CheckBombTarget(CBasePlayer *player);
@@ -929,9 +694,7 @@ void EscapeZoneIcon_Clear(CBasePlayer *player);
 void VIP_SafetyZoneIcon_Set(CBasePlayer *player);
 void VIP_SafetyZoneIcon_Clear(CBasePlayer *player);
 
-void LinkUserMessages();
-void WriteSigonMessages();
-void SendItemStatus(CBasePlayer *pPlayer);
+
 const char *GetCSModelName(int item_id);
 Vector VecVelocityForDamage(float flDamage);
 int TrainSpeed(int iSpeed, int iMax);
@@ -940,9 +703,14 @@ void LogAttack(CBasePlayer *pAttacker, CBasePlayer *pVictim, int teamAttack, int
 void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo);
 bool CanSeeUseable(CBasePlayer *me, CBaseEntity *entity);
 void FixPlayerCrouchStuck(edict_t *pPlayer);
+
+/*
 BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot);
 edict_t *EntSelectSpawnPoint(CBaseEntity *pPlayer);
-void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src);
+*/
+#include "player/player_spawnpoint.h"
+
+
 CBaseEntity *FindEntityForward(CBaseEntity *pMe);
 float GetPlayerPitch(const edict_t *pEdict);
 float GetPlayerYaw(const edict_t *pEdict);
