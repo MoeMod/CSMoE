@@ -232,6 +232,8 @@
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapontype.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -489,6 +491,9 @@
     <ClInclude Include="..\dlls\weapontype.h" />
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared.h" />
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />

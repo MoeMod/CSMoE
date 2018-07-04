@@ -53,6 +53,9 @@
     <Filter Include="dlls\player">
       <UniqueIdentifier>{7527e99f-2172-40a6-8acb-1d1efbc75db9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\wpn_shared\knife">
+      <UniqueIdentifier>{f37b98c5-fd69-4800-af21-eb4ab76d66ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -483,6 +486,12 @@
     </ClCompile>
     <ClCompile Include="..\dlls\player\player_msg.cpp">
       <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp">
+      <Filter>dlls\wpn_shared\knife</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1031,6 +1040,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\player\player_msg.h">
       <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife.h">
+      <Filter>dlls\wpn_shared\knife</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
