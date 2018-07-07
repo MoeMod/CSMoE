@@ -28,24 +28,34 @@
 #define SPAWN_DATA_V_ANGLES_Y 7
 #define SPAWN_DATA_V_ANGLES_Z 8
 
-using SpawnPointData_t = std::array<float, 9>;
-std::vector<SpawnPointData_t> g_vecSpawnCSDM;
+struct SpawnPointData
+{
+	Vector origin;
+	Vector angles;
+	Vector v_angle;
+};
+std::vector<SpawnPointData> g_vecSpawnCSDM;
 
-template<size_t...Vals>
-inline Vector PackVector_impl(const std::array<float, 9> &arr, size_t N, std::index_sequence<Vals...>)
+template<class Arr, size_t...Vals>
+inline Vector PackVector_impl(const Arr &arr, size_t N, std::index_sequence<Vals...>)
 {
 	return { arr[N * 3 + Vals]... };
 }
-inline Vector PackVector(const std::array<float, 9> &arr, size_t N)
+template<class Arr>
+inline Vector PackVector(const Arr &arr, size_t N)
 {
 	return PackVector_impl(arr, N, std::make_index_sequence<3>());
 }
+SpawnPointData MakeSpawnPointData(const std::array<float, 9> &arr)
+{
+	return { PackVector(arr, 0), PackVector(arr, 1), PackVector(arr, 2) };
+}
 
-BOOL CSDM_IsSpawnPointValid(CBaseEntity *pPlayer, const SpawnPointData_t &data)
+BOOL CSDM_IsSpawnPointValid(CBaseEntity *pPlayer, const SpawnPointData &data)
 {
 	CBaseEntity *ent = NULL;
 
-	while ((ent = UTIL_FindEntityInSphere(ent, PackVector(data, 0), 64)) != NULL)
+	while ((ent = UTIL_FindEntityInSphere(ent, data.origin, 64)) != NULL)
 	{
 		// if ent is a client, don't spawn on 'em
 		if (ent->IsPlayer() && ent != pPlayer)
@@ -53,6 +63,14 @@ BOOL CSDM_IsSpawnPointValid(CBaseEntity *pPlayer, const SpawnPointData_t &data)
 	}
 
 	return TRUE;
+}
+
+void CSDM_ApplyRandomSpawnPoint(CBaseEntity *pEntity, const SpawnPointData & data)
+{
+	pEntity->pev->origin = data.origin + Vector(0, 0, 1);
+	pEntity->pev->velocity = g_vecZero;
+	pEntity->pev->angles = data.angles;
+	pEntity->pev->v_angle = data.v_angle;
 }
 
 bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
@@ -68,11 +86,7 @@ bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
 		return false;
 
 	// sets these item
-	const SpawnPointData_t &item = *iter;
-	pEntity->pev->origin = PackVector(item, 0) + Vector(0, 0, 1);
-	pEntity->pev->velocity = g_vecZero;
-	pEntity->pev->angles = PackVector(item, 1);
-	pEntity->pev->v_angle = PackVector(item, 2);
+	CSDM_ApplyRandomSpawnPoint(pEntity, *iter);
 	return true;
 }
 
@@ -84,6 +98,9 @@ void CSDM_LoadSpawnPoints()
 	Q_sprintf(filename, "addons/amxmodx/configs/csdm/%s.spawns.cfg", STRING(gpGlobals->mapname));
 
 	SteamFile csdmFile(filename);
+
+	if (!csdmFile.IsValid())
+		return;
 
 	auto readline = [](SteamFile &sf) {
 		std::string ret;
@@ -102,15 +119,9 @@ void CSDM_LoadSpawnPoints()
 	{
 		std::array<float, 9> arr;
 		std::copy_n(std::istream_iterator<float>(std::istringstream(linedata.second)), 9, std::begin(arr));
-		g_vecSpawnCSDM.emplace_back(arr);
+		g_vecSpawnCSDM.emplace_back(MakeSpawnPointData(arr));
 	}
 }
-
-std::pair<Vector, Vector> GetRandomSpawnPoint()
-{
-
-}
-
 
 /*
 stock load_spawns()
