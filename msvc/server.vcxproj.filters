@@ -490,7 +490,7 @@
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp">
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_normal.cpp">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1041,13 +1041,13 @@
     <ClInclude Include="..\dlls\player\player_msg.h">
       <Filter>dlls\player</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_normal.h">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClInclude>
   </ItemGroup>

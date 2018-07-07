@@ -4,7 +4,90 @@
 #pragma once
 #endif
 
-struct KnifeSoundInfo
+enum KnifeID
+{
+	KNIFE_NORMAL = 0,
+	KNIFE_NATA,
+	KNIFE_HAMMER,
+	KNIFE_HDAGGER,
+	KNIFE_JKNIFE,
+	KNIFE_AXE,
+	KNIFE_COMBATKNIFE,
+	KNIFE_MASTERCOMBAT,
+	KNIFE_KNIFEDRAGON,
+	KNIFE_KANATA = 9,
+	KNIFE_SKULLAXE = 10,
+	KNIFE_DRAGONTAIL = 11,
+	KNIFE_HIDDENSTAFF = 12,
+	KNIFE_TOMAHAWK,
+	KNIFE_NATAKNIFED,
+	KNIFE_KANATAD,
+	KNIFE_DRAGONSWORD = 16,
+	KNIFE_BALROG9 = 17,
+	KNIFE_SHELTERAXE,
+	KNIFE_SNAKESWORD,
+	KNIFE_SFSWORD_ON = 20,
+	KNIFE_SFSWORD_OFF = 21,
+	KNIFE_BHDRAGGER,
+	KNIFE_ZOMBI,
+	KNIFE_SNOWMAN = 23,
+	KNIFE_HORSEAXE,
+	KNIFE_ZSH_MACHETE,
+	KNIFE_ZSH_CROWBAR,
+	KNIFE_ZSH_CLAWHAMMER,
+	KNIFE_JANUS9 = 28,
+	KNIFE_MONKEYWPNSET3 = 29,
+	KNIFE_BALROG9_2 = 30,
+	KNIFE_CROWBARCRAFT = 31,
+	KNIFE_SPKNIFE,
+	KNIFE_OZWPNSET3,
+	KNIFE_TOMAHAWK_XMAS = 34,
+	KNIFE_1PVE_UNARM_STANDALONEHAND,
+	KNIFE_1PVE_KNIFE_STANDALONEKNIFE,
+	KNIFE_SHEEPSWORD,
+	
+	KNIFE_THANATOS9 = 39,
+	KNIFE_VXLKNIFE,
+	KNIFE_ZBTAG = 41, // emotion_z?
+	KNIFE_ZBTAGH = 42,
+	KNIFE_VULCANUS9_ON = 43,
+	KNIFE_VULCANUS9_OFF = 44,
+	KNIFE_HZKNIFE,
+	KNIFE_STORMGIANT,
+	KNIFE_CROW9,
+	KNIFE_RUNEBLADE = 48,
+	KNIFE_IRONFAN = 49,
+	KNIFE_BALROG9_3 = 50,
+
+	KNIFE_TURBULENT9 = 52,
+	KNIFE_DUALSWORD = 53,
+	KNIFE_ZBS64KNIFE = 54,
+	KNIFE_SKULLAXE_2,
+	KNIFE_ARMTOUCH = 56,
+
+	KNIFE_ZOMBI_TANK,
+	KNIFE_ZOMBI_SPEED,
+	KNIFE_ZOMBI_HEAVY,
+	KNIFE_ZOMBI_PC,
+	KNIFE_ZOMBI_HEAL,
+	KNIFE_ZOMBI_DEIMOS,
+	KNIFE_ZOMBI_DEIMOS2,
+	KNIFE_ZOMBI_UNDERTAKER,
+	KNIFE_ZOMBI_WITCH,
+	KNIFE_ZOMBI_CHINA,
+	KNIFE_ZOMBI_BOOMER,
+	KNIFE_ZOMBI_RESIDENT,
+	KNIFE_ZOMBI_REVIVAL,
+	KNIFE_ZOMBI_TELEPORT,
+	KNIFE_ZOMBI_Z4NORMAL,
+	KNIFE_ZOMBI_Z4LIGHT,
+	KNIFE_ZOMBI_Z4HEAVY,
+	KNIFE_ZOMBI_Z4HIDE,
+	KNIFE_ZOMBI_Z4HUMPBACK,
+	KNIFE_SCHAND,
+};
+
+struct KnifeSoundInfo // sizeof == 84
 {
 	const char *szSoundDeploy;
 	int iSoundSlashNum;
@@ -17,7 +100,7 @@ struct KnifeSoundInfo
 	const char *szSoundHit[4];
 };
 
-struct KnifeModelInfo // sizeof==28
+struct KnifeModelInfo // sizeof == 28
 {
 	const char *v_model;
 	const char *p_model;
@@ -28,30 +111,31 @@ struct KnifeModelInfo // sizeof==28
 	int flDeployNextIdleTime;
 };
 
-class IBaseKnifeHelper // wtf
+class IKnifeHelper // wtf
 {
+public:
 	virtual void Deploy() = 0;
-	virtual void ph1() = 0;
-	virtual void ph2() = 0; // init ?
+	virtual BOOL CanHolster() { return 1; };
+	virtual void Holster() = 0;
 	virtual void WeaponIdle() = 0;
 	virtual void PrimaryAttack() = 0;
 	virtual void SecondaryAttack() = 0;
 	virtual void DelayPrimaryAttack() = 0;
 	virtual void DelaySecondaryAttack() = 0;
-	virtual void ph8() = 0; // always return 0 UseDecrement
+	virtual BOOL UseDecrement() { return FALSE; }; // always return 0
 	virtual void ScaleDamagePrimaryAttack(float in, float &out) = 0;
 	virtual void ScaleDamageSecondaryAttack(float in, float &out) = 0;
-	virtual void ph11() = 0; // null, get primaryattack radius?
-	virtual void ph12() = 0; // null, called from CKnife::PrimaryAttack
-	virtual void ph13() = 0; // GetKnockBackData from hw??
-	virtual void ph14() = 0; // null
-	virtual void ph15() = 0; // null
-	virtual void ph16() = 0; // null
-	virtual void ph17() = 0; // null
-	virtual void ph18() = 0; // null 
-	virtual void ph19() = 0; // null
+	virtual void GetPrimaryAttackDistance(){}; // null, called from CKnife::PrimaryAttack
+	virtual void GetSecondaryAttackDistance(){}; // null
+	virtual void GetKnockBackData(){}; // GetKnockBackData from hw??
+	virtual void ph14(){}; // null
+	virtual void ph15(){}; // null
+	virtual void ph16(){}; // null
+	virtual void AddToPlayer(){}; // 
+	virtual void ItemPostFrame(){}; // null 
+	virtual void ph19(){}; // null*/
 
-	virtual ~IBaseKnifeHelper() {}
+	virtual ~IKnifeHelper() {}
 
 };
 
