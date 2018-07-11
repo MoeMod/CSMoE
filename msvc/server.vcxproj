@@ -159,6 +159,7 @@
     <ClCompile Include="..\dlls\gamemode\mod_dm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
     <ClCompile Include="..\dlls\gamerules.cpp" />
     <ClCompile Include="..\dlls\ggrenade.cpp" />
     <ClCompile Include="..\dlls\globals.cpp" />
@@ -435,6 +436,7 @@
     <ClInclude Include="..\dlls\gamemode\mod_dm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
     <ClInclude Include="..\dlls\gamerules.h" />
     <ClInclude Include="..\dlls\globals.h" />
     <ClInclude Include="..\dlls\healthkit.h" />
