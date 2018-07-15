@@ -363,7 +363,6 @@ qboolean R_InitRenderAPI( void );
 void R_SetupFrustum( void );
 void R_FindViewLeaf( void );
 void R_DrawFog( void );
-void R_Strobe( void );
 
 #define cmatrix3x4 vec4_t *const
 #define cmatrix4x4 vec4_t *const
@@ -440,6 +439,13 @@ void EmitSkyLayers( msurface_t *fa );
 void EmitSkyPolys( msurface_t *fa );
 void EmitWaterPolys( glpoly_t *polys, qboolean noCull );
 void R_DrawSkyChain( msurface_t *s );
+
+//
+// gl_rstrobe.c
+//
+void R_Strobe_DrawDebugInfo( void );
+void R_Strobe_Tick( void );
+void R_Strobe_Init( void );
 
 //
 // gl_vidnt.c
@@ -635,6 +641,7 @@ typedef struct
 	qboolean		software;		// OpenGL software emulation
 	qboolean		initialized;	// OpenGL subsystem started
 	qboolean		extended;
+	int		safe;
 } glwstate_t;
 
 extern glconfig_t		glConfig;
@@ -699,8 +706,10 @@ extern convar_t	*r_dynamic;
 extern convar_t	*r_lightmap;
 extern convar_t	*r_fastsky;
 extern convar_t	*r_vbo;
+extern convar_t	*r_vbo_dlightmode;
+extern convar_t *r_strobe;
+
 extern convar_t	*r_bump;
-extern convar_t	*r_strobe;
 extern convar_t *r_underwater_distortion;
 
 extern convar_t *mp_decals;

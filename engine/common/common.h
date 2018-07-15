@@ -24,7 +24,7 @@ extern "C" {
 
 #include "backends.h"
 #include "defaults.h"
-//#include "wrect.h"
+#include "wrect.h"
 
 //
 // check if selected backend not allowed
@@ -168,7 +168,7 @@ typedef enum
 #include "crtlib.h"
 #include "base_cmd.h"
 
-#define XASH_VERSION	"0.19.1"		// engine current version
+#define XASH_VERSION	"0.19.2"		// engine current version
 // since this fork have own version, this is just left for compability
 #define BASED_VERSION	0.98f
 
@@ -447,8 +447,6 @@ typedef struct host_parm_s
 	qboolean enabledll;
 	qboolean textmode;
 	qboolean daemonized;
-
-	qboolean joke; // 1st April 2018
 } host_parm_t;
 
 extern host_parm_t	host;
@@ -461,7 +459,6 @@ int matchpattern( const char *in, const char *pattern, qboolean caseinsensitive 
 int matchpattern_with_separator( const char *in, const char *pattern, qboolean caseinsensitive, const char *separators, qboolean wildcard_least_one );
 void FS_Init( void );
 void FS_Path( void );
-char *FS_ToLowerCase( const char *path );
 void FS_Shutdown( void );
 void FS_ClearSearchPath( void );
 void FS_AllowDirectPaths( qboolean enable );
@@ -1050,6 +1047,8 @@ cvar_t *Cvar_GetList( void );
 void Cmd_Null_f( void );
 int CSCR_LoadDefaultCVars( const char *scriptfilename );
 int CSCR_WriteGameCVars( file_t *cfg, const char *scriptfilename );
+void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
+
 
 void HTTP_AddDownload( char *path, int size, qboolean process );
 void HTTP_ResetProcessState ( void );
@@ -1082,17 +1081,8 @@ void Con_ClearAutoComplete();
 //
 // console.c
 //
+extern rectf_t con_rect;
 
-//#define SolidConsoleX 0
-//#define SolidConsoleY (y - scr_width->value * 3 / 4)
-//#define SolidConsoleW (scr_width->value)
-//#define SolidConsoleH (scr_width->value * 3 / 4)
-//extern wrect_t con_rect; //Float - Int incompatibility
-typedef struct conrect_s
-{
-	float x, y, w, h;
-} conrect_t;
-extern conrect_t con_rect;
 void Con_Clear( void );
 
 extern const char *svc_strings[256];

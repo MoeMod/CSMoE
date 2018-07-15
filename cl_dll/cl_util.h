@@ -86,7 +86,13 @@ inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int fl
 
 #define GetScreenInfo (*gEngfuncs.pfnGetScreenInfo)
 #define ServerCmd (*gEngfuncs.pfnServerCmd)
-#define ClientCmd (*gEngfuncs.pfnClientCmd)
+
+//#define ClientCmd (*gEngfuncs.pfnClientCmd)
+inline int ClientCmd(const char *szCmdString)
+{
+	return gEngfuncs.pfnClientCmd(const_cast<char *>(szCmdString));
+}
+
 #define SetCrosshair (*gEngfuncs.pfnSetCrosshair)
 #define AngleVectors (*gEngfuncs.pfnAngleVectors)
 #define Com_RandomLong (*gEngfuncs.pfnRandomLong)
@@ -123,7 +129,7 @@ inline void CenterPrint( const char *string )
 #define GetPlayerInfo (*gEngfuncs.pfnGetPlayerInfo)
 
 // sound functions
-inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
+inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( const_cast<char *>(szSound), vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
 //#define max(a, b)  (((a) > (b)) ? (a) : (b))

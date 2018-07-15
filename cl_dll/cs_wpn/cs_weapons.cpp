@@ -883,7 +883,7 @@ void HUD_InitClientWeapons( void )
 
 	// Handled locally
 	g_engfuncs.pfnPlaybackEvent		= HUD_PlaybackEvent;
-	g_engfuncs.pfnAlertMessage		= AlertMessage;
+	g_engfuncs.pfnAlertMessage		= reinterpret_cast<void (*)(ALERT_TYPE atype, char *szFmt, ...)>(AlertMessage);
 
 	// Pass through to engine
 	g_engfuncs.pfnPrecacheEvent		= gEngfuncs.pfnPrecacheEvent;

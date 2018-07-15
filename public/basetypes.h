@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "port.h"
 #include "osconfig.h"
 #include "protected_things.h"
 
@@ -69,8 +70,8 @@ inline T clamp2(T const &val, T const &minVal, T const &maxVal) //renamed to cla
 
 typedef int BOOL;
 typedef int qboolean;
-typedef unsigned long ULONG;
-typedef unsigned char BYTE;
+//typedef unsigned int ULONG;
+//typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;
 

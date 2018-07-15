@@ -101,7 +101,7 @@ inline int PRECACHE_SOUND(const char *s) { return 0; }
 #define GET_LOCALIZED_STRING_LENGTH	(*g_engfuncs.pfnGetLocalizedStringLength)
 #define REGISTER_TUTOR_MESSAGE_SHOWN	(*g_engfuncs.pfnRegisterTutorMessageShown)
 #define GET_TIMES_TUTOR_MESSAGE_SHOWN	(*g_engfuncs.pfnGetTimesTutorMessageShown)
-#define ENG_CHECK_PARM			(*g_engfuncs.pfnEngCheckParm)
+#define ENG_CHECK_PARM			(*g_engfuncs.CheckParm)
 
 inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin = NULL, edict_t *ed = NULL)
 {

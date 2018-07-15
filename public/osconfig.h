@@ -134,7 +134,7 @@ typedef long long __int64_t;
 
 	typedef unsigned char byte;
 	typedef unsigned char BYTE;
-	typedef unsigned long ULONG;
+	typedef unsigned int ULONG;
 	typedef unsigned short uchar16;
 	typedef wchar_t uchar32;
 #endif // _WIN32
@@ -179,8 +179,8 @@ typedef long long __int64_t;
 	
 	typedef void *HWND;
 
-	typedef unsigned long DWORD;
-	typedef unsigned short WORD;
+	typedef unsigned int DWORD;
+	typedef short WORD;
 	typedef unsigned int UNINT32;
 	typedef unsigned char uint8;
 

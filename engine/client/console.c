@@ -33,7 +33,7 @@ convar_t	*con_fontscale;
 convar_t	*con_fontnum;
 convar_t	*vgui_utf8;
 
-conrect_t	con_rect;
+rectf_t	con_rect;
 
 static int g_codepage = 0;
 static qboolean g_utf8 = false;
@@ -1971,6 +1971,9 @@ void Con_RunConsole( void )
 
 	if( con_charset->modified || con_fontscale->modified || con_fontnum->modified || cl_charset->modified )
 	{
+		if( con_fontscale->integer <= 0 )
+			Cvar_SetFloat( "con_fontscale", 1 );
+
 		// update codepage parameters
 		g_codepage = 0;
 		if( !Q_stricmp( con_charset->string, "cp1251" ) )

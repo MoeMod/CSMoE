@@ -80,7 +80,10 @@ LOCAL_SRC_FILES := \
 	h_cycler.cpp \
 	healthkit.cpp \
 	h_export.cpp \
-	hintmessage.cpp \
+	player/csdm_randomspawn.cpp \
+	player/hintmessage.cpp \
+	player/player_msg.cpp \
+	player/player_spawnpoint.cpp \
 	hostage/hostage.cpp \
 	hostage/hostage_improv.cpp \
 	hostage/hostage_localnav.cpp \
@@ -151,6 +154,8 @@ LOCAL_SRC_FILES := \
 	gamemode/mod_base.cpp \
 	gamemode/mod_none.cpp \
 	gamemode/mod_tdm.cpp \
+	gamemode/mod_dm.cpp \
+	gamemode/mod_zb1.cpp \
 	../public/unicode_strtools.cpp \
 	../game_shared/bot/bot.cpp \
 	../game_shared/bot/bot_manager.cpp \

@@ -21,8 +21,10 @@ GNU General Public License for more details.
 #include "entity_types.h"
 #include "gl_local.h"
 #include "vgui_draw.h"
+
 #include "touch.h" // IN_TouchDraw( )
 #include "joyinput.h" // Joy_DrawOnScreenKeyboard( )
+
 
 /*
 ===============
@@ -413,10 +415,12 @@ void V_PostRender( void )
 
 	if( draw_2d )
 	{
-		IN_TouchDraw();
+		Touch_Draw();
 		SCR_RSpeeds();
 		SCR_NetSpeeds();
 		SCR_DrawFPS();
+		R_Strobe_DrawDebugInfo( );
+
 		SCR_DrawPos();
 		SV_DrawOrthoTriangles();
 		CL_DrawDemoRecording();

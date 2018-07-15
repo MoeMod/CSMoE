@@ -1393,7 +1393,17 @@ static void GAME_EXPORT R_StudioSetupModel( int bodypart, void **ppbodypart, voi
 
 	m_pBodyPart = (mstudiobodyparts_t *)((byte *)m_pStudioHeader + m_pStudioHeader->bodypartindex) + bodypart;
 
-	index = RI.currententity->curstate.body / m_pBodyPart->base;
+	// this cannot be equal 0 for valid model
+	if( m_pBodyPart->base )
+	{
+		index = RI.currententity->curstate.body / m_pBodyPart->base;
+	}
+	else
+	{
+		MsgDev( D_ERROR, "R_StudioSetupModel: m_pBodyPart->base = 0 in %s\n", RI.currentmodel->name );
+		index = 0;
+	}
+
 	index = index % m_pBodyPart->nummodels;
 
 	m_pSubModel = (mstudiomodel_t *)((byte *)m_pStudioHeader + m_pBodyPart->modelindex) + index;
@@ -3852,7 +3862,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			load_external = true; // sucessfully loaded
 		}
 	}
-
+	
 	// CSO Texture Load
 	if (name[0] == '#' || name[0] == '@')
 	{

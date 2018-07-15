@@ -36,15 +36,10 @@ struct SpawnPointData
 };
 std::vector<SpawnPointData> g_vecSpawnCSDM;
 
-template<class Arr, size_t...Vals>
-inline Vector PackVector_impl(const Arr &arr, size_t N, std::index_sequence<Vals...>)
-{
-	return { arr[N * 3 + Vals]... };
-}
 template<class Arr>
 inline Vector PackVector(const Arr &arr, size_t N)
 {
-	return PackVector_impl(arr, N, std::make_index_sequence<3>());
+	return { arr[N * 3 + 0], arr[N * 3 + 1], arr[N * 3 + 2] };
 }
 SpawnPointData MakeSpawnPointData(const std::array<float, 9> &arr)
 {
@@ -118,7 +113,8 @@ void CSDM_LoadSpawnPoints()
 	while ((linedata = readline(csdmFile)).first)
 	{
 		std::array<float, 9> arr;
-		std::copy_n(std::istream_iterator<float>(std::istringstream(linedata.second)), 9, std::begin(arr));
+		std::istringstream ss(linedata.second);
+		std::copy_n(std::istream_iterator<float>(ss), 9, std::begin(arr));
 		g_vecSpawnCSDM.emplace_back(MakeSpawnPointData(arr));
 	}
 }

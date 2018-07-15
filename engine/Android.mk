@@ -72,6 +72,7 @@ LOCAL_SRC_FILES := \
            client/gl_rmisc.c \
            client/gl_rpart.c \
            client/gl_rsurf.c \
+           client/gl_rstrobe.c \
            client/gl_sprite.c \
            client/gl_studio.c \
            client/vid_common.c \
@@ -111,7 +112,6 @@ LOCAL_SRC_FILES := \
            common/masterlist.c \
            common/mathlib.c \
            common/matrixlib.c \
-		   common/mod_decryptor.cpp \
            common/mod_studio.c \
            common/model.c \
            common/net_buffer.c \
@@ -128,7 +128,6 @@ LOCAL_SRC_FILES := \
            common/world.c \
            common/zone.c \
            common/crashhandler.c \
-		   common/IceKey.cpp \
            server/sv_client.c \
            server/sv_cmds.c \
            server/sv_custom.c \
@@ -169,7 +168,9 @@ LOCAL_SRC_FILES := \
 	   common/soundlib/libmpg/tabinit.c \
 	   common/Sequence.c \
            platform/android/vid_android.c \
-           platform/android/android_nosdl.c
+           platform/android/android_nosdl.c \
+	   common/IceKey.cpp \
+	   common/mod_decryptor.cpp 
 
 LOCAL_STATIC_LIBRARIES := NanoGL
 

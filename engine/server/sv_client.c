@@ -960,8 +960,13 @@ void SV_RemoteCommand( netadr_t from, sizebuf_t *msg )
 		remaining[0] = 0;
 		for( i = 2; i < Cmd_Argc(); i++ )
 		{
-			Q_strcat( remaining, Cmd_Argv( i ));
-			Q_strcat( remaining, " " );
+			string command;
+
+			Com_EscapeCommand( command, Cmd_Argv( i ), MAX_STRING );
+
+			Q_strncat( remaining, "\"", 1024 );
+			Q_strncat( remaining, command, 1024 );
+			Q_strncat( remaining, "\" ", 1024 );
 		}
 		Cmd_ExecuteString( remaining, src_command );
 	}
@@ -2149,6 +2154,7 @@ static void SV_UserinfoChanged( sv_client_t *cl, const char *userinfo )
 	string		temp1, temp2;
 	sv_client_t	*current;
 	char		*val;
+	const char *model;
 
 	if( !userinfo || !userinfo[0] ) return; // ignored
 
@@ -2251,7 +2257,7 @@ static void SV_UserinfoChanged( sv_client_t *cl, const char *userinfo )
 		cl->cl_updaterate = 1.0f / i;
 	}
 
-	const char *model = Info_ValueForKey( cl->userinfo, "model" );
+	model = Info_ValueForKey( cl->userinfo, "model" );
 
 	// apply custom playermodel
 	if( Q_strlen( model ) && Q_stricmp( model, "player" ))
@@ -3357,7 +3363,6 @@ void SV_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 	char	*args;
 	char	*c, buf[MAX_SYSPATH];
 	int	len = sizeof( buf );
-	char *gamedir = GI->gamefolder;
 
 	// prevent flooding from banned address
 	if( SV_CheckIP( &from ) )

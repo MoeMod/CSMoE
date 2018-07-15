@@ -11,11 +11,10 @@
 //typedef unsigned char byte;
 #endif
 
+#ifndef CDLL_INT_H
 //---------------------------------------------------------------------------
 // client_textmessage_t
 //---------------------------------------------------------------------------
-
-#ifndef CDLL_INT_H
 typedef struct client_textmessage_s
 {
 	int		effect;
@@ -27,32 +26,10 @@ typedef struct client_textmessage_s
 	float	fadeout;
 	float	holdtime;
 	float	fxtime;
-	const char *pName;
-	const char *pMessage;
+	char *pName;
+	char *pMessage;
 } client_textmessage_t;
 #endif
-
-//--------------------------------------------------------------------------
-// sequenceDefaultBits_e
-//	
-// Enumerated list of possible modifiers for a command.  This enumeration
-// is used in a bitarray controlling what modifiers are specified for a command.
-//---------------------------------------------------------------------------
-enum sequenceModifierBits
-{
-	SEQUENCE_MODIFIER_EFFECT_BIT		= (1 << 1),
-	SEQUENCE_MODIFIER_POSITION_BIT		= (1 << 2),
-	SEQUENCE_MODIFIER_COLOR_BIT			= (1 << 3),
-	SEQUENCE_MODIFIER_COLOR2_BIT		= (1 << 4),
-	SEQUENCE_MODIFIER_FADEIN_BIT		= (1 << 5),
-	SEQUENCE_MODIFIER_FADEOUT_BIT		= (1 << 6),
-	SEQUENCE_MODIFIER_HOLDTIME_BIT		= (1 << 7),
-	SEQUENCE_MODIFIER_FXTIME_BIT		= (1 << 8),
-	SEQUENCE_MODIFIER_SPEAKER_BIT		= (1 << 9),
-	SEQUENCE_MODIFIER_LISTENER_BIT		= (1 << 10),
-	SEQUENCE_MODIFIER_TEXTCHANNEL_BIT	= (1 << 11),
-};
-typedef enum sequenceModifierBits sequenceModifierBits_e ;
 
 
 //---------------------------------------------------------------------------
@@ -89,6 +66,28 @@ enum sequenceCommandEnum_
 	SEQUENCE_MODIFIER_TEXTCHANNEL,
 };
 typedef enum sequenceCommandEnum_ sequenceCommandEnum_e;
+
+//--------------------------------------------------------------------------
+// sequenceDefaultBits_e
+//
+// Enumerated list of possible modifiers for a command.  This enumeration
+// is used in a bitarray controlling what modifiers are specified for a command.
+//---------------------------------------------------------------------------
+enum sequenceModifierBits
+{
+	SEQUENCE_MODIFIER_EFFECT_BIT		= (1 << 1),
+	SEQUENCE_MODIFIER_POSITION_BIT		= (1 << 2),
+	SEQUENCE_MODIFIER_COLOR_BIT			= (1 << 3),
+	SEQUENCE_MODIFIER_COLOR2_BIT		= (1 << 4),
+	SEQUENCE_MODIFIER_FADEIN_BIT		= (1 << 5),
+	SEQUENCE_MODIFIER_FADEOUT_BIT		= (1 << 6),
+	SEQUENCE_MODIFIER_HOLDTIME_BIT		= (1 << 7),
+	SEQUENCE_MODIFIER_FXTIME_BIT		= (1 << 8),
+	SEQUENCE_MODIFIER_SPEAKER_BIT		= (1 << 9),
+	SEQUENCE_MODIFIER_LISTENER_BIT		= (1 << 10),
+	SEQUENCE_MODIFIER_TEXTCHANNEL_BIT	= (1 << 11),
+};
+typedef enum sequenceModifierBits sequenceModifierBits_e ;
 
 
 //---------------------------------------------------------------------------
@@ -195,12 +194,12 @@ struct sentenceGroupEntry_
 //---------------------------------------------------------------------------
 // Function declarations
 //---------------------------------------------------------------------------
-sequenceEntry_s* Sequence_Get(const char* fileName, const char* entryName);
-void Sequence_ParseFile(const char* fileName, qboolean isGlobal);
-void Sequence_OnLevelLoad(const char* mapName);
-sentenceEntry_s* Sequence_PickSentence(const char *groupName, int pickMethod, int *picked);
-void Sequence_Init(void);
-void Sequence_PurgeEntries(qboolean purgeGlobals);
-sentenceEntry_s *Sequence_GetSentenceByIndex(unsigned int index);
+sequenceEntry_s* Sequence_Get( const char* fileName, const char* entryName );
+void Sequence_ParseFile( const char* fileName, qboolean isGlobal );
+void Sequence_OnLevelLoad( const char* mapName );
+sentenceEntry_s* Sequence_PickSentence( const char *groupName, int pickMethod, int *picked );
+void Sequence_Init( void );
+void Sequence_PurgeEntries( qboolean purgeGlobals );
+sentenceEntry_s *Sequence_GetSentenceByIndex( unsigned int index );
 
-#endif /* _INCLUDE_SEQUENCE_H_ */
+#endif // _INCLUDE_SEQUENCE_H_

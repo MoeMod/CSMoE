@@ -38,7 +38,7 @@ int	in_mouse_oldbuttonstate;
 int	in_mouse_buttons;
 static struct inputstate_s
 {
-float lastpitch, lastyaw;
+	float lastpitch, lastyaw;
 } inputstate;
 
 extern convar_t *vid_fullscreen;
@@ -880,7 +880,7 @@ void IN_EngineAppendMove( float frametime, usercmd_t *cmd, qboolean active )
 		}
 #endif
 		Joy_FinalizeMove( &forward, &side, &dyaw, &dpitch );
-		IN_TouchMove( &forward, &side, &dyaw, &dpitch );
+		Touch_GetMove( &forward, &side, &dyaw, &dpitch );
 		IN_JoyAppendMove( cmd, forward, side );
 #ifdef USE_EVDEV
 		IN_EvdevMove( &dyaw, &dpitch );
@@ -917,7 +917,7 @@ void Host_InputFrame( void )
 	{
 		int dx, dy;
 
-#ifndef __ANDROID__
+#if XASH_INPUT == INPUT_SDL
 		if( in_mouseinitialized && !m_ignore->integer )
 		{
 			SDL_GetRelativeMouseState( &dx, &dy );
@@ -935,7 +935,7 @@ void Host_InputFrame( void )
 #endif
 
 		Joy_FinalizeMove( &forward, &side, &yaw, &pitch );
-		IN_TouchMove( &forward, &side, &yaw, &pitch );
+		Touch_GetMove( &forward, &side, &yaw, &pitch );
 #ifdef USE_EVDEV
 		IN_EvdevMove( &yaw, &pitch );
 #endif
@@ -945,12 +945,6 @@ void Host_InputFrame( void )
 			yaw = ( inputstate.lastyaw + yaw ) / 2;
 			inputstate.lastpitch = pitch;
 			inputstate.lastyaw = yaw;
-		}
-
-		if( host.joke )
-		{
-			yaw  = -yaw;
-			side = -side;
 		}
 
 		if( cls.key_dest == key_game )

@@ -481,6 +481,13 @@ void GL_UpdateSwapInterval( void )
 	}
 }
 
+#define SAFE_NO 0
+#define SAFE_NOACC 1
+#define SAFE_NODEPTH 2
+#define SAFE_NOATTRIB 3
+#define SAFE_DONTCARE 4
+
+
 /*
 ==================
 GL_SetupAttributes
@@ -493,17 +500,14 @@ void GL_SetupAttributes()
 #if !defined(_WIN32)
 	SDL_SetHint( "SDL_VIDEO_X11_XRANDR", "1" );
 	SDL_SetHint( "SDL_VIDEO_X11_XVIDMODE", "1" );
+
+	// Hints for Sailfish OS
+	// NOTE: landscape is just a hint to compositor, it will NOT rotate window
+	SDL_SetHint( "SDL_QTWAYLAND_CONTENT_ORIENTATION", "landscape" );
 #endif
 
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-	SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
+	SDL_GL_ResetAttributes();
 
-	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-	SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
-	SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, gl_stencilbits->integer );
 
 #ifdef XASH_GLES
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES );
@@ -517,14 +521,61 @@ void GL_SetupAttributes()
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
 #endif
 
-#else // XASH_GLES
+#elif !defined XASH_GL_STATIC
 	if( Sys_CheckParm( "-gldebug" ) && host.developer >= 1 )
 	{
 		MsgDev( D_NOTE, "Creating an extended GL context for debug...\n" );
 		SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG );
 		glw_state.extended = true;
 	}
+
 #endif // XASH_GLES
+
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+	if( glw_state.safe > SAFE_DONTCARE )
+	{
+		glw_state.safe = -1;
+		return;
+	}
+
+	if( glw_state.safe > SAFE_NO )
+		Msg("Trying safe opengl mode %d\n", glw_state.safe );
+
+	if( glw_state.safe >= SAFE_NOACC )
+		SDL_GL_SetAttribute( SDL_GL_ACCELERATED_VISUAL, 1 );
+
+	Msg ("bpp %d\n", glw_state.desktopBitsPixel );
+
+	if( glw_state.safe < SAFE_NODEPTH )
+		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
+	else if( glw_state.safe < 5 )
+		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 8 );
+
+
+	if( glw_state.safe < SAFE_NOATTRIB )
+	{
+		if( glw_state.desktopBitsPixel >= 24 )
+		{
+			if( glw_state.desktopBitsPixel == 32 )
+				SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
+
+			SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
+			SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
+			SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
+		}
+		else
+		{
+			SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5 );
+			SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 6 );
+			SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5 );
+		}
+	}
+
+	if( glw_state.safe >= SAFE_DONTCARE )
+		return;
+
+	SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, gl_stencilbits->integer );
 
 	switch( gl_msaa->integer )
 	{
@@ -699,9 +750,10 @@ void GL_InitExtensionsBigGL()
 	GL_CheckExtension( "GL_EXT_stencil_two_side", stenciltwosidefuncs, "gl_stenciltwoside", GL_STENCILTWOSIDE_EXT );
 	GL_CheckExtension( "GL_ARB_vertex_buffer_object", vbofuncs, "gl_vertex_buffer_object", GL_ARB_VERTEX_BUFFER_OBJECT_EXT );
 
+#ifndef XASH_GL_STATIC
 	// we don't care if it's an extension or not, they are identical functions, so keep it simple in the rendering code
 	if( pglDrawRangeElementsEXT == NULL ) pglDrawRangeElementsEXT = pglDrawRangeElements;
-
+#endif
 	GL_CheckExtension( "GL_ARB_texture_env_add", NULL, "gl_texture_env_add", GL_TEXTURE_ENV_ADD_EXT );
 
 	// vp and fp shaders
@@ -747,7 +799,7 @@ void GL_InitExtensionsBigGL()
 	else glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
 
 	Cvar_Set( "gl_anisotropy", va( "%f", bound( 0, gl_texture_anisotropy->value, glConfig.max_texture_anisotropy )));
-
+#ifndef XASH_GL_STATIC
 	// enable gldebug if allowed
 	if( GL_Support( GL_DEBUG_OUTPUT ))
 	{
@@ -765,6 +817,7 @@ void GL_InitExtensionsBigGL()
 		if( host.developer >= D_NOTE )
 			pglDebugMessageControlARB( GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW_ARB, 0, NULL, true );
 	}
+#endif
 }
 #endif
 
@@ -810,11 +863,6 @@ void GL_InitExtensions( void )
 #ifdef _WIN32
 	if( Q_strstr( glConfig.renderer_string, "gdi" ))
 		Cvar_SetFloat( "gl_finish", 1 );
-
-	// NVIDIA Windows drivers have a problem with mixing VBO and client arrays
-	// Disable it, as there is no suitable workaround here
-	if( Q_stristr( glConfig.vendor_string, "nvidia" ))
-		Cvar_FullSet( "r_vbo", "0", CVAR_READ_ONLY );
 #endif
 
 	glw_state.initialized = true;
@@ -906,6 +954,24 @@ R_Init_OpenGL
 */
 qboolean R_Init_OpenGL( void )
 {
+	SDL_DisplayMode displayMode;
+	string safe;
+
+	SDL_GetCurrentDisplayMode(0, &displayMode);
+	glw_state.desktopBitsPixel = SDL_BITSPERPIXEL(displayMode.format);
+	glw_state.desktopWidth = displayMode.w;
+	glw_state.desktopHeight = displayMode.h;
+
+	if( !glw_state.safe && Sys_GetParmFromCmdLine( "-safegl", safe ) )
+	{
+		glw_state.safe = Q_atoi( safe );
+		if( glw_state.safe < SAFE_NOACC || glw_state.safe > SAFE_DONTCARE  )
+			glw_state.safe = SAFE_DONTCARE;
+	}
+
+	if( glw_state.safe < SAFE_NO || glw_state.safe > SAFE_DONTCARE  )
+		return false;
+
 	GL_SetupAttributes();
 
 	if( SDL_GL_LoadLibrary( EGL_LIB ) )

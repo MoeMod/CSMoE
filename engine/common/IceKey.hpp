@@ -1,5 +1,7 @@
 #pragma once
 
+#include "port.h"
+
 struct TIceSubKey;
 
 class CIceKey

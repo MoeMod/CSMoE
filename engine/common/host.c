@@ -22,7 +22,6 @@ GNU General Public License for more details.
 #include <stdarg.h>  // va_args
 #include <errno.h> // errno
 #include <string.h> // strerror
-#include <time.h>
 
 #ifndef _WIN32
 #include <unistd.h> // fork
@@ -70,9 +69,6 @@ convar_t	*build, *ver; // original xash3d info
 convar_t	*host_build, *host_ver; // fork info
 convar_t	*host_mapdesign_fatal;
 convar_t 	*cmd_scripting = NULL;
-
-static convar_t *host_nojoke;
-static convar_t *host_forcejoke;
 
 static int num_decals;
 
@@ -1046,15 +1042,17 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 		Setup_LDT_Keeper( ); // Must call before creating any thread
 #endif
 
-	if( ( baseDir = getenv( "XASH3D_BASEDIR" ) ) )
+	if(( baseDir = getenv( "XASH3D_BASEDIR" )))
 	{
-		Q_strncpy( host.rootdir, baseDir, sizeof(host.rootdir) );
+		Q_strncpy( host.rootdir, baseDir, sizeof(host.rootdir));
 	}
 	else
 	{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 		const char *IOS_GetDocsDir();
-		Q_strncpy( host.rootdir, IOS_GetDocsDir(), sizeof(host.rootdir) );
+		Q_strncpy( host.rootdir, IOS_GetDocsDir(), sizeof( host.rootdir ));
+#elif defined(__SAILFISH__)
+		Q_strncpy( host.rootdir, GAMEPATH, sizeof( host.rootdir ));
 #elif defined(XASH_SDL)
 		if( !( baseDir = SDL_GetBasePath() ) )
 			Sys_Error( "couldn't determine current directory: %s", SDL_GetError() );
@@ -1089,6 +1087,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 			Sys_PrintUsage();
 	    }
 	}
+
 	if( host.rootdir[Q_strlen( host.rootdir ) - 1] == '/' )
 		host.rootdir[Q_strlen( host.rootdir ) - 1] = 0;
 
@@ -1144,7 +1143,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 		host.type = HOST_DEDICATED;
 	}
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
-#ifdef XASH_GLES
+#if defined XASH_GLES && !defined __EMSCRIPTEN__ && !TARGET_OS_IOS && defined SDL_HINT_OPENGL_ES_DRIVER
 	SDL_SetHint( SDL_HINT_OPENGL_ES_DRIVER, "1" );
 #endif
 #endif
@@ -1269,8 +1268,6 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 	host_ver = Cvar_Get( "host_ver", va("%i %s %s %s %s", Q_buildnum(), XASH_VERSION, Q_buildos(), Q_buildarch(), Q_buildcommit() ), CVAR_INIT, "detailed info about this build" );
 	host_mapdesign_fatal = Cvar_Get( "host_mapdesign_fatal", "1", CVAR_ARCHIVE, "make map design errors fatal" );
 	host_xashds_hacks = Cvar_Get( "xashds_hacks", "0", 0, "hacks for xashds in singleplayer" );
-	host_nojoke = Cvar_Get( "host_nojoke", "0", CVAR_ARCHIVE, "disable april fools joke");
-	host_forcejoke = Cvar_Get( "host_forcejoke", "0", 0, "let april fools continue" );
 
 	// content control
 	Cvar_Get( "violence_hgibs", "1", CVAR_ARCHIVE, "show human gib entities" );
@@ -1357,7 +1354,9 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 		Cbuf_AddText( "exec config.cfg\n" );
 		// listenserver/multiplayer config.
 		// need load it to update menu options.
-		Cbuf_AddText( "exec game.cfg\n" );
+		if( FS_FileExists( "game.cfg", true ) )
+			Cbuf_AddText( "exec game.cfg\n" );
+		Cbuf_AddText( "exec gamesettings.cfg\n" );
 		Cmd_AddCommand( "host_writeconfig", Host_WriteConfig, "force save configs. use with care" );
 	}
 
@@ -1381,7 +1380,7 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 	if( !host.stuffcmdsrun )
 		Cbuf_AddText( "stuffcmds\n" );
 
-	IN_TouchInitConfig();
+	Touch_InitConfig();
 	SCR_CheckStartupVids();	// must be last
 #ifdef XASH_SDL
 	SDL_StopTextInput(); // disable text input event. Enable this in chat/console?
@@ -1390,24 +1389,6 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 	if( host.state == HOST_INIT )
 		host.state = HOST_FRAME; // initialization is finished
 
-	if( host_forcejoke->value )
-	{
-		host.joke = true;
-	}
-	else
-	{
-	#ifdef __ANDROID__
-		time_t timeval;
-		struct tm *timeinfo;
-
-		timeval = time( NULL );
-		timeinfo = localtime( &timeval );
-
-		host.joke = !host_nojoke->value && ( timeinfo->tm_year == 118 && timeinfo->tm_mday == 1 && timeinfo->tm_mon == 3 );
-	#else
-		host.joke = false;
-	#endif
-	}
 	Host_FrameLoop();
 
 	// never reached
@@ -1442,7 +1423,7 @@ void EXPORT Host_Shutdown( void )
 			// restore all latched cheat cvars
 			Cvar_SetCheatState( true );
 			Host_WriteConfig();
-			IN_TouchWriteConfig();
+			Touch_WriteConfig();
 			host.skip_configs = false;
 		}
 #endif

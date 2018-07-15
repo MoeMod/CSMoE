@@ -101,6 +101,7 @@
     <ClCompile Include="..\engine\client\gl_rmath.c" />
     <ClCompile Include="..\engine\client\gl_rmisc.c" />
     <ClCompile Include="..\engine\client\gl_rpart.c" />
+    <ClCompile Include="..\engine\client\gl_rstrobe.c" />
     <ClCompile Include="..\engine\client\gl_rsurf.c" />
     <ClCompile Include="..\engine\client\gl_sprite.c" />
     <ClCompile Include="..\engine\client\gl_studio.c" />

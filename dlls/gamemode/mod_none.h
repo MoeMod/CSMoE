@@ -16,6 +16,7 @@ public:
 	CMod_None() {}
 
 public: // CHalfLifeMultiplay
+	BOOL IsTeamplay(void) override { return TRUE; }
 	void CheckMapConditions() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 

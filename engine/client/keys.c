@@ -459,8 +459,13 @@ void Key_WriteBindings( file_t *f )
 
 	for( i = 0; i < 256; i++ )
 	{
+		string command;
+
 		if( keys[i].binding && keys[i].binding[0] )
-			FS_Printf( f, "bind %s \"%s\"\n", Key_KeynumToString(i), keys[i].binding );
+		{
+			Com_EscapeCommand( command, keys[i].binding, MAX_STRING );
+			FS_Printf( f, "bind %s \"%s\"\n", Key_KeynumToString(i), command );
+		}
 	}
 }
 
@@ -599,7 +604,7 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 	}
 
 	VGui_KeyEvent( key, down );
-	IN_TouchKeyEvent( key, down );
+	Touch_KeyEvent( key, down );
 
 	// console key is hardcoded, so the user can never unbind it
 	if( key == '`' || key == '~' )

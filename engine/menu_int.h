@@ -158,11 +158,11 @@ typedef struct ui_enginefuncs_s
 	long	(*pfnRandomLong)( long lLow, long lHigh );
 
 	void	(*pfnSetCursor)( void *hCursor );			// change cursor
-	int	(*pfnIsMapValid)( char *filename );
+	int	(*pfnIsMapValid)( const char *filename );
 	void	(*pfnProcessImage)( int texnum, float gamma, int topColor, int bottomColor );
 	int	(*pfnCompareFileTime)( char *filename1, char *filename2, int *iCompare );
 
-	const char *(*pfnGetModeString)(int vid_mode);
+	const char *(*pfnGetModeString)( int vid_mode );
 } ui_enginefuncs_t;
 
 typedef struct ui_textfuncs_s {
@@ -196,7 +196,7 @@ typedef int (*MENUAPI)( UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t* engfuncs
 
 typedef int (*UITEXTAPI)( ui_textfuncs_t* engfuncs );
 
-typedef void(*ADDTOUCHBUTTONTOLIST)(const char *name, const char *texture, const char *command, unsigned char *color, int flags);
+typedef void (*ADDTOUCHBUTTONTOLIST)( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
 
 #define PLATFORM_UPDATE_PAGE "PlatformUpdatePage"
 #define GENERIC_UPDATE_PAGE "GenericUpdatePage"

@@ -587,6 +587,9 @@
     <ClCompile Include="..\engine\common\IceKey.cpp">
       <Filter>engine\common</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\client\gl_rstrobe.c">
+      <Filter>engine\client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\engine\common\soundlib\libmpg\libmpg.dsp">

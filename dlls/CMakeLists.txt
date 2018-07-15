@@ -111,7 +111,10 @@ set(HLDLL_SRCS
 	./h_cycler.cpp
 	./healthkit.cpp
 	./h_export.cpp
-	./hintmessage.cpp
+	./player/csdm_randomspawn.cpp
+	./player/hintmessage.cpp
+	./player/player_msg.cpp
+	./player/player_spawnpoint.cpp
 	./items.cpp
 	./lights.cpp
 	./maprules.cpp
@@ -181,6 +184,8 @@ set(HLDLL_SRCS
 	./gamemode/mod_base.cpp
 	./gamemode/mod_none.cpp
 	./gamemode/mod_tdm.cpp
+	./gamemode/mod_dm.cpp
+	./gamemode/mod_zb1.cpp
 	./../public/unicode_strtools.cpp
 	)
 

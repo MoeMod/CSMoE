@@ -78,7 +78,7 @@ convar_t	*r_lightmap;
 convar_t	*r_fastsky;
 convar_t	*r_vbo;
 convar_t 	*r_bump;
-convar_t	*r_strobe;
+convar_t	*r_vbo_dlightmode;
 convar_t	*r_underwater_distortion;
 convar_t	*mp_decals;
 
@@ -953,7 +953,7 @@ void Win_SetDPIAwareness( void )
 				MsgDev( D_NOTE, "SetDPIAwareness: Success\n" );
 				bSuccess = TRUE;
 			}
-			else if( hResult = E_INVALIDARG ) MsgDev( D_NOTE, "SetDPIAwareness: Invalid argument\n" );
+			else if( hResult == E_INVALIDARG ) MsgDev( D_NOTE, "SetDPIAwareness: Invalid argument\n" );
 			else if( hResult == E_ACCESSDENIED ) MsgDev( D_NOTE, "SetDPIAwareness: Access Denied\n" );
 		}
 		else MsgDev( D_NOTE, "SetDPIAwareness: Can't get SetProcessDpiAwareness\n" );
@@ -998,14 +998,39 @@ register VBO cvars and get default value
 static void R_CheckVBO( void )
 {
 	const char *def = "1";
+	const char *dlightmode = "1";
 	int flags = CVAR_ARCHIVE;
+	qboolean disable = false;
 
 	// some bad GLES1 implementations breaks dlights completely
 	if( glConfig.max_texture_units < 3 )
+		disable = true;
+
+#ifdef XASH_MOBILE_PLATFORM
+	// VideoCore4 drivers have a problem with mixing VBO and client arrays
+	// Disable it, as there is no suitable workaround here
+	if( Q_stristr( glConfig.renderer_string, "VideoCore IV" ) || Q_stristr( glConfig.renderer_string, "vc4" ) )
+		disable = true;
+
+	// dlightmode 1 is not too much tested on android
+	// so better to left it off
+	dlightmode = "0";
+#endif
+
+	if( disable )
+	{
+		// do not keep in config unless dev > 3 and enabled
+		flags = 0;
 		def = "0";
+	}
 
 	r_vbo = Cvar_Get( "r_vbo", def, flags, "draw world using VBO" );
-	r_bump = Cvar_Get( "r_bump", def, flags, "enable bump-mapping (r_vbo required)" );
+	r_bump = Cvar_Get( "r_bump", def, CVAR_ARCHIVE, "enable bump-mapping (r_vbo required)" );
+	r_vbo_dlightmode = Cvar_Get( "r_vbo_dlightmode", dlightmode, CVAR_ARCHIVE, "vbo dlight rendering mode(0-1)" );
+
+	// check if enabled manually
+	if( r_vbo->integer && host.developer > 3 )
+		r_vbo->flags |= CVAR_ARCHIVE;
 }
 
 static int GetCommandLineIntegerValue(const char* argName)
@@ -1038,7 +1063,7 @@ static void SetWidthAndHeightFromCommandLine()
 
 static void SetFullscreenModeFromCommandLine()
 {
-#ifndef __ANDROID__
+#ifndef XASH_MOBILE_PLATFORM
 	if ( Sys_CheckParm("-fullscreen") )
 	{
 		Cvar_Set2("fullscreen", "1", true);
@@ -1096,10 +1121,11 @@ qboolean R_Init( void )
 	R_InitImages();
 	R_SpriteInit();
 	R_StudioInit();
+
+	R_Strobe_Init();
+
 	R_ClearDecals();
 	R_ClearScene();
-
-	r_strobe = Cvar_Get("r_strobe", "0", CVAR_ARCHIVE, "black frame insertion interval");
 
 	// initialize screen
 	SCR_Init();
