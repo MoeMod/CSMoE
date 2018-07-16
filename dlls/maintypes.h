@@ -32,7 +32,6 @@
 #pragma once
 #endif
 
-#include "osconfig.h"
 #include "mathlib.h"
 
 // Has no references on multiplayer library CS.

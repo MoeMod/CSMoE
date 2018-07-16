@@ -63,6 +63,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+#include <ctype.h>
+
 /*
 * Globals initialization
 */

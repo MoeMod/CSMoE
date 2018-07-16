@@ -41,14 +41,14 @@
 #define SIZEBUF_OVERFLOWED		BIT(1)
 
 /* <6ae> ../common/common.h:82 */
-typedef struct sizebuf_s
+/*typedef struct sizebuf_s
 {
 	const char *buffername;
 	uint16_t flags;
 	byte *data;
 	int maxsize;
 	int cursize;
-} sizebuf_t;
+} sizebuf_t;*/
 
 /* <270aa> ../common/common.h:297 */
 typedef struct downloadtime_s

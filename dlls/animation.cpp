@@ -356,10 +356,10 @@ float SetController(void *pmodel, entvars_t *pev, int iController, float flValue
 		if (pbonecontroller->end > pbonecontroller->start + 359.0)
 		{
 			if (flValue > 360.0)
-				flValue = flValue - (int64_t)(flValue / 360.0) * 360.0;
+				flValue = flValue - (int)(flValue / 360.0) * 360.0;
 
 			else if (flValue < 0.0)
-				flValue = flValue + (int64_t)((flValue / -360.0) + 1) * 360.0;
+				flValue = flValue + (int)((flValue / -360.0) + 1) * 360.0;
 		}
 		else
 		{
@@ -371,7 +371,7 @@ float SetController(void *pmodel, entvars_t *pev, int iController, float flValue
 		}
 	}
 
-	int setting = (int64_t)(255.0f * (flValue - pbonecontroller->start) / (pbonecontroller->end - pbonecontroller->start));
+	int setting = (int)(255.0f * (flValue - pbonecontroller->start) / (pbonecontroller->end - pbonecontroller->start));
 
 	if (setting < 0)
 		setting = 0;

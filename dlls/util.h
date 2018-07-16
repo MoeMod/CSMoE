@@ -58,7 +58,6 @@
 	_logf(__FUNCTION__":: iNumPassed - %d", iNumPassedt++);
 
 #define eoNullEntity		0	// Testing the three types of "entity" for nullity
-#define iStringNull		0	// Testing strings for nullity
 
 #define cchMapNameMost		32
 
@@ -70,13 +69,7 @@
 
 extern globalvars_t *gpGlobals;
 
-#ifdef CLIENT_DLL
-#define STRING(offset) reinterpret_cast<const char *>(gpGlobals->pStringBase + (uintp)offset)
-#define MAKE_STRING(str) (reinterpret_cast<uintp>(str) - reinterpret_cast<uintp>(STRING(0)))
-#else
-#define STRING(offset)		((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
-#define MAKE_STRING(str)	((uint64_t)(str) - (uint64_t)(STRING(0)))
-#endif
+#include "qstring.h"
 
 #define WRITEKEY_INT(pf, szKeyName, iKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%d\"\n", szKeyName, iKeyValue)
 #define WRITEKEY_FLOAT(pf, szKeyName, flKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%f\"\n", szKeyName, flKeyValue)

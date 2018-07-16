@@ -1,4 +1,10 @@
+
 #include "common.h"
+#include "extdll.h"
+
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
 
 /*
 * Globals initialization

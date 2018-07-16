@@ -84,39 +84,7 @@ extern "C" {
 
 	extern DLONG	dlong;
 
-#ifdef _WIN32
-	void __inline set_fpu_cw(void)
-	{
-		_asm
-		{		wait
-			fnstcw	old_cw
-			wait
-			mov		ax, word ptr old_cw
-			or ah, 0xc
-			mov		word ptr new_cw, ax
-			fldcw	new_cw
-		}
-	}
 
-	int __inline quick_ftol(float f)
-	{
-		_asm {
-			// Assumes that we are already in chop mode, and only need a 32-bit int
-			fld		DWORD PTR f
-			fistp	DWORD PTR dlong
-		}
-		return dlong.i[0];
-	}
-
-	void __inline restore_fpu_cw(void)
-	{
-		_asm	fldcw	old_cw
-	}
-#else
-#define set_fpu_cw() /* */
-#define quick_ftol(f) ftol(f)
-#define restore_fpu_cw() /* */
-#endif
 
 	void FloorDivMod(double numer, double denom, int *quotient,
 		int *rem);

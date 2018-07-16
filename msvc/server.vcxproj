@@ -475,7 +475,6 @@
     <ClInclude Include="..\dlls\sound.h" />
     <ClInclude Include="..\dlls\soundent.h" />
     <ClInclude Include="..\dlls\spectator.h" />
-    <ClInclude Include="..\dlls\stdafx.h" />
     <ClInclude Include="..\dlls\subs.h" />
     <ClInclude Include="..\dlls\talkmonster.h" />
     <ClInclude Include="..\dlls\training_gamerules.h" />

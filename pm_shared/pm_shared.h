@@ -39,7 +39,7 @@
 extern "C" {
 #endif
 
-#define MAX_CLIENTS			32
+//#define MAX_CLIENTS			32
 
 #define PM_DEAD_VIEWHEIGHT		-8
 

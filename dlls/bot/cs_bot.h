@@ -38,6 +38,8 @@
 #include "bot/cs_bot_manager.h"
 #include "bot/cs_bot_chatter.h"
 
+#define MAX_CLIENTS			32
+
 #define CSBOT_VERSION_MAJOR		1
 #define CSBOT_VERSION_MINOR		50
 

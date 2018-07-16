@@ -846,9 +846,6 @@
     <ClInclude Include="..\public\utllinkedlist.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\stdafx.h">
-      <Filter>dlls</Filter>
-    </ClInclude>
     <ClInclude Include="..\pm_shared\pm_defs.h">
       <Filter>pm_shared</Filter>
     </ClInclude>

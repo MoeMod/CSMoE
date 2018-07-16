@@ -1,4 +1,4 @@
-#include "osconfig.h"
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -46,9 +46,11 @@
 #include <sys/stat.h>
 #include <assert.h>
 
-#ifndef _WIN32
+#ifdef _MSC_VER
+#include <corecrt_io.h>
+#else
 #include <unistd.h>
-#endif // _WIN32
+#endif
 
 PlaceDirectory placeDirectory;
 

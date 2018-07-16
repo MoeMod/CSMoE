@@ -278,7 +278,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>DBGHELP;XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_WINDLL;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DBGHELP;XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />

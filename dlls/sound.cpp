@@ -9,6 +9,8 @@
 
 #include "sound.h"
 
+#include <ctype.h>
+
 // presets for runtime pitch and vol modulation of ambient sounds
 UNTESTED dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
 {

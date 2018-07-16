@@ -212,10 +212,25 @@ include_directories (
 	../public/tier1/
 	${SDL2_INCLUDE_DIR})
 add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
+
+if(LINUX)
+	add_definitions(
+		-DLINUX -D_LINUX
+		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+		)
+endif()
+
+if(MINGW)
+add_definitions(
+	-D_EMULATE_GLIBC
+	-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+		)
+endif()
+
 add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 	-DLINUX -D_LINUX -DCLIENT_WEAPONS -DCLIENT_DLL
 	-D_DEBUG  -D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
-	-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp )
+	 )
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} ${SDL2_LIBRARY} )
 

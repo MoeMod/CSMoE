@@ -12,7 +12,6 @@
 #endif
 
 #include "port.h"
-#include "osconfig.h"
 #include "protected_things.h"
 
 

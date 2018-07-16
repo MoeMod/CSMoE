@@ -33,6 +33,7 @@
 #pragma warning(disable : 4100)		// unreferenced formal parameter
 #endif
 
+#include "stdint.h"
 #include "maintypes.h"
 #include "basetypes.h"
 #include "archtypes.h"     // DAL
@@ -86,6 +87,8 @@ typedef float vec_t;				// needed before including progdefs.h
 
 									// Shared header describing protocol between engine and DLLs
 #include "eiface.h"
+#undef DLLEXPORT
+#include "exportdef.h"
 
 									// Shared header between the client DLL and the game DLLs
 #include "cdll_dll.h"

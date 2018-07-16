@@ -35,6 +35,8 @@
 #include "hostage/hostage.h"
 #include "hostage/hostage_states.h"
 
+#define MAX_CLIENTS			32
+
 class CHostage;
 //enum HostageChatterType;
 

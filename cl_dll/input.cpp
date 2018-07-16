@@ -12,10 +12,7 @@
 // Quake is a trademark of Id Software, Inc., (c) 1996 Id Software, Inc. All
 // rights reserved.
 
-#ifdef _WIN32
 #include "port.h"
-#endif
-
 #include "hud.h"
 #include "cl_util.h"
 #include "camera.h"

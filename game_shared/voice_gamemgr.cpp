@@ -1,5 +1,3 @@
-#include "osconfig.h"
-#include "archtypes.h"     // DAL
 
 #include <string.h>
 #include <assert.h>

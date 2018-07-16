@@ -4173,7 +4173,7 @@ void CBasePlayer::CheckTimeBasedDamage()
 		return;
 
 	// only check for time based damage approx. every 2 seconds
-	if (abs((int64_t)(gpGlobals->time - m_tbdPrev)) < 2.0f)
+	if (abs(gpGlobals->time - m_tbdPrev) < 2.0f)
 		return;
 
 	m_tbdPrev = gpGlobals->time;
@@ -7449,7 +7449,7 @@ void CBasePlayer::StudioEstimateGait()
 		float flYawDiff = pev->angles.y - m_flGaityaw;
 		float flYaw = fmod(flYawDiff, 360);
 
-		flYawDiff = flYawDiff - (int64_t)(flYawDiff / 360) * 360;
+		flYawDiff = flYawDiff - (int)(flYawDiff / 360) * 360;
 
 		if (flYawDiff > 180)
 			flYawDiff -= 360;
@@ -7474,11 +7474,11 @@ void CBasePlayer::StudioEstimateGait()
 		else
 			flYawDiff *= dt;
 
-		if ((float)abs((int64_t)flYawDiff) < 0.1)
+		if ((float)abs((int)flYawDiff) < 0.1)
 			flYawDiff = 0;
 
 		m_flGaityaw += flYawDiff;
-		m_flGaityaw -= (int64_t)(m_flGaityaw / 360) * 360;
+		m_flGaityaw -= (int)(m_flGaityaw / 360) * 360;
 
 		m_flGaitMovement = 0;
 	}
@@ -7497,7 +7497,7 @@ void CBasePlayer::StudioEstimateGait()
 void CBasePlayer::StudioPlayerBlend(int *pBlend, float *pPitch)
 {
 	// calc up/down pointing
-	float range = (float)(int64_t)(*pPitch * 3.0f);
+	float range = (float)(int)(*pPitch * 3.0f);
 
 	*pBlend = range;
 
@@ -7513,7 +7513,7 @@ void CBasePlayer::StudioPlayerBlend(int *pBlend, float *pPitch)
 	}
 	else
 	{
-		*pBlend = (int64_t)((45.0f - range) * (255.0f / 90.0f));
+		*pBlend = (int)((45.0f - range) * (255.0f / 90.0f));
 		*pPitch = 0;
 	}
 }
@@ -7582,7 +7582,7 @@ void CBasePlayer::CalculateYawBlend()
 
 	blend_yaw = maxyaw - flYaw;
 
-	pev->blending[0] = (int64_t)blend_yaw;
+	pev->blending[0] = (int)blend_yaw;
 	m_flYaw = blend_yaw;
 }
 
