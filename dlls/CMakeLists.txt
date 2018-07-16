@@ -268,23 +268,32 @@ add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
 
 if(LINUX)
 	add_definitions(
+		-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
 		-DLINUX -D_LINUX -DGNUC
 		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+		-D_alloca=alloca -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE
 		)
 endif()
 
 if(MINGW)
 add_definitions(
+	-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
 	-D_EMULATE_GLIBC -DGNUC
 	-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+	-D_alloca=alloca -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE
 		)
+endif()
+
+if(MSVC)
+add_definitions(
+	-DWIN32 -DDEDICATED -D_USING_V110_SDK71_ -D_WINDLL -D_MBCS
+	-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE
+)
 endif()
 
 add_definitions( 
 	-DCLIENT_WEAPONS
-	-fpermissive -fno-strict-aliasing -DNDEBUG 
-	-w 
-	-DQUIVER -DQUAKE2 -DVALVE_DLL -D_alloca=alloca -fno-exceptions -fexpensive-optimizations -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE
+	-DQUIVER -DQUAKE2 -DVALVE_DLL
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )

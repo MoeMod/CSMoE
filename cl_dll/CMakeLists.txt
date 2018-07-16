@@ -26,6 +26,8 @@ project (CLDLL)
 # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 if (APPLE)
 set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Wpedantic -Wno-unused-parameter -ggdb")
+elseif(MSVC)
+set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 else()
 set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wl,--no-undefined -ggdb")
 endif()
@@ -227,9 +229,16 @@ add_definitions(
 		)
 endif()
 
+if(MSVC)
+add_definitions(
+	-DWIN32 -DDEDICATED -D_USING_V110_SDK71_ -D_WINDLL -D_MBCS
+	-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE
+)
+endif()
+
 add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
-	-DLINUX -D_LINUX -DCLIENT_WEAPONS -DCLIENT_DLL
-	-D_DEBUG  -D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
+	-DCLIENT_WEAPONS -DCLIENT_DLL
+	-D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
 	 )
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} ${SDL2_LIBRARY} )
