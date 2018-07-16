@@ -297,3 +297,16 @@ add_definitions(
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
+
+
+if(NOT WIN32)
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES
+			    OUTPUT_NAME "cs")
+else()
+	# For Win32 we have split DLL names
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES
+			OUTPUT_NAME "mp")
+endif()
+
+install( TARGETS ${SERVER_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)

@@ -23,21 +23,10 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (CLDLL)
 
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
-if (APPLE)
-set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Wpedantic -Wno-unused-parameter -ggdb")
-elseif(MSVC)
-set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-else()
-set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Wpedantic -Wno-unused-parameter -Wl,--no-undefined -ggdb")
-endif()
-set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb")
-set (CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  -O3")
-set (CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os")
-set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ggdb -O3")
-
 if (APPLE)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -stdlib=libc++")
+elseif(MSVC)
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 else()
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -static-libstdc++")
 endif()
@@ -244,6 +233,6 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} ${SDL2_LIBRARY} )
 
 
-set_target_properties (${CLDLL_SHARED} PROPERTIES
+set_target_properties (${CLDLL_SHARED} PROPERTIES OUTPUT_NAME "menu"
 	VERSION 1.6 SOVERSION 1.6
 	POSITION_INDEPENDENT_CODE 1)

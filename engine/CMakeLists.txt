@@ -24,17 +24,196 @@ project(XASH_ENGINE C)
 
 set(XASH_ENGINE xash) # Lib name
 
-fwgs_fix_default_msvc_settings()
-file(GLOB_RECURSE XASH_ENGINE_SOURCES         common/*.c server/*.c ) # Minimal sources
-file(GLOB_RECURSE XASH_ENGINE_WIN32_SOURCES   platform/win32/*.c) # Win32 only sources
-file(GLOB_RECURSE XASH_ENGINE_SDL_SOURCES     platform/sdl/*.c) # SDL version sources
-file(GLOB_RECURSE XASH_ENGINE_ANDROID_SOURCES platform/android/*.c) # Android sources
-file(GLOB_RECURSE XASH_ENGINE_CLIENT_SOURCES  client/*.c) # Client sources
+option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
+option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" OFF)
+option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
+option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
+option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
+option(XASH_STATIC "Static build. Implicitly enables XASH_SINGLE_BINARY." OFF)
+option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
-cond_list_append(WIN32        XASH_ENGINE_SOURCES XASH_ENGINE_WIN32_SOURCES)
-cond_list_append(XASH_SDL     XASH_ENGINE_SOURCES XASH_ENGINE_SDL_SOURCES)
-cond_list_append(ANDROID      XASH_ENGINE_SOURCES XASH_ENGINE_ANDROID_SOURCES)
-cond_list_append("NOT XASH_DEDICATED" XASH_ENGINE_SOURCES XASH_ENGINE_CLIENT_SOURCES)
+option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
+
+# Desktop or dedicated version options
+if(XASH_DEDICATED) 
+	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
+else()
+	option(XASH_SDL "Enable SDL." ON)
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
+endif()
+
+
+#file(GLOB_RECURSE XASH_ENGINE_SOURCES         common/*.c server/*.c ) # Minimal sources
+#file(GLOB_RECURSE XASH_ENGINE_WIN32_SOURCES   platform/win32/*.c) # Win32 only sources
+#file(GLOB_RECURSE XASH_ENGINE_SDL_SOURCES     platform/sdl/*.c) # SDL version sources
+#file(GLOB_RECURSE XASH_ENGINE_ANDROID_SOURCES platform/android/*.c) # Android sources
+#file(GLOB_RECURSE XASH_ENGINE_CLIENT_SOURCES  client/*.c) # Client sources
+
+set(XASH_ENGINE_SOURCES 
+	common/avikit.c
+	common/build.c
+	common/base_cmd.c
+	common/cfgscript.c
+	common/cmd.c
+	common/common.c
+	common/con_utils.c
+	common/crclib.c
+	common/crtlib.c
+	common/cvar.c
+	common/filesystem.c
+	common/host.c
+	common/hpak.c
+	common/infostring.c
+	common/identification.c
+	common/library.c
+	common/masterlist.c
+	common/mathlib.c
+	common/matrixlib.c
+	common/mod_studio.c
+	common/model.c
+	common/net_buffer.c
+	common/net_chan.c
+	common/net_encode.c
+	common/net_huff.c
+	common/network.c
+	common/pm_surface.c
+	common/pm_trace.c
+	common/random.c
+	common/sys_con.c
+	common/system.c
+	common/titles.c
+	common/world.c
+	common/zone.c
+	common/crashhandler.c
+	common/imagelib/img_bmp.c
+	common/imagelib/img_main.c
+	common/imagelib/img_quant.c
+	common/imagelib/img_tga.c
+	common/imagelib/img_utils.c
+	common/imagelib/img_wad.c
+	common/imagelib/img_dds.c
+	common/soundlib/snd_main.c
+	common/soundlib/snd_mp3.c
+	common/soundlib/snd_utils.c
+	common/soundlib/snd_wav.c
+	common/soundlib/libmpg/dct36.c
+	common/soundlib/libmpg/dct64.c
+	common/soundlib/libmpg/format.c
+	common/soundlib/libmpg/frame.c
+	common/soundlib/libmpg/index.c
+	common/soundlib/libmpg/layer3.c
+	common/soundlib/libmpg/libmpg.c
+	common/soundlib/libmpg/mpg123.c
+	common/soundlib/libmpg/parse.c
+	common/soundlib/libmpg/reader.c
+	common/soundlib/libmpg/synth.c
+	common/soundlib/libmpg/tabinit.c
+	common/Sequence.c
+	common/IceKey.cpp
+	common/mod_decryptor.cpp 
+
+
+	server/sv_client.c
+	server/sv_cmds.c
+	server/sv_custom.c
+	server/sv_frame.c
+	server/sv_filter.c
+	server/sv_game.c
+	server/sv_init.c
+	server/sv_main.c
+	server/sv_log.c
+	server/sv_move.c
+	server/sv_phys.c
+	server/sv_pmove.c
+	server/sv_save.c
+	server/sv_world.c
+
+)
+
+set(XASH_ENGINE_WIN32_SOURCES
+	./platform/win32/con_win.c
+)
+
+set(XASH_ENGINE_SDL_SOURCES
+	./platform/sdl/events.c
+	./platform/sdl/gl_sdl.c
+	./platform/sdl/snd_sdl.c
+	./platform/sdl/vid_sdl.c
+)
+
+set(XASH_ENGINE_ANDROID_SOURCES
+   platform/android/vid_android.c
+   platform/android/android_nosdl.c
+   platform/android/snd_opensles.c
+)
+
+set(XASH_ENGINE_CLIENT_SOURCES
+   client/cl_cmds.c
+   client/cl_demo.c
+   client/cl_events.c
+   client/cl_frame.c
+   client/cl_game.c
+   client/cl_main.c
+   client/cl_menu.c
+   client/cl_mobile.c
+   client/cl_parse.c
+   client/cl_pmove.c
+   client/cl_remap.c
+   client/cl_scrn.c
+   client/cl_tent.c
+   client/cl_video.c
+   client/cl_view.c
+   client/cl_netgraph.c
+   client/gl_backend.c
+   client/gl_beams.c
+   client/gl_cull.c
+   client/gl_decals.c
+   client/gl_draw.c
+   client/gl_image.c
+   client/gl_mirror.c
+   client/gl_refrag.c
+   client/gl_rlight.c
+   client/gl_rmain.c
+   client/gl_rmath.c
+   client/gl_rmisc.c
+   client/gl_rpart.c
+   client/gl_rsurf.c
+   client/gl_rstrobe.c
+   client/gl_sprite.c
+   client/gl_studio.c
+   client/vid_common.c
+   client/gl_warp.c
+   client/joyinput.c
+   client/input.c
+   client/keys.c
+   client/input_evdevkey.c
+   client/console.c
+   client/touch.c
+   client/gamma.c
+   client/s_dsp.c
+   client/s_load.c
+   client/s_main.c
+   client/s_mix.c
+   client/s_mouth.c
+   client/s_stream.c
+   client/s_utils.c
+   client/s_vox.c
+   client/vgui/vgui_draw.c
+)
+
+if(WIN32)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_WIN32_SOURCES})
+endif()
+if(XASH_SDL)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_SDL_SOURCES})
+endif()
+if(ANDROID)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_ANDROID_SOURCES})
+endif()
+if(NOT XASH_DEDICATED)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_CLIENT_SOURCES})
+endif()
 
 
 include_directories(
@@ -47,6 +226,7 @@ include_directories(
 	server/
 	../common
 	../pm_shared
+	../SDL2/include
 )
 
 if(XASH_NANOGL)
@@ -128,12 +308,43 @@ if(XASH_DEDICATED)
 	endif()
 endif()
 
+
 if(XASH_SDL)
+
+	# /*
+	# ==============
+	# xash_link_sdl2
+	#
+	# Download and link SDL2, if supported
+	# ==============
+	# */
+
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-	xash_link_sdl2(${XASH_ENGINE})
+
+	find_library(SDL2_LIBRARY
+		NAMES 
+			SDL2 SDL2.dll SDL2.lib
+		PATHS  
+			../SDL2/lib
+			../SDL2/lib/i386-linux-gnu
+			../SDL2/lib/x86
+			NO_DEFAULT_PATH
+	)
+
+	if(MINGW)
+		if(XASH_64BIT)
+			set(SDL2_SUBDIR "SDL2-${SDL2_VER}/x86_64-w64-mingw32")
+		else()
+			set(SDL2_SUBDIR "SDL2-${SDL2_VER}/i686-w64-mingw32")
+		endif()
+		set(SDL2_DLL "${SDL2_SUBDIR}/SDL2.dll")
+	endif()
+
 	add_definitions(-DXASH_SDL)
 	if(MSVC)
+
 		string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
+		
 		install(FILES ${SDL2_DLL}
 			CONFIGURATIONS Debug
 			DESTINATION ${LIB_INSTALL_DIR}/Debug/)
@@ -141,7 +352,9 @@ if(XASH_SDL)
 			CONFIGURATIONS Release
 			DESTINATION ${LIB_INSTALL_DIR}/Release/)
 	endif()
-endif()
+	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
+
+endif() #if(XASH_SDL)
 
 if(XASH_GLES)
 	add_definitions(-DXASH_GLES -DXASH_GL_STATIC)
@@ -199,7 +412,7 @@ if(XASH_USE_STB_SPRINTF)
 	add_definitions(-DXASH_USE_STB_SPRINTF)
 endif()
 
-fwgs_set_default_properties(${XASH_ENGINE})
+#fwgs_set_default_properties(${XASH_ENGINE})
 
 if(NOT WIN32)
 	target_link_libraries(${XASH_ENGINE} -lm -lpthread)
@@ -219,4 +432,5 @@ else()
 	endif()
 endif()
 
-fwgs_install(${XASH_ENGINE})
+install( TARGETS ${XASH_ENGINE} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
+        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)

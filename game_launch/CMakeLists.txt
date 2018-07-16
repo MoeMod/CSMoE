@@ -24,7 +24,6 @@ cmake_minimum_required(VERSION 2.6.0)
 project(XASH_LAUNCHER C)
 
 set(XASH_LAUNCHER xash3d)
-fwgs_fix_default_msvc_settings()
 file(GLOB XASH_LAUNCHER_SOURCES *.c)
 if(WIN32)
 	list(APPEND XASH_LAUNCHER_SOURCES game.rc)
@@ -43,9 +42,9 @@ endif()
 
 if(WIN32)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
-		OUTPUT_NAME xash) # Change name to your gamedir, if you building a standalone game
+		OUTPUT_NAME csbtem_win32) # Change name to your gamedir, if you building a standalone game
 endif()
 
 target_link_libraries(${XASH_LAUNCHER} ${CMAKE_DL_LIBS})
 
-fwgs_install(${XASH_LAUNCHER})
+install( TARGETS ${XASH_LAUNCHER} DESTINATION ${LIB_INSTALL_DIR}/xash3d )

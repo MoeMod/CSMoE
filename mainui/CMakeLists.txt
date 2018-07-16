@@ -23,18 +23,6 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
-if(MSVC)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-else()
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -m32")
-endif()
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-set (CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os")
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g -O3")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
-
 if(PANDORA)
 	add_definitions(-DPANDORA)
 endif()
@@ -45,9 +33,23 @@ file (GLOB MAINUI_SOURCES *.cpp legacy/*.cpp)
 include_directories (../common ../engine ../pm_shared ../mainui)
 add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
 
+if(MSVC)
+	add_definitions(
+	-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE
+		)
+endif()
+
 set_target_properties (${MAINUI_SHARED} PROPERTIES
 	VERSION ${XASH3D_VERSION} SOVERSION ${XASH3D_VERSION}
 	POSITION_INDEPENDENT_CODE 1)
+
+if(NOT WIN32)
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
+			    OUTPUT_NAME "xash_menu")
+else()
+	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
+			OUTPUT_NAME "menu")
+endif()
 
 install( TARGETS ${MAINUI_LIBRARY} DESTINATION ${LIB_INSTALL_DIR}/xash3d 
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
