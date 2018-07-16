@@ -43,13 +43,6 @@ else()
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
 endif()
 
-
-#file(GLOB_RECURSE XASH_ENGINE_SOURCES         common/*.c server/*.c ) # Minimal sources
-#file(GLOB_RECURSE XASH_ENGINE_WIN32_SOURCES   platform/win32/*.c) # Win32 only sources
-#file(GLOB_RECURSE XASH_ENGINE_SDL_SOURCES     platform/sdl/*.c) # SDL version sources
-#file(GLOB_RECURSE XASH_ENGINE_ANDROID_SOURCES platform/android/*.c) # Android sources
-#file(GLOB_RECURSE XASH_ENGINE_CLIENT_SOURCES  client/*.c) # Client sources
-
 set(XASH_ENGINE_SOURCES 
 	common/avikit.c
 	common/build.c
@@ -253,7 +246,7 @@ add_definitions(-DXASH_FORCEINLINE)
 
 # Important, as HLSDK and engine shares some symbol names!
 if(NOT WIN32) # Windows by default have hidden visibility and better linker
-	fwgs_add_compile_options(C -fvisibility=hidden)
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
 # ----- Conditions -----
@@ -411,8 +404,6 @@ endif()
 if(XASH_USE_STB_SPRINTF)
 	add_definitions(-DXASH_USE_STB_SPRINTF)
 endif()
-
-#fwgs_set_default_properties(${XASH_ENGINE})
 
 if(NOT WIN32)
 	target_link_libraries(${XASH_ENGINE} -lm -lpthread)
