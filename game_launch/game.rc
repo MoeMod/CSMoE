@@ -23,6 +23,6 @@
 #define VER_ORIGINALFILENAME_STR	"hl.exe"
 #define VER_INTERNALNAME_STR		"xash"
 
-#include <common.ver>
+//#include <common.ver>
 
 IDI_ICON1	ICON    DISCARDABLE		"game.ico"

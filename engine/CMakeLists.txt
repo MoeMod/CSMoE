@@ -266,20 +266,20 @@ if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
-if(WIN32 AND NOT XASH_64BIT)
+if(MINGW OR LINUX)
+	add_definitions(-DGDB_BREAK)
+elseif(WIN32 AND NOT XASH_64BIT)
 	add_definitions( -DDBGHELP -DXASH_W32CON) # dbghelp crashhandler
 	if(MINGW)
 		target_link_libraries(${XASH_ENGINE} -luser32 -lkernel32 -lgdi32 -ldbghelp -lpsapi)
 	endif()
-else()
+endif()
+
+if(NOT WIN32 OR XASH_64BIT)
 	if(XASH_USE_SELECT)
 		add_definitions(-DUSE_SELECT)
 	endif()
 	add_definitions(-DCOLORIZE_CONSOLE)
-endif()
-
-if(LINUX)
-	add_definitions(-DGDB_BREAK)
 endif()
 
 if(NOT XASH_64BIT AND NOT MSVC)

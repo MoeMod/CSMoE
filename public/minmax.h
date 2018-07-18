@@ -4,6 +4,14 @@
 #pragma once
 #endif
 
+#ifdef min
+#undef min
+#endif 
+#ifdef max
+#undef max
+#endif 
+
+
 #ifndef __cplusplus
 #ifndef min
 #define min(a, b) ((a) < (b) ? (a) : (b))
