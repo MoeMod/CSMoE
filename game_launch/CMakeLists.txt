@@ -47,4 +47,3 @@ endif()
 
 target_link_libraries(${XASH_LAUNCHER} ${CMAKE_DL_LIBS})
 
-install( TARGETS ${XASH_LAUNCHER} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX} )

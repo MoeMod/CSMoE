@@ -22,9 +22,28 @@
 #endif
 #else // __cplusplus
 
-#include<algorithm>
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+
+#include <algorithm>
+#include <type_traits>
 using std::min;
 using std::max;
+
+template<class T1, class T2, class Ret = typename std::common_type<T1, T2>::type>
+auto min(const T1 &a, const T2 &b) -> std::enable_if_t<!std::is_same<T1, T2>::value, Ret>
+{
+    return std::min(static_cast<Ret>(a), static_cast<Ret>(b));
+}
+template<class T1, class T2, class Ret = typename std::common_type<T1, T2>::type>
+auto max(const T1 &a, const T2 &b) -> std::enable_if_t<!std::is_same<T1, T2>::value, Ret>
+{
+    return std::max(static_cast<Ret>(a), static_cast<Ret>(b));
+}
 
 #endif // __cplusplus
 

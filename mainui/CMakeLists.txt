@@ -51,5 +51,4 @@ else()
 			OUTPUT_NAME "menu")
 endif()
 
-install( TARGETS ${MAINUI_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/cl_dlls )
 

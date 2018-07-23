@@ -75,6 +75,10 @@ if (MINGW)
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--add-stdcall-alias")
 endif()
 
+if(CLANG)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -static-libstdc++ ")
+endif()
+
 # add_compile_options for older cmake versions
 if(${CMAKE_VERSION} VERSION_LESS "3.0.2")
 	macro(add_compile_options)
@@ -270,7 +274,7 @@ if(LINUX)
 	add_definitions(
 		-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
 		-DLINUX -D_LINUX -DGNUC
-		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
 		-D_alloca=alloca -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE
 		)
 endif()
@@ -307,5 +311,3 @@ else()
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES
 			OUTPUT_NAME "mp")
 endif()
-
-install( TARGETS ${SERVER_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/dlls)

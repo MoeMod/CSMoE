@@ -201,7 +201,7 @@ include_directories (
 	../game_shared/
 	../public/
 	../public/tier1/
-	${SDL2_INCLUDE_DIR})
+	)
 add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
 
 if(LINUX)
@@ -230,11 +230,9 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 	-D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
 	 )
 
-target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} ${SDL2_LIBRARY} )
+target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
 
 
 set_target_properties (${CLDLL_SHARED} PROPERTIES OUTPUT_NAME "menu"
 	VERSION 1.6 SOVERSION 1.6
 	POSITION_INDEPENDENT_CODE 1)
-
-install( TARGETS ${CLDLL_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/cl_dlls )

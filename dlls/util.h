@@ -33,6 +33,7 @@
 #endif
 
 #include "port.h"
+#include "minmax.h"
 #include <string.h>
 #ifndef ACTIVITY_H
 #include "activity.h"
@@ -160,7 +161,7 @@ extern DLL_GLOBAL const Vector g_vecZero;
 		PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
 
 #include <type_traits>
-#define CHECK_TRIVIALLYDESTRUCTIBLE(T) static_assert(std::is_trivially_destructible<T>::value, #T" should be TriviallyDestructible.")
+#define CHECK_TRIVIALLYDESTRUCTIBLE(T) static_assert(std::is_trivially_destructible<T>::value, #T " should be TriviallyDestructible.")
 
 #ifdef CLIENT_DLL
 #define LINK_ENTITY_TO_CLASS( x, y )
