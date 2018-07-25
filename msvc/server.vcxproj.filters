@@ -496,6 +496,12 @@
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\player\player_zombie.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\player\player_model.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1052,6 +1058,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h">
       <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_zombie.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_model.h">
+      <Filter>dlls\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

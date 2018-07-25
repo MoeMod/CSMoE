@@ -136,7 +136,16 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 {
 	// TODO: update local health data
 	BufferReader reader( pszName, pbuf, iSize );
-	int x = reader.ReadByte();
+	//int x = reader.ReadByte();
+	int x = m_iHealth;
+	if (iSize == 2)
+	{
+		x = reader.ReadShort();
+	}
+	else
+	{
+		x = reader.ReadByte();
+	}
 
 	m_iFlags |= HUD_DRAW;
 
@@ -285,6 +294,7 @@ void CHudHealth::DrawHealthBar( float flTime )
 		x = CrossWidth + HealthWidth / 2;
 
 		x = DrawUtils::DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iHealth, r, g, b);
+		//x = DrawUtils::DrawHudNumber2(x, y, m_iHealth, r, g, b);
 	}
 }
 

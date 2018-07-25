@@ -156,6 +156,8 @@
 
 #include "player/player_const.h"
 
+#include "player/player_zombie.h"
+
 struct WeaponStruct
 {
 	int m_type;
@@ -664,6 +666,17 @@ public:
 	float m_silentTimestamp;
 	MusicState m_musicState;
 	float m_flLastCommandTime[8];
+
+public:
+#ifdef CLIENT_DLL
+	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
+#else
+	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
+#endif
+
+public:
+	bool m_bIsZombie;
+	ZombieLevel m_iZombieLevel;
 };
 
 extern int gEvilImpulse101;

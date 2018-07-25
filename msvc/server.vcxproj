@@ -213,8 +213,10 @@
     <ClCompile Include="..\dlls\player.cpp" />
     <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\player\hintmessage.cpp" />
+    <ClCompile Include="..\dlls\player\player_model.cpp" />
     <ClCompile Include="..\dlls\player\player_msg.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
+    <ClCompile Include="..\dlls\player\player_zombie.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />
     <ClCompile Include="..\dlls\sound.cpp" />
@@ -465,9 +467,11 @@
     <ClInclude Include="..\dlls\player\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\player\hintmessage.h" />
     <ClInclude Include="..\dlls\player\player_const.h" />
+    <ClInclude Include="..\dlls\player\player_model.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
     <ClInclude Include="..\dlls\player\player_signal.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
+    <ClInclude Include="..\dlls\player\player_zombie.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
     <ClInclude Include="..\dlls\schedule.h" />
     <ClInclude Include="..\dlls\scriptevent.h" />

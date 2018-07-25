@@ -65,28 +65,14 @@
 #include "tutor_cs_states.h"
 #include "tutor_cs_tutor.h"
 
+#include "player/player_model.h"
+
 /*
 * Globals initialization
 */
 float g_flTimeLimit = 0;
 float g_flResetTime = 0;
 bool g_bClientPrintEnable = true;
-
-char *sPlayerModelFiles[] =
-{
-	"models/player.mdl",
-	"models/player/leet/leet.mdl",
-	"models/player/gign/gign.mdl",
-	"models/player/vip/vip.mdl",
-	"models/player/gsg9/gsg9.mdl",
-	"models/player/guerilla/guerilla.mdl",
-	"models/player/arctic/arctic.mdl",
-	"models/player/sas/sas.mdl",
-	"models/player/terror/terror.mdl",
-	"models/player/urban/urban.mdl",
-	"models/player/spetsnaz/spetsnaz.mdl",	// CZ
-	"models/player/militia/militia.mdl"	// CZ
-};
 
 bool g_skipCareerInitialSpawn = false;
 
@@ -1957,7 +1943,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	player->m_iModelName = appearance.model_id;
 
 	SET_CLIENT_KEY_VALUE(player->entindex(), GET_INFO_BUFFER(player->edict()), "model", appearance.model_name);
-	player->SetNewPlayerModel(sPlayerModelFiles[ appearance.model_name_index ]);
+	player->SetNewPlayerModel(Client_ApperanceToModel(appearance.model_name_index));
 
 	if (mp->m_iMapHasVIPSafetyZone == MAP_VIP_SAFETYZONE_UNINITIALIZED)
 	{
@@ -4206,14 +4192,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/pl_pain6.wav");
 	PRECACHE_SOUND("player/pl_pain7.wav");
 
-	int numPlayerModels;
-	if (g_bIsCzeroGame)
-		numPlayerModels = ARRAYSIZE(sPlayerModelFiles);
-	else
-		numPlayerModels = ARRAYSIZE(sPlayerModelFiles) - 2;
-
-	for (i = 0; i < numPlayerModels; ++i)
-		PRECACHE_MODEL(sPlayerModelFiles[i]);
+	PlayerModel_Precache();
 
 	if (g_bIsCzeroGame)
 	{
@@ -4277,8 +4256,7 @@ void ClientPrecache()
 	Vector vMin = Vector(-38, -24, -41);
 	Vector vMax = Vector(38, 24, 41);
 
-	for (i = 0; i < numPlayerModels; ++i)
-		ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, sPlayerModelFiles[i]);
+	PlayerModel_ForceUnmodified(vMin, vMax);
 
 	if (g_bIsCzeroGame)
 	{

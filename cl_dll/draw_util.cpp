@@ -161,15 +161,43 @@ int DrawUtils::DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int 
 
 	if ( iNumber > 0 )
 	{
+		// SPR_Draw 10000's
+		if (iNumber >= 10000)
+		{
+			k = iNumber / 10000;
+			SPR_Set(gHUD.GetSprite(gHUD.m_HUD_number_0 + k), r, g, b);
+			SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(gHUD.m_HUD_number_0 + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS))
+		{
+			//SPR_DrawAdditive( 0, x, y, &rc );
+			x += iWidth;
+		}
+
+		// SPR_Draw 1000's
+		if (iNumber >= 1000)
+		{
+			k = (iNumber % 10000) / 1000;
+			SPR_Set(gHUD.GetSprite(gHUD.m_HUD_number_0 + k), r, g, b);
+			SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(gHUD.m_HUD_number_0 + k));
+			x += iWidth;
+		}
+		else if (iFlags & (DHN_5DIGITS | DHN_4DIGITS))
+		{
+			//SPR_DrawAdditive( 0, x, y, &rc );
+			x += iWidth;
+		}
+
 		// SPR_Draw 100's
 		if ( iNumber >= 100 )
 		{
-			k = iNumber / 100;
+			k = (iNumber % 1000) / 100;
 			SPR_Set( gHUD.GetSprite( gHUD.m_HUD_number_0 + k ), r, g, b );
 			SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( gHUD.m_HUD_number_0 + k ) );
 			x += iWidth;
 		}
-		else if ( iFlags & ( DHN_3DIGITS ) )
+		else if ( iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS ) )
 		{
 			//SPR_DrawAdditive( 0, x, y, &rc );
 			x += iWidth;
@@ -183,7 +211,7 @@ int DrawUtils::DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int 
 			SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect( gHUD.m_HUD_number_0 + k ) );
 			x += iWidth;
 		}
-		else if ( iFlags & ( DHN_3DIGITS | DHN_2DIGITS ) )
+		else if ( iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS | DHN_2DIGITS ) )
 		{
 			//SPR_DrawAdditive( 0, x, y, &rc );
 			x += iWidth;
@@ -199,18 +227,17 @@ int DrawUtils::DrawHudNumber( int x, int y, int iFlags, int iNumber, int r, int 
 	{
 		SPR_Set( gHUD.GetSprite( gHUD.m_HUD_number_0 ), r, g, b );
 
-		// SPR_Draw 100's
-		if ( iFlags & ( DHN_3DIGITS ) )
-		{
-			//SPR_DrawAdditive( 0, x, y, &rc );
+		if (iFlags & (DHN_5DIGITS))
 			x += iWidth;
-		}
 
-		if ( iFlags & ( DHN_3DIGITS | DHN_2DIGITS ) )
-		{
-			//SPR_DrawAdditive( 0, x, y, &rc );
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS))
 			x += iWidth;
-		}
+
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS))
+			x += iWidth;
+
+		if (iFlags & (DHN_5DIGITS | DHN_4DIGITS | DHN_3DIGITS | DHN_2DIGITS))
+			x += iWidth;
 
 		// SPR_Draw ones
 

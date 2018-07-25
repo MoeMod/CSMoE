@@ -1324,20 +1324,27 @@ void CBasePlayer::GiveDefaultItems()
 	RemoveAllItems(FALSE);
 	m_bHasPrimary = false;
 
-	switch (m_iTeam)
+	if (m_bIsZombie)
 	{
-	case CT:
 		GiveNamedItem("weapon_knife");
-		GiveNamedItem("weapon_usp");
-		GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
+	}
+	else
+	{
+		switch (m_iTeam)
+		{
+		case CT:
+			GiveNamedItem("weapon_knife");
+			GiveNamedItem("weapon_usp");
+			GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
-		break;
-	case TERRORIST:
-		GiveNamedItem("weapon_knife");
-		GiveNamedItem("weapon_glock18");
-		GiveAmmo(40, "9mm", MAX_AMMO_9MM);
+			break;
+		case TERRORIST:
+			GiveNamedItem("weapon_knife");
+			GiveNamedItem("weapon_glock18");
+			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
-		break;
+			break;
+		}
 	}
 }
 
@@ -1946,7 +1953,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	m_iClientHealth = 0;
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
-		WRITE_BYTE(m_iClientHealth);
+		WRITE_SHORT(m_iClientHealth); // WRITE_BYTE
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pev);
@@ -3280,7 +3287,7 @@ void CBasePlayer::Disappear()
 
 	m_iClientHealth = 0;
 	MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
-		WRITE_BYTE(m_iClientHealth);
+		WRITE_SHORT(m_iClientHealth); // WRITE_BYTE
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pev);
@@ -6333,7 +6340,7 @@ void CBasePlayer::UpdateClientData()
 
 		// send "health" update message
 		MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
-			WRITE_BYTE(iHealth);
+			WRITE_SHORT(iHealth); // WRITE_BYTE
 		MESSAGE_END();
 
 		m_iClientHealth = (int)pev->health;
@@ -6575,6 +6582,10 @@ void CBasePlayer::ResetMaxSpeed()
 	else if (m_bIsVIP != NULL)
 	{
 		speed = 227;
+	}
+	else if (m_bIsZombie)
+	{
+		speed = 270;
 	}
 	else if (m_pActiveItem != NULL)
 	{

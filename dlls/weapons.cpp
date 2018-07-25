@@ -664,6 +664,11 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 		return;
 	}
 
+	if (pPlayer->m_bIsZombie && m_iId != WEAPON_KNIFE)
+	{
+		return;
+	}
+
 	// can I have this?
 	if (!g_pGameRules->CanHavePlayerItem(pPlayer, this))
 	{
@@ -1712,7 +1717,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
-	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn)
+	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie)
 		return;
 
 	pPlayer->OnTouchingWeapon(this);
