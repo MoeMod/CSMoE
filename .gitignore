@@ -63,9 +63,7 @@ ZERO_CHECK.*
 
 # Visual Studio
 *.obj
-*.dll
 *.exp
-*.lib
 *.suo
 *.sdf
 Debug/
@@ -307,3 +305,8 @@ build-*
 
 # Android
 *.apk
+
+
+# Others
+/.idea
+/cmake-build-debug
