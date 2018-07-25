@@ -390,7 +390,7 @@ void OnFreeEntPrivateData(edict_t *pEnt)
 	RemoveEntityHashValue(pEntity->pev, STRING(pEntity->pev->classname), CLASSNAME);
 }
 
-static NEW_DLL_FUNCTIONS gNewDLLFunctions =
+NEW_DLL_FUNCTIONS gNewDLLFunctions =
 {
 	OnFreeEntPrivateData,
 	NULL,

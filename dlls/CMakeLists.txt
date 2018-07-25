@@ -270,12 +270,13 @@ include_directories (
 	../game_shared/)
 add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
 
-if(LINUX)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions(
-		-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
-		-DLINUX -D_LINUX -DGNUC
-		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
-		-D_alloca=alloca -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE
+			-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
+			-DLINUX -D_LINUX -DGNUC
+			-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
+			-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
+			-D_close=close -D_write=write
 		)
 endif()
 
@@ -295,7 +296,7 @@ add_definitions(
 )
 endif()
 
-add_definitions( 
+add_definitions(
 	-DCLIENT_WEAPONS
 	-DQUIVER -DQUAKE2 -DVALVE_DLL
 	)

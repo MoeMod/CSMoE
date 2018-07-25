@@ -35,12 +35,12 @@ using std::min;
 using std::max;
 
 template<class T1, class T2, class Ret = typename std::common_type<T1, T2>::type>
-auto min(const T1 &a, const T2 &b) -> std::enable_if_t<!std::is_same<T1, T2>::value, Ret>
+auto min(const T1 &a, const T2 &b) -> typename std::enable_if<!std::is_same<T1, T2>::value, Ret>::type
 {
     return std::min(static_cast<Ret>(a), static_cast<Ret>(b));
 }
 template<class T1, class T2, class Ret = typename std::common_type<T1, T2>::type>
-auto max(const T1 &a, const T2 &b) -> std::enable_if_t<!std::is_same<T1, T2>::value, Ret>
+auto max(const T1 &a, const T2 &b) -> typename std::enable_if<!std::is_same<T1, T2>::value, Ret>::type
 {
     return std::max(static_cast<Ret>(a), static_cast<Ret>(b));
 }

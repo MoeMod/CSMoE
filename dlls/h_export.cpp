@@ -13,6 +13,10 @@ globalvars_t *gpGlobals;
 	#pragma comment (linker, "/SECTION:.data,RW")
 #endif
 
+#ifndef _WIN32
+#define WINAPI // LINUX SUPPORT
+#endif
+
 // Receive engine function table from engine.
 // This appears to be the _first_ DLL routine called by the engine, so we
 // do some setup operations here.
