@@ -417,6 +417,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\dlls\bot_include.h" />
     <ClInclude Include="..\dlls\career_tasks.h" />
     <ClInclude Include="..\dlls\cbase.h" />
     <ClInclude Include="..\dlls\cdll_dll.h" />

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "bot_include.h"
+
 CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
@@ -25,16 +27,20 @@ void CMod_Zombi::CheckMapConditions()
 	CVAR_SET_FLOAT("sv_skycolor_g", 150);
 	CVAR_SET_FLOAT("sv_skycolor_b", 150);
 
-	// create fog
+	// create fog, however it doesnt work...
 	CBaseEntity *fog = nullptr;
 	while ((fog = UTIL_FindEntityByClassname(fog, "env_fog")) != nullptr)
 	{
 		REMOVE_ENTITY(fog->edict());
 	}
 	CClientFog *newfog = GetClassPtr<CClientFog>(NULL);
+	MAKE_STRING_CLASS("env_fog", newfog->pev);
 	newfog->Spawn();
 	newfog->m_fDensity = 0.0016f;
 	newfog->pev->rendercolor = { 0,0,0 };
+
+	// light
+	LIGHT_STYLE(0, "f");
 }
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
@@ -262,8 +268,8 @@ void CMod_Zombi::MakeZombieOrigin()
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
 	player->MakeZombie(ZOMBIE_LEVEL_HOST);
-	player->pev->health = std::min(1000, static_cast<int>(attacker->pev->health * 0.7f)) + 1000;
-	player->pev->armorvalue = std::min(100, static_cast<int>(attacker->pev->armorvalue * 0.5f)) + 100;
+	player->pev->health = std::max(1000, static_cast<int>(attacker->pev->health * 0.7f)) + 1000;
+	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f)) + 100;
 
 	InfectionSound();
 	PRECACHE_SOUND("zombi/human_death_01.wav");
@@ -324,6 +330,8 @@ void CMod_Zombi::TeamCheck()
 		{
 			player->m_iTeam = player->m_bIsZombie ? TERRORIST :CT;
 			TeamChangeUpdate(player, player->m_iTeam);
+
+			TheBots->OnEvent(EVENT_PLAYER_CHANGED_TEAM, player);
 		}
 	}
 }
