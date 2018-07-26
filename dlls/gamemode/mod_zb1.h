@@ -16,6 +16,7 @@ public:
 	CMod_Zombi();
 
 public: // CHalfLifeMultiplay
+	void CheckMapConditions() override;
 	BOOL IsTeamplay(void) override { return TRUE; }
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
@@ -24,8 +25,9 @@ public: // CHalfLifeMultiplay
 	BOOL FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker) override;
 	void CheckWinConditions() override;
 	int IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled);
+	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 
-public:
+public: // IBaseMod
 	bool IsZBMode() override { return true; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
 

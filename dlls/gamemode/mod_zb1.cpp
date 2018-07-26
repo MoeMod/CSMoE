@@ -13,10 +13,28 @@
 
 CMod_Zombi::CMod_Zombi() // precache
 {
-	CVAR_SET_STRING("sv_skyname", "hk");
-
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
+}
+
+void CMod_Zombi::CheckMapConditions()
+{
+	IBaseMod_RemoveObjects::CheckMapConditions();
+	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
+	CVAR_SET_FLOAT("sv_skycolor_r", 150);
+	CVAR_SET_FLOAT("sv_skycolor_g", 150);
+	CVAR_SET_FLOAT("sv_skycolor_b", 150);
+
+	// create fog
+	CBaseEntity *fog = nullptr;
+	while ((fog = UTIL_FindEntityByClassname(fog, "env_fog")) != nullptr)
+	{
+		REMOVE_ENTITY(fog->edict());
+	}
+	CClientFog *newfog = GetClassPtr<CClientFog>(NULL);
+	newfog->Spawn();
+	newfog->m_fDensity = 0.0016f;
+	newfog->pev->rendercolor = { 0,0,0 };
 }
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
@@ -36,7 +54,7 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 	if (player->pev->deadflag != DEAD_NO)
 		return false;
 
-	if (player->m_iTeam == TEAM_TERRORIST)
+	if (player->m_bIsZombie)
 		return false;
 
 	return true;
@@ -109,15 +127,23 @@ void CMod_Zombi::CheckWinConditions()
 
 	if (!NumAliveTerrorist || TimeRemaining() < 0.0f)
 	{
+		Broadcast("ctwin");
 		EndRoundMessage("#CTs_Win", ROUND_CTS_WIN);
 		TerminateRound(5, WINSTATUS_CTS);
 		RoundEndScore(WINSTATUS_CTS);
+
+		++m_iNumCTWins;
+		UpdateTeamScores();
 	}
 	else if (!NumAliveCT)
 	{
+		Broadcast("terwin");
 		EndRoundMessage("#Terrorists_Win", ROUND_TERRORISTS_WIN);
 		TerminateRound(5, WINSTATUS_TERRORISTS);
 		RoundEndScore(WINSTATUS_TERRORISTS);
+
+		++m_iNumTerroristWins;
+		UpdateTeamScores();
 	}
 
 }
@@ -167,7 +193,6 @@ void CMod_Zombi::RoundEndScore(int iWinStatus)
 		
 	}
 
-	
 }
 
 int CMod_Zombi::IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled)
@@ -176,6 +201,16 @@ int CMod_Zombi::IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled)
 		return 3;
 
 	return 0;
+}
+
+void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
+{
+	// additional death when zombie being killed.
+	if (pVictim->m_bIsZombie)
+	{
+		pVictim->m_iDeaths++;
+	}
+	return IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 
 int CMod_Zombi::ZombieOriginNum()
@@ -235,12 +270,13 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 	PRECACHE_SOUND("zombi/human_death_02.wav");
 	EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_01.wav" : "zombi/human_death_02.wav", VOL_NORM, ATTN_NORM);
 
-	TeamCheck();
+
 	DeathNotice(player, attacker->pev, attacker->m_pActiveItem->pev);
 	SetScoreAttrib(player, player);
-	//CheckWinConditions();
+	TeamCheck();
+	CheckWinConditions();
 
-	player->m_iDeaths -= 1;
+	player->m_iDeaths += 1;
 	player->AddPoints(0, FALSE);
 	attacker->AddPoints(1, FALSE);
 }
@@ -258,9 +294,19 @@ void CMod_Zombi::InfectionSound()
 
 void CMod_Zombi::RestartRound()
 {
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
+		player->m_bIsZombie = false;
+	}
+
 	TeamCheck();
 
 	CVAR_SET_FLOAT("mp_autoteambalance", 0.0f);
+	
 	IBaseMod::RestartRound();
 	m_bTCantBuy = false;
 }
@@ -290,7 +336,7 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 
 	// Give Armor
 	pPlayer->pev->health = 1000;
-	pPlayer->pev->gravity = 0.83f;
+	pPlayer->pev->gravity = 0.86f;
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;

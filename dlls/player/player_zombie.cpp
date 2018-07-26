@@ -3,6 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "gamerules.h"
+#include "client.h"
 
 void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 {
@@ -13,13 +14,24 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	pev->body = 0;
 	m_iModelName = iEvolutionLevel ? MODEL_ZOMBIE_ORIGIN : MODEL_ZOMBIE_HOST;
 
-	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", iEvolutionLevel ? "zombi_origin" : "zombi_host");
+	const char *szModel = iEvolutionLevel ? "zombi_origin" : "zombi_host";
+	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", const_cast<char *>(szModel));
+
+	static char szModelPath[64];
+	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	SetNewPlayerModel(szModelPath);
+	//this->m_modelIndexPlayer = MODEL_INDEX(szModelPath);
+	//ClientUserInfoChanged
+
 
 	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_ZOMBIE\"\n", STRING(pev->netname), GETPLAYERUSERID(edict()), GETPLAYERAUTHID(edict()));
 
-	// remove guns
+	// remove guns & give nvg
 	GiveDefaultItems();
+	m_bNightVisionOn = false;
+	ClientCommand("nightvision");
 
+	// set default property
 	pev->health = 2000;
 	pev->armortype = ARMOR_TYPE_HELMET;
 	pev->armorvalue = 200;

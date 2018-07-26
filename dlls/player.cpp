@@ -616,6 +616,9 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	if (pAttacker != NULL && g_pGameRules->IsTeamplay() && m_iTeam == pAttacker->m_iTeam && CVAR_GET_FLOAT("mp_friendlyfire") == 0)
 		bShouldBleed = false;
 
+	if (m_bIsZombie)
+		bShouldBleed = false;
+
 	if (pev->takedamage == DAMAGE_NO)
 		return;
 
@@ -654,7 +657,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 
 		case HITGROUP_HEAD:
 		{
-			if (m_iKevlar == ARMOR_TYPE_HELMET)
+			if (m_iKevlar == ARMOR_TYPE_HELMET && !m_bIsZombie)
 			{
 				bShouldBleed = false;
 				bShouldSpark = true;
@@ -1327,6 +1330,15 @@ void CBasePlayer::GiveDefaultItems()
 	if (m_bIsZombie)
 	{
 		GiveNamedItem("weapon_knife");
+
+		if (!(this->m_flDisplayHistory & DHF_NIGHTVISION))
+		{
+			this->HintMessage("#Hint_use_nightvision");
+			this->m_flDisplayHistory |= DHF_NIGHTVISION;
+		}
+		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+		m_bHasNightVision = true;
+		SendItemStatus(this);
 	}
 	else
 	{
