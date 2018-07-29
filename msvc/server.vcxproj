@@ -235,7 +235,8 @@
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapontype.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_normal.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -293,6 +294,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m249.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -498,7 +500,7 @@
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_normal.h" />
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
@@ -514,6 +516,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
@@ -566,6 +569,7 @@
     <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\arraysize.h" />
     <ClInclude Include="..\public\basetypes.h" />
+    <ClInclude Include="..\public\json.hpp" />
     <ClInclude Include="..\public\MemPool.h" />
     <ClInclude Include="..\public\minmax.h" />
     <ClInclude Include="..\public\osconfig.h" />

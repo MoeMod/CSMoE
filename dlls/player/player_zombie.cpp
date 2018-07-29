@@ -38,3 +38,30 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	pev->gravity = 0.83f;
 	ResetMaxSpeed();
 }
+
+void CBasePlayer::DeathSound_Zombie()
+{
+	// temporarily using pain sounds for death sounds
+	switch (RANDOM_LONG(1, 2))
+	{
+	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
+	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+	}
+}
+
+void CBasePlayer::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
+{
+	switch (RANDOM_LONG(0, 1))
+	{
+	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
+	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
+	}
+}
+
+void PlayerZombie_Precache()
+{
+	PRECACHE_SOUND("zombi/zombi_death_1.wav");
+	PRECACHE_SOUND("zombi/zombi_death_2.wav");
+	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
+	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
+}

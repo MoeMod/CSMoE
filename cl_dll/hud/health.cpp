@@ -199,6 +199,7 @@ int CHudHealth:: MsgFunc_ScoreAttrib(const char *pszName,  int iSize, void *pbuf
 	g_PlayerExtraInfo[index].dead   = !!(flags & PLAYER_DEAD);
 	g_PlayerExtraInfo[index].has_c4 = !!(flags & PLAYER_HAS_C4);
 	g_PlayerExtraInfo[index].vip    = !!(flags & PLAYER_VIP);
+	g_PlayerExtraInfo[index].zombie = !!(flags & PLAYER_ZOMBIE);
 	return 1;
 }
 // Returns back a color from the

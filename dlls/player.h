@@ -674,6 +674,9 @@ public:
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
 #endif
 
+	void DeathSound_Zombie();
+	void Pain_Zombie(int m_LastHitGroup, bool HasArmour);
+
 public:
 	bool m_bIsZombie;
 	ZombieLevel m_iZombieLevel;

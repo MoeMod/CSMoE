@@ -229,13 +229,16 @@ void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src)
 {
 	int state = 0;
 	if (src->pev->deadflag != DEAD_NO)
-		state |= SCORE_STATUS_DEAD;
+		state |= PLAYER_DEAD;
 
 	if (src->m_bHasC4)
-		state |= SCORE_STATUS_BOMB;
+		state |= PLAYER_HAS_C4;
 
 	if (src->m_bIsVIP)
-		state |= SCORE_STATUS_VIP;
+		state |= PLAYER_VIP;
+
+	if (src->m_bIsZombie)
+		state |= PLAYER_ZOMBIE;
 
 	if (gmsgScoreAttrib)
 	{

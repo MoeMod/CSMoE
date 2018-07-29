@@ -83,12 +83,10 @@
 #define ITEMSTATE_HASNIGHTVISION (1<<0)
 #define ITEMSTATE_HASDEFUSER (1<<1)
 
-#define SCORE_STATUS_DEAD		(1<<0)
-#define SCORE_STATUS_BOMB		(1<<1)
-#define SCORE_STATUS_VIP		(1<<2)
 #define PLAYER_DEAD (1<<0)
 #define PLAYER_HAS_C4 (1<<1)
 #define PLAYER_VIP (1<<2)
+#define PLAYER_ZOMBIE (1<<3)
 
 #define SIGNAL_BUY			(1<<0)
 #define SIGNAL_BOMB			(1<<1)

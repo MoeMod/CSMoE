@@ -147,6 +147,7 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	{
 		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_ZB;
 		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_HM;
+		m_Teamplay = false;
 		break;
 	}
 	default:

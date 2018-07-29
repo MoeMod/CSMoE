@@ -4192,6 +4192,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/pl_pain6.wav");
 	PRECACHE_SOUND("player/pl_pain7.wav");
 
+	PlayerZombie_Precache();
 	PlayerModel_Precache();
 
 	if (g_bIsCzeroGame)

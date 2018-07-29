@@ -448,6 +448,9 @@ void CBasePlayer::SmartRadio()
 
 void CBasePlayer::Pain(int m_LastHitGroup, bool HasArmour)
 {
+	if (m_bIsZombie)
+		return Pain_Zombie(m_LastHitGroup, HasArmour);
+
 	int temp = RANDOM_LONG(0, 2);
 
 	if (m_LastHitGroup == HITGROUP_HEAD)
@@ -524,6 +527,9 @@ int TrainSpeed(int iSpeed, int iMax)
 
 void CBasePlayer::DeathSound()
 {
+	if (m_bIsZombie)
+		return DeathSound_Zombie();
+
 	// temporarily using pain sounds for death sounds
 	switch (RANDOM_LONG(1, 4))
 	{
@@ -570,9 +576,6 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	CBasePlayer *pAttacker = dynamic_cast<CBasePlayer *>(CBaseEntity::Instance(pevAttacker));
 
 	if (pAttacker != NULL && g_pGameRules->IsTeamplay() && m_iTeam == pAttacker->m_iTeam && CVAR_GET_FLOAT("mp_friendlyfire") == 0)
-		bShouldBleed = false;
-
-	if (m_bIsZombie)
 		bShouldBleed = false;
 
 	if (pev->takedamage == DAMAGE_NO)
@@ -641,7 +644,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 		{
 			flDamage *= 1;
 
-			if (m_iKevlar != ARMOR_TYPE_EMPTY)
+			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
 			else if (bShouldBleed)
@@ -657,7 +660,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 		{
 			flDamage *= 1.25;
 
-			if (m_iKevlar != ARMOR_TYPE_EMPTY)
+			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
 			else if (bShouldBleed)
@@ -672,7 +675,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 		case HITGROUP_LEFTARM:
 		case HITGROUP_RIGHTARM:
 		{
-			if (m_iKevlar != ARMOR_TYPE_EMPTY)
+			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
 			break;
@@ -688,7 +691,8 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 
 	if (bShouldBleed)
 	{
-		BloodSplat(ptr->vecEndPos, vecDir, ptr->iHitgroup, flDamage * 5);
+		if(!m_bIsZombie)
+			BloodSplat(ptr->vecEndPos, vecDir, ptr->iHitgroup, flDamage * 5);
 		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);			// a little surface blood.
 		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
 	}
@@ -1285,7 +1289,8 @@ void CBasePlayer::GiveDefaultItems()
 
 	if (m_bIsZombie)
 	{
-		GiveNamedItem("weapon_knife");
+		//GiveNamedItem("weapon_knife");
+		GiveNamedItem("weapon_knife_zombi");
 
 		if (!(this->m_flDisplayHistory & DHF_NIGHTVISION))
 		{

@@ -45,7 +45,7 @@ enum KnifeID
 	KNIFE_1PVE_UNARM_STANDALONEHAND,
 	KNIFE_1PVE_KNIFE_STANDALONEKNIFE,
 	KNIFE_SHEEPSWORD,
-	
+
 	KNIFE_THANATOS9 = 39,
 	KNIFE_VXLKNIFE,
 	KNIFE_ZBTAG = 41, // emotion_z?
@@ -85,6 +85,8 @@ enum KnifeID
 	KNIFE_ZOMBI_Z4HIDE,
 	KNIFE_ZOMBI_Z4HUMPBACK,
 	KNIFE_SCHAND,
+
+	KNIFE_ENDS
 };
 
 struct KnifeSoundInfo // sizeof == 84
@@ -111,32 +113,36 @@ struct KnifeModelInfo // sizeof == 28
 	int flDeployNextIdleTime;
 };
 
+class CKnife;
+
 class IKnifeHelper // wtf
 {
 public:
-	virtual void Deploy() = 0;
-	virtual BOOL CanHolster() { return 1; };
-	virtual void Holster() = 0;
-	virtual void WeaponIdle() = 0;
-	virtual void PrimaryAttack() = 0;
-	virtual void SecondaryAttack() = 0;
-	virtual void DelayPrimaryAttack() = 0;
-	virtual void DelaySecondaryAttack() = 0;
-	virtual BOOL UseDecrement() { return FALSE; }; // always return 0
-	virtual void ScaleDamagePrimaryAttack(float in, float &out) = 0;
-	virtual void ScaleDamageSecondaryAttack(float in, float &out) = 0;
-	virtual void GetPrimaryAttackDistance(){}; // null, called from CKnife::PrimaryAttack
-	virtual void GetSecondaryAttackDistance(){}; // null
-	virtual void GetKnockBackData(){}; // GetKnockBackData from hw??
-	virtual void ph14(){}; // null
-	virtual void ph15(){}; // null
-	virtual void ph16(){}; // null
-	virtual void AddToPlayer(){}; // 
-	virtual void ItemPostFrame(){}; // null 
-	virtual void ph19(){}; // null*/
+	virtual BOOL Deploy(CKnife *) = 0;
+	virtual BOOL CanHolster(CKnife *) { return 1; };
+	virtual void Holster(CKnife *, int skiplocal) = 0;
+	virtual void WeaponIdle(CKnife *) = 0;
+	virtual void PrimaryAttack(CKnife *) = 0;
+	virtual void SecondaryAttack(CKnife *) = 0;
+	virtual void DelayPrimaryAttack(CKnife *) = 0;
+	virtual void DelaySecondaryAttack(CKnife *) = 0;
+	virtual BOOL UseDecrement(CKnife *) { return FALSE; }; // always return 0
+	virtual void ScaleDamagePrimaryAttack(CKnife *, float in, float &out) = 0;
+	virtual void ScaleDamageSecondaryAttack(CKnife *, float in, float &out) = 0;
+	virtual void GetPrimaryAttackDistance(CKnife *){}; // null, called from CKnife::PrimaryAttack
+	virtual void GetSecondaryAttackDistance(CKnife *){}; // null
+	virtual void GetKnockBackData(CKnife *){}; // GetKnockBackData from hw??
+	virtual void ph14(CKnife *){}; // null
+	virtual void ph15(CKnife *){}; // null
+	virtual void ph16(CKnife *){}; // null
+	virtual void AddToPlayer(CKnife *){}; // 
+	virtual void ItemPostFrame(CKnife *){}; // null 
+	virtual void ph19(CKnife *){}; // null*/
 
 	virtual ~IKnifeHelper() {}
 
 };
+
+IKnifeHelper *KnifeHelper_Get(KnifeID idx);
 
 #endif

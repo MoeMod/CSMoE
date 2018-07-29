@@ -11,4 +11,6 @@ enum ZombieLevel
 	ZOMBIE_LEVEL_ORIGIN_LV2, // TBD
 };
 
+void PlayerZombie_Precache();
+
 #endif

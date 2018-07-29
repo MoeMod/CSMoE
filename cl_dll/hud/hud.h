@@ -414,6 +414,7 @@ struct extra_player_info_t
 	bool has_c4;
 	bool vip;
 	bool dead;
+	bool zombie;
 	bool showhealth;
 	bool nextflash;
 	bool talking;
@@ -834,6 +835,7 @@ class CHudNVG: public CHudBase
 {
 public:
 	int Init( void );
+	int VidInit(void);
 	int Draw( float flTime );
 	CHudMsgFunc(NVGToggle);
 
@@ -843,6 +845,7 @@ private:
 	int m_iAlpha;
 	cvar_t *cl_fancy_nvg;
 	dlight_t *m_pLight;
+	float m_LightStypeBackup;
 };
 
 //

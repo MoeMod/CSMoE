@@ -490,9 +490,6 @@
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_normal.cpp">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
@@ -501,6 +498,15 @@
     </ClCompile>
     <ClCompile Include="..\dlls\player\player_model.cpp">
       <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp">
+      <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1053,9 +1059,6 @@
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h">
       <Filter>dlls\wpn_shared\knife</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_normal.h">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
@@ -1067,6 +1070,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\bot_include.h">
       <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\json.hpp">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h">
+      <Filter>dlls\wpn_shared\knife</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

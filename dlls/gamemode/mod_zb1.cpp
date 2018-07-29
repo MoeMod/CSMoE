@@ -348,6 +348,8 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;
+
+	pPlayer->m_signals.Signal(SIGNAL_BUY);
 }
 
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)

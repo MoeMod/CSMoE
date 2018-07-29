@@ -1,0 +1,125 @@
+{
+	"name": "usp",
+	"classname": "weapon_usp",
+
+	"Spawn": {
+		"iDefaultAmmo": 12,
+		"flAccuracyDefault": 0.92,
+		"szWorldModel": "w_usp.mdl"
+	},
+
+	"GetItemInfo": {
+		"szAmmo1": "45acp",
+		"iMaxAmmo1": {
+			"Zombie": 200,
+			"ZombieScenario": 600,
+			"ZombieShelter": 600,
+			"Default": 100
+		},
+		"szAmmo2": "",
+		"iMaxAmmo2": -1,
+		"iSlot": "SECONDARY",
+
+		"bCanBuy": true,
+		"iTeam": "ALL",
+		"iCost": 500,
+		"flArmorRatio": 1.0,
+		"szBuyMenuType": "PISTOL"
+	},
+
+	"Deploy": {
+		"DefaultDeploy": {
+			"szViewModel": "models/v_usp.mdl",
+			"szWeaponModel": "models/p_usp.mdl",
+			"iAnim": [ 14, 6 ],
+			"szAnimExt": "onehanded"
+		},
+		"flDeployTime": 0.75,
+		"flDeployIdleTime": 1.0,
+		"flMaxSpeed": 250
+	},
+
+	"PrimaryAttack": {
+		"USPFire": {
+			"SpreadCalculate": {
+				"formula": "flSpread = a * (1 - m_flAccuracy)",
+				"a": {
+					"NotOnGround": [ 1.2, 1.3 ],
+					"Walking": [ 0.225, 0.25 ],
+					"Ducking": [ 0.08, 0.125 ],
+					"Default": [ 0.1, 0.15 ]
+				}
+			},
+			"flCycleTime": [ 0.225, 0.225 ]
+		}
+	},
+
+	"SecondaryAttack": {
+		"iAnim": [ 7, 15 ],
+		"flNextAttackTime": 3
+	},
+
+	"USPFire": {
+		"flCycleTimeDecrease": 0.075,
+		"AccuracyCalculate": {
+			"formula": "m_flAccuracy -= (a - (gpGlobals->time - m_flLastFire)) * b",
+			"a": 0.3,
+			"b": 0.275
+		},
+		"AccuracyRange": {
+			"formula": "m_flAccuracy = clamp(m_flAccuracy, min, max)",
+			"min": 0.6,
+			"max": 0.92
+		},
+		"FireBullets3": {
+			"flDistance": 4096,
+			"iPenetration": 1,
+			"iBulletType": "BULLET_PLAYER_45ACP",
+			"iDamage": {
+				"Zombie": [ 34, 30 ],
+				"ZombieScenario": [ 34, 30 ],
+				"ZombieShelter": [ 34, 30 ],
+				"Default": [ 34, 30 ]
+			},
+			"flRangeModifier": 0.79,
+			"bPistol": true
+		},
+		"flNextIdleTime": 2,
+		"PunchAngleDelta": [ -2, 0, 0 ]
+	},
+
+	"Reload": {
+		"DefaultReload": {
+			"iClipSize": 12,
+			"iAnim": [ 13, 5 ],
+			"flReloadTime": 2.7
+		}
+	},
+
+	"WeaponIdle": {
+		"flNextIdleTime": 20,
+		"iAnim": [ 8, 0 ]
+	},
+
+	"HudSprite": {
+		"WeaponList": "weapon_usp",
+		"DeathNotice": "d_usp				640 640hud1	192	32	32	16"
+	},
+
+	"EV_FireUSP": {
+		"iAnim": [
+			[ 9, 10, 11 ],
+			[ 1, 2, 3 ]
+		],
+		"szShootSound": [
+			[ "weapons/usp_unsil-1.wav" ],
+			[ "weapons/usp1.wav", "weapons/usp2.wav" ]
+		],
+		"ShellModel": "models/pshell.mdl",
+		"ShellOrigin": {
+			"LocalLeftHand": [ 36, -14, -14 ],
+			"LocalRightHand": [ 36, -14, 14 ],
+			"Default": [ 20, -12, 4 ]
+		}
+	}
+}
