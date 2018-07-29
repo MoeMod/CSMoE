@@ -133,8 +133,15 @@ void CMod_Zombi::CheckWinConditions()
 
 	if (!NumAliveTerrorist || TimeRemaining() < 0.0f)
 	{
-		Broadcast("ctwin");
-		EndRoundMessage("#CTs_Win", ROUND_CTS_WIN);
+		//Broadcast("ctwin");
+		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+		{
+			CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+			if (!entity)
+				continue;
+			CLIENT_COMMAND(entity->edict(), "spk win_human\n");
+		}
+		EndRoundMessage("HumanWin", ROUND_CTS_WIN);
 		TerminateRound(5, WINSTATUS_CTS);
 		RoundEndScore(WINSTATUS_CTS);
 
@@ -143,8 +150,15 @@ void CMod_Zombi::CheckWinConditions()
 	}
 	else if (!NumAliveCT)
 	{
-		Broadcast("terwin");
-		EndRoundMessage("#Terrorists_Win", ROUND_TERRORISTS_WIN);
+		//Broadcast("terwin");
+		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+		{
+			CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+			if (!entity)
+				continue;
+			CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
+		}
+		EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
 		TerminateRound(5, WINSTATUS_TERRORISTS);
 		RoundEndScore(WINSTATUS_TERRORISTS);
 

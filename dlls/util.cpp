@@ -1608,7 +1608,7 @@ void CSaveRestoreBuffer::BufferRewind(int size)
 }
 
 #ifndef _WIN32
-extern "C"
+/*extern "C"
 {
 	inline unsigned _rotr(unsigned val, int shift)
 	{
@@ -1627,7 +1627,7 @@ extern "C"
 
 		return num;
 	}
-}
+}*/
 #endif // _WIN32
 
 unsigned int CSaveRestoreBuffer::HashString(const char *pszToken)

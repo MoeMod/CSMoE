@@ -82,8 +82,10 @@ LOCAL_SRC_FILES := \
 	h_export.cpp \
 	player/csdm_randomspawn.cpp \
 	player/hintmessage.cpp \
+	player/player_model.cpp \
 	player/player_msg.cpp \
 	player/player_spawnpoint.cpp \
+	player/player_zombie.cpp \
 	hostage/hostage.cpp \
 	hostage/hostage_improv.cpp \
 	hostage/hostage_localnav.cpp \
@@ -150,6 +152,7 @@ LOCAL_SRC_FILES := \
 	wpn_shared/wpn_ump45.cpp \
 	wpn_shared/wpn_usp.cpp \
 	wpn_shared/wpn_xm1014.cpp \
+	wpn_shared/wpn_knife_zombi.cpp \
 	gamemode/mods.cpp \
 	gamemode/mod_base.cpp \
 	gamemode/mod_none.cpp \
