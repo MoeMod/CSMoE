@@ -71,8 +71,10 @@ private:
 
 extern globalvars_t *gpGlobals;
 
-#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
-#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))
+//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
+//#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))
+#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
+#define MAKE_STRING(str) ((ptrdiff_t)(str) - (ptrdiff_t)(STRING(0)))
 
 // Inlines
 inline bool QString::IsNull() const

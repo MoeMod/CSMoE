@@ -291,42 +291,6 @@ public:
 		return NULL;
 	}
 
-#if defined(_DEBUG) && !defined(CLIENT_DLL)
-	void FunctionCheck(void *pFunction, char *name)
-	{
-		if (pFunction && !NAME_FOR_FUNCTION((unsigned long)(pFunction)))
-			ALERT(at_error, "No EXPORT: %s:%s (%08lx)\n", STRING(pev->classname), name, (unsigned long)pFunction);
-	}
-
-	BASEPTR ThinkSet(BASEPTR func, char *name)
-	{
-		m_pfnThink = func;
-		FunctionCheck((void *)*((int *)((char *)this + (offsetof(CBaseEntity, m_pfnThink)))), name);
-		return func;
-	}
-
-	ENTITYFUNCPTR TouchSet(ENTITYFUNCPTR func, char *name)
-	{
-		m_pfnTouch = func;
-		FunctionCheck((void *)*((int *)((char *)this + (offsetof(CBaseEntity, m_pfnTouch)))), name);
-		return func;
-	}
-
-	USEPTR UseSet(USEPTR func, char *name)
-	{
-		m_pfnUse = func;
-		FunctionCheck((void *)*((int *)((char *)this + (offsetof(CBaseEntity, m_pfnUse)))), name);
-		return func;
-	}
-
-	ENTITYFUNCPTR BlockedSet(ENTITYFUNCPTR func, char *name)
-	{
-		m_pfnBlocked = func;
-		FunctionCheck((void *)*((int *)((char *)this + (offsetof(CBaseEntity, m_pfnBlocked)))), name);
-		return func;
-	}
-#endif
-
 	static CBaseEntity *Create(char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner = NULL);
 
 	edict_t *edict(void) { return ENT(pev); }
@@ -379,17 +343,14 @@ public:
 	bool has_disconnected;
 };
 
-#if defined(_DEBUG) && !defined(CLIENT_DLL)
-#define SetThink(a) ThinkSet(static_cast <void (CBaseEntity::*)(void)>(a), #a)
-#define SetTouch(a) TouchSet(static_cast <void (CBaseEntity::*)(CBaseEntity *)>(a), #a)
-#define SetUse(a) UseSet(static_cast <void (CBaseEntity::*)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)>(a), #a)
-#define SetBlocked(a) BlockedSet(static_cast <void (CBaseEntity::*)(CBaseEntity *)>(a), #a)
-#else
-#define SetThink(a) m_pfnThink = static_cast<void (CBaseEntity::*)(void)>(a)
-#define SetTouch(a) m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
-#define SetUse(a) m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(a)
-#define SetBlocked(a) m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
-#endif
+#define SetThink(a)\
+	m_pfnThink = static_cast<void (CBaseEntity::*)()>(a)
+#define SetTouch(a)\
+	m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
+#define SetUse(a)\
+	m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(a)
+#define SetBlocked(a)\
+	m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
 
 class CPointEntity : public CBaseEntity
 {

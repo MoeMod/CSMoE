@@ -49,6 +49,8 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 	endif()
 endif()
 
+
+set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
