@@ -14,6 +14,7 @@ class CKnife_Zombi : public CKnife
 {
 public:
 	void Precache() override;
+	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL Deploy();
 	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
 	virtual int iItemSlot() { return KNIFE_SLOT; }

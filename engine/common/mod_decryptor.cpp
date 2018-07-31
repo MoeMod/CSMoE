@@ -61,7 +61,7 @@ extern "C" void Mod_DecryptModel(model_t *mod, byte *buffer)
 {
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);
 
-	if (!strncmp(mod->name, "models/player", 13))
+	if (!Q_strncmp(mod->name, "models/player", 13))
 	{
 		if (studiohdr->numhitboxes == 21)
 			studiohdr->numhitboxes = 20;

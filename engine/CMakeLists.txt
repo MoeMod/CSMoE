@@ -314,7 +314,7 @@ if(XASH_SDL)
 
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 
-	find_library(SDL2_																																																																																																																																																																																																																																																							LIBRARY
+	find_library(SDL2																																																																																																																																																																																																																																																							LIBRARY
 		NAMES 
 			SDL2 SDL2.dll SDL2.lib
 		PATHS  

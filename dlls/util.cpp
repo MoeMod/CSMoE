@@ -1607,8 +1607,8 @@ void CSaveRestoreBuffer::BufferRewind(int size)
 	m_pdata->size -= size;
 }
 
-#ifndef _WIN32
-/*extern "C"
+#if defined __arm__ || defined _M_ARM
+extern "C"
 {
 	inline unsigned _rotr(unsigned val, int shift)
 	{
@@ -1627,7 +1627,7 @@ void CSaveRestoreBuffer::BufferRewind(int size)
 
 		return num;
 	}
-}*/
+}
 #endif // _WIN32
 
 unsigned int CSaveRestoreBuffer::HashString(const char *pszToken)

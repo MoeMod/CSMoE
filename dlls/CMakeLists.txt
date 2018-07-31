@@ -25,9 +25,15 @@ cmake_minimum_required(VERSION 2.6.0)
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-# include(VSForceXPToolchain) # Force XP toolchain for Visual Studio
-
 project (SERVER)
+
+if (APPLE)
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -stdlib=libc++")
+elseif(MSVC)
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+else()
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -static-libstdc++")
+endif()
 
 #--------------
 # USER DEFINES \
@@ -48,46 +54,6 @@ set(SERVER_LIBRARY_NAME "cs" CACHE STRING "Library name for Linux/MacOS/Windows"
 ###################\
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT 64BIT)
-	if(MSVC)
-		error("UNDONE: set 32 build flags")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -m32")
-	endif()
-	set(CMAKE_SIZEOF_VOID_P 4)
-endif()
-
-if(64BIT AND CMAKE_SIZEOF_VOID_P EQUAL 4)
-	message(FATAL_ERROR "You enabled XASH_64BIT, but compiler can't create 64 bit code!")
-endif()
-
-if(64BIT)
-	message(STATUS "Building for 64 Bit")
-else()
-	message(STATUS "Building for 32 Bit")
-endif()
-
-if (MINGW)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
-	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--add-stdcall-alias")
-endif()
-
-if(CLANG)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -static-libstdc++ ")
-endif()
-
-# add_compile_options for older cmake versions
-if(${CMAKE_VERSION} VERSION_LESS "3.0.2")
-	macro(add_compile_options)
-		set(list_var "${ARGV}")
-		foreach(arg IN LISTS list_var)
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${arg}")
-		endforeach()
-	endmacro()
-endif()
 
 set(HLDLL_SRCS
 	./airtank.cpp
@@ -119,6 +85,8 @@ set(HLDLL_SRCS
 	./player/hintmessage.cpp
 	./player/player_msg.cpp
 	./player/player_spawnpoint.cpp
+	./player/player_model.cpp
+	./player/player_zombie.cpp
 	./items.cpp
 	./lights.cpp
 	./maprules.cpp
@@ -223,6 +191,8 @@ set(HLWPN_SRCS
 	./wpn_shared/wpn_ump45.cpp
 	./wpn_shared/wpn_usp.cpp
 	./wpn_shared/wpn_xm1014.cpp
+
+	./wpn_shared/wpn_knife_zombi.cpp
 	)
 
 set(PM_SRCS
@@ -306,9 +276,9 @@ target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
 
 if(NOT WIN32)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES
-			    OUTPUT_NAME "cs")
+		PREFIX "" OUTPUT_NAME "cs")
 else()
 	# For Win32 we have split DLL names
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES
-			OUTPUT_NAME "mp")
+		OUTPUT_NAME "mp")
 endif()

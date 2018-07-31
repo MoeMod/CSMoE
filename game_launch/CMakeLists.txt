@@ -29,6 +29,11 @@ if(WIN32)
 	list(APPEND XASH_LAUNCHER_SOURCES game.rc)
 endif()
 
+include_directories(
+	.
+	../SDL2/include
+)
+
 add_executable(${XASH_LAUNCHER} WIN32 ${XASH_LAUNCHER_SOURCES})
 
 # SDL2 provides it's own crossplatform main() implementation and simple message boxes
@@ -36,7 +41,7 @@ add_executable(${XASH_LAUNCHER} WIN32 ${XASH_LAUNCHER_SOURCES})
 # Otherwise it prints errors in stdin.
 if(XASH_SDL AND NOT WIN32)
 	set(SDL2_BUILDING_EXECUTABLE YES) # Link SDL2main also
-	xash_link_sdl2(${XASH_LAUNCHER})
+	target_link_libraries(${XASH_LAUNCHER} SDL2)
 	add_definitions(-DXASH_SDL)
 endif()
 

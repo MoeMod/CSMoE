@@ -45,7 +45,7 @@ set_target_properties (${MAINUI_SHARED} PROPERTIES
 
 if(NOT WIN32)
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
-			    OUTPUT_NAME "xash_menu")
+			    OUTPUT_NAME "xashmenu")
 else()
 	set_target_properties(${MAINUI_LIBRARY} PROPERTIES
 			OUTPUT_NAME "menu")

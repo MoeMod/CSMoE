@@ -304,6 +304,10 @@ build-*
 # Android
 *.apk
 
+# SDL2
+/SDL2
+!/SDL2/include
+!/SDL2/lib
 
 # Others
 /.idea

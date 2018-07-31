@@ -35,16 +35,6 @@ set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set (CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} ")
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ")
 
-# force build 32bit libraries
-if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    if(APPLE)
-        SET(CMAKE_OSX_ARCHITECTURES "i386")
-    else()
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-    endif()
-endif()
-
 #find_package(SDL2 REQUIRED)
 
 set (CLDLL_LIBRARY client)
@@ -204,7 +194,7 @@ include_directories (
 	)
 add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
 
-if(LINUX)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions(
 		-DLINUX -D_LINUX
 		-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
@@ -232,7 +222,5 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
 
-
-set_target_properties (${CLDLL_SHARED} PROPERTIES OUTPUT_NAME "menu"
-	VERSION 1.6 SOVERSION 1.6
-	POSITION_INDEPENDENT_CODE 1)
+set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+	PREFIX "" OUTPUT_NAME "client")

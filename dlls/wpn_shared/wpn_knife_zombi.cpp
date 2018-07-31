@@ -59,6 +59,14 @@ void CKnife_Zombi::Precache(void)
 	m_usKnife = PRECACHE_EVENT(1, "events/knife.sc");
 }
 
+int CKnife_Zombi::GetItemInfo(ItemInfo *p)
+{
+	CKnife::GetItemInfo(p);
+	p->pszName = STRING("weapon_knife");
+
+	return 1;
+}
+
 BOOL CKnife_Zombi::Deploy(void)
 {
 	m_fMaxSpeed = 250;
