@@ -291,7 +291,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 	EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_01.wav" : "zombi/human_death_02.wav", VOL_NORM, ATTN_NORM);
 
 
-	DeathNotice(player, attacker->pev, attacker->m_pActiveItem->pev);
+	DeathNotice(player, attacker->pev, attacker->pev);
 	SetScoreAttrib(player, player);
 	TeamCheck();
 	CheckWinConditions();
@@ -362,8 +362,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;
-
-	pPlayer->m_signals.Signal(SIGNAL_BUY);
 }
 
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)

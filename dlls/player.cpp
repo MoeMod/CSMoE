@@ -5755,6 +5755,12 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 void OLD_CheckBuyZone(CBasePlayer *player)
 {
+	if (g_pModRunning->FIgnoreBuyZone(player))
+	{
+		player->m_signals.Signal(SIGNAL_BUY);
+		return;
+	}
+
 	const char *pszSpawnClass = NULL;
 
 	if (player->m_iTeam == TERRORIST)
@@ -5800,7 +5806,7 @@ void CBasePlayer::HandleSignals()
 
 	if (mp->IsMultiplayer())
 	{
-		if (!mp->m_bMapHasBuyZone)
+		if (!mp->m_bMapHasBuyZone || g_pModRunning->FIgnoreBuyZone(this))
 			OLD_CheckBuyZone(this);
 
 		if (!mp->m_bMapHasBombZone)

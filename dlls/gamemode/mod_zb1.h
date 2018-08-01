@@ -29,6 +29,7 @@ public: // CHalfLifeMultiplay
 
 public: // IBaseMod
 	bool IsZBMode() override { return true; }
+	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
 
 protected:

@@ -30,7 +30,8 @@ public: // CHalfLifeMultiplay
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override { return true; }
 public:
-	bool IsZBMode() override { return false; }
+	bool IsZBMode() override { return true; }
+	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
 
 public:
 	int CalcLeaderFrags();

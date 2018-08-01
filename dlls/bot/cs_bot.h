@@ -336,6 +336,8 @@ public:
 	virtual void Walk();
 	virtual bool Jump(bool mustJump = false);										// returns true if jump was started
 
+	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
+
 	virtual void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL);			// invoked when event occurs in the game (some events have NULL entity)
 
 	#define CHECK_FOV true
@@ -1411,20 +1413,6 @@ inline const Vector *CCSBot::GetNoisePosition() const
 		return &m_noisePosition;
 
 	return NULL;
-}
-
-inline bool CCSBot::IsAwareOfEnemyDeath() const
-{
-	if (GetEnemyDeathTimestamp() == 0.0f)
-		return false;
-
-	if (m_enemy == NULL)
-		return true;
-
-	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > (1.0f - GetProfile()->GetSkill()))
-		return true;
-
-	return false;
 }
 
 inline bool CCSBot::IsNotMoving() const

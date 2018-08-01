@@ -973,6 +973,8 @@ void CCSBot::UpdateReactionQueue()
 		m_enemyQueue[ now ].player = NULL;
 		m_enemyQueue[ now ].isReloading = false;
 		m_enemyQueue[ now ].isProtectedByShield = false;
+		if(m_isAttacking)
+			StopAttacking();
 	}
 
 	// queue is round-robin

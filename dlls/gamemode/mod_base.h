@@ -15,7 +15,8 @@ class CBasePlayer; // player.h
 class IBaseMod : public CHalfLifeMultiplay
 {
 public:
-	virtual bool IsZBMode() = 0;
+	virtual bool IsZBMode() { return false; };
+	virtual bool FIgnoreBuyZone(CBasePlayer *player) { return false; }
 	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) = 0;
 };
 

@@ -31,6 +31,11 @@ if(CMAKE_SIZEOF_VOID_P MATCHES "8")
     endif()
 endif()
 
+# force xp build
+if(MSVC)
+	add_definitions(-D_USING_V110_SDK71_)
+endif()
+
 if(64BIT AND CMAKE_SIZEOF_VOID_P EQUAL 4)
 	message(FATAL_ERROR "You enabled XASH_64BIT, but compiler can't create 64 bit code!")
 endif()

@@ -516,10 +516,11 @@ void AttackState::OnUpdate(CCSBot *me)
 	if (gpGlobals->time > m_reacquireTimestamp)
 		me->FireWeaponAtEnemy();
 
-
+	bool bEnemyIsZombie = (enemy->IsPlayer() && static_cast<CBasePlayer *>(enemy)->m_bIsZombie);
+	// attacking zombie, must moveback
 	// do dodge behavior
 	// If sniping or crouching, stand still.
-	if (m_dodge && !me->IsUsingSniperRifle() && !m_crouchAndHold)
+	if (m_dodge || bEnemyIsZombie)
 	{
 		Vector toEnemy = enemy->pev->origin - me->pev->origin;
 		float range = toEnemy.Length2D();
@@ -530,67 +531,76 @@ void AttackState::OnUpdate(CCSBot *me)
 		float maxRange = me->GetCombatRange() + hysterisRange;
 
 		// move towards (or away from) enemy if we are using a knife, behind a corner, or we aren't very skilled
-		if (me->GetProfile()->GetSkill() < 0.66f || !me->IsEnemyVisible())
+		if (me->GetProfile()->GetSkill() < 0.66f || !me->IsEnemyVisible() || bEnemyIsZombie)
 		{
 			if (range > maxRange)
+			{
 				me->MoveForward();
+				SetCrouchAndHold(false);
+			}
 			else if (range < minRange)
+			{
 				me->MoveBackward();
-		}
-
-		// don't dodge if enemy is facing away
-		const float dodgeRange = 2000.0f;
-		if (range > dodgeRange || !me->IsPlayerFacingMe(enemy))
-		{
-			m_dodgeState = STEADY_ON;
-			m_nextDodgeStateTimestamp = 0.0f;
-		}
-		else if (gpGlobals->time >= m_nextDodgeStateTimestamp)
-		{
-			int next;
-
-			// select next dodge state that is different that our current one
-			do
-			{
-				// high-skill bots may jump when first engaging the enemy (if they are moving)
-				const float jumpChance = 33.3f;
-				if (m_firstDodge && me->GetProfile()->GetSkill() > 0.5f && RANDOM_FLOAT(0, 100) < jumpChance && !me->IsNotMoving())
-					next = RANDOM_LONG(0, NUM_ATTACK_STATES - 1);
-				else
-					next = RANDOM_LONG(0, NUM_ATTACK_STATES - 2);
+				SetCrouchAndHold(false);
 			}
-			while (!m_firstDodge && next == m_dodgeState);
-
-			m_dodgeState = (DodgeStateType)next;
-			m_nextDodgeStateTimestamp = gpGlobals->time + RANDOM_FLOAT(0.3f, 1.0f);
-			m_firstDodge = false;
 		}
 
-		switch (m_dodgeState)
+		if (!me->IsUsingSniperRifle() && !m_crouchAndHold)
 		{
-		case STEADY_ON:
-		{
-			break;
-		}
-		case SLIDE_LEFT:
-		{
-			me->StrafeLeft();
-			break;
-		}
-		case SLIDE_RIGHT:
-		{
-			me->StrafeRight();
-			break;
-		}
-		case JUMP:
-		{
-			if (me->m_isEnemyVisible)
+			// don't dodge if enemy is facing away
+			const float dodgeRange = 2000.0f;
+			if (range > dodgeRange || !me->IsPlayerFacingMe(enemy))
 			{
-				me->Jump();
+				m_dodgeState = STEADY_ON;
+				m_nextDodgeStateTimestamp = 0.0f;
 			}
-			break;
+			else if (gpGlobals->time >= m_nextDodgeStateTimestamp)
+			{
+				int next;
+
+				// select next dodge state that is different that our current one
+				do
+				{
+					// high-skill bots may jump when first engaging the enemy (if they are moving)
+					const float jumpChance = 33.3f;
+					if (m_firstDodge && me->GetProfile()->GetSkill() > 0.5f && RANDOM_FLOAT(0, 100) < jumpChance && !me->IsNotMoving())
+						next = RANDOM_LONG(0, NUM_ATTACK_STATES - 1);
+					else
+						next = RANDOM_LONG(0, NUM_ATTACK_STATES - 2);
+				} while (!m_firstDodge && next == m_dodgeState);
+
+				m_dodgeState = (DodgeStateType)next;
+				m_nextDodgeStateTimestamp = gpGlobals->time + RANDOM_FLOAT(0.3f, 1.0f);
+				m_firstDodge = false;
+			}
+
+			switch (m_dodgeState)
+			{
+			case STEADY_ON:
+			{
+				break;
+			}
+			case SLIDE_LEFT:
+			{
+				me->StrafeLeft();
+				break;
+			}
+			case SLIDE_RIGHT:
+			{
+				me->StrafeRight();
+				break;
+			}
+			case JUMP:
+			{
+				if (me->m_isEnemyVisible)
+				{
+					me->Jump();
+				}
+				break;
+			}
+			}
 		}
-		}
+		
 	}
 }
 

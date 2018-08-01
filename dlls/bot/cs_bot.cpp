@@ -965,3 +965,28 @@ float CCSBot::GetRangeToFarthestEscortedHostage() const
 
 	return away.m_farRange;
 }
+
+bool CCSBot::IsAwareOfEnemyDeath() const
+{
+	if (GetEnemyDeathTimestamp() == 0.0f)
+		return false;
+
+	if (m_enemy == NULL)
+		return true;
+
+	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > (1.0f - GetProfile()->GetSkill()))
+		return true;
+
+	if (g_pGameRules->PlayerRelationship(const_cast<CCSBot *>(this), m_enemy) == GR_TEAMMATE)
+		return true;
+
+	return false;
+}
+
+void CCSBot::MakeZombie(ZombieLevel iEvolutionLevel)
+{
+	CBasePlayer::MakeZombie(iEvolutionLevel);
+	StopAiming();
+	StopAttacking();
+	Idle();
+}

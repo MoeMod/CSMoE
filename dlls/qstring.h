@@ -69,6 +69,8 @@ private:
 #include "eiface.h"
 #include "enginecallback.h"
 
+#include "stddef.h"
+
 extern globalvars_t *gpGlobals;
 
 //#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
