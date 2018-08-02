@@ -105,6 +105,13 @@ cvar_t	v_ipitch_level		= {"v_ipitch_level", "0.3", 0, 0.3, NULL};
 
 float	v_idlescale;  // used by TFC for concussion grenade effect
 
+#ifdef XASH_64BIT
+#define BAD_ENT_PTR 0xFFFFFFFFFFFFFFFF
+#else
+#define BAD_ENT_PTR 0xFFFFFFFF
+#endif
+
+
 //=============================================================================
 /*
 void V_NormalizeAngles( float *angles )
@@ -1205,8 +1212,8 @@ void V_GetDirectedChasePosition(cl_entity_t	 * ent1, cl_entity_t * ent2,float * 
 		v_lastDistance = 4096.0f;
 		// v_cameraMode = CAM_MODE_FOCUS;
 	}
-	
-	if ( ( ent2 == (cl_entity_t*)UINTPTR_MAX) || ( ent1->player && (ent1->curstate.solid == SOLID_NOT) ) )
+
+	if ( ( ent2 == (cl_entity_t*)BAD_ENT_PTR) || ( ent1->player && (ent1->curstate.solid == SOLID_NOT) ) )
 	{
 		// we have no second target or player just died
 		V_GetSingleTargetCam(ent1, angle, origin);
@@ -1286,7 +1293,7 @@ void V_GetChasePos(int target, float * cl_angles, float * origin, float * angles
 			V_GetDirectedChasePosition( ent, gEngfuncs.GetEntityByIndex( g_iUser3 ),
 										angles, origin );
 		else
-			V_GetDirectedChasePosition( ent, (cl_entity_t*)UINTPTR_MAX,
+			V_GetDirectedChasePosition( ent, (cl_entity_t*)BAD_ENT_PTR,
 										angles, origin );
 	}
 	else
