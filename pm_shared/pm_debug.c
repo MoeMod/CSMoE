@@ -264,7 +264,8 @@ void PM_DrawBBox(vec3_t mins, vec3_t maxs, vec3_t origin, int pcolor, float life
 }
 
 
-#ifndef DEDICATED
+//#ifndef DEDICATED
+#if 1
 
 /*
 ================

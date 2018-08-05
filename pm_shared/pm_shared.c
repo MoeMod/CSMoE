@@ -48,7 +48,7 @@ playermove_t *pmove = NULL;
 #define TIME_TO_DUCK		0.4
 #define VEC_DUCK_HULL_MIN	-18
 #define VEC_DUCK_HULL_MAX	18
-#define VEC_DUCK_VIEW		32
+#define VEC_DUCK_VIEW		12
 #define PM_DEAD_VIEWHEIGHT	-8
 #define MAX_CLIMB_SPEED		200
 #define STUCK_MOVEUP		1
