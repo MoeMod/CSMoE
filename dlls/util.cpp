@@ -2113,14 +2113,14 @@ int CRestore::ReadField(void *pBaseData, TYPEDESCRIPTION *pFields, int fieldCoun
 							*((char *)pOutputData) = *(char *)pInputData;
 							break;
 						case FIELD_POINTER:
-							*((int *)pOutputData) = *(int *)pInputData;
+							*((void**)pOutputData) = *(void **)pInputData;
 							break;
 						case FIELD_FUNCTION:
 						{
 							if (!Q_strlen((char *)pInputData))
-								*((int *)pOutputData) = 0;
+								*((void**)pOutputData) = 0;
 							else
-								*((int *)pOutputData) = FUNCTION_FROM_NAME((char *)pInputData);
+								*((void**)pOutputData) = (void *)FUNCTION_FROM_NAME((char *)pInputData);
 
 							break;
 						}
