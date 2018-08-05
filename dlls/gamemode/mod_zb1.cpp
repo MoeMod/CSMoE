@@ -68,7 +68,7 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 
 void CMod_Zombi::Think()
 {
-	IBaseMod::Think();
+	//IBaseMod::Think();
 
 	static int iLastCountDown = -1;
 	int iCountDown = gpGlobals->time - m_fRoundCount;
@@ -114,6 +114,101 @@ void CMod_Zombi::Think()
 		}
 		TeamCheck();
 	}
+
+	if (CheckGameOver())   // someone else quit the game already
+		return;
+
+	if (CheckTimeLimit())
+		return;
+
+	if (IsFreezePeriod())
+	{
+		CheckFreezePeriodExpired();
+	}
+
+	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+	{
+		RestartRound();
+	}
+
+	CheckLevelInitialized();
+
+	if (gpGlobals->time > m_tmNextPeriodicThink)
+	{
+		CheckRestartRound();
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+
+		if (g_psv_accelerate->value != 5.0f)
+		{
+			CVAR_SET_FLOAT("sv_accelerate", 5.0);
+		}
+
+		if (g_psv_friction->value != 4.0f)
+		{
+			CVAR_SET_FLOAT("sv_friction", 4.0);
+		}
+
+		if (g_psv_stopspeed->value != 75.0f)
+		{
+			CVAR_SET_FLOAT("sv_stopspeed", 75.0);
+		}
+
+
+		m_iMaxRounds = (int)maxrounds.value;
+
+		if (m_iMaxRounds < 0)
+		{
+			m_iMaxRounds = 0;
+			CVAR_SET_FLOAT("mp_maxrounds", 0);
+		}
+
+		m_iMaxRoundsWon = (int)winlimit.value;
+
+		if (m_iMaxRoundsWon < 0)
+		{
+			m_iMaxRoundsWon = 0;
+			CVAR_SET_FLOAT("mp_winlimit", 0);
+		}
+	}
+
+	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
+		HumanWin();
+}
+
+void CMod_Zombi::HumanWin()
+{
+	//Broadcast("ctwin");
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+		CLIENT_COMMAND(entity->edict(), "spk win_human\n");
+	}
+	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
+	TerminateRound(5, WINSTATUS_CTS);
+	RoundEndScore(WINSTATUS_CTS);
+
+	++m_iNumCTWins;
+	UpdateTeamScores();
+}
+
+void CMod_Zombi::ZombieWin()
+{
+	//Broadcast("terwin");
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+		CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
+	}
+	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
+	TerminateRound(5, WINSTATUS_TERRORISTS);
+	RoundEndScore(WINSTATUS_TERRORISTS);
+
+	++m_iNumTerroristWins;
+	UpdateTeamScores();
 }
 
 void CMod_Zombi::CheckWinConditions()
@@ -127,45 +222,28 @@ void CMod_Zombi::CheckWinConditions()
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
 	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
 
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 20)
+	if (!FInfectionStarted())
 		return;
+	
 
-	if (!NumAliveTerrorist || TimeRemaining() < 0.0f)
+	if (!NumAliveTerrorist)
 	{
-		//Broadcast("ctwin");
-		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-		{
-			CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-			if (!entity)
-				continue;
-			CLIENT_COMMAND(entity->edict(), "spk win_human\n");
-		}
-		EndRoundMessage("HumanWin", ROUND_CTS_WIN);
-		TerminateRound(5, WINSTATUS_CTS);
-		RoundEndScore(WINSTATUS_CTS);
-
-		++m_iNumCTWins;
-		UpdateTeamScores();
+		HumanWin();
 	}
 	else if (!NumAliveCT)
 	{
-		//Broadcast("terwin");
-		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-		{
-			CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-			if (!entity)
-				continue;
-			CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
-		}
-		EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
-		TerminateRound(5, WINSTATUS_TERRORISTS);
-		RoundEndScore(WINSTATUS_TERRORISTS);
-
-		++m_iNumTerroristWins;
-		UpdateTeamScores();
+		ZombieWin();
 	}
 
+}
+
+BOOL CMod_Zombi::FInfectionStarted()
+{
+	int iCountDown = gpGlobals->time - m_fRoundCount;
+	if (iCountDown <= 20)
+		return false;
+
+	return true;
 }
 
 void CMod_Zombi::RoundEndScore(int iWinStatus)
@@ -367,6 +445,9 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
 {
 	int iReturn = FALSE;
+
+	if (!FInfectionStarted() || m_bRoundTerminating)
+		return FALSE;
 
 	if (!pAttacker || PlayerRelationship(pPlayer, pAttacker) != GR_TEAMMATE)
 	{

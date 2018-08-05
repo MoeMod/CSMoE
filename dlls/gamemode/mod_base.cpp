@@ -81,17 +81,24 @@ edict_t *IBaseMod_RandomSpawn::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
 {
 	// completely rewrites it
 
+	// select spawnpoint from both teams.
+	TeamName iBackupTeam = pPlayer->m_iTeam;
+	pPlayer->m_iTeam = static_cast<TeamName>(RANDOM_LONG(TERRORIST, CT));
+
 	// gat valid spawn point
 	edict_t *pentSpawnSpot = EntSelectSpawnPoint(pPlayer);
 
+	pPlayer->m_iTeam = iBackupTeam;
+
 	// Move the player to the place it said.
 	// Note that here has been modified
-	//pPlayer->pev->origin = VARS(pentSpawnSpot)->origin + Vector(0, 0, 1);
-	//pPlayer->pev->v_angle = g_vecZero;
-	//pPlayer->pev->velocity = g_vecZero;
-	//pPlayer->pev->angles = VARS(pentSpawnSpot)->angles;
-
-	CSDM_DoRandomSpawn(pPlayer);
+	if (!CSDM_DoRandomSpawn(pPlayer))
+	{
+		pPlayer->pev->origin = VARS(pentSpawnSpot)->origin + Vector(0, 0, 1);
+		pPlayer->pev->v_angle = g_vecZero;
+		pPlayer->pev->velocity = g_vecZero;
+		pPlayer->pev->angles = VARS(pentSpawnSpot)->angles;
+	}
 
 	pPlayer->pev->punchangle = g_vecZero;
 	pPlayer->pev->fixangle = 1;

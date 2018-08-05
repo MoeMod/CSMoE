@@ -41,6 +41,11 @@ protected:
 protected:
 	void TeamCheck();
 	void InfectionSound();
+
+	void HumanWin();
+	void ZombieWin();
+
+	BOOL FInfectionStarted();
 };
 
 #endif

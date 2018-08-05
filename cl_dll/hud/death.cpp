@@ -418,7 +418,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 			}
 		}
 
-		if (!strcmp(killedwith, "d_knife"))
+		if (!strcmp(killedwith, "d_knife") && !g_PlayerExtraInfo[killer].zombie)
 		{
 			if (killer == idx)
 			{
