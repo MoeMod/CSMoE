@@ -23,8 +23,10 @@
 
 #include <string.h>
 
+#ifdef _MSC_VER
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4305)
+#endif
 
 extern playermove_t *pmove;
 
@@ -261,6 +263,9 @@ void PM_DrawBBox(vec3_t mins, vec3_t maxs, vec3_t origin, int pcolor, float life
 	}
 }
 
+
+#ifndef DEDICATED
+
 /*
 ================
 PM_ViewEntity
@@ -313,3 +318,5 @@ void PM_ViewEntity( void )
 		PM_DrawPhysEntBBox(trace.ent, pcolor, 0.3f);
 	}
 }
+
+#endif
