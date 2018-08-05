@@ -264,7 +264,7 @@ inline edict_t *FIND_ENTITY_BY_TARGETNAME(edict_t *entStart, const char *pszName
 	return FIND_ENTITY_BY_STRING(entStart, "targetname", pszName);
 }
 
-#if defined(DEBUG) && !defined(CLIENT_DLL)
+#if defined(_DEBUG) && !defined(CLIENT_DLL)
 extern edict_t *DBG_EntOfVars(const entvars_t *pev);
 inline edict_t *ENT(const entvars_t *pev) { return DBG_EntOfVars(pev); }
 #else

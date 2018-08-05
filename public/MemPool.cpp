@@ -4,7 +4,13 @@
 
 #include <basetypes.h>
 #include <math.h>
+
+#ifdef __APPLE__ 
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
+
 #include "MemPool.h"
 #include "common.h"
 #include "minmax.h"

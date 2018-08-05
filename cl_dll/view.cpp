@@ -52,8 +52,15 @@ extern "C"
 
 extern "C"
 {
-	extern float	vJumpOrigin[3];
-	extern float	vJumpAngles[3];
+	int PM_GetVisEntInfo(int ent);
+	int PM_GetPhysEntInfo(int ent);
+	void InterpolateAngles(float *start, float *end, float *output, float frac);
+	void NormalizeAngles(float *angles);
+	float Distance(const float *v1, const float *v2);
+	float AngleBetweenVectors(const float *v1, const float *v2);
+
+	float	vJumpOrigin[3];
+	float	vJumpAngles[3];
 }
 
 extern engine_studio_api_t IEngineStudio;

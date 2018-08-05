@@ -78,6 +78,8 @@ float CTalkMonster::g_talkWaitTime = 0;
 char gszallsentencenames[ CVOXFILESENTENCEMAX ][ CBSENTENCENAME_MAX ];
 sentenceg rgsentenceg[ CSENTENCEG_MAX ];
 
+#define CTEXTURESMAX		512			// max number of textures loaded
+
 char grgszTextureName[ CTEXTURESMAX ][ CBTEXTURENAMEMAX ];
 char grgchTextureType[ CTEXTURESMAX ];
 int fTextureTypeInit;
