@@ -17,6 +17,7 @@ CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
+	PRECACHE_SOUND("zombi/zombi_ambient.mp3");
 }
 
 void CMod_Zombi::CheckMapConditions()
@@ -111,6 +112,14 @@ void CMod_Zombi::Think()
 		{
 			// select zombie
 			MakeZombieOrigin();
+			
+			for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+			{
+				CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+				if (!entity)
+					continue;
+				CLIENT_COMMAND(entity->edict(), "mp3 play zombi/zombi_ambient\n");
+			}
 		}
 		TeamCheck();
 	}
@@ -184,6 +193,9 @@ void CMod_Zombi::HumanWin()
 		if (!entity)
 			continue;
 		CLIENT_COMMAND(entity->edict(), "spk win_human\n");
+		
+		// stop playing ambience sound
+		CLIENT_COMMAND(entity->edict(), "mp3 stop\n");
 	}
 	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
 	TerminateRound(5, WINSTATUS_CTS);
@@ -202,6 +214,9 @@ void CMod_Zombi::ZombieWin()
 		if (!entity)
 			continue;
 		CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
+
+		// stop playing ambience sound
+		CLIENT_COMMAND(entity->edict(), "mp3 stop\n");
 	}
 	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
 	TerminateRound(5, WINSTATUS_TERRORISTS);
