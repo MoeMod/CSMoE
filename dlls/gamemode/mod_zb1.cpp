@@ -126,13 +126,6 @@ void CMod_Zombi::Think()
 		{
 			// select zombie
 			MakeZombieOrigin();
-			
-			/*for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-			{
-				CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-				if (!entity)
-					continue;
-			}*/
 		}
 		TeamCheck();
 	}
