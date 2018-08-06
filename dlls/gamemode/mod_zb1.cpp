@@ -67,6 +67,20 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 	return true;
 }
 
+BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
+{
+	CLIENT_COMMAND(pEntity, "mp3 loop Zombi_Ambience\n");
+
+	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
+}
+
+void CMod_Zombi::ClientDisconnected(edict_t *pClient)
+{
+	CLIENT_COMMAND(pClient, "mp3 stop\n");
+
+	IBaseMod::ClientDisconnected(pClient);
+}
+
 void CMod_Zombi::Think()
 {
 	//IBaseMod::Think();
@@ -113,13 +127,12 @@ void CMod_Zombi::Think()
 			// select zombie
 			MakeZombieOrigin();
 			
-			for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+			/*for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 			{
 				CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
 				if (!entity)
 					continue;
-				CLIENT_COMMAND(entity->edict(), "mp3 play Zombi_Ambience\n");
-			}
+			}*/
 		}
 		TeamCheck();
 	}
@@ -405,9 +418,6 @@ void CMod_Zombi::RestartRound()
 		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
 		if (!entity)
 			continue;
-
-		// stop playing ambience
-		CLIENT_COMMAND(entity->edict(), "mp3 stop\n");
 
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 		player->m_bIsZombie = false;
