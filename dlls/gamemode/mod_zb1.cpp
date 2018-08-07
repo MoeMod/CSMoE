@@ -24,9 +24,9 @@ void CMod_Zombi::CheckMapConditions()
 {
 	IBaseMod_RemoveObjects::CheckMapConditions();
 	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
-	CVAR_SET_FLOAT("sv_skycolor_r", 150);
-	CVAR_SET_FLOAT("sv_skycolor_g", 150);
-	CVAR_SET_FLOAT("sv_skycolor_b", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_r", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_g", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_b", 150);
 
 	// create fog, however it doesnt work...
 	CBaseEntity *fog = nullptr;
@@ -167,7 +167,6 @@ void CMod_Zombi::Think()
 		{
 			CVAR_SET_FLOAT("sv_stopspeed", 75.0);
 		}
-
 
 		m_iMaxRounds = (int)maxrounds.value;
 
@@ -455,6 +454,9 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;
+
+	// Open buy menu on spawn
+	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
 }
 
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
