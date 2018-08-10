@@ -70,6 +70,7 @@
     <ClCompile Include="..\cl_dll\hud\flashlight.cpp" />
     <ClCompile Include="..\cl_dll\hud\followicon.cpp" />
     <ClCompile Include="..\cl_dll\hud\geiger.cpp" />
+    <ClCompile Include="..\cl_dll\hud\headname.cpp" />
     <ClCompile Include="..\cl_dll\hud\health.cpp" />
     <ClCompile Include="..\cl_dll\hud\hud.cpp" />
     <ClCompile Include="..\cl_dll\hud\hud_msg.cpp" />
