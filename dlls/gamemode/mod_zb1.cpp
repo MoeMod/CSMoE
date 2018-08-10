@@ -17,15 +17,16 @@ CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
+	PRECACHE_SOUND("Zombi_Ambience.mp3");
 }
 
 void CMod_Zombi::CheckMapConditions()
 {
 	IBaseMod_RemoveObjects::CheckMapConditions();
 	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
-	CVAR_SET_FLOAT("sv_skycolor_r", 150);
-	CVAR_SET_FLOAT("sv_skycolor_g", 150);
-	CVAR_SET_FLOAT("sv_skycolor_b", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_r", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_g", 150);
+//	CVAR_SET_FLOAT("sv_skycolor_b", 150);
 
 	// create fog, however it doesnt work...
 	CBaseEntity *fog = nullptr;
@@ -64,6 +65,20 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 		return false;
 
 	return true;
+}
+
+BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
+{
+	CLIENT_COMMAND(pEntity, "mp3 loop Zombi_Ambience\n");
+
+	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
+}
+
+void CMod_Zombi::ClientDisconnected(edict_t *pClient)
+{
+	CLIENT_COMMAND(pClient, "mp3 stop\n");
+
+	IBaseMod::ClientDisconnected(pClient);
 }
 
 void CMod_Zombi::Think()
@@ -153,7 +168,6 @@ void CMod_Zombi::Think()
 			CVAR_SET_FLOAT("sv_stopspeed", 75.0);
 		}
 
-
 		m_iMaxRounds = (int)maxrounds.value;
 
 		if (m_iMaxRounds < 0)
@@ -225,7 +239,6 @@ void CMod_Zombi::CheckWinConditions()
 	if (!FInfectionStarted())
 		return;
 	
-
 	if (!NumAliveTerrorist)
 	{
 		HumanWin();
@@ -397,6 +410,7 @@ void CMod_Zombi::RestartRound()
 		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
 		if (!entity)
 			continue;
+
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 		player->m_bIsZombie = false;
 	}
@@ -440,6 +454,9 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;
+
+	// Open buy menu on spawn
+	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
 }
 
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
