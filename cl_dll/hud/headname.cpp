@@ -34,7 +34,7 @@ bool CHudHeadName::CheckForPlayer(cl_entity_s *pEnt)
 
 int CHudHeadName::Draw(float flTime)
 {
-	if (!gHUD.cl_headname->value)
+	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL) || g_iUser1 || !gHUD.cl_headname->value)
 		return 1;
 
 	for (int i = 0; i < 33; i++)
@@ -69,7 +69,9 @@ int CHudHeadName::Draw(float flTime)
 			screen[0] = screen[0] * w + w;
 			screen[1] = -screen[1] * t + t;
 
-			DrawUtils::DrawHudString(screen[0], screen[1], ScreenInfo.iWidth, g_PlayerInfoList[i].name, 150, 150, 150);
+			int textlen = DrawUtils::HudStringLen(g_PlayerInfoList[i].name);
+
+			DrawUtils::DrawHudString(screen[0] - textlen / 2, screen[1], ScreenInfo.iWidth, g_PlayerInfoList[i].name, 150, 150, 150);
 		}
 	}
 
