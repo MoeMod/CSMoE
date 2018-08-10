@@ -141,6 +141,7 @@ set (HUD_SRCS
 	./hud/saytext.cpp
 	./hud/spectator_gui.cpp
 	./hud/followicon.cpp
+	./hud/headname.cpp
 )
 
 set (STUDIORENDER_SRCS
