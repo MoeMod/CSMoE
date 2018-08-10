@@ -54,6 +54,9 @@ byte g_color_table[][4] =
 
 int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, int r, int g, int b, float scale, bool drawing )
 {
+	if (!str)
+		return 1;
+
 	char *szIt = (char *)str;
 	// draw the string until we hit the null character or a newline character
 	for ( ; *szIt != 0 && *szIt != '\n'; szIt++ )
@@ -316,6 +319,10 @@ void DrawUtils::Draw2DQuad( float x1, float y1, float x2, float y2 )
 int DrawUtils::HudStringLen( const char *szIt, float scale )
 {
 	int l;
+
+	if (!szIt)
+		return 1;
+
 	// count length until we hit the null character or a newline character
 	for ( l = 0; *szIt != 0 && *szIt != '\n'; szIt++ )
 	{
