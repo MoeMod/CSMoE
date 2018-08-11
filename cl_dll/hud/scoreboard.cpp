@@ -157,7 +157,7 @@ int CHudScoreboard :: VidInit( void )
 
 	m_iBGIndex = m_iOriginalBG;
 	m_iTextIndex = m_iText_Round;
-	m_iTTextIndex = m_iText_T;
+	m_iTTextIndex = m_iText_TR;
 	m_iCTTextIndex = m_iText_CT;
 	m_bIsTeamplay = true;
 
@@ -775,7 +775,7 @@ int CHudScoreboard::DrawTopScoreBoard(float flTime)
 		wrect_t textRect = gHUD.GetSpriteRect(m_iTTextIndex);
 
 		SPR_Set(textSprite_T, 128, 128, 128);
-		SPR_DrawAdditive(0, (ScreenWidth) / 2 - 45, bgY + 11, &textRect);
+		SPR_DrawAdditive(0, (ScreenWidth) / 2 - 50, bgY + 11, &textRect);
 	}
 
 	HSPRITE textSprite_CT = gHUD.GetSprite(m_iCTTextIndex);
