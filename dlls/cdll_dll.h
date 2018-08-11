@@ -32,6 +32,7 @@
 #pragma once
 #endif
 
+#define MAX_CLIENTS 32
 #define MAX_WEAPONS 32
 #define MAX_WEAPON_SLOTS 5
 #define MAX_ITEM_TYPES 6
@@ -80,8 +81,6 @@
 
 #define ITEM_STATUS_NIGHTVISION		(1<<0)
 #define ITEM_STATUS_DEFUSER		(1<<1)
-#define ITEMSTATE_HASNIGHTVISION (1<<0)
-#define ITEMSTATE_HASDEFUSER (1<<1)
 
 #define PLAYER_DEAD (1<<0)
 #define PLAYER_HAS_C4 (1<<1)

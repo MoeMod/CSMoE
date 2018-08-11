@@ -32,8 +32,6 @@
 
 #include "events.h"
 
-#define MAX_CLIENTS 32
-
 extern float g_flRoundTime;
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS

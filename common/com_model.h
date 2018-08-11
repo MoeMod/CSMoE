@@ -28,13 +28,7 @@
 
 #define ZISCALE		((float)0x8000)
 
-#ifndef MAX_CLIENTS
-#define MAX_CLIENTS			32
-#endif
-//#define	MAX_EDICTS			900
-
 #define MAX_MODEL_NAME		64
-//#define MAX_MAP_HULLS		4
 
 #define	MIPLEVELS			4
 #define VERTEXSIZE		7
