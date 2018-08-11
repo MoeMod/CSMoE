@@ -508,6 +508,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\player\player_spawnprotection.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">

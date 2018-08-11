@@ -310,6 +310,7 @@
     <ClCompile Include="..\dlls\player\player_model.cpp" />
     <ClCompile Include="..\dlls\player\player_msg.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
+    <ClCompile Include="..\dlls\player\player_spawnprotection.cpp" />
     <ClCompile Include="..\dlls\player\player_zombie.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />

@@ -282,6 +282,8 @@ void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	// Give Armor
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
+
+	pPlayer->SpawnProtection_Start(3.0f);
 }
 
 bool CMod_DeathMatch::CheckWinLimitDM()

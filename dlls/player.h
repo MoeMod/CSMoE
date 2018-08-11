@@ -677,9 +677,15 @@ public:
 	void DeathSound_Zombie();
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour);
 
+	void SpawnProtection_Check();
+	void SpawnProtection_Start(float flTime);
+	void SpawnProtection_End();
+
 public:
 	bool m_bIsZombie;
+	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
+	float m_flTimeSpawnProctionExpires;
 };
 
 extern int gEvilImpulse101;

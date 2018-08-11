@@ -87,6 +87,7 @@ set(HLDLL_SRCS
 	./player/player_spawnpoint.cpp
 	./player/player_model.cpp
 	./player/player_zombie.cpp
+	./player/player_spawnprotection.cpp
 	./items.cpp
 	./lights.cpp
 	./maprules.cpp

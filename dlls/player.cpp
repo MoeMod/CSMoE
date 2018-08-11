@@ -4132,6 +4132,8 @@ void CBasePlayer::PreThink()
 	}
 
 	UpdateLocation();
+
+	SpawnProtection_Check();
 }
 
 // If player is taking time based damage, continue doing damage to player -
@@ -4773,6 +4775,9 @@ void CBasePlayer::Spawn()
 	m_rgbTimeBasedDamage[ itbd_DrownRecover ] = 0;
 	m_idrowndmg = 0;
 	m_idrownrestored = 0;
+
+	m_bIsZombie = false;
+	SpawnProtection_End();
 
 	if (m_iObserverC4State)
 	{
