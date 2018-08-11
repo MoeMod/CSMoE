@@ -41,7 +41,7 @@ void CMod_Zombi::CheckMapConditions()
 	newfog->pev->rendercolor = { 0,0,0 };
 
 	// light
-	LIGHT_STYLE(0, "f");
+	LIGHT_STYLE(0, "g"); // previous one is "f"
 }
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
@@ -361,7 +361,7 @@ void CMod_Zombi::MakeZombieOrigin()
 	for (int i = 0; i < iNumZombies; ++i)
 	{
 		players[i]->MakeZombie(ZOMBIE_LEVEL_ORIGIN);
-		players[i]->pev->health = 1000 * iNumPlayers / iNumZombies + 1000;
+		players[i]->pev->health = players[i]->pev->max_health = 1000 * iNumPlayers / iNumZombies + 1000;
 		players[i]->pev->armorvalue = 1100;
 	}
 
@@ -373,8 +373,8 @@ void CMod_Zombi::MakeZombieOrigin()
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
 	player->MakeZombie(ZOMBIE_LEVEL_HOST);
-	player->pev->health = std::max(1000, static_cast<int>(attacker->pev->health * 0.7f)) + 1000;
-	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f)) + 100;
+	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 0.5f));
+	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f));
 
 	InfectionSound();
 	PRECACHE_SOUND("zombi/human_death_01.wav");
@@ -449,8 +449,8 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->AddAccount(16000);
 
 	// Give Armor
-	pPlayer->pev->health = 1000;
-	pPlayer->pev->gravity = 0.86f;
+	pPlayer->pev->health = pPlayer->pev->max_health= 1000;
+	//pPlayer->pev->gravity = 0.86f;
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->m_bIsZombie = false;
