@@ -157,7 +157,7 @@ int CHudScoreboard :: VidInit( void )
 
 	m_iBGIndex = m_iOriginalBG;
 	m_iTextIndex = m_iText_Round;
-	m_iTTextIndex = m_iText_T;
+	m_iTTextIndex = m_iText_TR;
 	m_iCTTextIndex = m_iText_CT;
 	m_bIsTeamplay = true;
 
