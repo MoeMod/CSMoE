@@ -571,12 +571,16 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 {
 	bool bShouldBleed = true;
 	bool bShouldSpark = false;
+	bool bShouldPunch = true;
 	bool bHitShield = IsHittingShield(vecDir, ptr);
 
 	CBasePlayer *pAttacker = dynamic_cast<CBasePlayer *>(CBaseEntity::Instance(pevAttacker));
 
 	if (pAttacker != NULL && g_pGameRules->IsTeamplay() && m_iTeam == pAttacker->m_iTeam && CVAR_GET_FLOAT("mp_friendlyfire") == 0)
 		bShouldBleed = false;
+
+	if (m_bIsZombie)
+		bShouldPunch = false;
 
 	if (pev->takedamage == DAMAGE_NO)
 		return;
@@ -623,7 +627,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 			}
 
 			flDamage *= 4;
-			if (bShouldBleed)
+			if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.5;
 
@@ -647,7 +651,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
-			else if (bShouldBleed)
+			else if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.1;
 
@@ -663,7 +667,7 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
-			else if (bShouldBleed)
+			else if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.1;
 
