@@ -136,6 +136,7 @@ public:
 	void Reset(void);
 
 	void DrawCrosshair(float flTime);
+	int DrawCrosshairEx(float flTime, int weaponid, int iBarSize, float flCrosshairDistance, bool bAdditive, int r, int g, int b, int a);
 	void CalcCrosshairSize();
 	void CalcCrosshairDrawMode();
 	void CalcCrosshairColor();
@@ -195,6 +196,7 @@ private:
 	cvar_t *m_pHud_FastSwitch;
 	cvar_t *m_pHud_DrawHistory_Time;
 
+	cvar_t *cl_crosshair_type;
 };
 
 //

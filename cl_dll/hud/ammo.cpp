@@ -354,6 +354,7 @@ int CHudAmmo::Init(void)
 	m_pClCrosshairTranslucent = CVAR_CREATE( "cl_crosshair_translucent", "1", FCVAR_ARCHIVE );
 	m_pClCrosshairSize = CVAR_CREATE( "cl_crosshair_size", "auto", FCVAR_ARCHIVE );
 	m_pClDynamicCrosshair = CVAR_CREATE("cl_dynamiccrosshair", "1", FCVAR_ARCHIVE);
+	cl_crosshair_type = CVAR_CREATE("cl_crosshair_type", "0", FCVAR_ARCHIVE);
 
 	m_iFlags = HUD_DRAW | HUD_THINK; //!!!
 	m_R = 50;
@@ -1365,7 +1366,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 
 
 	// drawing
-	if ( gHUD.m_NVG.m_iFlags )
+	/*if ( gHUD.m_NVG.m_iFlags )
 	{
 		FillRGBABlend(WEST_XPOS, EAST_WEST_YPOS,	iLength, 1, 250, 50, 50, m_iAlpha);
 		FillRGBABlend(EAST_XPOS, EAST_WEST_YPOS,	iLength, 1, 250, 50, 50, m_iAlpha);
@@ -1385,9 +1386,103 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		FillRGBABlend(EAST_XPOS, EAST_WEST_YPOS,	iLength, 1, m_R, m_G, m_B, m_iAlpha);
 		FillRGBABlend(NORTH_SOUTH_XPOS, NORTH_YPOS, 1, iLength, m_R, m_G, m_B, m_iAlpha);
 		FillRGBABlend(NORTH_SOUTH_XPOS, SOUTH_YPOS, 1, iLength, m_R, m_G, m_B, m_iAlpha);
-	}
+	}*/
+	if (gHUD.m_NVG.m_iFlags)
+		DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, false, 250, 50, 50, m_iAlpha);
+	else
+		DrawCrosshairEx(flTime, weaponid, iLength, flCrosshairDistance, m_bAdditive, m_R, m_G, m_B, m_iAlpha);
 	return;
 }
+
+
+
+int CHudAmmo::DrawCrosshairEx(float flTime, int weaponid, int iBarSize, float flCrosshairDistance, bool bAdditive, int r, int g, int b, int a)
+{
+	bool bDrawPoint = false;
+	bool bDrawCircle = false;
+	bool bDrawCross = false;
+
+	void(*pfnFillRGBA)(int x, int y, int w, int h, int r, int g, int b, int a) = (bAdditive == false) ? gEngfuncs.pfnFillRGBABlend : gEngfuncs.pfnFillRGBA;
+
+	switch ((int)cl_crosshair_type->value)
+	{
+	case 1:
+	{
+		bDrawPoint = true;
+		bDrawCross = true;
+		break;
+	}
+
+	case 2:
+	{
+		bDrawPoint = true;
+		bDrawCircle = true;
+		break;
+	}
+
+	case 3:
+	{
+		bDrawPoint = true;
+		bDrawCircle = true;
+		bDrawCross = true;
+		break;
+	}
+
+	case 4:
+	{
+		bDrawPoint = true;
+		break;
+	}
+
+	default:
+	{
+		bDrawCross = true;
+		break;
+	}
+	}
+
+	if (bDrawCircle)
+	{
+		float radius = (iBarSize / 2) + flCrosshairDistance;
+#if 0
+		switch (m_iCrosshairScaleBase)
+		{
+		case 640: radius += 0.1; break;
+		case 800: radius += 0.8; break;
+		case 1024: radius += 0.5; break;
+		}
+#endif
+		int count = (int)((cos(0.7853981852531433) * radius) + 0.5);
+
+		for (int i = 0; i < count; i++)
+		{
+			int size = sqrt((radius * radius) - (float)(i * i));
+
+			pfnFillRGBA((ScreenWidth / 2) + i, (ScreenHeight / 2) + size, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) + i, (ScreenHeight / 2) - size, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) - i, (ScreenHeight / 2) + size, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) - i, (ScreenHeight / 2) - size, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) + size, (ScreenHeight / 2) + i, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) + size, (ScreenHeight / 2) - i, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) - size, (ScreenHeight / 2) + i, 1, 1, r, g, b, a);
+			pfnFillRGBA((ScreenWidth / 2) - size, (ScreenHeight / 2) - i, 1, 1, r, g, b, a);
+		}
+	}
+
+	if (bDrawPoint)
+		pfnFillRGBA((ScreenWidth / 2) - 1, (ScreenHeight / 2) - 1, 3, 3, r, g, b, a);
+
+	if (bDrawCross)
+	{
+		pfnFillRGBA((ScreenWidth / 2) - (int)flCrosshairDistance - iBarSize + 1, ScreenHeight / 2, iBarSize, 1, r, g, b, a);
+		pfnFillRGBA((ScreenWidth / 2) + (int)flCrosshairDistance, ScreenHeight / 2, iBarSize, 1, r, g, b, a);
+		pfnFillRGBA(ScreenWidth / 2, (ScreenHeight / 2) - (int)flCrosshairDistance - iBarSize + 1, 1, iBarSize, r, g, b, a);
+		pfnFillRGBA(ScreenWidth / 2, (ScreenHeight / 2) + (int)flCrosshairDistance, 1, iBarSize, r, g, b, a);
+	}
+
+	return 1;
+}
+
 
 void CHudAmmo::CalcCrosshairSize()
 {
