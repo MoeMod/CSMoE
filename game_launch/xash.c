@@ -64,7 +64,7 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
-#define GAME_PATH	"cstrike"	// default dir to start from
+#define GAME_PATH	"csbtem"	// default dir to start from
 
 typedef void (*pfnChangeGame)( const char *progname );
 typedef int  (*pfnInit)( int argc, char **argv, const char *progname, int bChangeGame, pfnChangeGame func );
