@@ -44,6 +44,7 @@ enum
 	ID_CROSSHAIRSIZE,
 	ID_CROSSHAIRTRANSLUCENCY,
 	ID_CROSSHAIRCOLOR,
+	ID_CROSSHAIRTYPE,
 	ID_SPRAYVIEW,
 	ID_SPRAYDECAL,
 	ID_SPRAYCOLOR
@@ -64,6 +65,7 @@ struct uiPlayerSetup_t
 	menuBitmap_s	  crosshairView;
 	menuSpinControl_s crosshairSize;
 	menuSpinControl_s crosshairColor;
+	menuSpinControl_s crosshairType;
 	menuCheckBox_s    crosshairTranslucent;
 
 #if 0
@@ -97,6 +99,10 @@ static byte g_iCrosshairAvailColors[6][3] =
 static char g_szCrosshairAvailSizes[4][CS_SIZE] =
 {
 	"auto", "small", "medium", "large"
+};
+static char g_szCrosshairTypes[5][CS_SIZE] = 
+{
+	"cross", "cross + dot", "circle", "combined", "dot only"
 };
 
 /*
@@ -186,6 +192,10 @@ static void UI_PlayerSetup_GetConfig( void )
 	}
 	if( CVAR_GET_FLOAT( "cl_crosshair_translucent") )
 		uiPlayerSetup.crosshairTranslucent.enabled = 1;
+
+	uiPlayerSetup.crosshairType.curValue = CVAR_GET_FLOAT("cl_crosshair_type");
+	if (uiPlayerSetup.crosshairType.curValue < 0 || uiPlayerSetup.crosshairType.curValue>4)
+		uiPlayerSetup.crosshairType.curValue = 0;
 }
 
 /*
@@ -206,6 +216,7 @@ static void UI_PlayerSetup_SetConfig( void )
 	CVAR_SET_STRING( "cl_crosshair_color", curColor );
 	CVAR_SET_STRING( "cl_crosshair_size", uiPlayerSetup.crosshairSize.generic.name );
 	CVAR_SET_FLOAT( "cl_crosshair_translucent", uiPlayerSetup.crosshairTranslucent.enabled );
+	CVAR_SET_FLOAT("cl_crosshair_type", uiPlayerSetup.crosshairType.curValue);
 }
 
 /*
@@ -229,8 +240,12 @@ static void UI_PlayerSetup_UpdateConfig( void )
 	i = uiPlayerSetup.crosshairSize.curValue;
 	uiPlayerSetup.crosshairSize.generic.name = g_szCrosshairAvailSizes[i];
 
+	i = uiPlayerSetup.crosshairType.curValue;
+	uiPlayerSetup.crosshairType.generic.name = g_szCrosshairTypes[i];
+
 	CVAR_SET_STRING( "cl_crosshair_size", uiPlayerSetup.crosshairSize.generic.name );
 	CVAR_SET_FLOAT( "cl_crosshair_translucent", uiPlayerSetup.crosshairTranslucent.enabled );
+	CVAR_SET_FLOAT("cl_crosshair_type", uiPlayerSetup.crosshairType.curValue);
 }
 
 /*
@@ -303,6 +318,48 @@ static void UI_Crosshair_Ownerdraw( void *self )
 		else l = 10;
 	}
 
+	bool bDrawPoint = false;
+	bool bDrawCircle = false;
+	bool bDrawCross = false;
+
+	switch ((int)uiPlayerSetup.crosshairType.curValue)
+	{
+	case 1:
+	{
+		bDrawPoint = true;
+		bDrawCross = true;
+		break;
+	}
+
+	case 2:
+	{
+		bDrawPoint = true;
+		bDrawCircle = true;
+		break;
+	}
+
+	case 3:
+	{
+		bDrawPoint = true;
+		bDrawCircle = true;
+		bDrawCross = true;
+		break;
+	}
+
+	case 4:
+	{
+		bDrawPoint = true;
+		break;
+	}
+
+	default:
+	{
+		bDrawCross = true;
+		break;
+	}
+	}
+
+
 	l *= ScreenHeight / 768.0f;
 
 	int x = item->generic.x, // xpos
@@ -320,38 +377,77 @@ static void UI_Crosshair_Ownerdraw( void *self )
 		// blue
 		b = g_iCrosshairAvailColors[(int)uiPlayerSetup.crosshairColor.curValue][2];
 
-	if( uiPlayerSetup.crosshairTranslucent.enabled )
+	bool additive = uiPlayerSetup.crosshairTranslucent.enabled;
+
+	if (bDrawCircle)
 	{
-		// verical
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawTrans(x + w / 2, y + d,         1, l );
+		int radius = d + (l / 2);
+		int count = radius * 6;
 
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawTrans(x + w / 2, y + h / 2 + d, 1, l );
-
-		// horizontal
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawTrans(x + d,         y + h / 2, l, 1 );
-
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawTrans(x + w / 2 + d, y + h / 2, l, 1 );
+		if (additive)
+		{
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			for (int i = 0; i < count; i++)
+				PIC_DrawTrans(x + w / 2 + radius * cos(2 * M_PI / count * i), y + h / 2 + radius * sin(2 * M_PI / count * i), 1, 1);
+		}
+		else
+		{
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			for (int i = 0; i < count; i++)
+				PIC_DrawAdditive(x + w / 2 + radius * cos(2 * M_PI / count * i), y + h / 2 + radius * sin(2 * M_PI / count * i), 1, 1);
+		}
 	}
-	else
+
+	if (bDrawPoint)
 	{
-		// verical
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawAdditive(x + w / 2, y + d,         1, l );
-
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawAdditive(x + w / 2, y + h / 2 + d, 1, l );
-
-		// horizontal
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawAdditive(x + d,         y + h / 2, l, 1 );
-
-		PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
-		PIC_DrawAdditive(x + w / 2 + d, y + h / 2, l, 1 );
+		if (additive)
+		{
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawTrans(x + w / 2 - 1, y + h / 2 - 1, 3, 3);
+		}
+		else
+		{
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawAdditive(x + w / 2 - 1, y + h / 2 - 1, 3, 3);
+		}
 	}
+
+	if (bDrawCross)
+	{
+		if (additive)
+		{
+			// verical
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawTrans(x + w / 2, y + d, 1, l);
+
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawTrans(x + w / 2, y + h / 2 + d, 1, l);
+
+			// horizontal
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawTrans(x + d, y + h / 2, l, 1);
+
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawTrans(x + w / 2 + d, y + h / 2, l, 1);
+		}
+		else
+		{
+			// verical
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawAdditive(x + w / 2, y + d, 1, l);
+
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawAdditive(x + w / 2, y + h / 2 + d, 1, l);
+
+			// horizontal
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawAdditive(x + d, y + h / 2, l, 1);
+
+			PIC_Set(uiPlayerSetup.uiWhite, r, g, b, a);
+			PIC_DrawAdditive(x + w / 2 + d, y + h / 2, l, 1);
+		}
+	}
+
 
 #if 0
 	// verical
@@ -432,7 +528,7 @@ static void UI_PlayerSetup_Init( void )
 	uiPlayerSetup.crosshairView.generic.type = QMTYPE_BITMAP;
 	uiPlayerSetup.crosshairView.generic.flags = QMF_INACTIVE;
 	uiPlayerSetup.crosshairView.generic.x = 320;
-	uiPlayerSetup.crosshairView.generic.y = 310;
+	uiPlayerSetup.crosshairView.generic.y = 340; // 310;
 	uiPlayerSetup.crosshairView.generic.width = 96;
 	uiPlayerSetup.crosshairView.generic.height = 96;
 	uiPlayerSetup.crosshairView.generic.callback = UI_PlayerSetup_Callback;
@@ -470,10 +566,23 @@ static void UI_PlayerSetup_Init( void )
 	uiPlayerSetup.crosshairTranslucent.generic.type = QMTYPE_CHECKBOX;
 	uiPlayerSetup.crosshairTranslucent.generic.flags = QMF_HIGHLIGHTIFFOCUS | QMF_ACT_ONRELEASE | QMF_DROPSHADOW;
 	uiPlayerSetup.crosshairTranslucent.generic.x = 320;
-	uiPlayerSetup.crosshairTranslucent.generic.y = 420;
+	uiPlayerSetup.crosshairTranslucent.generic.y = 480; // 420
 	uiPlayerSetup.crosshairTranslucent.generic.callback = UI_PlayerSetup_Callback;
 	uiPlayerSetup.crosshairTranslucent.generic.name = "Translucent crosshair";
 	uiPlayerSetup.crosshairTranslucent.generic.statusText = "Set additive render crosshair";
+
+	uiPlayerSetup.crosshairType.generic.id = ID_CROSSHAIRTYPE;
+	uiPlayerSetup.crosshairType.generic.type = QMTYPE_SPINCONTROL;
+	uiPlayerSetup.crosshairType.generic.flags = QMF_CENTER_JUSTIFY | QMF_HIGHLIGHTIFFOCUS | QMF_DROPSHADOW;
+	uiPlayerSetup.crosshairType.generic.x = 480;
+	uiPlayerSetup.crosshairType.generic.y = 435;
+	uiPlayerSetup.crosshairType.generic.height = 26;
+	uiPlayerSetup.crosshairType.generic.width = 256;
+	uiPlayerSetup.crosshairType.generic.callback = UI_PlayerSetup_Callback;
+	uiPlayerSetup.crosshairType.generic.statusText = "Set crosshair type";
+	uiPlayerSetup.crosshairType.minValue = 0;
+	uiPlayerSetup.crosshairType.maxValue = 4;
+	uiPlayerSetup.crosshairType.range = 1;
 
 	UI_PlayerSetup_GetConfig();
 
@@ -486,6 +595,7 @@ static void UI_PlayerSetup_Init( void )
 	UI_AddItem( &uiPlayerSetup.menu, (void *)&uiPlayerSetup.crosshairSize );
 	UI_AddItem( &uiPlayerSetup.menu, (void *)&uiPlayerSetup.crosshairTranslucent );
 	UI_AddItem( &uiPlayerSetup.menu, (void *)&uiPlayerSetup.crosshairColor );
+	UI_AddItem(&uiPlayerSetup.menu, (void *)&uiPlayerSetup.crosshairType);
 
 }
 
