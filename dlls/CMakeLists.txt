@@ -115,7 +115,7 @@ set(HLDLL_SRCS
 	./util.cpp
 	./vehicle.cpp
 	./weapons.cpp
-	./weapontype.cpp
+	./weapons_buy.cpp
 	./world.cpp
 	./bot/cs_bot_chatter.cpp
 	./bot/cs_bot.cpp

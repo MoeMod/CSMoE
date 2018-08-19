@@ -58,7 +58,7 @@ extern Vector g_clorg;
 extern Vector g_clang;
 
 // Pool of client side entities/entvars_t
-static entvars_t	ev[ 32 ];
+static entvars_t	ev[MAX_WEAPONS];
 static int			num_ents = 0;
 
 // The entity we'll use to represent the local client
@@ -67,11 +67,11 @@ static CBasePlayer	player;
 // Local version of game .dll global variables ( time, etc. )
 static globalvars_t	Globals = { };
 
-static CBasePlayerWeapon *g_pWpns[ 32 ];
+static CBasePlayerWeapon *g_pWpns[MAX_WEAPONS];
 
 
 // CS Weapon placeholder entities
-static CAK47 g_AK47;
+/*static CAK47 g_AK47;
 static CAUG g_AUG;
 static CAWP g_AWP;
 static CC4 g_C4;
@@ -99,7 +99,15 @@ static CSmokeGrenade g_SmokeGrenade;
 static CTMP g_TMP;
 static CUMP45 g_UMP45;
 static CUSP g_USP;
-static CXM1014 g_XM1014;
+static CXM1014 g_XM1014;*/
+
+// pre-C++14 doesn't have varible templates, so use function template instead
+template<class T>
+T &WeaponEntitySingleton()
+{
+	static T x;
+	return x;
+}
 
 int    g_iWeaponFlags;
 bool   g_bInBombZone;
@@ -864,6 +872,14 @@ HUD_InitClientWeapons
 Set up weapons, player and functions needed to run weapons code client-side.
 =====================
 */
+template<WeaponIdType...CSWs, class...WeaponClasses>
+void HUD_PrepEntity_AllWeapons(WeaponMap_Template<WeaponMapNode<CSWs, WeaponClasses>...>)
+{
+	int a[] = { (
+		HUD_PrepEntity(&WeaponEntitySingleton<WeaponClasses>(), &player),
+		0)... };
+}
+
 void HUD_InitClientWeapons( void )
 {
 	static int initialized = 0;
@@ -894,7 +910,7 @@ void HUD_InitClientWeapons( void )
 	HUD_PrepEntity( &player		, NULL );
 
 	// Allocate slot(s) for each weapon that we are going to be predicting
-	HUD_PrepEntity( &g_P228, &player);
+	/*HUD_PrepEntity( &g_P228, &player);
 	HUD_PrepEntity( &g_SCOUT, &player);
 	HUD_PrepEntity( &g_HEGrenade, &player);
 	HUD_PrepEntity( &g_XM1014, &player);
@@ -922,7 +938,8 @@ void HUD_InitClientWeapons( void )
 	HUD_PrepEntity( &g_SG552, &player);
 	HUD_PrepEntity( &g_AK47, &player);
 	HUD_PrepEntity( &g_Knife, &player);
-	HUD_PrepEntity( &g_P90, &player );
+	HUD_PrepEntity( &g_P90, &player );*/
+	HUD_PrepEntity_AllWeapons(WeaponMap());
 }
 
 
@@ -1032,7 +1049,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	gpGlobals->time = time;
 
 	// Fill in data based on selected weapon
-	switch ( from->client.m_iId )
+	/*switch ( from->client.m_iId )
 	{
 		case WEAPON_P228:
 			pWeapon = &g_P228;
@@ -1150,14 +1167,15 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 			pWeapon = &g_P90;
 			break;
 
-		/*case WEAPON_NONE:
-			break;
+		//case WEAPON_NONE:
+		//	break;
 
-		case WEAPON_GLOCK:
-		default:
-			gEngfuncs.Con_Printf("VALVEWHY: Unknown Weapon %i is active.\n", from->client.m_iId );
-			break;*/
-	}
+		//case WEAPON_GLOCK:
+		//default:
+		//	gEngfuncs.Con_Printf("VALVEWHY: Unknown Weapon %i is active.\n", from->client.m_iId );
+		//	break;
+	}*/
+	pWeapon = g_pWpns[from->client.m_iId];
 
 	// Store pointer to our destination entity_state_t so we can get our origin, etc. from it
 	//  for setting up events on the client

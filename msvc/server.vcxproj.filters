@@ -181,9 +181,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\weapontype.cpp">
-      <Filter>dlls</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\debug.cpp">
       <Filter>dlls</Filter>
     </ClCompile>
@@ -511,6 +508,9 @@
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\weapons_buy.cpp">
+      <Filter>dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -837,13 +837,7 @@
     <ClInclude Include="..\dlls\schedule.h">
       <Filter>dlls</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\weapontype.h">
-      <Filter>dlls</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\scriptevent.h">
-      <Filter>dlls</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared.h">
       <Filter>dlls</Filter>
     </ClInclude>
     <ClInclude Include="..\game_shared\bot\bot_constants.h">
@@ -1082,6 +1076,18 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_bitmask.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_const.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_ammo.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_buy.h">
+      <Filter>dlls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

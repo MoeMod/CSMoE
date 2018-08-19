@@ -61,8 +61,8 @@
 /*
 * Globals initialization
 */
-ItemInfo CBasePlayerItem::ItemInfoArray[32];
-AmmoInfo CBasePlayerItem::AmmoInfoArray[32];
+ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];
+AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
 
 TYPEDESCRIPTION CBasePlayerItem::m_SaveData[] =
 {

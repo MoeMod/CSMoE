@@ -32,11 +32,10 @@
 #pragma once
 #endif
 
-#include "weapontype.h"
-
-#ifndef NOXREF
-#define NOXREF
-#endif
+#include "weapons_const.h"
+#include "weapons_ammo.h"
+#include "weapons_bitmask.h"
+#include "weapons_buy.h"
 
 class CBasePlayer;
 
@@ -316,8 +315,8 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
-	static ItemInfo ItemInfoArray[32];
-	static AmmoInfo AmmoInfoArray[32];
+	static ItemInfo ItemInfoArray[MAX_WEAPONS];
+	static AmmoInfo AmmoInfoArray[MAX_AMMO_SLOTS];
 
 	CBasePlayer *m_pPlayer;
 	CBasePlayerItem *m_pNext;
