@@ -24,6 +24,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "menu_btnsbmp_table.h"
 
+#include <algorithm>
+#include <functional>
+
 #define ART_BANNER		"gfx/shell/head_creategame"
 
 #define ID_BACKGROUND	0
@@ -42,6 +45,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ID_MSGBOX	 	12
 #define ID_MSGTEXT	 	13
 #define ID_BOTNUM		14
+#define ID_GAMEMODE		15
 #define ID_YES	 	130
 #define ID_NO	 	131
 
@@ -66,6 +70,7 @@ typedef struct
 	menuField_s	hostName;
 	menuField_s	password;
 	menuField_s	botNum;
+	menuSpinControl_s gamemode;
 	menuCheckBox_s	nat;
 	menuCheckBox_s	dedicatedServer;
 
@@ -82,6 +87,14 @@ typedef struct
 } uiCreateGame_t;
 
 static uiCreateGame_t	uiCreateGame;
+
+#define MAX_GAMEMODES 4
+static const char *g_szGameModeNames[MAX_GAMEMODES] = {
+	"Original", "DeathMatch", "TeamDeathMatch", "ZombieMod 1"
+};
+static const char *g_szGameModeCodes[MAX_GAMEMODES] = {
+	"none", "dm", "tdm", "zb1"
+};
 
 /*
 =================
@@ -107,6 +120,7 @@ static void UI_CreateGame_Begin(void)
 	CVAR_SET_STRING("defaultmap", uiCreateGame.mapName[uiCreateGame.mapsList.curItem]);
 	CVAR_SET_FLOAT("sv_nat", CVAR_GET_FLOAT("public") ? uiCreateGame.nat.enabled : 0);
 	CVAR_SET_FLOAT("bot_quota", atoi(uiCreateGame.botNum.buffer));
+	CVAR_SET_STRING("mp_gamemode", g_szGameModeCodes[ static_cast<size_t>(uiCreateGame.gamemode.curValue)]);
 
 	BACKGROUND_TRACK(NULL, NULL);
 
@@ -157,6 +171,7 @@ static void UI_PromptDialog(void)
 	uiCreateGame.advOptions.generic.flags ^= QMF_INACTIVE;
 	uiCreateGame.done.generic.flags ^= QMF_INACTIVE;
 	uiCreateGame.cancel.generic.flags ^= QMF_INACTIVE;
+	uiCreateGame.gamemode.generic.flags ^= QMF_INACTIVE;
 	uiCreateGame.maxClients.generic.flags ^= QMF_INACTIVE;
 	uiCreateGame.botNum.generic.flags ^= QMF_INACTIVE;
 	uiCreateGame.hostName.generic.flags ^= QMF_INACTIVE;
@@ -243,6 +258,18 @@ static void UI_CreateGame_GetMapsList(void)
 
 /*
 =================
+UI_CreateGame_Update
+=================
+*/
+static void UI_CreateGame_Update()
+{
+	int i = 0;
+	i = uiCreateGame.gamemode.curValue;
+	uiCreateGame.gamemode.generic.name = g_szGameModeNames[i];
+}
+
+/*
+=================
 UI_CreateGame_Callback
 =================
 */
@@ -258,6 +285,12 @@ static void UI_CreateGame_Callback(void *self, int event)
 			((menuCheckBox_s *)self)->focusPic = UI_CHECKBOX_PRESSED;
 		else ((menuCheckBox_s *)self)->focusPic = UI_CHECKBOX_FOCUS;
 		break;
+	}
+
+	if (event == QM_CHANGED)
+	{
+		UI_CreateGame_Update();
+		return;
 	}
 
 	if (event != QM_ACTIVATED)
@@ -376,15 +409,15 @@ static void UI_CreateGame_Init(void)
 	uiCreateGame.hintMessage.generic.color = uiColorHelp;
 	uiCreateGame.hintMessage.generic.name = uiCreateGame.hintText;
 	uiCreateGame.hintMessage.generic.x = 590;
-	uiCreateGame.hintMessage.generic.y = 215;
+	uiCreateGame.hintMessage.generic.y = 245;
 
 	uiCreateGame.mapsList.generic.id = ID_MAPLIST;
 	uiCreateGame.mapsList.generic.type = QMTYPE_SCROLLLIST;
 	uiCreateGame.mapsList.generic.flags = QMF_HIGHLIGHTIFFOCUS | QMF_SMALLFONT;
 	uiCreateGame.mapsList.generic.x = 590;
-	uiCreateGame.mapsList.generic.y = 245;
+	uiCreateGame.mapsList.generic.y = 245; // 245;
 	uiCreateGame.mapsList.generic.width = 410;
-	uiCreateGame.mapsList.generic.height = 440;
+	uiCreateGame.mapsList.generic.height = 440; // 440;
 	uiCreateGame.mapsList.generic.callback = UI_CreateGame_Callback;
 
 	uiCreateGame.hostName.generic.id = ID_HOSTNAME;
@@ -434,6 +467,24 @@ static void UI_CreateGame_Init(void)
 	uiCreateGame.botNum.generic.height = 32;
 	uiCreateGame.botNum.maxLength = 2;
 	strcpy(uiCreateGame.botNum.buffer, CVAR_GET_STRING("bot_quota"));
+
+	uiCreateGame.gamemode.generic.id = ID_GAMEMODE;
+	uiCreateGame.gamemode.generic.type = QMTYPE_SPINCONTROL;
+	uiCreateGame.gamemode.generic.flags = QMF_CENTER_JUSTIFY | QMF_HIGHLIGHTIFFOCUS | QMF_DROPSHADOW;
+	uiCreateGame.gamemode.generic.x = 620;
+	uiCreateGame.gamemode.generic.y = 205;
+	uiCreateGame.gamemode.generic.width = 350;
+	uiCreateGame.gamemode.generic.height = 26;
+	uiCreateGame.gamemode.generic.callback = UI_CreateGame_Callback;
+	uiCreateGame.gamemode.minValue = 0;
+	uiCreateGame.gamemode.maxValue = MAX_GAMEMODES - 1;
+	uiCreateGame.gamemode.range = 1;
+
+	const char *szGameModeCode = CVAR_GET_STRING("mp_gamemode");
+	using std::placeholders::_1;
+	auto iter = std::find_if_not(std::begin(g_szGameModeCodes), std::end(g_szGameModeCodes), std::bind(stricmp, szGameModeCode, _1));
+	uiCreateGame.gamemode.curValue = iter != std::end(g_szGameModeCodes) ? std::distance(std::begin(g_szGameModeCodes), iter) : 0;
+	UI_CreateGame_Update();
 
 	uiCreateGame.msgBox.generic.id = ID_MSGBOX;
 	uiCreateGame.msgBox.generic.type = QMTYPE_ACTION;
@@ -489,10 +540,11 @@ static void UI_CreateGame_Init(void)
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.hostName);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.password);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.botNum);
+	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.gamemode);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.dedicatedServer);
 	if (CVAR_GET_FLOAT("public"))
 		UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.nat);
-	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.hintMessage);
+	//UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.hintMessage);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.mapsList);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.msgBox);
 	UI_AddItem(&uiCreateGame.menu, (void *)&uiCreateGame.dlgMessage1);
