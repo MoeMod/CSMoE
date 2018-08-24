@@ -122,7 +122,7 @@ LOCAL_SRC_FILES := \
 	util.cpp \
 	vehicle.cpp \
 	weapons.cpp \
-	weapontype.cpp \
+	weapons_buy.cpp \
 	world.cpp \
 	wpn_shared/wpn_ak47.cpp \
 	wpn_shared/wpn_aug.cpp \

@@ -180,6 +180,27 @@ void LinkUserMessages()
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 }
 
+void WriteWeaponInfo(const ItemInfo &II)
+{
+	const char *pszName;
+	if (!II.pszName)
+		pszName = "Empty";
+	else
+		pszName = II.pszName;
+
+	MESSAGE_BEGIN(MSG_INIT, gmsgWeaponList);
+	WRITE_STRING(pszName);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
+	WRITE_BYTE(II.iMaxAmmo1);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
+	WRITE_BYTE(II.iMaxAmmo2);
+	WRITE_BYTE(II.iSlot);
+	WRITE_BYTE(II.iPosition);
+	WRITE_BYTE(II.iId);
+	WRITE_BYTE(II.iFlags);
+	MESSAGE_END();
+}
+
 void WriteSigonMessages()
 {
 	for (int i = 0; i < MAX_WEAPONS; ++i)
@@ -189,27 +210,9 @@ void WriteSigonMessages()
 		if (!II.iId)
 			continue;
 
-		const char *pszName;
-		if (!II.pszName)
-			pszName = "Empty";
-		else
-			pszName = II.pszName;
-
-		MESSAGE_BEGIN(MSG_INIT, gmsgWeaponList);
-		WRITE_STRING(pszName);
-		WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
-		WRITE_BYTE(II.iMaxAmmo1);
-		WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
-		WRITE_BYTE(II.iMaxAmmo2);
-		WRITE_BYTE(II.iSlot);
-		WRITE_BYTE(II.iPosition);
-		WRITE_BYTE(II.iId);
-		WRITE_BYTE(II.iFlags);
-		MESSAGE_END();
+		WriteWeaponInfo(II);
 	}
 }
-
-
 
 void SendItemStatus(CBasePlayer *pPlayer)
 {

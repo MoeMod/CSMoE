@@ -328,7 +328,7 @@
     <ClCompile Include="..\dlls\util.cpp" />
     <ClCompile Include="..\dlls\vehicle.cpp" />
     <ClCompile Include="..\dlls\weapons.cpp" />
-    <ClCompile Include="..\dlls\weapontype.cpp" />
+    <ClCompile Include="..\dlls\weapons_buy.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
@@ -663,9 +663,10 @@
     <ClInclude Include="..\dlls\vector.h" />
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
-    <ClInclude Include="..\dlls\weapontype.h" />
+    <ClInclude Include="..\dlls\weapons_ammo.h" />
+    <ClInclude Include="..\dlls\weapons_const.h" />
+    <ClInclude Include="..\dlls\weapons_buy.h" />
     <ClInclude Include="..\dlls\world.h" />
-    <ClInclude Include="..\dlls\wpn_shared.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />

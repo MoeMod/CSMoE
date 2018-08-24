@@ -5,8 +5,6 @@
 #include "monsters.h"
 #include "weapons.h"
 
-#include "weapontype.h"
-
 /*
 * Globals initialization
 */
