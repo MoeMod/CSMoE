@@ -11,6 +11,7 @@
 #include "mod_dm.h"
 #include "mod_tdm.h"
 #include "mod_zb1.h"
+#include "mod_zbs.h"
 
 IBaseMod *g_pModRunning = nullptr;
 
@@ -26,7 +27,8 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "none", DefaultFactory<CMod_None> }, // BTE_MOD_NONE
 	{ "dm", DefaultFactory<CMod_DeathMatch> },
 	{ "tdm", DefaultFactory<CMod_TeamDeathMatch> },
-	{ "zb1", DefaultFactory<CMod_Zombi> }
+	{ "zb1", DefaultFactory<CMod_Zombi> },
+	{ "zbs", DefaultFactory<CMod_ZombieScenario> }
 };
 
 void InstallBteMod(const char *name)

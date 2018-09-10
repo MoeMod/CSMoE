@@ -32,6 +32,8 @@
 
 #include "events.h"
 
+#include "gamemode/mods_const.h"
+
 extern float g_flRoundTime;
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS

@@ -36,7 +36,7 @@
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
 
-#include "gamemode/mods_const.h"
+enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
 #define MIN_ALPHA	 100	
 #define	HUDELEM_ACTIVE	1

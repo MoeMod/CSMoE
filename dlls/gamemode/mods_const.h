@@ -12,6 +12,11 @@ enum GameMode_e : byte
 	MOD_DM = 3,
 	MOD_TDM = 4,
 	MOD_ZB1 = 5,
+	MOD_ZB2 = 6,
+	MOD_ZBU = 7,
+	MOD_ZB3 = 8,
+	MOD_ZBS = 9,
+	MOD_ZE = 10,
 };
 
 #endif
