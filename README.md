@@ -16,11 +16,10 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), Android(ARMv
 * [x] GameMode : Deathmatch (DM) with BOT support
 * [ ] HUD : Respawn Bar
 * [x] Player spawn protection
-* [x] Zombie knife, sound, models, effects, properties
-* [ ] Zombie knockback
+* [x] Zombie knife, sound, models, effects, knockback, properties
 * [x] GameMode : Zombie Mod 1
 * [ ] Zombie classes, skills
-* [ ] SupplyBox
+* [ ] SupplyBox : CV47-60R, Dual MP7A1, Dual Deagle Camo
 * [ ] Zombie evolution
 * [ ] GameMode : Zombie Mod 2
 * [ ] GameMode : Zombie United

@@ -35,6 +35,7 @@
 #include "weapons_const.h"
 #include "weapons_ammo.h"
 #include "weapons_buy.h"
+#include "player/player_knockback.h"
 
 class CBasePlayer;
 
@@ -300,6 +301,10 @@ public:
 	void FallInit();
 	void CheckRespawn();
 #endif
+
+public:
+	/* CSBTE Added */
+	virtual KnockbackData GetKnockBackData() { return { 0.0f, 0.0f, 0.0f ,0.0f ,0.5f }; }
 
 public:
 	inline int iItemPosition() const	{ return ItemInfoArray[ m_iId ].iPosition; }

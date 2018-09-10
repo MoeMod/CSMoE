@@ -216,7 +216,7 @@ public:
 		return &x;
 	}
    
-	Vector Normalize()
+	Vector Normalize() const
 	{
 		float flLen = Length();
 		if (flLen == 0)

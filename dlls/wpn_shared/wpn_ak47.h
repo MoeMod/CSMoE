@@ -32,6 +32,8 @@ public:
 #endif
 	}
 
+	virtual KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 200.0f, 100.0f, 0.6f }; }
+
 public:
 	void AK47Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
 

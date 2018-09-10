@@ -28,6 +28,7 @@ public:
 		return FALSE;
 #endif
 	}
+	virtual KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f }; }
 
 public:
 	int m_iShell;

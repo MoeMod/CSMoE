@@ -307,6 +307,7 @@
     <ClCompile Include="..\dlls\player.cpp" />
     <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\player\hintmessage.cpp" />
+    <ClCompile Include="..\dlls\player\player_knockback.cpp" />
     <ClCompile Include="..\dlls\player\player_model.cpp" />
     <ClCompile Include="..\dlls\player\player_msg.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
@@ -637,6 +638,7 @@
     <ClInclude Include="..\dlls\player\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\player\hintmessage.h" />
     <ClInclude Include="..\dlls\player\player_const.h" />
+    <ClInclude Include="..\dlls\player\player_knockback.h" />
     <ClInclude Include="..\dlls\player\player_model.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
     <ClInclude Include="..\dlls\player\player_signal.h" />

@@ -30,6 +30,7 @@ public:
 		return FALSE;
 #endif
 	}
+	virtual KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 
 public:
 	void M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);

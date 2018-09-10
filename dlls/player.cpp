@@ -40,6 +40,7 @@
 
 // addons
 #include "player/player_spawnpoint.h"
+#include "player/player_knockback.h"
 
 /*
 * Globals initialization
@@ -1066,7 +1067,14 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			}
 		}
 
-		if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
+		if (m_bIsZombie) // Zombie Knockback...
+		{
+			if (pAttack->m_pActiveItem)
+			{
+				ApplyKnockbackData(this, this->pev->origin - pAttack->pev->origin, pAttack->m_pActiveItem->GetKnockBackData());
+			}
+		}
+		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
 			m_flVelocityModifier = 0.5f;
 

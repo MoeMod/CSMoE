@@ -31,6 +31,7 @@ public:
 #endif
 	}
 	virtual BOOL IsPistol() { return TRUE; }
+	virtual KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
 
 public:
 	void ELITEFire(float flSpread, float flCycleTime, BOOL fUseSemi);

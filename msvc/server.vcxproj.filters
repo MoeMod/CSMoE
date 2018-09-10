@@ -511,6 +511,9 @@
     <ClCompile Include="..\dlls\weapons_buy.cpp">
       <Filter>dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\player\player_knockback.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1085,6 +1088,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_buy.h">
       <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_knockback.h">
+      <Filter>dlls\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
