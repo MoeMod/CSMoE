@@ -44,6 +44,7 @@
 
 // Hostage
 #include "hostage/hostage.h"
+#include "hostage/hostage_improv.h"
 #include "hostage/hostage_localnav.h"
 
 #include "bot/cs_bot.h"
@@ -1222,6 +1223,32 @@ void CHostage::PreThink()
 	}
 }
 
+CBaseEntity *CHostage::GetLeader()				// return our leader, or NULL
+{
+	if (m_improv != NULL)
+	{
+		return m_improv->GetFollowLeader();
+	}
+
+	return m_hTargetEnt;
+}
+
+bool CHostage::IsFollowing(const CBaseEntity *entity)
+{
+	if (m_improv != NULL)
+	{
+		return m_improv->IsFollowing();
+	}
+
+	if ((entity == NULL && m_hTargetEnt == NULL) || (entity != NULL && m_hTargetEnt != entity))
+		return false;
+
+	if (m_State != FOLLOW)
+		return false;
+
+	return true;
+}
+
 void Hostage_RegisterCVars()
 {
 // These cvars are only used in czero
@@ -1617,3 +1644,4 @@ float SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
 
 	return duration;
 }
+
