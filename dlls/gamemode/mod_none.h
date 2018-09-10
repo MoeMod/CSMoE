@@ -21,7 +21,6 @@ public: // CHalfLifeMultiplay
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 
 public:
-	bool IsZBMode() override { return false; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
 
 protected:

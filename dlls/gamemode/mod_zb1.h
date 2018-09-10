@@ -30,7 +30,7 @@ public: // CHalfLifeMultiplay
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 
 public: // IBaseMod
-	bool IsZBMode() override { return true; }
+	DamageTrack_e DamageTrack() override { return DT_ZB; }
 	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
 

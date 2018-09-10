@@ -19,4 +19,12 @@ enum GameMode_e : byte
 	MOD_ZE = 10,
 };
 
+enum DamageTrack_e : byte
+{
+	DT_NONE,
+	DT_ZB,
+	DT_ZBS,
+	DT_ZSE
+};
+
 #endif
