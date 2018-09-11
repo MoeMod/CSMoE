@@ -108,6 +108,7 @@ void CMonster::Spawn()
 	m_bStuck = FALSE;
 	m_flStuckTime = 0;
 	m_improv = NULL;
+	m_flNextAttackThink = 0;
 
 	//CHostage::Spawn();
 	pev->team = TEAM_TERRORIST; // allow bot attack...
@@ -354,6 +355,8 @@ void CMonster::IdleThink()
 			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
 
 		// Some attack code here
+		if(player != NULL)
+			Attack(player->pev);
 	}
 
 	if (m_improv != NULL)
@@ -372,6 +375,35 @@ void CMonster::IdleThink()
 		{
 			SetAnimation(MONSTERANIM_IDLE);
 		}
+	}
+}
+
+void CMonster::Attack(entvars_t *pevVictim)
+{
+	const float flAttackDistance = 35.0f;
+	const float flAttackRate = 2.0f;
+	const float flAttackIdleTime = 1.0f;
+	const float flAttackDamage = 1.0f;
+
+	if (m_flNextAttackThink > gpGlobals->time)
+		return;
+
+	if (CalcBoxDistance(pev, pevVictim) > flAttackDistance)
+		return;
+
+	SetAnimation(MONSTERANIM_ATTACK);
+	CBasePlayer *pVictim = NULL;
+	pVictim = GetClassPtr((CBasePlayer *)pevVictim);
+	pVictim->TakeDamage(pev, pev, flAttackDamage, DMG_BULLET);
+	m_flNextAttackThink = gpGlobals->time + flAttackRate;
+	m_flNextFullThink = gpGlobals->time + flAttackIdleTime;
+	m_flNextAttackAnimTime = gpGlobals->time + 1.0f;
+
+	switch (RANDOM_LONG(1, 3))
+	{
+	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_1.wav", VOL_NORM, ATTN_NORM); break;
+	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_2.wav", VOL_NORM, ATTN_NORM); break;
+	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM); break;
 	}
 }
 
@@ -419,6 +451,9 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		return;
 
 	if (anim != MONSTERANIM_FLINCH && anim != MONSTERANIM_LARGE_FLINCH && m_flFlinchTime > gpGlobals->time && pev->health > 0.0f)
+		return;
+
+	if (m_flNextAttackAnimTime > gpGlobals->time && pev->health > 0.0f)
 		return;
 
 	speed = pev->velocity.Length2D();
@@ -718,4 +753,17 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		ResetSequenceInfo();
 	}
 
+}
+
+float CMonster::CalcBoxDistance(entvars_s *pev, entvars_s *pevTarget)
+{
+	Vector vecDistance = Vector(0, 0, 0);
+	for (int i = 0; i < 3; i++)
+	{
+		if (((float *)pev->absmin)[i] > ((float *)pevTarget->absmax)[i])
+			(float)(vecDistance)[i] = ((float *)pev->absmin)[i] - ((float *)pevTarget->absmax)[i];
+		else if (((float *)pevTarget->absmin)[i] > ((float *)pev->absmax)[i])
+			(float)(vecDistance)[i] = ((float *)pevTarget->absmin)[i] - ((float *)pev->absmax)[i];
+	}
+	return vecDistance.Length();
 }

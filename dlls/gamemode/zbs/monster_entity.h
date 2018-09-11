@@ -38,12 +38,17 @@ public:
 	void EXPORT IdleThink();
 	void Remove();
 
-	void DoFollow();
 	void Wander();
+	void Attack(entvars_t *pevVictim);
 
 	void PlayPainSound();
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
+	float CalcBoxDistance(entvars_s *pev, entvars_s *pevTarget);
+
+public:
+	float m_flNextAttackThink;
+	float m_flNextAttackAnimTime;
 };
 
 #endif
