@@ -200,11 +200,13 @@ public:
 	bool DiscontinuityJump(float ground, bool onlyJumpDown = false, bool mustJump = false);
 	void UpdateVision();
 
+	void SetFollowRange(float maxPathLength, float giveUpRange, float stopRange) { m_followState.SetFollowRange(maxPathLength, giveUpRange, stopRange); }
+
 public:
 	CountdownTimer m_coughTimer;
 	CountdownTimer m_grenadeTimer;
 
-private:
+protected:
 	CHostage *m_hostage;
 	CNavArea *m_lastKnownArea;	// last area we were in
 	mutable Vector m_centroid;

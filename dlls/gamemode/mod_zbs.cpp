@@ -153,7 +153,7 @@ void CMod_ZombieScenario::Think()
 
 	//return IBaseMod::Think();
 
-	if (FRoundStarted())
+	if (FRoundStarted() && !m_bRoundTerminating)
 	{
 		// spawn zombie
 		if (gpGlobals->time > m_flNextSpawnNPC)
@@ -279,16 +279,17 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	}
 	else
 	{
+		Vector backup_v_angle = monster->pev->v_angle;
 		CSDM_DoRandomSpawn(monster);
+		monster->pev->v_angle = backup_v_angle;
 	}
 
 	pent->v.spawnflags |= SF_NORESPAWN;
 	
-
 	DispatchSpawn(pent);
-	monster->pev->health = 300.0f;
-	monster->pev->max_health = 500;
+	monster->pev->max_health = 100;
 	monster->pev->health = monster->pev->max_health;
+
 	return monster;
 }
 

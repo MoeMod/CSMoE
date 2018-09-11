@@ -13,6 +13,27 @@
 
 LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 
+class CMonsterImprov : public CHostageImprov
+{
+public:
+	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity) 
+	{
+		
+	}
+	~CMonsterImprov() {} // virtual
+
+	// jumping control
+	bool GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Vector *normal) override
+	{
+		bool result = CHostageImprov::GetSimpleGroundHeightWithFloor(pos, height, normal);
+
+		if (IsRunning() || IsWalking())
+			return false;
+
+		return result;
+	}
+};
+
 void CMonster::Spawn()
 {
 	Precache();
@@ -35,6 +56,7 @@ void CMonster::Spawn()
 	pev->gravity = 1;
 	pev->view_ofs = VEC_HOSTAGE_VIEW;
 	pev->velocity = Vector(0, 0, 0);
+	pev->maxspeed = 140.0f;
 
 	if (pev->spawnflags & SF_MONSTER_HITMONSTERCLIP)
 		pev->flags |= FL_MONSTERCLIP;
@@ -162,7 +184,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pev->health > 0)
 	{
-		m_flFlinchTime = gpGlobals->time + 0.75;
+		m_flFlinchTime = gpGlobals->time + 0.7;
 		//SetFlinchActivity();
 		SetAnimation(MONSTERANIM_FLINCH);
 
@@ -242,7 +264,28 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	SetAnimation(MONSTERANIM_DIE);
 
 	pev->nextthink = gpGlobals->time + 3;
-	SetThink(&CHostage::Remove);
+	SetThink(&CMonster::Remove);
+}
+
+void CMonster::Remove()
+{
+	pev->movetype = MOVETYPE_NONE;
+	pev->solid = SOLID_NOT;
+	pev->takedamage = DAMAGE_NO;
+
+	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+	pev->nextthink = -1;
+	m_flNextFullThink = -1;
+
+	CLocalNav *pPrevNav = m_LocalNav;
+	m_LocalNav = nullptr;
+	delete pPrevNav;
+
+	CHostageImprov *pPrevImprov = m_improv;
+	m_improv = nullptr;
+	delete pPrevImprov;
+
+	pev->flags |= FL_KILLME;
 }
 
 void CMonster::IdleThink()
@@ -254,7 +297,7 @@ void CMonster::IdleThink()
 
 	if (!m_improv)
 	{
-		m_improv = new CHostageImprov(this);
+		m_improv = new CMonsterImprov(this);
 	}
 
 	pev->nextthink = gpGlobals->time + giveUpTime;
@@ -275,19 +318,6 @@ void CMonster::IdleThink()
 	// sth to be inserted
 
 	m_flNextFullThink = gpGlobals->time + 0.1;
-	
-	if (pev->deadflag == DEAD_DEAD)
-	{
-		UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
-		return;
-	}
-
-	if (m_hTargetEnt != NULL && ((m_bStuck && gpGlobals->time - m_flStuckTime > 5.0f) || m_hTargetEnt->pev->deadflag != DEAD_NO))
-	{
-		m_State = STAND;
-		m_hTargetEnt = NULL;
-		m_bStuck = FALSE;
-	}
 
 	if (m_hTargetEnt != NULL || m_improv != NULL)
 	{
@@ -296,32 +326,42 @@ void CMonster::IdleThink()
 		if (m_improv != NULL)
 		{
 			if (m_improv->IsFollowing())
+			{ 
 				player = (CBasePlayer *)m_improv->GetFollowLeader();
+			}
+			else
+			{
+				// find target
+				
+				if (player = m_improv->GetClosestVisiblePlayer(TEAM_CT))
+				{
+					m_improv->Follow(player);
+					m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+				}
+				else if(player = m_improv->GetClosestPlayerByTravelDistance())
+				{
+					m_improv->MoveTo(player->Center());
+					m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+				}
+				else
+				{
+					// TODO : no player found, wander around
+					Wander();
+				}
+			}
 		}
 		else
 			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
 
-		
+		// Some attack code here
 	}
 
 	if (m_improv != NULL)
 	{
-		if (!m_improv->IsFollowing())
-		{
-			CBasePlayer *target = m_improv->GetClosestVisiblePlayer(TEAM_CT);
-			if (target && target->IsAlive())
-			{
-				m_improv->Follow(target);
-			}
-		}
 		m_improv->OnUpdate(updateRate);
 	}
-	else
-	{
-		// m_hTargetEnt ??
-		DoFollow();
-	}
 
+	// sequence settings.
 	if (gpGlobals->time >= m_flFlinchTime)
 	{
 		if (pev->velocity.Length() > 15)
@@ -333,6 +373,40 @@ void CMonster::IdleThink()
 			SetAnimation(MONSTERANIM_IDLE);
 		}
 	}
+}
+
+void CMonster::Wander()
+{
+	if (m_improv)
+	{
+		CBaseEntity *target = NULL;
+
+		float shorestDistance = 9.9999998e10f;
+		CBaseEntity *shorestTarget = NULL;
+
+		while ((target = UTIL_FindEntityByTargetname(target, "func_buyzone")) != NULL)
+		{
+			ShortestPathCost cost;
+			Vector vecCenter = target->Center();
+
+			float range = NavAreaTravelDistance(m_improv->GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&vecCenter), cost);
+
+			if (range < shorestDistance)
+			{
+				shorestDistance = range;
+				shorestTarget = target;
+			}
+		}
+
+		if (shorestTarget)
+		{
+			m_improv->MoveTo(shorestTarget->Center());
+			m_improv->SetFollowRange(6000.0f, 3000.0f, 50.0f);
+			return;
+		}
+	}
+
+	Wiggle();
 }
 
 void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnimation
@@ -644,98 +718,4 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		ResetSequenceInfo();
 	}
 
-}
-
-void CMonster::DoFollow()
-{
-	CBaseEntity *pFollowing;
-	Vector vecDest;
-	float flRadius = 0;
-	float flDistToDest;
-
-	if (m_hTargetEnt == NULL)
-		return;
-
-	/*if (cv_hostage_stop.value > 0.0)
-	{
-		m_State = STAND;
-		m_hTargetEnt = NULL;
-		m_hStoppedTargetEnt = NULL;
-		return;
-	}*/
-
-	pFollowing = GetClassPtr((CBaseEntity *)m_hTargetEnt->pev);
-	m_LocalNav->SetTargetEnt(pFollowing);
-
-	vecDest = pFollowing->pev->origin;
-	vecDest.z += pFollowing->pev->mins.z;
-	flDistToDest = (vecDest - pev->origin).Length();
-
-	if (flDistToDest < 80 && (m_fHasPath || m_LocalNav->PathTraversable(pev->origin, vecDest, TRUE)))
-		return;
-
-	if (pev->flags & FL_ONGROUND)
-	{
-		if (m_flPathCheckInterval + m_flLastPathCheck < gpGlobals->time)
-		{
-			if (!m_fHasPath || pFollowing->pev->velocity.Length2D() > 1)
-			{
-				m_flLastPathCheck = gpGlobals->time;
-				m_LocalNav->RequestNav(this);
-			}
-		}
-	}
-
-	if (m_fHasPath)
-	{
-		nTargetNode = m_LocalNav->GetFurthestTraversableNode(pev->origin, vecNodes, m_nPathNodes, TRUE);
-
-		if (!nTargetNode)
-		{
-			if ((vecNodes[nTargetNode] - pev->origin).Length2D() < HOSTAGE_STEPSIZE)
-				nTargetNode = -1;
-		}
-		if (nTargetNode == -1)
-		{
-			m_fHasPath = FALSE;
-			m_flPathCheckInterval = 0.1f;
-		}
-	}
-
-	if (gpGlobals->time < m_flFlinchTime)
-		return;
-
-	if (nTargetNode != -1)
-	{
-		if (pev->flags & FL_ONGROUND)
-			PointAt(vecNodes[nTargetNode]);
-
-		if (pev->movetype == MOVETYPE_FLY)
-			pev->v_angle.x = -60;
-
-		MoveToward(vecNodes[nTargetNode]);
-		m_bStuck = FALSE;
-	}
-	else if (pev->takedamage == DAMAGE_YES)
-	{
-		if (IsFollowingSomeone())
-		{
-			if (!m_bStuck && flDistToDest > 200)
-			{
-				m_bStuck = TRUE;
-				m_flStuckTime = gpGlobals->time;
-			}
-		}
-	}
-
-	if (pev->flags & FL_ONGROUND)
-	{
-		if (m_flPathAcquired != -1 && m_flPathAcquired + 2 > gpGlobals->time)
-		{
-			if (pev->velocity.Length2D() < 1 || nTargetNode == -1)
-			{
-				Wiggle();
-			}
-		}
-	}
 }

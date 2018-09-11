@@ -998,7 +998,8 @@ void CHostageImprov::UpdatePosition(float deltaT)
 
 	float speed = m_vel.NormalizeInPlace();
 
-	const float maxSpeed = 285.0f;
+	//const float maxSpeed = 285.0f;
+	const float maxSpeed = m_hostage->pev->maxspeed;
 	if (speed > maxSpeed)
 	{
 		speed = maxSpeed;

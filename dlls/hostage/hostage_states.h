@@ -177,7 +177,6 @@ class HostageFollowState: public HostageState
 {
 public:
 	virtual ~HostageFollowState() {};
-
 	virtual void OnEnter(CHostageImprov *improv);
 	virtual void OnUpdate(CHostageImprov *improv);
 	virtual void OnExit(CHostageImprov *improv);
@@ -187,6 +186,12 @@ public:
 public:
 	void SetLeader(CBaseEntity *leader) { m_leader = leader; }
 	CBaseEntity *GetLeader() const { return m_leader; }
+	void SetFollowRange(float maxPathLength, float giveUpRange, float stopRange) 
+	{
+		m_maxPathLength = maxPathLength; 
+		m_giveUpRange = giveUpRange;
+		m_stopRange = stopRange;
+	}
 
 private:
 	mutable EHANDLE m_leader;
@@ -198,6 +203,9 @@ private:
 	CountdownTimer m_repathTimer;
 	bool m_isWaitingForFriend;
 	CountdownTimer m_waitForFriendTimer;
+
+	float m_maxPathLength;
+	float m_giveUpRange;
 };
 
 class HostageAnimateState: public HostageState
