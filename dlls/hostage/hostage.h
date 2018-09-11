@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+enum GameEventType : int; // #include "game_shared/GameEvent.h"
+
 #define MAX_NODES			100
 #define MAX_HOSTAGES			12
 #define MAX_HOSTAGES_NAV		20
@@ -78,7 +80,7 @@ enum HostageChatterType
 
 
 // Improved the hostages from CZero
-#include "hostage/hostage_improv.h"
+//#include "hostage/hostage_improv.h"
 
 
 extern CHostageManager *g_pHostages;
@@ -105,7 +107,7 @@ public:
 	void EXPORT IdleThink();
 	void EXPORT Remove();
 	void RePosition();
-	void SetActivity(int act);
+	void SetActivity(Activity act);
 	int GetActivity() { return m_Activity; }
 	float GetModifiedDamage(float flDamage, int nHitGroup);
 	void SetFlinchActivity();
@@ -127,37 +129,15 @@ public:
 
 	// queries
 	bool IsFollowingSomeone() { return IsFollowing(); }
-	CBaseEntity *GetLeader()				// return our leader, or NULL
-	{
-		if (m_improv != NULL)
-		{
-			return m_improv->GetFollowLeader();
-		}
-
-		return m_hTargetEnt;
-	}
-	bool IsFollowing(const CBaseEntity *entity = NULL)
-	{
-		if (m_improv != NULL)
-		{
-			return m_improv->IsFollowing();
-		}
-
-		if( ( entity == NULL && m_hTargetEnt == NULL ) || ( entity != NULL && m_hTargetEnt != entity ) )
-			return false;
-
-		if (m_State != FOLLOW)
-			return false;
-
-		return true;
-	}
+	CBaseEntity *GetLeader();				// return our leader, or NULL
+	bool IsFollowing(const CBaseEntity *entity = NULL);
 	bool IsValid() { return (pev->takedamage == DAMAGE_YES); }
 	bool IsDead() { return (pev->deadflag == DEAD_DEAD); }
 	bool IsAtHome() { return (pev->origin - m_vStart).IsLengthGreaterThan(20) != true; }
 	const Vector *GetHomePosition() { return &m_vStart; }
 
 public:
-	int m_Activity;
+	Activity m_Activity;
 	BOOL m_bTouched;
 	BOOL m_bRescueMe;
 	float m_flFlinchTime;

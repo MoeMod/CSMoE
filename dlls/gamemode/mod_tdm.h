@@ -26,8 +26,6 @@ public: // CHalfLifeMultiplay
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override { return true; }
-public:
-	bool IsZBMode() override { return false; }
 };
 
 #endif

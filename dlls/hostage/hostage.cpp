@@ -44,6 +44,7 @@
 
 // Hostage
 #include "hostage/hostage.h"
+#include "hostage/hostage_improv.h"
 #include "hostage/hostage_localnav.h"
 
 #include "bot/cs_bot.h"
@@ -99,6 +100,7 @@ void CHostage::Spawn()
 	pev->gravity = 1;
 	pev->view_ofs = VEC_HOSTAGE_VIEW;
 	pev->velocity = Vector(0, 0, 0);
+	pev->maxspeed = 285.0f; // ref CHostageImprov::UpdatePosition
 
 	if (pev->spawnflags & SF_MONSTER_HITMONSTERCLIP)
 		pev->flags |= FL_MONSTERCLIP;
@@ -198,7 +200,7 @@ void CHostage::Precache()
 	PRECACHE_MODEL("sprites/smoke.spr");
 }
 
-void CHostage::SetActivity(int act)
+void CHostage::SetActivity(Activity act)
 {
 	if (m_Activity != act)
 	{
@@ -1222,6 +1224,32 @@ void CHostage::PreThink()
 	}
 }
 
+CBaseEntity *CHostage::GetLeader()				// return our leader, or NULL
+{
+	if (m_improv != NULL)
+	{
+		return m_improv->GetFollowLeader();
+	}
+
+	return m_hTargetEnt;
+}
+
+bool CHostage::IsFollowing(const CBaseEntity *entity)
+{
+	if (m_improv != NULL)
+	{
+		return m_improv->IsFollowing();
+	}
+
+	if ((entity == NULL && m_hTargetEnt == NULL) || (entity != NULL && m_hTargetEnt != entity))
+		return false;
+
+	if (m_State != FOLLOW)
+		return false;
+
+	return true;
+}
+
 void Hostage_RegisterCVars()
 {
 // These cvars are only used in czero
@@ -1617,3 +1645,4 @@ float SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
 
 	return duration;
 }
+
