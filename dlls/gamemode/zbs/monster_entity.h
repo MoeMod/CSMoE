@@ -36,7 +36,11 @@ public:
 
 public:
 	void EXPORT IdleThink();
+	void Remove();
+
 	void DoFollow();
+	void Wander();
+
 	void PlayPainSound();
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);

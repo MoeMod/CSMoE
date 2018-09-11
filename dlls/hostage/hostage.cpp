@@ -100,6 +100,7 @@ void CHostage::Spawn()
 	pev->gravity = 1;
 	pev->view_ofs = VEC_HOSTAGE_VIEW;
 	pev->velocity = Vector(0, 0, 0);
+	pev->maxspeed = 285.0f; // ref CHostageImprov::UpdatePosition
 
 	if (pev->spawnflags & SF_MONSTER_HITMONSTERCLIP)
 		pev->flags |= FL_MONSTERCLIP;
