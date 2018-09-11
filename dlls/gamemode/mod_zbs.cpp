@@ -245,7 +245,7 @@ void CMod_ZombieScenario::RoundStart()
 BOOL CMod_ZombieScenario::FRoundStarted()
 {
 	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 1)
+	if (iCountDown <= 20)
 		return false;
 
 	return true;
@@ -261,9 +261,6 @@ CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()
 
 CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 {
-	if (m_iCurrentNPC >= 50)
-		return nullptr;
-
 	edict_t *pent = CREATE_NAMED_ENTITY(MAKE_STRING("monster_entity"));
 
 	if (FNullEnt(pent))
@@ -292,7 +289,6 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	DispatchSpawn(pent);
 	monster->pev->max_health = 100;
 	monster->pev->health = monster->pev->max_health;
-	m_iCurrentNPC++;
 
 	return monster;
 }
@@ -304,5 +300,4 @@ void CMod_ZombieScenario::ClearZombieNPC()
 	{
 		npc->Killed(nullptr, GIB_NORMAL);
 	}
-	m_iCurrentNPC = 0;
 }

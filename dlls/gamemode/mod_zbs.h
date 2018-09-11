@@ -43,7 +43,6 @@ public:
 public:
 	std::vector<CZombieSpawn *> m_vecZombieSpawns;
 	float m_flNextSpawnNPC;
-	int m_iCurrentNPC;
 };
 
 #endif

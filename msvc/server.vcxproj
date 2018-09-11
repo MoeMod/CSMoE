@@ -848,7 +848,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
