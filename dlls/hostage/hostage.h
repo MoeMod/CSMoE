@@ -107,7 +107,7 @@ public:
 	void EXPORT IdleThink();
 	void EXPORT Remove();
 	void RePosition();
-	void SetActivity(int act);
+	void SetActivity(Activity act);
 	int GetActivity() { return m_Activity; }
 	float GetModifiedDamage(float flDamage, int nHitGroup);
 	void SetFlinchActivity();
@@ -137,7 +137,7 @@ public:
 	const Vector *GetHomePosition() { return &m_vStart; }
 
 public:
-	int m_Activity;
+	Activity m_Activity;
 	BOOL m_bTouched;
 	BOOL m_bRescueMe;
 	float m_flFlinchTime;

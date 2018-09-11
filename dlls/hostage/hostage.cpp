@@ -199,7 +199,7 @@ void CHostage::Precache()
 	PRECACHE_MODEL("sprites/smoke.spr");
 }
 
-void CHostage::SetActivity(int act)
+void CHostage::SetActivity(Activity act)
 {
 	if (m_Activity != act)
 	{

@@ -9,6 +9,7 @@
 #include "mod_zbs.h"
 
 #include "zbs/zs_subs.h"
+#include "player/csdm_randomspawn.h"
 
 #include <algorithm>
 
@@ -275,8 +276,12 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	{
 		monster->pev->origin = sp->pev->origin;
 		monster->pev->angles = sp->pev->angles;
-
 	}
+	else
+	{
+		CSDM_DoRandomSpawn(monster);
+	}
+
 	pent->v.spawnflags |= SF_NORESPAWN;
 	
 
