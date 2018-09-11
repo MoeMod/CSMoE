@@ -1,6 +1,6 @@
 
-#ifndef ZS_SUBS_H
-#define ZS_SUBS_H
+#ifndef MONSTER_ENTITY_H
+#define MONSTER_ENTITY_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -39,16 +39,12 @@ public:
 	void Remove();
 
 	void Wander();
-	void Attack(entvars_t *pevVictim);
+	CBaseEntity *CheckAttack();
+	CBaseEntity *CheckTraceHullAttack(float flDist, int iDamage, int iDmgType);
+	bool ShouldAttack(CBaseEntity *target);
 
-	void PlayPainSound();
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
-	float CalcBoxDistance(entvars_s *pev, entvars_s *pevTarget);
-
-public:
-	float m_flNextAttackThink;
-	float m_flNextAttackAnimTime;
 };
 
 #endif
