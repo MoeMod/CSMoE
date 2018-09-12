@@ -332,7 +332,7 @@ void CMonster::IdleThink()
 
 	if (m_hTargetEnt != NULL || m_improv != NULL)
 	{
-		CBaseEntity *player = NULL;
+		CBasePlayer *player = NULL;
 
 		if (m_improv != NULL)
 		{
