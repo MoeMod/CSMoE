@@ -896,7 +896,7 @@ void CHostageImprov::UpdatePosition(float deltaT)
 
 	DrawAxes(m_moveGoal, 255, 255, 0);
 
-	if (IsJumping())
+	if (IsJumping() && CanJump())
 	{
 		Vector dir;
 		const float pushSpeed = 100.0f;

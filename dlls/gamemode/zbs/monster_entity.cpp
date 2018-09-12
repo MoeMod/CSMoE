@@ -38,8 +38,13 @@ public:
 	}
 	bool CanJump() const override
 	{
-		if (m_hostage->m_IdealActivity >= ACT_RANGE_ATTACK1 && m_hostage->m_IdealActivity <= ACT_MELEE_ATTACK2)
-			return false;
+		CBasePlayer *player = NULL;
+		if (IsFollowing())
+		{
+			player = (CBasePlayer *)GetFollowLeader();
+			if ((m_hostage->Center() - player->Center()).Length() < 48.0)
+				return false;
+		}
 
 		return CHostageImprov::CanJump();
 	}
@@ -131,6 +136,9 @@ void CMonster::Precache()
 	PRECACHE_SOUND("zombi/zombi_death_2.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
+	PRECACHE_SOUND("zombi/zombi_attack_1.wav");
+	PRECACHE_SOUND("zombi/zombi_attack_2.wav");
+	PRECACHE_SOUND("zombi/zombi_attack_3.wav");
 }
 
 void CMonster::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
@@ -324,7 +332,7 @@ void CMonster::IdleThink()
 
 	if (m_hTargetEnt != NULL || m_improv != NULL)
 	{
-		CBasePlayer *player = NULL;
+		CBaseEntity *player = NULL;
 
 		if (m_improv != NULL)
 		{
@@ -335,29 +343,14 @@ void CMonster::IdleThink()
 			else
 			{
 				// find target
-				
-				if (player = m_improv->GetClosestVisiblePlayer(TEAM_CT))
-				{
-					m_improv->Follow(player);
-					m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
-				}
-				else if(player = m_improv->GetClosestPlayerByTravelDistance())
-				{
-					m_improv->MoveTo(player->Center());
-					m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
-				}
-				else
-				{
-					// TODO : no player found, wander around
-					Wander();
-				}
+				player = (CBasePlayer *)FindTarget();
 			}
 		}
 		else
 			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
 
 		// Some attack code here
-		if(player != NULL)
+		if (player != NULL)
 			CheckAttack();
 	}
 
@@ -378,6 +371,28 @@ void CMonster::IdleThink()
 			SetAnimation(MONSTERANIM_IDLE);
 		}
 	}
+}
+
+CBaseEntity *CMonster::FindTarget()
+{
+	CBasePlayer *player = NULL;
+	if (player = m_improv->GetClosestVisiblePlayer(TEAM_CT))
+	{
+		m_improv->Follow(player);
+		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+	}
+	else if (player = m_improv->GetClosestPlayerByTravelDistance())
+	{
+		m_improv->MoveTo(player->Center());
+		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+	}
+	else
+	{
+		// TODO : no player found, wander around
+		Wander();
+	}
+
+	return player;
 }
 
 CBaseEntity *CMonster::CheckAttack()
@@ -778,7 +793,6 @@ CBaseEntity *CMonster::CheckTraceHullAttack(float flDist, int iDamage, int iDmgT
 		UTIL_MakeAimVectors(pev->angles);
 
 	Vector vecStart = pev->origin;
-	vecStart.z += pev->size.z * 0.5;
 	Vector vecEnd = vecStart + (gpGlobals->v_forward * flDist);
 
 	UTIL_TraceHull(vecStart, vecEnd, dont_ignore_monsters, head_hull, ENT(pev), &tr);

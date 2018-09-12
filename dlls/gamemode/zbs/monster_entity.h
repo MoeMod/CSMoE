@@ -38,6 +38,7 @@ public:
 	void EXPORT IdleThink();
 	void Remove();
 
+	CBaseEntity *FindTarget();
 	void Wander();
 	CBaseEntity *CheckAttack();
 	CBaseEntity *CheckTraceHullAttack(float flDist, int iDamage, int iDmgType);
