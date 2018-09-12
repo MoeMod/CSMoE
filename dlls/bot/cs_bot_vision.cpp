@@ -412,7 +412,12 @@ void CCSBot::UpdatePeripheralVision()
 		{
 			spotOrder = &m_spotEncounter->spotList[it];
 
-			const Vector *spotPos = spotOrder->spot->GetPosition();
+			// spot could be nullptr
+			HidingSpot *hspot = spotOrder->spot;
+			if (!hspot)
+				continue;
+
+			const Vector *spotPos = hspot->GetPosition();
 
 			pos.x = spotPos->x;
 			pos.y = spotPos->y;
