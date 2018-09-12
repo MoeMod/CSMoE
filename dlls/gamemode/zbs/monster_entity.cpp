@@ -7,6 +7,7 @@
 #include "trains.h"
 
 #include "monster_entity.h"
+#include "zs_subs.h"
 
 #include "game.h"
 #include "bot_include.h" // nav
@@ -22,6 +23,9 @@ public:
 	}
 	~CMonsterImprov() {} // virtual
 
+	// remove some hostage staffs
+	void Crouch() override { /* no code needed */ }
+
 	// jumping control
 	bool GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Vector *normal) override
 	{
@@ -31,6 +35,13 @@ public:
 			return false;
 
 		return result;
+	}
+	bool CanJump() const override
+	{
+		if (m_hostage->m_IdealActivity >= ACT_RANGE_ATTACK1 && m_hostage->m_IdealActivity <= ACT_MELEE_ATTACK2)
+			return false;
+
+		return CHostageImprov::CanJump();
 	}
 };
 
@@ -54,7 +65,7 @@ void CMonster::Spawn()
 	pev->max_health = 100;
 	pev->health = pev->max_health;
 	pev->gravity = 1;
-	pev->view_ofs = VEC_HOSTAGE_VIEW;
+	pev->view_ofs = VEC_VIEW;
 	pev->velocity = Vector(0, 0, 0);
 	pev->maxspeed = 140.0f;
 
@@ -108,8 +119,8 @@ void CMonster::Spawn()
 	m_bStuck = FALSE;
 	m_flStuckTime = 0;
 	m_improv = NULL;
-	m_flNextAttackThink = 0;
-
+	m_flNextAttack = 0;
+	
 	//CHostage::Spawn();
 	pev->team = TEAM_TERRORIST; // allow bot attack...
 }
@@ -206,15 +217,6 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	}
 
 	return 0;
-}
-
-void CMonster::PlayPainSound()
-{
-	/*switch (RANDOM_LONG(0, 1))
-	{
-	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
-	}*/
 }
 
 void CMonster::PlayDeathSound()
@@ -356,7 +358,7 @@ void CMonster::IdleThink()
 
 		// Some attack code here
 		if(player != NULL)
-			Attack(player->pev);
+			CheckAttack();
 	}
 
 	if (m_improv != NULL)
@@ -378,26 +380,25 @@ void CMonster::IdleThink()
 	}
 }
 
-void CMonster::Attack(entvars_t *pevVictim)
+CBaseEntity *CMonster::CheckAttack()
 {
 	const float flAttackDistance = 35.0f;
 	const float flAttackRate = 2.0f;
-	const float flAttackIdleTime = 1.0f;
+	const float flAttackAnimTime = 0.6f;
 	const float flAttackDamage = 1.0f;
 
-	if (m_flNextAttackThink > gpGlobals->time)
-		return;
+	if (m_flNextAttack > gpGlobals->time)
+		return nullptr;
 
-	if (CalcBoxDistance(pev, pevVictim) > flAttackDistance)
-		return;
+	CBaseEntity *pHit = CheckTraceHullAttack(flAttackDistance, flAttackDamage, DMG_BULLET);
+
+	if (!pHit)
+		return nullptr;
 
 	SetAnimation(MONSTERANIM_ATTACK);
-	CBasePlayer *pVictim = NULL;
-	pVictim = GetClassPtr((CBasePlayer *)pevVictim);
-	pVictim->TakeDamage(pev, pev, flAttackDamage, DMG_BULLET);
-	m_flNextAttackThink = gpGlobals->time + flAttackRate;
-	m_flNextFullThink = gpGlobals->time + flAttackIdleTime;
-	m_flNextAttackAnimTime = gpGlobals->time + 1.0f;
+
+	m_flNextAttack = gpGlobals->time + flAttackRate;
+	m_flNextFullThink = gpGlobals->time + flAttackAnimTime;
 
 	switch (RANDOM_LONG(1, 3))
 	{
@@ -405,6 +406,7 @@ void CMonster::Attack(entvars_t *pevVictim)
 	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_2.wav", VOL_NORM, ATTN_NORM); break;
 	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM); break;
 	}
+	return pHit;
 }
 
 void CMonster::Wander()
@@ -416,7 +418,7 @@ void CMonster::Wander()
 		float shorestDistance = 9.9999998e10f;
 		CBaseEntity *shorestTarget = NULL;
 
-		while ((target = UTIL_FindEntityByTargetname(target, "func_buyzone")) != NULL)
+		while ((target = UTIL_FindEntityByClassname(target, "func_buyzone")) != NULL)
 		{
 			ShortestPathCost cost;
 			Vector vecCenter = target->Center();
@@ -451,9 +453,6 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		return;
 
 	if (anim != MONSTERANIM_FLINCH && anim != MONSTERANIM_LARGE_FLINCH && m_flFlinchTime > gpGlobals->time && pev->health > 0.0f)
-		return;
-
-	if (m_flNextAttackAnimTime > gpGlobals->time && pev->health > 0.0f)
 		return;
 
 	speed = pev->velocity.Length2D();
@@ -755,9 +754,9 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 }
 
-float CMonster::CalcBoxDistance(entvars_s *pev, entvars_s *pevTarget)
+inline float CalcBoxDistance(CBaseEntity *ent1, CBaseEntity *ent2)
 {
-	Vector vecDistance = Vector(0, 0, 0);
+	/*Vector vecDistance = Vector(0, 0, 0);
 	for (int i = 0; i < 3; i++)
 	{
 		if (((float *)pev->absmin)[i] > ((float *)pevTarget->absmax)[i])
@@ -765,5 +764,54 @@ float CMonster::CalcBoxDistance(entvars_s *pev, entvars_s *pevTarget)
 		else if (((float *)pevTarget->absmin)[i] > ((float *)pev->absmax)[i])
 			(float)(vecDistance)[i] = ((float *)pevTarget->absmin)[i] - ((float *)pev->absmax)[i];
 	}
-	return vecDistance.Length();
+	return vecDistance.Length();*/
+	return (ent1->Center() - ent2->Center()).Length();
+}
+
+CBaseEntity *CMonster::CheckTraceHullAttack(float flDist, int iDamage, int iDmgType)
+{
+	TraceResult tr;
+
+	if (IsPlayer())
+		UTIL_MakeVectors(pev->angles);
+	else
+		UTIL_MakeAimVectors(pev->angles);
+
+	Vector vecStart = pev->origin;
+	vecStart.z += pev->size.z * 0.5;
+	Vector vecEnd = vecStart + (gpGlobals->v_forward * flDist);
+
+	UTIL_TraceHull(vecStart, vecEnd, dont_ignore_monsters, head_hull, ENT(pev), &tr);
+
+	if (tr.pHit)
+	{
+		CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
+
+		if (!ShouldAttack(pEntity))
+			return nullptr;
+
+		if (iDamage > 0)
+		{
+			pEntity->TakeDamage(pev, pev, iDamage, iDmgType);
+		}
+
+		return pEntity;
+	}
+
+	return NULL;
+}
+
+bool CMonster::ShouldAttack(CBaseEntity *target)
+{
+	if (target->pev->takedamage == DAMAGE_NO)
+		return false;
+
+	if (target->IsPlayer() && g_pGameRules->PlayerRelationship(static_cast<CBasePlayer *>(target), this) != GR_TEAMMATE)
+		return true;
+
+	CZBSBreak *zbs_break = dynamic_cast<CZBSBreak *>(target);
+	if (zbs_break)
+		return zbs_break->m_flZombiDamageRatio > 0.0f;
+
+	return false;
 }
