@@ -584,6 +584,10 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			{
 				spotOrder = &m_spotEncounter->spotList[it];
 
+				// could be nullptr, fuck it
+				if(!spotOrder->spot)
+					continue;
+
 				// if we have seen this spot recently, we don't need to look at it
 				if (gpGlobals->time - GetHidingSpotCheckTimestamp(spotOrder->spot) <= checkTime)
 					continue;
@@ -604,13 +608,15 @@ void CCSBot::UpdateLookAround(bool updateNow)
 				int which = RANDOM_LONG(0, dangerSpotCount - 1);
 
 				const Vector *checkSpot = dangerSpot[ which ]->GetPosition();
+				// could be nullptr, fix it
+				if (checkSpot)
+				{
+					Vector pos = *checkSpot;
+					pos.z += HalfHumanHeight;
 
-				Vector pos = *checkSpot;
-				pos.z += HalfHumanHeight;
-
-				// glance at the spot for minimum time
-				SetLookAt("Encounter Spot", &pos, PRIORITY_LOW, 0, true, 10.0f);
-
+					// glance at the spot for minimum time
+					SetLookAt("Encounter Spot", &pos, PRIORITY_LOW, 0, true, 10.0f);
+				}
 				// immediately mark it as "checked", so we don't check it again
 				// if we get distracted before we check it - that's the way it goes
 				SetHidingSpotCheckTimestamp(dangerSpot[which]);
@@ -1008,7 +1014,7 @@ void CCSBot::UpdateReactionQueue()
 
 // Return the most dangerous threat we are "conscious" of
 
-CBasePlayer *CCSBot::GetRecognizedEnemy()
+CBaseEntity *CCSBot::GetRecognizedEnemy()
 {
 	if (m_enemyQueueAttendIndex >= m_enemyQueueCount)
 		return NULL;
@@ -1040,7 +1046,7 @@ bool CCSBot::IsRecognizedEnemyProtectedByShield()
 
 float CCSBot::GetRangeToNearestRecognizedEnemy()
 {
-	const CBasePlayer *enemy = GetRecognizedEnemy();
+	const CBaseEntity *enemy = GetRecognizedEnemy();
 
 	if (enemy != NULL)
 	{

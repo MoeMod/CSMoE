@@ -62,14 +62,14 @@
 
 void AttackState::OnEnter(CCSBot *me)
 {
-	CBasePlayer *enemy = me->GetEnemy();
+	CBaseEntity *enemy = me->GetEnemy();
 
 	// store our posture when the attack began
 	me->PushPostureContext();
 	me->DestroyPath();
 
 	// if we are using a knife, try to sneak up on the enemy
-	if (enemy != NULL && me->IsUsingKnife() && !me->IsPlayerFacingMe(enemy))
+	if (enemy != NULL && me->IsUsingKnife() && (enemy->IsPlayer() && !me->IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy))))
 		me->Walk();
 	else
 		me->Run();
@@ -203,7 +203,7 @@ void AttackState::OnUpdate(CCSBot *me)
 		}
 	}
 
-	CBasePlayer *enemy = me->GetEnemy();
+	CBaseEntity *enemy = me->GetEnemy();
 	if (enemy == NULL)
 	{
 		StopAttacking(me);
@@ -260,7 +260,7 @@ void AttackState::OnUpdate(CCSBot *me)
 		me->StandUp();
 
 		// if we are using a knife and our prey is looking towards us, run at him
-		if (me->IsPlayerFacingMe(enemy))
+		if (enemy->IsPlayer() && me->IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
 		{
 			me->ForceRun(5.0f);
 			me->Hurry(10.0f);
@@ -306,6 +306,7 @@ void AttackState::OnUpdate(CCSBot *me)
 	}
 
 	// Simple shield usage
+#ifdef ENABLE_SHIELD
 	if (me->HasShield())
 	{
 		if (me->IsEnemyVisible() && !m_shieldForceOpen)
@@ -338,6 +339,7 @@ void AttackState::OnUpdate(CCSBot *me)
 			m_shieldForceOpen = !m_shieldForceOpen;
 		}
 	}
+#endif
 
 	// check if our weapon range is bad and we should switch to pistol
 	if (me->IsUsingSniperRifle())
@@ -516,7 +518,7 @@ void AttackState::OnUpdate(CCSBot *me)
 	if (gpGlobals->time > m_reacquireTimestamp)
 		me->FireWeaponAtEnemy();
 
-	bool bEnemyIsZombie = (enemy->IsPlayer() && static_cast<CBasePlayer *>(enemy)->m_bIsZombie);
+	bool bEnemyIsZombie = (enemy->IsPlayer() && static_cast<CBasePlayer *>(enemy)->m_bIsZombie) || (enemy->Classify() == CLASS_PLAYER_ALLY); // zbs support...
 	// attacking zombie, must moveback
 	// do dodge behavior
 	// If sniping or crouching, stand still.
@@ -549,7 +551,7 @@ void AttackState::OnUpdate(CCSBot *me)
 		{
 			// don't dodge if enemy is facing away
 			const float dodgeRange = 2000.0f;
-			if (range > dodgeRange || !me->IsPlayerFacingMe(enemy))
+			if (range > dodgeRange || !enemy->IsPlayer() || !me->IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
 			{
 				m_dodgeState = STEADY_ON;
 				m_nextDodgeStateTimestamp = 0.0f;

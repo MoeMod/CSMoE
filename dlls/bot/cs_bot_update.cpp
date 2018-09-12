@@ -130,8 +130,10 @@ void CCSBot::Upkeep()
 						m_aimSpot.y -= to.x * 16.0f;
 						m_aimSpot.z -= feetOffset * 0.5f;
 					}
-					else // FEET
+					else  if (IsEnemyPartVisible(FEET))
 						m_aimSpot.z -= (feetOffset + feetOffset);
+					else
+						m_aimSpot = m_lastEnemyPosition;
 				}
 			}
 			else
@@ -344,7 +346,10 @@ void CCSBot::Update()
 	UpdateReactionQueue();
 
 	// "threat" may be the same as our current enemy
-	CBasePlayer *threat = GetRecognizedEnemy();
+	CBaseEntity *enemy = GetRecognizedEnemy();
+	CBasePlayer *threat = nullptr;
+	if (enemy && enemy->IsPlayer())
+		threat = static_cast<CBasePlayer *>(enemy);
 	if (threat != NULL)
 	{
 		// adjust our personal "safe" time
@@ -428,6 +433,38 @@ void CCSBot::Update()
 
 		ctrl->SetLastSeenEnemyTimestamp();
 	}
+	else
+	{
+		// not player enemy found
+		// try monsters...
+		CBaseEntity *target = NULL;
+
+		float shorestDistance = 9.9999998e10f;
+		CBaseEntity *shorestTarget = NULL;
+
+		while ((target = UTIL_FindEntityByClassname(target, "monster_entity")) != NULL)
+		{
+			if (!FVisible(target))
+				continue;
+
+			if (g_pGameRules->PlayerRelationship(this, target) == GR_TEAMMATE)
+				continue;
+
+			float range = (pev->origin - target->pev->origin).Length();
+
+			if (range < shorestDistance)
+			{
+				shorestDistance = range;
+				shorestTarget = target;
+			}
+		}
+
+		if (shorestTarget)
+		{
+			Attack(shorestTarget);
+			m_isEnemyVisible = true;
+		}
+	}
 
 	// Validate existing enemy, if any
 	if (m_enemy != NULL)
@@ -442,15 +479,19 @@ void CCSBot::Update()
 		{
 			// check LOS to current enemy (chest & head), in case he's dead (GetNearestEnemy() only returns live players)
 			// note we're not checking FOV - once we've acquired an enemy (which does check FOV), assume we know roughly where he is
-			if (IsVisible(m_enemy, false, &m_visibleEnemyParts))
+
+			m_isEnemyVisible = false;
+			if (m_enemy->IsPlayer() && IsVisible(static_cast<CBasePlayer *>(m_enemy), false, &m_visibleEnemyParts))
 			{
 				m_isEnemyVisible = true;
 				m_lastSawEnemyTimestamp = gpGlobals->time;
 				m_lastEnemyPosition = m_enemy->pev->origin;
 			}
-			else
+			else if (!m_enemy->IsPlayer() && FVisible(m_enemy))
 			{
-				m_isEnemyVisible = false;
+				m_isEnemyVisible = true;
+				m_lastSawEnemyTimestamp = gpGlobals->time;
+				m_lastEnemyPosition = m_enemy->Center();
 			}
 
 			// check if enemy died

@@ -65,7 +65,7 @@ void CMonster::Spawn()
 	pev->max_health = 100;
 	pev->health = pev->max_health;
 	pev->gravity = 1;
-	pev->view_ofs = VEC_HOSTAGE_VIEW;
+	pev->view_ofs = VEC_VIEW;
 	pev->velocity = Vector(0, 0, 0);
 	pev->maxspeed = 140.0f;
 
@@ -418,7 +418,7 @@ void CMonster::Wander()
 		float shorestDistance = 9.9999998e10f;
 		CBaseEntity *shorestTarget = NULL;
 
-		while ((target = UTIL_FindEntityByTargetname(target, "func_buyzone")) != NULL)
+		while ((target = UTIL_FindEntityByClassname(target, "func_buyzone")) != NULL)
 		{
 			ShortestPathCost cost;
 			Vector vecCenter = target->Center();
