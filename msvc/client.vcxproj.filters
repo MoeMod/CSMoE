@@ -408,6 +408,9 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp">
       <Filter>cl_dll\hud\zbs</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -567,6 +570,9 @@
       <Filter>cl_dll\hud\zbs</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h">
       <Filter>cl_dll\hud\zbs</Filter>
     </ClInclude>
   </ItemGroup>

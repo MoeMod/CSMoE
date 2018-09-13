@@ -31,7 +31,7 @@ int CHudZBSLevel::Draw(float time)
 	int y = ScreenHeight - 220;
 	const float flScale = 0.0f;
 
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
+	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iZBSBoard_BG);
@@ -65,6 +65,18 @@ int CHudZBSLevel::Draw(float time)
 		sprintf(szBuffer, "%d%%", m_iLevel_ATK * 10 + 90);
 	DrawUtils::DrawHudString(x + 130, y + 65, ScreenWidth, szBuffer, r, g, b, flScale);
 	
+	// Wall Level
+	y -= 30;
+	gRenderAPI.GL_SelectTexture(0);
+	gRenderAPI.GL_Bind(0, m_iZBSBoard_BG_Wall);
+	DrawUtils::Draw2DQuad(x, y, x + 204, y + 28);
+
+	DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
+	if (m_iLevel_Wall >= 40)
+		sprintf(szBuffer, "Level MAX");
+	else
+		sprintf(szBuffer, "Level %d", m_iLevel_Wall);
+	DrawUtils::DrawHudString(x + 100, y + 5, ScreenWidth, szBuffer, r, g, b, flScale);
 
 	return 1;
 }

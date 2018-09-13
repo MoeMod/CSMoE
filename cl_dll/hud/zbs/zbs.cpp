@@ -6,18 +6,21 @@
 
 #include "zbs.h"
 #include "zbs_level.h"
+#include "zbs_scoreboard.h"
 
 class CHudZBS::impl_t
 {
 public:
-	CHudZBSLevel level;
+	CHudZBSLevel lv;
+	CHudZBSScoreBoard sb;
 
 public:
 	template<class T, class F, class...Args>
 	void for_each(F T::*f, Args &&...args)
 	{
 		// add dispatch here.
-		(level.*f)(std::forward<Args>(args)...);
+		(lv.*f)(std::forward<Args>(args)...);
+		(sb.*f)(std::forward<Args>(args)...);
 	}
 };
 

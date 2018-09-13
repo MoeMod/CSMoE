@@ -350,6 +350,7 @@ public:
 	int m_iTeamAlive_T, m_iTeamAlive_CT;
 
 public:
+	bool m_bTopScoreBoardEnabled;
 	int m_iBGIndex;
 	int m_iTextIndex;
 	int m_iTTextIndex, m_iCTTextIndex;

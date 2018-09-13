@@ -154,6 +154,7 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	{
 		m_Teamplay = false;
 		gHUD.m_ZBS.m_iFlags |= HUD_ACTIVE;
+		gHUD.m_Scoreboard.m_bTopScoreBoardEnabled = false;
 		break;
 	}
 	default:
