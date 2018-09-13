@@ -13,8 +13,8 @@ public:
 	CHudZBSLevel level;
 
 public:
-	template<class F, class...Args>
-	void for_each(F CHudBase_ZBS::*f, Args &&...args)
+	template<class T, class F, class...Args>
+	void for_each(F T::*f, Args &&...args)
 	{
 		// add dispatch here.
 		(level.*f)(std::forward<Args>(args)...);

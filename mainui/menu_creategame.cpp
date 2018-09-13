@@ -481,9 +481,18 @@ static void UI_CreateGame_Init(void)
 	uiCreateGame.gamemode.range = 1;
 
 	const char *szGameModeCode = CVAR_GET_STRING("mp_gamemode");
-	using std::placeholders::_1;
+	uiCreateGame.gamemode.curValue = 0;
+	for (int i = 0; i < MAX_GAMEMODES; ++i)
+	{
+		if (stricmp(szGameModeCode, g_szGameModeCodes[i]))
+			continue;
+		uiCreateGame.gamemode.curValue = i;
+		break;
+	}
+	/*using std::placeholders::_1;
 	auto iter = std::find_if_not(std::begin(g_szGameModeCodes), std::end(g_szGameModeCodes), std::bind(stricmp, szGameModeCode, _1));
-	uiCreateGame.gamemode.curValue = iter != std::end(g_szGameModeCodes) ? std::distance(std::begin(g_szGameModeCodes), iter) : 0;
+	uiCreateGame.gamemode.curValue = iter != std::end(g_szGameModeCodes) ? std::distance(std::begin(g_szGameModeCodes), iter) : 0;*/
+
 	UI_CreateGame_Update();
 
 	uiCreateGame.msgBox.generic.id = ID_MSGBOX;
