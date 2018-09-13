@@ -301,7 +301,7 @@ bool CMod_DeathMatch::CheckWinLimitDM()
 
 int CMod_DeathMatch::CalcLeaderFrags()
 {
-	int iResult = 0;
+	int iFrags = 0, iMaxFrags = 0;
 	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 	{
 		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
@@ -314,8 +314,11 @@ int CMod_DeathMatch::CalcLeaderFrags()
 		if (player->m_iTeam == TEAM_UNASSIGNED || player->m_iTeam == TEAM_SPECTATOR)
 			continue;
 
-		iResult += player->pev->frags;
+		iFrags = player->pev->frags;
+		if (iMaxFrags >= iFrags)
+			continue;
 
+		iMaxFrags = iFrags;
 	}
-	return iResult;
+	return iMaxFrags;
 }
