@@ -150,6 +150,12 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		m_Teamplay = false;
 		break;
 	}
+	case MOD_ZBS:
+	{
+		m_Teamplay = false;
+		gHUD.m_ZBS.m_iFlags |= HUD_ACTIVE;
+		break;
+	}
 	default:
 		break;
 	}

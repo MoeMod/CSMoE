@@ -118,6 +118,7 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "zbs/zbs.h"
 
 
 //
@@ -1042,8 +1043,9 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
-
+	
 	CHudHeadName	m_HeadName;
+	CHudZBS m_ZBS;
 
 	// user messages
 	CHudMsgFunc(Damage);
