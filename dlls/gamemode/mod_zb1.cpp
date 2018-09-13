@@ -444,6 +444,7 @@ void CMod_Zombi::TeamCheck()
 
 void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 {
+	pPlayer->m_bIsZombie = false;
 	pPlayer->m_bNotKilled = false;
 	IBaseMod::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
@@ -453,7 +454,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	//pPlayer->pev->gravity = 0.86f;
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
-	pPlayer->m_bIsZombie = false;
 
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
