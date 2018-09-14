@@ -206,9 +206,13 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pev->health > 0)
 	{
-		m_flFlinchTime = gpGlobals->time + 0.7;
-		//SetFlinchActivity();
-		SetAnimation(MONSTERANIM_FLINCH);
+		// if attacking then dont play flinch anim
+		if (m_flNextAttack <= gpGlobals->time)
+		{
+			m_flFlinchTime = gpGlobals->time + 0.7;
+			//SetFlinchActivity();
+			SetAnimation(MONSTERANIM_FLINCH);
+		}
 
 		if (pAttacker != NULL)
 		{
