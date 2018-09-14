@@ -18,6 +18,7 @@ public:
 public: // CHalfLifeMultiplay
 	BOOL IsTeamplay(void) override { return TRUE; }
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
+	void InitHUD(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void Think() override;

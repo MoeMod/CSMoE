@@ -18,6 +18,7 @@ public:
 	void Shutdown(void) override;
 
 	int MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf);
+	int MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf);
 
 protected:
 	class impl_t;

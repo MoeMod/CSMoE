@@ -28,6 +28,12 @@ void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
 	MESSAGE_END();
 }
 
+void CMod_ZombieScenario::InitHUD(CBasePlayer *pPlayer)
+{
+	pPlayer->HumanLevel_UpdateHUD();
+	return IBaseMod::InitHUD(pPlayer);
+}
+
 void CMod_ZombieScenario::CheckMapConditions()
 {
 	m_vecZombieSpawns.clear();

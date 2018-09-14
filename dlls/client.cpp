@@ -625,6 +625,8 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	}
 
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
+
+	pPlayer->HumanLevel_Reset();
 }
 
 int Q_strlen_(const char *str)

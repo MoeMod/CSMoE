@@ -4,6 +4,8 @@
 #include "draw_util.h"
 #include "triangleapi.h"
 
+#include "parsemsg.h"
+
 #include "zbs.h"
 #include "zbs_level.h"
 #include "zbs_scoreboard.h"
@@ -28,10 +30,24 @@ public:
 };
 
 DECLARE_MESSAGE(m_ZBS, ZBSKill)
+DECLARE_MESSAGE(m_ZBS, ZBSLevel)
 
 int CHudZBS::MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf)
 {
 	pimpl->k.OnKillMessage();
+	return 1;
+}
+
+int CHudZBS::MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf)
+{
+	BufferReader buf(pszName, pbuf, iSize);
+	int type = buf.ReadByte(); // reserved.
+	int hp = buf.ReadByte();
+	int att = buf.ReadByte();
+	int wall = buf.ReadByte();
+
+	pimpl->lv.UpdateLevel(hp, att, wall);
+
 	return 1;
 }
 
@@ -41,6 +57,7 @@ int CHudZBS::Init(void)
 	gHUD.AddHudElem(this);
 
 	HOOK_MESSAGE(ZBSKill);
+	HOOK_MESSAGE(ZBSLevel);
 
 	return 1;
 }

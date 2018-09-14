@@ -8,6 +8,12 @@ public:
 	//void Reset(void) override;
 	int Draw(float time) override;
 	void Shutdown(void) override;
+	void UpdateLevel(int hp, int att, int wall) 
+	{
+		m_iLevel_HP = hp;
+		m_iLevel_ATK = att;
+		m_iLevel_Wall = wall;
+	}
 
 protected:
 	int m_iZBSBoard_BG;

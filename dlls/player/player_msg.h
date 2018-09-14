@@ -87,6 +87,7 @@ extern int gmsgFog;
 extern int gmsgShowTimer;
 
 extern int gmsgZBSKill;
+extern int gmsgZBSLevel;
 
 void LinkUserMessages();
 void WriteSigonMessages();

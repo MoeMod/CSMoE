@@ -27,11 +27,12 @@ void CBasePlayer::HumanLevel_LevelUpHealth()
 
 	m_iHumanLevel.m_iHealth++;
 	CLIENT_COMMAND(edict(), "spk zombi/td_heal.wav\n");
+	HumanLevel_UpdateHUD();
 
 	if (!IsAlive())
 		return;
 
-	pev->health += (m_iHumanLevel.m_iHealth >= 40) ? 40.0f : 20.0f;
+	pev->health += 20.0f;
 }
 
 void CBasePlayer::HumanLevel_LevelUpAttack()
@@ -41,11 +42,21 @@ void CBasePlayer::HumanLevel_LevelUpAttack()
 
 	m_iHumanLevel.m_iAttack++;
 	CLIENT_COMMAND(edict(), "spk zombi/td_heal.wav\n");
+	HumanLevel_UpdateHUD();
 }
-
 
 void CBasePlayer::HumanLevel_Reset()
 {
-	m_iHumanLevel.m_iHealth= 0;
-	m_iHumanLevel.m_iAttack = 0;
+	m_iHumanLevel.m_iHealth = 1;
+	m_iHumanLevel.m_iAttack = 1;
+}
+
+void CBasePlayer::HumanLevel_UpdateHUD()
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSLevel, NULL, this->pev);
+	WRITE_BYTE(0); // type, reserved.
+	WRITE_BYTE(m_iHumanLevel.m_iHealth); // HP
+	WRITE_BYTE(m_iHumanLevel.m_iAttack); // ATK
+	WRITE_BYTE(0); // Wall
+	MESSAGE_END();
 }

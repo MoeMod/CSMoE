@@ -89,6 +89,7 @@ int gmsgFog = 0;
 int gmsgShowTimer = 0;
 
 int gmsgZBSKill = 0;
+int gmsgZBSLevel = 0;
 
 // utils
 inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
@@ -182,6 +183,7 @@ void LinkUserMessages()
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 
 	gmsgZBSKill = REG_USER_MSG("ZBSKill", -1);
+	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
 }
 
 void WriteWeaponInfo(const ItemInfo &II)

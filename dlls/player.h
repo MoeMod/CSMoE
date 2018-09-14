@@ -687,6 +687,7 @@ public:
 	void HumanLevel_LevelUpHealth();
 	void HumanLevel_LevelUpAttack();
 	void HumanLevel_Reset();
+	void HumanLevel_UpdateHUD();
 
 public:
 	bool m_bIsZombie;

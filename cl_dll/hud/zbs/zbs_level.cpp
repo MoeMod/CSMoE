@@ -66,17 +66,21 @@ int CHudZBSLevel::Draw(float time)
 	DrawUtils::DrawHudString(x + 130, y + 65, ScreenWidth, szBuffer, r, g, b, flScale);
 	
 	// Wall Level
-	y -= 32;
-	gRenderAPI.GL_SelectTexture(0);
-	gRenderAPI.GL_Bind(0, m_iZBSBoard_BG_Wall);
-	DrawUtils::Draw2DQuad(x, y, x + 204, y + 28);
+	if (m_iLevel_Wall)
+	{
+		y -= 32;
+		gRenderAPI.GL_SelectTexture(0);
+		gRenderAPI.GL_Bind(0, m_iZBSBoard_BG_Wall);
+		DrawUtils::Draw2DQuad(x, y, x + 204, y + 28);
 
-	DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
-	if (m_iLevel_Wall >= 40)
-		sprintf(szBuffer, "Level MAX");
-	else
-		sprintf(szBuffer, "Level %d", m_iLevel_Wall);
-	DrawUtils::DrawHudString(x + 100, y + 5, ScreenWidth, szBuffer, r, g, b, flScale);
+		DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
+		if (m_iLevel_Wall >= 40)
+			sprintf(szBuffer, "Level MAX");
+		else
+			sprintf(szBuffer, "Level %d", m_iLevel_Wall);
+		DrawUtils::DrawHudString(x + 100, y + 5, ScreenWidth, szBuffer, r, g, b, flScale);
+	}
+	
 
 	return 1;
 }
