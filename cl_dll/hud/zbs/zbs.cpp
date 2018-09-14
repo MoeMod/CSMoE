@@ -7,12 +7,14 @@
 #include "zbs.h"
 #include "zbs_level.h"
 #include "zbs_scoreboard.h"
+#include "zbs_kill.h"
 
 class CHudZBS::impl_t
 {
 public:
 	CHudZBSLevel lv;
 	CHudZBSScoreBoard sb;
+	CHudZBSKill k;
 
 public:
 	template<class T, class F, class...Args>
@@ -21,13 +23,25 @@ public:
 		// add dispatch here.
 		(lv.*f)(std::forward<Args>(args)...);
 		(sb.*f)(std::forward<Args>(args)...);
+		(k.*f)(std::forward<Args>(args)...);
 	}
 };
+
+DECLARE_MESSAGE(m_ZBS, ZBSKill)
+
+int CHudZBS::MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf)
+{
+	pimpl->k.OnKillMessage();
+	return 1;
+}
 
 int CHudZBS::Init(void)
 {
 	pimpl = new CHudZBS::impl_t;
 	gHUD.AddHudElem(this);
+
+	HOOK_MESSAGE(ZBSKill);
+
 	return 1;
 }
 

@@ -86,6 +86,8 @@ extern int gmsgBrass;
 extern int gmsgFog;
 extern int gmsgShowTimer;
 
+extern int gmsgZBSKill;
+
 void LinkUserMessages();
 void WriteSigonMessages();
 void SendItemStatus(CBasePlayer *pPlayer);

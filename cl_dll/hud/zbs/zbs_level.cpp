@@ -66,7 +66,7 @@ int CHudZBSLevel::Draw(float time)
 	DrawUtils::DrawHudString(x + 130, y + 65, ScreenWidth, szBuffer, r, g, b, flScale);
 	
 	// Wall Level
-	y -= 30;
+	y -= 32;
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iZBSBoard_BG_Wall);
 	DrawUtils::Draw2DQuad(x, y, x + 204, y + 28);

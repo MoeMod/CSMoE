@@ -46,6 +46,8 @@ public:
 
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
+
+	void KillBouns(CBasePlayer *player);
 };
 
 #endif

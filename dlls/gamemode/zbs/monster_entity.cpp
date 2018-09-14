@@ -278,6 +278,10 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 
 	pev->nextthink = gpGlobals->time + 3;
 	SetThink(&CMonster::Remove);
+
+	CBaseEntity *attacker = CBaseEntity::Instance(pevAttacker);
+	if (attacker->IsPlayer())
+		KillBouns(static_cast<CBasePlayer *>(attacker));
 }
 
 void CMonster::Remove()
@@ -830,4 +834,13 @@ bool CMonster::ShouldAttack(CBaseEntity *target)
 		return zbs_break->m_flZombiDamageRatio > 0.0f;
 
 	return false;
+}
+
+void CMonster::KillBouns(CBasePlayer *player)
+{
+	player->AddPoints(1, FALSE);
+	player->AddAccount(50);
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSKill, NULL, player->pev);
+	MESSAGE_END();
 }

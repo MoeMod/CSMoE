@@ -1,7 +1,7 @@
 
 #pragma once
 
-class CHudBase_ZBS : protected CHudBase
+class CHudBase_ZBS : public CHudBase
 {
 	friend class CHudZBS;
 };
@@ -16,6 +16,8 @@ public:
 	void Reset(void) override;
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
+
+	int MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf);
 
 protected:
 	class impl_t;
