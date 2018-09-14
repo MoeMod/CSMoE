@@ -526,9 +526,6 @@
     <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp">
       <Filter>dlls\gamemode\zbs</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\player\player_human_level.cpp">
-      <Filter>dlls\player</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1115,9 +1112,6 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h">
       <Filter>dlls\gamemode\zbs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\player\player_human_level.h">
-      <Filter>dlls\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
