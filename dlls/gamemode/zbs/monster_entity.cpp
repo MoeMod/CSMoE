@@ -170,17 +170,6 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	flActualDamage = GetModifiedDamage(flDamage, m_LastHitGroup);
 
-	if (flActualDamage > pev->health)
-		flActualDamage = pev->health;
-
-	pev->health -= flActualDamage;
-
-	if (m_improv != NULL)
-	{
-		m_improv->OnInjury(flActualDamage);
-	}
-
-	PlayPainSound();
 
 	if (pevAttacker != NULL)
 	{
@@ -199,8 +188,21 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 		if (pAttackingEnt->IsPlayer())
 		{
 			pAttacker = GetClassPtr((CBasePlayer *)pevAttacker);
+			flActualDamage *= pAttacker->HumanLevel_GetAttackBonus();
 		}
 	}
+
+	if (flActualDamage > pev->health)
+		flActualDamage = pev->health;
+
+	pev->health -= flActualDamage;
+
+	if (m_improv != NULL)
+	{
+		m_improv->OnInjury(flActualDamage);
+	}
+
+	PlayPainSound();
 
 	if (pev->health > 0)
 	{

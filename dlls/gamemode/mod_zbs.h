@@ -19,7 +19,9 @@ public: // CHalfLifeMultiplay
 	BOOL IsTeamplay(void) override { return TRUE; }
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
+	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void Think() override;
+	BOOL ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason) override;
 	void CheckWinConditions() override;
 	void CheckMapConditions() override;
 

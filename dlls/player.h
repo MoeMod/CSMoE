@@ -157,6 +157,7 @@
 #include "player/player_const.h"
 
 #include "player/player_zombie.h"
+#include "player/player_human_level.h"
 
 struct WeaponStruct
 {
@@ -681,11 +682,19 @@ public:
 	void SpawnProtection_Start(float flTime);
 	void SpawnProtection_End();
 
+	float HumanLevel_GetHealthBonus();
+	float HumanLevel_GetAttackBonus();
+	void HumanLevel_LevelUpHealth();
+	void HumanLevel_LevelUpAttack();
+	void HumanLevel_Reset();
+
 public:
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
+
+	HumanLevelStruct m_iHumanLevel;
 };
 
 extern int gEvilImpulse101;

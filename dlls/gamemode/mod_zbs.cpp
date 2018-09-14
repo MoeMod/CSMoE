@@ -58,8 +58,15 @@ bool CMod_ZombieScenario::CanPlayerBuy(CBasePlayer *player, bool display)
 
 void CMod_ZombieScenario::RestartRound()
 {
+	ClearZombieNPC();
 	IBaseMod::RestartRound();
 	m_iIntroRoundTime = 20; // keep it from ReadMultiplayCvars
+}
+
+void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
+{
+	IBaseMod::PlayerSpawn(pPlayer);
+	pPlayer->pev->health += pPlayer->HumanLevel_GetHealthBonus();
 }
 
 void CMod_ZombieScenario::Think()
@@ -98,9 +105,9 @@ void CMod_ZombieScenario::Think()
 
 	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
 	{
-		if (m_iNumTerroristWins)
-			g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
-		else
+		//if (m_iNumTerroristWins)
+			//g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
+		//else
 			RestartRound();
 	}
 
@@ -167,6 +174,15 @@ void CMod_ZombieScenario::Think()
 		HumanWin();
 }
 
+BOOL CMod_ZombieScenario::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
+{
+	CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance(pEntity);
+	if (pPlayer != NULL)
+		pPlayer->HumanLevel_Reset();
+
+	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
+}
+
 void CMod_ZombieScenario::CheckWinConditions()
 {
 	// If a winner has already been determined and game of started.. then get the heck out of here
@@ -208,10 +224,13 @@ void CMod_ZombieScenario::ZombieWin()
 	//Broadcast("terwin");
 	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
+		CBasePlayer *player = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(iIndex));
+
+		if (!player)
 			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
+
+		player->HumanLevel_Reset();
+		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
 	}
 	EndRoundMessage("Round Failed...", ROUND_TERRORISTS_WIN);
 	TerminateRound(5, WINSTATUS_TERRORISTS);

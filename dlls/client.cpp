@@ -3832,6 +3832,14 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				player->SmartRadio();
 			}
+			else if (FStrEq(pcmd, "zbs_hp_up"))
+			{
+				player->HumanLevel_LevelUpHealth();
+			}
+			else if (FStrEq(pcmd, "zbs_atk_up"))
+			{
+				player->HumanLevel_LevelUpAttack();
+			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
