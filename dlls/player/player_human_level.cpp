@@ -25,6 +25,14 @@ void CBasePlayer::HumanLevel_LevelUpHealth()
 	if (m_iHumanLevel.m_iHealth >= 40)
 		return;
 
+	if (m_iAccount < 3000)
+	{
+		ClientPrint(pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+		BlinkAccount(this, 2);
+		return;
+	}
+
+	AddAccount(-3000);
 	m_iHumanLevel.m_iHealth++;
 	CLIENT_COMMAND(edict(), "spk zombi/td_heal.wav\n");
 	HumanLevel_UpdateHUD();
@@ -40,6 +48,14 @@ void CBasePlayer::HumanLevel_LevelUpAttack()
 	if (m_iHumanLevel.m_iAttack >= 40)
 		return;
 
+	if (m_iAccount < 3000)
+	{
+		ClientPrint(pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+		BlinkAccount(this, 2);
+		return;
+	}
+
+	AddAccount(-3000);
 	m_iHumanLevel.m_iAttack++;
 	CLIENT_COMMAND(edict(), "spk zombi/td_heal.wav\n");
 	HumanLevel_UpdateHUD();
