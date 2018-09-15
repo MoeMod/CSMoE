@@ -10,14 +10,14 @@ float CBasePlayer::HumanLevel_GetHealthBonus()
 	if (m_iHumanLevel.m_iHealth >= 40)
 		return 800.0f;
 
-	return m_iHumanLevel.m_iHealth * 20.0f;
+	return (m_iHumanLevel.m_iHealth - 1) * 20.0f;
 }
 float CBasePlayer::HumanLevel_GetAttackBonus()
 {
 	if (m_iHumanLevel.m_iAttack >= 40)
 		return 5.0f;
 
-	return 1.0 + m_iHumanLevel.m_iAttack * 0.1f;
+	return 1.0 + (m_iHumanLevel.m_iAttack - 1) * 0.1f;
 }
 
 void CBasePlayer::HumanLevel_LevelUpHealth()

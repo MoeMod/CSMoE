@@ -15,7 +15,8 @@
 
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
-	m_iIntroRoundTime = 20; // keep it from ReadMultiplayCvars
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+	WaitingSound();
 }
 
 void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
@@ -42,6 +43,10 @@ void CMod_ZombieScenario::CheckMapConditions()
 	{
 		m_vecZombieSpawns.push_back(static_cast<CZombieSpawn *>(sp));
 	}
+
+	// hook from RestartRound()
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+
 	return IBaseMod_RemoveObjects::CheckMapConditions();
 }
 
@@ -65,8 +70,8 @@ bool CMod_ZombieScenario::CanPlayerBuy(CBasePlayer *player, bool display)
 void CMod_ZombieScenario::RestartRound()
 {
 	ClearZombieNPC();
+	WaitingSound();
 	IBaseMod::RestartRound();
-	m_iIntroRoundTime = 20; // keep it from ReadMultiplayCvars
 }
 
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
@@ -75,39 +80,20 @@ void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->pev->health += pPlayer->HumanLevel_GetHealthBonus();
 }
 
+void CMod_ZombieScenario::WaitingSound()
+{
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+		CLIENT_COMMAND(entity->edict(), "spk zombi_start\n");
+	}
+}
+
 void CMod_ZombieScenario::Think()
 {
 	TeamCheck();
-
-	static int iLastCountDown = -1;
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-
-	if (iCountDown != iLastCountDown)
-	{
-		iLastCountDown = iCountDown;
-		if (iCountDown > 0 && iCountDown < 20 && !m_bFreezePeriod)
-		{
-
-			UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Zombie Selection: %s1 Sec", UTIL_dtos1(20 - iCountDown)); // #CSO_ZombiSelectCount
-
-			if (iCountDown == 1)
-			{
-				for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-				{
-					CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-					if (!entity)
-						continue;
-					CLIENT_COMMAND(entity->edict(), "spk zombi_start\n");
-				}
-			}
-		}
-		else if (iCountDown == 20)
-		{
-			// select zombie
-			RoundStart();
-		}
-		TeamCheck();
-	}
 
 	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
 	{
@@ -122,6 +108,25 @@ void CMod_ZombieScenario::Think()
 
 	if (IsFreezePeriod())
 	{
+		static int iLastCountDown = -1;
+		int iCountDown = TimeRemaining();
+
+		if (iCountDown > 0)
+		{
+			if (iCountDown != iLastCountDown)
+			{
+				iLastCountDown = iCountDown;
+				if (iCountDown > 0 && iCountDown < 20)
+				{
+					UTIL_ClientPrintAll(HUD_PRINTCENTER, "Waiting for Round Start: %s1 sec(s)", UTIL_dtos1(iCountDown)); // #CSO_ZBS_StartCount
+				}
+			}
+		}
+		else
+		{
+			RoundStart();
+		}
+
 		CheckFreezePeriodExpired();
 	}
 
@@ -223,6 +228,11 @@ void CMod_ZombieScenario::HumanWin()
 	++m_iNumCTWins;
 	UpdateTeamScores();
 	ClearZombieNPC();
+
+	if (m_iNumCTWins >= m_iMaxRoundsWon)
+	{
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "Congratulations! You've cleared all the Rounds."); // #CSO_CongAllRoundClear
+	}
 }
 
 void CMod_ZombieScenario::ZombieWin()

@@ -32,6 +32,7 @@ public:
 
 public:
 	void TeamCheck();
+	void WaitingSound();
 	void RoundStart();
 	void HumanWin();
 	void ZombieWin();
