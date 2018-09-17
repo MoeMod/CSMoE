@@ -17,6 +17,13 @@ void CHudZBSKill::OnKillMessage()
 	m_killTimes.push_back(gHUD.m_flTime);
 }
 
+int CHudZBSKill::Init(void)
+{
+	m_iKillTexture = 0;
+
+	return 1;
+}
+
 int CHudZBSKill::VidInit(void)
 {
 	m_iKillTexture = gRenderAPI.GL_LoadTexture("resource/hud/zbs/zbskill", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);

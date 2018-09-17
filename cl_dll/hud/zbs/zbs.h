@@ -17,7 +17,7 @@ public:
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
 
-	int MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf);
+	int MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf);
 
 protected:

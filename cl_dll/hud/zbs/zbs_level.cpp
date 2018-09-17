@@ -9,6 +9,14 @@
 
 #include "string.h"
 
+int CHudZBSLevel::Init(void)
+{
+	m_iZBSBoard_BG = m_iZBSBoard_BG_Wall = 0;
+
+	m_iLevel_HP = m_iLevel_ATK = m_iLevel_Wall = 0;
+	return 1;
+}
+
 int CHudZBSLevel::VidInit(void)
 {
 	m_iZBSBoard_BG = gRenderAPI.GL_LoadTexture("resource/hud/zbs/zbslevelupbg", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);

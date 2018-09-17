@@ -6,6 +6,7 @@
 class CHudZBSKill : public CHudBase_ZBS
 {
 public:
+	int Init(void) override;
 	int VidInit(void) override;
 	void Reset(void) override;
 	int Draw(float time) override;

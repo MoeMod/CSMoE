@@ -285,9 +285,13 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	pev->nextthink = gpGlobals->time + 3;
 	SetThink(&CMonster::Remove);
 
-	CBaseEntity *attacker = CBaseEntity::Instance(pevAttacker);
-	if (attacker->IsPlayer())
-		KillBouns(static_cast<CBasePlayer *>(attacker));
+	if (pevAttacker) // pevAttacker can be NULL
+	{
+		CBaseEntity *attacker = CBaseEntity::Instance(pevAttacker);
+		if (attacker->IsPlayer())
+			KillBouns(static_cast<CBasePlayer *>(attacker));
+	}
+	
 }
 
 void CMonster::Remove()

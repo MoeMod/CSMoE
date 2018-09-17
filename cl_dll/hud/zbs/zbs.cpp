@@ -13,6 +13,8 @@
 
 #include "zbs_kill.h"
 
+#include "gamemode/zbs/zbs_const.h"
+
 class CHudZBS::impl_t
 {
 public:
@@ -33,12 +35,26 @@ public:
 	}
 };
 
-DECLARE_MESSAGE(m_ZBS, ZBSKill)
+DECLARE_MESSAGE(m_ZBS, ZBSTip)
 DECLARE_MESSAGE(m_ZBS, ZBSLevel)
 
-int CHudZBS::MsgFunc_ZBSKill(const char *pszName, int iSize, void *pbuf)
+int CHudZBS::MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf)
 {
-	pimpl->k.OnKillMessage();
+	BufferReader buf(pszName, pbuf, iSize);
+	ZBSTipType type = static_cast<ZBSTipType>(buf.ReadByte());
+	switch (type)
+	{
+	case ZBS_TIP_KILL:
+		pimpl->k.OnKillMessage();
+		break;
+	case ZBS_TIP_ROUNDCLEAR:
+		pimpl->rc.OnRoundClear();
+		break;
+	case ZBS_TIP_ROUNDFAIL:
+		pimpl->rc.OnRoundFail();
+		break;
+	}
+	
 	return 1;
 }
 
@@ -58,9 +74,11 @@ int CHudZBS::MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf)
 int CHudZBS::Init(void)
 {
 	pimpl = new CHudZBS::impl_t;
+	pimpl->for_each(&CHudBase_ZBS::Init);
+
 	gHUD.AddHudElem(this);
 
-	HOOK_MESSAGE(ZBSKill);
+	HOOK_MESSAGE(ZBSTip);
 	HOOK_MESSAGE(ZBSLevel);
 
 	return 1;

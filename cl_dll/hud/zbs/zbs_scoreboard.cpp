@@ -92,6 +92,13 @@ inline int DrawTexturedNumbersTopCenterAligned(int tex, const wrect_t(&rect)[10]
 	return DrawTexturedNumbersTopRightAligned(tex, rect, iNumber, x, y, scale);
 }
 
+int CHudZBSScoreBoard::Init(void)
+{
+	m_iBackground = m_iTeamnumber = m_iSelfnumber = m_iToprecord = 0;
+
+	return 1;
+}
+
 int CHudZBSScoreBoard::VidInit(void)
 {
 	m_iBackground = gRenderAPI.GL_LoadTexture("resource/hud/zbs/zbsboard", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
