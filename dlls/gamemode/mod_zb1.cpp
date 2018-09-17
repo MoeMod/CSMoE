@@ -17,7 +17,7 @@ CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
-	PRECACHE_SOUND("Zombi_Ambience.mp3");
+	PRECACHE_GENERIC("sound/Zombi_Ambience.mp3");
 }
 
 void CMod_Zombi::CheckMapConditions()
@@ -69,7 +69,7 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 
 BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
 {
-	CLIENT_COMMAND(pEntity, "mp3 loop Zombi_Ambience\n");
+	CLIENT_COMMAND(pEntity, "mp3 loop sound/Zombi_Ambience.mp3\n");
 
 	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 }

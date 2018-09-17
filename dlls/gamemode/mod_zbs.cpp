@@ -17,7 +17,8 @@
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
-	WaitingSound();
+	
+	PRECACHE_GENERIC("sound/Scenario_Ready.mp3");
 }
 
 void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
@@ -71,7 +72,6 @@ bool CMod_ZombieScenario::CanPlayerBuy(CBasePlayer *player, bool display)
 void CMod_ZombieScenario::RestartRound()
 {
 	ClearZombieNPC();
-	WaitingSound();
 	IBaseMod::RestartRound();
 }
 
@@ -88,7 +88,7 @@ void CMod_ZombieScenario::WaitingSound()
 		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
 		if (!entity)
 			continue;
-		CLIENT_COMMAND(entity->edict(), "spk zombi_start\n");
+		CLIENT_COMMAND(entity->edict(), "mp3 play sound/Scenario_Ready.mp3\n");
 	}
 }
 
@@ -120,6 +120,11 @@ void CMod_ZombieScenario::Think()
 				if (iCountDown > 0 && iCountDown < 20)
 				{
 					UTIL_ClientPrintAll(HUD_PRINTCENTER, "Waiting for Round Start: %s1 sec(s)", UTIL_dtos1(iCountDown)); // #CSO_ZBS_StartCount
+				}
+
+				if (iCountDown == 19)
+				{
+					WaitingSound();
 				}
 			}
 		}

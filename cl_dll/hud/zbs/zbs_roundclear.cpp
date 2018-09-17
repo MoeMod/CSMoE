@@ -47,11 +47,11 @@ int CHudZBSRoundClear::Draw(float time)
 	}
 
 	int x = ScreenWidth / 2;
-	int y = 5;
+	int y = ScreenHeight / 4;
 	const float flScale = 0.0f;
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * std::max(5.0f - (time - m_flDisplayTime), 1.0f));
+	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * std::min(5.0f - (time - m_flDisplayTime), 1.0f));
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iRoundClear);
 	DrawUtils::Draw2DQuad(x - 373 / 2, y, x + 373 / 2, y + 51);
