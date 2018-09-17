@@ -9,6 +9,8 @@
 #include "zbs.h"
 #include "zbs_level.h"
 #include "zbs_scoreboard.h"
+#include "zbs_roundclear.h"
+
 #include "zbs_kill.h"
 
 class CHudZBS::impl_t
@@ -17,6 +19,7 @@ public:
 	CHudZBSLevel lv;
 	CHudZBSScoreBoard sb;
 	CHudZBSKill k;
+	CHudZBSRoundClear rc;
 
 public:
 	template<class T, class F, class...Args>
@@ -26,6 +29,7 @@ public:
 		(lv.*f)(std::forward<Args>(args)...);
 		(sb.*f)(std::forward<Args>(args)...);
 		(k.*f)(std::forward<Args>(args)...);
+		(rc.*f)(std::forward<Args>(args)...);
 	}
 };
 
