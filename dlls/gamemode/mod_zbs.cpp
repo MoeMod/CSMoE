@@ -9,6 +9,7 @@
 #include "mod_zbs.h"
 
 #include "zbs/zs_subs.h"
+#include "zbs/zbs_const.h"
 #include "player/csdm_randomspawn.h"
 
 #include <algorithm>
@@ -214,15 +215,10 @@ void CMod_ZombieScenario::CheckWinConditions()
 
 void CMod_ZombieScenario::HumanWin()
 {
-	//Broadcast("ctwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_human\n");
-	}
-	EndRoundMessage("Round Clear!!!", ROUND_CTS_WIN);
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSTip);
+	WRITE_BYTE(ZBS_TIP_ROUNDCLEAR);
+	MESSAGE_END();
+
 	TerminateRound(5, WINSTATUS_CTS);
 
 	++m_iNumCTWins;
@@ -237,18 +233,10 @@ void CMod_ZombieScenario::HumanWin()
 
 void CMod_ZombieScenario::ZombieWin()
 {
-	//Broadcast("terwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBasePlayer *player = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(iIndex));
+	MESSAGE_BEGIN(MSG_ALL, gmsgZBSTip);
+	WRITE_BYTE(ZBS_TIP_ROUNDFAIL);
+	MESSAGE_END();
 
-		if (!player)
-			continue;
-
-		player->HumanLevel_Reset();
-		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
-	}
-	EndRoundMessage("Round Failed...", ROUND_TERRORISTS_WIN);
 	TerminateRound(5, WINSTATUS_TERRORISTS);
 
 	++m_iNumTerroristWins;
@@ -322,8 +310,9 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	pent->v.spawnflags |= SF_NORESPAWN;
 	
 	DispatchSpawn(pent);
-	monster->pev->max_health = 100;
+	monster->pev->max_health = 100 + m_iNumCTWins * 20;
 	monster->pev->health = monster->pev->max_health;
+	monster->pev->maxspeed = 100.0f + (m_iNumCTWins / 3) * 15;
 
 	return monster;
 }

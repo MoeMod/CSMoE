@@ -12,6 +12,8 @@
 #include "game.h"
 #include "bot_include.h" // nav
 
+#include "zbs_const.h"
+
 LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 
 class CMonsterImprov : public CHostageImprov
@@ -845,6 +847,7 @@ void CMonster::KillBouns(CBasePlayer *player)
 	player->AddPoints(1, FALSE);
 	player->AddAccount(50);
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgZBSKill, NULL, player->pev);
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, player->pev);
+	WRITE_BYTE(ZBS_TIP_KILL);
 	MESSAGE_END();
 }

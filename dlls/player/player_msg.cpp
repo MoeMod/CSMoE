@@ -88,7 +88,7 @@ int gmsgBrass = 0;
 int gmsgFog = 0;
 int gmsgShowTimer = 0;
 
-int gmsgZBSKill = 0;
+int gmsgZBSTip = 0;
 int gmsgZBSLevel = 0;
 
 // utils
@@ -182,7 +182,7 @@ void LinkUserMessages()
 	gmsgShowTimer = REG_USER_MSG("ShowTimer", 0);
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 
-	gmsgZBSKill = REG_USER_MSG("ZBSKill", -1);
+	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
 }
 

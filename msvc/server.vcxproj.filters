@@ -1119,5 +1119,8 @@
     <ClInclude Include="..\dlls\player\player_human_level.h">
       <Filter>dlls\player</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

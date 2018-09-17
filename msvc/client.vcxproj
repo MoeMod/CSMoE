@@ -96,6 +96,7 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\inputw32.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
