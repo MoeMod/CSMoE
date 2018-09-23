@@ -87,7 +87,6 @@ int CalcScreen(const float in[3], float out[2])
 	float num;
 
 	aim = Vector(in) - Vector(v_origin);
-
 	MakeVector(v_angles, view);
 
 	if (VectorAngle(view, aim) > (gHUD.m_iFOV / 1.8))
@@ -96,6 +95,8 @@ int CalcScreen(const float in[3], float out[2])
 	VectorRotateZ(aim, -v_angles[1], newaim);
 	VectorRotateY(newaim, -v_angles[0], tmp);
 	VectorRotateX(tmp, -v_angles[2], newaim);
+	newaim[1] *= 0.733333f;
+	newaim[2] *= 0.733333f;
 
 	if (gHUD.m_iFOV == 0.0)
 		return false;

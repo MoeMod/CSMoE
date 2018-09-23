@@ -34,6 +34,9 @@
     <Filter Include="dlls\wpn_shared">
       <UniqueIdentifier>{bf8c2f92-98f5-45fb-95c5-5f4261d4bdff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\hud\zbs">
+      <UniqueIdentifier>{9718376f-9be6-4149-90e0-74ecacbe3f55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -399,6 +402,21 @@
     <ClCompile Include="..\cl_dll\hud\headname.cpp">
       <Filter>cl_dll\hud</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -553,6 +571,21 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\calcscreen.h">
       <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs.h">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h">
+      <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h">
+      <Filter>cl_dll\hud\zbs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

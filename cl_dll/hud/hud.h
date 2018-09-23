@@ -36,7 +36,7 @@
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
 
-#include "gamemode/mods_const.h"
+enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
 #define MIN_ALPHA	 100	
 #define	HUDELEM_ACTIVE	1
@@ -118,6 +118,7 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "zbs/zbs.h"
 
 
 //
@@ -349,6 +350,7 @@ public:
 	int m_iTeamAlive_T, m_iTeamAlive_CT;
 
 public:
+	bool m_bTopScoreBoardEnabled;
 	int m_iBGIndex;
 	int m_iTextIndex;
 	int m_iTTextIndex, m_iCTTextIndex;
@@ -1042,8 +1044,9 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
-
+	
 	CHudHeadName	m_HeadName;
+	CHudZBS m_ZBS;
 
 	// user messages
 	CHudMsgFunc(Damage);

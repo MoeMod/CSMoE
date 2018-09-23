@@ -2033,15 +2033,12 @@ void PM_Duck( void )
 		return;
 	}
 
-	if( pmove->flags & FL_DUCKING )
+	if( ( pmove->cmd.buttons & IN_DUCK ) || ( pmove->bInDuck ) || ( pmove->flags & FL_DUCKING ) )
 	{
 		pmove->cmd.forwardmove *= PLAYER_DUCKING_MULTIPLIER;
 		pmove->cmd.sidemove *= PLAYER_DUCKING_MULTIPLIER;
 		pmove->cmd.upmove *= PLAYER_DUCKING_MULTIPLIER;
-	}
-
-	if( ( pmove->cmd.buttons & IN_DUCK ) || ( pmove->bInDuck ) || ( pmove->flags & FL_DUCKING ) )
-	{
+		
 		if( pmove->cmd.buttons & IN_DUCK )
 		{
 			if( (nButtonPressed & IN_DUCK ) && !( pmove->flags & FL_DUCKING ) )

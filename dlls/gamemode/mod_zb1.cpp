@@ -17,7 +17,7 @@ CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
-	PRECACHE_SOUND("Zombi_Ambience.mp3");
+	PRECACHE_GENERIC("sound/Zombi_Ambience.mp3");
 }
 
 void CMod_Zombi::CheckMapConditions()
@@ -69,7 +69,7 @@ bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
 
 BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
 {
-	CLIENT_COMMAND(pEntity, "mp3 loop Zombi_Ambience\n");
+	CLIENT_COMMAND(pEntity, "mp3 loop sound/Zombi_Ambience.mp3\n");
 
 	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 }
@@ -444,6 +444,7 @@ void CMod_Zombi::TeamCheck()
 
 void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 {
+	pPlayer->m_bIsZombie = false;
 	pPlayer->m_bNotKilled = false;
 	IBaseMod::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
@@ -453,7 +454,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	//pPlayer->pev->gravity = 0.86f;
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
-	pPlayer->m_bIsZombie = false;
 
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");

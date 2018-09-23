@@ -315,7 +315,7 @@ void CCSBot::Hunt()
 // Attack our the given victim
 // NOTE: Attacking does not change our task.
 
-void CCSBot::Attack(CBasePlayer *victim)
+void CCSBot::Attack(CBaseEntity *victim)
 {
 	if (victim == NULL)
 		return;

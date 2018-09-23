@@ -12,7 +12,7 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a-hard)
 LOCAL_MODULE_FILENAME = libmenu_hardfp
 endif
 
-
+LOCAL_CPPFLAGS += -std=c++11
 
 LOCAL_MODULE := menu
 

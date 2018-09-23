@@ -160,6 +160,7 @@ int CHudScoreboard :: VidInit( void )
 	m_iTTextIndex = m_iText_TR;
 	m_iCTTextIndex = m_iText_CT;
 	m_bIsTeamplay = true;
+	m_bTopScoreBoardEnabled = true;
 
 	BuildHudNumberRect(m_iNum_L, m_rcNumber_Large, 13, 13, 1, 1);
 	BuildHudNumberRect(m_iNum_S, m_rcNumber_Small, 10, 10, 1, 1);
@@ -193,7 +194,8 @@ void CHudScoreboard :: InitHUDData( void )
 
 int CHudScoreboard :: Draw( float flTime )
 {
-	DrawTopScoreBoard(flTime);
+	if(m_bTopScoreBoardEnabled)
+		DrawTopScoreBoard(flTime);
 
 	if( !m_bForceDraw )
 	{

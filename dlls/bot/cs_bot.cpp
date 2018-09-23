@@ -389,7 +389,7 @@ CBasePlayer *CCSBot::FindNearbyPlayer()
 
 // Assign given player as our current enemy to attack
 
-void CCSBot::SetEnemy(CBasePlayer *enemy)
+void CCSBot::SetEnemy(CBaseEntity *enemy)
 {
 	if (m_enemy != enemy)
 	{

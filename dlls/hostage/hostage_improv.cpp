@@ -45,6 +45,7 @@
 // Hostage
 #include "hostage/hostage.h"
 #include "hostage/hostage_localnav.h"
+#include "hostage/hostage_improv.h"
 
 #include "bot/cs_bot.h"
 
@@ -895,7 +896,7 @@ void CHostageImprov::UpdatePosition(float deltaT)
 
 	DrawAxes(m_moveGoal, 255, 255, 0);
 
-	if (IsJumping())
+	if (IsJumping() && CanJump())
 	{
 		Vector dir;
 		const float pushSpeed = 100.0f;
@@ -997,7 +998,8 @@ void CHostageImprov::UpdatePosition(float deltaT)
 
 	float speed = m_vel.NormalizeInPlace();
 
-	const float maxSpeed = 285.0f;
+	//const float maxSpeed = 285.0f;
+	const float maxSpeed = m_hostage->pev->maxspeed;
 	if (speed > maxSpeed)
 	{
 		speed = maxSpeed;

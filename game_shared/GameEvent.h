@@ -32,7 +32,7 @@
 #pragma once
 #endif
 
-enum GameEventType
+enum GameEventType : int
 {
 	EVENT_INVALID = 0,
 	EVENT_WEAPON_FIRED,			// tell bots the player is attack (argumens: 1 = attacker, 2 = NULL)

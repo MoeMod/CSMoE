@@ -68,7 +68,7 @@
 
 void CCSBot::FireWeaponAtEnemy()
 {
-	CBasePlayer *enemy = GetEnemy();
+	CBaseEntity *enemy = GetEnemy();
 	if (enemy == NULL)
 	{
 		StopRapidFire();
@@ -88,7 +88,10 @@ void CCSBot::FireWeaponAtEnemy()
 	{
 		ClearSurpriseDelay();
 
-		if (!(IsRecognizedEnemyProtectedByShield() && IsPlayerFacingMe(enemy))		// dont shoot at enemies behind shields
+		if (1
+#ifdef ENABLE_SHIELD
+			&& !(IsRecognizedEnemyProtectedByShield() && IsPlayerFacingMe(enemy))		// dont shoot at enemies behind shields
+#endif
 			&& !IsActiveWeaponReloading()
 			&& !IsActiveWeaponClipEmpty()
 			&& IsEnemyVisible())
@@ -140,7 +143,7 @@ void CCSBot::FireWeaponAtEnemy()
 							ForceRun(5.0f);
 
 							// if our prey is facing away, backstab him!
-							if (!IsPlayerFacingMe(enemy))
+							if (enemy->IsPlayer() && !IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
 							{
 								SecondaryAttack();
 							}

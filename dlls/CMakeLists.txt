@@ -160,6 +160,9 @@ set(HLDLL_SRCS
 	./gamemode/mod_tdm.cpp
 	./gamemode/mod_dm.cpp
 	./gamemode/mod_zb1.cpp
+	./gamemode/mod_zbs.cpp
+	./gamemode/zbs/zs_subs.cpp
+	./gamemode/zbs/monster_entity.cpp
 	./../public/unicode_strtools.cpp
 	)
 

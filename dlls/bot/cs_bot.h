@@ -374,7 +374,7 @@ public:
 	void Hunt();
 	bool IsHunting() const;									// returns true if bot is currently hunting
 
-	void Attack(CBasePlayer *victim);
+	void Attack(CBaseEntity *victim);
 	void FireWeaponAtEnemy();								// fire our active weapon towards our current enemy
 	void StopAttacking();
 	bool IsAttacking() const;								// returns true if bot is currently engaging a target
@@ -518,8 +518,8 @@ public:
 	// enemies
 	// BOTPORT: GetEnemy() collides with GetEnemy() in CBaseEntity - need to use different nomenclature
 
-	void SetEnemy(CBasePlayer *enemy);							// set given player as our current enemy
-	CBasePlayer *GetEnemy();
+	void SetEnemy(CBaseEntity *enemy);							// set given player as our current enemy
+	CBaseEntity *GetEnemy();
 	int GetNearbyEnemyCount() const;							// return max number of nearby enemies we've seen recently
 	unsigned int GetEnemyPlace() const;							// return location where we see the majority of our enemies
 	bool CanSeeBomber() const;								// return true if we can see the bomb carrier
@@ -536,7 +536,7 @@ public:
 	CBasePlayer *GetImportantEnemy(bool checkVisibility = false) const;			// return the closest "important" enemy for the given scenario (bomb carrier, VIP, hostage escorter)
 
 	void UpdateReactionQueue();								// update our reaction time queue
-	CBasePlayer *GetRecognizedEnemy();							// return the most dangerous threat we are "conscious" of
+	CBaseEntity *GetRecognizedEnemy();							// return the most dangerous threat we are "conscious" of
 	bool IsRecognizedEnemyReloading();							// return true if the enemy we are "conscious" of is reloading
 	bool IsRecognizedEnemyProtectedByShield();						// return true if the enemy we are "conscious" of is hiding behind a shield
 	float GetRangeToNearestRecognizedEnemy();						// return distance to closest enemy we are "conscious" of
@@ -1171,7 +1171,7 @@ inline bool CCSBot::IsUsingVoice() const
 	return (m_voiceFeedbackEndTimestamp != 0.0f);
 }
 
-inline CBasePlayer *CCSBot::GetEnemy()
+inline CBaseEntity *CCSBot::GetEnemy()
 {
 	return m_enemy;
 }

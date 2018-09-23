@@ -45,6 +45,7 @@
 // Hostage
 #include "hostage/hostage.h"
 #include "hostage/hostage_localnav.h"
+#include "hostage/hostage_improv.h"
 
 #include "bot/cs_bot.h"
 
@@ -72,7 +73,7 @@ void HostageFollowState::OnEnter(CHostageImprov *improv)
 	m_lastLeaderPos = Vector(999999, 999999, 999999);
 
 	m_makeWayTimer.Invalidate();
-	m_stopRange = RANDOM_FLOAT(125, 175);
+	SetFollowRange(3000.0f, 1000.0f, RANDOM_FLOAT(125, 175));
 
 	if (improv->IsTerroristNearby())
 	{
@@ -98,10 +99,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 
 	float range = (m_leader->pev->origin - improv->GetCentroid()).Length();
 
-	const float maxPathLength = 3000.0f;
-	const float giveUpRange = 1000.0f;
-
-	if( range > giveUpRange || ( improv->GetPath()->GetSegmentCount() > 0 && improv->GetPath()->GetLength() > maxPathLength ) )
+	if( range > m_giveUpRange || ( improv->GetPath()->GetSegmentCount() > 0 && improv->GetPath()->GetLength() > m_maxPathLength) )
 	{
 		improv->Idle();
 		return;

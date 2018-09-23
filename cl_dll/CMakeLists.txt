@@ -142,6 +142,10 @@ set (HUD_SRCS
 	./hud/spectator_gui.cpp
 	./hud/followicon.cpp
 	./hud/headname.cpp
+	./hud/zbs/zbs.cpp
+	./hud/zbs/zbs_level.cpp
+	./hud/zbs/zbs_scoreboard.cpp
+	./hud/zbs/zbs_kill.cpp
 )
 
 set (STUDIORENDER_SRCS

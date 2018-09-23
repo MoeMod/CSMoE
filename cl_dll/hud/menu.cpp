@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+#include "gamemode/mods_const.h"
+
 //#include "vgui_TeamFortressViewport.h"
 
 #define MAX_MENU_STRING	512
@@ -291,7 +293,16 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 		szCmd = "exec touch/chooseteam_ct.cfg";
 		break;
 	case MENU_BUY:
-		szCmd = "exec touch/buy.cfg";
+		switch (gHUD.m_iModRunning)
+		{
+		case MOD_ZBS:
+			szCmd = "exec touch/buy_zbs.cfg";
+			break;
+		default:
+			szCmd = "exec touch/buy.cfg";
+			break;
+		}
+		
 		break;
 	case MENU_BUY_PISTOL:
 		if( g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_TERRORIST )

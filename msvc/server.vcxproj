@@ -238,6 +238,9 @@
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp" />
     <ClCompile Include="..\dlls\gamerules.cpp" />
     <ClCompile Include="..\dlls\ggrenade.cpp" />
     <ClCompile Include="..\dlls\globals.cpp" />
@@ -307,6 +310,7 @@
     <ClCompile Include="..\dlls\player.cpp" />
     <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\player\hintmessage.cpp" />
+    <ClCompile Include="..\dlls\player\player_human_level.cpp" />
     <ClCompile Include="..\dlls\player\player_knockback.cpp" />
     <ClCompile Include="..\dlls\player\player_model.cpp" />
     <ClCompile Include="..\dlls\player\player_msg.cpp" />
@@ -610,6 +614,10 @@
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_zbs.h" />
+    <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h" />
+    <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h" />
+    <ClInclude Include="..\dlls\gamemode\zbs\zs_subs.h" />
     <ClInclude Include="..\dlls\gamerules.h" />
     <ClInclude Include="..\dlls\globals.h" />
     <ClInclude Include="..\dlls\healthkit.h" />
@@ -638,6 +646,7 @@
     <ClInclude Include="..\dlls\player\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\player\hintmessage.h" />
     <ClInclude Include="..\dlls\player\player_const.h" />
+    <ClInclude Include="..\dlls\player\player_human_level.h" />
     <ClInclude Include="..\dlls\player\player_knockback.h" />
     <ClInclude Include="..\dlls\player\player_model.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
@@ -842,7 +851,7 @@
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\hookers\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Full</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>

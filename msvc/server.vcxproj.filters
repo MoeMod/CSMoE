@@ -56,6 +56,9 @@
     <Filter Include="dlls\wpn_shared\knife">
       <UniqueIdentifier>{f37b98c5-fd69-4800-af21-eb4ab76d66ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\gamemode\zbs">
+      <UniqueIdentifier>{72f0b1e9-cfa5-40ae-8419-70f0922f6c00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -512,6 +515,18 @@
       <Filter>dlls</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\player\player_knockback.cpp">
+      <Filter>dlls\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\player\player_human_level.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1091,6 +1106,21 @@
     </ClInclude>
     <ClInclude Include="..\dlls\player\player_knockback.h">
       <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_zbs.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\zs_subs.h">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\player\player_human_level.h">
+      <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h">
+      <Filter>dlls\gamemode\zbs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

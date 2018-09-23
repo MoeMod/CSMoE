@@ -47,6 +47,7 @@
 // Hostage
 #include "hostage/hostage.h"
 #include "hostage/hostage_localnav.h"
+#include "hostage/hostage_improv.h"
 
 #include "bot/cs_bot.h"
 

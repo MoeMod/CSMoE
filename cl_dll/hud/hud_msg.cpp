@@ -32,6 +32,8 @@
 
 #include "events.h"
 
+#include "gamemode/mods_const.h"
+
 extern float g_flRoundTime;
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS
@@ -146,6 +148,13 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_ZB;
 		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_HM;
 		m_Teamplay = false;
+		break;
+	}
+	case MOD_ZBS:
+	{
+		m_Teamplay = false;
+		gHUD.m_ZBS.m_iFlags |= HUD_ACTIVE;
+		gHUD.m_Scoreboard.m_bTopScoreBoardEnabled = false;
 		break;
 	}
 	default:

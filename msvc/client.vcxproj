@@ -93,6 +93,11 @@
     <ClCompile Include="..\cl_dll\hud\text_message.cpp" />
     <ClCompile Include="..\cl_dll\hud\timer.cpp" />
     <ClCompile Include="..\cl_dll\hud\train.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\inputw32.cpp" />
     <ClCompile Include="..\cl_dll\in_camera.cpp" />
@@ -144,6 +149,11 @@
   <ItemGroup>
     <ClInclude Include="..\cl_dll\calcscreen.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
+    <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
     <ClInclude Include="..\common\com_model.h" />
@@ -317,7 +327,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>

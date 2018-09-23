@@ -68,6 +68,10 @@ SRCS := \
 	./hud/spectator_gui.cpp \
 	./hud/followicon.cpp \
 	./hud/headname.cpp \
+	./hud/zbs/zbs.cpp \
+	./hud/zbs/zbs_level.cpp \
+	./hud/zbs/zbs_scoreboard.cpp \
+	./hud/zbs/zbs_kill.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
