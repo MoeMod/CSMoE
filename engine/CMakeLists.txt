@@ -316,8 +316,8 @@ if(XASH_SDL)
 
 	find_library(SDL2																																																																																																																																																																																																																																																							LIBRARY
 		NAMES 
-			SDL2 SDL2.dll SDL2.lib
-		PATHS  
+			SDL2 SDL2.dll SDL2.lib libSDL2d.dylib
+		PATHS
 			../SDL2/lib
 			../SDL2/lib/i386-linux-gnu
 			../SDL2/lib/x86
@@ -345,6 +345,11 @@ if(XASH_SDL)
 			CONFIGURATIONS Release
 			DESTINATION ${LIB_INSTALL_DIR}/Release/)
 	endif()
+
+	if(APPLE)
+		set(SDL2_LIBRARY SDL2)
+	endif()
+
 	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
 
 endif() #if(XASH_SDL)

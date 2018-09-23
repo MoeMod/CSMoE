@@ -89,6 +89,7 @@ set(HLDLL_SRCS
 	./player/player_zombie.cpp
 	./player/player_spawnprotection.cpp
 	./player/player_knockback.cpp
+	./player/player_human_level.cpp
 	./items.cpp
 	./lights.cpp
 	./maprules.cpp
@@ -245,14 +246,22 @@ include_directories (
 	../game_shared/)
 add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
 
+if(APPLE)
+	add_definitions(
+		-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
+		-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
+		-D_close=close -D_write=write
+	)
+endif()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions(
-			-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
-			-DLINUX -D_LINUX -DGNUC
-			-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
-			-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
-			-D_close=close -D_write=write
-		)
+		-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
+		-DLINUX -D_LINUX -DGNUC
+		-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
+		-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
+		-D_close=close -D_write=write
+	)
 endif()
 
 if(MINGW)

@@ -146,6 +146,7 @@ set (HUD_SRCS
 	./hud/zbs/zbs_level.cpp
 	./hud/zbs/zbs_scoreboard.cpp
 	./hud/zbs/zbs_kill.cpp
+	./hud/zbs/zbs_roundclear.cpp
 )
 
 set (STUDIORENDER_SRCS
@@ -198,6 +199,12 @@ include_directories (
 	../public/tier1/
 	)
 add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
+
+if(APPLE)
+	add_definitions(
+			-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
+	)
+endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions(

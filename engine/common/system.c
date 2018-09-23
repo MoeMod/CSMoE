@@ -210,7 +210,7 @@ static qboolean Sys_DebuggerPresent(void)
 }
 
 #undef DEBUG_BREAK
-#ifdef __i386__
+#if defined(__i386__) || defined(__x86_64__)
 #define DEBUG_BREAK \
 	if( Sys_DebuggerPresent() ) { __asm__("int $3"); }
 #else

@@ -23,9 +23,7 @@ endif()
 
 # force build 32bit libraries
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    if(APPLE)
-        SET(CMAKE_OSX_ARCHITECTURES "i386")
-    else()
+    if(NOT APPLE)
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
     endif()
@@ -34,6 +32,10 @@ endif()
 # force xp build
 if(MSVC)
 	add_definitions(-D_USING_V110_SDK71_)
+endif()
+
+if(APPLE)
+	add_definitions(-DHAVE_STDINT_H)
 endif()
 
 if(64BIT AND CMAKE_SIZEOF_VOID_P EQUAL 4)

@@ -1607,7 +1607,8 @@ void CSaveRestoreBuffer::BufferRewind(int size)
 	m_pdata->size -= size;
 }
 
-#if defined __arm__ || defined _M_ARM || defined __arm64__ 
+//#if defined __arm__ || defined _M_ARM || defined __arm64__
+#ifndef _WIN32
 extern "C"
 {
 	inline unsigned _rotr(unsigned val, int shift)
