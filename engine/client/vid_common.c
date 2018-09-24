@@ -914,7 +914,12 @@ void GL_InitCommands( void )
 	vid_mode = Cvar_Get( "vid_mode", VID_AUTOMODE, CVAR_RENDERINFO, "display resolution mode" );
 	vid_fullscreen = Cvar_Get( "fullscreen", "0", CVAR_RENDERINFO, "set in 1 to enable fullscreen mode" );
 	vid_displayfrequency = Cvar_Get ( "vid_displayfrequency", "0", CVAR_RENDERINFO, "fullscreen refresh rate" );
+
+#ifdef __APPLE__
+	vid_highdpi = Cvar_Get( "vid_highdpi", "0", CVAR_RENDERINFO, "Enable High-DPI mode" );
+#else
 	vid_highdpi = Cvar_Get( "vid_highdpi", "1", CVAR_RENDERINFO, "Enable High-DPI mode" );
+#endif
 
 	Cmd_AddCommand( "r_info", R_RenderInfo_f, "display renderer info" );
 	Cmd_AddCommand( "texturelist", R_TextureList_f, "display loaded textures list" );
