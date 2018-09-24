@@ -88,6 +88,7 @@ LOCAL_SRC_FILES := \
 	player/player_zombie.cpp \
 	player/player_spawnprotection.cpp \
 	player/player_knockback.cpp \
+	player/player_human_level.cpp \
 	hostage/hostage.cpp \
 	hostage/hostage_improv.cpp \
 	hostage/hostage_localnav.cpp \

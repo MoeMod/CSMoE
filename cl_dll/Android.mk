@@ -72,6 +72,7 @@ SRCS := \
 	./hud/zbs/zbs_level.cpp \
 	./hud/zbs/zbs_scoreboard.cpp \
 	./hud/zbs/zbs_kill.cpp \
+	./hud/zbs/zbs_roundclear.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
