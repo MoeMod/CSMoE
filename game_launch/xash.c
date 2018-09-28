@@ -64,6 +64,11 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
+#ifndef _WIN32
+#define TRUE 1
+#define FALSE 0
+#endif
+
 #define GAME_PATH	"csbtem"	// default dir to start from
 
 typedef void (*pfnChangeGame)( const char *progname );
@@ -147,7 +152,7 @@ static void Sys_ChangeGame( const char *progname )
 	Sys_UnloadEngine ();
 	Sys_LoadEngine ();
 
-	Xash_Main( szArgc, szArgv, szGameDir, true, Sys_ChangeGame );
+	Xash_Main( szArgc, szArgv, szGameDir, TRUE, Sys_ChangeGame );
 }
 
 _inline int Sys_Start( void )
@@ -155,7 +160,7 @@ _inline int Sys_Start( void )
 	int ret;
 
 	Sys_LoadEngine();
-	ret = Xash_Main( szArgc, szArgv, GAME_PATH, false, Xash_Shutdown ? Sys_ChangeGame : NULL );
+	ret = Xash_Main( szArgc, szArgv, GAME_PATH, FALSE, Xash_Shutdown ? Sys_ChangeGame : NULL );
 	Sys_UnloadEngine();
 
 	return ret;
