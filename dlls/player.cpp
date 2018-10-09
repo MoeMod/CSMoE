@@ -155,48 +155,6 @@ entvars_t *g_pevLastInflictor;
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
-const char *GetCSModelName(int item_id)
-{
-	const char *modelName = NULL;
-	switch (item_id)
-	{
-	case WEAPON_P228:		modelName = "models/w_p228.mdl"; break;
-	case WEAPON_SCOUT:		modelName = "models/w_scout.mdl"; break;
-	case WEAPON_HEGRENADE:		modelName = "models/w_hegrenade.mdl"; break;
-	case WEAPON_XM1014:		modelName = "models/w_xm1014.mdl"; break;
- 	case WEAPON_C4:			modelName = "models/w_backpack.mdl"; break;
-	case WEAPON_MAC10:		modelName = "models/w_mac10.mdl"; break;
-	case WEAPON_AUG:		modelName = "models/w_aug.mdl"; break;
-	case WEAPON_SMOKEGRENADE:	modelName = "models/w_smokegrenade.mdl"; break;
-	case WEAPON_ELITE:		modelName = "models/w_elite.mdl"; break;
-	case WEAPON_FIVESEVEN:		modelName = "models/w_fiveseven.mdl"; break;
-	case WEAPON_UMP45:		modelName = "models/w_ump45.mdl"; break;
-	case WEAPON_SG550:		modelName = "models/w_sg550.mdl"; break;
-	case WEAPON_GALIL:		modelName = "models/w_galil.mdl"; break;
-	case WEAPON_FAMAS:		modelName = "models/w_famas.mdl"; break;
-	case WEAPON_USP:		modelName = "models/w_usp.mdl"; break;
-	case WEAPON_GLOCK18:		modelName = "models/w_glock18.mdl"; break;
-	case WEAPON_AWP:		modelName = "models/w_awp.mdl"; break;
-	case WEAPON_MP5N:		modelName = "models/w_mp5.mdl"; break;
-	case WEAPON_M249:		modelName = "models/w_m249.mdl"; break;
-	case WEAPON_M3:			modelName = "models/w_m3.mdl"; break;
-	case WEAPON_M4A1:		modelName = "models/w_m4a1.mdl"; break;
-	case WEAPON_TMP:		modelName = "models/w_tmp.mdl"; break;
-	case WEAPON_G3SG1:		modelName = "models/w_g3sg1.mdl"; break;
-	case WEAPON_FLASHBANG:		modelName = "models/w_flashbang.mdl"; break;
-	case WEAPON_DEAGLE:		modelName = "models/w_deagle.mdl"; break;
-	case WEAPON_SG552:		modelName = "models/w_sg552.mdl"; break;
-	case WEAPON_AK47:		modelName = "models/w_ak47.mdl"; break;
-	case WEAPON_KNIFE:		modelName = "models/w_knife.mdl"; break;
-	case WEAPON_P90:		modelName = "models/w_p90.mdl"; break;
-	case WEAPON_SHIELDGUN:		modelName = "models/w_shield.mdl"; break;
-	default:
-		ALERT(at_console, "CBasePlayer::PackDeadPlayerItems(): Unhandled item- not creating weaponbox\n");
-	}
-
-	return modelName;
-}
-
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
@@ -1227,7 +1185,7 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 	if (pItem == NULL)
 		return;
 
-	const char *modelName = GetCSModelName(pItem->m_iId);
+	const char *modelName = pItem->GetCSModelName();
 	if (modelName != NULL)
 	{
 		CWeaponBox *pWeaponBox = (CWeaponBox *)CBaseEntity::Create("weaponbox", pPlayer->pev->origin, pPlayer->pev->angles, ENT(pPlayer->pev));
@@ -1332,6 +1290,7 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
+		GiveNamedItem("weapon_ak47l");
 	}
 }
 
@@ -5988,6 +5947,8 @@ int CBasePlayer::GiveAmmo(int iCount, char *szName, int iMax)
 		return -1;
 	}
 
+	iMax = g_pModRunning->ComputeMaxAmmo(this, const_cast<const char *>(szName), iMax);
+
 	if (!g_pGameRules->CanHaveAmmo(this, szName, iMax))
 	{
 		// game rules say I can't have any more of this ammo type.
@@ -6991,7 +6952,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				}
 			}
 
-			const char *modelname = GetCSModelName(pWeapon->m_iId);
+			const char *modelname = pWeapon->GetCSModelName();
 
 			if (modelname != NULL)
 			{

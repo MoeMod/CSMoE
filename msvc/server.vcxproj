@@ -313,6 +313,7 @@
     <ClCompile Include="..\dlls\player\player_human_level.cpp" />
     <ClCompile Include="..\dlls\player\player_knockback.cpp" />
     <ClCompile Include="..\dlls\player\player_model.cpp" />
+    <ClCompile Include="..\dlls\player\player_mod_strategy.cpp" />
     <ClCompile Include="..\dlls\player\player_msg.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp" />
@@ -334,6 +335,7 @@
     <ClCompile Include="..\dlls\vehicle.cpp" />
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapons_buy.cpp" />
+    <ClCompile Include="..\dlls\weapons_model.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
@@ -344,6 +346,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -649,6 +652,7 @@
     <ClInclude Include="..\dlls\player\player_human_level.h" />
     <ClInclude Include="..\dlls\player\player_knockback.h" />
     <ClInclude Include="..\dlls\player\player_model.h" />
+    <ClInclude Include="..\dlls\player\player_mod_strategy.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
     <ClInclude Include="..\dlls\player\player_signal.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
@@ -677,11 +681,13 @@
     <ClInclude Include="..\dlls\weapons_ammo.h" />
     <ClInclude Include="..\dlls\weapons_const.h" />
     <ClInclude Include="..\dlls\weapons_buy.h" />
+    <ClInclude Include="..\dlls\weapons_model.h" />
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />

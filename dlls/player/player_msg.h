@@ -94,4 +94,7 @@ void WriteSigonMessages();
 void SendItemStatus(CBasePlayer *pPlayer);
 
 void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src);
+
+struct ItemInfo;
+void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II);
 #endif

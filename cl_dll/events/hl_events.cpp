@@ -16,6 +16,44 @@
 
 int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 
+
+//extern "C"
+
+	DECLARE_EVENT(FireAK47);
+	DECLARE_EVENT(FireAUG);
+	DECLARE_EVENT(FireAWP);
+	DECLARE_EVENT(CreateExplo);
+	DECLARE_EVENT(CreateSmoke);
+	DECLARE_EVENT(FireDEAGLE);
+	DECLARE_EVENT(DecalReset);
+	DECLARE_EVENT(FireEliteLeft);
+	DECLARE_EVENT(FireEliteRight);
+	DECLARE_EVENT(FireFAMAS);
+	DECLARE_EVENT(Fire57);
+	DECLARE_EVENT(FireG3SG1);
+	DECLARE_EVENT(FireGALIL);
+	DECLARE_EVENT(Fireglock18);
+	DECLARE_EVENT(Knife);
+	DECLARE_EVENT(FireM249);
+	DECLARE_EVENT(FireM3);
+	DECLARE_EVENT(FireM4A1);
+	DECLARE_EVENT(FireMAC10);
+	DECLARE_EVENT(FireMP5);
+	DECLARE_EVENT(FireP228);
+	DECLARE_EVENT(FireP90);
+	DECLARE_EVENT(FireScout);
+	DECLARE_EVENT(FireSG550);
+	DECLARE_EVENT(FireSG552);
+	DECLARE_EVENT(FireTMP);
+	DECLARE_EVENT(FireUMP45);
+	DECLARE_EVENT(FireUSP);
+	DECLARE_EVENT(Vehicle);
+	DECLARE_EVENT(FireXM1014);
+	DECLARE_EVENT(TrainPitchAdjust);
+
+	DECLARE_EVENT(FireAK47L);
+
+
 /*
 ======================
 Game_HookEvents
@@ -61,4 +99,6 @@ void Game_HookEvents( void )
 	HOOK_EVENT( usp, FireUSP );
 	HOOK_EVENT( vehicle, Vehicle );
 	HOOK_EVENT( xm1014, FireXM1014 );
+
+	HOOK_EVENT( ak47l, FireAK47L);
 }

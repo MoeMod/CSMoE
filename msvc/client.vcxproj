@@ -30,6 +30,7 @@
     <ClCompile Include="..\cl_dll\entity.cpp" />
     <ClCompile Include="..\cl_dll\events.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_ak47l.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />

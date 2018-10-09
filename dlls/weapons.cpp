@@ -1111,6 +1111,11 @@ int CBasePlayerItem::AddToPlayer(CBasePlayer *pPlayer)
 		WRITE_BYTE(m_iId);
 	MESSAGE_END();
 
+	// added for WeaponList update
+	ItemInfo II;
+	GetItemInfo(&II);
+	WriteWeaponInfo(pPlayer, II);
+
 	return TRUE;
 }
 

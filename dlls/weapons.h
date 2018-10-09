@@ -35,6 +35,7 @@
 #include "weapons_const.h"
 #include "weapons_ammo.h"
 #include "weapons_buy.h"
+#include "weapons_model.h"
 #include "player/player_knockback.h"
 
 class CBasePlayer;
@@ -305,17 +306,24 @@ public:
 public:
 	/* CSBTE Added */
 	virtual KnockbackData GetKnockBackData() { return { 0.0f, 0.0f, 0.0f ,0.0f ,0.5f }; }
+#ifdef CLIENT_DLL
+	virtual const char *GetCSModelName() { return ""; }
+#else
+	virtual const char *GetCSModelName();
+#endif
 
+	
 public:
-	inline int iItemPosition() const	{ return ItemInfoArray[ m_iId ].iPosition; }
-	inline const char *pszAmmo1() const	{ return ItemInfoArray[ m_iId ].pszAmmo1; }
-	inline int iMaxAmmo1() const		{ return ItemInfoArray[ m_iId ].iMaxAmmo1; }
-	inline const char *pszAmmo2() const	{ return ItemInfoArray[ m_iId ].pszAmmo2; }
-	inline int iMaxAmmo2() const		{ return ItemInfoArray[ m_iId ].iMaxAmmo2; }
-	inline const char *pszName() const	{ return ItemInfoArray[ m_iId ].pszName; }
-	inline int iMaxClip() const		{ return ItemInfoArray[ m_iId ].iMaxClip; }
-	inline int iWeight() const		{ return ItemInfoArray[ m_iId ].iWeight; }
-	inline int iFlags() const		{ return ItemInfoArray[ m_iId ].iFlags; }
+	inline ItemInfo ItemInfoInstance() const { ItemInfo II; const_cast<CBasePlayerItem *>(this)->GetItemInfo(&II); return II; }
+	inline int iItemPosition() const	{ return ItemInfoInstance().iPosition; }
+	inline const char *pszAmmo1() const	{ return ItemInfoInstance().pszAmmo1; }
+	inline int iMaxAmmo1() const		{ return ItemInfoInstance().iMaxAmmo1; }
+	inline const char *pszAmmo2() const	{ return ItemInfoInstance().pszAmmo2; }
+	inline int iMaxAmmo2() const		{ return ItemInfoInstance().iMaxAmmo2; }
+	inline const char *pszName() const	{ return ItemInfoInstance().pszName; }
+	inline int iMaxClip() const		{ return ItemInfoInstance().iMaxClip; }
+	inline int iWeight() const		{ return ItemInfoInstance().iWeight; }
+	inline int iFlags() const		{ return ItemInfoInstance().iFlags; }
 
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
@@ -399,7 +407,7 @@ public:
 	void ReloadSound();
 	float GetNextAttackDelay(float delay);
 	float GetNextAttackDelay2(float delay);
-	bool HasSecondaryAttack();
+	virtual bool HasSecondaryAttack(); // virtualized...
 	BOOL IsPistol() { return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE || m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN); }
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();

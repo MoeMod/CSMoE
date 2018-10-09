@@ -33,6 +33,7 @@ public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
 	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
+	int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) override;
 
 protected:
 	virtual int ZombieOriginNum();

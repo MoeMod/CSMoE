@@ -324,6 +324,17 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 	return IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 
+int CMod_Zombi::ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax)
+{
+	int ret = iOriginalMax * 2;
+
+	// do not *2 for machine-guns.
+	if (Q_strstr(szAmmoClassName, "box"))
+		ret = iOriginalMax;
+
+	return ret;
+}
+
 int CMod_Zombi::ZombieOriginNum()
 {
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;

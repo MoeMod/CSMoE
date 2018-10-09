@@ -26,8 +26,8 @@
 *
 */
 
-#ifndef WEAPONTYPE_H
-#define WEAPONTYPE_H
+#ifndef WEAPONS_BUY_H
+#define WEAPONS_BUY_H
 #ifdef _WIN32
 #pragma once
 #endif

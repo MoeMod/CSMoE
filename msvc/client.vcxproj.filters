@@ -417,6 +417,9 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp">
       <Filter>cl_dll\hud\zbs</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_ak47l.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">

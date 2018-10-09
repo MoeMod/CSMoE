@@ -65,6 +65,7 @@
 #include "tutor_cs_states.h"
 #include "tutor_cs_tutor.h"
 
+#include "gamemode/mods.h"
 #include "player/player_model.h"
 
 /*
@@ -2472,12 +2473,6 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 		return false;
 	}
 
-	// Can only buy if the player does not already have full ammo
-	if (player->m_rgAmmo[ nAmmo ] >= weapon->iMaxAmmo1())
-	{
-		return false;
-	}
-
 	switch (weapon->m_iId)
 	{
 	case WEAPON_AWP:
@@ -2536,6 +2531,13 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 		break;
 	default:
 		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
+		return false;
+	}
+
+	// Can only buy if the player does not already have full ammo
+	int iMax = weapon->iMaxAmmo1();
+	if (player->m_rgAmmo[nAmmo] >= g_pModRunning->ComputeMaxAmmo(player, classname, iMax))
+	{
 		return false;
 	}
 

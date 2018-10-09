@@ -957,7 +957,7 @@ public:
 		// look through the loaded sprite name list for SpriteName
 		for ( int i = 0; i < m_iSpriteCount; i++ )
 		{
-			if ( strncmp( SpriteName, m_rgszSpriteNames + (i * MAX_SPRITE_NAME_LENGTH), MAX_SPRITE_NAME_LENGTH ) == 0 )
+			if ( strnicmp( SpriteName, m_rgszSpriteNames + (i * MAX_SPRITE_NAME_LENGTH), MAX_SPRITE_NAME_LENGTH ) == 0 )
 				return i;
 		}
 

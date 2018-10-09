@@ -186,7 +186,7 @@ void LinkUserMessages()
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
 }
 
-void WriteWeaponInfo(const ItemInfo &II)
+/*void WriteWeaponInfo(const ItemInfo &II)
 {
 	const char *pszName;
 	if (!II.pszName)
@@ -205,11 +205,35 @@ void WriteWeaponInfo(const ItemInfo &II)
 	WRITE_BYTE(II.iId);
 	WRITE_BYTE(II.iFlags);
 	MESSAGE_END();
+}*/
+
+void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II)
+{
+	const char *pszName;
+	if (!II.pszName)
+		pszName = "Empty";
+	else
+		pszName = II.pszName;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList, NULL, pPlayer->pev);
+	WRITE_STRING(pszName);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
+	WRITE_BYTE(II.iMaxAmmo1);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
+	WRITE_BYTE(II.iMaxAmmo2);
+	WRITE_BYTE(II.iSlot);
+	WRITE_BYTE(II.iPosition);
+	WRITE_BYTE(II.iId);
+	WRITE_BYTE(II.iFlags);
+	MESSAGE_END();
 }
 
 void WriteSigonMessages()
 {
-	for (int i = 0; i < MAX_WEAPONS; ++i)
+	// No need for this
+	// WeaponList will be sent when player pick up weapon.
+
+	/*for (int i = 0; i < MAX_WEAPONS; ++i)
 	{
 		ItemInfo &II = CBasePlayerItem::ItemInfoArray[i];
 
@@ -217,7 +241,7 @@ void WriteSigonMessages()
 			continue;
 
 		WriteWeaponInfo(II);
-	}
+	}*/
 }
 
 void SendItemStatus(CBasePlayer *pPlayer)
