@@ -101,7 +101,7 @@ void LinkUserMessages()
 	if (gmsgCurWeapon)
 		return;
 
-	gmsgCurWeapon = REG_USER_MSG("CurWeapon", 3);
+	gmsgCurWeapon = REG_USER_MSG("CurWeapon", -1); // 3
 	gmsgGeigerRange = REG_USER_MSG("Geiger", 1);
 	gmsgFlashlight = REG_USER_MSG("Flashlight", 2);
 	gmsgFlashBattery = REG_USER_MSG("FlashBat", 1);
@@ -134,7 +134,7 @@ void LinkUserMessages()
 	gmsgShowMenu = REG_USER_MSG("ShowMenu", -1);
 	gmsgShake = REG_USER_MSG("ScreenShake", 6);
 	gmsgFade = REG_USER_MSG("ScreenFade", 10);
-	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
+	gmsgAmmoX = REG_USER_MSG("AmmoX", -1); // 2
 	gmsgSendAudio = REG_USER_MSG("SendAudio", -1);
 	gmsgRoundTime = REG_USER_MSG("RoundTime", 2);
 	gmsgMoney = REG_USER_MSG("Money", 5);
