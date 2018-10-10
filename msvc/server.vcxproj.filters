@@ -541,6 +541,9 @@
     <ClCompile Include="..\dlls\weapons_data.cpp">
       <Filter>dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\weapons_msg.cpp">
+      <Filter>dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1141,6 +1144,9 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_data.h">
+      <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_msg.h">
       <Filter>dlls</Filter>
     </ClInclude>
   </ItemGroup>

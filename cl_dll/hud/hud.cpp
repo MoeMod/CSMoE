@@ -38,6 +38,7 @@
 
 #include "camera.h"
 
+#include "cs_wpn/bte_weapons.h"
 
 extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes, int iCount);
 
@@ -263,6 +264,8 @@ void CHud :: Init( void )
 	m_HeadName.Init();
 
 	InitRain();
+
+	BTEClientWeapons().Init();
 
 	//ServersInit();
 

@@ -1269,6 +1269,7 @@ void CBasePlayer::GiveDefaultItems()
 			break;
 		}
 		GiveNamedItem("weapon_ak47l");
+		GiveNamedItem("weapon_deagled");
 	}
 }
 

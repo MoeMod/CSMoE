@@ -35,6 +35,7 @@
 #include "weapons_const.h"
 #include "weapons_buy.h"
 #include "weapons_data.h"
+#include "weapons_msg.h"
 #include "player/player_knockback.h"
 
 class CBasePlayer;
@@ -355,7 +356,11 @@ public:
 	virtual BOOL CanDeploy();
 	virtual BOOL IsWeapon() { return TRUE; }
 	virtual void Holster(int skiplocal = 0);
+#ifdef CLIENT_DLL
 	virtual void UpdateItemInfo() {};
+#else
+	virtual void UpdateItemInfo();
+#endif
 	virtual void ItemPostFrame();
 #ifdef CLIENT_DLL
 	int PrimaryAmmoIndex(void) { return -1; }

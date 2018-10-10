@@ -22,6 +22,7 @@
     <ClCompile Include="..\cl_dll\calcscreen.cpp" />
     <ClCompile Include="..\cl_dll\cdll_int.cpp" />
     <ClCompile Include="..\cl_dll\com_weapons.cpp" />
+    <ClCompile Include="..\cl_dll\cs_wpn\bte_weapons.cpp" />
     <ClCompile Include="..\cl_dll\cs_wpn\cs_baseentity.cpp" />
     <ClCompile Include="..\cl_dll\cs_wpn\cs_objects.cpp" />
     <ClCompile Include="..\cl_dll\cs_wpn\cs_weapons.cpp" />
@@ -115,10 +116,12 @@
     <ClCompile Include="..\cl_dll\view.cpp" />
     <ClCompile Include="..\common\interface.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_famas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_fiveseven.cpp" />
@@ -150,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\cl_dll\calcscreen.h" />
+    <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
@@ -165,12 +169,13 @@
     <ClInclude Include="..\common\event_api.h" />
     <ClInclude Include="..\common\mathlib.h" />
     <ClInclude Include="..\common\render_api.h" />
-    <ClInclude Include="..\dlls\wpn_shared.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_famas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_fiveseven.h" />

@@ -49,7 +49,7 @@ void CDeagleD::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_deagled");
 
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_DEAGLE;
 	SET_MODEL(ENT(pev), "models/w_ddeagle.mdl");
 
 	m_iDefaultAmmo = DEAGLED_MAXCLIP;
@@ -81,7 +81,7 @@ int CDeagleD::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = DEAGLED_MAXCLIP;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_DEAGLE;
 	p->iFlags = 0;
 	p->iWeight = DEAGLE_WEIGHT;
 

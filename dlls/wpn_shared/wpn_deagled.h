@@ -1,5 +1,5 @@
-#ifndef WPN_ELITE_H
-#define WPN_ELITE_H
+#ifndef WPN_DEAGLED_H
+#define WPN_DEAGLED_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -29,7 +29,9 @@ public:
 	KnockbackData GetKnockBackData() override { return { 3000.0f, 500.0f, 1200.0f, 800.0f, 0.3f }; }
 	float GetArmorRatioModifier() override { return 1.5; }
 	const char *GetCSModelName() override { return "models/w_ddeagle.mdl"; }
+#ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() { return ::GetBuyAmmoConfig(WEAPON_DEAGLE); }
+#endif
 
 public:
 	void ELITEFire(float flSpread, float flCycleTime, BOOL fUseSemi);

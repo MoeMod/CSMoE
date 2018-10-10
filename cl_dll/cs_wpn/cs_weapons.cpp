@@ -47,6 +47,8 @@ extern "C"
 
 #include "wpn_shared.h"
 
+#include "bte_weapons.h"
+
 #include "minmax.h"
 
 extern globalvars_t *gpGlobals;
@@ -67,7 +69,8 @@ static CBasePlayer	player;
 // Local version of game .dll global variables ( time, etc. )
 static globalvars_t	Globals = { };
 
-static CBasePlayerWeapon *g_pWpns[ MAX_WEAPONS ];
+// ref from bte_weapons.cpp
+CBasePlayerWeapon *g_pWpns[ MAX_WEAPONS ];
 
 
 // CS Weapon placeholder entities
@@ -923,6 +926,8 @@ void HUD_InitClientWeapons( void )
 	HUD_PrepEntity( &g_AK47, &player);
 	HUD_PrepEntity( &g_Knife, &player);
 	HUD_PrepEntity( &g_P90, &player );
+
+	BTEClientWeapons().PrepEntity(&player);
 }
 
 
@@ -1158,6 +1163,11 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 			gEngfuncs.Con_Printf("VALVEWHY: Unknown Weapon %i is active.\n", from->client.m_iId );
 			break;*/
 	}
+
+	// if we have BTE weapon entity, use it.
+	CBasePlayerWeapon *pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+	if (pActiveBTEWeapon)
+		pWeapon = pActiveBTEWeapon;
 
 	// Store pointer to our destination entity_state_t so we can get our origin, etc. from it
 	//  for setting up events on the client

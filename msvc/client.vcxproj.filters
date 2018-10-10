@@ -423,6 +423,15 @@
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\cs_wpn\bte_weapons.cpp">
+      <Filter>cl_dll\cs_wpn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -569,9 +578,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared.h">
-      <Filter>dlls</Filter>
-    </ClInclude>
     <ClInclude Include="..\cl_dll\hud\followicon.h">
       <Filter>cl_dll\hud</Filter>
     </ClInclude>
@@ -592,6 +598,15 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h">
       <Filter>cl_dll\hud\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h">
+      <Filter>cl_dll\cs_wpn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
