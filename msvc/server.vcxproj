@@ -335,7 +335,7 @@
     <ClCompile Include="..\dlls\vehicle.cpp" />
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapons_buy.cpp" />
-    <ClCompile Include="..\dlls\weapons_model.cpp" />
+    <ClCompile Include="..\dlls\weapons_data.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
@@ -371,6 +371,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -678,10 +679,9 @@
     <ClInclude Include="..\dlls\vector.h" />
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
-    <ClInclude Include="..\dlls\weapons_ammo.h" />
     <ClInclude Include="..\dlls\weapons_const.h" />
     <ClInclude Include="..\dlls\weapons_buy.h" />
-    <ClInclude Include="..\dlls\weapons_model.h" />
+    <ClInclude Include="..\dlls\weapons_data.h" />
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
@@ -692,6 +692,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_famas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_fiveseven.h" />

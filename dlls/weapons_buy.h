@@ -173,6 +173,12 @@ struct WeaponInfoStruct
 	char *entityName;
 };
 
+struct WeaponBuyAmmoConfig
+{
+	const char *classname;
+	int cost;
+};
+
 extern AutoBuyInfoStruct g_autoBuyInfo[35];
 
 // WeaponType

@@ -64,7 +64,7 @@ int CGalil::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556Nato";
-	p->iMaxAmmo1 = _556NATO_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_556NATO;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = GALIL_MAX_CLIP;

@@ -64,7 +64,7 @@ int CTMP::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "9mm";
-	p->iMaxAmmo1 = _9MM_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_9MM;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = TMP_MAX_CLIP;

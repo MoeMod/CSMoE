@@ -4,8 +4,6 @@
 #pragma once
 #endif
 
-#include "wpn_ak47.h"
-
 class CAK47_Long : public CBasePlayerWeapon
 {
 public:
@@ -13,7 +11,7 @@ public:
 	virtual void Precache();
 	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL Deploy();
-	virtual float GetMaxSpeed() { return AK47_MAX_SPEED; }
+	virtual float GetMaxSpeed() { return 221; }
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
 	virtual void PrimaryAttack();
 	virtual void SecondaryAttack();

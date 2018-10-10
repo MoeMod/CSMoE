@@ -36,6 +36,7 @@
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
     <ClCompile Include="..\cl_dll\events\event_decal_reset.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_left.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_right.cpp" />

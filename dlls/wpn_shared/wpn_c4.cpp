@@ -75,7 +75,7 @@ int CC4::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "C4";
-	p->iMaxAmmo1 = C4_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_C4;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = WEAPON_NOCLIP;

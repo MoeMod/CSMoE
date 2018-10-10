@@ -68,7 +68,7 @@ int CDEAGLE::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "50AE";
-	p->iMaxAmmo1 = _50AE_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_50AE;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = DEAGLE_MAX_CLIP;

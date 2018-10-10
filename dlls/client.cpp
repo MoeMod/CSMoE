@@ -68,6 +68,8 @@
 #include "gamemode/mods.h"
 #include "player/player_model.h"
 
+#include <tuple>
+
 /*
 * Globals initialization
 */
@@ -2458,9 +2460,6 @@ void Radio3(CBasePlayer *player, int slot)
 
 bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 {
-	int cost;
-	const char *classname;
-
 	if (!player->CanPlayerBuy(true))
 	{
 		return false;
@@ -2473,63 +2472,12 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 		return false;
 	}
 
-	switch (weapon->m_iId)
+	WeaponBuyAmmoConfig config = weapon->GetBuyAmmoConfig();
+	int cost = config.cost;
+	const char *classname = config.classname;
+
+	if (!classname)
 	{
-	case WEAPON_AWP:
-		cost = AMMO_338MAG_PRICE;
-		classname = "ammo_338magnum";
-		break;
-	case WEAPON_SCOUT:
-	case WEAPON_G3SG1:
-	case WEAPON_AK47:
-		cost = AMMO_762MM_PRICE;
-		classname = "ammo_762nato";
-		break;
-	case WEAPON_XM1014:
-	case WEAPON_M3:
-		cost = AMMO_BUCKSHOT_PRICE;
-		classname = "ammo_buckshot";
-		break;
-	case WEAPON_MAC10:
-	case WEAPON_UMP45:
-	case WEAPON_USP:
-		cost = AMMO_45ACP_PRICE;
-		classname = "ammo_45acp";
-		break;
-	case WEAPON_M249:
-		cost = AMMO_556MM_PRICE;
-		classname = "ammo_556natobox";
-		break;
-	case WEAPON_FIVESEVEN:
-	case WEAPON_P90:
-		cost = AMMO_57MM_PRICE;
-		classname = "ammo_57mm";
-		break;
-	case WEAPON_ELITE:
-	case WEAPON_GLOCK18:
-	case WEAPON_MP5N:
-	case WEAPON_TMP:
-		cost = AMMO_9MM_PRICE;
-		classname = "ammo_9mm";
-		break;
-	case WEAPON_DEAGLE:
-		cost = AMMO_50AE_PRICE;
-		classname = "ammo_50ae";
-		break;
-	case WEAPON_P228:
-		cost = AMMO_357SIG_PRICE;
-		classname = "ammo_357sig";
-		break;
-	case WEAPON_AUG:
-	case WEAPON_SG550:
-	case WEAPON_GALIL:
-	case WEAPON_FAMAS:
-	case WEAPON_M4A1:
-	case WEAPON_SG552:
-		cost = AMMO_556MM_PRICE;
-		classname = "ammo_556nato";
-		break;
-	default:
 		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
 		return false;
 	}

@@ -998,31 +998,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		if (pAttack->m_pActiveItem)
 		{
-			iGunType = pAttack->m_pActiveItem->m_iId;
+			// moved to weapons_data.cpp
 			flRatio += flShieldRatio;
-
-			switch (iGunType)
-			{
-			case WEAPON_AUG:
-			case WEAPON_M4A1:	flRatio *= 1.4; break;
-			case WEAPON_AWP:	flRatio *= 1.95; break;
-			case WEAPON_G3SG1:	flRatio *= 1.65; break;
-			case WEAPON_SG550:	flRatio *= 1.45; break;
-			case WEAPON_M249:	flRatio *= 1.5; break;
-			case WEAPON_ELITE:	flRatio *= 1.05; break;
-			case WEAPON_DEAGLE:	flRatio *= 1.5; break;
-			case WEAPON_GLOCK18:	flRatio *= 1.05; break;
-			case WEAPON_FIVESEVEN:
-			case WEAPON_P90:	flRatio *= 1.5; break;
-			case WEAPON_MAC10:	flRatio *= 0.95; break;
-			case WEAPON_P228:	flRatio *= 1.25; break;
-			case WEAPON_SCOUT:
-			case WEAPON_KNIFE:	flRatio *= 1.7; break;
-			case WEAPON_FAMAS:
-			case WEAPON_SG552:	flRatio *= 1.4; break;
-			case WEAPON_GALIL:
-			case WEAPON_AK47:	flRatio *= 1.55; break;
-			}
+			flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
 		}
 
 		if (m_bIsZombie) // Zombie Knockback...
@@ -6065,7 +6043,9 @@ void CBasePlayer::SendAmmoUpdate()
 			// send "Ammo" update message
 			MESSAGE_BEGIN(MSG_ONE, gmsgAmmoX, NULL, pev);
 				WRITE_BYTE(i);
-				WRITE_BYTE(Q_max(Q_min(m_rgAmmo[i], 254), 0)); // clamp the value to one byte
+				//WRITE_BYTE(Q_max(Q_min(m_rgAmmo[i], 254), 0)); // clamp the value to one byte
+				// fuck 256 limit
+				WRITE_SHORT(Q_max(Q_min(m_rgAmmo[i], 65534), 0)); // clamp the value to one byte
 			MESSAGE_END();
 		}
 	}

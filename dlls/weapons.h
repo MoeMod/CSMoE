@@ -33,9 +33,8 @@
 #endif
 
 #include "weapons_const.h"
-#include "weapons_ammo.h"
 #include "weapons_buy.h"
-#include "weapons_model.h"
+#include "weapons_data.h"
 #include "player/player_knockback.h"
 
 class CBasePlayer;
@@ -304,12 +303,16 @@ public:
 #endif
 
 public:
-	/* CSBTE Added */
+	/* CSBTE Added, in weapons_data.cpp */
 	virtual KnockbackData GetKnockBackData() { return { 0.0f, 0.0f, 0.0f ,0.0f ,0.5f }; }
 #ifdef CLIENT_DLL
+	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
+	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig() { return {}; }
 #else
+	virtual float GetArmorRatioModifier();
 	virtual const char *GetCSModelName();
+	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig();
 #endif
 
 	
@@ -332,7 +335,7 @@ public:
 
 	CBasePlayer *m_pPlayer;
 	CBasePlayerItem *m_pNext;
-	int m_iId;
+	WeaponIdType m_iId;
 };
 
 class CBasePlayerWeapon: public CBasePlayerItem

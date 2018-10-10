@@ -67,7 +67,7 @@ int CP90::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "57mm";
-	p->iMaxAmmo1 = _57MM_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_57MM;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = P90_MAX_CLIP;
