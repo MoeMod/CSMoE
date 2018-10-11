@@ -32,3 +32,4 @@
 
 #include "wpn_shared/wpn_ak47l.h"
 #include "wpn_shared/wpn_deagled.h"
+#include "wpn_shared/wpn_mp7a1d.h"

@@ -432,6 +432,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -607,6 +613,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h">
+      <Filter>cl_dll\cs_wpn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

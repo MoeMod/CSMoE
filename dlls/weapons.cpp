@@ -442,6 +442,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_galil");
 	UTIL_PrecacheOtherWeapon("weapon_famas");
 
+	UTIL_PrecacheOtherWeapon("weapon_mp7a1d");
+	UTIL_PrecacheOtherWeapon("weapon_ak47l");
+	UTIL_PrecacheOtherWeapon("weapon_deagled");
+
 	if (g_pGameRules->IsDeathmatch())
 	{
 		// container for dropped deathmatch weapons

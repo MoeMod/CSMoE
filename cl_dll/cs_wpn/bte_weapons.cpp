@@ -35,7 +35,8 @@ CBasePlayerWeapon *WeaponEntityPlaceHolderFactory() // Static
 
 const std::map<std::string, CBasePlayerWeapon *(*)()> g_WeaponEntityFindList = {
 	{ "weapon_ak47l", WeaponEntityPlaceHolderFactory<CAK47_Long> },
-	{ "weapon_deagled", WeaponEntityPlaceHolderFactory<CDeagleD> }
+	{ "weapon_deagled", WeaponEntityPlaceHolderFactory<CDeagleD> },
+	{ "weapon_mp7a1d", WeaponEntityPlaceHolderFactory<CMP7A1D> }
 };
 
 /*

@@ -64,6 +64,7 @@ enum AmmoCostType
 	AMMO_762MM_PRICE	= 80,
 	AMMO_9MM_PRICE		= 20,
 	AMMO_BUCKSHOT_PRICE	= 65,
+	AMMO_46MM_PRICE		= 20,
 };
 
 enum WeaponCostType
@@ -121,6 +122,7 @@ enum AmmoBuyAmount
 	AMMO_762NATO_BUY	= 30,
 	AMMO_9MM_BUY		= 30,
 	AMMO_BUCKSHOT_BUY	= 8,
+	AMMO_46MM_BUY = 30,
 };
 
 enum ItemCostType
