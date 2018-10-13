@@ -32,6 +32,9 @@ version.
 #include "parsemsg.h"
 #include "draw_util.h"
 #include "triangleapi.h"
+
+#include "gamemode/mods_const.h"
+
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
@@ -113,7 +116,11 @@ void CHudRadar::Reset()
 	{
 		g_PlayerExtraInfo[i].radarflashes = 0;
 
-		if( i <= MAX_HOSTAGES ) g_HostageInfo[i].radarflashes = 0;
+		if (i <= MAX_HOSTAGES)
+		{
+			g_HostageInfo[i].radarflashes = 0;
+			g_HostageInfo[i].dead = true;
+		}
 	}
 }
 
@@ -197,6 +204,7 @@ int CHudRadar::VidInit(void)
 	m_hRadarOpaque.SetSpriteByName( "radaropaque" );
 	m_hRadarBombTarget[0].SetSpriteByName("radar_a");
 	m_hRadarBombTarget[1].SetSpriteByName("radar_b");
+	m_hRadarSupplybox.SetSpriteByName("radar_item");
 	iMaxRadius = (m_hRadar.rect.right - m_hRadar.rect.left) / 2.0f;
 	return 1;
 }
@@ -366,21 +374,39 @@ int CHudRadar::Draw(float flTime)
 	else if( g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT )
 	{
 		// draw hostages for CT
-		for( int i = 0; i < MAX_HOSTAGES; i++ )
+		if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
 		{
-			if( !HostageFlashTime( flTime, g_HostageInfo + i ) )
+			for (int i = 0; i < MAX_HOSTAGES; i++)
 			{
-				continue;
+				if (!g_HostageInfo[i].dead)
+				{
+					Vector pos = WorldToRadar(gHUD.m_vecOrigin, g_HostageInfo[i].origin, gHUD.m_vecAngles);
+					// supply box
+					SPR_Set(m_hRadarSupplybox.spr, 200, 200, 200);
+					float x = iMaxRadius + pos.x - (m_hRadarSupplybox.rect.right - m_hRadarSupplybox.rect.left) / 2.0f, y = iMaxRadius + pos.y - (m_hRadarSupplybox.rect.bottom - m_hRadarSupplybox.rect.top) / 2.0f;
+					SPR_DrawAdditive(0, x, y, &m_hRadarSupplybox.rect);
+				}
 			}
+		}
+		else
+		{
+			for (int i = 0; i < MAX_HOSTAGES; i++)
+			{
+				if (!HostageFlashTime(flTime, g_HostageInfo + i))
+				{
+					continue;
+				}
 
-			Vector pos = WorldToRadar(gHUD.m_vecOrigin, g_HostageInfo[i].origin, gHUD.m_vecAngles);
-			if( g_HostageInfo[i].dead )
-			{
-				DrawZAxis( pos, 255, 0, 0, 255 );
-			}
-			else
-			{
-				DrawZAxis( pos, 4, 25, 110, 255 );
+				Vector pos = WorldToRadar(gHUD.m_vecOrigin, g_HostageInfo[i].origin, gHUD.m_vecAngles);
+
+				if (g_HostageInfo[i].dead)
+				{
+					DrawZAxis(pos, 255, 0, 0, 255);
+				}
+				else
+				{
+					DrawZAxis(pos, 4, 25, 110, 255);
+				}
 			}
 		}
 	}

@@ -6451,7 +6451,7 @@ void CBasePlayer::UpdateClientData()
 					continue;
 
 				//if (pPlayer->m_iTeam == m_iTeam)
-				if (g_pGameRules->PlayerRelationship(this, pPlayer) == GR_ENEMY)
+				if (g_pGameRules->PlayerRelationship(this, pPlayer) == GR_TEAMMATE)
 				{
 					MESSAGE_BEGIN(MSG_ONE, gmsgRadar, NULL, pPlayer->pev);
 						WRITE_BYTE(entindex());

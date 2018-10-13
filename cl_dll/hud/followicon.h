@@ -28,5 +28,6 @@ public:
 public:
 	int m_iBombTargetsNum;
 	int m_iBombAB[2];
+	int m_iSupplybox;
 	Vector m_vecBombTargets[2];
 };

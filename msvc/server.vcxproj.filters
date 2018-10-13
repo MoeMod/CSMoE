@@ -59,6 +59,9 @@
     <Filter Include="dlls\gamemode\zbs">
       <UniqueIdentifier>{72f0b1e9-cfa5-40ae-8419-70f0922f6c00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\gamemode\zb2">
+      <UniqueIdentifier>{b71978a8-5a8e-4cfb-9ca0-e027dc3ddd97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -546,6 +549,12 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_zb2.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp">
+      <Filter>dlls\gamemode\zb2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1154,6 +1163,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_zb2.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h">
+      <Filter>dlls\gamemode\zb2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

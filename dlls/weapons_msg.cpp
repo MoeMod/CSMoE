@@ -8,7 +8,7 @@
 void CBasePlayerWeapon::UpdateItemInfo()
 {
 	CBasePlayer *player = m_pPlayer;
-	if (player->m_pActiveItem == this)
+	if (player && player->m_pActiveItem == this)
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgBTEWeapon, NULL, player->pev);
 		WRITE_BYTE(BTE_Weapon_Active); // type, reserved.

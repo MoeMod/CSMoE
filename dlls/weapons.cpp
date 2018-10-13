@@ -443,6 +443,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_famas");
 
 	UTIL_PrecacheOtherWeapon("weapon_mp7a1d");
+	UTIL_PrecacheOther("ammo_46mm");
 	UTIL_PrecacheOtherWeapon("weapon_ak47l");
 	UTIL_PrecacheOtherWeapon("weapon_deagled");
 

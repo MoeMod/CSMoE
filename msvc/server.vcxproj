@@ -238,7 +238,9 @@
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_zb2.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp" />
     <ClCompile Include="..\dlls\gamerules.cpp" />
@@ -620,7 +622,9 @@
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_zb2.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zbs.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\zs_subs.h" />

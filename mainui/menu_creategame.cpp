@@ -88,12 +88,12 @@ typedef struct
 
 static uiCreateGame_t	uiCreateGame;
 
-#define MAX_GAMEMODES 5
+#define MAX_GAMEMODES 6
 static const char *g_szGameModeNames[MAX_GAMEMODES] = {
-	"Original", "DeathMatch", "TeamDeathMatch", "ZombieMod 1", "ZombieScenario"
+	"Original", "DeathMatch", "TeamDeathMatch", "ZombieMod 1", "ZombieMod 2", "ZombieScenario"
 };
 static const char *g_szGameModeCodes[MAX_GAMEMODES] = {
-	"none", "dm", "tdm", "zb1", "zbs"
+	"none", "dm", "tdm", "zb1", "zb2", "zbs"
 };
 
 /*
