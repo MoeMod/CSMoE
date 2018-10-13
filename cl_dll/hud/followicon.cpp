@@ -75,10 +75,10 @@ int CHudFollowIcon::Draw(float time)
 					DrawUtils::Draw2DQuad(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];
-					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length()));
+					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length()) / 42.0f);
 
 					int textlen = DrawUtils::HudStringLen(szBuffer);
-					DrawUtils::DrawHudString(xyScreen[0] - textlen * 0.5f, xyScreen[1] + 30, gHUD.m_scrinfo.iWidth, szBuffer, 150, 150, 250);
+					DrawUtils::DrawHudString(xyScreen[0] - textlen * 0.5f, xyScreen[1] + 30, gHUD.m_scrinfo.iWidth, szBuffer, 250, 250, 250);
 				}
 
 			}
