@@ -164,7 +164,9 @@ extern DLL_GLOBAL const Vector g_vecZero;
 #define CHECK_TRIVIALLYDESTRUCTIBLE(T) static_assert(std::is_trivially_destructible<T>::value, #T " should be TriviallyDestructible.")
 
 #ifdef CLIENT_DLL
-#define LINK_ENTITY_TO_CLASS( x, y )
+#include "cs_wpn/bte_weapons.h"
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	static CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); 
 #elif defined(_WIN32)
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
 	CHECK_TRIVIALLYDESTRUCTIBLE(DLLClassName);\

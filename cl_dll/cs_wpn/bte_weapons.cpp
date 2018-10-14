@@ -19,25 +19,11 @@
 /*
 	Weapon Registers
 */
-template<class T>
-CBasePlayerWeapon *WeaponEntityPlaceHolderFactory() // Static
+class CBTEClientWeapons::WeaponEntityFindList_t : public std::map<std::string, CBasePlayerWeapon *(*)()> {} CBTEClientWeapons::staticWeaponEntityFindList;
+void CBTEClientWeapons::AddToFindList(const char *name, CBasePlayerWeapon *(*pfn)())
 {
-	static T w;
-	static entvars_t ev;
-
-	CBasePlayerWeapon *pEntity = &w;
-	pEntity->pev = &ev;
-	pEntity->Precache();
-	pEntity->Spawn();
-
-	return pEntity;
+	staticWeaponEntityFindList.emplace(name, pfn);
 }
-
-const std::map<std::string, CBasePlayerWeapon *(*)()> g_WeaponEntityFindList = {
-	{ "weapon_ak47l", WeaponEntityPlaceHolderFactory<CAK47_Long> },
-	{ "weapon_deagled", WeaponEntityPlaceHolderFactory<CDeagleD> },
-	{ "weapon_mp7a1d", WeaponEntityPlaceHolderFactory<CMP7A1D> }
-};
 
 /*
 	Entity Pools
@@ -50,7 +36,7 @@ extern CBasePlayerWeapon *g_pWpns[MAX_WEAPONS]; // cs_weapons.cpp
 
 void CBTEClientWeapons::PrepEntity(CBasePlayer *pWeaponOwner)
 {
-	for (auto &kv : g_WeaponEntityFindList)
+	for (auto &kv : staticWeaponEntityFindList)
 	{
 		CBasePlayerWeapon *pEntity = kv.second();
 
@@ -66,8 +52,8 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 {
 	m_pActiveWeapon = nullptr;
 
-	auto iter = g_WeaponEntityFindList.find({ name });
-	if (iter != g_WeaponEntityFindList.end())
+	auto iter = staticWeaponEntityFindList.find({ name });
+	if (iter != staticWeaponEntityFindList.end())
 	{
 		m_pActiveWeapon = iter->second();
 
@@ -75,6 +61,10 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 		memset(&info, 0, sizeof(ItemInfo));
 		m_pActiveWeapon->GetItemInfo(&info);
 		g_pWpns[info.iId] = m_pActiveWeapon;
+	}
+	else
+	{
+		gEngfuncs.Con_Printf("BTE Weapon Client Predict: Unknown Weapon %s is active.\n", name);
 	}
 	
 }
