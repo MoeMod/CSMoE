@@ -16,7 +16,7 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 * [ ] HUD : Respawn Bar
 * [x] GameMode : Zombie Mod 1
 * [ ] Zombie classes, skills
-* [ ] SupplyBox : CV47-60R, Dual MP7A1, Dual Deagle Camo
+* [x] SupplyBox : CV47-60R, Dual MP7A1, Dual Deagle Camo
 * [ ] Zombie evolution
 * [ ] GameMode : Zombie Mod 2
 * [ ] GameMode : Zombie United
@@ -87,6 +87,11 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 5. launch iTunes and select the CSBTE-Mobile APP in file sharing
 6. drag csbtem, cstrike, valve into iTunes
 7. run the CSBTE-Mobile app on the SpringBoard
+### macOS
+1. download ***-macos-x64 and ***-GameDir and extract them together
+2. purchase and download Counter-Strike on Steam
+3. copy cstrike and valve directory to where the csbtem locates
+4. run csbtem_macos.sh with Terminal
 
 ## Known BUGs
 * iOS : Due to lack of return button, you can't exit console after entered.
