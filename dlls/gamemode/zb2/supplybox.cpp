@@ -15,6 +15,8 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 			p->AddAccount(16000);
 			BuyItem(p, MENU_SLOT_ITEM_NVG);
 			p->AddAccount(16000);
+			p->m_bNightVisionOn = false;
+			p->ClientCommand("nightvision");
 		}
 	},
 	{ "Grenades, Ammo Set", [](CBasePlayer *p) {

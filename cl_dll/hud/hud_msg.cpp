@@ -146,9 +146,17 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		m_Scoreboard.m_bIsTeamplay = false;
 		break;
 	}
-	case MOD_ZB1:
-	case MOD_ZB2:
+	
 	case MOD_ZB3:
+	{
+		// dont break, continue to ZB2...
+	}
+	case MOD_ZB2:
+	{
+		gHUD.m_ZB2.m_iFlags |= HUD_ACTIVE;
+		// dont break, continue to ZB1...
+	}
+	case MOD_ZB1:
 	{
 		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_ZB;
 		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_HM;

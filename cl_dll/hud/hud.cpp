@@ -261,6 +261,7 @@ void CHud :: Init( void )
 	m_Menu.Init();
 	m_Scoreboard.Init();
 	m_ZBS.Init();
+	m_ZB2.Init();
 	m_HeadName.Init();
 
 	InitRain();

@@ -689,11 +689,14 @@ public:
 	void HumanLevel_Reset();
 	void HumanLevel_UpdateHUD();
 
+	void Zombie_HealthRecoveryThink();
+
 public:
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
+	float m_flTimeNextZombieHealthRecovery;
 
 	HumanLevelStruct m_iHumanLevel;
 };

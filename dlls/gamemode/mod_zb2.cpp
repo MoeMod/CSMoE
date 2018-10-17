@@ -39,6 +39,12 @@ void CMod_ZombieMod2::Think()
 	return CMod_Zombi::Think();
 }
 
+void CMod_ZombieMod2::PlayerThink(CBasePlayer *pPlayer)
+{
+	pPlayer->Zombie_HealthRecoveryThink();
+	return CMod_Zombi::PlayerThink(pPlayer);
+}
+
 void CMod_ZombieMod2::RestartRound()
 {
 	RemoveAllSupplybox();

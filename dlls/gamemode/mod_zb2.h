@@ -18,6 +18,7 @@ public:
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void Think() override;
+	void PlayerThink(CBasePlayer *pPlayer) override;
 
 protected:
 	void MakeSupplyboxThink();

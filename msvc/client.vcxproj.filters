@@ -37,6 +37,15 @@
     <Filter Include="cl_dll\hud\zbs">
       <UniqueIdentifier>{9718376f-9be6-4149-90e0-74ecacbe3f55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\hud\zb2">
+      <UniqueIdentifier>{d9c65c73-59d9-44c6-8962-22c76159f6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dlls\gamemode">
+      <UniqueIdentifier>{d8e590bf-41b8-4fb7-9af3-499fd59690a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dlls\gamemode\zb2">
+      <UniqueIdentifier>{bfe516c8-2205-4872-a2be-cd1c32c09097}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -438,6 +447,12 @@
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zb2\zb2_skill.cpp">
+      <Filter>cl_dll\hud\zb2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zb2\zb2.cpp">
+      <Filter>cl_dll\hud\zb2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -619,6 +634,15 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h">
       <Filter>cl_dll\cs_wpn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zb2\zb2.h">
+      <Filter>cl_dll\hud\zb2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zb2\zb2_skill.h">
+      <Filter>cl_dll\hud\zb2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h">
+      <Filter>dlls\gamemode\zb2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

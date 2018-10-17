@@ -25,6 +25,7 @@
 #define RGB_REDISH 0x00FF1010 //255,16,16
 #define RGB_GREENISH 0x0000A000 //0,160,0
 #define RGB_WHITE 0x00FFFFFF
+#define RGB_LIGHTBLUE 0x0072C5FF //114, 197, 255
 
 #include <assert.h>
 #include <string.h>
@@ -119,7 +120,7 @@ struct HUDLIST {
 #include "hud_spectator.h"
 #include "followicon.h"
 #include "zbs/zbs.h"
-
+#include "zb2/zb2.h"
 
 //
 //-----------------------------------------------------
@@ -1047,6 +1048,7 @@ public:
 	
 	CHudHeadName	m_HeadName;
 	CHudZBS m_ZBS;
+	CHudZB2 m_ZB2;
 
 	// user messages
 	CHudMsgFunc(Damage);

@@ -105,6 +105,12 @@ inline char* BufferReader::Read( void )
 }
 
 template<>
+inline const char * BufferReader::Read(void)
+{
+	return Read<char *>();
+}
+
+template<>
 inline float BufferReader::Read( void )
 {
 	union

@@ -97,6 +97,8 @@
     <ClCompile Include="..\cl_dll\hud\text_message.cpp" />
     <ClCompile Include="..\cl_dll\hud\timer.cpp" />
     <ClCompile Include="..\cl_dll\hud\train.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb2\zb2.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb2\zb2_skill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
@@ -158,6 +160,8 @@
     <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h" />
     <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
+    <ClInclude Include="..\cl_dll\hud\zb2\zb2.h" />
+    <ClInclude Include="..\cl_dll\hud\zb2\zb2_skill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
@@ -172,6 +176,7 @@
     <ClInclude Include="..\common\event_api.h" />
     <ClInclude Include="..\common\mathlib.h" />
     <ClInclude Include="..\common\render_api.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />

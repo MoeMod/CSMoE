@@ -5,6 +5,8 @@
 #include "gamerules.h"
 #include "client.h"
 
+#include "gamemode/zb2/zb2_const.h"
+
 void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 {
 	m_bIsZombie = true;
@@ -20,8 +22,6 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	static char szModelPath[64];
 	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
 	SetNewPlayerModel(szModelPath);
-	//this->m_modelIndexPlayer = MODEL_INDEX(szModelPath);
-	//ClientUserInfoChanged
 
 
 	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_ZOMBIE\"\n", STRING(pev->netname), GETPLAYERUSERID(edict()), GETPLAYERAUTHID(edict()));
@@ -32,11 +32,13 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	ClientCommand("nightvision");
 
 	// set default property
-	pev->health = 2000;
+	pev->health = pev->max_health = 2000;
 	pev->armortype = ARMOR_TYPE_HELMET;
 	pev->armorvalue = 200;
 	pev->gravity = 0.83f;
 	ResetMaxSpeed();
+
+	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 }
 
 void CBasePlayer::DeathSound_Zombie()
@@ -56,6 +58,9 @@ void CBasePlayer::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
 	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
 	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
 	}
+
+	// should not recover after damage taken...
+	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 }
 
 void PlayerZombie_Precache()
@@ -64,4 +69,38 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_death_2.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
+
+	PRECACHE_SOUND("zombi/zombi_heal.wav");
+}
+
+// called by CMod_ZombieMod2::PlayerThink
+void CBasePlayer::Zombie_HealthRecoveryThink()
+{
+	if (!m_bIsZombie)
+		return;
+
+	if (pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
+	{
+		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
+	}
+
+	if (gpGlobals->time > m_flTimeNextZombieHealthRecovery)
+	{
+		if (pev->max_health != pev->health)
+		{
+			float flRecoverValue = (m_iZombieLevel == ZOMBIE_LEVEL_HOST) ? 200.0f : 500.0f;
+
+			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 1.0f;
+			pev->health = std::min(pev->max_health, pev->health + flRecoverValue);
+
+			// effects
+			CLIENT_COMMAND(this->edict(), "spk zombi/zombi_heal.wav\n");
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
+			WRITE_BYTE(ZB2_MESSAGE_HEALTH_RECOVERY);
+			MESSAGE_END();
+		}
+		
+		
+	}
 }

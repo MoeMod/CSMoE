@@ -1170,5 +1170,8 @@
     <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h">
+      <Filter>dlls\gamemode\zb2</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

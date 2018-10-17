@@ -89,6 +89,7 @@ extern int gmsgShowTimer;
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;
 extern int gmsgBTEWeapon;
+extern int gmsgZB2Msg;
 
 void LinkUserMessages();
 void WriteSigonMessages();
