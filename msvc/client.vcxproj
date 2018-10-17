@@ -89,6 +89,7 @@
     <ClCompile Include="..\cl_dll\hud\radar.cpp" />
     <ClCompile Include="..\cl_dll\hud\radio.cpp" />
     <ClCompile Include="..\cl_dll\hud\saytext.cpp" />
+    <ClCompile Include="..\cl_dll\hud\scenariostatus.cpp" />
     <ClCompile Include="..\cl_dll\hud\scoreboard.cpp" />
     <ClCompile Include="..\cl_dll\hud\sniperscope.cpp" />
     <ClCompile Include="..\cl_dll\hud\spectator_gui.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h" />
     <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
+    <ClInclude Include="..\cl_dll\hud\scenariostatus.h" />
     <ClInclude Include="..\cl_dll\hud\zb2\zb2.h" />
     <ClInclude Include="..\cl_dll\hud\zb2\zb2_skill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />

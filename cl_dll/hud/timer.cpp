@@ -50,6 +50,11 @@ int CHudTimer::Init()
 	return 1;
 }
 
+void CHudTimer::Reset(void)
+{
+	m_closestRight = ScreenWidth;
+}
+
 int CHudTimer::VidInit()
 {
 	m_HUD_timer = gHUD.GetSpriteIndex( "stopwatch" );
@@ -100,7 +105,10 @@ int CHudTimer::Draw( float fTime )
 	FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
 	FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
 
-	DrawUtils::DrawHudNumber2( x + iWatchWidth / 2, y, true, 2, seconds, r, g, b );
+	x = DrawUtils::DrawHudNumber2( x + iWatchWidth / 2, y, true, 2, seconds, r, g, b );
+
+	m_closestRight = x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 1.5;
+
 	return 1;
 }
 

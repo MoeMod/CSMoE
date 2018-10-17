@@ -453,6 +453,9 @@
     <ClCompile Include="..\cl_dll\hud\zb2\zb2.cpp">
       <Filter>cl_dll\hud\zb2</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\scenariostatus.cpp">
+      <Filter>cl_dll\hud</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -643,6 +646,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h">
       <Filter>dlls\gamemode\zb2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\scenariostatus.h">
+      <Filter>cl_dll\hud</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

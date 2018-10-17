@@ -119,6 +119,7 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "scenariostatus.h"
 #include "zbs/zbs.h"
 #include "zb2/zb2.h"
 
@@ -771,9 +772,11 @@ public:
 class CHudTimer: public CHudBase
 {
 	friend class CHudSpectatorGui;
+	friend class CHudScenarioStatus;
 public:
 	int Init( void );
 	int VidInit( void );
+	void Reset(void);
 	int Draw(float fTime);
 	// set up the timer.
 	// [short]
@@ -787,6 +790,7 @@ private:
 	float m_fStartTime;
 	bool m_bPanicColorChange;
 	float m_flPanicTime;
+	int m_closestRight;
 };
 //
 //-----------------------------------------------------
@@ -1045,6 +1049,7 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
+	CHudScenarioStatus m_scenarioStatus;
 	
 	CHudHeadName	m_HeadName;
 	CHudZBS m_ZBS;

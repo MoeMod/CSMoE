@@ -255,6 +255,7 @@ void CHud :: Init( void )
 	m_TextMessage.Init();
 	m_FollowIcon.Init();
 	m_MOTD.Init();
+	m_scenarioStatus.Init();
 
 	// all things that have own background and must be drawn last
 	m_ProgressBar.Init();
