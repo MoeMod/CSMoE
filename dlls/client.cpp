@@ -3792,6 +3792,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				player->HumanLevel_LevelUpAttack();
 			}
+			else if (FStrEq(pcmd, "zombiecrazy"))
+			{
+				if(player->m_bIsZombie)
+					player->ZombieSkill_Start();
+			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))

@@ -671,8 +671,14 @@ public:
 public:
 #ifdef CLIENT_DLL
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
+	virtual void ZombieSkill_Check() {}
+	virtual void ZombieSkill_Start() {}
+	virtual void ZombieSkill_End() {}
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
+	virtual void ZombieSkill_Check();
+	virtual void ZombieSkill_Start();
+	virtual void ZombieSkill_End();
 #endif
 
 	void DeathSound_Zombie();
@@ -697,6 +703,8 @@ public:
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
 	float m_flTimeNextZombieHealthRecovery;
+	int m_iZombieSkill;
+	float m_flTimeNextZombieSkillThink;
 
 	HumanLevelStruct m_iHumanLevel;
 };

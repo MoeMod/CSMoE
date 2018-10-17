@@ -4087,6 +4087,7 @@ void CBasePlayer::PreThink()
 	UpdateLocation();
 
 	SpawnProtection_Check();
+	ZombieSkill_Check();
 }
 
 // If player is taking time based damage, continue doing damage to player -
@@ -6526,7 +6527,10 @@ void CBasePlayer::ResetMaxSpeed()
 	}
 	else if (m_bIsZombie)
 	{
-		speed = 290;
+		if(m_iZombieSkill == 1)
+			speed = 390;
+		else
+			speed = 290;
 	}
 	else if (m_pActiveItem != NULL)
 	{
