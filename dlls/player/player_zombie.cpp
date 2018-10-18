@@ -36,6 +36,7 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	pev->armortype = ARMOR_TYPE_HELMET;
 	pev->armorvalue = 200;
 	pev->gravity = 0.83f;
+	ZombieSkill_Reset();
 	ResetMaxSpeed();
 
 	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
