@@ -34,6 +34,9 @@ void CBasePlayer::ZombieSkill_Start()
 
 	m_iZombieSkill = 1;
 	m_flTimeNextZombieSkillThink = gpGlobals->time + ZOMBIECRAZY_DURATION;
+	pev->renderfx = kRenderFxGlowShell;
+	pev->rendercolor = { 255,0,0 };
+	pev->renderamt = 1;
 	ResetMaxSpeed();
 	ClientPrint(pev, HUD_PRINTCENTER, "Skill Start.");
 	//EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM);
@@ -44,4 +47,18 @@ void CBasePlayer::ZombieSkill_End()
 	ClientPrint(pev, HUD_PRINTCENTER, "Skill End.");
 	m_iZombieSkill = 2;
 	m_flTimeNextZombieSkillThink = gpGlobals->time + ZOMBIECRAZY_COOLDOWN;
+	pev->renderfx = kRenderFxNone;
+	pev->rendercolor = { 255,255,255 };
+	pev->renderamt = 16;
+	ResetMaxSpeed();
+}
+
+void CBasePlayer::ZombieSkill_Reset()
+{
+	m_iZombieSkill = 0;
+}
+
+void ZombieSkill_Precache()
+{
+	//PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 }

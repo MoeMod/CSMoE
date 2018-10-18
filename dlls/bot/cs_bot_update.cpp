@@ -422,6 +422,15 @@ void CCSBot::Update()
 				{
 					Attack(threat);
 				}
+
+				if (m_bIsZombie)
+				{
+					const float skillUseRange = 8192.0f;
+					if ((pev->origin - threat->pev->origin).IsLengthLessThan(skillUseRange))
+					{
+						ZombieSkill_Start();
+					}
+				}
 			}
 		}
 		else

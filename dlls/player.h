@@ -674,11 +674,14 @@ public:
 	virtual void ZombieSkill_Check() {}
 	virtual void ZombieSkill_Start() {}
 	virtual void ZombieSkill_End() {}
+	virtual void ZombieSkill_Reset() {}
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
 	virtual void ZombieSkill_Check();
 	virtual void ZombieSkill_Start();
 	virtual void ZombieSkill_End();
+	virtual void ZombieSkill_Reset();
+	
 #endif
 
 	void DeathSound_Zombie();

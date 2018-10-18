@@ -67,6 +67,7 @@
 
 #include "gamemode/mods.h"
 #include "player/player_model.h"
+#include "player/player_zombie_skill.h"
 
 #include <tuple>
 
@@ -3639,18 +3640,23 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (FStrEq(pcmd, "drop"))
 			{
-				// player is dropping an item.
-				if (player->HasShield())
+				if (player->m_bIsZombie && player->m_pActiveItem != nullptr && !strcmp(STRING(player->m_pActiveItem->pev->classname), "weapon_knife_zombi"))
+					player->ZombieSkill_Start();
+				else
 				{
-					if (player->m_pActiveItem != NULL && player->m_pActiveItem->m_iId == WEAPON_C4)
+					// player is dropping an item.
+					if (player->HasShield())
 					{
-						player->DropPlayerItem("weapon_c4");
+						if (player->m_pActiveItem != NULL && player->m_pActiveItem->m_iId == WEAPON_C4)
+						{
+							player->DropPlayerItem("weapon_c4");
+						}
+						else
+							player->DropShield();
 					}
 					else
-						player->DropShield();
+						player->DropPlayerItem(CMD_ARGV_(1));
 				}
-				else
-					player->DropPlayerItem(CMD_ARGV_(1));
 			}
 			else if (FStrEq(pcmd, "fov"))
 			{
@@ -3791,11 +3797,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "zbs_atk_up"))
 			{
 				player->HumanLevel_LevelUpAttack();
-			}
-			else if (FStrEq(pcmd, "zombiecrazy"))
-			{
-				if(player->m_bIsZombie)
-					player->ZombieSkill_Start();
 			}
 			else
 			{
@@ -4159,6 +4160,7 @@ void ClientPrecache()
 
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
+	ZombieSkill_Precache();
 
 	if (g_bIsCzeroGame)
 	{

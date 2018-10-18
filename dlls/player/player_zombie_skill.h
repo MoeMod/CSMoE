@@ -7,4 +7,6 @@
 const float ZOMBIECRAZY_DURATION = 10.0f;
 const float ZOMBIECRAZY_COOLDOWN = 10.0f;
 
+void ZombieSkill_Precache();
+
 #endif
