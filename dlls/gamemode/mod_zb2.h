@@ -19,12 +19,16 @@ public:
 	void RestartRound() override;
 	void Think() override;
 	void PlayerThink(CBasePlayer *pPlayer) override;
+	BOOL ClientCommand(CBasePlayer *pPlayer, const char *pcmd) override;
 
 protected:
 	void MakeSupplyboxThink();
 	void RemoveAllSupplybox();
 	CSupplyBox *CreateSupplybox();
 	int SupplyboxCount();
+
+public:
+	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) override;
 
 protected:
 	float m_flTimeNextMakeSupplybox;

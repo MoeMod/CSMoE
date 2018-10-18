@@ -39,6 +39,7 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	ResetMaxSpeed();
 
 	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
+
 }
 
 void CBasePlayer::DeathSound_Zombie()
@@ -76,7 +77,7 @@ void PlayerZombie_Precache()
 // called by CMod_ZombieMod2::PlayerThink
 void CBasePlayer::Zombie_HealthRecoveryThink()
 {
-	if (!m_bIsZombie)
+	if (!IsAlive() || !m_bIsZombie)
 		return;
 
 	if (pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))

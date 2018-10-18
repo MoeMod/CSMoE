@@ -17,7 +17,7 @@ public:
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
 
-	int MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf);
+	CHudMsgFunc(ZB2Msg);
 
 protected:
 	class impl_t;

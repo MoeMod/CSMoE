@@ -3640,7 +3640,12 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "drop"))
 			{
 				// player is dropping an item.
-				if (player->HasShield())
+				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1"))
+				{
+					// ...
+				}
+#ifdef ENABLE_SHIELD
+				else if (player->HasShield())
 				{
 					if (player->m_pActiveItem != NULL && player->m_pActiveItem->m_iId == WEAPON_C4)
 					{
@@ -3649,6 +3654,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					else
 						player->DropShield();
 				}
+#endif
 				else
 					player->DropPlayerItem(CMD_ARGV_(1));
 			}
@@ -3791,11 +3797,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "zbs_atk_up"))
 			{
 				player->HumanLevel_LevelUpAttack();
-			}
-			else if (FStrEq(pcmd, "zombiecrazy"))
-			{
-				if(player->m_bIsZombie)
-					player->ZombieSkill_Start();
 			}
 			else
 			{

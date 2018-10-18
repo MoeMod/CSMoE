@@ -42,6 +42,7 @@ void CMod_ZombieMod2::Think()
 void CMod_ZombieMod2::PlayerThink(CBasePlayer *pPlayer)
 {
 	pPlayer->Zombie_HealthRecoveryThink();
+	pPlayer->ZombieSkill_Check();
 	return CMod_Zombi::PlayerThink(pPlayer);
 }
 
@@ -50,6 +51,17 @@ void CMod_ZombieMod2::RestartRound()
 	RemoveAllSupplybox();
 	m_flTimeNextMakeSupplybox = gpGlobals->time + RANDOM_FLOAT(30.0f, 60.0f);
 	return CMod_Zombi::RestartRound();
+}
+
+BOOL CMod_ZombieMod2::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
+{
+	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && pPlayer->m_bIsZombie)
+	{
+		pPlayer->ZombieSkill_Start();
+		return TRUE;
+	}
+
+	return CMod_Zombi::ClientCommand(pPlayer, pcmd);
 }
 
 void CMod_ZombieMod2::MakeSupplyboxThink()
@@ -142,4 +154,11 @@ CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 
 	DispatchSpawn(pent);
 	return static_cast<CSupplyBox *>(monster);
+}
+
+void CMod_ZombieMod2::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
+{
+	CMod_Zombi::MakeZombie(player, iEvolutionLevel);
+
+	player->ZombieSkill_Init();
 }

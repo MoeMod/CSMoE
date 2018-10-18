@@ -43,6 +43,8 @@ public:
 	float ReadCoord( void );
 	float ReadAngle( void );
 	float ReadHiResAngle( void );
+	bool Eof() const { return m_iRead >= m_iSize; }
+
 private:
 	const char *m_szMsgName;
 	uint8_t *m_pBuf;

@@ -125,7 +125,7 @@ void CMod_Zombi::Think()
 		else if (iCountDown == 20)
 		{
 			// select zombie
-			MakeZombieOrigin();
+			PickZombieOrigin();
 		}
 		TeamCheck();
 	}
@@ -345,7 +345,7 @@ int CMod_Zombi::ZombieOriginNum()
 	return NumAliveCT / 10 + 1;
 }
 
-void CMod_Zombi::MakeZombieOrigin()
+void CMod_Zombi::PickZombieOrigin()
 {
 	int iNumZombies = ZombieOriginNum();
 	int iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
@@ -371,7 +371,7 @@ void CMod_Zombi::MakeZombieOrigin()
 	// pick them
 	for (int i = 0; i < iNumZombies; ++i)
 	{
-		players[i]->MakeZombie(ZOMBIE_LEVEL_ORIGIN);
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		players[i]->pev->health = players[i]->pev->max_health = 1000 * iNumPlayers / iNumZombies + 1000;
 		players[i]->pev->armorvalue = 1100;
 	}
@@ -383,7 +383,7 @@ void CMod_Zombi::MakeZombieOrigin()
 
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
-	player->MakeZombie(ZOMBIE_LEVEL_HOST);
+	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 0.5f));
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f));
 
@@ -499,4 +499,9 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	
 
 	return iReturn;
+}
+
+void CMod_Zombi::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
+{
+	return player->MakeZombie(iEvolutionLevel);
 }

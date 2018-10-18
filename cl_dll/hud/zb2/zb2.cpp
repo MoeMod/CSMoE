@@ -33,8 +33,29 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	switch (type)
 	{
 	case ZB2_MESSAGE_HEALTH_RECOVERY:
+	{
 		pimpl->skill.OnHealthRecovery();
 		break;
+	}
+	case ZB2_MESSAGE_SKILL_INIT:
+	{
+		ZombieClassType zclass = static_cast<ZombieClassType>(buf.ReadByte());
+		ZombieSkillType skills[4]{};
+		for (int i = 0; i < 4 && !buf.Eof(); ++i)
+			skills[i] = static_cast<ZombieSkillType>(buf.ReadByte());
+		pimpl->skill.OnSkillInit(zclass, skills[0], skills[1], skills[2], skills[3]);
+		break;
+	}
+	case ZB2_MESSAGE_SKILL_ACTIVATE:
+	{
+		ZombieSkillType type = static_cast<ZombieSkillType>(buf.ReadByte());
+		float flHoldTime = buf.ReadShort();
+		float flFreezeTime = buf.ReadShort();
+		pimpl->skill.OnSkillActivate(type, flHoldTime, flFreezeTime);
+		break;
+	}
+		
+		
 	}
 	
 	return 1;
@@ -86,4 +107,3 @@ void CHudZB2::Shutdown(void)
 	delete pimpl;
 	pimpl = nullptr;
 }
-

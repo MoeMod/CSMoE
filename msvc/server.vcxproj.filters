@@ -556,7 +556,7 @@
     <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClCompile>
-    <ClCompile Include="player_zombie_skill.cpp">
+    <ClCompile Include="..\dlls\player\player_zombie_skill.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1176,7 +1176,7 @@
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClInclude>
-    <ClInclude Include="player_zombie_skill.h">
+    <ClInclude Include="..\dlls\player\player_zombie_skill.h">
       <Filter>dlls\player</Filter>
     </ClInclude>
   </ItemGroup>

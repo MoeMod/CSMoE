@@ -37,9 +37,10 @@ public: // IBaseMod
 
 protected:
 	virtual int ZombieOriginNum();
-	virtual void MakeZombieOrigin();
+	virtual void PickZombieOrigin();
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void RoundEndScore(int iWinStatus);
+	virtual void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel);
 
 protected:
 	void TeamCheck();

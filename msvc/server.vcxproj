@@ -320,6 +320,7 @@
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp" />
     <ClCompile Include="..\dlls\player\player_zombie.cpp" />
+    <ClCompile Include="..\dlls\player\player_zombie_skill.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />
     <ClCompile Include="..\dlls\sound.cpp" />
@@ -536,7 +537,6 @@
     <ClCompile Include="..\pm_shared\pm_shared.c" />
     <ClCompile Include="..\public\MemPool.cpp" />
     <ClCompile Include="..\public\unicode_strtools.cpp" />
-    <ClCompile Include="player_zombie_skill.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\bspfile.h" />
@@ -666,6 +666,7 @@
     <ClInclude Include="..\dlls\player\player_signal.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
     <ClInclude Include="..\dlls\player\player_zombie.h" />
+    <ClInclude Include="..\dlls\player\player_zombie_skill.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
     <ClInclude Include="..\dlls\schedule.h" />
     <ClInclude Include="..\dlls\scriptevent.h" />
@@ -776,7 +777,6 @@
     <ClInclude Include="..\public\utllinkedlist.h" />
     <ClInclude Include="..\public\utlmemory.h" />
     <ClInclude Include="..\public\utlvector.h" />
-    <ClInclude Include="player_zombie_skill.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{70A2B904-B7DB-4C48-8DE0-AF567360D572}</ProjectGuid>
