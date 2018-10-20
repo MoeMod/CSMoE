@@ -116,12 +116,10 @@ void ZombieSkill_Precache()
 
 float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	ClientPrint(pev, HUD_PRINTCONSOLE, "#1 %.2f.", std::to_string(static_cast<float>(flDamage)).c_str());
 	if (m_bIsZombie && m_iZombieSkillStatus == SKILL_STATUS_USING)
 	{
 		flDamage *= 1.6;
 	}
-	ClientPrint(pev, HUD_PRINTCONSOLE, "#2 %.2f.", std::to_string(static_cast<float>(flDamage)).c_str());
 
 	return flDamage;
 }
