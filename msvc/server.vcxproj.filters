@@ -559,6 +559,9 @@
     <ClCompile Include="..\dlls\player\player_zombie_skill.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\bot\cs_bot_bhopjump.cpp">
+      <Filter>dlls\bot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1178,6 +1181,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\player\player_zombie_skill.h">
       <Filter>dlls\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\bot\cs_bot_statemachine.h">
+      <Filter>dlls\bot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

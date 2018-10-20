@@ -715,7 +715,7 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 		CBasePlayer *enemy;
 		float range;
 	}
-	threat[ MAX_THREATS ];
+	threat[ MAX_THREATS + 1 ];
 	int threatCount = 0;
 
 	m_bomber = NULL;

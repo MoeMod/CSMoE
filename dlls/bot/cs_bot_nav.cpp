@@ -286,6 +286,11 @@ void CCSBot::MoveTowardsPosition(const Vector *pos)
 				jumped = DiscontinuityJump(ground, ONLY_JUMP_DOWN, MUST_JUMP);
 			}
 		}
+
+		if (!jumped)
+		{
+			jumped = BhopJump_Start();
+		}
 	}
 
 	// compute our current forward and lateral vectors

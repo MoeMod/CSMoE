@@ -676,7 +676,7 @@ public:
 	virtual void ZombieSkill_Start() {}
 	virtual void ZombieSkill_End() {}
 	virtual void ZombieSkill_Reset() {}
-	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) {}
+	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
 	virtual void ZombieSkill_Init();
