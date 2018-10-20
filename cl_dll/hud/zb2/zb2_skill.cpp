@@ -25,6 +25,21 @@ const char *CHudZB2_Skill::ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL] =
 	"zombicrazy2" // ZOMBIE_SKILL_CRAZY2,
 };
 
+const char *CHudZB2_Skill::ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL] =
+{
+	"", // ZOMBIE_SKILL_EMPTY
+	"", // ZOMBIE_SKILL_SPRINT
+	"", // ZOMBIE_SKILL_HEADSHOT
+	"", // ZOMBIE_SKILL_KNIFE2X
+	"resource/helperhud/evolution", // ZOMBIE_SKILL_CRAZY,
+	"resource/helperhud/hiding", // ZOMBIE_SKILL_HIDE,
+	"resource/helperhud/trap", // ZOMBIE_SKILL_TRAP,
+	"resource/helperhud/smoke", // ZOMBIE_SKILL_SMOKE,
+	"resource/helperhud/heal", // ZOMBIE_SKILL_HEAL,
+	"resource/helperhud/tentacle", // ZOMBIE_SKILL_SHOCK,
+	"resource/helperhud/crazyspeed" // ZOMBIE_SKILL_CRAZY2,
+};
+
 const char *CHudZB2_Skill::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
 {
 	"", // ZOMBIE_CLASS_HUMAN
@@ -48,6 +63,7 @@ int CHudZB2_Skill::Init(void)
 	m_HUD_zombirecovery = m_HUD_zombieGKey = 0;
 	std::fill(std::begin(m_HUD_SkillIcons), std::end(m_HUD_SkillIcons), 0);
 	std::fill(std::begin(m_HUD_ClassIcons), std::end(m_HUD_ClassIcons), 0);
+	std::fill(std::begin(m_iTexture_SkillIcons), std::end(m_iTexture_SkillIcons), 0);
 	return 1;
 }
 
@@ -67,12 +83,22 @@ int CHudZB2_Skill::VidInit(void)
 			m_HUD_ClassIcons[i] = gHUD.GetSpriteIndex(ZOMBIE_CLASS_HUD_ICON[i]);
 	}
 
+	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
+	{
+		if (ZOMBIE_SKILL_HUD_TIP[i][0] != '\0')
+			m_iTexture_SkillIcons[i] = gRenderAPI.GL_LoadTexture(ZOMBIE_SKILL_HUD_TIP[i], NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	}
+
 	return 1;
 }
 
 void CHudZB2_Skill::Shutdown(void)
 {
-	
+	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
+	{
+		if (m_iTexture_SkillIcons[i])
+			gRenderAPI.GL_FreeTexture(m_iTexture_SkillIcons[i]);
+	}
 }
 
 void CHudZB2_Skill::Reset(void)
@@ -88,6 +114,9 @@ int CHudZB2_Skill::Draw(float time)
 
 	x = DrawHealthRecoveryIcon(time, x, y);
 	x = DrawSkillBoard(time, x, y);
+
+	DrawSkillTip(time);
+
 	return 1;
 }
 
@@ -98,8 +127,11 @@ void CHudZB2_Skill::Think()
 		if (icon.m_iCurrentSkillStatus == SKILL_STATUS_USING || icon.m_iCurrentSkillStatus == SKILL_STATUS_FREEZING)
 		{
 			if (gHUD.m_flTime > icon.m_flTimeSkillReady)
+			{
 				icon.m_iCurrentSkillStatus = SKILL_STATUS_READY;
-			// maybe some blink effect here...
+				icon.m_flTimeSkillBlink = gHUD.m_flTime + 3.0f;
+			}
+			
 		}
 	}
 }
@@ -200,13 +232,46 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 	return x;
 }
 
+void CHudZB2_Skill::DrawSkillTip(float time) const
+{
+	int x = ScreenWidth / 2;
+	int y = ScreenHeight * 2 / 3;
+	for (auto &icon : m_ZombieSkillHudIcons)
+	{
+		if (icon.m_iCurrentSkill == ZOMBIE_SKILL_EMPTY)
+			continue;
+		if (time > icon.m_flTimeSkillBlink)
+			continue;
+		int tex = m_iTexture_SkillIcons[icon.m_iCurrentSkill];
+		if (!tex)
+			continue;
+
+		int w = gRenderAPI.RenderGetParm(PARM_TEX_SRC_WIDTH, tex);
+		int h = gRenderAPI.RenderGetParm(PARM_TEX_SRC_HEIGHT, tex);
+
+		float timeDelta = icon.m_flTimeSkillBlink - time;
+		float modDelta = timeDelta - static_cast<float>(static_cast<int>(timeDelta));
+		float a = modDelta < 0.5f ? modDelta * 2.0f : 3.0f - modDelta * 2.0f;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
+		gRenderAPI.GL_SelectTexture(0);
+		gRenderAPI.GL_Bind(0, tex);
+
+		DrawUtils::Draw2DQuad(x - w / 2, y, x + w / 2, y + h);
+
+		y += h;
+	}
+}
+
 void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, ZombieSkillType skill2, ZombieSkillType skill3, ZombieSkillType skill4)
 {
+	float flSkillBlinkTime = gHUD.m_flTime + 3.0f;
 	m_iCurrentClass = zclass;
-	m_ZombieSkillHudIcons[0] = { skill1, SKILL_STATUS_READY, 0.0f, 0.0f };
-	m_ZombieSkillHudIcons[1] = { skill2, SKILL_STATUS_READY, 0.0f, 0.0f };
-	m_ZombieSkillHudIcons[2] = { skill3, SKILL_STATUS_READY, 0.0f, 0.0f };
-	m_ZombieSkillHudIcons[3] = { skill4, SKILL_STATUS_READY, 0.0f, 0.0f };
+	m_ZombieSkillHudIcons[0] = { skill1, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
+	m_ZombieSkillHudIcons[1] = { skill2, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
+	m_ZombieSkillHudIcons[2] = { skill3, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
+	m_ZombieSkillHudIcons[3] = { skill4, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
 	// some blink ? 
 }
 
@@ -216,7 +281,7 @@ void CHudZB2_Skill::OnSkillActivate(ZombieSkillType skill, float flHoldTime, flo
 	{
 		if (icon.m_iCurrentSkill == skill)
 		{
-			icon = { skill, flFreezeTime > 0.0f ? SKILL_STATUS_FREEZING : SKILL_STATUS_USED, gHUD.m_flTime, gHUD.m_flTime + flFreezeTime };
+			icon = { skill, flFreezeTime > 0.0f ? SKILL_STATUS_FREEZING : SKILL_STATUS_USED, gHUD.m_flTime, gHUD.m_flTime + flFreezeTime, 0.0f };
 		}
 	}
 }
