@@ -291,7 +291,18 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 		case EVENT_WEAPON_RELOADED:
 		{
 			if (m_enemy == entity && IsUsingKnife())
+			{
 				ForceRun(5.0f);
+
+				if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)
+				{
+					const float skillUseRange = 8192.0f;
+					if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+					{
+						ClientCommand("BTE_ZombieSkill1");
+					}
+				}
+			}
 			break;
 		}
 		default:

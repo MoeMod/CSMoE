@@ -50,15 +50,19 @@ void CBasePlayer::ZombieSkill_Start()
 		return;
 	}
 
+	if(pev->health <= 500.0f)
+		return;
 
 	m_iZombieSkillStatus = SKILL_STATUS_USING;
 	m_flTimeZombieSkillEnd = gpGlobals->time + ZOMBIECRAZY_DURATION;
 	m_flTimeZombieSkillNext = gpGlobals->time + ZOMBIECRAZY_COOLDOWN;
+	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 
 	pev->renderfx = kRenderFxGlowShell;
 	pev->rendercolor = { 255,0,0 };
 	pev->renderamt = 1;
 	pev->fov = m_iFOV = 105;
+	pev->health -= 500.0f;
 	ResetMaxSpeed();
 
 	//EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM);
@@ -108,4 +112,16 @@ void CBasePlayer::ZombieSkill_Reset()
 void ZombieSkill_Precache()
 {
 	//PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
+}
+
+float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	ClientPrint(pev, HUD_PRINTCONSOLE, "#1 %.2f.", std::to_string(static_cast<float>(flDamage)).c_str());
+	if (m_bIsZombie && m_iZombieSkillStatus == SKILL_STATUS_USING)
+	{
+		flDamage *= 1.6;
+	}
+	ClientPrint(pev, HUD_PRINTCONSOLE, "#2 %.2f.", std::to_string(static_cast<float>(flDamage)).c_str());
+
+	return flDamage;
 }

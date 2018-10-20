@@ -777,6 +777,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (m_bIsVIP)
 		flRatio *= 0.5;
 
+	flDamage = Zombie_AdjustDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST))
 	{
 		if (!IsAlive())
@@ -1268,9 +1270,9 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
-		GiveNamedItem("weapon_ak47l");
-		GiveNamedItem("weapon_mp7a1d");
-		GiveNamedItem("weapon_deagled");
+		//GiveNamedItem("weapon_ak47l");
+		//GiveNamedItem("weapon_mp7a1d");
+		//GiveNamedItem("weapon_deagled");
 	}
 }
 
