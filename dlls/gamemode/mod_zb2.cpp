@@ -156,9 +156,31 @@ CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 	return static_cast<CSupplyBox *>(monster);
 }
 
+void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
+{
+	CMod_Zombi::HumanInfectionByZombie(player, attacker);
+	attacker->m_iZombieInfections++;
+
+	if (attacker->m_iZombieLevel == ZOMBIE_LEVEL_HOST && attacker->m_iZombieInfections >= 3)
+	{
+		MakeZombie(attacker, ZOMBIE_LEVEL_ORIGIN);
+
+		attacker->pev->health = attacker->pev->max_health = 7000.0f;
+		attacker->pev->armorvalue = 500.0f;
+	}
+
+	if (attacker->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && attacker->m_iZombieInfections >= 5)
+	{
+		MakeZombie(attacker, ZOMBIE_LEVEL_ORIGIN_LV2);
+
+		attacker->pev->health = attacker->pev->max_health = 14000.0f;
+		attacker->pev->armorvalue = 1000.0f;
+	}
+}
+
 void CMod_ZombieMod2::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
 {
 	CMod_Zombi::MakeZombie(player, iEvolutionLevel);
-
+	player->m_iZombieInfections = 0;
 	player->ZombieSkill_Init();
 }

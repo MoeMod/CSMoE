@@ -28,6 +28,7 @@ protected:
 	int SupplyboxCount();
 
 public:
+	void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker) override;
 	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) override;
 
 protected:

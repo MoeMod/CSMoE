@@ -708,6 +708,7 @@ public:
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
 	float m_flTimeNextZombieHealthRecovery;
+	int m_iZombieInfections;
 
 	ZombieSkillStatus m_iZombieSkillStatus;
 	float m_flTimeZombieSkillEnd;
