@@ -52,6 +52,8 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flHoldTime = buf.ReadShort();
 		float flFreezeTime = buf.ReadShort();
 		pimpl->skill.OnSkillActivate(type, flHoldTime, flFreezeTime);
+		if (type == ZOMBIE_SKILL_CRAZY || type == ZOMBIE_SKILL_CRAZY2)
+			gHUD.m_Retina.AddItem("resource/zombi/zombicrazy", CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f);
 		break;
 	}
 		
@@ -64,7 +66,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 int CHudZB2::Init(void)
 {
 	pimpl = new CHudZB2::impl_t;
-	pimpl->for_each(&CHudBase_ZBS::Init);
+	pimpl->for_each(&CHudBase_ZB2::Init);
 
 	gHUD.AddHudElem(this);
 
@@ -75,34 +77,37 @@ int CHudZB2::Init(void)
 
 int CHudZB2::VidInit(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::VidInit);
+	pimpl->for_each(&CHudBase_ZB2::VidInit);
+
+	gHUD.m_Retina.PrecacheTexture("resource/zombi/zombicrazy");
+
 	return 1;
 }
 
 int CHudZB2::Draw(float time)
 {
-	pimpl->for_each(&CHudBase_ZBS::Draw, time);
+	pimpl->for_each(&CHudBase_ZB2::Draw, time);
 	return 1;
 }
 
 void CHudZB2::Think(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Think);
+	pimpl->for_each(&CHudBase_ZB2::Think);
 }
 
 void CHudZB2::Reset(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Reset);
+	pimpl->for_each(&CHudBase_ZB2::Reset);
 }
 
 void CHudZB2::InitHUDData(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::InitHUDData);
+	pimpl->for_each(&CHudBase_ZB2::InitHUDData);
 }
 
 void CHudZB2::Shutdown(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Shutdown);
+	pimpl->for_each(&CHudBase_ZB2::Shutdown);
 
 	delete pimpl;
 	pimpl = nullptr;

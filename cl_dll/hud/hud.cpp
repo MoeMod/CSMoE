@@ -230,7 +230,9 @@ void CHud :: Init( void )
 	// fullscreen overlays
 	m_SniperScope.Init();
 	m_NVG.Init();
+	m_Retina.Init();
 	m_SpectatorGui.Init();
+
 
 	// Game HUD things
 	m_Ammo.Init();
@@ -243,6 +245,8 @@ void CHud :: Init( void )
 	m_Battery.Init();
 	m_StatusIcons.Init();
 	m_Radar.Init();
+	m_ZBS.Init();
+	m_ZB2.Init();
 
 	// chat, death notice, status bars and other
 	m_SayText.Init();
@@ -256,14 +260,13 @@ void CHud :: Init( void )
 	m_FollowIcon.Init();
 	m_MOTD.Init();
 	m_scenarioStatus.Init();
+	m_HeadName.Init();
 
 	// all things that have own background and must be drawn last
 	m_ProgressBar.Init();
 	m_Menu.Init();
 	m_Scoreboard.Init();
-	m_ZBS.Init();
-	m_ZB2.Init();
-	m_HeadName.Init();
+	
 
 	InitRain();
 
@@ -273,7 +276,7 @@ void CHud :: Init( void )
 
 	gEngfuncs.Cvar_SetValue( "hand", 1 );
 	gEngfuncs.Cvar_SetValue( "sv_skipshield", 1.0f );
-#ifdef __ANDROID__
+#ifdef __ANDROID__ || TARGET_OS_IPHONE 
 	gEngfuncs.Cvar_SetValue( "hud_fastswitch", 1 );
 #endif
 

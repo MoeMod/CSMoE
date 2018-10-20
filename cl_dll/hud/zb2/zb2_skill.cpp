@@ -251,7 +251,7 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 
 		float timeDelta = icon.m_flTimeSkillBlink - time;
 		float modDelta = timeDelta - static_cast<float>(static_cast<int>(timeDelta));
-		float a = modDelta < 0.5f ? modDelta * 2.0f : 3.0f - modDelta * 2.0f;
+		float a = modDelta < 0.5f ? modDelta * 2.0f : 2.0f - modDelta * 2.0f;
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);

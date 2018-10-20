@@ -122,6 +122,7 @@ struct HUDLIST {
 #include "scenariostatus.h"
 #include "zbs/zbs.h"
 #include "zb2/zb2.h"
+#include "retina.h"
 
 //
 //-----------------------------------------------------
@@ -1052,7 +1053,8 @@ public:
 	CHudScenarioStatus m_scenarioStatus;
 	
 	CHudHeadName	m_HeadName;
-	CHudZBS m_ZBS;
+	CHudRetina		m_Retina;
+	CHudZBS	m_ZBS;
 	CHudZB2 m_ZB2;
 
 	// user messages
