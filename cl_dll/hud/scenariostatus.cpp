@@ -20,7 +20,7 @@ int CHudScenarioStatus::VidInit(void)
 {
 	m_alpha = 100;
 	m_hSprite = NULL;
-
+	m_iRepeatTimes = 0;
 	return 1;
 }
 
@@ -28,6 +28,7 @@ void CHudScenarioStatus::Reset(void)
 {
 	m_iFlags &= ~HUD_ACTIVE;
 	m_hSprite = NULL;
+	m_iRepeatTimes = 0;
 	m_nextFlash = 0;
 }
 
@@ -49,14 +50,19 @@ int CHudScenarioStatus::Draw(float fTime)
 
 		int x = gHUD.m_Timer.m_closestRight;
 		int y = ScreenHeight + (3 * gHUD.m_iFontHeight) / -2 - (m_rect.bottom - m_rect.top - gHUD.m_iFontHeight) / 2;
+		int w = m_rect.right - m_rect.left;
 
 		DrawUtils::ScaleColors(r, g, b, m_alpha);
 
 		if (m_alpha > 100)
 			m_alpha *= 0.9;
 
-		SPR_Set(m_hSprite, r, g, b);
-		SPR_DrawAdditive(0, x, y, &m_rect);
+		for (int i = 0; i < m_iRepeatTimes; ++i)
+		{
+			SPR_Set(m_hSprite, r, g, b);
+			SPR_DrawAdditive(0, x, y, &m_rect);
+			x += w;
+		}
 	}
 
 	if (m_flashInterval && fTime >= m_nextFlash)
@@ -86,6 +92,15 @@ int CHudScenarioStatus::MsgFunc_Scenario(const char *pszName, int iSize, void *p
 	m_iFlags |= HUD_ACTIVE;
 
 	spriteName = reader.ReadString();
+	if (sscanf(spriteName, "hostage%d", &m_iRepeatTimes) == 1)
+	{
+		spriteName = "hostage";
+		m_iRepeatTimes = m_iRepeatTimes; // sscanf did it...
+	}
+	else 
+	{
+		m_iRepeatTimes = 1;
+	}
 	sprIndex = gHUD.GetSpriteIndex(spriteName);
 
 	m_hSprite = gHUD.GetSprite(sprIndex);

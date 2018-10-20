@@ -39,6 +39,12 @@ void CMod_ZombieMod2::Think()
 	return CMod_Zombi::Think();
 }
 
+void CMod_ZombieMod2::PlayerSpawn(CBasePlayer *pPlayer)
+{
+	CMod_Zombi::PlayerSpawn(pPlayer);
+	UpdatePlayerEvolutionHUD(pPlayer);
+}
+
 void CMod_ZombieMod2::PlayerThink(CBasePlayer *pPlayer)
 {
 	pPlayer->Zombie_HealthRecoveryThink();
@@ -55,7 +61,7 @@ void CMod_ZombieMod2::RestartRound()
 
 BOOL CMod_ZombieMod2::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 {
-	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && pPlayer->m_bIsZombie)
+	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && CanUseZombieSkill(pPlayer))
 	{
 		pPlayer->ZombieSkill_Start();
 		return TRUE;
@@ -176,11 +182,47 @@ void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *a
 		attacker->pev->health = attacker->pev->max_health = 14000.0f;
 		attacker->pev->armorvalue = 1000.0f;
 	}
+
+	UpdatePlayerEvolutionHUD(attacker);
+}
+
+void CMod_ZombieMod2::UpdatePlayerEvolutionHUD(CBasePlayer *player)
+{
+	int iCount = 0;
+	if (player->m_bIsZombie && player->m_iZombieLevel != ZOMBIE_LEVEL_ORIGIN_LV2)
+	{
+		int iInfectionRequired = player->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 3 : 5;
+		iCount = iInfectionRequired - player->m_iZombieInfections;
+	}
+
+	char buf[16];
+	Q_snprintf(buf, ARRAYSIZE(buf), "hostage%d", iCount);
+
+	if (iCount)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, NULL, player->pev);
+		WRITE_BYTE(1);
+		WRITE_STRING(buf);
+		WRITE_BYTE(0);
+		MESSAGE_END();
+	}
+	else
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, NULL, player->pev);
+		WRITE_BYTE(0);
+		MESSAGE_END();
+	}
+}
+
+bool CMod_ZombieMod2::CanUseZombieSkill(CBasePlayer *player)
+{
+	return player->m_bIsZombie && player->m_iZombieLevel != ZOMBIE_LEVEL_HOST;
 }
 
 void CMod_ZombieMod2::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
 {
 	CMod_Zombi::MakeZombie(player, iEvolutionLevel);
+	UpdatePlayerEvolutionHUD(player);
 	player->m_iZombieInfections = 0;
 	player->ZombieSkill_Init();
 }

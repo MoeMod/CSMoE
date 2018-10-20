@@ -276,7 +276,7 @@ void CHud :: Init( void )
 
 	gEngfuncs.Cvar_SetValue( "hand", 1 );
 	gEngfuncs.Cvar_SetValue( "sv_skipshield", 1.0f );
-#ifdef __ANDROID__ || TARGET_OS_IPHONE 
+#if defined(__ANDROID__) || defined(TARGET_OS_IPHONE )
 	gEngfuncs.Cvar_SetValue( "hud_fastswitch", 1 );
 #endif
 

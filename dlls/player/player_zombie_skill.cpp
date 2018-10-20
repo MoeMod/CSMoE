@@ -8,6 +8,8 @@
 
 #include <string>
 
+#include <gamemode/mod_zb2.h>
+
 void CBasePlayer::ZombieSkill_Check()
 {
 	if (m_iZombieSkillStatus == SKILL_STATUS_READY)
@@ -81,11 +83,21 @@ void CBasePlayer::ZombieSkill_End()
 
 void CBasePlayer::ZombieSkill_Init()
 {
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	MESSAGE_END();
+	CMod_ZombieMod2 *mp = dynamic_cast<CMod_ZombieMod2 *>(g_pModRunning);
+	if (mp && mp->CanUseZombieSkill(this))
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
+		WRITE_BYTE(ZOMBIE_CLASS_TANK);
+		WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+		MESSAGE_END();
+	}
+	else
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
+		MESSAGE_END();
+	}
 }
 
 void CBasePlayer::ZombieSkill_Reset()

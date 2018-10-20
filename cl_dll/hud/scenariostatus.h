@@ -19,4 +19,5 @@ public:
 	float m_nextFlash;
 	float m_flashInterval;
 	int m_flashAlpha;
+	int m_iRepeatTimes;
 };
