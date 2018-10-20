@@ -164,20 +164,26 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 
 	if (time < icon.m_flTimeSkillReady)
 	{
-		float flPercent = (time - icon.m_flTimeSkillStart) / (icon.m_flTimeSkillReady - icon.m_flTimeSkillStart);
-		wrect_t TopHalf = gHUD.GetSpriteRect(iHudIcon);
-		TopHalf.bottom += (TopHalf.bottom - TopHalf.top) * flPercent;
+		wrect_t Rect = gHUD.GetSpriteRect(iHudIcon);
+		int iHeight = Rect.bottom - Rect.top;
 
-		wrect_t BottomHalf = gHUD.GetSpriteRect(iHudIcon);
-		BottomHalf.top -= (BottomHalf.bottom - BottomHalf.top) * (1.0f - flPercent);
+		float flPercent = (time - icon.m_flTimeSkillStart) / (icon.m_flTimeSkillReady - icon.m_flTimeSkillStart);
+		
 
 		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
 
+		wrect_t BottomHalf = Rect;
+		float deltaY = iHeight * (1.0f - flPercent);
+		BottomHalf.top += deltaY;
+
 		SPR_Set(gHUD.GetSprite(iHudIcon), r, g, b);
-		SPR_DrawAdditive(0, x, y, &BottomHalf);
+		SPR_DrawAdditive(0, x, y + deltaY, &BottomHalf);
 
 		int a = 50;
 		DrawUtils::ScaleColors(r, g, b, a);
+
+		wrect_t TopHalf = Rect;
+		TopHalf.bottom -= iHeight *  flPercent;
 
 		SPR_Set(gHUD.GetSprite(iHudIcon), r, g, b);
 		SPR_DrawAdditive(0, x, y, &TopHalf);
@@ -208,9 +214,9 @@ void CHudZB2_Skill::OnSkillActivate(ZombieSkillType skill, float flHoldTime, flo
 {
 	for (auto &icon : m_ZombieSkillHudIcons)
 	{
-		if (icon.m_iCurrentSkill = skill)
+		if (icon.m_iCurrentSkill == skill)
 		{
-			icon = { skill, flFreezeTime < 0.0f ? SKILL_STATUS_FREEZING : SKILL_STATUS_USED, gHUD.m_flTime, gHUD.m_flTime + flFreezeTime };
+			icon = { skill, flFreezeTime > 0.0f ? SKILL_STATUS_FREEZING : SKILL_STATUS_USED, gHUD.m_flTime, gHUD.m_flTime + flFreezeTime };
 		}
 	}
 }
