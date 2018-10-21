@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_knife.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
@@ -357,10 +361,18 @@ int CKnife::Swing(int fFirst)
 		ClearMultiDamage();
 		if (pEntity)
 		{
+			float flDamage = 15;
 			if (m_flNextPrimaryAttack + 0.4 < UTIL_WeaponTimeBase())
-				pEntity->TraceAttack(m_pPlayer->pev, 20, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
-			else
-				pEntity->TraceAttack(m_pPlayer->pev, 15, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
+				flDamage = 20;
+
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage *= 9.5f;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage *= 5.5f;
+#endif
+
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
 		}
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -484,6 +496,13 @@ int CKnife::Stab(int fFirst)
 			if (DotProduct(vec2LOS, gpGlobals->v_forward.Make2D()) > 0.8)
 				flDamage *= 3.0;
 		}
+
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 9.5f;
+		else if(g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage *= 5.5f;
+#endif
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		ClearMultiDamage();

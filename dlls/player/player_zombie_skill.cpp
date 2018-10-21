@@ -130,6 +130,18 @@ float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAt
 		flDamage *= 1.6;
 	}
 
+	// grenade damage 5x in zb mode
+	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
+	{
+		if (bitsDamageType & DMG_EXPLOSION)
+		{
+			if(m_bIsZombie)
+				flDamage *= 5.0f;
+			else
+				flDamage *= 2.5f;
+		}
+	}
+
 	return flDamage;
 }
 
