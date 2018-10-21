@@ -67,14 +67,14 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 
 	if (item.type & RETINA_DRAW_TYPE_QUARTER)
 	{
-		DrawUtils::Draw2DQuad(0,			0,				ScreenWidth / 2,	ScreenHeight / 2); // ¨I	
-		DrawUtils::Draw2DQuad(ScreenWidth,	0,				ScreenWidth / 2,	ScreenHeight / 2); // ¨J
-		DrawUtils::Draw2DQuad(0,			ScreenHeight, 	ScreenWidth / 2,	ScreenHeight / 2); // ¨L
-		DrawUtils::Draw2DQuad(ScreenWidth,	ScreenHeight,	ScreenWidth / 2,	ScreenHeight / 2); // ¨K
+		DrawUtils::Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2); // ¨I	
+		DrawUtils::Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2); // ¨J
+		DrawUtils::Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2); // ¨L
+		DrawUtils::Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2); // ¨K
 	}
 	else
 	{
-		DrawUtils::Draw2DQuad(0, 0, ScreenWidth, ScreenHeight);
+		DrawUtils::Draw2DQuad(0, 0, TrueWidth, TrueHeight);
 	}
 }
 

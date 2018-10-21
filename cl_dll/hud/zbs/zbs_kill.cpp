@@ -60,7 +60,7 @@ int CHudZBSKill::Draw(float time)
 		float a = (flStartTime - gHUD.m_flTime) / ZBS_KILL_DISPLAY_TIME;
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
 		
-		DrawUtils::Draw2DQuad(x, y, x + 234, y + 55);
+		DrawUtils::Draw2DQuadScaled(x, y, x + 234, y + 55);
 	}
 
 	return 1;

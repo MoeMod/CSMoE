@@ -92,7 +92,7 @@ int CHudStatusIcons::Draw( float flTime )
 				else
 					gRenderAPI.GL_Bind(0, m_tgaC4[0]);
 
-				DrawUtils::Draw2DQuad(x, y, x + 58, y + 55);
+				DrawUtils::Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}
 			else
 			{

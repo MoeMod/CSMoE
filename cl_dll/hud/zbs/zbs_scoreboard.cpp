@@ -48,6 +48,10 @@ inline void DrawTexturePart(int tex, const wrect_t &rect, int x1, int y1, float 
 	float w = static_cast<float>(gRenderAPI.RenderGetParm(PARM_TEX_SRC_WIDTH, tex));
 	float h = static_cast<float>(gRenderAPI.RenderGetParm(PARM_TEX_SRC_HEIGHT, tex));
 
+	x1 *= gHUD.m_flScale;
+	y1 *= gHUD.m_flScale;
+	scale *= gHUD.m_flScale;
+
 	int x2 = x1 + (rect.right - rect.left) * scale;
 	int y2 = y1 + (rect.bottom - rect.top) * scale;
 
@@ -132,7 +136,7 @@ int CHudZBSScoreBoard::Draw(float time)
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iBackground);
-	DrawUtils::Draw2DQuad(x - 373 / 2, y, x + 373 / 2, y + 51);
+	DrawUtils::Draw2DQuadScaled(x - 373 / 2, y, x + 373 / 2, y + 51);
 	
 	int idx = gEngfuncs.GetLocalPlayer()->index;
 	int roundNumber = gHUD.m_Scoreboard.m_iTeamScore_CT + 1;

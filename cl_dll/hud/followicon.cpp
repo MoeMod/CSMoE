@@ -51,7 +51,7 @@ int CHudFollowIcon::Draw(float time)
 			gRenderAPI.GL_SelectTexture(0);
 			gRenderAPI.GL_Bind(0, m_iBombAB[i]);
 
-			DrawUtils::Draw2DQuad(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
+			DrawUtils::Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
 		}
 	}
 
@@ -72,7 +72,7 @@ int CHudFollowIcon::Draw(float time)
 					gRenderAPI.GL_SelectTexture(0);
 					gRenderAPI.GL_Bind(0, m_iSupplybox);
 
-					DrawUtils::Draw2DQuad(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
+					DrawUtils::Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];
 					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length() / 42.0f));

@@ -258,7 +258,7 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 		gRenderAPI.GL_SelectTexture(0);
 		gRenderAPI.GL_Bind(0, tex);
 
-		DrawUtils::Draw2DQuad(x - w / 2, y, x + w / 2, y + h);
+		DrawUtils::Draw2DQuadScaled(x - w / 2, y, x + w / 2, y + h);
 
 		y += h;
 	}

@@ -43,7 +43,7 @@ int CHudZBSLevel::Draw(float time)
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iZBSBoard_BG);
-	DrawUtils::Draw2DQuad(x, y, x + 204, y + 85);
+	DrawUtils::Draw2DQuadScaled(x, y, x + 204, y + 85);
 	
 	const int r = 255, g = 255, b = 255;
 
@@ -79,7 +79,7 @@ int CHudZBSLevel::Draw(float time)
 		y -= 32;
 		gRenderAPI.GL_SelectTexture(0);
 		gRenderAPI.GL_Bind(0, m_iZBSBoard_BG_Wall);
-		DrawUtils::Draw2DQuad(x, y, x + 204, y + 28);
+		DrawUtils::Draw2DQuadScaled(x, y, x + 204, y + 28);
 
 		DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
 		if (m_iLevel_Wall >= 40)

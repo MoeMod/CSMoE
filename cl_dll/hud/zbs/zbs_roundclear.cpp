@@ -54,7 +54,7 @@ int CHudZBSRoundClear::Draw(float time)
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * std::min(5.0f - (time - m_flDisplayTime), 1.0f));
 	gRenderAPI.GL_SelectTexture(0);
 	gRenderAPI.GL_Bind(0, m_iRoundClear);
-	DrawUtils::Draw2DQuad(x - 373 / 2, y, x + 373 / 2, y + 51);
+	DrawUtils::Draw2DQuadScaled(x - 373 / 2, y, x + 373 / 2, y + 51);
 	return 1;
 }
 

@@ -182,15 +182,15 @@ int CHudDeathNotice :: Draw( float flTime )
 			{
 				gRenderAPI.GL_SelectTexture(0);
 				gRenderAPI.GL_Bind(0, DrawBg[0]);
-				DrawUtils::Draw2DQuad(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
+				DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
 
 				gRenderAPI.GL_SelectTexture(0);
 				gRenderAPI.GL_Bind(0, DrawBg[1]);
-				DrawUtils::Draw2DQuad(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
+				DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
 
 				gRenderAPI.GL_SelectTexture(0);
 				gRenderAPI.GL_Bind(0, DrawBg[2]);
-				DrawUtils::Draw2DQuad(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
+				DrawUtils::Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
 			}
 
 			if ( !rgDeathNoticeList[i].bSuicide )
