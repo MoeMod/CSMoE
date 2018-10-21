@@ -18,6 +18,8 @@ CMod_Zombi::CMod_Zombi() // precache
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
 	PRECACHE_GENERIC("sound/Zombi_Ambience.mp3");
+
+	CVAR_SET_FLOAT("sv_maxspeed", 390);
 }
 
 void CMod_Zombi::CheckMapConditions()

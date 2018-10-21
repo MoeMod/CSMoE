@@ -499,6 +499,7 @@ private:
 	bool BhopJump_Start();
 	void BhopJump_UpdateJump();
 	void BhopJump_UpdateSync();
+	void Knockback(CBasePlayer *attacker, const KnockbackData &data) override; // knockback revolves
 
 	CNavArea *m_currentArea;						// the nav area we are standing on
 	CNavArea *m_lastKnownArea;						// the last area we were in

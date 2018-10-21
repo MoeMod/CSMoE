@@ -1009,7 +1009,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		{
 			if (pAttack->m_pActiveItem)
 			{
-				ApplyKnockbackData(this, this->pev->origin - pAttack->pev->origin, pAttack->m_pActiveItem->GetKnockBackData());
+				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData());
 			}
 		}
 		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
