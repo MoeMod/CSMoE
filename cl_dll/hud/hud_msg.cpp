@@ -113,6 +113,10 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	m_Scoreboard.m_iTeamScore_Max = reader.ReadByte();
 	reader.ReadByte();
 
+	// reset mod-specific settings
+	gHUD.m_ZB2.m_iFlags &= ~HUD_ACTIVE;
+	gHUD.m_ZBS.m_iFlags &= ~HUD_ACTIVE;
+
 	switch (m_iModRunning)
 	{
 	case MOD_NONE:
