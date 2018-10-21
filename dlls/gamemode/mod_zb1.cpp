@@ -18,6 +18,8 @@ CMod_Zombi::CMod_Zombi() // precache
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
 	PRECACHE_GENERIC("sound/Zombi_Ambience.mp3");
+
+	CVAR_SET_FLOAT("sv_maxspeed", 390);
 }
 
 void CMod_Zombi::CheckMapConditions()
@@ -125,7 +127,7 @@ void CMod_Zombi::Think()
 		else if (iCountDown == 20)
 		{
 			// select zombie
-			MakeZombieOrigin();
+			PickZombieOrigin();
 		}
 		TeamCheck();
 	}
@@ -324,6 +326,17 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 	return IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 
+int CMod_Zombi::ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax)
+{
+	int ret = iOriginalMax * 2;
+
+	// do not *2 for machine-guns.
+	if (Q_strstr(szAmmoClassName, "box"))
+		ret = iOriginalMax;
+
+	return ret;
+}
+
 int CMod_Zombi::ZombieOriginNum()
 {
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
@@ -334,7 +347,7 @@ int CMod_Zombi::ZombieOriginNum()
 	return NumAliveCT / 10 + 1;
 }
 
-void CMod_Zombi::MakeZombieOrigin()
+void CMod_Zombi::PickZombieOrigin()
 {
 	int iNumZombies = ZombieOriginNum();
 	int iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
@@ -360,7 +373,7 @@ void CMod_Zombi::MakeZombieOrigin()
 	// pick them
 	for (int i = 0; i < iNumZombies; ++i)
 	{
-		players[i]->MakeZombie(ZOMBIE_LEVEL_ORIGIN);
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		players[i]->pev->health = players[i]->pev->max_health = 1000 * iNumPlayers / iNumZombies + 1000;
 		players[i]->pev->armorvalue = 1100;
 	}
@@ -372,7 +385,7 @@ void CMod_Zombi::MakeZombieOrigin()
 
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
-	player->MakeZombie(ZOMBIE_LEVEL_HOST);
+	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 0.5f));
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f));
 
@@ -457,6 +470,7 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
+	pPlayer->m_iMenu = Menu_Buy;
 }
 
 BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
@@ -488,4 +502,9 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	
 
 	return iReturn;
+}
+
+void CMod_Zombi::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
+{
+	return player->MakeZombie(iEvolutionLevel);
 }

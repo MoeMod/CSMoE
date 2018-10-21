@@ -13,9 +13,9 @@
 void CMod_None::CheckMapConditions()
 {
 	IBaseMod::CheckMapConditions();
+	m_mapBombZones.clear();
 	if (m_bMapHasBombZone)
 	{
-		m_mapBombZones.clear();
 		CBaseEntity *pEntity = nullptr;
 		
 		while (pEntity = UTIL_FindEntityByClassname(pEntity, "func_bomb_target"))
@@ -41,16 +41,13 @@ void CMod_None::UpdateGameMode(CBasePlayer *pPlayer)
 	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 
-	if (m_bMapHasBombZone) // BombTarget Position (for followicon & radar)
+	WRITE_BYTE(m_mapBombZones.size());
+	for (const auto& EV : m_mapBombZones)
 	{
-		WRITE_BYTE(m_mapBombZones.size());
-		for (const auto& EV : m_mapBombZones)
-		{
-			const Vector &pos(EV.second);
-			WRITE_COORD(pos[0]);
-			WRITE_COORD(pos[1]);
-			WRITE_COORD(pos[2]);
-		}
+		const Vector &pos(EV.second);
+		WRITE_COORD(pos[0]);
+		WRITE_COORD(pos[1]);
+		WRITE_COORD(pos[2]);
 	}
 
 	MESSAGE_END();

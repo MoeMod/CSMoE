@@ -26,8 +26,8 @@
 *
 */
 
-#ifndef WEAPONTYPE_H
-#define WEAPONTYPE_H
+#ifndef WEAPONS_BUY_H
+#define WEAPONS_BUY_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -64,6 +64,7 @@ enum AmmoCostType
 	AMMO_762MM_PRICE	= 80,
 	AMMO_9MM_PRICE		= 20,
 	AMMO_BUCKSHOT_PRICE	= 65,
+	AMMO_46MM_PRICE		= 20,
 };
 
 enum WeaponCostType
@@ -121,6 +122,7 @@ enum AmmoBuyAmount
 	AMMO_762NATO_BUY	= 30,
 	AMMO_9MM_BUY		= 30,
 	AMMO_BUCKSHOT_BUY	= 8,
+	AMMO_46MM_BUY = 30,
 };
 
 enum ItemCostType
@@ -171,6 +173,12 @@ struct WeaponInfoStruct
 	int maxRounds;
 	int ammoType;
 	char *entityName;
+};
+
+struct WeaponBuyAmmoConfig
+{
+	const char *classname;
+	int cost;
 };
 
 extern AutoBuyInfoStruct g_autoBuyInfo[35];

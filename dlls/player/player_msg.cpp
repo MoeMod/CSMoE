@@ -90,6 +90,8 @@ int gmsgShowTimer = 0;
 
 int gmsgZBSTip = 0;
 int gmsgZBSLevel = 0;
+int gmsgBTEWeapon = 0;
+int gmsgZB2Msg = 0;
 
 // utils
 inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
@@ -101,7 +103,7 @@ void LinkUserMessages()
 	if (gmsgCurWeapon)
 		return;
 
-	gmsgCurWeapon = REG_USER_MSG("CurWeapon", 3);
+	gmsgCurWeapon = REG_USER_MSG("CurWeapon", -1); // 3
 	gmsgGeigerRange = REG_USER_MSG("Geiger", 1);
 	gmsgFlashlight = REG_USER_MSG("Flashlight", 2);
 	gmsgFlashBattery = REG_USER_MSG("FlashBat", 1);
@@ -134,7 +136,7 @@ void LinkUserMessages()
 	gmsgShowMenu = REG_USER_MSG("ShowMenu", -1);
 	gmsgShake = REG_USER_MSG("ScreenShake", 6);
 	gmsgFade = REG_USER_MSG("ScreenFade", 10);
-	gmsgAmmoX = REG_USER_MSG("AmmoX", 2);
+	gmsgAmmoX = REG_USER_MSG("AmmoX", -1); // 2
 	gmsgSendAudio = REG_USER_MSG("SendAudio", -1);
 	gmsgRoundTime = REG_USER_MSG("RoundTime", 2);
 	gmsgMoney = REG_USER_MSG("Money", 5);
@@ -184,9 +186,11 @@ void LinkUserMessages()
 
 	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
+	gmsgBTEWeapon = REG_USER_MSG("BTEWeapon", -1);
+	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
 }
 
-void WriteWeaponInfo(const ItemInfo &II)
+/*void WriteWeaponInfo(const ItemInfo &II)
 {
 	const char *pszName;
 	if (!II.pszName)
@@ -205,11 +209,35 @@ void WriteWeaponInfo(const ItemInfo &II)
 	WRITE_BYTE(II.iId);
 	WRITE_BYTE(II.iFlags);
 	MESSAGE_END();
+}*/
+
+void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II)
+{
+	const char *pszName;
+	if (!II.pszName)
+		pszName = "Empty";
+	else
+		pszName = II.pszName;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeaponList, NULL, pPlayer->pev);
+	WRITE_STRING(pszName);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo1));
+	WRITE_BYTE(II.iMaxAmmo1);
+	WRITE_BYTE(CBasePlayer::GetAmmoIndex(II.pszAmmo2));
+	WRITE_BYTE(II.iMaxAmmo2);
+	WRITE_BYTE(II.iSlot);
+	WRITE_BYTE(II.iPosition);
+	WRITE_BYTE(II.iId);
+	WRITE_BYTE(II.iFlags);
+	MESSAGE_END();
 }
 
 void WriteSigonMessages()
 {
-	for (int i = 0; i < MAX_WEAPONS; ++i)
+	// No need for this
+	// WeaponList will be sent when player pick up weapon.
+
+	/*for (int i = 0; i < MAX_WEAPONS; ++i)
 	{
 		ItemInfo &II = CBasePlayerItem::ItemInfoArray[i];
 
@@ -217,7 +245,7 @@ void WriteSigonMessages()
 			continue;
 
 		WriteWeaponInfo(II);
-	}
+	}*/
 }
 
 void SendItemStatus(CBasePlayer *pPlayer)

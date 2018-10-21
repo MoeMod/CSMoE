@@ -141,6 +141,7 @@ void CMonster::Precache()
 	PRECACHE_SOUND("zombi/zombi_attack_1.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_2.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_3.wav");
+	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 }
 
 void CMonster::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)

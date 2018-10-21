@@ -25,6 +25,7 @@
 #define RGB_REDISH 0x00FF1010 //255,16,16
 #define RGB_GREENISH 0x0000A000 //0,160,0
 #define RGB_WHITE 0x00FFFFFF
+#define RGB_LIGHTBLUE 0x0072C5FF //114, 197, 255
 
 #include <assert.h>
 #include <string.h>
@@ -118,8 +119,10 @@ struct HUDLIST {
 //#include "voice_status.h"
 #include "hud_spectator.h"
 #include "followicon.h"
+#include "scenariostatus.h"
 #include "zbs/zbs.h"
-
+#include "zb2/zb2.h"
+#include "retina.h"
 
 //
 //-----------------------------------------------------
@@ -770,9 +773,11 @@ public:
 class CHudTimer: public CHudBase
 {
 	friend class CHudSpectatorGui;
+	friend class CHudScenarioStatus;
 public:
 	int Init( void );
 	int VidInit( void );
+	void Reset(void);
 	int Draw(float fTime);
 	// set up the timer.
 	// [short]
@@ -786,6 +791,7 @@ private:
 	float m_fStartTime;
 	bool m_bPanicColorChange;
 	float m_flPanicTime;
+	int m_closestRight;
 };
 //
 //-----------------------------------------------------
@@ -957,7 +963,7 @@ public:
 		// look through the loaded sprite name list for SpriteName
 		for ( int i = 0; i < m_iSpriteCount; i++ )
 		{
-			if ( strncmp( SpriteName, m_rgszSpriteNames + (i * MAX_SPRITE_NAME_LENGTH), MAX_SPRITE_NAME_LENGTH ) == 0 )
+			if ( strnicmp( SpriteName, m_rgszSpriteNames + (i * MAX_SPRITE_NAME_LENGTH), MAX_SPRITE_NAME_LENGTH ) == 0 )
 				return i;
 		}
 
@@ -1044,9 +1050,12 @@ public:
 	CHudRadar       m_Radar;
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
+	CHudScenarioStatus m_scenarioStatus;
 	
 	CHudHeadName	m_HeadName;
-	CHudZBS m_ZBS;
+	CHudRetina		m_Retina;
+	CHudZBS	m_ZBS;
+	CHudZB2 m_ZB2;
 
 	// user messages
 	CHudMsgFunc(Damage);

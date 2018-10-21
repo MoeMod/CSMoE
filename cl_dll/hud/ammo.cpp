@@ -570,7 +570,16 @@ int CHudAmmo::MsgFunc_AmmoX(const char *pszName, int iSize, void *pbuf)
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int iIndex = reader.ReadByte();
-	int iCount = reader.ReadByte();
+	// fuck 255 limit
+	int iCount;
+	if (iSize == 3)
+	{
+		iCount = reader.ReadShort();
+	}
+	else
+	{
+		iCount = reader.ReadByte();
+	}
 
 	gWR.SetAmmo( iIndex, abs(iCount) );
 
@@ -646,7 +655,18 @@ int CHudAmmo::MsgFunc_CurWeapon(const char *pszName, int iSize, void *pbuf )
 
 	int iState = reader.ReadByte();
 	int iId = reader.ReadChar();
-	int iClip = reader.ReadChar();
+	
+	// fuck 128 limit
+	int iClip;
+	if (iSize == 4)
+	{
+		iClip = reader.ReadShort();
+	}
+	else
+	{
+		iClip = reader.ReadByte();
+	}
+
 
 	if ( iId < 1 )
 	{

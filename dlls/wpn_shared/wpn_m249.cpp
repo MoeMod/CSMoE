@@ -67,7 +67,7 @@ int CM249::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556NatoBox";
-	p->iMaxAmmo1 = _556NATOBOX_MAX_CARRY;
+	p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = M249_MAX_CLIP;

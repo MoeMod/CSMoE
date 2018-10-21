@@ -88,10 +88,15 @@ extern int gmsgShowTimer;
 
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;
+extern int gmsgBTEWeapon;
+extern int gmsgZB2Msg;
 
 void LinkUserMessages();
 void WriteSigonMessages();
 void SendItemStatus(CBasePlayer *pPlayer);
 
 void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src);
+
+struct ItemInfo;
+void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II);
 #endif

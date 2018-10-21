@@ -65,7 +65,11 @@
 #include "tutor_cs_states.h"
 #include "tutor_cs_tutor.h"
 
+#include "gamemode/mods.h"
 #include "player/player_model.h"
+#include "player/player_zombie_skill.h"
+
+#include <tuple>
 
 /*
 * Globals initialization
@@ -2457,9 +2461,6 @@ void Radio3(CBasePlayer *player, int slot)
 
 bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 {
-	int cost;
-	const char *classname;
-
 	if (!player->CanPlayerBuy(true))
 	{
 		return false;
@@ -2472,70 +2473,20 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 		return false;
 	}
 
-	// Can only buy if the player does not already have full ammo
-	if (player->m_rgAmmo[ nAmmo ] >= weapon->iMaxAmmo1())
+	WeaponBuyAmmoConfig config = weapon->GetBuyAmmoConfig();
+	int cost = config.cost;
+	const char *classname = config.classname;
+
+	if (!classname)
 	{
+		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
 		return false;
 	}
 
-	switch (weapon->m_iId)
+	// Can only buy if the player does not already have full ammo
+	int iMax = weapon->iMaxAmmo1();
+	if (player->m_rgAmmo[nAmmo] >= g_pModRunning->ComputeMaxAmmo(player, classname, iMax))
 	{
-	case WEAPON_AWP:
-		cost = AMMO_338MAG_PRICE;
-		classname = "ammo_338magnum";
-		break;
-	case WEAPON_SCOUT:
-	case WEAPON_G3SG1:
-	case WEAPON_AK47:
-		cost = AMMO_762MM_PRICE;
-		classname = "ammo_762nato";
-		break;
-	case WEAPON_XM1014:
-	case WEAPON_M3:
-		cost = AMMO_BUCKSHOT_PRICE;
-		classname = "ammo_buckshot";
-		break;
-	case WEAPON_MAC10:
-	case WEAPON_UMP45:
-	case WEAPON_USP:
-		cost = AMMO_45ACP_PRICE;
-		classname = "ammo_45acp";
-		break;
-	case WEAPON_M249:
-		cost = AMMO_556MM_PRICE;
-		classname = "ammo_556natobox";
-		break;
-	case WEAPON_FIVESEVEN:
-	case WEAPON_P90:
-		cost = AMMO_57MM_PRICE;
-		classname = "ammo_57mm";
-		break;
-	case WEAPON_ELITE:
-	case WEAPON_GLOCK18:
-	case WEAPON_MP5N:
-	case WEAPON_TMP:
-		cost = AMMO_9MM_PRICE;
-		classname = "ammo_9mm";
-		break;
-	case WEAPON_DEAGLE:
-		cost = AMMO_50AE_PRICE;
-		classname = "ammo_50ae";
-		break;
-	case WEAPON_P228:
-		cost = AMMO_357SIG_PRICE;
-		classname = "ammo_357sig";
-		break;
-	case WEAPON_AUG:
-	case WEAPON_SG550:
-	case WEAPON_GALIL:
-	case WEAPON_FAMAS:
-	case WEAPON_M4A1:
-	case WEAPON_SG552:
-		cost = AMMO_556MM_PRICE;
-		classname = "ammo_556nato";
-		break;
-	default:
-		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
 		return false;
 	}
 
@@ -3690,7 +3641,12 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "drop"))
 			{
 				// player is dropping an item.
-				if (player->HasShield())
+				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1"))
+				{
+					// ...
+				}
+#ifdef ENABLE_SHIELD
+				else if (player->HasShield())
 				{
 					if (player->m_pActiveItem != NULL && player->m_pActiveItem->m_iId == WEAPON_C4)
 					{
@@ -3699,6 +3655,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					else
 						player->DropShield();
 				}
+#endif
 				else
 					player->DropPlayerItem(CMD_ARGV_(1));
 			}
@@ -4204,6 +4161,7 @@ void ClientPrecache()
 
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
+	ZombieSkill_Precache();
 
 	if (g_bIsCzeroGame)
 	{

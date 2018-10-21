@@ -29,6 +29,7 @@ public: // CHalfLifeMultiplay
 public:
 	DamageTrack_e DamageTrack() override { return DT_ZBS; }
 	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
+	int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) override { return 600; }
 
 public:
 	void TeamCheck();

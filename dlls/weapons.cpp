@@ -442,6 +442,11 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_galil");
 	UTIL_PrecacheOtherWeapon("weapon_famas");
 
+	UTIL_PrecacheOtherWeapon("weapon_mp7a1d");
+	UTIL_PrecacheOther("ammo_46mm");
+	UTIL_PrecacheOtherWeapon("weapon_ak47l");
+	UTIL_PrecacheOtherWeapon("weapon_deagled");
+
 	if (g_pGameRules->IsDeathmatch())
 	{
 		// container for dropped deathmatch weapons
@@ -1111,6 +1116,11 @@ int CBasePlayerItem::AddToPlayer(CBasePlayer *pPlayer)
 		WRITE_BYTE(m_iId);
 	MESSAGE_END();
 
+	// added for WeaponList update
+	ItemInfo II;
+	GetItemInfo(&II);
+	WriteWeaponInfo(pPlayer, II);
+
 	return TRUE;
 }
 
@@ -1203,7 +1213,10 @@ int CBasePlayerWeapon::UpdateClientData(CBasePlayer *pPlayer)
 	if (this == pPlayer->m_pActiveItem || this == pPlayer->m_pClientActiveItem)
 	{
 		if (pPlayer->m_pActiveItem != pPlayer->m_pClientActiveItem)
+		{
 			bSend = TRUE;
+			UpdateItemInfo();
+		}
 	}
 
 	if (m_iClip != m_iClientClip || state != m_iClientWeaponState || pPlayer->m_iFOV != pPlayer->m_iClientFOV)
@@ -1214,7 +1227,8 @@ int CBasePlayerWeapon::UpdateClientData(CBasePlayer *pPlayer)
 		MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pPlayer->pev);
 			WRITE_BYTE(state);
 			WRITE_BYTE(m_iId);
-			WRITE_BYTE(m_iClip);
+		//	WRITE_BYTE(m_iClip);
+			WRITE_SHORT(m_iClip);
 		MESSAGE_END();
 
 		m_iClientClip = m_iClip;

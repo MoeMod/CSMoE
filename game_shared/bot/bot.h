@@ -221,7 +221,7 @@ protected:
 	// the "personality" profile of this bot
 	const BotProfile *m_profile;
 
-private:
+protected:
 	void ResetCommand();
 	byte ThrottledMsec() const;
 

@@ -206,6 +206,7 @@ void CCSBot::Upkeep()
 	}
 
 	// view angles can change quickly
+	BhopJump_UpdateSync();
 	UpdateLookAngles();
 }
 
@@ -606,7 +607,11 @@ void CCSBot::Update()
 		m_avoid = NULL;
 	}
 
-	if (m_isJumpCrouching)
+	if (m_isBhopJumping)
+	{
+		BhopJump_UpdateJump();
+	}
+	else if (m_isJumpCrouching)
 	{
 		const float duration = 0.75f;
 		const float crouchDelayTime = 0.05f;

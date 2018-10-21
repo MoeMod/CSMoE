@@ -62,7 +62,7 @@ void CKnife_Zombi::Precache(void)
 int CKnife_Zombi::GetItemInfo(ItemInfo *p)
 {
 	CKnife::GetItemInfo(p);
-	p->pszName = STRING("weapon_knife");
+	p->pszName = "weapon_knife";
 
 	return 1;
 }

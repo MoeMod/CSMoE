@@ -1,0 +1,6 @@
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "player.h"
+#include "client.h"
+#include "player_mod_strategy.h"

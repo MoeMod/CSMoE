@@ -671,8 +671,25 @@ public:
 public:
 #ifdef CLIENT_DLL
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
+	virtual void ZombieSkill_Init() {}
+	virtual void ZombieSkill_Check() {}
+	virtual void ZombieSkill_Start() {}
+	virtual void ZombieSkill_End() {}
+	virtual void ZombieSkill_Reset() {}
+	virtual void ZombieSkill_Effect() {}
+	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
+	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) {}
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
+	virtual void ZombieSkill_Init();
+	virtual void ZombieSkill_Check();
+	virtual void ZombieSkill_Start();
+	virtual void ZombieSkill_End();
+	virtual void ZombieSkill_Reset();
+	virtual void ZombieSkill_Effect();
+	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
+	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) { ApplyKnockbackData(this, this->pev->origin - attacker->pev->origin, data); }
+	
 #endif
 
 	void DeathSound_Zombie();
@@ -689,11 +706,20 @@ public:
 	void HumanLevel_Reset();
 	void HumanLevel_UpdateHUD();
 
+	void Zombie_HealthRecoveryThink();
+
 public:
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
+	float m_flTimeNextZombieHealthRecovery;
+	int m_iZombieInfections;
+
+	ZombieSkillStatus m_iZombieSkillStatus;
+	float m_flTimeZombieSkillEnd;
+	float m_flTimeZombieSkillNext;
+	float m_flTimeZombieSkillEffect;
 
 	HumanLevelStruct m_iHumanLevel;
 };
@@ -726,8 +752,6 @@ void EscapeZoneIcon_Clear(CBasePlayer *player);
 void VIP_SafetyZoneIcon_Set(CBasePlayer *player);
 void VIP_SafetyZoneIcon_Clear(CBasePlayer *player);
 
-
-const char *GetCSModelName(int item_id);
 Vector VecVelocityForDamage(float flDamage);
 int TrainSpeed(int iSpeed, int iMax);
 const char *GetWeaponName(entvars_t *pevInflictor, entvars_t *pKiller);
