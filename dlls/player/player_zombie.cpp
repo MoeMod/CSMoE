@@ -86,6 +86,10 @@ void CBasePlayer::Zombie_HealthRecoveryThink()
 		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 	}
 
+	// cannot recover during using zombie skill.
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+		return;
+
 	if (gpGlobals->time > m_flTimeNextZombieHealthRecovery)
 	{
 		if (pev->max_health != pev->health)

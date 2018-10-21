@@ -676,6 +676,7 @@ public:
 	virtual void ZombieSkill_Start() {}
 	virtual void ZombieSkill_End() {}
 	virtual void ZombieSkill_Reset() {}
+	virtual void ZombieSkill_Effect() {}
 	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) {}
 #else
@@ -685,6 +686,7 @@ public:
 	virtual void ZombieSkill_Start();
 	virtual void ZombieSkill_End();
 	virtual void ZombieSkill_Reset();
+	virtual void ZombieSkill_Effect();
 	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) { ApplyKnockbackData(this, this->pev->origin - attacker->pev->origin, data); }
 	
@@ -717,6 +719,7 @@ public:
 	ZombieSkillStatus m_iZombieSkillStatus;
 	float m_flTimeZombieSkillEnd;
 	float m_flTimeZombieSkillNext;
+	float m_flTimeZombieSkillEffect;
 
 	HumanLevelStruct m_iHumanLevel;
 };

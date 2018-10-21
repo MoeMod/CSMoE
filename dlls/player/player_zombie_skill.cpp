@@ -17,6 +17,11 @@ void CBasePlayer::ZombieSkill_Check()
 
 	}
 
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEffect)
+	{
+		ZombieSkill_Effect();
+	}
+
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
 	{
 		ZombieSkill_End();
@@ -56,6 +61,7 @@ void CBasePlayer::ZombieSkill_Start()
 	m_iZombieSkillStatus = SKILL_STATUS_USING;
 	m_flTimeZombieSkillEnd = gpGlobals->time + ZOMBIECRAZY_DURATION;
 	m_flTimeZombieSkillNext = gpGlobals->time + ZOMBIECRAZY_COOLDOWN;
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
 	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 
 	pev->renderfx = kRenderFxGlowShell;
@@ -65,7 +71,8 @@ void CBasePlayer::ZombieSkill_Start()
 	pev->health -= 500.0f;
 	ResetMaxSpeed();
 
-	//EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM);
+	EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_pressure.wav", VOL_NORM, ATTN_NORM);
+
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
@@ -111,7 +118,9 @@ void CBasePlayer::ZombieSkill_Reset()
 
 void ZombieSkill_Precache()
 {
-	//PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
+	PRECACHE_SOUND("zombi/zombi_pressure.wav");
+	PRECACHE_SOUND("zombi/zombi_pre_idle_1.wav");
+	PRECACHE_SOUND("zombi/zombi_pre_idle_2.wav");
 }
 
 float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
@@ -122,4 +131,14 @@ float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAt
 	}
 
 	return flDamage;
+}
+
+void CBasePlayer::ZombieSkill_Effect()
+{
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
+
+	if(RANDOM_LONG(0, 1))
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_pre_idle_1.wav", VOL_NORM, ATTN_NORM);
+	else
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
 }
