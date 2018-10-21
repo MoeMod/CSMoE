@@ -330,6 +330,7 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	{
 		monster->pev->health = monster->pev->max_health = monster->pev->max_health / 2;
 		SET_MODEL(monster->edict(), "models/player/zombi_host/zombi_host.mdl");
+		UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	}
 
 	return monster;
