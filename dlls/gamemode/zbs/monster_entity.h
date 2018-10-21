@@ -48,6 +48,9 @@ public:
 	void SetAnimation(MonsterAnim anim);
 
 	void KillBouns(CBasePlayer *player);
+
+public:
+	float m_flAttackDamage;
 };
 
 #endif

@@ -108,7 +108,7 @@ int CHudZBSScoreBoard::VidInit(void)
 	m_iToprecord = gRenderAPI.GL_LoadTexture("resource/hud/challenge/toprecord", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
 
 	BuildNumberRC(m_rcTeamnumber, 23, 24);
-	BuildNumberRC(m_rcSelfnumber, 18, 19);
+	BuildNumberRC(m_rcSelfnumber, 19, 19);
 	BuildNumberRC(m_rcToprecord, 14, 14);
 
 	return 1;

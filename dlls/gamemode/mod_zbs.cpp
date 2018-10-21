@@ -10,6 +10,7 @@
 
 #include "zbs/zs_subs.h"
 #include "zbs/zbs_const.h"
+#include "zbs/monster_entity.h"
 #include "player/csdm_randomspawn.h"
 
 #include <algorithm>
@@ -19,6 +20,8 @@ CMod_ZombieScenario::CMod_ZombieScenario()
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
 	
 	PRECACHE_GENERIC("sound/Scenario_Ready.mp3");
+	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
 }
 
 void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
@@ -98,9 +101,9 @@ void CMod_ZombieScenario::Think()
 
 	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
 	{
-		//if (m_iNumTerroristWins)
-			//g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
-		//else
+		if (m_iNumTerroristWins)
+			g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
+		else
 			RestartRound();
 	}
 
@@ -230,7 +233,7 @@ void CMod_ZombieScenario::HumanWin()
 	UpdateTeamScores();
 	ClearZombieNPC();
 
-	if (m_iNumCTWins >= m_iMaxRoundsWon)
+	if (m_iMaxRoundsWon && m_iNumCTWins >= m_iMaxRoundsWon)
 	{
 		UTIL_ClientPrintAll(HUD_PRINTCENTER, "Congratulations! You've cleared all the Rounds."); // #CSO_CongAllRoundClear
 	}
@@ -297,7 +300,9 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 		return nullptr;
 	}
 
-	CBaseEntity *monster = CBaseEntity::Instance(pent);
+	CMonster *monster = dynamic_cast<CMonster *>(CBaseEntity::Instance(pent));
+	if (!monster)
+		return nullptr;
 
 	CZombieSpawn *sp = SelectZombieSpawnPoint();
 	if (sp)
@@ -315,9 +320,17 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	pent->v.spawnflags |= SF_NORESPAWN;
 	
 	DispatchSpawn(pent);
-	monster->pev->max_health = 100 + m_iNumCTWins * 20;
-	monster->pev->health = monster->pev->max_health;
+
+	// default settings
+	monster->pev->health = monster->pev->max_health = 100 + m_iNumCTWins * 15;
 	monster->pev->maxspeed = 100.0f + (m_iNumCTWins / 3) * 15;
+	monster->m_flAttackDamage = (0.2f * m_iNumCTWins + 1) * (0.2f * m_iNumCTWins + 1);
+
+	if (m_iNumCTWins < 5 || RANDOM_LONG(0, 3))
+	{
+		monster->pev->health = monster->pev->max_health = monster->pev->max_health / 2;
+		SET_MODEL(monster->edict(), "models/player/zombi_host/zombi_host.mdl");
+	}
 
 	return monster;
 }

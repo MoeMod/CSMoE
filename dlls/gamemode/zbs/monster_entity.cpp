@@ -130,6 +130,8 @@ void CMonster::Spawn()
 	
 	//CHostage::Spawn();
 	pev->team = TEAM_TERRORIST; // allow bot attack...
+
+	m_flAttackDamage = 1.0f;
 }
 
 void CMonster::Precache()
@@ -313,7 +315,7 @@ void CMonster::Remove()
 	m_improv = nullptr;
 	delete pPrevImprov;
 
-	pev->flags |= FL_KILLME;
+	SUB_Remove();
 }
 
 void CMonster::IdleThink()
@@ -417,7 +419,7 @@ CBaseEntity *CMonster::CheckAttack()
 	const float flAttackDistance = 35.0f;
 	const float flAttackRate = 2.0f;
 	const float flAttackAnimTime = 0.6f;
-	const float flAttackDamage = 1.0f;
+	const float flAttackDamage = m_flAttackDamage;
 
 	if (m_flNextAttack > gpGlobals->time)
 		return nullptr;
@@ -850,7 +852,7 @@ bool CMonster::ShouldAttack(CBaseEntity *target)
 void CMonster::KillBouns(CBasePlayer *player)
 {
 	player->AddPoints(1, FALSE);
-	player->AddAccount(50);
+	player->AddAccount(500);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, player->pev);
 	WRITE_BYTE(ZBS_TIP_KILL);
