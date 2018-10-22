@@ -165,6 +165,7 @@ extern DLL_GLOBAL const Vector g_vecZero;
 
 #ifdef CLIENT_DLL
 #include "cs_wpn/bte_weapons.h"
+#include "cs_wpn/bte_weapons_register.h"
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
 	static CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); 
 #elif defined(_WIN32)

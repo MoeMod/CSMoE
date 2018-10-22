@@ -165,6 +165,12 @@ set(HLDLL_SRCS
 	./gamemode/zbs/zs_subs.cpp
 	./gamemode/zbs/monster_entity.cpp
 	./../public/unicode_strtools.cpp
+	./gamemode/mod_zb2.cpp
+	./gamemode/zb2/supplybox.cpp
+	./bot/cs_bot_bhopjump.cpp
+	./player/player_zombie_skill.cpp
+	./weapons_data.cpp
+	./weapons_msg.cpp
 	)
 
 set(HLWPN_SRCS
@@ -199,6 +205,9 @@ set(HLWPN_SRCS
 	./wpn_shared/wpn_xm1014.cpp
 
 	./wpn_shared/wpn_knife_zombi.cpp
+	./wpn_shared/wpn_ak47l.cpp
+	./wpn_shared/wpn_mp7a1d.cpp
+	./wpn_shared/wpn_deagled.cpp
 	)
 
 set(PM_SRCS

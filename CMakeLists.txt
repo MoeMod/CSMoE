@@ -23,7 +23,7 @@ endif()
 
 # force build 32bit libraries
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    if(NOT APPLE)
+    if(WIN32)
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
     endif()

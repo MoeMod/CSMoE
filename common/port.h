@@ -99,8 +99,9 @@ GNU General Public License for more details.
 	#define SetCurrentDirectory( x )	(!chdir( x ))
 	#define FreeLibrary( x )			dlclose( x )
 	//#define MAKEWORD( a, b )			((short int)(((unsigned char)(a))|(((short int)((unsigned char)(b)))<<8)))
-	#define max( a, b )                 (((a) > (b)) ? (a) : (b))
-	#define min( a, b )                 (((a) < (b)) ? (a) : (b))
+	//#define max( a, b )                 (((a) > (b)) ? (a) : (b))
+	//#define min( a, b )                 (((a) < (b)) ? (a) : (b))
+#include "minmax.h"
 	#define tell( a )					lseek(a, 0, SEEK_CUR)
 
 	typedef unsigned char	BYTE;

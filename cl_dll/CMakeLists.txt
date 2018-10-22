@@ -73,12 +73,17 @@ set (WEAPONEVENT_SRCS
 	./events/event_xm1014.cpp
 	./events/hl_events.cpp
 	./ev_common.cpp
+
+	./events/event_ak47l.cpp
+	./events/event_mp7a1d.cpp
+	./events/event_deagled.cpp
 )
 
 set (CLWEAPON_SRCS
 	./com_weapons.cpp
 	./cs_wpn/cs_baseentity.cpp
 	./cs_wpn/cs_weapons.cpp
+	./cs_wpn/bte_weapons.cpp
 	../dlls/wpn_shared/wpn_ak47.cpp
 	../dlls/wpn_shared/wpn_aug.cpp
 	../dlls/wpn_shared/wpn_awp.cpp
@@ -108,6 +113,10 @@ set (CLWEAPON_SRCS
 	../dlls/wpn_shared/wpn_ump45.cpp
 	../dlls/wpn_shared/wpn_usp.cpp
 	../dlls/wpn_shared/wpn_xm1014.cpp
+
+	../dlls/wpn_shared/wpn_ak47l.cpp
+	../dlls/wpn_shared/wpn_mp7a1d.cpp
+	../dlls/wpn_shared/wpn_deagled.cpp
 )
 
 set (HUD_SRCS
@@ -147,6 +156,10 @@ set (HUD_SRCS
 	./hud/zbs/zbs_scoreboard.cpp
 	./hud/zbs/zbs_kill.cpp
 	./hud/zbs/zbs_roundclear.cpp
+	./hud/retina.cpp
+	./hud/scenariostatus.cpp
+	./hud/zb2/zb2.cpp
+	./hud/zb2/zb2_skill.cpp
 )
 
 set (STUDIORENDER_SRCS

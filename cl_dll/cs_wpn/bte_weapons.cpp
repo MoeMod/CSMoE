@@ -110,3 +110,10 @@ CBTEClientWeapons &BTEClientWeapons()
 	static CBTEClientWeapons x;
 	return x;
 }
+
+void InitializeWeaponEntity(CBasePlayerWeapon *pEntity, entvars_t *pev)
+{
+	pEntity->pev = pev;
+	pEntity->Precache();
+	pEntity->Spawn();
+}
