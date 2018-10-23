@@ -73,9 +73,14 @@ SRCS := \
 	./hud/zbs/zbs_scoreboard.cpp \
 	./hud/zbs/zbs_kill.cpp \
 	./hud/zbs/zbs_roundclear.cpp \
+	./hud/retina.cpp \
+	./hud/scenariostatus.cpp \
+	./hud/zb2/zb2.cpp \
+	./hud/zb2/zb2_skill.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
+	./cs_wpn/bte_weapons.cpp \
 	../dlls/wpn_shared/wpn_ak47.cpp \
 	../dlls/wpn_shared/wpn_aug.cpp \
 	../dlls/wpn_shared/wpn_awp.cpp \
@@ -105,6 +110,9 @@ SRCS := \
 	../dlls/wpn_shared/wpn_ump45.cpp \
 	../dlls/wpn_shared/wpn_usp.cpp \
 	../dlls/wpn_shared/wpn_xm1014.cpp \
+	../dlls/wpn_shared/wpn_ak47l.cpp \
+	../dlls/wpn_shared/wpn_mp7a1d.cpp \
+	../dlls/wpn_shared/wpn_deagled.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -137,8 +145,13 @@ SRCS := \
 	./events/event_vehicle.cpp \
 	./events/event_xm1014.cpp \
 	./events/hl_events.cpp \
+	./events/event_ak47l.cpp \
+	./events/event_mp7a1d.cpp \
+	./events/event_deagled.cpp \
 	./ev_common.cpp \
-	./calcscreen.cpp 
+	./calcscreen.cpp \
+	
+
 
 DEFINES = -Wno-write-strings -DLINUX -D_LINUX -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -DCLIENT_WEAPONS -DCLIENT_DLL -Wl,--no-undefined
 

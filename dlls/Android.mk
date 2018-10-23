@@ -180,6 +180,16 @@ LOCAL_SRC_FILES := \
 	../pm_shared/pm_math.c \
 	../pm_shared/pm_shared.c \
 	../public/MemPool.cpp \
+	./gamemode/mod_zb2.cpp \
+	./gamemode/zb2/supplybox.cpp \
+	./bot/cs_bot_bhopjump.cpp \
+	./player/player_zombie_skill.cpp \
+	./weapons_data.cpp \
+	./weapons_msg.cpp \
+	./wpn_shared/wpn_knife_zombi.cpp \
+	./wpn_shared/wpn_ak47l.cpp \
+	./wpn_shared/wpn_mp7a1d.cpp \
+	./wpn_shared/wpn_deagled.cpp \
 
 
 LOCAL_CPPFLAGS += -frtti -std=c++11

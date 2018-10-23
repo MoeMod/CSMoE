@@ -23,6 +23,14 @@
 cmake_minimum_required(VERSION 2.6.0)
 project (MAINUI)
 
+if (APPLE)
+	set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -stdlib=libc++")
+elseif(MSVC)
+	set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+else()
+	set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -static-libstdc++")
+endif()
+
 if(PANDORA)
 	add_definitions(-DPANDORA)
 endif()
