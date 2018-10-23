@@ -42,9 +42,11 @@ void CBasePlayer::ZombieSkill_Start()
 		{
 		case SKILL_STATUS_USING:
 		case SKILL_STATUS_FREEZING:
+			char buf[16];
+			sprintf(buf, "%d", static_cast<int>(m_flTimeZombieSkillNext - gpGlobals->time));
 			ClientPrint(pev, HUD_PRINTCENTER,
 				"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
-				std::to_string(static_cast<int>(m_flTimeZombieSkillNext - gpGlobals->time)).c_str()
+				buf
 			); // #CSO_WaitCoolTimeNormal
 
 			break;
