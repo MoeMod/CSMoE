@@ -148,6 +148,7 @@ private:
 class CBaseEntity
 {
 public:
+	virtual ~CBaseEntity() = default;
 	virtual void Spawn(void) {}
 	virtual void Precache(void) {}
 	virtual void Restart(void) {}
