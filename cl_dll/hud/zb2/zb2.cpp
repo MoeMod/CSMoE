@@ -11,11 +11,15 @@
 
 #include "gamemode/zb2/zb2_const.h"
 
+#include <vector>
+
 class CHudZB2::impl_t
 {
 public:
 	CHudZB2_Skill skill;
 
+	SharedTexture m_pTexture_RageRetina;
+	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 public:
 	template<class T, class F, class...Args>
 	void for_each(F T::*f, Args &&...args)
@@ -44,6 +48,13 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		for (int i = 0; i < 4 && !buf.Eof(); ++i)
 			skills[i] = static_cast<ZombieSkillType>(buf.ReadByte());
 		pimpl->skill.OnSkillInit(zclass, skills[0], skills[1], skills[2], skills[3]);
+
+		// remove retinas...
+		for (auto x : pimpl->m_RetinaIndexes)
+		{
+			gHUD.m_Retina.RemoveItem(x);
+		}
+		pimpl->m_RetinaIndexes.clear();
 		break;
 	}
 	case ZB2_MESSAGE_SKILL_ACTIVATE:
@@ -53,7 +64,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flFreezeTime = buf.ReadShort();
 		pimpl->skill.OnSkillActivate(type, flHoldTime, flFreezeTime);
 		if (type == ZOMBIE_SKILL_CRAZY || type == ZOMBIE_SKILL_CRAZY2)
-			gHUD.m_Retina.AddItem("resource/zombi/zombicrazy", CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f);
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f));
 		break;
 	}
 		
@@ -79,8 +90,7 @@ int CHudZB2::VidInit(void)
 {
 	pimpl->for_each(&CHudBase_ZB2::VidInit);
 
-	gHUD.m_Retina.PrecacheTexture("resource/zombi/zombicrazy");
-
+	pimpl->m_pTexture_RageRetina = R_LoadTextureShared("resource/zombi/zombicrazy");
 	return 1;
 }
 

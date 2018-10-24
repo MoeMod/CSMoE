@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "r_texture.h"
+
 class CHudZBSRoundClear : public CHudBase_ZBS
 {
 public:
@@ -13,8 +15,8 @@ public:
 	void OnRoundFail();
 
 protected:
-	int m_iRoundClear;
-	int m_iRoundFail;
-	int m_iCurTexture;
+	SharedTexture m_pTexture_RoundClear;
+	SharedTexture m_pTexture_RoundFail;
+	SharedTexture m_pCurTexture;
 	float m_flDisplayTime;
 };

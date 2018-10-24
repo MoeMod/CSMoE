@@ -19,21 +19,19 @@ void CHudZBSKill::OnKillMessage()
 
 int CHudZBSKill::Init(void)
 {
-	m_iKillTexture = 0;
-
 	return 1;
 }
 
 int CHudZBSKill::VidInit(void)
 {
-	m_iKillTexture = gRenderAPI.GL_LoadTexture("resource/hud/zbs/zbskill", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	m_iKillTexture = R_LoadTextureUnique("resource/hud/zbs/zbskill");
 	
 	return 1;
 }
 
 void CHudZBSKill::Shutdown(void)
 {
-	gRenderAPI.GL_FreeTexture(m_iKillTexture);
+	m_iKillTexture = nullptr;
 }
 
 void CHudZBSKill::Reset(void)
@@ -44,8 +42,6 @@ void CHudZBSKill::Reset(void)
 int CHudZBSKill::Draw(float time)
 {
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-	gRenderAPI.GL_SelectTexture(0);
-	gRenderAPI.GL_Bind(0, m_iKillTexture);
 	
 	for (auto &flStartTime : m_killTimes)
 	{
@@ -56,7 +52,8 @@ int CHudZBSKill::Draw(float time)
 		int x = ScreenWidth / 2 - 234 / 2;
 		int y = ScreenHeight / 4 - shownTime * 100.0f;
 
-		
+		m_iKillTexture->Bind();
+
 		float a = (flStartTime - gHUD.m_flTime) / ZBS_KILL_DISPLAY_TIME;
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
 		

@@ -3,6 +3,7 @@
 
 #include "zb2.h"
 #include "gamemode/zb2/zb2_const.h"
+#include "r_texture.h"
 
 class CHudZB2_Skill : public CHudBase_ZB2
 {
@@ -31,7 +32,7 @@ protected:
 	int m_HUD_zombieGKey;
 	int m_HUD_SkillIcons[MAX_ZOMBIE_SKILL];
 	int m_HUD_ClassIcons[MAX_ZOMBIE_CLASS];
-	int m_iTexture_SkillIcons[MAX_ZOMBIE_SKILL];
+	UniqueTexture m_pTexture_SkillTips[MAX_ZOMBIE_SKILL];
 
 protected:
 	float m_flRecoveryBeginTime;

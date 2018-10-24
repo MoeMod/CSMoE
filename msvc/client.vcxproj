@@ -112,6 +112,7 @@
     <ClCompile Include="..\cl_dll\overview.cpp" />
     <ClCompile Include="..\cl_dll\parsemsg.cpp" />
     <ClCompile Include="..\cl_dll\rain.cpp" />
+    <ClCompile Include="..\cl_dll\r_texture.cpp" />
     <ClCompile Include="..\cl_dll\studio\GameStudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\StudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\studio_util.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
+    <ClInclude Include="..\cl_dll\r_texture.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
     <ClInclude Include="..\common\com_model.h" />

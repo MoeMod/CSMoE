@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "r_texture.h"
+
 class CHudZBSKill : public CHudBase_ZBS
 {
 public:
@@ -18,6 +20,6 @@ public:
 
 protected:
 	
-	int m_iKillTexture;
+	UniqueTexture m_iKillTexture;
 	std::vector<float> m_killTimes;
 };

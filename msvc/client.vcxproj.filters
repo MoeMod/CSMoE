@@ -459,6 +459,9 @@
     <ClCompile Include="..\cl_dll\hud\retina.cpp">
       <Filter>cl_dll\hud</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\r_texture.cpp">
+      <Filter>cl_dll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -655,6 +658,9 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\retina.h">
       <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\r_texture.h">
+      <Filter>cl_dll</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

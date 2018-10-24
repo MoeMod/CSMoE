@@ -6,13 +6,13 @@
 
 #include "calcscreen.h"
 
+#include <tuple>
+
 #include "gamemode/mods_const.h"
 
 int CHudFollowIcon::Init(void)
 {
 	m_iBombTargetsNum = 0;
-	m_iBombAB[0] = m_iBombAB[1] = 0;
-	m_iSupplybox = 0;
 	gHUD.AddHudElem(this);
 	m_iFlags = 0;
 	return 1;
@@ -20,17 +20,18 @@ int CHudFollowIcon::Init(void)
 
 int CHudFollowIcon::VidInit(void)
 {
-	m_iBombAB[0] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_a", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_iBombAB[1] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_b", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_iSupplybox = gRenderAPI.GL_LoadTexture("resource/helperhud/supplybox", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	m_pTexture_BombAB[0] = R_LoadTextureUnique("resource/helperhud/c4_a");
+	m_pTexture_BombAB[1] = R_LoadTextureUnique("resource/helperhud/c4_b");
+	m_pTexture_Supplybox = R_LoadTextureUnique("resource/helperhud/supplybox");
 	m_iFlags |= HUD_DRAW;
 	return 1;
 }
 
 void CHudFollowIcon::Shutdown(void)
 {
-	gRenderAPI.GL_FreeTexture(m_iBombAB[0]);
-	gRenderAPI.GL_FreeTexture(m_iBombAB[1]);
+	m_pTexture_BombAB[0] = nullptr;
+	m_pTexture_BombAB[1] = nullptr;
+	m_pTexture_Supplybox = nullptr;
 }
 
 void CHudFollowIcon::Reset(void)
@@ -48,8 +49,7 @@ int CHudFollowIcon::Draw(float time)
 		{
 			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-			gRenderAPI.GL_SelectTexture(0);
-			gRenderAPI.GL_Bind(0, m_iBombAB[i]);
+			m_pTexture_BombAB[i]->Bind();
 
 			DrawUtils::Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
 		}
@@ -69,9 +69,7 @@ int CHudFollowIcon::Draw(float time)
 				{
 					gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-					gRenderAPI.GL_SelectTexture(0);
-					gRenderAPI.GL_Bind(0, m_iSupplybox);
-
+					m_pTexture_Supplybox->Bind();
 					DrawUtils::Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];

@@ -63,7 +63,7 @@ int CHudZB2_Skill::Init(void)
 	m_HUD_zombirecovery = m_HUD_zombieGKey = 0;
 	std::fill(std::begin(m_HUD_SkillIcons), std::end(m_HUD_SkillIcons), 0);
 	std::fill(std::begin(m_HUD_ClassIcons), std::end(m_HUD_ClassIcons), 0);
-	std::fill(std::begin(m_iTexture_SkillIcons), std::end(m_iTexture_SkillIcons), 0);
+	std::fill(std::begin(m_pTexture_SkillTips), std::end(m_pTexture_SkillTips), nullptr);
 	return 1;
 }
 
@@ -86,7 +86,7 @@ int CHudZB2_Skill::VidInit(void)
 	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
 	{
 		if (ZOMBIE_SKILL_HUD_TIP[i][0] != '\0')
-			m_iTexture_SkillIcons[i] = gRenderAPI.GL_LoadTexture(ZOMBIE_SKILL_HUD_TIP[i], NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+			m_pTexture_SkillTips[i] = R_LoadTextureUnique(ZOMBIE_SKILL_HUD_TIP[i]);
 	}
 
 	return 1;
@@ -94,11 +94,7 @@ int CHudZB2_Skill::VidInit(void)
 
 void CHudZB2_Skill::Shutdown(void)
 {
-	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
-	{
-		if (m_iTexture_SkillIcons[i])
-			gRenderAPI.GL_FreeTexture(m_iTexture_SkillIcons[i]);
-	}
+	std::fill(std::begin(m_pTexture_SkillTips), std::end(m_pTexture_SkillTips), nullptr);
 }
 
 void CHudZB2_Skill::Reset(void)
@@ -242,12 +238,12 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 			continue;
 		if (time > icon.m_flTimeSkillBlink)
 			continue;
-		int tex = m_iTexture_SkillIcons[icon.m_iCurrentSkill];
-		if (!tex)
+		auto &tex = m_pTexture_SkillTips[icon.m_iCurrentSkill];
+		if (!tex || !tex->IsValid())
 			continue;
 
-		int w = gRenderAPI.RenderGetParm(PARM_TEX_SRC_WIDTH, tex);
-		int h = gRenderAPI.RenderGetParm(PARM_TEX_SRC_HEIGHT, tex);
+		int w = tex->w();
+		int h = tex->h();
 
 		float timeDelta = icon.m_flTimeSkillBlink - time;
 		float modDelta = timeDelta - static_cast<float>(static_cast<int>(timeDelta));
@@ -255,8 +251,7 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
-		gRenderAPI.GL_SelectTexture(0);
-		gRenderAPI.GL_Bind(0, tex);
+		tex->Bind();
 
 		DrawUtils::Draw2DQuadScaled(x - w / 2, y, x + w / 2, y + h);
 
