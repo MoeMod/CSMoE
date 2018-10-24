@@ -20,9 +20,12 @@ int CHudFollowIcon::Init(void)
 
 int CHudFollowIcon::VidInit(void)
 {
-	m_pTexture_BombAB[0] = R_LoadTextureUnique("resource/helperhud/c4_a");
-	m_pTexture_BombAB[1] = R_LoadTextureUnique("resource/helperhud/c4_b");
-	m_pTexture_Supplybox = R_LoadTextureUnique("resource/helperhud/supplybox");
+	if (!m_pTexture_BombAB[0]) 
+		m_pTexture_BombAB[0] = R_LoadTextureUnique("resource/helperhud/c4_a");
+	if (!m_pTexture_BombAB[1]) 
+		m_pTexture_BombAB[1] = R_LoadTextureUnique("resource/helperhud/c4_b");
+	if (!m_pTexture_Supplybox) 
+		m_pTexture_Supplybox = R_LoadTextureUnique("resource/helperhud/supplybox");
 	m_iFlags |= HUD_DRAW;
 	return 1;
 }

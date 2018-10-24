@@ -86,7 +86,8 @@ int CHudZB2_Skill::VidInit(void)
 	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
 	{
 		if (ZOMBIE_SKILL_HUD_TIP[i][0] != '\0')
-			m_pTexture_SkillTips[i] = R_LoadTextureUnique(ZOMBIE_SKILL_HUD_TIP[i]);
+			if (!m_pTexture_SkillTips[i]) 
+				m_pTexture_SkillTips[i] = R_LoadTextureUnique(ZOMBIE_SKILL_HUD_TIP[i]);
 	}
 
 	return 1;

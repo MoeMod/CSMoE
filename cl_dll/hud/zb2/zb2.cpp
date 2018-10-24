@@ -90,7 +90,8 @@ int CHudZB2::VidInit(void)
 {
 	pimpl->for_each(&CHudBase_ZB2::VidInit);
 
-	pimpl->m_pTexture_RageRetina = R_LoadTextureShared("resource/zombi/zombicrazy");
+	if(!pimpl->m_pTexture_RageRetina)
+		pimpl->m_pTexture_RageRetina = R_LoadTextureShared("resource/zombi/zombicrazy");
 	return 1;
 }
 

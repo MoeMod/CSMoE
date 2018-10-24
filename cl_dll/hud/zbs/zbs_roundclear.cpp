@@ -21,8 +21,10 @@ int CHudZBSRoundClear::Init(void)
 
 int CHudZBSRoundClear::VidInit(void)
 {
-	m_pTexture_RoundClear = R_LoadTextureShared("resource/hud/zbs/roundclear", TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_pTexture_RoundFail = R_LoadTextureShared("resource/hud/zbs/roundfail", TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	if(!m_pTexture_RoundClear)
+		m_pTexture_RoundClear = R_LoadTextureShared("resource/hud/zbs/roundclear", TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	if (!m_pTexture_RoundFail)
+		m_pTexture_RoundFail = R_LoadTextureShared("resource/hud/zbs/roundfail", TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
 	return 1;
 }
 

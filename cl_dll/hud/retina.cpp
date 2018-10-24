@@ -18,7 +18,7 @@ int CHudRetina::Init(void)
 
 int CHudRetina::VidInit(void)
 {
-	
+	RemoveAll();
 	m_iFlags |= HUD_ACTIVE;
 	return 1;
 }

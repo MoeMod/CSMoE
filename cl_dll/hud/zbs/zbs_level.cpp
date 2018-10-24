@@ -17,8 +17,10 @@ int CHudZBSLevel::Init(void)
 
 int CHudZBSLevel::VidInit(void)
 {
-	m_pTexture_ZBSBoard_BG = R_LoadTextureUnique("resource/hud/zbs/zbslevelupbg");
-	m_pTexture_ZBSBoard_BG_Wall = R_LoadTextureUnique("resource/hud/zbs/zbslevelupwallbg");
+	if (!m_pTexture_ZBSBoard_BG) 
+		m_pTexture_ZBSBoard_BG = R_LoadTextureUnique("resource/hud/zbs/zbslevelupbg");
+	if (!m_pTexture_ZBSBoard_BG_Wall) 
+		m_pTexture_ZBSBoard_BG_Wall = R_LoadTextureUnique("resource/hud/zbs/zbslevelupwallbg");
 	//m_iFlags |= HUD_DRAW;
 
 	m_iLevel_HP = m_iLevel_ATK = m_iLevel_Wall = 1;

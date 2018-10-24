@@ -24,7 +24,8 @@ int CHudZBSKill::Init(void)
 
 int CHudZBSKill::VidInit(void)
 {
-	m_iKillTexture = R_LoadTextureUnique("resource/hud/zbs/zbskill");
+	if(!m_iKillTexture) 
+		m_iKillTexture = R_LoadTextureUnique("resource/hud/zbs/zbskill");
 	
 	return 1;
 }
