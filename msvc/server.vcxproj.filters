@@ -562,6 +562,9 @@
     <ClCompile Include="..\dlls\bot\cs_bot_bhopjump.cpp">
       <Filter>dlls\bot</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1184,6 +1187,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\bot\cs_bot_statemachine.h">
       <Filter>dlls\bot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\monster_manager.h">
+      <Filter>dlls\gamemode\zbs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
