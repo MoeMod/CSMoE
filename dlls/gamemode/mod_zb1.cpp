@@ -187,7 +187,7 @@ void CMod_Zombi::Think()
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
+	if (TimeRemaining() <= 0 && !m_bRoundTerminating && !m_bFreezePeriod)
 		HumanWin();
 }
 
