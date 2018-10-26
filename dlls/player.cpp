@@ -155,6 +155,8 @@ entvars_t *g_pevLastInflictor;
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
+
+
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());

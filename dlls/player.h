@@ -215,6 +215,12 @@ public:
 class CBasePlayer : public CBaseMonster
 {
 public:
+	CBasePlayer() : m_rebuyString(nullptr) {}
+	CBasePlayer::~CBasePlayer()
+	{
+		delete[] m_rebuyString;
+	}
+
 	virtual void Spawn();
 
 #ifdef CLIENT_DLL
