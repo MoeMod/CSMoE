@@ -571,6 +571,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1202,6 +1205,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\monster_manager.h">
+      <Filter>dlls\gamemode\zbs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
