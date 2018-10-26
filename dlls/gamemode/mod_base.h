@@ -6,13 +6,14 @@
 #endif
 
 #include "mods.h"
+#include "ruleof350.h"
 
 class CBasePlayer; // player.h
 
 #pragma warning(push)
 #pragma warning(disable:4250) // fuck diamond inhertance warning
 
-class IBaseMod : public CHalfLifeMultiplay
+class IBaseMod : public CHalfLifeMultiplay, ruleof350::unique
 {
 public:
 	virtual DamageTrack_e DamageTrack() { return DT_NONE; }
