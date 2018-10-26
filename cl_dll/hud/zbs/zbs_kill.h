@@ -4,16 +4,15 @@
 #include <vector>
 
 #include "r_texture.h"
+#include "hud_sub.h"
 
-class CHudZBSKill : public CHudBase_ZBS
+class CHudZBSKill : public IBaseHudSub
 {
 public:
-	int Init(void) override;
 	int VidInit(void) override;
 	void Reset(void) override;
 	int Draw(float time) override;
 	void Think(void) override;
-	void Shutdown(void) override;
 
 public:
 	void OnKillMessage();

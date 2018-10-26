@@ -14,11 +14,6 @@
 
 const float ZBS_ROUNDCLEAR_DISPLAY_TIME = 1.0f;
 
-int CHudZBSRoundClear::Init(void)
-{
-	return 1;
-}
-
 int CHudZBSRoundClear::VidInit(void)
 {
 	if(!m_pTexture_RoundClear)
@@ -26,11 +21,6 @@ int CHudZBSRoundClear::VidInit(void)
 	if (!m_pTexture_RoundFail)
 		m_pTexture_RoundFail = R_LoadTextureShared("resource/hud/zbs/roundfail", TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
 	return 1;
-}
-
-void CHudZBSRoundClear::Shutdown(void)
-{
-	std::tie(m_pTexture_RoundClear, m_pTexture_RoundFail, m_pCurTexture) = std::make_tuple(nullptr,nullptr,nullptr);
 }
 
 int CHudZBSRoundClear::Draw(float time)

@@ -77,7 +77,6 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 int CHudZB2::Init(void)
 {
 	pimpl = new CHudZB2::impl_t;
-	pimpl->for_each(&CHudBase_ZB2::Init);
 
 	gHUD.AddHudElem(this);
 
@@ -88,7 +87,7 @@ int CHudZB2::Init(void)
 
 int CHudZB2::VidInit(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::VidInit);
+	pimpl->for_each(&IBaseHudSub::VidInit);
 
 	if(!pimpl->m_pTexture_RageRetina)
 		pimpl->m_pTexture_RageRetina = R_LoadTextureShared("resource/zombi/zombicrazy");
@@ -97,29 +96,27 @@ int CHudZB2::VidInit(void)
 
 int CHudZB2::Draw(float time)
 {
-	pimpl->for_each(&CHudBase_ZB2::Draw, time);
+	pimpl->for_each(&IBaseHudSub::Draw, time);
 	return 1;
 }
 
 void CHudZB2::Think(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Think);
+	pimpl->for_each(&IBaseHudSub::Think);
 }
 
 void CHudZB2::Reset(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Reset);
+	pimpl->for_each(&IBaseHudSub::Reset);
 }
 
 void CHudZB2::InitHUDData(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::InitHUDData);
+	pimpl->for_each(&IBaseHudSub::InitHUDData);
 }
 
 void CHudZB2::Shutdown(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Shutdown);
-
 	delete pimpl;
 	pimpl = nullptr;
 }

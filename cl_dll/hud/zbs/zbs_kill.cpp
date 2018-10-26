@@ -17,22 +17,12 @@ void CHudZBSKill::OnKillMessage()
 	m_killTimes.push_back(gHUD.m_flTime);
 }
 
-int CHudZBSKill::Init(void)
-{
-	return 1;
-}
-
 int CHudZBSKill::VidInit(void)
 {
 	if(!m_iKillTexture) 
 		m_iKillTexture = R_LoadTextureUnique("resource/hud/zbs/zbskill");
 	
 	return 1;
-}
-
-void CHudZBSKill::Shutdown(void)
-{
-	m_iKillTexture = nullptr;
 }
 
 void CHudZBSKill::Reset(void)

@@ -9,10 +9,9 @@
 
 #include "string.h"
 
-int CHudZBSLevel::Init(void)
+CHudZBSLevel::CHudZBSLevel(void)
 {
 	m_iLevel_HP = m_iLevel_ATK = m_iLevel_Wall = 0;
-	return 1;
 }
 
 int CHudZBSLevel::VidInit(void)
@@ -25,12 +24,6 @@ int CHudZBSLevel::VidInit(void)
 
 	m_iLevel_HP = m_iLevel_ATK = m_iLevel_Wall = 1;
 	return 1;
-}
-
-void CHudZBSLevel::Shutdown(void)
-{
-	m_pTexture_ZBSBoard_BG = nullptr;
-	m_pTexture_ZBSBoard_BG_Wall = nullptr;
 }
 
 int CHudZBSLevel::Draw(float time)

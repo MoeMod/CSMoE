@@ -1,15 +1,14 @@
 
 #pragma once
 
+#include "hud_sub.h"
 #include "r_texture.h"
 
-class CHudZBSRoundClear : public CHudBase_ZBS
+class CHudZBSRoundClear : public IBaseHudSub
 {
 public:
-	int Init(void) override;
 	int VidInit(void) override;
 	int Draw(float time) override;
-	void Shutdown(void) override;
 
 	void OnRoundClear();
 	void OnRoundFail();

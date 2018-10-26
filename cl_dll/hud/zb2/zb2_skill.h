@@ -3,17 +3,17 @@
 
 #include "zb2.h"
 #include "gamemode/zb2/zb2_const.h"
+#include "hud_sub.h"
 #include "r_texture.h"
 
-class CHudZB2_Skill : public CHudBase_ZB2
+class CHudZB2_Skill : public IBaseHudSub
 {
 public:
-	int Init(void) override;
+	CHudZB2_Skill(void);
 	int VidInit(void) override;
 	void Reset(void) override;
 	int Draw(float time) override;
 	void Think(void) override;
-	void Shutdown(void) override;
 
 public:
 	// returns x

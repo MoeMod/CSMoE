@@ -689,5 +689,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\hud_sub.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

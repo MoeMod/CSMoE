@@ -58,13 +58,12 @@ const char *CHudZB2_Skill::ZOMBIE_ITEM_HUD_ICON[2][3] =
 	{ "zombiATER", "zombiBTER", "zombiHTER" }
 };
 
-int CHudZB2_Skill::Init(void)
+CHudZB2_Skill::CHudZB2_Skill(void)
 {
 	m_HUD_zombirecovery = m_HUD_zombieGKey = 0;
 	std::fill(std::begin(m_HUD_SkillIcons), std::end(m_HUD_SkillIcons), 0);
 	std::fill(std::begin(m_HUD_ClassIcons), std::end(m_HUD_ClassIcons), 0);
 	std::fill(std::begin(m_pTexture_SkillTips), std::end(m_pTexture_SkillTips), nullptr);
-	return 1;
 }
 
 int CHudZB2_Skill::VidInit(void)
@@ -91,11 +90,6 @@ int CHudZB2_Skill::VidInit(void)
 	}
 
 	return 1;
-}
-
-void CHudZB2_Skill::Shutdown(void)
-{
-	std::fill(std::begin(m_pTexture_SkillTips), std::end(m_pTexture_SkillTips), nullptr);
 }
 
 void CHudZB2_Skill::Reset(void)
