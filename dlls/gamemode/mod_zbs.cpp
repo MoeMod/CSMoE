@@ -12,6 +12,7 @@
 #include "zbs/zbs_const.h"
 #include "zbs/monster_entity.h"
 #include "player/csdm_randomspawn.h"
+#include "zbs/monster_manager.h"
 
 #include <algorithm>
 
@@ -275,11 +276,7 @@ void CMod_ZombieScenario::RoundStart()
 
 BOOL CMod_ZombieScenario::FRoundStarted()
 {
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 20)
-		return false;
-
-	return true;
+	return !IsFreezePeriod();
 }
 
 CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()

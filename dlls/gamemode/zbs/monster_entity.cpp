@@ -13,6 +13,7 @@
 #include "bot_include.h" // nav
 
 #include "zbs_const.h"
+#include "monster_manager.h"
 
 LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 
@@ -119,19 +120,24 @@ void CMonster::Spawn()
 
 	m_flLastPathCheck = -1;
 	m_flPathAcquired = -1;
-	m_flPathCheckInterval = 0.1;
+	m_flPathCheckInterval = 3.0f;
 	m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
 
 	m_LocalNav = new CLocalNav(this);
 	m_bStuck = FALSE;
 	m_flStuckTime = 0;
+
+	if (m_improv)
+		delete m_improv;
 	m_improv = NULL;
+
 	m_flNextAttack = 0;
 	
 	//CHostage::Spawn();
 	pev->team = TEAM_TERRORIST; // allow bot attack...
 
 	m_flAttackDamage = 1.0f;
+	m_flTimeLastActive = gpGlobals->time;
 }
 
 void CMonster::Precache()
@@ -148,6 +154,7 @@ void CMonster::Precache()
 
 void CMonster::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 { 
+	// skip CHostage::Use
 	return CBaseMonster::Use(pActivator, pCaller, useType, value); 
 }
 
@@ -208,6 +215,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	}
 
 	PlayPainSound();
+	m_flTimeLastActive = gpGlobals->time;
 
 	if (pev->health > 0)
 	{
@@ -227,12 +235,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	}
 	else
 	{
-		if (pAttacker != NULL)
-		{
-			// Player killed monster
-		}
-		
-		Killed(pAttacker->pev, GIB_NORMAL);
+		Killed(pevAttacker, GIB_NORMAL);
 	}
 
 	return 0;
@@ -260,6 +263,8 @@ void CMonster::BecomeDead(void)
 
 void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 {
+	if (!IsAlive())
+		return;
 	// unsigned int cCount = 0;
 	// BOOL fDone = FALSE;
 
@@ -288,11 +293,13 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	pev->nextthink = gpGlobals->time + 3;
 	SetThink(&CMonster::Remove);
 
+	m_flTimeLastActive = -1;
+
 	if (pevAttacker) // pevAttacker can be NULL
 	{
 		CBaseEntity *attacker = CBaseEntity::Instance(pevAttacker);
 		if (attacker->IsPlayer())
-			KillBouns(static_cast<CBasePlayer *>(attacker));
+			KilledByPlayer(static_cast<CBasePlayer *>(attacker));
 	}
 	
 }
@@ -307,15 +314,19 @@ void CMonster::Remove()
 	pev->nextthink = -1;
 	m_flNextFullThink = -1;
 
-	CLocalNav *pPrevNav = m_LocalNav;
-	m_LocalNav = nullptr;
-	delete pPrevNav;
-
-	CHostageImprov *pPrevImprov = m_improv;
-	m_improv = nullptr;
-	delete pPrevImprov;
+	
 
 	SUB_Remove();
+}
+
+CMonster::CMonster() : CHostage(), m_iKillBonusMoney(500), m_iKillBonusFrags(1), m_flTimeLastActive(0.0f)
+{
+	MonsterManager().OnEntityAdd(this);
+}
+
+CMonster::~CMonster()
+{
+	MonsterManager().OnEntityRemove(this);
 }
 
 void CMonster::IdleThink()
@@ -356,21 +367,28 @@ void CMonster::IdleThink()
 		if (m_improv != NULL)
 		{
 			if (m_improv->IsFollowing())
-			{ 
-				player = (CBasePlayer *)m_improv->GetFollowLeader();
-			}
-			else
 			{
-				// find target
-				player = (CBasePlayer *)FindTarget();
+				player = (CBasePlayer *)m_improv->GetFollowLeader();
 			}
 		}
 		else
 			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
 
-		// Some attack code here
-		if (player != NULL)
-			CheckAttack();
+		// force repath
+		if (gpGlobals->time > m_flLastPathCheck + m_flPathCheckInterval)
+		{
+			// forget the current target and find a new one.
+			player = NULL;
+			m_flLastPathCheck = gpGlobals->time;
+		}
+
+		// invalid target, find another one!
+		if (player == NULL || !player->IsAlive())
+			player = (CBasePlayer *)FindTarget();
+
+		// fix: no target needs, should still attack (to wall, etc)
+		//if (player != NULL)
+		CheckAttack();
 	}
 
 	if (m_improv != NULL)
@@ -399,8 +417,9 @@ CBaseEntity *CMonster::FindTarget()
 	{
 		m_improv->Follow(player);
 		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+		m_flTimeLastActive = gpGlobals->time;
 	}
-	else if (player = m_improv->GetClosestPlayerByTravelDistance())
+	else if (player = m_improv->GetClosestPlayerByTravelDistance(TEAM_CT))
 	{
 		m_improv->MoveTo(player->Center());
 		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
@@ -440,6 +459,7 @@ CBaseEntity *CMonster::CheckAttack()
 	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_2.wav", VOL_NORM, ATTN_NORM); break;
 	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM); break;
 	}
+	m_flTimeLastActive = gpGlobals->time;
 	return pHit;
 }
 
@@ -849,10 +869,12 @@ bool CMonster::ShouldAttack(CBaseEntity *target)
 	return false;
 }
 
-void CMonster::KillBouns(CBasePlayer *player)
+void CMonster::KilledByPlayer(CBasePlayer *player)
 {
-	player->AddPoints(1, FALSE);
-	player->AddAccount(500);
+	if (m_iKillBonusFrags)
+		player->AddPoints(m_iKillBonusFrags, FALSE);
+	if(m_iKillBonusMoney)
+		player->AddAccount(m_iKillBonusMoney);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, player->pev);
 	WRITE_BYTE(ZBS_TIP_KILL);

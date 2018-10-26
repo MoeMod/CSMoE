@@ -34,6 +34,10 @@ public:
 	virtual void Touch(CBaseEntity *pOther);
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 
+	// RAII support to prevent memory leak.
+	CMonster();
+	~CMonster();
+
 public:
 	void EXPORT IdleThink();
 	void Remove();
@@ -47,10 +51,13 @@ public:
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
 
-	void KillBouns(CBasePlayer *player);
+	void KilledByPlayer(CBasePlayer *player);
 
 public:
 	float m_flAttackDamage;
+	int m_iKillBonusMoney;
+	int m_iKillBonusFrags;
+	float m_flTimeLastActive;
 };
 
 #endif
