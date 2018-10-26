@@ -14,7 +14,7 @@ inline int CalcTeamFrags()
 {
 	int result = 0;
 	for (auto &info : g_PlayerExtraInfo)
-		result += info.frags;
+		result += max(0, info.frags);
 	return result;
 }
 
@@ -140,7 +140,7 @@ int CHudZBSScoreBoard::Draw(float time)
 	
 	int idx = gEngfuncs.GetLocalPlayer()->index;
 	int roundNumber = gHUD.m_Scoreboard.m_iTeamScore_CT + 1;
-	int selfKill = g_PlayerExtraInfo[idx].frags;
+	int selfKill = max(0, g_PlayerExtraInfo[idx].frags);
 	int teamKill = CalcTeamFrags();
 
 	DrawTexturedNumbersTopCenterAligned(m_iToprecord, m_rcToprecord, roundNumber, x + 25, y + 25); // ok

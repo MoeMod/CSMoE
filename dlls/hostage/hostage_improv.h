@@ -111,6 +111,7 @@ public:
 	virtual void OnReset();
 	virtual void OnGameEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL);
 	virtual void OnTouch(CBaseEntity *other);									// in contact with "other"
+	virtual CBasePlayer *GetClosestVisiblePlayer(int team);
 
 public:
 	enum MoveType { Stopped, Walking, Running };
@@ -163,7 +164,6 @@ public:
 	bool IsAtHome() const;
 	bool CanSeeRescueZone() const;
 	CBaseEntity *GetFollowLeader() const { return m_followState.GetLeader(); }
-	CBasePlayer *GetClosestVisiblePlayer(int team);
 	float GetTimeSinceLastSawPlayer(int team);
 	float GetTimeSinceLastInjury();
 	float GetTimeSinceLastNoise();

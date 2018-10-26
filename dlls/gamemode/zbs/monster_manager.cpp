@@ -36,7 +36,7 @@ public:
 
 CMonsterManager::CMonsterManager() : pimpl(new impl_t)
 {
-	SetMaxNumOfEntity(96);
+	SetMaxNumOfEntity(10);
 	SetAutoGcRatio(0.8f);
 }
 

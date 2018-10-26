@@ -28,6 +28,7 @@ public:
 
 	// remove some hostage staffs
 	void Crouch() override { /* no code needed */ }
+	void OnMoveToFailure(const Vector &goal, MoveToFailureType reason) override { /* no code needed */ }
 
 	// jumping control
 	bool GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Vector *normal) override
@@ -50,6 +51,33 @@ public:
 		}
 
 		return CHostageImprov::CanJump();
+	}
+
+	CBasePlayer *GetClosestVisiblePlayer(int team) override
+	{
+		CBasePlayer *close = NULL;
+		float closeRangeSq = 1e8f;
+
+		for (int i = 0; i < m_visiblePlayerCount; ++i)
+		{
+			CBasePlayer *player = (CBasePlayer *)CBaseEntity::Instance(m_visiblePlayer[i]);
+
+			if (player == NULL)
+				continue;
+
+			if (!player->IsAlive())
+				continue;
+
+			float rangeSq = (GetCentroid() - player->pev->origin).LengthSquared();
+
+			if (rangeSq < closeRangeSq)
+			{
+				closeRangeSq = rangeSq;
+				close = player;
+			}
+		}
+
+		return close;
 	}
 };
 
@@ -416,6 +444,7 @@ CBaseEntity *CMonster::FindTarget()
 	if (player = m_improv->GetClosestVisiblePlayer(TEAM_CT))
 	{
 		m_improv->Follow(player);
+		m_hTargetEnt = player;
 		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
 		m_flTimeLastActive = gpGlobals->time;
 	}
