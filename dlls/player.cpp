@@ -7942,13 +7942,10 @@ void CBasePlayer::InitRebuyData(const char *str)
 		return;
 	}
 
-	if (m_rebuyString != NULL)
-	{
-		delete m_rebuyString;
-		m_rebuyString = NULL;
-	}
-
-	m_rebuyString = new char[ Q_strlen(str) + 1 ];
+	// god bless the fucking new[] and delete[]
+	char *new_buyString = new char[Q_strlen(str) + 1];
+	delete[] m_rebuyString;
+	m_rebuyString = new_buyString;
 	Q_strcpy(m_rebuyString, str);
 	m_rebuyString[ Q_strlen(str) ] = '\0';
 }
