@@ -32,6 +32,7 @@
     <ClCompile Include="..\cl_dll\events.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47l.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_as50.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
@@ -50,6 +51,7 @@
     <ClCompile Include="..\cl_dll\events\event_m249.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m3.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m4a1.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp5n.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp" />
@@ -62,6 +64,7 @@
     <ClCompile Include="..\cl_dll\events\event_ump45.cpp" />
     <ClCompile Include="..\cl_dll\events\event_usp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_vehicle.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_wa2000.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm1014.cpp" />
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp" />
     <ClCompile Include="..\cl_dll\events\hl_events.cpp" />
@@ -123,6 +126,7 @@
     <ClCompile Include="..\common\interface.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
@@ -140,6 +144,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m249.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m4a1.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
@@ -152,6 +157,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ump45.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_usp.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.c" />
     <ClCompile Include="..\pm_shared\pm_math.c" />
@@ -185,6 +191,7 @@
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
@@ -202,6 +209,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
@@ -214,6 +222,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ump45.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
     <ClInclude Include="..\engine\cdll_int.h" />
     <ClInclude Include="..\engine\custom.h" />

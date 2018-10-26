@@ -291,3 +291,30 @@ BOOL C46MMAmmo::AddAmmo(CBaseEntity *pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_46mm, C46MMAmmo);
+
+
+void C50BMGAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C50BMGAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C50BMGAmmo::AddAmmo(CBaseEntity *pOther)
+{
+	if (pOther->GiveAmmo(AMMO_50BMG_BUY, "50bmg", MAX_AMMO_50BMG) == -1)
+	{
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_50bmg, C50BMGAmmo);

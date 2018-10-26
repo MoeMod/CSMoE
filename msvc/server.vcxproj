@@ -352,6 +352,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -450,6 +451,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -517,6 +519,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -700,6 +703,7 @@
     <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
@@ -718,6 +722,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
@@ -730,6 +735,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ump45.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
     <ClInclude Include="..\engine\custom.h" />
     <ClInclude Include="..\engine\customentity.h" />

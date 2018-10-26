@@ -562,6 +562,15 @@
     <ClCompile Include="..\dlls\bot\cs_bot_bhopjump.cpp">
       <Filter>dlls\bot</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1184,6 +1193,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\bot\cs_bot_statemachine.h">
       <Filter>dlls\bot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
