@@ -124,6 +124,16 @@ void CMonster::Spawn()
 	m_bRescueMe = FALSE;
 
 	UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
+
+	TraceResult tr;
+	TRACE_MONSTER_HULL(edict(), pev->origin, pev->origin, dont_ignore_monsters, edict(), &tr);
+
+	if (tr.fStartSolid || tr.fAllSolid || !tr.fInOpen)
+	{
+		Killed(nullptr, GIB_NORMAL);
+		return;
+	}
+
 	UTIL_MakeVectors(pev->v_angle);
 
 	SetBoneController(0, UTIL_VecToYaw(gpGlobals->v_forward));
