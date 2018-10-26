@@ -339,6 +339,12 @@ void CBasePlayer::Observer_CheckProperties()
 				WRITE_BYTE(m_iObserverWeapon);
 				WRITE_BYTE(0);	// clip
 			MESSAGE_END();
+
+			// fix observer client weapon prediction
+			MESSAGE_BEGIN(MSG_ONE, gmsgBTEWeapon, NULL, pev);
+			WRITE_BYTE(BTE_Weapon_Active); // type, reserved.
+			WRITE_STRING(target->m_pActiveItem ? target->m_pActiveItem->pszName() : "");
+			MESSAGE_END();
 		}
 
 		if (target->m_bHasC4)
