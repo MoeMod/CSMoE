@@ -4,6 +4,7 @@
 #include "player.h"
 #include "client.h"
 #include "player_human_level.h"
+#include "gamemode/mods.h"
 
 float CBasePlayer::HumanLevel_GetHealthBonus()
 {
@@ -22,6 +23,9 @@ float CBasePlayer::HumanLevel_GetAttackBonus()
 
 void CBasePlayer::HumanLevel_LevelUpHealth()
 {
+	if(g_pModRunning->DamageTrack() != DT_ZBS)
+		return;
+
 	if (m_iHumanLevel.m_iHealth >= 40)
 		return;
 
@@ -45,6 +49,9 @@ void CBasePlayer::HumanLevel_LevelUpHealth()
 
 void CBasePlayer::HumanLevel_LevelUpAttack()
 {
+	if (g_pModRunning->DamageTrack() != DT_ZBS)
+		return;
+
 	if (m_iHumanLevel.m_iAttack >= 40)
 		return;
 
