@@ -419,41 +419,7 @@ void CBasePlayer::Pain(int m_LastHitGroup, bool HasArmour)
 	if (m_bIsZombie)
 		return Pain_Zombie(m_LastHitGroup, HasArmour);
 
-	int temp = RANDOM_LONG(0, 2);
-
-	if (m_LastHitGroup == HITGROUP_HEAD)
-	{
-		if (m_iKevlar == ARMOR_TYPE_HELMET)
-		{
-			EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_helmet-1.wav", VOL_NORM, ATTN_NORM);
-			return;
-		}
-
-		switch (temp)
-		{
-		case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
-		default: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
-		}
-	}
-	else
-	{
-		if (m_LastHitGroup != HITGROUP_LEFTLEG && m_LastHitGroup != HITGROUP_RIGHTLEG)
-		{
-			if (HasArmour)
-			{
-				EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_kevlar-1.wav", VOL_NORM, ATTN_NORM);
-				return;
-			}
-		}
-
-		switch (temp)
-		{
-		case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
-		default: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
-		}
-	}
+	return m_pModStrategy->Pain(m_LastHitGroup, HasArmour);
 }
 
 Vector VecVelocityForDamage(float flDamage)
@@ -498,14 +464,7 @@ void CBasePlayer::DeathSound()
 	if (m_bIsZombie)
 		return DeathSound_Zombie();
 
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 4))
-	{
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
-	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
-	case 4: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
-	}
+	return m_pModStrategy->DeathSound();
 }
 
 // override takehealth
@@ -868,6 +827,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			else if (bitsDamageType & DMG_EXPLOSION)
 				m_bKilledByGrenade = true;
 		}
+
+		// notify gamerules
+		flDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 		LogAttack(pAttack, this, teamAttack, (int)flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 		fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
@@ -6205,6 +6167,7 @@ void CBasePlayer::UpdateClientData()
 			}
 
 			mp->InitHUD(this);
+			m_pModStrategy->OnInitHUD();
 			m_fGameHUDInitialized = TRUE;
 
 			if (mp->IsMultiplayer())
@@ -6544,10 +6507,7 @@ void CBasePlayer::ResetMaxSpeed()
 	}
 	else if (m_bIsZombie)
 	{
-		if(m_iZombieSkillStatus == SKILL_STATUS_USING)
-			speed = 390;
-		else
-			speed = 290;
+		speed = 290;
 	}
 	else if (m_pActiveItem != NULL)
 	{
@@ -6561,6 +6521,8 @@ void CBasePlayer::ResetMaxSpeed()
 	}
 
 	pev->maxspeed = speed;
+
+	m_pModStrategy->OnResetMaxSpeed();
 }
 
 bool CBasePlayer::HintMessage(const char *pMessage, BOOL bDisplayIfPlayerDead, BOOL bOverride)

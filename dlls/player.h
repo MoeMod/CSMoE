@@ -157,7 +157,6 @@
 #include "player/player_const.h"
 
 #include "player/player_zombie.h"
-#include "player/player_human_level.h"
 #include "player/player_mod_strategy.h"
 #include <memory>
 
@@ -684,22 +683,10 @@ public:
 public:
 #ifdef CLIENT_DLL
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
-	virtual void ZombieSkill_Init() {}
-	virtual void ZombieSkill_Check() {}
-	virtual void ZombieSkill_Start() {}
-	virtual void ZombieSkill_End() {}
-	virtual void ZombieSkill_Reset() {}
-	virtual void ZombieSkill_Effect() {}
 	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) {}
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
-	virtual void ZombieSkill_Init();
-	virtual void ZombieSkill_Check();
-	virtual void ZombieSkill_Start();
-	virtual void ZombieSkill_End();
-	virtual void ZombieSkill_Reset();
-	virtual void ZombieSkill_Effect();
 	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) { ApplyKnockbackData(this, this->pev->origin - attacker->pev->origin, data); }
 	
@@ -712,29 +699,11 @@ public:
 	void SpawnProtection_Start(float flTime);
 	void SpawnProtection_End();
 
-	float HumanLevel_GetHealthBonus();
-	float HumanLevel_GetAttackBonus();
-	void HumanLevel_LevelUpHealth();
-	void HumanLevel_LevelUpAttack();
-	void HumanLevel_Reset();
-	void HumanLevel_UpdateHUD();
-
-	void Zombie_HealthRecoveryThink();
-
 public:
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
 	float m_flTimeSpawnProctionExpires;
-	float m_flTimeNextZombieHealthRecovery;
-	int m_iZombieInfections;
-
-	ZombieSkillStatus m_iZombieSkillStatus;
-	float m_flTimeZombieSkillEnd;
-	float m_flTimeZombieSkillNext;
-	float m_flTimeZombieSkillEffect;
-
-	HumanLevelStruct m_iHumanLevel;
 
 public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;

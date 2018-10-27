@@ -14,19 +14,72 @@
 #include "player/csdm_randomspawn.h"
 #include "zbs/monster_manager.h"
 
+#include "player/player_human_level.h"
+
 #include <algorithm>
+
+class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
+{
+public:
+	PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player)
+	{
+		m_eventAdjustDamage = mp->m_eventAdjustDamage.subscribe(
+			[&](CBasePlayer *attacker, float &out) 
+			{ 
+				if(attacker == m_pPlayer)
+					out *= m_HumanLevel.GetAttackBonus(); 
+			}
+		);
+	}
+	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+
+	void OnSpawn() override
+	{
+		m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+	}
+	bool ClientCommand(const char *pcmd) override
+	{
+		if (FStrEq(pcmd, "zbs_hp_up"))
+		{
+			m_HumanLevel.LevelUpHealth();
+			return true;
+		}
+		else if (FStrEq(pcmd, "zbs_atk_up"))
+		{
+			m_HumanLevel.LevelUpAttack();
+			return true;
+		}
+		return CPlayerModStrategy_Default::ClientCommand(pcmd);
+	}
+	void OnInitHUD() override
+	{
+		m_HumanLevel.UpdateHUD();
+	}
+
+protected:
+	EventListener m_eventAdjustDamage;
+
+	PlayerExtraHumanLevel_ZBS m_HumanLevel;
+
+};
 
 void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	class MyPlayerModStrategy : public CPlayerModStrategy_Default
-	{
-	public:
-		MyPlayerModStrategy(CBasePlayer *player) : CPlayerModStrategy_Default(player) {}
-		int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return 600; }
-	};
+	player->m_pModStrategy = std::make_unique<PlayerModStrategy_ZBS>(player, this);
+}
 
-	std::unique_ptr<MyPlayerModStrategy> up(new MyPlayerModStrategy(player));
-	player->m_pModStrategy = std::move(up);
+float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = IBaseMod_RemoveObjects::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
+	if (pAttackingEnt->IsPlayer())
+	{
+		CBasePlayer *pAttacker = static_cast<CBasePlayer *>(pAttackingEnt);
+		m_eventAdjustDamage.dispatch(pAttacker, flDamage);
+	}
+		
+	return flDamage;
 }
 
 CMod_ZombieScenario::CMod_ZombieScenario()
@@ -46,12 +99,6 @@ void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
 	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 	MESSAGE_END();
-}
-
-void CMod_ZombieScenario::InitHUD(CBasePlayer *pPlayer)
-{
-	pPlayer->HumanLevel_UpdateHUD();
-	return IBaseMod::InitHUD(pPlayer);
 }
 
 void CMod_ZombieScenario::CheckMapConditions()
@@ -78,7 +125,6 @@ void CMod_ZombieScenario::RestartRound()
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	IBaseMod::PlayerSpawn(pPlayer);
-	pPlayer->pev->health += pPlayer->HumanLevel_GetHealthBonus();
 }
 
 void CMod_ZombieScenario::WaitingSound()
@@ -189,15 +235,6 @@ void CMod_ZombieScenario::Think()
 
 	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
 		HumanWin();
-}
-
-BOOL CMod_ZombieScenario::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
-{
-	CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance(pEntity);
-	if (pPlayer != NULL)
-		pPlayer->HumanLevel_Reset();
-
-	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 }
 
 void CMod_ZombieScenario::CheckWinConditions()

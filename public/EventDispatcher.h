@@ -50,8 +50,10 @@ struct IBaseEventListener
 	virtual ~IBaseEventListener() = 0 {};
 };
 using EventListener = std::shared_ptr<IBaseEventListener>;
-template<class...Args>
-class EventDispatcher
+template<class F>
+class EventDispatcher;
+template<class R, class...Args>
+class EventDispatcher<R(Args...)>
 {
 	struct ICallable : IBaseEventListener
 	{

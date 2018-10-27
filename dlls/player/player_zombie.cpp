@@ -5,6 +5,7 @@
 #include "gamerules.h"
 #include "client.h"
 
+#include "gamemode/mods.h"
 #include "gamemode/zb2/zb2_const.h"
 
 void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
@@ -36,10 +37,7 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 	pev->armortype = ARMOR_TYPE_HELMET;
 	pev->armorvalue = 200;
 	pev->gravity = 0.83f;
-	ZombieSkill_Reset();
 	ResetMaxSpeed();
-
-	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 
 }
 
@@ -60,9 +58,6 @@ void CBasePlayer::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
 	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
 	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
 	}
-
-	// should not recover after damage taken...
-	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 }
 
 void PlayerZombie_Precache()
@@ -75,38 +70,19 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 }
 
-// called by CMod_ZombieMod2::PlayerThink
-void CBasePlayer::Zombie_HealthRecoveryThink()
+float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	if (!IsAlive() || !m_bIsZombie)
-		return;
-
-	if (pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
+	// grenade damage 5x in zb mode
+	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
 	{
-		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
-	}
-
-	// cannot recover during using zombie skill.
-	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-		return;
-
-	if (gpGlobals->time > m_flTimeNextZombieHealthRecovery)
-	{
-		if (pev->max_health != pev->health)
+		if (bitsDamageType & DMG_EXPLOSION)
 		{
-			float flRecoverValue = (m_iZombieLevel == ZOMBIE_LEVEL_HOST) ? 200.0f : 500.0f;
-
-			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 1.0f;
-			pev->health = std::min(pev->max_health, pev->health + flRecoverValue);
-
-			// effects
-			CLIENT_COMMAND(this->edict(), "spk zombi/zombi_heal.wav\n");
-
-			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, this->pev);
-			WRITE_BYTE(ZB2_MESSAGE_HEALTH_RECOVERY);
-			MESSAGE_END();
+			if (m_bIsZombie)
+				flDamage *= 5.0f;
+			else
+				flDamage *= 2.5f;
 		}
-		
-		
 	}
+
+	return flDamage = m_pModStrategy->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }

@@ -14,6 +14,7 @@
 
 #include "zbs_const.h"
 #include "monster_manager.h"
+#include "gamemode/mods.h"
 
 LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 
@@ -220,7 +221,6 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	flActualDamage = GetModifiedDamage(flDamage, m_LastHitGroup);
 
-
 	if (pevAttacker != NULL)
 	{
 		CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
@@ -238,9 +238,10 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 		if (pAttackingEnt->IsPlayer())
 		{
 			pAttacker = GetClassPtr((CBasePlayer *)pevAttacker);
-			flActualDamage *= pAttacker->HumanLevel_GetAttackBonus();
 		}
 	}
+
+	flActualDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flActualDamage, bitsDamageType);
 
 	if (flActualDamage > pev->health)
 		flActualDamage = pev->health;

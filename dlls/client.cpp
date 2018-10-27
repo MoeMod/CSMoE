@@ -629,8 +629,6 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	}
 
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
-
-	pPlayer->HumanLevel_Reset();
 }
 
 int Q_strlen_(const char *str)
@@ -1519,12 +1517,12 @@ void ZbsUpgrade(CBasePlayer *pPlayer, int iSlot)
 	{
 		case MENU_SLOT_UPGRADE_HP:
 		{
-			pPlayer->HumanLevel_LevelUpHealth();
+			pPlayer->ClientCommand("zbs_hp_up");
 			break;
 		}
 		case MENU_SLOT_UPGRADE_ATK:
 		{
-			pPlayer->HumanLevel_LevelUpAttack();
+			pPlayer->ClientCommand("zbs_atk_up");
 			break;
 		}
 	}
@@ -3680,7 +3678,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "drop"))
 			{
 				// player is dropping an item.
-				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1"))
+				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1") || player->m_pModStrategy->ClientCommand("BTE_ZombieSkill1"))
 				{
 					// ...
 				}
@@ -3833,14 +3831,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				player->SmartRadio();
 			}
-			else if (FStrEq(pcmd, "zbs_hp_up"))
-			{
-				player->HumanLevel_LevelUpHealth();
-			}
-			else if (FStrEq(pcmd, "zbs_atk_up"))
-			{
-				player->HumanLevel_LevelUpAttack();
-			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -3850,7 +3840,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					return;
 
 
-				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd) && !player->m_pModStrategy->ClientCommand(player, pcmd))
+				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd) && !player->m_pModStrategy->ClientCommand(pcmd))
 				{
 					// tell the user they entered an unknown command
 					char command[128];

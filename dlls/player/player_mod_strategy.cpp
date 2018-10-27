@@ -3,6 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "client.h"
+#include "monsters.h"
 #include "player_mod_strategy.h"
 #include "gamemode/mods.h"
 
@@ -96,4 +97,55 @@ bool CPlayerModStrategy_Default::CanPlayerBuy(bool display)
 	}
 
 	return true;
+}
+
+void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
+{
+	int temp = RANDOM_LONG(0, 2);
+
+	if (m_LastHitGroup == HITGROUP_HEAD)
+	{
+		if (m_pPlayer->m_iKevlar == ARMOR_TYPE_HELMET)
+		{
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_helmet-1.wav", VOL_NORM, ATTN_NORM);
+			return;
+		}
+
+		switch (temp)
+		{
+		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
+		default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
+		}
+	}
+	else
+	{
+		if (m_LastHitGroup != HITGROUP_LEFTLEG && m_LastHitGroup != HITGROUP_RIGHTLEG)
+		{
+			if (HasArmour)
+			{
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_kevlar-1.wav", VOL_NORM, ATTN_NORM);
+				return;
+			}
+		}
+
+		switch (temp)
+		{
+		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
+		default: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
+		}
+	}
+}
+
+void CPlayerModStrategy_Default::DeathSound()
+{
+	// temporarily using pain sounds for death sounds
+	switch (RANDOM_LONG(1, 4))
+	{
+	case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
+	case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
+	case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
+	case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
+	}
 }
