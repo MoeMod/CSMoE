@@ -54,7 +54,7 @@ public:
 		return CHostageImprov::CanJump();
 	}
 
-	CBasePlayer *GetClosestVisiblePlayer(int team) override
+	/*CBasePlayer *GetClosestVisiblePlayer(int team) override
 	{
 		CBasePlayer *close = NULL;
 		float closeRangeSq = 1e8f;
@@ -79,7 +79,7 @@ public:
 		}
 
 		return close;
-	}
+	}*/
 };
 
 void CMonster::Spawn()
@@ -210,6 +210,13 @@ void CMonster::Touch(CBaseEntity *pOther)
 	if (m_improv != NULL)
 	{
 		m_improv->OnTouch(pOther);
+
+		/*if (static_cast<CHostage *>(pOther)->m_hTargetEnt->entindex() != m_hTargetEnt->entindex() && gpGlobals->time > m_flTargetChange)
+		{
+			m_flTargetChange = gpGlobals->time + 2.0f;
+			static_cast<CHostage *>(pOther)->m_hTargetEnt = m_hTargetEnt;
+		}*/
+
 		return;
 	}
 }
@@ -398,37 +405,38 @@ void CMonster::IdleThink()
 	// sth to be inserted
 
 	m_flNextFullThink = gpGlobals->time + 0.1;
+	CheckTarget();
 
-	if (m_hTargetEnt != NULL || m_improv != NULL)
-	{
-		CBasePlayer *player = NULL;
+	//if (m_hTargetEnt != NULL || m_improv != NULL)
+	//{
+	//	CBasePlayer *player = NULL;
 
-		if (m_improv != NULL)
-		{
-			if (m_improv->IsFollowing())
-			{
-				player = (CBasePlayer *)m_improv->GetFollowLeader();
-			}
-		}
-		else
-			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
+	//	if (m_improv != NULL)
+	//	{
+	//		if (m_improv->IsFollowing())
+	//		{
+	//			player = (CBasePlayer *)m_improv->GetFollowLeader();
+	//		}
+	//	}
+	//	else
+	//		player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
 
-		// force repath
-		if (gpGlobals->time > m_flLastPathCheck + m_flPathCheckInterval)
-		{
-			// forget the current target and find a new one.
-			player = NULL;
-			m_flLastPathCheck = gpGlobals->time;
-		}
+	//	// force repath
+	//	if (gpGlobals->time > m_flLastPathCheck + m_flPathCheckInterval)
+	//	{
+	//		// forget the current target and find a new one.
+	//		player = NULL;
+	//		m_flLastPathCheck = gpGlobals->time;
+	//	}
 
-		// invalid target, find another one!
-		if (player == NULL || !player->IsAlive())
-			player = (CBasePlayer *)FindTarget();
+	//	// invalid target, find another one!
+	//	if (player == NULL || !player->IsAlive())
+	//		player = (CBasePlayer *)FindTarget();
 
-		// fix: no target needs, should still attack (to wall, etc)
-		//if (player != NULL)
-		CheckAttack();
-	}
+	//	// fix: no target needs, should still attack (to wall, etc)
+	//	//if (player != NULL)
+	//	CheckAttack();
+	//}
 
 	if (m_improv != NULL)
 	{
@@ -449,11 +457,31 @@ void CMonster::IdleThink()
 	}
 }
 
+void CMonster::CheckTarget()
+{
+	if (!m_hTargetEnt || m_flTargetChange <= gpGlobals->time)
+	{
+		m_hTargetEnt = FindTarget();
+		return;
+	}
+
+	CBasePlayer *player = NULL;
+	player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
+	if (!player->IsAlive())
+	{
+		m_hTargetEnt = NULL;
+		return;
+	}
+
+	CheckAttack();
+}
+
 CBaseEntity *CMonster::FindTarget()
 {
 	CBasePlayer *player = NULL;
-	if (player = m_improv->GetClosestVisiblePlayer(TEAM_CT))
+	if (player = GetClosestPlayer(true)/* m_improv->GetClosestVisiblePlayer(TEAM_CT)*/)
 	{
+		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
 		m_improv->Follow(player);
 		m_hTargetEnt = player;
 		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
@@ -461,6 +489,8 @@ CBaseEntity *CMonster::FindTarget()
 	}
 	else if (player = m_improv->GetClosestPlayerByTravelDistance(TEAM_CT))
 	{
+		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
+		m_hTargetEnt = player;
 		m_improv->MoveTo(player->Center());
 		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
 	}
@@ -500,6 +530,7 @@ CBaseEntity *CMonster::CheckAttack()
 	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM); break;
 	}
 	m_flTimeLastActive = gpGlobals->time;
+	m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
 	return pHit;
 }
 
@@ -919,4 +950,43 @@ void CMonster::KilledByPlayer(CBasePlayer *player)
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, player->pev);
 	WRITE_BYTE(ZBS_TIP_KILL);
 	MESSAGE_END();
+}
+
+CBasePlayer *CMonster::GetClosestPlayer(bool bVisible)
+{
+	if (!m_improv)
+		return NULL;
+
+	CBasePlayer *close = NULL;
+	float closeRangeSq = 1e8f;
+
+	for (int i = 1; i <= gpGlobals->maxClients; ++i)
+	{
+		CBasePlayer *player = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
+
+		if (player == NULL)
+			continue;
+
+		if (FNullEnt(player->pev))
+			continue;
+
+		if (FStrEq(STRING(player->pev->netname), ""))
+			continue;
+
+		if (!player->IsAlive())
+			continue;
+
+		if(bVisible && !m_improv->IsVisible(m_improv->GetEyes(), true))
+			continue;
+
+		float rangeSq = (m_improv->GetCentroid() - player->pev->origin).LengthSquared();
+
+		if (rangeSq < closeRangeSq)
+		{
+			closeRangeSq = rangeSq;
+			close = player;
+		}
+	}
+
+	return close;
 }
