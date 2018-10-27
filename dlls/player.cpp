@@ -1273,10 +1273,14 @@ void CBasePlayer::GiveDefaultItems()
 			break;
 		}
 		//GiveNamedItem("weapon_wa2000");
-		if(RANDOM_LONG(0, 1))
+		if (RANDOM_LONG(0, 1))
+			GiveNamedItem("weapon_thompson");
+		else
+			GiveNamedItem("weapon_kriss");
+		/*if(RANDOM_LONG(0, 1))
 			GiveNamedItem("weapon_as50");
 		else
-			GiveNamedItem("weapon_m95");
+			GiveNamedItem("weapon_m95");*/
 		//GiveNamedItem("weapon_mp7a1d");
 		//GiveNamedItem("weapon_deagled");
 	}

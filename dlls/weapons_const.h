@@ -64,6 +64,7 @@ enum WeaponState
 	WPNSTATE_ELITE_LEFT = (1 << 3),
 	WPNSTATE_FAMAS_BURST_MODE = (1 << 4),
 	WPNSTATE_SHIELD_DRAWN = (1 << 5),
+	WPNSTATE_KRISS_SILENCED = (1 << 6),
 };
 
 // custom enum

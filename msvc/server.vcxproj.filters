@@ -574,6 +574,12 @@
     <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp">
       <Filter>dlls\gamemode\zbs</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1211,6 +1217,12 @@
     </ClInclude>
     <ClInclude Include="..\public\ruleof350.h">
       <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

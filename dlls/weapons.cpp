@@ -450,6 +450,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m95");
 	UTIL_PrecacheOtherWeapon("weapon_as50");
 	UTIL_PrecacheOther("ammo_50bmg");
+	UTIL_PrecacheOtherWeapon("weapon_kriss");
+	UTIL_PrecacheOtherWeapon("weapon_thompson");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

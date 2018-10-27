@@ -36,3 +36,5 @@
 #include "wpn_shared/wpn_wa2000.h"
 #include "wpn_shared/wpn_m95.h"
 #include "wpn_shared/wpn_as50.h"
+#include "wpn_shared/wpn_kriss.h"
+#include "wpn_shared/wpn_thompson.h"
