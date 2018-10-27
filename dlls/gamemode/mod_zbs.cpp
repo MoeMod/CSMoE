@@ -16,6 +16,19 @@
 
 #include <algorithm>
 
+void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	class MyPlayerModStrategy : public CPlayerModStrategy_Default
+	{
+	public:
+		MyPlayerModStrategy(CBasePlayer *player) : CPlayerModStrategy_Default(player) {}
+		int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+	};
+
+	std::unique_ptr<MyPlayerModStrategy> up(new MyPlayerModStrategy(player));
+	player->m_pModStrategy = std::move(up);
+}
+
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
@@ -54,23 +67,6 @@ void CMod_ZombieScenario::CheckMapConditions()
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
 
 	return IBaseMod_RemoveObjects::CheckMapConditions();
-}
-
-bool CMod_ZombieScenario::CanPlayerBuy(CBasePlayer *player, bool display)
-{
-	// is the player alive?
-	if (player->pev->deadflag != DEAD_NO)
-	{
-		return false;
-	}
-
-	// is the player in a buy zone?
-	if (!(player->m_signals.GetState() & SIGNAL_BUY))
-	{
-		return false;
-	}
-
-	return true;
 }
 
 void CMod_ZombieScenario::RestartRound()

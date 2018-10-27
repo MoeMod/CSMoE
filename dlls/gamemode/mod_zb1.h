@@ -31,9 +31,7 @@ public: // CHalfLifeMultiplay
 
 public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
-	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
-	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
-	int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) override;
+	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 protected:
 	virtual int ZombieOriginNum();
@@ -50,6 +48,15 @@ protected:
 	void ZombieWin();
 
 	BOOL FInfectionStarted();
+};
+
+class CPlayerModStrategy_ZB1 : public CPlayerModStrategy_Default
+{
+public:
+	CPlayerModStrategy_ZB1(CBasePlayer *player) : CPlayerModStrategy_Default(player) {}
+	void CheckBuyZone() override { m_pPlayer->m_signals.Signal(SIGNAL_BUY); };
+	bool CanPlayerBuy(bool display) override;
+	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override;
 };
 
 #endif

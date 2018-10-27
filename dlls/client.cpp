@@ -2505,7 +2505,7 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 
 	// Can only buy if the player does not already have full ammo
 	int iMax = weapon->iMaxAmmo1();
-	if (player->m_rgAmmo[nAmmo] >= g_pModRunning->ComputeMaxAmmo(player, classname, iMax))
+	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(classname, iMax))
 	{
 		return false;
 	}
@@ -3849,7 +3849,8 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				if (HandleRadioAliasCommands(player, pcmd))
 					return;
 
-				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd))
+
+				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd) && !player->m_pModStrategy->ClientCommand(player, pcmd))
 				{
 					// tell the user they entered an unknown command
 					char command[128];

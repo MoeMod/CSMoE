@@ -28,9 +28,9 @@ public: // CHalfLifeMultiplay
 	void CheckWinConditions() override {}
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
-	bool CanPlayerBuy(CBasePlayer *player, bool display) override { return true; }
+	
 public:
-	bool FIgnoreBuyZone(CBasePlayer *player) override { return true; }
+	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 public:
 	int CalcLeaderFrags();

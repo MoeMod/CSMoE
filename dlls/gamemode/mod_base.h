@@ -8,6 +8,8 @@
 #include "mods.h"
 #include "ruleof350.h"
 
+#include <memory>
+
 class CBasePlayer; // player.h
 
 #pragma warning(push)
@@ -17,9 +19,7 @@ class IBaseMod : public CHalfLifeMultiplay, ruleof350::unique
 {
 public:
 	virtual DamageTrack_e DamageTrack() { return DT_NONE; }
-	virtual bool FIgnoreBuyZone(CBasePlayer *player) { return false; }
-	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) { return true; }
-	virtual int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) { return iOriginalMax; }
+	virtual void InstallPlayerModStrategy(CBasePlayer *player);
 };
 
 class IBaseMod_RemoveObjects : virtual public IBaseMod

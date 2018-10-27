@@ -155,7 +155,14 @@ entvars_t *g_pevLastInflictor;
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
-
+CBasePlayer::CBasePlayer() : m_rebuyString(nullptr) 
+{
+	g_pModRunning->InstallPlayerModStrategy(this);
+}
+CBasePlayer::~CBasePlayer()
+{
+	delete[] m_rebuyString;
+}
 
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
@@ -1718,6 +1725,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	if (!m_bKilledByBomb)
 	{
 		g_pGameRules->PlayerKilled(this, pevAttacker, g_pevLastInflictor);
+		m_pModStrategy->OnKilled(pevAttacker, g_pevLastInflictor);
 	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgNVGToggle, NULL, pev);
@@ -3838,7 +3846,7 @@ bool CBasePlayer::CanPlayerBuy(bool display)
 		return CHalfLifeTraining::PlayerCanBuy(this);
 	}
 
-	return g_pModRunning->CanPlayerBuy(this, display); // rediected to IBaseMod.
+	return m_pModStrategy->CanPlayerBuy(display); // rediected to IBaseMod.
 }
 
 void CBasePlayer::PreThink()
@@ -3860,6 +3868,7 @@ void CBasePlayer::PreThink()
 	// Hint messages should be updated even if the game is over
 	m_hintMessageQueue.Update(this);
 	g_pGameRules->PlayerThink(this);
+	m_pModStrategy->OnThink();
 
 	if (g_fGameOver)
 	{
@@ -4904,6 +4913,7 @@ void CBasePlayer::Spawn()
 	m_lastx = m_lasty = 0;
 
 	g_pGameRules->PlayerSpawn(this);
+	m_pModStrategy->OnSpawn();
 
 	m_bNotKilled = true;
 	m_bIsDefusing = false;
@@ -5725,11 +5735,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 void OLD_CheckBuyZone(CBasePlayer *player)
 {
-	if (g_pModRunning->FIgnoreBuyZone(player))
-	{
-		player->m_signals.Signal(SIGNAL_BUY);
-		return;
-	}
 
 	const char *pszSpawnClass = NULL;
 
@@ -5776,8 +5781,9 @@ void CBasePlayer::HandleSignals()
 
 	if (mp->IsMultiplayer())
 	{
-		if (!mp->m_bMapHasBuyZone || g_pModRunning->FIgnoreBuyZone(this))
-			OLD_CheckBuyZone(this);
+		//if (!mp->m_bMapHasBuyZone)
+		//	OLD_CheckBuyZone(this);
+		m_pModStrategy->CheckBuyZone();
 
 		if (!mp->m_bMapHasBombZone)
 			OLD_CheckBombTarget(this);
@@ -5939,7 +5945,7 @@ int CBasePlayer::GiveAmmo(int iCount, char *szName, int iMax)
 		return -1;
 	}
 
-	iMax = g_pModRunning->ComputeMaxAmmo(this, const_cast<const char *>(szName), iMax);
+	iMax = m_pModStrategy->ComputeMaxAmmo(const_cast<const char *>(szName), iMax);
 
 	if (!g_pGameRules->CanHaveAmmo(this, szName, iMax))
 	{

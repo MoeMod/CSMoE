@@ -27,6 +27,20 @@ public:
 };
 static CMultiplayGameMgrHelper g_GameMgrHelper;
 
+void CMod_DeathMatch::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	class MyPlayerModStrategy : public CPlayerModStrategy_Default
+	{
+	public:
+		MyPlayerModStrategy(CBasePlayer *player) : CPlayerModStrategy_Default(player) {}
+		void CheckBuyZone() override { m_pPlayer->m_signals.Signal(SIGNAL_BUY); };
+		bool CanPlayerBuy(bool display) override { return true; }
+	};
+
+	std::unique_ptr<MyPlayerModStrategy> up(new MyPlayerModStrategy(player));
+	player->m_pModStrategy = std::move(up);
+}
+
 CMod_DeathMatch::CMod_DeathMatch()
 {
 	m_VoiceGameMgr.Init(&g_GameMgrHelper, gpGlobals->maxClients);

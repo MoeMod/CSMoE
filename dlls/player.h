@@ -158,6 +158,8 @@
 
 #include "player/player_zombie.h"
 #include "player/player_human_level.h"
+#include "player/player_mod_strategy.h"
+#include <memory>
 
 struct WeaponStruct
 {
@@ -215,11 +217,16 @@ public:
 class CBasePlayer : public CBaseMonster
 {
 public:
+#ifdef CLIENT_DLL
 	CBasePlayer() : m_rebuyString(nullptr) {}
-	CBasePlayer::~CBasePlayer()
+	~CBasePlayer()
 	{
 		delete[] m_rebuyString;
 	}
+#else
+	CBasePlayer();
+	~CBasePlayer();
+#endif
 
 	virtual void Spawn();
 
@@ -728,6 +735,9 @@ public:
 	float m_flTimeZombieSkillEffect;
 
 	HumanLevelStruct m_iHumanLevel;
+
+public:
+	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 };
 
 extern int gEvilImpulse101;

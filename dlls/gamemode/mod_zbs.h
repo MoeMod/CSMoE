@@ -28,8 +28,7 @@ public: // CHalfLifeMultiplay
 
 public:
 	DamageTrack_e DamageTrack() override { return DT_ZBS; }
-	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
-	int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 public:
 	void TeamCheck();
@@ -42,8 +41,6 @@ public:
 	CZombieSpawn *SelectZombieSpawnPoint();
 	CBaseEntity *MakeZombieNPC();
 	void ClearZombieNPC();
-
-	
 
 public:
 	std::vector<CZombieSpawn *> m_vecZombieSpawns;
