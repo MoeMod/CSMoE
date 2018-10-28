@@ -322,17 +322,12 @@ CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()
 
 CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 {
-	edict_t *pent = CREATE_NAMED_ENTITY(MAKE_STRING("monster_entity"));
+	CMonster *monster = GetClassPtr<CMonster>(nullptr);
 
-	if (FNullEnt(pent))
-	{
-		ALERT(at_console, "NULL Ent in MakeZombieNPC()!\n");
-		return nullptr;
-	}
-
-	CMonster *monster = dynamic_cast<CMonster *>(CBaseEntity::Instance(pent));
 	if (!monster)
 		return nullptr;
+
+	edict_t *pent = monster->edict();
 
 	CZombieSpawn *sp = SelectZombieSpawnPoint();
 	if (sp)

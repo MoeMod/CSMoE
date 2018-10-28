@@ -68,6 +68,8 @@
     <ClCompile Include="..\cl_dll\events\event_vehicle.cpp" />
     <ClCompile Include="..\cl_dll\events\event_wa2000.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm1014.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_xm8c.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_xm8s.cpp" />
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp" />
     <ClCompile Include="..\cl_dll\events\hl_events.cpp" />
     <ClCompile Include="..\cl_dll\ev_common.cpp" />
@@ -163,6 +165,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_usp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.c" />
     <ClCompile Include="..\pm_shared\pm_math.c" />
     <ClCompile Include="..\pm_shared\pm_shared.c" />
@@ -231,6 +235,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8c.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h" />
     <ClInclude Include="..\engine\cdll_int.h" />
     <ClInclude Include="..\engine\custom.h" />
     <ClInclude Include="..\engine\edict.h" />

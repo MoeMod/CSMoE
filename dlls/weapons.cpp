@@ -1893,6 +1893,30 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					bEmitSound = true;
 				}
 
+				// also gets the linked one
+				if (pItem->m_pLink)
+				{
+					CBasePlayerItem *pLinkItem = dynamic_cast<CBasePlayerItem *>(pItem->m_pLink);
+
+					if (pPlayer->AddPlayerItem(pLinkItem))
+					{
+						pLinkItem->AttachToPlayer(pPlayer);
+						bEmitSound = true;
+					}
+
+					// unlink this weapon from the box
+					CBasePlayerItem *pPrev = m_rgpPlayerItems[i];
+					while (pPrev)
+					{
+						if (pPrev->m_pNext == pLinkItem)
+						{
+							pPrev->m_pNext = pLinkItem->m_pNext;
+							pLinkItem->m_pNext = nullptr;
+						}
+						pPrev = pPrev->m_pNext;
+					}
+				}
+
 				// unlink this weapon from the box
 				pItem = m_rgpPlayerItems[i]->m_pNext;
 				m_rgpPlayerItems[i] = pItem;

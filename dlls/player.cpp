@@ -1241,17 +1241,7 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
-		//GiveNamedItem("weapon_wa2000");
-		if (RANDOM_LONG(0, 1))
-			GiveNamedItem("weapon_thompson");
-		else
-			GiveNamedItem("weapon_kriss");
-		/*if(RANDOM_LONG(0, 1))
-			GiveNamedItem("weapon_as50");
-		else
-			GiveNamedItem("weapon_m95");*/
-		//GiveNamedItem("weapon_mp7a1d");
-		//GiveNamedItem("weapon_deagled");
+		GiveNamedItem("weapon_xm8c");
 	}
 }
 
@@ -6889,7 +6879,29 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			pWeaponBox->pev->angles.z = 0;
 			pWeaponBox->SetThink(&CWeaponBox::Kill);
 			pWeaponBox->pev->nextthink = gpGlobals->time + 300;
-			pWeaponBox->PackWeapon(pWeapon);
+			
+			if (pWeapon->m_pLink)
+			{
+				CBasePlayerWeapon *pLinkWeapon = dynamic_cast<CBasePlayerWeapon *>(pWeapon->m_pLink);
+				if (pLinkWeapon)
+				{
+					pWeaponBox->PackWeapon(pLinkWeapon);
+					pWeaponBox->PackWeapon(pWeapon);
+					
+					// take item off hud
+					pev->weapons &= ~(1 << pLinkWeapon->m_iId);
+					g_pGameRules->GetNextBestWeapon(this, pLinkWeapon);
+					UTIL_MakeVectors(pev->angles);
+
+					if (pLinkWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
+						m_bHasPrimary = false;
+				}
+			}
+			else
+			{
+				pWeaponBox->PackWeapon(pWeapon);
+			}
+
 			pWeaponBox->pev->velocity = gpGlobals->v_forward * 300 + gpGlobals->v_forward * 100;
 
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_c4"))
