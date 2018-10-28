@@ -32,6 +32,14 @@ public:
 		);
 	}
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+	bool CanPlayerBuy(bool display) override
+	{
+		// is the player alive?
+		if (m_pPlayer->pev->deadflag != DEAD_NO)
+			return false;
+
+		return true;
+	}
 
 	void OnSpawn() override
 	{

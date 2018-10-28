@@ -50,14 +50,16 @@ public:
 
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
-
 	void KilledByPlayer(CBasePlayer *player);
+	void CheckTarget();
+	CBasePlayer *GetClosestPlayer(bool bVisible);
 
 public:
 	float m_flAttackDamage;
 	int m_iKillBonusMoney;
 	int m_iKillBonusFrags;
 	float m_flTimeLastActive;
+	float m_flTargetChange;
 };
 
 #endif

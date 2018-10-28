@@ -47,6 +47,7 @@ DECLARE_MESSAGE( m_Radar, HostageK )
 DECLARE_MESSAGE( m_Radar, HostagePos )
 DECLARE_MESSAGE( m_Radar, BombDrop )
 DECLARE_MESSAGE( m_Radar, BombPickup )
+DECLARE_MESSAGE(m_Radar, Location)
 
 
 static byte	r_RadarCross[8][8] =
@@ -88,6 +89,7 @@ static byte	r_RadarFlippedT[8][8] =
 #define BLOCK_SIZE_MAX 1024
 
 static byte	data2D[BLOCK_SIZE_MAX*4];	// intermediate texbuffer
+char g_szLocation[2048];
 
 int CHudRadar::Init()
 {
@@ -98,12 +100,14 @@ int CHudRadar::Init()
 	HOOK_MESSAGE( HostagePos );
 	HOOK_MESSAGE( BombDrop );
 	HOOK_MESSAGE( BombPickup );
+	HOOK_MESSAGE( Location );
 
 	m_iFlags = HUD_DRAW;
 
 	cl_radartype = CVAR_CREATE( "cl_radartype", "0", FCVAR_ARCHIVE );
 
 	bTexturesInitialized = bUseRenderAPI = false;
+	memset(g_szLocation, 0, sizeof(g_szLocation));
 
 	gHUD.AddHudElem( this );
 	return 1;
@@ -310,6 +314,14 @@ int CHudRadar::Draw(float flTime)
 	{
 		SPR_Set( m_hRadar.spr, 25, 75, 25 );
 		SPR_DrawAdditive( 0, 0, 0, &m_hRadarOpaque.rect );
+	}
+
+	if (strlen(g_szLocation))
+	{
+		int iLength, iHeight;
+		gEngfuncs.pfnDrawSetTextColor(0.0f, 0.8f, 0.0f);
+		gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+		gEngfuncs.pfnDrawConsoleString(64 - iLength / 2, m_hRadarOpaque.rect.bottom + iHeight, g_szLocation);
 	}
 
 	if( bUseRenderAPI )
@@ -593,6 +605,16 @@ int CHudRadar::MsgFunc_HostageK(const char *pszName, int iSize, void *pbuf)
 		g_HostageInfo[idx].radarflashes = 15;
 		g_HostageInfo[idx].radarflashtimedelta = 0.1f;
 	}
+
+	return 1;
+}
+
+int CHudRadar::MsgFunc_Location(const char * pszName, int iSize, void * pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+	int iPlayerID = reader.ReadByte();
+	if (iPlayerID == gEngfuncs.GetLocalPlayer()->index)
+		strcpy(g_szLocation, reader.ReadString());
 
 	return 1;
 }

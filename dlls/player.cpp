@@ -1240,7 +1240,6 @@ void CBasePlayer::GiveDefaultItems()
 			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 			break;
-		}
 		GiveNamedItem("weapon_xm8c");
 	}
 }
