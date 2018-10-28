@@ -38,3 +38,5 @@
 #include "wpn_shared/wpn_as50.h"
 #include "wpn_shared/wpn_kriss.h"
 #include "wpn_shared/wpn_thompson.h"
+#include "wpn_shared/wpn_m1887.h"
+#include "wpn_shared/wpn_tar21.h"

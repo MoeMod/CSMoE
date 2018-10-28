@@ -1241,11 +1241,13 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
+		GiveNamedItem("weapon_m1887");
+		GiveNamedItem("weapon_tar21");
 		//GiveNamedItem("weapon_wa2000");
-		if (RANDOM_LONG(0, 1))
+		/*if (RANDOM_LONG(0, 1))
 			GiveNamedItem("weapon_thompson");
 		else
-			GiveNamedItem("weapon_kriss");
+			GiveNamedItem("weapon_kriss");*/
 		/*if(RANDOM_LONG(0, 1))
 			GiveNamedItem("weapon_as50");
 		else
