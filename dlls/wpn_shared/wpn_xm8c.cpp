@@ -100,6 +100,16 @@ void CXM8Carbine::ItemPostFrame()
 		m_pLink->m_iSwing = 1;
 	return CBasePlayerWeapon::ItemPostFrame();
 }
+
+CXM8Carbine::~CXM8Carbine()
+{
+	CBaseEntity *pOther = m_pLink;
+	if (pOther && pOther->m_pLink == this)
+	{
+		pOther->m_pLink = m_pLink = nullptr;
+		pOther->SUB_Remove();
+	}
+}
 #endif
 
 void CXM8Carbine::Precache(void)

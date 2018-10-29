@@ -97,6 +97,16 @@ void CXM8SharpShooter::ItemPostFrame()
 		m_pLink->m_iSwing = 1;
 	return CBasePlayerWeapon::ItemPostFrame();
 }
+
+CXM8SharpShooter::~CXM8SharpShooter()
+{
+	CBaseEntity *pOther = m_pLink;
+	if (pOther && pOther->m_pLink == this)
+	{
+		pOther->m_pLink = m_pLink = nullptr;
+		pOther->SUB_Remove();
+	}
+}
 #endif
 
 void CXM8SharpShooter::Precache(void)

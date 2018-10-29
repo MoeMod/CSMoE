@@ -516,6 +516,18 @@
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarl.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_scarh.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_scarl.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -744,6 +756,12 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1242,6 +1242,7 @@ void CBasePlayer::GiveDefaultItems()
 			break;
 		}
 		GiveNamedItem("weapon_xm8c");
+		GiveNamedItem("weapon_scarl");
 	}
 }
 
@@ -6880,26 +6881,50 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			pWeaponBox->SetThink(&CWeaponBox::Kill);
 			pWeaponBox->pev->nextthink = gpGlobals->time + 300;
 			
-			if (pWeapon->m_pLink)
-			{
-				CBasePlayerWeapon *pLinkWeapon = dynamic_cast<CBasePlayerWeapon *>(pWeapon->m_pLink);
-				if (pLinkWeapon)
-				{
-					pWeaponBox->PackWeapon(pLinkWeapon);
-					pWeaponBox->PackWeapon(pWeapon);
-					
-					// take item off hud
-					pev->weapons &= ~(1 << pLinkWeapon->m_iId);
-					g_pGameRules->GetNextBestWeapon(this, pLinkWeapon);
-					UTIL_MakeVectors(pev->angles);
+			pWeaponBox->PackWeapon(pWeapon);
 
-					if (pLinkWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
-						m_bHasPrimary = false;
-				}
-			}
-			else
+			CBasePlayerWeapon *pLinkWeapon = dynamic_cast<CBasePlayerWeapon *>(pWeapon->m_pLink);
+			if (pLinkWeapon) // not == here
 			{
-				pWeaponBox->PackWeapon(pWeapon);
+				// don't pack it in case of some bug...
+				//pWeaponBox->PackWeapon(pLinkWeapon);
+				{
+					if (pLinkWeapon->m_pPlayer)
+					{
+						if (pLinkWeapon->m_pPlayer->m_pActiveItem == pLinkWeapon)
+						{
+							pLinkWeapon->Holster();
+						}
+
+						if (!pLinkWeapon->m_pPlayer->RemovePlayerItem(pLinkWeapon))
+						{
+							// failed to unhook the weapon from the player!
+							assert(FALSE);
+						}
+					}
+
+					// never respawn
+					pLinkWeapon->pev->spawnflags |= SF_NORESPAWN;
+					pLinkWeapon->pev->movetype = MOVETYPE_NONE;
+					pLinkWeapon->pev->solid = SOLID_NOT;
+					pLinkWeapon->pev->effects = EF_NODRAW;
+					pLinkWeapon->pev->modelindex = 0;
+					pLinkWeapon->pev->model = NULL;
+					pLinkWeapon->pev->owner = ENT(pev);
+					pLinkWeapon->SetThink(NULL);
+					pLinkWeapon->SetTouch(NULL);
+					pLinkWeapon->m_pPlayer = NULL;
+					pLinkWeapon->m_pNext = NULL;
+				}
+					
+				// take item off hud
+				pev->weapons &= ~(1 << pLinkWeapon->m_iId);
+				g_pGameRules->GetNextBestWeapon(this, pLinkWeapon);
+				UTIL_MakeVectors(pev->angles);
+
+				if (pLinkWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
+					m_bHasPrimary = false;
+				
 			}
 
 			pWeaponBox->pev->velocity = gpGlobals->v_forward * 300 + gpGlobals->v_forward * 100;

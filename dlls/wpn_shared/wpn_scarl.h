@@ -1,17 +1,26 @@
-
+#ifndef WPN_GALIL_H
+#define WPN_GALIL_H
+#ifdef _WIN32
 #pragma once
+#endif
 
-class CXM8Carbine : public CBasePlayerWeapon
+//galil
+#define GALIL_MAX_SPEED			240
+#define GALIL_DAMAGE			30
+#define GALIL_RANGE_MODIFER		0.98
+#define GALIL_RELOAD_TIME		2.45
+
+class CScarLight : public CBasePlayerWeapon
 {
 public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL Deploy();
-	virtual float GetMaxSpeed();
+	virtual float GetMaxSpeed() { return GALIL_MAX_SPEED; }
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
 	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
+	virtual void SecondaryAttack() {}
 	virtual void Reload();
 	virtual void WeaponIdle();
 	virtual BOOL UseDecrement()
@@ -22,23 +31,27 @@ public:
 		return FALSE;
 #endif
 	}
+
 	virtual KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
-	
-	virtual const char *GetCSModelName() override { return "models/w_xm8.mdl"; }
+	float GetArmorRatioModifier() override { return 1.4; }
+	virtual const char *GetCSModelName() override { return "models/w_scar.mdl"; }
 
 #ifndef CLIENT_DLL
 	virtual void ItemPostFrame() override;
-	~CXM8Carbine();
+	~CScarLight();
 	virtual void AttachToPlayer(CBasePlayer *pPlayer) override;
 #endif
 
 public:
-	void XM8CarbineFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
+public:
 	int m_iShell;
 	int iShellOn;
 
 private:
-	unsigned short m_usFireSG552;
+	unsigned short m_usFireGalil;
 };
+
+#endif

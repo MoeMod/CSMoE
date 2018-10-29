@@ -480,6 +480,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarl.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_scout.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -738,6 +740,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p90.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_scout.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />

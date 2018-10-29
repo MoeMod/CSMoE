@@ -59,6 +59,8 @@
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p228.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p90.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_scarh.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_scarl.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scout.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg550.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg552.cpp" />
@@ -158,6 +160,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_p228.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_p90.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarl.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_scout.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
@@ -230,6 +234,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p90.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_scout.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />

@@ -592,6 +592,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarl.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1246,6 +1252,12 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>

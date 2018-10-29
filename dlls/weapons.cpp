@@ -454,6 +454,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_thompson");
 	UTIL_PrecacheOtherWeapon("weapon_m1887");
 	UTIL_PrecacheOtherWeapon("weapon_tar21");
+	UTIL_PrecacheOtherWeapon("weapon_xm8c");
+	UTIL_PrecacheOtherWeapon("weapon_xm8s");
+	UTIL_PrecacheOtherWeapon("weapon_scarl");
+	UTIL_PrecacheOtherWeapon("weapon_scarh");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
@@ -1904,18 +1908,6 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					{
 						pLinkItem->AttachToPlayer(pPlayer);
 						bEmitSound = true;
-					}
-
-					// unlink this weapon from the box
-					CBasePlayerItem *pPrev = m_rgpPlayerItems[i];
-					while (pPrev)
-					{
-						if (pPrev->m_pNext == pLinkItem)
-						{
-							pPrev->m_pNext = pLinkItem->m_pNext;
-							pLinkItem->m_pNext = nullptr;
-						}
-						pPrev = pPrev->m_pNext;
 					}
 				}
 
