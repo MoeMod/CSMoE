@@ -10,10 +10,13 @@
 
 #include <memory>
 
+class CBaseEntity;
 class CBasePlayer; // player.h
 
+#ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable:4250) // fuck diamond inhertance warning
+#pragma warning(disable:4250) // fuck msvc diamond inhertance warning
+#endif
 
 class IBaseMod : public CHalfLifeMultiplay, ruleof350::unique
 {

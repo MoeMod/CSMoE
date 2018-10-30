@@ -3,17 +3,41 @@
 
 #include "weapons/WeaponTemplate.hpp"
 
-class CXM8Carbine : public 
+/*class CXM8Carbine : public
 	TReloadDefault<CXM8Carbine, 
-	TSecondaryAttackZoom<CXM8Carbine, 
-	CBasePlayerWeapon>>
+	TSecondaryAttackZoom<CXM8Carbine,
+	TWeaponIdleDefault<CXM8Carbine,
+	CBasePlayerWeapon>>>*/
+class CXM8Carbine : public LinkWeaponTemplate<CXM8Carbine,
+		TReloadDefault,
+		TSecondaryAttackZoom,
+		TWeaponIdleDefault
+>
 {
+private:
+	enum xm8_e
+	{
+		CARBINE_XM8_IDLE1,
+		CARBINE_XM8_RELOAD,
+		CARBINE_XM8_DRAW,
+		CARBINE_XM8_SHOOT1,
+		CARBINE_XM8_SHOOT2,
+		CARBINE_XM8_SHOOT3,
+		XM8_CHANGE_SHARPSHOOTER,
+		SHARPSHOOTER_XM8_IDLE1,
+		SHARPSHOOTER_XM8_RELOAD,
+		SHARPSHOOTER_XM8_DRAW,
+		SHARPSHOOTER_XM8_SHOOT1,
+		SHARPSHOOTER_XM8_SHOOT2,
+		SHARPSHOOTER_XM8_SHOOT3,
+		XM8_CHANGE_CARBINE,
+	};
 
 public:
 	static constexpr auto MaxClip = 30;
 	static constexpr auto DefaultReloadTime = 3.2;
 	static constexpr auto DefaultAccuracy = 0.2;
-	static constexpr auto ZoomFOV = 55;
+	static constexpr int ZoomFOV = 50;
 
 	static constexpr const char *V_Model = "models/v_xm8.mdl";
 	static constexpr const char *P_Model = "models/p_xm8.mdl";
@@ -21,12 +45,9 @@ public:
 
 	enum
 	{
-		ANIM_IDLE1,
-		ANIM_RELOAD,
-		ANIM_DRAW,
-		ANIM_SHOOT1,
-		ANIM_SHOOT2,
-		ANIM_SHOOT3,
+		ANIM_IDLE1 = CARBINE_XM8_IDLE1,
+		ANIM_RELOAD = CARBINE_XM8_RELOAD,
+		ANIM_DRAW = CARBINE_XM8_DRAW,
 	};
 
 public:
@@ -37,7 +58,6 @@ public:
 	virtual float GetMaxSpeed();
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
 	virtual void PrimaryAttack();
-	virtual void WeaponIdle();
 	virtual BOOL UseDecrement()
 	{
 #ifdef CLIENT_WEAPONS

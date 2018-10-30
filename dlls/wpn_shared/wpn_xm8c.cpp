@@ -242,18 +242,6 @@ float CXM8Carbine::GetDamage()
 	return 32;
 }
 
-void CXM8Carbine::WeaponIdle(void)
-{
-	ResetEmptySound();
-	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
-	SendWeaponAnim(CARBINE_XM8_IDLE1, UseDecrement() != FALSE);
-}
-
 float CXM8Carbine::GetMaxSpeed(void)
 {
 	if (m_pPlayer->m_iFOV == 90)

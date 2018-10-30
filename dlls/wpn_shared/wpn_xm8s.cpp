@@ -24,24 +24,6 @@
 #include "gamemode/mods.h"
 #endif
 
-enum xm8_e
-{
-	CARBINE_XM8_IDLE1,
-	CARBINE_XM8_RELOAD,
-	CARBINE_XM8_DRAW,
-	CARBINE_XM8_SHOOT1,
-	CARBINE_XM8_SHOOT2,
-	CARBINE_XM8_SHOOT3,
-	XM8_CHANGE_SHARPSHOOTER,
-	SHARPSHOOTER_XM8_IDLE1,
-	SHARPSHOOTER_XM8_RELOAD,
-	SHARPSHOOTER_XM8_DRAW,
-	SHARPSHOOTER_XM8_SHOOT1,
-	SHARPSHOOTER_XM8_SHOOT2,
-	SHARPSHOOTER_XM8_SHOOT3,
-	XM8_CHANGE_CARBINE,
-};
-
 LINK_ENTITY_TO_CLASS(weapon_xm8s, CXM8SharpShooter)
 
 void CXM8SharpShooter::Spawn(void)
@@ -159,19 +141,6 @@ BOOL CXM8SharpShooter::Deploy(void)
 	return TRUE;
 }
 
-void CXM8SharpShooter::SecondaryAttack(void)
-{
-	switch (m_pPlayer->m_iFOV)
-	{
-		case 90: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 25; break;
-		default: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90; break;
-	}
-
-	m_pPlayer->ResetMaxSpeed();
-	EMIT_SOUND(ENT(pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
-}
-
 void CXM8SharpShooter::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -252,42 +221,6 @@ float CXM8SharpShooter::GetDamage()
 		return 66;
 #endif
 	return 50;
-}
-
-void CXM8SharpShooter::Reload(void)
-{
-	if (m_pPlayer->ammo_556nato <= 0)
-		return;
-
-	if (DefaultReload(SG550_MAX_CLIP, SHARPSHOOTER_XM8_RELOAD, 3.2))
-	{
-		m_flAccuracy = 0.2;
-#ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_RELOAD);
-#endif
-
-		if (m_pPlayer->pev->fov != 90)
-		{
-			m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 25;
-			SecondaryAttack();
-		}
-	}
-}
-
-void CXM8SharpShooter::WeaponIdle(void)
-{
-	ResetEmptySound();
-
-	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	if (m_iClip)
-	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
-		SendWeaponAnim(SHARPSHOOTER_XM8_IDLE1, UseDecrement() != FALSE);
-	}
 }
 
 float CXM8SharpShooter::GetMaxSpeed(void)

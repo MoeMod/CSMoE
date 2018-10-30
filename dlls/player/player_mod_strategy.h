@@ -21,7 +21,7 @@ class IBasePlayerModStrategy : public BasePlayerExtra
 {
 public:
 	IBasePlayerModStrategy(CBasePlayer *p) : BasePlayerExtra(p) {}
-	virtual ~IBasePlayerModStrategy() = 0 {};
+	virtual ~IBasePlayerModStrategy() = 0;
 
 	virtual void OnThink() = 0;
 	virtual void OnSpawn() = 0;
@@ -39,6 +39,8 @@ public:
 	virtual float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) = 0;
 
 };
+
+inline IBasePlayerModStrategy::~IBasePlayerModStrategy() {}
 
 class CPlayerModStrategy_Default : public IBasePlayerModStrategy
 {

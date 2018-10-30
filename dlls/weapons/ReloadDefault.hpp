@@ -19,37 +19,40 @@ class TReloadDefault : public CBase
 public:
 	void Reload(void) override
 	{
-		if (DefaultReload(CFinal::MaxClip, CFinal::ANIM_RELOAD, CFinal::DefaultReloadTime))
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		if (wpn.DefaultReload(
+				wpn.MaxClip,
+				wpn.ANIM_RELOAD,
+				wpn.DefaultReloadTime
+				))
 		{
 #ifndef CLIENT_DLL
-			m_pPlayer->SetAnimation(PLAYER_RELOAD);
+			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-			m_flAccuracy = CFinal::DefaultAccuracy;
-			m_iShotsFired = 0;
-			m_bDelayFire = false;
+			CBase::m_flAccuracy = wpn.DefaultAccuracy;
+			CBase::m_iShotsFired = 0;
+			CBase::m_bDelayFire = false;
 
 			ReloadCheckZoom();
 		}
 		return CBase::Reload();
 	}
 private:
-
 	void ReloadCheckZoom()
 	{
-		ReloadCheckZoom_impl(1);
+		ReloadCheckZoom_impl();
 	}
 
 	// fucking sfinae
 	void ReloadCheckZoom_impl(...) { /* default impl*/}
-	template<class Enabled = typename std::enable_if<CFinal::Rec_SecondaryAttack_HasZoom>::type>
-	Enabled ReloadCheckZoom_impl(int)
+	template<class ClassToFind = CFinal>
+	void ReloadCheckZoom_impl(bool = ClassToFind::Rec_SecondaryAttack_HasZoom)
 	{
-		if (m_pPlayer->pev->fov != 90)
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		if (CBase::m_pPlayer->pev->fov != 90)
 		{
-			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = CFinal::Ref_GetMinZoomFOV();
-			SecondaryAttack();
+			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
+			wpn.SecondaryAttack();
 		}
 	}
-
-	
 };

@@ -47,8 +47,9 @@ private:
 
 struct IBaseEventListener
 {
-	virtual ~IBaseEventListener() = 0 {};
+	virtual ~IBaseEventListener() = 0;
 };
+inline IBaseEventListener::~IBaseEventListener() {}
 using EventListener = std::shared_ptr<IBaseEventListener>;
 template<class F>
 class EventDispatcher;

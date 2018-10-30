@@ -9,24 +9,25 @@
 */
 
 template<class CFinal, class CBase = CBasePlayerWeapon>
-class TSecondaryAttackZoom : public CBase
+class TSecondaryAttackSniperZoom1 : public CBase
 {
 public:
 
 	static constexpr auto Rec_SecondaryAttack_HasZoom = true;
-	constexpr int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).ZoomFOV; }
+	constexpr int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).CFinal::ZoomFOV; }
 
 public:
 	void SecondaryAttack(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		const int fov1 = wpn.ZoomFOV;
+		switch (CBase::m_pPlayer->m_iFOV)
+		{
+			case 90: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = wpn.ZoomFOV; break;
+			default: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = 90; break;
+		}
 
-		if (CBase::m_pPlayer->m_iFOV != 90)
-			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = 90;
-		else
-			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = fov1;
-
+		CBase::m_pPlayer->ResetMaxSpeed();
+		EMIT_SOUND(ENT(CBase::pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
 		CBase::m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
 
 		return CBase::SecondaryAttack(); // pass over
