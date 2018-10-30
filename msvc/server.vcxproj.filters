@@ -62,6 +62,9 @@
     <Filter Include="dlls\gamemode\zb2">
       <UniqueIdentifier>{b71978a8-5a8e-4cfb-9ca0-e027dc3ddd97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\weapons">
+      <UniqueIdentifier>{52b37e27-762c-4242-bfc6-9a8e6d49e634}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -1259,6 +1262,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp">
+      <Filter>dlls\weapons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

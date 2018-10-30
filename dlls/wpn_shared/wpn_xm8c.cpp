@@ -163,16 +163,6 @@ BOOL CXM8Carbine::Deploy(void)
 	return TRUE;
 }
 
-void CXM8Carbine::SecondaryAttack(void)
-{
-	if (m_pPlayer->m_iFOV != 90)
-		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
-	else
-		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
-
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
-}
-
 void CXM8Carbine::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -250,26 +240,6 @@ float CXM8Carbine::GetDamage()
 		return 48;
 #endif
 	return 32;
-}
-
-void CXM8Carbine::Reload(void)
-{
-	if (m_pPlayer->ammo_556nato <= 0)
-		return;
-
-	if (DefaultReload(SG552_MAX_CLIP, CARBINE_XM8_RELOAD, 3.2))
-	{
-#ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_RELOAD);
-#endif
-
-		if (m_pPlayer->m_iFOV != 90)
-			SecondaryAttack();
-
-		m_flAccuracy = 0.2;
-		m_iShotsFired = 0;
-		m_bDelayFire = false;
-	}
 }
 
 void CXM8Carbine::WeaponIdle(void)

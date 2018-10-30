@@ -13,6 +13,12 @@
 *
 ****/
 
+#ifndef CBASE_H
+#define CBASE_H
+#ifdef _WIN32
+#pragma once
+#endif
+
 #define FCAP_CUSTOMSAVE 0x00000001
 #define FCAP_ACROSS_TRANSITION 0x00000002
 #define FCAP_MUST_SPAWN 0x00000004
@@ -276,7 +282,7 @@ public:
 	BOOL IsLockedByMaster(void) { return FALSE; }
 
 public:
-	static CBaseEntity *Instance(edict_t *pent) { return (CBaseEntity *)GET_PRIVATE(pent ? pent : ENT(0)); }
+	static CBaseEntity *Instance(edict_t *pent) { return GET_PRIVATE<CBaseEntity>(pent ? pent : ENT(0)); }
 	static CBaseEntity *Instance(entvars_t *instpev) { return Instance(ENT(instpev)); }
 	static CBaseEntity *Instance(int inst_eoffset) { return Instance(ENT(inst_eoffset)); }
 
@@ -712,16 +718,16 @@ public:
 	int m_sounds;
 };
 
-template <class T> T *GetClassPtr(T *a)
+template <class T> auto GetClassPtr(T *a) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
-	entvars_t *pev = (entvars_t *)a;
+	entvars_t *pev = reinterpret_cast<entvars_t *>(a);
 
-	if (pev == NULL)
+	if (pev == nullptr)
 		pev = VARS(CREATE_ENTITY());
 
-	a = (T *)GET_PRIVATE(ENT(pev));
+	a = GET_PRIVATE<T>(ENT(pev));
 
-	if (a == NULL)
+	if (a == nullptr)
 	{
 		a = new(pev) T;
 		a->pev = pev;
@@ -748,3 +754,5 @@ public:
 	int m_iStartDist, m_iEndDist;
 	float m_fDensity;
 };
+
+#endif

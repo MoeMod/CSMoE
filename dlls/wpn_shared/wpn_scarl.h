@@ -4,12 +4,6 @@
 #pragma once
 #endif
 
-//galil
-#define GALIL_MAX_SPEED			240
-#define GALIL_DAMAGE			30
-#define GALIL_RANGE_MODIFER		0.98
-#define GALIL_RELOAD_TIME		2.45
-
 class CScarLight : public CBasePlayerWeapon
 {
 public:
@@ -17,7 +11,7 @@ public:
 	virtual void Precache();
 	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL Deploy();
-	virtual float GetMaxSpeed() { return GALIL_MAX_SPEED; }
+	virtual float GetMaxSpeed() { return 230; }
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
 	virtual void PrimaryAttack();
 	virtual void SecondaryAttack() {}

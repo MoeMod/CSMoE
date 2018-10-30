@@ -703,6 +703,9 @@
     <ClInclude Include="..\dlls\vector.h" />
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
+    <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp" />
+    <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp" />
     <ClInclude Include="..\dlls\weapons_const.h" />
     <ClInclude Include="..\dlls\weapons_buy.h" />
     <ClInclude Include="..\dlls\weapons_data.h" />
