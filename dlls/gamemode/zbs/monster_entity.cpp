@@ -21,9 +21,9 @@ LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 class CMonsterImprov : public CHostageImprov
 {
 public:
-	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity) 
+	CMonsterImprov(CBaseEntity *entity) : CHostageImprov(entity)
 	{
-		
+
 	}
 	~CMonsterImprov() {} // virtual
 
@@ -53,33 +53,6 @@ public:
 
 		return CHostageImprov::CanJump();
 	}
-
-	/*CBasePlayer *GetClosestVisiblePlayer(int team) override
-	{
-		CBasePlayer *close = NULL;
-		float closeRangeSq = 1e8f;
-
-		for (int i = 0; i < m_visiblePlayerCount; ++i)
-		{
-			CBasePlayer *player = (CBasePlayer *)CBaseEntity::Instance(m_visiblePlayer[i]);
-
-			if (player == NULL)
-				continue;
-
-			if (!player->IsAlive())
-				continue;
-
-			float rangeSq = (GetCentroid() - player->pev->origin).LengthSquared();
-
-			if (rangeSq < closeRangeSq)
-			{
-				closeRangeSq = rangeSq;
-				close = player;
-			}
-		}
-
-		return close;
-	}*/
 };
 
 void CMonster::Spawn()
@@ -113,7 +86,6 @@ void CMonster::Spawn()
 		pev->skin = 0;
 
 	SET_MODEL(edict(), "models/player/zombi_origin/zombi_origin.mdl");
-	//SetActivity(ACT_IDLE);
 	SetAnimation(MONSTERANIM_IDLE);
 
 	m_flNextChange = 0;
@@ -171,12 +143,16 @@ void CMonster::Spawn()
 	m_improv = NULL;
 
 	m_flNextAttack = 0;
-	
-	//CHostage::Spawn();
+
 	pev->team = TEAM_TERRORIST; // allow bot attack...
 
+	m_flAttackDist = 35.0f;
 	m_flAttackDamage = 1.0f;
+	m_flAttackRate = 2.0f;
+	m_flAttackAnimTime = 0.6f;
 	m_flTimeLastActive = gpGlobals->time;
+
+	m_pMonsterStrategy->OnSpawn();
 }
 
 void CMonster::Precache()
@@ -268,7 +244,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 		// if attacking then dont play flinch anim
 		if (m_flNextAttack <= gpGlobals->time)
 		{
-			m_flFlinchTime = gpGlobals->time + 0.7;
+			m_flFlinchTime = gpGlobals->time + 0.25f;
 			//SetFlinchActivity();
 			SetAnimation(MONSTERANIM_FLINCH);
 		}
@@ -289,11 +265,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 void CMonster::PlayDeathSound()
 {
-	switch (RANDOM_LONG(1, 2))
-	{
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
-	}
+	m_pMonsterStrategy->DeathSound();
 }
 
 void CMonster::BecomeDead(void) 
@@ -347,7 +319,8 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 		if (attacker->IsPlayer())
 			KilledByPlayer(static_cast<CBasePlayer *>(attacker));
 	}
-	
+
+	m_pMonsterStrategy->OnKilled(pevAttacker, iGib);
 }
 
 void CMonster::Remove()
@@ -360,13 +333,13 @@ void CMonster::Remove()
 	pev->nextthink = -1;
 	m_flNextFullThink = -1;
 
-	
-
 	SUB_Remove();
 }
 
 CMonster::CMonster() : CHostage(), m_iKillBonusMoney(500), m_iKillBonusFrags(1), m_flTimeLastActive(0.0f)
 {
+	std::unique_ptr<CMonsterModStrategy_Default> up(new CMonsterModStrategy_Default(this));
+	m_pMonsterStrategy = std::move(up);
 	MonsterManager().OnEntityAdd(this);
 }
 
@@ -407,37 +380,6 @@ void CMonster::IdleThink()
 	m_flNextFullThink = gpGlobals->time + 0.1;
 	CheckTarget();
 
-	//if (m_hTargetEnt != NULL || m_improv != NULL)
-	//{
-	//	CBasePlayer *player = NULL;
-
-	//	if (m_improv != NULL)
-	//	{
-	//		if (m_improv->IsFollowing())
-	//		{
-	//			player = (CBasePlayer *)m_improv->GetFollowLeader();
-	//		}
-	//	}
-	//	else
-	//		player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
-
-	//	// force repath
-	//	if (gpGlobals->time > m_flLastPathCheck + m_flPathCheckInterval)
-	//	{
-	//		// forget the current target and find a new one.
-	//		player = NULL;
-	//		m_flLastPathCheck = gpGlobals->time;
-	//	}
-
-	//	// invalid target, find another one!
-	//	if (player == NULL || !player->IsAlive())
-	//		player = (CBasePlayer *)FindTarget();
-
-	//	// fix: no target needs, should still attack (to wall, etc)
-	//	//if (player != NULL)
-	//	CheckAttack();
-	//}
-
 	if (m_improv != NULL)
 	{
 		m_improv->OnUpdate(updateRate);
@@ -455,6 +397,8 @@ void CMonster::IdleThink()
 			SetAnimation(MONSTERANIM_IDLE);
 		}
 	}
+
+	m_pMonsterStrategy->OnThink();
 }
 
 void CMonster::CheckTarget()
@@ -505,23 +449,18 @@ CBaseEntity *CMonster::FindTarget()
 
 CBaseEntity *CMonster::CheckAttack()
 {
-	const float flAttackDistance = 35.0f;
-	const float flAttackRate = 2.0f;
-	const float flAttackAnimTime = 0.6f;
-	const float flAttackDamage = m_flAttackDamage;
-
 	if (m_flNextAttack > gpGlobals->time)
 		return nullptr;
 
-	CBaseEntity *pHit = CheckTraceHullAttack(flAttackDistance, flAttackDamage, DMG_BULLET);
+	CBaseEntity *pHit = CheckTraceHullAttack(m_flAttackDist, m_flAttackDamage, DMG_BULLET);
 
 	if (!pHit)
 		return nullptr;
 
 	SetAnimation(MONSTERANIM_ATTACK);
 
-	m_flNextAttack = gpGlobals->time + flAttackRate;
-	m_flNextFullThink = gpGlobals->time + flAttackAnimTime;
+	m_flNextAttack = gpGlobals->time + m_flAttackRate;
+	m_flNextFullThink = gpGlobals->time + m_flAttackAnimTime;
 
 	switch (RANDOM_LONG(1, 3))
 	{
@@ -879,20 +818,6 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 }
 
-inline float CalcBoxDistance(CBaseEntity *ent1, CBaseEntity *ent2)
-{
-	/*Vector vecDistance = Vector(0, 0, 0);
-	for (int i = 0; i < 3; i++)
-	{
-		if (((float *)pev->absmin)[i] > ((float *)pevTarget->absmax)[i])
-			(float)(vecDistance)[i] = ((float *)pev->absmin)[i] - ((float *)pevTarget->absmax)[i];
-		else if (((float *)pevTarget->absmin)[i] > ((float *)pev->absmax)[i])
-			(float)(vecDistance)[i] = ((float *)pevTarget->absmin)[i] - ((float *)pev->absmax)[i];
-	}
-	return vecDistance.Length();*/
-	return (ent1->Center() - ent2->Center()).Length();
-}
-
 CBaseEntity *CMonster::CheckTraceHullAttack(float flDist, int iDamage, int iDmgType)
 {
 	TraceResult tr;
@@ -989,4 +914,163 @@ CBasePlayer *CMonster::GetClosestPlayer(bool bVisible)
 	}
 
 	return close;
+}
+
+
+void CMonsterModStrategy_Default::OnSpawn()
+{
+	/*m_pMonster->Precache();
+
+	if (m_pMonster->pev->classname)
+	{
+		RemoveEntityHashValue(m_pMonster->pev, STRING(m_pMonster->pev->classname), CLASSNAME);
+	}
+
+	MAKE_STRING_CLASS("monster_entity", m_pMonster->pev);
+	AddEntityHashValue(m_pMonster->pev, STRING(m_pMonster->pev->classname), CLASSNAME);
+
+	m_pMonster->pev->movetype = MOVETYPE_STEP;
+	m_pMonster->pev->solid = SOLID_SLIDEBOX;
+	m_pMonster->pev->takedamage = DAMAGE_YES;
+	m_pMonster->pev->flags |= FL_MONSTER;
+	m_pMonster->pev->deadflag = DEAD_NO;
+	m_pMonster->pev->max_health = 100;
+	m_pMonster->pev->health = m_pMonster->pev->max_health;
+	m_pMonster->pev->gravity = 1;
+	m_pMonster->pev->view_ofs = VEC_VIEW;
+	m_pMonster->pev->velocity = Vector(0, 0, 0);
+	m_pMonster->pev->maxspeed = 140.0f;
+
+	if (m_pMonster->pev->spawnflags & SF_MONSTER_HITMONSTERCLIP)
+		m_pMonster->pev->flags |= FL_MONSTERCLIP;
+
+	if (m_pMonster->pev->skin < 0)
+		m_pMonster->pev->skin = 0;
+
+	SET_MODEL(m_pMonster->edict(), "models/player/zombi_origin/zombi_origin.mdl");
+	m_pMonster->SetAnimation(MONSTERANIM_IDLE);
+
+	m_pMonster->m_flNextChange = 0;
+	m_pMonster->m_State = CHostage::STAND;
+	m_pMonster->m_hTargetEnt = NULL;
+	m_pMonster->m_hStoppedTargetEnt = NULL;
+	m_pMonster->m_vPathToFollow[0] = Vector(0, 0, 0);
+	m_pMonster->m_flFlinchTime = 0;
+	m_pMonster->m_bRescueMe = FALSE;
+
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+
+	TraceResult tr;
+	TRACE_MONSTER_HULL(m_pMonster->edict(), m_pMonster->pev->origin, m_pMonster->pev->origin, dont_ignore_monsters, m_pMonster->edict(), &tr);
+
+	if (tr.fStartSolid || tr.fAllSolid || !tr.fInOpen)
+	{
+		m_pMonster->Killed(nullptr, GIB_NORMAL);
+		return;
+	}
+
+	UTIL_MakeVectors(m_pMonster->pev->v_angle);
+
+	m_pMonster->SetBoneController(0, UTIL_VecToYaw(gpGlobals->v_forward));
+	m_pMonster->SetBoneController(1, 0);
+	m_pMonster->SetBoneController(2, 0);
+	m_pMonster->SetBoneController(3, 0);
+	m_pMonster->SetBoneController(4, 0);
+
+	DROP_TO_FLOOR(m_pMonster->edict());
+
+	m_pMonster->SetThink(&CMonster::IdleThink);
+	m_pMonster->pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+
+	m_pMonster->m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	m_pMonster->m_vStart = m_pMonster->pev->origin;
+	m_pMonster->m_vStartAngles = m_pMonster->pev->angles;
+	m_pMonster->m_vOldPos = Vector(9999, 9999, 9999);
+	m_pMonster->m_iHostageIndex = ++g_iHostageNumber;
+
+	m_pMonster->nTargetNode = -1;
+	m_pMonster->m_fHasPath = FALSE;
+
+	m_pMonster->m_flLastPathCheck = -1;
+	m_pMonster->m_flPathAcquired = -1;
+	m_pMonster->m_flPathCheckInterval = 3.0f;
+	m_pMonster->m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
+
+	m_pMonster->m_LocalNav = new CLocalNav(m_pMonster);
+	m_pMonster->m_bStuck = FALSE;
+	m_pMonster->m_flStuckTime = 0;
+
+	if (m_pMonster->m_improv)
+		delete m_pMonster->m_improv;
+	m_pMonster->m_improv = NULL;
+
+	m_pMonster->m_flNextAttack = 0;
+
+	m_pMonster->pev->team = TEAM_TERRORIST; // allow bot attack...
+
+	m_pMonster->m_flAttackDamage = 1.0f;
+	m_pMonster->m_flTimeLastActive = gpGlobals->time;*/
+}
+
+void CMonsterModStrategy_Default::OnThink()
+{
+	/*float flInterval;
+	const float upkeepRate = 0.03f;
+	const float giveUpTime = (1 / 30.0f);
+	float const updateRate = 0.1f;
+
+	if (!m_pMonster->m_improv)
+	{
+		m_pMonster->m_improv = new CMonsterImprov(m_pMonster);
+	}
+
+	m_pMonster->pev->nextthink = gpGlobals->time + giveUpTime;
+
+	flInterval = m_pMonster->StudioFrameAdvance(0);
+	m_pMonster->DispatchAnimEvents(flInterval);
+
+	if (m_pMonster->m_improv != NULL)
+	{
+		m_pMonster->m_improv->OnUpkeep(upkeepRate);
+	}
+
+	if (m_pMonster->m_flNextFullThink > gpGlobals->time)
+	{
+		return;
+	}
+
+	m_pMonster->m_flNextFullThink = gpGlobals->time + 0.1;
+	m_pMonster->CheckTarget();
+
+	if (m_pMonster->m_improv != NULL)
+	{
+		m_pMonster->m_improv->OnUpdate(updateRate);
+	}
+
+	// sequence settings.
+	if (gpGlobals->time >= m_pMonster->m_flFlinchTime)
+	{
+		if (m_pMonster->pev->velocity.Length() > 15)
+		{
+			m_pMonster->SetAnimation(MONSTERANIM_WALK);
+		}
+		else
+		{
+			m_pMonster->SetAnimation(MONSTERANIM_IDLE);
+		}
+	}*/
+}
+
+void CMonsterModStrategy_Default::OnKilled(entvars_t *pKiller, int iGib)
+{
+
+}
+
+void CMonsterModStrategy_Default::DeathSound()
+{
+	switch (RANDOM_LONG(1, 2))
+	{
+	case 1: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
+	case 2: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+	}
 }

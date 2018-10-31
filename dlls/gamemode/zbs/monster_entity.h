@@ -6,6 +6,7 @@
 #endif
 
 #include "hostage/hostage.h"
+#include <memory>
 
 enum MonsterAnim
 {
@@ -18,6 +19,44 @@ enum MonsterAnim
 	MONSTERANIM_LARGE_FLINCH,
 	MONSTERANIM_ATTACK,
 	MONSTERANIM_SKILL,
+};
+
+class CMonster;
+
+struct BaseMonsterExtra
+{
+public:
+	BaseMonsterExtra(CMonster *p) : m_pMonster(p) {}
+
+public:
+	CMonster * const m_pMonster;
+};
+
+class IBaseMonsterStrategy : public BaseMonsterExtra
+{
+public:
+	IBaseMonsterStrategy(CMonster *p) : BaseMonsterExtra(p) {}
+	virtual ~IBaseMonsterStrategy() = 0;
+
+	virtual void OnSpawn() = 0;
+	virtual void OnThink() = 0;
+	virtual void OnKilled(entvars_t *pKiller, int iGib) = 0;
+
+	virtual void DeathSound() = 0;
+};
+
+inline IBaseMonsterStrategy::~IBaseMonsterStrategy() {}
+
+class CMonsterModStrategy_Default : public IBaseMonsterStrategy
+{
+public:
+	CMonsterModStrategy_Default(CMonster *p) : IBaseMonsterStrategy(p) {}
+
+	void OnSpawn() override;
+	void OnThink() override;
+	void OnKilled(entvars_t *pKiller, int iGib) override;
+
+	void DeathSound() override;
 };
 
 class CMonster : public CHostage
@@ -55,11 +94,18 @@ public:
 	CBasePlayer *GetClosestPlayer(bool bVisible);
 
 public:
+	float m_flAttackDist;
+	float m_flAttackRate;
+	float m_flAttackAnimTime;
 	float m_flAttackDamage;
 	int m_iKillBonusMoney;
 	int m_iKillBonusFrags;
 	float m_flTimeLastActive;
 	float m_flTargetChange;
+
+public:
+	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
+
 };
 
 #endif
