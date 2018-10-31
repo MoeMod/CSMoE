@@ -10,6 +10,8 @@
 #include "string.h"
 #include "assert.h"
 
+const float ZBS_SELFNUMBER_SCALE_TIME = 0.3f;
+
 inline int CalcTeamFrags()
 {
 	int result = 0;
@@ -129,12 +131,29 @@ int CHudZBSScoreBoard::Draw(float time)
 	int roundNumber = gHUD.m_Scoreboard.m_iTeamScore_CT + 1;
 	int selfKill = max(0, g_PlayerExtraInfo[idx].frags);
 	int teamKill = CalcTeamFrags();
-
 	DrawTexturedNumbersTopCenterAligned(*m_pToprecord, m_rcToprecord, roundNumber, x + 25, y + 25); // ok
 	DrawTexturedNumbersTopCenterAligned(*m_pTeamnumber, m_rcTeamnumber, teamKill, x - 80, y + 10);
 
-	gEngfuncs.pTriAPI->Color4ub(160, 210, 250, 255);
-	DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10);
+	if (m_iSelfKills != selfKill)
+	{
+		m_iSelfnumberScale = 2.0f;
+		m_flSelfnumberScaleTime = time;
+	}
+	
+	if (time > m_flSelfnumberScaleTime + ZBS_SELFNUMBER_SCALE_TIME)
+	{
+		gEngfuncs.pTriAPI->Color4ub(160, 210, 250, 255);
+		DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10);
+	}
+	else
+	{
+		m_iSelfnumberScale = max(1.0f, m_iSelfnumberScale - 0.1f);
+		gEngfuncs.pTriAPI->Color4ub(255, 160, 0, 255);
+		DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10, m_iSelfnumberScale);
+	}
+
+
+	m_iSelfKills = selfKill;
 	
 	return 1;
 }

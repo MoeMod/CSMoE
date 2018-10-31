@@ -18,4 +18,7 @@ protected:
 	UniqueTexture m_pSelfnumber;
 	wrect_t m_rcToprecord[10];
 	UniqueTexture m_pToprecord;
+	int m_iSelfKills;
+	float m_iSelfnumberScale;
+	float m_flSelfnumberScaleTime;
 };
