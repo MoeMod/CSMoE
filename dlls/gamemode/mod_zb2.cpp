@@ -183,7 +183,7 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
-	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1"))
+	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && m_pPlayer->m_bIsZombie)
 	{
 		m_pZombieSkill->Activate();
 		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
