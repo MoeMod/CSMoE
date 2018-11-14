@@ -13,21 +13,18 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 * [x] New HUD elements (ScoreBoard, KillerEffects, C4 follow icons, Custom Crosshair)
 * [x] GameMode : TeamDeathmatch (TDM)
 * [x] GameMode : Deathmatch (DM) with BOT support
-* [ ] HUD : Respawn Bar
 * [x] GameMode : Zombie Mod 1
-* [ ] Zombie classes, skills
-* [x] SupplyBox : CV47-60R, Dual MP7A1, Dual Deagle Camo
-* [ ] Zombie evolution
-* [ ] GameMode : Zombie Mod 2
+* [x] GameMode : Zombie Mod 2
 * [ ] GameMode : Zombie United
 * [ ] GameMode : Zombie Mod 3 (classic)
 * [x] GameMode : Zombie Scenario (classic)
+* [ ] GameMode : GunDeath
 * [ ] UI : BuyMenu
 
 ## Difference from other CSBTE(s) now
-* No more custom weapons and player classes
+* No more dominating weapons and immortal player classes
 * Simplified gameplay
-* No AMXX, all C/C++ native code instead
+* Without AMXX, all C/C++ native code instead
 * No VGUI2 support, English only
 * Low-end system requirements
 * Cross-platform
@@ -40,7 +37,11 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 * RAM : 8 GB
 * Resolution : 2736 x 1824
 * Result : Smooth but hot, 80+fps
-### Linux (inconvenient to test)
+### Linux (in Chrome OS) - Google Pixelbook
+* CPU : Intel Core i5-7Y57
+* GPU : Intel HD615 (without full driver)
+* RAM : 8 GB
+* Result : Due to lack of OpenGL driver on Chrome OS, it can only run dedicated server.
 ### Android - Huawei Ascend P9
 * SoC : Kirin 950
 * RAM : 4 GB
@@ -62,7 +63,9 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 1. download ***-win32-i386 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
 3. copy cstrike and valve directory to where the csbtem locates
-4. run csbtem_win32.exe
+4. run csbtem_win32.exe \
+Note : If you get errors about MSVCR140.dll and so on, install Microsoft VC++ Redist on \
+https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 ### Linux
 1. download ***-linux-i386 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
@@ -70,7 +73,8 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 4. launch terminal, cd to the dir, type 
   sudo chmod +x xash3d
 5. type the cmd below to run the game
-  bash csbtem_linux.sh
+  bash csbtem_linux.sh \
+Note : You may need to install libSDL2 and other dependency.
 ### Android
 1. download ***-GameDir and extract it into an empty folder on your phone
 2. purchase and download Counter-Strike on Steam
@@ -86,19 +90,17 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 4. find cstrike and valve directory in steamapps
 5. launch iTunes and select the CSBTE-Mobile APP in file sharing
 6. drag csbtem, cstrike, valve into iTunes
-7. run the CSBTE-Mobile app on the SpringBoard
+7. run the CSBTE-Mobile app on the SpringBoard \
+Note : Thanks to the fxxking App Store limitations, you must reinstall it every week or it will crash (no need to recopy resources).
 ### macOS
 1. download ***-macos-x64 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
 3. copy cstrike and valve directory to where the csbtem locates
-4. run csbtem_macos.sh with Terminal
-
-## Known BUGs
-* iOS : Due to lack of return button, you can't exit console after entered.
-* macOS : Scrolling problem in MainUI. https://github.com/FWGS/xash3d/issues/398
+4. run csbtem_macos.sh with Terminal \
+Note : If it results in a black window, try to drag it and then the menu will appear.
 
 ## License
-This repo is licensed under GPLv3 license, see LICENSE file for details.
+This repo is licensed under GPLv3 license, check LICENSE file for details.
 
 ## Contributing
 * explain what's wrong & what's to be added
@@ -130,5 +132,5 @@ CSBTE-Mobile继承依赖模块（xash3d、regamedll、cs16client）采用GPLv3�
 * 请详细说明修改/增加了何处，并 commit 一个可行的解决方案
 
  这里仅接受BUG提交，请不要提交关于游戏内容的建议（例如要求更新AK47-火麒麟）\
- 欢迎开发者加入我们，请加入QQ群397471679了解关于本项目的更多信息（非开发者勿加！） \
- 非开发者请访问 https://tieba.baidu.com/f?kw=csoldjb 获取更多信息.
+ 游戏交流群：3266216 \
+ 请访问 https://tieba.baidu.com/f?kw=csoldjb 获取更多信息.
