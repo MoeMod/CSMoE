@@ -12,8 +12,83 @@
 #include "zbs/zbs_const.h"
 #include "zbs/monster_entity.h"
 #include "player/csdm_randomspawn.h"
+#include "zbs/monster_manager.h"
+
+#include "player/player_human_level.h"
 
 #include <algorithm>
+
+class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
+{
+public:
+	PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player)
+	{
+		m_eventAdjustDamage = mp->m_eventAdjustDamage.subscribe(
+			[&](CBasePlayer *attacker, float &out) 
+			{ 
+				if(attacker == m_pPlayer)
+					out *= m_HumanLevel.GetAttackBonus(); 
+			}
+		);
+	}
+	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+	bool CanPlayerBuy(bool display) override
+	{
+		// is the player alive?
+		if (m_pPlayer->pev->deadflag != DEAD_NO)
+			return false;
+
+		return true;
+	}
+
+	void OnSpawn() override
+	{
+		m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+	}
+	bool ClientCommand(const char *pcmd) override
+	{
+		if (FStrEq(pcmd, "zbs_hp_up"))
+		{
+			m_HumanLevel.LevelUpHealth();
+			return true;
+		}
+		else if (FStrEq(pcmd, "zbs_atk_up"))
+		{
+			m_HumanLevel.LevelUpAttack();
+			return true;
+		}
+		return CPlayerModStrategy_Default::ClientCommand(pcmd);
+	}
+	void OnInitHUD() override
+	{
+		m_HumanLevel.UpdateHUD();
+	}
+
+protected:
+	EventListener m_eventAdjustDamage;
+
+	PlayerExtraHumanLevel_ZBS m_HumanLevel;
+
+};
+
+void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	player->m_pModStrategy = std::make_unique<PlayerModStrategy_ZBS>(player, this);
+}
+
+float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = IBaseMod_RemoveObjects::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
+	if (pAttackingEnt->IsPlayer())
+	{
+		CBasePlayer *pAttacker = static_cast<CBasePlayer *>(pAttackingEnt);
+		m_eventAdjustDamage.dispatch(pAttacker, flDamage);
+	}
+		
+	return flDamage;
+}
 
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
@@ -34,12 +109,6 @@ void CMod_ZombieScenario::UpdateGameMode(CBasePlayer *pPlayer)
 	MESSAGE_END();
 }
 
-void CMod_ZombieScenario::InitHUD(CBasePlayer *pPlayer)
-{
-	pPlayer->HumanLevel_UpdateHUD();
-	return IBaseMod::InitHUD(pPlayer);
-}
-
 void CMod_ZombieScenario::CheckMapConditions()
 {
 	m_vecZombieSpawns.clear();
@@ -55,23 +124,6 @@ void CMod_ZombieScenario::CheckMapConditions()
 	return IBaseMod_RemoveObjects::CheckMapConditions();
 }
 
-bool CMod_ZombieScenario::CanPlayerBuy(CBasePlayer *player, bool display)
-{
-	// is the player alive?
-	if (player->pev->deadflag != DEAD_NO)
-	{
-		return false;
-	}
-
-	// is the player in a buy zone?
-	if (!(player->m_signals.GetState() & SIGNAL_BUY))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 void CMod_ZombieScenario::RestartRound()
 {
 	ClearZombieNPC();
@@ -81,7 +133,6 @@ void CMod_ZombieScenario::RestartRound()
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	IBaseMod::PlayerSpawn(pPlayer);
-	pPlayer->pev->health += pPlayer->HumanLevel_GetHealthBonus();
 }
 
 void CMod_ZombieScenario::WaitingSound()
@@ -194,15 +245,6 @@ void CMod_ZombieScenario::Think()
 		HumanWin();
 }
 
-BOOL CMod_ZombieScenario::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
-{
-	CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance(pEntity);
-	if (pPlayer != NULL)
-		pPlayer->HumanLevel_Reset();
-
-	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
-}
-
 void CMod_ZombieScenario::CheckWinConditions()
 {
 	// If a winner has already been determined and game of started.. then get the heck out of here
@@ -275,11 +317,7 @@ void CMod_ZombieScenario::RoundStart()
 
 BOOL CMod_ZombieScenario::FRoundStarted()
 {
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 20)
-		return false;
-
-	return true;
+	return !IsFreezePeriod();
 }
 
 CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()
@@ -292,17 +330,12 @@ CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()
 
 CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 {
-	edict_t *pent = CREATE_NAMED_ENTITY(MAKE_STRING("monster_entity"));
+	CMonster *monster = GetClassPtr<CMonster>(nullptr);
 
-	if (FNullEnt(pent))
-	{
-		ALERT(at_console, "NULL Ent in MakeZombieNPC()!\n");
-		return nullptr;
-	}
-
-	CMonster *monster = dynamic_cast<CMonster *>(CBaseEntity::Instance(pent));
 	if (!monster)
 		return nullptr;
+
+	edict_t *pent = monster->edict();
 
 	CZombieSpawn *sp = SelectZombieSpawnPoint();
 	if (sp)

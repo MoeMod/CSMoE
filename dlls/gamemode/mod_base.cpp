@@ -11,6 +11,12 @@
 
 #include "player/csdm_randomspawn.h"
 
+void IBaseMod::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	std::unique_ptr<CPlayerModStrategy_Default> up(new CPlayerModStrategy_Default(player));
+	player->m_pModStrategy = std::move(up);
+}
+
 void IBaseMod_RemoveObjects::CheckMapConditions()
 {
 	//CHalfLifeMultiplay::CheckMapConditions();

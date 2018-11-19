@@ -30,6 +30,7 @@ public:
 	int MsgFunc_BombPickup(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_HostagePos(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_HostageK(const char *pszName, int iSize, void *pbuf);
+	int MsgFunc_Location(const char *pszName, int iSize, void *pbuf);
 private:
 
 	cvar_t *cl_radartype;

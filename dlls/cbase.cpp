@@ -388,6 +388,7 @@ void OnFreeEntPrivateData(edict_t *pEnt)
 
 	pEntity->UpdateOnRemove();
 	RemoveEntityHashValue(pEntity->pev, STRING(pEntity->pev->classname), CLASSNAME);
+	pEntity->~CBaseEntity();
 }
 
 NEW_DLL_FUNCTIONS gNewDLLFunctions =

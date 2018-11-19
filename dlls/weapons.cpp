@@ -446,6 +446,18 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_46mm");
 	UTIL_PrecacheOtherWeapon("weapon_ak47l");
 	UTIL_PrecacheOtherWeapon("weapon_deagled");
+	UTIL_PrecacheOtherWeapon("weapon_wa2000");
+	UTIL_PrecacheOtherWeapon("weapon_m95");
+	UTIL_PrecacheOtherWeapon("weapon_as50");
+	UTIL_PrecacheOther("ammo_50bmg");
+	UTIL_PrecacheOtherWeapon("weapon_kriss");
+	UTIL_PrecacheOtherWeapon("weapon_thompson");
+	UTIL_PrecacheOtherWeapon("weapon_m1887");
+	UTIL_PrecacheOtherWeapon("weapon_tar21");
+	UTIL_PrecacheOtherWeapon("weapon_xm8c");
+	UTIL_PrecacheOtherWeapon("weapon_xm8s");
+	UTIL_PrecacheOtherWeapon("weapon_scarl");
+	UTIL_PrecacheOtherWeapon("weapon_scarh");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
@@ -1885,6 +1897,18 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 				{
 					pItem->AttachToPlayer(pPlayer);
 					bEmitSound = true;
+				}
+
+				// also gets the linked one
+				if (pItem->m_pLink)
+				{
+					CBasePlayerItem *pLinkItem = dynamic_cast<CBasePlayerItem *>(pItem->m_pLink);
+
+					if (pPlayer->AddPlayerItem(pLinkItem))
+					{
+						pLinkItem->AttachToPlayer(pPlayer);
+						bEmitSound = true;
+					}
 				}
 
 				// unlink this weapon from the box

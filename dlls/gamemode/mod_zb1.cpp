@@ -57,18 +57,6 @@ void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
 	MESSAGE_END();
 }
 
-bool CMod_Zombi::CanPlayerBuy(CBasePlayer *player, bool display)
-{
-	// is the player alive?
-	if (player->pev->deadflag != DEAD_NO)
-		return false;
-
-	if (player->m_bIsZombie)
-		return false;
-
-	return true;
-}
-
 BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason)
 {
 	CLIENT_COMMAND(pEntity, "mp3 loop sound/Zombi_Ambience.mp3\n");
@@ -187,7 +175,7 @@ void CMod_Zombi::Think()
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
+	if (TimeRemaining() <= 0 && !m_bRoundTerminating && !m_bFreezePeriod)
 		HumanWin();
 }
 
@@ -326,7 +314,25 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 	return IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 
-int CMod_Zombi::ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax)
+void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player));
+	player->m_pModStrategy = std::move(up);
+}
+
+bool CPlayerModStrategy_ZB1::CanPlayerBuy(bool display)
+{
+	// is the player alive?
+	if (m_pPlayer->pev->deadflag != DEAD_NO)
+		return false;
+
+	if (m_pPlayer->m_bIsZombie)
+		return false;
+
+	return true;
+}
+
+int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax)
 {
 	int ret = iOriginalMax * 2;
 

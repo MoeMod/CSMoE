@@ -62,6 +62,9 @@
     <Filter Include="dlls\gamemode\zb2">
       <UniqueIdentifier>{b71978a8-5a8e-4cfb-9ca0-e027dc3ddd97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\weapons">
+      <UniqueIdentifier>{52b37e27-762c-4242-bfc6-9a8e6d49e634}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -561,6 +564,42 @@
     </ClCompile>
     <ClCompile Include="..\dlls\bot\cs_bot_bhopjump.cpp">
       <Filter>dlls\bot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarl.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp">
+      <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1184,6 +1223,54 @@
     </ClInclude>
     <ClInclude Include="..\dlls\bot\cs_bot_statemachine.h">
       <Filter>dlls\bot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbs\monster_manager.h">
+      <Filter>dlls\gamemode\zbs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ruleof350.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8c.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_scarl.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp">
+      <Filter>dlls\weapons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

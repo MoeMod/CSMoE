@@ -1,13 +1,15 @@
 
 #pragma once
 
-class CHudZBSLevel : public CHudBase_ZBS
+#include "hud_sub.h"
+#include "r_texture.h"
+
+class CHudZBSLevel : public IBaseHudSub
 {
 public:
-	int Init(void) override;
+	CHudZBSLevel();
 	int VidInit(void) override;
 	int Draw(float time) override;
-	void Shutdown(void) override;
 	void UpdateLevel(int hp, int att, int wall) 
 	{
 		m_iLevel_HP = hp;
@@ -16,8 +18,8 @@ public:
 	}
 
 protected:
-	int m_iZBSBoard_BG;
-	int m_iZBSBoard_BG_Wall;
+	UniqueTexture m_pTexture_ZBSBoard_BG;
+	UniqueTexture m_pTexture_ZBSBoard_BG_Wall;
 
 	int m_iLevel_HP;
 	int m_iLevel_ATK;

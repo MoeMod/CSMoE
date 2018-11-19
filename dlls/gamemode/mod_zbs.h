@@ -8,6 +8,8 @@
 #include "mod_base.h"
 #include <vector>
 
+#include "EventDispatcher.h"
+
 class CZombieSpawn;
 
 class CMod_ZombieScenario : public IBaseMod_RemoveObjects
@@ -18,18 +20,16 @@ public:
 public: // CHalfLifeMultiplay
 	BOOL IsTeamplay(void) override { return TRUE; }
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
-	void InitHUD(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void Think() override;
-	BOOL ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason) override;
 	void CheckWinConditions() override;
 	void CheckMapConditions() override;
 
 public:
 	DamageTrack_e DamageTrack() override { return DT_ZBS; }
-	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
-	int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) override { return 600; }
+	void InstallPlayerModStrategy(CBasePlayer *player) override;
+	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 
 public:
 	void TeamCheck();
@@ -43,11 +43,11 @@ public:
 	CBaseEntity *MakeZombieNPC();
 	void ClearZombieNPC();
 
-	
-
 public:
 	std::vector<CZombieSpawn *> m_vecZombieSpawns;
 	float m_flNextSpawnNPC;
+
+	EventDispatcher<void(CBasePlayer *attacker, float &)> m_eventAdjustDamage;
 };
 
 #endif

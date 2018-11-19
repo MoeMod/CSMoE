@@ -56,7 +56,17 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireDeagleD_Right);
 	DECLARE_EVENT(FireMP7A1D_Left);
 	DECLARE_EVENT(FireMP7A1D_Right);
-
+	DECLARE_EVENT(FireWA2000);
+	DECLARE_EVENT(FireM95);
+	DECLARE_EVENT(FireAS50);
+	DECLARE_EVENT(FireKRISS);
+	DECLARE_EVENT(FireTHOMPSON);
+	DECLARE_EVENT(FireM1887);
+	DECLARE_EVENT(FireTAR21);
+	DECLARE_EVENT(FireXM8C);
+	DECLARE_EVENT(FireXM8S);
+	DECLARE_EVENT(FireScarH);
+	DECLARE_EVENT(FireScarL);
 /*
 ======================
 Game_HookEvents
@@ -108,4 +118,15 @@ void Game_HookEvents( void )
 	HOOK_EVENT(deagled_right, FireDeagleD_Right);
 	HOOK_EVENT(mp7a1d_left, FireMP7A1D_Left);
 	HOOK_EVENT(mp7a1d_right, FireMP7A1D_Right);
+	HOOK_EVENT(wa2000, FireWA2000);
+	HOOK_EVENT(m95, FireM95);
+	HOOK_EVENT(as50, FireAS50);
+	HOOK_EVENT(kriss, FireKRISS);
+	HOOK_EVENT(thompson, FireTHOMPSON);
+	HOOK_EVENT(m1887, FireM1887);
+	HOOK_EVENT(tar21, FireTAR21);
+	HOOK_EVENT(xm8c, FireXM8C);
+	HOOK_EVENT(xm8s, FireXM8S);
+	HOOK_EVENT(scarh, FireScarH);
+	HOOK_EVENT(scarl, FireScarL);
 }

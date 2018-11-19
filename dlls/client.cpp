@@ -629,8 +629,6 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	}
 
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
-
-	pPlayer->HumanLevel_Reset();
 }
 
 int Q_strlen_(const char *str)
@@ -1507,6 +1505,26 @@ void BuyMachineGun(CBasePlayer *pPlayer, int iSlot)
 	if (TheTutor != NULL)
 	{
 		TheTutor->OnEvent(EVENT_PLAYER_BOUGHT_SOMETHING, pPlayer);
+	}
+}
+
+void ZbsUpgrade(CBasePlayer *pPlayer, int iSlot)
+{
+	if (!pPlayer->CanPlayerBuy(true))
+		return;
+
+	switch (iSlot)
+	{
+		case MENU_SLOT_UPGRADE_HP:
+		{
+			pPlayer->ClientCommand("zbs_hp_up");
+			break;
+		}
+		case MENU_SLOT_UPGRADE_ATK:
+		{
+			pPlayer->ClientCommand("zbs_atk_up");
+			break;
+		}
 	}
 }
 
@@ -2485,7 +2503,7 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 
 	// Can only buy if the player does not already have full ammo
 	int iMax = weapon->iMaxAmmo1();
-	if (player->m_rgAmmo[nAmmo] >= g_pModRunning->ComputeMaxAmmo(player, classname, iMax))
+	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(classname, iMax))
 	{
 		return false;
 	}
@@ -3304,6 +3322,16 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 							}
 							break;
 						}
+						case VGUI_MenuSlot_Zbs_Upgrade:
+						{
+							if (player->m_signals.GetState() & SIGNAL_BUY)
+							{
+								if (!player->m_bVGUIMenus)
+									ShowMenu(player, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_0), -1, 0, "#ZbsUpgrade");
+								player->m_iMenu = Menu_ZbsUpgrade;
+							}
+							break;
+						}
 					}
 				}
 				break;
@@ -3371,6 +3399,15 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				Radio3(player, slot);
 				break;
 			}
+			case Menu_ZbsUpgrade:
+			{
+				if (!player->m_bVGUIMenus)
+				{
+					ZbsUpgrade(player, slot);
+				}
+				break;
+			}
+
 			default:
 				ALERT(at_console, "ClientCommand(): Invalid menu selected\n");
 				break;
@@ -3641,7 +3678,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "drop"))
 			{
 				// player is dropping an item.
-				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1"))
+				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1") || player->m_pModStrategy->ClientCommand("BTE_ZombieSkill1"))
 				{
 					// ...
 				}
@@ -3732,7 +3769,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				if (player->m_signals.GetState() & SIGNAL_BUY)
 				{
-					ShowVGUIMenu(player, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
+					if (g_pModRunning->DamageTrack() == DT_ZBS)
+						ShowVGUIMenu(player, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_9 | MENU_KEY_0), "#BuyZbs");
+					else
+						ShowVGUIMenu(player, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
 					player->m_iMenu = Menu_Buy;
 
 					if (TheBots != NULL)
@@ -3791,14 +3831,6 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				player->SmartRadio();
 			}
-			else if (FStrEq(pcmd, "zbs_hp_up"))
-			{
-				player->HumanLevel_LevelUpHealth();
-			}
-			else if (FStrEq(pcmd, "zbs_atk_up"))
-			{
-				player->HumanLevel_LevelUpAttack();
-			}
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
@@ -3807,7 +3839,8 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				if (HandleRadioAliasCommands(player, pcmd))
 					return;
 
-				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd))
+
+				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd) && !player->m_pModStrategy->ClientCommand(pcmd))
 				{
 					// tell the user they entered an unknown command
 					char command[128];

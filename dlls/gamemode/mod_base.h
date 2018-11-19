@@ -6,19 +6,24 @@
 #endif
 
 #include "mods.h"
+#include "ruleof350.h"
 
+#include <memory>
+
+class CBaseEntity;
 class CBasePlayer; // player.h
 
+#ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable:4250) // fuck diamond inhertance warning
+#pragma warning(disable:4250) // fuck msvc diamond inhertance warning
+#endif
 
-class IBaseMod : public CHalfLifeMultiplay
+class IBaseMod : public CHalfLifeMultiplay, ruleof350::unique
 {
 public:
 	virtual DamageTrack_e DamageTrack() { return DT_NONE; }
-	virtual bool FIgnoreBuyZone(CBasePlayer *player) { return false; }
-	virtual bool CanPlayerBuy(CBasePlayer *player, bool display) { return true; }
-	virtual int ComputeMaxAmmo(CBasePlayer *player, const char *szAmmoClassName, int iOriginalMax) { return iOriginalMax; }
+	virtual void InstallPlayerModStrategy(CBasePlayer *player);
+	virtual float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 };
 
 class IBaseMod_RemoveObjects : virtual public IBaseMod

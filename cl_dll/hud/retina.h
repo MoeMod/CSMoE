@@ -18,6 +18,8 @@
 #include <string>
 #include <map>
 
+#include "r_texture.h"
+
 class CHudRetina : public CHudBase
 {
 public:
@@ -29,7 +31,7 @@ public:
 	void Shutdown(void) override;
 
 public:
-	using RetinaItemIndex_t = size_t;
+	using MagicNumber = int;
 	enum RetinaDrawType_e : int
 	{
 		RETINA_DRAW_TYPE_NONE,
@@ -39,18 +41,19 @@ public:
 
 	struct RetinaDrawItem_s
 	{
-		RetinaDrawType_e type;
-		int iTexture;
+		int type;
+		SharedTexture pTexture;
 		float flTimeEnd;
+		MagicNumber num;
 	};
 	
-	RetinaItemIndex_t AddItem(const char *path, RetinaDrawType_e type, float time = -1.0f);
-	RetinaDrawItem_s RemoveItem(RetinaItemIndex_t idx);
+	MagicNumber AddItem(SharedTexture tex, int type = RETINA_DRAW_TYPE_NONE, float time = -1.0f, MagicNumber num = gEngfuncs.pfnRandomLong(INT_MIN, INT_MAX));
+	bool RemoveItem(MagicNumber idx);
 	void RemoveAll();
 	void DrawItem(float time, const RetinaDrawItem_s &item) const;
-	int PrecacheTexture(const char *path);
+	SharedTexture PrecacheTexture(const char *path);
 
 private:
 	std::vector<RetinaDrawItem_s> m_ItemList;
-	std::map<std::string, int> m_TextureMap;
+	std::map<std::string, SharedTexture> m_TextureMap;
 };

@@ -74,7 +74,6 @@ int CHudZBS::MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf)
 int CHudZBS::Init(void)
 {
 	pimpl = new CHudZBS::impl_t;
-	pimpl->for_each(&CHudBase_ZBS::Init);
 
 	gHUD.AddHudElem(this);
 
@@ -86,35 +85,33 @@ int CHudZBS::Init(void)
 
 int CHudZBS::VidInit(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::VidInit);
+	pimpl->for_each(&IBaseHudSub::VidInit);
 	return 1;
 }
 
 int CHudZBS::Draw(float time)
 {
-	pimpl->for_each(&CHudBase_ZBS::Draw, time);
+	pimpl->for_each(&IBaseHudSub::Draw, time);
 	return 1;
 }
 
 void CHudZBS::Think(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Think);
+	pimpl->for_each(&IBaseHudSub::Think);
 }
 
 void CHudZBS::Reset(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Reset);
+	pimpl->for_each(&IBaseHudSub::Reset);
 }
 
 void CHudZBS::InitHUDData(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::InitHUDData);
+	pimpl->for_each(&IBaseHudSub::InitHUDData);
 }
 
 void CHudZBS::Shutdown(void)
 {
-	pimpl->for_each(&CHudBase_ZBS::Shutdown);
-
 	delete pimpl;
 	pimpl = nullptr;
 }

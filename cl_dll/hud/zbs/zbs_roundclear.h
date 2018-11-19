@@ -1,20 +1,21 @@
 
 #pragma once
 
-class CHudZBSRoundClear : public CHudBase_ZBS
+#include "hud_sub.h"
+#include "r_texture.h"
+
+class CHudZBSRoundClear : public IBaseHudSub
 {
 public:
-	int Init(void) override;
 	int VidInit(void) override;
 	int Draw(float time) override;
-	void Shutdown(void) override;
 
 	void OnRoundClear();
 	void OnRoundFail();
 
 protected:
-	int m_iRoundClear;
-	int m_iRoundFail;
-	int m_iCurTexture;
+	SharedTexture m_pTexture_RoundClear;
+	SharedTexture m_pTexture_RoundFail;
+	SharedTexture m_pCurTexture;
 	float m_flDisplayTime;
 };

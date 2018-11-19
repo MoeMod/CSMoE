@@ -64,6 +64,7 @@ enum WeaponState
 	WPNSTATE_ELITE_LEFT = (1 << 3),
 	WPNSTATE_FAMAS_BURST_MODE = (1 << 4),
 	WPNSTATE_SHIELD_DRAWN = (1 << 5),
+	WPNSTATE_KRISS_SILENCED = (1 << 6),
 };
 
 // custom enum
@@ -149,6 +150,7 @@ enum MaxAmmoType
 	MAX_AMMO_C4 = 1,
 
 	MAX_AMMO_46MM = 80,
+	MAX_AMMO_50BMG = 50,
 };
 
 enum WeightWeapon

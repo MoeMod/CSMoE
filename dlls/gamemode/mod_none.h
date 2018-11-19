@@ -20,9 +20,6 @@ public: // CHalfLifeMultiplay
 	void CheckMapConditions() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 
-public:
-	bool CanPlayerBuy(CBasePlayer *player, bool display) override;
-
 protected:
 	std::vector<std::pair<CBaseEntity *, Vector>> m_mapBombZones;
 };

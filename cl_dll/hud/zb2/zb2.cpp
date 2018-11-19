@@ -11,11 +11,15 @@
 
 #include "gamemode/zb2/zb2_const.h"
 
+#include <vector>
+
 class CHudZB2::impl_t
 {
 public:
 	CHudZB2_Skill skill;
 
+	SharedTexture m_pTexture_RageRetina;
+	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 public:
 	template<class T, class F, class...Args>
 	void for_each(F T::*f, Args &&...args)
@@ -44,6 +48,13 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		for (int i = 0; i < 4 && !buf.Eof(); ++i)
 			skills[i] = static_cast<ZombieSkillType>(buf.ReadByte());
 		pimpl->skill.OnSkillInit(zclass, skills[0], skills[1], skills[2], skills[3]);
+
+		// remove retinas...
+		for (auto x : pimpl->m_RetinaIndexes)
+		{
+			gHUD.m_Retina.RemoveItem(x);
+		}
+		pimpl->m_RetinaIndexes.clear();
 		break;
 	}
 	case ZB2_MESSAGE_SKILL_ACTIVATE:
@@ -53,7 +64,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flFreezeTime = buf.ReadShort();
 		pimpl->skill.OnSkillActivate(type, flHoldTime, flFreezeTime);
 		if (type == ZOMBIE_SKILL_CRAZY || type == ZOMBIE_SKILL_CRAZY2)
-			gHUD.m_Retina.AddItem("resource/zombi/zombicrazy", CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f);
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f));
 		break;
 	}
 		
@@ -66,7 +77,6 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 int CHudZB2::Init(void)
 {
 	pimpl = new CHudZB2::impl_t;
-	pimpl->for_each(&CHudBase_ZB2::Init);
 
 	gHUD.AddHudElem(this);
 
@@ -77,38 +87,36 @@ int CHudZB2::Init(void)
 
 int CHudZB2::VidInit(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::VidInit);
+	pimpl->for_each(&IBaseHudSub::VidInit);
 
-	gHUD.m_Retina.PrecacheTexture("resource/zombi/zombicrazy");
-
+	if(!pimpl->m_pTexture_RageRetina)
+		pimpl->m_pTexture_RageRetina = R_LoadTextureShared("resource/zombi/zombicrazy");
 	return 1;
 }
 
 int CHudZB2::Draw(float time)
 {
-	pimpl->for_each(&CHudBase_ZB2::Draw, time);
+	pimpl->for_each(&IBaseHudSub::Draw, time);
 	return 1;
 }
 
 void CHudZB2::Think(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Think);
+	pimpl->for_each(&IBaseHudSub::Think);
 }
 
 void CHudZB2::Reset(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Reset);
+	pimpl->for_each(&IBaseHudSub::Reset);
 }
 
 void CHudZB2::InitHUDData(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::InitHUDData);
+	pimpl->for_each(&IBaseHudSub::InitHUDData);
 }
 
 void CHudZB2::Shutdown(void)
 {
-	pimpl->for_each(&CHudBase_ZB2::Shutdown);
-
 	delete pimpl;
 	pimpl = nullptr;
 }

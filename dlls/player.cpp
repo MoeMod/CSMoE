@@ -155,6 +155,15 @@ entvars_t *g_pevLastInflictor;
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
+CBasePlayer::CBasePlayer() : m_rebuyString(nullptr) 
+{
+	g_pModRunning->InstallPlayerModStrategy(this);
+}
+CBasePlayer::~CBasePlayer()
+{
+	delete[] m_rebuyString;
+}
+
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
@@ -410,41 +419,7 @@ void CBasePlayer::Pain(int m_LastHitGroup, bool HasArmour)
 	if (m_bIsZombie)
 		return Pain_Zombie(m_LastHitGroup, HasArmour);
 
-	int temp = RANDOM_LONG(0, 2);
-
-	if (m_LastHitGroup == HITGROUP_HEAD)
-	{
-		if (m_iKevlar == ARMOR_TYPE_HELMET)
-		{
-			EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_helmet-1.wav", VOL_NORM, ATTN_NORM);
-			return;
-		}
-
-		switch (temp)
-		{
-		case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot1.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot2.wav", VOL_NORM, ATTN_NORM); break;
-		default: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/headshot3.wav", VOL_NORM, ATTN_NORM); break;
-		}
-	}
-	else
-	{
-		if (m_LastHitGroup != HITGROUP_LEFTLEG && m_LastHitGroup != HITGROUP_RIGHTLEG)
-		{
-			if (HasArmour)
-			{
-				EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_kevlar-1.wav", VOL_NORM, ATTN_NORM);
-				return;
-			}
-		}
-
-		switch (temp)
-		{
-		case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-1.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-2.wav", VOL_NORM, ATTN_NORM); break;
-		default: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/bhit_flesh-3.wav", VOL_NORM, ATTN_NORM); break;
-		}
-	}
+	return m_pModStrategy->Pain(m_LastHitGroup, HasArmour);
 }
 
 Vector VecVelocityForDamage(float flDamage)
@@ -489,14 +464,7 @@ void CBasePlayer::DeathSound()
 	if (m_bIsZombie)
 		return DeathSound_Zombie();
 
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 4))
-	{
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
-	case 3: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
-	case 4: EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
-	}
+	return m_pModStrategy->DeathSound();
 }
 
 // override takehealth
@@ -859,6 +827,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			else if (bitsDamageType & DMG_EXPLOSION)
 				m_bKilledByGrenade = true;
 		}
+
+		// notify gamerules
+		flDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 		LogAttack(pAttack, this, teamAttack, (int)flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 		fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
@@ -1270,9 +1241,8 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
-		//GiveNamedItem("weapon_ak47l");
-		//GiveNamedItem("weapon_mp7a1d");
-		//GiveNamedItem("weapon_deagled");
+		GiveNamedItem("weapon_xm8c");
+		GiveNamedItem("weapon_scarl");
 	}
 }
 
@@ -1708,6 +1678,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	if (!m_bKilledByBomb)
 	{
 		g_pGameRules->PlayerKilled(this, pevAttacker, g_pevLastInflictor);
+		m_pModStrategy->OnKilled(pevAttacker, g_pevLastInflictor);
 	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgNVGToggle, NULL, pev);
@@ -3828,7 +3799,7 @@ bool CBasePlayer::CanPlayerBuy(bool display)
 		return CHalfLifeTraining::PlayerCanBuy(this);
 	}
 
-	return g_pModRunning->CanPlayerBuy(this, display); // rediected to IBaseMod.
+	return m_pModStrategy->CanPlayerBuy(display); // rediected to IBaseMod.
 }
 
 void CBasePlayer::PreThink()
@@ -3850,6 +3821,7 @@ void CBasePlayer::PreThink()
 	// Hint messages should be updated even if the game is over
 	m_hintMessageQueue.Update(this);
 	g_pGameRules->PlayerThink(this);
+	m_pModStrategy->OnThink();
 
 	if (g_fGameOver)
 	{
@@ -4894,6 +4866,7 @@ void CBasePlayer::Spawn()
 	m_lastx = m_lasty = 0;
 
 	g_pGameRules->PlayerSpawn(this);
+	m_pModStrategy->OnSpawn();
 
 	m_bNotKilled = true;
 	m_bIsDefusing = false;
@@ -5715,11 +5688,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 void OLD_CheckBuyZone(CBasePlayer *player)
 {
-	if (g_pModRunning->FIgnoreBuyZone(player))
-	{
-		player->m_signals.Signal(SIGNAL_BUY);
-		return;
-	}
 
 	const char *pszSpawnClass = NULL;
 
@@ -5766,8 +5734,9 @@ void CBasePlayer::HandleSignals()
 
 	if (mp->IsMultiplayer())
 	{
-		if (!mp->m_bMapHasBuyZone || g_pModRunning->FIgnoreBuyZone(this))
-			OLD_CheckBuyZone(this);
+		//if (!mp->m_bMapHasBuyZone)
+		//	OLD_CheckBuyZone(this);
+		m_pModStrategy->CheckBuyZone();
 
 		if (!mp->m_bMapHasBombZone)
 			OLD_CheckBombTarget(this);
@@ -5929,7 +5898,7 @@ int CBasePlayer::GiveAmmo(int iCount, char *szName, int iMax)
 		return -1;
 	}
 
-	iMax = g_pModRunning->ComputeMaxAmmo(this, const_cast<const char *>(szName), iMax);
+	iMax = m_pModStrategy->ComputeMaxAmmo(const_cast<const char *>(szName), iMax);
 
 	if (!g_pGameRules->CanHaveAmmo(this, szName, iMax))
 	{
@@ -6189,6 +6158,7 @@ void CBasePlayer::UpdateClientData()
 			}
 
 			mp->InitHUD(this);
+			m_pModStrategy->OnInitHUD();
 			m_fGameHUDInitialized = TRUE;
 
 			if (mp->IsMultiplayer())
@@ -6528,10 +6498,7 @@ void CBasePlayer::ResetMaxSpeed()
 	}
 	else if (m_bIsZombie)
 	{
-		if(m_iZombieSkillStatus == SKILL_STATUS_USING)
-			speed = 390;
-		else
-			speed = 290;
+		speed = 290;
 	}
 	else if (m_pActiveItem != NULL)
 	{
@@ -6545,6 +6512,8 @@ void CBasePlayer::ResetMaxSpeed()
 	}
 
 	pev->maxspeed = speed;
+
+	m_pModStrategy->OnResetMaxSpeed();
 }
 
 bool CBasePlayer::HintMessage(const char *pMessage, BOOL bDisplayIfPlayerDead, BOOL bOverride)
@@ -6911,7 +6880,53 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			pWeaponBox->pev->angles.z = 0;
 			pWeaponBox->SetThink(&CWeaponBox::Kill);
 			pWeaponBox->pev->nextthink = gpGlobals->time + 300;
+			
 			pWeaponBox->PackWeapon(pWeapon);
+
+			CBasePlayerWeapon *pLinkWeapon = dynamic_cast<CBasePlayerWeapon *>(pWeapon->m_pLink);
+			if (pLinkWeapon) // not == here
+			{
+				// don't pack it in case of some bug...
+				//pWeaponBox->PackWeapon(pLinkWeapon);
+				{
+					if (pLinkWeapon->m_pPlayer)
+					{
+						if (pLinkWeapon->m_pPlayer->m_pActiveItem == pLinkWeapon)
+						{
+							pLinkWeapon->Holster();
+						}
+
+						if (!pLinkWeapon->m_pPlayer->RemovePlayerItem(pLinkWeapon))
+						{
+							// failed to unhook the weapon from the player!
+							assert(FALSE);
+						}
+					}
+
+					// never respawn
+					pLinkWeapon->pev->spawnflags |= SF_NORESPAWN;
+					pLinkWeapon->pev->movetype = MOVETYPE_NONE;
+					pLinkWeapon->pev->solid = SOLID_NOT;
+					pLinkWeapon->pev->effects = EF_NODRAW;
+					pLinkWeapon->pev->modelindex = 0;
+					pLinkWeapon->pev->model = NULL;
+					pLinkWeapon->pev->owner = ENT(pev);
+					pLinkWeapon->SetThink(NULL);
+					pLinkWeapon->SetTouch(NULL);
+					pLinkWeapon->m_pPlayer = NULL;
+					pLinkWeapon->m_pNext = NULL;
+				}
+					
+				// take item off hud
+				pev->weapons &= ~(1 << pLinkWeapon->m_iId);
+				g_pGameRules->GetNextBestWeapon(this, pLinkWeapon);
+				UTIL_MakeVectors(pev->angles);
+
+				if (pLinkWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
+					m_bHasPrimary = false;
+				
+			}
+
 			pWeaponBox->pev->velocity = gpGlobals->v_forward * 300 + gpGlobals->v_forward * 100;
 
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_c4"))
@@ -7938,13 +7953,10 @@ void CBasePlayer::InitRebuyData(const char *str)
 		return;
 	}
 
-	if (m_rebuyString != NULL)
-	{
-		delete m_rebuyString;
-		m_rebuyString = NULL;
-	}
-
-	m_rebuyString = new char[ Q_strlen(str) + 1 ];
+	// god bless the fucking new[] and delete[]
+	char *new_buyString = new char[Q_strlen(str) + 1];
+	delete[] m_rebuyString;
+	m_rebuyString = new_buyString;
 	Q_strcpy(m_rebuyString, str);
 	m_rebuyString[ Q_strlen(str) ] = '\0';
 }

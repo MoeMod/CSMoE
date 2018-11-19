@@ -10,11 +10,13 @@
 #include "string.h"
 #include "assert.h"
 
+const float ZBS_SELFNUMBER_SCALE_TIME = 0.3f;
+
 inline int CalcTeamFrags()
 {
 	int result = 0;
 	for (auto &info : g_PlayerExtraInfo)
-		result += info.frags;
+		result += max(0, info.frags);
 	return result;
 }
 
@@ -41,12 +43,12 @@ inline void BuildNumberRC(wrect_t(&rgrc)[10], int tex)
 	return BuildNumberRC(rgrc, w / 10, h);
 }
 
-inline void DrawTexturePart(int tex, const wrect_t &rect, int x1, int y1, float scale = 1.0f)
+inline void DrawTexturePart(const CTextureRef &tex, const wrect_t &rect, int x1, int y1, float scale = 1.0f)
 {
-	gRenderAPI.GL_Bind(0, tex);
+	tex.Bind();
 
-	float w = static_cast<float>(gRenderAPI.RenderGetParm(PARM_TEX_SRC_WIDTH, tex));
-	float h = static_cast<float>(gRenderAPI.RenderGetParm(PARM_TEX_SRC_HEIGHT, tex));
+	float w = tex.w();
+	float h = tex.h();
 
 	x1 *= gHUD.m_flScale;
 	y1 *= gHUD.m_flScale;
@@ -67,7 +69,7 @@ inline void DrawTexturePart(int tex, const wrect_t &rect, int x1, int y1, float 
 	gEngfuncs.pTriAPI->End();
 }
 
-inline int DrawTexturedNumbersTopRightAligned(int tex, const wrect_t(&rect)[10], int iNumber, int x, int y, float scale = 1.0f)
+inline int DrawTexturedNumbersTopRightAligned(const CTextureRef &tex, const wrect_t(&rect)[10], int iNumber, int x, int y, float scale = 1.0f)
 {
 	assert(iNumber >= 0);
 
@@ -89,41 +91,29 @@ inline unsigned math_log10(unsigned v)
 		(v >= 1000) ? 3 : (v >= 100) ? 2 : (v >= 10) ? 1 : 0;
 }
 
-inline int DrawTexturedNumbersTopCenterAligned(int tex, const wrect_t(&rect)[10], int iNumber, int x, int y, float scale = 1.0f)
+inline int DrawTexturedNumbersTopCenterAligned(const CTextureRef &tex, const wrect_t(&rect)[10], int iNumber, int x, int y, float scale = 1.0f)
 {
 	int n = math_log10(iNumber);
 	x += (rect[0].right - rect[0].left) * (n - 1) * scale * 0.5f;
 	return DrawTexturedNumbersTopRightAligned(tex, rect, iNumber, x, y, scale);
 }
 
-int CHudZBSScoreBoard::Init(void)
-{
-	m_iBackground = m_iTeamnumber = m_iSelfnumber = m_iToprecord = 0;
-
-	return 1;
-}
-
 int CHudZBSScoreBoard::VidInit(void)
 {
-	m_iBackground = gRenderAPI.GL_LoadTexture("resource/hud/zbs/zbsboard", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-
-	m_iTeamnumber = gRenderAPI.GL_LoadTexture("resource/hud/zbs/teamnumber", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_iSelfnumber = gRenderAPI.GL_LoadTexture("resource/hud/zbs/selfnumber", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_iToprecord = gRenderAPI.GL_LoadTexture("resource/hud/challenge/toprecord", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	if(!m_pBackground)
+		m_pBackground = R_LoadTextureUnique("resource/hud/zbs/zbsboard");
+	if (!m_pTeamnumber)
+		m_pTeamnumber = R_LoadTextureUnique("resource/hud/zbs/teamnumber");
+	if (!m_pSelfnumber)
+		m_pSelfnumber = R_LoadTextureUnique("resource/hud/zbs/selfnumber");
+	if (!m_pToprecord)
+		m_pToprecord = R_LoadTextureUnique("resource/hud/challenge/toprecord");
 
 	BuildNumberRC(m_rcTeamnumber, 23, 24);
 	BuildNumberRC(m_rcSelfnumber, 19, 19);
 	BuildNumberRC(m_rcToprecord, 14, 14);
 
 	return 1;
-}
-
-void CHudZBSScoreBoard::Shutdown(void)
-{
-	gRenderAPI.GL_FreeTexture(m_iBackground);
-	gRenderAPI.GL_FreeTexture(m_iTeamnumber);
-	gRenderAPI.GL_FreeTexture(m_iSelfnumber);
-	gRenderAPI.GL_FreeTexture(m_iToprecord);
 }
 
 int CHudZBSScoreBoard::Draw(float time)
@@ -134,20 +124,36 @@ int CHudZBSScoreBoard::Draw(float time)
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-	gRenderAPI.GL_SelectTexture(0);
-	gRenderAPI.GL_Bind(0, m_iBackground);
+	m_pBackground->Bind();
 	DrawUtils::Draw2DQuadScaled(x - 373 / 2, y, x + 373 / 2, y + 51);
 	
 	int idx = gEngfuncs.GetLocalPlayer()->index;
 	int roundNumber = gHUD.m_Scoreboard.m_iTeamScore_CT + 1;
-	int selfKill = g_PlayerExtraInfo[idx].frags;
+	int selfKill = max(0, g_PlayerExtraInfo[idx].frags);
 	int teamKill = CalcTeamFrags();
+	DrawTexturedNumbersTopCenterAligned(*m_pToprecord, m_rcToprecord, roundNumber, x + 25, y + 25); // ok
+	DrawTexturedNumbersTopCenterAligned(*m_pTeamnumber, m_rcTeamnumber, teamKill, x - 80, y + 10);
 
-	DrawTexturedNumbersTopCenterAligned(m_iToprecord, m_rcToprecord, roundNumber, x + 25, y + 25); // ok
-	DrawTexturedNumbersTopCenterAligned(m_iTeamnumber, m_rcTeamnumber, teamKill, x - 80, y + 10);
+	if (m_iSelfKills != selfKill)
+	{
+		m_iSelfnumberScale = 2.0f;
+		m_flSelfnumberScaleTime = time;
+	}
+	
+	if (time > m_flSelfnumberScaleTime + ZBS_SELFNUMBER_SCALE_TIME)
+	{
+		gEngfuncs.pTriAPI->Color4ub(160, 210, 250, 255);
+		DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10);
+	}
+	else
+	{
+		m_iSelfnumberScale = max(1.0f, m_iSelfnumberScale - 0.1f);
+		gEngfuncs.pTriAPI->Color4ub(255, 160, 0, 255);
+		DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10, m_iSelfnumberScale);
+	}
 
-	gEngfuncs.pTriAPI->Color4ub(160, 210, 250, 255);
-	DrawTexturedNumbersTopCenterAligned(m_iSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10);
+
+	m_iSelfKills = selfKill;
 	
 	return 1;
 }

@@ -20,19 +20,21 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 3.1.3)
 
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 project (SERVER)
 
+set(CMAKE_CXX_STANDARD 14)
+
 if (APPLE)
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -stdlib=libc++")
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 else()
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 -static-libstdc++")
+set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -static-libstdc++")
 endif()
 
 #--------------
@@ -171,43 +173,12 @@ set(HLDLL_SRCS
 	./player/player_zombie_skill.cpp
 	./weapons_data.cpp
 	./weapons_msg.cpp
+	./player/player_mod_strategy.cpp
+	./gamemode/zbs/monster_manager.cpp
 	)
 
-set(HLWPN_SRCS
-	./wpn_shared/wpn_ak47.cpp
-	./wpn_shared/wpn_aug.cpp
-	./wpn_shared/wpn_awp.cpp
-	./wpn_shared/wpn_c4.cpp
-	./wpn_shared/wpn_deagle.cpp
-	./wpn_shared/wpn_elite.cpp
-	./wpn_shared/wpn_famas.cpp
-	./wpn_shared/wpn_fiveseven.cpp
-	./wpn_shared/wpn_flashbang.cpp
-	./wpn_shared/wpn_g3sg1.cpp
-	./wpn_shared/wpn_galil.cpp
-	./wpn_shared/wpn_glock18.cpp
-	./wpn_shared/wpn_hegrenade.cpp
-	./wpn_shared/wpn_knife.cpp
-	./wpn_shared/wpn_m249.cpp
-	./wpn_shared/wpn_m3.cpp
-	./wpn_shared/wpn_m4a1.cpp
-	./wpn_shared/wpn_mac10.cpp
-	./wpn_shared/wpn_mp5navy.cpp
-	./wpn_shared/wpn_p228.cpp
-	./wpn_shared/wpn_p90.cpp
-	./wpn_shared/wpn_scout.cpp
-	./wpn_shared/wpn_sg550.cpp
-	./wpn_shared/wpn_sg552.cpp
-	./wpn_shared/wpn_smokegrenade.cpp
-	./wpn_shared/wpn_tmp.cpp
-	./wpn_shared/wpn_ump45.cpp
-	./wpn_shared/wpn_usp.cpp
-	./wpn_shared/wpn_xm1014.cpp
-
-	./wpn_shared/wpn_knife_zombi.cpp
-	./wpn_shared/wpn_ak47l.cpp
-	./wpn_shared/wpn_mp7a1d.cpp
-	./wpn_shared/wpn_deagled.cpp
+file (GLOB HLWPN_SRCS
+	./wpn_shared/wpn_*.cpp
 	)
 
 set(PM_SRCS

@@ -160,9 +160,6 @@ extern DLL_GLOBAL const Vector g_vecZero;
 #define PLAYBACK_EVENT_DELAY(flags, who, index, delay)\
 		PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
 
-#include <type_traits>
-#define CHECK_TRIVIALLYDESTRUCTIBLE(T) static_assert(std::is_trivially_destructible<T>::value, #T " should be TriviallyDestructible.")
-
 #ifdef CLIENT_DLL
 #include "cs_wpn/bte_weapons.h"
 #include "cs_wpn/bte_weapons_register.h"
@@ -170,14 +167,12 @@ extern DLL_GLOBAL const Vector g_vecZero;
 	static CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); 
 #elif defined(_WIN32)
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	CHECK_TRIVIALLYDESTRUCTIBLE(DLLClassName);\
 	extern "C" EXPORT void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
+	void mapClassName(entvars_t *pev) { GetClassPtr(reinterpret_cast<DLLClassName *>(pev)); }
 #else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	CHECK_TRIVIALLYDESTRUCTIBLE(DLLClassName);\
 	extern "C" void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr((DLLClassName *)pev); }
+	void mapClassName(entvars_t *pev) { GetClassPtr(reinterpret_cast<DLLClassName *>(pev)); }
 #endif
 
 typedef enum

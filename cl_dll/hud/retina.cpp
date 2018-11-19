@@ -18,23 +18,19 @@ int CHudRetina::Init(void)
 
 int CHudRetina::VidInit(void)
 {
-	
+	RemoveAll();
 	m_iFlags |= HUD_ACTIVE;
 	return 1;
 }
 
 void CHudRetina::Shutdown(void)
 {
-	for (auto &kv : m_TextureMap)
-	{
-		gRenderAPI.GL_FreeTexture(kv.second);
-	}
-	m_TextureMap.clear();
+	RemoveAll();
 }
 
 void CHudRetina::Reset(void)
 {
-	//m_ItemList.clear();
+	//RemoveAll();
 }
 
 void CHudRetina::Think(void)
@@ -62,8 +58,7 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
-	gRenderAPI.GL_SelectTexture(0);
-	gRenderAPI.GL_Bind(0, item.iTexture);
+	item.pTexture->Bind();
 
 	if (item.type & RETINA_DRAW_TYPE_QUARTER)
 	{
@@ -83,30 +78,27 @@ void CHudRetina::RemoveAll()
 	m_ItemList.clear();
 }
 
-auto CHudRetina::AddItem(const char *path, RetinaDrawType_e type, float time) -> RetinaItemIndex_t
+auto CHudRetina::AddItem(SharedTexture tex, int type, float time, MagicNumber num) -> MagicNumber
 {
-	int tex = PrecacheTexture(path);
 	float flTimeEnd = time <= 0.0f ? time : gHUD.m_flTime + time;
-	m_ItemList.push_back({ type, tex, flTimeEnd });
+	m_ItemList.push_back({ type, tex, flTimeEnd, num });
 	return m_ItemList.size() - 1;
 }
 
-auto CHudRetina::RemoveItem(RetinaItemIndex_t idx) -> RetinaDrawItem_s
+bool CHudRetina::RemoveItem(MagicNumber idx)
 {
-	assert(idx >= 0 && idx < m_ItemList.size());
-
-	RetinaDrawItem_s item = m_ItemList[idx];
-	m_ItemList.erase(m_ItemList.begin() + idx);
-	return item;
+	auto iter_new_end = std::remove_if(m_ItemList.begin(), m_ItemList.end(), [idx](const RetinaDrawItem_s &item) {return item.num == idx; });
+	bool success = iter_new_end != m_ItemList.end();
+	m_ItemList.erase(iter_new_end, m_ItemList.end());
+	return success;
 }
 
-int CHudRetina::PrecacheTexture(const char *path)
+SharedTexture CHudRetina::PrecacheTexture(const char *path)
 {
 	auto iter = m_TextureMap.find(path);
 	if (iter == m_TextureMap.end())
 	{
-		int tex = gRenderAPI.GL_LoadTexture(path, NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-		iter = m_TextureMap.emplace(path, tex).first;
+		iter = m_TextureMap.emplace(path, R_LoadTextureShared(path)).first;
 	}
 	return iter->second;
 }
