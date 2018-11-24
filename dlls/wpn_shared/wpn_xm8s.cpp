@@ -33,7 +33,7 @@ void CXM8SharpShooter::Spawn(void)
 	Precache();
 	m_iId = WEAPON_SG550;
 	SET_MODEL(ENT(pev), "models/w_xm8.mdl");
-	m_iDefaultAmmo = SG550_DEFAULT_GIVE;
+	current_ammo = m_iDefaultAmmo = SG550_DEFAULT_GIVE;
 
 	FallInit();
 

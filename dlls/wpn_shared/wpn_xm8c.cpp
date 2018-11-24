@@ -52,7 +52,7 @@ void CXM8Carbine::Spawn(void)
 	m_iId = WEAPON_SG552;
 	SET_MODEL(ENT(pev), "models/w_xm8.mdl");
 
-	m_iDefaultAmmo = SG552_DEFAULT_GIVE;
+	current_ammo = m_iDefaultAmmo = SG552_DEFAULT_GIVE;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 
