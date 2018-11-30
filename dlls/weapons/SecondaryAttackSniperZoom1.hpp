@@ -2,7 +2,7 @@
 
 /*
 	template<class T>
-	concept SecondaryAttackZoom_c requires
+	concept SecondaryAttackZoom_c = requires
 	{
 		T::ZoomFOV;
 	};

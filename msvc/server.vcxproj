@@ -704,7 +704,10 @@
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp" />
+    <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp" />
     <ClInclude Include="..\dlls\weapons_const.h" />
     <ClInclude Include="..\dlls\weapons_buy.h" />

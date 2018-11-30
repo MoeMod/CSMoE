@@ -1,5 +1,5 @@
-## About
-Here is the source code of engine, server, client (windows and linux only). \
+## Counter-Strike Mobile-oriented Edition
+Here are the source code of engine, server, client (windows and linux only). \
 For Android or iOS launcher, check them in other repo. \
 This is a combination of CS1.6 mods that are implemented based on Xash3D engine, \
 aiming to act like CSO (aka CS:NZ), however the traditional one in pre-2009. \
@@ -27,32 +27,33 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 * Fully open-source under GPLv3 licence
 
 ## Tested systems
-### Windows - Surface Pro
+### Windows - Surface Pro 5 (2017)
 * CPU : Intel Core i5-7300U
 * GPU : Intel HD620
 * RAM : 8 GB
-* Resolution : 2736 x 1824
-* Result : Smooth but hot, 80+fps
-### Linux (in Chrome OS) - Google Pixelbook
+* Resolution : 2736 x 1824 PixelSense
+* Result : Smooth but hot, 80+ fps
+### Linux (in Chrome OS) - Google Pixelbook (2017)
 * CPU : Intel Core i5-7Y57
 * GPU : Intel HD615 (without full driver)
+* Resolution : 2400 x 1600
 * RAM : 8 GB
 * Result : Due to lack of OpenGL driver on Chrome OS, it can only run dedicated server.
-### Android - Huawei Ascend P9
-* SoC : Kirin 950
+### Android - Google Pixel C (2015)
+* SoC : nVIDIA Tegra X1
 * RAM : 4 GB
-* Resolution : 1920 x 1080 FHD
-* Result : Playable, 40~60fps
-### iOS - Apple iPhone 7
+* Resolution : 2560 ¡Á 1800
+* Result : Smooth, 90+ fps
+### iOS - Apple iPad 6th Gen (2018)
 * SoC : A10 Fusion
-* Resolution : 1334 x 750
+* Resolution : 2048 x 1536 Retina
 * Result : Smooth, 55~60fps
 ### macOS - MacBook Pro (2018)
 * CPU : Intel Core i5-8259U
 * GPU : Intel Iris Plus 655
 * RAM : 8GB
-* Resolution : 2560 x 1600
-* Result : Smooth but hot, 80+fps
+* Resolution : 2560 x 1600 Retina
+* Result : Smooth but hot, 80+ fps
 
 ## Installation
 ### Windows

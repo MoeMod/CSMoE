@@ -50,9 +50,9 @@ endif()
 
 if(NOT ${CMAKE_INSTALL_PREFIX})
 	if(WIN32)
-		set (CMAKE_INSTALL_PREFIX "D:\\CSBTE-Mobile")
+		set (CMAKE_INSTALL_PREFIX "D:\\CSMoE")
 	else()
-		set (CMAKE_INSTALL_PREFIX "~/CSBTE-Mobile")
+		set (CMAKE_INSTALL_PREFIX "~/CSMoE")
 	endif()
 endif()
 

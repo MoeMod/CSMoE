@@ -69,7 +69,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #define FALSE 0
 #endif
 
-#define GAME_PATH	"csbtem"	// default dir to start from
+#define GAME_PATH	"csmoe"	// default dir to start from
 
 typedef void (*pfnChangeGame)( const char *progname );
 typedef int  (*pfnInit)( int argc, char **argv, const char *progname, int bChangeGame, pfnChangeGame func );
@@ -158,6 +158,22 @@ static void Sys_ChangeGame( const char *progname )
 _inline int Sys_Start( void )
 {
 	int ret;
+
+	// need to specify rootdir
+	int i;
+	char buffer[256];
+	const char *baseDir;
+	for (i = 0; i < szArgc; ++i)
+	{
+		if (!strcmp(szArgv[i], "-rootdir") && i + 1 < szArgc)
+		{
+			baseDir = szArgv[i + 1];
+			sprintf(buffer, "XASH3D_BASEDIR=%s", baseDir);
+			_putenv(buffer);
+			SetCurrentDirectory(baseDir);
+			break;
+		}
+	}
 
 	Sys_LoadEngine();
 	ret = Xash_Main( szArgc, szArgv, GAME_PATH, FALSE, Xash_Shutdown ? Sys_ChangeGame : NULL );
