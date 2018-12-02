@@ -1272,5 +1272,8 @@
     <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp">
       <Filter>dlls\weapons</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
+    <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp" />
   </ItemGroup>
 </Project>

@@ -276,3 +276,5 @@ else()
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES
 		OUTPUT_NAME "mp")
 endif()
+
+install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/csmoe/dlls)

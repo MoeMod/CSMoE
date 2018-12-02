@@ -172,7 +172,7 @@ static __inline float cbrt(float f)
 
 #ifdef XASH_64BIT
 // windows NameForFunction not implemented yet
-#define XASH_ALLOW_SAVERESTORE_OFFSETS
+//#define XASH_ALLOW_SAVERESTORE_OFFSETS
 #endif
 #endif //WIN32
 

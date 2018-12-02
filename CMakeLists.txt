@@ -22,12 +22,11 @@ set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ggdb -O3")
 endif()
 
 # force build 32bit libraries
-if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    if(WIN32)
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-    endif()
-endif()
+#if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+#    if(WIN32)
+#		message(FATAL_ERROR "CAN NOT build x64 on Windows!")
+#    endif()
+#endif()
 
 # force xp build
 if(MSVC)
@@ -38,21 +37,18 @@ if(APPLE)
 	add_definitions(-DHAVE_STDINT_H)
 endif()
 
-if(64BIT AND CMAKE_SIZEOF_VOID_P EQUAL 4)
-	message(FATAL_ERROR "You enabled XASH_64BIT, but compiler can't create 64 bit code!")
-endif()
-
-if(64BIT)
+if(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	message(STATUS "Building for 64 Bit")
+	set(XASH_64BIT ON)
 else()
 	message(STATUS "Building for 32 Bit")
 endif()
 
 if(NOT ${CMAKE_INSTALL_PREFIX})
 	if(WIN32)
-		set (CMAKE_INSTALL_PREFIX "D:\\CSMoE")
+		set (CMAKE_INSTALL_PREFIX "D:/CSMoE")
 	else()
-		set (CMAKE_INSTALL_PREFIX "~/CSMoE")
+		set (CMAKE_INSTALL_PREFIX "~/CSMoE/")
 	endif()
 endif()
 
@@ -69,11 +65,3 @@ ADD_SUBDIRECTORY(cl_dll)
 #ADD_SUBDIRECTORY(mainui)
 ADD_SUBDIRECTORY(mainui_cpp)
 
-#install( TARGETS ${XASH_ENGINE} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX})
-#				install( FILES ${SDL2_DLL} DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-#install( TARGETS ${CLDLL_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/cl_dlls )
-#install( TARGETS ${SERVER_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/dlls)
-
-#install( TARGETS ${MAINUI_LIBRARY} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/cstrike/cl_dlls )
-#install( TARGETS ${XASH_LAUNCHER} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX} )

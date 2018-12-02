@@ -47,8 +47,8 @@ endif()
 
 if(WIN32)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
-		OUTPUT_NAME csbtem_win32) # Change name to your gamedir, if you building a standalone game
+		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
 endif()
 
 target_link_libraries(${XASH_LAUNCHER} ${CMAKE_DL_LIBS})
-
+install( TARGETS ${XASH_LAUNCHER} DESTINATION ${CMAKE_INSTALL_PREFIX} )

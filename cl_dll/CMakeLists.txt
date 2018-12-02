@@ -185,5 +185,12 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
 
-set_target_properties(${CLDLL_LIBRARY} PROPERTIES
-	PREFIX "" OUTPUT_NAME "client")
+if(XASH_64BIT)
+	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+		PREFIX "" OUTPUT_NAME "client64")
+else()
+	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+		PREFIX "" OUTPUT_NAME "client")
+endif()
+
+install( TARGETS ${CLDLL_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/csmoe/cl_dlls )

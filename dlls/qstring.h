@@ -76,7 +76,19 @@ extern globalvars_t *gpGlobals;
 //#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
 //#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))
 #define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
-#define MAKE_STRING(str) ((int)(ptrdiff_t)(str) - (int)(ptrdiff_t)(STRING(0)))
+
+#if !defined XASH_64BIT || defined(CLIENT_DLL)
+#define MAKE_STRING(str)	((int)(long int)str - (int)(long int)STRING(0))
+#else
+static inline int MAKE_STRING(const char *szValue)
+{
+	long long ptrdiff = szValue - STRING(0);
+	if (ptrdiff > INT_MAX || ptrdiff < INT_MIN)
+		return ALLOC_STRING(szValue);
+	else
+		return (int)ptrdiff;
+}
+#endif
 
 // Inlines
 inline bool QString::IsNull() const

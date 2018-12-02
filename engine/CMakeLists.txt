@@ -304,53 +304,13 @@ endif()
 
 if(XASH_SDL)
 
-	# /*
-	# ==============
-	# xash_link_sdl2
-	#
-	# Download and link SDL2, if supported
-	# ==============
-	# */
-
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 
-	find_library(SDL2																																																																																																																																																																																																																																																							LIBRARY
-		NAMES 
-			SDL2 SDL2.dll SDL2.lib libSDL2d.dylib
-		PATHS
-			../SDL2/lib
-			../SDL2/lib/i386-linux-gnu
-			../SDL2/lib/x86
-			NO_DEFAULT_PATH
-	)
-
-	if(MINGW)
-		if(XASH_64BIT)
-			set(SDL2_SUBDIR "SDL2-${SDL2_VER}/x86_64-w64-mingw32")
-		else()
-			set(SDL2_SUBDIR "SDL2-${SDL2_VER}/i686-w64-mingw32")
-		endif()
-		set(SDL2_DLL "${SDL2_SUBDIR}/SDL2.dll")
-	endif()
+	set(SDL2_LIBRARY SDL2)
 
 	add_definitions(-DXASH_SDL)
-	if(MSVC)
 
-		string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-		
-		install(FILES ${SDL2_DLL}
-			CONFIGURATIONS Debug
-			DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-		install(FILES ${SDL2_DLL}
-			CONFIGURATIONS Release
-			DESTINATION ${LIB_INSTALL_DIR}/Release/)
-	endif()
-
-	if(APPLE)
-		set(SDL2_LIBRARY SDL2)
-	endif()
-
-	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
+	target_link_libraries(${XASH_ENGINE} SDL2)
 
 endif() #if(XASH_SDL)
 
@@ -428,3 +388,4 @@ else()
 	endif()
 endif()
 
+install( TARGETS ${XASH_ENGINE} DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -29,7 +29,7 @@ private:
 
 public:
 	class WeaponEntityFindList_t;
-	static WeaponEntityFindList_t staticWeaponEntityFindList;
+	static WeaponEntityFindList_t &WeaponEntityFindList();
 
 public:
 	// singleton accessor

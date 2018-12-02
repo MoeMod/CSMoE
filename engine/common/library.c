@@ -389,13 +389,22 @@ const char *Com_NameForFunction( void *hInstance, void *function )
 #include <dbghelp.h>
 void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 {
-	return LoadLibraryA( dllname );
+	dll_user_t *hInst;
+	string fullPath;
+	hInst = FS_FindLibrary(dllname, false);
+	if (!hInst)
+		return NULL;
+
+	strcpy(fullPath, hInst->fullPath);
+	Mem_Free(hInst);
+
+	return LoadLibraryA(fullPath);
 }
+
 void Com_FreeLibrary( void *hInstance )
 {
 	FreeLibrary( hInstance );
 }
-
 
 void *Com_GetProcAddress( void *hInstance, const char *name )
 {
