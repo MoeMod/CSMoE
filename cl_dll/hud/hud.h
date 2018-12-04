@@ -175,6 +175,8 @@ public:
 	CHudUserCmd(Rebuy);
 	CHudUserCmd(Autobuy);
 
+	bool FHasSecondaryAmmo() { return m_pWeapon && m_pWeapon->iAmmo2Type > 0; }
+
 private:
 	float m_fFade;
 	RGBA  m_rgba;

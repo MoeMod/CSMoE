@@ -459,6 +459,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_scarl");
 	UTIL_PrecacheOtherWeapon("weapon_scarh");
 
+	UTIL_PrecacheOtherWeapon("weapon_cannon");
+	UTIL_PrecacheOther("ammo_cannon");
+
 	if (g_pGameRules->IsDeathmatch())
 	{
 		// container for dropped deathmatch weapons

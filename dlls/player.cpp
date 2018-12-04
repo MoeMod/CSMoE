@@ -1241,8 +1241,7 @@ void CBasePlayer::GiveDefaultItems()
 
 			break;
 		}
-		GiveNamedItem("weapon_xm8c");
-		GiveNamedItem("weapon_scarl");
+		GiveNamedItem("weapon_cannon");
 	}
 }
 
@@ -6949,7 +6948,9 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 
 				if (iAmmoIndex != -1)
 				{
-					pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex] > 0);
+					// WTF m_rgAmmo[iAmmoIndex] > 0 ???
+					//pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex] > 0);
+					pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex]);
 					m_rgAmmo[iAmmoIndex] = 0;
 				}
 			}

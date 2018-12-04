@@ -34,9 +34,14 @@ public:
 		return FALSE;
 #endif
 	}
+	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 
 	virtual KnockbackData GetKnockBackData() override { return { 1100.f, 500.f, 700.f, 400.f, 0.9f }; }
 	virtual const char *GetCSModelName() override { return W_Model; }
+	float GetArmorRatioModifier() override { return 1.5; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
+#endif
 
 public:
 	void CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);

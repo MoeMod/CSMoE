@@ -8,12 +8,13 @@
 
 #ifndef CLIENT_DLL
 #include "soundent.h"
+#include "monsters.h"
 #include "gamemode/mods.h"
 #endif
 
 LINK_ENTITY_TO_CLASS(weapon_cannon, CCannon)
 
-
+#ifndef CLIENT_DLL
 static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t *pevInflictor, entvars_t *pevAttacker)
 {
 	TraceResult tr;
@@ -86,6 +87,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 				}
 				else
 				{
+					tr.iHitgroup = HITGROUP_CHEST;
 					ClearMultiDamage();
 					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
@@ -95,6 +97,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 	}
 	return vecDir;
 }
+#endif
 
 void CCannon::Spawn(void)
 {
@@ -102,10 +105,10 @@ void CCannon::Spawn(void)
 
 	Precache();
 	m_iId = WEAPON_AK47;
-	SET_MODEL(ENT(pev), "models/w_ak47.mdl");
+	SET_MODEL(ENT(pev), "models/w_cannon.mdl");
 
 	m_iDefaultAmmo = 20;
-	m_iShotsFired = 0;
+	m_iClip = WEAPON_NOCLIP;
 
 	FallInit();
 }
@@ -125,18 +128,30 @@ void CCannon::Precache(void)
 int CCannon::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = NULL;
-	p->iMaxAmmo1 = -1;
+	p->pszAmmo1 = "CannonAmmo";
+	p->iMaxAmmo1 = 20;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = 20;
+	p->iMaxClip = WEAPON_NOCLIP;
 	p->iSlot = 0;
 	p->iPosition = 1;
 	p->iId = m_iId = WEAPON_AK47;
-	p->iFlags = 0;
+	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
 	p->iWeight = AK47_WEIGHT;
 
 	return 1;
+}
+
+int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
+{
+	if (m_iDefaultAmmo)
+	{
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
+		m_iClip = WEAPON_NOCLIP;
+		m_iDefaultAmmo = 0;
+		return TRUE;
+	}
+	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
 
 void CCannon::PrimaryAttack(void)
@@ -148,7 +163,7 @@ void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
-	/*if (m_iClip <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -159,8 +174,8 @@ void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		return;
 	}
 
-	m_iClip--;
-	*/
+	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
+	
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);

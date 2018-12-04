@@ -82,6 +82,12 @@ int CHudMoney::Draw(float flTime)
 	int x = ScreenWidth - iDollarWidth * 7;
 	int y = MONEY_YPOS;
 
+	// Does weapon have seconday ammo?
+	if (gHUD.m_Ammo.FHasSecondaryAmmo())
+	{
+		y -= gHUD.m_iFontHeight + gHUD.m_iFontHeight / 4;
+	}
+
 	if( m_iBlinkAmt )
 	{
 		m_fBlinkTime += gHUD.m_flTimeDelta;

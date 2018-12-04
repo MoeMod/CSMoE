@@ -1163,16 +1163,15 @@ int CHudAmmo::Draw(float flTime)
 	if (m_fFade > 0)
 		m_fFade -= (gHUD.m_flTimeDelta * 20);
 
-	DrawUtils::UnpackRGB(r,g,b, RGB_YELLOWISH);
-
-	DrawUtils::ScaleColors(r, g, b, a );
-
 	// Does this weapon have a clip?
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight/2;
 
 	// Does weapon have any ammo at all?
 	if (m_pWeapon->iAmmoType > 0)
 	{
+		DrawUtils::UnpackRGB(r, g, b, RGB_YELLOWISH);
+		DrawUtils::ScaleColors(r, g, b, a);
+
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 		
 		if (pw->iClip >= 0)
@@ -1201,6 +1200,13 @@ int CHudAmmo::Draw(float flTime)
 		}
 		else
 		{
+			if (pw->iSlot < 3)
+			{
+				// No clip weapon, draws blue special ammo
+				DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+				//DrawUtils::ScaleColors(r, g, b, a);
+			}
+
 			// SPR_Draw a bullets only line
 			x = ScreenWidth - 4 * AmmoWidth - iIconWidth;
 			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
@@ -1215,6 +1221,10 @@ int CHudAmmo::Draw(float flTime)
 	// Does weapon have seconday ammo?
 	if (pw->iAmmo2Type > 0) 
 	{
+		// No clip weapon, draws blue special ammo
+		DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+		//DrawUtils::ScaleColors(r, g, b, a);
+
 		int iIconWidth = m_pWeapon->rcAmmo2.right - m_pWeapon->rcAmmo2.left;
 
 		// Do we have secondary ammo?
