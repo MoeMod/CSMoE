@@ -35,6 +35,7 @@
     <ClCompile Include="..\cl_dll\events\event_as50.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
@@ -212,6 +214,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />

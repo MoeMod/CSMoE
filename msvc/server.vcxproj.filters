@@ -601,6 +601,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1272,8 +1275,20 @@
     <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp">
       <Filter>dlls\weapons</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
-    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
-    <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\DeployDefault.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

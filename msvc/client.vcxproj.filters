@@ -528,6 +528,12 @@
     <ClCompile Include="..\cl_dll\events\event_scarl.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_cannon.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -762,6 +768,9 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_scarh.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>

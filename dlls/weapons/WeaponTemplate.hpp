@@ -6,6 +6,8 @@
 #include "player.h"
 #include "weapons.h"
 
+#include "DeployDefault.hpp"
+
 #include "ReloadDefault.hpp"
 
 #include "SecondaryAttackZoom.hpp"

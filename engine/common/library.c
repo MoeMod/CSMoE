@@ -41,7 +41,7 @@ void *Com_FunctionFromName_SR( void *hInstance, const char *pName )
 {
 #ifdef XASH_ALLOW_SAVERESTORE_OFFSETS
 	if( !Q_memcmp( pName, "ofs:",4 ) )
-		return svgame.dllFuncs.pfnGameInit + Q_atoi(pName + 4);
+		return (void*)((intptr_t)svgame.dllFuncs.pfnGameInit + (ptrdiff_t)Q_atoi(pName + 4));
 #endif
 	return Com_FunctionFromName( hInstance, pName );
 }
@@ -50,7 +50,7 @@ void *Com_FunctionFromName_SR( void *hInstance, const char *pName )
 char *Com_OffsetNameForFunction( void *function )
 {
 	static string sname;
-	Q_snprintf( sname, MAX_STRING, "ofs:%d", (int)(void*)(function - (void*)svgame.dllFuncs.pfnGameInit) );
+	Q_snprintf( sname, MAX_STRING, "ofs:%d", (int)((intptr_t)function - (intptr_t)svgame.dllFuncs.pfnGameInit) );
 	MsgDev( D_NOTE, "Com_OffsetNameForFunction %s\n", sname );
 	return sname;
 }

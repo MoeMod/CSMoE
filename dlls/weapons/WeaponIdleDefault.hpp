@@ -2,7 +2,7 @@
 
 /*
 	template<class T>
-	concept SecondaryAttackZoom_c requires
+	concept WeaponIdleDefault_c requires
 	{
 		T::WeaponIdleTime = 20; // optional
 		T::ANIM_IDLE1

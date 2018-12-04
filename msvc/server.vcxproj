@@ -372,6 +372,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -703,6 +704,7 @@
     <ClInclude Include="..\dlls\vector.h" />
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
+    <ClInclude Include="..\dlls\weapons\DeployDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
@@ -723,6 +725,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
@@ -815,7 +818,7 @@
     <ProjectGuid>{70A2B904-B7DB-4C48-8DE0-AF567360D572}</ProjectGuid>
     <RootNamespace>regamelite</RootNamespace>
     <ProjectName>server</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -823,26 +826,26 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -915,15 +918,12 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -954,15 +954,12 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -988,10 +985,8 @@
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
@@ -1017,10 +1012,8 @@
       <PreprocessorDefinitions>WIN32;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>psapi.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
