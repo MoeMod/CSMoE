@@ -314,6 +314,7 @@
     <ClCompile Include="..\dlls\player.cpp" />
     <ClCompile Include="..\dlls\player\csdm_randomspawn.cpp" />
     <ClCompile Include="..\dlls\player\hintmessage.cpp" />
+    <ClCompile Include="..\dlls\player\player_account.cpp" />
     <ClCompile Include="..\dlls\player\player_human_level.cpp" />
     <ClCompile Include="..\dlls\player\player_knockback.cpp" />
     <ClCompile Include="..\dlls\player\player_model.cpp" />
@@ -679,8 +680,9 @@
     <ClInclude Include="..\dlls\player\player_model.h" />
     <ClInclude Include="..\dlls\player\player_mod_strategy.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
-    <ClInclude Include="..\dlls\player\player_signal.h" />
+    <ClInclude Include="..\dlls\player\player_account.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
+    <ClInclude Include="..\dlls\player\player_account.h" />
     <ClInclude Include="..\dlls\player\player_zombie.h" />
     <ClInclude Include="..\dlls\player\player_zombie_skill.h" />
     <ClInclude Include="..\dlls\saverestore.h" />

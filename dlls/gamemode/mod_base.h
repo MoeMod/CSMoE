@@ -24,6 +24,7 @@ public:
 	virtual DamageTrack_e DamageTrack() { return DT_NONE; }
 	virtual void InstallPlayerModStrategy(CBasePlayer *player);
 	virtual float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
+	virtual int MaxMoney() { return 16000; }
 };
 
 class IBaseMod_RemoveObjects : virtual public IBaseMod

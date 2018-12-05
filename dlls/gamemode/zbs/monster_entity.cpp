@@ -313,13 +313,6 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 
 	m_flTimeLastActive = -1;
 
-	if (pevAttacker) // pevAttacker can be NULL
-	{
-		CBaseEntity *attacker = CBaseEntity::Instance(pevAttacker);
-		if (attacker->IsPlayer())
-			KilledByPlayer(static_cast<CBasePlayer *>(attacker));
-	}
-
 	m_pMonsterStrategy->OnKilled(pevAttacker, iGib);
 }
 
@@ -336,10 +329,12 @@ void CMonster::Remove()
 	SUB_Remove();
 }
 
-CMonster::CMonster() : CHostage(), m_iKillBonusMoney(500), m_iKillBonusFrags(1), m_flTimeLastActive(0.0f)
+CMonster::CMonster() : CHostage(), 
+	m_iKillBonusMoney(500), 
+	m_iKillBonusFrags(1), 
+	m_flTimeLastActive(0.0f), 
+	m_pMonsterStrategy(std::make_unique<CMonsterModStrategy_Default>(this))
 {
-	std::unique_ptr<CMonsterModStrategy_Default> up(new CMonsterModStrategy_Default(this));
-	m_pMonsterStrategy = std::move(up);
 	MonsterManager().OnEntityAdd(this);
 }
 
@@ -863,18 +858,6 @@ bool CMonster::ShouldAttack(CBaseEntity *target)
 		return zbs_break->m_flZombiDamageRatio > 0.0f;
 
 	return false;
-}
-
-void CMonster::KilledByPlayer(CBasePlayer *player)
-{
-	if (m_iKillBonusFrags)
-		player->AddPoints(m_iKillBonusFrags, FALSE);
-	if(m_iKillBonusMoney)
-		player->AddAccount(m_iKillBonusMoney);
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, player->pev);
-	WRITE_BYTE(ZBS_TIP_KILL);
-	MESSAGE_END();
 }
 
 CBasePlayer *CMonster::GetClosestPlayer(bool bVisible)

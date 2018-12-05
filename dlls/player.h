@@ -113,8 +113,6 @@
 #define DHM_ROUND_CLEAR			(DHF_ROUND_STARTED | DHF_HOSTAGE_KILLED | DHF_FRIEND_KILLED | DHF_BOMB_RETRIEVED)
 #define DHM_CONNECT_CLEAR		(DHF_HOSTAGE_SEEN_FAR | DHF_HOSTAGE_SEEN_NEAR | DHF_HOSTAGE_USED | DHF_HOSTAGE_INJURED | DHF_FRIEND_SEEN | DHF_ENEMY_SEEN | DHF_FRIEND_INJURED | DHF_ENEMY_KILLED | DHF_AMMO_EXHAUSTED | DHF_IN_TARGET_ZONE | DHF_IN_RESCUE_ZONE | DHF_IN_ESCAPE_ZONE | DHF_IN_VIPSAFETY_ZONE | DHF_HOSTAGE_CTMOVE | DHF_SPEC_DUCK)
 
-#include "player/player_signal.h"
-
 #define IGNOREMSG_NONE			0
 #define IGNOREMSG_ENEMY			1
 #define IGNOREMSG_TEAM			2
@@ -155,9 +153,10 @@
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
 #include "player/player_const.h"
-
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
+#include "player/player_account.h"
+#include "player/player_signal.h"
 #include <memory>
 
 struct WeaponStruct
@@ -504,7 +503,7 @@ public:
 	int m_iKevlar;
 	bool m_bNotKilled;
 	TeamName m_iTeam;
-	int m_iAccount;
+	CPlayerAccount m_iAccount;
 	bool m_bHasPrimary;
 	float m_flDeathThrowTime;
 	int m_iThrowDirection;

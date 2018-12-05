@@ -11,6 +11,7 @@
 #include "EventDispatcher.h"
 
 class CZombieSpawn;
+class CMonster;
 
 class CMod_ZombieScenario : public IBaseMod_RemoveObjects
 {
@@ -30,6 +31,7 @@ public:
 	DamageTrack_e DamageTrack() override { return DT_ZBS; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	int MaxMoney() override { return 32000; }
 
 public:
 	void TeamCheck();
@@ -48,6 +50,7 @@ public:
 	float m_flNextSpawnNPC;
 
 	EventDispatcher<void(CBasePlayer *attacker, float &)> m_eventAdjustDamage;
+	EventDispatcher<void(CMonster *victim, CBaseEntity *attacker)> m_eventMonsterKilled;
 };
 
 #endif

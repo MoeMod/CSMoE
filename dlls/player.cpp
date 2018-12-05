@@ -2829,23 +2829,6 @@ NOXREF void CBasePlayer::ThrowPrimary()
 	DropShield();
 }
 
-void CBasePlayer::AddAccount(int amount, bool bTrackChange)
-{
-	m_iAccount += amount;
-   
-	if (m_iAccount < 0)
-		m_iAccount = 0;
-
-	else if (m_iAccount > 16000)
-		m_iAccount = 16000;
-
-	// Send money update to HUD
-	MESSAGE_BEGIN(MSG_ONE, gmsgMoney, NULL, pev);
-		WRITE_LONG(m_iAccount);
-		WRITE_BYTE(bTrackChange);
-	MESSAGE_END();
-}
-
 void CBasePlayer::ResetMenu()
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgShowMenu, NULL, pev);
@@ -5062,12 +5045,8 @@ void CBasePlayer::Reset()
 {
 	pev->frags = 0;
 	m_iDeaths = 0;
-	m_iAccount = 0;
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgMoney, NULL, pev);
-		WRITE_LONG(m_iAccount);
-		WRITE_BYTE(0);
-	MESSAGE_END();
+	m_iAccount.Reset();
+	m_iAccount.UpdateHUD(this);
 
 	m_bNotKilled = false;
 
@@ -6173,10 +6152,7 @@ void CBasePlayer::UpdateClientData()
 
 		FireTargets("game_playerspawn", this, this, USE_TOGGLE, 0);
 
-		MESSAGE_BEGIN(MSG_ONE, gmsgMoney, NULL, pev);
-			WRITE_LONG(m_iAccount);
-			WRITE_BYTE(0);
-		MESSAGE_END();
+		m_iAccount.UpdateHUD(this);
 
 		if (m_bHasDefuser)
 		{
@@ -6436,6 +6412,8 @@ void CBasePlayer::UpdateClientData()
 
 		m_vLastOrigin = pev->origin;
 	}
+
+	m_iAccount.UpdateHUD(this, true);
 }
 
 BOOL CBasePlayer::FBecomeProne()

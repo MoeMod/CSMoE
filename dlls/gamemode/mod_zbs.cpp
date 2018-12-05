@@ -23,11 +23,27 @@ class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
 public:
 	PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player)
 	{
-		m_eventAdjustDamage = mp->m_eventAdjustDamage.subscribe(
-			[&](CBasePlayer *attacker, float &out) 
+		m_listenerAdjustDamage = mp->m_eventAdjustDamage.subscribe(
+			[=](CBasePlayer *attacker, float &out) 
 			{ 
 				if(attacker == m_pPlayer)
 					out *= m_HumanLevel.GetAttackBonus(); 
+			}
+		);
+		m_listenerMonsterKilled = mp->m_eventMonsterKilled.subscribe(
+			[=](CMonster *victim, CBaseEntity *attacker)
+			{
+				if (attacker == m_pPlayer)
+				{
+					if (victim->m_iKillBonusFrags)
+						m_pPlayer->AddPoints(victim->m_iKillBonusFrags, FALSE);
+					if (victim->m_iKillBonusMoney)
+						m_pPlayer->AddAccount(victim->m_iKillBonusMoney);
+
+					MESSAGE_BEGIN(MSG_ONE, gmsgZBSTip, NULL, m_pPlayer->pev);
+					WRITE_BYTE(ZBS_TIP_KILL);
+					MESSAGE_END();
+				}
 			}
 		);
 	}
@@ -65,10 +81,32 @@ public:
 	}
 
 protected:
-	EventListener m_eventAdjustDamage;
-
+	EventListener m_listenerAdjustDamage;
+	EventListener m_listenerMonsterKilled;
 	PlayerExtraHumanLevel_ZBS m_HumanLevel;
 
+};
+
+class CMonsterModStrategy_ZBS : public CMonsterModStrategy_Default
+{
+public:
+	CMonsterModStrategy_ZBS(CMonster *p, CMod_ZombieScenario * pGameRules) : CMonsterModStrategy_Default(p), mp(pGameRules)
+	{
+
+	}
+
+	void OnKilled(entvars_t *pevKiller, int iGib) override
+	{
+		CMonsterModStrategy_Default::OnKilled(pevKiller, iGib);
+		if (pevKiller)
+		{
+			CBaseEntity *pKiller = CBaseEntity::Instance(pevKiller);
+			mp->m_eventMonsterKilled.dispatch(m_pMonster, pKiller);
+		}
+	}
+
+protected:
+	CMod_ZombieScenario * const mp;
 };
 
 void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
@@ -365,6 +403,8 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 		SET_MODEL(monster->edict(), "models/player/zombi_host/zombi_host.mdl");
 		UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	}
+
+	monster->m_pMonsterStrategy = std::make_unique<CMonsterModStrategy_ZBS>(monster, this);
 
 	return monster;
 }

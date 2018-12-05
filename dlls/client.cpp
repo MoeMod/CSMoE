@@ -2120,12 +2120,8 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 			player->m_iJoiningState = JOINED;
 
 			// Reset money
-			player->m_iAccount = 0;
-
-			MESSAGE_BEGIN(MSG_ONE, gmsgMoney, NULL, player->pev);
-				WRITE_LONG(player->m_iAccount);
-				WRITE_BYTE(0);
-			MESSAGE_END();
+			player->m_iAccount.Reset();
+			player->m_iAccount.UpdateHUD(player);
 
 			MESSAGE_BEGIN(MSG_BROADCAST, gmsgScoreInfo);
 				WRITE_BYTE(ENTINDEX(player->edict()));

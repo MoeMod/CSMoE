@@ -89,7 +89,6 @@ public:
 
 	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
-	void KilledByPlayer(CBasePlayer *player);
 	void CheckTarget();
 	CBasePlayer *GetClosestPlayer(bool bVisible);
 
