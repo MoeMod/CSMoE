@@ -33,15 +33,23 @@ class EventDispatcher<R(Args...)>
 
 	struct ICallable
 	{
-		virtual void operator()(typename ParseArg<Args>::type...args) = 0;
+		// NOT using vtable any more! 
+		void(ICallable::* const pfn)(typename ParseArg<Args>::type...) const = nullptr;
+		void operator()(typename ParseArg<Args>::type...args) const
+		{
+			(this->*pfn)(args...);
+		}
 	};
 	template<class F, class = void>
 	struct CCallable : ICallable
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : m_Function(std::forward<RealF>(f)) {}
-		F m_Function;
-		void operator()(typename ParseArg<Args>::type...args) override
+		CCallable(RealF &&f) : 
+			m_Function(std::forward<RealF>(f)), 
+			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator()) } 
+		{}
+		const F m_Function;
+		void operator()(typename ParseArg<Args>::type...args) const
 		{
 			m_Function(args...);
 		}
@@ -51,8 +59,11 @@ class EventDispatcher<R(Args...)>
 	struct CCallable<F, typename std::enable_if<std::is_empty<F>::value>::type> : ICallable, private F
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : F(std::forward<RealF>(f)) {}
-		void operator()(typename ParseArg<Args>::type...args) override
+		CCallable(RealF &&f) : 
+			F(std::forward<RealF>(f)), 
+			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) } 
+		{}
+		void operator()(typename ParseArg<Args>::type...args) const
 		{
 			F::operator()(args...);
 		}
@@ -73,8 +84,8 @@ public:
 	template<class F>
 	/*[[nodiscard]]*/ EventListener subscribe(F &&f)
 	{
-		auto sp = std::make_shared<CCallable<F>>(std::forward<F>(f));
-		v.push_back(sp);
+		auto sp = std::make_shared<CCallable<typename std::remove_reference<F>::type>>(std::forward<F>(f));
+		v.emplace_back(sp);
 		return sp;
 	}
 private:
