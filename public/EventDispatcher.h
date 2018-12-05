@@ -8,86 +8,61 @@
 #include <algorithm>
 #include <memory>
 
-/*
-class UnsubscribeException : public std::exception {};
+using EventListener = std::shared_ptr<void>;
 template<class F>
 class EventDispatcher;
 template<class R, class...Args>
 class EventDispatcher<R(Args...)>
 {
-public:
-	using F = std::function<R(Args...)>;
-	EventDispatcher() = default;
-	EventDispatcher(const F &f) : v{ f } {}
-	EventDispatcher(std::initializer_list<F> l) : v(l) {}
-public:
-	void dispatch(Args...args)
+	template<class T>
+	struct ParseArg
 	{
-		v.erase(std::remove_if(v.begin(), v.end(), [](const F &f) {
-			try
-			{
-				f(std::forward<Args>(args)...);
-			}
-			catch (const UnsubscribeException &e)
-			{
-				return true;
-			}
-			return false;
-		}), v.end());
-	}
-	void subscribe(const F &f)
+		using type = const T &;
+	};
+	template<class T>
+	struct ParseArg<T &>
 	{
-		if (f) v.push_back(f);
-		return *this;
-	}
-private:
-	std::vector<F> v;
-};
-*/
+		using type = T &;
+	};
+	template<class T>
+	struct ParseArg<T &&>
+	{
+		template<class = void> struct Error;
+		using type = typename Error<>::not_allowed_to_move_arg;
+	};
 
-struct IBaseEventListener
-{
-	virtual ~IBaseEventListener() = 0;
-};
-inline IBaseEventListener::~IBaseEventListener() {}
-using EventListener = std::shared_ptr<IBaseEventListener>;
-template<class F>
-class EventDispatcher;
-template<class R, class...Args>
-class EventDispatcher<R(Args...)>
-{
-	struct ICallable : IBaseEventListener
+	struct ICallable
 	{
-		virtual void operator()(Args...args) = 0;
+		virtual void operator()(typename ParseArg<Args>::type...args) = 0;
 	};
 	template<class F>
 	struct CCallable : ICallable
 	{
-		CCallable(const F &f) : m_Function(f) {}
+		template<class RealF>
+		CCallable(RealF &&f) : m_Function(std::forward<RealF>(f)) {}
 		F m_Function;
-		void operator()(Args...args) override
+		void operator()(typename ParseArg<Args>::type...args) override
 		{
-			return m_Function(std::forward<Args>(args)...);
+			m_Function(args...);
 		}
 	};
 public:
 	// dont move args!
-	template<class...RealArgs>
-	void dispatch(RealArgs&&...args)
+	void dispatch(typename ParseArg<Args>::type...args)
 	{
 		v.erase(std::remove_if(v.begin(), v.end(), [&](const std::weak_ptr<ICallable> &wpf) {
 			auto spf = wpf.lock();
 			if (!spf)
 				return true;
-			(*spf)(std::forward<RealArgs>(args)...);
+			(*spf)(args...);
 			return false;
 		}), v.end());
 	}
 	// note that the lifespan of EventListener object keeps the callback
 	template<class F>
-	EventListener subscribe(const F &f)
+	/*[[nodiscard]]*/ EventListener subscribe(F &&f)
 	{
-		auto sp = std::make_shared<CCallable<F>>(f);
+		auto sp = std::make_shared<CCallable<F>>(std::forward<F>(f));
 		v.push_back(sp);
 		return sp;
 	}

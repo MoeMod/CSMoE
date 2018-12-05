@@ -16,9 +16,7 @@ void CBasePlayer::AddAccount(int amount, bool bTrackChange)
 CPlayerAccount &CPlayerAccount::operator+=(int delta)
 {
 	const int iMax = g_pModRunning->MaxMoney();
-
-	m_iLastAmount = m_iAmount;
-	m_iAmount = std::min(std::max(0, m_iLastAmount + delta), iMax);
+	m_iAmount = std::min(std::max(0, m_iAmount + delta), iMax);
 
 	return *this;
 }

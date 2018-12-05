@@ -6,6 +6,7 @@
 #include "client.h"
 
 #include "supplybox.h"
+#include "gamemode/mods.h"
 
 #include <utility>
 
@@ -37,19 +38,22 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 	{ "Dual MP7A1", [](CBasePlayer *p) {
 			DropPrimary(p);
 			p->GiveNamedItem("weapon_mp7a1d");
-			p->GiveAmmo(MAX_AMMO_46MM, "46mm", MAX_AMMO_46MM);
+			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("46mm", MAX_AMMO_46MM);
+			p->GiveAmmo(iAmount, "46mm", iAmount);
 		}
 	},
 	{ "AK-47 60R", [](CBasePlayer *p) {
 			DropPrimary(p);
 			p->GiveNamedItem("weapon_ak47l");
-			p->GiveAmmo(MAX_AMMO_762NATO, "762Nato", MAX_AMMO_762NATO);
+			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("762Nato", MAX_AMMO_762NATO);
+			p->GiveAmmo(iAmount, "762Nato", iAmount);
 		}
 	},
 	{ "Dual Desert Eagle", [](CBasePlayer *p) {
 			DropSecondary(p);
 			p->GiveNamedItem("weapon_deagled");
-			p->GiveAmmo(MAX_AMMO_50AE, "50ae", MAX_AMMO_50AE);
+			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
+			p->GiveAmmo(iAmount, "762Nato", iAmount);
 		}
 	}
 };
