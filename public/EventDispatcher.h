@@ -35,7 +35,7 @@ class EventDispatcher<R(Args...)>
 	{
 		virtual void operator()(typename ParseArg<Args>::type...args) = 0;
 	};
-	template<class F>
+	template<class F, class = void>
 	struct CCallable : ICallable
 	{
 		template<class RealF>
@@ -44,6 +44,17 @@ class EventDispatcher<R(Args...)>
 		void operator()(typename ParseArg<Args>::type...args) override
 		{
 			m_Function(args...);
+		}
+	};
+	// empty base-class optimization for F...
+	template<class F>
+	struct CCallable<F, typename std::enable_if<std::is_empty<F>::value>::type> : ICallable, private F
+	{
+		template<class RealF>
+		CCallable(RealF &&f) : F(std::forward<RealF>(f)) {}
+		void operator()(typename ParseArg<Args>::type...args) override
+		{
+			F::operator()(args...);
 		}
 	};
 public:
