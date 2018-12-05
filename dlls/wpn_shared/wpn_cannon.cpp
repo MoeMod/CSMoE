@@ -42,8 +42,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 			{
 				float flAdjustedDamage = flDamage - (vecSrc - pHit->pev->origin).Length() * falloff;
 				ClearMultiDamage();
-				if (pHit)
-					pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
 			}
 			vecEnd = tr.vecEndPos;
@@ -61,11 +60,17 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 			if (!bInWater && pEntity->pev->waterlevel == 3)
 				continue;
 
-			Vector vecSpot = pEntity->BodyTarget(vecSrc);
-			if (AngleBetweenVectors(vecSpot - vecSrc, vecDir) > flAngleDegrees)
+			if (pEntity->IsBSPModel())
 				continue;
-				
-			UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+			if (pEntity->pev == pevAttacker)
+				continue;
+
+			Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
+				continue;
 
 			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
 			{
@@ -75,11 +80,8 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 					tr.flFraction = 0;
 				}
 
-				float flAdjustedDamage;
-				flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-
-				if (flAdjustedDamage < 0)
-					flAdjustedDamage = 0;
+				float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+				flAdjustedDamage = Q_max(0, flAdjustedDamage);
 
 				if (tr.flFraction == 1.0f)
 				{
