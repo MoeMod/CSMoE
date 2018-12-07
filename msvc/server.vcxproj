@@ -674,15 +674,14 @@
     <ClInclude Include="..\dlls\player.h" />
     <ClInclude Include="..\dlls\player\csdm_randomspawn.h" />
     <ClInclude Include="..\dlls\player\hintmessage.h" />
+    <ClInclude Include="..\dlls\player\player_account.h" />
     <ClInclude Include="..\dlls\player\player_const.h" />
     <ClInclude Include="..\dlls\player\player_human_level.h" />
     <ClInclude Include="..\dlls\player\player_knockback.h" />
     <ClInclude Include="..\dlls\player\player_model.h" />
     <ClInclude Include="..\dlls\player\player_mod_strategy.h" />
     <ClInclude Include="..\dlls\player\player_msg.h" />
-    <ClInclude Include="..\dlls\player\player_account.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
-    <ClInclude Include="..\dlls\player\player_account.h" />
     <ClInclude Include="..\dlls\player\player_zombie.h" />
     <ClInclude Include="..\dlls\player\player_zombie_skill.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
