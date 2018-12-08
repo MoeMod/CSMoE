@@ -3,7 +3,7 @@ Here are the source code of engine, server, client (windows and linux only). \
 For Android or iOS launcher, check them in other repo. \
 This is a combination of CS1.6 mods that are implemented based on Xash3D engine, \
 aiming to act like CSO (aka CS:NZ), however the traditional one in pre-2009. \
-Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), Android(ARMv7,x86), iOS(ARMv7,ARM64).
+Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x64), Android(ARMv7,x86), iOS(ARMv7,ARM64).
 
 ## Features
 * [x] New HUD elements (ScoreBoard, KillerEffects, C4 follow icons, Custom Crosshair)
@@ -42,7 +42,7 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 ### Android - Google Pixel C (2015)
 * SoC : nVIDIA Tegra X1
 * RAM : 4 GB
-* Resolution : 2560 °¡ 1800
+* Resolution : 2560 ¬°√Å 1800
 * Result : Smooth, 90+ fps
 ### iOS - Apple iPad 6th Gen (2018)
 * SoC : A10 Fusion
@@ -59,23 +59,23 @@ Cross-platform designed, it can be run on Windows(x86), Linux(x86), macOS(x64), 
 ### Windows
 1. download ***-win32-i386 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csbtem locates
-4. run csbtem_win32.exe \
+3. copy cstrike and valve directory to where the csmoe locates
+4. run csmoe_win32.exe \
 Note : If you get errors about MSVCR140.dll and so on, install Microsoft VC++ Redist on \
 https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 ### Linux
 1. download ***-linux-i386 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csbtem locates
+3. copy cstrike and valve directory to where the csmoe locates
 4. launch terminal, cd to the dir, type 
   sudo chmod +x xash3d
 5. type the cmd below to run the game
-  bash csbtem_linux.sh \
+  bash csmoe_linux.sh \
 Note : You may need to install libSDL2 and other dependency.
 ### Android
 1. download ***-GameDir and extract it into an empty folder on your phone
 2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csbtem locates
+3. copy cstrike and valve directory to where the csmoe locates
 4. download and install ***-Android.apk
 5. run the game and follow the instructions
 ### iOS
@@ -86,15 +86,35 @@ Note : You may need to install libSDL2 and other dependency.
 3. purchase and download Counter-Strike on Steam
 4. find cstrike and valve directory in steamapps
 5. launch iTunes and select the APP in file sharing
-6. drag csbtem, cstrike, valve into iTunes
+6. drag csmoe, cstrike, valve into iTunes
 7. run the app on the SpringBoard \
 Note : Thanks to the fxxking App Store limitations, you must reinstall it every week or it will crash (no need to recopy resources).
 ### macOS
 1. download ***-macos-x64 and ***-GameDir and extract them together
 2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csbtem locates
-4. run csbtem_macos.sh with Terminal \
+3. copy cstrike and valve directory to where the csmoe locates
+4. run csmoe_macos.sh with Terminal \
 Note : If it results in a black window, try to drag it and then the menu will appear.
+
+## Building
+### Generic
+- This project uses C++14 standard, and please ensure that your compiler supports it.
+### Windows
+- Visual Studio 2017 projects can be found in msvc/csmoe.sln
+- Download SDL2-devel-2.0.9-VC.zip from http://www.libsdl.org/ and put them into SDL2/
+- It should be OK to build with both x86 and x64. \
+  Note : You can also use cmake to build with mingw, etc.
+### macOS & Linux
+- Build with CMake
+- Set SDL2_PATH to where the SDL2 locates
+- It should be OK to build with both x86 and x64.
+### Android
+- Put this repo into jni/src/xash3d
+- Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version
+- arm64-v8a is not supported. Please build armeabi, armeabi-v7a, x86 only.
+### iOS
+- TODO
+- supports both armv7, arm64.
 
 ## License
 This repo is licensed under GPLv3 license, check LICENSE file for details.
