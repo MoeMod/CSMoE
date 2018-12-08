@@ -61,6 +61,9 @@
 
 bool CCSBot::BhopJump_Start()
 {
+	// dont jump when bot_stop 1
+	if (cv_bot_stop.value != 0.0f)
+		return false;
 	// zombie only
 	if (!m_bIsZombie)
 		return false;
@@ -201,6 +204,9 @@ void CCSBot::BhopJump_UpdateSync()
 void CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 {
 	CBasePlayer::Knockback(attacker, data);
+
+	if (cv_bot_stop.value != 0.0f)
+		return;
 
 	if (RANDOM_FLOAT(0.0f, 1.0f + GetProfile()->GetSkill()) < 0.75f)
 		return;

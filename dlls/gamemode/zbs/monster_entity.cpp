@@ -34,12 +34,33 @@ public:
 	// jumping control
 	bool GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Vector *normal) override
 	{
-		bool result = CHostageImprov::GetSimpleGroundHeightWithFloor(pos, height, normal);
+		Vector to(*pos);
+		to.z -=  9999.9f;
 
-		if (IsRunning() || IsWalking())
+		TraceResult tr;
+
+		UTIL_TraceLine(*pos, to, ignore_monsters, dont_ignore_glass, NULL, &tr);
+
+		if (tr.fStartSolid)
 			return false;
 
-		return result;
+		*height = tr.vecEndPos.z;
+
+		if (normal != NULL)
+		{
+			*normal = tr.vecPlaneNormal;
+		}
+
+		UTIL_MakeVectors(m_hostage->pev->angles);
+
+		// no need to jump down !
+		if (DotProduct2D(tr.vecPlaneNormal, gpGlobals->v_forward) > 0)
+			return false;
+
+		if (m_lastKnownArea != NULL && m_lastKnownArea->IsOverlapping(pos))
+			*height = Q_max((*height), m_lastKnownArea->GetZ(pos));
+
+		return true;
 	}
 	bool CanJump() const override
 	{
