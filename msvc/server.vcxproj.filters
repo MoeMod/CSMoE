@@ -1293,8 +1293,5 @@
     <ClInclude Include="..\dlls\player\player_account.h">
       <Filter>dlls\player</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\player\player_account.h">
-      <Filter>dlls\player</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
