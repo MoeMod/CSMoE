@@ -91,16 +91,14 @@ find_path(SDL2_INCLUDE_DIR SDL.h
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	set(SDL2_LIBRARY_PATH_SUFFIXES
 		lib
-		lib/amd64-linux-gnu
+		lib/x86_64-linux-gnu
 		lib/x64
-		i686-w64-mingw32/lib
 	)
 else()
 	set(SDL2_LIBRARY_PATH_SUFFIXES
 		lib
 		lib/i386-linux-gnu
 		lib/x86
-		i686-w64-mingw32/lib
 		)
 endif()
 
