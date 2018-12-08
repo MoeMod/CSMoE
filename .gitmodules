@@ -1,6 +1,3 @@
 [submodule "mainui_cpp"]
 	path = mainui_cpp
 	url = https://github.com/MoeMod/mainui_cpp
-[submodule "SDL2"]
-	path = SDL2
-	url = https://github.com/spurious/SDL-mirror

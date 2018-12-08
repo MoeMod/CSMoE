@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION  2.8.0)
 
+# Install custom module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 if (APPLE)
 set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra -Wpedantic -Wno-unused-parameter -ggdb")
 set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb")
@@ -58,7 +61,6 @@ set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
 ADD_SUBDIRECTORY(game_launch)
-ADD_SUBDIRECTORY(SDL2)
 ADD_SUBDIRECTORY(engine)
 ADD_SUBDIRECTORY(dlls)
 ADD_SUBDIRECTORY(cl_dll)

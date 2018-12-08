@@ -219,7 +219,6 @@ include_directories(
 	server/
 	../common
 	../pm_shared
-	../SDL2/include
 )
 
 if(XASH_NANOGL)
@@ -303,16 +302,21 @@ endif()
 
 
 if(XASH_SDL)
-
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-
-	set(SDL2_LIBRARY SDL2)
-
+	find_package(SDL2 REQUIRED)
+	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
+	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
-
-	target_link_libraries(${XASH_ENGINE} SDL2)
-
-endif() #if(XASH_SDL)
+	if(MSVC)
+		string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
+		install(FILES ${SDL2_DLL}
+				CONFIGURATIONS Debug
+				DESTINATION ${LIB_INSTALL_DIR}/Debug/)
+		install(FILES ${SDL2_DLL}
+				CONFIGURATIONS Release
+				DESTINATION ${LIB_INSTALL_DIR}/Release/)
+	endif()
+endif()
 
 if(XASH_GLES)
 	add_definitions(-DXASH_GLES -DXASH_GL_STATIC)
