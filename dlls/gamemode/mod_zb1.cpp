@@ -36,7 +36,7 @@ void CMod_Zombi::CheckMapConditions()
 	{
 		REMOVE_ENTITY(fog->edict());
 	}
-	CClientFog *newfog = GetClassPtr<CClientFog>(NULL);
+	CClientFog *newfog = GetClassPtr<CClientFog>(nullptr);
 	MAKE_STRING_CLASS("env_fog", newfog->pev);
 	newfog->Spawn();
 	newfog->m_fDensity = 0.0016f;

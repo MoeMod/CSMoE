@@ -9,13 +9,13 @@ class PlayerExtraHumanLevel_ZBS : public BasePlayerExtra
 public:
 	PlayerExtraHumanLevel_ZBS(CBasePlayer *player);
 
-	float GetHealthBonus();
-	float GetAttackBonus();
+	float GetHealthBonus() const;
+	float GetAttackBonus() const;
 
 	void LevelUpHealth();
 	void LevelUpAttack();
 	void Reset();
-	void UpdateHUD();
+	void UpdateHUD() const;
 
 protected:
 	int m_iHealth;

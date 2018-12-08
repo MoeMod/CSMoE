@@ -6,6 +6,7 @@
 
 class CBasePlayer;
 
+#ifndef CLIENT_DLL
 class CPlayerAccount
 {
 public:
@@ -31,12 +32,15 @@ public:
 
 	operator int() const { return Get(); }
 
-	void UpdateHUD(CBasePlayer *player, bool bTrackChange = false);
+	void UpdateHUD(CBasePlayer *player, bool bTrackChange = false) const;
 	void Reset() { m_iAmount = m_iLastAmount = 0; }
 
 private:
 	int m_iAmount;
-	int m_iLastAmount;
+	mutable int m_iLastAmount;
 };
+#else
+using CPlayerAccount = int;
+#endif
 
 #endif

@@ -141,7 +141,7 @@ void CSupplyBox::SendPositionMsg()
 		if (pEntity->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pTempPlayer = static_cast<CBasePlayer *>(pEntity);
 
 		if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == CT)
 		{

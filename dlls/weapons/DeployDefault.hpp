@@ -27,7 +27,7 @@ public:
 		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 		CBase::m_iShotsFired = 0;
 
-		BOOL result = wpn.DefaultDeploy(wpn.V_Model, wpn.P_Model, wpn.ANIM_DRAW, wpn.AnimExtension, UseDecrement() != FALSE);
+		BOOL result = wpn.DefaultDeploy(wpn.V_Model, wpn.P_Model, wpn.ANIM_DRAW, wpn.AnimExtension, wpn.UseDecrement() != FALSE);
 
 		CBase::m_pPlayer->m_flNextAttack = wpn.DefaultDeployTime;
 		return result;

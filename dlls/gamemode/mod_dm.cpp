@@ -168,7 +168,7 @@ void CMod_DeathMatch::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, ent
 	else if (peKiller && peKiller->IsPlayer())
 	{
 		// if a player dies in a deathmatch game and the killer is a client, award the killer some points
-		CBasePlayer *killer = GetClassPtr((CBasePlayer *)pKiller);
+		CBasePlayer *killer = peKiller;
 		bool killedByFFA = false;
 
 		pKiller->frags += IPointsForKill(peKiller, pVictim);
@@ -233,10 +233,7 @@ int CMod_DeathMatch::PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarg
 		return GR_NOTTEAMMATE;
 	}
 
-	CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
-	CBasePlayer *target = GetClassPtr((CBasePlayer *)pTarget->pev);
-
-	if (player == target)
+	if (pPlayer == pTarget)
 	{
 		return GR_TEAMMATE;
 	}

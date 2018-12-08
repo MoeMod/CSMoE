@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 2.6.0)
 project(XASH_LAUNCHER C)
 
-set(XASH_LAUNCHER xash3d)
+set(XASH_LAUNCHER game_launch)
 file(GLOB XASH_LAUNCHER_SOURCES *.c)
 if(WIN32)
 	list(APPEND XASH_LAUNCHER_SOURCES game.rc)

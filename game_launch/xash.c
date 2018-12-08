@@ -27,6 +27,7 @@ GNU General Public License for more details.
 #ifdef __APPLE__
 	#include <dlfcn.h>
 	#include <errno.h>
+	#include <unistd.h>
 	#define XASHLIB    "libxash.dylib"
 	#define dlmount(x) dlopen(x, RTLD_NOW)
 	#define HINSTANCE  void*
@@ -169,8 +170,13 @@ _inline int Sys_Start( void )
 		{
 			baseDir = szArgv[i + 1];
 			sprintf(buffer, "XASH3D_BASEDIR=%s", baseDir);
+#ifdef _WIN32
 			_putenv(buffer);
 			SetCurrentDirectory(baseDir);
+#else
+			putenv(buffer);
+			chdir(baseDir);
+#endif
 			break;
 		}
 	}

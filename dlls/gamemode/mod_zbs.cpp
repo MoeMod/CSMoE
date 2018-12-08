@@ -118,11 +118,14 @@ float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_
 {
 	flDamage = IBaseMod_RemoveObjects::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
-	CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
-	if (pAttackingEnt->IsPlayer())
+	if(pevAttacker)
 	{
-		CBasePlayer *pAttacker = static_cast<CBasePlayer *>(pAttackingEnt);
-		m_eventAdjustDamage.dispatch(pAttacker, flDamage);
+		CBaseEntity *pAttackingEnt = CBaseEntity::Instance(pevAttacker);
+		if (pAttackingEnt->IsPlayer())
+		{
+			CBasePlayer *pAttacker = static_cast<CBasePlayer *>(pAttackingEnt);
+			m_eventAdjustDamage.dispatch(pAttacker, flDamage);
+		}
 	}
 		
 	return flDamage;

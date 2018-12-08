@@ -21,7 +21,7 @@ CPlayerAccount &CPlayerAccount::operator+=(int delta)
 	return *this;
 }
 
-void CPlayerAccount::UpdateHUD(CBasePlayer *player, bool bTrackChange)
+void CPlayerAccount::UpdateHUD(CBasePlayer *player, bool bTrackChange) const
 {
 	if (!bTrackChange || m_iAmount != m_iLastAmount)
 	{
