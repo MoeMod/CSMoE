@@ -66,7 +66,7 @@
 
 message(STATUS "<FindSDL2.cmake> ${SDL2_PATH}")
 
-if(WIN32 AND (NOT SDL2_PATH AND NOT XASH_DOWNLOAD_DEPENDENCIES))
+if(WIN32 AND (NOT SDL2_PATH))
 	message(FATAL_ERROR "To find SDL2 correctly, you need to pass SDL2_PATH variable to CMake")
 endif()
 
@@ -88,12 +88,25 @@ find_path(SDL2_INCLUDE_DIR SDL.h
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
-find_library(SDL2_LIBRARY_TEMP
-	NAMES SDL2 SDL2.dll
-	PATH_SUFFIXES
-	    lib
+if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+	set(SDL2_LIBRARY_PATH_SUFFIXES
+		lib
+		lib/amd64-linux-gnu
+		lib/x64
+		i686-w64-mingw32/lib
+	)
+else()
+	set(SDL2_LIBRARY_PATH_SUFFIXES
+		lib
 		lib/i386-linux-gnu
 		lib/x86
+		i686-w64-mingw32/lib
+		)
+endif()
+
+find_library(SDL2_LIBRARY_TEMP
+	NAMES SDL2 SDL2.dll
+	PATH_SUFFIXES ${SDL2_LIBRARY_PATH_SUFFIXES}
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
@@ -116,10 +129,7 @@ if(SDL2_BUILDING_EXECUTABLE)
 		# necessarily need it.
 		find_library(SDL2MAIN_LIBRARY
 			NAMES SDL2main libSDL2main.a
-			PATH_SUFFIXES
-			    lib
-				lib/i386-linux-gnu
-				lib/x86
+			PATH_SUFFIXES ${SDL2_LIBRARY_PATH_SUFFIXES}
 			PATHS ${SDL2_SEARCH_PATHS}
 		)
     endif()

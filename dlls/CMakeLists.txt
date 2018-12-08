@@ -22,11 +22,7 @@
 
 cmake_minimum_required(VERSION 3.1.3)
 
-# Install custom module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-
 project (SERVER)
-
 set(CMAKE_CXX_STANDARD 14)
 
 if (APPLE)
@@ -37,25 +33,22 @@ else()
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -static-libstdc++")
 endif()
 
+set (SERVER_LIBRARY server)
+
 #--------------
 # USER DEFINES \
 ################\
-option(64BIT "Allow 64 Bit builds" OFF)
-option(USE_VGUI "Enable VGUI1. UNDONE" OFF)
-option(USE_VGUI2 "Enable VGUI2. UNDONE" OFF)
-option(USE_VOICEMGR "Enable VOICE MANAGER." OFF)
-option(GOLDSOURCE_SUPPORT "Build goldsource compatible client library" OFF)
-option(64BIT "Disable auto -m32 appending to compiler flags" OFF)
-set(GAMEDIR "valve" CACHE STRING "Gamedir path")
+set(GAMEDIR "csmoe" CACHE STRING "Gamedir path")
 set(SERVER_INSTALL_DIR "dlls" CACHE STRING "Where put server dll")
-set(CLIENT_INSTALL_DIR "cl_dlls" CACHE STRING "Where put client dll")
-set(SERVER_LIBRARY_NAME "cs" CACHE STRING "Library name for Linux/MacOS/Windows")
+if(NOT WIN32)
+set(SERVER_LIBRARY_NAME "cs" CACHE STRING "Library name for Linux/MacOS")
+else()
+set(SERVER_LIBRARY_NAME "mp" CACHE STRING "Library name for Windows")
+endif()
 
 #-----------------
 # MAIN BUILD CODE \
 ###################\
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(HLDLL_SRCS
 	./airtank.cpp
@@ -205,9 +198,6 @@ set(PUBLIC_SRCS
 	../public/MemPool.cpp
     )
 
-set (SERVER_LIBRARY server)
-#file (GLOB SERVER_SOURCES *.cpp ../pm_shared/*.c)
-
 set (SERVER_SOURCES
 	${HLDLL_SRCS}
 	${HLWPN_SRCS}
@@ -268,14 +258,7 @@ add_definitions(
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
 
+set_target_properties(${SERVER_LIBRARY} PROPERTIES
+		PREFIX "" OUTPUT_NAME ${SERVER_LIBRARY_NAME})
 
-if(NOT WIN32)
-	set_target_properties(${SERVER_LIBRARY} PROPERTIES
-		PREFIX "" OUTPUT_NAME "cs")
-else()
-	# For Win32 we have split DLL names
-	set_target_properties(${SERVER_LIBRARY} PROPERTIES
-		OUTPUT_NAME "mp")
-endif()
-
-install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/csmoe/dlls)
+install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${SERVER_INSTALL_DIR})

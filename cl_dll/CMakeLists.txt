@@ -42,6 +42,21 @@ set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ")
 
 set (CLDLL_LIBRARY client)
 
+#--------------
+# USER DEFINES \
+################\
+set(GAMEDIR "csmoe" CACHE STRING "Gamedir path")
+set(CLIENT_INSTALL_DIR "cl_dlls" CACHE STRING "Where put client dll")
+if(XASH_64BIT)
+	set(CLIENT_LIBRARY_NAME "client64" CACHE STRING "Library name for 64bit")
+else()
+	set(CLIENT_LIBRARY_NAME "client" CACHE STRING "Library name for 32bit")
+endif()
+
+#-----------------
+# MAIN BUILD CODE \
+###################\
+
 file (GLOB WEAPONEVENT_SRCS
 	./ev_common.cpp
 	./events/ev_cs16.cpp
@@ -185,12 +200,7 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
 
-if(XASH_64BIT)
-	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
-		PREFIX "" OUTPUT_NAME "client64")
-else()
-	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
-		PREFIX "" OUTPUT_NAME "client")
-endif()
+set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+		PREFIX "" OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
 
-install( TARGETS ${CLDLL_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/csmoe/cl_dlls )
+install( TARGETS ${CLDLL_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${CLIENT_INSTALL_DIR} )

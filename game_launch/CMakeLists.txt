@@ -31,7 +31,6 @@ endif()
 
 include_directories(
 	.
-	../SDL2/include
 )
 
 add_executable(${XASH_LAUNCHER} WIN32 ${XASH_LAUNCHER_SOURCES})
@@ -41,7 +40,9 @@ add_executable(${XASH_LAUNCHER} WIN32 ${XASH_LAUNCHER_SOURCES})
 # Otherwise it prints errors in stdin.
 if(XASH_SDL AND NOT WIN32)
 	set(SDL2_BUILDING_EXECUTABLE YES) # Link SDL2main also
-	target_link_libraries(${XASH_LAUNCHER} SDL2)
+	find_package(SDL2 REQUIRED)
+	target_link_libraries(${XASH_LAUNCHER} ${SDL2_LIBRARY})
+	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
 endif()
 

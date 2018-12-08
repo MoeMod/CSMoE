@@ -24,12 +24,7 @@ set (CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Os")
 set (CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -ggdb -O3")
 endif()
 
-# force build 32bit libraries
-#if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-#    if(WIN32)
-#		message(FATAL_ERROR "CAN NOT build x64 on Windows!")
-#    endif()
-#endif()
+set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
 # force xp build
 if(MSVC)
