@@ -31,7 +31,7 @@ public:
 	void Shutdown(void) override;
 
 public:
-	using MagicNumber = int;
+	using MagicNumber = size_t;
 	enum RetinaDrawType_e : int
 	{
 		RETINA_DRAW_TYPE_NONE,
@@ -47,7 +47,8 @@ public:
 		MagicNumber num;
 	};
 	
-	MagicNumber AddItem(SharedTexture tex, int type = RETINA_DRAW_TYPE_NONE, float time = -1.0f, MagicNumber num = gEngfuncs.pfnRandomLong(INT_MIN, INT_MAX));
+	MagicNumber AddItem(SharedTexture tex, int type = RETINA_DRAW_TYPE_NONE, float time = -1.0f);
+	MagicNumber AddItem(SharedTexture tex, int type, float time, MagicNumber num);
 	bool RemoveItem(MagicNumber idx);
 	void RemoveAll();
 	void DrawItem(float time, const RetinaDrawItem_s &item) const;

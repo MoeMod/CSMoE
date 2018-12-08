@@ -62,10 +62,10 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 
 	if (item.type & RETINA_DRAW_TYPE_QUARTER)
 	{
-		DrawUtils::Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2); // ¨I	
-		DrawUtils::Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2); // ¨J
-		DrawUtils::Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2); // ¨L
-		DrawUtils::Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2); // ¨K
+		DrawUtils::Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2); // ï¿½I	
+		DrawUtils::Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2); // ï¿½J
+		DrawUtils::Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2); // ï¿½L
+		DrawUtils::Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2); // ï¿½K
 	}
 	else
 	{
@@ -83,6 +83,11 @@ auto CHudRetina::AddItem(SharedTexture tex, int type, float time, MagicNumber nu
 	float flTimeEnd = time <= 0.0f ? time : gHUD.m_flTime + time;
 	m_ItemList.push_back({ type, tex, flTimeEnd, num });
 	return m_ItemList.size() - 1;
+}
+
+auto CHudRetina::AddItem(SharedTexture tex, int type, float time) -> MagicNumber
+{
+	return AddItem(tex, type, time, std::hash<SharedTexture>()(tex));
 }
 
 bool CHudRetina::RemoveItem(MagicNumber idx)
