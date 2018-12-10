@@ -202,6 +202,7 @@ extern cvar_t cv_bot_zombie;
 extern cvar_t cv_bot_defer_to_human;
 extern cvar_t cv_bot_chatter;
 extern cvar_t cv_bot_profile_db;
+extern cvar_t friendlyfire;
 
 #define IS_ALIVE true
 int UTIL_HumansOnTeam(int teamID, bool isAlive = false);

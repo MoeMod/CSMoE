@@ -452,7 +452,6 @@ CBaseEntity *CMonster::FindTarget()
 		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
 		m_hTargetEnt = player;
 		m_improv->MoveTo(player->Center());
-		m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
 	}
 	else
 	{
@@ -905,7 +904,7 @@ CBasePlayer *CMonster::GetClosestPlayer(bool bVisible)
 		if (!player->IsAlive())
 			continue;
 
-		if(bVisible && !m_improv->IsVisible(m_improv->GetEyes(), true))
+		if (bVisible && !m_improv->IsVisible(m_improv->GetEyes(), true))
 			continue;
 
 		float rangeSq = (m_improv->GetCentroid() - player->pev->origin).LengthSquared();
