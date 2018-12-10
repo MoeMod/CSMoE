@@ -147,18 +147,21 @@ private:
 	int m_serialnumber;
 };
 
+#include "cbase/cbase_memory.h"
 #include "ruleof350.h"
 #include <functional> // why not use c++11 std::function?
 
 class CBaseEntity : ruleof350::unique
 {
 #ifndef CLIENT_DLL
-protected:
-	// ban creating auto vars
-	friend void OnFreeEntPrivateData(edict_t *pEnt);
-	virtual ~CBaseEntity() = default;
+public:
+	static void CheckEntityDestructor(CBaseEntity *pEntity);
+	CBaseEntity();
+
+	virtual ~CBaseEntity();
 #else
 public:
+	CBaseEntity() = default;
 	virtual ~CBaseEntity() = default;
 #endif
 
@@ -313,12 +316,14 @@ public:
 	int entindex(void) { return ENTINDEX(edict()); }
 
 public:
-	// hides the global ::operator new, so that you cannot CBaseEntity *p = new CBaseEntity
-	void *operator new(size_t stAllocateBlock, entvars_t *newpev) { return ALLOC_PRIVATE(ENT(newpev), stAllocateBlock); }
-
-#if defined(_MSC_VER) && _MSC_VER >= 1200
-	void operator delete(void *pMem, entvars_t *pev) { pev->flags |= FL_KILLME; }
-#endif
+	// allocate memory for CBaseEntity with given pev
+	void *operator new(size_t stAllocateBlock, entvars_t *newpev);
+	// free pev  when constructor throws, etc... 
+	void operator delete(void *pMem, entvars_t *pev);
+	// automatically allocate pev
+	void *operator new(size_t stAllocateBlock);
+	// auto remove entity...
+	void operator delete(void *pMem);
 
 public:
 	template <typename T>
@@ -363,13 +368,13 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
+#ifdef CLIENT_DLL
 	entvars_t * pev;
-	CBaseEntity *m_pGoalEnt;
-	CBaseEntity *m_pLink;
-	//void (CBaseEntity::*m_pfnThink)(void);
-	//void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
-	//void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	//void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
+#else
+	entvars_t * const pev;
+#endif
+	CBaseEntity *m_pGoalEnt = nullptr;
+	CBaseEntity *m_pLink = nullptr;
 	std::function<void()> m_pfnThink;
 	std::function<void(CBaseEntity *pOther)> m_pfnTouch;
 	std::function<void(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> m_pfnUse;
@@ -717,24 +722,6 @@ public:
 	BYTE m_bUnlockedSentence;
 	int m_sounds;
 };
-
-template <class T> auto GetClassPtr(T *a) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
-{
-	entvars_t *pev = reinterpret_cast<entvars_t *>(a);
-
-	if (pev == nullptr)
-		pev = VARS(CREATE_ENTITY());
-
-	a = GET_PRIVATE<T>(ENT(pev));
-
-	if (a == nullptr)
-	{
-		a = new(pev) T;
-		a->pev = pev;
-	}
-
-	return a;
-}
 
 class CWorld : public CBaseEntity
 {

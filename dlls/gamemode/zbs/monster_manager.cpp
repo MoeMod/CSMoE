@@ -34,7 +34,7 @@ public:
 	}
 };
 
-CMonsterManager::CMonsterManager() : pimpl(new impl_t)
+CMonsterManager::CMonsterManager() : pimpl(std::make_unique<impl_t>())
 {
 	SetMaxNumOfEntity(64);
 	SetAutoGcRatio(0.8f);

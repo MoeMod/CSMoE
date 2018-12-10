@@ -224,6 +224,7 @@
     <ClCompile Include="..\dlls\buttons.cpp" />
     <ClCompile Include="..\dlls\career_tasks.cpp" />
     <ClCompile Include="..\dlls\cbase.cpp" />
+    <ClCompile Include="..\dlls\cbase\cbase_memory.cpp" />
     <ClCompile Include="..\dlls\client.cpp" />
     <ClCompile Include="..\dlls\combat.cpp" />
     <ClCompile Include="..\dlls\debug.cpp" />
@@ -619,6 +620,7 @@
     <ClInclude Include="..\dlls\bot_include.h" />
     <ClInclude Include="..\dlls\career_tasks.h" />
     <ClInclude Include="..\dlls\cbase.h" />
+    <ClInclude Include="..\dlls\cbase\cbase_memory.h" />
     <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\client.h" />
     <ClInclude Include="..\dlls\common.h" />
