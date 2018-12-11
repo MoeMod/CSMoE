@@ -169,6 +169,8 @@ set(HLDLL_SRCS
 	./player/player_mod_strategy.cpp
 	./gamemode/zbs/monster_manager.cpp
 	./player/player_account.cpp
+	./cbase/cbase_memory.cpp
+	./gamemode/zbs/npc_group.cpp
 	)
 
 file (GLOB HLWPN_SRCS

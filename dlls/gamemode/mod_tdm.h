@@ -11,7 +11,7 @@ class CBaseEntity; // cbase.h
 class CBasePlayer; // player.h
 typedef struct entvars_s entvars_t; // progdefs.h
 
-class CMod_TeamDeathMatch : public IBaseMod_RemoveObjects
+class CMod_TeamDeathMatch : public TBaseMod_RemoveObjects<>
 {
 public:
 	CMod_TeamDeathMatch();

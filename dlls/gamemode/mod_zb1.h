@@ -10,7 +10,7 @@
 #include <vector>
 #include <utility>
 
-class CMod_Zombi : public IBaseMod_RemoveObjects, public IBaseMod_RandomSpawn
+class CMod_Zombi : public TBaseMod_RemoveObjects<TBaseMod_RandomSpawn<>>
 {
 public:
 	CMod_Zombi();

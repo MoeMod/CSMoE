@@ -116,7 +116,7 @@ void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
 
 float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	flDamage = IBaseMod_RemoveObjects::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	flDamage = Base::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	if(pevAttacker)
 	{
@@ -162,7 +162,7 @@ void CMod_ZombieScenario::CheckMapConditions()
 	// hook from RestartRound()
 	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
 
-	return IBaseMod_RemoveObjects::CheckMapConditions();
+	return Base::CheckMapConditions();
 }
 
 void CMod_ZombieScenario::RestartRound()

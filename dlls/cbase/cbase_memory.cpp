@@ -6,11 +6,11 @@
 #include <mutex>
 #include <atomic>
 
-static std::atomic<entvars_t *> g_pCachedEntVarsPtr = nullptr;
+static std::atomic<entvars_t *> g_pCachedEntVarsPtr(nullptr);
 // operator new -> CBaseEntity()
 static std::mutex g_CreateEntityLock;
 
-static std::atomic<bool> g_bDontDestruct = false;
+static std::atomic<bool> g_bDontDestruct(false);
 // ~CBaseEntity() -> operator delete
 static std::mutex g_RemoveEntityLock;
 

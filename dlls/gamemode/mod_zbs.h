@@ -13,7 +13,7 @@
 class CZombieSpawn;
 class CMonster;
 
-class CMod_ZombieScenario : public IBaseMod_RemoveObjects
+class CMod_ZombieScenario : public TBaseMod_RemoveObjects<>
 {
 public:
 	CMod_ZombieScenario();

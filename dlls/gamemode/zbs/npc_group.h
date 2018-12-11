@@ -3,6 +3,8 @@
 #include <memory>
 
 class CHostageImprov;
+class CNpcGroup;
+class CNpcGroupMember;
 
 class CNpcGroup : public std::enable_shared_from_this<CNpcGroup>
 {

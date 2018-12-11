@@ -24,7 +24,7 @@ CMod_Zombi::CMod_Zombi() // precache
 
 void CMod_Zombi::CheckMapConditions()
 {
-	IBaseMod_RemoveObjects::CheckMapConditions();
+	Base::CheckMapConditions();
 	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
 //	CVAR_SET_FLOAT("sv_skycolor_r", 150);
 //	CVAR_SET_FLOAT("sv_skycolor_g", 150);

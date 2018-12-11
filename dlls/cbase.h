@@ -316,6 +316,9 @@ public:
 	int entindex(void) { return ENTINDEX(edict()); }
 
 public:
+#ifndef CLIENT_DLL
+	// cbase_memory.cpp
+
 	// allocate memory for CBaseEntity with given pev
 	void *operator new(size_t stAllocateBlock, entvars_t *newpev);
 	// free pev  when constructor throws, etc... 
@@ -324,6 +327,7 @@ public:
 	void *operator new(size_t stAllocateBlock);
 	// auto remove entity...
 	void operator delete(void *pMem);
+#endif
 
 public:
 	template <typename T>
