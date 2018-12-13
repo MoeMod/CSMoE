@@ -68,6 +68,7 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireScarH);
 	DECLARE_EVENT(FireScarL);
 	DECLARE_EVENT(FireCannon);
+	DECLARE_EVENT(FireK1a);
 /*
 ======================
 Game_HookEvents
@@ -131,4 +132,5 @@ void Game_HookEvents( void )
 	HOOK_EVENT(scarh, FireScarH);
 	HOOK_EVENT(scarl, FireScarL);
 	HOOK_EVENT(cannon, FireCannon);
+	HOOK_EVENT(k1a, FireK1a);
 }
