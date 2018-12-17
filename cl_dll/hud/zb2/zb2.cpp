@@ -43,7 +43,9 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	}
 	case ZB2_MESSAGE_SKILL_INIT:
 	{
-		ZombieClassType zclass = static_cast<ZombieClassType>(buf.ReadByte());
+		ZombieClassType zclass = ZOMBIE_CLASS_HUMAN;
+		if(!buf.Eof())
+			zclass = static_cast<ZombieClassType>(buf.ReadByte());
 		ZombieSkillType skills[4]{};
 		for (int i = 0; i < 4 && !buf.Eof(); ++i)
 			skills[i] = static_cast<ZombieSkillType>(buf.ReadByte());
