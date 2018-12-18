@@ -12,8 +12,16 @@
 
 struct CHudZB2_Skill::Config
 {
-	static constexpr const char *ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL] =
-	{
+	static const char * const ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL];
+	static const char * const ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL];
+	static const char * const ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS];
+	static const char * const ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL];
+	static const char * const ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS];
+	static const char * const ZOMBIE_ITEM_HUD_ICON[2][3];
+};
+
+const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL] =
+{
 		"", // ZOMBIE_SKILL_EMPTY
 		"zombiFCT2", // ZOMBIE_SKILL_SPRINT
 		"zombiICT", // ZOMBIE_SKILL_HEADSHOT
@@ -25,10 +33,10 @@ struct CHudZB2_Skill::Config
 		"zombiheal", // ZOMBIE_SKILL_HEAL,
 		"zombideimos", // ZOMBIE_SKILL_SHOCK,
 		"zombicrazy2" // ZOMBIE_SKILL_CRAZY2,
-	};
+};
 
-	static constexpr const char *ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL] =
-	{
+const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL] =
+{
 		"", // ZOMBIE_SKILL_EMPTY
 		"", // ZOMBIE_SKILL_SPRINT
 		"", // ZOMBIE_SKILL_HEADSHOT
@@ -40,10 +48,10 @@ struct CHudZB2_Skill::Config
 		"resource/helperhud/heal", // ZOMBIE_SKILL_HEAL,
 		"resource/helperhud/tentacle", // ZOMBIE_SKILL_SHOCK,
 		"resource/helperhud/crazyspeed" // ZOMBIE_SKILL_CRAZY2,
-	};
+};
 
-	static constexpr const char *ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
-	{
+const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
+{
 		"", // ZOMBIE_CLASS_HUMAN
 		"", // ZOMBIE_CLASS_TANK,
 		"zombiDTER", // ZOMBIE_CLASS_SPEED,
@@ -52,10 +60,10 @@ struct CHudZB2_Skill::Config
 		"zombiGTER", // ZOMBIE_CLASS_HEAL,
 		"zombiITER", // ZOMBIE_CLASS_DEIMOS,
 		"zombiJTER", // ZOMBIE_CLASS_DEIMOS2,
-	};
+};
 
-	static constexpr const char *ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL] =
-	{
+const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL] =
+{
 		"", // ZOMBIE_SKILL_EMPTY
 		"resource/zombi/humanskill_hm_spd", // ZOMBIE_SKILL_SPRINT
 		"resource/zombi/humanskill_hm_hd", // ZOMBIE_SKILL_HEADSHOT
@@ -67,10 +75,10 @@ struct CHudZB2_Skill::Config
 		"resource/zombi/zombieskill_zombiheal", // ZOMBIE_SKILL_HEAL,
 		"resource/zombi/zombieskill_zombideimos", // ZOMBIE_SKILL_SHOCK,
 		"resource/zombi/zombieskill_zombicrazy2" // ZOMBIE_SKILL_CRAZY2,
-	};
+};
 
-	static constexpr const char *ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
-	{
+const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
+{
 		"", // ZOMBIE_CLASS_HUMAN
 		"resource/zombi/zombietype_defaultzb", // ZOMBIE_CLASS_TANK,
 		"resource/zombi/zombietype_lightzb", // ZOMBIE_CLASS_SPEED,
@@ -79,23 +87,22 @@ struct CHudZB2_Skill::Config
 		"resource/zombi/zombietype_doctorzb", // ZOMBIE_CLASS_HEAL,
 		"resource/zombi/zombietype_deimoszb", // ZOMBIE_CLASS_DEIMOS,
 		"resource/zombi/zombietype_deimos2zb", // ZOMBIE_CLASS_DEIMOS2,
-	};
+};
 
-	static constexpr const char *ZOMBIE_ITEM_HUD_ICON[2][3] =
-	{
+const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =
+{
 		{ "zombiACT", "zombiBCT", "zombiHCT" },
 		{ "zombiATER", "zombiBTER", "zombiHTER" }
-	};
 };
 
 CHudZB2_Skill::CHudZB2_Skill(void) :  // 0-init
-	m_flRecoveryBeginTime(0.0f),
 	m_HUD_zombirecovery(0),
 	m_HUD_zombieGKey(0),
 	m_HUD_SkillIcons{},
-	m_ZombieSkillHudIcons{},
 	m_HUD_ClassIcons{},
-	m_iCurrentClass(ZOMBIE_CLASS_HUMAN)
+	m_flRecoveryBeginTime(0.0f),
+	m_iCurrentClass(ZOMBIE_CLASS_HUMAN),
+	m_ZombieSkillHudIcons{}
 {
 	
 }
@@ -352,16 +359,16 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				skillicon->Bind();
 
 				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-				// ¨I (x1, y1)
+				// ï¿½I (x1, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(0, 0);
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, y * gHUD.m_flScale, 0);
-				// ¨L (x1, y2)
+				// ï¿½L (x1, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(0, (1.0f - flPercent));
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// ¨K (x2, y2)
+				// ï¿½K (x2, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
 				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// ¨J (x2, y1)
+				// ï¿½J (x2, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(1, 0);
 				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, y * gHUD.m_flScale, 0);
 				gEngfuncs.pTriAPI->End();
@@ -371,16 +378,16 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				skillicon->Bind();
 
 				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-				// ¨I (x1, y1)
+				// ï¿½I (x1, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(0, (1.0f - flPercent));
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// ¨L (x1, y2)
+				// ï¿½L (x1, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, (y + skillicon->h()) * gHUD.m_flScale, 0);
-				// ¨K (x2, y2)
+				// ï¿½K (x2, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
 				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, (y + skillicon->h()) * gHUD.m_flScale, 0);
-				// ¨J (x2, y1)
+				// ï¿½J (x2, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
 				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
 				gEngfuncs.pTriAPI->End();
