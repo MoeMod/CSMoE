@@ -46,6 +46,12 @@
     <Filter Include="dlls\gamemode\zb2">
       <UniqueIdentifier>{bfe516c8-2205-4872-a2be-cd1c32c09097}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\hud\legacy">
+      <UniqueIdentifier>{01673bc5-d5f2-4b53-af8e-0b049595122e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cl_dll\hud\modern">
+      <UniqueIdentifier>{b34175f4-b656-4d88-9c40-4e9c0931ca86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -534,6 +540,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\legacy\hud_radar_legacy.cpp">
+      <Filter>cl_dll\hud\legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\modern\hud_radar_modern.cpp">
+      <Filter>cl_dll\hud\modern</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -772,6 +784,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\legacy\hud_radar_legacy.h">
+      <Filter>cl_dll\hud\legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\radar.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\modern\hud_radar_modern.h">
+      <Filter>cl_dll\hud\modern</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -93,8 +93,10 @@
     <ClCompile Include="..\cl_dll\hud\hud_redraw.cpp" />
     <ClCompile Include="..\cl_dll\hud\hud_spectator.cpp" />
     <ClCompile Include="..\cl_dll\hud\hud_update.cpp" />
+    <ClCompile Include="..\cl_dll\hud\legacy\hud_radar_legacy.cpp" />
     <ClCompile Include="..\cl_dll\hud\menu.cpp" />
     <ClCompile Include="..\cl_dll\hud\message.cpp" />
+    <ClCompile Include="..\cl_dll\hud\modern\hud_radar_modern.cpp" />
     <ClCompile Include="..\cl_dll\hud\money.cpp" />
     <ClCompile Include="..\cl_dll\hud\MOTD.cpp" />
     <ClCompile Include="..\cl_dll\hud\nvg.cpp" />
@@ -188,6 +190,9 @@
     <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
     <ClInclude Include="..\cl_dll\hud\hud_sub.h" />
+    <ClInclude Include="..\cl_dll\hud\legacy\hud_radar_legacy.h" />
+    <ClInclude Include="..\cl_dll\hud\modern\hud_radar_modern.h" />
+    <ClInclude Include="..\cl_dll\hud\radar.h" />
     <ClInclude Include="..\cl_dll\hud\retina.h" />
     <ClInclude Include="..\cl_dll\hud\scenariostatus.h" />
     <ClInclude Include="..\cl_dll\hud\zb2\zb2.h" />
