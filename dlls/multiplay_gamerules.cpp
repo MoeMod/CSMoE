@@ -3744,6 +3744,9 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	if (!Q_strncmp(killer_weapon_name, "weapon_", 7))
 		killer_weapon_name += 7;
 
+	else if (!Q_strncmp(killer_weapon_name, "knife_", 6))
+		killer_weapon_name += 6;
+
 	else if (!Q_strncmp(killer_weapon_name, "monster_", 8))
 		killer_weapon_name += 8;
 

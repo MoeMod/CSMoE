@@ -1229,18 +1229,19 @@ void CBasePlayer::GiveDefaultItems()
 		switch (m_iTeam)
 		{
 		case CT:
-			GiveNamedItem("weapon_knife");
+			//GiveNamedItem("weapon_knife");
 			GiveNamedItem("weapon_usp");
 			GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 			break;
 		case TERRORIST:
-			GiveNamedItem("weapon_knife");
+			//GiveNamedItem("weapon_knife");
 			GiveNamedItem("weapon_glock18");
 			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 			break;
 		}
+		GiveNamedItem("knife_skullaxe");
 		GiveNamedItem("weapon_cannon");
 	}
 }

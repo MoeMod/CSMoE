@@ -488,7 +488,8 @@ int CKnife::Stab(int fFirst)
 			Vector2D vec2LOS;
 			Vector vecForward = gpGlobals->v_forward;
 
-			UTIL_MakeVectors(m_pPlayer->pev->angles);
+			// ???
+			UTIL_MakeVectors(pEntity->pev->angles);
 
 			vec2LOS = vecForward.Make2D();
 			vec2LOS = vec2LOS.Normalize();

@@ -546,6 +546,15 @@
     <ClCompile Include="..\cl_dll\hud\modern\hud_radar_modern.cpp">
       <Filter>cl_dll\hud\modern</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_k1a.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -793,6 +802,9 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\modern\hud_radar_modern.h">
       <Filter>cl_dll\hud\modern</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

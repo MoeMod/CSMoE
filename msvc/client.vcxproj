@@ -48,6 +48,7 @@
     <ClCompile Include="..\cl_dll\events\event_g3sg1.cpp" />
     <ClCompile Include="..\cl_dll\events\event_galil.cpp" />
     <ClCompile Include="..\cl_dll\events\event_glock18.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_k1a.cpp" />
     <ClCompile Include="..\cl_dll\events\event_knife.cpp" />
     <ClCompile Include="..\cl_dll\events\event_kriss.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m1887.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="..\cl_dll\vgui_parser.cpp" />
     <ClCompile Include="..\cl_dll\view.cpp" />
     <ClCompile Include="..\common\interface.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
@@ -152,6 +154,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_galil.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_glock18.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_hegrenade.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
@@ -230,6 +233,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_galil.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />

@@ -613,6 +613,12 @@
     <ClCompile Include="..\dlls\cbase\cbase_memory.cpp">
       <Filter>dlls\cbase</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1301,6 +1307,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\cbase\cbase_memory.h">
       <Filter>dlls\cbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

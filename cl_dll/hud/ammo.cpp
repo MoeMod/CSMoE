@@ -144,6 +144,25 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
+
+	if (!strncmp(pWeapon->szName, "knife_", 6))
+	{
+		char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
+		char szSpriteName[32]{};
+		int x, y, w, h;
+		if (sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+		{
+			sprintf(sz, "sprites/%s.spr", szSpriteName);
+			pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);
+			pWeapon->rcInactive = pWeapon->rcActive = { x, x + w, y, y + h };
+
+			gHR.iHistoryGap = max(gHR.iHistoryGap, pWeapon->rcActive.bottom - pWeapon->rcActive.top);
+		}
+
+		gEngfuncs.COM_FreeFile(buffer);
+		return;
+	}
+
 	client_sprite_t *pList = SPR_GetList(sz, &i);
 
 	if (!pList)
