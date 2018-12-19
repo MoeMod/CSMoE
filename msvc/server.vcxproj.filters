@@ -619,6 +619,9 @@
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1309,6 +1312,9 @@
       <Filter>dlls\cbase</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
