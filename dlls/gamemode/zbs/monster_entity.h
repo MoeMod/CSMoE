@@ -42,7 +42,8 @@ public:
 	virtual void OnThink() = 0;
 	virtual void OnKilled(entvars_t *pKiller, int iGib) = 0;
 
-	virtual void DeathSound() = 0;
+	virtual void DeathSound() const = 0;
+	virtual bool IsTeamMate(CBaseEntity *that) const = 0;
 };
 
 inline IBaseMonsterStrategy::~IBaseMonsterStrategy() {}
@@ -56,7 +57,8 @@ public:
 	void OnThink() override;
 	void OnKilled(entvars_t *pKiller, int iGib) override;
 
-	void DeathSound() override;
+	void DeathSound() const override;
+	bool IsTeamMate(CBaseEntity *that) const override { return false; }
 };
 
 class CMonster : public CHostage
@@ -81,16 +83,20 @@ public:
 	void EXPORT IdleThink();
 	void Remove();
 
-	CBaseEntity *FindTarget();
 	void Wander();
-	CBaseEntity *CheckAttack();
+	
 	CBaseEntity *CheckTraceHullAttack(float flDist, int iDamage, int iDmgType);
-	bool ShouldAttack(CBaseEntity *target);
+	bool ShouldAttack(CBaseEntity *target) const;
 
-	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
-	void CheckTarget();
-	CBasePlayer *GetClosestPlayer(bool bVisible);
+
+	bool CheckTarget();
+	bool CheckAttack();
+	bool CheckSequence();
+
+	// pTarget, bCanSee
+	std::pair<CBasePlayer *, bool> FindTarget() const;
+	CBasePlayer *GetClosestPlayer(bool bVisible) const;
 
 public:
 	float m_flAttackDist;
