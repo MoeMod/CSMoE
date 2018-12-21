@@ -252,6 +252,117 @@ public:
 
 		m_moveFlags = 0;
 	}
+
+	void OnTouch(CBaseEntity *other) override
+	{
+		m_collisionTimer.Start();
+
+		if (FClassnameIs(other->pev, "worldspawn"))
+		{
+			const float lookAheadRange = 30.0f;
+			float ground;
+			Vector normal = Vector(0, 0, 1);
+			Vector alongFloor;
+			TraceResult result;
+			bool isStep = false;
+
+			UTIL_MakeVectors(m_hostage->pev->angles);
+
+			if (!GetSimpleGroundHeightWithFloor(&GetEyes(), &ground, &normal))
+				return;
+
+			if (cv_hostage_debug.value < 0.0)
+			{
+				UTIL_DrawBeamPoints(GetFeet() + normal * 50, GetFeet(), 2, 255, 255, 0);
+			}
+
+			alongFloor = CrossProduct(normal, gpGlobals->v_right);
+
+			Vector pos = alongFloor * lookAheadRange;
+
+			for (double offset = 1.0f; offset <= 18.0f; offset += 3.0f)
+			{
+				Vector vecStart = GetFeet();
+				vecStart.z += offset;
+
+				UTIL_TraceLine(vecStart, vecStart + pos, ignore_monsters, dont_ignore_glass, m_hostage->pev->pContainingEntity, &result);
+
+				if (result.flFraction < 1.0f && result.vecPlaneNormal[2] < 0.7f)
+				{
+					isStep = true;
+					break;
+				}
+			}
+
+			if (isStep)
+			{
+				float stepAheadGround = pos.z;
+				Vector stepAheadNormal = Vector(0, 0, stepAheadGround);
+
+				m_inhibitObstacleAvoidance.Start(0.5);
+
+				for (float range = 1.0f; range <= 30.5f; range += 5.0f)
+				{
+					Vector stepAhead = GetFeet() + alongFloor * range;
+					stepAhead.z = GetEyes().z;
+
+					if (GetSimpleGroundHeightWithFloor(&stepAhead, &stepAheadGround, &stepAheadNormal))
+					{
+						float dz = stepAheadGround - GetFeet().z;
+
+						if (dz > 0.0f && dz < 18.0f)
+						{
+							m_hostage->pev->origin.z = stepAheadGround + 3.0f;
+							break;
+						}
+					}
+				}
+			}
+			else if (!IsMoving() && !IsUsingLadder())
+			{
+				bool isSeam = false;
+				const float checkSeamRange = 50.0f;
+				Vector posBehind;
+
+				posBehind = GetEyes() - alongFloor * checkSeamRange;
+				UTIL_TraceLine(posBehind, posBehind - Vector(0, 0, 9999), ignore_monsters, dont_ignore_glass, m_hostage->pev->pContainingEntity, &result);
+
+				if (result.flFraction < 1.0f && DotProduct(result.vecPlaneNormal, normal) < 1.0f)
+				{
+					isSeam = true;
+				}
+				else
+				{
+					Vector posAhead = GetEyes() + alongFloor * checkSeamRange;
+					UTIL_TraceLine(posAhead, posAhead - Vector(0, 0, 9999), ignore_monsters, dont_ignore_glass, m_hostage->pev->pContainingEntity, &result);
+
+					if (result.flFraction < 1.0f && DotProduct(result.vecPlaneNormal, normal) < 1.0f)
+						isSeam = true;
+				}
+
+				if (isSeam)
+				{
+					if (cv_hostage_debug.value != 0.0)
+					{
+						CONSOLE_ECHO("Hostage stuck on seam.\n");
+					}
+
+					const float nudge = 3.0f;
+					m_hostage->pev->origin.z += nudge;
+				}
+			}
+		}
+		else if (FClassnameIs(other->pev, STRING(m_hostage->pev->classname)))
+		{
+			const float pushForce = 10.0f;
+			Vector2D to = (m_hostage->pev->origin - other->pev->origin).Make2D();
+			to.NormalizeInPlace();
+
+			m_vel.x += to.x * pushForce;
+			m_vel.y += to.y * pushForce;
+		}
+	}
+
 	std::atomic<bool> m_bCalculatingPath;
 	std::future<bool> m_fbCalcPathResult;
 };
@@ -376,26 +487,28 @@ void CMonster::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 
 void CMonster::Touch(CBaseEntity *pOther)
 {
-	//return CHostage::Touch(pOther);
-
-	if (pOther->IsPlayer())
-		return; // attack???
-
-	if (!FClassnameIs(pOther->pev, "monster_entity"))
-		return;
-
 	if (m_improv != NULL)
 	{
 		m_improv->OnTouch(pOther);
-
-		/*if (static_cast<CHostage *>(pOther)->m_hTargetEnt->entindex() != m_hTargetEnt->entindex() && gpGlobals->time > m_flTargetChange)
-		{
-			m_flTargetChange = gpGlobals->time + 2.0f;
-			static_cast<CHostage *>(pOther)->m_hTargetEnt = m_hTargetEnt;
-		}*/
-
-		return;
 	}
+}
+
+float CMonster::GetModifiedDamage(float flDamage, int nHitGroup) const
+{
+	switch (nHitGroup)
+	{
+		case HITGROUP_GENERIC: flDamage *= 1; break;
+		case HITGROUP_HEAD: flDamage *= 4; break;
+		case HITGROUP_CHEST: flDamage *= 1; break;
+		case HITGROUP_STOMACH: flDamage *= 1.25; break;
+		case HITGROUP_LEFTARM:
+		case HITGROUP_RIGHTARM: flDamage *= 1; break;
+		case HITGROUP_LEFTLEG:
+		case HITGROUP_RIGHTLEG: flDamage *= 0.75; break;
+		default: flDamage *= 1; break;
+	}
+
+	return flDamage;
 }
 
 int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
@@ -588,10 +701,15 @@ bool CMonster::CheckTarget()
 
 		CBasePlayer *player = result.first;
 
-		if (result.second)
+		if(!player)
+		{
+			Wander();
+			m_hTargetEnt = player;
+		}
+		else if (result.second)
 		{
 			m_improv->Follow(player);
-			m_improv->SetFollowRange(9.9999998e10f, 3000.0f, 20.0f);
+			m_improv->SetFollowRange(6000.0f, 3000.0f, 20.0f);
 			m_hTargetEnt = player;
 		}
 		else
@@ -599,9 +717,6 @@ bool CMonster::CheckTarget()
 			m_hTargetEnt = player;
 			m_improv->MoveTo(player->Center());
 		}
-
-		if(!m_hTargetEnt)
-			Wander();
 
 		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
 		return result.second;
@@ -617,8 +732,8 @@ bool CMonster::CheckTarget()
 
 std::pair<CBasePlayer *, bool> CMonster::FindTarget() const
 {
-	std::future<CBasePlayer *> fpNear = std::async(std::launch::async, &CMonster::GetClosestPlayer, this, true);
-	std::future<CBasePlayer *> fpFar = std::async(std::launch::async, &CMonsterImprov::GetClosestPlayerByTravelDistance, m_improv, UNASSIGNED, nullptr);
+	std::future<CBasePlayer *> fpNear = std::async(&CMonster::GetClosestPlayer, this, true);
+	std::future<CBasePlayer *> fpFar = std::async(&CMonsterImprov::GetClosestPlayerByTravelDistance, m_improv, UNASSIGNED, nullptr);
 
 	CBasePlayer *player = nullptr;
 
@@ -720,6 +835,9 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 	if (anim != MONSTERANIM_FLINCH && anim != MONSTERANIM_LARGE_FLINCH && m_flFlinchTime > gpGlobals->time && pev->health > 0.0f)
 		return;
+
+	// may be called from both CheckAttack and CheckSequence
+	std::lock_guard<std::mutex> lock(m_mutexSetAnimation);
 
 	speed = pev->velocity.Length2D();
 
@@ -983,13 +1101,7 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		if (animDesired == -1)
 			animDesired = 0;
 
-		if (pev->sequence != animDesired)
-		{
-			pev->sequence = animDesired;
-			pev->frame = 0.0f;
-			ResetSequenceInfo();
-		}
-		return;
+		break;
 	}
 	default:
 	{
@@ -999,14 +1111,7 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		m_Activity = m_IdealActivity;
 		animDesired = LookupActivity(m_IdealActivity);
 
-		if (pev->sequence != animDesired)
-		{
-			pev->sequence = animDesired;
-			pev->frame = 0;
-
-			ResetSequenceInfo();
-		}
-		return;
+		break;
 	}
 	}
 	
@@ -1018,6 +1123,18 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		ResetSequenceInfo();
 	}
 
+}
+
+int CMonster::LookupSequence(const char *label)
+{
+	// only called from SetAnimation, no need to lock...
+
+	auto iter = m_mapLookupSequenceCache.find(label);
+	if(iter != m_mapLookupSequenceCache.end())
+	{
+		iter = m_mapLookupSequenceCache.emplace(label, CBaseAnimating::LookupSequence(label)).first;
+	}
+	return iter->second;
 }
 
 CBaseEntity *CMonster::CheckTraceHullAttack(float flDist, int iDamage, int iDmgType)

@@ -175,6 +175,7 @@ set(HLDLL_SRCS
 
 file (GLOB HLWPN_SRCS
 	./wpn_shared/wpn_*.cpp
+	./wpn_shared/knife_*.cpp
 	)
 
 set(PM_SRCS

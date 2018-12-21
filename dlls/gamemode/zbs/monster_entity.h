@@ -7,6 +7,9 @@
 
 #include "hostage/hostage.h"
 #include <memory>
+#include <map>
+#include <string>
+#include <mutex>
 
 enum MonsterAnim
 {
@@ -80,6 +83,9 @@ public:
 	~CMonster();
 
 public:
+	int LookupSequence(const char *label);
+
+public:
 	void EXPORT IdleThink();
 	void Remove();
 
@@ -94,9 +100,11 @@ public:
 	bool CheckAttack();
 	bool CheckSequence();
 
+protected:
 	// pTarget, bCanSee
 	std::pair<CBasePlayer *, bool> FindTarget() const;
 	CBasePlayer *GetClosestPlayer(bool bVisible) const;
+	float GetModifiedDamage(float flDamage, int nHitGroup) const;
 
 public:
 	float m_flAttackDist;
@@ -107,6 +115,9 @@ public:
 	int m_iKillBonusFrags;
 	float m_flTimeLastActive;
 	float m_flTargetChange;
+
+	std::map<std::string, int> m_mapLookupSequenceCache;
+	std::mutex m_mutexSetAnimation;
 
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;

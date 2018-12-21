@@ -404,7 +404,7 @@ int CHudRadarModern::Draw(float time)
 			else
 			{
 				valid = true;
-				origin = &Vector(ent->origin);
+				origin = &ent->origin;
 			}
 
 			if (!CalcPoint(*origin, rx, ry, scale))
@@ -464,7 +464,7 @@ int CHudRadarModern::Draw(float time)
 				else
 				{
 					valid = true;
-					origin = &Vector(ent->origin);
+					origin = &ent->origin;
 				}
 
 				if (!CalcPoint(*origin, rx, ry, scale))
@@ -523,7 +523,7 @@ int CHudRadarModern::Draw(float time)
 			else
 			{
 				valid = true;
-				origin = &Vector(ent->origin);
+				origin = &ent->origin;
 			}
 
 			if (!CalcPoint(*origin, rx, ry, scale))

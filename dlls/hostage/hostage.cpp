@@ -73,7 +73,7 @@ LINK_ENTITY_TO_CLASS(hostage_entity, CHostage);
 
 LINK_ENTITY_TO_CLASS(monster_scientist, CHostage);
 
-CHostage::CHostage() : m_LocalNav(nullptr), m_improv(nullptr), m_target(nullptr) 
+CHostage::CHostage()
 {
 
 }

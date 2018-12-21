@@ -70,6 +70,7 @@ file (GLOB CLWEAPON_SRCS
 	./cs_wpn/cs_weapons.cpp
 	./cs_wpn/bte_weapons.cpp
 	../dlls/wpn_shared/wpn_*.cpp
+	../dlls/wpn_shared/knife_*.cpp
 )
 
 set (HUD_SRCS
@@ -113,6 +114,8 @@ set (HUD_SRCS
 	./hud/scenariostatus.cpp
 	./hud/zb2/zb2.cpp
 	./hud/zb2/zb2_skill.cpp
+	./hud/legacy/hud_radar_legacy.cpp
+	./hud/modern/hud_radar_modern.cpp
 )
 
 set (STUDIORENDER_SRCS

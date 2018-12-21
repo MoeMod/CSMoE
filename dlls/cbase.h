@@ -147,7 +147,6 @@ private:
 	int m_serialnumber;
 };
 
-#include "cbase/cbase_memory.h"
 #include "ruleof350.h"
 #include <functional> // why not use c++11 std::function?
 
@@ -162,7 +161,7 @@ public:
 #else
 public:
 	CBaseEntity() = default;
-	virtual ~CBaseEntity() = default;
+	~CBaseEntity() = default;
 #endif
 
 public:
@@ -315,12 +314,13 @@ public:
 	EOFFSET eoffset(void) { return OFFSET(pev); }
 	int entindex(void) { return ENTINDEX(edict()); }
 
-public:
+
 #ifndef CLIENT_DLL
+public:
 	// cbase_memory.cpp
 
 	// allocate memory for CBaseEntity with given pev
-	void *operator new(size_t stAllocateBlock, entvars_t *newpev);
+	void *operator new(size_t stAllocateBlock, entvars_t *newpev) noexcept;
 	// free pev  when constructor throws, etc... 
 	void operator delete(void *pMem, entvars_t *pev);
 	// automatically allocate pev
@@ -377,8 +377,8 @@ public:
 #else
 	entvars_t * const pev;
 #endif
-	CBaseEntity *m_pGoalEnt = nullptr;
-	CBaseEntity *m_pLink = nullptr;
+	CBaseEntity *m_pGoalEnt;
+	CBaseEntity *m_pLink;
 	std::function<void()> m_pfnThink;
 	std::function<void(CBaseEntity *pOther)> m_pfnTouch;
 	std::function<void(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> m_pfnUse;
@@ -411,7 +411,7 @@ public:
 	bool has_disconnected;
 };
 
-
+#include "cbase/cbase_memory.h"
 
 class CPointEntity : public CBaseEntity
 {
