@@ -70,6 +70,7 @@ void CHudRadar::Reset()
 			g_HostageInfo[i].dead = true;
 		}
 	}
+	pimpl->for_each(&IBaseHudSub::Reset);
 }
 
 void CHudRadar::InitHUDData(void)

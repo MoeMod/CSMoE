@@ -294,7 +294,7 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 		if (time > icon.m_flTimeSkillBlink)
 			continue;
 		auto &tex = m_pTexture_SkillTips[icon.m_iCurrentSkill];
-		if (!tex || !tex->IsValid())
+		if (!tex)
 			continue;
 
 		int w = tex->w();
@@ -323,7 +323,7 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 
 	x -= m_pTexture_skillslotbg->w() / 2;
 	const auto &classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
-	if (classicon != nullptr && classicon->IsValid() && m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
+	if (classicon != nullptr && m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 	{
 		x -= (classicon->w() + 4) / 2;
 		
