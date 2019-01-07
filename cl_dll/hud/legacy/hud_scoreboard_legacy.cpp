@@ -235,6 +235,11 @@ void CHudScoreBoardLegacy::Reset(void)
 		m_iBGIndex = -1;
 		break;
 	}
+	default:
+	{
+		// shut clang warnings
+		break;
+	}
 	}
 }
 
