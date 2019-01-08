@@ -103,6 +103,10 @@ USE_TYPE;
 
 extern void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 
+typedef void (CBaseEntity::*BASEPTR)(void);
+typedef void (CBaseEntity::*ENTITYFUNCPTR)(CBaseEntity *pOther);
+typedef void (CBaseEntity::*USEPTR)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+
 #define CLASS_NONE 0
 #define CLASS_MACHINE 1
 #define CLASS_PLAYER 2
@@ -241,10 +245,10 @@ public:
 	virtual CBaseEntity *GetNextTarget(void);
 #endif
 
-	virtual void Think(void) { if (m_pfnThink) m_pfnThink(); }
-	virtual void Touch(CBaseEntity *pOther) { if (m_pfnTouch) m_pfnTouch(pOther); }
-	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) { if (m_pfnUse) m_pfnUse(pActivator, pCaller, useType, value); }
-	virtual void Blocked(CBaseEntity *pOther) { if (m_pfnBlocked) m_pfnBlocked(pOther); }
+	virtual void Think(void) { if (m_pfnThink) (this->*m_pfnThink)(); }
+	virtual void Touch(CBaseEntity *pOther) { if (m_pfnTouch) (this->*m_pfnTouch)(pOther); }
+	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) { if (m_pfnUse) (this->*m_pfnUse)(pActivator, pCaller, useType, value); }
+	virtual void Blocked(CBaseEntity *pOther) { if (m_pfnBlocked) (this->*m_pfnBlocked)(pOther); }
 	virtual CBaseEntity *Respawn(void) { return NULL; }
 	virtual void UpdateOwner(void) {}
 	virtual BOOL FBecomeProne(void) { return FALSE; }
@@ -321,52 +325,13 @@ public:
 
 	// allocate memory for CBaseEntity with given pev
 	void *operator new(size_t stAllocateBlock, entvars_t *newpev) noexcept;
-	// free pev  when constructor throws, etc... 
+	// free pev  when constructor throws, etc...
 	void operator delete(void *pMem, entvars_t *pev);
 	// automatically allocate pev
 	void *operator new(size_t stAllocateBlock);
 	// auto remove entity...
 	void operator delete(void *pMem);
 #endif
-
-public:
-	template <typename T>
-	void SetThink(void (T::*pfn)())
-	{
-		SetThink(std::bind(static_cast<void (CBaseEntity::*)()>(pfn), this));
-	}
-	void SetThink(std::function<void()> f)
-	{
-		m_pfnThink = f;
-	}
-	template <typename T>
-	void SetTouch(void (T::*pfn)(CBaseEntity *pOther))
-	{
-		SetTouch(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pOther)>(pfn), this, std::placeholders::_1));
-	}
-	void SetTouch(std::function<void(CBaseEntity *pOther)> f)
-	{
-		m_pfnTouch = f;
-	}
-	template <typename T>
-	void SetUse(void (T::*pfn)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value))
-	{
-		SetUse(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)>(pfn), this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-	}
-	void SetUse(std::function<void (CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> f)
-	{
-		m_pfnUse = f;
-	}
-	template <typename T>
-	void SetBlocked(void (T::*pfn)(CBaseEntity *pOther))
-	{
-		SetBlocked(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pOther)>(pfn), this, std::placeholders::_1));
-	}
-
-	void SetBlocked(std::function<void(CBaseEntity *pOther)> f)
-	{
-		m_pfnBlocked = f;
-	}
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
@@ -379,10 +344,10 @@ public:
 #endif
 	CBaseEntity *m_pGoalEnt;
 	CBaseEntity *m_pLink;
-	std::function<void()> m_pfnThink;
-	std::function<void(CBaseEntity *pOther)> m_pfnTouch;
-	std::function<void(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> m_pfnUse;
-	std::function<void(CBaseEntity *pOther)> m_pfnBlocked;
+	void (CBaseEntity::*m_pfnThink)(void);
+	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
+	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
 	int current_ammo;
 	int currentammo;
 	int maxammo_buckshot;
@@ -411,6 +376,15 @@ public:
 	bool has_disconnected;
 };
 
+
+#define SetThink(a)\
+	m_pfnThink = static_cast<void (CBaseEntity::*)()>(a)
+#define SetTouch(a)\
+	m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
+#define SetUse(a)\
+	m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(a)
+#define SetBlocked(a)\
+	m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
 #include "cbase/cbase_memory.h"
 
 class CPointEntity : public CBaseEntity
