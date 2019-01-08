@@ -111,8 +111,8 @@ public:
 	void WeaponIdle() override;
 
 public:
-	int DelayedPrimaryAttack(int fFirst);
-	int DelayedSecondaryAttack(int fFirst);
+	void DelayedPrimaryAttack();
+	void DelayedSecondaryAttack();
 	float GetPrimaryAttackDamage() const
 	{ 
 		float flDamage = 100;
@@ -148,7 +148,7 @@ void CKnifeSkullAxe::PrimaryAttack(void)
 #endif
 	SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
 
-	SetThink([=]() {DelayedPrimaryAttack(TRUE); });
+	SetThink(&CKnifeSkullAxe::DelayedPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4;
@@ -162,7 +162,7 @@ void CKnifeSkullAxe::SecondaryAttack(void)
 #endif
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
-	SetThink([=]() {DelayedSecondaryAttack(TRUE); });
+	SetThink(&CKnifeSkullAxe::DelayedSecondaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4;
@@ -299,7 +299,7 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 }
 #endif
 
-int CKnifeSkullAxe::DelayedPrimaryAttack(int fFirst)
+void CKnifeSkullAxe::DelayedPrimaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -343,10 +343,10 @@ int CKnifeSkullAxe::DelayedPrimaryAttack(int fFirst)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
 	SetThink(nullptr);
 
-	return fDidHit;
+	//return fDidHit;
 }
 
-int CKnifeSkullAxe::DelayedSecondaryAttack(int fFirst)
+void CKnifeSkullAxe::DelayedSecondaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -384,5 +384,5 @@ int CKnifeSkullAxe::DelayedSecondaryAttack(int fFirst)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
 	SetThink(nullptr);
 
-	return fDidHit;
+	//return fDidHit;
 }

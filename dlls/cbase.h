@@ -103,10 +103,6 @@ USE_TYPE;
 
 extern void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 
-typedef void (CBaseEntity::*BASEPTR)(void);
-typedef void (CBaseEntity::*ENTITYFUNCPTR)(CBaseEntity *pOther);
-typedef void (CBaseEntity::*USEPTR)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-
 #define CLASS_NONE 0
 #define CLASS_MACHINE 1
 #define CLASS_PLAYER 2
@@ -332,6 +328,43 @@ public:
 	// auto remove entity...
 	void operator delete(void *pMem);
 #endif
+public:
+	template <typename T>
+	auto SetThink(void (T::*pfn)()) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
+	{
+		m_pfnThink = static_cast<void (CBaseEntity::*)()>(pfn);
+	}
+	void SetThink(std::nullptr_t null)
+	{
+		m_pfnThink = null;
+	}
+	template <typename T>
+	auto SetTouch(void (T::*pfn)(CBaseEntity *pOther)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
+	{
+		m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(pfn);
+	}
+	void SetTouch(std::nullptr_t null)
+	{
+		m_pfnThink = null;
+	}
+	template <typename T>
+	auto SetUse(void (T::*pfn)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
+	{
+		m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(pfn);
+	}
+	void SetUse(std::nullptr_t null)
+	{
+		m_pfnThink = null;
+	}
+	template <typename T>
+	auto SetBlocked(void (T::*pfn)(CBaseEntity *pOther)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
+	{
+		m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(pfn);
+	}
+	void SetBlocked(std::nullptr_t null)
+	{
+		m_pfnThink = null;
+	}
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
@@ -376,15 +409,6 @@ public:
 	bool has_disconnected;
 };
 
-
-#define SetThink(a)\
-	m_pfnThink = static_cast<void (CBaseEntity::*)()>(a)
-#define SetTouch(a)\
-	m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
-#define SetUse(a)\
-	m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(a)
-#define SetBlocked(a)\
-	m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(a)
 #include "cbase/cbase_memory.h"
 
 class CPointEntity : public CBaseEntity
