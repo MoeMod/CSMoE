@@ -125,6 +125,7 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\inputw32.cpp" />
+    <ClCompile Include="..\cl_dll\input_touch.cpp" />
     <ClCompile Include="..\cl_dll\in_camera.cpp" />
     <ClCompile Include="..\cl_dll\overview.cpp" />
     <ClCompile Include="..\cl_dll\parsemsg.cpp" />

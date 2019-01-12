@@ -564,6 +564,9 @@
     <ClCompile Include="..\cl_dll\hud\legacy\hud_scoreboard_legacy.cpp">
       <Filter>cl_dll\hud\legacy</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\input_touch.cpp">
+      <Filter>cl_dll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">

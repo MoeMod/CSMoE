@@ -82,7 +82,7 @@ auto CHudRetina::AddItem(SharedTexture tex, int type, float time, MagicNumber nu
 {
 	float flTimeEnd = time <= 0.0f ? time : gHUD.m_flTime + time;
 	m_ItemList.push_back({ type, tex, flTimeEnd, num });
-	return m_ItemList.size() - 1;
+	return num;
 }
 
 auto CHudRetina::AddItem(SharedTexture tex, int type, float time) -> MagicNumber

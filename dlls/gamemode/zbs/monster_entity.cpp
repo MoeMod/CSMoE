@@ -1130,7 +1130,7 @@ int CMonster::LookupSequence(const char *label)
 	// only called from SetAnimation, no need to lock...
 
 	auto iter = m_mapLookupSequenceCache.find(label);
-	if(iter != m_mapLookupSequenceCache.end())
+	if(iter == m_mapLookupSequenceCache.end())
 	{
 		iter = m_mapLookupSequenceCache.emplace(label, CBaseAnimating::LookupSequence(label)).first;
 	}
