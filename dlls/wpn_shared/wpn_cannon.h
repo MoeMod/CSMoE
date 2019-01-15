@@ -26,7 +26,6 @@ public:
 		static constexpr const char *szAmmo1 = "CannonAmmo";
 		static constexpr int iMaxAmmo1 = 20;
 	};
-	ItemInfoData_t ItemInfoData;
 
 public:
 	virtual void Spawn();

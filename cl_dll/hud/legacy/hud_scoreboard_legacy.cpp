@@ -204,7 +204,7 @@ void CHudScoreBoardLegacy::Reset(void)
 	{
 	case MOD_NONE:
 	{
-		m_iTextIndex = m_iText_Kill;
+		// nothing to change
 		break;
 	}
 	case MOD_TDM:
