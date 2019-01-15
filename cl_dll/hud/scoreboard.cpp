@@ -110,19 +110,7 @@ DECLARE_MESSAGE( m_Scoreboard, ScoreInfo )
 DECLARE_MESSAGE( m_Scoreboard, TeamInfo )
 DECLARE_MESSAGE( m_Scoreboard, TeamScore )
 
-struct CHudScoreboard::impl_t
-{
-public:
-	CHudScoreBoardLegacy legacy;
-
-public:
-	template<class T, class F, class...Args>
-	void for_each(F T::*f, Args &&...args)
-	{
-		// add dispatch here.
-		(legacy.*f)(std::forward<Args>(args)...);
-	}
-};
+struct CHudScoreboard::impl_t : THudSubDispatcher<CHudScoreBoardLegacy> {};
 
 CHudScoreboard::CHudScoreboard() = default;
 CHudScoreboard::~CHudScoreboard() = default;

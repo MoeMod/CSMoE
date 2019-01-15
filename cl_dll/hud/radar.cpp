@@ -19,19 +19,7 @@ DECLARE_MESSAGE( m_Radar, Location )
 
 char g_szLocation[2048];
 
-struct CHudRadar::impl_t
-{
-public:
-	CHudRadarLegacy radar;
-
-public:
-	template<class T, class F, class...Args>
-	void for_each(F T::*f, Args &&...args)
-	{
-		// add dispatch here.
-		(radar.*f)(std::forward<Args>(args)...);
-	}
-};
+struct CHudRadar::impl_t : THudSubDispatcher<CHudRadarLegacy> {};
 
 CHudRadar::CHudRadar() = default;
 CHudRadar::~CHudRadar() = default;

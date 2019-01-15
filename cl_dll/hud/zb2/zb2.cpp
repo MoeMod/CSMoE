@@ -14,19 +14,11 @@
 #include <vector>
 
 class CHudZB2::impl_t
+	: public THudSubDispatcher<CHudZB2_Skill>
 {
 public:
-	CHudZB2_Skill skill;
-
 	SharedTexture m_pTexture_RageRetina;
 	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
-public:
-	template<class T, class F, class...Args>
-	void for_each(F T::*f, Args &&...args)
-	{
-		// add dispatch here.
-		(skill.*f)(std::forward<Args>(args)...);
-	}
 };
 
 DECLARE_MESSAGE(m_ZB2, ZB2Msg)
@@ -38,7 +30,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	{
 	case ZB2_MESSAGE_HEALTH_RECOVERY:
 	{
-		pimpl->skill.OnHealthRecovery();
+		pimpl->get<CHudZB2_Skill>().OnHealthRecovery();
 		break;
 	}
 	case ZB2_MESSAGE_SKILL_INIT:
@@ -49,7 +41,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		ZombieSkillType skills[4]{};
 		for (int i = 0; i < 4 && !buf.Eof(); ++i)
 			skills[i] = static_cast<ZombieSkillType>(buf.ReadByte());
-		pimpl->skill.OnSkillInit(zclass, skills[0], skills[1], skills[2], skills[3]);
+		pimpl->get<CHudZB2_Skill>().OnSkillInit(zclass, skills[0], skills[1], skills[2], skills[3]);
 
 		// remove retinas...
 		for (auto x : pimpl->m_RetinaIndexes)
@@ -64,7 +56,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		ZombieSkillType type = static_cast<ZombieSkillType>(buf.ReadByte());
 		float flHoldTime = buf.ReadShort();
 		float flFreezeTime = buf.ReadShort();
-		pimpl->skill.OnSkillActivate(type, flHoldTime, flFreezeTime);
+		pimpl->get<CHudZB2_Skill>().OnSkillActivate(type, flHoldTime, flFreezeTime);
 		if (type == ZOMBIE_SKILL_CRAZY || type == ZOMBIE_SKILL_CRAZY2)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, 10.0f));
 		break;
