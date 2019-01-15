@@ -15,9 +15,32 @@ public:
 	virtual void InitHUDData( void ) {}		// called every time a server is connected to
 };
 
+namespace detail
+{
+template<class T, class...Args>
+struct TypeExists;
+template<class T, class First, class...Args>
+struct TypeExists<T, First, Args...> : TypeExists<T, Args...> {};
+template<class T, class...Args>
+struct TypeExists<T, T, Args...> : std::true_type {};
+template<class T>
+struct TypeExists<T> : std::false_type {};
+
+template<class...Args>
+struct IsUnique;
+template<class First>
+struct IsUnique<First> : std::true_type{};
+template<class First, class Second, class...Args>
+struct IsUnique<First, Second, Args...> : std::integral_constant<bool,
+	!TypeExists<First, Second, Args...>::value && IsUnique<First, Args...>::value && IsUnique<Second, Args...>::value
+	>{};
+}
+
 template<class...Elements>
 class THudSubDispatcher
 {
+	// ensure that all elements appear only once
+	static_assert(detail::IsUnique<Elements...>::value, "Elements should be unique!");
 private:
 	std::tuple<Elements...> t;
 public:
