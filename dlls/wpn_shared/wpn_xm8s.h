@@ -14,7 +14,8 @@
 class CXM8SharpShooter : public LinkWeaponTemplate<CXM8SharpShooter,
 		TReloadDefault,
 		TSecondaryAttackSniperZoom1,
-		TWeaponIdleDefault
+		TWeaponIdleDefault,
+		BuildTGetItemInfoFromCSW<WEAPON_SG550>::template type
 		>
 {
 private:
@@ -53,7 +54,6 @@ public:
 public:
 	virtual void Spawn();
 	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL Deploy();
 	virtual float GetMaxSpeed();
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }

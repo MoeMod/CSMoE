@@ -127,23 +127,6 @@ void CCannon::Precache(void)
 	m_usFire = PRECACHE_EVENT(1, "events/cannon.sc");
 }
 
-int CCannon::GetItemInfo(ItemInfo *p)
-{
-	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "CannonAmmo";
-	p->iMaxAmmo1 = 20;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
-	p->iMaxClip = WEAPON_NOCLIP;
-	p->iSlot = 0;
-	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
-	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
-	p->iWeight = AK47_WEIGHT;
-
-	return 1;
-}
-
 int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 {
 	if (m_iDefaultAmmo)

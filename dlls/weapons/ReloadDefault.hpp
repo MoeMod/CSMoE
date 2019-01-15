@@ -40,14 +40,16 @@ public:
 private:
 	void ReloadCheckZoom()
 	{
-		ReloadCheckZoom_impl(*this);
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		ReloadCheckZoom_impl(&wpn);
 	}
 
 	// fxxking sfinae
 	void ReloadCheckZoom_impl(...) { /* default impl*/}
 	template<class ClassToFind = CFinal>
-	auto ReloadCheckZoom_impl(ClassToFind &wpn) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
+	auto ReloadCheckZoom_impl(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
 	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();

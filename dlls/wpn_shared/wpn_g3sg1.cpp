@@ -70,7 +70,7 @@ int CG3SG1::GetItemInfo(ItemInfo *p)
 	p->iPosition = 3;
 	p->iId = m_iId = WEAPON_G3SG1;
 	p->iFlags = 0;
-	p->iWeight = WEAPON_G3SG1;
+	p->iWeight = G3SG1_WEIGHT;
 
 	return 1;
 }

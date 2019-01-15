@@ -3,6 +3,7 @@
 #include "weapons/WeaponTemplate.hpp"
 
 class CCannon : public LinkWeaponTemplate<CCannon,
+	TGetItemInfoDefault,
 	TWeaponIdleDefault,
 	TDeployDefault
 >
@@ -19,10 +20,17 @@ public:
 	static constexpr const char *W_Model = "models/w_cannon.mdl";
 	static constexpr const char *AnimExtension = "carbine";
 
+	struct ItemInfoData_t : StaticItemInfo<WEAPON_AK47>
+	{
+		static constexpr int iFlags = ITEM_FLAG_EXHAUSTIBLE;
+		static constexpr const char *szAmmo1 = "CannonAmmo";
+		static constexpr int iMaxAmmo1 = 20;
+	};
+	ItemInfoData_t ItemInfoData;
+
 public:
 	virtual void Spawn();
 	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
 	virtual float GetMaxSpeed() { return 235; }
 	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
 	virtual void PrimaryAttack();

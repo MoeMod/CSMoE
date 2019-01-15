@@ -22,10 +22,14 @@
 #include "gamemode/mods.h"
 #endif
 
+#include "weapons/WeaponTemplate.hpp"
+
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
-class CKnifeSkullAxe : public CBasePlayerWeapon
+class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
+		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type
+		>
 {
 public:
 	void Spawn(void) override
@@ -42,7 +46,7 @@ public:
 		FallInit();
 	}
 
-	enum knife_e
+	enum skullaxe_e
 	{
 		ANIM_IDLE = 0,
 		ANIM_SLASH_HIT,
@@ -66,23 +70,6 @@ public:
 		PRECACHE_SOUND("weapons/skullaxe_slash2.wav");
 		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
 		PRECACHE_SOUND("weapons/skullaxe_stab.wav");
-	}
-
-	int GetItemInfo(ItemInfo *p) override
-	{
-		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = NULL;
-		p->iMaxAmmo1 = -1;
-		p->pszAmmo2 = NULL;
-		p->iMaxAmmo2 = -1;
-		p->iMaxClip = WEAPON_NOCLIP;
-		p->iSlot = 2;
-		p->iPosition = 1;
-		p->iId = WEAPON_KNIFE;
-		p->iFlags = 0;
-		p->iWeight = KNIFE_WEIGHT;
-
-		return 1;
 	}
 
 	BOOL Deploy() override
