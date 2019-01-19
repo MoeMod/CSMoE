@@ -58,10 +58,11 @@ public:
 //	static constexpr auto V_Model = "";
 //	static constexpr auto W_Model = "";
 	static constexpr float ArmorRatioModifier = 1.0f;
-	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+//	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 	static constexpr float MaxSpeed = 250;
-	//static constexpr WeaponIdType WeaponId = WEAPON_NONE;
-	//static constexpr const char *ClassName = "weapon_???";
+//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
+//  static constexpr const char *ClassName = "weapon_???";
+	static constexpr KnockbackData &&KnockBack{};
 
 // Knock back data can be defined as following :
 //  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f};
@@ -95,7 +96,7 @@ public:
 		CBase::pev->classname = MAKE_STRING(wpn.ClassName);
 
 		wpn.Precache();
-		CBase::m_iId = WEAPON_AK47;
+		CBase::m_iId = wpn.WeaponId;
 		SET_MODEL(ENT(CBase::pev), wpn.W_Model);
 
 		SetDefaultAmmo_impl(&wpn);
@@ -153,9 +154,9 @@ private:
 	}
 	constexpr auto SetDefaultAmmo_impl(...){}
 	template<class ClassToFind = CFinal>
-	constexpr auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(p->DefaultAmmo, void())
+	constexpr auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(p->MaxClip, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_iDefaultAmmo = wpn.DefaultAmmo;
+		CBase::m_iDefaultAmmo = wpn.MaxClip;
 	}
 };

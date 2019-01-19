@@ -11,7 +11,7 @@ template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TRecoilPunch : public CBase
 {
 public:
-	static constexpr Vector RecoilPunchAngleDelta = {0,0,-2};
+	static constexpr float RecoilPunchAngleDelta[] = {0,0,-2};
 
 	void Recoil(void)
 	{
@@ -19,6 +19,5 @@ public:
 
 		CBase::m_pPlayer->pev->punchangle -= wpn.RecoilPunchAngleDelta;
 
-		return CBase::Recoil();
 	}
 };

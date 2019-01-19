@@ -10,25 +10,27 @@
 		KickBackData KickBackDefault;
 	};
 */
+
+struct KickBackData
+{
+	float up_base;
+	float lateral_base;
+	float up_modifier;
+	float lateral_modifier;
+	float up_max;
+	float lateral_max;
+	int direction_change;
+};
+
 template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TRecoilKickBack : public CBase
 {
 public:
-	struct KickBackData
-	{
-		float up_base;
-		float lateral_base;
-		float up_modifier;
-		float lateral_modifier;
-		float up_max;
-		float lateral_max;
-		int direction_change;
-	};
-
+	using CBasePlayerWeapon::KickBack;
 	void KickBack(const KickBackData &data)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		return wpn.KickBack(up_base, lateral_base, up_modifier, lateral_modifier, up_max, lateral_max, direction_change);
+		return wpn.KickBack(data.up_base, data.lateral_base, data.up_modifier, data.lateral_modifier, data.up_max, data.lateral_max, data.direction_change);
 	}
 
 	void Recoil(void)
@@ -43,6 +45,5 @@ public:
 		else
 			KickBack(wpn.KickBackDefault);
 
-		return CBase::Recoil();
 	}
 };

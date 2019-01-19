@@ -20,43 +20,13 @@
 #include "weapons.h"
 #include "wpn_xm8c.h"
 
-#ifndef CLIENT_DLL
-#include "gamemode/mods.h"
-#endif
-
-enum xm8_e
-{
-	CARBINE_XM8_IDLE1,
-	CARBINE_XM8_RELOAD,
-	CARBINE_XM8_DRAW,
-	CARBINE_XM8_SHOOT1,
-	CARBINE_XM8_SHOOT2,
-	CARBINE_XM8_SHOOT3,
-	XM8_CHANGE_SHARPSHOOTER,
-	SHARPSHOOTER_XM8_IDLE1,
-	SHARPSHOOTER_XM8_RELOAD,
-	SHARPSHOOTER_XM8_DRAW,
-	SHARPSHOOTER_XM8_SHOOT1,
-	SHARPSHOOTER_XM8_SHOOT2,
-	SHARPSHOOTER_XM8_SHOOT3,
-	XM8_CHANGE_CARBINE,
-};
-
 LINK_ENTITY_TO_CLASS(weapon_xm8c, CXM8Carbine)
 
 void CXM8Carbine::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_xm8c");
+	Base::Spawn();
 
-	Precache();
-	m_iId = WEAPON_SG552;
-	SET_MODEL(ENT(pev), "models/w_xm8.mdl");
-
-	current_ammo = m_iDefaultAmmo = SG552_DEFAULT_GIVE;
-	m_flAccuracy = 0.2;
-	m_iShotsFired = 0;
-
-	FallInit();
+	current_ammo = m_iDefaultAmmo;
 
 	m_pLink = nullptr;
 	m_iSwing = 0;
@@ -65,7 +35,7 @@ void CXM8Carbine::Spawn(void)
 #ifndef CLIENT_DLL
 void CXM8Carbine::AttachToPlayer(CBasePlayer *pPlayer)
 {
-	CBasePlayerWeapon::AttachToPlayer(pPlayer);
+	Base::AttachToPlayer(pPlayer);
 
 	// find the linked weapon
 	while (!m_pLink)
@@ -98,7 +68,7 @@ void CXM8Carbine::ItemPostFrame()
 	current_ammo = m_iClip;
 	if (m_pLink)
 		m_pLink->m_iSwing = 1;
-	return CBasePlayerWeapon::ItemPostFrame();
+	return Base::ItemPostFrame();
 }
 
 CXM8Carbine::~CXM8Carbine()
@@ -114,21 +84,14 @@ CXM8Carbine::~CXM8Carbine()
 
 void CXM8Carbine::Precache(void)
 {
-	PRECACHE_MODEL("models/v_xm8.mdl");
-	PRECACHE_MODEL("models/w_xm8.mdl");
-	PRECACHE_MODEL("models/p_xm8.mdl");
-
+	Base::Precache();
 	PRECACHE_SOUND("weapons/xm8_carbine.wav");
-
-	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
-	m_usFireSG552 = PRECACHE_EVENT(1, "events/xm8c.sc");
 }
 
 BOOL CXM8Carbine::Deploy(void)
 {
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-	iShellOn = 1;
 
 	if (m_iSwing)
 	{
@@ -144,85 +107,6 @@ BOOL CXM8Carbine::Deploy(void)
 		m_pPlayer->m_flNextAttack = 1.5f;
 	}
 	return TRUE;
-}
-
-void CXM8Carbine::PrimaryAttack(void)
-{
-	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		XM8CarbineFire(0.04 + (0.4) * m_flAccuracy, 0.0955, FALSE);
-	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		XM8CarbineFire(0.04 + (0.07) * m_flAccuracy, 0.0955, FALSE);
-	else if (m_pPlayer->pev->fov == 90)
-		XM8CarbineFire((0.0275) * m_flAccuracy, 0.0955, FALSE);
-	else
-		XM8CarbineFire((0.0275) * m_flAccuracy, 0.12, FALSE);
-}
-
-void CXM8Carbine::XM8CarbineFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
-{
-	m_bDelayFire = true;
-	m_iShotsFired++;
-	m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired * m_iShotsFired) / 200.0) + 0.35;
-
-	if (m_flAccuracy > 1.25)
-		m_flAccuracy = 1.25;
-
-	if (m_iClip <= 0)
-	{
-		if (m_fFireOnEmpty)
-		{
-			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
-		}
-
-		return;
-	}
-
-	m_iClip--;
-	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-#ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-
-	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.955, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSG552, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), 5, FALSE);
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-#ifndef CLIENT_DLL
-	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
-#endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
-
-	if (m_pPlayer->pev->velocity.Length2D() > 0)
-		KickBack(1.425, 0.44999999, 0.2, 0.045000002, 6.25, 2.5, (signed int)7.0);
-	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		KickBack(1.825, 1.2, 0.40000001, 0.30000001, 8.5, 6.125, (signed int)5.0);
-	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		KickBack(0.82499999, 0.32499999, 0.12, 0.0275, 5.125, 1.5, (signed int)8.0);
-	else
-		KickBack(0.85000002, 0.35499999, 0.18000001, 0.035999998, 5.25, 1.85, (signed int)7.0);
-}
-
-float CXM8Carbine::GetDamage()
-{
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() != DT_NONE)
-		return 48;
-#endif
-	return 32;
 }
 
 float CXM8Carbine::GetMaxSpeed(void)

@@ -28,27 +28,27 @@
 #define KNIFE_WALLHIT_VOLUME 512
 
 class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
-		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type
+		TGeneralData,
+		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
+		TWeaponIdleDefault,
+		TDeployDefault
 		>
 {
 public:
-	void Spawn(void) override
-	{
-		pev->classname = MAKE_STRING("knife_skullaxe");
+	static constexpr const char *ClassName = "knife_skullaxe";
+	static constexpr const char *V_Model = "models/v_skullaxe.mdl";
+	static constexpr const char *P_Model = "models/p_skullaxe.mdl";
+	static constexpr const char *W_Model = "models/w_knife.mdl";
 
-		Precache();
-		m_iId = WEAPON_KNIFE;
-		SET_MODEL(ENT(pev), "models/w_knife.mdl");
+	static constexpr int MaxClip = -1;
+	static constexpr auto ItemSlot = KNIFE_SLOT;
+	static constexpr const char *AnimExtension = "skullaxe";
 
-		m_iClip = WEAPON_NOCLIP;
-		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-
-		FallInit();
-	}
+public:
 
 	enum skullaxe_e
 	{
-		ANIM_IDLE = 0,
+		ANIM_IDLE1 = 0,
 		ANIM_SLASH_HIT,
 		ANIM_STAB,
 		ANIM_DRAW,
@@ -60,8 +60,7 @@ public:
 	};
 	void Precache() override
 	{
-		PRECACHE_MODEL("models/p_skullaxe.mdl");
-		PRECACHE_MODEL("models/v_skullaxe.mdl");
+		Base::Precache();
 
 		PRECACHE_SOUND("weapons/skullaxe_draw.wav");
 		PRECACHE_SOUND("weapons/skullaxe_hit.wav");
@@ -80,22 +79,12 @@ public:
 		m_iSwing = 0;
 		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 		m_pPlayer->m_bShieldDrawn = false;
-		return DefaultDeploy("models/v_skullaxe.mdl", "models/p_skullaxe.mdl", ANIM_DRAW, "skullaxe", UseDecrement() != FALSE);
+		return Base::Deploy();
 	}
 
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
-	int iItemSlot() override { return KNIFE_SLOT; }
 	void PrimaryAttack() override;
-	void SecondaryAttack();
-	BOOL UseDecrement() override
-	{
-#ifdef CLIENT_WEAPONS
-		return TRUE;
-#else
-		return FALSE;
-#endif
-	}
-	void WeaponIdle() override;
+	void SecondaryAttack() override;
 
 public:
 	void DelayedPrimaryAttack();
@@ -154,21 +143,6 @@ void CKnifeSkullAxe::SecondaryAttack(void)
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
-}
-
-void CKnifeSkullAxe::WeaponIdle(void)
-{
-	ResetEmptySound();
- 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
-
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	if (m_pPlayer->m_bShieldDrawn != true)
-	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
-		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
-	}
 }
 
 #ifndef CLIENT_DLL

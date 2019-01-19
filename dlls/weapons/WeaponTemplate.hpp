@@ -13,13 +13,19 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 };
 
 #include "GeneralData.hpp"
+#include "PrecacheEvent.hpp"
 #include "ItemInfo.hpp"
 #include "DeployDefault.hpp"
 #include "ReloadDefault.hpp"
+#include "PrimaryAttackRifle.hpp"
 #include "SecondaryAttackZoom.hpp"
 #include "SecondaryAttackSniperZoom1.hpp"
 #include "SecondaryAttackSniperZoom2.hpp"
 #include "WeaponIdleDefault.hpp"
+#include "FireRifle.hpp"
+#include "RecoilKickBack.hpp"
+#include "RecoilPunch.hpp"
+#include "GetDamageDefault.hpp"
 
 /*
  * template<class CFinal, class CBase>
@@ -29,7 +35,7 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 template<class CFinal, template<class, class> class First, template<class, class> class...Args>
 struct LinkWeaponTemplate : First<CFinal, LinkWeaponTemplate<CFinal, Args...>>
 {
-	using Base = First<CFinal, LinkWeaponTemplate<CFinal, Args...>>;
+	using Base = LinkWeaponTemplate;
 	using Final = CFinal;
 	// ...
 };
@@ -37,7 +43,7 @@ struct LinkWeaponTemplate : First<CFinal, LinkWeaponTemplate<CFinal, Args...>>
 template<class CFinal, template<class, class> class First>
 struct LinkWeaponTemplate<CFinal, First> : First<CFinal, CBaseTemplateWeapon>
 {
-	using Base = First<CFinal, CBaseTemplateWeapon>;
+	using Base = LinkWeaponTemplate;
 	using Final = CFinal;
 	// ...
 };
