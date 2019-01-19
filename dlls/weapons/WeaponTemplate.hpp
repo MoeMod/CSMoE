@@ -6,23 +6,20 @@
 #include "player.h"
 #include "weapons.h"
 
-#include "ItemInfo.hpp"
-
-#include "DeployDefault.hpp"
-
-#include "ReloadDefault.hpp"
-
-#include "SecondaryAttackZoom.hpp"
-#include "SecondaryAttackSniperZoom1.hpp"
-#include "SecondaryAttackSniperZoom2.hpp"
-
-#include "WeaponIdleDefault.hpp"
-
 struct CBaseTemplateWeapon : CBasePlayerWeapon
 {
 	using Base = CBasePlayerWeapon;
 	// ...
 };
+
+#include "GeneralData.hpp"
+#include "ItemInfo.hpp"
+#include "DeployDefault.hpp"
+#include "ReloadDefault.hpp"
+#include "SecondaryAttackZoom.hpp"
+#include "SecondaryAttackSniperZoom1.hpp"
+#include "SecondaryAttackSniperZoom2.hpp"
+#include "WeaponIdleDefault.hpp"
 
 /*
  * template<class CFinal, class CBase>

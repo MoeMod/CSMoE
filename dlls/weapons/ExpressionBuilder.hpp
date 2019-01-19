@@ -1,0 +1,150 @@
+//
+// Created by 小白白 on 2019-01-18.
+//
+
+#pragma once
+#include <type_traits>
+
+namespace ExpressionBuilder
+{
+	namespace detail
+	{
+		struct Expression_t {};
+		template<class T>
+		struct IsExpression : std::is_base_of<detail::Expression_t, T> {};
+		template<class UnderlyingType>
+		struct ConstantType : Expression_t
+		{
+			const UnderlyingType c;
+			constexpr explicit ConstantType(UnderlyingType a) : c(a) {}
+			template<class T>
+			constexpr UnderlyingType operator()(T x) const
+			{
+				return c;
+			}
+			constexpr operator UnderlyingType() const { return c; }
+		};
+
+		template<class Varible, class Constant>
+		struct BindedType
+		{
+			const Varible var;
+			const Constant con;
+			constexpr explicit BindedType(Varible x, Constant c) : var(x), con(c) {}
+
+			template<class T>
+			constexpr auto operator()(T x) const
+			{
+				return *this;
+			}
+		};
+
+		template<char Name>
+		struct VaribleType : Expression_t
+		{
+			template<class UnderlyingType>
+			constexpr auto operator=(UnderlyingType c) const
+			{
+				return BindedType<VaribleType<Name>, ConstantType<UnderlyingType>>(*this, ConstantType<UnderlyingType>(c));
+			}
+
+			template<class UnderlyingType>
+			constexpr auto operator()(BindedType<VaribleType<Name>, ConstantType<UnderlyingType>> x) const
+			{
+				return x.con.c;
+			}
+
+			template<class T>
+			constexpr auto operator()(T x) const
+			{
+				return *this;
+			}
+		};
+
+		template<class Exp1, class Exp2>
+		struct BinaryOperator : Expression_t
+		{
+			const Exp1 _1;
+			const Exp2 _2;
+			constexpr BinaryOperator(Exp1 a, Exp2 b) : _1(a), _2(b) {}
+		};
+
+		template<class T>
+		constexpr auto varcon(T x) -> typename std::enable_if<!std::is_base_of<Expression_t, T>::value, ConstantType<T>>::type
+		{
+			return ConstantType<T>(x);
+		}
+		template<class T>
+		constexpr auto varcon(T x) -> typename std::enable_if<std::is_base_of<Expression_t, T>::value, T>::type
+		{
+			return x;
+		}
+
+		template<class Exp1, class Exp2>
+		struct OperatorPlus_t : BinaryOperator<Exp1, Exp2>
+		{
+			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			using BinaryOperator<Exp1, Exp2>::_1;
+			using BinaryOperator<Exp1, Exp2>::_2;
+			template<class T>
+			constexpr auto operator()(T x) const { return _1(x) + _2(x); }
+		};
+
+		template<class Exp1, class Exp2>
+		struct OperatorMinus_t : BinaryOperator<Exp1, Exp2>
+		{
+			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			using BinaryOperator<Exp1, Exp2>::_1;
+			using BinaryOperator<Exp1, Exp2>::_2;
+			template<class T>
+			constexpr auto operator()(T x) const { return _1(x) - _2(x); }
+		};
+		template<class Exp1, class Exp2>
+		struct OperatorMul_t : BinaryOperator<Exp1, Exp2>
+		{
+			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			using BinaryOperator<Exp1, Exp2>::_1;
+			using BinaryOperator<Exp1, Exp2>::_2;
+			template<class T>
+			constexpr auto operator()(T x) const { return _1(x) * _2(x); }
+		};
+		template<class Exp1, class Exp2>
+		struct OperatorDiv_t : BinaryOperator<Exp1, Exp2>
+		{
+			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			using BinaryOperator<Exp1, Exp2>::_1;
+			using BinaryOperator<Exp1, Exp2>::_2;
+			template<class T>
+			constexpr auto operator()(T x) const { return _1(x) / _2(x); }
+		};
+
+		template<class Exp1, class Exp2, class = typename std::enable_if<detail::IsExpression<Exp1>::value || detail::IsExpression<Exp2>::value>::type>
+		constexpr auto operator+(Exp1 _1, Exp2 _2)
+		{
+			using detail::varcon;
+			return detail::OperatorPlus_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
+		};
+		template<class Exp1, class Exp2, class = typename std::enable_if<detail::IsExpression<Exp1>::value || detail::IsExpression<Exp2>::value>::type>
+		constexpr auto operator-(Exp1 _1, Exp2 _2)
+		{
+			using detail::varcon;
+			return detail::OperatorMinus_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
+		};
+		template<class Exp1, class Exp2, class = typename std::enable_if<detail::IsExpression<Exp1>::value || detail::IsExpression<Exp2>::value>::type>
+		constexpr auto operator*(Exp1 _1, Exp2 _2)
+		{
+			using detail::varcon;
+			return detail::OperatorMul_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
+		};
+		template<class Exp1, class Exp2, class = typename std::enable_if<detail::IsExpression<Exp1>::value || detail::IsExpression<Exp2>::value>::type>
+		constexpr auto operator/(Exp1 _1, Exp2 _2)
+		{
+			using detail::varcon;
+			return detail::OperatorDiv_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
+		};
+	}
+
+	constexpr detail::VaribleType<'x'> x;
+	constexpr detail::VaribleType<'y'> y;
+	constexpr detail::VaribleType<'z'> z;
+}

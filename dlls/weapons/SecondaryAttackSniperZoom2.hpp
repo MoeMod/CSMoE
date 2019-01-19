@@ -9,7 +9,7 @@
 	};
 */
 
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TSecondaryAttackSniperZoom2 : public CBase
 {
 public:

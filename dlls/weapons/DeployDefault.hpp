@@ -13,7 +13,7 @@
 	};
 */
 
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TDeployDefault : public CBase
 {
 public:

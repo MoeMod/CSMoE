@@ -27,7 +27,7 @@ struct StaticItemInfo
 	static constexpr int iMaxClip = -1;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 0;
-	static constexpr int iId = CSW;
+	static constexpr WeaponIdType iId = CSW;
 	static constexpr int iFlags = 0;
 	static constexpr int iWeight = KNIFE_WEIGHT;
 };
@@ -40,7 +40,7 @@ struct StaticItemInfo<WEAPON_AK47> : StaticItemInfo<>
 	static constexpr int iMaxClip = AK47_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 1;
-	static constexpr int iId = WEAPON_AK47;
+	static constexpr WeaponIdType iId = WEAPON_AK47;
 	static constexpr int iWeight = AK47_WEIGHT;
 };
 template<>
@@ -51,7 +51,7 @@ struct StaticItemInfo<WEAPON_AUG> : StaticItemInfo<>
 	static constexpr int iMaxClip = AUG_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 14;
-	static constexpr int iId = WEAPON_AUG;
+	static constexpr WeaponIdType iId = WEAPON_AUG;
 	static constexpr int iWeight = AUG_WEIGHT;
 };
 template<>
@@ -62,7 +62,7 @@ struct StaticItemInfo<WEAPON_AWP> : StaticItemInfo<>
 	static constexpr int iMaxClip = AWP_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 2;
-	static constexpr int iId = WEAPON_AWP;
+	static constexpr WeaponIdType iId = WEAPON_AWP;
 	static constexpr int iWeight = AWP_WEIGHT;
 };
 template<>
@@ -73,7 +73,7 @@ struct StaticItemInfo<WEAPON_C4> : StaticItemInfo<>
 	static constexpr int iMaxClip = WEAPON_NOCLIP;
 	static constexpr int iSlot = 4;
 	static constexpr int iPosition = 3;
-	static constexpr int iId = WEAPON_C4;
+	static constexpr WeaponIdType iId = WEAPON_C4;
 	static constexpr int iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 	static constexpr int iWeight = C4_WEIGHT;
 };
@@ -85,7 +85,7 @@ struct StaticItemInfo<WEAPON_DEAGLE> : StaticItemInfo<>
 	static constexpr int iMaxClip = DEAGLE_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 1;
-	static constexpr int iId = WEAPON_DEAGLE;
+	static constexpr WeaponIdType iId = WEAPON_DEAGLE;
 	static constexpr int iWeight = DEAGLE_WEIGHT;
 };
 template<>
@@ -96,7 +96,7 @@ struct StaticItemInfo<WEAPON_ELITE> : StaticItemInfo<>
 	static constexpr int iMaxClip = ELITE_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 5;
-	static constexpr int iId = WEAPON_ELITE;
+	static constexpr WeaponIdType iId = WEAPON_ELITE;
 	static constexpr int iWeight = ELITE_WEIGHT;
 };
 template<>
@@ -107,7 +107,7 @@ struct StaticItemInfo<WEAPON_FAMAS> : StaticItemInfo<>
 	static constexpr int iMaxClip = FAMAS_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 18;
-	static constexpr int iId = WEAPON_FAMAS;
+	static constexpr WeaponIdType iId = WEAPON_FAMAS;
 	static constexpr int iWeight = FAMAS_WEIGHT;
 };
 template<>
@@ -118,7 +118,7 @@ struct StaticItemInfo<WEAPON_FIVESEVEN> : StaticItemInfo<>
 	static constexpr int iMaxClip = FIVESEVEN_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 6;
-	static constexpr int iId = WEAPON_FIVESEVEN;
+	static constexpr WeaponIdType iId = WEAPON_FIVESEVEN;
 	static constexpr int iWeight = FIVESEVEN_WEIGHT;
 };
 template<>
@@ -129,7 +129,7 @@ struct StaticItemInfo<WEAPON_FLASHBANG> : StaticItemInfo<>
 	static constexpr int iMaxClip = WEAPON_NOCLIP;
 	static constexpr int iSlot = 3;
 	static constexpr int iPosition = 2;
-	static constexpr int iId = WEAPON_FLASHBANG;
+	static constexpr WeaponIdType iId = WEAPON_FLASHBANG;
 	static constexpr int iWeight = FIVESEVEN_WEIGHT;
 	static constexpr int iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 };
@@ -141,7 +141,7 @@ struct StaticItemInfo<WEAPON_G3SG1> : StaticItemInfo<>
 	static constexpr int iMaxClip = G3SG1_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 3;
-	static constexpr int iId = WEAPON_G3SG1;
+	static constexpr WeaponIdType iId = WEAPON_G3SG1;
 	static constexpr int iWeight = G3SG1_WEIGHT;
 };
 template<>
@@ -152,7 +152,7 @@ struct StaticItemInfo<WEAPON_GALIL> : StaticItemInfo<>
 	static constexpr int iMaxClip = GALIL_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 17;
-	static constexpr int iId = WEAPON_GALIL;
+	static constexpr WeaponIdType iId = WEAPON_GALIL;
 	static constexpr int iWeight = GALIL_WEIGHT;
 };
 template<>
@@ -163,7 +163,7 @@ struct StaticItemInfo<WEAPON_GLOCK18> : StaticItemInfo<>
 	static constexpr int iMaxClip = GLOCK18_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 2;
-	static constexpr int iId = WEAPON_GLOCK18;
+	static constexpr WeaponIdType iId = WEAPON_GLOCK18;
 	static constexpr int iWeight = GLOCK18_WEIGHT;
 };
 template<>
@@ -174,7 +174,7 @@ struct StaticItemInfo<WEAPON_HEGRENADE> : StaticItemInfo<>
 	static constexpr int iMaxClip = WEAPON_NOCLIP;
 	static constexpr int iSlot = 3;
 	static constexpr int iPosition = 1;
-	static constexpr int iId = WEAPON_HEGRENADE;
+	static constexpr WeaponIdType iId = WEAPON_HEGRENADE;
 	static constexpr int iWeight = HEGRENADE_WEIGHT;
 	static constexpr int iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 };
@@ -183,7 +183,7 @@ struct StaticItemInfo<WEAPON_KNIFE> : StaticItemInfo<>
 {
 	static constexpr int iSlot = 2;
 	static constexpr int iPosition = 1;
-	static constexpr int iId = WEAPON_KNIFE;
+	static constexpr WeaponIdType iId = WEAPON_KNIFE;
 	static constexpr int iWeight = KNIFE_WEIGHT;
 };
 template<>
@@ -194,7 +194,7 @@ struct StaticItemInfo<WEAPON_M3> : StaticItemInfo<>
 	static constexpr int iMaxClip = M3_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 5;
-	static constexpr int iId = WEAPON_M3;
+	static constexpr WeaponIdType iId = WEAPON_M3;
 	static constexpr int iWeight = M3_WEIGHT;
 };
 template<>
@@ -205,7 +205,7 @@ struct StaticItemInfo<WEAPON_M4A1> : StaticItemInfo<>
 	static constexpr int iMaxClip = M4A1_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 6;
-	static constexpr int iId = WEAPON_M4A1;
+	static constexpr WeaponIdType iId = WEAPON_M4A1;
 	static constexpr int iWeight = M4A1_WEIGHT;
 };
 template<>
@@ -216,7 +216,7 @@ struct StaticItemInfo<WEAPON_M249> : StaticItemInfo<>
 	static constexpr int iMaxClip = M249_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 4;
-	static constexpr int iId = WEAPON_M249;
+	static constexpr WeaponIdType iId = WEAPON_M249;
 	static constexpr int iWeight = M249_WEIGHT;
 };
 template<>
@@ -227,7 +227,7 @@ struct StaticItemInfo<WEAPON_MAC10> : StaticItemInfo<>
 	static constexpr int iMaxClip = MAC10_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 13;
-	static constexpr int iId = WEAPON_MAC10;
+	static constexpr WeaponIdType iId = WEAPON_MAC10;
 	static constexpr int iWeight = MAC10_WEIGHT;
 };
 template<>
@@ -238,7 +238,7 @@ struct StaticItemInfo<WEAPON_MP5N> : StaticItemInfo<>
 	static constexpr int iMaxClip = MP5N_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 7;
-	static constexpr int iId = WEAPON_MP5N;
+	static constexpr WeaponIdType iId = WEAPON_MP5N;
 	static constexpr int iWeight = MP5NAVY_WEIGHT;
 };
 template<>
@@ -249,7 +249,7 @@ struct StaticItemInfo<WEAPON_P90> : StaticItemInfo<>
 	static constexpr int iMaxClip = P90_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 8;
-	static constexpr int iId = WEAPON_P90;
+	static constexpr WeaponIdType iId = WEAPON_P90;
 	static constexpr int iWeight = P90_WEIGHT;
 };
 template<>
@@ -260,7 +260,7 @@ struct StaticItemInfo<WEAPON_P228> : StaticItemInfo<>
 	static constexpr int iMaxClip = P228_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 3;
-	static constexpr int iId = WEAPON_P228;
+	static constexpr WeaponIdType iId = WEAPON_P228;
 	static constexpr int iWeight = P228_WEIGHT;
 };
 template<>
@@ -271,7 +271,7 @@ struct StaticItemInfo<WEAPON_SCOUT> : StaticItemInfo<>
 	static constexpr int iMaxClip = SCOUT_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 9;
-	static constexpr int iId = WEAPON_SCOUT;
+	static constexpr WeaponIdType iId = WEAPON_SCOUT;
 	static constexpr int iWeight = SCOUT_WEIGHT;
 };
 template<>
@@ -282,7 +282,7 @@ struct StaticItemInfo<WEAPON_SG550> : StaticItemInfo<>
 	static constexpr int iMaxClip = SG550_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 16;
-	static constexpr int iId = WEAPON_SG550;
+	static constexpr WeaponIdType iId = WEAPON_SG550;
 	static constexpr int iWeight = SG550_WEIGHT;
 };
 template<>
@@ -293,7 +293,7 @@ struct StaticItemInfo<WEAPON_SG552> : StaticItemInfo<>
 	static constexpr int iMaxClip = SG552_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 10;
-	static constexpr int iId = WEAPON_SG552;
+	static constexpr WeaponIdType iId = WEAPON_SG552;
 	static constexpr int iWeight = SG552_WEIGHT;
 };
 template<>
@@ -303,7 +303,7 @@ struct StaticItemInfo<WEAPON_SMOKEGRENADE> : StaticItemInfo<>
 	static constexpr int iMaxAmmo1 = MAX_AMMO_SMOKEGRENADE;
 	static constexpr int iSlot = 3;
 	static constexpr int iPosition = 3;
-	static constexpr int iId = WEAPON_SMOKEGRENADE;
+	static constexpr WeaponIdType iId = WEAPON_SMOKEGRENADE;
 	static constexpr int iWeight = SMOKEGRENADE_WEIGHT;
 	static constexpr int iFlags = ITEM_FLAG_LIMITINWORLD | ITEM_FLAG_EXHAUSTIBLE;
 };
@@ -315,7 +315,7 @@ struct StaticItemInfo<WEAPON_TMP> : StaticItemInfo<>
 	static constexpr int iMaxClip = TMP_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 11;
-	static constexpr int iId = WEAPON_TMP;
+	static constexpr WeaponIdType iId = WEAPON_TMP;
 	static constexpr int iWeight = TMP_WEIGHT;
 };
 template<>
@@ -326,7 +326,7 @@ struct StaticItemInfo<WEAPON_UMP45> : StaticItemInfo<>
 	static constexpr int iMaxClip = UMP45_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 15;
-	static constexpr int iId = WEAPON_UMP45;
+	static constexpr WeaponIdType iId = WEAPON_UMP45;
 	static constexpr int iWeight = UMP45_WEIGHT;
 };
 template<>
@@ -337,7 +337,7 @@ struct StaticItemInfo<WEAPON_USP> : StaticItemInfo<>
 	static constexpr int iMaxClip = USP_MAX_CLIP;
 	static constexpr int iSlot = 1;
 	static constexpr int iPosition = 4;
-	static constexpr int iId = WEAPON_USP;
+	static constexpr WeaponIdType iId = WEAPON_USP;
 	static constexpr int iWeight = USP_WEIGHT;
 };
 template<>
@@ -348,7 +348,7 @@ struct StaticItemInfo<WEAPON_XM1014> : StaticItemInfo<>
 	static constexpr int iMaxClip = XM1014_MAX_CLIP;
 	static constexpr int iSlot = 0;
 	static constexpr int iPosition = 12;
-	static constexpr int iId = WEAPON_XM1014;
+	static constexpr WeaponIdType iId = WEAPON_XM1014;
 	static constexpr int iWeight = XM1014_WEIGHT;
 };
 
@@ -402,7 +402,7 @@ constexpr ItemInfo BuildItemInfo(const ItemInfo &II)
 	};
 */
 
-template</*GetItemInfoDefault_c*/ class CFinal, class CBase = CBasePlayerWeapon>
+template</*GetItemInfoDefault_c*/ class CFinal, class CBase = CBaseTemplateWeapon>
 class TGetItemInfoDefault : public CBase
 {
 public:
@@ -414,7 +414,7 @@ public:
 		assert(p != nullptr);
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		*p = BuildItemInfoFrom(&wpn);
+		*p = BuildItemInfoFrom(wpn);
 		p->pszName = STRING(CBase::pev->classname);
 
 		return 1;
@@ -423,25 +423,28 @@ public:
 public:
 	// sfinae call, when there is ItemInfoData, use it
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildItemInfoFrom(ClassToFind *) -> decltype(&ClassToFind::ItemInfoData, ItemInfo())
+	constexpr auto BuildItemInfoFrom(ClassToFind &wpn) -> decltype(&ClassToFind::ItemInfoData, ItemInfo())
 	{
-		CFinal &wpn = static_cast<CFinal &>(*this);
 		return ::BuildItemInfo(wpn.ItemInfoData);
 	}
 	// otherwise build from ItemInfoData_t
-	constexpr auto BuildItemInfoFrom(...) -> ItemInfo
+	template<class ClassToFind = CFinal>
+	constexpr auto BuildItemInfoFrom(ClassToFind &wpn) -> decltype(typename ClassToFind::ItemInfoData_t(), ItemInfo())
 	{
-		return ::BuildItemInfo<typename CFinal::ItemInfoData_t>();
+		return ::BuildItemInfo<typename ClassToFind::ItemInfoData_t>();
 	}
 };
 
 template<WeaponIdType CSW>
 struct BuildTGetItemInfoFromCSW
 {
-	template<class CFinal, class CBase = CBasePlayerWeapon>
+	template<class CFinal, class CBase = CBaseTemplateWeapon>
 	class type : public TGetItemInfoDefault<CFinal, CBase>
 	{
 	public:
 		using ItemInfoData_t = StaticItemInfo<CSW>;
+		static constexpr WeaponIdType WeaponId = ItemInfoData_t::iId;
+		static constexpr int DefaultAmmo = ItemInfoData_t::iMaxClip;
+
 	};
 };

@@ -7,7 +7,7 @@
 		Vector RecoilPunchAngleDelta = {0,0,-2}; // optional
 	};
 */
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TRecoilPunch : public CBase
 {
 public:

@@ -103,23 +103,13 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 
 void CCannon::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_cannon");
-
-	Precache();
-	m_iId = WEAPON_AK47;
-	SET_MODEL(ENT(pev), "models/w_cannon.mdl");
-
-	m_iDefaultAmmo = 20;
+	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
-
-	FallInit();
 }
 
 void CCannon::Precache(void)
 {
-	PRECACHE_MODEL("models/v_cannon.mdl");
-	PRECACHE_MODEL("models/p_cannon.mdl");
-	PRECACHE_MODEL("models/w_cannon.mdl");
+	Base::Precache();
 	PRECACHE_MODEL("sprites/flame_puff01.spr");
 
 	PRECACHE_SOUND("weapons/cannon-1.wav");

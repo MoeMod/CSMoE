@@ -8,7 +8,7 @@
 	};
 */
 
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TSecondaryAttackZoom : public CBase
 {
 public:

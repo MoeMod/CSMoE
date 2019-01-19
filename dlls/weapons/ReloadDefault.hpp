@@ -11,9 +11,7 @@
 	};
 */
 
-#include "WeaponTemplate.hpp"
-
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TReloadDefault : public CBase
 {
 public:

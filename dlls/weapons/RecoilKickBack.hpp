@@ -10,7 +10,7 @@
 		KickBackData KickBackDefault;
 	};
 */
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TRecoilKickBack : public CBase
 {
 public:
