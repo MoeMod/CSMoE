@@ -50,11 +50,10 @@ public:
 		CBase::m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 
+		UTIL_MakeVectors(CBase::m_pPlayer->pev->v_angle + CBase::m_pPlayer->pev->punchangle);
+
 		CBase::m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 		CBase::m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
-
-		UTIL_MakeVectors(CBase::m_pPlayer->pev->v_angle + CBase::m_pPlayer->pev->punchangle);
-		Vector vecSrc = CBase::m_pPlayer->GetGunPosition();
 
 		const float flDistance = wpn.Distance;
 		const int iPenetration = wpn.Penetration;
@@ -62,6 +61,7 @@ public:
 		const int iDamage = wpn.GetDamage();
 		const float flRangeModifier = wpn.RangeModifier;
 		const BOOL bPistol = wpn.ItemSlot == PISTOL_SLOT;
+		Vector vecSrc = CBase::m_pPlayer->GetGunPosition();
 		Vector vecDir = CBase::m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, flDistance, iPenetration, iBulletType, iDamage, flRangeModifier, CBase::m_pPlayer->pev, bPistol, CBase::m_pPlayer->random_seed);
 
 		wpn.FireEvent(vecDir);
@@ -80,18 +80,19 @@ public:
 	}
 
 public:
-	void FireEvent(const Vector &vecDir) {
-
-		int flags;
+	void FireEvent(const Vector &vecDir)
+	{
+		int flags = 0;
+		/*
 #ifdef CLIENT_WEAPONS
 		flags = FEV_NOTHOST;
 #else
 		flags = 0;
 #endif
+		 */
+
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *) &g_vecZero,
-		                    (float *) &g_vecZero, vecDir.x, vecDir.y, (int) (CBase::m_pPlayer->pev->punchangle.x * 100),
-		                    (int) (CBase::m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100),static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	}
 
 private:

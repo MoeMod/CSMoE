@@ -3,11 +3,6 @@
 
 #include "weapons/WeaponTemplate.hpp"
 
-/*class CXM8Carbine : public
-	TReloadDefault<CXM8Carbine, 
-	TSecondaryAttackZoom<CXM8Carbine,
-	TWeaponIdleDefault<CXM8Carbine,
-	CBasePlayerWeapon>>>*/
 class CXM8Carbine : public LinkWeaponTemplate<CXM8Carbine,
 		TGeneralData,
 		TReloadDefault,

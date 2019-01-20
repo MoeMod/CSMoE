@@ -39,6 +39,7 @@ private:
 
 
 public:
+	static constexpr auto ClassName = "weapon_xm8s";
 	static constexpr auto MaxClip = 30;
 	static constexpr auto DefaultReloadTime = 3.2;
 	static constexpr auto DefaultAccuracy = 0.2;

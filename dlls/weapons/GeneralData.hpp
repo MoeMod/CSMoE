@@ -147,14 +147,14 @@ private:
 private:
 	constexpr auto SetDefaultAccuracy_impl(...){}
 	template<class ClassToFind = CFinal>
-	constexpr auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(p->DefaultAccuracy, void())
+	constexpr auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 	}
 	constexpr auto SetDefaultAmmo_impl(...){}
 	template<class ClassToFind = CFinal>
-	constexpr auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(p->MaxClip, void())
+	constexpr auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_iDefaultAmmo = wpn.MaxClip;

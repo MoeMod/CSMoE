@@ -8,9 +8,9 @@ class TPrecacheEvent : public CBase
 public:
 	void Precache(void) override
 	{
-		CBase::Precache();
 		auto &wpn = static_cast<CFinal &>(*this);
 		m_usFire = PRECACHE_EVENT(1, wpn.EventFile);
+		CBase::Precache();
 	}
 
 	unsigned short m_usFire;

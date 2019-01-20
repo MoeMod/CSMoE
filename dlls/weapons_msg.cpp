@@ -12,7 +12,7 @@ void CBasePlayerWeapon::UpdateItemInfo()
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgBTEWeapon, NULL, player->pev);
 		WRITE_BYTE(BTE_Weapon_Active); // type, reserved.
-		WRITE_STRING(this->pszName());
+		WRITE_STRING(STRING(this->pev->classname));
 		MESSAGE_END();
 	}
 	

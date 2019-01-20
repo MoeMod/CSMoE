@@ -399,7 +399,7 @@ public:
 	void ResetMenu();
 	void SyncRoundTimer();
 	void CheckSuitUpdate();
-	void SetSuitUpdate(char *name = NULL, int fgroup = 0, int iNoRepeatTime = 0);
+	void SetSuitUpdate(const char *name = nullptr, int fgroup = 0, int iNoRepeatTime = 0);
 	void UpdateGeigerCounter();
 	void CheckTimeBasedDamage();
 	void BarnacleVictimBitten(entvars_t *pevBarnacle);

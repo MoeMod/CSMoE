@@ -28,7 +28,7 @@ private:
 	// sfinae query for whether the weapon has/is zoom.
 	constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
 	template<class ClassToFind = CFinal>
-	constexpr auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, bool())
+	constexpr auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
