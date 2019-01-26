@@ -425,6 +425,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_hegrenade.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -711,6 +712,15 @@
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
     <ClInclude Include="..\dlls\weapons\DeployDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\ExpressionBuilder.hpp" />
+    <ClInclude Include="..\dlls\weapons\FireRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\GeneralData.hpp" />
+    <ClInclude Include="..\dlls\weapons\GetDamageDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\ItemInfo.hpp" />
+    <ClInclude Include="..\dlls\weapons\PrecacheEvent.hpp" />
+    <ClInclude Include="..\dlls\weapons\PrimaryAttackRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\RecoilKickBack.hpp" />
+    <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />

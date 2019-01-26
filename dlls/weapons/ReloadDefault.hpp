@@ -27,7 +27,7 @@ public:
 #ifndef CLIENT_DLL
 			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-			CBase::m_flAccuracy = wpn.DefaultAccuracy;
+			SetDefaultAccuracy_impl(&wpn);
 			CBase::m_iShotsFired = 0;
 			CBase::m_bDelayFire = false;
 
@@ -48,5 +48,13 @@ private:
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
 			wpn.SecondaryAttack();
 		}
+	}
+
+	auto SetDefaultAccuracy_impl(...) {}
+	template<class ClassToFind = CFinal>
+	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 	}
 };

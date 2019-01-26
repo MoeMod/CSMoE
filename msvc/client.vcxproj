@@ -156,6 +156,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_g3sg1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_galil.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_glock18.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_hegrenade.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />

@@ -622,6 +622,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1316,6 +1319,33 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\ExpressionBuilder.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\FireRifle.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\GeneralData.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\GetDamageDefault.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\ItemInfo.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\PrecacheEvent.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\PrimaryAttackRifle.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\RecoilKickBack.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp">
+      <Filter>dlls\weapons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
