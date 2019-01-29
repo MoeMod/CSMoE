@@ -16,7 +16,8 @@ LOCAL_MODULE_FILENAME = libclient_hardfp
 endif
 
 LOCAL_CFLAGS += -fsigned-char -DCLIENT_DLL=1 -DCLIENT_WEAPONS=1
-LOCAL_CPPFLAGS += -std=c++11
+LOCAL_CPPFLAGS += -std=c++14
+
 SRCS := \
 	./cdll_int.cpp \
 	./demo.cpp \
@@ -77,6 +78,9 @@ SRCS := \
 	./hud/scenariostatus.cpp \
 	./hud/zb2/zb2.cpp \
 	./hud/zb2/zb2_skill.cpp \
+	./hud/legacy/hud_radar_legacy.cpp \
+	./hud/legacy/hud_scoreboard_legacy.cpp \
+	./hud/modern/hud_radar_modern.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
@@ -113,6 +117,22 @@ SRCS := \
 	../dlls/wpn_shared/wpn_ak47l.cpp \
 	../dlls/wpn_shared/wpn_mp7a1d.cpp \
 	../dlls/wpn_shared/wpn_deagled.cpp \
+../dlls/wpn_shared/wpn_as50.cpp \
+../dlls/wpn_shared/wpn_cannon.cpp \
+../dlls/wpn_shared/wpn_infinity.cpp \
+../dlls/wpn_shared/wpn_k1a.cpp \
+../dlls/wpn_shared/wpn_knife_zombi.cpp \
+../dlls/wpn_shared/wpn_kriss.cpp \
+../dlls/wpn_shared/wpn_m95.cpp \
+../dlls/wpn_shared/wpn_m1887.cpp \
+../dlls/wpn_shared/wpn_scarh.cpp \
+../dlls/wpn_shared/wpn_scarl.cpp \
+../dlls/wpn_shared/wpn_tar21.cpp \
+../dlls/wpn_shared/wpn_thompson.cpp \
+../dlls/wpn_shared/wpn_wa2000.cpp \
+../dlls/wpn_shared/wpn_xm8c.cpp \
+../dlls/wpn_shared/wpn_xm8s.cpp \
+../dlls/wpn_shared/knife_skullaxe.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -148,8 +168,22 @@ SRCS := \
 	./events/event_ak47l.cpp \
 	./events/event_mp7a1d.cpp \
 	./events/event_deagled.cpp \
+./events/event_as50.cpp \
+./events/event_cannon.cpp \
+./events/event_infinity.cpp \
+./events/event_k1a.cpp \
+./events/event_kriss.cpp \
+./events/event_m95.cpp \
+./events/event_m1887.cpp \
+./events/event_scarh.cpp \
+./events/event_scarl.cpp \
+./events/event_tar21.cpp \
+./events/event_thompson.cpp \
+./events/event_wa2000.cpp \
+./events/event_xm8c.cpp \
+./events/event_xm8s.cpp \
 	./ev_common.cpp \
-	./calcscreen.cpp \
+	./calcscreen.cpp 
 	
 
 

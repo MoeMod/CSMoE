@@ -10,8 +10,9 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a-hard)
 LOCAL_MODULE_FILENAME = libserver_hardfp
 endif
 
-LOCAL_CFLAGS += -w -D_LINUX -DCLIENT_WEAPONS -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf -D_stricmp=strcasecmp -D_vsnprintf=vsnprintf -D_strdup=strdup -D_write=write -D_close=close \
-	-fno-exceptions
+LOCAL_CFLAGS += -w -D_LINUX -DCLIENT_WEAPONS -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf -D_stricmp=strcasecmp -D_vsnprintf=vsnprintf -D_strdup=strdup -D_write=write -D_close=close 
+
+LOCAL_CPPFLAGS += -frtti -std=c++14
 	
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/. \
 		    $(LOCAL_PATH)/.. \
@@ -155,6 +156,7 @@ LOCAL_SRC_FILES := \
 	wpn_shared/wpn_ump45.cpp \
 	wpn_shared/wpn_usp.cpp \
 	wpn_shared/wpn_xm1014.cpp \
+	cbase/cbase_memory.cpp \
 	gamemode/mods.cpp \
 	gamemode/mod_base.cpp \
 	gamemode/mod_none.cpp \
@@ -183,14 +185,31 @@ LOCAL_SRC_FILES := \
 	./gamemode/zb2/supplybox.cpp \
 	./bot/cs_bot_bhopjump.cpp \
 	./player/player_zombie_skill.cpp \
+	./player/player_account.cpp \
+	./player/player_mod_strategy.cpp \
 	./weapons_data.cpp \
 	./weapons_msg.cpp \
 	./wpn_shared/wpn_knife_zombi.cpp \
 	./wpn_shared/wpn_ak47l.cpp \
 	./wpn_shared/wpn_mp7a1d.cpp \
 	./wpn_shared/wpn_deagled.cpp \
+../dlls/wpn_shared/wpn_as50.cpp \
+../dlls/wpn_shared/wpn_cannon.cpp \
+../dlls/wpn_shared/wpn_infinity.cpp \
+../dlls/wpn_shared/wpn_k1a.cpp \
+../dlls/wpn_shared/wpn_knife_zombi.cpp \
+../dlls/wpn_shared/wpn_kriss.cpp \
+../dlls/wpn_shared/wpn_m95.cpp \
+../dlls/wpn_shared/wpn_m1887.cpp \
+../dlls/wpn_shared/wpn_scarh.cpp \
+../dlls/wpn_shared/wpn_scarl.cpp \
+../dlls/wpn_shared/wpn_tar21.cpp \
+../dlls/wpn_shared/wpn_thompson.cpp \
+../dlls/wpn_shared/wpn_wa2000.cpp \
+../dlls/wpn_shared/wpn_xm8c.cpp \
+../dlls/wpn_shared/wpn_xm8s.cpp \
+../dlls/wpn_shared/knife_skullaxe.cpp \
+	./gamemode/zbs/monster_manager.cpp \
 
-
-LOCAL_CPPFLAGS += -frtti -std=c++11
 
 include $(BUILD_SHARED_LIBRARY)

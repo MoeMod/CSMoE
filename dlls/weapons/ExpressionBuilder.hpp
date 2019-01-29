@@ -140,7 +140,7 @@ namespace ExpressionBuilder
 		};
 	}
 
-	constexpr detail::VaribleType<'x'> x;
-	constexpr detail::VaribleType<'y'> y;
-	constexpr detail::VaribleType<'z'> z;
+    constexpr detail::VaribleType<'x'> x{};
+    constexpr detail::VaribleType<'y'> y{};
+    constexpr detail::VaribleType<'z'> z{};
 }
