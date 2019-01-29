@@ -567,6 +567,9 @@
     <ClCompile Include="..\cl_dll\input_touch.cpp">
       <Filter>cl_dll</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
