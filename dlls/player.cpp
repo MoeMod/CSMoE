@@ -1244,7 +1244,7 @@ void CBasePlayer::GiveDefaultItems()
 		}
 #else
 		GiveNamedItem("knife_skullaxe");
-		GiveNamedItem("weapon_cannon");
+		GiveNamedItem("weapon_gungnir");
 		GiveNamedItem("weapon_infinity");
 		GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 #endif

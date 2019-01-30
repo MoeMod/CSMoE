@@ -461,6 +461,8 @@ void W_Precache()
 
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");
+	UTIL_PrecacheOtherWeapon("weapon_gungnir");
+	UTIL_PrecacheOther("ammo_gungnir");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

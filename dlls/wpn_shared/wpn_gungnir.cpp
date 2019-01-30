@@ -5,8 +5,11 @@
 #include "player.h"
 #include "weapons.h"
 #include "weapons/WeaponTemplate.hpp"
+#include "effects.h"
+#include "customentity.h"
 
 #include <vector>
+#include <array>
 
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -47,14 +50,16 @@ public:
 	static constexpr const char *AnimExtension = "m249";
 	struct ItemInfoData_t : Base::ItemInfoData_t
 	{
-		static constexpr int iFlags = ITEM_FLAG_EXHAUSTIBLE;
 		static constexpr const char *szAmmo1 = "GungnirAmmo";
-		static constexpr int iMaxAmmo1 = 200;
+		static constexpr int iMaxAmmo1 = 100;
 	};
 	static constexpr int MaxClip = 50;
 	static constexpr float WeaponIdleTime = 10;
 
+	static constexpr const char *Beam_SPR = "sprites/ef_gungnir_xbeam.spr"; // 
+
 public:
+	void Precache() override;
 	BOOL Deploy() override;
 	void Spawn() override;
 	void Holster(int skiplocal) override;
@@ -63,11 +68,17 @@ public:
 	bool HasSecondaryAttack() override { return true; }
 	void ItemPostFrame() override;
 
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_gungnir" , 200 }; }
+#endif
+
 public:
+	void CreateEffect();
+	void DestroyEffect();
 	void PrimaryAttack_FindTargets();
 	bool PrimaryAttack_CheckTargetAvailable(CBaseEntity *a2, Vector vecDirection);
 	void PrimaryAttack_InstantDamage();
-	void sub_10334A80();
+	void ClearEffect();
 	void ShootProjectile();
 	void ShootSpear();
 
@@ -136,12 +147,19 @@ public:
 	float phs2;	// secondary attack start time
 	float phs3; // primary attack start time
 	float phs4; // spear attack end time... cannot switch weapon?
-	std::vector<CBaseEntity *> phs5_6_7;
+	std::array<CBeam *, 3> phs5_6_7; // EHANDLE ? 
 	// unsigned short phs8; // m_usFireGungnir
-	std::vector<CBaseEntity *> phs9_10_11;
+	std::vector<EHANDLE> phs9_10_11;
 	float phs12;
 };
 LINK_ENTITY_TO_CLASS(weapon_gungnir, CGungnir)
+
+void CGungnir::Precache()
+{
+	PRECACHE_MODEL(const_cast<char *>(Beam_SPR));
+	return Base::Precache();
+
+}
 
 BOOL CGungnir::Deploy()
 {
@@ -150,14 +168,10 @@ BOOL CGungnir::Deploy()
 	phs4 = -1;
 	phs12 = -1; // 0xBF800000
 
-	// CreateEffect
-
-	// 0.75, 1.0
-	BOOL result = DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE);
-
+	CreateEffect();
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0f;
 
-	return result;
+	return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE);
 }
 
 void CGungnir::Spawn()
@@ -180,7 +194,8 @@ void CGungnir::Holster(int skiplocal)
 	phs12 = -1;
 
 	// clear target list ?
-
+	ClearEffect();
+	DestroyEffect();
 	return Base::Holster();
 }
 
@@ -344,7 +359,7 @@ void CGungnir::ItemPostFrame()
 				this->SendWeaponAnim(ANIM_SHOOT_END, UseDecrement() != FALSE); // 5
 				phs3 = -1;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4f;
-				sub_10334A80();
+				ClearEffect();
 				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, 2, 0, FALSE, FALSE);
 				phs12 = -1;
 			}
@@ -365,13 +380,13 @@ void CGungnir::ItemPostFrame()
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
 				}
-				else if (v16 != ANIM_SHOOT_B_CHARGE) // 7
-				{
-					SendWeaponAnim(ANIM_SHOOT_B_CHARGE, UseDecrement() != FALSE);
-					Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir");
-					m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gungnirB.mdl");
-					return CBasePlayerWeapon::ItemPostFrame();
-				}
+			}
+			else if (v16 != ANIM_SHOOT_B_CHARGE) // 7
+			{
+				SendWeaponAnim(ANIM_SHOOT_B_CHARGE, UseDecrement() != FALSE);
+				Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir");
+				m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gungnirB.mdl");
+				return CBasePlayerWeapon::ItemPostFrame();
 			}
 		}
 		else
@@ -409,6 +424,32 @@ void CGungnir::ItemPostFrame()
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
+void CGungnir::CreateEffect()
+{
+#ifndef CLIENT_DLL
+	for (size_t i = 0; i < 3; ++i)
+	{
+		CBeam *pBeam = CBeam::BeamCreate(Beam_SPR, 10);
+		pBeam->SetColor(255, 255, 255);
+		pBeam->SetScrollRate(15);
+		pBeam->SetBrightness(0);
+
+		phs5_6_7[i] = pBeam;
+	}
+#endif
+}
+
+void CGungnir::DestroyEffect()
+{
+#ifndef CLIENT_DLL
+	for (CBeam *p : phs5_6_7)
+	{
+		if(p)
+			p -> SUB_Remove();
+	}
+#endif
+}
+
 void CGungnir::PrimaryAttack_FindTargets()
 {
 	const float flRadius = 320;
@@ -420,7 +461,9 @@ void CGungnir::PrimaryAttack_FindTargets()
 	{
 		if (PrimaryAttack_CheckTargetAvailable(pEntity, m_pPlayer->pev->v_angle))
 		{
-			phs9_10_11.push_back(pEntity);
+			EHANDLE eh;
+			eh.Set(pEntity->edict());
+			phs9_10_11.push_back(eh);
 		}
 	}
 #endif
@@ -456,7 +499,7 @@ void CGungnir::PrimaryAttack_InstantDamage()
 {
 	if (phs9_10_11.empty())
 	{
-		sub_10334A80();
+		ClearEffect();
 		if (!phs5_6_7.empty())
 		{
 			// ???
@@ -464,10 +507,14 @@ void CGungnir::PrimaryAttack_InstantDamage()
 		return;
 	}
 
-	size_t iLoopNum = phs9_10_11.size() / 4;
-	for (size_t v8 = 0; v8 < iLoopNum; ++v8)
+	//std::random_shuffle(phs9_10_11.begin(), phs9_10_11.end());
+	size_t v8 = 0;
+	for (CBaseEntity *pEntity : phs9_10_11)
 	{
-		CBaseEntity *pEntity = phs9_10_11[4 * v8];
+		if (v8 >= 3)
+			break;
+		if (!pEntity)
+			continue;
 		Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
 
 		TraceResult tr;
@@ -480,26 +527,39 @@ void CGungnir::PrimaryAttack_InstantDamage()
 		
 		if (v8 < 3)
 		{
-			//CBaseEntity *v36 = phs5_6_7[4 * v8];
+#ifndef CLIENT_DLL
+			CBeam *pBeam = phs5_6_7[v8];
+			if (pBeam)
+			{
+				//pBeam->EntsInit(ENTINDEX(m_pPlayer->edict()), ENTINDEX(pEntity->edict()));
+				pBeam->SetType(BEAM_ENTS);
+				pBeam->SetStartEntity(ENTINDEX(m_pPlayer->edict()));
+				pBeam->SetEndEntity(ENTINDEX(pEntity->edict()));
+				pBeam->SetStartAttachment(1);
+				pBeam->SetEndAttachment(0);
+				pBeam->RelinkBeam();
+				pBeam->SetBrightness(230);
+				pBeam->pev->effects &= ~FL_NOTARGET;
 
-			//phs5_6_7.push_back(pEntity);
-			// ???
+			}
+#endif
+			++v8;
 		}
 	}
 }
 
-void CGungnir::sub_10334A80()
+void CGungnir::ClearEffect()
 {
-	auto v1 = phs5_6_7.begin();
-	size_t v2 = (phs5_6_7.size() + 3) / 2;
-	
-	for (size_t v3 = 0; v3 != v2; ++v3)
+#ifndef CLIENT_DLL
+	for (CBeam *pBeam : phs5_6_7)
 	{
-		if (phs5_6_7[v3])
-			; // ???
-		++v1;
+		if (pBeam)
+		{
+			pBeam->pev->effects |= FL_NOTARGET; // 0x80
+			pBeam->SetBrightness(0);
+		}
 	}
-
+#endif
 	phs9_10_11.clear();
 }
 
