@@ -34,7 +34,7 @@ public: // IBaseMod
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 protected:
-	virtual int ZombieOriginNum();
+	virtual size_t ZombieOriginNum();
 	virtual void PickZombieOrigin();
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void RoundEndScore(int iWinStatus);

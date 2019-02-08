@@ -13,6 +13,8 @@
 
 #include "bot_include.h"
 
+#include "util/u_range.hpp"
+
 CMod_Zombi::CMod_Zombi() // precache
 {
 	PRECACHE_SOUND("zombi/human_death_01.wav");
@@ -93,23 +95,15 @@ void CMod_Zombi::Think()
 
 			if (iCountDown == 1)
 			{
-				for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-				{
-					CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-					if (!entity)
-						continue;
-					CLIENT_COMMAND(entity->edict(), "spk zombi_start\n");
-				}
+				for(CBasePlayer *player : moe::range::PlayersList())
+					CLIENT_COMMAND(player->edict(), "spk zombi_start\n");
+
 			}
 			else if (iCountDown >= 10)
 			{
-				for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-				{
-					CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-					if (!entity)
-						continue;
-					CLIENT_COMMAND(entity->edict(), "spk %s\n", szCountDownSound[20 - iCountDown]);
-				}
+				for(CBasePlayer *player : moe::range::PlayersList())
+					CLIENT_COMMAND(player->edict(), "spk %s\n", szCountDownSound[20 - iCountDown]);
+
 			}
 		}
 		else if (iCountDown == 20)
@@ -182,13 +176,9 @@ void CMod_Zombi::Think()
 void CMod_Zombi::HumanWin()
 {
 	//Broadcast("ctwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_human\n");
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk win_human\n");
+
 	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
 	TerminateRound(5, WINSTATUS_CTS);
 	RoundEndScore(WINSTATUS_CTS);
@@ -200,13 +190,9 @@ void CMod_Zombi::HumanWin()
 void CMod_Zombi::ZombieWin()
 {
 	//Broadcast("terwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
+
 	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
 	TerminateRound(5, WINSTATUS_TERRORISTS);
 	RoundEndScore(WINSTATUS_TERRORISTS);
@@ -251,12 +237,8 @@ BOOL CMod_Zombi::FInfectionStarted()
 
 void CMod_Zombi::RoundEndScore(int iWinStatus)
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	for(CBasePlayer *player : moe::range::PlayersList())
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 		if (player->m_iTeam == TEAM_UNASSIGNED || player->m_iTeam == TEAM_SPECTATOR)
 			continue;
 
@@ -343,14 +325,10 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 	return ret;
 }
 
-int CMod_Zombi::ZombieOriginNum()
+size_t CMod_Zombi::ZombieOriginNum()
 {
-	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
-	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
-
-	if (!NumAliveCT)
-		return 0;
-	return NumAliveCT / 10 + 1;
+	moe::range::PlayersList list;
+	return std::distance(list.begin(), list.end()) / 10 + 1;
 }
 
 void CMod_Zombi::PickZombieOrigin()
@@ -358,20 +336,10 @@ void CMod_Zombi::PickZombieOrigin()
 	int iNumZombies = ZombieOriginNum();
 	int iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
 
-	std::vector<CBasePlayer *> players;
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
-		if (!player->IsAlive())
-			continue;
-		if (player->m_iTeam == TEAM_UNASSIGNED || player->m_iTeam == TEAM_SPECTATOR)
-			continue;
-
-		players.push_back(player);
-	}
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer *> players {list.begin(), list.end()};
+	players.erase(std::remove_if(players.begin(), players.end(), std::mem_fn(&CBasePlayer::IsAlive)), players.end());
 
 	// randomize player list
 	std::random_shuffle(players.begin(), players.end());
@@ -413,26 +381,14 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 
 void CMod_Zombi::InfectionSound()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
 }
 
 void CMod_Zombi::RestartRound()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
+	for(CBasePlayer *player : moe::range::PlayersList())
 		player->m_bIsZombie = false;
-	}
 
 	TeamCheck();
 
@@ -444,13 +400,8 @@ void CMod_Zombi::RestartRound()
 
 void CMod_Zombi::TeamCheck()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	for(CBasePlayer *player : moe::range::PlayersList())
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
-		
 		if ((player->m_bIsZombie && player->m_iTeam != TERRORIST) || (!player->m_bIsZombie && player->m_iTeam != CT))
 		{
 			player->m_iTeam = player->m_bIsZombie ? TERRORIST :CT;
