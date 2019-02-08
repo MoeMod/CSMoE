@@ -549,7 +549,9 @@ void CBaseDoor::DoorGoUp ()
 	bool isReversing = (m_toggle_state == TS_GOING_DOWN);
 
 	// It could be going-down, if blocked.
+#ifdef DOOR_ASSERT
 	assert (m_toggle_state == TS_AT_BOTTOM || m_toggle_state == TS_GOING_DOWN);
+#endif
 
 	// emit door moving and stop sounds on CHAN_STATIC so that the multicast doesn't
 	// filter them out and leave a client stuck with looping door sounds!
