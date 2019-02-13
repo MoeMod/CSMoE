@@ -19,10 +19,10 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (wpn.DefaultReload(
-				wpn.MaxClip,
-				wpn.ANIM_RELOAD,
-				wpn.DefaultReloadTime
-				))
+			wpn.MaxClip,
+			wpn.ANIM_RELOAD,
+			wpn.DefaultReloadTime
+		))
 		{
 #ifndef CLIENT_DLL
 			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -38,7 +38,7 @@ public:
 private:
 
 	// fxxking sfinae
-	void ReloadCheckZoom(...) { /* default impl*/}
+	void ReloadCheckZoom(...) { /* default impl*/ }
 	template<class ClassToFind = CFinal>
 	auto ReloadCheckZoom(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
 	{
@@ -50,7 +50,7 @@ private:
 		}
 	}
 
-	auto SetDefaultAccuracy_impl(...) {}
+	void SetDefaultAccuracy_impl(...) {}
 	template<class ClassToFind = CFinal>
 	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
 	{

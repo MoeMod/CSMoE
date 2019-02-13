@@ -11,7 +11,6 @@
 #include "hud_radar_modern.h"
 
 #include <string>
-using namespace std::string_literals;
 
 #if 1
 #define USE_HOSTAGEENTITY
@@ -83,10 +82,10 @@ void CHudRadarModern::Reset(void)
 		std::string map = gEngfuncs.pfnGetLevelName();
 		map.erase(map.rfind('.'));
 		map.erase(0, map.find_last_of("/\\") + 1);
-		LoadOverviewInfo((("overviews/"s) + std::move(map) + ".txt"s).c_str(), &m_OverviewData);
+		LoadOverviewInfo((std::string("overviews/") + std::move(map) + ".txt").c_str(), &m_OverviewData);
 		LoadMapSprites();
 	}
-	
+
 }
 
 void CHudRadarModern::Think(void)
@@ -100,12 +99,12 @@ static inline char *FileExtension(char *in)
 	const char *separator = strrchr(in, '/');
 	const char *backslash = strrchr(in, '\\');
 
-	if (!separator || separator < backslash) 
+	if (!separator || separator < backslash)
 		separator = backslash;
 
 	const char *colon = strrchr(in, ':');
 
-	if (!separator || separator < colon) 
+	if (!separator || separator < colon)
 		separator = colon;
 
 	char *dot = strrchr(in, '.');
@@ -127,7 +126,7 @@ void CHudRadarModern::LoadMapSprites(void)
 		ext[-1] = '.';
 }
 
-bool CHudRadarModern::LoadOverviewInfo(const char* fileName, overview_t* data) 
+bool CHudRadarModern::LoadOverviewInfo(const char* fileName, overview_t* data)
 {
 	char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)fileName, 5, nullptr);
 	if (!buffer) {

@@ -1212,9 +1212,6 @@
     <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h">
       <Filter>dlls\gamemode\zbs</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\player\player_mod_strategy.h">
       <Filter>dlls\player</Filter>
     </ClInclude>

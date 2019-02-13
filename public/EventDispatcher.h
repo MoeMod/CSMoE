@@ -22,7 +22,7 @@ class EventDispatcher<R(Args...)>
 	template<class T>
 	struct ParseArg<T &>
 	{
-		using type = T &;
+		using type = T & ;
 	};
 	template<class T>
 	struct ParseArg<T &&>
@@ -34,6 +34,7 @@ class EventDispatcher<R(Args...)>
 	struct ICallable
 	{
 		// NOT using vtable any more! 
+		ICallable(void(ICallable::*p)(typename ParseArg<Args>::type...) const) : pfn(p) {}
 		void(ICallable::* const pfn)(typename ParseArg<Args>::type...) const = nullptr;
 		void operator()(typename ParseArg<Args>::type...args) const
 		{
@@ -44,9 +45,9 @@ class EventDispatcher<R(Args...)>
 	struct CCallable : ICallable
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : 
-			m_Function(std::forward<RealF>(f)), 
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator()) } 
+		CCallable(RealF &&f) :
+			m_Function(std::forward<RealF>(f)),
+			ICallable(static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator()))
 		{}
 		const F m_Function;
 		void operator()(typename ParseArg<Args>::type...args) const
@@ -59,9 +60,9 @@ class EventDispatcher<R(Args...)>
 	struct CCallable<F, typename std::enable_if<std::is_empty<F>::value>::type> : ICallable, private F
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : 
-			F(std::forward<RealF>(f)), 
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) } 
+		CCallable(RealF &&f) :
+			F(std::forward<RealF>(f)),
+			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) }
 		{}
 		void operator()(typename ParseArg<Args>::type...args) const
 		{

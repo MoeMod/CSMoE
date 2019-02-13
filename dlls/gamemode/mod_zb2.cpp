@@ -169,12 +169,12 @@ void CMod_ZombieMod2::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLeve
 
 void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	player->m_pModStrategy = std::make_unique<CPlayerModStrategy_ZB2>(player, this);
+	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB2(player, this));
 }
 
 CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player), m_pModZB2(mp)
 {
-	m_pZombieSkill = std::make_unique<IZombieSkill>(m_pPlayer);
+	m_pZombieSkill.reset(new IZombieSkill(m_pPlayer));
 
 	using namespace std::placeholders;
 	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(std::bind(&CPlayerModStrategy_ZB2::Event_OnBecomeZombie, this, _1, _2));
@@ -196,7 +196,7 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 {
 	UpdatePlayerEvolutionHUD();
 
-	m_pZombieSkill = std::make_unique<IZombieSkill>(m_pPlayer);
+	m_pZombieSkill.reset(new IZombieSkill(m_pPlayer));
 	m_pZombieSkill->InitHUD();
 }
 
@@ -257,7 +257,7 @@ void CPlayerModStrategy_ZB2::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 	m_iZombieInfections = 0;
 
 	if(CanUseZombieSkill())
-		m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+		m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
 
 	m_pZombieSkill->InitHUD();
 }

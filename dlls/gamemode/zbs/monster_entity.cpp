@@ -642,7 +642,7 @@ CMonster::CMonster() : CHostage(),
 	m_iKillBonusMoney(500), 
 	m_iKillBonusFrags(1), 
 	m_flTimeLastActive(0.0f), 
-	m_pMonsterStrategy(std::make_unique<CMonsterModStrategy_Default>(this))
+	m_pMonsterStrategy(new CMonsterModStrategy_Default(this))
 {
 	MonsterManager().OnEntityAdd(this);
 }

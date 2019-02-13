@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 project (SERVER)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 if (APPLE)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")

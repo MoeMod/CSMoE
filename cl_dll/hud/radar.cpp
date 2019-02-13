@@ -26,7 +26,7 @@ CHudRadar::~CHudRadar() = default;
 
 int CHudRadar::Init()
 {
-	pimpl = std::make_unique<impl_t>();
+	pimpl.reset(new impl_t);
 
 	HOOK_MESSAGE( Radar );
 	HOOK_COMMAND( "drawradar", ShowRadar );

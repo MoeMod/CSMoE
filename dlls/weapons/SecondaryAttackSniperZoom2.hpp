@@ -15,7 +15,7 @@ class TSecondaryAttackSniperZoom2 : public CBase
 public:
 
 	static constexpr auto Rec_SecondaryAttack_HasZoom = true;
-	constexpr int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).ZoomFOV2; }
+	int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).ZoomFOV2; }
 
 public:
 	void SecondaryAttack(void) override

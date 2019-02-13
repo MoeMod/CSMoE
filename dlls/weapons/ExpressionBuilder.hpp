@@ -1,5 +1,5 @@
 //
-// Created by 小白白 on 2019-01-18.
+// Created by С�װ� on 2019-01-18.
 //
 
 #pragma once
@@ -33,7 +33,7 @@ namespace ExpressionBuilder
 			constexpr explicit BindedType(Varible x, Constant c) : var(x), con(c) {}
 
 			template<class T>
-			constexpr auto operator()(T x) const
+			constexpr auto operator()(T x) const -> decltype(*this)
 			{
 				return *this;
 			}
@@ -43,19 +43,19 @@ namespace ExpressionBuilder
 		struct VaribleType : Expression
 		{
 			template<class UnderlyingType>
-			constexpr auto operator=(UnderlyingType c) const
+			constexpr auto operator=(UnderlyingType c) const -> BindedType<VaribleType<Name>, ConstantType<UnderlyingType>>
 			{
 				return BindedType<VaribleType<Name>, ConstantType<UnderlyingType>>(*this, ConstantType<UnderlyingType>(c));
 			}
 
 			template<class UnderlyingType>
-			constexpr auto operator()(BindedType<VaribleType<Name>, ConstantType<UnderlyingType>> x) const
+			constexpr auto operator()(BindedType<VaribleType<Name>, ConstantType<UnderlyingType>> x) const -> decltype(x.con.c)
 			{
 				return x.con.c;
 			}
 
 			template<class T>
-			constexpr auto operator()(T x) const
+			constexpr auto operator()(T x) const -> decltype(*this)
 			{
 				return *this;
 			}
@@ -87,7 +87,7 @@ namespace ExpressionBuilder
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
-			constexpr auto operator()(T x) const { return _1(x) + _2(x); }
+			constexpr auto operator()(T x) const -> decltype(_1(x) + _2(x)) { return _1(x) + _2(x); }
 		};
 
 		template<class Exp1, class Exp2>
@@ -97,7 +97,7 @@ namespace ExpressionBuilder
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
-			constexpr auto operator()(T x) const { return _1(x) - _2(x); }
+			constexpr auto operator()(T x) const -> decltype(_1(x) - _2(x)) { return _1(x) - _2(x); }
 		};
 		template<class Exp1, class Exp2>
 		struct OperatorMul_t : BinaryOperator<Exp1, Exp2>
@@ -106,7 +106,7 @@ namespace ExpressionBuilder
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
-			constexpr auto operator()(T x) const { return _1(x) * _2(x); }
+			constexpr auto operator()(T x) const -> decltype(_1(x) * _2(x)) { return _1(x) * _2(x); }
 		};
 		template<class Exp1, class Exp2>
 		struct OperatorDiv_t : BinaryOperator<Exp1, Exp2>
@@ -115,32 +115,32 @@ namespace ExpressionBuilder
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
-			constexpr auto operator()(T x) const { return _1(x) / _2(x); }
+			constexpr auto operator()(T x) const -> decltype(_1(x) / _2(x)) { return _1(x) / _2(x); }
 		};
 
 		template<class Exp1, class Exp2, class = typename std::enable_if<IsExpression<Exp1>::value || IsExpression<Exp2>::value>::type>
-		constexpr auto operator+(Exp1 _1, Exp2 _2)
+		constexpr auto operator+(Exp1 _1, Exp2 _2) -> OperatorPlus_t<decltype(varcon(_1)), decltype(varcon(_2))>
 		{
 			return OperatorPlus_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
 		};
 		template<class Exp1, class Exp2, class = typename std::enable_if<IsExpression<Exp1>::value || IsExpression<Exp2>::value>::type>
-		constexpr auto operator-(Exp1 _1, Exp2 _2)
+		constexpr auto operator-(Exp1 _1, Exp2 _2) -> OperatorMinus_t<decltype(varcon(_1)), decltype(varcon(_2))>
 		{
 			return OperatorMinus_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
 		};
 		template<class Exp1, class Exp2, class = typename std::enable_if<IsExpression<Exp1>::value || IsExpression<Exp2>::value>::type>
-		constexpr auto operator*(Exp1 _1, Exp2 _2)
+		constexpr auto operator*(Exp1 _1, Exp2 _2) -> OperatorMul_t<decltype(varcon(_1)), decltype(varcon(_2))>
 		{
 			return OperatorMul_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
 		};
 		template<class Exp1, class Exp2, class = typename std::enable_if<IsExpression<Exp1>::value || IsExpression<Exp2>::value>::type>
-		constexpr auto operator/(Exp1 _1, Exp2 _2)
+		constexpr auto operator/(Exp1 _1, Exp2 _2) -> OperatorDiv_t<decltype(varcon(_1)), decltype(varcon(_2))>
 		{
 			return OperatorDiv_t<decltype(varcon(_1)), decltype(varcon(_2))>(varcon(_1), varcon(_2));
 		};
 	}
 
-    constexpr detail::VaribleType<'x'> x{};
-    constexpr detail::VaribleType<'y'> y{};
-    constexpr detail::VaribleType<'z'> z{};
+	constexpr detail::VaribleType<'x'> x{};
+	constexpr detail::VaribleType<'y'> y{};
+	constexpr detail::VaribleType<'z'> z{};
 }

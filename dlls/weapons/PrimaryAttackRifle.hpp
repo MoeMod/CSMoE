@@ -12,7 +12,7 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		if(!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
+		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
 			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
 		else if (CBase::m_pPlayer->pev->velocity.Length2D() > 140)
 			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
@@ -28,7 +28,7 @@ private:
 	// sfinae query for whether the weapon has/is zoom.
 	constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
 	template<class ClassToFind = CFinal>
-	constexpr auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
+	auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 

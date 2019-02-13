@@ -23,15 +23,15 @@ public:
 	};
 public:
 	explicit CTextureRef(const char *path, int flags = TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP)
-		: m_iInternalId(gRenderAPI.GL_LoadTexture(path, NULL, 0, flags)) 
+		: m_iInternalId(gRenderAPI.GL_LoadTexture(path, NULL, 0, flags))
 	{
-		if(!m_iInternalId)
+		if (!m_iInternalId)
 			throw TextureNotFoundException();
 	}
 
 public:
 	~CTextureRef() { gRenderAPI.GL_FreeTexture(m_iInternalId); }
-	
+
 public:
 	void Bind(int tmu = 0) const noexcept
 	{
@@ -53,7 +53,7 @@ inline UniqueTexture R_LoadTextureUnique(Args&&...args)
 {
 	try
 	{
-		return std::make_unique<CTextureRef>(std::forward<Args>(args)...);
+		return std::unique_ptr<CTextureRef>(new CTextureRef(std::forward<Args>(args)...));
 	}
 	catch (const CTextureRef::TextureNotFoundException &e) {}
 	return nullptr;

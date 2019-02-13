@@ -111,7 +111,7 @@ protected:
 
 void CMod_ZombieScenario::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	player->m_pModStrategy = std::make_unique<PlayerModStrategy_ZBS>(player, this);
+	player->m_pModStrategy.reset(new PlayerModStrategy_ZBS(player, this));
 }
 
 float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
@@ -407,7 +407,7 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 		UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	}
 
-	monster->m_pMonsterStrategy = std::make_unique<CMonsterModStrategy_ZBS>(monster, this);
+	monster->m_pMonsterStrategy.reset(new CMonsterModStrategy_ZBS(monster, this));
 
 	return monster;
 }

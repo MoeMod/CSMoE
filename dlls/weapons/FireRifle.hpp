@@ -1,5 +1,5 @@
 //
-// Created by 小白白 on 2019-01-19.
+// Created by С�װ� on 2019-01-19.
 //
 
 #pragma once
@@ -92,7 +92,7 @@ public:
 		 */
 
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100),static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100), static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	}
 
 private:
@@ -102,7 +102,7 @@ private:
 		if (CBase::m_flAccuracy < p->AccuracyMin)
 			CBase::m_flAccuracy = p->AccuracyMin;
 	}
-	auto CheckAccuracyBoundaryMin(...) {}
+	void CheckAccuracyBoundaryMin(...) {}
 
 	template<class ClassToCheck = CFinal>
 	auto CheckAccuracyBoundaryMax(ClassToCheck *p) -> decltype(&ClassToCheck::AccuracyMax(), void())
@@ -110,5 +110,5 @@ private:
 		if (CBase::m_flAccuracy > p->AccuracyMax)
 			CBase::m_flAccuracy = p->AccuracyMax;
 	}
-	auto CheckAccuracyBoundaryMax(...) {}
+	void CheckAccuracyBoundaryMax(...) {}
 };

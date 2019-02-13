@@ -30,18 +30,18 @@ enum ak47_e
 	AK47_SHOOT3
 };
 
-class CAK47_Long: public LinkWeaponTemplate<CAK47_Long,
-		TGeneralData,
-		BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
-		TPrecacheEvent,
-		TDeployDefault,
-		TReloadDefault,
-		TSecondaryAttackZoom,
-		TPrimaryAttackRifle,
-		TFireRifle,
-		TRecoilKickBack,
-		TWeaponIdleDefault,
-		TGetDamageDefault
+class CAK47_Long : public LinkWeaponTemplate<CAK47_Long,
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
+	TPrecacheEvent,
+	TDeployDefault,
+	TReloadDefault,
+	TSecondaryAttackZoom,
+	TPrimaryAttackRifle,
+	TFireRifle,
+	TRecoilKickBack,
+	TWeaponIdleDefault,
+	TGetDamageDefault
 >
 {
 public:
@@ -56,22 +56,22 @@ public:
 	static constexpr const char *AnimExtension = "ak47";
 	static constexpr int MaxClip = 60;
 	static constexpr auto   ANIM_IDLE1 = AK47_IDLE1,
-							ANIM_RELOAD = AK47_RELOAD,
-							ANIM_DRAW = AK47_DRAW;
-	static constexpr auto &&SpreadCalcNotOnGround = 0.04 + 0.4 * A;
-	static constexpr auto &&SpreadCalcWalking = 0.03 + 0.02 * A;
-	static constexpr auto &&SpreadCalcDefault = 0.02 * A;
+		ANIM_RELOAD = AK47_RELOAD,
+		ANIM_DRAW = AK47_DRAW;
+	static constexpr auto SpreadCalcNotOnGround = 0.04 + 0.4 * A;
+	static constexpr auto SpreadCalcWalking = 0.03 + 0.02 * A;
+	static constexpr auto SpreadCalcDefault = 0.02 * A;
 	static constexpr float CycleTime = 0.0955;
 	static constexpr int DamageDefault = 97;
-	static constexpr auto &&AccuracyCalc = (N * N * N / 200.0) + 0.35;
+	static constexpr auto AccuracyCalc = (N * N * N / 200.0) + 0.35;
 	static constexpr float AccuracyMax = 1;
 	static constexpr float RangeModifier = 0.98;
 	static constexpr auto BulletType = BULLET_PLAYER_762MM;
 	static constexpr int Penetration = 2;
-	static constexpr KickBackData &&KickBackWalking = {0.4125, 0.15, 0.075, 0.015, 2.5, 0.5, 3};
-	static constexpr KickBackData &&KickBackNotOnGround = {1, 0.5, 0.25, 0.175, 4.5, 3, 1};
-	static constexpr KickBackData &&KickBackDucking = {0.3, 0.15, 0.05, 0.005, 2.5, 0.5, 4};
-	static constexpr KickBackData &&KickBackDefault = {0.4, 0.15, 0.0625, 0.015, 2.5, 0.5, 3};
-	static constexpr KnockbackData &&KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
+	static constexpr KickBackData KickBackWalking = { 0.4125, 0.15, 0.075, 0.015, 2.5, 0.5, 3 };
+	static constexpr KickBackData KickBackNotOnGround = { 1, 0.5, 0.25, 0.175, 4.5, 3, 1 };
+	static constexpr KickBackData KickBackDucking = { 0.3, 0.15, 0.05, 0.005, 2.5, 0.5, 4 };
+	static constexpr KickBackData KickBackDefault = { 0.4, 0.15, 0.0625, 0.015, 2.5, 0.5, 3 };
+	static constexpr KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
 };
 LINK_ENTITY_TO_CLASS(weapon_ak47l, CAK47_Long)

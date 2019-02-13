@@ -12,7 +12,7 @@ endif
 
 LOCAL_CFLAGS += -w -D_LINUX -DCLIENT_WEAPONS -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf -D_stricmp=strcasecmp -D_vsnprintf=vsnprintf -D_strdup=strdup -D_write=write -D_close=close 
 
-LOCAL_CPPFLAGS += -frtti -std=c++14
+LOCAL_CPPFLAGS += -frtti -std=c++11 -fexceptions
 	
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/. \
 		    $(LOCAL_PATH)/.. \
@@ -197,7 +197,6 @@ LOCAL_SRC_FILES := \
 ../dlls/wpn_shared/wpn_cannon.cpp \
 ../dlls/wpn_shared/wpn_infinity.cpp \
 ../dlls/wpn_shared/wpn_k1a.cpp \
-../dlls/wpn_shared/wpn_knife_zombi.cpp \
 ../dlls/wpn_shared/wpn_kriss.cpp \
 ../dlls/wpn_shared/wpn_m95.cpp \
 ../dlls/wpn_shared/wpn_m1887.cpp \

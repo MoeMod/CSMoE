@@ -14,7 +14,7 @@ class TSecondaryAttackSniperZoom1 : public CBase
 public:
 
 	static constexpr auto Rec_SecondaryAttack_HasZoom = true;
-	constexpr int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).CFinal::ZoomFOV; }
+	int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).CFinal::ZoomFOV; }
 
 public:
 	void SecondaryAttack(void) override
@@ -22,8 +22,8 @@ public:
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		switch (CBase::m_pPlayer->m_iFOV)
 		{
-			case 90: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = wpn.ZoomFOV; break;
-			default: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = 90; break;
+		case 90: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = wpn.ZoomFOV; break;
+		default: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = 90; break;
 		}
 
 		CBase::m_pPlayer->ResetMaxSpeed();

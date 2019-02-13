@@ -1,7 +1,8 @@
 //
-// Created by 小白白 on 2019-01-17.
+// Created by С�װ� on 2019-01-17.
 //
 
+#pragma once
 struct StaticKnockbackData
 {
 	static constexpr float KnockbackOnGround = 0;
@@ -12,13 +13,13 @@ struct StaticKnockbackData
 
 template<class NewStaticKnockbackData>
 constexpr auto BuildKnockbackData(NewStaticKnockbackData &&t, float flVelocityModifier)
-	-> decltype(
-			typename NewStaticKnockbackData::KnockbackOnGround(),
-			typename NewStaticKnockbackData::KnockbackNotOnGround(),
-			typename NewStaticKnockbackData::KnockbackFlying(),
-			typename NewStaticKnockbackData::KnockbackDucking(),
-			KnockbackData()
-			)
+-> decltype(
+	typename NewStaticKnockbackData::KnockbackOnGround(),
+	typename NewStaticKnockbackData::KnockbackNotOnGround(),
+	typename NewStaticKnockbackData::KnockbackFlying(),
+	typename NewStaticKnockbackData::KnockbackDucking(),
+	KnockbackData()
+	)
 {
 	return {
 			t.KnockbackOnGround,
@@ -30,54 +31,53 @@ constexpr auto BuildKnockbackData(NewStaticKnockbackData &&t, float flVelocityMo
 }
 template<class T, T...Is, template<T...> class SequenceHolder>
 constexpr auto BuildKnockbackData(SequenceHolder<Is...>, float flVelocityModifier)
-	-> typename std::enable_if<sizeof...(Is) == 4, KnockbackData>::type
+-> typename std::enable_if<sizeof...(Is) == 4, KnockbackData>::type
 {
 	return { Is..., flVelocityModifier };
 }
-template<class T, T...Is, template<class,T...> class SequenceHolder>
+template<class T, T...Is, template<class, T...> class SequenceHolder>
 constexpr auto BuildKnockbackData(SequenceHolder<T, Is...>, float flVelocityModifier)
-	-> typename std::enable_if<sizeof...(Is) == 4, KnockbackData>::type
+-> typename std::enable_if<sizeof...(Is) == 4, KnockbackData>::type
 {
 	return { Is..., flVelocityModifier };
 }
-constexpr KnockbackData BuildKnockbackData(KnockbackData kbd)
+constexpr KnockbackData BuildKnockbackData(const KnockbackData &kbd)
 {
-	return kbd;
+	return { kbd.flOnGround, kbd.flNotOnGround, kbd.flFlying, kbd.flDucking, kbd.flDucking };
 }
-constexpr KnockbackData BuildKnockbackData(std::initializer_list<float> kbd)
+constexpr KnockbackData BuildKnockbackData(const float(&kbd)[5])
 {
-	auto iter = kbd.begin();
-	return { *iter++, *iter++, *iter++, *iter++, *iter++ };
+	return { kbd[0], kbd[1], kbd[2], kbd[3], kbd[4] };
 }
 
 template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TGeneralData : public CBase
 {
 public:
-//	static constexpr auto P_Model = "";
-//	static constexpr auto V_Model = "";
-//	static constexpr auto W_Model = "";
+	//	static constexpr auto P_Model = "";
+	//	static constexpr auto V_Model = "";
+	//	static constexpr auto W_Model = "";
 	static constexpr float ArmorRatioModifier = 1.0f;
-//	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+	//	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 	static constexpr float MaxSpeed = 250;
-//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
-//  static constexpr const char *ClassName = "weapon_???";
-	static constexpr KnockbackData &&KnockBack{};
+	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
+	//  static constexpr const char *ClassName = "weapon_???";
+	static constexpr KnockbackData KnockBack = KnockbackData{};
 
-// Knock back data can be defined as following :
-//  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f};
-//
-//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>;
-//      static constexpr float VelocityModifier = 1.0f;
-//
-//  (C) struct Knockback_t
-//      {
-//      	static constexpr float KnockbackOnGround = 0.f;
-//      	static constexpr float KnockbackNotOnGround = 0.f;
-//      	static constexpr float KnockbackFlying = 0.f;
-//          static constexpr float KnockbackDucking = 0.f;
-//      };
-//      static constexpr float VelocityModifier = 1.0f;
+	// Knock back data can be defined as following :
+	//  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f}; // requires c++14
+	//
+	//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>;
+	//      static constexpr float VelocityModifier = 1.0f;
+	//
+	//  (C) struct Knockback_t
+	//      {
+	//      	static constexpr float KnockbackOnGround = 0.f;
+	//      	static constexpr float KnockbackNotOnGround = 0.f;
+	//      	static constexpr float KnockbackFlying = 0.f;
+	//          static constexpr float KnockbackDucking = 0.f;
+	//      };
+	//      static constexpr float VelocityModifier = 1.0f;
 
 
 public:
@@ -111,11 +111,11 @@ public:
 	void Precache(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		if(wpn.P_Model && wpn.P_Model[0])
+		if (wpn.P_Model && wpn.P_Model[0])
 			PRECACHE_MODEL(const_cast<char *>(wpn.P_Model));
-		if(wpn.V_Model && wpn.V_Model[0])
+		if (wpn.V_Model && wpn.V_Model[0])
 			PRECACHE_MODEL(const_cast<char *>(wpn.V_Model));
-		if(wpn.W_Model && wpn.W_Model[0])
+		if (wpn.W_Model && wpn.W_Model[0])
 			PRECACHE_MODEL(const_cast<char *>(wpn.W_Model));
 
 		CBase::Precache();
@@ -134,9 +134,9 @@ public:
 private:
 	// sfinae call
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(&ClassToFind::KnockBack, KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(wpn.KnockBack, KnockbackData())
 	{
-		return ::BuildKnockbackData(wpn.KnockBack);
+		return BuildKnockbackData(wpn.KnockBack);
 	}
 	template<class ClassToFind = CFinal>
 	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
@@ -145,16 +145,16 @@ private:
 	}
 
 private:
-	constexpr auto SetDefaultAccuracy_impl(...){}
+	constexpr void SetDefaultAccuracy_impl(...) {}
 	template<class ClassToFind = CFinal>
-	constexpr auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
+	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 	}
-	constexpr auto SetDefaultAmmo_impl(...){}
+	constexpr void SetDefaultAmmo_impl(...) {}
 	template<class ClassToFind = CFinal>
-	constexpr auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
+	auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_iDefaultAmmo = wpn.MaxClip;

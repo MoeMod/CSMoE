@@ -42,7 +42,7 @@ Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x6
 ### Android - Google Pixel C (2015)
 * SoC : nVIDIA Tegra X1
 * RAM : 4 GB
-* Resolution : 2560 ¡Á 1800
+* Resolution : 2560 x 1800
 * Result : Smooth, 90+ fps
 ### iOS - Apple iPad 6th Gen (2018)
 * SoC : A10 Fusion
@@ -98,7 +98,7 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 
 ## Building
 ### Generic
-- This project uses C++14 standard, and please ensure that your compiler supports it.
+- This project uses C++11 standard, and please ensure that your compiler supports it.
 ### Windows
 - Visual Studio 2017 projects can be found in msvc/csmoe.sln
 - Download SDL2-devel-2.0.9-VC.zip from http://www.libsdl.org/ and put them into SDL2/

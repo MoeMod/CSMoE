@@ -95,8 +95,7 @@ void CHudZBS::InitHUDData(void)
 
 void CHudZBS::Shutdown(void)
 {
-	//delete pimpl;
-	//pimpl = nullptr;
-	delete std::exchange(pimpl, nullptr);
+	delete pimpl;
+	pimpl = nullptr;
 }
 
