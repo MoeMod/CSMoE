@@ -16,7 +16,7 @@ LOCAL_MODULE_FILENAME = libclient_hardfp
 endif
 
 LOCAL_CFLAGS += -fsigned-char -DCLIENT_DLL=1 -DCLIENT_WEAPONS=1
-LOCAL_CPPFLAGS += -std=c++14
+LOCAL_CPPFLAGS += -std=c++11 -fexceptions
 
 SRCS := \
 	./cdll_int.cpp \
@@ -133,6 +133,7 @@ SRCS := \
 ../dlls/wpn_shared/wpn_xm8c.cpp \
 ../dlls/wpn_shared/wpn_xm8s.cpp \
 ../dlls/wpn_shared/knife_skullaxe.cpp \
+../dlls/wpn_shared/wpn_gungnir.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \

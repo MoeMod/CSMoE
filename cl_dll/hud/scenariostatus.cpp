@@ -19,7 +19,7 @@ int CHudScenarioStatus::Init(void)
 int CHudScenarioStatus::VidInit(void)
 {
 	m_alpha = 100;
-	m_hSprite = NULL;
+	m_hSprite = 0;
 	m_iRepeatTimes = 0;
 	return 1;
 }
@@ -27,7 +27,7 @@ int CHudScenarioStatus::VidInit(void)
 void CHudScenarioStatus::Reset(void)
 {
 	m_iFlags &= ~HUD_ACTIVE;
-	m_hSprite = NULL;
+	m_hSprite = 0;
 	m_iRepeatTimes = 0;
 	m_nextFlash = 0;
 }

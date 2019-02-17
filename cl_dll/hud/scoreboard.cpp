@@ -117,7 +117,7 @@ CHudScoreboard::~CHudScoreboard() = default;
 
 int CHudScoreboard::Init(void)
 {
-	pimpl.reset(new impl_t);
+	pimpl.reset(new impl_t());
 
 	gHUD.AddHudElem(this);
 

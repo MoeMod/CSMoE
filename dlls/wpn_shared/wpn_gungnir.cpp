@@ -59,7 +59,7 @@ public:
 		PRECACHE_MODEL("sprites/ef_gungnir_bexplo.spr");
 	}
 
-	constexpr KnockbackData GetKnockBackData()
+	KnockbackData GetKnockBackData()
 	{
 		return { 0.0, 0.0, 0.0, 0.0, 1.0 };
 	}
@@ -238,7 +238,7 @@ public:
 		ph8 = 300.0;
 		this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
-		
+
 	}
 
 	void Precache() override
@@ -249,7 +249,7 @@ public:
 		PRECACHE_MODEL("sprites/ef_gungnir_lightline2.spr");
 	}
 
-	constexpr KnockbackData GetKnockBackData()
+	KnockbackData GetKnockBackData()
 	{
 		return { 1100.0, 500.0, 700.0, 400.0, 0.89999998 };
 	}
@@ -315,13 +315,13 @@ LINK_ENTITY_TO_CLASS(gungnir_spear, CGungnirSpear)
 
 #endif
 
-class CGungnir: public LinkWeaponTemplate< CGungnir,
-		TGeneralData,
-		BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
-		TPrecacheEvent,
-		TReloadDefault,
-		TWeaponIdleDefault,
-		TGetDamageDefault
+class CGungnir : public LinkWeaponTemplate< CGungnir,
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
+	TPrecacheEvent,
+	TReloadDefault,
+	TWeaponIdleDefault,
+	TGetDamageDefault
 >
 {
 public:
@@ -604,7 +604,7 @@ void CGungnir::ShootSpear()
 		// set ent...
 	}
 #endif
-	
+
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.12;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.13;
 	m_iClip = std::max(m_iClip - 5, 0);
@@ -623,7 +623,7 @@ void CGungnir::SecondaryAttack()
 	{
 		if (phs2 == -1)
 			phs2 = gpGlobals->time;
-		
+
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0f;
 	}
 }
@@ -741,8 +741,8 @@ void CGungnir::DestroyEffect()
 #ifndef CLIENT_DLL
 	for (CBeam *p : phs5_6_7)
 	{
-		if(p)
-			p -> SUB_Remove();
+		if (p)
+			p->SUB_Remove();
 	}
 #endif
 }
@@ -821,7 +821,7 @@ void CGungnir::PrimaryAttack_InstantDamage()
 		pEntity->TraceAttack(m_pPlayer->pev, GetDamage_PrimaryAttack_Instant(), vecDirection, &tr, DMG_BULLET);
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
-		
+
 		if (v8 < 3)
 		{
 #ifndef CLIENT_DLL
