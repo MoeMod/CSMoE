@@ -138,7 +138,7 @@ void FollowState::ComputeLeaderMotionState(float leaderSpeed)
 void FollowState::OnUpdate(CCSBot *me)
 {
 	// if we lost our leader, give up
-	if (m_leader == NULL || !m_leader->IsAlive())
+	if (m_leader == nullptr || !m_leader->IsAlive())
 	{
 		me->Idle();
 		return;
@@ -261,7 +261,7 @@ void FollowState::OnUpdate(CCSBot *me)
 
 		const float runSpeed = 200.0f;
 		const float collectRange = (leaderSpeed > runSpeed) ? 600.0f : 400.0f;
-		FollowTargetCollector collector(m_leader);
+		FollowTargetCollector collector(static_cast<CBasePlayer *>(m_leader));
 		SearchSurroundingAreas(TheNavAreaGrid.GetNearestNavArea(&m_lastLeaderPos), &m_lastLeaderPos, collector, collectRange);
 
 		if (cv_bot_debug.value > 0.0f)
@@ -307,7 +307,7 @@ void FollowState::OnUpdate(CCSBot *me)
 				}
 			}
 
-			if (me->ComputePath(target, NULL, FASTEST_ROUTE) == NULL)
+			if (me->ComputePath(target, NULL, FASTEST_ROUTE) == false)
 				me->PrintIfWatched("Pathfind to leader failed.\n");
 
 			// throttle how often we repath

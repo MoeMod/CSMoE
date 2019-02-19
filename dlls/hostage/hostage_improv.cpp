@@ -1527,7 +1527,7 @@ CBasePlayer *CHostageImprov::GetClosestVisiblePlayer(int team)
 
 	for (int i = 0; i < m_visiblePlayerCount; ++i)
 	{
-		CBasePlayer *player = (CBasePlayer *)CBaseEntity::Instance(m_visiblePlayer[i]);
+		CBasePlayer *player = static_cast<CBasePlayer *>(m_visiblePlayer[i]);
 
 		if (player == NULL || (team > 0 && player->m_iTeam != team))
 			continue;

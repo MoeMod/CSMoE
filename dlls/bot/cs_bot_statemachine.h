@@ -204,12 +204,12 @@ public:
 	virtual void OnExit(CCSBot *me);
 	virtual const char *GetName() const { return "Follow"; }
 
-	void SetLeader(CBaseEntity *leader) { m_leader = leader; }
+	void SetLeader(CBasePlayer *leader) { m_leader = leader; }
 
 private:
 	void ComputeLeaderMotionState(float leaderSpeed);
 
-	EHANDLE m_leader;
+	EntityHandle<CBasePlayer> m_leader;
 	Vector m_lastLeaderPos;
 	bool m_isStopped;
 	float m_stoppedTimestamp;

@@ -35,7 +35,7 @@ IMPLEMENT_SAVERESTORE(CCycler, CBaseToggle);
 
 void CGenericCycler::Spawn()
 {
-	GenericCyclerSpawn((char *)STRING(pev->model), Vector(-16, -16, 0), Vector(16, 16, 72));
+	GenericCyclerSpawn(STRING(pev->model), Vector(-16, -16, 0), Vector(16, 16, 72));
 }
 
 LINK_ENTITY_TO_CLASS(cycler, CGenericCycler);
@@ -50,7 +50,7 @@ void CCyclerProbe::Spawn()
 
 // Cycler member functions
 
-void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
+void CCycler::GenericCyclerSpawn(const char *szModel, Vector vecMin, Vector vecMax)
 {
 	if (!szModel || !szModel[0])
 	{
@@ -204,7 +204,7 @@ void CCyclerSprite::Spawn()
 	m_rendermode = pev->rendermode;
 	m_renderamt = pev->renderamt;
 
-	for (int i = 0; i < ARRAYSIZE(pev->rendercolor); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(pev->rendercolor); ++i)
 	{
 		pev->rendercolor[i] = m_rendercolor[i];
 	}
@@ -226,7 +226,7 @@ void CCyclerSprite::Restart()
 	pev->rendermode = m_rendermode;
 	pev->renderamt = m_renderamt;
 
-	for (int i = 0; i < ARRAYSIZE(pev->rendercolor); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(pev->rendercolor); ++i)
 	{
 		pev->rendercolor[i] = m_rendercolor[i];
 	}

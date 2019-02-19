@@ -26,7 +26,7 @@ public: // CHalfLifeMultiplay
 	void ClientDisconnected(edict_t *pClient) override;
 	BOOL FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker) override;
 	void CheckWinConditions() override;
-	int IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled);
+	int IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled) override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 
 public: // IBaseMod

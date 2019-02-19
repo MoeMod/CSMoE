@@ -35,7 +35,8 @@
 class CCareerTask
 {
 public:
-	CCareerTask() {};
+	CCareerTask() = default;
+	virtual ~CCareerTask() = default;
 	CCareerTask(const char *taskName, GameEventType event, const char *weaponName, int n, bool mustLive, bool crossRounds, int id, bool isComplete);
 public:
 	virtual void OnEvent(GameEventType event, CBasePlayer *pAttacker, CBasePlayer *pVictim);

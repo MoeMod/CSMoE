@@ -139,7 +139,7 @@ WeaponStruct g_weaponStruct[ MAX_WEAPONS ] =
 	{ 0, 0, 0, 0, 0 }
 };
 
-char *CDeadHEV::m_szPoses[] =
+const char *CDeadHEV::m_szPoses[] =
 {
 	"deadback",
 	"deadsitting",
@@ -167,7 +167,7 @@ CBasePlayer::~CBasePlayer()
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
-	char *model;
+	const char *model;
 
 	if (m_iTeam == CT)
 	{
@@ -281,7 +281,7 @@ CBasePlayer *CBasePlayer::GetNextRadioRecipient(CBasePlayer *pStartPlayer)
 			if (iSpecMode != OBS_CHASE_LOCKED && iSpecMode != OBS_CHASE_FREE && iSpecMode != OBS_IN_EYE)
 				continue;
 
-			if (!FNullEnt(m_hObserverTarget))
+			if (!m_hObserverTarget)
 				continue;
 
 			CBasePlayer *pTarget = (CBasePlayer *)CBaseEntity::Instance(pPlayer->m_hObserverTarget->pev);
@@ -343,7 +343,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			if (iSpecMode != OBS_CHASE_LOCKED && iSpecMode != OBS_CHASE_FREE && iSpecMode != OBS_IN_EYE)
 				continue;
 
-			if (!FNullEnt(pPlayer->m_hObserverTarget))
+			if (!pPlayer->m_hObserverTarget)
 				continue;
 
 			CBasePlayer *pTarget = (CBasePlayer *)CBaseEntity::Instance(pPlayer->m_hObserverTarget->pev);
@@ -1242,6 +1242,8 @@ void CBasePlayer::GiveDefaultItems()
 			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 			break;
+		default:
+			break;
 		}
 	}
 }
@@ -1308,7 +1310,7 @@ void CBasePlayer::RemoveAllItems(BOOL removeSuit)
 	}
 
 	m_pActiveItem = NULL;
-	m_bHasPrimary = NULL;
+	m_bHasPrimary = false;
 
 	pev->viewmodel = 0;
 	pev->weaponmodel = 0;
@@ -3109,6 +3111,8 @@ void CBasePlayer::JoiningThink()
 
 			return;
 		}
+		default:
+			break;
 	}
 
 	if (m_pIntroCamera && gpGlobals->time >= m_fIntroCamTime)
@@ -4578,7 +4582,6 @@ bool CBasePlayer::SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot
 
 void CBasePlayer::Spawn()
 {
-	int i;
 
 	m_iGaitsequence = 0;
 
@@ -4721,7 +4724,7 @@ void CBasePlayer::Spawn()
 	m_iNumSpawns++;
 	InitStatusBar();
 
-	for (i = 0; i < MAX_RECENT_PATH; ++i)
+	for (size_t i = 0; i < MAX_RECENT_PATH; ++i)
 		m_vRecentPath[ i ] = Vector(0, 0, 0);
 
 	if (m_pActiveItem != NULL && !pev->viewmodel)
@@ -4739,6 +4742,8 @@ void CBasePlayer::Spawn()
 			break;
 		case WEAPON_SG550:
 			pev->viewmodel = MAKE_STRING("models/v_sg550.mdl");
+			break;
+		default:
 			break;
 		}
 	}
@@ -4812,7 +4817,7 @@ void CBasePlayer::Spawn()
 	{
 		m_iClientHideHUD = -1;
 
-		for (i = 0; i < MAX_AMMO_SLOTS; ++i)
+		for (size_t i = 0; i < MAX_AMMO_SLOTS; ++i)
 			m_rgAmmo[i] = 0;
 
 		m_bHasPrimary = false;
@@ -4822,7 +4827,7 @@ void CBasePlayer::Spawn()
 	}
 	else
 	{
-		for (i = 0; i < MAX_AMMO_SLOTS; ++i)
+		for (size_t i = 0; i < MAX_AMMO_SLOTS; ++i)
 			m_rgAmmoLast[i] = -1;
 	}
 
@@ -4832,7 +4837,7 @@ void CBasePlayer::Spawn()
 
 	m_bNightVisionOn = false;
 
-	for (i = 1; i <= gpGlobals->maxClients; ++i)
+	for (int i = 1; i <= gpGlobals->maxClients; ++i)
 	{
 		CBasePlayer *pObserver = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
 
@@ -4923,7 +4928,7 @@ void CBasePlayer::Spawn()
 
 	sv_aim = CVAR_GET_POINTER("sv_aim");
 
-	for (i = 0; i < ARRAYSIZE(m_flLastCommandTime); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(m_flLastCommandTime); ++i)
 		m_flLastCommandTime[i] = -1;
 }
 
@@ -5866,7 +5871,7 @@ BOOL CBasePlayer::RemovePlayerItem(CBasePlayerItem *pItem)
 
 // Returns the unique ID for the ammo, or -1 if error
 
-int CBasePlayer::GiveAmmo(int iCount, char *szName, int iMax)
+int CBasePlayer::GiveAmmo(int iCount, const char *szName, int iMax)
 {
 	if (pev->flags & FL_SPECTATOR)
 		return -1;
@@ -6470,7 +6475,7 @@ void CBasePlayer::ResetMaxSpeed()
 		speed = 1;
 	}
 	// VIP is slow due to the armour he's wearing
-	else if (m_bIsVIP != NULL)
+	else if (m_bIsVIP)
 	{
 		speed = 227;
 	}
@@ -6887,7 +6892,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 					pLinkWeapon->pev->solid = SOLID_NOT;
 					pLinkWeapon->pev->effects = EF_NODRAW;
 					pLinkWeapon->pev->modelindex = 0;
-					pLinkWeapon->pev->model = NULL;
+					pLinkWeapon->pev->model = (int)NULL;
 					pLinkWeapon->pev->owner = ENT(pev);
 					pLinkWeapon->SetThink(NULL);
 					pLinkWeapon->SetTouch(NULL);
@@ -6983,8 +6988,8 @@ BOOL CBasePlayer::HasNamedPlayerItem(const char *pszItemName)
 void CBasePlayer::SwitchTeam()
 {
 	int oldTeam;
-	char *szOldTeam;
-	char *szNewTeam;
+	const char *szOldTeam;
+	const char *szNewTeam;
 	const char *szName;
 
 	oldTeam = m_iTeam;
@@ -8132,11 +8137,11 @@ const char *CBasePlayer::PickPrimaryCareerTaskWeapon()
 		CCareerTask *pTask = taskVector[i];
 
 		if (IsPrimaryWeaponId(pTask->GetWeaponId()))
-			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf));
+			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf) - 1);
 		else
-			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf));
+			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf) - 1);
 
-		Q_strncat(buf, " ", sizeof(buf));
+		Q_strncat(buf, " ", sizeof(buf) - 1);
 	}
 
 	return buf;
@@ -8216,11 +8221,11 @@ const char *CBasePlayer::PickSecondaryCareerTaskWeapon()
 		CCareerTask *pTask = taskVector[i];
 
 		if (IsSecondaryWeaponId(pTask->GetWeaponId()))
-			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf));
+			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf) - 1);
 		else
-			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf));
+			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf) - 1);
 
-		Q_strncat(buf, " ", sizeof(buf));
+		Q_strncat(buf, " ", sizeof(buf) - 1);
 	}
 
 	return buf;
@@ -8368,7 +8373,7 @@ void CBasePlayer::ParseAutoBuyString(const char *string, bool &boughtPrimary, bo
 	// loop through the string of commands, trying each one in turn.
 	while (*c)
 	{
-		int i = 0;
+		size_t i = 0;
 
 		// copy the next word into the command buffer.
 		while (*c && (*c != ' ') && i < sizeof(command) - 1)

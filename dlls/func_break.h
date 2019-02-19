@@ -154,7 +154,7 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[2];
-	static char *m_soundNames[3];
+	static const char *m_soundNames[3];
 
 	int m_lastSound;
 	float m_maxSpeed;

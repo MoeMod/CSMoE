@@ -275,7 +275,7 @@ void EXT_FUNC ClientKill(edict_t *pEntity)
 	}
 }
 
-void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, char *pszText)
+void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, const char *pszText)
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgShowMenu, NULL, pPlayer->pev);
 		WRITE_SHORT(bitsValidSlots);
@@ -285,7 +285,7 @@ void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL f
 	MESSAGE_END();
 }
 
-void ShowVGUIMenu(CBasePlayer *pPlayer, int MenuType, int BitMask, char *szOldMenu)
+void ShowVGUIMenu(CBasePlayer *pPlayer, int MenuType, int BitMask, const char *szOldMenu)
 {
 	if (pPlayer->m_bVGUIMenus || MenuType > VGUI_Menu_Buy_Item)
 	{
@@ -715,8 +715,8 @@ void Host_Say(edict_t *pEntity, int teamonly)
 		return;
 
 	const char *placeName = NULL;
-	char *pszFormat = NULL;
-	char *pszConsoleFormat = NULL;
+	const char *pszFormat = NULL;
+	const char *pszConsoleFormat = NULL;
 	bool consoleUsesPlaceName = false;
 
 	// team only
@@ -918,7 +918,7 @@ void Host_Say(edict_t *pEntity, int teamonly)
 		const char *temp = teamonly ? "say_team" : "say";
 		const char *deadText = (player->m_iTeam != SPECTATOR && bSenderDead) ? " (dead)" : "";
 
-		char *szTeam = GetTeam(player->m_iTeam);
+		const char *szTeam = GetTeam(player->m_iTeam);
 
 		UTIL_LogPrintf
 		(
@@ -1838,7 +1838,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	struct
 	{
 		ModelName model_id;
-		char *model_name;
+		const char *model_name;
 		int model_name_index;
 
 	} appearance;
@@ -1994,8 +1994,8 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 	CHalfLifeMultiplay *mp = g_pGameRules;
 
 	int oldTeam;
-	char *szOldTeam;
-	char *szNewTeam;
+	const char *szOldTeam;
+	const char *szNewTeam;
 
 	// If this player is a VIP, don't allow him to switch teams/appearances unless the following conditions are met :
 	// a) There is another CT player who is in the queue to be a VIP
@@ -2281,6 +2281,9 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 				ShowVGUIMenu(player, VGUI_Menu_Class_T, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6), "#Terrorist_Select");
 			else
 				ShowVGUIMenu(player, VGUI_Menu_Class_T, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5), "#Terrorist_Select");
+			break;
+
+		default:
 			break;
 		}
 	}

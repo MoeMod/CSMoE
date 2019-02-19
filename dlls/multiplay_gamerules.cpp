@@ -311,7 +311,7 @@ void Broadcast(const char *sentence)
 	MESSAGE_END();
 }
 
-char *GetTeam(int teamNo)
+const char * GetTeam(int teamNo)
 {
 	switch (teamNo)
 	{
@@ -331,7 +331,7 @@ char *GetTeam(int teamNo)
 void EndRoundMessage(const char *sentence, int event)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
-	char *team = NULL;
+	const char *team = NULL;
 	const char *message = &(sentence[1]);
 	int teamTriggered = 1;
 
@@ -3345,7 +3345,7 @@ void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)
 				WRITE_STRING("");
 			MESSAGE_END();
 
-			char *team = GetTeam(pPlayer->m_iTeam);
+			const char *team = GetTeam(pPlayer->m_iTeam);
 
 			FireTargets("game_playerleave", pPlayer, pPlayer, USE_TOGGLE, 0);
 			UTIL_LogPrintf("\"%s<%i><%s><%s>\" disconnected\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()), team);
@@ -3710,8 +3710,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	int killer_index = 0;
 
 	// Hack to fix name change
-	char *tau = "tau_cannon";
-	char *gluon = "gluon gun";
+	const char *tau = "tau_cannon";
+	const char *gluon = "gluon gun";
 
 	// Is the killer a client?
 	if (pKiller->flags & FL_CLIENT)
@@ -3779,7 +3779,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	if (pVictim->pev == pKiller)
 	{
 		// killed self
-		char *team = GetTeam(pVictim->m_iTeam);
+		const char *team = GetTeam(pVictim->m_iTeam);
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\"\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
 			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
 	}
@@ -3796,7 +3796,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	else
 	{
 		// killed by the world
-		char *team = GetTeam(pVictim->m_iTeam);
+		const char *team = GetTeam(pVictim->m_iTeam);
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\" (world)\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
 			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
 	}

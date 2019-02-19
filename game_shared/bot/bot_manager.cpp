@@ -145,7 +145,9 @@ const char *GameEventName[NUM_GAME_EVENTS + 1] =
 };
 
 // STL uses exceptions, but we are not compiling with them - ignore warning
+#ifdef _MSC_VER
 #pragma warning(disable : 4530)
+#endif
 
 const float smokeRadius = 115.0f;		// for smoke grenades
 

@@ -867,7 +867,7 @@ int CBaseMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 		{
 			if (pevInflictor)
 			{
-				if (m_hEnemy == NULL || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
+				if (m_hEnemy == nullptr || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
 					m_vecEnemyLKP = pevInflictor->origin;
 			}
 			else

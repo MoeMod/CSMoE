@@ -33,7 +33,9 @@
 #endif
 
 // STL uses exceptions, but we are not compiling with them - ignore warning
+#ifdef _MSC_VER
 #pragma warning(disable : 4530)
+#endif
 
 class CNavPath
 {

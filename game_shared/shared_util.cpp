@@ -15,7 +15,7 @@ char s_shared_quote = '\"';
 
 
 /* <2d4b0a> ../game_shared/shared_util.cpp:68 */
-char *SharedVarArgs(char *format, ...)
+char *SharedVarArgs(const char *format, ...)
 {
 	va_list argptr;
 	const int BufLen = 1024;

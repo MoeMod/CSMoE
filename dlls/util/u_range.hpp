@@ -26,8 +26,8 @@ namespace moe
 		using iterator::Enum_Iterator;
 		struct PlayersList
 		{
-			static Enum_Iterator<Enumer_Player> begin() { return Enum_Iterator<Enumer_Player> (Enumer_Player()(nullptr), Enumer_Player() ); }
-			static Enum_Iterator<Enumer_Player> end() { return Enum_Iterator<Enumer_Player> (nullptr, Enumer_Player() ); }
+			Enum_Iterator<Enumer_Player> begin() const { return Enum_Iterator<Enumer_Player> (Enumer_Player()(nullptr), Enumer_Player() ); }
+			Enum_Iterator<Enumer_Player> end() const { return Enum_Iterator<Enumer_Player> (nullptr, Enumer_Player() ); }
 		};
 	}
 

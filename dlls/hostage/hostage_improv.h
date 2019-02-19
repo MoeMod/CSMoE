@@ -273,7 +273,7 @@ protected:
 	Vector m_jumpTarget;
 	CountdownTimer m_clearPathTimer;
 	bool m_traversingLadder;
-	EHANDLE m_visiblePlayer[ MAX_CLIENTS ];
+	EntityHandle<CBasePlayer> m_visiblePlayer[ MAX_CLIENTS ];
 	int m_visiblePlayerCount;
 	CountdownTimer m_visionTimer;
 };

@@ -932,7 +932,7 @@ void CTriggerMultiple::Spawn()
 
 	InitTrigger();
 
-	assert(("trigger_multiple with health", pev->health == 0));
+	assert("trigger_multiple with health" && (pev->health == 0));
 
 	//UTIL_SetOrigin(pev, pev->origin);
 	//SET_MODEL(ENT(pev), STRING(pev->model));
@@ -1108,7 +1108,7 @@ void CTriggerVolume::Spawn()
 	// set size and link into world
 	SET_MODEL(ENT(pev), STRING(pev->model));
 
-	pev->model = NULL;
+	pev->model = (int)NULL;
 	pev->modelindex = 0;
 }
 
@@ -1837,6 +1837,8 @@ void CEscapeZone::EscapeTouch(CBaseEntity *pOther)
 	case CT:
 		p->m_signals.Signal(SIGNAL_ESCAPE);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -2094,7 +2096,7 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 		pActivator = CBaseEntity::Instance(INDEXENT(1));
 	}
 
-	m_hPlayer = pActivator;
+	m_hPlayer = static_cast<CBasePlayer *>(pActivator);
 	m_flReturnTime = gpGlobals->time + m_flWait;
 
 	pev->speed = m_initialSpeed;
@@ -2110,7 +2112,7 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	}
 
 	// Nothing to look at!
-	if (m_hTarget == NULL)
+	if (m_hTarget == nullptr)
 	{
 		return;
 	}
@@ -2171,16 +2173,16 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 
 void CTriggerCamera::FollowTarget()
 {
-	if (m_hPlayer == NULL)
+	if (m_hPlayer == nullptr)
 		return;
 
-	if (m_hTarget == NULL || m_flReturnTime < gpGlobals->time)
+	if (m_hTarget == nullptr || m_flReturnTime < gpGlobals->time)
 	{
 		if (m_hPlayer->IsAlive())
 		{
 			SET_VIEW(m_hPlayer->edict(), m_hPlayer->edict());
-			((CBasePlayer *)CBaseEntity::Instance(m_hPlayer))->EnableControl(TRUE);
-			((CBasePlayer *)CBaseEntity::Instance(m_hPlayer))->ResetMaxSpeed();
+			m_hPlayer->EnableControl(TRUE);
+			m_hPlayer->ResetMaxSpeed();
 		}
 
 		SUB_UseTargets(this, USE_TOGGLE, 0);

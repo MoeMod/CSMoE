@@ -271,7 +271,7 @@ globalentity_t *CGlobalState::Find(string_t globalname)
 
 void CGlobalState::DumpGlobals()
 {
-	static char *estates[] = { "Off", "On", "Dead" };
+	static const char *estates[] = { "Off", "On", "Dead" };
 	globalentity_t *pTest;
 
 	ALERT(at_console, "-- Globals --\n");
@@ -444,7 +444,7 @@ void CWorld::Spawn()
 	int flength = 0;
 	char *pFile = (char *)LOAD_FILE_FOR_ME(UTIL_VarArgs("maps/%s.txt", STRING(gpGlobals->mapname)), &flength);
 
-	if (pFile && flength != NULL)
+	if (pFile && flength != 0.0f)
 	{
 		Q_strncpy(g_szMapBriefingText, pFile, ARRAYSIZE(g_szMapBriefingText) - 2);
 		g_szMapBriefingText[ ARRAYSIZE(g_szMapBriefingText) - 2 ] = 0;
@@ -602,7 +602,7 @@ void CWorld::Precache()
 	// 63 testing
 	LIGHT_STYLE(63, "a");
 
-	for (int i = 0; i < ARRAYSIZE(gDecals); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(gDecals); ++i)
 		gDecals[i].index = DECAL_INDEX(gDecals[i].name);
 
 	// init the WorldGraph.

@@ -35,11 +35,11 @@
 class CPathCorner: public CPointEntity
 {
 public:
-	virtual void Spawn();
-	virtual void KeyValue(KeyValueData *pkvd);
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
-
+	void Spawn() override;
+	void KeyValue(KeyValueData *pkvd) override;
+	int Save(CSave &save) override;
+	int Restore(CRestore &restore) override;
+	float GetDelay() override { return m_flWait; }
 	virtual float GetDelay() const { return m_flWait; }
 
 public:

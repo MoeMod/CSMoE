@@ -84,7 +84,7 @@ void HostageFollowState::OnEnter(CHostageImprov *improv)
 void HostageFollowState::OnUpdate(CHostageImprov *improv)
 {
 	// if we lost our leader, give up
-	if (m_leader == NULL)
+	if (m_leader == nullptr)
 	{
 		improv->Idle();
 		return;
@@ -192,7 +192,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 		bool makeWay = false;
 		const float cosTolerance = 0.99f;
 
-		if (improv->IsPlayerLookingAtMe((CBasePlayer *)CBaseEntity::Instance(m_leader), cosTolerance))
+		if (improv->IsPlayerLookingAtMe(static_cast<CBasePlayer *>(static_cast<CBaseEntity *>(m_leader)), cosTolerance))
 		{
 			if (!m_makeWayTimer.HasStarted())
 			{

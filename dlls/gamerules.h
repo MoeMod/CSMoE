@@ -590,7 +590,7 @@ extern void Broadcast(const char *sentence, int pitch = 100);
 #else
 void Broadcast(const char *sentence);
 #endif
-char *GetTeam(int teamNo);
+const char * GetTeam(int teamNo);
 void EndRoundMessage(const char *sentence, int event);
 void ReadMultiplayCvars(CHalfLifeMultiplay *mp);
 void DestroyMapCycle(mapcycle_t *cycle);

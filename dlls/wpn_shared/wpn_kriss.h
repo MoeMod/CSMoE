@@ -17,25 +17,24 @@
 class CKRISS : public CBasePlayerWeapon
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL Deploy();
-	virtual float GetMaxSpeed() { return KRISS_MAX_SPEED; }
-	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
-	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
-	virtual void Reload();
-	virtual void WeaponIdle();
-	virtual BOOL UseDecrement()
-	{
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo *p) override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override { return KRISS_MAX_SPEED; }
+	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
 #else
 		return FALSE;
 #endif
 	}
-	virtual KnockbackData GetKnockBackData() override { return { 500.0f, 400.0f, 500.0f, 180.0f, 0.25f }; }
+	KnockbackData GetKnockBackData() override { return { 500.0f, 400.0f, 500.0f, 180.0f, 0.25f }; }
 	float GetArmorRatioModifier() override { return KRISS_ARMOR_RATIO_MODIFIER; }
 	const char *GetCSModelName() override { return "models/w_kriss.mdl"; }
 

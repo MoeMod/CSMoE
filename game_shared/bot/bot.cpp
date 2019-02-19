@@ -468,7 +468,7 @@ bool CBot::IsLocalPlayerWatchingMe() const
 	return false;
 }
 
-NOXREF void CBot::Print(char *format, ...) const
+NOXREF void CBot::Print(const char *format, ...) const
 {
 	va_list varg;
 	char buffer[1024];
@@ -484,7 +484,7 @@ NOXREF void CBot::Print(char *format, ...) const
 	SERVER_PRINT(buffer);
 }
 
-void CBot::PrintIfWatched(char *format, ...) const
+void CBot::PrintIfWatched(const char *format, ...) const
 {
 	if (!cv_bot_debug.value)
 		return;

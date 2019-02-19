@@ -342,7 +342,7 @@ void CBaseToggle::KeyValue(KeyValueData *pkvd)
 
 void CBaseToggle::LinearMove(Vector vecDest, float flSpeed)
 {
-	assert(("LinearMove:  no speed is defined!", flSpeed != 0));
+	assert(("LinearMove:  no speed is defined!" && (flSpeed != 0)));
 	//assert(("LinearMove: no post-move function defined", m_pfnCallWhenMoveDone != NULL));
 
 	m_vecFinalDest = vecDest;
@@ -396,7 +396,7 @@ NOXREF BOOL CBaseToggle::IsLockedByMaster()
 
 void CBaseToggle::AngularMove(Vector vecDestAngle, float flSpeed)
 {
-	assert(("AngularMove:  no speed is defined!", flSpeed != 0));
+	assert("AngularMove:  no speed is defined!" && (flSpeed != 0));
 	//assert(("AngularMove: no post-move function defined", m_pfnCallWhenMoveDone != NULL));
 
 	m_vecFinalAngle = vecDestAngle;

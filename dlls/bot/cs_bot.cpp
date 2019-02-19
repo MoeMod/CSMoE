@@ -971,7 +971,7 @@ bool CCSBot::IsAwareOfEnemyDeath() const
 	if (GetEnemyDeathTimestamp() == 0.0f)
 		return false;
 
-	if (m_enemy == NULL)
+	if (m_enemy == nullptr)
 		return true;
 
 	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > (1.0f - GetProfile()->GetSkill()))

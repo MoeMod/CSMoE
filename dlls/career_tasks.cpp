@@ -505,7 +505,7 @@ void CCareerTaskManager::AddTask(const char *taskName, const char *weaponName, i
 {
 	++m_nextId;
 
-	for (int i = 0; i < ARRAYSIZE(taskInfo); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(taskInfo); ++i)
 	{
 		const TaskInfo *pTaskInfo = &taskInfo[ i ];
 

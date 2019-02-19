@@ -24,7 +24,7 @@ namespace moe
 	class EBOBase : private Empty
 	{
 	protected:
-		EBOBase(const Empty &alloc) : Empty(alloc) {}
+		constexpr EBOBase(const Empty &alloc) : Empty(alloc) {}
 		Empty get()
 		{
 			return *this;

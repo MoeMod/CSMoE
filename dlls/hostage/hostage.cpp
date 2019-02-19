@@ -869,7 +869,7 @@ void CHostage::DoFollow()
 	float flRadius = 0;
 	float flDistToDest;
 
-	if (m_hTargetEnt == NULL)
+	if (m_hTargetEnt == nullptr)
 		return;
 
 	if (cv_hostage_stop.value > 0.0)
@@ -1155,7 +1155,7 @@ void CHostage::Wiggle()
 		Vector(-50, -50, 0)
 	};
 
-	for (int i = 0; i < ARRAYSIZE(wiggle_directions); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(wiggle_directions); ++i)
 	{
 		Vector dest = pev->origin + wiggle_directions[i];
 
@@ -1252,12 +1252,12 @@ CBaseEntity *CHostage::GetLeader()				// return our leader, or NULL
 
 bool CHostage::IsFollowing(const CBaseEntity *entity)
 {
-	if (m_improv != NULL)
+	if (m_improv != nullptr)
 	{
 		return m_improv->IsFollowing();
 	}
 
-	if ((entity == NULL && m_hTargetEnt == NULL) || (entity != NULL && m_hTargetEnt != entity))
+	if ((entity == nullptr && m_hTargetEnt == nullptr) || (entity != nullptr && m_hTargetEnt != entity))
 		return false;
 
 	if (m_State != FOLLOW)
@@ -1534,7 +1534,7 @@ void CHostageManager::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEnt
 
 SimpleChatter::SimpleChatter()
 {
-	for (int i = 0; i < ARRAYSIZE(m_chatter); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(m_chatter); ++i)
 	{
 		m_chatter[i].count = 0;
 		m_chatter[i].index = 0;
@@ -1544,7 +1544,7 @@ SimpleChatter::SimpleChatter()
 
 SimpleChatter::~SimpleChatter()
 {
-	for (int i = 0; i < ARRAYSIZE(m_chatter); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(m_chatter); ++i)
 	{
 		for (int f = 0; f < m_chatter[i].count; f++)
 		{
@@ -1556,7 +1556,7 @@ SimpleChatter::~SimpleChatter()
 	}
 }
 
-void SimpleChatter::AddSound(HostageChatterType type, char *filename)
+void SimpleChatter::AddSound(HostageChatterType type, const char *filename)
 {
 	ChatterSet *chatter;
 	char actualFilename[128];

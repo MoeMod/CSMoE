@@ -37,7 +37,8 @@ namespace moe
 	struct Enumer_ClassName
 	{
 		const char * const m_classname;
-		Enumer_ClassName(const char *classname) : m_classname(classname) {}
+
+		explicit Enumer_ClassName(const char *classname) : m_classname(classname) {}
 
 		EntityType *operator()(EntityType *pCurrent)
 		{

@@ -198,6 +198,8 @@ void BotBombStatusMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
 			}
 			break;
 		}
+		default:
+			break;
 	}
 }
 
@@ -947,6 +949,8 @@ bool BotStatement::IsValid() const
 					return false;
 				break;
 			}
+			default:
+				break;
 		}
 	}
 
@@ -1794,6 +1798,8 @@ void BotChatterInterface::ReportingIn()
 		{
 			break;
 		}
+		default:
+			break;
 	}
 
 	// what do we see

@@ -50,22 +50,22 @@ namespace iterator {
 		using reference = const value_type &;
 
 	public:
-		explicit Enum_Iterator(value_type p = nullptr, const Enumer &f = Enumer())
-				: m_pCurrent(p), EBOBase<Enumer>(f) {}
+		constexpr explicit Enum_Iterator(value_type p = nullptr, const Enumer &f = Enumer())
+				: EBOBase<Enumer>(f), m_pCurrent(p) {}
 
 	public:
 		Enum_Iterator &operator++() noexcept { return (m_pCurrent = EBOBase<Enumer>::get()(m_pCurrent)), *this; }
 
-		Enum_Iterator operator++(int) noexcept {
+		const Enum_Iterator operator++(int) noexcept {
 			return Enum_Iterator(cxx14::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
 		}
 
-		reference operator*() const noexcept { return m_pCurrent; }
+		constexpr reference operator*() const noexcept { return m_pCurrent; }
 
 	public:
-		bool operator==(const Enum_Iterator &other) const noexcept { return m_pCurrent == other.m_pCurrent; }
+		constexpr bool operator==(const Enum_Iterator &other) const noexcept { return m_pCurrent == other.m_pCurrent; }
 
-		bool operator!=(const Enum_Iterator &other) const noexcept { return !(*this == other); }
+		constexpr bool operator!=(const Enum_Iterator &other) const noexcept { return !(*this == other); }
 
 	private:
 		value_type m_pCurrent;

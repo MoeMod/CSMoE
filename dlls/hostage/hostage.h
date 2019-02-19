@@ -197,7 +197,7 @@ public:
 		bool needsShuffle;
 	};
 
-	void AddSound(HostageChatterType type, char *filename);
+	void AddSound(HostageChatterType type, const char *filename);
 
 #ifdef _WIN32
 	#undef PlaySound

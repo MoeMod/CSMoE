@@ -1048,7 +1048,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 		EMIT_SOUND(ENT(player->pev), CHAN_ITEM, "weapons/c4_disarm.wav", VOL_NORM, ATTN_NORM);
 
 		player->m_bIsDefusing = true;
-		m_pBombDefuser = pActivator;
+		m_pBombDefuser = player;
 		m_bStartDefuse = true;
 		m_flDefuseCountDown = gpGlobals->time + 5.0f;
 		m_fNextDefuse = gpGlobals->time + 0.5f;
@@ -1068,7 +1068,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 		EMIT_SOUND(ENT(player->pev), CHAN_ITEM, "weapons/c4_disarm.wav", VOL_NORM, ATTN_NORM);
 
 		player->m_bIsDefusing = true;
-		m_pBombDefuser = pActivator;
+		m_pBombDefuser = player;
 		m_bStartDefuse = true;
 		m_flDefuseCountDown = gpGlobals->time + 10.0f;
 		m_fNextDefuse = gpGlobals->time + 0.5f;
@@ -1309,7 +1309,7 @@ void CGrenade::C4Think()
 	// if the defusing process has started
 	if (m_bStartDefuse && m_pBombDefuser != NULL)
 	{
-		CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance(m_pBombDefuser);
+		CBasePlayer *pPlayer = static_cast<CBasePlayer *>(m_pBombDefuser);
 
 		// if the defusing process has not ended yet
 		if (gpGlobals->time < m_flDefuseCountDown)

@@ -39,7 +39,7 @@ public:
 
 	virtual ~CBaseTutorState();
 	virtual int CheckForStateTransition(GameEventType event, CBaseEntity *entity, CBaseEntity *other) = 0;
-	virtual char *GetStateString() = 0;
+	virtual const char * GetStateString() = 0;
 
 public:
 	int GetType() const;
@@ -55,7 +55,7 @@ public:
 
 	virtual ~CBaseTutorStateSystem();
 	virtual bool UpdateState(GameEventType event, CBaseEntity *entity, CBaseEntity *other) = 0;
-	virtual char *GetCurrentStateString() = 0;
+	virtual const char * GetCurrentStateString() = 0;
 	virtual CBaseTutorState *ConstructNewState(int stateType) = 0;
 
 public:

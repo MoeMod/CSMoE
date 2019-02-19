@@ -189,7 +189,7 @@ struct BuyInfo
 {
 	WeaponType type;
 	bool preferred;		// more challenging bots prefer these weapons
-	char *buyAlias;		// the buy alias for this equipment
+	const char *buyAlias;		// the buy alias for this equipment
 };
 
 // These tables MUST be kept in sync with the CT and T buy aliases
@@ -388,6 +388,8 @@ void BuyState::OnUpdate(CCSBot *me)
 				case SNIPER_RIFLE:
 					if (!ctrl->AllowSnipers())
 						buyAlias = NULL;
+					break;
+				default:
 					break;
 				}
 			}

@@ -46,8 +46,8 @@ class EventDispatcher<R(Args...)>
 	{
 		template<class RealF>
 		CCallable(RealF &&f) :
-			m_Function(std::forward<RealF>(f)),
-			ICallable(static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator()))
+			ICallable(static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator())),
+			m_Function(std::forward<RealF>(f))
 		{}
 		const F m_Function;
 		void operator()(typename ParseArg<Args>::type...args) const
@@ -61,8 +61,8 @@ class EventDispatcher<R(Args...)>
 	{
 		template<class RealF>
 		CCallable(RealF &&f) :
-			F(std::forward<RealF>(f)),
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) }
+			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) },
+			F(std::forward<RealF>(f))
 		{}
 		void operator()(typename ParseArg<Args>::type...args) const
 		{

@@ -190,7 +190,7 @@ CSimpleMap sayTextFmt[] =
 int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
-	char szBuf[3][64] = { 0 };
+	char szBuf[3][64] {  };
 
 	int client_index = reader.ReadByte();		// the client who spoke the message
 	strncpy( szBuf[0], reader.ReadString(), sizeof(szBuf[0]));

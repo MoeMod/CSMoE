@@ -68,7 +68,7 @@ public:
 
 	virtual ~CCSTutorStateSystem();
 	virtual bool UpdateState(GameEventType event, CBaseEntity *entity, CBaseEntity *other);
-	virtual char *GetCurrentStateString();
+	virtual const char * GetCurrentStateString();
 
 protected:
 	virtual CBaseTutorState *ConstructNewState(int stateType);
@@ -81,7 +81,7 @@ public:
 
 	virtual ~CCSTutorUndefinedState();
 	virtual int CheckForStateTransition(GameEventType event, CBaseEntity *entity, CBaseEntity *other);
-	virtual char *GetStateString();
+	virtual const char * GetStateString();
 
 protected:
 	int HandlePlayerSpawned(CBaseEntity *entity, CBaseEntity *other);
@@ -94,7 +94,7 @@ public:
 
 	virtual ~CCSTutorWaitingForStartState();
 	virtual int CheckForStateTransition(GameEventType event, CBaseEntity *entity, CBaseEntity *other);
-	virtual char *GetStateString();
+	virtual const char * GetStateString();
 
 protected:
 	int HandlePlayerSpawned(CBaseEntity *entity, CBaseEntity *other);
@@ -108,7 +108,7 @@ public:
 
 	virtual ~CCSTutorBuyMenuState();
 	virtual int CheckForStateTransition(GameEventType event, CBaseEntity *entity, CBaseEntity *other);
-	virtual char *GetStateString();
+	virtual const char * GetStateString();
 
 protected:
 	int HandleRoundStart(CBaseEntity *entity, CBaseEntity *other);

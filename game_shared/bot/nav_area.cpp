@@ -2464,6 +2464,8 @@ void CNavArea::DrawMarkedCorner(NavCornerType corner, byte red, byte green, byte
 	case SOUTH_WEST:
 		UTIL_DrawBeamPoints(sw + Vector(0, 0, 10), sw, duration, red, green, blue);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -2592,6 +2594,9 @@ const Vector *CNavArea::GetCorner(NavCornerType corner) const
 
 	case SOUTH_EAST:
 		return &m_extent.hi;
+
+	default:
+		break;
 	}
 
 	return NULL;
@@ -3673,6 +3678,8 @@ void CNavArea::DrawConnectedAreas()
 						from = hookPos + Vector(size, 0.0f, 0.0f);
 						to = hookPos + Vector(-size, 0.0f, 0.0f);
 						break;
+					default:
+						break;
 				}
 
 				from.z = GetZ(&from) + cv_bot_nav_zdraw.value;
@@ -3716,6 +3723,8 @@ void CNavArea::RaiseCorner(NavCornerType corner, int amount)
 			break;
 		case SOUTH_EAST:
 			m_extent.hi.z += amount;
+			break;
+		default:
 			break;
 		}
 	}
@@ -3979,8 +3988,12 @@ void EditNavAreas(NavEditCmdType cmd)
 						ctrl->SetNavPlace(area->GetPlace());
 						break;
 					case EDIT_PLACE_FLOODFILL:
+					{
 						PlaceFloodFillFunctor pff(area);
 						SearchSurroundingAreas(area, area->GetCenter(), pff);
+						break;
+					}
+					default:
 						break;
 				}
 			}
@@ -4265,6 +4278,8 @@ void EditNavAreas(NavEditCmdType cmd)
 							EMIT_SOUND_DYN(ENT(UTIL_GetLocalPlayer()->pev), CHAN_ITEM, "buttons/button11.wav", 1, ATTN_NORM, 0, 100);
 						}
 						break;
+					default:
+						break;
 				}
 			}
 		}
@@ -4335,6 +4350,8 @@ void EditNavAreas(NavEditCmdType cmd)
 				}
 				break;
 			}
+			default:
+				break;
 		}
 	}
 
