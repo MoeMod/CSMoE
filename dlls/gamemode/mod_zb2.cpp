@@ -203,6 +203,7 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 void CPlayerModStrategy_ZB2::OnThink()
 {
 	m_pZombieSkill->Think();
+	Zombie_HealthRecoveryThink();
 }
 
 void CPlayerModStrategy_ZB2::OnResetMaxSpeed()
