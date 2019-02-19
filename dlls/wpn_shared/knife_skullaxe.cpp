@@ -28,11 +28,11 @@
 #define KNIFE_WALLHIT_VOLUME 512
 
 class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
-		TGeneralData,
-		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
-		TWeaponIdleDefault,
-		TDeployDefault
-		>
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
+	TWeaponIdleDefault,
+	TDeployDefault
+>
 {
 public:
 	static constexpr const char *ClassName = "knife_skullaxe";
@@ -43,6 +43,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
+	static constexpr const auto & KnockBack = KnockbackData{ .0f, .0f, .0f, .0f, 1.0f };
 
 public:
 
@@ -90,7 +91,7 @@ public:
 	void DelayedPrimaryAttack();
 	void DelayedSecondaryAttack();
 	float GetPrimaryAttackDamage() const
-	{ 
+	{
 		float flDamage = 100;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -100,7 +101,7 @@ public:
 #endif
 		return flDamage;
 	}
-	float GetSecondaryAttackDamage() const 
+	float GetSecondaryAttackDamage() const
 	{
 		float flDamage = 100;
 #ifndef CLIENT_DLL
@@ -246,7 +247,7 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 				UTIL_MakeVectors(pEntity->pev->angles);
 				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
 					flDamage *= 3.0;
-				
+
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);

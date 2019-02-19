@@ -1,5 +1,5 @@
 //
-// Created by С�װ� on 2019-01-17.
+// Created by 小白白 on 2019-01-17.
 //
 
 #pragma once
@@ -62,12 +62,11 @@ public:
 	static constexpr float MaxSpeed = 250;
 	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
 	//  static constexpr const char *ClassName = "weapon_???";
-	static constexpr const auto & KnockBack = KnockbackData{};
 
 	// Knock back data can be defined as following :
-	//  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f}; // requires c++14
+	//  (A) static constexpr const KnockbackData &KnockBack{0.f, 0.f, 0.f, 0.f, 1.f};
 	//
-	//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>;
+	//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>; // requires c++14
 	//      static constexpr float VelocityModifier = 1.0f;
 	//
 	//  (C) struct Knockback_t
