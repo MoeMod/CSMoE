@@ -1,5 +1,5 @@
 //
-// Created by С�װ� on 2019-01-17.
+// Created by С�װ� on 2019-01-17.
 //
 
 #pragma once
@@ -62,7 +62,7 @@ public:
 	static constexpr float MaxSpeed = 250;
 	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
 	//  static constexpr const char *ClassName = "weapon_???";
-	static constexpr KnockbackData KnockBack = KnockbackData{};
+	static constexpr const auto & KnockBack = KnockbackData{};
 
 	// Knock back data can be defined as following :
 	//  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f}; // requires c++14
@@ -134,25 +134,25 @@ public:
 private:
 	// sfinae call
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(wpn.KnockBack, KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(wpn.KnockBack, KnockbackData())
 	{
 		return BuildKnockbackData(wpn.KnockBack);
 	}
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
 	{
 		return BuildKnockbackData(typename CFinal::KnockBack_t(), wpn.VelocityModifier);
 	}
 
 private:
-	constexpr void SetDefaultAccuracy_impl(...) {}
+	void SetDefaultAccuracy_impl(...) {}
 	template<class ClassToFind = CFinal>
 	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 	}
-	constexpr void SetDefaultAmmo_impl(...) {}
+	void SetDefaultAmmo_impl(...) {}
 	template<class ClassToFind = CFinal>
 	auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
 	{

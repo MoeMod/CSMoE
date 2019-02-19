@@ -13,7 +13,7 @@
 const float ZOMBIECRAZY_DURATION = 10.0f;
 const float ZOMBIECRAZY_COOLDOWN = 10.0f;
 
-void IZombieSkill::Think()
+void CZombieSkill_Base::Think()
 {
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
 	{
@@ -28,12 +28,12 @@ void IZombieSkill::Think()
 
 }
 
-IZombieSkill::IZombieSkill(CBasePlayer *player) : BasePlayerExtra(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
+CZombieSkill_Base::CZombieSkill_Base(CBasePlayer *player) : IZombieSkill(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
 {
 	
 }
 
-void IZombieSkill::InitHUD()
+void CZombieSkill_Base::InitHUD()
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
@@ -47,7 +47,7 @@ void ZombieSkill_Precache()
 	PRECACHE_SOUND("zombi/zombi_pre_idle_2.wav");
 }
 
-CZombieSkill_ZombieCrazy::CZombieSkill_ZombieCrazy(CBasePlayer *player) : IZombieSkill(player)
+CZombieSkill_ZombieCrazy::CZombieSkill_ZombieCrazy(CBasePlayer *player) : CZombieSkill_Base(player)
 {
 	
 }
@@ -63,7 +63,7 @@ void CZombieSkill_ZombieCrazy::InitHUD()
 
 void CZombieSkill_ZombieCrazy::Think()
 {
-	IZombieSkill::Think();
+	CZombieSkill_Base::Think();
 
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEffect)
 	{
@@ -89,6 +89,9 @@ void CZombieSkill_ZombieCrazy::Activate()
 			break;
 		case SKILL_STATUS_USED:
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+			break;
+		default:
+			break;
 		}
 
 		return;
@@ -145,7 +148,7 @@ void CZombieSkill_ZombieCrazy::OnCrazyEffect()
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
 }
 
-float CZombieSkill_ZombieCrazy::GetDamageRatio()
+float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 {
 	if(m_iZombieSkillStatus == SKILL_STATUS_USING)
 		return 1.6f;

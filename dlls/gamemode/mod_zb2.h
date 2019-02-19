@@ -59,6 +59,7 @@ public:
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 
 protected:
+	virtual void InitZombieSkill();
 	virtual bool CanUseZombieSkill();
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();

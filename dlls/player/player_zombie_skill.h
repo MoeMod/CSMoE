@@ -12,33 +12,61 @@ void ZombieSkill_Precache();
 class IZombieSkill : public BasePlayerExtra
 {
 public:
-	IZombieSkill(CBasePlayer *player);
+	explicit IZombieSkill(CBasePlayer *player) : BasePlayerExtra(player) {}
+	virtual ~IZombieSkill() = default;
 
-	virtual void InitHUD();
-	virtual void Think();
-	virtual void Activate() {}
-	virtual void Reset() { m_iZombieSkillStatus = SKILL_STATUS_READY; }
-	virtual void ResetMaxSpeed() {}
-	virtual float GetDamageRatio() { return 1.0f; }
+	virtual void InitHUD() = 0;
+	virtual void Think() = 0;
+	virtual void Activate() = 0;
+	virtual void Reset() = 0;
+	virtual void ResetMaxSpeed() = 0;
+	virtual float GetDamageRatio() const = 0;
+	virtual ZombieSkillStatus GetStatus() const = 0;
+	
+};
+
+class CZombieSkill_Base : public IZombieSkill
+{
+public:
+	explicit CZombieSkill_Base(CBasePlayer *player);
+
+	void InitHUD() override;
+	void Think() override;
+	void Activate() override {}
+	void Reset() override { m_iZombieSkillStatus = SKILL_STATUS_READY; }
+	void ResetMaxSpeed() override {}
+	float GetDamageRatio() const override { return 1.0f; }
+	ZombieSkillStatus GetStatus() const override {	return m_iZombieSkillStatus; }
 
 protected:
 	virtual void OnSkillEnd() {}
 	virtual void OnSkillReady() {}
 
-public:
-	ZombieSkillStatus GetStatus() {	return m_iZombieSkillStatus; }
-
 protected:
 	ZombieSkillStatus m_iZombieSkillStatus;
 	float m_flTimeZombieSkillEnd;
 	float m_flTimeZombieSkillNext;
-	
+
 };
 
-class CZombieSkill_ZombieCrazy : public IZombieSkill
+class CZombieSkill_Empty : public IZombieSkill
 {
 public:
-	CZombieSkill_ZombieCrazy(CBasePlayer *player);
+	explicit CZombieSkill_Empty(CBasePlayer *player)  : IZombieSkill(player) {}
+
+	void InitHUD() override {}
+	void Think() override {}
+	void Activate() override {}
+	void Reset() override {}
+	void ResetMaxSpeed() override {}
+	float GetDamageRatio() const override { return 1.0f; }
+	ZombieSkillStatus GetStatus() const override {	return SKILL_STATUS_USED; }
+};
+
+class CZombieSkill_ZombieCrazy : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieCrazy(CBasePlayer *player);
 
 public:
 	void InitHUD() override;
@@ -46,7 +74,7 @@ public:
 	void Activate() override;
 	void ResetMaxSpeed()  override;
 	void OnSkillEnd() override;
-	float GetDamageRatio() override;
+	float GetDamageRatio() const override;
 
 protected:
 	void OnCrazyEffect();

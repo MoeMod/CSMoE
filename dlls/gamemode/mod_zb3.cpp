@@ -26,7 +26,7 @@ bool CPlayerModStrategy_ZB3::CanUseZombieSkill()
 
 void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	player->m_pModStrategy = std::make_unique<CPlayerModStrategy_ZB3>(player, this);
+	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3(player, this));
 }
 
 void CMod_ZombieHero::PickZombieOrigin()

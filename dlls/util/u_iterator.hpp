@@ -8,6 +8,16 @@
 #include <iterator>
 #include "u_ebobase.hpp"
 
+namespace cxx14 {
+	template<class T, class U = T>
+	T exchange(T& obj, U&& new_value)
+	{
+		T old_value = std::move(obj);
+		obj = std::forward<U>(new_value);
+		return old_value;
+	}
+}
+
 namespace moe {
 namespace iterator {
 	/*
@@ -36,7 +46,7 @@ namespace iterator {
 		Enum_Iterator &operator++() noexcept { return (m_pCurrent = EBOBase<Enumer>::get()(m_pCurrent)), *this; }
 
 		Enum_Iterator operator++(int) noexcept {
-			return Enum_Iterator(std::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
+			return Enum_Iterator(cxx14::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
 		}
 
 		reference operator*() const noexcept { return m_pCurrent; }

@@ -33,7 +33,7 @@ public:
 	static constexpr float MaxSpeed = 230;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 
-	static constexpr KnockbackData KnockBack = { 1100.f, 500.f, 700.f, 400.f, 0.9f };
+	static constexpr const auto & KnockBack = KnockbackData{ 1100.f, 500.f, 700.f, 400.f, 0.9f };
 	static constexpr float ArmorRatioModifier = 1.5f;
 
 public:

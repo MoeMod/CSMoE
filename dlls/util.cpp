@@ -13,6 +13,9 @@
 
 unsigned int glSeed;
 
+#include <string>
+#include <functional>
+
 /*
 * Globals initialization
 */

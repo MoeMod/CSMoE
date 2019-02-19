@@ -174,7 +174,7 @@ void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 
 CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player), m_pModZB2(mp)
 {
-	m_pZombieSkill.reset(new IZombieSkill(m_pPlayer));
+	m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
 
 	using namespace std::placeholders;
 	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(std::bind(&CPlayerModStrategy_ZB2::Event_OnBecomeZombie, this, _1, _2));
@@ -186,7 +186,6 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && m_pPlayer->m_bIsZombie)
 	{
 		m_pZombieSkill->Activate();
-		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
 		return true;
 	}
 	return false;
@@ -196,13 +195,13 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 {
 	UpdatePlayerEvolutionHUD();
 
-	m_pZombieSkill.reset(new IZombieSkill(m_pPlayer));
-	m_pZombieSkill->InitHUD();
+	InitZombieSkill();
 }
 
 void CPlayerModStrategy_ZB2::OnThink()
 {
 	m_pZombieSkill->Think();
+	Zombie_HealthRecoveryThink();
 }
 
 void CPlayerModStrategy_ZB2::OnResetMaxSpeed()
@@ -223,6 +222,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 	if (m_pPlayer->pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
 	{
 		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
+		return;
 	}
 
 	// cannot recover during using zombie skill.
@@ -256,10 +256,8 @@ void CPlayerModStrategy_ZB2::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 	UpdatePlayerEvolutionHUD();
 	m_iZombieInfections = 0;
 
-	if(CanUseZombieSkill())
-		m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
 
-	m_pZombieSkill->InitHUD();
+	InitZombieSkill();
 }
 
 void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker)
@@ -320,4 +318,22 @@ void CPlayerModStrategy_ZB2::UpdatePlayerEvolutionHUD()
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
+}
+
+void CPlayerModStrategy_ZB2::InitZombieSkill()
+{
+	if(m_pPlayer->m_bIsZombie)
+	{
+		if(CanUseZombieSkill())
+			m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
+		else
+			m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
+
+	}
+	else
+	{
+		m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
+	}
+
+	m_pZombieSkill->InitHUD();
 }
