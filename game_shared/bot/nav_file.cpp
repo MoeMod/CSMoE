@@ -152,7 +152,7 @@ const char *GetBspFilename(const char *navFilename)
 	static char bspFilename[256];
 	Q_sprintf(bspFilename, "maps\\%s.bsp", STRING(gpGlobals->mapname));
 
-	int len = Q_strlen(bspFilename);
+	size_t len = Q_strlen(bspFilename);
 	if (len < 3)
 		return NULL;
 

@@ -322,16 +322,19 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 
 	x -= m_pTexture_skillslotbg->w() / 2;
-	const auto &classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
-	if (classicon != nullptr && m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
+	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 	{
-		x -= (classicon->w() + 4) / 2;
-		
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-		classicon->Bind();
-		DrawUtils::Draw2DQuadScaled(x, y, x + classicon->w(), y + classicon->h());
+		const auto &classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
+		if (classicon != nullptr)
+		{
+			x -= (classicon->w() + 4) / 2;
 
-		x += classicon->w() + 4;
+			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+			classicon->Bind();
+			DrawUtils::Draw2DQuadScaled(x, y, x + classicon->w(), y + classicon->h());
+
+			x += classicon->w() + 4;
+		}
 	}
 
 	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);

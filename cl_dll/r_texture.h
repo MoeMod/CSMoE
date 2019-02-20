@@ -16,18 +16,12 @@ using WeakTexture = std::weak_ptr<CTextureRef>;
 class CTextureRef
 {
 public:
-	class TextureNotFoundException : public std::runtime_error
-	{
-	public:
-		TextureNotFoundException() : runtime_error("cannot load texture") {}
-	};
-public:
 	explicit CTextureRef(const char *path, int flags = TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP)
-		: m_iInternalId(gRenderAPI.GL_LoadTexture(path, NULL, 0, flags))
-	{
-		if (!m_iInternalId)
-			throw TextureNotFoundException();
-	}
+		: m_iInternalId(gRenderAPI.GL_LoadTexture(path, NULL, 0, flags)) {}
+	CTextureRef(const CTextureRef&) = delete;
+	CTextureRef(CTextureRef &&rhs) : m_iInternalId(0) { std::swap(m_iInternalId, rhs.m_iInternalId); }
+	CTextureRef &operator=(const CTextureRef&) const = delete;
+	CTextureRef &operator=(CTextureRef &&rhs) { std::swap(m_iInternalId, rhs.m_iInternalId); return *this; }
 
 public:
 	~CTextureRef() { gRenderAPI.GL_FreeTexture(m_iInternalId); }
@@ -43,30 +37,24 @@ public:
 	int w() const noexcept { return GetParm(PARM_TEX_WIDTH); }
 	int h() const noexcept { return GetParm(PARM_TEX_HEIGHT); }
 	int texnum() const noexcept { return m_iInternalId; }
+	bool valid() const noexcept { return texnum() > 0; }
 
 private:
-	const int m_iInternalId;
+	unsigned int m_iInternalId;
 };
 
 template<class...Args>
 inline UniqueTexture R_LoadTextureUnique(Args&&...args)
 {
-	try
-	{
-		return std::unique_ptr<CTextureRef>(new CTextureRef(std::forward<Args>(args)...));
-	}
-	catch (const CTextureRef::TextureNotFoundException &e) {}
-	return nullptr;
+	CTextureRef tex(std::forward<Args>(args)...);
+	return tex.valid() ? std::unique_ptr<CTextureRef>(new CTextureRef(std::move(tex))) : nullptr;
 }
+
 template<class...Args>
 inline SharedTexture R_LoadTextureShared(Args&&...args)
 {
-	try
-	{
-		return std::make_shared<CTextureRef>(std::forward<Args>(args)...);
-	}
-	catch (const CTextureRef::TextureNotFoundException &e) {}
-	return nullptr;
+	CTextureRef tex(std::forward<Args>(args)...);
+	return tex.valid() ? std::make_shared<CTextureRef>(std::move(tex)) : nullptr;
 }
 
 template<class P, class...Args>
@@ -74,12 +62,9 @@ inline bool R_InitTexture(P &p, Args&&...args)
 {
 	if (!p)
 	{
-		try
-		{
-			p = P(new CTextureRef(std::forward<Args>(args)...));
-			return true;
-		}
-		catch (const CTextureRef::TextureNotFoundException &e) {}
+		CTextureRef tex(std::forward<Args>(args)...);
+		if (tex.valid())
+			return static_cast<bool>(p = P(new CTextureRef(std::move(tex))));
 	}
 	return false;
 }

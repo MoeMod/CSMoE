@@ -60,7 +60,7 @@ constexpr auto static_ent_cast(T *p)
 	>::type
 {
 	return static_cast<Result>(p);
-};
+}
 
 // CBaseEntity * => entvars_t *
 template<class Result, class T>
@@ -72,7 +72,7 @@ constexpr auto static_ent_cast(T *p)
 >::type
 {
 	return p->pev;
-};
+}
 
 // CBaseEntity * => edict_t *
 template<class Result, class T>
@@ -84,21 +84,21 @@ constexpr auto static_ent_cast(T *p)
 >::type
 {
 	return p->edict();
-};
+}
 
 // edict_t * / entvars_t * => CBaseEntity *
 template<class Result, class T>
 auto static_ent_cast(T *p) -> decltype(CBaseEntity::Instance(p), Result())
 {
 	return static_ent_cast<Result>(CBaseEntity::Instance(p));
-};
+}
 
 // nullptr => *
 template<class Result>
 Result static_ent_cast(nullptr_t)
 {
 	return nullptr;
-};
+}
 
 // CBaseEntity * <=> CBasePlayer *
 template<class Result, class T>
@@ -110,13 +110,13 @@ constexpr auto dynamic_ent_cast(T *p)
 >::type
 {
 	return dynamic_cast<Result>(p);
-};
+}
 
 // edict_t * / entvars_t * => CBaseEntity *
 template<class Result, class T>
 auto dynamic_ent_cast(T *p) -> decltype(CBaseEntity::Instance(p), Result())
 {
 	return dynamic_ent_cast<Result>(CBaseEntity::Instance(p));
-};
+}
 
 #endif

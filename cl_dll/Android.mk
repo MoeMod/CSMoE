@@ -1,3 +1,26 @@
+#
+# Android.mk - CSMoE Client Android Port
+# Copyright (c) 2018 Moemod Hyakuya
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
 #hlsdk-2.3 client port for android
 #Copyright (c) mittorn
 
@@ -6,8 +29,6 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := client
-APP_PLATFORM := android-8
-LOCAL_CONLYFLAGS += -std=c99
 
 include $(XASH3D_CONFIG)
 
@@ -15,10 +36,24 @@ ifeq ($(TARGET_ARCH_ABI),armeabi-v7a-hard)
 LOCAL_MODULE_FILENAME = libclient_hardfp
 endif
 
-LOCAL_CFLAGS += -fsigned-char -DCLIENT_DLL=1 -DCLIENT_WEAPONS=1
-LOCAL_CPPFLAGS += -std=c++11 -fexceptions
+LOCAL_CFLAGS += -fsigned-char -DCLIENT_DLL=1 -DCLIENT_WEAPONS=1 -D_LINUX
+LOCAL_CFLAGS += -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp 
+LOCAL_CONLYFLAGS += -std=c99
+LOCAL_CPPFLAGS += -std=c++11
 
-SRCS := \
+LOCAL_C_INCLUDES := $(LOCAL_PATH) \
+	$(LOCAL_PATH) \
+	$(LOCAL_PATH)/hud \
+	$(LOCAL_PATH)/studio \
+	$(LOCAL_PATH)/../common \
+	$(LOCAL_PATH)/../engine \
+	$(LOCAL_PATH)/../game_shared \
+	$(LOCAL_PATH)/../dlls \
+	$(LOCAL_PATH)/../pm_shared \
+	$(LOCAL_PATH)/../public \
+	$(LOCAL_PATH)/../public/tier1 \
+
+LOCAL_SRC_FILES := \
 	./cdll_int.cpp \
 	./demo.cpp \
 	./entity.cpp \
@@ -117,23 +152,23 @@ SRCS := \
 	../dlls/wpn_shared/wpn_ak47l.cpp \
 	../dlls/wpn_shared/wpn_mp7a1d.cpp \
 	../dlls/wpn_shared/wpn_deagled.cpp \
-../dlls/wpn_shared/wpn_as50.cpp \
-../dlls/wpn_shared/wpn_cannon.cpp \
-../dlls/wpn_shared/wpn_infinity.cpp \
-../dlls/wpn_shared/wpn_k1a.cpp \
-../dlls/wpn_shared/wpn_knife_zombi.cpp \
-../dlls/wpn_shared/wpn_kriss.cpp \
-../dlls/wpn_shared/wpn_m95.cpp \
-../dlls/wpn_shared/wpn_m1887.cpp \
-../dlls/wpn_shared/wpn_scarh.cpp \
-../dlls/wpn_shared/wpn_scarl.cpp \
-../dlls/wpn_shared/wpn_tar21.cpp \
-../dlls/wpn_shared/wpn_thompson.cpp \
-../dlls/wpn_shared/wpn_wa2000.cpp \
-../dlls/wpn_shared/wpn_xm8c.cpp \
-../dlls/wpn_shared/wpn_xm8s.cpp \
-../dlls/wpn_shared/knife_skullaxe.cpp \
-../dlls/wpn_shared/wpn_gungnir.cpp \
+	../dlls/wpn_shared/wpn_as50.cpp \
+	../dlls/wpn_shared/wpn_cannon.cpp \
+	../dlls/wpn_shared/wpn_infinity.cpp \
+	../dlls/wpn_shared/wpn_k1a.cpp \
+	../dlls/wpn_shared/wpn_knife_zombi.cpp \
+	../dlls/wpn_shared/wpn_kriss.cpp \
+	../dlls/wpn_shared/wpn_m95.cpp \
+	../dlls/wpn_shared/wpn_m1887.cpp \
+	../dlls/wpn_shared/wpn_scarh.cpp \
+	../dlls/wpn_shared/wpn_scarl.cpp \
+	../dlls/wpn_shared/wpn_tar21.cpp \
+	../dlls/wpn_shared/wpn_thompson.cpp \
+	../dlls/wpn_shared/wpn_wa2000.cpp \
+	../dlls/wpn_shared/wpn_xm8c.cpp \
+	../dlls/wpn_shared/wpn_xm8s.cpp \
+	../dlls/wpn_shared/knife_skullaxe.cpp \
+	../dlls/wpn_shared/wpn_gungnir.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -169,40 +204,22 @@ SRCS := \
 	./events/event_ak47l.cpp \
 	./events/event_mp7a1d.cpp \
 	./events/event_deagled.cpp \
-./events/event_as50.cpp \
-./events/event_cannon.cpp \
-./events/event_infinity.cpp \
-./events/event_k1a.cpp \
-./events/event_kriss.cpp \
-./events/event_m95.cpp \
-./events/event_m1887.cpp \
-./events/event_scarh.cpp \
-./events/event_scarl.cpp \
-./events/event_tar21.cpp \
-./events/event_thompson.cpp \
-./events/event_wa2000.cpp \
-./events/event_xm8c.cpp \
-./events/event_xm8s.cpp \
+	./events/event_as50.cpp \
+	./events/event_cannon.cpp \
+	./events/event_infinity.cpp \
+	./events/event_k1a.cpp \
+	./events/event_kriss.cpp \
+	./events/event_m95.cpp \
+	./events/event_m1887.cpp \
+	./events/event_scarh.cpp \
+	./events/event_scarl.cpp \
+	./events/event_tar21.cpp \
+	./events/event_thompson.cpp \
+	./events/event_wa2000.cpp \
+	./events/event_xm8c.cpp \
+	./events/event_xm8s.cpp \
 	./ev_common.cpp \
-	./calcscreen.cpp 
+	./calcscreen.cpp \
 	
-
-
-DEFINES = -Wno-write-strings -DLINUX -D_LINUX -Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -DCLIENT_WEAPONS -DCLIENT_DLL -Wl,--no-undefined
-
-LOCAL_C_INCLUDES := $(LOCAL_PATH) \
-	$(LOCAL_PATH) \
-	$(LOCAL_PATH)/hud \
-	$(LOCAL_PATH)/studio \
-	$(LOCAL_PATH)/../common \
-	$(LOCAL_PATH)/../engine \
-	$(LOCAL_PATH)/../game_shared \
-	$(LOCAL_PATH)/../dlls \
-	$(LOCAL_PATH)/../pm_shared \
-	$(LOCAL_PATH)/../public \
-	$(LOCAL_PATH)/../public/tier1
-LOCAL_CFLAGS += $(DEFINES)
-
-LOCAL_SRC_FILES := $(SRCS)
 
 include $(BUILD_SHARED_LIBRARY)

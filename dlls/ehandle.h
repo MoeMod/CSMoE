@@ -33,10 +33,17 @@ template <typename T = CBaseEntity>
 class EntityHandle
 {
 public:
+	// default constructor
 	constexpr EntityHandle() : m_edict(nullptr), m_serialnumber(0) {}
+
+	// copy constructor
+	// Note : template functions cannot be  copy constructor
 	constexpr EntityHandle(const EntityHandle<T> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
+
+	// Note : template functions are considered behind non-template functions
 	template<class U, class = typename std::enable_if<std::is_base_of<T, U>::value>::type>
 	constexpr EntityHandle(const EntityHandle<U> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
+
 	EntityHandle(const T *pEntity);
 	explicit EntityHandle(edict_t *pEdict);
 
@@ -59,8 +66,17 @@ public:
 	constexpr int GetSerialNumber() const;
 
 	bool operator==(T *pEntity) const;
-	explicit operator bool() const;
-	operator T *() const;
+	friend bool operator==(T *pEntity, const EntityHandle<T> &rhs) { return rhs == pEntity; }
+
+	// if(p), and also works for comparsion with NULL
+	operator bool() const { return IsValid(); }
+	// Gets the Entity this handle refers to.
+	// Returns null if invalid.
+	// works for comparsion with nullptr
+	operator T *() const { return Get<T>(); }
+	// Note : template functions are considered behind non-template functions
+	template <class R, class = typename std::enable_if<std::is_base_of<R, T>::value, R*>::type>
+	operator R *() const { return Get<R>(); }
 
 	T *operator->() const;
 
@@ -163,20 +179,6 @@ inline bool EntityHandle<T>::operator==(T *pEntity) const
 		return false;
 
 	return m_edict == pEntity->edict();
-}
-
-template <typename T>
-inline EntityHandle<T>::operator bool() const
-{
-	return IsValid();
-}
-
-// Gets the Entity this handle refers to.
-// Returns null if invalid.
-template <typename T>
-inline EntityHandle<T>::operator T *() const
-{
-	return GET_PRIVATE<T>(Get());
 }
 
 template <typename T>
