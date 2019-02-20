@@ -23,10 +23,10 @@ public:
 	constexpr CZB3HumanMorale() : m_iHumanMoraleLevel(0) {}
 
 	constexpr float DamageModifier(ZB3HumanMoraleType_e type) const 
-	{ 
-		if(type == ZB3_MORALE_STRENGTHEN)
-			return 1.3f + m_iHumanMoraleLevel * 0.1f;
-		return 1.0f + m_iHumanMoraleLevel * 0.1f; 
+	{
+		return type == ZB3_MORALE_STRENGTHEN ?
+		       1.3f + m_iHumanMoraleLevel * 0.1f :
+			1.0f + m_iHumanMoraleLevel * 0.1f;
 	}
 
 	constexpr int GetMoraleLevel() const { return m_iHumanMoraleLevel; }

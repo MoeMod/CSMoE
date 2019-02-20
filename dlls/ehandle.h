@@ -66,7 +66,6 @@ public:
 	constexpr int GetSerialNumber() const;
 
 	bool operator==(T *pEntity) const;
-	friend bool operator==(T *pEntity, const EntityHandle<T> &rhs) { return rhs == pEntity; }
 
 	// if(p), and also works for comparsion with NULL
 	operator bool() const { return IsValid(); }
@@ -74,9 +73,6 @@ public:
 	// Returns null if invalid.
 	// works for comparsion with nullptr
 	operator T *() const { return Get<T>(); }
-	// Note : template functions are considered behind non-template functions
-	template <class R, class = typename std::enable_if<std::is_base_of<R, T>::value, R*>::type>
-	operator R *() const { return Get<R>(); }
 
 	T *operator->() const;
 
