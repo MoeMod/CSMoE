@@ -39,6 +39,26 @@ bool CPlayerModStrategy_ZB3::CanUseZombieSkill()
 	return true;
 }
 
+void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const
+{
+	if(player)
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB3Msg, nullptr, player->edict());
+	else
+		MESSAGE_BEGIN(MSG_ALL, gmsgZB3Msg);
+
+	WRITE_BYTE(ZB3_MESSAGE_MORALE); // type, reserved.
+	WRITE_BYTE(type);
+	WRITE_BYTE(GetMoraleLevel());
+	MESSAGE_END();
+}
+
+constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_STRENGTHEN;
+
+CMod_ZombieHero::CMod_ZombieHero()
+{
+
+}
+
 void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 {
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3(player, this));
@@ -50,9 +70,49 @@ void CMod_ZombieHero::PickZombieOrigin()
 	PickHero();
 }
 
+float CMod_ZombieHero::GetAdjustedEntityDamage(CBaseEntity * victim, entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = CMod_ZombieMod2::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	flDamage *= m_Morale.DamageModifier(MORALE_TYPE_GLOBAL);
+
+	return flDamage;
+}
+
+void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, NULL, pPlayer->edict());
+	WRITE_BYTE(MOD_ZB3);
+	WRITE_BYTE(0); // Reserved. (weapon restriction? )
+	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
+	WRITE_BYTE(0); // Reserved. (MaxTime?)
+
+	MESSAGE_END();
+}
+
+void CMod_ZombieHero::RestartRound()
+{
+	m_Morale.ResetLevel();
+	return CMod_ZombieMod2::RestartRound();
+}
+
+void CMod_ZombieHero::PlayerSpawn(CBasePlayer * pPlayer)
+{
+	m_Morale.UpdateHUD(pPlayer, MORALE_TYPE_GLOBAL);
+	return CMod_ZombieMod2::PlayerSpawn(pPlayer);
+}
+
+void CMod_ZombieHero::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)
+{
+	if (pVictim->m_bIsZombie)
+		if (m_Morale.LevelUp())
+			m_Morale.UpdateHUD(nullptr, MORALE_TYPE_GLOBAL);
+	return CMod_ZombieMod2::PlayerKilled(pVictim, pKiller, pInflictor);
+}
+
 void CMod_ZombieHero::PickHero()
 {
-	int iNumHeroes = HeroNum();
+	auto iNumHeroes = HeroNum();
 
 	moe::range::PlayersList list;
 	std::vector<CBasePlayer *> players (list.begin(), list.end());

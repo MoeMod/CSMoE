@@ -17,20 +17,29 @@ GNU General Public License for more details.
 #define PROJECT_MOD_ZB3_H
 
 #include "mod_zb2.h"
+#include "zb3/zb3_const.h"
+#include "zb3/zb3_morale.h"
 
 class CMod_ZombieHero : public CMod_ZombieMod2
 {
 public:
+	CMod_ZombieHero();
 	void InstallPlayerModStrategy(CBasePlayer *) override;
 
 protected:
 	void PickZombieOrigin() override;
-
+	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void UpdateGameMode(CBasePlayer *pPlayer) override;
+	void RestartRound() override;
+	void PlayerSpawn(CBasePlayer *pPlayer) override;
+	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 
 protected:
 	virtual void PickHero();
 	virtual size_t HeroNum();
 	virtual void MakeHero(CBasePlayer *);
+
+	CZB3HumanMorale m_Morale;
 };
 
 class CPlayerModStrategy_ZB3 : public CPlayerModStrategy_ZB2

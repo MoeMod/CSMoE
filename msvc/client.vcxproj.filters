@@ -52,6 +52,9 @@
     <Filter Include="cl_dll\hud\modern">
       <UniqueIdentifier>{b34175f4-b656-4d88-9c40-4e9c0931ca86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\hud\zb3">
+      <UniqueIdentifier>{f9829210-3f11-4dc1-8a06-eec5ea21f55e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -570,6 +573,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3.cpp">
+      <Filter>cl_dll\hud\zb3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3_morale.cpp">
+      <Filter>cl_dll\hud\zb3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -829,6 +838,12 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\scoreboard.h">
       <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3.h">
+      <Filter>cl_dll\hud\zb3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3_morale.h">
+      <Filter>cl_dll\hud\zb3</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

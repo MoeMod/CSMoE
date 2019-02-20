@@ -125,6 +125,7 @@ struct HUDLIST {
 #include "scoreboard.h"
 #include "zbs/zbs.h"
 #include "zb2/zb2.h"
+#include "zb3/zb3.h"
 #include "retina.h"
 
 //
@@ -978,6 +979,7 @@ public:
 	CHudRetina		m_Retina;
 	CHudZBS	m_ZBS;
 	CHudZB2 m_ZB2;
+	CHudZB3 m_ZB3;
 
 	// user messages
 	CHudMsgFunc(Damage);

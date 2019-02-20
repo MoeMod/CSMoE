@@ -1,3 +1,18 @@
+/*
+player_msg.cpp - CSMoE Server : CBasePlayer messages
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -92,6 +107,7 @@ int gmsgZBSTip = 0;
 int gmsgZBSLevel = 0;
 int gmsgBTEWeapon = 0;
 int gmsgZB2Msg = 0;
+int gmsgZB3Msg = 0;
 
 // utils
 inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
@@ -188,6 +204,7 @@ void LinkUserMessages()
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
 	gmsgBTEWeapon = REG_USER_MSG("BTEWeapon", -1);
 	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
+	gmsgZB3Msg = REG_USER_MSG("ZB3Msg", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)
