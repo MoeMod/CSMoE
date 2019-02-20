@@ -1670,7 +1670,7 @@ void CWeaponBox::BombThink()
 		if (!pEntity->IsPlayer() || pEntity->IsDormant())
 			continue;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == TERRORIST)
 		{
@@ -1824,7 +1824,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					if (pEntity->pev->flags == FL_DORMANT)
 						continue;
 
-					CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+					CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 					if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == TERRORIST)
 					{

@@ -228,7 +228,7 @@ void respawn(entvars_t *pev, BOOL fCopyCorpse)
 		if (mp->m_iTotalRoundsPlayed > 0)
 			mp->MarkSpawnSkipped();
 
-		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pev);
+		CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pev);
 
 		if (mp->IsCareer() && mp->ShouldSkipSpawn() && pPlayer->IsAlive())
 			g_skipCareerInitialSpawn = true;
@@ -311,7 +311,7 @@ NOXREF int CountTeams()
 		if (FNullEnt(pPlayer->edict()))
 			break;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->m_iTeam == UNASSIGNED)
 			continue;
@@ -346,7 +346,7 @@ void ListPlayers(CBasePlayer *current)
 		if (pPlayer->pev->flags & FL_DORMANT)
 			continue;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 		int iUserID = GETPLAYERUSERID(ENT(player->pev));
 
 		Q_sprintf(cNumber, "%d", iUserID);
@@ -374,7 +374,7 @@ int CountTeamPlayers(int iTeam)
 		if (pPlayer->pev->flags & FL_DORMANT)
 			continue;
 
-		if (GetClassPtr((CBasePlayer *)pPlayer->pev)->m_iTeam == iTeam)
+		if (GetClassPtr<CBasePlayer>(pPlayer->pev)->m_iTeam == iTeam)
 			++i;
 	}
 
@@ -407,7 +407,7 @@ void ProcessKickVote(CBasePlayer *pVotingPlayer, CBasePlayer *pKickPlayer)
 		if (FNullEnt(pTempEntity->edict()))
 			break;
 
-		pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+		pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 		if (!pTempPlayer || pTempPlayer->m_iTeam == UNASSIGNED)
 			continue;
@@ -436,7 +436,7 @@ void ProcessKickVote(CBasePlayer *pVotingPlayer, CBasePlayer *pKickPlayer)
 			if (FNullEnt(pTempEntity->edict()))
 				break;
 
-			pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+			pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 			if (!pTempPlayer || pTempPlayer->m_iTeam == UNASSIGNED)
 				continue;
@@ -520,7 +520,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 {
 
 	entvars_t *pev = &pEntity->v;
-	CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pev);
+	CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pev);
 	CHalfLifeMultiplay *mp = g_pGameRules;
 
 	pPlayer->SetCustomDecalFrames(-1);
@@ -654,7 +654,7 @@ void Host_Say(edict_t *pEntity, int teamonly)
 	bool bSenderDead = false;
 
 	entvars_t *pev = &pEntity->v;
-	CBasePlayer *player = GetClassPtr((CBasePlayer *)pev);
+	CBasePlayer *player = GetClassPtr<CBasePlayer>(pev);
 
 	if (player->m_flLastTalk != 0.0f && gpGlobals->time - player->m_flLastTalk < 0.66f)
 		return;
@@ -2578,7 +2578,7 @@ CBaseEntity *EntityFromUserID(int userID)
 		if (FNullEnt(pTempEntity->edict()))
 			break;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 		if (pTempPlayer->m_iTeam != UNASSIGNED && userID == GETPLAYERUSERID(pTempEntity->edict()))
 		{
@@ -2599,7 +2599,7 @@ NOXREF int CountPlayersInServer()
 		if (FNullEnt(pTempEntity->edict()))
 			break;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 		if (pTempPlayer->m_iTeam != UNASSIGNED)
 		{
@@ -2883,7 +2883,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 		return;
 
 	entvars_t *pev = &pEntity->v;
-	CBasePlayer *player = GetClassPtr((CBasePlayer *)pev);
+	CBasePlayer *player = GetClassPtr<CBasePlayer>(pev);
 
 	if (FStrEq(pcmd, "say"))
 	{
@@ -2958,7 +2958,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				CBaseEntity *pKickEntity = EntityFromUserID(iVoteID);
 				if (pKickEntity != NULL)
 				{
-					CBasePlayer *pKickPlayer = GetClassPtr((CBasePlayer *)pKickEntity->pev);
+					CBasePlayer *pKickPlayer = GetClassPtr<CBasePlayer>(pKickEntity->pev);
 
 					if (pKickPlayer->m_iTeam != player->m_iTeam)
 					{
@@ -3540,12 +3540,12 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	}
 	else
 	{
-		if (mp->ClientCommand_DeadOrAlive(GetClassPtr((CBasePlayer *)pev), pcmd))
+		if (mp->ClientCommand_DeadOrAlive(GetClassPtr<CBasePlayer>(pev), pcmd))
 			return;
 
 		if (TheBots != NULL)
 		{
-			if (TheBots->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd))
+			if (TheBots->ClientCommand(GetClassPtr<CBasePlayer>(pev), pcmd))
 				return;
 		}
 
@@ -3699,26 +3699,26 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 #if 0
 				if (g_flWeaponCheat && CMD_ARGC() > 1)
-					GetClassPtr((CBasePlayer *)pev)->m_iFOV = Q_atoi(CMD_ARGV(1));
+					GetClassPtr<CBasePlayer>(pev)->m_iFOV = Q_atoi(CMD_ARGV(1));
 				else
-					CLIENT_PRINTF(pEntity, print_console, UTIL_VarArgs("\"fov\" is \"%d\"\n", (int)GetClassPtr((CBasePlayer *)pev)->m_iFOV));
+					CLIENT_PRINTF(pEntity, print_console, UTIL_VarArgs("\"fov\" is \"%d\"\n", (int)GetClassPtr<CBasePlayer>(pev)->m_iFOV));
 #endif
 			}
 			else if (FStrEq(pcmd, "use"))
 			{
-				GetClassPtr((CBasePlayer *)pev)->SelectItem(CMD_ARGV_(1));
+				GetClassPtr<CBasePlayer>(pev)->SelectItem(CMD_ARGV_(1));
 			}
 			else if (((pstr = Q_strstr(pcmd, "weapon_")) != NULL) && (pstr == pcmd))
 			{
-				GetClassPtr((CBasePlayer *)pev)->SelectItem(pcmd);
+				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (((pstr = Q_strstr(pcmd, "knife_")) != NULL) && (pstr == pcmd))
 			{
-			GetClassPtr((CBasePlayer *)pev)->SelectItem(pcmd);
+			GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (FStrEq(pcmd, "lastinv"))
 			{
-				GetClassPtr((CBasePlayer *)pev)->SelectLastItem();
+				GetClassPtr<CBasePlayer>(pev)->SelectLastItem();
 			}
 			else if (FStrEq(pcmd, "buyammo1"))
 			{
@@ -3843,7 +3843,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					return;
 
 
-				if (!g_pGameRules->ClientCommand(GetClassPtr((CBasePlayer *)pev), pcmd) && !player->m_pModStrategy->ClientCommand(pcmd))
+				if (!g_pGameRules->ClientCommand(GetClassPtr<CBasePlayer>(pev), pcmd) && !player->m_pModStrategy->ClientCommand(pcmd))
 				{
 					// tell the user they entered an unknown command
 					char command[128];
@@ -3922,7 +3922,7 @@ void EXT_FUNC ClientUserInfoChanged(edict_t *pEntity, char *infobuffer)
 		}
 	}
 
-	g_pGameRules->ClientUserInfoChanged(GetClassPtr((CBasePlayer *)&pEntity->v), infobuffer);
+	g_pGameRules->ClientUserInfoChanged(GetClassPtr<CBasePlayer>(&pEntity->v), infobuffer);
 }
 
 void EXT_FUNC ServerDeactivate()

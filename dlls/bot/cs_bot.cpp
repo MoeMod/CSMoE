@@ -130,7 +130,7 @@ bool CCSBot::Jump(bool mustJump)
 
 int CCSBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	CBaseEntity *attacker = GetClassPtr((CBaseEntity *)pevInflictor);
+	CBaseEntity *attacker = GetClassPtr<CBaseEntity>(pevInflictor);
 
 	// if we were attacked by a teammate, rebuke
 	if (attacker->IsPlayer())

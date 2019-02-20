@@ -396,7 +396,7 @@ void CMultiManager::ManagerThink()
 
 CMultiManager *CMultiManager::Clone()
 {
-	CMultiManager *pMulti = GetClassPtr((CMultiManager *)NULL);
+	CMultiManager *pMulti = CreateClassPtr<CMultiManager>();
 
 	edict_t *pEdict = pMulti->pev->pContainingEntity;
 	Q_memcpy(pMulti->pev, pev, sizeof(*pev));
@@ -762,7 +762,7 @@ void CTriggerHurt::RadiationThink()
 	// reset origin
 	if (!FNullEnt(pentPlayer))
 	{
-		pPlayer = GetClassPtr((CBasePlayer *)VARS(pentPlayer));
+		pPlayer = GetClassPtr<CBasePlayer>(VARS(pentPlayer));
 
 		pevTarget = VARS(pentPlayer);
 
@@ -1267,7 +1267,7 @@ void CChangeLevel::ChangeLevelNow(CBaseEntity *pActivator)
 	// Create an entity to fire the changetarget
 	if (m_changeTarget)
 	{
-		CFireAndDie *pFireAndDie = GetClassPtr((CFireAndDie *)NULL);
+		CFireAndDie *pFireAndDie = CreateClassPtr<CFireAndDie>();
 
 		if (pFireAndDie)
 		{
@@ -1409,7 +1409,7 @@ int CChangeLevel::ChangeList(LEVELLIST *pLevelList, int maxList)
 
 	while (!FNullEnt(pentChangelevel))
 	{
-		CChangeLevel *pTrigger = GetClassPtr((CChangeLevel *)VARS(pentChangelevel));
+		CChangeLevel *pTrigger = GetClassPtr<CChangeLevel>(VARS(pentChangelevel));
 
 		if (pTrigger != NULL)
 		{
@@ -1512,11 +1512,11 @@ NOXREF void NextLevel()
 	if (FNullEnt(pent))
 	{
 		gpGlobals->mapname = ALLOC_STRING("start");
-		pChange = GetClassPtr((CChangeLevel *)NULL);
+		pChange = CreateClassPtr<CChangeLevel>();
 		Q_strcpy(pChange->m_szMapName, "start");
 	}
 	else
-		pChange = GetClassPtr((CChangeLevel *)VARS(pent));
+		pChange = GetClassPtr<CChangeLevel>(VARS(pent));
 
 	Q_strcpy(st_szNextMap, pChange->m_szMapName);
 	g_fGameOver = TRUE;

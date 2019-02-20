@@ -57,7 +57,7 @@ T *CreateBot(const BotProfile *profile)
 	{
 		T *pBot = NULL;
 		FREE_PRIVATE(pentBot);
-		pBot = GetClassPtr((T *)VARS(pentBot));
+		pBot = GetClassPtr<T>(VARS(pentBot));
 		pBot->Initialize(profile);
 
 		return pBot;

@@ -304,7 +304,7 @@ void CHostage::IdleThink()
 				player = (CBasePlayer *)m_improv->GetFollowLeader();
 		}
 		else
-			player = GetClassPtr((CBasePlayer *)m_hTargetEnt->pev);
+			player = GetClassPtr<CBasePlayer>(m_hTargetEnt->pev);
 
 		if (player == NULL || player->m_iTeam == CT)
 		{
@@ -501,7 +501,7 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pevAttacker != NULL)
 	{
-		CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
+		CBaseEntity *pAttackingEnt = GetClassPtr<CBaseEntity>(pevAttacker);
 
 		if (pAttackingEnt->Classify() == CLASS_VEHICLE)
 		{
@@ -515,7 +515,7 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 		if (pAttackingEnt->IsPlayer())
 		{
-			pAttacker = GetClassPtr((CBasePlayer *)pevAttacker);
+			pAttacker = GetClassPtr<CBasePlayer>(pevAttacker);
 		}
 	}
 
@@ -880,7 +880,7 @@ void CHostage::DoFollow()
 		return;
 	}
 
-	pFollowing = GetClassPtr((CBaseEntity *)m_hTargetEnt->pev);
+	pFollowing = GetClassPtr<CBaseEntity>(m_hTargetEnt->pev);
 	m_LocalNav->SetTargetEnt(pFollowing);
 
 	vecDest = pFollowing->pev->origin;
@@ -973,7 +973,7 @@ void CHostage::MoveToward(const Vector &vecLoc)
 	Vector vecAng;
 	float flDist;
 
-	pFollowing = GetClassPtr((CBaseEntity *)m_hTargetEnt->pev);
+	pFollowing = GetClassPtr<CBaseEntity>(m_hTargetEnt->pev);
 	vecMove = vecLoc - pev->origin;
 	vecAng = UTIL_VecToAngles(vecMove);
 	vecAng = Vector(0, vecAng.y, 0);
@@ -1036,7 +1036,7 @@ void CHostage::NavReady()
 		return;
 	}
 
-	pFollowing = GetClassPtr((CBaseEntity *)m_hTargetEnt->pev);
+	pFollowing = GetClassPtr<CBaseEntity>(m_hTargetEnt->pev);
 	vecDest = pFollowing->pev->origin;
 
 	if (!(pFollowing->pev->flags & FL_ONGROUND))
@@ -1095,7 +1095,7 @@ void CHostage::SendHostagePositionMsg()
 		if (pEntity->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == CT)
 		{
@@ -1125,7 +1125,7 @@ void CHostage::SendHostageEventMsg()
 		if (pEntity->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == CT)
 		{

@@ -520,7 +520,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pevAttacker != NULL)
 	{
-		CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
+		CBaseEntity *pAttackingEnt = GetClassPtr<CBaseEntity>(pevAttacker);
 
 		if (pAttackingEnt->Classify() == CLASS_VEHICLE)
 		{
@@ -534,7 +534,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 		if (pAttackingEnt->IsPlayer())
 		{
-			pAttacker = GetClassPtr((CBasePlayer *)pevAttacker);
+			pAttacker = GetClassPtr<CBasePlayer>(pevAttacker);
 		}
 	}
 

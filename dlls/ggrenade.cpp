@@ -900,7 +900,7 @@ void CGrenade::Spawn()
 
 NOXREF CGrenade *CGrenade::ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity)
 {
-	CGrenade *pGrenade = GetClassPtr((CGrenade *)NULL);
+	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
 
 	// contact grenades arc lower
@@ -928,7 +928,7 @@ NOXREF CGrenade *CGrenade::ShootContact(entvars_t *pevOwner, Vector vecStart, Ve
 
 CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time, int iTeam, unsigned short usEvent)
 {
-	CGrenade *pGrenade = GetClassPtr((CGrenade *)NULL);
+	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
@@ -962,7 +962,7 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 
 CGrenade *CGrenade::ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time)
 {
-	CGrenade *pGrenade = GetClassPtr((CGrenade *)NULL);
+	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
@@ -1006,7 +1006,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	if (!m_bIsC4)
 		return;
 
-	CBasePlayer *player = GetClassPtr((CBasePlayer *)pActivator->pev);
+	CBasePlayer *player = GetClassPtr<CBasePlayer>(pActivator->pev);
 
 	// For CTs to defuse the c4
 	if (player->m_iTeam != CT)
@@ -1080,7 +1080,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 
 CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vector vecAngles)
 {
-	CGrenade *pGrenade = GetClassPtr((CGrenade *)NULL);
+	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->pev->movetype = MOVETYPE_TOSS;
 
 	if (pGrenade->pev->classname)
@@ -1138,7 +1138,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 
 CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time, unsigned short usEvent)
 {
-	CGrenade *pGrenade = GetClassPtr((CGrenade *)NULL);
+	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
 
 	UTIL_SetOrigin(pGrenade->pev, vecStart);

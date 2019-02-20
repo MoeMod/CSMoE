@@ -33,32 +33,36 @@ template <typename T = CBaseEntity>
 class EntityHandle
 {
 public:
-	EntityHandle() : m_edict(nullptr), m_serialnumber(0) {}
-	EntityHandle(const EntityHandle<T> &other);
+	constexpr EntityHandle() : m_edict(nullptr), m_serialnumber(0) {}
+	constexpr EntityHandle(const EntityHandle<T> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
+	template<class U, class = typename std::enable_if<std::is_base_of<T, U>::value>::type>
+	constexpr EntityHandle(const EntityHandle<U> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
 	EntityHandle(const T *pEntity);
-	EntityHandle(const edict_t *pEdict);
+	explicit EntityHandle(edict_t *pEdict);
+
+	template<class U>
+	friend class EntityHandle;
 
 	// cast to base class
 	// NOTE: this is a unsafe method
 	template <typename R>
-	R *Get() const;
+	auto Get() const -> typename std::enable_if<std::is_base_of<R, T>::value, R *>::type
+	{
+		return GET_PRIVATE<R>(Get());
+	}
 
-	edict_t *Get() const;
+	constexpr edict_t *Get() const;
 	edict_t *Set(edict_t *pEdict);
 
 	void Remove();
 	bool IsValid() const;
-	int GetSerialNumber() const;
+	constexpr int GetSerialNumber() const;
 
 	bool operator==(T *pEntity) const;
 	explicit operator bool() const;
 	operator T *() const;
 
-	T *operator=(T *pEntity);
-	T *operator->();
-
-	// Copy the ehandle.
-	EntityHandle<T>& operator=(const EntityHandle<T> &other);
+	T *operator->() const;
 
 private:
 	edict_t *m_edict;
@@ -71,55 +75,30 @@ using EHANDLE = EHandle;
 
 // Inlines
 template <typename T>
-inline bool FNullEnt(EntityHandle<T> &hent)
+inline bool FNullEnt(const EntityHandle<T> &hent)
 {
 	return (!hent || FNullEnt(OFFSET(hent.Get())));
 }
 
-// Copy constructor
 template <typename T>
-EntityHandle<T>::EntityHandle(const EntityHandle<T> &other)
-{
-	m_edict = other.m_edict;
-	m_serialnumber = other.m_serialnumber;
-}
-
-template <typename T>
-EntityHandle<T>::EntityHandle(const T *pEntity)
+EntityHandle<T>::EntityHandle(const T *pEntity) : EntityHandle()
 {
 	if (pEntity)
 	{
 		Set(ENT(pEntity->pev));
 	}
-	else
-	{
-		m_edict = nullptr;
-		m_serialnumber = 0;
-	}
 }
 
 template <typename T>
-EntityHandle<T>::EntityHandle(const edict_t *pEdict)
+EntityHandle<T>::EntityHandle(edict_t *pEdict)
 {
-	Set(const_cast<edict_t *>(pEdict));
+	Set((pEdict));
 }
 
 template <typename T>
-template <typename R>
-inline R *EntityHandle<T>::Get() const
+constexpr inline edict_t *EntityHandle<T>::Get() const
 {
-	return GET_PRIVATE<R>(Get());
-}
-
-template <typename T>
-inline edict_t *EntityHandle<T>::Get() const
-{
-	if (!m_edict || m_edict->serialnumber != m_serialnumber || m_edict->free)
-	{
-		return nullptr;
-	}
-
-	return m_edict;
+	return (!m_edict || m_edict->serialnumber != m_serialnumber || m_edict->free) ? nullptr : m_edict;
 }
 
 template <typename T>
@@ -168,7 +147,7 @@ inline bool EntityHandle<T>::IsValid() const
 // CBaseEntity serial number.
 // Used to determine if the entity is still valid.
 template <typename T>
-inline int EntityHandle<T>::GetSerialNumber() const
+constexpr inline int EntityHandle<T>::GetSerialNumber() const
 {
 	return m_serialnumber;
 }
@@ -176,12 +155,12 @@ inline int EntityHandle<T>::GetSerialNumber() const
 template <typename T>
 inline bool EntityHandle<T>::operator==(T *pEntity) const
 {
-	assert("EntityHandle<T>::operator==:  got a nullptr pointer!" && (pEntity != nullptr));
+	//assert("EntityHandle<T>::operator==:  got a nullptr pointer!" && (pEntity != nullptr));
+	if (pEntity == nullptr)
+		return !IsValid();
 
 	if (m_serialnumber != pEntity->edict()->serialnumber)
-	{
 		return false;
-	}
 
 	return m_edict == pEntity->edict();
 }
@@ -200,25 +179,8 @@ inline EntityHandle<T>::operator T *() const
 	return GET_PRIVATE<T>(Get());
 }
 
-// Assigns the given entity to this handle.
 template <typename T>
-inline T *EntityHandle<T>::operator=(T *pEntity)
-{
-	if (pEntity)
-	{
-		Set(ENT(pEntity->pev));
-	}
-	else
-	{
-		m_edict = nullptr;
-		m_serialnumber = 0;
-	}
-
-	return static_cast<T *>(pEntity);
-}
-
-template <typename T>
-inline T *EntityHandle<T>::operator->()
+inline T *EntityHandle<T>::operator->() const
 {
 	edict_t *pEdict = Get();
 	assert("EntityHandle<T>::operator->:  pointer is nullptr!" && (pEdict != nullptr));
@@ -226,14 +188,4 @@ inline T *EntityHandle<T>::operator->()
 	T *pEntity = GET_PRIVATE<T>(pEdict);
 	assert("EntityHandle<T>::operator->:  pvPrivateData is nullptr!" && (pEntity != nullptr));
 	return pEntity;
-}
-
-// Makes this handle refer to the same entity as the given handle.
-template <typename T>
-inline EntityHandle<T>& EntityHandle<T>::operator=(const EntityHandle<T> &other)
-{
-	m_edict = other.m_edict;
-	m_serialnumber = other.m_serialnumber;
-
-	return (*this);
 }

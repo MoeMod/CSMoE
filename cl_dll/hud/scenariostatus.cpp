@@ -95,7 +95,6 @@ int CHudScenarioStatus::MsgFunc_Scenario(const char *pszName, int iSize, void *p
 	if (sscanf(spriteName, "hostage%d", &m_iRepeatTimes) == 1)
 	{
 		spriteName = "hostage";
-		m_iRepeatTimes = m_iRepeatTimes; // sscanf did it...
 	}
 	else
 	{

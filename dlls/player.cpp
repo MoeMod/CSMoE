@@ -264,7 +264,7 @@ CBasePlayer *CBasePlayer::GetNextRadioRecipient(CBasePlayer *pStartPlayer)
 			break;
 
 		BOOL bSend = FALSE;
-		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pEntity->IsPlayer())
 		{
@@ -318,7 +318,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			break;
 
 		BOOL bSend = FALSE;
-		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pPlayer == NULL)
 			continue;
@@ -756,11 +756,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		if (bitsDamageType & DMG_EXPLOSION)
 		{
-			CBaseEntity *temp = GetClassPtr((CBaseEntity *)pevInflictor);
+			CBaseEntity *temp = GetClassPtr<CBaseEntity>(pevInflictor);
 
 			if (!Q_strcmp(STRING(temp->pev->classname), "grenade"))
 			{
-				CGrenade *pGrenade = GetClassPtr((CGrenade *)pevInflictor);
+				CGrenade *pGrenade = GetClassPtr<CGrenade>(pevInflictor);
 
 				if (CVAR_GET_FLOAT("mp_friendlyfire"))
 				{
@@ -923,11 +923,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (!IsAlive())
 		return 0;
 
-	pAttacker = GetClassPtr((CBaseEntity *)pevAttacker);
+	pAttacker = GetClassPtr<CBaseEntity>(pevAttacker);
 
 	if (pAttacker->IsPlayer())
 	{
-		pAttack = GetClassPtr((CBasePlayer *)pevAttacker);
+		pAttack = GetClassPtr<CBasePlayer>(pevAttacker);
 
 		bool bAttackFFA = !g_pGameRules->IsTeamplay();
 
@@ -951,7 +951,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					if (FNullEnt(pBasePlayer->edict()))
 						break;
 
-					CBasePlayer *basePlayer = GetClassPtr((CBasePlayer *)pBasePlayer->pev);
+					CBasePlayer *basePlayer = GetClassPtr<CBasePlayer>(pBasePlayer->pev);
 
 					if (basePlayer->m_iTeam == m_iTeam)
 					{
@@ -1380,7 +1380,7 @@ void CBasePlayer::SetProgressBarTime(int time)
 		if (FNullEnt(pPlayer->edict()))
 			break;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->IsObserver() == OBS_IN_EYE && player->pev->iuser2 == myIndex)
 		{
@@ -1420,7 +1420,7 @@ void CBasePlayer::SetProgressBarTime2(int time, float timeElapsed)
 		if (FNullEnt(pPlayer->edict()))
 			break;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->IsObserver() == OBS_IN_EYE && player->pev->iuser2 == myIndex)
 		{
@@ -5479,7 +5479,7 @@ void CBasePlayer::ImpulseCommands()
 			{
 				// line hit something, so paint a decal
 				m_flNextDecalTime = gpGlobals->time + CVAR_GET_FLOAT("decalfrequency");
-				CSprayCan *pCan = GetClassPtr((CSprayCan *)NULL);
+				CSprayCan *pCan = CreateClassPtr<CSprayCan>();
 				pCan->Spawn(pev);
 			}
 			break;
@@ -5621,7 +5621,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 			if (tr.flFraction != 1.0f)
 			{
 				// line hit something, so paint a decal
-				CBloodSplat *pBlood = GetClassPtr((CBloodSplat *)NULL);
+				CBloodSplat *pBlood = CreateClassPtr<CBloodSplat>();
 				pBlood->Spawn(pev);
 			}
 			break;
@@ -6395,7 +6395,7 @@ void CBasePlayer::UpdateClientData()
 				if (!pEntity || i == entindex())
 					continue;
 
-				CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+				CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 				if (pPlayer->pev->flags == FL_DORMANT)
 					continue;
@@ -6840,7 +6840,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 
 						if (pEntity->pev->flags != FL_DORMANT)
 						{
-							CBasePlayer *pOther = GetClassPtr((CBasePlayer *)pEntity->pev);
+							CBasePlayer *pOther = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 							if (pOther->pev->deadflag == DEAD_NO && pOther->m_iTeam == TERRORIST)
 							{

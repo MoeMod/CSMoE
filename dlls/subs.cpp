@@ -210,7 +210,7 @@ void CBaseDelay::SUB_UseTargets(CBaseEntity *pActivator, USE_TYPE useType, float
 	if (m_flDelay != 0)
 	{
 		// create a temp object to fire at a later time
-		CBaseDelay *pTemp = GetClassPtr((CBaseDelay *)NULL);
+		CBaseDelay *pTemp = CreateClassPtr<CBaseDelay>();
 		if (pTemp->pev->classname)
 		{
 			RemoveEntityHashValue(pTemp->pev, STRING(pTemp->pev->classname), CLASSNAME);
