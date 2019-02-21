@@ -63,6 +63,7 @@ protected:
 	virtual bool CanUseZombieSkill();
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();
+	virtual void CheckEvolution();
 
 protected:
 	virtual void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel);

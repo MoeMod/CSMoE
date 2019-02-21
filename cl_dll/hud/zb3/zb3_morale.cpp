@@ -18,11 +18,13 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "draw_util.h"
 #include "triangleapi.h"
+#include "eventscripts.h"
 
 #include "zb3.h"
 #include "zb3_morale.h"
 
 #include "gamemode/zb3/zb3_const.h"
+
 
 CHudZB3Morale::CHudZB3Morale(void)
 {
@@ -39,6 +41,10 @@ int CHudZB3Morale::VidInit(void)
 
 int CHudZB3Morale::Draw(float time)
 {
+	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
+	if (g_PlayerExtraInfo[idx].zombie)
+		return 0;
+
 	int iX = ScreenWidth / 2 - 130;
 	int iY = ScreenHeight - 100;
 	

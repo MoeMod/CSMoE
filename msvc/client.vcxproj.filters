@@ -579,6 +579,9 @@
     <ClCompile Include="..\cl_dll\hud\zb3\zb3_morale.cpp">
       <Filter>cl_dll\hud\zb3</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3_rage.cpp">
+      <Filter>cl_dll\hud\zb3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -843,6 +846,9 @@
       <Filter>cl_dll\hud\zb3</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\zb3\zb3_morale.h">
+      <Filter>cl_dll\hud\zb3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3_rage.h">
       <Filter>cl_dll\hud\zb3</Filter>
     </ClInclude>
   </ItemGroup>

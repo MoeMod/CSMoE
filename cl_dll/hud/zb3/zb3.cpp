@@ -23,13 +23,15 @@ GNU General Public License for more details.
 
 #include "zb3.h"
 #include "zb3_morale.h"
+#include "zb3_rage.h"
 
 #include "gamemode/zb3/zb3_const.h"
+#include "player/player_zombie.h"
 
 #include <vector>
 
 class CHudZB3::impl_t
-	: public THudSubDispatcher<CHudZB3Morale>
+	: public THudSubDispatcher<CHudZB3Morale, CHudZB3Rage>
 {
 public:
 };
@@ -48,7 +50,14 @@ int CHudZB3::MsgFunc_ZB3Msg(const char *pszName, int iSize, void *pbuf)
 		pimpl->get<CHudZB3Morale>().UpdateLevel(morale_type, morale_level);
 		break;
 	}
-		
+	case ZB3_MESSAGE_RAGE:
+	{
+		auto zombie_level = static_cast<ZombieLevel>(buf.ReadByte());
+		int percent = buf.ReadByte();
+		pimpl->get<CHudZB3Rage>().SetZombieLevel(zombie_level);
+		pimpl->get<CHudZB3Rage>().SetPercent(percent);
+		break;
+	}
 	}
 	
 	return 1;

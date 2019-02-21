@@ -120,6 +120,7 @@
     <ClCompile Include="..\cl_dll\hud\zb2\zb2_skill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zb3\zb3.cpp" />
     <ClCompile Include="..\cl_dll\hud\zb3\zb3_morale.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3_rage.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\cl_dll\hud\zb2\zb2_skill.h" />
     <ClInclude Include="..\cl_dll\hud\zb3\zb3.h" />
     <ClInclude Include="..\cl_dll\hud\zb3\zb3_morale.h" />
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3_rage.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />

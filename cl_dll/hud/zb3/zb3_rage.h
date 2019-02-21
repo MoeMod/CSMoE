@@ -1,5 +1,5 @@
 /*
-zb3_const.h - CSMoE : Zombie Hero Shared Constants
+zb3_rage.h - CSMoE Client HUD : Zombie Hero Zombie Rage System
 Copyright (C) 2019 Moemod Hyakuya
 
 This program is free software: you can redistribute it and/or modify
@@ -13,23 +13,31 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef ZB3_CONST_H
-#define ZB3_CONST_H
-#ifdef _WIN32
 #pragma once
-#endif
 
-enum ZB3HumanMoraleType_e : byte
+#include "hud_sub.h"
+
+enum ZombieLevel : int;
+
+class CHudZB3Rage : public IBaseHudSub
 {
-	ZB3_MORALE_DEFAULT = 0,
-	ZB3_MORALE_STRENGTHEN = 1
+public:
+	CHudZB3Rage();
+	int VidInit(void) override;
+	int Draw(float time) override;
+
+	void SetPercent(int iPercent) { m_iPercent = iPercent; }
+	void SetZombieLevel(ZombieLevel zl) { m_iZombieLevel = zl; }
+
+protected:
+	ZombieLevel m_iZombieLevel;
+	int m_iPercent;
+	int m_iRageFrame;
+	float m_flRageTimer;
+
+private:
+	int m_iRageBG;
+	int m_iRageLevel;
+
+	int m_iRageIndex[3][8];
 };
-
-enum ZB3MessageType : byte
-{
-	ZB3_MESSAGE_MORALE, // { byte msg_type, byte morale_type, byte level }
-	ZB3_MESSAGE_RAGE, // { byte msg_type, byte zombielevel[0-2], byte percent[0-100] }
-
-};
-
-#endif

@@ -34,9 +34,71 @@ CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieH
 
 }
 
+void CPlayerModStrategy_ZB3::OnSpawn()
+{
+	m_flRagePercent = 0;
+	return CPlayerModStrategy_ZB2::OnSpawn();
+}
+
 bool CPlayerModStrategy_ZB3::CanUseZombieSkill()
 {
 	return true;
+}
+
+void CPlayerModStrategy_ZB3::CheckEvolution()
+{
+	float flLastRagePercent = m_flRagePercent;
+	auto iLastLevel = m_pPlayer->m_iZombieLevel;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_flRagePercent > 100.0f)
+	{
+		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
+
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
+		m_pPlayer->pev->armorvalue = 500.0f;
+	}
+
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_flRagePercent > 100.0f)
+	{
+		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN_LV2);
+		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
+
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
+		m_pPlayer->pev->armorvalue = 1000.0f;
+	}
+
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+	{
+		m_flRagePercent = 100.0f;
+	}
+
+	if (m_flRagePercent != flLastRagePercent || m_pPlayer->m_iZombieLevel != iLastLevel)
+		UpdatePlayerEvolutionHUD();
+}
+
+void CPlayerModStrategy_ZB3::Event_OnBecomeZombie(CBasePlayer * who, ZombieLevel iEvolutionLevel)
+{
+	return CPlayerModStrategy_ZB2::Event_OnBecomeZombie(who, iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB3::Event_OnInfection(CBasePlayer * victim, CBasePlayer * attacker)
+{
+	if (m_pPlayer != attacker)
+		return;
+
+	// TODO : damage => rage
+	m_flRagePercent+=m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 40 : 20;
+	CheckEvolution();
+
+}
+
+void CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD()
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB3Msg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZB3_MESSAGE_RAGE); // type, reserved.
+	WRITE_BYTE(m_pPlayer->m_iZombieLevel);
+	WRITE_BYTE(static_cast<int>(m_flRagePercent));
+	MESSAGE_END();
 }
 
 void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const

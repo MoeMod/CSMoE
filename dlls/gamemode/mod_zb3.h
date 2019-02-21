@@ -47,10 +47,16 @@ class CPlayerModStrategy_ZB3 : public CPlayerModStrategy_ZB2
 public:
 	CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp);
 
+	void OnSpawn() override;
 	bool CanUseZombieSkill() override;
+	void CheckEvolution() override;
+	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel) override;
+	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
+	void UpdatePlayerEvolutionHUD() override;
 
 private:
 	CMod_ZombieHero * const m_pModZB3;
+	float m_flRagePercent; // [0.0-100.0]
 };
 
 

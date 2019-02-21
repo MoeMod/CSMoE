@@ -253,9 +253,8 @@ void CPlayerModStrategy_ZB2::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 	if (m_pPlayer != who)
 		return;
 
-	UpdatePlayerEvolutionHUD();
 	m_iZombieInfections = 0;
-
+	UpdatePlayerEvolutionHUD();
 
 	InitZombieSkill();
 }
@@ -267,23 +266,7 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 
 	m_iZombieInfections++;
 
-	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_iZombieInfections >= 3)
-	{
-		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
-		m_pPlayer->pev->armorvalue = 500.0f;
-	}
-
-	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_iZombieInfections >= 5)
-	{
-		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN_LV2);
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
-		m_pPlayer->pev->armorvalue = 1000.0f;
-	}
-
-	UpdatePlayerEvolutionHUD();
+	CheckEvolution();
 }
 
 void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
@@ -318,6 +301,27 @@ void CPlayerModStrategy_ZB2::UpdatePlayerEvolutionHUD()
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
+}
+
+void CPlayerModStrategy_ZB2::CheckEvolution()
+{
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_iZombieInfections >= 3)
+	{
+		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
+		m_pPlayer->pev->armorvalue = 500.0f;
+	}
+
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_iZombieInfections >= 5)
+	{
+		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN_LV2);
+
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
+		m_pPlayer->pev->armorvalue = 1000.0f;
+	}
+
+	UpdatePlayerEvolutionHUD();
 }
 
 void CPlayerModStrategy_ZB2::InitZombieSkill()
