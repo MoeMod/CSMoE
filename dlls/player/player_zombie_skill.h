@@ -78,6 +78,8 @@ public:
 
 protected:
 	void OnCrazyEffect();
+	float GetDurationTime() const;
+	float GetCooldownTime() const;
 
 	float m_flTimeZombieSkillEffect;
 };

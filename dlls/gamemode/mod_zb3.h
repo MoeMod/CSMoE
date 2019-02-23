@@ -25,18 +25,16 @@ class CMod_ZombieHero : public CMod_ZombieMod2
 public:
 	CMod_ZombieHero();
 	void InstallPlayerModStrategy(CBasePlayer *) override;
-
-protected:
 	void PickZombieOrigin() override;
-	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 
+	const CZB3HumanMorale &HumanMorale() const { return m_Morale; }
+
 protected:
 	virtual void PickHero();
-	virtual size_t HeroNum();
 	virtual void MakeHero(CBasePlayer *);
 
 	CZB3HumanMorale m_Morale;
@@ -48,11 +46,11 @@ public:
 	CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp);
 
 	void OnSpawn() override;
-	bool CanUseZombieSkill() override;
+	bool CanUseZombieSkill() override { return true; }
 	void CheckEvolution() override;
-	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel) override;
 	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
 	void UpdatePlayerEvolutionHUD() override;
+	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 
 private:
 	CMod_ZombieHero * const m_pModZB3;

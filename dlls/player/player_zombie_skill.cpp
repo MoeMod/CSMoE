@@ -10,9 +10,6 @@
 
 #include "gamemode/mod_zb2.h"
 
-const float ZOMBIECRAZY_DURATION = 10.0f;
-const float ZOMBIECRAZY_COOLDOWN = 10.0f;
-
 void CZombieSkill_Base::Think()
 {
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
@@ -101,8 +98,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 		return;
 
 	m_iZombieSkillStatus = SKILL_STATUS_USING;
-	m_flTimeZombieSkillEnd = gpGlobals->time + ZOMBIECRAZY_DURATION;
-	m_flTimeZombieSkillNext = gpGlobals->time + ZOMBIECRAZY_COOLDOWN;
+	m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+	m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
 
 	m_pPlayer->pev->renderfx = kRenderFxGlowShell;
@@ -117,8 +114,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	WRITE_SHORT(ZOMBIECRAZY_DURATION);
-	WRITE_SHORT(ZOMBIECRAZY_COOLDOWN);
+	WRITE_SHORT(GetDurationTime());
+	WRITE_SHORT(GetCooldownTime());
 	MESSAGE_END();
 }
 
@@ -146,6 +143,16 @@ void CZombieSkill_ZombieCrazy::OnCrazyEffect()
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_1.wav", VOL_NORM, ATTN_NORM);
 	else
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
+}
+
+float CZombieSkill_ZombieCrazy::GetDurationTime() const
+{
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 3.0f : 10.0f;
+}
+
+float CZombieSkill_ZombieCrazy::GetCooldownTime() const
+{
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 10.0f : 10.0f;
 }
 
 float CZombieSkill_ZombieCrazy::GetDamageRatio() const

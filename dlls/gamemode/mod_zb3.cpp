@@ -27,6 +27,8 @@ GNU General Public License for more details.
 #include <algorithm>
 #include <random>
 
+constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_DEFAULT;
+
 CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp)
 	: CPlayerModStrategy_ZB2(player, static_cast<CMod_ZombieMod2 *>(mp)),
 	  m_pModZB3(mp)
@@ -38,11 +40,6 @@ void CPlayerModStrategy_ZB3::OnSpawn()
 {
 	m_flRagePercent = 0;
 	return CPlayerModStrategy_ZB2::OnSpawn();
-}
-
-bool CPlayerModStrategy_ZB3::CanUseZombieSkill()
-{
-	return true;
 }
 
 void CPlayerModStrategy_ZB3::CheckEvolution()
@@ -72,13 +69,7 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 		m_flRagePercent = 100.0f;
 	}
 
-	if (m_flRagePercent != flLastRagePercent || m_pPlayer->m_iZombieLevel != iLastLevel)
-		UpdatePlayerEvolutionHUD();
-}
-
-void CPlayerModStrategy_ZB3::Event_OnBecomeZombie(CBasePlayer * who, ZombieLevel iEvolutionLevel)
-{
-	return CPlayerModStrategy_ZB2::Event_OnBecomeZombie(who, iEvolutionLevel);
+	UpdatePlayerEvolutionHUD();
 }
 
 void CPlayerModStrategy_ZB3::Event_OnInfection(CBasePlayer * victim, CBasePlayer * attacker)
@@ -86,7 +77,7 @@ void CPlayerModStrategy_ZB3::Event_OnInfection(CBasePlayer * victim, CBasePlayer
 	if (m_pPlayer != attacker)
 		return;
 
-	// TODO : damage => rage
+	// infection => rage
 	m_flRagePercent+=m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 40 : 20;
 	CheckEvolution();
 
@@ -101,20 +92,37 @@ void CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD()
 	MESSAGE_END();
 }
 
+float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = CPlayerModStrategy_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	// morale calc
+	CBasePlayer *pPlayerAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker);
+	if (pPlayerAttacker && pPlayerAttacker->m_pActiveItem)
+	{
+		// knife doesn't have extra damage
+		if(pPlayerAttacker->m_pActiveItem->m_iId != WEAPON_KNIFE)
+			flDamage *= m_pModZB3->HumanMorale().DamageModifier(MORALE_TYPE_GLOBAL);
+	}
+
+	// damage => rage
+	m_flRagePercent += flDamage * (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.01f : 0.005f);
+	CheckEvolution();
+
+	return flDamage;
+}
+
 void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const
 {
 	if(player)
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB3Msg, nullptr, player->edict());
 	else
 		MESSAGE_BEGIN(MSG_ALL, gmsgZB3Msg);
-
 	WRITE_BYTE(ZB3_MESSAGE_MORALE); // type, reserved.
 	WRITE_BYTE(type);
 	WRITE_BYTE(GetMoraleLevel());
 	MESSAGE_END();
 }
-
-constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_STRENGTHEN;
 
 CMod_ZombieHero::CMod_ZombieHero()
 {
@@ -132,15 +140,6 @@ void CMod_ZombieHero::PickZombieOrigin()
 	PickHero();
 }
 
-float CMod_ZombieHero::GetAdjustedEntityDamage(CBaseEntity * victim, entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
-{
-	flDamage = CMod_ZombieMod2::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
-
-	flDamage *= m_Morale.DamageModifier(MORALE_TYPE_GLOBAL);
-
-	return flDamage;
-}
-
 void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, NULL, pPlayer->edict());
@@ -148,7 +147,6 @@ void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
 	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
-
 	MESSAGE_END();
 }
 
@@ -174,28 +172,18 @@ void CMod_ZombieHero::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, e
 
 void CMod_ZombieHero::PickHero()
 {
-	auto iNumHeroes = HeroNum();
-
+	// randomize player list
 	moe::range::PlayersList list;
 	std::vector<CBasePlayer *> players (list.begin(), list.end());
-	players.erase(std::remove_if(players.begin(), players.end(),
-				[](CBasePlayer *player){ return player->IsAlive() && player->m_iTeam == TEAM_CT && !player->m_bIsZombie; }),
-				players.end());
-
-	// randomize player list
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 	std::shuffle(players.begin(), players.end(), std::random_device());
-
+	
+	auto iNumHeroes = std::distance(list.begin(), list.end()) / 10 + std::uniform_int_distribution<size_t>(0, 1)(std::random_device());
 	for(int i = 0; i < iNumHeroes; ++i)
 	{
 		CBasePlayer *hero = players[i];
 		MakeHero(hero);
 	}
-}
-
-size_t CMod_ZombieHero::HeroNum()
-{
-	moe::range::PlayersList list;
-	return std::distance(list.begin(), list.end()) / 10 + RANDOM_LONG(0, 1);
 }
 
 void CMod_ZombieHero::MakeHero(CBasePlayer *player)

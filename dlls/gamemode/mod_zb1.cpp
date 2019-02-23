@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <random>
 
 #include "bot_include.h"
 
@@ -339,10 +340,10 @@ void CMod_Zombi::PickZombieOrigin()
 	// build alive player list
 	moe::range::PlayersList list;
 	std::vector<CBasePlayer *> players {list.begin(), list.end()};
-	players.erase(std::remove_if(players.begin(), players.end(), std::mem_fn(&CBasePlayer::IsAlive)), players.end());
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 
 	// randomize player list
-	std::random_shuffle(players.begin(), players.end());
+	std::shuffle(players.begin(), players.end(), std::random_device());
 
 	// pick them
 	for (int i = 0; i < iNumZombies; ++i)
