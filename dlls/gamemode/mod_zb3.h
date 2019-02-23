@@ -28,14 +28,17 @@ public:
 	void PickZombieOrigin() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void RestartRound() override;
-	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
+	void CheckWinConditions() override;
 
 	const CZB3HumanMorale &HumanMorale() const { return m_Morale; }
 
+	EventDispatcher<void(CBasePlayer *who)> m_eventBecomeHero;
+	EventDispatcher<void()> m_eventRoundStart;
+
 protected:
-	virtual void PickHero();
-	virtual void MakeHero(CBasePlayer *);
+	void PickHero();
+	void MakeHero(CBasePlayer *p) { m_eventBecomeHero.dispatch(p); }
 
 	CZB3HumanMorale m_Morale;
 };
@@ -48,13 +51,27 @@ public:
 	void OnSpawn() override;
 	bool CanUseZombieSkill() override { return true; }
 	void CheckEvolution() override;
+	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel) override;
 	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
 	void UpdatePlayerEvolutionHUD() override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void OnThink() override;
+	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
+
+	virtual void Event_OnBecomeHero(CBasePlayer *who);
+	virtual void Event_OnRoundStart();
+
+	bool IsHero() const { return m_pPlayer->m_bIsVIP; }
 
 private:
 	CMod_ZombieHero * const m_pModZB3;
+	const EventListener m_eventBecomeHeroListener;
+	const EventListener m_eventRoundStartListener;
+
 	float m_flRagePercent; // [0.0-100.0]
+	float m_flDeadTime;
+	float m_flBackupMaxHealth;
+	float m_flBackupArmor;
 };
 
 

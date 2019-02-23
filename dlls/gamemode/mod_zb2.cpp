@@ -1,3 +1,18 @@
+/*
+mod_zb2.cpp - CSMoE Gameplay server : Zombie Mod 2
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -19,6 +34,8 @@ CMod_ZombieMod2::CMod_ZombieMod2() // precache
 	UTIL_PrecacheOther("supplybox");
 
 	PRECACHE_SOUND("zombi/zombi_box.wav");
+	PRECACHE_SOUND("zombi/zombi_evolution.wav");
+	PRECACHE_SOUND("zombi/zombi_evolution_female.wav");
 }
 
 void CMod_ZombieMod2::UpdateGameMode(CBasePlayer *pPlayer)
@@ -311,6 +328,8 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
 		m_pPlayer->pev->armorvalue = 500.0f;
+
+		EvolutionSound();
 	}
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_iZombieInfections >= 5)
@@ -319,9 +338,16 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
 		m_pPlayer->pev->armorvalue = 1000.0f;
+
+		EvolutionSound();
 	}
 
 	UpdatePlayerEvolutionHUD();
+}
+
+void CPlayerModStrategy_ZB2::EvolutionSound() const
+{
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
 }
 
 void CPlayerModStrategy_ZB2::InitZombieSkill()

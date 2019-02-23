@@ -1,3 +1,17 @@
+/*
+mod_zb2.h - CSMoE Gameplay server : Zombie Mod 2
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #ifndef MOD_ZB2_H
 #define MOD_ZB2_H
@@ -64,6 +78,7 @@ protected:
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();
 	virtual void CheckEvolution();
+	virtual void EvolutionSound() const;
 
 protected:
 	virtual void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel);
