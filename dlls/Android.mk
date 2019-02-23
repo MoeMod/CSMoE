@@ -191,6 +191,7 @@ LOCAL_SRC_FILES := \
 	./gamemode/mod_dm.cpp \
 	./gamemode/mod_zb1.cpp \
 	./gamemode/mod_zbs.cpp \
+	./gamemode/mod_zb3.cpp \
 	./gamemode/zbs/zs_subs.cpp \
 	./gamemode/zbs/monster_entity.cpp \
 	../public/unicode_strtools.cpp \
