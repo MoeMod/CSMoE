@@ -116,6 +116,9 @@ LOCAL_SRC_FILES := \
 	./hud/legacy/hud_radar_legacy.cpp \
 	./hud/legacy/hud_scoreboard_legacy.cpp \
 	./hud/modern/hud_radar_modern.cpp \
+	./hud/zb3/zb3.cpp \
+	./hud/zb3/zb3_rage.cpp \
+	./hud/zb3/zb3_morale.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
