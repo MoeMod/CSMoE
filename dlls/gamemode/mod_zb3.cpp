@@ -33,8 +33,8 @@ constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_DEFAULT;
 CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp)
 	:	CPlayerModStrategy_ZB2(player, static_cast<CMod_ZombieMod2 *>(mp)),
 		m_pModZB3(mp),
-		m_eventBecomeHeroListener(mp->m_eventBecomeHero.subscribe(std::bind(&CPlayerModStrategy_ZB3::Event_OnBecomeHero, this, std::placeholders::_1))),
-		m_eventRoundStartListener(mp->m_eventRoundStart.subscribe(std::bind(&CPlayerModStrategy_ZB3::Event_OnRoundStart, this))),
+		m_eventBecomeHeroListener(mp->m_eventBecomeHero.subscribe(&CPlayerModStrategy_ZB3::Event_OnBecomeHero, this)),
+		m_eventRoundStartListener(mp->m_eventRoundStart.subscribe(&CPlayerModStrategy_ZB3::Event_OnRoundStart, this)),
 		m_flRagePercent(0.0f)
 {
 	

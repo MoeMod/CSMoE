@@ -1,3 +1,18 @@
+/*
+EventDispatcher.h - simple RAII and functor-based observer pattern implement
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #ifndef EVENTDISPATCHER_H
 #define EVENTDISPATCHER_H
 #ifdef _WIN32
@@ -89,6 +104,13 @@ public:
 		v.emplace_back(sp);
 		return sp;
 	}
+
+	template<class C, class Ret, class...ArgsListener>
+	/*[[nodiscard]]*/ EventListener subscribe(Ret (C::*pmem_fn)(ArgsListener...), C *pthis)
+	{
+		return subscribe([pmem_fn, pthis](typename ParseArg<Args>::type...args) { return (pthis->*pmem_fn)(args...); });
+	}
+
 private:
 	std::vector<std::weak_ptr<ICallable>> v;
 };

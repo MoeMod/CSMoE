@@ -194,8 +194,8 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 	m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
 
 	using namespace std::placeholders;
-	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(std::bind(&CPlayerModStrategy_ZB2::Event_OnBecomeZombie, this, _1, _2));
-	m_eventInfectionListener = mp->m_eventInfection.subscribe(std::bind(&CPlayerModStrategy_ZB2::Event_OnInfection, this, _1, _2));
+	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB2::Event_OnBecomeZombie, this);
+	m_eventInfectionListener = mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this);
 }
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
