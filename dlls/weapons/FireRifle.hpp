@@ -17,8 +17,15 @@ GNU General Public License for more details.
 
 #include "ExpressionBuilder.hpp"
 
+namespace detail {
+	class TFireRifle_Detail {
+	public:
+		static constexpr const auto &N = ExpressionBuilder::x;
+	};
+}
+
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TFireRifle : public CBase
+class TFireRifle : public CBase, public detail::TFireRifle_Detail
 {
 public:
 	// Default Settings
@@ -28,8 +35,6 @@ public:
 //	static constexpr auto BulletType = BULLET_PLAYER_762MM;
 //	static constexpr int Penetration = 2;
 	static constexpr int Distance = 8192;
-
-	static constexpr auto &&N = ExpressionBuilder::x;
 
 public:
 	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)

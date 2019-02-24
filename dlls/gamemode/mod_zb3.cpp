@@ -243,11 +243,12 @@ void CMod_ZombieHero::PickHero()
 {
 	// randomize player list
 	moe::range::PlayersList list;
+	std::random_device rd;
 	std::vector<CBasePlayer *> players (list.begin(), list.end());
 	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
-	std::shuffle(players.begin(), players.end(), std::random_device());
+	std::shuffle(players.begin(), players.end(), rd);
 	// make heroes
-	const auto iNumHeroes = std::max(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(std::random_device()));
+	const auto iNumHeroes = std::max(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
 	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieHero::MakeHero, this, std::placeholders::_1));
 }
 
