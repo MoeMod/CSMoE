@@ -25,7 +25,7 @@ void CZombieSkill_Base::Think()
 
 }
 
-CZombieSkill_Base::CZombieSkill_Base(CBasePlayer *player) : IZombieSkill(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
+CZombieSkill_Base::CZombieSkill_Base(CBasePlayer *player) : BasePlayerExtra(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
 {
 	
 }

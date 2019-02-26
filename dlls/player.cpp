@@ -416,9 +416,6 @@ void CBasePlayer::SmartRadio()
 
 void CBasePlayer::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if (m_bIsZombie)
-		return Pain_Zombie(m_LastHitGroup, HasArmour);
-
 	return m_pModStrategy->Pain(m_LastHitGroup, HasArmour);
 }
 
@@ -461,9 +458,6 @@ int TrainSpeed(int iSpeed, int iMax)
 
 void CBasePlayer::DeathSound()
 {
-	if (m_bIsZombie)
-		return DeathSound_Zombie();
-
 	return m_pModStrategy->DeathSound();
 }
 
@@ -745,7 +739,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (m_bIsVIP)
 		flRatio *= 0.5;
 
-	flDamage = Zombie_AdjustDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	flDamage = m_pModStrategy->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST))
 	{

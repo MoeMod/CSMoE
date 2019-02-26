@@ -9,11 +9,10 @@ void ZombieSkill_Precache();
 #include "player_mod_strategy.h"
 #include "gamemode/zb2/zb2_const.h"
 
-class IZombieSkill : public BasePlayerExtra
+class IZombieSkill
 {
 public:
-	explicit IZombieSkill(CBasePlayer *player) : BasePlayerExtra(player) {}
-	virtual ~IZombieSkill() = default;
+	virtual ~IZombieSkill() = 0;
 
 	virtual void InitHUD() = 0;
 	virtual void Think() = 0;
@@ -25,7 +24,9 @@ public:
 	
 };
 
-class CZombieSkill_Base : public IZombieSkill
+inline IZombieSkill::~IZombieSkill() = default;
+
+class CZombieSkill_Base : public IZombieSkill, public BasePlayerExtra
 {
 public:
 	explicit CZombieSkill_Base(CBasePlayer *player);
@@ -49,10 +50,10 @@ protected:
 
 };
 
-class CZombieSkill_Empty : public IZombieSkill
+class CZombieSkill_Empty : public IZombieSkill, public BasePlayerExtra
 {
 public:
-	explicit CZombieSkill_Empty(CBasePlayer *player)  : IZombieSkill(player) {}
+	explicit CZombieSkill_Empty(CBasePlayer *player)  : BasePlayerExtra(player) {}
 
 	void InitHUD() override {}
 	void Think() override {}

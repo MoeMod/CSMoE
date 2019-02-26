@@ -684,17 +684,11 @@ public:
 public:
 #ifdef CLIENT_DLL
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
-	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) {}
 #else
 	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
-	virtual float Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) { ApplyKnockbackData(this, this->pev->origin - attacker->pev->origin, data); }
-	
 #endif
-
-	void DeathSound_Zombie();
-	void Pain_Zombie(int m_LastHitGroup, bool HasArmour);
 
 	void SpawnProtection_Check();
 	void SpawnProtection_Start(float flTime);

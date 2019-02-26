@@ -200,7 +200,7 @@ void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) 
 
 CMod_ZombieHero::CMod_ZombieHero()
 {
-	
+
 }
 
 void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
@@ -211,7 +211,8 @@ void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 void CMod_ZombieHero::PickZombieOrigin()
 {
 	CMod_Zombi::PickZombieOrigin();
-	PickHero();
+	// TODO : pick hero
+	// PickHero();
 }
 
 void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
@@ -248,7 +249,7 @@ void CMod_ZombieHero::PickHero()
 	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 	std::shuffle(players.begin(), players.end(), rd);
 	// make heroes
-	const auto iNumHeroes = std::max(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
+	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
 	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieHero::MakeHero, this, std::placeholders::_1));
 }
 

@@ -41,25 +41,6 @@ void CBasePlayer::MakeZombie(ZombieLevel iEvolutionLevel)
 
 }
 
-void CBasePlayer::DeathSound_Zombie()
-{
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 2))
-	{
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
-	}
-}
-
-void CBasePlayer::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
-{
-	switch (RANDOM_LONG(0, 1))
-	{
-	case 0: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
-	case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
-	}
-}
-
 void PlayerZombie_Precache()
 {
 	PRECACHE_SOUND("zombi/zombi_death_1.wav");
@@ -68,21 +49,4 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
-}
-
-float CBasePlayer::Zombie_AdjustDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
-{
-	// grenade damage 5x in zb mode
-	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
-	{
-		if (bitsDamageType & DMG_EXPLOSION)
-		{
-			if (m_bIsZombie)
-				flDamage *= 5.0f;
-			else
-				flDamage *= 2.5f;
-		}
-	}
-
-	return flDamage = m_pModStrategy->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }

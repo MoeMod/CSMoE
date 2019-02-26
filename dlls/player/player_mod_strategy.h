@@ -1,5 +1,8 @@
 #ifndef PLAYER_MOD_STRATEGY_H
 #define PLAYER_MOD_STRATEGY_H
+
+#include <player.h>
+
 #ifdef _WIN32
 #pragma once
 #endif
@@ -11,16 +14,15 @@ class CBasePlayer;
 struct BasePlayerExtra
 {
 public:
-	BasePlayerExtra(CBasePlayer *p) : m_pPlayer(p) {}
+	explicit BasePlayerExtra(CBasePlayer *p) : m_pPlayer(p) {}
 	
 public:
 	CBasePlayer * const m_pPlayer;
 };
 
-class IBasePlayerModStrategy : public BasePlayerExtra
+class IBasePlayerModStrategy
 {
 public:
-	IBasePlayerModStrategy(CBasePlayer *p) : BasePlayerExtra(p) {}
 	virtual ~IBasePlayerModStrategy() = 0;
 
 	virtual void OnThink() = 0;
@@ -40,12 +42,12 @@ public:
 
 };
 
-inline IBasePlayerModStrategy::~IBasePlayerModStrategy() {}
+inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
 
-class CPlayerModStrategy_Default : public IBasePlayerModStrategy
+class CPlayerModStrategy_Default : public IBasePlayerModStrategy, public BasePlayerExtra
 {
 public:
-	CPlayerModStrategy_Default(CBasePlayer *p) : IBasePlayerModStrategy(p) {}
+	explicit CPlayerModStrategy_Default(CBasePlayer *p) : IBasePlayerModStrategy(), BasePlayerExtra(p) {}
 
 	void OnThink() override {}
 	void OnSpawn() override {}
@@ -61,6 +63,27 @@ public:
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return iOriginalMax; }
 	bool ClientCommand(const char *pcmd) override { return false; }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return flDamage; }
+};
+
+class IPlayerModStrategyExtra_Zombie
+{
+	virtual void Pain_Zombie(int m_LastHitGroup, bool HasArmour) = 0;
+	virtual void DeathSound_Zombie() = 0;
+};
+
+class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default, public IPlayerModStrategyExtra_Zombie
+{
+public:
+	explicit CPlayerModStrategy_Zombie(CBasePlayer *p) : CPlayerModStrategy_Default(p) {}
+
+public:
+	void Pain(int m_LastHitGroup, bool HasArmour) override;
+	void DeathSound() override;
+	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+
+public:
+	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
+	void DeathSound_Zombie() override;
 };
 
 #endif
