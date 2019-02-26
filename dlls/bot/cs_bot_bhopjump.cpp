@@ -201,15 +201,17 @@ void CCSBot::BhopJump_UpdateSync()
 	
 }
 
-void CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
+bool CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 {
-	CBasePlayer::Knockback(attacker, data);
+	bool value = CBasePlayer::Knockback(attacker, data);
+	if(!value)
+		return false;
 
 	if (cv_bot_stop.value != 0.0f)
-		return;
+		return value;
 
 	if (RANDOM_FLOAT(0.0f, 1.0f + GetProfile()->GetSkill()) < 0.75f)
-		return;
+		return value;
 
 	if (!IsCrouching())
 	{
@@ -231,5 +233,5 @@ void CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 		//m_lookYawVel *= 3.0f;
 	}
 
-	
+	return value;
 }

@@ -970,12 +970,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
 		}
 
-		if (m_bIsZombie) // Zombie Knockback...
+		if (pAttack->m_pActiveItem && Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData())) // Zombie Knockback...
 		{
-			if (pAttack->m_pActiveItem)
-			{
-				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData());
-			}
+			// already handled.
 		}
 		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
@@ -6472,10 +6469,6 @@ void CBasePlayer::ResetMaxSpeed()
 	else if (m_bIsVIP)
 	{
 		speed = 227;
-	}
-	else if (m_bIsZombie)
-	{
-		speed = 290;
 	}
 	else if (m_pActiveItem != NULL)
 	{

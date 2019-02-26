@@ -196,8 +196,7 @@ void CPlayerModStrategy_Zombie::DeathSound()
 		return DeathSound_Zombie();
 	CPlayerModStrategy_Default::DeathSound();
 }
-float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,
-                                                   int bitsDamageType)
+float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
 	// grenade damage 5x in zb mode
 	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))

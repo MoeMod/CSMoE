@@ -1,6 +1,6 @@
 /*
-player_zombie.h - CSMoE Gameplay server : CBasePlayer impl for zombies
-Copyright (C) 2018 Moemod Hyakuya
+zb1_const.h - CSMoE : Zombie Mod Shared Constants
+Copyright (C) 2019 Moemod Hyakuya
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,14 +13,14 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PLAYER_ZOMBIE_H
-#define PLAYER_ZOMBIE_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef PROJECT_ZB1_CONST_H
+#define PROJECT_ZB1_CONST_H
 
-#include "gamemode/zb1/zb1_const.h"
+enum ZombieLevel : int
+{
+	ZOMBIE_LEVEL_HOST,
+	ZOMBIE_LEVEL_ORIGIN,
+	ZOMBIE_LEVEL_ORIGIN_LV2, // TBD
+};
 
-void PlayerZombie_Precache();
-
-#endif
+#endif //PROJECT_ZB1_CONST_H

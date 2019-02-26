@@ -53,7 +53,7 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 	auto iLastLevel = m_pPlayer->m_iZombieLevel;
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_flRagePercent > 100.0f)
 	{
-		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+		BecomeZombie(ZOMBIE_LEVEL_ORIGIN);
 		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
@@ -64,7 +64,7 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_flRagePercent > 100.0f)
 	{
-		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN_LV2);
+		BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
 		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
@@ -81,14 +81,11 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 	UpdatePlayerEvolutionHUD();
 }
 
-void CPlayerModStrategy_ZB3::Event_OnBecomeZombie(CBasePlayer * who, ZombieLevel iEvolutionLevel)
+void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	if (m_pPlayer != who)
-		return;
-
 	m_pPlayer->m_bIsVIP = false;
 	
-	return CPlayerModStrategy_ZB2::Event_OnBecomeZombie(who, iEvolutionLevel);
+	return CPlayerModStrategy_ZB2::BecomeZombie(iEvolutionLevel);
 }
 
 void CPlayerModStrategy_ZB3::Event_OnInfection(CBasePlayer * victim, CBasePlayer * attacker)
@@ -145,7 +142,7 @@ void CPlayerModStrategy_ZB3::OnThink()
 			const float armor = m_flBackupArmor;
 
 			m_pPlayer->RoundRespawn();
-			m_pModZB3->MakeZombie(m_pPlayer, m_pPlayer->m_iZombieLevel);
+			BecomeZombie(m_pPlayer->m_iZombieLevel);
 
 			m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
 			m_pPlayer->pev->armorvalue = armor;

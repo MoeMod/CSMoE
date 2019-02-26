@@ -91,7 +91,7 @@ public:
 	void Walk() override;
 	bool Jump(bool mustJump = false) override;										// returns true if jump was started
 
-	void MakeZombie(ZombieLevel iEvolutionLevel) override;
+	void OnBecomeZombie(ZombieLevel iEvolutionLevel) override;
 
 	void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL) override;			// invoked when event occurs in the game (some events have NULL entity)
 
@@ -499,7 +499,7 @@ private:
 	bool BhopJump_Start();
 	void BhopJump_UpdateJump();
 	void BhopJump_UpdateSync();
-	void Knockback(CBasePlayer *attacker, const KnockbackData &data) override; // knockback revolves
+	bool Knockback(CBasePlayer *attacker, const KnockbackData &data) override; // knockback revolves
 
 	CNavArea *m_currentArea;						// the nav area we are standing on
 	CNavArea *m_lastKnownArea;						// the last area we were in
@@ -750,7 +750,7 @@ private:
 	CNavNode *m_currentNode;
 	NavDirType m_generationDir;
 	int m_analyzeIter;
-	
+
 	enum ProcessType
 	{
 		PROCESS_NORMAL,

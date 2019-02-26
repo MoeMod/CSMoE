@@ -25,6 +25,8 @@ GNU General Public License for more details.
 
 #include "EventDispatcher.h"
 
+#include "dlls/gamemode/zb2/zb2_zclass.h"
+
 class CSupplyBox;
 
 class CMod_ZombieMod2 : public CMod_Zombi
@@ -51,10 +53,8 @@ protected:
 
 public:
 	void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker) override;
-	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) override;
 
 public:
-	EventDispatcher<void(CBasePlayer *who, ZombieLevel iEvolutionLevel)> m_eventBecomeZombie;
 	EventDispatcher<void(CBasePlayer *victim, CBasePlayer *attacker)> m_eventInfection;
 
 protected:
@@ -81,9 +81,8 @@ protected:
 	virtual void EvolutionSound() const;
 
 protected:
-	virtual void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel);
+	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
 	virtual void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker);
-	EventListener m_eventBecomeZombieListener;
 	EventListener m_eventInfectionListener;
 	
 private:

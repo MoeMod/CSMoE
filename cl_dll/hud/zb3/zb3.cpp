@@ -26,7 +26,6 @@ GNU General Public License for more details.
 #include "zb3_rage.h"
 
 #include "gamemode/zb3/zb3_const.h"
-#include "player/player_zombie.h"
 
 #include <vector>
 

@@ -983,9 +983,9 @@ bool CCSBot::IsAwareOfEnemyDeath() const
 	return false;
 }
 
-void CCSBot::MakeZombie(ZombieLevel iEvolutionLevel)
+void CCSBot::OnBecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	CBasePlayer::MakeZombie(iEvolutionLevel);
+	CBasePlayer::OnBecomeZombie(iEvolutionLevel);
 	StopAiming();
 	StopAttacking();
 	Idle();

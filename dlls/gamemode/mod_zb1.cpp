@@ -314,7 +314,7 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 
 void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player));
+	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player, this));
 	player->m_pModStrategy = std::move(up);
 }
 
@@ -339,6 +339,37 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 		ret = iOriginalMax;
 
 	return ret;
+}
+
+void CPlayerModStrategy_ZB1::OnSpawn()
+{
+	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+	return CPlayerModStrategy_Default::OnSpawn();
+}
+
+void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel)
+{
+	if (m_pPlayer != who)
+		return;
+
+	BecomeZombie(iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
+{
+	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+	m_pPlayer->OnBecomeZombie(iEvolutionLevel);
+}
+
+CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp) : CPlayerModStrategy_Zombie(player)
+{
+	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this);
+}
+
+float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = m_pCharacter->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	return CPlayerModStrategy_Zombie::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 size_t CMod_Zombi::ZombieOriginNum()
@@ -435,12 +466,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	IBaseMod::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
 
-	// Give Armor
-	pPlayer->pev->health = pPlayer->pev->max_health= 1000;
-	//pPlayer->pev->gravity = 0.86f;
-	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
-	pPlayer->pev->armorvalue = 100;
-
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
 	pPlayer->m_iMenu = Menu_Buy;
@@ -475,9 +500,4 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	
 
 	return iReturn;
-}
-
-void CMod_Zombi::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
-{
-	return player->MakeZombie(iEvolutionLevel);
 }

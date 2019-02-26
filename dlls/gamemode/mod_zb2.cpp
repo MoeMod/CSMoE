@@ -178,23 +178,16 @@ void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *a
 	m_eventInfection.dispatch(player, attacker);
 }
 
-void CMod_ZombieMod2::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
-{
-	CMod_Zombi::MakeZombie(player, iEvolutionLevel);
-	m_eventBecomeZombie.dispatch(player, iEvolutionLevel);
-}
-
 void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 {
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB2(player, this));
 }
 
-CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player), m_pModZB2(mp)
+CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player, mp), m_pModZB2(mp)
 {
 	m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
 
 	using namespace std::placeholders;
-	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB2::Event_OnBecomeZombie, this);
 	m_eventInfectionListener = mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this);
 }
 
@@ -213,6 +206,7 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 	UpdatePlayerEvolutionHUD();
 
 	InitZombieSkill();
+	return CPlayerModStrategy_ZB1::OnSpawn();
 }
 
 void CPlayerModStrategy_ZB2::OnThink()
@@ -265,10 +259,9 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 	}
 }
 
-void CPlayerModStrategy_ZB2::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel)
+void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	if (m_pPlayer != who)
-		return;
+	CPlayerModStrategy_ZB1::BecomeZombie(iEvolutionLevel); // pass over
 
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
@@ -324,7 +317,7 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_iZombieInfections >= 3)
 	{
-		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+		BecomeZombie(ZOMBIE_LEVEL_ORIGIN);
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
 		m_pPlayer->pev->armorvalue = 500.0f;
@@ -334,7 +327,7 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_iZombieInfections >= 5)
 	{
-		m_pModZB2->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN_LV2);
+		BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
 
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
 		m_pPlayer->pev->armorvalue = 1000.0f;

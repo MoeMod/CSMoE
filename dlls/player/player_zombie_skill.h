@@ -26,7 +26,7 @@ public:
 
 inline IZombieSkill::~IZombieSkill() = default;
 
-class CZombieSkill_Base : public IZombieSkill, public BasePlayerExtra
+class CZombieSkill_Base : public BasePlayerExtra, public IZombieSkill
 {
 public:
 	explicit CZombieSkill_Base(CBasePlayer *player);
@@ -50,7 +50,7 @@ protected:
 
 };
 
-class CZombieSkill_Empty : public IZombieSkill, public BasePlayerExtra
+class CZombieSkill_Empty : public BasePlayerExtra, public IZombieSkill
 {
 public:
 	explicit CZombieSkill_Empty(CBasePlayer *player)  : BasePlayerExtra(player) {}

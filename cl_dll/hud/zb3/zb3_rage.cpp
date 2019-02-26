@@ -23,7 +23,7 @@ GNU General Public License for more details.
 #include "zb3.h"
 #include "zb3_rage.h"
 
-#include "player/player_zombie.h"
+#include "gamemode/zb1/zb1_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
 CHudZB3Rage::CHudZB3Rage(void)

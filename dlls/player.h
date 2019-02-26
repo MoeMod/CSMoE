@@ -683,11 +683,11 @@ public:
 
 public:
 #ifdef CLIENT_DLL
-	virtual void MakeZombie(ZombieLevel iEvolutionLevel) {}
-	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) {}
+	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {}
+	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return false; }
 #else
-	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
-	virtual void Knockback(CBasePlayer *attacker, const KnockbackData &data) { ApplyKnockbackData(this, this->pev->origin - attacker->pev->origin, data); }
+	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
+	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return m_pModStrategy->ApplyKnockback(attacker, data); }
 #endif
 
 	void SpawnProtection_Check();

@@ -54,15 +54,15 @@ public:
 	virtual int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) = 0;
 	virtual bool ClientCommand(const char *pcmd) = 0;
 	virtual float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) = 0;
-
+	virtual bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
 
-class CPlayerModStrategy_Default : public IBasePlayerModStrategy, public BasePlayerExtra
+class CPlayerModStrategy_Default : public BasePlayerExtra, public IBasePlayerModStrategy
 {
 public:
-	explicit CPlayerModStrategy_Default(CBasePlayer *p) : IBasePlayerModStrategy(), BasePlayerExtra(p) {}
+	explicit CPlayerModStrategy_Default(CBasePlayer *p) : BasePlayerExtra(p), IBasePlayerModStrategy() {}
 
 	void OnThink() override {}
 	void OnSpawn() override {}
@@ -78,6 +78,7 @@ public:
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return iOriginalMax; }
 	bool ClientCommand(const char *pcmd) override { return false; }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return flDamage; }
+	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return false; }
 };
 
 class IPlayerModStrategyExtra_Zombie

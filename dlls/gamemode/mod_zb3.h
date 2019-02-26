@@ -51,7 +51,7 @@ public:
 	void OnSpawn() override;
 	bool CanUseZombieSkill() override { return true; }
 	void CheckEvolution() override;
-	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel) override;
+	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
 	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
 	void UpdatePlayerEvolutionHUD() override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
