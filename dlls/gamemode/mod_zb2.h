@@ -69,11 +69,9 @@ public:
 	bool ClientCommand(const char *pcmd) override;
 	void OnSpawn() override;
 	void OnThink() override;
-	void OnResetMaxSpeed() override;
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 
 protected:
-	virtual void InitZombieSkill();
 	virtual bool CanUseZombieSkill();
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();
@@ -82,13 +80,16 @@ protected:
 
 protected:
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
+	void BecomeHuman() override;
 	virtual void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker);
 	EventListener m_eventInfectionListener;
+
 	
 private:
 	CMod_ZombieMod2 * const m_pModZB2;
 
-	std::unique_ptr<IZombieSkill> m_pZombieSkill;
+	//std::unique_ptr<IZombieSkill> m_pZombieSkill;
+	std::shared_ptr<IZombieModeCharacter_ZB2_Extra> m_pCharacter_ZB2;
 	float m_flTimeNextZombieHealthRecovery;
 	int m_iZombieInfections;
 };

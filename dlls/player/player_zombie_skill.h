@@ -1,3 +1,18 @@
+/*
+player_zombie_skill.h - CSMoE Gameplay server : CBasePlayer impl for zombie skill
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #ifndef PLAYER_ZOMBIE_SKILL_H
 #define PLAYER_ZOMBIE_SKILL_H
 #ifdef _WIN32
@@ -14,7 +29,6 @@ class IZombieSkill
 public:
 	virtual ~IZombieSkill() = 0;
 
-	virtual void InitHUD() = 0;
 	virtual void Think() = 0;
 	virtual void Activate() = 0;
 	virtual void Reset() = 0;
@@ -31,7 +45,6 @@ class CZombieSkill_Base : public BasePlayerExtra, public IZombieSkill
 public:
 	explicit CZombieSkill_Base(CBasePlayer *player);
 
-	void InitHUD() override;
 	void Think() override;
 	void Activate() override {}
 	void Reset() override { m_iZombieSkillStatus = SKILL_STATUS_READY; }
@@ -55,7 +68,6 @@ class CZombieSkill_Empty : public BasePlayerExtra, public IZombieSkill
 public:
 	explicit CZombieSkill_Empty(CBasePlayer *player)  : BasePlayerExtra(player) {}
 
-	void InitHUD() override {}
 	void Think() override {}
 	void Activate() override {}
 	void Reset() override {}
@@ -70,7 +82,6 @@ public:
 	explicit CZombieSkill_ZombieCrazy(CBasePlayer *player);
 
 public:
-	void InitHUD() override;
 	void Think() override;
 	void Activate() override;
 	void ResetMaxSpeed()  override;

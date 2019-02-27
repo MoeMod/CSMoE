@@ -343,7 +343,7 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 
 void CPlayerModStrategy_ZB1::OnSpawn()
 {
-	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+	BecomeHuman();
 	return CPlayerModStrategy_Default::OnSpawn();
 }
 
@@ -353,17 +353,24 @@ void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 		return;
 
 	BecomeZombie(iEvolutionLevel);
+	m_pPlayer->OnBecomeZombie(iEvolutionLevel);
 }
 
 void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
-	m_pPlayer->OnBecomeZombie(iEvolutionLevel);
 }
 
-CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp) : CPlayerModStrategy_Zombie(player)
+void CPlayerModStrategy_ZB1::BecomeHuman()
 {
-	m_eventBecomeZombieListener = mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this);
+	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+}
+
+CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)
+	:   CPlayerModStrategy_Zombie(player),
+	    m_eventBecomeZombieListener(mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this))
+{
+
 }
 
 float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)

@@ -27,6 +27,7 @@ GNU General Public License for more details.
 
 #include <algorithm>
 #include <vector>
+#include <dlls/gamemode/zb2/zb2_zclass.h>
 
 
 CMod_ZombieMod2::CMod_ZombieMod2() // precache
@@ -185,8 +186,6 @@ void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 
 CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player, mp), m_pModZB2(mp)
 {
-	m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
-
 	using namespace std::placeholders;
 	m_eventInfectionListener = mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this);
 }
@@ -195,7 +194,8 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
 	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && m_pPlayer->m_bIsZombie)
 	{
-		m_pZombieSkill->Activate();
+		if(CanUseZombieSkill())
+			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_1);
 		return true;
 	}
 	return false;
@@ -205,19 +205,13 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 {
 	UpdatePlayerEvolutionHUD();
 
-	InitZombieSkill();
 	return CPlayerModStrategy_ZB1::OnSpawn();
 }
 
 void CPlayerModStrategy_ZB2::OnThink()
 {
-	m_pZombieSkill->Think();
 	Zombie_HealthRecoveryThink();
-}
-
-void CPlayerModStrategy_ZB2::OnResetMaxSpeed()
-{
-	m_pZombieSkill->ResetMaxSpeed();
+	return CPlayerModStrategy_ZB1::OnThink();
 }
 
 bool CPlayerModStrategy_ZB2::CanUseZombieSkill()
@@ -237,14 +231,14 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 	}
 
 	// cannot recover during using zombie skill.
-	if (m_pZombieSkill->GetStatus() == SKILL_STATUS_USING)
+	const float flRecoverValue = m_pCharacter_ZB2->HealthRecoveryAmount();
+	if (!flRecoverValue)
 		return;
 
 	if (gpGlobals->time > m_flTimeNextZombieHealthRecovery)
 	{
 		if (m_pPlayer->pev->max_health != m_pPlayer->pev->health)
 		{
-			float flRecoverValue = (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST) ? 200.0f : 500.0f;
 
 			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 1.0f;
 			m_pPlayer->pev->health = std::min(m_pPlayer->pev->max_health, m_pPlayer->pev->health + flRecoverValue);
@@ -261,12 +255,23 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	CPlayerModStrategy_ZB1::BecomeZombie(iEvolutionLevel); // pass over
+	auto sp = std::make_shared<CZombieClass_Default>(m_pPlayer, iEvolutionLevel);
+	m_pCharacter_ZB2 = sp;
+	m_pCharacter = sp;
+
+	sp->InitHUD();
 
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
+}
 
-	InitZombieSkill();
+void CPlayerModStrategy_ZB2::BecomeHuman()
+{
+	auto sp = std::make_shared<CHuman_ZB2>(m_pPlayer);
+	m_pCharacter_ZB2 = sp;
+	m_pCharacter = sp;
+
+	sp->InitHUD();
 }
 
 void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker)
@@ -343,20 +348,68 @@ void CPlayerModStrategy_ZB2::EvolutionSound() const
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
 }
 
-void CPlayerModStrategy_ZB2::InitZombieSkill()
+void CHuman_ZB2::InitHUD() const
 {
-	if(m_pPlayer->m_bIsZombie)
-	{
-		if(CanUseZombieSkill())
-			m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
-		else
-			m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
+	MESSAGE_END();
+}
 
-	}
-	else
-	{
-		m_pZombieSkill.reset(new CZombieSkill_Empty(m_pPlayer));
-	}
+void CBaseZombieClass_ZB2::InitHUD() const
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
+	MESSAGE_END();
+}
 
-	m_pZombieSkill->InitHUD();
+void CZombieClass_Default::InitHUD() const
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
+	WRITE_BYTE(ZOMBIE_CLASS_TANK);
+	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+	MESSAGE_END();
+}
+
+void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
+{
+	if(m_pZombieSkill && which == SKILL_SLOT_1)
+		m_pZombieSkill->Activate();
+}
+
+void CBaseZombieClass_ZB2::Think()
+{
+	if(m_pZombieSkill)
+		m_pZombieSkill->Think();
+	return CZombie_ZB1::Think();
+}
+
+void CBaseZombieClass_ZB2::ResetMaxSpeed() const
+{
+	CZombie_ZB1::ResetMaxSpeed();
+	if(m_pZombieSkill)
+		m_pZombieSkill->ResetMaxSpeed(); // cans replace result of CZombie_ZB1::ResetMaxSpeed()
+}
+
+bool CBaseZombieClass_ZB2::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
+{
+	// TODO : knockback adjustment by skill
+	return CZombie_ZB1::ApplyKnockback(attacker, kbd);
+}
+
+float CBaseZombieClass_ZB2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
+{
+	if(m_pZombieSkill)
+		flDamage *= m_pZombieSkill->GetDamageRatio();
+	return CZombie_ZB1::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
+float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
+{
+	return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
+}
+
+CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel lv) : CBaseZombieClass_ZB2(player, lv)
+{
+	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
 }

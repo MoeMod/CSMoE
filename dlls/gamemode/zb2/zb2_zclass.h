@@ -21,34 +21,41 @@ GNU General Public License for more details.
 class IZombieModeCharacter_ZB2_Extra
 {
 public:
+	virtual float HealthRecoveryAmount() const = 0;
 	virtual void ActivateSkill(ZombieSkillSlot which) = 0;
-};
-
-class IZombieClass_ZB2_Extra : public IZombieModeCharacter_ZB2_Extra
-{
-public:
-	virtual float OnHealthRecovery() = 0;
+	virtual void InitHUD() const = 0;
 };
 
 class CHuman_ZB2 : public CHuman_ZB1, public IZombieModeCharacter_ZB2_Extra
 {
 public:
-	explicit CHuman_ZB2(CBasePlayer *player); // TODO
-	void ActivateSkill(ZombieSkillSlot which) override; // TODO
+	explicit CHuman_ZB2(CBasePlayer *player) : CHuman_ZB1(player) {}
+	void ActivateSkill(ZombieSkillSlot which) override {}
+	float HealthRecoveryAmount() const override { return 0.0f; }
+	void InitHUD() const override;
 };
 
-class CBaseZombieClass_ZB2 : public CZombie_ZB1, public IZombieClass_ZB2_Extra
+class CBaseZombieClass_ZB2 : public CZombie_ZB1, public IZombieModeCharacter_ZB2_Extra
 {
 public:
-	explicit CBaseZombieClass_ZB2(CBasePlayer *player); // TODO
-	float OnHealthRecovery() override; // TODO
-	void ActivateSkill(ZombieSkillSlot which) override {}
+	explicit CBaseZombieClass_ZB2(CBasePlayer *player, ZombieLevel lv) : CZombie_ZB1(player, lv) {}
+	float HealthRecoveryAmount() const override;
+	void ActivateSkill(ZombieSkillSlot which) override;
+	void InitHUD() const override;
+	void Think() override;
+	void ResetMaxSpeed() const override;
+	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override;
+	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override;
+
+protected:
+	std::unique_ptr<IZombieSkill> m_pZombieSkill;
 };
 
 class CZombieClass_Default : public CBaseZombieClass_ZB2
 {
 public:
-	void ActivateSkill(ZombieSkillSlot which) override; // TODO
+	explicit CZombieClass_Default(CBasePlayer *player, ZombieLevel lv);
+	void InitHUD() const override;
 };
 
 #endif //PROJECT_ZCLASS_H

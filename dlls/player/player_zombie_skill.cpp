@@ -1,3 +1,18 @@
+/*
+player_zombie_skill.cpp - CSMoE Gameplay server : CBasePlayer impl for zombie skill
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -30,13 +45,6 @@ CZombieSkill_Base::CZombieSkill_Base(CBasePlayer *player) : BasePlayerExtra(play
 	
 }
 
-void CZombieSkill_Base::InitHUD()
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	MESSAGE_END();
-}
-
 void ZombieSkill_Precache()
 {
 	PRECACHE_SOUND("zombi/zombi_pressure.wav");
@@ -47,15 +55,6 @@ void ZombieSkill_Precache()
 CZombieSkill_ZombieCrazy::CZombieSkill_ZombieCrazy(CBasePlayer *player) : CZombieSkill_Base(player)
 {
 	
-}
-
-void CZombieSkill_ZombieCrazy::InitHUD()
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	MESSAGE_END();
 }
 
 void CZombieSkill_ZombieCrazy::Think()

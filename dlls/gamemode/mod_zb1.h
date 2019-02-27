@@ -80,16 +80,18 @@ public:
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override;
 
 	void OnSpawn() override;
+	void OnThink() override { m_pCharacter->Think(); return CPlayerModStrategy_Zombie::OnThink(); }
 	void OnResetMaxSpeed() override { m_pCharacter->ResetMaxSpeed(); return CPlayerModStrategy_Zombie::OnResetMaxSpeed(); }
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return m_pCharacter->ApplyKnockback(attacker, data); }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 
 private:
 	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel);
-	EventListener m_eventBecomeZombieListener;
+	const EventListener m_eventBecomeZombieListener;
 
 public:
 	virtual void BecomeZombie(ZombieLevel iEvolutionLevel);
+	virtual void BecomeHuman();
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
 };
