@@ -172,6 +172,7 @@ set(HLDLL_SRCS
 	./cbase/cbase_memory.cpp
 	./gamemode/zbs/npc_group.cpp
 	./gamemode/mod_zb3.cpp
+	./gamemode/mod_gd.cpp
 	)
 
 file (GLOB HLWPN_SRCS

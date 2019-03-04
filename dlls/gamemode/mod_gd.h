@@ -1,5 +1,5 @@
 /*
-mods_const.h - CSMoE Gameplay shared : Constants
+mod_gd.h - CSMoE Gameplay server : GunDeath
 Copyright (C) 2019 Moemod Hyakuya
 
 This program is free software: you can redistribute it and/or modify
@@ -13,35 +13,16 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef BTE_MOD_CONST_H
-#define BTE_MOD_CONST_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef PROJECT_MOD_GD_H
+#define PROJECT_MOD_GD_H
 
-enum GameMode_e : byte
+#include "mod_tdm.h"
+
+class CMod_GunDeath : public CMod_TeamDeathMatch
 {
-	MOD_SINGLEPLAY = 0, // backward supports
-	MOD_MULTIPLAY = 1, // backward supports
-	MOD_NONE = 2,
-	MOD_DM = 3,
-	MOD_TDM = 4,
-	MOD_ZB1 = 5,
-	MOD_ZB2 = 6,
-	MOD_ZBU = 7,
-	MOD_ZB3 = 8,
-	MOD_ZBS = 9,
-	MOD_ZE = 10,
-	MOD_ZB4 = 11,
-	MOD_GD = 12,
+public:
+	void UpdateGameMode(CBasePlayer *pPlayer) override;
+	void InstallPlayerModStrategy(CBasePlayer *player) override;
 };
 
-enum DamageTrack_e : byte
-{
-	DT_NONE,
-	DT_ZB,
-	DT_ZBS,
-	DT_ZSE
-};
-
-#endif
+#endif //PROJECT_MOD_GD_H
