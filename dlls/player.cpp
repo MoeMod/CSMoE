@@ -6752,7 +6752,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 		pszItemName = NULL;
 	}
 
-	if (m_bIsVIP)
+	if (m_bIsVIP || !m_pModStrategy->CanDropWeapon(pszItemName))
 	{
 		ClientPrint(pev, HUD_PRINTCENTER, "#Weapon_Cannot_Be_Dropped");
 		return;
