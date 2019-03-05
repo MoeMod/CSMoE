@@ -271,7 +271,7 @@ void CBaseDoor::Spawn ()
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
 	m_vecPosition2 = m_vecPosition1 + (pev->movedir * (fabs ((float)(pev->movedir.x * (pev->size.x - 2))) + fabs ((float)(pev->movedir.y * (pev->size.y - 2))) + fabs ((float)(pev->movedir.z * (pev->size.z - 2))) - m_flLip));
 
-	assert (("door start/end positions are equal", m_vecPosition1 != m_vecPosition2));
+	assert (("door start/end positions are equal" && (m_vecPosition1 != m_vecPosition2)));
 
 	if (pev->spawnflags & SF_DOOR_START_OPEN)
 	{
@@ -322,7 +322,7 @@ void CBaseDoor::SetToggleState (int state)
 
 void CBaseDoor::Precache ()
 {
-	char *pszSound;
+	const char *pszSound = nullptr;
 
 	// set the door's "in-motion" sound
 	switch (m_bMoveSnd)
@@ -526,7 +526,7 @@ int CBaseDoor::DoorActivate ()
 	else // door should open
 	{
 		// give health if player opened the door (medikit)
-		if (m_hActivator != NULL && m_hActivator->IsPlayer ())
+		if (m_hActivator != nullptr && m_hActivator->IsPlayer ())
 		{
 			// VARS(m_eoActivator)->health += m_bHealthValue;
 			m_hActivator->TakeHealth (m_bHealthValue, DMG_GENERIC);
@@ -580,7 +580,7 @@ void CBaseDoor::DoorGoUp ()
 	{
 		float sign = 1.0;
 
-		if (m_hActivator != NULL)
+		if (m_hActivator != nullptr)
 		{
 			pevActivator = m_hActivator->pev;
 
@@ -822,7 +822,7 @@ void CBaseDoor::Blocked (CBaseEntity *pOther)
 
 				if (FClassnameIs (pentTarget, "func_door") || FClassnameIs (pentTarget, "func_door_rotating"))
 				{
-					pDoor = GetClassPtr ((CBaseDoor *)VARS (pentTarget));
+					pDoor = GetClassPtr<CBaseDoor>(VARS(pentTarget));
 
 					if (pDoor->m_flWait >= 0)
 					{
@@ -943,7 +943,7 @@ void CRotDoor::Spawn ()
 	m_vecAngle1 = pev->angles;
 	m_vecAngle2 = pev->angles + pev->movedir * m_flMoveDistance;
 
-	assert (("rotating door start/end positions are equal", m_vecAngle1 != m_vecAngle2));
+	assert (("rotating door start/end positions are equal" && (m_vecAngle1 != m_vecAngle2)));
 
 	if (pev->spawnflags & SF_DOOR_PASSABLE)
 		pev->solid = SOLID_NOT;
@@ -1019,7 +1019,7 @@ void CMomentaryDoor::Spawn ()
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
 	m_vecPosition2 = m_vecPosition1 + (pev->movedir * (fabs ((float)(pev->movedir.x * (pev->size.x - 2))) + fabs ((float)(pev->movedir.y * (pev->size.y - 2))) + fabs ((float)(pev->movedir.z * (pev->size.z - 2))) - m_flLip));
-	assert (("door start/end positions are equal", m_vecPosition1 != m_vecPosition2));
+	assert ("door start/end positions are equal" && (m_vecPosition1 != m_vecPosition2));
 
 	if (pev->spawnflags & SF_DOOR_START_OPEN)
 	{

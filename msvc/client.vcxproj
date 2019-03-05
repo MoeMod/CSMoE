@@ -67,6 +67,7 @@
     <ClCompile Include="..\cl_dll\events\event_scout.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg550.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg552.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_svdex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp" />
     <ClCompile Include="..\cl_dll\events\event_thompson.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tmp.cpp" />
@@ -118,6 +119,9 @@
     <ClCompile Include="..\cl_dll\hud\train.cpp" />
     <ClCompile Include="..\cl_dll\hud\zb2\zb2.cpp" />
     <ClCompile Include="..\cl_dll\hud\zb2\zb2_skill.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3_morale.cpp" />
+    <ClCompile Include="..\cl_dll\hud\zb3\zb3_rage.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_kill.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
@@ -140,6 +144,7 @@
     <ClCompile Include="..\cl_dll\view.cpp" />
     <ClCompile Include="..\common\interface.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
@@ -178,6 +183,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
@@ -207,6 +213,9 @@
     <ClInclude Include="..\cl_dll\hud\scoreboard.h" />
     <ClInclude Include="..\cl_dll\hud\zb2\zb2.h" />
     <ClInclude Include="..\cl_dll\hud\zb2\zb2_skill.h" />
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3.h" />
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3_morale.h" />
+    <ClInclude Include="..\cl_dll\hud\zb3\zb3_rage.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_kill.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
@@ -260,6 +269,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />

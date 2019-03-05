@@ -114,7 +114,7 @@ struct CNpcGroup::impl_t
 };
 
 CNpcGroup::CNpcGroup(const Vector &origin)
-	: pimpl(std::make_unique<impl_t>()) 
+	: pimpl(new impl_t())
 {
 	pimpl->m_startArea = TheNavAreaGrid.GetNearestNavArea(&origin);
 	pimpl->recomputePath();

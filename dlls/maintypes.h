@@ -42,7 +42,21 @@
 #define UNTESTED
 // Function is doubt reversed
 #define TODOBODY
-
+// Function is deprecated
+#ifdef __cplusplus
+#   if __cplusplus >= 201402L && !defined(DEPRECATED)
+#       define DEPRECATED [[deprecated]]
+#   endif
+#endif
+#ifndef DEPRECATED
+#   if defined(__GNUC__)
+#       define DEPRECATED __attribute__((deprecated))
+#   elif defined(_MSC_VER)
+#       define DEPRECATED __declspec(deprecated)
+#   else
+#       define DEPRECATED
+#   endif
+#endif
 
 #define BIT(n) (1<<(n))
 

@@ -58,5 +58,6 @@ public:
 	void for_each(F IBaseHudSub::*f, Args &&...args)
 	{
 		int x[]{ ((get<Elements>().*f)(std::forward<Args>(args)...), 0)... };
+		return void(x);
 	}
 };

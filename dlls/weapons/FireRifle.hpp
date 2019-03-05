@@ -1,13 +1,31 @@
-//
-// Created by Ð¡°×°× on 2019-01-19.
-//
+/*
+FireRifle.hpp - part of CSMoE template weapon framework, to auto-gen Fire() function for rifles
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #pragma once
 
 #include "ExpressionBuilder.hpp"
 
+namespace detail {
+	class TFireRifle_Detail {
+	public:
+		static constexpr const auto &N = ExpressionBuilder::x;
+	};
+}
+
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TFireRifle : public CBase
+class TFireRifle : public CBase, public detail::TFireRifle_Detail
 {
 public:
 	// Default Settings
@@ -17,8 +35,6 @@ public:
 //	static constexpr auto BulletType = BULLET_PLAYER_762MM;
 //	static constexpr int Penetration = 2;
 	static constexpr int Distance = 8192;
-
-	static constexpr auto &&N = ExpressionBuilder::x;
 
 public:
 	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)

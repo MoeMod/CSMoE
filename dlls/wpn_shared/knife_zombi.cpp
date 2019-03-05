@@ -1,17 +1,17 @@
-/***
-*
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*
-*	This product contains software technology licensed from Id
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
-*	All Rights Reserved.
-*
-*   Use, distribution, and modification of this source code and/or resulting
-*   object code is restricted to non-commercial enhancements to products from
-*   Valve LLC.  All other use, distribution, or modification is prohibited
-*   without written permission from Valve LLC.
-*
-****/
+/*
+knife_zombi.cpp
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "extdll.h"
 #include "util.h"
@@ -19,12 +19,35 @@
 #include "player.h"
 #include "weapons.h"
 #include "wpn_knife.h"
-#include "wpn_knife_zombi.h"
 
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
-LINK_ENTITY_TO_CLASS(weapon_knife_zombi, CKnife_Zombi)
+class CKnife_Zombi : public CKnife
+{
+public:
+	void Precache() override;
+	int GetItemInfo(ItemInfo *p) override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override { return m_fMaxSpeed; }
+	int iItemSlot() override { return KNIFE_SLOT; }
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	BOOL UseDecrement() override {
+#ifdef CLIENT_WEAPONS
+		return TRUE;
+#else
+		return FALSE;
+#endif
+	}
+	void WeaponIdle() override;
+
+public:
+	int Stab(int fFirst);
+	int Swing(int fFirst);
+};
+
+LINK_ENTITY_TO_CLASS(knife_zombi, CKnife_Zombi)
 
 enum knife_e
 {

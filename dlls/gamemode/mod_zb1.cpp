@@ -1,3 +1,18 @@
+/*
+mod_zb1.cpp - CSMoE Gameplay server : Zombie Mod
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -10,6 +25,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <random>
 
 #include "bot_include.h"
 
@@ -298,7 +314,7 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 
 void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player));
+	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player, this));
 	player->m_pModStrategy = std::move(up);
 }
 
@@ -325,6 +341,44 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 	return ret;
 }
 
+void CPlayerModStrategy_ZB1::OnSpawn()
+{
+	BecomeHuman();
+	return CPlayerModStrategy_Default::OnSpawn();
+}
+
+void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel)
+{
+	if (m_pPlayer != who)
+		return;
+
+	BecomeZombie(iEvolutionLevel);
+	m_pPlayer->OnBecomeZombie(iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
+{
+	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB1::BecomeHuman()
+{
+	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+}
+
+CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)
+	:   CPlayerModStrategy_Zombie(player),
+	    m_eventBecomeZombieListener(mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this))
+{
+
+}
+
+float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = m_pCharacter->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	return CPlayerModStrategy_Zombie::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
 size_t CMod_Zombi::ZombieOriginNum()
 {
 	moe::range::PlayersList list;
@@ -339,10 +393,10 @@ void CMod_Zombi::PickZombieOrigin()
 	// build alive player list
 	moe::range::PlayersList list;
 	std::vector<CBasePlayer *> players {list.begin(), list.end()};
-	players.erase(std::remove_if(players.begin(), players.end(), std::mem_fn(&CBasePlayer::IsAlive)), players.end());
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 
 	// randomize player list
-	std::random_shuffle(players.begin(), players.end());
+	std::shuffle(players.begin(), players.end(), std::random_device());
 
 	// pick them
 	for (int i = 0; i < iNumZombies; ++i)
@@ -419,12 +473,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	IBaseMod::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
 
-	// Give Armor
-	pPlayer->pev->health = pPlayer->pev->max_health= 1000;
-	//pPlayer->pev->gravity = 0.86f;
-	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
-	pPlayer->pev->armorvalue = 100;
-
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
 	pPlayer->m_iMenu = Menu_Buy;
@@ -459,9 +507,4 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	
 
 	return iReturn;
-}
-
-void CMod_Zombi::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
-{
-	return player->MakeZombie(iEvolutionLevel);
 }

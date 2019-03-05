@@ -20,9 +20,6 @@ CHudScoreBoardLegacy::~CHudScoreBoardLegacy()
 
 int CHudScoreBoardLegacy::VidInit(void)
 {
-	BuildHudNumberRect(m_iNum_L, m_rcNumber_Large, 13, 13, 1, 1);
-	BuildHudNumberRect(m_iNum_S, m_rcNumber_Small, 10, 10, 1, 1);
-
 	m_iOriginalBG = gHUD.GetSpriteIndex("SBOriginalBG");
 	m_iTeamDeathBG = gHUD.GetSpriteIndex("SBTeamDeathBG");
 	m_iUnitehBG = gHUD.GetSpriteIndex("SBUnitehBG");
@@ -36,6 +33,9 @@ int CHudScoreBoardLegacy::VidInit(void)
 	m_iText_1st = gHUD.GetSpriteIndex("SBText_1st");
 	m_iText_Kill = gHUD.GetSpriteIndex("SBText_Kill");
 	m_iText_Round = gHUD.GetSpriteIndex("SBText_Round");
+
+	BuildHudNumberRect(m_iNum_L, m_rcNumber_Large, 13, 13, 1, 1);
+	BuildHudNumberRect(m_iNum_S, m_rcNumber_Small, 10, 10, 1, 1);
 
 	return 1;
 }

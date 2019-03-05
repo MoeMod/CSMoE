@@ -2905,7 +2905,11 @@ void FS_StripExtension( char *path )
 {
 	size_t	length;
 
-	length = Q_strlen( path ) - 1;
+	length = Q_strlen( path );
+	
+	if( length )
+		length--;
+	
 	while( length > 0 && path[length] != '.' )
 	{
 		length--;

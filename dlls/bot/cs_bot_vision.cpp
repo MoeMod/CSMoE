@@ -77,6 +77,8 @@ float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder)
 		return (-stiffness * (ladder->m_top.x - me->pev->origin.x));
 	case WEST:
 		return (-stiffness * (ladder->m_top.y - me->pev->origin.y));
+	default:
+		break;
 	}
 
 	return 0.0f;
@@ -184,6 +186,8 @@ void CCSBot::UpdateLookAngles()
 				useYaw = DirectionToAngle(faceDir);
 				break;
 			}
+			default:
+				break;
 		}
 	}
 
@@ -1019,7 +1023,7 @@ CBaseEntity *CCSBot::GetRecognizedEnemy()
 	if (m_enemyQueueAttendIndex >= m_enemyQueueCount)
 		return NULL;
 
-	return (CBasePlayer *)m_enemyQueue[ m_enemyQueueAttendIndex ].player;
+	return m_enemyQueue[ m_enemyQueueAttendIndex ].player;
 }
 
 // Return true if the enemy we are "conscious" of is reloading

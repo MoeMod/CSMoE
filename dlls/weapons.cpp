@@ -1670,7 +1670,7 @@ void CWeaponBox::BombThink()
 		if (!pEntity->IsPlayer() || pEntity->IsDormant())
 			continue;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == TERRORIST)
 		{
@@ -1824,7 +1824,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					if (pEntity->pev->flags == FL_DORMANT)
 						continue;
 
-					CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+					CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 					if (pTempPlayer->pev->deadflag == DEAD_NO && pTempPlayer->m_iTeam == TERRORIST)
 					{
@@ -1876,6 +1876,8 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 					case WEAPON_FLASHBANG:
 						grenadeName = "weapon_flashbang";
 						maxGrenades = 2;
+						break;
+					default:
 						break;
 					}
 
@@ -2002,7 +2004,7 @@ BOOL CWeaponBox::PackWeapon(CBasePlayerItem *pWeapon)
 	pWeapon->pev->solid = SOLID_NOT;
 	pWeapon->pev->effects = EF_NODRAW;
 	pWeapon->pev->modelindex = 0;
-	pWeapon->pev->model = NULL;
+	pWeapon->pev->model = (int)NULL;
 	pWeapon->pev->owner = ENT(pev);
 	pWeapon->SetThink(NULL);
 	pWeapon->SetTouch(NULL);
@@ -2031,7 +2033,7 @@ int CWeaponBox::PackAmmo(int iszName, int iCount)
 	return FALSE;
 }
 
-int CWeaponBox::GiveAmmo(int iCount, char *szName, int iMax, int *pIndex)
+int CWeaponBox::GiveAmmo(int iCount, const char *szName, int iMax, int *pIndex)
 {
 	int i;
 

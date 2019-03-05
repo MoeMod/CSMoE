@@ -1,17 +1,17 @@
-/***
-*
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*
-*	This product contains software technology licensed from Id
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
-*	All Rights Reserved.
-*
-*   Use, distribution, and modification of this source code and/or resulting
-*   object code is restricted to non-commercial enhancements to products from
-*   Valve LLC.  All other use, distribution, or modification is prohibited
-*   without written permission from Valve LLC.
-*
-****/
+/*
+knife_skullaxe.cpp
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "extdll.h"
 #include "util.h"
@@ -28,11 +28,11 @@
 #define KNIFE_WALLHIT_VOLUME 512
 
 class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
-		TGeneralData,
-		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
-		TWeaponIdleDefault,
-		TDeployDefault
-		>
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
+	TWeaponIdleDefault,
+	TDeployDefault
+>
 {
 public:
 	static constexpr const char *ClassName = "knife_skullaxe";
@@ -43,6 +43,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
+	static constexpr const auto & KnockBack = KnockbackData{ .0f, .0f, .0f, .0f, 1.0f };
 
 public:
 
@@ -85,12 +86,13 @@ public:
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	BOOL CanDrop() override { return false; }
 
 public:
 	void DelayedPrimaryAttack();
 	void DelayedSecondaryAttack();
 	float GetPrimaryAttackDamage() const
-	{ 
+	{
 		float flDamage = 100;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -100,7 +102,7 @@ public:
 #endif
 		return flDamage;
 	}
-	float GetSecondaryAttackDamage() const 
+	float GetSecondaryAttackDamage() const
 	{
 		float flDamage = 100;
 #ifndef CLIENT_DLL
@@ -157,8 +159,6 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 	TraceResult tr;
 	hit_result_t result = HIT_NONE;
 
-	const float falloff = flRadius ? flDamage / flRadius : 1;
-
 	vecSrc.z += 1;
 
 	if (!pevAttacker)
@@ -189,7 +189,7 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 		CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
 		if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
 		{
-			float flAdjustedDamage = flDamage - (vecSrc - pHit->pev->origin).Length() * falloff;
+			const float flAdjustedDamage = flDamage;
 			ClearMultiDamage();
 			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 			ApplyMultiDamage(pevInflictor, pevAttacker);
@@ -197,7 +197,7 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 
 		float flVol = 1;
 		BOOL fHitWorld = TRUE;
-		if (pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE)
+		if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE)
 		{
 			flVol = 0.1f;
 			fHitWorld = FALSE;
@@ -210,8 +210,8 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 		}
 	}
 
-	CBaseEntity *pEntity = NULL;
-	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	CBaseEntity *pEntity = nullptr;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr)
 	{
 		if (pEntity->pev->takedamage != DAMAGE_NO)
 		{
@@ -246,7 +246,7 @@ static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDa
 				UTIL_MakeVectors(pEntity->pev->angles);
 				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
 					flDamage *= 3.0;
-				
+
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);

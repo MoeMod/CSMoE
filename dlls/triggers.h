@@ -478,7 +478,7 @@ public:
 
 	static TYPEDESCRIPTION m_SaveData[13];
 
-	EHANDLE m_hPlayer;
+	EntityHandle<CBasePlayer> m_hPlayer;
 	EHANDLE m_hTarget;
 	CBaseEntity *m_pentPath;
 	int m_sPath;

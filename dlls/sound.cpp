@@ -888,7 +888,7 @@ void CEnvSound::KeyValue(KeyValueData *pkvd)
 
 BOOL FEnvSoundInRange(entvars_t *pev, entvars_t *pevTarget, float *pflRange)
 {
-	CEnvSound *pSound = GetClassPtr((CEnvSound *)pev);
+	CEnvSound *pSound = GetClassPtr<CEnvSound>(pev);
 	Vector vecSpot1 = pev->origin + pev->view_ofs;
 	Vector vecSpot2 = pevTarget->origin + pevTarget->view_ofs;
 	Vector vecRange;
@@ -940,7 +940,7 @@ void CEnvSound::Think()
 		goto env_sound_Think_slow;
 	}
 
-	pPlayer = GetClassPtr((CBasePlayer *)VARS(pentPlayer));
+	pPlayer = GetClassPtr<CBasePlayer>(VARS(pentPlayer));
 	float flRange;
 
 	// check to see if this is the sound entity that is
@@ -1644,7 +1644,7 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 	const char *pTextureName;
 	float rgfl1[3];
 	float rgfl2[3];
-	char *rgsz[4];
+	const char *rgsz[4];
 	int cnt;
 	float fattn = ATTN_NORM;
 
@@ -1877,7 +1877,7 @@ void CSpeaker::Precache()
 
 void CSpeaker::SpeakerThink()
 {
-	char *szSoundFile = NULL;
+	const char *szSoundFile = NULL;
 	float flvolume = pev->health * 0.1f;
 	float flattenuation = 0.3f;
 	int flags = 0;

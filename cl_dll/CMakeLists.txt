@@ -114,11 +114,12 @@ set (HUD_SRCS
 	./hud/scenariostatus.cpp
 	./hud/zb2/zb2.cpp
 	./hud/zb2/zb2_skill.cpp
-
 	./hud/legacy/hud_radar_legacy.cpp
 	./hud/legacy/hud_scoreboard_legacy.cpp
-
 	./hud/modern/hud_radar_modern.cpp
+	./hud/zb3/zb3.cpp
+	./hud/zb3/zb3_morale.cpp
+	./hud/zb3/zb3_rage.cpp
 
 )
 

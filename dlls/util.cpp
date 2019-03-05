@@ -13,6 +13,9 @@
 
 unsigned int glSeed;
 
+#include <string>
+#include <functional>
+
 /*
 * Globals initialization
 */
@@ -1016,7 +1019,7 @@ float UTIL_SplineFraction(float value, float scale)
 	return 3.0f * (valueSquared * valueSquared) - (valueSquared * valueSquared * valueSquared + valueSquared * valueSquared * valueSquared);
 }
 
-char *UTIL_VarArgs(char *format, ...)
+char *UTIL_VarArgs(const char *format, ...)
 {
 	va_list argptr;
 	static char string[1024];
@@ -1487,7 +1490,7 @@ void UTIL_PrecacheOther(const char *szClassname)
 	REMOVE_ENTITY(pent);
 }
 
-void UTIL_LogPrintf(char *fmt, ...)
+void UTIL_LogPrintf(const char *fmt, ...)
 {
 	va_list argptr;
 	static char string[1024];
@@ -1770,7 +1773,7 @@ void CSave::WriteFunction(const char *pname, const int *data, int count)
 
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd)
 {
-	for (int i = 0; i < ARRAYSIZE(gEntvarsDescription); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(gEntvarsDescription); ++i)
 	{
 		TYPEDESCRIPTION *pField = &gEntvarsDescription[i];
 
@@ -2364,7 +2367,7 @@ int UTIL_ReadFlags(const char *c)
 			flags |= (1 << (*c - 'a'));
 		}
 
-		*c++;
+		(void)*c++;
 	}
 
 	return flags;

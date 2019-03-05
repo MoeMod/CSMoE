@@ -59,7 +59,7 @@ private:
 	CUtlVector<Place> m_directory;
 };
 
-char *GetBspFilename(const char *navFilename);
+const char * GetBspFilename(const char *navFilename);
 bool SaveNavigationMap(const char *filename);
 void SanityCheckNavigationMap(const char *mapName);	// Performs a lightweight sanity-check of the specified map's nav mesh
 NavErrorType LoadNavigationMap();

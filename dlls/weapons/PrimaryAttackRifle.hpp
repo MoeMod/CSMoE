@@ -1,12 +1,32 @@
+/*
+PrimaryAttackRifle.hpp - part of CSMoE template weapon framework, to auto-gen PrimaryAttack() function for rifles
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #pragma once
 
 #include "ExpressionBuilder.hpp"
 
+namespace detail {
+	class TPrimaryAttackRifle_Detail {
+	public:
+		static constexpr const auto &A = ExpressionBuilder::x;
+	};
+}
+
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TPrimaryAttackRifle : public CBase
+class TPrimaryAttackRifle : public CBase, public detail::TPrimaryAttackRifle_Detail
 {
-public:
-	static constexpr auto &&A = ExpressionBuilder::x;
 public:
 	void PrimaryAttack(void) override
 	{
@@ -26,7 +46,7 @@ public:
 
 private:
 	// sfinae query for whether the weapon has/is zoom.
-	constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
+	static constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
 	template<class ClassToFind = CFinal>
 	auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
 	{

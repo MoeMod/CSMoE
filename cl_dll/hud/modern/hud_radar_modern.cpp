@@ -90,7 +90,7 @@ void CHudRadarModern::Reset(void)
 
 void CHudRadarModern::Think(void)
 {
-	int wide = cl_newradar_size->value * ScreenWidth;
+	//int wide = cl_newradar_size->value * ScreenWidth;
 
 }
 
@@ -484,7 +484,6 @@ int CHudRadarModern::Draw(float time)
 
 		int r, g, b;
 		HSPRITE hspr = 0;
-		HSPRITE hspr2 = 0;
 		int scale = 8;
 		int rx, ry;
 		float yaw = 0;
@@ -576,13 +575,15 @@ void CHudRadarModern::BuildHostageList(void)
 
 bool CHudRadarModern::IsValidEntity(cl_entity_s *pEntity)
 {
-	if (pEntity && pEntity->model && pEntity->model->name && !(pEntity->curstate.messagenum < gEngfuncs.GetLocalPlayer()->curstate.messagenum))
+	if (pEntity && pEntity->model && pEntity->model->name[0] && !(pEntity->curstate.messagenum < gEngfuncs.GetLocalPlayer()->curstate.messagenum))
 		return true;
 
 	return false;
 }
 
+#ifdef _MSC_VER
 #pragma optimize("", off)
+#endif
 
 bool CHudRadarModern::CalcPoint(float *origin, int &screenX, int &screenY, int &scale)
 {
@@ -650,7 +651,9 @@ bool CHudRadarModern::CalcPoint(float *origin, int &screenX, int &screenY, int &
 	return result;
 }
 
+#ifdef _MSC_VER
 #pragma optimize("", on)
+#endif
 
 void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scale, int r, int g, int b, int a)
 {

@@ -130,7 +130,7 @@ bool CCSBot::Jump(bool mustJump)
 
 int CCSBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	CBaseEntity *attacker = GetClassPtr((CBaseEntity *)pevInflictor);
+	CBaseEntity *attacker = GetClassPtr<CBaseEntity>(pevInflictor);
 
 	// if we were attacked by a teammate, rebuke
 	if (attacker->IsPlayer())
@@ -971,7 +971,7 @@ bool CCSBot::IsAwareOfEnemyDeath() const
 	if (GetEnemyDeathTimestamp() == 0.0f)
 		return false;
 
-	if (m_enemy == NULL)
+	if (m_enemy == nullptr)
 		return true;
 
 	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > (1.0f - GetProfile()->GetSkill()))
@@ -983,9 +983,9 @@ bool CCSBot::IsAwareOfEnemyDeath() const
 	return false;
 }
 
-void CCSBot::MakeZombie(ZombieLevel iEvolutionLevel)
+void CCSBot::OnBecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	CBasePlayer::MakeZombie(iEvolutionLevel);
+	CBasePlayer::OnBecomeZombie(iEvolutionLevel);
 	StopAiming();
 	StopAttacking();
 	Idle();

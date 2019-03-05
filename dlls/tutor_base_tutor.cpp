@@ -288,7 +288,7 @@ void CBaseTutor::DisplayNewStateDescriptionToPlayer()
 		return;
 	}
 
-	char *desc = m_stateSystem->GetCurrentStateString();
+	const char *desc = m_stateSystem->GetCurrentStateString();
 
 	if (!desc)
 	{

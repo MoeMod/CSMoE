@@ -10,9 +10,9 @@
 class CZombieSpawn: public CPointEntity
 {
 public:
-	virtual void Spawn() override;
-	virtual void KeyValue(KeyValueData *pkvd);
-	virtual BOOL IsTriggered(CBaseEntity *pEntity);
+	void Spawn() override;
+	void KeyValue(KeyValueData *pkvd) override;
+	BOOL IsTriggered(CBaseEntity *pEntity) override;
 
 public:
 	int m_iId;
@@ -22,8 +22,8 @@ public:
 class CZBSBreak : public CBreakable
 {
 public:
-	virtual void KeyValue(KeyValueData *pkvd) override;
-	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override; 
+	void KeyValue(KeyValueData *pkvd) override;
+	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 
 public:
 	float m_flHumanDamageRatio;

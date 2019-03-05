@@ -33,7 +33,7 @@ void *CBaseEntity::operator new(size_t stAllocateBlock, entvars_t *newpev) noexc
 CBaseEntity::CBaseEntity() : pev(g_pCachedEntVarsPtr.exchange(nullptr))
 {
 	assert(pev != nullptr);
-	assert(g_CreateEntityLock.try_lock() == false && "auto var of CBaseEntity is not allowed!");
+	assert("auto var of CBaseEntity is not allowed!" && (g_CreateEntityLock.try_lock() == false));
 	g_CreateEntityLock.unlock();
 }
 

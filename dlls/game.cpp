@@ -104,7 +104,7 @@ void EXT_FUNC GameDLLInit()
 {
 	//g_bIsCzeroGame = UTIL_IsGame("czero");
 	g_bIsCzeroGame = true;
-	g_bEnableCSBot = g_bIsCzeroGame || ENG_CHECK_PARM ("-bots", NULL) != 0;
+	g_bEnableCSBot = g_bIsCzeroGame || ENG_CHECK_PARM (const_cast<char *>("-bots"), nullptr) != 0;
 
 	g_psv_gravity = CVAR_GET_POINTER("sv_gravity");
 	g_psv_aim = CVAR_GET_POINTER("sv_aim");

@@ -141,60 +141,6 @@ Links the raw entity to an entvars_s holder.  If a player is passed in as the ow
 we set up the m_pPlayer field.
 =====================
 */
-edict_t *EHANDLE::Get(void)
-{
-	if (!m_pent)
-		return NULL;
-
-	if (m_pent->serialnumber != m_serialnumber)
-		return NULL;
-
-	return m_pent;
-}
-
-edict_t *EHANDLE::Set(edict_t *pent)
-{
-	m_pent = pent;
-
-	if (pent)
-		m_serialnumber = m_pent->serialnumber;
-
-	return pent;
-}
-
-EHANDLE::operator CBaseEntity *(void)
-{
-	return (CBaseEntity *)GET_PRIVATE(Get());
-}
-
-CBaseEntity *EHANDLE::operator = (CBaseEntity *pEntity)
-{
-	if (pEntity)
-	{
-		m_pent = ENT(pEntity->pev);
-
-		if (m_pent)
-			m_serialnumber = m_pent->serialnumber;
-	}
-	else
-	{
-		m_pent = NULL;
-		m_serialnumber = 0;
-	}
-
-	return pEntity;
-}
-
-EHANDLE::operator int(void)
-{
-	return Get() != NULL;
-}
-
-CBaseEntity *EHANDLE::operator ->(void)
-{
-	return (CBaseEntity *)GET_PRIVATE(Get());
-}
-
 
 void HUD_PrepEntity( CBaseEntity *pEntity, CBasePlayer *pWeaponOwner )
 {
@@ -886,7 +832,7 @@ void HUD_InitClientWeapons( void )
 
 	// Handled locally
 	g_engfuncs.pfnPlaybackEvent		= HUD_PlaybackEvent;
-	g_engfuncs.pfnAlertMessage		= reinterpret_cast<void (*)(ALERT_TYPE atype, char *szFmt, ...)>(AlertMessage);
+	g_engfuncs.pfnAlertMessage		= AlertMessage;
 
 	// Pass through to engine
 	g_engfuncs.pfnPrecacheEvent		= gEngfuncs.pfnPrecacheEvent;

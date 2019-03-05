@@ -152,7 +152,7 @@ void Bot_RegisterCvars()
 
 // Constructor
 
-CCSBot::CCSBot() : m_chatter(this), m_gameState(this)
+CCSBot::CCSBot() : m_gameState(this), m_chatter(this)
 {
 	;
 }
@@ -224,7 +224,7 @@ void CCSBot::ResetValues()
 	m_closestVisibleFriend = NULL;
 	m_closestVisibleHumanFriend = NULL;
 
-	for (int w = 0; w < ARRAYSIZE(m_watchInfo); ++w)
+	for (size_t w = 0; w < ARRAYSIZE(m_watchInfo); ++w)
 	{
 		m_watchInfo[w].timestamp = 0.0f;
 		m_watchInfo[w].isEnemy = false;

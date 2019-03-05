@@ -15,7 +15,7 @@ public:
 	int Draw(float flTime) override;
 	void Think() override;
 	void Reset() override;
-	void InitHUDData(void);
+	void InitHUDData(void) override;
 	void Shutdown(void) override;
 
 

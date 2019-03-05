@@ -1,12 +1,33 @@
-//
-// Created by 小白白 on 2019-02-09.
-//
+/*
+u_iterator.hpp - some iterators wrapping UTIL_* with Modern C++
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #ifndef PROJECT_U_ITERATOR_HPP
 #define PROJECT_U_ITERATOR_HPP
 
 #include <iterator>
 #include "u_ebobase.hpp"
+
+namespace cxx14 {
+	template<class T, class U = T>
+	T exchange(T& obj, U&& new_value)
+	{
+		T old_value = std::move(obj);
+		obj = std::forward<U>(new_value);
+		return old_value;
+	}
+}
 
 namespace moe {
 namespace iterator {
@@ -29,22 +50,22 @@ namespace iterator {
 		using reference = const value_type &;
 
 	public:
-		explicit Enum_Iterator(value_type p = nullptr, const Enumer &f = Enumer())
-				: m_pCurrent(p), EBOBase<Enumer>(f) {}
+		constexpr explicit Enum_Iterator(value_type p = nullptr, const Enumer &f = Enumer())
+				: EBOBase<Enumer>(f), m_pCurrent(p) {}
 
 	public:
 		Enum_Iterator &operator++() noexcept { return (m_pCurrent = EBOBase<Enumer>::get()(m_pCurrent)), *this; }
 
-		Enum_Iterator operator++(int) noexcept {
-			return Enum_Iterator(std::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
+		const Enum_Iterator operator++(int) noexcept {
+			return Enum_Iterator(cxx14::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
 		}
 
-		reference operator*() const noexcept { return m_pCurrent; }
+		constexpr reference operator*() const noexcept { return m_pCurrent; }
 
 	public:
-		bool operator==(const Enum_Iterator &other) const noexcept { return m_pCurrent == other.m_pCurrent; }
+		constexpr bool operator==(const Enum_Iterator &other) const noexcept { return m_pCurrent == other.m_pCurrent; }
 
-		bool operator!=(const Enum_Iterator &other) const noexcept { return !(*this == other); }
+		constexpr bool operator!=(const Enum_Iterator &other) const noexcept { return !(*this == other); }
 
 	private:
 		value_type m_pCurrent;

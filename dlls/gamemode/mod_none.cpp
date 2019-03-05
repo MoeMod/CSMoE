@@ -17,13 +17,13 @@ void CMod_None::CheckMapConditions()
 	if (m_bMapHasBombZone)
 	{
 		CBaseEntity *pEntity = nullptr;
-		
-		while (pEntity = UTIL_FindEntityByClassname(pEntity, "func_bomb_target"))
+
+		while ((pEntity = UTIL_FindEntityByClassname(pEntity, "func_bomb_target")))
 		{
 			m_mapBombZones.emplace_back(pEntity, VecBModelOrigin(pEntity->pev));
 		}
 		// pEntity = nullptr;
-		while (pEntity = UTIL_FindEntityByClassname(pEntity, "info_bomb_target"))
+		while ((pEntity = UTIL_FindEntityByClassname(pEntity, "info_bomb_target")))
 		{
 			m_mapBombZones.emplace_back(pEntity, pEntity->pev->origin);
 		}

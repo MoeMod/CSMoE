@@ -53,9 +53,6 @@
     <Filter Include="dlls\player">
       <UniqueIdentifier>{7527e99f-2172-40a6-8acb-1d1efbc75db9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dlls\wpn_shared\knife">
-      <UniqueIdentifier>{f37b98c5-fd69-4800-af21-eb4ab76d66ac}</UniqueIdentifier>
-    </Filter>
     <Filter Include="dlls\gamemode\zbs">
       <UniqueIdentifier>{72f0b1e9-cfa5-40ae-8419-70f0922f6c00}</UniqueIdentifier>
     </Filter>
@@ -67,6 +64,9 @@
     </Filter>
     <Filter Include="dlls\cbase">
       <UniqueIdentifier>{bf5ee8c4-f943-4ef7-a4dd-24b6ef23af3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dlls\gamemode\zb3">
+      <UniqueIdentifier>{4ef8c464-25b1-442b-9df5-829f8de2d72c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -496,9 +496,6 @@
     <ClCompile Include="..\dlls\player\player_msg.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
@@ -507,15 +504,6 @@
     </ClCompile>
     <ClCompile Include="..\dlls\player\player_model.cpp">
       <Filter>dlls\player</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp">
-      <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp">
       <Filter>dlls\player</Filter>
@@ -623,6 +611,18 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_zb3.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_gd.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1161,12 +1161,6 @@
     <ClInclude Include="..\dlls\player\player_msg.h">
       <Filter>dlls\player</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife.h">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
@@ -1181,12 +1175,6 @@
     </ClInclude>
     <ClInclude Include="..\public\json.hpp">
       <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h">
-      <Filter>dlls\wpn_shared\knife</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h">
-      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_const.h">
       <Filter>dlls</Filter>
@@ -1343,6 +1331,21 @@
     </ClInclude>
     <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp">
       <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_zb3.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb3\zb3_morale.h">
+      <Filter>dlls\gamemode\zb3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb3\zb3_const.h">
+      <Filter>dlls\gamemode\zb3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_gd.h">
+      <Filter>dlls\gamemode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

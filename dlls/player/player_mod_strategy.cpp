@@ -1,3 +1,18 @@
+/*
+player_mod_strategy.cpp - CSMoE Gameplay server : player strategy for gamemodes
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -148,4 +163,98 @@ void CPlayerModStrategy_Default::DeathSound()
 	case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
 	case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
 	}
+}
+
+void CPlayerModStrategy_Default::GiveDefaultItems()
+{
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	switch (m_pPlayer->m_iTeam)
+	{
+	case CT:
+		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("knife_skullaxe");
+		m_pPlayer->GiveNamedItem("weapon_usp");
+		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
+
+		break;
+	case TERRORIST:
+		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("knife_skullaxe");
+		m_pPlayer->GiveNamedItem("weapon_glock18");
+		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
+
+		break;
+	default:
+		break;
+	}
+}
+
+void CPlayerModStrategy_Zombie::Pain(int m_LastHitGroup, bool HasArmour)
+{
+	if (m_pPlayer->m_bIsZombie)
+		return Pain_Zombie(m_LastHitGroup, HasArmour);
+	CPlayerModStrategy_Default::Pain(m_LastHitGroup, HasArmour);
+}
+
+void CPlayerModStrategy_Zombie::DeathSound_Zombie()
+{
+	// temporarily using pain sounds for death sounds
+	switch (RANDOM_LONG(1, 2))
+	{
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
+		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+	}
+}
+
+void CPlayerModStrategy_Zombie::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
+{
+	switch (RANDOM_LONG(0, 1))
+	{
+		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
+	}
+}
+void CPlayerModStrategy_Zombie::DeathSound()
+{
+	if (m_pPlayer->m_bIsZombie)
+		return DeathSound_Zombie();
+	CPlayerModStrategy_Default::DeathSound();
+}
+float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	// grenade damage 5x in zb mode
+	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
+	{
+		if (bitsDamageType & DMG_EXPLOSION)
+		{
+			if (m_pPlayer->m_bIsZombie)
+				flDamage *= 5.0f;
+			else
+				flDamage *= 2.5f;
+		}
+	}
+	return CPlayerModStrategy_Default::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
+void CPlayerModStrategy_Zombie::GiveDefaultItems()
+{
+	if (!m_pPlayer->m_bIsZombie)
+		return CPlayerModStrategy_Default::GiveDefaultItems();
+	
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	m_pPlayer->GiveNamedItem("knife_zombi");
+
+	if (!(m_pPlayer->m_flDisplayHistory & DHF_NIGHTVISION))
+	{
+		m_pPlayer->HintMessage("#Hint_use_nightvision");
+		m_pPlayer->m_flDisplayHistory |= DHF_NIGHTVISION;
+	}
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+	m_pPlayer->m_bHasNightVision = true;
+	SendItemStatus(m_pPlayer);
+	
 }

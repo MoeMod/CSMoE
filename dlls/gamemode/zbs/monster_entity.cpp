@@ -520,7 +520,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pevAttacker != NULL)
 	{
-		CBaseEntity *pAttackingEnt = GetClassPtr((CBaseEntity *)pevAttacker);
+		CBaseEntity *pAttackingEnt = GetClassPtr<CBaseEntity>(pevAttacker);
 
 		if (pAttackingEnt->Classify() == CLASS_VEHICLE)
 		{
@@ -534,7 +534,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 		if (pAttackingEnt->IsPlayer())
 		{
-			pAttacker = GetClassPtr((CBasePlayer *)pevAttacker);
+			pAttacker = GetClassPtr<CBasePlayer>(pevAttacker);
 		}
 	}
 
@@ -737,12 +737,12 @@ std::pair<CBasePlayer *, bool> CMonster::FindTarget() const
 
 	CBasePlayer *player = nullptr;
 
-	if (player = fpNear.get())
+	if ((player = fpNear.get()))
 	{
 		// abandon fpFar...
 		return { player, true };
 	}
-	else if (player = fpFar.get())
+	else if ((player = fpFar.get()))
 	{
 		return { player, false };
 	}
@@ -826,7 +826,7 @@ void CMonster::Wander()
 
 void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnimation
 {
-	int animDesired;
+	int animDesired = 0;
 	float speed;
 	char szAnim[64];
 

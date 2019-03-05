@@ -1,3 +1,17 @@
+/*
+wpn_cannon.cpp - Black Dragon Cannon from CSO
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "extdll.h"
 #include "util.h"
@@ -40,7 +54,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 
 			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
 			{
-				float flAdjustedDamage = flDamage - (vecSrc - pHit->pev->origin).Length() * falloff;
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
 				ClearMultiDamage();
 				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
@@ -80,7 +94,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 					tr.flFraction = 0;
 				}
 
-				float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
 				flAdjustedDamage = Q_max(0, flAdjustedDamage);
 
 				if (tr.flFraction == 1.0f)

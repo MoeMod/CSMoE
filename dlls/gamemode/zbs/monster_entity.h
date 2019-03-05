@@ -67,20 +67,20 @@ public:
 class CMonster : public CHostage
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int ObjectCaps() override { return (CBaseMonster::ObjectCaps() | FCAP_MUST_SPAWN); }
-	virtual int Classify() { return CLASS_PLAYER_ALLY; }
-	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
-	virtual void BecomeDead(void);
-	virtual void Killed(entvars_t *pevAttacker, int iGib);
-	virtual int BloodColor() { return BLOOD_COLOR_RED; }
-	virtual void Touch(CBaseEntity *pOther);
-	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void Spawn() override;
+	void Precache() override;
+	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() | FCAP_MUST_SPAWN); }
+	int Classify() override { return CLASS_PLAYER_ALLY; }
+	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void BecomeDead(void) override;
+	void Killed(entvars_t *pevAttacker, int iGib) override;
+	int BloodColor() override { return BLOOD_COLOR_RED; }
+	void Touch(CBaseEntity *pOther) override;
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 
 	// RAII support to prevent memory leak.
 	CMonster();
-	~CMonster();
+	~CMonster() override;
 
 public:
 	int LookupSequence(const char *label);

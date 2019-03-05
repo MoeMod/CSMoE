@@ -44,8 +44,8 @@
 
 edict_t *CREATE_NAMED_ENTITY(int iClass);
 void REMOVE_ENTITY(edict_t *e);
-void CONSOLE_ECHO(char *pszMsg, ...);
-void CONSOLE_ECHO_LOGGED(char *pszMsg, ...);
+void CONSOLE_ECHO(const char *pszMsg, ...);
+void CONSOLE_ECHO_LOGGED(const char *pszMsg, ...);
 
 #include "exportdef.h"
 
@@ -128,24 +128,7 @@ class CBasePlayer;
 
 #define SF_NORESPAWN (1<<30)
 
-class EHANDLE
-{
-public:
-	edict_t * Get();
-	edict_t *Set(edict_t *pent);
-
-	operator int();
-	operator CBaseEntity*();
-
-	operator CBasePlayer*() { return static_cast<CBasePlayer *>(GET_PRIVATE(Get())); }
-
-	CBaseEntity *operator=(CBaseEntity *pEntity);
-	CBaseEntity *operator->();
-
-private:
-	edict_t * m_pent;
-	int m_serialnumber;
-};
+#include "ehandle.h"
 
 #include "ruleof350.h"
 #include <functional> // why not use c++11 std::function?
@@ -209,7 +192,8 @@ public:
 	virtual void AddPointsToTeam(int score, BOOL bAllowNegativeScore) {}
 	virtual BOOL AddPlayerItem(CBasePlayerItem *pItem) { return 0; }
 	virtual BOOL RemovePlayerItem(CBasePlayerItem *pItem) { return 0; }
-	virtual int GiveAmmo(int iAmount, char *szName, int iMax) { return -1; }
+	virtual int GiveAmmo(int iAmount, const char *szName, int iMax) { return -1; } // TODO : prevent from wrong override...
+	//virtual int GiveAmmo(int iAmount, char *szName, int iMax) final = delete;
 	virtual float GetDelay(void) { return 0; }
 	virtual int IsMoving(void) { return pev->velocity != g_vecZero; }
 	virtual void OverrideReset(void) {}
@@ -308,7 +292,7 @@ public:
 		return NULL;
 	}
 
-	static CBaseEntity *Create(char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner = NULL);
+	static CBaseEntity *Create(const char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner = NULL);
 
 	edict_t *edict(void) { return ENT(pev); }
 	EOFFSET eoffset(void) { return OFFSET(pev); }
@@ -682,7 +666,7 @@ class CSound;
 
 #include "basemonster.h"
 
-char *ButtonSound(int sound);
+const char *ButtonSound(int sound);
 
 class CBaseButton : public CBaseToggle
 {

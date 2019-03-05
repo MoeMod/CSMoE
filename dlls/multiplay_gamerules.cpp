@@ -311,7 +311,7 @@ void Broadcast(const char *sentence)
 	MESSAGE_END();
 }
 
-char *GetTeam(int teamNo)
+const char * GetTeam(int teamNo)
 {
 	switch (teamNo)
 	{
@@ -331,7 +331,7 @@ char *GetTeam(int teamNo)
 void EndRoundMessage(const char *sentence, int event)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
-	char *team = NULL;
+	const char *team = NULL;
 	const char *message = &(sentence[1]);
 	int teamTriggered = 1;
 
@@ -834,7 +834,7 @@ void CHalfLifeMultiplay::GiveC4()
 		if (pPlayer->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->pev->deadflag != DEAD_NO || player->m_iTeam != TERRORIST || (giveToHumans && player->IsBot()))
 			continue;
@@ -872,7 +872,7 @@ void CHalfLifeMultiplay::GiveC4()
 			if (pPlayer->pev->flags == FL_DORMANT)
 				continue;
 
-			CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+			CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 			if (player->pev->deadflag != DEAD_NO || player->m_iTeam != TERRORIST)
 				continue;
@@ -1061,7 +1061,7 @@ void CHalfLifeMultiplay::InitializePlayerCounts(int &NumAliveTerrorist, int &Num
 			break;
 		}
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (pPlayer->pev->flags == FL_DORMANT)
 		{
@@ -1536,7 +1536,7 @@ void CHalfLifeMultiplay::SwapAllPlayers()
 		if (pPlayer->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 		player->SwitchTeam();
 	}
 
@@ -1625,7 +1625,7 @@ void CHalfLifeMultiplay::BalanceTeams()
 			if (pPlayer->pev->flags == FL_DORMANT)
 				continue;
 
-			CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+			CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 			if (player->m_iTeam == iTeamToSwap && GETPLAYERUSERID(player->edict()) > iHighestUserID && m_pVIP != player)
 			{
@@ -1988,7 +1988,7 @@ void CHalfLifeMultiplay::RestartRound()
 		if (pPlayer->pev->flags == FL_DORMANT)
 			continue;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		player->m_iNumSpawns = 0;
 		player->m_bTeamChanged = false;
@@ -2318,7 +2318,7 @@ void CHalfLifeMultiplay::PickNextVIP()
 		{
 			if (!(pPlayer->pev->flags & FL_DORMANT))
 			{
-				player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+				player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 				if (player->m_iTeam == CT && iCount == m_iLastPick)
 				{
@@ -2357,7 +2357,7 @@ void CHalfLifeMultiplay::PickNextVIP()
 		{
 			if (pPlayer->pev->flags != FL_DORMANT)
 			{
-				player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+				player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 				if (player->m_iTeam == CT)
 				{
@@ -3345,7 +3345,7 @@ void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)
 				WRITE_STRING("");
 			MESSAGE_END();
 
-			char *team = GetTeam(pPlayer->m_iTeam);
+			const char *team = GetTeam(pPlayer->m_iTeam);
 
 			FireTargets("game_playerleave", pPlayer, pPlayer, USE_TOGGLE, 0);
 			UTIL_LogPrintf("\"%s<%i><%s><%s>\" disconnected\n", STRING(pPlayer->pev->netname), GETPLAYERUSERID(pPlayer->edict()), GETPLAYERAUTHID(pPlayer->edict()), team);
@@ -3599,7 +3599,7 @@ void CHalfLifeMultiplay::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, 
 	else if (peKiller && peKiller->IsPlayer())
 	{
 		// if a player dies in a deathmatch game and the killer is a client, award the killer some points
-		CBasePlayer *killer = GetClassPtr((CBasePlayer *)pKiller);
+		CBasePlayer *killer = GetClassPtr<CBasePlayer>(pKiller);
 		bool killedByFFA = false;
 
 		if (killer->m_iTeam == pVictim->m_iTeam && !killedByFFA)
@@ -3710,8 +3710,8 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	int killer_index = 0;
 
 	// Hack to fix name change
-	char *tau = "tau_cannon";
-	char *gluon = "gluon gun";
+	const char *tau = "tau_cannon";
+	const char *gluon = "gluon gun";
 
 	// Is the killer a client?
 	if (pKiller->flags & FL_CLIENT)
@@ -3779,7 +3779,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	if (pVictim->pev == pKiller)
 	{
 		// killed self
-		char *team = GetTeam(pVictim->m_iTeam);
+		const char *team = GetTeam(pVictim->m_iTeam);
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\"\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
 			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
 	}
@@ -3796,7 +3796,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 	else
 	{
 		// killed by the world
-		char *team = GetTeam(pVictim->m_iTeam);
+		const char *team = GetTeam(pVictim->m_iTeam);
 		UTIL_LogPrintf("\"%s<%i><%s><%s>\" committed suicide with \"%s\" (world)\n", STRING(pVictim->pev->netname), GETPLAYERUSERID(pVictim->edict()),
 			GETPLAYERAUTHID(pVictim->edict()), team, killer_weapon_name);
 	}
@@ -3983,8 +3983,8 @@ int CHalfLifeMultiplay::PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pT
 		return GR_NOTTEAMMATE;
 	}
 
-	CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
-	CBasePlayer *target = GetClassPtr((CBasePlayer *)pTarget->pev);
+	CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+	CBasePlayer *target = GetClassPtr<CBasePlayer>(pTarget->pev);
 
 	if (player->m_iTeam != target->m_iTeam)
 	{
@@ -4402,7 +4402,7 @@ void CHalfLifeMultiplay::ResetAllMapVotes()
 		if (FNullEnt(pTempEntity->edict()))
 			break;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 		if (pTempPlayer->m_iTeam != UNASSIGNED)
 		{
@@ -4502,7 +4502,7 @@ void CHalfLifeMultiplay::ProcessMapVote(CBasePlayer *player, int iVote)
 		if (FNullEnt(pTempEntity->edict()))
 			break;
 
-		CBasePlayer *pTempPlayer = GetClassPtr((CBasePlayer *)pTempEntity->pev);
+		CBasePlayer *pTempPlayer = GetClassPtr<CBasePlayer>(pTempEntity->pev);
 
 		if (pTempPlayer->m_iTeam != UNASSIGNED)
 		{

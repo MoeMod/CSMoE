@@ -600,6 +600,8 @@ void AttackState::OnUpdate(CCSBot *me)
 				}
 				break;
 			}
+			default:
+				break;
 			}
 		}
 		

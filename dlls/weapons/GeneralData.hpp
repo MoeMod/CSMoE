@@ -1,6 +1,17 @@
-//
-// Created by Ð¡°×°× on 2019-01-17.
-//
+/*
+GeneralData.hpp - part of CSMoE template weapon framework, to auto-gen general functions
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #pragma once
 struct StaticKnockbackData
@@ -62,12 +73,11 @@ public:
 	static constexpr float MaxSpeed = 250;
 	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
 	//  static constexpr const char *ClassName = "weapon_???";
-	static constexpr KnockbackData KnockBack = KnockbackData{};
 
 	// Knock back data can be defined as following :
-	//  (A) static constexpr KnockbackData &&KnockBack{0.f, 0.f, 0.f, 0.f, 1.f}; // requires c++14
+	//  (A) static constexpr const KnockbackData &KnockBack{0.f, 0.f, 0.f, 0.f, 1.f};
 	//
-	//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>;
+	//  (B) using Knockback_t = std::index_sequence<0, 0, 0, 0>; // requires c++14
 	//      static constexpr float VelocityModifier = 1.0f;
 	//
 	//  (C) struct Knockback_t
@@ -134,25 +144,25 @@ public:
 private:
 	// sfinae call
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(wpn.KnockBack, KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(wpn.KnockBack, KnockbackData())
 	{
 		return BuildKnockbackData(wpn.KnockBack);
 	}
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
 	{
 		return BuildKnockbackData(typename CFinal::KnockBack_t(), wpn.VelocityModifier);
 	}
 
 private:
-	constexpr void SetDefaultAccuracy_impl(...) {}
+	void SetDefaultAccuracy_impl(...) {}
 	template<class ClassToFind = CFinal>
 	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		CBase::m_flAccuracy = wpn.DefaultAccuracy;
 	}
-	constexpr void SetDefaultAmmo_impl(...) {}
+	void SetDefaultAmmo_impl(...) {}
 	template<class ClassToFind = CFinal>
 	auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
 	{

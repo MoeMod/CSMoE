@@ -14,31 +14,29 @@
 class CTAR21 : public CBasePlayerWeapon
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL Deploy();
-	virtual float GetMaxSpeed()
-	{
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo *p) override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override {
 		if (m_pPlayer->m_iFOV == 90)
 			return TAR21_MAX_SPEED;
 
 		return TAR21_MAX_SPEED_ZOOM;
 	}
-	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
-	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
-	virtual void Reload();
-	virtual void WeaponIdle();
-	virtual BOOL UseDecrement()
-	{
+	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
 #else
 		return FALSE;
 #endif
 	}
-	virtual KnockbackData GetKnockBackData() override { return { 1200.0f,950.0f,1100.0f,950.0f,0.5f }; }
+	KnockbackData GetKnockBackData() override { return { 1200.0f,950.0f,1100.0f,950.0f,0.5f }; }
 	float GetArmorRatioModifier() override { return 1.2; }
 	const char *GetCSModelName() override { return "models/w_tar21.mdl"; }
 

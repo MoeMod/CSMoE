@@ -76,30 +76,30 @@ public:
 	CCSBot();														// constructor initializes all values to zero
 
 public:
-	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);		// invoked when injured by something (EXTEND) - returns the amount of damage inflicted
-	virtual void Killed(entvars_t *pevAttacker, int iGib);									// invoked when killed (EXTEND)
-	virtual void RoundRespawn();
-	virtual void Blind(float duration, float holdTime, float fadeTime, int alpha = 255);					// player blinded by a flashbang
-	virtual void OnTouchingWeapon(CWeaponBox *box);										// invoked when in contact with a CWeaponBox
+	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;		// invoked when injured by something (EXTEND) - returns the amount of damage inflicted
+	void Killed(entvars_t *pevAttacker, int iGib) override;									// invoked when killed (EXTEND)
+	void RoundRespawn() override;
+	void Blind(float duration, float holdTime, float fadeTime, int alpha = 255) override;					// player blinded by a flashbang
+	void OnTouchingWeapon(CWeaponBox *box) override;										// invoked when in contact with a CWeaponBox
 
-	virtual bool Initialize(const BotProfile *profile);									// (EXTEND) prepare bot for action
-	virtual void SpawnBot();												// (EXTEND) spawn the bot into the game
+	bool Initialize(const BotProfile *profile) override;									// (EXTEND) prepare bot for action
+	void SpawnBot() override;												// (EXTEND) spawn the bot into the game
 
-	virtual void Upkeep();													// lightweight maintenance, invoked frequently
-	virtual void Update();													// heavyweight algorithms, invoked less often
+	void Upkeep() override;													// lightweight maintenance, invoked frequently
+	void Update() override;													// heavyweight algorithms, invoked less often
 
-	virtual void Walk();
-	virtual bool Jump(bool mustJump = false);										// returns true if jump was started
+	void Walk() override;
+	bool Jump(bool mustJump = false) override;										// returns true if jump was started
 
-	virtual void MakeZombie(ZombieLevel iEvolutionLevel);
+	void OnBecomeZombie(ZombieLevel iEvolutionLevel) override;
 
-	virtual void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL);			// invoked when event occurs in the game (some events have NULL entity)
+	void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL) override;			// invoked when event occurs in the game (some events have NULL entity)
 
 	#define CHECK_FOV true
-	virtual bool IsVisible(const Vector *pos, bool testFOV = false) const;							// return true if we can see the point
-	virtual bool IsVisible(CBasePlayer *player, bool testFOV = false, unsigned char *visParts = NULL) const;		// return true if we can see any part of the player
+	bool IsVisible(const Vector *pos, bool testFOV = false) const override;							// return true if we can see the point
+	bool IsVisible(CBasePlayer *player, bool testFOV = false, unsigned char *visParts = NULL) const override;		// return true if we can see any part of the player
 
-	virtual bool IsEnemyPartVisible(VisiblePartType part) const;								// if enemy is visible, return the part we see for our current enemy
+	bool IsEnemyPartVisible(VisiblePartType part) const override;								// if enemy is visible, return the part we see for our current enemy
 
 public:
 	void Disconnect();
@@ -459,7 +459,7 @@ private:
 	float m_surpriseTimestamp;
 
 	bool m_isFollowing;					// true if we are following someone
-	EHANDLE m_leader;					// the ID of who we are following
+	EntityHandle<CBasePlayer> m_leader;					// the ID of who we are following
 	float m_followTimestamp;				// when we started following
 	float m_allowAutoFollowTime;				// time when we can auto follow
 
@@ -499,7 +499,7 @@ private:
 	bool BhopJump_Start();
 	void BhopJump_UpdateJump();
 	void BhopJump_UpdateSync();
-	void Knockback(CBasePlayer *attacker, const KnockbackData &data) override; // knockback revolves
+	bool Knockback(CBasePlayer *attacker, const KnockbackData &data) override; // knockback revolves
 
 	CNavArea *m_currentArea;						// the nav area we are standing on
 	CNavArea *m_lastKnownArea;						// the last area we were in
@@ -679,11 +679,11 @@ private:
 		bool isEnemy;
 	}
 	m_watchInfo[ MAX_CLIENTS ];
-	mutable EHANDLE m_bomber;				// points to bomber if we can see him
+	mutable EntityHandle<CBasePlayer> m_bomber;				// points to bomber if we can see him
 
 	int m_nearbyFriendCount;				// number of nearby teammates
-	mutable EHANDLE m_closestVisibleFriend;			// the closest friend we can see
-	mutable EHANDLE m_closestVisibleHumanFriend;		// the closest human friend we can see
+	mutable EntityHandle<CBasePlayer> m_closestVisibleFriend;			// the closest friend we can see
+	mutable EntityHandle<CBasePlayer> m_closestVisibleHumanFriend;		// the closest human friend we can see
 
 	CBasePlayer *m_attacker;				// last enemy that hurt us (may not be same as m_enemy)
 	float m_attackedTimestamp;				// when we were hurt by the m_attacker
@@ -739,7 +739,7 @@ private:
 	void EndVoiceFeedback(bool force = true);
 	float m_lastRadioRecievedTimestamp;			// time we recieved a radio message
 	float m_lastRadioSentTimestamp;				// time when we send a radio message
-	EHANDLE m_radioSubject;					// who issued the radio message
+	EntityHandle<CBasePlayer> m_radioSubject;					// who issued the radio message
 	Vector m_radioPosition;					// position referred to in radio message
 	float m_voiceFeedbackStartTimestamp;
 	float m_voiceFeedbackEndTimestamp;			// new-style "voice" chatter gets voice feedback
@@ -750,7 +750,7 @@ private:
 	CNavNode *m_currentNode;
 	NavDirType m_generationDir;
 	int m_analyzeIter;
-	
+
 	enum ProcessType
 	{
 		PROCESS_NORMAL,
@@ -813,7 +813,7 @@ inline bool CCSBot::IsFollowing() const
 
 inline CBasePlayer *CCSBot::GetFollowLeader()
 {
-	return m_leader;
+	return static_cast<CBasePlayer *>(m_leader);
 }
 
 inline float CCSBot::GetFollowDuration() const
@@ -952,12 +952,12 @@ inline unsigned int CCSBot::GetEnemyPlace() const
 
 inline bool CCSBot::CanSeeBomber() const
 {
-	return (m_bomber == NULL) ? false : true;
+	return ((CBaseEntity *)m_bomber == nullptr) ? false : true;
 }
 
 inline CBasePlayer *CCSBot::GetBomber() const
 {
-	return m_bomber;
+	return static_cast<CBasePlayer *>(m_bomber);
 }
 
 inline int CCSBot::GetNearbyFriendCount() const
@@ -967,12 +967,12 @@ inline int CCSBot::GetNearbyFriendCount() const
 
 inline CBasePlayer *CCSBot::GetClosestVisibleFriend() const
 {
-	return m_closestVisibleFriend;
+	return static_cast<CBasePlayer *>(m_closestVisibleFriend);
 }
 
 inline CBasePlayer *CCSBot::GetClosestVisibleHumanFriend() const
 {
-	return m_closestVisibleHumanFriend;
+	return static_cast<CBasePlayer *>(m_closestVisibleHumanFriend);
 }
 
 inline float CCSBot::GetTimeSinceAttacked() const

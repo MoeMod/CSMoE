@@ -1,3 +1,18 @@
+/*
+wpn_cannon.h - Black Dragon Cannon from CSO
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #pragma once
 
 #include "weapons/WeaponTemplate.hpp"
@@ -33,14 +48,14 @@ public:
 	static constexpr float MaxSpeed = 230;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 
-	static constexpr KnockbackData KnockBack = { 1100.f, 500.f, 700.f, 400.f, 0.9f };
+	static constexpr const auto & KnockBack = KnockbackData{ 1100.f, 500.f, 700.f, 400.f, 0.9f };
 	static constexpr float ArmorRatioModifier = 1.5f;
 
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual void PrimaryAttack();
-	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
+	void Spawn() override;
+	void Precache() override;
+	void PrimaryAttack() override;
+	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
 #endif

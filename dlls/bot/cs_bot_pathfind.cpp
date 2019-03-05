@@ -338,6 +338,8 @@ bool CCSBot::UpdateLadderMovement()
 			}
 			break;
 		}
+		default:
+			break;
 	}
 
 	m_areaEnteredTimestamp = gpGlobals->time;
@@ -597,6 +599,7 @@ bool CCSBot::UpdateLadderMovement()
 					case LEFT:	StrafeLeft();	break;
 					case RIGHT:	StrafeRight();	break;
 					case FORWARD:	MoveForward();	break;
+					default:    break;
 				}
 			}
 			else
@@ -606,6 +609,7 @@ bool CCSBot::UpdateLadderMovement()
 					case LEFT:	StrafeRight();	break;
 					case RIGHT:	StrafeLeft();	break;
 					case FORWARD:	MoveBackward();	break;
+					default:    break;
 				}
 			}
 			break;
@@ -628,6 +632,8 @@ bool CCSBot::UpdateLadderMovement()
 			MoveTowardsPosition(&m_goalPosition);
 			break;
 		}
+		default:
+			break;
 	}
 
 	return true;
@@ -1744,6 +1750,8 @@ bool CCSBot::ComputePath(CNavArea *goalArea, const Vector *goal, RouteType route
 		case GO_WEST:
 			pathEndPosition.x = effectiveGoalArea->GetCenter()->x;
 			pathEndPosition.y = m_path[m_pathLength - 1].pos.y;
+			break;
+		default:
 			break;
 		}
 

@@ -171,7 +171,7 @@ CNavNode *CCSBot::AddNode(const Vector *destPos, const Vector *normal, NavDirTyp
 	return node;
 }
 
-void drawProgressMeter(float progress, char *title)
+void drawProgressMeter(float progress, const char *title)
 {
 	MESSAGE_BEGIN(MSG_ALL, gmsgBotProgress);
 		WRITE_BYTE(FLAG_PROGRESS_DRAW);

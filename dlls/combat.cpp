@@ -73,7 +73,7 @@ NOXREF void CGib::SpawnStickyGibs(entvars_t *pevVictim, Vector vecOrigin, int cG
 
 	for (i = 0; i < cGibs; ++i)
 	{
-		CGib *pGib = GetClassPtr((CGib *)NULL);
+		CGib *pGib = CreateClassPtr<CGib>();
 
 		pGib->Spawn("models/stickygib.mdl");
 		pGib->pev->body = RANDOM_LONG(0, 2);
@@ -126,7 +126,7 @@ NOXREF void CGib::SpawnStickyGibs(entvars_t *pevVictim, Vector vecOrigin, int cG
 
 void CGib::SpawnHeadGib(entvars_t *pevVictim)
 {
-	CGib *pGib = GetClassPtr((CGib *)NULL);
+	CGib *pGib = CreateClassPtr<CGib>();
 
 	if (g_Language == LANGUAGE_GERMAN)
 	{
@@ -188,7 +188,7 @@ void CGib::SpawnRandomGibs(entvars_t *pevVictim, int cGibs, int human)
 	int cSplat;
 	for (cSplat = 0; cSplat < cGibs; cSplat++)
 	{
-		CGib *pGib = GetClassPtr((CGib *)NULL);
+		CGib *pGib = CreateClassPtr<CGib>();
 
 		if (g_Language == LANGUAGE_GERMAN)
 		{
@@ -867,7 +867,7 @@ int CBaseMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, fl
 		{
 			if (pevInflictor)
 			{
-				if (m_hEnemy == NULL || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
+				if (m_hEnemy == nullptr || pevInflictor == m_hEnemy->pev || !HasConditions(bits_COND_SEE_ENEMY))
 					m_vecEnemyLKP = pevInflictor->origin;
 			}
 			else

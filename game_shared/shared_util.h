@@ -38,7 +38,7 @@
 #endif // _WIN32
 
 NOXREF wchar_t *SharedWVarArgs(wchar_t *format, ...);
-char *SharedVarArgs(char *format, ...);
+char *SharedVarArgs(const char *format, ...);
 char *BufPrintf(char *buf, int &len, const char *fmt, ...);
 NOXREF wchar_t *BufWPrintf(wchar_t *buf, int &len, const wchar_t *fmt, ...);
 NOXREF const wchar_t *NumAsWString(int val);

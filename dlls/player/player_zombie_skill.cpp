@@ -1,3 +1,18 @@
+/*
+player_zombie_skill.cpp - CSMoE Gameplay server : CBasePlayer impl for zombie skill
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -10,10 +25,7 @@
 
 #include "gamemode/mod_zb2.h"
 
-const float ZOMBIECRAZY_DURATION = 10.0f;
-const float ZOMBIECRAZY_COOLDOWN = 10.0f;
-
-void IZombieSkill::Think()
+void CZombieSkill_Base::Think()
 {
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
 	{
@@ -28,16 +40,9 @@ void IZombieSkill::Think()
 
 }
 
-IZombieSkill::IZombieSkill(CBasePlayer *player) : BasePlayerExtra(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
+CZombieSkill_Base::CZombieSkill_Base(CBasePlayer *player) : BasePlayerExtra(player), m_iZombieSkillStatus(SKILL_STATUS_READY)
 {
 	
-}
-
-void IZombieSkill::InitHUD()
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	MESSAGE_END();
 }
 
 void ZombieSkill_Precache()
@@ -47,23 +52,14 @@ void ZombieSkill_Precache()
 	PRECACHE_SOUND("zombi/zombi_pre_idle_2.wav");
 }
 
-CZombieSkill_ZombieCrazy::CZombieSkill_ZombieCrazy(CBasePlayer *player) : IZombieSkill(player)
+CZombieSkill_ZombieCrazy::CZombieSkill_ZombieCrazy(CBasePlayer *player) : CZombieSkill_Base(player)
 {
 	
 }
 
-void CZombieSkill_ZombieCrazy::InitHUD()
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	MESSAGE_END();
-}
-
 void CZombieSkill_ZombieCrazy::Think()
 {
-	IZombieSkill::Think();
+	CZombieSkill_Base::Think();
 
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEffect)
 	{
@@ -89,6 +85,9 @@ void CZombieSkill_ZombieCrazy::Activate()
 			break;
 		case SKILL_STATUS_USED:
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+			break;
+		default:
+			break;
 		}
 
 		return;
@@ -98,8 +97,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 		return;
 
 	m_iZombieSkillStatus = SKILL_STATUS_USING;
-	m_flTimeZombieSkillEnd = gpGlobals->time + ZOMBIECRAZY_DURATION;
-	m_flTimeZombieSkillNext = gpGlobals->time + ZOMBIECRAZY_COOLDOWN;
+	m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+	m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
 
 	m_pPlayer->pev->renderfx = kRenderFxGlowShell;
@@ -114,8 +113,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	WRITE_SHORT(ZOMBIECRAZY_DURATION);
-	WRITE_SHORT(ZOMBIECRAZY_COOLDOWN);
+	WRITE_SHORT(GetDurationTime());
+	WRITE_SHORT(GetCooldownTime());
 	MESSAGE_END();
 }
 
@@ -145,7 +144,17 @@ void CZombieSkill_ZombieCrazy::OnCrazyEffect()
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
 }
 
-float CZombieSkill_ZombieCrazy::GetDamageRatio()
+float CZombieSkill_ZombieCrazy::GetDurationTime() const
+{
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 3.0f : 10.0f;
+}
+
+float CZombieSkill_ZombieCrazy::GetCooldownTime() const
+{
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 10.0f : 10.0f;
+}
+
+float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 {
 	if(m_iZombieSkillStatus == SKILL_STATUS_USING)
 		return 1.6f;

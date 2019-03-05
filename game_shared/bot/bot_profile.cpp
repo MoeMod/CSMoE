@@ -36,7 +36,7 @@
 * Globals initialization
 */
 BotProfileManager *TheBotProfiles = NULL;
-char *BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
+const char *BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
 
 // Generates a filename-decorated skin name
 
