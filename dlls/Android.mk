@@ -210,6 +210,6 @@ LOCAL_SRC_FILES := \
 ../dlls/wpn_shared/knife_skullaxe.cpp \
 	./gamemode/zbs/monster_manager.cpp \
 ../dlls/wpn_shared/wpn_gungnir.cpp \
-
+../dlls/wpn_shared/wpn_mg3.cpp \
 
 include $(BUILD_SHARED_LIBRARY)
