@@ -134,6 +134,7 @@ SRCS := \
 ../dlls/wpn_shared/wpn_xm8s.cpp \
 ../dlls/wpn_shared/knife_skullaxe.cpp \
 ../dlls/wpn_shared/wpn_gungnir.cpp \
+../dlls/wpn_shared/wpn_mg3.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -183,6 +184,7 @@ SRCS := \
 ./events/event_wa2000.cpp \
 ./events/event_xm8c.cpp \
 ./events/event_xm8s.cpp \
+./events/event_mg3.cpp \
 	./ev_common.cpp \
 	./calcscreen.cpp 
 	
