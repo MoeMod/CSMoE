@@ -165,6 +165,32 @@ void CPlayerModStrategy_Default::DeathSound()
 	}
 }
 
+void CPlayerModStrategy_Default::GiveDefaultItems()
+{
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	switch (m_pPlayer->m_iTeam)
+	{
+	case CT:
+		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("knife_skullaxe");
+		m_pPlayer->GiveNamedItem("weapon_usp");
+		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
+
+		break;
+	case TERRORIST:
+		//m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("knife_skullaxe");
+		m_pPlayer->GiveNamedItem("weapon_glock18");
+		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
+
+		break;
+	default:
+		break;
+	}
+}
+
 void CPlayerModStrategy_Zombie::Pain(int m_LastHitGroup, bool HasArmour)
 {
 	if (m_pPlayer->m_bIsZombie)
@@ -210,4 +236,25 @@ float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entv
 		}
 	}
 	return CPlayerModStrategy_Default::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
+void CPlayerModStrategy_Zombie::GiveDefaultItems()
+{
+	if (!m_pPlayer->m_bIsZombie)
+		return CPlayerModStrategy_Default::GiveDefaultItems();
+	
+	m_pPlayer->RemoveAllItems(FALSE);
+	m_pPlayer->m_bHasPrimary = false;
+
+	m_pPlayer->GiveNamedItem("knife_zombi");
+
+	if (!(m_pPlayer->m_flDisplayHistory & DHF_NIGHTVISION))
+	{
+		m_pPlayer->HintMessage("#Hint_use_nightvision");
+		m_pPlayer->m_flDisplayHistory |= DHF_NIGHTVISION;
+	}
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+	m_pPlayer->m_bHasNightVision = true;
+	SendItemStatus(m_pPlayer);
+	
 }

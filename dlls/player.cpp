@@ -1198,45 +1198,7 @@ void CBasePlayer::PackDeadPlayerItems()
 
 void CBasePlayer::GiveDefaultItems()
 {
-	RemoveAllItems(FALSE);
-	m_bHasPrimary = false;
-
-	if (m_bIsZombie)
-	{
-		//GiveNamedItem("weapon_knife");
-		GiveNamedItem("weapon_knife_zombi");
-
-		if (!(this->m_flDisplayHistory & DHF_NIGHTVISION))
-		{
-			this->HintMessage("#Hint_use_nightvision");
-			this->m_flDisplayHistory |= DHF_NIGHTVISION;
-		}
-		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
-		m_bHasNightVision = true;
-		SendItemStatus(this);
-	}
-	else
-	{
-		switch (m_iTeam)
-		{
-		case CT:
-			//GiveNamedItem("weapon_knife");
-			GiveNamedItem("knife_skullaxe");
-			GiveNamedItem("weapon_usp");
-			GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
-
-			break;
-		case TERRORIST:
-			//GiveNamedItem("weapon_knife");
-			GiveNamedItem("knife_skullaxe");
-			GiveNamedItem("weapon_glock18");
-			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
-
-			break;
-		default:
-			break;
-		}
-	}
+	return m_pModStrategy->GiveDefaultItems();
 }
 
 void CBasePlayer::RemoveAllItems(BOOL removeSuit)
@@ -6752,7 +6714,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 		pszItemName = NULL;
 	}
 
-	if (m_bIsVIP)
+	if (m_bIsVIP || !m_pModStrategy->CanDropWeapon(pszItemName))
 	{
 		ClientPrint(pev, HUD_PRINTCENTER, "#Weapon_Cannot_Be_Dropped");
 		return;

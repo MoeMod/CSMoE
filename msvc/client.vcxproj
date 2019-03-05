@@ -67,6 +67,7 @@
     <ClCompile Include="..\cl_dll\events\event_scout.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg550.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg552.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_svdex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp" />
     <ClCompile Include="..\cl_dll\events\event_thompson.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tmp.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="..\cl_dll\view.cpp" />
     <ClCompile Include="..\common\interface.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
@@ -181,6 +183,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
@@ -266,6 +269,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />

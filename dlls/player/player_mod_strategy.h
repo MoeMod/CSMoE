@@ -55,6 +55,7 @@ public:
 	virtual bool ClientCommand(const char *pcmd) = 0;
 	virtual float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) = 0;
 	virtual bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) = 0;
+	virtual void GiveDefaultItems() = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -79,6 +80,7 @@ public:
 	bool ClientCommand(const char *pcmd) override { return false; }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return flDamage; }
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return false; }
+	void GiveDefaultItems() override;
 };
 
 class IPlayerModStrategyExtra_Zombie
@@ -96,6 +98,7 @@ public:
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound() override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void GiveDefaultItems() override;
 
 public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;

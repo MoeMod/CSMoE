@@ -237,6 +237,7 @@
     <ClCompile Include="..\dlls\gamemode\mods.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_base.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_dm.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_gd.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
@@ -346,10 +347,8 @@
     <ClCompile Include="..\dlls\weapons_data.cpp" />
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -441,7 +440,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m249.cpp">
@@ -514,6 +512,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp">
@@ -643,6 +642,7 @@
     <ClInclude Include="..\dlls\gamemode\mods_const.h" />
     <ClInclude Include="..\dlls\gamemode\mod_base.h" />
     <ClInclude Include="..\dlls\gamemode\mod_dm.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_gd.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
@@ -736,9 +736,6 @@
     <ClInclude Include="..\dlls\weapons_data.h" />
     <ClInclude Include="..\dlls\weapons_msg.h" />
     <ClInclude Include="..\dlls\world.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
@@ -758,7 +755,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
@@ -776,6 +772,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
