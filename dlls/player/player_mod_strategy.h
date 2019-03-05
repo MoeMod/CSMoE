@@ -55,6 +55,7 @@ public:
 	virtual bool ClientCommand(const char *pcmd) = 0;
 	virtual float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) = 0;
 	virtual bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) = 0;
+	virtual bool CanDropWeapon(const char *pszItemName = nullptr) = 0;
 	virtual void GiveDefaultItems() = 0;
 };
 
@@ -80,6 +81,7 @@ public:
 	bool ClientCommand(const char *pcmd) override { return false; }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return flDamage; }
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return false; }
+	bool CanDropWeapon(const char *pszItemName) override { return true; }
 	void GiveDefaultItems() override;
 };
 

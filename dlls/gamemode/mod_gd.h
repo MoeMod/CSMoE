@@ -18,11 +18,19 @@ GNU General Public License for more details.
 
 #include "mod_tdm.h"
 
+#include "EventDispatcher.h"
+
 class CMod_GunDeath : public CMod_TeamDeathMatch
 {
 public:
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
+	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
+
+	class PlayerModStrategy;
+
+private:
+	EventDispatcher<void(CBasePlayer *pVictim, CBasePlayer *pKiller, entvars_t *pInflictor)> m_eventPlayerKilled;
 };
 
 #endif //PROJECT_MOD_GD_H

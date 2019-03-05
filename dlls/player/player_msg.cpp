@@ -108,6 +108,7 @@ int gmsgZBSLevel = 0;
 int gmsgBTEWeapon = 0;
 int gmsgZB2Msg = 0;
 int gmsgZB3Msg = 0;
+int gmsgGunDeath = 0;
 
 // utils
 inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
@@ -205,6 +206,7 @@ void LinkUserMessages()
 	gmsgBTEWeapon = REG_USER_MSG("BTEWeapon", -1);
 	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
 	gmsgZB3Msg = REG_USER_MSG("ZB3Msg", -1);
+	gmsgGunDeath = REG_USER_MSG("GunDeath", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)
