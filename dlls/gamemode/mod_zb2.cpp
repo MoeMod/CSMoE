@@ -210,8 +210,8 @@ void CPlayerModStrategy_ZB2::OnSpawn()
 
 void CPlayerModStrategy_ZB2::OnThink()
 {
-	m_pZombieSkill->Think();
 	Zombie_HealthRecoveryThink();
+	return CPlayerModStrategy_ZB1::OnThink();
 }
 
 void CPlayerModStrategy_ZB2::OnResetMaxSpeed()
@@ -324,6 +324,7 @@ void CPlayerModStrategy_ZB2::UpdatePlayerEvolutionHUD()
 		MESSAGE_END();
 	}
 }
+
 void CPlayerModStrategy_ZB2::CheckEvolution()
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_iZombieInfections >= 3)
