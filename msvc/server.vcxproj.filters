@@ -625,6 +625,12 @@
     <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1p.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1257,9 +1263,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8c.h">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
@@ -1346,6 +1349,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\mod_gd.h">
       <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\DoubleModeType.hpp">
+      <Filter>dlls\weapons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -59,7 +59,9 @@
     <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp5n.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_mp7a1c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_mp7a1p.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p228.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p90.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scarh.cpp" />
@@ -174,7 +176,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1p.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_p228.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_p90.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_scarh.cpp" />

@@ -72,6 +72,8 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireInfinity_Left);
 	DECLARE_EVENT(FireInfinity_Right);
 	DECLARE_EVENT(FireSVDEX);
+	DECLARE_EVENT(FireMP7A1C);
+	DECLARE_EVENT(FireMP7A1P);
 /*
 ======================
 Game_HookEvents
@@ -139,4 +141,6 @@ void Game_HookEvents( void )
 	HOOK_EVENT(infinity_left, FireInfinity_Left);
 	HOOK_EVENT(infinity_right, FireInfinity_Right);
 	HOOK_EVENT(svdex, FireSVDEX);
+	HOOK_EVENT(mp7a1c, FireMP7A1C);
+	HOOK_EVENT(mp7a1p, FireMP7A1P);
 }

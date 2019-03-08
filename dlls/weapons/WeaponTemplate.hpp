@@ -44,6 +44,7 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 #include "RecoilKickBack.hpp"
 #include "RecoilPunch.hpp"
 #include "GetDamageDefault.hpp"
+#include "DoubleModeType.hpp"
 
 /*
  * template<class CFinal, class CBase>
