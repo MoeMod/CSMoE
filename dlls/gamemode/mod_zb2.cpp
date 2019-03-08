@@ -214,13 +214,6 @@ void CPlayerModStrategy_ZB2::OnThink()
 	return CPlayerModStrategy_ZB1::OnThink();
 }
 
-void CPlayerModStrategy_ZB2::OnResetMaxSpeed()
-{
-	m_pZombieSkill->ResetMaxSpeed();
-	Zombie_HealthRecoveryThink();
-	return CPlayerModStrategy_ZB1::OnThink();
-}
-
 bool CPlayerModStrategy_ZB2::CanUseZombieSkill()
 {
 	return m_pPlayer->m_bIsZombie && m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST;
