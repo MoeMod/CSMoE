@@ -155,24 +155,24 @@ LOCAL_SRC_FILES := \
 	../dlls/wpn_shared/wpn_ak47l.cpp \
 	../dlls/wpn_shared/wpn_mp7a1d.cpp \
 	../dlls/wpn_shared/wpn_deagled.cpp \
-../dlls/wpn_shared/wpn_as50.cpp \
-../dlls/wpn_shared/wpn_cannon.cpp \
-../dlls/wpn_shared/wpn_infinity.cpp \
-../dlls/wpn_shared/wpn_k1a.cpp \
-../dlls/wpn_shared/wpn_knife_zombi.cpp \
-../dlls/wpn_shared/wpn_kriss.cpp \
-../dlls/wpn_shared/wpn_m95.cpp \
-../dlls/wpn_shared/wpn_m1887.cpp \
-../dlls/wpn_shared/wpn_scarh.cpp \
-../dlls/wpn_shared/wpn_scarl.cpp \
-../dlls/wpn_shared/wpn_tar21.cpp \
-../dlls/wpn_shared/wpn_thompson.cpp \
-../dlls/wpn_shared/wpn_wa2000.cpp \
-../dlls/wpn_shared/wpn_xm8c.cpp \
-../dlls/wpn_shared/wpn_xm8s.cpp \
-../dlls/wpn_shared/knife_skullaxe.cpp \
-../dlls/wpn_shared/wpn_gungnir.cpp \
-../dlls/wpn_shared/wpn_mg3.cpp \
+	../dlls/wpn_shared/wpn_as50.cpp \
+	../dlls/wpn_shared/wpn_cannon.cpp \
+	../dlls/wpn_shared/wpn_infinity.cpp \
+	../dlls/wpn_shared/wpn_k1a.cpp \
+	../dlls/wpn_shared/wpn_knife_zombi.cpp \
+	../dlls/wpn_shared/wpn_kriss.cpp \
+	../dlls/wpn_shared/wpn_m95.cpp \
+	../dlls/wpn_shared/wpn_m1887.cpp \
+	../dlls/wpn_shared/wpn_scarh.cpp \
+	../dlls/wpn_shared/wpn_scarl.cpp \
+	../dlls/wpn_shared/wpn_tar21.cpp \
+	../dlls/wpn_shared/wpn_thompson.cpp \
+	../dlls/wpn_shared/wpn_wa2000.cpp \
+	../dlls/wpn_shared/wpn_xm8c.cpp \
+	../dlls/wpn_shared/wpn_xm8s.cpp \
+	../dlls/wpn_shared/knife_skullaxe.cpp \
+	../dlls/wpn_shared/wpn_gungnir.cpp \
+	../dlls/wpn_shared/wpn_mg3.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -208,21 +208,21 @@ LOCAL_SRC_FILES := \
 	./events/event_ak47l.cpp \
 	./events/event_mp7a1d.cpp \
 	./events/event_deagled.cpp \
-./events/event_as50.cpp \
-./events/event_cannon.cpp \
-./events/event_infinity.cpp \
-./events/event_k1a.cpp \
-./events/event_kriss.cpp \
-./events/event_m95.cpp \
-./events/event_m1887.cpp \
-./events/event_scarh.cpp \
-./events/event_scarl.cpp \
-./events/event_tar21.cpp \
-./events/event_thompson.cpp \
-./events/event_wa2000.cpp \
-./events/event_xm8c.cpp \
-./events/event_xm8s.cpp \
-./events/event_mg3.cpp \
+	./events/event_as50.cpp \
+	./events/event_cannon.cpp \
+	./events/event_infinity.cpp \
+	./events/event_k1a.cpp \
+	./events/event_kriss.cpp \
+	./events/event_m95.cpp \
+	./events/event_m1887.cpp \
+	./events/event_scarh.cpp \
+	./events/event_scarl.cpp \
+	./events/event_tar21.cpp \
+	./events/event_thompson.cpp \
+	./events/event_wa2000.cpp \
+	./events/event_xm8c.cpp \
+	./events/event_xm8s.cpp \
+	./events/event_mg3.cpp \
 	./ev_common.cpp \
 	./calcscreen.cpp \
 	
