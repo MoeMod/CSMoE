@@ -433,6 +433,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -467,6 +468,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -720,6 +722,7 @@
     <ClInclude Include="..\dlls\weapons\DeployDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\DoubleModeType.hpp" />
     <ClInclude Include="..\dlls\weapons\ExpressionBuilder.hpp" />
+    <ClInclude Include="..\dlls\weapons\FirePistol.hpp" />
     <ClInclude Include="..\dlls\weapons\FireRifle.hpp" />
     <ClInclude Include="..\dlls\weapons\GeneralData.hpp" />
     <ClInclude Include="..\dlls\weapons\GetDamageDefault.hpp" />
@@ -732,6 +735,7 @@
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp" />
+    <ClInclude Include="..\dlls\weapons\WeaponDataVaribles.hpp" />
     <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp" />
     <ClInclude Include="..\dlls\weapons_const.h" />
@@ -765,6 +769,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />

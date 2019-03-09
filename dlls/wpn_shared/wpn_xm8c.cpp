@@ -91,6 +91,7 @@ public:
 	static constexpr int DamageZBS = 48;
 
 	static constexpr const auto & AccuracyCalc = (N * N * N / 200.0) + 0.35;
+	static constexpr float AccuracyDefault = 0.2f;
 	static constexpr float AccuracyMax = 1.25f;
 	static constexpr float RangeModifier = 0.98;
 	static constexpr auto BulletType = BULLET_PLAYER_762MM;

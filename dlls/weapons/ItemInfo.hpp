@@ -492,9 +492,9 @@ struct BuildTGetItemInfoFromCSW
 		struct ItemInfoData_t : StaticItemInfo<CSW>
 		{
 			static constexpr const char *szName = CFinal::ClassName;
-			static constexpr int iMaxClip = CFinal::MaxClip;
+			//static constexpr int iMaxClip = CFinal::MaxClip;
 		};
 		static constexpr WeaponIdType WeaponId = CSW;
-		static constexpr int MaxClip = MetaItemMaxClip<CSW>::value;
+		//static constexpr int MaxClip = MetaItemMaxClip<CSW>::value;
 	};
 };

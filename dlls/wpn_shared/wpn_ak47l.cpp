@@ -64,6 +64,7 @@ public:
 	static constexpr float CycleTime = 0.0955;
 	static constexpr int DamageDefault = 97;
 	static constexpr const auto & AccuracyCalc = (N * N * N / 200.0) + 0.35;
+	static constexpr float AccuracyDefault = 0.2;
 	static constexpr float AccuracyMax = 1;
 	static constexpr float RangeModifier = 0.98;
 	static constexpr auto BulletType = BULLET_PLAYER_762MM;

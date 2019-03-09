@@ -151,6 +151,7 @@ namespace ExpressionBuilder
 		}
 	}
 
+	using detail::VaribleType;
 	constexpr const detail::VaribleType<'x'> x{};
 	constexpr const detail::VaribleType<'y'> y{};
 	constexpr const detail::VaribleType<'z'> z{};

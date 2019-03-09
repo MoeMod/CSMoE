@@ -1,6 +1,6 @@
 /*
-FireRifle.hpp - part of CSMoE template weapon framework, to auto-gen Fire() function for rifles
-Copyright (C) 2019 Moemod Hyakuya
+FirePistol.hpp - part of CSMoE template weapon framework, to auto-gen Fire() function for pistols
+Copyright (C) 2019 Moemod Yanase
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,30 +16,39 @@ GNU General Public License for more details.
 #pragma once
 
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TFireRifle : public CBase
+class TFirePistol : public CBase
 {
 public:
 	// Default Settings
 //	static constexpr auto &&AccuracyCalc = (x * x * x / 200.0) + 0.35;
-//	static constexpr float AccuracyMax = 1.25f;
-//	static constexpr float RangeModifier = 0.98;
-//	static constexpr auto BulletType = BULLET_PLAYER_762MM;
-//	static constexpr int Penetration = 2;
-	static constexpr int Distance = 8192;
-	static constexpr const auto &N = WeaponTemplate::Varibles::N;
+//	static constexpr float AccuracyMin = 0.6f;
+//	static constexpr float AccuracyMax = 0.92f;
+//	static constexpr float RangeModifier = 0.79;
+//	static constexpr auto BulletType = BULLET_PLAYER_45ACP;
+//	static constexpr int Penetration = 1;
+	static constexpr int Distance = 4096;
+	static constexpr const auto &T = WeaponTemplate::Varibles::T;
+	static constexpr const auto &A = WeaponTemplate::Varibles::A;
 
 public:
 	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		CBase::m_bDelayFire = true;
+		flCycleTime -= 0.075;
 		CBase::m_iShotsFired++;
 
-		CBase::m_flAccuracy = wpn.AccuracyCalc(N = CBase::m_iShotsFired);
+		if (CBase::m_iShotsFired > 1)
+			return;
 
-		CheckAccuracyBoundaryMin(&wpn);
-		CheckAccuracyBoundaryMax(&wpn);
+		if (CBase::m_flLastFire)
+		{
+			CBase::m_flAccuracy -= wpn.AccuracyCalc(T = (gpGlobals->time - CBase::m_flLastFire));
+			CheckAccuracyBoundaryMin(&wpn);
+			CheckAccuracyBoundaryMax(&wpn);
+		}
+
+		CBase::m_flLastFire = gpGlobals->time;
 
 		if (CBase::m_iClip <= 0)
 		{
@@ -60,8 +69,8 @@ public:
 
 		UTIL_MakeVectors(CBase::m_pPlayer->pev->v_angle + CBase::m_pPlayer->pev->punchangle);
 
-		CBase::m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
-		CBase::m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
+		CBase::m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
+		CBase::m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
 		const float flDistance = wpn.Distance;
 		const int iPenetration = wpn.Penetration;
@@ -100,7 +109,7 @@ public:
 		 */
 
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100), static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100), static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), CBase::m_iClip != 0, FALSE);
 	}
 
 private:

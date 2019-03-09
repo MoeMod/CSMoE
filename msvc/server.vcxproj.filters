@@ -631,6 +631,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1p.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1351,6 +1357,15 @@
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons\DoubleModeType.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\FirePistol.hpp">
+      <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons\WeaponDataVaribles.hpp">
       <Filter>dlls\weapons</Filter>
     </ClInclude>
   </ItemGroup>

@@ -45,6 +45,7 @@ public:
 		static constexpr int iMaxAmmo1 = 20;
 	};
 
+	static constexpr int MaxClip = -1;
 	static constexpr float MaxSpeed = 230;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 

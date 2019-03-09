@@ -15,20 +15,12 @@ GNU General Public License for more details.
 
 #pragma once
 
-#include "ExpressionBuilder.hpp"
-
-namespace detail {
-	class TPrimaryAttackRifle_Detail {
-	public:
-		static constexpr const auto &A = ExpressionBuilder::x;
-	};
-}
-
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TPrimaryAttackRifle : public CBase, public detail::TPrimaryAttackRifle_Detail
+class TPrimaryAttackRifle : public CBase
 {
 public:
 	static constexpr float PrimaryAttackWalkingMiniumSpeed = 140;
+	static constexpr const auto &A = WeaponTemplate::Varibles::A;
 
 public:
 	void PrimaryAttack(void) override
@@ -38,6 +30,8 @@ public:
 		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
 			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
 		else if (PrimaryAttackImpl_Walking(&wpn))
+			void(); // do nothing
+		else if (PrimaryAttackImpl_Ducking(&wpn))
 			void(); // do nothing
 		else if (PrimaryAttackImpl_Zoomed(&wpn))
 			void(); // do nothing
@@ -58,6 +52,22 @@ private:
 		if(CBase::m_pPlayer->pev->velocity.Length2D() > wpn.PrimaryAttackWalkingMiniumSpeed)
 		{
 			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
+			return true;
+		}
+
+		return false;
+	}
+
+	// sfinae query for whether the weapon has SpreadCalcDucking.
+	static constexpr bool PrimaryAttackImpl_Ducking(...) { return false; }
+	template<class ClassToFind = CFinal>
+	auto PrimaryAttackImpl_Ducking(ClassToFind *) -> decltype(&ClassToFind::SpreadCalcDucking, bool())
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+
+		if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
+		{
+			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
 			return true;
 		}
 

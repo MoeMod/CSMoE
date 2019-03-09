@@ -30,6 +30,7 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 	// ...
 };
 
+#include "WeaponDataVaribles.hpp"
 #include "GeneralData.hpp"
 #include "PrecacheEvent.hpp"
 #include "ItemInfo.hpp"
@@ -41,6 +42,7 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 #include "SecondaryAttackSniperZoom2.hpp"
 #include "WeaponIdleDefault.hpp"
 #include "FireRifle.hpp"
+#include "FirePistol.hpp"
 #include "RecoilKickBack.hpp"
 #include "RecoilPunch.hpp"
 #include "GetDamageDefault.hpp"

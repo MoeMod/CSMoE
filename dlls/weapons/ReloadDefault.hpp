@@ -52,9 +52,9 @@ private:
 
 	void SetDefaultAccuracy_impl(...) {}
 	template<class ClassToFind = CFinal>
-	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultAccuracy, void())
+	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = wpn.DefaultAccuracy;
+		CBase::m_flAccuracy = wpn.AccuracyDefault;
 	}
 };
