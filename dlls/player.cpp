@@ -495,6 +495,8 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	bool bShouldPunch = true;
 	bool bHitShield = IsHittingShield(vecDir, ptr);
 
+	ptr->iHitgroup = g_pModRunning->GetAdjustedTraceAttackHitgroup(this, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+
 	CBasePlayer *pAttacker = dynamic_cast<CBasePlayer *>(CBaseEntity::Instance(pevAttacker));
 
 	if (pAttacker != NULL && g_pGameRules->IsTeamplay() && m_iTeam == pAttacker->m_iTeam && CVAR_GET_FLOAT("mp_friendlyfire") == 0)

@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #define PROJECT_ZCLASS_H
 
 #include "gamemode/zb1/zb1_zclass.h"
+#include "gamemode/zb2/zb2_const.h"
 
 class IZombieModeCharacter_ZB2_Extra
 {
@@ -24,16 +25,26 @@ public:
 	virtual float HealthRecoveryAmount() const = 0;
 	virtual void ActivateSkill(ZombieSkillSlot which) = 0;
 	virtual void InitHUD() const = 0;
+	virtual ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const = 0;
 };
 
 class CHuman_ZB2 : public CHuman_ZB1, public IZombieModeCharacter_ZB2_Extra
 {
 public:
-	explicit CHuman_ZB2(CBasePlayer *player) : CHuman_ZB1(player) {}
-	void ActivateSkill(ZombieSkillSlot which) override {}
+	explicit CHuman_ZB2(CBasePlayer *player);
+	void ActivateSkill(ZombieSkillSlot which) override;
 	float HealthRecoveryAmount() const override { return 0.0f; }
 	void InitHUD() const override;
+	void Think() override;
+	void ResetMaxSpeed() const override;
+	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
+
+protected:
+	class impl_t;
+	const std::unique_ptr<impl_t> pimpl;
 };
+
+class IZombieSkill;
 
 class CBaseZombieClass_ZB2 : public CZombie_ZB1, public IZombieModeCharacter_ZB2_Extra
 {
@@ -46,6 +57,7 @@ public:
 	void ResetMaxSpeed() const override;
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override;
+	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
 
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;
@@ -57,5 +69,9 @@ public:
 	explicit CZombieClass_Default(CBasePlayer *player, ZombieLevel lv);
 	void InitHUD() const override;
 };
+
+void ZombieSkill_Precache();
+void HumanSkill_Precache();
+
 
 #endif //PROJECT_ZCLASS_H

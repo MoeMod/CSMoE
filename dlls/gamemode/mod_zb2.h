@@ -21,11 +21,10 @@ GNU General Public License for more details.
 
 #include "mod_zb1.h"
 
-#include "player/player_zombie_skill.h"
-
 #include "EventDispatcher.h"
 
-#include "dlls/gamemode/zb2/zb2_zclass.h"
+#include "zb2/zb2_zclass.h"
+#include "zb2/zb2_skill.h"
 
 class CSupplyBox;
 
@@ -44,6 +43,8 @@ public:
 
 public: // IBaseMod
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
+	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType) override;
 
 protected:
 	void MakeSupplyboxThink();
@@ -56,6 +57,8 @@ public:
 
 public:
 	EventDispatcher<void(CBasePlayer *victim, CBasePlayer *attacker)> m_eventInfection;
+	EventDispatcher<void(CBasePlayer *attacker, float &)> m_eventAdjustDamage;
+	EventDispatcher<void(CBasePlayer *attacker, HitBoxGroup &)> m_eventAdjustHitgroup;
 
 protected:
 	float m_flTimeNextMakeSupplybox;
@@ -82,8 +85,12 @@ protected:
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
 	void BecomeHuman() override;
 	virtual void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker);
+	virtual void Event_AdjustHumanDamage(CBasePlayer *attacker, float &flDamage);
+	virtual void Event_AdjustHumanHitgroup(CBasePlayer *attacker, HitBoxGroup &iHitgroup);
 	EventListener m_eventInfectionListener;
-
+	EventListener m_eventAdjustDamageListener;
+	EventListener m_eventAdjustHitgroupListener;
+	const std::vector<EventListener> m_eventListeners;
 	
 private:
 	CMod_ZombieMod2 * const m_pModZB2;

@@ -67,7 +67,6 @@
 
 #include "gamemode/mods.h"
 #include "player/player_model.h"
-#include "player/player_zombie_skill.h"
 
 #include <tuple>
 
@@ -4197,7 +4196,6 @@ void ClientPrecache()
 
 	PlayerZombie_Precache();
 	PlayerModel_Precache();
-	ZombieSkill_Precache();
 
 	if (g_bIsCzeroGame)
 	{

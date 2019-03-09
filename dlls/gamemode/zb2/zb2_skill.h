@@ -1,5 +1,5 @@
 /*
-player_zombie_skill.h - CSMoE Gameplay server : CBasePlayer impl for zombie skill
+zb2_skill.h - CSMoE Gameplay server : CBasePlayer impl for zombie skill
 Copyright (C) 2018 Moemod Hyakuya
 
 This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,7 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
-void ZombieSkill_Precache();
-
-#include "player_mod_strategy.h"
+#include "player/player_mod_strategy.h"
 #include "gamemode/zb2/zb2_const.h"
 
 class IZombieSkill

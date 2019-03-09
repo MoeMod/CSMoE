@@ -37,6 +37,9 @@ CMod_ZombieMod2::CMod_ZombieMod2() // precache
 	PRECACHE_SOUND("zombi/zombi_box.wav");
 	PRECACHE_SOUND("zombi/zombi_evolution.wav");
 	PRECACHE_SOUND("zombi/zombi_evolution_female.wav");
+
+	ZombieSkill_Precache();
+	HumanSkill_Precache();
 }
 
 void CMod_ZombieMod2::UpdateGameMode(CBasePlayer *pPlayer)
@@ -76,9 +79,33 @@ void CMod_ZombieMod2::RestartRound()
 
 BOOL CMod_ZombieMod2::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 {
-	
-
 	return CMod_Zombi::ClientCommand(pPlayer, pcmd);
+}
+
+float CMod_ZombieMod2::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = Base::GetAdjustedEntityDamage(victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	CBasePlayer *pAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker);
+	if (pAttacker)
+	{
+		m_eventAdjustDamage.dispatch(pAttacker, flDamage);
+	}
+
+	return flDamage;
+}
+
+HitBoxGroup CMod_ZombieMod2::GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType)
+{
+	HitBoxGroup hbg = CMod_Zombi::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+
+	CBasePlayer *pAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker);
+	if (pAttacker)
+	{
+		m_eventAdjustHitgroup.dispatch(pAttacker, hbg);
+	}
+
+	return hbg;
 }
 
 void CMod_ZombieMod2::MakeSupplyboxThink()
@@ -184,11 +211,15 @@ void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB2(player, this));
 }
 
-CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp) : CPlayerModStrategy_ZB1(player, mp), m_pModZB2(mp)
-{
-	using namespace std::placeholders;
-	m_eventInfectionListener = mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this);
-}
+CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp)
+	:	CPlayerModStrategy_ZB1(player, mp), 
+		m_pModZB2(mp), 
+		m_eventListeners {
+			mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this),
+			mp->m_eventAdjustDamage.subscribe([this](CBasePlayer *attacker, float &out){ return this->Event_AdjustHumanDamage(attacker, out); }),
+			mp->m_eventAdjustHitgroup.subscribe([this](CBasePlayer *attacker, HitBoxGroup &out) { return this->Event_AdjustHumanHitgroup(attacker, out); })
+		} 
+{}
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
@@ -198,6 +229,31 @@ bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_1);
 		return true;
 	}
+
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		if (!Q_stricmp(pcmd, "MoE_HumanSkill1"))
+		{
+			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_1);
+			return true;
+		}
+		else if (!Q_stricmp(pcmd, "MoE_HumanSkill2"))
+		{
+			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_2);
+			return true;
+		}
+		else if (!Q_stricmp(pcmd, "MoE_HumanSkill3"))
+		{
+			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_3);
+			return true;
+		}
+		else if (!Q_stricmp(pcmd, "MoE_HumanSkill4"))
+		{
+			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_4);
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -284,6 +340,30 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 	CheckEvolution();
 }
 
+void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, float &flDamage)
+{
+	if (attacker != m_pPlayer)
+		return;
+	if (!m_pPlayer->m_bIsZombie && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_3) == SKILL_STATUS_USING)
+	{
+		// using knife 2x?
+		if (m_pPlayer->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+			flDamage *= 10.0f;
+	}
+}
+
+void CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(CBasePlayer * attacker, HitBoxGroup & iHitgroup)
+{
+	if (attacker != m_pPlayer)
+		return;
+
+	if (!m_pPlayer->m_bIsZombie && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING)
+	{
+		if (m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
+			iHitgroup = HITGROUP_HEAD;
+	}
+}
+
 void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
 {
 	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
@@ -346,70 +426,4 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 void CPlayerModStrategy_ZB2::EvolutionSound() const
 {
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
-}
-
-void CHuman_ZB2::InitHUD() const
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	MESSAGE_END();
-}
-
-void CBaseZombieClass_ZB2::InitHUD() const
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	MESSAGE_END();
-}
-
-void CZombieClass_Default::InitHUD() const
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	MESSAGE_END();
-}
-
-void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
-{
-	if(m_pZombieSkill && which == SKILL_SLOT_1)
-		m_pZombieSkill->Activate();
-}
-
-void CBaseZombieClass_ZB2::Think()
-{
-	if(m_pZombieSkill)
-		m_pZombieSkill->Think();
-	return CZombie_ZB1::Think();
-}
-
-void CBaseZombieClass_ZB2::ResetMaxSpeed() const
-{
-	CZombie_ZB1::ResetMaxSpeed();
-	if(m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed(); // cans replace result of CZombie_ZB1::ResetMaxSpeed()
-}
-
-bool CBaseZombieClass_ZB2::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
-{
-	// TODO : knockback adjustment by skill
-	return CZombie_ZB1::ApplyKnockback(attacker, kbd);
-}
-
-float CBaseZombieClass_ZB2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
-{
-	if(m_pZombieSkill)
-		flDamage *= m_pZombieSkill->GetDamageRatio();
-	return CZombie_ZB1::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-}
-
-float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
-{
-	return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
-}
-
-CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel lv) : CBaseZombieClass_ZB2(player, lv)
-{
-	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
 }

@@ -245,6 +245,8 @@
     <ClCompile Include="..\dlls\gamemode\mod_zb3.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_human.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_zombie.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp" />
@@ -326,7 +328,6 @@
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp" />
     <ClCompile Include="..\dlls\player\player_zombie.cpp" />
-    <ClCompile Include="..\dlls\player\player_zombie_skill.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />
     <ClCompile Include="..\dlls\sound.cpp" />
@@ -655,6 +656,8 @@
     <ClInclude Include="..\dlls\gamemode\mod_zbs.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_skill.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_zclass.h" />
     <ClInclude Include="..\dlls\gamemode\zb3\zb3_const.h" />
     <ClInclude Include="..\dlls\gamemode\zb3\zb3_morale.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h" />
@@ -697,7 +700,6 @@
     <ClInclude Include="..\dlls\player\player_msg.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
     <ClInclude Include="..\dlls\player\player_zombie.h" />
-    <ClInclude Include="..\dlls\player\player_zombie_skill.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
     <ClInclude Include="..\dlls\schedule.h" />
     <ClInclude Include="..\dlls\scriptevent.h" />
