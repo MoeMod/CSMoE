@@ -21,6 +21,8 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
+#include "zb2_zclass.h"
+
 
 constexpr bool ENABLE_SPRINT = true;
 constexpr bool ENABLE_HEADSHOT = true;
@@ -256,3 +258,5 @@ ZombieSkillStatus CHuman_ZB2::GetSkillStatus(ZombieSkillSlot which) const
 		return pimpl->k2x.GetStatus();
 	return SKILL_STATUS_USED;
 }
+
+CHuman_ZB2::~CHuman_ZB2() = default;

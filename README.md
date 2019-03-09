@@ -1,7 +1,7 @@
 ## Counter-Strike Mobile-oriented Edition
 Here are the source code of engine, server, client (windows and linux only). \
 For Android or iOS launcher, check them in other repo. \
-This is a combination of CS1.6 mods that are implemented based on Xash3D engine, \
+CSMoE is a combination of CS1.6 mods that are implemented based on Xash3D engine, \
 aiming to act like CSO (aka CS:NZ), however the traditional one in pre-2009. \
 Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x64), Android(ARMv7,x86), iOS(ARMv7,ARM64).
 
@@ -12,10 +12,10 @@ Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x6
 * [x] GameMode : Zombie Mod 1
 * [x] GameMode : Zombie Mod 2
 * [ ] GameMode : Zombie United
-* [ ] GameMode : Zombie Mod 3 (classic)
-* [x] GameMode : Zombie Scenario (classic)
+* [x] GameMode : Zombie Mod 3 (classic)
+* [x] GameMode : Zombie Scenario (classic) with BOT support
 * [ ] GameMode : GunDeath
-* [ ] UI : BuyMenu
+* [ ] GameMode : Zombie Mod 4
 
 ## Difference from other CSO-like mods now
 * No more dominating weapons and immortal player classes
@@ -71,7 +71,7 @@ https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-d
   sudo chmod +x xash3d
 5. type the cmd below to run the game
   bash csmoe_linux.sh \
-Note : You may need to install libSDL2 and other dependency.
+Note : You may need to install libSDL2 and other dependencies.
 ### Android
 1. download ***-GameDir and extract it into an empty folder on your phone
 2. purchase and download Counter-Strike on Steam
@@ -111,17 +111,17 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 ### Android
 - Put this repo into jni/src/xash3d
 - Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version
-- arm64-v8a is not supported. Please build armeabi, armeabi-v7a, x86 only.
+- arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
 ### iOS
-- TODO
+- please refer to mittorn/xash3d-ios
 - supports both armv7, arm64.
 
 ## License
 This repo is licensed under GPLv3 license, check LICENSE file for details.
 
 ## Contributing
+* star / fork
 * explain what's wrong & what's to be added
-* commit a possibe solution
+* commit a possibe solution \
 
- DO NOT commit suggestions about gameplay such as When will the new annual weapon be updated.\
  For non-developers, turn to QQ group 3266216 for more information.

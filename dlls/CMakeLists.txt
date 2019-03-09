@@ -163,16 +163,16 @@ set(HLDLL_SRCS
 	./gamemode/mod_zb2.cpp
 	./gamemode/zb2/supplybox.cpp
 	./bot/cs_bot_bhopjump.cpp
-	./player/player_zombie_skill.cpp
 	./weapons_data.cpp
 	./weapons_msg.cpp
 	./player/player_mod_strategy.cpp
 	./gamemode/zbs/monster_manager.cpp
 	./player/player_account.cpp
 	./cbase/cbase_memory.cpp
-	./gamemode/zbs/npc_group.cpp
 	./gamemode/mod_zb3.cpp
 	./gamemode/mod_gd.cpp
+	./gamemode/zb2/zb2_skill_human.cpp
+	./gamemode/zb2/zb2_skill_zombie.cpp
 	)
 
 file (GLOB HLWPN_SRCS

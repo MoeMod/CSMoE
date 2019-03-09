@@ -32,6 +32,7 @@ class CHuman_ZB2 : public CHuman_ZB1, public IZombieModeCharacter_ZB2_Extra
 {
 public:
 	explicit CHuman_ZB2(CBasePlayer *player);
+	~CHuman_ZB2() override;
 	void ActivateSkill(ZombieSkillSlot which) override;
 	float HealthRecoveryAmount() const override { return 0.0f; }
 	void InitHUD() const override;
@@ -50,6 +51,7 @@ class CBaseZombieClass_ZB2 : public CZombie_ZB1, public IZombieModeCharacter_ZB2
 {
 public:
 	explicit CBaseZombieClass_ZB2(CBasePlayer *player, ZombieLevel lv) : CZombie_ZB1(player, lv) {}
+	~CBaseZombieClass_ZB2() override;
 	float HealthRecoveryAmount() const override;
 	void ActivateSkill(ZombieSkillSlot which) override;
 	void InitHUD() const override;

@@ -30,12 +30,12 @@ public:
 		CBase::Spawn();
 
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		m_pLink = nullptr;
-		m_iSwing = 0;
+		CBase::m_pLink = nullptr;
+		CBase::m_iSwing = 0;
 
 		if /*constexpr*/ (wpn.DoubleMode_SyncAmmo)
 		{
-			current_ammo = m_iDefaultAmmo = wpn.MaxClip;
+			CBase::current_ammo = CBase::m_iDefaultAmmo = wpn.MaxClip;
 		}
 	}
 
@@ -49,7 +49,7 @@ public:
 
 		if /*constexpr*/ (wpn.DoubleMode_SyncAmmo)
 		{
-			current_ammo = m_iClip;
+			CBase::current_ammo = CBase::m_iClip;
 		}
 
 		return CBase::ItemPostFrame();

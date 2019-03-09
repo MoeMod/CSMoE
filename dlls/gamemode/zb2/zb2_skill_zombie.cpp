@@ -21,6 +21,8 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
+#include "zb2_zclass.h"
+
 
 void ZombieSkill_Precache()
 {
@@ -87,6 +89,8 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 {
 	return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
 }
+
+CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;
 
 CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel lv) : CBaseZombieClass_ZB2(player, lv)
 {

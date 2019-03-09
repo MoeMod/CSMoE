@@ -61,7 +61,7 @@ public:
 	static constexpr auto BulletType = BULLET_PLAYER_45ACP;
 	static constexpr int Penetration = 2;
 	static constexpr const auto & KnockBack = KnockbackData{ 250, 200, 250, 90, 0.7f };
-	static constexpr float RecoilPunchAngleDelta[] = { -2, 0, 0 };
+	static constexpr const float (&RecoilPunchAngleDelta)[3] = { -2, 0, 0 };
 };
 
 struct InfinitySR_WeaponData : InfinitySS_WeaponData

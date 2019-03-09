@@ -316,6 +316,7 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	m_pCharacter = sp;
 
 	sp->InitHUD();
+	sp->ResetMaxSpeed();
 
 	m_iZombieInfections = 0;
 	UpdatePlayerEvolutionHUD();
@@ -328,6 +329,7 @@ void CPlayerModStrategy_ZB2::BecomeHuman()
 	m_pCharacter = sp;
 
 	sp->InitHUD();
+	sp->ResetMaxSpeed();
 }
 
 void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker)
