@@ -55,6 +55,9 @@
     <Filter Include="cl_dll\hud\zb3">
       <UniqueIdentifier>{f9829210-3f11-4dc1-8a06-eec5ea21f55e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\hud\moe">
+      <UniqueIdentifier>{2441c342-4c6a-412d-b545-0512bfd993b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -615,6 +618,9 @@
     <ClCompile Include="..\cl_dll\events\event_infinitys.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\moe\moe_touch.cpp">
+      <Filter>cl_dll\hud\moe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -889,6 +895,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\moe\moe_touch.h">
+      <Filter>cl_dll\hud\moe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

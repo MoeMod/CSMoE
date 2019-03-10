@@ -105,6 +105,7 @@
     <ClCompile Include="..\cl_dll\hud\menu.cpp" />
     <ClCompile Include="..\cl_dll\hud\message.cpp" />
     <ClCompile Include="..\cl_dll\hud\modern\hud_radar_modern.cpp" />
+    <ClCompile Include="..\cl_dll\hud\moe\moe_touch.cpp" />
     <ClCompile Include="..\cl_dll\hud\money.cpp" />
     <ClCompile Include="..\cl_dll\hud\MOTD.cpp" />
     <ClCompile Include="..\cl_dll\hud\nvg.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\cl_dll\hud\legacy\hud_radar_legacy.h" />
     <ClInclude Include="..\cl_dll\hud\legacy\hud_scoreboard_legacy.h" />
     <ClInclude Include="..\cl_dll\hud\modern\hud_radar_modern.h" />
+    <ClInclude Include="..\cl_dll\hud\moe\moe_touch.h" />
     <ClInclude Include="..\cl_dll\hud\radar.h" />
     <ClInclude Include="..\cl_dll\hud\retina.h" />
     <ClInclude Include="..\cl_dll\hud\scenariostatus.h" />
