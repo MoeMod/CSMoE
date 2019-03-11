@@ -173,6 +173,9 @@ set(HLDLL_SRCS
 	./gamemode/mod_gd.cpp
 	./gamemode/zb2/zb2_skill_human.cpp
 	./gamemode/zb2/zb2_skill_zombie.cpp
+	./gamemode/zb2/zb2_zclass.cpp
+	./gamemode/zb2/zb2_zclass_tank.cpp
+	./gamemode/zb2/zb2_zclass_speed.cpp
 	)
 
 file (GLOB HLWPN_SRCS

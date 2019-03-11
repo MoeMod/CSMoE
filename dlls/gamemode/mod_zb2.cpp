@@ -28,6 +28,7 @@ GNU General Public License for more details.
 #include <algorithm>
 #include <vector>
 #include <dlls/gamemode/zb2/zb2_zclass.h>
+#include <dlls/util/u_range.hpp>
 
 
 CMod_ZombieMod2::CMod_ZombieMod2() // precache
@@ -44,10 +45,10 @@ CMod_ZombieMod2::CMod_ZombieMod2() // precache
 
 void CMod_ZombieMod2::UpdateGameMode(CBasePlayer *pPlayer)
 {
-	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, NULL, pPlayer->edict());
+	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, nullptr, pPlayer->edict());
 	WRITE_BYTE(MOD_ZB2);
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
-	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
+	WRITE_BYTE(static_cast<int>(maxrounds.value)); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 
 	MESSAGE_END();
@@ -126,15 +127,12 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 			continue;
 		sb->m_iSupplyboxIndex = i + 1;
 
-		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+		for(CBasePlayer * player : moe::range::PlayersList())
 		{
-			CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-			if (!entity)
-				continue;
-			if(static_cast<CBasePlayer *>(entity)->m_bIsZombie)
+			if(player->m_bIsZombie)
 				continue;
 
-			MESSAGE_BEGIN(MSG_ALL, gmsgHostagePos, NULL, entity->pev);
+			MESSAGE_BEGIN(MSG_ALL, gmsgHostagePos, nullptr, player->pev);
 			WRITE_BYTE(1);
 			WRITE_BYTE(sb->m_iSupplyboxIndex);
 			WRITE_COORD(sb->pev->origin.x);
@@ -170,7 +168,7 @@ void CMod_ZombieMod2::RemoveAllSupplybox()
 	CBaseEntity *ent = nullptr;
 	while ((ent = UTIL_FindEntityByClassname(ent, "supplybox")) != nullptr)
 	{
-		CSupplyBox *sb = static_cast<CSupplyBox *>(ent);
+		CSupplyBox *sb = dynamic_ent_cast<CSupplyBox *>(ent);
 		sb->pev->effects |= EF_NODRAW;
 		sb->pev->flags |= FL_KILLME;
 		sb->SendPositionMsg();
@@ -180,24 +178,16 @@ void CMod_ZombieMod2::RemoveAllSupplybox()
 
 CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
 {
-	edict_t *pent = CREATE_NAMED_ENTITY(MAKE_STRING("supplybox"));
+	auto supplybox = CreateClassPtr<CSupplyBox>();
 
-	if (FNullEnt(pent))
-	{
-		ALERT(at_console, "NULL Ent in CreateSupplybox()!\n");
-		return nullptr;
-	}
+	Vector backup_v_angle = supplybox->pev->v_angle;
+	CSDM_DoRandomSpawn(supplybox);
+	supplybox->pev->v_angle = backup_v_angle;
 
-	CBaseEntity *monster = CBaseEntity::Instance(pent);
+	supplybox->pev->spawnflags |= SF_NORESPAWN;
 
-	Vector backup_v_angle = monster->pev->v_angle;
-	CSDM_DoRandomSpawn(monster);
-	monster->pev->v_angle = backup_v_angle;
-
-	pent->v.spawnflags |= SF_NORESPAWN;
-
-	DispatchSpawn(pent);
-	return static_cast<CSupplyBox *>(monster);
+	DispatchSpawn(supplybox->edict());
+	return supplybox;
 }
 
 void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
@@ -212,13 +202,13 @@ void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 }
 
 CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieMod2 *mp)
-	:	CPlayerModStrategy_ZB1(player, mp), 
-		m_pModZB2(mp), 
+	:	CPlayerModStrategy_ZB1(player, mp),
 		m_eventListeners {
 			mp->m_eventInfection.subscribe(&CPlayerModStrategy_ZB2::Event_OnInfection, this),
 			mp->m_eventAdjustDamage.subscribe([this](CBasePlayer *attacker, float &out){ return this->Event_AdjustHumanDamage(attacker, out); }),
 			mp->m_eventAdjustHitgroup.subscribe([this](CBasePlayer *attacker, HitBoxGroup &out) { return this->Event_AdjustHumanHitgroup(attacker, out); })
-		} 
+		} ,
+		m_pModZB2(mp)
 {}
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
@@ -288,7 +278,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 	// cannot recover during using zombie skill.
 	const float flRecoverValue = m_pCharacter_ZB2->HealthRecoveryAmount();
-	if (!flRecoverValue)
+	if (flRecoverValue <= 0.0f)
 		return;
 
 	if (gpGlobals->time > m_flTimeNextZombieHealthRecovery)
@@ -302,7 +292,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 			// effects
 			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
 
-			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 			WRITE_BYTE(ZB2_MESSAGE_HEALTH_RECOVERY);
 			MESSAGE_END();
 		}
@@ -311,7 +301,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	auto sp = std::make_shared<CZombieClass_Default>(m_pPlayer, iEvolutionLevel);
+	auto sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, "random");
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
 
@@ -337,6 +327,9 @@ void CPlayerModStrategy_ZB2::Event_OnInfection(CBasePlayer *victim, CBasePlayer 
 	if (m_pPlayer != attacker)
 		return;
 
+	if (victim == attacker)
+		return;
+
 	m_iZombieInfections++;
 
 	CheckEvolution();
@@ -350,7 +343,7 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, flo
 	{
 		// using knife 2x?
 		if (m_pPlayer->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
-			flDamage *= 10.0f;
+			flDamage *= 2.0f;
 	}
 }
 
@@ -386,7 +379,7 @@ void CPlayerModStrategy_ZB2::UpdatePlayerEvolutionHUD()
 
 	if (iCount)
 	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, NULL, m_pPlayer->pev);
+		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, nullptr, m_pPlayer->pev);
 		WRITE_BYTE(1);
 		WRITE_STRING(buf);
 		WRITE_BYTE(0);
@@ -394,7 +387,7 @@ void CPlayerModStrategy_ZB2::UpdatePlayerEvolutionHUD()
 	}
 	else
 	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, NULL, m_pPlayer->pev);
+		MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, nullptr, m_pPlayer->pev);
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}

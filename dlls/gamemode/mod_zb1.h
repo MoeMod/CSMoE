@@ -84,6 +84,8 @@ public:
 	void OnResetMaxSpeed() override { m_pCharacter->ResetMaxSpeed(); return CPlayerModStrategy_Zombie::OnResetMaxSpeed(); }
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return m_pCharacter->ApplyKnockback(attacker, data); }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void Pain(int m_LastHitGroup, bool HasArmour) override;
+	void DeathSound() override;
 
 private:
 	void Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel);

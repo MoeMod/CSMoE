@@ -28,7 +28,7 @@ void CPlayerModStrategy_Default::CheckBuyZone()
 		return;
 	CBasePlayer *player = m_pPlayer;
 
-	const char *pszSpawnClass = NULL;
+	const char *pszSpawnClass = nullptr;
 
 	if (player->m_iTeam == TERRORIST)
 		pszSpawnClass = "info_player_deathmatch";
@@ -36,10 +36,10 @@ void CPlayerModStrategy_Default::CheckBuyZone()
 	else if (player->m_iTeam == CT)
 		pszSpawnClass = "info_player_start";
 
-	if (pszSpawnClass != NULL)
+	if (pszSpawnClass != nullptr)
 	{
-		CBaseEntity *pSpot = NULL;
-		while ((pSpot = UTIL_FindEntityByClassname(pSpot, pszSpawnClass)) != NULL)
+		CBaseEntity *pSpot = nullptr;
+		while ((pSpot = UTIL_FindEntityByClassname(pSpot, pszSpawnClass)) != nullptr)
 		{
 			if ((pSpot->pev->origin - player->pev->origin).Length() < 200.0f)
 				player->m_signals.Signal(SIGNAL_BUY);
@@ -116,7 +116,7 @@ bool CPlayerModStrategy_Default::CanPlayerBuy(bool display)
 
 void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	int temp = RANDOM_LONG(0, 2);
+	auto temp = RANDOM_LONG(0, 2);
 
 	if (m_LastHitGroup == HITGROUP_HEAD)
 	{
@@ -162,6 +162,7 @@ void CPlayerModStrategy_Default::DeathSound()
 	case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
 	case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
 	case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
+	default:break;
 	}
 }
 
@@ -193,35 +194,14 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 
 void CPlayerModStrategy_Zombie::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if (m_pPlayer->m_bIsZombie)
-		return Pain_Zombie(m_LastHitGroup, HasArmour);
 	CPlayerModStrategy_Default::Pain(m_LastHitGroup, HasArmour);
 }
 
-void CPlayerModStrategy_Zombie::DeathSound_Zombie()
-{
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 2))
-	{
-		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
-	}
-}
-
-void CPlayerModStrategy_Zombie::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
-{
-	switch (RANDOM_LONG(0, 1))
-	{
-		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
-	}
-}
 void CPlayerModStrategy_Zombie::DeathSound()
 {
-	if (m_pPlayer->m_bIsZombie)
-		return DeathSound_Zombie();
 	CPlayerModStrategy_Default::DeathSound();
 }
+
 float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
 	// grenade damage 5x in zb mode

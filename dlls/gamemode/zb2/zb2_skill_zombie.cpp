@@ -31,73 +31,6 @@ void ZombieSkill_Precache()
 	PRECACHE_SOUND("zombi/zombi_pre_idle_2.wav");
 }
 
-void CBaseZombieClass_ZB2::InitHUD() const
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	MESSAGE_END();
-}
-
-void CZombieClass_Default::InitHUD() const
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	MESSAGE_END();
-}
-
-void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
-{
-	if (m_pZombieSkill && which == SKILL_SLOT_1)
-		m_pZombieSkill->Activate();
-}
-
-void CBaseZombieClass_ZB2::Think()
-{
-	if (m_pZombieSkill)
-		m_pZombieSkill->Think();
-	return CZombie_ZB1::Think();
-}
-
-void CBaseZombieClass_ZB2::ResetMaxSpeed() const
-{
-	CZombie_ZB1::ResetMaxSpeed();
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed(); // cans replace result of CZombie_ZB1::ResetMaxSpeed()
-}
-
-bool CBaseZombieClass_ZB2::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
-{
-	// TODO : knockback adjustment by skill
-	return CZombie_ZB1::ApplyKnockback(attacker, kbd);
-}
-
-float CBaseZombieClass_ZB2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
-{
-	if (m_pZombieSkill)
-		flDamage *= m_pZombieSkill->GetDamageRatio();
-	return CZombie_ZB1::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-}
-
-ZombieSkillStatus CBaseZombieClass_ZB2::GetSkillStatus(ZombieSkillSlot which) const
-{
-	return m_pZombieSkill && which == SKILL_SLOT_1 ? m_pZombieSkill->GetStatus() : SKILL_STATUS_USED;
-}
-
-float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
-{
-	return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
-}
-
-CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;
-
-CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel lv) : CBaseZombieClass_ZB2(player, lv)
-{
-	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
-}
-
-
 void CZombieSkill_Base::Think()
 {
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEnd)
@@ -179,8 +112,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	WRITE_SHORT(GetDurationTime());
-	WRITE_SHORT(GetCooldownTime());
+	WRITE_SHORT(static_cast<int>(GetDurationTime()));
+	WRITE_SHORT(static_cast<int>(GetCooldownTime()));
 	MESSAGE_END();
 }
 
@@ -218,7 +151,7 @@ float CZombieSkill_ZombieCrazy::GetDurationTime() const
 
 float CZombieSkill_ZombieCrazy::GetCooldownTime() const
 {
-	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 10.0f : 10.0f;
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 15.0f : 10.0f;
 }
 
 float CZombieSkill_ZombieCrazy::GetDamageRatio() const

@@ -71,6 +71,27 @@ void CZombie_ZB1::ResetMaxSpeed() const
 	m_pPlayer->pev->maxspeed = 290;
 }
 
+void CZombie_ZB1::DeathSound_Zombie()
+{
+	// temporarily using pain sounds for death sounds
+	switch (RANDOM_LONG(1, 2))
+	{
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
+		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+		default:break;
+	}
+}
+
+void CZombie_ZB1::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
+{
+	switch (RANDOM_LONG(0, 1))
+	{
+		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
+		default:break;
+	}
+}
+
 void PlayerZombie_Precache()
 {
 	PRECACHE_SOUND("zombi/zombi_death_1.wav");

@@ -27,7 +27,8 @@ public:
 	virtual void ResetMaxSpeed() const = 0;
 	virtual bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) = 0;
 	virtual float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const = 0;
-
+	virtual void Pain_Zombie(int m_LastHitGroup, bool HasArmour) = 0;
+	virtual void DeathSound_Zombie() = 0;
 	// activation on constructor in order to RAII
 };
 
@@ -39,6 +40,8 @@ public:
 	void ResetMaxSpeed() const override {}
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override { return false;}
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override { return flDamage; }
+	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override {}
+	void DeathSound_Zombie() override {}
 };
 
 class CZombie_ZB1 : public BasePlayerExtra, public IZombieModeCharacter
@@ -49,6 +52,8 @@ public:
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override { ApplyKnockbackData(m_pPlayer, m_pPlayer->pev->origin - attacker->pev->origin, data); return true; }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override { return flDamage; }
 	void ResetMaxSpeed() const override;
+	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
+	void DeathSound_Zombie() override;
 };
 
 #endif //PROJECT_ZB1_ZCLASS_H

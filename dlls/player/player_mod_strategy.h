@@ -85,13 +85,7 @@ public:
 	void GiveDefaultItems() override;
 };
 
-class IPlayerModStrategyExtra_Zombie
-{
-	virtual void Pain_Zombie(int m_LastHitGroup, bool HasArmour) = 0;
-	virtual void DeathSound_Zombie() = 0;
-};
-
-class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default, public IPlayerModStrategyExtra_Zombie
+class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default
 {
 public:
 	explicit CPlayerModStrategy_Zombie(CBasePlayer *p) : CPlayerModStrategy_Default(p) {}
@@ -102,9 +96,6 @@ public:
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void GiveDefaultItems() override;
 
-public:
-	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
-	void DeathSound_Zombie() override;
 };
 
 #endif

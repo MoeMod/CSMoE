@@ -66,10 +66,10 @@ void CMod_Zombi::CheckMapConditions()
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
 {
-	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, NULL, pPlayer->edict());
+	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, nullptr, pPlayer->edict());
 	WRITE_BYTE(MOD_ZB1);
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
-	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
+	WRITE_BYTE(static_cast<int>(maxrounds.value)); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 
 	MESSAGE_END();
@@ -94,7 +94,7 @@ void CMod_Zombi::Think()
 	//IBaseMod::Think();
 
 	static int iLastCountDown = -1;
-	int iCountDown = gpGlobals->time - m_fRoundCount;
+	int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
 
 	if (iCountDown != iLastCountDown)
 	{
@@ -244,11 +244,8 @@ void CMod_Zombi::CheckWinConditions()
 
 BOOL CMod_Zombi::FInfectionStarted()
 {
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 20)
-		return false;
-
-	return true;
+	const int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
+	return iCountDown > 20;
 }
 
 void CMod_Zombi::RoundEndScore(int iWinStatus)
@@ -324,10 +321,7 @@ bool CPlayerModStrategy_ZB1::CanPlayerBuy(bool display)
 	if (m_pPlayer->pev->deadflag != DEAD_NO)
 		return false;
 
-	if (m_pPlayer->m_bIsZombie)
-		return false;
-
-	return true;
+	return !m_pPlayer->m_bIsZombie;
 }
 
 int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax)
@@ -379,16 +373,30 @@ float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars
 	return CPlayerModStrategy_Zombie::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
+void CPlayerModStrategy_ZB1::Pain(int m_LastHitGroup, bool HasArmour)
+{
+	if(m_pPlayer->m_bIsZombie)
+		return m_pCharacter->Pain_Zombie(m_LastHitGroup, HasArmour);
+	return CPlayerModStrategy_Zombie::Pain(m_LastHitGroup, HasArmour);
+}
+
+void CPlayerModStrategy_ZB1::DeathSound()
+{
+	if(m_pPlayer->m_bIsZombie)
+		return m_pCharacter->DeathSound_Zombie();
+	return CPlayerModStrategy_Zombie::DeathSound();
+}
+
 size_t CMod_Zombi::ZombieOriginNum()
 {
 	moe::range::PlayersList list;
-	return std::distance(list.begin(), list.end()) / 10 + 1;
+	return static_cast<size_t>(std::distance(list.begin(), list.end()) / 10 + 1);
 }
 
 void CMod_Zombi::PickZombieOrigin()
 {
-	int iNumZombies = ZombieOriginNum();
-	int iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
 
 	// build alive player list
 	moe::range::PlayersList list;
@@ -399,10 +407,10 @@ void CMod_Zombi::PickZombieOrigin()
 	std::shuffle(players.begin(), players.end(), std::random_device());
 
 	// pick them
-	for (int i = 0; i < iNumZombies; ++i)
+	for (size_t i = 0; i < iNumZombies; ++i)
 	{
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
-		players[i]->pev->health = players[i]->pev->max_health = 1000 * iNumPlayers / iNumZombies + 1000;
+		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
 	}
 
@@ -495,12 +503,12 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 		iReturn = TRUE;
 	}
 
-	if (pAttacker->IsPlayer())
+	CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
+	if (pAttackerPlayer)
 	{
-		CBasePlayer *pAttacker2 = static_cast<CBasePlayer *>(pAttacker);
-		if (pAttacker2->m_bIsZombie && !pPlayer->m_bIsZombie)
+		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
-			HumanInfectionByZombie(pPlayer, pAttacker2);
+			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}
 	}

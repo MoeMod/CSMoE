@@ -40,6 +40,9 @@ public:
 	void ResetMaxSpeed() const override;
 	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
 
+	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override {}
+	void DeathSound_Zombie() override {}
+
 protected:
 	class impl_t;
 	const std::unique_ptr<impl_t> pimpl;
@@ -65,15 +68,10 @@ protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;
 };
 
-class CZombieClass_Default : public CBaseZombieClass_ZB2
-{
-public:
-	explicit CZombieClass_Default(CBasePlayer *player, ZombieLevel lv);
-	void InitHUD() const override;
-};
-
 void ZombieSkill_Precache();
 void HumanSkill_Precache();
+
+std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name = nullptr);
 
 
 #endif //PROJECT_ZCLASS_H
