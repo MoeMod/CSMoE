@@ -212,7 +212,6 @@ LOCAL_SRC_FILES := \
 	./gamemode/mod_zb2.cpp \
 	./gamemode/zb2/supplybox.cpp \
 	./bot/cs_bot_bhopjump.cpp \
-	./player/player_zombie_skill.cpp \
 	./player/player_account.cpp \
 	./player/player_mod_strategy.cpp \
 	./weapons_data.cpp \
@@ -239,5 +238,15 @@ LOCAL_SRC_FILES := \
 	./gamemode/zbs/monster_manager.cpp \
 	./wpn_shared/wpn_gungnir.cpp \
 	./wpn_shared/wpn_mg3.cpp \
+	./wpn_shared/wpn_mp7a1c.cpp \
+	./wpn_shared/wpn_mp7a1p.cpp \
+	./wpn_shared/wpn_infinitys.cpp \
+	./gamemode/mod_gd.cpp \
+	./gamemode/zb2/zb2_skill_human.cpp \
+	./gamemode/zb2/zb2_skill_zombie.cpp \
+	./gamemode/zb2/zb2_zclass.cpp \
+	./gamemode/zb2/zb2_zclass_tank.cpp \
+	./gamemode/zb2/zb2_zclass_speed.cpp \
+
 
 include $(BUILD_SHARED_LIBRARY)

@@ -119,6 +119,7 @@ LOCAL_SRC_FILES := \
 	./hud/zb3/zb3.cpp \
 	./hud/zb3/zb3_rage.cpp \
 	./hud/zb3/zb3_morale.cpp \
+	./hud/moe/moe_touch.cpp \
 	./com_weapons.cpp \
 	./cs_wpn/cs_baseentity.cpp \
 	./cs_wpn/cs_weapons.cpp \
@@ -173,6 +174,9 @@ LOCAL_SRC_FILES := \
 	../dlls/wpn_shared/knife_skullaxe.cpp \
 	../dlls/wpn_shared/wpn_gungnir.cpp \
 	../dlls/wpn_shared/wpn_mg3.cpp \
+	../dlls/wpn_shared/wpn_mp7a1c.cpp \
+	../dlls/wpn_shared/wpn_mp7a1p.cpp \
+	../dlls/wpn_shared/infinitys.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -223,6 +227,10 @@ LOCAL_SRC_FILES := \
 	./events/event_xm8c.cpp \
 	./events/event_xm8s.cpp \
 	./events/event_mg3.cpp \
+	./events/event_mp7a1c.cpp \
+	./events/event_mp7a1p.cpp \
+	./events/event_svdex.cpp \
+	./events/event_infinitys.cpp \
 	./ev_common.cpp \
 	./calcscreen.cpp \
 	
