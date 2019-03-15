@@ -15,23 +15,18 @@ GNU General Public License for more details.
 
 #pragma once
 
-class CHudZB2 : public CHudBase
+#include "hud_sub_crtp.h"
+
+class CHudZB2 : public THudSubPimplCRTP<CHudZB2>
 {
 public:
-	int Init(void) override;
-	int VidInit(void) override;
-	int Draw(float time) override;
-	void Think(void) override;
-	void Reset(void) override;
-	void InitHUDData(void) override;		// called every time a server is connected to
-	void Shutdown(void) override;
+	int Init() override;
+	int VidInit() override;
 
 public:
 	bool ActivateSkill(int iSlot);
-
 	CHudMsgFunc(ZB2Msg);
 
-protected:
-	class impl_t;
-	impl_t *pimpl;
+public:
+	class CHudZB2_impl_t *pimpl = nullptr;
 };

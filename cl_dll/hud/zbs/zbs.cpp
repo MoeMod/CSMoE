@@ -1,3 +1,18 @@
+/*
+zbs.cpp - CSMoE Client HUD : Zombie Scenerio
+Copyright (C) 2019 Moemod Yanase
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "hud.h"
 #include "followicon.h"
 #include "cl_util.h"
@@ -5,6 +20,8 @@
 #include "triangleapi.h"
 
 #include "parsemsg.h"
+
+#include "hud_sub_impl.h"
 
 #include "zbs.h"
 #include "zbs_level.h"

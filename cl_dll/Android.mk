@@ -233,6 +233,7 @@ LOCAL_SRC_FILES := \
 	./events/event_infinitys.cpp \
 	./ev_common.cpp \
 	./calcscreen.cpp \
+	./input_touch.cpp \
 	
 
 include $(BUILD_SHARED_LIBRARY)

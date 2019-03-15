@@ -1,22 +1,17 @@
-/***
-*
-*	Copyright (c) 1999, Valve LLC. All rights reserved.
-*
-*	This product contains software technology licensed from Id
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
-*	All Rights Reserved.
-*
-*   Use, distribution, and modification of this source code and/or resulting
-*   object code is restricted to non-commercial enhancements to products from
-*   Valve LLC.  All other use, distribution, or modification is prohibited
-*   without written permission from Valve LLC.
-*
-****/
-//
-// Scoreboard.cpp
-//
-// implementation of CHudScoreboard class
-//
+/*
+Scoreboard.cpp - CSMoE Client HUD : Scoreboard
+Copyright (C) 2019 Moemod Yanase
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "hud.h"
 #include "cl_util.h"
@@ -28,6 +23,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "draw_util.h"
+
+#include "hud_sub_impl.h"
 
 #include "legacy/hud_scoreboard_legacy.h"
 

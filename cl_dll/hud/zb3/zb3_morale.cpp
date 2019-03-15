@@ -66,7 +66,7 @@ int CHudZB3Morale::Draw(float time)
 		std::tie(r, g, b, a) = std::make_tuple(250, 229, 0, 255);
 	else if (iMorale < 10)
 		std::tie(r, g, b, a) = std::make_tuple(243, 127, 1, 255);
-	else if (iMorale = 10)
+	else if (iMorale == 10)
 		std::tie(r, g, b, a) = std::make_tuple(255, 3, 0, 255);
 	else if (iMorale > 10)
 		std::tie(r, g, b, a) = std::make_tuple(127, 40, 208, 255);

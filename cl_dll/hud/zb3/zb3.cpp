@@ -21,6 +21,8 @@ GNU General Public License for more details.
 
 #include "parsemsg.h"
 
+#include "hud_sub_impl.h"
+
 #include "zb3.h"
 #include "zb3_morale.h"
 #include "zb3_rage.h"
