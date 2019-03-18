@@ -51,8 +51,6 @@ template<class Final>
 class THudSubPimplGenerator
 {
 public:
-	THudSubPimplGenerator() = delete;
-	~THudSubPimplGenerator() = delete;
 	friend int Init_impl(Final *pthis)
 	{
 		pthis->pimpl = new typename std::decay<decltype(*pthis->pimpl)>::type();
@@ -66,6 +64,28 @@ public:
 	friend void Reset_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::Reset); }
 	friend void InitHUDData_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::InitHUDData); }
 	friend void Shutdown_impl(Final *pthis) { delete pthis->pimpl; pthis->pimpl = nullptr; }
+
+private:
+	// !!! force msvc external linkage
+	THudSubPimplGenerator() = delete;
+	virtual ~THudSubPimplGenerator()
+	{
+		int Init_impl(Final *pthis);
+		int VidInit_impl(Final *pthis);
+		int Draw_impl(Final *pthis, float time);
+		void Think_impl(Final *pthis);
+		void Reset_impl(Final *pthis);
+		void InitHUDData_impl(Final *pthis);
+		void Shutdown_impl(Final *pthis);
+
+		Init_impl(nullptr);
+		VidInit_impl(nullptr);
+		Draw_impl(nullptr, 0.0f);
+		Think_impl(nullptr);
+		Reset_impl(nullptr);
+		InitHUDData_impl(nullptr);
+		Shutdown_impl(nullptr);
+	}
 };
 
 // usage:

@@ -27,6 +27,8 @@ GNU General Public License for more details.
 #include <vector>
 #include <algorithm>
 
+constexpr float POSITION_SWITCH_DURATION = 1.0f;
+
 class CHudMoeTouch::impl_t
 {
 public:
@@ -37,6 +39,7 @@ public:
 	float m_flLastDx = -1;
 	float m_flLastDy = -1;
 	float m_flStartY = -1;
+	float m_flMinX = -1;
 
 	float m_flX = -1;
 	float m_flY = -1;
@@ -46,14 +49,30 @@ public:
 	int m_iActiveSlot = 0;
 	int m_iLastSlot = -1;
 
-	std::map<std::string, UniqueTexture> m_weaponTexture;
-
 	void ResetValues()
 	{
-		m_flLastX = m_flLastY = m_flX = m_flY = m_flStartY = -1;
+		m_flLastY = m_flY = m_flStartY = -1;
+		m_flLastX = m_flX = m_flMinX = 1;
 		m_flLastDx = m_flLastDy = m_flDx = m_flDy = 0;
+		m_flSwitchPositionJudgeStartTime = 0;
+		//std::fill(std::begin(m_flLastSwitchPosition), std::end(m_flLastSwitchPosition), 0.0f);
 	}
 
+	static constexpr size_t SLOT_COUNT_WEAPON = MAX_WEAPON_SLOTS;
+	static constexpr size_t SLOT_COUNT_SKILL = 4;
+
+	int m_iWeaponSlotSelectedPosition[MAX_WEAPON_SLOTS] = {};
+	float m_flSwitchPositionJudgeStartTime = 0.0f;
+	//float m_flLastSwitchPosition[MAX_WEAPON_SLOTS] = {};
+
+	int WeaponCountInSlot(int slot) const
+	{
+		int result = 0;
+		for (int i = 0; i < MAX_WEAPON_POSITIONS; ++i)
+			if (gWR.GetWeaponSlot(slot, i))
+				++result;
+		return result;
+	}
 };
 
 int CHudMoeTouch::Init(void)
@@ -69,39 +88,31 @@ int CHudMoeTouch::Init(void)
 
 int CHudMoeTouch::VidInit(void)
 {
-	
+
 	return 1;
 }
-
-// ammo.cpp
-extern WEAPON *gpActiveSel;	// NULL means off, 1 means just the menu bar, otherwise
-						// this points to the active weapon menu item
-extern WEAPON *gpLastSel;		// Last weapon menu selection 
 
 int CHudMoeTouch::Draw(float time)
 {
 	if (!pimpl->m_bActive)
 		return 0;
-
+	
 	const int x = ScreenWidth * pimpl->m_flX;
 	const int y = ScreenHeight * pimpl->m_flStartY;
-	const float scale = ScreenHeight / 480.0f;
-	//int w = ScreenWidth - x;
-	//int h = 250;
+	const float scale = 1;
 
 	int r, g, b;
-	//gEngfuncs.pfnFillRGBA(x, y, w, h, 255, 255, 255, 255);
 
 	const int iActiveSlot = pimpl->m_iActiveSlot;
 
 	// Draw all of the buckets
 	int y2 = y - iActiveSlot * 45 * scale;
 
-	for (size_t i = 0; i < MAX_WEAPON_SLOTS; i++)
+	for (int iSlot = 0; iSlot < MAX_WEAPON_SLOTS; iSlot++)
 	{
 		// If this is the active slot, draw the bigger pictures,
 		// otherwise just draw boxes
-		WEAPON *p = gWR.GetFirstPos(i);
+		WEAPON *p = gWR.GetFirstPos(iSlot);
 		int iWidth = 175 * scale;
 		int iHeight = 45 * scale;
 		if (p)
@@ -111,12 +122,26 @@ int CHudMoeTouch::Draw(float time)
 		}
 		
 		int x2 = x;
-		if (i == iActiveSlot)
-			x2 -= 45;
 
-		for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
+		bool bFirstPosition = true;
+		const int giBucketWeight = 20;
+		const int giBucketHeight = 20;
+
+		const int iBoundaryX = ScreenWidth - iWidth;
+		if (x < iBoundaryX)
 		{
-			p = gWR.GetWeaponSlot(i, iPos);
+			const float extraDistance = iBoundaryX - x;
+			x2 = iBoundaryX - log10(1 + extraDistance / ScreenWidth) * ScreenWidth;
+		}
+		if (iActiveSlot == iSlot)
+			x2 -= giBucketWeight;
+
+		for (int j = 0; j < MAX_WEAPON_POSITIONS; ++j)
+		{
+			const int iSelectedPosition = pimpl->m_iWeaponSlotSelectedPosition[iSlot];
+			int iPos = (iSelectedPosition + j) % MAX_WEAPON_POSITIONS;
+
+			p = gWR.GetWeaponSlot(iSlot, iPos);
 
 			if (!p || !p->iId)
 				continue;
@@ -135,19 +160,41 @@ int CHudMoeTouch::Draw(float time)
 
 			rect_s rc = p->rcActive;
 
-			if (iActiveSlot == i)
+			int x3 = x2;
+			int a = 255;
+			if (iActiveSlot == iSlot && pimpl->m_flSwitchPositionJudgeStartTime > 0.0f)
 			{
-				SPR_Set(gHUD.GetSprite(gHUD.m_Ammo.m_HUD_selection), r, g, b);
-				SPR_DrawAdditive(0, x2, y2, &gHUD.GetSpriteRect(gHUD.m_Ammo.m_HUD_selection));
+				const float percent = (gHUD.m_flTime - pimpl->m_flSwitchPositionJudgeStartTime) / POSITION_SWITCH_DURATION;
+				x3 -= percent * iWidth;
+				if (bFirstPosition)
+					a = 255 * (1 - percent) * (1 - percent);
 			}
 
-			SPR_Set(p->hInactive, r, g, b);
-			SPR_DrawAdditive(0, x2, y2, &p->rcInactive);
+			if (iActiveSlot == iSlot && bFirstPosition)
+			{
+				bFirstPosition = false;
+				DrawUtils::UnpackRGB(r, g, b, RGB_YELLOWISH);
+				SPR_Set(gHUD.GetSprite(gHUD.m_Ammo.m_HUD_bucket0 + iSlot), r, g, b);
+				SPR_DrawAdditive(0, x2, y2 - giBucketHeight, &gHUD.GetSpriteRect(gHUD.m_Ammo.m_HUD_bucket0 + iSlot));
+
+				DrawUtils::UnpackRGB(r, g, b, RGB_YELLOWISH);
+				SPR_Set(gHUD.GetSprite(gHUD.m_Ammo.m_HUD_selection), r, g, b);
+				SPR_DrawAdditive(0, x2, y2, &gHUD.GetSpriteRect(gHUD.m_Ammo.m_HUD_selection));
+
+				DrawUtils::UnpackRGB(r, g, b, RGB_YELLOWISH);
+				DrawUtils::ScaleColors(r, g, b, a);
+				SPR_Set(p->hInactive, r, g, b);
+				SPR_DrawAdditive(0, x3, y2, &p->rcInactive);
+			}
+			else
+			{
+				SPR_Set(p->hInactive, r, g, b);
+				SPR_DrawAdditive(0, x3, y2, &p->rcInactive);
+			}
 
 			x2 += iWidth + 5 * scale;
 		}
 
-		
 		y2 += iHeight + 5 * scale;
 	}
 
@@ -162,16 +209,52 @@ void CHudMoeTouch::Think(void)
 	if (pimpl->m_fingerID)
 	{
 		pimpl->m_flX = pimpl->m_flLastX;
-		pimpl->m_flY = pimpl->m_flLastY;
 		pimpl->m_flDx = pimpl->m_flLastDx;
+		pimpl->m_flY = pimpl->m_flLastY;
 		pimpl->m_flDy = pimpl->m_flLastDy;
 
-		const float scale = ScreenHeight / 480.0f;
-		const float flHeight = 45 * scale * gHUD.m_flScale;
+		const float scale = 1;
+		const float flWidth = 170 * scale;
+		const float flHeight = 45 * scale;
+
+		pimpl->m_flMinX = pimpl->m_flX;
+
+		if (pimpl->m_flX < (ScreenWidth - flWidth) / ScreenWidth)
+		{
+			const int iWeaponCount = pimpl->WeaponCountInSlot(pimpl->m_iActiveSlot);
+			if (iWeaponCount > 1 && gHUD.m_flTime > pimpl->m_flSwitchPositionJudgeStartTime + POSITION_SWITCH_DURATION)
+			{
+				// pull and hold to start switching position
+				pimpl->m_flSwitchPositionJudgeStartTime = gHUD.m_flTime;
+
+				// find next pos
+				for (int j = 0; j < MAX_WEAPON_POSITIONS; ++j)
+				{
+					int iPos = (pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] + j + 1) % MAX_WEAPON_POSITIONS;
+					if (gWR.GetWeaponSlot(pimpl->m_iActiveSlot, iPos))
+					{
+						pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] = iPos;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			pimpl->m_flSwitchPositionJudgeStartTime = -1.0f;
+		}
+
+		
 		//const int iCurrentSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : 0;
 		const int iCurrentSlot = pimpl->m_iLastSlot;
 		const int Result = (pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot;
-		pimpl->m_iActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
+		const int NewActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
+
+		if (pimpl->m_iActiveSlot != NewActiveSlot)
+		{
+			pimpl->m_flSwitchPositionJudgeStartTime = -1.0f;
+			pimpl->m_iActiveSlot = NewActiveSlot;
+		}
 	}
 	else
 	{
@@ -180,6 +263,8 @@ void CHudMoeTouch::Think(void)
 
 		// make reversed x motion ->
 		pimpl->m_flDx += (2 - pimpl->m_flX) * 0.005;
+
+		pimpl->m_flMinX = std::min(pimpl->m_flMinX, pimpl->m_flX);
 
 		// slow down dy
 		if (std::abs(pimpl->m_flDy) < 0.1)
@@ -192,8 +277,22 @@ void CHudMoeTouch::Think(void)
 		// end
 		if (pimpl->m_flX > 1)
 			pimpl->m_bActive = false;
-	}
 
+		if (pimpl->m_flMinX * ScreenWidth < (ScreenWidth - 170) && pimpl->m_flDx > 0.0f)
+		{
+			const int iPrevSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : pimpl->m_iActiveSlot;
+			if (pimpl->m_iActiveSlot != iPrevSlot)
+				pimpl->m_iLastSlot = iPrevSlot;
+
+			//WEAPON *p = gWR.GetFirstPos(pimpl->m_iActiveSlot);
+			int iSlot = pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] - 1;
+			if (pimpl->m_flSwitchPositionJudgeStartTime > 0.0f && gHUD.m_flTime > pimpl->m_flSwitchPositionJudgeStartTime + POSITION_SWITCH_DURATION / 2)
+				iSlot += 1;
+			WEAPON *p = gWR.GetNextActivePos(pimpl->m_iActiveSlot, iSlot);
+			if (p)
+				ServerCmd(p->szName);
+		}
+	}
 }
 
 void CHudMoeTouch::Reset(void)
@@ -228,18 +327,6 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 			}
 			else if (type == event_up)
 			{
-				/*if (pimpl->m_flLastX < 0.8)
-				{
-					gEngfuncs.pfnClientCmd("lastinv");
-				}*/
-
-				const int iPrevSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : pimpl->m_iActiveSlot;
-				if(pimpl->m_iActiveSlot != iPrevSlot)
-					pimpl->m_iLastSlot = iPrevSlot;
-
-				WEAPON *p = gWR.GetFirstPos(pimpl->m_iActiveSlot);
-				if(p)
-					ServerCmd(p->szName);
 				pimpl->m_fingerID = 0;
 			}
 			return 1;
@@ -254,6 +341,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 				pimpl->m_fingerID = fingerID;
 				pimpl->m_bActive = true;
 				pimpl->ResetValues();
+				pimpl->m_flMinX = 1;
 				pimpl->m_flStartY = y;
 
 				return 1;

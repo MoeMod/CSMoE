@@ -640,6 +640,15 @@
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_zombie.cpp">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_tank.cpp">
+      <Filter>dlls\gamemode\zb2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass.cpp">
+      <Filter>dlls\gamemode\zb2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_speed.cpp">
+      <Filter>dlls\gamemode\zb2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
