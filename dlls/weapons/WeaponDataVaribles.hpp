@@ -18,8 +18,8 @@ GNU General Public License for more details.
 namespace WeaponTemplate {
 	namespace Varibles
 	{
-		static constexpr const auto &A = ExpressionBuilder::VaribleType<'A'>{};
-		static constexpr const auto &T = ExpressionBuilder::VaribleType<'T'>{};
-		static constexpr const auto &N = ExpressionBuilder::VaribleType<'N'>{};
+		constexpr auto A = ExpressionBuilder::VaribleType<'A'>{};
+		constexpr auto T = ExpressionBuilder::VaribleType<'T'>{};
+		constexpr auto N = ExpressionBuilder::VaribleType<'N'>{};
 	}
 }

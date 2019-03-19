@@ -37,56 +37,14 @@ namespace detail
 	struct IsUnique<First, Second, Args...> : std::integral_constant<bool,
 		!TypeExists<First, Second, Args...>::value && IsUnique<First, Args...>::value && IsUnique<Second, Args...>::value
 	> {};
+	
+	template<class T, class First, class...Tail>
+	struct FindElementId : std::integral_constant<size_t, FindElementId<T, Tail...>::value + 1> {};
+	template<class T, class...Tail>
+	struct FindElementId<T, T, Tail...> : std::integral_constant<size_t, 0> {};
 }
 
-template<class T, class First, class...Tail>
-struct FindElementId : std::integral_constant<size_t, FindElementId<T, Tail...>::value + 1> {};
-template<class T, class...Tail>
-struct FindElementId<T, T, Tail...> : std::integral_constant<size_t, 0> {};
 
-// usage :
-// template class THudSubPimplGenerator<CHudZB2>;
-// in hud_zb2.cpp
-template<class Final>
-class THudSubPimplGenerator
-{
-public:
-	friend int Init_impl(Final *pthis)
-	{
-		pthis->pimpl = new typename std::decay<decltype(*pthis->pimpl)>::type();
-		gHUD.AddHudElem(pthis);
-		pthis->m_iFlags |= HUD_ACTIVE;
-		return 1;
-	}
-	friend int VidInit_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::VidInit), 1; }
-	friend int Draw_impl(Final *pthis, float time) { return pthis->pimpl->for_each(&IBaseHudSub::Draw, time), 1; }
-	friend void Think_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::Think); }
-	friend void Reset_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::Reset); }
-	friend void InitHUDData_impl(Final *pthis) { return pthis->pimpl->for_each(&IBaseHudSub::InitHUDData); }
-	friend void Shutdown_impl(Final *pthis) { delete pthis->pimpl; pthis->pimpl = nullptr; }
-
-private:
-	// !!! force msvc external linkage
-	THudSubPimplGenerator() = delete;
-	virtual ~THudSubPimplGenerator()
-	{
-		int Init_impl(Final *pthis);
-		int VidInit_impl(Final *pthis);
-		int Draw_impl(Final *pthis, float time);
-		void Think_impl(Final *pthis);
-		void Reset_impl(Final *pthis);
-		void InitHUDData_impl(Final *pthis);
-		void Shutdown_impl(Final *pthis);
-
-		Init_impl(nullptr);
-		VidInit_impl(nullptr);
-		Draw_impl(nullptr, 0.0f);
-		Think_impl(nullptr);
-		Reset_impl(nullptr);
-		InitHUDData_impl(nullptr);
-		Shutdown_impl(nullptr);
-	}
-};
 
 // usage:
 // class CHudZB2::impl_t : public THudSubDispatcher<...> {...};
@@ -102,7 +60,7 @@ public:
 	template<class T>
 	T &get() noexcept
 	{
-		return std::get<FindElementId<T, Elements...>::value>(t);
+		return std::get<detail::FindElementId<T, Elements...>::value>(t);
 	}
 	template<class F, class...Args>
 	void for_each(F IBaseHudSub::*f, Args &&...args)

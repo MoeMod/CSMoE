@@ -17,7 +17,8 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		CBase::m_pPlayer->pev->punchangle = CBase::m_pPlayer->pev->punchangle + wpn.RecoilPunchAngleDelta;
-
+		CBase::m_pPlayer->pev->punchangle[0] += wpn.RecoilPunchAngleDelta[0];
+		CBase::m_pPlayer->pev->punchangle[1] += wpn.RecoilPunchAngleDelta[1];
+		CBase::m_pPlayer->pev->punchangle[2] += wpn.RecoilPunchAngleDelta[2];
 	}
 };

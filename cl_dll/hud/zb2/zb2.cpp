@@ -37,7 +37,6 @@ public:
 	SharedTexture m_pTexture_DamageDoubleRetina;
 	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 };
-template class THudSubPimplGenerator<CHudZB2>;
 
 DECLARE_MESSAGE(m_ZB2, ZB2Msg)
 int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
@@ -92,7 +91,9 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 
 int CHudZB2::Init()
 {
-	Base::Init();
+	pimpl = new CHudZB2_impl_t;
+
+	gHUD.AddHudElem(this);
 
 	HOOK_MESSAGE(ZB2Msg);
 
@@ -101,12 +102,39 @@ int CHudZB2::Init()
 
 int CHudZB2::VidInit()
 {
-	Base::VidInit();
+	pimpl->for_each(&IBaseHudSub::VidInit);
 
 	R_InitTexture(pimpl->m_pTexture_RageRetina, "resource/zombi/zombicrazy");
 	R_InitTexture(pimpl->m_pTexture_SprintRetina, "resource/zombi/zombispeedup");
 	R_InitTexture(pimpl->m_pTexture_DamageDoubleRetina, "resource/zombi/damagedouble");
 	return 1;
+}
+
+int CHudZB2::Draw(float time)
+{
+	pimpl->for_each(&IBaseHudSub::Draw, time);
+	return 1;
+}
+
+void CHudZB2::Think()
+{
+	pimpl->for_each(&IBaseHudSub::Think);
+}
+
+void CHudZB2::Reset()
+{
+	pimpl->for_each(&IBaseHudSub::Reset);
+}
+
+void CHudZB2::InitHUDData()
+{
+	pimpl->for_each(&IBaseHudSub::InitHUDData);
+}
+
+void CHudZB2::Shutdown()
+{
+	delete pimpl;
+	pimpl = nullptr;
 }
 
 bool CHudZB2::ActivateSkill(int iSlot)

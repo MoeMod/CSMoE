@@ -27,7 +27,7 @@ GNU General Public License for more details.
 #include <vector>
 #include <algorithm>
 
-constexpr float POSITION_SWITCH_DURATION = 1.0f;
+constexpr float POSITION_SWITCH_ANIM = 0.25f;
 
 class CHudMoeTouch::impl_t
 {
@@ -54,7 +54,9 @@ public:
 		m_flLastY = m_flY = m_flStartY = -1;
 		m_flLastX = m_flX = m_flMinX = 1;
 		m_flLastDx = m_flLastDy = m_flDx = m_flDy = 0;
-		m_flSwitchPositionJudgeStartTime = 0;
+		std::fill(std::begin(m_flSwitchPositionJudgeStartTime), std::end(m_flSwitchPositionJudgeStartTime), 0.0f);
+		std::fill(std::begin(m_flSwitchPositionJudgeAction), std::end(m_flSwitchPositionJudgeAction), false);
+
 		//std::fill(std::begin(m_flLastSwitchPosition), std::end(m_flLastSwitchPosition), 0.0f);
 	}
 
@@ -62,7 +64,8 @@ public:
 	static constexpr size_t SLOT_COUNT_SKILL = 4;
 
 	int m_iWeaponSlotSelectedPosition[MAX_WEAPON_SLOTS] = {};
-	float m_flSwitchPositionJudgeStartTime = 0.0f;
+	float m_flSwitchPositionJudgeStartTime[MAX_WEAPON_SLOTS] = {};
+	bool m_flSwitchPositionJudgeAction[MAX_WEAPON_SLOTS] = {};
 	//float m_flLastSwitchPosition[MAX_WEAPON_SLOTS] = {};
 
 	int WeaponCountInSlot(int slot) const
@@ -138,8 +141,7 @@ int CHudMoeTouch::Draw(float time)
 
 		for (int j = 0; j < MAX_WEAPON_POSITIONS; ++j)
 		{
-			const int iSelectedPosition = pimpl->m_iWeaponSlotSelectedPosition[iSlot];
-			int iPos = (iSelectedPosition + j) % MAX_WEAPON_POSITIONS;
+			const int iPos = (pimpl->m_iWeaponSlotSelectedPosition[iSlot] + j) % MAX_WEAPON_POSITIONS;
 
 			p = gWR.GetWeaponSlot(iSlot, iPos);
 
@@ -162,9 +164,9 @@ int CHudMoeTouch::Draw(float time)
 
 			int x3 = x2;
 			int a = 255;
-			if (iActiveSlot == iSlot && pimpl->m_flSwitchPositionJudgeStartTime > 0.0f)
+			if (iActiveSlot == iSlot && pimpl->m_flSwitchPositionJudgeStartTime[iSlot] > 0.0f)
 			{
-				const float percent = (gHUD.m_flTime - pimpl->m_flSwitchPositionJudgeStartTime) / POSITION_SWITCH_DURATION;
+				const float percent = std::min((gHUD.m_flTime - pimpl->m_flSwitchPositionJudgeStartTime[iSlot]) / POSITION_SWITCH_ANIM, 1.0f);
 				x3 -= percent * iWidth;
 				if (bFirstPosition)
 					a = 255 * (1 - percent) * (1 - percent);
@@ -219,32 +221,6 @@ void CHudMoeTouch::Think(void)
 
 		pimpl->m_flMinX = pimpl->m_flX;
 
-		if (pimpl->m_flX < (ScreenWidth - flWidth) / ScreenWidth)
-		{
-			const int iWeaponCount = pimpl->WeaponCountInSlot(pimpl->m_iActiveSlot);
-			if (iWeaponCount > 1 && gHUD.m_flTime > pimpl->m_flSwitchPositionJudgeStartTime + POSITION_SWITCH_DURATION)
-			{
-				// pull and hold to start switching position
-				pimpl->m_flSwitchPositionJudgeStartTime = gHUD.m_flTime;
-
-				// find next pos
-				for (int j = 0; j < MAX_WEAPON_POSITIONS; ++j)
-				{
-					int iPos = (pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] + j + 1) % MAX_WEAPON_POSITIONS;
-					if (gWR.GetWeaponSlot(pimpl->m_iActiveSlot, iPos))
-					{
-						pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] = iPos;
-						break;
-					}
-				}
-			}
-		}
-		else
-		{
-			pimpl->m_flSwitchPositionJudgeStartTime = -1.0f;
-		}
-
-		
 		//const int iCurrentSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : 0;
 		const int iCurrentSlot = pimpl->m_iLastSlot;
 		const int Result = (pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot;
@@ -252,8 +228,44 @@ void CHudMoeTouch::Think(void)
 
 		if (pimpl->m_iActiveSlot != NewActiveSlot)
 		{
-			pimpl->m_flSwitchPositionJudgeStartTime = -1.0f;
+			pimpl->m_flSwitchPositionJudgeStartTime[NewActiveSlot] = -1.0f;
 			pimpl->m_iActiveSlot = NewActiveSlot;
+		}
+
+		
+		if (pimpl->m_flX < (ScreenWidth - flWidth * 2) / ScreenWidth)
+		{
+			const int iSlot = pimpl->m_iActiveSlot;
+			const int iWeaponCount = pimpl->WeaponCountInSlot(iSlot);
+			if (iWeaponCount > 1 && !pimpl->m_flSwitchPositionJudgeAction[iSlot])
+			{
+				// pull and hold to start switching position
+				pimpl->m_flSwitchPositionJudgeAction[iSlot] = true;
+				pimpl->m_flSwitchPositionJudgeStartTime[iSlot] = gHUD.m_flTime;
+
+			}
+
+			// find next slot
+			if (pimpl->m_flSwitchPositionJudgeStartTime[iSlot] > 0.0f && gHUD.m_flTime > pimpl->m_flSwitchPositionJudgeStartTime[iSlot] + POSITION_SWITCH_ANIM)
+			{
+				pimpl->m_flSwitchPositionJudgeStartTime[iSlot] = -1.0f;
+				for (int j = 0; j < MAX_WEAPON_POSITIONS; ++j)
+				{
+					const int iPos = (pimpl->m_iWeaponSlotSelectedPosition[iSlot] + j + 1) % MAX_WEAPON_POSITIONS;
+					if (gWR.GetWeaponSlot(iSlot, iPos))
+					{
+						pimpl->m_iWeaponSlotSelectedPosition[iSlot] = iPos;
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			for (int iSlot = 0; iSlot < MAX_WEAPON_SLOTS; ++iSlot)
+			{
+				pimpl->m_flSwitchPositionJudgeAction[iSlot] = false;
+			}
 		}
 	}
 	else
@@ -285,10 +297,17 @@ void CHudMoeTouch::Think(void)
 				pimpl->m_iLastSlot = iPrevSlot;
 
 			//WEAPON *p = gWR.GetFirstPos(pimpl->m_iActiveSlot);
-			int iSlot = pimpl->m_iWeaponSlotSelectedPosition[pimpl->m_iActiveSlot] - 1;
-			if (pimpl->m_flSwitchPositionJudgeStartTime > 0.0f && gHUD.m_flTime > pimpl->m_flSwitchPositionJudgeStartTime + POSITION_SWITCH_DURATION / 2)
-				iSlot += 1;
-			WEAPON *p = gWR.GetNextActivePos(pimpl->m_iActiveSlot, iSlot);
+			const int iSlot = pimpl->m_iActiveSlot;
+			int iPos = pimpl->m_iWeaponSlotSelectedPosition[iSlot] - 1;
+			if (pimpl->m_flSwitchPositionJudgeStartTime[iSlot] > 0.0f)
+				iPos += 1;
+			WEAPON *p = gWR.GetNextActivePos(iSlot, iPos);
+			if (!p)
+			{
+				p = gWR.GetFirstPos(iSlot);
+				pimpl->m_iWeaponSlotSelectedPosition[iSlot] = 0;
+			}
+				
 			if (p)
 				ServerCmd(p->szName);
 		}

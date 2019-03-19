@@ -216,7 +216,7 @@ LOCAL_SRC_FILES := \
 	./player/player_mod_strategy.cpp \
 	./weapons_data.cpp \
 	./weapons_msg.cpp \
-	./wpn_shared/wpn_knife_zombi.cpp \
+	./wpn_shared/knife_zombi.cpp \
 	./wpn_shared/wpn_ak47l.cpp \
 	./wpn_shared/wpn_mp7a1d.cpp \
 	./wpn_shared/wpn_deagled.cpp \

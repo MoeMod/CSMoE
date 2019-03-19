@@ -26,7 +26,7 @@ GNU General Public License for more details.
 #include <string>
 
 constexpr int MAX_LEVEL = 18;
-constexpr int KILL_NUMS[MAX_LEVEL] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 2, 3, 3, 3, 3};
+constexpr int KILL_NUMS[MAX_LEVEL] = { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 2, 3, 3, 3, 3 };
 constexpr const char *DEFAULT_WEAPONS[MAX_LEVEL][2] = {
 		{"weapon_m4a1","weapon_ak47"},
 		{"weapon_sg550","weapon_g3sg1"},
@@ -58,14 +58,14 @@ public:
 
 	void OnKillEnemy()
 	{
-		if(m_iLevel >= MAX_LEVEL)
+		if (m_iLevel >= MAX_LEVEL)
 		{
 			GiveGreande();
 			return;
 		}
 
 		--m_iKillsRemaining;
-		if(!m_iKillsRemaining)
+		if (!m_iKillsRemaining)
 		{
 			++m_iLevel;
 			m_iKillsRemaining = KillRemainingForCurrentLevel();
@@ -102,9 +102,11 @@ public:
 
 		if (m_iKillsRemaining)
 		{
+			char buffer[64];
+			sprintf(buffer, "hostage%d", m_iKillsRemaining);
 			MESSAGE_BEGIN(MSG_ONE, gmsgScenarioIcon, nullptr, m_pPlayer->pev);
 			WRITE_BYTE(1);
-			WRITE_STRING((std::string("hostage") + std::to_string(m_iKillsRemaining)).c_str());
+			WRITE_STRING(buffer);
 			WRITE_BYTE(0);
 			MESSAGE_END();
 		}
@@ -117,7 +119,7 @@ public:
 	}
 
 protected:
-	constexpr int KillRemainingForCurrentLevel() const { return KILL_NUMS[m_iLevel]; }
+	int KillRemainingForCurrentLevel() const { return KILL_NUMS[m_iLevel]; }
 
 private:
 	int m_iLevel;
@@ -128,17 +130,17 @@ class CMod_GunDeath::PlayerModStrategy : public CPlayerModStrategy_Default
 {
 public:
 	explicit PlayerModStrategy(CBasePlayer *player, CMod_GunDeath *pGD)
-		:   CPlayerModStrategy_Default(player),
-			mp(pGD),
-			lv(player),
-			m_eventPlayerKilledListener(pGD->m_eventPlayerKilled.subscribe(&PlayerModStrategy::Event_OnPlayerKilled, this))
-		{}
+		: CPlayerModStrategy_Default(player),
+		mp(pGD),
+		lv(player),
+		m_eventPlayerKilledListener(pGD->m_eventPlayerKilled.subscribe(&PlayerModStrategy::Event_OnPlayerKilled, this))
+	{}
 	bool CanPlayerBuy(bool display) override { return false; }
 	bool CanDropWeapon(const char *pszItemName) override { return false; }
 	void CheckBuyZone() override { /* */ }
 	void Event_OnPlayerKilled(CBasePlayer *pVictim, CBasePlayer *pKiller, entvars_t *pInflictor)
 	{
-		if(pKiller != m_pPlayer)
+		if (pKiller != m_pPlayer)
 			return;
 		lv.OnKillEnemy();
 	}
@@ -167,7 +169,7 @@ void CMod_GunDeath::InstallPlayerModStrategy(CBasePlayer *player)
 void CMod_GunDeath::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
 {
 	CBasePlayer *pKillerPlayer = dynamic_ent_cast<CBasePlayer *>(pKiller);
-	if(pKillerPlayer)
+	if (pKillerPlayer)
 		m_eventPlayerKilled.dispatch(pVictim, pKillerPlayer, pInflictor);
 	CMod_TeamDeathMatch::PlayerKilled(pVictim, pKiller, pInflictor);
 }
