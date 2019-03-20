@@ -32,7 +32,7 @@ constexpr float POSITION_SWITCH_ANIM = 0.25f;
 class CHudMoeTouch::impl_t
 {
 public:
-	int m_fingerID = 0;
+	int m_fingerID = -1;
 	bool m_bActive = false;
 	float m_flLastX = -1;
 	float m_flLastY = -1;
@@ -208,7 +208,7 @@ void CHudMoeTouch::Think(void)
 	if (!pimpl->m_bActive)
 		return;
 
-	if (pimpl->m_fingerID)
+	if (pimpl->m_fingerID >= 0)
 	{
 		pimpl->m_flX = pimpl->m_flLastX;
 		pimpl->m_flDx = pimpl->m_flLastDx;
@@ -223,15 +223,19 @@ void CHudMoeTouch::Think(void)
 
 		//const int iCurrentSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : 0;
 		const int iCurrentSlot = pimpl->m_iLastSlot;
-		const int Result = (pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot;
-		const int NewActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
 
-		if (pimpl->m_iActiveSlot != NewActiveSlot)
+		// switching slot ?
+		if(pimpl->m_flDy >= pimpl->m_flDx / 4)
 		{
-			pimpl->m_flSwitchPositionJudgeStartTime[NewActiveSlot] = -1.0f;
-			pimpl->m_iActiveSlot = NewActiveSlot;
-		}
+			const int Result = static_cast<int>((pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot);
+			const int NewActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
 
+			if (pimpl->m_iActiveSlot != NewActiveSlot)
+			{
+				pimpl->m_flSwitchPositionJudgeStartTime[NewActiveSlot] = -1.0f;
+				pimpl->m_iActiveSlot = NewActiveSlot;
+			}
+		}
 		
 		if (pimpl->m_flX < (ScreenWidth - flWidth * 2) / ScreenWidth)
 		{
@@ -332,7 +336,7 @@ void CHudMoeTouch::Shutdown(void)
 
 int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy)
 {
-	if (pimpl->m_fingerID)
+	if (pimpl->m_fingerID >= 0)
 	{
 		if (fingerID == pimpl->m_fingerID)
 		{
@@ -346,7 +350,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 			}
 			else if (type == event_up)
 			{
-				pimpl->m_fingerID = 0;
+				pimpl->m_fingerID = -1;
 			}
 			return 1;
 		}
@@ -363,7 +367,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 				pimpl->m_flMinX = 1;
 				pimpl->m_flStartY = y;
 
-				return 1;
+				//return 1;
 			}
 		}
 	}
