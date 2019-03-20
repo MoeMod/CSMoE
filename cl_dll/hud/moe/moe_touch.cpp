@@ -225,7 +225,7 @@ void CHudMoeTouch::Think(void)
 		const int iCurrentSlot = pimpl->m_iLastSlot;
 
 		// switching slot ?
-		if(pimpl->m_flDy >= pimpl->m_flDx / 4)
+		if(pimpl->m_flDy >= pimpl->m_flDx / 2)
 		{
 			const int Result = static_cast<int>((pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot);
 			const int NewActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
@@ -359,7 +359,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 	{
 		if (type == event_down)
 		{
-			if (x > 0.95f)
+			if (x > 0.95f && dy <= dx / 2.0f && dx > 0.0f)
 			{
 				pimpl->m_fingerID = fingerID;
 				pimpl->m_bActive = true;
@@ -367,7 +367,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 				pimpl->m_flMinX = 1;
 				pimpl->m_flStartY = y;
 
-				//return 1;
+				return 1;
 			}
 		}
 	}
