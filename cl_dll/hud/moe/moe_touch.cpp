@@ -225,7 +225,7 @@ void CHudMoeTouch::Think(void)
 		const int iCurrentSlot = pimpl->m_iLastSlot;
 
 		// switching slot ?
-		if(pimpl->m_flDy >= pimpl->m_flDx / 2)
+		if(pimpl->m_flX < 0.95 && abs(pimpl->m_flDy) >= abs(pimpl->m_flDx) / 4)
 		{
 			const int Result = static_cast<int>((pimpl->m_flY - pimpl->m_flStartY) * ScreenHeight / flHeight + iCurrentSlot);
 			const int NewActiveSlot = std::min(std::max(Result, 0), MAX_WEAPON_SLOTS - 1);
@@ -297,8 +297,6 @@ void CHudMoeTouch::Think(void)
 		if (pimpl->m_flMinX * ScreenWidth < (ScreenWidth - 170) && pimpl->m_flDx > 0.0f)
 		{
 			const int iPrevSlot = gHUD.m_Ammo.m_pWeapon ? gHUD.m_Ammo.m_pWeapon->iSlot : pimpl->m_iActiveSlot;
-			if (pimpl->m_iActiveSlot != iPrevSlot)
-				pimpl->m_iLastSlot = iPrevSlot;
 
 			//WEAPON *p = gWR.GetFirstPos(pimpl->m_iActiveSlot);
 			const int iSlot = pimpl->m_iActiveSlot;
@@ -313,7 +311,11 @@ void CHudMoeTouch::Think(void)
 			}
 				
 			if (p)
+			{
 				ServerCmd(p->szName);
+				if (pimpl->m_iActiveSlot != iPrevSlot)
+					pimpl->m_iLastSlot = iPrevSlot;
+			}
 		}
 	}
 }
@@ -359,7 +361,7 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 	{
 		if (type == event_down)
 		{
-			if (x > 0.95f && dy <= dx / 2.0f && dx > 0.0f)
+			if (x > 0.95f && abs(dy) <= -dx / 2.0f)
 			{
 				pimpl->m_fingerID = fingerID;
 				pimpl->m_bActive = true;
