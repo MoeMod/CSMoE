@@ -145,8 +145,9 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/snd_opensles.c
 )
 
-set(XASH_ENGINE_MACOS_SOURCES
+set(XASH_ENGINE_APPLE_SOURCES
    platform/macos/TouchBar.mm
+   platform/iOS/TapicEngine.mm
 )
 
 set(XASH_ENGINE_CLIENT_SOURCES
@@ -213,7 +214,7 @@ if(ANDROID)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_ANDROID_SOURCES})
 endif()
 if(APPLE)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_MACOS_SOURCES})
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_APPLE_SOURCES})
 endif()
 if(NOT XASH_DEDICATED)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_CLIENT_SOURCES})
@@ -358,7 +359,7 @@ else()
 endif()
 
 if(APPLE)
-	target_link_libraries(${XASH_ENGINE} "-framework AppKit")
+	target_link_libraries(${XASH_ENGINE} "-framework AppKit -framework AudioToolBox")
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
