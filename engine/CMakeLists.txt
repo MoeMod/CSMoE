@@ -145,6 +145,10 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/snd_opensles.c
 )
 
+set(XASH_ENGINE_MACOS_SOURCES
+   platform/macos/TouchBar.mm
+)
+
 set(XASH_ENGINE_CLIENT_SOURCES
    client/cl_cmds.c
    client/cl_demo.c
@@ -207,6 +211,9 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_SDL_SOURCES})
 endif()
 if(ANDROID)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_ANDROID_SOURCES})
+endif()
+if(APPLE)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_MACOS_SOURCES})
 endif()
 if(NOT XASH_DEDICATED)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_CLIENT_SOURCES})
@@ -348,6 +355,10 @@ if(XASH_LIBDL)
 	target_link_libraries(${XASH_ENGINE} ${CMAKE_DL_LIBS})
 else()
 	add_definitions(-DNO_LIBDL)
+endif()
+
+if(APPLE)
+	target_link_libraries(${XASH_ENGINE} "-framework AppKit")
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

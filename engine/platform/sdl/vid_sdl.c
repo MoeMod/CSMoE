@@ -23,6 +23,10 @@ GNU General Public License for more details.
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+#include "platform/macos/TouchBar.h"
+#endif
+
 typedef enum
 {
 	rserr_ok,
@@ -316,6 +320,15 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 
 	SDL_GL_GetDrawableSize( host.hWnd, &width, &height );
 	R_ChangeDisplaySettingsFast( width, height );
+
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+	SDL_SysWMinfo wminfo;
+	if( SDL_GetWindowWMInfo( host.hWnd, &wminfo ) )
+	{
+		NSWindow *nswin = wminfo.info.cocoa.window;
+		InstallTouchBar(nswin);
+	}
+#endif
 
 	return true;
 }
