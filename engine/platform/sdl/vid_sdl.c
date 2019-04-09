@@ -322,12 +322,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	R_ChangeDisplaySettingsFast( width, height );
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
-	SDL_SysWMinfo wminfo;
-	if( SDL_GetWindowWMInfo( host.hWnd, &wminfo ) )
-	{
-		NSWindow *nswin = wminfo.info.cocoa.window;
-		InstallTouchBar(nswin);
-	}
+	TouchBar_Install();
 #endif
 
 	return true;
