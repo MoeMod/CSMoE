@@ -33,6 +33,7 @@ static NSTouchBarItemIdentifier MouseSensitivityItemIdentifier = @"com.csmoe.Mou
 static NSTouchBarItemIdentifier MouseSensitivitySliderItemIdentifier = @"com.csmoe.MouseSensitivitySliderItemIdentifier";
 static NSTouchBarItemIdentifier MouseZoomSensitivityRatioSliderItemIdentifier = @"com.csmoe.MouseZoomSensitivityRatioSliderItemIdentifier";
 static NSTouchBarItemIdentifier MouseFilterButtonItemIdentifier = @"com.csmoe.MouseFilterButtonItemIdentifier";
+static NSTouchBarItemIdentifier CrosshairGroupItemIdentifier = @"com.csmoe.CrosshairGroupItemIdentifier";
 static NSTouchBarItemIdentifier CrosshairTypeItemIdentifier = @"com.csmoe.CrosshairTypeItemIdentifier";
 static NSTouchBarItemIdentifier CustomizeItemIdentifier = @"com.csmoe.CustomizeItemIdentifier";
 static NSTouchBarItemIdentifier CrosshairTypeScrubberItemIdentifier = @"com.csmoe.CrosshairTypeScrubberItemIdentifier";
@@ -140,8 +141,9 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	bar.defaultItemIdentifiers = @[
 	//		NSTouchBarItemIdentifierCharacterPicker,
 			MouseSensitivityItemIdentifier,
-			CrosshairTypeItemIdentifier,
-			CrosshairColorPickerItemIdentifier,
+			NSTouchBarItemIdentifierFixedSpaceSmall,
+			CrosshairGroupItemIdentifier,
+			NSTouchBarItemIdentifierFlexibleSpace,
 			CustomizeItemIdentifier
     //      Button1Identifier,
     //      Button2Identifier,
@@ -159,15 +161,15 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	// Create touch bar items as NSCustomTouchBarItems which can contain any NSView.
 	if ([identifier isEqualToString:MouseSensitivityItemIdentifier]) {
 		NSPopoverTouchBarItem *item = [[NSPopoverTouchBarItem alloc] initWithIdentifier:identifier];
-		item.collapsedRepresentationLabel = @"Mouse";
-		item.showsCloseButton = YES;
+		item.collapsedRepresentationLabel = @"<🖱>";
 		//NSImage *img = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericPreferencesIcon)];
 		//item.collapsedRepresentationImage = [NSImage imageNamed:NSImageNameTouchBarRewindTemplate];
 		//item.collapsedRepresentationImage = [[NSImage alloc] initByReferencingFile:@"/System/Library/PreferencePanes/Mouse.prefPane/Contents/Resources/Mouse.icns"];
 
+
 		NSTouchBar *secondaryTouchBar = [[NSTouchBar alloc] init];
 		secondaryTouchBar.delegate = self;
-		secondaryTouchBar.defaultItemIdentifiers = @[MouseSensitivitySliderItemIdentifier, MouseZoomSensitivityRatioSliderItemIdentifier, MouseFilterButtonItemIdentifier];
+		secondaryTouchBar.defaultItemIdentifiers = @[MouseSensitivitySliderItemIdentifier, MouseZoomSensitivityRatioSliderItemIdentifier];
 
 		NSTouchBar *secondaryTouchBar2 = [[NSTouchBar alloc] init];
 		secondaryTouchBar2.delegate = self;
@@ -214,10 +216,23 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 		item.view =  self.touchBarButtonMouseFilter;
 		return item;
 	}
+	else if ([identifier isEqualToString:CrosshairGroupItemIdentifier]) {
+		NSGroupTouchBarItem *item = [[NSGroupTouchBarItem alloc] initWithIdentifier:identifier];
+
+		NSTouchBar *secondaryTouchBar = [[NSTouchBar alloc] init];
+		secondaryTouchBar.delegate = self;
+		secondaryTouchBar.defaultItemIdentifiers = @[CrosshairTypeItemIdentifier,
+		                                             CrosshairColorPickerItemIdentifier];
+
+		item.groupTouchBar = secondaryTouchBar;
+
+		return item;
+	}
 	else if ([identifier isEqualToString:CrosshairTypeItemIdentifier]) {
 		NSPopoverTouchBarItem *item = [[NSPopoverTouchBarItem alloc] initWithIdentifier:identifier];
 
-		item.collapsedRepresentationLabel = @"Crosshair";
+		//item.collapsedRepresentationLabel = @"Crosshair Type";
+		item.collapsedRepresentationImage = [NSImage imageNamed:NSImageNameTouchBarRecordStartTemplate];
 
 		NSTouchBar *secondaryTouchBar = [[NSTouchBar alloc] init];
 		secondaryTouchBar.delegate = self;
@@ -233,7 +248,9 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 		return item;
 	}
 	else if ([identifier isEqualToString:CrosshairColorPickerItemIdentifier]) {
-		self.touchBarCrosshairColor = [NSColorPickerTouchBarItem strokeColorPickerWithIdentifier:identifier];
+		NSColorPickerTouchBarItem *item = [NSColorPickerTouchBarItem strokeColorPickerWithIdentifier:identifier];
+
+		self.touchBarCrosshairColor = item;
 
 		self.touchBarCrosshairColor.action = @selector(crosshairColorClicked);
 		self.touchBarCrosshairColor.allowedColorSpaces = @[ [NSColorSpace sRGBColorSpace]];
@@ -247,7 +264,8 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	}
 	else if ([identifier isEqualToString:CustomizeItemIdentifier]) {
 		NSPopoverTouchBarItem *item = [[NSPopoverTouchBarItem alloc] initWithIdentifier:identifier];
-		item.collapsedRepresentationLabel = @"Customize";
+		//item.collapsedRepresentationLabel = @"Customize";
+		item.collapsedRepresentationImage = [NSImage imageNamed:NSImageNameTouchBarUserTemplate];
 
 		NSTouchBar *secondaryTouchBar = [[NSTouchBar alloc] init];
 		secondaryTouchBar.delegate = self;
@@ -357,7 +375,7 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 
 		NSImage *img = [NSImage imageNamed:NSImageNameTouchBarSidebarTemplate];
 		button.image = img;
-		button.imageHugsTitle = true;
+		button.imageHugsTitle = false;
 		item.view =  button;
 		return item;
 	}
