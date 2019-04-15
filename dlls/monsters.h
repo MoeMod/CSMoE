@@ -70,8 +70,9 @@ BOOL FBoxVisible(entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTargetOr
 class CGib : public CBaseEntity
 {
 public:
+	using CBaseEntity::Spawn;
 	void Spawn(const char *szGibModel);
-	int ObjectCaps(void) { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
+	int ObjectCaps(void) override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
 
 public:
 	void EXPORT BounceGibTouch(CBaseEntity *pOther);

@@ -14,7 +14,8 @@
 class CXM8SharpShooter : public LinkWeaponTemplate<CXM8SharpShooter,
 		TReloadDefault,
 		TSecondaryAttackSniperZoom1,
-		TWeaponIdleDefault
+		TWeaponIdleDefault,
+		BuildTGetItemInfoFromCSW<WEAPON_SG550>::template type
 		>
 {
 private:
@@ -38,6 +39,7 @@ private:
 
 
 public:
+	static constexpr auto ClassName = "weapon_xm8s";
 	static constexpr auto MaxClip = 30;
 	static constexpr auto DefaultReloadTime = 3.2;
 	static constexpr auto DefaultAccuracy = 0.2;
@@ -51,23 +53,21 @@ public:
 	};
 
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL Deploy();
-	virtual float GetMaxSpeed();
-	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
-	virtual void PrimaryAttack();
-	virtual BOOL UseDecrement()
-	{
+	void Spawn() override;
+	void Precache() override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override;
+	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	void PrimaryAttack() override;
+	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
 #else
 		return FALSE;
 #endif
 	}
-	virtual KnockbackData GetKnockBackData() override { return { 450.0f, 400.0f, 400.0f, 200.0f, 0.5f }; }
-	virtual const char *GetCSModelName() override { return "models/w_xm8.mdl"; }
+	KnockbackData GetKnockBackData() override { return { 450.0f, 400.0f, 400.0f, 200.0f, 0.5f }; }
+	const char *GetCSModelName() override { return "models/w_xm8.mdl"; }
 
 #ifndef CLIENT_DLL
 	virtual void ItemPostFrame() override;

@@ -3906,6 +3906,14 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			}
 		}
 	}
+	if ( name[0] == '$' )
+	{
+		if ( name[1] == '0' && name[2] == 'b' )
+		{
+			ptexture->flags |= STUDIO_NF_ADDITIVE;
+			ptexture->flags |= STUDIO_NF_FULLBRIGHT;
+		}
+	}
 
 	if( !load_external )
 	{

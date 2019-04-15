@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 project (SERVER)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 if (APPLE)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -163,18 +163,24 @@ set(HLDLL_SRCS
 	./gamemode/mod_zb2.cpp
 	./gamemode/zb2/supplybox.cpp
 	./bot/cs_bot_bhopjump.cpp
-	./player/player_zombie_skill.cpp
 	./weapons_data.cpp
 	./weapons_msg.cpp
 	./player/player_mod_strategy.cpp
 	./gamemode/zbs/monster_manager.cpp
 	./player/player_account.cpp
 	./cbase/cbase_memory.cpp
-	./gamemode/zbs/npc_group.cpp
+	./gamemode/mod_zb3.cpp
+	./gamemode/mod_gd.cpp
+	./gamemode/zb2/zb2_skill_human.cpp
+	./gamemode/zb2/zb2_skill_zombie.cpp
+	./gamemode/zb2/zb2_zclass.cpp
+	./gamemode/zb2/zb2_zclass_tank.cpp
+	./gamemode/zb2/zb2_zclass_speed.cpp
 	)
 
 file (GLOB HLWPN_SRCS
 	./wpn_shared/wpn_*.cpp
+	./wpn_shared/knife_*.cpp
 	)
 
 set(PM_SRCS

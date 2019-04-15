@@ -76,6 +76,7 @@ float GetArmorRatioModifier(WeaponIdType iGunType)
 	case WEAPON_SG552:	flRatio *= 1.4; break;
 	case WEAPON_GALIL:
 	case WEAPON_AK47:	flRatio *= 1.55; break;
+	default:            break;
 	}
 	return flRatio;
 }

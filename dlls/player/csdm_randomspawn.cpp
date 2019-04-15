@@ -114,7 +114,11 @@ void CSDM_LoadSpawnPoints()
 	{
 		std::array<float, 9> arr;
 		std::istringstream ss(linedata.second);
-		std::copy_n(std::istream_iterator<float>(ss), 9, std::begin(arr));
+		for(int i=0;i<9;++i)
+		{
+			if(ss)
+				ss>>arr[i];
+		}
 		g_vecSpawnCSDM.emplace_back(MakeSpawnPointData(arr));
 	}
 }

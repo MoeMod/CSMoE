@@ -13,26 +13,25 @@
 class CDEAGLE : public CBasePlayerWeapon
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL Deploy();
-	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
-	virtual int iItemSlot() { return PISTOL_SLOT; }
-	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
-	virtual void Reload();
-	virtual void WeaponIdle();
-	virtual BOOL UseDecrement()
-	{
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo *p) override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override { return m_fMaxSpeed; }
+	int iItemSlot() override { return PISTOL_SLOT; }
+	void PrimaryAttack() override;
+	void SecondaryAttack() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
 #else
 		return FALSE;
 #endif
 	}
-	virtual BOOL IsPistol() { return TRUE; }
-	virtual KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }
+	BOOL IsPistol() override { return TRUE; }
+	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }
 
 public:
 	void DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseSemi);

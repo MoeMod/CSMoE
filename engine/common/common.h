@@ -168,7 +168,7 @@ typedef enum
 #include "crtlib.h"
 #include "base_cmd.h"
 
-#define XASH_VERSION	"0.19.2"		// engine current version
+#define XASH_VERSION	"0.19.3"		// engine current version
 // since this fork have own version, this is just left for compability
 #define BASED_VERSION	0.98f
 
@@ -1095,6 +1095,8 @@ int S_GetCurrentStaticSounds( soundlist_t *pout, int size );
 void S_StopAllSounds( void );
 
 // gamma routines
+#define MAX_GAMMA 7.0f
+#define MIN_GAMMA 1.8f
 void BuildGammaTable( float gamma, float texGamma );
 byte TextureToTexGamma( byte b );
 byte TextureToGamma( byte b );

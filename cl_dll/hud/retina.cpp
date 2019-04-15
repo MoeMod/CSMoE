@@ -1,3 +1,18 @@
+/*
+retina.cpp - CSMoE Client HUD : Retina
+Copyright (C) 2019 Moemod Yanase
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "hud.h"
 #include "cl_util.h"
 #include "draw_util.h"
@@ -48,6 +63,9 @@ int CHudRetina::Draw(float time)
 
 void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 {
+	if (!item.pTexture)
+		return;
+
 	float a = 1.0f;
 	if (item.type & RETINA_DRAW_TYPE_BLINK)
 	{
@@ -82,7 +100,7 @@ auto CHudRetina::AddItem(SharedTexture tex, int type, float time, MagicNumber nu
 {
 	float flTimeEnd = time <= 0.0f ? time : gHUD.m_flTime + time;
 	m_ItemList.push_back({ type, tex, flTimeEnd, num });
-	return m_ItemList.size() - 1;
+	return num;
 }
 
 auto CHudRetina::AddItem(SharedTexture tex, int type, float time) -> MagicNumber

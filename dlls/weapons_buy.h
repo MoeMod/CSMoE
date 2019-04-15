@@ -142,26 +142,26 @@ enum ItemCostType
 struct AutoBuyInfoStruct
 {
 	int m_class;
-	char *m_command;
-	char *m_classname;
+	const char *m_command;
+	const char *m_classname;
 };
 
 struct WeaponAliasInfo
 {
-	char *alias;
+	const char *alias;
 	WeaponIdType id;
 };
 
 struct WeaponBuyAliasInfo
 {
-	char *alias;
+	const char *alias;
 	WeaponIdType id;
-	char *failName;
+	const char *failName;
 };
 
 struct WeaponClassAliasInfo
 {
-	char *alias;
+	const char *alias;
 	WeaponClassType id;
 };
 
@@ -174,7 +174,7 @@ struct WeaponInfoStruct
 	int gunClipSize;
 	int maxRounds;
 	int ammoType;
-	char *entityName;
+	const char *entityName;
 };
 
 struct WeaponBuyAmmoConfig

@@ -168,11 +168,11 @@ extern DLL_GLOBAL const Vector g_vecZero;
 #elif defined(_WIN32)
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
 	extern "C" EXPORT void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr(reinterpret_cast<DLLClassName *>(pev)); }
+	void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); }
 #else
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
 	extern "C" void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr(reinterpret_cast<DLLClassName *>(pev)); }
+	void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); }
 #endif
 
 typedef enum
@@ -457,7 +457,7 @@ float UTIL_Approach(float target, float value, float speed);
 float UTIL_ApproachAngle(float target, float value, float speed);
 float UTIL_AngleDistance(float next, float cur);
 float UTIL_SplineFraction(float value, float scale);
-char *UTIL_VarArgs(char *format, ...);
+char *UTIL_VarArgs(const char *format, ...);
 //NOXREF Vector UTIL_GetAimVector(edict_t *pent, float flSpeed);
 int UTIL_IsMasterTriggered(string_t sMaster, CBaseEntity *pActivator);
 BOOL UTIL_ShouldShowBlood(int color);
@@ -481,7 +481,7 @@ void UTIL_BubbleTrail(Vector from, Vector to, int count);
 void UTIL_Remove(CBaseEntity *pEntity);
 //NOXREF BOOL UTIL_IsValidEntity(edict_t *pent);
 void UTIL_PrecacheOther(const char *szClassname);
-void UTIL_LogPrintf(char *fmt, ...);
+void UTIL_LogPrintf(const char *fmt, ...);
 //NOXREF float UTIL_DotPoints(const Vector &vecSrc, const Vector &vecCheck, const Vector &vecDir);
 void UTIL_StripToken(const char *pKey, char *pDest);
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);

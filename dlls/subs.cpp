@@ -210,7 +210,7 @@ void CBaseDelay::SUB_UseTargets(CBaseEntity *pActivator, USE_TYPE useType, float
 	if (m_flDelay != 0)
 	{
 		// create a temp object to fire at a later time
-		CBaseDelay *pTemp = GetClassPtr((CBaseDelay *)NULL);
+		CBaseDelay *pTemp = CreateClassPtr<CBaseDelay>();
 		if (pTemp->pev->classname)
 		{
 			RemoveEntityHashValue(pTemp->pev, STRING(pTemp->pev->classname), CLASSNAME);
@@ -342,7 +342,7 @@ void CBaseToggle::KeyValue(KeyValueData *pkvd)
 
 void CBaseToggle::LinearMove(Vector vecDest, float flSpeed)
 {
-	assert(("LinearMove:  no speed is defined!", flSpeed != 0));
+	assert(("LinearMove:  no speed is defined!" && (flSpeed != 0)));
 	//assert(("LinearMove: no post-move function defined", m_pfnCallWhenMoveDone != NULL));
 
 	m_vecFinalDest = vecDest;
@@ -396,7 +396,7 @@ NOXREF BOOL CBaseToggle::IsLockedByMaster()
 
 void CBaseToggle::AngularMove(Vector vecDestAngle, float flSpeed)
 {
-	assert(("AngularMove:  no speed is defined!", flSpeed != 0));
+	assert("AngularMove:  no speed is defined!" && (flSpeed != 0));
 	//assert(("AngularMove: no post-move function defined", m_pfnCallWhenMoveDone != NULL));
 
 	m_vecFinalAngle = vecDestAngle;

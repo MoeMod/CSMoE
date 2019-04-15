@@ -139,7 +139,7 @@ WeaponStruct g_weaponStruct[ MAX_WEAPONS ] =
 	{ 0, 0, 0, 0, 0 }
 };
 
-char *CDeadHEV::m_szPoses[] =
+const char *CDeadHEV::m_szPoses[] =
 {
 	"deadback",
 	"deadsitting",
@@ -167,7 +167,7 @@ CBasePlayer::~CBasePlayer()
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
-	char *model;
+	const char *model;
 
 	if (m_iTeam == CT)
 	{
@@ -264,7 +264,7 @@ CBasePlayer *CBasePlayer::GetNextRadioRecipient(CBasePlayer *pStartPlayer)
 			break;
 
 		BOOL bSend = FALSE;
-		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pEntity->IsPlayer())
 		{
@@ -281,7 +281,7 @@ CBasePlayer *CBasePlayer::GetNextRadioRecipient(CBasePlayer *pStartPlayer)
 			if (iSpecMode != OBS_CHASE_LOCKED && iSpecMode != OBS_CHASE_FREE && iSpecMode != OBS_IN_EYE)
 				continue;
 
-			if (!FNullEnt(m_hObserverTarget))
+			if (!m_hObserverTarget)
 				continue;
 
 			CBasePlayer *pTarget = (CBasePlayer *)CBaseEntity::Instance(pPlayer->m_hObserverTarget->pev);
@@ -318,7 +318,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			break;
 
 		BOOL bSend = FALSE;
-		CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+		CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 		if (pPlayer == NULL)
 			continue;
@@ -343,7 +343,7 @@ void CBasePlayer::Radio(const char *msg_id, const char *msg_verbose, short pitch
 			if (iSpecMode != OBS_CHASE_LOCKED && iSpecMode != OBS_CHASE_FREE && iSpecMode != OBS_IN_EYE)
 				continue;
 
-			if (!FNullEnt(pPlayer->m_hObserverTarget))
+			if (!pPlayer->m_hObserverTarget)
 				continue;
 
 			CBasePlayer *pTarget = (CBasePlayer *)CBaseEntity::Instance(pPlayer->m_hObserverTarget->pev);
@@ -416,9 +416,6 @@ void CBasePlayer::SmartRadio()
 
 void CBasePlayer::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if (m_bIsZombie)
-		return Pain_Zombie(m_LastHitGroup, HasArmour);
-
 	return m_pModStrategy->Pain(m_LastHitGroup, HasArmour);
 }
 
@@ -461,9 +458,6 @@ int TrainSpeed(int iSpeed, int iMax)
 
 void CBasePlayer::DeathSound()
 {
-	if (m_bIsZombie)
-		return DeathSound_Zombie();
-
 	return m_pModStrategy->DeathSound();
 }
 
@@ -500,6 +494,8 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	bool bShouldSpark = false;
 	bool bShouldPunch = true;
 	bool bHitShield = IsHittingShield(vecDir, ptr);
+
+	ptr->iHitgroup = g_pModRunning->GetAdjustedTraceAttackHitgroup(this, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 
 	CBasePlayer *pAttacker = dynamic_cast<CBasePlayer *>(CBaseEntity::Instance(pevAttacker));
 
@@ -745,7 +741,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (m_bIsVIP)
 		flRatio *= 0.5;
 
-	flDamage = Zombie_AdjustDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	flDamage = m_pModStrategy->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST))
 	{
@@ -756,11 +752,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		if (bitsDamageType & DMG_EXPLOSION)
 		{
-			CBaseEntity *temp = GetClassPtr((CBaseEntity *)pevInflictor);
+			CBaseEntity *temp = GetClassPtr<CBaseEntity>(pevInflictor);
 
 			if (!Q_strcmp(STRING(temp->pev->classname), "grenade"))
 			{
-				CGrenade *pGrenade = GetClassPtr((CGrenade *)pevInflictor);
+				CGrenade *pGrenade = GetClassPtr<CGrenade>(pevInflictor);
 
 				if (CVAR_GET_FLOAT("mp_friendlyfire"))
 				{
@@ -923,11 +919,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (!IsAlive())
 		return 0;
 
-	pAttacker = GetClassPtr((CBaseEntity *)pevAttacker);
+	pAttacker = GetClassPtr<CBaseEntity>(pevAttacker);
 
 	if (pAttacker->IsPlayer())
 	{
-		pAttack = GetClassPtr((CBasePlayer *)pevAttacker);
+		pAttack = GetClassPtr<CBasePlayer>(pevAttacker);
 
 		bool bAttackFFA = !g_pGameRules->IsTeamplay();
 
@@ -951,7 +947,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					if (FNullEnt(pBasePlayer->edict()))
 						break;
 
-					CBasePlayer *basePlayer = GetClassPtr((CBasePlayer *)pBasePlayer->pev);
+					CBasePlayer *basePlayer = GetClassPtr<CBasePlayer>(pBasePlayer->pev);
 
 					if (basePlayer->m_iTeam == m_iTeam)
 					{
@@ -976,12 +972,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
 		}
 
-		if (m_bIsZombie) // Zombie Knockback...
+		if (pAttack->m_pActiveItem && Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData())) // Zombie Knockback...
 		{
-			if (pAttack->m_pActiveItem)
-			{
-				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData());
-			}
+			// already handled.
 		}
 		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
@@ -1207,42 +1200,7 @@ void CBasePlayer::PackDeadPlayerItems()
 
 void CBasePlayer::GiveDefaultItems()
 {
-	RemoveAllItems(FALSE);
-	m_bHasPrimary = false;
-
-	if (m_bIsZombie)
-	{
-		//GiveNamedItem("weapon_knife");
-		GiveNamedItem("weapon_knife_zombi");
-
-		if (!(this->m_flDisplayHistory & DHF_NIGHTVISION))
-		{
-			this->HintMessage("#Hint_use_nightvision");
-			this->m_flDisplayHistory |= DHF_NIGHTVISION;
-		}
-		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
-		m_bHasNightVision = true;
-		SendItemStatus(this);
-	}
-	else
-	{
-		switch (m_iTeam)
-		{
-		case CT:
-			GiveNamedItem("weapon_knife");
-			GiveNamedItem("weapon_usp");
-			GiveAmmo(m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
-
-			break;
-		case TERRORIST:
-			GiveNamedItem("weapon_knife");
-			GiveNamedItem("weapon_glock18");
-			GiveAmmo(40, "9mm", MAX_AMMO_9MM);
-
-			break;
-		}
-		GiveNamedItem("weapon_cannon");
-	}
+	return m_pModStrategy->GiveDefaultItems();
 }
 
 void CBasePlayer::RemoveAllItems(BOOL removeSuit)
@@ -1307,7 +1265,7 @@ void CBasePlayer::RemoveAllItems(BOOL removeSuit)
 	}
 
 	m_pActiveItem = NULL;
-	m_bHasPrimary = NULL;
+	m_bHasPrimary = false;
 
 	pev->viewmodel = 0;
 	pev->weaponmodel = 0;
@@ -1377,7 +1335,7 @@ void CBasePlayer::SetProgressBarTime(int time)
 		if (FNullEnt(pPlayer->edict()))
 			break;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->IsObserver() == OBS_IN_EYE && player->pev->iuser2 == myIndex)
 		{
@@ -1417,7 +1375,7 @@ void CBasePlayer::SetProgressBarTime2(int time, float timeElapsed)
 		if (FNullEnt(pPlayer->edict()))
 			break;
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)pPlayer->pev);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(pPlayer->pev);
 
 		if (player->IsObserver() == OBS_IN_EYE && player->pev->iuser2 == myIndex)
 		{
@@ -3108,6 +3066,8 @@ void CBasePlayer::JoiningThink()
 
 			return;
 		}
+		default:
+			break;
 	}
 
 	if (m_pIntroCamera && gpGlobals->time >= m_fIntroCamTime)
@@ -4241,7 +4201,7 @@ void CBasePlayer::CheckSuitUpdate()
 // seconds, then we won't repeat playback of this word or sentence
 // for at least that number of seconds.
 
-void CBasePlayer::SetSuitUpdate(char *name, int fgroup, int iNoRepeatTime)
+void CBasePlayer::SetSuitUpdate(const char *name, int fgroup, int iNoRepeatTime)
 {
 	;
 }
@@ -4577,7 +4537,6 @@ bool CBasePlayer::SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot
 
 void CBasePlayer::Spawn()
 {
-	int i;
 
 	m_iGaitsequence = 0;
 
@@ -4720,7 +4679,7 @@ void CBasePlayer::Spawn()
 	m_iNumSpawns++;
 	InitStatusBar();
 
-	for (i = 0; i < MAX_RECENT_PATH; ++i)
+	for (size_t i = 0; i < MAX_RECENT_PATH; ++i)
 		m_vRecentPath[ i ] = Vector(0, 0, 0);
 
 	if (m_pActiveItem != NULL && !pev->viewmodel)
@@ -4738,6 +4697,8 @@ void CBasePlayer::Spawn()
 			break;
 		case WEAPON_SG550:
 			pev->viewmodel = MAKE_STRING("models/v_sg550.mdl");
+			break;
+		default:
 			break;
 		}
 	}
@@ -4811,7 +4772,7 @@ void CBasePlayer::Spawn()
 	{
 		m_iClientHideHUD = -1;
 
-		for (i = 0; i < MAX_AMMO_SLOTS; ++i)
+		for (size_t i = 0; i < MAX_AMMO_SLOTS; ++i)
 			m_rgAmmo[i] = 0;
 
 		m_bHasPrimary = false;
@@ -4821,7 +4782,7 @@ void CBasePlayer::Spawn()
 	}
 	else
 	{
-		for (i = 0; i < MAX_AMMO_SLOTS; ++i)
+		for (size_t i = 0; i < MAX_AMMO_SLOTS; ++i)
 			m_rgAmmoLast[i] = -1;
 	}
 
@@ -4831,7 +4792,7 @@ void CBasePlayer::Spawn()
 
 	m_bNightVisionOn = false;
 
-	for (i = 1; i <= gpGlobals->maxClients; ++i)
+	for (int i = 1; i <= gpGlobals->maxClients; ++i)
 	{
 		CBasePlayer *pObserver = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
 
@@ -4922,7 +4883,7 @@ void CBasePlayer::Spawn()
 
 	sv_aim = CVAR_GET_POINTER("sv_aim");
 
-	for (i = 0; i < ARRAYSIZE(m_flLastCommandTime); ++i)
+	for (size_t i = 0; i < ARRAYSIZE(m_flLastCommandTime); ++i)
 		m_flLastCommandTime[i] = -1;
 }
 
@@ -5473,7 +5434,7 @@ void CBasePlayer::ImpulseCommands()
 			{
 				// line hit something, so paint a decal
 				m_flNextDecalTime = gpGlobals->time + CVAR_GET_FLOAT("decalfrequency");
-				CSprayCan *pCan = GetClassPtr((CSprayCan *)NULL);
+				CSprayCan *pCan = CreateClassPtr<CSprayCan>();
 				pCan->Spawn(pev);
 			}
 			break;
@@ -5615,7 +5576,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 			if (tr.flFraction != 1.0f)
 			{
 				// line hit something, so paint a decal
-				CBloodSplat *pBlood = GetClassPtr((CBloodSplat *)NULL);
+				CBloodSplat *pBlood = CreateClassPtr<CBloodSplat>();
 				pBlood->Spawn(pev);
 			}
 			break;
@@ -5865,7 +5826,7 @@ BOOL CBasePlayer::RemovePlayerItem(CBasePlayerItem *pItem)
 
 // Returns the unique ID for the ammo, or -1 if error
 
-int CBasePlayer::GiveAmmo(int iCount, char *szName, int iMax)
+int CBasePlayer::GiveAmmo(int iCount, const char *szName, int iMax)
 {
 	if (pev->flags & FL_SPECTATOR)
 		return -1;
@@ -6389,7 +6350,7 @@ void CBasePlayer::UpdateClientData()
 				if (!pEntity || i == entindex())
 					continue;
 
-				CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pEntity->pev);
+				CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 				if (pPlayer->pev->flags == FL_DORMANT)
 					continue;
@@ -6469,13 +6430,9 @@ void CBasePlayer::ResetMaxSpeed()
 		speed = 1;
 	}
 	// VIP is slow due to the armour he's wearing
-	else if (m_bIsVIP != NULL)
+	else if (m_bIsVIP)
 	{
 		speed = 227;
-	}
-	else if (m_bIsZombie)
-	{
-		speed = 290;
 	}
 	else if (m_pActiveItem != NULL)
 	{
@@ -6759,7 +6716,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 		pszItemName = NULL;
 	}
 
-	if (m_bIsVIP)
+	if (m_bIsVIP || !m_pModStrategy->CanDropWeapon(pszItemName))
 	{
 		ClientPrint(pev, HUD_PRINTCENTER, "#Weapon_Cannot_Be_Dropped");
 		return;
@@ -6834,7 +6791,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 
 						if (pEntity->pev->flags != FL_DORMANT)
 						{
-							CBasePlayer *pOther = GetClassPtr((CBasePlayer *)pEntity->pev);
+							CBasePlayer *pOther = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 							if (pOther->pev->deadflag == DEAD_NO && pOther->m_iTeam == TERRORIST)
 							{
@@ -6886,7 +6843,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 					pLinkWeapon->pev->solid = SOLID_NOT;
 					pLinkWeapon->pev->effects = EF_NODRAW;
 					pLinkWeapon->pev->modelindex = 0;
-					pLinkWeapon->pev->model = NULL;
+					pLinkWeapon->pev->model = (int)NULL;
 					pLinkWeapon->pev->owner = ENT(pev);
 					pLinkWeapon->SetThink(NULL);
 					pLinkWeapon->SetTouch(NULL);
@@ -6982,8 +6939,8 @@ BOOL CBasePlayer::HasNamedPlayerItem(const char *pszItemName)
 void CBasePlayer::SwitchTeam()
 {
 	int oldTeam;
-	char *szOldTeam;
-	char *szNewTeam;
+	const char *szOldTeam;
+	const char *szNewTeam;
 	const char *szName;
 
 	oldTeam = m_iTeam;
@@ -8131,11 +8088,11 @@ const char *CBasePlayer::PickPrimaryCareerTaskWeapon()
 		CCareerTask *pTask = taskVector[i];
 
 		if (IsPrimaryWeaponId(pTask->GetWeaponId()))
-			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf));
+			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf) - 1);
 		else
-			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf));
+			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf) - 1);
 
-		Q_strncat(buf, " ", sizeof(buf));
+		Q_strncat(buf, " ", sizeof(buf) - 1);
 	}
 
 	return buf;
@@ -8215,11 +8172,11 @@ const char *CBasePlayer::PickSecondaryCareerTaskWeapon()
 		CCareerTask *pTask = taskVector[i];
 
 		if (IsSecondaryWeaponId(pTask->GetWeaponId()))
-			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf));
+			Q_strncat(buf, WeaponIDToAlias(pTask->GetWeaponId()), sizeof(buf) - 1);
 		else
-			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf));
+			Q_strncat(buf, GetBuyStringForWeaponClass(pTask->GetWeaponClassId()), sizeof(buf) - 1);
 
-		Q_strncat(buf, " ", sizeof(buf));
+		Q_strncat(buf, " ", sizeof(buf) - 1);
 	}
 
 	return buf;
@@ -8367,7 +8324,7 @@ void CBasePlayer::ParseAutoBuyString(const char *string, bool &boughtPrimary, bo
 	// loop through the string of commands, trying each one in turn.
 	while (*c)
 	{
-		int i = 0;
+		size_t i = 0;
 
 		// copy the next word into the command buffer.
 		while (*c && (*c != ' ') && i < sizeof(command) - 1)

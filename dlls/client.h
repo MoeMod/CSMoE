@@ -124,8 +124,8 @@ BOOL ClientConnect(edict_t *pEntity, const char *pszName, const char *pszAddress
 void ClientDisconnect(edict_t *pEntity);
 void respawn(entvars_t *pev, BOOL fCopyCorpse = FALSE);
 void ClientKill(edict_t *pEntity);
-void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, char *pszText);
-void ShowVGUIMenu(CBasePlayer *pPlayer, int MenuType, int BitMask, char *szOldMenu);
+void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, const char *pszText);
+void ShowVGUIMenu(CBasePlayer *pPlayer, int MenuType, int BitMask, const char *szOldMenu);
 NOXREF C_DLLEXPORT int CountTeams();
 void ListPlayers(CBasePlayer *current);
 C_DLLEXPORT int CountTeamPlayers(int iTeam);

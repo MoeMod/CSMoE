@@ -481,12 +481,12 @@ void CBasePlayer::Observer_SetMode(int iMode)
 	pev->iuser1 = iMode;
 
 	// if we are not roaming, we need a valid target to track
-	if (iMode != OBS_ROAMING && m_hObserverTarget == NULL)
+	if (iMode != OBS_ROAMING && m_hObserverTarget == nullptr)
 	{
 		Observer_FindNextPlayer(false);
 
 		// if we didn't find a valid target switch to roaming
-		if (m_hObserverTarget == NULL)
+		if (m_hObserverTarget == nullptr)
 		{
 			ClientPrint(pev, HUD_PRINTCENTER, "#Spec_NoTarget");
 			pev->iuser1 = OBS_ROAMING;

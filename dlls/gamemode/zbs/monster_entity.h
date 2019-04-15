@@ -7,6 +7,9 @@
 
 #include "hostage/hostage.h"
 #include <memory>
+#include <map>
+#include <string>
+#include <mutex>
 
 enum MonsterAnim
 {
@@ -42,7 +45,8 @@ public:
 	virtual void OnThink() = 0;
 	virtual void OnKilled(entvars_t *pKiller, int iGib) = 0;
 
-	virtual void DeathSound() = 0;
+	virtual void DeathSound() const = 0;
+	virtual bool IsTeamMate(CBaseEntity *that) const = 0;
 };
 
 inline IBaseMonsterStrategy::~IBaseMonsterStrategy() {}
@@ -56,41 +60,51 @@ public:
 	void OnThink() override;
 	void OnKilled(entvars_t *pKiller, int iGib) override;
 
-	void DeathSound() override;
+	void DeathSound() const override;
+	bool IsTeamMate(CBaseEntity *that) const override { return false; }
 };
 
 class CMonster : public CHostage
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int ObjectCaps() override { return (CBaseMonster::ObjectCaps() | FCAP_MUST_SPAWN); }
-	virtual int Classify() { return CLASS_PLAYER_ALLY; }
-	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
-	virtual void BecomeDead(void);
-	virtual void Killed(entvars_t *pevAttacker, int iGib);
-	virtual int BloodColor() { return BLOOD_COLOR_RED; }
-	virtual void Touch(CBaseEntity *pOther);
-	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void Spawn() override;
+	void Precache() override;
+	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() | FCAP_MUST_SPAWN); }
+	int Classify() override { return CLASS_PLAYER_ALLY; }
+	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void BecomeDead(void) override;
+	void Killed(entvars_t *pevAttacker, int iGib) override;
+	int BloodColor() override { return BLOOD_COLOR_RED; }
+	void Touch(CBaseEntity *pOther) override;
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 
 	// RAII support to prevent memory leak.
 	CMonster();
-	~CMonster();
+	~CMonster() override;
+
+public:
+	int LookupSequence(const char *label);
 
 public:
 	void EXPORT IdleThink();
 	void Remove();
 
-	CBaseEntity *FindTarget();
 	void Wander();
-	CBaseEntity *CheckAttack();
+	
 	CBaseEntity *CheckTraceHullAttack(float flDist, int iDamage, int iDmgType);
-	bool ShouldAttack(CBaseEntity *target);
+	bool ShouldAttack(CBaseEntity *target) const;
 
-	void PlayDeathSound();
 	void SetAnimation(MonsterAnim anim);
-	void CheckTarget();
-	CBasePlayer *GetClosestPlayer(bool bVisible);
+
+	bool CheckTarget();
+	bool CheckAttack();
+	bool CheckSequence();
+
+protected:
+	// pTarget, bCanSee
+	std::pair<CBasePlayer *, bool> FindTarget() const;
+	CBasePlayer *GetClosestPlayer(bool bVisible) const;
+	float GetModifiedDamage(float flDamage, int nHitGroup) const;
 
 public:
 	float m_flAttackDist;
@@ -101,6 +115,9 @@ public:
 	int m_iKillBonusFrags;
 	float m_flTimeLastActive;
 	float m_flTargetChange;
+
+	std::map<std::string, int> m_mapLookupSequenceCache;
+	std::mutex m_mutexSetAnimation;
 
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;

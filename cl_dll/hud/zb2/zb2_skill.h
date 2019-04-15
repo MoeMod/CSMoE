@@ -19,8 +19,8 @@ public:
 	// returns x
 	int DrawHealthRecoveryIcon(float time, int x, int y) const;
 	int DrawSkillBoard(float time, int x, int y) const;
-	
 	void DrawSkillTip(float time) const;
+	void DrawSkillBoardNew(float time) const;
 
 public:
 	void OnHealthRecovery();
@@ -29,10 +29,16 @@ public:
 
 protected:
 	int m_HUD_zombirecovery;
+
 	int m_HUD_zombieGKey;
 	int m_HUD_SkillIcons[MAX_ZOMBIE_SKILL];
 	int m_HUD_ClassIcons[MAX_ZOMBIE_CLASS];
 	UniqueTexture m_pTexture_SkillTips[MAX_ZOMBIE_SKILL];
+
+	UniqueTexture m_pTexture_skillslotkeybg;
+	UniqueTexture m_pTexture_skillslotbg;
+	UniqueTexture m_pTexture_NewSkillIcons[MAX_ZOMBIE_SKILL];
+	UniqueTexture m_pTexture_NewClassIcons[MAX_ZOMBIE_CLASS];
 
 protected:
 	float m_flRecoveryBeginTime;
@@ -49,9 +55,5 @@ protected:
 	int DrawSkillIcon(float time, int x, int y, const ZombieSkillHudIcon &icon) const;
 	
 private:
-	static const char *ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL];
-	static const char *ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS];
-	static const char *ZOMBIE_ITEM_HUD_ICON[2][3];
-
-	static const char *ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL];
+	struct Config;
 };

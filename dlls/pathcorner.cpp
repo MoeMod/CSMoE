@@ -40,7 +40,7 @@ void CPathCorner::KeyValue(KeyValueData *pkvd)
 
 void CPathCorner::Spawn()
 {
-	assert(("path_corner without a targetname", !FStringNull(pev->targetname)));
+	assert(("path_corner without a targetname" && !FStringNull(pev->targetname)));
 }
 
 IMPLEMENT_SAVERESTORE(CPathTrack, CBaseEntity);

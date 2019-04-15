@@ -1,3 +1,17 @@
+/*
+wpn_cannon.cpp - Black Dragon Cannon from CSO
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #include "extdll.h"
 #include "util.h"
@@ -40,7 +54,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 
 			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
 			{
-				float flAdjustedDamage = flDamage - (vecSrc - pHit->pev->origin).Length() * falloff;
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
 				ClearMultiDamage();
 				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
@@ -80,7 +94,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 					tr.flFraction = 0;
 				}
 
-				float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
 				flAdjustedDamage = Q_max(0, flAdjustedDamage);
 
 				if (tr.flFraction == 1.0f)
@@ -103,45 +117,18 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 
 void CCannon::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_cannon");
-
-	Precache();
-	m_iId = WEAPON_AK47;
-	SET_MODEL(ENT(pev), "models/w_cannon.mdl");
-
-	m_iDefaultAmmo = 20;
+	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
-
-	FallInit();
 }
 
 void CCannon::Precache(void)
 {
-	PRECACHE_MODEL("models/v_cannon.mdl");
-	PRECACHE_MODEL("models/p_cannon.mdl");
-	PRECACHE_MODEL("models/w_cannon.mdl");
+	Base::Precache();
 	PRECACHE_MODEL("sprites/flame_puff01.spr");
 
 	PRECACHE_SOUND("weapons/cannon-1.wav");
 
 	m_usFire = PRECACHE_EVENT(1, "events/cannon.sc");
-}
-
-int CCannon::GetItemInfo(ItemInfo *p)
-{
-	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "CannonAmmo";
-	p->iMaxAmmo1 = 20;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
-	p->iMaxClip = WEAPON_NOCLIP;
-	p->iSlot = 0;
-	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
-	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
-	p->iWeight = AK47_WEIGHT;
-
-	return 1;
 }
 
 int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)

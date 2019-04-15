@@ -11,9 +11,7 @@
 	};
 */
 
-#include "WeaponTemplate.hpp"
-
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TReloadDefault : public CBase
 {
 public:
@@ -21,37 +19,42 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (wpn.DefaultReload(
-				wpn.MaxClip,
-				wpn.ANIM_RELOAD,
-				wpn.DefaultReloadTime
-				))
+			wpn.MaxClip,
+			wpn.ANIM_RELOAD,
+			wpn.DefaultReloadTime
+		))
 		{
 #ifndef CLIENT_DLL
 			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-			CBase::m_flAccuracy = wpn.DefaultAccuracy;
+			SetDefaultAccuracy_impl(&wpn);
 			CBase::m_iShotsFired = 0;
 			CBase::m_bDelayFire = false;
 
-			ReloadCheckZoom();
+			ReloadCheckZoom(&wpn);
 		}
 		return CBase::Reload();
 	}
 private:
-	void ReloadCheckZoom()
-	{
-		ReloadCheckZoom_impl(*this);
-	}
 
 	// fxxking sfinae
-	void ReloadCheckZoom_impl(...) { /* default impl*/}
+	void ReloadCheckZoom(...) { /* default impl*/ }
 	template<class ClassToFind = CFinal>
-	auto ReloadCheckZoom_impl(ClassToFind &wpn) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
+	auto ReloadCheckZoom(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
 	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
 			wpn.SecondaryAttack();
 		}
+	}
+
+	void SetDefaultAccuracy_impl(...) {}
+	template<class ClassToFind = CFinal>
+	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
+	{
+		CFinal &wpn = static_cast<CFinal &>(*this);
+		CBase::m_flAccuracy = wpn.AccuracyDefault;
 	}
 };

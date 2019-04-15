@@ -144,6 +144,25 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
+
+	if (!strncmp(pWeapon->szName, "knife_", 6))
+	{
+		char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
+		char szSpriteName[32]{};
+		int x, y, w, h;
+		if (sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+		{
+			sprintf(sz, "sprites/%s.spr", szSpriteName);
+			pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);
+			pWeapon->rcInactive = pWeapon->rcActive = { x, x + w, y, y + h };
+
+			gHR.iHistoryGap = max(gHR.iHistoryGap, pWeapon->rcActive.bottom - pWeapon->rcActive.top);
+		}
+
+		gEngfuncs.COM_FreeFile(buffer);
+		return;
+	}
+
 	client_sprite_t *pList = SPR_GetList(sz, &i);
 
 	if (!pList)
@@ -501,6 +520,12 @@ void WeaponsResource :: SelectSlot( int iSlot, int fAdvance, int iDirection )
 	{ // menu is overriding slot use commands
 		gHUD.m_Menu.SelectMenuItem( iSlot + 1 );  // slots are one off the key numbers
 		return;
+	}
+
+	if ((gHUD.m_ZB2.m_iFlags & HUD_ACTIVE) && (fAdvance == FALSE) && (iDirection == 1))
+	{
+		if(gHUD.m_ZB2.ActivateSkill(iSlot + 1))
+			return;
 	}
 
 	if ( iSlot > MAX_WEAPON_SLOTS )
@@ -1675,7 +1700,7 @@ int CHudAmmo::DrawWList(float flTime)
 	else 
 		iActiveSlot = gpActiveSel->iSlot;
 
-	x = gHUD.m_Radar.m_hRadar.rect.right + 10; //!!!
+	x = gHUD.m_Radar.GetRadarSize() + 10; //!!!
 	y = 10; //!!!
 	
 
@@ -1723,7 +1748,7 @@ int CHudAmmo::DrawWList(float flTime)
 
 
 	a = 128; //!!!
-	x = gHUD.m_Radar.m_hRadar.rect.right + 10; //!!!;
+	x = gHUD.m_Radar.GetRadarSize() + 10; //!!!;
 
 	// Draw all of the buckets
 	for (i = 0; i < MAX_WEAPON_SLOTS; i++)

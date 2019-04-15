@@ -115,6 +115,7 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 
 	// reset mod-specific settings
 	gHUD.m_ZB2.m_iFlags &= ~HUD_ACTIVE;
+	gHUD.m_ZB3.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZBS.m_iFlags &= ~HUD_ACTIVE;
 
 	switch (m_iModRunning)
@@ -132,46 +133,38 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 			float z = reader.ReadCoord();
 			m_FollowIcon.m_vecBombTargets[i] = { x,y,z };
 		}
-		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
 		break;
 	}
 	case MOD_TDM:
 	{
-		m_Scoreboard.m_iBGIndex = m_Scoreboard.m_iTeamDeathBG;
-		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
+		
 		break;
 	}
 	case MOD_DM:
 	{
-		m_Scoreboard.m_iBGIndex = m_Scoreboard.m_iTeamDeathBG;
-		m_Scoreboard.m_iTextIndex = m_Scoreboard.m_iText_Kill;
-		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_1st;
-		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_Kill;
-		m_Scoreboard.m_bIsTeamplay = false;
 		break;
 	}
 	
 	case MOD_ZB3:
 	{
+		gHUD.m_ZB3.m_iFlags |= HUD_ACTIVE;
 		// dont break, continue to ZB2...
+		//[fallthrough]];
 	}
 	case MOD_ZB2:
 	{
 		gHUD.m_ZB2.m_iFlags |= HUD_ACTIVE;
 		// dont break, continue to ZB1...
+		//[fallthrough]];
 	}
 	case MOD_ZB1:
 	{
-		m_Scoreboard.m_iTTextIndex = m_Scoreboard.m_iText_ZB;
-		m_Scoreboard.m_iCTTextIndex = m_Scoreboard.m_iText_HM;
-		m_Teamplay = false;
 		break;
 	}
 	case MOD_ZBS:
 	{
 		m_Teamplay = false;
 		gHUD.m_ZBS.m_iFlags |= HUD_ACTIVE;
-		gHUD.m_Scoreboard.m_bTopScoreBoardEnabled = false;
 		break;
 	}
 	default:

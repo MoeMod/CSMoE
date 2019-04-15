@@ -24,7 +24,7 @@ cmake_minimum_required(VERSION 3.1.3)
 
 project (client)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 if (APPLE)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -70,6 +70,7 @@ file (GLOB CLWEAPON_SRCS
 	./cs_wpn/cs_weapons.cpp
 	./cs_wpn/bte_weapons.cpp
 	../dlls/wpn_shared/wpn_*.cpp
+	../dlls/wpn_shared/knife_*.cpp
 )
 
 set (HUD_SRCS
@@ -113,6 +114,14 @@ set (HUD_SRCS
 	./hud/scenariostatus.cpp
 	./hud/zb2/zb2.cpp
 	./hud/zb2/zb2_skill.cpp
+	./hud/legacy/hud_radar_legacy.cpp
+	./hud/legacy/hud_scoreboard_legacy.cpp
+	./hud/modern/hud_radar_modern.cpp
+	./hud/zb3/zb3.cpp
+	./hud/zb3/zb3_morale.cpp
+	./hud/zb3/zb3_rage.cpp
+	./hud/moe/moe_touch.cpp
+
 )
 
 set (STUDIORENDER_SRCS
@@ -144,6 +153,7 @@ set (CLDLL_SOURCES
     ../public/unicode_strtools.cpp
 	./draw_util.cpp
 	./calcscreen.cpp
+	./input_touch.cpp
 
 	${PLAYERMOVE_SRCS}
 	${HUD_SRCS}

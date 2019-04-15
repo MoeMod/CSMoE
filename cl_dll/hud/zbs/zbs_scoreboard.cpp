@@ -100,14 +100,10 @@ inline int DrawTexturedNumbersTopCenterAligned(const CTextureRef &tex, const wre
 
 int CHudZBSScoreBoard::VidInit(void)
 {
-	if(!m_pBackground)
-		m_pBackground = R_LoadTextureUnique("resource/hud/zbs/zbsboard");
-	if (!m_pTeamnumber)
-		m_pTeamnumber = R_LoadTextureUnique("resource/hud/zbs/teamnumber");
-	if (!m_pSelfnumber)
-		m_pSelfnumber = R_LoadTextureUnique("resource/hud/zbs/selfnumber");
-	if (!m_pToprecord)
-		m_pToprecord = R_LoadTextureUnique("resource/hud/challenge/toprecord");
+	R_InitTexture(m_pBackground, "resource/hud/zbs/zbsboard");
+	R_InitTexture(m_pTeamnumber, "resource/hud/zbs/teamnumber");
+	R_InitTexture(m_pSelfnumber, "resource/hud/zbs/selfnumber");
+	R_InitTexture(m_pToprecord, "resource/hud/challenge/toprecord");
 
 	BuildNumberRC(m_rcTeamnumber, 23, 24);
 	BuildNumberRC(m_rcSelfnumber, 19, 19);

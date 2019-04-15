@@ -47,7 +47,7 @@ public:
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 
 public:
-	void GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax);
+	void GenericCyclerSpawn(const char *szModel, Vector vecMin, Vector vecMax);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[1];

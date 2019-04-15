@@ -1,3 +1,18 @@
+/*
+RecoilKickback.hpp - part of CSMoE template weapon framework, to auto-gen Recoil() function
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #pragma once
 
 /*
@@ -10,25 +25,27 @@
 		KickBackData KickBackDefault;
 	};
 */
-template<class CFinal, class CBase = CBasePlayerWeapon>
+
+struct KickBackData
+{
+	float up_base;
+	float lateral_base;
+	float up_modifier;
+	float lateral_modifier;
+	float up_max;
+	float lateral_max;
+	int direction_change;
+};
+
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TRecoilKickBack : public CBase
 {
 public:
-	struct KickBackData
-	{
-		float up_base;
-		float lateral_base;
-		float up_modifier;
-		float lateral_modifier;
-		float up_max;
-		float lateral_max;
-		int direction_change;
-	};
-
+	using CBasePlayerWeapon::KickBack;
 	void KickBack(const KickBackData &data)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		return wpn.KickBack(up_base, lateral_base, up_modifier, lateral_modifier, up_max, lateral_max, direction_change);
+		return wpn.KickBack(data.up_base, data.lateral_base, data.up_modifier, data.lateral_modifier, data.up_max, data.lateral_max, data.direction_change);
 	}
 
 	void Recoil(void)
@@ -43,6 +60,5 @@ public:
 		else
 			KickBack(wpn.KickBackDefault);
 
-		return CBase::Recoil();
 	}
 };

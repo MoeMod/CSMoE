@@ -191,6 +191,8 @@ void CCSBot::Upkeep()
 				}
 				break;
 			}
+			default:
+				break;
 		}
 
 		float driftAmplitude = 2.0f;
@@ -228,6 +230,7 @@ void CCSBot::Update()
 	case PROCESS_ANALYZE_ALPHA:	UpdateAnalyzeAlphaProcess(); return;
 	case PROCESS_ANALYZE_BETA:	UpdateAnalyzeBetaProcess(); return;
 	case PROCESS_SAVE:		UpdateSaveProcess(); return;
+	default:    break;
 	}
 
 	// update our radio chatter
@@ -388,6 +391,8 @@ void CCSBot::Update()
 					doAttack = true;
 					break;
 				}
+				default:
+					break;
 			}
 		}
 		else
@@ -482,7 +487,7 @@ void CCSBot::Update()
 			// note we're not checking FOV - once we've acquired an enemy (which does check FOV), assume we know roughly where he is
 
 			m_isEnemyVisible = false;
-			if (m_enemy->IsPlayer() && IsVisible(static_cast<CBasePlayer *>(m_enemy), false, &m_visibleEnemyParts))
+			if (m_enemy->IsPlayer() && IsVisible(static_cast<CBasePlayer *>(static_cast<CBaseEntity *>(m_enemy)), false, &m_visibleEnemyParts))
 			{
 				m_isEnemyVisible = true;
 				m_lastSawEnemyTimestamp = gpGlobals->time;
@@ -693,6 +698,8 @@ void CCSBot::Update()
 			}
 			break;
 		}
+		default:
+			break;
 	}
 
 	// Follow nearby humans if our co-op is high and we have nothing else to do

@@ -1432,7 +1432,7 @@ void V_GetMapChasePosition(int target, float * cl_angles, float * origin, float 
 int V_FindViewModelByWeaponModel( int iWeaponIndex )
 {
 	model_t *pWeaponModel = IEngineStudio.GetModelByIndex( iWeaponIndex );
-	if ( pWeaponModel && pWeaponModel->name )
+	if ( pWeaponModel && pWeaponModel->name[0] )
 	{
 		static char szViewModelName[MAX_MODEL_NAME];
 		strncpy( szViewModelName, pWeaponModel->name, sizeof( szViewModelName ) );

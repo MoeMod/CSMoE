@@ -1,3 +1,18 @@
+/*
+zbs.cpp - CSMoE Client HUD : Zombie Scenerio
+Copyright (C) 2019 Moemod Yanase
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "hud.h"
 #include "followicon.h"
 #include "cl_util.h"
@@ -5,6 +20,8 @@
 #include "triangleapi.h"
 
 #include "parsemsg.h"
+
+#include "hud_sub_impl.h"
 
 #include "zbs.h"
 #include "zbs_level.h"
@@ -16,24 +33,7 @@
 #include "gamemode/zbs/zbs_const.h"
 
 class CHudZBS::impl_t
-{
-public:
-	CHudZBSLevel lv;
-	CHudZBSScoreBoard sb;
-	CHudZBSKill k;
-	CHudZBSRoundClear rc;
-
-public:
-	template<class T, class F, class...Args>
-	void for_each(F T::*f, Args &&...args)
-	{
-		// add dispatch here.
-		(lv.*f)(std::forward<Args>(args)...);
-		(sb.*f)(std::forward<Args>(args)...);
-		(k.*f)(std::forward<Args>(args)...);
-		(rc.*f)(std::forward<Args>(args)...);
-	}
-};
+	: public THudSubDispatcher<CHudZBSLevel, CHudZBSScoreBoard, CHudZBSKill, CHudZBSRoundClear> {};
 
 DECLARE_MESSAGE(m_ZBS, ZBSTip)
 DECLARE_MESSAGE(m_ZBS, ZBSLevel)
@@ -45,13 +45,13 @@ int CHudZBS::MsgFunc_ZBSTip(const char *pszName, int iSize, void *pbuf)
 	switch (type)
 	{
 	case ZBS_TIP_KILL:
-		pimpl->k.OnKillMessage();
+		pimpl->get<CHudZBSKill>().OnKillMessage();
 		break;
 	case ZBS_TIP_ROUNDCLEAR:
-		pimpl->rc.OnRoundClear();
+		pimpl->get<CHudZBSRoundClear>().OnRoundClear();
 		break;
 	case ZBS_TIP_ROUNDFAIL:
-		pimpl->rc.OnRoundFail();
+		pimpl->get<CHudZBSRoundClear>().OnRoundFail();
 		break;
 	}
 	
@@ -66,7 +66,7 @@ int CHudZBS::MsgFunc_ZBSLevel(const char *pszName, int iSize, void *pbuf)
 	int att = buf.ReadByte();
 	int wall = buf.ReadByte();
 
-	pimpl->lv.UpdateLevel(hp, att, wall);
+	pimpl->get<CHudZBSLevel>().UpdateLevel(hp, att, wall);
 
 	return 1;
 }

@@ -15,18 +15,17 @@ static std::atomic<bool> g_bDontDestruct(false);
 static std::mutex g_RemoveEntityLock;
 
 // allocate memory for CBaseEntity with given pev
-void *CBaseEntity::operator new(size_t stAllocateBlock, entvars_t *newpev)
+void *CBaseEntity::operator new(size_t stAllocateBlock, entvars_t *newpev) noexcept
 {
 	// nothing to do with nullptr
-	if (newpev == nullptr)
-		return nullptr;
+	assert(newpev != nullptr);
 
 	// cache pev
 	g_CreateEntityLock.lock();
 	g_pCachedEntVarsPtr.store(newpev);
 
 	// alloc memory and then the constructor knows newpev...
-	return ALLOC_PRIVATE(ENT(newpev), static_cast<long>(stAllocateBlock));
+	return ALLOC_PRIVATE(ENT(newpev), stAllocateBlock); // ???
 }
 
 // No way to ban creating auto var anymore... 
@@ -34,7 +33,7 @@ void *CBaseEntity::operator new(size_t stAllocateBlock, entvars_t *newpev)
 CBaseEntity::CBaseEntity() : pev(g_pCachedEntVarsPtr.exchange(nullptr))
 {
 	assert(pev != nullptr);
-	assert(g_CreateEntityLock.try_lock() == false && "auto var of CBaseEntity is not allowed!");
+	assert("auto var of CBaseEntity is not allowed!" && (g_CreateEntityLock.try_lock() == false));
 	g_CreateEntityLock.unlock();
 }
 
@@ -70,6 +69,7 @@ void CBaseEntity::CheckEntityDestructor(CBaseEntity *pEntity)
 	}
 }
 
+
 void *CBaseEntity::operator new(size_t stAllocateBlock)
 {
 	entvars_t *newpev = VARS(CREATE_ENTITY());
@@ -77,7 +77,10 @@ void *CBaseEntity::operator new(size_t stAllocateBlock)
 
 	// failed? should free newpev
 	if (result == nullptr)
+	{
 		operator delete(nullptr, newpev);
+		throw std::bad_alloc();
+	}
 
 	return result;
 }

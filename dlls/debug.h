@@ -55,17 +55,17 @@ struct DebugOutputLevel
 
 bool IsDeveloper();
 NOXREF void UTIL_DPrintf(DebugOutputType outputType, char *pszMsg, ...);
-void UTIL_DPrintf(char *pszMsg, ...);
+void UTIL_DPrintf(const char *pszMsg, ...);
 void PrintDebugFlags();
 
 void SetDebugFlag(const char *flagStr, bool state);
 void PrintDebugFlag(const char *flagStr);
 void UTIL_SetDprintfFlags(const char *flagStr);
 
-NOXREF void UTIL_BotDPrintf(char *pszMsg, ...);
-void UTIL_CareerDPrintf(char *pszMsg, ...);
-NOXREF void UTIL_TutorDPrintf(char *pszMsg, ...);
-NOXREF void UTIL_StatsDPrintf(char *pszMsg, ...);
-NOXREF void UTIL_HostageDPrintf(char *pszMsg, ...);
+NOXREF void UTIL_BotDPrintf(const char *pszMsg, ...);
+void UTIL_CareerDPrintf(const char *pszMsg, ...);
+NOXREF void UTIL_TutorDPrintf(const char *pszMsg, ...);
+NOXREF void UTIL_StatsDPrintf(const char *pszMsg, ...);
+NOXREF void UTIL_HostageDPrintf(const char *pszMsg, ...);
 
 #endif // DEBUG_H

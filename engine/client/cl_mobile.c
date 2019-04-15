@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include "platform/android/android-main.h"
 #endif
 
+#if defined(__APPLE__)
+#include "platform/iOS/TapicEngine.h"
+#endif
+
 mobile_engfuncs_t *gMobileEngfuncs;
 
 convar_t *vibration_length;
@@ -47,6 +51,10 @@ static void pfnVibrate( float life, char flags )
 	// here goes platform-specific backends
 #ifdef __ANDROID__
 	Android_Vibrate( life * vibration_length->value, flags );
+#endif
+
+#if __APPLE__
+	TapicEngine_Vibrate(flags ? TapicEngine_Pop : TapicEngine_Peek);
 #endif
 }
 

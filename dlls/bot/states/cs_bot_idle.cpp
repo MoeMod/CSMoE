@@ -373,7 +373,7 @@ void IdleState::OnUpdate(CCSBot *me)
 						}
 					}
 
-					assert((0, "A CT bot doesn't know what to do while the bomb is planted!\n"));
+					assert((0 && "A CT bot doesn't know what to do while the bomb is planted!\n"));
 				}
 
 				// if we have a sniper rifle, we like to camp, whether rogue or not

@@ -19,7 +19,7 @@ int CHudScenarioStatus::Init(void)
 int CHudScenarioStatus::VidInit(void)
 {
 	m_alpha = 100;
-	m_hSprite = NULL;
+	m_hSprite = 0;
 	m_iRepeatTimes = 0;
 	return 1;
 }
@@ -27,7 +27,7 @@ int CHudScenarioStatus::VidInit(void)
 void CHudScenarioStatus::Reset(void)
 {
 	m_iFlags &= ~HUD_ACTIVE;
-	m_hSprite = NULL;
+	m_hSprite = 0;
 	m_iRepeatTimes = 0;
 	m_nextFlash = 0;
 }
@@ -95,9 +95,8 @@ int CHudScenarioStatus::MsgFunc_Scenario(const char *pszName, int iSize, void *p
 	if (sscanf(spriteName, "hostage%d", &m_iRepeatTimes) == 1)
 	{
 		spriteName = "hostage";
-		m_iRepeatTimes = m_iRepeatTimes; // sscanf did it...
 	}
-	else 
+	else
 	{
 		m_iRepeatTimes = 1;
 	}

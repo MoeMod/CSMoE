@@ -33,7 +33,9 @@
 #endif
 
 // long STL names get truncated in browse info.
+#ifdef _MSC_VER
 #pragma warning(disable : 4786)
+#endif
 
 #ifndef _WIN32
 #include <strings.h>

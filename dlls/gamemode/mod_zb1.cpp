@@ -1,3 +1,18 @@
+/*
+mod_zb1.cpp - CSMoE Gameplay server : Zombie Mod
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -10,8 +25,11 @@
 
 #include <algorithm>
 #include <vector>
+#include <random>
 
 #include "bot_include.h"
+
+#include "util/u_range.hpp"
 
 CMod_Zombi::CMod_Zombi() // precache
 {
@@ -48,10 +66,10 @@ void CMod_Zombi::CheckMapConditions()
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
 {
-	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, NULL, pPlayer->edict());
+	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, nullptr, pPlayer->edict());
 	WRITE_BYTE(MOD_ZB1);
 	WRITE_BYTE(0); // Reserved. (weapon restriction? )
-	WRITE_BYTE(maxrounds.value); // MaxRound (mp_roundlimit)
+	WRITE_BYTE(static_cast<int>(maxrounds.value)); // MaxRound (mp_roundlimit)
 	WRITE_BYTE(0); // Reserved. (MaxTime?)
 
 	MESSAGE_END();
@@ -76,7 +94,7 @@ void CMod_Zombi::Think()
 	//IBaseMod::Think();
 
 	static int iLastCountDown = -1;
-	int iCountDown = gpGlobals->time - m_fRoundCount;
+	int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
 
 	if (iCountDown != iLastCountDown)
 	{
@@ -93,23 +111,15 @@ void CMod_Zombi::Think()
 
 			if (iCountDown == 1)
 			{
-				for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-				{
-					CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-					if (!entity)
-						continue;
-					CLIENT_COMMAND(entity->edict(), "spk zombi_start\n");
-				}
+				for(CBasePlayer *player : moe::range::PlayersList())
+					CLIENT_COMMAND(player->edict(), "spk zombi_start\n");
+
 			}
 			else if (iCountDown >= 10)
 			{
-				for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-				{
-					CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-					if (!entity)
-						continue;
-					CLIENT_COMMAND(entity->edict(), "spk %s\n", szCountDownSound[20 - iCountDown]);
-				}
+				for(CBasePlayer *player : moe::range::PlayersList())
+					CLIENT_COMMAND(player->edict(), "spk %s\n", szCountDownSound[20 - iCountDown]);
+
 			}
 		}
 		else if (iCountDown == 20)
@@ -182,13 +192,9 @@ void CMod_Zombi::Think()
 void CMod_Zombi::HumanWin()
 {
 	//Broadcast("ctwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_human\n");
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk win_human\n");
+
 	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
 	TerminateRound(5, WINSTATUS_CTS);
 	RoundEndScore(WINSTATUS_CTS);
@@ -200,13 +206,9 @@ void CMod_Zombi::HumanWin()
 void CMod_Zombi::ZombieWin()
 {
 	//Broadcast("terwin");
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk win_zombi\n");
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
+
 	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
 	TerminateRound(5, WINSTATUS_TERRORISTS);
 	RoundEndScore(WINSTATUS_TERRORISTS);
@@ -242,21 +244,14 @@ void CMod_Zombi::CheckWinConditions()
 
 BOOL CMod_Zombi::FInfectionStarted()
 {
-	int iCountDown = gpGlobals->time - m_fRoundCount;
-	if (iCountDown <= 20)
-		return false;
-
-	return true;
+	const int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
+	return iCountDown > 20;
 }
 
 void CMod_Zombi::RoundEndScore(int iWinStatus)
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	for(CBasePlayer *player : moe::range::PlayersList())
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 		if (player->m_iTeam == TEAM_UNASSIGNED || player->m_iTeam == TEAM_SPECTATOR)
 			continue;
 
@@ -316,7 +311,7 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 
 void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
 {
-	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player));
+	std::unique_ptr<CPlayerModStrategy_ZB1> up(new CPlayerModStrategy_ZB1(player, this));
 	player->m_pModStrategy = std::move(up);
 }
 
@@ -326,10 +321,7 @@ bool CPlayerModStrategy_ZB1::CanPlayerBuy(bool display)
 	if (m_pPlayer->pev->deadflag != DEAD_NO)
 		return false;
 
-	if (m_pPlayer->m_bIsZombie)
-		return false;
-
-	return true;
+	return !m_pPlayer->m_bIsZombie;
 }
 
 int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax)
@@ -343,44 +335,82 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 	return ret;
 }
 
-int CMod_Zombi::ZombieOriginNum()
+void CPlayerModStrategy_ZB1::OnSpawn()
 {
-	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
-	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
+	BecomeHuman();
+	return CPlayerModStrategy_Default::OnSpawn();
+}
 
-	if (!NumAliveCT)
-		return 0;
-	return NumAliveCT / 10 + 1;
+void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel iEvolutionLevel)
+{
+	if (m_pPlayer != who)
+		return;
+
+	BecomeZombie(iEvolutionLevel);
+	m_pPlayer->OnBecomeZombie(iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
+{
+	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+}
+
+void CPlayerModStrategy_ZB1::BecomeHuman()
+{
+	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+}
+
+CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)
+	:   CPlayerModStrategy_Zombie(player),
+	    m_eventBecomeZombieListener(mp->m_eventBecomeZombie.subscribe(&CPlayerModStrategy_ZB1::Event_OnBecomeZombie, this))
+{
+
+}
+
+float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+{
+	flDamage = m_pCharacter->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	return CPlayerModStrategy_Zombie::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
+void CPlayerModStrategy_ZB1::Pain(int m_LastHitGroup, bool HasArmour)
+{
+	if(m_pPlayer->m_bIsZombie)
+		return m_pCharacter->Pain_Zombie(m_LastHitGroup, HasArmour);
+	return CPlayerModStrategy_Zombie::Pain(m_LastHitGroup, HasArmour);
+}
+
+void CPlayerModStrategy_ZB1::DeathSound()
+{
+	if(m_pPlayer->m_bIsZombie)
+		return m_pCharacter->DeathSound_Zombie();
+	return CPlayerModStrategy_Zombie::DeathSound();
+}
+
+size_t CMod_Zombi::ZombieOriginNum()
+{
+	moe::range::PlayersList list;
+	return static_cast<size_t>(std::distance(list.begin(), list.end()) / 10 + 1);
 }
 
 void CMod_Zombi::PickZombieOrigin()
 {
-	int iNumZombies = ZombieOriginNum();
-	int iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
 
-	std::vector<CBasePlayer *> players;
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
-		if (!player->IsAlive())
-			continue;
-		if (player->m_iTeam == TEAM_UNASSIGNED || player->m_iTeam == TEAM_SPECTATOR)
-			continue;
-
-		players.push_back(player);
-	}
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer *> players {list.begin(), list.end()};
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 
 	// randomize player list
-	std::random_shuffle(players.begin(), players.end());
+	std::shuffle(players.begin(), players.end(), std::random_device());
 
 	// pick them
-	for (int i = 0; i < iNumZombies; ++i)
+	for (size_t i = 0; i < iNumZombies; ++i)
 	{
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
-		players[i]->pev->health = players[i]->pev->max_health = 1000 * iNumPlayers / iNumZombies + 1000;
+		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
 	}
 
@@ -413,26 +443,14 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 
 void CMod_Zombi::InfectionSound()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CLIENT_COMMAND(entity->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
-	}
+	for(CBasePlayer *player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
 }
 
 void CMod_Zombi::RestartRound()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
-	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
+	for(CBasePlayer *player : moe::range::PlayersList())
 		player->m_bIsZombie = false;
-	}
 
 	TeamCheck();
 
@@ -444,13 +462,8 @@ void CMod_Zombi::RestartRound()
 
 void CMod_Zombi::TeamCheck()
 {
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	for(CBasePlayer *player : moe::range::PlayersList())
 	{
-		CBaseEntity *entity = UTIL_PlayerByIndex(iIndex);
-		if (!entity)
-			continue;
-		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
-		
 		if ((player->m_bIsZombie && player->m_iTeam != TERRORIST) || (!player->m_bIsZombie && player->m_iTeam != CT))
 		{
 			player->m_iTeam = player->m_bIsZombie ? TERRORIST :CT;
@@ -467,12 +480,6 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_bNotKilled = false;
 	IBaseMod::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
-
-	// Give Armor
-	pPlayer->pev->health = pPlayer->pev->max_health= 1000;
-	//pPlayer->pev->gravity = 0.86f;
-	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
-	pPlayer->pev->armorvalue = 100;
 
 	// Open buy menu on spawn
 	ShowVGUIMenu(pPlayer, VGUI_Menu_Buy, (MENU_KEY_1 | MENU_KEY_2 | MENU_KEY_3 | MENU_KEY_4 | MENU_KEY_5 | MENU_KEY_6 | MENU_KEY_7 | MENU_KEY_8 | MENU_KEY_0), "#Buy");
@@ -496,21 +503,16 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 		iReturn = TRUE;
 	}
 
-	if (pAttacker->IsPlayer())
+	CBasePlayer *pAttackerPlayer = dynamic_ent_cast<CBasePlayer *>(pAttacker);
+	if (pAttackerPlayer)
 	{
-		CBasePlayer *pAttacker2 = static_cast<CBasePlayer *>(pAttacker);
-		if (pAttacker2->m_bIsZombie && !pPlayer->m_bIsZombie)
+		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
-			HumanInfectionByZombie(pPlayer, pAttacker2);
+			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}
 	}
 	
 
 	return iReturn;
-}
-
-void CMod_Zombi::MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel)
-{
-	return player->MakeZombie(iEvolutionLevel);
 }

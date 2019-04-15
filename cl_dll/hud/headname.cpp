@@ -22,7 +22,7 @@ int CHudHeadName::VidInit(void)
 
 bool CHudHeadName::CheckForPlayer(cl_entity_s *pEnt)
 {
-	if (pEnt && pEnt->model && pEnt->model->name && pEnt->player)
+	if (pEnt && pEnt->model && pEnt->model->name[0] && pEnt->player)
 		return true;
 
 	return false;

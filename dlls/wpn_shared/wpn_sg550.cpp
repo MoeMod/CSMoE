@@ -70,7 +70,7 @@ int CSG550::GetItemInfo(ItemInfo *p)
 	p->iPosition = 16;
 	p->iId = m_iId = WEAPON_SG550;
 	p->iFlags = 0;
-	p->iWeight = WEAPON_SG550;
+	p->iWeight = SG550_WEIGHT;
 
 	return 1;
 }

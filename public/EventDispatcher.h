@@ -1,3 +1,18 @@
+/*
+EventDispatcher.h - simple RAII and functor-based observer pattern implement
+Copyright (C) 2018 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #ifndef EVENTDISPATCHER_H
 #define EVENTDISPATCHER_H
 #ifdef _WIN32
@@ -22,7 +37,7 @@ class EventDispatcher<R(Args...)>
 	template<class T>
 	struct ParseArg<T &>
 	{
-		using type = T &;
+		using type = T & ;
 	};
 	template<class T>
 	struct ParseArg<T &&>
@@ -34,6 +49,7 @@ class EventDispatcher<R(Args...)>
 	struct ICallable
 	{
 		// NOT using vtable any more! 
+		ICallable(void(ICallable::*p)(typename ParseArg<Args>::type...) const) : pfn(p) {}
 		void(ICallable::* const pfn)(typename ParseArg<Args>::type...) const = nullptr;
 		void operator()(typename ParseArg<Args>::type...args) const
 		{
@@ -44,9 +60,9 @@ class EventDispatcher<R(Args...)>
 	struct CCallable : ICallable
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : 
-			m_Function(std::forward<RealF>(f)), 
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator()) } 
+		CCallable(RealF &&f) :
+			ICallable(static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator())),
+			m_Function(std::forward<RealF>(f))
 		{}
 		const F m_Function;
 		void operator()(typename ParseArg<Args>::type...args) const
@@ -59,9 +75,9 @@ class EventDispatcher<R(Args...)>
 	struct CCallable<F, typename std::enable_if<std::is_empty<F>::value>::type> : ICallable, private F
 	{
 		template<class RealF>
-		CCallable(RealF &&f) : 
-			F(std::forward<RealF>(f)), 
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) } 
+		CCallable(RealF &&f) :
+			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) },
+			F(std::forward<RealF>(f))
 		{}
 		void operator()(typename ParseArg<Args>::type...args) const
 		{
@@ -88,6 +104,13 @@ public:
 		v.emplace_back(sp);
 		return sp;
 	}
+
+	template<class C, class Ret, class...ArgsListener>
+	/*[[nodiscard]]*/ EventListener subscribe(Ret (C::*pmem_fn)(ArgsListener...), C *pthis)
+	{
+		return subscribe([pmem_fn, pthis](typename ParseArg<Args>::type...args) { return (pthis->*pmem_fn)(args...); });
+	}
+
 private:
 	std::vector<std::weak_ptr<ICallable>> v;
 };

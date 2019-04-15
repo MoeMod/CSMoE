@@ -1,13 +1,32 @@
+/*
+wpn_cannon.h - Black Dragon Cannon from CSO
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #pragma once
 
 #include "weapons/WeaponTemplate.hpp"
 
 class CCannon : public LinkWeaponTemplate<CCannon,
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
+	TGetItemInfoDefault,
 	TWeaponIdleDefault,
 	TDeployDefault
 >
 {
 public:
+	static constexpr const char *ClassName = "weapon_cannon";
 	enum cannon_e
 	{
 		ANIM_IDLE1,
@@ -19,26 +38,25 @@ public:
 	static constexpr const char *W_Model = "models/w_cannon.mdl";
 	static constexpr const char *AnimExtension = "carbine";
 
-public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual float GetMaxSpeed() { return 235; }
-	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
-	virtual void PrimaryAttack();
-	virtual BOOL UseDecrement()
+	struct ItemInfoData_t : Base::ItemInfoData_t
 	{
-#ifdef CLIENT_WEAPONS
-		return TRUE;
-#else
-		return FALSE;
-#endif
-	}
-	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
+		static constexpr int iFlags = ITEM_FLAG_EXHAUSTIBLE;
+		static constexpr const char *szAmmo1 = "CannonAmmo";
+		static constexpr int iMaxAmmo1 = 20;
+	};
 
-	virtual KnockbackData GetKnockBackData() override { return { 1100.f, 500.f, 700.f, 400.f, 0.9f }; }
-	virtual const char *GetCSModelName() override { return W_Model; }
-	float GetArmorRatioModifier() override { return 1.5; }
+	static constexpr int MaxClip = -1;
+	static constexpr float MaxSpeed = 230;
+	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+
+	static constexpr const auto & KnockBack = KnockbackData{ 1100.f, 500.f, 700.f, 400.f, 0.9f };
+	static constexpr float ArmorRatioModifier = 1.5f;
+
+public:
+	void Spawn() override;
+	void Precache() override;
+	void PrimaryAttack() override;
+	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
 #endif

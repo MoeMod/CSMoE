@@ -9,7 +9,7 @@
 	};
 */
 
-template<class CFinal, class CBase = CBasePlayerWeapon>
+template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TWeaponIdleDefault : public CBase
 {
 public:

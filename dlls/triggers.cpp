@@ -396,7 +396,7 @@ void CMultiManager::ManagerThink()
 
 CMultiManager *CMultiManager::Clone()
 {
-	CMultiManager *pMulti = GetClassPtr((CMultiManager *)NULL);
+	CMultiManager *pMulti = CreateClassPtr<CMultiManager>();
 
 	edict_t *pEdict = pMulti->pev->pContainingEntity;
 	Q_memcpy(pMulti->pev, pev, sizeof(*pev));
@@ -762,7 +762,7 @@ void CTriggerHurt::RadiationThink()
 	// reset origin
 	if (!FNullEnt(pentPlayer))
 	{
-		pPlayer = GetClassPtr((CBasePlayer *)VARS(pentPlayer));
+		pPlayer = GetClassPtr<CBasePlayer>(VARS(pentPlayer));
 
 		pevTarget = VARS(pentPlayer);
 
@@ -932,7 +932,7 @@ void CTriggerMultiple::Spawn()
 
 	InitTrigger();
 
-	assert(("trigger_multiple with health", pev->health == 0));
+	assert("trigger_multiple with health" && (pev->health == 0));
 
 	//UTIL_SetOrigin(pev, pev->origin);
 	//SET_MODEL(ENT(pev), STRING(pev->model));
@@ -1108,7 +1108,7 @@ void CTriggerVolume::Spawn()
 	// set size and link into world
 	SET_MODEL(ENT(pev), STRING(pev->model));
 
-	pev->model = NULL;
+	pev->model = (int)NULL;
 	pev->modelindex = 0;
 }
 
@@ -1267,7 +1267,7 @@ void CChangeLevel::ChangeLevelNow(CBaseEntity *pActivator)
 	// Create an entity to fire the changetarget
 	if (m_changeTarget)
 	{
-		CFireAndDie *pFireAndDie = GetClassPtr((CFireAndDie *)NULL);
+		CFireAndDie *pFireAndDie = CreateClassPtr<CFireAndDie>();
 
 		if (pFireAndDie)
 		{
@@ -1409,7 +1409,7 @@ int CChangeLevel::ChangeList(LEVELLIST *pLevelList, int maxList)
 
 	while (!FNullEnt(pentChangelevel))
 	{
-		CChangeLevel *pTrigger = GetClassPtr((CChangeLevel *)VARS(pentChangelevel));
+		CChangeLevel *pTrigger = GetClassPtr<CChangeLevel>(VARS(pentChangelevel));
 
 		if (pTrigger != NULL)
 		{
@@ -1512,11 +1512,11 @@ NOXREF void NextLevel()
 	if (FNullEnt(pent))
 	{
 		gpGlobals->mapname = ALLOC_STRING("start");
-		pChange = GetClassPtr((CChangeLevel *)NULL);
+		pChange = CreateClassPtr<CChangeLevel>();
 		Q_strcpy(pChange->m_szMapName, "start");
 	}
 	else
-		pChange = GetClassPtr((CChangeLevel *)VARS(pent));
+		pChange = GetClassPtr<CChangeLevel>(VARS(pent));
 
 	Q_strcpy(st_szNextMap, pChange->m_szMapName);
 	g_fGameOver = TRUE;
@@ -1837,6 +1837,8 @@ void CEscapeZone::EscapeTouch(CBaseEntity *pOther)
 	case CT:
 		p->m_signals.Signal(SIGNAL_ESCAPE);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -2094,7 +2096,7 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 		pActivator = CBaseEntity::Instance(INDEXENT(1));
 	}
 
-	m_hPlayer = pActivator;
+	m_hPlayer = static_cast<CBasePlayer *>(pActivator);
 	m_flReturnTime = gpGlobals->time + m_flWait;
 
 	pev->speed = m_initialSpeed;
@@ -2110,7 +2112,7 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	}
 
 	// Nothing to look at!
-	if (m_hTarget == NULL)
+	if (m_hTarget == nullptr)
 	{
 		return;
 	}
@@ -2171,16 +2173,16 @@ void CTriggerCamera::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 
 void CTriggerCamera::FollowTarget()
 {
-	if (m_hPlayer == NULL)
+	if (m_hPlayer == nullptr)
 		return;
 
-	if (m_hTarget == NULL || m_flReturnTime < gpGlobals->time)
+	if (m_hTarget == nullptr || m_flReturnTime < gpGlobals->time)
 	{
 		if (m_hPlayer->IsAlive())
 		{
 			SET_VIEW(m_hPlayer->edict(), m_hPlayer->edict());
-			((CBasePlayer *)CBaseEntity::Instance(m_hPlayer))->EnableControl(TRUE);
-			((CBasePlayer *)CBaseEntity::Instance(m_hPlayer))->ResetMaxSpeed();
+			m_hPlayer->EnableControl(TRUE);
+			m_hPlayer->ResetMaxSpeed();
 		}
 
 		SUB_UseTargets(this, USE_TOGGLE, 0);

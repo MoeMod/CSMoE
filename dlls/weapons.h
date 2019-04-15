@@ -130,10 +130,10 @@ struct MULTIDAMAGE
 class CArmoury: public CBaseEntity
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual void Restart();
-	virtual void KeyValue(KeyValueData *pkvd);
+	void Spawn() override;
+	void Precache() override;
+	void Restart() override;
+	void KeyValue(KeyValueData *pkvd) override;
    
 public:
 	void EXPORT ArmouryTouch(CBaseEntity *pOther);
@@ -148,13 +148,13 @@ public:
 class CGrenade: public CBaseMonster
 {
 public:
-	virtual void Spawn();
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
-	virtual int ObjectCaps() { return m_bIsC4 ? FCAP_CONTINUOUS_USE : 0; }
-	virtual void Killed(entvars_t *pevAttacker, int iGib);
-	virtual int BloodColor() { return DONT_BLEED; }
-	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void Spawn() override;
+	int Save(CSave &save) override;
+	int Restore(CRestore &restore) override;
+	int ObjectCaps() override { return m_bIsC4 ? FCAP_CONTINUOUS_USE : 0; }
+	void Killed(entvars_t *pevAttacker, int iGib) override;
+	int BloodColor() override { return DONT_BLEED; }
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 	virtual void BounceSound();
    
 public:
@@ -211,13 +211,13 @@ public:
 
 	bool m_bStartDefuse;
 	bool m_bIsC4;
-	EHANDLE m_pBombDefuser;
+	EntityHandle<CBasePlayer> m_pBombDefuser;
 	float m_flDefuseCountDown;
 	float m_flC4Blow;
 	float m_flNextFreqInterval;
 	float m_flNextBeep;
 	float m_flNextFreq;
-	char *m_sBeepName;
+	const char *m_sBeepName;
 	float m_fAttenu;
 	float m_flNextBlink;
 	float m_fNextDefuse;
@@ -240,16 +240,16 @@ class CBasePlayerItem: public CBaseAnimating
 public:
 	
 #ifdef CLIENT_DLL
-	virtual int Save(CSave &save) { return 1; }
-	virtual int Restore(CRestore &restore) { return 1; }
-	virtual void SetObjectCollisionBox(void) { }
-	virtual CBaseEntity *Respawn() { return this; }
+	int Save(CSave &save) override { return 1; }
+	int Restore(CRestore &restore) override { return 1; }
+	void SetObjectCollisionBox(void) override { }
+	CBaseEntity *Respawn() override { return this; }
 	virtual int AddToPlayer(CBasePlayer *pPlayer) { return false; }
 #else
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
-	virtual void SetObjectCollisionBox();
-	virtual CBaseEntity *Respawn();
+	int Save(CSave &save) override;
+	int Restore(CRestore &restore) override;
+	void SetObjectCollisionBox() override;
+	CBaseEntity *Respawn() override;
 	virtual int AddToPlayer(CBasePlayer *pPlayer);
 #endif
 	
@@ -343,35 +343,35 @@ class CBasePlayerWeapon: public CBasePlayerItem
 {
 public:
 #ifdef CLIENT_DLL
-	virtual int Save(CSave &save) { return 1; }
-	virtual int Restore(CRestore &restore) { return 1; }
-	virtual int AddToPlayer(CBasePlayer *pPlayer) { return 0; }
-	virtual int AddDuplicate(CBasePlayerItem *pItem) { return 0; }
-#else 
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
-	virtual int AddToPlayer(CBasePlayer *pPlayer);
-	virtual int AddDuplicate(CBasePlayerItem *pItem);
-#endif
-	virtual BOOL CanDeploy();
-	virtual BOOL IsWeapon() { return TRUE; }
-	virtual void Holster(int skiplocal = 0);
-#ifdef CLIENT_DLL
-	virtual void UpdateItemInfo() {};
+	int Save(CSave &save) override { return 1; }
+	int Restore(CRestore &restore) override { return 1; }
+	int AddToPlayer(CBasePlayer *pPlayer) override { return 0; }
+	int AddDuplicate(CBasePlayerItem *pItem) override { return 0; }
 #else
-	virtual void UpdateItemInfo();
+	int Save(CSave &save) override;
+	int Restore(CRestore &restore) override;
+	int AddToPlayer(CBasePlayer *pPlayer) override;
+	int AddDuplicate(CBasePlayerItem *pItem) override;
 #endif
-	virtual void ItemPostFrame();
+	BOOL CanDeploy() override;
+	BOOL IsWeapon() override { return TRUE; }
+	void Holster(int skiplocal = 0) override;
 #ifdef CLIENT_DLL
-	int PrimaryAmmoIndex(void) { return -1; }
-	int SecondaryAmmoIndex(void) { return -1; }
-	virtual int UpdateClientData(CBasePlayer *pPlayer) { return 0; }
+	void UpdateItemInfo() override {};
 #else
-	virtual int PrimaryAmmoIndex();
-	virtual int SecondaryAmmoIndex();
-	virtual int UpdateClientData(CBasePlayer *pPlayer);
+	void UpdateItemInfo() override;
 #endif
-	virtual CBasePlayerItem *GetWeaponPtr() { return (CBasePlayerItem *)this; }
+	void ItemPostFrame() override;
+#ifdef CLIENT_DLL
+	int PrimaryAmmoIndex(void) override { return -1; }
+	int SecondaryAmmoIndex(void) override { return -1; }
+	int UpdateClientData(CBasePlayer *pPlayer) override { return 0; }
+#else
+	int PrimaryAmmoIndex() override;
+	int SecondaryAmmoIndex() override;
+	int UpdateClientData(CBasePlayer *pPlayer) override;
+#endif
+	CBasePlayerItem *GetWeaponPtr() override { return (CBasePlayerItem *)this; }
 
 #ifdef CLIENT_DLL
 	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon) { return 0; }
@@ -464,9 +464,9 @@ public:
 class CBasePlayerAmmo: public CBaseEntity
 {
 public:
-	virtual void Spawn();
+	void Spawn() override;
 	virtual BOOL AddAmmo(CBaseEntity *pOther) { return TRUE; }
-	virtual CBaseEntity *Respawn();
+	CBaseEntity *Respawn() override;
    
 public:
 	void EXPORT DefaultTouch(CBaseEntity *pOther);
@@ -476,17 +476,18 @@ public:
 class CWeaponBox: public CBaseEntity
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual void KeyValue(KeyValueData *pkvd);
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
-	virtual void SetObjectCollisionBox();
-	virtual void Touch(CBaseEntity *pOther);
+	void Spawn() override;
+	void Precache() override;
+	void KeyValue(KeyValueData *pkvd) override;
+	int Save(CSave &save) override;
+	int Restore(CRestore &restore) override;
+	void SetObjectCollisionBox() override;
+	void Touch(CBaseEntity *pOther) override;
 
 public:
 	BOOL IsEmpty();
-	int GiveAmmo(int iCount, char *szName, int iMax, int *pIndex = NULL);
+	int GiveAmmo(int iCount, const char *szName, int iMax) override { return GiveAmmo(iCount, szName, iMax, nullptr); }
+	int GiveAmmo(int iCount, const char *szName, int iMax, int *pIndex);
 
 	void EXPORT Kill();
 	void EXPORT BombThink();

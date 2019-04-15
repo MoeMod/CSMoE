@@ -237,12 +237,19 @@
     <ClCompile Include="..\dlls\gamemode\mods.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_base.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_dm.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_gd.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_none.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_tdm.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb2.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_zb3.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_human.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_zombie.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_speed.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_tank.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp" />
@@ -324,7 +331,6 @@
     <ClCompile Include="..\dlls\player\player_spawnpoint.cpp" />
     <ClCompile Include="..\dlls\player\player_spawnprotection.cpp" />
     <ClCompile Include="..\dlls\player\player_zombie.cpp" />
-    <ClCompile Include="..\dlls\player\player_zombie_skill.cpp" />
     <ClCompile Include="..\dlls\singleplay_gamerules.cpp" />
     <ClCompile Include="..\dlls\skill.cpp" />
     <ClCompile Include="..\dlls\sound.cpp" />
@@ -345,9 +351,8 @@
     <ClCompile Include="..\dlls\weapons_data.cpp" />
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_default.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\knife\knife_zombi.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -424,19 +429,22 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_hegrenade.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m249.cpp">
@@ -464,13 +472,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1p.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_p228.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -509,6 +520,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp">
@@ -638,13 +650,19 @@
     <ClInclude Include="..\dlls\gamemode\mods_const.h" />
     <ClInclude Include="..\dlls\gamemode\mod_base.h" />
     <ClInclude Include="..\dlls\gamemode\mod_dm.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_gd.h" />
     <ClInclude Include="..\dlls\gamemode\mod_none.h" />
     <ClInclude Include="..\dlls\gamemode\mod_tdm.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb2.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_zb3.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zbs.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_skill.h" />
+    <ClInclude Include="..\dlls\gamemode\zb2\zb2_zclass.h" />
+    <ClInclude Include="..\dlls\gamemode\zb3\zb3_const.h" />
+    <ClInclude Include="..\dlls\gamemode\zb3\zb3_morale.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_manager.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h" />
@@ -685,7 +703,6 @@
     <ClInclude Include="..\dlls\player\player_msg.h" />
     <ClInclude Include="..\dlls\player\player_spawnpoint.h" />
     <ClInclude Include="..\dlls\player\player_zombie.h" />
-    <ClInclude Include="..\dlls\player\player_zombie_skill.h" />
     <ClInclude Include="..\dlls\saverestore.h" />
     <ClInclude Include="..\dlls\schedule.h" />
     <ClInclude Include="..\dlls\scriptevent.h" />
@@ -708,10 +725,22 @@
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
     <ClInclude Include="..\dlls\weapons\DeployDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\DoubleModeType.hpp" />
+    <ClInclude Include="..\dlls\weapons\ExpressionBuilder.hpp" />
+    <ClInclude Include="..\dlls\weapons\FirePistol.hpp" />
+    <ClInclude Include="..\dlls\weapons\FireRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\GeneralData.hpp" />
+    <ClInclude Include="..\dlls\weapons\GetDamageDefault.hpp" />
+    <ClInclude Include="..\dlls\weapons\ItemInfo.hpp" />
+    <ClInclude Include="..\dlls\weapons\PrecacheEvent.hpp" />
+    <ClInclude Include="..\dlls\weapons\PrimaryAttackRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\RecoilKickBack.hpp" />
+    <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom1.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackSniperZoom2.hpp" />
     <ClInclude Include="..\dlls\weapons\SecondaryAttackZoom.hpp" />
+    <ClInclude Include="..\dlls\weapons\WeaponDataVaribles.hpp" />
     <ClInclude Include="..\dlls\weapons\WeaponIdleDefault.hpp" />
     <ClInclude Include="..\dlls\weapons\WeaponTemplate.hpp" />
     <ClInclude Include="..\dlls\weapons_const.h" />
@@ -719,11 +748,7 @@
     <ClInclude Include="..\dlls\weapons_data.h" />
     <ClInclude Include="..\dlls\weapons_msg.h" />
     <ClInclude Include="..\dlls\world.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_default.h" />
-    <ClInclude Include="..\dlls\wpn_shared\knife\knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
@@ -739,8 +764,9 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_galil.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_knife_zombi.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
@@ -748,6 +774,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
@@ -758,6 +785,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
@@ -765,7 +793,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8c.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h" />
     <ClInclude Include="..\engine\custom.h" />
     <ClInclude Include="..\engine\customentity.h" />

@@ -44,8 +44,8 @@
 
 edict_t *CREATE_NAMED_ENTITY(int iClass);
 void REMOVE_ENTITY(edict_t *e);
-void CONSOLE_ECHO(char *pszMsg, ...);
-void CONSOLE_ECHO_LOGGED(char *pszMsg, ...);
+void CONSOLE_ECHO(const char *pszMsg, ...);
+void CONSOLE_ECHO_LOGGED(const char *pszMsg, ...);
 
 #include "exportdef.h"
 
@@ -128,26 +128,8 @@ class CBasePlayer;
 
 #define SF_NORESPAWN (1<<30)
 
-class EHANDLE
-{
-public:
-	edict_t * Get();
-	edict_t *Set(edict_t *pent);
+#include "ehandle.h"
 
-	operator int();
-	operator CBaseEntity*();
-
-	operator CBasePlayer*() { return static_cast<CBasePlayer *>(GET_PRIVATE(Get())); }
-
-	CBaseEntity *operator=(CBaseEntity *pEntity);
-	CBaseEntity *operator->();
-
-private:
-	edict_t * m_pent;
-	int m_serialnumber;
-};
-
-#include "cbase/cbase_memory.h"
 #include "ruleof350.h"
 #include <functional> // why not use c++11 std::function?
 
@@ -162,7 +144,7 @@ public:
 #else
 public:
 	CBaseEntity() = default;
-	virtual ~CBaseEntity() = default;
+	~CBaseEntity() = default;
 #endif
 
 public:
@@ -210,7 +192,8 @@ public:
 	virtual void AddPointsToTeam(int score, BOOL bAllowNegativeScore) {}
 	virtual BOOL AddPlayerItem(CBasePlayerItem *pItem) { return 0; }
 	virtual BOOL RemovePlayerItem(CBasePlayerItem *pItem) { return 0; }
-	virtual int GiveAmmo(int iAmount, char *szName, int iMax) { return -1; }
+	virtual int GiveAmmo(int iAmount, const char *szName, int iMax) { return -1; } // TODO : prevent from wrong override...
+	//virtual int GiveAmmo(int iAmount, char *szName, int iMax) final = delete;
 	virtual float GetDelay(void) { return 0; }
 	virtual int IsMoving(void) { return pev->velocity != g_vecZero; }
 	virtual void OverrideReset(void) {}
@@ -242,10 +225,10 @@ public:
 	virtual CBaseEntity *GetNextTarget(void);
 #endif
 
-	virtual void Think(void) { if (m_pfnThink) m_pfnThink(); }
-	virtual void Touch(CBaseEntity *pOther) { if (m_pfnTouch) m_pfnTouch(pOther); }
-	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) { if (m_pfnUse) m_pfnUse(pActivator, pCaller, useType, value); }
-	virtual void Blocked(CBaseEntity *pOther) { if (m_pfnBlocked) m_pfnBlocked(pOther); }
+	virtual void Think(void) { if (m_pfnThink) (this->*m_pfnThink)(); }
+	virtual void Touch(CBaseEntity *pOther) { if (m_pfnTouch) (this->*m_pfnTouch)(pOther); }
+	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) { if (m_pfnUse) (this->*m_pfnUse)(pActivator, pCaller, useType, value); }
+	virtual void Blocked(CBaseEntity *pOther) { if (m_pfnBlocked) (this->*m_pfnBlocked)(pOther); }
 	virtual CBaseEntity *Respawn(void) { return NULL; }
 	virtual void UpdateOwner(void) {}
 	virtual BOOL FBecomeProne(void) { return FALSE; }
@@ -309,63 +292,62 @@ public:
 		return NULL;
 	}
 
-	static CBaseEntity *Create(char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner = NULL);
+	static CBaseEntity *Create(const char *szName, const Vector &vecOrigin, const Vector &vecAngles, edict_t *pentOwner = NULL);
 
 	edict_t *edict(void) { return ENT(pev); }
 	EOFFSET eoffset(void) { return OFFSET(pev); }
 	int entindex(void) { return ENTINDEX(edict()); }
 
-public:
+
 #ifndef CLIENT_DLL
+public:
 	// cbase_memory.cpp
 
 	// allocate memory for CBaseEntity with given pev
-	void *operator new(size_t stAllocateBlock, entvars_t *newpev);
-	// free pev  when constructor throws, etc... 
+	void *operator new(size_t stAllocateBlock, entvars_t *newpev) noexcept;
+	// free pev  when constructor throws, etc...
 	void operator delete(void *pMem, entvars_t *pev);
 	// automatically allocate pev
 	void *operator new(size_t stAllocateBlock);
 	// auto remove entity...
 	void operator delete(void *pMem);
 #endif
-
 public:
 	template <typename T>
-	void SetThink(void (T::*pfn)())
+	auto SetThink(void (T::*pfn)()) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
 	{
-		SetThink(std::bind(static_cast<void (CBaseEntity::*)()>(pfn), this));
+		m_pfnThink = static_cast<void (CBaseEntity::*)()>(pfn);
 	}
-	void SetThink(std::function<void()> f)
+	void SetThink(std::nullptr_t null)
 	{
-		m_pfnThink = f;
-	}
-	template <typename T>
-	void SetTouch(void (T::*pfn)(CBaseEntity *pOther))
-	{
-		SetTouch(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pOther)>(pfn), this, std::placeholders::_1));
-	}
-	void SetTouch(std::function<void(CBaseEntity *pOther)> f)
-	{
-		m_pfnTouch = f;
+		m_pfnThink = null;
 	}
 	template <typename T>
-	void SetUse(void (T::*pfn)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value))
+	auto SetTouch(void (T::*pfn)(CBaseEntity *pOther)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
 	{
-		SetUse(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)>(pfn), this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+		m_pfnTouch = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(pfn);
 	}
-	void SetUse(std::function<void (CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> f)
+	void SetTouch(std::nullptr_t null)
 	{
-		m_pfnUse = f;
+		m_pfnThink = null;
 	}
 	template <typename T>
-	void SetBlocked(void (T::*pfn)(CBaseEntity *pOther))
+	auto SetUse(void (T::*pfn)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
 	{
-		SetBlocked(std::bind(static_cast<void (CBaseEntity::*)(CBaseEntity *pOther)>(pfn), this, std::placeholders::_1));
+		m_pfnUse = static_cast<void (CBaseEntity::*)(CBaseEntity *, CBaseEntity *, USE_TYPE, float)>(pfn);
 	}
-
-	void SetBlocked(std::function<void(CBaseEntity *pOther)> f)
+	void SetUse(std::nullptr_t null)
 	{
-		m_pfnBlocked = f;
+		m_pfnThink = null;
+	}
+	template <typename T>
+	auto SetBlocked(void (T::*pfn)(CBaseEntity *pOther)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
+	{
+		m_pfnBlocked = static_cast<void (CBaseEntity::*)(CBaseEntity *)>(pfn);
+	}
+	void SetBlocked(std::nullptr_t null)
+	{
+		m_pfnThink = null;
 	}
 
 public:
@@ -377,12 +359,12 @@ public:
 #else
 	entvars_t * const pev;
 #endif
-	CBaseEntity *m_pGoalEnt = nullptr;
-	CBaseEntity *m_pLink = nullptr;
-	std::function<void()> m_pfnThink;
-	std::function<void(CBaseEntity *pOther)> m_pfnTouch;
-	std::function<void(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)> m_pfnUse;
-	std::function<void(CBaseEntity *pOther)> m_pfnBlocked;
+	CBaseEntity *m_pGoalEnt;
+	CBaseEntity *m_pLink;
+	void (CBaseEntity::*m_pfnThink)(void);
+	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
+	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
 	int current_ammo;
 	int currentammo;
 	int maxammo_buckshot;
@@ -411,7 +393,7 @@ public:
 	bool has_disconnected;
 };
 
-
+#include "cbase/cbase_memory.h"
 
 class CPointEntity : public CBaseEntity
 {
@@ -684,7 +666,7 @@ class CSound;
 
 #include "basemonster.h"
 
-char *ButtonSound(int sound);
+const char *ButtonSound(int sound);
 
 class CBaseButton : public CBaseToggle
 {

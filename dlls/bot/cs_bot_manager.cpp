@@ -289,6 +289,9 @@ bool CCSBotManager::IsOnDefense(CBasePlayer *player) const
 
 		case SCENARIO_ESCORT_VIP:
 			return (player->m_iTeam == TERRORIST);
+
+		default:
+			break;
 	}
 
 	return false;
@@ -407,7 +410,7 @@ void CCSBotManager::ClientDisconnect(CBasePlayer *pPlayer)
 
 		FREE_PRIVATE(pPlayer->edict());
 
-		CBasePlayer *player = GetClassPtr((CBasePlayer *)temp);
+		CBasePlayer *player = GetClassPtr<CBasePlayer>(temp);
 		AddEntityHashValue(player->pev, STRING(player->pev->classname), CLASSNAME);
 		player->pev->flags = FL_DORMANT;
 	}
@@ -748,7 +751,7 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 				if ((pEntity->pev->flags & FL_DORMANT) == FL_DORMANT)
 					continue;
 
-				CBasePlayer *playerOrBot = GetClassPtr((CBasePlayer *)pEntity->pev);
+				CBasePlayer *playerOrBot = GetClassPtr<CBasePlayer>(pEntity->pev);
 
 				if (playerOrBot->IsBot())
 				{
@@ -1464,6 +1467,8 @@ bool CCSBotManager::IsImportantPlayer(CBasePlayer *player) const
 			// TODO: CT's escorting hostages are important
 			return false;
 		}
+		default:
+			break;
 	}
 
 	// everyone is equally important in a deathmatch
@@ -1515,6 +1520,8 @@ unsigned int CCSBotManager::GetPlayerPriority(CBasePlayer *player) const
 
 			break;
 		}
+		default:
+			break;
 	}
 
 	// everyone else is ranked by their unique ID (which cannot be zero)
@@ -1560,9 +1567,9 @@ void CCSBotManager::SetRadioMessageTimestamp(GameEventType event, int teamID)
 
 void CCSBotManager::ResetRadioMessageTimestamps()
 {
-	for (int t = 0; t < ARRAYSIZE(m_radioMsgTimestamp[0]); ++t)
+	for (size_t t = 0; t < ARRAYSIZE(m_radioMsgTimestamp[0]); ++t)
 	{
-		for (int m = 0; m < ARRAYSIZE(m_radioMsgTimestamp); ++m)
+		for (size_t m = 0; m < ARRAYSIZE(m_radioMsgTimestamp); ++m)
 		{
 			m_radioMsgTimestamp[m][t] = 0.0f;
 		}
