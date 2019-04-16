@@ -251,7 +251,7 @@ public:
 
 	KnockbackData GetKnockBackData()
 	{
-		return { 1100.0, 500.0, 700.0, 400.0, 0.89999998 };
+		return { 1100.0f, 500.0f, 700.0f, 400.0f, 0.89999998f };
 	}
 
 	void EXPORT FlyThink()

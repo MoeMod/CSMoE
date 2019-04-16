@@ -649,6 +649,9 @@
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_speed.cpp">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1382,6 +1385,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_skill.h">
       <Filter>dlls\gamemode\zb2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

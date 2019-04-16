@@ -458,6 +458,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_xm8s");
 	UTIL_PrecacheOtherWeapon("weapon_scarl");
 	UTIL_PrecacheOtherWeapon("weapon_scarh");
+	UTIL_PrecacheOtherWeapon("weapon_m14ebr");
 
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");

@@ -31,6 +31,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 250.0f, 200.0f, 250.0f, 90.0f, 0.6f }; }
+	const char *GetCSModelName() override { return "models/w_k1a.mdl"; }
 
 public:
 	void K1aFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);

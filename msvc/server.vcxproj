@@ -446,6 +446,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m249.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -768,6 +769,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m249.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
