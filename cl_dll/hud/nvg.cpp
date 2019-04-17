@@ -143,16 +143,19 @@ int CHudNVG::MsgFunc_NVGToggle(const char *pszName, int iSize, void *pbuf)
 		m_pLight = NULL; // it's safe to set it 0 now
 	}
 
-	if (m_LightStypeBackup < 0)
-		m_LightStypeBackup = gRenderAPI.GetLightStyle(0)->map[0];
+	if (g_iXash)
+	{
+		if (m_LightStypeBackup < 0)
+			m_LightStypeBackup = gRenderAPI.GetLightStyle(0)->map[0];
 
-	if (bDraw)
-	{
-		gRenderAPI.GetLightStyle(0)->map[0] = 64;
-	}
-	else
-	{
-		gRenderAPI.GetLightStyle(0)->map[0] = m_LightStypeBackup;
+		if (bDraw)
+		{
+			gRenderAPI.GetLightStyle(0)->map[0] = 64;
+		}
+		else
+		{
+			gRenderAPI.GetLightStyle(0)->map[0] = m_LightStypeBackup;
+		}
 	}
 
 	return 1;

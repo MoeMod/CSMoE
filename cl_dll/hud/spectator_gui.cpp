@@ -103,7 +103,6 @@ int CHudSpectatorGui::Init()
 	m_iFlags = HUD_DRAW;
 	m_menuFlags = 0;
 	m_fTextScale = 1.0f;
-	m_hTimerTexture = 0;
 	return 1;
 }
 
@@ -119,13 +118,13 @@ int CHudSpectatorGui::VidInit()
 	m_fTextScale = ScreenWidth / 1024.0f;
 	if( m_fTextScale < 1.0f )
 		m_fTextScale = 1.0f;
-	m_hTimerTexture = gRenderAPI.GL_LoadTexture("gfx/vgui/timer.tga", NULL, 0, TF_NEAREST |TF_NOPICMIP|TF_NOMIPMAP|TF_CLAMP );
+	R_InitTexture(m_hTimerTexture, "gfx/vgui/timer.tga");
 	return 1;
 }
 
 void CHudSpectatorGui::Shutdown()
 {
-	gRenderAPI.GL_FreeTexture( m_hTimerTexture );
+	m_hTimerTexture = nullptr;
 }
 
 inline void DrawButtonWithText( int x1, int y1, int wide, int tall, const char *sz, int r, int g, int b )
@@ -176,8 +175,7 @@ int CHudSpectatorGui::Draw( float flTime )
 		{
 			if( m_hTimerTexture )
 			{
-				gRenderAPI.GL_SelectTexture( 0 );
-				gRenderAPI.GL_Bind(0, m_hTimerTexture);
+				m_hTimerTexture->Bind();
 				gEngfuncs.pTriAPI->RenderMode( kRenderTransAlpha );
 				DrawUtils::Draw2DQuad( (INT_XPOS(12.5) + 10) * gHUD.m_flScale,
 									   (INT_YPOS(2) * 0.5) * gHUD.m_flScale,

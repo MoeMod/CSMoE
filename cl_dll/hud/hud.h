@@ -412,8 +412,8 @@ private:
 	float m_killEffectTime, m_killIconTime;
 
 private:
-	int m_killBg[3];
-	int m_deathBg[3];
+	SharedTexture m_killBg[3];
+	SharedTexture m_deathBg[3];
 	int m_KM_Number0;
 	int m_KM_Number1;
 	int m_KM_Number2;
@@ -646,7 +646,7 @@ private:
 	} icon_sprite_t;
 
 	icon_sprite_t m_IconList[MAX_ICONSPRITES];
-	int m_tgaC4[2];
+	UniqueTexture m_tgaC4[2];
 };
 
 
@@ -758,7 +758,7 @@ public:
 
 private:
 	float left, right, centerx, centery;
-	int m_iScopeArc[4];
+	UniqueTexture m_iScopeArc[4];
 };
 
 //
@@ -821,7 +821,7 @@ private:
 		char m_szMap[64];
 		char m_szNameAndHealth[80];
 	} label;
-	int m_hTimerTexture;
+	UniqueTexture m_hTimerTexture;
 
 	enum {
 		ROOT_MENU = (1<<0),

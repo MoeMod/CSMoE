@@ -1303,7 +1303,7 @@ void CHostageManager::ServerActivate()
 		AddHostage((CHostage *)pEntity);
 	}
 
-	if (g_bIsCzeroGame)
+	if (0 && g_bIsCzeroGame)
 	{
 		m_chatter.AddSound(HOSTAGE_CHATTER_START_FOLLOW, "hostage/huse/getouttahere.wav");
 		m_chatter.AddSound(HOSTAGE_CHATTER_START_FOLLOW, "hostage/huse/illfollow.wav");

@@ -118,7 +118,7 @@ public:
 
 	static inline int ConsoleStringLen(  const char *szIt )
 	{
-		if ( gHUD.hud_textmode->value )
+		if ( !g_iXash || gHUD.hud_textmode->value )
 		{
 			return HudStringLen( (char *)szIt );
 		}
@@ -133,7 +133,7 @@ public:
 
 	static inline void ConsoleStringSize( const char *szIt, int *width, int *height )
 	{
-		if ( gHUD.hud_textmode->value )
+		if (!g_iXash || gHUD.hud_textmode->value )
 			*height = 13, *width = HudStringLen( (char *)szIt );
 		else
 			gEngfuncs.pfnDrawConsoleStringLen( szIt, width, height );

@@ -36,13 +36,6 @@ inline void BuildNumberRC(wrect_t(&rgrc)[10], int w, int h)
 	}
 }
 
-inline void BuildNumberRC(wrect_t(&rgrc)[10], int tex)
-{
-	int w = gRenderAPI.RenderGetParm(PARM_TEX_SRC_WIDTH, tex);
-	int h = gRenderAPI.RenderGetParm(PARM_TEX_SRC_HEIGHT, tex);
-	return BuildNumberRC(rgrc, w / 10, h);
-}
-
 inline void DrawTexturePart(const CTextureRef &tex, const wrect_t &rect, int x1, int y1, float scale = 1.0f)
 {
 	tex.Bind();

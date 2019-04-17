@@ -104,22 +104,20 @@ int CHudDeathNotice :: VidInit( void )
 	m_KM_Icon_Knife = gHUD.GetSpriteIndex("KM_Icon_knife");
 	m_KM_Icon_Frag = gHUD.GetSpriteIndex("KM_Icon_Frag");
 
-	m_killBg[0] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/KillBg_left", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_killBg[1] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/KillBg_center", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_killBg[2] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/KillBg_right", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_deathBg[0] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/DeathBg_left", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_deathBg[1] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/DeathBg_center", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_deathBg[2] = gRenderAPI.GL_LoadTexture("resource/Hud/DeathNotice/DeathBg_right", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	R_InitTexture(m_killBg[0], "resource/Hud/DeathNotice/KillBg_left");
+	R_InitTexture(m_killBg[1], "resource/Hud/DeathNotice/KillBg_center");
+	R_InitTexture(m_killBg[2], "resource/Hud/DeathNotice/KillBg_right");
+	R_InitTexture(m_deathBg[0], "resource/Hud/DeathNotice/DeathBg_left");
+	R_InitTexture(m_deathBg[1], "resource/Hud/DeathNotice/DeathBg_center");
+	R_InitTexture(m_deathBg[2], "resource/Hud/DeathNotice/DeathBg_right");
 
 	return 1;
 }
 
 void CHudDeathNotice::Shutdown(void)
 {
-	for (int iTexture : m_killBg)
-		gRenderAPI.GL_FreeTexture(iTexture);
-	for (int iTexture : m_deathBg)
-		gRenderAPI.GL_FreeTexture(iTexture);
+	std::fill(std::begin(m_killBg), std::end(m_killBg), nullptr);
+	std::fill(std::begin(m_deathBg), std::end(m_deathBg), nullptr);
 }
 
 int CHudDeathNotice :: Draw( float flTime )
@@ -167,29 +165,26 @@ int CHudDeathNotice :: Draw( float flTime )
 			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 
-			int *DrawBg = nullptr;
+			SharedTexture (*DrawBg)[3] = nullptr;
 			switch (rgDeathNoticeList[i].DrawBg)
 			{
 			case DB_KILL:
-				DrawBg = m_killBg; break;
+				DrawBg = &m_killBg; break;
 			case DB_DEATH:
-				DrawBg = m_deathBg; break;
+				DrawBg = &m_deathBg; break;
 			default:
 				DrawBg = nullptr; break;
 			}
 
 			if (DrawBg)
 			{
-				gRenderAPI.GL_SelectTexture(0);
-				gRenderAPI.GL_Bind(0, DrawBg[0]);
+				(*DrawBg)[0]->Bind();
 				DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
 
-				gRenderAPI.GL_SelectTexture(0);
-				gRenderAPI.GL_Bind(0, DrawBg[1]);
+				(*DrawBg)[1]->Bind();
 				DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
 
-				gRenderAPI.GL_SelectTexture(0);
-				gRenderAPI.GL_Bind(0, DrawBg[2]);
+				(*DrawBg)[2]->Bind();
 				DrawUtils::Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
 			}
 

@@ -53,13 +53,7 @@ void CAS50::Precache(void)
 	PRECACHE_MODEL("models/w_as50.mdl");
 
 	PRECACHE_SOUND("weapons/as50-1.wav");
-	PRECACHE_SOUND("weapons/boltpull1.wav");
-	PRECACHE_SOUND("weapons/boltup.wav");
-	PRECACHE_SOUND("weapons/boltdown.wav");
 	PRECACHE_SOUND("weapons/zoom.wav");
-	PRECACHE_SOUND("weapons/as50_deploy.wav");
-	PRECACHE_SOUND("weapons/as50_clipin.wav");
-	PRECACHE_SOUND("weapons/as50_clipout.wav");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireAS50 = PRECACHE_EVENT(1, "events/as50.sc");

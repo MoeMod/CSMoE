@@ -4216,23 +4216,14 @@ void ClientPrecache()
 	PRECACHE_MODEL("models/p_c4.mdl");
 	PRECACHE_MODEL("models/w_c4.mdl");
 	PRECACHE_MODEL("models/p_deagle.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_deagle.mdl");
 	PRECACHE_MODEL("models/p_flashbang.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_flashbang.mdl");
 	PRECACHE_MODEL("models/p_hegrenade.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_hegrenade.mdl");
 	PRECACHE_MODEL("models/p_glock18.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_glock18.mdl");
 	PRECACHE_MODEL("models/p_p228.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_p228.mdl");
 	PRECACHE_MODEL("models/p_smokegrenade.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_smokegrenade.mdl");
 	PRECACHE_MODEL("models/p_usp.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_usp.mdl");
 	PRECACHE_MODEL("models/p_fiveseven.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_fiveseven.mdl");
 	PRECACHE_MODEL("models/p_knife.mdl");
-	PRECACHE_MODEL("models/shield/p_shield_knife.mdl");
 	PRECACHE_MODEL("models/w_flashbang.mdl");
 	PRECACHE_MODEL("models/w_hegrenade.mdl");
 	PRECACHE_MODEL("models/p_sg550.mdl");
@@ -4252,8 +4243,19 @@ void ClientPrecache()
 	PRECACHE_MODEL("models/p_xm1014.mdl");
 	PRECACHE_MODEL("models/p_galil.mdl");
 	PRECACHE_MODEL("models/p_famas.mdl");
+#ifdef ENABLE_SHIELD
+	PRECACHE_MODEL("models/shield/p_shield_deagle.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_flashbang.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_hegrenade.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_glock18.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_p228.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_smokegrenade.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_usp.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_fiveseven.mdl");
+	PRECACHE_MODEL("models/shield/p_shield_knife.mdl");
 	PRECACHE_MODEL("models/p_shield.mdl");
 	PRECACHE_MODEL("models/w_shield.mdl");
+#endif
 
 	Vector temp = g_vecZero;
 	Vector vMin = Vector(-38, -24, -41);
@@ -4433,6 +4435,7 @@ void ClientPrecache()
 		vMax = Vector(16, 6, 24);
 	}
 
+#ifdef ENABLE_SHIELD
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_deagle.mdl");
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_fiveseven.mdl");
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_flashbang.mdl");
@@ -4442,6 +4445,7 @@ void ClientPrecache()
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_p228.mdl");
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_smokegrenade.mdl");
 	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_usp.mdl");
+#endif
 
 	PRECACHE_SOUND("common/wpn_hudoff.wav");
 	PRECACHE_SOUND("common/wpn_hudon.wav");

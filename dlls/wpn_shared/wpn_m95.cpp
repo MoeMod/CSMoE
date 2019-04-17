@@ -56,9 +56,6 @@ void CM95::Precache(void)
 	PRECACHE_SOUND("weapons/boltup.wav");
 	PRECACHE_SOUND("weapons/boltdown.wav");
 	PRECACHE_SOUND("weapons/zoom.wav");
-	PRECACHE_SOUND("weapons/m95_deploy.wav");
-	PRECACHE_SOUND("weapons/m95_clipin.wav");
-	PRECACHE_SOUND("weapons/m95_clipout.wav");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireM95 = PRECACHE_EVENT(1, "events/m95.sc");

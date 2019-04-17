@@ -66,13 +66,6 @@ void CKRISS::Precache(void)
 
 	PRECACHE_SOUND("weapons/kriss-1.wav");
 	PRECACHE_SOUND("weapons/kriss_sil-1.wav");
-	PRECACHE_SOUND("weapons/kriss_clipin.wav");
-	PRECACHE_SOUND("weapons/kriss_clipon.wav");
-	PRECACHE_SOUND("weapons/kriss_clipout.wav");
-	PRECACHE_SOUND("weapons/kriss_boltpull.wav");
-	PRECACHE_SOUND("weapons/kriss_draw.wav");
-	PRECACHE_SOUND("weapons/kriss_foley1.wav"); // reload
-	PRECACHE_SOUND("weapons/kriss_foley2.wav"); // (de)attach silencer
 
 	m_iShell = PRECACHE_MODEL("models/pshell.mdl");
 	m_usFireKRISS = PRECACHE_EVENT(1, "events/kriss.sc");

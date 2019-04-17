@@ -78,7 +78,9 @@ void CGLOCK18::Precache(void)
 {
 	PRECACHE_MODEL("models/v_glock18.mdl");
 	PRECACHE_MODEL("models/w_glock18.mdl");
+#ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_glock18.mdl");
+#endif
 
 	PRECACHE_SOUND("weapons/glock18-1.wav");
 	PRECACHE_SOUND("weapons/glock18-2.wav");
@@ -120,10 +122,11 @@ BOOL CGLOCK18::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
-
+#ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_glock18.mdl", "models/shield/p_shield_glock18.mdl", GLOCK18_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
+#endif
 		return DefaultDeploy("models/v_glock18.mdl", "models/p_glock18.mdl", RANDOM_LONG(0, 1) ? GLOCK18_DRAW : GLOCK18_DRAW2, "onehanded", UseDecrement() != FALSE);
 }
 

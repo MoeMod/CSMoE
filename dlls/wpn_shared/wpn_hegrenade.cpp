@@ -48,7 +48,9 @@ void CHEGrenade::Spawn(void)
 void CHEGrenade::Precache(void)
 {
 	PRECACHE_MODEL("models/v_hegrenade.mdl");
+#ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_hegrenade.mdl");
+#endif
 
 	PRECACHE_SOUND("weapons/hegrenade-1.wav");
 	PRECACHE_SOUND("weapons/hegrenade-2.wav");
@@ -81,10 +83,11 @@ BOOL CHEGrenade::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
-
+#ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_hegrenade.mdl", "models/shield/p_shield_hegrenade.mdl", HEGRENADE_DRAW, "shieldgren", UseDecrement() != FALSE);
 	else
+#endif
 		return DefaultDeploy("models/v_hegrenade.mdl", "models/p_hegrenade.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
 }
 

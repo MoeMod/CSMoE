@@ -17,23 +17,35 @@ class CTextureRef
 {
 public:
 	explicit CTextureRef(const char *path, int flags = TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP)
-		: m_iInternalId(gRenderAPI.GL_LoadTexture(path, NULL, 0, flags)) {}
+		: m_iInternalId(g_iXash ? gRenderAPI.GL_LoadTexture(path, NULL, 0, flags) : 0) {}
 	CTextureRef(const CTextureRef&) = delete;
 	CTextureRef(CTextureRef &&rhs) : m_iInternalId(0) { std::swap(m_iInternalId, rhs.m_iInternalId); }
 	CTextureRef &operator=(const CTextureRef&) const = delete;
 	CTextureRef &operator=(CTextureRef &&rhs) { std::swap(m_iInternalId, rhs.m_iInternalId); return *this; }
 
 public:
-	~CTextureRef() { gRenderAPI.GL_FreeTexture(m_iInternalId); }
+	~CTextureRef() 
+	{ 
+		if(g_iXash) 
+			gRenderAPI.GL_FreeTexture(m_iInternalId); 
+	}
 
 public:
 	void Bind(int tmu = 0) const noexcept
 	{
-		gRenderAPI.GL_SelectTexture(tmu);
-		gRenderAPI.GL_Bind(tmu, m_iInternalId);
+		if (g_iXash)
+		{
+			gRenderAPI.GL_SelectTexture(tmu);
+			gRenderAPI.GL_Bind(tmu, m_iInternalId);
+		}
 	}
 
-	int GetParm(int parm = PARM_TEX_TYPE) const noexcept { return gRenderAPI.RenderGetParm(parm, m_iInternalId); }
+	int GetParm(int parm = PARM_TEX_TYPE) const noexcept 
+	{ 
+		if(g_iXash)
+			return gRenderAPI.RenderGetParm(parm, m_iInternalId); 
+		return 0;
+	}
 	int w() const noexcept { return GetParm(PARM_TEX_WIDTH); }
 	int h() const noexcept { return GetParm(PARM_TEX_HEIGHT); }
 	int texnum() const noexcept { return m_iInternalId; }

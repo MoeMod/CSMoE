@@ -39,15 +39,14 @@ int CHudStatusIcons::Init( void )
 
 	Reset();
 
-	m_tgaC4[0] = m_tgaC4[1] = 0;
 
 	return 1;
 }
 
 int CHudStatusIcons::VidInit( void )
 {
-	m_tgaC4[0] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_left_default", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
-	m_tgaC4[1] = gRenderAPI.GL_LoadTexture("resource/helperhud/c4_left_install", NULL, 0, TF_NEAREST | TF_NOPICMIP | TF_NOMIPMAP | TF_CLAMP);
+	R_InitTexture(m_tgaC4[0], "resource/helperhud/c4_left_default");
+	R_InitTexture(m_tgaC4[1], "resource/helperhud/c4_left_install");
 	return 1;
 }
 
@@ -59,8 +58,7 @@ void CHudStatusIcons::Reset( void )
 
 void CHudStatusIcons::Shutdown(void)
 {
-	for (int iTexture : m_tgaC4)
-		gRenderAPI.GL_FreeTexture(iTexture);
+	std::fill(std::begin(m_tgaC4), std::end(m_tgaC4), nullptr);
 }
 
 // Draw status icons along the left-hand side of the screen
@@ -86,11 +84,10 @@ int CHudStatusIcons::Draw( float flTime )
 			{
 				gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-				gRenderAPI.GL_SelectTexture(0);
 				if(g_bInBombZone && ((int)(flTime * 10) % 2))
-					gRenderAPI.GL_Bind(0, m_tgaC4[1]);
+					m_tgaC4[1]->Bind();
 				else
-					gRenderAPI.GL_Bind(0, m_tgaC4[0]);
+					m_tgaC4[0]->Bind();
 
 				DrawUtils::Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}

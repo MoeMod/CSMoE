@@ -67,7 +67,9 @@ void CKnife::Spawn(void)
 void CKnife::Precache(void)
 {
 	PRECACHE_MODEL("models/v_knife.mdl");
+#ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_knife.mdl");
+#endif
 	PRECACHE_MODEL("models/w_knife.mdl");
 
 	PRECACHE_SOUND("weapons/knife_deploy1.wav");
@@ -108,10 +110,11 @@ BOOL CKnife::Deploy(void)
 	m_iSwing = 0;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
-
+#ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_knife.mdl", "models/shield/p_shield_knife.mdl", KNIFE_SHIELD_DRAW, "shieldknife", UseDecrement() != FALSE);
 	else
+#endif
 		return DefaultDeploy("models/v_knife.mdl", "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
 }
 

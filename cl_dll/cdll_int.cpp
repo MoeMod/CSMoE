@@ -153,27 +153,6 @@ void DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 	PM_Move( ppmove, server );
 }
 
-#ifdef _CS16CLIENT_ENABLE_GSRC_SUPPORT
-/*
-=================
-HUD_GetRect
-
-VGui stub
-=================
-*/
-int *HUD_GetRect( void )
-{
-	static int extent[4];
-
-	extent[0] = gEngfuncs.GetWindowCenterX() - ScreenWidth / 2;
-	extent[1] = gEngfuncs.GetWindowCenterY() - ScreenHeight / 2;
-	extent[2] = gEngfuncs.GetWindowCenterX() + ScreenWidth / 2;
-	extent[3] = gEngfuncs.GetWindowCenterY() + ScreenHeight / 2;
-
-	return extent;
-}
-#endif
-
 /*
 ==========================
 	HUD_VidInit
@@ -266,6 +245,21 @@ void DLLEXPORT HUD_Reset( void )
 }
 
 /*
+=================
+HUD_GetRect
+
+VGui stub
+=================
+*/
+void getAbsExtents(int &x0, int &y0, int &x1, int &y1)
+{
+	x0 = gEngfuncs.GetWindowCenterX() - ScreenWidth / 2;
+	y0 = gEngfuncs.GetWindowCenterY() - ScreenHeight / 2;
+	x1 = gEngfuncs.GetWindowCenterX() + ScreenWidth / 2;
+	y1 = gEngfuncs.GetWindowCenterY() + ScreenHeight / 2;
+}
+
+/*
 ==========================
 HUD_Frame
 
@@ -275,9 +269,9 @@ Called by engine every frame that client .dll is loaded
 
 void DLLEXPORT HUD_Frame( double time )
 {
-#ifdef _CS16CLIENT_ENABLE_GSRC_SUPPORT
-	gEngfuncs.VGui_ViewportPaintBackground(HUD_GetRect());
-#endif
+	int extents[4];
+	getAbsExtents(extents[0], extents[1], extents[2], extents[3]);
+	gEngfuncs.VGui_ViewportPaintBackground(extents);
 }
 
 

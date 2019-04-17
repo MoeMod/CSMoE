@@ -74,7 +74,9 @@ void CUSP::Precache(void)
 {
 	PRECACHE_MODEL("models/v_usp.mdl");
 	PRECACHE_MODEL("models/w_usp.mdl");
+#ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_usp.mdl");
+#endif
 
 	PRECACHE_SOUND("weapons/usp1.wav");
 	PRECACHE_SOUND("weapons/usp2.wav");
@@ -113,13 +115,14 @@ BOOL CUSP::Deploy(void)
    m_flAccuracy = 0.92f;
    m_fMaxSpeed = 250.0f;
    m_pPlayer->m_bShieldDrawn = false;
-
+#ifdef ENABLE_SHIELD
    if (m_pPlayer->HasShield())
    {
       m_iWeaponState &= ~WPNSTATE_USP_SILENCED;
       return DefaultDeploy("models/shield/v_shield_usp.mdl", "models/shield/p_shield_usp.mdl", USP_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
    }
-   else if (m_iWeaponState & WPNSTATE_USP_SILENCED)
+#endif
+   if (m_iWeaponState & WPNSTATE_USP_SILENCED)
       return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_DRAW, "onehanded", UseDecrement() != FALSE);
    return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_UNSIL_DRAW, "onehanded", UseDecrement() != FALSE);
 }

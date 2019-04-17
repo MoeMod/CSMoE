@@ -51,7 +51,9 @@ void CDEAGLE::Spawn(void)
 void CDEAGLE::Precache(void)
 {
 	PRECACHE_MODEL("models/v_deagle.mdl");
+#ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_deagle.mdl");
+#endif
 	PRECACHE_MODEL("models/w_deagle.mdl");
 
 	PRECACHE_SOUND("weapons/deagle-1.wav");
@@ -87,10 +89,11 @@ BOOL CDEAGLE::Deploy(void)
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
 	m_fMaxSpeed = 250;
-
+#ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_deagle.mdl", "models/shield/p_shield_deagle.mdl", DEAGLE_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
+#endif
 		return DefaultDeploy("models/v_deagle.mdl", "models/p_deagle.mdl", DEAGLE_DRAW, "onehanded", UseDecrement() != FALSE);
 }
 

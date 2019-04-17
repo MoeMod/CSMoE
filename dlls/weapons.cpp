@@ -463,6 +463,13 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_cannon");
 	UTIL_PrecacheOtherWeapon("weapon_gungnir");
 	UTIL_PrecacheOther("ammo_gungnir");
+	UTIL_PrecacheOtherWeapon("knife_skullaxe");
+	UTIL_PrecacheOtherWeapon("weapon_infinityss");
+	UTIL_PrecacheOtherWeapon("weapon_infinitysb");
+	UTIL_PrecacheOtherWeapon("weapon_infinitysr");
+	UTIL_PrecacheOtherWeapon("weapon_mp7a1C");
+	UTIL_PrecacheOtherWeapon("weapon_mp7a1P");
+	UTIL_PrecacheOtherWeapon("knife_zombi");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

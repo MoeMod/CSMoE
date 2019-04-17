@@ -342,7 +342,7 @@ public:
 
 	static constexpr auto DefaultReloadTime = 1.9;
 	static constexpr const char *V_Model = "models/v_gungnir.mdl";
-	static constexpr const char *P_Model = "models/p_gungnir.mdl";
+	static constexpr const char *P_Model = "models/p_gungnira.mdl";
 	static constexpr const char *W_Model = "models/w_gungnir.mdl";
 	static constexpr const char *EventFile = "events/gungnir.sc";
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
