@@ -20,8 +20,7 @@ public:
 
 
 	int DrawScoreboard(float flTime);
-	int DrawTeams(float listslot);
-	int DrawPlayers(float listslot, int nameoffset = 0, const char *team = NULL); // returns the ypos where it finishes drawing
+	void DrawScoreNew(bool bDivideTeam);
 
 	void DeathMsg(int killer, int victim);
 	void SetScoreboardDefaults(void);

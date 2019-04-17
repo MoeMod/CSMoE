@@ -34,6 +34,7 @@ enum GameMode_e : byte
 	MOD_ZE = 10,
 	MOD_ZB4 = 11,
 	MOD_GD = 12,
+	MOD_ZBB = 13,
 };
 
 enum DamageTrack_e : byte

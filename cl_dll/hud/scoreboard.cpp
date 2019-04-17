@@ -23,8 +23,12 @@ GNU General Public License for more details.
 #include <string.h>
 #include <stdio.h>
 #include "draw_util.h"
+#include <algorithm>
+#include <numeric>
+#include <tuple>
 
 #include "hud_sub_impl.h"
+#include "gamemode/mods_const.h"
 
 #include "legacy/hud_scoreboard_legacy.h"
 
@@ -78,24 +82,6 @@ inline int GetTeamAliveCounts(short teamnumber)
 
 // X positions
 
-int xstart, xend;
-int ystart, yend;
-// relative to the side of the scoreboard
-inline int NAME_POS_START() { return xstart + 15; }
-inline int NAME_POS_END() { return xend - 210; }
-// 10 pixels gap
-inline int ATTRIB_POS_START() { return xend - 210; }
-inline int ATTRIB_POS_END() { return xend - 150; }
-// 10 pixels gap
-inline int KILLS_POS_START() { return xend - 140; }
-inline int KILLS_POS_END() { return xend - 110; }
-// 10 pixels gap
-inline int DEATHS_POS_START() { return xend - 100; }
-inline int DEATHS_POS_END() { return xend - 40; }
-// 20 pixels gap
-inline int PING_POS_START() { return xend - 40; }
-inline int PING_POS_END() { return xend - 10; }
-
 //#include "vgui_TeamFortressViewport.h"
 
 DECLARE_COMMAND(m_Scoreboard, ShowScores)
@@ -139,10 +125,6 @@ int CHudScoreboard::VidInit(void)
 {
 	m_iFlags |= HUD_ACTIVE;
 
-	xstart = ScreenWidth * 0.125f;
-	xend = ScreenWidth - xstart;
-	ystart = 100;
-	yend = ScreenHeight - ystart;
 	m_bForceDraw = false;
 
 	// Load sprites here
@@ -178,9 +160,6 @@ void CHudScoreboard::Shutdown(void)
 	pimpl = nullptr;
 }
 
-// Y positions
-#define ROW_GAP  15
-
 int CHudScoreboard::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
@@ -191,10 +170,6 @@ int CHudScoreboard::Draw(float time)
 			return 1;
 		else
 		{
-			xstart = 0.125f * ScreenWidth;
-			xend = ScreenWidth - xstart;
-			ystart = 90;
-			yend = ScreenHeight - ystart;
 			m_colors.r = 0;
 			m_colors.g = 0;
 			m_colors.b = 0;
@@ -221,197 +196,275 @@ void CHudScoreboard::Reset()
 	pimpl->for_each(&IBaseHudSub::Reset);
 }
 
+const char *GetGameModeName()
+{
+	switch (gHUD.m_iModRunning)
+	{
+	case MOD_NONE	: return "Original";
+	case MOD_DM		: return "DeathMatch";
+	case MOD_TDM	: return "Team DeathMatch";
+	case MOD_ZB1	: return "Zombie Mod 1";
+	case MOD_ZB2	: return "Zombie Mod 2";
+	case MOD_ZBU	: return "Zombie United";
+	case MOD_ZB3	: return "Zombie Mod 3";
+	case MOD_ZBS	: return "Zombie Scenario";
+	case MOD_ZE		: return "Zombie Escape";
+	case MOD_ZB4	: return "Zombie Darkness";
+	case MOD_GD		: return "GunDeath Match";
+	case MOD_ZBB	: return "Zombie BaseBuilder";
+	}
+	return "Unknown";
+}
+
 int CHudScoreboard::DrawScoreboard(float fTime)
 {
 	GetAllPlayersInfo();
-	char ServerName[90];
+	char szTitle[90];
 
-	//	Packetloss removed on Kelly 'shipping nazi' Bailey's orders
-	//	if ( cl_showpacketloss && cl_showpacketloss->value && ( ScreenWidth >= 400 ) )
-	//	{
-	//		can_show_packetloss = 1;
-	//	}
-
-		// just sort the list on the fly
-		// list is sorted first by frags, then by deaths
-	float list_slot = 0;
-
-	// print the heading line
-
-	DrawUtils::DrawRectangle(xstart, ystart, xend - xstart, yend - ystart,
-		m_colors.r, m_colors.g, m_colors.b, m_colors.a, m_bDrawStroke);
-
-	int ypos = ystart + (list_slot * ROW_GAP) + 5;
+	const int iStartX = (float)ScreenHeight / (float)ScreenWidth < 0.75 ? 100 * (ScreenHeight / 768.0) + 4 : 4;
+	const int iStartY = 40 * (ScreenHeight / 768.0);
+	const int iStartW = ScreenWidth - 2 * iStartX + 4;
+	const int iStartH = ScreenHeight - 2 * iStartY + 25;
+	DrawUtils::DrawRectangle(iStartX, iStartY, iStartW, iStartH, m_colors.r, m_colors.g, m_colors.b, m_colors.a, m_bDrawStroke);
 
 	if (gHUD.m_szServerName[0])
-		snprintf(ServerName, 80, "%s SERVER: %s", (char*)(gHUD.m_Teamplay ? "TEAMS" : "PLAYERS"), gHUD.m_szServerName);
+		snprintf(szTitle, 80, "%s (%s)", gHUD.m_szServerName, GetGameModeName());
 	else
-		strncpy(ServerName, gHUD.m_Teamplay ? "TEAMS" : "PLAYERS", 80);
+		snprintf(szTitle, 80, "CSMoE Server (%s)", GetGameModeName());
 
-	DrawUtils::DrawHudString(NAME_POS_START(), ypos, NAME_POS_END(), ServerName, 255, 140, 0);
-	DrawUtils::DrawHudStringReverse(KILLS_POS_END(), ypos, 0, "KILLS", 255, 140, 0);
-	DrawUtils::DrawHudString(DEATHS_POS_START(), ypos, DEATHS_POS_END(), "DEATHS", 255, 140, 0);
-	DrawUtils::DrawHudStringReverse(PING_POS_END(), ypos, PING_POS_START(), "PING", 255, 140, 0);
+	const float flScale = 1.6f;
+	const auto iCenterX = ScreenWidth / 2;
+	const auto iTextLen = DrawUtils::HudStringLen(szTitle, flScale);
+	DrawUtils::DrawHudString(iCenterX - iTextLen / 2, iStartY + 35, 1000, szTitle, 255, 255, 255, flScale);
 
-	list_slot += 2;
-	ypos = ystart + (list_slot * ROW_GAP);
-	FillRGBA(xstart, ypos, xend - xstart, 1, 255, 140, 0, 255);  // draw the separator line
-
-	list_slot += 0.8;
-
-	if (gHUD.m_Teamplay)
+	if ((gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZB4 || gHUD.m_iModRunning == MOD_ZBB || gHUD.m_iModRunning == MOD_ZE || gHUD.m_iModRunning == MOD_DM || gHUD.m_iModRunning == MOD_ZBS))
 	{
-		DrawTeams(list_slot);
+		DrawScoreNew(false);
 	}
 	else
 	{
-		// it's not teamplay,  so just draw a simple player list
-		DrawPlayers(list_slot);
+		DrawScoreNew(true);
 	}
 	return 1;
 }
 
-int CHudScoreboard::DrawTeams(float list_slot)
+void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 {
-	int j;
-	int ypos = ystart + (list_slot * ROW_GAP) + 5;
+	int iLocalIndex = gEngfuncs.GetLocalPlayer()->index;
+	const int iCharHeightOffset = 0;
+	const int iStartX = (float)ScreenHeight / (float)ScreenWidth < 0.75 ? 100 * (ScreenHeight / 768.0) + 4 : 4;
+	const int iStartY = 40 * (ScreenHeight / 768.0);
+	const int iStartW = ScreenWidth - 2 * iStartX + 4;
+	const int iStartH = ScreenHeight - 2 * iStartY + 25;
 
-	// clear out team scores
-	for (int i = 1; i <= m_iNumTeams; i++)
+	size_t SortedId[MAX_PLAYERS + 1];
+	std::iota(std::begin(SortedId), std::end(SortedId), 0);
+	std::sort(std::begin(SortedId), std::end(SortedId), [](size_t a, size_t b) {
+		return g_PlayerExtraInfo[a].frags > g_PlayerExtraInfo[b].frags || 
+			(g_PlayerExtraInfo[a].frags == g_PlayerExtraInfo[b].frags && g_PlayerExtraInfo[a].deaths < g_PlayerExtraInfo[b].deaths);
+	});
+
+	int r = 255, g = 255, b = 255, a = 255;
+	const bool bIsZombieMode = gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZB4 || gHUD.m_iModRunning == MOD_ZBB;
+
+	for (int iColumn = 1; iColumn <= 2; iColumn++)
 	{
-		if (!g_TeamInfo[i].scores_overriden)
-			g_TeamInfo[i].frags = g_TeamInfo[i].deaths = 0;
-		g_TeamInfo[i].sumping = 0;
-		g_TeamInfo[i].players = 0;
-		g_TeamInfo[i].already_drawn = FALSE;
-	}
+		int iDraw = 0;
 
-	// recalc the team scores, then draw them
-	for (int i = 1; i < MAX_PLAYERS; i++)
-	{
-		if (!g_PlayerInfoList[i].name || !g_PlayerInfoList[i].name[0])
-			continue; // empty player slot, skip
+		int x = iStartX + (iColumn - 1) * ((iStartW / 2) - 12);
+		int y = iStartY;
 
-		if (g_PlayerExtraInfo[i].teamname[0] == 0)
-			continue; // skip over players who are not in a team
+		int iTotalScore = 0, iTotalDeath = 0, iTotalPing = 0, iPingDivider = 0, iPlayerCount = 0;
 
-		// find what team this player is in
-		for (j = 1; j <= m_iNumTeams; j++)
+		char szBuf[128];
+		const float flScale = 0.0f;
+
+		for (int i : SortedId)
 		{
-			if (!stricmp(g_PlayerExtraInfo[i].teamname, g_TeamInfo[j].name))
-				break;
+			const int id = SortedId[i];
+
+			if (!IsConnected(id))
+				continue;
+
+			if (g_PlayerExtraInfo[id].teamnumber != TEAM_CT && g_PlayerExtraInfo[id].teamnumber != TEAM_TERRORIST)
+				continue;
+
+			if (bDivideTeam && g_PlayerExtraInfo[id].teamnumber != (iColumn == 1 ? TEAM_TERRORIST : TEAM_CT))
+				continue;
+
+			if (!bDivideTeam && ((i & 1) != (iColumn - 1)))
+				continue;
+
+			if (id == iLocalIndex)
+			{
+				std::tie(r, g, b, a) = std::make_tuple(255, 255, 255, 255);
+			}
+			else if (g_PlayerExtraInfo[id].teamnumber == TEAM_CT)
+			{
+				std::tie(r, g, b, a) = std::make_tuple(173, 201, 235, 255);
+			}
+			else if (g_PlayerExtraInfo[id].teamnumber == TEAM_TERRORIST)
+			{
+				std::tie(r, g, b, a) = std::make_tuple(216, 81, 80, 255);
+			}
+			else
+			{
+				std::tie(r, g, b, a) = std::make_tuple(255, 255, 255, 255);
+			}
+
+			iDraw++;
+
+			int offsetY = 120 + 21 * iDraw + iCharHeightOffset - 6;
+			
+			//if (m_bHostOwnBuff)
+			//	GL_DrawTGA2(g_Texture[m_iBuffIcon].iTexture, x + 80, y + offsetY - 14, g_Texture[m_iBuffIcon].iWidth, g_Texture[m_iBuffIcon].iHeight, 255);
+			DrawUtils::DrawHudString(x + 105, y + offsetY, 1000, g_PlayerInfoList[id].name, r, g, b, flScale);
+
+			sprintf(szBuf, "%d", g_PlayerExtraInfo[id].frags);
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 145, y + offsetY, 0, szBuf, r, g, b, flScale);
+			
+			sprintf(szBuf, "%d", g_PlayerExtraInfo[id].deaths);
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 75, y + offsetY, 0, szBuf, r, g, b, flScale);
+
+
+			if (g_PlayerExtraInfo[id].dead)
+			{
+				sprintf(szBuf, "Dead");
+				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
+			}
+			else if (g_PlayerExtraInfo[id].has_c4)
+			{
+				sprintf(szBuf, "Bomb");
+				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
+			}
+			else if (g_PlayerExtraInfo[id].vip)
+			{
+				if(gHUD.m_iModRunning == MOD_ZB3)
+					sprintf(szBuf, "Hero");
+				else 
+					sprintf(szBuf, "VIP");
+				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
+			}
+			else if (g_PlayerExtraInfo[id].zombie)
+			{
+				sprintf(szBuf, "Zombie");
+				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
+			}
+
+			if (g_PlayerInfoList[id].ping == 0)
+			{
+				const char *isBotString = gEngfuncs.PlayerInfo_ValueForKey(id, "*bot");
+				if (isBotString && atoi(isBotString) > 0)
+					sprintf(szBuf, "BOT");
+				else
+					sprintf(szBuf, "HOST");
+			}
+			else
+			{
+				sprintf(szBuf, "%d", g_PlayerInfoList[id].ping);
+			}
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5, y + offsetY, 0, szBuf, r, g, b, flScale);
+
+			iTotalScore += g_PlayerExtraInfo[id].frags;
+			iTotalDeath += g_PlayerExtraInfo[id].deaths;
+			iTotalPing += g_PlayerInfoList[id].ping;
+			if (g_PlayerInfoList[id].ping)
+				iPingDivider++;
+			iPlayerCount++;
 		}
 
-		if (j > m_iNumTeams)  // player is not in a team, skip to the next guy
-			continue;
 
-		if (!g_TeamInfo[j].scores_overriden)
+		std::tie(r, g, b, a) = std::make_tuple(255, 188, 0, 255);
+		sprintf(szBuf, "Kills");
+		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 145, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+		sprintf(szBuf, "Deaths");
+		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 75, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+		sprintf(szBuf, "Ping");
+		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 5, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+
+		gEngfuncs.pfnFillRGBA(x + 9, y + 96, (iStartW / 2) - 16, 1, 172, 104, 0, 255);
+
+		if (bDivideTeam && iPlayerCount)
 		{
-			g_TeamInfo[j].frags += g_PlayerExtraInfo[i].frags;
-			g_TeamInfo[j].deaths += g_PlayerExtraInfo[i].deaths;
+			const bool bIsZombieMode = gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZB4 || gHUD.m_iModRunning == MOD_ZBB;
+			if (iColumn == 2)
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Human" : "CT", iPlayerCount);
+			else
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Zombie" : "TR", iPlayerCount);
+
+			DrawUtils::DrawHudString(x + 105, y + 110 + iCharHeightOffset, 1000, szBuf, r, g, b, flScale);
+
+			gEngfuncs.pfnFillRGBA(x + 10, y + 125, (iStartW / 2) - 16, 1, 188, 112, 0, 255);
+
+			sprintf(szBuf, "%d", iTotalScore / iPlayerCount);
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 145, y + 110 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+
+			sprintf(szBuf, "%d", iTotalDeath / iPlayerCount);
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 75, y + 110 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+
+			if (iPingDivider)
+			{
+				sprintf(szBuf, "%d", iTotalPing / iPingDivider);
+				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 0, y + 110 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+
+			}
+
+		}
+		else if (!bDivideTeam && iPlayerCount)
+		{
+			if (iColumn == 2)
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Human" : "CT", g_PlayerExtraInfo[SortedId[0]].frags);
+			else
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Zombie" : "TR", g_PlayerExtraInfo[SortedId[0]].frags);
+
+			DrawUtils::DrawHudString(x + 105, y + 110 + iCharHeightOffset, 1000, szBuf, r, g, b, flScale);
+
+			sprintf(szBuf, "%d (%s)", g_TeamInfo[iColumn == 1 ? 1 : 0].frags, "Rounds");
+			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 2, y + 110 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
+
+			gEngfuncs.pfnFillRGBA(x + 10, y + 125, (iStartW / 2) - 15, 1, 188, 112, 0, 255);
 		}
 
-		g_TeamInfo[j].sumping += g_PlayerInfoList[i].ping;
 
-		if (g_PlayerInfoList[i].thisplayer)
-			g_TeamInfo[j].ownteam = TRUE;
+		if (iColumn == 1)
+		{
+			std::tie(r, g, b, a) = std::make_tuple(255, 188, 0, 255);
+			sprintf(szBuf, "Contributors");
+			DrawUtils::DrawHudString(x + 29, y + iStartH + iCharHeightOffset - 229, 1000, szBuf, r, g, b, flScale);
+
+			gEngfuncs.pfnFillRGBA(x + 19, y + iStartH - 212, (iStartW / 2) - 49, 1, 188, 112, 0, 255);
+			std::tie(r, g, b, a) = std::make_tuple(188, 112, 0, 255);
+			for (int i = 0; i < 3; i++)
+			{
+				static constexpr const char *szLeaderNames[] = { "CSMoE Team", "BTE Team", "Xash3D FWGS" };
+				sprintf(szBuf, "%d. %s", i + 1, szLeaderNames[i]);
+				DrawUtils::DrawHudString(x + 34, y + iStartH - 194 + 25 * i, 1000, szBuf, r, g, b, flScale);
+			}
+		}
 		else
-			g_TeamInfo[j].ownteam = FALSE;
-
-		g_TeamInfo[j].players++;
-	}
-
-	// Draw the teams
-	int iSpectatorPos = -1;
-
-	while (true)
-	{
-		int highest_frags = -99999; int lowest_deaths = 99999;
-		int best_team = 0;
-
-		for (int i = 1; i <= m_iNumTeams; i++)
 		{
-			// don't draw team without players
-			if (g_TeamInfo[i].players <= 0)
-				continue;
-
-			if (!strnicmp(g_TeamInfo[i].name, "SPECTATOR", MAX_TEAM_NAME))
+			iPlayerCount = 0;
+			for (int id = 1; id <= 32; id++)
 			{
-				iSpectatorPos = i;
-				continue;
+				if (!g_PlayerInfoList[id].name)
+					continue;
+				if (g_PlayerExtraInfo[id].teamnumber == TEAM_TERRORIST || g_PlayerExtraInfo[id].teamnumber == TEAM_CT)
+					continue;
+
+				iPlayerCount++;
+				std::tie(r, g, b, a) = std::make_tuple(255, 255, 255, 255);
+
+				int offsetY = iStartH - 213 + 21 * iPlayerCount;
+				DrawUtils::DrawHudString(x + 35, y + offsetY, 1000, g_PlayerInfoList[id].name, r, g, b, flScale);
 			}
-
-			if (!g_TeamInfo[i].already_drawn && g_TeamInfo[i].frags >= highest_frags)
+			if (iPlayerCount)
 			{
-				if (g_TeamInfo[i].frags > highest_frags || g_TeamInfo[i].deaths < lowest_deaths)
-				{
-					best_team = i;
-					lowest_deaths = g_TeamInfo[i].deaths;
-					highest_frags = g_TeamInfo[i].frags;
-				}
+				std::tie(r, g, b, a) = std::make_tuple(255, 188, 0, 255);
+				DrawUtils::DrawHudString(x + 35, y + iStartH - 212, (iStartW / 2) - 49 - (x + 35), "Spectators", r, g, b, flScale);
+				gEngfuncs.pfnFillRGBA(x + 19, y + iStartH - 212, (iStartW / 2) - 49, 1, 188, 112, 0, 255);
 			}
 		}
-
-		// draw the best team on the scoreboard
-		if (!best_team)
-		{
-			// if spectators is found and still not drawn
-			if (iSpectatorPos != -1 && g_TeamInfo[iSpectatorPos].already_drawn == FALSE)
-				best_team = iSpectatorPos;
-			else break;
-		}
-		// draw out the best team
-		team_info_t *team_info = &g_TeamInfo[best_team];
-
-		// don't draw team without players
-		if (team_info->players <= 0)
-			continue;
-
-		ypos = ystart + (list_slot * ROW_GAP);
-
-		// check we haven't drawn too far down
-		if (ypos > yend)  // don't draw to close to the lower border
-			break;
-
-		int r, g, b;
-		char teamName[64];
-
-		GetTeamColor(r, g, b, team_info->teamnumber);
-		switch (team_info->teamnumber)
-		{
-		case TEAM_TERRORIST:
-			snprintf(teamName, sizeof(teamName), "Terrorists   -   %i players", team_info->players);
-			DrawUtils::DrawHudNumberString(KILLS_POS_END(), ypos, KILLS_POS_START(), team_info->frags, r, g, b);
-			break;
-		case TEAM_CT:
-			snprintf(teamName, sizeof(teamName), "Counter-Terrorists   -   %i players", team_info->players);
-			DrawUtils::DrawHudNumberString(KILLS_POS_END(), ypos, KILLS_POS_START(), team_info->frags, r, g, b);
-			break;
-		case TEAM_SPECTATOR:
-		case TEAM_UNASSIGNED:
-			strncpy(teamName, "Spectators", sizeof(teamName));
-			break;
-		}
-
-		DrawUtils::DrawHudString(NAME_POS_START(), ypos, NAME_POS_END(), teamName, r, g, b);
-		DrawUtils::DrawHudNumberString(PING_POS_END(), ypos, PING_POS_START(), team_info->sumping / team_info->players, r, g, b);
-
-		team_info->already_drawn = TRUE;  // set the already_drawn to be TRUE, so this team won't get drawn again
-
-		// draw underline
-		list_slot += 1.2f;
-		FillRGBA(xstart, ystart + (list_slot * ROW_GAP), xend - xstart, 1, r, g, b, 255);
-
-		list_slot += 0.4f;
-		// draw all the players that belong to this team, indented slightly
-		list_slot = DrawPlayers(list_slot, 10, team_info->name);
 	}
-
-	// draw all the players who are not in a team
-	list_slot += 4.0f;
-	DrawPlayers(list_slot, 0, "");
-
-	return 1;
 }
 
 int CHudScoreboard::FindBestPlayer(const char *team)
@@ -436,82 +489,6 @@ int CHudScoreboard::FindBestPlayer(const char *team)
 	}
 	return best_player;
 }
-
-// returns the ypos where it finishes drawing
-int CHudScoreboard::DrawPlayers(float list_slot, int nameoffset, const char *team)
-{
-	// draw the players, in order,  and restricted to team if set
-	while (1)
-	{
-		// Find the top ranking player
-
-		int best_player = FindBestPlayer(team);
-
-		if (!best_player)
-			break;
-
-		// draw out the best player
-		hud_player_info_t *pl_info = &g_PlayerInfoList[best_player];
-
-		int ypos = ystart + (list_slot * ROW_GAP);
-
-		// check we haven't drawn too far down
-		if (ypos > yend)  // don't draw to close to the lower border
-			break;
-
-		int r = 255, g = 255, b = 255;
-		float *colors = GetClientColor(best_player);
-		r *= colors[0];
-		g *= colors[1];
-		b *= colors[2];
-
-		if (pl_info->thisplayer) // hey, it's me!
-		{
-			FillRGBABlend(xstart, ypos, xend - xstart, ROW_GAP, 255, 255, 255, 15);
-		}
-
-		DrawUtils::DrawHudString(NAME_POS_START() + nameoffset, ypos, NAME_POS_END(), pl_info->name, r, g, b);
-
-		// draw bomb( if player have the bomb )
-		if (g_PlayerExtraInfo[best_player].dead)
-			DrawUtils::DrawHudString(ATTRIB_POS_START(), ypos, ATTRIB_POS_END(), "Dead", r, g, b);
-		else if (g_PlayerExtraInfo[best_player].has_c4)
-			DrawUtils::DrawHudString(ATTRIB_POS_START(), ypos, ATTRIB_POS_END(), "Bomb", r, g, b);
-		else if (g_PlayerExtraInfo[best_player].vip)
-			DrawUtils::DrawHudString(ATTRIB_POS_START(), ypos, ATTRIB_POS_END(), "VIP", r, g, b);
-		else if (g_PlayerExtraInfo[best_player].zombie)
-			DrawUtils::DrawHudString(ATTRIB_POS_START(), ypos, ATTRIB_POS_END(), "Zombie", r, g, b);
-
-		// draw kills (right to left)
-		DrawUtils::DrawHudNumberString(KILLS_POS_END(), ypos, KILLS_POS_START(), g_PlayerExtraInfo[best_player].frags, r, g, b);
-
-		// draw deaths
-		DrawUtils::DrawHudNumberString(DEATHS_POS_END(), ypos, DEATHS_POS_START(), g_PlayerExtraInfo[best_player].deaths, r, g, b);
-
-		// draw ping & packetloss
-		const char *value;
-		if (pl_info->ping <= 5  // must be 0, until Xash's bug not fixed
-			&& (value = gEngfuncs.PlayerInfo_ValueForKey(best_player, "*bot"))
-			&& atoi(value) > 0)
-		{
-			DrawUtils::DrawHudStringReverse(PING_POS_END(), ypos, PING_POS_START(), "BOT", r, g, b);
-		}
-		else
-		{
-			static char buf[64];
-			sprintf(buf, "%d", pl_info->ping);
-			DrawUtils::DrawHudStringReverse(PING_POS_END(), ypos, PING_POS_START(), buf, r, g, b);
-		}
-
-		pl_info->name = NULL;  // set the name to be NULL, so this client won't get drawn again
-		list_slot++;
-	}
-
-	list_slot += 2.0f;
-
-	return list_slot;
-}
-
 
 void CHudScoreboard::GetAllPlayersInfo(void)
 {
@@ -711,10 +688,6 @@ void CHudScoreboard::UserCmd_ShowScoreboard2()
 		ConsolePrint("showscoreboard2 <xstart> <xend> <ystart> <yend> <r> <g> <b> <a>");
 	}
 
-	xstart = atof(gEngfuncs.Cmd_Argv(1)) * ScreenWidth;
-	xend = atof(gEngfuncs.Cmd_Argv(2)) * ScreenWidth;
-	ystart = atof(gEngfuncs.Cmd_Argv(3)) * ScreenHeight;
-	yend = atof(gEngfuncs.Cmd_Argv(4)) * ScreenHeight;
 	m_colors.r = atoi(gEngfuncs.Cmd_Argv(5));
 	m_colors.b = atoi(gEngfuncs.Cmd_Argv(6));
 	m_colors.b = atoi(gEngfuncs.Cmd_Argv(7));
