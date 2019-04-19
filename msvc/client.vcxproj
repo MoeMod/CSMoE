@@ -311,6 +311,9 @@
     <ClInclude Include="..\cl_dll\vgui2\IViewport.h" />
     <ClInclude Include="..\cl_dll\vgui2\IViewportPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\KeyValuesCompat.h" />
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\ICSViewPortMsgs.h" />
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPort.h" />
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPortMsgs.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
     <ClInclude Include="..\common\com_model.h" />

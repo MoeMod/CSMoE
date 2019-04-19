@@ -85,6 +85,9 @@
     <Filter Include="vgui2_support\SourceSDK\public\tier0">
       <UniqueIdentifier>{4e2ebba7-c6b8-4145-a12f-f39d6ee1b8f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\vgui\Viewport">
+      <UniqueIdentifier>{f58db136-9fca-429b-b0bf-b459bff654c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -1276,6 +1279,15 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h">
       <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\ICSViewPortMsgs.h">
+      <Filter>cl_dll\vgui\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPortMsgs.h">
+      <Filter>cl_dll\vgui\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPort.h">
+      <Filter>cl_dll\vgui\Viewport</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

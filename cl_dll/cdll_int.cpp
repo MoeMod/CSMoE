@@ -366,6 +366,20 @@ int DLLEXPORT HUD_MobilityInterface( mobile_engfuncs_t *mobileapi )
 
 /*
 ========================
+ClientFactory
+
+This function is never called, but it has to exist in order for the engine to load stuff from the client. - Solokiller
+Identification to detect whether the Client supports VGUI2.
+No need for Xash3D.
+========================
+*/
+extern "C" DLLEXPORT void* ClientFactory()
+{
+	return nullptr;
+}
+
+/*
+========================
 F
 
 For GoldSrc CS1.6 with VGUI2 to export client funcs.
@@ -418,7 +432,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 		HUD_GetStudioModelInterface,
 		nullptr,	// HUD_ChatInputPosition,
 		nullptr,	// HUD_GetPlayerTeam
-		nullptr,	// pfnGetClientFactory
+		ClientFactory,	// pfnGetClientFactory
 		HUD_GetRenderInterface,	// Xash3D pfnGetRenderInterface
 		nullptr,	// Xash3D pfnClipMoveToEntity
 		IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent

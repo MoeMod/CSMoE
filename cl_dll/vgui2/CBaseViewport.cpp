@@ -58,7 +58,7 @@ CBaseViewport::~CBaseViewport()
 
 void CBaseViewport::Initialize( CreateInterfaceFn* pFactories, int iNumFactories )
 {
-	//ReloadScheme();
+	ReloadScheme();
 }
 
 void CBaseViewport::Start()
