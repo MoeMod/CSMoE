@@ -2360,6 +2360,8 @@ void CL_Init( void )
 		Com_ResetLibraryError();
 		if( Sys_GetParmFromCmdLine( "-clientlib", clientlib ) )
 			loaded = CL_LoadProgs( clientlib );
+		else if(FS_FileExists(VGUI_SUPPORT_DLL, false))
+			loaded = CL_LoadProgs(VGUI_SUPPORT_DLL);
 		else
 #ifdef XASH_INTERNAL_GAMELIBS
 			loaded = CL_LoadProgs( "client" );

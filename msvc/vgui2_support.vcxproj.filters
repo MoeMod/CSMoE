@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vgui2_support">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="vgui2_support\interfaces">
+      <UniqueIdentifier>{14ad1f5d-9f8d-4a18-95db-febfddce46e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\interfaces\vgui">
+      <UniqueIdentifier>{2b4349e1-e116-4a65-a32a-da0985cc6e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\vgui_controls_simple">
+      <UniqueIdentifier>{366eb1a8-6bf1-4191-be98-63dce218b38a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\vgui_controls">
+      <UniqueIdentifier>{e4ea098b-878e-445e-a6cc-fb0d217d8360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK">
+      <UniqueIdentifier>{e5e02363-8605-4bc0-9859-1dcb75543e62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\tier1">
+      <UniqueIdentifier>{548fcfc1-38a2-4944-8cd1-24a3f7b4c22b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vgui2_support\BaseUISurface.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\CBaseUI.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\cdll_int.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\CGameUIFuncs.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_int.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls_simple\Panel.cpp">
+      <Filter>vgui2_support\vgui_controls_simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls_simple\controls.cpp">
+      <Filter>vgui2_support\vgui_controls_simple</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\vgui2_support\interfaces\IBaseUI.h">
+      <Filter>vgui2_support\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\IGameUIFuncs.h">
+      <Filter>vgui2_support\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\IHTMLChromeController.h">
+      <Filter>vgui2_support\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\IKeyValues.h">
+      <Filter>vgui2_support\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\IMouseControl.h">
+      <Filter>vgui2_support\interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\BaseUISurface.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\CBaseUI.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\CGameUIFuncs.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\dbg.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IInput.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IInputInternal.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IPanel.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IScheme.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\ISurface.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\ISystem.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IVGui.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\KeyCode.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\MouseCode.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\VGUI2.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\Cursor.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\Dar.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IBorder.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IClientPanel.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IClientVGUI.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IEngineVGui.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IHTML.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\IImage.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\ISchemeManager.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls_simple\Panel.h">
+      <Filter>vgui2_support\vgui_controls_simple</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls_simple\controls.h">
+      <Filter>vgui2_support\vgui_controls_simple</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -22,12 +22,17 @@
 #include "cl_util.h"
 #include "netadr.h"
 
-
 #include <string.h>
 //#include "interface.h" // not used here
 #include "render_api.h"
 #include "mobility_int.h"
 #include "vgui_parser.h"
+
+#include "entity_state.h"
+#include "usercmd.h"
+#include "ref_params.h"
+#include "cl_entity.h"
+#include "cdll_exp.h"
 
 extern "C"
 {
@@ -357,4 +362,69 @@ int DLLEXPORT HUD_MobilityInterface( mobile_engfuncs_t *mobileapi )
 	gMobileAPI = *mobileapi;
 
 	return 0;
+}
+
+/*
+========================
+F
+
+For GoldSrc CS1.6 with VGUI2 to export client funcs.
+No need for Xash3D.
+========================
+*/
+extern "C" void DLLEXPORT F(void *pv) {
+	cldll_func_t *pcldll_func = reinterpret_cast<cldll_func_t *>(pv);
+
+	static cldll_func_t cldll_func = {
+		Initialize,
+		HUD_Init,
+		HUD_VidInit,
+		HUD_Redraw,
+		HUD_UpdateClientData,
+		HUD_Reset,
+		HUD_PlayerMove,
+		HUD_PlayerMoveInit,
+		HUD_PlayerMoveTexture,
+		IN_ActivateMouse,
+		IN_DeactivateMouse,
+		IN_MouseEvent,
+		IN_ClearStates,
+		IN_Accumulate,
+		CL_CreateMove,
+		CL_IsThirdPerson,
+		CL_CameraOffset,
+		KB_Find,
+		CAM_Think,
+		V_CalcRefdef,
+		HUD_AddEntity,
+		HUD_CreateEntities,
+		HUD_DrawNormalTriangles,
+		HUD_DrawTransparentTriangles,
+		HUD_StudioEvent,
+		HUD_PostRunCmd,
+		HUD_Shutdown,
+		HUD_TxferLocalOverrides,
+		HUD_ProcessPlayerState,
+		HUD_TxferPredictionData,
+		Demo_ReadBuffer,
+		HUD_ConnectionlessPacket,
+		HUD_GetHullBounds,
+		HUD_Frame,
+		HUD_Key_Event,
+		HUD_TempEntUpdate,
+		HUD_GetUserEntity,
+		HUD_VoiceStatus,
+		HUD_DirectorMessage,
+		HUD_GetStudioModelInterface,
+		nullptr,	// HUD_ChatInputPosition,
+		nullptr,	// HUD_GetPlayerTeam
+		nullptr,	// pfnGetClientFactory
+		HUD_GetRenderInterface,	// Xash3D pfnGetRenderInterface
+		nullptr,	// Xash3D pfnClipMoveToEntity
+		IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
+		IN_ClientMoveEvent,	// SDL Xash pfnMoveEvent
+		IN_ClientLookEvent	// SDL Xash pfnLookEvent
+	};
+
+	*pcldll_func = cldll_func;
 }

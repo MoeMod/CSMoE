@@ -44,7 +44,7 @@
 #endif
 
 #ifdef CLIENT_DLL
-#include <tier1/UtlVector.h>
+#include <UtlVector.h>
 #else
 #include <vector>
 #endif

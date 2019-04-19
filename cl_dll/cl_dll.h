@@ -86,7 +86,7 @@ void       DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams );
 void       DLLEXPORT Demo_ReadBuffer( int size, unsigned char *buffer );
 struct cl_entity_s DLLEXPORT *HUD_GetUserEntity( int index );
 struct kbutton_s   DLLEXPORT *KB_Find( const char *name );
-
+int        DLLEXPORT IN_ClientTouchEvent(int type_id, int fingerID, float x, float y, float dx, float dy);
 void       DLLEXPORT IN_ClientMoveEvent( float forwardmove, float sidemove );
 void       DLLEXPORT IN_ClientLookEvent( float relyaw, float relpitch );
 }

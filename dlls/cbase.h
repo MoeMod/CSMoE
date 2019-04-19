@@ -37,7 +37,7 @@
 #include "monsterevent.h"
 #endif
 
-#include <tier1/UtlVector.h>
+#include <UtlVector.h>
 
 #undef CREATE_NAMED_ENTITY
 #undef REMOVE_ENTITY

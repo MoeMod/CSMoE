@@ -1,0 +1,10 @@
+add_sources(
+	AttributeFlags.h
+	DmAttributeVar.h
+	DmElementRef.h
+	DmElementUtils.h
+	IDataModel.h
+	IDmAttribute.h
+	IDmElement.h
+	idmelementinternal.h
+)

@@ -5,10 +5,25 @@
 #include "keydefs.h"
 #include "input.h"
 
-C_DLLEXPORT int IN_ClientTouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy)
+extern "C" {
+
+int DLLEXPORT IN_ClientTouchEvent(int type_id, int fingerID, float x, float y, float dx, float dy)
 {
+	touchEventType type = static_cast<touchEventType>(type_id);
 	if (gHUD.m_MoeTouch.TouchEvent(type, fingerID, x, y, dx, dy))
 		return 1;
 
 	return 0;
+}
+
+void DLLEXPORT IN_ClientMoveEvent(float forwardmove, float sidemove)
+{
+	/**/
+}
+
+void DLLEXPORT IN_ClientLookEvent(float relyaw, float relpitch)
+{
+	/**/
+}
+
 }

@@ -184,7 +184,8 @@ int CHudHealth:: MsgFunc_Damage(const char *pszName,  int iSize, void *pbuf )
 			float time = damageTaken * 4.0f + armor * 2.0f;
 
 			if( time > 200.0f ) time = 200.0f;
-			gMobileAPI.pfnVibrate( time, 1 );
+			if(gMobileAPI.pfnVibrate)
+				gMobileAPI.pfnVibrate( time, 1 );
 		}
 	}
 	return 1;

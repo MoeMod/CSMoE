@@ -1,0 +1,9 @@
+add_sources(
+	cvar.h
+	ICommandline.h
+	IKeyValuesSystem.h
+	pch_vstdlib.h
+	random.h
+	strtools.h
+	vstdlib.h
+)

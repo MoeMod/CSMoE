@@ -160,7 +160,7 @@ int CHudMoeTouch::Draw(float time)
 				DrawUtils::ScaleColors(r, g, b, 128);
 			}
 
-			rect_s rc = p->rcActive;
+			wrect_t rc = p->rcActive;
 
 			int x3 = x2;
 			int a = 255;

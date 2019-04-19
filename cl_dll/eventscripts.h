@@ -93,7 +93,7 @@ inline void EV_MuzzleFlash( void )
 	// Or in the muzzle flash
 	ent->curstate.effects |= EF_MUZZLEFLASH;
 
-	gMobileAPI.pfnVibrate(0.1, false);
+	gMobileAPI.pfnVibrate(0.1f, false);
 }
 
 /*

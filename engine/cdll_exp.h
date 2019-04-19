@@ -39,7 +39,7 @@ typedef struct cldll_func_s
 	void	(*CL_CreateMove)( float frametime, struct usercmd_s *cmd, int active );
 	int	(*CL_IsThirdPerson)( void );
 	void	(*CL_CameraOffset)( float *ofs );
-	void	*(*KB_Find)( const char *name );
+	struct kbutton_s *(*KB_Find)( const char *name );
 	void	(*CAM_Think)( void );		// camera stuff
 	void	(*pfnCalcRefdef)( ref_params_t *pparams );
 	int	(*pfnAddEntity)( int type, cl_entity_t *ent, const char *modelname );
@@ -66,7 +66,7 @@ typedef struct cldll_func_s
 	int	(*pfnGetPlayerTeam)( int playerIndex );
 	void	*(*pfnGetClientFactory)( void );
 	// Xash3D extension
-	int	(*pfnGetRenderInterface)( int version, render_api_t *renderfuncs, render_interface_t *callback );
+	int	(*pfnGetRenderInterface)( int version, struct render_api_s *renderfuncs, struct render_interface_s *callback );
 	void	(*pfnClipMoveToEntity)( struct physent_s *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
 	// More extenstions for the extensions god! (SDL Xash port)
 	int (*pfnTouchEvent)( int type, int fingerID, float x, float y, float dx, float dy );

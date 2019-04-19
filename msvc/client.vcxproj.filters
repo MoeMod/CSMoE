@@ -58,6 +58,33 @@
     <Filter Include="cl_dll\hud\moe">
       <UniqueIdentifier>{2441c342-4c6a-412d-b545-0512bfd993b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\vgui">
+      <UniqueIdentifier>{0c4bc149-8ba8-4f12-90e8-944cc2353332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support">
+      <UniqueIdentifier>{d6dee339-7013-4cae-8fa9-75f871394648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\vgui_controls">
+      <UniqueIdentifier>{d7ef9fd2-7ad6-4a0f-9028-4fd110496500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK">
+      <UniqueIdentifier>{e4091607-8918-4c33-9995-553d64cbec76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\wrapper">
+      <UniqueIdentifier>{20d249a8-1560-45ca-80b4-df4428819fb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\tier1">
+      <UniqueIdentifier>{163ec7c4-d3c4-48e9-8e05-1f2bd00e8b7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\tier0">
+      <UniqueIdentifier>{a1d9fff3-c2f9-4043-a214-f3d7668aa6cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\public">
+      <UniqueIdentifier>{849d8309-f46c-4be4-972a-92a90097b7b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\public\tier0">
+      <UniqueIdentifier>{4e2ebba7-c6b8-4145-a12f-f39d6ee1b8f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -300,9 +327,6 @@
     <ClCompile Include="..\cl_dll\hud\hud_update.cpp">
       <Filter>cl_dll\hud</Filter>
     </ClCompile>
-    <ClCompile Include="..\cl_dll\hud\menu.cpp">
-      <Filter>cl_dll\hud</Filter>
-    </ClCompile>
     <ClCompile Include="..\cl_dll\hud\message.cpp">
       <Filter>cl_dll\hud</Filter>
     </ClCompile>
@@ -407,9 +431,6 @@
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui_parser.cpp">
       <Filter>cl_dll</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\interface.cpp">
-      <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="..\public\unicode_strtools.cpp">
       <Filter>public</Filter>
@@ -620,6 +641,219 @@
     </ClCompile>
     <ClCompile Include="..\cl_dll\hud\moe\moe_touch.cpp">
       <Filter>cl_dll\hud\moe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CClientVGUI.cpp">
+      <Filter>cl_dll\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\KeyValuesCompat.cpp">
+      <Filter>cl_dll\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\controls.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Panel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\BuildGroup.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Frame.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Button.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\AnimationController.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\MenuButton.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\MenuItem.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\MessageBox.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\EditablePanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\FocusNavGroup.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\TextImage.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Label.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Menu.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ScrollBarSlider.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ScrollBar.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\BuildModeDialog.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ComboBox.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\CheckButton.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ProgressBar.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\RadioButton.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ToggleButton.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ImagePanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\AnimatingImagePanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Divider.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\URLLabel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\RichText.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\BitmapImagePanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\TextEntry.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\PanelListPanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ListPanel.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\ImageList.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\hud\hud_menu.cpp">
+      <Filter>cl_dll\hud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\FileSystem_Helpers.cpp">
+      <Filter>vgui2_support\SourceSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadipanel.cpp">
+      <Filter>vgui2_support\SourceSDK\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadscheme.cpp">
+      <Filter>vgui2_support\SourceSDK\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadsurface.cpp">
+      <Filter>vgui2_support\SourceSDK\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadinput.cpp">
+      <Filter>vgui2_support\SourceSDK\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlBuffer.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlString.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlSymbol.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\xboxstubs.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\processor_detect.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\RangeCheckedVar.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\MemPool.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\netadr.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\KeyValues.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\StringPool.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\strtools.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\tier1.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\TokenReader.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\byteswap.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\CharacterSet.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\checksum_crc.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\ConVar.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\DataManager.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\Diff.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\generichash.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\bitbuf.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Image.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\Tooltip.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\BuildFactoryHelper.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\checksum_md5.cpp">
+      <Filter>vgui2_support\SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\public\tier0\memoverride.cpp">
+      <Filter>vgui2_support\SourceSDK\public\tier0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CHudViewPort.cpp">
+      <Filter>cl_dll\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CBaseViewport.cpp">
+      <Filter>cl_dll\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CBackGroundPanel.cpp">
+      <Filter>cl_dll\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CGameUITestPanel.cpp">
+      <Filter>cl_dll\vgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -898,6 +1132,150 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\hud\moe\moe_touch.h">
       <Filter>cl_dll\hud\moe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CClientVGUI.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IEngineVgui.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\KeyValuesCompat.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\controls.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Panel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\keybindingmap.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\MessageMap.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\PanelAnimationVar.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\PHandle.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Tooltip.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Menu.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\MenuItem.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Label.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Button.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\EditablePanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\MessageBox.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\FocusNavGroup.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Frame.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\AnimationController.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\MenuButton.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\TextImage.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Image.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\BuildGroup.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ScrollBar.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ScrollBarSlider.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\BuildModeDialog.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ComboBox.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\CheckButton.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ProgressBar.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\RadioButton.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ToggleButton.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ImagePanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\AnimatingImagePanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Divider.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\URLLabel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\RichText.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\BitmapImagePanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\TextEntry.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\PanelListPanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ListPanel.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\ImageList.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CHudViewPort.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CBaseViewport.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IViewport.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IViewportPanel.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CBackGroundPanel.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IGameUIPanel.h">
+      <Filter>cl_dll\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h">
+      <Filter>cl_dll\vgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
