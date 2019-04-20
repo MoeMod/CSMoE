@@ -58,9 +58,6 @@
     <Filter Include="cl_dll\hud\moe">
       <UniqueIdentifier>{2441c342-4c6a-412d-b545-0512bfd993b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cl_dll\vgui">
-      <UniqueIdentifier>{0c4bc149-8ba8-4f12-90e8-944cc2353332}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vgui2_support">
       <UniqueIdentifier>{d6dee339-7013-4cae-8fa9-75f871394648}</UniqueIdentifier>
     </Filter>
@@ -85,8 +82,17 @@
     <Filter Include="vgui2_support\SourceSDK\public\tier0">
       <UniqueIdentifier>{4e2ebba7-c6b8-4145-a12f-f39d6ee1b8f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cl_dll\vgui\Viewport">
+    <Filter Include="cl_dll\vgui2">
+      <UniqueIdentifier>{0c4bc149-8ba8-4f12-90e8-944cc2353332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cl_dll\vgui2\Viewport">
       <UniqueIdentifier>{f58db136-9fca-429b-b0bf-b459bff654c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\vgui2">
+      <UniqueIdentifier>{0b71a025-a213-433a-ba18-c962a032cc28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\SourceSDK\vgui2\src">
+      <UniqueIdentifier>{3236c1c8-399f-4ed2-8ace-2376e7fc0a78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -646,10 +652,10 @@
       <Filter>cl_dll\hud\moe</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\CClientVGUI.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\KeyValuesCompat.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
     <ClCompile Include="..\vgui2_support\vgui_controls\controls.cpp">
       <Filter>vgui2_support\vgui_controls</Filter>
@@ -847,16 +853,37 @@
       <Filter>vgui2_support\SourceSDK\public\tier0</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\CHudViewPort.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\CBaseViewport.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\CBackGroundPanel.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
     <ClCompile Include="..\cl_dll\vgui2\CGameUITestPanel.cpp">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CClientMOTD.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\HTML.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\FileOpenDialog.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\InputDialog.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\QueryBox.cpp">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadfilesystem.cpp">
+      <Filter>vgui2_support\SourceSDK\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.cpp">
+      <Filter>vgui2_support\SourceSDK\vgui2\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1137,13 +1164,13 @@
       <Filter>cl_dll\hud\moe</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CClientVGUI.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\IEngineVgui.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\KeyValuesCompat.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\vgui2_support\vgui_controls\controls.h">
       <Filter>vgui2_support\vgui_controls</Filter>
@@ -1260,34 +1287,49 @@
       <Filter>vgui2_support\vgui_controls</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CHudViewPort.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CBaseViewport.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\IViewport.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\IViewportPanel.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CBackGroundPanel.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\IGameUIPanel.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h">
-      <Filter>cl_dll\vgui</Filter>
+      <Filter>cl_dll\vgui2</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\Viewport\ICSViewPortMsgs.h">
-      <Filter>cl_dll\vgui\Viewport</Filter>
+      <Filter>cl_dll\vgui2\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPortMsgs.h">
-      <Filter>cl_dll\vgui\Viewport</Filter>
+      <Filter>cl_dll\vgui2\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPort.h">
-      <Filter>cl_dll\vgui\Viewport</Filter>
+      <Filter>cl_dll\vgui2\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CClientMOTD.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\HTML.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\FileOpenDialog.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\InputDialog.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\QueryBox.h">
+      <Filter>vgui2_support\vgui_controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

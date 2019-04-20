@@ -3,6 +3,8 @@
 
 #include "vgui2/CBaseViewport.h"
 
+#include <string>
+
 class CClientMOTD;
 
 /**
@@ -32,6 +34,13 @@ public:
 	IGameUIPanel* CreateGameUIPanelByName(const char* pszName) override;
 
 private:
+	int MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf);
+
+	// MOTD
+	bool m_bGotAllMOTD = false;
+	std::string	m_szMOTD;
+	
+	CClientMOTD *m_pMOTD = nullptr;
 };
 
 #endif //GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H

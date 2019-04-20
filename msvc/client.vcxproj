@@ -147,6 +147,7 @@
     <ClCompile Include="..\cl_dll\util.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CBackGroundPanel.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CBaseViewport.cpp" />
+    <ClCompile Include="..\cl_dll\vgui2\CClientMOTD.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CClientVGUI.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CGameUITestPanel.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CHudViewPort.cpp" />
@@ -236,6 +237,8 @@
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlString.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlSymbol.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\xboxstubs.cpp" />
+    <ClCompile Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.cpp" />
+    <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadfilesystem.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadinput.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadipanel.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadscheme.cpp" />
@@ -252,11 +255,14 @@
     <ClCompile Include="..\vgui2_support\vgui_controls\controls.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\Divider.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\EditablePanel.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui_controls\FileOpenDialog.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\FocusNavGroup.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\Frame.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui_controls\HTML.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\Image.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\ImageList.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\ImagePanel.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui_controls\InputDialog.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\Label.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\ListPanel.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\Menu.cpp" />
@@ -266,6 +272,7 @@
     <ClCompile Include="..\vgui2_support\vgui_controls\Panel.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\PanelListPanel.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\ProgressBar.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui_controls\QueryBox.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\RadioButton.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\RichText.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\ScrollBar.cpp" />
@@ -303,6 +310,7 @@
     <ClInclude Include="..\cl_dll\r_texture.h" />
     <ClInclude Include="..\cl_dll\vgui2\CBackGroundPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\CBaseViewport.h" />
+    <ClInclude Include="..\cl_dll\vgui2\CClientMOTD.h" />
     <ClInclude Include="..\cl_dll\vgui2\CClientVGUI.h" />
     <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\CHudViewPort.h" />
@@ -393,11 +401,14 @@
     <ClInclude Include="..\vgui2_support\vgui_controls\controls.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\Divider.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\EditablePanel.h" />
+    <ClInclude Include="..\vgui2_support\vgui_controls\FileOpenDialog.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\FocusNavGroup.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\Frame.h" />
+    <ClInclude Include="..\vgui2_support\vgui_controls\HTML.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\Image.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\ImageList.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\ImagePanel.h" />
+    <ClInclude Include="..\vgui2_support\vgui_controls\InputDialog.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\keybindingmap.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\Label.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\ListPanel.h" />
@@ -411,6 +422,7 @@
     <ClInclude Include="..\vgui2_support\vgui_controls\PanelListPanel.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\PHandle.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\ProgressBar.h" />
+    <ClInclude Include="..\vgui2_support\vgui_controls\QueryBox.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\RadioButton.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\RichText.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\ScrollBar.h" />
@@ -506,7 +518,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\vgui2_support;..\vgui2_support\interfaces;..\vgui2_support\SourceSDK;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\vgui2_support;..\vgui2_support\interfaces;..\vgui2_support\SourceSDK;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -560,7 +572,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\vgui2_support;..\vgui2_support\interfaces;..\vgui2_support\SourceSDK;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\vgui2_support;..\vgui2_support\interfaces;..\vgui2_support\SourceSDK;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

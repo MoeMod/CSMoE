@@ -5,8 +5,10 @@
 
 #include "CHudViewport.h"
 #include "CGameUITestPanel.h"
+#include "CClientMOTD.h"
 
 #include "hud.h"
+#include "parsemsg.h"
 
 void CHudViewport::ApplySchemeSettings(vgui2::IScheme *pScheme)
 {
@@ -21,6 +23,33 @@ void CHudViewport::ApplySchemeSettings(vgui2::IScheme *pScheme)
 void CHudViewport::Start()
 {
 	BaseClass::Start();
+
+	static CHudViewport * const s_pHudViewPort = this;
+
+	gEngfuncs.pfnHookUserMsg("VGUIMenu", [](const char *pszName, int iSize, void *pbuf) { return s_pHudViewPort->MsgFunc_MOTD(pszName, iSize, pbuf); });
+}
+
+int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
+{
+	if (m_bGotAllMOTD)
+		m_szMOTD.clear();
+
+	BufferReader buf(pszName, pbuf, iSize);
+
+	m_bGotAllMOTD = buf.ReadByte();
+
+	m_szMOTD += buf.ReadString();
+
+	//CClientMOTD *panel = dynamic_cast<CClientMOTD *>(g_pViewport->FindPanelByName("ClientMOTD"));
+	CClientMOTD *panel = m_pMOTD;
+	if (panel)
+	{
+		panel->Activate(gHUD.m_szServerName, m_szMOTD.c_str());
+	}
+	else
+		gEngfuncs.Con_Printf("MsgFunc_MOTD() : Error! CClientMOTD is nullptr\n");
+
+	return 1;
 }
 
 void CHudViewport::HideScoreBoard()
@@ -43,7 +72,7 @@ void CHudViewport::HideClientUI()
 
 void CHudViewport::CreateDefaultPanels()
 {
-	//AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_MOTD));
+	AddNewPanel(CreatePanelByName("ClientMOTD"));
 	//AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
@@ -52,12 +81,14 @@ void CHudViewport::CreateDefaultPanels()
 IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 {
 	IViewportPanel* pPanel = nullptr;
-	/*
-	if (Q_strcmp(VIEWPORT_PANEL_MOTD, pszName) == 0)
+	
+	if (Q_strcmp("ClientMOTD", pszName) == 0)
 	{
-		pPanel = new CClientMOTD(this);
+		if(!m_pMOTD)
+			m_pMOTD = new CClientMOTD(this);
+		pPanel = m_pMOTD;
 	}
-	else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
+	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
 	{
 		pPanel = new CScorePanel(this);
 	}
