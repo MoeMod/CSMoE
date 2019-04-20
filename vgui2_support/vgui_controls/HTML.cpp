@@ -9,7 +9,7 @@
 //=============================================================================//
 
 #include <vgui/IPanel.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include <vgui/IBorder.h>
 #include <vgui/IVGui.h>

@@ -8,7 +8,7 @@
 #include <tier1/KeyValues.h>
 
 #include <vgui/IPanel.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGUI.h>
 

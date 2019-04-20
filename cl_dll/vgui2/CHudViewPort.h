@@ -32,8 +32,8 @@ public:
 
 	IViewportPanel* CreatePanelByName(const char* pszName) override;
 	IGameUIPanel* CreateGameUIPanelByName(const char* pszName) override;
+	
 
-private:
 	int MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf);
 
 	// MOTD

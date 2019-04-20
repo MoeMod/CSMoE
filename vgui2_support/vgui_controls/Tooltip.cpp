@@ -9,7 +9,7 @@
 #include <math.h>
 #define PROTECTED_THINGS_DISABLE
 
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>

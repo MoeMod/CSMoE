@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include <vgui/ISurface.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 
 #include <tier1/KeyValues.h>
 

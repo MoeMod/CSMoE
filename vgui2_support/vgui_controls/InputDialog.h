@@ -10,99 +10,57 @@
 #pragma once
 #endif
 
-#include <tier1/utlvector.h>
-
-#include "Controls.h"
-#include "Frame.h"
+#include <vgui_controls/Controls.h>
+#include <vgui_controls/Frame.h>
 
 namespace vgui2
 {
 
-class Label;
-class Button;
-class TextEntry;
+	class Label;
+	class Button;
+	class TextEntry;
 
+	//-----------------------------------------------------------------------------
+	// Purpose: Utility dialog, used to let user type in some text
+	//-----------------------------------------------------------------------------
+	class InputDialog : public Frame
+	{
+		DECLARE_CLASS_SIMPLE(InputDialog, Frame);
 
-//-----------------------------------------------------------------------------
-// Purpose: Utility dialog base class - just has context kv and ok/cancel buttons
-//-----------------------------------------------------------------------------
-class BaseInputDialog : public Frame
-{
-	DECLARE_CLASS_SIMPLE( BaseInputDialog, Frame );
+	public:
+		InputDialog(vgui2::Panel *parent, const char *title, char const *prompt, char const *defaultValue = "");
+		~InputDialog();
 
-public:
-	BaseInputDialog( vgui2::Panel *parent, const char *title );
-	~BaseInputDialog();
+		void SetMultiline(bool state);
 
-	void DoModal( KeyValues *pContextKeyValues = NULL );
+		/* action signals
 
-protected:
-	virtual void PerformLayout();
-	virtual void PerformLayout( int x, int y, int w, int h ) {}
+			"InputCompleted"
+				"text"	- the text entered
 
-	// command buttons
-	virtual void OnCommand( const char *command );
+			"InputCanceled"
+		*/
+		void DoModal(KeyValues *pContextKeyValues = NULL);
+		void AllowNumericInputOnly(bool bOnlyNumeric);
 
-	void CleanUpContextKeyValues();
-	KeyValues		*m_pContextKeyValues;
+	protected:
+		virtual void PerformLayout();
 
-private:
-	vgui2::Button	*m_pCancelButton;
-	vgui2::Button	*m_pOKButton;
-};
+		// command buttons
+		virtual void OnCommand(const char *command);
 
-//-----------------------------------------------------------------------------
-// Purpose: Utility dialog, used to ask yes/no questions of the user
-//-----------------------------------------------------------------------------
-class InputMessageBox : public BaseInputDialog
-{
-	DECLARE_CLASS_SIMPLE( InputMessageBox, BaseInputDialog );
+	private:
+		void CleanUpContextKeyValues();
+		KeyValues *m_pContextKeyValues;
 
-public:
-	InputMessageBox( vgui2::Panel *parent, const char *title, char const *prompt );
-	~InputMessageBox();
+		vgui2::Label			*m_pPrompt;
+		vgui2::TextEntry		*m_pInput;
 
-protected:
-	virtual void PerformLayout( int x, int y, int w, int h );
+		vgui2::Button		*m_pCancelButton;
+		vgui2::Button		*m_pOKButton;
+	};
 
-private:
-	vgui2::Label			*m_pPrompt;
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: Utility dialog, used to let user type in some text
-//-----------------------------------------------------------------------------
-class InputDialog : public BaseInputDialog
-{
-	DECLARE_CLASS_SIMPLE( InputDialog, BaseInputDialog );
-
-public:
-	InputDialog( vgui2::Panel *parent, const char *title, char const *prompt, char const *defaultValue = "" );
-	~InputDialog();
-
-	void SetMultiline( bool state );
-
-	/* action signals
-
-		"InputCompleted"
-			"text"	- the text entered
-
-		"InputCanceled"
-	*/
-	void AllowNumericInputOnly( bool bOnlyNumeric );
-
-protected:
-	virtual void PerformLayout( int x, int y, int w, int h );
-
-	// command buttons
-	virtual void OnCommand(const char *command);
-
-private:
-	vgui2::Label			*m_pPrompt;
-	vgui2::TextEntry		*m_pInput;
-};
-
-} // namespace vgui
+} // namespace vgui2
 
 
 #endif // INPUTDIALOG_H

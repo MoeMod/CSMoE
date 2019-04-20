@@ -15,7 +15,7 @@
 #include <vgui/Cursor.h>
 #include <vgui/MouseCode.h>
 #include <vgui/IBorder.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
@@ -234,10 +234,10 @@ namespace
 			bool isSmall = ((Frame *)GetParent())->IsSmallCaption();
 
 			_marlettFont = pScheme->GetFont( isSmall ? "MarlettSmall" : "Marlett", IsProportional());
-			SetFgColor(GetSchemeColor("BorderBright", pScheme));
-			SetBgColor(GetSchemeColor("BorderSelection", pScheme));
+			SetFgColor(GetSchemeColor("FrameGrip.Color1", pScheme));
+			SetBgColor(GetSchemeColor("FrameGrip.Color2", pScheme));
 
-			const char *snapRange = pScheme->GetResourceString("AutoSnapRange");
+			const char *snapRange = pScheme->GetResourceString("Frame.AutoSnapRange");
 			if (snapRange && *snapRange)
 			{
 				m_iSnapRange = atoi(snapRange);
@@ -547,12 +547,12 @@ namespace vgui2
 		{
 			Button::ApplySchemeSettings(pScheme);
 			
-			_enabledFgColor = GetSchemeColor("TitleButtonFgColor", pScheme);
-			_enabledBgColor = GetSchemeColor("TitleButtonBgColor", pScheme);
+			_enabledFgColor = GetSchemeColor("FrameTitleButton.FgColor", pScheme);
+			_enabledBgColor = GetSchemeColor("FrameTitleButton.BgColor", pScheme);
 
-			_disabledFgColor = GetSchemeColor("TitleButtonDisabledFgColor", pScheme);
-			_disabledBgColor = GetSchemeColor("TitleButtonDisabledBgColor", pScheme);
-			
+			_disabledFgColor = GetSchemeColor("FrameTitleButton.DisabledFgColor", pScheme);
+			_disabledBgColor = GetSchemeColor("FrameTitleButton.DisabledBgColor", pScheme);
+
 			_brightBorder = pScheme->GetBorder("TitleButtonBorder");
 			_depressedBorder = pScheme->GetBorder("TitleButtonDepressedBorder");
 			_disabledBorder = pScheme->GetBorder("TitleButtonDisabledBorder");
@@ -681,13 +681,13 @@ public:
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
-		_enCol = GetSchemeColor("TitleBarBgColor", pScheme);
-		_disCol = GetSchemeColor("TitleBarDisabledBgColor", pScheme);
-		
-		const char *pEnabledImage = m_EnabledImage.Length() ? m_EnabledImage.Get() : 
-			pScheme->GetResourceString( "TitleBarIcon" );
-		const char *pDisabledImage = m_DisabledImage.Length() ? m_DisabledImage.Get() : 
-			pScheme->GetResourceString( "TitleBarDisabledIcon" );
+		_enCol = GetSchemeColor("FrameSystemButton.FgColor", pScheme);
+		_disCol = GetSchemeColor("FrameSystemButton.BgColor", pScheme);
+
+		const char *pEnabledImage = m_EnabledImage.Length() ? m_EnabledImage.Get() :
+			pScheme->GetResourceString("FrameSystemButton.Icon");
+		const char *pDisabledImage = m_DisabledImage.Length() ? m_DisabledImage.Get() :
+			pScheme->GetResourceString("FrameSystemButton.DisabledIcon");
 		_enabled = scheme()->GetImage( pEnabledImage, false);
 		_disabled = scheme()->GetImage( pDisabledImage, false);
 
@@ -1662,19 +1662,19 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	// always chain back
 	BaseClass::ApplySchemeSettings(pScheme);
 	
-	_titleBarFgColor = GetSchemeColor("TitleBarFgColor", pScheme);
-	_titleBarBgColor = GetSchemeColor("TitleBarBgColor", pScheme);
-	_titleBarDisabledFgColor = GetSchemeColor("TitleBarDisabledFgColor", pScheme);
-	_titleBarDisabledBgColor = GetSchemeColor("TitleBarDisabledBgColor", pScheme);
+	_titleBarFgColor = GetSchemeColor("FrameTitleBar.TextColor", pScheme);
+	_titleBarBgColor = GetSchemeColor("FrameTitleBar.BgColor", pScheme);
+	_titleBarDisabledFgColor = GetSchemeColor("FrameTitleBar.DisabledTextColor", pScheme);
+	_titleBarDisabledBgColor = GetSchemeColor("FrameTitleBar.DisabledBgColor", pScheme);
 
 	const char *font = NULL;
-	if ( m_bSmallCaption )
+	if (m_bSmallCaption)
 	{
-		font = pScheme->GetResourceString("SmallFont");
+		font = pScheme->GetResourceString("FrameTitleBar.SmallFont");
 	}
 	else
 	{
-		font = pScheme->GetResourceString("Font");
+		font = pScheme->GetResourceString("FrameTitleBar.Font");
 	}
 	_title->SetFont( pScheme->GetFont((font && *font) ? font : "Default", IsProportional()) );
 	_title->ResizeImageToContent();
@@ -1694,23 +1694,23 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	_minimizeToSysTrayButton->SetFont(marfont);
 	_closeButton->SetFont(marfont);
 
-	m_flTransitionEffectTime = atof(pScheme->GetResourceString("TransitionEffectTime"));
-	m_flFocusTransitionEffectTime = atof(pScheme->GetResourceString("FocusTransitionEffectTime"));
+	m_flTransitionEffectTime = atof(pScheme->GetResourceString("Frame.TransitionEffectTime"));
+	m_flFocusTransitionEffectTime = atof(pScheme->GetResourceString("Frame.FocusTransitionEffectTime"));
 
-	m_InFocusBgColor = pScheme->GetColor("BgColor", GetBgColor());
-	m_OutOfFocusBgColor = pScheme->GetColor("OutOfFocusBgColor", m_InFocusBgColor);
+	m_InFocusBgColor = pScheme->GetColor("Frame.BgColor", GetBgColor());
+	m_OutOfFocusBgColor = pScheme->GetColor("Frame.OutOfFocusBgColor", m_InFocusBgColor);
 
-	const char *resourceString = pScheme->GetResourceString("ClientInsetX");
+	const char *resourceString = pScheme->GetResourceString("Frame.ClientInsetX");
 	if ( resourceString && *resourceString )
 	{
 		m_iClientInsetX = atoi(resourceString);
 	}
-	resourceString = pScheme->GetResourceString("ClientInsetY");
+	resourceString = pScheme->GetResourceString("Frame.ClientInsetY");
 	if ( resourceString && *resourceString )
 	{
 		m_iClientInsetY = atoi(resourceString);
 	}
-	resourceString = pScheme->GetResourceString("TitleTextInsetX");
+	resourceString = pScheme->GetResourceString("Frame.TitleTextInsetX");
 	if ( resourceString && *resourceString )
 	{
 		m_iTitleTextInsetX = atoi(resourceString);

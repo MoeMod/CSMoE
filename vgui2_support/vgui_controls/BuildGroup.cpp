@@ -28,7 +28,7 @@
 #include <vgui/Cursor.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGUI.h>
 #include <vgui/ISurface.h>

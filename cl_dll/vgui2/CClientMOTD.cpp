@@ -44,7 +44,7 @@ CClientMOTD::CClientMOTD( IViewport* pParent )
 	m_pMessage = new vgui2::RichText( this, "TextMessage" );
 	m_pMessageHtml = new CClientMOTDHTML( this, "Message" );
 
-	LoadControlSettings( "Resource/MOTD.res" );
+	LoadControlSettings( "Resource/UI/MOTD.res" );
 	InvalidateLayout();
 
 	m_pServerName = new vgui2::Label( this, "serverName", "" );

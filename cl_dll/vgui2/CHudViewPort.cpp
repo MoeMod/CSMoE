@@ -27,6 +27,8 @@ void CHudViewport::Start()
 	static CHudViewport * const s_pHudViewPort = this;
 
 	gEngfuncs.pfnHookUserMsg("VGUIMenu", [](const char *pszName, int iSize, void *pbuf) { return s_pHudViewPort->MsgFunc_MOTD(pszName, iSize, pbuf); });
+
+	gEngfuncs.pfnAddCommand("motd_open", []() { s_pHudViewPort->m_pMOTD->Activate(gHUD.m_szServerName, "wow"); });
 }
 
 int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
@@ -102,8 +104,8 @@ IGameUIPanel *CHudViewport::CreateGameUIPanelByName(const char *pszName)
 	
 	if (Q_strcmp("GameUITestPanel", pszName) == 0)
 	{
-		//pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_ROOT));
-		pPanel = new CGameUITestPanel(this->GetVPanel());
+		pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
+		//pPanel = new CGameUITestPanel(this->GetVPanel());
 	}
 	
 	return pPanel;

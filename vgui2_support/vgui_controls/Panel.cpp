@@ -20,7 +20,7 @@
 #include <IKeyValues.h>
 #include <FileSystem.h>
 #include <vgui/IBorder.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/IPanel.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
@@ -1613,14 +1613,7 @@ bool Panel::IsChildOfSurfaceModalPanel()
 //-----------------------------------------------------------------------------
 bool Panel::IsChildOfModalSubTree()
 {
-	VPANEL subTree = input()->GetModalSubTree();
-	if ( !subTree )
-		return true;
-
-	if ( HasParent( subTree ) )
-		return true;
-
-	return false;
+	return input()->IsChildOfModalPanel(GetVPanel());
 }
 
 //-----------------------------------------------------------------------------
@@ -1628,33 +1621,16 @@ bool Panel::IsChildOfModalSubTree()
 // Input  :  - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-static bool ShouldHandleInputMessage( VPANEL p )
-{
-	// If there is not modal subtree, then always handle the msg
-	if ( !input()->GetModalSubTree() )
-		return true;
-
-	// What state are we in?
-	bool bChildOfModal = false;
-	VPANEL subTree = input()->GetModalSubTree();
-	if ( !subTree )
-	{
-		bChildOfModal = true;
-	}
-	else if ( ipanel()->HasParent( p, subTree ) )
-	{
-		bChildOfModal = true;
-	}
-
-	if ( input()->ShouldModalSubTreeReceiveMessages() )
-		return bChildOfModal;
-
-	return !bChildOfModal;
-}
-
 bool Panel::ShouldHandleInputMessage()
 {
-	return ::ShouldHandleInputMessage( GetVPanel() );
+	// If there is not modal subtree, then always handle the msg
+	if (input()->GetAppModalSurface() == 0)
+	{
+		return true;
+	}
+
+	// What state are we in?
+	return IsChildOfModalSubTree();
 }
 
 void Panel::InternalMousePressed(int code)
@@ -4116,7 +4092,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 
 			if (item->name)
 			{
-				item->nameSymbol = KeyValuesSystem()->GetSymbolForString(item->name);
+				item->nameSymbol = keyvalues()->GetSymbolForString(item->name);
 			}
 			else
 			{
@@ -4124,7 +4100,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 			}
 			if (item->firstParamName)
 			{
-				item->firstParamSymbol = KeyValuesSystem()->GetSymbolForString(item->firstParamName);
+				item->firstParamSymbol = keyvalues()->GetSymbolForString(item->firstParamName);
 			}
 			else
 			{
@@ -4132,7 +4108,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 			}
 			if (item->secondParamName)
 			{
-				item->secondParamSymbol = KeyValuesSystem()->GetSymbolForString(item->secondParamName);
+				item->secondParamSymbol = keyvalues()->GetSymbolForString(item->secondParamName);
 			}
 			else
 			{
@@ -4576,7 +4552,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 
 			if (item->name)
 			{
-				item->nameSymbol = KeyValuesSystem()->GetSymbolForString(item->name);
+				item->nameSymbol = keyvalues()->GetSymbolForString(item->name);
 			}
 			else
 			{
@@ -4584,7 +4560,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 			}
 			if (item->firstParamName)
 			{
-				item->firstParamSymbol = KeyValuesSystem()->GetSymbolForString(item->firstParamName);
+				item->firstParamSymbol = keyvalues()->GetSymbolForString(item->firstParamName);
 			}
 			else
 			{
@@ -4592,7 +4568,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 			}
 			if (item->secondParamName)
 			{
-				item->secondParamSymbol = KeyValuesSystem()->GetSymbolForString(item->secondParamName);
+				item->secondParamSymbol = keyvalues()->GetSymbolForString(item->secondParamName);
 			}
 			else
 			{
@@ -6173,7 +6149,7 @@ void Panel::FindDropTargetPanel_R( CUtlVector< VPANEL >& panelList, int x, int y
 	if ( !ipanel()->IsFullyVisible( check ) )
 		return;
 
-	if ( ::ShouldHandleInputMessage( check ) && ipanel()->IsWithinTraverse( check, x, y, false ) )
+	if ( /*::ShouldHandleInputMessage( check ) &&*/ ipanel()->IsWithinTraverse( check, x, y, false ) )
 	{
 		panelList.AddToTail( check );
 	}

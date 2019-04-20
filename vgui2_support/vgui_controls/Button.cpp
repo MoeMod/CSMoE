@@ -11,7 +11,7 @@
 #include <tier1/utlsymbol.h>
 
 #include <vgui/IBorder.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
@@ -429,15 +429,15 @@ void Button::ApplySchemeSettings(IScheme *pScheme)
 	_depressedBorder = pScheme->GetBorder("ButtonDepressedBorder");
 	_keyFocusBorder = pScheme->GetBorder("ButtonKeyFocusBorder");
 
-	_defaultFgColor = GetSchemeColor("BaseText", Color(255, 255, 255, 255), pScheme);
-	_defaultBgColor = GetSchemeColor("BgColor", Color(0, 0, 0, 255), pScheme);
+	_defaultFgColor = GetSchemeColor("Button.TextColor", Color(255, 255, 255, 255), pScheme);
+	_defaultBgColor = GetSchemeColor("Button.BgColor", Color(0, 0, 0, 255), pScheme);
 
-	_armedFgColor = GetSchemeColor("ButtonArmedFgColor", _defaultFgColor, pScheme);
-	_armedBgColor = GetSchemeColor("ButtonArmedBgColor", _defaultBgColor, pScheme);
+	_armedFgColor = GetSchemeColor("Button.ArmedTextColor", _defaultFgColor, pScheme);
+	_armedBgColor = GetSchemeColor("Button.ArmedBgColor", _defaultBgColor, pScheme);
 
-	_depressedFgColor = GetSchemeColor("ButtonDepressedFgColor", _defaultFgColor, pScheme);
-	_depressedBgColor = GetSchemeColor("ButtonDepressedBgColor", _defaultBgColor, pScheme);
-	_keyboardFocusColor = GetSchemeColor("Button.FocusBorderColor", Color(0,0,0,255), pScheme);
+	_depressedFgColor = GetSchemeColor("Button.DepressedTextColor", _defaultFgColor, pScheme);
+	_depressedBgColor = GetSchemeColor("Button.DepressedBgColor", _defaultBgColor, pScheme);
+	_keyboardFocusColor = GetSchemeColor("Button.FocusBorderColor", Color(0, 0, 0, 255), pScheme);
 
 	int xInset = 0, yInset = 0;
 

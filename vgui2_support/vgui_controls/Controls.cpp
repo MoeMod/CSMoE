@@ -1,29 +1,28 @@
 #include <string.h>
 #include <locale.h>
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
+#include <vgui/IInputInternal.h>
+#include <vgui/ISchemeManager.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 #include <vgui/ILocalize.h>
-#include <interfaces/IKeyValues.h>
+#include <IKeyValues.h>
 #include <FileSystem.h>
 #include "controls.h"
 
 namespace vgui2
 {
-	vgui2::IInput *g_pInputInterface = NULL;
+	vgui2::IInputInternal *g_pInputInterface = NULL;
 	vgui2::ISchemeManager *g_pSchemeInterface = NULL;
 	vgui2::ISurface *g_pSurfaceInterface = NULL;
 	vgui2::ISystem *g_pSystemInterface = NULL;
 	vgui2::IVGui *g_pVGuiInterface = NULL;
 	vgui2::IPanel *g_pPanelInterface = NULL;
 	vgui2::ILocalize *g_pLocalizeInterface = NULL;
-	vgui2::IKeyValues *g_pKeyValuesInterface = NULL;
 	IFileSystem *g_pFileSystemInterface = NULL;
 
-	vgui2::IInput *input() {
+	vgui2::IInputInternal *input() {
 		return g_pInputInterface;
 	}
 
@@ -49,10 +48,6 @@ namespace vgui2
 
 	vgui2::ILocalize *localize() {
 		return g_pLocalizeInterface;
-	}
-
-	vgui2::IKeyValues *keyvalues() {
-		return g_pKeyValuesInterface;
 	}
 	
 	IFileSystem *filesystem() {
@@ -91,18 +86,12 @@ namespace vgui2
 		g_pSurfaceInterface = (ISurface *)InitializeInterface(VGUI_SURFACE_INTERFACE_VERSION, factoryList, numFactories);
 		g_pSchemeInterface = (ISchemeManager *)InitializeInterface(VGUI_SCHEME_INTERFACE_VERSION, factoryList, numFactories);
 		g_pSystemInterface = (ISystem *)InitializeInterface(VGUI_SYSTEM_INTERFACE_VERSION, factoryList, numFactories);
-		g_pInputInterface = (IInput *)InitializeInterface(VGUI_INPUT_INTERFACE_VERSION, factoryList, numFactories);
+		g_pInputInterface = (IInputInternal *)InitializeInterface(VGUI_INPUTINTERNAL_INTERFACE_VERSION, factoryList, numFactories);
 		g_pLocalizeInterface = (ILocalize *)InitializeInterface(VGUI_LOCALIZE_INTERFACE_VERSION, factoryList, numFactories);
 		g_pFileSystemInterface = (IFileSystem *)InitializeInterface(FILESYSTEM_INTERFACE_VERSION, factoryList, numFactories);
-		g_pKeyValuesInterface = (IKeyValues *)InitializeInterface(VGUI_KEYVALUES_INTERFACE_VERSION, factoryList, numFactories);
 
 		if (!g_pVGuiInterface) {
 			return false;
-		}
-
-		if (g_pKeyValuesInterface) {
-			// TODO: implement KeyValues
-			g_pKeyValuesInterface->RegisterSizeofKeyValues(24);
 		}
 
 		g_pVGuiInterface->Init(factoryList, numFactories);

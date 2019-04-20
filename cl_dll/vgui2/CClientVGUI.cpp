@@ -108,7 +108,8 @@ void CClientVGUI::Start()
 	g_pViewport->Start();
 
 #if 1
-	vgui2::Frame* pFrame = new vgui2::Frame(g_pViewport, "TestFrame");
+	vgui2::Frame* pFrame = new vgui2::Frame(nullptr, "TestFrame");
+	pFrame->SetParent(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
 	pFrame->SetProportional(false);
 	pFrame->SetTitleBarVisible(true);
 	pFrame->SetMinimizeButtonVisible(false);
@@ -118,6 +119,7 @@ void CClientVGUI::Start()
 	pFrame->SetMoveable(true);
 	pFrame->SetVisible(true);
 	//pFrame->SetScheme(vgui2::scheme()->LoadSchemeFromFile("ui/resource/SourceScheme.res", "SourceScheme"));
+	pFrame->SetScheme(vgui2::scheme()->LoadSchemeFromFile("Resource/TrackerScheme.res", "BaseUI"));
 	pFrame->SetSize(500, 500);
 	pFrame->SetTitle("Test Frame", true);
 	pFrame->Activate();

@@ -11,7 +11,7 @@
 #include <tier1/utlvector.h>
 #include <tier1/KeyValues.h>
 
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>

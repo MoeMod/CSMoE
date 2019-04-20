@@ -14,7 +14,7 @@
 #include <tier1/KeyValues.h>
 
 #include <vgui/Cursor.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>

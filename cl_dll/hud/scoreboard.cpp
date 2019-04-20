@@ -260,8 +260,9 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 	size_t SortedId[MAX_PLAYERS + 1];
 	std::iota(std::begin(SortedId), std::end(SortedId), 0);
 	std::sort(std::begin(SortedId), std::end(SortedId), [](size_t a, size_t b) {
-		return g_PlayerExtraInfo[a].frags > g_PlayerExtraInfo[b].frags || 
-			(g_PlayerExtraInfo[a].frags == g_PlayerExtraInfo[b].frags && g_PlayerExtraInfo[a].deaths < g_PlayerExtraInfo[b].deaths);
+		return std::make_pair(g_PlayerExtraInfo[a].frags, -g_PlayerExtraInfo[a].deaths) > std::make_pair(g_PlayerExtraInfo[b].frags, -g_PlayerExtraInfo[b].deaths);
+		//return (g_PlayerExtraInfo[a].frags > g_PlayerExtraInfo[b].deaths) || 
+		//	(g_PlayerExtraInfo[a].frags == g_PlayerExtraInfo[b].frags && g_PlayerExtraInfo[a].deaths < g_PlayerExtraInfo[b].deaths);
 	});
 
 	int r = 255, g = 255, b = 255, a = 255;

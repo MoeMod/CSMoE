@@ -25,7 +25,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGUI.h>
 #include <vgui/ILocalize.h>
-#include <vgui/IInput.h>
+#include <vgui/IInputInternal.h>
 
 #include "FileOpenDialog.h"
 
