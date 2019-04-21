@@ -241,11 +241,11 @@ void RichText::ApplySchemeSettings(IScheme *pScheme)
 	_font = pScheme->GetFont("Default", IsProportional() );
 	m_hFontUnderline = pScheme->GetFont("DefaultUnderline", IsProportional() );
 	
-	SetFgColor(GetSchemeColor("WindowFgColor", pScheme));
-	SetBgColor(GetSchemeColor("WindowBgColor", pScheme));
+	SetFgColor(GetSchemeColor("RichText.TextColor", pScheme));
+	SetBgColor(GetSchemeColor("RichText.BgColor", pScheme));
 	
-	_selectionTextColor = GetSchemeColor("SelectionFgColor", GetFgColor(), pScheme);
-	_selectionColor = GetSchemeColor("SelectionBgColor", pScheme);
+	_selectionTextColor = GetSchemeColor("RichText.SelectedTextColor", GetFgColor(), pScheme);
+	_selectionColor = GetSchemeColor("RichText.SelectedBgColor", pScheme);
 
 	if ( Q_strlen( pScheme->GetResourceString( "RichText.InsetX" ) ) )
 	{

@@ -37,7 +37,7 @@ CClientMOTD::CClientMOTD( IViewport* pParent )
 	strcpy( m_szTempFileName, "motd_temp.html" );
 
 	SetTitle( "", true );
-	SetScheme( "GameScheme" );
+	SetScheme( "ClientScheme" );
 	SetMoveable( false );
 	SetProportional( true );
 

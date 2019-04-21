@@ -50,10 +50,10 @@ public:
 
 	virtual void ApplySchemeSettings(IScheme *pScheme, bool proportional)
 	{
-		_bgColor = _radioButton->GetSchemeColor("CheckBgColor", Color(150, 150, 150, 0), pScheme);
-		_borderColor1 = _radioButton->GetSchemeColor("CheckButtonBorder1", Color(20, 20, 20, 0), pScheme);
-		_borderColor2 = _radioButton->GetSchemeColor("CheckButtonBorder2", Color(90, 90, 90, 0), pScheme);
-		_checkColor = _radioButton->GetSchemeColor("CheckButtonCheck", Color(20, 20, 20, 0), pScheme);
+		_bgColor = _radioButton->GetSchemeColor("CheckButton.BgColor", Color(150, 150, 150, 0), pScheme);
+		_borderColor1 = _radioButton->GetSchemeColor("CheckButton.Border1", Color(20, 20, 20, 0), pScheme);
+		_borderColor2 = _radioButton->GetSchemeColor("CheckButton.Border2", Color(90, 90, 90, 0), pScheme);
+		_checkColor = _radioButton->GetSchemeColor("CheckButton.Check", Color(20, 20, 20, 0), pScheme);
 		_font = pScheme->GetFont("Marlett", proportional);
 	}
 

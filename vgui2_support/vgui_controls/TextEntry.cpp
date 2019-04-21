@@ -126,19 +126,17 @@ void TextEntry::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 	
-	//SetFgColor(GetSchemeColor("WindowFgColor", pScheme));
-	//SetBgColor(GetSchemeColor("WindowBgColor", pScheme));
-	SetFgColor(GetSchemeColor("TextEntryFgColor", pScheme));
-	SetBgColor(GetSchemeColor("InvisibleBG", pScheme));
-	
-	_cursorColor = GetSchemeColor("TextCursorColor", pScheme);
-	_disabledFgColor = GetSchemeColor("TextEntryFgColor", pScheme);
-	_disabledBgColor = GetSchemeColor("InvisibleBG", pScheme);
-	
-	_selectionTextColor = GetSchemeColor("SelectionFgColor", GetFgColor(), pScheme);
-	_selectionColor = GetSchemeColor("SelectionBgColor", pScheme);
-	_defaultSelectionBG2Color = GetSchemeColor("SelectionBG2", pScheme);
-	_focusEdgeColor = GetSchemeColor("BorderSelection", Color(0, 0, 0, 0), pScheme);
+	SetFgColor(GetSchemeColor("TextEntry.TextColor", pScheme));
+	SetBgColor(GetSchemeColor("TextEntry.BgColor", pScheme));
+
+	_cursorColor = GetSchemeColor("TextEntry.CursorColor", pScheme);
+	_disabledFgColor = GetSchemeColor("TextEntry.DisabledTextColor", pScheme);
+	_disabledBgColor = GetSchemeColor("TextEntry.DisabledBgColor", pScheme);
+
+	_selectionTextColor = GetSchemeColor("TextEntry.SelectedTextColor", GetFgColor(), pScheme);
+	_selectionColor = GetSchemeColor("TextEntry.SelectedBgColor", pScheme);
+	_defaultSelectionBG2Color = GetSchemeColor("TextEntry.OutOfFocusSelectedBgColor", pScheme);
+	_focusEdgeColor = GetSchemeColor("TextEntry.FocusEdgeColor", Color(0, 0, 0, 0), pScheme);
 
 	SetBorder( pScheme->GetBorder("ButtonDepressedBorder"));
 

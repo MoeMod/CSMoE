@@ -104,8 +104,8 @@ IGameUIPanel *CHudViewport::CreateGameUIPanelByName(const char *pszName)
 	
 	if (Q_strcmp("GameUITestPanel", pszName) == 0)
 	{
-		pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
-		//pPanel = new CGameUITestPanel(this->GetVPanel());
+		//pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
+		pPanel = new CGameUITestPanel(this->GetVPanel());
 	}
 	
 	return pPanel;

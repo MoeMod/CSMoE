@@ -61,9 +61,9 @@ public:
 		SetDefaultBorder(pScheme->GetBorder("ScrollBarButtonBorder"));
         SetDepressedBorder(pScheme->GetBorder("ScrollBarButtonDepressedBorder"));
 		
-		SetDefaultColor(GetSchemeColor("DimBaseText", pScheme), GetBgColor());
-		SetArmedColor(GetFgColor(), GetBgColor());
-		SetDepressedColor(GetFgColor(), GetBgColor());
+		SetDefaultColor(GetSchemeColor("ScrollBarButton.FgColor", pScheme), GetSchemeColor("ScrollBarButton.BgColor", pScheme));
+		SetArmedColor(GetSchemeColor("ScrollBarButton.ArmedFgColor", pScheme), GetSchemeColor("ScrollBarButton.ArmedBgColor", pScheme));
+		SetDepressedColor(GetSchemeColor("ScrollBarButton.DepressedFgColor", pScheme), GetSchemeColor("ScrollBarButton.DepressedBgColor", pScheme));
 	}
 	/*
 	virtual void Paint()

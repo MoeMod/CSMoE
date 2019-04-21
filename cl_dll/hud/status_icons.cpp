@@ -80,11 +80,11 @@ int CHudStatusIcons::Draw( float flTime )
 			/*if( g_bInBombZone && !strcmp(m_IconList[i].szSpriteName, "c4") && ((int)(flTime * 10) % 2))
 				SPR_Set( m_IconList[i].spr, 255, 16, 16 );
 			else SPR_Set( m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b );*/
-			if (!strcmp(m_IconList[i].szSpriteName, "c4"))
+			if (!strcmp(m_IconList[i].szSpriteName, "c4") && m_tgaC4[0] && m_tgaC4[1])
 			{
 				gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-				if(g_bInBombZone && ((int)(flTime * 10) % 2))
+				if (g_bInBombZone && ((int)(flTime * 10) % 2))
 					m_tgaC4[1]->Bind();
 				else
 					m_tgaC4[0]->Bind();
