@@ -86,7 +86,7 @@ LOCAL_SRC_FILES := \
 	./hud/hud_update.cpp \
 	./hud/sniperscope.cpp \
 	./hud/nvg.cpp \
-	./hud/menu.cpp \
+	./hud/hud_menu.cpp \
 	./hud/message.cpp \
 	./hud/status_icons.cpp \
 	./hud/statusbar.cpp \
