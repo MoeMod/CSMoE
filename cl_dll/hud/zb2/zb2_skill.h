@@ -28,8 +28,8 @@ public:
 	void OnSkillActivate(ZombieSkillType skill, float flHoldTime, float flFreezeTime);
 
 protected:
+	cvar_t* touch_enable;
 	int m_HUD_zombirecovery;
-
 	int m_HUD_zombieGKey;
 	int m_HUD_SkillIcons[MAX_ZOMBIE_SKILL];
 	int m_HUD_ClassIcons[MAX_ZOMBIE_CLASS];

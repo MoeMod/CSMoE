@@ -119,7 +119,7 @@ CHudZB2_Skill::CHudZB2_Skill(void) :  // 0-init
 	m_iCurrentClass(ZOMBIE_CLASS_HUMAN),
 	m_ZombieSkillHudIcons{}
 {
-	
+	touch_enable = gEngfuncs.pfnGetCvarPointer("touch_enable");
 }
 
 int CHudZB2_Skill::VidInit(void)
@@ -179,23 +179,34 @@ int CHudZB2_Skill::Draw(float time)
 	int y = ScreenHeight - gHUD.m_iFontHeight * 3 / 2 - iHeight;
 
 	x = DrawHealthRecoveryIcon(time, x, y);
-	x = DrawSkillBoard(time, x, y);
-	DrawSkillTip(time);
-	DrawSkillBoardNew(time);
+	if (!touch_enable || !touch_enable->value)
+	{
+		x = DrawSkillBoard(time, x, y);
+		DrawSkillTip(time);
+	}
+	else
+	{
+		DrawSkillBoardNew(time);
+	}
 
 	return 1;
 }
 
 void CHudZB2_Skill::Think()
 {
-	for (auto &icon : m_ZombieSkillHudIcons)
+	for (int i = 0; i < 4; ++i)
 	{
+		auto& icon = m_ZombieSkillHudIcons[i];
 		if (icon.m_iCurrentSkillStatus == SKILL_STATUS_USING || icon.m_iCurrentSkillStatus == SKILL_STATUS_FREEZING)
 		{
 			if (gHUD.m_flTime > icon.m_flTimeSkillReady)
 			{
 				icon.m_iCurrentSkillStatus = SKILL_STATUS_READY;
 				icon.m_flTimeSkillBlink = gHUD.m_flTime + 3.0f;
+
+				char buf[128];
+				sprintf(buf, "touch_show \"_moe_skill%d_button\"\n", i);
+				gEngfuncs.pfnClientCmd(buf);
 			}
 			
 		}
@@ -463,14 +474,66 @@ void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, 
 	m_ZombieSkillHudIcons[2] = { skill3, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
 	m_ZombieSkillHudIcons[3] = { skill4, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
 	// some blink ? 
+	if (!m_pTexture_skillslotbg || !m_pTexture_skillslotbg->valid())
+		return;
+
+	int x = ScreenWidth / 2 - m_pTexture_skillslotbg->w() / 2;
+	const int y = 58;
+	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
+	{
+		const auto& classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
+		if (classicon != nullptr)
+		{
+			x += (classicon->w() + 4) / 2;
+		}
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		auto& icon = m_ZombieSkillHudIcons[i];
+		const auto& skillicon = m_pTexture_NewSkillIcons[icon.m_iCurrentSkill];
+
+		char buf[256];
+		sprintf(buf, "touch_removebutton \"_moe_skill%d_button\"\n", i);
+		gEngfuncs.pfnClientCmd(buf);
+
+		if (skillicon && icon.m_iCurrentSkill >= 0 && icon.m_iCurrentSkill < MAX_ZOMBIE_SKILL)
+		{
+			const float x1 = x / (float)ScreenWidth;
+			const float y1 = y / (float)ScreenHeight;
+			const float x2 = (x + skillicon->w()) / (float)ScreenWidth;
+			const float y2 = (y + skillicon->h()) / (float)ScreenHeight;
+
+			sprintf(buf, "alias +_moe_skill%d_press \"touch_setcolor _moe_skill%d_button 156 77 20 180\"\n", i, i);
+			gEngfuncs.pfnClientCmd(buf);
+
+			if(m_iCurrentClass == ZOMBIE_CLASS_HUMAN)
+				sprintf(buf, "alias -_moe_skill%d_press \"MoE_HumanSkill%d; touch_setcolor _moe_skill%d_button 0 0 0 50\"\n", i, i + 1, i);
+			else
+				sprintf(buf, "alias -_moe_skill%d_press \"BTE_ZombieSkill%d; touch_setcolor _moe_skill%d_button 0 0 0 50\"\n", i, i + 1, i);
+
+			gEngfuncs.pfnClientCmd(buf);
+			sprintf(buf, "touch_addbutton \"_moe_skill%d_button\" \"*white\" \"+_moe_skill%d_press\" %f %f %f %f 0 0 0 50 260", i, i, x1, y1, x2, y2);
+			gEngfuncs.pfnClientCmd(buf);
+			//gMobileAPI.pfnTouchAddClientButton("_moe_skill1_button", "*white", "+_moe_skill1_press", 0.100000, 0.408511, 0.340000, 0.459574, color, 0, 0.0f, 0);
+
+		}
+		
+		x += 58;
+	}
+
 }
 
 void CHudZB2_Skill::OnSkillActivate(ZombieSkillType skill, float flHoldTime, float flFreezeTime)
 {
-	for (auto &icon : m_ZombieSkillHudIcons)
+	for (int i = 0; i < 4; ++i)
 	{
+		auto& icon = m_ZombieSkillHudIcons[i];
 		if (icon.m_iCurrentSkill == skill)
 		{
+			char buf[128];
+			sprintf(buf, "touch_hide \"_moe_skill%d_button\"\n", i);
+			gEngfuncs.pfnClientCmd(buf);
 			icon = { skill, flFreezeTime > 0.0f ? SKILL_STATUS_FREEZING : SKILL_STATUS_USED, gHUD.m_flTime, gHUD.m_flTime + flFreezeTime, 0.0f };
 		}
 	}

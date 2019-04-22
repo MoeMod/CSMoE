@@ -221,6 +221,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>MAINUI_USE_CUSTOM_FONT_RENDER;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../engine;../common;../pm_shared;../mainui_cpp;../mainui_cpp/model;../mainui_cpp/font;../mainui_cpp/controls;../mainui_cpp/menus;../mainui_cpp/utl</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -233,6 +234,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>MAINUI_USE_CUSTOM_FONT_RENDER;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../engine;../common;../pm_shared;../mainui_cpp;../mainui_cpp/model;../mainui_cpp/font;../mainui_cpp/controls;../mainui_cpp/menus;../mainui_cpp/utl</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -247,6 +249,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>MAINUI_USE_CUSTOM_FONT_RENDER;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../engine;../common;../pm_shared;../mainui_cpp;../mainui_cpp/model;../mainui_cpp/font;../mainui_cpp/controls;../mainui_cpp/menus;../mainui_cpp/utl</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -263,6 +266,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>MAINUI_USE_CUSTOM_FONT_RENDER;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../engine;../common;../pm_shared;../mainui_cpp;../mainui_cpp/model;../mainui_cpp/font;../mainui_cpp/controls;../mainui_cpp/menus;../mainui_cpp/utl</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

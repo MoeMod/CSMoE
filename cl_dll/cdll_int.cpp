@@ -436,8 +436,8 @@ extern "C" void DLLEXPORT F(void *pv) {
 		HUD_GetRenderInterface,	// Xash3D pfnGetRenderInterface
 		nullptr,	// Xash3D pfnClipMoveToEntity
 		IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
-		IN_ClientMoveEvent,	// SDL Xash pfnMoveEvent
-		IN_ClientLookEvent	// SDL Xash pfnLookEvent
+		nullptr,	// SDL Xash pfnMoveEvent
+		nullptr	// SDL Xash pfnLookEvent
 	};
 
 	*pcldll_func = cldll_func;

@@ -15,6 +15,7 @@ int DLLEXPORT IN_ClientTouchEvent(int type_id, int fingerID, float x, float y, f
 
 	return 0;
 }
+#if 0
 #ifdef _WIN32
 void DLLEXPORT IN_ClientMoveEvent(float forwardmove, float sidemove)
 {
@@ -26,5 +27,5 @@ void DLLEXPORT IN_ClientLookEvent(float relyaw, float relpitch)
 	/**/
 }
 #endif
-
+#endif
 }

@@ -113,7 +113,7 @@ int IN_ClientTouchEvent(int type, int fingerID, float x, float y, float dx, floa
 		return gClDllFuncs.pfnTouchEvent(type, fingerID, x, y, dx, dy); 
 	return 0;
 }
-
+/*
 void IN_ClientMoveEvent(float forwardmove, float sidemove)
 { 
 	if(gClDllFuncs.pfnMoveEvent)
@@ -125,7 +125,7 @@ void IN_ClientLookEvent(float relyaw, float relpitch)
 	if(gClDllFuncs.pfnLookEvent)
 		gClDllFuncs.pfnLookEvent(relyaw, relpitch); 
 }
-
+*/
 } // namespace ClientDLL_Hooks
 
 extern "C" void EXPORT_FUNCTION F(void *pv) {
