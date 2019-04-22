@@ -649,6 +649,9 @@
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_speed.cpp">
       <Filter>dlls\gamemode\zb2</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\weapons_moe_buy.cpp">
+      <Filter>dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1382,6 +1385,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_skill.h">
       <Filter>dlls\gamemode\zb2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\weapons_moe_buy.h">
+      <Filter>dlls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -67,6 +67,7 @@
 
 #include "gamemode/mods.h"
 #include "player/player_model.h"
+#include "weapons_moe_buy.h"
 
 #include <tuple>
 
@@ -3832,6 +3833,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "smartradio"))
 			{
 				player->SmartRadio();
+			}
+			else if (FStrEq(pcmd, "moe_buy"))
+			{
+				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
 			else
 			{

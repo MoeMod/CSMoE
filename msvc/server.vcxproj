@@ -349,6 +349,7 @@
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapons_buy.cpp" />
     <ClCompile Include="..\dlls\weapons_data.cpp" />
+    <ClCompile Include="..\dlls\weapons_moe_buy.cpp" />
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
@@ -746,6 +747,7 @@
     <ClInclude Include="..\dlls\weapons_const.h" />
     <ClInclude Include="..\dlls\weapons_buy.h" />
     <ClInclude Include="..\dlls\weapons_data.h" />
+    <ClInclude Include="..\dlls\weapons_moe_buy.h" />
     <ClInclude Include="..\dlls\weapons_msg.h" />
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
