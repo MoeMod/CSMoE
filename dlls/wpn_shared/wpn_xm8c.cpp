@@ -98,10 +98,10 @@ public:
 	static constexpr int Penetration = 2;
 	static constexpr int Distance = 8192;
 
-	static constexpr const auto & KickBackWalking = KickBackData{ 1.425, 0.44999999, 0.2, 0.045000002, 6.25, 2.5, (signed int)7.0 };
-	static constexpr const auto & KickBackNotOnGround = KickBackData{ 1.825, 1.2, 0.40000001, 0.30000001, 8.5, 6.125, (signed int)5.0 };
-	static constexpr const auto & KickBackDucking = KickBackData{ 0.82499999, 0.32499999, 0.12, 0.0275, 5.125, 1.5, (signed int)8.0 };
-	static constexpr const auto & KickBackDefault = KickBackData{ 0.85000002, 0.35499999, 0.18000001, 0.035999998, 5.25, 1.85, (signed int)7.0 };
+	static constexpr const auto & KickBackWalking = KickBackData{ 1.425f, 0.44999999f, 0.2f, 0.045000002f, 6.25f, 2.5f, (signed int)7.0f };
+	static constexpr const auto & KickBackNotOnGround = KickBackData{ 1.825f, 1.2f, 0.40000001f, 0.30000001f, 8.5f, 6.125f, (signed int)5.0f };
+	static constexpr const auto & KickBackDucking = KickBackData{ 0.82499999f, 0.32499999f, 0.12f, 0.0275f, 5.125f, 1.5f, (signed int)8.0f };
+	static constexpr const auto & KickBackDefault = KickBackData{ 0.85000002f, 0.35499999f, 0.18000001f, 0.035999998f, 5.25f, 1.85f, (signed int)7.0f };
 
 	static constexpr const auto & KnockBack = KnockbackData{ 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
 
