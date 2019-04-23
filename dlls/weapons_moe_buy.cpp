@@ -34,7 +34,9 @@ struct MoEWeaponBuyInfo_s
 };
 
 static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
-	{ "weapon_infinity", "Infinity", 1500, PISTOL_SLOT, UNASSIGNED },
+	{ "weapon_infinity", "Infinity Black/Sliver", 1500, PISTOL_SLOT, UNASSIGNED },
+	{ "weapon_infinityex1", "Infinity Red/Sliver", 1500, PISTOL_SLOT, UNASSIGNED },
+	{ "weapon_infinityex2", "Infinity Red/Gold", 1500, PISTOL_SLOT, UNASSIGNED },
 	{ "weapon_infinityss", "Infinity Sliver", 600, PISTOL_SLOT, UNASSIGNED },
 	{ "weapon_infinitysr", "Infinity Red",600, PISTOL_SLOT, UNASSIGNED },
 	{ "weapon_infinitysb", "Infinity Black",600, PISTOL_SLOT, UNASSIGNED },
@@ -46,6 +48,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ "weapon_thompson", "Thompson", 2000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{ "weapon_mp7a1c", "MP7A1", 2150, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 
+	{ "weapon_m14ebr", "M14 EBR", 3100, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{ "weapon_xm8c", "XM8", 3250, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{ "weapon_scarl", "Scar", 3250, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{ "weapon_tar21", "TAR-21", 3600, PRIMARY_WEAPON_SLOT, UNASSIGNED },

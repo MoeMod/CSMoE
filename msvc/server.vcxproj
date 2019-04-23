@@ -351,6 +351,7 @@
     <ClCompile Include="..\dlls\weapons_data.cpp" />
     <ClCompile Include="..\dlls\weapons_moe_buy.cpp" />
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
+    <ClCompile Include="..\dlls\weapons_precache.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
@@ -438,6 +439,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp">
@@ -750,6 +753,7 @@
     <ClInclude Include="..\dlls\weapons_data.h" />
     <ClInclude Include="..\dlls\weapons_moe_buy.h" />
     <ClInclude Include="..\dlls\weapons_msg.h" />
+    <ClInclude Include="..\dlls\weapons_precache.h" />
     <ClInclude Include="..\dlls\world.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
@@ -768,6 +772,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />

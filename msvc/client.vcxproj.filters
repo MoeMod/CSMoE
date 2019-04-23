@@ -891,6 +891,12 @@
     <ClCompile Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.cpp">
       <Filter>vgui2_support\SourceSDK\vgui2\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -1338,6 +1344,12 @@
       <Filter>vgui2_support\vgui_controls</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
