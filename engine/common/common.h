@@ -169,7 +169,7 @@ typedef enum
 #include "base_cmd.h"
 
 #define XASH_VERSION	"0.19.3"		// engine current version
-// since this fork have own version, this is just left for compability
+// since this fork have own version, this is just left for compatibility
 #define BASED_VERSION	0.98f
 
 // generic update page, see ShellExecute
@@ -767,10 +767,13 @@ qboolean Host_NewGame( const char *mapName, qboolean loadGame );
 void Host_EndGame( const char *message, ... );
 #ifdef __GNUC__
 void EXPORT Host_AbortCurrentFrame( void ) __attribute__ ((noreturn)) __attribute__ ((noinline)) ;
-#endif
-#ifdef _MSC_VER
+#elif defined _MSC_VER
 __declspec(noreturn) void EXPORT Host_AbortCurrentFrame( void );
+#else
+void EXPORT Host_AbortCurrentFrame( void );
 #endif
+
+
 void Host_RestartAmbientSounds( void );
 void Host_RestartDecals( void );
 qboolean CL_ChangeGame( const char *gamefolder, qboolean bReset );
@@ -1103,6 +1106,10 @@ byte TextureToGamma( byte b );
 
 #ifdef __ANDROID__
 #include "platform/android/android-main.h"
+#endif
+
+#ifdef __HAIKU__
+#include <FindDirectory.h>
 #endif
 
 #ifdef __cplusplus

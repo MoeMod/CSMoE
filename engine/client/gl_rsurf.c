@@ -2217,7 +2217,7 @@ static void R_DisableDetail( void )
 ===================
 R_EnableDetail
 
-enable detail tmu if availiable
+enable detail tmu if available
 ===================
 */
 static void R_EnableDetail( void )
