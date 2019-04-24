@@ -44,4 +44,4 @@ private:
 	unsigned short m_usFireM14EBR;
 };
 
-#endif#pragma once
+#endif

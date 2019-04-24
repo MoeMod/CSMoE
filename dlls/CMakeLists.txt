@@ -177,6 +177,8 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_tank.cpp
 	./gamemode/zb2/zb2_zclass_speed.cpp
 	./gamemode/mod_zbb.cpp
+	./weapons_moe_buy.cpp
+	./weapons_precache.cpp
 	)
 
 file (GLOB HLWPN_SRCS

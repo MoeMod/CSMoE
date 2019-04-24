@@ -247,6 +247,8 @@ LOCAL_SRC_FILES := \
 	./gamemode/zb2/zb2_zclass.cpp \
 	./gamemode/zb2/zb2_zclass_tank.cpp \
 	./gamemode/zb2/zb2_zclass_speed.cpp \
+	./weapons_moe_buy.cpp \
+    ./weapons_precache.cpp \
 
 
 include $(BUILD_SHARED_LIBRARY)
