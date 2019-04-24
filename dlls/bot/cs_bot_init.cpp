@@ -352,7 +352,7 @@ void CCSBot::SpawnBot()
 	SetState(&m_buyState);
 	SetTouch(&CCSBot::BotTouch);
 
-	if (!TheNavAreaList.Count () && !ctrl->IsLearningMap())
+	if (!TheNavAreaList.size () && !ctrl->IsLearningMap())
 	{
 		ctrl->SetLearningMapFlag();
 		StartLearnProcess();

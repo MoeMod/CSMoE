@@ -13,72 +13,27 @@
 #include "vehicle.h"
 #include "globals.h"
 
-#include "pm_shared.h"
-#include "utllinkedlist.h"
-
 // CSBOT and Nav
-#include "game_shared/GameEvent.h"		// Game event enum used by career mode, tutor system, and bots
-#include "game_shared/bot/bot_util.h"
-#include "game_shared/bot/simple_state_machine.h"
-
-#include "game_shared/steam_util.h"
-
-#include "game_shared/bot/bot_manager.h"
-#include "game_shared/bot/bot_constants.h"
-#include "game_shared/bot/bot.h"
-
-#include "game_shared/shared_util.h"
-#include "game_shared/bot/bot_profile.h"
-
-#include "game_shared/bot/nav.h"
-#include "game_shared/bot/improv.h"
-#include "game_shared/bot/nav_node.h"
-#include "game_shared/bot/nav_area.h"
-#include "game_shared/bot/nav_file.h"
-#include "game_shared/bot/nav_path.h"
-
-#include "airtank.h"
-#include "h_ai.h"
-#include "h_cycler.h"
-#include "h_battery.h"
-
-// Hostage
-#include "hostage/hostage.h"
-#include "hostage/hostage_localnav.h"
-
-#include "bot/cs_bot.h"
-
-// Tutor
-#include "tutor.h"
-#include "tutor_base_states.h"
-#include "tutor_base_tutor.h"
-#include "tutor_cs_states.h"
-#include "tutor_cs_tutor.h"
-
-#include "gamerules.h"
-#include "career_tasks.h"
-#include "maprules.h"
-
+#include "bot_include.h"
 const float updateTimesliceDuration = 0.5f;
 
 int _navAreaCount = 0;
 int _currentIndex = 0;
 
-inline CNavNode *LadderEndSearch(CBaseEntity *entity, const Vector *pos, NavDirType mountDir)
+inline CNavNode *LadderEndSearch(CBaseEntity *pEntity, const Vector *pos, NavDirType mountDir)
 {
 	Vector center = *pos;
 	AddDirectionVector(&center, mountDir, HalfHumanWidth);
 
 	// Test the ladder dismount point first, then each cardinal direction one and two steps away
-
-	for (int d = (-1); d < 2 * NUM_DIRECTIONS; ++d)
+	for (int dir = (-1); dir < 2 * NUM_DIRECTIONS; dir++)
 	{
 		Vector tryPos = center;
 
-		if (d >= NUM_DIRECTIONS)
-			AddDirectionVector(&tryPos, (NavDirType)(d - NUM_DIRECTIONS), GenerationStepSize * 2.0f);
-		else if (d >= 0)
-			AddDirectionVector(&tryPos, (NavDirType)d, GenerationStepSize);
+		if (dir >= NUM_DIRECTIONS)
+			AddDirectionVector(&tryPos, (NavDirType)(dir - NUM_DIRECTIONS), GenerationStepSize * 2.0f);
+		else if (dir >= 0)
+			AddDirectionVector(&tryPos, (NavDirType)dir, GenerationStepSize);
 
 		// step up a rung, to ensure adjacent floors are below us
 		tryPos.z += GenerationStepSize;
@@ -92,19 +47,19 @@ inline CNavNode *LadderEndSearch(CBaseEntity *entity, const Vector *pos, NavDirT
 		// make sure this point is not on the other side of a wall
 		const float fudge = 2.0f;
 		TraceResult result;
-		UTIL_TraceLine(center + Vector(0, 0, fudge), tryPos + Vector(0, 0, fudge), ignore_monsters, dont_ignore_glass, ENT(entity->pev), &result);
+		UTIL_TraceLine(center + Vector(0, 0, fudge), tryPos + Vector(0, 0, fudge), ignore_monsters, dont_ignore_glass, ENT(pEntity->pev), &result);
 
 		if (result.flFraction != 1.0f || result.fStartSolid)
 			continue;
 
 		// if no node exists here, create one and continue the search
-		if (CNavNode::GetNode(&tryPos) == NULL)
+		if (!CNavNode::GetNode(&tryPos))
 		{
-			return new CNavNode(&tryPos, &tryNormal, NULL);
+			return new CNavNode(&tryPos, &tryNormal, nullptr);
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CNavNode *CCSBot::AddNode(const Vector *destPos, const Vector *normal, NavDirType dir, CNavNode *source)
@@ -114,7 +69,7 @@ CNavNode *CCSBot::AddNode(const Vector *destPos, const Vector *normal, NavDirTyp
 
 	// if no node exists, create one
 	bool useNew = false;
-	if (node == NULL)
+	if (!node)
 	{
 		node = new CNavNode(destPos, normal, source);
 		useNew = true;
@@ -175,7 +130,7 @@ void drawProgressMeter(float progress, const char *title)
 {
 	MESSAGE_BEGIN(MSG_ALL, gmsgBotProgress);
 		WRITE_BYTE(FLAG_PROGRESS_DRAW);
-		WRITE_BYTE((int)progress);
+		WRITE_BYTE(int(progress * 100.0f));
 		WRITE_STRING(title);
 	MESSAGE_END();
 }
@@ -197,8 +152,8 @@ void hideProgressMeter()
 
 void CCSBot::StartLearnProcess()
 {
-	startProgressMeter("Analyzing map geometry...");
-	drawProgressMeter(0, "Analyzing map geometry...");
+	startProgressMeter("#CZero_LearningMap");
+	drawProgressMeter(0, "#CZero_LearningMap");
 	BuildLadders();
 
 	Vector normal;
@@ -230,13 +185,11 @@ bool CCSBot::LearnStep()
 	// take a step
 	while (true)
 	{
-		if (m_currentNode == NULL)
+		if (!m_currentNode)
 		{
 			// search is exhausted - continue search from ends of ladders
-			FOR_EACH_LL (TheNavLadderList, it)
+			for (CNavLadder *ladder : TheNavLadderList)
 			{
-				CNavLadder *ladder = TheNavLadderList[it];
-
 				// check ladder bottom
 				if ((m_currentNode = LadderEndSearch(ladder->m_entity, &ladder->m_bottom, ladder->m_dir)) != 0)
 					break;
@@ -246,7 +199,7 @@ bool CCSBot::LearnStep()
 					break;
 			}
 
-			if (m_currentNode == NULL)
+			if (!m_currentNode)
 			{
 				// all seeds exhausted, sampling complete
 				GenerateNavigationAreaMesh();
@@ -377,10 +330,10 @@ bool CCSBot::LearnStep()
 						walkable = false;
 					}
 				}
-            
+
 				// if we're incrementally generating, don't overlap existing nav areas
 				CNavArea *overlap = TheNavAreaGrid.GetNavArea(&to, HumanHeight);
-				if (overlap != NULL)
+				if (overlap)
 				{
 					walkable = false;
 				}
@@ -416,27 +369,28 @@ void CCSBot::UpdateLearnProcess()
 void CCSBot::StartAnalyzeAlphaProcess()
 {
 	m_processMode = PROCESS_ANALYZE_ALPHA;
-	m_analyzeIter = TheNavAreaList.Head ();
+	m_analyzeIter = TheNavAreaList.begin ();
 
-	_navAreaCount = TheNavAreaList.Count();
+	_navAreaCount = TheNavAreaList.size();
 	_currentIndex = 0;
 
+	ApproachAreaAnalysisPrep();
 	DestroyHidingSpots();
 
-	startProgressMeter("Analyzing hiding spots...");
-	drawProgressMeter(0, "Analyzing hiding spots...");
+	startProgressMeter("#CZero_AnalyzingHidingSpots");
+	drawProgressMeter(0, "#CZero_AnalyzingHidingSpots");
 }
 
 bool CCSBot::AnalyzeAlphaStep()
 {
 	++_currentIndex;
-	if (m_analyzeIter == TheNavAreaList.InvalidIndex ())
+	if (m_analyzeIter == TheNavAreaList.end ())
 		return false;
 
-	CNavArea *area = TheNavAreaList.Element (m_analyzeIter);
+	CNavArea *area = (*m_analyzeIter);
 	area->ComputeHidingSpots();
 	area->ComputeApproachAreas();
-	m_analyzeIter = TheNavAreaList.Next (m_analyzeIter);
+	++m_analyzeIter;
 
 	return true;
 }
@@ -448,35 +402,36 @@ void CCSBot::UpdateAnalyzeAlphaProcess()
 	{
 		if (AnalyzeAlphaStep() == false)
 		{
-			drawProgressMeter(50, "Analyzing hiding spots...");
+			drawProgressMeter(0.5f, "#CZero_AnalyzingHidingSpots");
+			CleanupApproachAreaAnalysisPrep();
 			StartAnalyzeBetaProcess();
 			return;
 		}
 	}
 
 	float progress = (double (_currentIndex) / double (_navAreaCount)) * 0.5f;
-	drawProgressMeter(progress, "Analyzing hiding spots...");
+	drawProgressMeter(progress, "#CZero_AnalyzingHidingSpots");
 }
 
 void CCSBot::StartAnalyzeBetaProcess()
 {
 	m_processMode = PROCESS_ANALYZE_BETA;
-	m_analyzeIter = TheNavAreaList.Head ();
+	m_analyzeIter = TheNavAreaList.begin ();
 
-	_navAreaCount = TheNavAreaList.Count ();
+	_navAreaCount = TheNavAreaList.size ();
 	_currentIndex = 0;
 }
 
 bool CCSBot::AnalyzeBetaStep()
 {
 	++_currentIndex;
-	if (m_analyzeIter == TheNavAreaList.InvalidIndex ())
+	if (m_analyzeIter == TheNavAreaList.end ())
 		return false;
 
-	CNavArea *area = TheNavAreaList.Element (m_analyzeIter);
+	CNavArea *area = (*m_analyzeIter);
 	area->ComputeSpotEncounters();
 	area->ComputeSniperSpots();
-	m_analyzeIter = TheNavAreaList.Next (m_analyzeIter);
+	++m_analyzeIter;
 
 	return true;
 }
@@ -488,14 +443,14 @@ void CCSBot::UpdateAnalyzeBetaProcess()
 	{
 		if (AnalyzeBetaStep() == false)
 		{
-			drawProgressMeter(100, "Analyzing approach points...");
+			drawProgressMeter(1, "#CZero_AnalyzingApproachPoints");
 			StartSaveProcess();
 			return;
 		}
 	}
 
-	float progress = (double (_currentIndex) / double (_navAreaCount) + 1.0f) * 0.5f;
-	drawProgressMeter(progress, "Analyzing approach points...");
+	float progress = (double(_currentIndex) / double(_navAreaCount) + 1.0f) * 0.5f;
+	drawProgressMeter(progress, "#CZero_AnalyzingApproachPoints");
 }
 
 void CCSBot::StartSaveProcess()

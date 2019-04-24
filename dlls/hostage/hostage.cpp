@@ -247,7 +247,7 @@ void CHostage::IdleThink()
 	const float giveUpTime = (1 / 30.0f);
 	float const updateRate = 0.1f;
 
-	if (g_bIsCzeroGame && TheNavAreaList.Count())
+	if (g_bIsCzeroGame && TheNavAreaList.size())
 	{
 		if (!m_improv)
 		{
@@ -435,6 +435,8 @@ void CHostage::Remove()
 	pev->movetype = MOVETYPE_NONE;
 	pev->solid = SOLID_NOT;
 	pev->takedamage = DAMAGE_NO;
+
+	pev->deadflag = DEAD_DEAD;
 
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 	pev->nextthink = -1;
@@ -733,7 +735,7 @@ void CHostage::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 	if (!pActivator->IsPlayer())
 		return;
 
-	if (pev->takedamage == DAMAGE_NO)
+	if (!IsAlive())
 		return;
 
 	CBasePlayer *pPlayer = (CBasePlayer *)pActivator;

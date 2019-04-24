@@ -75,7 +75,8 @@ private:
 	bool m_vip;
 };
 
-typedef CUtlLinkedList<CCareerTask *, int> CareerTaskList;
+typedef std::list<CCareerTask *> CareerTaskList;
+typedef CareerTaskList::iterator CareerTaskListIt;
 
 typedef CCareerTask *(*TaskFactoryFunction)(const char *taskName, GameEventType event, const char *weaponName, int eventCount, bool mustLive, bool crossRounds, int nextId, bool isComplete);
 

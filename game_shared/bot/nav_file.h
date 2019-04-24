@@ -56,7 +56,7 @@ public:
 	void Load(SteamFile *file);			// load the directory
 
 private:
-	CUtlVector<Place> m_directory;
+	std::vector<Place> m_directory;
 };
 
 const char * GetBspFilename(const char *navFilename);

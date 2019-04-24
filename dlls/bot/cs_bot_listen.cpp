@@ -83,7 +83,7 @@ bool CCSBot::ShouldInvestigateNoise(float *retNoiseDist)
 		float noiseDist = toNoise.Length();
 
 		float const oneStoreyHeight = 120.0f;
-		if (abs(int64(toNoise.z)) > oneStoreyHeight)
+		if (abs(toNoise.z) > oneStoreyHeight)
 		{
 			PathCost pc(this);
 			float travelDistToNoise = NavAreaTravelDistance(m_lastKnownArea, m_noiseArea, pc);

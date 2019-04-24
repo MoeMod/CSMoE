@@ -273,7 +273,7 @@ inline WeaponType GetWeaponType(const char *alias)
 void BuyState::OnUpdate(CCSBot *me)
 {
 	// wait for a Navigation Mesh
-	if (!TheNavAreaList.Count())
+	if (!TheNavAreaList.size())
 		return;
 
 	// apparently we cant buy things in the first few seconds, so wait a bit

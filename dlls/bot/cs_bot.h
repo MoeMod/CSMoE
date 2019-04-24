@@ -749,7 +749,7 @@ private:
 	const CNavNode *m_navNodeList;
 	CNavNode *m_currentNode;
 	NavDirType m_generationDir;
-	int m_analyzeIter;
+	NavAreaList::iterator m_analyzeIter;
 
 	enum ProcessType
 	{
@@ -1203,11 +1203,8 @@ public:
 	bool operator()(CNavArea *area)
 	{
 		// collect all the hiding spots in this area
-		const HidingSpotList *list = area->GetHidingSpotList ();
-
-		FOR_EACH_LL ((*list), it)
+		for (auto const spot : *area->GetHidingSpotList())
 		{
-			const HidingSpot *spot = (*list)[it];
 
 			if (m_count >= MAX_SPOTS)
 				break;

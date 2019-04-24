@@ -270,13 +270,11 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 					*c = '\0';
 
 				// find the given template name
-				FOR_EACH_LL (templateList, it)
+				for (auto templates : templateList)
 				{
-					BotProfile *profile = templateList[it];
-
-					if (!Q_stricmp(profile->GetName(), token))
+					if (!Q_stricmp(templates->GetName(), token))
 					{
-						inherit = profile;
+						inherit = templates;
 						break;
 					}
 				}
@@ -314,7 +312,8 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 			// HACK HACK
 			// Until we have a generalized means of storing bot preferences, we're going to hardcode the bot's
 			// preference towards silencers based on his name.
-			if (profile->m_name[0] % 2)
+			//if (profile->m_name[0] % 2)
+			if (RANDOM_LONG(0, 2) == 2)
 			{
 				profile->m_prefersSilencer = true;
 			}
@@ -492,12 +491,12 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 			if (isTemplate)
 			{
 				// add to template list
-				templateList.AddToTail(profile);
+				templateList.push_back(profile);
 			}
 			else
 			{
 				// add profile to the master list
-				m_profileList.AddToTail (profile);
+				m_profileList.push_back (profile);
 			}
 		}
 	}
@@ -505,20 +504,23 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 	FREE_FILE(dataPointer);
 
 	// free the templates
-	templateList.PurgeAndDeleteElements ();
+	std::for_each(templateList.begin(), templateList.end(), std::default_delete<BotProfile>());
+	templateList.clear();
 }
 
 BotProfileManager::~BotProfileManager()
 {
 	Reset();
-	m_voiceBanks.PurgeAndDeleteElements ();
+	std::for_each(m_voiceBanks.begin(), m_voiceBanks.end(), std::default_delete<char[]>());
+	m_voiceBanks.clear();
 }
 
 // Free all bot profiles
 
 void BotProfileManager::Reset()
 {
-	m_profileList.PurgeAndDeleteElements ();
+	std::for_each(m_profileList.begin(), m_profileList.end(), std::default_delete<BotProfile>());
+	m_profileList.clear();
 
 	for (int i = 0; i < NumCustomSkins; ++i)
 	{
@@ -605,16 +607,15 @@ int BotProfileManager::GetCustomSkinIndex(const char *name, const char *filename
 int BotProfileManager::FindVoiceBankIndex(const char *filename)
 {
 	int index = 0;
-
-	for (int i = 0; i<m_voiceBanks.Count (); ++i)
+	for (auto phrase : m_voiceBanks)
 	{
-		if (!Q_stricmp (filename, m_voiceBanks[i]))
-		{
+		if (!Q_stricmp(filename, phrase))
 			return index;
-		}
+
+		index++;
 	}
 
-	m_voiceBanks.AddToTail (CloneString (filename));
+	m_voiceBanks.push_back(CloneString(filename));
 	return index;
 }
 
@@ -623,36 +624,33 @@ int BotProfileManager::FindVoiceBankIndex(const char *filename)
 const BotProfile *BotProfileManager::GetRandomProfile(BotDifficultyType difficulty, BotProfileTeamType team) const
 {
 #ifdef RANDOM_LONG
+	BotProfileList::const_iterator iter;
 
 	// count up valid profiles
-	CUtlVector< const BotProfile * > profiles;
-	FOR_EACH_LL( m_profileList, it )
+	int validCount = 0;
+	for (auto profile : m_profileList)
 	{
-		const BotProfile *profile = m_profileList[ it ];
-
-		// Match difficulty
-		if ( !profile->IsDifficulty( difficulty ) )
-			continue;
-
-		// Prevent duplicate names
-		if ( UTIL_IsNameTaken( profile->GetName() ) )
-			continue;
-
-		// Match team choice
-		if ( !profile->IsValidForTeam( team ) )
-			continue;
-
-		profiles.AddToTail( profile );
+		if (profile->IsDifficulty(difficulty) && !UTIL_IsNameTaken(profile->GetName()) && profile->IsValidForTeam(team))
+			validCount++;
 	}
 
-	if ( !profiles.Count() )
-		return NULL;
+	if (validCount == 0)
+		return nullptr;
 
 	// select one at random
-	int which = RANDOM_LONG( 0, profiles.Count()-1 );
-	return profiles[which];
+	int which = RANDOM_LONG(0, validCount - 1);
+	for (auto profile : m_profileList)
+	{
+		if (profile->IsDifficulty(difficulty) && !UTIL_IsNameTaken(profile->GetName()) && profile->IsValidForTeam(team))
+		{
+			if (which-- == 0)
+				return profile;
+		}
+	}
+
+	return nullptr;
 #else
 	// we don't need random profiles when we're not in the game dll
-	return NULL;
+	return nullptr;
 #endif // RANDOM_LONG
 }

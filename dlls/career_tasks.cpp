@@ -474,16 +474,16 @@ void CCareerTaskManager::Reset(bool deleteTasks)
 {
 	if (deleteTasks)
 	{
-		m_tasks.PurgeAndDeleteElements ();
+		for (auto task : m_tasks)
+			delete task;
+
+		m_tasks.clear();
 		m_nextId = 0;
 	}
 	else
 	{
-		FOR_EACH_LL (m_tasks, it)
-		{
-			CCareerTask *pTask = m_tasks[it];
-			pTask->Reset();
-		}
+		for (auto task : m_tasks)
+			task->Reset();
 	}
 
 	m_finishedTaskTime  = 0;
@@ -525,7 +525,7 @@ void CCareerTaskManager::AddTask(const char *taskName, const char *weaponName, i
 					isComplete
 				);
 
-				m_tasks.AddToTail (newTask);
+				m_tasks.push_back (newTask);
 
 				if (pTaskInfo->event == EVENT_ROUND_WIN && !Q_strcmp(taskName, "winfast"))
 				{
@@ -562,17 +562,17 @@ void CCareerTaskManager::HandleEvent(GameEventType event, CBasePlayer *pAttacker
 		return;
 	}
 
-	FOR_EACH_LL (m_tasks, it)
+	for (auto task : m_tasks)
 	{
-		m_tasks[it]->OnEvent(event, pAttacker, pVictim);
+		task->OnEvent(event, pAttacker, pVictim);
 	}
 }
 
 void CCareerTaskManager::HandleWeaponKill(int weaponId, int weaponClassId, bool headshot, bool killerHasShield, CBasePlayer *pAttacker, CBasePlayer *pVictim)
 {
-	FOR_EACH_LL (m_tasks, it)
+	for (auto task : m_tasks)
 	{
-		m_tasks[it]->OnWeaponKill(weaponId, weaponClassId, headshot, killerHasShield, pAttacker, pVictim);
+		task->OnWeaponKill(weaponId, weaponClassId, headshot, killerHasShield, pAttacker, pVictim);
 	}
 }
 
@@ -594,9 +594,9 @@ void CCareerTaskManager::HandleEnemyKill(bool wasBlind, const char *weaponName, 
 
 void CCareerTaskManager::HandleWeaponInjury(int weaponId, int weaponClassId, bool attackerHasShield, CBasePlayer *pAttacker)
 {
-	FOR_EACH_LL (m_tasks, it)
+	for (auto task : m_tasks)
 	{
-		m_tasks[it]->OnWeaponInjury(weaponId, weaponClassId, attackerHasShield, pAttacker);
+		task->OnWeaponInjury(weaponId, weaponClassId, attackerHasShield, pAttacker);
 	}
 }
 
@@ -630,9 +630,9 @@ void CCareerTaskManager::HandleDeath(int team, CBasePlayer *pAttacker)
 
 bool CCareerTaskManager::AreAllTasksComplete()
 {
-	FOR_EACH_LL (m_tasks, it)
+	for (auto task : m_tasks)
 	{
-		if (!m_tasks[it]->IsComplete())
+		if (!task->IsComplete())
 			return false;
 	}
 
@@ -642,9 +642,9 @@ bool CCareerTaskManager::AreAllTasksComplete()
 int CCareerTaskManager::GetNumRemainingTasks()
 {
 	int ret = 0;
-	FOR_EACH_LL (m_tasks, it)
+	for (auto task : m_tasks)
 	{
-		if (!m_tasks[it]->IsComplete ())
+		if (!task->IsComplete ())
 			ret++;
 	}
 

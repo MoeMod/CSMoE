@@ -32,10 +32,6 @@
 #pragma once
 #endif
 
-// unknown flags
-#define TUTOR_STATE_FLAG_1		0x00000014
-#define TUTOR_STATE_FLAG_2		0x00000013
-
 enum TutorStateType
 {
 	TUTORSTATE_UNDEFINED = 0,

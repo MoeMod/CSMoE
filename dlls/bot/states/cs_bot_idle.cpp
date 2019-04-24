@@ -117,11 +117,15 @@ void IdleState::OnUpdate(CCSBot *me)
 		if (me->GetHostageEscortCount())
 		{
 			const CCSBotManager::Zone *zone = ctrl->GetClosestZone(me->GetLastKnownArea(), PathCost(me, FASTEST_ROUTE));
-			me->SetTask(CCSBot::RESCUE_HOSTAGES);
-			me->Run();
-			me->SetDisposition(CCSBot::SELF_DEFENSE);
-			me->MoveTo(ctrl->GetRandomPositionInZone(zone), FASTEST_ROUTE);
-			me->PrintIfWatched("Trying to rescue hostages at the end of the round\n");
+			const Vector *zonePos = TheCSBots()->GetRandomPositionInZone(zone);
+			if (zonePos)
+			{
+				me->SetTask(CCSBot::RESCUE_HOSTAGES);
+				me->Run();
+				me->SetDisposition(CCSBot::SELF_DEFENSE);
+				me->MoveTo(ctrl->GetRandomPositionInZone(zone), FASTEST_ROUTE);
+				me->PrintIfWatched("Trying to rescue hostages at the end of the round\n");
+			}
 			return;
 		}
 
@@ -154,19 +158,23 @@ void IdleState::OnUpdate(CCSBot *me)
 				{
 					if (me->GetGameState()->GetPlantedBombsite() != CSGameState::UNKNOWN)
 					{
-						// T's always know where the bomb is - go defend it
-						const CCSBotManager::Zone *zone = ctrl->GetZone(me->GetGameState()->GetPlantedBombsite());
-						me->SetTask(CCSBot::GUARD_TICKING_BOMB);
-
-						Place place = TheNavAreaGrid.GetPlace(&zone->m_center);
-						if (place != UNDEFINED_PLACE)
+						const CCSBotManager::Zone *zone = TheCSBots()->GetZone(me->GetGameState()->GetPlantedBombsite());
+						if(zone)
 						{
-							// pick a random hiding spot in this place
-							const Vector *spot = FindRandomHidingSpot(me, place, me->IsSniper());
-							if (spot != NULL)
+							// T's always know where the bomb is - go defend it
+							const CCSBotManager::Zone *zone = ctrl->GetZone(me->GetGameState()->GetPlantedBombsite());
+							me->SetTask(CCSBot::GUARD_TICKING_BOMB);
+
+							Place place = TheNavAreaGrid.GetPlace(&zone->m_center);
+							if (place != UNDEFINED_PLACE)
 							{
-								me->Hide(spot);
-								return;
+								// pick a random hiding spot in this place
+								const Vector *spot = FindRandomHidingSpot(me, place, me->IsSniper());
+								if (spot != NULL)
+								{
+									me->Hide(spot);
+									return;
+								}
 							}
 						}
 
@@ -337,7 +345,10 @@ void IdleState::OnUpdate(CCSBot *me)
 							ShortestPathCost pathCost = ShortestPathCost();
 							float dist = NavAreaTravelDistance(me->GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&ctrl->GetZone(z)->m_center), pathCost);
 
-							if (/*dist >= 0.0f && */dist < travelDistance)
+							if (dist < 0.0f)
+								continue;
+
+							if (dist < travelDistance)
 							{
 								zone = ctrl->GetZone(z);
 								travelDistance = dist;

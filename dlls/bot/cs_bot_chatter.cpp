@@ -70,57 +70,52 @@ const Vector *GetRandomSpotAtPlace(Place place)
 	int count = 0;
 	int which;
 
-	FOR_EACH_LL (TheNavAreaList, it)
+	for (auto area : TheNavAreaList)
 	{
-		CNavArea *area = TheNavAreaList[it];
-
 		if (area->GetPlace() == place)
-			++count;
+			count++;
 	}
 
 	if (count == 0)
-		return NULL;
+		return nullptr;
 
 	which = RANDOM_LONG(0, count - 1);
 
-	FOR_EACH_LL (TheNavAreaList, it)
+	for (auto area : TheNavAreaList)
 	{
-		CNavArea *area = TheNavAreaList[it];
-
 		if (area->GetPlace() == place && which == 0)
 			return area->GetCenter();
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // Transmit meme to other bots
-
-void BotMeme::Transmit(CCSBot *sender) const
+void BotMeme::Transmit(CCSBot *pSender) const
 {
-	for (int i = 1; i <= gpGlobals->maxClients; ++i)
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
 	{
-		CBasePlayer *player = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
+		CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(i));
 
-		if (player == NULL)
+		if (!pPlayer)
 			continue;
 
-		if (FNullEnt(player->pev))
+		if (FNullEnt(pPlayer->pev))
 			continue;
 
-		if (FStrEq(STRING(player->pev->netname), ""))
+		if (FStrEq(STRING(pPlayer->pev->netname), ""))
 			continue;
 
 		// skip self
-		if (sender == player)
+		if (pSender == pPlayer)
 			continue;
 
 		// ignore dead humans
-		if (!player->IsBot() && !player->IsAlive())
+		if (!pPlayer->IsBot() && !pPlayer->IsAlive())
 			continue;
 
 		// ignore enemies, since we can't hear them talk
-		if (sender->m_iTeam != player->m_iTeam)
+		if (pSender->m_iTeam != pSender->m_iTeam)
 			continue;
 
 		// no teamplay chat what jb?
@@ -128,94 +123,83 @@ void BotMeme::Transmit(CCSBot *sender) const
 			continue;
 
 		// if not a bot, fail the test
-		if (!player->IsBot())
-			continue;
-
-		CCSBot *bot = dynamic_cast<CCSBot *>(player);
-
-		if (!bot)
+		if (!pPlayer->IsBot())
 			continue;
 
 		// allow bot to interpret our meme
-		Interpret(sender, bot);
+		Interpret(pSender, (CCSBot *)pPlayer);
 	}
 }
 
 // A teammate called for help - respond
-
-void BotHelpMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotHelpMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
 	const float maxHelpRange = 3000.0f; // 2000
-	receiver->RespondToHelpRequest(sender, m_place, maxHelpRange);
+	pReceiver->RespondToHelpRequest(pSender, m_place, maxHelpRange);
 }
 
 // A teammate reported information about a bombsite
-
-void BotBombsiteStatusMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotBombsiteStatusMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
 	// remember this bombsite's status
 	if (m_status == CLEAR)
-		receiver->GetGameState()->ClearBombsite(m_zoneIndex);
+		pReceiver->GetGameState()->ClearBombsite(m_zoneIndex);
 	else
-		receiver->GetGameState()->MarkBombsiteAsPlanted(m_zoneIndex);
+		pReceiver->GetGameState()->MarkBombsiteAsPlanted(m_zoneIndex);
 
 	// if we were heading to the just-cleared bombsite, pick another one to search
 	// if our target bombsite wasn't cleared, will will continue going to it,
 	// because GetNextBombsiteToSearch() will return the same zone (since its not cleared)
 	// if the bomb was planted, we will head to that bombsite
-	if (receiver->GetTask() == CCSBot::FIND_TICKING_BOMB)
+	if (pReceiver->GetTask() == CCSBot::FIND_TICKING_BOMB)
 	{
-		receiver->Idle();
-		receiver->GetChatter()->Affirmative();
+		pReceiver->Idle();
+		pReceiver->GetChatter()->Affirmative();
 	}
 }
 
 // A teammate reported information about the bomb
-
-void BotBombStatusMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotBombStatusMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
 	// update our gamestate based on teammate's report
 	switch (m_state)
 	{
 		case CSGameState::MOVING:
 		{
-			receiver->GetGameState()->UpdateBomber(&m_pos);
+			pReceiver->GetGameState()->UpdateBomber(&m_pos);
 
 			// if we are hunting and see no enemies, respond
-			if (!receiver->IsRogue() && receiver->IsHunting() && receiver->GetNearbyEnemyCount() == 0)
-				receiver->RespondToHelpRequest(sender, TheNavAreaGrid.GetPlace(&m_pos));
+			if (!pReceiver->IsRogue() && pReceiver->IsHunting() && pReceiver->GetNearbyEnemyCount() == 0)
+				pReceiver->RespondToHelpRequest(pSender, TheNavAreaGrid.GetPlace(&m_pos));
 
 			break;
 		}
 		case CSGameState::LOOSE:
 		{
-			receiver->GetGameState()->UpdateLooseBomb(&m_pos);
+			pReceiver->GetGameState()->UpdateLooseBomb(&m_pos);
 
-			if (receiver->GetTask() == CCSBot::GUARD_BOMB_ZONE)
+			if (pReceiver->GetTask() == CCSBot::GUARD_BOMB_ZONE)
 			{
-				receiver->Idle();
-				receiver->GetChatter()->Affirmative();
+				pReceiver->Idle();
+				pReceiver->GetChatter()->Affirmative();
 			}
 			break;
 		}
-		default:
-			break;
 	}
 }
 
 // A teammate has asked that we follow him
-
-void BotFollowMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotFollowMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	if (receiver->IsRogue())
+	if (pReceiver->IsRogue())
 		return;
 
 	// if we're busy, ignore
-	if (receiver->IsBusy())
+	if (pReceiver->IsBusy())
 		return;
 
-	PathCost pathCost(receiver);
-	float travelDistance = NavAreaTravelDistance(receiver->GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&sender->pev->origin), pathCost);
+	PathCost pathCost(pReceiver);
+	float travelDistance = NavAreaTravelDistance(pReceiver->GetLastKnownArea(), TheNavAreaGrid.GetNearestNavArea(&pSender->pev->origin), pathCost);
 	if (travelDistance < 0.0f)
 		return;
 
@@ -224,104 +208,100 @@ void BotFollowMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
 		return;
 
 	// begin following
-	receiver->Follow(sender);
+	pReceiver->Follow(pSender);
 
 	// acknowledge
-	receiver->GetChatter()->Say("CoveringFriend");
+	pReceiver->GetChatter()->Say("CoveringFriend");
 }
 
 // A teammate has asked us to defend a place
-
-void BotDefendHereMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotDefendHereMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	if (receiver->IsRogue())
+	if (pReceiver->IsRogue())
 		return;
 
 	// if we're busy, ignore
-	if (receiver->IsBusy())
+	if (pReceiver->IsBusy())
 		return;
 
 	Place place = TheNavAreaGrid.GetPlace(&m_pos);
 	if (place != UNDEFINED_PLACE)
 	{
 		// pick a random hiding spot in this place
-		const Vector *spot = FindRandomHidingSpot(receiver, place, receiver->IsSniper());
-		if (spot != NULL)
+		const Vector *spot = FindRandomHidingSpot(pReceiver, place, pReceiver->IsSniper());
+		if (spot)
 		{
-			receiver->SetTask(CCSBot::HOLD_POSITION);
-			receiver->Hide(spot);
+			pReceiver->SetTask(CCSBot::HOLD_POSITION);
+			pReceiver->Hide(spot);
 			return;
 		}
 	}
 
 	// hide nearby
-	receiver->SetTask(CCSBot::HOLD_POSITION);
-	receiver->Hide(TheNavAreaGrid.GetNearestNavArea(&m_pos));
+	pReceiver->SetTask(CCSBot::HOLD_POSITION);
+	pReceiver->Hide(TheNavAreaGrid.GetNearestNavArea(&m_pos));
 
 	// acknowledge
-	receiver->GetChatter()->Say("Affirmative");
+	pReceiver->GetChatter()->Say("Affirmative");
 }
 
 // A teammate has asked where the bomb is planted
-
-void BotWhereBombMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotWhereBombMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	int zone = receiver->GetGameState()->GetPlantedBombsite();
-
+	int zone = pReceiver->GetGameState()->GetPlantedBombsite();
 	if (zone != CSGameState::UNKNOWN)
-		receiver->GetChatter()->FoundPlantedBomb(zone);
+	{
+		pReceiver->GetChatter()->FoundPlantedBomb(zone);
+	}
 }
 
 // A teammate has asked us to report in
-
-void BotRequestReportMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotRequestReportMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	receiver->GetChatter()->ReportingIn();
+	pReceiver->GetChatter()->ReportingIn();
 }
 
 // A teammate told us all the hostages are gone
-
-void BotAllHostagesGoneMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotAllHostagesGoneMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	receiver->GetGameState()->AllHostagesGone();
+	pReceiver->GetGameState()->AllHostagesGone();
 
 	// acknowledge
-	receiver->GetChatter()->Say("Affirmative");
+	pReceiver->GetChatter()->Say("Affirmative");
 }
 
 // A teammate told us a CT is talking to a hostage
-
-void BotHostageBeingTakenMeme::Interpret(CCSBot *sender, CCSBot *receiver) const
+void BotHostageBeingTakenMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 {
-	receiver->GetGameState()->HostageWasTaken();
+	pReceiver->GetGameState()->HostageWasTaken();
 
 	// if we're busy, ignore
-	if (receiver->IsBusy())
+	if (pReceiver->IsBusy())
 		return;
 
-	receiver->Idle();
+	pReceiver->Idle();
 
 	// acknowledge
-	receiver->GetChatter()->Say("Affirmative");
+	pReceiver->GetChatter()->Say("Affirmative");
 }
 
 BotSpeakable::BotSpeakable()
 {
-	m_phrase = NULL;
+	m_phrase = nullptr;
 }
 
 BotSpeakable::~BotSpeakable()
 {
-	if (m_phrase != NULL)
+	if (m_phrase)
 	{
 		delete[] m_phrase;
-		m_phrase = NULL;
+		m_phrase = nullptr;
 	}
 }
 
 BotPhrase::BotPhrase(unsigned int id, bool isPlace)
 {
-	m_name = NULL;
+	m_name = nullptr;
 	m_id = id;
 	m_isPlace = isPlace;
 	m_radioEvent = EVENT_INVALID;
@@ -333,55 +313,58 @@ BotPhrase::BotPhrase(unsigned int id, bool isPlace)
 	InitVoiceBank(0);
 }
 
-BotPhrase::~BotPhrase ()
+BotPhrase::~BotPhrase()
 {
-	for (int bank = 0; bank < m_voiceBank.Count (); ++bank)
+	for (size_t bank = 0; bank < m_voiceBank.size(); bank++)
 	{
-		for (int speakable = 0; speakable < m_voiceBank[bank]->Count (); ++speakable)
+		for (size_t speakable = 0; speakable < m_voiceBank[bank]->size(); speakable++)
 		{
 			delete (*m_voiceBank[bank])[speakable];
 		}
+
 		delete m_voiceBank[bank];
 	}
 
 	if (m_name)
+	{
 		delete[] m_name;
+		m_name = nullptr;
+	}
 }
 
 void BotPhrase::InitVoiceBank(int bankIndex)
 {
 	while (m_numVoiceBanks <= bankIndex)
 	{
-		m_count.AddToTail (0);
-		m_index.AddToTail (0);
-		m_voiceBank.AddToTail (new BotSpeakableVector);
-		++m_numVoiceBanks;
+		m_count.push_back(0);
+		m_index.push_back(0);
+		m_voiceBank.push_back(new BotSpeakableVector);
+		m_numVoiceBanks++;
 	}
 }
 
 // Return a random speakable - avoid repeating
-
 char *BotPhrase::GetSpeakable(int bankIndex, float *duration) const
 {
 	if (bankIndex < 0 || bankIndex >= m_numVoiceBanks || m_count[bankIndex] == 0)
 	{
-		if (duration != NULL)
+		if (duration)
 			*duration = 0.0f;
 
-		return NULL;
+		return nullptr;
 	}
 
 	// find phrase that meets the current criteria
-	int start = m_index[ bankIndex ];
+	int start = m_index[bankIndex];
 	while (true)
 	{
-		BotSpeakableVector *speakables = m_voiceBank[ bankIndex ];
-		int &index = m_index[ bankIndex ];
+		BotSpeakableVector *speakables = m_voiceBank[bankIndex];
+		int &index = m_index[bankIndex];
 
 		const BotSpeakable *speak = (*speakables)[index++];
 
-		if (m_index[ bankIndex ] >= m_count[ bankIndex ])
-			m_index[ bankIndex ] = 0;
+		if (m_index[bankIndex] >= m_count[bankIndex])
+			m_index[bankIndex] = 0;
 
 		// check place criteria
 		// if this speakable has a place criteria, it must match to be used
@@ -405,81 +388,61 @@ char *BotPhrase::GetSpeakable(int bankIndex, float *duration) const
 		// check if we exhausted all speakables
 		if (m_index[bankIndex] == start)
 		{
-			if (duration != NULL)
+			if (duration)
 				*duration = 0.0f;
 
-			return NULL;
+			return nullptr;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // Randomly shuffle the speakable order
-
 void BotPhrase::Randomize()
 {
-	for (int bank = 0; bank < m_voiceBank.Count (); ++bank)
+	for (size_t i = 0; i < m_voiceBank.size(); i++)
 	{
-		BotSpeakableVector *speakables = m_voiceBank[bank];
-		if (speakables->Count () == 1)
-			continue;
-
-		// A simple shuffle: for each array index, swap it with a random index
-		for (int index = 0; index < speakables->Count (); ++index)
-		{
-			int newIndex = RANDOM_LONG (0, speakables->Count () - 1);
-
-			BotSpeakable *speakable = (*speakables)[index];
-			(*speakables)[index] = (*speakables)[newIndex];
-			(*speakables)[newIndex] = speakable;
-		}
+		std::random_shuffle(m_voiceBank[i]->begin(), m_voiceBank[i]->end());
 	}
 }
 
 BotPhraseManager::BotPhraseManager()
 {
-	for (int i = 0; i < MAX_PLACES_PER_MAP; ++i)
+	for (int i = 0; i < MAX_PLACES_PER_MAP; i++)
 		m_placeStatementHistory[i].timer.Invalidate();
 
 	m_placeCount = 0;
 }
 
 // Invoked when map changes
-
 void BotPhraseManager::OnMapChange()
 {
 	m_placeCount = 0;
 }
 
 // Invoked when the round resets
-
 void BotPhraseManager::OnRoundRestart()
 {
 	// effectively reset all interval timers
 	m_placeCount = 0;
 
 	// shuffle all the speakables
-	FOR_EACH_LL (m_placeList, it)
-	{
-		m_placeList[it]->Randomize();
-	}
+	for (auto phrase : m_placeList)
+		phrase->Randomize();
 
-	FOR_EACH_LL (m_list, it)
-	{
-		m_list[it]->Randomize();
-	}
+	for (auto phrase : m_list)
+		phrase->Randomize();
 }
 
 // Initialize phrase system from database file
-
 bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 {
 	bool isDefault = (bankIndex == 0);
 	int phraseDataLength;
 	char *phraseDataFile = (char *)LOAD_FILE_FOR_ME((char *)filename, &phraseDataLength);
 
-	if (phraseDataFile == NULL)
+	if (!phraseDataFile)
 	{
 		if (g_bEnableCSBot)
 		{
@@ -489,6 +452,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 		return false;
 	}
 
+	char *token;
 	char *phraseData = phraseDataFile;
 	unsigned int nextID = 1;
 
@@ -496,6 +460,14 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 	const int RadioPathLen = 128;
 	char baseDir[RadioPathLen] = "";
 	char compositeFilename[RadioPathLen];
+
+#ifdef REGAMEDLL_ADD
+	char soundDir[MAX_PATH];
+	char filePath[MAX_PATH];
+
+	GET_GAME_DIR(soundDir);
+	Q_strcat(soundDir, "\\sound\\");
+#endif
 
 	// Parse the BotChatter.db into BotPhrase collections
 	while (true)
@@ -517,7 +489,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 				return false;
 			}
 
-			char *token = MP_COM_GetToken();
+			token = MP_COM_GetToken();
 			Q_strncpy(baseDir, token, RadioPathLen);
 			baseDir[RadioPathLen - 1] = '\0';
 		}
@@ -526,7 +498,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 			bool isPlace = (Q_stricmp(token, "Place") == 0);
 
 			// encountered a new phrase collection
-			BotPhrase *phrase = NULL;
+			BotPhrase *phrase = nullptr;
 			if (isDefault)
 			{
 				phrase = new BotPhrase(nextID++, isPlace);
@@ -541,6 +513,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 				return false;
 			}
 
+			token = SharedGetToken();
 			if (isDefault)
 			{
 				phrase->m_name = CloneString(MP_COM_GetToken());
@@ -550,16 +523,16 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 			{
 				if (isPlace)
 				{
-					phrase = const_cast<BotPhrase *>(GetPlace(MP_COM_GetToken()));
+					phrase = const_cast<BotPhrase *>(GetPlace(token));
 				}
 				else
 				{
-					phrase = const_cast<BotPhrase *>(GetPhrase(MP_COM_GetToken()));
+					phrase = const_cast<BotPhrase *>(GetPhrase(token));
 				}
 
 				if (!phrase)
 				{
-					CONSOLE_ECHO("Error parsing '%s' - phrase '%s' is invalid\n", filename, MP_COM_GetToken());
+					CONSOLE_ECHO("Error parsing '%s' - phrase '%s' is invalid\n", filename, token);
 					FREE_FILE(phraseDataFile);
 					return false;
 				}
@@ -695,10 +668,10 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 					speak->m_duration = 1.0f;
 				}
 
-				BotSpeakableVector *speakables = phrase->m_voiceBank[ bankIndex ];
-				speakables->AddToTail(speak);
+				BotSpeakableVector *speakables = phrase->m_voiceBank[bankIndex];
+				speakables->push_back(speak);
 
-				++phrase->m_count[ bankIndex ];
+				phrase->m_count[bankIndex]++;
 			}
 
 			if (isDefault)
@@ -709,92 +682,73 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 
 			// add phrase collection to the appropriate master list
 			if (isPlace)
-				m_placeList.AddToTail (phrase);
+				m_placeList.push_back(phrase);
 			else
-				m_list.AddToTail (phrase);
+				m_list.push_back(phrase);
 		}
 	}
 
 	FREE_FILE(phraseDataFile);
-
 	return true;
 }
 
 BotPhraseManager::~BotPhraseManager()
 {
-	int i;
+	for (auto phrase : m_list)
+		delete phrase;
 
-	// free phrase resources
-	for (i = 0; i < m_list.Count (); ++i)
-	{
-		delete m_list[i];
-	}
+	for (auto phrase : m_placeList)
+		delete phrase;
 
-	for (i = 0; i < m_placeList.Count (); ++i)
-	{
-		delete m_placeList[i];
-	}
-
-	m_list.RemoveAll ();
-	m_placeList.RemoveAll ();
+	m_list.clear();
+	m_placeList.clear();
 }
 
 Place BotPhraseManager::NameToID(const char *name) const
 {
-	FOR_EACH_LL (m_placeList, it)
+	for (auto phrase : m_placeList)
 	{
-		const BotPhrase *phrase = m_placeList[it];
-
 		if (!Q_stricmp(phrase->m_name, name))
 			return phrase->m_id;
 	}
 
-	FOR_EACH_LL (m_list, it)
+	for (auto phrase : m_list)
 	{
-		const BotPhrase *phrase = m_list[it];
-
 		if (!Q_stricmp(phrase->m_name, name))
 			return phrase->m_id;
 	}
 
-	return 0;
+	return UNDEFINED_PLACE;
 }
 
 const char *BotPhraseManager::IDToName(Place id) const
 {
-	FOR_EACH_LL (m_placeList, it)
+	for (auto phrase : m_placeList)
 	{
-		const BotPhrase *phrase = m_placeList[it];
-
 		if (phrase->m_id == id)
 			return phrase->m_name;
 	}
 
-	FOR_EACH_LL (m_list, it)
+	for (auto phrase : m_list)
 	{
-		const BotPhrase *phrase = m_list[it];
-
 		if (phrase->m_id == id)
 			return phrase->m_name;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // Given a name, return the associated phrase collection
-
 const BotPhrase *BotPhraseManager::GetPhrase(const char *name) const
 {
-	FOR_EACH_LL (m_list, it)
+	for (auto phrase : m_list)
 	{
-		const BotPhrase *phrase = m_list[it];
-
 		if (!Q_stricmp(phrase->m_name, name))
 			return phrase;
 	}
 
 	//CONSOLE_ECHO("GetPhrase: ERROR - Invalid phrase '%s'\n", name);
-	return NULL;
+	return nullptr;
 }
 
 // Given an id, return the associated phrase collection
@@ -803,53 +757,45 @@ const BotPhrase *BotPhraseManager::GetPhrase(const char *name) const
 /*
 const BotPhrase *BotPhraseManager::GetPhrase(unsigned int id) const
 {
-	for (BotPhraseList::const_iterator iter = m_list.begin(); iter != m_list.end(); ++iter)
+	for (auto phrase : m_list)
 	{
-		const BotPhrase *phrase = *iter;
-
 		if (phrase->m_id == id)
 			return phrase;
 	}
 
 	CONSOLE_ECHO("GetPhrase: ERROR - Invalid phrase id #%d\n", id);
-	return NULL;
+	return nullptr;
 }
 */
 
 // Given a name, return the associated Place phrase collection
-
 const BotPhrase *BotPhraseManager::GetPlace(const char *name) const
 {
-	if (name == NULL)
-		return NULL;
+	if (!name)
+		return nullptr;
 
-	FOR_EACH_LL (m_placeList, it)
+	for (auto phrase : m_placeList)
 	{
-		const BotPhrase *phrase = m_placeList[it];
-
 		if (!Q_stricmp(phrase->m_name, name))
 			return phrase;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // Given a place, return the associated Place phrase collection
-
 const BotPhrase *BotPhraseManager::GetPlace(PlaceCriteria place) const
 {
 	if (place == UNDEFINED_PLACE)
-		return NULL;
+		return nullptr;
 
-	FOR_EACH_LL (m_placeList, it)
+	for (auto phrase : m_placeList)
 	{
-		const BotPhrase *phrase = m_placeList[it];
-
 		if (phrase->m_id == place)
 			return phrase;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 BotStatement::BotStatement(BotChatterInterface *chatter, BotStatementType type, float expireDuration)
@@ -1141,7 +1087,10 @@ bool BotStatement::Update()
 					else if (enemyCount > 1)
 					{
 						phrase = TheBotPhrases->GetPhrase("EnemySpotted");
-						phrase->SetCountCriteria(enemyCount);
+						if (phrase)
+						{
+							phrase->SetCountCriteria(enemyCount);
+						}
 					}
 					break;
 				}
@@ -1688,11 +1637,17 @@ bool BotChatterInterface::ShouldSpeak() const
 
 float BotChatterInterface::GetRadioSilenceDuration()
 {
+	if (m_me->m_iTeam != CT && m_me->m_iTeam != TERRORIST)
+		return 0;
+
 	return m_radioSilenceInterval[ m_me->m_iTeam - 1 ].GetElapsedTime();
 }
 
 void BotChatterInterface::ResetRadioSilenceDuration()
 {
+	if (m_me->m_iTeam != CT && m_me->m_iTeam != TERRORIST)
+		return;
+
 	m_radioSilenceInterval[m_me->m_iTeam - 1].Reset();
 }
 

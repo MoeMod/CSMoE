@@ -360,10 +360,8 @@ inline float AngleDifference(float a, float b)
 
 inline bool AnglesAreEqual(float a, float b, float tolerance = 5.0f)
 {
-	if (abs(int64(AngleDifference(a, b))) < tolerance)
-		return true;
+	return abs(AngleDifference(a, b)) < tolerance;
 
-	return false;
 }
 
 inline bool VectorsAreEqual(const Vector *a, const Vector *b, float tolerance = 0.1f)

@@ -66,7 +66,7 @@ class BotProfile
 public:
 	BotProfile()
 	{
-		m_name = NULL;
+		m_name = nullptr;
 		m_aggression = 0.0f;
 		m_skill = 0.0f;
 		m_teamwork = 0.0f;
@@ -174,7 +174,7 @@ inline void BotProfile::Inherit(const BotProfile *parent, const BotProfile *base
 		m_voiceBank = parent->m_voiceBank;
 }
 
-typedef CUtlLinkedList <BotProfile *, int> BotProfileList;
+typedef std::list<BotProfile *> BotProfileList;
 
 class BotProfileManager
 {
@@ -182,19 +182,17 @@ public:
 	BotProfileManager();
 	~BotProfileManager();
 
-	void Init(const char *filename, unsigned int *checksum = NULL);
+	void Init(const char *filename, unsigned int *checksum = nullptr);
 	void Reset();
 
 	const BotProfile *GetProfile (const char *name, BotProfileTeamType team) const
 	{
-		FOR_EACH_LL (m_profileList, it)
-		{
-			BotProfile *profile = m_profileList[it];
-
-			if (!Q_stricmp (name, profile->GetName ()) && profile->IsValidForTeam (team))
+		for (auto profile : m_profileList) {
+			if (!Q_stricmp(name, profile->GetName()) && profile->IsValidForTeam(team))
 				return profile;
 		}
-		return NULL;
+
+		return nullptr;
 	}
 
 	const BotProfileList *GetProfileList() const { return &m_profileList; }
@@ -203,9 +201,9 @@ public:
 	const char *GetCustomSkin(int index);
 	const char *GetCustomSkinModelname(int index);
 	const char *GetCustomSkinFname(int index);
-	int GetCustomSkinIndex(const char *name, const char *filename = NULL);
+	int GetCustomSkinIndex(const char *name, const char *filename = nullptr);
 
-	typedef CUtlVector<char *> VoiceBankList;
+	typedef std::vector<char *> VoiceBankList;
 
 	const VoiceBankList *GetVoiceBanks() const { return &m_voiceBanks; }
 	int FindVoiceBankIndex(const char *filename);

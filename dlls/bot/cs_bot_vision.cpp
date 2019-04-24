@@ -285,6 +285,9 @@ bool CCSBot::IsVisible(const Vector *pos, bool testFOV) const
 
 bool CCSBot::IsVisible(CBasePlayer *player, bool testFOV, unsigned char *visParts) const
 {
+	if ((player->pev->flags & FL_NOTARGET) || (player->pev->effects & EF_NODRAW))
+		return false;
+
 	Vector spot = player->pev->origin;
 	int testVisParts = NONE;
 
@@ -409,19 +412,10 @@ void CCSBot::UpdatePeripheralVision()
 	if (m_spotEncounter)
 	{
 		// check LOS to all spots in case we see them with our "peripheral vision"
-		const SpotOrder *spotOrder = NULL;
 		Vector pos;
-
-		FOR_EACH_LL (m_spotEncounter->spotList, it)
+		for (auto &spotOrder : m_spotEncounter->spotList)
 		{
-			spotOrder = &m_spotEncounter->spotList[it];
-
-			// spot could be nullptr
-			HidingSpot *hspot = spotOrder->spot;
-			if (!hspot)
-				continue;
-
-			const Vector *spotPos = hspot->GetPosition();
+			const Vector *spotPos = spotOrder.spot->GetPosition();
 
 			pos.x = spotPos->x;
 			pos.y = spotPos->y;
@@ -431,7 +425,7 @@ void CCSBot::UpdatePeripheralVision()
 				continue;
 
 			// can see hiding spot, remember when we saw it last
-			SetHidingSpotCheckTimestamp(spotOrder->spot);
+			SetHidingSpotCheckTimestamp(spotOrder.spot);
 		}
 	}
 }
@@ -557,8 +551,8 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			// figure out how far along the path segment we are
 			Vector delta = m_spotEncounter->path.to - m_spotEncounter->path.from;
 			float length = delta.Length();
-			float adx = (float)abs(int64(delta.x));
-			float ady = (float)abs(int64(delta.y));
+			float adx = abs(delta.x);
+			float ady = abs(delta.y);
 			float t;
 
 			if (adx > ady)
@@ -584,22 +578,16 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			const float checkTime = 10.0f;
 			const SpotOrder *spotOrder;
 
-			FOR_EACH_LL (m_spotEncounter->spotList, it)
+			for (auto &spotOrder : m_spotEncounter->spotList)
 			{
-				spotOrder = &m_spotEncounter->spotList[it];
-
-				// could be nullptr, fuck it
-				if(!spotOrder->spot)
-					continue;
-
 				// if we have seen this spot recently, we don't need to look at it
-				if (gpGlobals->time - GetHidingSpotCheckTimestamp(spotOrder->spot) <= checkTime)
+				if (gpGlobals->time - GetHidingSpotCheckTimestamp(spotOrder.spot) <= checkTime)
 					continue;
 
-				if (spotOrder->t > t)
+				if (spotOrder.t > t)
 					break;
 
-				dangerSpot[ dangerIndex++ ] = spotOrder->spot;
+				dangerSpot[ dangerIndex++ ] = spotOrder.spot;
 				if (dangerIndex >= MAX_DANGER_SPOTS)
 					dangerIndex = 0;
 				if (dangerSpotCount < MAX_DANGER_SPOTS)
@@ -713,7 +701,7 @@ bool CCSBot::BendLineOfSight(const Vector *eye, const Vector *point, Vector *ben
 CBasePlayer *CCSBot::FindMostDangerousThreat()
 {
 	// maximum number of simulataneously attendable threats
-	enum { MAX_THREATS = 16 };
+	const int MAX_THREATS = MAX_CLIENTS;
 	struct CloseInfo
 	{
 		CBasePlayer *enemy;
@@ -755,6 +743,9 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 
 			// is it alive?
 			if (!player->IsAlive())
+				continue;
+
+			if ((player->pev->flags & FL_NOTARGET) || (player->pev->effects & EF_NODRAW))
 				continue;
 
 			// is it an enemy?

@@ -139,10 +139,12 @@ CCSBotManager::CCSBotManager()
 	// Now that we've parsed all the profiles, we have a list of the voice banks they're using.
 	// Go back and parse the custom voice speakables.
 	const BotProfileManager::VoiceBankList *pVoiceBanks = TheBotProfiles->GetVoiceBanks();
-	for (int i = 1; i < pVoiceBanks->Count(); ++i)
+	for (uint32_t i = 1; i < pVoiceBanks->size(); ++i)
 	{
 		TheBotPhrases->Initialize((*pVoiceBanks)[i], i);
 	}
+
+	AddServerCommands();
 }
 
 // Invoked when a new round begins
@@ -665,9 +667,8 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			// no arguments = list all available places
 			int i = 0;
 			const BotPhraseList *placeList = TheBotPhrases->GetPlaceList();
-			FOR_EACH_LL ((*placeList), it)
+			for(auto phrase : *placeList)
 			{
-				const BotPhrase *phrase = (*placeList)[it];
 
 				if (phrase->GetID() == GetNavPlace())
 					CONSOLE_ECHO("--> %-26s", phrase->GetName());
@@ -685,9 +686,8 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			const BotPhraseList *placeList = TheBotPhrases->GetPlaceList();
 			const BotPhrase *found = NULL;
 			bool isAmbiguous = false;
-			FOR_EACH_LL ((*placeList), it)
+			for(auto phrase : *placeList)
 			{
-				const BotPhrase *phrase = (*placeList)[it];
 				if (!Q_strnicmp(phrase->GetName(), msg, Q_strlen(msg)))
 				{
 					// check for exact match in case of subsets of other strings
@@ -775,21 +775,18 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			sizeof(CNavArea),
 			TheNavAreaGrid.GetNavAreaCount() * sizeof(CNavArea));
 		CONSOLE_ECHO("  %d Hiding Spots @ %d bytes each = %d bytes\n",
-			TheHidingSpotList.Count(),
+			TheHidingSpotList.size(),
 			sizeof(HidingSpot),
-			sizeof(HidingSpot) * TheHidingSpotList.Count());
+			sizeof(HidingSpot) * TheHidingSpotList.size());
 
 		unsigned int encounterMem = 0;
-		FOR_EACH_LL (TheNavAreaList, it)
+		for (CNavArea *area : TheNavAreaList)
 		{
-			CNavArea *area = TheNavAreaList[it];
-
-			FOR_EACH_LL (area->m_spotEncounterList, it2)
+			for (SpotEncounter &se : area->m_spotEncounterList)
 			{
-				SpotEncounter *se = area->m_spotEncounterList[it2];
 
 				encounterMem += sizeof(SpotEncounter);
-				encounterMem += sizeof(SpotOrder) * se->spotList.Count();
+				encounterMem += sizeof(SpotOrder) * se.spotList.size();
 			}
 		}
 
@@ -907,6 +904,11 @@ bool CCSBotManager::BotAddCommand(BotProfileTeamType team, bool isFromConsole)
 			// increase the bot quota to account for manually added bot
 			CVAR_SET_FLOAT("bot_quota", cv_bot_quota.value + 1);
 		}
+	}
+	else
+	{
+		// decrease the bot quota
+		CVAR_SET_FLOAT("bot_quota", cv_bot_quota.value - 1);
 	}
 
 	return true;
@@ -1170,6 +1172,9 @@ void CCSBotManager::ValidateMapData()
 
 		while ((entity = UTIL_FindEntityByClassname(entity, "info_player_start")) != NULL)
 		{
+			if (m_zoneCount >= MAX_ZONES)
+				break;
+
 			if (FNullEnt(entity->edict()))
 				break;
 

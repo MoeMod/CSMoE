@@ -186,23 +186,23 @@ void CBotManager::StartFrame()
 	{
 		Vector edge, lastEdge;
 
-		int it = m_activeGrenadeList.Head ();
-
-		while (it != m_activeGrenadeList.InvalidIndex ())
+		auto iter = m_activeGrenadeList.begin();
+		while (iter != m_activeGrenadeList.end())
 		{
-			ActiveGrenade *ag = m_activeGrenadeList[it];
-
-			int current = it;
-			it = m_activeGrenadeList.Next (it);
+			ActiveGrenade *ag = *iter;
 
 			// lazy validation
-			if (!ag->IsValid ())
+			if (!ag->IsValid())
 			{
-				m_activeGrenadeList.Remove (current);
 				delete ag;
-
+				iter = m_activeGrenadeList.erase(iter);
 				continue;
 			}
+			else
+			{
+				iter++;
+			}
+
 			const Vector *pos = ag->GetDetonationPosition();
 
 			UTIL_DrawBeamPoints(*pos, *pos + Vector(0, 0, 50), 1, 255, 100, 0);
@@ -305,17 +305,17 @@ void CBotManager::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity 
 
 void CBotManager::AddGrenade(int type, CGrenade *grenade)
 {
-	m_activeGrenadeList.AddToTail(new ActiveGrenade (type, grenade));
+	ActiveGrenade *ag = new ActiveGrenade(type, grenade);
+
+	m_activeGrenadeList.push_back(ag);
 }
 
 // The grenade entity in the world is going away
 
 void CBotManager::RemoveGrenade(CGrenade *grenade)
 {
-	FOR_EACH_LL (m_activeGrenadeList, it)
+	for(auto ag : m_activeGrenadeList)
 	{
-		ActiveGrenade *ag = m_activeGrenadeList[it];
-
 		if (ag->IsEntity (grenade))
 		{
 			ag->OnEntityGone ();
@@ -328,49 +328,52 @@ void CBotManager::RemoveGrenade(CGrenade *grenade)
 
 NOXREF void CBotManager::ValidateActiveGrenades()
 {
-	int it = m_activeGrenadeList.Head ();
-
-	while (it != m_activeGrenadeList.InvalidIndex ())
+	auto iter = m_activeGrenadeList.begin ();
+	while (iter != m_activeGrenadeList.end ())
 	{
-		ActiveGrenade *ag = m_activeGrenadeList[it];
+		ActiveGrenade *ag = *iter;
 
-		int current = it;
-		it = m_activeGrenadeList.Next (it);
+		auto current = iter;
 
 		// lazy validation
 		if (!ag->IsValid ())
 		{
-			m_activeGrenadeList.Remove (current);
 			delete ag;
-			continue;
+			iter = m_activeGrenadeList.erase (current);
+		}
+		else
+		{
+			++iter;
 		}
 	}
 }
 
 void CBotManager::DestroyAllGrenades()
 {
-	m_activeGrenadeList.PurgeAndDeleteElements ();
+	std::for_each(m_activeGrenadeList.begin(), m_activeGrenadeList.end(), std::default_delete<ActiveGrenade>());
+
+	m_activeGrenadeList.clear();
 }
 
 // Return true if position is inside a smoke cloud
 
 bool CBotManager::IsInsideSmokeCloud(const Vector *pos)
 {
-	int it = m_activeGrenadeList.Head ();
-
-	while (it != m_activeGrenadeList.InvalidIndex ())
+	auto iter = m_activeGrenadeList.begin();
+	while (iter != m_activeGrenadeList.end())
 	{
-		ActiveGrenade *ag = m_activeGrenadeList[it];
-
-		int current = it;
-		it = m_activeGrenadeList.Next (it);
+		ActiveGrenade *ag = (*iter);
 
 		// lazy validation
 		if (!ag->IsValid())
 		{
-			m_activeGrenadeList.Remove (current);
 			delete ag;
+			iter = m_activeGrenadeList.erase(iter);
 			continue;
+		}
+		else
+		{
+			iter++;
 		}
 
 		if (ag->GetID() == WEAPON_SMOKEGRENADE)
@@ -401,21 +404,22 @@ bool CBotManager::IsLineBlockedBySmoke(const Vector *from, const Vector *to)
 	Vector sightDir = *to - *from;
 	float sightLength = sightDir.NormalizeInPlace();
 
-	int it = m_activeGrenadeList.Head ();
+	auto iter = m_activeGrenadeList.begin ();
 
-	while (it != m_activeGrenadeList.InvalidIndex ())
+	while (iter != m_activeGrenadeList.end ())
 	{
-		ActiveGrenade *ag = m_activeGrenadeList[it];
-
-		int current = it;
-		it = m_activeGrenadeList.Next (it);
+		ActiveGrenade *ag = (*iter);
 
 		// lazy validation
-		if (!ag->IsValid ())
+		if (!ag->IsValid())
 		{
-			m_activeGrenadeList.Remove (current);
 			delete ag;
+			iter = m_activeGrenadeList.erase(iter);
 			continue;
+		}
+		else
+		{
+			iter++;
 		}
 
 		if (ag->GetID() == WEAPON_SMOKEGRENADE)

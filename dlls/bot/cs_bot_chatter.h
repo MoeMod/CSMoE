@@ -181,8 +181,8 @@ public:
 	CountCriteria m_count;
 };
 
-typedef CUtlVector<BotSpeakable *> BotSpeakableVector;
-typedef CUtlVector<BotSpeakableVector *> BotVoiceBankVector;
+typedef std::vector<BotSpeakable *> BotSpeakableVector;
+typedef std::vector<BotSpeakableVector *> BotVoiceBankVector;
 
 // The BotPhrase class is a collection of Speakables associated with a name, ID, and criteria
 class BotPhrase
@@ -215,8 +215,8 @@ private:
 	bool m_isImportant;					// mission-critical statement
 
 	mutable BotVoiceBankVector m_voiceBank;			// array of voice banks (arrays of speakables)
-	CUtlVector<int> m_count;				// number of speakables
-	mutable CUtlVector< int > m_index;			// index of next speakable to return
+	std::vector<int> m_count;				// number of speakables
+	mutable std::vector< int > m_index;			// index of next speakable to return
 	int m_numVoiceBanks;					// number of voice banks that have been initialized
 	void InitVoiceBank(int bankIndex);			// sets up the vector of voice banks for the first bankIndex voice banks
 
@@ -224,7 +224,7 @@ private:
 	mutable CountCriteria m_countCriteria;
 };
 
-typedef CUtlLinkedList<BotPhrase *, int> BotPhraseList;
+typedef std::list<BotPhrase *> BotPhraseList;
 
 inline void BotPhrase::ClearCriteria() const
 {

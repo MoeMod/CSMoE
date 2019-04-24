@@ -340,7 +340,9 @@ void CCSBot::Attack(CBaseEntity *victim)
 	else
 		m_attackState.SetCrouchAndHold(false);
 
-	PrintIfWatched("ATTACK BEGIN (reaction time = %g (+ update time), surprise time = %g, attack delay = %g)\n");
+	PrintIfWatched("ATTACK BEGIN (reaction time = %g (+ update time), surprise time = %g, attack delay = %g)\n"
+			, GetProfile()->GetReactionTime(), m_surpriseDelay, GetProfile()->GetAttackDelay()
+	);
 	m_isAttacking = true;
 	m_attackState.OnEnter(this);
 
@@ -353,7 +355,7 @@ void CCSBot::Attack(CBaseEntity *victim)
 	Vector toEnemy = victim->pev->origin - pev->origin;
 	Vector idealAngle = UTIL_VecToAngles(toEnemy);
 
-	float deltaYaw = abs((int)(m_lookYaw - idealAngle.y));
+	float deltaYaw = abs(m_lookYaw - idealAngle.y);
 
 	while (deltaYaw > 180.0f)
 		deltaYaw -= 360.0f;

@@ -184,7 +184,7 @@ int CCSTutorUndefinedState::HandlePlayerSpawned(CBaseEntity *entity, CBaseEntity
 		if (player != NULL && player->IsPlayer() && player == localPlayer)
 		{
 			// flags
-			return TUTOR_STATE_FLAG_1;
+			return TUTORSTATE_WAITING_FOR_START;
 		}
 	}
 
@@ -198,7 +198,7 @@ const char * CCSTutorUndefinedState::GetStateString()
 
 CCSTutorWaitingForStartState::CCSTutorWaitingForStartState()
 {
-	m_type = (TUTORMESSAGETYPE_ENEMY_DEATH | TUTORMESSAGETYPE_BUY);
+	m_type = TUTORSTATE_WAITING_FOR_START;
 }
 
 CCSTutorWaitingForStartState::~CCSTutorWaitingForStartState()
@@ -223,6 +223,10 @@ int CCSTutorWaitingForStartState::CheckForStateTransition(GameEventType event, C
 
 const char * CCSTutorWaitingForStartState::GetStateString()
 {
+	if (m_type < TUTORSTATE_UNDEFINED || m_type > TUTORSTATE_WAITING_FOR_START)
+	{
+		return nullptr;
+	}
 	return g_TutorStateStrings[m_type];
 }
 
@@ -237,7 +241,7 @@ int CCSTutorWaitingForStartState::HandlePlayerSpawned(CBaseEntity *entity, CBase
 		if (player != NULL && player->IsPlayer() && player == localPlayer)
 		{
 			// flags
-			return TUTOR_STATE_FLAG_1;
+			return TUTORSTATE_WAITING_FOR_START;
 		}
 	}
 
@@ -246,12 +250,12 @@ int CCSTutorWaitingForStartState::HandlePlayerSpawned(CBaseEntity *entity, CBase
 
 int CCSTutorWaitingForStartState::HandleBuyTimeStart(CBaseEntity *entity, CBaseEntity *other)
 {
-	return TUTOR_STATE_FLAG_2;
+	return TUTORSTATE_BUYTIME;
 }
 
 CCSTutorBuyMenuState::CCSTutorBuyMenuState()
 {
-	m_type = (TUTORMESSAGETYPE_DEFAULT | TUTORMESSAGETYPE_FRIEND_DEATH | TUTORMESSAGETYPE_BUY);
+	m_type = TUTORSTATE_BUYTIME;
 }
 
 CCSTutorBuyMenuState::~CCSTutorBuyMenuState()
@@ -271,10 +275,14 @@ int CCSTutorBuyMenuState::CheckForStateTransition(GameEventType event, CBaseEnti
 
 const char * CCSTutorBuyMenuState::GetStateString()
 {
+	if (m_type < TUTORSTATE_UNDEFINED || m_type > TUTORSTATE_WAITING_FOR_START)
+	{
+		return nullptr;
+	}
 	return g_TutorStateStrings[m_type];
 }
 
 int CCSTutorBuyMenuState::HandleRoundStart(CBaseEntity *entity, CBaseEntity *other)
 {
-	return TUTOR_STATE_FLAG_1;
+	return TUTORSTATE_WAITING_FOR_START;
 }

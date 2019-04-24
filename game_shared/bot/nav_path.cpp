@@ -113,11 +113,11 @@ bool CNavPath::ComputePathPositions()
 		else if (to->how == GO_LADDER_UP)
 		{
 			// find our ladder
-			const NavLadderList *list = from->area->GetLadderList (LADDER_UP);
-			int it;
-			for (it = list->Head (); it != list->InvalidIndex (); it = list->Next (it))
+			const NavLadderList *list = from->area->GetLadderList(LADDER_UP);
+			NavLadderList::const_iterator iter;
+			for (iter = list->begin(); iter != list->end(); iter++)
 			{
-				CNavLadder *ladder = list->Element (it);
+				CNavLadder *ladder = (*iter);
 
 				// can't use "behind" area when ascending...
 				if (ladder->m_topForwardArea == to->area || ladder->m_topLeftArea == to->area || ladder->m_topRightArea == to->area)
@@ -129,7 +129,7 @@ bool CNavPath::ComputePathPositions()
 				}
 			}
 
-			if (it == list->InvalidIndex ())
+			if (iter == list->end())
 			{
 				//PrintIfWatched( "ERROR: Can't find ladder in path\n" );
 				return false;
@@ -140,11 +140,11 @@ bool CNavPath::ComputePathPositions()
 		else if (to->how == GO_LADDER_DOWN)
 		{
 			// find our ladder
-			const NavLadderList *list = from->area->GetLadderList (LADDER_DOWN);
-			int it;
-			for (it = list->Head (); it != list->InvalidIndex (); it = list->Next (it))
+			const NavLadderList *list = from->area->GetLadderList(LADDER_DOWN);
+			NavLadderList::const_iterator iter;
+			for (iter = list->begin(); iter != list->end(); iter++)
 			{
-				CNavLadder *ladder = list->Element (it);
+				CNavLadder *ladder = (*iter);
 
 				if (ladder->m_bottomArea == to->area)
 				{
@@ -155,7 +155,7 @@ bool CNavPath::ComputePathPositions()
 				}
 			}
 
-			if (it == list->InvalidIndex ())
+			if (iter == list->end())
 			{
 				//PrintIfWatched( "ERROR: Can't find ladder in path\n" );
 				return false;

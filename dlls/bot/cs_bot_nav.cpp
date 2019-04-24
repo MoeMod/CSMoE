@@ -12,57 +12,14 @@
 #include "vehicle.h"
 #include "globals.h"
 
-#include "pm_shared.h"
-#include "utllinkedlist.h"
-
 // CSBOT and Nav
-#include "game_shared/GameEvent.h"		// Game event enum used by career mode, tutor system, and bots
-#include "game_shared/bot/bot_util.h"
-#include "game_shared/bot/simple_state_machine.h"
-
-#include "game_shared/steam_util.h"
-
-#include "game_shared/bot/bot_manager.h"
-#include "game_shared/bot/bot_constants.h"
-#include "game_shared/bot/bot.h"
-
-#include "game_shared/shared_util.h"
-#include "game_shared/bot/bot_profile.h"
-
-#include "game_shared/bot/nav.h"
-#include "game_shared/bot/improv.h"
-#include "game_shared/bot/nav_node.h"
-#include "game_shared/bot/nav_area.h"
-#include "game_shared/bot/nav_file.h"
-#include "game_shared/bot/nav_path.h"
-
-#include "airtank.h"
-#include "h_ai.h"
-#include "h_cycler.h"
-#include "h_battery.h"
-
-// Hostage
-#include "hostage/hostage.h"
-#include "hostage/hostage_localnav.h"
-
-#include "bot/cs_bot.h"
-
-// Tutor
-#include "tutor.h"
-#include "tutor_base_states.h"
-#include "tutor_base_tutor.h"
-#include "tutor_cs_states.h"
-#include "tutor_cs_tutor.h"
-
-#include "gamerules.h"
-#include "career_tasks.h"
-#include "maprules.h"
-
-// Reset the stuck-checker.
+#include "bot_include.h"
 
 #define PITCH	0	// up/down
 #define YAW	1	// left/right
 #define ROLL	2	// fall over
+
+// Reset the stuck-checker.
 
 void CCSBot::ResetStuckMonitor()
 {
@@ -206,7 +163,7 @@ bool CCSBot::GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Ve
 	if (GetSimpleGroundHeight(pos, height, normal))
 	{
 		// our current nav area also serves as a ground polygon
-		if (m_lastKnownArea != NULL && m_lastKnownArea->IsOverlapping(pos))
+		if (m_lastKnownArea && m_lastKnownArea->IsOverlapping(pos))
 		{
 			*height = Q_max((*height), m_lastKnownArea->GetZ(pos));
 		}
@@ -219,8 +176,10 @@ bool CCSBot::GetSimpleGroundHeightWithFloor(const Vector *pos, float *height, Ve
 
 Place CCSBot::GetPlace() const
 {
-	if (m_lastKnownArea != NULL)
+	if (m_lastKnownArea)
+	{
 		return m_lastKnownArea->GetPlace();
+	}
 
 	return UNDEFINED_PLACE;
 }
@@ -235,8 +194,8 @@ void CCSBot::MoveTowardsPosition(const Vector *pos)
 
 	// NOTE: We need to do this frequently to catch edges at the right time
 	// TODO: Look ahead *along path* instead of straight line
-	if ((m_lastKnownArea == NULL || !(m_lastKnownArea->GetAttributes() & NAV_NO_JUMP)) &&
-		!IsOnLadder() && !m_isJumpCrouching)
+	if ((!m_lastKnownArea || !(m_lastKnownArea->GetAttributes() & NAV_NO_JUMP))
+	    && !IsOnLadder() && !m_isJumpCrouching)
 	{
 		float ground;
 		Vector aheadRay(pos->x - pev->origin.x, pos->y - pev->origin.y, 0);
@@ -314,7 +273,7 @@ void CCSBot::MoveTowardsPosition(const Vector *pos)
 		MoveBackward();
 
 	// if we are avoiding someone via strafing, don't override
-	if (m_avoid != NULL)
+	if (m_avoid)
 		return;
 
 	if (latProj >= c)
@@ -367,16 +326,30 @@ void CCSBot::StrafeAwayFromPosition(const Vector *pos)
 	Vector2D to(pos->x - pev->origin.x, pos->y - pev->origin.y);
 	to.NormalizeInPlace();
 
+	// move away from the position independant of our view direction
+	float toProj = to.x * dir.x + to.y * dir.y;
 	float latProj = to.x * lat.x + to.y * lat.y;
 
+#if 1 // def REGAMEDLL_FIXES
+	const float c = 0.5f;
+	if (toProj > c)
+		MoveBackward();
+	else if (toProj < -c)
+		MoveForward();
+
+	if (latProj >= c)
+		StrafeRight();
+	else if (latProj <= -c)
+		StrafeLeft();
+#else
 	if (latProj >= 0.0f)
 		StrafeRight();
 	else
 		StrafeLeft();
+#endif
 }
 
 // For getting un-stuck
-
 void CCSBot::Wiggle()
 {
 	if (IsCrouching())
@@ -426,7 +399,7 @@ void CCSBot::ComputeApproachPoints()
 {
 	m_approachPointCount = 0;
 
-	if (m_lastKnownArea == NULL)
+	if (!m_lastKnownArea)
 	{
 		return;
 	}
@@ -440,7 +413,7 @@ void CCSBot::ComputeApproachPoints()
 	{
 		const CNavArea::ApproachInfo *info = m_lastKnownArea->GetApproachInfo(i);
 
-		if (info->here.area == NULL || info->prev.area == NULL)
+		if (!info->here.area || !info->prev.area)
 		{
 			continue;
 		}
@@ -487,7 +460,7 @@ NOXREF bool CCSBot::FindApproachPointNearestPath(Vector *pos)
 	if (m_approachPointCount == 0)
 		return false;
 
-	Vector target = Vector(0, 0, 0), close;
+	Vector target(0, 0, 0), close;
 	float targetRangeSq = 0.0f;
 	bool found = false;
 

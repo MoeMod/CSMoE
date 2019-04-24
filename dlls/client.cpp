@@ -197,11 +197,12 @@ void EXT_FUNC ClientDisconnect(edict_t *pEntity)
 	if (!g_fGameOver)
 	{
 		UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_disconnected", STRING(pEntity->v.netname));
+#if 0
 		CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(pEntity));
 
 		if (pSound)
 			pSound->Reset();
-
+#endif
 		pEntity->v.takedamage = DAMAGE_NO;
 		pEntity->v.solid = SOLID_NOT;
 		pEntity->v.flags = FL_DORMANT;
@@ -213,7 +214,7 @@ void EXT_FUNC ClientDisconnect(edict_t *pEntity)
 		g_pGameRules->ClientDisconnected(pEntity);
 	}
 
-	if (TheBots != NULL && pPlayer != NULL && pPlayer->IsBot())
+	if (TheBots != NULL)
 	{
 		TheBots->ClientDisconnect(pPlayer);
 	}
@@ -612,7 +613,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		pPlayer->pev->angles = gpGlobals->v_forward;
 	}
    
-	if (TheBots != NULL)
+	if (TheBots)
 	{
 		TheBots->OnEvent(EVENT_PLAYER_CHANGED_TEAM, (CBaseEntity *)pPlayer);
 	}
@@ -728,10 +729,8 @@ void Host_Say(edict_t *pEntity, int teamonly)
 			Place playerPlace = TheNavAreaGrid.GetPlace(&player->pev->origin);
 			const BotPhraseList *placeList = TheBotPhrases->GetPlaceList();
 
-			FOR_EACH_LL((*placeList), it)
+			for(auto phrase : *placeList)
 			{
-				BotPhrase *phrase = (*placeList)[it];
-
 				if (phrase->GetID() == playerPlace)
 				{
 					placeName = phrase->GetName();
@@ -1776,7 +1775,7 @@ void BuyItem(CBasePlayer *pPlayer, int iSlot)
 				pPlayer->pev->body = 1;
 				pPlayer->AddAccount(-DEFUSEKIT_PRICE);
 
-				EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/kevlar.wav", VOL_NORM, ATTN_NORM);
+				EMIT_SOUND(ENT(pPlayer->pev), CHAN_VOICE, "items/kevlar.wav", VOL_NORM, ATTN_NORM);
 				SendItemStatus(pPlayer);
 			}
 			else
@@ -1943,7 +1942,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 		appearance.model_name_index = 9;
 	}
 
-	player->m_iMenu = Menu_OFF;
+	player->ResetMenu();
 
 	// Reset the player's state
 	if (player->m_iJoiningState == JOINED)
@@ -2123,7 +2122,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 			player->m_iAccount.Reset();
 			player->m_iAccount.UpdateHUD(player);
 
-			MESSAGE_BEGIN(MSG_BROADCAST, gmsgScoreInfo);
+			MESSAGE_BEGIN(MSG_ALL, gmsgScoreInfo);
 				WRITE_BYTE(ENTINDEX(player->edict()));
 				WRITE_SHORT((int)player->pev->frags);
 				WRITE_SHORT(player->m_iDeaths);
@@ -2144,10 +2143,12 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 			edict_t *pentSpawnSpot = mp->GetPlayerSpawnSpot(player);
 			player->StartObserver(VARS(pentSpawnSpot)->origin, VARS(pentSpawnSpot)->angles);
 
+#if 0
 			MESSAGE_BEGIN(MSG_ALL, gmsgSpectator);
 				WRITE_BYTE(ENTINDEX(player->edict()));
 				WRITE_BYTE(1);
 			MESSAGE_END();
+#endif
 
 			// do we have fadetoblack on? (need to fade their screen back in)
 			if (fadetoblack.value)
@@ -3566,7 +3567,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				if (slot == MENU_SLOT_TEAM_VIP || slot == MENU_SLOT_TEAM_SPECT || player->m_bIsVIP)
 				{
-					player->m_iMenu = Menu_OFF;
+					player->ResetMenu();
 				}
 				else
 					player->m_iMenu = Menu_ChooseAppearance;
@@ -3857,6 +3858,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 					Q_strncpy(command, pcmd, sizeof(command) - 1);
 					command[sizeof(command) - 1] = '\0';
 
+					// Add extra '\n' to make command string safe
+					// This extra '\n' is removed by the client, so it is ok
+					command[sizeof(command) - 2] = '\0';
+					command[Q_strlen(command)] = '\n';
+
 					// tell the user they entered an unknown command
 					ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "#Game_unknown_command", command);
 				}
@@ -3926,7 +3932,7 @@ void EXT_FUNC ClientUserInfoChanged(edict_t *pEntity, char *infobuffer)
 		}
 	}
 
-	g_pGameRules->ClientUserInfoChanged(GetClassPtr<CBasePlayer>(&pEntity->v), infobuffer);
+	g_pGameRules->ClientUserInfoChanged(pPlayer, infobuffer);
 }
 
 void EXT_FUNC ServerDeactivate()
@@ -4477,6 +4483,7 @@ void ClientPrecache()
 	PRECACHE_MODEL("sprites/black_smoke2.spr");
 	PRECACHE_MODEL("sprites/black_smoke3.spr");
 	PRECACHE_MODEL("sprites/black_smoke4.spr");
+	PRECACHE_MODEL("sprites/gas_puff_01.spr");
 	PRECACHE_MODEL("sprites/fast_wallpuff1.spr");
 	PRECACHE_MODEL("sprites/pistol_smoke1.spr");
 	PRECACHE_MODEL("sprites/pistol_smoke2.spr");
@@ -5254,6 +5261,23 @@ int EXT_FUNC ConnectionlessPacket(const struct netadr_s *net_from, const char *a
 
 int EXT_FUNC GetHullBounds(int hullnumber, float *mins, float *maxs)
 {
+	switch (hullnumber)
+	{
+		case 0: // Normal player
+			Q_memcpy(mins, (float*)VEC_HULL_MIN, sizeof(vec3_t));
+			Q_memcpy(maxs, (float*)VEC_HULL_MAX, sizeof(vec3_t));
+			return TRUE;
+		case 1: // Crouched player
+			Q_memcpy(mins, (float*)VEC_DUCK_HULL_MIN, sizeof(vec3_t));
+			Q_memcpy(maxs, (float*)VEC_DUCK_HULL_MAX, sizeof(vec3_t));
+			return TRUE;
+		case 2: // Point based hull
+			Q_memcpy(mins, (float*)Vector(0, 0, 0), sizeof(vec3_t));
+			Q_memcpy(maxs, (float*)Vector(0, 0, 0), sizeof(vec3_t));
+			return TRUE;
+		default:
+			return FALSE;
+	}
 	return hullnumber < 3;
 }
 
@@ -5262,6 +5286,18 @@ int EXT_FUNC GetHullBounds(int hullnumber, float *mins, float *maxs)
 
 void EXT_FUNC CreateInstancedBaselines()
 {
+#if 0
+	int iret = 0;
+	entity_state_t state;
+
+	Q_memset(&state, 0, sizeof(state));
+
+	// Create any additional baselines here for things like grendates, etc.
+	// iret = ENGINE_INSTANCE_BASELINE(pc->pev->classname, &state);
+
+	// Destroy objects.
+	// UTIL_Remove(pc);
+#endif
 }
 
 int EXT_FUNC InconsistentFile(const edict_t *player, const char *filename, char *disconnect_message)

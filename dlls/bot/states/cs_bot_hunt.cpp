@@ -206,10 +206,8 @@ void HuntState::OnUpdate(CCSBot *me)
 		int areaCount = 0;
 		const float minSize = 150.0f;
 
-		FOR_EACH_LL (TheNavAreaList, it)
+		for (CNavArea *area : TheNavAreaList)
 		{
-			CNavArea *area = TheNavAreaList[it];
-
 			++areaCount;
 
 			// skip the small areas
@@ -230,14 +228,14 @@ void HuntState::OnUpdate(CCSBot *me)
 		int which = RANDOM_LONG(0, areaCount - 1);
 
 		areaCount = 0;
-		FOR_EACH_LL (TheNavAreaList, it2)
+		for (auto area : TheNavAreaList)
 		{
-			m_huntArea = TheNavAreaList[it2];
+			m_huntArea = area;
 
 			if (which == areaCount)
 				break;
 
-			--which;
+			which--;
 		}
 
 		if (m_huntArea != NULL)

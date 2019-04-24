@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+#include <list>
+
 class CNavArea;
 class CGrenade;
 
@@ -56,7 +58,7 @@ private:
 	float m_dieTimestamp;
 };
 
-typedef CUtlLinkedList<ActiveGrenade *, int> ActiveGrenadeList;
+typedef std::list<ActiveGrenade *> ActiveGrenadeList;
 
 class CBotManager
 {
