@@ -248,7 +248,9 @@ LOCAL_SRC_FILES := \
 	./gamemode/zb2/zb2_zclass_tank.cpp \
 	./gamemode/zb2/zb2_zclass_speed.cpp \
 	./weapons_moe_buy.cpp \
-    ./weapons_precache.cpp \
+    	./weapons_precache.cpp \
+	./wpn_shared/wpn_m14ebr.cpp \
+	./wpn_shared/wpn_infinityex2.cpp \
 
 
 include $(BUILD_SHARED_LIBRARY)

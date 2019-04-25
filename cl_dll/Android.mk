@@ -177,6 +177,8 @@ LOCAL_SRC_FILES := \
 	../dlls/wpn_shared/wpn_mp7a1c.cpp \
 	../dlls/wpn_shared/wpn_mp7a1p.cpp \
 	../dlls/wpn_shared/wpn_infinitys.cpp \
+	../dlls/wpn_shared/wpn_m14ebr.cpp \
+	../dlls/wpn_shared/wpn_infinityex2.cpp \
 	./events/ev_cs16.cpp \
 	./events/event_ak47.cpp \
 	./events/event_aug.cpp \
@@ -231,6 +233,7 @@ LOCAL_SRC_FILES := \
 	./events/event_mp7a1p.cpp \
 	./events/event_svdex.cpp \
 	./events/event_infinitys.cpp \
+	./events/event_m14ebr.cpp \
 	./ev_common.cpp \
 	./calcscreen.cpp \
 	./input_touch.cpp \
