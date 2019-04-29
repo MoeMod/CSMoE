@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "globals.h"
 
 #include "mod_gd.h"
+#include "player/player_mod_strategy.h"
 
 #include <random>
 #include <string>

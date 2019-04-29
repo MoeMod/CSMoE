@@ -153,11 +153,12 @@
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
 #include "player/player_const.h"
-#include "player/player_zombie.h"
-#include "player/player_mod_strategy.h"
 #include "player/player_account.h"
 #include "player/player_signal.h"
 #include <memory>
+
+class IBasePlayerModStrategy;
+enum ZombieLevel : int;
 
 struct WeaponStruct
 {
@@ -687,7 +688,7 @@ public:
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return false; }
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
-	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return m_pModStrategy->ApplyKnockback(attacker, data); }
+	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
 #endif
 
 	void SpawnProtection_Check();
@@ -701,7 +702,9 @@ public:
 	float m_flTimeSpawnProctionExpires;
 
 public:
+#ifndef CLIENT_DLL
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
+#endif
 };
 
 extern int gEvilImpulse101;

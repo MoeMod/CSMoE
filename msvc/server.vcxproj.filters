@@ -68,6 +68,9 @@
     <Filter Include="dlls\gamemode\zb3">
       <UniqueIdentifier>{4ef8c464-25b1-442b-9df5-829f8de2d72c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\gamemode\zbb">
+      <UniqueIdentifier>{dcab357c-5b1f-4c65-82eb-1a5562d7d7e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -663,6 +666,12 @@
     </ClCompile>
     <ClCompile Include="..\dlls\weapons_precache.cpp">
       <Filter>dlls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_zbb.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbb\basebuilder.cpp">
+      <Filter>dlls\gamemode\zbb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1412,6 +1421,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_precache.h">
       <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_zbb.h">
+      <Filter>dlls\gamemode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbb\basebuilder.h">
+      <Filter>dlls\gamemode\zbb</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

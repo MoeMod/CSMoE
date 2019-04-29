@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "game.h"
 
 #include "mod_zb3.h"
+#include "player/player_zombie.h"
+#include "player/player_mod_strategy.h"
 
 #include "util/u_range.hpp"
 

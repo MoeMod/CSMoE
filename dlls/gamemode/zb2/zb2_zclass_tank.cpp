@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
 
+#include "player/player_zombie.h"
+
 #include "zb2_zclass_tank.h"
 
 CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)

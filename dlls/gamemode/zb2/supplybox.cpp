@@ -7,6 +7,7 @@
 
 #include "supplybox.h"
 #include "gamemode/mods.h"
+#include "player/player_mod_strategy.h"
 
 #include <utility>
 

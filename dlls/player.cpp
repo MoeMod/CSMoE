@@ -41,6 +41,7 @@
 // addons
 #include "player/player_spawnpoint.h"
 #include "player/player_knockback.h"
+#include "player/player_mod_strategy.h"
 
 /*
 * Globals initialization
@@ -8736,4 +8737,9 @@ void CBasePlayer::UpdateLocation(bool forceUpdate)
 			MESSAGE_END();
 		}
 	}
+}
+
+bool CBasePlayer::Knockback(CBasePlayer *attacker, const KnockbackData &data) 
+{ 
+	return m_pModStrategy->ApplyKnockback(attacker, data); 
 }

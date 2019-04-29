@@ -10,6 +10,7 @@
 #include "mod_base.h"
 
 #include "player/csdm_randomspawn.h"
+#include "player/player_mod_strategy.h"
 
 void IBaseMod::InstallPlayerModStrategy(CBasePlayer *player)
 {

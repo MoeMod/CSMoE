@@ -8,6 +8,7 @@
 #include "bmodels.h"
 
 #include "mod_tdm.h"
+#include "player/player_mod_strategy.h"
 
 class CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
 {
