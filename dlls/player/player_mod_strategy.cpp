@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "player.h"
 #include "client.h"
 #include "monsters.h"
+#include "entity_state.h"
 #include "player_mod_strategy.h"
 #include "gamemode/mods.h"
 
@@ -190,6 +191,125 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	default:
 		break;
 	}
+}
+
+void CPlayerModStrategy_Default::CmdStart(usercmd_s * cmd, unsigned int random_seed)
+{
+	if (m_pPlayer->pev->groupinfo)
+	{
+		UTIL_SetGroupTrace(m_pPlayer->pev->groupinfo, GROUP_OP_AND);
+	}
+
+	m_pPlayer->random_seed = random_seed;
+}
+
+void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s * cd, entvars_t *pevOrg)
+{
+	CBasePlayer *pl = m_pPlayer;
+	entvars_t *pev = pl->pev;
+	edict_t *ent = ENT(pev);
+
+	cd->flags = pev->flags;
+	cd->health = pev->health;
+	cd->viewmodel = MODEL_INDEX(STRING(pev->viewmodel));
+	cd->waterlevel = pev->waterlevel;
+	cd->watertype = pev->watertype;
+	cd->weapons = pev->weapons;
+	cd->origin = pev->origin;
+	cd->velocity = pev->velocity;
+	cd->view_ofs = pev->view_ofs;
+	cd->punchangle = pev->punchangle;
+	cd->bInDuck = pev->bInDuck;
+	cd->flTimeStepSound = pev->flTimeStepSound;
+	cd->flDuckTime = pev->flDuckTime;
+	cd->flSwimTime = pev->flSwimTime;
+	cd->waterjumptime = (int)pev->teleport_time;
+
+	Q_strcpy(cd->physinfo, ENGINE_GETPHYSINFO(ent));
+
+	cd->maxspeed = pev->maxspeed;
+	cd->fov = pev->fov;
+	cd->weaponanim = pev->weaponanim;
+	cd->pushmsec = pev->pushmsec;
+
+	if (pevOrg)
+	{
+		cd->iuser1 = pevOrg->iuser1;
+		cd->iuser2 = pevOrg->iuser2;
+		cd->iuser3 = pevOrg->iuser3;
+	}
+	else
+	{
+		cd->iuser1 = pev->iuser1;
+		cd->iuser2 = pev->iuser2;
+		cd->iuser3 = pev->iuser3;
+	}
+
+	cd->fuser1 = pev->fuser1;
+	cd->fuser3 = pev->fuser3;
+	cd->fuser2 = pev->fuser2;
+
+	if (sendweapons && pl != NULL)
+	{
+		cd->ammo_shells = pl->ammo_buckshot;
+		cd->ammo_nails = pl->ammo_9mm;
+		cd->ammo_cells = pl->ammo_556nato;
+		cd->ammo_rockets = pl->ammo_556natobox;
+		cd->vuser2.x = pl->ammo_762nato;
+		cd->vuser2.y = pl->ammo_45acp;
+		cd->vuser2.z = pl->ammo_50ae;
+		cd->vuser3.x = pl->ammo_338mag;
+		cd->vuser3.y = pl->ammo_57mm;
+		cd->vuser3.z = pl->ammo_357sig;
+		cd->m_flNextAttack = pl->m_flNextAttack;
+
+		int iUser3 = 0;
+		if (pl->m_bCanShoot && !pl->m_bIsDefusing)
+			iUser3 |= DATA_IUSER3_CANSHOOT;
+
+		if (g_pGameRules->IsFreezePeriod())
+			iUser3 |= DATA_IUSER3_FREEZETIMEOVER;
+		else
+			iUser3 &= ~DATA_IUSER3_FREEZETIMEOVER;
+
+		if (pl->m_signals.GetState() & SIGNAL_BOMB)
+			iUser3 |= DATA_IUSER3_INBOMBZONE;
+		else
+			iUser3 &= ~DATA_IUSER3_INBOMBZONE;
+
+		if (pl->HasShield())
+			iUser3 |= DATA_IUSER3_HOLDINGSHIELD;
+		else
+			iUser3 &= ~DATA_IUSER3_HOLDINGSHIELD;
+
+		if (!pl->pev->iuser1 && !pevOrg)
+			cd->iuser3 = iUser3;
+
+		if (pl->m_pActiveItem != NULL)
+		{
+			ItemInfo II;
+			Q_memset(&II, 0, sizeof(II));
+
+			CBasePlayerWeapon *gun = dynamic_cast<CBasePlayerWeapon *>(pl->m_pActiveItem->GetWeaponPtr());
+
+			if (gun != NULL && gun->UseDecrement() && gun->GetItemInfo(&II))
+			{
+				cd->m_iId = II.iId;
+
+				if ((unsigned int)gun->m_iPrimaryAmmoType < MAX_AMMO_TYPES)
+				{
+					cd->vuser4.x = gun->m_iPrimaryAmmoType;
+					cd->vuser4.y = pl->m_rgAmmo[gun->m_iPrimaryAmmoType];
+				}
+				else
+				{
+					cd->vuser4.x = -1.0;
+					cd->vuser4.y = 0;
+				}
+			}
+		}
+	}
+
 }
 
 void CPlayerModStrategy_Zombie::Pain(int m_LastHitGroup, bool HasArmour)

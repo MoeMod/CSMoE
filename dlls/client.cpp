@@ -67,6 +67,8 @@
 
 #include "gamemode/mods.h"
 #include "player/player_model.h"
+#include "player/player_mod_strategy.h"
+#include "player/player_zombie.h"
 #include "weapons_moe_buy.h"
 
 #include <tuple>
@@ -4813,6 +4815,9 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
       state->playerclass = ent->v.playerclass;
 
    state->iuser4 = ent->v.iuser4;
+
+   g_pModRunning->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+
    return 1;
 }
 
@@ -5112,121 +5117,26 @@ void EXT_FUNC UpdateClientData(const struct edict_s *ent, int sendweapons, struc
 		pl = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pev));
 	}
 
-	cd->flags = pev->flags;
-	cd->health = pev->health;
-	cd->viewmodel = MODEL_INDEX(STRING(pev->viewmodel));
-	cd->waterlevel = pev->waterlevel;
-	cd->watertype = pev->watertype;
-	cd->weapons = pev->weapons;
-	cd->origin = pev->origin;
-	cd->velocity = pev->velocity;
-	cd->view_ofs = pev->view_ofs;
-	cd->punchangle = pev->punchangle;
-	cd->bInDuck = pev->bInDuck;
-	cd->flTimeStepSound = pev->flTimeStepSound;
-	cd->flDuckTime = pev->flDuckTime;
-	cd->flSwimTime = pev->flSwimTime;
-	cd->waterjumptime = (int)pev->teleport_time;
-
-	Q_strcpy(cd->physinfo, ENGINE_GETPHYSINFO(ent));
-
-	cd->maxspeed = pev->maxspeed;
-	cd->fov = pev->fov;
-	cd->weaponanim = pev->weaponanim;
-	cd->pushmsec = pev->pushmsec;
-
-	if (pevOrg)
-	{
-		cd->iuser1 = pevOrg->iuser1;
-		cd->iuser2 = pevOrg->iuser2;
-		cd->iuser3 = pevOrg->iuser3;
-	}
-	else
-	{
-		cd->iuser1 = pev->iuser1;
-		cd->iuser2 = pev->iuser2;
-		cd->iuser3 = pev->iuser3;
-	}
-
-	cd->fuser1 = pev->fuser1;
-	cd->fuser3 = pev->fuser3;
-	cd->fuser2 = pev->fuser2;
-
-	if (sendweapons && pl != NULL)
-	{
-		cd->ammo_shells = pl->ammo_buckshot;
-		cd->ammo_nails = pl->ammo_9mm;
-		cd->ammo_cells = pl->ammo_556nato;
-		cd->ammo_rockets = pl->ammo_556natobox;
-		cd->vuser2.x = pl->ammo_762nato;
-		cd->vuser2.y = pl->ammo_45acp;
-		cd->vuser2.z = pl->ammo_50ae;
-		cd->vuser3.x = pl->ammo_338mag;
-		cd->vuser3.y = pl->ammo_57mm;
-		cd->vuser3.z = pl->ammo_357sig;
-		cd->m_flNextAttack = pl->m_flNextAttack;
-
-		int iUser3 = 0;
-		if (pl->m_bCanShoot && !pl->m_bIsDefusing)
-			iUser3 |= DATA_IUSER3_CANSHOOT;
-
-		if (g_pGameRules->IsFreezePeriod())
-			iUser3 |= DATA_IUSER3_FREEZETIMEOVER;
-		else
-			iUser3 &= ~DATA_IUSER3_FREEZETIMEOVER;
-
-		if (pl->m_signals.GetState() & SIGNAL_BOMB)
-			iUser3 |= DATA_IUSER3_INBOMBZONE;
-		else
-			iUser3 &= ~DATA_IUSER3_INBOMBZONE;
-
-		if (pl->HasShield())
-			iUser3 |= DATA_IUSER3_HOLDINGSHIELD;
-		else
-			iUser3 &= ~DATA_IUSER3_HOLDINGSHIELD;
-
-		if (!pl->pev->iuser1 && !pevOrg)
-			cd->iuser3 = iUser3;
-
-		if (pl->m_pActiveItem != NULL)
-		{
-			ItemInfo II;
-			Q_memset(&II, 0, sizeof(II));
-
-			CBasePlayerWeapon *gun = dynamic_cast<CBasePlayerWeapon *>(pl->m_pActiveItem->GetWeaponPtr());
-
-			if (gun != NULL && gun->UseDecrement() && gun->GetItemInfo(&II))
-			{
-				cd->m_iId = II.iId;
-
-				if ((unsigned int)gun->m_iPrimaryAmmoType < MAX_AMMO_TYPES)
-				{
-					cd->vuser4.x = gun->m_iPrimaryAmmoType;
-					cd->vuser4.y = pl->m_rgAmmo[ gun->m_iPrimaryAmmoType ];
-				}
-				else
-				{
-					cd->vuser4.x = -1.0;
-					cd->vuser4.y = 0;
-				}
-			}
-		}
-	}
+	pl->m_pModStrategy->UpdateClientData(sendweapons, cd, pevOrg);
 }
 
-void EXT_FUNC CmdStart(const edict_t *player, const struct usercmd_s *cmd, unsigned int random_seed)
+void EXT_FUNC CmdStart(const edict_t *player, struct usercmd_s *cmd, unsigned int random_seed)
 {
 	entvars_t *pev = const_cast<entvars_t *>(&player->v);
 	CBasePlayer *pl = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pev));
 
 	if (pl != NULL)
 	{
+		/*
 		if (pl->pev->groupinfo)
 		{
 			UTIL_SetGroupTrace(pl->pev->groupinfo, GROUP_OP_AND);
 		}
 
 		pl->random_seed = random_seed;
+		*/
+		// moved to player_mod_strategy
+		pl->m_pModStrategy->CmdStart(cmd, random_seed);
 	}
 }
 

@@ -28,6 +28,7 @@ GNU General Public License for more details.
 #include <random>
 
 #include "bot_include.h"
+#include "player/player_zombie.h"
 
 #include "util/u_range.hpp"
 

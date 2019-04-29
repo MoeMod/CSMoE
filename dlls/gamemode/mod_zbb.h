@@ -1,6 +1,6 @@
 /*
 mob_zbb.h - CSMoE Gameplay server : Zombie Mod Base-builder
-Copyright (C) 2018 Moemod Hyakuya
+Copyright (C) 2019 Moemod Hymei
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,16 +17,29 @@ GNU General Public License for more details.
 #define PROJECT_MOD_ZBB_H
 
 #include "mod_zb1.h"
+#include <array>
+#include <unordered_map>
+
+class IPlayerBuildingInterface;
 
 class CMod_ZombieBaseBuilder : public CMod_Zombi
 {
 public:
 	CMod_ZombieBaseBuilder();
 
+	BOOL IsAllowedToSpawn(CBaseEntity *pEntity) override;
+
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
+	int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet)  override;
+
+public:
+	bool CanEntityBuild(CBaseEntity *pEntity);
+
+	std::array<IPlayerBuildingInterface *, MAX_CLIENTS> m_BuildingInterfaces;
+	std::unordered_map<CBaseEntity *, IPlayerBuildingInterface *> m_BuildingEntities;
 };
 
 #endif //PROJECT_MOD_ZBB_H

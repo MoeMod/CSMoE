@@ -37,6 +37,7 @@ public:
 	virtual float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
 	virtual int MaxMoney() { return 16000; }
 	virtual HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType) { return static_cast<HitBoxGroup>(ptr->iHitgroup); }
+	virtual int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet) { return 0; }
 };
 
 template<class CBase = IBaseMod>

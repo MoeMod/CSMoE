@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
 
+#include "player/player_zombie.h"
+
 #include "zb2_zclass_tank.h"
 #include "zb2_zclass_speed.h"
 

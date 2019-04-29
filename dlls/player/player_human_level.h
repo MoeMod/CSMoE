@@ -4,6 +4,8 @@
 #pragma once
 #endif
 
+#include "player/player_mod_strategy.h"
+
 class PlayerExtraHumanLevel_ZBS : public BasePlayerExtra
 {
 public:

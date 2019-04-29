@@ -24,6 +24,8 @@ GNU General Public License for more details.
 #include "mod_zb2.h"
 #include "zb2/supplybox.h"
 #include "player/csdm_randomspawn.h"
+#include "player/player_mod_strategy.h"
+#include "player/player_zombie.h"
 
 #include <algorithm>
 #include <vector>
