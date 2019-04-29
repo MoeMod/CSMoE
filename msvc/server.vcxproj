@@ -243,6 +243,7 @@
     <ClCompile Include="..\dlls\gamemode\mod_zb1.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb2.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zb3.cpp" />
+    <ClCompile Include="..\dlls\gamemode\mod_zbb.cpp" />
     <ClCompile Include="..\dlls\gamemode\mod_zbs.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\supplybox.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_skill_human.cpp" />
@@ -661,6 +662,7 @@
     <ClInclude Include="..\dlls\gamemode\mod_zb1.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb2.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zb3.h" />
+    <ClInclude Include="..\dlls\gamemode\mod_zbb.h" />
     <ClInclude Include="..\dlls\gamemode\mod_zbs.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\supplybox.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />

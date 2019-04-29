@@ -30,6 +30,7 @@ GNU General Public License for more details.
 #include "mod_zb2.h"
 #include "mod_zb3.h"
 #include "mod_gd.h"
+#include "mod_zbb.h"
 
 IBaseMod *g_pModRunning = nullptr;
 
@@ -49,7 +50,8 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zbs", DefaultFactory<CMod_ZombieScenario> },
 	{ "zb2", DefaultFactory<CMod_ZombieMod2> },
 	{ "zb3", DefaultFactory<CMod_ZombieHero> },
-	{ "gd", DefaultFactory<CMod_GunDeath> }
+	{ "gd", DefaultFactory<CMod_GunDeath> },
+	{ "zbb", DefaultFactory<CMod_ZombieBaseBuilder> }
 };
 
 void InstallBteMod(const char *name)

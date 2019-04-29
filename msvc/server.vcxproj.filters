@@ -664,6 +664,9 @@
     <ClCompile Include="..\dlls\weapons_precache.cpp">
       <Filter>dlls</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\mod_zbb.cpp">
+      <Filter>dlls\gamemode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1412,6 +1415,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_precache.h">
       <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\mod_zbb.h">
+      <Filter>dlls\gamemode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

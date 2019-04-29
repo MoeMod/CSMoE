@@ -29,11 +29,4 @@ public:
 
 };
 
-class CPlayerModStrategy_ZBB : public CPlayerModStrategy_ZB1
-{
-	using CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1;
-
-};
-
-
 #endif //PROJECT_MOD_ZBB_H
