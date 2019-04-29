@@ -41,12 +41,12 @@ public:
 	// Set the rangeof numbers the slider can scroll through
 	virtual void    SetRange(int min,int max);
 
-    virtual void    GetRange(int &min, int &max);
+	virtual void    GetRange(int &min, int &max);
 
 	// Set how many lines are displayed at one time 
 	// in the window the scroll bar is attached to.
 	virtual void    SetRangeWindow(int rangeWindow);
-	
+
 	// Get how many lines are displayed at one time 
 	// in the window the scroll bar is attached to.
 	virtual int    GetRangeWindow();
@@ -71,7 +71,7 @@ public:
 	virtual void    SetButtonPressedScrollValue(int value);
 
 	virtual void    Validate();
-	
+
 	// Update and look for clicks when mouse is in the scroll bar window.
 	virtual void	OnMouseFocusTicked();
 
@@ -85,6 +85,8 @@ public:
 	// Sets the scrollbar buttons visible or not
 	virtual void    SetScrollbarButtonsVisible(bool visible);
 
+	void			SetAutohideButtons(bool bAutohide) { m_bAutoHideButtons = bAutohide; }
+
 	/* MESSAGES SENT:
 		"ScrollBarSliderMoved"
 			"position" - new value of the slider
@@ -97,7 +99,7 @@ protected:
 	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void OnSizeChanged(int wide, int tall);
 
-	MESSAGE_FUNC_INT( OnSliderMoved, "ScrollBarSliderMoved", position );
+	MESSAGE_FUNC_INT(OnSliderMoved, "ScrollBarSliderMoved", position);
 	virtual void RespondToScrollArrow(int const direction);
 
 private:
@@ -106,6 +108,17 @@ private:
 	int     _buttonPressedScrollValue;
 	int		_scrollDelay; // used to control delays in scrolling
 	bool	_respond;
+	bool	_vertical;
+
+	bool _imageBackground;
+	IImage *_upButtonDefault;
+	IImage *_upButtonArmed;
+	IImage *_downButtonDepressed;
+	IImage *_downButtonDefault;
+	IImage *_downButtonArmed;
+	IImage *_upButtonDepressed;
+
+	CPanelAnimationVar(bool, m_bAutoHideButtons, "autohide_buttons", "0");
 };
 
 }

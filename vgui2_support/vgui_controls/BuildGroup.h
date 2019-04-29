@@ -170,7 +170,7 @@ private:
 	bool	_showRulers;	   // toggles ruler display
 	CUtlVector<CUtlSymbol> m_RegisteredControlSettingsFiles;
 
-	friend class Panel;
+	friend class vgui2::Panel;
 };
 
 

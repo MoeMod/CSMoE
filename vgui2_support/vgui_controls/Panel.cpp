@@ -17,7 +17,7 @@
 #include <tier1/utldict.h>
 #include <tier1/utlvector.h>
 
-#include <IKeyValues.h>
+#include <vstdlib/IKeyValuesSystem.h>
 #include <FileSystem.h>
 #include <vgui/IBorder.h>
 #include <vgui/IInputInternal.h>
@@ -36,8 +36,6 @@
 #include "PHandle.h"
 #include "Menu.h"
 #include "MenuItem.h"
-
-#include "FileSystem.h"
 
 #include "tier0/vprof.h"
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1053,7 +1051,7 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 			ipanel()->PaintTraverse( child, false, false );
 		}
 	}
-#if 0
+
 	// draw the border last
 	if ( repaint && _flags.IsFlagSet( PAINT_BORDER_ENABLED ) && ( _border != null ) )
 	{
@@ -1062,7 +1060,7 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 		PaintBorder();
 		surface()->PopMakeCurrent( vpanel );
 	}
-#endif	// !! disable all border
+
 	if ( repaint && IsBuildGroupEnabled() ) //&& HasFocus() )
 	{
 		// outline all selected panels 
@@ -3240,7 +3238,7 @@ void Panel::SetPaintBackgroundEnabled(bool state)
 void Panel::SetPaintBackgroundType( int type )
 {
 	// HACK only 0 through 2 supported for now
-	m_nPaintBackgroundType = std::min(std::max( type, 0 ), 2);
+	m_nPaintBackgroundType = min(max( type, 0 ), 2);
 }
 
 void Panel::SetPaintEnabled(bool state)
@@ -3532,8 +3530,8 @@ void Panel::GetResizeOffset( int &dx, int &dy )
 void Panel::ApplySchemeSettings(IScheme *pScheme)
 {
 	// get colors
-	SetFgColor(GetSchemeColor("Panel.FgColor", pScheme));
-	SetBgColor(GetSchemeColor("Panel.BgColor", pScheme));
+	SetFgColor(GetSchemeColor("Panel.FgColor", GetSchemeColor("FgColor", pScheme), pScheme));
+	SetBgColor(GetSchemeColor("Panel.BgColor", GetSchemeColor("BgColor", pScheme), pScheme));
 
 #if defined( VGUI_USEDRAGDROP )
     m_clrDragFrame = pScheme->GetColor("DragDrop.DragFrame", Color(255, 255, 255, 192));
@@ -4092,7 +4090,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 
 			if (item->name)
 			{
-				item->nameSymbol = keyvalues()->GetSymbolForString(item->name);
+				item->nameSymbol = KeyValuesSystem()->GetSymbolForString(item->name);
 			}
 			else
 			{
@@ -4100,7 +4098,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 			}
 			if (item->firstParamName)
 			{
-				item->firstParamSymbol = keyvalues()->GetSymbolForString(item->firstParamName);
+				item->firstParamSymbol = KeyValuesSystem()->GetSymbolForString(item->firstParamName);
 			}
 			else
 			{
@@ -4108,7 +4106,7 @@ void PreparePanelMessageMap(PanelMessageMap *panelMap)
 			}
 			if (item->secondParamName)
 			{
-				item->secondParamSymbol = keyvalues()->GetSymbolForString(item->secondParamName);
+				item->secondParamSymbol = KeyValuesSystem()->GetSymbolForString(item->secondParamName);
 			}
 			else
 			{
@@ -4133,21 +4131,25 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 	bool bFound = false;
 	int iMessageName = params->GetNameSymbol();
 
-	if ( !panelMap->processed )
+	if (!panelMap->processed)
 	{
-		PreparePanelMessageMap( panelMap );
+		PreparePanelMessageMap(panelMap);
 	}
 
 	// iterate through the class hierarchy message maps
-	for ( ; panelMap != NULL && !bFound; panelMap = panelMap->baseMap )
+	for (; panelMap != NULL && !bFound; panelMap = panelMap->baseMap)
 	{
+		if (!panelMap->pfnClassName)
+			break;
 #if defined( _DEBUG )
-//		char const *className = panelMap->pfnClassName();
-//		NOTE_UNUSED( className );
+				char const *className = panelMap->pfnClassName();
+				auto count = panelMap->entries.Count();
+				const char *szMessageName = params->GetName();
+				NOTE_UNUSED( className );
 #endif
 
 		// iterate all the entries in the panel map
-		for ( int i = 0; i < panelMap->entries.Count(); i++ )
+		for (int i = 0; i < panelMap->entries.Count(); i++)
 		{
 			MessageMapItem_t *pMap = &panelMap->entries[i];
 
@@ -4162,7 +4164,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					(this->*(pMap->func))();
 					break;
 				}
-		
+
 				case 1:
 				{
 					KeyValues *param1 = params->FindKey(pMap->firstParamSymbol);
@@ -4171,54 +4173,54 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 						param1 = const_cast<KeyValues *>(params);
 					}
 
-					switch ( pMap->firstParamType )
+					switch (pMap->firstParamType)
 					{
-						case DATATYPE_INT:
-							typedef void (Panel::*MessageFunc_Int_t)(int);
-							(this->*((MessageFunc_Int_t)pMap->func))( param1->GetInt() );
-							break;
+					case DATATYPE_INT:
+						typedef void (Panel::*MessageFunc_Int_t)(int);
+						(this->*((MessageFunc_Int_t)pMap->func))(param1->GetInt());
+						break;
 
-						case DATATYPE_UINT64:
-							typedef void (Panel::*MessageFunc_Uin64_t)(uint64);
-							(this->*((MessageFunc_Uin64_t)pMap->func))( param1->GetUint64() );
-							break;
+					case DATATYPE_UINT64:
+						typedef void (Panel::*MessageFunc_Uin64_t)(uint64);
+						(this->*((MessageFunc_Uin64_t)pMap->func))(param1->GetUint64());
+						break;
 
-						case DATATYPE_PTR:
-							typedef void (Panel::*MessageFunc_Ptr_t)( void * );
-							(this->*((MessageFunc_Ptr_t)pMap->func))( param1->GetPtr() );
-							break;
+					case DATATYPE_PTR:
+						typedef void (Panel::*MessageFunc_Ptr_t)(void *);
+						(this->*((MessageFunc_Ptr_t)pMap->func))(param1->GetPtr());
+						break;
 
-						case DATATYPE_FLOAT:
-							typedef void (Panel::*MessageFunc_Float_t)( float );
-							(this->*((MessageFunc_Float_t)pMap->func))( param1->GetFloat() );
-							break;
+					case DATATYPE_FLOAT:
+						typedef void (Panel::*MessageFunc_Float_t)(float);
+						(this->*((MessageFunc_Float_t)pMap->func))(param1->GetFloat());
+						break;
 
-						case DATATYPE_CONSTCHARPTR:
-							typedef void (Panel::*MessageFunc_CharPtr_t)( const char * );
-							(this->*((MessageFunc_CharPtr_t)pMap->func))( param1->GetString() );
-							break;
+					case DATATYPE_CONSTCHARPTR:
+						typedef void (Panel::*MessageFunc_CharPtr_t)(const char *);
+						(this->*((MessageFunc_CharPtr_t)pMap->func))(param1->GetString());
+						break;
 
-						case DATATYPE_CONSTWCHARPTR:
-							typedef void (Panel::*MessageFunc_WCharPtr_t)( const wchar_t * );
-							(this->*((MessageFunc_WCharPtr_t)pMap->func))( param1->GetWString() );
-							break;
+					case DATATYPE_CONSTWCHARPTR:
+						typedef void (Panel::*MessageFunc_WCharPtr_t)(const wchar_t *);
+						(this->*((MessageFunc_WCharPtr_t)pMap->func))(param1->GetWString());
+						break;
 
-						case DATATYPE_KEYVALUES:
-							typedef void (Panel::*MessageFunc_KeyValues_t)(KeyValues *);
-							if ( pMap->firstParamName )
-							{
-								(this->*((MessageFunc_KeyValues_t)pMap->func))( (KeyValues *)param1->GetPtr() );
-							}
-							else
-							{
-								// no param set, so pass in the whole thing
-								(this->*((MessageFunc_KeyValues_t)pMap->func))( const_cast<KeyValues *>(params) );
-							}
-							break;
+					case DATATYPE_KEYVALUES:
+						typedef void (Panel::*MessageFunc_KeyValues_t)(KeyValues *);
+						if (pMap->firstParamName)
+						{
+							(this->*((MessageFunc_KeyValues_t)pMap->func))((KeyValues *)param1->GetPtr());
+						}
+						else
+						{
+							// no param set, so pass in the whole thing
+							(this->*((MessageFunc_KeyValues_t)pMap->func))(const_cast<KeyValues *>(params));
+						}
+						break;
 
-						default:
-							Assert(!("No handler for vgui message function"));
-							break;
+					default:
+						Assert(!("No handler for vgui message function"));
+						break;
 					}
 					break;
 				}
@@ -4236,45 +4238,45 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 						param2 = const_cast<KeyValues *>(params);
 					}
 
-					if ( (DATATYPE_INT == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType) )
+					if ((DATATYPE_INT == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_IntInt_t)(int, int);
-						(this->*((MessageFunc_IntInt_t)pMap->func))( param1->GetInt(), param2->GetInt() );
+						(this->*((MessageFunc_IntInt_t)pMap->func))(param1->GetInt(), param2->GetInt());
 					}
-					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType) )
+					else if ((DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrInt_t)(void *, int);
-						(this->*((MessageFunc_PtrInt_t)pMap->func))( param1->GetPtr(), param2->GetInt() );
+						(this->*((MessageFunc_PtrInt_t)pMap->func))(param1->GetPtr(), param2->GetInt());
 					}
-					else if ( (DATATYPE_CONSTCHARPTR == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType) )
+					else if ((DATATYPE_CONSTCHARPTR == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_ConstCharPtrInt_t)(const char *, int);
-						(this->*((MessageFunc_ConstCharPtrInt_t)pMap->func))( param1->GetString(), param2->GetInt() );
+						(this->*((MessageFunc_ConstCharPtrInt_t)pMap->func))(param1->GetString(), param2->GetInt());
 					}
-					else if ( (DATATYPE_CONSTCHARPTR == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType) )
+					else if ((DATATYPE_CONSTCHARPTR == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_ConstCharPtrConstCharPtr_t)(const char *, const char *);
-						(this->*((MessageFunc_ConstCharPtrConstCharPtr_t)pMap->func))( param1->GetString(), param2->GetString() );
+						(this->*((MessageFunc_ConstCharPtrConstCharPtr_t)pMap->func))(param1->GetString(), param2->GetString());
 					}
-					else if ( (DATATYPE_INT == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType) )
+					else if ((DATATYPE_INT == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_IntConstCharPtr_t)(int, const char *);
-						(this->*((MessageFunc_IntConstCharPtr_t)pMap->func))( param1->GetInt(), param2->GetString() );
+						(this->*((MessageFunc_IntConstCharPtr_t)pMap->func))(param1->GetInt(), param2->GetString());
 					}
-					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType) )
+					else if ((DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTCHARPTR == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const char *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetString() );
+						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))(param1->GetPtr(), param2->GetString());
 					}
-					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType) )
+					else if ((DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_CONSTWCHARPTR == pMap->secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))( param1->GetPtr(), param2->GetWString() );
+						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))(param1->GetPtr(), param2->GetWString());
 					}
 					else
 					{
 						// the message isn't handled
-						ivgui()->DPrintf( "Message '%s', sent to '%s', has invalid parameter types\n", params->GetName(), GetName() );
+						ivgui()->DPrintf("Message '%s', sent to '%s', has invalid parameter types\n", params->GetName(), GetName());
 					}
 					break;
 				}
@@ -4304,114 +4306,114 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 	int iMessageName = params->GetNameSymbol();
 
 	PanelMap_t *panelMap = GetPanelMap();
-	if ( !panelMap->processed )
+	if (!panelMap->processed)
 	{
-		PreparePanelMap( panelMap );
+		PreparePanelMap(panelMap);
 	}
 
 	// iterate through the class hierarchy message maps
-	for ( ; panelMap != NULL && !bFound; panelMap = panelMap->baseMap )
+	for (; panelMap != NULL && !bFound; panelMap = panelMap->baseMap)
 	{
 		MessageMapItem_t *pMessageMap = panelMap->dataDesc;
 
-		for ( int i = 0; i < panelMap->dataNumFields; i++ )
+		for (int i = 0; i < panelMap->dataNumFields; i++)
 		{
 			if (iMessageName == pMessageMap[i].nameSymbol)
 			{
 				// call the mapped function
-				switch ( pMessageMap[i].numParams )
+				switch (pMessageMap[i].numParams)
 				{
 				case 2:
-					if ( (DATATYPE_INT == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType) )
+					if ((DATATYPE_INT == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_IntInt_t)(int, int);
-						(this->*((MessageFunc_IntInt_t)pMessageMap[i].func))( params->GetInt(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_IntInt_t)pMessageMap[i].func))(params->GetInt(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrInt_t)(void *, int);
-						(this->*((MessageFunc_PtrInt_t)pMessageMap[i].func))( params->GetPtr(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_PtrInt_t)pMessageMap[i].func))(params->GetPtr(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_CONSTCHARPTR == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_CONSTCHARPTR == pMessageMap[i].firstParamType) && (DATATYPE_INT == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_ConstCharPtrInt_t)(const char *, int);
-						(this->*((MessageFunc_ConstCharPtrInt_t)pMessageMap[i].func))( params->GetString(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_ConstCharPtrInt_t)pMessageMap[i].func))(params->GetString(pMessageMap[i].firstParamName), params->GetInt(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_CONSTCHARPTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_CONSTCHARPTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_ConstCharPtrConstCharPtr_t)(const char *, const char *);
-						(this->*((MessageFunc_ConstCharPtrConstCharPtr_t)pMessageMap[i].func))( params->GetString(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_ConstCharPtrConstCharPtr_t)pMessageMap[i].func))(params->GetString(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_INT == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_INT == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_IntConstCharPtr_t)(int, const char *);
-						(this->*((MessageFunc_IntConstCharPtr_t)pMessageMap[i].func))( params->GetInt(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_IntConstCharPtr_t)pMessageMap[i].func))(params->GetInt(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTCHARPTR == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const char *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMessageMap[i].func))( params->GetPtr(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_PtrConstCharPtr_t)pMessageMap[i].func))(params->GetPtr(pMessageMap[i].firstParamName), params->GetString(pMessageMap[i].secondParamName));
 					}
-					else if ( (DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTWCHARPTR == pMessageMap[i].secondParamType) )
+					else if ((DATATYPE_PTR == pMessageMap[i].firstParamType) && (DATATYPE_CONSTWCHARPTR == pMessageMap[i].secondParamType))
 					{
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
-						(this->*((MessageFunc_PtrConstCharPtr_t)pMessageMap[i].func))( params->GetPtr(pMessageMap[i].firstParamName), params->GetWString(pMessageMap[i].secondParamName) );
+						(this->*((MessageFunc_PtrConstCharPtr_t)pMessageMap[i].func))(params->GetPtr(pMessageMap[i].firstParamName), params->GetWString(pMessageMap[i].secondParamName));
 					}
 					else
 					{
 						// the message isn't handled
-						ivgui()->DPrintf( "Message '%s', sent to '%s', has invalid parameter types\n", params->GetName(), GetName() );
+						ivgui()->DPrintf("Message '%s', sent to '%s', has invalid parameter types\n", params->GetName(), GetName());
 					}
 					break;
 
 				case 1:
-					switch ( pMessageMap[i].firstParamType )
+					switch (pMessageMap[i].firstParamType)
 					{
 					case DATATYPE_BOOL:
 						typedef void (Panel::*MessageFunc_Bool_t)(bool);
-						(this->*((MessageFunc_Bool_t)pMessageMap[i].func))( (bool)params->GetInt(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_Bool_t)pMessageMap[i].func))((bool)params->GetInt(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_CONSTCHARPTR:
 						typedef void (Panel::*MessageFunc_ConstCharPtr_t)(const char *);
-						(this->*((MessageFunc_ConstCharPtr_t)pMessageMap[i].func))( (const char *)params->GetString(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_ConstCharPtr_t)pMessageMap[i].func))((const char *)params->GetString(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_CONSTWCHARPTR:
 						typedef void (Panel::*MessageFunc_ConstCharPtr_t)(const char *);
-						(this->*((MessageFunc_ConstCharPtr_t)pMessageMap[i].func))( (const char *)params->GetWString(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_ConstCharPtr_t)pMessageMap[i].func))((const char *)params->GetWString(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_INT:
 						typedef void (Panel::*MessageFunc_Int_t)(int);
-						(this->*((MessageFunc_Int_t)pMessageMap[i].func))( params->GetInt(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_Int_t)pMessageMap[i].func))(params->GetInt(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_FLOAT:
 						typedef void (Panel::*MessageFunc_Float_t)(float);
-						(this->*((MessageFunc_Float_t)pMessageMap[i].func))( params->GetFloat(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_Float_t)pMessageMap[i].func))(params->GetFloat(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_PTR:
 						typedef void (Panel::*MessageFunc_Ptr_t)(void *);
-						(this->*((MessageFunc_Ptr_t)pMessageMap[i].func))( (void *)params->GetPtr(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_Ptr_t)pMessageMap[i].func))((void *)params->GetPtr(pMessageMap[i].firstParamName));
 						break;
 
 					case DATATYPE_KEYVALUES:
 						typedef void (Panel::*MessageFunc_KeyValues_t)(KeyValues *);
-						if ( pMessageMap[i].firstParamName )
+						if (pMessageMap[i].firstParamName)
 						{
-							(this->*((MessageFunc_KeyValues_t)pMessageMap[i].func))( (KeyValues *)params->GetPtr(pMessageMap[i].firstParamName) );
+							(this->*((MessageFunc_KeyValues_t)pMessageMap[i].func))((KeyValues *)params->GetPtr(pMessageMap[i].firstParamName));
 						}
 						else
 						{
-							(this->*((MessageFunc_KeyValues_t)pMessageMap[i].func))( params );
+							(this->*((MessageFunc_KeyValues_t)pMessageMap[i].func))(params);
 						}
 						break;
 
 					default:
 						// the message isn't handled
-						ivgui()->DPrintf( "Message '%s', sent to '%s', has an invalid parameter type\n", params->GetName(), GetName() );
+						ivgui()->DPrintf("Message '%s', sent to '%s', has an invalid parameter type\n", params->GetName(), GetName());
 						break;
 					}
 
@@ -4431,21 +4433,11 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 
 	// message not handled
 	// debug code
-	if ( !bFound )
+	if (!bFound)
 	{
-		static int s_bDebugMessages = -1;
-		if ( s_bDebugMessages == -1 )
-		{
-//			s_bDebugMessages = CommandLine()->FindParm( "-vguimessages" ) ? 1 : 0;
-			s_bDebugMessages = 0;
-		}
-		if ( s_bDebugMessages == 1 )
-		{
-			ivgui()->DPrintf( "Message '%s' not handled by panel '%s'\n", params->GetName(), GetName() );
-		}
+		ivgui()->DPrintf("Message '%s' not handled by panel '%s'\n", params->GetName(), GetName());
 	}
 }
-
 //-----------------------------------------------------------------------------
 // Purpose: Safe call to get info from child panel by name
 //-----------------------------------------------------------------------------
@@ -4552,7 +4544,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 
 			if (item->name)
 			{
-				item->nameSymbol = keyvalues()->GetSymbolForString(item->name);
+				item->nameSymbol = KeyValuesSystem()->GetSymbolForString(item->name);
 			}
 			else
 			{
@@ -4560,7 +4552,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 			}
 			if (item->firstParamName)
 			{
-				item->firstParamSymbol = keyvalues()->GetSymbolForString(item->firstParamName);
+				item->firstParamSymbol = KeyValuesSystem()->GetSymbolForString(item->firstParamName);
 			}
 			else
 			{
@@ -4568,7 +4560,7 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 			}
 			if (item->secondParamName)
 			{
-				item->secondParamSymbol = keyvalues()->GetSymbolForString(item->secondParamName);
+				item->secondParamSymbol = KeyValuesSystem()->GetSymbolForString(item->secondParamName);
 			}
 			else
 			{
@@ -6528,9 +6520,10 @@ private:
 
 char const *CPanelMessageMapDictionary::StripNamespace( char const *className )
 {
-	if ( !strnicmp( className, "vgui2::", 6 ) )
+	constexpr const char szNamespace[] = "vgui2::";
+	if ( !strnicmp( className, szNamespace, strlen(szNamespace) ) )
 	{
-		return className + 6;
+		return className + strlen(szNamespace);
 	}
 	return className;
 }

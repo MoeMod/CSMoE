@@ -39,7 +39,6 @@ public:
 	~MenuItem();
 
 	virtual void Paint();
-	virtual void PaintBorder() { ; }
 	virtual void PaintBackground() { Label::PaintBackground(); }
 
 	// Activate the menu item as if it had been selected by the user

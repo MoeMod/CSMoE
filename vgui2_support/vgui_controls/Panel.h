@@ -12,6 +12,19 @@
 #pragma once
 #endif
 
+// undefine windows function macros that overlap 
+#ifdef PostMessage
+#undef PostMessage
+#endif
+
+#ifdef SetCursor
+#undef SetCursor
+#endif
+
+#ifdef GetClassName
+#undef GetClassName
+#endif
+
 #include <tier1/utlvector.h>
 #include <tier1/utlflags.h>
 #include <tier1/utlsymbol.h>
@@ -35,15 +48,6 @@
 #include "Color.h"
 
 #include <vstdlib/IKeyValuesSystem.h>
-
-// undefine windows function macros that overlap 
-#ifdef PostMessage
-#undef PostMessage
-#endif
-
-#ifdef SetCursor
-#undef SetCursor
-#endif
 
 class CUtlBuffer;
 

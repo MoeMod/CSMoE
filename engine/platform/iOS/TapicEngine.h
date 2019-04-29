@@ -13,8 +13,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PROJECT_TAPICENGINE_H
-#define PROJECT_TAPICENGINE_H
+#ifndef TAPICENGINE_H
+#define TAPICENGINE_H
 
 typedef enum TapicEngineSoundID_e {
 	TapicEngine_Peek = 1519,

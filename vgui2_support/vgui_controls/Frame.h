@@ -167,7 +167,6 @@ protected:
 
 	// painting
 	virtual void PaintBackground();
-	void PaintBorder() { return; }
 
 	// per-frame thinking, used for transition effects
 	virtual void OnThink();
@@ -247,6 +246,8 @@ protected:
 	IImage *m_pTopBackground[3];
 	IImage *m_pCenterBackground[3];
 	IImage *m_pBottomBackground[3];
+	bool m_bFrameTitleButtonLeft;
+	int m_iFrameTitleAlign;
 };
 
 } // namespace vgui

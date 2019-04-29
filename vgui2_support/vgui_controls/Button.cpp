@@ -290,8 +290,6 @@ void Button::Paint(void)
 		return; 
 
 	BaseClass::Paint();
-
-	return;
 	
 	if ( HasFocus() && IsEnabled() && IsDrawingFocusBox() )
 	{
@@ -429,14 +427,14 @@ void Button::ApplySchemeSettings(IScheme *pScheme)
 	_depressedBorder = pScheme->GetBorder("ButtonDepressedBorder");
 	_keyFocusBorder = pScheme->GetBorder("ButtonKeyFocusBorder");
 
-	_defaultFgColor = GetSchemeColor("Button.TextColor", Color(255, 255, 255, 255), pScheme);
-	_defaultBgColor = GetSchemeColor("Button.BgColor", Color(0, 0, 0, 255), pScheme);
+	_defaultFgColor = GetSchemeColor("Button.TextColor", GetSchemeColor("BaseText", Color(255, 255, 255, 255), pScheme), pScheme);
+	_defaultBgColor = GetSchemeColor("Button.BgColor", GetSchemeColor("BgColor", Color(0, 0, 0, 255), pScheme), pScheme);
 
-	_armedFgColor = GetSchemeColor("Button.ArmedTextColor", _defaultFgColor, pScheme);
-	_armedBgColor = GetSchemeColor("Button.ArmedBgColor", _defaultBgColor, pScheme);
+	_armedFgColor = GetSchemeColor("Button.ArmedTextColor", GetSchemeColor("ButtonArmedFgColor", _defaultFgColor, pScheme), pScheme);
+	_armedBgColor = GetSchemeColor("Button.ArmedBgColor", GetSchemeColor("ButtonArmedBgColor", _defaultBgColor, pScheme), pScheme);
 
-	_depressedFgColor = GetSchemeColor("Button.DepressedTextColor", _defaultFgColor, pScheme);
-	_depressedBgColor = GetSchemeColor("Button.DepressedBgColor", _defaultBgColor, pScheme);
+	_depressedFgColor = GetSchemeColor("Button.DepressedTextColor", GetSchemeColor("ButtonDepressedFgColor", _defaultFgColor, pScheme), pScheme);
+	_depressedBgColor = GetSchemeColor("Button.DepressedBgColor", GetSchemeColor("ButtonDepressedBgColor", _defaultBgColor, pScheme), pScheme);
 	_keyboardFocusColor = GetSchemeColor("Button.FocusBorderColor", Color(0, 0, 0, 255), pScheme);
 
 	int xInset = 0, yInset = 0;
@@ -453,20 +451,20 @@ void Button::ApplySchemeSettings(IScheme *pScheme)
 
 	SetTextInset(xInset, yInset);
 
-	const char *enableImage = pScheme->GetResourceString("Button.LeftC");
+	const char *enableImage = pScheme->GetResourceString("Button/LeftC");
 
 	if (enableImage[0])
 	{
 		_imageBackground = true;
 		_depressedImage[0] = scheme()->GetImage(enableImage, true);
-		_depressedImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button.CenterC"), true);
-		_depressedImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button.RightC"), true);
-		_defaultImage[0] = scheme()->GetImage(pScheme->GetResourceString("Button.LeftN"), true);
-		_defaultImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button.CenterN"), true);
-		_defaultImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button.RightN"), true);
-		_armedImage[0] = scheme()->GetImage(pScheme->GetResourceString("Button.LeftO"), true);
-		_armedImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button.CenterO"), true);
-		_armedImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button.RightO"), true);
+		_depressedImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button/CenterC"), true);
+		_depressedImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button/RightC"), true);
+		_defaultImage[0] = scheme()->GetImage(pScheme->GetResourceString("Button/LeftN"), true);
+		_defaultImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button/CenterN"), true);
+		_defaultImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button/RightN"), true);
+		_armedImage[0] = scheme()->GetImage(pScheme->GetResourceString("Button/LeftO"), true);
+		_armedImage[1] = scheme()->GetImage(pScheme->GetResourceString("Button/CenterO"), true);
+		_armedImage[2] = scheme()->GetImage(pScheme->GetResourceString("Button/RightO"), true);
 	}
 
 	_blinkFgColor = GetSchemeColor("Button.BlinkColor", Color(255, 155, 0, 255), pScheme);

@@ -197,8 +197,8 @@ void Tooltip::PerformLayout()
 
 	IScheme *pScheme = scheme()->GetIScheme( s_TooltipWindow->GetScheme() );
 
-	s_TooltipWindow->SetBgColor(s_TooltipWindow->GetSchemeColor("SelectionBG", s_TooltipWindow->GetBgColor(), pScheme));
-	s_TooltipWindow->SetFgColor(s_TooltipWindow->GetSchemeColor("BorderSelection", s_TooltipWindow->GetFgColor(), pScheme));
+	s_TooltipWindow->SetBgColor(s_TooltipWindow->GetSchemeColor("Tooltip.TextColor", s_TooltipWindow->GetSchemeColor("SelectionBG", s_TooltipWindow->GetBgColor(), pScheme), pScheme));
+	s_TooltipWindow->SetFgColor(s_TooltipWindow->GetSchemeColor("Tooltip.BgColor", s_TooltipWindow->GetSchemeColor("BorderSelection", s_TooltipWindow->GetFgColor(), pScheme), pScheme));
 	s_TooltipWindow->SetBorder(pScheme->GetBorder("ToolTipBorder"));
 
 	// get cursor position

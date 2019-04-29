@@ -237,7 +237,6 @@ protected:
 	virtual void PerformLayout();  // layout the text in the window
 	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void PaintBackground();
-	virtual void PaintBorder() { ; }
 	virtual int  DrawChar(wchar_t ch, HFont font, int index, int x, int y);
 	virtual bool DrawCursor(int x, int y);
 

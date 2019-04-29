@@ -276,7 +276,8 @@ void DLLEXPORT HUD_Frame( double time )
 {
 	int extents[4];
 	getAbsExtents(extents[0], extents[1], extents[2], extents[3]);
-	gEngfuncs.VGui_ViewportPaintBackground(extents);
+	//gEngfuncs.VGui_ViewportPaintBackground(extents);
+	gEngfuncs.VGui_GetPanel
 }
 
 

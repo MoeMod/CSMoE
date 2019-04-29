@@ -192,8 +192,8 @@ void ProgressBar::ApplySchemeSettings(IScheme *pScheme)
 {
 	Panel::ApplySchemeSettings(pScheme);
 
-	SetFgColor(GetSchemeColor("BrightControlText", pScheme));
-	SetBgColor(GetSchemeColor("WindowBgColor", pScheme));
+	SetFgColor(GetSchemeColor("ProgressBar.FgColor", GetSchemeColor("BrightControlText", pScheme), pScheme));
+	SetBgColor(GetSchemeColor("ProgressBar.BgColor", GetSchemeColor("WindowBgColor", pScheme), pScheme));
 	SetBorder(pScheme->GetBorder("ButtonDepressedBorder"));
 }
 

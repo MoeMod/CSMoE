@@ -1,7 +1,7 @@
 
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
-#include <vgui/IEngineVgui.h>
+#include <IEngineVgui.h>
 
 #include "CHudViewport.h"
 #include "CGameUITestPanel.h"

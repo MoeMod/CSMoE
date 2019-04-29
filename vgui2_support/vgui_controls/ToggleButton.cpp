@@ -89,7 +89,7 @@ void ToggleButton::DoClick()
 void ToggleButton::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
-	_selectedColor = GetSchemeColor("BrightControlText", pScheme);
+	_selectedColor = GetSchemeColor("ToggleButton.SelectedTextColor", GetSchemeColor("BrightControlText", pScheme), pScheme);
 }
 
 void ToggleButton::OnKeyCodePressed(KeyCode code)

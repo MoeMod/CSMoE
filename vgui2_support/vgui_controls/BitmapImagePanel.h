@@ -16,7 +16,7 @@
 namespace vgui2 
 {
 
-class CBitmapImagePanel : public vgui2::Panel
+class CBitmapImagePanel : public Panel
 {
 public:
 	CBitmapImagePanel( vgui2::Panel *parent, char const *panelName, char const *filename = NULL );

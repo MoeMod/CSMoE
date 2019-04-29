@@ -152,6 +152,7 @@
     <ClCompile Include="..\vgui2_support\CBaseUI.cpp" />
     <ClCompile Include="..\vgui2_support\cdll_int.cpp" />
     <ClCompile Include="..\vgui2_support\CGameUIFuncs.cpp" />
+    <ClCompile Include="..\vgui2_support\SourceSDK\mathlib\mathlib.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls_simple\controls.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls_simple\Panel.cpp" />

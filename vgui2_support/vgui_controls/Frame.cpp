@@ -234,10 +234,11 @@ namespace
 			bool isSmall = ((Frame *)GetParent())->IsSmallCaption();
 
 			_marlettFont = pScheme->GetFont( isSmall ? "MarlettSmall" : "Marlett", IsProportional());
-			SetFgColor(GetSchemeColor("FrameGrip.Color1", pScheme));
-			SetBgColor(GetSchemeColor("FrameGrip.Color2", pScheme));
+			SetFgColor(GetSchemeColor("FrameGrip.Color1", GetSchemeColor("BorderBright", pScheme), pScheme));
+			SetBgColor(GetSchemeColor("FrameGrip.Color2", GetSchemeColor("BorderSelection", pScheme), pScheme));
 
 			const char *snapRange = pScheme->GetResourceString("Frame.AutoSnapRange");
+
 			if (snapRange && *snapRange)
 			{
 				m_iSnapRange = atoi(snapRange);
@@ -517,8 +518,6 @@ namespace vgui2
 				}
 			}
 		}
-		void PaintBackground() { ; }
-		void PaintBorder() { ; }
 	
 		static int GetButtonSide( Frame *pFrame )
 		{
@@ -547,11 +546,11 @@ namespace vgui2
 		{
 			Button::ApplySchemeSettings(pScheme);
 			
-			_enabledFgColor = GetSchemeColor("FrameTitleButton.FgColor", pScheme);
-			_enabledBgColor = GetSchemeColor("FrameTitleButton.BgColor", pScheme);
+			_enabledFgColor = GetSchemeColor("FrameTitleButton.FgColor", GetSchemeColor("TitleButtonFgColor", pScheme), pScheme);
+			_enabledBgColor = GetSchemeColor("FrameTitleButton.BgColor", GetSchemeColor("TitleButtonBgColor", pScheme), pScheme);
 
-			_disabledFgColor = GetSchemeColor("FrameTitleButton.DisabledFgColor", pScheme);
-			_disabledBgColor = GetSchemeColor("FrameTitleButton.DisabledBgColor", pScheme);
+			_disabledFgColor = GetSchemeColor("FrameTitleButton.DisabledFgColor", GetSchemeColor("TitleButtonDisabledFgColor", pScheme), pScheme);
+			_disabledBgColor = GetSchemeColor("FrameTitleButton.DisabledBgColor", GetSchemeColor("TitleButtonDisabledBgColor", pScheme), pScheme);
 
 			_brightBorder = pScheme->GetBorder("TitleButtonBorder");
 			_depressedBorder = pScheme->GetBorder("TitleButtonDepressedBorder");
@@ -681,13 +680,19 @@ public:
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
-		_enCol = GetSchemeColor("FrameSystemButton.FgColor", pScheme);
-		_disCol = GetSchemeColor("FrameSystemButton.BgColor", pScheme);
+		_enCol = GetSchemeColor("FrameSystemButton.FgColor", GetSchemeColor("TitleBarBgColor", pScheme), pScheme);
+		_disCol = GetSchemeColor("FrameSystemButton.BgColor", GetSchemeColor("TitleBarDisabledBgColor", pScheme), pScheme);
 
 		const char *pEnabledImage = m_EnabledImage.Length() ? m_EnabledImage.Get() :
 			pScheme->GetResourceString("FrameSystemButton.Icon");
+		if(!pEnabledImage || !*pEnabledImage)
+			pEnabledImage = pScheme->GetResourceString("TitleBarIcon");
+
 		const char *pDisabledImage = m_DisabledImage.Length() ? m_DisabledImage.Get() :
 			pScheme->GetResourceString("FrameSystemButton.DisabledIcon");
+		if (!pEnabledImage || !*pEnabledImage)
+			pEnabledImage = pScheme->GetResourceString("TitleBarDisabledIcon");
+
 		_enabled = scheme()->GetImage( pEnabledImage, false);
 		_disabled = scheme()->GetImage( pDisabledImage, false);
 
@@ -708,9 +713,11 @@ public:
 		
 		if (IsEnabled())
 		{
+			SetPaintBackgroundEnabled(true);
 			if ( _enabled )
 			{
 				SetImageAtIndex(0, _enabled, 0);
+				SetPaintBackgroundEnabled(false);
 			}
 			SetBgColor(_enCol);
 			SetDefaultColor(_enCol, _enCol);
@@ -719,9 +726,11 @@ public:
 		}
 		else
 		{
+			SetPaintBackgroundEnabled(true);
 			if ( _disabled )
 			{
 				SetImageAtIndex(0, _disabled, 0);
+				SetPaintBackgroundEnabled(false);
 			}
 			SetBgColor(_disCol);
 			SetDefaultColor(_disCol, _disCol);
@@ -795,6 +804,8 @@ Frame::Frame(Panel *parent, const char *panelName, bool showTaskbarIcon) : Edita
 	m_bSmallCaption = false;
 	m_bChainKeysToParent = false;
 	m_bPrimed = false;
+	m_bFrameTitleButtonLeft = false;
+	m_iFrameTitleAlign = Label::a_west;
 
 	SetTitle("#Frame_Untitled", parent ? false : true);
 	
@@ -1243,8 +1254,9 @@ void Frame::PerformLayout()
 	_menuButton->MoveToFront();
 	_minimizeButton->MoveToFront();
 	_minimizeToSysTrayButton->MoveToFront();
-	
-	_menuButton->SetBounds(5+2, 5+3, GetCaptionHeight()-5, GetCaptionHeight()-5);
+
+	//_menuButton->SetBounds(5 + 2, 5 + 3, GetCaptionHeight() - 5, GetCaptionHeight() - 5);
+	_menuButton->SetSize(GetCaptionHeight() - 5, GetCaptionHeight() - 5);
 
 	float scale = 1;
 
@@ -1273,26 +1285,38 @@ void Frame::PerformLayout()
 	// 	 push the buttons against the east side
 	if (_closeButton->IsVisible())
 	{
-		_closeButton->SetPos((wide - side_border_offset) - offset + 5, top_border_offset - 5);
+		if(m_bFrameTitleButtonLeft)
+			_closeButton->SetPos((side_border_offset - _closeButton->GetWide()) + offset, top_border_offset);
+		else
+			_closeButton->SetPos((wide - side_border_offset) - offset, top_border_offset);
 		offset += offset_start;
 		LayoutProportional(_closeButton);
 
 	}
 	if (_minimizeToSysTrayButton->IsVisible())
 	{
-		_minimizeToSysTrayButton->SetPos((wide-side_border_offset)-offset,top_border_offset);
+		if (m_bFrameTitleButtonLeft)
+			_minimizeToSysTrayButton->SetPos((side_border_offset - _minimizeToSysTrayButton->GetWide())+offset,top_border_offset);
+		else
+			_minimizeToSysTrayButton->SetPos((wide-side_border_offset)-offset,top_border_offset);
 		offset += offset_start;
 		LayoutProportional( _minimizeToSysTrayButton );
 	}
 	if (_maximizeButton->IsVisible())
 	{
-		_maximizeButton->SetPos((wide-side_border_offset)-offset,top_border_offset);
+		if(m_bFrameTitleButtonLeft)
+			_maximizeButton->SetPos((side_border_offset - _maximizeButton->GetWide())+offset,top_border_offset);
+		else
+			_maximizeButton->SetPos((wide - side_border_offset) - offset, top_border_offset);
 		offset += offset_start;
 		LayoutProportional( _maximizeButton );
 	}
 	if (_minimizeButton->IsVisible())
 	{
-		_minimizeButton->SetPos((wide-side_border_offset)-offset,top_border_offset);
+		if (m_bFrameTitleButtonLeft)
+			_minimizeButton->SetPos((side_border_offset - _minimizeButton->GetWide())+offset,top_border_offset);
+		else
+			_minimizeButton->SetPos((wide-side_border_offset)-offset,top_border_offset);
 		offset += offset_start;
 		LayoutProportional( _minimizeButton );
 	}
@@ -1647,8 +1671,27 @@ void Frame::PaintBackground()
 				nTitleX += mw;
 				nTitleWidth -= mw;
 			}
-			_title->SetPos( nTitleX, m_bSmallCaption ? 2 : 9 );		
-			_title->SetSize( nTitleWidth, tall);
+
+			if(m_iFrameTitleAlign == Label::a_center)
+			{
+				int cw, ch;
+				_title->GetContentSize(cw, ch);
+				_title->SetPos(wide / 2 - cw / 2 - nTitleX / 2 + m_iTitleTextInsetX, m_bSmallCaption ? 2 : 9);
+				_menuButton->SetPos(wide / 2 - cw / 2 - nTitleX + m_iTitleTextInsetX, 5 + 3);
+			}
+			else if (m_iFrameTitleAlign == Label::a_east)
+			{
+				int cw, ch;
+				_title->GetContentSize(cw, ch);
+				_title->SetPos(wide - cw - nTitleX, m_bSmallCaption ? 2 : 9);
+				_menuButton->SetPos(wide - cw - nTitleX * 2 , 5 + 3);
+			}
+			else
+			{
+				_title->SetPos(nTitleX, m_bSmallCaption ? 2 : 9);
+				_menuButton->SetPos(5 + 2, 5 + 3);
+			}
+			_title->SetSize(nTitleWidth, tall);
 			_title->Paint();
 		}
 	}
@@ -1662,19 +1705,23 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	// always chain back
 	BaseClass::ApplySchemeSettings(pScheme);
 	
-	_titleBarFgColor = GetSchemeColor("FrameTitleBar.TextColor", pScheme);
-	_titleBarBgColor = GetSchemeColor("FrameTitleBar.BgColor", pScheme);
-	_titleBarDisabledFgColor = GetSchemeColor("FrameTitleBar.DisabledTextColor", pScheme);
-	_titleBarDisabledBgColor = GetSchemeColor("FrameTitleBar.DisabledBgColor", pScheme);
+	_titleBarFgColor = GetSchemeColor("FrameTitleBar.TextColor", GetSchemeColor("TitleBarFgColor", pScheme), pScheme);
+	_titleBarBgColor = GetSchemeColor("FrameTitleBar.BgColor", GetSchemeColor("TitleBarBgColor", pScheme), pScheme);
+	_titleBarDisabledFgColor = GetSchemeColor("FrameTitleBar.DisabledTextColor", GetSchemeColor("TitleBarDisabledFgColor", pScheme), pScheme);
+	_titleBarDisabledBgColor = GetSchemeColor("FrameTitleBar.DisabledBgColor", GetSchemeColor("TitleBarDisabledBgColor", pScheme), pScheme);
 
 	const char *font = NULL;
 	if (m_bSmallCaption)
 	{
 		font = pScheme->GetResourceString("FrameTitleBar.SmallFont");
+		if(!font || !*font)
+			font = pScheme->GetResourceString("SmallFont");
 	}
 	else
 	{
 		font = pScheme->GetResourceString("FrameTitleBar.Font");
+		if (!font || !*font)
+			font = pScheme->GetResourceString("Font");
 	}
 	_title->SetFont( pScheme->GetFont((font && *font) ? font : "Default", IsProportional()) );
 	_title->ResizeImageToContent();
@@ -1693,12 +1740,13 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	_maximizeButton->SetFont(marfont);
 	_minimizeToSysTrayButton->SetFont(marfont);
 	_closeButton->SetFont(marfont);
-
+	
 	m_flTransitionEffectTime = atof(pScheme->GetResourceString("Frame.TransitionEffectTime"));
 	m_flFocusTransitionEffectTime = atof(pScheme->GetResourceString("Frame.FocusTransitionEffectTime"));
+	m_bFrameTitleButtonLeft = !Q_stricmp(pScheme->GetResourceString("Frame.FrameTitleButtonPosition"), "left");
 
-	m_InFocusBgColor = pScheme->GetColor("Frame.BgColor", GetBgColor());
-	m_OutOfFocusBgColor = pScheme->GetColor("Frame.OutOfFocusBgColor", m_InFocusBgColor);
+	m_InFocusBgColor = GetSchemeColor("Frame.BgColor", GetSchemeColor("BgColor", GetBgColor(), pScheme), pScheme);
+	m_OutOfFocusBgColor = GetSchemeColor("Frame.OutOfFocusBgColor", GetSchemeColor("OutOfFocusBgColor", m_InFocusBgColor, pScheme), pScheme);
 
 	const char *resourceString = pScheme->GetResourceString("Frame.ClientInsetX");
 	if ( resourceString && *resourceString )
@@ -1716,23 +1764,38 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 		m_iTitleTextInsetX = atoi(resourceString);
 	}
 
+	resourceString = pScheme->GetResourceString("Frame.FrameTitlePosition");
+	if (!Q_stricmp(resourceString, "center"))
+	{
+		m_iFrameTitleAlign = Label::a_center;
+	}
+	else if(!Q_stricmp(resourceString, "right") || Q_stristr(resourceString, "east"))
+	{
+		m_iFrameTitleAlign = Label::a_east;
+	}
+	else
+	{
+		m_iFrameTitleAlign = Label::a_west;
+	}
+	
+
 	SetBgColor(m_InFocusBgColor);
 	SetBorder(pScheme->GetBorder("FrameBorder"));
 
-	resourceString = pScheme->GetResourceString("Frame.TopLeft");
+	resourceString = pScheme->GetResourceString("Frame/TopLeft");
 
 	if (resourceString[0])
 	{
 		m_bImageBackground = true;
 		m_pTopBackground[0] = scheme()->GetImage(resourceString, true);
-		m_pTopBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame.TopCenter"), true);
-		m_pTopBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame.TopRight"), true);
-		m_pCenterBackground[0] = scheme()->GetImage(pScheme->GetResourceString("Frame.MiddleLeft"), true);
-		m_pCenterBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame.MiddleCenter"), true);
-		m_pCenterBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame.MiddleRight"), true);
-		m_pBottomBackground[0] = scheme()->GetImage(pScheme->GetResourceString("Frame.BottomLeft"), true);
-		m_pBottomBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame.BottomCenter"), true);
-		m_pBottomBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame.BottomRight"), true);
+		m_pTopBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame/TopCenter"), true);
+		m_pTopBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame/TopRight"), true);
+		m_pCenterBackground[0] = scheme()->GetImage(pScheme->GetResourceString("Frame/MiddleLeft"), true);
+		m_pCenterBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame/MiddleCenter"), true);
+		m_pCenterBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame/MiddleRight"), true);
+		m_pBottomBackground[0] = scheme()->GetImage(pScheme->GetResourceString("Frame/BottomLeft"), true);
+		m_pBottomBackground[1] = scheme()->GetImage(pScheme->GetResourceString("Frame/BottomCenter"), true);
+		m_pBottomBackground[2] = scheme()->GetImage(pScheme->GetResourceString("Frame/BottomRight"), true);
 	}
 
 	OnFrameFocusChanged( m_bHasFocus );

@@ -23,6 +23,9 @@
     <Filter Include="vgui2_support\SourceSDK\tier1">
       <UniqueIdentifier>{548fcfc1-38a2-4944-8cd1-24a3f7b4c22b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vgui2_support\SourceSDK\mathlib">
+      <UniqueIdentifier>{39bb7923-7eaf-4e72-9019-851412a318cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\vgui2_support\BaseUISurface.cpp">
@@ -48,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="..\vgui2_support\vgui_controls_simple\controls.cpp">
       <Filter>vgui2_support\vgui_controls_simple</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\mathlib\mathlib.cpp">
+      <Filter>vgui2_support\SourceSDK\mathlib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

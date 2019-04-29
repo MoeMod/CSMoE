@@ -81,9 +81,9 @@ BuildGroup::BuildGroup(Panel *parentPanel, Panel *contextPanel)
 	for (int i=0; i<4; ++i)
 		_rulerNumber[i] = NULL;
 	SetContextPanel(contextPanel);
-	_controlGroup = NULL;
-	_groupDeltaX = 0;
-	_groupDeltaX = 0;
+	//_controlGroup = NULL;
+	//_groupDeltaX = 0;
+	//_groupDeltaX = 0;
 	_showRulers = false;
 
 }

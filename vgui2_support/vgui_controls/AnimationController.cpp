@@ -27,10 +27,11 @@
 
 #include <mathlib/math_base.h>
 
+#include <random>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/dbg.h>
 // for SRC
-#include <vstdlib/random.h>
 #include <tier0/memdbgon.h>
 
 using namespace vgui2;
@@ -799,7 +800,10 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 		pos = 0.5f + 0.5f * ( cos( pos * 2.0f * M_PI * interpolatorParam ) );
 		break;
 	case INTERPOLATOR_FLICKER:
-		if ( RandomFloat( 0.0f, 1.0f ) < interpolatorParam )
+	{
+		// if ( gEngfuncs.pfnRandomFloat( 0.0f, 1.0f ) < interpolatorParam )
+		static std::random_device rd;
+		if (std::uniform_real<float>(0.0f, 1.0f)(rd) < interpolatorParam)
 		{
 			pos = 1.0f;
 		}
@@ -808,6 +812,7 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 			pos = 0.0f;
 		}
 		break;
+	}
 	case INTERPOLATOR_LINEAR:
 	default:
 		break;

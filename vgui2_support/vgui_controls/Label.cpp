@@ -992,26 +992,26 @@ void Label::ApplySchemeSettings(IScheme *pScheme)
 		_imageDar[i].image = NULL;
 	}
 
-	SetDisabledFgColor1(GetSchemeColor("Label.DisabledFgColor1", pScheme));
-	SetDisabledFgColor2(GetSchemeColor("Label.DisabledFgColor2", pScheme));
-	SetBgColor(GetSchemeColor("Label.BgColor", pScheme));
+	SetDisabledFgColor1(GetSchemeColor("Label.DisabledFgColor1", GetSchemeColor("DisabledFgColor1", pScheme), pScheme));
+	SetDisabledFgColor2(GetSchemeColor("Label.DisabledFgColor2", GetSchemeColor("DisabledFgColor2", pScheme), pScheme));
+	SetBgColor(GetSchemeColor("Label.BgColor", GetSchemeColor("LabelBgColor", pScheme), pScheme));
 	SetBgColor(Color(0, 0, 0, 0));
 
 	switch (_textColorState)
 	{
 	case CS_DULL:
-		SetFgColor(GetSchemeColor("Label.TextDullColor", pScheme));
+		SetFgColor(GetSchemeColor("Label.TextDullColor", GetSchemeColor("LabelDimText", pScheme), pScheme));
 		break;
 	case CS_BRIGHT:
-		SetFgColor(GetSchemeColor("Label.TextBrightColor", pScheme));
+		SetFgColor(GetSchemeColor("Label.TextBrightColor", GetSchemeColor("BrightControlText", pScheme), pScheme));
 		break;
 	case CS_NORMAL:
 	default:
-		SetFgColor(GetSchemeColor("Label.TextColor", pScheme));
+		SetFgColor(GetSchemeColor("Label.TextColor", GetSchemeColor("BaseText", pScheme), pScheme));
 		break;
 	}
 
-	_associateColor = GetSchemeColor("Label.SelectedTextColor", pScheme);
+	_associateColor = GetSchemeColor("Label.SelectedTextColor", GetSchemeColor("BrightControlText", pScheme), pScheme);
 }
 
 //-----------------------------------------------------------------------------

@@ -7,7 +7,6 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 #include <vgui/ILocalize.h>
-#include <IKeyValues.h>
 #include <FileSystem.h>
 #include "controls.h"
 
@@ -89,7 +88,7 @@ namespace vgui2
 		g_pInputInterface = (IInputInternal *)InitializeInterface(VGUI_INPUTINTERNAL_INTERFACE_VERSION, factoryList, numFactories);
 		g_pLocalizeInterface = (ILocalize *)InitializeInterface(VGUI_LOCALIZE_INTERFACE_VERSION, factoryList, numFactories);
 		g_pFileSystemInterface = (IFileSystem *)InitializeInterface(FILESYSTEM_INTERFACE_VERSION, factoryList, numFactories);
-
+		
 		if (!g_pVGuiInterface) {
 			return false;
 		}

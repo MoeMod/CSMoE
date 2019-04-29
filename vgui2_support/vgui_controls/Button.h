@@ -159,7 +159,6 @@ protected:
 
 	// Paint button on screen
 	virtual void Paint(void);
-	virtual void PaintBorder(void) { return; }
 	virtual void PaintBackground(void);
 	// Get button border attributes.
 	virtual IBorder *GetBorder(bool depressed, bool armed, bool selected, bool keyfocus);

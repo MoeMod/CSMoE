@@ -7,7 +7,7 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 #include <vgui/ILocalize.h>
-#include <IKeyValues.h>
+#include <vgui/IKeyValues.h>
 #include <FileSystem.h>
 #include "controls.h"
 

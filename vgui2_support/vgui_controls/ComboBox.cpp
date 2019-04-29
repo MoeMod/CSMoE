@@ -92,14 +92,9 @@ void ComboBoxButton::ApplySchemeSettings(IScheme *pScheme)
 	SetDefaultBorder(pScheme->GetBorder("ScrollBarButtonBorder"));
 	
 	// arrow changes color but the background doesnt.
-	//SetDefaultColor(GetSchemeColor("MenuButton/ButtonArrowColor", pScheme), GetSchemeColor("MenuButton/ButtonBgColor", pScheme));
-	//SetArmedColor(GetSchemeColor("MenuButton/ArmedArrowColor", pScheme), GetSchemeColor("MenuButton/ButtonBgColor", pScheme));
-	//SetDepressedColor(GetSchemeColor("MenuButton/ArmedArrowColor", pScheme), GetSchemeColor("MenuButton/ButtonBgColor", pScheme));
-	
-	SetDefaultColor(Color(107, 107, 107, 255), Color(0, 0, 0, 0));
-	SetArmedColor(Color(200, 200, 200, 200), Color(0, 0, 0, 0));
-	SetDepressedColor(Color(200, 200, 200, 200), Color(0, 0, 0, 0));
-	
+	SetDefaultColor(GetSchemeColor("MenuButton/ButtonArrowColor", Color(107, 107, 107, 255), pScheme), GetSchemeColor("MenuButton/ButtonBgColor", Color(0, 0, 0, 0), pScheme));
+	SetArmedColor(GetSchemeColor("MenuButton/ArmedArrowColor", Color(200, 200, 200, 200), pScheme), GetSchemeColor("MenuButton/ButtonBgColor", Color(0, 0, 0, 0), pScheme));
+	SetDepressedColor(GetSchemeColor("MenuButton/ArmedArrowColor", Color(200, 200, 200, 200), pScheme), GetSchemeColor("MenuButton/ButtonBgColor", Color(0, 0, 0, 0), pScheme));
 	m_DisabledBgColor = GetBgColor();
 }
 

@@ -1,6 +1,6 @@
 #include <vgui_controls/RichText.h>
 #include "CGameUITestPanel.h"
-#include "vgui/IEngineVgui.h"
+#include "IEngineVgui.h"
 #include "CBaseViewport.h"
 #include "cl_dll.h"
 #include "cl_util.h"

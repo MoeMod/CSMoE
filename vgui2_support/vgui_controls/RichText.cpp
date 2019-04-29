@@ -15,9 +15,12 @@
 #include <vgui/IInputInternal.h>
 #include <vgui/ISystem.h>
 #include <tier1/KeyValues.h>
+#include <filesystem.h>
 
 // memdbgon must be the last include file in a .cpp file
 #include <tier0/memdbgon.h>
+
+#include <wctype.h>
 
 enum
 {
@@ -241,11 +244,11 @@ void RichText::ApplySchemeSettings(IScheme *pScheme)
 	_font = pScheme->GetFont("Default", IsProportional() );
 	m_hFontUnderline = pScheme->GetFont("DefaultUnderline", IsProportional() );
 	
-	SetFgColor(GetSchemeColor("RichText.TextColor", pScheme));
-	SetBgColor(GetSchemeColor("RichText.BgColor", pScheme));
+	SetFgColor(GetSchemeColor("RichText.TextColor", GetSchemeColor("WindowFgColor", pScheme), pScheme));
+	SetBgColor(GetSchemeColor("RichText.BgColor", GetSchemeColor("WindowBgColor", pScheme), pScheme));
 	
-	_selectionTextColor = GetSchemeColor("RichText.SelectedTextColor", GetFgColor(), pScheme);
-	_selectionColor = GetSchemeColor("RichText.SelectedBgColor", pScheme);
+	_selectionTextColor = GetSchemeColor("RichText.SelectedTextColor", GetSchemeColor("SelectionFgColor", GetFgColor(), pScheme), pScheme);
+	_selectionColor = GetSchemeColor("RichText.SelectedBgColor", GetSchemeColor("SelectionBgColor", pScheme), pScheme);
 
 	if ( Q_strlen( pScheme->GetResourceString( "RichText.InsetX" ) ) )
 	{

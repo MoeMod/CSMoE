@@ -14,15 +14,13 @@
 
 #include "tier1/UtlVector.h"
 
-#ifdef WIN32
 // more flexible than default pointers to members code required for casting member function pointers
 #pragma pointers_to_members( full_generality, virtual_inheritance )
-#endif
 
 namespace vgui2
 {
 
-////////////// MESSAGEMAP DEFINITIONS //////////////
+	////////////// MESSAGEMAP DEFINITIONS //////////////
 
 #ifndef offsetof
 #define offsetof(s,m)	(size_t)&(((s *)0)->m)
@@ -37,50 +35,48 @@ namespace vgui2
 // Purpose: parameter data type enumeration
 //			used internal but the shortcut macros require this to be exposed
 //-----------------------------------------------------------------------------
-enum DataType_t
-{
-	DATATYPE_VOID,
-	DATATYPE_CONSTCHARPTR,
-	DATATYPE_INT,
-	DATATYPE_FLOAT,
-	DATATYPE_PTR,
-	DATATYPE_BOOL,
-	DATATYPE_KEYVALUES,
-	DATATYPE_CONSTWCHARPTR,
-	DATATYPE_UINT64,
-};
+	enum DataType_t
+	{
+		DATATYPE_VOID,
+		DATATYPE_CONSTCHARPTR,
+		DATATYPE_INT,
+		DATATYPE_FLOAT,
+		DATATYPE_PTR,
+		DATATYPE_BOOL,
+		DATATYPE_KEYVALUES,
+		DATATYPE_CONSTWCHARPTR,
+		DATATYPE_UINT64,
+	};
 
-class Panel;
+	class Panel;
 
-typedef void (Panel::*MessageFunc_t)(void);
+	typedef void (Panel::*MessageFunc_t)(void);
 
-//-----------------------------------------------------------------------------
-// Purpose: Single item in a message map
-//			Contains the information to map a string message name with parameters
-//			to a function call
-//-----------------------------------------------------------------------------
-#ifdef WIN32
+	//-----------------------------------------------------------------------------
+	// Purpose: Single item in a message map
+	//			Contains the information to map a string message name with parameters
+	//			to a function call
+	//-----------------------------------------------------------------------------
 #pragma warning(disable:4121)
-#endif
-struct MessageMapItem_t
-{
-	const char *name;
-	// VC6 aligns this to 16-bytes.  Since some of the code has been compiled with VC6,
-	// we need to enforce the alignment on later compilers to remain compatible.
-	ALIGN16 MessageFunc_t func;
+	struct MessageMapItem_t
+	{
+		const char *name;
+		// VC6 aligns this to 16-bytes.  Since some of the code has been compiled with VC6,
+		// we need to enforce the alignment on later compilers to remain compatible.
+		ALIGN16 MessageFunc_t func;
 
-	int numParams;
+		int numParams;
 
-	DataType_t firstParamType;
-	const char *firstParamName;
+		DataType_t firstParamType;
+		const char *firstParamName;
 
-	DataType_t secondParamType;
-	const char *secondParamName;
+		DataType_t secondParamType;
+		const char *secondParamName;
 
-	int nameSymbol;
-	int firstParamSymbol;
-	int secondParamSymbol;
-};
+		int nameSymbol;
+		int firstParamSymbol;
+		int secondParamSymbol;
+	};
 
 #define DECLARE_PANELMESSAGEMAP( className )												\
 	static void AddToMap( char const *scriptname, vgui2::MessageFunc_t function, int paramCount, int p1type, const char *p1name, int p2type, const char *p2name ) 	\
@@ -202,9 +198,9 @@ public:							\
 	};													\
 	PanelMessageFunc_##name m_##name##_register;		\
 
-// Use this macro to define a message mapped function
-// must end with a semicolon ';', or with a function
-// no parameter
+	// Use this macro to define a message mapped function
+	// must end with a semicolon ';', or with a function
+	// no parameter
 #define MESSAGE_FUNC( name, scriptname )			_MessageFuncCommon( name, scriptname, 0, 0, 0, 0, 0 );	virtual void name( void )
 
 // one parameter
@@ -235,33 +231,33 @@ public:							\
 
 
 // mapping, one per class
-struct PanelMessageMap
-{
-	PanelMessageMap()
+	struct PanelMessageMap
 	{
-		baseMap = NULL;
-		pfnClassName = NULL;
-		processed = false;
-	}
+		PanelMessageMap()
+		{
+			baseMap = NULL;
+			pfnClassName = NULL;
+			processed = false;
+		}
 
-	CUtlVector< MessageMapItem_t > entries;
-	bool processed;
-	PanelMessageMap *baseMap;
-	char const *(*pfnClassName)( void );
-};
+		CUtlVector< MessageMapItem_t > entries;
+		bool processed;
+		PanelMessageMap *baseMap;
+		char const *(*pfnClassName)(void);
+	};
 
-PanelMessageMap *FindPanelMessageMap( char const *className );
-PanelMessageMap *FindOrAddPanelMessageMap( char const *className );
+	PanelMessageMap *FindPanelMessageMap(char const *className);
+	PanelMessageMap *FindOrAddPanelMessageMap(char const *className);
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-// 
-// OBSELETE MAPPING FUNCTIONS, USE ABOVE
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// 
+	// OBSELETE MAPPING FUNCTIONS, USE ABOVE
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// no parameters
+	// no parameters
 #define MAP_MESSAGE( type, name, func )						{ name, (vgui2::MessageFunc_t)(type::func), 0 }
 
 // implicit single parameter (params is the data store)
@@ -291,17 +287,17 @@ PanelMessageMap *FindOrAddPanelMessageMap( char const *className );
 // Purpose: stores the list of objects in the hierarchy
 //			used to iterate through an object's message maps
 //-----------------------------------------------------------------------------
-struct PanelMap_t
-{
-	MessageMapItem_t *dataDesc;
-	int dataNumFields;
-	const char *dataClassName;
-	PanelMap_t *baseMap;
-	int processed;
-};
+	struct PanelMap_t
+	{
+		MessageMapItem_t *dataDesc;
+		int dataNumFields;
+		const char *dataClassName;
+		PanelMap_t *baseMap;
+		int processed;
+	};
 
-// for use in class declarations
-// declares the static variables and functions needed for the data description iteration
+	// for use in class declarations
+	// declares the static variables and functions needed for the data description iteration
 #define DECLARE_PANELMAP() \
 	static vgui2::PanelMap_t m_PanelMap; \
 	static vgui2::MessageMapItem_t m_MessageMap[]; \
@@ -312,47 +308,47 @@ struct PanelMap_t
 	vgui2::PanelMap_t derivedClass::m_PanelMap = { derivedClass::m_MessageMap, ARRAYSIZE(derivedClass::m_MessageMap), #derivedClass, &baseClass::m_PanelMap }; \
 	vgui2::PanelMap_t *derivedClass::GetPanelMap( void ) { return &m_PanelMap; }
 
-typedef vgui2::Panel *( *PANELCREATEFUNC )( void );
+	typedef vgui2::Panel *(*PANELCREATEFUNC)(void);
 
-//-----------------------------------------------------------------------------
-// Purpose: Used by DECLARE_BUILD_FACTORY macro to create a linked list of
-//  instancing functions
-//-----------------------------------------------------------------------------
-class CBuildFactoryHelper
-{
-public:
-	// Static list of helpers
-	static CBuildFactoryHelper *m_sHelpers;
+	//-----------------------------------------------------------------------------
+	// Purpose: Used by DECLARE_BUILD_FACTORY macro to create a linked list of
+	//  instancing functions
+	//-----------------------------------------------------------------------------
+	class CBuildFactoryHelper
+	{
+	public:
+		// Static list of helpers
+		static CBuildFactoryHelper *m_sHelpers;
 
-public:
-	// Construction
-	CBuildFactoryHelper( char const *className, PANELCREATEFUNC func );
+	public:
+		// Construction
+		CBuildFactoryHelper(char const *className, PANELCREATEFUNC func);
 
-	// Accessors
-	CBuildFactoryHelper *GetNext( void );
+		// Accessors
+		CBuildFactoryHelper *GetNext(void);
 
-	char const	*GetClassName() const;
+		char const	*GetClassName() const;
 
-	vgui2::Panel *CreatePanel();
+		vgui2::Panel *CreatePanel();
 
-	static vgui2::Panel *InstancePanel( char const *className );
-	static void GetFactoryNames( CUtlVector< char const * >& list );
-private:
+		static vgui2::Panel *InstancePanel(char const *className);
+		static void GetFactoryNames(CUtlVector< char const * >& list);
+	private:
 
-	static bool HasFactory( char const *className );
+		static bool HasFactory(char const *className);
 
-	// Next factory in list
-	CBuildFactoryHelper	*m_pNext;
+		// Next factory in list
+		CBuildFactoryHelper	*m_pNext;
 
-	int					m_Type;
-	PANELCREATEFUNC		m_CreateFunc;
-	char const			*m_pClassName;
-};
+		int					m_Type;
+		PANELCREATEFUNC		m_CreateFunc;
+		char const			*m_pClassName;
+	};
 
-// This is the macro which implements creation of each type of panel
-// It creates a function which instances an object of the specified type
-// It them hooks that function up to the helper list so that the CHud objects can create
-//  the elements by name, with no header file dependency, etc.
+	// This is the macro which implements creation of each type of panel
+	// It creates a function which instances an object of the specified type
+	// It them hooks that function up to the helper list so that the CHud objects can create
+	//  the elements by name, with no header file dependency, etc.
 #define DECLARE_BUILD_FACTORY( className )										\
 	static vgui2::Panel *Create_##className( void )								\
 		{																		\

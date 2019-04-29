@@ -50,10 +50,10 @@ public:
 
 	virtual void ApplySchemeSettings(IScheme *pScheme, bool proportional)
 	{
-		_bgColor = _radioButton->GetSchemeColor("CheckButton.BgColor", Color(150, 150, 150, 0), pScheme);
-		_borderColor1 = _radioButton->GetSchemeColor("CheckButton.Border1", Color(20, 20, 20, 0), pScheme);
-		_borderColor2 = _radioButton->GetSchemeColor("CheckButton.Border2", Color(90, 90, 90, 0), pScheme);
-		_checkColor = _radioButton->GetSchemeColor("CheckButton.Check", Color(20, 20, 20, 0), pScheme);
+		_bgColor = _radioButton->GetSchemeColor("CheckButton.BgColor", _radioButton->GetSchemeColor("CheckBgColor", Color(150, 150, 150, 0), pScheme), pScheme);
+		_borderColor1 = _radioButton->GetSchemeColor("CheckButton.Border1", _radioButton->GetSchemeColor("CheckButtonBorder1", Color(20, 20, 20, 0), pScheme), pScheme);
+		_borderColor2 = _radioButton->GetSchemeColor("CheckButton.Border2", _radioButton->GetSchemeColor("CheckButtonBorder2", Color(90, 90, 90, 0), pScheme), pScheme);
+		_checkColor = _radioButton->GetSchemeColor("CheckButton.Check", _radioButton->GetSchemeColor("CheckButtonCheck", Color(20, 20, 20, 0), pScheme), pScheme);
 		_font = pScheme->GetFont("Marlett", proportional);
 	}
 
@@ -132,8 +132,8 @@ void RadioButton::ApplySchemeSettings(IScheme *pScheme)
 	BaseClass::ApplySchemeSettings(pScheme);
 	_radioBoxImage->ApplySchemeSettings(pScheme, IsProportional());
 
-	SetFgColor(GetSchemeColor("FgColor", pScheme));
-	_selectedFgColor = GetSchemeColor("BrightControlText", GetSchemeColor("ControlText", pScheme), pScheme);
+	SetFgColor(GetSchemeColor("RadioButton.TextColor", GetSchemeColor("FgColor", pScheme), pScheme));
+	_selectedFgColor = GetSchemeColor("RadioButton.SelectedTextColor", GetSchemeColor("BrightControlText", GetSchemeColor("ControlText", pScheme), pScheme), pScheme);
 
 	SetContentAlignment(a_west);
 

@@ -61,6 +61,9 @@ public:
 	virtual void OnMouseDoublePressed(MouseCode code);
 	virtual void OnMouseReleased(MouseCode code);
 
+	// Return true if this slider is actually drawing itself
+	virtual bool IsSliderVisible(void);
+
 protected:
 	virtual void Paint();
 	virtual void PaintBackground();
@@ -82,6 +85,10 @@ private:
 	int _rangeWindow;
 	int _buttonOffset;
 	IBorder *_ScrollBarSliderBorder;
+
+	bool _imageBackground;
+
+	IImage *_verticalImage[3];
 };
 
 } // namespace vgui

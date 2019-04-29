@@ -1,6 +1,6 @@
 #include "interface.h"
 #include "vstdlib/IKeyValuesSystem.h"
-#include "IKeyValues.h"
+#include "vgui/IKeyValues.h"
 #include "tier1/KeyValues.h"
 #include "KeyValuesCompat.h"
 

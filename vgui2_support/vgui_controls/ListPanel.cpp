@@ -2464,17 +2464,17 @@ void ListPanel::ApplySchemeSettings(IScheme *pScheme)
 
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	SetBgColor(GetSchemeColor("WindowBgColor", pScheme));
+	SetBgColor(GetSchemeColor("ListPanel.BgColor", GetSchemeColor("WindowBgColor", pScheme), pScheme));
 	SetBorder(pScheme->GetBorder("ButtonDepressedBorder"));
 
-	m_pLabel->SetBgColor(GetSchemeColor("Menu/ArmedBgColor", pScheme));
+	m_pLabel->SetBgColor(GetSchemeColor("ListPanel.BgColor", GetSchemeColor("Menu/ArmedBgColor", pScheme), pScheme));
 
-	m_LabelFgColor = GetSchemeColor("WindowFgColor", pScheme);
-	m_DisabledColor = GetSchemeColor("WindowFgColor", m_LabelFgColor, pScheme);
-	m_SelectionFgColor = GetSchemeColor("ListSelectionFgColor", m_LabelFgColor, pScheme);
-	m_DisabledSelectionFgColor = GetSchemeColor("ListSelectionFgColor", m_LabelFgColor, pScheme);
+	m_LabelFgColor = GetSchemeColor("ListPanel.TextColor", GetSchemeColor("WindowFgColor", pScheme), pScheme);
+	m_DisabledColor = GetSchemeColor("ListPanel.DisabledTextColor", GetSchemeColor("WindowFgColor", m_LabelFgColor, pScheme), pScheme);
+	m_SelectionFgColor = GetSchemeColor("ListPanel.SelectedTextColor", GetSchemeColor("ListSelectionFgColor", m_LabelFgColor, pScheme), pScheme);
+	m_DisabledSelectionFgColor = GetSchemeColor("ListPanel.DisabledSelectedTextColor", GetSchemeColor("ListSelectionFgColor", m_LabelFgColor, pScheme), pScheme);
 
-	m_pEmptyListText->SetColor(GetSchemeColor("LabelDimText", pScheme));
+	m_pEmptyListText->SetColor(GetSchemeColor("ListPanel.EmptyListInfoTextColor", pScheme));
 		
 	SetFont( pScheme->GetFont("Default", IsProportional() ) );
 	m_pEmptyListText->SetFont( pScheme->GetFont( "Default", IsProportional() ) );
