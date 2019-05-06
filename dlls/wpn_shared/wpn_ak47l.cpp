@@ -69,10 +69,10 @@ public:
 	static constexpr float RangeModifier = 0.98;
 	static constexpr auto BulletType = BULLET_PLAYER_762MM;
 	static constexpr int Penetration = 2;
-	static constexpr const auto & KickBackWalking = KickBackData{ 0.4125f, 0.15f, 0.075f, 0.015f, 2.5f, 0.5f, 3 };
-	static constexpr const auto & KickBackNotOnGround = KickBackData{ 1, 0.5f, 0.25f, 0.175f, 4.5f, 3, 1 };
-	static constexpr const auto & KickBackDucking = KickBackData{ 0.3f, 0.15f, 0.05f, 0.005f, 2.5f, 0.5f, 4 };
-	static constexpr const auto & KickBackDefault = KickBackData{ 0.4f, 0.15f, 0.0625f, 0.015f, 2.5f, 0.5f, 3 };
-	static constexpr const auto & KnockBack = KnockbackData{ 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
+	KickBackData KickBackWalking = { 0.4125f, 0.15f, 0.075f, 0.015f, 2.5f, 0.5f, 3 };
+	KickBackData KickBackNotOnGround = { 1, 0.5f, 0.25f, 0.175f, 4.5f, 3, 1 };
+	KickBackData KickBackDucking = { 0.3f, 0.15f, 0.05f, 0.005f, 2.5f, 0.5f, 4 };
+	KickBackData KickBackDefault = { 0.4f, 0.15f, 0.0625f, 0.015f, 2.5f, 0.5f, 3 };
+	KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
 };
 LINK_ENTITY_TO_CLASS(weapon_ak47l, CAK47_Long)

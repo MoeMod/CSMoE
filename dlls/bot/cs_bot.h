@@ -89,6 +89,7 @@ public:
 	void Update() override;													// heavyweight algorithms, invoked less often
 
 	void Walk() override;
+	void Jump() override { Jump(false); }
 	bool Jump(bool mustJump = false) override;										// returns true if jump was started
 
 	void OnBecomeZombie(ZombieLevel iEvolutionLevel) override;

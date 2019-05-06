@@ -596,7 +596,7 @@ void AttackState::OnUpdate(CCSBot *me)
 			{
 				if (me->m_isEnemyVisible)
 				{
-					me->Jump();
+					me->Jump(false);
 				}
 				break;
 			}

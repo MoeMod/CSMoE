@@ -386,7 +386,7 @@ void CCSBot::Wiggle()
 
 	if (gpGlobals->time >= m_stuckJumpTimestamp)
 	{
-		if (Jump())
+		if (Jump(false))
 		{
 			m_stuckJumpTimestamp = RANDOM_FLOAT(1.0, 2.0) + gpGlobals->time;
 		}

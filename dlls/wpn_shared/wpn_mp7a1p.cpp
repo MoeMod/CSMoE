@@ -67,7 +67,7 @@ public:
 	static constexpr const char *ClassName = "weapon_mp7a1p";
 	static constexpr const char *AnimExtension = "pistol";
 
-	static constexpr const auto & KnockBack = KnockbackData{ 250.0f, 200.0f, 250.0f, 90.0f, 0.7f };
+	KnockbackData KnockBack = { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f };
 	static constexpr float MaxSpeed = 250;
 
 	enum
@@ -104,10 +104,10 @@ public:
 	static constexpr int Penetration = 1;
 	static constexpr int Distance = 8192;
 
-	static constexpr const auto & KickBackWalking = KickBackData{ 0.6f, 0.3f, 0.25f, 0.035f, 3.5f, 2.75f, (signed int)10 };
-	static constexpr const auto & KickBackNotOnGround = KickBackData{ 1, 0.55f, 0.4f, 0.05f, 5, 3.25f, (signed int)9 };
-	static constexpr const auto & KickBackDucking = KickBackData{ 0.25f, 0.175f, 0.125f, 0.02f, 2.25f, 1.2f, (signed int)10 };
-	static constexpr const auto & KickBackDefault = KickBackData{ 0.275f, 0.2f, 0.15f, 0.02f, 3, 1.75f, (signed int)9 };
+	KickBackData KickBackWalking = { 0.6f, 0.3f, 0.25f, 0.035f, 3.5f, 2.75f, (signed int)10 };
+	KickBackData KickBackNotOnGround = { 1, 0.55f, 0.4f, 0.05f, 5, 3.25f, (signed int)9 };
+	KickBackData KickBackDucking = { 0.25f, 0.175f, 0.125f, 0.02f, 2.25f, 1.2f, (signed int)10 };
+	KickBackData KickBackDefault = { 0.275f, 0.2f, 0.15f, 0.02f, 3, 1.75f, (signed int)9 };
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_mp7a1c";
 	static constexpr bool DoubleMode_SyncAmmo = true;

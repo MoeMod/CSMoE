@@ -108,7 +108,7 @@ public:
 	// returns true if jump was started
 	#define MUST_JUMP true
 	void Jump() override { Jump(false); }
-	virtual bool Jump(bool mustJump);
+	virtual bool Jump(bool mustJump = false);
 
 	// zero any MoveForward(), Jump(), etc
 	virtual void ClearMovement();

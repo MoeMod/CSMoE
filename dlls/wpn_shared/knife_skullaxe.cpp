@@ -43,7 +43,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
-	static constexpr const auto & KnockBack = KnockbackData{ .0f, .0f, .0f, .0f, 1.0f };
+	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
 
 public:
 

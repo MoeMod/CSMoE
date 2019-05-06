@@ -98,12 +98,12 @@ public:
 	static constexpr int Penetration = 2;
 	static constexpr int Distance = 8192;
 
-	static constexpr const auto & KickBackWalking = KickBackData{ 1.425f, 0.44999999f, 0.2f, 0.045000002f, 6.25f, 2.5f, (signed int)7.0f };
-	static constexpr const auto & KickBackNotOnGround = KickBackData{ 1.825f, 1.2f, 0.40000001f, 0.30000001f, 8.5f, 6.125f, (signed int)5.0f };
-	static constexpr const auto & KickBackDucking = KickBackData{ 0.82499999f, 0.32499999f, 0.12f, 0.0275f, 5.125f, 1.5f, (signed int)8.0f };
-	static constexpr const auto & KickBackDefault = KickBackData{ 0.85000002f, 0.35499999f, 0.18000001f, 0.035999998f, 5.25f, 1.85f, (signed int)7.0f };
+	KickBackData KickBackWalking = { 1.425f, 0.44999999f, 0.2f, 0.045000002f, 6.25f, 2.5f, (signed int)7.0f };
+	KickBackData KickBackNotOnGround = { 1.825f, 1.2f, 0.40000001f, 0.30000001f, 8.5f, 6.125f, (signed int)5.0f };
+	KickBackData KickBackDucking = { 0.82499999f, 0.32499999f, 0.12f, 0.0275f, 5.125f, 1.5f, (signed int)8.0f };
+	KickBackData KickBackDefault = { 0.85000002f, 0.35499999f, 0.18000001f, 0.035999998f, 5.25f, 1.85f, (signed int)7.0f };
 
-	static constexpr const auto & KnockBack = KnockbackData{ 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
+	KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_xm8s";
 	static constexpr bool DoubleMode_SyncAmmo = true;

@@ -356,7 +356,7 @@ public:
 	static constexpr int MaxClip = 50;
 	static constexpr float WeaponIdleTime = 10;
 
-	static constexpr const auto & KnockBack = KnockbackData{ 250.0f, 100.0f, 150.0f, 100.0f, 0.2f };
+	KnockbackData KnockBack = { 250.0f, 100.0f, 150.0f, 100.0f, 0.2f };
 	static constexpr const char *Beam_SPR = "sprites/ef_gungnir_xbeam.spr"; // 
 
 public:

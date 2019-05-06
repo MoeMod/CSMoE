@@ -95,7 +95,7 @@ auto static_ent_cast(T *p) -> decltype(CBaseEntity::Instance(p), Result())
 
 // nullptr => *
 template<class Result>
-Result static_ent_cast(nullptr_t)
+Result static_ent_cast(std::nullptr_t)
 {
 	return nullptr;
 }
