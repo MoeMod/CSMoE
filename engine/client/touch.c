@@ -155,6 +155,8 @@ convar_t *touch_highlight_b;
 convar_t *touch_highlight_a;
 convar_t *touch_precise_amount;
 convar_t *touch_joy_texture;
+convar_t *touch_follow_attack_enable;
+convar_t *touch_3dtouch_attack_pressure;
 
 // code looks smaller with it
 #define B(x) button->x
@@ -970,6 +972,8 @@ void Touch_Init( void )
 	touch_joy_radius = Cvar_Get( "touch_joy_radius", "1.0", 0, "joy radius multiplier" );
 	touch_move_indicator = Cvar_Get( "touch_move_indicator", "0.0", 0, "indicate move events (0 to disable)" );
 	touch_joy_texture = Cvar_Get( "touch_joy_texture", "touch_default/joy.tga", 0, "texture for move indicator");
+	touch_follow_attack_enable = Cvar_Get( "touch_follow_attack_enable", "1", 0, "enable attack button follows finger");
+	touch_3dtouch_attack_pressure = Cvar_Get( "touch_3dtouch_attack_pressure", "2.0", 0, "enable attack button follows finger");
 
 	// input devices cvar
 	touch_enable = Cvar_Get( "touch_enable", DEFAULT_TOUCH_ENABLE, CVAR_ARCHIVE, "enable touch controls" );
@@ -1406,7 +1410,7 @@ static void Touch_EditMove( touchEventType type, int fingerID, float x, float y,
 	}
 }
 
-static void Touch_Motion( touchEventType type, int fingerID, float x, float y, float dx, float dy )
+static void Touch_Motion( touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure )
 {
 	// walk
 	if( fingerID == touch.move_finger )
@@ -1475,6 +1479,22 @@ static void Touch_Motion( touchEventType type, int fingerID, float x, float y, f
 
 		// accumulate
 		touch.yaw -= dx * touch_yaw->value, touch.pitch += dy * touch_pitch->value;
+
+		// 3d touch to shoot
+		if (touch_3dtouch_attack_pressure->value >= 0.0f)
+		{
+			static int attack_down = 0;
+			if( !attack_down && pressure > touch_3dtouch_attack_pressure->value )
+			{
+				Cbuf_AddText( "+attack; vibrate; \n" );
+				attack_down = 1;
+			}
+			else if( attack_down && pressure < touch_3dtouch_attack_pressure->value )
+			{
+				Cbuf_AddText( "-attack; vibrate; \n" );
+				attack_down = 0;
+			}
+		}
 	}
 }
 
@@ -1651,6 +1671,24 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 				if( button->type == touch_look )
 				{
 					touch.look_finger = -1;
+
+					if( touch_follow_attack_enable->value > 0.0f )
+					{
+						touch_button_t *newbutton;
+
+						// player touched touch_move with enabled look mode
+						// and same finger id. release all move triggers
+						for( newbutton = list->first; newbutton; newbutton = newbutton->next )
+							if( !Q_strcmp( newbutton->command, "+attack" )   )
+							{
+								float w = ( newbutton->x2 - newbutton->x1 ), h = ( newbutton->y2 - newbutton->y1 );
+								newbutton->x1 = x - w / 2;
+								newbutton->x2 = x + w / 2;
+								newbutton->y1 = y - h / 2;
+								newbutton->y2 = y + h / 2;
+							}
+
+					}
 				}
 			}
 		}
@@ -1727,7 +1765,7 @@ static qboolean Touch_ButtonEdit( touchEventType type, int fingerID, float x, fl
 	return false;
 }
 
-static int Touch_ControlsEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy )
+static int Touch_ControlsEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure )
 {
 	if( touch.state == state_edit_move )
 	{
@@ -1740,11 +1778,11 @@ static int Touch_ControlsEvent( touchEventType type, int fingerID, float x, floa
 	if( Touch_ButtonPress( &touch.list_user, type, fingerID, x, y, dx, dy ) )
 		return true;
 	if( type == event_motion )
-		Touch_Motion( type, fingerID, x, y, dx, dy );
+		Touch_Motion( type, fingerID, x, y, dx, dy, pressure );
 	return true;
 }
 
-int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy )
+int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure )
 {
 
 	// simulate menu mouse click
@@ -1814,7 +1852,7 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 	if( clgame.dllFuncs.pfnTouchEvent && clgame.dllFuncs.pfnTouchEvent( type, fingerID, x, y, dx, dy ) )
 		return true;
 
-	return Touch_ControlsEvent( type, fingerID, x, y, dx, dy );
+	return Touch_ControlsEvent( type, fingerID, x, y, dx, dy, pressure );
 }
 
 void Touch_GetMove( float *forward, float *side, float *yaw, float *pitch )
@@ -1842,7 +1880,7 @@ void Touch_KeyEvent( int key, int down )
 	x = xi/SCR_W;
 	y = yi/SCR_H;
 
-	Touch_ControlsEvent( !down, key == K_MOUSE1?0:1, x, y, 0, 0 );
+	Touch_ControlsEvent( !down, key == K_MOUSE1?0:1, x, y, 0, 0, 0 );
 }
 
 void Touch_Shutdown( void )

@@ -310,6 +310,7 @@ static void SDLash_EventFilter( SDL_Event *event )
 		touchEventType type;
 		static int scale = 0;
 		float x, y, dx, dy;
+		float pressure;
 
 		if( event->type == SDL_FINGERDOWN )
 			type = event_down;
@@ -352,8 +353,9 @@ static void SDLash_EventFilter( SDL_Event *event )
 			dx = event->tfinger.dx;
 			dy = event->tfinger.dy;
 		}
+		pressure = event->tfinger.pressure;
 
-		IN_TouchEvent( type, event->tfinger.fingerId, x, y, dx, dy );
+		IN_TouchEvent( type, event->tfinger.fingerId, x, y, dx, dy, pressure );
 		break;
 	}
 

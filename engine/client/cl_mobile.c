@@ -54,7 +54,7 @@ static void pfnVibrate( float life, char flags )
 #endif
 
 #if __APPLE__
-	TapicEngine_Vibrate(flags ? TapicEngine_Pop : TapicEngine_Peek);
+	TapicEngine_Vibrate( life > 0 ? TapicEngine_Pop : TapicEngine_Peek );
 #endif
 }
 
