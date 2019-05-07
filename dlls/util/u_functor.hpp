@@ -21,7 +21,7 @@ namespace moe
 	// !!! BOT's classname is not "player", so UTIL_FindEntityByClassname(p, "player") CANNOT enum players
 	struct Enumer_Player
 	{
-		CBasePlayer *operator()(CBasePlayer *pCurrent)
+		CBasePlayer *operator()(CBasePlayer *pCurrent) const
 		{
 			for(int iCurrentIndex = pCurrent ? pCurrent->entindex() + 1 : 1; iCurrentIndex <= gpGlobals->maxClients; ++iCurrentIndex)
 			{
@@ -40,7 +40,7 @@ namespace moe
 
 		explicit Enumer_ClassName(const char *classname) : m_classname(classname) {}
 
-		EntityType *operator()(EntityType *pCurrent)
+		EntityType *operator()(EntityType *pCurrent) const
 		{
 			return static_cast<EntityType *>(UTIL_FindEntityByClassname(pCurrent, m_classname));
 		}

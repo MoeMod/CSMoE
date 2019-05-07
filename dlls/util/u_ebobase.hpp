@@ -25,7 +25,11 @@ namespace moe
 	{
 	protected:
 		constexpr EBOBase(const Empty &alloc) : Empty(alloc) {}
-		Empty get()
+		Empty &get()
+		{
+			return *this;
+		}
+		const Empty &get() const
 		{
 			return *this;
 		}

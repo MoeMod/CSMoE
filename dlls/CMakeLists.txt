@@ -179,6 +179,8 @@ set(HLDLL_SRCS
 	./gamemode/mod_zbb.cpp
 	./weapons_moe_buy.cpp
 	./weapons_precache.cpp
+	./gamemode/zbb/zbb_basebuilder.cpp
+	./gamemode/zbb/zbb_ghost.cpp
 	)
 
 file (GLOB HLWPN_SRCS

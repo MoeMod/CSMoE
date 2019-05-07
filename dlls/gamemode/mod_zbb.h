@@ -20,7 +20,23 @@ GNU General Public License for more details.
 #include <array>
 #include <unordered_map>
 
-class IPlayerBuildingInterface;
+class IPlayerBuildingDelegate
+{
+public:
+	virtual ~IPlayerBuildingDelegate() = default;
+	virtual bool IsBuilding() = 0;
+	virtual CBaseEntity *CurrentTarget() = 0;
+	virtual bool IsGhost () = 0;
+};
+
+class IZombieModeCharacter_ZBB_ExtraDelegate
+{
+public:
+	virtual ~IZombieModeCharacter_ZBB_ExtraDelegate() = default;
+	virtual void ButtonEvent(unsigned short &bitsCurButton, int bitsOldButton) = 0;
+	virtual bool IsBuilding() = 0;
+	virtual void PostThink() = 0;
+};
 
 class CMod_ZombieBaseBuilder : public CMod_Zombi
 {
@@ -35,11 +51,13 @@ public:
 
 	int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet)  override;
 
+	BOOL FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker) override;
+
 public:
 	bool CanEntityBuild(CBaseEntity *pEntity);
-
-	std::array<IPlayerBuildingInterface *, MAX_CLIENTS> m_BuildingInterfaces;
-	std::unordered_map<CBaseEntity *, IPlayerBuildingInterface *> m_BuildingEntities;
+	// no need for weak_ptr, cause CPlayerModStrategy_ZBB handles its lifespan.
+	std::array<IPlayerBuildingDelegate *, MAX_CLIENTS> m_BuildingInterfaces;
+	std::unordered_map<CBaseEntity *, IPlayerBuildingDelegate *> m_BuildingEntities;
 };
 
 #endif //PROJECT_MOD_ZBB_H

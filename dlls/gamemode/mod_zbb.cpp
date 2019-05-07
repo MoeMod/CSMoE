@@ -24,17 +24,12 @@ GNU General Public License for more details.
 
 #include "mod_zbb.h"
 
-class IPlayerBuildingInterface
-{
-public:
-	virtual ~IPlayerBuildingInterface() = default;
-	virtual bool IsBuilding() = 0;
-	virtual CBaseEntity *CurrentTarget() = 0;
-};
+#include "dlls/gamemode/zbb/zbb_basebuilder.h"
+#include "dlls/gamemode/zbb/zbb_ghost.h"
 
 CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() // precache
 {
-
+	LIGHT_STYLE(0, "d");
 }
 
 BOOL CMod_ZombieBaseBuilder::IsAllowedToSpawn(CBaseEntity *pEntity)
@@ -63,98 +58,106 @@ int CMod_ZombieBaseBuilder::AddToFullPack_Post(struct entity_state_s *state, int
 	if (!pHost || !pHost->IsPlayer())
 		return 0;
 
-	int id = pHost->entindex();
+	auto id = pHost->entindex();
 	assert(id >= 1 && id <= 32);
 
-	IPlayerBuildingInterface *pbi = m_BuildingInterfaces[id];
-	CBaseEntity *pEntity = pbi->CurrentTarget();
-
-	if (pEntity && ent == pEntity->edict())
+	auto pbi = m_BuildingInterfaces[id];
+	if(pbi)
 	{
-		if (pbi->IsBuilding())
+		CBaseEntity *pCurrentBuildTarget = pbi->CurrentTarget();
+		if(pbi->IsGhost())
 		{
-			state->rendermode = kRenderTransColor;
-			state->renderfx = kRenderFxGlowShell;
-			state->rendercolor = { 90, 190, 90 };
-			state->renderamt = 125;
+			CBaseEntity *pEntity = CBaseEntity::Instance(ent);
+			if(player)
+			{
+				// already checked pHost->IsPlayer(), static_cast is safe.
+				if(static_cast<CBasePlayer *>(pHost)->m_bNightVisionOn)
+				{
+					state->rendermode = kRenderNormal;
+					state->renderamt = 0;
+				}
+				else
+				{
+					state->rendermode = kRenderTransTexture;
+					state->renderamt = 1;
+				}
+
+				state->renderfx = kRenderFxGlowShell;
+
+				if(pEntity->IsPlayer() && static_cast<CBasePlayer *>(pEntity)->m_bIsZombie)
+					state->rendercolor = { 190, 90, 90 };
+				else
+					state->rendercolor = { 90, 190, 90 };
+			}
+			else if(CanEntityBuild(pEntity))
+			{
+				// ghost can see through all entities
+				if(static_cast<CBasePlayer *>(pHost)->m_bNightVisionOn)
+				{
+					state->rendermode = kRenderTransAdd;
+					state->renderfx = kRenderFxGlowShell;
+					state->rendercolor = { 200, 200, 200 };
+					state->renderamt = 36;
+				}
+				else
+				{
+					// dont bother when nvg off
+				}
+
+				// hack the client prediction... in case looks like player is stuck with walls.
+				state->solid = SOLID_NOT;
+			}
 
 		}
-		else
+		else if (pCurrentBuildTarget && ent == pCurrentBuildTarget->edict())
 		{
-			state->rendermode = kRenderTransColor;
-			state->renderfx = kRenderFxGlowShell;
-			state->rendercolor = { 90, 90, 90 };
-			state->renderamt = 125;
+			if(pbi->IsBuilding())
+			{
+				state->rendermode = kRenderTransColor;
+				state->renderfx = kRenderFxGlowShell;
+				state->rendercolor = { 90, 190, 90 };
+				state->renderamt = 125;
+			}
+			else{
+				state->rendermode = kRenderTransColor;
+				state->renderfx = kRenderFxGlowShell;
+				state->rendercolor = { 90, 90, 90 };
+				state->renderamt = 125;
+			}
 		}
 	}
+
 	return 1;
 }
 
 bool CMod_ZombieBaseBuilder::CanEntityBuild(CBaseEntity *pEntity)
 {
-	return FClassnameIs(pEntity->edict(), "func_wall");
+	return static_cast<bool>(FClassnameIs(pEntity->edict(), "func_wall"));
 }
 
-class CPlayerModStrategy_ZBB : public CPlayerModStrategy_ZB1, public IPlayerBuildingInterface
+class CPlayerModStrategy_ZBB : public CPlayerModStrategy_ZB1
 {
 public:
-	CPlayerModStrategy_ZBB(CBasePlayer *player, CMod_ZombieBaseBuilder *mp) : CPlayerModStrategy_ZB1(player, mp), m_pModZBB(mp)
+	CPlayerModStrategy_ZBB(CBasePlayer *player, CMod_ZombieBaseBuilder *mp)
+		:   CPlayerModStrategy_ZB1(player, mp),
+			m_pModZBB(mp)
 	{
-		m_pModZBB->m_BuildingInterfaces[player->entindex()] = this;
+		m_pModZBB->m_BuildingInterfaces[player->entindex()] = nullptr;
 	}
 
-private:
-	CMod_ZombieBaseBuilder * const m_pModZBB;
-
-public:
-	bool IsBuilding() override
+	~CPlayerModStrategy_ZBB() override
 	{
-		return m_bIsBuilding;
-	}
-	CBaseEntity *CurrentTarget() override
-	{
-		return m_pPointingTarget;
+		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = nullptr;
 	}
 
 private:
 	void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) override
 	{
-		auto bitsCurButton = cmd->buttons;
-		auto bitsOldButton = m_pPlayer->pev->oldbuttons;
+		auto &bitsCurButton = cmd->buttons;
+		auto &bitsOldButton = m_pPlayer->pev->oldbuttons;
 
-		if (m_bIsBuilding)
-		{
-			if (bitsCurButton & IN_ATTACK)
-			{
-				m_flBuildDistance += BUILD_PUSHPULLRATE;
-				if (m_flBuildDistance > BUILD_MAXDIST)
-				{
-					m_flBuildDistance = BUILD_MAXDIST;
-				}
-				bitsCurButton &= ~IN_ATTACK;
-			}
-			else if (bitsCurButton & IN_ATTACK2)
-			{
-				m_flBuildDistance -= BUILD_PUSHPULLRATE;
-				if (m_flBuildDistance < BUILD_SETDIST)
-				{
-					m_flBuildDistance = BUILD_SETDIST;
-				}
-				bitsCurButton &= ~IN_ATTACK2;
-			}
-			cmd->buttons = bitsCurButton;
-		}
-
-		// Press USE
-		if (bitsCurButton & ~bitsOldButton & IN_USE)
-		{
-			Build_Start();
-		}
-		// Release USE
-		else if (m_bIsBuilding && !(bitsCurButton & IN_USE))
-		{
-			Build_End();
-		}
+		if(m_pZBB_Delegate)
+			m_pZBB_Delegate->ButtonEvent(bitsCurButton, bitsOldButton);
 
 		return CPlayerModStrategy_ZB1::CmdStart(cmd, random_seed);
 	}
@@ -164,117 +167,52 @@ private:
 		CPlayerModStrategy_ZB1::UpdateClientData(sendweapons, cd, pevOrg);
 
 		// MoeMod : hack the client prediction
-		if (IsBuilding())
+		if (m_pZBB_Delegate && m_pZBB_Delegate->IsBuilding())
 			cd->m_flNextAttack = gpGlobals->time + 0.01f;
 	}
 
 	void OnThink() override
 	{
-		Build_Update();
+		CPlayerModStrategy_ZB1::OnThink();
 	}
 
-	bool m_bCanBuild = true;
-	bool m_bIsBuilding = false;
-	float m_flBuildDistance;
-	CBaseEntity* m_pPointingTarget;
-	Vector m_vecOffset;
-	float m_flBuildDelay;
-
-	static constexpr auto BUILD_DELAY = 0.75;
-	static constexpr auto BUILD_MAXDIST = 720;
-	static constexpr auto BUILD_MINDIST = 30;
-	static constexpr auto BUILD_SETDIST = 64;
-	static constexpr auto BUILD_PUSHPULLRATE = 4.0;
-	
-	void Build_Start()
+	void OnPostThink() override
 	{
-		if (!m_bCanBuild || !m_pPlayer->IsAlive())
-			return;
-
-		if (m_bIsBuilding)
-			return;
-
-		CBaseEntity* pEntity = m_pPointingTarget;
-
-		if (!pEntity || pEntity->IsAlive() || !m_pModZBB->CanEntityBuild(pEntity))
-			return;
-
-		if (m_pModZBB->m_BuildingEntities.find(pEntity) != m_pModZBB->m_BuildingEntities.end())
-			return;
-
-		m_bIsBuilding = true;
-		m_pModZBB->m_BuildingEntities.emplace(pEntity, this);
+		if(m_pZBB_Delegate)
+			m_pZBB_Delegate->PostThink();
 	}
 
-	void Build_Update()
+	void BecomeZombie(ZombieLevel iEvolutionLevel) override
 	{
-		if (!m_bCanBuild || !m_pPlayer->IsAlive())
-		{
-			Build_End();
-			return;
-		}
+		auto sp = std::make_shared<CGhost_ZBB>(m_pPlayer);
+		m_pCharacter = sp;
+		m_pZBB_Delegate = sp;
 
-		const Vector vecStart = m_pPlayer->GetGunPosition();
-
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-		const Vector vecDir = gpGlobals->v_forward;
-		const Vector vecEnd = vecStart + vecDir * BUILD_MAXDIST;
-
-		TraceResult tr{};
-		UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
-
-		if (tr.flFraction >= 1)
-		{
-			UTIL_TraceHull(vecStart, vecEnd, dont_ignore_monsters, head_hull, m_pPlayer->edict(), &tr);
-		}
-
-		if (m_bIsBuilding)
-		{
-			const Vector vecLook = tr.vecEndPos;
-
-			float flLength = (vecLook - vecStart).Length();
-			if (flLength == 0.0) flLength = 1.0;
-			const Vector vecNewOrigin = (vecStart + (vecLook - vecStart) * m_flBuildDistance / flLength) + m_vecOffset;
-
-			g_engfuncs.pfnSetOrigin(m_pPointingTarget->edict(), vecNewOrigin);
-		}
-		else
-		{
-			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-			if (!pEntity || pEntity->IsAlive() || !m_pModZBB->CanEntityBuild(pEntity))
-			{
-				m_pPointingTarget = nullptr;
-				return;
-			}
-
-			m_pPointingTarget = pEntity;
-			m_vecOffset = pEntity->pev->origin - tr.vecEndPos;
-			m_flBuildDistance = (tr.vecEndPos - vecStart).Length();
-
-			if (m_flBuildDistance < BUILD_MINDIST)
-				m_flBuildDistance = BUILD_SETDIST;
-		}
+		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = g_pDelegateGhostShared;
 	}
 
-	void Build_End()
+	void BecomeHuman() override
 	{
-		if (!m_bIsBuilding)
-			return;
+		auto sp = std::make_shared<CHuman_ZBB>(m_pPlayer, m_pModZBB);
+		m_pCharacter = sp;
+		m_pZBB_Delegate = sp;
 
-		CBaseEntity * pEntity = m_pPointingTarget;
-
-		const Vector vecAngles = pEntity->pev->angles;
-		DispatchSpawn(pEntity->edict());
-		pEntity->pev->angles = vecAngles;
-
-		m_bIsBuilding = false;
-		m_pPointingTarget = nullptr;
-		m_pModZBB->m_BuildingEntities.erase(pEntity);
+		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = &sp->m_Build;
 	}
+
+private:
+	CMod_ZombieBaseBuilder * const m_pModZBB;
+	std::shared_ptr<IZombieModeCharacter_ZBB_ExtraDelegate> m_pZBB_Delegate;
 };
 
 void CMod_ZombieBaseBuilder::InstallPlayerModStrategy(CBasePlayer *player)
 {
 	std::unique_ptr<CPlayerModStrategy_ZBB> up(new CPlayerModStrategy_ZBB(player, this));
 	player->m_pModStrategy = std::move(up);
+}
+
+BOOL CMod_ZombieBaseBuilder::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
+{
+	// skip zb1 infection...
+	return IBaseMod::FPlayerCanTakeDamage(pPlayer, pAttacker);
 }

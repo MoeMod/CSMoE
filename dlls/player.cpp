@@ -4333,6 +4333,8 @@ void CBasePlayer::UpdatePlayerSound()
 
 void CBasePlayer::PostThink()
 {
+	m_pModStrategy->OnPostThink();
+
 	// intermission or finale
 	if (g_fGameOver)
 		goto pt_end;

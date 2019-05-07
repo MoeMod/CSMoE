@@ -45,6 +45,7 @@ public:
 	virtual void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) = 0;
 	virtual void OnResetMaxSpeed() = 0;
 	virtual void OnInitHUD() = 0;
+	virtual void OnPostThink() = 0;
 
 	virtual void CheckBuyZone() = 0;
 	virtual bool CanPlayerBuy(bool display) = 0;
@@ -60,6 +61,7 @@ public:
 
 	virtual void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) = 0;
 	virtual void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) = 0;
+
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -74,6 +76,7 @@ public:
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override {}
 	void OnResetMaxSpeed() override {}
 	void OnInitHUD() override {}
+	void OnPostThink() override {}
 
 	void CheckBuyZone() override;
 	bool CanPlayerBuy(bool display) override;

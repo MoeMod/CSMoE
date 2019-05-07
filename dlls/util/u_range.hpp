@@ -18,19 +18,29 @@ GNU General Public License for more details.
 
 #include "u_iterator.hpp"
 #include "u_functor.hpp"
+#include "u_ebobase.hpp"
 
 namespace moe
 {
 	namespace range
 	{
 		using iterator::Enum_Iterator;
-		struct PlayersList
+		template<class Enumer>
+		struct EntityList : private EBOBase<Enumer>
+        {
+			template<class...Args> explicit EntityList(Args &&...args) : EBOBase<Enumer>(Enumer(std::forward<Args>(args)...)) {}
+			Enum_Iterator<Enumer> begin() const  { return Enum_Iterator<Enumer> (EBOBase<Enumer>::get()(nullptr), EBOBase<Enumer>::get() ); }
+			Enum_Iterator<Enumer> end() const { return Enum_Iterator<Enumer> (nullptr, EBOBase<Enumer>::get() ); }
+		};
+
+		struct PlayersList : EntityList<Enumer_Player> {};
+
+		/*struct PlayersList
 		{
 			Enum_Iterator<Enumer_Player> begin() const { return Enum_Iterator<Enumer_Player> (Enumer_Player()(nullptr), Enumer_Player() ); }
 			Enum_Iterator<Enumer_Player> end() const { return Enum_Iterator<Enumer_Player> (nullptr, Enumer_Player() ); }
-		};
+		};*/
 	}
-
 }
 
 #endif //PROJECT_U_RANGE_HPP

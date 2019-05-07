@@ -77,7 +77,15 @@ int CHudNVG::Draw(float flTime)
 
 	if (g_PlayerExtraInfo[idx].zombie)
 	{
-		r = 225, g = 50, b = 50, a = 110;
+		auto view = gEngfuncs.GetViewModel();
+		if(view && view->model)
+		{
+			r = 225, g = 50, b = 50, a = 110;
+		}
+		else
+		{
+			r = 90, g = 90, b = 190, a = 100;
+		}
 		bNewLight = true;
 	}
 
