@@ -1689,6 +1689,11 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 							}
 
 					}
+
+					if( touch_3dtouch_attack_pressure->value > 0.0f )
+					{
+						Cbuf_AddText("-attack\n");
+					}
 				}
 			}
 		}
