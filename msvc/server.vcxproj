@@ -251,7 +251,8 @@
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_speed.cpp" />
     <ClCompile Include="..\dlls\gamemode\zb2\zb2_zclass_tank.cpp" />
-    <ClCompile Include="..\dlls\gamemode\zbb\basebuilder.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zbb\zbb_basebuilder.cpp" />
+    <ClCompile Include="..\dlls\gamemode\zbb\zbb_ghost.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_entity.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\monster_manager.cpp" />
     <ClCompile Include="..\dlls\gamemode\zbs\zs_subs.cpp" />
@@ -671,7 +672,8 @@
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_zclass.h" />
     <ClInclude Include="..\dlls\gamemode\zb3\zb3_const.h" />
     <ClInclude Include="..\dlls\gamemode\zb3\zb3_morale.h" />
-    <ClInclude Include="..\dlls\gamemode\zbb\basebuilder.h" />
+    <ClInclude Include="..\dlls\gamemode\zbb\zbb_basebuilder.h" />
+    <ClInclude Include="..\dlls\gamemode\zbb\zbb_ghost.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_entity.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\monster_manager.h" />
     <ClInclude Include="..\dlls\gamemode\zbs\zbs_const.h" />

@@ -670,7 +670,10 @@
     <ClCompile Include="..\dlls\gamemode\mod_zbb.cpp">
       <Filter>dlls\gamemode</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\gamemode\zbb\basebuilder.cpp">
+    <ClCompile Include="..\dlls\gamemode\zbb\zbb_ghost.cpp">
+      <Filter>dlls\gamemode\zbb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbb\zbb_basebuilder.cpp">
       <Filter>dlls\gamemode\zbb</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1425,7 +1428,10 @@
     <ClInclude Include="..\dlls\gamemode\mod_zbb.h">
       <Filter>dlls\gamemode</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\gamemode\zbb\basebuilder.h">
+    <ClInclude Include="..\dlls\gamemode\zbb\zbb_basebuilder.h">
+      <Filter>dlls\gamemode\zbb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbb\zbb_ghost.h">
       <Filter>dlls\gamemode\zbb</Filter>
     </ClInclude>
   </ItemGroup>
