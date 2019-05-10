@@ -71,6 +71,9 @@
     <Filter Include="dlls\gamemode\zbb">
       <UniqueIdentifier>{dcab357c-5b1f-4c65-82eb-1a5562d7d7e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\gamemode\zb1">
+      <UniqueIdentifier>{81c74af9-4330-4121-a5fa-36fee5a453ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -675,6 +678,9 @@
     </ClCompile>
     <ClCompile Include="..\dlls\gamemode\zbb\zbb_basebuilder.cpp">
       <Filter>dlls\gamemode\zbb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zb1\zb1_countdown.cpp">
+      <Filter>dlls\gamemode\zb1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1433,6 +1439,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zbb\zbb_ghost.h">
       <Filter>dlls\gamemode\zbb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb1\zb1_countdown.h">
+      <Filter>dlls\gamemode\zb1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb1\zb1_zclass.h">
+      <Filter>dlls\gamemode\zb1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zb1\zb1_const.h">
+      <Filter>dlls\gamemode\zb1</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

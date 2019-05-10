@@ -32,8 +32,12 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+
 CMod_Zombi::CMod_Zombi() // precache
+	: m_Countdown (this, std::unique_ptr<CZB1CountdownDelegate>(new CZB1CountdownDelegate(this)) )
 {
+	m_Countdown.SetCounts(20);
+
 	PRECACHE_SOUND("zombi/human_death_01.wav");
 	PRECACHE_SOUND("zombi/human_death_02.wav");
 	PRECACHE_GENERIC("sound/Zombi_Ambience.mp3");
@@ -94,42 +98,9 @@ void CMod_Zombi::Think()
 {
 	//IBaseMod::Think();
 
-	static int iLastCountDown = -1;
-	int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
-
-	if (iCountDown != iLastCountDown)
-	{
-		iLastCountDown = iCountDown;
-		if (iCountDown > 0 && iCountDown < 20 && !m_bFreezePeriod)
-		{
-
-			UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Zombie Selection: %s1 Sec", UTIL_dtos1(20 - iCountDown)); // #CSO_ZombiSelectCount
-
-			static const char *szCountDownSound[11] = {
-				"", "one", "two", "three", "four", "five", "six",
-				"seven", "eight", "nine", "ten"
-			};
-
-			if (iCountDown == 1)
-			{
-				for(CBasePlayer *player : moe::range::PlayersList())
-					CLIENT_COMMAND(player->edict(), "spk zombi_start\n");
-
-			}
-			else if (iCountDown >= 10)
-			{
-				for(CBasePlayer *player : moe::range::PlayersList())
-					CLIENT_COMMAND(player->edict(), "spk %s\n", szCountDownSound[20 - iCountDown]);
-
-			}
-		}
-		else if (iCountDown == 20)
-		{
-			// select zombie
-			PickZombieOrigin();
-		}
+	m_Countdown.Think();
+	if(!m_Countdown.IsExpired())
 		TeamCheck();
-	}
 
 	if (CheckGameOver())   // someone else quit the game already
 		return;
@@ -245,8 +216,7 @@ void CMod_Zombi::CheckWinConditions()
 
 BOOL CMod_Zombi::FInfectionStarted()
 {
-	const int iCountDown = static_cast<int>(gpGlobals->time - m_fRoundCount);
-	return iCountDown > 20;
+	return m_Countdown.IsExpired();
 }
 
 void CMod_Zombi::RoundEndScore(int iWinStatus)
@@ -516,4 +486,21 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	
 
 	return iReturn;
+}
+
+void CZB1CountdownDelegate::OnCountdownStart()
+{
+	for (CBasePlayer* player : moe::range::PlayersList())
+		CLIENT_COMMAND(player->edict(), "spk zombi_start\n");
+}
+
+inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)
+{
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Zombie Selection: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
+}
+
+inline void CZB1CountdownDelegate::OnCountdownEnd()
+{
+	// select zombie
+	m_pMod->PickZombieOrigin();
 }

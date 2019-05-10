@@ -27,9 +27,43 @@ GNU General Public License for more details.
 #include "dlls/gamemode/zbb/zbb_basebuilder.h"
 #include "dlls/gamemode/zbb/zbb_ghost.h"
 
+#include "util/u_range.hpp"
+
+class CZBBCountdownDelegate : public CZB1CountdownDelegate
+{
+public:
+	using CZB1CountdownDelegate::CZB1CountdownDelegate;
+	void OnCountdownStart() override
+	{
+		//return CZB1CountdownDelegate::OnCountdownStart();
+	}
+	void OnCountdownChanged(int iCurrentCount) override
+	{
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Building Phrase: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
+		//return CZB1CountdownDelegate::OnCountdownChanged(iCurrentCount);
+	}
+	void OnCountdownEnd() override
+	{
+		// respawn everyone
+		for (CBasePlayer* pPlayer : moe::range::PlayersList())
+		{
+			if (pPlayer->IsAlive())
+			{
+				pPlayer->Spawn();
+			}
+		}
+		// choose ghosts...
+		CZB1CountdownDelegate::OnCountdownEnd();
+	}
+};
+
 CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() // precache
 {
-	LIGHT_STYLE(0, "d");
+	LIGHT_STYLE(0, "i");
+
+	m_Countdown.SetCounts(100);
+	std::unique_ptr<CZBBCountdownDelegate> pd(new CZBBCountdownDelegate(this));
+	m_Countdown.SetDelegate(std::move(pd));
 }
 
 BOOL CMod_ZombieBaseBuilder::IsAllowedToSpawn(CBaseEntity *pEntity)

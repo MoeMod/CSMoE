@@ -78,6 +78,9 @@ void CGhost_ZBB::DeathSound_Zombie()
 
 void CGhost_ZBB::Think()
 {
+	if (!m_pPlayer->m_bNightVisionOn)
+		return;
+
 	for(CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_ClassName<CBaseEntity>>("func_wall"))
 	{
 		pEntity->pev->groupinfo |=  (1 << m_pPlayer->entindex());
@@ -86,6 +89,9 @@ void CGhost_ZBB::Think()
 
 void CGhost_ZBB::PostThink()
 {
+	if (!m_pPlayer->m_bNightVisionOn)
+		return;
+
 	for(CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_ClassName<CBaseEntity>>("func_wall"))
 	{
 		pEntity->pev->groupinfo &=  ~(1 << m_pPlayer->entindex());

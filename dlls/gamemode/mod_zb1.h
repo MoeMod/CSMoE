@@ -21,6 +21,7 @@ GNU General Public License for more details.
 
 #include "mod_base.h"
 #include "zb1/zb1_zclass.h"
+#include "zb1/zb1_countdown.h"
 
 #include <vector>
 #include <utility>
@@ -50,7 +51,7 @@ public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
-protected:
+public:
 	virtual size_t ZombieOriginNum();
 	virtual void PickZombieOrigin();
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
@@ -69,6 +70,7 @@ protected:
 
 public:
 	EventDispatcher<void(CBasePlayer *who, ZombieLevel iEvolutionLevel)> m_eventBecomeZombie;
+	CModCountdownHelper m_Countdown;
 };
 
 class CPlayerModStrategy_ZB1 : public CPlayerModStrategy_Zombie
@@ -96,6 +98,17 @@ public:
 	virtual void BecomeHuman();
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
+};
+
+class CZB1CountdownDelegate : public ICountdownDelegate
+{
+public:
+	CZB1CountdownDelegate(CMod_Zombi* mod) : m_pMod(mod) {}
+	void OnCountdownStart() override;
+	void OnCountdownChanged(int iCurrentCount) override;
+	void OnCountdownEnd() override;
+protected:
+	CMod_Zombi* const m_pMod;
 };
 
 #endif
