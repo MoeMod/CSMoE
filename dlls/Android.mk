@@ -247,10 +247,14 @@ LOCAL_SRC_FILES := \
 	./gamemode/zb2/zb2_zclass.cpp \
 	./gamemode/zb2/zb2_zclass_tank.cpp \
 	./gamemode/zb2/zb2_zclass_speed.cpp \
+	./gamemode/mod_zbb.cpp \
 	./weapons_moe_buy.cpp \
-    	./weapons_precache.cpp \
+    ./weapons_precache.cpp \
 	./wpn_shared/wpn_m14ebr.cpp \
 	./wpn_shared/wpn_infinityex2.cpp \
+	./gamemode/zbb/zbb_basebuilder.cpp \
+    ./gamemode/zbb/zbb_ghost.cpp \
+    ./gamemode/zb1/zb1_countdown.cpp \
 
 
 include $(BUILD_SHARED_LIBRARY)

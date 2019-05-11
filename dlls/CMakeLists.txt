@@ -180,7 +180,8 @@ set(HLDLL_SRCS
 	./weapons_moe_buy.cpp
 	./weapons_precache.cpp
 	./gamemode/zbb/zbb_basebuilder.cpp
-	./gamemode/zbb/zbb_ghost.cpp
+		./gamemode/zbb/zbb_ghost.cpp
+		./gamemode/zb1/zb1_countdown.cpp
 	)
 
 file (GLOB HLWPN_SRCS

@@ -166,7 +166,7 @@ int CMod_ZombieBaseBuilder::AddToFullPack_Post(struct entity_state_s *state, int
 
 bool CMod_ZombieBaseBuilder::CanEntityBuild(CBaseEntity *pEntity)
 {
-	return static_cast<bool>(FClassnameIs(pEntity->edict(), "func_wall"));
+	return pEntity && static_cast<bool>(FClassnameIs(pEntity->edict(), "func_wall"));
 }
 
 class CPlayerModStrategy_ZBB : public CPlayerModStrategy_ZB1
