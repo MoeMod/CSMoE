@@ -39,7 +39,7 @@ option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OF
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 
 # Desktop or dedicated version options
-if(XASH_DEDICATED) 
+if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
 else()
@@ -390,7 +390,10 @@ if(XASH_USE_STB_SPRINTF)
 	add_definitions(-DXASH_USE_STB_SPRINTF)
 endif()
 
-if(NOT WIN32)
+
+if(ANDROID)
+	target_link_libraries(${XASH_ENGINE} -ldl -llog)
+elseif(NOT WIN32)
 	if(NOT HAIKU)
 		target_link_libraries(${XASH_ENGINE} -lm -lpthread)
 	else()

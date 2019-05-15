@@ -26,7 +26,7 @@ project (client)
 
 set(CMAKE_CXX_STANDARD 11)
 
-if (APPLE)
+if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
@@ -47,11 +47,7 @@ set (CLDLL_LIBRARY client)
 ################\
 set(GAMEDIR "csmoe" CACHE STRING "Gamedir path")
 set(CLIENT_INSTALL_DIR "cl_dlls" CACHE STRING "Where put client dll")
-if(XASH_64BIT)
-	set(CLIENT_LIBRARY_NAME "client64" CACHE STRING "Library name for 64bit")
-else()
-	set(CLIENT_LIBRARY_NAME "client" CACHE STRING "Library name for 32bit")
-endif()
+set(CLIENT_LIBRARY_NAME "client" CACHE STRING "Library name for client")
 
 #-----------------
 # MAIN BUILD CODE \
@@ -176,7 +172,7 @@ include_directories (
 	)
 add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
 
-if(APPLE)
+if(APPLE OR ANDROID)
 	add_definitions(
 			-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
 	)
@@ -210,7 +206,21 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 
 target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
 
-set_target_properties(${CLDLL_LIBRARY} PROPERTIES
-		PREFIX "" OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
+if(ANDROID OR IOS)
+	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+			OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
+else()
+	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+			PREFIX "" OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
+endif()
+
+if(XASH_64BIT AND NOT ANDROID AND NOT IOS)
+	get_target_property(CLIENT_LIBRARY_NAME ${CLDLL_LIBRARY} OUTPUT_NAME)
+	if(NOT CLIENT_LIBRARY_NAME)
+		set(CLIENT_LIBRARY_NAME ${CLDLL_LIBRARY})
+	endif()
+	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+			OUTPUT_NAME ${CLIENT_LIBRARY_NAME}64)
+endif()
 
 install( TARGETS ${CLDLL_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${CLIENT_INSTALL_DIR} )

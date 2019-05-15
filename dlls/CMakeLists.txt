@@ -25,7 +25,7 @@ cmake_minimum_required(VERSION 3.1.3)
 project (SERVER)
 set(CMAKE_CXX_STANDARD 11)
 
-if (APPLE)
+if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
@@ -40,10 +40,12 @@ set (SERVER_LIBRARY server)
 ################\
 set(GAMEDIR "csmoe" CACHE STRING "Gamedir path")
 set(SERVER_INSTALL_DIR "dlls" CACHE STRING "Where put server dll")
-if(NOT WIN32)
-set(SERVER_LIBRARY_NAME "cs" CACHE STRING "Library name for Linux/MacOS")
+if(ANDROID OR IOS)
+	set(SERVER_LIBRARY_NAME "server" CACHE STRING "Library name for Android/iOS")
+elseif(NOT WIN32)
+	set(SERVER_LIBRARY_NAME "cs" CACHE STRING "Library name for Linux/MacOS")
 else()
-set(SERVER_LIBRARY_NAME "mp" CACHE STRING "Library name for Windows")
+	set(SERVER_LIBRARY_NAME "mp" CACHE STRING "Library name for Windows")
 endif()
 
 #-----------------
@@ -231,7 +233,7 @@ include_directories (
 	../game_shared/)
 add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
 
-if(APPLE)
+if(APPLE OR ANDROID)
 	add_definitions(
 		-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
 		-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
@@ -272,7 +274,12 @@ add_definitions(
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
 
-set_target_properties(${SERVER_LIBRARY} PROPERTIES
-		PREFIX "" OUTPUT_NAME ${SERVER_LIBRARY_NAME})
+if(ANDROID OR IOS)
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES
+			OUTPUT_NAME ${SERVER_LIBRARY_NAME})
+else()
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES
+			PREFIX "" OUTPUT_NAME ${SERVER_LIBRARY_NAME})
+endif()
 
 install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${SERVER_INSTALL_DIR})
