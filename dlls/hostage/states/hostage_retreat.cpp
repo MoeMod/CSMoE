@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void HostageRetreatState::OnEnter(CHostageImprov *improv)
 {
 	improv->Walk();
@@ -100,4 +102,6 @@ void HostageRetreatState::OnUpdate(CHostageImprov *improv)
 void HostageRetreatState::OnExit(CHostageImprov *improv)
 {
 	;
+}
+
 }

@@ -227,7 +227,11 @@ void IN_Move( float frametime, usercmd_t *cmd )
 	ac_movecount = 0;
 }
 
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT IN_MouseEvent_CL( int mstate )
+#else
 void DLLEXPORT IN_MouseEvent( int mstate )
+#endif
 {
 	static int mouse_oldbuttonstate;
 	// perform button actions
@@ -255,12 +259,20 @@ void DLLEXPORT IN_ClearStates ( void )
 	//gEngfuncs.Con_Printf("IN_ClearStates\n");
 }
 
-void  DLLEXPORT IN_ActivateMouse ( void )
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_ActivateMouse_CL ( void )
+#else
+void DLLEXPORT  IN_ActivateMouse ( void )
+#endif
 {
 	//gEngfuncs.Con_Printf("IN_ActivateMouse\n");
 }
 
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_DeactivateMouse_CL ( void )
+#else
 void DLLEXPORT  IN_DeactivateMouse ( void )
+#endif
 {
 	//gEngfuncs.Con_Printf("IN_DeactivateMouse\n");
 }

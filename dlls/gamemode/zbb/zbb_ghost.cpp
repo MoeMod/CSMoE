@@ -21,6 +21,8 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+namespace sv {
+
 class : public IPlayerBuildingDelegate
 {
 public:
@@ -112,4 +114,6 @@ void CGhost_ZBB::GiveDefaultItems()
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
 	m_pPlayer->m_bHasNightVision = true;
 	SendItemStatus(m_pPlayer);
+}
+
 }

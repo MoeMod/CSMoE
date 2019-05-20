@@ -6,6 +6,12 @@
 
 #include "weapons/WeaponTemplate.hpp"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 /*class CXM8SharpShooter : public
 		TReloadDefault<CXM8SharpShooter,
 		TSecondaryAttackSniperZoom2<CXM8SharpShooter,
@@ -85,5 +91,7 @@ public:
 private:
 	unsigned short m_usFireSG550;
 };
+
+}
 
 #endif

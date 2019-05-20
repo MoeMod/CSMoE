@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 static const char *SOUND_NAME = "weapons/mg3-1";
 
 enum m249_e
@@ -89,4 +91,6 @@ void EV_FireMG3(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

@@ -28,10 +28,18 @@
 #pragma warning(disable : 4305)
 #endif
 
+#if defined(CLIENT_DLL)
+namespace cl {
+#elif defined(SERVER_DLL)
+namespace sv {
+#elif defined(__cplusplus)
+extern "C" {
+#endif
+
 extern playermove_t *pmove;
 
 // Expand debugging BBOX particle hulls by this many units.
-#define BOX_GAP 0.0f               
+#define BOX_GAP 0.0f
 
 static int PM_boxpnt[6][4] =
 {
@@ -41,7 +49,7 @@ static int PM_boxpnt[6][4] =
 	{ 7, 5, 1, 3 }, // -X
 	{ 7, 3, 2, 6 }, // -Y
 	{ 7, 6, 4, 5 }, // -Z
-};	
+};
 
 void PM_ShowClipBox( void )
 {
@@ -109,7 +117,7 @@ void PM_ParticleLine(vec3_t start, vec3_t end, int pcolor, float life, float ver
 	// Determine distance;
 
 	VectorSubtract(end, start, diff);
-	
+
 	len = VectorNormalize(diff);
 
 	curdist = 0;
@@ -117,7 +125,7 @@ void PM_ParticleLine(vec3_t start, vec3_t end, int pcolor, float life, float ver
 	{
 		for (i = 0; i < 3; i++)
 			curpos[i] = start[i] + curdist * diff[i];
-		
+
 		pmove->PM_Particle( curpos, pcolor, life, 0, vert);
 		curdist += linestep;
 	}
@@ -237,7 +245,7 @@ PM_DrawBBox(vec3_t mins, vec3_t maxs, vec3_t origin, int pcolor, float life)
 void PM_DrawBBox(vec3_t mins, vec3_t maxs, vec3_t origin, int pcolor, float life)
 {
 	int j;
-	
+
 	vec3_t tmp;
 	vec3_t		p[8];
 	float gap = BOX_GAP;
@@ -312,7 +320,7 @@ void PM_ViewEntity( void )
 	{
 		pcolor = 111;
 	}
-	
+
 	// Draw the hull or bbox.
 	if (trace.ent > 0)
 	{
@@ -320,4 +328,8 @@ void PM_ViewEntity( void )
 	}
 }
 
+#endif
+
+#ifdef __cplusplus
+} // namespace cl | sv | extern "C"
 #endif

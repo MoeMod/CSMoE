@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 extern const Vector g_vecZero;
 extern int g_Language;
 
@@ -41,5 +43,7 @@ extern int gDisplayTitle;
 extern BOOL g_fGameOver;
 extern bool g_bIsCzeroGame;
 extern bool g_bEnableCSBot;
+
+}
 
 #endif // GLOBALS_H

@@ -35,6 +35,8 @@
 #include "hostage/hostage.h"
 #include "hostage/hostage_states.h"
 
+namespace sv {
+
 class CHostage;
 //enum HostageChatterType;
 
@@ -366,7 +368,7 @@ public:
 		const float space = 1.0f;
 		Vector to;
 		float range;
-		
+
 		if (entity == reinterpret_cast<CBaseEntity *>(m_improv->GetEntity()))
 			return true;
 
@@ -437,5 +439,7 @@ private:
 	Vector m_dir;
 	bool m_isBlocked;
 };
+
+}
 
 #endif // HOSTAGE_IMPROV_H

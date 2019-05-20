@@ -20,10 +20,11 @@ GNU General Public License for more details.
 #include "u_functor.hpp"
 #include "u_ebobase.hpp"
 
-namespace moe
-{
+namespace sv {
+namespace moe {
 	namespace range
 	{
+		using namespace ::moe;
 		using iterator::Enum_Iterator;
 		template<class Enumer>
 		struct EntityList : private EBOBase<Enumer>
@@ -41,6 +42,7 @@ namespace moe
 			Enum_Iterator<Enumer_Player> end() const { return Enum_Iterator<Enumer_Player> (nullptr, Enumer_Player() ); }
 		};*/
 	}
+}
 }
 
 #endif //PROJECT_U_RANGE_HPP

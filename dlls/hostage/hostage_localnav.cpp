@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -909,4 +911,6 @@ void CLocalNav::HostagePrethink()
 			GetClassPtr<CHostage>(hostages[ iCount ]->pev)->PreThink();
 		}
 	}
+}
+
 }

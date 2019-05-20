@@ -33,6 +33,8 @@
 #include "vgui_parser.h"
 #include "com_weapons.h"
 
+using namespace cl;
+
 extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
 

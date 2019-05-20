@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "zb2_zclass.h"
 #include "player/player_zombie.h"
 
+namespace sv {
 
 void ZombieSkill_Precache()
 {
@@ -160,5 +161,7 @@ float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 		return 1.6f;
 	return 1.0f;
+}
+
 }
 

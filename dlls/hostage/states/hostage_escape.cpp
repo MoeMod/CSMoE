@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void HostageEscapeToCoverState::OnEnter(CHostageImprov *improv)
 {
 	CNavPath path;
@@ -228,4 +230,6 @@ void HostageEscapeState::OnUpdate(CHostageImprov *improv)
 void HostageEscapeState::OnExit(CHostageImprov *improv)
 {
 	improv->Run();
+}
+
 }

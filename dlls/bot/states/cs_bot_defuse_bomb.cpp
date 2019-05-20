@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Begin defusing the bomb
 
 void DefuseBombState::OnEnter(CCSBot *me)
@@ -122,4 +124,6 @@ void DefuseBombState::OnExit(CCSBot *me)
 	me->SetTask(CCSBot::SEEK_AND_DESTROY);
 	me->SetDisposition(CCSBot::ENGAGE_AND_INVESTIGATE);
 	me->ClearLookAt();
+}
+
 }

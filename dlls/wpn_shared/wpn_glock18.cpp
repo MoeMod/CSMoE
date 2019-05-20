@@ -21,6 +21,12 @@
 #include "wpn_glock18.h"
 
 #ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+#ifdef CLIENT_DLL
 extern bool g_bGlockBurstMode;
 #endif
 
@@ -321,4 +327,6 @@ void CGLOCK18::WeaponIdle(void)
 			SendWeaponAnim(GLOCK18_IDLE2, UseDecrement() != FALSE);
 		}
 	}
+}
+
 }

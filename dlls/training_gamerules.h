@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CHalfLifeTraining: public CHalfLifeMultiplay
 {
 public:
@@ -48,7 +50,7 @@ public:
 	virtual int ItemShouldRespawn(CItem *pItem);
 	virtual void CheckMapConditions() {};
 	virtual void CheckWinConditions();
-   
+
 public:
 	static void HostageDied();
 	static bool PlayerCanBuy(CBasePlayer *pPlayer);
@@ -89,7 +91,7 @@ public:
 	virtual int Save(CSave &save);
 	virtual int Restore(CRestore &restore);
 	virtual void Touch(CBaseEntity *pOther);
-   
+
 public:
 	static TYPEDESCRIPTION m_SaveData[6];
 
@@ -101,5 +103,7 @@ private:
 	int iItemCount;
 	int iAnyWeapon;
 };
+
+}
 
 #endif // TRAINING_GAMERULES_H

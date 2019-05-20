@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // range for snipers to select a hiding spot
 const float sniperHideRange = 2000.0f;
 
@@ -822,4 +824,6 @@ void IdleState::OnUpdate(CCSBot *me)
 
 	// if we have nothing special to do, go hunting for enemies
 	me->Hunt();
+}
+
 }

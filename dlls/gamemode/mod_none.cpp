@@ -10,6 +10,8 @@
 
 #include <algorithm>
 
+namespace sv {
+
 void CMod_None::CheckMapConditions()
 {
 	IBaseMod::CheckMapConditions();
@@ -51,5 +53,7 @@ void CMod_None::UpdateGameMode(CBasePlayer *pPlayer)
 	}
 
 	MESSAGE_END();
+}
+
 }
 

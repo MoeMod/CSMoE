@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //hegrenade
 #define HEGRENADE_MAX_SPEED		250
 #define HEGRENADE_MAX_SPEED_SHIELD	180
@@ -41,5 +47,7 @@ public:
 public:
 	unsigned short m_usCreateExplosion;
 };
+
+}
 
 #endif

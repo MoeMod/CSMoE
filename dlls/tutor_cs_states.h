@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 enum TutorStateType
 {
 	TUTORSTATE_UNDEFINED = 0,
@@ -109,5 +111,7 @@ public:
 protected:
 	int HandleRoundStart(CBaseEntity *entity, CBaseEntity *other);
 };
+
+}
 
 #endif // TUTOR_CS_STATES_H

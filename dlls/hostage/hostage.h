@@ -34,6 +34,8 @@
 
 enum GameEventType : int; // #include "game_shared/GameEvent.h"
 
+namespace sv {
+
 #define MAX_NODES			100
 #define MAX_HOSTAGES			12
 #define MAX_HOSTAGES_NAV		20
@@ -278,5 +280,7 @@ private:
 
 void Hostage_RegisterCVars();
 void InstallHostageManager();
+
+}
 
 #endif // HOSTAGE_H

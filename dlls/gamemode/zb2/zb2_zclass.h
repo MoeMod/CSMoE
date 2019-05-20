@@ -19,6 +19,8 @@ GNU General Public License for more details.
 #include "gamemode/zb1/zb1_zclass.h"
 #include "gamemode/zb2/zb2_const.h"
 
+namespace sv {
+
 class IZombieModeCharacter_ZB2_Extra
 {
 public:
@@ -73,5 +75,6 @@ void HumanSkill_Precache();
 
 std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name = nullptr);
 
+}
 
 #endif //PROJECT_ZCLASS_H

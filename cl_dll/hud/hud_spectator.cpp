@@ -35,12 +35,13 @@ extern "C"
 #pragma warning(disable: 4244)
 #endif
 
-extern "C"
+namespace cl
 {
 	extern int		iJumpSpectator;
 	extern float	vJumpOrigin[3];
 	extern float	vJumpAngles[3];
 }
+using namespace cl;
 
 extern void V_GetInEyePos(int entity, float * origin, float * angles );
 extern void V_ResetChaseCam();

@@ -19,6 +19,8 @@
 #include "game_shared/bot/bot_constants.h"
 #include "game_shared/bot/bot.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -351,7 +353,7 @@ void CBot::ClientCommand(const char *cmd, const char *arg1, const char *arg2, co
 	BotArgs[3] = arg3;
 
 	UseBotArgs = true;
-	::ClientCommand(ENT(pev));
+	::sv::ClientCommand(ENT(pev));
 	UseBotArgs = false;
 }
 
@@ -547,4 +549,6 @@ bool ActiveGrenade::IsValid() const
 const Vector *ActiveGrenade::GetPosition() const
 {
 	return &m_entity->pev->origin;
+}
+
 }

@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 bool CCSBot::BhopJump_Start()
 {
 	// dont jump when bot_stop 1
@@ -234,4 +236,6 @@ bool CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 	}
 
 	return value;
+}
+
 }

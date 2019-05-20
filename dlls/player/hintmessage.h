@@ -15,6 +15,12 @@
 
 #include <UtlVector.h>
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CHintMessage
 {
 public:
@@ -45,3 +51,5 @@ private:
 	float m_tmMessageEnd;
 	CUtlVector<CHintMessage *> m_messages;
 };
+
+}

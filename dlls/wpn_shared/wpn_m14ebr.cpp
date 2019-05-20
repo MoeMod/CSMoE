@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m14ebr.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m14ebr_e
 {
 	M14EBR_IDLE1,
@@ -182,4 +188,6 @@ void CM14EBR::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(M14EBR_IDLE1, UseDecrement() != FALSE);
+}
+
 }

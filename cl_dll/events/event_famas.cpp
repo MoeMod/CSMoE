@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum famas_e
 {
 	FAMAS_IDLE = 0,
@@ -94,4 +96,6 @@ void EV_FireFAMAS( event_args_t *args )
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

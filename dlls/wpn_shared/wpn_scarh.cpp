@@ -24,6 +24,12 @@
 #include "gamemode/mods.h"
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum scar_e
 {
 	SCARL_IDLE1,
@@ -264,4 +270,6 @@ void CSCARHeavy::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(SCARH_IDLE1, UseDecrement() != FALSE);
+}
+
 }

@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_mp5navy.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum mp5n_e
 {
 	MP5N_IDLE1,
@@ -179,4 +185,6 @@ void CMP5N::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(MP5N_IDLE1, UseDecrement() != FALSE);
+}
+
 }

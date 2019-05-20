@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Lightweight maintenance, invoked frequently
 
 void CCSBot::Upkeep()
@@ -76,7 +78,7 @@ void CCSBot::Upkeep()
 		UpdateAimOffset();
 
 		// aim at enemy, if he's still alive
-		if (m_enemy != NULL)
+		if (m_enemy != nullptr)
 		{
 			float feetOffset = pev->origin.z - GetFeetZ();
 
@@ -473,12 +475,12 @@ void CCSBot::Update()
 	}
 
 	// Validate existing enemy, if any
-	if (m_enemy != NULL)
+	if (m_enemy != nullptr)
 	{
 		if (IsAwareOfEnemyDeath())
 		{
 			// we have noticed that our enemy has died
-			m_enemy = NULL;
+			m_enemy = nullptr;
 			m_isEnemyVisible = false;
 		}
 		else
@@ -521,7 +523,7 @@ void CCSBot::Update()
 
 	// if we have seen an enemy recently, keep an eye on him if we can
 	const float seenRecentTime = 3.0f;
-	if (m_enemy != NULL && GetTimeSinceLastSawEnemy() < seenRecentTime)
+	if (m_enemy != nullptr && GetTimeSinceLastSawEnemy() < seenRecentTime)
 	{
 		AimAtEnemy();
 	}
@@ -603,13 +605,13 @@ void CCSBot::Update()
 
 	// make way
 	const float avoidTime = 0.33f;
-	if (gpGlobals->time - m_avoidTimestamp < avoidTime && m_avoid != NULL)
+	if (gpGlobals->time - m_avoidTimestamp < avoidTime && m_avoid != nullptr)
 	{
 		StrafeAwayFromPosition(&m_avoid->pev->origin);
 	}
 	else
 	{
-		m_avoid = NULL;
+		m_avoid = nullptr;
 	}
 
 	if (m_isBhopJumping)
@@ -643,7 +645,7 @@ void CCSBot::Update()
 	UpdatePeripheralVision();
 
 	// Update gamestate
-	if (m_bomber != NULL)
+	if (m_bomber != nullptr)
 		GetChatter()->SpottedBomber(GetBomber());
 
 	if (CanSeeLooseBomb())
@@ -853,4 +855,6 @@ void CCSBot::Update()
 
 	// remember our prior safe time status
 	m_wasSafe = IsSafe();
+}
+
 }

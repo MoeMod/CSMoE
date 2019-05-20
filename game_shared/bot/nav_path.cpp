@@ -42,6 +42,8 @@
 
 #include "bot/cs_bot.h"
 
+namespace sv {
+
 // Determine actual path positions
 
 bool CNavPath::ComputePathPositions()
@@ -1144,4 +1146,6 @@ void CStuckMonitor::Update(CImprov *improv)
 
 	// always need to track this
 	m_lastCentroid = improv->GetCentroid();
+}
+
 }

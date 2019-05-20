@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CBaseTutorState
 {
 public:
@@ -64,5 +66,7 @@ public:
 protected:
 	CBaseTutorState *m_currentState;
 };
+
+}
 
 #endif // TUTOR_BASE_STATES_H

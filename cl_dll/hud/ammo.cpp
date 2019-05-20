@@ -32,6 +32,8 @@
 #include "com_weapons.h"
 #include "draw_util.h"
 
+using namespace cl;
+
 enum WeaponIdType
 {
 	WEAPON_NONE,
@@ -92,7 +94,10 @@ client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes
 WeaponsResource gWR;
 
 int g_weaponselect = 0;
+namespace cl {
 int g_iShotsFired;
+}
+
 
 void WeaponsResource :: LoadAllWeaponSprites( void )
 {

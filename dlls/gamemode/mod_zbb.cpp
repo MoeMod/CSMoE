@@ -29,6 +29,8 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+namespace sv {
+
 class CZBBCountdownDelegate : public CZB1CountdownDelegate
 {
 public:
@@ -249,4 +251,6 @@ BOOL CMod_ZombieBaseBuilder::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEnt
 {
 	// skip zb1 infection...
 	return IBaseMod::FPlayerCanTakeDamage(pPlayer, pAttacker);
+}
+
 }

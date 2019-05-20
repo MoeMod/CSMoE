@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -185,6 +187,9 @@ void BotBombStatusMeme::Interpret(CCSBot *pSender, CCSBot *pReceiver) const
 			}
 			break;
 		}
+		case CSGameState::PLANTED:break;
+		case CSGameState::DEFUSED:break;
+		case CSGameState::EXPLODED:break;
 	}
 }
 
@@ -2270,4 +2275,6 @@ void BotChatterInterface::FriendlyFire()
 	// give them time to react
 	say->SetStartTime(gpGlobals->time + RANDOM_FLOAT(0.3f, 0.5f));
 	AddStatement(say);
+}
+
 }

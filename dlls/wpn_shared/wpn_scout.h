@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //scout
 #define SCOUT_MAX_SPEED			260
 #define SCOUT_MAX_SPEED_ZOOM		220
@@ -40,5 +46,7 @@ public:
 private:
 	unsigned short m_usFireScout;
 };
+
+}
 
 #endif

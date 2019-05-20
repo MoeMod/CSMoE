@@ -14,10 +14,10 @@
 ****/
 #include "events.h"
 
+namespace cl {
+
 int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 
-
-//extern "C"
 
 	DECLARE_EVENT(FireAK47);
 	DECLARE_EVENT(FireAUG);
@@ -151,4 +151,6 @@ void Game_HookEvents( void )
 	HOOK_EVENT(infinityss, FireInfinityS);
 	HOOK_EVENT(infinitysb, FireInfinityS);
 	HOOK_EVENT(infinitysr, FireInfinityS);
+}
+
 }

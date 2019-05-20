@@ -8,6 +8,7 @@
 #include "pm_shared.h"
 #include "observer.h"
 
+namespace sv {
 
 int GetForceCamera(CBasePlayer *pObserver)
 {
@@ -311,7 +312,7 @@ void CBasePlayer::Observer_CheckTarget()
 void CBasePlayer::Observer_CheckProperties()
 {
 	// try to find a traget if we have no current one
-	if (pev->iuser1 == OBS_IN_EYE && m_hObserverTarget != NULL)
+	if (pev->iuser1 == OBS_IN_EYE && m_hObserverTarget != nullptr)
 	{
 		CBasePlayer *target = static_cast<CBasePlayer *>(UTIL_PlayerByIndex(m_hObserverTarget->entindex()));
 
@@ -469,12 +470,12 @@ void CBasePlayer::Observer_SetMode(int iMode)
 	}
 
 	// verify observer target again
-	if (m_hObserverTarget != NULL)
+	if (m_hObserverTarget != nullptr)
 	{
 		CBaseEntity *pEnt = m_hObserverTarget;
 
 		if (pEnt == this || !pEnt || pEnt->has_disconnected || ((CBasePlayer *)pEnt)->IsObserver() || (pEnt->pev->effects & EF_NODRAW) || (_forcecamera != CAMERA_MODE_SPEC_ANYONE && ((CBasePlayer *)pEnt)->m_iTeam != m_iTeam))
-			m_hObserverTarget = NULL;
+			m_hObserverTarget = nullptr;
 	}
 
 	// set spectator mode
@@ -502,7 +503,7 @@ void CBasePlayer::Observer_SetMode(int iMode)
 	// clear second target from death cam
 	pev->iuser3 = 0;
 
-	if (m_hObserverTarget != NULL)
+	if (m_hObserverTarget != nullptr)
 		UTIL_SetOrigin(pev, m_hObserverTarget->pev->origin);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgCrosshair, NULL, pev);
@@ -519,4 +520,6 @@ void CBasePlayer::Observer_SetMode(int iMode)
 
 	m_iObserverLastMode = iMode;
 	m_bWasFollowing = false;
+}
+
 }

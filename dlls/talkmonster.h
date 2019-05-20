@@ -32,10 +32,14 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CTalkMonster: public CBaseMonster
 {
 public:
 	static float g_talkWaitTime;
 };
+
+}
 
 #endif // TALKMONSTER_H

@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CCareerTask
 {
 public:
@@ -42,7 +44,7 @@ public:
 	virtual void OnEvent(GameEventType event, CBasePlayer *pAttacker, CBasePlayer *pVictim);
 	virtual void Reset();
 	virtual bool IsTaskCompletableThisRound() { return true; }
-   
+
 public:
 	static CCareerTask *NewTask(const char *taskName, GameEventType event, const char *weaponName, int n, bool mustLive, bool crossRounds, int id, bool isComplete);
 
@@ -147,5 +149,7 @@ struct TaskInfo
 };
 
 extern CCareerTaskManager *TheCareerTasks;
+
+}
 
 #endif // CAREER_TASK_H

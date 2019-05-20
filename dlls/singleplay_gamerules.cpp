@@ -8,6 +8,8 @@
 #include "skill.h"
 #include "items.h"
 
+namespace sv {
+
 CHalfLifeRules::CHalfLifeRules()
 {
 	m_bFreezePeriod = FALSE;
@@ -245,4 +247,6 @@ int CHalfLifeRules::PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarge
 BOOL CHalfLifeRules::FAllowMonsters()
 {
 	return TRUE;
+}
+
 }

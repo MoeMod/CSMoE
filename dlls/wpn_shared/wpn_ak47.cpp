@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_ak47.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum ak47_e
 {
 	AK47_IDLE1,
@@ -183,3 +189,5 @@ void CAK47::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(AK47_IDLE1, UseDecrement() != FALSE);
 }
+
+} // namespace cl/sv

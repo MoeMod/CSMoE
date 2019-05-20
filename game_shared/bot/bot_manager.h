@@ -34,6 +34,8 @@
 
 #include <list>
 
+namespace sv {
+
 class CNavArea;
 class CGrenade;
 
@@ -100,5 +102,7 @@ private:
 };
 
 GameEventType NameToGameEvent(const char *name);
+
+}
 
 #endif // BOT_MANAGER_H

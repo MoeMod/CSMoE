@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_p90.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum p90_e
 {
 	P90_IDLE1,
@@ -183,4 +189,6 @@ void CP90::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(P90_IDLE1, UseDecrement() != FALSE);
+}
+
 }

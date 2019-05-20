@@ -40,7 +40,7 @@ set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ")
 
 #find_package(SDL2 REQUIRED)
 
-set (CLDLL_LIBRARY client)
+set (CLIENT_LIBRARY client)
 
 #--------------
 # USER DEFINES \
@@ -60,14 +60,70 @@ file (GLOB WEAPONEVENT_SRCS
 	./events/event_*.cpp
 )
 
-file (GLOB CLWEAPON_SRCS
+set (CLWEAPON_SRCS
 	./com_weapons.cpp
 	./cs_wpn/cs_baseentity.cpp
 	./cs_wpn/cs_weapons.cpp
 	./cs_wpn/bte_weapons.cpp
-	../dlls/wpn_shared/wpn_*.cpp
-	../dlls/wpn_shared/knife_*.cpp
 )
+
+set (HLWPN_SRCS
+	../dlls/wpn_shared/wpn_ak47.cpp
+	../dlls/wpn_shared/wpn_aug.cpp
+	../dlls/wpn_shared/wpn_awp.cpp
+	../dlls/wpn_shared/wpn_c4.cpp
+	../dlls/wpn_shared/wpn_deagle.cpp
+	../dlls/wpn_shared/wpn_elite.cpp
+	../dlls/wpn_shared/wpn_famas.cpp
+	../dlls/wpn_shared/wpn_fiveseven.cpp
+	../dlls/wpn_shared/wpn_flashbang.cpp
+	../dlls/wpn_shared/wpn_g3sg1.cpp
+	../dlls/wpn_shared/wpn_galil.cpp
+	../dlls/wpn_shared/wpn_glock18.cpp
+	../dlls/wpn_shared/wpn_hegrenade.cpp
+	../dlls/wpn_shared/wpn_knife.cpp
+	../dlls/wpn_shared/wpn_m249.cpp
+	../dlls/wpn_shared/wpn_m3.cpp
+	../dlls/wpn_shared/wpn_m4a1.cpp
+	../dlls/wpn_shared/wpn_mac10.cpp
+	../dlls/wpn_shared/wpn_mp5navy.cpp
+	../dlls/wpn_shared/wpn_p228.cpp
+	../dlls/wpn_shared/wpn_p90.cpp
+	../dlls/wpn_shared/wpn_scout.cpp
+	../dlls/wpn_shared/wpn_sg550.cpp
+	../dlls/wpn_shared/wpn_sg552.cpp
+	../dlls/wpn_shared/wpn_smokegrenade.cpp
+	../dlls/wpn_shared/wpn_tmp.cpp
+	../dlls/wpn_shared/wpn_ump45.cpp
+	../dlls/wpn_shared/wpn_usp.cpp
+	../dlls/wpn_shared/wpn_xm1014.cpp
+	../dlls/wpn_shared/knife_zombi.cpp
+	../dlls/wpn_shared/wpn_ak47l.cpp
+	../dlls/wpn_shared/wpn_mp7a1d.cpp
+	../dlls/wpn_shared/wpn_deagled.cpp
+	../dlls/wpn_shared/wpn_as50.cpp
+	../dlls/wpn_shared/wpn_cannon.cpp
+	../dlls/wpn_shared/wpn_infinity.cpp
+	../dlls/wpn_shared/wpn_k1a.cpp
+	../dlls/wpn_shared/wpn_kriss.cpp
+	../dlls/wpn_shared/wpn_m95.cpp
+	../dlls/wpn_shared/wpn_m1887.cpp
+	../dlls/wpn_shared/wpn_scarh.cpp
+	../dlls/wpn_shared/wpn_scarl.cpp
+	../dlls/wpn_shared/wpn_tar21.cpp
+	../dlls/wpn_shared/wpn_thompson.cpp
+	../dlls/wpn_shared/wpn_wa2000.cpp
+	../dlls/wpn_shared/wpn_xm8c.cpp
+	../dlls/wpn_shared/wpn_xm8s.cpp
+	../dlls/wpn_shared/knife_skullaxe.cpp
+	../dlls/wpn_shared/wpn_gungnir.cpp
+	../dlls/wpn_shared/wpn_mg3.cpp
+	../dlls/wpn_shared/wpn_mp7a1c.cpp
+	../dlls/wpn_shared/wpn_mp7a1p.cpp
+	../dlls/wpn_shared/wpn_infinitys.cpp
+	../dlls/wpn_shared/wpn_m14ebr.cpp
+	../dlls/wpn_shared/wpn_infinityex2.cpp
+	)
 
 set (HUD_SRCS
 	./hud/ammo.cpp
@@ -127,10 +183,10 @@ set (STUDIORENDER_SRCS
 
 )
 
-set (PLAYERMOVE_SRCS
-	../pm_shared/pm_debug.c
-	../pm_shared/pm_math.c
-	../pm_shared/pm_shared.c
+set(PM_SRCS
+	../pm_shared/pm_shared.cpp
+	../pm_shared/pm_debug.cpp
+	../pm_shared/pm_math.cpp
 )
 
 set (CLDLL_SOURCES
@@ -151,10 +207,11 @@ set (CLDLL_SOURCES
 	./calcscreen.cpp
 	./input_touch.cpp
 
-	${PLAYERMOVE_SRCS}
+	${PM_SRCS}
 	${HUD_SRCS}
 	${WEAPONEVENT_SRCS}
 	${CLWEAPON_SRCS}
+	${HLWPN_SRCS}
 	${STUDIORENDER_SRCS}
 )
 
@@ -172,9 +229,9 @@ include_directories (
 	)
 
 if(XASH_STATIC_GAMELIB)
-	add_library (${CLDLL_LIBRARY} STATIC ${CLDLL_SOURCES})
+	add_library (${CLIENT_LIBRARY} STATIC ${CLDLL_SOURCES})
 else()
-	add_library (${CLDLL_LIBRARY} SHARED ${CLDLL_SOURCES})
+	add_library (${CLIENT_LIBRARY} SHARED ${CLDLL_SOURCES})
 endif()
 
 if(APPLE OR ANDROID)
@@ -209,25 +266,25 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 	-D_CS16CLIENT_ALLOW_SPECIAL_SCRIPTING
 	 )
 
-target_link_libraries( ${CLDLL_LIBRARY} ${CMAKE_DL_LIBS} )
+target_link_libraries( ${CLIENT_LIBRARY} ${CMAKE_DL_LIBS} )
 
 if(ANDROID OR IOS)
-	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
 			OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
 else()
-	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
 			PREFIX "" OUTPUT_NAME ${CLIENT_LIBRARY_NAME})
 endif()
 
 if(XASH_64BIT AND NOT ANDROID AND NOT IOS)
-	get_target_property(CLIENT_LIBRARY_NAME ${CLDLL_LIBRARY} OUTPUT_NAME)
+	get_target_property(CLIENT_LIBRARY_NAME ${CLIENT_LIBRARY} OUTPUT_NAME)
 	if(NOT CLIENT_LIBRARY_NAME)
-		set(CLIENT_LIBRARY_NAME ${CLDLL_LIBRARY})
+		set(CLIENT_LIBRARY_NAME ${CLIENT_LIBRARY})
 	endif()
-	set_target_properties(${CLDLL_LIBRARY} PROPERTIES
+	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
 			OUTPUT_NAME ${CLIENT_LIBRARY_NAME}64)
 endif()
 
 if(NOT XASH_STATIC_GAMELIB)
-	install( TARGETS ${CLDLL_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${CLIENT_INSTALL_DIR} )
+	install( TARGETS ${CLIENT_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${CLIENT_INSTALL_DIR} )
 endif()

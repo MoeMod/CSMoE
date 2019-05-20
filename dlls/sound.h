@@ -54,6 +54,8 @@
 #define LFO_TRIANGLE				2	// triangle
 #define LFO_RANDOM				3	// random
 
+namespace sv {
+
 // group of related sentences
 struct sentenceg
 {
@@ -187,5 +189,7 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 
 extern char gszallsentencenames[ CVOXFILESENTENCEMAX ][ CBSENTENCENAME_MAX ];
 extern int gcTextures;
+
+}
 
 #endif // SOUND_H

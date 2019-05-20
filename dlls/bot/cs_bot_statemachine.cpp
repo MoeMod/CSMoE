@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // This method is the ONLY legal way to change a bot's current state
 
 void CCSBot::SetState(BotState *state)
@@ -496,4 +498,6 @@ void CCSBot::DefuseBomb()
 void CCSBot::InvestigateNoise()
 {
 	SetState(&m_investigateNoiseState);
+}
+
 }

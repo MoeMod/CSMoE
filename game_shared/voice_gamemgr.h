@@ -36,6 +36,8 @@
 
 #include "voice_common.h"
 
+namespace sv {
+
 /* <111716> ../game_shared/voice_gamemgr.h:23 */
 class IVoiceGameMgrHelper
 {
@@ -70,5 +72,7 @@ private:
 };
 
 void VoiceServerDebug(const char *pFmt, ...);
+
+}
 
 #endif // VOICE_GAMEMGR_H

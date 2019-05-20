@@ -32,8 +32,6 @@
 #pragma once
 #endif
 
-
-
 enum AutoBuyClassType
 {
 	AUTOBUYCLASS_NONE		= 0,
@@ -183,6 +181,9 @@ struct WeaponBuyAmmoConfig
 	int cost;
 };
 
+#ifndef CLIENT_DLL
+namespace sv {
+
 extern AutoBuyInfoStruct g_autoBuyInfo[35];
 
 // WeaponType
@@ -195,5 +196,8 @@ bool IsPrimaryWeapon(int id);
 bool IsSecondaryWeapon(int id);
 WeaponInfoStruct *GetWeaponInfo(int weaponID);
 bool CanBuyWeaponByMaptype(int playerTeam, WeaponIdType weaponID, bool useAssasinationRestrictions);
+
+}
+#endif // CLIENT_DLL
 
 #endif // WEAPONTYPE_H

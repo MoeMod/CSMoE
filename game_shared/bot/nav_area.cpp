@@ -52,6 +52,8 @@
 #include <unistd.h>
 #endif // _WIN32
 
+namespace sv {
+
 enum { MAX_BLOCKED_AREAS = 256 };
 
 /*
@@ -4937,4 +4939,6 @@ Place CNavAreaGrid::GetPlace(const Vector *pos) const
 	}
 
 	return UNDEFINED_PLACE;
+}
+
 }

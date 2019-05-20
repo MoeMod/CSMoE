@@ -7,7 +7,9 @@
 #include "nodes.h"
 #include "talkmonster.h"
 
-CGraph WorldGraph;
+namespace sv {
+
+DLL_GLOBAL CGraph WorldGraph;
 
 void CGraph::InitGraph()
 {
@@ -271,4 +273,6 @@ CBaseEntity *CBaseMonster::BestVisibleEnemy()
 	}
 
 	return pReturn;
+}
+
 }

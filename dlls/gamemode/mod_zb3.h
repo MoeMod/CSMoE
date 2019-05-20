@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "zb3/zb3_const.h"
 #include "zb3/zb3_morale.h"
 
+namespace sv {
+
 class CMod_ZombieHero : public CMod_ZombieMod2
 {
 public:
@@ -74,5 +76,6 @@ private:
 	float m_flBackupArmor;
 };
 
+}
 
 #endif //PROJECT_MOD_ZB3_H

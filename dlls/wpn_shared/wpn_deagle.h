@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //Deagle
 #define DEAGLE_MAX_SPEED	250
 #define DEAGLE_DAMAGE		54
@@ -41,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireDeagle;
 };
+
+}
 
 #endif

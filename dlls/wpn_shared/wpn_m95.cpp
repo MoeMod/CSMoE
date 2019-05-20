@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m95.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m95_e
 {
 	M95_IDLE,
@@ -207,4 +213,6 @@ float CM95::GetMaxSpeed(void)
 		return M95_MAX_SPEED;
 
 	return M95_MAX_SPEED_ZOOM;
+}
+
 }

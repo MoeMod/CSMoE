@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //M95
 #define M95_MAX_SPEED		200
 #define M95_MAX_SPEED_ZOOM	140
@@ -47,5 +53,7 @@ public:
 private:
 	unsigned short m_usFireM95;
 };
+
+}
 
 #endif

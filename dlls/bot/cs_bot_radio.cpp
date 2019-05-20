@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Returns true if the radio message is an order to do something
 // NOTE: "Report in" is not considered a "command" because it doesnt ask the bot to go somewhere, or change its mind
 bool CCSBot::IsRadioCommand(GameEventType event) const
@@ -79,7 +81,7 @@ bool CCSBot::IsRadioCommand(GameEventType event) const
 void CCSBot::RespondToRadioCommands()
 {
 	// bots use the chatter system to respond to each other
-	if (m_radioSubject != NULL && m_radioSubject->IsPlayer())
+	if (m_radioSubject != nullptr && m_radioSubject->IsPlayer())
 	{
 		CBasePlayer *player = m_radioSubject;
 		if (player->IsBot())
@@ -384,4 +386,6 @@ void CCSBot::SendRadioMessage(GameEventType event)
 
 	ClientCommand("menuselect", slot);
 	ClientCommand("menuselect", "10");
+}
+
 }

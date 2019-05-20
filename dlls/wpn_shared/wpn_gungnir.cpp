@@ -5,9 +5,11 @@
 #include "player.h"
 #include "weapons.h"
 #include "weapons/WeaponTemplate.hpp"
+#ifndef CLIENT_DLL
 #include "effects.h"
 #include "customentity.h"
 #include "monsters.h"
+#endif
 
 #include <vector>
 #include <array>
@@ -15,6 +17,14 @@
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+class CBeam;
 
 #ifndef CLIENT_DLL
 class CGungnirProjectile : public CBaseEntity
@@ -357,7 +367,7 @@ public:
 	static constexpr float WeaponIdleTime = 10;
 
 	KnockbackData KnockBack = { 250.0f, 100.0f, 150.0f, 100.0f, 0.2f };
-	static constexpr const char *Beam_SPR = "sprites/ef_gungnir_xbeam.spr"; // 
+	static constexpr const char *Beam_SPR = "sprites/ef_gungnir_xbeam.spr"; //
 
 public:
 	void Precache() override;
@@ -448,7 +458,7 @@ public:
 	float phs2;	// secondary attack start time
 	float phs3; // primary attack start time
 	float phs4; // spear attack end time... cannot switch weapon?
-	std::array<CBeam *, 3> phs5_6_7; // EHANDLE ? 
+	std::array<CBeam *, 3> phs5_6_7; // EHANDLE ?
 	// unsigned short phs8; // m_usFireGungnir
 	std::vector<EHANDLE> phs9_10_11;
 	float phs12;
@@ -870,5 +880,7 @@ void CGungnir::ClearEffect()
 	}
 #endif
 	phs9_10_11.clear();
+}
+
 }
 

@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_ump45.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum ump45_e
 {
 	UMP45_IDLE1,
@@ -180,4 +186,6 @@ void CUMP45::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(UMP45_IDLE1, UseDecrement() != FALSE);
+}
+
 }

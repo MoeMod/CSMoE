@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum m14ebr_e
 {
 	M14EBR_IDLE1 = 0,
@@ -95,4 +97,6 @@ void EV_FireM14EBR(event_args_t *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_762MM,
 		2);
+}
+
 }

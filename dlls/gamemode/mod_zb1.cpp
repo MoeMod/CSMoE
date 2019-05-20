@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "game.h"
 #include "client.h"
 #include "bmodels.h"
+#include "triggers.h"
 
 #include "mod_zb1.h"
 
@@ -32,6 +33,8 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+
+namespace sv {
 
 CMod_Zombi::CMod_Zombi() // precache
 	: m_Countdown (this, std::unique_ptr<CZB1CountdownDelegate>(new CZB1CountdownDelegate(this)) )
@@ -503,4 +506,6 @@ inline void CZB1CountdownDelegate::OnCountdownEnd()
 {
 	// select zombie
 	m_pMod->PickZombieOrigin();
+}
+
 }

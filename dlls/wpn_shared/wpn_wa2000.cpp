@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_wa2000.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum wa2000_e
 {
 	WA2000_IDLE,
@@ -217,4 +223,6 @@ float CWA2000::GetMaxSpeed(void)
 		return 210;
 
 	return 150;
+}
+
 }

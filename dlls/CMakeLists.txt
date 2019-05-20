@@ -182,19 +182,74 @@ set(HLDLL_SRCS
 	./weapons_moe_buy.cpp
 	./weapons_precache.cpp
 	./gamemode/zbb/zbb_basebuilder.cpp
-		./gamemode/zbb/zbb_ghost.cpp
-		./gamemode/zb1/zb1_countdown.cpp
+	./gamemode/zbb/zbb_ghost.cpp
+	./gamemode/zb1/zb1_countdown.cpp
+	./cbase/cbase_entity_factory.cpp
+	./cbase/cbase_physint.cpp
 	)
 
-file (GLOB HLWPN_SRCS
-	./wpn_shared/wpn_*.cpp
-	./wpn_shared/knife_*.cpp
+set (HLWPN_SRCS
+	../dlls/wpn_shared/wpn_ak47.cpp
+	../dlls/wpn_shared/wpn_aug.cpp
+	../dlls/wpn_shared/wpn_awp.cpp
+	../dlls/wpn_shared/wpn_c4.cpp
+	../dlls/wpn_shared/wpn_deagle.cpp
+	../dlls/wpn_shared/wpn_elite.cpp
+	../dlls/wpn_shared/wpn_famas.cpp
+	../dlls/wpn_shared/wpn_fiveseven.cpp
+	../dlls/wpn_shared/wpn_flashbang.cpp
+	../dlls/wpn_shared/wpn_g3sg1.cpp
+	../dlls/wpn_shared/wpn_galil.cpp
+	../dlls/wpn_shared/wpn_glock18.cpp
+	../dlls/wpn_shared/wpn_hegrenade.cpp
+	../dlls/wpn_shared/wpn_knife.cpp
+	../dlls/wpn_shared/wpn_m249.cpp
+	../dlls/wpn_shared/wpn_m3.cpp
+	../dlls/wpn_shared/wpn_m4a1.cpp
+	../dlls/wpn_shared/wpn_mac10.cpp
+	../dlls/wpn_shared/wpn_mp5navy.cpp
+	../dlls/wpn_shared/wpn_p228.cpp
+	../dlls/wpn_shared/wpn_p90.cpp
+	../dlls/wpn_shared/wpn_scout.cpp
+	../dlls/wpn_shared/wpn_sg550.cpp
+	../dlls/wpn_shared/wpn_sg552.cpp
+	../dlls/wpn_shared/wpn_smokegrenade.cpp
+	../dlls/wpn_shared/wpn_tmp.cpp
+	../dlls/wpn_shared/wpn_ump45.cpp
+	../dlls/wpn_shared/wpn_usp.cpp
+	../dlls/wpn_shared/wpn_xm1014.cpp
+	../dlls/wpn_shared/knife_zombi.cpp
+	../dlls/wpn_shared/wpn_ak47l.cpp
+	../dlls/wpn_shared/wpn_mp7a1d.cpp
+	../dlls/wpn_shared/wpn_deagled.cpp
+	../dlls/wpn_shared/wpn_as50.cpp
+	../dlls/wpn_shared/wpn_cannon.cpp
+	../dlls/wpn_shared/wpn_infinity.cpp
+	../dlls/wpn_shared/wpn_k1a.cpp
+	../dlls/wpn_shared/wpn_kriss.cpp
+	../dlls/wpn_shared/wpn_m95.cpp
+	../dlls/wpn_shared/wpn_m1887.cpp
+	../dlls/wpn_shared/wpn_scarh.cpp
+	../dlls/wpn_shared/wpn_scarl.cpp
+	../dlls/wpn_shared/wpn_tar21.cpp
+	../dlls/wpn_shared/wpn_thompson.cpp
+	../dlls/wpn_shared/wpn_wa2000.cpp
+	../dlls/wpn_shared/wpn_xm8c.cpp
+	../dlls/wpn_shared/wpn_xm8s.cpp
+	../dlls/wpn_shared/knife_skullaxe.cpp
+	../dlls/wpn_shared/wpn_gungnir.cpp
+	../dlls/wpn_shared/wpn_mg3.cpp
+	../dlls/wpn_shared/wpn_mp7a1c.cpp
+	../dlls/wpn_shared/wpn_mp7a1p.cpp
+	../dlls/wpn_shared/wpn_infinitys.cpp
+	../dlls/wpn_shared/wpn_m14ebr.cpp
+	../dlls/wpn_shared/wpn_infinityex2.cpp
 	)
 
 set(PM_SRCS
-    ../pm_shared/pm_shared.c
-	../pm_shared/pm_math.c
-	../pm_shared/pm_debug.c
+	../pm_shared/pm_shared.cpp
+	../pm_shared/pm_debug.cpp
+	../pm_shared/pm_math.cpp
     )
 
 set(GAME_SHARED_SRCS
@@ -215,8 +270,8 @@ set(PUBLIC_SRCS
     )
 
 set (SERVER_SOURCES
-	${HLDLL_SRCS}
 	${HLWPN_SRCS}
+	${HLDLL_SRCS}
 	${PM_SRCS}
 	${GAME_SHARED_SRCS}
 	${PUBLIC_SRCS}
@@ -274,7 +329,7 @@ endif()
 
 add_definitions(
 	-DCLIENT_WEAPONS
-	-DQUIVER -DQUAKE2 -DVALVE_DLL
+	-DQUIVER -DQUAKE2 -DVALVE_DLL -DSERVER_DLL
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )

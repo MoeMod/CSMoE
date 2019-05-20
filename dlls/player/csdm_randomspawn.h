@@ -7,9 +7,13 @@
 #include <utility>
 #include "vector.h"
 
+namespace sv {
+
 class CBaseEntity;
 void CSDM_LoadSpawnPoints();
 
 bool CSDM_DoRandomSpawn(CBaseEntity *pEntity);
+
+}
 
 #endif

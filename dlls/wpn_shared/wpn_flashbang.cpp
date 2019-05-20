@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_flashbang.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum flashbang_e
 {
 	FLASHBANG_IDLE,
@@ -259,4 +265,6 @@ void CFlashbang::WeaponIdle(void)
 BOOL CFlashbang::CanDeploy(void)
 {
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+}
+
 }

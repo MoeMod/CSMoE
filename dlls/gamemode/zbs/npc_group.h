@@ -2,6 +2,8 @@
 
 #include <memory>
 
+namespace sv {
+
 class CHostageImprov;
 class CNpcGroup;
 class CNpcGroupMember;
@@ -34,3 +36,5 @@ private:
 };
 
 std::shared_ptr<CNpcGroupMember> GetGroup(const Vector &start);
+
+}

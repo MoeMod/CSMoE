@@ -10,6 +10,12 @@
 #define SIGNAL_ESCAPE			(1<<3)
 #define SIGNAL_VIPSAFETY		(1<<4)
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CUnifiedSignals
 {
 public:
@@ -32,5 +38,7 @@ private:
 	int m_flSignal;
 	int m_flState;
 };
+
+}
 
 #endif

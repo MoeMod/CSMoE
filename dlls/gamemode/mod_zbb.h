@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include <array>
 #include <unordered_map>
 
+namespace sv {
+
 class IPlayerBuildingDelegate
 {
 public:
@@ -59,5 +61,7 @@ public:
 	std::array<IPlayerBuildingDelegate *, MAX_CLIENTS> m_BuildingInterfaces;
 	std::unordered_map<CBaseEntity *, IPlayerBuildingDelegate *> m_BuildingEntities;
 };
+
+}
 
 #endif //PROJECT_MOD_ZBB_H

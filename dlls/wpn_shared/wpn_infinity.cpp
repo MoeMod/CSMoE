@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_infinity.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 LINK_ENTITY_TO_CLASS(weapon_infinity, CInfinity)
 
 void CInfinity::Spawn(void)
@@ -306,4 +312,6 @@ void CInfinity::WeaponIdle(void)
 		else
 			SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

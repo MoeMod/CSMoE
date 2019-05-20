@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //p228
 #define P228_MAX_SPEED		250
 #define P228_DAMAGE		32
@@ -44,5 +50,7 @@ public:
 private:
 	unsigned short m_usFireP228;
 };
+
+}
 
 #endif

@@ -26,6 +26,8 @@ GNU General Public License for more details.
 
 #include "zb2_zclass_speed.h"
 
+namespace sv {
+
 CZombieClass_Speed::CZombieClass_Speed(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
@@ -110,4 +112,6 @@ void CZombieClass_Speed::DeathSound_Zombie()
 		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
 		default:break;
 	}
+}
+
 }

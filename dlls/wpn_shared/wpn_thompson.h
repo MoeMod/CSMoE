@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 // thompson
 #define THOMPSON_MAX_SPEED		240
 #define THOMPSON_DAMAGE		30
@@ -45,5 +51,7 @@ public:
 private:
 	unsigned short m_usFireTHOMPSON;
 };
+
+}
 
 #endif

@@ -29,6 +29,8 @@
 
 #include "com_model.h"
 
+namespace cl {
+
 #define SMOKE_CLOUDS 20
 
 void EV_Smoke_FadeOut( struct tempent_s *te, float frametime, float currenttime )
@@ -102,4 +104,6 @@ void EV_CreateSmoke(event_args_s *args)
 			pTemp->entity.baseline.origin[0] = Com_RandomLong(10, 30);
 		}
 	}
+}
+
 }

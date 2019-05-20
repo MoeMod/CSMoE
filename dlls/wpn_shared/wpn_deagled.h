@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CDeagleD : public CBasePlayerWeapon
 {
 public:
@@ -29,7 +35,7 @@ public:
 	float GetArmorRatioModifier() override { return 1.5; }
 	const char *GetCSModelName() override { return "models/w_ddeagle.mdl"; }
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::GetBuyAmmoConfig(WEAPON_DEAGLE); }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_DEAGLE); }
 #endif
 
 public:
@@ -40,5 +46,7 @@ public:
 	unsigned short m_usFireELITE_LEFT;
 	unsigned short m_usFireELITE_RIGHT;
 };
+
+}
 
 #endif

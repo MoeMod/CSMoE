@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include "gamemode/mods.h"
 #include "gamemode/zb1/zb1_zclass.h"
 
+namespace sv {
+
 CHuman_ZB1::CHuman_ZB1(CBasePlayer *player) : BasePlayerExtra(player)
 {
 	m_pPlayer->m_bIsZombie = false;
@@ -100,4 +102,6 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
+}
+
 }

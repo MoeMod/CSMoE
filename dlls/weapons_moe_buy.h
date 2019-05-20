@@ -19,8 +19,12 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
+namespace sv {
+
 class CBasePlayer;
 
 bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand);
+
+}
 
 #endif

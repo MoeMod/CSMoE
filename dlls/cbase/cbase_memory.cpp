@@ -6,6 +6,8 @@
 #include <mutex>
 #include <atomic>
 
+namespace sv {
+
 static std::atomic<entvars_t *> g_pCachedEntVarsPtr(nullptr);
 // operator new -> CBaseEntity()
 static std::mutex g_CreateEntityLock;
@@ -60,8 +62,7 @@ void CBaseEntity::operator delete(void *pMem, entvars_t *pev)
 
 void CBaseEntity::CheckEntityDestructor(CBaseEntity *pEntity)
 {
-	if (!g_bDontDestruct.load())
-	{
+	if (!g_bDontDestruct.load()) {
 		// call from engine to destruct
 		pEntity->~CBaseEntity();
 		assert(g_RemoveEntityLock.try_lock() == false);
@@ -69,15 +70,13 @@ void CBaseEntity::CheckEntityDestructor(CBaseEntity *pEntity)
 	}
 }
 
-
 void *CBaseEntity::operator new(size_t stAllocateBlock)
 {
 	entvars_t *newpev = VARS(CREATE_ENTITY());
 	void *result = operator new(stAllocateBlock, newpev);
 
 	// failed? should free newpev
-	if (result == nullptr)
-	{
+	if (result == nullptr) {
 		operator delete(nullptr, newpev);
 		throw std::bad_alloc();
 	}
@@ -95,4 +94,6 @@ void CBaseEntity::operator delete(void *pMem)
 	operator delete(pMem, g_pCachedEntVarsPtr.exchange(nullptr));
 	assert(g_RemoveEntityLock.try_lock() == false);
 	g_RemoveEntityLock.unlock();
+}
+
 }

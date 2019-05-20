@@ -85,6 +85,8 @@ typedef struct
 
 } DLL_DECALLIST;
 
+namespace sv {
 extern DLL_DECALLIST gDecals[42];
+}
 
 #endif // DECALS_H

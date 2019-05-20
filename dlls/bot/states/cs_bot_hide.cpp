@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Begin moving to a nearby hidey-hole.
 // NOTE: Do not forget this state may include a very long "move-to" time to get to our hidey spot!
 
@@ -492,4 +494,6 @@ void HideState::OnExit(CCSBot *me)
 	// if we have a shield, put it away
 	if (me->HasShield() && me->IsProtectedByShield())
 		me->SecondaryAttack();
+}
+
 }

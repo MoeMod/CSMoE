@@ -56,6 +56,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 LINK_ENTITY_TO_CLASS(world_items, CWorldItem);
 
 void CWorldItem::KeyValue(KeyValueData *pkvd)
@@ -443,3 +445,5 @@ BOOL CItemThighPack::MyTouch(CBasePlayer *pPlayer)
 }
 
 LINK_ENTITY_TO_CLASS(item_thighpack, CItemThighPack);
+
+}

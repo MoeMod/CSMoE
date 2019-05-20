@@ -36,9 +36,14 @@
 #include "mods_const.h"
 #include "mod_base.h" // IBaseMod
 
+namespace sv {
+
 class IBaseMod;
+
 extern IBaseMod *g_pModRunning;
 
 void InstallBteMod(const char *name);
+
+}
 
 #endif

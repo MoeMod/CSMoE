@@ -6,8 +6,63 @@
 #include "weapons.h"
 #include "weapons_precache.h"
 
+#include "cbase/cbase_memory.h"
+
 
 // called by worldspawn
+namespace sv {
+
+template<class T>
+void W_PrecacheOther()
+{
+	auto pEntity = CreateClassPtr<T>();
+	if (!pEntity)
+	{
+		ALERT(at_console, "NULL Ent (%s) in UTIL_PrecacheOther\n", typeid(T).name());
+		return;
+	}
+
+	pEntity->Precache();
+
+	REMOVE_ENTITY(pEntity->edict());
+}
+
+template<class T>
+void PrecacheOtherWeapon()
+{
+	auto pEntity = CreateClassPtr<T>();
+	if (!pEntity)
+	{
+		ALERT(at_console, "NULL Ent (%s) in UTIL_PrecacheOther\n", typeid(T).name());
+		return;
+	}
+
+	pEntity->Precache();
+
+	if (pEntity != NULL)
+	{
+		ItemInfo II;
+		Q_memset(&II, 0, sizeof(II));
+
+		pEntity->Precache();
+		if (((CBasePlayerItem *)pEntity)->GetItemInfo(&II))
+		{
+			CBasePlayerItem::ItemInfoArray[ II.iId ] = II;
+
+			if (II.pszAmmo1 != NULL && *II.pszAmmo1 != '\0')
+			{
+				AddAmmoNameToAmmoRegistry(II.pszAmmo1);
+			}
+
+			if (II.pszAmmo2 != NULL && *II.pszAmmo2 != '\0')
+			{
+				AddAmmoNameToAmmoRegistry(II.pszAmmo2);
+			}
+		}
+	}
+
+	REMOVE_ENTITY(pEntity->edict());
+}
 
 void W_Precache()
 {
@@ -159,4 +214,6 @@ void W_Precache()
 
 	PRECACHE_SOUND("items/weapondrop1.wav");	// weapon falls to the ground
 	PRECACHE_SOUND("weapons/generic_reload.wav");
+}
+
 }

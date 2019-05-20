@@ -10,6 +10,8 @@
 #include <vector>
 #include <utility>
 
+namespace sv {
+
 class CMod_None : public IBaseMod
 {
 public:
@@ -23,5 +25,7 @@ public: // CHalfLifeMultiplay
 protected:
 	std::vector<std::pair<CBaseEntity *, Vector>> m_mapBombZones;
 };
+
+}
 
 #endif

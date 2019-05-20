@@ -23,6 +23,15 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 struct CBaseTemplateWeapon : CBasePlayerWeapon
 {
@@ -82,3 +91,5 @@ struct FindDownSideDerivedClass<CCurrent, CCurrent, CLast>
 {
 	using type = CLast;
 };
+
+}

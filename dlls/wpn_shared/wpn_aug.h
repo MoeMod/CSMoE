@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //AUG
 #define AUG_MAX_SPEED			240
 #define AUG_DAMAGE			32
@@ -41,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireAug;
 };
+
+}
 
 #endif

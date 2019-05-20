@@ -32,7 +32,9 @@ GNU General Public License for more details.
 #include "mod_gd.h"
 #include "mod_zbb.h"
 
-IBaseMod *g_pModRunning = nullptr;
+namespace sv {
+
+DLL_GLOBAL IBaseMod *g_pModRunning = nullptr;
 
 template<class T>
 IBaseMod *DefaultFactory()
@@ -66,4 +68,6 @@ void InstallBteMod(const char *name)
 	}
 	g_pModRunning = g_FindList[0].second(); // default
 	return;
+}
+
 }

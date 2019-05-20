@@ -2,6 +2,8 @@
 #include "extdll.h"
 #include "util.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -19,3 +21,5 @@ DLL_GLOBAL int g_Language;
 
 DLL_GLOBAL bool g_bIsCzeroGame = false;
 DLL_GLOBAL bool g_bEnableCSBot = false;
+
+}

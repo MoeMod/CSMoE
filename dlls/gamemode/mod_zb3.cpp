@@ -30,6 +30,8 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
+namespace sv {
+
 constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_DEFAULT;
 
 CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp)
@@ -269,4 +271,6 @@ void CMod_ZombieHero::CheckWinConditions()
 		ZombieWin();
 	else if (!iAliveZombie)
 		HumanWin();
+}
+
 }

@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m4a1.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m4a1_e
 {
 	M4A1_IDLE,
@@ -252,4 +258,6 @@ void CM4A1::WeaponIdle(void)
 		SendWeaponAnim(M4A1_IDLE, UseDecrement() != FALSE);
 	else
 		SendWeaponAnim(M4A1_UNSIL_IDLE, UseDecrement() != FALSE);
+}
+
 }

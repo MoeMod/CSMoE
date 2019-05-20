@@ -50,6 +50,8 @@
 #define SF_CORNER_TELEPORT		0x002
 #define SF_CORNER_FIREONCE		0x004
 
+namespace sv {
+
 class CPathTrack: public CPointEntity
 {
 public:
@@ -209,5 +211,7 @@ public:
 private:
 	unsigned short m_usAdjustPitch;
 };
+
+}
 
 #endif // TRAINS_H

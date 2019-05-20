@@ -38,6 +38,8 @@
 #include "studio.h"
 #include "r_studioint.h"
 
+namespace sv {
+
 int ExtractBbox(void *pmodel, int sequence, float *mins, float *maxs);
 int LookupActivity(void *pmodel, entvars_t *pev, int activity);
 int LookupActivityHeaviest(void *pmodel, entvars_t *pev, int activity);
@@ -66,5 +68,7 @@ void StudioSlerpBones(vec4_t *q1, float pos1[][3], vec4_t *q2, float pos2[][3], 
 void StudioCalcRotations(mstudiobone_t *pbones, int *chain, int chainlength, float *adj, float pos[128][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f, float s);
 void ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]);
 void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const byte *pcontroller, const byte *pblending, int iBone, const edict_t *pEdict);
+
+}
 
 #endif // ANIMATION_H

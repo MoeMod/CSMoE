@@ -19,6 +19,8 @@ GNU General Public License for more details.
 
 #include "zb2_zclass.h"
 
+namespace sv {
+
 class CZombieClass_Default : public CBaseZombieClass_ZB2
 {
 public:
@@ -30,5 +32,7 @@ public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
 };
+
+}
 
 #endif //PROJECT_ZB2_ZCLASS_TANK_H

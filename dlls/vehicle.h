@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 #define VEHICLE_SPEED0_ACCELERATION	0.005000000000000000
 #define VEHICLE_SPEED1_ACCELERATION	0.002142857142857143
 #define VEHICLE_SPEED2_ACCELERATION	0.003333333333333334
@@ -63,5 +65,7 @@ public:
 
 float Fix2(float angle);
 void FixupAngles2(Vector &v);
+
+}
 
 #endif // VEHICLE_H

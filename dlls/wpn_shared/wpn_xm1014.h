@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //xm1014
 #define XM1014_MAX_SPEED	240
 #define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
@@ -36,5 +42,7 @@ public:
 private:
 	unsigned short m_usFireXM1014;
 };
+
+}
 
 #endif

@@ -547,7 +547,11 @@ void CAM_EndDistance(void)
    iMouseInUse=0;
 }
 
+#ifdef XASH_STATIC_GAMELIB
+int DLLEXPORT CL_IsThirdPerson_CL( void )
+#else
 int DLLEXPORT CL_IsThirdPerson( void )
+#endif
 {
 	return (cam_thirdperson ? 1 : 0) || (g_iUser1 && gEngfuncs.GetLocalPlayer() && (g_iUser2 == gEngfuncs.GetLocalPlayer()->index) );
 }

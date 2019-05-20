@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_tar21.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum tar21_e
 {
 	TAR21_IDLE1,
@@ -204,4 +210,6 @@ void CTAR21::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(TAR21_IDLE1, UseDecrement() != FALSE);
+}
+
 }

@@ -4,6 +4,8 @@
 #include "cbase.h"
 #include "lights.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -165,4 +167,6 @@ void CEnvLight::Spawn()
 	CVAR_SET_STRING("sv_skyvec_z", szVector);
 
 	CLight::Spawn();
+}
+
 }

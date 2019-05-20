@@ -29,8 +29,10 @@
 #pragma warning(disable : 4244)
 #endif
 
-vec3_t vec3_origin = { 0,0,0 };
 int nanmask = 255 << 23;
+
+#ifndef XASH_STATIC_GAMELIB
+vec3_t vec3_origin = { 0,0,0 };
 
 float anglemod( float a )
 {
@@ -72,6 +74,7 @@ void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up 
 		up[2] = cr * cp;
 	}
 }
+#endif
 
 void AngleVectorsTranspose( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up )
 {
@@ -194,6 +197,7 @@ FIXME:  Use Quaternions to avoid discontinuities
 Frac is 0.0 to 1.0 ( i.e., should probably be clamped, but doesn't have to be )
 ===================
 */
+#ifndef XASH_STATIC_GAMELIB
 void InterpolateAngles( float *start, float *end, float *output, float frac )
 {
 	int i;
@@ -223,6 +227,7 @@ void InterpolateAngles( float *start, float *end, float *output, float frac )
 
 	NormalizeAngles( output );
 }
+#endif
 
 /*
 ===================
@@ -386,6 +391,7 @@ void VectorMatrix( vec3_t forward, vec3_t right, vec3_t up )
 	VectorNormalize( up );
 }
 
+#ifndef XASH_STATIC_GAMELIB
 void VectorAngles( const vec3_t forward, vec3_t angles )
 {
 	float tmp, yaw, pitch;
@@ -414,3 +420,4 @@ void VectorAngles( const vec3_t forward, vec3_t angles )
 	angles[1] = yaw;
 	angles[2] = 0;
 }
+#endif

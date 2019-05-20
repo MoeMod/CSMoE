@@ -18,6 +18,8 @@
 
 #include <algorithm>
 
+namespace sv {
+
 class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
 {
 public:
@@ -419,4 +421,6 @@ void CMod_ZombieScenario::ClearZombieNPC()
 	{
 		npc->Killed(nullptr, GIB_NORMAL);
 	}
+}
+
 }

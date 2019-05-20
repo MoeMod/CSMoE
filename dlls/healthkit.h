@@ -32,7 +32,9 @@
 #pragma once
 #endif
 
-class CHealthKit: public CItem
+namespace sv {
+
+class CHealthKit : public CItem
 {
 public:
 	virtual void Spawn();
@@ -40,7 +42,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CWallHealth: public CBaseToggle
+class CWallHealth : public CBaseToggle
 {
 public:
 	virtual void Spawn();
@@ -63,5 +65,7 @@ public:
 	int m_iOn;
 	float m_flSoundTime;
 };
+
+}
 
 #endif // HEALTKIT_H

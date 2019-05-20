@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void EscapeFromBombState::OnEnter(CCSBot *me)
 {
 	me->StandUp();
@@ -100,4 +102,6 @@ void EscapeFromBombState::OnUpdate(CCSBot *me)
 void EscapeFromBombState::OnExit(CCSBot *me)
 {
 	me->EquipBestWeapon();
+}
+
 }

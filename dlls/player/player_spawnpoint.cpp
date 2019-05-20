@@ -4,6 +4,8 @@
 #include "player.h"
 #include "gamerules.h"
 
+namespace sv {
+
 // global vars
 DLL_GLOBAL CBaseEntity *g_pLastSpawn;
 DLL_GLOBAL CBaseEntity *g_pLastCTSpawn, *g_pLastTerroristSpawn;
@@ -112,4 +114,6 @@ ReturnSpot:
 		g_pLastCTSpawn = pSpot;
 
 	return pSpot->edict();
+}
+
 }

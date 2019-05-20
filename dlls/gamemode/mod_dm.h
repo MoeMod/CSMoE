@@ -7,6 +7,8 @@
 
 #include "mod_base.h"
 
+namespace sv {
+
 class CBaseEntity; // cbase.h
 class CBasePlayer; // player.h
 typedef struct entvars_s entvars_t; // progdefs.h
@@ -26,7 +28,7 @@ public: // CHalfLifeMultiplay
 	void CheckWinConditions() override {}
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
-	
+
 public:
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
@@ -35,5 +37,7 @@ public:
 	bool CheckWinLimitDM();
 	void UpdateTeamScores();
 };
+
+}
 
 #endif

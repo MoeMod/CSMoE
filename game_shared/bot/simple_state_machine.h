@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 // Encapsulation of a finite-state-machine state
 
 template<typename T>
@@ -41,10 +43,10 @@ public:
 	SimpleState() { m_parent = NULL; }
 
 	virtual ~SimpleState() {};
-	virtual void OnEnter(T userData) {};		// when state is entered
-	virtual void OnUpdate(T userData) {};		// state behavior
-	virtual void OnExit(T userData) {};		// when state exited
-	virtual const char *GetName() const = 0;	// return state name
+	virtual void OnEnter(T userData) {};        // when state is entered
+	virtual void OnUpdate(T userData) {};        // state behavior
+	virtual void OnExit(T userData) {};        // when state exited
+	virtual const char *GetName() const = 0;    // return state name
 
 	void SetParent(SimpleState<T> *parent)
 	{
@@ -104,9 +106,11 @@ public:
 	}
 
 /*protected:*/
-	S *m_state;			// current behavior state
-	IntervalTimer m_stateTimer;	// how long have we been in the current state
+	S *m_state;            // current behavior state
+	IntervalTimer m_stateTimer;    // how long have we been in the current state
 	T m_userData;
 };
+
+}
 
 #endif // SIMPLE_STATE_MACHINE_H

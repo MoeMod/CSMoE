@@ -6,6 +6,8 @@
 #include "player_human_level.h"
 #include "gamemode/mods.h"
 
+namespace sv {
+
 PlayerExtraHumanLevel_ZBS::PlayerExtraHumanLevel_ZBS(CBasePlayer *player) : BasePlayerExtra(player)
 {
 	m_iHealth = 1;
@@ -83,4 +85,6 @@ void PlayerExtraHumanLevel_ZBS::UpdateHUD() const
 	WRITE_BYTE(m_iAttack); // ATK
 	WRITE_BYTE(0); // Wall
 	MESSAGE_END();
+}
+
 }

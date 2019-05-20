@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 inline void DrawAxes(const Vector &origin, int red, int green, int blue)
 {
 	float size = 10;
@@ -1903,4 +1905,6 @@ void CHostageImprov::StandUp()
 void CHostageImprov::UpdateStationaryAnimation()
 {
 	m_behavior.UpdateStationaryAnimation(this);
+}
+
 }

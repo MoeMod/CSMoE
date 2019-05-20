@@ -42,6 +42,8 @@ HitBoxGroup;
 #define SF_MONSTER_TURRET_AUTOACTIVATE 32
 #define SF_MONSTER_TURRET_STARTINACTIVE 64
 
+namespace sv {
+
 extern void UTIL_MoveToOrigin(edict_t *pent, const Vector &vecGoal, float flDist, int iMoveType);
 Vector VecCheckToss(entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float flGravityAdj = 1);
 Vector VecCheckThrow(entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flGravityAdj = 1);
@@ -58,6 +60,8 @@ extern void ExplodeModel(const Vector &vecOrigin, float speed, int model, int co
 BOOL FBoxVisible(entvars_t *pevLooker, entvars_t *pevTarget);
 BOOL FBoxVisible(entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTargetOrigin, float flSize = 0);
 
+}
+
 #define R_AL -2
 #define R_FR -1
 #define R_NO 0
@@ -66,6 +70,12 @@ BOOL FBoxVisible(entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTargetOr
 #define R_NM 3
 
 #define bits_MEMORY_KILLED (1<<7)
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 class CGib : public CBaseEntity
 {
@@ -91,5 +101,7 @@ public:
 	int m_material;
 	float m_lifeTime;
 };
+
+}
 
 #endif

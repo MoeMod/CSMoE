@@ -68,9 +68,6 @@
 #define GROUP_OP_AND		0
 #define GROUP_OP_NAND		1
 
-extern globalvars_t *gpGlobals;
-
-#include "qstring.h"
 
 #define WRITEKEY_INT(pf, szKeyName, iKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%d\"\n", szKeyName, iKeyValue)
 #define WRITEKEY_FLOAT(pf, szKeyName, flKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%f\"\n", szKeyName, flKeyValue)
@@ -109,7 +106,22 @@ typedef int BOOL;
 #define HUMAN_GIB_COUNT		6
 #define ALIEN_GIB_COUNT		4
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 extern DLL_GLOBAL const Vector g_vecZero;
+extern globalvars_t *gpGlobals;
+}
+
+#ifdef CLIENT_DLL
+using cl::gpGlobals;
+#else
+using sv::gpGlobals;
+#endif
+
+#include "qstring.h"
 
 #define LANGUAGE_ENGLISH	0
 #define LANGUAGE_GERMAN		1
@@ -164,15 +176,12 @@ extern DLL_GLOBAL const Vector g_vecZero;
 #include "cs_wpn/bte_weapons.h"
 #include "cs_wpn/bte_weapons_register.h"
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	static CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); 
-#elif defined(_WIN32)
-#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern "C" EXPORT void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); }
+	namespace detail { CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); }
 #else
-#define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	extern "C" void mapClassName(entvars_t *pev); \
-	void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); }
+#include "cbase/cbase_entity_factory.h"
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
+	namespace detail { namespace SV_AutoRegister_##mapClassName { static MoE_Entity_AutoRegister<DLLClassName> obj( mapClassName, #mapClassName ); } }
 #endif
 
 typedef enum
@@ -237,6 +246,9 @@ typedef struct hudtextparms_s
 
 } hudtextparms_t;
 
+#ifndef CLIENT_DLL
+namespace sv {
+
 class UTIL_GroupTrace
 {
 public:
@@ -247,9 +259,21 @@ private:
 	int m_oldgroupop;
 };
 
+extern int g_groupmask;
+extern int g_groupop;
+
+}
+#endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 inline void MAKE_STRING_CLASS(const char *str, entvars_t *pev)
 {
-	pev->classname = (string_t)MAKE_STRING(str);
+	pev->classname = (string_t) MAKE_STRING(str);
 }
 
 inline edict_t *FIND_ENTITY_BY_CLASSNAME(edict_t *entStart, const char *pszName)
@@ -266,7 +290,10 @@ inline edict_t *FIND_ENTITY_BY_TARGETNAME(edict_t *entStart, const char *pszName
 extern edict_t *DBG_EntOfVars(const entvars_t *pev);
 inline edict_t *ENT(const entvars_t *pev) { return DBG_EntOfVars(pev); }
 #else
-inline edict_t *ENT(const entvars_t *pev) { return pev->pContainingEntity; }
+inline edict_t *ENT(const entvars_t *pev)
+{
+	return pev->pContainingEntity;
+}
 #endif
 
 inline edict_t *ENT(EOFFSET eoffset)
@@ -316,9 +343,18 @@ inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin, entv
 	MESSAGE_BEGIN(msg_dest, msg_type, pOrigin, ENT(ent));
 }
 
-inline BOOL FNullEnt(EOFFSET eoffset) { return eoffset == 0; }
-inline BOOL FNullEnt(const edict_t *pent) { return pent == NULL || FNullEnt(OFFSET(pent)); }
-inline BOOL FNullEnt(entvars_t *pev) { return pev == NULL || FNullEnt(OFFSET(pev)); }
+inline BOOL FNullEnt(EOFFSET eoffset)
+{
+	return eoffset == 0;
+}
+inline BOOL FNullEnt(const edict_t *pent)
+{
+	return pent == NULL || FNullEnt(OFFSET(pent));
+}
+inline BOOL FNullEnt(entvars_t *pev)
+{
+	return pev == NULL || FNullEnt(OFFSET(pev));
+}
 
 inline BOOL FStringNull(int iString)
 {
@@ -346,18 +382,26 @@ inline void UTIL_MakeVectorsPrivate(Vector vecAngles, float *p_vForward, float *
 	g_engfuncs.pfnAngleVectors(vecAngles, p_vForward, p_vRight, p_vUp);
 }
 
-#ifndef CLIENT_DLL
-void TEXTURETYPE_Init();
-char TEXTURETYPE_Find(char *name);
-float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType);
-#endif
+} // namespace cl | sv
 
 #ifndef CLIENT_DLL
+namespace sv {
+
 void EMIT_SOUND_DYN(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int flags, int pitch);
-#else
-inline void EMIT_SOUND_DYN(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int flags, int pitch) { }
-#endif
+inline void EMIT_SOUND(edict_t *entity, int channel, const char *sample, float volume, float attenuation)
+{
+	EMIT_SOUND_DYN(entity, channel, sample, volume, attenuation, 0, PITCH_NORM);
+}
+inline void STOP_SOUND(edict_t *entity, int channel, const char *sample)
+{
+	EMIT_SOUND_DYN(entity, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
+}
 
+}
+#else
+namespace cl {
+
+inline void EMIT_SOUND_DYN(edict_t *entity, int channel, const char *sample, float volume, float attenuation, int flags, int pitch) { }
 inline void EMIT_SOUND(edict_t *entity, int channel, const char *sample, float volume, float attenuation)
 {
 	EMIT_SOUND_DYN(entity, channel, sample, volume, attenuation, 0, PITCH_NORM);
@@ -367,6 +411,18 @@ inline void STOP_SOUND(edict_t *entity, int channel, const char *sample)
 {
 	EMIT_SOUND_DYN(entity, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
 }
+
+}
+#endif
+
+
+
+#ifndef CLIENT_DLL
+namespace sv {
+
+void TEXTURETYPE_Init();
+char TEXTURETYPE_Find(char *name);
+float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType);
 
 class CBaseEntity;
 
@@ -382,7 +438,7 @@ float UTIL_SharedRandomFloat(unsigned int seed, float low, float high);
 //NOXREF void UTIL_ParametricRocket(entvars_t *pev, Vector vecOrigin, Vector vecAngles, edict_t *owner);
 void UTIL_SetGroupTrace(int groupmask, int op);
 void UTIL_UnsetGroupTrace();
-//NOXREF BOOL UTIL_GetNextBestWeapon(class CBasePlayer *pPlayer, class CBasePlayerItem *pCurrentWeapon);
+//NOXREF BOOL UTIL_GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCurrentWeapon);
 //NOXREF float UTIL_AngleMod(float a);
 //NOXREF float UTIL_AngleDiff(float destAngle, float srcAngle);
 Vector UTIL_VecToAngles(const Vector &vec);
@@ -392,42 +448,37 @@ int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, con
 CBaseEntity *UTIL_FindEntityInSphere(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
 CBaseEntity *UTIL_FindEntityByString_Old(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue);
 CBaseEntity *UTIL_FindEntityByString(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue);
-#ifndef CLIENT_DLL
 extern CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *pStartEntity, const char *szName);
-#else
-inline CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *, const char*) { return NULL; }
-#endif
 CBaseEntity *UTIL_FindEntityByTargetname(CBaseEntity *pStartEntity, const char *szName);
 //NOXREF CBaseEntity *UTIL_FindEntityGeneric(const char *szWhatever, const Vector &vecSrc, float flRadius);
 CBaseEntity *UTIL_PlayerByIndex(int playerIndex);
 void UTIL_MakeVectors(const Vector &vecAngles);
 void UTIL_MakeAimVectors(const Vector &vecAngles);
 void UTIL_MakeInvVectors(const Vector &vec, globalvars_t *pgv);
-void UTIL_EmitAmbientSound(edict_t *entity, const Vector &vecOrigin, const char *samp, float vol, float attenuation, int fFlags, int pitch);
+void UTIL_EmitAmbientSound(edict_t *entity, const Vector &vecOrigin, const char *samp, float vol, float attenuation,
+                           int fFlags, int pitch);
 unsigned short FixedUnsigned16(float value, float scale);
 short FixedSigned16(float value, float scale);
 void UTIL_ScreenShake(const Vector &center, float amplitude, float frequency, float duration, float radius);
 //NOXREF void UTIL_ScreenShakeAll(const Vector &center, float amplitude, float frequency, float duration);
 
-#ifndef CLIENT_DLL
 #ifdef SHAKE_H
 void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
 void UTIL_ScreenFadeWrite(const ScreenFade &fade, CBaseEntity *pEntity);
 #endif
-#endif
 
 void UTIL_ScreenFadeAll(const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
-void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold = 0.0f, int alpha = 0, int flags = 0);
+void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold = 0.0f, int alpha = 0,
+                     int flags = 0);
 
 void UTIL_HudMessage(CBaseEntity *pEntity, const hudtextparms_t &textparms, const char *pMessage);
 void UTIL_HudMessageAll(const hudtextparms_t &textparms, const char *pMessage);
-void UTIL_ClientPrintAll(int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL);
+void UTIL_ClientPrintAll(int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL,
+                         const char *param3 = NULL, const char *param4 = NULL);
 
-#ifndef CLIENT_DLL
-extern void ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL);
-#else
-inline void ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL) { }
-#endif
+extern void
+ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL,
+            const char *param3 = NULL, const char *param4 = NULL);
 
 //NOXREF void UTIL_SayText(const char *pText, CBaseEntity *pEntity);
 void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity);
@@ -440,14 +491,15 @@ void UTIL_ShowMessageArgs(const char *pString, CBaseEntity *pPlayer, CUtlVector<
 #endif
 void UTIL_ShowMessage(const char *pString, CBaseEntity *pEntity, bool isHint = false);
 void UTIL_ShowMessageAll(const char *pString, bool isHint = false);
-void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore, TraceResult *ptr);
-void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass, edict_t *pentIgnore, TraceResult *ptr);
-#ifndef CLIENT_DLL
-extern void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
-#else
-inline void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr) {}
-#endif
-void UTIL_TraceModel(const Vector &vecStart, const Vector &vecEnd, int hullNumber, edict_t *pentModel, TraceResult *ptr);
+void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore,
+                    TraceResult *ptr);
+void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,
+                    edict_t *pentIgnore, TraceResult *ptr);
+extern void
+UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore,
+               TraceResult *ptr);
+void
+UTIL_TraceModel(const Vector &vecStart, const Vector &vecEnd, int hullNumber, edict_t *pentModel, TraceResult *ptr);
 //NOXREF TraceResult UTIL_GetGlobalTrace();
 void UTIL_SetSize(entvars_t *pev, const Vector &vecMin, const Vector &vecMax);
 float UTIL_VecToYaw(const Vector &vec);
@@ -491,7 +543,31 @@ bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);
 int UTIL_ReadFlags(const char *c);
 
-extern int g_groupmask;
-extern int g_groupop;
+}
+#else
+namespace cl {
+class CBaseEntity;
+
+#ifndef CLIENT_WEAPONS
+float UTIL_WeaponTimeBase(void);
+#else
+inline float UTIL_WeaponTimeBase(void) { return 0; }
+#endif
+
+void UTIL_MakeVectors(const Vector &vecAngles);
+int UTIL_SharedRandomLong(unsigned int seed, int low, int high);
+float UTIL_SharedRandomFloat(unsigned int seed, float low, float high);
+
+inline CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *, const char*) { return NULL; }
+inline void ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL) { }
+inline void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr) {}
+void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore,
+                    TraceResult *ptr);
+void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,
+                    edict_t *pentIgnore, TraceResult *ptr);
+CBaseEntity *UTIL_PlayerByIndex(int playerIndex);
+
+}
+#endif
 
 #endif // UTIL_H

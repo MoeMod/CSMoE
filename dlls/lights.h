@@ -34,6 +34,8 @@
 
 #define SF_LIGHT_START_OFF		1
 
+namespace sv {
+
 class CLight: public CPointEntity
 {
 public:
@@ -58,5 +60,7 @@ public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
 };
+
+}
 
 #endif // LIGHT_H

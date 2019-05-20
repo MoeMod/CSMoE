@@ -3,7 +3,9 @@
 #include "util.h"
 #include "skill.h"
 
-skilldata_t gSkillData;
+namespace sv {
+
+DLL_GLOBAL skilldata_t gSkillData;
 
 // take the name of a cvar, tack a digit for the skill level
 // on, and return the value.of that Cvar
@@ -23,4 +25,6 @@ NOXREF float GetSkillCvar(char *pName)
 	}
 
 	return flValue;
+}
+
 }

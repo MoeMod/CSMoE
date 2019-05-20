@@ -50,18 +50,26 @@ extern "C"
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
-extern "C"
-{
-	int PM_GetVisEntInfo(int ent);
-	int PM_GetPhysEntInfo(int ent);
-	void InterpolateAngles(float *start, float *end, float *output, float frac);
-	void NormalizeAngles(float *angles);
-	float Distance(const float *v1, const float *v2);
-	float AngleBetweenVectors(const float *v1, const float *v2);
+extern "C" {
 
-	float	vJumpOrigin[3];
-	float	vJumpAngles[3];
+void NormalizeAngles(float *angles);
+float Distance(const float *v1, const float *v2);
+float AngleBetweenVectors(const float *v1, const float *v2);
+
+};
+
+namespace cl {
+
+int PM_GetVisEntInfo(int ent);
+int PM_GetPhysEntInfo(int ent);
+void InterpolateAngles(float *start, float *end, float *output, float frac);
+
+float	vJumpOrigin[3];
+float	vJumpAngles[3];
+
 }
+
+using namespace cl;
 
 extern engine_studio_api_t IEngineStudio;
 
@@ -1697,7 +1705,11 @@ void V_CalcThirdPersonRefdef( ref_params_t *pparams )
 	ent->latched.prevangles[PITCH] = pitch;
 }
 
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT V_CalcRefdef_CL( struct ref_params_s *pparams )
+#else
 void DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
+#endif
 {
 	// intermission / finale rendering
 	if ( pparams->intermission )

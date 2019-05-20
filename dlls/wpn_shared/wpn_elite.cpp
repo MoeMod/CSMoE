@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_elite.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum elite_e
 {
 	ELITE_IDLE,
@@ -220,4 +226,6 @@ void CELITE::WeaponIdle(void)
 		else
 			SendWeaponAnim(ELITE_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

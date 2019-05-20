@@ -32,23 +32,27 @@
 #pragma once
 #endif
 
-#define DOOR_SENTENCEWAIT		6
-#define DOOR_SOUNDWAIT			3
-#define BUTTON_SOUNDWAIT		0.5
+#include "cbase/cbase_locksound.h"
 
-#define SF_DOOR_ROTATE_Y		0
-#define SF_DOOR_START_OPEN		1
-#define SF_DOOR_ROTATE_BACKWARDS	2
-#define SF_DOOR_PASSABLE		8
-#define SF_DOOR_ONEWAY			16
-#define SF_DOOR_NO_AUTO_RETURN		32
-#define SF_DOOR_ROTATE_Z		64
-#define SF_DOOR_ROTATE_X		128
-#define SF_DOOR_USE_ONLY		256		// door must be opened by player's use button.
-#define SF_DOOR_NOMONSTERS		512		// Monster can't open
-#define SF_DOOR_SILENT			0x80000000
+namespace sv {
 
-class CBaseDoor: public CBaseToggle
+#define DOOR_SENTENCEWAIT        6
+#define DOOR_SOUNDWAIT            3
+#define BUTTON_SOUNDWAIT        0.5
+
+#define SF_DOOR_ROTATE_Y        0
+#define SF_DOOR_START_OPEN        1
+#define SF_DOOR_ROTATE_BACKWARDS    2
+#define SF_DOOR_PASSABLE        8
+#define SF_DOOR_ONEWAY            16
+#define SF_DOOR_NO_AUTO_RETURN        32
+#define SF_DOOR_ROTATE_Z        64
+#define SF_DOOR_ROTATE_X        128
+#define SF_DOOR_USE_ONLY        256        // door must be opened by player's use button.
+#define SF_DOOR_NOMONSTERS        512        // Monster can't open
+#define SF_DOOR_SILENT            0x80000000
+
+class CBaseDoor : public CBaseToggle
 {
 public:
 	virtual void Spawn();
@@ -80,14 +84,14 @@ public:
 	void EXPORT DoorHitBottom();
 
 public:
-	BYTE m_bHealthValue;		// some doors are medi-kit doors, they give players health
+	BYTE m_bHealthValue;        // some doors are medi-kit doors, they give players health
 
-	BYTE m_bMoveSnd;		// sound a door makes while moving
-	BYTE m_bStopSnd;		// sound a door makes when it stops
+	BYTE m_bMoveSnd;        // sound a door makes while moving
+	BYTE m_bStopSnd;        // sound a door makes when it stops
 
-	locksound_t m_ls;		// door lock sounds
+	locksound_t m_ls;        // door lock sounds
 
-	BYTE m_bLockedSound;		// ordinals from entity selection
+	BYTE m_bLockedSound;        // ordinals from entity selection
 	BYTE m_bLockedSentence;
 	BYTE m_bUnlockedSound;
 	BYTE m_bUnlockedSentence;
@@ -95,7 +99,7 @@ public:
 	float m_lastBlockedTimestamp;
 };
 
-class CRotDoor: public CBaseDoor
+class CRotDoor : public CBaseDoor
 {
 public:
 	virtual void Spawn();
@@ -103,7 +107,7 @@ public:
 	virtual void SetToggleState(int state);
 };
 
-class CMomentaryDoor: public CBaseToggle
+class CMomentaryDoor : public CBaseToggle
 {
 public:
 	virtual void Spawn();
@@ -113,13 +117,15 @@ public:
 	virtual int Restore(CRestore &restore);
 	virtual int ObjectCaps() { return (CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-   
+
 public:
 	static TYPEDESCRIPTION m_SaveData[1];
 
-	BYTE m_bMoveSnd;	// sound a door makes while moving
+	BYTE m_bMoveSnd;    // sound a door makes while moving
 };
 
 void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton);
+
+}
 
 #endif // DOORS_H

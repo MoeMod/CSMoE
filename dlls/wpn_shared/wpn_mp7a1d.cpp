@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_mp7a1d.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum elite_e
 {
 	ELITE_IDLE,
@@ -207,4 +213,6 @@ void CMP7A1D::WeaponIdle(void)
 		else
 			SendWeaponAnim(ELITE_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

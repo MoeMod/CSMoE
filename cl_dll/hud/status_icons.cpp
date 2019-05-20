@@ -29,6 +29,8 @@
 #include "draw_util.h"
 #include "triangleapi.h"
 
+using namespace cl;
+
 DECLARE_MESSAGE( m_StatusIcons, StatusIcon )
 
 int CHudStatusIcons::Init( void )

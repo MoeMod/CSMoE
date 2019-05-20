@@ -11,6 +11,8 @@
 
 #include "voice_gamemgr.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -224,4 +226,6 @@ void CVoiceGameMgr::UpdateMasks()
 			SET_CLIENT_LISTENING(iClient + 1, iOtherClient + 1, bCanHear);
 		}
 	}
+}
+
 }

@@ -62,6 +62,8 @@
 // enable it until fix isn't applied in Xash3D
 //#define _CS16CLIENT_FIX_EVENT_ORIGIN
 
+namespace cl {
+
 extern int g_iPShell;
 extern int g_iRShell;
 extern int g_iShotgunShell;
@@ -69,5 +71,7 @@ extern int g_iBlackSmoke;
 
 
 void Game_HookEvents( void );
+
+}
 
 #endif

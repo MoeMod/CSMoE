@@ -32,7 +32,9 @@
 #pragma once
 #endif
 
+#ifndef CLIENT_DLL
 #include "voice_gamemgr.h"
+#endif
 
 #define MAX_RULE_BUFFER				1024
 #define MAX_VOTE_MAPS				100
@@ -64,6 +66,9 @@
 // custom enum
 #define	WINNER_NONE			0
 #define WINNER_DRAW			1
+
+#ifndef CLIENT_DLL
+namespace sv {
 
 enum
 {
@@ -97,41 +102,41 @@ enum ScenarionEventEndRound
 // custom enum
 enum RewardAccount
 {
-	REWARD_TARGET_BOMB		= 3500,
-	REWARD_VIP_ESCAPED		= 3500,
-	REWARD_VIP_ASSASSINATED		= 3250,
-	REWARD_TERRORISTS_ESCAPED	= 3150,
-	REWARD_CTS_PREVENT_ESCAPE	= 3500,
-	REWARD_ESCAPING_TERRORISTS_NEUTRALIZED	= 3250,
-	REWARD_BOMB_DEFUSED		= 3250,
-	REWARD_BOMB_PLANTED		= 800,
-	REWARD_BOMB_EXPLODED		= 3250,
-	REWARD_CTS_WIN			= 3000,
-	REWARD_TERRORISTS_WIN		= 3000,
-	REWARD_ALL_HOSTAGES_RESCUED	= 2500,
+	REWARD_TARGET_BOMB = 3500,
+	REWARD_VIP_ESCAPED = 3500,
+	REWARD_VIP_ASSASSINATED = 3250,
+	REWARD_TERRORISTS_ESCAPED = 3150,
+	REWARD_CTS_PREVENT_ESCAPE = 3500,
+	REWARD_ESCAPING_TERRORISTS_NEUTRALIZED = 3250,
+	REWARD_BOMB_DEFUSED = 3250,
+	REWARD_BOMB_PLANTED = 800,
+	REWARD_BOMB_EXPLODED = 3250,
+	REWARD_CTS_WIN = 3000,
+	REWARD_TERRORISTS_WIN = 3000,
+	REWARD_ALL_HOSTAGES_RESCUED = 2500,
 
 	// the end round was by the expiration time
-	REWARD_TARGET_BOMB_SAVED	= 3250,
-	REWARD_HOSTAGE_NOT_RESCUED	= 3250,
-	REWARD_VIP_NOT_ESCAPED		= 3250,
+			REWARD_TARGET_BOMB_SAVED = 3250,
+	REWARD_HOSTAGE_NOT_RESCUED = 3250,
+	REWARD_VIP_NOT_ESCAPED = 3250,
 
 	// loser bonus
-	REWARD_LOSER_BONUS_DEFAULT	= 1400,
-	REWARD_LOSER_BONUS_MIN		= 1500,
-	REWARD_LOSER_BONUS_MAX		= 3000,
-	REWARD_LOSER_BONUS_ADD		= 500,
+			REWARD_LOSER_BONUS_DEFAULT = 1400,
+	REWARD_LOSER_BONUS_MIN = 1500,
+	REWARD_LOSER_BONUS_MAX = 3000,
+	REWARD_LOSER_BONUS_ADD = 500,
 
-	REWARD_RESCUED_HOSTAGE		= 750,
-	REWARD_KILLED_ENEMY		= 300,
-	REWARD_KILLED_VIP		= 2500,
-	REWARD_VIP_HAVE_SELF_RESCUED	= 2500,
+	REWARD_RESCUED_HOSTAGE = 750,
+	REWARD_KILLED_ENEMY = 300,
+	REWARD_KILLED_VIP = 2500,
+	REWARD_VIP_HAVE_SELF_RESCUED = 2500,
 
 };
 
 // custom enum
 enum PaybackForBadThing
 {
-	PAYBACK_FOR_KILLED_TEAMMATES	= -3300,
+	PAYBACK_FOR_KILLED_TEAMMATES = -3300,
 };
 
 // custom enum
@@ -163,13 +168,13 @@ enum
 // custom enum
 enum
 {
-	SCENARIO_BLOCK_TIME_EXPRIRED		= (1 << 0),
-	SCENARIO_BLOCK_NEED_PLAYERS		= (1 << 1),
-	SCENARIO_BLOCK_VIP_ESCAPRE		= (1 << 2),
-	SCENARIO_BLOCK_PRISON_ESCAPRE		= (1 << 3),
-	SCENARIO_BLOCK_BOMB			= (1 << 4),
-	SCENARIO_BLOCK_TEAM_EXTERMINATION	= (1 << 5),
-	SCENARIO_BLOCK_HOSTAGE_RESCUE		= (1 << 6),
+	SCENARIO_BLOCK_TIME_EXPRIRED = (1 << 0),
+	SCENARIO_BLOCK_NEED_PLAYERS = (1 << 1),
+	SCENARIO_BLOCK_VIP_ESCAPRE = (1 << 2),
+	SCENARIO_BLOCK_PRISON_ESCAPRE = (1 << 3),
+	SCENARIO_BLOCK_BOMB = (1 << 4),
+	SCENARIO_BLOCK_TEAM_EXTERMINATION = (1 << 5),
+	SCENARIO_BLOCK_HOSTAGE_RESCUE = (1 << 6),
 };
 
 enum
@@ -182,6 +187,7 @@ enum
 };
 
 class CItem;
+
 class CBasePlayerAmmo;
 
 class CGameRules
@@ -197,8 +203,10 @@ public:
 	virtual BOOL IsDeathmatch() = 0;
 	virtual BOOL IsTeamplay() { return FALSE; }
 	virtual BOOL IsCoOp() = 0;
-	virtual const char *GetGameDescription() { return "Counter-Strike"; }	// this is the game name that gets seen in the server browser
-	virtual BOOL ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason) = 0;
+	virtual const char *
+	GetGameDescription() { return "Counter-Strike"; }    // this is the game name that gets seen in the server browser
+	virtual BOOL
+	ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char *szRejectReason) = 0;
 	virtual void InitHUD(CBasePlayer *pl) = 0;
 	virtual void ClientDisconnected(edict_t *pClient) = 0;
 	virtual void UpdateGameMode(CBasePlayer *pPlayer) {};
@@ -252,7 +260,7 @@ public:
 	virtual BOOL IsFreezePeriod() { return m_bFreezePeriod; }
 	virtual void ServerDeactivate() {};
 	virtual void CheckMapConditions() {};
-   
+
 public:
 	virtual ~CGameRules() {} // Added.
 
@@ -261,7 +269,7 @@ public:
 	BOOL m_bBombDropped;
 };
 
-class CHalfLifeRules: public CGameRules
+class CHalfLifeRules : public CGameRules
 {
 public:
 	CHalfLifeRules();
@@ -274,7 +282,8 @@ public:
 	virtual BOOL IsMultiplayer();
 	virtual BOOL IsDeathmatch();
 	virtual BOOL IsCoOp();
-	virtual BOOL ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
+	virtual BOOL
+	ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
 	virtual void InitHUD(CBasePlayer *pl);
 	virtual void ClientDisconnected(edict_t *pClient);
 	virtual float FlPlayerFallDamage(CBasePlayer *pPlayer);
@@ -309,7 +318,7 @@ public:
 	virtual BOOL FAllowMonsters();
 };
 
-class CHalfLifeMultiplay: public CGameRules
+class CHalfLifeMultiplay : public CGameRules
 {
 public:
 	CHalfLifeMultiplay();
@@ -323,7 +332,8 @@ public:
 	virtual BOOL IsMultiplayer();
 	virtual BOOL IsDeathmatch();
 	virtual BOOL IsCoOp();
-	virtual BOOL ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
+	virtual BOOL
+	ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128]);
 	virtual void InitHUD(CBasePlayer *pl);
 	virtual void ClientDisconnected(edict_t *pClient);
 	virtual void UpdateGameMode(CBasePlayer *pPlayer);
@@ -364,9 +374,9 @@ public:
 	virtual int DeadPlayerAmmo(CBasePlayer *pPlayer);
 	virtual const char *GetTeamID(CBaseEntity *pEntity) { return ""; }
 	virtual int PlayerRelationship(CBasePlayer *pPlayer, CBaseEntity *pTarget);
-	virtual BOOL PlayTextureSounds() { return FALSE;}
+	virtual BOOL PlayTextureSounds() { return FALSE; }
 	virtual BOOL FAllowMonsters();
-	virtual void EndMultiplayerGame() { GoToIntermission();}
+	virtual void EndMultiplayerGame() { GoToIntermission(); }
 	virtual void ServerDeactivate();
 	virtual void CheckMapConditions();
 
@@ -394,13 +404,15 @@ public:
 
 	// Check to see if the round is over for the various game types. Terminates the round
 	// and returns true if the round should end.
-	bool PrisonRoundEndCheck(int NumAliveTerrorist, int NumAliveCT, int NumDeadTerrorist, int NumDeadCT, bool bNeededPlayers);
+	bool PrisonRoundEndCheck(int NumAliveTerrorist, int NumAliveCT, int NumDeadTerrorist, int NumDeadCT,
+	                         bool bNeededPlayers);
 	bool BombRoundEndCheck(bool bNeededPlayers);
 	bool HostageRescueRoundEndCheck(bool bNeededPlayers);
 	bool VIPRoundEndCheck(bool bNeededPlayers);
 
 	// Check to see if the teams exterminated each other. Ends the round and returns true if so.
-	bool TeamExterminationCheck(int NumAliveTerrorist, int NumAliveCT, int NumDeadTerrorist, int NumDeadCT, bool bNeededPlayers);
+	bool TeamExterminationCheck(int NumAliveTerrorist, int NumAliveCT, int NumDeadTerrorist, int NumDeadCT,
+	                            bool bNeededPlayers);
 	void TerminateRound(float tmDelay, int iWinStatus);
 
 	// Check various conditions to end the map.
@@ -445,7 +457,10 @@ public:
 	BOOL IsThereABomber();
 	BOOL IsThereABomb();
 
-	bool IsMatchStarted() { return (m_fTeamCount != 0.0f || m_fCareerRoundMenuTime != 0.0f || m_fCareerMatchMenuTime != 0.0f); }
+	bool IsMatchStarted()
+	{
+		return (m_fTeamCount != 0.0f || m_fCareerRoundMenuTime != 0.0f || m_fCareerMatchMenuTime != 0.0f);
+	}
 	void SendMOTDToClient(edict_t *client);
 
 private:
@@ -455,31 +470,31 @@ private:
 
 public:
 	CVoiceGameMgr m_VoiceGameMgr;
-	float m_fTeamCount;				// m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
+	float m_fTeamCount;                // m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
 	float m_flCheckWinConditions;
 	float m_fRoundCount;
-	int m_iRoundTime;				// (From mp_roundtime) - How many seconds long this round is.
+	int m_iRoundTime;                // (From mp_roundtime) - How many seconds long this round is.
 	int m_iRoundTimeSecs;
-	int m_iIntroRoundTime;				// (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
-	float m_fIntroRoundCount;			// The global time when the intro round ends and the real one starts
-							// wrote the original "m_flRoundTime" comment for this variable).
+	int m_iIntroRoundTime;                // (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
+	float m_fIntroRoundCount;            // The global time when the intro round ends and the real one starts
+	// wrote the original "m_flRoundTime" comment for this variable).
 	int m_iAccountTerrorist;
 	int m_iAccountCT;
-	int m_iNumTerrorist;				// The number of terrorists on the team (this is generated at the end of a round)
-	int m_iNumCT;					// The number of CTs on the team (this is generated at the end of a round)
+	int m_iNumTerrorist;                // The number of terrorists on the team (this is generated at the end of a round)
+	int m_iNumCT;                    // The number of CTs on the team (this is generated at the end of a round)
 	int m_iNumSpawnableTerrorist;
 	int m_iNumSpawnableCT;
-	int m_iSpawnPointCount_Terrorist;		// Number of Terrorist spawn points
-	int m_iSpawnPointCount_CT;			// Number of CT spawn points
+	int m_iSpawnPointCount_Terrorist;        // Number of Terrorist spawn points
+	int m_iSpawnPointCount_CT;            // Number of CT spawn points
 	int m_iHostagesRescued;
 	int m_iHostagesTouched;
-	int m_iRoundWinStatus;				// 1 == CT's won last round, 2 == Terrorists did, 3 == Draw, no winner
+	int m_iRoundWinStatus;                // 1 == CT's won last round, 2 == Terrorists did, 3 == Draw, no winner
 
 	short m_iNumCTWins;
 	short m_iNumTerroristWins;
 
-	bool m_bTargetBombed;				// whether or not the bomb has been bombed
-	bool m_bBombDefused;				// whether or not the bomb has been defused
+	bool m_bTargetBombed;                // whether or not the bomb has been bombed
+	bool m_bBombDefused;                // whether or not the bomb has been defused
 
 	bool m_bMapHasBombTarget;
 	bool m_bMapHasBombZone;
@@ -487,33 +502,33 @@ public:
 	bool m_bMapHasRescueZone;
 	bool m_bMapHasEscapeZone;
 
-	int m_iMapHasVIPSafetyZone;			// 0 = uninitialized;   1 = has VIP safety zone;   2 = DOES not have VIP safetyzone
+	int m_iMapHasVIPSafetyZone;            // 0 = uninitialized;   1 = has VIP safety zone;   2 = DOES not have VIP safetyzone
 	int m_bMapHasCameras;
 	int m_iC4Timer;
-	int m_iC4Guy;					// The current Terrorist who has the C4.
-	int m_iLoserBonus;				// the amount of money the losing team gets. This scales up as they lose more rounds in a row
-	int m_iNumConsecutiveCTLoses;			// the number of rounds the CTs have lost in a row.
-	int m_iNumConsecutiveTerroristLoses;		// the number of rounds the Terrorists have lost in a row.
+	int m_iC4Guy;                    // The current Terrorist who has the C4.
+	int m_iLoserBonus;                // the amount of money the losing team gets. This scales up as they lose more rounds in a row
+	int m_iNumConsecutiveCTLoses;            // the number of rounds the CTs have lost in a row.
+	int m_iNumConsecutiveTerroristLoses;        // the number of rounds the Terrorists have lost in a row.
 
-	float m_fMaxIdlePeriod;				// For the idle kick functionality. This is tha max amount of time that the player has to be idle before being kicked
+	float m_fMaxIdlePeriod;                // For the idle kick functionality. This is tha max amount of time that the player has to be idle before being kicked
 
 	int m_iLimitTeams;
 	bool m_bLevelInitialized;
 	bool m_bRoundTerminating;
-	bool m_bCompleteReset;				// Set to TRUE to have the scores reset next time round restarts
+	bool m_bCompleteReset;                // Set to TRUE to have the scores reset next time round restarts
 	float m_flRequiredEscapeRatio;
 	int m_iNumEscapers;
 	int m_iHaveEscaped;
 	bool m_bCTCantBuy;
-	bool m_bTCantBuy;				// Who can and can't buy.
+	bool m_bTCantBuy;                // Who can and can't buy.
 	float m_flBombRadius;
 	int m_iConsecutiveVIP;
 	int m_iTotalGunCount;
 	int m_iTotalGrenadeCount;
 	int m_iTotalArmourCount;
-	int m_iUnBalancedRounds;			// keeps track of the # of consecutive rounds that have gone by where one team outnumbers the other team by more than 2
-	int m_iNumEscapeRounds;				// keeps track of the # of consecutive rounds of escape played.. Teams will be swapped after 8 rounds
-	int m_iMapVotes[ MAX_VOTE_MAPS ];
+	int m_iUnBalancedRounds;            // keeps track of the # of consecutive rounds that have gone by where one team outnumbers the other team by more than 2
+	int m_iNumEscapeRounds;                // keeps track of the # of consecutive rounds of escape played.. Teams will be swapped after 8 rounds
+	int m_iMapVotes[MAX_VOTE_MAPS];
 	int m_iLastPick;
 	int m_iMaxMapTime;
 	int m_iMaxRounds;
@@ -524,7 +539,7 @@ public:
 	float m_flForceChaseCamValue;
 	float m_flFadeToBlackValue;
 	CBasePlayer *m_pVIP;
-	CBasePlayer *VIPQueue[ MAX_VIP_QUEUES ];
+	CBasePlayer *VIPQueue[MAX_VIP_QUEUES];
 
 protected:
 	float m_flIntermissionEndTime;
@@ -557,18 +572,18 @@ typedef struct mapcycle_s
 
 } mapcycle_t;
 
-class CMapInfo: public CPointEntity
+class CMapInfo : public CPointEntity
 {
 public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
-   
+
 public:
 	int m_iBuyingStatus;
 	float m_flBombRadius;
 };
 
-class CCStrikeGameMgrHelper: public IVoiceGameMgrHelper
+class CCStrikeGameMgrHelper : public IVoiceGameMgrHelper
 {
 public:
 	virtual bool CanPlayerHearPlayer(CBasePlayer *pListener, CBasePlayer *pSender);
@@ -585,12 +600,8 @@ void SV_Career_Restart_f();
 void SV_Career_EndRound_f();
 void SV_CareerAddTask_f();
 void SV_CareerMatchLimit_f();
-#ifdef CLIENT_DLL
-extern void Broadcast(const char *sentence, int pitch = 100);
-#else
 void Broadcast(const char *sentence);
-#endif
-const char * GetTeam(int teamNo);
+const char *GetTeam(int teamNo);
 void EndRoundMessage(const char *sentence, int event);
 void ReadMultiplayCvars(CHalfLifeMultiplay *mp);
 void DestroyMapCycle(mapcycle_t *cycle);
@@ -603,5 +614,11 @@ int ReloadMapCycleFile(char *filename, mapcycle_t *cycle);
 int CountPlayers();
 void ExtractCommandString(char *s, char *szCommand);
 int GetMapCount();
+
+}
+#else // CLIENT_DLL
+
+extern void Broadcast(const char *sentence, int pitch = 100);
+#endif
 
 #endif // GAMERULES_H

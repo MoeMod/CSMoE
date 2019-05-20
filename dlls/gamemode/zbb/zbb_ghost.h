@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "gamemode/zb1/zb1_zclass.h"
 #include "gamemode/mod_zbb.h"
 
+namespace sv {
 
 class CGhost_ZBB : public BasePlayerExtra, public IZombieModeCharacter, public IZombieModeCharacter_ZBB_ExtraDelegate
 {
@@ -44,5 +45,6 @@ public:
 
 extern IPlayerBuildingDelegate *g_pDelegateGhostShared;
 
+}
 
 #endif //PROJECT_ZBB_GHOST_H

@@ -4,6 +4,8 @@
 #include "player.h"
 #include "player_knockback.h"
 
+namespace sv {
+
 // copied from z4e_knockback.sma - KnockBack_Set
 void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackData &data)
 {
@@ -38,4 +40,6 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	{
 		player->m_flVelocityModifier = flVelocityModifier;
 	}
+}
+
 }

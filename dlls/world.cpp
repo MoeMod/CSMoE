@@ -18,9 +18,11 @@
 #include "gamemode/mods.h"
 #include "player/csdm_randomspawn.h"
 
-edict_t *g_pBodyQueueHead;
-CGlobalState gGlobalState;
-float g_flWeaponCheat;
+namespace sv {
+
+DLL_GLOBAL edict_t *g_pBodyQueueHead;
+DLL_GLOBAL CGlobalState gGlobalState;
+DLL_GLOBAL float g_flWeaponCheat;
 
 extern void BotPrecache(); // bot_utils.cpp
 
@@ -729,4 +731,6 @@ void CWorld::KeyValue(KeyValueData *pkvd)
 	}
 	else
 		CBaseEntity::KeyValue(pkvd);
+}
+
 }

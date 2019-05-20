@@ -52,6 +52,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -665,4 +667,6 @@ void CCareerTaskManager::UnlatchRoundEndMessage()
 {
 	m_shouldLatchRoundEndMessage = false;
 	HandleEvent(m_roundEndMessage);
+}
+
 }

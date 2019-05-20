@@ -6,6 +6,8 @@
 #include "saverestore.h"
 #include "pathcorner.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -354,4 +356,6 @@ CPathTrack *CPathTrack::Instance(edict_t *pent)
 	}
 
 	return NULL;
+}
+
 }

@@ -19,6 +19,8 @@
 #include <future>
 #include <atomic>
 
+namespace sv {
+
 LINK_ENTITY_TO_CLASS(monster_entity, CMonster);
 
 class CMonsterImprov : public CHostageImprov
@@ -1246,4 +1248,6 @@ void CMonsterModStrategy_Default::DeathSound() const
 	case 1: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
 	case 2: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
 	}
+}
+
 }

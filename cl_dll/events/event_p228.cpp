@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum p228_e
 {
 	P228_IDLE,
@@ -116,4 +118,6 @@ void EV_FireP228(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_357SIG,
 		2 );
+}
+
 }

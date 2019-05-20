@@ -22,6 +22,12 @@
 #include "gamerules.h"
 #include "wpn_c4.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //#define C4MADNESS
 #ifdef CLIENT_DLL
 extern bool g_bInBombZone;
@@ -221,12 +227,12 @@ void CC4::PrimaryAttack(void)
 
 				UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Planted_The_Bomb\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
 				g_pGameRules->m_bBombDropped = false;
-#endif		
+#endif
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/c4_plant.wav", VOL_NORM, ATTN_NORM);
 
 				m_pPlayer->pev->body = 0;
 #ifndef CLIENT_DLL
-				m_pPlayer->ResetMaxSpeed();				
+				m_pPlayer->ResetMaxSpeed();
 				m_pPlayer->SetBombIcon(FALSE);
 #endif
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
@@ -343,4 +349,5 @@ void CC4::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, f
 		pPlayer->m_pentCurBombTarget = target;
 		SUB_Remove();
 	}
+}
 }

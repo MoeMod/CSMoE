@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //Fiveseven
 #define FIVESEVEN_MAX_SPEED		250
 #define FIVESEVEN_DAMAGE		20
@@ -44,5 +50,7 @@ public:
 private:
 	unsigned short m_usFireFiveSeven;
 };
+
+}
 
 #endif

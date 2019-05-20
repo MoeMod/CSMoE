@@ -39,7 +39,9 @@
 #define SF_ENVEXPLOSION_NODECAL		(1<<4)	// don't make a scorch mark
 #define SF_ENVEXPLOSION_NOSPARKS	(1<<5)	// don't make a scorch mark
 
-class CShower: public CBaseEntity
+namespace sv {
+
+class CShower : public CBaseEntity
 {
 public:
 	virtual void Spawn();
@@ -48,7 +50,7 @@ public:
 	virtual void Touch(CBaseEntity *pOther);
 };
 
-class CEnvExplosion: public CBaseMonster
+class CEnvExplosion : public CBaseMonster
 {
 public:
 	virtual void Spawn();
@@ -68,5 +70,7 @@ public:
 };
 
 void ExplosionCreate(const Vector &center, Vector &angles, edict_t *pOwner, int magnitude, BOOL doDamage);
+
+}
 
 #endif // EXPLODE_H

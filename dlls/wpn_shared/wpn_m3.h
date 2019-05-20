@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //m3
 #define M3_MAX_SPEED		230
 #define M3_CONE_VECTOR		Vector(0.0675, 0.0675, 0.0)	// special shotgun spreads
@@ -36,5 +42,7 @@ public:
 private:
 	unsigned short m_usFireM3;
 };
+
+}
 
 #endif

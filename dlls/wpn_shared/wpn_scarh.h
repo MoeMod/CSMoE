@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CSCARHeavy : public CBasePlayerWeapon
 {
 public:
@@ -45,5 +51,7 @@ public:
 private:
 	unsigned short m_usFireAK47;
 };
+
+}
 
 #endif

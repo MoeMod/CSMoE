@@ -21,6 +21,12 @@ GNU General Public License for more details.
 
 #include "weapons/WeaponTemplate.hpp"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CXM8Carbine : public LinkWeaponTemplate<CXM8Carbine,
 	TGeneralData,
 	TDoubleModeType,
@@ -120,3 +126,5 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS(weapon_xm8c, CXM8Carbine)
+
+}

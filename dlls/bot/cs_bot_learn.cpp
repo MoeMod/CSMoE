@@ -15,6 +15,9 @@
 
 // CSBOT and Nav
 #include "bot_include.h"
+
+namespace sv {
+
 const float updateTimesliceDuration = 0.5f;
 
 int _navAreaCount = 0;
@@ -485,4 +488,6 @@ void CCSBot::UpdateSaveProcess()
 void CCSBot::StartNormalProcess()
 {
 	m_processMode = PROCESS_NORMAL;
+}
+
 }

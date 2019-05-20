@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_sg552.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum sg552_e
 {
 	SG552_IDLE1,
@@ -206,4 +212,6 @@ float CSG552::GetMaxSpeed(void)
 		return 235;
 
 	return 200;
+}
+
 }

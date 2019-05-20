@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Face the entity and "use" it
 // NOTE: This state assumes we are standing in range of the entity to be used, with no obstructions.
 
@@ -102,4 +104,6 @@ void UseEntityState::OnExit(CCSBot *me)
 {
 	me->ClearLookAt();
 	me->ResetStuckMonitor();
+}
+
 }

@@ -40,6 +40,8 @@
 #include "hostage/hostage.h"
 #include "hostage/hostage_localnav.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -735,4 +737,6 @@ void HintMessageToAllPlayers(const char *message)
 	textParms.channel = 0;
 
 	UTIL_HudMessageAll(textParms, message);
+}
+
 }

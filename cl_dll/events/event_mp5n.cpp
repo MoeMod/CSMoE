@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum mp5n_e
 {
 	MP5N_IDLE = 0,
@@ -95,4 +97,6 @@ void EV_FireMP5( event_args_t *args )
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_9MM,
 		2 );
+}
+
 }

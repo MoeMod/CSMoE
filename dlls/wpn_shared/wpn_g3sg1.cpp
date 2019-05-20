@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_g3sg1.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum g3sg1_e
 {
 	G3SG1_IDLE,
@@ -210,4 +216,6 @@ float CG3SG1::GetMaxSpeed(void)
 		return 210;
 
 	return 150;
+}
+
 }

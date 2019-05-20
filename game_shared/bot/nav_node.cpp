@@ -42,6 +42,8 @@
 
 #include "bot/cs_bot.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -123,4 +125,6 @@ BOOL CNavNode::IsClosedCell() const
 		return true;
 
 	return false;
+}
+
 }

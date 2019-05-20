@@ -10,6 +10,8 @@
 #include "mod_dm.h"
 #include "player/player_mod_strategy.h"
 
+namespace sv {
+
 class CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
 {
 public:
@@ -333,4 +335,6 @@ int CMod_DeathMatch::CalcLeaderFrags()
 		iMaxFrags = iFrags;
 	}
 	return iMaxFrags;
+}
+
 }

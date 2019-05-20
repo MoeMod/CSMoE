@@ -19,6 +19,12 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //SB
 #define SVDEX_MAX_SPEED		270
 #define SVDEX_DAMAGE		32
@@ -57,5 +63,7 @@ public:
 private:
 	unsigned short m_usFireSVDEX;
 };
+
+}
 
 #endif

@@ -15,6 +15,12 @@
 #ifndef SAVERESTORE_H
 #define SAVERESTORE_H
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CBaseEntity;
 
 class CSaveRestoreBuffer
@@ -170,4 +176,7 @@ private:
 };
 
 extern CGlobalState gGlobalState;
+
+}
+
 #endif

@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_as50.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum as50_e
 {
 	AS50_IDLE,
@@ -215,4 +221,6 @@ float CAS50::GetMaxSpeed(void)
 		return AS50_MAX_SPEED;
 
 	return AS50_MAX_SPEED_ZOOM;
+}
+
 }

@@ -8,6 +8,8 @@
 
 #include <algorithm>
 
+namespace sv {
+
 void CBasePlayer::AddAccount(int amount, bool bTrackChange)
 {
 	m_iAccount += amount;
@@ -32,4 +34,6 @@ void CPlayerAccount::UpdateHUD(CBasePlayer *player, bool bTrackChange) const
 
 		m_iLastAmount = m_iAmount;
 	}
+}
+
 }

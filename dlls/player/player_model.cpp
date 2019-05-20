@@ -4,7 +4,9 @@
 #include "player.h"
 #include "gamerules.h"
 
-const char *sPlayerModelFiles[] =
+namespace sv {
+
+static const char *sPlayerModelFiles[] =
 {
 	"models/player.mdl",
 	"models/player/leet/leet.mdl",
@@ -35,4 +37,6 @@ void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax)
 {
 	for (auto psz : sPlayerModelFiles)
 		ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, psz);
+}
+
 }

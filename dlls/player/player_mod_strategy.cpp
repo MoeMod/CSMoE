@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include "player_mod_strategy.h"
 #include "gamemode/mods.h"
 
+namespace sv {
+
 void CPlayerModStrategy_Default::CheckBuyZone()
 {
 	if (g_pGameRules->m_bMapHasBuyZone)
@@ -357,4 +359,6 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 	m_pPlayer->m_bHasNightVision = true;
 	SendItemStatus(m_pPlayer);
 	
+}
+
 }

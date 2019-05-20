@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //M14EBR
 #define M14EBR_MAX_SPEED			215
 #define M14EBR_DAMAGE			46
@@ -43,5 +49,7 @@ public:
 private:
 	unsigned short m_usFireM14EBR;
 };
+
+}
 
 #endif

@@ -108,6 +108,8 @@ struct entity_field_alias_t
 	int field;
 };
 
+namespace sv {
+
 extern float g_flTimeLimit;
 extern float g_flResetTime;
 extern bool g_skipCareerInitialSpawn;
@@ -178,8 +180,11 @@ void ResetPlayerPVS(edict_t *client, int clientnum);
 bool CheckPlayerPVSLeafChanged(edict_t *client, int clientnum);
 void MarkEntityInPVS(int clientnum, int entitynum, float time, bool inpvs);
 bool CheckEntityRecentlyInPVS(int clientnum, int entitynum, float currenttime);
-int AddToFullPack(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet);
-void CreateBaseline(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex, Vector player_mins, Vector player_maxs);
+int AddToFullPack(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player,
+                  unsigned char *pSet);
+void
+CreateBaseline(int player, int eindex, struct entity_state_s *baseline, struct edict_s *entity, int playermodelindex,
+               Vector player_mins, Vector player_maxs);
 void Entity_FieldInit(struct delta_s *pFields);
 void Entity_Encode(struct delta_s *pFields, const unsigned char *from, const unsigned char *to);
 void Player_FieldInit(struct delta_s *pFields);
@@ -191,10 +196,13 @@ int GetWeaponData(edict_s *player, struct weapon_data_s *info);
 void UpdateClientData(const edict_s *ent, int sendweapons, struct clientdata_s *cd);
 void CmdStart(const edict_t *player, struct usercmd_s *cmd, unsigned int random_seed);
 void CmdEnd(const edict_t *player);
-int ConnectionlessPacket(const struct netadr_s *net_from, const char *args, char *response_buffer, int *response_buffer_size);
+int ConnectionlessPacket(const struct netadr_s *net_from, const char *args, char *response_buffer,
+                         int *response_buffer_size);
 int GetHullBounds(int hullnumber, float *mins, float *maxs);
 void CreateInstancedBaselines();
 int InconsistentFile(const edict_t *player, const char *filename, char *disconnect_message);
 int AllowLagCompensation();
+
+}
 
 #endif // CLIENT_H

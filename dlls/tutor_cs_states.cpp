@@ -51,6 +51,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -285,4 +287,6 @@ const char * CCSTutorBuyMenuState::GetStateString()
 int CCSTutorBuyMenuState::HandleRoundStart(CBaseEntity *entity, CBaseEntity *other)
 {
 	return TUTORSTATE_WAITING_FOR_START;
+}
+
 }

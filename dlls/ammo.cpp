@@ -6,6 +6,8 @@
 
 #include "ammo.h"
 
+namespace sv {
+
 void C9MMAmmo::Spawn()
 {
 	Precache();
@@ -21,8 +23,7 @@ void C9MMAmmo::Precache()
 
 BOOL C9MMAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_9MM_BUY, "9mm", MAX_AMMO_9MM) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_9MM_BUY, "9mm", MAX_AMMO_9MM) == -1) {
 		return FALSE;
 	}
 
@@ -47,8 +48,7 @@ void CBuckShotAmmo::Precache()
 
 BOOL CBuckShotAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_BUCKSHOT_BUY, "buckshot", MAX_AMMO_BUCKSHOT) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_BUCKSHOT_BUY, "buckshot", MAX_AMMO_BUCKSHOT) == -1) {
 		return FALSE;
 	}
 
@@ -73,8 +73,7 @@ void C556NatoAmmo::Precache()
 
 BOOL C556NatoAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_556NATO_BUY, "556Nato", MAX_AMMO_556NATO) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_556NATO_BUY, "556Nato", MAX_AMMO_556NATO) == -1) {
 		return FALSE;
 	}
 
@@ -99,8 +98,7 @@ void C556NatoBoxAmmo::Precache()
 
 BOOL C556NatoBoxAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_556NATOBOX_BUY, "556NatoBox", MAX_AMMO_556NATOBOX) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_556NATOBOX_BUY, "556NatoBox", MAX_AMMO_556NATOBOX) == -1) {
 		return FALSE;
 	}
 
@@ -125,8 +123,7 @@ void C762NatoAmmo::Precache()
 
 BOOL C762NatoAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_762NATO_BUY, "762Nato", MAX_AMMO_762NATO) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_762NATO_BUY, "762Nato", MAX_AMMO_762NATO) == -1) {
 		return FALSE;
 	}
 
@@ -151,8 +148,7 @@ void C45ACPAmmo::Precache()
 
 BOOL C45ACPAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_45ACP_BUY, "45acp", MAX_AMMO_45ACP) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_45ACP_BUY, "45acp", MAX_AMMO_45ACP) == -1) {
 		return FALSE;
 	}
 
@@ -177,8 +173,7 @@ void C50AEAmmo::Precache()
 
 BOOL C50AEAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_50AE_BUY, "50AE", MAX_AMMO_50AE) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_50AE_BUY, "50AE", MAX_AMMO_50AE) == -1) {
 		return FALSE;
 	}
 
@@ -203,8 +198,7 @@ void C338MagnumAmmo::Precache()
 
 BOOL C338MagnumAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_338MAG_BUY, "338Magnum", MAX_AMMO_338MAGNUM) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_338MAG_BUY, "338Magnum", MAX_AMMO_338MAGNUM) == -1) {
 		return FALSE;
 	}
 
@@ -229,8 +223,7 @@ void C57MMAmmo::Precache()
 
 BOOL C57MMAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_57MM_BUY, "57mm", MAX_AMMO_57MM) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_57MM_BUY, "57mm", MAX_AMMO_57MM) == -1) {
 		return FALSE;
 	}
 
@@ -255,8 +248,7 @@ void C357SIGAmmo::Precache()
 
 BOOL C357SIGAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_357SIG_BUY, "357SIG", MAX_AMMO_357SIG) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_357SIG_BUY, "357SIG", MAX_AMMO_357SIG) == -1) {
 		return FALSE;
 	}
 
@@ -281,8 +273,7 @@ void C46MMAmmo::Precache()
 
 BOOL C46MMAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_46MM_BUY, "46mm", MAX_AMMO_46MM) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_46MM_BUY, "46mm", MAX_AMMO_46MM) == -1) {
 		return FALSE;
 	}
 
@@ -308,8 +299,7 @@ void C50BMGAmmo::Precache()
 
 BOOL C50BMGAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(AMMO_50BMG_BUY, "50bmg", MAX_AMMO_50BMG) == -1)
-	{
+	if (pOther->GiveAmmo(AMMO_50BMG_BUY, "50bmg", MAX_AMMO_50BMG) == -1) {
 		return FALSE;
 	}
 
@@ -334,8 +324,7 @@ void CCannonAmmo::Precache()
 
 BOOL CCannonAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(1, "CannonAmmo", 20) == -1)
-	{
+	if (pOther->GiveAmmo(1, "CannonAmmo", 20) == -1) {
 		return FALSE;
 	}
 
@@ -360,8 +349,7 @@ void CGungnirAmmo::Precache()
 
 BOOL CGungnirAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(50, "GungnirAmmo", 100) == -1)
-	{
+	if (pOther->GiveAmmo(50, "GungnirAmmo", 100) == -1) {
 		return FALSE;
 	}
 
@@ -370,3 +358,5 @@ BOOL CGungnirAmmo::AddAmmo(CBaseEntity *pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_gungnir, CGungnirAmmo);
+
+}

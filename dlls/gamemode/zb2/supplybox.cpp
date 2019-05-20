@@ -11,6 +11,8 @@
 
 #include <utility>
 
+namespace sv {
+
 static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 {
 	{ "NightVision", [](CBasePlayer *p) {
@@ -165,4 +167,6 @@ void CSupplyBox::SendPositionMsg()
 			
 		}
 	}
+}
+
 }

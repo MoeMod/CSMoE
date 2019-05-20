@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum wa2000_e
 {
 	WA2000_IDLE,
@@ -89,4 +91,6 @@ void EV_FireWA2000(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_762MM,
 		2 );
+}
+
 }

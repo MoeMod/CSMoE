@@ -62,10 +62,12 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
-CBotManager *TheBots = NULL;
+DLL_GLOBAL CBotManager *TheBots = NULL;
 
 float CCSBotManager::m_flNextCVarCheck = 0.0f;
 bool CCSBotManager::m_isMapDataLoaded = false;
@@ -1579,4 +1581,6 @@ void CCSBotManager::ResetRadioMessageTimestamps()
 			m_radioMsgTimestamp[m][t] = 0.0f;
 		}
 	}
+}
+
 }

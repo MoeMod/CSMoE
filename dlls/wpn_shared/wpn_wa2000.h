@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //wa2000
 #define WA2000_MAX_SPEED			210
 #define WA2000_MAX_SPEED_ZOOM		150
@@ -44,5 +50,7 @@ public:
 private:
 	unsigned short m_usFireWA2000;
 };
+
+}
 
 #endif

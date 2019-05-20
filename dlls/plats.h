@@ -46,6 +46,8 @@
 
 #define FGUNTARGET_START_ON	0x0001
 
+namespace sv {
+
 class CBasePlatTrain: public CBaseToggle
 {
 public:
@@ -90,7 +92,7 @@ class CPlatTrigger: public CBaseEntity
 public:
 	virtual int ObjectCaps() { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
 	virtual void Touch(CBaseEntity *pOther);
-   
+
 public:
 	void SpawnInsideTrigger(CFuncPlat *pPlatform);
 
@@ -188,5 +190,7 @@ private:
 void PlatSpawnInsideTrigger(entvars_t *pevPlatform);
 //float Fix(float angle);
 void FixupAngles(Vector &v);
+
+}
 
 #endif // PLATS_H

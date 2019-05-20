@@ -40,10 +40,7 @@
 
 #include "cl_entity.h"
 
-extern "C"
-{
 #include "pm_shared.h"
-}
 
 #include "wpn_shared.h"
 
@@ -51,13 +48,17 @@ extern "C"
 
 #include "minmax.h"
 
-extern globalvars_t *gpGlobals;
-extern int g_iUser1;
-extern bool g_bGlockBurstMode;
 extern int g_rseq;
 extern int g_gaitseq;
 extern Vector g_clorg;
 extern Vector g_clang;
+
+extern int g_iUser1;
+
+namespace cl {
+
+extern globalvars_t *gpGlobals;
+extern bool g_bGlockBurstMode;
 
 // Pool of client side entities/entvars_t
 static entvars_t	ev[ 32 ];
@@ -1415,7 +1416,7 @@ runfuncs is 1 if this is the first time we've predicted this command.  If so, so
 be ignored
 =====================
 */
-void DLLEXPORT HUD_PostRunCmd( local_state_t *from, local_state_t *to, struct usercmd_s *cmd, int runfuncs, double time, unsigned int random_seed )
+extern "C" void DLLEXPORT HUD_PostRunCmd( local_state_t *from, local_state_t *to, struct usercmd_s *cmd, int runfuncs, double time, unsigned int random_seed )
 {
 	g_runfuncs = runfuncs;
 
@@ -1430,3 +1431,5 @@ void DLLEXPORT HUD_PostRunCmd( local_state_t *from, local_state_t *to, struct us
 		g_clorg		= to->playerstate.origin;
 	}
 }
+
+} // namespace cl

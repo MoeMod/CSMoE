@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *other)
 {
 	GetGameState()->OnEvent(event, entity, other);
@@ -454,4 +456,6 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 		// note when we heard the noise
 		m_noiseTimestamp = gpGlobals->time;
 	}
+}
+
 }

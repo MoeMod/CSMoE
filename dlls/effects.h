@@ -30,6 +30,8 @@
 #define SF_SPRITE_ONCE 0x0002
 #define SF_SPRITE_TEMPORARY 0x8000
 
+namespace sv {
+
 class CSprite : public CPointEntity
 {
 public:
@@ -54,8 +56,7 @@ public:
 
 	inline void SetAttachment(edict_t *pEntity, int attachment)
 	{
-		if (pEntity)
-		{
+		if (pEntity) {
 			pev->skin = ENTINDEX(pEntity);
 			pev->body = attachment;
 			pev->aiment = pEntity;
@@ -79,7 +80,12 @@ public:
 	}
 	inline void SetTexture(int spriteIndex) { pev->modelindex = spriteIndex; }
 	inline void SetScale(float scale) { pev->scale = scale; }
-	inline void SetColor(int r, int g, int b) { pev->rendercolor.x = r; pev->rendercolor.y = g; pev->rendercolor.z = b; }
+	inline void SetColor(int r, int g, int b)
+	{
+		pev->rendercolor.x = r;
+		pev->rendercolor.y = g;
+		pev->rendercolor.z = b;
+	}
 	inline void SetBrightness(int brightness) { pev->renderamt = brightness; }
 
 	inline void AnimateAndDie(float framerate)
@@ -130,12 +136,20 @@ public:
 	void SetStartEntity(int entityIndex);
 	void SetEndEntity(int entityIndex);
 
-	inline void SetStartAttachment(int attachment) { pev->sequence = (pev->sequence & 0x0FFF) | ((attachment & 0xF) << 12); }
+	inline void SetStartAttachment(int attachment)
+	{
+		pev->sequence = (pev->sequence & 0x0FFF) | ((attachment & 0xF) << 12);
+	}
 	inline void SetEndAttachment(int attachment) { pev->skin = (pev->skin & 0x0FFF) | ((attachment & 0xF) << 12); }
 	inline void SetTexture(int spriteIndex) { pev->modelindex = spriteIndex; }
 	inline void SetWidth(int width) { pev->scale = width; }
 	inline void SetNoise(int amplitude) { pev->body = amplitude; }
-	inline void SetColor(int r, int g, int b) { pev->rendercolor.x = r; pev->rendercolor.y = g; pev->rendercolor.z = b; }
+	inline void SetColor(int r, int g, int b)
+	{
+		pev->rendercolor.x = r;
+		pev->rendercolor.y = g;
+		pev->rendercolor.z = b;
+	}
 	inline void SetBrightness(int brightness) { pev->renderamt = brightness; }
 	inline void SetFrame(float frame) { pev->frame = frame; }
 	inline void SetScrollRate(int speed) { pev->animtime = speed; }
@@ -153,11 +167,11 @@ public:
 
 public:
 	inline int GetTexture(void) { return pev->modelindex; }
-	inline int GetWidth(void) { return (int)(pev->scale); }
+	inline int GetWidth(void) { return (int) (pev->scale); }
 	inline int GetNoise(void) { return pev->body; }
-	inline int GetBrightness(void) { return (int)(pev->renderamt); }
-	inline int GetFrame(void) { return (int)(pev->frame); }
-	inline int GetScrollRate(void) { return (int)(pev->animtime); }
+	inline int GetBrightness(void) { return (int) (pev->renderamt); }
+	inline int GetFrame(void) { return (int) (pev->frame); }
+	inline int GetScrollRate(void) { return (int) (pev->animtime); }
 
 public:
 	void EXPORT TriggerTouch(CBaseEntity *pOther);
@@ -175,7 +189,11 @@ public:
 	static CBeam *BeamCreate(const char *pSpriteName, int width);
 
 public:
-	inline void LiveForTime(float time) { SetThink(&CBaseEntity::SUB_Remove); pev->nextthink = gpGlobals->time + time; }
+	inline void LiveForTime(float time)
+	{
+		SetThink(&CBaseEntity::SUB_Remove);
+		pev->nextthink = gpGlobals->time + time;
+	}
 
 	inline void BeamDamageInstant(TraceResult *ptr, float damage)
 	{
@@ -211,9 +229,11 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	CSprite * m_pSprite;
+	CSprite *m_pSprite;
 	int m_iszSpriteName;
 	Vector m_firePosition;
 };
+
+}
 
 #endif

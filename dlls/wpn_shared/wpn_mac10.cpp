@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_mac10.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum mac10_e
 {
 	MAC10_IDLE1,
@@ -179,4 +185,6 @@ void CMAC10::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(MAC10_IDLE1, UseDecrement() != FALSE);
+}
+
 }

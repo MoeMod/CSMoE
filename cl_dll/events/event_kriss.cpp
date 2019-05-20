@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum kriss_e
 {
 	KRISS_IDLE,
@@ -108,4 +110,6 @@ void EV_FireKRISS(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_45ACP,
 		2 );
+}
+
 }

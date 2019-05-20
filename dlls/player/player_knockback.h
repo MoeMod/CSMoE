@@ -4,6 +4,14 @@
 #pragma once
 #endif
 
+class Vector; // vector.h
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 struct KnockbackData
 {
 	float flOnGround;
@@ -14,7 +22,9 @@ struct KnockbackData
 };
 
 class CBasePlayer; // player.h
-class Vector; // vector.h
+
 void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackData &data);
+
+}
 
 #endif

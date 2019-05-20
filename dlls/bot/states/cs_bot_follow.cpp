@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Follow our leader
 
 void FollowState::OnEnter(CCSBot *me)
@@ -320,4 +322,6 @@ void FollowState::OnUpdate(CCSBot *me)
 void FollowState::OnExit(CCSBot *me)
 {
 	;
+}
+
 }

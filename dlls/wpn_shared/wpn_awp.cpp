@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_awp.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum awp_e
 {
 	AWP_IDLE,
@@ -211,4 +217,6 @@ float CAWP::GetMaxSpeed(void)
 		return 210;
 
 	return 150;
+}
+
 }

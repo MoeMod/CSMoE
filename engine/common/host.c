@@ -1243,7 +1243,7 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
  	extern int switch_installdll_client( void );
  	switch_installdll_client(); // cl_dll/cdll_int.cpp
  	extern int switch_installdll_server( void );
- 	//switch_installdll_server();
+ 	switch_installdll_server();
 #endif
 
 	pChangeGame = func;	// may be NULL

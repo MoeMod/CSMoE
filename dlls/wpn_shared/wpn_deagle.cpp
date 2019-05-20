@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_deagle.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum deagle_e
 {
 	DEAGLE_IDLE1,
@@ -205,4 +211,6 @@ void CDEAGLE::WeaponIdle(void)
 
 	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 		SendWeaponAnim(SHIELDGUN_DRAWN_IDLE, UseDecrement() != FALSE);
+}
+
 }

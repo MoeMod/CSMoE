@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //Flashbang
 #define FLASHBANG_MAX_SPEED		250
 #define FLASHBANG_MAX_SPEED_SHIELD	180
@@ -41,5 +47,7 @@ public:
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
 };
+
+}
 
 #endif

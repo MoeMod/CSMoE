@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_smokegrenade.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum smokegrenade_e
 {
 	SMOKEGRENADE_IDLE,
@@ -275,4 +281,6 @@ void CSmokeGrenade::WeaponIdle(void)
 BOOL CSmokeGrenade::CanDeploy(void)
 {
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+}
+
 }

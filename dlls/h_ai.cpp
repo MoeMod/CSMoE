@@ -5,6 +5,8 @@
 #include "monsters.h"
 #include "game.h"
 
+namespace sv {
+
 BOOL g_fDrawLines = FALSE;
 
 NOXREF BOOL FBoxVisible(entvars_t *pevLooker, entvars_t *pevTarget, Vector &vecTargetOrigin, float flSize)
@@ -166,4 +168,6 @@ NOXREF Vector VecCheckThrow(entvars_t *pev, const Vector &vecSpot1, Vector vecSp
 	}
 
 	return vecGrenadeVel;
+}
+
 }

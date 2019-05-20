@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum scout_e
 {
 	SCOUT_IDLE,
@@ -73,4 +75,6 @@ void EV_FireScout(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_762MM,
 		2 );
+}
+
 }

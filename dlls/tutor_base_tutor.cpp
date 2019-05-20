@@ -52,7 +52,9 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
-CBaseTutor *TheTutor = NULL;
+namespace sv {
+
+DLL_GLOBAL CBaseTutor *TheTutor = NULL;
 
 TutorMessageEvent::TutorMessageEvent(int mid, int duplicateID, float time, float lifetime, int priority)
 {
@@ -158,7 +160,7 @@ char *TutorMessageEvent::GetNextParameter(char *buf, int buflen)
 
 	Q_strncpy(buf, param->m_data, buflen);
 	buf[buflen] = '\0';
-   
+
 	delete param;
 	return buf;
 }
@@ -467,4 +469,6 @@ bool CBaseTutor::DoMessagesHaveSameID(int id1, int id2)
 	}
 
 	return false;
+}
+
 }

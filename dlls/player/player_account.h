@@ -4,9 +4,10 @@
 #pragma once
 #endif
 
+#ifndef CLIENT_DLL
+namespace sv {
 class CBasePlayer;
 
-#ifndef CLIENT_DLL
 class CPlayerAccount
 {
 public:
@@ -39,6 +40,7 @@ private:
 	int m_iAmount;
 	mutable int m_iLastAmount;
 };
+}
 #else
 using CPlayerAccount = int;
 #endif

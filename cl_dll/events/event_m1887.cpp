@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum m1887_e
 {
 	M1887_IDLE,
@@ -77,4 +79,6 @@ void EV_FireM1887( event_args_t *args )
 		8, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
 		1 );
+}
+
 }

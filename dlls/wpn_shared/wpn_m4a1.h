@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //m4a1
 #define M4A1_MAX_SPEED		230
 #define M4A1_DAMAGE		32
@@ -43,5 +49,7 @@ public:
 private:
 	unsigned short m_usFireM4A1;
 };
+
+}
 
 #endif

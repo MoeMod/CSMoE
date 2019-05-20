@@ -17,6 +17,9 @@ GNU General Public License for more details.
 #define PROJECT_ZB1_COUNTDOWN_H
 
 #include <memory>
+
+namespace sv {
+
 class IBaseMod;
 
 class ICountdownDelegate
@@ -31,7 +34,7 @@ public:
 class CModCountdownHelper
 {
 public:
-	CModCountdownHelper(IBaseMod* mod, std::unique_ptr<ICountdownDelegate> m_pDelegate) : m_pMod(mod), m_pDelegate(std::move(m_pDelegate)), m_iLastCountDown(-1), m_iTotalCounts(20){}
+	CModCountdownHelper(IBaseMod* mod, std::unique_ptr<ICountdownDelegate> m_pDelegate) : m_pDelegate(std::move(m_pDelegate)), m_pMod(mod), m_iTotalCounts(20), m_iLastCountDown(-1){}
 
 	void Think();
 
@@ -48,6 +51,8 @@ private:
 	int m_iLastCountDown;
 
 };
+
+}
 
 
 #endif //PROJECT_ZBB_GHOST_H

@@ -56,6 +56,8 @@
 #define HI_Z				0x10
 #define LO_Z				0x20
 
+namespace sv {
+
 extern int _navAreaCount;
 extern int _currentIndex;
 /*
@@ -1365,7 +1367,7 @@ public:
 				//{
 				//	fallDistance = ladder->m_bottom.z - area->GetCenter()->z;
 				//}
-				
+
 				float fallDamage = m_bot->GetApproximateFallDamage(fallDistance);
 
 				if (fallDamage > 0.0f)
@@ -1523,5 +1525,7 @@ void hideProgressMeter();
 
 bool isSniperRifle(CBasePlayerItem *item);
 float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder);
+
+}
 
 #endif // CS_BOT_H

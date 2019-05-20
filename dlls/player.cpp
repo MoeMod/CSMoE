@@ -25,6 +25,7 @@
 #include "items.h"
 #include "bmodels.h"
 #include "world.h"
+#include "triggers.h"
 
 #include "com_model.h"
 
@@ -42,6 +43,8 @@
 #include "player/player_spawnpoint.h"
 #include "player/player_knockback.h"
 #include "player/player_mod_strategy.h"
+
+namespace sv {
 
 /*
 * Globals initialization
@@ -1660,10 +1663,10 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		}
 	}
 
-	if (m_pTank != NULL)
+	if (m_pTank != nullptr)
 	{
 		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = NULL;
+		m_pTank = nullptr;
 	}
 
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -3103,10 +3106,10 @@ void CBasePlayer::JoiningThink()
 }
 void CBasePlayer::Disappear()
 {
-	if (m_pTank != NULL)
+	if (m_pTank != nullptr)
 	{
 		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = NULL;
+		m_pTank = nullptr;
 	}
 
 	CSound *pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
@@ -3322,13 +3325,13 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	MESSAGE_END();
 
 	// Holster weapon immediately, to allow it to cleanup
-	if (m_pActiveItem != NULL)
+	if (m_pActiveItem != nullptr)
 		m_pActiveItem->Holster();
 
-	if (m_pTank != NULL)
+	if (m_pTank != nullptr)
 	{
 		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = NULL;
+		m_pTank = nullptr;
 	}
 
 	// clear out the suit message cache so we don't keep chattering
@@ -3434,12 +3437,12 @@ void CBasePlayer::PlayerUse()
 	// Hit Use on a train?
 	if (m_afButtonPressed & IN_USE)
 	{
-		if (m_pTank != NULL)
+		if (m_pTank != nullptr)
 		{
 			// Stop controlling the tank
 			// TODO: Send HUD Update
 			m_pTank->Use(this, this, USE_OFF, 0);
-			m_pTank = NULL;
+			m_pTank = nullptr;
 			return;
 		}
 
@@ -4343,7 +4346,7 @@ void CBasePlayer::PostThink()
 		goto pt_end;
 
 	// Handle Tank controlling
-	if (m_pTank != NULL)
+	if (m_pTank != nullptr)
 	{
 		// if they've moved too far from the gun,  or selected a weapon, unuse the gun
 		if (m_pTank->OnControls(pev) && !pev->weaponmodel)
@@ -4355,7 +4358,7 @@ void CBasePlayer::PostThink()
 		{
 			// they've moved off the platform
 			m_pTank->Use(this, this, USE_OFF, 0);
-			m_pTank = NULL;
+			m_pTank = nullptr;
 		}
 	}
 
@@ -5896,10 +5899,10 @@ void CBasePlayer::ItemPostFrame()
 	static int fInSelect = FALSE;
 
 	// check if the player is using a tank
-	if (m_pTank != NULL)
+	if (m_pTank != nullptr)
 		return;
 
-	if (m_pActiveItem != NULL)
+	if (m_pActiveItem != nullptr)
 	{
 		if (HasShield() && IsReloading())
 		{
@@ -7838,7 +7841,7 @@ void CBasePlayer::ClientCommand(const char *cmd, const char *arg1, const char *a
 	BotArgs[3] = arg3;
 
 	UseBotArgs = true;
-	::ClientCommand(ENT(pev));
+	::sv::ClientCommand(ENT(pev));
 	UseBotArgs = false;
 }
 
@@ -8744,4 +8747,6 @@ void CBasePlayer::UpdateLocation(bool forceUpdate)
 bool CBasePlayer::Knockback(CBasePlayer *attacker, const KnockbackData &data) 
 { 
 	return m_pModStrategy->ApplyKnockback(attacker, data); 
+}
+
 }

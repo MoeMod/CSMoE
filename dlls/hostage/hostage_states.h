@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CHostageImprov;
 
 class HostageState: public SimpleState<CHostageImprov *>, public IImprovEvent
@@ -186,9 +188,9 @@ public:
 public:
 	void SetLeader(CBaseEntity *leader) { m_leader = leader; }
 	CBaseEntity *GetLeader() const { return m_leader; }
-	void SetFollowRange(float maxPathLength, float giveUpRange, float stopRange) 
+	void SetFollowRange(float maxPathLength, float giveUpRange, float stopRange)
 	{
-		m_maxPathLength = maxPathLength; 
+		m_maxPathLength = maxPathLength;
 		m_giveUpRange = giveUpRange;
 		m_stopRange = stopRange;
 	}
@@ -217,7 +219,7 @@ public:
 	virtual void OnUpdate(CHostageImprov *improv);
 	virtual void OnExit(CHostageImprov *improv);
 	virtual const char *GetName() const { return "Animate"; }
-   
+
 public:
 	struct SeqInfo
 	{
@@ -257,7 +259,7 @@ public:
 	void SetPerformance(PerformanceType performance) { m_performance = performance; }
 	void StartSequence(CHostageImprov *improv, const SeqInfo *seqInfo);
 	bool IsDoneHolding();
-	
+
 private:
 	enum { MAX_SEQUENCES = 8 };
 	struct SeqInfo m_sequence[ MAX_SEQUENCES ];
@@ -267,5 +269,7 @@ private:
 	bool m_isHolding;
 	CountdownTimer m_holdTimer;
 };
+
+}
 
 #endif // HOSTAGE_STATES_H

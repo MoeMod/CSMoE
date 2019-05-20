@@ -6,6 +6,8 @@
 
 #include "zs_subs.h"
 
+namespace sv {
+
 LINK_ENTITY_TO_CLASS(zombiespawn, CZombieSpawn);
 
 void CZombieSpawn::Spawn()
@@ -63,4 +65,6 @@ int CZBSBreak::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float
 			flDamage *= m_flHumanDamageRatio;
 	}
 	return CBreakable::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
 }

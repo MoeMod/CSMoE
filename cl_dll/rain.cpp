@@ -31,7 +31,6 @@ extern "C"
 #include "parsemsg.h"
 #include <new>
 
-
 #define DRIPSPEED    900		// speed of raindrips (pixel per secs)
 #define SNOWSPEED    200		// speed of snowflakes
 #define SNOWFADEDIST 80

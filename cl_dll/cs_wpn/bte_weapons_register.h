@@ -1,4 +1,5 @@
 #pragma once
+namespace cl {
 
 class CBasePlayerWeapon;
 
@@ -28,3 +29,5 @@ private:
 		return pEntity;
 	}
 };
+
+}

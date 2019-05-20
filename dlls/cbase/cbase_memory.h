@@ -10,11 +10,13 @@
 // for leaving this bug so long...
 
 #ifndef CLIENT_DLL
+namespace sv {
 //
 // Converts a entvars_t * to a class pointer
 // It will allocate the class and entity if necessary
 //
-template <class T> auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+template<class T>
+auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// call from mp to create entity ?
 	if (pev == nullptr)
@@ -24,8 +26,7 @@ template <class T> auto GetClassPtr(entvars_t *pev) noexcept -> typename std::en
 	T *a = GET_PRIVATE<T>(ENT(pev));
 
 	// call from engine to placement new CBase ?
-	if (a == nullptr)
-	{
+	if (a == nullptr) {
 		a = new(pev) T();
 		// should auto assign a->pev
 		// a->pev = pev;
@@ -38,14 +39,16 @@ template <class T> auto GetClassPtr(entvars_t *pev) noexcept -> typename std::en
 
 // pEntityVars should point to entvars_t, but can have different static type to deduce T
 // deprecated
-template <class T> DEPRECATED auto GetClassPtr(T *a) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+template<class T>
+DEPRECATED auto GetClassPtr(T *a) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// this is the real type...
 	entvars_t *pev = reinterpret_cast<entvars_t *>(a);
 	return GetClassPtr<T>(pev);
 }
 
-template<class T> T *CreateClassPtr()
+template<class T>
+T *CreateClassPtr()
 {
 	return GetClassPtr<T>(nullptr);
 }
@@ -53,11 +56,11 @@ template<class T> T *CreateClassPtr()
 // CBaseEntity * <=> CBasePlayer *
 template<class Result, class T>
 constexpr auto static_ent_cast(T *p)
-	-> typename std::enable_if<
+-> typename std::enable_if<
 		std::is_base_of<typename std::remove_cv<typename std::remove_pointer<Result>::type>::type, typename std::remove_cv<T>::type>::value ||
 		std::is_base_of<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value,
 		Result
-	>::type
+>::type
 {
 	return static_cast<Result>(p);
 }
@@ -119,4 +122,5 @@ auto dynamic_ent_cast(T *p) -> decltype(CBaseEntity::Instance(p), Result())
 	return dynamic_ent_cast<Result>(CBaseEntity::Instance(p));
 }
 
+} // namespace sv
 #endif

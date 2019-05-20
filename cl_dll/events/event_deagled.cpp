@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum elite_e
 {
 	ELITE_IDLE,
@@ -105,4 +107,6 @@ void EV_FireDeagleD_Left(event_args_s *args)
 void EV_FireDeagleD_Right( event_args_s *args )
 {
 	EV_FireDeagleD( args, Com_RandomLong( ELITE_SHOOTRIGHT1, ELITE_SHOOTRIGHT4 ));
+}
+
 }

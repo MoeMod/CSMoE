@@ -3,6 +3,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "saverestore.h"
+#include "bmodels.h"
 #include "client.h"
 #include "decals.h"
 #include "gamerules.h"
@@ -10,16 +11,18 @@
 #include "MemPool.h"
 
 #include "game_shared/perf_counter.h"
-void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
 
-extern "C"
+//extern "C"
+namespace sv
 {
 	void PM_Move(struct playermove_s *ppmove, int server);
 	void PM_Init(struct playermove_s *ppmove);
 	char PM_FindTextureType(char *name);
 }
 
-Vector VecBModelOrigin(entvars_t *pevBModel);
+namespace sv {
+
+void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
 extern DLL_GLOBAL Vector g_vecAttackDir;
 extern DLL_GLOBAL int g_iSkillLevel;
 
@@ -46,21 +49,20 @@ int CaseInsensitiveHash(const char *string, int iBounds)
 	return (hash % iBounds);
 }
 
-void EmptyEntityHashTable(void)
+void EmptyEntityHashTable()
 {
 	int i;
-	hash_item_t *item;
-	hash_item_t *temp;
-	hash_item_t *free;
+	hash_item_t *item, *temp, *free;
 
 	for (i = 0; i < stringsHashTable.Count(); i++)
 	{
 		item = &stringsHashTable[i];
 		temp = item->next;
-		item->pev = NULL;
+
+		item->pev = nullptr;
 		item->pevIndex = 0;
-		item->lastHash = NULL;
-		item->next = NULL;
+		item->lastHash = 0;
+		item->next = nullptr;
 
 		while (temp)
 		{
@@ -71,90 +73,82 @@ void EmptyEntityHashTable(void)
 	}
 }
 
-void AddEntityHashValue(struct entvars_s *pev, const char *value, hash_types_e fieldType)
+void AddEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType)
 {
 	int count;
-	hash_item_t *item;
-	hash_item_t *next;
-	hash_item_t *temp;
-	hash_item_t *newp;
-	unsigned int hash = 0;
-	int pevIndex;
+	hash_item_t *item, *next, *temp, *newp;
+	int hash, pevIndex;
 	entvars_t *pevtemp;
 
-	if (fieldType == CLASSNAME)
+	if (fieldType != CLASSNAME)
+		return;
+
+	if (FStringNull(pev->classname))
+		return;
+
+	count = stringsHashTable.Count();
+	hash = CaseInsensitiveHash(value, count);
+	pevIndex = ENTINDEX(ENT(pev));
+	item = &stringsHashTable[hash];
+
+	while (item->pev)
 	{
-		if (!FStringNull(pev->classname))
+		if (!Q_strcmp(STRING(item->pev->classname), STRING(pev->classname)))
+			break;
+
+		hash = (hash + 1) % count;
+		item = &stringsHashTable[hash];
+	}
+	if (item->pev)
+	{
+		next = item->next;
+		while (next)
 		{
-			count = stringsHashTable.Count();
-			hash = CaseInsensitiveHash(value, count);
-			pevIndex = ENTINDEX(ENT(pev));
-			item = &stringsHashTable[hash];
+			if (item->pev == pev || item->pevIndex >= pevIndex)
+				break;
 
-			while (item->pev)
-			{
-				if (!strcmp(STRING(item->pev->classname), STRING(pev->classname)))
-					break;
-
-				hash = (hash + 1) % count;
-				item = &stringsHashTable[hash];
-			}
-
-			if (item->pev)
-			{
-				next = item->next;
-
-				while (next)
-				{
-					if (item->pev == pev)
-						break;
-
-					if (item->pevIndex >= pevIndex)
-						break;
-
-					item = next;
-					next = next->next;
-				}
-
-				if (pevIndex < item->pevIndex)
-				{
-					pevtemp = item->pev;
-					item->pev = pev;
-					item->lastHash = NULL;
-					item->pevIndex = pevIndex;
-					pevIndex = ENTINDEX(ENT(pevtemp));
-				}
-				else
-					pevtemp = pev;
-
-				if (item->pev != pevtemp)
-				{
-					temp = item->next;
-					newp = (hash_item_t *)hashItemMemPool.Alloc(sizeof(hash_item_t));
-					item->next = newp;
-					newp->pev = pevtemp;
-					newp->lastHash = NULL;
-					newp->pevIndex = pevIndex;
-
-					if (temp)
-						newp->next = temp;
-					else
-						newp->next = NULL;
-				}
-			}
-			else
-			{
-				item->pev = pev;
-				item->lastHash = NULL;
-				item->pevIndex = ENTINDEX(ENT(pev));
-			}
+			item = next;
+			next = next->next;
 		}
+		if (pevIndex < item->pevIndex)
+		{
+			pevtemp = item->pev;
+			item->pev = pev;
+			item->lastHash = nullptr;
+			item->pevIndex = pevIndex;
+
+			pevIndex = ENTINDEX(ENT(pevtemp));
+		}
+		else
+			pevtemp = pev;
+
+		if (item->pev != pevtemp)
+		{
+			temp = item->next;
+			newp = (hash_item_t *)hashItemMemPool.Alloc(sizeof(hash_item_t));
+
+			item->next = newp;
+			newp->pev = pevtemp;
+			newp->lastHash = nullptr;
+			newp->pevIndex = pevIndex;
+
+			if (next)
+				newp->next = temp;
+			else
+				newp->next = nullptr;
+		}
+	}
+	else
+	{
+		item->pev = pev;
+		item->lastHash = nullptr;
+		item->pevIndex = ENTINDEX(ENT(pev));
 	}
 }
 
-void RemoveEntityHashValue(struct entvars_s *pev, const char *value, hash_types_e fieldType)
+void RemoveEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType)
 {
-	int hash = 0;
+	int hash;
 	hash_item_t *item;
 	hash_item_t *last;
 	int pevIndex;
@@ -164,59 +158,56 @@ void RemoveEntityHashValue(struct entvars_s *pev, const char *value, hash_types_
 	hash = CaseInsensitiveHash(value, count);
 	pevIndex = ENTINDEX(ENT(pev));
 
-	if (fieldType == CLASSNAME)
-	{
-		hash = hash % count;
-		item = &stringsHashTable[hash];
+	if (fieldType != CLASSNAME)
+		return;
 
-		while (item->pev)
+	hash = hash % count;
+	item = &stringsHashTable[hash];
+
+	while (item->pev)
+	{
+		if (!Q_strcmp(STRING(item->pev->classname), STRING(pev->classname)))
+			break;
+
+		hash = (hash + 1) % count;
+		item = &stringsHashTable[hash];
+	}
+	if (item->pev)
+	{
+		last = item;
+		while (item->next)
 		{
-			if (!strcmp(STRING(item->pev->classname), STRING(pev->classname)))
+			if (item->pev == pev)
 				break;
 
-			hash = (hash + 1) % count;
-			item = &stringsHashTable[hash];
-		}
-
-		if (item->pev)
-		{
 			last = item;
-
-			while (item->next)
+			item = item->next;
+		}
+		if (item->pev == pev)
+		{
+			if (last == item)
 			{
-				if (item->pev == pev)
-					break;
-
-				last = item;
-				item = item->next;
-			}
-
-			if (item->pev == pev)
-			{
-				if (last == item)
+				if (item->next)
 				{
-					if (item->next)
-					{
-						item->pev = item->next->pev;
-						item->pevIndex = item->next->pevIndex;
-						item->lastHash = NULL;
-						item->next = item->next->next;
-					}
-					else
-					{
-						item->pev = NULL;
-						item->lastHash = NULL;
-						item->pevIndex = 0;
-					}
+					item->pev = item->next->pev;
+					item->pevIndex = item->next->pevIndex;
+					item->lastHash = nullptr;
+					item->next = item->next->next;
 				}
 				else
 				{
-					if (stringsHashTable[hash].lastHash == item)
-						stringsHashTable[hash].lastHash = NULL;
-
-					last->next = item->next;
-					hashItemMemPool.Free(item);
+					item->pev = nullptr;
+					item->lastHash = nullptr;
+					item->pevIndex = 0;
 				}
+			}
+			else
+			{
+				if (stringsHashTable[hash].lastHash == item)
+					stringsHashTable[hash].lastHash = nullptr;
+
+				last->next = item->next;
+				hashItemMemPool.Free(item);
 			}
 		}
 	}
@@ -309,6 +300,9 @@ void CONSOLE_ECHO_LOGGED(char *pszMsg, ...)
 	UTIL_LogPrintf(szStr);
 }
 */
+
+
+
 static DLL_FUNCTIONS gFunctionTable =
 {
 	GameDLLInit,
@@ -363,7 +357,7 @@ static DLL_FUNCTIONS gFunctionTable =
 	AllowLagCompensation
 };
 
-int GetEntityAPI(DLL_FUNCTIONS *pFunctionTable, int interfaceVersion)
+extern "C" EXPORT int GetEntityAPI(DLL_FUNCTIONS *pFunctionTable, int interfaceVersion)
 {
 	if (!pFunctionTable || interfaceVersion != INTERFACE_VERSION)
 		return 0;
@@ -376,6 +370,26 @@ int GetEntityAPI(DLL_FUNCTIONS *pFunctionTable, int interfaceVersion)
 		stringsHashTable[i].next = NULL;
 
 	EmptyEntityHashTable();
+	return 1;
+}
+
+extern "C" EXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion)
+{
+	if (!pFunctionTable || *interfaceVersion != INTERFACE_VERSION)
+	{
+		*interfaceVersion = INTERFACE_VERSION;
+		return 0;
+	}
+
+	Q_memcpy(pFunctionTable, &gFunctionTable, sizeof(DLL_FUNCTIONS));
+
+	stringsHashTable.SetSize(2048);
+
+	for (int i = 0; i < stringsHashTable.Count(); i++)
+		stringsHashTable[i].next = NULL;
+
+	EmptyEntityHashTable();
+
 	return 1;
 }
 
@@ -400,7 +414,7 @@ NEW_DLL_FUNCTIONS gNewDLLFunctions =
 	nullptr
 };
 
-int GetNewDLLFunctions(NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion)
+extern "C" EXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion)
 {
 	if (!pFunctionTable || *interfaceVersion != NEW_DLL_FUNCTIONS_VERSION)
 	{
@@ -812,7 +826,7 @@ void SetObjectCollisionBox(entvars_t *pev)
 
 void CBaseEntity::SetObjectCollisionBox(void)
 {
-	::SetObjectCollisionBox(pev);
+	::sv::SetObjectCollisionBox(pev);
 }
 
 int CBaseEntity::Intersects(CBaseEntity *pOther)
@@ -893,4 +907,6 @@ CBaseEntity *CBaseEntity::Create(const char *szName, const Vector &vecOrigin, co
 	pEntity->pev->angles = vecAngles;
 	DispatchSpawn(pEntity->edict());
 	return pEntity;
+}
+
 }

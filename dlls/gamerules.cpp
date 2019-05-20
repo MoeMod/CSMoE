@@ -36,6 +36,8 @@
 #include "cvardef.h"
 #include "gamemode/mods.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -45,14 +47,11 @@ BOOL CGameRules::CanHaveAmmo(CBasePlayer *pPlayer, const char *pszAmmoName, int 
 {
 	int iAmmoIndex;
 
-	if (pszAmmoName != NULL)
-	{
+	if (pszAmmoName != NULL) {
 		iAmmoIndex = pPlayer->GetAmmoIndex(pszAmmoName);
 
-		if (iAmmoIndex > -1)
-		{
-			if (pPlayer->AmmoInventory(iAmmoIndex) < iMaxCarry)
-			{
+		if (iAmmoIndex > -1) {
+			if (pPlayer->AmmoInventory(iAmmoIndex) < iMaxCarry) {
 				// player has room for more of this type of ammo
 				return TRUE;
 			}
@@ -82,35 +81,27 @@ edict_t *CGameRules::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
 BOOL CGameRules::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon)
 {
 	// only living players can have items
-	if (pPlayer->pev->deadflag != DEAD_NO)
-	{
+	if (pPlayer->pev->deadflag != DEAD_NO) {
 		return FALSE;
 	}
 
 	CCSBotManager *ctrl = TheCSBots();
 
-	if (pPlayer->IsBot() && ctrl != NULL && !ctrl->IsWeaponUseable(pWeapon))
-	{
+	if (pPlayer->IsBot() && ctrl != NULL && !ctrl->IsWeaponUseable(pWeapon)) {
 		return FALSE;
 	}
 
-	if (pWeapon->pszAmmo1())
-	{
-		if (!CanHaveAmmo(pPlayer, pWeapon->pszAmmo1(), pWeapon->iMaxAmmo1()))
-		{
+	if (pWeapon->pszAmmo1()) {
+		if (!CanHaveAmmo(pPlayer, pWeapon->pszAmmo1(), pWeapon->iMaxAmmo1())) {
 			// we can't carry anymore ammo for this gun. We can only
 			// have the gun if we aren't already carrying one of this type
-			if (pPlayer->HasPlayerItem(pWeapon))
-			{
+			if (pPlayer->HasPlayerItem(pWeapon)) {
 				return FALSE;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		// weapon doesn't use ammo, don't take another if you already have it.
-		if (pPlayer->HasPlayerItem(pWeapon))
-		{
+		if (pPlayer->HasPlayerItem(pWeapon)) {
 			return FALSE;
 		}
 	}
@@ -121,7 +112,7 @@ BOOL CGameRules::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pWeapo
 
 void CGameRules::RefreshSkillData()
 {
-	int iSkill = (int)CVAR_GET_FLOAT("skill");
+	int iSkill = (int) CVAR_GET_FLOAT("skill");
 
 	if (iSkill < 1)
 		iSkill = 1;
@@ -152,4 +143,6 @@ CGameRules *InstallGameRules()
 	//return new CHalfLifeMultiplay;
 	InstallBteMod(gamemode.string);
 	return g_pModRunning;
+}
+
 }

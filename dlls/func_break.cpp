@@ -47,6 +47,8 @@
 
 #include "bot/cs_bot.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -582,7 +584,7 @@ void CBreakable::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		pev->takedamage = DAMAGE_NO;
 		pev->deadflag = DEAD_DEAD;
 		pev->effects = EF_NODRAW;
-      
+
 		Die();
 	}
 }
@@ -1099,4 +1101,6 @@ int CPushable::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float
 	}
 
 	return 1;
+}
+
 }

@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum infinity_e
 {
 	ANIM_IDLE = 0,
@@ -113,4 +115,6 @@ void EV_FireInfinity_Right( event_args_s *args )
 		EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT1, 1);
 	else
 		EV_FireInfinity(args, ANIM_SP_SHOOT_RIGHT2, 1);
+}
+
 }

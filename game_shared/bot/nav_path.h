@@ -37,6 +37,8 @@
 #pragma warning(disable : 4530)
 #endif
 
+namespace sv {
+
 class CNavPath
 {
 public:
@@ -219,5 +221,7 @@ private:
 	bool m_isDebug;
 	CStuckMonitor m_stuckMonitor;
 };
+
+}
 
 #endif // NAV_PATH_H
