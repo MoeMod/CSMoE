@@ -442,3 +442,23 @@ extern "C" void DLLEXPORT F(void *pv) {
 
 	*pcldll_func = cldll_func;
 }
+
+#ifdef XASH_STATIC_GAMELIB
+typedef struct dllexport_s
+{
+	const char *name;
+	void *func;
+} dllexport_t;
+
+static dllexport_t switch_client_exports[] = {
+	{ "F", (void*)F },
+	{ NULL, NULL }
+};
+
+extern "C" int dll_register( const char *name, dllexport_t *exports );
+
+extern "C" int switch_installdll_client( void )
+{
+	return dll_register( "client", switch_client_exports );
+}
+#endif

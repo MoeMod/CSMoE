@@ -231,7 +231,12 @@ include_directories (
 	../public/tier1/
 	../dlls/
 	../game_shared/)
-add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
+
+if(XASH_STATIC_GAMELIB)
+	add_library (${SERVER_LIBRARY} STATIC ${SERVER_SOURCES})
+else()
+	add_library (${SERVER_LIBRARY} SHARED ${SERVER_SOURCES})
+endif()
 
 if(APPLE OR ANDROID)
 	add_definitions(
@@ -282,4 +287,6 @@ else()
 			PREFIX "" OUTPUT_NAME ${SERVER_LIBRARY_NAME})
 endif()
 
-install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${SERVER_INSTALL_DIR})
+if(NOT XASH_STATIC_GAMELIB)
+	install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${SERVER_INSTALL_DIR})
+endif()

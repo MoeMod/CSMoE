@@ -4,6 +4,12 @@ cmake_minimum_required(VERSION  2.8.0)
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
+option(XASH_STATIC_GAMELIB "Build static game library" OFF)
+
+if(XASH_STATIC_GAMELIB)
+	add_definitions(-DXASH_STATIC_GAMELIB=1)
+endif()
+
 if (APPLE OR ANDROID)
 	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof)
 	set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -58,10 +64,8 @@ set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
-
-ADD_SUBDIRECTORY(cl_dll)
 ADD_SUBDIRECTORY(dlls)
+ADD_SUBDIRECTORY(cl_dll)
+ADD_SUBDIRECTORY(mainui_cpp)
 ADD_SUBDIRECTORY(engine)
 ADD_SUBDIRECTORY(game_launch)
-ADD_SUBDIRECTORY(mainui_cpp)
-

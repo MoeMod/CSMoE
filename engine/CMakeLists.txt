@@ -63,7 +63,7 @@ set(XASH_ENGINE_SOURCES
 	common/hpak.c
 	common/infostring.c
 	common/identification.c
-	common/library.c
+#	common/library.c
 	common/masterlist.c
 	common/mathlib.c
 	common/matrixlib.c
@@ -127,6 +127,12 @@ set(XASH_ENGINE_SOURCES
 	server/sv_world.c
 
 )
+
+if(XASH_STATIC_GAMELIB)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.c)
+else()
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.c)
+endif()
 
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
@@ -273,6 +279,11 @@ else()
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
 endif()
 
+if(XASH_STATIC_GAMELIB)
+	#target_link_libraries(${XASH_ENGINE} xashmenu)
+	target_link_libraries(${XASH_ENGINE} xashmenu client server)
+endif()
+
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
@@ -389,7 +400,6 @@ endif()
 if(XASH_USE_STB_SPRINTF)
 	add_definitions(-DXASH_USE_STB_SPRINTF)
 endif()
-
 
 if(ANDROID)
 	target_link_libraries(${XASH_ENGINE} -ldl -llog)
