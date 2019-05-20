@@ -243,6 +243,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_mp7a1p.cpp
 	../dlls/wpn_shared/wpn_infinitys.cpp
 	../dlls/wpn_shared/wpn_m14ebr.cpp
+	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
 	)
 
