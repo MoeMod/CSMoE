@@ -972,7 +972,7 @@ void Touch_Init( void )
 	touch_joy_radius = Cvar_Get( "touch_joy_radius", "1.0", 0, "joy radius multiplier" );
 	touch_move_indicator = Cvar_Get( "touch_move_indicator", "0.0", 0, "indicate move events (0 to disable)" );
 	touch_joy_texture = Cvar_Get( "touch_joy_texture", "touch_default/joy.tga", 0, "texture for move indicator");
-	touch_follow_attack_enable = Cvar_Get( "touch_follow_attack_enable", "1", 0, "enable attack button follows finger");
+	touch_follow_attack_enable = Cvar_Get( "touch_follow_attack_enable", "0", 0, "enable attack button follows finger");
 	touch_3dtouch_attack_pressure = Cvar_Get( "touch_3dtouch_attack_pressure", "2.0", 0, "enable attack button follows finger");
 
 	// input devices cvar
