@@ -25,9 +25,6 @@
     <Filter Include="engine">
       <UniqueIdentifier>{ecbbee2b-1da6-4861-864a-8346d7a34db6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public">
-      <UniqueIdentifier>{3b9d1c81-47fa-4ca9-a462-51e928dbd118}</UniqueIdentifier>
-    </Filter>
     <Filter Include="dlls">
       <UniqueIdentifier>{1ffbfb16-9fec-424f-88bc-f44c078d51f0}</UniqueIdentifier>
     </Filter>
@@ -57,6 +54,9 @@
     </Filter>
     <Filter Include="cl_dll\hud\moe">
       <UniqueIdentifier>{2441c342-4c6a-412d-b545-0512bfd993b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{3b9d1c81-47fa-4ca9-a462-51e928dbd118}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -345,15 +345,6 @@
     <ClCompile Include="..\cl_dll\hud\spectator_gui.cpp">
       <Filter>cl_dll\hud</Filter>
     </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_math.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_shared.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_debug.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\cl_dll\view.cpp">
       <Filter>cl_dll</Filter>
     </ClCompile>
@@ -629,6 +620,15 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_math.cpp">
+      <Filter>pm_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_shared.cpp">
+      <Filter>pm_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_debug.cpp">
+      <Filter>pm_shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -916,6 +916,27 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_info.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_materials.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_math.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_movevars.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_shared.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_debug.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_defs.h">
+      <Filter>pm_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
