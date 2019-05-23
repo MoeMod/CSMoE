@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_thompson.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum thompson_e
 {
 	THOMPSON_IDLE,
@@ -193,4 +199,6 @@ void CTHOMPSON::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 
 	SendWeaponAnim(THOMPSON_IDLE, UseDecrement() != FALSE);
+}
+
 }

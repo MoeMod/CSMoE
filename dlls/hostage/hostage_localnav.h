@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 #define NODE_INVALID_EMPTY		-1
 
 #define PATH_TRAVERSABLE_EMPTY		0
@@ -106,7 +108,7 @@ private:
 	static float flLastThinkTime;
 	static EHANDLE hostages[ MAX_HOSTAGES_NAV ];
 	static int tot_hostages;
-   
+
 	CHostage *m_pOwner;
 	edict_t *m_pTargetEnt;
 	BOOL m_fTargetEntHit;
@@ -114,5 +116,7 @@ private:
 	node_index_t m_nindexAvailableNode;
 	Vector m_vecStartingLoc;
 };
+
+}
 
 #endif // HOSTAGE_LOCALNAV_H

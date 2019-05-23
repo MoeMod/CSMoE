@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m1887.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m1887_e
 {
 	M1887_IDLE,
@@ -232,4 +238,6 @@ void CM1887::WeaponIdle(void)
 		else
 			SendWeaponAnim(M1887_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

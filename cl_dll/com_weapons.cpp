@@ -24,15 +24,18 @@
 #include "entity_state.h"
 #include "r_efx.h"
 
+namespace cl {
+
 // g_runfuncs is true if this is the first time we've "predicated" a particular movement/firing
 //  command.  If it is 1, then we should play events/sounds etc., otherwise, we just will be
 //  updating state info, but not firing events
 int	g_runfuncs = 0;
 
+
 // During our weapon prediction processing, we'll need to reference some data that is part of
 //  the final state passed into the postthink functionality.  We'll set this pointer and then
 //  reset it to NULL as appropriate
-struct local_state_s *g_finalstate = NULL;
+local_state_t *g_finalstate = NULL;
 
 /*
 ====================
@@ -47,7 +50,7 @@ void COM_Log( char *pszFile, char *fmt, ...)
 	char		string[1024];
 	FILE *fp;
 	const char *pfilename;
-	
+
 	if ( !pszFile )
 	{
 		pfilename = "c:\\hllog.txt";
@@ -157,6 +160,8 @@ void HUD_PlaybackEvent( int flags, const edict_t *pInvoker, unsigned short event
 								bparam1, bparam2 );
 }
 
+
+
 /*
 =====================
 UTIL_WeaponTimeBase
@@ -171,7 +176,7 @@ inline float UTIL_WeaponTimeBase( void )
 }
 
 
-static unsigned int glSeed = 0; 
+static unsigned int glSeed = 0;
 
 unsigned int seed_table[ 256 ] =
 {
@@ -193,13 +198,13 @@ unsigned int seed_table[ 256 ] =
 	25678, 18555, 13256, 23316, 22407, 16727, 991, 9236, 5373, 29402, 6117, 15241, 27715, 19291, 19888, 19847
 };
 
-unsigned int U_Random( void ) 
-{ 
-	glSeed *= 69069; 
+unsigned int U_Random( void )
+{
+	glSeed *= 69069;
 	glSeed += seed_table[ glSeed & 0xff ];
- 
-	return ( ++glSeed & 0x0fffffff ); 
-} 
+
+	return ( ++glSeed & 0x0fffffff );
+}
 
 void U_Srand( unsigned int seed )
 {
@@ -266,4 +271,7 @@ float UTIL_SharedRandomFloat( unsigned int seed, float low, float high )
 
 		return (low + offset * range );
 	}
+}
+
+
 }

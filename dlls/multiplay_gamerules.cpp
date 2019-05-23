@@ -65,15 +65,17 @@
 
 #include <ctype.h>
 
+namespace sv {
+
 /*
 * Globals initialization
 */
 #define COM_TOKEN_LEN				1500
 static char mp_com_token[ COM_TOKEN_LEN ];
-cvar_t *sv_clienttrace = NULL;
+DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
 
-CCStrikeGameMgrHelper g_GameMgrHelper;
-CHalfLifeMultiplay *g_pMPGameRules = NULL;
+DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
+DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
 
 bool IsBotSpeaking()
 {
@@ -4724,4 +4726,6 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 {
 	pPlayer->SetPlayerModel(pPlayer->m_bHasC4);
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
+}
+
 }

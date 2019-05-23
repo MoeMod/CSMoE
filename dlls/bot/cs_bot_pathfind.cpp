@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Determine actual path positions bot will move between along the path
 
 bool CCSBot::ComputePathPositions()
@@ -1819,4 +1821,6 @@ void CCSBot::DrawPath()
 		UTIL_DrawBeamPoints(close + Vector(25, 0, 0), close + Vector(-25, 0, 0), 1, 0, 255, 0);
 		UTIL_DrawBeamPoints(close + Vector(0, 25, 0), close + Vector(0, -25, 0), 1, 0, 255, 0);
 	}
+}
+
 }

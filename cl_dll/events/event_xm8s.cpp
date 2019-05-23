@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum xm8_e
 {
 	CARBINE_XM8_IDLE1,
@@ -99,4 +101,6 @@ void EV_FireXM8S(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

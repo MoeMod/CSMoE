@@ -32,11 +32,13 @@
 #include "globals.h"
 #include "game_shared/simple_checksum.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
-BotProfileManager *TheBotProfiles = NULL;
-const char *BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
+DLL_GLOBAL BotProfileManager *TheBotProfiles = NULL;
+DLL_GLOBAL const char *BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
 
 // Generates a filename-decorated skin name
 
@@ -653,4 +655,6 @@ const BotProfile *BotProfileManager::GetRandomProfile(BotDifficultyType difficul
 	// we don't need random profiles when we're not in the game dll
 	return nullptr;
 #endif // RANDOM_LONG
+}
+
 }

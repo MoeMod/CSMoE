@@ -9,6 +9,8 @@
 #include <vector>
 #include <algorithm>
 
+namespace sv {
+
 class CMonsterManager::impl_t
 {
 public:
@@ -20,14 +22,15 @@ public:
 		if (m_vecEntities.size() <= new_size)
 			return;
 
-		std::nth_element(m_vecEntities.begin(), m_vecEntities.begin() + new_size, m_vecEntities.end(), [](CMonster *a, CMonster *b) {return a->m_flTimeLastActive > b->m_flTimeLastActive; });
-		std::for_each(m_vecEntities.begin() + new_size, m_vecEntities.end(), std::bind(&CBaseEntity::Killed, std::placeholders::_1, nullptr, GIB_NORMAL));
+		std::nth_element(m_vecEntities.begin(), m_vecEntities.begin() + new_size, m_vecEntities.end(),
+		                 [](CMonster *a, CMonster *b) { return a->m_flTimeLastActive > b->m_flTimeLastActive; });
+		std::for_each(m_vecEntities.begin() + new_size, m_vecEntities.end(),
+		              std::bind(&CBaseEntity::Killed, std::placeholders::_1, nullptr, GIB_NORMAL));
 	}
 
 	void AutoResizeCheck()
 	{
-		if (m_vecEntities.size() >= m_iMaxEntitiesNum)
-		{
+		if (m_vecEntities.size() >= m_iMaxEntitiesNum) {
 			// kills a quarter inactive zombies
 			ResizeEntities(m_iMaxEntitiesNum * m_flAutoGcRatio);
 		}
@@ -82,4 +85,6 @@ void CMonsterManager::SetAutoGcRatio(float what)
 {
 	assert(what >= 0.0f && what <= 1.0f);
 	pimpl->m_flAutoGcRatio = what;
+}
+
 }

@@ -6,6 +6,8 @@
 
 #include "player/player_mod_strategy.h"
 
+namespace sv {
+
 class PlayerExtraHumanLevel_ZBS : public BasePlayerExtra
 {
 public:
@@ -23,5 +25,7 @@ protected:
 	int m_iHealth;
 	int m_iAttack;
 };
+
+}
 
 #endif

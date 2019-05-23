@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
+namespace sv {
+
 class CBasePlayer;
 
 // Strategy Pattern
@@ -30,7 +32,7 @@ struct BasePlayerExtra
 {
 public:
 	explicit BasePlayerExtra(CBasePlayer *p) : m_pPlayer(p) {}
-	
+
 public:
 	CBasePlayer * const m_pPlayer;
 };
@@ -106,5 +108,7 @@ public:
 	void GiveDefaultItems() override;
 
 };
+
+}
 
 #endif

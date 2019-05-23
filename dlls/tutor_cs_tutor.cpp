@@ -51,6 +51,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -3254,4 +3256,6 @@ void CCSTutor::TransferDeathEvents(TutorMessageEvent *oldEvent, TutorMessageEven
 			m_playerDeathInfo[i].m_event = newEvent;
 		}
 	}
+}
+
 }

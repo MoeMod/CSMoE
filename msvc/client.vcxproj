@@ -205,9 +205,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
-    <ClCompile Include="..\pm_shared\pm_debug.c" />
-    <ClCompile Include="..\pm_shared\pm_math.c" />
-    <ClCompile Include="..\pm_shared\pm_shared.c" />
+    <ClCompile Include="..\pm_shared\pm_debug.cpp" />
+    <ClCompile Include="..\pm_shared\pm_math.cpp" />
+    <ClCompile Include="..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\public\unicode_strtools.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -305,6 +305,13 @@
     <ClInclude Include="..\engine\Sequence.h" />
     <ClInclude Include="..\engine\shake.h" />
     <ClInclude Include="..\engine\studio.h" />
+    <ClInclude Include="..\pm_shared\pm_debug.h" />
+    <ClInclude Include="..\pm_shared\pm_defs.h" />
+    <ClInclude Include="..\pm_shared\pm_info.h" />
+    <ClInclude Include="..\pm_shared\pm_materials.h" />
+    <ClInclude Include="..\pm_shared\pm_math.h" />
+    <ClInclude Include="..\pm_shared\pm_movevars.h" />
+    <ClInclude Include="..\pm_shared\pm_shared.h" />
     <ClInclude Include="..\public\unicode_strtools.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

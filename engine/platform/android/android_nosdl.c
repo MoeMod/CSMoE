@@ -250,7 +250,7 @@ void Android_RunEvents()
 		case event_touch_move:
 			IN_TouchEvent( events.queue[i].type, events.queue[i].arg,
 						   events.queue[i].touch.x, events.queue[i].touch.y,
-						   events.queue[i].touch.dx, events.queue[i].touch.dy );
+						   events.queue[i].touch.dx, events.queue[i].touch.dy, 1.0f );
 			break;
 
 		case event_key_down:

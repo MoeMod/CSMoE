@@ -32,13 +32,17 @@
 #pragma once
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define PITCH	0	// up/down
 #define YAW	1	// left/right
 #define ROLL	2	// fall over
+
+#if defined(CLIENT_DLL)
+namespace cl {
+#elif defined(SERVER_DLL)
+namespace sv {
+#elif defined(__cplusplus)
+extern "C++" {
+#endif
 
 extern vec3_t vec3_origin;
 extern int nanmask;
@@ -76,8 +80,6 @@ int   Q_log2(int val);
 void  VectorMatrix(vec_t *forward, vec_t *right, vec_t *up);
 void  VectorAngles(const vec_t *forward, vec_t *angles);
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
+}
+    
 #endif // PM_MATH_H

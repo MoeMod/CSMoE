@@ -39,7 +39,7 @@ option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OF
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 
 # Desktop or dedicated version options
-if(XASH_DEDICATED) 
+if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
 else()
@@ -63,7 +63,7 @@ set(XASH_ENGINE_SOURCES
 	common/hpak.c
 	common/infostring.c
 	common/identification.c
-	common/library.c
+#	common/library.c
 	common/masterlist.c
 	common/mathlib.c
 	common/matrixlib.c
@@ -128,6 +128,12 @@ set(XASH_ENGINE_SOURCES
 
 )
 
+if(XASH_STATIC_GAMELIB)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.c)
+else()
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.c)
+endif()
+
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
 )
@@ -145,10 +151,16 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/snd_opensles.c
 )
 
+if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
-   platform/macos/TouchBar.mm
-   platform/iOS/TapicEngine.mm
+	common/launcher.c
+	platform/iOS/TapicEngine.mm
 )
+else()
+set(XASH_ENGINE_APPLE_SOURCES
+	platform/macos/TouchBar.mm
+)
+endif()
 
 set(XASH_ENGINE_CLIENT_SOURCES
    client/cl_cmds.c
@@ -256,7 +268,7 @@ endif()
 add_definitions(-DXASH_FORCEINLINE)
 
 # Important, as HLSDK and engine shares some symbol names!
-if(NOT WIN32) # Windows by default have hidden visibility and better linker
+if(NOT WIN32 AND NOT IOS) # Windows by default have hidden visibility and better linker
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
@@ -266,11 +278,19 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(XASH_SINGLE_BINARY) # Set executable or library
+if(IOS)
+	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
+	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
+elseif(XASH_SINGLE_BINARY) # Set executable or library
 	add_definitions(-DSINGLE_BINARY)
 	add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
 else()
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
+endif()
+
+if(XASH_STATIC_GAMELIB)
+	#target_link_libraries(${XASH_ENGINE} xashmenu)
+	target_link_libraries(${XASH_ENGINE} xashmenu client server)
 endif()
 
 if(MSVC)
@@ -390,7 +410,9 @@ if(XASH_USE_STB_SPRINTF)
 	add_definitions(-DXASH_USE_STB_SPRINTF)
 endif()
 
-if(NOT WIN32)
+if(ANDROID)
+	target_link_libraries(${XASH_ENGINE} -ldl -llog)
+elseif(NOT WIN32)
 	if(NOT HAIKU)
 		target_link_libraries(${XASH_ENGINE} -lm -lpthread)
 	else()

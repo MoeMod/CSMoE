@@ -19,6 +19,8 @@ GNU General Public License for more details.
 #include "player.h"
 #include "zbb_basebuilder.h"
 
+namespace sv {
+
 //static constexpr float BUILD_DELAY = 0.75;
 static constexpr float BUILD_MAXDIST = 720;
 static constexpr float BUILD_MINDIST = 30;
@@ -150,4 +152,6 @@ void CHuman_ZBB::ButtonEvent(unsigned short &bitsCurButton, int bitsOldButton)
 	{
 		m_Build.Build_End();
 	}
+}
+
 }

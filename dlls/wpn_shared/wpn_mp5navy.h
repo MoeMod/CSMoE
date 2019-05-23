@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //mp5navy
 #define MP5N_MAX_SPEED			250
 #define MP5N_DAMAGE			26
@@ -40,5 +46,7 @@ public:
 private:
 	unsigned short m_usFireMP5N;
 };
+
+}
 
 #endif

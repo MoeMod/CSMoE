@@ -14,10 +14,6 @@
 ****/
 // mathlib.h
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <math.h>
 
 	typedef float vec_t;
@@ -37,6 +33,14 @@ extern "C" {
 	typedef	int	fixed16_t;
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
+#endif
+
+#if defined(CLIENT_DLL)
+namespace cl {
+#elif defined(SERVER_DLL)
+namespace sv {
+#elif defined(__cplusplus)
+extern "C++" {
 #endif
 
 	struct mplane_s;

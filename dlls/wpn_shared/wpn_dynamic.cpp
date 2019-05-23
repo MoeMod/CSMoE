@@ -22,6 +22,12 @@ GNU General Public License for more details.
 
 #include <string>
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 using namespace WeaponTemplate::Varibles;
 
 struct SerializableWeaponData
@@ -118,3 +124,5 @@ public:
 		TSecondaryAttackSniperZoom2::SecondaryAttack();
 	}
 };
+
+}

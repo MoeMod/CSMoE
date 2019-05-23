@@ -20,6 +20,12 @@ GNU General Public License for more details.
 #include "weapons.h"
 #include "wpn_knife.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
@@ -70,7 +76,7 @@ void CKnife_Zombi::Precache(void)
 	PRECACHE_SOUND("zombi/zombi_attack_2.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_3.wav");
 
-	
+
 	PRECACHE_SOUND("zombi/zombi_swing_1.wav");
 	PRECACHE_SOUND("zombi/zombi_swing_2.wav");
 	PRECACHE_SOUND("zombi/zombi_swing_3.wav");
@@ -246,7 +252,7 @@ int CKnife_Zombi::Swing(int fFirst)
 			case 1: EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/zombi_wall_2.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3)); break;
 			case 2: EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/zombi_wall_3.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3)); break;
 			}
-			
+
 		}
 #endif
 
@@ -386,4 +392,6 @@ int CKnife_Zombi::Stab(int fFirst)
 	}
 
 	return fDidHit;
+}
+
 }

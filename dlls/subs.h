@@ -32,13 +32,15 @@
 #pragma once
 #endif
 
-class CNullEntity: public CBaseEntity
+namespace sv {
+
+class CNullEntity : public CBaseEntity
 {
 public:
 	virtual void Spawn();
 };
 
-class CBaseDMStart: public CPointEntity
+class CBaseDMStart : public CPointEntity
 {
 public:
 	virtual void KeyValue(KeyValueData *pkvd);
@@ -48,5 +50,7 @@ public:
 void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 void SetMovedir(entvars_t *pev);
 NOXREF BOOL FEntIsVisible(entvars_t *pev, entvars_t *pevTarget);
+
+}
 
 #endif // SUBS_H

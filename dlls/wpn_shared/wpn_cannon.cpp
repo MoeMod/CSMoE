@@ -26,6 +26,12 @@ GNU General Public License for more details.
 #include "gamemode/mods.h"
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 LINK_ENTITY_TO_CLASS(weapon_cannon, CCannon)
 
 #ifndef CLIENT_DLL
@@ -164,7 +170,7 @@ void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	}
 
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-	
+
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -223,4 +229,6 @@ float CCannon::GetDamage()
 		return 650;
 #endif
 	return 410;
+}
+
 }

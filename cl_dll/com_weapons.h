@@ -40,11 +40,15 @@ extern "C"
 	void _DLLEXPORT HUD_PostRunCmd( struct local_state_s *from, struct local_state_s *to, struct usercmd_s *cmd, int runfuncs, double time, unsigned int random_seed );
 }
 
+
+
 void			COM_Log( char *pszFile, char *fmt, ...);
 bool			CL_IsDead();
 
+namespace cl {
 float			UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
 int				UTIL_SharedRandomLong( unsigned int seed, int low, int high );
+
 
 int				HUD_GetWeaponAnim( void );
 void			HUD_SendWeaponAnim(int iAnim, int iWeaponId, int iBody, int iForce = 0 );
@@ -57,8 +61,7 @@ int				GetWeaponAccuracyFlags( int weaponid );
 extern cvar_t *cl_lw;
 
 extern int g_runfuncs;
-extern vec3_t v_angles;
-extern float g_lastFOV;
+
 extern int g_iWeaponFlags;
 extern bool g_bInBombZone;
 extern int g_iFreezeTimeOver;
@@ -70,5 +73,10 @@ extern Vector g_vPlayerVelocity;
 extern struct local_state_s *g_curstate;
 extern struct local_state_s *g_finalstate;
 extern int g_iShotsFired;
+
+}
+
+extern float g_lastFOV;
+extern vec3_t v_angles;
 
 #endif

@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -287,14 +289,14 @@ void CHostage::IdleThink()
 		return;
 	}
 
-	if( m_hTargetEnt != NULL && ( ( m_bStuck && gpGlobals->time - m_flStuckTime > 5.0f ) || m_hTargetEnt->pev->deadflag != DEAD_NO ) )
+	if( m_hTargetEnt != nullptr && ( ( m_bStuck && gpGlobals->time - m_flStuckTime > 5.0f ) || m_hTargetEnt->pev->deadflag != DEAD_NO ) )
 	{
 		m_State = STAND;
 		m_hTargetEnt = NULL;
 		m_bStuck = FALSE;
 	}
 
-	if (m_hTargetEnt != NULL || m_improv != NULL)
+	if (m_hTargetEnt != nullptr || m_improv != nullptr)
 	{
 		CBasePlayer *player = NULL;
 
@@ -1662,5 +1664,7 @@ float SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
 	}
 
 	return duration;
+}
+
 }
 

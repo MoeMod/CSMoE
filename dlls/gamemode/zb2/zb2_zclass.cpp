@@ -29,6 +29,8 @@ GNU General Public License for more details.
 
 #include <random>
 
+namespace sv {
+
 template<class T>
 std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, ZombieLevel lv)
 {
@@ -113,3 +115,5 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 }
 
 CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;
+
+}

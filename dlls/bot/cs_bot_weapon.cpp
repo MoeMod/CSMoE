@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Fire our active weapon towards our current enemy
 // NOTE: Aiming our weapon is handled in RunBotUpkeep()
 
@@ -967,4 +969,6 @@ float CCSBot::ComputeWeaponSightRange()
 	UTIL_TraceLine(GetGunPosition(), target + 10000.0f * aimDir, dont_ignore_monsters, ignore_glass, ENT(pev), &result);
 
 	return (GetGunPosition() - result.vecEndPos).Length();
+}
+
 }

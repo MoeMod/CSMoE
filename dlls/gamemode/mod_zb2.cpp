@@ -32,6 +32,7 @@ GNU General Public License for more details.
 #include <dlls/gamemode/zb2/zb2_zclass.h>
 #include <dlls/util/u_range.hpp>
 
+namespace sv {
 
 CMod_ZombieMod2::CMod_ZombieMod2() // precache
 {
@@ -423,4 +424,6 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 void CPlayerModStrategy_ZB2::EvolutionSound() const
 {
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
+}
+
 }

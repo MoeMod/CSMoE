@@ -20,6 +20,12 @@ GNU General Public License for more details.
 #include "weapons.h"
 #include "wpn_infinityex1.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 LINK_ENTITY_TO_CLASS(weapon_infinityex1, CInfinityEX1)
 
 void CInfinityEX1::Spawn(void)
@@ -306,4 +312,6 @@ void CInfinityEX1::WeaponIdle(void)
 		else
 			SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

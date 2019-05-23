@@ -11,6 +11,8 @@
 #define YAW	1	// left/right
 #define ROLL	2	// fall over
 
+namespace sv {
+
 #define ANIM_WALK_SEQUENCE 3
 #define ANIM_JUMP_SEQUENCE 6
 #define ANIM_SWIM_1 8
@@ -981,7 +983,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 	int chain[MAXSTUDIOBONES];
 	int chainlength;
 	vec3_t temp_angles;
-	
+
 	/*static */float pos[MAXSTUDIOBONES][3], pos2[MAXSTUDIOBONES][3];
 	/*static */float q[MAXSTUDIOBONES][4], q2[MAXSTUDIOBONES][4];
 
@@ -1016,7 +1018,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 	f = StudioEstimateFrame(frame, pseqdesc);
 	subframe = (int)f;
 	f -= subframe;
-	
+
 	StudioCalcBoneAdj(0, adj, pcontroller, pcontroller, 0);
 	StudioCalcRotations(pbones, chain, chainlength, adj, pos, q, pseqdesc, panim, subframe, f);
 
@@ -1025,7 +1027,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 		if (pseqdesc->numblends > 1)
 		{
 			float b = (float)pblending[0] / 255.0f;
-			
+
 			pseqdesc = (mstudioseqdesc_t *)((byte *)g_pstudiohdr + g_pstudiohdr->seqindex) + sequence;
 			panim = StudioGetAnim(pModel, pseqdesc);
 			panim += g_pstudiohdr->numbones;
@@ -1039,7 +1041,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 	{
 		/*static */float pos3[MAXSTUDIOBONES][3], pos4[MAXSTUDIOBONES][3];
 		/*static */float q3[MAXSTUDIOBONES][4], q4[MAXSTUDIOBONES][4];
-		
+
 		float s, t;
 
 		if( pEdict )
@@ -1143,7 +1145,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 	{
 		int copy = 1;
 		int gaitsequence;
-		
+
 		if( pEdict )
 			gaitsequence = GetPlayerGaitsequence(pEdict);	// calc gait animation
 		else
@@ -1206,4 +1208,6 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 		else
 			ConcatTransforms((*g_pBoneTransform)[pbones[j].parent], bonematrix, (*g_pBoneTransform)[j]);
 	}
+}
+
 }

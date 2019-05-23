@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_fiveseven.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum fiveseven_e
 {
 	FIVESEVEN_IDLE,
@@ -213,4 +219,6 @@ void CFiveSeven::WeaponIdle(void)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625;
 		SendWeaponAnim(FIVESEVEN_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

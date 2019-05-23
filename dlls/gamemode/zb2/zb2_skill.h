@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #include "player/player_mod_strategy.h"
 #include "gamemode/zb2/zb2_const.h"
 
+namespace sv {
+
 class IZombieSkill
 {
 public:
@@ -93,6 +95,8 @@ protected:
 
 	float m_flTimeZombieSkillEffect;
 };
+
+}
 
 
 #endif

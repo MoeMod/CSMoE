@@ -20,6 +20,12 @@ GNU General Public License for more details.
 #include "weapons.h"
 #include "wpn_svdex.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum svdex_e
 {
 	SVDEX_IDLEA,
@@ -286,4 +292,6 @@ void CSVDEX::WeaponIdle(void)
 		SendWeaponAnim(SVDEX_IDLEB, UseDecrement() != FALSE);
 	else
 		SendWeaponAnim(SVDEX_IDLEA, UseDecrement() != FALSE);
+}
+
 }

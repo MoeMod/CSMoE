@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum deagle_e
 {
 	DEAGLE_IDLE1 = 0,
@@ -98,4 +100,6 @@ void EV_FireDEAGLE( event_args_t *args )
 		1, vecSrc, forward,
 		vSpread, 8192.0, BULLET_PLAYER_50AE,
 		2 );
+}
+
 }

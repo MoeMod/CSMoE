@@ -31,6 +31,8 @@
 
 float g_flRoundTime = 0.0f;
 
+namespace cl {
+
 void EV_DecalReset(event_args_s *args)
 {
 	int decalnum = (int)(gEngfuncs.pfnGetCvarFloat("r_decals"));
@@ -39,4 +41,6 @@ void EV_DecalReset(event_args_s *args)
 		gEngfuncs.pEfxAPI->R_DecalRemoveAll(i);
 
 	g_flRoundTime = gEngfuncs.GetClientTime();
+}
+
 }

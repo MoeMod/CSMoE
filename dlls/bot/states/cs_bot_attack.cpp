@@ -60,6 +60,8 @@
 
 // Begin attacking
 
+namespace sv {
+
 void AttackState::OnEnter(CCSBot *me)
 {
 	CBaseEntity *enemy = me->GetEnemy();
@@ -629,4 +631,6 @@ void AttackState::OnExit(CCSBot *me)
 
 	me->StopRapidFire();
 	me->ClearSurpriseDelay();
+}
+
 }

@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_aug.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum aug_e
 {
 	AUG_IDLE1,
@@ -198,4 +204,6 @@ void CAUG::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(AUG_IDLE1, UseDecrement() != FALSE);
+}
+
 }

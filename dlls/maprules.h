@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 #define MAX_EQUIP			32
 #define SF_SCORE_NEGATIVE		0x0001
 #define SF_SCORE_TEAM			0x0002
@@ -107,7 +109,7 @@ public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-   
+
 public:
 	int Points() const { return (int)(pev->frags); }
 	BOOL AllowNegativeScore() { return pev->spawnflags & SF_SCORE_NEGATIVE; }
@@ -134,7 +136,7 @@ public:
 	virtual int Save(CSave &save);
 	virtual int Restore(CRestore &restore);
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-   
+
 public:
 	BOOL MessageToAll() const { return (pev->spawnflags & SF_ENVTEXT_ALLPLAYERS) == SF_ENVTEXT_ALLPLAYERS; }
 	void MessageSet(const char *pMessage) { pev->message = ALLOC_STRING(pMessage); }
@@ -299,5 +301,7 @@ private:
 
 	const char *TargetTeamName(const char *pszTargetName);
 };
+
+}
 
 #endif // MAPRULES_H

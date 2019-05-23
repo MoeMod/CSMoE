@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum thompson_e
 {
 	THOMPSON_IDLE,
@@ -87,4 +89,6 @@ void EV_FireTHOMPSON(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_45ACP,
 		2 );
+}
+
 }

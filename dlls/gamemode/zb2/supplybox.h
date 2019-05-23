@@ -1,5 +1,7 @@
 #pragma once
 
+namespace sv {
+
 class CSupplyBox : public CBaseEntity
 {
 public:
@@ -17,3 +19,5 @@ public:
 	float m_flNextRadarTime;
 	int m_iSupplyboxIndex;
 };
+
+}

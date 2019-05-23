@@ -41,6 +41,8 @@
 #include "tutor_base_states.h"
 #include "tutor_base_tutor.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -513,4 +515,6 @@ bool CBotManager::IsLineBlockedBySmoke(const Vector *from, const Vector *to)
 
 	// return true if the total length of smoke-covered line-of-sight is too much
 	return (totalSmokedLength > maxSmokedLength);
+}
+
 }

@@ -9,11 +9,13 @@
 /*
 * Globals initialization
 */
+namespace sv {
+
 TYPEDESCRIPTION CEnvExplosion::m_SaveData[] =
-{
-	DEFINE_FIELD(CEnvExplosion, m_iMagnitude, FIELD_INTEGER),
-	DEFINE_FIELD(CEnvExplosion, m_spriteScale, FIELD_INTEGER),
-};
+		{
+				DEFINE_FIELD(CEnvExplosion, m_iMagnitude, FIELD_INTEGER),
+				DEFINE_FIELD(CEnvExplosion, m_spriteScale, FIELD_INTEGER),
+		};
 
 LINK_ENTITY_TO_CLASS(spark_shower, CShower);
 
@@ -63,8 +65,7 @@ void CShower::Touch(CBaseEntity *pOther)
 	else
 		pev->velocity = pev->velocity * 0.6f;
 
-	if ((pev->velocity.x * pev->velocity.x + pev->velocity.y * pev->velocity.y) < 10.0f)
-	{
+	if ((pev->velocity.x * pev->velocity.x + pev->velocity.y * pev->velocity.y) < 10.0f) {
 		pev->speed = 0;
 	}
 }
@@ -75,12 +76,10 @@ LINK_ENTITY_TO_CLASS(env_explosion, CEnvExplosion);
 
 void CEnvExplosion::KeyValue(KeyValueData *pkvd)
 {
-	if (FStrEq(pkvd->szKeyName, "iMagnitude"))
-	{
+	if (FStrEq(pkvd->szKeyName, "iMagnitude")) {
 		m_iMagnitude = Q_atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
-	}
-	else
+	} else
 		CBaseEntity::KeyValue(pkvd);
 }
 
@@ -92,12 +91,11 @@ void CEnvExplosion::Spawn()
 
 	float flSpriteScale = (m_iMagnitude - 50) * 0.6f;
 
-	if (flSpriteScale < 10.0f)
-	{
+	if (flSpriteScale < 10.0f) {
 		flSpriteScale = 10.0f;
 	}
 
-	m_spriteScale = (int)flSpriteScale;
+	m_spriteScale = (int) flSpriteScale;
 }
 
 void CEnvExplosion::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
@@ -111,62 +109,51 @@ void CEnvExplosion::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 
 	vecSpot = pev->origin + Vector(0, 0, 8);
 
-	UTIL_TraceLine(vecSpot, vecSpot + Vector (0, 0, -40), ignore_monsters, ENT(pev), & tr);
+	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -40), ignore_monsters, ENT(pev), &tr);
 
 	// Pull out of the wall a bit
-	if (tr.flFraction != 1.0f)
-	{
+	if (tr.flFraction != 1.0f) {
 		pev->origin = tr.vecEndPos + (tr.vecPlaneNormal * (m_iMagnitude - 24) * 0.6f);
-	}
-	else
-	{
+	} else {
 		pev->origin = pev->origin;
 	}
 
 	// draw decal
-	if (! (pev->spawnflags & SF_ENVEXPLOSION_NODECAL))
-	{
-		if (RANDOM_FLOAT(0, 1) < 0.5)
-		{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_NODECAL)) {
+		if (RANDOM_FLOAT(0, 1) < 0.5) {
 			UTIL_DecalTrace(&tr, DECAL_SCORCH1);
-		}
-		else
-		{
+		} else {
 			UTIL_DecalTrace(&tr, DECAL_SCORCH2);
 		}
 	}
 
 	// draw fireball
-	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOFIREBALL))
-	{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOFIREBALL)) {
 		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-			WRITE_BYTE(TE_EXPLOSION);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_SHORT(g_sModelIndexFireball);
-			WRITE_BYTE((byte)m_spriteScale); // scale * 10
-			WRITE_BYTE(15); // framerate
-			WRITE_BYTE(TE_EXPLFLAG_NONE);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_SHORT(g_sModelIndexFireball);
+		WRITE_BYTE((byte) m_spriteScale); // scale * 10
+		WRITE_BYTE(15); // framerate
+		WRITE_BYTE(TE_EXPLFLAG_NONE);
 		MESSAGE_END();
-	}
-	else
-	{
+	} else {
 		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-			WRITE_BYTE(TE_EXPLOSION);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_SHORT(g_sModelIndexFireball);
-			WRITE_BYTE(0); // no sprite
-			WRITE_BYTE(15); // framerate
-			WRITE_BYTE(TE_EXPLFLAG_NONE);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_SHORT(g_sModelIndexFireball);
+		WRITE_BYTE(0); // no sprite
+		WRITE_BYTE(15); // framerate
+		WRITE_BYTE(TE_EXPLFLAG_NONE);
 		MESSAGE_END();
 	}
 
 	// do damage
-	if (!(pev->spawnflags & SF_ENVEXPLOSION_NODAMAGE))
-	{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_NODAMAGE)) {
 		RadiusDamage(pev, pev, m_iMagnitude, CLASS_NONE, DMG_BLAST);
 	}
 
@@ -174,12 +161,10 @@ void CEnvExplosion::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	pev->nextthink = gpGlobals->time + 0.3f;
 
 	// draw sparks
-	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOSPARKS))
-	{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOSPARKS)) {
 		int sparkCount = RANDOM_LONG(0, 3);
 
-		for (int i = 0; i < sparkCount; ++i)
-		{
+		for (int i = 0; i < sparkCount; ++i) {
 			Create("spark_shower", pev->origin, tr.vecPlaneNormal, NULL);
 		}
 	}
@@ -187,21 +172,19 @@ void CEnvExplosion::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 
 void CEnvExplosion::Smoke()
 {
-	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOSMOKE))
-	{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOSMOKE)) {
 		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-			WRITE_BYTE(TE_SMOKE);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_SHORT(g_sModelIndexSmoke);
-			WRITE_BYTE((byte)m_spriteScale); // scale * 10
-			WRITE_BYTE(12); // framerate
+		WRITE_BYTE(TE_SMOKE);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_SHORT(g_sModelIndexSmoke);
+		WRITE_BYTE((byte) m_spriteScale); // scale * 10
+		WRITE_BYTE(12); // framerate
 		MESSAGE_END();
 	}
 
-	if (!(pev->spawnflags & SF_ENVEXPLOSION_REPEATABLE))
-	{
+	if (!(pev->spawnflags & SF_ENVEXPLOSION_REPEATABLE)) {
 		UTIL_Remove(this);
 	}
 }
@@ -222,11 +205,12 @@ void ExplosionCreate(const Vector &center, Vector &angles, edict_t *pOwner, int 
 
 	pExplosion->KeyValue(&kvd);
 
-	if (!doDamage)
-	{
+	if (!doDamage) {
 		pExplosion->pev->spawnflags |= SF_ENVEXPLOSION_NODAMAGE;
 	}
 
 	pExplosion->Spawn();
 	pExplosion->Use(NULL, NULL, USE_TOGGLE, 0);
+}
+
 }

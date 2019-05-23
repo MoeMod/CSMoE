@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 CSGameState::CSGameState(CCSBot *owner)
 {
 	m_owner = owner;
@@ -732,4 +734,6 @@ void CSGameState::AllHostagesGone()
 {
 	for (int i = 0; i < m_hostageCount; ++i)
 		m_hostage[i].isValid = false;
+}
+
 }

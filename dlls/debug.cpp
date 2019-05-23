@@ -5,6 +5,8 @@
 #include "shared_util.h"
 #include "debug.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -217,4 +219,6 @@ NOXREF void UTIL_HostageDPrintf(const char *pszMsg, ...)
 
 		SERVER_PRINT(theDebugBuffer);
 	}
+}
+
 }

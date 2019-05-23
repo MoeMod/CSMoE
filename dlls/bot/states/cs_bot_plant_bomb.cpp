@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Plant the bomb.
 
 void PlantBombState::OnEnter(CCSBot *me)
@@ -113,4 +115,6 @@ void PlantBombState::OnExit(CCSBot *me)
 	me->ResetStuckMonitor();
 	me->SetDisposition(CCSBot::ENGAGE_AND_INVESTIGATE);
 	me->ClearLookAt();
+}
+
 }

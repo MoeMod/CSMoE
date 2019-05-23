@@ -26,6 +26,8 @@ GNU General Public License for more details.
 #include <random>
 #include <string>
 
+namespace sv {
+
 constexpr int MAX_LEVEL = 18;
 constexpr int KILL_NUMS[MAX_LEVEL] = { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 2, 3, 3, 3, 3 };
 constexpr const char *DEFAULT_WEAPONS[MAX_LEVEL][2] = {
@@ -173,4 +175,6 @@ void CMod_GunDeath::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 	if (pKillerPlayer)
 		m_eventPlayerKilled.dispatch(pVictim, pKillerPlayer, pInflictor);
 	CMod_TeamDeathMatch::PlayerKilled(pVictim, pKiller, pInflictor);
+}
+
 }

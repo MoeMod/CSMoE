@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void HostageIdleState::OnEnter(CHostageImprov *improv)
 {
 	m_moveState = MoveDone;
@@ -310,4 +312,6 @@ void HostageIdleState::UpdateStationaryAnimation(CHostageImprov *improv)
 	}
 	else
 		improv->UpdateIdleActivity(ACT_IDLE_SNEAKY, ACT_IDLE_SNEAKY_FIDGET);
+}
+
 }

@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //C4
 #define C4_MAX_AMMO		1
 #define C4_MAX_SPEED		250.0
@@ -40,5 +46,7 @@ public:
 private:
 	bool m_bHasShield;
 };
+
+}
 
 #endif

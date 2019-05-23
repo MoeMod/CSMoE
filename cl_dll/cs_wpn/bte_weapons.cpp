@@ -19,6 +19,8 @@
 /*
 	Weapon Registers
 */
+namespace cl {
+
 class CBTEClientWeapons::WeaponEntityFindList_t : public std::map<std::string, CBasePlayerWeapon *(*)()> {};
 
 auto CBTEClientWeapons::WeaponEntityFindList() -> WeaponEntityFindList_t &
@@ -122,4 +124,6 @@ void InitializeWeaponEntity(CBasePlayerWeapon *pEntity, entvars_t *pev)
 	pEntity->pev = pev;
 	pEntity->Precache();
 	pEntity->Spawn();
+}
+
 }

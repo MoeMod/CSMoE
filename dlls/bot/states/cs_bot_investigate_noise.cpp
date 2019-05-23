@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Move towards currently heard noise
 
 void InvestigateNoiseState::AttendCurrentNoise(CCSBot *me)
@@ -169,4 +171,6 @@ void InvestigateNoiseState::OnExit(CCSBot *me)
 {
 	// reset to run mode in case we were sneaking about
 	me->Run();
+}
+
 }

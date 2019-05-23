@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_kriss.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum kriss_e
 {
 	KRISS_IDLE,
@@ -239,4 +245,6 @@ void CKRISS::WeaponIdle(void)
 		SendWeaponAnim(KRISS_IDLE, UseDecrement() != FALSE);
 	else
 		SendWeaponAnim(KRISS_UNSIL_IDLE, UseDecrement() != FALSE);
+}
+
 }

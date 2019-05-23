@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CMP7A1D : public CBasePlayerWeapon
 {
 public:
@@ -40,5 +46,7 @@ public:
 	unsigned short m_usFireELITE_LEFT;
 	unsigned short m_usFireELITE_RIGHT;
 };
+
+}
 
 #endif

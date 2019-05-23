@@ -8,6 +8,8 @@
 #include "gamerules.h"
 #include "h_battery.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -158,4 +160,6 @@ void CRecharge::Off()
 	}
 	else
 		SetThink(&CRecharge::SUB_DoNothing);
+}
+
 }

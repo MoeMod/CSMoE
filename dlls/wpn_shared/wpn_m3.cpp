@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m3.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m3_e
 {
 	M3_IDLE,
@@ -227,4 +233,6 @@ void CM3::WeaponIdle(void)
 		else
 			SendWeaponAnim(M3_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //p90
 #define P90_MAX_SPEED		245
 #define P90_DAMAGE		21
@@ -40,5 +46,7 @@ public:
 private:
 	unsigned short m_usFireP90;
 };
+
+}
 
 #endif

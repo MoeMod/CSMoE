@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class BotProfile;
 
 template <class T>
@@ -382,5 +384,7 @@ extern const char *BotArgs[4];
 extern bool UseBotArgs;
 
 class BotProfile;
+
+}
 
 #endif // BOT_H

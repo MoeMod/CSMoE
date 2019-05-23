@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum xm1014_e
 {
 	XM1014_IDLE,
@@ -91,4 +93,6 @@ void EV_FireXM1014(event_args_s *args)
 		6, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
 		1 );
+}
+
 }

@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CBaseEntity;
 class CNavLadder;
 
@@ -127,5 +129,7 @@ public:
 	virtual void OnGameEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *other) = 0;		// invoked when an event occurs in the game
 	virtual void OnTouch(CBaseEntity *other) = 0;								// "other" has touched us
 };
+
+}
 
 #endif // IMPROV_H

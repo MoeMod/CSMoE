@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //glock18
 #define GLOCK18_MAX_SPEED		250
 #define GLOCK18_DAMAGE			25
@@ -40,5 +46,7 @@ public:
 	int m_iShell;
 	bool m_bBurstFire;
 };
+
+}
 
 #endif

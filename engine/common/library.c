@@ -353,13 +353,7 @@ void *Com_FunctionFromName( void *hInstance, const char *pName )
 #endif
 	if( !( function = dlsym( hInstance, pName ) ) )
 	{
-#ifdef __ANDROID__
-		// Shitty Android's dlsym don't resolve weak symbols
-		if( !( function = dlsym_weak( hInstance, pName ) ) )
-#endif
-		{
-			MsgDev(D_ERROR, "FunctionFromName: Can't get symbol %s: %s\n", pName, dlerror());
-		}
+		MsgDev(D_ERROR, "FunctionFromName: Can't get symbol %s: %s\n", pName, dlerror());
 	}
 	return function;
 }

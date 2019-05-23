@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum sg550_e
 {
 	SG550_IDLE,
@@ -90,4 +92,6 @@ void EV_FireSG550(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

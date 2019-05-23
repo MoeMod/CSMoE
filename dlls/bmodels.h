@@ -56,8 +56,8 @@
 #define noiseRunning		noise3
 
 // This is just a solid wall if not inhibited
-
-class CFuncWall: public CBaseEntity
+namespace sv {
+class CFuncWall : public CBaseEntity
 {
 public:
 	virtual void Spawn();
@@ -67,7 +67,7 @@ public:
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 };
 
-class CFuncWallToggle: public CFuncWall
+class CFuncWallToggle : public CFuncWall
 {
 public:
 	virtual void Spawn();
@@ -80,12 +80,12 @@ public:
 
 };
 
-class CFuncConveyor: public CFuncWall
+class CFuncConveyor : public CFuncWall
 {
 public:
 	virtual void Spawn();
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-   
+
 public:
 	void UpdateSpeed(float speed);
 
@@ -93,13 +93,13 @@ public:
 
 // A simple entity that looks solid but lets you walk through it.
 
-class CFuncIllusionary: public CBaseToggle
+class CFuncIllusionary : public CBaseToggle
 {
 public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
 	virtual int ObjectCaps() { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-   
+
 public:
 	void EXPORT SloshTouch(CBaseEntity *pOther);
 
@@ -113,7 +113,7 @@ public:
 // otherwise it will be invisible and not solid.  This can be used to keep
 // specific monsters out of certain areas
 
-class CFuncMonsterClip: public CFuncWall
+class CFuncMonsterClip : public CFuncWall
 {
 public:
 	virtual void Spawn();
@@ -122,7 +122,7 @@ public:
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) {}
 };
 
-class CFuncRotating: public CBaseEntity
+class CFuncRotating : public CBaseEntity
 {
 public:
 	// basic functions
@@ -153,7 +153,7 @@ public:
 	int m_sounds;
 };
 
-class CPendulum: public CBaseEntity
+class CPendulum : public CBaseEntity
 {
 public:
 	virtual void Spawn();
@@ -175,7 +175,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[8];
 
 public:
-	float m_accel;		// Acceleration
+	float m_accel;        // Acceleration
 	float m_distance;
 	float m_time;
 	float m_damp;
@@ -187,5 +187,7 @@ public:
 };
 
 Vector VecBModelOrigin(entvars_t *pevBModel);
+
+}
 
 #endif // BMODELS_H

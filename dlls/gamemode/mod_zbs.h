@@ -10,6 +10,8 @@
 
 #include "EventDispatcher.h"
 
+namespace sv {
+
 class CZombieSpawn;
 class CMonster;
 
@@ -52,5 +54,7 @@ public:
 	EventDispatcher<void(CBasePlayer *attacker, float &)> m_eventAdjustDamage;
 	EventDispatcher<void(CMonster *victim, CBaseEntity *attacker)> m_eventMonsterKilled;
 };
+
+}
 
 #endif

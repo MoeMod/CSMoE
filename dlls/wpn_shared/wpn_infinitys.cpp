@@ -22,6 +22,12 @@ GNU General Public License for more details.
 
 #include <array>
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 using namespace WeaponTemplate::Varibles;
 
 struct InfinitySS_WeaponData
@@ -118,3 +124,5 @@ class CInfinitySB : public WeaponTemplateBase_InfinityS<CInfinitySB>, public Inf
 LINK_ENTITY_TO_CLASS(weapon_infinityss, CInfinitySS)
 LINK_ENTITY_TO_CLASS(weapon_infinitysr, CInfinitySR)
 LINK_ENTITY_TO_CLASS(weapon_infinitysb, CInfinitySB)
+
+}

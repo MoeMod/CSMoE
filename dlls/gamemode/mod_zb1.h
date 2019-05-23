@@ -28,6 +28,8 @@ GNU General Public License for more details.
 
 #include "EventDispatcher.h"
 
+namespace sv {
+
 class CMod_Zombi : public TBaseMod_RemoveObjects<TBaseMod_RandomSpawn<>>
 {
 public:
@@ -110,5 +112,7 @@ public:
 protected:
 	CMod_Zombi* const m_pMod;
 };
+
+}
 
 #endif

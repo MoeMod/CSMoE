@@ -24,6 +24,12 @@
 #include "gamemode/mods.h"
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
@@ -551,4 +557,6 @@ int CKnife::Stab(int fFirst)
 	}
 
 	return fDidHit;
+}
+
 }

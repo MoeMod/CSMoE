@@ -47,6 +47,9 @@
 
 #include "bot_constants.h"
 
+namespace sv {
+
+
 enum
 {
 	FirstCustomSkin = 100,
@@ -102,6 +105,7 @@ public:
 
 private:
 	void Inherit(const BotProfile *parent, const BotProfile *baseline);
+
 	friend class BotProfileManager;
 
 	char *m_name;
@@ -109,7 +113,10 @@ private:
 	float m_skill;
 	float m_teamwork;
 
-	enum { MAX_WEAPON_PREFS = 16 };
+	enum
+	{
+		MAX_WEAPON_PREFS = 16
+	};
 
 	int m_weaponPreference[MAX_WEAPON_PREFS];
 	int m_weaponPreferenceCount;
@@ -142,8 +149,7 @@ inline void BotProfile::Inherit(const BotProfile *parent, const BotProfile *base
 	if (parent->m_teamwork != baseline->m_teamwork)
 		m_teamwork = parent->m_teamwork;
 
-	if (parent->m_weaponPreferenceCount != baseline->m_weaponPreferenceCount)
-	{
+	if (parent->m_weaponPreferenceCount != baseline->m_weaponPreferenceCount) {
 		m_weaponPreferenceCount = parent->m_weaponPreferenceCount;
 		for (int i = 0; i < parent->m_weaponPreferenceCount; ++i)
 			m_weaponPreference[i] = parent->m_weaponPreference[i];
@@ -185,7 +191,7 @@ public:
 	void Init(const char *filename, unsigned int *checksum = nullptr);
 	void Reset();
 
-	const BotProfile *GetProfile (const char *name, BotProfileTeamType team) const
+	const BotProfile *GetProfile(const char *name, BotProfileTeamType team) const
 	{
 		for (auto profile : m_profileList) {
 			if (!Q_stricmp(name, profile->GetName()) && profile->IsValidForTeam(team))
@@ -219,5 +225,7 @@ protected:
 };
 
 extern BotProfileManager *TheBotProfiles;
+
+}
 
 #endif // BOT_PROFILE

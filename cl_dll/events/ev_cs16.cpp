@@ -31,8 +31,9 @@ extern "C"
 {
 #include "pm_defs.h"
 #include "pm_materials.h"
-#include "pm_shared.h"
 }
+
+#include "pm_shared.h"
 
 #include "eventscripts.h"
 #include "ev_hldm.h"
@@ -51,6 +52,8 @@ extern "C"
 #include <assert.h>
 
 extern float g_flRoundTime;
+
+namespace cl {
 
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.
@@ -843,4 +846,6 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 		model->hitcallback = HitBody;
 		model->callback = RemoveBody;
 	}
+}
+
 }

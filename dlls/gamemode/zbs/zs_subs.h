@@ -7,6 +7,8 @@
 
 #include "func_break.h" // CBreakable
 
+namespace sv {
+
 class CZombieSpawn: public CPointEntity
 {
 public:
@@ -30,5 +32,7 @@ public:
 	float m_flZombiDamageRatio;
 
 };
+
+}
 
 #endif

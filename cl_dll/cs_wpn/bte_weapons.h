@@ -1,5 +1,7 @@
 #pragma once
 
+namespace cl {
+
 class CBasePlayer;
 class CBasePlayerWeapon;
 
@@ -38,3 +40,5 @@ public:
 
 // non-msvc needs this...
 CBTEClientWeapons &BTEClientWeapons();
+
+}

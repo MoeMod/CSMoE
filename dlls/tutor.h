@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 extern cvar_t cv_tutor_message_repeats;
 extern cvar_t cv_tutor_debug_level;
 extern cvar_t cv_tutor_view_distance;
@@ -46,5 +48,7 @@ extern cvar_t cv_tutor_hint_interval_time;
 void InstallTutor(bool start);
 void Tutor_RegisterCVars();
 void MonitorTutorStatus();
+
+}
 
 #endif // TUTOR_H

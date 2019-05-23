@@ -32,7 +32,9 @@
 #pragma once
 #endif
 
-class CBaseSpectator: public CBaseEntity
+namespace sv {
+
+class CBaseSpectator : public CBaseEntity
 {
 public:
 	virtual void Spawn();
@@ -41,9 +43,11 @@ public:
 	void SpectatorConnect();
 	void SpectatorDisconnect();
 	void SpectatorThink();
-   
+
 private:
 	void SpectatorImpulseCommand();
 };
+
+}
 
 #endif // SPECTATOR_H

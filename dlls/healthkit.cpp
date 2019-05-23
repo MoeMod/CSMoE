@@ -11,6 +11,8 @@
 
 #include "healthkit.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -183,4 +185,6 @@ void CWallHealth::Off()
 	}
 	else
 		SetThink(&CWallHealth::SUB_DoNothing);
+}
+
 }

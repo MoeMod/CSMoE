@@ -11,6 +11,8 @@
 
 #include <ctype.h>
 
+namespace sv {
+
 // presets for runtime pitch and vol modulation of ambient sounds
 UNTESTED dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
 {
@@ -1917,7 +1919,7 @@ void CSpeaker::SpeakerThink()
 		// if is null - return;
 		return;
 	}
-   
+
 	if (szSoundFile[0] == '!')
 	{
 		// play single sentence, one shot
@@ -2003,4 +2005,6 @@ void CSpeaker::KeyValue(KeyValueData *pkvd)
 	}
 	else
 		CBaseEntity::KeyValue(pkvd);
+}
+
 }

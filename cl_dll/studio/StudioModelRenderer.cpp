@@ -42,6 +42,8 @@
 
 #include "com_weapons.h"
 
+using namespace cl;
+
 extern CGameStudioModelRenderer g_StudioRenderer;
 extern engine_studio_api_t IEngineStudio;
 typedef struct pmtrace_s pmtrace_t;

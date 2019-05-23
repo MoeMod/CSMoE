@@ -18,6 +18,8 @@
 #include <array>
 #include <functional>
 
+namespace sv {
+
 #define SPAWN_DATA_ORIGIN_X 0
 #define SPAWN_DATA_ORIGIN_Y 1
 #define SPAWN_DATA_ORIGIN_Z 2
@@ -121,6 +123,8 @@ void CSDM_LoadSpawnPoints()
 		}
 		g_vecSpawnCSDM.emplace_back(MakeSpawnPointData(arr));
 	}
+}
+
 }
 
 /*

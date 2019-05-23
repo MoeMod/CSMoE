@@ -5,10 +5,12 @@
 #include "monsters.h"
 #include "weapons.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
-AutoBuyInfoStruct g_autoBuyInfo[] =
+DLL_GLOBAL AutoBuyInfoStruct g_autoBuyInfo[] =
 {
 	{ AUTOBUYCLASS_PRIMARY|AUTOBUYCLASS_RIFLE,		"galil",	"weapon_galil" },
 	{ AUTOBUYCLASS_PRIMARY|AUTOBUYCLASS_RIFLE,		"ak47",		"weapon_ak47" },
@@ -47,7 +49,7 @@ AutoBuyInfoStruct g_autoBuyInfo[] =
 	{ AUTOBUYCLASS_NONE, NULL, NULL }
 };
 
-WeaponAliasInfo weaponAliasInfo[] =
+DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 {
 	{ "p228",	WEAPON_P228 },
 	{ "???",	WEAPON_GLOCK },
@@ -90,7 +92,7 @@ WeaponAliasInfo weaponAliasInfo[] =
 	{ NULL,		WEAPON_NONE }
 };
 
-WeaponBuyAliasInfo weaponBuyAliasInfo[] =
+DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 {
 	{ "galil",		WEAPON_GALIL,		"#Galil" },
 	{ "defender",		WEAPON_GALIL,		"#Galil" },
@@ -137,7 +139,7 @@ WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 	{ NULL,			WEAPON_NONE,		NULL }
 };
 
-WeaponClassAliasInfo weaponClassAliasInfo[] =
+DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 {
 	{ "p228",	WEAPONCLASS_PISTOL },
 	{ "???",	WEAPONCLASS_PISTOL },
@@ -187,7 +189,7 @@ WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ NULL,		WEAPONCLASS_NONE }
 };
 
-WeaponInfoStruct weaponInfo[] =
+DLL_GLOBAL WeaponInfoStruct weaponInfo[] =
 {
 	{ WEAPON_P228,		P228_PRICE,		AMMO_357SIG_PRICE,	AMMO_357SIG_BUY,	P228_MAX_CLIP,		MAX_AMMO_357SIG,	AMMO_357SIG,		"weapon_p228" },
 	{ WEAPON_GLOCK,		GLOCK18_PRICE,		AMMO_9MM_PRICE,		AMMO_9MM_BUY,		GLOCK18_MAX_CLIP,	MAX_AMMO_9MM,		AMMO_9MM,		"weapon_glock18" },
@@ -219,7 +221,7 @@ WeaponInfoStruct weaponInfo[] =
 };
 
 // Given an alias, return the associated weapon ID
-WeaponIdType AliasToWeaponID(const char *alias)
+DLL_GLOBAL WeaponIdType AliasToWeaponID(const char *alias)
 {
 	if (alias != NULL)
 	{
@@ -456,4 +458,6 @@ bool CanBuyWeaponByMaptype(int playerTeam, WeaponIdType weaponID, bool useAssasi
 	}
 
 	return false;
+}
+
 }

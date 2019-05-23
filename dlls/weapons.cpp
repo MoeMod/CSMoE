@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -2255,3 +2257,5 @@ void CArmoury::KeyValue(KeyValueData *pkvd)
 }
 
 LINK_ENTITY_TO_CLASS(armoury_entity, CArmoury);
+
+}

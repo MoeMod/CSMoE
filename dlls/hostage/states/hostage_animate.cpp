@@ -62,6 +62,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void HostageAnimateState::Reset()
 {
 	m_sequenceCount = 0;
@@ -185,4 +187,6 @@ NOXREF bool HostageAnimateState::IsPlaying(CHostageImprov *improv, const char *s
 	}
 
 	return LookupSequence(hostage, seqName) == id;
+}
+
 }

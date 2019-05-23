@@ -37,6 +37,8 @@
 #pragma warning(disable : 4530)
 #endif
 
+namespace sv {
+
 // to help identify nav files
 #define NAV_MAGIC_NUMBER	0xFEEDFACE
 
@@ -415,6 +417,8 @@ inline bool IsWalkableTraceLineClear(Vector &from, Vector &to, unsigned int flag
 		return true;
 
 	return false;
+}
+
 }
 
 #endif // NAV_H

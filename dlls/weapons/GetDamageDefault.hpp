@@ -13,10 +13,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef CLIENT_DLL
-#include "gamemode/mods.h"
-#endif
-
 #include <type_traits>
 
 template<class CFinal, class CBase = CBaseTemplateWeapon>

@@ -39,19 +39,34 @@
 
 #include <UtlVector.h>
 
+#ifndef CLIENT_DLL
 #undef CREATE_NAMED_ENTITY
 #undef REMOVE_ENTITY
-
+namespace sv {
 edict_t *CREATE_NAMED_ENTITY(int iClass);
 void REMOVE_ENTITY(edict_t *e);
 void CONSOLE_ECHO(const char *pszMsg, ...);
 void CONSOLE_ECHO_LOGGED(const char *pszMsg, ...);
+}
+#endif
 
 #include "exportdef.h"
+
+typedef enum
+{
+	USE_OFF,
+	USE_ON,
+	USE_SET,
+	USE_TOGGLE
+} USE_TYPE;
+
+#ifndef CLIENT_DLL
 
 extern "C" EXPORT int GetEntityAPI(DLL_FUNCTIONS *pFunctionTable, int interfaceVersion);
 extern "C" EXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion);
 extern "C" EXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion);
+
+namespace sv {
 
 typedef enum
 {
@@ -72,8 +87,8 @@ extern CUtlVector<hash_item_t> stringsHashTable;
 
 int CaseInsensitiveHash(const char *string, int iBounds);
 void EmptyEntityHashTable(void);
-void AddEntityHashValue(struct entvars_s *pev, const char *value, hash_types_e fieldType);
-void RemoveEntityHashValue(struct entvars_s *pev, const char *value, hash_types_e fieldType);
+void AddEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
+void RemoveEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
 void printEntities(void);
 void loopPerformance(void);
 
@@ -92,16 +107,9 @@ extern void SaveGlobalState(SAVERESTOREDATA *pSaveData);
 extern void RestoreGlobalState(SAVERESTOREDATA *pSaveData);
 extern void ResetGlobalState(void);
 
-typedef enum
-{
-	USE_OFF,
-	USE_ON,
-	USE_SET,
-	USE_TOGGLE
-}
-USE_TYPE;
-
 extern void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+}
+#endif // #ifndef CLIENT_DLL
 
 #define CLASS_NONE 0
 #define CLASS_MACHINE 1
@@ -120,11 +128,24 @@ extern void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEn
 #define CLASS_VEHICLE 14
 #define CLASS_BARNACLE 99
 
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CBaseEntity;
+
 class CBaseMonster;
+
 class CBasePlayerItem;
+
 class CSquadMonster;
+
 class CBasePlayer;
+
+}
 
 #define SF_NORESPAWN (1<<30)
 
@@ -132,6 +153,12 @@ class CBasePlayer;
 
 #include "ruleof350.h"
 #include <functional> // why not use c++11 std::function?
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 class CBaseEntity : ruleof350::unique
 {
@@ -155,7 +182,7 @@ public:
 #ifdef CLIENT_DLL
 	virtual int Save(CSave &save) { return 1; }
 	virtual int Restore(CRestore &restore) { return 1; }
-#else 
+#else
 	virtual int Save(CSave &save);
 	virtual int Restore(CRestore &restore);
 #endif
@@ -163,7 +190,7 @@ public:
 	virtual void Activate(void) {}
 #ifdef CLIENT_DLL
 	virtual void SetObjectCollisionBox(void) {}
-#else 
+#else
 	virtual void SetObjectCollisionBox(void);
 #endif
 	virtual int Classify(void) { return CLASS_NONE; }
@@ -172,7 +199,7 @@ public:
 	virtual void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) {}
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) { return 1; }
 	virtual int TakeHealth(float flHealth, int bitsDamageType) { return 1; }
-#else 
+#else
 	virtual void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual int TakeHealth(float flHealth, int bitsDamageType);
@@ -181,7 +208,7 @@ public:
 	virtual int BloodColor(void) { return DONT_BLEED; }
 #ifdef CLIENT_DLL
 	virtual void TraceBleed(float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) {}
-#else 
+#else
 	virtual void TraceBleed(float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
 #endif
 	virtual BOOL IsTriggered(CBaseEntity *pActivator) { return TRUE; }
@@ -199,7 +226,7 @@ public:
 	virtual void OverrideReset(void) {}
 #ifdef CLIENT_DLL
 	virtual int DamageDecal(int bitsDamageType) { return -1; }
-#else 
+#else
 	virtual int DamageDecal(int bitsDamageType);
 #endif
 	virtual void SetToggleState(int state) {}
@@ -213,7 +240,7 @@ public:
 	virtual BOOL HasTarget(string_t targetname) { return FStrEq(STRING(targetname), STRING(pev->targetname)); }
 #ifdef CLIENT_DLL
 	virtual BOOL IsInWorld(void) { return TRUE; }
-#else 
+#else
 	virtual BOOL IsInWorld(void);
 #endif
 	virtual BOOL IsPlayer(void) { return FALSE; }
@@ -221,7 +248,7 @@ public:
 	virtual const char *TeamID(void) { return ""; }
 #ifdef CLIENT_DLL
 	virtual CBaseEntity *GetNextTarget(void) { return 0; }
-#else 
+#else
 	virtual CBaseEntity *GetNextTarget(void);
 #endif
 
@@ -240,7 +267,7 @@ public:
 #ifdef CLIENT_DLL
 	virtual BOOL FVisible(CBaseEntity *pEntity) { return FALSE; }
 	virtual BOOL FVisible(const Vector &vecOrigin) { return FALSE; }
-#else 
+#else
 	virtual BOOL FVisible(CBaseEntity *pEntity);
 	virtual BOOL FVisible(const Vector &vecOrigin);
 #endif
@@ -248,7 +275,7 @@ public:
 public:
 #ifdef CLIENT_DLL
 	void EXPORT SUB_Remove(void) {}
-#else 
+#else
 	void EXPORT SUB_Remove(void);
 #endif
 	void EXPORT SUB_DoNothing(void);
@@ -393,7 +420,12 @@ public:
 	bool has_disconnected;
 };
 
+} // namespace sv | cl
+
 #include "cbase/cbase_memory.h"
+
+#ifndef CLIENT_DLL
+namespace sv {
 
 class CPointEntity : public CBaseEntity
 {
@@ -402,49 +434,14 @@ public:
 	int ObjectCaps(void) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 };
 
-typedef struct locksounds
-{
-	string_t sLockedSound;
-	string_t sLockedSentence;
-	string_t sUnlockedSound;
-	string_t sUnlockedSentence;
-	int iLockedSentence;
-	int iUnlockedSentence;
-	float flwaitSound;
-	float flwaitSentence;
-	BYTE bEOFLocked;
-	BYTE bEOFUnlocked;
-}
-locksound_t;
+} // namespace sv
+#endif
 
-void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton);
-
-#define MAX_MULTI_TARGETS 16
-#define MS_MAX_TARGETS 32
-
-class CMultiSource : public CPointEntity
-{
-public:
-	void Spawn(void);
-	void KeyValue(KeyValueData *pkvd);
-	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	int ObjectCaps(void) { return (CPointEntity::ObjectCaps() | FCAP_MASTER); }
-	BOOL IsTriggered(CBaseEntity *pActivator);
-	int Save(CSave &save);
-	int Restore(CRestore &restore);
-
-public:
-	void EXPORT Register(void);
-
-public:
-	static TYPEDESCRIPTION m_SaveData[];
-
-public:
-	EHANDLE m_rgEntities[MS_MAX_TARGETS];
-	int m_rgTriggered[MS_MAX_TARGETS];
-	int m_iTotal;
-	string_t m_globalstate;
-};
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 class CBaseDelay : public CBaseEntity
 {
@@ -572,6 +569,8 @@ public:
 
 #define SetMoveDone(a) m_pfnCallWhenMoveDone = static_cast<void (CBaseToggle::*)(void)>(a)
 
+} // namespace sv | cl
+
 #define GIB_HEALTH_VALUE -30
 
 #define ROUTE_SIZE 8
@@ -660,72 +659,12 @@ public:
 #define GIB_NEVER 1
 #define GIB_ALWAYS 2
 
-class CBaseMonster;
+namespace sv {
 class CCineMonster;
 class CSound;
+}
 
 #include "basemonster.h"
 
-const char *ButtonSound(int sound);
-
-class CBaseButton : public CBaseToggle
-{
-public:
-	void Spawn(void);
-	void Precache(void);
-	void KeyValue(KeyValueData* pkvd);
-	int ObjectCaps(void) { return (CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | (pev->takedamage ? 0 : FCAP_IMPULSE_USE); }
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
-	int Save(CSave &save);
-	int Restore(CRestore &restore);
-
-public:
-	void RotSpawn(void);
-	void ButtonActivate(void);
-	void SparkSoundCache(void);
-
-	void EXPORT ButtonShot(void);
-	void EXPORT ButtonTouch(CBaseEntity *pOther);
-	void EXPORT ButtonSpark(void);
-	void EXPORT TriggerAndWait(void);
-	void EXPORT ButtonReturn(void);
-	void EXPORT ButtonBackHome(void);
-	void EXPORT ButtonUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	enum BUTTON_CODE { BUTTON_NOTHING, BUTTON_ACTIVATE, BUTTON_RETURN };
-	BUTTON_CODE ButtonResponseToTouch(void);
-
-public:
-	static TYPEDESCRIPTION m_SaveData[];
-
-public:
-	BOOL m_fStayPushed;
-	BOOL m_fRotating;
-	string_t m_strChangeTarget;
-	locksound_t m_ls;
-	BYTE m_bLockedSound;
-	BYTE m_bLockedSentence;
-	BYTE m_bUnlockedSound;
-	BYTE m_bUnlockedSentence;
-	int m_sounds;
-};
-
-class CWorld : public CBaseEntity
-{
-public:
-	void Spawn(void);
-	void Precache(void);
-	void KeyValue(KeyValueData *pkvd);
-};
-
-class CClientFog : public CBaseEntity
-{
-public:
-	void Spawn(void);
-	void KeyValue(KeyValueData *pkvd);
-
-public:
-	int m_iStartDist, m_iEndDist;
-	float m_fDensity;
-};
 
 #endif

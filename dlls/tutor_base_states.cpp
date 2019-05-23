@@ -52,6 +52,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 CBaseTutorStateSystem::CBaseTutorStateSystem()
 {
 	;
@@ -85,4 +87,6 @@ CBaseTutorState::~CBaseTutorState()
 int CBaseTutorState::GetType() const
 {
 	return m_type;
+}
+
 }

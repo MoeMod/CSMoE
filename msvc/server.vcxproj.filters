@@ -463,15 +463,6 @@
     <ClCompile Include="..\public\MemPool.cpp">
       <Filter>public</Filter>
     </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_math.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_shared.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pm_shared\pm_debug.c">
-      <Filter>pm_shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\public\unicode_strtools.cpp">
       <Filter>public</Filter>
     </ClCompile>
@@ -681,6 +672,21 @@
     </ClCompile>
     <ClCompile Include="..\dlls\gamemode\zb1\zb1_countdown.cpp">
       <Filter>dlls\gamemode\zb1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_shared.cpp">
+      <Filter>pm_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_debug.cpp">
+      <Filter>pm_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pm_shared\pm_math.cpp">
+      <Filter>pm_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\cbase\cbase_physint.cpp">
+      <Filter>dlls\cbase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\cbase\cbase_entity_factory.cpp">
+      <Filter>dlls\cbase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1025,27 +1031,6 @@
     </ClInclude>
     <ClInclude Include="..\public\utllinkedlist.h">
       <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_defs.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_info.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_materials.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_math.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_movevars.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_shared.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_debug.h">
-      <Filter>pm_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\public\tier1\utlmemory.h">
       <Filter>public\tier1</Filter>
@@ -1448,6 +1433,36 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zb1\zb1_const.h">
       <Filter>dlls\gamemode\zb1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_math.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_movevars.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_shared.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_debug.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_defs.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_info.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\pm_shared\pm_materials.h">
+      <Filter>pm_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cbase\cbase_entity_factory.h">
+      <Filter>dlls\cbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cbase\cbase_locksound.h">
+      <Filter>dlls\cbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cbase\cbase_physint.h">
+      <Filter>dlls\cbase</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

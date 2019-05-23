@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //smokegrenade
 #define SMOKEGRENADE_MAX_SPEED		250
 #define SMOKEGRENADE_MAX_SPEED_SHIELD	180
@@ -40,5 +46,7 @@ public:
 public:
 	unsigned short m_usCreateSmoke;
 };
+
+}
 
 #endif

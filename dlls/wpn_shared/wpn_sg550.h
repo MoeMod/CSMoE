@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //sg550
 #define SG550_MAX_SPEED			210
 #define SG550_MAX_SPEED_ZOOM		150
@@ -42,5 +48,7 @@ public:
 private:
 	unsigned short m_usFireSG550;
 };
+
+}
 
 #endif

@@ -38,7 +38,15 @@
 #undef SERVER_EXECUTE
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 extern enginefuncs_t g_engfuncs;
+
+
 
 #define GETPLAYERUSERID			(*g_engfuncs.pfnGetPlayerUserId)
 #define PRECACHE_GENERIC		(*g_engfuncs.pfnPrecacheGeneric)
@@ -205,5 +213,8 @@ inline T *GET_PRIVATE(edict_t *pent)
 
 #define	REMOVE_KEY_VALUE		(*g_engfuncs.pfnInfo_RemoveKey)
 #define SET_PHYSICS_KEY_VALUE		(*g_engfuncs.pfnSetPhysicsKeyValue)
+
+}
+
 
 #endif //ENGINECALLBACK_H

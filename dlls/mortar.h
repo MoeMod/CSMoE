@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CFuncMortarField: public CBaseToggle
 {
 public:
@@ -43,7 +45,7 @@ public:
 
 	// Bmodels don't go across transitions
 	virtual int ObjectCaps() { return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-   
+
 public:
 	void EXPORT FieldUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 
@@ -70,5 +72,7 @@ public:
 public:
 	int m_spriteTexture;
 };
+
+}
 
 #endif // MORTAR_H

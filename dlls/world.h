@@ -32,7 +32,17 @@
 #pragma once
 #endif
 
-#define SF_DECAL_NOTINDEATHMATCH	2048
+namespace sv {
+
+#define SF_DECAL_NOTINDEATHMATCH    2048
+
+class CWorld : public CBaseEntity
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	void KeyValue(KeyValueData *pkvd);
+};
 
 void CopyToBodyQue(entvars_t *pev);
 void ClearBodyQue();
@@ -42,5 +52,7 @@ void ResetGlobalState();
 
 extern CGlobalState gGlobalState;
 extern float g_flWeaponCheat;
+
+}
 
 #endif // WORLD_H

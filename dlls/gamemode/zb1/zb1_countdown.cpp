@@ -22,6 +22,8 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+namespace sv {
+
 static const char* s_szCountDownSound[11] = {
 				"", "one", "two", "three", "four", "five", "six",
 				"seven", "eight", "nine", "ten"
@@ -73,4 +75,6 @@ bool CModCountdownHelper::IsExpired() const
 bool CModCountdownHelper::IsFreezePeriod() const
 {
 	return m_pMod->IsFreezePeriod();
+}
+
 }

@@ -27,6 +27,7 @@
 */
 #include "events.h"
 
+namespace cl {
 bool g_bGlockBurstMode = false;
 
 enum glock18_e
@@ -133,4 +134,5 @@ void EV_Fireglock18( event_args_t *args )
 		1, vecSrc, vecAiming,
 		vSpread, 4096.0, BULLET_PLAYER_9MM,
 		2 );
+}
 }

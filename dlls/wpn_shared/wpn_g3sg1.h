@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //g3sg1
 #define G3SG1_MAX_SPEED		210
 #define G3SG1_MAX_SPEED_ZOOM	150
@@ -41,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireG3SG1;
 };
+
+}
 
 #endif

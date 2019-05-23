@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum cannon_e
 {
 	ANIM_IDLE1,
@@ -151,4 +153,6 @@ void EV_FireCannon( event_args_t *args )
 		EV_CannonFireEffect(ent->attachment[0] + 7.0 * forward, forward, velocity, idx, 0);
 	else
 		EV_CannonFireEffect(vecSrc + 40.0 * forward, forward, velocity, idx, 0);
+}
+
 }

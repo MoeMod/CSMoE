@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum k1a_e
 {
 	K1A_IDLE = 0,
@@ -96,4 +98,6 @@ void EV_FireK1a( event_args_t *args )
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //ump45
 #define UMP45_MAX_SPEED			250
 #define UMP45_DAMAGE			30
@@ -41,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireUMP45;
 };
+
+}
 
 #endif

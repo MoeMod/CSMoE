@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CCSBot;
 
 // This class represents the game state as known by a particular bot
@@ -60,8 +62,8 @@ public:
 	bool IsBombPlanted() const	{ return (m_bombState == PLANTED); }
 	bool IsBombDefused() const	{ return (m_bombState == DEFUSED); }
 	bool IsBombExploded() const	{ return (m_bombState == EXPLODED); }
-	
-	void UpdateLooseBomb(const Vector *pos);		// we see the loose bomb	
+
+	void UpdateLooseBomb(const Vector *pos);		// we see the loose bomb
 	float TimeSinceLastSawLooseBomb() const;		// how long has is been since we saw the loose bomb
 	bool IsLooseBombLocationKnown() const;			// do we know where the loose bomb is
 
@@ -72,7 +74,7 @@ public:
 	bool IsPlantedBombLocationKnown() const;		// do we know where the bomb was planted
 	void MarkBombsiteAsPlanted(int zoneIndex);		// mark bombsite as the location of the planted bomb
 
-	enum { UNKNOWN = -1 };	
+	enum { UNKNOWN = -1 };
 	int GetPlantedBombsite() const;				// return the zone index of the planted bombsite, or UNKNOWN
 	bool IsAtPlantedBombsite() const;			// return true if we are currently in the bombsite where the bomb is planted
 
@@ -148,5 +150,7 @@ private:
 	bool m_allHostagesRescued;				// if true, so every hostages been is rescued
 	bool m_haveSomeHostagesBeenTaken;			// true if a hostage has been moved by a CT (and we've seen it)
 };
+
+}
 
 #endif // CS_GAMESTATE_H

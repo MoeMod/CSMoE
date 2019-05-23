@@ -34,6 +34,8 @@
 
 #include <list>
 
+namespace sv {
+
 class CNavArea;
 
 void DestroyHidingSpots();
@@ -1164,5 +1166,7 @@ int BuildArea(CNavNode *node, int width, int height);
 void BuildLadders();
 void MarkJumpAreas();
 void GenerateNavigationAreaMesh();
+
+}
 
 #endif // NAV_AREA_H

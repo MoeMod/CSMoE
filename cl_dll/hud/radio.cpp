@@ -28,10 +28,7 @@ version.
 
 #include "hud.h"
 
-extern "C"
-{
 #include "pm_math.h"
-}
 
 #include "parsemsg.h"
 #include "cl_util.h"

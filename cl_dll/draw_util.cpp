@@ -39,7 +39,7 @@ float DrawUtils::color[3];
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
 
 // console color typeing
-byte g_color_table[][4] =
+static byte g_color_table[][4] =
 {
 {100, 100, 100, 255},	// should be black, but hud font is additive, so printing black characters is impossible
 {255,   0,   0, 255},	// red

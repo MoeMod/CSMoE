@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //TAR21
 #define TAR21_MAX_SPEED			220
 #define TAR21_MAX_SPEED_ZOOM			150
@@ -49,5 +55,7 @@ public:
 private:
 	unsigned short m_usFireTar21;
 };
+
+}
 
 #endif

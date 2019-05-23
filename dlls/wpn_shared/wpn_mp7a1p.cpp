@@ -21,18 +21,24 @@ GNU General Public License for more details.
 
 #include "weapons/WeaponTemplate.hpp"
 
-class CMP7A1_Pistol : public LinkWeaponTemplate< CMP7A1_Pistol,
-	TGeneralData,
-	TDoubleModeType,
-	TDeployDoubleMode,
-	TReloadDefault,
-	TWeaponIdleDefault,
-	BuildTGetItemInfoFromCSW<WEAPON_MP5N>::template type,
-	TFireRifle,
-	TRecoilKickBack,
-	TPrimaryAttackRifle,
-	TPrecacheEvent,
-	TGetDamageDefault
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+class CMP7A1_Pistol : public LinkWeaponTemplate<CMP7A1_Pistol,
+		TGeneralData,
+		TDoubleModeType,
+		TDeployDoubleMode,
+		TReloadDefault,
+		TWeaponIdleDefault,
+		BuildTGetItemInfoFromCSW<WEAPON_MP5N>::template type,
+		TFireRifle,
+		TRecoilKickBack,
+		TPrimaryAttackRifle,
+		TPrecacheEvent,
+		TGetDamageDefault
 >
 {
 private:
@@ -67,7 +73,7 @@ public:
 	static constexpr const char *ClassName = "weapon_mp7a1p";
 	static constexpr const char *AnimExtension = "pistol";
 
-	KnockbackData KnockBack = { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f };
+	KnockbackData KnockBack = {250.0f, 200.0f, 250.0f, 90.0f, 0.7f};
 	static constexpr float MaxSpeed = 250;
 
 	enum
@@ -85,11 +91,11 @@ public:
 		static constexpr int iMaxAmmo1 = MAX_AMMO_46MM;
 	};
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_46mm" , AMMO_46MM_PRICE }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return {"ammo_46mm", AMMO_46MM_PRICE}; }
 #endif
 
-	static constexpr const auto & SpreadCalcNotOnGround = 0.375 * A;
-	static constexpr const auto & SpreadCalcDefault = 0.035 * A;
+	static constexpr const auto &SpreadCalcNotOnGround = 0.375 * A;
+	static constexpr const auto &SpreadCalcDefault = 0.035 * A;
 
 	static constexpr float CycleTime = 0.07;
 
@@ -97,21 +103,24 @@ public:
 	static constexpr int DamageZB = 37;
 	static constexpr int DamageZBS = 37;
 
-	static constexpr const auto & AccuracyCalc = (N * N / 190.0) + 0.6;
+	static constexpr const auto &AccuracyCalc = (N * N / 190.0) + 0.6;
 	static constexpr float AccuracyMax = 1.5f;
 	static constexpr float RangeModifier = 0.83;
 	static constexpr auto BulletType = BULLET_PLAYER_57MM;
 	static constexpr int Penetration = 1;
 	static constexpr int Distance = 8192;
 
-	KickBackData KickBackWalking = { 0.6f, 0.3f, 0.25f, 0.035f, 3.5f, 2.75f, (signed int)10 };
-	KickBackData KickBackNotOnGround = { 1, 0.55f, 0.4f, 0.05f, 5, 3.25f, (signed int)9 };
-	KickBackData KickBackDucking = { 0.25f, 0.175f, 0.125f, 0.02f, 2.25f, 1.2f, (signed int)10 };
-	KickBackData KickBackDefault = { 0.275f, 0.2f, 0.15f, 0.02f, 3, 1.75f, (signed int)9 };
+	KickBackData KickBackWalking = {0.6f, 0.3f, 0.25f, 0.035f, 3.5f, 2.75f, (signed int) 10};
+	KickBackData KickBackNotOnGround = {1, 0.55f, 0.4f, 0.05f, 5, 3.25f, (signed int) 9};
+	KickBackData KickBackDucking = {0.25f, 0.175f, 0.125f, 0.02f, 2.25f, 1.2f, (signed int) 10};
+	KickBackData KickBackDefault = {0.275f, 0.2f, 0.15f, 0.02f, 3, 1.75f, (signed int) 9};
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_mp7a1c";
 	static constexpr bool DoubleMode_SyncAmmo = true;
 	static constexpr float DoubleMode_ChangeTime = 6.0f;
 };
 
+
 LINK_ENTITY_TO_CLASS(weapon_mp7a1p, CMP7A1_Pistol)
+
+}

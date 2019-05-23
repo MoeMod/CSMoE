@@ -59,6 +59,9 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
+
 /*
 * Globals initialization
 */
@@ -1458,3 +1461,5 @@ NOXREF void CGrenade::UseSatchelCharges(entvars_t *pevOwner, SATCHELCODE code)
 }
 
 IMPLEMENT_SAVERESTORE(CGrenade, CBaseMonster);
+
+}

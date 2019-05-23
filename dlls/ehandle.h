@@ -28,8 +28,14 @@
 
 #pragma once
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 // Safe way to point to CBaseEntities who may die between frames.
-template <typename T = CBaseEntity>
+template<typename T = CBaseEntity>
 class EntityHandle
 {
 public:
@@ -38,21 +44,24 @@ public:
 
 	// copy constructor
 	// Note : template functions cannot be  copy constructor
-	constexpr EntityHandle(const EntityHandle<T> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
+	constexpr EntityHandle(const EntityHandle<T> &other) : m_edict(other.m_edict),
+	                                                       m_serialnumber(other.m_serialnumber) {}
 
 	// Note : template functions are considered behind non-template functions
 	template<class U, class = typename std::enable_if<std::is_base_of<T, U>::value>::type>
-	constexpr EntityHandle(const EntityHandle<U> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
+	constexpr
+	EntityHandle(const EntityHandle<U> &other) : m_edict(other.m_edict), m_serialnumber(other.m_serialnumber) {}
 
 	EntityHandle(const T *pEntity);
 	explicit EntityHandle(edict_t *pEdict);
 
 	template<class U>
-	friend class EntityHandle;
+	friend
+	class EntityHandle;
 
 	// cast to base class
 	// NOTE: this is a unsafe method
-	template <typename R>
+	template<typename R>
 	auto Get() const -> typename std::enable_if<std::is_base_of<R, T>::value, R *>::type
 	{
 		return GET_PRIVATE<R>(Get());
@@ -86,50 +95,47 @@ using EHandle = EntityHandle<>;
 using EHANDLE = EHandle;
 
 // Inlines
-template <typename T>
+template<typename T>
 inline bool FNullEnt(const EntityHandle<T> &hent)
 {
 	return (!hent || FNullEnt(OFFSET(hent.Get())));
 }
 
-template <typename T>
+template<typename T>
 EntityHandle<T>::EntityHandle(const T *pEntity) : EntityHandle()
 {
-	if (pEntity)
-	{
+	if (pEntity) {
 		Set(ENT(pEntity->pev));
 	}
 }
 
-template <typename T>
+template<typename T>
 EntityHandle<T>::EntityHandle(edict_t *pEdict)
 {
 	Set((pEdict));
 }
 
-template <typename T>
+template<typename T>
 constexpr inline edict_t *EntityHandle<T>::Get() const
 {
 	return (!m_edict || m_edict->serialnumber != m_serialnumber || m_edict->free) ? nullptr : m_edict;
 }
 
-template <typename T>
+template<typename T>
 inline edict_t *EntityHandle<T>::Set(edict_t *pEdict)
 {
 	m_edict = pEdict;
-	if (pEdict)
-	{
+	if (pEdict) {
 		m_serialnumber = pEdict->serialnumber;
 	}
 
 	return pEdict;
 }
 
-template <typename T>
+template<typename T>
 void EntityHandle<T>::Remove()
 {
-	if (IsValid())
-	{
+	if (IsValid()) {
 		UTIL_Remove(*this);
 	}
 
@@ -138,18 +144,16 @@ void EntityHandle<T>::Remove()
 }
 
 // Returns whether this handle is valid.
-template <typename T>
+template<typename T>
 inline bool EntityHandle<T>::IsValid() const
 {
 	edict_t *pEdict = Get();
-	if (!pEdict)
-	{
+	if (!pEdict) {
 		return false;
 	}
 
 	CBaseEntity *pEntity = GET_PRIVATE<CBaseEntity>(pEdict);
-	if (!pEntity)
-	{
+	if (!pEntity) {
 		return false;
 	}
 
@@ -158,13 +162,13 @@ inline bool EntityHandle<T>::IsValid() const
 
 // CBaseEntity serial number.
 // Used to determine if the entity is still valid.
-template <typename T>
+template<typename T>
 constexpr inline int EntityHandle<T>::GetSerialNumber() const
 {
 	return m_serialnumber;
 }
 
-template <typename T>
+template<typename T>
 inline bool EntityHandle<T>::operator==(T *pEntity) const
 {
 	//assert("EntityHandle<T>::operator==:  got a nullptr pointer!" && (pEntity != nullptr));
@@ -177,7 +181,7 @@ inline bool EntityHandle<T>::operator==(T *pEntity) const
 	return m_edict == pEntity->edict();
 }
 
-template <typename T>
+template<typename T>
 inline T *EntityHandle<T>::operator->() const
 {
 	edict_t *pEdict = Get();
@@ -186,4 +190,6 @@ inline T *EntityHandle<T>::operator->() const
 	T *pEntity = GET_PRIVATE<T>(pEdict);
 	assert("EntityHandle<T>::operator->:  pvPrivateData is nullptr!" && (pEntity != nullptr));
 	return pEntity;
+}
+
 }

@@ -4,7 +4,9 @@
 #pragma once
 #endif
 
+namespace sv {
 extern int giAmmoIndex;
 void W_Precache();
+}
 
 #endif

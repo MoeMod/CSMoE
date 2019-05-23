@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CPathCorner: public CPointEntity
 {
 public:
@@ -48,5 +50,7 @@ public:
 private:
 	float m_flWait;
 };
+
+}
 
 #endif // PATHCORNER_H

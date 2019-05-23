@@ -7,6 +7,8 @@
 #include "gamerules.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -600,4 +602,6 @@ void CGamePlayerTeam::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	{
 		UTIL_Remove(this);
 	}
+}
+
 }

@@ -40,6 +40,8 @@
 #define SIGN(num)		(((num) < 0) ? -1 : 1)
 #define ABS(num)		(SIGN(num) * (num))
 
+namespace sv {
+
 class CBasePlayer;
 class BotProfile;
 
@@ -239,5 +241,7 @@ float BotCOS(float angle);
 float BotSIN(float angle);
 bool IsGameEventAudible(enum GameEventType event, CBaseEntity *entity, CBaseEntity *other, float *range, PriorityType *priority, bool *isHostile);
 void HintMessageToAllPlayers(const char *message);
+
+}
 
 #endif // BOT_UTIL_H

@@ -16,8 +16,8 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_FUNCTOR_HPP
 #define PROJECT_U_FUNCTOR_HPP
 
-namespace moe
-{
+namespace sv {
+namespace moe {
 	// !!! BOT's classname is not "player", so UTIL_FindEntityByClassname(p, "player") CANNOT enum players
 	struct Enumer_Player
 	{
@@ -45,6 +45,7 @@ namespace moe
 			return static_cast<EntityType *>(UTIL_FindEntityByClassname(pCurrent, m_classname));
 		}
 	};
+}
 }
 
 #endif //PROJECT_U_FUNCTOR_HPP

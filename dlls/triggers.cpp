@@ -57,6 +57,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -2338,3 +2340,5 @@ void CClientFog::Spawn()
 }
 
 LINK_ENTITY_TO_CLASS(env_fog, CClientFog);
+
+}

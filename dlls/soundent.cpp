@@ -5,7 +5,9 @@
 #include "monsters.h"
 #include "soundent.h"
 
-CSoundEnt *pSoundEnt;
+namespace sv {
+
+DLL_GLOBAL CSoundEnt *pSoundEnt;
 
 LINK_ENTITY_TO_CLASS(soundent, CSoundEnt);
 
@@ -351,4 +353,6 @@ int CSoundEnt::ClientSoundIndex(edict_t *pClient)
 #endif // _DEBUG
 
 	return iReturn;
+}
+
 }

@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //galil
 #define GALIL_MAX_SPEED			240
 #define GALIL_DAMAGE			30
@@ -42,5 +48,7 @@ public:
 private:
 	unsigned short m_usFireGalil;
 };
+
+}
 
 #endif

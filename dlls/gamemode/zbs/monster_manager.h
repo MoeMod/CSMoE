@@ -7,6 +7,8 @@
 #include <memory>
 #include <functional>
 
+namespace sv {
+
 class CMonsterManager
 {
 private:
@@ -16,7 +18,7 @@ private:
 		static CMonsterManager x;
 		return x;
 	}
-	
+
 public:
 	~CMonsterManager();
 
@@ -41,5 +43,7 @@ private:
 };
 
 inline CMonsterManager &MonsterManager();
+
+}
 
 #endif

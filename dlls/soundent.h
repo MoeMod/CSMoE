@@ -43,6 +43,12 @@
 
 #define SOUND_NEVER_EXPIRE -1
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CSound
 {
 public:
@@ -95,5 +101,7 @@ private:
 };
 
 extern CSoundEnt *pSoundEnt;
+
+}
 
 #endif // SOUNDENT_H

@@ -52,6 +52,8 @@
 #include <unistd.h>
 #endif
 
+namespace sv {
+
 PlaceDirectory placeDirectory;
 
 void PlaceDirectory::Reset()
@@ -890,4 +892,6 @@ NavErrorType LoadNavigationMap()
 	BuildLadders();
 
 	return NAV_OK;
+}
+
 }

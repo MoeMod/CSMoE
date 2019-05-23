@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_p228.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum p228_e
 {
 	P228_IDLE,
@@ -234,4 +240,6 @@ void CP228::WeaponIdle(void)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625;
 		SendWeaponAnim(P228_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

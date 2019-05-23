@@ -17,6 +17,12 @@ GNU General Public License for more details.
 
 #include "weapons/WeaponTemplate.hpp"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CCannon : public LinkWeaponTemplate<CCannon,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
@@ -68,3 +74,4 @@ public:
 private:
 	unsigned short m_usFire;
 };
+}

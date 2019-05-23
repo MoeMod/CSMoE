@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Move to the bomb on the floor and pick it up
 
 void FetchBombState::OnEnter(CCSBot *me)
@@ -107,4 +109,6 @@ void FetchBombState::OnUpdate(CCSBot *me)
 
 	if (me->UpdatePathMovement() != CCSBot::PROGRESSING)
 		me->Idle();
+}
+
 }

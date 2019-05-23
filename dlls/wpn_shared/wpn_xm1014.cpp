@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_xm1014.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum xm1014_e
 {
 	XM1014_IDLE,
@@ -226,4 +232,6 @@ void CXM1014::WeaponIdle(void)
 		else
 			SendWeaponAnim(XM1014_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

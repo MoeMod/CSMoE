@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //Famas
 #define FAMAS_MAX_SPEED		240
 #define FAMAS_RELOAD_TIME	3.3
@@ -40,5 +46,7 @@ public:
 	int m_iShell;
 	int iShellOn;
 };
+
+}
 
 #endif

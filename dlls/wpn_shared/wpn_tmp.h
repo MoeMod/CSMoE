@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //tmp
 #define TMP_MAX_SPEED			250
 #define TMP_DAMAGE			20
@@ -41,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireTMP;
 };
+
+}
 
 #endif

@@ -17,12 +17,14 @@ GNU General Public License for more details.
 
 enum ZB3HumanMoraleType_e : byte;
 
+namespace sv {
+
 class CZB3HumanMorale
 {
 public:
 	constexpr CZB3HumanMorale() : m_iHumanMoraleLevel(0) {}
 
-	constexpr float DamageModifier(ZB3HumanMoraleType_e type) const 
+	constexpr float DamageModifier(ZB3HumanMoraleType_e type) const
 	{
 		return type == ZB3_MORALE_STRENGTHEN ?
 		       1.3f + m_iHumanMoraleLevel * 0.1f :
@@ -31,7 +33,7 @@ public:
 
 	constexpr int GetMoraleLevel() const { return m_iHumanMoraleLevel; }
 
-	bool LevelUp() 
+	bool LevelUp()
 	{
 		if (m_iHumanMoraleLevel < 10)
 		{
@@ -46,3 +48,5 @@ public:
 protected:
 	int m_iHumanMoraleLevel;
 };
+
+}

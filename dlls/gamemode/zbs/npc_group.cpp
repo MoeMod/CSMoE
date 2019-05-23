@@ -7,6 +7,8 @@
 #include "npc_group.h"
 #include <vector>
 
+namespace sv {
+
 // slow
 static inline CBasePlayer *GetClosestPlayerByTravelDistance(CNavArea *startArea, TeamName team)
 {
@@ -201,4 +203,6 @@ std::shared_ptr<CNpcGroupMember> GetGroup(const Vector &start)
 	}
 	
 	return spDesiredGroup->Join();
+}
+
 }

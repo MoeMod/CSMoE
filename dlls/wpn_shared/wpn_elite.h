@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //Elites
 #define ELITE_MAX_SPEED		250
 #define ELITE_RELOAD_TIME	4.5
@@ -40,5 +46,7 @@ public:
 	unsigned short m_usFireELITE_LEFT;
 	unsigned short m_usFireELITE_RIGHT;
 };
+
+}
 
 #endif

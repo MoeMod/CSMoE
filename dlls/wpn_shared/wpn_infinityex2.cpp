@@ -22,6 +22,13 @@ GNU General Public License for more details.
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 LINK_ENTITY_TO_CLASS(weapon_infinityex2, CInfinityEX2)
 
 void CInfinityEX2::Spawn(void)
@@ -315,4 +322,6 @@ void CInfinityEX2::WeaponIdle(void)
 		else
 			SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

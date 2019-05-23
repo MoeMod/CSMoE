@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_famas.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum famas_e
 {
 	FAMAS_IDLE1,
@@ -231,4 +237,6 @@ void CFamas::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(FAMAS_IDLE1, UseDecrement() != FALSE);
+}
+
 }

@@ -26,6 +26,9 @@
 *
 */
 #include "events.h"
+
+namespace cl {
+
 enum tar21_e
 {
 	TAR21_IDLE = 0,
@@ -87,4 +90,6 @@ void EV_FireTAR21( struct event_args_s *args )
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+}
+
 }

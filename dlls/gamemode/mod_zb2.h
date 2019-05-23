@@ -26,6 +26,8 @@ GNU General Public License for more details.
 #include "zb2/zb2_zclass.h"
 #include "zb2/zb2_skill.h"
 
+namespace sv {
+
 class CSupplyBox;
 
 class CMod_ZombieMod2 : public CMod_Zombi
@@ -100,5 +102,7 @@ private:
 	float m_flTimeNextZombieHealthRecovery;
 	int m_iZombieInfections;
 };
+
+}
 
 #endif

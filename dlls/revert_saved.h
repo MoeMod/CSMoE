@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CRevertSaved: public CPointEntity
 {
 public:
@@ -61,5 +63,7 @@ public:
 	float m_messageTime;
 	float m_loadTime;
 };
+
+}
 
 #endif // REVERT_SAVED_H

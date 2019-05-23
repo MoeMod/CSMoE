@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+#include "buttons.h"
+
 #define GRENADETYPE_SMOKE			1
 #define GRENADETYPE_FLASH			2
 
@@ -68,7 +70,20 @@
 #define SF_RENDER_MASKMODE	(1 << 2)
 #define SF_RENDER_MASKCOLOR	(1 << 3)
 
-class CFrictionModifier: public CBaseEntity
+namespace sv {
+
+class CClientFog : public CBaseEntity
+{
+public:
+	void Spawn(void);
+	void KeyValue(KeyValueData *pkvd);
+
+public:
+	int m_iStartDist, m_iEndDist;
+	float m_fDensity;
+};
+
+class CFrictionModifier : public CBaseEntity
 {
 public:
 	virtual void Spawn();
@@ -87,7 +102,7 @@ public:
 // This trigger will fire when the level spawns (or respawns if not fire once)
 // It will check a global state before firing.  It supports delay and killtargets
 
-class CAutoTrigger: public CBaseDelay
+class CAutoTrigger : public CBaseDelay
 {
 public:
 	virtual void Spawn();
@@ -105,7 +120,7 @@ public:
 	USE_TYPE triggerType;
 };
 
-class CTriggerRelay: public CBaseDelay
+class CTriggerRelay : public CBaseDelay
 {
 public:
 	virtual void Spawn();
@@ -126,7 +141,7 @@ public:
 // FLAG:		THREAD (create clones when triggered)
 // FLAG:		CLONE (this is a clone for a threaded execution)
 
-class CMultiManager: public CBaseToggle
+class CMultiManager : public CBaseToggle
 {
 public:
 	virtual void Spawn();
@@ -145,8 +160,7 @@ private:
 	/* <19dfe1> ../cstrike/dlls/triggers.cpp:293 */
 	BOOL IsClone()
 	{
-		if (pev->spawnflags & SF_MULTIMAN_CLONE)
-		{
+		if (pev->spawnflags & SF_MULTIMAN_CLONE) {
 			return TRUE;
 		}
 
@@ -155,13 +169,11 @@ private:
 	/* <19e4f3> ../cstrike/dlls/triggers.cpp:294 */
 	BOOL ShouldClone()
 	{
-		if (IsClone())
-		{
+		if (IsClone()) {
 			return FALSE;
 		}
 
-		if (pev->spawnflags & SF_MULTIMAN_THREAD)
-		{
+		if (pev->spawnflags & SF_MULTIMAN_THREAD) {
 			return TRUE;
 		}
 
@@ -175,8 +187,8 @@ public:
 	int m_cTargets;
 	int m_index;
 	float m_startTime;
-	int m_iTargetName[ MAX_MULTI_TARGETS ];
-	float m_flTargetDelay[ MAX_MULTI_TARGETS ];
+	int m_iTargetName[MAX_MULTI_TARGETS];
+	float m_flTargetDelay[MAX_MULTI_TARGETS];
 };
 
 // Render parameters trigger
@@ -184,14 +196,14 @@ public:
 // This entity will copy its render parameters (renderfx, rendermode, rendercolor, renderamt)
 // to its targets when triggered.
 
-class CRenderFxManager: public CBaseEntity
+class CRenderFxManager : public CBaseEntity
 {
 public:
 	virtual void Spawn();
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 };
 
-class CBaseTrigger: public CBaseToggle
+class CBaseTrigger : public CBaseToggle
 {
 public:
 	virtual void KeyValue(KeyValueData *pkvd);
@@ -212,14 +224,14 @@ public:
 // trigger_hurt - hurts anything that touches it. if the trigger has a targetname, firing it will toggle state
 // int gfToggleState = 0; // used to determine when all radiation trigger hurts have called 'RadiationThink'
 
-class CTriggerHurt: public CBaseTrigger
+class CTriggerHurt : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	void EXPORT RadiationThink();
 };
 
-class CTriggerMonsterJump: public CBaseTrigger
+class CTriggerMonsterJump : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -229,7 +241,7 @@ public:
 
 // trigger_cdaudio - starts/stops cd audio tracks
 
-class CTriggerCDAudio: public CBaseTrigger
+class CTriggerCDAudio : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -242,7 +254,7 @@ public:
 
 // This plays a CD track when fired or when the player enters it's radius
 
-class CTargetCDAudio: public CPointEntity
+class CTargetCDAudio : public CPointEntity
 {
 public:
 	virtual void Spawn();
@@ -269,7 +281,7 @@ public:
 // NEW
 // if a trigger has a NETNAME, that NETNAME will become the TARGET of the triggered object.
 
-class CTriggerMultiple: public CBaseTrigger
+class CTriggerMultiple : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -287,7 +299,7 @@ public:
 // 3)	large switch
 // 4)
 
-class CTriggerOnce: public CTriggerMultiple
+class CTriggerOnce : public CTriggerMultiple
 {
 public:
 	virtual void Spawn();
@@ -299,7 +311,7 @@ public:
 // "sequence complete" when finished.  After the counter has been triggered "cTriggersLeft"
 // times (default 2), it will fire all of it's targets and remove itself.
 
-class CTriggerCounter: public CBaseTrigger
+class CTriggerCounter : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -307,7 +319,7 @@ public:
 
 // Derive from point entity so this doesn't move across levels
 
-class CTriggerVolume: public CPointEntity
+class CTriggerVolume : public CPointEntity
 {
 public:
 	virtual void Spawn();
@@ -315,19 +327,22 @@ public:
 
 // Fires a target after level transition and then dies
 
-class CFireAndDie: public CBaseDelay
+class CFireAndDie : public CBaseDelay
 {
 public:
 	virtual void Spawn();
 	virtual void Precache();
-	virtual int ObjectCaps() { return (CBaseDelay::ObjectCaps() | FCAP_FORCE_TRANSITION); }		// Always go across transitions
+	virtual int ObjectCaps()
+	{
+		return (CBaseDelay::ObjectCaps() | FCAP_FORCE_TRANSITION);
+	}        // Always go across transitions
 	virtual void Think();
 };
 
 // QUAKED trigger_changelevel (0.5 0.5 0.5) ? NO_INTERMISSION
 // When the player touches this, he gets sent to the map listed in the "map" variable.  Unless the NO_INTERMISSION flag is set, the view will go to the info_intermission spot and display stats.
 
-class CChangeLevel: public CBaseTrigger
+class CChangeLevel : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -344,19 +359,21 @@ public:
 
 	static edict_t *FindLandmark(const char *pLandmarkName);
 	static int ChangeList(LEVELLIST *pLevelList, int maxList);
-	static int AddTransitionToList(LEVELLIST *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName, edict_t *pentLandmark);
+	static int
+	AddTransitionToList(LEVELLIST *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName,
+	                    edict_t *pentLandmark);
 	static int InTransitionVolume(CBaseEntity *pEntity, char *pVolumeName);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[4];
 
-	char m_szMapName[ cchMapNameMost ];		// trigger_changelevel only:  next map
-	char m_szLandmarkName[ cchMapNameMost ];	// trigger_changelevel only:  landmark on next map
+	char m_szMapName[cchMapNameMost];        // trigger_changelevel only:  next map
+	char m_szLandmarkName[cchMapNameMost];    // trigger_changelevel only:  landmark on next map
 	int m_changeTarget;
 	float m_changeTargetDelay;
 };
 
-class CLadder: public CBaseTrigger
+class CLadder : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -364,7 +381,7 @@ public:
 	virtual void KeyValue(KeyValueData *pkvd);
 };
 
-class CTriggerPush: public CBaseTrigger
+class CTriggerPush : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -372,20 +389,20 @@ public:
 	virtual void Touch(CBaseEntity *pOther);
 };
 
-class CTriggerTeleport: public CBaseTrigger
+class CTriggerTeleport : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 };
 
-class CBuyZone: public CBaseTrigger
+class CBuyZone : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	void EXPORT BuyTouch(CBaseEntity *pOther);
 };
 
-class CBombTarget: public CBaseTrigger
+class CBombTarget : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -395,7 +412,7 @@ public:
 	void EXPORT BombTargetUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 };
 
-class CHostageRescue: public CBaseTrigger
+class CHostageRescue : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -404,39 +421,39 @@ public:
 	void EXPORT HostageRescueTouch(CBaseEntity *pOther);
 };
 
-class CEscapeZone: public CBaseTrigger
+class CEscapeZone : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	void EXPORT EscapeTouch(CBaseEntity *pOther);
 };
 
-class CVIP_SafetyZone: public CBaseTrigger
+class CVIP_SafetyZone : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	void EXPORT VIP_SafetyTouch(CBaseEntity *pOther);
 };
 
-class CTriggerSave: public CBaseTrigger
+class CTriggerSave : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	void EXPORT SaveTouch(CBaseEntity *pOther);
 };
 
-class CTriggerEndSection: public CBaseTrigger
+class CTriggerEndSection : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
-   
+
 public:
 	void EXPORT EndSectionTouch(CBaseEntity *pOther);
 	void EXPORT EndSectionUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 };
 
-class CTriggerGravity: public CBaseTrigger
+class CTriggerGravity : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
@@ -445,7 +462,7 @@ public:
 
 // this is a really bad idea.
 
-class CTriggerChangeTarget: public CBaseDelay
+class CTriggerChangeTarget : public CBaseDelay
 {
 public:
 	virtual void Spawn();
@@ -462,7 +479,7 @@ private:
 	int m_iszNewTarget;
 };
 
-class CTriggerCamera: public CBaseDelay
+class CTriggerCamera : public CBaseDelay
 {
 public:
 	virtual void Spawn();
@@ -478,7 +495,7 @@ public:
 
 	static TYPEDESCRIPTION m_SaveData[13];
 
-	EntityHandle<CBasePlayer> m_hPlayer;
+	EntityHandle <CBasePlayer> m_hPlayer;
 	EHANDLE m_hTarget;
 	CBaseEntity *m_pentPath;
 	int m_sPath;
@@ -493,14 +510,16 @@ public:
 	int m_state;
 };
 
-class CWeather: public CBaseTrigger
+class CWeather : public CBaseTrigger
 {
 public:
 	virtual void Spawn();
 };
 
 void PlayCDTrack(int iTrack);
-int BuildChangeList(LEVELLIST * pLevelList, int maxList);
+int BuildChangeList(LEVELLIST *pLevelList, int maxList);
 NOXREF void NextLevel();
+
+}
 
 #endif // TRIGGERS_H

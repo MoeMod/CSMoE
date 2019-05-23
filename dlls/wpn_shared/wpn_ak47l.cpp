@@ -18,7 +18,14 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+
 #include "weapons/WeaponTemplate.hpp"
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
 enum ak47_e
 {
@@ -76,3 +83,5 @@ public:
 	KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
 };
 LINK_ENTITY_TO_CLASS(weapon_ak47l, CAK47_Long)
+
+}

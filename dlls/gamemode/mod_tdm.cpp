@@ -10,6 +10,8 @@
 #include "mod_tdm.h"
 #include "player/player_mod_strategy.h"
 
+namespace sv {
+
 class CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
 {
 public:
@@ -227,4 +229,6 @@ void CMod_TeamDeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 	pPlayer->SpawnProtection_Start(3.0f);
+}
+
 }

@@ -15,6 +15,8 @@ GNU General Public License for more details.
 
 #include "events.h"
 
+namespace cl {
+
 enum mp7a1_e
 {
 	MP7A1_PISTOL_IDLE,
@@ -85,4 +87,6 @@ void EV_FireMP7A1C( event_args_t *args )
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_57MM,
 		2 );
+}
+
 }

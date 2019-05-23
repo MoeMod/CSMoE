@@ -53,6 +53,8 @@ struct DebugOutputLevel
 	DebugOutputType value;
 };
 
+namespace sv {
+
 bool IsDeveloper();
 NOXREF void UTIL_DPrintf(DebugOutputType outputType, char *pszMsg, ...);
 void UTIL_DPrintf(const char *pszMsg, ...);
@@ -67,5 +69,7 @@ void UTIL_CareerDPrintf(const char *pszMsg, ...);
 NOXREF void UTIL_TutorDPrintf(const char *pszMsg, ...);
 NOXREF void UTIL_StatsDPrintf(const char *pszMsg, ...);
 NOXREF void UTIL_HostageDPrintf(const char *pszMsg, ...);
+
+}
 
 #endif // DEBUG_H

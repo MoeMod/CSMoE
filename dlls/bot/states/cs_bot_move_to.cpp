@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Move to a potentially far away position.
 
 void MoveToState::OnEnter(CCSBot *me)
@@ -360,4 +362,6 @@ void MoveToState::OnExit(CCSBot *me)
 	me->Run();
 	me->SetDisposition(CCSBot::ENGAGE_AND_INVESTIGATE);
 	//me->StopAiming();
+}
+
 }

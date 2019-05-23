@@ -21,6 +21,8 @@ GNU General Public License for more details.
 
 #include "gamemode/mod_zbb.h"
 
+namespace sv {
+
 class PlayerBuildingDelegate : public BasePlayerExtra, public IPlayerBuildingDelegate
 {
 public:
@@ -71,5 +73,7 @@ public:
 public:
 	PlayerBuildingDelegate m_Build;
 };
+
+}
 
 #endif

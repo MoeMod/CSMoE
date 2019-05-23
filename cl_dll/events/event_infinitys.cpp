@@ -15,6 +15,8 @@ GNU General Public License for more details.
 
 #include "events.h"
 
+namespace cl {
+
 enum
 {
 	ANIM_IDLE1,
@@ -87,4 +89,6 @@ void EV_FireInfinityS(event_args_t *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_45ACP,
 		2 );
+}
+
 }

@@ -24,6 +24,12 @@ GNU General Public License for more details.
 
 #include "weapons/WeaponTemplate.hpp"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
@@ -300,7 +306,7 @@ void CKnifeSkullAxe::DelayedPrimaryAttack()
 		break;
 	}
 	}
-#endif 
+#endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
 	SetThink(nullptr);
 
@@ -340,10 +346,12 @@ void CKnifeSkullAxe::DelayedSecondaryAttack()
 		break;
 	}
 	}
-#endif 
+#endif
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
 	SetThink(nullptr);
 
 	//return fDidHit;
+}
+
 }

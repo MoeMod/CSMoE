@@ -7,6 +7,8 @@
 
 #include "mod_base.h"
 
+namespace sv {
+
 class CBaseEntity; // cbase.h
 class CBasePlayer; // player.h
 typedef struct entvars_s entvars_t; // progdefs.h
@@ -29,5 +31,7 @@ public: // CHalfLifeMultiplay
 public:
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 };
+
+}
 
 #endif

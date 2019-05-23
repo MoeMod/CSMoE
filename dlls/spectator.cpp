@@ -5,6 +5,8 @@
 #include "monsters.h"
 #include "spectator.h"
 
+namespace sv {
+
 void CBaseSpectator::SpectatorConnect()
 {
 	pev->flags = FL_SPECTATOR;
@@ -101,4 +103,6 @@ void CBaseSpectator::Spawn()
 	pev->movetype = MOVETYPE_NOCLIP;
 
 	m_pGoalEnt = NULL;
+}
+
 }

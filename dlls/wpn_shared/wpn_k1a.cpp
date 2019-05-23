@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_k1a.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum k1a_e
 {
 	K1A_IDLE1,
@@ -193,4 +199,6 @@ void CK1a::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(K1A_IDLE1, UseDecrement() != FALSE);
+}
+
 }

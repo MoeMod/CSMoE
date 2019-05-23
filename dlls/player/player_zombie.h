@@ -21,6 +21,8 @@ GNU General Public License for more details.
 
 #include "gamemode/zb1/zb1_const.h"
 
+namespace sv {
 void PlayerZombie_Precache();
+}
 
 #endif

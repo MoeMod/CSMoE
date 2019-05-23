@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_scout.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum scout_e
 {
 	SCOUT_IDLE,
@@ -206,4 +212,6 @@ float CSCOUT::GetMaxSpeed(void)
 		return 260;
 
 	return 220;
+}
+
 }

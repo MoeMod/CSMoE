@@ -35,6 +35,8 @@
 #include <map>
 #include <string>
 
+namespace sv {
+
 enum TutorMessageClass
 {
 	TUTORMESSAGECLASS_NORMAL = 0,
@@ -391,7 +393,7 @@ public:
 	CBaseEntity *GetEntityForMessageID(int messageID, CBaseEntity *last = NULL);
 	void ResetPlayerDeathInfo();
 	void ConstructRecentDeathsList(TeamName team, char *buf, int buflen, TutorMessageEvent *event);
-   
+
 private:
 	float m_nextViewableCheckTime;
 	TutorMessageMap m_messageMap;
@@ -423,6 +425,8 @@ inline TutorMessageID operator++(TutorMessageID &e, int)
 
 	const int i = static_cast<int>(e);
 	return e = static_cast<TutorMessageID>(i + 1);
+}
+
 }
 
 #endif // TUTOR_CS_TUTOR_H

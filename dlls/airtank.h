@@ -32,7 +32,9 @@
 #pragma once
 #endif
 
-class CAirtank: public CGrenade
+namespace sv {
+
+class CAirtank : public CGrenade
 {
 
 public:
@@ -53,5 +55,7 @@ public:
 private:
 	int m_state;
 };
+
+}
 
 #endif // AIRTANK_H

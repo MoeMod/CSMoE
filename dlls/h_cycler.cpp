@@ -11,6 +11,8 @@
 
 #include "arraysize.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -394,4 +396,6 @@ void CWreckage::Think()
 		WRITE_BYTE(RANDOM_LONG(0, 49) + 50);	// scale * 10
 		WRITE_BYTE(RANDOM_LONG(0, 3) + 8);		// framerate
 	MESSAGE_END();
+}
+
 }

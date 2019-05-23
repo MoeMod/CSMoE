@@ -9,6 +9,8 @@
 
 #include "mortar.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -207,4 +209,6 @@ void CMortar::MortarExplode()
 
 	Explode(&tr, (DMG_BLAST | DMG_MORTAR));
 	UTIL_ScreenShake(tr.vecEndPos, 25.0, 150.0, 1.0, 750);
+}
+
 }

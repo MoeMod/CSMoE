@@ -32,7 +32,9 @@
 #pragma once
 #endif
 
-class CRecharge: public CBaseToggle
+namespace sv {
+
+class CRecharge : public CBaseToggle
 {
 public:
 	virtual void Spawn();
@@ -56,5 +58,7 @@ public:
 	int m_iOn;
 	float m_flSoundTime;
 };
+
+}
 
 #endif // H_BATTERY_H

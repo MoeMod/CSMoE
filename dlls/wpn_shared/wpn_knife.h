@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //knife
 #define KNIFE_BODYHIT_VOLUME		128
 #define KNIFE_WALLHIT_VOLUME		512
@@ -49,5 +55,9 @@ public:
 	TraceResult m_trHit;
 	unsigned short m_usKnife;
 };
+
+void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *mins, float *maxs, edict_t *pEntity);
+
+}
 
 #endif

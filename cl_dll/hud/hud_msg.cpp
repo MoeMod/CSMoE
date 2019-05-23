@@ -34,6 +34,8 @@
 
 #include "gamemode/mods_const.h"
 
+using namespace cl;
+
 extern float g_flRoundTime;
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS

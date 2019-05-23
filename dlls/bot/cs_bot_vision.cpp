@@ -58,6 +58,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Used to update view angles to stay on a ladder
 
 float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder)
@@ -1073,4 +1075,6 @@ void CCSBot::Blind(float duration, float holdTime, float fadeTime, int alpha)
 
 	// no longer safe
 	AdjustSafeTime();
+}
+
 }

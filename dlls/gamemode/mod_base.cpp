@@ -12,6 +12,8 @@
 #include "player/csdm_randomspawn.h"
 #include "player/player_mod_strategy.h"
 
+namespace sv {
+
 void IBaseMod::InstallPlayerModStrategy(CBasePlayer *player)
 {
 	std::unique_ptr<CPlayerModStrategy_Default> up(new CPlayerModStrategy_Default(player));
@@ -103,4 +105,6 @@ edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(IBaseMod *mod, CBasePlaye
 	}
 
 	return pentSpawnSpot;
+}
+
 }

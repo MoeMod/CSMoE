@@ -152,22 +152,8 @@
 #define SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
-#include "player/player_const.h"
-#include "player/player_account.h"
-#include "player/player_signal.h"
-#include <memory>
-
-class IBasePlayerModStrategy;
-enum ZombieLevel : int;
-
-struct WeaponStruct
-{
-	int m_type;
-	int m_price;
-	int m_side;
-	int m_slot;
-	int m_ammoPrice;
-};
+#ifndef CLIENT_DLL
+namespace sv {
 
 class CStripWeapons : public CPointEntity
 {
@@ -215,6 +201,35 @@ public:
 	void Spray();
 };
 
+}
+#endif
+
+#include "player/player_const.h"
+#include "player/player_account.h"
+#include "player/player_signal.h"
+#include <memory>
+
+enum ZombieLevel : int;
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+class IBasePlayerModStrategy;
+
+struct WeaponStruct
+{
+	int m_type;
+	int m_price;
+	int m_side;
+	int m_slot;
+	int m_ammoPrice;
+};
+
+class CWeaponBox;
+
 class CBasePlayer : public CBaseMonster
 {
 public:
@@ -232,8 +247,8 @@ public:
 	void Spawn() override;
 
 #ifdef CLIENT_DLL
-	void Precache(void) override { }
-	void Restart(void) override { }
+	void Precache(void) override {}
+	void Restart(void) override {}
 	int Save(CSave &save) override { return 1; }
 	int Restore(CRestore &restore) override { return 1; }
 #else
@@ -244,8 +259,10 @@ public:
 	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 #ifdef CLIENT_DLL
 	int Classify() override { return 0; }
-	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override { }
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return 0; }
+	void
+	TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override {}
+	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,
+	               int bitsDamageType) override { return 0; }
 	int TakeHealth(float flHealth, int bitsDamageType) override { return 0; }
 #else
 	int Classify() override;
@@ -315,7 +332,7 @@ public:
 	virtual Vector GetAutoaimVector(float flDelta);
 	virtual void Blind(float flUntilTime, float flHoldTime, float flFadeTime, int iAlpha);
 #endif
-	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) { }
+	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) {}
 
 public:
 	void SpawnClientSideCorpse();
@@ -436,7 +453,7 @@ public:
 	void DropShield(bool bDeploy = true);
 	void GiveShield(bool bDeploy = true);
 	bool IsHittingShield(Vector &vecDirection, TraceResult *ptr);
-	bool SelectSpawnSpot(const char *pEntClassName, CBaseEntity* &pSpot);
+	bool SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot);
 	bool IsReloading()
 	{
 		CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_pActiveItem);
@@ -486,7 +503,10 @@ public:
 		//m_intenseTimestamp = gpGlobals->time;
 	}
 public:
-	enum { MaxLocationLen = 32 };
+	enum
+	{
+		MaxLocationLen = 32
+	};
 
 	int random_seed;
 	unsigned short m_usPlayerBleed;
@@ -707,6 +727,13 @@ public:
 #endif
 };
 
+}
+
+#include "player/player_msg.h"
+
+#ifndef CLIENT_DLL
+namespace sv {
+
 extern int gEvilImpulse101;
 extern char g_szMapBriefingText[512];
 extern entvars_t *g_pevLastInflictor;
@@ -715,8 +742,6 @@ extern CBaseEntity *g_pLastCTSpawn;
 extern CBaseEntity *g_pLastTerroristSpawn;
 extern BOOL gInitHUD;
 extern cvar_t *sv_aim;
-
-#include "player/player_msg.h"
 
 void OLD_CheckBuyZone(CBasePlayer *player);
 void OLD_CheckBombTarget(CBasePlayer *player);
@@ -761,5 +786,8 @@ bool IsSecondaryWeaponClass(int classId);
 bool IsSecondaryWeaponId(int id);
 const char *GetWeaponAliasFromName(const char *weaponName);
 bool CurrentWeaponSatisfies(CBasePlayerWeapon *pWeapon, int id, int classId);
+
+}
+#endif
 
 #endif // PLAYER_H

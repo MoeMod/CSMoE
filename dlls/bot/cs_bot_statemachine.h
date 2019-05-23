@@ -4,6 +4,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CCSBot;
 
 class BotState
@@ -249,5 +251,7 @@ public:
 private:
 	EHANDLE m_entity;
 };
+
+}
 
 #endif

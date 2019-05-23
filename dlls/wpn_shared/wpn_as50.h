@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //as50
 #define AS50_MAX_SPEED		205
 #define AS50_MAX_SPEED_ZOOM	160
@@ -49,5 +55,7 @@ public:
 private:
 	unsigned short m_usFireAS50;
 };
+
+}
 
 #endif

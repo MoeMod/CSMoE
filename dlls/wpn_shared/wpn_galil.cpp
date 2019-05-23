@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_galil.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum galil_e
 {
 	GALIL_IDLE1,
@@ -188,4 +194,6 @@ void CGalil::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(GALIL_IDLE1, UseDecrement() != FALSE);
+}
+
 }

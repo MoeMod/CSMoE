@@ -11,6 +11,8 @@
 #include <string>
 #include <mutex>
 
+namespace sv {
+
 enum MonsterAnim
 {
 	MONSTERANIM_IDLE,
@@ -123,5 +125,7 @@ public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
 
 };
+
+}
 
 #endif

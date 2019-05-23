@@ -56,6 +56,7 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
 
 /*
 * Globals initialization
@@ -601,4 +602,6 @@ void CFuncWeaponCheck::KeyValue(KeyValueData *pkvd)
 	}
 	else
 		CBaseEntity::KeyValue(pkvd);
+}
+
 }

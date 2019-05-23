@@ -38,8 +38,6 @@
 #include "weapons_msg.h"
 #include "player/player_knockback.h"
 
-class CBasePlayer;
-
 #define MAX_WEAPONS			32
 #define MAX_NORMAL_BATTERY		100.0f
 
@@ -120,6 +118,9 @@ struct AmmoInfo
 	int iId;
 };
 
+#ifndef CLIENT_DLL
+namespace sv {
+
 struct MULTIDAMAGE
 {
 	CBaseEntity *pEntity;
@@ -144,6 +145,17 @@ public:
 	int m_iInitialCount;
 	bool m_bAlreadyCounted;
 };
+
+}
+#endif
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+class CBasePlayer;
 
 class CGrenade: public CBaseMonster
 {
@@ -235,14 +247,14 @@ public:
 	BOOL m_fRegisteredSound;
 };
 
-class CBasePlayerItem: public CBaseAnimating
+class CBasePlayerItem : public CBaseAnimating
 {
 public:
-	
+
 #ifdef CLIENT_DLL
 	int Save(CSave &save) override { return 1; }
 	int Restore(CRestore &restore) override { return 1; }
-	void SetObjectCollisionBox(void) override { }
+	void SetObjectCollisionBox(void) override {}
 	CBaseEntity *Respawn() override { return this; }
 	virtual int AddToPlayer(CBasePlayer *pPlayer) { return false; }
 #else
@@ -252,7 +264,7 @@ public:
 	CBaseEntity *Respawn() override;
 	virtual int AddToPlayer(CBasePlayer *pPlayer);
 #endif
-	
+
 	virtual int AddDuplicate(CBasePlayerItem *pItem) { return FALSE; }
 	virtual int GetItemInfo(ItemInfo *p) { return 0; }
 	virtual BOOL CanDeploy() { return TRUE; }
@@ -291,7 +303,7 @@ public:
 	void EXPORT FallThink() {}
 	void EXPORT Materialize() {}
 	void EXPORT AttemptToMaterialize() {}
-	void FallInit(void) { }
+	void FallInit(void) {}
 	void CheckRespawn(void) {}
 #else
 	void EXPORT DestroyItem();
@@ -305,7 +317,7 @@ public:
 
 public:
 	/* CSBTE Added, in weapons_data.cpp */
-	virtual KnockbackData GetKnockBackData() { return { 0.0f, 0.0f, 0.0f ,0.0f ,0.5f }; }
+	virtual KnockbackData GetKnockBackData() { return {0.0f, 0.0f, 0.0f, 0.0f, 0.5f}; }
 #ifdef CLIENT_DLL
 	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
@@ -316,18 +328,23 @@ public:
 	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig();
 #endif
 
-	
+
 public:
-	inline ItemInfo ItemInfoInstance() const { ItemInfo II; const_cast<CBasePlayerItem *>(this)->GetItemInfo(&II); return II; }
-	inline int iItemPosition() const	{ return ItemInfoInstance().iPosition; }
-	inline const char *pszAmmo1() const	{ return ItemInfoInstance().pszAmmo1; }
-	inline int iMaxAmmo1() const		{ return ItemInfoInstance().iMaxAmmo1; }
-	inline const char *pszAmmo2() const	{ return ItemInfoInstance().pszAmmo2; }
-	inline int iMaxAmmo2() const		{ return ItemInfoInstance().iMaxAmmo2; }
-	inline const char *pszName() const	{ return ItemInfoInstance().pszName; }
-	inline int iMaxClip() const		{ return ItemInfoInstance().iMaxClip; }
-	inline int iWeight() const		{ return ItemInfoInstance().iWeight; }
-	inline int iFlags() const		{ return ItemInfoInstance().iFlags; }
+	inline ItemInfo ItemInfoInstance() const
+	{
+		ItemInfo II;
+		const_cast<CBasePlayerItem *>(this)->GetItemInfo(&II);
+		return II;
+	}
+	inline int iItemPosition() const { return ItemInfoInstance().iPosition; }
+	inline const char *pszAmmo1() const { return ItemInfoInstance().pszAmmo1; }
+	inline int iMaxAmmo1() const { return ItemInfoInstance().iMaxAmmo1; }
+	inline const char *pszAmmo2() const { return ItemInfoInstance().pszAmmo2; }
+	inline int iMaxAmmo2() const { return ItemInfoInstance().iMaxAmmo2; }
+	inline const char *pszName() const { return ItemInfoInstance().pszName; }
+	inline int iMaxClip() const { return ItemInfoInstance().iMaxClip; }
+	inline int iWeight() const { return ItemInfoInstance().iWeight; }
+	inline int iFlags() const { return ItemInfoInstance().iFlags; }
 
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
@@ -339,7 +356,7 @@ public:
 	WeaponIdType m_iId;
 };
 
-class CBasePlayerWeapon: public CBasePlayerItem
+class CBasePlayerWeapon : public CBasePlayerItem
 {
 public:
 #ifdef CLIENT_DLL
@@ -371,7 +388,7 @@ public:
 	int SecondaryAmmoIndex() override;
 	int UpdateClientData(CBasePlayer *pPlayer) override;
 #endif
-	CBasePlayerItem *GetWeaponPtr() override { return (CBasePlayerItem *)this; }
+	CBasePlayerItem *GetWeaponPtr() override { return (CBasePlayerItem *) this; }
 
 #ifdef CLIENT_DLL
 	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon) { return 0; }
@@ -380,7 +397,7 @@ public:
 	virtual int ExtractAmmo(CBasePlayerWeapon *pWeapon);
 	virtual int ExtractClipAmmo(CBasePlayerWeapon *pWeapon);
 #endif
-	
+
 	virtual int AddWeapon()
 	{
 		ExtractAmmo(this);
@@ -405,10 +422,12 @@ public:
 public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
 	BOOL AddSecondaryAmmo(int iCount, char *szName, int iMaxCarry);
-	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal = 0);
+	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt,
+	                   int skiplocal = 0);
 	int DefaultReload(int iClipSize, int iAnim, float fDelay, int body = 0);
 	void FireRemaining(int &shotsFired, float &shootTime, BOOL isGlock18);
-	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change);
+	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
+	              float lateral_max, int direction_change);
 	void EjectBrassLate();
 	NOXREF void MakeBeam();
 	NOXREF void BeamUpdate();
@@ -416,7 +435,11 @@ public:
 	float GetNextAttackDelay(float delay);
 	float GetNextAttackDelay2(float delay);
 	virtual bool HasSecondaryAttack(); // virtualized...
-	virtual BOOL IsPistol() { return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE || m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN); }
+	virtual BOOL IsPistol()
+	{
+		return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE ||
+		        m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN);
+	}
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
 	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
@@ -447,8 +470,8 @@ public:
 	int m_iShotsFired;
 	Vector m_vVecAiming;
 	string_t model_name;
-	float m_flGlock18Shoot;				// time to shoot the remaining bullets of the glock18 burst fire
-	int m_iGlock18ShotsFired;			// used to keep track of the shots fired during the Glock18 burst fire mode.
+	float m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
+	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
 	float m_flFamasShoot;
 	int m_iFamasShotsFired;
 	float m_fBurstSpread;
@@ -460,6 +483,11 @@ public:
 	float m_flPrevPrimaryAttack;
 	float m_flLastFireTime;
 };
+
+}
+
+#ifndef CLIENT_DLL
+namespace sv {
 
 class CBasePlayerAmmo: public CBaseEntity
 {
@@ -549,26 +577,9 @@ extern short g_sModelIndexC4Glow;
 extern short g_sModelIndexRadio;
 extern MULTIDAMAGE gMultiDamage;
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *mins, float *maxs, edict_t *pEntity);
 void AnnounceFlashInterval(float interval, float offset = 0);
 
 int MaxAmmoCarry(int iszName);
-
-
-#ifndef CLIENT_DLL
-extern void ClearMultiDamage(void);
-extern void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker);
-extern void AddMultiDamage(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType);
-extern void DecalGunshot(TraceResult *pTrace, int iBulletType, bool ClientOnly, entvars_t *pShooter, bool bHitMetal);
-extern void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage);
-extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
-extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
-extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
-#else
-inline void ClearMultiDamage(void) { }
-inline void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker) { }
-inline void DecalGunshot(TraceResult *pTrace, int iBulletType, bool ClientOnly, entvars_t *pShooter, bool bHitMetal) { }
-#endif
 
 
 void EjectBrass(const Vector &vecOrigin, const Vector &vecLeft, const Vector &vecVelocity, float rotation, int model, int soundtype, int entityIndex);
@@ -578,5 +589,23 @@ void UTIL_PrecacheOtherWeapon(const char *szClassname);
 NOXREF void UTIL_PrecacheOtherWeapon2(const char *szClassname);
 void W_Precache();
 BOOL CanAttack(float attack_time, float curtime, BOOL isPredicted);
+
+
+extern void ClearMultiDamage(void);
+extern void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker);
+extern void AddMultiDamage(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType);
+extern void DecalGunshot(TraceResult *pTrace, int iBulletType, bool ClientOnly, entvars_t *pShooter, bool bHitMetal);
+extern void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage);
+extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
+extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
+extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+}
+#else
+namespace cl {
+inline void ClearMultiDamage(void) {}
+inline void ApplyMultiDamage(entvars_t *pevInflictor, entvars_t *pevAttacker) {}
+inline void DecalGunshot(TraceResult *pTrace, int iBulletType, bool ClientOnly, entvars_t *pShooter, bool bHitMetal) {}
+}
+#endif
 
 #endif // WEAPONS_H

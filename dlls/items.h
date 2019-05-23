@@ -32,36 +32,40 @@
 #pragma once
 #endif
 
-// constant items
-#define ITEM_HEALTHKIT		1
-#define ITEM_ANTIDOTE		2
-#define ITEM_SECURITY		3
-#define ITEM_BATTERY		4
-#define ITEM_SUIT		5
+namespace sv {
 
-class CItem: public CBaseEntity
+enum
+{
+	ITEM_HEALTHKIT = 1,
+	ITEM_ANTIDOTE = 2,
+	ITEM_SECURITY = 3,
+	ITEM_BATTERY = 4,
+	ITEM_SUIT = 5,
+};
+
+class CItem : public CBaseEntity
 {
 public:
 	virtual void Spawn();
 	virtual CBaseEntity *Respawn();
-	virtual BOOL MyTouch(CBasePlayer *pPlayer) { return FALSE;}
-   
+	virtual BOOL MyTouch(CBasePlayer *pPlayer) { return FALSE; }
+
 public:
 	void EXPORT ItemTouch(CBaseEntity *pOther);
 	void EXPORT Materialize();
 };
 
-class CWorldItem: public CBaseEntity
+class CWorldItem : public CBaseEntity
 {
 public:
 	virtual void Spawn();
 	virtual void KeyValue(KeyValueData *pkvd);
-   
+
 public:
 	int m_iType;
 };
 
-class CItemSuit: public CItem
+class CItemSuit : public CItem
 {
 public:
 	virtual void Spawn();
@@ -69,7 +73,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemBattery: public CItem
+class CItemBattery : public CItem
 {
 public:
 	virtual void Spawn();
@@ -77,7 +81,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemAntidote: public CItem
+class CItemAntidote : public CItem
 {
 public:
 	virtual void Spawn();
@@ -85,7 +89,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemSecurity: public CItem
+class CItemSecurity : public CItem
 {
 public:
 	virtual void Spawn();
@@ -93,7 +97,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemLongJump: public CItem
+class CItemLongJump : public CItem
 {
 public:
 	virtual void Spawn();
@@ -101,7 +105,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemKevlar: public CItem
+class CItemKevlar : public CItem
 {
 public:
 	virtual void Spawn();
@@ -109,7 +113,7 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemAssaultSuit: public CItem
+class CItemAssaultSuit : public CItem
 {
 public:
 	virtual void Spawn();
@@ -117,12 +121,14 @@ public:
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
 
-class CItemThighPack: public CItem
+class CItemThighPack : public CItem
 {
 public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual BOOL MyTouch(CBasePlayer *pPlayer);
 };
+
+}
 
 #endif // ITEMS_H

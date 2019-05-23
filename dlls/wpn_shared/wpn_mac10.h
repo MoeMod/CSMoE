@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //mac10
 #define MAC10_MAX_SPEED			250
 #define MAC10_DAMAGE			29
@@ -40,5 +46,7 @@ public:
 private:
 	unsigned short m_usFireMAC10;
 };
+
+}
 
 #endif

@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //tmp
 #define USP_MAX_SPEED		250
 #define USP_DAMAGE		34
@@ -44,5 +50,7 @@ public:
 private:
 	unsigned short m_usFireUSP;
 };
+
+}
 
 #endif

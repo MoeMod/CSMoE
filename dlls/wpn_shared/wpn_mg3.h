@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //mg3
 #define MG3_MAX_SPEED			235
 #define MG3_DAMAGE			35
@@ -13,24 +19,23 @@
 class CMG3 : public CBasePlayerWeapon
 {
 public:
-	virtual void Spawn();
-	virtual void Precache();
-	virtual int GetItemInfo(ItemInfo *p);
-	virtual BOOL Deploy();
-	virtual float GetMaxSpeed() { return MG3_MAX_SPEED; }
-	virtual int iItemSlot() { return PRIMARY_WEAPON_SLOT; }
-	virtual void PrimaryAttack();
-	virtual void Reload();
-	virtual void WeaponIdle();
-	virtual BOOL UseDecrement()
-	{
+	void Spawn() override;
+	void Precache() override;
+	int GetItemInfo(ItemInfo *p) override;
+	BOOL Deploy() override;
+	float GetMaxSpeed() override { return MG3_MAX_SPEED; }
+	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	void PrimaryAttack() override;
+	void Reload() override;
+	void WeaponIdle() override;
+	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
 #else
 		return FALSE;
 #endif
 	}
-	virtual KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
+	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 		const char *GetCSModelName() override { return "models/w_mg3.mdl"; }
 
 public:
@@ -42,5 +47,7 @@ public:
 private:
 	unsigned short m_usFireMG3;
 };
+
+}
 
 #endif

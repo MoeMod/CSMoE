@@ -51,6 +51,8 @@
 #include "gamerules.h"
 #include "career_tasks.h"
 #include "maprules.h"
+
+namespace sv {
 /*
 * Globals initialization
 */
@@ -89,7 +91,7 @@ void Tutor_RegisterCVars()
 {
 	if (!g_bIsCzeroGame)
 		return;
-   
+
 	CVAR_REGISTER(&cv_tutor_message_repeats);
 	CVAR_REGISTER(&cv_tutor_debug_level);
 	CVAR_REGISTER(&cv_tutor_view_distance);
@@ -171,4 +173,6 @@ void MonitorTutorStatus()
 	}
 
 	s_nextCvarCheckTime = gpGlobals->time + 1.0f;
+}
+
 }

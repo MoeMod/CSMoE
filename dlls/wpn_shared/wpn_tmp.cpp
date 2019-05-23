@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_tmp.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum tmp_e
 {
 	TMP_IDLE1,
@@ -177,4 +183,6 @@ void CTMP::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(TMP_IDLE1, UseDecrement() != FALSE);
+}
+
 }

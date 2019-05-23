@@ -6,29 +6,31 @@
 #include "bmodels.h"
 #include "subs.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
 TYPEDESCRIPTION CFuncRotating::m_SaveData[] =
-{
-	DEFINE_FIELD(CFuncRotating, m_flFanFriction, FIELD_FLOAT),
-	DEFINE_FIELD(CFuncRotating, m_flAttenuation, FIELD_FLOAT),
-	DEFINE_FIELD(CFuncRotating, m_flVolume, FIELD_FLOAT),
-	DEFINE_FIELD(CFuncRotating, m_pitch, FIELD_FLOAT),
-	DEFINE_FIELD(CFuncRotating, m_sounds, FIELD_INTEGER)
-};
+		{
+				DEFINE_FIELD(CFuncRotating, m_flFanFriction, FIELD_FLOAT),
+				DEFINE_FIELD(CFuncRotating, m_flAttenuation, FIELD_FLOAT),
+				DEFINE_FIELD(CFuncRotating, m_flVolume, FIELD_FLOAT),
+				DEFINE_FIELD(CFuncRotating, m_pitch, FIELD_FLOAT),
+				DEFINE_FIELD(CFuncRotating, m_sounds, FIELD_INTEGER)
+		};
 
 TYPEDESCRIPTION CPendulum::m_SaveData[] =
-{
-	DEFINE_FIELD(CPendulum, m_accel, FIELD_FLOAT),
-	DEFINE_FIELD(CPendulum, m_distance, FIELD_FLOAT),
-	DEFINE_FIELD(CPendulum, m_time, FIELD_TIME),
-	DEFINE_FIELD(CPendulum, m_damp, FIELD_FLOAT),
-	DEFINE_FIELD(CPendulum, m_maxSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(CPendulum, m_dampSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(CPendulum, m_center, FIELD_VECTOR),
-	DEFINE_FIELD(CPendulum, m_start, FIELD_VECTOR),
-};
+		{
+				DEFINE_FIELD(CPendulum, m_accel, FIELD_FLOAT),
+				DEFINE_FIELD(CPendulum, m_distance, FIELD_FLOAT),
+				DEFINE_FIELD(CPendulum, m_time, FIELD_TIME),
+				DEFINE_FIELD(CPendulum, m_damp, FIELD_FLOAT),
+				DEFINE_FIELD(CPendulum, m_maxSpeed, FIELD_FLOAT),
+				DEFINE_FIELD(CPendulum, m_dampSpeed, FIELD_FLOAT),
+				DEFINE_FIELD(CPendulum, m_center, FIELD_VECTOR),
+				DEFINE_FIELD(CPendulum, m_start, FIELD_VECTOR),
+		};
 
 // BModelOrigin - calculates origin of a bmodel from absmin/size because all bmodel origins are 0 0 0
 
@@ -55,8 +57,7 @@ void CFuncWall::Spawn()
 
 void CFuncWall::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
-	if (ShouldToggle(useType, (int)(pev->frame)))
-	{
+	if (ShouldToggle(useType, (int) (pev->frame))) {
 		pev->frame = 1.0 - pev->frame;
 	}
 }
@@ -67,8 +68,7 @@ void CFuncWallToggle::Spawn()
 {
 	CFuncWall::Spawn();
 
-	if (pev->spawnflags & SF_WALL_START_OFF)
-	{
+	if (pev->spawnflags & SF_WALL_START_OFF) {
 		TurnOff();
 	}
 }
@@ -89,8 +89,7 @@ void CFuncWallToggle::TurnOn()
 
 BOOL CFuncWallToggle::IsOn()
 {
-	if (pev->solid == SOLID_NOT)
-	{
+	if (pev->solid == SOLID_NOT) {
 		return FALSE;
 	}
 
@@ -101,8 +100,7 @@ void CFuncWallToggle::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 {
 	int status = IsOn();
 
-	if (ShouldToggle(useType, status))
-	{
+	if (ShouldToggle(useType, status)) {
 		if (status)
 			TurnOff();
 		else
@@ -117,14 +115,12 @@ void CFuncConveyor::Spawn()
 	SetMovedir(pev);
 	CFuncWall::Spawn();
 
-	if (!(pev->spawnflags & SF_CONVEYOR_VISUAL))
-	{
+	if (!(pev->spawnflags & SF_CONVEYOR_VISUAL)) {
 		pev->flags |= FL_CONVEYOR;
 	}
 
 	// HACKHACK - This is to allow for some special effects
-	if (pev->spawnflags & SF_CONVEYOR_NOTSOLID)
-	{
+	if (pev->spawnflags & SF_CONVEYOR_NOTSOLID) {
 		// Don't want the engine thinking we've got special contents on this brush
 		pev->solid = SOLID_NOT;
 		pev->skin = 0;
@@ -141,7 +137,7 @@ void CFuncConveyor::Spawn()
 void CFuncConveyor::UpdateSpeed(float speed)
 {
 	// Encode it as an integer with 4 fractional bits
-	int speedCode = (int)(fabs((float)speed) * 16.0);
+	int speedCode = (int) (fabs((float) speed) * 16.0);
 
 	if (speed < 0)
 		pev->rendercolor.x = 1;
@@ -163,12 +159,10 @@ LINK_ENTITY_TO_CLASS(func_illusionary, CFuncIllusionary);
 void CFuncIllusionary::KeyValue(KeyValueData *pkvd)
 {
 	//skin is used for content type
-	if (FStrEq(pkvd->szKeyName, "skin"))
-	{
-		pev->skin = (int)Q_atof(pkvd->szValue);
+	if (FStrEq(pkvd->szKeyName, "skin")) {
+		pev->skin = (int) Q_atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
-	}
-	else
+	} else
 		CBaseToggle::KeyValue(pkvd);
 }
 
@@ -194,8 +188,7 @@ void CFuncMonsterClip::Spawn()
 {
 	CFuncWall::Spawn();
 
-	if (CVAR_GET_FLOAT("showtriggers") == 0)
-	{
+	if (CVAR_GET_FLOAT("showtriggers") == 0) {
 		pev->effects = EF_NODRAW;
 	}
 
@@ -208,13 +201,10 @@ IMPLEMENT_SAVERESTORE(CFuncRotating, CBaseEntity);
 
 void CFuncRotating::KeyValue(KeyValueData *pkvd)
 {
-	if (FStrEq(pkvd->szKeyName, "fanfriction"))
-	{
+	if (FStrEq(pkvd->szKeyName, "fanfriction")) {
 		m_flFanFriction = Q_atof(pkvd->szValue) / 100;
 		pkvd->fHandled = TRUE;
-	}
-	else if (FStrEq(pkvd->szKeyName, "Volume"))
-	{
+	} else if (FStrEq(pkvd->szKeyName, "Volume")) {
 		m_flVolume = Q_atof(pkvd->szValue) / 10.0;
 
 		if (m_flVolume > 1.0)
@@ -224,23 +214,17 @@ void CFuncRotating::KeyValue(KeyValueData *pkvd)
 			m_flVolume = 0.0;
 
 		pkvd->fHandled = TRUE;
-	}
-	else if (FStrEq(pkvd->szKeyName, "spawnorigin"))
-	{
+	} else if (FStrEq(pkvd->szKeyName, "spawnorigin")) {
 		Vector tmp;
-		UTIL_StringToVector((float *)tmp, pkvd->szValue);
+		UTIL_StringToVector((float *) tmp, pkvd->szValue);
 
-		if (tmp != g_vecZero)
-		{
+		if (tmp != g_vecZero) {
 			pev->origin = tmp;
 		}
-	}
-	else if (FStrEq(pkvd->szKeyName, "sounds"))
-	{
+	} else if (FStrEq(pkvd->szKeyName, "sounds")) {
 		m_sounds = Q_atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
-	}
-	else
+	} else
 		CBaseEntity::KeyValue(pkvd);
 }
 
@@ -269,54 +253,39 @@ void CFuncRotating::Spawn()
 	// if the designer didn't set a sound attenuation, default to one.
 	m_flAttenuation = ATTN_NORM;
 
-	if (pev->spawnflags & SF_BRUSH_ROTATE_SMALLRADIUS)
-	{
+	if (pev->spawnflags & SF_BRUSH_ROTATE_SMALLRADIUS) {
 		m_flAttenuation = ATTN_IDLE;
-	}
-	else if (pev->spawnflags & SF_BRUSH_ROTATE_MEDIUMRADIUS)
-	{
+	} else if (pev->spawnflags & SF_BRUSH_ROTATE_MEDIUMRADIUS) {
 		m_flAttenuation = ATTN_STATIC;
-	}
-	else if (pev->spawnflags & SF_BRUSH_ROTATE_LARGERADIUS)
-	{
+	} else if (pev->spawnflags & SF_BRUSH_ROTATE_LARGERADIUS) {
 		m_flAttenuation = ATTN_NORM;
 	}
 
 	// prevent divide by zero if level designer forgets friction!
-	if (m_flFanFriction == 0)
-	{
+	if (m_flFanFriction == 0) {
 		m_flFanFriction = 1;
 	}
 
-	if (pev->spawnflags & SF_BRUSH_ROTATE_Z_AXIS)
-	{
+	if (pev->spawnflags & SF_BRUSH_ROTATE_Z_AXIS) {
 		pev->movedir = Vector(0, 0, 1);
-	}
-	else if (pev->spawnflags & SF_BRUSH_ROTATE_X_AXIS)
-	{
+	} else if (pev->spawnflags & SF_BRUSH_ROTATE_X_AXIS) {
 		pev->movedir = Vector(1, 0, 0);
-	}
-	else
-	{
+	} else {
 		// y-axis
 		pev->movedir = Vector(0, 1, 0);
 	}
 
 	// check for reverse rotation
-	if (pev->spawnflags & SF_BRUSH_ROTATE_BACKWARDS)
-	{
+	if (pev->spawnflags & SF_BRUSH_ROTATE_BACKWARDS) {
 		pev->movedir = pev->movedir * -1;
 	}
 
 	// some rotating objects like fake volumetric lights will not be solid.
-	if (pev->spawnflags & SF_ROTATING_NOT_SOLID)
-	{
+	if (pev->spawnflags & SF_ROTATING_NOT_SOLID) {
 		pev->solid = SOLID_NOT;
 		pev->skin = CONTENTS_EMPTY;
 		pev->movetype = MOVETYPE_PUSH;
-	}
-	else
-	{
+	} else {
 		pev->solid = SOLID_BSP;
 		pev->movetype = MOVETYPE_PUSH;
 	}
@@ -327,8 +296,7 @@ void CFuncRotating::Spawn()
 	SetUse(&CFuncRotating::RotatingUse);
 
 	// did level designer forget to assign speed?
-	if (pev->speed <= 0)
-	{
+	if (pev->speed <= 0) {
 		pev->speed = 0;
 	}
 
@@ -337,8 +305,7 @@ void CFuncRotating::Spawn()
 	//		pev->dmg = 2;
 
 	// instant-use brush?
-	if (pev->spawnflags & SF_BRUSH_ROTATE_INSTANT)
-	{
+	if (pev->spawnflags & SF_BRUSH_ROTATE_INSTANT) {
 		SetThink(&CFuncRotating::SUB_CallUseToggle);
 
 		// leave a magic delay for client to start up
@@ -346,8 +313,7 @@ void CFuncRotating::Spawn()
 	}
 
 	// can this brush inflict pain?
-	if (pev->spawnflags & SF_BRUSH_HURT)
-	{
+	if (pev->spawnflags & SF_BRUSH_HURT) {
 		SetTouch(&CFuncRotating::HurtTouch);
 	}
 
@@ -356,59 +322,51 @@ void CFuncRotating::Spawn()
 
 void CFuncRotating::Precache()
 {
-	char *szSoundFile = (char *)STRING(pev->message);
+	char *szSoundFile = (char *) STRING(pev->message);
 
 	// set up fan sounds
-	if (!FStringNull(pev->message) && Q_strlen(szSoundFile) > 0)
-	{
+	if (!FStringNull(pev->message) && Q_strlen(szSoundFile) > 0) {
 		// if a path is set for a wave, use it
 		PRECACHE_SOUND(szSoundFile);
 		pev->noiseRunning = ALLOC_STRING(szSoundFile);
-	}
-	else
-	{
+	} else {
 		// otherwise use preset sound
-		switch (m_sounds)
-		{
-		case 1:
-			PRECACHE_SOUND("fans/fan1.wav");
-			pev->noiseRunning = ALLOC_STRING("fans/fan1.wav");
-			break;
-		case 2:
-			PRECACHE_SOUND("fans/fan2.wav");
-			pev->noiseRunning = ALLOC_STRING("fans/fan2.wav");
-			break;
-		case 3:
-			PRECACHE_SOUND("fans/fan3.wav");
-			pev->noiseRunning = ALLOC_STRING("fans/fan3.wav");
-			break;
-		case 4:
-			PRECACHE_SOUND("fans/fan4.wav");
-			pev->noiseRunning = ALLOC_STRING("fans/fan4.wav");
-			break;
-		case 5:
-			PRECACHE_SOUND("fans/fan5.wav");
-			pev->noiseRunning = ALLOC_STRING("fans/fan5.wav");
-			break;
+		switch (m_sounds) {
+			case 1:
+				PRECACHE_SOUND("fans/fan1.wav");
+				pev->noiseRunning = ALLOC_STRING("fans/fan1.wav");
+				break;
+			case 2:
+				PRECACHE_SOUND("fans/fan2.wav");
+				pev->noiseRunning = ALLOC_STRING("fans/fan2.wav");
+				break;
+			case 3:
+				PRECACHE_SOUND("fans/fan3.wav");
+				pev->noiseRunning = ALLOC_STRING("fans/fan3.wav");
+				break;
+			case 4:
+				PRECACHE_SOUND("fans/fan4.wav");
+				pev->noiseRunning = ALLOC_STRING("fans/fan4.wav");
+				break;
+			case 5:
+				PRECACHE_SOUND("fans/fan5.wav");
+				pev->noiseRunning = ALLOC_STRING("fans/fan5.wav");
+				break;
 
-		case 0:
-		default:
-			if (!FStringNull(pev->message) && Q_strlen(szSoundFile) > 0)
-			{
-				PRECACHE_SOUND(szSoundFile);
-				pev->noiseRunning = ALLOC_STRING(szSoundFile);
-				break;
-			}
-			else
-			{
-				pev->noiseRunning = ALLOC_STRING("common/null.wav");
-				break;
-			}
+			case 0:
+			default:
+				if (!FStringNull(pev->message) && Q_strlen(szSoundFile) > 0) {
+					PRECACHE_SOUND(szSoundFile);
+					pev->noiseRunning = ALLOC_STRING(szSoundFile);
+					break;
+				} else {
+					pev->noiseRunning = ALLOC_STRING("common/null.wav");
+					break;
+				}
 		}
 	}
 
-	if (pev->avelocity != g_vecZero)
-	{
+	if (pev->avelocity != g_vecZero) {
 		// if fan was spinning, and we went through transition or save/restore,
 		// make sure we restart the sound.  1.5 sec delay is magic number. KDB
 		SetThink(&CFuncRotating::SpinUp);
@@ -423,8 +381,7 @@ void CFuncRotating::HurtTouch(CBaseEntity *pOther)
 	entvars_t *pevOther = pOther->pev;
 
 	// we can't hurt this thing, so we're not concerned with it
-	if (pevOther->takedamage == DAMAGE_NO)
-	{
+	if (pevOther->takedamage == DAMAGE_NO) {
 		return;
 	}
 
@@ -448,12 +405,12 @@ void CFuncRotating::RampPitchVol(int fUp)
 	int pitch;
 
 	// get current angular velocity
-	vecCur = abs((int)(vecAVel.x != 0 ? vecAVel.x : (vecAVel.y != 0 ? vecAVel.y : vecAVel.z)));
+	vecCur = abs((int) (vecAVel.x != 0 ? vecAVel.x : (vecAVel.y != 0 ? vecAVel.y : vecAVel.z)));
 
 	// get target angular velocity
 	vecFinal = (pev->movedir.x != 0 ? pev->movedir.x : (pev->movedir.y != 0 ? pev->movedir.y : pev->movedir.z));
 	vecFinal *= pev->speed;
-	vecFinal = abs((int)vecFinal);
+	vecFinal = abs((int) vecFinal);
 
 	// calc volume and pitch as % of final vol and pitch
 	fpct = vecCur / vecFinal;
@@ -471,14 +428,14 @@ void CFuncRotating::RampPitchVol(int fUp)
 
 	fpitch = FANPITCHMIN + (FANPITCHMAX - FANPITCHMIN) * fpct;
 
-	pitch = (int)fpitch;
-	if (pitch == PITCH_NORM)
-	{
+	pitch = (int) fpitch;
+	if (pitch == PITCH_NORM) {
 		pitch = PITCH_NORM - 1;
 	}
 
 	// change the fan's vol and pitch
-	EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *)STRING(pev->noiseRunning), fvol, m_flAttenuation, (SND_CHANGE_PITCH | SND_CHANGE_VOL), pitch);
+	EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), fvol, m_flAttenuation,
+	               (SND_CHANGE_PITCH | SND_CHANGE_VOL), pitch);
 }
 
 // SpinUp - accelerates a non-moving func_rotating up to it's speed
@@ -495,19 +452,17 @@ void CFuncRotating::SpinUp()
 	vecAVel = pev->avelocity;
 
 	// if we've met or exceeded target speed, set target speed and stop thinking
-	if (abs((int)vecAVel.x) >= abs((int)(pev->movedir.x * pev->speed))
-		&& abs((int)vecAVel.y) >= abs((int)(pev->movedir.y * pev->speed))
-		&& abs((int)vecAVel.z) >= abs((int)(pev->movedir.z * pev->speed)))
-	{
+	if (abs((int) vecAVel.x) >= abs((int) (pev->movedir.x * pev->speed))
+	    && abs((int) vecAVel.y) >= abs((int) (pev->movedir.y * pev->speed))
+	    && abs((int) vecAVel.z) >= abs((int) (pev->movedir.z * pev->speed))) {
 		// set speed in case we overshot
 		pev->avelocity = pev->movedir * pev->speed;
-		EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *)STRING(pev->noiseRunning), m_flVolume, m_flAttenuation, (SND_CHANGE_PITCH | SND_CHANGE_VOL), FANPITCHMAX);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), m_flVolume, m_flAttenuation,
+		               (SND_CHANGE_PITCH | SND_CHANGE_VOL), FANPITCHMAX);
 
 		SetThink(&CFuncRotating::Rotate);
 		Rotate();
-	}
-	else
-	{
+	} else {
 		RampPitchVol(TRUE);
 	}
 }
@@ -536,19 +491,16 @@ void CFuncRotating::SpinDown()
 	// if we've met or exceeded target speed, set target speed and stop thinking
 	// (note: must check for movedir > 0 or < 0)
 	if (((vecdir > 0) && (vecAVel.x <= 0 && vecAVel.y <= 0 && vecAVel.z <= 0))
-		|| ((vecdir < 0) && (vecAVel.x >= 0 && vecAVel.y >= 0 && vecAVel.z >= 0)))
-	{
+	    || ((vecdir < 0) && (vecAVel.x >= 0 && vecAVel.y >= 0 && vecAVel.z >= 0))) {
 		// set speed in case we overshot
 		pev->avelocity = g_vecZero;
 
 		// stop sound, we're done
-		EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *)STRING(pev->noiseRunning), 0, ATTN_NONE, SND_STOP, m_pitch);
+		EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), 0, ATTN_NONE, SND_STOP, m_pitch);
 
 		SetThink(&CFuncRotating::Rotate);
 		Rotate();
-	}
-	else
-	{
+	} else {
 		RampPitchVol(FALSE);
 	}
 }
@@ -563,28 +515,24 @@ void CFuncRotating::Rotate()
 void CFuncRotating::RotatingUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
 	// is this a brush that should accelerate and decelerate when turned on/off (fan)?
-	if (pev->spawnflags & SF_BRUSH_ACCDCC)
-	{
+	if (pev->spawnflags & SF_BRUSH_ACCDCC) {
 		// fan is spinning, so stop it.
-		if (pev->avelocity != g_vecZero)
-		{
+		if (pev->avelocity != g_vecZero) {
 			SetThink(&CFuncRotating::SpinDown);
 
 			//EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, (char *)STRING(pev->noiseStop), m_flVolume, m_flAttenuation, 0, m_pitch);
 			pev->nextthink = pev->ltime + 0.1;
-		}
-		else // fan is not moving, so start it
+		} else // fan is not moving, so start it
 		{
 			SetThink(&CFuncRotating::SpinUp);
-			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *)STRING(pev->noiseRunning), 0.01, m_flAttenuation, 0, FANPITCHMIN);
+			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), 0.01, m_flAttenuation, 0,
+			               FANPITCHMIN);
 
 			pev->nextthink = pev->ltime + 0.1;
 		}
-	}
-	else if (!(pev->spawnflags & SF_BRUSH_ACCDCC)) // this is a normal start/stop brush.
+	} else if (!(pev->spawnflags & SF_BRUSH_ACCDCC)) // this is a normal start/stop brush.
 	{
-		if (pev->avelocity != g_vecZero)
-		{
+		if (pev->avelocity != g_vecZero) {
 			// play stopping sound here
 			SetThink(&CFuncRotating::SpinDown);
 
@@ -592,10 +540,9 @@ void CFuncRotating::RotatingUse(CBaseEntity *pActivator, CBaseEntity *pCaller, U
 
 			pev->nextthink = pev->ltime + 0.1;
 			// pev->avelocity = g_vecZero;
-		}
-		else
-		{
-			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *)STRING(pev->noiseRunning), m_flVolume, m_flAttenuation, 0, FANPITCHMAX);
+		} else {
+			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), m_flVolume, m_flAttenuation, 0,
+			               FANPITCHMAX);
 			pev->avelocity = pev->movedir * pev->speed;
 
 			SetThink(&CFuncRotating::Rotate);
@@ -617,17 +564,13 @@ IMPLEMENT_SAVERESTORE(CPendulum, CBaseEntity);
 
 void CPendulum::KeyValue(KeyValueData *pkvd)
 {
-	if (FStrEq(pkvd->szKeyName, "distance"))
-	{
+	if (FStrEq(pkvd->szKeyName, "distance")) {
 		m_distance = Q_atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
-	}
-	else if (FStrEq(pkvd->szKeyName, "damp"))
-	{
+	} else if (FStrEq(pkvd->szKeyName, "damp")) {
 		m_damp = Q_atof(pkvd->szValue) * 0.001;
 		pkvd->fHandled = TRUE;
-	}
-	else
+	} else
 		CBaseEntity::KeyValue(pkvd);
 }
 
@@ -652,13 +595,12 @@ void CPendulum::Spawn()
 		pev->speed = 100;
 
 	// Calculate constant acceleration from speed and distance
-	m_accel = (pev->speed * pev->speed) / (2 * fabs((float)m_distance));
+	m_accel = (pev->speed * pev->speed) / (2 * fabs((float) m_distance));
 	m_maxSpeed = pev->speed;
 	m_start = pev->angles;
 	m_center = pev->angles + (m_distance * 0.5) * pev->movedir;
 
-	if (pev->spawnflags & SF_BRUSH_ROTATE_INSTANT)
-	{
+	if (pev->spawnflags & SF_BRUSH_ROTATE_INSTANT) {
 		SetThink(&CPendulum::SUB_CallUseToggle);
 		pev->nextthink = gpGlobals->time + 0.1f;
 	}
@@ -666,19 +608,16 @@ void CPendulum::Spawn()
 	pev->speed = 0;
 	SetUse(&CPendulum::PendulumUse);
 
-	if (pev->spawnflags & SF_PENDULUM_SWING)
-	{
-		SetTouch (&CPendulum::RopeTouch);
+	if (pev->spawnflags & SF_PENDULUM_SWING) {
+		SetTouch(&CPendulum::RopeTouch);
 	}
 }
 
 void CPendulum::PendulumUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
 	// Pendulum is moving, stop it and auto-return if necessary
-	if (pev->speed)
-	{
-		if (pev->spawnflags & SF_PENDULUM_AUTO_RETURN)
-		{
+	if (pev->speed) {
+		if (pev->spawnflags & SF_PENDULUM_AUTO_RETURN) {
 			float delta;
 
 			delta = CBaseToggle::AxisDelta(pev->spawnflags, pev->angles, m_start);
@@ -686,17 +625,13 @@ void CPendulum::PendulumUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 			pev->avelocity = m_maxSpeed * pev->movedir;
 			pev->nextthink = pev->ltime + (delta / m_maxSpeed);
 			SetThink(&CPendulum::Stop);
-		}
-		else
-		{
+		} else {
 			// Dead stop
 			pev->speed = 0;
 			SetThink(NULL);
 			pev->avelocity = g_vecZero;
 		}
-	}
-	else
-	{
+	} else {
 		// Start the pendulum moving
 		pev->nextthink = pev->ltime + 0.1f;
 
@@ -732,12 +667,10 @@ void CPendulum::Swing()
 	// Remember the last time called
 	m_time = gpGlobals->time;
 
-	if (delta > 0 && m_accel > 0)
-	{
+	if (delta > 0 && m_accel > 0) {
 		// Integrate velocity
 		pev->speed -= m_accel * dt;
-	}
-	else
+	} else
 		pev->speed += m_accel * dt;
 
 	if (pev->speed > m_maxSpeed)
@@ -752,18 +685,15 @@ void CPendulum::Swing()
 	// Call this again
 	pev->nextthink = pev->ltime + 0.1;
 
-	if (m_damp)
-	{
+	if (m_damp) {
 		m_dampSpeed -= m_damp * m_dampSpeed * dt;
 
-		if (m_dampSpeed < 30.0)
-		{
+		if (m_dampSpeed < 30.0) {
 			pev->angles = m_center;
 			pev->speed = 0;
 			SetThink(NULL);
 			pev->avelocity = g_vecZero;
-		}
-		else if (pev->speed > m_dampSpeed)
+		} else if (pev->speed > m_dampSpeed)
 			pev->speed = m_dampSpeed;
 
 		else if (pev->speed < -m_dampSpeed)
@@ -785,8 +715,7 @@ void CPendulum::Touch(CBaseEntity *pOther)
 	// calculate damage based on rotation speed
 	float damage = pev->dmg * pev->speed * 0.01;
 
-	if (damage < 0)
-	{
+	if (damage < 0) {
 		damage = -damage;
 	}
 
@@ -799,19 +728,19 @@ void CPendulum::RopeTouch(CBaseEntity *pOther)
 	entvars_t *pevOther = pOther->pev;
 
 	// not a player!
-	if (!pOther->IsPlayer())
-	{
+	if (!pOther->IsPlayer()) {
 		ALERT(at_console, "Not a client\n");
 		return;
 	}
 
 	// this player already on the rope.
-	if (ENT(pevOther) == pev->enemy)
-	{
+	if (ENT(pevOther) == pev->enemy) {
 		return;
 	}
 
 	pev->enemy = pOther->edict();
 	pevOther->velocity = g_vecZero;
 	pevOther->movetype = MOVETYPE_NONE;
+}
+
 }

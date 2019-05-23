@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_hegrenade.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum hegrenade_e
 {
 	HEGRENADE_IDLE,
@@ -268,4 +274,6 @@ void CHEGrenade::WeaponIdle(void)
 BOOL CHEGrenade::CanDeploy(void)
 {
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+}
+
 }

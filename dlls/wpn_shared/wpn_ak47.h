@@ -10,6 +10,12 @@
 #define AK47_RANGE_MODIFER		0.98
 #define AK47_RELOAD_TIME		2.45
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CAK47 : public CBasePlayerWeapon
 {
 public:
@@ -42,5 +48,7 @@ public:
 private:
 	unsigned short m_usFireAK47;
 };
+
+}
 
 #endif

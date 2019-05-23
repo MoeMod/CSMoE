@@ -19,6 +19,8 @@
 #define YAW	1	// left/right
 #define ROLL	2	// fall over
 
+namespace sv {
+
 // Reset the stuck-checker.
 
 void CCSBot::ResetStuckMonitor()
@@ -495,4 +497,6 @@ NOXREF bool CCSBot::FindApproachPointNearestPath(Vector *pos)
 	}
 
 	return false;
+}
+
 }

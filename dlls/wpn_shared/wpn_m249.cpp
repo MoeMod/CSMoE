@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_m249.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum m249_e
 {
 	M249_IDLE1,
@@ -185,4 +191,6 @@ void CM249::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
 	SendWeaponAnim(M249_IDLE1, UseDecrement() != FALSE);
+}
+
 }

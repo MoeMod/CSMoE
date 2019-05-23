@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 void HostageFollowState::OnEnter(CHostageImprov *improv)
 {
 	improv->Chatter(HOSTAGE_CHATTER_START_FOLLOW);
@@ -260,4 +262,6 @@ void HostageFollowState::UpdateStationaryAnimation(CHostageImprov *improv)
 		improv->UpdateIdleActivity(ACT_FOLLOW_IDLE_SCARED, ACT_RESET);
 	else
 		improv->UpdateIdleActivity(ACT_FOLLOW_IDLE, ACT_FOLLOW_IDLE_FIDGET);
+}
+
 }

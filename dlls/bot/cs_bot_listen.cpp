@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Listen for enemy noises, and determine if we should react to them.
 // Returns true if heard a noise and should move to investigate.
 
@@ -149,7 +151,7 @@ bool CCSBot::CanHearNearbyEnemyGunfire(float range) const
 	if (!CanSeeNoisePosition())
 		return false;
 
-	if (IsAttacking() && m_enemy != NULL)
+	if (IsAttacking() && m_enemy != nullptr)
 	{
 		// gunfire is only threatening if it is closer than our current enemy
 		float gunfireDistSq = (m_noisePosition - pev->origin).LengthSquared();
@@ -266,4 +268,6 @@ bool CCSBot::UpdateLookAtNoise()
 	}
 
 	return true;
+}
+
 }

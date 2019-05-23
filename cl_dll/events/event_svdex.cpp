@@ -27,6 +27,8 @@
 */
 #include "events.h"
 
+namespace cl {
+
 enum svdex_e
 {
 	SVDEX_IDLEA,
@@ -109,4 +111,6 @@ void EV_FireSVDEX( event_args_t *args )
 			2);
 	}
 	
+}
+
 }

@@ -6,14 +6,15 @@
 
 #include "shared_util.h"
 
+namespace sv {
+
 CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, float duration)
 {
 	m_hintString = hintString;
 	m_duration = duration;
 	m_isHint = isHint;
 
-	if (args)
-	{
+	if (args) {
 		for (int i = 0; i < args->Count(); ++i)
 			m_args.AddToTail(CloneString((*args)[i]));
 	}
@@ -22,7 +23,7 @@ CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const
 CHintMessage::~CHintMessage()
 {
 	for (int i = 0; i < m_args.Count(); ++i)
-		delete [] m_args[i];
+		delete[] m_args[i];
 
 	m_args.RemoveAll();
 }
@@ -63,4 +64,6 @@ bool CHintMessageQueue::AddMessage(const char *message, float duration, bool isH
 	m_messages.AddToTail(msg);
 
 	return true;
+}
+
 }

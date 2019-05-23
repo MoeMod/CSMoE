@@ -59,6 +59,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 // Begin the hunt
 
 void HuntState::OnEnter(CCSBot *me)
@@ -251,4 +253,6 @@ void HuntState::OnUpdate(CCSBot *me)
 void HuntState::OnExit(CCSBot *me)
 {
 	;
+}
+
 }

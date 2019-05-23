@@ -27,10 +27,18 @@
 #include <stdlib.h> // atoi
 #include <ctype.h>  // isspace
 
+#if defined(CLIENT_DLL)
+namespace cl {
+#elif defined(SERVER_DLL)
+namespace sv {
+#elif defined(__cplusplus)
+extern "C++" {
+#endif
+
 int g_bhopcap = 1;
 
 #ifdef CLIENT_DLL
-// Spectator Mode
+	// Spectator Mode
 int iJumpSpectator;
 extern float vJumpOrigin[3];
 extern float vJumpAngles[3];
@@ -39,7 +47,7 @@ extern float vJumpAngles[3];
 static int pm_shared_initialized = 0;
 
 #ifdef _MSC_VER
-#pragma warning( disable : 4305 )
+	#pragma warning( disable : 4305 )
 #endif
 
 playermove_t *pmove = NULL;
@@ -3615,3 +3623,7 @@ void PM_Init(struct playermove_s *ppmove)
 
 	pm_shared_initialized = 1;
 }
+
+#ifdef __cplusplus
+		} // namespace cl | sv | extern "C"
+#endif

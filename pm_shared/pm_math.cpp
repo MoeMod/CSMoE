@@ -29,8 +29,19 @@
 #pragma warning(disable : 4244)
 #endif
 
-vec3_t vec3_origin = { 0,0,0 };
+double sqrt( double x );
+
+#if defined(CLIENT_DLL)
+namespace cl {
+#elif defined(SERVER_DLL)
+namespace sv {
+#elif defined(__cplusplus)
+extern "C++" {
+#endif
+
 int nanmask = 255 << 23;
+
+vec3_t vec3_origin = { 0,0,0 };
 
 float anglemod( float a )
 {
@@ -303,8 +314,6 @@ void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross )
 	cross[2] = v1[0] * v2[1] - v1[1] * v2[0];
 }
 
-double sqrt( double x );
-
 float Length( const vec3_t v )
 {
 	int i;
@@ -413,4 +422,6 @@ void VectorAngles( const vec3_t forward, vec3_t angles )
 	angles[0] = pitch;
 	angles[1] = yaw;
 	angles[2] = 0;
+}
+    
 }

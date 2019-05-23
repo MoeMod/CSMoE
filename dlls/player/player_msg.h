@@ -19,6 +19,14 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
+struct ItemInfo;
+
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 extern int giPrecacheGrunt;
 extern int gmsgWeapPickup;
 extern int gmsgHudText;
@@ -114,6 +122,8 @@ void SendItemStatus(CBasePlayer *pPlayer);
 
 void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src);
 
-struct ItemInfo;
 void WriteWeaponInfo(CBasePlayer *pPlayer, const ItemInfo &II);
+
+}
+
 #endif

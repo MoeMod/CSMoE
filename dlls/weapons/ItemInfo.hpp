@@ -472,13 +472,13 @@ public:
 	template<class ClassToFind = CFinal>
 	static constexpr auto BuildItemInfoFrom(ClassToFind &wpn) -> decltype(&ClassToFind::ItemInfoData, ItemInfo())
 	{
-		return ::BuildItemInfo(wpn, wpn.ItemInfoData);
+		return BuildItemInfo(wpn, wpn.ItemInfoData);
 	}
 	// otherwise build from ItemInfoData_t
 	template<class ClassToFind = CFinal>
 	static constexpr auto BuildItemInfoFrom(ClassToFind &wpn) -> decltype(typename ClassToFind::ItemInfoData_t(), ItemInfo())
 	{
-		return ::BuildItemInfo<typename ClassToFind::ItemInfoData_t>(wpn);
+		return BuildItemInfo<typename ClassToFind::ItemInfoData_t>(wpn);
 	}
 };
 

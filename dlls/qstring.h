@@ -30,6 +30,13 @@
 
 #define QSTRING_DEFINE
 
+
+#ifdef CLIENT_DLL
+using cl::g_engfuncs;
+#else
+using sv::g_engfuncs;
+#endif
+
 #define iStringNull		0u	// Testing strings for nullity
 // constexpr unsigned int iStringNull = { 0 };
 
@@ -70,8 +77,6 @@ private:
 #include "enginecallback.h"
 
 #include "stddef.h"
-
-extern globalvars_t *gpGlobals;
 
 //#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
 //#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))

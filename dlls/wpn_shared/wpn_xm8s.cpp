@@ -24,6 +24,12 @@
 #include "gamemode/mods.h"
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 LINK_ENTITY_TO_CLASS(weapon_xm8s, CXM8SharpShooter)
 
 void CXM8SharpShooter::Spawn(void)
@@ -212,4 +218,6 @@ float CXM8SharpShooter::GetMaxSpeed(void)
 		return 210;
 
 	return 160;
+}
+
 }

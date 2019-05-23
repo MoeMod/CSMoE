@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class CCycler: public CBaseMonster
 {
 public:
@@ -82,7 +84,7 @@ public:
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	virtual void Think();
 	virtual void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-   
+
 public:
 	void Animate(float frames);
 	inline int ShouldAnimate() { return (m_animate && m_maxFrame > 1.0f); }
@@ -131,5 +133,7 @@ public:
 
 	int m_flStartTime;
 };
+
+}
 
 #endif // H_CYCLER_H

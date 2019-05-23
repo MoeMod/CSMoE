@@ -30,6 +30,8 @@
 #include "com_weapons.h"
 //#include "vgui_TeamFortressViewport.h"
 
+using namespace cl;
+
 extern float *GetClientColor( int clientIndex );
 
 #define MAX_LINES	5

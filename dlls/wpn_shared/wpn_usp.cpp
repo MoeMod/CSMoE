@@ -20,6 +20,12 @@
 #include "weapons.h"
 #include "wpn_usp.h"
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 enum usp_e
 {
 	USP_IDLE,
@@ -292,4 +298,6 @@ void CUSP::WeaponIdle(void)
 		else
 			SendWeaponAnim(USP_UNSIL_IDLE, UseDecrement() != FALSE);
 	}
+}
+
 }

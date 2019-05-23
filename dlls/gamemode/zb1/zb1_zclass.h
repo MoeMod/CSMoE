@@ -18,6 +18,8 @@ GNU General Public License for more details.
 
 #include "player/player_mod_strategy.h"
 
+namespace sv {
+
 class IZombieModeCharacter
 {
 public:
@@ -55,5 +57,7 @@ public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
 };
+
+}
 
 #endif //PROJECT_ZB1_ZCLASS_H

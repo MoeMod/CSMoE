@@ -7,6 +7,8 @@
 #include "doors.h"
 #include "subs.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
@@ -499,4 +501,6 @@ NOXREF BOOL FEntIsVisible(entvars_t *pev, entvars_t *pevTarget)
 	}
 
 	return FALSE;
+}
+
 }

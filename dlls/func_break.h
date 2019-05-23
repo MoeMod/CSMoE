@@ -32,17 +32,19 @@
 #pragma once
 #endif
 
+namespace sv {
+
 // this many shards spawned when breakable objects break;
 #define NUM_SHARDS 6
 
 // func breakable
-#define SF_BREAK_TRIGGER_ONLY		1	// may only be broken by trigger
-#define	SF_BREAK_TOUCH			2	// can be 'crashed through' by running player (plate glass)
-#define SF_BREAK_PRESSURE		4	// can be broken by a player standing on it
-#define SF_BREAK_CROWBAR		256	// instant break if hit with crowbar
+#define SF_BREAK_TRIGGER_ONLY        1    // may only be broken by trigger
+#define    SF_BREAK_TOUCH            2    // can be 'crashed through' by running player (plate glass)
+#define SF_BREAK_PRESSURE        4    // can be broken by a player standing on it
+#define SF_BREAK_CROWBAR        256    // instant break if hit with crowbar
 
 // func_pushable (it's also func_breakable, so don't collide with those flags)
-#define SF_PUSH_BREAKABLE		128
+#define SF_PUSH_BREAKABLE        128
 
 typedef enum
 {
@@ -67,7 +69,7 @@ typedef enum
 
 } Materials;
 
-class CBreakable: public CBaseDelay
+class CBreakable : public CBaseDelay
 {
 public:
 	// basic functions
@@ -80,7 +82,8 @@ public:
 	virtual int ObjectCaps() { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 
 	// To spark when hit
-	virtual void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
+	virtual void
+	TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
 
 	// breakables use an overridden takedamage
 	virtual int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
@@ -97,8 +100,8 @@ public:
 
 	void EXPORT Die();
 
-	BOOL Explodable() const		{ return ExplosionMagnitude() > 0; }
-	int ExplosionMagnitude() const	{ return pev->impulse; }
+	BOOL Explodable() const { return ExplosionMagnitude() > 0; }
+	int ExplosionMagnitude() const { return pev->impulse; }
 
 	void ExplosionSetMagnitude(int magnitude) { pev->impulse = magnitude; }
 
@@ -125,7 +128,7 @@ public:
 	float m_flHealth;
 };
 
-class CPushable: public CBreakable
+class CPushable : public CBreakable
 {
 public:
 	virtual void Spawn();
@@ -160,5 +163,7 @@ public:
 	float m_maxSpeed;
 	float m_soundTime;
 };
+
+}
 
 #endif // FUNC_BREAK_H

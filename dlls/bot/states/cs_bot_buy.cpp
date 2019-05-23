@@ -60,6 +60,8 @@
 #include "career_tasks.h"
 #include "maprules.h"
 
+namespace sv {
+
 bool HasDefaultPistol(CCSBot *me)
 {
 	CBasePlayerWeapon *pistol = static_cast<CBasePlayerWeapon *>(me->m_rgpPlayerItems[ PISTOL_SLOT ]);
@@ -569,4 +571,6 @@ void BuyState::OnExit(CCSBot *me)
 {
 	me->ResetStuckMonitor();
 	me->EquipBestWeapon();
+}
+
 }

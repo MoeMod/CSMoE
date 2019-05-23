@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 //kriss
 #define KRISS_MAX_SPEED		245
 #define KRISS_DAMAGE		29
@@ -47,5 +53,7 @@ public:
 private:
 	unsigned short m_usFireKRISS;
 };
+
+}
 
 #endif

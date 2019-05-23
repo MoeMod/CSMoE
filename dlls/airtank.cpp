@@ -8,13 +8,15 @@
 
 #include "airtank.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
 TYPEDESCRIPTION CAirtank::m_SaveData[] =
-{
-	DEFINE_FIELD(CAirtank, m_state, FIELD_INTEGER)
-};
+		{
+				DEFINE_FIELD(CAirtank, m_state, FIELD_INTEGER)
+		};
 
 
 LINK_ENTITY_TO_CLASS(item_airtank, CAirtank);
@@ -66,13 +68,11 @@ void CAirtank::TankThink()
 
 void CAirtank::TankTouch(CBaseEntity *pOther)
 {
-	if (!pOther->IsPlayer())
-	{
+	if (!pOther->IsPlayer()) {
 		return;
 	}
 
-	if (!m_state)
-	{
+	if (!m_state) {
 		// "no oxygen" sound
 		EMIT_SOUND(ENT(pev), CHAN_BODY, "player/pl_swim2.wav", VOL_NORM, ATTN_NORM);
 		return;
@@ -88,4 +88,6 @@ void CAirtank::TankTouch(CBaseEntity *pOther)
 	pev->nextthink = gpGlobals->time + 30.0f;
 	m_state = 0;
 	SUB_UseTargets(this, USE_TOGGLE, 1);
+}
+
 }

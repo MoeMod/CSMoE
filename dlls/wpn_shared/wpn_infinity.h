@@ -4,6 +4,12 @@
 #pragma once
 #endif
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 class CInfinity : public CBasePlayerWeapon
 {
 protected:
@@ -45,17 +51,17 @@ public:
 	}
 	BOOL IsPistol() override { return TRUE; }
 
-	KnockbackData GetKnockBackData() override 
-	{ 
+	KnockbackData GetKnockBackData() override
+	{
 		return m_iSpecialAttack ?
-			KnockbackData{ 450.0f, 400.0f, 400.0f, 200.0f, 0.5f } : 
-			KnockbackData{ 300.0f, 200.0f, 200.0f, 90.0f, 0.8f }; 
+			KnockbackData{ 450.0f, 400.0f, 400.0f, 200.0f, 0.5f } :
+			KnockbackData{ 300.0f, 200.0f, 200.0f, 90.0f, 0.8f };
 	}
 	bool HasSecondaryAttack() override { return true; }
 	float GetArmorRatioModifier() override { return 1.0; }
 	const char *GetCSModelName() override { return "models/w_infinity.mdl"; }
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::GetBuyAmmoConfig(WEAPON_USP); }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
 #endif
 
 public:
@@ -72,5 +78,7 @@ public:
 	unsigned short m_usFireELITE_LEFT;
 	unsigned short m_usFireELITE_RIGHT;
 };
+
+}
 
 #endif

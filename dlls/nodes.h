@@ -32,10 +32,12 @@
 #pragma once
 #endif
 
-#define bits_NODE_LAND		(1 << 0)	// Land node, so nudge if necessary.
-#define bits_NODE_AIR		(1 << 1)	// Air node, don't nudge.
-#define bits_NODE_WATER		(1 << 2)	// Water node, don't nudge.
-#define bits_NODE_GROUP_REALM	(bits_NODE_LAND | bits_NODE_AIR | bits_NODE_WATER)
+namespace sv {
+
+#define bits_NODE_LAND        (1 << 0)    // Land node, so nudge if necessary.
+#define bits_NODE_AIR        (1 << 1)    // Air node, don't nudge.
+#define bits_NODE_WATER        (1 << 2)    // Water node, don't nudge.
+#define bits_NODE_GROUP_REALM    (bits_NODE_LAND | bits_NODE_AIR | bits_NODE_WATER)
 
 class CBaseEntity;
 
@@ -65,5 +67,7 @@ public:
 };
 
 extern CGraph WorldGraph;
+
+}
 
 #endif // NODES_H

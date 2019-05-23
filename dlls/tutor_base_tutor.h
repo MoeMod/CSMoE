@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv {
+
 class TutorMessageEvent
 {
 public:
@@ -80,7 +82,7 @@ public:
 
 	virtual void HandleShotFired(Vector source, Vector target) = 0;
 	virtual struct TutorMessage *GetTutorMessageDefinition(int messageID) = 0;
-   
+
 public:
 	void StartFrame(float time);
 	void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL);
@@ -102,5 +104,7 @@ protected:
 };
 
 extern CBaseTutor *TheTutor;
+
+}
 
 #endif // TUTOR_BASE_TUTOR_H

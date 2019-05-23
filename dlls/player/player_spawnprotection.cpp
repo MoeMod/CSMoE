@@ -5,6 +5,8 @@
 #include "gamerules.h"
 #include "client.h"
 
+namespace sv {
+
 void CBasePlayer::SpawnProtection_Check()
 {
 	if (!m_bSpawnProtection)
@@ -32,4 +34,6 @@ void CBasePlayer::SpawnProtection_End()
 	m_bSpawnProtection = false;
 	pev->renderfx = kRenderFxNone;
 	pev->takedamage = DAMAGE_AIM;
+}
+
 }

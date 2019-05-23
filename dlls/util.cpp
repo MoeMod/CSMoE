@@ -16,6 +16,30 @@ unsigned int glSeed;
 #include <string>
 #include <functional>
 
+namespace sv {
+
+DLL_GLOBAL int g_groupmask = 0;
+DLL_GLOBAL int g_groupop = 0;
+
+NOXREF UTIL_GroupTrace::UTIL_GroupTrace(int groupmask, int op)
+{
+	m_oldgroupmask = g_groupmask;
+	m_oldgroupop = g_groupop;
+
+	g_groupmask = groupmask;
+	g_groupop = op;
+
+	ENGINE_SETGROUPMASK(groupmask, op);
+}
+
+NOXREF UTIL_GroupTrace::~UTIL_GroupTrace()
+{
+	g_groupmask = m_oldgroupmask;
+	g_groupop = m_oldgroupop;
+
+	ENGINE_SETGROUPMASK(g_groupmask, g_groupop);
+}
+
 /*
 * Globals initialization
 */
@@ -166,9 +190,6 @@ void DBG_AssertFunction(BOOL fExpr, const char *szExpr, const char *szFile, int 
 }
 #endif
 
-int g_groupmask = 0;
-int g_groupop = 0;
-
 const int gSizes[18] = { 4, 4, 4, 4, 4, 4, 4, 12, 12, 4, 4, 4, 4, 2, 1, 4, 4, 4 };
 
 unsigned int U_Random()
@@ -250,25 +271,6 @@ void UTIL_UnsetGroupTrace()
 	g_groupop = 0;
 
 	ENGINE_SETGROUPMASK(0, 0);
-}
-
-NOXREF UTIL_GroupTrace::UTIL_GroupTrace(int groupmask, int op)
-{
-	m_oldgroupmask = g_groupmask;
-	m_oldgroupop = g_groupop;
-
-	g_groupmask = groupmask;
-	g_groupop = op;
-
-	ENGINE_SETGROUPMASK(groupmask, op);
-}
-
-NOXREF UTIL_GroupTrace::~UTIL_GroupTrace()
-{
-	g_groupmask = m_oldgroupmask;
-	g_groupop = m_oldgroupop;
-
-	ENGINE_SETGROUPMASK(g_groupmask, g_groupop);
 }
 
 NOXREF BOOL UTIL_GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCurrentWeapon)
@@ -2371,4 +2373,6 @@ int UTIL_ReadFlags(const char *c)
 	}
 
 	return flags;
+}
+
 }

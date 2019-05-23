@@ -4,28 +4,28 @@
 #include "animation.h"
 #include "saverestore.h"
 
+namespace sv {
+
 /*
 * Globals initialization
 */
 TYPEDESCRIPTION CBaseAnimating::m_SaveData[] =
-{
-	DEFINE_FIELD(CBaseMonster, m_flFrameRate, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseMonster, m_flGroundSpeed, FIELD_FLOAT),
-	DEFINE_FIELD(CBaseMonster, m_flLastEventCheck, FIELD_TIME),
-	DEFINE_FIELD(CBaseMonster, m_fSequenceFinished, FIELD_BOOLEAN),
-	DEFINE_FIELD(CBaseMonster, m_fSequenceLoops, FIELD_BOOLEAN),
-};
+		{
+				DEFINE_FIELD(CBaseMonster, m_flFrameRate, FIELD_FLOAT),
+				DEFINE_FIELD(CBaseMonster, m_flGroundSpeed, FIELD_FLOAT),
+				DEFINE_FIELD(CBaseMonster, m_flLastEventCheck, FIELD_TIME),
+				DEFINE_FIELD(CBaseMonster, m_fSequenceFinished, FIELD_BOOLEAN),
+				DEFINE_FIELD(CBaseMonster, m_fSequenceLoops, FIELD_BOOLEAN),
+		};
 
 IMPLEMENT_SAVERESTORE(CBaseAnimating, CBaseDelay);
 
 float CBaseAnimating::StudioFrameAdvance(float flInterval)
 {
-	if (flInterval == 0.0f)
-	{
+	if (flInterval == 0.0f) {
 		flInterval = gpGlobals->time - pev->animtime;
 
-		if (flInterval <= 0.001)
-		{
+		if (flInterval <= 0.001) {
 			pev->animtime = gpGlobals->time;
 			return 0;
 		}
@@ -37,10 +37,9 @@ float CBaseAnimating::StudioFrameAdvance(float flInterval)
 	pev->frame += flInterval * m_flFrameRate * pev->framerate;
 	pev->animtime = gpGlobals->time;
 
-	if (pev->frame < 0.0 || pev->frame >= 256.0)
-	{
+	if (pev->frame < 0.0 || pev->frame >= 256.0) {
 		if (m_fSequenceLoops)
-			pev->frame -= (int)(pev->frame / 256.0) * 256.0;
+			pev->frame -= (int) (pev->frame / 256.0) * 256.0;
 		else
 			pev->frame = (pev->frame < 0) ? 0 : 255;
 
@@ -53,13 +52,13 @@ float CBaseAnimating::StudioFrameAdvance(float flInterval)
 int CBaseAnimating::LookupActivity(int activity)
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
-	return ::LookupActivity(pmodel, pev, activity);
+	return sv::LookupActivity(pmodel, pev, activity);
 }
 
 int CBaseAnimating::LookupActivityHeaviest(int activity)
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
-	return ::LookupActivityHeaviest(pmodel, pev, activity);
+	return sv::LookupActivityHeaviest(pmodel, pev, activity);
 }
 
 void CBaseAnimating::DispatchAnimEvents(float flInterval)
@@ -67,8 +66,7 @@ void CBaseAnimating::DispatchAnimEvents(float flInterval)
 	MonsterEvent_t event;
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
 
-	if (!pmodel)
-	{
+	if (!pmodel) {
 		ALERT(at_aiconsole, "Gibbed monster is thinking!\n");
 		return;
 	}
@@ -83,14 +81,12 @@ void CBaseAnimating::DispatchAnimEvents(float flInterval)
 	m_fSequenceFinished = FALSE;
 	m_flLastEventCheck = pev->animtime + flInterval;
 
-	if (flEnd >= 256.0f || flEnd <= 0.0f)
-	{
+	if (flEnd >= 256.0f || flEnd <= 0.0f) {
 		m_fSequenceFinished = TRUE;
 	}
 
 	int index = 0;
-	while ((index = GetAnimationEvent(pmodel, pev, &event, flStart, flEnd, index)) != 0)
-	{
+	while ((index = GetAnimationEvent(pmodel, pev, &event, flStart, flEnd, index)) != 0) {
 		HandleAnimEvent(&event);
 	}
 }
@@ -98,7 +94,7 @@ void CBaseAnimating::DispatchAnimEvents(float flInterval)
 int CBaseAnimating::LookupSequence(const char *label)
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
-	return ::LookupSequence(pmodel, label);
+	return sv::LookupSequence(pmodel, label);
 }
 
 void CBaseAnimating::ResetSequenceInfo()
@@ -117,7 +113,7 @@ void CBaseAnimating::ResetSequenceInfo()
 BOOL CBaseAnimating::GetSequenceFlags()
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
-	return ::GetSequenceFlags(pmodel, pev);
+	return sv::GetSequenceFlags(pmodel, pev);
 }
 
 float CBaseAnimating::SetBoneController(int iController, float flValue)
@@ -140,7 +136,7 @@ void CBaseAnimating::InitBoneControllers()
 NOXREF float CBaseAnimating::SetBlending(int iBlender, float flValue)
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
-	return ::SetBlending(pmodel, pev, iBlender, flValue);
+	return sv::SetBlending(pmodel, pev, iBlender, flValue);
 }
 
 NOXREF void CBaseAnimating::GetBonePosition(int iBone, Vector &origin, Vector &angles)
@@ -157,10 +153,9 @@ NOXREF int CBaseAnimating::FindTransition(int iEndingSequence, int iGoalSequence
 {
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
 
-	if (piDir == NULL)
-	{
+	if (piDir == NULL) {
 		int iDir;
-		int sequence = ::FindTransition(pmodel, iEndingSequence, iGoalSequence, &iDir);
+		int sequence = sv::FindTransition(pmodel, iEndingSequence, iGoalSequence, &iDir);
 
 		if (iDir != 1)
 			sequence = -1;
@@ -168,7 +163,7 @@ NOXREF int CBaseAnimating::FindTransition(int iEndingSequence, int iGoalSequence
 		return sequence;
 	}
 
-	return ::FindTransition(pmodel, iEndingSequence, iGoalSequence, piDir);
+	return sv::FindTransition(pmodel, iEndingSequence, iGoalSequence, piDir);
 }
 
 NOXREF void CBaseAnimating::GetAutomovement(Vector &origin, Vector &angles, float flInterval)
@@ -178,17 +173,17 @@ NOXREF void CBaseAnimating::GetAutomovement(Vector &origin, Vector &angles, floa
 
 NOXREF void CBaseAnimating::SetBodygroup(int iGroup, int iValue)
 {
-	::SetBodygroup(GET_MODEL_PTR(ENT(pev)), pev, iGroup, iValue);
+	sv::SetBodygroup(GET_MODEL_PTR(ENT(pev)), pev, iGroup, iValue);
 }
 
 NOXREF int CBaseAnimating::GetBodygroup(int iGroup)
 {
-	return ::GetBodygroup(GET_MODEL_PTR(ENT(pev)), pev, iGroup);
+	return sv::GetBodygroup(GET_MODEL_PTR(ENT(pev)), pev, iGroup);
 }
 
 int CBaseAnimating::ExtractBbox(int sequence, float *mins, float *maxs)
 {
-	return ::ExtractBbox(GET_MODEL_PTR(ENT(pev)), sequence, mins, maxs);
+	return sv::ExtractBbox(GET_MODEL_PTR(ENT(pev)), sequence, mins, maxs);
 }
 
 void CBaseAnimating::SetSequenceBox()
@@ -196,8 +191,7 @@ void CBaseAnimating::SetSequenceBox()
 	Vector mins, maxs;
 
 	// Get sequence bbox
-	if (ExtractBbox(pev->sequence, mins, maxs))
-	{
+	if (ExtractBbox(pev->sequence, mins, maxs)) {
 		// expand box for rotation
 		// find min / max for rotations
 		float yaw = pev->angles.y * (M_PI / 180.0);
@@ -216,14 +210,11 @@ void CBaseAnimating::SetSequenceBox()
 		Vector rmax(-9999, -9999, -9999);
 
 		Vector base, transformed;
-		for (int i = 0; i <= 1; ++i)
-		{
+		for (int i = 0; i <= 1; ++i) {
 			base.x = bounds[i].x;
-			for (int j = 0; j <= 1; j++)
-			{
+			for (int j = 0; j <= 1; j++) {
 				base.y = bounds[j].y;
-				for (int k = 0; k <= 1; k++)
-				{
+				for (int k = 0; k <= 1; k++) {
 					base.z = bounds[k].z;
 
 					// transform the point
@@ -256,4 +247,6 @@ void CBaseAnimating::SetSequenceBox()
 		rmax.z = rmin.z + 1;
 		UTIL_SetSize(pev, rmin, rmax);
 	}
+}
+
 }
