@@ -151,10 +151,16 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/snd_opensles.c
 )
 
+if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
-   platform/macos/TouchBar.mm
-   platform/iOS/TapicEngine.mm
+	common/launcher.c
+	platform/iOS/TapicEngine.mm
 )
+else()
+set(XASH_ENGINE_APPLE_SOURCES
+	platform/macos/TouchBar.mm
+)
+endif()
 
 set(XASH_ENGINE_CLIENT_SOURCES
    client/cl_cmds.c
@@ -262,7 +268,7 @@ endif()
 add_definitions(-DXASH_FORCEINLINE)
 
 # Important, as HLSDK and engine shares some symbol names!
-if(NOT WIN32) # Windows by default have hidden visibility and better linker
+if(NOT WIN32 AND NOT IOS) # Windows by default have hidden visibility and better linker
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
@@ -272,7 +278,10 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(XASH_SINGLE_BINARY) # Set executable or library
+if(IOS)
+	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
+	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
+elseif(XASH_SINGLE_BINARY) # Set executable or library
 	add_definitions(-DSINGLE_BINARY)
 	add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
 else()

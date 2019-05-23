@@ -33,7 +33,7 @@ namespace cl {
 #elif defined(SERVER_DLL)
 namespace sv {
 #elif defined(__cplusplus)
-extern "C" {
+extern "C++" {
 #endif
 
 extern playermove_t *pmove;

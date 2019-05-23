@@ -28,7 +28,7 @@ typedef struct dll_s
 static dll_t *dll_list;
 char lasterror[1024] = "";
 
-static void *dlfind( const char *name )
+static void *LS_dlfind( const char *name )
 {
 	dll_t *d = NULL;
 	for( d = dll_list; d; d = d->next )
@@ -37,7 +37,7 @@ static void *dlfind( const char *name )
 	return d;
 }
 
-static const char *dlname( void *handle )
+static const char *LS_dlname( void *handle )
 {
 	dll_t *d = NULL;
 	// iterate through all dll_ts to check if the handle is actually in the list
@@ -46,20 +46,20 @@ static const char *dlname( void *handle )
 	return d ? d->name : NULL;
 }
 
-void *dlopen( const char *name, int flag )
+void *LS_dlopen( const char *name, int flag )
 {
-	dll_t *d = dlfind( name );
+	dll_t *d = LS_dlfind( name );
 	if( d ) d->refcnt++;
-	else Com_PushLibraryError("dlopen(): unknown dll name");
+	else Com_PushLibraryError("LS_dlopen(): unknown dll name");
 	return d;
 }
 
-void *dlsym( void *handle, const char *symbol )
+void *LS_dlsym( void *handle, const char *symbol )
 {
-	if( !handle || !symbol ) { Com_PushLibraryError("dlsym(): NULL args"); return NULL; }
-	if( !dlname( handle ) ) { Com_PushLibraryError("dlsym(): unknown handle"); return NULL; }
+	if( !handle || !symbol ) { Com_PushLibraryError("LS_dlsym(): NULL args"); return NULL; }
+	if( !LS_dlname( handle ) ) { Com_PushLibraryError("LS_dlsym(): unknown handle"); return NULL; }
 	dll_t *d = handle;
-	if( !d->refcnt ) { Com_PushLibraryError("dlsym(): call dlopen() first"); return NULL; }
+	if( !d->refcnt ) { Com_PushLibraryError("LS_dlsym(): call LS_dlopen() first"); return NULL; }
 	dllexport_t *f = NULL;
 	for( f = d->exp; f && f->func; f++ )
 		if( !Q_strcmp( f->name, symbol ) )
@@ -71,24 +71,24 @@ void *dlsym( void *handle, const char *symbol )
 	}
 	else
 	{
-		Com_PushLibraryError("dlsym(): symbol not found in dll");
+		Com_PushLibraryError("LS_dlsym(): symbol not found in dll");
 		return NULL;
 	}
 }
 
-int dlclose( void *handle )
+int LS_dlclose( void *handle )
 {
-	if( !handle ) { Com_PushLibraryError("dlclose(): NULL arg"); return -1; }
-	if( !dlname( handle ) ) { Com_PushLibraryError("dlclose(): unknown handle"); return -2; }
+	if( !handle ) { Com_PushLibraryError("LS_dlclose(): NULL arg"); return -1; }
+	if( !LS_dlname( handle ) ) { Com_PushLibraryError("LS_dlclose(): unknown handle"); return -2; }
 	dll_t *d = handle;
-	if( !d->refcnt ) { Com_PushLibraryError("dlclose(): call dlopen() first"); return -3; }
+	if( !d->refcnt ) { Com_PushLibraryError("LS_dlclose(): call LS_dlopen() first"); return -3; }
 	d->refcnt--;
 	return 0;
 }
 
-char *dlerror( void );
+char *LS_dlerror( void );
 
-int dladdr( const void *addr, Dl_info *info )
+int LS_dladdr( const void *addr, Dl_info *info )
 {
 	dll_t *d = NULL;
 	dllexport_t *f = NULL;
@@ -114,7 +114,7 @@ int dladdr( const void *addr, Dl_info *info )
 int dll_register( const char *name, dllexport_t *exports )
 {
 	if( !name || !exports ) return -1;
-	if( dlfind( name ) ) return -2; // already registered
+	if( LS_dlfind( name ) ) return -2; // already registered
 	dll_t *new = calloc( 1, sizeof( dll_t ) );
 	if( !new ) return -3;
 	new->name = name;
@@ -125,12 +125,12 @@ int dll_register( const char *name, dllexport_t *exports )
 
 void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 {
-	return dlopen(dllname, RTLD_NOW);
+	return LS_dlopen(dllname, RTLD_NOW);
 }
 
 void *Com_GetProcAddress( void *hInstance, const char *name )
 {
-	return dlsym( hInstance, name );
+	return LS_dlsym( hInstance, name );
 }
 
 const char *Com_NameForFunction( void *hInstance, void *function )
@@ -140,7 +140,7 @@ const char *Com_NameForFunction( void *hInstance, void *function )
 
 void *Com_FunctionFromName( void *hInstance, const char *pName )
 {
-	return dlsym( hInstance, pName );
+	return LS_dlsym( hInstance, pName );
 }
 
 void *Com_FunctionFromName_SR( void *hInstance, const char *pName )
@@ -154,7 +154,7 @@ void *Com_FunctionFromName_SR( void *hInstance, const char *pName )
 
 void Com_FreeLibrary( void *hInstance )
 {
-	dlclose( hInstance );
+	LS_dlclose( hInstance );
 }
 
 void Com_PushLibraryError( const char *error )

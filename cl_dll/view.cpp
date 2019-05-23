@@ -13,10 +13,7 @@
 
 #include "hud.h"
 
-extern "C"
-{
 #include "pm_math.h"
-}
 
 #include "cl_util.h"
 #include "cvardef.h"
@@ -28,14 +25,11 @@ extern "C"
 #include "ref_params.h"
 #include "in_defs.h" // PITCH YAW ROLL
 
-extern "C"
-{
 #include "pm_movevars.h"
 #include "pm_shared.h"
 #include "pm_defs.h"
 #include "pm_debug.h"
 #include "pmtrace.h"
-}
 
 #include "event_api.h"
 #include "screenfade.h"
@@ -50,7 +44,7 @@ extern "C"
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
-extern "C" {
+namespace cl { // pm_math.cpp
 
 void NormalizeAngles(float *angles);
 float Distance(const float *v1, const float *v2);

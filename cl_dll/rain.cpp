@@ -12,10 +12,7 @@
 #include <memory.h>
 #include "hud.h"
 
-extern "C"
-{
 #include "pm_math.h"
-}
 
 #include "cl_util.h"
 #include "const.h"
@@ -44,6 +41,8 @@ extern "C"
 
 // radius water rings
 #define MAXRINGHALFSIZE	25
+
+using namespace cl;
 
 struct
 {

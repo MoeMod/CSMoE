@@ -12,7 +12,7 @@
 #include "triangleapi.h"
 #include "hltv.h"
 
-extern "C"
+extern "C++"
 {
 #include "pm_shared.h"
 #include "pm_defs.h"
