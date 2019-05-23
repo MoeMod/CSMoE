@@ -74,6 +74,17 @@ BOOL CMod_ZombieBaseBuilder::IsAllowedToSpawn(CBaseEntity *pEntity)
 	return CMod_Zombi::IsAllowedToSpawn(pEntity);
 }
 
+void CMod_ZombieBaseBuilder::RestartRound()
+{
+	for (CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_ClassName<CBaseEntity>>("func_wall"))
+	{
+		pEntity->pev->origin = {};
+		DispatchSpawn(pEntity->edict());
+	}
+	m_BuildingEntities.clear();
+	return CMod_Zombi::RestartRound();
+}
+
 void CMod_ZombieBaseBuilder::UpdateGameMode(CBasePlayer *pPlayer)
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgGameMode, nullptr, pPlayer->edict());
@@ -162,6 +173,32 @@ int CMod_ZombieBaseBuilder::AddToFullPack_Post(struct entity_state_s *state, int
 	}
 
 	return 1;
+}
+
+int CMod_ZombieBaseBuilder::ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther)
+{
+	auto f = [this](CBaseEntity *player, CBaseEntity *entity) {
+
+		const auto id = player->entindex();
+		assert(id >= 1 && id <= 32);
+
+		const auto pbi = m_BuildingInterfaces[id];
+		if (pbi)
+		{
+			// ghosts can penetrate all players
+			if (pbi->IsGhost() && entity && (entity->IsPlayer() || CanEntityBuild(entity)))
+				return 0;
+		}
+		return 1;
+	};
+
+	if (pTouched && pTouched->IsPlayer())
+		return f(pTouched, pOther);
+
+	if (pOther && pOther->IsPlayer())
+		return f(pOther, pTouched);
+	
+	return IBaseMod::ShouldCollide(pTouched, pOther);
 }
 
 bool CMod_ZombieBaseBuilder::CanEntityBuild(CBaseEntity *pEntity)

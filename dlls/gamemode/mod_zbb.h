@@ -44,12 +44,14 @@ public:
 	CMod_ZombieBaseBuilder();
 
 	BOOL IsAllowedToSpawn(CBaseEntity *pEntity) override;
-
+	void RestartRound() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
 
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 	int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet)  override;
+
+	int ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther) override;
 
 	BOOL FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker) override;
 

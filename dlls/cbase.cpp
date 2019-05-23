@@ -9,6 +9,8 @@
 #include "game.h"
 #include "MemPool.h"
 
+#include "gamemode/mods.h"
+
 #include "game_shared/perf_counter.h"
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
 
@@ -391,11 +393,22 @@ void OnFreeEntPrivateData(edict_t *pEnt)
 	CBaseEntity::CheckEntityDestructor(pEntity);
 }
 
+int ShouldCollide(edict_t *pentTouched, edict_t *pentOther)
+{
+	CBaseEntity *pEntity = (CBaseEntity *)GET_PRIVATE(pentTouched);
+	CBaseEntity *pOther = (CBaseEntity *)GET_PRIVATE(pentOther);
+
+	if (g_pModRunning && pEntity && pOther && !((pEntity->pev->flags | pOther->pev->flags) & FL_KILLME))
+		return g_pModRunning->ShouldCollide(pEntity, pOther);
+
+	return 1; // by default
+}
+
 NEW_DLL_FUNCTIONS gNewDLLFunctions =
 {
 	OnFreeEntPrivateData,
 	nullptr,
-	nullptr,
+	ShouldCollide,
 	nullptr,
 	nullptr
 };
@@ -470,7 +483,7 @@ void DispatchKeyValue(edict_t *pentKeyvalue, KeyValueData *pkvd)
 		pEntity->KeyValue(pkvd);
 }
 
-BOOL gTouchDisabled = FALSE;
+constexpr BOOL gTouchDisabled = FALSE;
 
 void DispatchTouch(edict_t *pentTouched, edict_t *pentOther)
 {
