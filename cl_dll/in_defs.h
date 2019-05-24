@@ -8,12 +8,15 @@
 #if !defined( IN_DEFSH )
 #define IN_DEFSH
 
-// up / down
-#define	PITCH	0
-// left / right
-#define	YAW		1
-// fall over
-#define	ROLL	2 
+enum : size_t
+{
+	// up / down
+	PITCH = 0,
+	// left / right
+	YAW = 1,
+	// fall over
+	ROLL = 2
+};
 
 #ifdef _WIN32
 #include <windows.h>

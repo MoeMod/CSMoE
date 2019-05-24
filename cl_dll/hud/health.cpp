@@ -29,15 +29,16 @@
 #include "eventscripts.h"
 
 #include "draw_util.h"
+#include "const/const_client.h"
 
 DECLARE_MESSAGE(m_Health, Health )
 DECLARE_MESSAGE(m_Health, Damage )
 DECLARE_MESSAGE(m_Health, ScoreAttrib )
 DECLARE_MESSAGE(m_Health, ClCorpse )
 
-#define PAIN_NAME "sprites/%d_pain.spr"
-#define DAMAGE_NAME "sprites/%d_dmg.spr"
-#define EPSILON 0.4f
+constexpr auto PAIN_NAME = "sprites/%d_pain.spr";
+constexpr auto DAMAGE_NAME = "sprites/%d_dmg.spr";
+constexpr auto EPSILON = 0.4f;
 
 int giDmgHeight, giDmgWidth;
 

@@ -256,7 +256,7 @@ public:
 	float GetDistanceSquaredToPoint(const Vector *pos) const;			// return shortest distance between point and this area
 	bool IsDegenerate() const;											// return true if this area is badly formed
 	bool IsEdge(NavDirType dir) const;									// return true if there are no bi-directional links on the given side
-	int GetAdjacentCount(NavDirType dir) const { return m_connect[dir].size(); }		// return number of connected areas in given direction
+	size_t GetAdjacentCount(NavDirType dir) const { return m_connect[dir].size(); }		// return number of connected areas in given direction
 	CNavArea *GetAdjacentArea(NavDirType dir, int i) const;				// return the i'th adjacent area in the given direction
 	CNavArea *GetRandomAdjacentArea(NavDirType dir) const;
 	const NavConnectList *GetAdjacentList(NavDirType dir) const { return &m_connect[dir]; }

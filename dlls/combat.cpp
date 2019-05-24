@@ -2,6 +2,7 @@
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
+#include "schedule.h"
 #include "monsters.h"
 #include "soundent.h"
 #include "decals.h"

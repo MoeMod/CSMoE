@@ -43,15 +43,15 @@
 #include "ev_hldm.h"
 #include "com_weapons.h"
 
-#ifndef PITCH
-// MOVEMENT INFO
-// up / down
-#define	PITCH	0
-// left / right
-#define	YAW		1
-// fall over
-#define	ROLL	2
-#endif
+enum : size_t
+{
+	// up / down
+	PITCH = 0,
+	// left / right
+	YAW = 1,
+	// fall over
+	ROLL = 2
+};
 
 #define DECLARE_EVENT( x ) void EV_##x( struct event_args_s *args )
 #define HOOK_EVENT( x, y ) gEngfuncs.pfnHookEvent( "events/" #x ".sc", EV_##y )

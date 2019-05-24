@@ -43,10 +43,6 @@
     <Filter Include="public\tier1">
       <UniqueIdentifier>{bae4f794-6891-495d-9cff-05a5792ef802}</UniqueIdentifier>
     </Filter>
-    <Filter Include="public\Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="dlls\gamemode">
       <UniqueIdentifier>{05781758-34ad-449d-9004-158d86af0488}</UniqueIdentifier>
     </Filter>
@@ -73,6 +69,13 @@
     </Filter>
     <Filter Include="dlls\gamemode\zb1">
       <UniqueIdentifier>{81c74af9-4330-4121-a5fa-36fee5a453ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="public\const">
+      <UniqueIdentifier>{98fd8c90-5625-473c-90c0-d723f7879ef6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1460,6 +1463,15 @@
     </ClInclude>
     <ClInclude Include="..\dlls\cbase\cbase_physint.h">
       <Filter>dlls\cbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\const\const_client.h">
+      <Filter>public\const</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\const\const_server.h">
+      <Filter>public\const</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\const\const_shared.h">
+      <Filter>public\const</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

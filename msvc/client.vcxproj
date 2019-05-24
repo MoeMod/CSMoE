@@ -212,10 +212,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\cl_dll\calcscreen.h" />
+    <ClInclude Include="..\cl_dll\com_weapons.h" />
     <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h" />
+    <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons_register.h" />
     <ClInclude Include="..\cl_dll\cs_wpn\wpn_shared.h" />
+    <ClInclude Include="..\cl_dll\demo.h" />
+    <ClInclude Include="..\cl_dll\draw_util.h" />
+    <ClInclude Include="..\cl_dll\events.h" />
+    <ClInclude Include="..\cl_dll\eventscripts.h" />
+    <ClInclude Include="..\cl_dll\ev_hldm.h" />
+    <ClInclude Include="..\cl_dll\hud\ammo.h" />
+    <ClInclude Include="..\cl_dll\hud\ammohistory.h" />
     <ClInclude Include="..\cl_dll\hud\followicon.h" />
+    <ClInclude Include="..\cl_dll\hud\health.h" />
+    <ClInclude Include="..\cl_dll\hud\hud.h" />
+    <ClInclude Include="..\cl_dll\hud\hud_iface.h" />
+    <ClInclude Include="..\cl_dll\hud\hud_spectator.h" />
     <ClInclude Include="..\cl_dll\hud\hud_sub.h" />
+    <ClInclude Include="..\cl_dll\hud\hud_sub_impl.h" />
     <ClInclude Include="..\cl_dll\hud\legacy\hud_radar_legacy.h" />
     <ClInclude Include="..\cl_dll\hud\legacy\hud_scoreboard_legacy.h" />
     <ClInclude Include="..\cl_dll\hud\modern\hud_radar_modern.h" />
@@ -234,7 +248,17 @@
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
+    <ClInclude Include="..\cl_dll\input.h" />
+    <ClInclude Include="..\cl_dll\in_defs.h" />
+    <ClInclude Include="..\cl_dll\kbutton.h" />
+    <ClInclude Include="..\cl_dll\parsemsg.h" />
+    <ClInclude Include="..\cl_dll\rain.h" />
     <ClInclude Include="..\cl_dll\r_texture.h" />
+    <ClInclude Include="..\cl_dll\studio\GameStudioModelRenderer.h" />
+    <ClInclude Include="..\cl_dll\studio\StudioModelRenderer.h" />
+    <ClInclude Include="..\cl_dll\studio\studio_util.h" />
+    <ClInclude Include="..\cl_dll\vgui_parser.h" />
+    <ClInclude Include="..\cl_dll\view.h" />
     <ClInclude Include="..\common\bspfile.h" />
     <ClInclude Include="..\common\cl_entity.h" />
     <ClInclude Include="..\common\com_model.h" />
@@ -244,6 +268,7 @@
     <ClInclude Include="..\common\event_api.h" />
     <ClInclude Include="..\common\mathlib.h" />
     <ClInclude Include="..\common\render_api.h" />
+    <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />

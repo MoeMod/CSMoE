@@ -16,13 +16,15 @@
 
 #include "mathlib.h"
 
-
-// up / down
-#define	PITCH	0
-// left / right
-#define	YAW	1
-// fall over
-#define	ROLL	2 
+enum : size_t
+{
+	// up / down
+	PITCH = 0,
+	// left / right
+	YAW = 1,
+	// fall over
+	ROLL = 2
+};
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)

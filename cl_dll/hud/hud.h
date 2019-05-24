@@ -21,12 +21,6 @@
 //
 #pragma once
 
-#define RGB_YELLOWISH 0x00FFA000 //255,160,0
-#define RGB_REDISH 0x00FF1010 //255,16,16
-#define RGB_GREENISH 0x0000A000 //0,160,0
-#define RGB_WHITE 0x00FFFFFF
-#define RGB_LIGHTBLUE 0x0072C5FF //114, 197, 255
-
 #include <assert.h>
 #include <string.h>
 
@@ -39,8 +33,6 @@
 
 enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
-#define MIN_ALPHA	 100	
-#define	HUDELEM_ACTIVE	1
 #define CHudMsgFunc(x) int MsgFunc_##x(const char *pszName, int iSize, void *buf)
 #define CHudUserCmd(x) void UserCmd_##x()
 
@@ -79,14 +71,13 @@ inline bool BIsValidCTModelIndex( int i )
 		return false;
 }
 
-#define HUD_DRAW         (1 << 0)
-#define HUD_THINK        (1 << 1)
-#define HUD_ACTIVE       (HUD_DRAW | HUD_THINK)
-#define HUD_INTERMISSION (1 << 2)
-
-#define MAX_PLAYER_NAME_LENGTH		32
-
-#define	MAX_MOTD_LENGTH				1536
+constexpr int HUDELEM_ACTIVE = 1;
+constexpr int HUD_DRAW = (1 << 0);
+constexpr int HUD_THINK = (1 << 1);
+constexpr int HUD_ACTIVE = (HUD_DRAW | HUD_THINK);
+constexpr int HUD_INTERMISSION = (1 << 2);
+constexpr size_t MAX_PLAYER_NAME_LENGTH = 32;
+constexpr size_t MAX_MOTD_LENGTH = 1536;
 
 //
 //-----------------------------------------------------
@@ -608,7 +599,7 @@ private:
 //
 //-----------------------------------------------------
 //
-#define MAX_SPRITE_NAME_LENGTH	24
+constexpr size_t MAX_SPRITE_NAME_LENGTH = 24;
 
 class CHudStatusIcons: public CHudBase
 {
@@ -653,8 +644,6 @@ private:
 //
 //-----------------------------------------------------
 //
-#define MONEY_YPOS ScreenHeight - 3 * gHUD.m_iFontHeight
-
 class CHudMoney : public CHudBase
 {
 public:

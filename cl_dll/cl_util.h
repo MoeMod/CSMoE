@@ -47,56 +47,47 @@ inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat(
 inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( (char*)x ); }
 inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( (char*)cv, (char*)val, flags ); }
 
-#define SPR_Load (*gEngfuncs.pfnSPR_Load)
-#define SPR_Set (*gEngfuncs.pfnSPR_Set)
-#define SPR_Frames (*gEngfuncs.pfnSPR_Frames)
-#define SPR_GetList (*gEngfuncs.pfnSPR_GetList)
+constexpr const auto &SPR_Load = (gEngfuncs.pfnSPR_Load);
+constexpr const auto &SPR_Set = (gEngfuncs.pfnSPR_Set);
+constexpr const auto &SPR_Frames = (gEngfuncs.pfnSPR_Frames);
+constexpr const auto &SPR_GetList = (gEngfuncs.pfnSPR_GetList);
 
 // SPR_Draw  draws a the current sprite as solid
-#define SPR_Draw (*gEngfuncs.pfnSPR_Draw)
+constexpr const auto &SPR_Draw = (gEngfuncs.pfnSPR_Draw);
 // SPR_DrawHoles  draws the current sprites,  with color index255 not drawn (transparent)
-#define SPR_DrawHoles (*gEngfuncs.pfnSPR_DrawHoles)
+constexpr const auto &SPR_DrawHoles = (gEngfuncs.pfnSPR_DrawHoles);
 // SPR_DrawAdditive  adds the sprites RGB values to the background  (additive transulency)
-#define SPR_DrawAdditive (*gEngfuncs.pfnSPR_DrawAdditive)
-
+constexpr const auto &SPR_DrawAdditive = (gEngfuncs.pfnSPR_DrawAdditive);
 // SPR_EnableScissor  sets a clipping rect for HUD sprites.  (0,0) is the top-left hand corner of the screen.
-#define SPR_EnableScissor (*gEngfuncs.pfnSPR_EnableScissor)
+constexpr const auto &SPR_EnableScissor = (gEngfuncs.pfnSPR_EnableScissor);
 // SPR_DisableScissor  disables the clipping rect
-#define SPR_DisableScissor (*gEngfuncs.pfnSPR_DisableScissor)
+constexpr const auto &SPR_DisableScissor = (gEngfuncs.pfnSPR_DisableScissor);
 //
-#define FillRGBA (*gEngfuncs.pfnFillRGBA)
-#define FillRGBABlend (*gEngfuncs.pfnFillRGBABlend)
-
+constexpr const auto &FillRGBA = (gEngfuncs.pfnFillRGBA);
+constexpr const auto &FillRGBABlend = (gEngfuncs.pfnFillRGBABlend);
 
 // ScreenHeight returns the height of the screen, in pixels
-#define ScreenHeight (gHUD.m_scrinfo.iHeight)
 // ScreenWidth returns the width of the screen, in pixels
-#define ScreenWidth (gHUD.m_scrinfo.iWidth)
-
-#define TrueHeight (gHUD.m_truescrinfo.iHeight)
-#define TrueWidth (gHUD.m_truescrinfo.iWidth)
+constexpr const auto &ScreenHeight = (gHUD.m_scrinfo.iHeight);
+constexpr const auto &ScreenWidth = (gHUD.m_scrinfo.iWidth);
+constexpr const auto &TrueHeight = (gHUD.m_truescrinfo.iHeight);
+constexpr const auto &TrueWidth = (gHUD.m_truescrinfo.iWidth);
 
 // Use this to set any co-ords in 640x480 space
-#define XRES(x)		((int)(float(x)  * ((float)ScreenWidth / 640.0f) + 0.5f))
-#define YRES(y)		((int)(float(y)  * ((float)ScreenHeight / 480.0f) + 0.5f))
+constexpr int XRES(float x) { return x * (static_cast<float>(ScreenWidth) / 640.0f) + 0.5f;  }
+constexpr int YRES(float y) { return y * (static_cast<float>(ScreenHeight) / 480.0f) + 0.5f;  }
 
 // use this to project world coordinates to screen coordinates
-#define XPROJECT(x)	( (1.0f+(x))*ScreenWidth*0.5f )
-#define YPROJECT(y) ( (1.0f-(y))*ScreenHeight*0.5f )
+constexpr float XPROJECT(float x) { return (1.0f + x) * ScreenWidth * 0.5f; }
+constexpr float YPROJECT(float y) { return (1.0f - y) * ScreenHeight * 0.5f; }
 
-#define GetScreenInfo (*gEngfuncs.pfnGetScreenInfo)
-#define ServerCmd (*gEngfuncs.pfnServerCmd)
-
-//#define ClientCmd (*gEngfuncs.pfnClientCmd)
-inline int ClientCmd(const char *szCmdString)
-{
-	return gEngfuncs.pfnClientCmd(const_cast<char *>(szCmdString));
-}
-
-#define SetCrosshair (*gEngfuncs.pfnSetCrosshair)
-#define AngleVectors (*gEngfuncs.pfnAngleVectors)
-#define Com_RandomLong (*gEngfuncs.pfnRandomLong)
-#define Com_RandomFloat (*gEngfuncs.pfnRandomFloat)
+constexpr const auto &GetScreenInfo = (gEngfuncs.pfnGetScreenInfo);
+constexpr const auto &ServerCmd = (gEngfuncs.pfnServerCmd);
+constexpr const auto &ClientCmd = (gEngfuncs.pfnClientCmd);
+constexpr const auto &SetCrosshair = (gEngfuncs.pfnSetCrosshair);
+constexpr const auto &AngleVectors = (gEngfuncs.pfnAngleVectors);
+constexpr const auto &Com_RandomLong = (gEngfuncs.pfnRandomLong);
+constexpr const auto &Com_RandomFloat = (gEngfuncs.pfnRandomFloat);
 
 extern float color[3]; // hud.cpp
 
@@ -126,17 +117,16 @@ inline void CenterPrint( const char *string )
 }
 
 // returns the players name of entity no.
-#define GetPlayerInfo (*gEngfuncs.pfnGetPlayerInfo)
+constexpr const auto &GetPlayerInfo = (gEngfuncs.pfnGetPlayerInfo);
 
 // sound functions
 inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( const_cast<char *>(szSound), vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
-//#define max(a, b)  (((a) > (b)) ? (a) : (b))
-//#define min(a, b)  (((a) < (b)) ? (a) : (b))
 #include "minmax.h"
 #ifndef __APPLE__
-#define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
+// template functions are considered after non-template functions, so it will not conflict with math.h
+template<class T> constexpr T fabs(T x) { return ((x) > 0 ? (x) : 0 - (x)); }
 #endif
 
 #if 0
@@ -158,6 +148,7 @@ template<class VectorTypeA> void VectorClear(VectorTypeA &a) { a[0] = 0.0; a[1] 
 template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) { return sqrt(DotProduct(a, a)); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorTypeC> void VectorMA(const VectorTypeA &a, ScaleType scale, const VectorTypeB &b, VectorTypeC &c) { ((c)[0] = (a)[0] + (scale) * (b)[0], (c)[1] = (a)[1] + (scale) * (b)[1], (c)[2] = (a)[2] + (scale) * (b)[2]); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
+template<class VectorTypeA> void VectorInverse(VectorTypeA &x) { ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2]); }
 #endif
 
 namespace cl{
@@ -165,7 +156,6 @@ namespace cl{
 	float VectorNormalize(vec_t v[3]); // pm_math.h
 	extern vec_t vec3_origin[3];
 }
-#define VectorInverse(x) ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2])
 
 #ifdef MSC_VER
 // disable 'possible loss of data converting float to int' warning message
@@ -216,7 +206,19 @@ inline void GetTeamColor( int &r, int &g, int &b, int teamIndex )
 	}
 }
 
-#define bound( min, num, max ) ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
-#define RAD2DEG( x )	((float)(x) * (float)(180.f / M_PI))
-#define DEG2RAD( x )	((float)(x) * (float)(M_PI / 180.f))
+template<class MinType, class NumType, class MaxType> constexpr auto bound(MinType min, NumType num, MaxType max) { return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));  }
+
+#ifdef M_PI
+#undef M_PI
+#endif
+
+#if __cplusplus >= 201402L // C++14
+template<class T>
+constexpr T M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
+#else
+constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
+#endif
+
+constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
+constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }
 

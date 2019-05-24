@@ -23,7 +23,6 @@
 #include "rain.h"
 #include "com_model.h"
 #include "studio.h"
-#include "studio_util.h"
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 #include "com_weapons.h"

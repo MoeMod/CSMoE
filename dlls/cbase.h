@@ -19,23 +19,11 @@
 #pragma once
 #endif
 
-#define FCAP_CUSTOMSAVE 0x00000001
-#define FCAP_ACROSS_TRANSITION 0x00000002
-#define FCAP_MUST_SPAWN 0x00000004
-#define FCAP_DONT_SAVE 0x80000000
-#define FCAP_IMPULSE_USE 0x00000008
-#define FCAP_CONTINUOUS_USE 0x00000010
-#define FCAP_ONOFF_USE 0x00000020
-#define FCAP_DIRECTIONAL_USE 0x00000040
-#define FCAP_MASTER 0x00000080
-#define FCAP_FORCE_TRANSITION 0x00000080
+#include "const/const_server.h"
 
 #include "saverestore.h"
-#include "schedule.h"
-
-#ifndef MONSTEREVENT_H
+//#include "schedule.h"
 #include "monsterevent.h"
-#endif
 
 #include <UtlVector.h>
 
@@ -111,24 +99,6 @@ extern void FireTargets(const char *targetName, CBaseEntity *pActivator, CBaseEn
 }
 #endif // #ifndef CLIENT_DLL
 
-#define CLASS_NONE 0
-#define CLASS_MACHINE 1
-#define CLASS_PLAYER 2
-#define CLASS_HUMAN_PASSIVE 3
-#define CLASS_HUMAN_MILITARY 4
-#define CLASS_ALIEN_MILITARY 5
-#define CLASS_ALIEN_PASSIVE 6
-#define CLASS_ALIEN_MONSTER 7
-#define CLASS_ALIEN_PREY 8
-#define CLASS_ALIEN_PREDATOR 9
-#define CLASS_INSECT 10
-#define CLASS_PLAYER_ALLY 11
-#define CLASS_PLAYER_BIOWEAPON 12
-#define CLASS_ALIEN_BIOWEAPON 13
-#define CLASS_VEHICLE 14
-#define CLASS_BARNACLE 99
-
-
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -146,8 +116,6 @@ class CSquadMonster;
 class CBasePlayer;
 
 }
-
-#define SF_NORESPAWN (1<<30)
 
 #include "ehandle.h"
 
@@ -513,8 +481,6 @@ public:
 	BOOL m_fSequenceLoops;
 };
 
-#define SF_ITEM_USE_ONLY 256
-
 class CBaseToggle : public CBaseAnimating
 {
 public:
@@ -565,99 +531,16 @@ public:
 	Vector m_vecFinalAngle;
 	int m_bitsDamageInflict;
 	string_t m_sMaster;
+
+public:
+	template <typename T>
+	auto SetMoveDone(void (T::*pfn)(void)) -> typename std::enable_if<std::is_base_of<CBaseToggle, T>::value>::type
+	{
+		m_pfnCallWhenMoveDone = static_cast<void (CBaseToggle::*)(void)>(pfn);
+	}
 };
 
-#define SetMoveDone(a) m_pfnCallWhenMoveDone = static_cast<void (CBaseToggle::*)(void)>(a)
-
 } // namespace sv | cl
-
-#define GIB_HEALTH_VALUE -30
-
-#define ROUTE_SIZE 8
-#define MAX_OLD_ENEMIES 4
-
-#define bits_CAP_DUCK (1<<0)
-#define bits_CAP_JUMP (1<<1)
-#define bits_CAP_STRAFE (1<<2)
-#define bits_CAP_SQUAD (1<<3)
-#define bits_CAP_SWIM (1<<4)
-#define bits_CAP_CLIMB (1<<5)
-#define bits_CAP_USE (1<<6)
-#define bits_CAP_HEAR (1<<7)
-#define bits_CAP_AUTO_DOORS (1<<8)
-#define bits_CAP_OPEN_DOORS (1<<9)
-#define bits_CAP_TURN_HEAD (1<<10)
-#define bits_CAP_RANGE_ATTACK1 (1<<11)
-#define bits_CAP_RANGE_ATTACK2 (1<<12)
-#define bits_CAP_MELEE_ATTACK1 (1<<13)
-#define bits_CAP_MELEE_ATTACK2 (1<<14)
-#define bits_CAP_FLY (1<<15)
-#define bits_CAP_DOORS_GROUP (bits_CAP_USE | bits_CAP_AUTO_DOORS | bits_CAP_OPEN_DOORS)
-
-#define DMG_GENERIC 0
-#define DMG_CRUSH (1<<0)
-#define DMG_BULLET (1<<1)
-#define DMG_SLASH (1<<2)
-#define DMG_BURN (1<<3)
-#define DMG_FREEZE (1<<4)
-#define DMG_FALL (1<<5)
-#define DMG_BLAST (1<<6)
-#define DMG_CLUB (1<<7)
-#define DMG_SHOCK (1<<8)
-#define DMG_SONIC (1<<9)
-#define DMG_ENERGYBEAM (1<<10)
-#define DMG_NEVERGIB (1<<12)
-#define DMG_ALWAYSGIB (1<<13)
-#define DMG_DROWN (1<<14)
-#define DMG_TIMEBASED (~(0x3FFF))
-
-#define DMG_PARALYZE (1<<15)
-#define DMG_NERVEGAS (1<<16)
-#define DMG_POISON (1<<17)
-#define DMG_RADIATION (1<<18)
-#define DMG_DROWNRECOVER (1<<19)
-#define DMG_ACID (1<<20)
-#define DMG_SLOWBURN (1<<21)
-#define DMG_SLOWFREEZE (1<<22)
-#define DMG_MORTAR (1<<23)
-#define DMG_EXPLOSION (1<<24)
-#define DMG_GIB_CORPSE (DMG_CRUSH | DMG_FALL | DMG_BLAST | DMG_SONIC | DMG_CLUB)
-#define DMG_SHOWNHUD (DMG_POISON | DMG_ACID | DMG_FREEZE | DMG_SLOWFREEZE | DMG_DROWN | DMG_BURN | DMG_SLOWBURN | DMG_NERVEGAS | DMG_RADIATION | DMG_SHOCK)
-
-#define PARALYZE_DURATION 2
-#define PARALYZE_DAMAGE 1.0
-
-#define NERVEGAS_DURATION 2
-#define NERVEGAS_DAMAGE 5.0
-
-#define POISON_DURATION 5
-#define POISON_DAMAGE 2.0
-
-#define RADIATION_DURATION 2
-#define RADIATION_DAMAGE 1.0
-
-#define ACID_DURATION 2
-#define ACID_DAMAGE 5.0
-
-#define SLOWBURN_DURATION 2
-#define SLOWBURN_DAMAGE 1.0
-
-#define SLOWFREEZE_DURATION 2
-#define SLOWFREEZE_DAMAGE 1.0
-
-#define itbd_Paralyze 0
-#define itbd_NerveGas 1
-#define itbd_Poison 2
-#define itbd_Radiation 3
-#define itbd_DrownRecover 4
-#define itbd_Acid 5
-#define itbd_SlowBurn 6
-#define itbd_SlowFreeze 7
-#define CDMG_TIMEBASED 8
-
-#define GIB_NORMAL 0
-#define GIB_NEVER 1
-#define GIB_ALWAYS 2
 
 namespace sv {
 class CCineMonster;

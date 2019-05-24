@@ -25,6 +25,10 @@
 #include "event_api.h"
 #include "pm_shared.h"
 
+// defaults for clientinfo messages
+constexpr int DEFAULT_VIEWHEIGHT = 28;
+constexpr int VEC_DUCK_VIEW = 12;
+
 /*
 =================
 EV_GetGunPosition

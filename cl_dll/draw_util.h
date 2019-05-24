@@ -30,14 +30,19 @@
 #define DRAW_UTIL_H
 // Drawing primitives
 
-#define DHN_DRAWZERO 1
-#define DHN_2DIGITS 2
-#define DHN_3DIGITS 4
-#define DHN_FILLZERO 8
-#define DHN_4DIGITS 16
-#define DHN_5DIGITS 32
-#define MIN_ALPHA 100
+constexpr int DHN_DRAWZERO = 1;
+constexpr int DHN_2DIGITS = 2;
+constexpr int DHN_3DIGITS = 4;
+constexpr int DHN_FILLZERO = 8;
+constexpr int DHN_4DIGITS = 16;
+constexpr int DHN_5DIGITS = 32;
+constexpr int MIN_ALPHA = 100;
 
+constexpr unsigned long RGB_YELLOWISH = 0x00FFA000; //255,160,0
+constexpr unsigned long RGB_REDISH = 0x00FF1010; //255,16,16
+constexpr unsigned long RGB_GREENISH = 0x0000A000; //0,160,0
+constexpr unsigned long RGB_WHITE = 0x00FFFFFF; //0,160,0
+constexpr unsigned long RGB_LIGHTBLUE = 0x0072C5FF; //114, 197, 255
 
 class DrawUtils
 {

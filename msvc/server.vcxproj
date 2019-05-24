@@ -855,6 +855,9 @@
     <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\arraysize.h" />
     <ClInclude Include="..\public\basetypes.h" />
+    <ClInclude Include="..\public\const\const_client.h" />
+    <ClInclude Include="..\public\const\const_server.h" />
+    <ClInclude Include="..\public\const\const_shared.h" />
     <ClInclude Include="..\public\json.hpp" />
     <ClInclude Include="..\public\MemPool.h" />
     <ClInclude Include="..\public\minmax.h" />

@@ -935,5 +935,80 @@
     <ClInclude Include="..\pm_shared\pm_defs.h">
       <Filter>pm_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\cl_dll\com_weapons.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\view.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cdll_dll.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\demo.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\draw_util.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\ev_hldm.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\events.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\eventscripts.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\in_defs.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\input.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\kbutton.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\parsemsg.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\rain.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui_parser.h">
+      <Filter>cl_dll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\studio\StudioModelRenderer.h">
+      <Filter>cl_dll\studio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\studio\GameStudioModelRenderer.h">
+      <Filter>cl_dll\studio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\studio\studio_util.h">
+      <Filter>cl_dll\studio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\ammohistory.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\ammo.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\hud_iface.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\hud_spectator.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\health.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\hud.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\hud\hud_sub_impl.h">
+      <Filter>cl_dll\hud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons_register.h">
+      <Filter>cl_dll\cs_wpn</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

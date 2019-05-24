@@ -1,7 +1,17 @@
-//
-// Created by 小白白 on 2019-05-20.
-//
+/*
+buttons.h - CSMoE Client : CBaseButton
+Copyright (C) 2019 Moemod Hymei
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 #ifndef PROJECT_BUTTONS_H
 #define PROJECT_BUTTONS_H
 
@@ -9,8 +19,8 @@
 
 namespace sv {
 
-#define MAX_MULTI_TARGETS 16
-#define MS_MAX_TARGETS 32
+constexpr size_t MAX_MULTI_TARGETS = 16;
+constexpr size_t MS_MAX_TARGETS = 32;
 
 class CMultiSource : public CPointEntity
 {
