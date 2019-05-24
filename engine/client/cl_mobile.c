@@ -53,7 +53,7 @@ static void pfnVibrate( float life, char flags )
 	Android_Vibrate( life * vibration_length->value, flags );
 #endif
 
-#if __APPLE__
+#if TARGET_OS_IPHONE
 	TapicEngine_Vibrate( life > 0 ? TapicEngine_Pop : TapicEngine_Peek );
 #endif
 }

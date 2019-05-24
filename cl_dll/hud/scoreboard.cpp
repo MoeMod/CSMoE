@@ -212,6 +212,7 @@ const char *GetGameModeName()
 	case MOD_ZB4	: return "Zombie Darkness";
 	case MOD_GD		: return "GunDeath Match";
 	case MOD_ZBB	: return "Zombie BaseBuilder";
+	default			: break;
 	}
 	return "Unknown";
 }

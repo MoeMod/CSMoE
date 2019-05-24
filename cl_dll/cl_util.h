@@ -43,84 +43,72 @@ extern cvar_t *hud_textmode;
 	gHUD.y.UserCmd_##x( ); \
 	}
 
-inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat( (char*)x ); }
-inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( (char*)x ); }
-inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( (char*)cv, (char*)val, flags ); }
+inline float CVAR_GET_FLOAT( const char *x ) {	return gEngfuncs.pfnGetCvarFloat( x ); }
+inline char* CVAR_GET_STRING( const char *x ) {	return gEngfuncs.pfnGetCvarString( x ); }
+inline struct cvar_s *CVAR_CREATE( const char *cv, const char *val, const int flags ) {	return gEngfuncs.pfnRegisterVariable( cv, val, flags ); }
 
-constexpr const auto &SPR_Load = (gEngfuncs.pfnSPR_Load);
-constexpr const auto &SPR_Set = (gEngfuncs.pfnSPR_Set);
-constexpr const auto &SPR_Frames = (gEngfuncs.pfnSPR_Frames);
-constexpr const auto &SPR_GetList = (gEngfuncs.pfnSPR_GetList);
+inline HSPRITE SPR_Load( const char *szPicName ) { return (*gEngfuncs.pfnSPR_Load)(szPicName);}
+inline void SPR_Set( HSPRITE hPic, int r, int g, int b ) { return (*gEngfuncs.pfnSPR_Set)(hPic, r, g, b);}
+inline int SPR_Frames( HSPRITE hPic ) { return (*gEngfuncs.pfnSPR_Frames)(hPic); }
+inline client_sprite_t *SPR_GetList( const char *psz, int *piCount ) { return (*gEngfuncs.pfnSPR_GetList)(psz, piCount); }
 
 // SPR_Draw  draws a the current sprite as solid
-constexpr const auto &SPR_Draw = (gEngfuncs.pfnSPR_Draw);
+inline void SPR_Draw( int frame, int x, int y, const wrect_t *prc ) { return (*gEngfuncs.pfnSPR_Draw)(frame, x, y, prc); }
 // SPR_DrawHoles  draws the current sprites,  with color index255 not drawn (transparent)
-constexpr const auto &SPR_DrawHoles = (gEngfuncs.pfnSPR_DrawHoles);
+inline void SPR_DrawHoles( int frame, int x, int y, const wrect_t *prc ) { return (*gEngfuncs.pfnSPR_DrawHoles)(frame, x, y, prc); }
 // SPR_DrawAdditive  adds the sprites RGB values to the background  (additive transulency)
-constexpr const auto &SPR_DrawAdditive = (gEngfuncs.pfnSPR_DrawAdditive);
+inline void SPR_DrawAdditive( int frame, int x, int y, const wrect_t *prc ) { return (*gEngfuncs.pfnSPR_DrawAdditive)(frame, x, y, prc); }
 // SPR_EnableScissor  sets a clipping rect for HUD sprites.  (0,0) is the top-left hand corner of the screen.
-constexpr const auto &SPR_EnableScissor = (gEngfuncs.pfnSPR_EnableScissor);
+inline void SPR_EnableScissor( int x, int y, int width, int height ) { return (*gEngfuncs.pfnSPR_EnableScissor)(x, y, width, height); }
 // SPR_DisableScissor  disables the clipping rect
-constexpr const auto &SPR_DisableScissor = (gEngfuncs.pfnSPR_DisableScissor);
+inline void SPR_DisableScissor(  ) { return (*gEngfuncs.pfnSPR_DisableScissor)(); }
 //
-constexpr const auto &FillRGBA = (gEngfuncs.pfnFillRGBA);
-constexpr const auto &FillRGBABlend = (gEngfuncs.pfnFillRGBABlend);
+inline void	FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a ) { return (*gEngfuncs.pfnFillRGBA)(x, y, width, height, r, g, b, a); }
+inline void	FillRGBABlend( int x, int y, int width, int height, int r, int g, int b, int a ) { return (*gEngfuncs.pfnFillRGBABlend)(x, y, width, height, r, g, b, a); }
 
 // ScreenHeight returns the height of the screen, in pixels
 // ScreenWidth returns the width of the screen, in pixels
-constexpr const auto &ScreenHeight = (gHUD.m_scrinfo.iHeight);
-constexpr const auto &ScreenWidth = (gHUD.m_scrinfo.iWidth);
-constexpr const auto &TrueHeight = (gHUD.m_truescrinfo.iHeight);
-constexpr const auto &TrueWidth = (gHUD.m_truescrinfo.iWidth);
+namespace detail {
+struct ScreenHeightGetterProxy { operator int() const { return gHUD.m_scrinfo.iHeight; } };
+struct ScreenWidthGetterProxy { operator int() const { return gHUD.m_scrinfo.iWidth; } };
+struct TrueHeightGetterProxy { operator int() const { return gHUD.m_truescrinfo.iHeight; } };
+struct TrueWidthGetterProxy { operator int() const { return gHUD.m_truescrinfo.iWidth; } };
+}
+constexpr detail::ScreenHeightGetterProxy ScreenHeight;
+constexpr detail::ScreenWidthGetterProxy ScreenWidth;
+constexpr detail::TrueHeightGetterProxy TrueHeight;
+constexpr detail::TrueWidthGetterProxy TrueWidth;
 
 // Use this to set any co-ords in 640x480 space
-constexpr int XRES(float x) { return x * (static_cast<float>(ScreenWidth) / 640.0f) + 0.5f;  }
-constexpr int YRES(float y) { return y * (static_cast<float>(ScreenHeight) / 480.0f) + 0.5f;  }
+inline int XRES(float x) { return static_cast<int>(x * (static_cast<float>(ScreenWidth) / 640.0f) + 0.5f);  }
+inline int YRES(float y) { return static_cast<int>(y * (static_cast<float>(ScreenHeight) / 480.0f) + 0.5f);  }
 
 // use this to project world coordinates to screen coordinates
-constexpr float XPROJECT(float x) { return (1.0f + x) * ScreenWidth * 0.5f; }
-constexpr float YPROJECT(float y) { return (1.0f - y) * ScreenHeight * 0.5f; }
+inline float XPROJECT(float x) { return (1.0f + x) * ScreenWidth * 0.5f; }
+inline float YPROJECT(float y) { return (1.0f - y) * ScreenHeight * 0.5f; }
 
-constexpr const auto &GetScreenInfo = (gEngfuncs.pfnGetScreenInfo);
-constexpr const auto &ServerCmd = (gEngfuncs.pfnServerCmd);
-constexpr const auto &ClientCmd = (gEngfuncs.pfnClientCmd);
-constexpr const auto &SetCrosshair = (gEngfuncs.pfnSetCrosshair);
-constexpr const auto &AngleVectors = (gEngfuncs.pfnAngleVectors);
-constexpr const auto &Com_RandomLong = (gEngfuncs.pfnRandomLong);
-constexpr const auto &Com_RandomFloat = (gEngfuncs.pfnRandomFloat);
+inline int GetScreenInfo( SCREENINFO *pscrinfo ) { return gEngfuncs.pfnGetScreenInfo(pscrinfo); }
+inline int ServerCmd( const char *szCmdString ) { return gEngfuncs.pfnServerCmd(szCmdString); }
+inline int ClientCmd( const char *szCmdString ) { return gEngfuncs.pfnClientCmd(szCmdString); }
+inline void SetCrosshair( HSPRITE hspr, wrect_t rc, int r, int g, int b ) { return gEngfuncs.pfnSetCrosshair(hspr, rc, r, g, b); }
+inline void AngleVectors( const float *vecAngles, float *forward, float *right, float *up ) { return gEngfuncs.pfnAngleVectors(vecAngles, forward, right, up); }
+inline int Com_RandomLong( int lLow, int lHigh ) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
+inline float Com_RandomFloat( float flLow, float flHigh ) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
 
 extern float color[3]; // hud.cpp
 
 // Gets the height & width of a sprite,  at the specified frame
-inline int SPR_Height( HSPRITE x, int f )
-{
-	return gEngfuncs.pfnSPR_Height(x, f);
-}
-inline int SPR_Width( HSPRITE x, int f )
-{
-	return gEngfuncs.pfnSPR_Width(x, f);
-}
-
-inline client_textmessage_t *TextMessageGet( const char *pName )
-{
-	return gEngfuncs.pfnTextMessageGet( pName );
-}
-
-inline void ConsolePrint( const char *string )
-{
-	gEngfuncs.pfnConsolePrint( string );
-}
-
-inline void CenterPrint( const char *string )
-{
-	gEngfuncs.pfnCenterPrint( string );
-}
+inline int SPR_Height( HSPRITE x, int f ) { return gEngfuncs.pfnSPR_Height(x, f); }
+inline int SPR_Width( HSPRITE x, int f ) { return gEngfuncs.pfnSPR_Width(x, f); }
+inline client_textmessage_t *TextMessageGet( const char *pName ) { return gEngfuncs.pfnTextMessageGet( pName ); }
+inline void ConsolePrint( const char *string ) { gEngfuncs.pfnConsolePrint( string );}
+inline void CenterPrint( const char *string ) { gEngfuncs.pfnCenterPrint( string ); }
 
 // returns the players name of entity no.
-constexpr const auto &GetPlayerInfo = (gEngfuncs.pfnGetPlayerInfo);
+inline void GetPlayerInfo( int ent_num, hud_player_info_t *pinfo ) { return gEngfuncs.pfnGetPlayerInfo(ent_num, pinfo); }
 
 // sound functions
-inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( const_cast<char *>(szSound), vol ); }
+inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySoundByName( szSound, vol ); }
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
 #include "minmax.h"
@@ -129,27 +117,16 @@ inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( 
 template<class T> constexpr T fabs(T x) { return ((x) > 0 ? (x) : 0 - (x)); }
 #endif
 
-#if 0
-#define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
-#define VectorSubtract(a,b,c) {(c)[0]=(a)[0]-(b)[0];(c)[1]=(a)[1]-(b)[1];(c)[2]=(a)[2]-(b)[2];}
-#define VectorAdd(a,b,c) {(c)[0]=(a)[0]+(b)[0];(c)[1]=(a)[1]+(b)[1];(c)[2]=(a)[2]+(b)[2];}
-#define VectorCopy(a,b) {(b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2];}
-inline void VectorClear(float *a) { a[0]=0.0;a[1]=0.0;a[2]=0.0;}
-#define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
-#define VectorLength(a) ( sqrt( DotProduct( a, a )))
-#define VectorMA(a, scale, b, c) ((c)[0] = (a)[0] + (scale) * (b)[0],(c)[1] = (a)[1] + (scale) * (b)[1],(c)[2] = (a)[2] + (scale) * (b)[2])
-#define VectorScale(in, scale, out) ((out)[0] = (in)[0] * (scale),(out)[1] = (in)[1] * (scale),(out)[2] = (in)[2] * (scale))
-#else
-template<class VectorTypeA, class VectorTypeB> auto DotProduct(const VectorTypeA &x, const VectorTypeB & y) { return ((x)[0] * (y)[0] + (x)[1] * (y)[1] + (x)[2] * (y)[2]); }
+
+template<class VectorTypeA, class VectorTypeB> auto DotProduct(const VectorTypeA &x, const VectorTypeB & y) -> decltype((x)[0] * (y)[0] + (x)[1] * (y)[1] + (x)[2] * (y)[2]) { return ((x)[0] * (y)[0] + (x)[1] * (y)[1] + (x)[2] * (y)[2]); }
 template<class VectorTypeA, class VectorTypeB, class VectorTypeC> void VectorSubtract(const VectorTypeA & a, const VectorTypeB & b, VectorTypeC &c) { (c)[0] = (a)[0] - (b)[0]; (c)[1] = (a)[1] - (b)[1]; (c)[2] = (a)[2] - (b)[2]; }
 template<class VectorTypeA, class VectorTypeB, class VectorTypeC> void VectorAdd(const VectorTypeA & a, const VectorTypeB & b, VectorTypeC &c) { (c)[0] = (a)[0] + (b)[0]; (c)[1] = (a)[1] + (b)[1]; (c)[2] = (a)[2] + (b)[2]; }
 template<class VectorTypeA, class VectorTypeB> void VectorCopy(const VectorTypeA & a, VectorTypeB & b) { (b)[0] = (a)[0]; (b)[1] = (a)[1]; (b)[2] = (a)[2]; }
 template<class VectorTypeA> void VectorClear(VectorTypeA &a) { a[0] = 0.0; a[1] = 0.0; a[2] = 0.0; }
-template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) { return sqrt(DotProduct(a, a)); }
+template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) -> decltype(sqrt(DotProduct(a, a))) { return sqrt(DotProduct(a, a)); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorTypeC> void VectorMA(const VectorTypeA &a, ScaleType scale, const VectorTypeB &b, VectorTypeC &c) { ((c)[0] = (a)[0] + (scale) * (b)[0], (c)[1] = (a)[1] + (scale) * (b)[1], (c)[2] = (a)[2] + (scale) * (b)[2]); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
 template<class VectorTypeA> void VectorInverse(VectorTypeA &x) { ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2]); }
-#endif
 
 namespace cl{
 	// const vec3_t ==untypedef=> float (const [3]) ==decay=> float *		NOT const float * !!!
@@ -206,18 +183,16 @@ inline void GetTeamColor( int &r, int &g, int &b, int teamIndex )
 	}
 }
 
-template<class MinType, class NumType, class MaxType> constexpr auto bound(MinType min, NumType num, MaxType max) { return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));  }
+template<class MinType, class NumType, class MaxType>
+constexpr auto bound(MinType min, NumType num, MaxType max) -> typename std::common_type<MinType, NumType, MaxType>::type
+{
+	return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));
+}
 
 #ifdef M_PI
 #undef M_PI
 #endif
-
-#if __cplusplus >= 201402L // C++14
-template<class T>
-constexpr T M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
-#else
 constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
-#endif
 
 constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
 constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }

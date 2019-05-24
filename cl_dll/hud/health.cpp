@@ -101,7 +101,7 @@ void CHudHealth::Reset( void )
 
 	// force all the flashing damage icons to expire
 	m_bitsDamage = 0;
-	for ( int i = 0; i < NUM_DMG_TYPES; i++ )
+	for ( size_t i = 0; i < NUM_DMG_TYPES; i++ )
 	{
 		m_dmg[i].fExpire = 0;
 	}
@@ -380,7 +380,7 @@ void CHudHealth::DrawDamage(float flTime)
 	a = (int)( fabs(sin(flTime*2)) * 256.0);
 
 	DrawUtils::ScaleColors(r, g, b, a);
-	int i;
+	size_t i;
 	// Draw all the items
 	for (i = 0; i < NUM_DMG_TYPES; i++)
 	{
@@ -411,7 +411,7 @@ void CHudHealth::DrawDamage(float flTime)
 				pdmg->x = pdmg->y = 0;
 
 				// move everyone above down
-				for (int j = 0; j < NUM_DMG_TYPES; j++)
+				for (size_t j = 0; j < NUM_DMG_TYPES; j++)
 				{
 					pdmg = &m_dmg[j];
 					if ((pdmg->y) && (pdmg->y < y))
@@ -433,7 +433,7 @@ void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
 	// Which types are new?
 	long bitsOn = ~m_bitsDamage & bitsDamage;
 	
-	for (int i = 0; i < NUM_DMG_TYPES; i++)
+	for (size_t i = 0; i < NUM_DMG_TYPES; i++)
 	{
 		pdmg = &m_dmg[i];
 
@@ -454,7 +454,7 @@ void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
 			pdmg->fExpire=flTime + DMG_IMAGE_LIFE;
 			
 			// move everyone else up
-			for (int j = 0; j < NUM_DMG_TYPES; j++)
+			for (size_t j = 0; j < NUM_DMG_TYPES; j++)
 			{
 				if (j == i)
 					continue;

@@ -65,7 +65,7 @@ inline T BufferReader::Read( void )
 		m_bBad = true;
 
 		// may occur, but safe
-		//gEngfuncs.Con_DPrintf( "BufferReader(%s): buffer overrun. Expected %i\n", m_szMsgName, m_iSize );
+		gEngfuncs.Con_DPrintf( "BufferReader(%s): buffer overrun. Expected %i\n", m_szMsgName, m_iSize );
 		return -1;
 	}
 
