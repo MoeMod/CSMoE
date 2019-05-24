@@ -11,6 +11,8 @@ extern kbutton_t	in_back;
 extern kbutton_t	in_moveleft;
 extern kbutton_t	in_moveright;
 
+namespace cl {
+
 extern cvar_t	*m_pitch;
 extern cvar_t	*m_yaw;
 extern cvar_t	*m_forward;
@@ -25,5 +27,7 @@ extern cvar_t *cl_sidespeed;
 extern cvar_t *cl_forwardspeed;
 extern cvar_t *cl_pitchspeed;
 extern cvar_t *cl_movespeedkey;
+    
+}
 
 #endif // INPUT_H

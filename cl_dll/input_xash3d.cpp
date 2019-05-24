@@ -5,6 +5,8 @@
 #include "keydefs.h"
 #include "input.h"
 
+using namespace cl;
+
 #define	PITCH	0
 #define	YAW		1
 #define	ROLL	2 

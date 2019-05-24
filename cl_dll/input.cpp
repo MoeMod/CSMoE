@@ -56,6 +56,7 @@ extern cvar_t *in_joystick;
 int	in_impulse	= 0;
 int	in_cancel	= 0;
 
+namespace cl {
 cvar_t	*m_pitch;
 cvar_t	*m_yaw;
 cvar_t	*m_forward;
@@ -74,6 +75,7 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
+}
 /*
 ===============================================================================
 
