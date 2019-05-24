@@ -1434,9 +1434,6 @@
     <ClInclude Include="..\dlls\gamemode\zb1\zb1_const.h">
       <Filter>dlls\gamemode\zb1</Filter>
     </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_math.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\pm_shared\pm_movevars.h">
       <Filter>pm_shared</Filter>
     </ClInclude>

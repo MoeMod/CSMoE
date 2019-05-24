@@ -15,8 +15,7 @@
 // pm_math.c -- math primitives
 
 #include "mathlib.h"
-#include "const.h"
-#include <math.h>
+
 
 // up / down
 #define	PITCH	0
@@ -28,8 +27,6 @@
 #ifdef _MSC_VER
 #pragma warning(disable : 4244)
 #endif
-
-double sqrt( double x );
 
 #if defined(CLIENT_DLL)
 namespace cl {

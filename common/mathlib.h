@@ -35,6 +35,8 @@
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
+	struct mplane_s;
+
 #if defined(CLIENT_DLL)
 namespace cl {
 #elif defined(SERVER_DLL)
@@ -42,8 +44,6 @@ namespace sv {
 #elif defined(__cplusplus)
 extern "C++" {
 #endif
-
-	struct mplane_s;
 
 	extern vec3_t vec3_origin;
 	extern	int nanmask;

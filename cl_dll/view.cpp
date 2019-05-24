@@ -13,8 +13,6 @@
 
 #include "hud.h"
 
-#include "pm_math.h"
-
 #include "cl_util.h"
 #include "cvardef.h"
 #include "usercmd.h"
@@ -45,11 +43,9 @@
 #endif
 
 namespace cl { // pm_math.cpp
-
-void NormalizeAngles(float *angles);
-float Distance(const float *v1, const float *v2);
-float AngleBetweenVectors(const float *v1, const float *v2);
-
+	void NormalizeAngles(vec_t angles[3]);
+	float Distance(const vec_t v1[3], const vec_t v2[3]);
+	void VectorAngles(const vec_t forward[3], vec_t angles[3]);
 };
 
 namespace cl {
@@ -1630,7 +1626,7 @@ void V_CalcSpectatorRefdef ( struct ref_params_s * pparams )
 
 	// write back new values into pparams
 	VectorCopy ( v_cl_angles, pparams->cl_viewangles );
-	VectorCopy ( v_angles, pparams->viewangles )
+	VectorCopy ( v_angles, pparams->viewangles );
 	VectorCopy ( v_origin, pparams->vieworg );
 }
 

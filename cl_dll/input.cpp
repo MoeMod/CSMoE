@@ -39,8 +39,8 @@ extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
 
 // Defined in pm_math.cpp
-extern "C" {
-float anglemod(float a);
+namespace cl {
+	float anglemod(float a);
 }
 
 void IN_Init (void);

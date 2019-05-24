@@ -11,9 +11,7 @@
 #define PM_MOVEVARSH
 
 // movevars_t                  // Physics variables.
-typedef struct movevars_s movevars_t;
-
-struct movevars_s
+typedef struct movevars_s
 {
 	float	gravity;           // Gravity for map
 	float	stopspeed;         // Deceleration when not moving
@@ -48,7 +46,7 @@ struct movevars_s
 	float	skydir_y;		//
 	float	skydir_z;		//
 	float	skyangle;		// skybox rotate angle
-};
+} movevars_t;
 
-extern movevars_t movevars;
+//extern movevars_t movevars;
 #endif

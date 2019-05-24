@@ -11,8 +11,7 @@
 
 #include <memory.h>
 #include "hud.h"
-
-#include "pm_math.h"
+#include "studio/studio_util.h"
 
 #include "cl_util.h"
 #include "const.h"

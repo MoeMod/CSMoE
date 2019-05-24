@@ -923,9 +923,6 @@
     <ClInclude Include="..\pm_shared\pm_materials.h">
       <Filter>pm_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\pm_shared\pm_math.h">
-      <Filter>pm_shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\pm_shared\pm_movevars.h">
       <Filter>pm_shared</Filter>
     </ClInclude>

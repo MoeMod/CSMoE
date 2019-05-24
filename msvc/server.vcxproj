@@ -850,7 +850,6 @@
     <ClInclude Include="..\pm_shared\pm_defs.h" />
     <ClInclude Include="..\pm_shared\pm_info.h" />
     <ClInclude Include="..\pm_shared\pm_materials.h" />
-    <ClInclude Include="..\pm_shared\pm_math.h" />
     <ClInclude Include="..\pm_shared\pm_movevars.h" />
     <ClInclude Include="..\pm_shared\pm_shared.h" />
     <ClInclude Include="..\public\archtypes.h" />

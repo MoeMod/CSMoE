@@ -28,15 +28,16 @@ version.
 
 #include "hud.h"
 
-#include "pm_math.h"
+#include "cl_util.h"
 
 #include "parsemsg.h"
-#include "cl_util.h"
 
 #include "r_efx.h"
 #include "event_api.h"
 #include "com_model.h"
 #include <string.h>
+
+using namespace cl;
 
 DECLARE_MESSAGE( m_Radio, SendAudio )
 DECLARE_MESSAGE( m_Radio, ReloadSound )

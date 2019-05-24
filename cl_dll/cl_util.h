@@ -138,6 +138,8 @@ inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( 
 #ifndef __APPLE__
 #define fabs(x)	   ((x) > 0 ? (x) : 0 - (x))
 #endif
+
+#if 0
 #define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define VectorSubtract(a,b,c) {(c)[0]=(a)[0]-(b)[0];(c)[1]=(a)[1]-(b)[1];(c)[2]=(a)[2]-(b)[2];}
 #define VectorAdd(a,b,c) {(c)[0]=(a)[0]+(b)[0];(c)[1]=(a)[1]+(b)[1];(c)[2]=(a)[2]+(b)[2];}
@@ -147,12 +149,23 @@ inline void VectorClear(float *a) { a[0]=0.0;a[1]=0.0;a[2]=0.0;}
 #define VectorLength(a) ( sqrt( DotProduct( a, a )))
 #define VectorMA(a, scale, b, c) ((c)[0] = (a)[0] + (scale) * (b)[0],(c)[1] = (a)[1] + (scale) * (b)[1],(c)[2] = (a)[2] + (scale) * (b)[2])
 #define VectorScale(in, scale, out) ((out)[0] = (in)[0] * (scale),(out)[1] = (in)[1] * (scale),(out)[2] = (in)[2] * (scale))
+#else
+template<class VectorTypeA, class VectorTypeB> auto DotProduct(const VectorTypeA &x, const VectorTypeB & y) { return ((x)[0] * (y)[0] + (x)[1] * (y)[1] + (x)[2] * (y)[2]); }
+template<class VectorTypeA, class VectorTypeB, class VectorTypeC> void VectorSubtract(const VectorTypeA & a, const VectorTypeB & b, VectorTypeC &c) { (c)[0] = (a)[0] - (b)[0]; (c)[1] = (a)[1] - (b)[1]; (c)[2] = (a)[2] - (b)[2]; }
+template<class VectorTypeA, class VectorTypeB, class VectorTypeC> void VectorAdd(const VectorTypeA & a, const VectorTypeB & b, VectorTypeC &c) { (c)[0] = (a)[0] + (b)[0]; (c)[1] = (a)[1] + (b)[1]; (c)[2] = (a)[2] + (b)[2]; }
+template<class VectorTypeA, class VectorTypeB> void VectorCopy(const VectorTypeA & a, VectorTypeB & b) { (b)[0] = (a)[0]; (b)[1] = (a)[1]; (b)[2] = (a)[2]; }
+template<class VectorTypeA> void VectorClear(VectorTypeA &a) { a[0] = 0.0; a[1] = 0.0; a[2] = 0.0; }
+template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) { return sqrt(DotProduct(a, a)); }
+template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorTypeC> void VectorMA(const VectorTypeA &a, ScaleType scale, const VectorTypeB &b, VectorTypeC &c) { ((c)[0] = (a)[0] + (scale) * (b)[0], (c)[1] = (a)[1] + (scale) * (b)[1], (c)[2] = (a)[2] + (scale) * (b)[2]); }
+template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
+#endif
+
 namespace cl{
-    float VectorNormalize (float *v); // pm_math.h
+	// const vec3_t ==untypedef=> float (const [3]) ==decay=> float *		NOT const float * !!!
+	float VectorNormalize(vec_t v[3]); // pm_math.h
+	extern vec_t vec3_origin[3];
 }
 #define VectorInverse(x) ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2])
-
-extern vec3_t vec3_origin;
 
 #ifdef MSC_VER
 // disable 'possible loss of data converting float to int' warning message
