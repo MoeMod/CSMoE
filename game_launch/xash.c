@@ -34,6 +34,7 @@ GNU General Public License for more details.
 #elif __unix__
 	#include <dlfcn.h>
 	#include <errno.h>
+	#include <unistd.h>
 	#define XASHLIB    "libxash.so"
 	#define dlmount(x) dlopen(x, RTLD_NOW)
 	#define HINSTANCE  void*

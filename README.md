@@ -27,18 +27,18 @@ Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x6
 * Fully open-source under GPLv3 licence
 
 ## Tested systems
-### Windows - Surface Pro 5 (2017)
+### Windows 10 ( Version 1703 ) - Surface Pro 5 (2017)
 * CPU : Intel Core i5-7300U
 * GPU : Intel HD620
 * RAM : 8 GB
 * Resolution : 2736 x 1824 PixelSense
 * Result : Smooth but hot, 80+ fps
-### Linux (in Chrome OS) - Google Pixelbook (2017)
+### Linux ( Ubuntu 19.04 ) - Google Pixelbook (2017)
 * CPU : Intel Core i5-7Y57
-* GPU : Intel HD615 (without full driver)
+* GPU : Intel HD615
 * Resolution : 2400 x 1600
 * RAM : 8 GB
-* Result : Due to lack of OpenGL driver on Chrome OS, it can only run dedicated server.
+* Result : 60+ fps
 ### Android - Google Pixel C (2015)
 * SoC : nVIDIA Tegra X1
 * RAM : 4 GB

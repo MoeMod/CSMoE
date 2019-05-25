@@ -723,9 +723,6 @@ char *SV_ReadEntityScript( const char *filename, int *flags )
 #ifdef XASH_BIG_ENDIAN
 		for (i=0 ; i<sizeof(dheader_t)/4 ; i++)
 			LittleLongSW(((int *)header)[i]);
-#else
-		// fix unused var
-		i = 0;
 #endif
 
 		if( header->lumps[LUMP_ENTITIES].fileofs <= 1024 && (header->lumps[LUMP_ENTITIES].filelen % sizeof( dplane_t )) == 0 )
@@ -3061,7 +3058,7 @@ void SV_SetStringArrayMode( qboolean dynamic )
 }
 
 #ifdef XASH_64BIT
-#if !defined(_WIN32) && !defined(__APPLE__)
+#ifndef _WIN32
 #define USE_MMAP
 #include <sys/mman.h>
 #endif
@@ -3096,18 +3093,10 @@ void SV_AllocStringPool( void )
 
 #ifdef USE_MMAP
 	{
-		size_t pagesize;
-		int arrlen = (str64.maxstringarray * 2) & ~(pagesize - 1);
+		size_t pagesize = sysconf( _SC_PAGESIZE );
+		int arrlen = ( str64.maxstringarray * 2 ) & ~( pagesize - 1 );
 		void *base = svgame.dllFuncs.pfnGameInit;
 		void *start = svgame.hInstance - arrlen;
-
-#ifdef _WIN32
-		SYSTEM_INFO si;
-		GetSystemInfo(&si);
-		pagesize = si.dwPageSize;
-#else
-		pagesize = sysconf(_SC_PAGESIZE);
-#endif
 
 		while( start - base > INT_MIN )
 		{
@@ -3154,9 +3143,9 @@ void SV_AllocStringPool( void )
 #endif
 
 	str64.pstringarray = ptr;
-	str64.pstringarraystatic = (uintptr_t)ptr + str64.maxstringarray;
+	str64.pstringarraystatic = (byte *)ptr + str64.maxstringarray;
 	str64.pstringbase = str64.poldstringbase = ptr;
-	str64.plast = (uintptr_t)ptr + 1;
+	str64.plast = (byte *)ptr + 1;
 	svgame.globals->pStringBase = ptr;
 #else
 	svgame.stringspool = Mem_AllocPool( "Server Strings" );
@@ -3167,24 +3156,14 @@ void SV_AllocStringPool( void )
 void SV_FreeStringPool( void )
 {
 #ifdef XASH_64BIT
-	size_t pagesize;
 	MsgDev( D_NOTE, "SV_FreeStringPool()\n" );
-
-#ifdef _WIN32
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	pagesize = si.dwPageSize;
-#else
-	pagesize = sysconf(_SC_PAGESIZE);
-#endif
 
 #ifdef USE_MMAP
 	if( str64.pstringarray != str64.staticstringarray )
-		munmap( str64.pstringarray, (str64.maxstringarray * 2) & ~(pagesize - 1) );
+		munmap( str64.pstringarray, (str64.maxstringarray * 2) & ~(sysconf( _SC_PAGESIZE ) - 1) );
 	else
 #endif // USE_MMAP
 		Mem_Free( str64.staticstringarray );
-
 #else
 	Mem_FreePool( &svgame.stringspool );
 #endif
