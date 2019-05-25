@@ -26,8 +26,6 @@
 *
 */
 
-#include "port.h"
-
 #include <string.h>
 #include "wrect.h" // need for cl_dll.h
 #include "cl_dll.h"
@@ -41,6 +39,7 @@
 
 // for localized titles.txt strings
 using namespace std;
+using namespace cl;
 typedef unordered_map< string, char* > CDict;
 
 CDict gTitlesTXT;

@@ -106,11 +106,13 @@ Note : If it results in a black window, try to drag it and then the menu will ap
   Note : You can also use cmake to build with mingw, etc.
 ### macOS & Linux
 - Build with CMake
-- Set SDL2_PATH to where the SDL2 locates
+- ~~Set SDL2_PATH to where the SDL2 locates~~
+- Install packages : libfontconfig1-dev libsdl2-dev
 - It should be OK to build with both x86 and x64.
 ### Android
 - Put this repo into jni/src/xash3d
-- Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version
+- ~~Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version~~
+- Build APK with Android Studio, tested with Android SDK level 28 and Android NDK r20
 - arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
 ### iOS
 - please refer to mittorn/xash3d-ios

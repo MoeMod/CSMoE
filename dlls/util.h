@@ -32,8 +32,7 @@
 #pragma once
 #endif
 
-#include "port.h"
-#include "minmax.h"
+#include "basetypes.h"
 #include <string.h>
 #ifndef ACTIVITY_H
 #include "activity.h"

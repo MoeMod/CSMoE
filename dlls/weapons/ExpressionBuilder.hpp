@@ -94,7 +94,7 @@ namespace ExpressionBuilder
 		template<class Exp1, class Exp2>
 		struct OperatorPlus_t : BinaryOperator<Exp1, Exp2>
 		{
-			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			constexpr OperatorPlus_t(Exp1 a, Exp2 b) : BinaryOperator<Exp1, Exp2>(a, b) {}
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
@@ -104,7 +104,7 @@ namespace ExpressionBuilder
 		template<class Exp1, class Exp2>
 		struct OperatorMinus_t : BinaryOperator<Exp1, Exp2>
 		{
-			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			constexpr OperatorMinus_t(Exp1 a, Exp2 b) : BinaryOperator<Exp1, Exp2>(a, b) {}
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
@@ -113,7 +113,7 @@ namespace ExpressionBuilder
 		template<class Exp1, class Exp2>
 		struct OperatorMul_t : BinaryOperator<Exp1, Exp2>
 		{
-			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			constexpr OperatorMul_t(Exp1 a, Exp2 b) : BinaryOperator<Exp1, Exp2>(a, b) {}
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>
@@ -122,7 +122,7 @@ namespace ExpressionBuilder
 		template<class Exp1, class Exp2>
 		struct OperatorDiv_t : BinaryOperator<Exp1, Exp2>
 		{
-			using BinaryOperator<Exp1, Exp2>::BinaryOperator;
+			constexpr OperatorDiv_t(Exp1 a, Exp2 b) : BinaryOperator<Exp1, Exp2>(a, b) {}
 			using BinaryOperator<Exp1, Exp2>::_1;
 			using BinaryOperator<Exp1, Exp2>::_2;
 			template<class T>

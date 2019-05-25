@@ -7,8 +7,6 @@
 
 // view/refresh setup functions
 
-#include "port.h"
-
 #include <string.h>
 
 #include "hud.h"

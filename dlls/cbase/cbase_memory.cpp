@@ -78,7 +78,6 @@ void *CBaseEntity::operator new(size_t stAllocateBlock)
 	// failed? should free newpev
 	if (result == nullptr) {
 		operator delete(nullptr, newpev);
-		throw std::bad_alloc();
 	}
 
 	return result;

@@ -54,6 +54,7 @@ int MoE_EntityFactory(edict_t *pent, const char *szName )
 
 	entvars_t *pev = &pent->v;
 
+	/*
 	try
 	{
 		iter->second(pev);
@@ -63,6 +64,8 @@ int MoE_EntityFactory(edict_t *pent, const char *szName )
 		ALERT(at_warning, "MoE_EntityFactory() : Fail to create %s with exception saying: %s\n", szName, e.what());
 		return -1; // WTF ? eat that exception and return...
 	}
+	 */
+    iter->second(pev);
 
 	return 0; // OK
 }

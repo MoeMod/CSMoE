@@ -34,7 +34,11 @@ else()
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	add_compile_options(-Wpedantic Wno-unused-private-field)
+	add_compile_options(-Wpedantic)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	add_compile_options(-Wno-unused-private-field)
 endif()
 
 set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
