@@ -22,6 +22,13 @@ GNU General Public License for more details.
 
 namespace sv {
 
+enum ZBB_GameStatus_e
+{
+	ZBB_GS_BUILDING,
+	ZBB_GS_EVE,
+	ZBB_GS_DAWN
+};
+
 class IPlayerBuildingDelegate
 {
 public:
@@ -59,9 +66,12 @@ public:
 
 public:
 	bool CanEntityBuild(CBaseEntity *pEntity);
+	ZBB_GameStatus_e GetGameStatus() { return m_GameStatus; }
+
 	// no need for weak_ptr, cause CPlayerModStrategy_ZBB handles its lifespan.
 	std::array<IPlayerBuildingDelegate *, MAX_CLIENTS> m_BuildingInterfaces;
 	std::unordered_map<CBaseEntity *, IPlayerBuildingDelegate *> m_BuildingEntities;
+	ZBB_GameStatus_e m_GameStatus;
 };
 
 }

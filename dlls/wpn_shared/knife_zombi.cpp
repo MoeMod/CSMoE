@@ -208,10 +208,7 @@ int CKnife_Zombi::Swing(int fFirst)
 		ClearMultiDamage();
 		if (pEntity)
 		{
-			if (m_flNextPrimaryAttack + 0.4 < UTIL_WeaponTimeBase())
-				pEntity->TraceAttack(m_pPlayer->pev, 20, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
-			else
-				pEntity->TraceAttack(m_pPlayer->pev, 15, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
+			pEntity->TraceAttack(m_pPlayer->pev, 75, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
 		}
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -328,7 +325,7 @@ int CKnife_Zombi::Stab(int fFirst)
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-		float flDamage = 65.0;
+		float flDamage = 200.0;
 
 		if (pEntity && pEntity->IsPlayer())
 		{

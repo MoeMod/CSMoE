@@ -45,6 +45,7 @@ void PlayerBuildingDelegate::Build_End()
 
 void PlayerBuildingDelegate::Build_Update()
 {
+	m_bCanBuild = m_pModZBB->GetGameStatus() == ZBB_GS_BUILDING;
 	if (!m_bCanBuild || !m_pPlayer->IsAlive())
 	{
 		Build_End();
@@ -95,6 +96,7 @@ void PlayerBuildingDelegate::Build_Update()
 
 void PlayerBuildingDelegate::Build_Start()
 {
+
 	if (!m_bCanBuild || !m_pPlayer->IsAlive())
 		return;
 

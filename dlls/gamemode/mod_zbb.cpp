@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "game.h"
+#include "client.h"
 
 #include "usercmd.h"
 #include "entity_state.h"
@@ -35,9 +36,13 @@ namespace sv {
 class CZBBCountdownDelegate : public CZB1CountdownDelegate
 {
 public:
-	using CZB1CountdownDelegate::CZB1CountdownDelegate;
+	explicit CZBBCountdownDelegate(CMod_ZombieBaseBuilder *mod) : CZB1CountdownDelegate(mod), m_pModZBB(mod)
+	{
+
+	}
 	void OnCountdownStart() override
 	{
+		m_pModZBB->m_GameStatus = ZBB_GS_BUILDING;
 		//return CZB1CountdownDelegate::OnCountdownStart();
 	}
 	void OnCountdownChanged(int iCurrentCount) override
@@ -47,6 +52,7 @@ public:
 	}
 	void OnCountdownEnd() override
 	{
+		m_pModZBB->m_GameStatus = ZBB_GS_EVE;
 		// respawn everyone
 		for (CBasePlayer* pPlayer : moe::range::PlayersList())
 		{
@@ -58,9 +64,11 @@ public:
 		// choose ghosts...
 		CZB1CountdownDelegate::OnCountdownEnd();
 	}
+
+	CMod_ZombieBaseBuilder *m_pModZBB;
 };
 
-CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() // precache
+CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() : m_BuildingInterfaces{} // precache
 {
 	LIGHT_STYLE(0, "i");
 
@@ -81,6 +89,19 @@ void CMod_ZombieBaseBuilder::RestartRound()
 {
 	for (CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_ClassName<CBaseEntity>>("func_wall"))
 	{
+		const Vector vecMins = pEntity->pev->mins;
+		const Vector vecMaxs = pEntity->pev->maxs;
+		Vector flSquare;
+		flSquare[0] = abs(vecMaxs[0] - vecMins[0]) * abs(vecMaxs[1] - vecMins[1]);
+		flSquare[1] = abs(vecMaxs[2] - vecMins[2]) * abs(vecMaxs[1] - vecMins[1]);
+		flSquare[2] = abs(vecMaxs[0] - vecMins[0]) * abs(vecMaxs[2] - vecMins[2]);
+
+		if(flSquare[0] > 100000.0 || flSquare[1] > 100000.0 || flSquare[2] > 100000.0)
+		{
+			pEntity->SUB_Remove();
+			continue;
+		}
+
 		pEntity->pev->origin = {};
 		DispatchSpawn(pEntity->edict());
 	}
@@ -112,6 +133,16 @@ int CMod_ZombieBaseBuilder::AddToFullPack_Post(struct entity_state_s *state, int
 	auto pbi = m_BuildingInterfaces[id];
 	if(pbi)
 	{
+		if(player)
+		{
+			CBaseEntity *pEntity = CBaseEntity::Instance(ent);
+			auto id2 = pEntity->entindex();
+			if(id2 >= 1 && id2 <= 32 && m_BuildingInterfaces[id2]->IsGhost())
+			{
+				state->effects |= EF_NODRAW;
+			}
+		}
+
 		CBaseEntity *pCurrentBuildTarget = pbi->CurrentTarget();
 		if(pbi->IsGhost())
 		{
@@ -259,7 +290,28 @@ private:
 
 	void OnThink() override
 	{
-		CPlayerModStrategy_ZB1::OnThink();
+		if(m_pModZBB->GetGameStatus() == ZBB_GS_EVE)
+		{
+			if (m_pPlayer->m_iTeam != TEAM_UNASSIGNED && m_pPlayer->m_iTeam != TEAM_SPECTATOR)
+			{
+				// respawn after 5 secs
+				if (m_pPlayer->pev->deadflag == DEAD_DEAD || m_pPlayer->pev->deadflag == DEAD_RESPAWNABLE)
+				{
+					m_pPlayer->RoundRespawn();
+					BecomeZombie(m_pPlayer->m_iZombieLevel);
+
+					for (CBasePlayer *dest : moe::range::PlayersList())
+						SetScoreAttrib(dest, m_pPlayer);
+				}
+			}
+		}
+
+		return CPlayerModStrategy_ZB1::OnThink();
+	}
+
+	void OnKilled(entvars_t * pKiller, entvars_t * pInflictor) override
+	{
+		return CPlayerModStrategy_ZB1::OnKilled(pKiller, pInflictor);
 	}
 
 	void OnPostThink() override
@@ -328,6 +380,8 @@ private:
 		m_pZBB_Delegate = sp;
 
 		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = g_pDelegateGhostShared;
+		m_pPlayer->m_iTeam = TERRORIST;
+		TeamChangeUpdate(m_pPlayer, m_pPlayer->m_iTeam);
 	}
 
 	void BecomeHuman() override
@@ -337,6 +391,8 @@ private:
 		m_pZBB_Delegate = sp;
 
 		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = &sp->m_Build;
+		m_pPlayer->m_iTeam = CT;
+		TeamChangeUpdate(m_pPlayer, m_pPlayer->m_iTeam);
 	}
 
 private:
