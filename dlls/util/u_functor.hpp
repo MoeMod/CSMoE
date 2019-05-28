@@ -45,6 +45,20 @@ namespace moe {
 			return static_cast<EntityType *>(UTIL_FindEntityByClassname(pCurrent, m_classname));
 		}
 	};
+
+	template<class EntityType = CBaseEntity>
+	struct Enumer_InSphere
+	{
+		const Vector m_vecOrigin;
+		const float m_flRadius;
+
+		Enumer_InSphere(const Vector &vecOrigin, float flRadius) : m_vecOrigin(vecOrigin), m_flRadius(flRadius) {}
+
+		EntityType *operator()(EntityType *pCurrent) const
+		{
+			return static_cast<EntityType *>(UTIL_FindEntityInSphere(pCurrent, m_vecOrigin, m_flRadius));
+		}
+	};
 }
 }
 

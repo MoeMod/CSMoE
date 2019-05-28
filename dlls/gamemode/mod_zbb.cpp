@@ -26,6 +26,7 @@ GNU General Public License for more details.
 
 #include "dlls/gamemode/zbb/zbb_basebuilder.h"
 #include "dlls/gamemode/zbb/zbb_ghost.h"
+#include "dlls/gamemode/zbb/zbb_zombie.h"
 
 #include "util/u_range.hpp"
 
@@ -63,7 +64,7 @@ CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() // precache
 {
 	LIGHT_STYLE(0, "i");
 
-	m_Countdown.SetCounts(100);
+	m_Countdown.SetCounts(20);
 	std::unique_ptr<CZBBCountdownDelegate> pd(new CZBBCountdownDelegate(this));
 	m_Countdown.SetDelegate(std::move(pd));
 }
@@ -230,7 +231,19 @@ private:
 		auto &bitsOldButton = m_pPlayer->pev->oldbuttons;
 
 		if(m_pZBB_Delegate)
-			m_pZBB_Delegate->ButtonEvent(bitsCurButton, bitsOldButton);
+		{
+			if( m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] &&
+				m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()]->IsGhost() &&
+				(bitsCurButton & ~bitsOldButton & IN_ATTACK)
+			)
+			{
+				Ghost_Check_Spawn();
+			}
+			else
+			{
+				m_pZBB_Delegate->ButtonEvent(bitsCurButton, bitsOldButton);
+			}
+		}
 
 		return CPlayerModStrategy_ZB1::CmdStart(cmd, random_seed);
 	}
@@ -253,6 +266,59 @@ private:
 	{
 		if(m_pZBB_Delegate)
 			m_pZBB_Delegate->PostThink();
+	}
+
+	bool Ghost_Check_CanRespawn(bool bTip)
+	{
+		if(!m_pPlayer->IsAlive())
+			return false;
+
+		if(Check_HumanNear())
+			return false;
+
+		if(IsUserStucked())
+			return false;
+
+		return true;
+	}
+
+	bool IsUserStucked()
+	{
+		auto origin = m_pPlayer->pev->origin;
+		auto hull = (m_pPlayer->pev->flags & FL_DUCKING) ? head_hull : human_hull;
+		TraceResult tr;
+		UTIL_TraceHull(origin, origin + Vector(0, 0, 1), dont_ignore_monsters, hull, m_pPlayer->edict(), &tr);
+
+		return tr.fStartSolid || tr.fAllSolid || !tr.fInOpen;
+	}
+
+	bool Check_HumanNear() const
+	{
+		for(CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_InSphere<CBaseEntity>>(m_pPlayer->pev->origin, 300))
+		{
+			if(pEntity->IsAlive())
+			{
+				CBasePlayer *pPlayer = dynamic_ent_cast<CBasePlayer *>(pEntity);
+				if(pPlayer)
+				{
+					if(!pPlayer->m_bIsZombie)
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	void Ghost_Check_Spawn()
+	{
+		if(!Ghost_Check_CanRespawn(false))
+			return;
+
+		auto sp = std::make_shared<CZombieClass_ZBB>(m_pPlayer);
+		m_pCharacter = sp;
+		m_pZBB_Delegate = sp;
+
+		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = g_pDelegateZombieShared;
 	}
 
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override

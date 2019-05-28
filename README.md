@@ -27,33 +27,31 @@ Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x6
 * Fully open-source under GPLv3 licence
 
 ## Tested systems
-### Windows 10 ( Version 1703 ) - Surface Pro 5 (2017)
-* CPU : Intel Core i5-7300U
-* GPU : Intel HD620
-* RAM : 8 GB
-* Resolution : 2736 x 1824 PixelSense
-* Result : Smooth but hot, 80+ fps
+### Windows 10 (1703) - Surface Pro 5 (2017)
+* Specs : Intel Core i5-7300U, Intel HD620, 8 GB
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(2736 x 1824 PixelSense), Sound
+* Result : 80+ fps
 ### Linux ( Ubuntu 19.04 ) - Google Pixelbook (2017)
-* CPU : Intel Core i5-7Y57
-* GPU : Intel HD615
-* Resolution : 2400 x 1600
-* RAM : 8 GB
-* Result : 60+ fps
-### Android - Google Pixel C (2015)
-* SoC : nVIDIA Tegra X1
-* RAM : 4 GB
-* Resolution : 2560 x 1800
-* Result : Smooth, 90+ fps
-### iOS - Apple iPad 6th Gen (2018)
-* SoC : A10 Fusion
-* Resolution : 2048 x 1536 Retina
-* Result : Smooth, 55~60fps
-### macOS - MacBook Pro (2018)
-* CPU : Intel Core i5-8259U
-* GPU : Intel Iris Plus 655
-* RAM : 8GB
-* Resolution : 2560 x 1600 Retina
-* Result : Smooth but hot, 80+ fps
+* CPU : Intel Core i5-7Y57, Intel HD615, 8GB
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(2400 x 1600), Sound
+* Result : 80+ fps
+### Android (8.1) - Google Pixel C (2015)
+* Specs : nVIDIA Tegra X1, 4 GB
+* Input : Touchscreen
+* Output : Display(2560 x 1800), Sound, Vibration(not available on Pixel C)
+* Result : ~90 fps
+### iOS (11.2) - Apple iPhone X (2017)
+* Specs : A11 Fusion
+* Input : Touchscreen, 3D Touch
+* Output : Display(2436 x 1125 Super-Retina), Sound, Vibration(Tapic-Engine)
+* Result : ~60 fps
+### macOS (10.14) - MacBook Pro (2018)
+* Specs : Intel Core i5-8259U, Intel Iris Plus 655, 8GB
+* Input : Mouse, Keyboard, Touchpad, Multi-touch Bar
+* Output : Display(2560 x 1600 Retina), Sound
+* Result : 80+ fps
 
 ## Installation
 ### Windows
@@ -99,6 +97,7 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 ## Building
 ### Generic
 - This project uses C++11 standard, and please ensure that your compiler supports it.
+- Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 ### Windows
 - Visual Studio 2017 projects can be found in msvc/csmoe.sln
 - Download SDL2-devel-2.0.9-VC.zip from http://www.libsdl.org/ and put them into SDL2/
