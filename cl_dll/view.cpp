@@ -7,6 +7,10 @@
 
 // view/refresh setup functions
 
+#ifdef _WIN32
+#include "basetypes.h"
+#endif
+
 #include <string.h>
 
 #include "hud.h"

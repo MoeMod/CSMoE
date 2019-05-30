@@ -48,6 +48,8 @@ extern kbutton_t	in_mlook;
 extern kbutton_t	in_speed;
 extern kbutton_t	in_jlook;
 
+namespace cl {
+
 extern cvar_t	*m_pitch;
 extern cvar_t	*m_yaw;
 extern cvar_t	*m_forward;
@@ -62,6 +64,8 @@ extern cvar_t *cl_sidespeed;
 extern cvar_t *cl_forwardspeed;
 extern cvar_t *cl_pitchspeed;
 extern cvar_t *cl_movespeedkey;
+}
+using namespace cl;
 
 // mouse variables
 cvar_t		*m_filter;

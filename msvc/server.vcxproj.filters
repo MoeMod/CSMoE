@@ -691,6 +691,9 @@
     <ClCompile Include="..\dlls\cbase\cbase_entity_factory.cpp">
       <Filter>dlls\cbase</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\gamemode\zbb\zbb_zombie.cpp">
+      <Filter>dlls\gamemode\zbb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
@@ -1472,6 +1475,9 @@
     </ClInclude>
     <ClInclude Include="..\public\const\const_shared.h">
       <Filter>public\const</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\gamemode\zbb\zbb_zombie.h">
+      <Filter>dlls\gamemode\zbb</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@
 //
 
 #ifdef _WIN32
-#include "port.h"
+#include "basetypes.h"
 #endif
 
 #include <new>
@@ -321,11 +321,11 @@ void CHud :: VidInit( void )
 	// assume cs16-client is launched in landscape mode
 	// must be only TrueWidth, but due to bug game may sometime rotate to portait mode
 	// calc scale depending on max side
-	float maxScale = (float)max( TrueWidth, TrueHeight ) / 640.0f;
+	float maxScale = max<float>( TrueWidth, TrueHeight ) / 640.0f;
 	
 	// REMOVE LATER
 	float currentScale = CVAR_GET_FLOAT("hud_scale");
-	float invalidScale = (float)min( TrueWidth, TrueHeight ) / 640.0f;
+	float invalidScale = min<float>( TrueWidth, TrueHeight ) / 640.0f;
 	// REMOVE LATER
 	
 	if( currentScale > maxScale ||
