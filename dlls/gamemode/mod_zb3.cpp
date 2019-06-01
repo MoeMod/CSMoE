@@ -53,6 +53,9 @@ void CPlayerModStrategy_ZB3::OnSpawn()
 
 void CPlayerModStrategy_ZB3::CheckEvolution()
 {
+	if (!m_pPlayer->m_bIsZombie)
+		return;
+
 	float flLastRagePercent = m_flRagePercent;
 	auto iLastLevel = m_pPlayer->m_iZombieLevel;
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_flRagePercent > 100.0f)
