@@ -48,6 +48,7 @@
     <ClCompile Include="..\cl_dll\events\event_g3sg1.cpp" />
     <ClCompile Include="..\cl_dll\events\event_galil.cpp" />
     <ClCompile Include="..\cl_dll\events\event_glock18.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_gungnir.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinity.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinitys.cpp" />
     <ClCompile Include="..\cl_dll\events\event_k1a.cpp" />

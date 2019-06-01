@@ -67,6 +67,7 @@ public:
 	{
 		PRECACHE_MODEL("sprites/ef_gungnir_missile.spr");
 		PRECACHE_MODEL("sprites/ef_gungnir_bexplo.spr");
+		PRECACHE_SOUND("weapons/gungnir_shoot_b_exp.wav");
 	}
 
 	KnockbackData GetKnockBackData()
@@ -86,8 +87,7 @@ public:
 
 		if (pAttackePlayer &&
 			pOther->pev->takedamage != DAMAGE_NO &&
-			pOther->IsAlive() &&
-			pOther->pev->team == m_iTeam
+			pOther->IsAlive()
 			)
 		{
 			Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
@@ -182,7 +182,7 @@ public:
 						ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
 					}*/
 				}
-			}
+			} 
 		}
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
@@ -191,10 +191,12 @@ public:
 		WRITE_COORD(pev->origin.y);
 		WRITE_COORD(pev->origin.z);
 		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_bexplo.spr"));
-		WRITE_BYTE(3);
-		WRITE_BYTE(15);
+		WRITE_BYTE(5);
+		WRITE_BYTE(30);
 		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
 		MESSAGE_END();
+
+		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_shoot_b_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		return Remove();
 	}
@@ -238,7 +240,6 @@ public:
 		//ph26 = 0;
 		SetTouch(&CGungnirSpear::OnTouch);
 		SetThink(&CGungnirSpear::FlyThink);
-		SET_MODEL(this->edict(), "sprites/gungnir_missile.spr");
 
 		//ph32 = ?
 		pev->solid = SOLID_CUSTOM; // 5
@@ -249,14 +250,26 @@ public:
 		this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
 
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_BEAMFOLLOW);
+		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
+		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_lightline1.spr"));// short (sprite index)
+		WRITE_BYTE(20);// byte (life in 0.1's) 
+		WRITE_BYTE(30);// byte (line width in 0.1's) 
+		WRITE_BYTE(255);// byte,byte,byte (color)
+		WRITE_BYTE(255);
+		WRITE_BYTE(255);
+		WRITE_BYTE(255);// byte (brightness)
+		MESSAGE_END();
 	}
 
 	void Precache() override
 	{
-		PRECACHE_MODEL("models/gungnir_missile.mdl");
 		PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
 		PRECACHE_MODEL("sprites/ef_gungnir_lightline1.spr");
 		PRECACHE_MODEL("sprites/ef_gungnir_lightline2.spr");
+		PRECACHE_SOUND("weapons/gungnir_charge_shoot_exp.wav");
+		PRECACHE_SOUND("weapons/gungnir_charge_shoot_exp2.wav");
 	}
 
 	KnockbackData GetKnockBackData()
@@ -269,8 +282,12 @@ public:
 		if (gpGlobals->time < ph7)
 		{
 			this->pev->nextthink = gpGlobals->time + 0.0099999998;
+			this_1_m_iSwing = gpGlobals->time;
 
-
+			if (pev->solid == SOLID_NOT)
+			{
+				PenetrateEnd();
+			}
 		}
 		else
 		{
@@ -295,12 +312,172 @@ public:
 
 	void TouchWall()
 	{
-
+		pev->velocity = {};
+		RadiusDamage();
 	}
 
 	void TouchEntity(CBaseEntity *pOther)
 	{
+		if (pev->owner == pOther->edict())
+			return;
 
+		CBaseEntity *pAttacker = CBaseEntity::Instance(pev->owner);
+		CBasePlayer *pAttackePlayer = nullptr;
+		if (pAttacker && pAttacker->IsPlayer())
+			pAttackePlayer = static_cast<CBasePlayer *>(pAttacker);
+
+		if (pAttackePlayer &&
+			pOther->pev->takedamage != DAMAGE_NO &&
+			pOther->IsAlive()
+			)
+		{
+			Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
+			TraceResult tr;
+			UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+			tr.iHitgroup = HITGROUP_CHEST; // ...
+
+			ClearMultiDamage();
+			pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+			ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+
+			PenetrateStart();
+		}
+		pev->velocity = {};
+	}
+
+	void PenetrateStart()
+	{
+		pev->origin = pev->origin + m_vecStartVelocity.Normalize() * 42;
+		pev->velocity = {};
+		
+		pev->solid = SOLID_NOT;
+
+		pev->nextthink = gpGlobals->time + 0.05f;
+	}
+	
+	void PenetrateEnd()
+	{
+		pev->velocity = m_vecStartVelocity;
+		pev->solid = SOLID_CUSTOM;
+
+		pev->nextthink = gpGlobals->time + 0.001f;
+	}
+	
+	void RadiusDamage()
+	{
+		const float flRadius = m_flExplodeRadius;
+		const float flDamage = m_flExplodeDamage;
+		const Vector vecSrc = pev->origin;
+		entvars_t * const pevAttacker = VARS(pev->owner);
+		entvars_t * const pevInflictor = this->pev;
+		int bitsDamageType = DMG_BULLET;
+
+		TraceResult tr;
+		const float falloff = flRadius ? flDamage / flRadius : 1;
+		const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+		CBaseEntity *pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+		{
+			if (pEntity->pev->takedamage != DAMAGE_NO)
+			{
+				if (bInWater && !pEntity->pev->waterlevel)
+					continue;
+
+				if (!bInWater && pEntity->pev->waterlevel == 3)
+					continue;
+
+				if (pEntity->IsBSPModel())
+					continue;
+
+				if (pEntity->pev == pevAttacker)
+					continue;
+
+				Vector vecSpot = pEntity->BodyTarget(vecSrc);
+				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+				{
+					if (tr.fStartSolid)
+					{
+						tr.vecEndPos = vecSrc;
+						tr.flFraction = 0;
+					}
+					float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+					flAdjustedDamage = Q_max(0, flAdjustedDamage);
+
+					if (tr.flFraction == 1.0f)
+					{
+						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+					}
+					else
+					{
+						tr.iHitgroup = HITGROUP_CHEST;
+						ClearMultiDamage();
+						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+						ApplyMultiDamage(pevInflictor, pevAttacker);
+					}
+
+					/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+					if (pVictim->m_bIsZombie) // Zombie Knockback...
+					{
+						ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
+					}*/
+				}
+			}
+		}
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_chargeexplo.spr"));
+		WRITE_BYTE(10);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_charge_shoot_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+		
+		SetThink(&CGungnirSpear::AdditionalDamageThink);
+		pev->nextthink = gpGlobals->time + 1.1f;
+	}
+
+	void EXPORT AdditionalDamageThink()
+	{
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_BEAMENTPOINT);
+		WRITE_SHORT(this->entindex()); // short (start entity) 
+		WRITE_COORD(m_vecStartOrigin.x); // coord coord coord (end position) 
+		WRITE_COORD(m_vecStartOrigin.y);
+		WRITE_COORD(m_vecStartOrigin.z);
+		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_lightline2.spr")); // short (sprite index) 
+		WRITE_BYTE(0); // byte (starting frame) 
+		WRITE_BYTE(30); // byte (frame rate in 0.1's) 
+		WRITE_BYTE(30); // byte (life in 0.1's) 
+		WRITE_BYTE(250); // byte (line width in 0.1's) 
+		WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
+		WRITE_BYTE(255); // byte,byte,byte (color)
+		WRITE_BYTE(255);
+		WRITE_BYTE(255);
+		WRITE_BYTE(255); // byte (brightness)
+		WRITE_BYTE(50); // byte (scroll speed in 0.1's)
+		MESSAGE_END();
+
+		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_charge_shoot_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+		CBaseEntity::FireBullets3(pev->origin, (m_vecStartOrigin - pev->origin).Normalize(), 0.0f, (m_vecStartOrigin - pev->origin).Length(), 9, BULLET_NONE, m_flAdditionalDamage, 1.0f, this->pev, FALSE);
+	}
+
+	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flAdditionalDamage, float flExplodeRadius, TeamName iTeam)
+	{
+		std::tie(m_flTouchDamage, m_flExplodeDamage, m_flAdditionalDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flAdditionalDamage, flExplodeRadius, iTeam);
+		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
+		m_vecStartOrigin = pev->origin;
 	}
 
 
@@ -311,6 +488,15 @@ public:
 	float ph8; // m_pfnThink?
 	float this_1_m_iSwing;
 	short this_1_has_disconnected;
+
+	float m_flTouchDamage;
+	float m_flExplodeDamage;
+	float m_flAdditionalDamage;
+	float m_flExplodeRadius;
+	TeamName m_iTeam;
+
+	Vector m_vecStartOrigin;
+	Vector m_vecStartVelocity;
 
 protected:
 	void Remove()
@@ -467,8 +653,9 @@ LINK_ENTITY_TO_CLASS(weapon_gungnir, CGungnir)
 
 void CGungnir::Precache()
 {
-	PRECACHE_MODEL(const_cast<char *>(Beam_SPR));
+	PRECACHE_MODEL(Beam_SPR);
 	PRECACHE_MODEL("models/p_gungnirB.mdl");
+	PRECACHE_MODEL("sprites/ef_gungnir_aexplo.spr");
 	return Base::Precache();
 
 }
@@ -548,7 +735,7 @@ void CGungnir::PrimaryAttack()
 #else
 	flags = 0;
 #endif
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, v6, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, v6 /*0*/, 0, v6, 0, FALSE, FALSE);
 
 	if (v6)
 		phs12 = v6 = gpGlobals->time;
@@ -589,7 +776,7 @@ void CGungnir::ShootProjectile()
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.58;
 
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, 3, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 3/*0*/, 0, 3, 0, FALSE, FALSE);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -603,16 +790,10 @@ void CGungnir::ShootSpear()
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrcA = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10 + gpGlobals->v_right * 5;
 	Vector vecSrcB = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10 + -gpGlobals->v_right * (-5);
-	CBaseEntity *pEnt = CBaseEntity::Create("gungnir_spear", vecSrcA, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev));
+	CGungnirSpear *pEnt = static_cast<CGungnirSpear *>(CBaseEntity::Create("gungnir_spear", vecSrcA, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
-		const auto team = m_pPlayer->m_iTeam;
-		Vector vecVelocity = gpGlobals->v_forward * 2000;
-		const float dmg1 = GetDamage_SpearA();
-		const float dmg2 = GetDamage_SpearB();
-		const float dmg3 = GetDamage_SpearC();
-		const float exp_radius = 110;
-		// set ent...
+		pEnt->Init(gpGlobals->v_forward * 2000, GetDamage_SpearA(), GetDamage_SpearB(), GetDamage_SpearC(), 110, m_pPlayer->m_iTeam);
 	}
 #endif
 
@@ -620,7 +801,7 @@ void CGungnir::ShootSpear()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.13;
 	m_iClip = std::max(m_iClip - 5, 0);
 
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, 4, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 4 /*0*/, 0, 4, 0, FALSE, FALSE);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -667,7 +848,7 @@ void CGungnir::ItemPostFrame()
 				phs3 = -1;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4f;
 				ClearEffect();
-				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, 2, 0, FALSE, FALSE);
+				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 2 /*0*/, 0, 2, 0, FALSE, FALSE);
 				phs12 = -1;
 			}
 		}
@@ -736,10 +917,11 @@ void CGungnir::CreateEffect()
 #ifndef CLIENT_DLL
 	for (size_t i = 0; i < 3; ++i)
 	{
-		CBeam *pBeam = CBeam::BeamCreate(Beam_SPR, 10);
+		CBeam *pBeam = CBeam::BeamCreate(Beam_SPR, 30);
 		pBeam->SetColor(255, 255, 255);
-		pBeam->SetScrollRate(15);
+		pBeam->SetScrollRate(30);
 		pBeam->SetBrightness(0);
+		pBeam->SetNoise(20);
 		pev->effects |= EF_NODRAW;
 
 		phs5_6_7[i] = pBeam;
@@ -857,8 +1039,8 @@ void CGungnir::PrimaryAttack_InstantDamage()
 			WRITE_COORD(pEntity->pev->origin.y);
 			WRITE_COORD(pEntity->pev->origin.z);
 			WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_aexplo.spr"));
-			WRITE_BYTE(3);
-			WRITE_BYTE(15);
+			WRITE_BYTE(5);
+			WRITE_BYTE(30);
 			WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
 			MESSAGE_END();
 #endif
