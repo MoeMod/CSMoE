@@ -630,6 +630,9 @@
     <ClCompile Include="..\pm_shared\pm_debug.cpp">
       <Filter>pm_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">

@@ -694,6 +694,9 @@
     <ClCompile Include="..\dlls\gamemode\zbb\zbb_zombie.cpp">
       <Filter>dlls\gamemode\zbb</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\archtypes.h">
