@@ -906,7 +906,7 @@ void CLocalNav::HostagePrethink()
 {
 	for (int iCount = 0; iCount < tot_hostages; ++iCount)
 	{
-		if (hostages[ iCount ] != NULL)
+		if (hostages[ iCount ] != nullptr)
 		{
 			GetClassPtr<CHostage>(hostages[ iCount ]->pev)->PreThink();
 		}

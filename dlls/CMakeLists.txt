@@ -246,6 +246,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m14ebr.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
+	../dlls/wpn_shared/knife_dualsword.cpp
 	)
 
 set(PM_SRCS

@@ -31,7 +31,6 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pEnginefuncsTable, global
 	gpGlobals = pGlobals;
 }
 
-#ifdef XASH_STATIC_GAMELIB
 typedef struct dllexport_s
 {
 	const char *name;
@@ -169,6 +168,7 @@ void 	item_security	( entvars_t *pev );
 void 	item_sodacan	( entvars_t *pev );
 void 	item_suit	( entvars_t *pev );
 void 	item_thighpack	( entvars_t *pev );
+void 	knife_dualsword	( entvars_t *pev );
 void 	knife_skullaxe	( entvars_t *pev );
 void 	knife_zombi	( entvars_t *pev );
 void 	light	( entvars_t *pev );
@@ -410,6 +410,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "item_sodacan", (void *)item_sodacan },
 		{ "item_suit", (void *)item_suit },
 		{ "item_thighpack", (void *)item_thighpack },
+		{ "knife_dualsword", (void *)knife_dualsword },
 		{ "knife_skullaxe", (void *)knife_skullaxe },
 		{ "knife_zombi", (void *)knife_zombi },
 		{ "light", (void *)light },
@@ -515,6 +516,8 @@ static dllexport_t switch_server_exports[] = {
 		{ "zombiespawn", (void *)zombiespawn },
 		{ nullptr, nullptr }
 };
+
+#ifdef XASH_STATIC_GAMELIB
 
 extern "C" int dll_register( const char *name, dllexport_t *exports );
 
