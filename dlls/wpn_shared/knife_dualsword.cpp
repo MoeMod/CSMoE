@@ -97,7 +97,10 @@ public:
 		PRECACHE_SOUND("weapons/dualsword_fly3.wav");
 		PRECACHE_SOUND("weapons/dualsword_fly4.wav");
 		PRECACHE_SOUND("weapons/dualsword_fly5.wav");
-
+		
+		PRECACHE_MODEL("models/p_dualsword_a.mdl");
+		PRECACHE_MODEL("models/p_dualsword_b.mdl");
+		
 		m_iModelLeaf1 = PRECACHE_MODEL("sprites/leaf01_dualsword.spr");
 		m_iModelLeaf2 = PRECACHE_MODEL("sprites/leaf02_dualsword.spr");
 		m_iModelPetal1 = PRECACHE_MODEL("sprites/petal01_dualsword.spr");
