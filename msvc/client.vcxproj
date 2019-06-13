@@ -32,6 +32,7 @@
     <ClCompile Include="..\cl_dll\events.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47l.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_anaconda.cpp" />
     <ClCompile Include="..\cl_dll\events\event_as50.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
@@ -154,6 +155,7 @@
     <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47l.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_anaconda.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_as50.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />

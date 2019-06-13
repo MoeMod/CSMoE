@@ -41,6 +41,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_infinityss",  "Infinity Sliver",       600,  PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinitysr",  "Infinity Red",          600,  PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinitysb",  "Infinity Black",        600,  PISTOL_SLOT,         UNASSIGNED},
+                                                  {"weapon_anaconda",	 "Anaconda",			  650,  PISTOL_SLOT,         UNASSIGNED},
 
                                                   {"weapon_m1887",       "M1887",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
@@ -65,7 +66,8 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_gungnir",     "Gungnir",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
                                                   {"weapon_knife",       "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
-                                                  {"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED}
+                                                  {"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED},
+                                                  {"knife_dualsword",    "Dual Sword Phantom Slayer",0, KNIFE_SLOT,          UNASSIGNED},
 
 };
 

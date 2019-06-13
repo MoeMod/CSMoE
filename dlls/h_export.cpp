@@ -213,6 +213,7 @@ void 	trigger_teleport	( entvars_t *pev );
 void 	trigger_transition	( entvars_t *pev );
 void 	weapon_ak47	( entvars_t *pev );
 void 	weapon_ak47l	( entvars_t *pev );
+void 	weapon_anaconda	( entvars_t *pev );
 void 	weapon_as50	( entvars_t *pev );
 void 	weapon_aug	( entvars_t *pev );
 void 	weapon_awp	( entvars_t *pev );
@@ -455,6 +456,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "trigger_transition", (void *)trigger_transition },
 		{ "weapon_ak47", (void *)weapon_ak47 },
 		{ "weapon_ak47l", (void *)weapon_ak47l },
+		{ "weapon_anaconda", (void *)weapon_anaconda },
 		{ "weapon_as50", (void *)weapon_as50 },
 		{ "weapon_aug", (void *)weapon_aug },
 		{ "weapon_awp", (void *)weapon_awp },

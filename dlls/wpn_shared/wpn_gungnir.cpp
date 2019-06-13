@@ -250,10 +250,10 @@ public:
 		this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_BEAMFOLLOW);
 		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
-		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_lightline1.spr"));// short (sprite index)
+		WRITE_SHORT(m_iModelLight1);// short (sprite index)
 		WRITE_BYTE(20);// byte (life in 0.1's) 
 		WRITE_BYTE(30);// byte (line width in 0.1's) 
 		WRITE_BYTE(255);// byte,byte,byte (color)
@@ -265,9 +265,9 @@ public:
 
 	void Precache() override
 	{
-		PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
-		PRECACHE_MODEL("sprites/ef_gungnir_lightline1.spr");
-		PRECACHE_MODEL("sprites/ef_gungnir_lightline2.spr");
+		m_iModelExplo = PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
+		m_iModelLight1 = PRECACHE_MODEL("sprites/ef_gungnir_lightline1.spr");
+		m_iModelLight2 = PRECACHE_MODEL("sprites/ef_gungnir_lightline2.spr");
 		PRECACHE_SOUND("weapons/gungnir_charge_shoot_exp.wav");
 		PRECACHE_SOUND("weapons/gungnir_charge_shoot_exp2.wav");
 	}
@@ -433,7 +433,7 @@ public:
 		WRITE_COORD(pev->origin.x);
 		WRITE_COORD(pev->origin.y);
 		WRITE_COORD(pev->origin.z);
-		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_chargeexplo.spr"));
+		WRITE_SHORT(m_iModelExplo);
 		WRITE_BYTE(10);
 		WRITE_BYTE(30);
 		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
@@ -449,13 +449,13 @@ public:
 	void EXPORT AdditionalDamageThink()
 	{
 
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_BEAMENTPOINT);
 		WRITE_SHORT(this->entindex()); // short (start entity) 
 		WRITE_COORD(m_vecStartOrigin.x); // coord coord coord (end position) 
 		WRITE_COORD(m_vecStartOrigin.y);
 		WRITE_COORD(m_vecStartOrigin.z);
-		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_lightline2.spr")); // short (sprite index) 
+		WRITE_SHORT(m_iModelLight2); // short (sprite index) 
 		WRITE_BYTE(0); // byte (starting frame) 
 		WRITE_BYTE(30); // byte (frame rate in 0.1's) 
 		WRITE_BYTE(30); // byte (life in 0.1's) 
@@ -497,6 +497,9 @@ public:
 
 	Vector m_vecStartOrigin;
 	Vector m_vecStartVelocity;
+	int m_iModelExplo;
+	int m_iModelLight1;
+	int m_iModelLight2;
 
 protected:
 	void Remove()
