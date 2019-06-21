@@ -14,10 +14,10 @@
 ****/
 #include "events.h"
 
+namespace cl {
+
 int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 
-
-//extern "C"
 
 	DECLARE_EVENT(FireAK47);
 	DECLARE_EVENT(FireAUG);
@@ -72,6 +72,14 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireInfinity_Left);
 	DECLARE_EVENT(FireInfinity_Right);
 	DECLARE_EVENT(FireSVDEX);
+	DECLARE_EVENT(FireMP7A1C);
+	DECLARE_EVENT(FireMP7A1P);
+	DECLARE_EVENT(FireMG3);
+	DECLARE_EVENT(FireM14EBR);
+	DECLARE_EVENT(FireInfinityS);
+	DECLARE_EVENT(FireGungnir);
+	DECLARE_EVENT(FireAnaconda);
+	DECLARE_EVENT(FireMG36);
 /*
 ======================
 Game_HookEvents
@@ -139,4 +147,16 @@ void Game_HookEvents( void )
 	HOOK_EVENT(infinity_left, FireInfinity_Left);
 	HOOK_EVENT(infinity_right, FireInfinity_Right);
 	HOOK_EVENT(svdex, FireSVDEX);
+	HOOK_EVENT(mp7a1c, FireMP7A1C);
+	HOOK_EVENT(mp7a1p, FireMP7A1P);
+	HOOK_EVENT(mg3, FireMG3);
+	HOOK_EVENT(m14ebr, FireM14EBR);
+	HOOK_EVENT(infinityss, FireInfinityS);
+	HOOK_EVENT(infinitysb, FireInfinityS);
+	HOOK_EVENT(infinitysr, FireInfinityS);
+	HOOK_EVENT(gungnir, FireGungnir);
+	HOOK_EVENT(anaconda, FireAnaconda);
+	HOOK_EVENT(mg36, FireMG36);
+}
+
 }
