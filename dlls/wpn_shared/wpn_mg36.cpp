@@ -30,10 +30,10 @@ namespace sv {
     enum m249_e
             {
         M249_IDLE1,
-        M249_RELOAD,
-        M249_DRAW,
         M249_SHOOT1,
-        M249_SHOOT2
+        M249_SHOOT2,
+        M249_RELOAD,
+        M249_DRAW
     };
 
     class CMG36 : public LinkWeaponTemplate<CMG36,
