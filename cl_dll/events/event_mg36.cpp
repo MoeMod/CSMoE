@@ -32,8 +32,8 @@ namespace cl {
 enum m249_e
 {
 	M249_IDLE1 = 0,
-    M249_SHOOT1,
-    M249_SHOOT2,
+        M249_SHOOT1,
+        M249_SHOOT2,
 	M249_RELOAD,
 	M249_DRAW
 };
