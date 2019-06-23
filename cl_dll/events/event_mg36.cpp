@@ -32,11 +32,10 @@ namespace cl {
 enum m249_e
 {
 	M249_IDLE1 = 0,
+    M249_SHOOT1,
+    M249_SHOOT2,
 	M249_RELOAD,
-	M249_DRAW,
-	M249_SHOOT1,
-	M249_SHOOT2,
-	M249_SHOOT3
+	M249_DRAW
 };
 
 
@@ -58,7 +57,7 @@ void EV_FireMG36( event_args_t *args )
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(M249_SHOOT1, M249_SHOOT3), 2);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(M249_SHOOT1, M249_SHOOT2), 2);
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{
