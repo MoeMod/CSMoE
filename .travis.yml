@@ -1,0 +1,18 @@
+language: cpp
+git:
+  submodules: true
+branches:
+  only:
+  - master
+addons:
+  apt:
+    sources:
+      - george-edison55-precise-backports
+    packages:
+      - cmake-data
+      - cmake
+before_insall:
+  - sudo apt-get install -y libsdl2-2.0
+script:
+- if [ $TRAVIS_OS_NAME == linux ]; then cmake ./
+- if [ $TRAVIS_OS_NAME == osx ]; then cmake ./
