@@ -1,18 +1,40 @@
-language: cpp
-git:
-  submodules: true
-branches:
-  only:
-  - master
+language: c
+cache: ccache
+compiler: gcc
+sudo: false
 addons:
   apt:
     sources:
       - george-edison55-precise-backports
     packages:
-      - cmake-data
       - cmake
-before_insall:
-  - sudo apt-get install -y libsdl2-2.0
+      - cmake-data
+      - mingw-w64-i686-dev
+      - binutils-mingw-w64-i686
+      - gcc-mingw-w64-i686
+      - g++-mingw-w64-i686
+      - p7zip-full
+      - gcc-multilib
+      - g++-multilib
+      - libx11-dev:i386
+      - libxext-dev:i386
+      - x11-utils
+      - libgl1-mesa-dev
+      - libasound-dev
+      - zlib1g:i386
+      - libstdc++6:i386
+
+os:
+- linux
+git:
+  submodules: true
+branches:
+  only:
+  - master
+before_script:
+    - sh scripts/travis_${TRAVIS_OS_NAME}_deps.sh
 script:
-- if [ $TRAVIS_OS_NAME == linux ]; then cmake ./
-- if [ $TRAVIS_OS_NAME == osx ]; then cmake ./
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
+after_script:
+    - cd ${TRAVIS_BUILD_DIR}
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ccache --show-stats > ccache_stats.log; fi
