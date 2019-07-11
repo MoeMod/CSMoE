@@ -1,7 +1,7 @@
 language: c
 cache: ccache
 compiler: gcc
-sudo: false
+sudo: true
 addons:
   apt:
     packages:
@@ -26,17 +26,12 @@ addons:
 git:
   depth: 50
   submodules: true
-jdk:
-    - oraclejdk8
 os:
     - linux
-    - osx
   
 before_script:
     - sh scripts/travis_linux_deps.sh
-    - sh scripts/travis_common_deps.sh
 script:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_portable_linux_engine.sh; fi
 after_script:
     - cd ${TRAVIS_BUILD_DIR}
