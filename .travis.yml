@@ -23,6 +23,8 @@ addons:
       - libasound-dev
       - zlib1g:i386
       - libstdc++6:i386
+      - libsdl2-dev
+      - libfontconfig1-dev
 
 os:
 - linux
