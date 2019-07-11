@@ -41,7 +41,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	add_compile_options(-Wno-unused-private-field)
 endif()
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
+set(SDL2_PATH ${CMAKE_SOURCE_DIR}/sdl2)
 
 # force xp build
 if(MSVC)
