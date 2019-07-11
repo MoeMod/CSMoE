@@ -1,3 +1,2 @@
-
-curl -s http://libsdl.org/release/SDL2-2.0.7.tar.gz | tar xzf -
-
+sudo apt-get install -y libsdl2-dev
+sudo apt-get install -y libfontconfig1-dev
