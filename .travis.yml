@@ -25,6 +25,7 @@ addons:
       - libstdc++6:i386
       - libsdl2-dev
       - libfontconfig1-dev
+      - libsdl2-image-dev
 
 os:
 - linux
@@ -33,8 +34,6 @@ git:
 branches:
   only:
   - master
-before_script:
-    - sh scripts/travis_linux_deps.sh
 script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
 after_script:
