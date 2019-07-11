@@ -6,6 +6,9 @@ addons:
   apt:
     packages:
       - cmake
+      - cmake-data
+      - libsdl2-dev
+      - libsdl2-2.0-0
       - mingw-w64-i686-dev
       - binutils-mingw-w64-i686
       - gcc-mingw-w64-i686
