@@ -34,6 +34,8 @@ git:
 branches:
   only:
   - master
+before_script:
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/travis_linux_deps.sh; fi
 script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
 after_script:
