@@ -32,7 +32,7 @@ branches:
   only:
   - master
 before_script:
-    - sh scripts/travis_${TRAVIS_OS_NAME}_deps.sh
+    - sh scripts/travis_linux_deps.sh
 script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
 after_script:
