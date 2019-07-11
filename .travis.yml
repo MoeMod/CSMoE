@@ -4,11 +4,8 @@ compiler: gcc
 sudo: false
 addons:
   apt:
-    sources:
-      - george-edison55-precise-backports
     packages:
       - cmake
-      - cmake-data
       - mingw-w64-i686-dev
       - binutils-mingw-w64-i686
       - gcc-mingw-w64-i686
@@ -23,21 +20,21 @@ addons:
       - libasound-dev
       - zlib1g:i386
       - libstdc++6:i386
-      - libsdl2-dev
-      - libfontconfig1-dev
-      - libsdl2-image-dev
-
-os:
-- linux
 git:
+  depth: 50
   submodules: true
-branches:
-  only:
-  - master
+jdk:
+    - oraclejdk8
+os:
+    - linux
+    - osx
+  
 before_script:
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/travis_linux_deps.sh; fi
+    - sh scripts/travis_linux_deps.sh
+    - sh scripts/travis_common_deps.sh
 script:
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_mingw_engine.sh; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_portable_linux_engine.sh; fi
 after_script:
     - cd ${TRAVIS_BUILD_DIR}
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ccache --show-stats > ccache_stats.log; fi
