@@ -27,9 +27,8 @@
 //		- Drawing the HUD graphics every frame
 //		- Handling the custum HUD-update packets
 //
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef float vec_t;
+#include "basetypes.h"
+
 typedef int (*pfnUserMsgHook)(const char *pszName, int iSize, void *pbuf);
 
 #include "util_vector.h"

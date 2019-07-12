@@ -1,5 +1,3 @@
-#include "common.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"

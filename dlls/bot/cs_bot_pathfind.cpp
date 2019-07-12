@@ -416,7 +416,7 @@ bool CCSBot::UpdateLadderMovement()
 				{
 					Vector2D perp(-m_pathLadder->m_dirVector.y, m_pathLadder->m_dirVector.x);
 
-					if (abs(int64(d.x * perp.x + d.y * perp.y)) < tolerance && d.Length() < closeToGoal)
+					if (abs(static_cast<long long>(d.x * perp.x + d.y * perp.y)) < tolerance && d.Length() < closeToGoal)
 						approached = true;
 				}
 

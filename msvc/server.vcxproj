@@ -745,6 +745,11 @@
     <ClInclude Include="..\dlls\tutor_cs_states.h" />
     <ClInclude Include="..\dlls\tutor_cs_tutor.h" />
     <ClInclude Include="..\dlls\util.h" />
+    <ClInclude Include="..\dlls\util\u_ebobase.hpp" />
+    <ClInclude Include="..\dlls\util\u_functor.hpp" />
+    <ClInclude Include="..\dlls\util\u_iterator.hpp" />
+    <ClInclude Include="..\dlls\util\u_range.hpp" />
+    <ClInclude Include="..\dlls\util\u_time.hpp" />
     <ClInclude Include="..\dlls\vector.h" />
     <ClInclude Include="..\dlls\vehicle.h" />
     <ClInclude Include="..\dlls\weapons.h" />
@@ -856,7 +861,6 @@
     <ClInclude Include="..\pm_shared\pm_materials.h" />
     <ClInclude Include="..\pm_shared\pm_movevars.h" />
     <ClInclude Include="..\pm_shared\pm_shared.h" />
-    <ClInclude Include="..\public\archtypes.h" />
     <ClInclude Include="..\public\arraysize.h" />
     <ClInclude Include="..\public\basetypes.h" />
     <ClInclude Include="..\public\const\const_client.h" />
@@ -866,7 +870,6 @@
     <ClInclude Include="..\public\MemPool.h" />
     <ClInclude Include="..\public\minmax.h" />
     <ClInclude Include="..\public\ruleof350.h" />
-    <ClInclude Include="..\public\osconfig.h" />
     <ClInclude Include="..\public\protected_things.h" />
     <ClInclude Include="..\public\tier1\utlmemory.h" />
     <ClInclude Include="..\public\tier1\utlvector.h" />
@@ -879,7 +882,7 @@
     <ProjectGuid>{70A2B904-B7DB-4C48-8DE0-AF567360D572}</ProjectGuid>
     <RootNamespace>regamelite</RootNamespace>
     <ProjectName>server</ProjectName>
-    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -887,7 +890,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>

@@ -33,10 +33,8 @@
 #pragma warning(disable : 4100)		// unreferenced formal parameter
 #endif
 
-#include "stdint.h"
 #include "maintypes.h"
 #include "basetypes.h"
-#include "archtypes.h"     // DAL
 #include "common.h"
 
 // Prevent tons of unused windows definitions
@@ -63,11 +61,11 @@ typedef int BOOL;
 #endif //_WIN32
 
 // Misc C-runtime library headers
-#include "stdio.h"
-#include "stdlib.h"
-#include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
-//#include "minmax.h"
+#include "minmax.h"
 
 // Header file containing definition of globalvars_t and entvars_t
 //typedef unsigned int func_t;					//
@@ -82,7 +80,6 @@ typedef float vec_t;				// needed before including progdefs.h
 
 									// Shared engine/DLL constants
 #include "const.h"
-#include "progdefs.h"
 #include "edict.h"
 
 									// Shared header describing protocol between engine and DLLs

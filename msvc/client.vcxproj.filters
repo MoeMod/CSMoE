@@ -953,9 +953,6 @@
     <ClInclude Include="..\cl_dll\view.h">
       <Filter>cl_dll</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\cdll_dll.h">
-      <Filter>cl_dll</Filter>
-    </ClInclude>
     <ClInclude Include="..\cl_dll\demo.h">
       <Filter>cl_dll</Filter>
     </ClInclude>
@@ -1021,6 +1018,9 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons_register.h">
       <Filter>cl_dll\cs_wpn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cdll_dll.h">
+      <Filter>dlls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

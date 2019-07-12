@@ -14,16 +14,22 @@
 #pragma once
 #endif
 
-#include <archtypes.h>
 #include <string.h>
+#ifdef NO_STL
+template <class T>
+void *operator new(size_t count, T *ptr) {
+	return ptr;
+}
+#elif defined(_WIN32) && !defined(__MINGW32__)
+#include <new.h>
+#else
+#include "new"
+#endif
+#include <stdlib.h>
+#include <math.h>
 #include <assert.h>
 
-#ifdef _MSC_VER
-#pragma warning (disable:4100)
-#pragma warning (disable:4514)
-#endif
-
-#define Assert(expr)
+#define Assert(x) assert(x)
 
 //-----------------------------------------------------------------------------
 

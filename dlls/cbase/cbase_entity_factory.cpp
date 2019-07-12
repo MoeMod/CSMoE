@@ -13,8 +13,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#include "common.h"
-
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"

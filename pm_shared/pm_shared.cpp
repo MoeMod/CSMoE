@@ -13,7 +13,7 @@
 *
 ****/
 
-#include <assert.h>
+#include "basetypes.h"
 #include "mathlib.h"
 #include "const.h"
 #include "usercmd.h"
@@ -26,6 +26,7 @@
 #include <string.h> // strcpy
 #include <stdlib.h> // atoi
 #include <ctype.h>  // isspace
+#include <assert.h>  // isspace
 
 #if defined(CLIENT_DLL)
 namespace cl {

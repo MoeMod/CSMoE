@@ -733,8 +733,6 @@ enum
 	kRenderFxClampMinScale		// Keep this sprite from getting very small (SPRITES only!)
 };
 
-#include "xash3d_types.h"
-
 typedef int		func_t;
 typedef int		string_t;
 

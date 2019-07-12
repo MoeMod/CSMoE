@@ -13,6 +13,7 @@
 *
 ****/
 
+#include "basetypes.h"
 #include "mathlib.h"
 #include "const.h"
 #include "usercmd.h"

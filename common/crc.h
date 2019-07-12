@@ -19,7 +19,7 @@
 #pragma once
 #endif
 
-#include "archtypes.h"     // DAL
+#include <stdint.h>
 
 // MD5 Hash
 typedef struct
@@ -30,11 +30,7 @@ typedef struct
 } MD5Context_t;
 
 
-#ifdef _WIN32
-typedef uint32 CRC32_t;
-#else
-typedef uint32 CRC32_t;
-#endif
+typedef uint32_t CRC32_t;
 
 #ifdef __cplusplus
 extern "C"
