@@ -30,8 +30,11 @@ GNU General Public License for more details.
 #include "dlls/gamemode/zbb/zbb_zombie.h"
 
 #include "util/u_range.hpp"
+#include "util/u_time.hpp"
 
 namespace sv {
+
+using namespace moe;
 
 class CZBBCountdownDelegate : public CZB1CountdownDelegate
 {
@@ -285,7 +288,7 @@ private:
 
 		// MoeMod : hack the client prediction
 		if (m_pZBB_Delegate && m_pZBB_Delegate->IsBuilding())
-			cd->m_flNextAttack = gpGlobals->time + 0.01f;
+			cd->m_flNextAttack = (EngineClock::now() + 10ms).time_since_epoch().count();
 	}
 
 	void OnThink() override

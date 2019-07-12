@@ -77,6 +77,9 @@
     <Filter Include="public\const">
       <UniqueIdentifier>{98fd8c90-5625-473c-90c0-d723f7879ef6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dlls\util">
+      <UniqueIdentifier>{89ff163d-57f3-4352-894b-39719b236c0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -702,9 +705,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\public\archtypes.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\basetypes.h">
       <Filter>public</Filter>
     </ClInclude>
@@ -1031,9 +1031,6 @@
     </ClInclude>
     <ClInclude Include="..\game_shared\bot\bot_constants.h">
       <Filter>game_shared\bot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\osconfig.h">
-      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="..\public\utlmemory.h">
       <Filter>public</Filter>
@@ -1484,6 +1481,21 @@
     </ClInclude>
     <ClInclude Include="..\dlls\gamemode\zbb\zbb_zombie.h">
       <Filter>dlls\gamemode\zbb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\u_iterator.hpp">
+      <Filter>dlls\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\u_range.hpp">
+      <Filter>dlls\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\u_time.hpp">
+      <Filter>dlls\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\u_ebobase.hpp">
+      <Filter>dlls\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\u_functor.hpp">
+      <Filter>dlls\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

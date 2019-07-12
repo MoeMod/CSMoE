@@ -11,7 +11,6 @@
 
 #include <memory.h>
 #include "hud.h"
-#include "studio/studio_util.h"
 
 #include "cl_util.h"
 #include "const.h"
@@ -25,6 +24,10 @@
 #include "con_nprint.h"
 #include "triangleapi.h"
 #include "parsemsg.h"
+#include "com_model.h"
+
+#include "studio/studio_util.h"
+
 #include <new>
 
 #define DRIPSPEED    900		// speed of raindrips (pixel per secs)
