@@ -62,7 +62,7 @@ CSMoE 可以跨平台运行, 支持的平台包括: Windows(x86,x64), Linux(x86)
 Note : 如果有关于 MSVCR140.dll 或有类似的错误, 点击下面链接安装 Microsoft VC++ Redist 即可 \
 https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 ### Linux
-1. 下载 ***-linux-i386 and ***-GameDir and 并将他们解压到一起
+1. 下载 ***-linux-i386 和 ***-GameDir and 并将他们解压到一起
 2. 在 Steam 上购买并下载 Counter-Strike (请支持正版!)
 3. 复制 'cstrike' 和 'valve' 目录至 CSMoE 目录下
 4. 运行命令号, cd 到 CSMoE 目录, 输入 
@@ -77,45 +77,45 @@ Note : 你可能需要安装 libSDL2 以及其他需求插件
 4. 下载并安装 ***-Android.apk
 5. 跟随说明运行游戏
 ### iOS
-1. download and install the ipa using Impactor 
-  * armv7 for iPhone 5, iPad 4, iPod Touch 5 or earlier
-  * arm64 for iPhone 5s, iPad Air 1, iPod Touch 6 or newer
+1. 使用 Impactor 下载并安装 ipa
+  * armv7 <- iPhone 5, iPad 4, iPod Touch 5 及更早的平台
+  * arm64 <- iPhone 5s, iPad Air 1, iPod Touch 6 及更早的平台
 2. 下载并解压 ***-GameDir
-2. 在 Steam 上购买并下载 Counter-Strike (请支持正版!)
-4. find cstrike and valve directory in steamapps
-5. launch iTunes and select the APP in file sharing
-6. drag csmoe, cstrike, valve into iTunes
-7. run the app on the SpringBoard \
-Note : Thanks to the fxxking App Store limitations, you must reinstall it every week or it will crash (no need to recopy resources).
+3. 在 Steam 上购买并下载 Counter-Strike (请支持正版!)
+4. 在 'steamapps' 目录下找到 'cstrike' 和 'valve' 目录
+5. 运行 iTunes 并在分享文件内选择 APP
+6. 将 csmoe, cstrike, valve 拉到 iTunes 内
+7. 在 SpringBoard 运行 CSMoE \
+Note : 由于傻逼 AppStore 的限制, 你必须每周安装一次 CSMoE , 否则它会崩溃 (不需要重新复制资源).
 ### macOS
-1. download ***-macos-x64 and ***-GameDir and extract them together
-2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csmoe locates
-4. run csmoe_macos.sh with Terminal \
-Note : If it results in a black window, try to drag it and then the menu will appear.
+1. 下载 ***-macos-x64 和 ***-GameDir 并将他们解压到一起
+2. 在 Steam 上购买并下载 Counter-Strike (请支持正版!)
+3. 复制 'cstrike' 和 'valve' 目录至 CSMoE 目录下
+4. 以管理员权限运行 csmoe_macos.sh \
+Note : 如果运行后黑屏, 试试看拖拉窗口, 之后菜单应该就出来了.
 
-## Building
-### Generic
-- This project uses C++11 standard, and please ensure that your compiler supports it.
-- Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
+## 工程
+### 通常
+- 本项目使用 C++11 基础, 请确保你的编译器支持它.
+- 已测试的编译器 : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 ### Windows
-- Visual Studio 2017 projects can be found in msvc/csmoe.sln
-- Download SDL2-devel-2.0.9-VC.zip from http://www.libsdl.org/ and put them into SDL2/
-- It should be OK to build with both x86 and x64. \
-  Note : You can also use cmake to build with mingw, etc.
+- Visual Studio 2017 项目的路径为 msvc/csmoe.sln
+- 下载 SDL2-devel-2.0.9-VC.zip 通过 http://www.libsdl.org/ 并将它们放到 SDL2/
+- 一般来说这样就可以在 x86 和 x64 环境下正常运行了. \
+  Note : 你也可以通过 cmake 来载入工程, 通过 mingw, 类似的软件.
 ### macOS & Linux
-- Build with CMake
+- 通过 CMake 载入工程
 - ~~Set SDL2_PATH to where the SDL2 locates~~
-- Install packages : libfontconfig1-dev libsdl2-dev
-- It should be OK to build with both x86 and x64.
+- 安装包 : libfontconfig1-dev libsdl2-dev
+- 一般来说这样就可以在 x86 和 x64 环境下正常运行了.
 ### Android
-- Put this repo into jni/src/xash3d
+- 将该项目放入 jni/src/xash3d
 - ~~Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version~~
-- Build APK with Android Studio, tested with Android SDK level 28 and Android NDK r20
-- arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
+- 通过 Android Studio 来 Build App, 用 Android SDK level 28 和 Android NDK r20 测试.
+- arm64-v8a 暂不支持. 请在 armeabi-v7a, x86 环境下 Build.
 ### iOS
-- please refer to mittorn/xash3d-ios
-- supports both armv7, arm64.
+- 请参考 mittorn/xash3d-ios
+- 支持 armv7, arm64.
 
 ## 协议
 本项目遵循 GPLv3 协议, 您可以点击目录下的 'LICENSE' 文件获取更多信息.
