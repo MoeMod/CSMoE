@@ -1,4 +1,4 @@
-[English](## Counter-Strike Mobile-oriented Edition) | [中文(简体)](## 关于本项目 - Counter-Strike Mobile-oriented Edition)
+[English](#Counter-Strike_Mobile-oriented_Edition) | [中文(简体)](#关于本项目)
 
 ## Counter-Strike Mobile-oriented Edition
 Here are the source code of engine, server, client (windows and linux only). \
@@ -130,7 +130,7 @@ This repo is licensed under GPLv3 license, check LICENSE file for details.
  For non-developers, turn to QQ group 3266216 for more information.
  
  
-## 关于本项目 - Counter-Strike Mobile-oriented Edition
+## 关于本项目
 本项目提供了 Counter-Strike Mobile-oriented Edition(下称'CSMoE')的 引擎, 服务端, 以及客户端的源代码(仅Windows及Linux). \
 关于 Android 系统或 iOs 系统的 CSMoE 启动器, 请查看其他项目. \
 CSMoE 是一个基于 Xash3D 引擎的 CS1.6 Mod 合集, \
