@@ -239,7 +239,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_xm8s.cpp
 	../dlls/wpn_shared/knife_skullaxe.cpp
 	../dlls/wpn_shared/wpn_gungnir.cpp
-	../dlls/wpn_shared/wpn_mg3.cpp
+	
 	../dlls/wpn_shared/wpn_mp7a1c.cpp
 	../dlls/wpn_shared/wpn_mp7a1p.cpp
 	../dlls/wpn_shared/wpn_infinitys.cpp
@@ -248,6 +248,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_infinityex2.cpp
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
+	../dlls/wpn_shared/wpn_mg36.cpp
 	)
 
 set(PM_SRCS
