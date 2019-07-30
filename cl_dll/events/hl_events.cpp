@@ -156,7 +156,7 @@ void Game_HookEvents( void )
 	HOOK_EVENT(infinitysr, FireInfinityS);
 	HOOK_EVENT(gungnir, FireGungnir);
 	HOOK_EVENT(anaconda, FireAnaconda);
-	HOOK_EVENT(anaconda, FireMG36);
+	HOOK_EVENT(mg36, FireMG36);
 }
 
 }
