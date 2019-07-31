@@ -308,3 +308,4 @@ build-*
 /.idea
 /cmake-build-debug
 CMakeSettings.json
+/SDL2
