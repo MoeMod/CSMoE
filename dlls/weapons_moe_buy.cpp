@@ -51,6 +51,8 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_mp7a1c",      "MP7A1",                 2150, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
                                                   {"weapon_m14ebr",      "M14 EBR",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  { "weapon_balrog7",      "Balrog7",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_gatling",      "Gatling",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED },
                                                   {"weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_tar21",       "TAR-21",                3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},

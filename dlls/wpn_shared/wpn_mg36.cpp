@@ -82,7 +82,7 @@ namespace sv {
     KickBackData KickBackWalking = { 1.4f, 0.3f, 0.065f, 0.04f, 3.5f, 2, 6 };
     KickBackData KickBackNotOnGround = { 1.6f, 0.6f, 0.4f, 0.125f, 5, 3, 8 };
     KickBackData KickBackDucking = { 0.6f, 0.15f, 0.15f, 0.01f, 2.0f, 0.8f, 15 };
-    KickBackData KickBackDefault = { 1.1, 0.2f, 0.04f, 0.22f, 2.5f, 2, 8 };
+    KickBackData KickBackDefault = { 1.1f, 0.2f, 0.04f, 0.22f, 2.5f, 2, 8 };
     KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
 };
 LINK_ENTITY_TO_CLASS(weapon_mg36, CMG36)

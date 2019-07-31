@@ -238,6 +238,8 @@ void 	weapon_k1a	( entvars_t *pev );
 void 	weapon_knife	( entvars_t *pev );
 void 	weapon_kriss	( entvars_t *pev );
 void 	weapon_m14ebr	( entvars_t *pev );
+void 	weapon_balrog7	(entvars_t *pev);
+void 	weapon_gatling	(entvars_t *pev);
 void 	weapon_m1887	( entvars_t *pev );
 void 	weapon_m249	( entvars_t *pev );
 void 	weapon_m3	( entvars_t *pev );
@@ -481,6 +483,8 @@ static dllexport_t switch_server_exports[] = {
 		{ "weapon_knife", (void *)weapon_knife },
 		{ "weapon_kriss", (void *)weapon_kriss },
 		{ "weapon_m14ebr", (void *)weapon_m14ebr },
+		{ "weapon_balrog7", (void *)weapon_balrog7 },
+		{ "weapon_gatling", (void *)weapon_gatling },
 		{ "weapon_m1887", (void *)weapon_m1887 },
 		{ "weapon_m249", (void *)weapon_m249 },
 		{ "weapon_m3", (void *)weapon_m3 },
