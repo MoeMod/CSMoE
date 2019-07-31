@@ -78,8 +78,8 @@ namespace sv {
 /*
 * Globals initialization
 */
-float g_flTimeLimit = 0;
-float g_flResetTime = 0;
+time_point_t g_flTimeLimit;
+time_point_t g_flResetTime;
 bool g_bClientPrintEnable = true;
 
 bool g_skipCareerInitialSpawn = false;
@@ -152,7 +152,7 @@ NOXREF void set_suicide_frame(entvars_t *pev)
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_TOSS;
 	pev->deadflag = DEAD_DEAD;
-	pev->nextthink = -1;
+	pev->nextthink = {};
 }
 
 void TeamChangeUpdate(CBasePlayer *player, int team_id)
@@ -535,7 +535,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->m_iHostagesKilled = 0;
 	pPlayer->m_iMapVote = 0;
 	pPlayer->m_iCurrentKickVote = 0;
-	pPlayer->m_fDeadTime = 0;
+	pPlayer->m_fDeadTime = {};
 	pPlayer->has_disconnected = false;
 	pPlayer->m_iMenu = Menu_OFF;
 	pPlayer->ClearAutoBuyData();
@@ -620,7 +620,7 @@ void Host_Say(edict_t *pEntity, int teamonly)
 	entvars_t *pev = &pEntity->v;
 	CBasePlayer *player = GetClassPtr<CBasePlayer>(pev);
 
-	if (player->m_flLastTalk != 0.0f && gpGlobals->time - player->m_flLastTalk < 0.66f)
+	if (player->m_flLastTalk != time_point_t{} && gpGlobals->time - player->m_flLastTalk < 0.66s)
 		return;
 
 	player->m_flLastTalk = gpGlobals->time;
@@ -1863,7 +1863,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 
 				// do we have fadetoblack on? (need to fade their screen back in)
 				if (fadetoblack.value) {
-					UTIL_ScreenFade(player, Vector(0, 0, 0), 0.001, 0, 0, FFADE_IN);
+					UTIL_ScreenFade(player, Vector(0, 0, 0), 0.001s, 0s, 0, FFADE_IN);
 				}
 
 				return TRUE;
@@ -1953,7 +1953,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 
 		player->m_bHasNightVision = false;
 		player->m_iHostagesKilled = 0;
-		player->m_fDeadTime = 0;
+		player->m_fDeadTime = {};
 		player->has_disconnected = false;
 
 		player->m_iJoiningState = GETINTOGAME;
@@ -2588,7 +2588,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[4])
 		{
-			player->m_flLastCommandTime[4] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[4] = gpGlobals->time + 0.3s;
 
 			if (gpGlobals->time < player->m_flNextVoteTime)
 			{
@@ -2596,11 +2596,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				return;
 			}
 
-			player->m_flNextVoteTime = gpGlobals->time + 3;
+			player->m_flNextVoteTime = gpGlobals->time + 3s;
 
 			if (player->m_iTeam != UNASSIGNED)
 			{
-				if (gpGlobals->time < 180)
+				if (gpGlobals->time.time_since_epoch() < 180s)
 				{
 					ClientPrint(player->pev, HUD_PRINTCONSOLE, "#Cannot_Vote_Map");
 					return;
@@ -2660,7 +2660,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time > player->m_iTimeCheckAllowed)
 		{
-			player->m_iTimeCheckAllowed = (int)(gpGlobals->time + 1);
+			player->m_iTimeCheckAllowed = gpGlobals->time + 1s;
 
 			if (!timelimit.value)
 			{
@@ -2668,7 +2668,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				return;
 			}
 
-			int iTimeRemaining = (int)(g_flTimeLimit - gpGlobals->time);
+			int iTimeRemaining = (int)(g_flTimeLimit - gpGlobals->time).count();
 
 			if (iTimeRemaining < 0)
 				iTimeRemaining = 0;
@@ -4240,7 +4240,7 @@ bool CheckPlayerPVSLeafChanged(edict_t *client, int clientnum)
 	return false;
 }
 
-void MarkEntityInPVS(int clientnum, int entitynum, float time, bool inpvs)
+void MarkEntityInPVS(int clientnum, int entitynum, time_point_t time, bool inpvs)
 {
 	PLAYERPVSSTATUS *pvs;
 	ENTITYPVSSTATUS *es;
@@ -4251,10 +4251,10 @@ void MarkEntityInPVS(int clientnum, int entitynum, float time, bool inpvs)
 	if (inpvs)
 		es->m_fTimeEnteredPVS = time;
 	else
-		es->m_fTimeEnteredPVS = 0;
+		es->m_fTimeEnteredPVS = {};
 }
 
-bool CheckEntityRecentlyInPVS(int clientnum, int entitynum, float currenttime)
+bool CheckEntityRecentlyInPVS(int clientnum, int entitynum, time_point_t currenttime)
 {
 	PLAYERPVSSTATUS *pvs;
 	ENTITYPVSSTATUS *es;
@@ -4262,7 +4262,7 @@ bool CheckEntityRecentlyInPVS(int clientnum, int entitynum, float currenttime)
 	pvs = &g_PVSStatus[clientnum];
 	es = &pvs->m_Status[entitynum];
 
-	if (es->m_fTimeEnteredPVS && es->m_fTimeEnteredPVS + 1.0f >= currenttime)
+	if (es->m_fTimeEnteredPVS + 1.0s >= currenttime)
 	{
 		return true;
 	}
@@ -4293,7 +4293,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
       {
          if (!ENGINE_CHECK_VISIBILITY (ent, pSet))
          {
-            MarkEntityInPVS (hostnum, e, 0, false);
+            MarkEntityInPVS (hostnum, e, invalid_time_point, false);
             return 0;
          }
 
@@ -4333,7 +4333,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    if (ent->v.flags & FL_CUSTOMENTITY)
       state->entityType = ENTITY_BEAM;
 
-   state->animtime = (int)(1000.0 * ent->v.animtime) / 1000.0;
+   state->animtime = (int)(1000.0 * ent->v.animtime.time_since_epoch().count()) / 1000.0;
 
    Q_memcpy (state->origin, ent->v.origin, sizeof (float) * 3);
    Q_memcpy (state->angles, ent->v.angles, sizeof (float) * 3);
@@ -4342,14 +4342,14 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    Q_memcpy (state->startpos, ent->v.startpos, sizeof (float) * 3);
    Q_memcpy (state->endpos, ent->v.endpos, sizeof (float) * 3);
 
-   state->impacttime = ent->v.impacttime;
-   state->starttime = ent->v.starttime;
+   state->impacttime = ent->v.impacttime.time_since_epoch() / 1s;
+   state->starttime = ent->v.starttime.time_since_epoch() / 1s;
    state->modelindex = ent->v.modelindex;
    state->frame = ent->v.frame;
    state->skin = ent->v.skin;
    state->effects = ent->v.effects;
 
-   if (!player && ent->v.animtime && !ent->v.velocity.x && !ent->v.velocity.y && !ent->v.velocity.z)
+   if (!player && ent->v.animtime > time_point_t{} && !ent->v.velocity.x && !ent->v.velocity.y && !ent->v.velocity.z)
       state->eflags |= EFLAG_SLERP;
 
    state->scale = ent->v.scale;
@@ -4666,17 +4666,17 @@ int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)
 
 					item->m_iId = II.iId;
 					item->m_iClip = gun->m_iClip;
-					item->m_flTimeWeaponIdle = Q_max(gun->m_flTimeWeaponIdle, -0.001f);
-					item->m_flNextPrimaryAttack = Q_max(gun->m_flNextPrimaryAttack, -0.001f);
-					item->m_flNextSecondaryAttack = Q_max(gun->m_flNextSecondaryAttack, -0.001f);
-					item->m_flNextReload = Q_max(gun->m_flNextReload, -0.001f);
+					item->m_flTimeWeaponIdle = max(gun->m_flTimeWeaponIdle, -0.001s) / 1s;
+					item->m_flNextPrimaryAttack = max(gun->m_flNextPrimaryAttack, -0.001s) / 1s;
+					item->m_flNextSecondaryAttack = max(gun->m_flNextSecondaryAttack, -0.001s) / 1s;
+					item->m_flNextReload = max(gun->m_flNextReload, -0.001s) / 1s;
 					item->m_fInReload = gun->m_fInReload;
 					item->m_fInSpecialReload = gun->m_fInSpecialReload;
 					item->m_fInZoom = gun->m_iShotsFired;
-					item->m_fAimedDamage = gun->m_flLastFire;
+					item->m_fAimedDamage = gun->m_flLastFire.time_since_epoch() / 1s;
 					item->m_iWeaponState = gun->m_iWeaponState;
-					item->fuser2 = gun->m_flStartThrow;
-					item->fuser3 = gun->m_flReleaseThrow;
+					item->fuser2 = gun->m_flStartThrow.time_since_epoch() / 1s;
+					item->fuser3 = gun->m_flReleaseThrow.time_since_epoch() / 1s;
 					item->iuser1 = gun->m_iSwing;
 				}
 			}

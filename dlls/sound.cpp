@@ -10,6 +10,7 @@
 #include "sound.h"
 
 #include <ctype.h>
+#include <chrono>
 
 namespace sv {
 
@@ -75,7 +76,7 @@ TYPEDESCRIPTION CSpeaker::m_SaveData[] =
 };
 
 // time delay until it's ok to speak: used so that two NPCs don't talk at once
-float CTalkMonster::g_talkWaitTime = 0;
+time_point_t CTalkMonster::g_talkWaitTime;
 
 char gszallsentencenames[ CVOXFILESENTENCEMAX ][ CBSENTENCENAME_MAX ];
 sentenceg rgsentenceg[ CSENTENCEG_MAX ];
@@ -139,7 +140,7 @@ void CAmbientGeneric::Spawn()
 	// start thinking yet.
 
 	SetThink(&CAmbientGeneric::RampThink);
-	pev->nextthink = 0;
+	pev->nextthink = invalid_time_point;
 
 	// allow on/off switching via 'use' function.
 	SetUse(&CAmbientGeneric::ToggleUse);
@@ -195,7 +196,7 @@ void CAmbientGeneric::Restart()
 	// of ambient sound's pitch or volume. Don't
 	// start thinking yet.
 	SetThink(&CAmbientGeneric::RampThink);
-	pev->nextthink = 0;
+	pev->nextthink = invalid_time_point;
 
 	// allow on/off switching via 'use' function.
 	SetUse(&CAmbientGeneric::ToggleUse);
@@ -1860,7 +1861,7 @@ void CSpeaker::Spawn()
 	pev->movetype = MOVETYPE_NONE;
 
 	SetThink(&CSpeaker::SpeakerThink);
-	pev->nextthink = 0.0f;
+	pev->nextthink = invalid_time_point;
 
 	// allow on/off switching via 'use' function.
 	SetUse(&CSpeaker::ToggleUse);
@@ -1888,7 +1889,7 @@ void CSpeaker::SpeakerThink()
 	// Wait for the talkmonster to finish first.
 	if (gpGlobals->time <= CTalkMonster::g_talkWaitTime)
 	{
-		pev->nextthink = CTalkMonster::g_talkWaitTime + RANDOM_FLOAT(5, 10);
+		pev->nextthink = CTalkMonster::g_talkWaitTime + duration_t(RANDOM_FLOAT(5, 10));
 		return;
 	}
 
@@ -1926,7 +1927,7 @@ void CSpeaker::SpeakerThink()
 		UTIL_EmitAmbientSound(ENT(pev), pev->origin, szSoundFile, flvolume, flattenuation, flags, pitch);
 
 		// shut off and reset
-		pev->nextthink = 0.0f;
+		pev->nextthink = invalid_time_point;
 	}
 	else
 	{
@@ -1951,7 +1952,7 @@ void CSpeaker::SpeakerThink()
 
 void CSpeaker::ToggleUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
-	int fActive = (pev->nextthink > 0.0f);
+	int fActive = (pev->nextthink > invalid_time_point);
 
 	// fActive is TRUE only if an announcement is pending
 	if (useType != USE_TOGGLE)
@@ -1974,7 +1975,7 @@ void CSpeaker::ToggleUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	if (useType == USE_OFF)
 	{
 		// turn off announcements
-		pev->nextthink = 0.0;
+		pev->nextthink = invalid_time_point;
 		return;
 
 	}
@@ -1983,7 +1984,7 @@ void CSpeaker::ToggleUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 	if (fActive)
 	{
 		// turn off announcements
-		pev->nextthink = 0.0;
+		pev->nextthink = invalid_time_point;
 	}
 	else
 	{

@@ -142,7 +142,7 @@ void HostageEscapeToCoverState::OnMoveToFailure(const Vector &goal, MoveToFailur
 
 void HostageEscapeLookAroundState::OnEnter(CHostageImprov *improv)
 {
-	m_timer.Start(RANDOM_FLOAT(5, 10));
+	m_timer.Start(RandomDuration<float>(5s, 10s));
 
 	improv->Stop();
 	improv->FaceOutwards();
@@ -210,7 +210,7 @@ void HostageEscapeState::OnUpdate(CHostageImprov *improv)
 		{
 			improv->Frighten(CHostageImprov::NERVOUS);
 
-			m_runTimer.Start(RANDOM_FLOAT(3, 6));
+			m_runTimer.Start(RandomDuration<float>(3s, 6s));
 			m_behavior.SetState(&m_toCoverState);
 		}
 		else

@@ -83,7 +83,7 @@ void HuntState::OnUpdate(CCSBot *me)
 {
 	// if we've been hunting for a long time, drop into Idle for a moment to
 	// select something else to do
-	const float huntingTooLongTime = 30.0f;
+	constexpr auto huntingTooLongTime = 30.0s;
 	if (gpGlobals->time - me->GetStateTimestamp() > huntingTooLongTime)
 	{
 		// stop being a rogue and do the scenario, since there must not be many enemies left to hunt
@@ -103,7 +103,7 @@ void HuntState::OnUpdate(CCSBot *me)
 			// if we have the bomb and it's time to plant, or we happen to be in a bombsite and it seems safe, do it
 			if (me->IsCarryingBomb())
 			{
-				const float safeTime = 3.0f;
+				constexpr auto safeTime = 3.0s;
 				if (ctrl->IsTimeToPlantBomb() || (me->IsAtBombsite() && gpGlobals->time - me->GetLastSawEnemyTimestamp() > safeTime))
 				{
 					me->Idle();
@@ -203,7 +203,7 @@ void HuntState::OnUpdate(CCSBot *me)
 	if (me->GetLastKnownArea() == m_huntArea || me->UpdatePathMovement() != CCSBot::PROGRESSING)
 	{
 		m_huntArea = NULL;
-		float oldest = 0.0f;
+		duration_t oldest = duration_t::min();
 
 		int areaCount = 0;
 		const float minSize = 150.0f;
@@ -218,7 +218,7 @@ void HuntState::OnUpdate(CCSBot *me)
 				continue;
 
 			// keep track of the least recently cleared area
-			float age = gpGlobals->time - area->GetClearedTimestamp(me->m_iTeam - 1);
+			auto age = gpGlobals->time - area->GetClearedTimestamp(me->m_iTeam - 1);
 			if (age > oldest)
 			{
 				oldest = age;

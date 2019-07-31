@@ -271,7 +271,7 @@ public:
 
 	// for hunting algorithm
 	void SetClearedTimestamp(int teamID) { m_clearedTimestamp[teamID] = gpGlobals->time; }	// set this area's "clear" timestamp to now
-	float GetClearedTimestamp(int teamID) { return m_clearedTimestamp[teamID]; }			// get time this area was marked "clear"
+	time_point_t GetClearedTimestamp(int teamID) { return m_clearedTimestamp[teamID]; }			// get time this area was marked "clear"
 
 	// hiding spots
 	const HidingSpotList *GetHidingSpotList() const { return &m_hidingSpotList; }
@@ -379,11 +379,11 @@ private:
 	enum { MAX_AREA_TEAMS = 2 };
 
 	// for hunting
-	float m_clearedTimestamp[MAX_AREA_TEAMS];	// time this area was last "cleared" of enemies
+	time_point_t m_clearedTimestamp[MAX_AREA_TEAMS];	// time this area was last "cleared" of enemies
 
 	// danger
 	float m_danger[MAX_AREA_TEAMS];				// danger of this area, allowing bots to avoid areas where they died in the past - zero is no danger
-	float m_dangerTimestamp[MAX_AREA_TEAMS];	// time when danger value was set - used for decaying
+	EngineClock::time_point m_dangerTimestamp[MAX_AREA_TEAMS];	// time when danger value was set - used for decaying
 	void DecayDanger();
 
 	// hiding spots

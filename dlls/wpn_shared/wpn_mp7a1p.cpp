@@ -60,7 +60,7 @@ private:
 
 public:
 	static constexpr auto MaxClip = 20;
-	static constexpr auto DefaultReloadTime = 3.6;
+	static constexpr const auto &DefaultReloadTime = 3.6s;
 	static constexpr auto DefaultAccuracy = 0.2;
 	static constexpr int ZoomFOV = 50;
 
@@ -97,7 +97,7 @@ public:
 	static constexpr const auto &SpreadCalcNotOnGround = 0.375 * A;
 	static constexpr const auto &SpreadCalcDefault = 0.035 * A;
 
-	static constexpr float CycleTime = 0.07;
+	static constexpr const auto &CycleTime = 0.07s;
 
 	static constexpr int DamageDefault = 29;
 	static constexpr int DamageZB = 37;
@@ -117,7 +117,7 @@ public:
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_mp7a1c";
 	static constexpr bool DoubleMode_SyncAmmo = true;
-	static constexpr float DoubleMode_ChangeTime = 6.0f;
+	static constexpr const auto & DoubleMode_ChangeTime = 6.0s;
 };
 
 

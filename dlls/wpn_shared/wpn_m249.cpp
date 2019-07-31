@@ -98,14 +98,14 @@ BOOL CM249::Deploy(void)
 void CM249::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		M249Fire(0.045 + (0.5) * m_flAccuracy, 0.1, FALSE);
+		M249Fire(0.045 + (0.5) * m_flAccuracy, 0.1s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		M249Fire(0.045 + (0.095) * m_flAccuracy, 0.1, FALSE);
+		M249Fire(0.045 + (0.095) * m_flAccuracy, 0.1s, FALSE);
 	else
-		M249Fire((0.03) * m_flAccuracy, 0.1, FALSE);
+		M249Fire((0.03) * m_flAccuracy, 0.1s, FALSE);
 }
 
-void CM249::M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CM249::M249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -119,7 +119,7 @@ void CM249::M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -153,7 +153,7 @@ void CM249::M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.8, 0.65, 0.45, 0.125, 5.0, 3.5, 8);
@@ -170,7 +170,7 @@ void CM249::Reload(void)
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
 
-	if (DefaultReload(M249_MAX_CLIP, M249_RELOAD, 4.7))
+	if (DefaultReload(M249_MAX_CLIP, M249_RELOAD, 4.7s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -189,7 +189,7 @@ void CM249::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(M249_IDLE1, UseDecrement() != FALSE);
 }
 

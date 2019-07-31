@@ -167,7 +167,7 @@ public:
 	bool IsJumping();
 
 	// return time last jump began
-	float GetJumpTimestamp() const { return m_jumpTimestamp; }
+	EngineClock::time_point GetJumpTimestamp() const { return m_jumpTimestamp; }
 	// returns ratio of ammo left to max ammo (1 = full clip, 0 = empty)
 	float GetActiveWeaponAmmoRatio() const;
 
@@ -232,11 +232,11 @@ protected:
 	unsigned int m_id;
 
 	// Think mechanism variables
-	float m_flNextBotThink;
-	float m_flNextFullBotThink;
+	EngineClock::time_point m_flNextBotThink;
+	EngineClock::time_point m_flNextFullBotThink;
 
 	// Command interface variables
-	float m_flPreviousCommandTime;
+	EngineClock::time_point m_flPreviousCommandTime;
 
 	// run/walk mode
 	bool m_isRunning;
@@ -251,7 +251,7 @@ protected:
 	unsigned short m_buttonFlags;
 
 	// time when we last began a jump
-	float m_jumpTimestamp;
+	EngineClock::time_point m_jumpTimestamp;
 
 	// the PostureContext represents the current settings of walking and crouching
 	struct PostureContext
@@ -378,7 +378,7 @@ inline bool CBot::IsPlayerLookingAtMe(CBasePlayer *other) const
 }
 
 extern float g_flBotCommandInterval;
-extern float g_flBotFullThinkInterval;
+extern EngineClock::duration g_flBotFullThinkInterval;
 
 extern const char *BotArgs[4];
 extern bool UseBotArgs;

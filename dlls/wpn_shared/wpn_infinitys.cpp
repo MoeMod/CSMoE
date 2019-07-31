@@ -33,8 +33,8 @@ using namespace WeaponTemplate::Varibles;
 struct InfinitySS_WeaponData
 {
 public:
-	static constexpr auto DefaultReloadTime = 3;
-	static constexpr auto DefaultDeployTime = 1;
+	static constexpr const auto &DefaultReloadTime = 3s;
+	static constexpr const auto &DefaultDeployTime = 1s;
 	static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
 	static constexpr const char *V_Model = "models/v_infinityss.mdl";
 	static constexpr const char *P_Model = "models/p_infinityss.mdl";
@@ -57,7 +57,7 @@ public:
 	static constexpr const auto & SpreadCalcWalking = 0.225 * (1 - A);
 	static constexpr const auto & SpreadCalcDucking = 0.1 * (1 - A);
 	static constexpr const auto & SpreadCalcDefault = 0.12 * (1 - A);
-	static constexpr float CycleTime = 0.21;
+	static constexpr const auto &CycleTime = 0.21s;
 	static constexpr int DamageDefault = 40;
 	static constexpr int DamageZB = 69;
 	static constexpr int DamageZBS = 69;
@@ -79,14 +79,14 @@ struct InfinitySR_WeaponData : InfinitySS_WeaponData
 	static constexpr const char *W_Model = "models/w_infinitysr.mdl";
 	static constexpr const char *EventFile = "events/infinitysr.sc";
 	static constexpr const char *ClassName = "weapon_infinitysr";
-	static constexpr auto DefaultReloadTime = 2;
+	static constexpr const auto &DefaultReloadTime = 2s;
 	static constexpr int DamageDefault = 38;
 	static constexpr int DamageZB = 62;
 	static constexpr int DamageZBS = 62;
 	static constexpr int MaxClip = 15;
 	static constexpr const auto & SpreadCalcDefault = 0.11 * (1 - A);
 	static constexpr const auto & AccuracyCalc = (0.35 - T) * 0.25;
-	static constexpr float CycleTime = 0.175;
+	static constexpr const auto &CycleTime = 0.175s;
 };
 
 struct InfinitySB_WeaponData : InfinitySS_WeaponData
@@ -101,7 +101,7 @@ struct InfinitySB_WeaponData : InfinitySS_WeaponData
 	static constexpr int DamageZBS = 79;
 	static constexpr const auto & SpreadCalcDefault = 0.125 * (1 - A);
 	static constexpr const auto & AccuracyCalc = (0.35 - T) * 0.25;
-	static constexpr float CycleTime = 0.225;
+	static constexpr const auto &CycleTime = 0.225s;
 };
 
 template<class Derived>

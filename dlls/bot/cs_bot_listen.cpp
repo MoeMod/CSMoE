@@ -78,7 +78,7 @@ bool CCSBot::ShouldInvestigateNoise(float *retNoiseDist)
 		return false;
 
 	// listen for enemy noises
-	if (IsNoiseHeard() && gpGlobals->time - m_noiseCheckTimestamp >= 0.25f)
+	if (IsNoiseHeard() && gpGlobals->time - m_noiseCheckTimestamp >= 0.25s)
 	{
 		m_noiseCheckTimestamp = gpGlobals->time;
 		Vector toNoise = m_noisePosition - pev->origin;
@@ -136,7 +136,7 @@ bool CCSBot::ShouldInvestigateNoise(float *retNoiseDist)
 bool CCSBot::CanHearNearbyEnemyGunfire(float range) const
 {
 	// only attend to noise if it just happened
-	if (gpGlobals->time - m_noiseTimestamp > 0.5f)
+	if (gpGlobals->time - m_noiseTimestamp > 0.5s)
 		return false;
 
 	// gunfire is high priority
@@ -188,11 +188,11 @@ bool CCSBot::CanSeeNoisePosition() const
 bool CCSBot::UpdateLookAtNoise()
 {
 	// make sure a noise exists
-	if (!IsNoiseHeard() || gpGlobals->time - m_noiseTimestamp > 0.5f)
+	if (!IsNoiseHeard() || gpGlobals->time - m_noiseTimestamp > 0.5s)
 		return false;
 
 	bool nearbyThreat = false;
-	float const recentThreatTime = 5.0f;
+	constexpr auto recentThreatTime = 5.0s;
 	if (GetTimeSinceLastSawEnemy() < recentThreatTime)
 	{
 		const float closeThreatRange = 750.0f;
@@ -255,16 +255,16 @@ bool CCSBot::UpdateLookAtNoise()
 		// if there is only one enemy left, look for a long time
 		if (GetEnemiesRemaining() == 1)
 		{
-			SetLookAt("Noise", &spot, pri, RANDOM_FLOAT(5.0f, 15.0f), true);
+			SetLookAt("Noise", &spot, pri, RandomDuration(5.0s, 15.0s), true);
 		}
 		else
 		{
-			SetLookAt("Noise", &spot, pri, RANDOM_FLOAT(2.0f, 5.0f), true);
+			SetLookAt("Noise", &spot, pri, RandomDuration(2.0s, 5.0s), true);
 		}
 	}
 	else
 	{
-		SetLookAt("Noise", &spot, pri, RANDOM_FLOAT(1.0f, 2.0f), true);
+		SetLookAt("Noise", &spot, pri, RandomDuration(1.0s, 2.0s), true);
 	}
 
 	return true;

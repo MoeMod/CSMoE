@@ -48,7 +48,7 @@ public:
 	bool IsEmpty(void) { return m_messages.Count() == 0; }
 
 private:
-	float m_tmMessageEnd;
+	time_point_t m_tmMessageEnd;
 	CUtlVector<CHintMessage *> m_messages;
 };
 

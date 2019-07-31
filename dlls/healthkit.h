@@ -59,11 +59,11 @@ public:
 
 	static TYPEDESCRIPTION m_SaveData[5];
 
-	float m_flNextCharge;
+	time_point_t m_flNextCharge;
 	int m_iReactivate;
 	int m_iJuice;
 	int m_iOn;
-	float m_flSoundTime;
+	time_point_t m_flSoundTime;
 };
 
 }

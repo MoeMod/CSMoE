@@ -119,13 +119,13 @@ BOOL CP228::Deploy(void)
 void CP228::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		P228Fire((1.5) * (1 - m_flAccuracy), 0.2, FALSE);
+		P228Fire((1.5) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		P228Fire((0.255) * (1 - m_flAccuracy), 0.2, FALSE);
+		P228Fire((0.255) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		P228Fire((0.075) * (1 - m_flAccuracy), 0.2, FALSE);
+		P228Fire((0.075) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else
-		P228Fire((0.15) * (1 - m_flAccuracy), 0.2, FALSE);
+		P228Fire((0.15) * (1 - m_flAccuracy), 0.2s, FALSE);
 }
 
 void CP228::SecondaryAttack(void)
@@ -133,17 +133,17 @@ void CP228::SecondaryAttack(void)
 	ShieldSecondaryFire(SHIELDGUN_UP, SHIELDGUN_DOWN);
 }
 
-void CP228::P228Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CP228::P228Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.05;
+	flCycleTime -= 0.05s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy -= (0.325 - (gpGlobals->time - m_flLastFire)) * 0.3;
+		m_flAccuracy -= (0.325 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.3;
 
 		if (m_flAccuracy > 0.9)
 			m_flAccuracy = 0.9;
@@ -158,7 +158,7 @@ void CP228::P228Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -191,7 +191,7 @@ void CP228::P228Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	ResetPlayerShieldAnim();
 	m_pPlayer->pev->punchangle.x -= 2;
 }
@@ -208,7 +208,7 @@ void CP228::Reload(void)
 	else
 		iAnim = P228_RELOAD;
 
-	if (DefaultReload(P228_MAX_CLIP, iAnim, 2.7))
+	if (DefaultReload(P228_MAX_CLIP, iAnim, 2.7s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -227,7 +227,7 @@ void CP228::WeaponIdle(void)
 
 	if (m_pPlayer->HasShield())
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 		if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 			SendWeaponAnim(P228_SHIELD_IDLE_UP, UseDecrement() != FALSE);
@@ -237,7 +237,7 @@ void CP228::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625s;
 		SendWeaponAnim(P228_IDLE, UseDecrement() != FALSE);
 	}
 }

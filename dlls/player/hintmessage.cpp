@@ -35,7 +35,7 @@ void CHintMessage::Send(CBaseEntity *client)
 
 void CHintMessageQueue::Reset()
 {
-	m_tmMessageEnd = 0;
+	m_tmMessageEnd = invalid_time_point;
 
 	for (int i = 0; i < m_messages.Count(); ++i)
 		delete m_messages[i];

@@ -98,14 +98,14 @@ BOOL CMG3::Deploy(void)
 void CMG3::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MG3Fire(0.045 + (0.5) * m_flAccuracy, 0.07, FALSE);
+		MG3Fire(0.045 + (0.5) * m_flAccuracy, 0.07s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		MG3Fire(0.045 + (0.095) * m_flAccuracy, 0.07, FALSE);
+		MG3Fire(0.045 + (0.095) * m_flAccuracy, 0.07s, FALSE);
 	else
-		MG3Fire((0.03) * m_flAccuracy, 0.07, FALSE);
+		MG3Fire((0.03) * m_flAccuracy, 0.07s, FALSE);
 }
 
-void CMG3::MG3Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CMG3::MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -119,7 +119,7 @@ void CMG3::MG3Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -153,7 +153,7 @@ void CMG3::MG3Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.85, 0.65, 0.45, 0.125, 5.0, 3.0, 1);
@@ -170,7 +170,7 @@ void CMG3::Reload(void)
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
 
-	if (DefaultReload( 400, M249_RELOAD, 4.8))
+	if (DefaultReload( 400, M249_RELOAD, 4.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -189,7 +189,7 @@ void CMG3::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 70;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 70s;
 	SendWeaponAnim(M249_IDLE1, UseDecrement() != FALSE);
 }
 

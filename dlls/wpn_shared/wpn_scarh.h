@@ -42,7 +42,7 @@ public:
 #endif
 
 public:
-	void AK47Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
 	int m_iShell;

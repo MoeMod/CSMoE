@@ -56,7 +56,7 @@ namespace sv {
 
 DLL_GLOBAL CBaseTutor *TheTutor = NULL;
 
-TutorMessageEvent::TutorMessageEvent(int mid, int duplicateID, float time, float lifetime, int priority)
+TutorMessageEvent::TutorMessageEvent(int mid, int duplicateID, time_point_t time, duration_t lifetime, int priority)
 {
 	m_messageID = mid;
 	m_duplicateID = duplicateID;
@@ -74,7 +74,7 @@ TutorMessageEvent::~TutorMessageEvent()
 	;
 }
 
-bool TutorMessageEvent::IsActive(float time)
+bool TutorMessageEvent::IsActive(time_point_t time)
 {
 	return (m_lifetime + m_activationTime >= time);
 }
@@ -84,12 +84,12 @@ int TutorMessageEvent::GetPriority()
 	return m_priority;
 }
 
-float TutorMessageEvent::GetTimeActive(float time)
+duration_t TutorMessageEvent::GetTimeActive(time_point_t time)
 {
 	return (time - m_activationTime);
 }
 
-void TutorMessageEvent::SetActivationTime(float time)
+void TutorMessageEvent::SetActivationTime(time_point_t time)
 {
 	m_activationTime = time;
 }
@@ -173,8 +173,8 @@ int TutorMessageEvent::GetNumParameters()
 CBaseTutor::CBaseTutor()
 {
 	m_eventList = NULL;
-	m_deadAirStartTime = 0;
-	m_roundStartTime = 0;
+	m_deadAirStartTime = invalid_time_point;
+	m_roundStartTime = invalid_time_point;
 }
 
 CBaseTutor::~CBaseTutor()
@@ -209,7 +209,7 @@ void CBaseTutor::CheckForStateTransition(GameEventType event, CBaseEntity *entit
 	}
 }
 
-void CBaseTutor::StartFrame(float time)
+void CBaseTutor::StartFrame(time_point_t time)
 {
 	TutorThink(time);
 }
@@ -246,11 +246,11 @@ void CBaseTutor::DisplayMessageToPlayer(CBasePlayer *player, int id, const char 
 			WRITE_SHORT(TUTORMESSAGETYPE_DEFAULT);
 	MESSAGE_END();
 
-	m_deadAirStartTime = -1.0f;
+	m_deadAirStartTime = invalid_time_point;
 
 	if (definition != NULL)
 	{
-		if (gpGlobals->time - m_roundStartTime > 1.0f)
+		if (gpGlobals->time - m_roundStartTime > 1.0s)
 		{
 			switch (definition->m_type)
 			{

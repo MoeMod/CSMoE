@@ -39,7 +39,7 @@ void HumanSkill_Precache()
 class SprintSkill : protected CZombieSkill_Base
 {
 public:
-	explicit SprintSkill(CBasePlayer * player) : CZombieSkill_Base(player), m_flTimeZombieSkillEffect(0.0f), m_bDebuffStatus(false) {}
+	explicit SprintSkill(CBasePlayer * player) : CZombieSkill_Base(player), m_flTimeZombieSkillEffect(invalid_time_point), m_bDebuffStatus(false) {}
 
 	void Think() override
 	{
@@ -61,7 +61,7 @@ public:
 
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0f;
-		m_flTimeZombieSkillNext = -1;
+		m_flTimeZombieSkillNext = invalid_time_point;
 		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0f;
 		m_bDebuffStatus = false;
 
@@ -122,7 +122,7 @@ protected:
 	}
 
 private:
-	float m_flTimeZombieSkillEffect;
+	EngineClock::time_point m_flTimeZombieSkillEffect;
 	bool m_bDebuffStatus;
 };
 
@@ -140,7 +140,7 @@ public:
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 4.5f;
-		m_flTimeZombieSkillNext = -1;
+		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
 
@@ -175,7 +175,7 @@ public:
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 10.f;
-		m_flTimeZombieSkillNext = -1;
+		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
 

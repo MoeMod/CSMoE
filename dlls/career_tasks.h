@@ -108,7 +108,7 @@ public:
 	static void Create();
 
 	void Reset(bool deleteTasks = true);
-	void AddTask(const char *taskName, const char *weaponName, int eventCount, bool mustLive, bool crossRounds, bool isComplete);
+	void AddTask(const char *taskName, const char *weaponName, std::chrono::duration<int, std::ratio<1>> eventCount, bool mustLive, bool crossRounds, bool isComplete);
 
 	void HandleEvent(GameEventType event, CBasePlayer *pAttacker = NULL, CBasePlayer *pVictim = NULL);
 	void HandleEnemyKill(bool wasBlind, const char *weaponName, bool headshot, bool killerHasShield, CBasePlayer *pAttacker, CBasePlayer *pVictim);
@@ -119,10 +119,10 @@ public:
 
 	bool AreAllTasksComplete();
 	int GetNumRemainingTasks();
-	float GetRoundElapsedTime();
-	int GetTaskTime() { return m_taskTime; }
-	void SetFinishedTaskTime(int val);
-	int GetFinishedTaskTime() { return m_finishedTaskTime; }
+	duration_t GetRoundElapsedTime();
+	std::chrono::duration<int, std::ratio<1>> GetTaskTime() { return m_taskTime; }
+	void SetFinishedTaskTime(std::chrono::duration<int, std::ratio<1>> val);
+	std::chrono::duration<int, std::ratio<1>> GetFinishedTaskTime() { return m_finishedTaskTime; }
 	int GetFinishedTaskRound() { return m_finishedTaskRound; }
 	CareerTaskList *GetTasks() { return &m_tasks; }
 	void LatchRoundEndMessage();
@@ -132,9 +132,9 @@ private:
 	CareerTaskList m_tasks;
 
 	int m_nextId;
-	float m_roundStartTime;
-	int m_taskTime;
-	int m_finishedTaskTime;
+	time_point_t m_roundStartTime;
+	std::chrono::duration<int, std::ratio<1>> m_taskTime;
+	std::chrono::duration<int, std::ratio<1>> m_finishedTaskTime;
 
 	int m_finishedTaskRound;
 	GameEventType m_roundEndMessage;

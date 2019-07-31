@@ -126,9 +126,9 @@ void CM4A1::SecondaryAttack(void)
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2s;
 }
 
 void CM4A1::PrimaryAttack(void)
@@ -136,24 +136,24 @@ void CM4A1::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			M4A1Fire(0.035 + (0.4) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire(0.035 + (0.4) * m_flAccuracy, 0.0875s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			M4A1Fire(0.035 + (0.07) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire(0.035 + (0.07) * m_flAccuracy, 0.0875s, FALSE);
 		else
-			M4A1Fire((0.025) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire((0.025) * m_flAccuracy, 0.0875s, FALSE);
 	}
 	else
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			M4A1Fire(0.035 + (0.4) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire(0.035 + (0.4) * m_flAccuracy, 0.0875s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			M4A1Fire(0.035 + (0.07) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire(0.035 + (0.07) * m_flAccuracy, 0.0875s, FALSE);
 		else
-			M4A1Fire((0.02) * m_flAccuracy, 0.0875, FALSE);
+			M4A1Fire((0.02) * m_flAccuracy, 0.0875s, FALSE);
 	}
 }
 
-void CM4A1::M4A1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CM4A1::M4A1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -167,7 +167,7 @@ void CM4A1::M4A1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -209,7 +209,7 @@ void CM4A1::M4A1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.045, 3.75, 3.0, 7);
@@ -233,7 +233,7 @@ void CM4A1::Reload(void)
 	else
 		iAnim = M4A1_UNSIL_RELOAD;
 
-	if (DefaultReload(M4A1_MAX_CLIP, iAnim, 3.05))
+	if (DefaultReload(M4A1_MAX_CLIP, iAnim, 3.05s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -252,7 +252,7 @@ void CM4A1::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		SendWeaponAnim(M4A1_IDLE, UseDecrement() != FALSE);

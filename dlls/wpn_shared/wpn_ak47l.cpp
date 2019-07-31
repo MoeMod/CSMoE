@@ -52,7 +52,7 @@ class CAK47_Long : public LinkWeaponTemplate<CAK47_Long,
 >
 {
 public:
-	static constexpr auto DefaultReloadTime = 2.45;
+	static constexpr const auto &DefaultReloadTime = 2.45s;
 	static constexpr int ZoomFOV = 55;
 	static constexpr const char *V_Model = "models/v_ak47_long.mdl";
 	static constexpr const char *P_Model = "models/p_ak47_long.mdl";
@@ -68,7 +68,7 @@ public:
 	static constexpr const auto & SpreadCalcNotOnGround = 0.04 + 0.4 * A;
 	static constexpr const auto & SpreadCalcWalking = 0.03 + 0.02 * A;
 	static constexpr const auto & SpreadCalcDefault = 0.02 * A;
-	static constexpr float CycleTime = 0.0955;
+	static constexpr const auto &CycleTime = 0.0955s;
 	static constexpr int DamageDefault = 97;
 	static constexpr const auto & AccuracyCalc = (N * N * N / 200.0) + 0.35;
 	static constexpr float AccuracyDefault = 0.2;

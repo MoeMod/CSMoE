@@ -110,26 +110,26 @@ BOOL CELITE::Deploy(void)
 void CELITE::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		ELITEFire((1.3) * (1 - m_flAccuracy), 0.2, FALSE);
+		ELITEFire((1.3) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		ELITEFire((0.175) * (1 - m_flAccuracy), 0.2, FALSE);
+		ELITEFire((0.175) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		ELITEFire((0.08) * (1 - m_flAccuracy), 0.2, FALSE);
+		ELITEFire((0.08) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else
-		ELITEFire((0.1) * (1 - m_flAccuracy), 0.2, FALSE);
+		ELITEFire((0.1) * (1 - m_flAccuracy), 0.2s, FALSE);
 }
 
-void CELITE::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CELITE::ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.125;
+	flCycleTime -= 0.125s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy -= (0.325 - (gpGlobals->time - m_flLastFire)) * 0.275;
+		m_flAccuracy -= (0.325 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.275;
 
 		if (m_flAccuracy > 0.88)
 			m_flAccuracy = 0.88;
@@ -144,7 +144,7 @@ void CELITE::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -191,7 +191,7 @@ void CELITE::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 2;
 }
 
@@ -200,7 +200,7 @@ void CELITE::Reload(void)
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
 
-	if (DefaultReload(ELITE_MAX_CLIP, ELITE_RELOAD, 4.5))
+	if (DefaultReload(ELITE_MAX_CLIP, ELITE_RELOAD, 4.5s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -219,7 +219,7 @@ void CELITE::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 
 		if (m_iClip == 1)
 			SendWeaponAnim(ELITE_IDLE_LEFTEMPTY, UseDecrement() != FALSE);

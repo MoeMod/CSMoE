@@ -34,8 +34,8 @@ void CCSBot::ResetStuckMonitor()
 	}
 
 	m_isStuck = false;
-	m_stuckTimestamp = 0.0f;
-	m_stuckJumpTimestamp = 0.0f;
+	m_stuckTimestamp = invalid_time_point;
+	m_stuckJumpTimestamp = invalid_time_point;
 
 	m_avgVelIndex = 0;
 	m_avgVelCount = 0;
@@ -72,9 +72,9 @@ void CCSBot::StuckCheck()
 
 		// cannot be Length2D, or will break ladder movement (they are only Z)
 		float moveDist = vel.Length();
-		float deltaT = g_flBotFullThinkInterval;
+		auto deltaT = g_flBotFullThinkInterval;
 
-		m_avgVel[ m_avgVelIndex++ ] = moveDist / deltaT;
+		m_avgVel[ m_avgVelIndex++ ] = moveDist / (deltaT / 1s);
 
 		if (m_avgVelIndex == MAX_VEL_SAMPLES)
 			m_avgVelIndex = 0;

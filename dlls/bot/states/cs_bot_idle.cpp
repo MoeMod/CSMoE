@@ -242,7 +242,7 @@ void IdleState::OnUpdate(CCSBot *me)
 					if (me->GetFriendsRemaining() && me->IsSniper() && RANDOM_FLOAT(0, 100.0f) < offenseSniperCampChance)
 					{
 						me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-						me->Hide(me->GetLastKnownArea(), RANDOM_FLOAT(10.0f, 30.0f), sniperHideRange);
+						me->Hide(me->GetLastKnownArea(), RandomDuration(10.0s, 30.0s), sniperHideRange);
 						me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 						me->PrintIfWatched("Sniping!\n");
 						return;
@@ -416,7 +416,7 @@ void IdleState::OnUpdate(CCSBot *me)
 						if (snipingArea != NULL)
 						{
 							me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-							me->Hide(snipingArea, -1.0f, sniperHideRange);
+							me->Hide(snipingArea, -1.0s, sniperHideRange);
 							me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 							return;
 						}
@@ -452,7 +452,7 @@ void IdleState::OnUpdate(CCSBot *me)
 								me->PrintIfWatched("I'm guarding a bombsite\n");
 								me->GetChatter()->AnnouncePlan("GoingToDefendBombsite", area->GetPlace());
 								me->SetTask(CCSBot::GUARD_BOMB_ZONE);
-								me->Hide(area, -1.0, guardRange);
+								me->Hide(area, -1.0s, guardRange);
 								me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 								return;
 							}
@@ -479,7 +479,7 @@ void IdleState::OnUpdate(CCSBot *me)
 							if (area != NULL)
 							{
 								me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-								me->Hide(area, -1.0, sniperHideRange);
+								me->Hide(area, -1.0s, sniperHideRange);
 								me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 								me->PrintIfWatched("Sniping near escape zone\n");
 								return;
@@ -510,7 +510,7 @@ void IdleState::OnUpdate(CCSBot *me)
 							me->PrintIfWatched("I'm guarding an escape zone\n");
 
 							float escapeGuardRange = 750.0f + 250.0f * (me->GetMorale() + 3);
-							me->Hide(area, -1.0, escapeGuardRange);
+							me->Hide(area, -1.0s, escapeGuardRange);
 							me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 							return;
 						}
@@ -523,7 +523,7 @@ void IdleState::OnUpdate(CCSBot *me)
 				if (me->m_bIsVIP)
 				{
 					// if early in round, pick a random zone, otherwise pick closest zone
-					const float earlyTime = 20.0f;
+					constexpr auto earlyTime = 20.0s;
 					const CCSBotManager::Zone *zone = NULL;
 
 					if (ctrl->GetElapsedRoundTime() < earlyTime)
@@ -549,7 +549,7 @@ void IdleState::OnUpdate(CCSBot *me)
 							me->MoveTo(pos);
 
 							// tell team to follow
-							const float repeatTime = 30.0f;
+							constexpr auto repeatTime = 30.0s;
 							if (me->GetFriendsRemaining() && ctrl->GetRadioMessageInterval(EVENT_RADIO_FOLLOW_ME, me->m_iTeam) > repeatTime)
 								me->SendRadioMessage(EVENT_RADIO_FOLLOW_ME);
 							return;
@@ -562,7 +562,7 @@ void IdleState::OnUpdate(CCSBot *me)
 					if (me->GetFriendsRemaining() && me->IsSniper() && RANDOM_FLOAT(0, 100.0f) < offenseSniperCampChance)
 					{
 						me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-						me->Hide(me->GetLastKnownArea(), RANDOM_FLOAT(10.0f, 30.0f), sniperHideRange);
+						me->Hide(me->GetLastKnownArea(), RandomDuration(10.0s, 30.0s), sniperHideRange);
 						me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 						me->PrintIfWatched("Sniping!\n");
 						return;
@@ -589,7 +589,7 @@ void IdleState::OnUpdate(CCSBot *me)
 				else
 				{
 					// later in the game, camp either hostages or escape zone
-					const float campZoneChance = 100.0f * (ctrl->GetElapsedRoundTime() - me->GetSafeTime()) / 120.0f;
+					const float campZoneChance = 100.0f * (ctrl->GetElapsedRoundTime() - me->GetSafeTime()) / 120.0s;
 					campHostages = (RANDOM_FLOAT(0, 100) > campZoneChance) ? true : false;
 				}
 
@@ -603,7 +603,7 @@ void IdleState::OnUpdate(CCSBot *me)
 						{
 							me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
 							me->PrintIfWatched("Sniping near hostages\n");
-							me->Hide(TheNavAreaGrid.GetNearestNavArea(hostagePos), -1.0, sniperHideRange);
+							me->Hide(TheNavAreaGrid.GetNearestNavArea(hostagePos), -1.0s, sniperHideRange);
 							me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 							return;
 						}
@@ -666,7 +666,7 @@ void IdleState::OnUpdate(CCSBot *me)
 						me->PrintIfWatched("I'm guarding hostages\n");
 
 						float hostageGuardRange = 750.0f + 250.0f * (me->GetMorale() + 3);
-						me->Hide(area, -1.0, hostageGuardRange);
+						me->Hide(area, -1.0s, hostageGuardRange);
 						me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 
 						if (RANDOM_FLOAT(0, 100) < 50)
@@ -696,7 +696,7 @@ void IdleState::OnUpdate(CCSBot *me)
 					if (me->GetFriendsRemaining() && me->IsSniper() && RANDOM_FLOAT(0, 100.0f) < offenseSniperCampChance)
 					{
 						me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-						me->Hide(me->GetLastKnownArea(), RANDOM_FLOAT(10.0f, 30.0f), sniperHideRange);
+						me->Hide(me->GetLastKnownArea(), RandomDuration(10.0s, 30.0s), sniperHideRange);
 						me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 						me->PrintIfWatched("Sniping!\n");
 						return;
@@ -813,7 +813,7 @@ void IdleState::OnUpdate(CCSBot *me)
 			if (me->GetFriendsRemaining() && me->IsSniper() && RANDOM_FLOAT(0, 100.0f) < offenseSniperCampChance)
 			{
 				me->SetTask(CCSBot::MOVE_TO_SNIPER_SPOT);
-				me->Hide(me->GetLastKnownArea(), RANDOM_FLOAT(10.0f, 30.0f), sniperHideRange);
+				me->Hide(me->GetLastKnownArea(), RandomDuration(10.0s, 30.0s), sniperHideRange);
 				me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
 				me->PrintIfWatched("Sniping!\n");
 				return;

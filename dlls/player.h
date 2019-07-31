@@ -57,8 +57,8 @@
 #define ARMOR_RATIO			0.5 // Armor Takes 50% of the damage
 #define ARMOR_BONUS			0.5 // Each Point of Armor is work 1/x points of health
 
-#define FLASH_DRAIN_TIME		1.2 // 100 units/3 minutes
-#define FLASH_CHARGE_TIME		0.2 // 100 units/20 seconds  (seconds per unit)
+#define FLASH_DRAIN_TIME		1.2s // 100 units/3 minutes
+#define FLASH_CHARGE_TIME		0.2s // 100 units/20 seconds  (seconds per unit)
 
 // damage per unit per second.
 #define DAMAGE_FOR_FALL_SPEED		100.0f / (PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED)
@@ -284,8 +284,8 @@ public:
 	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override;
 	int GiveAmmo(int iAmount, const char *szName, int iMax) override;
 #endif
-	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1; }
-	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30; }
+	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
+	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
 	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
 	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO && pev->health > 0.0f); }
 	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }
@@ -324,13 +324,13 @@ public:
 	virtual void ImpulseCommands() {}
 	virtual void RoundRespawn() {}
 	virtual Vector GetAutoaimVector(float flDelta) { return g_vecZero; }
-	virtual void Blind(float flUntilTime, float flHoldTime, float flFadeTime, int iAlpha) {}
+	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha) {}
 #else
 	virtual void UpdateClientData();
 	virtual void ImpulseCommands();
 	virtual void RoundRespawn();
 	virtual Vector GetAutoaimVector(float flDelta);
-	virtual void Blind(float flUntilTime, float flHoldTime, float flFadeTime, int iAlpha);
+	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha);
 #endif
 	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) {}
 
@@ -366,7 +366,7 @@ public:
 	void RemoveAllItems(BOOL removeSuit);
 	void SetBombIcon(BOOL bFlash = FALSE);
 	void SetProgressBarTime(int time);
-	void SetProgressBarTime2(int time, float timeElapsed);
+	void SetProgressBarTime2(int time, duration_t timeElapsed);
 	void SetPlayerModel(BOOL HasC4);
 	void SetNewPlayerModel(const char *modelName);
 	BOOL SwitchWeapon(CBasePlayerItem *pWeapon);
@@ -465,8 +465,8 @@ public:
 	}
 	bool IsBlind() const { return (m_blindUntilTime > gpGlobals->time); }
 	bool IsAutoFollowAllowed() const { return (gpGlobals->time > m_allowAutoFollowTime); }
-	void InhibitAutoFollow(float duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
-	void AllowAutoFollow() { m_allowAutoFollowTime = 0; }
+	void InhibitAutoFollow(duration_t duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
+	void AllowAutoFollow() { m_allowAutoFollowTime = {}; }
 	void ClearAutoBuyData();
 	void AddAutoBuyData(const char *str);
 	void AutoBuy();
@@ -511,32 +511,32 @@ public:
 	int random_seed;
 	unsigned short m_usPlayerBleed;
 	EHANDLE m_hObserverTarget;
-	float m_flNextObserverInput;
+	time_point_t m_flNextObserverInput;
 	int m_iObserverWeapon;
 	int m_iObserverC4State;
 	bool m_bObserverHasDefuser;
 	int m_iObserverLastMode;
-	float m_flFlinchTime;
-	float m_flAnimTime;
+	time_point_t m_flFlinchTime;
+	time_point_t m_flAnimTime;
 	bool m_bHighDamage;
 	float m_flVelocityModifier;
 	int m_iLastZoom;
 	bool m_bResumeZoom;
-	float m_flEjectBrass;
+	time_point_t m_flEjectBrass;
 	int m_iKevlar;
 	bool m_bNotKilled;
 	TeamName m_iTeam;
 	CPlayerAccount m_iAccount;
 	bool m_bHasPrimary;
-	float m_flDeathThrowTime;
+	time_point_t m_flDeathThrowTime;
 	int m_iThrowDirection;
-	float m_flLastTalk;
+	time_point_t m_flLastTalk;
 	bool m_bJustConnected;
 	bool m_bContextHelp;
 	JoinState m_iJoiningState;
 	CBaseEntity *m_pIntroCamera;
-	float m_fIntroCamTime;
-	float m_fLastMovement;
+	time_point_t m_fIntroCamTime;
+	time_point_t m_fLastMovement;
 	bool m_bMissionBriefing;
 	bool m_bTeamChanged;
 	ModelName m_iModelName;
@@ -545,8 +545,8 @@ public:
 	bool m_bHasNightVision;
 	bool m_bNightVisionOn;
 	Vector m_vRecentPath[MAX_RECENT_PATH];
-	float m_flIdleCheckTime;
-	float m_flRadioTime;
+	time_point_t m_flIdleCheckTime;
+	time_point_t m_flRadioTime;
 	int m_iRadioMessages;
 	bool m_bIgnoreRadio;
 	bool m_bHasC4;
@@ -562,24 +562,24 @@ public:
 	float m_fCamSwitch;
 	bool m_bEscaped;
 	bool m_bIsVIP;
-	float m_tmNextRadarUpdate;
+	EngineClock::time_point m_tmNextRadarUpdate;
 	Vector m_vLastOrigin;
 	int m_iCurrentKickVote;
-	float m_flNextVoteTime;
+	time_point_t m_flNextVoteTime;
 	bool m_bJustKilledTeammate;
 	int m_iHostagesKilled;
 	int m_iMapVote;
 	bool m_bCanShoot;
-	float m_flLastFired;
-	float m_flLastAttackedTeammate;
+	time_point_t m_flLastFired;
+	time_point_t m_flLastAttackedTeammate;
 	bool m_bHeadshotKilled;
 	bool m_bPunishedForTK;
 	bool m_bReceivesNoMoneyNextRound;
-	int m_iTimeCheckAllowed;
+	time_point_t m_iTimeCheckAllowed;
 	bool m_bHasChangedName;
 	char m_szNewName[MAX_PLAYER_NAME_LENGTH];
 	bool m_bIsDefusing;
-	float m_tmHandleSignals;
+	time_point_t m_tmHandleSignals;
 	CUnifiedSignals m_signals;
 	edict_t *m_pentCurBombTarget;
 	int m_iPlayerSound;
@@ -588,7 +588,7 @@ public:
 	int m_iExtraSoundTypes;
 	int m_iWeaponFlash;
 	float m_flStopExtraSoundTime;
-	float m_flFlashLightTime;
+	time_point_t m_flFlashLightTime;
 	int m_iFlashBattery;
 	int m_afButtonLast;
 	int m_afButtonPressed;
@@ -600,21 +600,21 @@ public:
 	int m_rgItems[MAX_ITEMS];
 	int m_fNewAmmo;
 	unsigned int m_afPhysicsFlags;
-	float m_fNextSuicideTime;
-	float m_flTimeStepSound;
-	float m_flTimeWeaponIdle;
-	float m_flSwimTime;
-	float m_flDuckTime;
-	float m_flWallJumpTime;
-	float m_flSuitUpdate;
+	time_point_t m_fNextSuicideTime;
+	time_point_t m_flTimeStepSound;
+	time_point_t m_flTimeWeaponIdle;
+	time_point_t m_flSwimTime;
+	time_point_t m_flDuckTime;
+	time_point_t m_flWallJumpTime;
+	time_point_t m_flSuitUpdate;
 	int m_rgSuitPlayList[CSUITPLAYLIST];
 	int m_iSuitPlayNext;
 	int m_rgiSuitNoRepeat[CSUITNOREPEAT];
 	float m_rgflSuitNoRepeatTime[CSUITNOREPEAT];
 	int m_lastDamageAmount;
-	float m_tbdPrev;
+	time_point_t m_tbdPrev;
 	float m_flgeigerRange;
-	float m_flgeigerDelay;
+	time_point_t m_flgeigerDelay;
 	int m_igeigerRangePrev;
 	int m_iStepLeft;
 	char m_szTextureName[CBTEXTURENAMEMAX];
@@ -627,10 +627,10 @@ public:
 	int m_iTrain;
 	BOOL m_fWeapon;
 	EHANDLE m_pTank;
-	float m_fDeadTime;
+	time_point_t m_fDeadTime;
 	BOOL m_fNoPlayerSound;
 	BOOL m_fLongJump;
-	float m_tSneaking;
+	time_point_t m_tSneaking;
 	int m_iUpdateTime;
 	int m_iClientHealth;
 	int m_iClientBattery;
@@ -650,13 +650,13 @@ public:
 	BOOL m_fOnTarget;
 	int m_iDeaths;
 	int m_izSBarState[SBAR_END];
-	float m_flNextSBarUpdateTime;
-	float m_flStatusBarDisappearDelay;
+	time_point_t m_flNextSBarUpdateTime;
+	time_point_t m_flStatusBarDisappearDelay;
 	char m_SbarString0[SBAR_STRING_SIZE];
 	int m_lastx;
 	int m_lasty;
 	int m_nCustomSprayFrames;
-	float m_flNextDecalTime;
+	time_point_t m_flNextDecalTime;
 	char m_szTeamName[TEAM_NAME_LENGTH];
 
 	static TYPEDESCRIPTION m_playerSaveData[40];
@@ -678,29 +678,29 @@ public:
 	bool m_bShieldDrawn;
 	bool m_bOwnsShield;
 	bool m_bWasFollowing;
-	float m_flNextFollowTime;
+	time_point_t m_flNextFollowTime;
 	float m_flYawModifier;
-	float m_blindUntilTime;
-	float m_blindStartTime;
-	float m_blindHoldTime;
-	float m_blindFadeTime;
+	time_point_t m_blindUntilTime;
+	time_point_t m_blindStartTime;
+	duration_t m_blindHoldTime;
+	duration_t m_blindFadeTime;
 	int m_blindAlpha;
-	float m_allowAutoFollowTime;
+	time_point_t m_allowAutoFollowTime;
 	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
 	char *m_rebuyString;
 	RebuyStruct m_rebuyStruct;
 	bool m_bIsInRebuy;
-	float m_flLastUpdateTime;
+	time_point_t m_flLastUpdateTime;
 	char m_lastLocation[MaxLocationLen];
-	float m_progressStart;
-	float m_progressEnd;
+	time_point_t m_progressStart;
+	time_point_t m_progressEnd;
 	bool m_bObserverAutoDirector;
 	bool m_canSwitchObserverModes;
 	float m_heartBeatTime;
 	float m_intenseTimestamp;
 	float m_silentTimestamp;
 	MusicState m_musicState;
-	float m_flLastCommandTime[8];
+	time_point_t m_flLastCommandTime[8];
 
 public:
 #ifdef CLIENT_DLL
@@ -719,7 +719,7 @@ public:
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
-	float m_flTimeSpawnProctionExpires;
+	time_point_t m_flTimeSpawnProctionExpires;
 
 public:
 #ifndef CLIENT_DLL

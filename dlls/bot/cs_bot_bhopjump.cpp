@@ -170,7 +170,7 @@ void CCSBot::BhopJump_UpdateSync()
 		else // default (random direction)
 		{
 			m_BhopLastSyncDir = m_BhopLastSyncDir == LEFT ? RIGHT : LEFT;
-			m_flBhopSyncNext = gpGlobals->time + RANDOM_FLOAT(0.15f, 0.3f);
+			m_flBhopSyncNext = gpGlobals->time + RandomDuration(0.15s, 0.3s);
 		}
 		
 	}

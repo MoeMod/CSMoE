@@ -40,7 +40,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_k1a.mdl"; }
 
 public:
-	void K1aFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void K1aFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 public:
 	int m_iShell;

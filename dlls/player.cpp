@@ -42,6 +42,9 @@
 #include "player/player_knockback.h"
 #include "player/player_mod_strategy.h"
 
+#include <chrono>
+#include <algorithm>
+
 namespace sv {
 
 /*
@@ -939,7 +942,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			}
 
 			teamAttack = TRUE;
-			if (gpGlobals->time > pAttack->m_flLastAttackedTeammate + 0.6f)
+			if (gpGlobals->time > pAttack->m_flLastAttackedTeammate + 0.6s)
 			{
 				CBaseEntity *pBasePlayer = NULL;
 				while ((pBasePlayer = UTIL_FindEntityByClassname(pBasePlayer, "player")) != NULL)
@@ -1319,8 +1322,8 @@ void CBasePlayer::SetProgressBarTime(int time)
 	}
 	else
 	{
-		m_progressStart = 0;
-		m_progressEnd = 0;
+		m_progressStart = invalid_time_point;
+		m_progressEnd = invalid_time_point;
 	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgBarTime, NULL, pev);
@@ -1346,21 +1349,21 @@ void CBasePlayer::SetProgressBarTime(int time)
 	}
 }
 
-void CBasePlayer::SetProgressBarTime2(int time, float timeElapsed)
+void CBasePlayer::SetProgressBarTime2(int time, duration_t timeElapsed)
 {
 	if (time)
 	{
 		m_progressStart = gpGlobals->time - timeElapsed;
-		m_progressEnd = time + gpGlobals->time - timeElapsed;
+		m_progressEnd = time * 1s + gpGlobals->time - timeElapsed;
 	}
 	else
 	{
-		timeElapsed = 0;
-		m_progressStart = 0;
-		m_progressEnd = 0;
+		timeElapsed = zero_duration;
+		m_progressStart = invalid_time_point;
+		m_progressEnd = invalid_time_point;
 	}
 
-	short iTimeElapsed = (timeElapsed * 100.0 / (m_progressEnd - m_progressStart));
+	short iTimeElapsed = (timeElapsed * 100.0 / ((m_progressEnd - m_progressStart) / 1s)) / 1s;
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgBarTime2, NULL, pev);
 		WRITE_SHORT(time);
@@ -1733,7 +1736,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		MESSAGE_END();
 	}
 	else
-		UTIL_ScreenFade(this, Vector(0, 0, 0), 3, 3, 255, (FFADE_OUT | FFADE_STAYOUT));
+		UTIL_ScreenFade(this, Vector(0, 0, 0), 3s, 3s, 255, (FFADE_OUT | FFADE_STAYOUT));
 
 	SetScoreboardAttributes();
 
@@ -2143,7 +2146,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				&& (m_Activity != ACT_LARGE_FLINCH || m_fSequenceFinished)
 				&& (m_Activity != ACT_RELOAD || m_fSequenceFinished))
 			{
-				if (speed <= 135.0f || m_flLastFired + 4.0 >= gpGlobals->time)
+				if (speed <= 135.0f || m_flLastFired + 4.0s >= gpGlobals->time)
 				{
 					if (pev->flags & FL_DUCKING)
 						Q_strcpy(szAnim, "crouch_aim_");
@@ -2243,7 +2246,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				return;
 
 			m_Activity = m_IdealActivity;
-			m_flDeathThrowTime = 0;
+			m_flDeathThrowTime = invalid_time_point;
 			m_iThrowDirection = THROW_NONE;
 
 			switch (m_LastHitGroup)
@@ -2411,7 +2414,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		{
 			if (speed > 135.0f)
 			{
-				if (m_flLastFired + 4.0f < gpGlobals->time)
+				if (m_flLastFired + 4.0s < gpGlobals->time)
 				{
 					if (m_Activity != ACT_FLINCH && m_Activity != ACT_LARGE_FLINCH)
 					{
@@ -2480,7 +2483,7 @@ void CBasePlayer::WaterMove()
 		if (pev->air_finished < gpGlobals->time)
 			EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_wade1.wav", VOL_NORM, ATTN_NORM);
 
-		else if (pev->air_finished < gpGlobals->time + 9)
+		else if (pev->air_finished < gpGlobals->time + 9s)
 			EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_wade2.wav", VOL_NORM, ATTN_NORM);
 
 		pev->air_finished = gpGlobals->time + AIRTIME;
@@ -2540,7 +2543,7 @@ void CBasePlayer::WaterMove()
 	}
 
 	// make bubbles
-	air = (int)(pev->air_finished - gpGlobals->time);
+	air = (int)((pev->air_finished - gpGlobals->time) / 1s);
 
 	if (!RANDOM_LONG(0, 0x1f) && RANDOM_LONG(0, AIRTIME - 1) >= air)
 	{
@@ -2566,7 +2569,7 @@ void CBasePlayer::WaterMove()
 	if (!(pev->flags & FL_INWATER))
 	{
 		pev->flags |= FL_INWATER;
-		pev->dmgtime = 0;
+		pev->dmgtime = invalid_time_point;
 	}
 }
 
@@ -2721,7 +2724,7 @@ void CBasePlayer::DropShield(bool bDeploy)
 		CBasePlayerWeapon *pWeapon = (CBasePlayerWeapon *)m_pActiveItem;
 
 		pWeapon->m_fInReload = FALSE;
-		m_flNextAttack = 0;
+		m_flNextAttack = zero_duration;
 	}
 
 	if (IsProtectedByShield() && m_pActiveItem)
@@ -2801,19 +2804,19 @@ void CBasePlayer::ResetMenu()
 
 void CBasePlayer::SyncRoundTimer()
 {
-	float tmRemaining;
+	duration_t tmRemaining;
 	CHalfLifeMultiplay *mp = g_pGameRules;
 
 	if (mp->IsMultiplayer())
 		tmRemaining = mp->TimeRemaining();
 	else
-		tmRemaining = 0;
+		tmRemaining = 0s;
 
-	if (tmRemaining < 0)
-		tmRemaining = 0;
+	if (tmRemaining < 0s)
+		tmRemaining = 0s;
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgRoundTime, NULL, pev);
-		WRITE_SHORT((int)tmRemaining);
+		WRITE_SHORT((int)(tmRemaining / 1s));
 	MESSAGE_END();
 
 	if (!mp->IsMultiplayer())
@@ -2828,40 +2831,40 @@ void CBasePlayer::SyncRoundTimer()
 
 	if (TheCareerTasks != NULL && mp->IsCareer())
 	{
-		int remaining = 0;
+		std::chrono::duration<int, std::ratio<1>> remaining = 0s;
 		bool shouldCountDown = false;
 		int fadeOutDelay = 0;
 
-		if (tmRemaining != 0.0f)
+		if (tmRemaining != 0.0s)
 		{
-			remaining = TheCareerTasks->GetTaskTime() - (gpGlobals->time - mp->m_fRoundCount);
+			remaining = std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(TheCareerTasks->GetTaskTime() - (gpGlobals->time - mp->m_fRoundCount));
 		}
 
-		if (remaining < 0)
-			remaining = 0;
+		if (remaining < 0s)
+			remaining = 0s;
 
 		if (mp->IsFreezePeriod())
-			remaining = -1;
+			remaining = -1s;
 
-		if (TheCareerTasks->GetFinishedTaskTime())
+		if (TheCareerTasks->GetFinishedTaskTime() != 0s)
 			remaining = -TheCareerTasks->GetFinishedTaskTime();
 
-		if (!mp->IsFreezePeriod() && !TheCareerTasks->GetFinishedTaskTime())
+		if (!mp->IsFreezePeriod() && TheCareerTasks->GetFinishedTaskTime() == 0s)
 		{
 			shouldCountDown = true;
 		}
 		if (!mp->IsFreezePeriod())
 		{
-			if (TheCareerTasks->GetFinishedTaskTime() || (TheCareerTasks->GetTaskTime() <= TheCareerTasks->GetRoundElapsedTime()))
+			if (TheCareerTasks->GetFinishedTaskTime() != 0s || (TheCareerTasks->GetTaskTime() <= TheCareerTasks->GetRoundElapsedTime()))
 			{
 				fadeOutDelay = 3;
 			}
 		}
 
-		if (!TheCareerTasks->GetFinishedTaskTime() || TheCareerTasks->GetFinishedTaskRound() == mp->m_iTotalRoundsPlayed)
+		if (TheCareerTasks->GetFinishedTaskTime() == 0s || TheCareerTasks->GetFinishedTaskRound() == mp->m_iTotalRoundsPlayed)
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgTaskTime, NULL, pev);
-				WRITE_SHORT(remaining);		// remaining of time, -1 the timer is disappears
+				WRITE_SHORT(remaining / 1s);		// remaining of time, -1 the timer is disappears
 				WRITE_BYTE(shouldCountDown);	// timer counts down
 				WRITE_BYTE(fadeOutDelay); // fade in time, hide HUD timer after the expiration time
 			MESSAGE_END();
@@ -2996,7 +2999,7 @@ void CBasePlayer::JoiningThink()
 
 				mp->CheckWinConditions();
 
-				if (!mp->m_fTeamCount && mp->m_bMapHasBombTarget && !mp->IsThereABomber() && !mp->IsThereABomb())
+				if (mp->m_fTeamCount != invalid_time_point && mp->m_bMapHasBombTarget && !mp->IsThereABomber() && !mp->IsThereABomb())
 				{
 					mp->GiveC4();
 				}
@@ -3225,7 +3228,7 @@ void CBasePlayer::PlayerDeathThink()
 	// choose to respawn.
 	if (g_pGameRules->IsMultiplayer())
 	{
-		if (gpGlobals->time > m_fDeadTime + 3.0 && !(m_afPhysicsFlags & PFLAG_OBSERVER))
+		if (gpGlobals->time > m_fDeadTime + 3.0s && !(m_afPhysicsFlags & PFLAG_OBSERVER))
 		{
 			// Send message to everybody to spawn a corpse.
 			SpawnClientSideCorpse();
@@ -3250,14 +3253,14 @@ void CBasePlayer::PlayerDeathThink()
 				g_pGameRules->CheckWinConditions();
 		}
 
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	}
 	else if (pev->deadflag == DEAD_RESPAWNABLE)
 	{
 		// don't copy a corpse if we're in deathcam.
 		respawn(pev, FALSE);
 		pev->button = 0;
-		pev->nextthink = -1;
+		pev->nextthink = invalid_time_point;
 	}
 }
 
@@ -3281,7 +3284,7 @@ void CBasePlayer::RoundRespawn()
 		respawn(pev);
 
 		pev->button = 0;
-		pev->nextthink = -1;
+		pev->nextthink = invalid_time_point;
 	}
 
 	if (m_pActiveItem)
@@ -3372,7 +3375,7 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	m_bObserverHasDefuser = false;
 
 	m_iObserverWeapon = 0;
-	m_flNextObserverInput = 0;
+	m_flNextObserverInput = invalid_time_point;
 
 	pev->iuser1 = OBS_NONE;
 
@@ -3630,7 +3633,7 @@ void CBasePlayer::Jump()
 
 	if ((pev->flags & FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING))
 	{
-		if (m_fLongJump && (pev->button & IN_DUCK) && (gpGlobals->time - m_flDuckTime < 1.0f) && pev->velocity.Length() > 50)
+		if (m_fLongJump && (pev->button & IN_DUCK) && (gpGlobals->time - m_flDuckTime < 1.0s) && pev->velocity.Length() > 50)
 		{
 			SetAnimation(PLAYER_SUPERJUMP);
 		}
@@ -3806,12 +3809,12 @@ void CBasePlayer::PreThink()
 			m_flVelocityModifier = 1;
 	}
 
-	if (m_flIdleCheckTime <= (double)gpGlobals->time || m_flIdleCheckTime == 0.0f)
+	if (m_flIdleCheckTime <= gpGlobals->time || m_flIdleCheckTime == invalid_time_point)
 	{
 		// check every 5 seconds
-		m_flIdleCheckTime = gpGlobals->time + 5.0;
+		m_flIdleCheckTime = gpGlobals->time + 5.0s;
 
-		float flLastMove = gpGlobals->time - m_fLastMovement;
+		auto flLastMove = gpGlobals->time - m_fLastMovement;
 
 		//check if this player has been inactive for 2 rounds straight
 		if (flLastMove > g_pGameRules->m_fMaxIdlePeriod)
@@ -4024,7 +4027,7 @@ void CBasePlayer::CheckTimeBasedDamage()
 		return;
 
 	// only check for time based damage approx. every 2 seconds
-	if (abs(gpGlobals->time - m_tbdPrev) < 2.0f)
+	if (gpGlobals->time - m_tbdPrev < 2.0s)
 		return;
 
 	m_tbdPrev = gpGlobals->time;
@@ -4117,7 +4120,7 @@ void CBasePlayer::UpdateGeigerCounter()
 	if (gpGlobals->time < m_flgeigerDelay)
 		return;
 
-	m_flgeigerDelay = gpGlobals->time + 0.25;
+	m_flgeigerDelay = gpGlobals->time + 0.25s;
 
 	// send range to radition source to client
 	range = (byte)(m_flgeigerRange / 4.0);//* 0.25);		// TODO: ACHECK!
@@ -4157,7 +4160,7 @@ void CBasePlayer::CheckSuitUpdate()
 		return;
 	}
 
-	if (gpGlobals->time >= m_flSuitUpdate && m_flSuitUpdate > 0)
+	if (gpGlobals->time >= m_flSuitUpdate && m_flSuitUpdate > invalid_time_point)
 	{
 		// play a sentence off of the end of the queue
 		for (i = 0; i < CSUITPLAYLIST; ++i)
@@ -4191,7 +4194,7 @@ void CBasePlayer::CheckSuitUpdate()
 		}
 		else
 			// queue is empty, don't check
-			m_flSuitUpdate = 0;
+			m_flSuitUpdate = invalid_time_point;
 	}
 }
 
@@ -4282,7 +4285,7 @@ void CBasePlayer::UpdatePlayerSound()
 	}
 
 	// decay weapon volume over time so bits_SOUND_COMBAT stays set for a while
-	m_iWeaponVolume -= 250 * gpGlobals->frametime;
+	m_iWeaponVolume -= 250 * gpGlobals->frametime /1s;
 
 	// if target volume is greater than the player sound's current volume, we paste the new volume in
 	// immediately. If target is less than the current volume, current volume is not set immediately to the
@@ -4296,7 +4299,7 @@ void CBasePlayer::UpdatePlayerSound()
 	}
 	else if (iVolume > m_iTargetVolume)
 	{
-		iVolume -= 250 * gpGlobals->frametime;
+		iVolume -= 250 * gpGlobals->frametime /1s;
 
 		if (iVolume < m_iTargetVolume)
 			iVolume = 0;
@@ -4308,7 +4311,7 @@ void CBasePlayer::UpdatePlayerSound()
 		iVolume = 0;
 	}
 
-	if (gpGlobals->time > m_flStopExtraSoundTime)
+	if (gpGlobals->time.time_since_epoch() /1s > m_flStopExtraSoundTime)
 	{
 		// since the extra sound that a weapon emits only lasts for one client frame, we keep that sound around for a server frame or two
 		// after actual emission to make sure it gets heard.
@@ -4323,7 +4326,7 @@ void CBasePlayer::UpdatePlayerSound()
 	}
 
 	// keep track of virtual muzzle flash
-	m_iWeaponFlash -= 256 * gpGlobals->frametime;
+	m_iWeaponFlash -= 256 * gpGlobals->frametime /1s;
 
 	if (m_iWeaponFlash < 0)
 		m_iWeaponFlash = 0;
@@ -4443,12 +4446,12 @@ pt_end:
 
 				if (gun && gun->UseDecrement())
 				{
-					gun->m_flNextPrimaryAttack = Q_max(gun->m_flNextPrimaryAttack - gpGlobals->frametime, -1.0f);
-					gun->m_flNextSecondaryAttack = Q_max(gun->m_flNextSecondaryAttack - gpGlobals->frametime, -0.001f);
+					gun->m_flNextPrimaryAttack = max(gun->m_flNextPrimaryAttack - gpGlobals->frametime, -1.0s);
+					gun->m_flNextSecondaryAttack = max(gun->m_flNextSecondaryAttack - gpGlobals->frametime, -0.001s);
 
-					if (gun->m_flTimeWeaponIdle != 1000.0f)
+					if (gun->m_flTimeWeaponIdle != 1000.0s)
 					{
-						gun->m_flTimeWeaponIdle = Q_max(gun->m_flTimeWeaponIdle - gpGlobals->frametime, -0.001f);
+						gun->m_flTimeWeaponIdle = max(gun->m_flTimeWeaponIdle - gpGlobals->frametime, -0.001s);
 					}
 				}
 
@@ -4459,8 +4462,8 @@ pt_end:
 
 	m_flNextAttack -= gpGlobals->frametime;
 
-	if (m_flNextAttack < -0.001)
-		m_flNextAttack = -0.001;
+	if (m_flNextAttack < -0.001s)
+		m_flNextAttack = -0.001s;
 #endif // CLIENT_WEAPONS
 
 	// Track button info so we can detect 'pressed' and 'released' buttons next frame
@@ -4546,8 +4549,8 @@ void CBasePlayer::Spawn()
 	m_flGaityaw = 0;
 	m_flGaitMovement = 0;
 	m_prevgaitorigin = Vector(0, 0, 0);
-	m_progressStart = 0;
-	m_progressEnd = 0;
+	m_progressStart = invalid_time_point;
+	m_progressEnd = invalid_time_point;
 
 	if (!FStringNull(pev->classname))
 	{
@@ -4602,22 +4605,22 @@ void CBasePlayer::Spawn()
 
 	m_flVelocityModifier = 1;
 	m_iLastZoom = DEFAULT_FOV;
-	m_flLastTalk = 0;
-	m_flIdleCheckTime = 0;
-	m_flRadioTime = 0;
+	m_flLastTalk = invalid_time_point;
+	m_flIdleCheckTime = invalid_time_point;
+	m_flRadioTime = invalid_time_point;
 	m_iRadioMessages = 60;
 	m_bHasC4 = false;
 	m_bKilledByBomb = false;
 	m_bKilledByGrenade = false;
 	m_flDisplayHistory &= ~DHM_ROUND_CLEAR;
-	m_tmHandleSignals = 0;
+	m_tmHandleSignals = invalid_time_point;
 	m_fCamSwitch = 0;
 	m_iChaseTarget = 1;
 	m_bEscaped = false;
 	m_tmNextRadarUpdate = gpGlobals->time;
 	m_vLastOrigin = Vector(0, 0, 0);
 	m_iCurrentKickVote = 0;
-	m_flNextVoteTime = 0;
+	m_flNextVoteTime = invalid_time_point;
 	m_bJustKilledTeammate = false;
 
 	SET_VIEW(ENT(pev), ENT(pev));
@@ -4627,15 +4630,15 @@ void CBasePlayer::Spawn()
 		pev->iuser2 =
 		pev->iuser3 = 0;
 
-	m_flLastFired = -15;
+	m_flLastFired = invalid_time_point - 15;
 	m_bHeadshotKilled = false;
 	m_bReceivesNoMoneyNextRound = false;
 	m_bShieldDrawn = false;
 
-	m_blindUntilTime = 0;
-	m_blindStartTime = 0;
-	m_blindHoldTime = 0;
-	m_blindFadeTime = 0;
+	m_blindUntilTime = invalid_time_point;
+	m_blindStartTime = invalid_time_point;
+	m_blindHoldTime = zero_duration;
+	m_blindFadeTime = zero_duration;
 	m_blindAlpha = 0;
 
 	m_canSwitchObserverModes = true;
@@ -4706,18 +4709,18 @@ void CBasePlayer::Spawn()
 	}
 
 	m_iFOV = DEFAULT_FOV;
-	m_flNextDecalTime = 0;
-	m_flTimeStepSound = 0;
+	m_flNextDecalTime = invalid_time_point;
+	m_flTimeStepSound = invalid_time_point;
 	m_iStepLeft = 0;
 	m_flFieldOfView = 0.5;
 	m_bloodColor = BLOOD_COLOR_RED;
-	m_flNextAttack = 0;
+	m_flNextAttack = zero_duration;
 	m_flgeigerDelay = gpGlobals->time + 2;
 
 	StartSneaking();
 
 	m_iFlashBattery = 99;
-	m_flFlashLightTime = 1;
+	m_flFlashLightTime = invalid_time_point + 1s;
 
 	if (m_bHasDefuser)
 		pev->body = 1;
@@ -4873,7 +4876,7 @@ void CBasePlayer::Spawn()
 		m_szNewName[0] = '\0';
 	}
 
-	UTIL_ScreenFade(this, Vector(0, 0, 0), 0.001);
+	UTIL_ScreenFade(this, Vector(0, 0, 0), 0.001s);
 	SyncRoundTimer();
 
 	if (TheBots != NULL)
@@ -4881,12 +4884,11 @@ void CBasePlayer::Spawn()
 		TheBots->OnEvent(EVENT_PLAYER_SPAWNED, this);
 	}
 
-	m_allowAutoFollowTime = false;
+	m_allowAutoFollowTime = invalid_time_point;
 
 	sv_aim = CVAR_GET_POINTER("sv_aim");
 
-	for (size_t i = 0; i < ARRAYSIZE(m_flLastCommandTime); ++i)
-		m_flLastCommandTime[i] = -1;
+	std::fill(std::begin(m_flLastCommandTime), std::end(m_flLastCommandTime), invalid_time_point);
 }
 
 void CBasePlayer::Precache()
@@ -5797,7 +5799,7 @@ BOOL CBasePlayer::RemovePlayerItem(CBasePlayerItem *pItem)
 	if (m_pActiveItem == pItem)
 	{
 		ResetAutoaim();
-		pItem->pev->nextthink = 0;
+		pItem->pev->nextthink = invalid_time_point;
 
 		pItem->SetThink(NULL);
 		m_pActiveItem = NULL;
@@ -5877,7 +5879,7 @@ int CBasePlayer::GiveAmmo(int iCount, const char *szName, int iMax)
 void CBasePlayer::ItemPreFrame()
 {
 #ifdef CLIENT_WEAPONS
-	if (m_flNextAttack > 0)
+	if (m_flNextAttack > 0s)
 		return;
 #else
 	if (gpGlobals->time < m_flNextAttack)
@@ -5905,12 +5907,12 @@ void CBasePlayer::ItemPostFrame()
 		if (HasShield() && IsReloading())
 		{
 			if (pev->button & IN_ATTACK2)
-				m_flNextAttack = 0;
+				m_flNextAttack = 0s;
 		}
 	}
 
 #ifdef CLIENT_WEAPONS
-	if (m_flNextAttack > 0)
+	if (m_flNextAttack > 0s)
 #else
 	if (gpGlobals->time < m_flNextAttack)
 #endif // CLIENT_WEAPONS
@@ -6249,7 +6251,7 @@ void CBasePlayer::UpdateClientData()
 	}
 
 	// Update Flashlight
-	if (m_flFlashLightTime && m_flFlashLightTime <= gpGlobals->time)
+	if (m_flFlashLightTime != invalid_time_point && m_flFlashLightTime <= gpGlobals->time)
 	{
 		if (FlashlightIsOn())
 		{
@@ -6272,7 +6274,7 @@ void CBasePlayer::UpdateClientData()
 				m_iFlashBattery++;
 			}
 			else
-				m_flFlashLightTime = 0;
+				m_flFlashLightTime = invalid_time_point;
 		}
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgFlashBattery, NULL, pev);
@@ -6334,14 +6336,14 @@ void CBasePlayer::UpdateClientData()
 
 	if (gpGlobals->time > m_tmHandleSignals)
 	{
-		m_tmHandleSignals = gpGlobals->time + 0.5f;
+		m_tmHandleSignals = gpGlobals->time + 0.5s;
 		HandleSignals();
 	}
 
 	if (pev->deadflag == DEAD_NO && gpGlobals->time > m_tmNextRadarUpdate)
 	{
 		Vector vecOrigin = pev->origin;
-		m_tmNextRadarUpdate = gpGlobals->time + 1.0f;
+		m_tmNextRadarUpdate = gpGlobals->time + 1.0s;
 
 		if ((pev->origin - m_vLastOrigin).Length() >= 64)
 		{
@@ -6562,7 +6564,7 @@ int CBasePlayer::GetCustomDecalFrames()
 	return m_nCustomSprayFrames;
 }
 
-void CBasePlayer::Blind(float duration, float holdTime, float fadeTime, int alpha)
+void CBasePlayer::Blind(duration_t duration, duration_t holdTime, duration_t fadeTime, int alpha)
 {
 	m_blindUntilTime = gpGlobals->time + duration;
 	m_blindStartTime = gpGlobals->time;
@@ -6574,7 +6576,7 @@ void CBasePlayer::Blind(float duration, float holdTime, float fadeTime, int alph
 
 void CBasePlayer::InitStatusBar()
 {
-	m_flStatusBarDisappearDelay = 0.0f;
+	m_flStatusBarDisappearDelay = invalid_time_point;
 	m_SbarString0[0] = '\0';
 }
 
@@ -6666,7 +6668,7 @@ void CBasePlayer::UpdateStatusBar()
 					HintMessage("#Hint_press_use_so_hostage_will_follow");
 				}
 
-				m_flStatusBarDisappearDelay = gpGlobals->time + 2.0f;
+				m_flStatusBarDisappearDelay = gpGlobals->time + 2.0s;
 			}
 		}
 	}
@@ -6772,7 +6774,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				SetBombIcon(FALSE);
 				pWeapon->m_pPlayer->SetProgressBarTime(0);
 
-				if (!g_pGameRules->m_fTeamCount)
+				if (g_pGameRules->m_fTeamCount != invalid_time_point)// TODO
 				{
 					UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Dropped_The_Bomb\"\n",
 						STRING(pev->netname),
@@ -7250,12 +7252,12 @@ void CRevertSaved::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "duration"))
 	{
-		SetDuration(Q_atof(pkvd->szValue));
+		SetDuration(Q_atof(pkvd->szValue) * 1s);
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "holdtime"))
 	{
-		SetHoldTime(Q_atof(pkvd->szValue));
+		SetHoldTime(Q_atof(pkvd->szValue) * 1s);
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "messagetime"))
@@ -7324,18 +7326,10 @@ LINK_ENTITY_TO_CLASS(info_intermission, CInfoIntermission);
 
 void CBasePlayer::StudioEstimateGait()
 {
-	float dt;
+	auto dt = min(max(0s, gpGlobals->frametime), 1s);
 	Vector est_velocity;
 
-	dt = gpGlobals->frametime;
-
-	if (dt < 0)
-		dt = 0;
-
-	else if (dt > 1.0)
-		dt = 1;
-
-	if (dt == 0)
+	if (dt == 0s)
 	{
 		m_flGaitMovement = 0;
 		return;
@@ -7346,7 +7340,7 @@ void CBasePlayer::StudioEstimateGait()
 
 	m_flGaitMovement = est_velocity.Length();
 
-	if (dt <= 0 || m_flGaitMovement / dt < 5)
+	if (dt <= 0s || m_flGaitMovement / (dt / 1s) < 5)
 	{
 		m_flGaitMovement = 0;
 
@@ -7379,10 +7373,10 @@ void CBasePlayer::StudioEstimateGait()
 		if (flYaw < -90 || flYaw > 90)
 			m_flYawModifier = 3.5;
 
-		if (dt < 0.25)
-			flYawDiff *= dt * m_flYawModifier;
+		if (dt < 0.25s)
+			flYawDiff *= dt / 1s * m_flYawModifier;
 		else
-			flYawDiff *= dt;
+			flYawDiff *= dt / 1s;
 
 		if ((float)abs((int)flYawDiff) < 0.1)
 			flYawDiff = 0;
@@ -7441,19 +7435,11 @@ void CBasePlayer::CalculatePitchBlend()
 
 void CBasePlayer::CalculateYawBlend()
 {
-	float dt;
+	duration_t dt = min(max(0s, gpGlobals->frametime), 1s);
 	float maxyaw = 255.0f;
 
 	float flYaw;		// view direction relative to movement
 	float blend_yaw;
-
-	dt = gpGlobals->frametime;
-
-	if (dt < 0.0)
-		dt = 0;
-
-	else if (dt > 1.0)
-		dt = 1;
 
 	StudioEstimateGait();
 
@@ -7499,13 +7485,7 @@ void CBasePlayer::CalculateYawBlend()
 void CBasePlayer::StudioProcessGait()
 {
 	mstudioseqdesc_t *pseqdesc;
-	float dt = gpGlobals->frametime;
-
-	if (dt < 0.0)
-		dt = 0;
-
-	else if (dt > 1.0)
-		dt = 1;
+	duration_t dt = min(max(0s, gpGlobals->frametime), 1s);
 
 	CalculateYawBlend();
 	CalculatePitchBlend();
@@ -7523,7 +7503,7 @@ void CBasePlayer::StudioProcessGait()
 	if (pseqdesc->linearmovement.x > 0.0f)
 		m_flGaitframe += (m_flGaitMovement / pseqdesc->linearmovement.x) * pseqdesc->numframes;
 	else
-		m_flGaitframe += pev->framerate * pseqdesc->fps * dt;
+		m_flGaitframe += pev->framerate * pseqdesc->fps * dt / 1s;
 
 	// do modulo
 	m_flGaitframe -= (int)(m_flGaitframe / pseqdesc->numframes) * pseqdesc->numframes;
@@ -7586,7 +7566,7 @@ void CBasePlayer::SpawnClientSideCorpse()
 		WRITE_COORD(pev->angles.x);
 		WRITE_COORD(pev->angles.y);
 		WRITE_COORD(pev->angles.z);
-		WRITE_LONG((pev->animtime - gpGlobals->time) * 100);
+		WRITE_LONG((pev->animtime - gpGlobals->time) * 100 / 1s);
 		WRITE_BYTE(pev->sequence);
 		WRITE_BYTE(pev->body);
 		WRITE_BYTE(m_iTeam);
@@ -8689,7 +8669,7 @@ bool CBasePlayer::IsObservingPlayer(CBasePlayer *pPlayer)
 
 void CBasePlayer::UpdateLocation(bool forceUpdate)
 {
-	if (!forceUpdate && m_flLastUpdateTime >= gpGlobals->time + 2)
+	if (!forceUpdate && m_flLastUpdateTime >= gpGlobals->time + 2s)
 		return;
 
 	const char *placeName = "";

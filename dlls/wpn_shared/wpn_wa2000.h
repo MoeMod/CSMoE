@@ -42,7 +42,7 @@ public:
 	float GetArmorRatioModifier() override { return 1.7; }
 
 public:
-	void WA2000Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void WA2000Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 public:
 	int m_iShell;

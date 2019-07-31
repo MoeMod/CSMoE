@@ -322,7 +322,7 @@ void CBaseToggle::KeyValue(KeyValueData *pkvd)
 	}
 	else if (FStrEq(pkvd->szKeyName, "wait"))
 	{
-		m_flWait = Q_atof(pkvd->szValue);
+		m_flWait = Q_atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "master"))
@@ -376,7 +376,7 @@ void CBaseToggle::LinearMoveDone()
 {
 	UTIL_SetOrigin(pev, m_vecFinalDest);
 	pev->velocity = g_vecZero;
-	pev->nextthink = -1;
+	pev->nextthink = invalid_time_point;
 
 	if (m_pfnCallWhenMoveDone)
 	{
@@ -430,7 +430,7 @@ void CBaseToggle::AngularMoveDone()
 {
 	pev->angles = m_vecFinalAngle;
 	pev->avelocity = g_vecZero;
-	pev->nextthink = -1;
+	pev->nextthink = invalid_time_point;
 
 	if (m_pfnCallWhenMoveDone)
 	{

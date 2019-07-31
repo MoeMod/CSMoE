@@ -68,7 +68,7 @@ public:
 #endif
 
 public:
-	void CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void CannonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
 private:

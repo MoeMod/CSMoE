@@ -166,9 +166,9 @@ public:
 	bool IsAtHome() const;
 	bool CanSeeRescueZone() const;
 	CBaseEntity *GetFollowLeader() const { return m_followState.GetLeader(); }
-	float GetTimeSinceLastSawPlayer(int team);
-	float GetTimeSinceLastInjury();
-	float GetTimeSinceLastNoise();
+	duration_t GetTimeSinceLastSawPlayer(int team);
+	duration_t GetTimeSinceLastInjury();
+	duration_t GetTimeSinceLastNoise();
 	bool IsTerroristNearby();
 	void Frighten(ScareType scare);
 	bool IsScared() const;
@@ -176,7 +176,7 @@ public:
 	bool IsIgnoringTerrorists() const { return m_ignoreTerroristTimer.IsElapsed(); }
 	float GetAggression() const { return m_aggression; }
 	void Chatter(HostageChatterType sayType, bool mustSpeak = true);
-	void DelayedChatter(float delayTime, HostageChatterType sayType, bool mustSpeak = false);
+	void DelayedChatter(duration_t delayTime, HostageChatterType sayType, bool mustSpeak = false);
 	NOXREF void UpdateDelayedChatter();
 	bool IsTalking() const { return m_talkingTimer.IsElapsed(); }
 	void UpdateGrenadeReactions();

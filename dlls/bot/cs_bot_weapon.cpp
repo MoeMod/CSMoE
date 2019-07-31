@@ -142,7 +142,7 @@ void CCSBot::FireWeaponAtEnemy()
 						if (rangeToEnemy < knifeRange)
 						{
 							// since we've given ourselves away - run!
-							ForceRun(5.0f);
+							ForceRun(5.0s);
 
 							// if our prey is facing away, backstab him!
 							if (enemy->IsPlayer() && !IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
@@ -166,6 +166,8 @@ void CCSBot::FireWeaponAtEnemy()
 					}
 				}
 
+				auto timestamp_delta = 0.0s;
+
 				if (IsUsingPistol())
 				{
 					// high-skill bots fire their pistols quickly at close range
@@ -175,12 +177,12 @@ void CCSBot::FireWeaponAtEnemy()
 						StartRapidFire();
 
 						// fire as fast as possible
-						m_fireWeaponTimestamp = 0.0f;
+						timestamp_delta = 0.0s;
 					}
 					else
 					{
 						// fire somewhat quickly
-						m_fireWeaponTimestamp = RANDOM_FLOAT(0.15f, 0.4f);
+						timestamp_delta = RandomDuration(0.15s, 0.4s);
 					}
 				}
 				// not using a pistol
@@ -190,7 +192,7 @@ void CCSBot::FireWeaponAtEnemy()
 					if (GetProfile()->GetSkill() < 0.5f || rangeToEnemy < sprayRange || IsUsingMachinegun())
 					{
 						// spray 'n pray if enemy is close, or we're not that good, or we're using the big machinegun
-						m_fireWeaponTimestamp = 0.0f;
+						timestamp_delta = 0.0s;
 					}
 					else
 					{
@@ -198,19 +200,20 @@ void CCSBot::FireWeaponAtEnemy()
 						if (!IsUsingSniperRifle() && rangeToEnemy > distantTargetRange)
 						{
 							// if very far away, fire slowly for better accuracy
-							m_fireWeaponTimestamp = RANDOM_FLOAT(0.3f, 0.7f);
+							timestamp_delta = RandomDuration(0.3s, 0.7s);
 						}
 						else
 						{
 							// fire short bursts for accuracy
-							m_fireWeaponTimestamp = RANDOM_FLOAT(0.15f, 0.5f); // 0.15f, 0.25f
+							timestamp_delta = RandomDuration(0.15s, 0.5s); // 0.15f, 0.25f
 						}
 					}
 				}
 
 				// subtract system latency
-				m_fireWeaponTimestamp -= g_flBotFullThinkInterval;
-				m_fireWeaponTimestamp += gpGlobals->time;
+				//m_fireWeaponTimestamp -= g_flBotFullThinkInterval;
+				//m_fireWeaponTimestamp += gpGlobals->time;
+				m_fireWeaponTimestamp = gpGlobals->time + timestamp_delta - g_flBotFullThinkInterval;
 			}
 		}
 	}
@@ -230,9 +233,9 @@ void CCSBot::SetAimOffset(float accuracy)
 		}
 
 		// focusTime is the time it takes for a bot to "focus in" for very good aim, from 2 to 5 seconds
-		const float focusTime = Q_max(5.0f * (1.0f - accuracy), 2.0f);
+		const auto focusTime = max(5.0s * (1.0f - accuracy), 2.0s);
 
-		float focusInterval = gpGlobals->time - m_aimSpreadTimestamp;
+		auto focusInterval = gpGlobals->time - m_aimSpreadTimestamp;
 		float focusAccuracy = focusInterval / focusTime;
 
 		// limit how much "focus" will help
@@ -496,7 +499,7 @@ bool CCSBot::DoEquip(CBasePlayerWeapon *gun)
 }
 
 // throttle how often equipping is allowed
-const float minEquipInterval = 5.0f;
+constexpr auto minEquipInterval = 5.0s;
 
 // Equip the best weapon we are carrying that has ammo
 
@@ -659,10 +662,10 @@ void CCSBot::ThrowGrenade(const Vector *target)
 	{
 		const float angleTolerance = 1.0f;
 
-		SetLookAt("GrenadeThrow", target, PRIORITY_UNINTERRUPTABLE, 3.0f, false, angleTolerance);
+		SetLookAt("GrenadeThrow", target, PRIORITY_UNINTERRUPTABLE, 3.0s, false, angleTolerance);
 
 		m_isWaitingToTossGrenade = true;
-		m_tossGrenadeTimer.Start(3.0f);
+		m_tossGrenadeTimer.Start(3.0s);
 	}
 }
 
@@ -769,8 +772,8 @@ bool CCSBot::FindGrenadeTossPathTarget(Vector *pos)
 
 void CCSBot::ReloadCheck()
 {
-	const float safeReloadWaitTime = 3.0f;
-	const float reloadAmmoRatio = 0.6f;
+	constexpr auto safeReloadWaitTime = 3.0s;
+	constexpr float reloadAmmoRatio = 0.6f;
 
 	// don't bother to reload if there are no enemies left
 	if (GetEnemiesRemaining() == 0)
@@ -818,7 +821,7 @@ void CCSBot::ReloadCheck()
 
 		if (!IsHiding() && RANDOM_FLOAT(0.0f, 100.0f) < hideChance)
 		{
-			const float safeTime = 5.0f;
+			constexpr auto safeTime = 5.0s;
 			if (GetTimeSinceLastSawEnemy() < safeTime)
 			{
 				PrintIfWatched("Retreating to a safe spot to reload!\n");
@@ -827,11 +830,11 @@ void CCSBot::ReloadCheck()
 				{
 					// ignore enemies for a second to give us time to hide
 					// reaching our hiding spot clears our disposition
-					IgnoreEnemies(10.0f);
+					IgnoreEnemies(10.0s);
 
 					Run();
 					StandUp();
-					Hide(spot, 0.0f);
+					Hide(spot, 0.0s);
 				}
 			}
 		}
@@ -843,7 +846,7 @@ void CCSBot::ReloadCheck()
 void CCSBot::SilencerCheck()
 {
 	// longer than reload check because reloading should take precedence
-	const float safeSilencerWaitTime = 3.5f;
+	constexpr auto safeSilencerWaitTime = 3.5s;
 
 	if (IsDefusingBomb() || IsActiveWeaponReloading() || IsAttacking())
 		return;
@@ -864,7 +867,8 @@ void CCSBot::SilencerCheck()
 
 		bool isSilencerOn = (myGun->m_iWeaponState & (WPNSTATE_M4A1_SILENCED | WPNSTATE_USP_SILENCED)) != 0;
 
-		if (myGun->m_flNextSecondaryAttack >= gpGlobals->time)
+		// TODO(MoeMod) : time fix
+		if (myGun->m_flNextSecondaryAttack >= zero_duration /*gpGlobals->time*/)
 			return;
 
 		// equip silencer if we want to and we don't have a shield.
@@ -894,7 +898,7 @@ void CCSBot::OnTouchingWeapon(CWeaponBox *box)
 			if (GetProfile()->HasPrimaryPreference())
 			{
 				// don't change weapons if we've seen enemies recently
-				const float safeTime = 2.5f;
+				constexpr auto safeTime = 2.5s;
 				if (GetTimeSinceLastSawEnemy() >= safeTime)
 				{
 					// we have a primary weapon - drop it if the one on the ground is better

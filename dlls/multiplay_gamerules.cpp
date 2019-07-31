@@ -64,6 +64,7 @@
 #include "maprules.h"
 
 #include <ctype.h>
+#include <chrono>
 
 namespace sv {
 
@@ -99,7 +100,7 @@ void SV_Continue_f()
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
 
-	if (mp->IsCareer() && mp->m_fTeamCount > 100000.0)
+	if (mp->IsCareer() && mp->m_fTeamCount.time_since_epoch() > 100000.0s)
 	{
 		mp->m_fTeamCount = gpGlobals->time;
 
@@ -188,7 +189,7 @@ void SV_CareerAddTask_f()
 
 	if (TheCareerTasks != NULL)
 	{
-		TheCareerTasks->AddTask(taskName, weaponName, reps, mustLive, crossRounds, isComplete);
+		TheCareerTasks->AddTask(taskName, weaponName, reps * 1s, mustLive, crossRounds, isComplete);
 	}
 }
 
@@ -396,43 +397,43 @@ void EndRoundMessage(const char *sentence, int event)
 
 void ReadMultiplayCvars(CHalfLifeMultiplay *mp)
 {
-	mp->m_iRoundTime = (int)(CVAR_GET_FLOAT("mp_roundtime") * 60);
-	mp->m_iC4Timer = (int)CVAR_GET_FLOAT("mp_c4timer");
-	mp->m_iIntroRoundTime = (int)CVAR_GET_FLOAT("mp_freezetime");
+	mp->m_iRoundTime = (int)(CVAR_GET_FLOAT("mp_roundtime") * 60) * 1s;
+	mp->m_iC4Timer = (int)CVAR_GET_FLOAT("mp_c4timer") * std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(1s);
+	mp->m_iIntroRoundTime = (int)CVAR_GET_FLOAT("mp_freezetime") * 1s;
 	mp->m_iLimitTeams = (int)CVAR_GET_FLOAT("mp_limitteams");
 
 
-	if (mp->m_iRoundTime > 540)
+	if (mp->m_iRoundTime > 9min)
 	{
 		CVAR_SET_FLOAT("mp_roundtime", 9);
-		mp->m_iRoundTime = 540;
+		mp->m_iRoundTime = 9min;
 	}
-	else if (mp->m_iRoundTime < 60)
+	else if (mp->m_iRoundTime < 1min)
 	{
 		CVAR_SET_FLOAT("mp_roundtime", 1);
-		mp->m_iRoundTime = 60;
+		mp->m_iRoundTime = 1min;
 	}
 
-	if (mp->m_iIntroRoundTime > 60)
+	if (mp->m_iIntroRoundTime > 1min)
 	{
 		CVAR_SET_FLOAT("mp_freezetime", 60);
-		mp->m_iIntroRoundTime = 60;
+		mp->m_iIntroRoundTime = 1min;
 	}
-	else if (mp->m_iIntroRoundTime < 0)
+	else if (mp->m_iIntroRoundTime < 0s)
 	{
 		CVAR_SET_FLOAT("mp_freezetime", 0);
-		mp->m_iIntroRoundTime = 0;
+		mp->m_iIntroRoundTime = 0s;
 	}
 
-	if (mp->m_iC4Timer > 90)
+	if (mp->m_iC4Timer > 90s)
 	{
 		CVAR_SET_FLOAT("mp_c4timer", 90);
-		mp->m_iC4Timer = 90;
+		mp->m_iC4Timer = 90s;
 	}
-	else if (mp->m_iC4Timer < 10)
+	else if (mp->m_iC4Timer < 10s)
 	{
 		CVAR_SET_FLOAT("mp_c4timer", 10);
-		mp->m_iC4Timer = 10;
+		mp->m_iC4Timer = 10s;
 	}
 
 	if (mp->m_iLimitTeams > 20)
@@ -452,9 +453,9 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	m_VoiceGameMgr.Init(&g_GameMgrHelper, gpGlobals->maxClients);
 	RefreshSkillData();
 
-	m_flIntermissionEndTime = 0;
-	m_flIntermissionStartTime = 0;
-	m_fTeamCount = 0;
+	m_flIntermissionEndTime = invalid_time_point;
+	m_flIntermissionStartTime = invalid_time_point;
+	m_fTeamCount = {};
 
 	m_iAccountCT = 0;
 	m_iAccountTerrorist = 0;
@@ -478,7 +479,7 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	m_bTargetBombed = false;
 	m_bFreezePeriod = TRUE;
 	m_bLevelInitialized = false;
-	m_tmNextPeriodicThink = 0;
+	m_tmNextPeriodicThink = invalid_time_point;
 	m_bFirstConnected = 0;
 	m_bCompleteReset = false;
 	m_flRequiredEscapeRatio = 0.5;
@@ -531,12 +532,12 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	CVAR_SET_FLOAT("cl_himodels", 0);
 	ReadMultiplayCvars(this);
 
-	m_iIntroRoundTime += 2;
+	m_iIntroRoundTime += 2s;
 	m_fMaxIdlePeriod = m_iRoundTime * 2;
 
-	float flAutoKickIdle = CVAR_GET_FLOAT("mp_autokick_timeout");
+	duration_t flAutoKickIdle = CVAR_GET_FLOAT("mp_autokick_timeout") * 1s;
 
-	if (flAutoKickIdle > 0.0)
+	if (flAutoKickIdle > 0.0s)
 	{
 		m_fMaxIdlePeriod = flAutoKickIdle;
 	}
@@ -575,8 +576,8 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 		}
 	}
 
-	m_fRoundCount = 0;
-	m_fIntroRoundCount = 0;
+	m_fRoundCount = {};
+	m_fIntroRoundCount = invalid_time_point;
 
 #ifndef CSTRIKE
 	InstallBotControl();
@@ -605,8 +606,8 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 		installedCommands = true;
 	}
 
-	m_fCareerRoundMenuTime = 0;
-	m_fCareerMatchMenuTime = 0;
+	m_fCareerRoundMenuTime = invalid_time_point;
+	m_fCareerMatchMenuTime = invalid_time_point;
 	m_iCareerMatchWins = 0;
 
 	m_iRoundWinDifference = (int)CVAR_GET_FLOAT("mp_windifference");
@@ -907,7 +908,7 @@ void CHalfLifeMultiplay::QueueCareerRoundEndMenu(float tmDelay, int iWinStatus)
 	if (TheCareerTasks == NULL)
 		return;
 
-	if (m_fCareerMatchMenuTime != 0.0f)
+	if (m_fCareerMatchMenuTime != invalid_time_point)
 		return;
 
 	m_fCareerRoundMenuTime = tmDelay + gpGlobals->time;
@@ -973,7 +974,7 @@ void CHalfLifeMultiplay::QueueCareerRoundEndMenu(float tmDelay, int iWinStatus)
 		break;
 	}
 
-	if (m_fCareerMatchMenuTime == 0.0f && m_iCareerMatchWins)
+	if (m_fCareerMatchMenuTime == invalid_time_point && m_iCareerMatchWins)
 	{
 		bool canTsWin = true;
 		bool canCTsWin = true;
@@ -994,8 +995,8 @@ void CHalfLifeMultiplay::QueueCareerRoundEndMenu(float tmDelay, int iWinStatus)
 
 		if (canCTsWin || canTsWin)
 		{
-			m_fCareerRoundMenuTime = 0;
-			m_fCareerMatchMenuTime = gpGlobals->time + 3.0f;
+			m_fCareerRoundMenuTime = invalid_time_point;
+			m_fCareerMatchMenuTime = gpGlobals->time + 3.0s;
 		}
 	}
 }
@@ -1807,10 +1808,10 @@ void CHalfLifeMultiplay::RestartRound()
 
 	ReadMultiplayCvars(this);
 
-	float flAutoKickIdle = CVAR_GET_FLOAT("mp_autokick_timeout");
+	duration_t flAutoKickIdle = CVAR_GET_FLOAT("mp_autokick_timeout") * 1s;
 
 	// set the idlekick max time (in seconds)
-	if (flAutoKickIdle > 0)
+	if (flAutoKickIdle > 0s)
 		m_fMaxIdlePeriod = flAutoKickIdle;
 	else
 		m_fMaxIdlePeriod = (m_iRoundTime * 2);
@@ -2056,9 +2057,9 @@ void CHalfLifeMultiplay::RestartRound()
 	}
 
 	// Reset game variables
-	m_flIntermissionEndTime = 0;
-	m_flIntermissionStartTime = 0;
-	m_fTeamCount = 0.0;
+	m_flIntermissionEndTime = invalid_time_point;
+	m_flIntermissionStartTime = invalid_time_point;
+	m_fTeamCount = invalid_time_point;
 	m_iAccountTerrorist = m_iAccountCT = 0;
 	m_iHostagesRescued = 0;
 	m_iHostagesTouched = 0;
@@ -2385,7 +2386,7 @@ void CHalfLifeMultiplay::Think()
 		CVAR_SET_FLOAT("sv_clienttrace", 1);
 	}
 
-	if (!m_fRoundCount)
+	if (m_fRoundCount == invalid_time_point)
 	{
 		// intialize the timer time stamps, this happens once only
 		m_fIntroRoundCount = m_fRoundCount = gpGlobals->time;
@@ -2424,7 +2425,7 @@ void CHalfLifeMultiplay::Think()
 			return;
 	}
 
-	if (!IsCareer() || (m_fCareerMatchMenuTime <= 0.0 || m_fCareerMatchMenuTime >= gpGlobals->time))
+	if (!IsCareer() || (m_fCareerMatchMenuTime <= time_point_t() || m_fCareerMatchMenuTime >= gpGlobals->time))
 	{
 		if (m_iStoredSpectValue != allow_spectators.value)
 		{
@@ -2445,9 +2446,9 @@ void CHalfLifeMultiplay::Think()
 			CheckRoundTimeExpired();
 		}
 
-		if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+		if (m_fTeamCount != time_point_t() && m_fTeamCount <= gpGlobals->time)
 		{
-			if (!IsCareer() || !m_fCareerRoundMenuTime)
+			if (!IsCareer() || m_fCareerRoundMenuTime == invalid_time_point)
 			{
 				RestartRound();
 			}
@@ -2455,14 +2456,14 @@ void CHalfLifeMultiplay::Think()
 			{
 				bool isBotSpeaking = false;
 
-				if (m_fTeamCount + 10.0 > gpGlobals->time)
+				if (m_fTeamCount + 10.0s > gpGlobals->time)
 				{
 					isBotSpeaking = IsBotSpeaking();
 				}
 
 				if (!isBotSpeaking)
 				{
-					if (m_fCareerMatchMenuTime == 0.0f && m_iCareerMatchWins)
+					if (m_fCareerMatchMenuTime == time_point_t() && m_iCareerMatchWins)
 					{
 						bool canCTsWin = true;
 						bool canTsWin = true;
@@ -2487,7 +2488,7 @@ void CHalfLifeMultiplay::Think()
 
 						if (canCTsWin || canTsWin)
 						{
-							m_fCareerRoundMenuTime = 0;
+							m_fCareerRoundMenuTime = invalid_time_point;
 							m_fCareerMatchMenuTime = gpGlobals->time + 3.0f;
 
 							return;
@@ -2519,7 +2520,7 @@ void CHalfLifeMultiplay::Think()
 						}
 					}
 
-					m_fCareerRoundMenuTime = 0;
+					m_fCareerRoundMenuTime = invalid_time_point;
 				}
 			}
 
@@ -2570,7 +2571,7 @@ void CHalfLifeMultiplay::Think()
 	}
 	else
 	{
-		if (m_fCareerMatchMenuTime + 10 <= gpGlobals->time || !IsBotSpeaking())
+		if (m_fCareerMatchMenuTime + 10s <= gpGlobals->time || !IsBotSpeaking())
 		{
 			UTIL_CareerDPrintf("Ending career match...one team has won the specified number of rounds\n");
 
@@ -2616,7 +2617,7 @@ bool CHalfLifeMultiplay::CheckGameOver()
 		{
 			if (!UTIL_HumansInGame()		// if only bots, just change immediately
 				|| m_iEndIntermissionButtonHit		// check that someone has pressed a key, or the max intermission time is over
-				|| ((m_flIntermissionStartTime + MAX_INTERMISSION_TIME) < gpGlobals->time))
+				|| ((m_flIntermissionStartTime + std::chrono::seconds(MAX_INTERMISSION_TIME)) < gpGlobals->time))
 			{
 				// intermission is over
 				ChangeLevel();
@@ -2687,7 +2688,7 @@ bool CHalfLifeMultiplay::CheckWinLimit()
 
 void CHalfLifeMultiplay::CheckFreezePeriodExpired()
 {
-	if (TimeRemaining() > 0)
+	if (TimeRemaining() > 0s)
 		return;
 
 	// Log this information
@@ -2939,7 +2940,7 @@ void CHalfLifeMultiplay::CheckRestartRound()
 bool CHalfLifeMultiplay::HasRoundTimeExpired()
 {
 	// We haven't completed other objectives, so go for this!.
-	if (TimeRemaining() > 0 || m_iRoundWinStatus != WINNER_NONE)
+	if (TimeRemaining() > 0s || m_iRoundWinStatus != WINNER_NONE)
 	{
 		return false;
 	}
@@ -3001,15 +3002,15 @@ void CHalfLifeMultiplay::CareerRestart()
 {
 	g_fGameOver = FALSE;
 
-	if (m_fTeamCount == 0.0f)
+	if (m_fTeamCount == invalid_time_point)
 	{
 		m_fTeamCount = gpGlobals->time + 1.0f;
 	}
 
 	// for reset everything
 	m_bCompleteReset = true;
-	m_fCareerRoundMenuTime = 0;
-	m_fCareerMatchMenuTime = 0;
+	m_fCareerRoundMenuTime = invalid_time_point;
+	m_fCareerMatchMenuTime = invalid_time_point;
 
 	if (TheCareerTasks != NULL)
 	{
@@ -3179,7 +3180,7 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer *pl)
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgCZCareer, NULL, pl->edict());
 			WRITE_STRING("START");
-			WRITE_SHORT(m_iRoundTime);
+			WRITE_SHORT(m_iRoundTime / 1s);
 		MESSAGE_END();
 	}
 	else
@@ -3523,11 +3524,11 @@ BOOL CHalfLifeMultiplay::FPlayerCanRespawn(CBasePlayer *pPlayer)
 	{
 		// If this player just connected and fadetoblack is on, then maybe
 		// the server admin doesn't want him peeking around.
-		if (gpGlobals->time > m_fRoundCount + 20.0f)
+		if (gpGlobals->time > m_fRoundCount + 20.0s)
 		{
 			if (fadetoblack.value != 0.0f)
 			{
-				UTIL_ScreenFade(pPlayer, Vector(0, 0, 0), 3, 3, 255, (FFADE_OUT | FFADE_STAYOUT));
+				UTIL_ScreenFade(pPlayer, Vector(0, 0, 0), 3s, 3s, 255, (FFADE_OUT | FFADE_STAYOUT));
 			}
 
 			return FALSE;
@@ -3543,7 +3544,7 @@ BOOL CHalfLifeMultiplay::FPlayerCanRespawn(CBasePlayer *pPlayer)
 	return TRUE;
 }
 
-float CHalfLifeMultiplay::FlPlayerSpawnTime(CBasePlayer *pPlayer)
+time_point_t CHalfLifeMultiplay::FlPlayerSpawnTime(CBasePlayer *pPlayer)
 {
 	return gpGlobals->time;//now!
 }
@@ -3834,7 +3835,7 @@ void CHalfLifeMultiplay::PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *
 // FlWeaponRespawnTime - what is the time in the future
 // at which this weapon may spawn?
 
-float CHalfLifeMultiplay::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
+time_point_t CHalfLifeMultiplay::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
 {
 	return gpGlobals->time + WEAPON_RESPAWN_TIME;
 }
@@ -3843,18 +3844,18 @@ float CHalfLifeMultiplay::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
 // now, otherwise it returns the time at which it can try
 // to spawn again.
 
-float CHalfLifeMultiplay::FlWeaponTryRespawn(CBasePlayerItem *pWeapon)
+time_point_t CHalfLifeMultiplay::FlWeaponTryRespawn(CBasePlayerItem *pWeapon)
 {
 	if (pWeapon && pWeapon->m_iId && (pWeapon->iFlags() & ITEM_FLAG_LIMITINWORLD))
 	{
 		if (NUMBER_OF_ENTITIES() < (gpGlobals->maxEntities - ENTITY_INTOLERANCE))
-			return 0;
+			return invalid_time_point;
 
 		// we're past the entity tolerance level, so delay the respawn
 		return FlWeaponRespawnTime(pWeapon);
 	}
 
-	return 0;
+	return invalid_time_point;
 }
 
 Vector CHalfLifeMultiplay::VecWeaponRespawnSpot(CBasePlayerItem *pWeapon)
@@ -3897,7 +3898,7 @@ int CHalfLifeMultiplay::ItemShouldRespawn(CItem *pItem)
 	return GR_ITEM_RESPAWN_YES;
 }
 
-float CHalfLifeMultiplay::FlItemRespawnTime(CItem *pItem)
+time_point_t CHalfLifeMultiplay::FlItemRespawnTime(CItem *pItem)
 {
 	return gpGlobals->time + ITEM_RESPAWN_TIME;
 }
@@ -3927,7 +3928,7 @@ int CHalfLifeMultiplay::AmmoShouldRespawn(CBasePlayerAmmo *pAmmo)
 	return GR_AMMO_RESPAWN_YES;
 }
 
-float CHalfLifeMultiplay::FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo)
+time_point_t CHalfLifeMultiplay::FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo)
 {
 	return gpGlobals->time + 20.0f;
 }

@@ -58,6 +58,7 @@
 #include "gamerules.h"
 #include "career_tasks.h"
 #include "maprules.h"
+#include <chrono>
 
 namespace sv {
 
@@ -820,9 +821,9 @@ void CGrenade::TumbleThink()
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.1f;
 
-	if (pev->dmgtime - 1 < gpGlobals->time)
+	if (pev->dmgtime - 1s < gpGlobals->time)
 	{
-		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time), 400, 0.1);
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1);
 	}
 
 	if (pev->dmgtime <= gpGlobals->time)
@@ -858,9 +859,9 @@ void CGrenade::SG_TumbleThink()
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.1f;
 
-	if (pev->dmgtime - 1 < gpGlobals->time)
+	if (pev->dmgtime - 1s < gpGlobals->time)
 	{
-		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time), 400, 0.1);
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1);
 	}
 
 	if (pev->dmgtime <= gpGlobals->time)
@@ -1112,7 +1113,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 
 	pGrenade->pev->nextthink = gpGlobals->time + 0.1f;
 	pGrenade->m_flC4Blow = gpGlobals->time + g_pGameRules->m_iC4Timer;
-	pGrenade->m_flNextFreqInterval = (g_pGameRules->m_iC4Timer / 4);
+	pGrenade->m_flNextFreqInterval = std::chrono::seconds(g_pGameRules->m_iC4Timer / 4);
 	pGrenade->m_flNextFreq = gpGlobals->time;
 
 	pGrenade->m_iCurWave = 0;
@@ -1120,7 +1121,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	pGrenade->m_sBeepName = NULL;
 	pGrenade->m_flNextBeep = gpGlobals->time + 0.5f;
 	pGrenade->m_bIsC4 = true;
-	pGrenade->m_fNextDefuse = 0;
+	pGrenade->m_fNextDefuse = {};
 	pGrenade->m_bStartDefuse = false;
 	pGrenade->m_flNextBlink = gpGlobals->time + 2.0f;
 
@@ -1335,7 +1336,7 @@ void CGrenade::C4Think()
 				pPlayer->SetProgressBarTime(0);
 				m_pBombDefuser = NULL;
 				m_bStartDefuse = false;
-				m_flDefuseCountDown = 0;
+				m_flDefuseCountDown = {};
 
 				// tell the bots someone has aborted defusing
 				if (TheBots != NULL)

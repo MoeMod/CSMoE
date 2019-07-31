@@ -288,7 +288,7 @@ private:
 
 		// MoeMod : hack the client prediction
 		if (m_pZBB_Delegate && m_pZBB_Delegate->IsBuilding())
-			cd->m_flNextAttack = (EngineClock::now() + 10ms).time_since_epoch().count();
+			cd->m_flNextAttack = (gpGlobals->time + 0.01s).time_since_epoch().count();
 	}
 
 	void OnThink() override

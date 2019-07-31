@@ -74,7 +74,7 @@ bool CPlayerModStrategy_Default::CanPlayerBuy(bool display)
 		CVAR_SET_FLOAT("mp_buytime", (MIN_BUY_TIME / 60.0f));
 	}
 
-	if (gpGlobals->time - g_pGameRules->m_fRoundCount > buyTime)
+	if (gpGlobals->time - g_pGameRules->m_fRoundCount > buyTime * 1s)
 	{
 		if (display)
 		{
@@ -263,7 +263,7 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 		cd->vuser3.x = pl->ammo_338mag;
 		cd->vuser3.y = pl->ammo_57mm;
 		cd->vuser3.z = pl->ammo_357sig;
-		cd->m_flNextAttack = pl->m_flNextAttack;
+		cd->m_flNextAttack = pl->m_flNextAttack /1s;
 
 		int iUser3 = 0;
 		if (pl->m_bCanShoot && !pl->m_bIsDefusing)

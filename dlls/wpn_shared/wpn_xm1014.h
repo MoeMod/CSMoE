@@ -37,7 +37,7 @@ public:
 
 public:
 	int m_iShell;
-	float m_flPumpTime;
+	duration_t m_flPumpTime;
 
 private:
 	unsigned short m_usFireXM1014;

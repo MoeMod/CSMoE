@@ -102,19 +102,19 @@ void CK1a::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		K1aFire(0.04 + (0.4) * m_flAccuracy, 0.0995, FALSE);
+		K1aFire(0.04 + (0.4) * m_flAccuracy, 0.0995s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		K1aFire(0.04 + (0.125) * m_flAccuracy, 0.0995, FALSE);
+		K1aFire(0.04 + (0.125) * m_flAccuracy, 0.0995s, FALSE);
 	else
-		K1aFire((0.03) * m_flAccuracy, 0.0995, FALSE);
+		K1aFire((0.03) * m_flAccuracy, 0.0995s, FALSE);
 }
 
-void CK1a::K1aFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CK1a::K1aFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -128,7 +128,7 @@ void CK1a::K1aFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -161,7 +161,7 @@ void CK1a::K1aFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(0.95, 0.4, 0.25, 0.03, 3.75, 2.75, 8);
@@ -178,7 +178,7 @@ void CK1a::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(K1A_MAXCLIP, K1A_RELOAD, 3.0))
+	if (DefaultReload(K1A_MAXCLIP, K1A_RELOAD, 3.0s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -197,7 +197,7 @@ void CK1a::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(K1A_IDLE1, UseDecrement() != FALSE);
 }
 

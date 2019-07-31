@@ -92,7 +92,7 @@ void CFuncVehicle::KeyValue(KeyValueData *pkvd)
 		CBaseEntity::KeyValue(pkvd);
 }
 
-void CFuncVehicle::NextThink(float thinkTime, BOOL alwaysThink)
+void CFuncVehicle::NextThink(time_point_t thinkTime, BOOL alwaysThink)
 {
 	if (alwaysThink)
 		pev->flags |= FL_ALWAYSTHINK;
@@ -340,23 +340,23 @@ void CFuncVehicle::CheckTurning()
 		int iCountTurn = abs(m_iTurnAngle);
 
 		if (iCountTurn > 4) {
-			if (m_flTurnStartTime != -1) {
-				float flTurnTime = gpGlobals->time - m_flTurnStartTime;
+			if (m_flTurnStartTime != invalid_time_point) {
+				duration_t flTurnTime = gpGlobals->time - m_flTurnStartTime;
 
-				if (flTurnTime >= 0)
+				if (flTurnTime >= 0s)
 					maxspeed = m_speed * 0.98;
-				else if (flTurnTime > 0.3)
+				else if (flTurnTime > 0.3s)
 					maxspeed = m_speed * 0.95;
-				else if (flTurnTime > 0.6)
+				else if (flTurnTime > 0.6s)
 					maxspeed = m_speed * 0.9;
-				else if (flTurnTime > 0.8)
+				else if (flTurnTime > 0.8s)
 					maxspeed = m_speed * 0.8;
-				else if (flTurnTime > 1)
+				else if (flTurnTime > 1s)
 					maxspeed = m_speed * 0.7;
-				else if (flTurnTime > 1.2)
+				else if (flTurnTime > 1.2s)
 					maxspeed = m_speed * 0.5;
 				else
-					maxspeed = flTurnTime;
+					maxspeed = flTurnTime / 1s;
 			}
 			else {
 				m_flTurnStartTime = gpGlobals->time;
@@ -364,7 +364,7 @@ void CFuncVehicle::CheckTurning()
 			}
 		}
 		else {
-			m_flTurnStartTime = -1;
+			m_flTurnStartTime = invalid_time_point;
 
 			if (iCountTurn > 2)
 				maxspeed = m_speed * 0.9;
@@ -582,14 +582,14 @@ void CFuncVehicle::Next()
 		pev->avelocity.y = (int) (vy * 10);
 		pev->avelocity.x = (int) (vx * 10);
 
-		m_flLaunchTime = -1;
+		m_flLaunchTime = invalid_time_point;
 		m_flLastNormalZ = m_vSurfaceNormal.z;
 	}
 	else {
-		if (m_flLaunchTime != -1) {
+		if (m_flLaunchTime != invalid_time_point) {
 			vGravityVector.x = 0;
 			vGravityVector.y = 0;
-			vGravityVector.z = (gpGlobals->time - m_flLaunchTime) * -35;
+			vGravityVector.z = (gpGlobals->time - m_flLaunchTime) / 1s * -35;
 
 			if (vGravityVector.z < -400) {
 				vGravityVector.z = -400;
@@ -608,7 +608,7 @@ void CFuncVehicle::Next()
 
 	if (m_flUpdateSound < gpGlobals->time) {
 		UpdateSound();
-		m_flUpdateSound = gpGlobals->time + 1.0;
+		m_flUpdateSound = gpGlobals->time + 1.0s;
 	}
 
 	if (m_vSurfaceNormal != g_vecZero) {
@@ -806,7 +806,7 @@ void CFuncVehicle::Spawn()
 	m_acceleration = 5;
 
 	m_dir = 1;
-	m_flTurnStartTime = -1;
+	m_flTurnStartTime = invalid_time_point;
 
 	if (FStringNull(pev->target)) {
 		ALERT(at_console, "Vehicle with no target");
@@ -843,8 +843,8 @@ void CFuncVehicle::Restart()
 	pev->avelocity = g_vecZero;
 
 	pev->impulse = (int) m_speed;
-	m_flTurnStartTime = -1;
-	m_flUpdateSound = -1;
+	m_flTurnStartTime = invalid_time_point;
+	m_flUpdateSound = invalid_time_point;
 	m_dir = 1;
 	m_pDriver = NULL;
 
@@ -855,7 +855,7 @@ void CFuncVehicle::Restart()
 	UTIL_SetOrigin(pev, pev->oldorigin);
 	STOP_SOUND(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noise));
 
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncVehicle::Find);
 }
 

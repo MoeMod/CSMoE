@@ -29,7 +29,7 @@ public:
 	static constexpr const auto &N = WeaponTemplate::Varibles::N;
 
 public:
-	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
@@ -46,7 +46,7 @@ public:
 			if (CBase::m_fFireOnEmpty)
 			{
 				CBase::PlayEmptySound();
-				CBase::m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+				CBase::m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 			}
 
 			return;
@@ -82,7 +82,7 @@ public:
 		if (!CBase::m_iClip && CBase::m_pPlayer->m_rgAmmo[CBase::m_iPrimaryAmmoType] <= 0)
 			CBase::m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime + 1.9f;
+		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime + 1.9s;
 
 		wpn.Recoil();
 	}

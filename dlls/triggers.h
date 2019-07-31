@@ -186,9 +186,9 @@ public:
 
 	int m_cTargets;
 	int m_index;
-	float m_startTime;
+	time_point_t m_startTime;
 	int m_iTargetName[MAX_MULTI_TARGETS];
-	float m_flTargetDelay[MAX_MULTI_TARGETS];
+	duration_t m_flTargetDelay[MAX_MULTI_TARGETS];
 };
 
 // Render parameters trigger
@@ -499,9 +499,9 @@ public:
 	EHANDLE m_hTarget;
 	CBaseEntity *m_pentPath;
 	int m_sPath;
-	float m_flWait;
-	float m_flReturnTime;
-	float m_flStopTime;
+	duration_t m_flWait;
+	time_point_t m_flReturnTime;
+	time_point_t m_flStopTime;
 	float m_moveDistance;
 	float m_targetSpeed;
 	float m_initialSpeed;

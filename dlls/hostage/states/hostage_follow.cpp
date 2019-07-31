@@ -79,7 +79,7 @@ void HostageFollowState::OnEnter(CHostageImprov *improv)
 
 	if (improv->IsTerroristNearby())
 	{
-		improv->DelayedChatter(3, HOSTAGE_CHATTER_WARN_NEARBY);
+		improv->DelayedChatter(3s, HOSTAGE_CHATTER_WARN_NEARBY);
 	}
 }
 
@@ -129,7 +129,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 			if (range < m_stopRange)
 			{
 				m_isWaiting = true;
-				m_impatientTimer.Start(RANDOM_FLOAT(5.0, 20.0));
+				m_impatientTimer.Start(RandomDuration<float>(5.0s, 20.0s));
 			}
 		}
 		else if (range > continueRange)
@@ -143,7 +143,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 		if (makeWay && !m_isWaitingForFriend)
 		{
 			m_isWaitingForFriend = true;
-			m_waitForFriendTimer.Start(15.0);
+			m_waitForFriendTimer.Start(15.0s);
 
 			improv->Stop();
 			return;
@@ -160,7 +160,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 			improv->MoveTo(m_leader->pev->origin);
 
 			m_lastLeaderPos = m_leader->pev->origin;
-			m_repathTimer.Start(1.0);
+			m_repathTimer.Start(1.0s);
 		}
 
 		if (isLeaderRunning || range > walkRange)
@@ -180,7 +180,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 
 	if (m_impatientTimer.IsElapsed() && !TheCSBots()->IsRoundOver())
 	{
-		m_impatientTimer.Start(RANDOM_FLOAT(20.0, 30.0));
+		m_impatientTimer.Start(RandomDuration<float>(20.0s, 30.0s));
 
 		if (improv->CanSeeRescueZone())
 			improv->Chatter(HOSTAGE_CHATTER_SEE_RESCUE_ZONE, false);
@@ -198,7 +198,7 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 		{
 			if (!m_makeWayTimer.HasStarted())
 			{
-				m_makeWayTimer.Start(RANDOM_FLOAT(0.4, 0.75));
+				m_makeWayTimer.Start(RandomDuration<float>(0.4s, 0.75s));
 			}
 			else if (m_makeWayTimer.IsElapsed())
 			{

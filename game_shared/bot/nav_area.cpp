@@ -75,7 +75,7 @@ CNavAreaGrid TheNavAreaGrid;
 CNavArea *CNavArea::m_openList = nullptr;
 bool CNavArea::m_isReset = false;
 
-float lastDrawTimestamp = 0.0f;
+EngineClock::time_point lastDrawTimestamp = invalid_time_point;
 NavAreaList goodSizedAreaList;
 
 CNavArea *markedArea = nullptr;
@@ -188,8 +188,8 @@ void CNavArea::Initialize()
 	for (int i = 0; i < MAX_AREA_TEAMS; ++i)
 	{
 		m_danger[i] = 0.0f;
-		m_dangerTimestamp[i] = 0.0f;
-		m_clearedTimestamp[i] = 0.0f;
+		m_dangerTimestamp[i] = invalid_time_point;
+		m_clearedTimestamp[i] = invalid_time_point;
 	}
 
 	m_approachCount = 0;
@@ -3071,8 +3071,8 @@ void CNavArea::DecayDanger()
 
 	for (int i = 0; i < MAX_AREA_TEAMS; ++i)
 	{
-		float deltaT = gpGlobals->time - m_dangerTimestamp[i];
-		float decayAmount = decayRate * deltaT;
+		auto deltaT = gpGlobals->time - m_dangerTimestamp[i];
+		float decayAmount = decayRate * deltaT / 1s;
 
 		m_danger[i] -= decayAmount;
 		if (m_danger[i] < 0.0f)
@@ -3550,7 +3550,7 @@ void EditNavAreasReset()
 	isPlacePainting = false;
 
 	editTimestamp = 0.0f;
-	lastDrawTimestamp = 0.0f;
+	lastDrawTimestamp = invalid_time_point;
 }
 
 void DrawHidingSpots(const class CNavArea *area)
@@ -3655,7 +3655,7 @@ void CNavArea::DrawConnectedAreas()
 					static IntervalTimer blink;
 					static bool blinkOn = false;
 
-					if (blink.GetElapsedTime() > 1.0f)
+					if (blink.GetElapsedTime() > 1.0s)
 					{
 						blink.Reset();
 						blinkOn = !blinkOn;
@@ -3788,8 +3788,8 @@ void EditNavAreas(NavEditCmdType cmd)
 		return;
 
 	// don't draw too often on fast video cards or the areas may not appear (odd video effect)
-	float drawTimestamp = gpGlobals->time;
-	const float maxDrawRate = 0.05f;
+	time_point_t drawTimestamp = gpGlobals->time;
+	constexpr auto maxDrawRate = 0.05s;
 
 	bool doDraw;
 	if (drawTimestamp - lastDrawTimestamp < maxDrawRate)

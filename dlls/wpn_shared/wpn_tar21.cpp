@@ -103,12 +103,12 @@ void CTAR21::SecondaryAttack(void)
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CTAR21::PrimaryAttack(void)
 {
-	float FireRate = (m_pPlayer->pev->fov == 90) ? 0.095 : 0.13;
+	const auto FireRate = (m_pPlayer->pev->fov == 90) ? 0.095s : 0.13s;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		TAR21Fire(0.05 * m_flAccuracy + (0.04), FireRate, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 130)
@@ -121,7 +121,7 @@ void CTAR21::PrimaryAttack(void)
 		TAR21Fire((0.008) * m_flAccuracy, FireRate, FALSE);
 }
 
-void CTAR21::TAR21Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CTAR21::TAR21Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -135,7 +135,7 @@ void CTAR21::TAR21Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -167,7 +167,7 @@ void CTAR21::TAR21Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1, 0.45, 0.26, 0.05, 4, 2.5, 7);
@@ -186,7 +186,7 @@ void CTAR21::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(TAR21_MAX_CLIP, TAR21_RELOAD, 3.0))
+	if (DefaultReload(TAR21_MAX_CLIP, TAR21_RELOAD, 3.0s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -208,7 +208,7 @@ void CTAR21::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(TAR21_IDLE1, UseDecrement() != FALSE);
 }
 

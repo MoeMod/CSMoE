@@ -98,14 +98,14 @@ BOOL CP90::Deploy(void)
 void CP90::PrimaryAttack(void)
 {
 	if (!(m_pPlayer->pev->flags & FL_ONGROUND))
-		P90Fire((0.3) * m_flAccuracy, 0.066, FALSE);
+		P90Fire((0.3) * m_flAccuracy, 0.066s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 170)
-		P90Fire((0.115) * m_flAccuracy, 0.066, FALSE);
+		P90Fire((0.115) * m_flAccuracy, 0.066s, FALSE);
 	else
-		P90Fire((0.045) * m_flAccuracy, 0.066, FALSE);
+		P90Fire((0.045) * m_flAccuracy, 0.066s, FALSE);
 }
 
-void CP90::P90Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CP90::P90Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -119,7 +119,7 @@ void CP90::P90Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -152,7 +152,7 @@ void CP90::P90Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.9, 0.45, 0.35, 0.04, 5.25, 3.5, 4);
@@ -169,7 +169,7 @@ void CP90::Reload(void)
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
 
-	if (DefaultReload(P90_MAX_CLIP, P90_RELOAD, 3.4))
+	if (DefaultReload(P90_MAX_CLIP, P90_RELOAD, 3.4s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -187,7 +187,7 @@ void CP90::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(P90_IDLE1, UseDecrement() != FALSE);
 }
 

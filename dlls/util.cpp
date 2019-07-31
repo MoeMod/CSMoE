@@ -682,10 +682,10 @@ NOXREF void UTIL_ScreenShakeAll(const Vector &center, float amplitude, float fre
 	UTIL_ScreenShake(center, amplitude, frequency, duration, 0);
 }
 
-void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
+void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags)
 {
-	fade.duration = FixedUnsigned16(fadeTime, 1 << 12);
-	fade.holdTime = FixedUnsigned16(fadeHold, 1 << 12);
+	fade.duration = FixedUnsigned16(fadeTime.count(), 1 << 12);
+	fade.holdTime = FixedUnsigned16(fadeHold.count(), 1 << 12);
 	fade.r = (int)color.x;
 	fade.g = (int)color.y;
 	fade.b = (int)color.z;
@@ -709,7 +709,7 @@ void UTIL_ScreenFadeWrite(const ScreenFade &fade, CBaseEntity *pEntity)
 	MESSAGE_END();
 }
 
-void UTIL_ScreenFadeAll(const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
+void UTIL_ScreenFadeAll(const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags)
 {
 	int i;
 	ScreenFade fade;
@@ -721,7 +721,7 @@ void UTIL_ScreenFadeAll(const Vector &color, float fadeTime, float fadeHold, int
 	}
 }
 
-void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags)
+void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags)
 {
 	ScreenFade fade;
 	UTIL_ScreenFadeBuild(fade, color, fadeTime, fadeHold, alpha, flags);

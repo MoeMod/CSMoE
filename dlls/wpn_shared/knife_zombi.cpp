@@ -114,7 +114,7 @@ void CKnife_Zombi::PrimaryAttack(void)
 void CKnife_Zombi::SecondaryAttack(void)
 {
 	Stab(TRUE);
-	pev->nextthink = UTIL_WeaponTimeBase() + 0.35;
+	pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.35s;
 }
 
 void CKnife_Zombi::WeaponIdle(void)
@@ -127,7 +127,7 @@ void CKnife_Zombi::WeaponIdle(void)
 
 	if (m_pPlayer->m_bShieldDrawn != true)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		SendWeaponAnim(KNIFE_IDLE, UseDecrement() != FALSE);
 	}
 }
@@ -167,10 +167,10 @@ int CKnife_Zombi::Swing(int fFirst)
 			case 1: SendWeaponAnim(KNIFE_MIDATTACK2HIT, UseDecrement() != FALSE); break;
 			}
 
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.35;
-			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.35s;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 			switch (RANDOM_LONG(0, 2))
 			{
@@ -194,10 +194,10 @@ int CKnife_Zombi::Swing(int fFirst)
 		case 1: SendWeaponAnim(KNIFE_MIDATTACK2HIT, UseDecrement() != FALSE); break;
 		}
 
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 		CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
 		SetPlayerShieldAnim();
@@ -257,7 +257,7 @@ int CKnife_Zombi::Swing(int fFirst)
 		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 
 		SetThink(&CKnife_Zombi::Smack);
-		pev->nextthink = UTIL_WeaponTimeBase() + 0.2;
+		pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.2s;
 		SetPlayerShieldAnim();
 	}
 
@@ -295,8 +295,8 @@ int CKnife_Zombi::Stab(int fFirst)
 		{
 			SendWeaponAnim(KNIFE_STABMISS, UseDecrement() != FALSE);
 
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1;
-			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 
 			switch (RANDOM_LONG(0, 2))
 			{
@@ -317,8 +317,8 @@ int CKnife_Zombi::Stab(int fFirst)
 #ifndef CLIENT_DLL
 		SendWeaponAnim(KNIFE_STABHIT, UseDecrement() != FALSE);
 #endif
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.1;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.1s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
 
 		CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
 
@@ -385,7 +385,7 @@ int CKnife_Zombi::Stab(int fFirst)
 		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 
 		SetThink(&CKnife_Zombi::Smack);
-		pev->nextthink = UTIL_WeaponTimeBase() + 0.2;
+		pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.2s;
 	}
 
 	return fDidHit;

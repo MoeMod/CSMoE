@@ -10,6 +10,7 @@
 #include "h_cycler.h"
 
 #include "arraysize.h"
+#include <chrono>
 
 namespace sv {
 
@@ -96,7 +97,7 @@ void CCycler::Spawn()
 	m_flFrameRate = 75;
 	m_flGroundSpeed = 0;
 
-	pev->nextthink += 1.0f;
+	pev->nextthink += 1.0s;
 
 	ResetSequenceInfo();
 
@@ -172,7 +173,7 @@ int CCycler::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float f
 	else
 	{
 		pev->framerate = 1.0;
-		StudioFrameAdvance(0.1);
+		StudioFrameAdvance(0.1s);
 		pev->framerate = 0;
 
 		ALERT(at_console, "sequence: %d, frame %.0f\n", pev->sequence, pev->frame);
@@ -238,10 +239,10 @@ void CCyclerSprite::Think()
 {
 	if (ShouldAnimate())
 	{
-		Animate(pev->framerate * (gpGlobals->time - m_lastTime));
+		Animate(pev->framerate * (gpGlobals->time - m_lastTime) / 1s);
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_lastTime = gpGlobals->time;
 }
 
@@ -292,7 +293,7 @@ void CWeaponCycler::Spawn()
 BOOL CWeaponCycler::Deploy()
 {
 	m_pPlayer->pev->viewmodel = m_iszModel;
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0f;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0s;
 
 	SendWeaponAnim(0);
 	m_iClip = 0;
@@ -302,13 +303,14 @@ BOOL CWeaponCycler::Deploy()
 
 void CWeaponCycler::Holster(int skiplocal)
 {
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5f;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 }
 
 void CWeaponCycler::PrimaryAttack()
 {
 	SendWeaponAnim(pev->sequence);
-	m_flNextPrimaryAttack = gpGlobals->time + 0.3f;
+	// TODO(MoeMod): time fix
+	m_flNextPrimaryAttack = /*gpGlobals->time*/ + 0.3s;
 }
 
 void CWeaponCycler::SecondaryAttack()
@@ -328,7 +330,8 @@ void CWeaponCycler::SecondaryAttack()
 	}
 
 	SendWeaponAnim(pev->sequence);
-	m_flNextSecondaryAttack = gpGlobals->time + 0.3f;
+	// TODO(MoeMod) : time fix
+	m_flNextSecondaryAttack = /*gpGlobals->time*/ + 0.3s;
 }
 
 IMPLEMENT_SAVERESTORE(CWreckage, CBaseToggle);
@@ -352,7 +355,7 @@ void CWreckage::Spawn()
 	}
 
 	// pev->scale = 5.0;
-	m_flStartTime = (int)gpGlobals->time;
+	m_flStartTime = std::chrono::time_point_cast<std::chrono::duration<int>>(gpGlobals->time);
 }
 
 void CWreckage::Precache()
@@ -368,14 +371,14 @@ void CWreckage::Think()
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.2f;
 
-	if (pev->dmgtime)
+	if (pev->dmgtime != time_point_t())
 	{
 		if (pev->dmgtime < gpGlobals->time)
 		{
 			UTIL_Remove(this);
 			return;
 		}
-		else if (RANDOM_FLOAT(0, pev->dmgtime - m_flStartTime) > pev->dmgtime - gpGlobals->time)
+		else if (duration_t(RANDOM_FLOAT(0, (pev->dmgtime - m_flStartTime).count())) > pev->dmgtime - gpGlobals->time)
 		{
 			return;
 		}

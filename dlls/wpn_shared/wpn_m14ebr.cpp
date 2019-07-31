@@ -97,14 +97,14 @@ BOOL CM14EBR::Deploy(void)
 void CM14EBR::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		M14EBRFire(0.0325 + (0.4) * m_flAccuracy, 0.0955, FALSE);
+		M14EBRFire(0.0325 + (0.4) * m_flAccuracy, 0.0955s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		M14EBRFire(0.0325 + (0.07) * m_flAccuracy, 0.0955, FALSE);
+		M14EBRFire(0.0325 + (0.07) * m_flAccuracy, 0.0955s, FALSE);
 	else
-		M14EBRFire((0.0225), 0.0955, FALSE);
+		M14EBRFire((0.0225), 0.0955s, FALSE);
 }
 
-void CM14EBR::M14EBRFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CM14EBR::M14EBRFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -118,7 +118,7 @@ void CM14EBR::M14EBRFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -150,7 +150,7 @@ void CM14EBR::M14EBRFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7);
@@ -167,7 +167,7 @@ void CM14EBR::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 
-	if (DefaultReload(M14EBR_MAXCLIP, M14EBR_RELOAD, 2.45))
+	if (DefaultReload(M14EBR_MAXCLIP, M14EBR_RELOAD, 2.45s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -186,7 +186,7 @@ void CM14EBR::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(M14EBR_IDLE1, UseDecrement() != FALSE);
 }
 

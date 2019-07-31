@@ -28,7 +28,7 @@ public:
 
 		CBase::m_pPlayer->ResetMaxSpeed();
 		EMIT_SOUND(ENT(CBase::pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-		CBase::m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+		CBase::m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 
 		return CBase::SecondaryAttack(); // pass over
 	}

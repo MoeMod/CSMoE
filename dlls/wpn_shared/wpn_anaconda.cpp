@@ -33,8 +33,8 @@ using namespace WeaponTemplate::Varibles;
 struct CAnaconda_WeaponData
 {
 public:
-	static constexpr auto DefaultReloadTime = 2.3f;
-	static constexpr auto DefaultDeployTime = 0.75f;
+	static constexpr const auto &DefaultReloadTime = 2.3s;
+	static constexpr const auto &DefaultDeployTime = 0.75s;
 	static constexpr InventorySlotType ItemSlot = PISTOL_SLOT;
 	static constexpr const char *V_Model = "models/v_anaconda.mdl";
 	static constexpr const char *P_Model = "models/p_anaconda.mdl";
@@ -57,7 +57,7 @@ public:
 	static constexpr const auto & SpreadCalcWalking = 0.25 * (1 - A);
 	static constexpr const auto & SpreadCalcDucking = 0.1 * (1 - A);
 	static constexpr const auto & SpreadCalcDefault = 0.125 * (1 - A);
-	static constexpr float CycleTime = 0.2f;
+	static constexpr const auto &CycleTime = 0.2s;
 	static constexpr int DamageDefault = 45;
 	static constexpr int DamageZB = 76;
 	static constexpr int DamageZBS = 76;

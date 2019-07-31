@@ -161,7 +161,7 @@ public:
 
 	int m_lastSound;
 	float m_maxSpeed;
-	float m_soundTime;
+	time_point_t m_soundTime;
 };
 
 }

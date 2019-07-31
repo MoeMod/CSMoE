@@ -80,8 +80,8 @@ public:
 #endif
 
 public:
-	void InfinityFire(float flSpread, float flCycleTime, BOOL fUseSemi);
-	void InfinityFire2(float flSpread, float flCycleTime, BOOL fUseSemi);
+	void InfinityFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
+	void InfinityFire2(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 
 protected:
 	int m_iMaxClip;
