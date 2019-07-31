@@ -66,9 +66,9 @@ namespace sv {
             ANIM_DRAW = M249_DRAW;
     static constexpr float MaxSpeed = 230;
     static constexpr float ArmorRatioModifier = 0.25f;
-    static constexpr const auto &SpreadCalcNotOnGround = 0.05 + 0.05 * A;
-    static constexpr const auto &SpreadCalcWalking = 0.042 + 0.02 * A;
-    static constexpr const auto &SpreadCalcDefault = 0.22 * A;
+    static constexpr const auto &SpreadCalcNotOnGround = 0.05*A + 0.05;
+    static constexpr const auto &SpreadCalcWalking = 0.042*A + 0.02;
+    static constexpr const auto &SpreadCalcDefault = 0.037*A + 0.017;
     static constexpr float CycleTime = 0.08403;
     static constexpr int DamageDefault = 33;
     static constexpr int DamageZB = 37;
