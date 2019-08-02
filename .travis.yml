@@ -1,11 +1,10 @@
 language: cpp
+dist: bionic
 cache: ccache
 compiler: gcc
 sudo: true
 addons:
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
     packages:
       - cmake
       - x11-utils
@@ -14,7 +13,6 @@ addons:
       - libgles2-mesa-dev
       - libsdl2-dev
       - libsdl2-image-dev
-      - g++-7
 git:
   depth: 50
   submodules: true
@@ -22,6 +20,5 @@ os:
   - linux
 
 before_script:
-  - eval "CC=gcc-7 && CXX=g++-7"
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_portable_linux_engine.sh; fi
+  - sh scripts/build_portable_linux_engine.sh;
