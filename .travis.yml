@@ -1,5 +1,4 @@
 language: cpp
-dist: bionic
 cache: ccache
 compiler: gcc
 sudo: true
@@ -13,6 +12,7 @@ addons:
       - libgles2-mesa-dev
       - libsdl2-dev
       - libsdl2-image-dev
+      - g++-7
 git:
   depth: 50
   submodules: true
