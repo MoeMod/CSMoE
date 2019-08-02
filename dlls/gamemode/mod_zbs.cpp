@@ -238,7 +238,7 @@ void CMod_ZombieScenario::Think()
 	if (gpGlobals->time > m_tmNextPeriodicThink)
 	{
 		CheckRestartRound();
-		m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
 
 		if (g_psv_accelerate->value != 5.0f)
 		{
@@ -280,7 +280,7 @@ void CMod_ZombieScenario::Think()
 		if (gpGlobals->time > m_flNextSpawnNPC)
 		{
 			MakeZombieNPC();
-			m_flNextSpawnNPC = gpGlobals->time + 1.0f;
+			m_flNextSpawnNPC = gpGlobals->time + 1.0s;
 		}
 	}
 
@@ -312,7 +312,7 @@ void CMod_ZombieScenario::HumanWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDCLEAR);
 	MESSAGE_END();
 
-	TerminateRound(5, WINSTATUS_CTS);
+	TerminateRound(5s, WINSTATUS_CTS);
 
 	++m_iNumCTWins;
 	UpdateTeamScores();
@@ -330,7 +330,7 @@ void CMod_ZombieScenario::ZombieWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDFAIL);
 	MESSAGE_END();
 
-	TerminateRound(5, WINSTATUS_TERRORISTS);
+	TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 	++m_iNumTerroristWins;
 	UpdateTeamScores();

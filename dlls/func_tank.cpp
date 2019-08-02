@@ -81,7 +81,7 @@ void CFuncTank::Spawn()
 	m_pitchCenter = pev->angles.x;
 
 	if (IsActive()) {
-		pev->nextthink = pev->ltime + 1.0f;
+		pev->nextthink = pev->ltime + 1.0s;
 	}
 
 	// Point at the end of the barrel
@@ -220,7 +220,7 @@ BOOL CFuncTank::StartControl(CBasePlayer *pController)
 	m_pController->m_iHideHUD |= HIDEHUD_WEAPONS;
 	m_vecControllerUsePos = m_pController->pev->origin;
 
-	pev->nextthink = pev->ltime + 0.1f;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	return TRUE;
 }
@@ -247,7 +247,7 @@ void CFuncTank::StopControl()
 	m_pController = NULL;
 
 	if (IsActive()) {
-		pev->nextthink = pev->ltime + 1.0f;
+		pev->nextthink = pev->ltime + 1.0s;
 	}
 }
 
@@ -269,7 +269,7 @@ void CFuncTank::ControllerPostFrame()
 			m_pController->m_iWeaponVolume = LOUD_GUN_VOLUME;
 		}
 
-		m_flNextAttack = gpGlobals->time + (1.0f / m_fireRate);
+		m_flNextAttack = gpGlobals->time + (1.0s / m_fireRate);
 	}
 }
 
@@ -339,17 +339,17 @@ void CFuncTank::TrackTarget()
 		// Tanks attempt to mirror the player's angles
 		angles = m_pController->pev->v_angle;
 		angles.x = 0 - angles.x;
-		pev->nextthink = pev->ltime + 0.05f;
+		pev->nextthink = pev->ltime + 0.05s;
 	} else {
 		if (IsActive())
-			pev->nextthink = pev->ltime + 0.1f;
+			pev->nextthink = pev->ltime + 0.1s;
 		else
 			return;
 
 		if (FNullEnt(pPlayer)) {
 			if (IsActive()) {
 				// Wait 2 secs
-				pev->nextthink = pev->ltime + 2.0f;
+				pev->nextthink = pev->ltime + 2.0s;
 			}
 
 			return;
@@ -668,7 +668,7 @@ void CFuncTankLaser::Fire(const Vector &barrelEnd, const Vector &forward, entvar
 
 				m_laserTime = gpGlobals->time;
 				m_pLaser->TurnOn();
-				m_pLaser->pev->dmgtime = gpGlobals->time - 1.0f;
+				m_pLaser->pev->dmgtime = gpGlobals->time - 1.0s;
 				m_pLaser->FireAtPoint(tr);
 				m_pLaser->pev->nextthink = {};
 			}
@@ -781,7 +781,7 @@ void CFuncTankControls::Spawn()
 	UTIL_SetOrigin(pev, pev->origin);
 
 	// After all the func_tank's have spawned
-	pev->nextthink = gpGlobals->time + 0.3f;
+	pev->nextthink = gpGlobals->time + 0.3s;
 
 	CBaseEntity::Spawn();
 }

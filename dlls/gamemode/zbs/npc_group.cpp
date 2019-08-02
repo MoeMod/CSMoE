@@ -54,7 +54,7 @@ struct CNpcGroup::impl_t
 	{
 		if (gpGlobals->time < m_flNextThink)
 			return;
-		m_flNextThink = gpGlobals->time + 0.01f;
+		m_flNextThink = gpGlobals->time + 0.01s;
 
 		if (gpGlobals->time > m_flNextTargetChange)
 		{
@@ -85,7 +85,7 @@ struct CNpcGroup::impl_t
 	{
 		if (!m_path.GetSegmentCount())
 		{
-			m_flNextTargetChange = gpGlobals->time + 1.0f;
+			m_flNextTargetChange = gpGlobals->time + 1.0s;
 			return false;
 		}
 

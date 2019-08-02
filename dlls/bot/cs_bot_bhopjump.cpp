@@ -160,12 +160,12 @@ void CCSBot::BhopJump_UpdateSync()
 		if (idealYaw - m_lookYaw > 30.f) // should StrafeLeft
 		{
 			m_BhopLastSyncDir = LEFT;
-			m_flBhopSyncNext = gpGlobals->time + 0.2f;
+			m_flBhopSyncNext = gpGlobals->time + 0.2s;
 		}
 		else if (m_lookYaw - idealYaw > 30.f) // should StrafeRight
 		{
 			m_BhopLastSyncDir = RIGHT;
-			m_flBhopSyncNext = gpGlobals->time + 0.2f;
+			m_flBhopSyncNext = gpGlobals->time + 0.2s;
 		}
 		else // default (random direction)
 		{
@@ -231,7 +231,7 @@ bool CCSBot::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 		m_buttonFlags |= IN_JUMP;
 
 		m_BhopLastSyncDir = m_BhopLastSyncDir == LEFT ? RIGHT : LEFT;
-		m_flBhopSyncNext = gpGlobals->time + 0.15f;
+		m_flBhopSyncNext = gpGlobals->time + 0.15s;
 		//m_lookYawVel *= 3.0f;
 	}
 

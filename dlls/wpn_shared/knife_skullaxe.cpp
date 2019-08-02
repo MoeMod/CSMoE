@@ -133,7 +133,7 @@ void CKnifeSkullAxe::PrimaryAttack(void)
 	SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
 
 	SetThink(&CKnifeSkullAxe::DelayedPrimaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9;
+	pev->nextthink = gpGlobals->time + 0.9s;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
@@ -147,7 +147,7 @@ void CKnifeSkullAxe::SecondaryAttack(void)
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
 	SetThink(&CKnifeSkullAxe::DelayedSecondaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9;
+	pev->nextthink = gpGlobals->time + 0.9s;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;

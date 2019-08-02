@@ -246,7 +246,7 @@ void CHostage::IdleThink()
 {
 	duration_t flInterval;
 	const float upkeepRate = 0.03f;
-	const float giveUpTime = (1 / 30.0f);
+	const auto giveUpTime = (1 / 30.0f) * 1s;
 	float const updateRate = 0.1f;
 
 	if (g_bIsCzeroGame && TheNavAreaList.size())
@@ -473,7 +473,7 @@ void CHostage::RePosition()
 
 	SetThink(&CHostage::IdleThink);
 
-	pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	pev->nextthink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 
 	m_fHasPath = FALSE;
 	nTargetNode = -1;
@@ -481,7 +481,7 @@ void CHostage::RePosition()
 	m_flLastPathCheck = invalid_time_point;
 	m_flPathAcquired = invalid_time_point;
 	m_flPathCheckInterval = 0.1s;
-	m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	m_flNextFullThink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 }
 
 int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
@@ -525,7 +525,7 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 	if (pev->health > 0)
 	{
-		m_flFlinchTime = gpGlobals->time + 0.75;
+		m_flFlinchTime = gpGlobals->time + 0.75s;
 		SetFlinchActivity();
 
 		if (pAttacker != NULL)
@@ -580,7 +580,7 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 		if (g_pGameRules->m_fTeamCount == invalid_time_point)
 			SendHostageEventMsg();
 
-		pev->nextthink = gpGlobals->time + 3;
+		pev->nextthink = gpGlobals->time + 3s;
 		SetThink(&CHostage::Remove);
 	}
 
@@ -755,7 +755,7 @@ void CHostage::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 
 	if (gpGlobals->time >= m_flNextChange)
 	{
-		m_flNextChange = gpGlobals->time + 1;
+		m_flNextChange = gpGlobals->time + 1s;
 
 		if (m_improv != NULL)
 		{

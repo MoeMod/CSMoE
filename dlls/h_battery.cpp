@@ -86,14 +86,14 @@ void CRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 	{
 		if (m_flSoundTime <= gpGlobals->time)
 		{
-			m_flSoundTime = gpGlobals->time + 0.62f;
+			m_flSoundTime = gpGlobals->time + 0.62s;
 			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/suitchargeno1.wav", 0.85, ATTN_NORM);
 		}
 
 		return;
 	}
 
-	pev->nextthink = pev->ltime + 0.25f;
+	pev->nextthink = pev->ltime + 0.25s;
 	SetThink(&CRecharge::Off);
 
 	// Time to recharge yet?
@@ -115,7 +115,7 @@ void CRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 	{
 		m_iOn++;
 		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/suitchargeok1.wav", 0.85, ATTN_NORM);
-		m_flSoundTime = gpGlobals->time + 0.56f;
+		m_flSoundTime = gpGlobals->time + 0.56s;
 	}
 
 	if (m_iOn == 1 && m_flSoundTime <= gpGlobals->time)
@@ -135,7 +135,7 @@ void CRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 	}
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->time + 0.1f;
+	m_flNextCharge = gpGlobals->time + 0.1s;
 }
 
 void CRecharge::Recharge()
@@ -155,7 +155,7 @@ void CRecharge::Off()
 
 	if (!m_iJuice && (m_iReactivate = g_pGameRules->FlHEVChargerRechargeTime()) > 0)
 	{
-		pev->nextthink = pev->ltime + m_iReactivate;
+		pev->nextthink = pev->ltime + m_iReactivate * 1s;
 		SetThink(&CRecharge::Recharge);
 	}
 	else

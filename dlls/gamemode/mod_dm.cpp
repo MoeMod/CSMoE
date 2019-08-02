@@ -79,7 +79,7 @@ void CMod_DeathMatch::Think(void)
 	if (gpGlobals->time > m_tmNextPeriodicThink)
 	{
 		CheckRestartRound();
-		m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
 
 		if (g_psv_accelerate->value != 5.0f)
 		{
@@ -297,7 +297,7 @@ void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	pPlayer->pev->armorvalue = 100;
 
-	pPlayer->SpawnProtection_Start(3.0f);
+	pPlayer->SpawnProtection_Start(3.0s);
 }
 
 bool CMod_DeathMatch::CheckWinLimitDM()

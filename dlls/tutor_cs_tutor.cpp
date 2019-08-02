@@ -417,7 +417,7 @@ TutorMessage *ConstructTutorMessage(char *&messageData, TutorMessage *defaults)
         ret->m_interruptFlag = defaults->m_interruptFlag;
         ret->m_minDisplayTimeOverride = defaults->m_minDisplayTimeOverride;
 	ret->m_minRepeatInterval = defaults->m_minRepeatInterval;
-	ret->m_examineStartTime = -1.0f;
+	ret->m_examineStartTime = invalid_time_point;
         ret->m_timesShown = 0;
 	ret->m_lastCloseTime = invalid_time_point;
 
@@ -649,7 +649,7 @@ void CCSTutor::TutorThink(time_point_t time)
 			}
 		}
 
-		m_nextViewableCheckTime = cv_tutor_viewable_check_interval.value + time;
+		m_nextViewableCheckTime = cv_tutor_viewable_check_interval.value * 1s + time;
 	}
 
 	CheckForInactiveEvents(time);
@@ -1140,7 +1140,7 @@ void CCSTutor::ComputeDisplayTimesForMessage()
 		return;
 	}
 
-	m_currentlyShownMessageCloseTime = message->m_duration + gpGlobals->time;
+	m_currentlyShownMessageCloseTime = message->m_duration * 1s + gpGlobals->time;
 	duration_t minCloseTime = cv_tutor_message_minimum_display_time.value * 1s;
 
 	int stringLength = GET_LOCALIZED_STRING_LENGTH(message->m_text);
@@ -1200,7 +1200,7 @@ void CCSTutor::UpdateCurrentMessage(TutorMessageEvent *event)
 
 		if (localPlayer != NULL)
 		{
-			m_currentlyShownMessageCloseTime = definition->m_duration + gpGlobals->time;
+			m_currentlyShownMessageCloseTime = definition->m_duration * 1s + gpGlobals->time;
 
 			if (definition->m_keepOld == TUTORMESSAGEKEEPOLDTYPE_UPDATE_CONTENT)
 			{
@@ -3084,10 +3084,10 @@ void CCSTutor::CheckExamineMessages(time_point_t time)
 
 		if (isPlayerLooking)
 		{
-			if (message->m_examineStartTime == -1.0f)
+			if (message->m_examineStartTime == invalid_time_point)
 				continue;
 
-			if (time - message->m_examineStartTime <= cv_tutor_examine_time.value)
+			if (time - message->m_examineStartTime <= cv_tutor_examine_time.value * 1s)
 				continue;
 
 			bool validEntity = false;
@@ -3128,7 +3128,7 @@ void CCSTutor::CheckExamineMessages(time_point_t time)
 			}
 		}
 		else
-			message->m_examineStartTime = -1.0f;
+			message->m_examineStartTime = invalid_time_point;
 	}
 }
 

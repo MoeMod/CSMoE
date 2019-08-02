@@ -60,9 +60,9 @@ public:
 		}
 
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0f;
+		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0s;
 		m_flTimeZombieSkillNext = invalid_time_point;
-		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0f;
+		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0s;
 		m_bDebuffStatus = false;
 
 		m_pPlayer->ResetMaxSpeed();
@@ -106,14 +106,14 @@ protected:
 		{
 			m_iZombieSkillStatus = SKILL_STATUS_USING;
 			m_bDebuffStatus = true;
-			m_flTimeZombieSkillEnd = gpGlobals->time + 5.0f;
+			m_flTimeZombieSkillEnd = gpGlobals->time + 5.0s;
 		}
 		m_pPlayer->ResetMaxSpeed();
 	}
 
 	void OnCrazyEffect()
 	{
-		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0f;
+		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0s;
 
 		if (m_bDebuffStatus)
 			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/human_breath_male.wav\n");
@@ -139,7 +139,7 @@ public:
 			return;
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_flTimeZombieSkillEnd = gpGlobals->time + 4.5f;
+		m_flTimeZombieSkillEnd = gpGlobals->time + 4.5s;
 		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
@@ -174,7 +174,7 @@ public:
 			return;
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_flTimeZombieSkillEnd = gpGlobals->time + 10.f;
+		m_flTimeZombieSkillEnd = gpGlobals->time + 10.s;
 		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);

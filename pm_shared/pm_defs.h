@@ -203,7 +203,7 @@ typedef struct playermove_s
 	void		*(*PM_HullForBsp)( physent_t *pe, float *offset );
 	float		(*PM_TraceModel)( physent_t *pEnt, float *start, float *end, trace_t *trace );
 	int		(*COM_FileSize)( char *filename );
-	byte		*(*COM_LoadFile)( char *path, int usehunk, int *pLength );
+	byte		*(*COM_LoadFile)( const char *path, int usehunk, int *pLength );
 	void		(*COM_FreeFile)( void *buffer );
 	char		*(*memfgets)( byte *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize );
 

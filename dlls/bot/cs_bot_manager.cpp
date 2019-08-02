@@ -158,7 +158,7 @@ void CCSBotManager::RestartRound()
 
 	SetLooseBomb(NULL);
 	m_isBombPlanted = false;
-	m_earliestBombPlantTimestamp = gpGlobals->time + RANDOM_FLOAT(10.0f, 30.0f);
+	m_earliestBombPlantTimestamp = gpGlobals->time + RandomDuration(10.0s, 30.0s);
 	m_bombDefuser = NULL;
 
 	m_editCmd = EDIT_NONE;
@@ -167,7 +167,7 @@ void CCSBotManager::RestartRound()
 
 	m_lastSeenEnemyTimestamp = time_point_t::min();
 
-	m_roundStartTimestamp = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
+	m_roundStartTimestamp = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime") * 1s;
 
 	// randomly decide if defensive team wants to "rush" as a whole
 	const float defenseRushChance = 33.3f;	// 25.0f;
@@ -1043,7 +1043,7 @@ void CCSBotManager::MonitorBotCVars()
 			DrawDanger();
 
 		MaintainBotQuota();
-		m_flNextCVarCheck = gpGlobals->time + 0.3f;
+		m_flNextCVarCheck = gpGlobals->time + 0.3s;
 	}
 }
 

@@ -163,7 +163,7 @@ void CM1887::PrimaryAttack(void)
 	else
 		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 10, 14);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.45;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.45s;
 }
 
 void CM1887::Reload(void)

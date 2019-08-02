@@ -238,21 +238,21 @@ void CBasePlayer::Observer_HandleButtons()
 			break;
 		}
 
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 
 	// Attack moves to the next player
 	if (m_afButtonPressed & IN_ATTACK)
 	{
 		Observer_FindNextPlayer(false);
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 
 	// Attack2 moves to the prev player
 	if (m_afButtonPressed & IN_ATTACK2)
 	{
 		Observer_FindNextPlayer(true);
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 }
 

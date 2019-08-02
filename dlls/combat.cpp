@@ -561,7 +561,7 @@ void CBaseEntity::SUB_StartFadeOut()
 
 	pev->solid = SOLID_NOT;
 	pev->avelocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	SetThink(&CBaseEntity::SUB_FadeOut);
 }
@@ -570,10 +570,10 @@ void CBaseEntity::SUB_FadeOut()
 {
 	if (pev->renderamt > 7) {
 		pev->renderamt -= 7.0f;
-		pev->nextthink = gpGlobals->time + 0.1f;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	} else {
 		pev->renderamt = 0.0f;
-		pev->nextthink = gpGlobals->time + 0.2f;
+		pev->nextthink = gpGlobals->time + 0.2s;
 		SetThink(&CBaseEntity::SUB_Remove);
 	}
 }
@@ -590,9 +590,9 @@ void CGib::WaitTillLand()
 		pev->nextthink = gpGlobals->time + m_lifeTime;
 
 		if (m_bloodColor != DONT_BLEED)
-			CSoundEnt::InsertSound(bits_SOUND_MEAT, pev->origin, 384, 25);
+			CSoundEnt::InsertSound(bits_SOUND_MEAT, pev->origin, 384, 25s);
 	} else
-		pev->nextthink = gpGlobals->time + 0.5f;
+		pev->nextthink = gpGlobals->time + 0.5s;
 }
 
 void CGib::BounceGibTouch(CBaseEntity *pOther)
@@ -629,7 +629,7 @@ void CGib::StickyGibTouch(CBaseEntity *pOther)
 	TraceResult tr;
 
 	SetThink(&CBaseEntity::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 10;
+	pev->nextthink = gpGlobals->time + 10s;
 
 	if (!FClassnameIs(pOther->pev, "worldspawn")) {
 		pev->nextthink = gpGlobals->time;
@@ -673,7 +673,7 @@ void CGib::Spawn(const char *szGibModel)
 	SET_MODEL(ENT(pev), szGibModel);
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
-	pev->nextthink = gpGlobals->time + 4.0f;
+	pev->nextthink = gpGlobals->time + 4.0s;
 	m_lifeTime = 25.0s;
 
 	SetThink(&CGib::WaitTillLand);

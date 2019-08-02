@@ -77,7 +77,7 @@ void CMod_ZombieMod2::PlayerThink(CBasePlayer *pPlayer)
 void CMod_ZombieMod2::RestartRound()
 {
 	RemoveAllSupplybox();
-	m_flTimeNextMakeSupplybox = gpGlobals->time + RANDOM_FLOAT(30.0f, 60.0f);
+	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(30.0s, 60.0s);
 	return CMod_Zombi::RestartRound();
 }
 
@@ -118,7 +118,7 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 		return;
 	if (gpGlobals->time < m_flTimeNextMakeSupplybox)
 		return;
-	m_flTimeNextMakeSupplybox = gpGlobals->time + RANDOM_FLOAT(20.0f, 30.0f);
+	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(20.0s, 30.0s);
 
 	RemoveAllSupplybox();
 
@@ -275,7 +275,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 	if (m_pPlayer->pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
 	{
-		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
+		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
 		return;
 	}
 
@@ -289,7 +289,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 		if (m_pPlayer->pev->max_health != m_pPlayer->pev->health)
 		{
 
-			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 1.0f;
+			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 1.0s;
 			m_pPlayer->pev->health = std::min(m_pPlayer->pev->max_health, m_pPlayer->pev->health + flRecoverValue);
 
 			// effects
@@ -364,7 +364,7 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(CBasePlayer * attacker, H
 
 void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0f;
+	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
 	return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
 }
 

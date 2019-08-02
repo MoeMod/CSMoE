@@ -116,7 +116,7 @@ void CCycler::Spawn()
 
 void CCycler::Think()
 {
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (m_animate)
 	{
@@ -194,7 +194,7 @@ void CCyclerSprite::Spawn()
 	pev->effects = 0;
 
 	pev->frame = 0;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_animate = 1;
 	m_lastTime = gpGlobals->time;
 
@@ -221,7 +221,7 @@ void CCyclerSprite::Restart()
 	pev->effects = 0;
 
 	pev->frame = 0;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_animate = 1;
 	m_lastTime = gpGlobals->time;
 
@@ -346,7 +346,7 @@ void CWreckage::Spawn()
 	pev->effects = 0;
 
 	pev->frame = 0;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (!FStringNull(pev->model))
 	{
@@ -369,7 +369,7 @@ void CWreckage::Precache()
 void CWreckage::Think()
 {
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.2f;
+	pev->nextthink = gpGlobals->time + 0.2s;
 
 	if (pev->dmgtime != time_point_t())
 	{

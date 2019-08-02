@@ -653,7 +653,7 @@ void CHalfLifeMultiplay::RemoveGuns()
 	while ((toremove = UTIL_FindEntityByClassname(toremove, "weapon_shield")) != NULL)
 	{
 		toremove->SetThink(&CBaseEntity::SUB_Remove);
-		toremove->pev->nextthink = gpGlobals->time + 0.1;
+		toremove->pev->nextthink = gpGlobals->time + 0.1s;
 	}
 }
 
@@ -896,14 +896,14 @@ void CHalfLifeMultiplay::GiveC4()
 	}
 }
 
-void CHalfLifeMultiplay::TerminateRound(float tmDelay, int iWinStatus)
+void CHalfLifeMultiplay::TerminateRound(duration_t tmDelay, int iWinStatus)
 {
 	m_iRoundWinStatus = iWinStatus;
 	m_fTeamCount = gpGlobals->time + tmDelay;
 	m_bRoundTerminating = true;
 }
 
-void CHalfLifeMultiplay::QueueCareerRoundEndMenu(float tmDelay, int iWinStatus)
+void CHalfLifeMultiplay::QueueCareerRoundEndMenu(duration_t tmDelay, int iWinStatus)
 {
 	if (TheCareerTasks == NULL)
 		return;
@@ -1160,7 +1160,7 @@ bool CHalfLifeMultiplay::NeededPlayersCheck(bool &bNeededPlayers)
 		m_bCompleteReset = true;
 
 		EndRoundMessage("#Game_Commencing", ROUND_END_DRAW);
-		TerminateRound(IsCareer() ? 0 : 3, WINSTATUS_DRAW);
+		TerminateRound(IsCareer() ? 0s : 3s, WINSTATUS_DRAW);
 
 		m_bFirstConnected = true;
 		if (TheBots != NULL)
@@ -1205,11 +1205,11 @@ bool CHalfLifeMultiplay::VIPRoundEndCheck(bool bNeededPlayers)
 			{
 				TheBots->OnEvent(EVENT_VIP_ESCAPED);
 			}
-			TerminateRound(5, WINSTATUS_CTS);
+			TerminateRound(5s, WINSTATUS_CTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 			}
 
 			return true;
@@ -1234,11 +1234,11 @@ bool CHalfLifeMultiplay::VIPRoundEndCheck(bool bNeededPlayers)
 			{
 				TheBots->OnEvent(EVENT_VIP_ASSASSINATED);
 			}
-			TerminateRound(5, WINSTATUS_TERRORISTS);
+			TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 			}
 
 			return true;
@@ -1268,11 +1268,11 @@ bool CHalfLifeMultiplay::PrisonRoundEndCheck(int NumAliveTerrorist, int NumAlive
 			}
 
 			EndRoundMessage("#Terrorists_Escaped", ROUND_TERRORISTS_ESCAPED);
-			TerminateRound(5, WINSTATUS_TERRORISTS);
+			TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 			}
 
 			return true;
@@ -1292,11 +1292,11 @@ bool CHalfLifeMultiplay::PrisonRoundEndCheck(int NumAliveTerrorist, int NumAlive
 			}
 
 			EndRoundMessage("#CTs_PreventEscape", ROUND_CTS_PREVENT_ESCAPE);
-			TerminateRound(5, WINSTATUS_CTS);
+			TerminateRound(5s, WINSTATUS_CTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 			}
 
 			return true;
@@ -1316,11 +1316,11 @@ bool CHalfLifeMultiplay::PrisonRoundEndCheck(int NumAliveTerrorist, int NumAlive
 			}
 
 			EndRoundMessage("#Escaping_Terrorists_Neutralized", ROUND_ESCAPING_TERRORISTS_NEUTRALIZED);
-			TerminateRound(5, WINSTATUS_CTS);
+			TerminateRound(5s, WINSTATUS_CTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 			}
 
 			return true;
@@ -1347,11 +1347,11 @@ bool CHalfLifeMultiplay::BombRoundEndCheck(bool bNeededPlayers)
 		}
 
 		EndRoundMessage("#Target_Bombed", ROUND_TARGET_BOMB);
-		TerminateRound(5, WINSTATUS_TERRORISTS);
+		TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 		}
 
 		return true;
@@ -1370,11 +1370,11 @@ bool CHalfLifeMultiplay::BombRoundEndCheck(bool bNeededPlayers)
 		}
 
 		EndRoundMessage("#Bomb_Defused", ROUND_BOMB_DEFUSED);
-		TerminateRound(5, WINSTATUS_CTS);
+		TerminateRound(5s, WINSTATUS_CTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 		}
 
 		return true;
@@ -1416,11 +1416,11 @@ bool CHalfLifeMultiplay::TeamExterminationCheck(int NumAliveTerrorist, int NumAl
 				}
 
 				EndRoundMessage("#CTs_Win", ROUND_CTS_WIN);
-				TerminateRound(5, WINSTATUS_CTS);
+				TerminateRound(5s, WINSTATUS_CTS);
 
 				if (IsCareer())
 				{
-					QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+					QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 				}
 
 				return true;
@@ -1441,11 +1441,11 @@ bool CHalfLifeMultiplay::TeamExterminationCheck(int NumAliveTerrorist, int NumAl
 			}
 
 			EndRoundMessage("#Terrorists_Win", ROUND_TERRORISTS_WIN);
-			TerminateRound(5, WINSTATUS_TERRORISTS);
+			TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 			}
 
 			return true;
@@ -1455,7 +1455,7 @@ bool CHalfLifeMultiplay::TeamExterminationCheck(int NumAliveTerrorist, int NumAl
 	{
 		EndRoundMessage("#Round_Draw", ROUND_END_DRAW);
 		Broadcast("rounddraw");
-		TerminateRound(5, WINSTATUS_DRAW);
+		TerminateRound(5s, WINSTATUS_DRAW);
 
 		return true;
 	}
@@ -1514,10 +1514,10 @@ bool CHalfLifeMultiplay::HostageRescueRoundEndCheck(bool bNeededPlayers)
 				}
 			}
 
-			TerminateRound(5, WINSTATUS_CTS);
+			TerminateRound(5s, WINSTATUS_CTS);
 			if (IsCareer())
 			{
-				QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+				QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 			}
 
 			return true;
@@ -1759,7 +1759,7 @@ void CHalfLifeMultiplay::RestartRound()
 
 		// Reset timelimit
 		if (timelimit.value)
-			g_flTimeLimit = gpGlobals->time + (timelimit.value * 60);
+			g_flTimeLimit = gpGlobals->time + (timelimit.value * 60s);
 
 		// Reset total # of rounds played
 		m_iTotalRoundsPlayed = 0;
@@ -2489,7 +2489,7 @@ void CHalfLifeMultiplay::Think()
 						if (canCTsWin || canTsWin)
 						{
 							m_fCareerRoundMenuTime = invalid_time_point;
-							m_fCareerMatchMenuTime = gpGlobals->time + 3.0f;
+							m_fCareerMatchMenuTime = gpGlobals->time + 3.0s;
 
 							return;
 						}
@@ -2513,7 +2513,7 @@ void CHalfLifeMultiplay::Think()
 							MESSAGE_END();
 
 							pPlayer->m_iHideHUD |= HIDEHUD_ALL;
-							m_fTeamCount = gpGlobals->time + 100000.0;
+							m_fTeamCount = gpGlobals->time + 100000.0s;
 
 							UTIL_LogPrintf("Career Round %d %d %d %d\n", m_iRoundWinStatus, m_iNumCTWins, m_iNumTerroristWins, TheCareerTasks->AreAllTasksComplete());
 							break;
@@ -2535,7 +2535,7 @@ void CHalfLifeMultiplay::Think()
 		if (gpGlobals->time > m_tmNextPeriodicThink)
 		{
 			CheckRestartRound();
-			m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+			m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
 
 			if (g_psv_accelerate->value != 5.0f)
 			{
@@ -2610,7 +2610,7 @@ bool CHalfLifeMultiplay::CheckGameOver()
 			CVAR_SET_STRING("mp_chattime", UTIL_dtos1(MAX_INTERMISSION_TIME));
 
 		// bounds check
-		m_flIntermissionEndTime = m_flIntermissionStartTime + mp_chattime.value;
+		m_flIntermissionEndTime = m_flIntermissionStartTime + mp_chattime.value * 1s;
 
 		// check to see if we should change levels now
 		if (m_flIntermissionEndTime < gpGlobals->time && !IsCareer())
@@ -2644,7 +2644,7 @@ bool CHalfLifeMultiplay::CheckTimeLimit()
 	{
 		if (fTimeLimit != 0.0f)
 		{
-			g_flTimeLimit = g_flResetTime + fTimeLimit * 60.0f;
+			g_flTimeLimit = g_flResetTime + fTimeLimit * 60.0s;
 		}
 
 		if (fTimeLimit > 0 && gpGlobals->time >= g_flTimeLimit)
@@ -2806,7 +2806,7 @@ void CHalfLifeMultiplay::CheckRoundTimeExpired()
 		if (!C4->m_bJustBlew)
 			flEndRoundTime = C4->m_flC4Blow;
 		else
-			flEndRoundTime = gpGlobals->time + 5.0;
+			flEndRoundTime = gpGlobals->time + 5.0s;
 	}
 #endif
 
@@ -2819,11 +2819,11 @@ void CHalfLifeMultiplay::CheckRoundTimeExpired()
 		m_iNumCTWins++;
 
 		EndRoundMessage("#Target_Saved", ROUND_TARGET_SAVED);
-		TerminateRound(5, WINSTATUS_CTS);
+		TerminateRound(5s, WINSTATUS_CTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 		}
 
 		UpdateTeamScores();
@@ -2836,11 +2836,11 @@ void CHalfLifeMultiplay::CheckRoundTimeExpired()
 		m_iNumTerroristWins++;
 
 		EndRoundMessage("#Hostages_Not_Rescued", ROUND_HOSTAGE_NOT_RESCUED);
-		TerminateRound(5, WINSTATUS_TERRORISTS);
+		TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 		}
 
 		UpdateTeamScores();
@@ -2852,11 +2852,11 @@ void CHalfLifeMultiplay::CheckRoundTimeExpired()
 		m_iNumCTWins++;
 
 		EndRoundMessage("#Terrorists_Not_Escaped", ROUND_TERRORISTS_NOT_ESCAPED);
-		TerminateRound(5, WINSTATUS_CTS);
+		TerminateRound(5s, WINSTATUS_CTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_CTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_CTS);
 		}
 
 		UpdateTeamScores();
@@ -2868,18 +2868,18 @@ void CHalfLifeMultiplay::CheckRoundTimeExpired()
 		m_iNumTerroristWins++;
 
 		EndRoundMessage("#VIP_Not_Escaped", ROUND_VIP_NOT_ESCAPED);
-		TerminateRound(5, WINSTATUS_TERRORISTS);
+		TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 		if (IsCareer())
 		{
-			QueueCareerRoundEndMenu(5, WINSTATUS_TERRORISTS);
+			QueueCareerRoundEndMenu(5s, WINSTATUS_TERRORISTS);
 		}
 
 		UpdateTeamScores();
 	}
 
 	// This is done so that the portion of code has enough time to do it's thing.
-	m_fRoundCount = gpGlobals->time + 60.0f;
+	m_fRoundCount = gpGlobals->time + 60.0s;
 }
 
 void CHalfLifeMultiplay::CheckLevelInitialized()
@@ -2927,7 +2927,7 @@ void CHalfLifeMultiplay::CheckRestartRound()
 		UTIL_ClientPrintAll(HUD_PRINTCENTER, "#Game_will_restart_in", UTIL_dtos1(iRestartDelay), (iRestartDelay == 1) ? "SECOND" : "SECONDS");
 		UTIL_ClientPrintAll(HUD_PRINTCONSOLE, "#Game_will_restart_in_console", UTIL_dtos1(iRestartDelay), (iRestartDelay == 1) ? "SECOND" : "SECONDS");
 
-		m_fTeamCount = gpGlobals->time + iRestartDelay;
+		m_fTeamCount = gpGlobals->time + iRestartDelay * 1s;
 		m_bCompleteReset = true;
 
 		CVAR_SET_FLOAT("sv_restartround", 0);
@@ -3004,7 +3004,7 @@ void CHalfLifeMultiplay::CareerRestart()
 
 	if (m_fTeamCount == invalid_time_point)
 	{
-		m_fTeamCount = gpGlobals->time + 1.0f;
+		m_fTeamCount = gpGlobals->time + 1.0s;
 	}
 
 	// for reset everything
@@ -3837,7 +3837,7 @@ void CHalfLifeMultiplay::PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *
 
 time_point_t CHalfLifeMultiplay::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
 {
-	return gpGlobals->time + WEAPON_RESPAWN_TIME;
+	return gpGlobals->time + WEAPON_RESPAWN_TIME * 1s;
 }
 
 // FlWeaponRespawnTime - Returns 0 if the weapon can respawn
@@ -3900,7 +3900,7 @@ int CHalfLifeMultiplay::ItemShouldRespawn(CItem *pItem)
 
 time_point_t CHalfLifeMultiplay::FlItemRespawnTime(CItem *pItem)
 {
-	return gpGlobals->time + ITEM_RESPAWN_TIME;
+	return gpGlobals->time + ITEM_RESPAWN_TIME * 1s;
 }
 
 Vector CHalfLifeMultiplay::VecItemRespawnSpot(CItem *pItem)
@@ -3930,7 +3930,7 @@ int CHalfLifeMultiplay::AmmoShouldRespawn(CBasePlayerAmmo *pAmmo)
 
 time_point_t CHalfLifeMultiplay::FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo)
 {
-	return gpGlobals->time + 20.0f;
+	return gpGlobals->time + 20.0s;
 }
 
 Vector CHalfLifeMultiplay::VecAmmoRespawnSpot(CBasePlayerAmmo *pAmmo)
@@ -4062,7 +4062,7 @@ void CHalfLifeMultiplay::GoToIntermission()
 	else if (time > MAX_INTERMISSION_TIME)
 		CVAR_SET_STRING("mp_chattime", UTIL_dtos1(MAX_INTERMISSION_TIME));
 
-	m_flIntermissionEndTime = gpGlobals->time + (int)mp_chattime.value;
+	m_flIntermissionEndTime = gpGlobals->time + (int)mp_chattime.value * 1s;
 	m_flIntermissionStartTime = gpGlobals->time;
 
 	g_fGameOver = TRUE;

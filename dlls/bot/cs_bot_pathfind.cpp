@@ -1393,7 +1393,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement(bool allowSpeedChange)
 	if (m_pathIndex < m_pathLength - 1 && (m_goalPosition - pev->origin).IsLengthLessThan(nearCornerRange))
 	{
 		ClearLookAt();
-		InhibitLookAround(0.5f);
+		InhibitLookAround(0.5s);
 	}
 
 	// if we moved to a new node on the path, setup movement

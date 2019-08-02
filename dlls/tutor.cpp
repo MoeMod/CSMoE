@@ -172,7 +172,7 @@ void MonitorTutorStatus()
 		}
 	}
 
-	s_nextCvarCheckTime = gpGlobals->time + 1.0f;
+	s_nextCvarCheckTime = gpGlobals->time + 1.0s;
 }
 
 }

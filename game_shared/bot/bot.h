@@ -377,8 +377,8 @@ inline bool CBot::IsPlayerLookingAtMe(CBasePlayer *other) const
 	return false;
 }
 
-extern float g_flBotCommandInterval;
-extern EngineClock::duration g_flBotFullThinkInterval;
+extern duration_t g_flBotCommandInterval;
+extern duration_t g_flBotFullThinkInterval;
 
 extern const char *BotArgs[4];
 extern bool UseBotArgs;

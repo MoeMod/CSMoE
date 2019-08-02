@@ -433,9 +433,9 @@ void CMonster::Spawn()
 	DROP_TO_FLOOR(edict());
 
 	SetThink(&CMonster::IdleThink);
-	pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	pev->nextthink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 
-	m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	m_flNextFullThink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 	m_vStart = pev->origin;
 	m_vStartAngles = pev->angles;
 	m_vOldPos = Vector(9999, 9999, 9999);
@@ -447,7 +447,7 @@ void CMonster::Spawn()
 	m_flLastPathCheck = invalid_time_point;
 	m_flPathAcquired = invalid_time_point;
 	m_flPathCheckInterval = 3.0s;
-	m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
+	m_flNextRadarTime = gpGlobals->time + RandomDuration(0.0s, 1.0s);
 
 	m_LocalNav = new CLocalNav(this);
 	m_bStuck = FALSE;
@@ -561,7 +561,7 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 		// if attacking then dont play flinch anim
 		if (m_timeNextAttack <= gpGlobals->time)
 		{
-			m_flFlinchTime = gpGlobals->time + 0.25f;
+			m_flFlinchTime = gpGlobals->time + 0.25s;
 			//SetFlinchActivity();
 			SetAnimation(MONSTERANIM_FLINCH);
 		}
@@ -620,7 +620,7 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	//SetDeathActivity();
 	SetAnimation(MONSTERANIM_DIE);
 
-	pev->nextthink = gpGlobals->time + 3;
+	pev->nextthink = gpGlobals->time + 3s;
 	SetThink(&CMonster::Remove);
 
 	m_flTimeLastActive = invalid_time_point;
@@ -658,7 +658,7 @@ CMonster::~CMonster()
 void CMonster::IdleThink()
 {
 	constexpr float upkeepRate = 0.03f;
-	constexpr float giveUpTime = (1 / 30.0f);
+	constexpr auto giveUpTime = (1 / 30.0f) * 1s;
 	constexpr float updateRate = 0.1f;
 
 	if (!m_improv)
@@ -678,7 +678,7 @@ void CMonster::IdleThink()
 
 	if (gpGlobals->time > m_flNextFullThink)
 	{
-		m_flNextFullThink = gpGlobals->time + 0.1;
+		m_flNextFullThink = gpGlobals->time + 0.1s;
 		std::future<bool> results[] = {
 			std::async(&CMonster::CheckTarget, this),
 			std::async(&CMonster::CheckAttack, this),
@@ -721,13 +721,13 @@ bool CMonster::CheckTarget()
 			m_improv->MoveTo(player->Center());
 		}
 
-		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
+		m_flTargetChange = gpGlobals->time + RandomDuration(10.0s, 20.0s);
 		return result.second;
 	}
 
 	if (m_hTargetEnt && !m_hTargetEnt->IsAlive())
 	{
-		m_flTargetChange = gpGlobals->time + 0.2f;
+		m_flTargetChange = gpGlobals->time + 0.2s;
 		return false;
 	}
 	return false;

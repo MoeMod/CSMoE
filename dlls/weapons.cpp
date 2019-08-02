@@ -392,7 +392,7 @@ void CBasePlayerItem::FallInit()
 	SetTouch(&CBasePlayerItem::DefaultTouch);
 	SetThink(&CBasePlayerItem::FallThink);
 
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 // FallThink - Items that have just spawned run this think
@@ -403,7 +403,7 @@ void CBasePlayerItem::FallInit()
 
 void CBasePlayerItem::FallThink()
 {
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (pev->flags & FL_ONGROUND)
 	{
@@ -453,7 +453,7 @@ void CBasePlayerItem::Materialize()
 		}
 
 		SetThink(&CBaseEntity::SUB_Remove);
-		pev->nextthink = gpGlobals->time + 1.0f;
+		pev->nextthink = gpGlobals->time + 1.0s;
 	}
 	else
 		SetThink(NULL);
@@ -691,7 +691,7 @@ void CBasePlayerWeapon::KickBack(float up_base, float lateral_base, float up_mod
 
 void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL bIsGlock)
 {
-	float nexttime = 0.1f;
+	auto nexttime = 0.1s;
 
 	m_iClip--;
 
@@ -915,7 +915,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 				m_iShotsFired = 15;
 			}
 
-			m_flDecreaseShotsFired = gpGlobals->time + 0.4f;
+			m_flDecreaseShotsFired = gpGlobals->time + 0.4s;
 		}
 
 		m_fFireOnEmpty = FALSE;
@@ -1003,14 +1003,14 @@ void CBasePlayerItem::Drop()
 {
 	SetTouch(NULL);
 	SetThink(&CBaseEntity::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBasePlayerItem::Kill()
 {
 	SetTouch(NULL);
 	SetThink(&CBaseEntity::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBasePlayerItem::Holster(int skiplocal)
@@ -1030,7 +1030,7 @@ void CBasePlayerItem::AttachToPlayer(CBasePlayer *pPlayer)
 	pev->modelindex = 0;
 	pev->model = 0;
 	pev->owner = pPlayer->edict();
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	SetTouch(NULL);
 }
@@ -1348,7 +1348,7 @@ void CBasePlayerAmmo::Spawn()
 	if (g_pGameRules->IsMultiplayer())
 	{
 		SetThink(&CBaseEntity::SUB_Remove);
-		pev->nextthink = gpGlobals->time + 2.0f;
+		pev->nextthink = gpGlobals->time + 2.0s;
 	}
 }
 
@@ -1398,7 +1398,7 @@ void CBasePlayerAmmo::DefaultTouch(CBaseEntity *pOther)
 		{
 			SetTouch(NULL);
 			SetThink(&CBaseEntity::SUB_Remove);
-			pev->nextthink = gpGlobals->time + 0.1f;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 	}
 	else if (gEvilImpulse101)
@@ -1406,7 +1406,7 @@ void CBasePlayerAmmo::DefaultTouch(CBaseEntity *pOther)
 		// evil impulse 101 hack, kill always
 		SetTouch(NULL);
 		SetThink(&CBaseEntity::SUB_Remove);
-		pev->nextthink = gpGlobals->time + 0.1f;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	}
 }
 
@@ -1541,7 +1541,7 @@ void CWeaponBox::BombThink()
 		}
 	}
 
-	pev->nextthink = gpGlobals->time + 1;
+	pev->nextthink = gpGlobals->time + 1s;
 }
 
 void CWeaponBox::Spawn()
@@ -1573,7 +1573,7 @@ void CWeaponBox::Kill()
 		while (pWeapon != NULL)
 		{
 			pWeapon->SetThink(&CBaseEntity::SUB_Remove);
-			pWeapon->pev->nextthink = gpGlobals->time + 0.1f;
+			pWeapon->pev->nextthink = gpGlobals->time + 0.1s;
 			pWeapon = pWeapon->m_pNext;
 		}
 	}

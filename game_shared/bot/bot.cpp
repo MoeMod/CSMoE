@@ -25,10 +25,10 @@ namespace sv {
 * Globals initialization
 */
 // 30 times per second, just like human clients
-float g_flBotCommandInterval = 1.0 / 30.0;
+duration_t g_flBotCommandInterval = 1.0s / 30.0;
 
 // full AI only 10 times per second
-EngineClock::duration g_flBotFullThinkInterval = 0.1s;
+duration_t g_flBotFullThinkInterval = 0.1s;
 
 // Nasty Hack.  See client.cpp/ClientCommand()
 const char *BotArgs[4] = { NULL };
@@ -529,7 +529,7 @@ void ActiveGrenade::OnEntityGone()
 	if (m_id == WEAPON_SMOKEGRENADE)
 	{
 		// smoke lingers after grenade is gone
-		const float smokeLingerTime = 4.0f;
+		constexpr auto smokeLingerTime = 4.0s;
 		m_dieTimestamp = gpGlobals->time + smokeLingerTime;
 	}
 

@@ -866,7 +866,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		{
 			// reset damage time countdown for each type of time based damage player just sustained
-			for (int i = 0; i < CDMG_TIMEBASED; ++i)
+			for (std::size_t i = 0; i < CDMG_TIMEBASED; ++i)
 			{
 				if (bitsDamageType & (DMG_PARALYZE << i))
 					m_rgbTimeBasedDamage[i] = 0;
@@ -1082,7 +1082,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	{
 		// reset damage time countdown for each type of time based damage player just sustained
-		for (int i = 0; i < CDMG_TIMEBASED; ++i)
+		for (std::size_t i = 0; i < CDMG_TIMEBASED; ++i)
 		{
 			if (bitsDamageType & (DMG_PARALYZE << i))
 				m_rgbTimeBasedDamage[i] = 0;
@@ -1143,7 +1143,7 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 		pWeaponBox->pev->velocity = pPlayer->pev->velocity * 0.75;
 
 		pWeaponBox->SetThink(&CWeaponBox::Kill);
-		pWeaponBox->pev->nextthink = gpGlobals->time + 300;
+		pWeaponBox->pev->nextthink = gpGlobals->time + 300s;
 		pWeaponBox->PackWeapon(pItem);
 
 		if (packAmmo)
@@ -1318,7 +1318,7 @@ void CBasePlayer::SetProgressBarTime(int time)
 	if (time)
 	{
 		m_progressStart = gpGlobals->time;
-		m_progressEnd = time + gpGlobals->time;
+		m_progressEnd = time * 1s + gpGlobals->time;
 	}
 	else
 	{
@@ -1688,7 +1688,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 			CHEGrenade *pHEGrenade = (CHEGrenade *)m_pActiveItem;
 			if ((pev->button & IN_ATTACK) && m_rgAmmo[ pHEGrenade->m_iPrimaryAmmoType ])
 			{
-				CGrenade::ShootTimed2(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5, m_iTeam, pHEGrenade->m_usCreateExplosion);
+				CGrenade::ShootTimed2(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, m_iTeam, pHEGrenade->m_usCreateExplosion);
 			}
 			break;
 		}
@@ -1696,7 +1696,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		{
 			if ((pev->button & IN_ATTACK) && m_rgAmmo[ ((CBasePlayerWeapon *)m_pActiveItem)->m_iPrimaryAmmoType ])
 			{
-				CGrenade::ShootTimed(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5);
+				CGrenade::ShootTimed(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s);
 			}
 			break;
 		}
@@ -1705,7 +1705,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 			CSmokeGrenade *pSmoke = (CSmokeGrenade *)m_pActiveItem;
 			if ((pev->button & IN_ATTACK) && m_rgAmmo[ pSmoke->m_iPrimaryAmmoType ])
 			{
-				CGrenade::ShootSmokeGrenade(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5, pSmoke->m_usCreateSmoke);
+				CGrenade::ShootSmokeGrenade(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, pSmoke->m_usCreateSmoke);
 			}
 			break;
 		}
@@ -1855,7 +1855,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 	BuyZoneIcon_Clear(this);
 
 	SetThink(&CBasePlayer::PlayerDeathThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	pev->solid = SOLID_NOT;
 
 	if (m_bPunishedForTK)
@@ -2486,7 +2486,7 @@ void CBasePlayer::WaterMove()
 		else if (pev->air_finished < gpGlobals->time + 9s)
 			EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/pl_wade2.wav", VOL_NORM, ATTN_NORM);
 
-		pev->air_finished = gpGlobals->time + AIRTIME;
+		pev->air_finished = gpGlobals->time + AIRTIME * 1s;
 		pev->dmg = 2;
 
 		// if we took drowning damage, give it back slowly
@@ -2523,7 +2523,7 @@ void CBasePlayer::WaterMove()
 					pev->dmg = 5;
 
 				TakeDamage(VARS(eoNullEntity), VARS(eoNullEntity), pev->dmg, DMG_DROWN);
-				pev->pain_finished = gpGlobals->time + 1;
+				pev->pain_finished = gpGlobals->time + 1s;
 
 				// track drowning damage, give it back when
 				// player finally takes a breath
@@ -2563,7 +2563,7 @@ void CBasePlayer::WaterMove()
 	}
 	else if (pev->watertype == CONTENT_SLIME)	// do damage
 	{
-		pev->dmgtime = gpGlobals->time + 1;
+		pev->dmgtime = gpGlobals->time + 1s;
 		TakeDamage(VARS(eoNullEntity), VARS(eoNullEntity), pev->waterlevel * 4, DMG_ACID);
 	}
 	if (!(pev->flags & FL_INWATER))
@@ -2646,7 +2646,7 @@ void CWShield::Touch(CBaseEntity *pOther)
 			EMIT_SOUND(edict(), CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM);
 			UTIL_Remove(this);
 
-			pev->nextthink = gpGlobals->time + 0.1;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 	}
 }
@@ -2747,7 +2747,7 @@ void CBasePlayer::DropShield(bool bDeploy)
 	pShield->pev->velocity = gpGlobals->v_forward * 400;
 
 	pShield->SetThink(&CBaseEntity::SUB_Remove);
-	pShield->pev->nextthink = gpGlobals->time + 300;
+	pShield->pev->nextthink = gpGlobals->time + 300s;
 
 	pShield->SetCantBePickedUpByUser(this, 2.0);
 #endif // ENABLE_SHIELD
@@ -3099,7 +3099,7 @@ void CBasePlayer::JoiningThink()
 
 			pev->fixangle = 1;
 			pev->view_ofs = g_vecZero;
-			m_fIntroCamTime = gpGlobals->time + 6;
+			m_fIntroCamTime = gpGlobals->time + 6s;
 		}
 		else
 			m_pIntroCamera = NULL;
@@ -3168,7 +3168,7 @@ void CBasePlayer::Disappear()
 	BuyZoneIcon_Clear(this);
 
 	SetThink(&CBasePlayer::PlayerDeathThink);
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	pev->angles.x = 0;
 	pev->angles.z = 0;
@@ -4019,7 +4019,6 @@ void CBasePlayer::PreThink()
 
 void CBasePlayer::CheckTimeBasedDamage()
 {
-	int i;
 	BYTE bDuration = 0;
 	static float gtbdPrev = 0.0;
 
@@ -4032,7 +4031,7 @@ void CBasePlayer::CheckTimeBasedDamage()
 
 	m_tbdPrev = gpGlobals->time;
 
-	for (i = 0; i < CDMG_TIMEBASED; ++i)
+	for (std::size_t i = 0; i < CDMG_TIMEBASED; ++i)
 	{
 		// make sure bit is set for damage type
 		if (m_bitsDamageType & (DMG_PARALYZE << i))
@@ -4409,7 +4408,7 @@ void CBasePlayer::PostThink()
 	{
 		if (m_flFallVelocity > 64.0f && !g_pGameRules->IsMultiplayer())
 		{
-			CSoundEnt::InsertSound(bits_SOUND_PLAYER, pev->origin, m_flFallVelocity, 0.2);
+			CSoundEnt::InsertSound(bits_SOUND_PLAYER, pev->origin, m_flFallVelocity, 0.2s);
 		}
 		m_flFallVelocity = 0;
 	}
@@ -4576,7 +4575,7 @@ void CBasePlayer::Spawn()
 
 	pev->flags &= FL_PROXY;
 	pev->flags |= FL_CLIENT;
-	pev->air_finished = gpGlobals->time + 12;
+	pev->air_finished = gpGlobals->time + 12s;
 	pev->dmg = 2;
 	pev->effects = 0;
 	pev->deadflag = DEAD_NO;
@@ -4630,7 +4629,7 @@ void CBasePlayer::Spawn()
 		pev->iuser2 =
 		pev->iuser3 = 0;
 
-	m_flLastFired = invalid_time_point - 15;
+	m_flLastFired = invalid_time_point - 15s;
 	m_bHeadshotKilled = false;
 	m_bReceivesNoMoneyNextRound = false;
 	m_bShieldDrawn = false;
@@ -4715,7 +4714,7 @@ void CBasePlayer::Spawn()
 	m_flFieldOfView = 0.5;
 	m_bloodColor = BLOOD_COLOR_RED;
 	m_flNextAttack = zero_duration;
-	m_flgeigerDelay = gpGlobals->time + 2;
+	m_flgeigerDelay = gpGlobals->time + 2s;
 
 	StartSneaking();
 
@@ -5229,7 +5228,7 @@ void CSprayCan::Spawn(entvars_t *pevOwner)
 	pev->owner = ENT(pevOwner);
 	pev->frame = 0;
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	EMIT_SOUND(ENT(pev), CHAN_VOICE, "player/sprayer.wav", VOL_NORM, ATTN_NORM);
 }
 
@@ -5267,7 +5266,7 @@ void CSprayCan::Think()
 			UTIL_Remove(this);
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBloodSplat::Spawn(entvars_t *pevOwner)
@@ -5277,7 +5276,7 @@ void CBloodSplat::Spawn(entvars_t *pevOwner)
 	pev->owner = ENT(pevOwner);
 
 	SetThink(&CBloodSplat::Spray);
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBloodSplat::Spray()
@@ -5291,7 +5290,7 @@ void CBloodSplat::Spray()
 	}
 
 	SetThink(&CBloodSplat::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBasePlayer::GiveNamedItem(const char *pszName)
@@ -5437,7 +5436,7 @@ void CBasePlayer::ImpulseCommands()
 			if (tr.flFraction != 1.0f)
 			{
 				// line hit something, so paint a decal
-				m_flNextDecalTime = gpGlobals->time + CVAR_GET_FLOAT("decalfrequency");
+				m_flNextDecalTime = gpGlobals->time + CVAR_GET_FLOAT("decalfrequency") * 1s;
 				CSprayCan *pCan = CreateClassPtr<CSprayCan>();
 				pCan->Spawn(pev);
 			}
@@ -6314,7 +6313,7 @@ void CBasePlayer::UpdateClientData()
 	if (m_flNextSBarUpdateTime < gpGlobals->time)
 	{
 		UpdateStatusBar();
-		m_flNextSBarUpdateTime = gpGlobals->time + 0.2;
+		m_flNextSBarUpdateTime = gpGlobals->time + 0.2s;
 	}
 
 	if (!(m_flDisplayHistory & DHF_AMMO_EXHAUSTED))
@@ -6460,7 +6459,7 @@ bool CBasePlayer::HintMessage(const char *pMessage, BOOL bDisplayIfPlayerDead, B
 		return false;
 
 	if (bOverride || m_bShowHints)
-		return m_hintMessageQueue.AddMessage(pMessage, 6.0, true, NULL);
+		return m_hintMessageQueue.AddMessage(pMessage, 6.0s, true, NULL);
 
 	return true;
 }
@@ -6640,7 +6639,7 @@ void CBasePlayer::UpdateStatusBar()
 					}
 				}
 
-				m_flStatusBarDisappearDelay = gpGlobals->time + 2.0f;
+				m_flStatusBarDisappearDelay = gpGlobals->time + 2.0s;
 			}
 			else if (pEntity->Classify() == CLASS_HUMAN_PASSIVE)
 			{
@@ -6817,7 +6816,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			pWeaponBox->pev->angles.x = 0;
 			pWeaponBox->pev->angles.z = 0;
 			pWeaponBox->SetThink(&CWeaponBox::Kill);
-			pWeaponBox->pev->nextthink = gpGlobals->time + 300;
+			pWeaponBox->pev->nextthink = gpGlobals->time + 300s;
 			
 			pWeaponBox->PackWeapon(pWeapon);
 
@@ -6871,7 +6870,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			{
 				pWeaponBox->m_bIsBomb = true;
 				pWeaponBox->SetThink(&CWeaponBox::BombThink);
-				pWeaponBox->pev->nextthink = gpGlobals->time + 1;
+				pWeaponBox->pev->nextthink = gpGlobals->time + 1s;
 
 				if (TheBots != NULL)
 				{
@@ -7277,16 +7276,16 @@ void CRevertSaved::KeyValue(KeyValueData *pkvd)
 void CRevertSaved::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
 	UTIL_ScreenFadeAll(pev->rendercolor, Duration(), HoldTime(), (int)pev->renderamt, FFADE_OUT);
-	pev->nextthink = gpGlobals->time + MessageTime();
+	pev->nextthink = gpGlobals->time + MessageTime() * 1s;
 	SetThink(&CRevertSaved::MessageThink);
 }
 
 void CRevertSaved::MessageThink()
 {
-	float nextThink = LoadTime() - MessageTime();
+	duration_t nextThink = (LoadTime() - MessageTime())  * 1s;
 	UTIL_ShowMessageAll(STRING(pev->message));
 
-	if (nextThink > 0)
+	if (nextThink > 0s)
 	{
 		pev->nextthink = gpGlobals->time + nextThink;
 		SetThink(&CRevertSaved::LoadThink);
@@ -7308,7 +7307,7 @@ void CInfoIntermission::Spawn()
 	pev->solid = SOLID_NOT;
 	pev->effects = EF_NODRAW;
 	pev->v_angle = g_vecZero;
-	pev->nextthink = gpGlobals->time + 2;
+	pev->nextthink = gpGlobals->time + 2s;
 }
 
 void CInfoIntermission::Think()

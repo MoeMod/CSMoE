@@ -90,8 +90,8 @@ public:
 
 protected:
 	void OnCrazyEffect();
-	float GetDurationTime() const;
-	float GetCooldownTime() const;
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
 
 	EngineClock::time_point m_flTimeZombieSkillEffect;
 };

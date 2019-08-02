@@ -240,7 +240,7 @@ NOXREF void UTIL_ParametricRocket(entvars_t *pev, Vector p_vecOrigin, Vector vec
 {
 	TraceResult tr;
 	Vector vecTravel;
-	float travelTime;
+	duration_t travelTime;
 
 	pev->startpos = p_vecOrigin;
 	UTIL_MakeVectors(vecAngles);
@@ -249,9 +249,9 @@ NOXREF void UTIL_ParametricRocket(entvars_t *pev, Vector p_vecOrigin, Vector vec
 
 	vecTravel = pev->endpos - pev->startpos;
 	if (pev->velocity.Length() > 0.0f)
-		travelTime = vecTravel.Length() / pev->velocity.Length();
+		travelTime = vecTravel.Length() / pev->velocity.Length() * 1s;
 	else
-		travelTime = 0.0f;
+		travelTime = 0.0s;
 
 	pev->starttime = gpGlobals->time;
 	pev->impacttime = travelTime + gpGlobals->time;

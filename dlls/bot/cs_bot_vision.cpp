@@ -94,7 +94,7 @@ float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder)
 // TODO: Make stiffness and turn rate constants timestep invariant.
 void CCSBot::UpdateLookAngles()
 {
-	const float deltaT = g_flBotCommandInterval;
+	const auto deltaT = g_flBotCommandInterval;
 	float maxAccel;
 	float stiffness;
 	float damping;
@@ -218,8 +218,8 @@ void CCSBot::UpdateLookAngles()
 		else if (accel < -maxAccel)
 			accel = -maxAccel;
 
-		m_lookYawVel += deltaT * accel;
-		pev->v_angle.y += deltaT * m_lookYawVel;
+		m_lookYawVel += deltaT / 1s * accel;
+		pev->v_angle.y += deltaT / 1s * m_lookYawVel;
 	}
 
 	// Pitch
@@ -246,8 +246,8 @@ void CCSBot::UpdateLookAngles()
 		else if (accel < -maxAccel)
 			accel = -maxAccel;
 
-		m_lookPitchVel += deltaT * accel;
-		pev->v_angle.x += deltaT * m_lookPitchVel;
+		m_lookPitchVel += deltaT / 1s * accel;
+		pev->v_angle.x += deltaT / 1s * m_lookPitchVel;
 	}
 
 	// limit range - avoid gimbal lock
@@ -398,7 +398,7 @@ void CCSBot::SetLookAt(const char *desc, const Vector *pos, PriorityType pri, du
 
 // Block all "look at" and "look around" behavior for given duration - just look ahead
 
-void CCSBot::InhibitLookAround(float duration)
+void CCSBot::InhibitLookAround(duration_t duration)
 {
 	m_inhibitLookAroundTimestamp = gpGlobals->time + duration;
 }
@@ -456,7 +456,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			spot.z += HalfHumanHeight;
 
 			SetLookAt("Check dangerous noise", &spot, PRIORITY_HIGH, recentThreatTime);
-			InhibitLookAround(RANDOM_FLOAT(2.0f, 4.0f));
+			InhibitLookAround(RandomDuration(2.0s, 4.0s));
 
 			return;
 		}
@@ -512,9 +512,9 @@ void CCSBot::UpdateLookAround(bool updateNow)
 
 		// if we're sniping, switch look-at spots less often
 		if (IsUsingSniperRifle())
-			m_lookAroundStateTimestamp = gpGlobals->time + RANDOM_FLOAT(5.0f, 10.0f);
+			m_lookAroundStateTimestamp = gpGlobals->time + RandomDuration(5.0s, 10.0s);
 		else
-			m_lookAroundStateTimestamp = gpGlobals->time + RANDOM_FLOAT(1.0f, 2.0f);
+			m_lookAroundStateTimestamp = gpGlobals->time + RandomDuration(1.0s, 2.0s);
 
 		if (m_approachPointCount == 0)
 		{
@@ -551,7 +551,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			asleep *= asleep;
 			asleep *= asleep;
 
-			m_spotCheckTimestamp = gpGlobals->time + asleep * RANDOM_FLOAT(10.0f, 30.0f);
+			m_spotCheckTimestamp = gpGlobals->time + asleep * RandomDuration(10.0s, 30.0s);
 
 			// figure out how far along the path segment we are
 			Vector delta = m_spotEncounter->path.to - m_spotEncounter->path.from;

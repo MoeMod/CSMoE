@@ -47,7 +47,7 @@
 
 #define MAX_RECENT_PATH			20
 
-#define SUITUPDATETIME			3.5
+#define SUITUPDATETIME			3.5s
 #define SUITFIRSTUPDATETIME		0.1
 
 #define PLAYER_FATAL_FALL_SPEED		1100.0f
@@ -712,7 +712,7 @@ public:
 #endif
 
 	void SpawnProtection_Check();
-	void SpawnProtection_Start(float flTime);
+	void SpawnProtection_Start(duration_t flTime);
 	void SpawnProtection_End();
 
 public:

@@ -343,7 +343,7 @@ void CPlatTrigger::Touch(CBaseEntity *pOther)
 		m_pPlatform->GoUp();
 	} else if (m_pPlatform->m_toggle_state == TS_AT_TOP) {
 		// delay going down
-		m_pPlatform->pev->nextthink = m_pPlatform->pev->ltime + 1;
+		m_pPlatform->pev->nextthink = m_pPlatform->pev->ltime + 1s;
 	}
 }
 
@@ -439,7 +439,7 @@ void CFuncPlat::HitTop()
 	if (!IsTogglePlat()) {
 		// After a delay, the platform will automatically start going down again.
 		SetThink(&CFuncPlat::CallGoDown);
-		pev->nextthink = pev->ltime + 3;
+		pev->nextthink = pev->ltime + 3s;
 	}
 }
 
@@ -556,7 +556,7 @@ void CFuncTrain::Blocked(CBaseEntity *pOther)
 	if (gpGlobals->time < m_flActivateFinished)
 		return;
 
-	m_flActivateFinished = gpGlobals->time + 0.5;
+	m_flActivateFinished = gpGlobals->time + 0.5s;
 
 	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
@@ -708,7 +708,7 @@ void CFuncTrain::Activate()
 
 		if (FStringNull(pev->targetname)) {
 			// not triggered, so start immediately
-			pev->nextthink = pev->ltime + 0.1;
+			pev->nextthink = pev->ltime + 0.1s;
 			SetThink(&CFuncTrain::Next);
 		} else
 			pev->spawnflags |= SF_TRAIN_WAIT_RETRIGGER;
@@ -800,7 +800,7 @@ void CFuncTrain::OverrideReset()
 		} else    // Keep moving for 0.1 secs, then find path_corner again and restart
 		{
 			SetThink(&CFuncTrain::Next);
-			pev->nextthink = pev->ltime + 0.1;
+			pev->nextthink = pev->ltime + 0.1s;
 		}
 	}
 }
@@ -988,7 +988,7 @@ void CFuncTrackTrain::UpdateSound()
 
 void CFuncTrackTrain::Next()
 {
-	float time = 0.5;
+	auto time = 0.5s;
 
 	if (!pev->speed) {
 		ALERT(at_aiconsole, "TRAIN(%s): Speed is 0\n", STRING(pev->targetname));
@@ -1111,7 +1111,7 @@ void CFuncTrackTrain::Next()
 		// Are we there yet?
 		if (distance > 0) {
 			// no, how long to get there?
-			time = distance / m_oldSpeed;
+			time = distance / m_oldSpeed * 1s;
 			pev->velocity = pev->velocity * (m_oldSpeed / distance);
 			SetThink(&CFuncTrackTrain::DeadEnd);
 			NextThink(pev->ltime + time, FALSE);
@@ -1229,7 +1229,7 @@ void CFuncTrackTrain::Find()
 	}
 
 	UTIL_SetOrigin(pev, nextPos);
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncTrackTrain::Next);
 	pev->speed = m_startSpeed;
 
@@ -1277,14 +1277,14 @@ void CFuncTrackTrain::NearestPath()
 	m_ppath = static_cast<CPathTrack *>(pNearest);
 
 	if (pev->speed != 0) {
-		NextThink(pev->ltime + 0.1, FALSE);
+		NextThink(pev->ltime + 0.1s, FALSE);
 		SetThink(&CFuncTrackTrain::Next);
 	}
 }
 
 void CFuncTrackTrain::OverrideReset()
 {
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncTrackTrain::NearestPath);
 }
 
@@ -1337,7 +1337,7 @@ void CFuncTrackTrain::Spawn()
 
 	// start trains on the next frame, to make sure their targets have had
 	// a chance to spawn/activate
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncTrackTrain::Find);
 	Precache();
 }
@@ -1357,7 +1357,7 @@ void CFuncTrackTrain::Restart()
 	}
 
 	UTIL_SetOrigin(pev, pev->oldorigin);
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncTrackTrain::Find);
 }
 
@@ -1521,7 +1521,7 @@ void CFuncTrackChange::Spawn()
 	}
 
 	EnableUse();
-	pev->nextthink = pev->ltime + 2.0;
+	pev->nextthink = pev->ltime + 2.0s;
 	SetThink(&CFuncTrackChange::Find);
 	Precache();
 }
@@ -1563,7 +1563,7 @@ void CFuncTrackChange::KeyValue(KeyValueData *pkvd)
 
 void CFuncTrackChange::OverrideReset()
 {
-	pev->nextthink = pev->ltime + 1.0;
+	pev->nextthink = pev->ltime + 1.0s;
 	SetThink(&CFuncTrackChange::Find);
 }
 
@@ -1917,7 +1917,7 @@ void CGunTarget::Spawn()
 
 	if (pev->spawnflags & FGUNTARGET_START_ON) {
 		SetThink(&CGunTarget::Start);
-		pev->nextthink = pev->ltime + 0.3;
+		pev->nextthink = pev->ltime + 0.3s;
 	}
 }
 

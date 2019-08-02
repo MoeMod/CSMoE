@@ -493,7 +493,7 @@ void CCareerTaskManager::Reset(bool deleteTasks)
 	m_finishedTaskRound = 0;
 	m_shouldLatchRoundEndMessage = false;
 
-	m_roundStartTime = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
+	m_roundStartTime = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime") * 1s;
 }
 
 void CCareerTaskManager::SetFinishedTaskTime(std::chrono::duration<int, std::ratio<1>> val)

@@ -127,13 +127,13 @@ void CWallHealth::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 	{
 		if (gpGlobals->time >= m_flSoundTime)
 		{
-			m_flSoundTime = gpGlobals->time + 0.62f;
+			m_flSoundTime = gpGlobals->time + 0.62s;
 			EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshotno1.wav", VOL_NORM, ATTN_NORM);
 		}
 		return;
 	}
 
-	pev->nextthink = pev->ltime + 0.25f;
+	pev->nextthink = pev->ltime + 0.25s;
 	SetThink(&CWallHealth::Off);
 
 	// Time to recharge yet?
@@ -146,7 +146,7 @@ void CWallHealth::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 	{
 		m_iOn++;
 		EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/medshot4.wav", VOL_NORM, ATTN_NORM);
-		m_flSoundTime = gpGlobals->time + 0.56f;
+		m_flSoundTime = gpGlobals->time + 0.56s;
 	}
 	if (m_iOn == 1 && gpGlobals->time >= m_flSoundTime)
 	{
@@ -159,7 +159,7 @@ void CWallHealth::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 		m_iJuice--;
 
 	// govern the rate of charge
-	m_flNextCharge = gpGlobals->time + 0.1f;
+	m_flNextCharge = gpGlobals->time + 0.1s;
 }
 
 void CWallHealth::Recharge()
@@ -180,7 +180,7 @@ void CWallHealth::Off()
 
 	if (!m_iJuice &&  ((m_iReactivate = g_pGameRules->FlHealthChargerRechargeTime()) > 0))
 	{
-		pev->nextthink = pev->ltime + m_iReactivate;
+		pev->nextthink = pev->ltime + m_iReactivate * 1s;
 		SetThink(&CWallHealth::Recharge);
 	}
 	else

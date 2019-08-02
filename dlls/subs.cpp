@@ -146,7 +146,7 @@ void CBaseDelay::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "delay"))
 	{
-		m_flDelay = Q_atof(pkvd->szValue);
+		m_flDelay = Q_atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "killtarget"))
@@ -209,7 +209,7 @@ void CBaseDelay::SUB_UseTargets(CBaseEntity *pActivator, USE_TYPE useType, float
 		return;
 
 	// check for a delay
-	if (m_flDelay != 0)
+	if (m_flDelay != 0s)
 	{
 		// create a temp object to fire at a later time
 		CBaseDelay *pTemp = CreateClassPtr<CBaseDelay>();
@@ -229,7 +229,7 @@ void CBaseDelay::SUB_UseTargets(CBaseEntity *pActivator, USE_TYPE useType, float
 		pTemp->m_iszKillTarget = m_iszKillTarget;
 
 		// prevent "recursion"
-		pTemp->m_flDelay = 0;
+		pTemp->m_flDelay = 0s;
 		pTemp->pev->target = pev->target;
 
 		// HACKHACK
@@ -363,7 +363,7 @@ void CBaseToggle::LinearMove(Vector vecDest, float flSpeed)
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
 
 	// set nextthink to trigger a call to LinearMoveDone when dest is reached
-	pev->nextthink = pev->ltime + flTravelTime;
+	pev->nextthink = pev->ltime + flTravelTime * 1s;
 	SetThink(&CBaseToggle::LinearMoveDone);
 
 	// scale the destdelta vector by the time spent traveling to get velocity
@@ -417,7 +417,7 @@ void CBaseToggle::AngularMove(Vector vecDestAngle, float flSpeed)
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
 
 	// set nextthink to trigger a call to AngularMoveDone when dest is reached
-	pev->nextthink = pev->ltime + flTravelTime;
+	pev->nextthink = pev->ltime + flTravelTime * 1s;
 	SetThink(&CBaseToggle::AngularMoveDone);
 
 	// scale the destdelta vector by the time spent traveling to get velocity

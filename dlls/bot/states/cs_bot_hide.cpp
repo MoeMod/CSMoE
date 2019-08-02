@@ -239,7 +239,7 @@ void HideState::OnUpdate(CCSBot *me)
 							else
 							{
 								me->MoveTo(&toDefuser, FASTEST_ROUTE);
-								me->InhibitLookAround(10.0f);
+								me->InhibitLookAround(10.0s);
 							}
 
 							return;

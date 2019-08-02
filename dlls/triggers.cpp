@@ -200,7 +200,7 @@ void CAutoTrigger::Spawn()
 
 void CAutoTrigger::Precache()
 {
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CAutoTrigger::Think()
@@ -271,7 +271,7 @@ void CMultiManager::KeyValue(KeyValueData *pkvd)
 	else // add this field to the target list
 	{
 		// this assumes that additional fields are targetnames and their values are delay values.
-		if (m_cTargets < MAX_MULTI_TARGETS)
+		if (m_cTargets < static_cast<int>(MAX_MULTI_TARGETS))
 		{
 			char tmp[128];
 
@@ -662,7 +662,7 @@ void CTargetCDAudio::Spawn()
 
 	if (pev->scale > 0)
 	{
-		pev->nextthink = gpGlobals->time + 1.0;
+		pev->nextthink = gpGlobals->time + 1.0s;
 	}
 }
 
@@ -684,7 +684,7 @@ void CTargetCDAudio::Think()
 	if (!pClient)
 		return;
 
-	pev->nextthink = gpGlobals->time + 0.5;
+	pev->nextthink = gpGlobals->time + 0.5s;
 
 	if ((pClient->v.origin - pev->origin).Length() <= pev->scale)
 	{
@@ -715,7 +715,7 @@ void CTriggerHurt::Spawn()
 	if (m_bitsDamageInflict & DMG_RADIATION)
 	{
 		SetThink(&CTriggerHurt::RadiationThink);
-		pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.0, 0.5);
+		pev->nextthink = gpGlobals->time + RandomDuration(0.0s, 0.5s);
 	}
 
 	if (pev->spawnflags & SF_TRIGGER_HURT_START_OFF)
@@ -783,7 +783,7 @@ void CTriggerHurt::RadiationThink()
 		}
 	}
 
-	pev->nextthink = gpGlobals->time + 0.25;
+	pev->nextthink = gpGlobals->time + 0.25s;
 }
 
 // ToggleUse - If this is the USE function for a trigger, its state will toggle every time it's fired
@@ -901,7 +901,7 @@ void CBaseTrigger::HurtTouch(CBaseEntity *pOther)
 
 	// Apply damage every half second
 	// half second delay until this trigger can hurt toucher again
-	pev->dmgtime = gpGlobals->time + 0.5;
+	pev->dmgtime = gpGlobals->time + 0.5s;
 
 	if (pev->target)
 	{
@@ -1030,7 +1030,7 @@ void CBaseTrigger::ActivateMultiTrigger(CBaseEntity *pActivator)
 		// we can't just remove (self) here, because this is a touch function
 		// called while C code is looping through area links...
 		SetTouch(NULL);
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 		SetThink(&CBaseTrigger::SUB_Remove);
 	}
 }
@@ -1172,7 +1172,7 @@ void CChangeLevel::KeyValue(KeyValueData *pkvd)
 	}
 	else if (FStrEq(pkvd->szKeyName, "changedelay"))
 	{
-		m_changeTargetDelay = Q_atof(pkvd->szValue);
+		m_changeTargetDelay = Q_atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	}
 	else
@@ -1524,7 +1524,7 @@ NOXREF void NextLevel()
 	if (pChange->pev->nextthink < gpGlobals->time)
 	{
 		pChange->SetThink(&CChangeLevel::ExecuteChangeLevel);
-		pChange->pev->nextthink = gpGlobals->time + 0.1;
+		pChange->pev->nextthink = gpGlobals->time + 0.1s;
 	}
 }
 

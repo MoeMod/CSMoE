@@ -51,7 +51,7 @@ namespace sv {
     >
     {
     public:
-    static constexpr auto DefaultReloadTime = 3.9;
+    static constexpr const auto &DefaultReloadTime = 3.9s;
     static constexpr int ZoomFOV = 65;
     static constexpr const char *V_Model = "models/v_mg36.mdl";
     static constexpr const char *P_Model = "models/p_mg36.mdl";
@@ -69,7 +69,7 @@ namespace sv {
     static constexpr const auto &SpreadCalcNotOnGround = 0.05*A + 0.05;
     static constexpr const auto &SpreadCalcWalking = 0.042*A + 0.02;
     static constexpr const auto &SpreadCalcDefault = 0.037*A + 0.017;
-    static constexpr float CycleTime = 0.08403;
+    static constexpr const auto &CycleTime = 0.08403s;
     static constexpr int DamageDefault = 33;
     static constexpr int DamageZB = 37;
     static constexpr int DamageZBS = 37;

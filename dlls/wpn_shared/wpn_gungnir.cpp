@@ -48,8 +48,8 @@ public:
 		pev->scale = 0.2;
 		pev->solid = SOLID_BBOX; // 2
 		pev->movetype = MOVETYPE_FLYMISSILE; // 9
-		pev->nextthink = gpGlobals->time + 0.0099999998;
-		m_flAnimEndTime = gpGlobals->time + 2.0; // ph27?
+		pev->nextthink = gpGlobals->time + 0.0099999998s;
+		m_flAnimEndTime = gpGlobals->time + 2.0s; // ph27?
 		m_flMaxFrames = 300.0;
 		/*
 		v9 = 0x40800000;
@@ -113,7 +113,7 @@ public:
 			{
 				pev->frame = fmod(pev->frame, m_flMaxFrames);
 			}
-			pev->nextthink = gpGlobals->time + 0.0099999998;
+			pev->nextthink = gpGlobals->time + 0.0099999998s;
 		}
 		else
 		{
@@ -244,8 +244,8 @@ public:
 		//ph32 = ?
 		pev->solid = SOLID_CUSTOM; // 5
 		pev->movetype = MOVETYPE_FLY; // 5
-		pev->nextthink = gpGlobals->time + 0.0099999998;
-		ph7 = gpGlobals->time + 1.0;
+		pev->nextthink = gpGlobals->time + 0.0099999998s;
+		ph7 = gpGlobals->time + 1.0s;
 		ph8 = 300.0;
 		this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
@@ -281,7 +281,7 @@ public:
 	{
 		if (gpGlobals->time < ph7)
 		{
-			this->pev->nextthink = gpGlobals->time + 0.0099999998;
+			this->pev->nextthink = gpGlobals->time + 0.0099999998s;
 			this_1_m_iSwing = gpGlobals->time;
 
 			if (pev->solid == SOLID_NOT)
@@ -353,7 +353,7 @@ public:
 		
 		pev->solid = SOLID_NOT;
 
-		pev->nextthink = gpGlobals->time + 0.05f;
+		pev->nextthink = gpGlobals->time + 0.05s;
 	}
 	
 	void PenetrateEnd()
@@ -361,7 +361,7 @@ public:
 		pev->velocity = m_vecStartVelocity;
 		pev->solid = SOLID_CUSTOM;
 
-		pev->nextthink = gpGlobals->time + 0.001f;
+		pev->nextthink = gpGlobals->time + 0.001s;
 	}
 	
 	void RadiusDamage()
@@ -443,7 +443,7 @@ public:
 
 		
 		SetThink(&CGungnirSpear::AdditionalDamageThink);
-		pev->nextthink = gpGlobals->time + 1.1f;
+		pev->nextthink = gpGlobals->time + 1.1s;
 	}
 
 	void EXPORT AdditionalDamageThink()
@@ -720,7 +720,7 @@ void CGungnir::PrimaryAttack()
 	if (phs3 == invalid_time_point)
 	{
 		SendWeaponAnim(ANIM_SHOOT_START, UseDecrement() != FALSE); // 3
-		phs3 = gpGlobals->time + 0.23;
+		phs3 = gpGlobals->time + 0.23s;
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 99999.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.0s;
 	}
@@ -841,7 +841,7 @@ void CGungnir::ItemPostFrame()
 				if (gpGlobals->time > phs3)
 				{
 					this->SendWeaponAnim(ANIM_SHOOT_LOOP, UseDecrement() != FALSE); // 4
-					phs3 = gpGlobals->time + 0.5f;
+					phs3 = gpGlobals->time + 0.5s;
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
 			}

@@ -111,7 +111,7 @@ void CGrenade::Explode(TraceResult *pTrace, int bitsDamageType)
 	}
 
 	int iContents = UTIL_PointContents(pev->origin);
-	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3);
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3s);
 
 	entvars_t *pevOwner;
 	if (pev->owner)
@@ -146,7 +146,7 @@ void CGrenade::Explode(TraceResult *pTrace, int bitsDamageType)
 	pev->effects |= EF_NODRAW;
 	SetThink(&CGrenade::Smoke);
 	pev->velocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.3f;
+	pev->nextthink = gpGlobals->time + 0.3s;
 
 	if (iContents != CONTENTS_WATER)
 	{
@@ -231,7 +231,7 @@ void CGrenade::Explode2(TraceResult *pTrace, int bitsDamageType)
 
 	// Sound! for everyone
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/c4_explode1.wav", VOL_NORM, 0.25);
-	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3);
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3s);
 
 	entvars_t *pevOwner;
 	if (pev->owner)
@@ -279,7 +279,7 @@ void CGrenade::Explode2(TraceResult *pTrace, int bitsDamageType)
 	pev->effects |= EF_NODRAW;
 	SetThink(&CGrenade::Smoke2);
 	pev->velocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.85f;
+	pev->nextthink = gpGlobals->time + 0.85s;
 
 	if (iContents != CONTENTS_WATER)
 	{
@@ -326,7 +326,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 		WRITE_BYTE(TE_EXPLFLAG_NONE);	// flags
 	MESSAGE_END();
 
-	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3);
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3s);
 
 	entvars_t *pevOwner;
 	if (pev->owner)
@@ -360,7 +360,7 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 	pev->effects |= EF_NODRAW;
 	SetThink(&CGrenade::Smoke3_C);
 	pev->velocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.55f;
+	pev->nextthink = gpGlobals->time + 0.55s;
 	int sparkCount = RANDOM_LONG(0, 3);
 
 	for (int i = 0; i < sparkCount; ++i)
@@ -383,7 +383,7 @@ NOXREF void CGrenade::SG_Explode(TraceResult *pTrace, int bitsDamageType)
 	}
 
 	int iContents = UTIL_PointContents(pev->origin);
-	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3);
+	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3s);
 
 	// can't traceline attack owner if this is set
 	pev->owner = NULL;
@@ -405,7 +405,7 @@ NOXREF void CGrenade::SG_Explode(TraceResult *pTrace, int bitsDamageType)
 	pev->effects |= EF_NODRAW;
 	SetThink(&CGrenade::Smoke);
 	pev->velocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (iContents != CONTENTS_WATER)
 	{
@@ -457,7 +457,7 @@ void CGrenade::Smoke3_B()
 		MESSAGE_END();
 	}
 
-	pev->nextthink = gpGlobals->time + 0.15;
+	pev->nextthink = gpGlobals->time + 0.15s;
 	SetThink(&CGrenade::Smoke3_A);
 }
 
@@ -560,7 +560,7 @@ void CGrenade::SG_Smoke()
 
 	if (m_SGSmoke <= 20)
 	{
-		pev->nextthink = gpGlobals->time + 1.0f;
+		pev->nextthink = gpGlobals->time + 1.0s;
 		SetThink(&CGrenade::SG_Smoke);
 		++m_SGSmoke;
 	}
@@ -591,10 +591,10 @@ void CGrenade::DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 void CGrenade::PreDetonate()
 {
-	CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, 400, 0.3);
+	CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, 400, 0.3s);
 
 	SetThink(&CGrenade::Detonate);
-	pev->nextthink = gpGlobals->time + 1.0f;
+	pev->nextthink = gpGlobals->time + 1.0s;
 }
 
 void CGrenade::Detonate()
@@ -655,7 +655,7 @@ void CGrenade::SG_Detonate()
 	pev->velocity.y = RANDOM_FLOAT(-175, 175);
 	pev->velocity.z = RANDOM_FLOAT(250, 350);
 
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	SetThink(&CGrenade::SG_Smoke);
 }
 
@@ -702,8 +702,8 @@ void CGrenade::DangerSoundThink()
 		return;
 	}
 
-	CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * 0.5, pev->velocity.Length(), 0.2);
-	pev->nextthink = gpGlobals->time + 0.2f;
+	CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * 0.5, pev->velocity.Length(), 0.2s);
+	pev->nextthink = gpGlobals->time + 0.2s;
 
 	if (pev->waterlevel != 0)
 	{
@@ -737,7 +737,7 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 		// go ahead and emit the danger sound.
 
 		// register a radius louder than the explosion, so we make sure everyone gets out of the way
-		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, pev->dmg / 0.4f, 0.3);
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, pev->dmg / 0.4f, 0.3s);
 		m_fRegisteredSound = TRUE;
 	}
 
@@ -819,11 +819,11 @@ void CGrenade::TumbleThink()
 	}
 
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (pev->dmgtime - 1s < gpGlobals->time)
 	{
-		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1);
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1s);
 	}
 
 	if (pev->dmgtime <= gpGlobals->time)
@@ -857,11 +857,11 @@ void CGrenade::SG_TumbleThink()
 	}
 
 	StudioFrameAdvance();
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	if (pev->dmgtime - 1s < gpGlobals->time)
 	{
-		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1);
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1s);
 	}
 
 	if (pev->dmgtime <= gpGlobals->time)
@@ -930,7 +930,7 @@ NOXREF CGrenade *CGrenade::ShootContact(entvars_t *pevOwner, Vector vecStart, Ve
 	return pGrenade;
 }
 
-CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time, int iTeam, unsigned short usEvent)
+CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
 {
 	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
@@ -946,7 +946,7 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->SetThink(&CGrenade::TumbleThink);
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1f;
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
 
 	pGrenade->pev->sequence = RANDOM_LONG(3, 6);
 	pGrenade->pev->framerate = 1.0f;
@@ -964,7 +964,7 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	return pGrenade;
 }
 
-CGrenade *CGrenade::ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time)
+CGrenade *CGrenade::ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time)
 {
 	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
@@ -983,9 +983,9 @@ CGrenade *CGrenade::ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecV
 
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->SetThink(&CGrenade::TumbleThink);
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1f;
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
 
-	if (time < 0.1f)
+	if (time < 0.1s)
 	{
 		pGrenade->pev->nextthink = gpGlobals->time;
 		pGrenade->pev->velocity = Vector(0, 0, 0);
@@ -1020,7 +1020,7 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 
 	if (m_bStartDefuse)
 	{
-		m_fNextDefuse = gpGlobals->time + 0.5f;
+		m_fNextDefuse = gpGlobals->time + 0.5s;
 		return;
 	}
 
@@ -1054,8 +1054,8 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 		player->m_bIsDefusing = true;
 		m_pBombDefuser = player;
 		m_bStartDefuse = true;
-		m_flDefuseCountDown = gpGlobals->time + 5.0f;
-		m_fNextDefuse = gpGlobals->time + 0.5f;
+		m_flDefuseCountDown = gpGlobals->time + 5.0s;
+		m_fNextDefuse = gpGlobals->time + 0.5s;
 
 		// start the progress bar
 		player->SetProgressBarTime(5);
@@ -1074,8 +1074,8 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 		player->m_bIsDefusing = true;
 		m_pBombDefuser = player;
 		m_bStartDefuse = true;
-		m_flDefuseCountDown = gpGlobals->time + 10.0f;
-		m_fNextDefuse = gpGlobals->time + 0.5f;
+		m_flDefuseCountDown = gpGlobals->time + 10.0s;
+		m_fNextDefuse = gpGlobals->time + 0.5s;
 
 		// start the progress bar
 		player->SetProgressBarTime(10);
@@ -1111,7 +1111,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	pGrenade->SetTouch(&CGrenade::C4Touch);
 	pGrenade->pev->spawnflags = SF_DETONATE;
 
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1f;
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
 	pGrenade->m_flC4Blow = gpGlobals->time + g_pGameRules->m_iC4Timer;
 	pGrenade->m_flNextFreqInterval = std::chrono::seconds(g_pGameRules->m_iC4Timer / 4);
 	pGrenade->m_flNextFreq = gpGlobals->time;
@@ -1119,11 +1119,11 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	pGrenade->m_iCurWave = 0;
 	pGrenade->m_fAttenu = 0;
 	pGrenade->m_sBeepName = NULL;
-	pGrenade->m_flNextBeep = gpGlobals->time + 0.5f;
+	pGrenade->m_flNextBeep = gpGlobals->time + 0.5s;
 	pGrenade->m_bIsC4 = true;
 	pGrenade->m_fNextDefuse = {};
 	pGrenade->m_bStartDefuse = false;
-	pGrenade->m_flNextBlink = gpGlobals->time + 2.0f;
+	pGrenade->m_flNextBlink = gpGlobals->time + 2.0s;
 
 	pGrenade->pev->friction = 0.9f;
 	pGrenade->m_bJustBlew = false;
@@ -1140,7 +1140,7 @@ CGrenade *CGrenade::ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vec
 	return pGrenade;
 }
 
-CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, float time, unsigned short usEvent)
+CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent)
 {
 	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
@@ -1155,9 +1155,9 @@ CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vect
 	pGrenade->SetTouch(&CGrenade::BounceTouch);
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->SetThink(&CGrenade::SG_TumbleThink);
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1f;
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
 
-	if (time < 0.1)
+	if (time < 0.1s)
 	{
 		pGrenade->pev->nextthink = gpGlobals->time;
 		pGrenade->pev->velocity = Vector(0, 0, 0);
@@ -1198,7 +1198,7 @@ void CGrenade::C4Think()
 		return;
 	}
 
-	pev->nextthink = gpGlobals->time + 0.12f;
+	pev->nextthink = gpGlobals->time + 0.12s;
 
 	if (gpGlobals->time >= m_flNextFreq)
 	{
@@ -1244,7 +1244,7 @@ void CGrenade::C4Think()
 
 	if (gpGlobals->time >= m_flNextBeep)
 	{
-		m_flNextBeep = gpGlobals->time + 1.4f;
+		m_flNextBeep = gpGlobals->time + 1.4s;
 		EMIT_SOUND(ENT(pev), CHAN_VOICE, m_sBeepName, VOL_NORM, m_fAttenu);
 
 		// let the bots hear the bomb beeping
@@ -1257,7 +1257,7 @@ void CGrenade::C4Think()
 
 	if (gpGlobals->time >= m_flNextBlink)
 	{
-		m_flNextBlink = gpGlobals->time + 2.0f;
+		m_flNextBlink = gpGlobals->time + 2.0s;
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 			WRITE_BYTE(TE_GLOWSPRITE);
@@ -1311,7 +1311,7 @@ void CGrenade::C4Think()
 	}
 
 	// if the defusing process has started
-	if (m_bStartDefuse && m_pBombDefuser != NULL)
+	if (m_bStartDefuse && m_pBombDefuser != nullptr)
 	{
 		CBasePlayer *pPlayer = static_cast<CBasePlayer *>(m_pBombDefuser);
 

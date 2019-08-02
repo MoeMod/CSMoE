@@ -154,7 +154,7 @@ void CAWP::AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 

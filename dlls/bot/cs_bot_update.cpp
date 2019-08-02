@@ -87,7 +87,7 @@ void CCSBot::Upkeep()
 				if (GetProfile()->GetSkill() > 0.5f)
 				{
 					const float k = 3.0f;
-					m_aimSpot = (m_enemy->pev->velocity - pev->velocity) * g_flBotCommandInterval * k + m_enemy->pev->origin;
+					m_aimSpot = (m_enemy->pev->velocity - pev->velocity) * (g_flBotCommandInterval / 1s) * k + m_enemy->pev->origin;
 				}
 				else
 					m_aimSpot = m_enemy->pev->origin;

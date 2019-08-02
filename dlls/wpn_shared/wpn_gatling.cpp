@@ -93,7 +93,7 @@ void CGatling::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
@@ -102,7 +102,7 @@ void CGatling::PrimaryAttack(void)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -137,13 +137,13 @@ void CGatling::PrimaryAttack(void)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.23;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.23;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.23s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.23s;
 
 	if (m_iClip)
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25s;
 	else
-		m_flTimeWeaponIdle = 0.75;
+		m_flTimeWeaponIdle = 0.75s;
 
 
 	if (m_pPlayer->pev->flags & FL_ONGROUND)
@@ -157,7 +157,7 @@ void CGatling::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(GATLING_MAX_CLIP, GATLING_RELOAD, 4.55))
+	if (DefaultReload(GATLING_MAX_CLIP, GATLING_RELOAD, 4.55s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -173,7 +173,7 @@ void CGatling::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(GATLING_IDLE, UseDecrement() != FALSE);
 	
 }

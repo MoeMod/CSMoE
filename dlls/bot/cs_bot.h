@@ -126,7 +126,7 @@ public:
 
 	// behaviors
 	void Idle();
-	DEPRECATED void Hide(CNavArea *searchFromArea = NULL, duration_t duration = -1.0s, float hideRange = 750.0f, bool holdPosition = false);						// DEPRECATED: Use TryToHide() instead
+	void Hide(CNavArea *searchFromArea = NULL, duration_t duration = -1.0s, float hideRange = 750.0f, bool holdPosition = false);						// DEPRECATED: Use TryToHide() instead
 	#define USE_NEAREST true
 	bool TryToHide(CNavArea *searchFromArea = NULL, EngineClock::duration duration = -1.0s, float hideRange = 750.0f, bool holdPosition = false, bool useNearest = false);			// try to hide nearby, return false if cannot
 
@@ -366,7 +366,7 @@ public:
 	void SetLookAngles(float yaw, float pitch);			// set our desired look angles
 	void UpdateLookAngles();					// move actual view angles towards desired ones
 	void UpdateLookAround(bool updateNow = false);			// update "looking around" mechanism
-	void InhibitLookAround(float duration);				// block all "look at" and "looking around" behavior for given duration - just look ahead
+	void InhibitLookAround(duration_t duration);				// block all "look at" and "looking around" behavior for given duration - just look ahead
 
 	// TODO: Clean up notion of "forward angle" and "look ahead angle"
 	void SetForwardAngle(float angle);				// define our forward facing

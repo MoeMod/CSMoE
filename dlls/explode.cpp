@@ -32,7 +32,7 @@ void CShower::Spawn()
 
 	pev->movetype = MOVETYPE_BOUNCE;
 	pev->gravity = 0.5f;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	pev->solid = SOLID_NOT;
 
 	// Need a model, just use the grenade, we don't draw it anyway
@@ -51,7 +51,7 @@ void CShower::Think()
 	pev->speed -= 0.1f;
 
 	if (pev->speed > 0)
-		pev->nextthink = gpGlobals->time + 0.1f;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	else
 		UTIL_Remove(this);
 
@@ -158,7 +158,7 @@ void CEnvExplosion::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	}
 
 	SetThink(&CEnvExplosion::Smoke);
-	pev->nextthink = gpGlobals->time + 0.3f;
+	pev->nextthink = gpGlobals->time + 0.3s;
 
 	// draw sparks
 	if (!(pev->spawnflags & SF_ENVEXPLOSION_NOSPARKS)) {

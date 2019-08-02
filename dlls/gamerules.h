@@ -413,7 +413,7 @@ public:
 	// Check to see if the teams exterminated each other. Ends the round and returns true if so.
 	bool TeamExterminationCheck(int NumAliveTerrorist, int NumAliveCT, int NumDeadTerrorist, int NumDeadCT,
 	                            bool bNeededPlayers);
-	void TerminateRound(float tmDelay, int iWinStatus);
+	void TerminateRound(duration_t tmDelay, int iWinStatus);
 
 	// Check various conditions to end the map.
 	bool CheckGameOver();
@@ -428,7 +428,7 @@ public:
 	void CheckRestartRound();
 
 	BOOL IsCareer();
-	void QueueCareerRoundEndMenu(float tmDelay, int iWinStatus);
+	void QueueCareerRoundEndMenu(duration_t tmDelay, int iWinStatus);
 	void SetCareerMatchLimit(int minWins, int winDifference);
 	bool IsInCareerRound();
 	void CareerRestart();

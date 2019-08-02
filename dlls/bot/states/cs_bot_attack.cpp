@@ -86,8 +86,8 @@ void AttackState::OnEnter(CCSBot *me)
 	m_isEnemyHidden = false;
 	m_reacquireTimestamp = invalid_time_point;
 
-	m_pinnedDownTimestamp = gpGlobals->time + RANDOM_FLOAT(7.0f, 10.0f);
-	m_shieldToggleTimestamp = gpGlobals->time + RANDOM_FLOAT(2.0f, 10.0f);
+	m_pinnedDownTimestamp = gpGlobals->time + RandomDuration(7.0s, 10.0s);
+	m_shieldToggleTimestamp = gpGlobals->time + RandomDuration(2.0s, 10.0s);
 	m_shieldForceOpen = false;
 
 	// if we encountered someone while escaping, grab our weapon and fight!
@@ -574,7 +574,7 @@ void AttackState::OnUpdate(CCSBot *me)
 				} while (!m_firstDodge && next == m_dodgeState);
 
 				m_dodgeState = (DodgeStateType)next;
-				m_nextDodgeStateTimestamp = gpGlobals->time + RANDOM_FLOAT(0.3f, 1.0f);
+				m_nextDodgeStateTimestamp = gpGlobals->time + RandomDuration(0.3s, 1.0s);
 				m_firstDodge = false;
 			}
 

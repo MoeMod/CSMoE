@@ -76,7 +76,7 @@ public:
 	void TankActivate()
 	{
 		pev->spawnflags |= SF_TANK_ACTIVE;
-		pev->nextthink = pev->ltime + 0.1f;
+		pev->nextthink = pev->ltime + 0.1s;
 		m_fireLast = {};
 	}
 	void TankDeactivate()

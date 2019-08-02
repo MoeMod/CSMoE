@@ -204,7 +204,7 @@ void CFamas::FamasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim,
 	{
 		m_fBurstSpread = flSpread;
 		m_iFamasShotsFired++;
-		m_flFamasShoot = gpGlobals->time + 0.05;
+		m_flFamasShoot = gpGlobals->time + 0.05s;
 	}
 }
 

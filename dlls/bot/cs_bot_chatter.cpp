@@ -988,12 +988,12 @@ void BotStatement::Convert(const BotStatement *say)
 			{
 				// same plan at the same place - convert to "me too"
 				m_statement[0].phrase = meToo;
-				m_startTime = gpGlobals->time + RANDOM_FLOAT(0.5f, 1.0f);
+				m_startTime = gpGlobals->time + RandomDuration(0.5s, 1.0s);
 			}
 			else
 			{
 				// same plan at different place - wait a bit to allow others to respond "me too"
-				m_startTime = gpGlobals->time + RANDOM_FLOAT(3.0f, 4.0f);
+				m_startTime = gpGlobals->time + RandomDuration(3.0s, 4.0s);
 			}
 		}
 	}
@@ -1900,7 +1900,7 @@ void BotChatterInterface::EnemiesRemaining()
 
 	BotStatement *say = new BotStatement(this, REPORT_ENEMIES_REMAINING, 5.0s);
 	say->AppendPhrase(BotStatement::REMAINING_ENEMY_COUNT);
-	say->SetStartTime(gpGlobals->time + RANDOM_FLOAT(2.0f, 4.0f));
+	say->SetStartTime(gpGlobals->time + RandomDuration(2.0s, 4.0s));
 	AddStatement(say);
 }
 
@@ -2159,7 +2159,7 @@ void BotChatterInterface::AnnouncePlan(const char *phraseName, Place place)
 	say->SetPlace(place);
 
 	// wait at least a short time after round start
-	say->SetStartTime(ctrl->GetRoundStartTime() + RANDOM_FLOAT(2.0, 3.0f));
+	say->SetStartTime(ctrl->GetRoundStartTime() + RandomDuration(2.0s, 3.0s));
 	AddStatement(say);
 }
 
@@ -2264,7 +2264,7 @@ void BotChatterInterface::KilledFriend()
 	say->AppendPhrase(TheBotPhrases->GetPhrase("KilledFriend"));
 
 	// give them time to react
-	say->SetStartTime(gpGlobals->time + RANDOM_FLOAT(0.5f, 1.0f));
+	say->SetStartTime(gpGlobals->time + RandomDuration(0.5s, 1.0s));
 	AddStatement(say);
 }
 
@@ -2274,7 +2274,7 @@ void BotChatterInterface::FriendlyFire()
 	say->AppendPhrase(TheBotPhrases->GetPhrase("FriendlyFire"));
 
 	// give them time to react
-	say->SetStartTime(gpGlobals->time + RANDOM_FLOAT(0.3f, 0.5f));
+	say->SetStartTime(gpGlobals->time + RandomDuration(0.3s, 0.5s));
 	AddStatement(say);
 }
 

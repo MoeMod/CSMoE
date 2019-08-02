@@ -84,7 +84,7 @@ struct TutorMessage
 	int m_lifetime;
 	TutorMessageInterruptFlag m_interruptFlag;
 	int m_duplicateID;
-	float m_examineStartTime;
+	time_point_t m_examineStartTime;
 	int m_timesShown;
 	duration_t m_minDisplayTimeOverride;
 	duration_t m_minRepeatInterval;

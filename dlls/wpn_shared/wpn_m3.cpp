@@ -158,7 +158,7 @@ void CM3::PrimaryAttack(void)
 	else
 		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 8, 11);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.45;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.45s;
 }
 
 void CM3::Reload(void)

@@ -101,7 +101,7 @@ void CHalfLifeTraining::HostageDied()
 
 	if (pPlayer != NULL)
 	{
-		pPlayer->pev->radsuit_finished = gpGlobals->time + 3;
+		pPlayer->pev->radsuit_finished = gpGlobals->time + 3s;
 	}
 }
 
@@ -395,7 +395,7 @@ void CBaseGrenCatch::Spawn()
 	pev->effects |= EF_NODRAW;
 
 	SET_MODEL(ENT(pev), STRING(pev->model));
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBaseGrenCatch::Touch(CBaseEntity *pOther)
@@ -472,7 +472,7 @@ void CBaseGrenCatch::Think()
 		}
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBaseGrenCatch::KeyValue(KeyValueData *pkvd)
@@ -548,7 +548,7 @@ void CFuncWeaponCheck::Touch(CBaseEntity *pOther)
 					if (pev->speed > -1.0f)
 					{
 						FireTargets(STRING(sTriggerNoItems), pOther, pOther, USE_TOGGLE, 0);
-						pev->dmgtime = pev->speed + gpGlobals->time;
+						pev->dmgtime = pev->speed * 1s + gpGlobals->time;
 
 						if (!pev->speed)
 							pev->speed = -1;

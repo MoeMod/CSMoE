@@ -82,12 +82,12 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 
 	// CONSIDER: consolidate the locksound_t struct (all entries are duplicates for lock/unlock)
 	// CONSIDER: and condense this code.
-	float flsoundwait;
+	duration_t flsoundwait;
 
 	if (fbutton)
-		flsoundwait = BUTTON_SOUNDWAIT;
+		flsoundwait = BUTTON_SOUNDWAIT * 1s;
 	else
-		flsoundwait = DOOR_SOUNDWAIT;
+		flsoundwait = DOOR_SOUNDWAIT * 1s;
 
 	if (flocked) {
 		int fplaysound = (pls->sLockedSound && gpGlobals->time > pls->flwaitSound);
@@ -117,7 +117,7 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 
 			// make sure we don't keep calling last sentence in list
 			pls->bEOFLocked = (iprev == pls->iLockedSentence);
-			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT;
+			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT * 1s;
 		}
 	} else {
 		// UNLOCKED SOUND
@@ -148,7 +148,7 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 
 			// make sure we don't keep calling last sentence in list
 			pls->bEOFUnlocked = (iprev == pls->iUnlockedSentence);
-			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT;
+			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT * 1s;
 		}
 	}
 }

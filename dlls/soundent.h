@@ -78,7 +78,7 @@ public:
 	int ObjectCaps(void) { return FCAP_DONT_SAVE; }
 
 public:
-	static void InsertSound(int iType, const Vector &vecOrigin, int iVolume, float flDuration);
+	static void InsertSound(int iType, const Vector &vecOrigin, int iVolume, duration_t flDuration);
 	static void FreeSound(int iSound, int iPrevious);
 	static int ActiveList(void);
 	static int FreeList(void);

@@ -561,9 +561,9 @@ void CBreakable::BreakTouch(CBaseEntity *pOther)
 		SetTouch(NULL);
 
 		// BUGBUG: why doesn't zero delay work?
-		if (m_flDelay == 0.0f)
+		if (m_flDelay == 0.0s)
 		{
-			m_flDelay = 0.1f;
+			m_flDelay = 0.1s;
 		}
 
 		pev->nextthink = pev->ltime + m_flDelay;
@@ -680,9 +680,9 @@ int CBreakable::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, floa
 
 		Die();
 
-		if (m_flDelay == 0.0f)
+		if (m_flDelay == 0.0s)
 		{
-			m_flDelay = 0.1f;
+			m_flDelay = 0.1s;
 		}
 
 		pev->nextthink = pev->ltime + m_flDelay;
@@ -871,7 +871,7 @@ void CBreakable::Die()
 	SUB_UseTargets(NULL, USE_TOGGLE, 0);
 	SetThink(NULL);
 
-	pev->nextthink = pev->ltime + 0.1f;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	if (m_iszSpawnObject)
 	{

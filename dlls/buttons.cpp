@@ -134,7 +134,7 @@ void CMultiSource::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	pev->spawnflags |= SF_MULTI_INIT;
 	SetThink(&CMultiSource::Register);
 }
@@ -191,7 +191,7 @@ void CMultiSource::Register(void)
 
 	edict_t *pentTarget = FIND_ENTITY_BY_STRING(NULL, "target", STRING(pev->targetname));
 
-	while (!FNullEnt(pentTarget) && m_iTotal < MS_MAX_TARGETS) {
+	while (!FNullEnt(pentTarget) && m_iTotal < static_cast<int>(MS_MAX_TARGETS)) {
 		CBaseEntity *pTarget = CBaseEntity::Instance(pentTarget);
 
 		if (pTarget)
@@ -202,7 +202,7 @@ void CMultiSource::Register(void)
 
 	pentTarget = FIND_ENTITY_BY_STRING(NULL, "classname", "multi_manager");
 
-	while (!FNullEnt(pentTarget) && m_iTotal < MS_MAX_TARGETS) {
+	while (!FNullEnt(pentTarget) && m_iTotal < static_cast<int>(MS_MAX_TARGETS)) {
 		CBaseEntity *pTarget = CBaseEntity::Instance(pentTarget);
 
 		if (pTarget && pTarget->HasTarget(pev->targetname))
@@ -378,7 +378,7 @@ void CBaseButton::Spawn(void)
 
 	if (FBitSet(pev->spawnflags, SF_BUTTON_SPARK_IF_OFF)) {
 		SetThink(&CBaseButton::ButtonSpark);
-		pev->nextthink = gpGlobals->time + 0.5;
+		pev->nextthink = gpGlobals->time + 0.5s;
 	}
 
 	SetMovedir(pev);
@@ -522,7 +522,7 @@ void DoSpark(entvars_t *pev, const Vector &location)
 void CBaseButton::ButtonSpark(void)
 {
 	SetThink(&CBaseButton::ButtonSpark);
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT(0, 1.5));
+	pev->nextthink = gpGlobals->time + (0.1s + RandomDuration(0s, 1.5s));
 	DoSpark(pev, pev->mins);
 }
 
@@ -676,7 +676,7 @@ void CBaseButton::ButtonBackHome(void)
 
 	if (FBitSet(pev->spawnflags, SF_BUTTON_SPARK_IF_OFF)) {
 		SetThink(&CBaseButton::ButtonSpark);
-		pev->nextthink = gpGlobals->time + 0.5;
+		pev->nextthink = gpGlobals->time + 0.5s;
 	}
 }
 
@@ -879,7 +879,7 @@ void CMomentaryRotButton::UpdateSelf(float value)
 	}
 
 	m_lastUsed = 1;
-	pev->nextthink = pev->ltime + 0.1;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	if (m_direction > 0 && value >= 1) {
 		pev->avelocity = g_vecZero;
@@ -930,7 +930,7 @@ void CMomentaryRotButton::Off(void)
 
 	if (FBitSet(pev->spawnflags, SF_PENDULUM_AUTO_RETURN) && m_returnSpeed > 0) {
 		SetThink(&CMomentaryRotButton::Return);
-		pev->nextthink = pev->ltime + 0.1;
+		pev->nextthink = pev->ltime + 0.1s;
 		m_direction = -1;
 	} else
 		SetThink(NULL);
@@ -956,7 +956,7 @@ void CMomentaryRotButton::UpdateSelfReturn(float value)
 		SetThink(NULL);
 	} else {
 		pev->avelocity = -m_returnSpeed * pev->movedir;
-		pev->nextthink = pev->ltime + 0.1;
+		pev->nextthink = pev->ltime + 0.1s;
 	}
 }
 
@@ -1004,7 +1004,7 @@ void CEnvSpark::Spawn(void)
 	} else
 		SetThink(&CEnvSpark::SparkThink);
 
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT(0, 1.5));
+	pev->nextthink = gpGlobals->time + (0.1s + RandomDuration(0s, 1.5s));
 
 	if (m_flDelay <= 0s)
 		m_flDelay = 1.5s;

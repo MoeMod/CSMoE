@@ -92,7 +92,7 @@ public:
 	{
 		SetThink(&CSprite::AnimateUntilDead);
 		pev->framerate = framerate;
-		pev->dmgtime = gpGlobals->time + (m_maxFrame / framerate);
+		pev->dmgtime = gpGlobals->time + (m_maxFrame / framerate) * 1s;
 		pev->nextthink = gpGlobals->time;
 	}
 
@@ -189,7 +189,7 @@ public:
 	static CBeam *BeamCreate(const char *pSpriteName, int width);
 
 public:
-	inline void LiveForTime(float time)
+	inline void LiveForTime(duration_t time)
 	{
 		SetThink(&CBaseEntity::SUB_Remove);
 		pev->nextthink = gpGlobals->time + time;
@@ -198,7 +198,7 @@ public:
 	inline void BeamDamageInstant(TraceResult *ptr, float damage)
 	{
 		pev->dmg = damage;
-		pev->dmgtime = gpGlobals->time - 1.0f;
+		pev->dmgtime = gpGlobals->time - 1.0s;
 		BeamDamage(ptr);
 	}
 };

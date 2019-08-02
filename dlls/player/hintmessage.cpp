@@ -8,7 +8,7 @@
 
 namespace sv {
 
-CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, float duration)
+CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, duration_t duration)
 {
 	m_hintString = hintString;
 	m_duration = duration;
@@ -58,7 +58,7 @@ void CHintMessageQueue::Update(CBaseEntity *client)
 	m_messages.Remove(0);
 }
 
-bool CHintMessageQueue::AddMessage(const char *message, float duration, bool isHint, CUtlVector<const char *> *args)
+bool CHintMessageQueue::AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args)
 {
 	CHintMessage *msg = new CHintMessage(message, isHint, args, duration);
 	m_messages.AddToTail(msg);

@@ -808,7 +808,7 @@ void CLocalNav::Think()
 			s_flStepSize = s_flStepSize ? sv_stepsize->value : HOSTAGE_STEPSIZE_DEFAULT;
 		}
 
-		flNextCvarCheck = gpGlobals->time + 1;
+		flNextCvarCheck = gpGlobals->time + 1s;
 	}
 
 	HostagePrethink();

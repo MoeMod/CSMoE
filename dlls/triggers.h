@@ -370,7 +370,7 @@ public:
 	char m_szMapName[cchMapNameMost];        // trigger_changelevel only:  next map
 	char m_szLandmarkName[cchMapNameMost];    // trigger_changelevel only:  landmark on next map
 	int m_changeTarget;
-	float m_changeTargetDelay;
+	duration_t m_changeTargetDelay;
 };
 
 class CLadder : public CBaseTrigger

@@ -123,7 +123,7 @@ void CCSBot::StopFollowing()
 {
 	m_isFollowing = false;
 	m_leader = NULL;
-	m_allowAutoFollowTime = gpGlobals->time + 10.0f;
+	m_allowAutoFollowTime = gpGlobals->time + 10.0s;
 }
 
 // Begin process of rescuing hostages
@@ -374,7 +374,7 @@ void CCSBot::Attack(CBaseEntity *victim)
 
 	// define time when aim offset will automatically be updated
 	// longer time the more we had to turn (surprise)
-	m_aimOffsetTimestamp = gpGlobals->time + RANDOM_FLOAT(0.25f + turn, 1.5f);
+	m_aimOffsetTimestamp = gpGlobals->time + RandomDuration(0.25s + turn * 1s, 1.5s);
 }
 
 // Exit the Attack state

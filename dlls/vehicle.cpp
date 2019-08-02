@@ -233,13 +233,13 @@ void CFuncVehicle::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 
 		pev->speed = flSpeedRatio * m_speed;
 		Next();
-		m_flAcceleratorDecay = gpGlobals->time + 0.25;
+		m_flAcceleratorDecay = gpGlobals->time + 0.25s;
 
 	}
 	else if (m_flCanTurnNow < gpGlobals->time) {
 		if (delta == 20) {
 			m_iTurnAngle++;
-			m_flSteeringWheelDecay = gpGlobals->time + 0.075;
+			m_flSteeringWheelDecay = gpGlobals->time + 0.075s;
 
 			if (m_iTurnAngle > 8) {
 				m_iTurnAngle = 8;
@@ -247,14 +247,14 @@ void CFuncVehicle::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		}
 		else if (delta == 30) {
 			m_iTurnAngle--;
-			m_flSteeringWheelDecay = gpGlobals->time + 0.075;
+			m_flSteeringWheelDecay = gpGlobals->time + 0.075s;
 
 			if (m_iTurnAngle < -8) {
 				m_iTurnAngle = -8;
 			}
 		}
 
-		m_flCanTurnNow = gpGlobals->time + 0.05;
+		m_flCanTurnNow = gpGlobals->time + 0.05s;
 	}
 }
 
@@ -485,7 +485,7 @@ void CFuncVehicle::TerrainFollowing()
 void CFuncVehicle::Next()
 {
 	Vector vGravityVector, forward, right, up;
-	float time = 0.1;
+	auto time = 0.1s;
 
 	vGravityVector = g_vecZero;
 	UTIL_MakeVectors(pev->angles);
@@ -505,7 +505,7 @@ void CFuncVehicle::Next()
 	CheckTurning();
 
 	if (m_flSteeringWheelDecay < gpGlobals->time) {
-		m_flSteeringWheelDecay = gpGlobals->time + 0.1;
+		m_flSteeringWheelDecay = gpGlobals->time + 0.1s;
 
 		if (m_iTurnAngle < 0)
 			m_iTurnAngle++;
@@ -515,7 +515,7 @@ void CFuncVehicle::Next()
 	}
 
 	if (m_flAcceleratorDecay < gpGlobals->time) {
-		m_flAcceleratorDecay = gpGlobals->time + 0.1;
+		m_flAcceleratorDecay = gpGlobals->time + 0.1s;
 
 		if (pev->speed < 0) {
 			pev->speed += 20;
@@ -720,7 +720,7 @@ void CFuncVehicle::Find()
 	}
 
 	UTIL_SetOrigin(pev, nextPos);
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncVehicle::Next);
 	pev->speed = m_startSpeed;
 	UpdateSound();
@@ -761,14 +761,14 @@ void CFuncVehicle::NearestPath()
 
 	m_ppath = static_cast<CPathTrack *>(pNearest);
 	if (pev->speed != 0) {
-		NextThink(pev->ltime + 0.1, FALSE);
+		NextThink(pev->ltime + 0.1s, FALSE);
 		SetThink(&CFuncVehicle::Next);
 	}
 }
 
 void CFuncVehicle::OverrideReset()
 {
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncVehicle::NearestPath);
 }
 
@@ -829,7 +829,7 @@ void CFuncVehicle::Spawn()
 	m_controlMaxs = pev->maxs;
 	m_controlMaxs.z += 72;
 
-	NextThink(pev->ltime + 0.1, FALSE);
+	NextThink(pev->ltime + 0.1s, FALSE);
 	SetThink(&CFuncVehicle::Find);
 	Precache();
 }

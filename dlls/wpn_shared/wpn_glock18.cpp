@@ -260,7 +260,7 @@ void CGLOCK18::GLOCK18Fire(float flSpread, duration_t flCycleTime, BOOL fUseBurs
 	if (fUseBurstMode != FALSE)
 	{
 		m_iGlock18ShotsFired++;
-		m_flGlock18Shoot = gpGlobals->time + 0.1;
+		m_flGlock18Shoot = gpGlobals->time + 0.1s;
 	}
 
 	ResetPlayerShieldAnim();

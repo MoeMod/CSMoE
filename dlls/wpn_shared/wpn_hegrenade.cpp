@@ -218,7 +218,7 @@ void CHEGrenade::WeaponIdle(void)
 		UTIL_MakeVectors(angThrow);
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
-		float time = 1.5;
+		auto time = 1.5s;
 		CGrenade::ShootTimed2(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion);
 
 		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);

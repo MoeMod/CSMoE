@@ -258,7 +258,7 @@ void CCSBot::SetAimOffset(float accuracy)
 	m_aimOffsetGoal[2] = RANDOM_FLOAT(-error, error);
 
 	// define time when aim offset will automatically be updated
-	m_aimOffsetTimestamp = gpGlobals->time + RANDOM_FLOAT(0.25, 1);
+	m_aimOffsetTimestamp = gpGlobals->time + RandomDuration(0.25s, 1s);
 }
 
 // Wiggle aim error based on GetProfile()->GetSkill()

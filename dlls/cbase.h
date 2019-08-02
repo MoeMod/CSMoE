@@ -434,7 +434,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	float m_flDelay;
+	duration_t m_flDelay;
 	int m_iszKillTarget;
 };
 

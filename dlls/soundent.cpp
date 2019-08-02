@@ -63,7 +63,7 @@ void CSoundEnt::Spawn()
 	pev->solid = SOLID_NOT;
 	Initialize();
 
-	pev->nextthink = gpGlobals->time + 1;
+	pev->nextthink = gpGlobals->time + 1s;
 }
 
 // Think - at interval, the entire active sound list is checked
@@ -76,7 +76,7 @@ void CSoundEnt::Think()
 	int iPreviousSound;
 
 	// how often to check the sound list.
-	pev->nextthink = gpGlobals->time + 0.3;
+	pev->nextthink = gpGlobals->time + 0.3s;
 
 	iPreviousSound = SOUNDLIST_EMPTY;
 	iSound = m_iActiveSound;
@@ -178,7 +178,7 @@ int CSoundEnt::IAllocSound()
 // InsertSound - Allocates a free sound and fills it with
 // sound info.
 
-void CSoundEnt::InsertSound(int iType, const Vector &vecOrigin, int iVolume, float flDuration)
+void CSoundEnt::InsertSound(int iType, const Vector &vecOrigin, int iVolume, duration_t flDuration)
 {
 	int iThisSound;
 

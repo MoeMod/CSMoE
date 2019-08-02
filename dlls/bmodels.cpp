@@ -309,7 +309,7 @@ void CFuncRotating::Spawn()
 		SetThink(&CFuncRotating::SUB_CallUseToggle);
 
 		// leave a magic delay for client to start up
-		pev->nextthink = pev->ltime + 1.5;
+		pev->nextthink = pev->ltime + 1.5s;
 	}
 
 	// can this brush inflict pain?
@@ -370,7 +370,7 @@ void CFuncRotating::Precache()
 		// if fan was spinning, and we went through transition or save/restore,
 		// make sure we restart the sound.  1.5 sec delay is magic number. KDB
 		SetThink(&CFuncRotating::SpinUp);
-		pev->nextthink = pev->ltime + 1.5;
+		pev->nextthink = pev->ltime + 1.5s;
 	}
 }
 
@@ -445,7 +445,7 @@ void CFuncRotating::SpinUp()
 	//rotational velocity
 	Vector vecAVel;
 
-	pev->nextthink = pev->ltime + 0.1;
+	pev->nextthink = pev->ltime + 0.1s;
 	pev->avelocity = pev->avelocity + (pev->movedir * (pev->speed * m_flFanFriction));
 
 	// cache entity's rotational velocity
@@ -473,7 +473,7 @@ void CFuncRotating::SpinDown()
 	Vector vecAVel;
 	vec_t vecdir;
 
-	pev->nextthink = pev->ltime + 0.1;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	//spin down slower than spinup
 	pev->avelocity = pev->avelocity - (pev->movedir * (pev->speed * m_flFanFriction));
@@ -507,7 +507,7 @@ void CFuncRotating::SpinDown()
 
 void CFuncRotating::Rotate()
 {
-	pev->nextthink = pev->ltime + 10;
+	pev->nextthink = pev->ltime + 10s;
 }
 
 // Rotating Use - when a rotating brush is triggered
@@ -521,14 +521,14 @@ void CFuncRotating::RotatingUse(CBaseEntity *pActivator, CBaseEntity *pCaller, U
 			SetThink(&CFuncRotating::SpinDown);
 
 			//EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, (char *)STRING(pev->noiseStop), m_flVolume, m_flAttenuation, 0, m_pitch);
-			pev->nextthink = pev->ltime + 0.1;
+			pev->nextthink = pev->ltime + 0.1s;
 		} else // fan is not moving, so start it
 		{
 			SetThink(&CFuncRotating::SpinUp);
 			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), 0.01, m_flAttenuation, 0,
 			               FANPITCHMIN);
 
-			pev->nextthink = pev->ltime + 0.1;
+			pev->nextthink = pev->ltime + 0.1s;
 		}
 	} else if (!(pev->spawnflags & SF_BRUSH_ACCDCC)) // this is a normal start/stop brush.
 	{
@@ -538,7 +538,7 @@ void CFuncRotating::RotatingUse(CBaseEntity *pActivator, CBaseEntity *pCaller, U
 
 			// EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, (char *)STRING(pev->noiseStop), m_flVolume, m_flAttenuation, 0, m_pitch);
 
-			pev->nextthink = pev->ltime + 0.1;
+			pev->nextthink = pev->ltime + 0.1s;
 			// pev->avelocity = g_vecZero;
 		} else {
 			EMIT_SOUND_DYN(ENT(pev), CHAN_STATIC, (char *) STRING(pev->noiseRunning), m_flVolume, m_flAttenuation, 0,
@@ -602,7 +602,7 @@ void CPendulum::Spawn()
 
 	if (pev->spawnflags & SF_BRUSH_ROTATE_INSTANT) {
 		SetThink(&CPendulum::SUB_CallUseToggle);
-		pev->nextthink = gpGlobals->time + 0.1f;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	}
 
 	pev->speed = 0;
@@ -623,7 +623,7 @@ void CPendulum::PendulumUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 			delta = CBaseToggle::AxisDelta(pev->spawnflags, pev->angles, m_start);
 
 			pev->avelocity = m_maxSpeed * pev->movedir;
-			pev->nextthink = pev->ltime + (delta / m_maxSpeed);
+			pev->nextthink = pev->ltime + (delta / m_maxSpeed) * 1s;
 			SetThink(&CPendulum::Stop);
 		} else {
 			// Dead stop
@@ -633,7 +633,7 @@ void CPendulum::PendulumUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 		}
 	} else {
 		// Start the pendulum moving
-		pev->nextthink = pev->ltime + 0.1f;
+		pev->nextthink = pev->ltime + 0.1s;
 
 		// Save time to calculate dt
 		m_time = gpGlobals->time;
@@ -683,7 +683,7 @@ void CPendulum::Swing()
 	pev->avelocity = pev->speed * pev->movedir;
 
 	// Call this again
-	pev->nextthink = pev->ltime + 0.1;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	if (m_damp) {
 		m_dampSpeed -= m_damp * m_dampSpeed * dt;

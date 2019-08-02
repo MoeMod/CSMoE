@@ -261,7 +261,7 @@ void EXT_FUNC ClientKill(edict_t *pEntity)
 	pl->m_LastHitGroup = 0;
 
 	// don't let them suicide for 5 seconds after suiciding
-	pl->m_fNextSuicideTime = gpGlobals->time + 1;
+	pl->m_fNextSuicideTime = gpGlobals->time + 1s;
 
 	// have the player kill themself
 	pEntity->v.health = 0;
@@ -565,7 +565,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		pPlayer->pev->angles = CamAngles;
 		pPlayer->pev->v_angle = pPlayer->pev->angles;
 
-		pPlayer->m_fIntroCamTime = gpGlobals->time + 6;
+		pPlayer->m_fIntroCamTime = gpGlobals->time + 6s;
 		pPlayer->pev->view_ofs = g_vecZero;
 	} else {
 		pPlayer->m_iTeam = CT;
@@ -2046,7 +2046,7 @@ void Radio1(CBasePlayer *player, int slot)
 	}
 
 	player->m_iRadioMessages--;
-	player->m_flRadioTime = gpGlobals->time + 1.5f;
+	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
 	switch (slot) {
 		case 1:
@@ -2085,7 +2085,7 @@ void Radio2(CBasePlayer *player, int slot)
 	}
 
 	player->m_iRadioMessages--;
-	player->m_flRadioTime = gpGlobals->time + 1.5f;
+	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
 	switch (slot) {
 		case 1:
@@ -2124,7 +2124,7 @@ void Radio3(CBasePlayer *player, int slot)
 	}
 
 	player->m_iRadioMessages--;
-	player->m_flRadioTime = gpGlobals->time + 1.5f;
+	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
 	switch (slot) {
 		case 1:
@@ -2481,7 +2481,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[0])
 		{
-			player->m_flLastCommandTime[0] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[0] = gpGlobals->time + 0.3s;
 			Host_Say(pEntity, 0);
 		}
 	}
@@ -2489,7 +2489,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[1])
 		{
-			player->m_flLastCommandTime[1] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[1] = gpGlobals->time + 0.3s;
 			Host_Say(pEntity, 1);
 		}
 	}
@@ -2497,7 +2497,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[2])
 		{
-			player->m_flLastCommandTime[2] = gpGlobals->time + 0.6f;
+			player->m_flLastCommandTime[2] = gpGlobals->time + 0.6s;
 			player->ForceClientDllUpdate();
 		}
 	}
@@ -2505,7 +2505,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[3])
 		{
-			player->m_flLastCommandTime[3] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[3] = gpGlobals->time + 0.3s;
 
 			if (gpGlobals->time < player->m_flNextVoteTime)
 			{
@@ -2513,7 +2513,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				return;
 			}
 
-			player->m_flNextVoteTime = gpGlobals->time + 3;
+			player->m_flNextVoteTime = gpGlobals->time + 3s;
 
 			if (player->m_iTeam != UNASSIGNED)
 			{
@@ -2580,7 +2580,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[5])
 		{
-			player->m_flLastCommandTime[5] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[5] = gpGlobals->time + 0.3s;
 			mp->DisplayMaps(player, 0);
 		}
 	}
@@ -2699,7 +2699,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[6])
 		{
-			player->m_flLastCommandTime[6] = gpGlobals->time + 0.3f;
+			player->m_flLastCommandTime[6] = gpGlobals->time + 0.3s;
 			ListPlayers(player);
 		}
 	}
@@ -3191,7 +3191,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				if (gpGlobals->time >= player->m_flLastCommandTime[7])
 				{
-					player->m_flLastCommandTime[7] = gpGlobals->time + 0.3f;
+					player->m_flLastCommandTime[7] = gpGlobals->time + 0.3s;
 
 					if (!player->m_bHasNightVision)
 						return;
