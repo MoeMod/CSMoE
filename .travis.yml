@@ -8,6 +8,10 @@ addons:
       - cmake
       - x11-utils
       - libgl1-mesa-dev
+      - libegl1-mesa-dev
+      - libgles2-mesa-dev
+      - libsdl2-dev
+      - libsdl2-image-dev
 git:
   depth: 50
   submodules: true
@@ -15,6 +19,5 @@ os:
   - linux
 
 before_script:
-  - sh scripts/travis_linux_deps.sh
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_portable_linux_engine.sh; fi
