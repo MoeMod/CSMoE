@@ -22,5 +22,6 @@ os:
   - linux
 
 before_script:
+  - eval "CC=gcc-7 && CXX=g++-7"
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh scripts/build_portable_linux_engine.sh; fi
