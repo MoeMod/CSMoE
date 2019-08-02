@@ -1,4 +1,4 @@
-[English](#Counter-Strike_Mobile-oriented_Edition) | [中文(简体)](#关于本项目)
+[English](#Counter-Strike_Mobile-oriented_Edition) | [中文(简体)](#关于本项目) [![Build Status](https://travis-ci.org/MoeMod/CSMoE.svg)](https://travis-ci.org/MoeMod/CSMoE)
 
 ## Counter-Strike Mobile-oriented Edition
 Here are the source code of engine, server, client (windows and linux only). \
