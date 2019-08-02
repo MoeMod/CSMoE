@@ -54,8 +54,8 @@ public:
 	KnockbackData GetKnockBackData() override { return { 1500.0f, 1000.0f, 1500.0f, 860.0f, 0.8f }; }
 
 public:
-	void SVDEXFire1(float flSpread, float flCycleTime, BOOL fUseAutoAim);
-	void SVDEXFire2(float flCycleTime, BOOL fUseAutoAim);
+	void SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+	void SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

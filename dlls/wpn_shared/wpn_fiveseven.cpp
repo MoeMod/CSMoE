@@ -105,13 +105,13 @@ BOOL CFiveSeven::Deploy(void)
 void CFiveSeven::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		FiveSevenFire((1.5) * (1 - m_flAccuracy), 0.2, FALSE);
+		FiveSevenFire((1.5) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		FiveSevenFire((0.255) * (1 - m_flAccuracy), 0.2, FALSE);
+		FiveSevenFire((0.255) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		FiveSevenFire((0.075) * (1 - m_flAccuracy), 0.2, FALSE);
+		FiveSevenFire((0.075) * (1 - m_flAccuracy), 0.2s, FALSE);
 	else
-		FiveSevenFire((0.15) * (1 - m_flAccuracy), 0.2, FALSE);
+		FiveSevenFire((0.15) * (1 - m_flAccuracy), 0.2s, FALSE);
 }
 
 void CFiveSeven::SecondaryAttack(void)
@@ -119,17 +119,17 @@ void CFiveSeven::SecondaryAttack(void)
 	ShieldSecondaryFire(SHIELDGUN_UP, SHIELDGUN_DOWN);
 }
 
-void CFiveSeven::FiveSevenFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CFiveSeven::FiveSevenFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.05;
+	flCycleTime -= 0.05s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy -= (0.275 - (gpGlobals->time - m_flLastFire)) * 0.25;
+		m_flAccuracy -= (0.275 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.25;
 
 		if (m_flAccuracy > 0.92)
 			m_flAccuracy = 0.92;
@@ -144,7 +144,7 @@ void CFiveSeven::FiveSevenFire(float flSpread, float flCycleTime, BOOL fUseAutoA
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -177,7 +177,7 @@ void CFiveSeven::FiveSevenFire(float flSpread, float flCycleTime, BOOL fUseAutoA
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 2;
 	ResetPlayerShieldAnim();
 }
@@ -187,7 +187,7 @@ void CFiveSeven::Reload(void)
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
 
-	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, 2.7))
+	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, 2.7s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -206,7 +206,7 @@ void CFiveSeven::WeaponIdle(void)
 
 	if (m_pPlayer->HasShield())
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 		if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 			SendWeaponAnim(SHIELDGUN_DRAWN_IDLE, UseDecrement() != FALSE);
@@ -216,7 +216,7 @@ void CFiveSeven::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0625s;
 		SendWeaponAnim(FIVESEVEN_IDLE, UseDecrement() != FALSE);
 	}
 }

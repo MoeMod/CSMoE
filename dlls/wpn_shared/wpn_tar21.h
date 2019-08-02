@@ -47,7 +47,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_tar21.mdl"; }
 
 public:
-	void TAR21Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void TAR21Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

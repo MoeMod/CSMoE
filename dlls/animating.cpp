@@ -20,21 +20,21 @@ TYPEDESCRIPTION CBaseAnimating::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE(CBaseAnimating, CBaseDelay);
 
-float CBaseAnimating::StudioFrameAdvance(float flInterval)
+duration_t CBaseAnimating::StudioFrameAdvance(duration_t flInterval)
 {
-	if (flInterval == 0.0f) {
+	if (flInterval == duration_t{}) {
 		flInterval = gpGlobals->time - pev->animtime;
 
-		if (flInterval <= 0.001) {
+		if (flInterval <= 0.001s) {
 			pev->animtime = gpGlobals->time;
-			return 0;
+			return 0s;
 		}
 	}
 
-	if (pev->animtime == 0.0f)
-		flInterval = 0;
+	if (pev->animtime == time_point_t{})
+		flInterval = duration_t{};
 
-	pev->frame += flInterval * m_flFrameRate * pev->framerate;
+	pev->frame += flInterval.count() * m_flFrameRate * pev->framerate;
 	pev->animtime = gpGlobals->time;
 
 	if (pev->frame < 0.0 || pev->frame >= 256.0) {
@@ -61,7 +61,7 @@ int CBaseAnimating::LookupActivityHeaviest(int activity)
 	return sv::LookupActivityHeaviest(pmodel, pev, activity);
 }
 
-void CBaseAnimating::DispatchAnimEvents(float flInterval)
+void CBaseAnimating::DispatchAnimEvents(duration_t flInterval)
 {
 	MonsterEvent_t event;
 	void *pmodel = GET_MODEL_PTR(ENT(pev));
@@ -72,11 +72,11 @@ void CBaseAnimating::DispatchAnimEvents(float flInterval)
 	}
 
 	// FIXME: I have to do this or some events get missed, and this is probably causing the problem below
-	flInterval = 0.1f;
+	flInterval = 0.1s;
 
 	// FIX: this still sometimes hits events twice
-	float flStart = pev->frame + (m_flLastEventCheck - pev->animtime) * m_flFrameRate * pev->framerate;
-	float flEnd = pev->frame + flInterval * m_flFrameRate * pev->framerate;
+	auto flStart = pev->frame + (m_flLastEventCheck - pev->animtime) * m_flFrameRate / 1s * pev->framerate;
+	float flEnd = pev->frame + flInterval * m_flFrameRate / 1s * pev->framerate;
 
 	m_fSequenceFinished = FALSE;
 	m_flLastEventCheck = pev->animtime + flInterval;

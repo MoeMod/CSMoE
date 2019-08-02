@@ -55,20 +55,20 @@ enum PriorityType
 class IntervalTimer
 {
 public:
-	IntervalTimer()		{ m_timestamp = -1.0f; }
+	IntervalTimer()		{ m_timestamp = time_point_t{}; }
 	void Reset()		{ m_timestamp = gpGlobals->time; }
 	void Start()		{ m_timestamp = gpGlobals->time; }
-	void Invalidate()	{ m_timestamp = -1.0f; }
+	void Invalidate()	{ m_timestamp = time_point_t{}; }
 
-	bool HasStarted() const { return (m_timestamp > 0.0f); }
+	bool HasStarted() const { return (m_timestamp > time_point_t{}); }
 
 	// if not started, elapsed time is very large
-	float GetElapsedTime() const			{ return (HasStarted()) ? (gpGlobals->time - m_timestamp) : 99999.9f; }
-	bool IsLessThen(float duration) const		{ return (gpGlobals->time - m_timestamp < duration) ? true : false; }
-	bool IsGreaterThen(float duration) const	{ return (gpGlobals->time - m_timestamp > duration) ? true : false; }
+	duration_t GetElapsedTime() const			{ return (HasStarted()) ? (gpGlobals->time - m_timestamp) : duration_t(99999.9f); }
+	bool IsLessThen(duration_t duration) const		{ return (gpGlobals->time - m_timestamp < duration) ? true : false; }
+	bool IsGreaterThen(duration_t duration) const	{ return (gpGlobals->time - m_timestamp > duration) ? true : false; }
 
 private:
-	float m_timestamp;
+	time_point_t m_timestamp;
 };
 
 // Simple class for counting down a short interval of time
@@ -76,18 +76,18 @@ private:
 class CountdownTimer
 {
 public:
-	CountdownTimer()	{ m_timestamp = -1.0f; m_duration = 0.0f; }
+	CountdownTimer()	{ m_timestamp = {}; m_duration = {}; }
 	void Reset()		{ m_timestamp = gpGlobals->time + m_duration; }
 
-	void Start(float duration)	{ m_timestamp = gpGlobals->time + duration; m_duration = duration; }
-	bool HasStarted() const		{ return (m_timestamp > 0.0f); }
+	void Start(duration_t duration)	{ m_timestamp = gpGlobals->time + duration; m_duration = duration; }
+	bool HasStarted() const		{ return (m_timestamp > time_point_t{}); }
 
-	void Invalidate()	{ m_timestamp = -1.0f; }
+	void Invalidate()	{ m_timestamp = {}; }
 	bool IsElapsed() const	{ return (gpGlobals->time > m_timestamp); }
 
 private:
-	float m_duration;
-	float m_timestamp;
+	duration_t m_duration;
+	time_point_t m_timestamp;
 };
 
 // Return true if the given entity is valid

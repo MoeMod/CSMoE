@@ -362,7 +362,8 @@ void CCareerTask::OnEvent(GameEventType event, CBasePlayer *pVictim, CBasePlayer
 				}
 				else if (!Q_strcmp(m_name, "winfast"))
 				{
-					if (m_eventsNeeded >= TheCareerTasks->GetRoundElapsedTime())
+					// TODO : what's goint on here?
+					if (m_eventsNeeded >= TheCareerTasks->GetRoundElapsedTime().count())
 					{
 						m_eventsSeen = m_eventsNeeded;
 						SendPartialNotification();
@@ -402,7 +403,7 @@ void CCareerTask::OnEvent(GameEventType event, CBasePlayer *pVictim, CBasePlayer
 
 		if (m_event == EVENT_ROUND_WIN && !Q_strcmp(m_name, "winfast"))
 		{
-			TheCareerTasks->SetFinishedTaskTime((int)TheCareerTasks->GetRoundElapsedTime());
+			TheCareerTasks->SetFinishedTaskTime(std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(TheCareerTasks->GetRoundElapsedTime()));
 			UTIL_GetLocalPlayer()->SyncRoundTimer();
 		}
 	}
@@ -434,7 +435,7 @@ void CCareerTask::OnEvent(GameEventType event, CBasePlayer *pVictim, CBasePlayer
 
 				if (m_event == EVENT_ROUND_WIN && !Q_strcmp(m_name, "winfast"))
 				{
-					TheCareerTasks->SetFinishedTaskTime((int)TheCareerTasks->GetRoundElapsedTime());
+					TheCareerTasks->SetFinishedTaskTime(std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(TheCareerTasks->GetRoundElapsedTime()));
 					UTIL_GetLocalPlayer()->SyncRoundTimer();
 				}
 
@@ -468,7 +469,7 @@ void CCareerTaskManager::Create()
 
 CCareerTaskManager::CCareerTaskManager()
 {
-	m_taskTime = 0;
+	m_taskTime = 0s;
 	Reset();
 }
 
@@ -488,14 +489,14 @@ void CCareerTaskManager::Reset(bool deleteTasks)
 			task->Reset();
 	}
 
-	m_finishedTaskTime  = 0;
+	m_finishedTaskTime  = 0s;
 	m_finishedTaskRound = 0;
 	m_shouldLatchRoundEndMessage = false;
 
 	m_roundStartTime = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
 }
 
-void CCareerTaskManager::SetFinishedTaskTime(int val)
+void CCareerTaskManager::SetFinishedTaskTime(std::chrono::duration<int, std::ratio<1>> val)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
 
@@ -503,7 +504,7 @@ void CCareerTaskManager::SetFinishedTaskTime(int val)
 	m_finishedTaskRound = mp->m_iTotalRoundsPlayed;
 }
 
-void CCareerTaskManager::AddTask(const char *taskName, const char *weaponName, int eventCount, bool mustLive, bool crossRounds, bool isComplete)
+void CCareerTaskManager::AddTask(const char *taskName, const char *weaponName, std::chrono::duration<int, std::ratio<1>> eventCount, bool mustLive, bool crossRounds, bool isComplete)
 {
 	++m_nextId;
 
@@ -520,7 +521,7 @@ void CCareerTaskManager::AddTask(const char *taskName, const char *weaponName, i
 					pTaskInfo->taskName,
 					pTaskInfo->event,
 					weaponName,
-					eventCount,
+					eventCount / 1s,
 					mustLive,
 					crossRounds,
 					m_nextId,
@@ -653,7 +654,7 @@ int CCareerTaskManager::GetNumRemainingTasks()
 	return ret;
 }
 
-float CCareerTaskManager::GetRoundElapsedTime()
+duration_t CCareerTaskManager::GetRoundElapsedTime()
 {
 	return (gpGlobals->time - m_roundStartTime);
 }

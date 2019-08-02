@@ -122,9 +122,9 @@ void CSVDEX::SecondaryAttack(void)
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.9;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.9s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2s;
 }
 
 void CSVDEX::PrimaryAttack(void)
@@ -132,29 +132,29 @@ void CSVDEX::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
 		/*if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			SVDEXFire(0.035 + (0.4) * m_flAccuracy, 0.0875, FALSE);
+			SVDEXFire(0.035 + (0.4) * m_flAccuracy, 0.0875s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			SVDEXFire(0.035 + (0.07) * m_flAccuracy, 0.0875, FALSE);
+			SVDEXFire(0.035 + (0.07) * m_flAccuracy, 0.0875s, FALSE);
 		else
-			SVDEXFire((0.025) * m_flAccuracy, 0.0875, FALSE);*/
-		SVDEXFire2(3.0, FALSE);
+			SVDEXFire((0.025) * m_flAccuracy, 0.0875s, FALSE);*/
+		SVDEXFire2(3.0s, FALSE);
 	}
 	else
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			SVDEXFire1(0.8, 0.346, FALSE);
+			SVDEXFire1(0.8, 0.346s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			SVDEXFire1(0.15, 0.346, FALSE);
+			SVDEXFire1(0.15, 0.346s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 10)
-			SVDEXFire1(0.1, 0.346, FALSE);
+			SVDEXFire1(0.1, 0.346s, FALSE);
 		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			SVDEXFire1(0.003, 0.346, FALSE);
+			SVDEXFire1(0.003, 0.346s, FALSE);
 		else
-			SVDEXFire1(0.007, 0.346, FALSE);
+			SVDEXFire1(0.007, 0.346s, FALSE);
 	}
 }
 
-void CSVDEX::SVDEXFire1(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -168,7 +168,7 @@ void CSVDEX::SVDEXFire1(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -203,13 +203,13 @@ void CSVDEX::SVDEXFire1(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 0.55, 1.0);
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -0.65, 0.95);
 }
 
-void CSVDEX::SVDEXFire2(float flCycleTime, BOOL fUseAutoAim)
+void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
@@ -218,7 +218,7 @@ void CSVDEX::SVDEXFire2(float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -255,7 +255,7 @@ void CSVDEX::SVDEXFire2(float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 }
 
 void CSVDEX::Reload(void)
@@ -267,7 +267,7 @@ void CSVDEX::Reload(void)
 		return;
 
 
-	if (DefaultReload(20, SVDEX_RELOAD, 3.8))
+	if (DefaultReload(20, SVDEX_RELOAD, 3.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -286,7 +286,7 @@ void CSVDEX::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		SendWeaponAnim(SVDEX_IDLEB, UseDecrement() != FALSE);

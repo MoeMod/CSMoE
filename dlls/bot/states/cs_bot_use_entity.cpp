@@ -73,7 +73,7 @@ void UseEntityState::OnUpdate(CCSBot *me)
 {
 	// in the very rare situation where two or more bots "used" a hostage at the same time,
 	// one bot will fail and needs to time out of this state
-	const float useTimeout = 5.0f;
+	constexpr auto useTimeout = 5.0s;
 	if (me->GetStateTimestamp() - gpGlobals->time > useTimeout)
 	{
 		me->Idle();

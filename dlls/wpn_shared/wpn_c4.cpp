@@ -55,7 +55,7 @@ void CC4::Spawn(void)
 	m_iId = WEAPON_C4;
 	m_iDefaultAmmo = C4_DEFAULT_GIVE;
 	m_bStartedArming = false;
-	m_fArmedTime = 0;
+	m_fArmedTime = invalid_time_point;
 
 	if (!FStringNull(pev->targetname))
 	{
@@ -66,7 +66,7 @@ void CC4::Spawn(void)
 
 	FallInit();
 	SetThink(&CBasePlayerItem::FallThink);
-	pev->nextthink = UTIL_WeaponTimeBase() + 0.1;
+	pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.1s;
 }
 
 void CC4::Precache(void)
@@ -98,7 +98,7 @@ BOOL CC4::Deploy(void)
 {
 	pev->body = 0;
 	m_bStartedArming = false;
-	m_fArmedTime = 0;
+	m_fArmedTime = invalid_time_point;
 
 	if (m_pPlayer->HasShield() != false)
 	{
@@ -111,7 +111,7 @@ BOOL CC4::Deploy(void)
 
 void CC4::Holster(int skiplocal)
 {
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 	m_bStartedArming = false;
 
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
@@ -145,14 +145,14 @@ void CC4::PrimaryAttack(void)
 		if (!onBombZone)
 		{
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#C4_Plant_At_Bomb_Spot");
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
 			return;
 		}
 
 		if (!onGround)
 		{
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#C4_Plant_Must_Be_On_Ground");
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
 			return;
 		}
 #endif
@@ -165,8 +165,8 @@ void CC4::PrimaryAttack(void)
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		m_pPlayer->SetProgressBarTime(3);
 #endif
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RANDOM_FLOAT(10, 15);
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 	}
 	else
 	{
@@ -179,7 +179,7 @@ void CC4::PrimaryAttack(void)
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#C4_Arming_Cancelled");
 
 			m_bStartedArming = false;
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 #ifndef CLIENT_DLL
 			m_pPlayer->ResetMaxSpeed();
 			m_pPlayer->SetProgressBarTime(0);
@@ -198,14 +198,14 @@ void CC4::PrimaryAttack(void)
 			if (m_bStartedArming == true)
 			{
 				m_bStartedArming = false;
-				m_fArmedTime = 0;
+				m_fArmedTime = invalid_time_point;
 				m_pPlayer->m_bHasC4 = false;
 
 				Broadcast("BOMBPL");
 #ifndef CLIENT_DLL
 
 				if (pev->speed != 0 && g_pGameRules)
-					g_pGameRules->m_iC4Timer = (int)pev->speed;
+					g_pGameRules->m_iC4Timer = (int)pev->speed * 1s;
 
 				CGrenade *pGrenade = CGrenade::ShootSatchelCharge(m_pPlayer->pev, m_pPlayer->pev->origin, Vector(0, 0, 0));
 
@@ -246,7 +246,7 @@ void CC4::PrimaryAttack(void)
 		}
 		else
 		{
-			if (gpGlobals->time >= m_fArmedTime - 0.75)
+			if (gpGlobals->time >= m_fArmedTime - 0.75s)
 			{
 				if (m_bBombPlacedAnimation == false)
 				{
@@ -260,8 +260,8 @@ void CC4::PrimaryAttack(void)
 		}
 	}
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RANDOM_FLOAT(10, 15);
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 }
 
 void CC4::WeaponIdle(void)
@@ -269,7 +269,7 @@ void CC4::WeaponIdle(void)
 	if (m_bStartedArming == true)
 	{
 		m_bStartedArming = false;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
 #ifndef CLIENT_DLL
 		m_pPlayer->ResetMaxSpeed();
 		m_pPlayer->SetProgressBarTime(0);
@@ -329,7 +329,7 @@ void CC4::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, f
 
 #ifndef CLIENT_DLL
 		if (pev->speed != 0 && g_pGameRules)
-			g_pGameRules->m_iC4Timer = (int)pev->speed;
+			g_pGameRules->m_iC4Timer = (int)pev->speed * 1s;
 #endif
 
 		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/c4_plant.wav", VOL_NORM, ATTN_NORM);

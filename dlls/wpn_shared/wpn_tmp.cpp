@@ -96,12 +96,12 @@ BOOL CTMP::Deploy(void)
 void CTMP::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		TMPFire((0.25) * m_flAccuracy, 0.07, FALSE);
+		TMPFire((0.25) * m_flAccuracy, 0.07s, FALSE);
 	else
-		TMPFire((0.03) * m_flAccuracy, 0.07, FALSE);
+		TMPFire((0.03) * m_flAccuracy, 0.07s, FALSE);
 }
 
-void CTMP::TMPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CTMP::TMPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -115,7 +115,7 @@ void CTMP::TMPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -146,7 +146,7 @@ void CTMP::TMPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6);
@@ -163,7 +163,7 @@ void CTMP::Reload(void)
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
 
-	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, 2.12))
+	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, 2.12s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -181,7 +181,7 @@ void CTMP::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(TMP_IDLE1, UseDecrement() != FALSE);
 }
 

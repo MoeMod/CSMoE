@@ -110,13 +110,13 @@ protected:
 
 public:
 	float m_flAttackDist;
-	float m_flAttackRate;
-	float m_flAttackAnimTime;
+	duration_t m_flAttackRate;
+	duration_t m_flAttackAnimTime;
 	float m_flAttackDamage;
 	int m_iKillBonusMoney;
 	int m_iKillBonusFrags;
-	float m_flTimeLastActive;
-	float m_flTargetChange;
+	EngineClock::time_point m_flTimeLastActive;
+	EngineClock::time_point m_flTargetChange;
 
 	std::map<std::string, int> m_mapLookupSequenceCache;
 	std::mutex m_mutexSetAnimation;

@@ -461,18 +461,18 @@ void CBasePlayerItem::Materialize()
 
 // AttemptToMaterialize - the item is trying to rematerialize,
 // should it do so now or wait longer?
-
+// TODO(MoeMod) : time fix heer ? the local var time should be a time_point ???
 void CBasePlayerItem::AttemptToMaterialize()
 {
-	float time = g_pGameRules->FlWeaponTryRespawn(this);
+	time_point_t time = g_pGameRules->FlWeaponTryRespawn(this);
 
-	if (time == 0)
+	if (time == invalid_time_point)
 	{
 		Materialize();
 		return;
 	}
 
-	pev->nextthink = gpGlobals->time + time;
+	pev->nextthink = time; // gpGlobals->time + time;
 }
 
 // CheckRespawn - a player is taking this weapon, should
@@ -638,9 +638,9 @@ bool CBasePlayerWeapon::ShieldSecondaryFire(int iUpAnim, int iDownAnim)
 	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_SHIELD_DRAWN) != WPNSTATE_SHIELD_DRAWN);
 	m_pPlayer->ResetMaxSpeed();
 
-	m_flNextSecondaryAttack = 0.4f;
-	m_flNextPrimaryAttack = 0.4f;
-	m_flTimeWeaponIdle = 0.6f;
+	m_flNextSecondaryAttack = 0.4s;
+	m_flNextPrimaryAttack = 0.4s;
+	m_flTimeWeaponIdle = 0.6s;
 
 	return true;
 }
@@ -689,7 +689,7 @@ void CBasePlayerWeapon::KickBack(float up_base, float lateral_base, float up_mod
 	}
 }
 
-void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL bIsGlock)
+void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL bIsGlock)
 {
 	float nexttime = 0.1f;
 
@@ -699,7 +699,7 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL bI
 	{
 		m_iClip = 0;
 		shotsFired = 3;
-		shootTime = 0;
+		shootTime = invalid_time_point;
 		return;
 	}
 
@@ -743,10 +743,10 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL bI
 		shootTime = gpGlobals->time + nexttime;
 	}
 	else
-		shootTime = 0;
+		shootTime = invalid_time_point;
 }
 
-BOOL CanAttack(float attack_time, float curtime, BOOL isPredicted)
+static inline BOOL CanAttack(duration_t attack_time, duration_t curtime, BOOL isPredicted)
 {
 #ifdef CLIENT_WEAPONS
 	if (!isPredicted)
@@ -758,7 +758,7 @@ BOOL CanAttack(float attack_time, float curtime, BOOL isPredicted)
 	}
 	else
 	{
-		return (attack_time <= 0.0f) ? TRUE : FALSE;
+		return (attack_time <= zero_duration) ? TRUE : FALSE;
 	}
 }
 
@@ -802,11 +802,11 @@ void CBasePlayerWeapon::ItemPostFrame()
 		usableButtons &= ~IN_ATTACK2;
 	}
 
-	if (m_flGlock18Shoot != 0)
+	if (m_flGlock18Shoot != invalid_time_point)
 	{
 		FireRemaining(m_iGlock18ShotsFired, m_flGlock18Shoot, TRUE);
 	}
-	else if (gpGlobals->time > m_flFamasShoot && m_flFamasShoot != 0)
+	else if (gpGlobals->time > m_flFamasShoot && m_flFamasShoot != invalid_time_point)
 	{
 		FireRemaining(m_iFamasShotsFired, m_flFamasShoot, FALSE);
 	}
@@ -828,15 +828,15 @@ void CBasePlayerWeapon::ItemPostFrame()
 		}
 	}
 
-	if (m_pPlayer->m_flEjectBrass != 0 && m_pPlayer->m_flEjectBrass <= gpGlobals->time)
+	if (m_pPlayer->m_flEjectBrass != invalid_time_point && m_pPlayer->m_flEjectBrass <= gpGlobals->time)
 	{
-		m_pPlayer->m_flEjectBrass = 0;
+		m_pPlayer->m_flEjectBrass = invalid_time_point;
 		EjectBrassLate();
 	}
 
 	if (!(m_pPlayer->pev->button & IN_ATTACK))
 	{
-		m_flLastFireTime = 0;
+		m_flLastFireTime = invalid_time_point;
 	}
 
 	if (m_pPlayer->HasShield())
@@ -891,7 +891,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 	else if ((m_pPlayer->pev->button & IN_RELOAD) && iMaxClip() != WEAPON_NOCLIP && !m_fInReload && m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 	{
 		// reload when reload is pressed, or if no buttons are down and weapon is empty.
-		if (m_flFamasShoot == 0 && m_flGlock18Shoot == 0)
+		if (m_flFamasShoot == invalid_time_point && m_flGlock18Shoot == invalid_time_point)
 		{
 			if (!(m_iWeaponState & WPNSTATE_SHIELD_DRAWN))
 			{
@@ -929,7 +929,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 		{
 			if (m_iShotsFired > 0 && m_flDecreaseShotsFired < gpGlobals->time)
 			{
-				m_flDecreaseShotsFired = gpGlobals->time + 0.0225f;
+				m_flDecreaseShotsFired = gpGlobals->time + 0.0225s;
 				m_iShotsFired--;
 			}
 		}
@@ -940,7 +940,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 			// weapon isn't useable, switch.
 			if (!(iFlags() & ITEM_FLAG_NOAUTOSWITCHEMPTY) && g_pGameRules->GetNextBestWeapon(m_pPlayer, this))
 			{
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3;
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 				return;
 			}
 #endif
@@ -952,7 +952,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 				// weapon is useable. Reload if empty and weapon has waited as long as it has to after firing
 				if (!m_iClip && !(iFlags() & ITEM_FLAG_NOAUTORELOAD) && m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 				{
-					if (m_flFamasShoot == 0 && m_flGlock18Shoot == 0)
+					if (m_flFamasShoot == invalid_time_point && m_flGlock18Shoot == invalid_time_point)
 					{
 						Reload();
 						return;
@@ -1221,9 +1221,9 @@ BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWea
 	Q_strcpy(m_pPlayer->m_szAnimExtention, szAnimExt);
 	SendWeaponAnim(iAnim, skiplocal);
 
-	m_pPlayer->m_flNextAttack = 0.75f;
-	m_flTimeWeaponIdle = 1.5f;
-	m_flLastFireTime = 0.0f;
+	m_pPlayer->m_flNextAttack = 0.75s;
+	m_flTimeWeaponIdle = 1.5s;
+	m_flLastFireTime = invalid_time_point;
 	m_flDecreaseShotsFired = gpGlobals->time;
 
 	m_pPlayer->m_iFOV = DEFAULT_FOV;
@@ -1267,7 +1267,7 @@ void CBasePlayerWeapon::ReloadSound()
 	}
 }
 
-int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, float fDelay, int body)
+int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body)
 {
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return FALSE;
@@ -1285,7 +1285,7 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, float fDelay, int
 	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0);
 
 	m_fInReload = TRUE;
-	m_flTimeWeaponIdle = fDelay + 0.5f;
+	m_flTimeWeaponIdle = fDelay + 0.5s;
 
 	return TRUE;
 }
@@ -1468,9 +1468,9 @@ void CBasePlayerWeapon::RetireWeapon()
 
 // GetNextAttackDelay - An accurate way of calcualting the next attack time.
 
-float CBasePlayerWeapon::GetNextAttackDelay(float delay)
+duration_t CBasePlayerWeapon::GetNextAttackDelay(duration_t delay)
 {
-	if (m_flLastFireTime == 0.0f || m_flNextPrimaryAttack == -1.0f)
+	if (m_flLastFireTime == invalid_time_point || m_flNextPrimaryAttack <= zero_duration)
 	{
 		// At this point, we are assuming that the client has stopped firing
 		// and we are going to reset our book keeping variables.
@@ -1478,7 +1478,7 @@ float CBasePlayerWeapon::GetNextAttackDelay(float delay)
 		m_flLastFireTime = gpGlobals->time;
 	}
 
-	float flNextAttack = UTIL_WeaponTimeBase() + delay;
+	auto flNextAttack = UTIL_WeaponTimeBase() + delay;
 
 	// save the last fire time
 	m_flLastFireTime = gpGlobals->time;

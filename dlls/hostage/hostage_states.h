@@ -224,7 +224,7 @@ public:
 	struct SeqInfo
 	{
 		int seqID;
-		float holdTime;
+		duration_t holdTime;
 		float rate;
 	};
 
@@ -249,8 +249,8 @@ public:
 	};
 
 	void Reset();
-	void AddSequence(CHostageImprov *improv, const char *seqName, float holdTime = -1.0f, float rate = 1.0f);
-	void AddSequence(CHostageImprov *improv, int activity, float holdTime = -1.0f, float rate = 1.0f);
+	void AddSequence(CHostageImprov *improv, const char *seqName, duration_t holdTime = -1.0s, float rate = 1.0f);
+	void AddSequence(CHostageImprov *improv, int activity, duration_t holdTime = -1.0s, float rate = 1.0f);
 
 	bool IsBusy() const { return (m_sequenceCount > 0); }
 	NOXREF bool IsPlaying(CHostageImprov *improv, const char *seqName) const;

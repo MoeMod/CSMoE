@@ -71,7 +71,7 @@ private:
 	const EventListener m_eventRoundStartListener;
 
 	float m_flRagePercent; // [0.0-100.0]
-	float m_flDeadTime;
+	EngineClock::time_point m_flDeadTime;
 	float m_flBackupMaxHealth;
 	float m_flBackupArmor;
 };

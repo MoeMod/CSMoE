@@ -14,9 +14,9 @@ namespace sv {
 #define THOMPSON_MAX_SPEED		240
 #define THOMPSON_DAMAGE		30
 #define THOMPSON_RANGE_MODIFER      0.82
-#define THOMPSON_RELOAD_TIME	3.7
+#define THOMPSON_RELOAD_TIME	3.7s
 #define THOMPSON_ARMOR_RATIO_MODIFIER	1.0
-#define THOMPSON_FIRE_RATE	0.1
+#define THOMPSON_FIRE_RATE	0.1s
 
 class CTHOMPSON : public CBasePlayerWeapon
 {
@@ -43,7 +43,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_thompson.mdl"; }
 
 public:
-	void THOMPSONFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void THOMPSONFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

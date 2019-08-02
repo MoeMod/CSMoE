@@ -77,12 +77,12 @@ public:
 	{
 		pev->spawnflags |= SF_TANK_ACTIVE;
 		pev->nextthink = pev->ltime + 0.1f;
-		m_fireLast = 0.0f;
+		m_fireLast = {};
 	}
 	void TankDeactivate()
 	{
 		pev->spawnflags &= ~SF_TANK_ACTIVE;
-		m_fireLast = 0.0f;
+		m_fireLast = {};
 		StopRotSound();
 	}
 
@@ -110,7 +110,7 @@ public:
 
 protected:
 	CBasePlayer *m_pController;
-	float m_flNextAttack;
+	time_point_t m_flNextAttack;
 	Vector m_vecControllerUsePos;
 
 	float m_yawCenter;        // "Center" yaw
@@ -125,10 +125,10 @@ protected:
 	float m_pitchRange;        // Range of pitch motion as above
 	float m_pitchTolerance;        // Tolerance angle
 
-	float m_fireLast;        // Last time I fired
+	time_point_t m_fireLast;        // Last time I fired
 	float m_fireRate;        // How many rounds/second
-	float m_lastSightTime;        // Last time I saw target
-	float m_persist;        // Persistence of firing (how long do I shoot when I can't see)
+	time_point_t m_lastSightTime;        // Last time I saw target
+	duration_t m_persist;        // Persistence of firing (how long do I shoot when I can't see)
 	float m_minRange;        // Minimum range to aim/track
 	float m_maxRange;        // Max range to aim/track
 
@@ -167,7 +167,7 @@ public:
 
 private:
 	CLaser *m_pLaser;
-	float m_laserTime;
+	time_point_t m_laserTime;
 };
 
 class CFuncTankRocket : public CFuncTank

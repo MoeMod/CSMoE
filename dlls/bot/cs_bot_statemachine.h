@@ -59,15 +59,15 @@ protected:
 		NUM_ATTACK_STATES
 	} m_dodgeState;
 
-	float m_nextDodgeStateTimestamp;
+	time_point_t m_nextDodgeStateTimestamp;
 	CountdownTimer m_repathTimer;
-	float m_scopeTimestamp;
+	time_point_t m_scopeTimestamp;
 	bool m_haveSeenEnemy;
 	bool m_isEnemyHidden;
-	float m_reacquireTimestamp;
-	float m_shieldToggleTimestamp;
+	time_point_t m_reacquireTimestamp;
+	time_point_t m_shieldToggleTimestamp;
 	bool m_shieldForceOpen;
-	float m_pinnedDownTimestamp;
+	time_point_t m_pinnedDownTimestamp;
 	bool m_crouchAndHold;
 	bool m_didAmbushCheck;
 	bool m_dodge;
@@ -168,7 +168,7 @@ public:
 	void SetSearchArea(CNavArea *area) { m_searchFromArea = area; }
 	void SetSearchRange(float range) { m_range = range; }
 
-	void SetDuration(float time) { m_duration = time; }
+	void SetDuration(duration_t time) { m_duration = time; }
 	void SetHoldPosition(bool hold) { m_isHoldingPosition = hold; }
 
 	bool IsAtSpot() const { return m_isAtSpot; }
@@ -179,12 +179,12 @@ private:
 
 	Vector m_hidingSpot;
 	bool m_isAtSpot;
-	float m_duration;
+	duration_t m_duration;
 	bool m_isHoldingPosition;
-	float m_holdPositionTime;
+	duration_t m_holdPositionTime;
 	bool m_heardEnemy;
 
-	float m_firstHeardEnemyTime;
+	time_point_t m_firstHeardEnemyTime;
 	int m_retry;
 	Vector m_leaderAnchorPos;
 };
@@ -228,13 +228,13 @@ private:
 	IntervalTimer m_leaderMotionStateTime;
 
 	bool m_isSneaking;
-	float m_lastSawLeaderTime;
+	time_point_t m_lastSawLeaderTime;
 	CountdownTimer m_repathInterval;
 
 	IntervalTimer m_walkTime;
 	bool m_isAtWalkSpeed;
 
-	float m_waitTime;
+	duration_t m_waitTime;
 	CountdownTimer m_idleTimer;
 };
 

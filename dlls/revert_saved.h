@@ -47,13 +47,13 @@ public:
 	void EXPORT LoadThink();
 
 public:
-	float Duration() const		{ return pev->dmg_take; }
-	float HoldTime() const		{ return pev->dmg_save; }
+	duration_t Duration() const		{ return pev->dmg_take * 1.0s; }
+	duration_t HoldTime() const		{ return pev->dmg_save * 1.0s; }
 	float MessageTime() const	{ return m_messageTime; }
 	float LoadTime() const		{ return m_loadTime; }
 
-	void SetDuration(float duration)	{ pev->dmg_take = duration; }
-	void SetHoldTime(float hold)		{ pev->dmg_save = hold; }
+	void SetDuration(duration_t duration)	{ pev->dmg_take = duration / 1s; }
+	void SetHoldTime(duration_t hold)		{ pev->dmg_save = hold / 1s; }
 	void SetMessageTime(float time)		{ m_messageTime = time; }
 	void SetLoadTime(float time)		{ m_loadTime = time; }
 

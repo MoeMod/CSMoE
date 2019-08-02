@@ -78,7 +78,7 @@ void HostageAnimateState::StartSequence(CHostageImprov *improv, const SeqInfo *s
 
 		hostage->pev->sequence = seqInfo->seqID;
 		hostage->ResetSequenceInfo();
-		hostage->m_fSequenceLoops = (seqInfo->holdTime > 0) ? TRUE : FALSE;
+		hostage->m_fSequenceLoops = (seqInfo->holdTime > 0s) ? TRUE : FALSE;
 		hostage->pev->frame = (seqInfo->rate < 0) ? 255 : 0;
 		hostage->pev->framerate = seqInfo->rate * hostage->pev->framerate;
 	}
@@ -86,7 +86,7 @@ void HostageAnimateState::StartSequence(CHostageImprov *improv, const SeqInfo *s
 	m_isHolding = false;
 }
 
-void HostageAnimateState::AddSequence(CHostageImprov *improv, const char *seqName, float holdTime, float rate)
+void HostageAnimateState::AddSequence(CHostageImprov *improv, const char *seqName, duration_t holdTime, float rate)
 {
 	int seqIndex;
 	CHostage *hostage = improv->GetEntity();
@@ -109,7 +109,7 @@ void HostageAnimateState::AddSequence(CHostageImprov *improv, const char *seqNam
 	StartSequence(improv, m_sequence);
 }
 
-void HostageAnimateState::AddSequence(CHostageImprov *improv, int activity, float holdTime, float rate)
+void HostageAnimateState::AddSequence(CHostageImprov *improv, int activity, duration_t holdTime, float rate)
 {
 	CHostage *hostage = improv->GetEntity();
 	void *model = GET_MODEL_PTR(hostage->edict());
@@ -129,7 +129,7 @@ void HostageAnimateState::AddSequence(CHostageImprov *improv, int activity, floa
 
 bool HostageAnimateState::IsDoneHolding()
 {
-	if (m_sequence[m_currentSequence].holdTime < 0)
+	if (m_sequence[m_currentSequence].holdTime < 0s)
 		return true;
 
 	if (m_isHolding)
@@ -153,7 +153,7 @@ void HostageAnimateState::OnUpdate(CHostageImprov *improv)
 	if (!improv->GetEntity()->m_fSequenceFinished && m_sequence[m_currentSequence].seqID >= 0)
 		return;
 
-	if (m_sequence[m_currentSequence].holdTime >= 0)
+	if (m_sequence[m_currentSequence].holdTime >= 0s)
 	{
 		if (!IsDoneHolding())
 		{

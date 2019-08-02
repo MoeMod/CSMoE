@@ -31,6 +31,7 @@
 #ifdef _WIN32
 #pragma once
 #endif
+#include <chrono>
 
 namespace sv {
 
@@ -93,7 +94,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[3];
 
 	int m_animate;
-	float m_lastTime;
+	time_point_t m_lastTime;
 	float m_maxFrame;
 	int m_renderfx;
 	int m_rendermode;
@@ -131,7 +132,7 @@ public:
 public:
 	static TYPEDESCRIPTION m_SaveData[1];
 
-	int m_flStartTime;
+	std::chrono::time_point<moe::EngineClock, std::chrono::duration<int>> m_flStartTime;
 };
 
 }

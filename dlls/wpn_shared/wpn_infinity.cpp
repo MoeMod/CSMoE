@@ -93,13 +93,13 @@ void CInfinity::PrimaryAttack(void)
 	}
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		InfinityFire((0.09) * m_flAccuracy, 0.2, FALSE);
+		InfinityFire((0.09) * m_flAccuracy, 0.2s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		InfinityFire((0.055) * m_flAccuracy, 0.2, FALSE);
+		InfinityFire((0.055) * m_flAccuracy, 0.2s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		InfinityFire((0.01) * m_flAccuracy, 0.2, FALSE);
+		InfinityFire((0.01) * m_flAccuracy, 0.2s, FALSE);
 	else
-		InfinityFire((0.03) * m_flAccuracy, 0.2, FALSE);
+		InfinityFire((0.03) * m_flAccuracy, 0.2s, FALSE);
 }
 
 void CInfinity::SecondaryAttack(void)
@@ -111,23 +111,23 @@ void CInfinity::SecondaryAttack(void)
 	}
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		InfinityFire2((0.08) * m_flAccuracy, 0.1, FALSE);
+		InfinityFire2((0.08) * m_flAccuracy, 0.1s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		InfinityFire2((0.04) * m_flAccuracy, 0.1, FALSE);
+		InfinityFire2((0.04) * m_flAccuracy, 0.1s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		InfinityFire2((0.02) * m_flAccuracy, 0.1, FALSE);
+		InfinityFire2((0.02) * m_flAccuracy, 0.1s, FALSE);
 	else
-		InfinityFire2((0.03) * m_flAccuracy, 0.1, FALSE);
+		InfinityFire2((0.03) * m_flAccuracy, 0.1s, FALSE);
 }
 
-void CInfinity::InfinityFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CInfinity::InfinityFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
 		m_flAccuracy = (m_iShotsFired * m_iShotsFired) / 240.0f + 0.5f;
 
@@ -144,7 +144,7 @@ void CInfinity::InfinityFire(float flSpread, float flCycleTime, BOOL fUseAutoAim
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -191,15 +191,15 @@ void CInfinity::InfinityFire(float flSpread, float flCycleTime, BOOL fUseAutoAim
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 2;
 }
 
-void CInfinity::InfinityFire2(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CInfinity::InfinityFire2(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_iShotsFired++;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
 		m_flAccuracy = (m_iShotsFired * m_iShotsFired) / 210.0f + 0.65f;
 
@@ -216,7 +216,7 @@ void CInfinity::InfinityFire2(float flSpread, float flCycleTime, BOOL fUseAutoAi
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -263,7 +263,7 @@ void CInfinity::InfinityFire2(float flSpread, float flCycleTime, BOOL fUseAutoAi
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(0.35, 0.4, 0.1, 0.15, 2.3, 3.3, 2);
@@ -285,7 +285,7 @@ void CInfinity::Reload(void)
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
 
-	if (DefaultReload(m_iMaxClip, ANIM_RELOAD, 4.0))
+	if (DefaultReload(m_iMaxClip, ANIM_RELOAD, 4.0s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -305,7 +305,7 @@ void CInfinity::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 
 		if (m_iClip == 1)
 			SendWeaponAnim(ANIM_IDLE_LEFTEMPTY, UseDecrement() != FALSE);

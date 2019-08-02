@@ -89,8 +89,8 @@ BOOL CAWP::Deploy(void)
 {
 	if (DefaultDeploy("models/v_awp.mdl", "models/p_awp.mdl", AWP_DRAW, "rifle", UseDecrement() != FALSE))
 	{
-		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.45;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1;
+		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.45s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 		return TRUE;
 	}
 
@@ -108,24 +108,24 @@ void CAWP::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CAWP::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AWPFire(0.85, 1.45, FALSE);
+		AWPFire(0.85, 1.45s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		AWPFire(0.25, 1.45, FALSE);
+		AWPFire(0.25, 1.45s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 10)
-		AWPFire(0.1, 1.45, FALSE);
+		AWPFire(0.1, 1.45s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		AWPFire(0.0, 1.45, FALSE);
+		AWPFire(0.0, 1.45s, FALSE);
 	else
-		AWPFire(0.001, 1.45, FALSE);
+		AWPFire(0.001, 1.45s, FALSE);
 }
 
-void CAWP::AWPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CAWP::AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov != 90)
 	{
@@ -141,7 +141,7 @@ void CAWP::AWPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -174,7 +174,7 @@ void CAWP::AWPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 2;
 }
 
@@ -183,7 +183,7 @@ void CAWP::Reload(void)
 	if (m_pPlayer->ammo_338mag <= 0)
 		return;
 
-	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, 2.5))
+	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, 2.5s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -206,7 +206,7 @@ void CAWP::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(AWP_IDLE, UseDecrement() != FALSE);
 	}
 }

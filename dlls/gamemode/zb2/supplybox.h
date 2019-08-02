@@ -16,7 +16,7 @@ public:
 	void SendPositionMsg();
 
 public:
-	float m_flNextRadarTime;
+	time_point_t m_flNextRadarTime;
 	int m_iSupplyboxIndex;
 };
 

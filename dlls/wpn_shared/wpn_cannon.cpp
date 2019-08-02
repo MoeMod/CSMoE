@@ -151,10 +151,10 @@ int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 
 void CCannon::PrimaryAttack(void)
 {
-	CannonFire(0, 3.5, FALSE);
+	CannonFire(0, 3.5s, FALSE);
 }
 
-void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CCannon::CannonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
@@ -163,7 +163,7 @@ void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -206,7 +206,7 @@ void CCannon::CannonFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.5f;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.5s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(13.0, 2.25, 1.45, 0.7, 12.0, 10.0, 1);

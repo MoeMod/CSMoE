@@ -55,8 +55,8 @@ public:
 	static void HostageDied();
 	static bool PlayerCanBuy(CBasePlayer *pPlayer);
 
-	float FillAccountTime;
-	float ServerRestartTime;
+	time_point_t FillAccountTime;
+	time_point_t ServerRestartTime;
 	BOOL fInBuyArea;
 	BOOL fVisitedBuyArea;
 	bool fVGUIMenus;

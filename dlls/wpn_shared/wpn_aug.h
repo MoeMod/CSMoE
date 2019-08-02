@@ -39,7 +39,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 350.0f,250.0f,300.0f,100.0f,0.6f }; }
 
 public:
-	void AUGFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

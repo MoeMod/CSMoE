@@ -60,7 +60,7 @@ void CBasePlatTrain::KeyValue(KeyValueData *pkvd)
 		m_flLip = Q_atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "wait")) {
-		m_flWait = Q_atof(pkvd->szValue);
+		m_flWait = Q_atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "height")) {
 		m_flHeight = Q_atof(pkvd->szValue);
@@ -524,17 +524,17 @@ void CFuncPlatRot::HitTop()
 	pev->angles = m_end;
 }
 
-void CFuncPlatRot::RotMove(Vector &destAngle, float time)
+void CFuncPlatRot::RotMove(Vector &destAngle, duration_t time)
 {
 	// set destdelta to the vector needed to move
 	Vector vecDestDelta = destAngle - pev->angles;
 
 	// Travel time is so short, we're practically there already;  so make it so.
-	if (time >= 0.1) {
-		pev->avelocity = vecDestDelta / time;
+	if (time >= 0.1s) {
+		pev->avelocity = vecDestDelta / (time / 1s);
 	} else {
 		pev->avelocity = vecDestDelta;
-		pev->nextthink = pev->ltime + 1;
+		pev->nextthink = pev->ltime + 1s;
 	}
 }
 
@@ -574,7 +574,7 @@ void CFuncTrain::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 			pev->target = pev->enemy->v.targetname;
 		}
 
-		pev->nextthink = 0;
+		pev->nextthink = invalid_time_point;
 		pev->velocity = g_vecZero;
 		if (pev->noiseStopMoving) {
 			EMIT_SOUND(ENT(pev), CHAN_VOICE, (char *) STRING(pev->noiseStopMoving), m_volume, ATTN_NORM);
@@ -605,12 +605,12 @@ void CFuncTrain::Wait()
 				EMIT_SOUND(ENT(pev), CHAN_VOICE, (char *) STRING(pev->noiseStopMoving), m_volume, ATTN_NORM);
 			}
 
-			pev->nextthink = 0;
+			pev->nextthink = invalid_time_point;
 			return;
 		}
 	}
 
-	if (m_flWait != 0) {
+	if (m_flWait != 0s) {
 		// -1 wait will wait forever!
 		pev->nextthink = pev->ltime + m_flWait;
 		if (pev->noiseMovement) {
@@ -788,14 +788,14 @@ void CFuncTrain::OverrideReset()
 	CBaseEntity *pTarg;
 
 	// Are we moving?
-	if (pev->velocity != g_vecZero && pev->nextthink != 0) {
+	if (pev->velocity != g_vecZero && pev->nextthink != invalid_time_point) {
 		pev->target = pev->message;
 
 		// now find our next target
 		pTarg = GetNextTarget();
 
 		if (!pTarg) {
-			pev->nextthink = 0;
+			pev->nextthink = invalid_time_point;
 			pev->velocity = g_vecZero;
 		} else    // Keep moving for 0.1 secs, then find path_corner again and restart
 		{
@@ -834,7 +834,7 @@ void CFuncTrackTrain::KeyValue(KeyValueData *pkvd)
 		CBaseEntity::KeyValue(pkvd);
 }
 
-void CFuncTrackTrain::NextThink(float thinkTime, BOOL alwaysThink)
+void CFuncTrackTrain::NextThink(time_point_t thinkTime, BOOL alwaysThink)
 {
 	if (alwaysThink)
 		pev->flags |= FL_ALWAYSTHINK;
@@ -1635,14 +1635,14 @@ TRAIN_CODE CFuncTrackChange::EvaluateTrain(CPathTrack *pcurrent)
 
 void CFuncTrackChange::UpdateTrain(Vector &dest)
 {
-	float time = (pev->nextthink - pev->ltime);
+	duration_t time = (pev->nextthink - pev->ltime);
 
 	m_train->pev->velocity = pev->velocity;
 	m_train->pev->avelocity = pev->avelocity;
 	m_train->NextThink(m_train->pev->ltime + time, FALSE);
 
 	// Attempt at getting the train to rotate properly around the origin of the trackchange
-	if (time <= 0)
+	if (time <= 0s)
 		return;
 
 	Vector offset = m_train->pev->origin - pev->origin;
@@ -1657,7 +1657,7 @@ void CFuncTrackChange::UpdateTrain(Vector &dest)
 	local.z = DotProduct(offset, gpGlobals->v_up);
 
 	local = local - offset;
-	m_train->pev->velocity = pev->velocity + (local * (1.0 / time));
+	m_train->pev->velocity = pev->velocity + (local * (1.0s / time));
 }
 
 void CFuncTrackChange::GoDown()
@@ -1782,7 +1782,7 @@ void CFuncTrackChange::HitBottom()
 		m_train->SetTrack(m_trackBottom);
 	}
 	SetThink(NULL);
-	pev->nextthink = -1;
+	pev->nextthink = invalid_time_point;
 
 	UpdateAutoTargets(m_toggle_state);
 	EnableUse();
@@ -1800,7 +1800,7 @@ void CFuncTrackChange::HitTop()
 
 	// Don't let the plat go back down
 	SetThink(NULL);
-	pev->nextthink = -1;
+	pev->nextthink = invalid_time_point;
 
 	UpdateAutoTargets(m_toggle_state);
 	EnableUse();
@@ -1977,7 +1977,7 @@ void CGunTarget::Wait()
 	pev->target = pTarget->pev->target;
 	SetThink(&CGunTarget::Next);
 
-	if (m_flWait != 0) {
+	if (m_flWait != 0s) {
 		// -1 wait will wait forever!
 		pev->nextthink = pev->ltime + m_flWait;
 	} else {
@@ -1989,7 +1989,7 @@ void CGunTarget::Wait()
 void CGunTarget::Stop()
 {
 	pev->velocity = g_vecZero;
-	pev->nextthink = 0;
+	pev->nextthink = invalid_time_point;
 	pev->takedamage = DAMAGE_NO;
 }
 

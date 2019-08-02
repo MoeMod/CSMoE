@@ -41,14 +41,14 @@ public:
 	void KeyValue(KeyValueData *pkvd) override;
 	int Save(CSave &save) override;
 	int Restore(CRestore &restore) override;
-	float GetDelay() override { return m_flWait; }
-	virtual float GetDelay() const { return m_flWait; }
+	duration_t GetDelay() override { return m_flWait; }
+	virtual duration_t GetDelay() const { return m_flWait; }
 
 public:
 	static TYPEDESCRIPTION m_SaveData[1];
 
 private:
-	float m_flWait;
+	duration_t m_flWait;
 };
 
 }

@@ -12,6 +12,7 @@
 #endif
 
 #include "port.h"
+#include "xash3d_types.h"
 #include "minmax.h"
 #include "protected_things.h"
 
@@ -36,7 +37,6 @@
 
 typedef int BOOL;
 typedef int qboolean;
-typedef unsigned long ULONG;
 typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;

@@ -18,6 +18,13 @@ typedef byte		rgb_t[3];		// unsigned byte colorpack
 typedef vec_t		matrix3x4[3][4];
 typedef vec_t		matrix4x4[4][4];
 
+#ifndef time_point_t
+typedef float		time_point_t;
+#endif
+#ifndef duration_t
+typedef float		duration_t;
+#endif
+
 #undef true
 #undef false
 

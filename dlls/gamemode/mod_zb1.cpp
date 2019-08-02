@@ -116,7 +116,7 @@ void CMod_Zombi::Think()
 		CheckFreezePeriodExpired();
 	}
 
-	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		RestartRound();
 	}
@@ -160,7 +160,7 @@ void CMod_Zombi::Think()
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating && !m_bFreezePeriod)
+	if (TimeRemaining() <= 0s && !m_bRoundTerminating && !m_bFreezePeriod)
 		HumanWin();
 }
 

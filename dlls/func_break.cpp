@@ -932,7 +932,7 @@ void CPushable::Spawn()
 
 	// Multiply by area of the box's cross-section (assume 1000 units^3 standard volume)
 	pev->skin = (int)((pev->skin * (pev->maxs.x - pev->mins.x) * (pev->maxs.y - pev->mins.y)) * 0.0005);
-	m_soundTime = 0;
+	m_soundTime = {};
 }
 
 void CPushable::Precache()
@@ -1075,7 +1075,7 @@ void CPushable::Move(CBaseEntity *pOther, int push)
 		pevToucher->velocity.x = pev->velocity.x;
 		pevToucher->velocity.y = pev->velocity.y;
 
-		if ((gpGlobals->time - m_soundTime) > 0.7f)
+		if ((gpGlobals->time - m_soundTime) > 0.7s)
 		{
 			m_soundTime = gpGlobals->time;
 

@@ -156,7 +156,7 @@ void CFuncTank::KeyValue(KeyValueData *pkvd)
 		pev->noise = ALLOC_STRING(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "persistence")) {
-		m_persist = Q_atof(pkvd->szValue);
+		m_persist = duration_t(Q_atof(pkvd->szValue));
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "bullet")) {
 		m_bulletType = (TANKBULLET) Q_atoi(pkvd->szValue);
@@ -243,7 +243,7 @@ void CFuncTank::StopControl()
 
 	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
 
-	pev->nextthink = 0;
+	pev->nextthink = {};
 	m_pController = NULL;
 
 	if (IsActive()) {
@@ -262,7 +262,7 @@ void CFuncTank::ControllerPostFrame()
 		Vector vecForward;
 		UTIL_MakeVectorsPrivate(pev->angles, vecForward, NULL, NULL);
 
-		m_fireLast = gpGlobals->time - (1.0f / m_fireRate) - 0.01f;
+		m_fireLast = gpGlobals->time - duration_t(1.0f / m_fireRate) - 0.01s;
 		Fire(BarrelPosition(), vecForward, m_pController->pev);
 
 		if (m_pController && m_pController->IsPlayer()) {
@@ -465,9 +465,9 @@ void CFuncTank::TrackTarget()
 		if (fire) {
 			Fire(BarrelPosition(), forward, pev);
 		} else
-			m_fireLast = 0;
+			m_fireLast = {};
 	} else
-		m_fireLast = 0;
+		m_fireLast = {};
 }
 
 // If barrel is offset, add in additional rotation
@@ -496,7 +496,7 @@ void CFuncTank::AdjustAnglesForBarrel(Vector &angles, float distance)
 
 void CFuncTank::Fire(const Vector &barrelEnd, const Vector &forward, entvars_t *pevAttacker)
 {
-	if (m_fireLast != 0.0f) {
+	if (m_fireLast != time_point_t()) {
 		if (m_iszSpriteSmoke) {
 			CSprite *pSprite = CSprite::SpriteCreate(STRING(m_iszSpriteSmoke), barrelEnd, TRUE);
 
@@ -515,7 +515,7 @@ void CFuncTank::Fire(const Vector &barrelEnd, const Vector &forward, entvars_t *
 			pSprite->SetScale(m_spriteScale);
 
 			// Hack Hack, make it stick around for at least 100 ms.
-			pSprite->pev->nextthink += 0.1;
+			pSprite->pev->nextthink += 0.1s;
 		}
 
 		SUB_UseTargets(this, USE_TOGGLE, 0);
@@ -566,11 +566,11 @@ LINK_ENTITY_TO_CLASS(func_tank, CFuncTankGun);
 
 void CFuncTankGun::Fire(const Vector &barrelEnd, const Vector &forward, entvars_t *pevAttacker)
 {
-	if (m_fireLast != 0.0f) {
+	if (m_fireLast != time_point_t()) {
 		// FireBullets needs gpGlobals->v_up, etc.
 		UTIL_MakeAimVectors(pev->angles);
 
-		int bulletCount = (int) ((gpGlobals->time - m_fireLast) * m_fireRate);
+		int bulletCount = (int) ((gpGlobals->time - m_fireLast) / (1s / m_fireRate));
 
 		if (bulletCount > 0) {
 			for (int i = 0; i < bulletCount; ++i) {
@@ -656,11 +656,11 @@ void CFuncTankLaser::Fire(const Vector &barrelEnd, const Vector &forward, entvar
 	int i;
 	TraceResult tr;
 
-	if (m_fireLast != 0.0f && GetLaser()) {
+	if (m_fireLast != time_point_t() && GetLaser()) {
 		// TankTrace needs gpGlobals->v_up, etc.
 		UTIL_MakeAimVectors(pev->angles);
 
-		int bulletCount = (int) ((gpGlobals->time - m_fireLast) * m_fireRate);
+		int bulletCount = (int) ((gpGlobals->time - m_fireLast) / (1s / m_fireRate));
 		if (bulletCount) {
 			for (i = 0; i < bulletCount; ++i) {
 				m_pLaser->pev->origin = barrelEnd;
@@ -670,7 +670,7 @@ void CFuncTankLaser::Fire(const Vector &barrelEnd, const Vector &forward, entvar
 				m_pLaser->TurnOn();
 				m_pLaser->pev->dmgtime = gpGlobals->time - 1.0f;
 				m_pLaser->FireAtPoint(tr);
-				m_pLaser->pev->nextthink = 0;
+				m_pLaser->pev->nextthink = {};
 			}
 
 			CFuncTank::Fire(barrelEnd, forward, pev);
@@ -692,8 +692,8 @@ void CFuncTankRocket::Fire(const Vector &barrelEnd, const Vector &forward, entva
 {
 	int i;
 
-	if (m_fireLast != 0.0f) {
-		int bulletCount = (int) ((gpGlobals->time - m_fireLast) * m_fireRate);
+	if (m_fireLast != time_point_t()) {
+		int bulletCount = (int)((gpGlobals->time - m_fireLast) / (1s / m_fireRate));
 		if (bulletCount > 0) {
 			for (i = 0; i < bulletCount; ++i) {
 				CBaseEntity *pRocket = CBaseEntity::Create("rpg_rocket", barrelEnd, pev->angles, edict());
@@ -718,8 +718,8 @@ void CFuncTankMortar::KeyValue(KeyValueData *pkvd)
 
 void CFuncTankMortar::Fire(const Vector &barrelEnd, const Vector &forward, entvars_t *pevAttacker)
 {
-	if (m_fireLast != 0.0f) {
-		int bulletCount = (int) ((gpGlobals->time - m_fireLast) * m_fireRate);
+	if (m_fireLast != time_point_t()) {
+		int bulletCount = (int) ((gpGlobals->time - m_fireLast) / (1s / m_fireRate));
 
 		// Only create 1 explosion
 		if (bulletCount > 0) {

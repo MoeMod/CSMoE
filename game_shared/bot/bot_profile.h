@@ -78,8 +78,8 @@ public:
 		m_skin = 0;
 		m_difficultyFlags = 0;
 		m_voicePitch = 100;
-		m_reactionTime = 0.3f;
-		m_attackDelay = 0.0f;
+		m_reactionTime = 0.3s;
+		m_attackDelay = 0.0s;
 		m_teams = BOT_TEAM_ANY;
 		m_voiceBank = 0;
 		m_prefersSilencer = false;
@@ -97,8 +97,8 @@ public:
 	int GetSkin() const { return m_skin; }
 	bool IsDifficulty(BotDifficultyType diff) const;
 	int GetVoicePitch() const { return m_voicePitch; }
-	float GetReactionTime() const { return m_reactionTime; }
-	float GetAttackDelay() const { return m_attackDelay; }
+	duration_t GetReactionTime() const { return m_reactionTime; }
+	duration_t GetAttackDelay() const { return m_attackDelay; }
 	int GetVoiceBank() const { return m_voiceBank; }
 	bool IsValidForTeam(BotProfileTeamType team) const;
 	bool PrefersSilencer() const { return m_prefersSilencer; }
@@ -126,8 +126,8 @@ private:
 
 	unsigned char m_difficultyFlags;
 	int m_voicePitch;
-	float m_reactionTime;
-	float m_attackDelay;
+	duration_t m_reactionTime;
+	duration_t m_attackDelay;
 	enum BotProfileTeamType m_teams;
 	bool m_prefersSilencer;
 	int m_voiceBank;

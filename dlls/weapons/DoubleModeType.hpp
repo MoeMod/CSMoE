@@ -101,9 +101,9 @@ template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TDeployDoubleMode : public CBase
 {
 public:
-	static constexpr float DefaultDeployTime = 0.75f;
+	static constexpr const auto &DefaultDeployTime = 0.75s;
 	static constexpr float DefaultAccuracy = 0.2f;
-	//static constexpr float DoubleMode_ChangeTime = ?;
+	//static constexpr const auto & DoubleMode_ChangeTime = ?;
 
 public:
 	BOOL Deploy(void) override

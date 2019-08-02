@@ -156,7 +156,7 @@ BOOL CScarLight::Deploy(void)
 	if (m_iSwing)
 	{
 		DefaultDeploy("models/v_scar.mdl", "models/p_scar.mdl", CHANGE_SCARL, "rifle", UseDecrement() != FALSE);
-		m_pPlayer->m_flNextAttack = 6.0f;
+		m_pPlayer->m_flNextAttack = 6.0s;
 	}
 	else
 	{
@@ -170,19 +170,19 @@ void CScarLight::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		GalilFire(0.035 + (0.4) * m_flAccuracy, 0.087, FALSE);
+		GalilFire(0.035 + (0.4) * m_flAccuracy, 0.087s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		GalilFire(0.035 + (0.07) * m_flAccuracy, 0.087, FALSE);
+		GalilFire(0.035 + (0.07) * m_flAccuracy, 0.087s, FALSE);
 	else
-		GalilFire((0.025) * m_flAccuracy, 0.087, FALSE);
+		GalilFire((0.025) * m_flAccuracy, 0.087s, FALSE);
 }
 
-void CScarLight::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CScarLight::GalilFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -196,7 +196,7 @@ void CScarLight::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -229,7 +229,7 @@ void CScarLight::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.3, 0.45, 0.325, 0.05, 4.5, 2.5, 7);
@@ -255,7 +255,7 @@ void CScarLight::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(SCARL_AMMO, SCARL_RELOAD, 3.05))
+	if (DefaultReload(SCARL_AMMO, SCARL_RELOAD, 3.05s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -274,7 +274,7 @@ void CScarLight::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(SCARL_IDLE1, UseDecrement() != FALSE);
 }
 

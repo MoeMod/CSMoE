@@ -99,29 +99,29 @@ void CG3SG1::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CG3SG1::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		G3SG1Fire(0.45, 0.25, FALSE);
+		G3SG1Fire(0.45, 0.25s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		G3SG1Fire(0.15, 0.25, FALSE);
+		G3SG1Fire(0.15, 0.25s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		G3SG1Fire(0.035, 0.25, FALSE);
+		G3SG1Fire(0.035, 0.25s, FALSE);
 	else
-		G3SG1Fire(0.055, 0.25, FALSE);
+		G3SG1Fire(0.055, 0.25s, FALSE);
 }
 
-void CG3SG1::G3SG1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CG3SG1::G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov == 90)
-		flCycleTime += 0.025;
+		flCycleTime += 0.025s;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy = (gpGlobals->time - m_flLastFire) * 0.3 + 0.55;
+		m_flAccuracy = ((gpGlobals->time - m_flLastFire) / 1s) * 0.3 + 0.55;
 
 		if (m_flAccuracy > 0.98)
 			m_flAccuracy = 0.98;
@@ -136,7 +136,7 @@ void CG3SG1::G3SG1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -169,7 +169,7 @@ void CG3SG1::G3SG1Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 2.75, 3.25) + m_pPlayer->pev->punchangle.x * 0.25;
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -1.25, 1.5);
@@ -180,7 +180,7 @@ void CG3SG1::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 
-	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, 3.5))
+	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, 3.5s))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
@@ -205,7 +205,7 @@ void CG3SG1::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(G3SG1_IDLE, UseDecrement() != FALSE);
 	}
 }

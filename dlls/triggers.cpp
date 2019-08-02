@@ -265,7 +265,7 @@ void CMultiManager::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "wait"))
 	{
-		m_flWait = Q_atof(pkvd->szValue);
+		m_flWait = duration_t(Q_atof(pkvd->szValue));
 		pkvd->fHandled = TRUE;
 	}
 	else // add this field to the target list
@@ -277,7 +277,7 @@ void CMultiManager::KeyValue(KeyValueData *pkvd)
 
 			UTIL_StripToken(pkvd->szKeyName, tmp);
 			m_iTargetName[m_cTargets] = ALLOC_STRING(tmp);
-			m_flTargetDelay[m_cTargets] = Q_atof(pkvd->szValue);
+			m_flTargetDelay[m_cTargets] = duration_t(Q_atof(pkvd->szValue));
 			m_cTargets++;
 
 			pkvd->fHandled = TRUE;
@@ -304,7 +304,7 @@ void CMultiManager::Spawn()
 			{
 				// Swap out of order elements
 				int name = m_iTargetName[i];
-				float delay = m_flTargetDelay[i];
+				auto delay = m_flTargetDelay[i];
 
 				m_iTargetName[i] = m_iTargetName[i - 1];
 				m_flTargetDelay[i] = m_flTargetDelay[i - 1];
@@ -370,9 +370,7 @@ BOOL CMultiManager::HasTarget(string_t targetname)
 
 void CMultiManager::ManagerThink()
 {
-	float time;
-
-	time = gpGlobals->time - m_startTime;
+	auto time = gpGlobals->time - m_startTime;
 	while (m_index < m_cTargets && m_flTargetDelay[ m_index ] <= time)
 	{
 		FireTargets(STRING(m_iTargetName[ m_index ]), m_hActivator, this, USE_TOGGLE, 0);
@@ -529,7 +527,7 @@ void CTriggerMonsterJump::Spawn()
 
 	InitTrigger();
 
-	pev->nextthink = 0;
+	pev->nextthink = invalid_time_point;
 	pev->speed = 200;
 	m_flHeight = 150;
 
@@ -929,8 +927,8 @@ LINK_ENTITY_TO_CLASS(trigger_multiple, CTriggerMultiple);
 
 void CTriggerMultiple::Spawn()
 {
-	if (m_flWait == 0)
-		m_flWait = 0.2;
+	if (m_flWait == zero_duration)
+		m_flWait = 0.2s;
 
 	InitTrigger();
 
@@ -963,7 +961,7 @@ LINK_ENTITY_TO_CLASS(trigger_once, CTriggerOnce);
 
 void CTriggerOnce::Spawn()
 {
-	m_flWait = -1;
+	m_flWait = -1s;
 	CTriggerMultiple::Spawn();
 }
 
@@ -1022,7 +1020,7 @@ void CBaseTrigger::ActivateMultiTrigger(CBaseEntity *pActivator)
 		UTIL_ShowMessage(STRING(pev->message), pActivator);
 	}
 
-	if (m_flWait > 0)
+	if (m_flWait > 0s)
 	{
 		SetThink(&CBaseTrigger::MultiWaitOver);
 		pev->nextthink = gpGlobals->time + m_flWait;
@@ -1088,7 +1086,7 @@ void CTriggerCounter::Spawn()
 {
 	// By making the flWait be -1, this counter-trigger will disappear after it's activated
 	// (but of course it needs cTriggersLeft "uses" before that happens).
-	m_flWait = -1;
+	m_flWait = -1s;
 
 	if (m_cTriggersLeft == 0)
 	{
@@ -2052,7 +2050,7 @@ void CTriggerCamera::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "wait"))
 	{
-		m_flWait = Q_atof(pkvd->szValue);
+		m_flWait = duration_t(Q_atof(pkvd->szValue));
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "moveto"))
@@ -2215,8 +2213,8 @@ void CTriggerCamera::FollowTarget()
 	if (dy > 180)
 		dy = dy - 360;
 
-	pev->avelocity.x = dx * 40 * gpGlobals->frametime;
-	pev->avelocity.y = dy * 40 * gpGlobals->frametime;
+	pev->avelocity.x = dx * 40 * gpGlobals->frametime / 1s;
+	pev->avelocity.y = dy * 40 * gpGlobals->frametime / 1s;
 
 	if (!(pev->spawnflags & SF_CAMERA_PLAYER_TAKECONTROL))
 	{
@@ -2239,7 +2237,7 @@ void CTriggerCamera::Move()
 		return;
 
 	// Subtract movement from the previous frame
-	m_moveDistance -= pev->speed * gpGlobals->frametime;
+	m_moveDistance -= (pev->speed * gpGlobals->frametime) / 1s;
 
 	// Have we moved enough to reach the target?
 	if (m_moveDistance <= 0)
@@ -2279,14 +2277,14 @@ void CTriggerCamera::Move()
 
 	if (m_flStopTime > gpGlobals->time)
 	{
-		pev->speed = UTIL_Approach(0, pev->speed, m_deceleration * gpGlobals->frametime);
+		pev->speed = UTIL_Approach(0, pev->speed, m_deceleration * gpGlobals->frametime / 1s);
 	}
 	else
 	{
-		pev->speed = UTIL_Approach(m_targetSpeed, pev->speed, m_acceleration * gpGlobals->frametime);
+		pev->speed = UTIL_Approach(m_targetSpeed, pev->speed, m_acceleration * gpGlobals->frametime / 1s);
 	}
 
-	float fraction = 2 * gpGlobals->frametime;
+	float fraction = 2 * gpGlobals->frametime / 1s;
 	pev->velocity = ((pev->movedir * pev->speed) * fraction) + (pev->velocity * (1 - fraction));
 }
 

@@ -41,7 +41,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
 
 public:
-	void USPFire(float flSpread, float flCycleTime, BOOL fUseSemi);
+	void USPFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	NOXREF void MakeBeam();
 	NOXREF void BeamUpdate();
 

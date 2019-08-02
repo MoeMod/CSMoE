@@ -224,15 +224,15 @@ public:
 	bool m_bStartDefuse;
 	bool m_bIsC4;
 	EntityHandle<CBasePlayer> m_pBombDefuser;
-	float m_flDefuseCountDown;
-	float m_flC4Blow;
-	float m_flNextFreqInterval;
-	float m_flNextBeep;
-	float m_flNextFreq;
+	time_point_t m_flDefuseCountDown;
+	time_point_t m_flC4Blow;
+	duration_t m_flNextFreqInterval;
+	time_point_t m_flNextBeep;
+	time_point_t m_flNextFreq;
 	const char *m_sBeepName;
 	float m_fAttenu;
-	float m_flNextBlink;
-	float m_fNextDefuse;
+	time_point_t m_flNextBlink;
+	time_point_t m_fNextDefuse;
 	bool m_bJustBlew;
 	int m_iTeam;
 	int m_iCurWave;
@@ -424,16 +424,16 @@ public:
 	BOOL AddSecondaryAmmo(int iCount, char *szName, int iMaxCarry);
 	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt,
 	                   int skiplocal = 0);
-	int DefaultReload(int iClipSize, int iAnim, float fDelay, int body = 0);
-	void FireRemaining(int &shotsFired, float &shootTime, BOOL isGlock18);
+	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
+	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
 	void EjectBrassLate();
 	NOXREF void MakeBeam();
 	NOXREF void BeamUpdate();
 	void ReloadSound();
-	float GetNextAttackDelay(float delay);
-	float GetNextAttackDelay2(float delay);
+	duration_t GetNextAttackDelay(duration_t delay);
+	//float GetNextAttackDelay2(float delay);
 	virtual bool HasSecondaryAttack(); // virtualized...
 	virtual BOOL IsPistol()
 	{
@@ -449,9 +449,9 @@ public:
 
 	int m_iPlayEmptySound;
 	int m_fFireOnEmpty;
-	float m_flNextPrimaryAttack;
-	float m_flNextSecondaryAttack;
-	float m_flTimeWeaponIdle;
+	duration_t m_flNextPrimaryAttack;
+	duration_t m_flNextSecondaryAttack;
+	duration_t m_flTimeWeaponIdle;
 	int m_iPrimaryAmmoType;
 	int m_iSecondaryAmmoType;
 	int m_iClip;
@@ -466,22 +466,22 @@ public:
 	int m_iDirection;
 	bool m_bSecondarySilencerOn;
 	float m_flAccuracy;
-	float m_flLastFire;
+	time_point_t m_flLastFire;
 	int m_iShotsFired;
 	Vector m_vVecAiming;
 	string_t model_name;
-	float m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
+	time_point_t m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
 	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
-	float m_flFamasShoot;
+	time_point_t m_flFamasShoot;
 	int m_iFamasShotsFired;
 	float m_fBurstSpread;
 	int m_iWeaponState;
-	float m_flNextReload;
-	float m_flDecreaseShotsFired;
+	duration_t m_flNextReload;
+	time_point_t m_flDecreaseShotsFired;
 	unsigned short m_usFireGlock18;
 	unsigned short m_usFireFamas;
-	float m_flPrevPrimaryAttack;
-	float m_flLastFireTime;
+	duration_t m_flPrevPrimaryAttack;
+	time_point_t m_flLastFireTime;
 };
 
 }

@@ -99,29 +99,29 @@ void CSG550::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CSG550::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		SG550Fire((0.45) * (1 - m_flAccuracy), 0.25, FALSE);
+		SG550Fire((0.45) * (1 - m_flAccuracy), 0.25s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		SG550Fire(0.15, 0.25, FALSE);
+		SG550Fire(0.15, 0.25s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		SG550Fire((0.04) * (1 - m_flAccuracy), 0.25, FALSE);
+		SG550Fire((0.04) * (1 - m_flAccuracy), 0.25s, FALSE);
 	else
-		SG550Fire((0.05) * (1 - m_flAccuracy), 0.25, FALSE);
+		SG550Fire((0.05) * (1 - m_flAccuracy), 0.25s, FALSE);
 }
 
-void CSG550::SG550Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CSG550::SG550Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov == 90)
 		flSpread += 0.025;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy = (gpGlobals->time - m_flLastFire) * 0.35 + 0.65;
+		m_flAccuracy = ((gpGlobals->time - m_flLastFire) / 1s) * 0.35 + 0.65;
 
 		if (m_flAccuracy > 0.98)
 			m_flAccuracy = 0.98;
@@ -134,7 +134,7 @@ void CSG550::SG550Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -166,7 +166,7 @@ void CSG550::SG550Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 1.5, 1.75) + m_pPlayer->pev->punchangle.x * 0.25;
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -1.0, 1.0);
@@ -177,7 +177,7 @@ void CSG550::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, 3.35))
+	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, 3.35s))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
@@ -203,7 +203,7 @@ void CSG550::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(SG550_IDLE, UseDecrement() != FALSE);
 	}
 }

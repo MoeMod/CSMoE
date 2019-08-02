@@ -674,7 +674,7 @@ void CGib::Spawn(const char *szGibModel)
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 	pev->nextthink = gpGlobals->time + 4.0f;
-	m_lifeTime = 25.0f;
+	m_lifeTime = 25.0s;
 
 	SetThink(&CGib::WaitTillLand);
 	SetTouch(&CGib::BounceGibTouch);
@@ -884,11 +884,11 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 		TraceResult tr2;
 		Vector vecLOS;
 		float flDot;
-		float fadeTime;
-		float fadeHold;
+		duration_t fadeTime;
+		duration_t fadeHold;
 		int alpha;
 		CBasePlayer *pPlayer;
-		float currentHoldTime;
+		duration_t currentHoldTime;
 
 		if (!pEntity->IsPlayer())
 			continue;
@@ -929,20 +929,20 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 
 			if (flDot < 0) {
 				alpha = 200;
-				fadeTime = flAdjustedDamage * 1.75;
-				fadeHold = flAdjustedDamage / 3.5;
+				fadeTime = flAdjustedDamage * 1.75s;
+				fadeHold = duration_t(flAdjustedDamage / 3.5);
 			} else {
 				alpha = 255;
-				fadeTime = flAdjustedDamage * 3;
-				fadeHold = flAdjustedDamage / 1.5;
+				fadeTime = flAdjustedDamage * 3s;
+				fadeHold = duration_t(flAdjustedDamage / 1.5);
 			}
 
 			currentHoldTime = pPlayer->m_blindStartTime + pPlayer->m_blindHoldTime - gpGlobals->time;
 
-			if (currentHoldTime > 0.0 && alpha == 255)
+			if (currentHoldTime > 0.0s && alpha == 255)
 				fadeHold += currentHoldTime;
 
-			if (pPlayer->m_blindStartTime != 0.0f && pPlayer->m_blindFadeTime != 0.0f) {
+			if (pPlayer->m_blindStartTime > time_point_t() && pPlayer->m_blindFadeTime > duration_t()) {
 				if ((pPlayer->m_blindStartTime + pPlayer->m_blindFadeTime + pPlayer->m_blindHoldTime) >
 				    gpGlobals->time) {
 					if (pPlayer->m_blindFadeTime > fadeTime)

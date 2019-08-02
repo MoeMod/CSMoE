@@ -99,7 +99,7 @@ public:
 	int m_bloodColor;
 	int m_cBloodDecals;
 	int m_material;
-	float m_lifeTime;
+	duration_t m_lifeTime;
 };
 
 }

@@ -39,7 +39,7 @@ public:
 		const char *GetCSModelName() override { return "models/w_mg3.mdl"; }
 
 public:
-	void MG3Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

@@ -41,7 +41,7 @@
 #define SOUNDLISTTYPE_FREE 1
 #define SOUNDLISTTYPE_ACTIVE 2
 
-#define SOUND_NEVER_EXPIRE -1
+#define SOUND_NEVER_EXPIRE invalid_time_point // -1
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -59,7 +59,7 @@ public:
 	Vector m_vecOrigin;
 	int m_iType;
 	int m_iVolume;
-	float m_flExpireTime;
+	time_point_t m_flExpireTime;
 	int m_iNext;
 	int m_iNextAudible;
 

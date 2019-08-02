@@ -192,7 +192,7 @@ public:
 	~BotSpeakable();
 
 	char *m_phrase;
-	float m_duration;
+	duration_t m_duration;
 	PlaceCriteria m_place;
 	CountCriteria m_count;
 };
@@ -204,8 +204,7 @@ typedef std::vector<BotSpeakableVector *> BotVoiceBankVector;
 class BotPhrase
 {
 public:
-	char *GetSpeakable(int bankIndex,
-	                   float *duration = NULL) const;        // return a random speakable and its duration in seconds that meets the current criteria
+	char *GetSpeakable(int bankIndex, duration_t *duration = nullptr) const;        // return a random speakable and its duration in seconds that meets the current criteria
 
 	// NOTE: Criteria must be set just before the GetSpeakable() call, since they are shared among all bots
 	void ClearCriteria() const;
@@ -294,7 +293,7 @@ public:
 	const BotPhraseList *GetPlaceList() const { return &m_placeList; }
 
 	// return time last statement of given type was emitted by a teammate for the given place
-	float GetPlaceStatementInterval(Place place) const;
+	duration_t GetPlaceStatementInterval(Place place) const;
 
 	// set time of last statement of given type was emitted by a teammate for the given place
 	void ResetPlaceStatementInterval(Place place) const;
@@ -334,15 +333,15 @@ inline int BotPhraseManager::FindPlaceIndex(Place where) const
 	return -1;
 }
 
-inline float BotPhraseManager::GetPlaceStatementInterval(Place place) const
+inline duration_t BotPhraseManager::GetPlaceStatementInterval(Place place) const
 {
 	int index = FindPlaceIndex(place);
 
 	if (index < 0)
-		return 999999.9f;
+		return duration_t(999999.9f);
 
 	if (index >= m_placeCount)
-		return 999999.9f;
+		return duration_t(999999.9f);
 
 	return m_placeStatementHistory[index].timer.GetElapsedTime();
 }
@@ -364,7 +363,7 @@ inline void BotPhraseManager::ResetPlaceStatementInterval(Place place) const
 class BotStatement
 {
 public:
-	BotStatement(BotChatterInterface *chatter, BotStatementType type, float expireDuration);
+	BotStatement(BotChatterInterface *chatter, BotStatementType type, duration_t expireDuration);
 	~BotStatement();
 
 public:
@@ -396,9 +395,8 @@ public:
 
 	void AppendPhrase(const BotPhrase *phrase);
 
-	void SetStartTime(
-			float timestamp) { m_startTime = timestamp; }            // define the earliest time this statement can be spoken
-	float GetStartTime() const { return m_startTime; }
+	void SetStartTime(time_point_t timestamp) { m_startTime = timestamp; }            // define the earliest time this statement can be spoken
+	time_point_t GetStartTime() const { return m_startTime; }
 
 	enum ConditionType
 	{
@@ -423,8 +421,7 @@ public:
 
 	bool Update();                                // emit statement over time, return false if statement is done
 	bool IsSpeaking() const { return m_isSpeaking; }        // return true if this statement is currently being spoken
-	float
-	GetTimestamp() const { return m_timestamp; }        // get time statement was created (but not necessarily started talking)
+	time_point_t GetTimestamp() const { return m_timestamp; }        // get time statement was created (but not necessarily started talking)
 
 	void AttachMeme(
 			BotMeme *meme);                        // attach a meme to this statement, to be transmitted to other friendly bots when spoken
@@ -441,13 +438,13 @@ public:
 	Place m_place;                        // explicit place - note some phrases have implicit places as well
 	BotMeme *m_meme;                    // a statement can only have a single meme for now
 
-	float m_timestamp;                    // time when message was created
-	float m_startTime;                    // the earliest time this statement can be spoken
-	float m_expireTime;                    // time when this statement is no longer valid
-	float m_speakTimestamp;                    // time when message began being spoken
+	time_point_t m_timestamp;                    // time when message was created
+	time_point_t m_startTime;                    // the earliest time this statement can be spoken
+	time_point_t m_expireTime;                    // time when this statement is no longer valid
+	time_point_t m_speakTimestamp;                    // time when message began being spoken
 	bool m_isSpeaking;                    // true if this statement is current being spoken
 
-	float m_nextTime;                    // time for next phrase to begin
+	time_point_t m_nextTime;                    // time for next phrase to begin
 
 	enum
 	{
@@ -503,7 +500,7 @@ public:
 
 	CCSBot *GetOwner() const { return m_me; }
 	bool IsTalking() const;                                // return true if we are currently talking
-	float GetRadioSilenceDuration();                        // return time since any teammate said anything
+	duration_t GetRadioSilenceDuration();                        // return time since any teammate said anything
 	void ResetRadioSilenceDuration();
 
 	enum
@@ -521,7 +518,7 @@ public:
 	int GetPitch() const { return m_pitch; }
 
 	// things the bots can say
-	void Say(const char *phraseName, float lifetime = 3.0f, float delay = 0.0f);
+	void Say(const char *phraseName, duration_t lifetime = 3.0s, duration_t delay = 0.0s);
 
 	void AnnouncePlan(const char *phraseName, Place place);
 	void Affirmative();
@@ -562,8 +559,7 @@ public:
 
 	void CelebrateWin();
 
-	void Encourage(const char *phraseName, float repeatInterval = 10.0f,
-	               float lifetime = 3.0f);        // "encourage" the player to do the scenario
+	void Encourage(const char *phraseName, duration_t repeatInterval = 10.0s, duration_t lifetime = 3.0s);        // "encourage" the player to do the scenario
 
 	void KilledFriend();
 	void FriendlyFire();
@@ -578,7 +574,7 @@ private:
 	CCSBot *m_me;                        // the bot this chatter is for
 
 	bool m_seeAtLeastOneEnemy;
-	float m_timeWhenSawFirstEnemy;
+	time_point_t m_timeWhenSawFirstEnemy;
 	bool m_reportedEnemies;
 	bool m_requestedBombLocation;                // true if we already asked where the bomb has been planted
 
@@ -631,13 +627,13 @@ inline BotStatement *BotChatterInterface::GetStatement() const
 
 extern BotPhraseManager *TheBotPhrases;
 
-inline void BotChatterInterface::Say(const char *phraseName, float lifetime, float delay)
+inline void BotChatterInterface::Say(const char *phraseName, duration_t lifetime, duration_t delay)
 {
 	BotStatement *say = new BotStatement(this, REPORT_MY_INTENTION, lifetime);
 
 	say->AppendPhrase(TheBotPhrases->GetPhrase(phraseName));
 
-	if (delay > 0.0f)
+	if (delay > 0.0s)
 		say->SetStartTime(gpGlobals->time + delay);
 
 	AddStatement(say);

@@ -78,7 +78,7 @@ void FollowState::OnEnter(CCSBot *me)
 	m_lastLeaderPos.y = -99999999.9f;
 	m_lastLeaderPos.z = -99999999.9f;
 
-	m_lastSawLeaderTime = 0;
+	m_lastSawLeaderTime = invalid_time_point;
 
 	// set re-pathing frequency
 	m_repathInterval.Invalidate();
@@ -89,7 +89,7 @@ void FollowState::OnEnter(CCSBot *me)
 	m_isAtWalkSpeed = false;
 
 	m_leaderMotionState = INVALID;
-	m_idleTimer.Start(RANDOM_FLOAT(2.0f, 5.0f));
+	m_idleTimer.Start(RandomDuration(2.0s, 5.0s));
 }
 
 // Determine the leader's motion state by tracking his speed
@@ -114,7 +114,7 @@ void FollowState::ComputeLeaderMotionState(float leaderSpeed)
 			m_isAtWalkSpeed = true;
 		}
 
-		const float minWalkTime = 0.25f;
+		constexpr auto minWalkTime = 0.25s;
 		if (m_walkTime.GetElapsedTime() > minWalkTime)
 		{
 			m_leaderMotionState = WALKING;
@@ -130,7 +130,7 @@ void FollowState::ComputeLeaderMotionState(float leaderSpeed)
 	if (prevState != m_leaderMotionState)
 	{
 		m_leaderMotionStateTime.Start();
-		m_waitTime = RANDOM_FLOAT(1.0f, 3.0f);
+		m_waitTime = RandomDuration(1.0s, 3.0s);
 	}
 }
 
@@ -163,7 +163,7 @@ void FollowState::OnUpdate(CCSBot *me)
 
 	// if we are moving, we are not idle
 	if (me->IsNotMoving() == false)
-		m_idleTimer.Start(RANDOM_FLOAT(2.0f, 5.0f));
+		m_idleTimer.Start(RandomDuration(2.0s, 5.0s));
 
 	// compute the leader's speed
 	float leaderSpeed = Vector2D(m_leader->pev->velocity.x, m_leader->pev->velocity.y).Length();
@@ -202,7 +202,7 @@ void FollowState::OnUpdate(CCSBot *me)
 	}
 
 	// if we haven't seen the leader for a long time, run
-	const float longTime = 20.0f;
+	constexpr auto longTime = 20.0s;
 	if (gpGlobals->time - m_lastSawLeaderTime > longTime)
 		m_isSneaking = false;
 
@@ -218,13 +218,13 @@ void FollowState::OnUpdate(CCSBot *me)
 	if (!me->HasPath() && m_leaderMotionState == STOPPED && m_leaderMotionStateTime.GetElapsedTime() > m_waitTime)
 	{
 		// throttle how often this check occurs
-		m_waitTime += RANDOM_FLOAT(1.0f, 3.0f);
+		m_waitTime += RandomDuration(1.0s, 3.0s);
 
 		// the leader has stopped - if we are close to him, take up a hiding spot
 		if ((m_leader->pev->origin - me->pev->origin).IsLengthLessThan(nearLeaderRange))
 		{
 			const float hideRange = 250.0f;
-			if (me->TryToHide(NULL, -1.0f, hideRange, false, USE_NEAREST))
+			if (me->TryToHide(NULL, -1.0s, hideRange, false, USE_NEAREST))
 			{
 				me->ResetStuckMonitor();
 				return;
@@ -313,7 +313,7 @@ void FollowState::OnUpdate(CCSBot *me)
 				me->PrintIfWatched("Pathfind to leader failed.\n");
 
 			// throttle how often we repath
-			m_repathInterval.Start(0.5f);
+			m_repathInterval.Start(0.5s);
 			m_idleTimer.Reset();
 		}
 	}

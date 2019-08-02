@@ -23,6 +23,7 @@
 #include "const.h"
 #include "entity_state.h"
 #include "r_efx.h"
+#include <chrono>
 
 namespace cl {
 
@@ -170,9 +171,9 @@ Always 0.0 on client, even if not predicting weapons ( won't get called
  in that case )
 =====================
 */
-inline float UTIL_WeaponTimeBase( void )
+inline std::chrono::duration<float> UTIL_WeaponTimeBase( void )
 {
-	return 0.0;
+	return {};
 }
 
 

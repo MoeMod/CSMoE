@@ -69,7 +69,7 @@ namespace sv {
 */
 DLL_GLOBAL CBotManager *TheBots = NULL;
 
-float CCSBotManager::m_flNextCVarCheck = 0.0f;
+time_point_t CCSBotManager::m_flNextCVarCheck = invalid_time_point;
 bool CCSBotManager::m_isMapDataLoaded = false;
 bool CCSBotManager::m_isLearningMap = false;
 bool CCSBotManager::m_isAnalysisRequested = false;
@@ -78,7 +78,7 @@ NavEditCmdType CCSBotManager::m_editCmd = EDIT_NONE;
 
 CCSBotManager::CCSBotManager()
 {
-	m_flNextCVarCheck = 0.0f;
+	m_flNextCVarCheck = invalid_time_point;
 
 	m_zoneCount = 0;
 	SetLooseBomb(NULL);
@@ -91,7 +91,7 @@ CCSBotManager::CCSBotManager()
 	m_editCmd = EDIT_NONE;
 
 	m_navPlace = false;
-	m_roundStartTimestamp = 0.0f;
+	m_roundStartTimestamp = invalid_time_point;
 
 	m_bServerActive = false;
 
@@ -165,7 +165,7 @@ void CCSBotManager::RestartRound()
 
 	ResetRadioMessageTimestamps();
 
-	m_lastSeenEnemyTimestamp = -9999.9f;
+	m_lastSeenEnemyTimestamp = time_point_t::min();
 
 	m_roundStartTimestamp = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
 
@@ -1429,7 +1429,7 @@ void CCSBotManager::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntit
 
 // Get the time remaining before the planted bomb explodes
 
-float CCSBotManager::GetBombTimeLeft() const
+duration_t CCSBotManager::GetBombTimeLeft() const
 {
 	return (g_pGameRules->m_iC4Timer - (gpGlobals->time - m_bombPlantTimestamp));
 }
@@ -1538,10 +1538,10 @@ unsigned int CCSBotManager::GetPlayerPriority(CBasePlayer *player) const
 // Return the last time the given radio message was sent for given team
 // 'teamID' can be CT or TERRORIST
 
-float CCSBotManager::GetRadioMessageTimestamp(GameEventType event, int teamID) const
+time_point_t CCSBotManager::GetRadioMessageTimestamp(GameEventType event, int teamID) const
 {
 	if (event <= EVENT_START_RADIO_1 || event >= EVENT_END_RADIO)
-		return 0.0f;
+		return invalid_time_point;
 
 	int i = (teamID == TERRORIST) ? 0 : 1;
 	return m_radioMsgTimestamp[ event - EVENT_START_RADIO_1 ][ i ];
@@ -1549,10 +1549,10 @@ float CCSBotManager::GetRadioMessageTimestamp(GameEventType event, int teamID) c
 
 // Return the interval since the last time this message was sent
 
-float CCSBotManager::GetRadioMessageInterval(GameEventType event, int teamID) const
+duration_t CCSBotManager::GetRadioMessageInterval(GameEventType event, int teamID) const
 {
 	if (event <= EVENT_START_RADIO_1 || event >= EVENT_END_RADIO)
-		return 99999999.9f;
+		return duration_t::max();
 
 	int i = (teamID == TERRORIST) ? 0 : 1;
 	return gpGlobals->time - m_radioMsgTimestamp[ event - EVENT_START_RADIO_1 ][ i ];
@@ -1578,7 +1578,7 @@ void CCSBotManager::ResetRadioMessageTimestamps()
 	{
 		for (size_t m = 0; m < ARRAYSIZE(m_radioMsgTimestamp); ++m)
 		{
-			m_radioMsgTimestamp[m][t] = 0.0f;
+			m_radioMsgTimestamp[m][t] = invalid_time_point;
 		}
 	}
 }

@@ -41,7 +41,7 @@ public:
 public:
 	bool m_bStartedArming;
 	bool m_bBombPlacedAnimation;
-	float m_fArmedTime;
+	time_point_t m_fArmedTime;
 
 private:
 	bool m_bHasShield;

@@ -129,12 +129,12 @@ void CHostage::Spawn()
 	SET_MODEL(edict(), STRING(pev->model));
 	SetActivity(ACT_IDLE);
 
-	m_flNextChange = 0;
+	m_flNextChange = invalid_time_point;
 	m_State = STAND;
 	m_hTargetEnt = NULL;
 	m_hStoppedTargetEnt = NULL;
 	m_vPathToFollow[0] = Vector(0, 0, 0);
-	m_flFlinchTime = 0;
+	m_flFlinchTime = invalid_time_point;
 	m_bRescueMe = FALSE;
 
 	UTIL_SetSize(pev, VEC_HOSTAGE_HULL_MIN, VEC_HOSTAGE_HULL_MAX);
@@ -149,9 +149,9 @@ void CHostage::Spawn()
 	DROP_TO_FLOOR(edict());
 
 	SetThink(&CHostage::IdleThink);
-	pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	pev->nextthink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 
-	m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	m_flNextFullThink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 	m_vStart = pev->origin;
 	m_vStartAngles = pev->angles;
 	m_vOldPos = Vector(9999, 9999, 9999);
@@ -160,14 +160,14 @@ void CHostage::Spawn()
 	nTargetNode = -1;
 	m_fHasPath = FALSE;
 
-	m_flLastPathCheck = -1;
-	m_flPathAcquired = -1;
-	m_flPathCheckInterval = 0.1;
-	m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
+	m_flLastPathCheck = invalid_time_point;
+	m_flPathAcquired = invalid_time_point;
+	m_flPathCheckInterval = 0.1s;
+	m_flNextRadarTime = gpGlobals->time + RandomDuration(0.0s, 1.0s);
 
 	m_LocalNav = new CLocalNav(this);
 	m_bStuck = FALSE;
-	m_flStuckTime = 0;
+	m_flStuckTime = invalid_time_point;
 	m_improv = NULL;
 }
 
@@ -244,7 +244,7 @@ void CHostage::SetActivity(Activity act)
 
 void CHostage::IdleThink()
 {
-	float flInterval;
+	duration_t flInterval;
 	const float upkeepRate = 0.03f;
 	const float giveUpTime = (1 / 30.0f);
 	float const updateRate = 0.1f;
@@ -268,7 +268,7 @@ void CHostage::IdleThink()
 
 	pev->nextthink = gpGlobals->time + giveUpTime;
 
-	flInterval = StudioFrameAdvance(0);
+	flInterval = StudioFrameAdvance({});
 	DispatchAnimEvents(flInterval);
 
 	if (m_improv != NULL)
@@ -281,7 +281,7 @@ void CHostage::IdleThink()
 		return;
 	}
 
-	m_flNextFullThink = gpGlobals->time + 0.1;
+	m_flNextFullThink = gpGlobals->time + 0.1s;
 
 	if (pev->deadflag == DEAD_DEAD)
 	{
@@ -289,7 +289,7 @@ void CHostage::IdleThink()
 		return;
 	}
 
-	if( m_hTargetEnt != nullptr && ( ( m_bStuck && gpGlobals->time - m_flStuckTime > 5.0f ) || m_hTargetEnt->pev->deadflag != DEAD_NO ) )
+	if( m_hTargetEnt != nullptr && ( ( m_bStuck && gpGlobals->time - m_flStuckTime > 5.0s ) || m_hTargetEnt->pev->deadflag != DEAD_NO ) )
 	{
 		m_State = STAND;
 		m_hTargetEnt = NULL;
@@ -421,13 +421,13 @@ void CHostage::IdleThink()
 			{
 				m_vOldPos = pev->origin;
 
-				if (!g_pGameRules->m_fTeamCount)
+				if (g_pGameRules->m_fTeamCount <= invalid_time_point)
 				{
 					SendHostagePositionMsg();
 				}
 			}
 
-			m_flNextRadarTime = gpGlobals->time + 1;
+			m_flNextRadarTime = gpGlobals->time + 1s;
 		}
 	}
 }
@@ -441,8 +441,8 @@ void CHostage::Remove()
 	pev->deadflag = DEAD_DEAD;
 
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
-	pev->nextthink = -1;
-	m_flNextFullThink = -1;
+	pev->nextthink = invalid_time_point;
+	m_flNextFullThink = invalid_time_point;
 }
 
 void CHostage::RePosition()
@@ -462,7 +462,7 @@ void CHostage::RePosition()
 	m_bTouched = FALSE;
 	m_bRescueMe = FALSE;
 
-	m_flNextRadarTime = 0;
+	m_flNextRadarTime = invalid_time_point;
 	m_vOldPos = Vector(9999, 9999, 9999);
 
 	UTIL_SetOrigin(pev, m_vStart);
@@ -478,9 +478,9 @@ void CHostage::RePosition()
 	m_fHasPath = FALSE;
 	nTargetNode = -1;
 
-	m_flLastPathCheck = -1;
-	m_flPathAcquired = -1;
-	m_flPathCheckInterval = 0.1f;
+	m_flLastPathCheck = invalid_time_point;
+	m_flPathAcquired = invalid_time_point;
+	m_flPathCheckInterval = 0.1s;
 	m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
 }
 
@@ -577,7 +577,7 @@ int CHostage::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 
 		g_pGameRules->CheckWinConditions();
 
-		if (!g_pGameRules->m_fTeamCount)
+		if (g_pGameRules->m_fTeamCount == invalid_time_point)
 			SendHostageEventMsg();
 
 		pev->nextthink = gpGlobals->time + 3;
@@ -918,7 +918,7 @@ void CHostage::DoFollow()
 		if (nTargetNode == -1)
 		{
 			m_fHasPath = FALSE;
-			m_flPathCheckInterval = 0.1f;
+			m_flPathCheckInterval = 0.1s;
 		}
 	}
 
@@ -950,7 +950,7 @@ void CHostage::DoFollow()
 
 	if (pev->flags & FL_ONGROUND)
 	{
-		if (m_flPathAcquired != -1 && m_flPathAcquired + 2 > gpGlobals->time)
+		if (m_flPathAcquired != invalid_time_point && m_flPathAcquired + 2s > gpGlobals->time)
 		{
 			if (pev->velocity.Length2D() < 1 || nTargetNode == -1)
 			{
@@ -1065,11 +1065,11 @@ void CHostage::NavReady()
 	{
 		if (!m_fHasPath)
 		{
-			m_flPathCheckInterval += 0.1;
+			m_flPathCheckInterval += 0.1s;
 
-			if (m_flPathCheckInterval >= 0.5f)
+			if (m_flPathCheckInterval >= 0.5s)
 			{
-				m_flPathCheckInterval = 0.5f;
+				m_flPathCheckInterval = 0.5s;
 			}
 		}
 	}
@@ -1078,7 +1078,7 @@ void CHostage::NavReady()
 		m_fHasPath = TRUE;
 		nTargetNode = -1;
 		m_flPathAcquired = gpGlobals->time;
-		m_flPathCheckInterval = 0.5;
+		m_flPathCheckInterval = 0.5s;
 
 		m_nPathNodes = m_LocalNav->SetupPathNodes(nindexPath, vecNodes, 1);
 	}
@@ -1199,7 +1199,7 @@ void CHostage::PreThink()
 	vecSrc = pev->origin;
 
 	flInterval = s_flStepSize_LocalNav;
-	vecDest = vecSrc + pev->velocity * gpGlobals->frametime;
+	vecDest = vecSrc + pev->velocity * (gpGlobals->frametime / 1s);
 	vecDest.z = vecSrc.z;
 
 	TRACE_MONSTER_HULL(edict(), vecSrc, vecDest, dont_ignore_monsters, edict(), &tr);
@@ -1240,7 +1240,7 @@ void CHostage::PreThink()
 
 		vecNewOrigin.z = tr.vecEndPos.z;
 		UTIL_SetOrigin(pev, vecNewOrigin);
-		pev->velocity.z += pev->gravity * g_psv_gravity->value * gpGlobals->frametime;
+		pev->velocity.z += pev->gravity * g_psv_gravity->value * (gpGlobals->frametime / 1s);
 	}
 }
 
@@ -1570,7 +1570,7 @@ void SimpleChatter::AddSound(HostageChatterType type, const char *filename)
 	Q_snprintf(actualFilename, sizeof(actualFilename), "sound\\%s", filename);
 
 	chatter->file[chatter->count].filename = CloneString(filename);
-	chatter->file[chatter->count].duration = (double)GET_APPROX_WAVE_PLAY_LEN(actualFilename) / 1000.0;
+	chatter->file[chatter->count].duration = duration_t((double)GET_APPROX_WAVE_PLAY_LEN(actualFilename) / 1000.0);
 
 	chatter->needsShuffle = true;
 	chatter->count++;
@@ -1603,7 +1603,7 @@ void SimpleChatter::Shuffle(ChatterSet *chatter)
 	chatter->needsShuffle = false;
 }
 
-char *SimpleChatter::GetSound(HostageChatterType type, float *duration)
+char *SimpleChatter::GetSound(HostageChatterType type, duration_t *duration)
 {
 	ChatterSet *chatter = &m_chatter[type];
 	char *sound;
@@ -1620,10 +1620,10 @@ char *SimpleChatter::GetSound(HostageChatterType type, float *duration)
 	return sound;
 }
 
-float SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
+duration_t SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
 {
 	CHostage *hostage;
-	float duration;
+	duration_t duration;
 	char *sound;
 	int pitch;
 	int attenuation = 1;
@@ -1633,7 +1633,7 @@ float SimpleChatter::PlaySound(CBaseEntity *entity, HostageChatterType type)
 
 	if (sound == NULL)
 	{
-		return 0;
+		return 0s;
 	}
 
 	switch (hostage->m_whichModel)

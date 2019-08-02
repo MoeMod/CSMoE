@@ -49,7 +49,7 @@ public:
 
 public:
 	std::vector<CZombieSpawn *> m_vecZombieSpawns;
-	float m_flNextSpawnNPC;
+	EngineClock::time_point m_flNextSpawnNPC;
 
 	EventDispatcher<void(CBasePlayer *attacker, float &)> m_eventAdjustDamage;
 	EventDispatcher<void(CMonster *victim, CBaseEntity *attacker)> m_eventMonsterKilled;

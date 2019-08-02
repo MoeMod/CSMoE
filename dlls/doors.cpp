@@ -270,7 +270,7 @@ void CBaseDoor::Spawn()
 		SetTouch(&CBaseDoor::DoorTouch);
 	}
 
-	m_lastBlockedTimestamp = 0;
+	m_lastBlockedTimestamp = {};
 }
 
 void CBaseDoor::Restart()
@@ -659,8 +659,8 @@ void CBaseDoor::DoorHitTop()
 		pev->nextthink = pev->ltime + m_flWait;
 		SetThink(&CBaseDoor::DoorGoDown);
 
-		if (m_flWait == -1) {
-			pev->nextthink = -1;
+		if (m_flWait == -1s) {
+			pev->nextthink = {};
 		}
 	}
 
@@ -740,7 +740,7 @@ void CBaseDoor::Blocked(CBaseEntity *pOther)
 {
 	edict_t *pentTarget = NULL;
 	CBaseDoor *pDoor = NULL;
-	const float checkBlockedInterval = 0.25f;
+	const duration_t checkBlockedInterval = 0.25s;
 
 	// Hurt the blocker a little.
 	if (pev->dmg != 0.0f) {
@@ -755,7 +755,7 @@ void CBaseDoor::Blocked(CBaseEntity *pOther)
 
 	// if a door has a negative wait, it would never come back if blocked,
 	// so let it just squash the object to death real fast
-	if (m_flWait >= 0) {
+	if (m_flWait >= 0s) {
 		if (m_toggle_state == TS_GOING_DOWN) {
 			DoorGoUp();
 		} else {
@@ -775,7 +775,7 @@ void CBaseDoor::Blocked(CBaseEntity *pOther)
 				if (FClassnameIs(pentTarget, "func_door") || FClassnameIs(pentTarget, "func_door_rotating")) {
 					pDoor = GetClassPtr<CBaseDoor>(VARS(pentTarget));
 
-					if (pDoor->m_flWait >= 0) {
+					if (pDoor->m_flWait >= 0s) {
 						if (pDoor->pev->velocity == pev->velocity && pDoor->pev->avelocity == pev->velocity) {
 							// this is the most hacked, evil, bastardized thing I've ever seen. kjb
 							if (FClassnameIs(pentTarget, "func_door")) {
@@ -1056,7 +1056,7 @@ void CMomentaryDoor::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 
 	// This entity only thinks when it moves, so if it's thinking, it's in the process of moving
 	// play the sound when it starts moving (not yet thinking)
-	if (pev->nextthink < pev->ltime || pev->nextthink == 0) {
+	if (pev->nextthink < pev->ltime || pev->nextthink == time_point_t()) {
 		EMIT_SOUND(ENT(pev), CHAN_STATIC, (char *) STRING (pev->noiseMoving), VOL_NORM, ATTN_NORM);
 	}
 #if 0

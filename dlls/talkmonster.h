@@ -37,7 +37,7 @@ namespace sv {
 class CTalkMonster: public CBaseMonster
 {
 public:
-	static float g_talkWaitTime;
+	static time_point_t g_talkWaitTime;
 };
 
 }

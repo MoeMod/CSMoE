@@ -216,7 +216,7 @@ public:
 	virtual void PlayerSpawn(CBasePlayer *pPlayer) = 0;
 	virtual void PlayerThink(CBasePlayer *pPlayer) = 0;
 	virtual BOOL FPlayerCanRespawn(CBasePlayer *pPlayer) = 0;
-	virtual float FlPlayerSpawnTime(CBasePlayer *pPlayer) = 0;
+	virtual time_point_t FlPlayerSpawnTime(CBasePlayer *pPlayer) = 0;
 	virtual edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer);
 	virtual BOOL AllowAutoTargetCrosshair() { return TRUE; }
 	virtual BOOL ClientCommand_DeadOrAlive(CBasePlayer *pPlayer, const char *pcmd) { return FALSE; }
@@ -228,18 +228,18 @@ public:
 	virtual BOOL CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem);
 	virtual void PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon) = 0;
 	virtual int WeaponShouldRespawn(CBasePlayerItem *pWeapon) = 0;
-	virtual float FlWeaponRespawnTime(CBasePlayerItem *pWeapon) = 0;
-	virtual float FlWeaponTryRespawn(CBasePlayerItem *pWeapon) = 0;
+	virtual time_point_t FlWeaponRespawnTime(CBasePlayerItem *pWeapon) = 0;
+	virtual time_point_t FlWeaponTryRespawn(CBasePlayerItem *pWeapon) = 0;
 	virtual Vector VecWeaponRespawnSpot(CBasePlayerItem *pWeapon) = 0;
 	virtual BOOL CanHaveItem(CBasePlayer *pPlayer, CItem *pItem) = 0;
 	virtual void PlayerGotItem(CBasePlayer *pPlayer, CItem *pItem) = 0;
 	virtual int ItemShouldRespawn(CItem *pItem) = 0;
-	virtual float FlItemRespawnTime(CItem *pItem) = 0;
+	virtual time_point_t FlItemRespawnTime(CItem *pItem) = 0;
 	virtual Vector VecItemRespawnSpot(CItem *pItem) = 0;
 	virtual BOOL CanHaveAmmo(CBasePlayer *pPlayer, const char *pszAmmoName, int iMaxCarry);
 	virtual void PlayerGotAmmo(CBasePlayer *pPlayer, char *szName, int iCount) = 0;
 	virtual int AmmoShouldRespawn(CBasePlayerAmmo *pAmmo) = 0;
-	virtual float FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo) = 0;
+	virtual time_point_t FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo) = 0;
 	virtual Vector VecAmmoRespawnSpot(CBasePlayerAmmo *pAmmo) = 0;
 	virtual float FlHealthChargerRechargeTime() = 0;
 	virtual float FlHEVChargerRechargeTime() { return 0.0f; }
@@ -290,7 +290,7 @@ public:
 	virtual void PlayerSpawn(CBasePlayer *pPlayer);
 	virtual void PlayerThink(CBasePlayer *pPlayer);
 	virtual BOOL FPlayerCanRespawn(CBasePlayer *pPlayer);
-	virtual float FlPlayerSpawnTime(CBasePlayer *pPlayer);
+	virtual time_point_t FlPlayerSpawnTime(CBasePlayer *pPlayer);
 	virtual edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer);
 	virtual BOOL AllowAutoTargetCrosshair();
 	virtual int IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled);
@@ -298,17 +298,17 @@ public:
 	virtual void DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor);
 	virtual void PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon);
 	virtual int WeaponShouldRespawn(CBasePlayerItem *pWeapon);
-	virtual float FlWeaponRespawnTime(CBasePlayerItem *pWeapon);
-	virtual float FlWeaponTryRespawn(CBasePlayerItem *pWeapon);
+	virtual time_point_t FlWeaponRespawnTime(CBasePlayerItem *pWeapon);
+	virtual time_point_t FlWeaponTryRespawn(CBasePlayerItem *pWeapon);
 	virtual Vector VecWeaponRespawnSpot(CBasePlayerItem *pWeapon);
 	virtual BOOL CanHaveItem(CBasePlayer *pPlayer, CItem *pItem);
 	virtual void PlayerGotItem(CBasePlayer *pPlayer, CItem *pItem);
 	virtual int ItemShouldRespawn(CItem *pItem);
-	virtual float FlItemRespawnTime(CItem *pItem);
+	virtual time_point_t FlItemRespawnTime(CItem *pItem);
 	virtual Vector VecItemRespawnSpot(CItem *pItem);
 	virtual void PlayerGotAmmo(CBasePlayer *pPlayer, char *szName, int iCount);
 	virtual int AmmoShouldRespawn(CBasePlayerAmmo *pAmmo);
-	virtual float FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo);
+	virtual time_point_t FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo);
 	virtual Vector VecAmmoRespawnSpot(CBasePlayerAmmo *pAmmo);
 	virtual float FlHealthChargerRechargeTime();
 	virtual int DeadPlayerWeapons(CBasePlayer *pPlayer);
@@ -342,7 +342,7 @@ public:
 	virtual void PlayerSpawn(CBasePlayer *pPlayer);
 	virtual void PlayerThink(CBasePlayer *pPlayer);
 	virtual BOOL FPlayerCanRespawn(CBasePlayer *pPlayer);
-	virtual float FlPlayerSpawnTime(CBasePlayer *pPlayer);
+	virtual time_point_t FlPlayerSpawnTime(CBasePlayer *pPlayer);
 	virtual edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer);
 	virtual BOOL AllowAutoTargetCrosshair();
 	virtual BOOL ClientCommand_DeadOrAlive(CBasePlayer *pPlayer, const char *pcmd);
@@ -356,17 +356,17 @@ public:
 	virtual BOOL CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon);
 	virtual void PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon);
 	virtual int WeaponShouldRespawn(CBasePlayerItem *pWeapon);
-	virtual float FlWeaponRespawnTime(CBasePlayerItem *pWeapon);
-	virtual float FlWeaponTryRespawn(CBasePlayerItem *pWeapon);
+	virtual time_point_t FlWeaponRespawnTime(CBasePlayerItem *pWeapon);
+	virtual time_point_t FlWeaponTryRespawn(CBasePlayerItem *pWeapon);
 	virtual Vector VecWeaponRespawnSpot(CBasePlayerItem *pWeapon);
 	virtual BOOL CanHaveItem(CBasePlayer *pPlayer, CItem *pItem);
 	virtual void PlayerGotItem(CBasePlayer *pPlayer, CItem *pItem);
 	virtual int ItemShouldRespawn(CItem *pItem);
-	virtual float FlItemRespawnTime(CItem *pItem);
+	virtual time_point_t FlItemRespawnTime(CItem *pItem);
 	virtual Vector VecItemRespawnSpot(CItem *pItem);
 	virtual void PlayerGotAmmo(CBasePlayer *pPlayer, char *szName, int iCount);
 	virtual int AmmoShouldRespawn(CBasePlayerAmmo *pAmmo);
-	virtual float FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo);
+	virtual time_point_t FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo);
 	virtual Vector VecAmmoRespawnSpot(CBasePlayerAmmo *pAmmo);
 	virtual float FlHealthChargerRechargeTime();
 	virtual float FlHEVChargerRechargeTime();
@@ -435,7 +435,7 @@ public:
 	bool ShouldSkipSpawn() const { return m_bSkipSpawn; }
 	void MarkSpawnSkipped() { m_bSkipSpawn = false; }
 	//NOXREF void PlayerJoinedTeam(CBasePlayer *pPlayer) { }
-	float TimeRemaining() { return m_iRoundTimeSecs - gpGlobals->time + m_fRoundCount; }
+	duration_t TimeRemaining() { return duration_t(m_iRoundTimeSecs) - (gpGlobals->time - m_fRoundCount); }
 	BOOL TeamFull(int team_id);
 	BOOL TeamStacked(int newTeam_id, int curTeam_id);
 	bool IsVIPQueueEmpty();
@@ -459,7 +459,7 @@ public:
 
 	bool IsMatchStarted()
 	{
-		return (m_fTeamCount != 0.0f || m_fCareerRoundMenuTime != 0.0f || m_fCareerMatchMenuTime != 0.0f);
+		return (m_fTeamCount != invalid_time_point || m_fCareerRoundMenuTime != invalid_time_point || m_fCareerMatchMenuTime != invalid_time_point);
 	}
 	void SendMOTDToClient(edict_t *client);
 
@@ -470,13 +470,13 @@ private:
 
 public:
 	CVoiceGameMgr m_VoiceGameMgr;
-	float m_fTeamCount;                // m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
+	time_point_t m_fTeamCount;                // m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
 	float m_flCheckWinConditions;
-	float m_fRoundCount;
-	int m_iRoundTime;                // (From mp_roundtime) - How many seconds long this round is.
-	int m_iRoundTimeSecs;
-	int m_iIntroRoundTime;                // (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
-	float m_fIntroRoundCount;            // The global time when the intro round ends and the real one starts
+	time_point_t m_fRoundCount;
+	std::chrono::duration<int, std::ratio<1>> m_iRoundTime;                // (From mp_roundtime) - How many seconds long this round is.
+	std::chrono::duration<int, std::ratio<1>> m_iRoundTimeSecs;
+	std::chrono::duration<int, std::ratio<1>> m_iIntroRoundTime;                // (From mp_freezetime) - How many seconds long the intro round (when players are frozen) is.
+	time_point_t m_fIntroRoundCount;            // The global time when the intro round ends and the real one starts
 	// wrote the original "m_flRoundTime" comment for this variable).
 	int m_iAccountTerrorist;
 	int m_iAccountCT;
@@ -504,13 +504,13 @@ public:
 
 	int m_iMapHasVIPSafetyZone;            // 0 = uninitialized;   1 = has VIP safety zone;   2 = DOES not have VIP safetyzone
 	int m_bMapHasCameras;
-	int m_iC4Timer;
+	std::chrono::duration<int, std::ratio<1>> m_iC4Timer;
 	int m_iC4Guy;                    // The current Terrorist who has the C4.
 	int m_iLoserBonus;                // the amount of money the losing team gets. This scales up as they lose more rounds in a row
 	int m_iNumConsecutiveCTLoses;            // the number of rounds the CTs have lost in a row.
 	int m_iNumConsecutiveTerroristLoses;        // the number of rounds the Terrorists have lost in a row.
 
-	float m_fMaxIdlePeriod;                // For the idle kick functionality. This is tha max amount of time that the player has to be idle before being kicked
+	duration_t m_fMaxIdlePeriod;                // For the idle kick functionality. This is tha max amount of time that the player has to be idle before being kicked
 
 	int m_iLimitTeams;
 	bool m_bLevelInitialized;
@@ -542,16 +542,16 @@ public:
 	CBasePlayer *VIPQueue[MAX_VIP_QUEUES];
 
 protected:
-	float m_flIntermissionEndTime;
-	float m_flIntermissionStartTime;
+	time_point_t m_flIntermissionEndTime;
+	time_point_t m_flIntermissionStartTime;
 	BOOL m_iEndIntermissionButtonHit;
-	float m_tmNextPeriodicThink;
+	time_point_t m_tmNextPeriodicThink;
 	bool m_bFirstConnected;
 	bool m_bInCareerGame;
-	float m_fCareerRoundMenuTime;
+	time_point_t m_fCareerRoundMenuTime;
 	int m_iCareerMatchWins;
 	int m_iRoundWinDifference;
-	float m_fCareerMatchMenuTime;
+	time_point_t m_fCareerMatchMenuTime;
 	bool m_bSkipSpawn;
 };
 

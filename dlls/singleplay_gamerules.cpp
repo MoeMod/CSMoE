@@ -108,7 +108,7 @@ BOOL CHalfLifeRules::FPlayerCanRespawn(CBasePlayer *pPlayer)
 	return TRUE;
 }
 
-float CHalfLifeRules::FlPlayerSpawnTime(CBasePlayer *pPlayer)
+time_point_t CHalfLifeRules::FlPlayerSpawnTime(CBasePlayer *pPlayer)
 {
 	return gpGlobals->time;
 }
@@ -133,14 +133,14 @@ void CHalfLifeRules::PlayerGotWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWea
 	;
 }
 
-float CHalfLifeRules::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
+time_point_t CHalfLifeRules::FlWeaponRespawnTime(CBasePlayerItem *pWeapon)
 {
-	return -1;
+	return invalid_time_point;
 }
 
-float CHalfLifeRules::FlWeaponTryRespawn(CBasePlayerItem *pWeapon)
+time_point_t CHalfLifeRules::FlWeaponTryRespawn(CBasePlayerItem *pWeapon)
 {
-	return 0;
+	return invalid_time_point;
 }
 
 Vector CHalfLifeRules::VecWeaponRespawnSpot(CBasePlayerItem *pWeapon)
@@ -188,9 +188,9 @@ int CHalfLifeRules::ItemShouldRespawn(CItem *pItem)
 	return GR_ITEM_RESPAWN_NO;
 }
 
-float CHalfLifeRules::FlItemRespawnTime(CItem *pItem)
+time_point_t CHalfLifeRules::FlItemRespawnTime(CItem *pItem)
 {
-	return -1;
+	return invalid_time_point;
 }
 
 Vector CHalfLifeRules::VecItemRespawnSpot(CItem *pItem)
@@ -213,9 +213,9 @@ int CHalfLifeRules::AmmoShouldRespawn(CBasePlayerAmmo *pAmmo)
 	return GR_AMMO_RESPAWN_NO;
 }
 
-float CHalfLifeRules::FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo)
+time_point_t CHalfLifeRules::FlAmmoRespawnTime(CBasePlayerAmmo *pAmmo)
 {
-	return -1;
+	return invalid_time_point;
 }
 
 Vector CHalfLifeRules::VecAmmoRespawnSpot(CBasePlayerAmmo *pAmmo)

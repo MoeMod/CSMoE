@@ -662,7 +662,7 @@ void CPendulum::Swing()
 	delta = CBaseToggle::AxisDelta(pev->spawnflags, pev->angles, m_center);
 
 	// How much time has passed?
-	dt = gpGlobals->time - m_time;
+	dt = (gpGlobals->time - m_time).count();
 
 	// Remember the last time called
 	m_time = gpGlobals->time;

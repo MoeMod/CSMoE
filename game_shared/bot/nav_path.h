@@ -173,7 +173,7 @@ public:
 	void Update(CImprov *improv);
 
 	bool IsStuck() const { return m_isStuck; }
-	float GetDuration() const { return m_isStuck ? m_stuckTimer.GetElapsedTime() : 0.0f; }
+	duration_t GetDuration() const { return m_isStuck ? m_stuckTimer.GetElapsedTime() : duration_t(); }
 
 private:
 	bool m_isStuck;			// if true, we are stuck
@@ -186,7 +186,7 @@ private:
 	int m_avgVelIndex;
 	int m_avgVelCount;
 	Vector m_lastCentroid;
-	float m_lastTime;
+	time_point_t m_lastTime;
 };
 
 // The CNavPathFollower class implements path following behavior
@@ -204,7 +204,7 @@ public:
 
 	bool IsStuck() const { return m_stuckMonitor.IsStuck(); }			// return true if improv is stuck
 	void ResetStuck() { m_stuckMonitor.Reset(); }
-	float GetStuckDuration() const { return m_stuckMonitor.GetDuration(); }		// return how long we've been stuck
+	duration_t GetStuckDuration() const { return m_stuckMonitor.GetDuration(); }		// return how long we've been stuck
 
 	void FeelerReflexAdjustment(Vector *goalPosition, float height = -1.0f);	// adjust goal position if "feelers" are touched
 

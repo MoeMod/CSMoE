@@ -142,7 +142,7 @@ int CCSBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float fl
 	if (attacker->IsPlayer() && IsEnemy(attacker)) {
 		// Track previous attacker so we don't try to panic multiple times for a shotgun blast
 		CBasePlayer *lastAttacker = m_attacker;
-		float lastAttackedTimestamp = m_attackedTimestamp;
+		auto lastAttackedTimestamp = m_attackedTimestamp;
 
 		// keep track of our last attacker
 		m_attacker = static_cast<CBasePlayer *>(attacker);
@@ -316,7 +316,7 @@ void CCSBot::BotTouch(CBaseEntity *other)
 
 		if (breakIt) {
 			// it's breakable - try to shoot it.
-			SetLookAt("Breakable", &center, PRIORITY_HIGH, 0.2, 0, 5.0);
+			SetLookAt("Breakable", &center, PRIORITY_HIGH, 0.2s, 0, 5.0);
 
 			if (IsUsingGrenade()) {
 				EquipBestWeapon(0);
@@ -467,10 +467,10 @@ void CCSBot::Panic(CBasePlayer *enemy)
 	spot.z = pev->origin.z + RANDOM_FLOAT(-50.0, 50.0);
 
 	// we are stunned for a moment
-	m_surpriseDelay = RANDOM_FLOAT(0.1, 0.2);
+	m_surpriseDelay = duration_t(RANDOM_FLOAT(0.1, 0.2));
 	m_surpriseTimestamp = gpGlobals->time;
 
-	SetLookAt("Panic", &spot, PRIORITY_HIGH, 0, 0, 5.0);
+	SetLookAt("Panic", &spot, PRIORITY_HIGH, 0s, 0, 5.0);
 	PrintIfWatched("Aaaah!\n");
 }
 
@@ -562,14 +562,14 @@ void CCSBot::GetOffLadder()
 
 // Return time when given spot was last checked
 
-float CCSBot::GetHidingSpotCheckTimestamp(HidingSpot *spot) const
+time_point_t CCSBot::GetHidingSpotCheckTimestamp(HidingSpot *spot) const
 {
 	for (int i = 0; i < m_checkedHidingSpotCount; ++i) {
 		if (m_checkedHidingSpot[i].spot->GetID() == spot->GetID())
 			return m_checkedHidingSpot[i].timestamp;
 	}
 
-	return -999999.9f;
+	return time_point_t::min();
 }
 
 // Set the timestamp of the given spot to now.
@@ -578,7 +578,7 @@ float CCSBot::GetHidingSpotCheckTimestamp(HidingSpot *spot) const
 void CCSBot::SetHidingSpotCheckTimestamp(HidingSpot *spot)
 {
 	int leastRecent = 0;
-	float leastRecentTime = gpGlobals->time + 1.0f;
+	time_point_t leastRecentTime = gpGlobals->time + 1.0s;
 
 	for (int i = 0; i < m_checkedHidingSpotCount; ++i) {
 		// if spot is in the set, just update its timestamp
@@ -611,7 +611,7 @@ void CCSBot::SetHidingSpotCheckTimestamp(HidingSpot *spot)
 
 void CCSBot::UpdateHostageEscortCount()
 {
-	const float updateInterval = 1.0f;
+	constexpr duration_t updateInterval = 1.0s;
 	if (m_hostageEscortCount == 0 || gpGlobals->time - m_hostageEscortCountTimestamp < updateInterval)
 		return;
 
@@ -730,7 +730,7 @@ CCSBot::DispositionType CCSBot::GetDisposition() const
 
 // Ignore enemies for a short durationy
 
-void CCSBot::IgnoreEnemies(float duration)
+void CCSBot::IgnoreEnemies(duration_t duration)
 {
 	m_ignoreEnemiesTimer.Start(duration);
 }
@@ -765,7 +765,7 @@ bool CCSBot::IsRogue() const
 
 	// periodically re-evaluate our rogue status
 	if (m_rogueTimer.IsElapsed()) {
-		m_rogueTimer.Start(RANDOM_FLOAT(10, 30));
+		m_rogueTimer.Start(duration_t(RANDOM_FLOAT(10, 30)));
 
 		// our chance of going rogue is inversely proportional to our teamwork attribute
 		const float rogueChance = 100.0f * (1.0f - GetProfile()->GetTeamwork());
@@ -830,7 +830,7 @@ bool CCSBot::IsEndOfSafeTime() const
 
 // Return the amount of "safe time" we have left
 
-float CCSBot::GetSafeTimeRemaining() const
+duration_t CCSBot::GetSafeTimeRemaining() const
 {
 	CCSBotManager *ctrl = TheCSBots();
 
@@ -846,7 +846,7 @@ void CCSBot::AdjustSafeTime()
 	// if we spotted an enemy sooner than we thought possible, adjust our notion of "safe" time
 	if (m_safeTime > ctrl->GetElapsedRoundTime()) {
 		// since right now is not safe, adjust safe time to be a few seconds ago
-		m_safeTime = ctrl->GetElapsedRoundTime() - 2.0f;
+		m_safeTime = ctrl->GetElapsedRoundTime() - 2.0s;
 	}
 }
 
@@ -854,7 +854,7 @@ void CCSBot::AdjustSafeTime()
 
 bool CCSBot::HasNotSeenEnemyForLongTime() const
 {
-	const float longTime = 30.0f;
+	constexpr auto longTime = 30.0s;
 	return (GetTimeSinceLastSawEnemy() > longTime);
 }
 
@@ -868,7 +868,7 @@ bool CCSBot::GuardRandomZone(float range)
 	if (zone != NULL) {
 		CNavArea *rescueArea = ctrl->GetRandomAreaInZone(zone);
 		if (rescueArea != NULL) {
-			Hide(rescueArea, -1.0f, range);
+			Hide(rescueArea, -1.0s, range);
 			return true;
 		}
 	}
@@ -911,13 +911,13 @@ float CCSBot::GetRangeToFarthestEscortedHostage() const
 
 bool CCSBot::IsAwareOfEnemyDeath() const
 {
-	if (GetEnemyDeathTimestamp() == 0.0f)
+	if (GetEnemyDeathTimestamp() == invalid_time_point)
 		return false;
 
 	if (m_enemy == nullptr)
 		return true;
 
-	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > (1.0f - GetProfile()->GetSkill()))
+	if (!m_enemy->IsAlive() && gpGlobals->time - GetEnemyDeathTimestamp() > 1.0s * (1.0f - GetProfile()->GetSkill()))
 		return true;
 
 	if (g_pGameRules->PlayerRelationship(const_cast<CCSBot *>(this), m_enemy) == GR_TEAMMATE)

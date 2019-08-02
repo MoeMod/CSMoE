@@ -16,9 +16,9 @@ namespace sv {
 #define KRISS_DAMAGE_SIL		28
 #define KRISS_RANGE_MODIFER      0.83
 #define KRISS_RANGE_MODIFER_SIL  0.81
-#define KRISS_RELOAD_TIME	3.5
+#define KRISS_RELOAD_TIME	3.5s
 #define KRISS_ARMOR_RATIO_MODIFIER	0.8
-#define KRISS_FIRE_RATE	0.088028
+#define KRISS_FIRE_RATE	0.088028s
 
 class CKRISS : public CBasePlayerWeapon
 {
@@ -45,7 +45,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_kriss.mdl"; }
 
 public:
-	void KRISSFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void KRISSFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

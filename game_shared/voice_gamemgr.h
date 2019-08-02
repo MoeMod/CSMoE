@@ -32,7 +32,7 @@
 #pragma once
 #endif
 
-#define UPDATE_INTERVAL		0.3
+#define UPDATE_INTERVAL		0.3s
 
 #include "voice_common.h"
 
@@ -54,7 +54,7 @@ public:
 
 	bool Init(IVoiceGameMgrHelper *pHelper, int maxClients);
 	void SetHelper(IVoiceGameMgrHelper *pHelper);
-	void Update(double frametime);
+	void Update(duration_t frametime);
 	void ClientConnected(edict_t *pEdict);
 	bool ClientCommand(CBasePlayer *pPlayer, const char *cmd);
 	bool PlayerHasBlockedPlayer(CBasePlayer *pReceiver, CBasePlayer *pSender);
@@ -68,7 +68,7 @@ private:
 	int m_msgRequestState;
 	IVoiceGameMgrHelper *m_pHelper;
 	int m_nMaxPlayers;
-	double m_UpdateInterval;
+	duration_t m_UpdateInterval;
 };
 
 void VoiceServerDebug(const char *pFmt, ...);

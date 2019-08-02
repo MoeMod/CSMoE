@@ -133,13 +133,14 @@ public:
 	MONSTERSTATE m_IdealMonsterState;
 	int m_afConditions;
 	int m_afMemory;
-	float m_flNextAttack;
+	duration_t m_flNextAttack;
 	EHANDLE m_hEnemy;
 	EHANDLE m_hTargetEnt;
 	float m_flFieldOfView;
 	int m_bloodColor;
 	Vector m_HackedGunPos;
 	Vector m_vecEnemyLKP;
+	time_point_t m_timeNextAttack;
 };
 
 }

@@ -63,7 +63,7 @@ private:
 
 public:
 	static constexpr auto MaxClip = 30;
-	static constexpr auto DefaultReloadTime = 3.2;
+	static constexpr const auto &DefaultReloadTime = 3.2s;
 	static constexpr auto DefaultAccuracy = 0.2;
 	static constexpr int ZoomFOV = 50;
 
@@ -89,8 +89,8 @@ public:
 	static constexpr const auto & SpreadCalcZoomed = 0.0275 * A;
 	static constexpr const auto & SpreadCalcDefault = 0.0275 * A;
 
-	static constexpr float CycleTime = 0.0955;
-	static constexpr float CycleTimeZoomed = 0.12;
+	static constexpr const auto &CycleTime = 0.0955s;
+	static constexpr const auto &CycleTimeZoomed = 0.12s;
 
 	static constexpr int DamageDefault = 32;
 	static constexpr int DamageZB = 48;
@@ -113,7 +113,7 @@ public:
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_xm8s";
 	static constexpr bool DoubleMode_SyncAmmo = true;
-	static constexpr float DoubleMode_ChangeTime = 6.0f;
+	static constexpr const auto & DoubleMode_ChangeTime = 6.0s;
 
 public:
 	float GetMaxSpeed() override

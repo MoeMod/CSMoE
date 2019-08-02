@@ -48,7 +48,7 @@ void CFamas::Spawn(void)
 
 	m_iDefaultAmmo = FAMAS_DEFAULT_GIVE;
 	m_iFamasShotsFired = 0;
-	m_flFamasShoot = 0;
+	m_flFamasShoot = invalid_time_point;
 
 	FallInit();
 }
@@ -92,7 +92,7 @@ BOOL CFamas::Deploy(void)
 {
 	m_iShotsFired = 0;
 	m_iFamasShotsFired = 0;
-	m_flFamasShoot = 0;
+	m_flFamasShoot = invalid_time_point;
 	m_flAccuracy = 0.2;
 	iShellOn = 1;
 
@@ -112,7 +112,7 @@ void CFamas::SecondaryAttack(void)
 		m_iWeaponState |= WPNSTATE_FAMAS_BURST_MODE;
 	}
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CFamas::PrimaryAttack(void)
@@ -120,26 +120,26 @@ void CFamas::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
 	BOOL bBurstMode = FBitSet(m_iWeaponState, WPNSTATE_FAMAS_BURST_MODE) ? TRUE : FALSE;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		FamasFire(0.030 + (0.3) * m_flAccuracy, 0.0825, FALSE, bBurstMode);
+		FamasFire(0.030 + (0.3) * m_flAccuracy, 0.0825s, FALSE, bBurstMode);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		FamasFire(0.030 + (0.07) * m_flAccuracy, 0.0825, FALSE, bBurstMode);
+		FamasFire(0.030 + (0.07) * m_flAccuracy, 0.0825s, FALSE, bBurstMode);
 	else
-		FamasFire((0.02) * m_flAccuracy, 0.0825, FALSE, bBurstMode);
+		FamasFire((0.02) * m_flAccuracy, 0.0825s, FALSE, bBurstMode);
 }
 
-void CFamas::FamasFire(float flSpread, float flCycleTime, BOOL fUseAutoAim, BOOL bFireBurst)
+void CFamas::FamasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim, BOOL bFireBurst)
 {
 	if (bFireBurst != FALSE)
 	{
 		m_iFamasShotsFired = 0;
-		flCycleTime = 0.55;
+		flCycleTime = 0.55s;
 	}
 	else
 		flSpread += 0.01;
@@ -156,7 +156,7 @@ void CFamas::FamasFire(float flSpread, float flCycleTime, BOOL fUseAutoAim, BOOL
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -189,7 +189,7 @@ void CFamas::FamasFire(float flSpread, float flCycleTime, BOOL fUseAutoAim, BOOL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1, 0.45, 0.275, 0.05, 4, 2.5, 7);
@@ -213,7 +213,7 @@ void CFamas::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(FAMAS_MAX_CLIP, FAMAS_RELOAD, 3.3))
+	if (DefaultReload(FAMAS_MAX_CLIP, FAMAS_RELOAD, 3.3s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -235,7 +235,7 @@ void CFamas::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(FAMAS_IDLE1, UseDecrement() != FALSE);
 }
 

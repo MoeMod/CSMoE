@@ -18,7 +18,7 @@ void CSound::Clear()
 	m_vecOrigin = g_vecZero;
 	m_iType = 0;
 	m_iVolume = 0;
-	m_flExpireTime = 0;
+	m_flExpireTime = invalid_time_point;
 	m_iNext = SOUNDLIST_EMPTY;
 	m_iNextAudible = 0;
 }

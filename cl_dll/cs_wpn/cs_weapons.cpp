@@ -180,7 +180,7 @@ void CBaseEntity :: Killed( entvars_t *pevAttacker, int iGib )
 CBasePlayerWeapon :: DefaultReload
 =====================
 */
-BOOL CBasePlayerWeapon :: DefaultReload( int iClipSize, int iAnim, float fDelay, int body )
+BOOL CBasePlayerWeapon :: DefaultReload( int iClipSize, int iAnim, duration_t fDelay, int body )
 {
 	if( !m_pPlayer->m_pActiveItem )
 		return FALSE;
@@ -200,7 +200,7 @@ BOOL CBasePlayerWeapon :: DefaultReload( int iClipSize, int iAnim, float fDelay,
 
 	m_fInReload = TRUE;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + fDelay + 0.5f;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + fDelay + 0.5s;
 	return TRUE;
 }
 
@@ -270,7 +270,7 @@ bool CBasePlayerWeapon::HasSecondaryAttack()
 	return true;
 }
 
-void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL isGlock18)
+void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18)
 {
 	m_iClip--;
 
@@ -278,7 +278,7 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL is
 	{
 		m_iClip = 0;
 		shotsFired = 3;
-		shootTime = 0;
+		shootTime = invalid_time_point;
 		return;
 	}
 
@@ -306,9 +306,9 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL is
 	shotsFired++;
 
 	if (shotsFired == 3)
-		shootTime = 0;
+		shootTime = invalid_time_point;
 	else
-		shootTime = gpGlobals->time + 0.1;
+		shootTime = gpGlobals->time + 0.1s;
 }
 
 bool CBasePlayerWeapon::ShieldSecondaryFire(int up_anim, int down_anim)
@@ -337,9 +337,9 @@ bool CBasePlayerWeapon::ShieldSecondaryFire(int up_anim, int down_anim)
 	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_SHIELD_DRAWN) ? true : false);
 	m_pPlayer->ResetMaxSpeed();
 #endif
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.6;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.6s;
 	return true;
 }
 
@@ -383,8 +383,8 @@ BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *sz
 
 	SendWeaponAnim( iAnim, skiplocal );
 
-	m_pPlayer->m_flNextAttack = 0.75f;
-	m_flTimeWeaponIdle = 1.5f;
+	m_pPlayer->m_flNextAttack = 0.75s;
+	m_flTimeWeaponIdle = 1.5s;
 	return TRUE;
 }
 
@@ -499,7 +499,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 	if (!HasSecondaryAttack())
 		button &= ~IN_ATTACK2;
 
-	if (m_flGlock18Shoot != 0)
+	if (m_flGlock18Shoot != invalid_time_point)
 	{
 		m_iClip--;
 		if( m_iClip < 0 )
@@ -508,7 +508,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 		}
 		FireRemaining(m_iGlock18ShotsFired, m_flGlock18Shoot, TRUE);
 	}
-	else if (gpGlobals->time > m_flFamasShoot && m_flFamasShoot != 0)
+	else if (gpGlobals->time > m_flFamasShoot && m_flFamasShoot != invalid_time_point)
 	{
 		m_iClip--;
 		if( m_iClip < 0 )
@@ -572,7 +572,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 	{
 		if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 		{
-			if (m_flFamasShoot == 0 && m_flGlock18Shoot == 0)
+			if (m_flFamasShoot == invalid_time_point && m_flGlock18Shoot == invalid_time_point)
 			{
 				if (!(m_iWeaponState & WPNSTATE_SHIELD_DRAWN))
 					Reload();
@@ -588,7 +588,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			if (m_iShotsFired > 15)
 				m_iShotsFired = 15;
 
-			m_flDecreaseShotsFired = gpGlobals->time + 0.4;
+			m_flDecreaseShotsFired = gpGlobals->time + 0.4s;
 		}
 
 		m_fFireOnEmpty = FALSE;
@@ -600,7 +600,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 				if (gpGlobals->time > m_flDecreaseShotsFired)
 				{
 					m_iShotsFired--;
-					m_flDecreaseShotsFired = gpGlobals->time + 0.0225;
+					m_flDecreaseShotsFired = gpGlobals->time + 0.0225s;
 				}
 			}
 		}
@@ -614,7 +614,7 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 			if (m_iClip == 0 && !(iFlags() & ITEM_FLAG_NOAUTORELOAD)
 					&& m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
 			{
-				if (m_flFamasShoot == 0 && m_flGlock18Shoot == 0)
+				if (m_flFamasShoot == invalid_time_point && m_flGlock18Shoot == invalid_time_point)
 				{
 					Reload();
 					return;
@@ -824,7 +824,7 @@ void HUD_InitClientWeapons( void )
 	gpGlobals = &Globals;
 
 	// Fill in current time ( probably not needed )
-	gpGlobals->time = gEngfuncs.GetClientTime();
+	gpGlobals->time = time_point_t (duration_t(gEngfuncs.GetClientTime()));
 
 	// Fake functions
 	//g_engfuncs.pfnSetClientMaxspeed = HUD_SetMaxSpeed;
@@ -979,7 +979,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	HUD_InitClientWeapons();
 
 	// Get current clock
-	gpGlobals->time = time;
+	gpGlobals->time = time_point_t(duration_t (time));
 
 	// Fill in data based on selected weapon
 	switch ( from->client.m_iId )
@@ -1146,14 +1146,14 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 		pCurrent->m_fInReload			= pfrom->m_fInReload;
 		pCurrent->m_fInSpecialReload	= pfrom->m_fInSpecialReload;
 		pCurrent->m_iClip				= pfrom->m_iClip;
-		pCurrent->m_flNextPrimaryAttack	= pfrom->m_flNextPrimaryAttack;
-		pCurrent->m_flNextSecondaryAttack = pfrom->m_flNextSecondaryAttack;
-		pCurrent->m_flTimeWeaponIdle	= pfrom->m_flTimeWeaponIdle;
-		pCurrent->m_flStartThrow		= pfrom->fuser2;
-		pCurrent->m_flReleaseThrow		= pfrom->fuser3;
+		pCurrent->m_flNextPrimaryAttack	= duration_t (pfrom->m_flNextPrimaryAttack);
+		pCurrent->m_flNextSecondaryAttack = duration_t (pfrom->m_flNextSecondaryAttack);
+		pCurrent->m_flTimeWeaponIdle	= duration_t (pfrom->m_flTimeWeaponIdle);
+		pCurrent->m_flStartThrow		= time_point_t (duration_t (pfrom->fuser2));
+		pCurrent->m_flReleaseThrow		= time_point_t (duration_t (pfrom->fuser3));
 		pCurrent->m_iSwing				= pfrom->iuser1;
 		pCurrent->m_iWeaponState		= pfrom->m_iWeaponState;
-		pCurrent->m_flLastFire			= pfrom->m_fAimedDamage;
+		pCurrent->m_flLastFire			= time_point_t (duration_t (pfrom->m_fAimedDamage));
 		pCurrent->m_iShotsFired			= pfrom->m_fInZoom;
 	}
 
@@ -1195,7 +1195,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	player.pev->fov        = from->client.fov;
 	player.pev->weaponanim = from->client.weaponanim;
 	player.pev->viewmodel  = from->client.viewmodel;
-	player.m_flNextAttack  = from->client.m_flNextAttack;
+	player.m_flNextAttack  = duration_t (from->client.m_flNextAttack);
 
 	g_iPlayerFlags    = player.pev->flags = from->client.flags;
 	g_vPlayerVelocity = player.pev->velocity;
@@ -1239,8 +1239,8 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	{
 		if( g_bHoldingKnife && pWeapon->m_iClientWeaponState &&
 				player.pev->button & IN_FORWARD )
-			player.m_flNextAttack = 0;
-		else if( player.m_flNextAttack <= 0 )
+			player.m_flNextAttack = 0s;
+		else if( player.m_flNextAttack <= 0s )
 		{
 			pWeapon->ItemPostFrame();
 		}
@@ -1281,7 +1281,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	to->client.viewmodel				= player.pev->viewmodel;
 	to->client.fov						= player.pev->fov;
 	to->client.weaponanim				= player.pev->weaponanim;
-	to->client.m_flNextAttack			= player.m_flNextAttack;
+	to->client.m_flNextAttack			= player.m_flNextAttack / 1s;
 	to->client.maxspeed					= player.pev->maxspeed;
 	to->client.punchangle				= player.pev->punchangle;
 
@@ -1332,19 +1332,19 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 
 		pto->m_iClip					= pCurrent->m_iClip;
 
-		pto->m_flNextPrimaryAttack		= pCurrent->m_flNextPrimaryAttack;
-		pto->m_flNextSecondaryAttack	= pCurrent->m_flNextSecondaryAttack;
-		pto->m_flTimeWeaponIdle			= pCurrent->m_flTimeWeaponIdle;
+		pto->m_flNextPrimaryAttack		= pCurrent->m_flNextPrimaryAttack / 1s;
+		pto->m_flNextSecondaryAttack	= pCurrent->m_flNextSecondaryAttack / 1s;
+		pto->m_flTimeWeaponIdle			= pCurrent->m_flTimeWeaponIdle / 1s;
 
 		pto->m_fInReload				= pCurrent->m_fInReload;
 		pto->m_fInSpecialReload			= pCurrent->m_fInSpecialReload;
-		pto->m_flNextReload				= pCurrent->m_flNextReload;
-		pto->fuser2						= pCurrent->m_flStartThrow;
-		pto->fuser3						= pCurrent->m_flReleaseThrow;
+		pto->m_flNextReload				= pCurrent->m_flNextReload / 1s;
+		pto->fuser2						= pCurrent->m_flStartThrow.time_since_epoch() / 1s;
+		pto->fuser3						= pCurrent->m_flReleaseThrow.time_since_epoch() / 1s;
 		pto->iuser1						= pCurrent->m_iSwing;
 		pto->m_iWeaponState				= pCurrent->m_iWeaponState;
 		pto->m_fInZoom					= pCurrent->m_iShotsFired;
-		pto->m_fAimedDamage				= pCurrent->m_flLastFire;
+		pto->m_fAimedDamage				= pCurrent->m_flLastFire.time_since_epoch() / 1s;
 
 		// Decrement weapon counters, server does this at same time ( during post think, after doing everything else )
 		pto->m_flNextReload				-= cmd->msec / 1000.0f;

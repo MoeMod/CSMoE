@@ -111,7 +111,7 @@ public:
 		//TPrimaryAttackRifle::PrimaryAttack();
 	}
 
-	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	{
 		//TFirePistol::Fire(flSpread, flCycleTime, fUseAutoAim);
 		//TFireRifle::Fire(flSpread, flCycleTime, fUseAutoAim);

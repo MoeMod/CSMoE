@@ -85,8 +85,8 @@ BOOL CSCOUT::Deploy(void)
 {
 	if (DefaultDeploy("models/v_scout.mdl", "models/p_scout.mdl", SCOUT_DRAW, "rifle", UseDecrement() != FALSE))
 	{
-		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1;
+		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 		return TRUE;
 	}
 
@@ -104,22 +104,22 @@ void CSCOUT::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CSCOUT::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		SCOUTFire(0.2, 1.25, FALSE);
+		SCOUTFire(0.2, 1.25s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 170)
-		SCOUTFire(0.075, 1.25, FALSE);
+		SCOUTFire(0.075, 1.25s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		SCOUTFire(0.0, 1.25, FALSE);
+		SCOUTFire(0.0, 1.25s, FALSE);
 	else
-		SCOUTFire(0.007, 1.25, FALSE);
+		SCOUTFire(0.007, 1.25s, FALSE);
 }
 
-void CSCOUT::SCOUTFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CSCOUT::SCOUTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov != 90)
 	{
@@ -135,7 +135,7 @@ void CSCOUT::SCOUTFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -168,7 +168,7 @@ void CSCOUT::SCOUTFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 	m_pPlayer->pev->punchangle.x -= 2;
 }
 
@@ -177,7 +177,7 @@ void CSCOUT::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 
-	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, 2))
+	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, 2s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -201,7 +201,7 @@ void CSCOUT::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(SCOUT_IDLE, UseDecrement() != FALSE);
 	}
 }

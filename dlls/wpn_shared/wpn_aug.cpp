@@ -102,22 +102,22 @@ void CAUG::SecondaryAttack(void)
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CAUG::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AUGFire(0.035 + (0.4) * m_flAccuracy, 0.0825, FALSE);
+		AUGFire(0.035 + (0.4) * m_flAccuracy, 0.0825s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		AUGFire(0.035 + (0.07) * m_flAccuracy, 0.0825, FALSE);
+		AUGFire(0.035 + (0.07) * m_flAccuracy, 0.0825s, FALSE);
 	else if (m_pPlayer->pev->fov == 90)
-		AUGFire((0.02) * m_flAccuracy, 0.0825, FALSE);
+		AUGFire((0.02) * m_flAccuracy, 0.0825s, FALSE);
 	else
-		AUGFire((0.02) * m_flAccuracy, 0.135, FALSE);
+		AUGFire((0.02) * m_flAccuracy, 0.135s, FALSE);
 }
 
-void CAUG::AUGFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CAUG::AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -131,7 +131,7 @@ void CAUG::AUGFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -163,7 +163,7 @@ void CAUG::AUGFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.275, 0.05, 4.0, 2.5, 7);
@@ -180,7 +180,7 @@ void CAUG::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3))
+	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -202,7 +202,7 @@ void CAUG::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(AUG_IDLE1, UseDecrement() != FALSE);
 }
 

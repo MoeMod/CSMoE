@@ -31,19 +31,19 @@ public:
 	static constexpr const auto &A = WeaponTemplate::Varibles::A;
 
 public:
-	void Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		flCycleTime -= 0.075;
+		flCycleTime -= 0.075s;
 		CBase::m_iShotsFired++;
 
 		if (CBase::m_iShotsFired > 1)
 			return;
 
-		if (CBase::m_flLastFire)
+		if (CBase::m_flLastFire != invalid_time_point)
 		{
-			CBase::m_flAccuracy -= wpn.AccuracyCalc(T = (gpGlobals->time - CBase::m_flLastFire));
+			CBase::m_flAccuracy -= wpn.AccuracyCalc(T = ((gpGlobals->time - CBase::m_flLastFire) / 1s));
 			CheckAccuracyBoundaryMin(&wpn);
 			CheckAccuracyBoundaryMax(&wpn);
 		}
@@ -55,7 +55,7 @@ public:
 			if (CBase::m_fFireOnEmpty)
 			{
 				CBase::PlayEmptySound();
-				CBase::m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+				CBase::m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 			}
 
 			return;
@@ -91,7 +91,7 @@ public:
 		if (!CBase::m_iClip && CBase::m_pPlayer->m_rgAmmo[CBase::m_iPrimaryAmmoType] <= 0)
 			CBase::m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime + 1.9f;
+		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime + 1.9s;
 
 		wpn.Recoil();
 	}

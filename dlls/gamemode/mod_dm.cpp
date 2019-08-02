@@ -48,8 +48,8 @@ CMod_DeathMatch::CMod_DeathMatch()
 {
 	m_VoiceGameMgr.Init(&g_GameMgrHelper, gpGlobals->maxClients);
 
-	m_flIntermissionEndTime = 0;
-	m_flIntermissionStartTime = 0;
+	m_flIntermissionEndTime = invalid_time_point;
+	m_flIntermissionStartTime = invalid_time_point;
 
 	m_iMaxRoundsWon = (int)maxkills.value;
 }
@@ -121,7 +121,7 @@ void CMod_DeathMatch::Think(void)
 		if (player->m_iTeam == TEAM_UNASSIGNED  || player->m_iTeam == TEAM_SPECTATOR)
 			continue;
 
-		if(gpGlobals->time < player->m_fDeadTime + 5.0f)
+		if(gpGlobals->time < player->m_fDeadTime + 5.0s)
 			continue;
 
 		player->RoundRespawn();

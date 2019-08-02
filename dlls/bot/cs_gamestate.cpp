@@ -184,7 +184,7 @@ void CSGameState::UpdateLooseBomb(const Vector *pos)
 	SetBombState(LOOSE);
 }
 
-float CSGameState::TimeSinceLastSawLooseBomb() const
+duration_t CSGameState::TimeSinceLastSawLooseBomb() const
 {
 	return m_lastSawLooseBomb.GetElapsedTime();
 }
@@ -206,7 +206,7 @@ void CSGameState::UpdateBomber(const Vector *pos)
 	SetBombState(MOVING);
 }
 
-float CSGameState::TimeSinceLastSawBomber() const
+duration_t CSGameState::TimeSinceLastSawBomber() const
 {
 	return m_lastSawBomber.GetElapsedTime();
 }
@@ -507,7 +507,7 @@ CSGameState::ValidateStatusType CSGameState::ValidateHostagePositions()
 	if (!m_validateInterval.IsElapsed())
 		return NO_CHANGE;
 
-	const float validateInterval = 0.5f;
+	constexpr auto validateInterval = 0.5s;
 	m_validateInterval.Start(validateInterval);
 
 	// check the status of hostages

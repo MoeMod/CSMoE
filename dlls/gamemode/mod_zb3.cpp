@@ -143,7 +143,7 @@ void CPlayerModStrategy_ZB3::OnThink()
 	if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie)
 	{
 		// respawn after 5 secs
-		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 5.0f)
+		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 5.0s)
 		{
 			const float health = max(m_flBackupMaxHealth / 2, 1000);
 			const float armor = m_flBackupArmor;

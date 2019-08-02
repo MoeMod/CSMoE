@@ -58,7 +58,7 @@ private:
 	int m_iuser3; // iSkillRecord
 	int m_iuser4; // iPrimaryAttackRecord
 	int m_sequence; // iThinkType
-	float m_fuser1; // flNextTimeCanHolster
+	time_point_t m_fuser1; // flNextTimeCanHolster
 	int m_weaponanim; // iLastAnim
 	int m_waterlevel; // iSecondaryAttackCount
 
@@ -120,7 +120,7 @@ public:
 		m_iuser4 = 1;
 		m_iuser1 = 0;
 		m_sequence = 0;
-		m_fuser1 = 0.0f;
+		m_fuser1 = invalid_time_point;
 		m_waterlevel = 0;
 		m_iuser3 %= 2;
 		DestroyEffect();
@@ -136,7 +136,7 @@ public:
 		else
 			result = DefaultDeploy(V_Model, P_Model_B, 6, AnimExtension, UseDecrement() != FALSE);
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.2f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.2s;
 
 		return result;
 	}
@@ -145,7 +145,7 @@ public:
 	{
 		m_iuser3 %= 2;
 		DestroyEffect();
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.0f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.0s;
 		return Base::Holster(skiplocal);
 	}
 
@@ -204,7 +204,7 @@ void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *pflMins,
 
 void CKnifeDualsword::WeaponIdle()
 {
-	if (m_flTimeWeaponIdle > 0.0f)
+	if (m_flTimeWeaponIdle > 0.0s)
 		return;
 
 	ResetEmptySound();
@@ -217,12 +217,12 @@ void CKnifeDualsword::WeaponIdle()
 	if (m_iuser1 % 2)
 	{
 		SendWeaponAnim(7);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 	}
 	else
 	{
 		SendWeaponAnim(0);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0s;
 	}
 }
 
@@ -266,8 +266,8 @@ void CKnifeDualsword::ItemPostFrame()
 	{
 		SendWeaponAnim(5);
 		m_weaponanim = 5;
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0f;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
 		// ADDED
 		m_sequence = 0;
@@ -313,8 +313,8 @@ void CKnifeDualsword::ItemPostFrame()
 	{
 		SendWeaponAnim(10);
 		m_weaponanim = 10;
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0f;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 		// ADDED
 		m_sequence = 0;
@@ -328,7 +328,7 @@ void CKnifeDualsword::ItemPostFrame()
 		m_sequence = 8;
 		pev->nextthink = gpGlobals->time + 1.0f;
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f; // ADDED
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s; // ADDED
 		break;
 	}
 	case 8:
@@ -348,8 +348,8 @@ void CKnifeDualsword::ItemPostFrame()
 		m_iuser3 = 1;
 
 		// NOT SURE
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0f;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.2f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.2s;
 
 		// ADDED
 		m_sequence = 0;
@@ -369,7 +369,7 @@ void CKnifeDualsword::PrimaryAttack(void)
 		m_weaponanim = 12;
 
 		m_iuser3 = 0;
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 		
 		m_sequence = 4;
 		pev->nextthink = gpGlobals->time + 0.0;
@@ -382,7 +382,7 @@ void CKnifeDualsword::PrimaryAttack(void)
 	{
 		m_sequence = 4;
 		//pev->nextthink = gpGlobals->time + 0.0;
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 	}
 }
 
@@ -395,7 +395,7 @@ void CKnifeDualsword::SecondaryAttack(void)
 		SendWeaponAnim(13);
 		m_weaponanim = 13;
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
 		m_sequence = 1;
 		pev->nextthink = gpGlobals->time + 0.0f;
@@ -433,7 +433,7 @@ void CKnifeDualsword::DelayPrimaryAttack()
 
 	m_sequence = 5;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 	pev->nextthink = gpGlobals->time + 0.25;
 }
 
@@ -612,9 +612,9 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 	}
 	}
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (iType ? 0.15 : 0.65);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iuser3 ? 0.15 : 0.65);
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (iType ? 0.15s : 0.65s);
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iuser3 ? 0.15s : 0.65s);
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 	m_fuser1 = gpGlobals->time + (iType ? 0.15 : 0.65);
 
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -709,21 +709,21 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	}
 	}
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	SetThink(nullptr);
 
 	if (m_waterlevel < 4)
 	{
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.0f;
-		m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.0s;
+		m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
 		pev->nextthink = gpGlobals->time + 0.15f;
 		m_sequence = 1;
 	}
 	else
 	{
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.65f;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.65s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
 		m_fuser1 = gpGlobals->time + 0.65;
 		pev->nextthink = gpGlobals->time + 0.53;
@@ -758,10 +758,10 @@ class CDualSwordSpecialEffect : public CBaseEntity
 {
 private:
 	int m_iEffectType; // this+93, iuser1
-	float m_flNextEffect; // this+97,fuser1
-	float m_flLastAttack1;
-	float m_flLastAttack2;
-	float m_flLastAttack3;
+	time_point_t m_flNextEffect; // this+97,fuser1
+	time_point_t m_flLastAttack1;
+	time_point_t m_flLastAttack2;
+	time_point_t m_flLastAttack3;
 
 	int m_iAnim;
 	
@@ -855,17 +855,17 @@ public:
 	{
 		if (gpGlobals->time < m_flNextEffect)
 		{
-			if (gpGlobals->time >= m_flLastAttack1 + 0.15)
+			if (gpGlobals->time >= m_flLastAttack1 + 0.15s)
 			{
 				Attack1();
 				m_flLastAttack1 = gpGlobals->time;
 			}
-			if (gpGlobals->time >= m_flLastAttack2 + 0.05)
+			if (gpGlobals->time >= m_flLastAttack2 + 0.05s)
 			{
 				Attack2();
 				m_flLastAttack2 = gpGlobals->time;
 			}
-			if (gpGlobals->time >= m_flLastAttack3 + 0.15)
+			if (gpGlobals->time >= m_flLastAttack3 + 0.15s)
 			{
 				Attack3();
 				m_flLastAttack3 = gpGlobals->time;
@@ -1024,7 +1024,7 @@ void CKnifeDualsword::SpawnEffect()
 	//client_print(id, print_chat, "DualSword_SpawnEffect");
 
 	m_iuser1 = 0;
-	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 }
 
 void CKnifeDualsword::DestroyEffect()
@@ -1042,7 +1042,7 @@ void CKnifeDualsword::DestroyEffect()
 void CKnifeDualsword::SpawnEffect()
 {
 	m_iuser1 = 0;
-	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992f;
+	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 }
 void CKnifeDualsword::DestroyEffect() {}
 #endif

@@ -171,7 +171,7 @@ void CMortar::Spawn()
 	pev->dmg = 200;
 
 	SetThink(&CMortar::MortarExplode);
-	pev->nextthink = 0;
+	pev->nextthink = {};
 	Precache();
 }
 

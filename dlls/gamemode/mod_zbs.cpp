@@ -135,7 +135,7 @@ float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_
 
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
-	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 	
 	PRECACHE_GENERIC("sound/Scenario_Ready.mp3");
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
@@ -162,7 +162,7 @@ void CMod_ZombieScenario::CheckMapConditions()
 	}
 
 	// hook from RestartRound()
-	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 
 	return Base::CheckMapConditions();
 }
@@ -193,7 +193,7 @@ void CMod_ZombieScenario::Think()
 {
 	TeamCheck();
 
-	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		if (m_iNumTerroristWins)
 			g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
@@ -207,7 +207,7 @@ void CMod_ZombieScenario::Think()
 	if (IsFreezePeriod())
 	{
 		static int iLastCountDown = -1;
-		int iCountDown = TimeRemaining();
+		int iCountDown = TimeRemaining() /1s;
 
 		if (iCountDown > 0)
 		{
@@ -284,7 +284,7 @@ void CMod_ZombieScenario::Think()
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
+	if (TimeRemaining() <= 0s && !m_bRoundTerminating)
 		HumanWin();
 }
 

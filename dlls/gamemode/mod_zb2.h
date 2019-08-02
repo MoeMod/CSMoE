@@ -63,7 +63,7 @@ public:
 	EventDispatcher<void(CBasePlayer *attacker, HitBoxGroup &)> m_eventAdjustHitgroup;
 
 protected:
-	float m_flTimeNextMakeSupplybox;
+	EngineClock::time_point m_flTimeNextMakeSupplybox;
 };
 
 class CPlayerModStrategy_ZB2 : public CPlayerModStrategy_ZB1
@@ -99,7 +99,7 @@ private:
 
 	//std::unique_ptr<IZombieSkill> m_pZombieSkill;
 	std::shared_ptr<IZombieModeCharacter_ZB2_Extra> m_pCharacter_ZB2;
-	float m_flTimeNextZombieHealthRecovery;
+	EngineClock::time_point m_flTimeNextZombieHealthRecovery;
 	int m_iZombieInfections;
 };
 

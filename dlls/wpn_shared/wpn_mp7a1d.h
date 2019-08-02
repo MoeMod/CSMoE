@@ -39,7 +39,7 @@ public:
 #endif
 
 public:
-	void ELITEFire(float flSpread, float flCycleTime, BOOL fUseSemi);
+	void ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 
 public:
 	int m_iShell;

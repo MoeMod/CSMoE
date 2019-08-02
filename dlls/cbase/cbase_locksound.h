@@ -24,8 +24,8 @@ typedef struct locksounds
 	string_t sUnlockedSentence;
 	int iLockedSentence;
 	int iUnlockedSentence;
-	float flwaitSound;
-	float flwaitSentence;
+	time_point_t flwaitSound;
+	time_point_t flwaitSentence;
 	BYTE bEOFLocked;
 	BYTE bEOFUnlocked;
 } locksound_t;

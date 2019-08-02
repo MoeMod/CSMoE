@@ -61,7 +61,7 @@ private:
 
 public:
 	static constexpr auto MaxClip = 20;
-	static constexpr auto DefaultReloadTime = 3.6;
+	static constexpr const auto &DefaultReloadTime = 3.6s;
 	static constexpr auto DefaultAccuracy = 0;
 	static constexpr int ZoomFOV = 50;
 
@@ -99,8 +99,8 @@ public:
 	static constexpr const auto & SpreadCalcWalking = 0.1 * A;
 	static constexpr const auto & SpreadCalcDefault = 0.025 * A;
 
-	static constexpr float CycleTime = 0.18;
-	static constexpr float CycleTimeZoomed = 0.18;
+	static constexpr const auto &CycleTime = 0.18s;
+	static constexpr const auto &CycleTimeZoomed = 0.18s;
 
 	static constexpr int DamageDefault = 29;
 	static constexpr int DamageZB = 52;
@@ -121,7 +121,7 @@ public:
 
 	static constexpr const auto DoubleMode_LinkedWeaponClassName = "weapon_mp7a1p";
 	static constexpr bool DoubleMode_SyncAmmo = true;
-	static constexpr float DoubleMode_ChangeTime = 6.0f;
+	static constexpr const auto & DoubleMode_ChangeTime = 6.0s;
 
 public:
 	float GetMaxSpeed() override

@@ -124,7 +124,7 @@ void CSupplyBox::SupplyboxThink()
 		if (m_flNextRadarTime <= gpGlobals->time)
 		{
 			SendPositionMsg();
-			m_flNextRadarTime = gpGlobals->time + 1;
+			m_flNextRadarTime = gpGlobals->time + 1s;
 		}
 	}
 }
