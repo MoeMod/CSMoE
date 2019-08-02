@@ -4,6 +4,8 @@ compiler: gcc
 sudo: true
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - cmake
       - x11-utils
@@ -12,7 +14,7 @@ addons:
       - libgles2-mesa-dev
       - libsdl2-dev
       - libsdl2-image-dev
-      - g++-6
+      - g++-7
 git:
   depth: 50
   submodules: true
