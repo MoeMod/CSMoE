@@ -89,7 +89,7 @@ public:
 		m_stateTimer.Start();
 	}
 	// how long have we been in the current state
-	float GetStateDuration() const
+	duration_t GetStateDuration() const
 	{
 		return m_stateTimer.GetElapsedTime();
 	}
