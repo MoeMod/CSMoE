@@ -1,4 +1,5 @@
-language: c
+language: cpp
+dist: bionic
 cache: ccache
 compiler: gcc
 sudo: true
