@@ -12,7 +12,7 @@ addons:
       - libgles2-mesa-dev
       - libsdl2-dev
       - libsdl2-image-dev
-      - g++-7
+      - g++-6
 git:
   depth: 50
   submodules: true
