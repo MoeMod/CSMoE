@@ -11,14 +11,13 @@ addons:
       - libgl1-mesa-dev
       - libegl1-mesa-dev
       - libgles2-mesa-dev
-      - libsdl2-dev
-      - libsdl2-image-dev
 git:
   depth: 50
   submodules: true
 os:
   - linux
-
 before_script:
+  sudo apt-get install libsdl2-dev
+  sudo apt-get install libsdl2-image-dev
 script:
   - sh scripts/build_portable_linux_engine.sh;
