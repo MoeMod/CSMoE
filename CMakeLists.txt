@@ -10,6 +10,8 @@ else()
 	option(XASH_STATIC_GAMELIB "Build static game library" OFF)
 endif()
 
+option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
+
 if(XASH_STATIC_GAMELIB)
 	add_definitions(-DXASH_STATIC_GAMELIB=1)
 endif()
@@ -67,15 +69,25 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 	endif()
 endif()
 
+# Desktop or dedicated version options
+if(XASH_DEDICATED)
+	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
+else()
+	option(XASH_SDL "Enable SDL." ON)
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
+endif()
 
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
-ADD_SUBDIRECTORY(cl_dll)
+if(NOT XASH_DEDICATED)
+	ADD_SUBDIRECTORY(cl_dll)
+	ADD_SUBDIRECTORY(mainui_cpp)
+endif()
 ADD_SUBDIRECTORY(dlls)
-ADD_SUBDIRECTORY(mainui_cpp)
 ADD_SUBDIRECTORY(engine)
-if(NOT ANDROID AND NOT IOS)
+if(NOT XASH_SINGLE_BINARY AND NOT ANDROID AND NOT IOS)
 	ADD_SUBDIRECTORY(game_launch)
 endif()
