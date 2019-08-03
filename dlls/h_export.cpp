@@ -185,6 +185,7 @@ void 	path_track	( entvars_t *pev );
 void 	player	( entvars_t *pev );
 void 	player_loadsaved	( entvars_t *pev );
 void 	player_weaponstrip	( entvars_t *pev );
+void 	rail_knife	( entvars_t *pev );
 void 	soundent	( entvars_t *pev );
 void 	spark_shower	( entvars_t *pev );
 void 	speaker	( entvars_t *pev );
@@ -272,6 +273,7 @@ void 	weaponbox	( entvars_t *pev );
 void 	world_items	( entvars_t *pev );
 void 	worldspawn	( entvars_t *pev );
 void 	zbsbreak	( entvars_t *pev );
+void 	z4b_Frequency9	( entvars_t *pev );
 void 	zombiespawn	( entvars_t *pev );
 }
 
@@ -430,6 +432,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "player", (void *)player },
 		{ "player_loadsaved", (void *)player_loadsaved },
 		{ "player_weaponstrip", (void *)player_weaponstrip },
+		{ "rail_knife", (void *)rail_knife },
 		{ "soundent", (void *)soundent },
 		{ "spark_shower", (void *)spark_shower },
 		{ "speaker", (void *)speaker },
@@ -516,6 +519,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "weaponbox", (void *)weaponbox },
 		{ "world_items", (void *)world_items },
 		{ "worldspawn", (void *)worldspawn },
+		{ "z4b_Frequency9", (void *)z4b_Frequency9 },
 		{ "zbsbreak", (void *)zbsbreak },
 		{ "zombiespawn", (void *)zombiespawn },
 		{ nullptr, nullptr }
