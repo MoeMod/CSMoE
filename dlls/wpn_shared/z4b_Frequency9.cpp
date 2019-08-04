@@ -374,7 +374,7 @@ public:
 		pev->movetype = MOVETYPE_FLY; // 5
 		pev->nextthink = gpGlobals->time + 0.0099999998s;
 		SET_MODEL(edict(), "models/z4b/Frequency9_scythe.mdl");
-		UTIL_SetSize(pev, { -1.44, -1.45, -1.3 }, { 1.44, 1.45, 4.3 });
+		UTIL_SetSize(pev, { -1.44f, -1.45f, -1.3f }, { 1.44f, 1.45f, 4.3f });
 
 		pev->animtime = gpGlobals->time;
 		pev->sequence = 0;

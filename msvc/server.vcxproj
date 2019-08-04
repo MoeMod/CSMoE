@@ -384,6 +384,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -434,6 +435,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gatling.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_glock18.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -487,6 +489,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -564,6 +567,7 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
     <ClCompile Include="..\game_shared\bot\bot.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_manager.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_profile.cpp" />
@@ -783,6 +787,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
@@ -793,6 +798,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_flashbang.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_g3sg1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_galil.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
