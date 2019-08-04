@@ -253,6 +253,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
+	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	)
 
 set(PM_SRCS
