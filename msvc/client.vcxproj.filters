@@ -642,6 +642,24 @@
     <ClCompile Include="..\cl_dll\events\event_anaconda.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_balrog7.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_gatling.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gatling.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_mg36.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -1021,6 +1039,12 @@
     </ClInclude>
     <ClInclude Include="..\dlls\cdll_dll.h">
       <Filter>dlls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
