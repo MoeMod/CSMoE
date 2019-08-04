@@ -135,7 +135,7 @@ float CMod_ZombieScenario::GetAdjustedEntityDamage(CBaseEntity *victim, entvars_
 
 CMod_ZombieScenario::CMod_ZombieScenario()
 {
-	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 	
 	PRECACHE_GENERIC("sound/Scenario_Ready.mp3");
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
@@ -162,7 +162,7 @@ void CMod_ZombieScenario::CheckMapConditions()
 	}
 
 	// hook from RestartRound()
-	m_iRoundTimeSecs = m_iIntroRoundTime = 20 + 2; // keep it from ReadMultiplayCvars
+	m_iRoundTimeSecs = m_iIntroRoundTime = 20s + 2s; // keep it from ReadMultiplayCvars
 
 	return Base::CheckMapConditions();
 }
@@ -193,7 +193,7 @@ void CMod_ZombieScenario::Think()
 {
 	TeamCheck();
 
-	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		if (m_iNumTerroristWins)
 			g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
@@ -207,7 +207,7 @@ void CMod_ZombieScenario::Think()
 	if (IsFreezePeriod())
 	{
 		static int iLastCountDown = -1;
-		int iCountDown = TimeRemaining();
+		int iCountDown = TimeRemaining() /1s;
 
 		if (iCountDown > 0)
 		{
@@ -238,7 +238,7 @@ void CMod_ZombieScenario::Think()
 	if (gpGlobals->time > m_tmNextPeriodicThink)
 	{
 		CheckRestartRound();
-		m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
 
 		if (g_psv_accelerate->value != 5.0f)
 		{
@@ -280,11 +280,11 @@ void CMod_ZombieScenario::Think()
 		if (gpGlobals->time > m_flNextSpawnNPC)
 		{
 			MakeZombieNPC();
-			m_flNextSpawnNPC = gpGlobals->time + 1.0f;
+			m_flNextSpawnNPC = gpGlobals->time + 1.0s;
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating)
+	if (TimeRemaining() <= 0s && !m_bRoundTerminating)
 		HumanWin();
 }
 
@@ -312,7 +312,7 @@ void CMod_ZombieScenario::HumanWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDCLEAR);
 	MESSAGE_END();
 
-	TerminateRound(5, WINSTATUS_CTS);
+	TerminateRound(5s, WINSTATUS_CTS);
 
 	++m_iNumCTWins;
 	UpdateTeamScores();
@@ -330,7 +330,7 @@ void CMod_ZombieScenario::ZombieWin()
 	WRITE_BYTE(ZBS_TIP_ROUNDFAIL);
 	MESSAGE_END();
 
-	TerminateRound(5, WINSTATUS_TERRORISTS);
+	TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 	++m_iNumTerroristWins;
 	UpdateTeamScores();

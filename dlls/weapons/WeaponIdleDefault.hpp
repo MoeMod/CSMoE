@@ -13,7 +13,7 @@ template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TWeaponIdleDefault : public CBase
 {
 public:
-	static constexpr float WeaponIdleTime = 20;
+	static constexpr const auto & WeaponIdleTime = 20s;
 
 public:
 	void WeaponIdle(void)

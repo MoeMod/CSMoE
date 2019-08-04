@@ -61,20 +61,21 @@ void UpdateClientEffects(CBasePlayer *pObserver, int oldMode)
 
 			if (pPlayer)
 			{
-				if (pPlayer->m_progressStart && pPlayer->m_progressEnd > pPlayer->m_progressStart)
+				if (pPlayer->m_progressStart != invalid_time_point && pPlayer->m_progressEnd > pPlayer->m_progressStart)
 				{
 					if (pPlayer->m_progressEnd > gpGlobals->time)
 					{
-						float percentRemaining = gpGlobals->time - pPlayer->m_progressStart;
-						pObserver->SetProgressBarTime2((int)(pPlayer->m_progressEnd - pPlayer->m_progressStart), percentRemaining);
+						auto percentRemaining = (gpGlobals->time - pPlayer->m_progressStart);
+						pObserver->SetProgressBarTime2((int)((pPlayer->m_progressEnd - pPlayer->m_progressStart) / 1s), percentRemaining);
 						clearProgress = false;
 					}
 				}
 
-				if (blindnessOk && pPlayer->m_blindStartTime && pPlayer->m_blindFadeTime)
+				if (blindnessOk && pPlayer->m_blindStartTime != invalid_time_point && pPlayer->m_blindFadeTime != zero_duration)
 				{
-					float fadeTime, holdTime, alpha, ratio;
-					float endTime = pPlayer->m_blindFadeTime + pPlayer->m_blindHoldTime + pPlayer->m_blindStartTime;
+					duration_t fadeTime, holdTime;
+					float alpha, ratio;
+					time_point_t endTime = pPlayer->m_blindFadeTime + pPlayer->m_blindHoldTime + pPlayer->m_blindStartTime;
 
 					if (endTime > gpGlobals->time)
 					{
@@ -84,9 +85,9 @@ void UpdateClientEffects(CBasePlayer *pObserver, int oldMode)
 						alpha = (float)pPlayer->m_blindAlpha;
 						holdTime = pPlayer->m_blindHoldTime + pPlayer->m_blindStartTime - gpGlobals->time;
 
-						if (holdTime <= 0)
+						if (holdTime <= 0s)
 						{
-							holdTime = 0;
+							holdTime = 0s;
 							ratio = (endTime - gpGlobals->time) / fadeTime;
 							alpha = pPlayer->m_blindAlpha * ratio;
 							fadeTime = ratio * fadeTime;
@@ -120,7 +121,7 @@ void UpdateClientEffects(CBasePlayer *pObserver, int oldMode)
 		pObserver->SetProgressBarTime(0);
 
 	if (blindnessOk && clearBlindness)
-		UTIL_ScreenFade(pObserver, Vector(0, 0, 0), 0.001);
+		UTIL_ScreenFade(pObserver, Vector(0, 0, 0), 1ms);
 
 	if (clearNightvision)
 	{
@@ -142,10 +143,10 @@ void CBasePlayer::Observer_FindNextPlayer(bool bReverse, const char *name)
 	bool bForceSameTeam;
 	CBasePlayer *pPlayer;
 
-	if (m_flNextFollowTime && m_flNextFollowTime > gpGlobals->time)
+	if (m_flNextFollowTime != invalid_time_point && m_flNextFollowTime > gpGlobals->time)
 		return;
 
-	m_flNextFollowTime = gpGlobals->time + 0.25f;
+	m_flNextFollowTime = gpGlobals->time + 0.25s;
 
 	iStart = m_hObserverTarget ? ENTINDEX(m_hObserverTarget->edict()) : ENTINDEX(edict());
 	iCurrent = iStart;
@@ -237,21 +238,21 @@ void CBasePlayer::Observer_HandleButtons()
 			break;
 		}
 
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 
 	// Attack moves to the next player
 	if (m_afButtonPressed & IN_ATTACK)
 	{
 		Observer_FindNextPlayer(false);
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 
 	// Attack2 moves to the prev player
 	if (m_afButtonPressed & IN_ATTACK2)
 	{
 		Observer_FindNextPlayer(true);
-		m_flNextObserverInput = gpGlobals->time + 0.2f;
+		m_flNextObserverInput = gpGlobals->time + 0.2s;
 	}
 }
 
@@ -284,7 +285,7 @@ void CBasePlayer::Observer_CheckTarget()
 			if (!target || target->pev->deadflag == DEAD_RESPAWNABLE || (target->pev->effects & EF_NODRAW))
 				Observer_FindNextPlayer(false);
 
-			else if (target->pev->deadflag == DEAD_DEAD && gpGlobals->time > target->m_fDeadTime + 2.0f)
+			else if (target->pev->deadflag == DEAD_DEAD && gpGlobals->time > target->m_fDeadTime + 2.0s)
 			{
 				// 3 secs after death change target
 				Observer_FindNextPlayer(false);

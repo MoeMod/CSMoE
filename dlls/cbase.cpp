@@ -558,7 +558,7 @@ void DispatchSave(edict_t *pent, SAVERESTOREDATA *pSaveData)
 
 		if (pEntity->pev->movetype == MOVETYPE_PUSH)
 		{
-			float delta = pEntity->pev->nextthink - pEntity->pev->ltime;
+			auto delta = pEntity->pev->nextthink - pEntity->pev->ltime;
 			pEntity->pev->ltime = gpGlobals->time;
 			pEntity->pev->nextthink = pEntity->pev->ltime + delta;
 		}
@@ -856,7 +856,7 @@ void CBaseEntity::MakeDormant(void)
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
 	pev->effects |= EF_NODRAW;
-	pev->nextthink = 0;
+	pev->nextthink = {};
 	UTIL_SetOrigin(pev, pev->origin);
 }
 

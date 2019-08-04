@@ -116,7 +116,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 					if (!IsSniper() && IsVisible(&player->pev->origin))
 					{
 						// people are dying - we should hurry
-						Hurry(RANDOM_FLOAT(10.0f, 15.0f));
+						Hurry(RandomDuration(10.0s, 15.0s));
 
 						// if we're hiding with only our knife, be a little more cautious
 						const float knifeAmbushChance = 50.0f;
@@ -142,7 +142,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 			// if the human player died in the single player game, tell the team
 			if (g_pGameRules->IsCareer() && !victim->IsBot() && victim->m_iTeam == m_iTeam)
 			{
-				GetChatter()->Say("CommanderDown", 20.0f);
+				GetChatter()->Say("CommanderDown", 20.0s);
 			}
 
 			// keep track of the last player we killed
@@ -169,12 +169,12 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 
 				if (IsAttacking())
 				{
-					if (GetTimeSinceLastSawEnemy() > 0.4f)
+					if (GetTimeSinceLastSawEnemy() > 0.4s)
 					{
 						PrintIfWatched("Rethinking my attack due to teammate death\n");
 
 						// allow us to sneak past windows, doors, etc
-						IgnoreEnemies(1.0f);
+						IgnoreEnemies(1.0s);
 
 						// move to last known position of enemy - this could cause us to flank if 
 						// the danger has changed due to our teammate's recent death
@@ -200,19 +200,19 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 							// congratulate teammates on their kills
 							if (killer != NULL && killer != this)
 							{
-								float delay = RANDOM_FLOAT(2.0f, 3.0f);
+								auto delay = RandomDuration(2.0s, 3.0s);
 								if (killer->IsBot())
 								{
 									if (RANDOM_FLOAT(0.0f, 100.0f) < 40.0f)
-										GetChatter()->Say("NiceShot", 3.0f, delay);
+										GetChatter()->Say("NiceShot", 3.0s, delay);
 								}
 								else
 								{
 									// humans get the honorific
 									if (g_pGameRules->IsCareer())
-										GetChatter()->Say("NiceShotCommander", 3.0f, delay);
+										GetChatter()->Say("NiceShotCommander", 3.0s, delay);
 									else
-										GetChatter()->Say("NiceShotSir", 3.0f, delay);
+										GetChatter()->Say("NiceShotSir", 3.0s, delay);
 								}
 							}
 						}
@@ -230,7 +230,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 				GetChatter()->CelebrateWin();
 			return;
 		case EVENT_BOMB_DEFUSED:
-			if (m_iTeam == CT && TheCSBots()->GetBombTimeLeft() < 2.0)
+			if (m_iTeam == CT && TheCSBots()->GetBombTimeLeft() < 2.0s)
 				GetChatter()->Say("BarelyDefused");
 			return;
 		case EVENT_BOMB_PICKED_UP:
@@ -296,7 +296,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 		{
 			if (m_enemy == entity && IsUsingKnife())
 			{
-				ForceRun(5.0f);
+				ForceRun(5.0s);
 
 				if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)
 				{
@@ -403,10 +403,10 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 
 		// should we pay attention to it
 		// if noise timestamp is zero, there is no prior noise
-		if (m_noiseTimestamp > 0.0f)
+		if (m_noiseTimestamp > invalid_time_point)
 		{
 			// only overwrite recent sound if we are louder (closer), or more important - if old noise was long ago, its faded
-			const float shortTermMemoryTime = 3.0f;
+			constexpr auto shortTermMemoryTime = 3.0s;
 			if (gpGlobals->time - m_noiseTimestamp < shortTermMemoryTime)
 			{
 				// prior noise is more important - ignore new one

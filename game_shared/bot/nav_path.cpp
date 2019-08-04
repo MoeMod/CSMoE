@@ -578,7 +578,7 @@ void CNavPathFollower::Update(float deltaT, bool avoidObstacles)
 	m_stuckMonitor.Update(m_improv);
 
 	// if improv has been stuck for too long, give up
-	const float giveUpTime = 2.0f;
+	EngineClock::duration giveUpTime = 2.0s;
 	if (m_stuckMonitor.GetDuration() > giveUpTime)
 	{
 		m_improv->OnMoveToFailure(m_path->GetEndpoint(), IImprovEvent::FAIL_STUCK);
@@ -1105,14 +1105,14 @@ void CStuckMonitor::Update(CImprov *improv)
 		// cannot be Length2D, or will break ladder movement (they are only Z)
 		float moveDist = vel.Length();
 
-		float deltaT = gpGlobals->time - m_lastTime;
-		if (deltaT <= 0.0f)
+		auto deltaT = gpGlobals->time - m_lastTime;
+		if (deltaT <= 0.0s)
 			return;
 
 		m_lastTime = gpGlobals->time;
 
 		// compute current velocity
-		m_avgVel[m_avgVelIndex++] = moveDist / deltaT;
+		m_avgVel[m_avgVelIndex++] = moveDist / (deltaT / 1s);
 
 		if (m_avgVelIndex == MAX_VEL_SAMPLES)
 			m_avgVelIndex = 0;

@@ -77,7 +77,7 @@ void CZombieSkill_ZombieCrazy::Activate()
 		case SKILL_STATUS_USING:
 		case SKILL_STATUS_FREEZING:
 			char buf[16];
-			sprintf(buf, "%d", static_cast<int>(m_flTimeZombieSkillNext - gpGlobals->time));
+			sprintf(buf, "%d", static_cast<int>(m_flTimeZombieSkillNext.time_since_epoch() /1s - gpGlobals->time.time_since_epoch() /1s));
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
 				"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
 				buf
@@ -100,7 +100,7 @@ void CZombieSkill_ZombieCrazy::Activate()
 	m_iZombieSkillStatus = SKILL_STATUS_USING;
 	m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 	m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
-	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 
 	m_pPlayer->pev->renderfx = kRenderFxGlowShell;
 	m_pPlayer->pev->rendercolor = { 255,0,0 };
@@ -114,8 +114,8 @@ void CZombieSkill_ZombieCrazy::Activate()
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
-	WRITE_SHORT(static_cast<int>(GetDurationTime()));
-	WRITE_SHORT(static_cast<int>(GetCooldownTime()));
+	WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+	WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 	MESSAGE_END();
 }
 
@@ -138,7 +138,7 @@ void CZombieSkill_ZombieCrazy::OnSkillEnd()
 
 void CZombieSkill_ZombieCrazy::OnCrazyEffect()
 {
-	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0f;
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 
 	if (RANDOM_LONG(0, 1))
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_1.wav", VOL_NORM, ATTN_NORM);
@@ -146,14 +146,14 @@ void CZombieSkill_ZombieCrazy::OnCrazyEffect()
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
 }
 
-float CZombieSkill_ZombieCrazy::GetDurationTime() const
+duration_t CZombieSkill_ZombieCrazy::GetDurationTime() const
 {
-	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 3.0f : 10.0f;
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 3.0s : 10.0s;
 }
 
-float CZombieSkill_ZombieCrazy::GetCooldownTime() const
+duration_t CZombieSkill_ZombieCrazy::GetCooldownTime() const
 {
-	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 15.0f : 10.0f;
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 15.0s : 10.0s;
 }
 
 float CZombieSkill_ZombieCrazy::GetDamageRatio() const

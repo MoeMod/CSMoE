@@ -57,7 +57,7 @@ private:
 	int m_id;
 	CGrenade *m_entity;
 	Vector m_detonationPosition;
-	float m_dieTimestamp;
+	EngineClock::time_point m_dieTimestamp;
 };
 
 typedef std::list<ActiveGrenade *> ActiveGrenadeList;

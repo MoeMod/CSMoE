@@ -92,7 +92,7 @@ public:
 	{
 		SetThink(&CSprite::AnimateUntilDead);
 		pev->framerate = framerate;
-		pev->dmgtime = gpGlobals->time + (m_maxFrame / framerate);
+		pev->dmgtime = gpGlobals->time + (m_maxFrame / framerate) * 1s;
 		pev->nextthink = gpGlobals->time;
 	}
 
@@ -107,7 +107,7 @@ public:
 	static CSprite *SpriteCreate(const char *pSpriteName, const Vector &origin, BOOL animate);
 
 private:
-	float m_lastTime;
+	time_point_t m_lastTime;
 	float m_maxFrame;
 };
 
@@ -152,7 +152,7 @@ public:
 	}
 	inline void SetBrightness(int brightness) { pev->renderamt = brightness; }
 	inline void SetFrame(float frame) { pev->frame = frame; }
-	inline void SetScrollRate(int speed) { pev->animtime = speed; }
+	inline void SetScrollRate(int speed) { reinterpret_cast<float &>(pev->animtime) = speed; }
 
 public:
 	inline int GetType(void) { return pev->rendermode & 0x0F; }
@@ -171,7 +171,7 @@ public:
 	inline int GetNoise(void) { return pev->body; }
 	inline int GetBrightness(void) { return (int) (pev->renderamt); }
 	inline int GetFrame(void) { return (int) (pev->frame); }
-	inline int GetScrollRate(void) { return (int) (pev->animtime); }
+	inline int GetScrollRate(void) { return reinterpret_cast<float &>(pev->animtime); }
 
 public:
 	void EXPORT TriggerTouch(CBaseEntity *pOther);
@@ -189,7 +189,7 @@ public:
 	static CBeam *BeamCreate(const char *pSpriteName, int width);
 
 public:
-	inline void LiveForTime(float time)
+	inline void LiveForTime(duration_t time)
 	{
 		SetThink(&CBaseEntity::SUB_Remove);
 		pev->nextthink = gpGlobals->time + time;
@@ -198,7 +198,7 @@ public:
 	inline void BeamDamageInstant(TraceResult *ptr, float damage)
 	{
 		pev->dmg = damage;
-		pev->dmgtime = gpGlobals->time - 1;
+		pev->dmgtime = gpGlobals->time - 1.0s;
 		BeamDamage(ptr);
 	}
 };

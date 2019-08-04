@@ -113,7 +113,7 @@ public:
 
 public:
 	void SetupRotation();
-	void RotMove(Vector &destAngle, float time);
+	void RotMove(Vector &destAngle, duration_t time);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[2];

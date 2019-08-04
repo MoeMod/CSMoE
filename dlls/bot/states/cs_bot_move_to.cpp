@@ -217,7 +217,7 @@ void MoveToState::OnUpdate(CCSBot *me)
 							// don't do this if we have already radioed that we are starting to plant
 							if (!m_radioedPlan)
 							{
-								const float radioTime = 2.0f;
+								constexpr auto radioTime = 2.0s;
 								if (gpGlobals->time - me->GetStateTimestamp() > radioTime)
 								{
 									me->GetChatter()->GoingToPlantTheBomb(TheNavAreaGrid.GetPlace(&m_goalPosition));
@@ -262,7 +262,7 @@ void MoveToState::OnUpdate(CCSBot *me)
 					const float watchHostageRange = 100.0f;
 					if (to.IsLengthLessThan(watchHostageRange))
 					{
-						me->SetLookAt("Hostage", &pos, PRIORITY_LOW, 0.5f);
+						me->SetLookAt("Hostage", &pos, PRIORITY_LOW, 0.5s);
 
 						// randomly move just a bit to avoid infinite use loops from bad hostage placement
 						NavRelativeDirType dir = (NavRelativeDirType)RANDOM_LONG(0, 3);

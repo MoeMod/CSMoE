@@ -58,8 +58,8 @@ protected:
 
 protected:
 	ZombieSkillStatus m_iZombieSkillStatus;
-	float m_flTimeZombieSkillEnd;
-	float m_flTimeZombieSkillNext;
+	EngineClock::time_point m_flTimeZombieSkillEnd;
+	EngineClock::time_point m_flTimeZombieSkillNext;
 
 };
 
@@ -90,10 +90,10 @@ public:
 
 protected:
 	void OnCrazyEffect();
-	float GetDurationTime() const;
-	float GetCooldownTime() const;
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
 
-	float m_flTimeZombieSkillEffect;
+	EngineClock::time_point m_flTimeZombieSkillEffect;
 };
 
 }

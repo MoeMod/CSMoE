@@ -97,19 +97,19 @@ void CGalil::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		GalilFire(0.04 + (0.3) * m_flAccuracy, 0.0875, FALSE);
+		GalilFire(0.04 + (0.3) * m_flAccuracy, 0.0875s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		GalilFire(0.04 + (0.07) * m_flAccuracy, 0.0875, FALSE);
+		GalilFire(0.04 + (0.07) * m_flAccuracy, 0.0875s, FALSE);
 	else
-		GalilFire((0.0375) * m_flAccuracy, 0.0875, FALSE);
+		GalilFire((0.0375) * m_flAccuracy, 0.0875s, FALSE);
 }
 
-void CGalil::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CGalil::GalilFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -123,7 +123,7 @@ void CGalil::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -156,7 +156,7 @@ void CGalil::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.045, 3.75, 3.0, 7);
@@ -173,7 +173,7 @@ void CGalil::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(GALIL_MAX_CLIP, GALIL_RELOAD, 2.45))
+	if (DefaultReload(GALIL_MAX_CLIP, GALIL_RELOAD, 2.45s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -192,7 +192,7 @@ void CGalil::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(GALIL_IDLE1, UseDecrement() != FALSE);
 }
 

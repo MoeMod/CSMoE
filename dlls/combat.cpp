@@ -561,7 +561,7 @@ void CBaseEntity::SUB_StartFadeOut()
 
 	pev->solid = SOLID_NOT;
 	pev->avelocity = g_vecZero;
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	SetThink(&CBaseEntity::SUB_FadeOut);
 }
@@ -570,10 +570,10 @@ void CBaseEntity::SUB_FadeOut()
 {
 	if (pev->renderamt > 7) {
 		pev->renderamt -= 7.0f;
-		pev->nextthink = gpGlobals->time + 0.1f;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	} else {
 		pev->renderamt = 0.0f;
-		pev->nextthink = gpGlobals->time + 0.2f;
+		pev->nextthink = gpGlobals->time + 0.2s;
 		SetThink(&CBaseEntity::SUB_Remove);
 	}
 }
@@ -590,9 +590,9 @@ void CGib::WaitTillLand()
 		pev->nextthink = gpGlobals->time + m_lifeTime;
 
 		if (m_bloodColor != DONT_BLEED)
-			CSoundEnt::InsertSound(bits_SOUND_MEAT, pev->origin, 384, 25);
+			CSoundEnt::InsertSound(bits_SOUND_MEAT, pev->origin, 384, 25s);
 	} else
-		pev->nextthink = gpGlobals->time + 0.5f;
+		pev->nextthink = gpGlobals->time + 0.5s;
 }
 
 void CGib::BounceGibTouch(CBaseEntity *pOther)
@@ -629,7 +629,7 @@ void CGib::StickyGibTouch(CBaseEntity *pOther)
 	TraceResult tr;
 
 	SetThink(&CBaseEntity::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 10;
+	pev->nextthink = gpGlobals->time + 10s;
 
 	if (!FClassnameIs(pOther->pev, "worldspawn")) {
 		pev->nextthink = gpGlobals->time;
@@ -673,8 +673,8 @@ void CGib::Spawn(const char *szGibModel)
 	SET_MODEL(ENT(pev), szGibModel);
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
-	pev->nextthink = gpGlobals->time + 4.0f;
-	m_lifeTime = 25.0f;
+	pev->nextthink = gpGlobals->time + 4.0s;
+	m_lifeTime = 25.0s;
 
 	SetThink(&CGib::WaitTillLand);
 	SetTouch(&CGib::BounceGibTouch);
@@ -884,11 +884,11 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 		TraceResult tr2;
 		Vector vecLOS;
 		float flDot;
-		float fadeTime;
-		float fadeHold;
+		duration_t fadeTime;
+		duration_t fadeHold;
 		int alpha;
 		CBasePlayer *pPlayer;
-		float currentHoldTime;
+		duration_t currentHoldTime;
 
 		if (!pEntity->IsPlayer())
 			continue;
@@ -929,20 +929,20 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 
 			if (flDot < 0) {
 				alpha = 200;
-				fadeTime = flAdjustedDamage * 1.75;
-				fadeHold = flAdjustedDamage / 3.5;
+				fadeTime = flAdjustedDamage * 1.75s;
+				fadeHold = duration_t(flAdjustedDamage / 3.5);
 			} else {
 				alpha = 255;
-				fadeTime = flAdjustedDamage * 3;
-				fadeHold = flAdjustedDamage / 1.5;
+				fadeTime = flAdjustedDamage * 3s;
+				fadeHold = duration_t(flAdjustedDamage / 1.5);
 			}
 
 			currentHoldTime = pPlayer->m_blindStartTime + pPlayer->m_blindHoldTime - gpGlobals->time;
 
-			if (currentHoldTime > 0.0 && alpha == 255)
+			if (currentHoldTime > 0.0s && alpha == 255)
 				fadeHold += currentHoldTime;
 
-			if (pPlayer->m_blindStartTime != 0.0f && pPlayer->m_blindFadeTime != 0.0f) {
+			if (pPlayer->m_blindStartTime > time_point_t() && pPlayer->m_blindFadeTime > duration_t()) {
 				if ((pPlayer->m_blindStartTime + pPlayer->m_blindFadeTime + pPlayer->m_blindHoldTime) >
 				    gpGlobals->time) {
 					if (pPlayer->m_blindFadeTime > fadeTime)

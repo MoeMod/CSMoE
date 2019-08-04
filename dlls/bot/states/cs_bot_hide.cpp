@@ -69,9 +69,9 @@ void HideState::OnEnter(CCSBot *me)
 	m_isAtSpot = false;
 
 	// if duration is "infinite", set it to a reasonably long time to prevent infinite camping
-	if (m_duration < 0.0f)
+	if (m_duration < 0.0s)
 	{
-		m_duration = RANDOM_FLOAT(30.0f, 60.0f);
+		m_duration = RandomDuration(30.0s, 60.0s);
 	}
 
 	// decide whether to "ambush" or not - never set to false so as not to override external setting
@@ -83,15 +83,15 @@ void HideState::OnEnter(CCSBot *me)
 	// if we are holding position, decide for how long
 	if (m_isHoldingPosition)
 	{
-		m_holdPositionTime = RANDOM_FLOAT(3.0f, 10.0f);
+		m_holdPositionTime = RandomDuration(3.0s, 10.0s);
 	}
 	else
 	{
-		m_holdPositionTime = 0.0f;
+		m_holdPositionTime = 0.0s;
 	}
 
 	m_heardEnemy = false;
-	m_firstHeardEnemyTime = 0.0f;
+	m_firstHeardEnemyTime = invalid_time_point;
 	m_retry = 0;
 
 	if (me->IsFollowing())
@@ -239,7 +239,7 @@ void HideState::OnUpdate(CCSBot *me)
 							else
 							{
 								me->MoveTo(&toDefuser, FASTEST_ROUTE);
-								me->InhibitLookAround(10.0f);
+								me->InhibitLookAround(10.0s);
 							}
 
 							return;
@@ -335,7 +335,7 @@ void HideState::OnUpdate(CCSBot *me)
 			me->SecondaryAttack();
 
 		// while sitting at our hiding spot, if we are being attacked but can't see our attacker, move somewhere else
-		const float hurtRecentlyTime = 1.0f;
+		constexpr auto hurtRecentlyTime = 1.0s;
 		if (!me->IsEnemyVisible() && me->GetTimeSinceAttacked() < hurtRecentlyTime)
 		{
 			me->Idle();
@@ -351,15 +351,15 @@ void HideState::OnUpdate(CCSBot *me)
 				{
 					if (me->GetNearbyEnemyCount() == 0)
 					{
-						const float someTime = 30.0f;
-						const float littleTime = 11.0;
+						constexpr auto someTime = 30.0s;
+						constexpr auto littleTime = 11.0s;
 
 						if (ctrl->GetBombTimeLeft() > someTime)
-							me->GetChatter()->Encourage("BombsiteSecure", RANDOM_FLOAT(10.0f, 15.0f));
+							me->GetChatter()->Encourage("BombsiteSecure", RandomDuration(10.0s, 15.0s));
 						else if (ctrl->GetBombTimeLeft() > littleTime)
-							me->GetChatter()->Encourage("WaitingForHumanToDefuseBomb", RANDOM_FLOAT(5.0f, 8.0f));
+							me->GetChatter()->Encourage("WaitingForHumanToDefuseBomb", RandomDuration(5.0s, 8.0s));
 						else
-							me->GetChatter()->Encourage("WaitingForHumanToDefuseBombPanic", RANDOM_FLOAT(3.0f, 4.0f));
+							me->GetChatter()->Encourage("WaitingForHumanToDefuseBombPanic", RandomDuration(3.0s, 4.0s));
 					}
 				}
 
@@ -370,7 +370,7 @@ void HideState::OnUpdate(CCSBot *me)
 						CHostage *hostage = me->GetGameState()->GetNearestVisibleFreeHostage();
 						if (hostage != NULL)
 						{
-							me->GetChatter()->Encourage("WaitingForHumanToRescueHostages", RANDOM_FLOAT(10.0f, 15.0f));
+							me->GetChatter()->Encourage("WaitingForHumanToRescueHostages", RandomDuration(10.0s, 15.0s));
 						}
 					}
 				}

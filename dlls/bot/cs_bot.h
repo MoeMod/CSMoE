@@ -38,6 +38,10 @@
 #include "bot/cs_bot_manager.h"
 #include "bot/cs_bot_chatter.h"
 #include "bot/cs_bot_statemachine.h"
+#include <chrono>
+#include <chrono>
+#include <chrono>
+#include <chrono>
 
 #define CSBOT_VERSION_MAJOR		1
 #define CSBOT_VERSION_MINOR		50
@@ -81,7 +85,7 @@ public:
 	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;		// invoked when injured by something (EXTEND) - returns the amount of damage inflicted
 	void Killed(entvars_t *pevAttacker, int iGib) override;									// invoked when killed (EXTEND)
 	void RoundRespawn() override;
-	void Blind(float duration, float holdTime, float fadeTime, int alpha = 255) override;					// player blinded by a flashbang
+	void Blind(duration_t duration, duration_t holdTime, duration_t fadeTime, int alpha = 255) override;					// player blinded by a flashbang
 	void OnTouchingWeapon(CWeaponBox *box) override;										// invoked when in contact with a CWeaponBox
 
 	bool Initialize(const BotProfile *profile) override;									// (EXTEND) prepare bot for action
@@ -112,21 +116,21 @@ public:
 	bool IsRogue() const;					// return true if we dont listen to teammates or pursue scenario goals
 	void SetRogue(bool rogue);
 	bool IsHurrying() const;				// return true if we are in a hurry
-	void Hurry(float duration);				// force bot to hurry
+	void Hurry(duration_t duration);				// force bot to hurry
 	bool IsSafe() const;					// return true if we are in a safe region
 	bool IsWellPastSafe() const;				// return true if it is well past the early, "safe", part of the round
 	bool IsEndOfSafeTime() const;				// return true if we were in the safe time last update, but not now
-	float GetSafeTimeRemaining() const;			// return the amount of "safe time" we have left
-	float GetSafeTime() const;				// return what we think the total "safe time" for this map is
+	duration_t GetSafeTimeRemaining() const;			// return the amount of "safe time" we have left
+	duration_t GetSafeTime() const;				// return what we think the total "safe time" for this map is
 	NOXREF bool IsUnhealthy() const;			// returns true if bot is low on health
 
 	// behaviors
 	void Idle();
-	void Hide(CNavArea *searchFromArea = NULL, float duration = -1.0f, float hideRange = 750.0f, bool holdPosition = false);						// DEPRECATED: Use TryToHide() instead
+	void Hide(CNavArea *searchFromArea = NULL, duration_t duration = -1.0s, float hideRange = 750.0f, bool holdPosition = false);						// DEPRECATED: Use TryToHide() instead
 	#define USE_NEAREST true
-	bool TryToHide(CNavArea *searchFromArea = NULL, float duration = -1.0f, float hideRange = 750.0f, bool holdPosition = false, bool useNearest = false);			// try to hide nearby, return false if cannot
+	bool TryToHide(CNavArea *searchFromArea = NULL, EngineClock::duration duration = -1.0s, float hideRange = 750.0f, bool holdPosition = false, bool useNearest = false);			// try to hide nearby, return false if cannot
 
-	void Hide(const Vector *hidingSpot, float duration = -1.0f, bool holdPosition = false);											// move to the given hiding place
+	void Hide(const Vector *hidingSpot, EngineClock::duration duration = -1.0s, bool holdPosition = false);											// move to the given hiding place
 	bool IsHiding() const;																			// returns true if bot is currently hiding
 	bool IsAtHidingSpot() const;																		// return true if we are hiding and at our hiding spot
 	bool TryToRetreat();																			// retreat to a nearby hiding spot, away from enemies
@@ -167,7 +171,7 @@ public:
 	void StopFollowing();									// stop following
 	bool IsFollowing() const;								// return true if we are following someone (not necessarily in the follow state)
 	CBasePlayer *GetFollowLeader();								// return the leader we are following
-	float GetFollowDuration() const;							// return how long we've been following our leader
+	duration_t GetFollowDuration() const;							// return how long we've been following our leader
 	bool CanAutoFollow() const;								// return true if we can auto-follow
 
 	bool IsNotMoving() const;								// return true if we are currently standing still
@@ -177,10 +181,10 @@ public:
 	bool IsAimingAtEnemy() const;								// returns true if we are trying to aim at an enemy
 
 	bool IsSurprised() const;								// return true if we are "surprised"
-	float GetSurpriseDelay() const;
+	duration_t GetSurpriseDelay() const;
 	void ClearSurpriseDelay();
 
-	float GetStateTimestamp() const;							// get time current state was entered
+	time_point_t GetStateTimestamp() const;							// get time current state was entered
 
 	bool IsDoingScenario() const;								// return true if we will do scenario-related tasks
 
@@ -238,7 +242,7 @@ public:
 	void SetDisposition(DispositionType disposition);					// define how we react to enemies
 	DispositionType GetDisposition() const;							// return enum describing current disposition
 
-	void IgnoreEnemies(float duration);							// ignore enemies for a short duration
+	void IgnoreEnemies(duration_t duration);							// ignore enemies for a short duration
 
 	enum MoraleType
 	{
@@ -272,7 +276,7 @@ public:
 	void SendRadioMessage(GameEventType event);						// send voice chatter
 	BotChatterInterface *GetChatter();							// return an interface to this bot's chatter system
 	bool RespondToHelpRequest(CBasePlayer *them, Place place, float maxRange = -1.0f);	// decide if we should move to help the player, return true if we will
-	void StartVoiceFeedback(float duration);
+	void StartVoiceFeedback(duration_t duration);
 	bool IsUsingVoice() const;								// new-style "voice" chatter gets voice feedback
 
 	// enemies
@@ -302,15 +306,15 @@ public:
 	float GetRangeToNearestRecognizedEnemy();						// return distance to closest enemy we are "conscious" of
 
 	CBasePlayer *GetAttacker() const;							// return last enemy that hurt us
-	float GetTimeSinceAttacked() const;							// return duration since we were last injured by an attacker
-	float GetFirstSawEnemyTimestamp() const;						// time since we saw any enemies
-	float GetLastSawEnemyTimestamp() const;
-	float GetTimeSinceLastSawEnemy() const;
-	float GetTimeSinceAcquiredCurrentEnemy() const;
+	duration_t GetTimeSinceAttacked() const;							// return duration since we were last injured by an attacker
+	time_point_t GetFirstSawEnemyTimestamp() const;						// time since we saw any enemies
+	time_point_t GetLastSawEnemyTimestamp() const;
+	duration_t GetTimeSinceLastSawEnemy() const;
+	duration_t GetTimeSinceAcquiredCurrentEnemy() const;
 	bool HasNotSeenEnemyForLongTime() const;						// return true if we haven't seen an enemy for "a long time"
 	const Vector &GetLastKnownEnemyPosition() const;
 	bool IsEnemyVisible() const;								// is our current enemy visible
-	float GetEnemyDeathTimestamp() const;
+	time_point_t GetEnemyDeathTimestamp() const;
 	bool IsFriendInLineOfFire();								// return true if a friend is in our weapon's way
 	bool IsAwareOfEnemyDeath() const;							// return true if we *noticed* that our enemy died
 	int GetLastVictimID() const;								// return the ID (entindex) of the last victim we killed, or zero
@@ -352,7 +356,7 @@ public:
 	bool IsNearJump() const;									// return true if nearing a jump in the path
 	float GetApproximateFallDamage(float height) const;						// return how much damage will will take from the given fall height
 
-	void ForceRun(float duration);									// force the bot to run if it moves for the given duration
+	void ForceRun(duration_t duration);									// force the bot to run if it moves for the given duration
 	void Wiggle();											// random movement, for getting un-stuck
 
 	bool IsFriendInTheWay(const Vector *goalPos) const;						// return true if a friend is between us and the given position
@@ -362,14 +366,14 @@ public:
 	void SetLookAngles(float yaw, float pitch);			// set our desired look angles
 	void UpdateLookAngles();					// move actual view angles towards desired ones
 	void UpdateLookAround(bool updateNow = false);			// update "looking around" mechanism
-	void InhibitLookAround(float duration);				// block all "look at" and "looking around" behavior for given duration - just look ahead
+	void InhibitLookAround(duration_t duration);				// block all "look at" and "looking around" behavior for given duration - just look ahead
 
 	// TODO: Clean up notion of "forward angle" and "look ahead angle"
 	void SetForwardAngle(float angle);				// define our forward facing
 	void SetLookAheadAngle(float angle);				// define default look ahead angle
 
 	// look at the given point in space for the given duration (-1 means forever)
-	void SetLookAt(const char *desc, const Vector *pos, PriorityType pri, float duration = -1.0f, bool clearIfClose = false, float angleTolerance = 5.0f);
+	void SetLookAt(const char *desc, const Vector *pos, PriorityType pri, duration_t duration = -1.0s, bool clearIfClose = false, float angleTolerance = 5.0f);
 	void ClearLookAt();						// stop looking at a point in space and just look ahead
 	bool IsLookingAtSpot(PriorityType pri = PRIORITY_LOW) const;	// return true if we are looking at spot with equal or higher priority
 	bool IsViewMoving(float angleVelThreshold = 1.0f) const;	// returns true if bot's view angles are rotating (not still)
@@ -386,7 +390,7 @@ public:
 	NOXREF void UpdateApproachPoints();					// recompute the approach point set if we have moved far enough to invalidate the current ones
 	void ClearApproachPoints();
 	void DrawApproachPoints();						// for debugging
-	float GetHidingSpotCheckTimestamp(HidingSpot *spot) const;		// return time when given spot was last checked
+	time_point_t GetHidingSpotCheckTimestamp(HidingSpot *spot) const;		// return time when given spot was last checked
 	void SetHidingSpotCheckTimestamp(HidingSpot *spot);			// set the timestamp of the given spot to now
 
 	// weapon query and equip
@@ -452,19 +456,19 @@ private:
 	mutable CountdownTimer m_rogueTimer;
 	MoraleType m_morale;					// our current morale, based on our win/loss history
 	bool m_diedLastRound;					// true if we died last round
-	float m_safeTime;					// duration at the beginning of the round where we feel "safe"
+	duration_t m_safeTime;					// duration at the beginning of the round where we feel "safe"
 	bool m_wasSafe;						// true if we were in the safe time last update
 	NavRelativeDirType m_blindMoveDir;			// which way to move when we're blind
 	bool m_blindFire;					// if true, fire weapon while blinded
 
 	// TODO: implement through CountdownTimer
-	float m_surpriseDelay;					// when we were surprised
-	float m_surpriseTimestamp;
+	duration_t m_surpriseDelay;					// when we were surprised
+	time_point_t m_surpriseTimestamp;
 
 	bool m_isFollowing;					// true if we are following someone
 	EntityHandle<CBasePlayer> m_leader;					// the ID of who we are following
-	float m_followTimestamp;				// when we started following
-	float m_allowAutoFollowTime;				// time when we can auto follow
+	time_point_t m_followTimestamp;				// when we started following
+	time_point_t m_allowAutoFollowTime;				// time when we can auto follow
 
 	CountdownTimer m_hurryTimer;				// if valid, bot is in a hurry
 
@@ -486,7 +490,7 @@ private:
 	// TODO: Allow multiple simultaneous state machines (look around, etc)
 	void SetState(BotState *state);						// set the current behavior state
 	BotState *m_state;							// current behavior state
-	float m_stateTimestamp;							// time state was entered
+	time_point_t m_stateTimestamp;							// time state was entered
 	bool m_isAttacking;							// if true, special Attack state is overriding the state machine
 
 	TaskType m_task;							// our current task
@@ -507,13 +511,13 @@ private:
 	CNavArea *m_currentArea;						// the nav area we are standing on
 	CNavArea *m_lastKnownArea;						// the last area we were in
 	EHANDLE m_avoid;							// higher priority player we need to make way for
-	float m_avoidTimestamp;
+	time_point_t m_avoidTimestamp;
 	bool m_isJumpCrouching;
 	bool m_isJumpCrouched;
 	bool m_isBhopJumping;
-	float m_flBhopSyncNext;
+	time_point_t m_flBhopSyncNext;
 	NavRelativeDirType m_BhopLastSyncDir;
-	float m_jumpCrouchTimestamp;
+	time_point_t m_jumpCrouchTimestamp;
 
 	// path navigation data
 	enum { 	MAX_PATH_LENGTH = 256 };
@@ -527,7 +531,7 @@ private:
 	m_path[ MAX_PATH_LENGTH ];
 	int m_pathLength;
 	int m_pathIndex;
-	float m_areaEnteredTimestamp;
+	time_point_t m_areaEnteredTimestamp;
 	void BuildTrivialPath(const Vector *goal);										// build trivial path to goal, assuming we are already in the same area
 	bool FindGrenadeTossPathTarget(Vector *pos);
 
@@ -569,10 +573,10 @@ private:
 	const CNavLadder *m_pathLadder;			// the ladder we need to use to reach the next area
 	bool UpdateLadderMovement();			// called by UpdatePathMovement()
 	NavRelativeDirType m_pathLadderDismountDir;	// which way to dismount
-	float m_pathLadderDismountTimestamp;		// time when dismount started
+	time_point_t m_pathLadderDismountTimestamp;		// time when dismount started
 	float m_pathLadderEnd;				// if ascending, z of top, if descending z of bottom
 	void ComputeLadderEndpoint(bool isAscending);
-	float m_pathLadderTimestamp;			// time when we started using ladder - for timeout check
+	time_point_t m_pathLadderTimestamp;			// time when we started using ladder - for timeout check
 
 	CountdownTimer m_mustRunTimer;			// if nonzero, bot cannot walk
 
@@ -582,25 +586,25 @@ private:
 	// hostages mechanism
 	byte m_hostageEscortCount;
 	void UpdateHostageEscortCount();
-	float m_hostageEscortCountTimestamp;
+	time_point_t m_hostageEscortCountTimestamp;
 	bool m_isWaitingForHostage;
 	CountdownTimer m_inhibitWaitingForHostageTimer;
 	CountdownTimer m_waitForHostageTimer;
 
 	// listening mechanism
 	Vector m_noisePosition;				// position we last heard non-friendly noise
-	float m_noiseTimestamp;				// when we heard it (can get zeroed)
+	time_point_t m_noiseTimestamp;				// when we heard it (can get zeroed)
 	CNavArea *m_noiseArea;				// the nav area containing the noise
-	float m_noiseCheckTimestamp;
+	time_point_t m_noiseCheckTimestamp;
 	PriorityType m_noisePriority;			// priority of currently heard noise
 	bool UpdateLookAtNoise();			// return true if we decided to look towards the most recent noise source
 	bool m_isNoiseTravelRangeChecked;
 
 	// "looking around" mechanism
-	float m_lookAroundStateTimestamp;		// time of next state change
+	time_point_t m_lookAroundStateTimestamp;		// time of next state change
 	float m_lookAheadAngle;				// our desired forward look angle
 	float m_forwardAngle;				// our current forward facing direction
-	float m_inhibitLookAroundTimestamp;		// time when we can look around again
+	time_point_t m_inhibitLookAroundTimestamp;		// time when we can look around again
 
 	enum LookAtSpotState
 	{
@@ -612,14 +616,14 @@ private:
 	m_lookAtSpotState;
 	Vector m_lookAtSpot;					// the spot we're currently looking at
 	PriorityType m_lookAtSpotPriority;
-	float m_lookAtSpotDuration;				// how long we need to look at the spot
-	float m_lookAtSpotTimestamp;				// when we actually began looking at the spot
+	duration_t m_lookAtSpotDuration;				// how long we need to look at the spot
+	time_point_t m_lookAtSpotTimestamp;				// when we actually began looking at the spot
 	float m_lookAtSpotAngleTolerance;			// how exactly we must look at the spot
 	bool m_lookAtSpotClearIfClose;				// if true, the look at spot is cleared if it gets close to us
 	const char *m_lookAtDesc;				// for debugging
 	void UpdateLookAt();
 	void UpdatePeripheralVision();				// update enounter spot timestamps, etc
-	float m_peripheralTimestamp;
+	time_point_t m_peripheralTimestamp;
 
 	enum { MAX_APPROACH_POINTS = 16 };
 	Vector m_approachPoint[ MAX_APPROACH_POINTS ];
@@ -633,14 +637,14 @@ private:
 	CountdownTimer m_tossGrenadeTimer;			// timeout timer for grenade tossing
 
 	SpotEncounter *m_spotEncounter;				// the spots we will encounter as we move thru our current area
-	float m_spotCheckTimestamp;				// when to check next encounter spot
+	time_point_t m_spotCheckTimestamp;				// when to check next encounter spot
 
 	// TODO: Add timestamp for each possible client to hiding spots
 	enum { MAX_CHECKED_SPOTS = 64 };
 	struct HidingSpotCheckInfo
 	{
 		HidingSpot *spot;
-		float timestamp;
+		time_point_t timestamp;
 	}
 	m_checkedHidingSpot[ MAX_CHECKED_SPOTS ];
 	int m_checkedHidingSpotCount;
@@ -655,8 +659,8 @@ private:
 	mutable Vector m_eyePos;
 	Vector m_aimOffset;					// current error added to victim's position to get actual aim spot
 	Vector m_aimOffsetGoal;					// desired aim offset
-	float m_aimOffsetTimestamp;				// time of next offset adjustment
-	float m_aimSpreadTimestamp;				// time used to determine max spread as it begins to tighten up
+	time_point_t m_aimOffsetTimestamp;				// time of next offset adjustment
+	time_point_t m_aimSpreadTimestamp;				// time used to determine max spread as it begins to tighten up
 	void SetAimOffset(float accuracy);			// set the current aim offset
 	void UpdateAimOffset();					// wiggle aim error based on m_accuracy
 	Vector m_aimSpot;					// the spot we are currently aiming to fire at
@@ -668,17 +672,17 @@ private:
 	bool m_isEnemyVisible;					// result of last visibility test on enemy
 	unsigned char m_visibleEnemyParts;			// which parts of the visible enemy do we see
 	Vector m_lastEnemyPosition;				// last place we saw the enemy
-	float m_lastSawEnemyTimestamp;
-	float m_firstSawEnemyTimestamp;
-	float m_currentEnemyAcquireTimestamp;
-	float m_enemyDeathTimestamp;				// if m_enemy is dead, this is when he died
+	time_point_t m_lastSawEnemyTimestamp;
+	time_point_t m_firstSawEnemyTimestamp;
+	time_point_t m_currentEnemyAcquireTimestamp;
+	time_point_t m_enemyDeathTimestamp;				// if m_enemy is dead, this is when he died
 	bool m_isLastEnemyDead;					// true if we killed or saw our last enemy die
 	int m_nearbyEnemyCount;					// max number of enemies we've seen recently
 	unsigned int m_enemyPlace;				// the location where we saw most of our enemies
 
 	struct WatchInfo
 	{
-		float timestamp;
+		time_point_t timestamp;
 		bool isEnemy;
 	}
 	m_watchInfo[ MAX_CLIENTS ];
@@ -689,7 +693,7 @@ private:
 	mutable EntityHandle<CBasePlayer> m_closestVisibleHumanFriend;		// the closest human friend we can see
 
 	CBasePlayer *m_attacker;				// last enemy that hurt us (may not be same as m_enemy)
-	float m_attackedTimestamp;				// when we were hurt by the m_attacker
+	time_point_t m_attackedTimestamp;				// when we were hurt by the m_attacker
 
 	int m_lastVictimID;					// the entindex of the last victim we killed, or zero
 	bool m_isAimingAtEnemy;					// if true, we are trying to aim at our enemy
@@ -700,7 +704,7 @@ private:
 	void ReloadCheck();					// reload our weapon if we must
 	void SilencerCheck();					// use silencer
 
-	float m_fireWeaponTimestamp;
+	time_point_t m_fireWeaponTimestamp;
 
 	// reaction time system
 	enum { MAX_ENEMY_QUEUE = 20 };
@@ -721,11 +725,11 @@ private:
 
 	// stuck detection
 	bool m_isStuck;
-	float m_stuckTimestamp;					// time when we got stuck
+	time_point_t m_stuckTimestamp;					// time when we got stuck
 	Vector m_stuckSpot;					// the location where we became stuck
 	NavRelativeDirType m_wiggleDirection;
-	float m_wiggleTimestamp;
-	float m_stuckJumpTimestamp;				// time for next jump when stuck
+	time_point_t m_wiggleTimestamp;
+	time_point_t m_stuckJumpTimestamp;				// time for next jump when stuck
 
 	enum { MAX_VEL_SAMPLES = 5 };
 	float m_avgVel[ MAX_VEL_SAMPLES ];
@@ -740,12 +744,12 @@ private:
 
 	#define NO_FORCE false
 	void EndVoiceFeedback(bool force = true);
-	float m_lastRadioRecievedTimestamp;			// time we recieved a radio message
-	float m_lastRadioSentTimestamp;				// time when we send a radio message
+	time_point_t m_lastRadioRecievedTimestamp;			// time we recieved a radio message
+	time_point_t m_lastRadioSentTimestamp;				// time when we send a radio message
 	EntityHandle<CBasePlayer> m_radioSubject;					// who issued the radio message
 	Vector m_radioPosition;					// position referred to in radio message
-	float m_voiceFeedbackStartTimestamp;
-	float m_voiceFeedbackEndTimestamp;			// new-style "voice" chatter gets voice feedback
+	time_point_t m_voiceFeedbackStartTimestamp;
+	time_point_t m_voiceFeedbackEndTimestamp;			// new-style "voice" chatter gets voice feedback
 	BotChatterInterface m_chatter;
 
 	// learn map mechanism
@@ -794,12 +798,12 @@ inline void CCSBot::SetRogue(bool rogue)
 	m_isRogue = rogue;
 }
 
-inline void CCSBot::Hurry(float duration)
+inline void CCSBot::Hurry(duration_t duration)
 {
 	m_hurryTimer.Start(duration);
 }
 
-inline float CCSBot::GetSafeTime() const
+inline duration_t CCSBot::GetSafeTime() const
 {
 	return m_safeTime;
 }
@@ -819,7 +823,7 @@ inline CBasePlayer *CCSBot::GetFollowLeader()
 	return static_cast<CBasePlayer *>(m_leader);
 }
 
-inline float CCSBot::GetFollowDuration() const
+inline duration_t CCSBot::GetFollowDuration() const
 {
 	return gpGlobals->time - m_followTimestamp;
 }
@@ -846,21 +850,24 @@ inline bool CCSBot::IsAimingAtEnemy() const
 
 inline bool CCSBot::IsSurprised() const
 {
-	return gpGlobals->time - m_surpriseTimestamp < 5.0f;
+	return gpGlobals->time - m_surpriseTimestamp < 5.0s;
 }
 
-inline float CCSBot::GetSurpriseDelay() const
+inline duration_t CCSBot::GetSurpriseDelay() const
 {
-	return ( gpGlobals->time -  IsSurprised() )? m_surpriseDelay : 0.0f;
+	if (!IsSurprised())
+		return 0.0s;
+
+	return m_surpriseDelay;
 }
 
 inline void CCSBot::ClearSurpriseDelay()
 {
-	m_surpriseDelay = 0.0f;
-	m_surpriseTimestamp = 0.0f;
+	m_surpriseDelay = 0.0s;
+	m_surpriseTimestamp = invalid_time_point;
 }
 
-inline float CCSBot::GetStateTimestamp() const
+inline time_point_t CCSBot::GetStateTimestamp() const
 {
 	return m_stateTimestamp;
 }
@@ -887,7 +894,7 @@ inline CCSBot::MoraleType CCSBot::GetMorale() const
 
 inline bool CCSBot::IsNoiseHeard() const
 {
-	if (m_noiseTimestamp <= 0.0f)
+	if (m_noiseTimestamp <= invalid_time_point)
 		return false;
 
 	// primitive reaction time simulation - cannot "hear" noise until reaction time has elapsed
@@ -920,7 +927,7 @@ inline CNavArea *CCSBot::GetNoiseArea() const
 
 inline void CCSBot::ForgetNoise()
 {
-	m_noiseTimestamp = 0.0f;
+	m_noiseTimestamp = invalid_time_point;
 }
 
 inline PriorityType CCSBot::GetNoisePriority() const
@@ -935,7 +942,7 @@ inline BotChatterInterface *CCSBot::GetChatter()
 
 inline bool CCSBot::IsUsingVoice() const
 {
-	return (m_voiceFeedbackEndTimestamp != 0.0f);
+	return (m_voiceFeedbackEndTimestamp != invalid_time_point);
 }
 
 inline CBaseEntity *CCSBot::GetEnemy()
@@ -978,27 +985,27 @@ inline CBasePlayer *CCSBot::GetClosestVisibleHumanFriend() const
 	return static_cast<CBasePlayer *>(m_closestVisibleHumanFriend);
 }
 
-inline float CCSBot::GetTimeSinceAttacked() const
+inline duration_t CCSBot::GetTimeSinceAttacked() const
 {
 	return gpGlobals->time - m_attackedTimestamp;
 }
 
-inline float CCSBot::GetFirstSawEnemyTimestamp() const
+inline time_point_t CCSBot::GetFirstSawEnemyTimestamp() const
 {
 	return m_firstSawEnemyTimestamp;
 }
 
-inline float CCSBot::GetLastSawEnemyTimestamp() const
+inline time_point_t CCSBot::GetLastSawEnemyTimestamp() const
 {
 	return m_lastSawEnemyTimestamp;
 }
 
-inline float CCSBot::GetTimeSinceLastSawEnemy() const
+inline duration_t CCSBot::GetTimeSinceLastSawEnemy() const
 {
 	return gpGlobals->time - m_lastSawEnemyTimestamp;
 }
 
-inline float CCSBot::GetTimeSinceAcquiredCurrentEnemy() const
+inline duration_t CCSBot::GetTimeSinceAcquiredCurrentEnemy() const
 {
 	return gpGlobals->time - m_currentEnemyAcquireTimestamp;
 }
@@ -1013,7 +1020,7 @@ inline bool CCSBot::IsEnemyVisible() const
 	return m_isEnemyVisible;
 }
 
-inline float CCSBot::GetEnemyDeathTimestamp() const
+inline time_point_t CCSBot::GetEnemyDeathTimestamp() const
 {
 	return m_enemyDeathTimestamp;
 }
@@ -1064,7 +1071,7 @@ inline CBaseEntity *CCSBot::GetGoalEntity()
 	return m_goalEntity;
 }
 
-inline void CCSBot::ForceRun(float duration)
+inline void CCSBot::ForceRun(duration_t duration)
 {
 	Run();
 	m_mustRunTimer.Start(duration);
@@ -1174,7 +1181,7 @@ inline float CCSBot::GetFeetZ() const
 
 inline const Vector *CCSBot::GetNoisePosition() const
 {
-	if (m_noiseTimestamp > 0.0f)
+	if (m_noiseTimestamp > invalid_time_point)
 		return &m_noisePosition;
 
 	return NULL;

@@ -177,7 +177,7 @@ public:
 public:
 	float m_accel;        // Acceleration
 	float m_distance;
-	float m_time;
+	time_point_t m_time;
 	float m_damp;
 	float m_maxSpeed;
 	float m_dampSpeed;

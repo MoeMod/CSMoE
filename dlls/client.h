@@ -90,7 +90,7 @@ enum ZbsUpgradeMenuSlot
 
 typedef struct
 {
-	float m_fTimeEnteredPVS;
+	time_point_t m_fTimeEnteredPVS;
 
 } ENTITYPVSSTATUS;
 
@@ -110,8 +110,8 @@ struct entity_field_alias_t
 
 namespace sv {
 
-extern float g_flTimeLimit;
-extern float g_flResetTime;
+extern time_point_t g_flTimeLimit;
+extern time_point_t g_flResetTime;
 extern bool g_skipCareerInitialSpawn;
 
 extern unsigned short m_usResetDecals;
@@ -178,7 +178,7 @@ void SpectatorThink(edict_t *pEntity);
 void SetupVisibility(edict_t *pViewEntity, edict_t *pClient, unsigned char **pvs, unsigned char **pas);
 void ResetPlayerPVS(edict_t *client, int clientnum);
 bool CheckPlayerPVSLeafChanged(edict_t *client, int clientnum);
-void MarkEntityInPVS(int clientnum, int entitynum, float time, bool inpvs);
+void MarkEntityInPVS(int clientnum, int entitynum, time_point_t time, bool inpvs);
 bool CheckEntityRecentlyInPVS(int clientnum, int entitynum, float currenttime);
 int AddToFullPack(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player,
                   unsigned char *pSet);

@@ -96,7 +96,7 @@ public:
 	BYTE m_bUnlockedSound;
 	BYTE m_bUnlockedSentence;
 
-	float m_lastBlockedTimestamp;
+	time_point_t m_lastBlockedTimestamp;
 };
 
 class CRotDoor : public CBaseDoor

@@ -116,7 +116,7 @@ void CMod_Zombi::Think()
 		CheckFreezePeriodExpired();
 	}
 
-	if (m_fTeamCount != 0.0f && m_fTeamCount <= gpGlobals->time)
+	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		RestartRound();
 	}
@@ -126,7 +126,7 @@ void CMod_Zombi::Think()
 	if (gpGlobals->time > m_tmNextPeriodicThink)
 	{
 		CheckRestartRound();
-		m_tmNextPeriodicThink = gpGlobals->time + 1.0f;
+		m_tmNextPeriodicThink = gpGlobals->time + 1.0s;
 
 		if (g_psv_accelerate->value != 5.0f)
 		{
@@ -160,7 +160,7 @@ void CMod_Zombi::Think()
 		}
 	}
 
-	if (TimeRemaining() <= 0 && !m_bRoundTerminating && !m_bFreezePeriod)
+	if (TimeRemaining() <= 0s && !m_bRoundTerminating && !m_bFreezePeriod)
 		HumanWin();
 }
 
@@ -171,7 +171,7 @@ void CMod_Zombi::HumanWin()
 		CLIENT_COMMAND(player->edict(), "spk win_human\n");
 
 	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
-	TerminateRound(5, WINSTATUS_CTS);
+	TerminateRound(5s, WINSTATUS_CTS);
 	RoundEndScore(WINSTATUS_CTS);
 
 	++m_iNumCTWins;
@@ -185,7 +185,7 @@ void CMod_Zombi::ZombieWin()
 		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
 
 	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
-	TerminateRound(5, WINSTATUS_TERRORISTS);
+	TerminateRound(5s, WINSTATUS_TERRORISTS);
 	RoundEndScore(WINSTATUS_TERRORISTS);
 
 	++m_iNumTerroristWins;

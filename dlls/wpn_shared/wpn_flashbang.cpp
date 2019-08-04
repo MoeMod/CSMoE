@@ -46,8 +46,8 @@ void CFlashbang::Spawn(void)
 
 	pev->dmg = 4;
 	m_iDefaultAmmo = FLASHBANG_DEFAULT_GIVE;
-	m_flStartThrow = 0;
-	m_flReleaseThrow = -1;
+	m_flStartThrow = invalid_time_point;
+	m_flReleaseThrow = invalid_time_point;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 
 	FallInit();
@@ -84,7 +84,7 @@ int CFlashbang::GetItemInfo(ItemInfo *p)
 
 BOOL CFlashbang::Deploy(void)
 {
-	m_flReleaseThrow = -1;
+	m_flReleaseThrow = invalid_time_point;
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
@@ -98,7 +98,7 @@ BOOL CFlashbang::Deploy(void)
 
 void CFlashbang::Holster(int skiplocal)
 {
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5;
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
@@ -106,8 +106,8 @@ void CFlashbang::Holster(int skiplocal)
 		DestroyItem();
 	}
 
-	m_flStartThrow = 0;
-	m_flReleaseThrow = -1;
+	m_flStartThrow = invalid_time_point;
+	m_flReleaseThrow = invalid_time_point;
 }
 
 void CFlashbang::PrimaryAttack(void)
@@ -115,12 +115,12 @@ void CFlashbang::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 		return;
 
-	if (!m_flStartThrow && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
 	{
 		m_flStartThrow = gpGlobals->time;
-		m_flReleaseThrow = 0;
+		m_flReleaseThrow = invalid_time_point;
 		SendWeaponAnim(FLASHBANG_PULLPIN, UseDecrement() != FALSE);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 	}
 }
 
@@ -149,7 +149,7 @@ bool CFlashbang::ShieldSecondaryFire(int up_anim, int down_anim)
 	if (m_pPlayer->HasShield() == false)
 		return false;
 
-	if (m_flStartThrow > 0)
+	if (m_flStartThrow != invalid_time_point)
 		return false;
 
 	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
@@ -173,9 +173,9 @@ bool CFlashbang::ShieldSecondaryFire(int up_anim, int down_anim)
 	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_SHIELD_DRAWN) == 0);
 	m_pPlayer->ResetMaxSpeed();
 #endif
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.6;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.6s;
 	return true;
 }
 
@@ -186,13 +186,13 @@ void CFlashbang::SecondaryAttack(void)
 
 void CFlashbang::WeaponIdle(void)
 {
-	if (!m_flReleaseThrow && m_flStartThrow)
+	if (m_flReleaseThrow == invalid_time_point && m_flStartThrow != invalid_time_point)
 		m_flReleaseThrow = gpGlobals->time;
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	if (m_flStartThrow)
+	if (m_flStartThrow != invalid_time_point)
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->Radio("%!MRAD_FIREINHOLE", "#Fire_in_the_hole");
@@ -212,7 +212,7 @@ void CFlashbang::WeaponIdle(void)
 		UTIL_MakeVectors(angThrow);
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
-		float time = 1.5;
+		auto time = 1.5s;
 		CGrenade::ShootTimed(m_pPlayer->pev, vecSrc, vecThrow, time);
 
 		SendWeaponAnim(FLASHBANG_THROW, UseDecrement() != FALSE);
@@ -221,20 +221,20 @@ void CFlashbang::WeaponIdle(void)
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-		m_flStartThrow = 0;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75;
+		m_flStartThrow = invalid_time_point;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-			m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5;
+			m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 		ResetPlayerShieldAnim();
 		return;
 	}
-	else if (m_flReleaseThrow > 0)
+	else if (m_flReleaseThrow != invalid_time_point)
 	{
-		m_flStartThrow = 0;
+		m_flStartThrow = invalid_time_point;
 		RetireWeapon();
 		return;
 	}
@@ -245,7 +245,7 @@ void CFlashbang::WeaponIdle(void)
 
 		if (m_pPlayer->HasShield() != false)
 		{
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
 
 			if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 				SendWeaponAnim(SHIELDREN_IDLE, UseDecrement() != FALSE);
@@ -254,9 +254,9 @@ void CFlashbang::WeaponIdle(void)
 		}
 
 		if (flRand > 0.75)
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5s;
 		else
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RANDOM_FLOAT(10, 15);
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + RandomDuration<float>(10s, 15s);
 
 		SendWeaponAnim(FLASHBANG_IDLE, UseDecrement() != FALSE);
 	}

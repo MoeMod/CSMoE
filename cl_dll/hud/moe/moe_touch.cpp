@@ -283,7 +283,7 @@ void CHudMoeTouch::Think(void)
 		pimpl->m_flMinX = std::min(pimpl->m_flMinX, pimpl->m_flX);
 
 		// slow down dy
-		if (std::abs(pimpl->m_flDy) < 0.1)
+		if (abs(pimpl->m_flDy) < 0.1)
 			pimpl->m_flDy = 0.0f;
 		else if (pimpl->m_flDy > 0)
 			pimpl->m_flDy -= 0.05f;

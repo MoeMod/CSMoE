@@ -430,7 +430,7 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 			}
 			else if (!Q_stricmp("ReactionTime", attributeName))
 			{
-				profile->m_reactionTime = Q_atof(token);
+				profile->m_reactionTime = Q_atof(token) * 1s;
 
 #ifndef GAMEUI_EXPORTS
 				// subtract off latency due to "think" update rate.
@@ -441,7 +441,7 @@ void BotProfileManager::Init(const char *filename, unsigned int *checksum)
 			}
 			else if (!Q_stricmp("AttackDelay", attributeName))
 			{
-				profile->m_attackDelay = Q_atof(token);
+				profile->m_attackDelay = Q_atof(token) * 1s;
 			}
 			else if (!Q_stricmp("Difficulty", attributeName))
 			{

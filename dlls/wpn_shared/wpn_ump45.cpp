@@ -96,12 +96,12 @@ BOOL CUMP45::Deploy(void)
 void CUMP45::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		UMP45Fire((0.24) * m_flAccuracy, 0.1, FALSE);
+		UMP45Fire((0.24) * m_flAccuracy, 0.1s, FALSE);
 	else
-		UMP45Fire((0.04) * m_flAccuracy, 0.1, FALSE);
+		UMP45Fire((0.04) * m_flAccuracy, 0.1s, FALSE);
 }
 
-void CUMP45::UMP45Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CUMP45::UMP45Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -115,7 +115,7 @@ void CUMP45::UMP45Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -149,7 +149,7 @@ void CUMP45::UMP45Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.125, 0.65, 0.55, 0.0475, 5.5, 4.0, 10);
@@ -166,7 +166,7 @@ void CUMP45::Reload(void)
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
 
-	if (DefaultReload(UMP45_MAX_CLIP, UMP45_RELOAD, 3.5))
+	if (DefaultReload(UMP45_MAX_CLIP, UMP45_RELOAD, 3.5s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -184,7 +184,7 @@ void CUMP45::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(UMP45_IDLE1, UseDecrement() != FALSE);
 }
 

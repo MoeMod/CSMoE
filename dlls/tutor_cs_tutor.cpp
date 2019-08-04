@@ -214,7 +214,7 @@ CCSTutor::CCSTutor()
 {
 	m_stateSystem = new CCSTutorStateSystem;
 
-	m_nextViewableCheckTime = 0;
+	m_nextViewableCheckTime = invalid_time_point;
 	m_currentlyShownMessageID = TUTOR_NUM_MESSAGES;
 	m_currentMessageEvent = NULL;
 	m_messageTypeMask = TUTORMESSAGETYPE_ALL;
@@ -391,12 +391,12 @@ void ParseMessageParameters(char *&messageData, TutorMessage *ret)
 		else if (!Q_stricmp(token, "MinDisplayTimeOverride"))
 		{
 			messageData = MP_COM_Parse((char *)messageData);
-			ret->m_minDisplayTimeOverride = Q_atof(MP_COM_GetToken());
+			ret->m_minDisplayTimeOverride = Q_atof(MP_COM_GetToken()) * 1s;
 		}
 		else if (!Q_stricmp(token, "MinRepeatInterval"))
 		{
 			messageData = MP_COM_Parse((char *)messageData);
-			ret->m_minRepeatInterval = Q_atof(MP_COM_GetToken());
+			ret->m_minRepeatInterval = Q_atof(MP_COM_GetToken()) * 1s;
 		}
 	}
 }
@@ -417,9 +417,9 @@ TutorMessage *ConstructTutorMessage(char *&messageData, TutorMessage *defaults)
         ret->m_interruptFlag = defaults->m_interruptFlag;
         ret->m_minDisplayTimeOverride = defaults->m_minDisplayTimeOverride;
 	ret->m_minRepeatInterval = defaults->m_minRepeatInterval;
-	ret->m_examineStartTime = -1.0f;
+	ret->m_examineStartTime = invalid_time_point;
         ret->m_timesShown = 0;
-	ret->m_lastCloseTime = 0;
+	ret->m_lastCloseTime = invalid_time_point;
 
 	ParseMessageParameters(messageData, ret);
 
@@ -460,8 +460,8 @@ void CCSTutor::ReadTutorMessageFile()
 	defaultMessage.m_decay = 10;
 	defaultMessage.m_lifetime = 10;
 	defaultMessage.m_interruptFlag = TUTORMESSAGEINTERRUPTFLAG_DEFAULT;
-	defaultMessage.m_minDisplayTimeOverride = 0;
-	defaultMessage.m_minRepeatInterval = 0;
+	defaultMessage.m_minDisplayTimeOverride = zero_duration;
+	defaultMessage.m_minRepeatInterval = zero_duration;
 
 	while (true)
 	{
@@ -510,12 +510,12 @@ void CCSTutor::ApplyPersistentDecay()
 	}
 }
 
-bool CCSTutor::HasCurrentWindowBeenActiveLongEnough(float time)
+bool CCSTutor::HasCurrentWindowBeenActiveLongEnough(time_point_t time)
 {
 	return (m_currentlyShownMessageID < 0 || m_currentlyShownMessageID >= TUTOR_NUM_MESSAGES || time > m_currentlyShownMessageMinimumCloseTime);
 }
 
-bool CCSTutor::ShouldShowMessageEvent(TutorMessageEvent *event, float time)
+bool CCSTutor::ShouldShowMessageEvent(TutorMessageEvent *event, time_point_t time)
 {
 	if (event == NULL)
 	{
@@ -570,7 +570,7 @@ bool CCSTutor::ShouldShowMessageEvent(TutorMessageEvent *event, float time)
 	return false;
 }
 
-void CCSTutor::CheckForInterruptingMessageEvent(float time)
+void CCSTutor::CheckForInterruptingMessageEvent(time_point_t time)
 {
 	bool newEvent = false;
 
@@ -615,7 +615,7 @@ void CCSTutor::CheckForInterruptingMessageEvent(float time)
 	ConstructMessageAndDisplay();
 }
 
-void CCSTutor::TutorThink(float time)
+void CCSTutor::TutorThink(time_point_t time)
 {
 	if (m_nextViewableCheckTime <= time)
 	{
@@ -649,7 +649,7 @@ void CCSTutor::TutorThink(float time)
 			}
 		}
 
-		m_nextViewableCheckTime = cv_tutor_viewable_check_interval.value + time;
+		m_nextViewableCheckTime = cv_tutor_viewable_check_interval.value * 1s + time;
 	}
 
 	CheckForInactiveEvents(time);
@@ -658,7 +658,7 @@ void CCSTutor::TutorThink(float time)
 	CheckForInterruptingMessageEvent(time);
 }
 
-void CCSTutor::CheckForWindowClose(float time)
+void CCSTutor::CheckForWindowClose(time_point_t time)
 {
 	if (m_currentlyShownMessageID < 0 || m_currentlyShownMessageID >= 150 || time <= m_currentlyShownMessageCloseTime)
 	{
@@ -720,8 +720,8 @@ void CCSTutor::ClearCurrentEvent(bool closeWindow, bool processDeathsForEvent)
 	}
 
 	m_currentlyShownMessageID = TUTOR_NUM_MESSAGES;
-	m_currentlyShownMessageCloseTime = 0;
-	m_currentlyShownMessageMinimumCloseTime = 0;
+	m_currentlyShownMessageCloseTime = invalid_time_point;
+	m_currentlyShownMessageMinimumCloseTime = invalid_time_point;
 
 	if (m_currentMessageEvent != NULL)
 	{
@@ -783,7 +783,7 @@ bool CCSTutor::GetDuplicateMessagesFromEventList(TutorMessageEvent *&event1, Tut
 	return false;
 }
 
-void CCSTutor::CheckForInactiveEvents(float time)
+void CCSTutor::CheckForInactiveEvents(time_point_t time)
 {
 	TutorMessageEvent *event = m_eventList;
 
@@ -888,7 +888,7 @@ TutorMessageEvent *CCSTutor::CreateTutorMessageEvent(TutorMessageID mid, CBaseEn
 		mid,
 		message->m_duplicateID,
 		gpGlobals->time,
-		message->m_lifetime,
+		std::chrono::seconds (message->m_lifetime),
 		message->m_priority
 	);
 
@@ -1130,34 +1130,33 @@ void CCSTutor::PurgeMessages()
 	}
 }
 
+// TODO(MoeMod): time fix here?
 void CCSTutor::ComputeDisplayTimesForMessage()
 {
 	TutorMessage *message = GetTutorMessageDefinition(m_currentlyShownMessageID);
-	float now = gpGlobals->time;
-
-	if (message == NULL)
+	if (!message)
 	{
-		m_currentlyShownMessageCloseTime = now;
+		m_currentlyShownMessageCloseTime = gpGlobals->time;
 		return;
 	}
 
-	m_currentlyShownMessageCloseTime = message->m_duration + now;
-	m_currentlyShownMessageMinimumCloseTime = cv_tutor_message_minimum_display_time.value;
+	m_currentlyShownMessageCloseTime = message->m_duration * 1s + gpGlobals->time;
+	duration_t minCloseTime = cv_tutor_message_minimum_display_time.value * 1s;
 
 	int stringLength = GET_LOCALIZED_STRING_LENGTH(message->m_text);
-	float minShowTime = stringLength * cv_tutor_message_character_display_time_coefficient.value;
+	duration_t minShowTime = stringLength * cv_tutor_message_character_display_time_coefficient.value * 1s;
 
-	if (minShowTime > m_currentlyShownMessageMinimumCloseTime)
+	if (minShowTime > minCloseTime)
 	{
-		m_currentlyShownMessageMinimumCloseTime = minShowTime;
+		minCloseTime = minShowTime;
 	}
 
-	if (message->m_minDisplayTimeOverride <= m_currentlyShownMessageMinimumCloseTime)
+	if (message->m_minDisplayTimeOverride <= minCloseTime)
 	{
-		message->m_minDisplayTimeOverride = m_currentlyShownMessageMinimumCloseTime;
+		message->m_minDisplayTimeOverride = minCloseTime;
 	}
 
-	m_currentlyShownMessageMinimumCloseTime = message->m_minDisplayTimeOverride + now;
+	m_currentlyShownMessageMinimumCloseTime = message->m_minDisplayTimeOverride + gpGlobals->time;
 
 	if (m_currentlyShownMessageMinimumCloseTime > m_currentlyShownMessageCloseTime)
 	{
@@ -1201,7 +1200,7 @@ void CCSTutor::UpdateCurrentMessage(TutorMessageEvent *event)
 
 		if (localPlayer != NULL)
 		{
-			m_currentlyShownMessageCloseTime = definition->m_duration + gpGlobals->time;
+			m_currentlyShownMessageCloseTime = definition->m_duration * 1s + gpGlobals->time;
 
 			if (definition->m_keepOld == TUTORMESSAGEKEEPOLDTYPE_UPDATE_CONTENT)
 			{
@@ -1228,8 +1227,8 @@ void CCSTutor::ShowTutorMessage(TutorMessageEvent *event)
 		m_currentlyShownMessageID = mid;
 		m_currentMessageEvent = event;
 
-		m_currentlyShownMessageCloseTime = 0;
-		m_currentlyShownMessageMinimumCloseTime = 0;
+		m_currentlyShownMessageCloseTime = invalid_time_point;
+		m_currentlyShownMessageMinimumCloseTime = invalid_time_point;
 	}
 }
 
@@ -1461,7 +1460,7 @@ void CCSTutor::HandleWeaponFiredOnEmpty(CBaseEntity *entity, CBaseEntity *other)
 
 				if (message != NULL)
 				{
-					message->m_lastCloseTime = 0;
+					message->m_lastCloseTime = invalid_time_point;
 				}
 
 				CreateAndAddEventToList(YOU_ARE_OUT_OF_AMMO);
@@ -2720,7 +2719,7 @@ void CCSTutor::CheckForTimeRunningOut()
 	CBasePlayer *localPlayer = UTIL_GetLocalPlayer();
 	CHalfLifeMultiplay *mpRules = g_pGameRules;
 
-	if (localPlayer == NULL || mpRules->IsFreezePeriod() || mpRules->TimeRemaining() > 30.0f)
+	if (localPlayer == NULL || mpRules->IsFreezePeriod() || mpRules->TimeRemaining() > 30.0s)
 	{
 		return;
 	}
@@ -2897,9 +2896,9 @@ CBaseEntity *CCSTutor::GetEntityForMessageID(int messageID, CBaseEntity *last)
 	return ret;
 }
 
-void CCSTutor::CheckHintMessages(float time)
+void CCSTutor::CheckHintMessages(time_point_t time)
 {
-	if (m_deadAirStartTime <= 0.0f || (time - m_deadAirStartTime <= cv_tutor_hint_interval_time.value))
+	if (m_deadAirStartTime == invalid_time_point || (time - m_deadAirStartTime <= duration_t(cv_tutor_hint_interval_time.value)))
 	{
 		return;
 	}
@@ -2940,9 +2939,9 @@ void CCSTutor::CheckHintMessages(float time)
 	}
 }
 
-void CCSTutor::CheckInGameHintMessages(float time)
+void CCSTutor::CheckInGameHintMessages(time_point_t time)
 {
-	if (m_deadAirStartTime <= 0.0f || (time - m_deadAirStartTime <= cv_tutor_hint_interval_time.value))
+	if (m_deadAirStartTime == invalid_time_point || (time - m_deadAirStartTime <= duration_t(cv_tutor_hint_interval_time.value)))
 	{
 		return;
 	}
@@ -3009,7 +3008,7 @@ void CCSTutor::CheckForNeedToReload(bool isPassiveCheck)
 
 				if (message != NULL)
 				{
-					message->m_lastCloseTime = 0;
+					message->m_lastCloseTime = invalid_time_point;
 				}
 
 				CreateAndAddEventToList(YOU_SHOULD_RELOAD);
@@ -3033,7 +3032,7 @@ void CCSTutor::CheckForNeedToReload(bool isPassiveCheck)
 
 			if (message != NULL)
 			{
-				message->m_lastCloseTime = 0;
+				message->m_lastCloseTime = invalid_time_point;
 			}
 		}
 
@@ -3041,7 +3040,7 @@ void CCSTutor::CheckForNeedToReload(bool isPassiveCheck)
 	}
 }
 
-void CCSTutor::CheckExamineMessages(float time)
+void CCSTutor::CheckExamineMessages(time_point_t time)
 {
 	CBasePlayer *localPlayer = UTIL_GetLocalPlayer();
 
@@ -3085,10 +3084,10 @@ void CCSTutor::CheckExamineMessages(float time)
 
 		if (isPlayerLooking)
 		{
-			if (message->m_examineStartTime == -1.0f)
+			if (message->m_examineStartTime == invalid_time_point)
 				continue;
 
-			if (time - message->m_examineStartTime <= cv_tutor_examine_time.value)
+			if (time - message->m_examineStartTime <= cv_tutor_examine_time.value * 1s)
 				continue;
 
 			bool validEntity = false;
@@ -3129,7 +3128,7 @@ void CCSTutor::CheckExamineMessages(float time)
 			}
 		}
 		else
-			message->m_examineStartTime = -1.0f;
+			message->m_examineStartTime = invalid_time_point;
 	}
 }
 

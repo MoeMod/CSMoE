@@ -74,7 +74,7 @@ void CBubbling::Spawn(void)
 
 	if (!(pev->spawnflags & SF_BUBBLES_STARTOFF)) {
 		SetThink(&CBubbling::FizzThink);
-		pev->nextthink = gpGlobals->time + 2;
+		pev->nextthink = gpGlobals->time + 2s;
 		m_state = 1;
 	} else
 		m_state = 0;
@@ -92,10 +92,10 @@ void CBubbling::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 
 	if (m_state) {
 		SetThink(&CBubbling::FizzThink);
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	} else {
 		SetThink(NULL);
-		pev->nextthink = 0;
+		pev->nextthink = {};
 	}
 }
 
@@ -124,9 +124,9 @@ void CBubbling::FizzThink(void)
 	MESSAGE_END();
 
 	if (m_frequency > 19)
-		pev->nextthink = gpGlobals->time + 0.5;
+		pev->nextthink = gpGlobals->time + 0.5s;
 	else
-		pev->nextthink = gpGlobals->time + 2.5 - (0.1 * m_frequency);
+		pev->nextthink = gpGlobals->time + 2.5s - (0.1s * m_frequency);
 }
 
 LINK_ENTITY_TO_CLASS(beam, CBeam);
@@ -330,7 +330,7 @@ public:
 
 	inline BOOL ServerSide(void)
 	{
-		if (m_life == 0 && !(pev->spawnflags & SF_BEAM_RING))
+		if (m_life.count() == 0 && !(pev->spawnflags & SF_BEAM_RING))
 			return TRUE;
 
 		return FALSE;
@@ -349,12 +349,12 @@ public:
 	int m_active;
 	int m_iszStartEntity;
 	int m_iszEndEntity;
-	float m_life;
+	duration_t m_life;
 	int m_boltWidth;
 	int m_noiseAmplitude;
 	int m_brightness;
 	int m_speed;
-	float m_restrike;
+	duration_t m_restrike;
 	int m_spriteTexture;
 	int m_iszSpriteName;
 	int m_frameStart;
@@ -416,14 +416,14 @@ void CLightning::Spawn(void)
 
 		if (pev->dmg > 0) {
 			SetThink(&CLightning::DamageThink);
-			pev->nextthink = gpGlobals->time + 0.1;
+			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 
 		if (pev->targetname) {
 			if (!(pev->spawnflags & SF_BEAM_STARTON)) {
 				pev->effects = EF_NODRAW;
 				m_active = 0;
-				pev->nextthink = 0;
+				pev->nextthink = {};
 			} else
 				m_active = 1;
 
@@ -437,7 +437,7 @@ void CLightning::Spawn(void)
 
 		if (FStringNull(pev->targetname) || FBitSet(pev->spawnflags, SF_BEAM_STARTON)) {
 			SetThink(&CLightning::StrikeThink);
-			pev->nextthink = gpGlobals->time + 1;
+			pev->nextthink = gpGlobals->time + 1s;
 		}
 	}
 }
@@ -463,7 +463,7 @@ void CLightning::KeyValue(KeyValueData *pkvd)
 		m_iszEndEntity = ALLOC_STRING(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "life")) {
-		m_life = atof(pkvd->szValue);
+		m_life = duration_t(atof(pkvd->szValue));
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "BoltWidth")) {
 		m_boltWidth = atoi(pkvd->szValue);
@@ -475,7 +475,7 @@ void CLightning::KeyValue(KeyValueData *pkvd)
 		m_speed = atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "StrikeTime")) {
-		m_restrike = atof(pkvd->szValue);
+		m_restrike = atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "texture")) {
 		m_iszSpriteName = ALLOC_STRING(pkvd->szValue);
@@ -501,7 +501,7 @@ void CLightning::ToggleUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	if (m_active) {
 		m_active = 0;
 		pev->effects |= EF_NODRAW;
-		pev->nextthink = 0;
+		pev->nextthink = {};
 	} else {
 		m_active = 1;
 		pev->effects &= ~EF_NODRAW;
@@ -524,7 +524,7 @@ void CLightning::StrikeUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		SetThink(NULL);
 	} else {
 		SetThink(&CLightning::StrikeThink);
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	}
 
 	if (!FBitSet(pev->spawnflags, SF_BEAM_TOGGLE))
@@ -545,9 +545,9 @@ int IsPointEntity(CBaseEntity *pEnt)
 
 void CLightning::StrikeThink(void)
 {
-	if (m_life != 0) {
+	if (m_life > 0s) {
 		if (pev->spawnflags & SF_BEAM_RANDOM)
-			pev->nextthink = gpGlobals->time + m_life + RANDOM_FLOAT(0, m_restrike);
+			pev->nextthink = gpGlobals->time + m_life + RandomDuration(0.0s, m_restrike);
 		else
 			pev->nextthink = gpGlobals->time + m_life + m_restrike;
 	}
@@ -616,7 +616,7 @@ void CLightning::StrikeThink(void)
 		WRITE_SHORT(m_spriteTexture);
 		WRITE_BYTE(m_frameStart);
 		WRITE_BYTE((int) pev->framerate);
-		WRITE_BYTE((int) (m_life * 10));
+		WRITE_BYTE((int) (m_life.count() * 10));
 		WRITE_BYTE(m_boltWidth);
 		WRITE_BYTE(m_noiseAmplitude);
 		WRITE_BYTE((int) pev->rendercolor.x);
@@ -645,7 +645,7 @@ void CBeam::BeamDamage(TraceResult *ptr)
 
 		if (pHit) {
 			ClearMultiDamage();
-			pHit->TraceAttack(pev, pev->dmg * (gpGlobals->time - pev->dmgtime),
+			pHit->TraceAttack(pev, pev->dmg * (gpGlobals->time - pev->dmgtime).count(),
 			                  (ptr->vecEndPos - pev->origin).Normalize(), ptr, DMG_ENERGYBEAM);
 			ApplyMultiDamage(pev, pev);
 
@@ -661,7 +661,7 @@ void CBeam::BeamDamage(TraceResult *ptr)
 
 void CLightning::DamageThink(void)
 {
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 
 	TraceResult tr;
 	UTIL_TraceLine(GetStartPos(), GetEndPos(), dont_ignore_monsters, NULL, &tr);
@@ -681,7 +681,7 @@ void CLightning::Zap(const Vector &vecSrc, const Vector &vecDest)
 	WRITE_SHORT(m_spriteTexture);
 	WRITE_BYTE(m_frameStart);
 	WRITE_BYTE((int) pev->framerate);
-	WRITE_BYTE((int) (m_life * 10));
+	WRITE_BYTE((int) (m_life.count() * 10));
 	WRITE_BYTE(m_boltWidth);
 	WRITE_BYTE(m_noiseAmplitude);
 	WRITE_BYTE((int) pev->rendercolor.x);
@@ -902,7 +902,7 @@ int CLaser::IsOn(void)
 void CLaser::TurnOff(void)
 {
 	pev->effects |= EF_NODRAW;
-	pev->nextthink = 0;
+	pev->nextthink = {};
 
 	if (m_pSprite)
 		m_pSprite->TurnOff();
@@ -953,7 +953,7 @@ void CLaser::StrikeThink(void)
 	TraceResult tr;
 	UTIL_TraceLine(pev->origin, m_firePosition, dont_ignore_monsters, NULL, &tr);
 	FireAtPoint(tr);
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 class CGlow : public CPointEntity
@@ -969,7 +969,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	float m_lastTime;
+	time_point_t m_lastTime;
 	float m_maxFrame;
 };
 
@@ -995,15 +995,15 @@ void CGlow::Spawn(void)
 	m_maxFrame = (float) MODEL_FRAMES(pev->modelindex) - 1;
 
 	if (m_maxFrame > 1 && pev->framerate != 0)
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 
 	m_lastTime = gpGlobals->time;
 }
 
 void CGlow::Think(void)
 {
-	Animate(pev->framerate * (gpGlobals->time - m_lastTime));
-	pev->nextthink = gpGlobals->time + 0.1;
+	Animate(pev->framerate * (gpGlobals->time - m_lastTime).count());
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_lastTime = gpGlobals->time;
 }
 
@@ -1020,8 +1020,8 @@ public:
 	void Think(void);
 
 public:
-	float m_flLastFreq;
-	float m_flFreqInterval;
+	time_point_t m_flLastFreq;
+	duration_t m_flFreqInterval;
 	bool m_bHasSetModel;
 };
 
@@ -1033,7 +1033,7 @@ void CBombGlow::Spawn(void)
 	pev->movetype = MOVETYPE_NONE;
 	pev->effects = 0;
 	pev->frame = 0;
-	pev->nextthink = gpGlobals->time + 0.05;
+	pev->nextthink = gpGlobals->time + 0.05s;
 	pev->rendermode = kRenderGlow;
 	pev->rendercolor.x = 255;
 	pev->rendercolor.y = 15;
@@ -1041,7 +1041,7 @@ void CBombGlow::Spawn(void)
 	pev->renderamt = 100;
 	pev->renderfx = kRenderFxNone;
 
-	m_flFreqInterval = 2;
+	m_flFreqInterval = 2s;
 	m_flLastFreq = gpGlobals->time;
 	m_bHasSetModel = false;
 }
@@ -1060,14 +1060,14 @@ void CBombGlow::Think(void)
 		m_flFreqInterval *= 0.95;
 		m_flLastFreq = gpGlobals->time;
 
-		if (m_flFreqInterval < 0.1)
-			m_flFreqInterval = 0.1;
+		if (m_flFreqInterval < 0.1s)
+			m_flFreqInterval = 0.1s;
 
 		pev->effects = 0;
 		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/c4_beep1.wav", VOL_NORM, 1);
 	}
 
-	pev->nextthink = gpGlobals->time + 0.05;
+	pev->nextthink = gpGlobals->time + 0.05s;
 }
 
 LINK_ENTITY_TO_CLASS(env_sprite, CSprite);
@@ -1156,8 +1156,8 @@ CSprite *CSprite::SpriteCreate(const char *pSpriteName, const Vector &origin, BO
 
 void CSprite::AnimateThink(void)
 {
-	Animate(pev->framerate * (gpGlobals->time - m_lastTime));
-	pev->nextthink = gpGlobals->time + 0.1;
+	Animate(pev->framerate * (gpGlobals->time - m_lastTime).count());
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_lastTime = gpGlobals->time;
 }
 
@@ -1183,15 +1183,15 @@ void CSprite::Expand(float scaleSpeed, float fadeSpeed)
 
 void CSprite::ExpandThink(void)
 {
-	float frametime = gpGlobals->time - m_lastTime;
-	pev->scale += pev->speed * frametime;
-	pev->renderamt -= pev->health * frametime;
+	duration_t frametime = gpGlobals->time - m_lastTime;
+	pev->scale += pev->speed * frametime.count();
+	pev->renderamt -= pev->health * frametime.count();
 
 	if (pev->renderamt <= 0) {
 		pev->renderamt = 0;
 		UTIL_Remove(this);
 	} else {
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 		m_lastTime = gpGlobals->time;
 	}
 }
@@ -1211,7 +1211,7 @@ void CSprite::Animate(float frames)
 void CSprite::TurnOff(void)
 {
 	pev->effects = EF_NODRAW;
-	pev->nextthink = 0;
+	pev->nextthink = {};
 }
 
 void CSprite::TurnOn(void)
@@ -1263,7 +1263,7 @@ public:
 	int m_iGibModelIndex;
 	float m_flGibVelocity;
 	float m_flVariance;
-	float m_flGibLife;
+	duration_t m_flGibLife;
 };
 
 TYPEDESCRIPTION CGibShooter::m_SaveData[] =
@@ -1300,7 +1300,7 @@ void CGibShooter::KeyValue(KeyValueData *pkvd)
 		m_flVariance = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "m_flGibLife")) {
-		m_flGibLife = atof(pkvd->szValue);
+		m_flGibLife = duration_t(atof(pkvd->szValue));
 		pkvd->fHandled = TRUE;
 	} else
 		CBaseDelay::KeyValue(pkvd);
@@ -1319,11 +1319,11 @@ void CGibShooter::Spawn(void)
 	pev->solid = SOLID_NOT;
 	pev->effects = EF_NODRAW;
 
-	if (m_flDelay == 0)
-		m_flDelay = 0.1;
+	if (m_flDelay == 0s)
+		m_flDelay = 0.1s;
 
-	if (m_flGibLife == 0)
-		m_flGibLife = 25;
+	if (m_flGibLife.count() == 0)
+		m_flGibLife = 25s;
 
 	SetMovedir(pev);
 	pev->body = MODEL_FRAMES(m_iGibModelIndex);
@@ -1363,12 +1363,12 @@ void CGibShooter::ShootThink(void)
 		pGib->pev->avelocity.x = RANDOM_FLOAT(100, 200);
 		pGib->pev->avelocity.y = RANDOM_FLOAT(100, 300);
 
-		float thinkTime = pGib->pev->nextthink - gpGlobals->time;
+		duration_t thinkTime = pGib->pev->nextthink - gpGlobals->time;
 		pGib->m_lifeTime = (m_flGibLife * RANDOM_FLOAT(0.95, 1.05));
 
 		if (pGib->m_lifeTime < thinkTime) {
 			pGib->pev->nextthink = gpGlobals->time + pGib->m_lifeTime;
-			pGib->m_lifeTime = 0;
+			pGib->m_lifeTime = {};
 		}
 	}
 
@@ -1473,8 +1473,8 @@ public:
 	int m_iLoop;
 	int m_iBeam;
 	CBeam *m_pBeam[24];
-	float m_flBeamTime[24];
-	float m_flStartTime;
+	time_point_t m_flBeamTime[24];
+	time_point_t m_flStartTime;
 };
 
 LINK_ENTITY_TO_CLASS(test_effect, CTestEffect);
@@ -1491,7 +1491,7 @@ void CTestEffect::Precache(void)
 
 void CTestEffect::TestThink(void)
 {
-	float t = (gpGlobals->time - m_flStartTime);
+	float t = (gpGlobals->time - m_flStartTime) / 1s;
 
 	if (m_iBeam < 24) {
 		CBeam *pbeam = CBeam::BeamCreate("sprites/lgtning.spr", 100);
@@ -1514,11 +1514,11 @@ void CTestEffect::TestThink(void)
 
 	if (t < 3) {
 		for (int i = 0; i < m_iBeam; i++) {
-			t = (gpGlobals->time - m_flBeamTime[i]) / (3 + m_flStartTime - m_flBeamTime[i]);
+			t = (gpGlobals->time - m_flBeamTime[i]) / (3s + m_flStartTime - m_flBeamTime[i]);
 			m_pBeam[i]->SetBrightness((int) (255 * t));
 		}
 
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 	} else {
 		for (int i = 0; i < m_iBeam; i++)
 			UTIL_Remove(m_pBeam[i]);
@@ -1532,7 +1532,7 @@ void CTestEffect::TestThink(void)
 void CTestEffect::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
 	SetThink(&CTestEffect::TestThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	m_flStartTime = gpGlobals->time;
 }
 
@@ -1754,9 +1754,9 @@ void CFade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType,
 
 	if (pev->spawnflags & SF_FADE_ONLYONE) {
 		if (pActivator->IsNetClient())
-			UTIL_ScreenFade(pActivator, pev->rendercolor, Duration(), HoldTime(), (int) (pev->renderamt), fadeFlags);
+			UTIL_ScreenFade(pActivator, pev->rendercolor, duration_t(Duration()), duration_t(HoldTime()), (int) (pev->renderamt), fadeFlags);
 	} else
-		UTIL_ScreenFadeAll(pev->rendercolor, Duration(), HoldTime(), (int) (pev->renderamt), fadeFlags);
+		UTIL_ScreenFadeAll(pev->rendercolor, duration_t(Duration()), duration_t(HoldTime()), (int) (pev->renderamt), fadeFlags);
 
 	SUB_UseTargets(this, USE_TOGGLE, 0);
 }
@@ -1966,7 +1966,7 @@ void CItemSoda::Spawn(void)
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
 	SetThink(&CItemSoda::CanThink);
-	pev->nextthink = gpGlobals->time + 0.5;
+	pev->nextthink = gpGlobals->time + 0.5s;
 }
 
 void CItemSoda::CanThink(void)

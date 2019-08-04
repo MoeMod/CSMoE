@@ -97,12 +97,12 @@ BOOL CMP5N::Deploy(void)
 void CMP5N::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MP5NFire((0.2) * m_flAccuracy, 0.075, FALSE);
+		MP5NFire((0.2) * m_flAccuracy, 0.075s, FALSE);
 	else
-		MP5NFire((0.04) * m_flAccuracy, 0.075, FALSE);
+		MP5NFire((0.04) * m_flAccuracy, 0.075s, FALSE);
 }
 
-void CMP5N::MP5NFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CMP5N::MP5NFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -116,7 +116,7 @@ void CMP5N::MP5NFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -148,7 +148,7 @@ void CMP5N::MP5NFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.9, 0.475, 0.35, 0.0425, 5.0, 3.0, 6);
@@ -165,7 +165,7 @@ void CMP5N::Reload(void)
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
 
-	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, 2.63))
+	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, 2.63s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -183,7 +183,7 @@ void CMP5N::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(MP5N_IDLE1, UseDecrement() != FALSE);
 }
 

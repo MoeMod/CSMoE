@@ -47,7 +47,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_balrog7.mdl"; }
 
 public:
-	void Balrog7Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void RadiusDamage(Vector vecAiming, float flDamage);
 	float GetDamage();
 	int m_iShell;

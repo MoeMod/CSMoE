@@ -40,7 +40,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }
 
 public:
-	void DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseSemi);
+	void DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 
 	int m_iShell;
 

@@ -147,7 +147,7 @@ void CDecal::TriggerDecal(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	MESSAGE_END();
 
 	SetThink(&CDecal::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CDecal::StaticDecal()
@@ -647,7 +647,7 @@ void CWorld::Precache()
 			pEntity->SetThink(&CBaseEntity::SUB_CallUseToggle);
 			pEntity->pev->message = pev->netname;
 			pev->netname = 0;
-			pEntity->pev->nextthink = gpGlobals->time + 0.3f;
+			pEntity->pev->nextthink = gpGlobals->time + 0.3s;
 			pEntity->pev->spawnflags = SF_MESSAGE_ONCE;
 		}
 	}

@@ -134,7 +134,7 @@ void CMultiSource::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NONE;
-	pev->nextthink = gpGlobals->time + 0.1;
+	pev->nextthink = gpGlobals->time + 0.1s;
 	pev->spawnflags |= SF_MULTI_INIT;
 	SetThink(&CMultiSource::Register);
 }
@@ -191,7 +191,7 @@ void CMultiSource::Register(void)
 
 	edict_t *pentTarget = FIND_ENTITY_BY_STRING(NULL, "target", STRING(pev->targetname));
 
-	while (!FNullEnt(pentTarget) && m_iTotal < MS_MAX_TARGETS) {
+	while (!FNullEnt(pentTarget) && m_iTotal < static_cast<int>(MS_MAX_TARGETS)) {
 		CBaseEntity *pTarget = CBaseEntity::Instance(pentTarget);
 
 		if (pTarget)
@@ -202,7 +202,7 @@ void CMultiSource::Register(void)
 
 	pentTarget = FIND_ENTITY_BY_STRING(NULL, "classname", "multi_manager");
 
-	while (!FNullEnt(pentTarget) && m_iTotal < MS_MAX_TARGETS) {
+	while (!FNullEnt(pentTarget) && m_iTotal < static_cast<int>(MS_MAX_TARGETS)) {
 		CBaseEntity *pTarget = CBaseEntity::Instance(pentTarget);
 
 		if (pTarget && pTarget->HasTarget(pev->targetname))
@@ -378,7 +378,7 @@ void CBaseButton::Spawn(void)
 
 	if (FBitSet(pev->spawnflags, SF_BUTTON_SPARK_IF_OFF)) {
 		SetThink(&CBaseButton::ButtonSpark);
-		pev->nextthink = gpGlobals->time + 0.5;
+		pev->nextthink = gpGlobals->time + 0.5s;
 	}
 
 	SetMovedir(pev);
@@ -392,8 +392,8 @@ void CBaseButton::Spawn(void)
 	if (pev->health > 0)
 		pev->takedamage = DAMAGE_YES;
 
-	if (!m_flWait)
-		m_flWait = 1;
+	if (m_flWait == 0s)
+		m_flWait = 1s;
 
 	if (!m_flLip)
 		m_flLip = 4;
@@ -407,7 +407,7 @@ void CBaseButton::Spawn(void)
 	if (((m_vecPosition2 - m_vecPosition1).Length() < 1) || (pev->spawnflags & SF_BUTTON_DONTMOVE))
 		m_vecPosition2 = m_vecPosition1;
 
-	m_fStayPushed = m_flWait == -1 ? TRUE : FALSE;
+	m_fStayPushed = m_flWait == -1s ? TRUE : FALSE;
 	m_fRotating = FALSE;
 
 	if (FBitSet(pev->spawnflags, SF_BUTTON_TOUCH_ONLY)) {
@@ -522,7 +522,7 @@ void DoSpark(entvars_t *pev, const Vector &location)
 void CBaseButton::ButtonSpark(void)
 {
 	SetThink(&CBaseButton::ButtonSpark);
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT(0, 1.5));
+	pev->nextthink = gpGlobals->time + (0.1s + RandomDuration(0s, 1.5s));
 	DoSpark(pev, pev->mins);
 }
 
@@ -676,7 +676,7 @@ void CBaseButton::ButtonBackHome(void)
 
 	if (FBitSet(pev->spawnflags, SF_BUTTON_SPARK_IF_OFF)) {
 		SetThink(&CBaseButton::ButtonSpark);
-		pev->nextthink = gpGlobals->time + 0.5;
+		pev->nextthink = gpGlobals->time + 0.5s;
 	}
 }
 
@@ -710,8 +710,8 @@ void CRotButton::Spawn(void)
 	if (!pev->speed)
 		pev->speed = 40;
 
-	if (!m_flWait)
-		m_flWait = 1;
+	if (m_flWait == 0s)
+		m_flWait = 1s;
 
 	if (pev->health > 0)
 		pev->takedamage = DAMAGE_YES;
@@ -719,7 +719,7 @@ void CRotButton::Spawn(void)
 	m_toggle_state = TS_AT_BOTTOM;
 	m_vecAngle1 = pev->angles;
 	m_vecAngle2 = pev->angles + pev->movedir * m_flMoveDistance;
-	m_fStayPushed = m_flWait == -1 ? TRUE : FALSE;
+	m_fStayPushed = m_flWait == -1s ? TRUE : FALSE;
 	m_fRotating = TRUE;
 
 	if (!FBitSet(pev->spawnflags, SF_BUTTON_TOUCH_ONLY)) {
@@ -879,7 +879,7 @@ void CMomentaryRotButton::UpdateSelf(float value)
 	}
 
 	m_lastUsed = 1;
-	pev->nextthink = pev->ltime + 0.1;
+	pev->nextthink = pev->ltime + 0.1s;
 
 	if (m_direction > 0 && value >= 1) {
 		pev->avelocity = g_vecZero;
@@ -895,9 +895,9 @@ void CMomentaryRotButton::UpdateSelf(float value)
 		PlaySound();
 
 	if (pev->nextthink < pev->ltime)
-		pev->nextthink = pev->ltime + 0.1;
+		pev->nextthink = pev->ltime + 0.1s;
 	else
-		pev->nextthink += 0.1;
+		pev->nextthink += 0.1s;
 
 	pev->avelocity = (m_direction * pev->speed) * pev->movedir;
 	SetThink(&CMomentaryRotButton::Off);
@@ -930,7 +930,7 @@ void CMomentaryRotButton::Off(void)
 
 	if (FBitSet(pev->spawnflags, SF_PENDULUM_AUTO_RETURN) && m_returnSpeed > 0) {
 		SetThink(&CMomentaryRotButton::Return);
-		pev->nextthink = pev->ltime + 0.1;
+		pev->nextthink = pev->ltime + 0.1s;
 		m_direction = -1;
 	} else
 		SetThink(NULL);
@@ -952,11 +952,11 @@ void CMomentaryRotButton::UpdateSelfReturn(float value)
 	if (value <= 0) {
 		pev->avelocity = g_vecZero;
 		pev->angles = m_start;
-		pev->nextthink = -1;
+		pev->nextthink = {};
 		SetThink(NULL);
 	} else {
 		pev->avelocity = -m_returnSpeed * pev->movedir;
-		pev->nextthink = pev->ltime + 0.1;
+		pev->nextthink = pev->ltime + 0.1s;
 	}
 }
 
@@ -978,7 +978,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	float m_flDelay;
+	duration_t m_flDelay;
 };
 
 TYPEDESCRIPTION CEnvSpark::m_SaveData[] =
@@ -1004,10 +1004,10 @@ void CEnvSpark::Spawn(void)
 	} else
 		SetThink(&CEnvSpark::SparkThink);
 
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT(0, 1.5));
+	pev->nextthink = gpGlobals->time + (0.1s + RandomDuration(0s, 1.5s));
 
-	if (m_flDelay <= 0)
-		m_flDelay = 1.5;
+	if (m_flDelay <= 0s)
+		m_flDelay = 1.5s;
 
 	Precache();
 }
@@ -1025,7 +1025,7 @@ void CEnvSpark::Precache(void)
 void CEnvSpark::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "MaxDelay")) {
-		m_flDelay = atof(pkvd->szValue);
+		m_flDelay = atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	} else if (FStrEq(pkvd->szKeyName, "style") || FStrEq(pkvd->szKeyName, "height") ||
 	           FStrEq(pkvd->szKeyName, "killtarget") || FStrEq(pkvd->szKeyName, "value1") ||
@@ -1037,7 +1037,7 @@ void CEnvSpark::KeyValue(KeyValueData *pkvd)
 
 void EXPORT CEnvSpark::SparkThink(void)
 {
-	pev->nextthink = gpGlobals->time + 0.1 + RANDOM_FLOAT(0, m_flDelay);
+	pev->nextthink = gpGlobals->time + 0.1s + RandomDuration(0.0s, m_flDelay);
 	DoSpark(pev, pev->origin);
 }
 
@@ -1045,7 +1045,7 @@ void EXPORT CEnvSpark::SparkStart(CBaseEntity *pActivator, CBaseEntity *pCaller,
 {
 	SetUse(&CEnvSpark::SparkStop);
 	SetThink(&CEnvSpark::SparkThink);
-	pev->nextthink = gpGlobals->time + (0.1 + RANDOM_FLOAT(0, m_flDelay));
+	pev->nextthink = gpGlobals->time + (0.1s + RandomDuration(0.0s, m_flDelay));
 }
 
 void EXPORT CEnvSpark::SparkStop(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)

@@ -57,6 +57,9 @@
 #include "gamerules.h"
 #include "career_tasks.h"
 #include "maprules.h"
+#include <chrono>
+#include <chrono>
+#include <chrono>
 
 namespace sv {
 
@@ -91,7 +94,7 @@ float StayOnLadderLine(CCSBot *me, const CNavLadder *ladder)
 // TODO: Make stiffness and turn rate constants timestep invariant.
 void CCSBot::UpdateLookAngles()
 {
-	const float deltaT = g_flBotCommandInterval;
+	const auto deltaT = g_flBotCommandInterval;
 	float maxAccel;
 	float stiffness;
 	float damping;
@@ -215,8 +218,8 @@ void CCSBot::UpdateLookAngles()
 		else if (accel < -maxAccel)
 			accel = -maxAccel;
 
-		m_lookYawVel += deltaT * accel;
-		pev->v_angle.y += deltaT * m_lookYawVel;
+		m_lookYawVel += deltaT / 1s * accel;
+		pev->v_angle.y += deltaT / 1s * m_lookYawVel;
 	}
 
 	// Pitch
@@ -243,8 +246,8 @@ void CCSBot::UpdateLookAngles()
 		else if (accel < -maxAccel)
 			accel = -maxAccel;
 
-		m_lookPitchVel += deltaT * accel;
-		pev->v_angle.x += deltaT * m_lookPitchVel;
+		m_lookPitchVel += deltaT / 1s * accel;
+		pev->v_angle.x += deltaT / 1s * m_lookPitchVel;
 	}
 
 	// limit range - avoid gimbal lock
@@ -361,7 +364,7 @@ void CCSBot::UpdateLookAt()
 
 // Look at the given point in space for the given duration (-1 means forever)
 
-void CCSBot::SetLookAt(const char *desc, const Vector *pos, PriorityType pri, float duration, bool clearIfClose, float angleTolerance)
+void CCSBot::SetLookAt(const char *desc, const Vector *pos, PriorityType pri, duration_t duration, bool clearIfClose, float angleTolerance)
 {
 	if (pos == NULL)
 		return;
@@ -395,7 +398,7 @@ void CCSBot::SetLookAt(const char *desc, const Vector *pos, PriorityType pri, fl
 
 // Block all "look at" and "look around" behavior for given duration - just look ahead
 
-void CCSBot::InhibitLookAround(float duration)
+void CCSBot::InhibitLookAround(duration_t duration)
 {
 	m_inhibitLookAroundTimestamp = gpGlobals->time + duration;
 }
@@ -405,7 +408,7 @@ void CCSBot::InhibitLookAround(float duration)
 void CCSBot::UpdatePeripheralVision()
 {
 	// if we update at 10Hz, this ensures we test once every three
-	const float peripheralUpdateInterval = 0.29f;
+	constexpr auto peripheralUpdateInterval = 0.29s;
 	if (gpGlobals->time - m_peripheralTimestamp < peripheralUpdateInterval)
 		return;
 
@@ -441,7 +444,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 	if (gpGlobals->time < m_inhibitLookAroundTimestamp)
 		return;
 
-	const float recentThreatTime = 0.25f; // 1.0f;
+	constexpr auto recentThreatTime = 0.25s; // 1.0f;
 
 	// Unless we can hear them moving, in which case look towards the noise
 	if (!IsEnemyVisible())
@@ -453,7 +456,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			spot.z += HalfHumanHeight;
 
 			SetLookAt("Check dangerous noise", &spot, PRIORITY_HIGH, recentThreatTime);
-			InhibitLookAround(RANDOM_FLOAT(2.0f, 4.0f));
+			InhibitLookAround(RandomDuration(2.0s, 4.0s));
 
 			return;
 		}
@@ -470,7 +473,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 		if (GetSimpleGroundHeight(&m_lastEnemyPosition, &spot.z))
 		{
 			spot.z += HalfHumanHeight;
-			SetLookAt("Last Enemy Position", &spot, PRIORITY_MEDIUM, RANDOM_FLOAT(2.0f, 3.0f), true);
+			SetLookAt("Last Enemy Position", &spot, PRIORITY_MEDIUM, RandomDuration(2.0s, 3.0s), true);
 			return;
 		}
 	}
@@ -509,9 +512,9 @@ void CCSBot::UpdateLookAround(bool updateNow)
 
 		// if we're sniping, switch look-at spots less often
 		if (IsUsingSniperRifle())
-			m_lookAroundStateTimestamp = gpGlobals->time + RANDOM_FLOAT(5.0f, 10.0f);
+			m_lookAroundStateTimestamp = gpGlobals->time + RandomDuration(5.0s, 10.0s);
 		else
-			m_lookAroundStateTimestamp = gpGlobals->time + RANDOM_FLOAT(1.0f, 2.0f);
+			m_lookAroundStateTimestamp = gpGlobals->time + RandomDuration(1.0s, 2.0s);
 
 		if (m_approachPointCount == 0)
 		{
@@ -548,7 +551,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			asleep *= asleep;
 			asleep *= asleep;
 
-			m_spotCheckTimestamp = gpGlobals->time + asleep * RANDOM_FLOAT(10.0f, 30.0f);
+			m_spotCheckTimestamp = gpGlobals->time + asleep * RandomDuration(10.0s, 30.0s);
 
 			// figure out how far along the path segment we are
 			Vector delta = m_spotEncounter->path.to - m_spotEncounter->path.from;
@@ -577,7 +580,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 			int dangerSpotCount = 0;
 			int dangerIndex = 0;
 
-			const float checkTime = 10.0f;
+			constexpr auto checkTime = 10.0s;
 			const SpotOrder *spotOrder;
 
 			for (auto &spotOrder : m_spotEncounter->spotList)
@@ -609,7 +612,7 @@ void CCSBot::UpdateLookAround(bool updateNow)
 					pos.z += HalfHumanHeight;
 
 					// glance at the spot for minimum time
-					SetLookAt("Encounter Spot", &pos, PRIORITY_LOW, 0, true, 10.0f);
+					SetLookAt("Encounter Spot", &pos, PRIORITY_LOW, 0s, true, 10.0f);
 				}
 				// immediately mark it as "checked", so we don't check it again
 				// if we get distracted before we check it - that's the way it goes
@@ -841,10 +844,10 @@ CBasePlayer *CCSBot::FindMostDangerousThreat()
 
 		for (i = 0; i < MAX_CLIENTS; ++i)
 		{
-			if (m_watchInfo[i].timestamp <= 0.0f)
+			if (m_watchInfo[i].timestamp <= invalid_time_point)
 				continue;
 
-			const float recentTime = 3.0f;
+			constexpr auto recentTime = 3.0s;
 			if (gpGlobals->time - m_watchInfo[i].timestamp < recentTime)
 			{
 				if (m_watchInfo[i].isEnemy)
@@ -994,13 +997,13 @@ void CCSBot::UpdateReactionQueue()
 		++m_enemyQueueCount;
 
 	// clamp reaction time to enemy queue size
-	float reactionTime = GetProfile()->GetReactionTime();
-	float maxReactionTime = (MAX_ENEMY_QUEUE * g_flBotFullThinkInterval) - 0.01f;
+	auto reactionTime = GetProfile()->GetReactionTime();
+	const auto maxReactionTime = (MAX_ENEMY_QUEUE * g_flBotFullThinkInterval) - 0.01s;
 	if (reactionTime > maxReactionTime)
 		reactionTime = maxReactionTime;
 
 	// "rewind" time back to our reaction time
-	int reactionTimeSteps = (int)((reactionTime / g_flBotFullThinkInterval) + 0.5f);
+	int reactionTimeSteps = (int)((reactionTime.count() / (g_flBotFullThinkInterval / 1s)) + 0.5f);
 
 	int i = now - reactionTimeSteps;
 	if (i < 0)
@@ -1055,7 +1058,7 @@ float CCSBot::GetRangeToNearestRecognizedEnemy()
 
 // Blind the bot for the given duration
 
-void CCSBot::Blind(float duration, float holdTime, float fadeTime, int alpha)
+void CCSBot::Blind(duration_t duration, duration_t holdTime, duration_t fadeTime, int alpha)
 {
 	// extend
 	CBasePlayer::Blind(duration, holdTime, fadeTime, alpha);
@@ -1064,7 +1067,7 @@ void CCSBot::Blind(float duration, float holdTime, float fadeTime, int alpha)
 
 	if (RANDOM_FLOAT(0.0f, 100.0f) < 33.3f)
 	{
-		GetChatter()->Say("Blinded", 1.0f);
+		GetChatter()->Say("Blinded", 1.0s);
 	}
 
 	// decide which way to move while blind

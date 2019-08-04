@@ -70,8 +70,8 @@ int CLocalNav::qptr;
 EHANDLE CLocalNav::_queue[MAX_HOSTAGES_NAV];
 int CLocalNav::tot_inqueue;
 float CLocalNav::nodeval;
-float CLocalNav::flNextCvarCheck;
-float CLocalNav::flLastThinkTime;
+time_point_t CLocalNav::flNextCvarCheck;
+time_point_t CLocalNav::flLastThinkTime;
 EHANDLE CLocalNav::hostages[MAX_HOSTAGES_NAV];
 int CLocalNav::tot_hostages;
 
@@ -808,13 +808,13 @@ void CLocalNav::Think()
 			s_flStepSize = s_flStepSize ? sv_stepsize->value : HOSTAGE_STEPSIZE_DEFAULT;
 		}
 
-		flNextCvarCheck = gpGlobals->time + 1;
+		flNextCvarCheck = gpGlobals->time + 1s;
 	}
 
 	HostagePrethink();
 
-	float flElapsedTime = gpGlobals->time - flLastThinkTime;
-	nodeval -= flElapsedTime * 250;
+	auto flElapsedTime = gpGlobals->time - flLastThinkTime;
+	nodeval -= flElapsedTime / 1s * 250;
 	flLastThinkTime = gpGlobals->time;
 
 	if (nodeval < 0)
@@ -894,8 +894,8 @@ void CLocalNav::RequestNav(CHostage *pCaller)
 
 void CLocalNav::Reset()
 {
-	flNextCvarCheck = 0;
-	flLastThinkTime = 0;
+	flNextCvarCheck = invalid_time_point;
+	flLastThinkTime = invalid_time_point;
 	tot_inqueue = 0;
 	qptr = 0;
 	nodeval = 0;

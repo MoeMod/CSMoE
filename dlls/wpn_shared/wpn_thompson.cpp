@@ -96,7 +96,7 @@ BOOL CTHOMPSON::Deploy(void)
 
 	if (DefaultDeploy("models/v_thompson.mdl", "models/p_thompson.mdl", THOMPSON_DRAW, "carbine", UseDecrement() != FALSE))
 	{
-		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0;
+		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.0s;
 		return TRUE;
 	}
 
@@ -111,7 +111,7 @@ void CTHOMPSON::PrimaryAttack(void)
 		THOMPSONFire(0.045 * m_flAccuracy + 0.025, THOMPSON_FIRE_RATE, FALSE);
 }
 
-void CTHOMPSON::THOMPSONFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CTHOMPSON::THOMPSONFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -125,7 +125,7 @@ void CTHOMPSON::THOMPSONFire(float flSpread, float flCycleTime, BOOL fUseAutoAim
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -160,7 +160,7 @@ void CTHOMPSON::THOMPSONFire(float flSpread, float flCycleTime, BOOL fUseAutoAim
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(0.55, 0.18, 0.23, 0.03, 2.5, 1.2, 5);
@@ -196,7 +196,7 @@ void CTHOMPSON::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	SendWeaponAnim(THOMPSON_IDLE, UseDecrement() != FALSE);
 }

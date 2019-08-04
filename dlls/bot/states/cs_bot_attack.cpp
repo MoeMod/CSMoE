@@ -81,13 +81,13 @@ void AttackState::OnEnter(CCSBot *me)
 
 	m_repathTimer.Invalidate();
 	m_haveSeenEnemy = me->IsEnemyVisible();
-	m_nextDodgeStateTimestamp = 0.0f;
+	m_nextDodgeStateTimestamp = invalid_time_point;
 	m_firstDodge = true;
 	m_isEnemyHidden = false;
-	m_reacquireTimestamp = 0.0f;
+	m_reacquireTimestamp = invalid_time_point;
 
-	m_pinnedDownTimestamp = gpGlobals->time + RANDOM_FLOAT(7.0f, 10.0f);
-	m_shieldToggleTimestamp = gpGlobals->time + RANDOM_FLOAT(2.0f, 10.0f);
+	m_pinnedDownTimestamp = gpGlobals->time + RandomDuration(7.0s, 10.0s);
+	m_shieldToggleTimestamp = gpGlobals->time + RandomDuration(2.0s, 10.0s);
 	m_shieldForceOpen = false;
 
 	// if we encountered someone while escaping, grab our weapon and fight!
@@ -147,7 +147,7 @@ void AttackState::OnEnter(CCSBot *me)
 		}
 	}
 
-	m_scopeTimestamp = 0;
+	m_scopeTimestamp = invalid_time_point;
 	m_didAmbushCheck = false;
 
 	float skill = me->GetProfile()->GetSkill();
@@ -177,7 +177,7 @@ void AttackState::StopAttacking(CCSBot *me)
 	if (me->m_task == CCSBot::SNIPING)
 	{
 		// stay in our hiding spot
-		me->Hide(me->GetLastKnownArea(), -1.0f, 50.0f);
+		me->Hide(me->GetLastKnownArea(), -1.0s, 50.0f);
 	}
 	else
 	{
@@ -235,7 +235,7 @@ void AttackState::OnUpdate(CCSBot *me)
 			else
 				me->GetChatter()->Scared();
 
-			m_retreatTimer.Start(RANDOM_FLOAT(3.0f, 15.0f));
+			m_retreatTimer.Start(RandomDuration(3.0s, 15.0s));
 
 			// try to retreat
 			if (me->TryToRetreat())
@@ -264,8 +264,8 @@ void AttackState::OnUpdate(CCSBot *me)
 		// if we are using a knife and our prey is looking towards us, run at him
 		if (enemy->IsPlayer() && me->IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
 		{
-			me->ForceRun(5.0f);
-			me->Hurry(10.0f);
+			me->ForceRun(5.0s);
+			me->Hurry(10.0s);
 		}
 		else
 		{
@@ -294,7 +294,7 @@ void AttackState::OnUpdate(CCSBot *me)
 		{
 			me->ComputePath(TheNavAreaGrid.GetNearestNavArea(&enemy->pev->origin), &enemy->pev->origin, FASTEST_ROUTE);
 
-			const float repathInterval = 0.5f;
+			constexpr auto repathInterval = 0.5s;
 			m_repathTimer.Start(repathInterval);
 		}
 
@@ -377,7 +377,7 @@ void AttackState::OnUpdate(CCSBot *me)
 		if (me->GetZoomLevel() == CCSBot::NO_ZOOM && me->AdjustZoom(targetRange))
 			m_scopeTimestamp = gpGlobals->time;
 
-		const float waitScopeTime = 0.2f + me->GetProfile()->GetReactionTime();
+		const auto waitScopeTime = 0.2s + me->GetProfile()->GetReactionTime();
 		if (gpGlobals->time - m_scopeTimestamp < waitScopeTime)
 		{
 			// force us to wait until zoomed in before firing
@@ -398,29 +398,29 @@ void AttackState::OnUpdate(CCSBot *me)
 		return;
 	}
 
-	float notSeenEnemyTime = gpGlobals->time - me->GetLastSawEnemyTimestamp();
+	auto notSeenEnemyTime = gpGlobals->time - me->GetLastSawEnemyTimestamp();
 
 	// if we haven't seen our enemy for a moment, continue on if we dont want to fight, or decide to ambush if we do
 	if (!me->IsEnemyVisible())
 	{
 		// attend to nearby enemy gunfire
-		if (notSeenEnemyTime > 0.5f && me->CanHearNearbyEnemyGunfire())
+		if (notSeenEnemyTime > 0.5s && me->CanHearNearbyEnemyGunfire())
 		{
 			// give up the attack, since we didn't want it in the first place
 			StopAttacking(me);
 
-			me->SetLookAt("Nearby enemy gunfire", me->GetNoisePosition(), PRIORITY_HIGH, 0.0f);
+			me->SetLookAt("Nearby enemy gunfire", me->GetNoisePosition(), PRIORITY_HIGH, 0.0s);
 			me->PrintIfWatched("Checking nearby threatening enemy gunfire!\n");
 			return;
 		}
 
 		// check if we have lost track of our enemy during combat
-		if (notSeenEnemyTime > 0.25f)
+		if (notSeenEnemyTime > 0.25s)
 		{
 			m_isEnemyHidden = true;
 		}
 
-		if (notSeenEnemyTime > 0.1f)
+		if (notSeenEnemyTime > 0.1s)
 		{
 			if (me->GetDisposition() == CCSBot::ENGAGE_AND_INVESTIGATE)
 			{
@@ -431,14 +431,14 @@ void AttackState::OnUpdate(CCSBot *me)
 
 					if (RANDOM_FLOAT(0.0, 100.0f) < hideChance)
 					{
-						float ambushTime = RANDOM_FLOAT(3.0f, 15.0f);
+						auto ambushTime = RandomDuration(3.0s, 15.0s);
 
 						// hide in ambush nearby
 						// TODO: look towards where we know enemy is
 						const Vector *spot = FindNearbyRetreatSpot(me, 200.0f);
 						if (spot != NULL)
 						{
-							me->IgnoreEnemies(1.0f);
+							me->IgnoreEnemies(1.0s);
 							me->Run();
 							me->StandUp();
 							me->Hide(spot, ambushTime, true);
@@ -472,14 +472,14 @@ void AttackState::OnUpdate(CCSBot *me)
 	}
 
 	// if we haven't seen our enemy for a long time, chase after them
-	float chaseTime = 2.0f + 2.0f * (1.0f - me->GetProfile()->GetAggression());
+	auto chaseTime = 2.0s + 2.0s * (1.0f - me->GetProfile()->GetAggression());
 
 	// if we are sniping, be very patient
 	if (me->IsUsingSniperRifle())
-		chaseTime += 3.0f;
+		chaseTime += 3.0s;
 	// if we are crouching, be a little patient
 	else if (me->IsCrouching())
-		chaseTime += 1.0f;
+		chaseTime += 1.0s;
 
 	// if we can't see the enemy, and have either seen him but currently lost sight of him,
 	// or haven't yet seen him, chase after him (unless we are a sniper)
@@ -502,7 +502,7 @@ void AttackState::OnUpdate(CCSBot *me)
 
 	// if we can't see our enemy at the moment, and were shot by
 	// a different visible enemy, engage them instead
-	const float hurtRecentlyTime = 3.0f;
+	constexpr auto hurtRecentlyTime = 3.0s;
 	if (!me->IsEnemyVisible() &&
 		me->GetTimeSinceAttacked() < hurtRecentlyTime &&
 		me->GetAttacker() != NULL &&
@@ -556,7 +556,7 @@ void AttackState::OnUpdate(CCSBot *me)
 			if (range > dodgeRange || !enemy->IsPlayer() || !me->IsPlayerFacingMe(static_cast<CBasePlayer *>(enemy)))
 			{
 				m_dodgeState = STEADY_ON;
-				m_nextDodgeStateTimestamp = 0.0f;
+				m_nextDodgeStateTimestamp = invalid_time_point;
 			}
 			else if (gpGlobals->time >= m_nextDodgeStateTimestamp)
 			{
@@ -574,7 +574,7 @@ void AttackState::OnUpdate(CCSBot *me)
 				} while (!m_firstDodge && next == m_dodgeState);
 
 				m_dodgeState = (DodgeStateType)next;
-				m_nextDodgeStateTimestamp = gpGlobals->time + RANDOM_FLOAT(0.3f, 1.0f);
+				m_nextDodgeStateTimestamp = gpGlobals->time + RandomDuration(0.3s, 1.0s);
 				m_firstDodge = false;
 			}
 

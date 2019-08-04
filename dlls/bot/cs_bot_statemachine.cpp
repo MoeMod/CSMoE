@@ -123,7 +123,7 @@ void CCSBot::StopFollowing()
 {
 	m_isFollowing = false;
 	m_leader = NULL;
-	m_allowAutoFollowTime = gpGlobals->time + 10.0f;
+	m_allowAutoFollowTime = gpGlobals->time + 10.0s;
 }
 
 // Begin process of rescuing hostages
@@ -145,7 +145,7 @@ void CCSBot::UseEntity(CBaseEntity *entity)
 // Move to a hiding place.
 // If 'searchFromArea' is non-NULL, hiding spots are looked for from that area first.
 
-void CCSBot::Hide(CNavArea *searchFromArea, float duration, float hideRange, bool holdPosition)
+void CCSBot::Hide(CNavArea *searchFromArea, duration_t duration, float hideRange, bool holdPosition)
 {
 	DestroyPath();
 
@@ -204,7 +204,7 @@ void CCSBot::Hide(CNavArea *searchFromArea, float duration, float hideRange, boo
 
 // Move to the given hiding place
 
-void CCSBot::Hide(const Vector *hidingSpot, float duration, bool holdPosition)
+void CCSBot::Hide(const Vector *hidingSpot, EngineClock::duration duration, bool holdPosition)
 {
 	CNavArea *hideArea = TheNavAreaGrid.GetNearestNavArea(hidingSpot);
 	if (hideArea == NULL)
@@ -236,7 +236,7 @@ void CCSBot::Hide(const Vector *hidingSpot, float duration, bool holdPosition)
 // Try to hide nearby. Return true if hiding, false if can't hide here.
 // If 'searchFromArea' is non-NULL, hiding spots are looked for from that area first.
 
-bool CCSBot::TryToHide(CNavArea *searchFromArea, float duration, float hideRange, bool holdPosition, bool useNearest)
+bool CCSBot::TryToHide(CNavArea *searchFromArea, EngineClock::duration duration, float hideRange, bool holdPosition, bool useNearest)
 {
 	CNavArea *source;
 	Vector sourcePos;
@@ -294,9 +294,9 @@ bool CCSBot::TryToRetreat()
 	{
 		// ignore enemies for a second to give us time to hide
 		// reaching our hiding spot clears our disposition
-		IgnoreEnemies(10.0f);
+		IgnoreEnemies(10.0s);
 
-		float holdTime = RANDOM_FLOAT(3.0f, 15.0f);
+		EngineClock::duration holdTime = RandomDuration(3.0s, 15.0s);
 
 		StandUp();
 		Run();
@@ -374,7 +374,7 @@ void CCSBot::Attack(CBaseEntity *victim)
 
 	// define time when aim offset will automatically be updated
 	// longer time the more we had to turn (surprise)
-	m_aimOffsetTimestamp = gpGlobals->time + RANDOM_FLOAT(0.25f + turn, 1.5f);
+	m_aimOffsetTimestamp = gpGlobals->time + RandomDuration(0.25s + turn * 1s, 1.5s);
 }
 
 // Exit the Attack state

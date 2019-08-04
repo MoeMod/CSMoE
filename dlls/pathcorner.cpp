@@ -33,7 +33,7 @@ void CPathCorner::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "wait"))
 	{
-		m_flWait = Q_atof(pkvd->szValue);
+		m_flWait = Q_atof(pkvd->szValue) * 1s;
 		pkvd->fHandled = TRUE;
 	}
 	else

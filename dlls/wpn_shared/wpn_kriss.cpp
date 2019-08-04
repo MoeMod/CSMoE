@@ -122,9 +122,9 @@ void CKRISS::SecondaryAttack(void)
 		strcpy(m_pPlayer->m_szAnimExtention, "carbine");
 	}
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.5;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.5;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.5s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.5s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.5s;
 }
 
 void CKRISS::PrimaryAttack(void)
@@ -140,7 +140,7 @@ void CKRISS::PrimaryAttack(void)
 	}
 }
 
-void CKRISS::KRISSFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CKRISS::KRISSFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -154,7 +154,7 @@ void CKRISS::KRISSFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -196,7 +196,7 @@ void CKRISS::KRISSFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(0.55, 0.18, 0.23, 0.03, 2.5, 1.2, 5);
@@ -239,7 +239,7 @@ void CKRISS::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	if (m_iWeaponState & WPNSTATE_KRISS_SILENCED)
 		SendWeaponAnim(KRISS_IDLE, UseDecrement() != FALSE);

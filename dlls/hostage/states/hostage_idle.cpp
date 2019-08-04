@@ -81,10 +81,10 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 
 		if ((improv->GetScareIntensity() == CHostageImprov::TERRIFIED || m_mustFlee) || (m_fleeTimer.IsElapsed() && improv->GetScareIntensity() > CHostageImprov::NERVOUS))
 		{
-			m_fleeTimer.Start(RANDOM_FLOAT(10, 20));
+			m_fleeTimer.Start(RandomDuration<float>(10s, 20s));
 
 			const float fleeChance = 33.3f;
-			const float terroristRecentTime = 5.0f;
+			constexpr auto terroristRecentTime = 5.0s;
 
 			if (!m_mustFlee && improv->GetTimeSinceLastSawPlayer(TERRORIST) > terroristRecentTime && RANDOM_FLOAT(0, 100) < fleeChance)
 				m_mustFlee = true;
@@ -170,7 +170,7 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 					if (result.flFraction != 1.0f && m_disagreeTimer.IsElapsed())
 					{
 						improv->Disagree();
-						m_disagreeTimer.Start(RANDOM_FLOAT(2, 4));
+						m_disagreeTimer.Start(RandomDuration<float>(2s, 4s));
 					}
 				}
 
@@ -191,7 +191,7 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 						say = HOSTAGE_CHATTER_PLEASE_RESCUE_ME;
 
 					improv->Chatter(say, false);
-					m_askTimer.Start(RANDOM_FLOAT(3, 10));
+					m_askTimer.Start(RandomDuration<float>(3s, 10s));
 				}
 			}
 		}
@@ -210,7 +210,7 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 				improv->Chatter(HOSTAGE_CHATTER_CALL_TO_RESCUER, false);
 
 				m_moveState = NotMoving;
-				m_waveTimer.Start(RANDOM_FLOAT(10, 20));
+				m_waveTimer.Start(RandomDuration<float>(10s, 20s));
 			}
 		}
 	}
@@ -232,11 +232,11 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 				improv->Frighten(CHostageImprov::NERVOUS);
 			}
 
-			const float minThreatenTime = 1.0f;
+			constexpr auto minThreatenTime = 1.0s;
 			if ((!m_intimidatedTimer.HasStarted() || m_intimidatedTimer.IsGreaterThen(minThreatenTime)) && m_pleadTimer.IsElapsed())
 			{
 				improv->Chatter(HOSTAGE_CHATTER_INTIMIDATED, true);
-				m_pleadTimer.Start(RANDOM_FLOAT(10, 20));
+				m_pleadTimer.Start(RandomDuration<float>(10s, 20s));
 			}
 
 			if (!improv->IsAtHome())
@@ -255,15 +255,15 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 		improv->ClearLookAt();
 
 		const float pushbackRange = 60.0f;
-		if (pushbackRange - improv->GetAggression() * 5.0f < TheCSBots()->GetElapsedRoundTime() && m_escapeTimer.IsElapsed())
+		if ((pushbackRange - improv->GetAggression() * 5.0) * 1s < TheCSBots()->GetElapsedRoundTime() && m_escapeTimer.IsElapsed())
 		{
-			const float stayHomeDuration = 5.0f;
+			constexpr auto stayHomeDuration = 5.0s;
 			m_escapeTimer.Start(stayHomeDuration);
 
-			float sightTimeT = improv->GetTimeSinceLastSawPlayer(TERRORIST);
-			float sightTimeCT = improv->GetTimeSinceLastSawPlayer(CT);
+			auto sightTimeT = improv->GetTimeSinceLastSawPlayer(TERRORIST);
+			auto sightTimeCT = improv->GetTimeSinceLastSawPlayer(CT);
 
-			const float waitTime = 15.0f - improv->GetAggression() * 3.0f;
+			const auto waitTime = 15.0s - improv->GetAggression() * 3.0s;
 
 			if (sightTimeT > waitTime && sightTimeCT > waitTime)
 			{

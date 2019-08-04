@@ -135,7 +135,7 @@ void CFuncMortarField::FieldUse(CBaseEntity *pActivator, CBaseEntity *pCaller, U
 
 	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "weapons/mortar.wav", VOL_NORM, ATTN_NONE, 0, pitch);
 
-	float t = 2.5;
+	auto t = 2.5s;
 	for (int i = 0; i < m_iCount; ++i)
 	{
 		Vector vecSpot = vecStart;
@@ -153,11 +153,11 @@ void CFuncMortarField::FieldUse(CBaseEntity *pActivator, CBaseEntity *pCaller, U
 
 		CBaseEntity *pMortar = Create("monster_mortar", tr.vecEndPos, Vector(0, 0, 0), pentOwner);
 		pMortar->pev->nextthink = gpGlobals->time + t;
-		t += RANDOM_FLOAT(0.2, 0.5);
+		t += RandomDuration(0.2s, 0.5s);
 
 		if (i == 0)
 		{
-			CSoundEnt::InsertSound(bits_SOUND_DANGER, tr.vecEndPos, 400, 0.3);
+			CSoundEnt::InsertSound(bits_SOUND_DANGER, tr.vecEndPos, 400, 0.3s);
 		}
 	}
 }
@@ -171,7 +171,7 @@ void CMortar::Spawn()
 	pev->dmg = 200;
 
 	SetThink(&CMortar::MortarExplode);
-	pev->nextthink = 0;
+	pev->nextthink = {};
 	Precache();
 }
 

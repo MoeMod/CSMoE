@@ -101,7 +101,7 @@ void CHalfLifeTraining::HostageDied()
 
 	if (pPlayer != NULL)
 	{
-		pPlayer->pev->radsuit_finished = gpGlobals->time + 3;
+		pPlayer->pev->radsuit_finished = gpGlobals->time + 3s;
 	}
 }
 
@@ -129,7 +129,7 @@ edict_t *CHalfLifeTraining::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
 
 void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 {
-	if (pPlayer->pev->radsuit_finished && gpGlobals->time > pPlayer->pev->radsuit_finished)
+	if (pPlayer->pev->radsuit_finished != invalid_time_point && gpGlobals->time > pPlayer->pev->radsuit_finished)
 	{
 		SERVER_COMMAND("reload\n");
 	}
@@ -149,7 +149,7 @@ void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 	}
 
 	m_iHostagesRescued = 0;
-	m_iRoundTimeSecs = (int)(gpGlobals->time + 1.0f);
+	m_iRoundTimeSecs = std::chrono::duration_cast<decltype(m_iRoundTimeSecs)>((gpGlobals->time + 1.0s).time_since_epoch());
 	m_bFreezePeriod = FALSE;
 	g_fGameOver = FALSE;
 
@@ -200,7 +200,7 @@ void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 	{
 		if (!fInBuyArea)
 		{
-			FillAccountTime = 1;
+			FillAccountTime = invalid_time_point + 1s;
 
 			if (!fVisitedBuyArea)
 			{
@@ -216,10 +216,10 @@ void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 
 		fInBuyArea = TRUE;
 
-		if (pPlayer->m_iAccount < 16000 && FillAccountTime == 0.0f)
-			FillAccountTime = gpGlobals->time + 5;
+		if (pPlayer->m_iAccount < 16000 && FillAccountTime == invalid_time_point)
+			FillAccountTime = gpGlobals->time + 5s;
 
-		if (FillAccountTime != 0.0f && gpGlobals->time > FillAccountTime)
+		if (FillAccountTime != invalid_time_point && gpGlobals->time > FillAccountTime)
 		{
 			if (!fVisitedBuyArea)
 			{
@@ -239,7 +239,7 @@ void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 			}
 
 			pPlayer->AddAccount(16000 - pPlayer->m_iAccount);
-			FillAccountTime = 0;
+			FillAccountTime = invalid_time_point;
 		}
 	}
 	else if (fInBuyArea && fVisitedBuyArea)
@@ -263,7 +263,7 @@ void CHalfLifeTraining::PlayerSpawn(CBasePlayer *pPlayer)
 
 	fInBuyArea = TRUE;
 	fVisitedBuyArea = FALSE;
-	FillAccountTime = 0;
+	FillAccountTime = invalid_time_point;
 
 	pPlayer->m_iJoiningState = JOINED;
 	pPlayer->m_iTeam = CT;
@@ -395,7 +395,7 @@ void CBaseGrenCatch::Spawn()
 	pev->effects |= EF_NODRAW;
 
 	SET_MODEL(ENT(pev), STRING(pev->model));
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBaseGrenCatch::Touch(CBaseEntity *pOther)
@@ -472,7 +472,7 @@ void CBaseGrenCatch::Think()
 		}
 	}
 
-	pev->nextthink = gpGlobals->time + 0.1f;
+	pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBaseGrenCatch::KeyValue(KeyValueData *pkvd)
@@ -506,7 +506,7 @@ void CBaseGrenCatch::KeyValue(KeyValueData *pkvd)
 
 void CFuncWeaponCheck::Spawn()
 {
-	pev->dmgtime = 0;
+	pev->dmgtime = {};
 	pev->solid = SOLID_TRIGGER;
 	pev->flags |= FL_WORLDBRUSH;
 	pev->solid |= EF_NODRAW;
@@ -548,7 +548,7 @@ void CFuncWeaponCheck::Touch(CBaseEntity *pOther)
 					if (pev->speed > -1.0f)
 					{
 						FireTargets(STRING(sTriggerNoItems), pOther, pOther, USE_TOGGLE, 0);
-						pev->dmgtime = pev->speed + gpGlobals->time;
+						pev->dmgtime = pev->speed * 1s + gpGlobals->time;
 
 						if (!pev->speed)
 							pev->speed = -1;

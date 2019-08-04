@@ -108,29 +108,29 @@ void CWA2000::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CWA2000::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		WA2000Fire((0.8) * (1 - m_flAccuracy), 0.5, FALSE);
+		WA2000Fire((0.8) * (1 - m_flAccuracy), 0.5s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		WA2000Fire((0.5) * (1 - m_flAccuracy), 0.5, FALSE);
+		WA2000Fire((0.5) * (1 - m_flAccuracy), 0.5s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		WA2000Fire((0.04) * (1 - m_flAccuracy), 0.5, FALSE);
+		WA2000Fire((0.04) * (1 - m_flAccuracy), 0.5s, FALSE);
 	else
-		WA2000Fire((0.055) * (1 - m_flAccuracy), 0.5, FALSE);
+		WA2000Fire((0.055) * (1 - m_flAccuracy), 0.5s, FALSE);
 }
 
-void CWA2000::WA2000Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CWA2000::WA2000Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov == 90)
 		flSpread += 0.025;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy = (gpGlobals->time - m_flLastFire) * 0.5 + 0.7;
+		m_flAccuracy = ((gpGlobals->time - m_flLastFire) / 1s) * 0.5 + 0.7;
 
 		if (m_flAccuracy > 0.9)
 			m_flAccuracy = 0.9;
@@ -143,7 +143,7 @@ void CWA2000::WA2000Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -175,7 +175,7 @@ void CWA2000::WA2000Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 1.5, 3.0) + m_pPlayer->pev->punchangle.x * 0.75;
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -1.3, 1.3);
@@ -186,7 +186,7 @@ void CWA2000::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 
-	if (DefaultReload(WA2000_MAX_CLIP, WA2000_RELOAD, 3.45))
+	if (DefaultReload(WA2000_MAX_CLIP, WA2000_RELOAD, 3.45s))
 	{
 		m_flAccuracy = 0.9;
 #ifndef CLIENT_DLL
@@ -212,7 +212,7 @@ void CWA2000::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(WA2000_IDLE, UseDecrement() != FALSE);
 	}
 }

@@ -96,12 +96,12 @@ BOOL CMAC10::Deploy(void)
 void CMAC10::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MAC10Fire((0.375) * m_flAccuracy, 0.07, FALSE);
+		MAC10Fire((0.375) * m_flAccuracy, 0.07s, FALSE);
 	else
-		MAC10Fire((0.03) * m_flAccuracy, 0.07, FALSE);
+		MAC10Fire((0.03) * m_flAccuracy, 0.07s, FALSE);
 }
 
-void CMAC10::MAC10Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CMAC10::MAC10Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -115,7 +115,7 @@ void CMAC10::MAC10Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -148,7 +148,7 @@ void CMAC10::MAC10Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.3, 0.55, 0.4, 0.05, 4.75, 3.75, 5);
@@ -165,7 +165,7 @@ void CMAC10::Reload(void)
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
 
-	if (DefaultReload(MAC10_MAX_CLIP, MAC10_RELOAD, 3.15))
+	if (DefaultReload(MAC10_MAX_CLIP, MAC10_RELOAD, 3.15s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -183,7 +183,7 @@ void CMAC10::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(MAC10_IDLE1, UseDecrement() != FALSE);
 }
 

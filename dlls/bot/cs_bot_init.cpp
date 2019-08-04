@@ -176,7 +176,7 @@ bool CCSBot::Initialize(const BotProfile *profile)
 	m_currentNode = NULL;
 
 	// set initial safe time guess for this map
-	m_safeTime = 15.0f + 5.0f * GetProfile()->GetAggression();
+	m_safeTime = 15.0s + 5.0s * GetProfile()->GetAggression();
 
 	m_name[0] = '\0';
 
@@ -194,18 +194,18 @@ void CCSBot::ResetValues()
 	m_gameState.Reset();
 
 	m_avoid = NULL;
-	m_avoidTimestamp = 0.0f;
+	m_avoidTimestamp = invalid_time_point;
 
 	m_hurryTimer.Invalidate();
 
 	m_isStuck = false;
-	m_stuckTimestamp = 0.0f;
-	m_wiggleTimestamp = 0.0f;
-	m_stuckJumpTimestamp = 0.0f;
+	m_stuckTimestamp = invalid_time_point;
+	m_wiggleTimestamp = invalid_time_point;
+	m_stuckJumpTimestamp = invalid_time_point;
 
 	m_pathLength = 0;
 	m_pathIndex = 0;
-	m_areaEnteredTimestamp = 0.0f;
+	m_areaEnteredTimestamp = invalid_time_point;
 	m_currentArea = NULL;
 	m_lastKnownArea = NULL;
 
@@ -228,49 +228,49 @@ void CCSBot::ResetValues()
 
 	for (size_t w = 0; w < ARRAYSIZE(m_watchInfo); ++w)
 	{
-		m_watchInfo[w].timestamp = 0.0f;
+		m_watchInfo[w].timestamp = invalid_time_point;
 		m_watchInfo[w].isEnemy = false;
 	}
 
 	m_isEnemyVisible = false;
 	m_visibleEnemyParts = NONE;
-	m_lastSawEnemyTimestamp = 0.0f;
-	m_firstSawEnemyTimestamp = 0.0f;
-	m_currentEnemyAcquireTimestamp = 0.0f;
+	m_lastSawEnemyTimestamp = invalid_time_point;
+	m_firstSawEnemyTimestamp = invalid_time_point;
+	m_currentEnemyAcquireTimestamp = invalid_time_point;
 	m_isLastEnemyDead = true;
 	m_attacker = NULL;
-	m_attackedTimestamp = 0.0f;
-	m_enemyDeathTimestamp = 0.0f;
+	m_attackedTimestamp = invalid_time_point;
+	m_enemyDeathTimestamp = invalid_time_point;
 	m_lastVictimID = 0;
 	m_isAimingAtEnemy = false;
-	m_fireWeaponTimestamp = 0.0f;
+	m_fireWeaponTimestamp = invalid_time_point;
 	m_equipTimer.Invalidate();
 
 	m_isFollowing = false;
 	m_leader = NULL;
-	m_followTimestamp = 0.0f;
-	m_allowAutoFollowTime = 0.0f;
+	m_followTimestamp = invalid_time_point;
+	m_allowAutoFollowTime = invalid_time_point;
 
 	m_enemyQueueIndex = 0;
 	m_enemyQueueCount = 0;
 	m_enemyQueueAttendIndex = 0;
 	m_bomber = NULL;
 
-	m_lookAroundStateTimestamp = 0.0f;
-	m_inhibitLookAroundTimestamp = 0.0f;
+	m_lookAroundStateTimestamp = invalid_time_point;
+	m_inhibitLookAroundTimestamp = invalid_time_point;
 
 	m_lookPitch = 0.0f;
 	m_lookPitchVel = 0.0f;
 	m_lookYaw = 0.0f;
 	m_lookYawVel = 0.0f;
 
-	m_aimOffsetTimestamp = 0.0f;
-	m_aimSpreadTimestamp = 0.0f;
+	m_aimOffsetTimestamp = invalid_time_point;
+	m_aimSpreadTimestamp = invalid_time_point;
 	m_lookAtSpotState = NOT_LOOKING_AT_SPOT;
 
 	m_spotEncounter = NULL;
-	m_spotCheckTimestamp = 0.0f;
-	m_peripheralTimestamp = 0.0f;
+	m_spotCheckTimestamp = invalid_time_point;
+	m_peripheralTimestamp = invalid_time_point;
 
 	m_avgVelIndex = 0;
 	m_avgVelCount = 0;
@@ -278,20 +278,20 @@ void CCSBot::ResetValues()
 	m_lastOrigin = (pev != NULL) ? pev->origin : Vector(0, 0, 0);
 
 	m_lastRadioCommand = EVENT_INVALID;
-	m_lastRadioRecievedTimestamp = 0.0f;
-	m_lastRadioSentTimestamp = 0.0f;
+	m_lastRadioRecievedTimestamp = invalid_time_point;
+	m_lastRadioSentTimestamp = invalid_time_point;
 	m_radioSubject = NULL;
-	m_voiceFeedbackEndTimestamp = 0.0f;
+	m_voiceFeedbackEndTimestamp = invalid_time_point;
 
 	m_hostageEscortCount = 0;
-	m_hostageEscortCountTimestamp = 0.0f;
+	m_hostageEscortCountTimestamp = invalid_time_point;
 
 	m_noisePosition = Vector(0, 0, 0);
-	m_noiseTimestamp = 0.0f;
-	m_noiseCheckTimestamp = 0.0f;
+	m_noiseTimestamp = invalid_time_point;
+	m_noiseCheckTimestamp = invalid_time_point;
 	m_isNoiseTravelRangeChecked = false;
 
-	m_stateTimestamp = 0.0f;
+	m_stateTimestamp = invalid_time_point;
 	m_task = SEEK_AND_DESTROY;
 	m_taskEntity = NULL;
 
@@ -319,8 +319,8 @@ void CCSBot::ResetValues()
 	// IsRogue() randomly changes this
 	m_isRogue = false;
 
-	m_surpriseDelay = 0.0f;
-	m_surpriseTimestamp = 0.0f;
+	m_surpriseDelay = zero_duration;
+	m_surpriseTimestamp = invalid_time_point;
 
 	// even though these are EHANDLEs, they need to be NULL-ed
 	m_goalEntity = NULL;

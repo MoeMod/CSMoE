@@ -34,8 +34,8 @@ void CCSBot::ResetStuckMonitor()
 	}
 
 	m_isStuck = false;
-	m_stuckTimestamp = 0.0f;
-	m_stuckJumpTimestamp = 0.0f;
+	m_stuckTimestamp = invalid_time_point;
+	m_stuckJumpTimestamp = invalid_time_point;
 
 	m_avgVelIndex = 0;
 	m_avgVelCount = 0;
@@ -72,9 +72,9 @@ void CCSBot::StuckCheck()
 
 		// cannot be Length2D, or will break ladder movement (they are only Z)
 		float moveDist = vel.Length();
-		float deltaT = g_flBotFullThinkInterval;
+		auto deltaT = g_flBotFullThinkInterval;
 
-		m_avgVel[ m_avgVelIndex++ ] = moveDist / deltaT;
+		m_avgVel[ m_avgVelIndex++ ] = moveDist / (deltaT / 1s);
 
 		if (m_avgVelIndex == MAX_VEL_SAMPLES)
 			m_avgVelIndex = 0;
@@ -100,7 +100,7 @@ void CCSBot::StuckCheck()
 				// we are stuck - note when and where we initially become stuck
 				m_stuckTimestamp = gpGlobals->time;
 				m_stuckSpot = pev->origin;
-				m_stuckJumpTimestamp = gpGlobals->time + RANDOM_FLOAT(0.0f, 0.5f);
+				m_stuckJumpTimestamp = gpGlobals->time + RandomDuration(0.0s, 0.5s);
 
 				PrintIfWatched("STUCK\n");
 				if (IsLocalPlayerWatchingMe() && cv_bot_debug.value > 0.0f)
@@ -364,7 +364,7 @@ void CCSBot::Wiggle()
 	if (gpGlobals->time >= m_wiggleTimestamp)
 	{
 		m_wiggleDirection = (NavRelativeDirType)RANDOM_LONG(0, 3);
-		m_wiggleTimestamp = RANDOM_FLOAT(0.5, 1.5) + gpGlobals->time;
+		m_wiggleTimestamp = RandomDuration(0.5s, 1.5s) + gpGlobals->time;
 	}
 
 	// TODO: implement checking of the movement to fall down
@@ -390,7 +390,7 @@ void CCSBot::Wiggle()
 	{
 		if (Jump(false))
 		{
-			m_stuckJumpTimestamp = RANDOM_FLOAT(1.0, 2.0) + gpGlobals->time;
+			m_stuckJumpTimestamp = RandomDuration(1.0s, 2.0s) + gpGlobals->time;
 		}
 	}
 }

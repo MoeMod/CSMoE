@@ -48,8 +48,8 @@ public:
 		pev->scale = 0.2;
 		pev->solid = SOLID_BBOX; // 2
 		pev->movetype = MOVETYPE_FLYMISSILE; // 9
-		pev->nextthink = gpGlobals->time + 0.0099999998;
-		m_flAnimEndTime = gpGlobals->time + 2.0; // ph27?
+		pev->nextthink = gpGlobals->time + 0.0099999998s;
+		m_flAnimEndTime = gpGlobals->time + 2.0s; // ph27?
 		m_flMaxFrames = 300.0;
 		/*
 		v9 = 0x40800000;
@@ -108,12 +108,12 @@ public:
 	{
 		if (gpGlobals->time <= m_flAnimEndTime)
 		{
-			this->pev->frame = (float)(this->pev->framerate * gpGlobals->frametime) + this->pev->frame;
+			this->pev->frame = (float)(this->pev->framerate * gpGlobals->frametime / 1s) + this->pev->frame;
 			if (pev->frame > m_flMaxFrames)
 			{
 				pev->frame = fmod(pev->frame, m_flMaxFrames);
 			}
-			pev->nextthink = gpGlobals->time + 0.0099999998;
+			pev->nextthink = gpGlobals->time + 0.0099999998s;
 		}
 		else
 		{
@@ -208,7 +208,7 @@ public:
 	}
 
 	int m_fSequenceLoops;
-	float m_flAnimEndTime;
+	time_point_t m_flAnimEndTime;
 	float m_flMaxFrames;
 	float m_flTouchDamage;
 	float m_flExplodeDamage;
@@ -244,8 +244,8 @@ public:
 		//ph32 = ?
 		pev->solid = SOLID_CUSTOM; // 5
 		pev->movetype = MOVETYPE_FLY; // 5
-		pev->nextthink = gpGlobals->time + 0.0099999998;
-		ph7 = gpGlobals->time + 1.0;
+		pev->nextthink = gpGlobals->time + 0.0099999998s;
+		ph7 = gpGlobals->time + 1.0s;
 		ph8 = 300.0;
 		this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
@@ -281,7 +281,7 @@ public:
 	{
 		if (gpGlobals->time < ph7)
 		{
-			this->pev->nextthink = gpGlobals->time + 0.0099999998;
+			this->pev->nextthink = gpGlobals->time + 0.0099999998s;
 			this_1_m_iSwing = gpGlobals->time;
 
 			if (pev->solid == SOLID_NOT)
@@ -353,7 +353,7 @@ public:
 		
 		pev->solid = SOLID_NOT;
 
-		pev->nextthink = gpGlobals->time + 0.05f;
+		pev->nextthink = gpGlobals->time + 0.05s;
 	}
 	
 	void PenetrateEnd()
@@ -361,7 +361,7 @@ public:
 		pev->velocity = m_vecStartVelocity;
 		pev->solid = SOLID_CUSTOM;
 
-		pev->nextthink = gpGlobals->time + 0.001f;
+		pev->nextthink = gpGlobals->time + 0.001s;
 	}
 	
 	void RadiusDamage()
@@ -443,7 +443,7 @@ public:
 
 		
 		SetThink(&CGungnirSpear::AdditionalDamageThink);
-		pev->nextthink = gpGlobals->time + 1.1f;
+		pev->nextthink = gpGlobals->time + 1.1s;
 	}
 
 	void EXPORT AdditionalDamageThink()
@@ -484,9 +484,9 @@ public:
 	int ph4;
 	int ph5;
 	int ph6;
-	float ph7;
+	time_point_t ph7;
 	float ph8; // m_pfnThink?
-	float this_1_m_iSwing;
+	time_point_t this_1_m_iSwing;
 	short this_1_has_disconnected;
 
 	float m_flTouchDamage;
@@ -539,7 +539,7 @@ public:
 		ANIM_CHARGE_LOOP
 	};
 
-	static constexpr auto DefaultReloadTime = 1.9;
+	static constexpr const auto &DefaultReloadTime = 1.9s;
 	static constexpr const char *V_Model = "models/v_gungnir.mdl";
 	static constexpr const char *P_Model = "models/p_gungnira.mdl";
 	static constexpr const char *W_Model = "models/w_gungnir.mdl";
@@ -553,7 +553,7 @@ public:
 		static constexpr int iMaxAmmo1 = 100;
 	};
 	static constexpr int MaxClip = 50;
-	static constexpr float WeaponIdleTime = 10;
+	static constexpr const auto & WeaponIdleTime = 10s;
 
 	KnockbackData KnockBack = { 250.0f, 100.0f, 150.0f, 100.0f, 0.2f };
 	static constexpr const char *Beam_SPR = "sprites/ef_gungnir_xbeam.spr"; //
@@ -644,13 +644,13 @@ public:
 	}
 
 public:
-	float phs2;	// secondary attack start time
-	float phs3; // primary attack start time
-	float phs4; // spear attack end time... cannot switch weapon?
+	time_point_t phs2;	// secondary attack start time
+	time_point_t phs3; // primary attack start time
+	time_point_t phs4; // spear attack end time... cannot switch weapon?
 	std::array<CBeam *, 3> phs5_6_7; // EHANDLE ?
 	// unsigned short phs8; // m_usFireGungnir
 	std::vector<EHANDLE> phs9_10_11;
-	float phs12;
+	time_point_t phs12;
 };
 LINK_ENTITY_TO_CLASS(weapon_gungnir, CGungnir)
 
@@ -665,13 +665,13 @@ void CGungnir::Precache()
 
 BOOL CGungnir::Deploy()
 {
-	phs2 = -1;
-	phs3 = -1;
-	phs4 = -1;
-	phs12 = -1; // 0xBF800000
+	phs2 = invalid_time_point;
+	phs3 = invalid_time_point;
+	phs4 = invalid_time_point;
+	phs12 = invalid_time_point; // 0xBF800000
 
 	CreateEffect();
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0f;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 
 	return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE);
 }
@@ -682,18 +682,18 @@ void CGungnir::Spawn()
 
 	const double flAngle = 60.0 * 0.0174532925199433;
 
-	phs2 = -1;
-	phs3 = -1;
-	phs4 = -1;
-	phs12 = -1;
+	phs2 = invalid_time_point;
+	phs3 = invalid_time_point;
+	phs4 = invalid_time_point;
+	phs12 = invalid_time_point;
 }
 
 void CGungnir::Holster(int skiplocal)
 {
-	phs2 = -1;
-	phs3 = -1;
-	phs4 = -1;
-	phs12 = -1;
+	phs2 = invalid_time_point;
+	phs3 = invalid_time_point;
+	phs4 = invalid_time_point;
+	phs12 = invalid_time_point;
 
 	// clear target list ?
 	ClearEffect();
@@ -710,19 +710,19 @@ void CGungnir::PrimaryAttack()
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 		return; // sth ignored
 	}
 	--m_iClip;
-	if (phs2 > 0.0f)
-		phs2 = -1.0f; // 0xBF800000
-	if (phs3 == -1.0f)
+	if (phs2 > invalid_time_point)
+		phs2 = invalid_time_point; // 0xBF800000
+	if (phs3 == invalid_time_point)
 	{
 		SendWeaponAnim(ANIM_SHOOT_START, UseDecrement() != FALSE); // 3
-		phs3 = gpGlobals->time + 0.23;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 99999.0;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.0;
+		phs3 = gpGlobals->time + 0.23s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 99999.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.0s;
 	}
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1); // 5
@@ -731,7 +731,7 @@ void CGungnir::PrimaryAttack()
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH; // 512
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH; // 2u
 
-	bool v6 = gpGlobals->time > phs12 + 1.0f;
+	bool v6 = gpGlobals->time > phs12 + 1.0s;
 	int flags;
 #ifdef CLIENT_WEAPONS
 	flags = FEV_NOTHOST;
@@ -741,14 +741,14 @@ void CGungnir::PrimaryAttack()
 	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, v6 /*0*/, 0, v6, 0, FALSE, FALSE);
 
 	if (v6)
-		phs12 = v6 = gpGlobals->time;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.12f;
+		phs12 = gpGlobals->time;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.12s;
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.9f;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.9s;
 
 	PrimaryAttack_FindTargets();
 	PrimaryAttack_InstantDamage();
@@ -761,7 +761,7 @@ void CGungnir::ShootProjectile()
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 		return; // sth ignored
 	}
@@ -777,7 +777,7 @@ void CGungnir::ShootProjectile()
 	}
 #endif
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.58;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.58s;
 
 	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 3/*0*/, 0, 3, 0, FALSE, FALSE);
 
@@ -800,8 +800,8 @@ void CGungnir::ShootSpear()
 	}
 #endif
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.12;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.13;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.12s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.13s;
 	m_iClip = std::max(m_iClip - 5, 0);
 
 	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 4 /*0*/, 0, 4, 0, FALSE, FALSE);
@@ -814,45 +814,45 @@ void CGungnir::ShootSpear()
 
 void CGungnir::SecondaryAttack()
 {
-	if (phs3 <= 0.0 && m_iClip > 0)
+	if (phs3 <= invalid_time_point && m_iClip > 0)
 	{
-		if (phs2 == -1)
+		if (phs2 == invalid_time_point)
 			phs2 = gpGlobals->time;
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0f;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999.0s;
 	}
 }
 
 void CGungnir::ItemPostFrame()
 {
-	if (phs4 > 0.0f && gpGlobals->time > phs4)
+	if (phs4 > invalid_time_point && gpGlobals->time > phs4)
 	{
 		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model);
-		phs4 = -1;
+		phs4 = invalid_time_point;
 		return;
 	}
 
-	if (phs2 <= 0.0f)
+	if (phs2 <= invalid_time_point)
 	{
-		if (phs3 > 0.0f)
+		if (phs3 > invalid_time_point)
 		{
 			if (this->m_pPlayer->pev->button & IN_ATTACK && this->m_iClip > 0)
 			{
 				if (gpGlobals->time > phs3)
 				{
 					this->SendWeaponAnim(ANIM_SHOOT_LOOP, UseDecrement() != FALSE); // 4
-					phs3 = gpGlobals->time + 0.5f;
+					phs3 = gpGlobals->time + 0.5s;
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
 			}
 			else
 			{
 				this->SendWeaponAnim(ANIM_SHOOT_END, UseDecrement() != FALSE); // 5
-				phs3 = -1;
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4f;
+				phs3 = invalid_time_point;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4s;
 				ClearEffect();
 				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 2 /*0*/, 0, 2, 0, FALSE, FALSE);
-				phs12 = -1;
+				phs12 = invalid_time_point;
 			}
 		}
 	}
@@ -861,9 +861,9 @@ void CGungnir::ItemPostFrame()
 		if (this->m_pPlayer->pev->button & IN_ATTACK2) // 0x800
 		{
 			const int v16 = m_pPlayer->pev->weaponanim;
-			if (gpGlobals->time > phs2 + 0.64999998)
+			if (gpGlobals->time > phs2 + 0.64999998s)
 			{
-				if (gpGlobals->time - phs2 >= 0.64999998 + 2.03)
+				if (gpGlobals->time - phs2 >= 0.64999998s + 2.03s)
 				{
 					if (v16 != ANIM_CHARGE_LOOP) // 9
 					{
@@ -882,27 +882,27 @@ void CGungnir::ItemPostFrame()
 		}
 		else
 		{
-			if (gpGlobals->time - phs2 < 0.64999998)
+			if (gpGlobals->time - phs2 < 0.64999998s)
 			{
 #ifndef CLIENT_DLL
 				m_pPlayer->SetAnimation(PLAYER_ATTACK1); //5
 #endif
 				SendWeaponAnim(ANIM_SHOOT_B, UseDecrement() != FALSE); // 6
 				ShootProjectile();
-				phs2 = -1;
+				phs2 = invalid_time_point;
 				return CBasePlayerWeapon::ItemPostFrame();
 			}
-			else if (gpGlobals->time - phs2 >= 0.64999998 + 2.03)
+			else if (gpGlobals->time - phs2 >= 0.64999998s + 2.03s)
 			{
 #ifndef CLIENT_DLL
 				m_pPlayer->SetAnimation(PLAYER_ATTACK1); //5
 #endif
 				SendWeaponAnim(ANIM_CHARGE_SHOOT, UseDecrement() != FALSE); // 8
 				ShootSpear();
-				phs2 = -1;
+				phs2 = invalid_time_point;
 				Q_strcpy(m_pPlayer->m_szAnimExtention, "m249");
 				m_pPlayer->pev->weaponmodel = MAKE_STRING("models/null.mdl");
-				phs4 = gpGlobals->time + fminf(3.1199999, 0.2);
+				phs4 = gpGlobals->time + min(3.1199999s, 0.2s);
 				return CBasePlayerWeapon::ItemPostFrame();
 			}
 			else if (m_pPlayer->pev->weaponanim != ANIM_SHOOT_B_CHARGE) // 7

@@ -47,7 +47,7 @@ private:
 public:
 	static constexpr auto ClassName = "weapon_xm8s";
 	static constexpr auto MaxClip = 30;
-	static constexpr auto DefaultReloadTime = 3.2;
+	static constexpr const auto &DefaultReloadTime = 3.2s;
 	static constexpr auto DefaultAccuracy = 0.2;
 	static constexpr auto ZoomFOV = 25;
 
@@ -82,7 +82,7 @@ public:
 #endif
 
 public:
-	void XM8SharpShooterFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void XM8SharpShooterFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
 public:

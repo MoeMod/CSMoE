@@ -42,7 +42,7 @@ public:
 #endif
 
 public:
-	void GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void GalilFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
 public:

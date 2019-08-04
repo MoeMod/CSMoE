@@ -104,8 +104,8 @@ private:
 	static int qptr;
 	static int tot_inqueue;
 	static float nodeval;
-	static float flNextCvarCheck;
-	static float flLastThinkTime;
+	static time_point_t flNextCvarCheck;
+	static time_point_t flLastThinkTime;
 	static EHANDLE hostages[ MAX_HOSTAGES_NAV ];
 	static int tot_hostages;
 

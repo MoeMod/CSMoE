@@ -169,7 +169,7 @@ public:
 
 	bool
 	IsBombPlanted() const { return m_isBombPlanted; }                        // returns true if bomb has been planted
-	float
+	time_point_t
 	GetBombPlantTimestamp() const { return m_bombPlantTimestamp; }                    // return time bomb was planted
 	bool IsTimeToPlantBomb() const
 	{
@@ -177,7 +177,7 @@ public:
 	}        // return true if it's ok to try to plant bomb
 	CBasePlayer *
 	GetBombDefuser() const { return m_bombDefuser; }                        // return the player currently defusing the bomb, or NULL
-	float
+	duration_t
 	GetBombTimeLeft() const;                                                // get the time remaining before the planted bomb explodes
 	CBaseEntity *
 	GetLooseBomb() { return m_looseBomb; }                            // return the bomb if it is loose on the ground
@@ -185,19 +185,19 @@ public:
 	GetLooseBombArea() const { return m_looseBombArea; }                        // return area that bomb is in/near
 	void SetLooseBomb(CBaseEntity *bomb);
 
-	float GetRadioMessageTimestamp(GameEventType event,
+	time_point_t GetRadioMessageTimestamp(GameEventType event,
 	                               int teamID) const;            // return the last time the given radio message was sent for given team
-	float GetRadioMessageInterval(GameEventType event,
+	duration_t GetRadioMessageInterval(GameEventType event,
 	                              int teamID) const;            // return the interval since the last time this message was sent
 	void SetRadioMessageTimestamp(GameEventType event, int teamID);
 	void ResetRadioMessageTimestamps();
 
-	float
+	time_point_t
 	GetLastSeenEnemyTimestamp() const { return m_lastSeenEnemyTimestamp; }                // return the last time anyone has seen an enemy
 	void SetLastSeenEnemyTimestamp() { m_lastSeenEnemyTimestamp = gpGlobals->time; }
 
-	float GetRoundStartTime() const { return m_roundStartTimestamp; }
-	float GetElapsedRoundTime() const
+	time_point_t GetRoundStartTime() const { return m_roundStartTimestamp; }
+	duration_t GetElapsedRoundTime() const
 	{
 		return gpGlobals->time - m_roundStartTimestamp;
 	}        // return the elapsed time since the current round began
@@ -243,7 +243,7 @@ public:
 	                          bool isFromConsole = false);            // process the "bot_add" console command
 
 private:
-	static float m_flNextCVarCheck;
+	static time_point_t m_flNextCVarCheck;
 	static bool m_isMapDataLoaded;                // true if we've attempted to load map data
 	static bool m_isLearningMap;
 	static bool m_isAnalysisRequested;
@@ -254,18 +254,18 @@ private:
 	int m_zoneCount;
 
 	bool m_isBombPlanted;                        // true if bomb has been planted
-	float m_bombPlantTimestamp;                    // time bomb was planted
-	float m_earliestBombPlantTimestamp;                // don't allow planting until after this time has elapsed
+	time_point_t m_bombPlantTimestamp;                    // time bomb was planted
+	time_point_t m_earliestBombPlantTimestamp;                // don't allow planting until after this time has elapsed
 	CBasePlayer *m_bombDefuser;                    // the player currently defusing a bomb
 	EHANDLE m_looseBomb;                        // will be non-NULL if bomb is loose on the ground
 	CNavArea *m_looseBombArea;                    // area that bomb is is/near
 
 	bool m_isRoundOver;                        // true if the round has ended
 
-	float m_radioMsgTimestamp[24][2];
+	time_point_t m_radioMsgTimestamp[24][2];
 
-	float m_lastSeenEnemyTimestamp;
-	float m_roundStartTimestamp;                    // the time when the current round began
+	time_point_t m_lastSeenEnemyTimestamp;
+	time_point_t m_roundStartTimestamp;                    // the time when the current round began
 
 	bool m_isDefenseRushing;                    // whether defensive team is rushing this round or not
 

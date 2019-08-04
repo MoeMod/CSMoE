@@ -74,7 +74,7 @@ bool CPlayerModStrategy_Default::CanPlayerBuy(bool display)
 		CVAR_SET_FLOAT("mp_buytime", (MIN_BUY_TIME / 60.0f));
 	}
 
-	if (gpGlobals->time - g_pGameRules->m_fRoundCount > buyTime)
+	if (gpGlobals->time - g_pGameRules->m_fRoundCount > buyTime * 1s)
 	{
 		if (display)
 		{
@@ -178,14 +178,14 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	{
 	case CT:
 		//m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("knife_dualsword");
+		m_pPlayer->GiveNamedItem("z4b_Frequency9");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
 		//m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("knife_dualsword");
+		m_pPlayer->GiveNamedItem("z4b_Frequency9");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
@@ -263,7 +263,7 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 		cd->vuser3.x = pl->ammo_338mag;
 		cd->vuser3.y = pl->ammo_57mm;
 		cd->vuser3.z = pl->ammo_357sig;
-		cd->m_flNextAttack = pl->m_flNextAttack;
+		cd->m_flNextAttack = pl->m_flNextAttack /1s;
 
 		int iUser3 = 0;
 		if (pl->m_bCanShoot && !pl->m_bIsDefusing)

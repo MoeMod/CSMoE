@@ -103,29 +103,29 @@ void CAS50::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CAS50::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AS50Fire((0.7) * (1 - m_flAccuracy), 0.4, FALSE);
+		AS50Fire((0.7) * (1 - m_flAccuracy), 0.4s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		AS50Fire((0.3) * (1 - m_flAccuracy), 0.4, FALSE);
+		AS50Fire((0.3) * (1 - m_flAccuracy), 0.4s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		AS50Fire((0.03) * (1 - m_flAccuracy), 0.4, FALSE);
+		AS50Fire((0.03) * (1 - m_flAccuracy), 0.4s, FALSE);
 	else
-		AS50Fire((0.15) * (1 - m_flAccuracy), 0.4, FALSE);
+		AS50Fire((0.15) * (1 - m_flAccuracy), 0.4s, FALSE);
 }
 
-void CAS50::AS50Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CAS50::AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov == 90)
 		flSpread += 0.1;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy = (gpGlobals->time - m_flLastFire) * 0.375 + 0.6;
+		m_flAccuracy = ((gpGlobals->time - m_flLastFire) / 1s) * 0.375 + 0.6;
 
 		if (m_flAccuracy > 1.0)
 			m_flAccuracy = 1.0;
@@ -138,7 +138,7 @@ void CAS50::AS50Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -151,7 +151,7 @@ void CAS50::AS50Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
@@ -171,7 +171,7 @@ void CAS50::AS50Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (m_pPlayer->pev->fov != 90)
 	{
@@ -210,7 +210,7 @@ void CAS50::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(AS50_IDLE, UseDecrement() != FALSE);
 	}
 }

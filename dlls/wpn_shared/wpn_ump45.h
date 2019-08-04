@@ -38,7 +38,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f }; }
 
 public:
-	void UMP45Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void UMP45Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 public:
 	int m_iShell;

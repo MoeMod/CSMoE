@@ -84,11 +84,11 @@ struct TutorMessage
 	int m_lifetime;
 	TutorMessageInterruptFlag m_interruptFlag;
 	int m_duplicateID;
-	float m_examineStartTime;
+	time_point_t m_examineStartTime;
 	int m_timesShown;
-	float m_minDisplayTimeOverride;
-	float m_minRepeatInterval;
-	float m_lastCloseTime;
+	duration_t m_minDisplayTimeOverride;
+	duration_t m_minRepeatInterval;
+	time_point_t m_lastCloseTime;
 };
 
 struct TutorMessageEventParam
@@ -280,7 +280,7 @@ public:
 	};
 
 	virtual ~CCSTutor();
-	virtual void TutorThink(float time);
+	virtual void TutorThink(time_point_t time);
 	virtual void PurgeMessages();
 	virtual void CallEventHandler(GameEventType event, CBaseEntity *entity, CBaseEntity *other);
 	virtual void ShowTutorMessage(TutorMessageEvent *event);
@@ -294,17 +294,17 @@ public:
 	void ClearEventList();
 	void ClearCurrentEvent(bool closeWindow = true, bool processDeathsForEvent = true);
 	void DeleteEvent(TutorMessageEvent *event);
-	bool ShouldShowMessageEvent(TutorMessageEvent *event, float time);
+	bool ShouldShowMessageEvent(TutorMessageEvent *event, time_point_t time);
 	NOXREF bool ShouldUpdateCurrentMessage(TutorMessageID messageID);
 	void ComputeDisplayTimesForMessage();
 	void UpdateCurrentMessage(TutorMessageEvent *event);
 	void ConstructMessageAndDisplay();
 	NOXREF void LookupHotKey(TutorMessageID mid, int paramNum, wchar_t *buf, int buflen);
-	void CheckForWindowClose(float time);
+	void CheckForWindowClose(time_point_t time);
 	void CheckForContentUpdate();
-	bool HasCurrentWindowBeenActiveLongEnough(float time);
-	void CheckForInterruptingMessageEvent(float time);
-	void CheckForInactiveEvents(float time);
+	bool HasCurrentWindowBeenActiveLongEnough(time_point_t time);
+	void CheckForInterruptingMessageEvent(time_point_t time);
+	void CheckForInactiveEvents(time_point_t time);
 	void CancelEvent(TutorMessageID mid);
 	void ProcessShownDeathsForEvent(TutorMessageEvent *event);
 	void TransferDeathEvents(TutorMessageEvent *oldEvent, TutorMessageEvent *newEvent);
@@ -381,9 +381,9 @@ public:
 	void CheckForTimeRunningOut();
 	void CheckForAllHostagesDead();
 	bool CheckForAllHostagesFollowingSomeone();
-	void CheckHintMessages(float time);
-	void CheckInGameHintMessages(float time);
-	void CheckExamineMessages(float time);
+	void CheckHintMessages(time_point_t time);
+	void CheckInGameHintMessages(time_point_t time);
+	void CheckExamineMessages(time_point_t time);
 	void CheckForNeedToReload(bool isPassiveCheck = false);
 	bool CanLocalPlayerBuyStuff();
 	void CheckBuyZoneMessages();
@@ -395,12 +395,12 @@ public:
 	void ConstructRecentDeathsList(TeamName team, char *buf, int buflen, TutorMessageEvent *event);
 
 private:
-	float m_nextViewableCheckTime;
+	time_point_t m_nextViewableCheckTime;
 	TutorMessageMap m_messageMap;
 	TutorMessageID m_currentlyShownMessageID;
-	float m_currentlyShownMessageCloseTime;
-	float m_currentlyShownMessageStartTime;
-	float m_currentlyShownMessageMinimumCloseTime;
+	time_point_t m_currentlyShownMessageCloseTime;
+	time_point_t m_currentlyShownMessageStartTime;
+	time_point_t m_currentlyShownMessageMinimumCloseTime;
 	TutorMessageEvent *m_currentMessageEvent;
 	TutorMessageEvent *m_lastScenarioEvent;
 	TutorMessageID m_lastHintShown;

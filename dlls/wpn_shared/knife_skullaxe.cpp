@@ -133,10 +133,10 @@ void CKnifeSkullAxe::PrimaryAttack(void)
 	SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
 
 	SetThink(&CKnifeSkullAxe::DelayedPrimaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9;
+	pev->nextthink = gpGlobals->time + 0.9s;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
 void CKnifeSkullAxe::SecondaryAttack(void)
@@ -147,10 +147,10 @@ void CKnifeSkullAxe::SecondaryAttack(void)
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
 	SetThink(&CKnifeSkullAxe::DelayedSecondaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9;
+	pev->nextthink = gpGlobals->time + 0.9s;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
 #ifndef CLIENT_DLL
@@ -307,7 +307,7 @@ void CKnifeSkullAxe::DelayedPrimaryAttack()
 	}
 	}
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	SetThink(nullptr);
 
 	//return fDidHit;
@@ -348,7 +348,7 @@ void CKnifeSkullAxe::DelayedSecondaryAttack()
 	}
 #endif
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	SetThink(nullptr);
 
 	//return fDidHit;

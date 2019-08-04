@@ -146,12 +146,12 @@ public:
 	Activity m_Activity;
 	BOOL m_bTouched;
 	BOOL m_bRescueMe;
-	float m_flFlinchTime;
-	float m_flNextChange;
+	time_point_t m_flFlinchTime;
+	time_point_t m_flNextChange;
 	float m_flMarkPosition;
 	int m_iModel;
 	int m_iSkin;
-	float m_flNextRadarTime;
+	time_point_t m_flNextRadarTime;
 	enum state { FOLLOW, STAND, DUCK, SCARED, IDLE, FOLLOWPATH }
 	m_State;
 	Vector m_vStart;
@@ -163,16 +163,16 @@ public:
 	int nTargetNode;
 	Vector vecNodes[ MAX_NODES ];
 	EHANDLE m_hStoppedTargetEnt;
-	float m_flNextFullThink;
-	float m_flPathCheckInterval;
-	float m_flLastPathCheck;
+	time_point_t m_flNextFullThink;
+	duration_t m_flPathCheckInterval;
+	time_point_t m_flLastPathCheck;
 	int m_nPathNodes;
 	BOOL m_fHasPath;
-	float m_flPathAcquired;
+	time_point_t m_flPathAcquired;
 	Vector m_vOldPos;
 	int m_iHostageIndex;
 	BOOL m_bStuck;
-	float m_flStuckTime;
+	time_point_t m_flStuckTime;
 	CHostageImprov *m_improv;
 
 	enum ModelType { REGULAR_GUY, OLD_GUY, BLACK_GUY, GOOFY_GUY }
@@ -188,7 +188,7 @@ public:
 	struct SoundFile
 	{
 		char *filename;
-		float duration;
+		duration_t duration;
 	};
 
 	struct ChatterSet
@@ -205,8 +205,8 @@ public:
 	#undef PlaySound
 #endif // _WIN32
 
-	float PlaySound(CBaseEntity *entity, HostageChatterType type);
-	char *GetSound(HostageChatterType type, float *duration);
+	duration_t PlaySound(CBaseEntity *entity, HostageChatterType type);
+	char *GetSound(HostageChatterType type, duration_t *duration);
 	void Shuffle(ChatterSet *chatter);
 
 private:

@@ -112,9 +112,9 @@ void CCSBot::RespondToRadioCommands()
 
 	// wait for reaction time before responding
 	// delay needs to be long enough for the radio message we're responding to to finish
-	float respondTime = 1.0f + 2.0f * GetProfile()->GetReactionTime();
+	auto respondTime = 1.0s + GetProfile()->GetReactionTime() * 2;
 	if (IsRogue())
-		respondTime += 2.0f;
+		respondTime += 2.0s;
 
 	if (gpGlobals->time - m_lastRadioRecievedTimestamp < respondTime)
 		return;
@@ -139,7 +139,7 @@ void CCSBot::RespondToRadioCommands()
 
 	// respond to command
 	bool canDo = false;
-	const float inhibitAutoFollowDuration = 60.0f;
+	EngineClock::duration inhibitAutoFollowDuration = 60.0s;
 	switch (m_lastRadioCommand)
 	{
 		case EVENT_RADIO_REPORT_IN_TEAM:
@@ -255,7 +255,7 @@ void CCSBot::RespondToRadioCommands()
 
 // Send voice chatter.  Also sends the entindex.
 
-void CCSBot::StartVoiceFeedback(float duration)
+void CCSBot::StartVoiceFeedback(duration_t duration)
 {
 	m_voiceFeedbackStartTimestamp = gpGlobals->time;
 	m_voiceFeedbackEndTimestamp = duration + gpGlobals->time;
@@ -272,10 +272,10 @@ void CCSBot::StartVoiceFeedback(float duration)
 
 void CCSBot::EndVoiceFeedback(bool force)
 {
-	if (!force && !m_voiceFeedbackEndTimestamp)
+	if (!force && m_voiceFeedbackEndTimestamp == invalid_time_point)
 		return;
 
-	m_voiceFeedbackEndTimestamp = 0;
+	m_voiceFeedbackEndTimestamp = invalid_time_point;
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgBotVoice);
 		WRITE_BYTE(0);

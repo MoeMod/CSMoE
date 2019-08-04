@@ -40,7 +40,7 @@ public:
 	KnockbackData GetKnockBackData() override { return { 3000.0f, 500.0f, 1200.0f, 800.0f, 0.3f }; }
 
 public:
-	void SCOUTFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void SCOUTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	int m_iShell;
 
 private:

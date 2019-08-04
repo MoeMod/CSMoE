@@ -87,7 +87,7 @@ void CCSBot::Upkeep()
 				if (GetProfile()->GetSkill() > 0.5f)
 				{
 					const float k = 3.0f;
-					m_aimSpot = (m_enemy->pev->velocity - pev->velocity) * g_flBotCommandInterval * k + m_enemy->pev->origin;
+					m_aimSpot = (m_enemy->pev->velocity - pev->velocity) * (g_flBotCommandInterval / 1s) * k + m_enemy->pev->origin;
 				}
 				else
 					m_aimSpot = m_enemy->pev->origin;
@@ -186,10 +186,10 @@ void CCSBot::Upkeep()
 			{
 				UpdateLookAt();
 
-				if (m_lookAtSpotDuration >= 0.0f && gpGlobals->time - m_lookAtSpotTimestamp > m_lookAtSpotDuration)
+				if (m_lookAtSpotDuration >= zero_duration && gpGlobals->time - m_lookAtSpotTimestamp > m_lookAtSpotDuration)
 				{
 					m_lookAtSpotState = NOT_LOOKING_AT_SPOT;
-					m_lookAtSpotDuration = 0.0f;
+					m_lookAtSpotDuration = zero_duration;
 				}
 				break;
 			}
@@ -205,8 +205,8 @@ void CCSBot::Upkeep()
 			driftAmplitude = 0.5f;
 		}
 
-		m_lookYaw += driftAmplitude * BotCOS(33.0f * gpGlobals->time);
-		m_lookPitch += driftAmplitude * BotSIN(13.0f * gpGlobals->time);
+		m_lookYaw += driftAmplitude * BotCOS(33.0f * gpGlobals->time.time_since_epoch() /1s);
+		m_lookPitch += driftAmplitude * BotSIN(13.0f * gpGlobals->time.time_since_epoch() /1s);
 	}
 
 	// view angles can change quickly
@@ -239,7 +239,7 @@ void CCSBot::Update()
 	// need to allow bots to finish their chatter even if they are dead
 	GetChatter()->Update();
 
-	if (m_voiceFeedbackEndTimestamp != 0.0f
+	if (m_voiceFeedbackEndTimestamp != invalid_time_point
 		&& (m_voiceFeedbackEndTimestamp <= gpGlobals->time || gpGlobals->time < m_voiceFeedbackStartTimestamp))
 	{
 		EndVoiceFeedback(NO_FORCE);
@@ -292,8 +292,8 @@ void CCSBot::Update()
 	StuckCheck();
 
 	// if our current 'noise' was heard a long time ago, forget it
-	const float rememberNoiseDuration = 20.0f;
-	if (m_noiseTimestamp > 0.0f && gpGlobals->time - m_noiseTimestamp > rememberNoiseDuration)
+	constexpr auto rememberNoiseDuration = 20.0s;
+	if (m_noiseTimestamp > invalid_time_point && gpGlobals->time - m_noiseTimestamp > rememberNoiseDuration)
 	{
 		ForgetNoise();
 	}
@@ -403,7 +403,7 @@ void CCSBot::Update()
 		// if we aren't attacking but we are being attacked, retaliate
 		if (!doAttack && !IsAttacking() && GetDisposition() != IGNORE_ENEMIES)
 		{
-			const float recentAttackDuration = 1.0f;
+			constexpr auto recentAttackDuration = 1.0s;
 			if (GetTimeSinceAttacked() < recentAttackDuration)
 			{
 				// we may not be attacking our attacker, but at least we're not just taking it
@@ -505,10 +505,10 @@ void CCSBot::Update()
 			// check if enemy died
 			if (m_enemy->IsAlive())
 			{
-				m_enemyDeathTimestamp = 0.0f;
+				m_enemyDeathTimestamp = invalid_time_point;
 				m_isLastEnemyDead = false;
 			}
-			else if (m_enemyDeathTimestamp == 0.0f)
+			else if (m_enemyDeathTimestamp == invalid_time_point)
 			{
 				// note time of death (to allow bots to overshoot for a time)
 				m_enemyDeathTimestamp = gpGlobals->time;
@@ -522,7 +522,7 @@ void CCSBot::Update()
 	}
 
 	// if we have seen an enemy recently, keep an eye on him if we can
-	const float seenRecentTime = 3.0f;
+	constexpr auto seenRecentTime = 3.0s;
 	if (m_enemy != nullptr && GetTimeSinceLastSawEnemy() < seenRecentTime)
 	{
 		AimAtEnemy();
@@ -588,7 +588,7 @@ void CCSBot::Update()
 
 	// if we haven't seen an enemy in awhile, and we switched to our pistol during combat,
 	// switch back to our primary weapon (if it still has ammo left)
-	const float safeRearmTime = 5.0f;
+	constexpr auto safeRearmTime = 5.0s;
 	if (!IsActiveWeaponReloading() && IsUsingPistol() && !IsPrimaryWeaponEmpty() && GetTimeSinceLastSawEnemy() > safeRearmTime)
 	{
 		EquipBestWeapon();
@@ -604,7 +604,7 @@ void CCSBot::Update()
 	RespondToRadioCommands();
 
 	// make way
-	const float avoidTime = 0.33f;
+	constexpr auto avoidTime = 0.33s;
 	if (gpGlobals->time - m_avoidTimestamp < avoidTime && m_avoid != nullptr)
 	{
 		StrafeAwayFromPosition(&m_avoid->pev->origin);
@@ -620,10 +620,10 @@ void CCSBot::Update()
 	}
 	else if (m_isJumpCrouching)
 	{
-		const float duration = 0.75f;
-		const float crouchDelayTime = 0.05f;
-		const float standUpTime = 0.6f;
-		float elapsed = gpGlobals->time - m_jumpCrouchTimestamp;
+		constexpr auto duration = 0.75s;
+		constexpr auto crouchDelayTime = 0.05s;
+		constexpr auto standUpTime = 0.6s;
+		const auto elapsed = gpGlobals->time - m_jumpCrouchTimestamp;
 
 		if (elapsed > crouchDelayTime && elapsed < standUpTime)
 			Crouch();
@@ -658,7 +658,7 @@ void CCSBot::Update()
 		{
 			// flee if the bomb is ready to blow and we aren't defusing it or attacking and we know where the bomb is
 			// (aggressive players wait until its almost too late)
-			float gonnaBlowTime = 8.0f - (2.0f * GetProfile()->GetAggression());
+			auto gonnaBlowTime = 8.0s - (2.0s * GetProfile()->GetAggression());
 
 			// if we have a defuse kit, can wait longer
 			if (m_bHasDefuser)
@@ -707,7 +707,7 @@ void CCSBot::Update()
 	// Follow nearby humans if our co-op is high and we have nothing else to do
 	// If we were just following someone, don't auto-follow again for a short while to
 	// give us a chance to do something else.
-	const float earliestAutoFollowTime = 5.0f;
+	EngineClock::duration earliestAutoFollowTime = 5.0s;
 	const float minAutoFollowTeamwork = 0.4f;
 	if (ctrl->GetElapsedRoundTime() > earliestAutoFollowTime
 		&& GetProfile()->GetTeamwork() > minAutoFollowTeamwork
@@ -742,11 +742,11 @@ void CCSBot::Update()
 
 								if (g_pGameRules->IsCareer())
 								{
-									GetChatter()->Say("FollowingCommander", 10.0f);
+									GetChatter()->Say("FollowingCommander", 10.0s);
 								}
 								else
 								{
-									GetChatter()->Say("FollowingSir", 10.0f);
+									GetChatter()->Say("FollowingSir", 10.0s);
 								}
 							}
 						}
@@ -757,7 +757,7 @@ void CCSBot::Update()
 		else
 		{
 			// we decided not to follow, don't re-check for a duration
-			m_allowAutoFollowTime = gpGlobals->time + 15.0f + (1.0f - GetProfile()->GetTeamwork()) * 30.0f;
+			m_allowAutoFollowTime = gpGlobals->time + 15.0s + (1.0 - GetProfile()->GetTeamwork()) * 30.0s;
 		}
 	}
 
@@ -774,8 +774,8 @@ void CCSBot::Update()
 		const float highTeamwork = 0.85f;
 		if (GetProfile()->GetTeamwork() < highTeamwork)
 		{
-			float minFollowDuration = 15.0f;
-			if (GetFollowDuration() > minFollowDuration + 40.0f * GetProfile()->GetTeamwork())
+			constexpr auto minFollowDuration = 15.0s;
+			if (GetFollowDuration() > minFollowDuration + 40.0s * GetProfile()->GetTeamwork())
 			{
 				// we are bored of following our leader
 				StopFollowing();
@@ -785,14 +785,14 @@ void CCSBot::Update()
 	}
 	else
 	{
-		if (GetMorale() < NEUTRAL && IsSafe() && GetSafeTimeRemaining() < 2.0f && IsHunting())
+		if (GetMorale() < NEUTRAL && IsSafe() && GetSafeTimeRemaining() < 2.0s && IsHunting())
 		{
 			if (GetMorale() * -40.0 > RANDOM_FLOAT(0.0f, 100.0f))
 			{
 				if (ctrl->IsOnOffense(this) || !ctrl->IsDefenseRushing())
 				{
 					SetDisposition(OPPORTUNITY_FIRE);
-					Hide(m_lastKnownArea, RANDOM_FLOAT(3.0f, 15.0f));
+					Hide(m_lastKnownArea, RandomDuration(3.0s, 15.0s));
 					GetChatter()->Say("WaitingHere");
 				}
 			}
@@ -832,7 +832,7 @@ void CCSBot::Update()
 			{
 				// just started waiting
 				m_isWaitingForHostage = true;
-				m_waitForHostageTimer.Start(10.0f);
+				m_waitForHostageTimer.Start(10.0s);
 			}
 			else
 			{
@@ -841,7 +841,7 @@ void CCSBot::Update()
 				{
 					// give up waiting for awhile
 					m_isWaitingForHostage = false;
-					m_inhibitWaitingForHostageTimer.Start(3.0f);
+					m_inhibitWaitingForHostageTimer.Start(3.0s);
 				}
 				else
 				{

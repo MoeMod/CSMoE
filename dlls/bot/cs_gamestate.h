@@ -64,11 +64,11 @@ public:
 	bool IsBombExploded() const	{ return (m_bombState == EXPLODED); }
 
 	void UpdateLooseBomb(const Vector *pos);		// we see the loose bomb
-	float TimeSinceLastSawLooseBomb() const;		// how long has is been since we saw the loose bomb
+	duration_t TimeSinceLastSawLooseBomb() const;		// how long has is been since we saw the loose bomb
 	bool IsLooseBombLocationKnown() const;			// do we know where the loose bomb is
 
 	void UpdateBomber(const Vector *pos);			// we see the bomber
-	float TimeSinceLastSawBomber() const;			// how long has is been since we saw the bomber
+	duration_t TimeSinceLastSawBomber() const;			// how long has is been since we saw the bomber
 
 	void UpdatePlantedBomb(const Vector *pos);		// we see the planted bomb
 	bool IsPlantedBombLocationKnown() const;		// do we know where the bomb was planted

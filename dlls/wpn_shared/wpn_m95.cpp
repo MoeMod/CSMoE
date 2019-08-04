@@ -88,8 +88,8 @@ BOOL CM95::Deploy(void)
 {
 	if (DefaultDeploy("models/v_m95.mdl", "models/p_m95.mdl", M95_DRAW, "rifle", UseDecrement() != FALSE))
 	{
-		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1;
+		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 		return TRUE;
 	}
 
@@ -107,24 +107,24 @@ void CM95::SecondaryAttack(void)
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CM95::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		M95Fire(1.0, 1.5, FALSE);
+		M95Fire(1.0, 1.5s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 120)
-		M95Fire(0.3, 1.5, FALSE);
+		M95Fire(0.3, 1.5s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 10)
-		M95Fire(0.1, 1.5, FALSE);
+		M95Fire(0.1, 1.5s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		M95Fire(0.0, 1.5, FALSE);
+		M95Fire(0.0, 1.5s, FALSE);
 	else
-		M95Fire(0.002, 1.5, FALSE);
+		M95Fire(0.002, 1.5s, FALSE);
 }
 
-void CM95::M95Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CM95::M95Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov != 90)
 	{
@@ -140,7 +140,7 @@ void CM95::M95Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -153,7 +153,7 @@ void CM95::M95Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
@@ -173,7 +173,7 @@ void CM95::M95Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 12;
 }
 
@@ -202,7 +202,7 @@ void CM95::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 		SendWeaponAnim(M95_IDLE, UseDecrement() != FALSE);
 	}
 }

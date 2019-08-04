@@ -25,10 +25,10 @@ namespace sv {
 * Globals initialization
 */
 // 30 times per second, just like human clients
-float g_flBotCommandInterval = 1.0 / 30.0;
+duration_t g_flBotCommandInterval = 1.0s / 30.0;
 
 // full AI only 10 times per second
-float g_flBotFullThinkInterval = 1.0 / 10.0;
+duration_t g_flBotFullThinkInterval = 0.1s;
 
 // Nasty Hack.  See client.cpp/ClientCommand()
 const char *BotArgs[4] = { NULL };
@@ -68,7 +68,7 @@ void CBot::Spawn()
 
 	// Bots use their own thinking mechanism
 	SetThink(NULL);
-	pev->nextthink = -1;
+	pev->nextthink = invalid_time_point;
 
 	m_flNextBotThink = gpGlobals->time + g_flBotCommandInterval;
 	m_flNextFullBotThink = gpGlobals->time + g_flBotFullThinkInterval;
@@ -78,7 +78,7 @@ void CBot::Spawn()
 	m_isCrouching = false;
 	m_postureStackIndex = 0;
 
-	m_jumpTimestamp = 0.0f;
+	m_jumpTimestamp = invalid_time_point;
 
 	// Command interface variable initialization
 	ResetCommand();
@@ -155,13 +155,13 @@ bool CBot::Jump(bool mustJump)
 
 	if (!mustJump)
 	{
-		const float minJumpInterval = 0.9f; // 1.5f;
+		EngineClock::duration minJumpInterval = 0.9s; // 1.5f;
 		if (gpGlobals->time - m_jumpTimestamp < minJumpInterval)
 			return false;
 	}
 
 	// still need sanity check for jumping frequency
-	const float sanityInterval = 0.3f;
+	EngineClock::duration sanityInterval = 0.3s;
 	if (gpGlobals->time - m_jumpTimestamp < sanityInterval)
 		return false;
 
@@ -183,11 +183,11 @@ void CBot::ClearMovement()
 bool CBot::IsJumping()
 {
 	// if long time after last jump, we can't be jumping
-	if (gpGlobals->time - m_jumpTimestamp > 3.0f)
+	if (gpGlobals->time - m_jumpTimestamp > 3.0s)
 		return false;
 
 	// if we just jumped, we're still jumping
-	if (gpGlobals->time - m_jumpTimestamp < 1.0f)
+	if (gpGlobals->time - m_jumpTimestamp < 1.0s)
 		return true;
 
 	// a little after our jump, we're jumping until we hit the ground
@@ -333,7 +333,7 @@ byte CBot::ThrottledMsec() const
 	int iNewMsec;
 
 	// Estimate Msec to use for this command based on time passed from the previous command
-	iNewMsec = (int)((gpGlobals->time - m_flPreviousCommandTime) * 1000);
+	iNewMsec = (int)((gpGlobals->time.time_since_epoch() /1s - m_flPreviousCommandTime.time_since_epoch() /1s) * 1000);
 
 	// Doh, bots are going to be slower than they should if this happens.
 	// Upgrade that CPU or use less bots!
@@ -521,7 +521,7 @@ ActiveGrenade::ActiveGrenade(int weaponID, CGrenade *grenadeEntity)
 	m_id = weaponID;
 	m_entity = grenadeEntity;
 	m_detonationPosition = grenadeEntity->pev->origin;
-	m_dieTimestamp = 0;
+	m_dieTimestamp = invalid_time_point;
 }
 
 void ActiveGrenade::OnEntityGone()
@@ -529,7 +529,7 @@ void ActiveGrenade::OnEntityGone()
 	if (m_id == WEAPON_SMOKEGRENADE)
 	{
 		// smoke lingers after grenade is gone
-		const float smokeLingerTime = 4.0f;
+		constexpr auto smokeLingerTime = 4.0s;
 		m_dieTimestamp = gpGlobals->time + smokeLingerTime;
 	}
 

@@ -286,7 +286,7 @@ bool CCSBot::UpdateLadderMovement()
 	bool giveUp = false;
 
 	// check for timeout
-	const float ladderTimeoutDuration = 10.0f;
+	constexpr auto ladderTimeoutDuration = 10.0s;
 	if (gpGlobals->time - m_pathLadderTimestamp > ladderTimeoutDuration)
 	{
 		PrintIfWatched("Ladder timeout!\n");
@@ -586,7 +586,7 @@ bool CCSBot::UpdateLadderMovement()
 		}
 		case DISMOUNT_ASCENDING_LADDER:
 		{
-			if (gpGlobals->time - m_pathLadderDismountTimestamp >= 0.4f)
+			if (gpGlobals->time - m_pathLadderDismountTimestamp >= 0.4s)
 			{
 				m_pathLadderState = MOVE_TO_DESTINATION;
 				m_path[ m_pathIndex ].area->GetClosestPointOnArea(&pev->origin, &m_goalPosition);
@@ -1147,7 +1147,7 @@ bool CCSBot::IsFriendInTheWay(const Vector *goalPos) const
 		return m_isFriendInTheWay;
 	}
 
-	const float avoidFriendInterval = 0.5f;
+	constexpr auto avoidFriendInterval = 0.5s;
 	m_avoidFriendTimer.Start(avoidFriendInterval);
 
 	// compute ray along intended path
@@ -1393,7 +1393,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement(bool allowSpeedChange)
 	if (m_pathIndex < m_pathLength - 1 && (m_goalPosition - pev->origin).IsLengthLessThan(nearCornerRange))
 	{
 		ClearLookAt();
-		InhibitLookAround(0.5f);
+		InhibitLookAround(0.5s);
 	}
 
 	// if we moved to a new node on the path, setup movement
@@ -1533,7 +1533,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement(bool allowSpeedChange)
 		{
 			m_isWaitingBehindFriend = true;
 
-			const float politeDuration = 5.0f - 3.0f * GetProfile()->GetAggression();
+			const auto politeDuration = 5.0s - 3.0s * GetProfile()->GetAggression();
 			m_politeTimer.Start(politeDuration);
 		}
 		else if (m_politeTimer.IsElapsed())
@@ -1596,7 +1596,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement(bool allowSpeedChange)
 	// This timeout check is needed if the bot somehow slips way off
 	// of its path and cannot progress, but also moves around
 	// enough that it never becomes "stuck"
-	const float giveUpDuration = 5.0f; // 4.0f
+	constexpr auto giveUpDuration = 5.0s; // 4.0f
 	if (didFall || gpGlobals->time - m_areaEnteredTimestamp > giveUpDuration)
 	{
 		if (didFall)
@@ -1660,7 +1660,7 @@ bool CCSBot::ComputePath(CNavArea *goalArea, const Vector *goal, RouteType route
 		return false;
 
 	// randomize to distribute CPU load
-	m_repathTimer.Start(RANDOM_FLOAT(0.4f, 0.6f));
+	m_repathTimer.Start(RandomDuration(0.4s, 0.6s));
 
 	DestroyPath();
 

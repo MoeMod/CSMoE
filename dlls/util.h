@@ -426,9 +426,9 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 class CBaseEntity;
 
 #ifndef CLIENT_WEAPONS
-float UTIL_WeaponTimeBase(void);
+std::chrono::duration<float> UTIL_WeaponTimeBase(void);
 #else
-inline float UTIL_WeaponTimeBase(void) { return 0; }
+constexpr std::chrono::duration<float> UTIL_WeaponTimeBase(void) { return 0s; }
 #endif
 unsigned int U_Random();
 void U_Srand(unsigned int seed);
@@ -462,12 +462,12 @@ void UTIL_ScreenShake(const Vector &center, float amplitude, float frequency, fl
 //NOXREF void UTIL_ScreenShakeAll(const Vector &center, float amplitude, float frequency, float duration);
 
 #ifdef SHAKE_H
-void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
+void UTIL_ScreenFadeBuild(ScreenFade &fade, const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags);
 void UTIL_ScreenFadeWrite(const ScreenFade &fade, CBaseEntity *pEntity);
 #endif
 
-void UTIL_ScreenFadeAll(const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
-void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold = 0.0f, int alpha = 0,
+void UTIL_ScreenFadeAll(const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags);
+void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, duration_t fadeTime, duration_t fadeHold = 0.0s, int alpha = 0,
                      int flags = 0);
 
 void UTIL_HudMessage(CBaseEntity *pEntity, const hudtextparms_t &textparms, const char *pMessage);
@@ -548,9 +548,9 @@ namespace cl {
 class CBaseEntity;
 
 #ifndef CLIENT_WEAPONS
-float UTIL_WeaponTimeBase(void);
+std::chrono::duration<float> UTIL_WeaponTimeBase(void);
 #else
-inline float UTIL_WeaponTimeBase(void) { return 0; }
+constexpr std::chrono::duration<float> UTIL_WeaponTimeBase(void) { return zero_duration; }
 #endif
 
 void UTIL_MakeVectors(const Vector &vecAngles);

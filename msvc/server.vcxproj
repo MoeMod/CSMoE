@@ -976,7 +976,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Full</Optimization>
-      <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
@@ -1013,7 +1012,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
-      <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -1049,7 +1047,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
@@ -1078,7 +1075,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

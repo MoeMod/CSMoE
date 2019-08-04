@@ -281,7 +281,7 @@ void BuyState::OnUpdate(CCSBot *me)
 	// apparently we cant buy things in the first few seconds, so wait a bit
 	if (m_isInitialDelay)
 	{
-		const float waitToBuyTime = 2.0f; // 0.25f;
+		constexpr auto waitToBuyTime = 2.0s; // 0.25f;
 		if (gpGlobals->time - me->GetStateTimestamp() < waitToBuyTime)
 			return;
 
@@ -315,7 +315,7 @@ void BuyState::OnUpdate(CCSBot *me)
 	CCSBotManager *ctrl = TheCSBots();
 
 	// try to buy some weapons
-	const float buyInterval = 0.2f; // 0.02f
+	constexpr auto buyInterval = 0.2s; // 0.02f
 	if (gpGlobals->time - me->GetStateTimestamp() > buyInterval)
 	{
 		me->m_stateTimestamp = gpGlobals->time;

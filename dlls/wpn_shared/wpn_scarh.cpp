@@ -158,7 +158,7 @@ BOOL CSCARHeavy::Deploy(void)
 	if (m_iSwing)
 	{
 		DefaultDeploy("models/v_scar.mdl", "models/p_scar.mdl", CHANGE_SCARH, "rifle", UseDecrement() != FALSE);
-		m_pPlayer->m_flNextAttack = 6.0f;
+		m_pPlayer->m_flNextAttack = 6.0s;
 	}
 	else
 	{
@@ -170,14 +170,14 @@ BOOL CSCARHeavy::Deploy(void)
 void CSCARHeavy::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AK47Fire(0.04 + (0.4) * m_flAccuracy, 0.11, FALSE);
+		AK47Fire(0.04 + (0.4) * m_flAccuracy, 0.11s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		AK47Fire(0.04 + (0.07) * m_flAccuracy, 0.11, FALSE);
+		AK47Fire(0.04 + (0.07) * m_flAccuracy, 0.11s, FALSE);
 	else
-		AK47Fire((0.0275), 0.11, FALSE);
+		AK47Fire((0.0275), 0.11s, FALSE);
 }
 
-void CSCARHeavy::AK47Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CSCARHeavy::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -191,7 +191,7 @@ void CSCARHeavy::AK47Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -223,7 +223,7 @@ void CSCARHeavy::AK47Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7);
@@ -249,7 +249,7 @@ void CSCARHeavy::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 
-	if (DefaultReload(SCARH_AMMO, SCARH_RELOAD, 3.35))
+	if (DefaultReload(SCARH_AMMO, SCARH_RELOAD, 3.35s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -268,7 +268,7 @@ void CSCARHeavy::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(SCARH_IDLE1, UseDecrement() != FALSE);
 }
 

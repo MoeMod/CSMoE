@@ -75,7 +75,7 @@ NOXREF void CBaseMonster::CorpseFallThink()
 		UTIL_SetOrigin(pev, pev->origin);
 	}
 	else
-		pev->nextthink = gpGlobals->time + 0.1;
+		pev->nextthink = gpGlobals->time + 0.1s;
 }
 
 void CBaseMonster::MonsterInitDead()
@@ -97,7 +97,7 @@ void CBaseMonster::MonsterInitDead()
 
 	BecomeDead();
 	SetThink(&CBaseEntity::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.5;
+	pev->nextthink = gpGlobals->time + 0.5s;
 }
 
 BOOL CBaseMonster::ShouldFadeOnDeath()

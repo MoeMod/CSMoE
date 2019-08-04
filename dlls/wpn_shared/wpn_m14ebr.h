@@ -41,7 +41,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_m14ebr.mdl"; }
 
 public:
-	void M14EBRFire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void M14EBRFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 	int iShellOn;

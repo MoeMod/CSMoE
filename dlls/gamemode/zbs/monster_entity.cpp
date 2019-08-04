@@ -95,7 +95,7 @@ public:
 		m_actualVel.x = m_hostage->pev->origin.x - m_lastPosition.x;
 		m_actualVel.y = m_hostage->pev->origin.y - m_lastPosition.y;
 
-		const float safeTime = 0.4f;
+		EngineClock::duration safeTime = 0.4s;
 
 		if (!m_collisionTimer.HasStarted() || m_collisionTimer.IsGreaterThen(safeTime))
 			SetKnownGoodPosition(m_lastPosition);
@@ -302,7 +302,7 @@ public:
 				float stepAheadGround = pos.z;
 				Vector stepAheadNormal = Vector(0, 0, stepAheadGround);
 
-				m_inhibitObstacleAvoidance.Start(0.5);
+				m_inhibitObstacleAvoidance.Start(0.5s);
 
 				for (float range = 1.0f; range <= 30.5f; range += 5.0f)
 				{
@@ -403,12 +403,12 @@ void CMonster::Spawn()
 	SET_MODEL(edict(), "models/player/zombi_origin/zombi_origin.mdl");
 	SetAnimation(MONSTERANIM_IDLE);
 
-	m_flNextChange = 0;
+	m_flNextChange = invalid_time_point;
 	m_State = STAND;
 	m_hTargetEnt = NULL;
 	m_hStoppedTargetEnt = NULL;
 	m_vPathToFollow[0] = Vector(0, 0, 0);
-	m_flFlinchTime = 0;
+	m_flFlinchTime = invalid_time_point;
 	m_bRescueMe = FALSE;
 
 	UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
@@ -433,9 +433,9 @@ void CMonster::Spawn()
 	DROP_TO_FLOOR(edict());
 
 	SetThink(&CMonster::IdleThink);
-	pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	pev->nextthink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 
-	m_flNextFullThink = gpGlobals->time + RANDOM_FLOAT(0.1, 0.2);
+	m_flNextFullThink = gpGlobals->time + RandomDuration(0.1s, 0.2s);
 	m_vStart = pev->origin;
 	m_vStartAngles = pev->angles;
 	m_vOldPos = Vector(9999, 9999, 9999);
@@ -444,27 +444,27 @@ void CMonster::Spawn()
 	nTargetNode = -1;
 	m_fHasPath = FALSE;
 
-	m_flLastPathCheck = -1;
-	m_flPathAcquired = -1;
-	m_flPathCheckInterval = 3.0f;
-	m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
+	m_flLastPathCheck = invalid_time_point;
+	m_flPathAcquired = invalid_time_point;
+	m_flPathCheckInterval = 3.0s;
+	m_flNextRadarTime = gpGlobals->time + RandomDuration(0.0s, 1.0s);
 
 	m_LocalNav = new CLocalNav(this);
 	m_bStuck = FALSE;
-	m_flStuckTime = 0;
+	m_flStuckTime = invalid_time_point;
 
 	if (m_improv)
 		delete m_improv;
 	m_improv = NULL;
 
-	m_flNextAttack = 0;
+	m_timeNextAttack = invalid_time_point;
 
 	pev->team = TEAM_TERRORIST; // allow bot attack...
 
 	m_flAttackDist = 35.0f;
 	m_flAttackDamage = 1.0f;
-	m_flAttackRate = 2.0f;
-	m_flAttackAnimTime = 0.6f;
+	m_flAttackRate = 2.0s;
+	m_flAttackAnimTime = 0.6s;
 	m_flTimeLastActive = gpGlobals->time;
 
 	m_pMonsterStrategy->OnSpawn();
@@ -559,9 +559,9 @@ int CMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float 
 	if (pev->health > 0)
 	{
 		// if attacking then dont play flinch anim
-		if (m_flNextAttack <= gpGlobals->time)
+		if (m_timeNextAttack <= gpGlobals->time)
 		{
-			m_flFlinchTime = gpGlobals->time + 0.25f;
+			m_flFlinchTime = gpGlobals->time + 0.25s;
 			//SetFlinchActivity();
 			SetAnimation(MONSTERANIM_FLINCH);
 		}
@@ -620,10 +620,10 @@ void CMonster::Killed(entvars_t *pevAttacker, int iGib)
 	//SetDeathActivity();
 	SetAnimation(MONSTERANIM_DIE);
 
-	pev->nextthink = gpGlobals->time + 3;
+	pev->nextthink = gpGlobals->time + 3s;
 	SetThink(&CMonster::Remove);
 
-	m_flTimeLastActive = -1;
+	m_flTimeLastActive = invalid_time_point;
 
 	m_pMonsterStrategy->OnKilled(pevAttacker, iGib);
 }
@@ -635,8 +635,8 @@ void CMonster::Remove()
 	pev->takedamage = DAMAGE_NO;
 
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
-	pev->nextthink = -1;
-	m_flNextFullThink = -1;
+	pev->nextthink = invalid_time_point;
+	m_flNextFullThink = invalid_time_point;
 
 	SUB_Remove();
 }
@@ -644,7 +644,7 @@ void CMonster::Remove()
 CMonster::CMonster() : CHostage(), 
 	m_iKillBonusMoney(500), 
 	m_iKillBonusFrags(1), 
-	m_flTimeLastActive(0.0f), 
+	m_flTimeLastActive(0.0s), 
 	m_pMonsterStrategy(new CMonsterModStrategy_Default(this))
 {
 	MonsterManager().OnEntityAdd(this);
@@ -658,7 +658,7 @@ CMonster::~CMonster()
 void CMonster::IdleThink()
 {
 	constexpr float upkeepRate = 0.03f;
-	constexpr float giveUpTime = (1 / 30.0f);
+	constexpr auto giveUpTime = (1 / 30.0f) * 1s;
 	constexpr float updateRate = 0.1f;
 
 	if (!m_improv)
@@ -669,7 +669,7 @@ void CMonster::IdleThink()
 	pev->nextthink = gpGlobals->time + giveUpTime;
 
 	// Outer...
-	const float flInterval = StudioFrameAdvance(0);
+	EngineClock::duration flInterval = StudioFrameAdvance(0s);
 	std::future<void> handleDispatchAnimEvents = std::async(&CMonster::DispatchAnimEvents, this, flInterval);
 	std::future<void> handleUpkeepImprov = std::async(&CHostageImprov::OnUpkeep, m_improv, upkeepRate);
 	// wait for them...
@@ -678,7 +678,7 @@ void CMonster::IdleThink()
 
 	if (gpGlobals->time > m_flNextFullThink)
 	{
-		m_flNextFullThink = gpGlobals->time + 0.1;
+		m_flNextFullThink = gpGlobals->time + 0.1s;
 		std::future<bool> results[] = {
 			std::async(&CMonster::CheckTarget, this),
 			std::async(&CMonster::CheckAttack, this),
@@ -721,13 +721,13 @@ bool CMonster::CheckTarget()
 			m_improv->MoveTo(player->Center());
 		}
 
-		m_flTargetChange = gpGlobals->time + RANDOM_FLOAT(10.0f, 20.0f);
+		m_flTargetChange = gpGlobals->time + RandomDuration(10.0s, 20.0s);
 		return result.second;
 	}
 
 	if (m_hTargetEnt && !m_hTargetEnt->IsAlive())
 	{
-		m_flTargetChange = gpGlobals->time + 0.2f;
+		m_flTargetChange = gpGlobals->time + 0.2s;
 		return false;
 	}
 	return false;
@@ -755,7 +755,7 @@ std::pair<CBasePlayer *, bool> CMonster::FindTarget() const
 
 bool CMonster::CheckAttack()
 {
-	if (m_flNextAttack > gpGlobals->time)
+	if (m_timeNextAttack > gpGlobals->time)
 		return false;
 
 	CBaseEntity *pHit = CheckTraceHullAttack(m_flAttackDist, m_flAttackDamage, DMG_BULLET);
@@ -765,7 +765,7 @@ bool CMonster::CheckAttack()
 
 	SetAnimation(MONSTERANIM_ATTACK);
 
-	m_flNextAttack = gpGlobals->time + m_flAttackRate;
+	m_timeNextAttack = gpGlobals->time + m_flAttackRate;
 	m_flNextFullThink = gpGlobals->time + m_flAttackAnimTime;
 
 	switch (RANDOM_LONG(1, 3))

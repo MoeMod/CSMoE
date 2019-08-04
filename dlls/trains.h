@@ -108,7 +108,7 @@ public:
 	void EXPORT NearestPath();
 	void EXPORT DeadEnd();
 
-	void NextThink(float thinkTime, BOOL alwaysThink);
+	void NextThink(time_point_t thinkTime, BOOL alwaysThink);
 	void SetTrack(CPathTrack *track) { m_ppath = track->Nearest(pev->origin); }
 	void SetControls(entvars_t *pevControls);
 	void StopSound();
@@ -160,7 +160,7 @@ public:
 	void EXPORT NearestPath();
 	void EXPORT DeadEnd();
 
-	void NextThink(float thinkTime, BOOL alwaysThink);
+	void NextThink(time_point_t thinkTime, BOOL alwaysThink);
 	void CollisionDetection();
 	void TerrainFollowing();
 	void CheckTurning();
@@ -191,13 +191,13 @@ public:
 	float m_flBank;
 	float m_oldSpeed;
 	int m_iTurnAngle;
-	float m_flSteeringWheelDecay;
-	float m_flAcceleratorDecay;
-	float m_flTurnStartTime;
-	float m_flLaunchTime;
+	time_point_t m_flSteeringWheelDecay;
+	time_point_t m_flAcceleratorDecay;
+	time_point_t m_flTurnStartTime;
+	time_point_t m_flLaunchTime;
 	float m_flLastNormalZ;
-	float m_flCanTurnNow;
-	float m_flUpdateSound;
+	time_point_t m_flCanTurnNow;
+	time_point_t m_flUpdateSound;
 	Vector m_vFrontLeft;
 	Vector m_vFront;
 	Vector m_vFrontRight;

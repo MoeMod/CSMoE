@@ -354,7 +354,7 @@ bool CHostageImprov::IsFriendInTheWay(const Vector &goalPos) const
 		return m_isFriendInTheWay;
 	}
 
-	const float avoidFriendInterval = 0.5f;
+	constexpr auto avoidFriendInterval = 0.5s;
 	m_avoidFriendTimer.Start(avoidFriendInterval);
 
 	CheckWayFunctor check(this, goalPos);
@@ -479,7 +479,7 @@ bool CHostageImprov::Jump()
 		m_hostage->pev->origin.z += fudge;
 	}
 
-	const float minJumpInterval = 3.0f;
+	constexpr auto minJumpInterval = 3.0s;
 	m_jumpTimer.Start(minJumpInterval);
 
 	m_animateState.Reset();
@@ -715,7 +715,7 @@ void CHostageImprov::UpdateVision()
 		}
 	}
 
-	m_visionTimer.Start(RANDOM_FLOAT(0.4, 0.6));
+	m_visionTimer.Start(RandomDuration(0.4s, 0.6s));
 }
 
 void CHostageImprov::TrackPath(const Vector &pathGoal, float deltaT)
@@ -738,7 +738,7 @@ void CHostageImprov::SetKnownGoodPosition(const Vector &pos)
 		{
 			m_hasPriorKnownGoodPos = true;
 			m_priorKnownGoodPos = m_knownGoodPos;
-			m_priorKnownGoodPosTimer.Start(1);
+			m_priorKnownGoodPosTimer.Start(1s);
 		}
 	}
 
@@ -758,7 +758,7 @@ void CHostageImprov::ResetToKnownGoodPosition()
 			{
 				m_hasPriorKnownGoodPos = false;
 				m_knownGoodPos = m_priorKnownGoodPos;
-				m_priorKnownGoodPosTimer.Start(5);
+				m_priorKnownGoodPosTimer.Start(5s);
 			}
 			else
 			{
@@ -1048,7 +1048,7 @@ void CHostageImprov::CheckForNearbyTerrorists()
 	if (!m_checkNearbyTerroristTimer.IsElapsed())
 		return;
 
-	const float checkInterval = 2.0f;
+	constexpr auto checkInterval = 2.0s;
 	m_checkNearbyTerroristTimer.Start(checkInterval);
 	m_isTerroristNearby = false;
 
@@ -1059,7 +1059,7 @@ void CHostageImprov::CheckForNearbyTerrorists()
 		if (range < nearbyTerroristRange)
 		{
 			m_isTerroristNearby = true;
-			m_nearbyTerroristTimer.Start(10);
+			m_nearbyTerroristTimer.Start(10s);
 		}
 	}
 }
@@ -1070,7 +1070,7 @@ void CHostageImprov::UpdateGrenadeReactions()
 	{
 		if (TheBots->IsInsideSmokeCloud(&GetCentroid()))
 		{
-			m_coughTimer.Start(RANDOM_FLOAT(1, 3));
+			m_coughTimer.Start(RandomDuration(1.0s, 3.0s));
 			Chatter(HOSTAGE_CHATTER_COUGH);
 			Frighten(SCARED);
 		}
@@ -1081,7 +1081,7 @@ void CHostageImprov::UpdateGrenadeReactions()
 		CBaseEntity *entity = NULL;
 		const float watchGrenadeRadius = 500.0f;
 
-		m_grenadeTimer.Start(RANDOM_FLOAT(0.4, 0.6));
+		m_grenadeTimer.Start(RandomDuration(0.4s, 0.6s));
 
 		while ((entity = UTIL_FindEntityInSphere(entity, GetCentroid(), watchGrenadeRadius)) != NULL)
 		{
@@ -1102,7 +1102,7 @@ void CHostageImprov::UpdateGrenadeReactions()
 				else
 					Frighten(SCARED);
 
-				m_grenadeTimer.Start(10);
+				m_grenadeTimer.Start(10s);
 				break;
 			}
 		}
@@ -1118,12 +1118,12 @@ void CHostageImprov::OnUpdate(float deltaT)
 	{
 		if (m_scaredTimer.IsElapsed() && m_animateState.GetPerformance() != HostageAnimateState::Afraid)
 		{
-			m_blinkTimer.Start(RANDOM_FLOAT(3, 10));
+			m_blinkTimer.Start(RandomDuration<float>(3s, 10s));
 			m_blinkCounter = RANDOM_LONG(2, 4);
 		}
 		else
 		{
-			m_blinkTimer.Start(RANDOM_FLOAT(0.5, 2.0));
+			m_blinkTimer.Start(RandomDuration(0.5s, 2.0s));
 			m_blinkCounter = RANDOM_LONG(1, 2);
 
 		}
@@ -1151,7 +1151,7 @@ void CHostageImprov::OnUpdate(float deltaT)
 	const float runSpeed = 289.0f;
 	const float walkSpeed = 9.0f;
 	const float fallVelocity = -1000.0f;
-	const float safeTime = 0.4f;
+	constexpr auto safeTime = 0.4s;
 
 	if (IsOnGround())
 	{
@@ -1166,9 +1166,9 @@ void CHostageImprov::OnUpdate(float deltaT)
 
 					ClearLookAt();
 					if (m_scaredTimer.IsElapsed() && m_animateState.GetPerformance() != HostageAnimateState::Afraid)
-						m_animateState.AddSequence(this, ACT_CROUCH_WALK, 99.9, 2.0);
+						m_animateState.AddSequence(this, ACT_CROUCH_WALK, 99.9s, 2.0);
 					else
-						m_animateState.AddSequence(this, ACT_CROUCH_WALK_SCARED, 99.9, 2.0);
+						m_animateState.AddSequence(this, ACT_CROUCH_WALK_SCARED, 99.9s, 2.0);
 				}
 			}
 			else if (m_animateState.GetPerformance() != HostageAnimateState::Crouch)
@@ -1177,7 +1177,7 @@ void CHostageImprov::OnUpdate(float deltaT)
 				m_animateState.SetPerformance(HostageAnimateState::Crouch);
 
 				if (m_scaredTimer.IsElapsed())
-					m_animateState.AddSequence(this, ACT_CROUCH_IDLE, 99.9);
+					m_animateState.AddSequence(this, ACT_CROUCH_IDLE, 99.9s);
 				else
 					m_animateState.AddSequence(this, ACT_CROUCH_IDLE_SCARED);
 			}
@@ -1202,7 +1202,7 @@ void CHostageImprov::OnUpdate(float deltaT)
 					else
 						speed = 1.0f;
 
-					m_animateState.AddSequence(this, ACT_WALK_BACK, 99.9, speed);
+					m_animateState.AddSequence(this, ACT_WALK_BACK, 99.9s, speed);
 				}
 			}
 			else
@@ -1216,9 +1216,9 @@ void CHostageImprov::OnUpdate(float deltaT)
 						ClearLookAt();
 
 						if (m_scaredTimer.IsElapsed() && m_animateState.GetPerformance() != HostageAnimateState::Afraid && !m_behavior.IsState(&m_escapeState))
-							m_animateState.AddSequence(this, ACT_RUN, 99.9, 2.0);
+							m_animateState.AddSequence(this, ACT_RUN, 99.9s, 2.0);
 						else
-							m_animateState.AddSequence(this, ACT_RUN_SCARED, 99.9, 2.0);
+							m_animateState.AddSequence(this, ACT_RUN_SCARED, 99.9s, 2.0);
 					}
 				}
 				else if (m_actualVel.LengthSquared() > walkSpeed)
@@ -1231,14 +1231,14 @@ void CHostageImprov::OnUpdate(float deltaT)
 
 						if (m_behavior.IsState(&m_escapeState))
 						{
-							m_animateState.AddSequence(this, ACT_WALK_SNEAKY, 99.9, 1.5);
+							m_animateState.AddSequence(this, ACT_WALK_SNEAKY, 99.9s, 1.5);
 						}
 						else if (m_scaredTimer.IsElapsed() && m_animateState.GetPerformance() != HostageAnimateState::Afraid)
 						{
-							m_animateState.AddSequence(this, ACT_WALK, 99.9, 1.5);
+							m_animateState.AddSequence(this, ACT_WALK, 99.9s, 1.5);
 						}
 						else
-							m_animateState.AddSequence(this, ACT_WALK_SCARED, 99.9, 1.5);
+							m_animateState.AddSequence(this, ACT_WALK_SCARED, 99.9s, 1.5);
 					}
 				}
 				else
@@ -1255,7 +1255,7 @@ void CHostageImprov::OnUpdate(float deltaT)
 	{
 		m_animateState.Reset();
 		m_animateState.SetPerformance(HostageAnimateState::Fall);
-		m_animateState.AddSequence(this, ACT_FALL, 99.9);
+		m_animateState.AddSequence(this, ACT_FALL, 99.9s);
 	}
 
 	if (!m_collisionTimer.HasStarted() || m_collisionTimer.IsGreaterThen(safeTime))
@@ -1288,7 +1288,7 @@ void CHostageImprov::OnGameEvent(GameEventType event, CBaseEntity *entity, CBase
 
 			if( !entity->IsPlayer() || ( entity->IsPlayer() && ( (CBasePlayer *)entity )->m_iTeam != TERRORIST ) )
 			{
-				DelayedChatter(RANDOM_FLOAT(0.5, 0.7), HOSTAGE_CHATTER_SCARED_OF_MURDER, true);
+				DelayedChatter(RandomDuration(0.5s, 0.7s), HOSTAGE_CHATTER_SCARED_OF_MURDER, true);
 			}
 			if (!entity->IsPlayer())
 			{
@@ -1308,12 +1308,12 @@ void CHostageImprov::OnGameEvent(GameEventType event, CBaseEntity *entity, CBase
 	case EVENT_TERRORISTS_WIN:
 		Frighten(SCARED);
 		m_isDelayedChatterPending = false;
-		DelayedChatter(RANDOM_FLOAT(1.0, 4.0), HOSTAGE_CHATTER_TERRORISTS_WIN);
+		DelayedChatter(RandomDuration(1.0s, 4.0s), HOSTAGE_CHATTER_TERRORISTS_WIN);
 		return;
 	case EVENT_CTS_WIN:
 		m_scaredTimer.Invalidate();
 		m_isDelayedChatterPending = false;
-		DelayedChatter(RANDOM_FLOAT(1.0, 4.0), HOSTAGE_CHATTER_CTS_WIN);
+		DelayedChatter(RandomDuration(1.0s, 4.0s), HOSTAGE_CHATTER_CTS_WIN);
 		return;
 	default:
 		break;
@@ -1339,7 +1339,7 @@ void CHostageImprov::OnGameEvent(GameEventType event, CBaseEntity *entity, CBase
 				{
 				case EVENT_WEAPON_FIRED:
 				{
-					DelayedChatter(RANDOM_FLOAT(0.3, 1.0), HOSTAGE_CHATTER_SCARED_OF_GUNFIRE);
+					DelayedChatter(RandomDuration(0.3s, 1.0s), HOSTAGE_CHATTER_SCARED_OF_GUNFIRE);
 					break;
 				}
 				case EVENT_HE_GRENADE_EXPLODED:
@@ -1349,7 +1349,7 @@ void CHostageImprov::OnGameEvent(GameEventType event, CBaseEntity *entity, CBase
 				case EVENT_BREAK_METAL:
 				case EVENT_BREAK_FLESH:
 				case EVENT_BREAK_CONCRETE:
-					DelayedChatter(RANDOM_FLOAT(0.3, 1.0), HOSTAGE_CHATTER_LOOK_OUT);
+					DelayedChatter(RandomDuration(0.3s, 1.0s), HOSTAGE_CHATTER_LOOK_OUT);
 					break;
 
 				default:
@@ -1366,7 +1366,7 @@ void CHostageImprov::OnGameEvent(GameEventType event, CBaseEntity *entity, CBase
 
 		if ((GetEyes() - *impactPos).IsLengthLessThan(flashRange) && IsVisible(*impactPos))
 		{
-			DelayedChatter(RANDOM_FLOAT(0.0, 1.0), HOSTAGE_CHATTER_BLINDED, true);
+			DelayedChatter(RandomDuration(0.0s, 1.0s), HOSTAGE_CHATTER_BLINDED, true);
 			Frighten(TERRIFIED);
 		}
 	}
@@ -1429,7 +1429,7 @@ void CHostageImprov::OnTouch(CBaseEntity *other)
 			float stepAheadGround = pos.z;
 			Vector stepAheadNormal = Vector(0, 0, stepAheadGround);
 
-			m_inhibitObstacleAvoidance.Start(0.5);
+			m_inhibitObstacleAvoidance.Start(0.5s);
 
 			for (float range = 1.0f; range <= 30.5f; range += 5.0f)
 			{
@@ -1546,10 +1546,10 @@ CBasePlayer *CHostageImprov::GetClosestVisiblePlayer(int team)
 	return close;
 }
 
-float CHostageImprov::GetTimeSinceLastSawPlayer(int team)
+duration_t CHostageImprov::GetTimeSinceLastSawPlayer(int team)
 {
-	float timeCT = m_lastSawCT.GetElapsedTime();
-	float timeT = m_lastSawT.GetElapsedTime();
+	auto timeCT = m_lastSawCT.GetElapsedTime();
+	auto timeT = m_lastSawT.GetElapsedTime();
 
 	switch (team)
 	{
@@ -1562,12 +1562,12 @@ float CHostageImprov::GetTimeSinceLastSawPlayer(int team)
 	}
 }
 
-float CHostageImprov::GetTimeSinceLastInjury()
+duration_t CHostageImprov::GetTimeSinceLastInjury()
 {
 	return m_lastInjuryTimer.GetElapsedTime();
 }
 
-float CHostageImprov::GetTimeSinceLastNoise()
+duration_t CHostageImprov::GetTimeSinceLastNoise()
 {
 	return m_lastNoiseTimer.GetElapsedTime();
 }
@@ -1584,7 +1584,7 @@ bool CHostageImprov::IsScared() const
 
 void CHostageImprov::Frighten(ScareType scare)
 {
-	const float ignoreTime = 10.0f;
+	constexpr auto ignoreTime = 10.0s;
 
 	if (!IsScared())
 	{
@@ -1597,13 +1597,13 @@ void CHostageImprov::Frighten(ScareType scare)
 	switch (scare)
 	{
 	case NERVOUS:
-		m_scaredTimer.Start(RANDOM_FLOAT(2, 4));
+		m_scaredTimer.Start(RandomDuration<float>(2s, 4s));
 		break;
 	case SCARED:
-		m_scaredTimer.Start(RANDOM_FLOAT(3, 8));
+		m_scaredTimer.Start(RandomDuration<float>(3s, 8s));
 		break;
 	case TERRIFIED:
-		m_scaredTimer.Start(RANDOM_FLOAT(5, 10));
+		m_scaredTimer.Start(RandomDuration<float>(5s, 10s));
 		m_ignoreTerroristTimer.Start(ignoreTime);
 		break;
 	}
@@ -1634,7 +1634,7 @@ void CHostageImprov::Afraid()
 		Q_sprintf(animExit, "cower_exit_%d", which);
 
 		m_animateState.AddSequence(this, animInto);
-		m_animateState.AddSequence(this, animLoop, RANDOM_FLOAT(3, 10));
+		m_animateState.AddSequence(this, animLoop, RandomDuration(3s, 10s));
 		m_animateState.AddSequence(this, animExit);
 	}
 }
@@ -1648,13 +1648,13 @@ void CHostageImprov::UpdateIdleActivity(Activity activity, Activity fidget)
 
 	if (m_didFidget || fidget == ACT_RESET)
 	{
-		m_animateState.AddSequence(this, activity, RANDOM_FLOAT(1, 10), RANDOM_FLOAT(0.9, 1.1));
+		m_animateState.AddSequence(this, activity, RandomDuration(1s, 10s), RANDOM_FLOAT(0.9, 1.1));
 		m_didFidget = false;
 
 	}
 	else
 	{
-		m_animateState.AddSequence(this, fidget, -1, RANDOM_FLOAT(0.9, 1.5));
+		m_animateState.AddSequence(this, fidget, -1s, RANDOM_FLOAT(0.9, 1.5));
 		m_didFidget = true;
 
 	}
@@ -1670,13 +1670,13 @@ void CHostageImprov::Chatter(HostageChatterType sayType, bool mustSpeak)
 
 	if (m_chatterTimer.IsElapsed() || mustSpeak)
 	{
-		m_chatterTimer.Start(RANDOM_FLOAT(5, 15));
-		float duration = g_pHostages->GetChatter()->PlaySound(m_hostage, sayType);
+		m_chatterTimer.Start(RandomDuration<float>(5s, 15s));
+		const auto duration = g_pHostages->GetChatter()->PlaySound(m_hostage, sayType);
 		m_talkingTimer.Start(duration);
 	}
 }
 
-void CHostageImprov::DelayedChatter(float delayTime, HostageChatterType sayType, bool mustSpeak)
+void CHostageImprov::DelayedChatter(duration_t delayTime, HostageChatterType sayType, bool mustSpeak)
 {
 	if (!IsAlive())
 		return;
@@ -1751,7 +1751,7 @@ void CHostageImprov::Disagree()
 	if (m_animateState.GetPerformance() != HostageAnimateState::Disagreeing)
 	{
 		m_animateState.Reset();
-		m_animateState.AddSequence(this, ACT_NO, -1.0, RANDOM_FLOAT(1.5, 3.0));
+		m_animateState.AddSequence(this, ACT_NO, -1.0s, RANDOM_FLOAT(1.5, 3.0));
 	}
 }
 
@@ -1780,7 +1780,7 @@ void CHostageImprov::Wiggle()
 	if (m_wiggleTimer.IsElapsed())
 	{
 		m_wiggleDirection = static_cast<NavRelativeDirType>(RANDOM_LONG(FORWARD, LEFT));
-		m_wiggleTimer.Start(RANDOM_FLOAT(0.3, 0.5));
+		m_wiggleTimer.Start(RandomDuration(0.3s, 0.5s));
 	}
 
 	const float force = 15.0f;
@@ -1805,12 +1805,12 @@ void CHostageImprov::Wiggle()
 		break;
 	}
 
-	const float minStuckJumpTime = 0.5f;
+	constexpr auto minStuckJumpTime = 0.5s;
 	if (m_follower.GetStuckDuration() > minStuckJumpTime && m_wiggleJumpTimer.IsElapsed())
 	{
 		if (Jump())
 		{
-			m_wiggleJumpTimer.Start(RANDOM_FLOAT(0.75f, 1.2f));
+			m_wiggleJumpTimer.Start(RandomDuration(0.75s, 1.2s));
 		}
 	}
 }
@@ -1824,7 +1824,7 @@ void CHostageImprov::ClearPath()
 	if (!m_clearPathTimer.IsElapsed())
 		return;
 
-	m_clearPathTimer.Start(RANDOM_FLOAT(0.3, 0.5));
+	m_clearPathTimer.Start(RandomDuration(0.3s, 0.5s));
 
 	const Vector eye = GetEyes();
 	start = eye;
@@ -1864,7 +1864,7 @@ void CHostageImprov::ClearPath()
 
 void CHostageImprov::Crouch()
 {
-	const float minCrouchTime = 1.0f;
+	constexpr auto minCrouchTime = 1.0s;
 
 	if (IsCrouching())
 		return;

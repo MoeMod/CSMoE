@@ -68,7 +68,7 @@ cvar_t cv_tutor_message_character_display_time_coefficient = { "_tutor_message_c
 cvar_t cv_tutor_hint_interval_time = { "_tutor_hint_interval_time", "10.0", FCVAR_SERVER, 0.0f, NULL };
 
 bool s_tutorDisabledThisGame;
-float s_nextCvarCheckTime;
+time_point_t s_nextCvarCheckTime;
 
 void InstallTutor(bool start)
 {
@@ -172,7 +172,7 @@ void MonitorTutorStatus()
 		}
 	}
 
-	s_nextCvarCheckTime = gpGlobals->time + 1.0f;
+	s_nextCvarCheckTime = gpGlobals->time + 1.0s;
 }
 
 }

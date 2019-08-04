@@ -27,7 +27,7 @@ public:
 		else
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = fov1;
 
-		CBase::m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+		CBase::m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 
 		return CBase::SecondaryAttack(); // pass over
 	}

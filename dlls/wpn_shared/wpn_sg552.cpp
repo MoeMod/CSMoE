@@ -101,22 +101,22 @@ void CSG552::SecondaryAttack(void)
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 void CSG552::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		SG552Fire(0.035 + (0.45) * m_flAccuracy, 0.0825, FALSE);
+		SG552Fire(0.035 + (0.45) * m_flAccuracy, 0.0825s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		SG552Fire(0.035 + (0.075) * m_flAccuracy, 0.0825, FALSE);
+		SG552Fire(0.035 + (0.075) * m_flAccuracy, 0.0825s, FALSE);
 	else if (m_pPlayer->pev->fov == 90)
-		SG552Fire((0.02) * m_flAccuracy, 0.0825, FALSE);
+		SG552Fire((0.02) * m_flAccuracy, 0.0825s, FALSE);
 	else
-		SG552Fire((0.02) * m_flAccuracy, 0.135, FALSE);
+		SG552Fire((0.02) * m_flAccuracy, 0.135s, FALSE);
 }
 
-void CSG552::SG552Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CSG552::SG552Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -130,7 +130,7 @@ void CSG552::SG552Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -162,7 +162,7 @@ void CSG552::SG552Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.04, 4.25, 2.5, 7);
@@ -179,7 +179,7 @@ void CSG552::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, 3))
+	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, 3s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -202,7 +202,7 @@ void CSG552::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(SG552_IDLE1, UseDecrement() != FALSE);
 }
 

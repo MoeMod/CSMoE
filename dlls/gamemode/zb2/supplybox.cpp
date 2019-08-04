@@ -91,7 +91,7 @@ void CSupplyBox::Spawn()
 
 	SET_MODEL(edict(), "models/supplybox.mdl");
 
-	m_flNextRadarTime = gpGlobals->time + RANDOM_FLOAT(0, 1);
+	m_flNextRadarTime = gpGlobals->time + RandomDuration(0.0s, 1.0s);
 }
 
 void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
@@ -124,7 +124,7 @@ void CSupplyBox::SupplyboxThink()
 		if (m_flNextRadarTime <= gpGlobals->time)
 		{
 			SendPositionMsg();
-			m_flNextRadarTime = gpGlobals->time + 1;
+			m_flNextRadarTime = gpGlobals->time + 1s;
 		}
 	}
 }

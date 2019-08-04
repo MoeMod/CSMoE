@@ -117,7 +117,7 @@ BOOL CXM8SharpShooter::Deploy(void)
 	if (m_iSwing)
 	{
 		DefaultDeploy("models/v_xm8.mdl", "models/p_xm8.mdl", XM8_CHANGE_SHARPSHOOTER, "rifle", UseDecrement() != FALSE);
-		m_pPlayer->m_flNextAttack =  6.0f;
+		m_pPlayer->m_flNextAttack =  6.0s;
 		// sync ammo
 		if(m_pLink)
 			m_iClip = m_pLink->current_ammo;
@@ -125,7 +125,7 @@ BOOL CXM8SharpShooter::Deploy(void)
 	else
 	{
 		DefaultDeploy("models/v_xm8.mdl", "models/p_xm8.mdl", SHARPSHOOTER_XM8_DRAW, "rifle", UseDecrement() != FALSE);
-		m_pPlayer->m_flNextAttack = 1.5f;
+		m_pPlayer->m_flNextAttack = 1.5s;
 	}
 	return TRUE;
 }
@@ -133,25 +133,25 @@ BOOL CXM8SharpShooter::Deploy(void)
 void CXM8SharpShooter::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		XM8SharpShooterFire((0.65) * (1 - m_flAccuracy), 0.375, FALSE);
+		XM8SharpShooterFire((0.65) * (1 - m_flAccuracy), 0.375s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		XM8SharpShooterFire((0.25) * (1 - m_flAccuracy), 0.25, FALSE);
+		XM8SharpShooterFire((0.25) * (1 - m_flAccuracy), 0.25s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 10)
-		XM8SharpShooterFire((0.1) * (1 - m_flAccuracy), 0.25, FALSE);
+		XM8SharpShooterFire((0.1) * (1 - m_flAccuracy), 0.25s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		XM8SharpShooterFire((0.01), 0.375, FALSE);
+		XM8SharpShooterFire((0.01), 0.375s, FALSE);
 	else
-		XM8SharpShooterFire((0.03) * (1 - m_flAccuracy), 0.375, FALSE);
+		XM8SharpShooterFire((0.03) * (1 - m_flAccuracy), 0.375s, FALSE);
 }
 
-void CXM8SharpShooter::XM8SharpShooterFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CXM8SharpShooter::XM8SharpShooterFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	if (m_pPlayer->pev->fov == 90)
 		flSpread += 0.08;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy = (gpGlobals->time - m_flLastFire) * 0.3 + 0.55;
+		m_flAccuracy = ((gpGlobals->time - m_flLastFire) / 1s) * 0.3 + 0.55;
 
 		if (m_flAccuracy > 0.9)
 			m_flAccuracy = 0.9;
@@ -164,7 +164,7 @@ void CXM8SharpShooter::XM8SharpShooterFire(float flSpread, float flCycleTime, BO
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -178,7 +178,7 @@ void CXM8SharpShooter::XM8SharpShooterFire(float flSpread, float flCycleTime, BO
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55;
+	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
@@ -197,7 +197,7 @@ void CXM8SharpShooter::XM8SharpShooterFire(float flSpread, float flCycleTime, BO
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 0.8, 1.3) + m_pPlayer->pev->punchangle.x * 0.25;
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -0.85, -0.85);

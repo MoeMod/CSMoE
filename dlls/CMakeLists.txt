@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.1.3)
 
 project (SERVER)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -252,6 +252,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
+	../dlls/wpn_shared/z4b_Frequency9.cpp
 	)
 
 set(PM_SRCS

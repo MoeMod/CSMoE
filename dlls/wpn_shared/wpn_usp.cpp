@@ -151,9 +151,9 @@ void CUSP::SecondaryAttack(void)
 		strcpy(m_pPlayer->m_szAnimExtention, "onehanded");
 	}
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3s;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3s;
 }
 
 void CUSP::PrimaryAttack(void)
@@ -161,38 +161,38 @@ void CUSP::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_USP_SILENCED)
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			USPFire((1.3) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((1.3) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			USPFire((0.25) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.25) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			USPFire((0.125) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.125) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else
-			USPFire((0.15) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.15) * (1 - m_flAccuracy), 0.225s, FALSE);
 	}
 	else
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			USPFire((1.2) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((1.2) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			USPFire((0.225) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.225) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			USPFire((0.08) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.08) * (1 - m_flAccuracy), 0.225s, FALSE);
 		else
-			USPFire((0.1) * (1 - m_flAccuracy), 0.225, FALSE);
+			USPFire((0.1) * (1 - m_flAccuracy), 0.225s, FALSE);
 	}
 }
 
-void CUSP::USPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CUSP::USPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.075;
+	flCycleTime -= 0.075s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy -= (0.3 - (gpGlobals->time - m_flLastFire)) * 0.275;
+		m_flAccuracy -= (0.3 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.275;
 
 		if (m_flAccuracy > 0.92)
 			m_flAccuracy = 0.92;
@@ -207,7 +207,7 @@ void CUSP::USPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -242,7 +242,7 @@ void CUSP::USPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_pPlayer->pev->punchangle.x -= 2;
 	ResetPlayerShieldAnim();
 }
@@ -261,7 +261,7 @@ void CUSP::Reload(void)
 	else
 		iAnim = USP_UNSIL_RELOAD;
 
-	if (DefaultReload(USP_MAX_CLIP, iAnim, 2.7))
+	if (DefaultReload(USP_MAX_CLIP, iAnim, 2.7s))
 	{
 
 #ifndef CLIENT_DLL
@@ -281,7 +281,7 @@ void CUSP::WeaponIdle(void)
 
 	if (m_pPlayer->HasShield())
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 		if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 			SendWeaponAnim(USP_DRAW, UseDecrement() != FALSE);
@@ -291,7 +291,7 @@ void CUSP::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 
 		if (m_iWeaponState & WPNSTATE_USP_SILENCED)
 			SendWeaponAnim(USP_IDLE, UseDecrement() != FALSE);

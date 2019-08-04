@@ -189,7 +189,7 @@ public:
 	virtual BOOL RemovePlayerItem(CBasePlayerItem *pItem) { return 0; }
 	virtual int GiveAmmo(int iAmount, const char *szName, int iMax) { return -1; } // TODO : prevent from wrong override...
 	//virtual int GiveAmmo(int iAmount, char *szName, int iMax) final = delete;
-	virtual float GetDelay(void) { return 0; }
+	virtual duration_t GetDelay(void) { return zero_duration; }
 	virtual int IsMoving(void) { return pev->velocity != g_vecZero; }
 	virtual void OverrideReset(void) {}
 #ifdef CLIENT_DLL
@@ -382,8 +382,8 @@ public:
 	int ammo_57mm;
 	int maxammo_357sig;
 	int ammo_357sig;
-	float m_flStartThrow;
-	float m_flReleaseThrow;
+	time_point_t m_flStartThrow;
+	time_point_t m_flReleaseThrow;
 	int m_iSwing;
 	bool has_disconnected;
 };
@@ -434,7 +434,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	float m_flDelay;
+	duration_t m_flDelay;
 	int m_iszKillTarget;
 };
 
@@ -451,13 +451,13 @@ public:
 	virtual void HandleAnimEvent(MonsterEvent_t *pEvent) {}
 
 public:
-	float StudioFrameAdvance(float flInterval = 0);
+	duration_t StudioFrameAdvance(duration_t flInterval = {});
 	int GetSequenceFlags(void);
 	int LookupActivity(int activity);
 	int LookupActivityHeaviest(int activity);
 	int LookupSequence(const char *label);
 	void ResetSequenceInfo(void);
-	void DispatchAnimEvents(float flFutureInterval = 0.1);
+	void DispatchAnimEvents(duration_t flFutureInterval = 0.1s);
 	float SetBoneController(int iController, float flValue);
 	void InitBoneControllers(void);
 	float SetBlending(int iBlender, float flValue);
@@ -476,7 +476,7 @@ public:
 public:
 	float m_flFrameRate;
 	float m_flGroundSpeed;
-	float m_flLastEventCheck;
+	time_point_t m_flLastEventCheck;
 	BOOL m_fSequenceFinished;
 	BOOL m_fSequenceLoops;
 };
@@ -494,7 +494,7 @@ public:
 	int Restore(CRestore &restore);
 #endif
 	int GetToggleState(void) { return m_toggle_state; }
-	float GetDelay(void) { return m_flWait; }
+	duration_t GetDelay(void) { return m_flWait; }
 
 public:
 	void LinearMove(Vector vecDest, float flSpeed);
@@ -513,9 +513,9 @@ public:
 
 public:
 	TOGGLE_STATE m_toggle_state;
-	float m_flActivateFinished;
+	time_point_t m_flActivateFinished;
 	float m_flMoveDistance;
-	float m_flWait;
+	duration_t m_flWait;
 	float m_flLip;
 	float m_flTWidth;
 	float m_flTLength;

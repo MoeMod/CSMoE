@@ -17,7 +17,7 @@ void CBasePlayer::SpawnProtection_Check()
 	}
 }
 
-void CBasePlayer::SpawnProtection_Start(float flTime)
+void CBasePlayer::SpawnProtection_Start(duration_t flTime)
 {
 	m_bSpawnProtection = true;
 	m_flTimeSpawnProctionExpires = gpGlobals->time + flTime;

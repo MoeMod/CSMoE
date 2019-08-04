@@ -37,13 +37,13 @@ namespace sv {
 class TutorMessageEvent
 {
 public:
-	TutorMessageEvent(int mid, int duplicateID, float time, float lifetime, int priority);
+	TutorMessageEvent(int mid, int duplicateID, time_point_t time, duration_t lifetime, int priority);
 	virtual ~TutorMessageEvent();
 
-	bool IsActive(float time);
+	bool IsActive(time_point_t time);
 	int GetPriority();
-	float GetTimeActive(float time);
-	void SetActivationTime(float time);
+	duration_t GetTimeActive(time_point_t time);
+	void SetActivationTime(time_point_t time);
 	int GetID();
 	int GetDuplicateID();
 	void AddParameter(char *str);
@@ -55,8 +55,8 @@ public:
 private:
 	int m_messageID;
 	int m_duplicateID;
-	float m_activationTime;
-	float m_lifetime;
+	time_point_t m_activationTime;
+	duration_t m_lifetime;
 	int m_priority;
 	int m_numParameters;
 	struct TutorMessageEventParam *m_paramList;
@@ -69,7 +69,7 @@ public:
 	CBaseTutor();
 
 	virtual ~CBaseTutor();
-	virtual void TutorThink(float time) = 0;
+	virtual void TutorThink(time_point_t time) = 0;
 	virtual void PurgeMessages() = 0;
 	virtual void CallEventHandler(GameEventType event, CBaseEntity *entity, CBaseEntity *other) = 0;
 	virtual void ShowTutorMessage(TutorMessageEvent *event) = 0;
@@ -84,7 +84,7 @@ public:
 	virtual struct TutorMessage *GetTutorMessageDefinition(int messageID) = 0;
 
 public:
-	void StartFrame(float time);
+	void StartFrame(time_point_t time);
 	void OnEvent(GameEventType event, CBaseEntity *entity = NULL, CBaseEntity *other = NULL);
 
 	void ShotFired(Vector source, Vector target);
@@ -99,8 +99,8 @@ public:
 protected:
 	CBaseTutorStateSystem *m_stateSystem;
 	TutorMessageEvent *m_eventList;
-	float m_deadAirStartTime;
-	float m_roundStartTime;
+	time_point_t m_deadAirStartTime;
+	time_point_t m_roundStartTime;
 };
 
 extern CBaseTutor *TheTutor;

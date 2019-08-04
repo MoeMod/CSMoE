@@ -44,7 +44,7 @@ void VoiceServerDebug(const char *pFmt, ...)
 /* <2d3cd1> ../game_shared/voice_gamemgr.cpp:89 */
 CVoiceGameMgr::CVoiceGameMgr()
 {
-	m_UpdateInterval = 0;
+	m_UpdateInterval = 0s;
 	m_nMaxPlayers = 0;
 }
 
@@ -82,7 +82,7 @@ void CVoiceGameMgr::SetHelper(IVoiceGameMgrHelper *pHelper)
 }
 
 /* <2d4486> ../game_shared/voice_gamemgr.cpp:129 */
-void CVoiceGameMgr::Update(double frametime)
+void CVoiceGameMgr::Update(duration_t frametime)
 {
 	// Only update periodically.
 	m_UpdateInterval += frametime;
@@ -169,7 +169,7 @@ bool CVoiceGameMgr::ClientCommand(CBasePlayer *pPlayer, const char *cmd)
 /* <2d416b> ../game_shared/voice_gamemgr.cpp:215 */
 void CVoiceGameMgr::UpdateMasks()
 {
-	m_UpdateInterval = 0;
+	m_UpdateInterval = 0s;
 
 	bool bAllTalk = !!(sv_alltalk.value);
 

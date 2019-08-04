@@ -106,13 +106,13 @@ BOOL CDEAGLE::Deploy(void)
 void CDEAGLE::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		DEAGLEFire((1.5) * (1 - m_flAccuracy), 0.3, FALSE);
+		DEAGLEFire((1.5) * (1 - m_flAccuracy), 0.3s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		DEAGLEFire((0.25) * (1 - m_flAccuracy), 0.3, FALSE);
+		DEAGLEFire((0.25) * (1 - m_flAccuracy), 0.3s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		DEAGLEFire((0.115) * (1 - m_flAccuracy), 0.3, FALSE);
+		DEAGLEFire((0.115) * (1 - m_flAccuracy), 0.3s, FALSE);
 	else
-		DEAGLEFire((0.13) * (1 - m_flAccuracy), 0.3, FALSE);
+		DEAGLEFire((0.13) * (1 - m_flAccuracy), 0.3s, FALSE);
 }
 
 void CDEAGLE::SecondaryAttack(void)
@@ -120,17 +120,17 @@ void CDEAGLE::SecondaryAttack(void)
 	ShieldSecondaryFire(SHIELDGUN_UP, SHIELDGUN_DOWN);
 }
 
-void CDEAGLE::DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CDEAGLE::DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.075;
+	flCycleTime -= 0.075s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)
 		return;
 
-	if (m_flLastFire)
+	if (m_flLastFire != invalid_time_point)
 	{
-		m_flAccuracy -= (0.4 - (gpGlobals->time - m_flLastFire)) * 0.35;
+		m_flAccuracy -= (0.4 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.35;
 
 		if (m_flAccuracy > 0.9)
 			m_flAccuracy = 0.9;
@@ -145,7 +145,7 @@ void CDEAGLE::DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -180,7 +180,7 @@ void CDEAGLE::DEAGLEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 	m_pPlayer->pev->punchangle.x -= 2;
 	ResetPlayerShieldAnim();
 }
@@ -190,7 +190,7 @@ void CDEAGLE::Reload(void)
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
 
-	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, 2.2))
+	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, 2.2s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -207,7 +207,7 @@ void CDEAGLE::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 		SendWeaponAnim(SHIELDGUN_DRAWN_IDLE, UseDecrement() != FALSE);

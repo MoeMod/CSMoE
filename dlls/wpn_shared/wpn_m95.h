@@ -15,7 +15,7 @@ namespace sv {
 #define M95_MAX_SPEED_ZOOM	140
 #define M95_DAMAGE		115
 #define M95_RANGE_MODIFER	0.985
-#define M95_RELOAD_TIME		3.38
+#define M95_RELOAD_TIME		3.38s
 #define M95_ARMOR_RATIO_MODIFIER	1.9
 
 class CM95 : public CBasePlayerWeapon
@@ -46,7 +46,7 @@ public:
 #endif
 
 public:
-	void M95Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim);
+	void M95Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
 

@@ -68,15 +68,21 @@ typedef int BOOL;
 #include "minmax.h"
 
 // Header file containing definition of globalvars_t and entvars_t
-//typedef unsigned int func_t;					//
-//typedef unsigned int string_t;				// from engine's pr_comp.h;
-typedef float vec_t;				// needed before including progdefs.h
-
 									// Vector class
 #include "vector.h"
-
 									// Defining it as a (bogus) struct helps enforce type-checking
 #define vec3_t Vector
+
+#include "util/u_time.hpp"
+
+#ifndef CLIENT_DLL
+using namespace sv::moe;
+#else
+using namespace cl::moe;
+#endif
+
+#define time_point_t EngineClock::time_point
+#define duration_t EngineClock::duration
 
 									// Shared engine/DLL constants
 #include "const.h"

@@ -107,12 +107,12 @@ BOOL CMP7A1D::Deploy(void)
 void CMP7A1D::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		ELITEFire((0.375) * m_flAccuracy, 0.07, FALSE);
+		ELITEFire((0.375) * m_flAccuracy, 0.07s, FALSE);
 	else
-		ELITEFire((0.035) * m_flAccuracy, 0.07, FALSE);
+		ELITEFire((0.035) * m_flAccuracy, 0.07s, FALSE);
 }
 
-void CMP7A1D::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CMP7A1D::ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -126,7 +126,7 @@ void CMP7A1D::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -173,7 +173,7 @@ void CMP7A1D::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1, 0.55, 0.4, 0.05, 5, 3.25, 9);
@@ -187,7 +187,7 @@ void CMP7A1D::ELITEFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CMP7A1D::Reload(void)
 {
-	if (DefaultReload(WEAPON_MAXCLIP, ELITE_RELOAD, 3.6))
+	if (DefaultReload(WEAPON_MAXCLIP, ELITE_RELOAD, 3.6s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -206,7 +206,7 @@ void CMP7A1D::WeaponIdle(void)
 
 	if (m_iClip)
 	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60s;
 
 		if (m_iClip == 1)
 			SendWeaponAnim(ELITE_IDLE_LEFTEMPTY, UseDecrement() != FALSE);

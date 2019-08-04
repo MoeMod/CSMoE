@@ -91,7 +91,7 @@ void CXM1014::PrimaryAttack(void)
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		return;
 	}
 
@@ -102,7 +102,7 @@ void CXM1014::PrimaryAttack(void)
 		if (m_iClip == 0)
 			PlayEmptySound();
 
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 		return;
 	}
 
@@ -129,22 +129,22 @@ void CXM1014::PrimaryAttack(void)
 	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireXM1014, 0, (float *)&g_vecZero, (float *)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
 
 	if (m_iClip)
-		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125;
+		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125s;
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	if (m_iClip)
-		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125;
+		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125s;
 
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.25;
+	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.25s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.25s;
 
 	if (m_iClip)
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25s;
 	else
-		m_flTimeWeaponIdle = 0.75;
+		m_flTimeWeaponIdle = 0.75s;
 
 	m_fInSpecialReload = 0;
 
@@ -170,10 +170,10 @@ void CXM1014::Reload(void)
 		SendWeaponAnim(XM1014_START_RELOAD, UseDecrement() != FALSE);
 
 		m_fInSpecialReload = 1;
-		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.55;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.55;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.55;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.55;
+		m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.55s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.55s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.55s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.55s;
 	}
 	else if (m_fInSpecialReload == 1)
 	{
@@ -189,8 +189,8 @@ void CXM1014::Reload(void)
 
 		SendWeaponAnim(XM1014_RELOAD, UseDecrement());
 
-		m_flNextReload = UTIL_WeaponTimeBase() + 0.3;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.3;
+		m_flNextReload = UTIL_WeaponTimeBase() + 0.3s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.3s;
 	}
 	else
 	{
@@ -206,8 +206,8 @@ void CXM1014::WeaponIdle(void)
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_5DEGREES);
 
-	if (m_flPumpTime && m_flPumpTime < UTIL_WeaponTimeBase())
-		m_flPumpTime = 0;
+	if (m_flPumpTime != zero_duration && m_flPumpTime < UTIL_WeaponTimeBase())
+		m_flPumpTime = zero_duration;
 
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
@@ -226,7 +226,7 @@ void CXM1014::WeaponIdle(void)
 				SendWeaponAnim(XM1014_PUMP, UseDecrement() != FALSE);
 
 				m_fInSpecialReload = 0;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 			}
 		}
 		else

@@ -113,13 +113,13 @@ BOOL CBalrog7::Deploy(void)
 void CBalrog7::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		Balrog7Fire(0.045 + (0.5) * m_flAccuracy, 0.1, FALSE);
+		Balrog7Fire(0.045 + (0.5) * m_flAccuracy, 0.1s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		Balrog7Fire(0.045 + (0.095) * m_flAccuracy, 0.1, FALSE);
+		Balrog7Fire(0.045 + (0.095) * m_flAccuracy, 0.1s, FALSE);
 	else if (m_pPlayer->pev->fov == 90)
-		Balrog7Fire((0.02) * m_flAccuracy, 0.1, FALSE);
+		Balrog7Fire((0.02) * m_flAccuracy, 0.1s, FALSE);
 	else	
-		Balrog7Fire((0.03) * m_flAccuracy, 0.135, FALSE);
+		Balrog7Fire((0.03) * m_flAccuracy, 0.135s, FALSE);
 }
 
 void CBalrog7::SecondaryAttack(void)
@@ -129,7 +129,7 @@ void CBalrog7::SecondaryAttack(void)
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
 Vector Get_Aiming(CBaseEntity *pevAttacker)
@@ -258,7 +258,7 @@ float CBalrog7::GetDamage()
 	return 105.0;
 }
 
-void CBalrog7::Balrog7Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
+void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -272,7 +272,7 @@ void CBalrog7::Balrog7Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 		if (m_fFireOnEmpty)
 		{
 			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		}
 
 		return;
@@ -325,7 +325,7 @@ void CBalrog7::Balrog7Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.1, 0.3, 0.2, 0.06, 4, 2.5, 8);
@@ -346,7 +346,7 @@ void CBalrog7::Reload(void)
 	if (m_pPlayer->m_iFOV != 90)
 		SecondaryAttack();
 
-	if (DefaultReload(BALROG7_MAX_CLIP, BALROG7_RELOAD, 4.0))
+	if (DefaultReload(BALROG7_MAX_CLIP, BALROG7_RELOAD, 4.0s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -365,7 +365,7 @@ void CBalrog7::WeaponIdle(void)
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(BALROG7_IDLE1, UseDecrement() != FALSE);
 }
 
