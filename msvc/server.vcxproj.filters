@@ -712,6 +712,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\basetypes.h">

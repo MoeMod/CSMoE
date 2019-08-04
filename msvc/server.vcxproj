@@ -567,6 +567,7 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
     <ClCompile Include="..\game_shared\bot\bot.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_manager.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_profile.cpp" />
