@@ -595,6 +595,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\dlls\player\player_account.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
@@ -659,6 +665,9 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
@@ -1431,7 +1440,16 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_precache.h">

@@ -38,6 +38,8 @@
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_balrog7.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
@@ -53,6 +55,7 @@
     <ClCompile Include="..\cl_dll\events\event_glock18.cpp" />
     <ClCompile Include="..\cl_dll\events\event_gungnir.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinity.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_infinityx.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinitys.cpp" />
     <ClCompile Include="..\cl_dll\events\event_k1a.cpp" />
     <ClCompile Include="..\cl_dll\events\event_knife.cpp" />
@@ -165,6 +168,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
@@ -180,6 +185,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
@@ -289,6 +295,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
@@ -303,6 +311,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />

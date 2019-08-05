@@ -531,6 +531,18 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\cl_dll\hud\legacy\hud_radar_legacy.cpp">
       <Filter>cl_dll\hud\legacy</Filter>
     </ClCompile>
@@ -620,6 +632,12 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_infinityx.cpp">
+      <Filter>cl_dll\events</Filter>
     </ClCompile>
     <ClCompile Include="..\pm_shared\pm_math.cpp">
       <Filter>pm_shared</Filter>
