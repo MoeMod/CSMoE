@@ -225,6 +225,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_deagled.cpp
 	../dlls/wpn_shared/wpn_as50.cpp
 	../dlls/wpn_shared/wpn_cannon.cpp
+	../dlls/wpn_shared/wpn_cannontiger.cpp
+	../dlls/wpn_shared/wpn_cannonplasma.cpp
 	../dlls/wpn_shared/wpn_infinity.cpp
 	../dlls/wpn_shared/wpn_k1a.cpp
 	../dlls/wpn_shared/wpn_kriss.cpp
@@ -247,6 +249,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m14ebr.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
+	../dlls/wpn_shared/wpn_infinityx.cpp
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
