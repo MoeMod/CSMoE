@@ -275,6 +275,7 @@ void 	worldspawn	( entvars_t *pev );
 void 	zbsbreak	( entvars_t *pev );
 void 	z4b_Frequency9	( entvars_t *pev );
 void 	z4b_lc_sword	( entvars_t *pev );
+void 	z4b_oppovivo	( entvars_t *pev );
 void 	z4b_stormgiantx	( entvars_t *pev );
 void 	zombiespawn	( entvars_t *pev );
 }
@@ -523,6 +524,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "worldspawn", (void *)worldspawn },
 		{ "z4b_Frequency9", (void *)z4b_Frequency9 },
 		{ "z4b_lc_sword", (void *)z4b_lc_sword },
+		{ "z4b_oppovivo", (void *)z4b_oppovivo },
 		{ "z4b_stormgiantx", (void *)z4b_stormgiantx },
 		{ "zbsbreak", (void *)zbsbreak },
 		{ "zombiespawn", (void *)zombiespawn },
