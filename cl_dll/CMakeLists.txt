@@ -136,6 +136,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp
 	../dlls/wpn_shared/z4b_oppovivo.cpp
+	../dlls/wpn_shared/z4b_strongknifex.cpp
+	../dlls/wpn_shared/z4b_nataknifedx.cpp
 	)
 
 set (HUD_SRCS

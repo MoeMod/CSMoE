@@ -27,6 +27,60 @@ enum hit_result_t
 	HIT_NONE, HIT_WALL, HIT_PLAYER,
 };
 inline hit_result_t
+KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bitsDamageType,
+             entvars_t *pevInflictor, entvars_t *pevAttacker)
+{
+	TraceResult tr;
+	hit_result_t result = HIT_NONE;
+
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+	if (tr.flFraction >= 1) {
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+
+		if (tr.flFraction < 1) {
+			CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (!pHit || pHit->IsBSPModel()) {
+				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
+			}
+
+			vecEnd = tr.vecEndPos;
+		}
+	}
+
+	if (tr.flFraction < 1) {
+		CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
+		if (pHit && pHit->pev->takedamage != DAMAGE_NO) {
+			const float flAdjustedDamage = flDamage;
+			ClearMultiDamage();
+			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+			ApplyMultiDamage(pevInflictor, pevAttacker);
+			result = HIT_PLAYER;
+		}
+
+		float flVol = 1;
+		BOOL fHitWorld = TRUE;
+		if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE) {
+			flVol = 0.1f;
+			fHitWorld = FALSE;
+		}
+
+		if (fHitWorld) {
+			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
+			result = HIT_WALL;
+		}
+	}
+
+	return result;
+}
+inline hit_result_t
 KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
              entvars_t *pevInflictor, entvars_t *pevAttacker)
 {
@@ -38,7 +92,7 @@ KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 	if (!pevAttacker)
 		pevAttacker = pevInflictor;
 
-	Vector vecEnd = vecSrc + vecDir.Normalize() * flAngleDegrees;
+	Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
 
 	if (tr.flFraction >= 1) {
