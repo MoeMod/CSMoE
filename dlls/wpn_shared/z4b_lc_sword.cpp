@@ -34,7 +34,7 @@ namespace sv {
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
-class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
+class CKnifeLcSword: public LinkWeaponTemplate<CKnifeLcSword,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
 	TWeaponIdleDefault,
@@ -42,14 +42,14 @@ class CKnifeSkullAxe: public LinkWeaponTemplate<CKnifeSkullAxe,
 >
 {
 public:
-	static constexpr const char *ClassName = "knife_skullaxe";
-	static constexpr const char *V_Model = "models/v_skullaxe.mdl";
-	static constexpr const char *P_Model = "models/p_skullaxe.mdl";
+	static constexpr const char *ClassName = "z4b_lc_sword";
+	static constexpr const char *V_Model = "models/z4b/v_lc_sword.mdl";
+	static constexpr const char *P_Model = "models/z4b/p_lc_sword.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
-	static constexpr const char *AnimExtension = "skullaxe";
+	static constexpr const char *AnimExtension = "knife";
 	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
 
 public:
@@ -57,31 +57,29 @@ public:
 	enum skullaxe_e
 	{
 		ANIM_IDLE1 = 0,
-		ANIM_SLASH_HIT,
-		ANIM_STAB,
+		ANIM_SLASH1,
+		ANIM_SLASH2,
 		ANIM_DRAW,
-		ANIM_NONE1,
-		ANIM_SLASH_MISS,
-		ANIM_NONE2,
-		ANIM_NONE3,
-		ANIM_SLASH,
+		ANIM_STAB,
+		ANIM_STAB_HIT
 	};
 	void Precache() override
 	{
 		Base::Precache();
 
-		PRECACHE_SOUND("weapons/skullaxe_draw.wav");
-		PRECACHE_SOUND("weapons/skullaxe_hit.wav");
-		PRECACHE_SOUND("weapons/skullaxe_miss.wav");
-		PRECACHE_SOUND("weapons/skullaxe_slash1.wav");
-		PRECACHE_SOUND("weapons/skullaxe_slash2.wav");
-		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
-		PRECACHE_SOUND("weapons/skullaxe_stab.wav");
+		PRECACHE_SOUND("weapons/dragonsword_draw.wav");
+		PRECACHE_SOUND("weapons/dragonsword_hit1.wav");
+		PRECACHE_SOUND("weapons/dragonsword_hit2.wav");
+		PRECACHE_SOUND("weapons/dragonsword_idle.wav");
+		PRECACHE_SOUND("weapons/dragonsword_slash1.wav");
+		PRECACHE_SOUND("weapons/dragonsword_slash2.wav");
+		PRECACHE_SOUND("weapons/dragonsword_stab_hit.wav");
+		PRECACHE_SOUND("weapons/dragonsword_wall.wav");
 	}
 
 	BOOL Deploy() override
 	{
-		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/skullaxe_draw.wav", 0.3, 2.4);
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dragonsword_draw.wav", 0.3, 2.4);
 
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
@@ -100,10 +98,10 @@ public:
 	void DelaySecondaryAttack();
 	float GetPrimaryAttackDamage() const
 	{
-		float flDamage = 100;
+		float flDamage = 76;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 9.5f;
+			flDamage = 720;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -111,10 +109,10 @@ public:
 	}
 	float GetSecondaryAttackDamage() const
 	{
-		float flDamage = 100;
+		float flDamage = 72;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 9.5f;
+			flDamage = 680;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -122,37 +120,48 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(knife_skullaxe, CKnifeSkullAxe)
+LINK_ENTITY_TO_CLASS(z4b_lc_sword, CKnifeLcSword)
 
-void CKnifeSkullAxe::PrimaryAttack(void)
+void CKnifeLcSword::PrimaryAttack(void)
 {
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-	SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
-
-	SetThink(&CKnifeSkullAxe::DelayPrimaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9s;
-
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+	m_iSwing++;
+	if(m_iSwing & 1)
+	{
+		SendWeaponAnim(ANIM_SLASH1, UseDecrement() != FALSE);
+		SetThink(&CKnifeLcSword::DelayPrimaryAttack);
+		pev->nextthink = gpGlobals->time + 0.5s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+	}
+	else
+	{
+		SendWeaponAnim(ANIM_SLASH2, UseDecrement() != FALSE);
+		SetThink(nullptr);
+		DelayPrimaryAttack();
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.22s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+	}
 }
 
-void CKnifeSkullAxe::SecondaryAttack(void)
+void CKnifeLcSword::SecondaryAttack(void)
 {
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
-	SetThink(&CKnifeSkullAxe::DelaySecondaryAttack);
-	pev->nextthink = gpGlobals->time + 0.9s;
+	SetThink(&CKnifeLcSword::DelaySecondaryAttack);
+	pev->nextthink = gpGlobals->time + 0.658s;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.75s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+	m_iSwing = 0;
 }
 
-void CKnifeSkullAxe::DelayPrimaryAttack()
+void CKnifeLcSword::DelayPrimaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -163,30 +172,29 @@ void CKnifeSkullAxe::DelayPrimaryAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	m_iSwing++;
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 95, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	const float flRadius = m_iSwing & 1 ? 108:118;
+	const float flAngle = m_iSwing & 1 ? 60 : 10;
+
+	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 	{
 	case HIT_NONE:
 	{
-		SendWeaponAnim(ANIM_SLASH_MISS, UseDecrement() != FALSE);
 		if(m_iSwing & 1)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dragonsword_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dragonsword_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	case HIT_PLAYER:
 	{
-		SendWeaponAnim(ANIM_SLASH_HIT, UseDecrement() != FALSE);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dragonsword_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 		fDidHit = TRUE;
 		break;
 	}
 	case HIT_WALL:
 	{
-		SendWeaponAnim(ANIM_SLASH_HIT, UseDecrement() != FALSE);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dragonsword_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
 		fDidHit = TRUE;
 		break;
@@ -199,7 +207,7 @@ void CKnifeSkullAxe::DelayPrimaryAttack()
 	//return fDidHit;
 }
 
-void CKnifeSkullAxe::DelaySecondaryAttack()
+void CKnifeLcSword::DelaySecondaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -210,15 +218,17 @@ void CKnifeSkullAxe::DelaySecondaryAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 75, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 108, 72, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 	{
 	case HIT_NONE:
 	{
+		SendWeaponAnim(ANIM_STAB_HIT, UseDecrement() != FALSE);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		break;
 	}
 	case HIT_PLAYER:
 	{
+		SendWeaponAnim(ANIM_STAB_HIT, UseDecrement() != FALSE);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 		fDidHit = TRUE;
@@ -226,6 +236,7 @@ void CKnifeSkullAxe::DelaySecondaryAttack()
 	}
 	case HIT_WALL:
 	{
+		SendWeaponAnim(ANIM_STAB_HIT, UseDecrement() != FALSE);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/skullaxe_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.1;
 		fDidHit = TRUE;

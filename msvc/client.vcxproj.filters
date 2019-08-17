@@ -636,6 +636,12 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\cl_dll\events\event_infinityx.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
@@ -679,6 +685,15 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>

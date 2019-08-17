@@ -3306,7 +3306,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "knife_")) != NULL) && (pstr == pcmd))
 			{
-			GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
+				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
+			}
+			else if (((pstr = Q_strstr(pcmd, "z4b_")) != NULL) && (pstr == pcmd))
+			{
+				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (FStrEq(pcmd, "lastinv"))
 			{
