@@ -573,6 +573,9 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp" />
     <ClCompile Include="..\game_shared\bot\bot.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_manager.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_profile.cpp" />
