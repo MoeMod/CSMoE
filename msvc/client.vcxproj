@@ -226,7 +226,7 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_strongkinfex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />
