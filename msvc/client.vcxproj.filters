@@ -1082,5 +1082,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
   </ItemGroup>
 </Project>
