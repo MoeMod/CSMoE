@@ -121,6 +121,7 @@ int dll_register( const char *name, dllexport_t *exports )
 	new->exp = exports;
 	new->next = dll_list;
 	dll_list = new;
+    return 0;
 }
 
 void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
