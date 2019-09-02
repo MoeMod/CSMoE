@@ -103,7 +103,7 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 - Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 ### Windows
 - Visual Studio 2017 projects can be found in msvc/csmoe.sln
-- Download SDL2-devel-2.0.9-VC.zip from http://www.libsdl.org/ and put them into SDL2/
+- Download SDL2-devel-2.0.10-VC.zip from http://www.libsdl.org/ and put them into SDL2/
 - It should be OK to build with both x86 and x64. \
   Note : You can also use cmake to build with mingw, etc.
 ### macOS & Linux
@@ -117,7 +117,8 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 - Build APK with Android Studio, tested with Android SDK level 28 and Android NDK r20
 - arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
 ### iOS
-- please refer to mittorn/xash3d-ios
+- Xcode projects can be found in Xcode-iOS/CSMoE-iOS.xcodeproj
+- Download SDL2-2.0.10.zip from http://www.libsdl.org/ and put them into SDL2/
 - supports both armv7, arm64.
 
 ## License
