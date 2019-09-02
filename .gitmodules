@@ -1,3 +1,6 @@
 [submodule "mainui_cpp"]
 	path = mainui_cpp
 	url = https://github.com/MoeMod/mainui_cpp
+[submodule "nanogl"]
+	path = nanogl
+	url = https://github.com/MoeMod/nanogl
