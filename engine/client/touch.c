@@ -1900,6 +1900,18 @@ void Touch_KeyEvent( int key, int down )
 	x = xi/SCR_W;
 	y = yi/SCR_H;
 
+#ifdef TARGET_OS_MAC
+	int w1, w2, h1, h2;
+	w1 = scr_width->integer;
+	h1 = scr_height->integer;
+	SDL_GetWindowSize( host.hWnd, &w2, &h2 );
+	x = (float)xi/(float)w2;
+	y = (float)yi/(float)h2;
+#else
+	x = xi/SCR_W;
+	y = yi/SCR_H;
+#endif
+
 	Touch_ControlsEvent( !down, key == K_MOUSE1?0:1, x, y, 0, 0, 0 );
 }
 

@@ -387,9 +387,6 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	fullscreen = false;
 #endif
 
-	MsgDev(D_INFO, "R_ChangeDisplaySettings: Setting video mode to %dx%d %s\n", width, height, fullscreen ? "fullscreen" : "windowed");
-	R_SaveVideoMode( width, height );
-
 	// check our desktop attributes
 	glw_state.desktopBitsPixel = SDL_BITSPERPIXEL(displayMode.format);
 	glw_state.desktopWidth = displayMode.w;
@@ -436,6 +433,9 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	}
 
 #endif
+
+	MsgDev(D_INFO, "R_ChangeDisplaySettings: Setting video mode to %dx%d %s\n", width, height, fullscreen ? "fullscreen" : "windowed");
+	R_SaveVideoMode( width, height );
 
 	return rserr_ok;
 }

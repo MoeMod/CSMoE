@@ -506,12 +506,14 @@ static void SDLash_EventFilter( SDL_Event *event )
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
 		{
+#ifndef TARGET_OS_MAC
 			int w, h;
 			if( vid_fullscreen->integer != 0 ) break;
 			Cvar_SetFloat( "vid_mode", VID_NOMODE ); // no mode
 
 			SDL_GL_GetDrawableSize( host.hWnd, &w, &h );
 			R_ChangeDisplaySettingsFast( w, h );
+#endif
 			break;
 		}
 		default:
