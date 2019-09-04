@@ -34,8 +34,7 @@ jobs:
     before_script:
       - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
       - hdiutil attach SDL2.dmg
-      - cd /Volumes/SDL2
       - mkdir -p ~/Library/Frameworks
-      - cp -r SDL2.framework ~/Library/Frameworks/
+      - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
     script:
       - sh scripts/build_osx_engine.sh;
