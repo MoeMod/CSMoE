@@ -43,21 +43,20 @@ jobs:
     name: "Build for iOS"
     osx_image: xcode11
     language: objective-c
-    xcode_project: Xcode-iOS/CSMoE-iOS.xcodeproj
-    xcode_scheme: CSMoE-iOS
-    xcode_destination: platform=iOS Simulator,OS=10.3,name=iPhone 6s
     before_script:
       - curl -s http://libsdl.org/release/SDL2-2.0.10.tar.gz > SDL2.tar.gz
       - tar xzf SDL2.tar.gz
       - mv SDL2-2.0.10 SDL2
+    script:
+      - xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
   - stage: build
     name: "Build for Windows MSVC"
     cache: ccache
     os: windows
     language: cpp
     before_script:
-      - curl http://libsdl.org/release/SDL2-devel-2.0.10.zip -o SDL2.zip
+      - curl http://libsdl.org/release/SDL2-devel-2.0.10-VC.zip -o SDL2.zip
       - unzip SDL2.zip
-      - mv SDL2-2.0.10 SDL2_VC
+      - mv SDL2-2.0.10 SDL2
     script:
       - sh scripts/build_windows_engine.sh
