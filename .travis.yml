@@ -55,8 +55,8 @@ jobs:
     os: windows
     language: cpp
     before_script:
-      - curl http://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz -o SDL2.zip
-      - unzip SDL2.zip
+      - curl http://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz -o SDL2.tar.gz
+      - tar xzf SDL2.tar.gz
       - mv SDL2-2.0.10 SDL2
     script:
       - sh scripts/build_mingw_engine.sh
