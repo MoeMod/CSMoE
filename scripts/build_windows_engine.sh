@@ -5,4 +5,4 @@ mkdir -p win-build && cd win-build
 cmake \
     -G "NMake Makefiles" \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-nmake
+nmake /nologo

@@ -48,7 +48,7 @@ jobs:
       - tar xzf SDL2.tar.gz
       - mv SDL2-2.0.10 SDL2
     script:
-      - xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+      - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
   - stage: build
     name: "Build for Windows MSVC"
     cache: ccache
@@ -59,4 +59,8 @@ jobs:
       - unzip SDL2.zip
       - mv SDL2-2.0.10 SDL2
     script:
+      - export CXX=""
+      - export CXX_FOR_BUILD=""
+      - export CC=""
+      - export CC_FOR_BUILD=""
       - sh scripts/build_windows_engine.sh
