@@ -377,14 +377,17 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 	for (auto &icon : m_ZombieSkillHudIcons)
 	{
 		const auto &skillicon = m_pTexture_NewSkillIcons[icon.m_iCurrentSkill];
+        const int w = m_pTexture_skillslotbg->w() / 4;
+        const int h = m_pTexture_skillslotbg->h();
 		if (skillicon && icon.m_iCurrentSkill >= 0 && icon.m_iCurrentSkill < MAX_ZOMBIE_SKILL)
 		{
+            
 			if (time < icon.m_flTimeSkillReady)
 			{
 				// waiting for freezing
 				float flPercent = (time - icon.m_flTimeSkillStart) / (icon.m_flTimeSkillReady - icon.m_flTimeSkillStart);
 
-				float center_y = y + skillicon->h() * (1.0f - flPercent);
+				float center_y = y + h * (1.0f - flPercent);
 
 				// top half
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 50);
@@ -399,10 +402,10 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
 				// �K (x2, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
+				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
 				// �J (x2, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(1, 0);
-				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, y * gHUD.m_flScale, 0);
+				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, y * gHUD.m_flScale, 0);
 				gEngfuncs.pTriAPI->End();
 
 				// bottom half
@@ -415,13 +418,13 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
 				// �L (x1, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
-				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, (y + skillicon->h()) * gHUD.m_flScale, 0);
+				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, (y + h) * gHUD.m_flScale, 0);
 				// �K (x2, y2)
 				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
-				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, (y + skillicon->h()) * gHUD.m_flScale, 0);
+				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, (y + h) * gHUD.m_flScale, 0);
 				// �J (x2, y1)
 				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f((x + skillicon->w()) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
+				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
 				gEngfuncs.pTriAPI->End();
 			}
 			else if (icon.m_iCurrentSkillStatus == SKILL_STATUS_USED)
@@ -429,7 +432,7 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				// used
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 50);
 				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + skillicon->w(), y + skillicon->h());
+				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
 			}
 			else if (time < icon.m_flTimeSkillBlink)
 			{
@@ -441,14 +444,14 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 255 * a);
 				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + skillicon->w(), y + skillicon->h());
+				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
 			}
 			else
 			{
 				// normal
 				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 255);
 				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + skillicon->w(), y + skillicon->h());
+				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
 			}
 		}
 		
@@ -460,7 +463,7 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 		DrawUtils::TextMessageDrawChar(x + 7, y, SkillKey, 100, 100, 100);
 
 		SkillKey = SkillKey == 'G' ? '5' : SkillKey + 1;
-		x += 58;
+		x += w;
 	}
 }
 
@@ -497,12 +500,14 @@ void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, 
 		sprintf(buf, "touch_removebutton \"_moe_skill%d_button\"\n", i);
 		gEngfuncs.pfnClientCmd(buf);
 
+        const int w = m_pTexture_skillslotbg->w() / 4;
+        const int h = m_pTexture_skillslotbg->h();
 		if (skillicon && icon.m_iCurrentSkill >= 0 && icon.m_iCurrentSkill < MAX_ZOMBIE_SKILL)
 		{
 			const float x1 = x / (float)ScreenWidth;
 			const float y1 = y / (float)ScreenHeight;
-			const float x2 = (x + skillicon->w()) / (float)ScreenWidth;
-			const float y2 = (y + skillicon->h()) / (float)ScreenHeight;
+			const float x2 = (x + w) / (float)ScreenWidth;
+			const float y2 = (y + h) / (float)ScreenHeight;
 
 			sprintf(buf, "alias +_moe_skill%d_press \"touch_setcolor _moe_skill%d_button 156 77 20 180\"\n", i, i);
 			gEngfuncs.pfnClientCmd(buf);
@@ -519,7 +524,7 @@ void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, 
 
 		}
 		
-		x += 58;
+		x += w;
 	}
 
 }
