@@ -1889,8 +1889,8 @@ void Touch_KeyEvent( int key, int down )
 	int xi, yi;
 	float x, y;
 
-	if( touch_enable->integer )
-		return;
+	//if( touch_enable->integer )
+	//	return;
 
 	if( !touch.clientonly )
 		return;
