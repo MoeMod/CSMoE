@@ -170,10 +170,11 @@
 
 - (IBAction)OnInstallationFinishComfirmed:(id)sender
 {
-	while (self.presentingViewController) {
-		self = self.presentingViewController;
+	UIViewController *vc = self;
+	while (vc.presentingViewController) {
+		vc = vc.presentingViewController;
 	}
-	[self dismissViewControllerAnimated:YES completion:nil];
+	[vc dismissViewControllerAnimated:YES completion:nil];
 
 }
 
@@ -187,22 +188,4 @@
 }
 */
 
-- (void)dealloc {
-	
-	[_ScrollView release];
-	[_PageControl release];
-	[_TutorContent release];
-    [_PowerCableCenterXConstraint release];
-    [_PowerCableCenterYConstraint release];
-    [_PowerCablePortraitConstraint release];
-    [_PowerCableLandscapeLeftConstraint release];
-    [_PowerCablePortraitUpsideDownConstraint release];
-    [_PowerCableLandscapeRightConstraint release];
-    [_PowerCableImageView release];
-    [_WaitingForResourcesActivityIndicator release];
-    [_WaitingForResourcesLabel release];
-    [_InstallationFinishLabel release];
-    [_InstallationFinishComfirmButton release];
-    [super dealloc];
-}
 @end

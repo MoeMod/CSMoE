@@ -38,12 +38,17 @@
 
 @end
 
+@interface MainTabBarController()
+@property(strong) MainViewControllerDelegate *m_pMainViewControllerDelegate;
+@end
+
 @implementation MainTabBarController
 
 - (void)viewDidLoad {
 	
 	[super setSelectedIndex:0];
-	self.delegate = [MainViewControllerDelegate new];
+	self.m_pMainViewControllerDelegate = [MainViewControllerDelegate new];
+	self.delegate = self.m_pMainViewControllerDelegate;
 	[super viewDidLoad];
     // Do any additional setup after loading the view.
 #ifndef TARGET_IPHONE_SIMULATOR

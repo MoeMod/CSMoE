@@ -69,15 +69,9 @@ void IOS_PrepareView()
 	UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:bundle];
 	UIViewController * controller = storyboard.instantiateInitialViewController;
 	
-	[storyboard release];
-	[storyboardName release];
-	[bundle release];
 	
 	[window setRootViewController:controller];
-	[controller release];
-	
 	[window makeKeyAndVisible];
-	[window release];
 }
 
 void IOS_SetDefaultArgs()
@@ -93,7 +87,6 @@ void IOS_LaunchDialog( void )
 	NSString *ver = [[UIDevice currentDevice] systemVersion];
 	g_iOSVer = [ver floatValue];
 	NSLog(@"System Version is %@",ver);
-	[ver release];
 	
 	if(g_iStartGameStatus == XGS_WAITING)
 	{
@@ -122,7 +115,6 @@ char *IOS_GetUDID( void )
 	static char udid[256];
 	NSString *id = [[[UIDevice currentDevice]identifierForVendor] UUIDString];
 	strncpy( udid, [id UTF8String], 255 );
-	[id release];
 	return udid;
 }
 

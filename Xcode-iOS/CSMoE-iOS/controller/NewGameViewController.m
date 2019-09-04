@@ -59,27 +59,27 @@ gamemode_t g_GameModes[] = {
 
 @end
 
+@interface NewGameViewController()
+@property(strong) GameModeViewDelegateAndDataSource *m_pGameModeDelegate;
+@end
+
 @implementation NewGameViewController
 
-- (void)dealloc {
-	[_StartGameButton release];
-	[_ArgsInput release];
-	[_GameplayPickerView release];
-    [_MapButton release];
-    [super dealloc];
-}
 - (void)viewDidLoad {
 	[self loadSettings];
 	
-	GameModeViewDelegateAndDataSource *gmvdads = [GameModeViewDelegateAndDataSource new];
-	self.GameplayPickerView.delegate = gmvdads;
-	self.GameplayPickerView.dataSource = gmvdads;
+	{
+		GameModeViewDelegateAndDataSource *p = [[GameModeViewDelegateAndDataSource alloc] init];
+		self.GameplayPickerView.delegate = p;
+		self.GameplayPickerView.dataSource = p;
+		self.m_pGameModeDelegate = p;
+	}
 	
 	
 	[super viewDidLoad];
 	
 	//UIApplication *app = [UIApplication sharedApplication];
-	{
+	@autoreleasepool {
 		
 		NSString *imagePath = [[NSBundle mainBundle] pathForResource:@"maps/random_cso" ofType:@"tga"];
 		tImageTGA *tga = tgaLoad([imagePath UTF8String]);
@@ -91,9 +91,9 @@ gamemode_t g_GameModes[] = {
 		
 		UIImage *mapImage = [UIImage imageWithCGImage:cgImage2 scale:1.0 orientation:UIImageOrientationDownMirrored];
 		
-		[self.MapButton setBackgroundImage:mapImage forState:UIControlStateNormal];
-		[self.MapButton.heightAnchor constraintEqualToAnchor:self.MapButton.widthAnchor multiplier:(CGFloat)tga->height/tga->width].active = YES;
-		[self.MapButton setTitle:nil forState:UIControlStateNormal];
+		//[self.MapButton setBackgroundImage:mapImage forState:UIControlStateNormal];
+		//[self.MapButton.heightAnchor constraintEqualToAnchor:self.MapButton.widthAnchor multiplier:(CGFloat)tga->height/tga->width].active = YES;
+		//[self.MapButton setTitle:nil forState:UIControlStateNormal];
 		
 		CGImageRelease(cgImage2);
         CGContextRelease(contextRef);
@@ -122,6 +122,7 @@ gamemode_t g_GameModes[] = {
 	g_pszArgv[count + 1] = 0;
 	
 	g_iStartGameStatus = XGS_START;
+	
 }
 
 - (void) loadSettings

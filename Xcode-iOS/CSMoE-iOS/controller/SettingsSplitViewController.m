@@ -25,7 +25,7 @@
 @end
 
 @interface SettingsSplitViewController ()
-
+@property(strong) SettingsSplitViewControllerDelegate *m_pSettingsSplitViewControllerDelegate;
 @end
 
 @implementation SettingsSplitViewController
@@ -33,7 +33,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-	self.delegate = [SettingsSplitViewControllerDelegate new];
+	self.m_pSettingsSplitViewControllerDelegate = [[SettingsSplitViewControllerDelegate alloc] init];
+	self.delegate = self.m_pSettingsSplitViewControllerDelegate;
 }
 
 /*

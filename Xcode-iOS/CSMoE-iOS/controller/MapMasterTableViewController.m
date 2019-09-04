@@ -25,10 +25,11 @@
 
 - (IBAction)OnCloseMapPage:(id)sender
 {
-	while (self.presentingViewController) {
-		self = self.presentingViewController;
+	UIViewController *vc = self;
+	while (vc.presentingViewController) {
+		vc = vc.presentingViewController;
 	}
-	[self dismissViewControllerAnimated:YES completion:nil];
+	[vc dismissViewControllerAnimated:YES completion:nil];
 	
 }
 
