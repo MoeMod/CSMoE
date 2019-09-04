@@ -6,4 +6,4 @@ cd $TRAVIS_BUILD_DIR
 mkdir -p osx-build && cd osx-build
 cmake \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-make -j4 VERBOSE=1
+make -j 4
