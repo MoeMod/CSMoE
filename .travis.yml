@@ -1,7 +1,3 @@
-language: cpp
-compiler: gcc
-sudo: true
-
 git:
   depth: 50
   submodules: true
@@ -13,6 +9,9 @@ jobs:
     os: linux
     dist: bionic
     cache: ccache
+    language: cpp
+    compiler: gcc
+    sudo: true
     addons:
       apt:
         packages:
@@ -28,9 +27,11 @@ jobs:
     script:
       - sh scripts/build_portable_linux_engine.sh;
   - stage: build
-    name: "Build for OSX "
+    name: "Build for macOS"
     cache: ccache
     os: osx
+    language: cpp
+    compiler: clang
     before_script:
       - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
       - hdiutil attach SDL2.dmg
@@ -38,3 +39,25 @@ jobs:
       - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
     script:
       - sh scripts/build_osx_engine.sh;
+  - stage: build
+    name: "Build for iOS"
+    osx_image: xcode11
+    language: objective-c
+    xcode_project: Xcode-iOS/CSMoE-iOS.xcodeproj
+    xcode_scheme: CSMoE-iOS
+    xcode_destination: platform=iOS Simulator,OS=10.3,name=iPhone 6s
+    before_script:
+      - curl -s http://libsdl.org/release/SDL2-2.0.10.tar.gz > SDL2.tar.gz
+      - tar xzf SDL2.tar.gz
+      - mv SDL2-2.0.10 SDL2
+  - stage: build
+    name: "Build for Windows MSVC"
+    cache: ccache
+    os: windows
+    language: cpp
+    before_script:
+      - curl http://libsdl.org/release/SDL2-devel-2.0.10.zip -o SDL2.zip
+      - unzip SDL2.zip
+      - mv SDL2-2.0.10 SDL2_VC
+    script:
+      - sh scripts/build_windows_engine.sh

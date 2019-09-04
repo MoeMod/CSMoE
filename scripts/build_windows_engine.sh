@@ -1,9 +1,8 @@
-#!/bin/bash
-
 # Build engine
 
 cd $TRAVIS_BUILD_DIR
-mkdir -p osx-build && cd osx-build
+mkdir -p win-build && cd win-build
 cmake \
+    -G "NMake Makefiles" \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-make -j 4
+nmake
