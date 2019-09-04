@@ -50,17 +50,13 @@ jobs:
     script:
       - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
   - stage: build
-    name: "Build for Windows MSVC"
+    name: "Build for Windows MinGW"
     cache: ccache
     os: windows
     language: cpp
     before_script:
-      - curl http://libsdl.org/release/SDL2-devel-2.0.10-VC.zip -o SDL2.zip
+      - curl http://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz -o SDL2.zip
       - unzip SDL2.zip
       - mv SDL2-2.0.10 SDL2
     script:
-      - export CXX=""
-      - export CXX_FOR_BUILD=""
-      - export CC=""
-      - export CC_FOR_BUILD=""
-      - sh scripts/build_windows_engine.sh
+      - sh scripts/build_mingw_engine.sh

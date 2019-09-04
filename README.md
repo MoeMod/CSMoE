@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/MoeMod/CSMoE.svg)](https://travis-ci.org/MoeMod/CSMoE)   [![Build status](https://ci.appveyor.com/api/projects/status/7e8u0ssq80vpy4ba/branch/master?svg=true)](https://ci.appveyor.com/project/MoeMod/csmoe/branch/master) \
+[![Build Status](https://travis-ci.com/MoeMod/CSMoE.svg?branch=master)](https://travis-ci.com/MoeMod/CSMoE)   [![Build status](https://ci.appveyor.com/api/projects/status/7e8u0ssq80vpy4ba/branch/master?svg=true)](https://ci.appveyor.com/project/MoeMod/csmoe/branch/master) \
 [English](#Counter-Strike_Mobile-oriented_Edition) | [中文(简体)](#关于本项目) 
 
 ## Counter-Strike Mobile-oriented Edition
