@@ -1,23 +1,40 @@
 language: cpp
-dist: bionic
-cache: ccache
 compiler: gcc
 sudo: true
-addons:
-  apt:
-    packages:
-      - cmake
-      - x11-utils
-      - libgl1-mesa-dev
-      - libegl1-mesa-dev
-      - libgles2-mesa-dev
+
 git:
   depth: 50
   submodules: true
-os:
-  - linux
-before_script:
-  - sudo apt-get install libsdl2-dev
-  - sudo apt-get install libsdl2-image-dev
-script:
-  - sh scripts/build_portable_linux_engine.sh;
+
+jobs:
+  include:
+  - stage: build
+    name: "Build for Linux amd64"
+    os: linux
+    dist: bionic
+    cache: ccache
+    addons:
+      apt:
+        packages:
+          - cmake
+          - x11-utils
+          - libgl1-mesa-dev
+          - libegl1-mesa-dev
+          - libgles2-mesa-dev
+    before_script:
+      - export ARCH=x86_64
+      - sudo apt-get install libsdl2-dev
+      - sudo apt-get install libsdl2-image-dev
+    script:
+      - sh scripts/build_portable_linux_engine.sh;
+  - stage: build
+    name: "Build for OSX "
+    cache: ccache
+    os: osx
+    before_script:
+      - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
+      - hdiutil attach SDL2.dmg
+      - mkdir -p ~/Library/Frameworks
+      - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
+    script:
+      - sh scripts/build_osx_engine.sh;
