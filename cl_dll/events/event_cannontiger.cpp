@@ -43,7 +43,7 @@ enum cannontiger_e
 void EV_CannonTigerFireEffect(vec3_t vecSrc, vec3_t vecForward, vec3_t vecVelocity, int idx, int iModel)
 {
 	if (!iModel)
-		iModel = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/z4b/ef_aircyclone.spr");
+		iModel = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_aircyclone.spr");
 	TEMPENTITY *ent;
 	int i;
 	int ran;

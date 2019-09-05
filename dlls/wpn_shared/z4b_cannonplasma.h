@@ -23,7 +23,7 @@ namespace cl {
 namespace sv {
 #endif
 
-class CCannonTiger : public LinkWeaponTemplate<CCannonTiger,
+class CCannonPlasma : public LinkWeaponTemplate<CCannonPlasma,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
 	TGetItemInfoDefault,
@@ -32,16 +32,17 @@ class CCannonTiger : public LinkWeaponTemplate<CCannonTiger,
 >
 {
 public:
-	static constexpr const char *ClassName = "weapon_cannontiger";
-	enum cannontiger_e
+	static constexpr const char *ClassName = "z4b_cannonplasma";
+	enum cannonplasma_e
 	{
 		ANIM_IDLE1,
-		ANIM_SHOOT,
+		ANIM_SHOOT1,
+		ANIM_SHOOT2,
 		ANIM_DRAW,
 	};
-	static constexpr const char *V_Model = "models/z4b/v_cannontiger.mdl";
-	static constexpr const char *P_Model = "models/z4b/p_cannontiger.mdl";
-	static constexpr const char *W_Model = "models/z4b/w_cannontiger.mdl";
+	static constexpr const char *V_Model = "models/z4b/v_cannonplasma.mdl";
+	static constexpr const char *P_Model = "models/z4b/p_cannonplasma.mdl";
+	static constexpr const char *W_Model = "models/z4b/w_cannonplasma.mdl";
 	static constexpr const char *AnimExtension = "carbine";
 
 	struct ItemInfoData_t : Base::ItemInfoData_t
@@ -68,7 +69,7 @@ public:
 #endif
 
 public:
-	void CannonTigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+	void CannonPlasmaFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
 
 private:
