@@ -86,6 +86,9 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireGungnir);
 	DECLARE_EVENT(FireAnaconda);
 	DECLARE_EVENT(FireMG36);
+	DECLARE_EVENT(FireM134HeroI);
+	DECLARE_EVENT(FireM134HeroI_EgonFire);
+	DECLARE_EVENT(FireM134HeroI_EgonStop);
 /*
 ======================
 Game_HookEvents
@@ -169,6 +172,9 @@ void Game_HookEvents( void )
 	HOOK_EVENT(gungnir, FireGungnir);
 	HOOK_EVENT(anaconda, FireAnaconda);
 	HOOK_EVENT(mg36, FireMG36);
+	HOOK_EVENT(m134heroi, FireM134HeroI);
+	HOOK_EVENT(m134heroi_fire, FireM134HeroI_EgonFire);
+	HOOK_EVENT(m134heroi_stop, FireM134HeroI_EgonStop);
 }
 
 }
