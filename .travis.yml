@@ -50,6 +50,17 @@ jobs:
     script:
       - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
   - stage: build
+    name: "Build for Android"
+    cache: ccache
+    language: android
+    dist: bionic
+    android:
+      components:
+        - build-tools-28.0.3
+        - android-29
+    script:
+      - "Android/gradlew assembleRelease"
+  - stage: build
     name: "Build for Windows MSVC"
     cache: ccache
     os: windows
