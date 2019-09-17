@@ -1,3 +1,5 @@
+language: cpp
+
 git:
   depth: 50
   submodules: true
@@ -51,9 +53,8 @@ jobs:
       - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
   - stage: build
     name: "Build for Android"
-    cache: ccache
     language: android
-    dist: bionic
+    dist: trusty
     android:
       components:
         - build-tools-28.0.3
