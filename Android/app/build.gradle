@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "28.0.3"
+
+    defaultConfig {
+        applicationId "in.celest.xash3d.csbtem"
+        minSdkVersion 14
+        targetSdkVersion 29
+
+        externalNativeBuild {
+            cmake {
+                arguments   "-DXASH_SDL=0",
+                            "-DXASH_NANOGL=1",
+                            "-DXASH_NANOGL_SRC=" + file('../../nanogl/'),
+                            "-DXASH_STATIC_GAMELIB=1",
+                            "-DMAINUI_USE_CUSTOM_FONT_RENDER=0"
+            }
+        }
+        ndk {
+            // Specifies the ABI configurations of your native
+            // libraries Gradle should build and package with your APK.
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path file('../../CMakeLists.txt')
+
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+}
