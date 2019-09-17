@@ -12,6 +12,7 @@
 		3D1D533A23312D6000D26B94 /* z4b_infinityx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533723312D5F00D26B94 /* z4b_infinityx.cpp */; };
 		3D1D533D23312D7800D26B94 /* z4b_facelessvoid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533B23312D7800D26B94 /* z4b_facelessvoid.cpp */; };
 		3D1D533E23312D7800D26B94 /* z4b_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533C23312D7800D26B94 /* z4b_m134heroi.cpp */; };
+		3D1D534A2331356800D26B94 /* event_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D53492331356800D26B94 /* event_m134heroi.cpp */; };
 		3D4413A2231D0E6E001A0696 /* pm_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139C231D0E6E001A0696 /* pm_math.cpp */; };
 		3D4413A3231D0E6E001A0696 /* pm_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139D231D0E6E001A0696 /* pm_shared.cpp */; };
 		3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139E231D0E6E001A0696 /* pm_debug.cpp */; };
@@ -243,6 +244,7 @@
 		3D1D533723312D5F00D26B94 /* z4b_infinityx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_infinityx.cpp; sourceTree = "<group>"; };
 		3D1D533B23312D7800D26B94 /* z4b_facelessvoid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_facelessvoid.cpp; sourceTree = "<group>"; };
 		3D1D533C23312D7800D26B94 /* z4b_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m134heroi.cpp; sourceTree = "<group>"; };
+		3D1D53492331356800D26B94 /* event_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m134heroi.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libclient.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D441399231D0E6E001A0696 /* pm_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pm_defs.h; sourceTree = "<group>"; };
 		3D44139A231D0E6E001A0696 /* pm_materials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pm_materials.h; sourceTree = "<group>"; };
@@ -817,6 +819,7 @@
 				3D44144E231D1133001A0696 /* event_gatling.cpp */,
 				3D44144F231D1133001A0696 /* event_galil.cpp */,
 				3D441450231D1133001A0696 /* event_anaconda.cpp */,
+				3D1D53492331356800D26B94 /* event_m134heroi.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1249,6 +1252,7 @@
 				3D4415DE231D1164001A0696 /* wpn_awp.cpp in Sources */,
 				3D4414F7231D1133001A0696 /* event_m14ebr.cpp in Sources */,
 				3D4415F4231D1164001A0696 /* wpn_c4.cpp in Sources */,
+				3D1D534A2331356800D26B94 /* event_m134heroi.cpp in Sources */,
 				3D44151F231D1133001A0696 /* MOTD.cpp in Sources */,
 				3D4414F5231D1133001A0696 /* event_svdex.cpp in Sources */,
 				3D441514231D1133001A0696 /* saytext.cpp in Sources */,
