@@ -91,6 +91,7 @@
     <ClCompile Include="..\cl_dll\events\event_xm1014.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8s.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m134heroi.cpp" />
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp" />
     <ClCompile Include="..\cl_dll\events\hl_events.cpp" />
     <ClCompile Include="..\cl_dll\ev_common.cpp" />
@@ -168,8 +169,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
@@ -185,7 +184,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
@@ -227,6 +225,11 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m134heroi.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_facelessvoid.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />

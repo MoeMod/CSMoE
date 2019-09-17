@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_cannontiger.h"
+#include "z4b_cannontiger.h"
 
 #ifndef CLIENT_DLL
 #include "soundent.h"
@@ -32,7 +32,7 @@ namespace cl {
 namespace sv {
 #endif
 
-LINK_ENTITY_TO_CLASS(weapon_cannontiger, CCannonTiger)
+LINK_ENTITY_TO_CLASS(z4b_cannontiger, CCannonTiger)
 
 #ifndef CLIENT_DLL
 static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t *pevInflictor, entvars_t *pevAttacker)
@@ -130,7 +130,7 @@ void CCannonTiger::Spawn(void)
 void CCannonTiger::Precache(void)
 {
 	Base::Precache();
-	PRECACHE_MODEL("sprites/z4b/ef_aircyclone.spr");
+	PRECACHE_MODEL("sprites/ef_aircyclone.spr");
 
 	PRECACHE_SOUND("weapons/cannon-1.wav");
 

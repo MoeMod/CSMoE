@@ -301,11 +301,27 @@ _Pvt_Extensions
 # QtCreator
 build-*
 
-# Android
+# Android Build
 *.apk
+libs/armeabi*
+libs/x86
+obj
+bin
+gen
+
+# Android Studio
+local.properties
+build/
+release/
+debug/
+.gradle/
+.idea/
+.cxx/
+*.iml
 
 # Others
-/.idea
-/cmake-build-debug
+.idea
+/cmake-build-*
+/cmake-build-*
 CMakeSettings.json
 /SDL2

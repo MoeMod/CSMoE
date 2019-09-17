@@ -38,7 +38,6 @@ struct MoEWeaponBuyInfo_s
 static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infinity Black/Sliver", 1500, PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinityex1", "Infinity Red/Sliver",   1500, PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinityex2", "Infinity Red/Gold",     1500, PISTOL_SLOT,         UNASSIGNED},
-						  {"weapon_infinityx", "Infinity X",     1500, PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinityss",  "Infinity Sliver",       600,  PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinitysr",  "Infinity Red",          600,  PISTOL_SLOT,         UNASSIGNED},
                                                   {"weapon_infinitysb",  "Infinity Black",        600,  PISTOL_SLOT,         UNASSIGNED},
@@ -64,16 +63,27 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_as50",        "AS50",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
                                                   {"weapon_mg3",         "MG-3",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-						  {"weapon_mg36",         "MG-36",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+                                                  {"weapon_mg36",         "MG-36",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+
                                                   {"weapon_cannon",      "Blackdragon Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-						  {"weapon_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-						  {"weapon_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_gungnir",     "Gungnir",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 						 
                                                   {"weapon_knife", "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
                                                   {"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED},
                                                   {"knife_dualsword",    "Dual Sword Phantom Slayer",0, KNIFE_SLOT,          UNASSIGNED},
+
+												  {"z4b_infinityx", "Yet Another Infinity",     1500, PISTOL_SLOT,         UNASSIGNED},
+												  {"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_Frequency9",      "Frequency 9",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_lc_sword",      "Legion Commander's Sword",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_facelessvoid",      "Faceless Void's Stick",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_nataknifex",      "Lunula Knife",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_nataknifedx",      "Dual Lunula Knife",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_oppovivo",      "Dual Light Stick",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_stormgiantx",      "Storm Giant's Hammer",    0, KNIFE_SLOT, UNASSIGNED},
+												  {"z4b_m134heroi",      "M134 CORE-i7",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 };
 

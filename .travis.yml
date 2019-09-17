@@ -1,3 +1,5 @@
+language: cpp
+
 git:
   depth: 50
   submodules: true
@@ -49,6 +51,23 @@ jobs:
       - mv SDL2-2.0.10 SDL2
     script:
       - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
+  - stage: build
+    name: "Build for Android"
+    language: android
+    dist: trusty
+    android:
+      components:
+        - build-tools-28.0.3
+        - android-29
+        - extra
+        - add-on
+        - tools
+    before_script:
+      - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
+      - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
+    script:
+      - cd Android
+      - ./gradlew assembleRelease
   - stage: build
     name: "Build for Windows MSVC"
     cache: ccache

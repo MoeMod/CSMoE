@@ -32,7 +32,8 @@ namespace cl {
 enum cannonplasma_e
 {
 	ANIM_IDLE1,
-	ANIM_SHOOT,
+	ANIM_SHOOT1,
+	ANIM_SHOOT2,
 	ANIM_DRAW,
 };
 
@@ -43,7 +44,7 @@ enum cannonplasma_e
 void EV_CannonPlasmaFireEffect(vec3_t vecSrc, vec3_t vecForward, vec3_t vecVelocity, int idx, int iModel)
 {
 	if (!iModel)
-		iModel = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/z4b/plasmaroll.spr");
+		iModel = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/plasmaroll.spr");
 	TEMPENTITY *ent;
 	int i;
 	int ran;
@@ -112,7 +113,7 @@ void EV_FireCannonPlasma( event_args_t *args )
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT, 2);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT1, 2);
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{

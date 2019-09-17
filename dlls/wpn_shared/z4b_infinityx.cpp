@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_infinityx.h"
+#include "z4b_infinityx.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
@@ -29,11 +29,11 @@ namespace cl {
 namespace sv {
 #endif
 
-LINK_ENTITY_TO_CLASS(weapon_infinityx, CInfinityX)
+LINK_ENTITY_TO_CLASS(z4b_infinityx, CInfinityX)
 
 void CInfinityX::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_infinityx");
+	pev->classname = MAKE_STRING("z4b_infinityx");
 
 	Precache();
 	m_iId = WEAPON_ELITE;
