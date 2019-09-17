@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3D1D534423312DA700D26B94 /* z4b_facelessvoid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533F23312DA700D26B94 /* z4b_facelessvoid.cpp */; };
+		3D1D534523312DA700D26B94 /* z4b_cannonplasma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534023312DA700D26B94 /* z4b_cannonplasma.cpp */; };
+		3D1D534623312DA700D26B94 /* z4b_cannontiger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */; };
+		3D1D534723312DA700D26B94 /* z4b_infinityx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */; };
+		3D1D534823312DA700D26B94 /* z4b_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */; };
 		3D44116F231D06CD001A0696 /* triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E2231D06C5001A0696 /* triggers.cpp */; };
 		3D441170231D06CD001A0696 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E5231D06C5001A0696 /* items.cpp */; };
 		3D441171231D06CD001A0696 /* spectator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410ED231D06C5001A0696 /* spectator.cpp */; };
@@ -108,7 +113,6 @@
 		3D4412FC231D0789001A0696 /* wpn_deagle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441225231D0788001A0696 /* wpn_deagle.cpp */; };
 		3D4412FD231D0789001A0696 /* wpn_k1a.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441227231D0788001A0696 /* wpn_k1a.cpp */; };
 		3D4412FE231D0789001A0696 /* wpn_sg550.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441229231D0788001A0696 /* wpn_sg550.cpp */; };
-		3D4412FF231D0789001A0696 /* wpn_cannonplasma.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44122A231D0788001A0696 /* wpn_cannonplasma.cpp */; };
 		3D441300231D0789001A0696 /* wpn_xm8s.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44122B231D0788001A0696 /* wpn_xm8s.cpp */; };
 		3D441301231D0789001A0696 /* wpn_infinityex2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44122C231D0788001A0696 /* wpn_infinityex2.cpp */; };
 		3D441302231D0789001A0696 /* wpn_flashbang.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44122D231D0788001A0696 /* wpn_flashbang.cpp */; };
@@ -116,7 +120,6 @@
 		3D441304231D0789001A0696 /* wpn_xm1014.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44122F231D0788001A0696 /* wpn_xm1014.cpp */; };
 		3D441305231D0789001A0696 /* wpn_mg3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441230231D0788001A0696 /* wpn_mg3.cpp */; };
 		3D441306231D0789001A0696 /* wpn_infinityex1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441232231D0788001A0696 /* wpn_infinityex1.cpp */; };
-		3D441307231D0789001A0696 /* wpn_infinityx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441233231D0788001A0696 /* wpn_infinityx.cpp */; };
 		3D441308231D0789001A0696 /* wpn_mac10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441234231D0788001A0696 /* wpn_mac10.cpp */; };
 		3D441309231D0789001A0696 /* wpn_elite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441235231D0788001A0696 /* wpn_elite.cpp */; };
 		3D44130A231D0789001A0696 /* knife_zombi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441236231D0788001A0696 /* knife_zombi.cpp */; };
@@ -155,7 +158,6 @@
 		3D44132B231D0789001A0696 /* wpn_svdex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44127A231D0788001A0696 /* wpn_svdex.cpp */; };
 		3D44132C231D0789001A0696 /* wpn_gungnir.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44127C231D0788001A0696 /* wpn_gungnir.cpp */; };
 		3D44132D231D0789001A0696 /* z4b_oppovivo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44127D231D0788001A0696 /* z4b_oppovivo.cpp */; };
-		3D44132E231D0789001A0696 /* wpn_cannontiger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44127F231D0788001A0696 /* wpn_cannontiger.cpp */; };
 		3D44132F231D0789001A0696 /* wpn_mp5navy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441280231D0788001A0696 /* wpn_mp5navy.cpp */; };
 		3D441330231D0789001A0696 /* wpn_ak47l.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441281231D0788001A0696 /* wpn_ak47l.cpp */; };
 		3D441331231D0789001A0696 /* wpn_famas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D441282231D0788001A0696 /* wpn_famas.cpp */; };
@@ -243,6 +245,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3D1D533F23312DA700D26B94 /* z4b_facelessvoid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_facelessvoid.cpp; sourceTree = "<group>"; };
+		3D1D534023312DA700D26B94 /* z4b_cannonplasma.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_cannonplasma.cpp; sourceTree = "<group>"; };
+		3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_cannontiger.cpp; sourceTree = "<group>"; };
+		3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_infinityx.cpp; sourceTree = "<group>"; };
+		3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m134heroi.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libserver.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libserver.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D4410DF231D06C5001A0696 /* spectator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spectator.h; sourceTree = "<group>"; };
 		3D4410E0231D06C5001A0696 /* decals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decals.h; sourceTree = "<group>"; };
@@ -495,9 +502,7 @@
 		3D441225231D0788001A0696 /* wpn_deagle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_deagle.cpp; sourceTree = "<group>"; };
 		3D441226231D0788001A0696 /* wpn_balrog7.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_balrog7.h; sourceTree = "<group>"; };
 		3D441227231D0788001A0696 /* wpn_k1a.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_k1a.cpp; sourceTree = "<group>"; };
-		3D441228231D0788001A0696 /* wpn_cannonplasma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_cannonplasma.h; sourceTree = "<group>"; };
 		3D441229231D0788001A0696 /* wpn_sg550.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_sg550.cpp; sourceTree = "<group>"; };
-		3D44122A231D0788001A0696 /* wpn_cannonplasma.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_cannonplasma.cpp; sourceTree = "<group>"; };
 		3D44122B231D0788001A0696 /* wpn_xm8s.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_xm8s.cpp; sourceTree = "<group>"; };
 		3D44122C231D0788001A0696 /* wpn_infinityex2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_infinityex2.cpp; sourceTree = "<group>"; };
 		3D44122D231D0788001A0696 /* wpn_flashbang.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_flashbang.cpp; sourceTree = "<group>"; };
@@ -506,7 +511,6 @@
 		3D441230231D0788001A0696 /* wpn_mg3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_mg3.cpp; sourceTree = "<group>"; };
 		3D441231231D0788001A0696 /* wpn_infinity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_infinity.h; sourceTree = "<group>"; };
 		3D441232231D0788001A0696 /* wpn_infinityex1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_infinityex1.cpp; sourceTree = "<group>"; };
-		3D441233231D0788001A0696 /* wpn_infinityx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_infinityx.cpp; sourceTree = "<group>"; };
 		3D441234231D0788001A0696 /* wpn_mac10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_mac10.cpp; sourceTree = "<group>"; };
 		3D441235231D0788001A0696 /* wpn_elite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_elite.cpp; sourceTree = "<group>"; };
 		3D441236231D0788001A0696 /* knife_zombi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knife_zombi.cpp; sourceTree = "<group>"; };
@@ -526,7 +530,6 @@
 		3D441244231D0788001A0696 /* wpn_m4a1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m4a1.cpp; sourceTree = "<group>"; };
 		3D441245231D0788001A0696 /* wpn_sg552.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_sg552.h; sourceTree = "<group>"; };
 		3D441246231D0788001A0696 /* wpn_scout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_scout.h; sourceTree = "<group>"; };
-		3D441247231D0788001A0696 /* wpn_cannontiger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_cannontiger.h; sourceTree = "<group>"; };
 		3D441248231D0788001A0696 /* wpn_aug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_aug.h; sourceTree = "<group>"; };
 		3D441249231D0788001A0696 /* wpn_xm8s.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_xm8s.h; sourceTree = "<group>"; };
 		3D44124A231D0788001A0696 /* wpn_flashbang.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_flashbang.h; sourceTree = "<group>"; };
@@ -555,7 +558,6 @@
 		3D441261231D0788001A0696 /* wpn_m249.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_m249.h; sourceTree = "<group>"; };
 		3D441262231D0788001A0696 /* wpn_glock18.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_glock18.cpp; sourceTree = "<group>"; };
 		3D441263231D0788001A0696 /* wpn_fiveseven.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_fiveseven.h; sourceTree = "<group>"; };
-		3D441264231D0788001A0696 /* wpn_infinityx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_infinityx.h; sourceTree = "<group>"; };
 		3D441265231D0788001A0696 /* wpn_svdex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_svdex.h; sourceTree = "<group>"; };
 		3D441266231D0788001A0696 /* wpn_mp7a1c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_mp7a1c.cpp; sourceTree = "<group>"; };
 		3D441267231D0788001A0696 /* wpn_scarl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_scarl.cpp; sourceTree = "<group>"; };
@@ -582,7 +584,6 @@
 		3D44127C231D0788001A0696 /* wpn_gungnir.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_gungnir.cpp; sourceTree = "<group>"; };
 		3D44127D231D0788001A0696 /* z4b_oppovivo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_oppovivo.cpp; sourceTree = "<group>"; };
 		3D44127E231D0788001A0696 /* wpn_deagled.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_deagled.h; sourceTree = "<group>"; };
-		3D44127F231D0788001A0696 /* wpn_cannontiger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_cannontiger.cpp; sourceTree = "<group>"; };
 		3D441280231D0788001A0696 /* wpn_mp5navy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_mp5navy.cpp; sourceTree = "<group>"; };
 		3D441281231D0788001A0696 /* wpn_ak47l.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_ak47l.cpp; sourceTree = "<group>"; };
 		3D441282231D0788001A0696 /* wpn_famas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_famas.cpp; sourceTree = "<group>"; };
@@ -1096,9 +1097,7 @@
 				3D441225231D0788001A0696 /* wpn_deagle.cpp */,
 				3D441226231D0788001A0696 /* wpn_balrog7.h */,
 				3D441227231D0788001A0696 /* wpn_k1a.cpp */,
-				3D441228231D0788001A0696 /* wpn_cannonplasma.h */,
 				3D441229231D0788001A0696 /* wpn_sg550.cpp */,
-				3D44122A231D0788001A0696 /* wpn_cannonplasma.cpp */,
 				3D44122B231D0788001A0696 /* wpn_xm8s.cpp */,
 				3D44122C231D0788001A0696 /* wpn_infinityex2.cpp */,
 				3D44122D231D0788001A0696 /* wpn_flashbang.cpp */,
@@ -1107,7 +1106,6 @@
 				3D441230231D0788001A0696 /* wpn_mg3.cpp */,
 				3D441231231D0788001A0696 /* wpn_infinity.h */,
 				3D441232231D0788001A0696 /* wpn_infinityex1.cpp */,
-				3D441233231D0788001A0696 /* wpn_infinityx.cpp */,
 				3D441234231D0788001A0696 /* wpn_mac10.cpp */,
 				3D441235231D0788001A0696 /* wpn_elite.cpp */,
 				3D441236231D0788001A0696 /* knife_zombi.cpp */,
@@ -1127,7 +1125,6 @@
 				3D441244231D0788001A0696 /* wpn_m4a1.cpp */,
 				3D441245231D0788001A0696 /* wpn_sg552.h */,
 				3D441246231D0788001A0696 /* wpn_scout.h */,
-				3D441247231D0788001A0696 /* wpn_cannontiger.h */,
 				3D441248231D0788001A0696 /* wpn_aug.h */,
 				3D441249231D0788001A0696 /* wpn_xm8s.h */,
 				3D44124A231D0788001A0696 /* wpn_flashbang.h */,
@@ -1156,7 +1153,6 @@
 				3D441261231D0788001A0696 /* wpn_m249.h */,
 				3D441262231D0788001A0696 /* wpn_glock18.cpp */,
 				3D441263231D0788001A0696 /* wpn_fiveseven.h */,
-				3D441264231D0788001A0696 /* wpn_infinityx.h */,
 				3D441265231D0788001A0696 /* wpn_svdex.h */,
 				3D441266231D0788001A0696 /* wpn_mp7a1c.cpp */,
 				3D441267231D0788001A0696 /* wpn_scarl.cpp */,
@@ -1183,7 +1179,6 @@
 				3D44127C231D0788001A0696 /* wpn_gungnir.cpp */,
 				3D44127D231D0788001A0696 /* z4b_oppovivo.cpp */,
 				3D44127E231D0788001A0696 /* wpn_deagled.h */,
-				3D44127F231D0788001A0696 /* wpn_cannontiger.cpp */,
 				3D441280231D0788001A0696 /* wpn_mp5navy.cpp */,
 				3D441281231D0788001A0696 /* wpn_ak47l.cpp */,
 				3D441282231D0788001A0696 /* wpn_famas.cpp */,
@@ -1209,6 +1204,11 @@
 				3D441296231D0788001A0696 /* wpn_m95.h */,
 				3D441297231D0788001A0696 /* wpn_scout.cpp */,
 				3D441298231D0788001A0696 /* wpn_p90.h */,
+				3D1D534023312DA700D26B94 /* z4b_cannonplasma.cpp */,
+				3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */,
+				3D1D533F23312DA700D26B94 /* z4b_facelessvoid.cpp */,
+				3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */,
+				3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1507,6 +1507,7 @@
 				3D4412E5231D0789001A0696 /* mods.cpp in Sources */,
 				3D44138E231D0DEE001A0696 /* voice_gamemgr.cpp in Sources */,
 				3D441171231D06CD001A0696 /* spectator.cpp in Sources */,
+				3D1D534723312DA700D26B94 /* z4b_infinityx.cpp in Sources */,
 				3D4412DB231D0789001A0696 /* zbb_zombie.cpp in Sources */,
 				3D441324231D0789001A0696 /* wpn_m95.cpp in Sources */,
 				3D441188231D06CD001A0696 /* func_tank.cpp in Sources */,
@@ -1550,7 +1551,6 @@
 				3D441357231D0789001A0696 /* cs_bot_use_entity.cpp in Sources */,
 				3D441301231D0789001A0696 /* wpn_infinityex2.cpp in Sources */,
 				3D44119A231D06CD001A0696 /* observer.cpp in Sources */,
-				3D441307231D0789001A0696 /* wpn_infinityx.cpp in Sources */,
 				3D441345231D0789001A0696 /* cs_bot_chatter.cpp in Sources */,
 				3D44130B231D0789001A0696 /* knife_skullaxe.cpp in Sources */,
 				3D4412F3231D0789001A0696 /* csdm_randomspawn.cpp in Sources */,
@@ -1574,8 +1574,10 @@
 				3D441336231D0789001A0696 /* wpn_p228.cpp in Sources */,
 				3D441352231D0789001A0696 /* cs_bot_buy.cpp in Sources */,
 				3D441342231D0789001A0696 /* cs_bot_weapon.cpp in Sources */,
+				3D1D534423312DA700D26B94 /* z4b_facelessvoid.cpp in Sources */,
 				3D441193231D06CD001A0696 /* effects.cpp in Sources */,
 				3D441338231D0789001A0696 /* wpn_infinitys.cpp in Sources */,
+				3D1D534823312DA700D26B94 /* z4b_m134heroi.cpp in Sources */,
 				3D4412FE231D0789001A0696 /* wpn_sg550.cpp in Sources */,
 				3D441174231D06CD001A0696 /* func_break.cpp in Sources */,
 				3D44133F231D0789001A0696 /* cbase_physint.cpp in Sources */,
@@ -1595,6 +1597,7 @@
 				3D4411A7231D06CD001A0696 /* util.cpp in Sources */,
 				3D441335231D0789001A0696 /* wpn_thompson.cpp in Sources */,
 				3D4412D9231D0789001A0696 /* zbb_ghost.cpp in Sources */,
+				3D1D534523312DA700D26B94 /* z4b_cannonplasma.cpp in Sources */,
 				3D44130A231D0789001A0696 /* knife_zombi.cpp in Sources */,
 				3D441354231D0789001A0696 /* cs_bot_move_to.cpp in Sources */,
 				3D441359231D0789001A0696 /* cs_bot_vision.cpp in Sources */,
@@ -1617,7 +1620,6 @@
 				3D441323231D0789001A0696 /* wpn_wa2000.cpp in Sources */,
 				3D441195231D06CD001A0696 /* doors.cpp in Sources */,
 				3D4412E0231D0789001A0696 /* mod_zbb.cpp in Sources */,
-				3D44132E231D0789001A0696 /* wpn_cannontiger.cpp in Sources */,
 				3D441318231D0789001A0696 /* z4b_Frequency9.cpp in Sources */,
 				3D441199231D06CD001A0696 /* mpstubb.cpp in Sources */,
 				3D44135C231D0789001A0696 /* cs_bot_learn.cpp in Sources */,
@@ -1652,8 +1654,8 @@
 				3D441340231D0789001A0696 /* cbase_memory.cpp in Sources */,
 				3D441363231D0789001A0696 /* hostage_escape.cpp in Sources */,
 				3D441331231D0789001A0696 /* wpn_famas.cpp in Sources */,
-				3D4412FF231D0789001A0696 /* wpn_cannonplasma.cpp in Sources */,
 				3D441392231D0DEE001A0696 /* nav_area.cpp in Sources */,
+				3D1D534623312DA700D26B94 /* z4b_cannontiger.cpp in Sources */,
 				3D44132F231D0789001A0696 /* wpn_mp5navy.cpp in Sources */,
 				3D441197231D06CD001A0696 /* buttons.cpp in Sources */,
 				3D44134B231D0789001A0696 /* cs_bot_update.cpp in Sources */,
