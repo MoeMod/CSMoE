@@ -67,7 +67,7 @@ jobs:
       - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
     script:
       - cd Android
-      - ./gradlew build
+      - ./gradlew assembleRelease
   - stage: build
     name: "Build for Windows MSVC"
     cache: ccache
