@@ -103,6 +103,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_deagled.cpp
 	../dlls/wpn_shared/wpn_as50.cpp
 	../dlls/wpn_shared/wpn_cannon.cpp
+	../dlls/wpn_shared/z4b_cannontiger.cpp
+	../dlls/wpn_shared/z4b_cannonplasma.cpp
 	../dlls/wpn_shared/wpn_infinity.cpp
 	../dlls/wpn_shared/wpn_k1a.cpp
 	../dlls/wpn_shared/wpn_kriss.cpp
@@ -126,10 +128,18 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
+	../dlls/wpn_shared/z4b_infinityx.cpp
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
+	../dlls/wpn_shared/z4b_stormgiantx.cpp
+	../dlls/wpn_shared/z4b_lc_sword.cpp
+	../dlls/wpn_shared/z4b_oppovivo.cpp
+	../dlls/wpn_shared/z4b_strongknifex.cpp
+	../dlls/wpn_shared/z4b_nataknifedx.cpp
+	../dlls/wpn_shared/z4b_facelessvoid.cpp
+	../dlls/wpn_shared/z4b_m134heroi.cpp
 	)
 
 set (HUD_SRCS

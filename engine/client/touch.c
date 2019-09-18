@@ -900,28 +900,43 @@ void Touch_Init( void )
 	touch.list_user.first = touch.list_user.last = NULL;
 
 	// fill default buttons list
-	MakeRGBA( color, 255, 255, 255, 255 );
-	Touch_AddDefaultButton( "look", "", "_look", 0.500000, 0.000000, 1.000000, 1, color, 0, 0, 0 );
-	Touch_AddDefaultButton( "move", "", "_move", 0.000000, 0.000000, 0.500000, 1, color, 0, 0, 0 );
-	Touch_AddDefaultButton( "invnext", "touch_default/next_weap.tga", "invnext", 0.000000, 0.530200, 0.120000, 0.757428, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "invprev", "touch_default/prev_weap.tga", "invprev", 0.000000, 0.075743, 0.120000, 0.302971, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "use", "touch_default/use.tga", "+use", 0.880000, 0.454457, 1.000000, 0.681685, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "jump", "touch_default/jump.tga", "+jump", 0.880000, 0.227228, 1.000000, 0.454457, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "attack", "touch_default/shoot.tga", "+attack", 0.760000, 0.530200, 0.880000, 0.757428, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "attack2", "touch_default/shoot_alt.tga", "+attack2", 0.760000, 0.302971, 0.880000, 0.530200, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "loadquick", "touch_default/load.tga", "loadquick", 0.760000, 0.000000, 0.840000, 0.151486, color, 2, 1, 16 );
-	Touch_AddDefaultButton( "savequick", "touch_default/save.tga", "savequick", 0.840000, 0.000000, 0.920000, 0.151486, color, 2, 1, 16 );
-	Touch_AddDefaultButton( "messagemode", "touch_default/keyboard.tga", "messagemode", 0.840000, 0.000000, 0.920000, 0.151486, color, 2, 1, 8 );
-	Touch_AddDefaultButton( "reload", "touch_default/reload.tga", "+reload", 0.000000, 0.302971, 0.120000, 0.530200, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "flashlight", "touch_default/flash_light_filled.tga", "impulse 100", 0.920000, 0.000000, 1.000000, 0.151486, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "scores", "touch_default/map.tga", "+showscores", 0.760000, 0.000000, 0.840000, 0.151486, color, 2, 1, 8 );
-	Touch_AddDefaultButton( "show_numbers", "touch_default/show_weapons.tga", "exec touch_default/numbers.cfg", 0.440000, 0.833171, 0.520000, 0.984656, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "duck", "touch_default/crouch.tga", "+duck", 0.880000, 0.757428, 1.000000, 0.984656, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "tduck", "touch_default/tduck.tga", ";+duck", 0.560000, 0.833171, 0.620000, 0.946785, color, 2, 1, 0 );
-	Touch_AddDefaultButton( "edit", "touch_default/settings.tga", "touch_enableedit", 0.420000, 0.000000, 0.500000, 0.151486, color, 2, 1, 32 );
-	Touch_AddDefaultButton( "menu", "touch_default/menu.tga", "escape", 0.000000, 0.833171, 0.080000, 0.984656, color, 2, 1, 0 );
+	MakeRGBA( color, 255, 255, 255, 150 );
+	Touch_AddDefaultButton("move", "", "_move", 0.000000, 0.389565, 0.460000, 0.952271, color, 0, 0, 0);
+	Touch_AddDefaultButton("look", "", "_look", 0.480000, 0.173140, 0.980000, 0.995556, color, 0, 0, 0);
+	Touch_AddDefaultButton("joy", "touch/gfx/joy.tga", "_joy", 0.360000, 0.173140, 0.480000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("dpad", "touch/gfx/dpad.tga", "_dpad", 0.240000, 0.173140, 0.360000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("walk", "touch/gfx/walk.tga", "+speed", 0.200000, 0.779130, 0.300000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("plus_nvg", "touch/gfx/plus.tga", "+nvgadjust", 0.400000, 0.692560, 0.460000, 0.822415, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("minus_nvg", "touch/gfx/minus.tga", "-nvgadjust", 0.340000, 0.692560, 0.400000, 0.822415, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("exit", "touch/gfx/exit.tga", "cancelselect", 0.380000, 0.000000, 0.460000, 0.173140, color, 2, 1, 0);
+	Touch_AddDefaultButton("touch_edit", "touch/gfx/settings.tga", "touch_enableedit", 0.540000, 0.000000, 0.620000, 0.173140, color, 2, 1, 0);
+	Touch_AddDefaultButton("nightvision", "touch/gfx/nightvision.tga", "nightvision;toggle_plusminus", 0.920000, 0.432850, 1.000000, 0.605990, color, 2, 1, 0);
+	Touch_AddDefaultButton("jump", "touch/gfx/jump.tga", "+jump", 0.900000, 0.779130, 1.000000, 0.995556, color, 2, 1, 0);
+	Touch_AddDefaultButton("numbers", "touch_default/show_weapons.tga", "exec,touch_default/numbers.cfg", 0.460000, 0.735845, 0.540000, 0.908985, color, 2, 1, 0);
+	Touch_AddDefaultButton("score", "touch/gfx/score.tga", "+showscores", 0.460000, 0.000000, 0.540000, 0.173140, color, 2, 1, 0);
+	Touch_AddDefaultButton("w2", "touch/gfx/w_pistol.tga", "slot2", 0.840000, 0.086570, 0.920000, 0.259710, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("w1", "touch/gfx/w_rifle.tga", "slot1", 0.840000, 0.259710, 0.920000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("w4", "touch/gfx/w_grenade.tga", "slot4", 0.680000, 0.086570, 0.760000, 0.259710, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("w5", "touch/gfx/w_c4.tga", "slot5", 0.680000, 0.259710, 0.760000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("w3", "touch/gfx/w_knife.tga", "slot3", 0.760000, 0.259710, 0.840000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("duck_sw", "touch/gfx/duck.tga", "crouchtoggle", 0.300000, 0.779130, 0.400000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("use", "touch/gfx/use.tga", "+use", 0.080000, 0.692560, 0.160000, 0.865700, color, 2, 1, 0);
+	Touch_AddDefaultButton("reload", "touch/gfx/reload.tga", "+reload", 0.840000, 0.692560, 0.920000, 0.865700, color, 2, 1, 0);
+	Touch_AddDefaultButton("buy", "touch/gfx/buy.tga", "buy", 0.000000, 0.432850, 0.080000, 0.605990, color, 2, 1, 0);
+	Touch_AddDefaultButton("change_team", "touch/gfx/change_team.tga", "chooseteam", 0.100000, 0.822415, 0.180000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("spraypaint", "touch/gfx/spraypaint.tga", "impulse,201", 0.820000, 0.822415, 0.900000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("invnext", "touch/gfx/right.tga", "invnext", 0.160000, 0.432850, 0.240000, 0.605990, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("invprev", "touch/gfx/left.tga", "invprev", 0.080000, 0.432850, 0.160000, 0.605990, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("cmd", "touch/gfx/cmdmenu.tga", "exec,touch/cmd/cmd", 0.080000, 0.259710, 0.160000, 0.432850, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("duck", "touch/gfx/duck.tga", "+duck", 0.000000, 0.779130, 0.100000, 0.995556, color, 2, 1, TOUCH_FL_PRECISION);
+	Touch_AddDefaultButton("attack2", "touch/gfx/attack2.tga", "+attack2", 0.720000, 0.000000, 0.860000, 0.302995, color, 2, 1, 0);
+	Touch_AddDefaultButton("attack", "touch/gfx/attack.tga", "+attack", 0.140000, 0.000000, 0.280000, 0.302995, color, 2, 1, 0);
+	Touch_AddDefaultButton("flight", "touch/gfx/flaghtlight.tga", "impulse,100", 0.740000, 0.822415, 0.820000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("light", "touch/gfx/light.tga", "toggle_light", 0.660000, 0.822415, 0.740000, 0.995556, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("radio", "touch/gfx/radio.tga", "showvguimenu,38", 0.000000, 0.605990, 0.080000, 0.779130, color, 2, 1, 0);
+	Touch_AddDefaultButton("drop", "touch/gfx/drop.tga", "drop", 0.920000, 0.605990, 1.000000, 0.779130, color, 2, 1, 0);
 
-	
+
 	Cmd_AddCommand( "touch_addbutton", Touch_AddButton_f, "add native touch button" );
 	Cmd_AddCommand( "touch_removebutton", IN_TouchRemoveButton_f, "remove native touch button" );
 	Cmd_AddCommand( "touch_enableedit", Touch_EnableEdit_f, "enable button editing mode" );
@@ -1874,8 +1889,8 @@ void Touch_KeyEvent( int key, int down )
 	int xi, yi;
 	float x, y;
 
-	if( touch_enable->integer )
-		return;
+	//if( touch_enable->integer )
+	//	return;
 
 	if( !touch.clientonly )
 		return;
@@ -1884,6 +1899,18 @@ void Touch_KeyEvent( int key, int down )
 
 	x = xi/SCR_W;
 	y = yi/SCR_H;
+
+#ifdef TARGET_OS_MAC
+	int w1, w2, h1, h2;
+	w1 = scr_width->integer;
+	h1 = scr_height->integer;
+	SDL_GetWindowSize( host.hWnd, &w2, &h2 );
+	x = (float)xi/(float)w2;
+	y = (float)yi/(float)h2;
+#else
+	x = xi/SCR_W;
+	y = yi/SCR_H;
+#endif
 
 	Touch_ControlsEvent( !down, key == K_MOUSE1?0:1, x, y, 0, 0, 0 );
 }

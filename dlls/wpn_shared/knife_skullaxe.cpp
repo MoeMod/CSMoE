@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
+#include "weapons/KnifeAttack.h"
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -95,8 +96,8 @@ public:
 	BOOL CanDrop() override { return false; }
 
 public:
-	void DelayedPrimaryAttack();
-	void DelayedSecondaryAttack();
+	void DelayPrimaryAttack();
+	void DelaySecondaryAttack();
 	float GetPrimaryAttackDamage() const
 	{
 		float flDamage = 100;
@@ -123,8 +124,6 @@ public:
 
 LINK_ENTITY_TO_CLASS(knife_skullaxe, CKnifeSkullAxe)
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *pflMins, float *pfkMaxs, edict_t *pEntity);
-
 void CKnifeSkullAxe::PrimaryAttack(void)
 {
 #ifndef CLIENT_DLL
@@ -132,7 +131,7 @@ void CKnifeSkullAxe::PrimaryAttack(void)
 #endif
 	SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
 
-	SetThink(&CKnifeSkullAxe::DelayedPrimaryAttack);
+	SetThink(&CKnifeSkullAxe::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9s;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
@@ -146,127 +145,14 @@ void CKnifeSkullAxe::SecondaryAttack(void)
 #endif
 	SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
 
-	SetThink(&CKnifeSkullAxe::DelayedSecondaryAttack);
+	SetThink(&CKnifeSkullAxe::DelaySecondaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9s;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
-#ifndef CLIENT_DLL
-enum hit_result_t
-{
-	HIT_NONE,
-	HIT_WALL,
-	HIT_PLAYER,
-};
-static inline hit_result_t KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t *pevInflictor, entvars_t *pevAttacker)
-{
-	TraceResult tr;
-	hit_result_t result = HIT_NONE;
-
-	vecSrc.z += 1;
-
-	if (!pevAttacker)
-		pevAttacker = pevInflictor;
-
-	Vector vecEnd = vecSrc + vecDir.Normalize() * flAngleDegrees;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
-
-	if (tr.flFraction >= 1)
-	{
-		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
-
-		if (tr.flFraction < 1)
-		{
-			CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
-
-			if (!pHit || pHit->IsBSPModel())
-			{
-				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
-			}
-
-			vecEnd = tr.vecEndPos;
-		}
-	}
-
-	if (tr.flFraction < 1)
-	{
-		CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
-		if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
-		{
-			const float flAdjustedDamage = flDamage;
-			ClearMultiDamage();
-			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-			ApplyMultiDamage(pevInflictor, pevAttacker);
-		}
-
-		float flVol = 1;
-		BOOL fHitWorld = TRUE;
-		if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE)
-		{
-			flVol = 0.1f;
-			fHitWorld = FALSE;
-		}
-
-		if (fHitWorld)
-		{
-			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-			result = HIT_WALL;
-		}
-	}
-
-	CBaseEntity *pEntity = nullptr;
-	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr)
-	{
-		if (pEntity->pev->takedamage != DAMAGE_NO)
-		{
-			if (pEntity->IsBSPModel())
-				continue;
-
-			if (pEntity->pev == pevAttacker)
-				continue;
-
-			Vector vecSpot = pEntity->BodyTarget(vecSrc);
-			vecSpot.z = vecEnd.z;
-			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
-				continue;
-
-			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-			{
-				if (tr.fStartSolid)
-				{
-					tr.vecEndPos = vecSrc;
-					tr.flFraction = 0;
-				}
-
-				if (tr.flFraction == 1.0f)
-				{
-					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-				}
-
-				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
-
-				UTIL_MakeVectors(pEntity->pev->angles);
-				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
-					flDamage *= 3.0;
-
-				ClearMultiDamage();
-				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
-				ApplyMultiDamage(pevInflictor, pevAttacker);
-
-				result = HIT_PLAYER;
-			}
-		}
-	}
-
-	return result;
-}
-#endif
-
-void CKnifeSkullAxe::DelayedPrimaryAttack()
+void CKnifeSkullAxe::DelayPrimaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -313,7 +199,7 @@ void CKnifeSkullAxe::DelayedPrimaryAttack()
 	//return fDidHit;
 }
 
-void CKnifeSkullAxe::DelayedSecondaryAttack()
+void CKnifeSkullAxe::DelaySecondaryAttack()
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);

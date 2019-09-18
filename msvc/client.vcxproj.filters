@@ -531,6 +531,18 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\cl_dll\hud\legacy\hud_radar_legacy.cpp">
       <Filter>cl_dll\hud\legacy</Filter>
     </ClCompile>
@@ -621,6 +633,18 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_infinityx.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
     <ClCompile Include="..\pm_shared\pm_math.cpp">
       <Filter>pm_shared</Filter>
     </ClCompile>
@@ -661,6 +685,15 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1049,5 +1082,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
   </ItemGroup>
 </Project>

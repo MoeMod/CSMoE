@@ -68,9 +68,13 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireScarH);
 	DECLARE_EVENT(FireScarL);
 	DECLARE_EVENT(FireCannon);
+	DECLARE_EVENT(FireCannonPlasma);
+	DECLARE_EVENT(FireCannonTiger);
 	DECLARE_EVENT(FireK1a);
 	DECLARE_EVENT(FireInfinity_Left);
 	DECLARE_EVENT(FireInfinity_Right);
+	DECLARE_EVENT(FireInfinityX_Left);
+	DECLARE_EVENT(FireInfinityX_Right);
 	DECLARE_EVENT(FireSVDEX);
 	DECLARE_EVENT(FireMP7A1C);
 	DECLARE_EVENT(FireMP7A1P);
@@ -82,6 +86,9 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireGungnir);
 	DECLARE_EVENT(FireAnaconda);
 	DECLARE_EVENT(FireMG36);
+	DECLARE_EVENT(FireM134HeroI);
+	DECLARE_EVENT(FireM134HeroI_EgonFire);
+	DECLARE_EVENT(FireM134HeroI_EgonStop);
 /*
 ======================
 Game_HookEvents
@@ -145,9 +152,13 @@ void Game_HookEvents( void )
 	HOOK_EVENT(scarh, FireScarH);
 	HOOK_EVENT(scarl, FireScarL);
 	HOOK_EVENT(cannon, FireCannon);
+	HOOK_EVENT(cannonplasma, FireCannonPlasma);
+	HOOK_EVENT(cannontiger, FireCannonTiger);
 	HOOK_EVENT(k1a, FireK1a);
 	HOOK_EVENT(infinity_left, FireInfinity_Left);
 	HOOK_EVENT(infinity_right, FireInfinity_Right);
+	HOOK_EVENT(infinityx_left, FireInfinityX_Left);
+	HOOK_EVENT(infinityx_right, FireInfinityX_Right);
 	HOOK_EVENT(svdex, FireSVDEX);
 	HOOK_EVENT(mp7a1c, FireMP7A1C);
 	HOOK_EVENT(mp7a1p, FireMP7A1P);
@@ -161,6 +172,9 @@ void Game_HookEvents( void )
 	HOOK_EVENT(gungnir, FireGungnir);
 	HOOK_EVENT(anaconda, FireAnaconda);
 	HOOK_EVENT(mg36, FireMG36);
+	HOOK_EVENT(m134heroi, FireM134HeroI);
+	HOOK_EVENT(m134heroi_fire, FireM134HeroI_EgonFire);
+	HOOK_EVENT(m134heroi_stop, FireM134HeroI_EgonStop);
 }
 
 }

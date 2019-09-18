@@ -622,6 +622,14 @@ void IN_MouseMove( void )
 	// find mouse movement
 #ifdef XASH_SDL
 	SDL_GetMouseState( &current_pos.x, &current_pos.y );
+#ifdef TARGET_OS_MAC
+	int w1, w2, h1, h2;
+	w1 = scr_width->integer;
+	h1 = scr_height->integer;
+	SDL_GetWindowSize( host.hWnd, &w2, &h2 );
+	current_pos.x = (int)((float)current_pos.x * (float)w1 / (float)w2);
+	current_pos.y = (int)((float)current_pos.y * (float)h1 / (float)h2);
+#endif
 #endif
 
 	VGui_MouseMove( current_pos.x, current_pos.y );

@@ -38,6 +38,8 @@
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_balrog7.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
@@ -53,6 +55,7 @@
     <ClCompile Include="..\cl_dll\events\event_glock18.cpp" />
     <ClCompile Include="..\cl_dll\events\event_gungnir.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinity.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_infinityx.cpp" />
     <ClCompile Include="..\cl_dll\events\event_infinitys.cpp" />
     <ClCompile Include="..\cl_dll\events\event_k1a.cpp" />
     <ClCompile Include="..\cl_dll\events\event_knife.cpp" />
@@ -88,6 +91,7 @@
     <ClCompile Include="..\cl_dll\events\event_xm1014.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8s.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m134heroi.cpp" />
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp" />
     <ClCompile Include="..\cl_dll\events\hl_events.cpp" />
     <ClCompile Include="..\cl_dll\ev_common.cpp" />
@@ -216,6 +220,16 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_oppovivo.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m134heroi.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_facelessvoid.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />
@@ -289,6 +303,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
@@ -303,6 +319,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
@@ -355,7 +372,6 @@
     <ProjectGuid>{DC1DD765-CFEB-47DA-A2EA-9F1E20A24272}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>hl_cdll</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -375,7 +391,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
