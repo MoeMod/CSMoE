@@ -58,6 +58,8 @@ jobs:
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
       - git tag --force $TRAVIS_TAG
+      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git push travis-deploy-public --tags --force
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
@@ -68,6 +70,7 @@ jobs:
         repo: MoeMod/CSMoE
       overwrite: true
       skip_cleanup: true
+      prerelease: true
   - stage: build
     name: Build for Android and deploy
     language: android
@@ -92,6 +95,8 @@ jobs:
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
       - git tag --force $TRAVIS_TAG
+      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git push travis-deploy-public --tags --force
       - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned.apk
     deploy:
       provider: releases
