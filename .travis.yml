@@ -40,7 +40,7 @@ jobs:
     script:
     - sh scripts/build_osx_engine.sh;
   - stage: build
-    name: Build for iOS
+    name: Build for iOS and deploy
     osx_image: xcode11
     language: objective-c
     before_script:
@@ -57,7 +57,7 @@ jobs:
       - git config --local user.name "CSMoE-Deployer"
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
-      - git tag $TRAVIS_TAG
+      - git tag --force $TRAVIS_TAG
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
@@ -69,7 +69,7 @@ jobs:
       overwrite: true
       skip_cleanup: true
   - stage: build
-    name: Build for Android and Upload
+    name: Build for Android and deploy
     language: android
     dist: trusty
     android:
@@ -91,7 +91,7 @@ jobs:
       - git config --local user.name "CSMoE-Deployer"
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
-      - git tag $TRAVIS_TAG
+      - git tag --force $TRAVIS_TAG
       - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-unsigned.apk
     deploy:
       provider: releases
