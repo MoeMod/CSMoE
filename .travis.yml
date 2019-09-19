@@ -77,8 +77,7 @@ jobs:
       - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-Android-CD.apk
     deploy:
       provider: releases
-      user: ${GITHUB_USERNAME}
-      password: ${GITHUB_PASSWORD}
+      api_key: ${GITHUB_TOKEN}
       file:
         - CSMoE-Android-CD.apk
       on:
