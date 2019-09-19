@@ -92,7 +92,7 @@ jobs:
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
       - git tag --force $TRAVIS_TAG
-      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-unsigned.apk
+      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned.apk
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
