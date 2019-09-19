@@ -50,7 +50,7 @@ jobs:
     script:
     - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
     - mkdir -p Payload
-    - cp -a Xcode-iOS/build/Release-iphoneos/csmoe-ios.app Payload/
+    - cp -a Xcode-iOS/build/Products/Release-iphoneos/csmoe-ios.app Payload/
     - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
     before_deploy:
       # Set up git user name and tag this commit
