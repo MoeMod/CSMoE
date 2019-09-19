@@ -48,8 +48,26 @@ jobs:
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.10 SDL2
     script:
-    - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme
-      CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
+    - set -o pipefail && xcodebuild -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | xcpretty
+    - mkdir -p Payload
+    - cp -a Xcode-iOS/build/Release-iphoneos/csmoe-ios.app Payload/
+    - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
+    before_deploy:
+      # Set up git user name and tag this commit
+      - git config --local user.name "CSMoE-Deployer"
+      - git config --local user.email "824395314@qq.com"
+      - export TRAVIS_TAG=continuous
+      - git tag $TRAVIS_TAG
+    deploy:
+      provider: releases
+      api_key: ${GITHUB_TOKEN}
+      file:
+        - CSMoE-CD-iOS-universal-unsigned.ipa
+      on:
+        branch: master
+        repo: MoeMod/CSMoE
+      overwrite: true
+      skip_cleanup: true
   - stage: build
     name: Build for Android and Upload
     language: android
@@ -74,12 +92,12 @@ jobs:
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
       - git tag $TRAVIS_TAG
-      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-Android-CD.apk
+      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-unsigned.apk
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-Android-CD.apk
+        - CSMoE-CD-Android-arm64-unsigned.apk
       on:
         branch: master
         repo: MoeMod/CSMoE
