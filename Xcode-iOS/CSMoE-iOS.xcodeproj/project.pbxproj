@@ -6,6 +6,33 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 3D2DCBF7233209E300ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-gen-csmoe" */;
+			buildPhases = (
+				3D2DCBFA233209ED00ADBA6B /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "cmake-gen-csmoe";
+			productName = "cmake-mkdir-csmoe";
+		};
+		3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 3D2DCBFE23320D5D00ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-build-csmoe" */;
+			buildPhases = (
+				3D2DCC0123320D9600ADBA6B /* ShellScript */,
+				3D2DCC04233211BF00ADBA6B /* CopyFiles */,
+			);
+			dependencies = (
+				3D2DCC0323320DCF00ADBA6B /* PBXTargetDependency */,
+			);
+			name = "cmake-build-csmoe";
+			productName = "cmake-build-csmoe";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -21,9 +48,12 @@
 		3D11D3F4228F58D600393F66 /* MapMasterTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3F3228F58D600393F66 /* MapMasterTableViewController.m */; };
 		3D11D3F82291732300393F66 /* SettingsStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */; };
 		3D11D3FB22917BFC00393F66 /* SettingsSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */; };
+		3D2DCC2823321B4500ADBA6B /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D2DCC2123321B2B00ADBA6B /* libclient.a */; };
+		3D2DCC2923321B4500ADBA6B /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D2DCC1523321B2A00ADBA6B /* libmenu.a */; };
+		3D2DCC2A23321B4500ADBA6B /* libnanogl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7D7F8231D263600B5DB3A /* libnanogl.a */; };
+		3D2DCC2B23321B4500ADBA6B /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D2DCC1B23321B2A00ADBA6B /* libserver.a */; };
+		3D2DCC2C23321B4500ADBA6B /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D2DCC2723321B2B00ADBA6B /* libxash.a */; };
 		3D3EE8A3228F193400A695FE /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 3D3EE89D228F193400A695FE /* maps */; };
-		3D441367231D0B0B001A0696 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4410DE231D0697001A0696 /* libserver.a */; };
-		3D44160B231D133D001A0696 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4413C5231D104D001A0696 /* libclient.a */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
 		3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D37322E229488AA00713C9C /* GLKit.framework */; };
@@ -34,9 +64,7 @@
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
 		3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D670D7D227EE1210030B7D1 /* AppDelegate.m */; };
 		3D6C2F0F22988F6A00DACF3E /* OptionsSubAboutTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */; };
-		3DA7D7F0231D258F00B5DB3A /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7D65C231D241A00B5DB3A /* libxash.a */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
-		3DA7D7FB231D30B600B5DB3A /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7D64B231D206C00B5DB3A /* libmenu.a */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
 		3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A42289683100114D80 /* MacBookiTunes.png */; };
@@ -61,19 +89,40 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3D4410DD231D0697001A0696 /* PBXContainerItemProxy */ = {
+		3D2DCC0223320DCF00ADBA6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3D4410D9231D0697001A0696 /* server.xcodeproj */;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3D2DCBF6233209E300ADBA6B;
+			remoteInfo = "cmake-gen-csmoe";
+		};
+		3D2DCC1423321B2A00ADBA6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D2DCC1023321B2A00ADBA6B /* menu.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D4410C7231D066B001A0696;
+			remoteInfo = menu;
+		};
+		3D2DCC1A23321B2A00ADBA6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D2DCC1623321B2A00ADBA6B /* server.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 3D4410C7231D066B001A0696;
 			remoteInfo = server;
 		};
-		3D4413C4231D104D001A0696 /* PBXContainerItemProxy */ = {
+		3D2DCC2023321B2B00ADBA6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3D4413C0231D104D001A0696 /* client.xcodeproj */;
+			containerPortal = 3D2DCC1C23321B2A00ADBA6B /* client.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 3D4410C7231D066B001A0696;
-			remoteInfo = server;
+			remoteInfo = client;
+		};
+		3D2DCC2623321B2B00ADBA6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D2DCC2223321B2B00ADBA6B /* engine.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D4410C7231D066B001A0696;
+			remoteInfo = xash;
 		};
 		3D441703231D1E07001A0696 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -117,20 +166,6 @@
 			remoteGlobalIDString = F3E3C75F224138AE007D243C;
 			remoteInfo = "libSDLmain-tvOS";
 		};
-		3DA7D64A231D206C00B5DB3A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D44160C231D1358001A0696 /* menu.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3D4410C7231D066B001A0696;
-			remoteInfo = menu;
-		};
-		3DA7D65B231D241A00B5DB3A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3DA7D657231D241A00B5DB3A /* engine.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3D4410C7231D066B001A0696;
-			remoteInfo = client;
-		};
 		3DA7D7F7231D263600B5DB3A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3DA7D7F3231D263600B5DB3A /* nanogl.xcodeproj */;
@@ -139,6 +174,18 @@
 			remoteInfo = xash;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3D2DCC04233211BF00ADBA6B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -166,11 +213,12 @@
 		3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsStoryboard.storyboard; sourceTree = "<group>"; };
 		3D11D3F922917BFC00393F66 /* SettingsSplitViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsSplitViewController.h; sourceTree = "<group>"; };
 		3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsSplitViewController.m; sourceTree = "<group>"; };
+		3D2DCC1023321B2A00ADBA6B /* menu.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = menu.xcodeproj; sourceTree = "<group>"; };
+		3D2DCC1623321B2A00ADBA6B /* server.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = server.xcodeproj; sourceTree = "<group>"; };
+		3D2DCC1C23321B2A00ADBA6B /* client.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = client.xcodeproj; sourceTree = "<group>"; };
+		3D2DCC2223321B2B00ADBA6B /* engine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = engine.xcodeproj; sourceTree = "<group>"; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3D3EE89D228F193400A695FE /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = Resources/maps; sourceTree = "<group>"; };
-		3D4410D9231D0697001A0696 /* server.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = server.xcodeproj; sourceTree = "<group>"; };
-		3D4413C0231D104D001A0696 /* client.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = client.xcodeproj; sourceTree = "<group>"; };
-		3D44160C231D1358001A0696 /* menu.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = menu.xcodeproj; sourceTree = "<group>"; };
 		3D4416F7231D1E07001A0696 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = "../SDL2/Xcode-iOS/SDL/SDL.xcodeproj"; sourceTree = "<group>"; };
 		3D525D7722252AAB00DD9932 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		3D5E35D6227768B10073D791 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Icon.png; sourceTree = "<group>"; };
@@ -184,7 +232,6 @@
 		3D670D7F227F05E80030B7D1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptionsSubAboutTableViewController.h; sourceTree = "<group>"; };
 		3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OptionsSubAboutTableViewController.m; sourceTree = "<group>"; };
-		3DA7D657231D241A00B5DB3A /* engine.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = engine.xcodeproj; sourceTree = "<group>"; };
 		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3DA7D7F3231D263600B5DB3A /* nanogl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = nanogl.xcodeproj; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
@@ -216,10 +263,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DA7D7F0231D258F00B5DB3A /* libxash.a in Frameworks */,
-				3D44160B231D133D001A0696 /* libclient.a in Frameworks */,
-				3D441367231D0B0B001A0696 /* libserver.a in Frameworks */,
-				3DA7D7FB231D30B600B5DB3A /* libmenu.a in Frameworks */,
+				3D2DCC2823321B4500ADBA6B /* libclient.a in Frameworks */,
+				3D2DCC2923321B4500ADBA6B /* libmenu.a in Frameworks */,
+				3D2DCC2A23321B4500ADBA6B /* libnanogl.a in Frameworks */,
+				3D2DCC2B23321B4500ADBA6B /* libserver.a in Frameworks */,
+				3D2DCC2C23321B4500ADBA6B /* libxash.a in Frameworks */,
 				3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */,
 				3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */,
 				3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */,
@@ -252,10 +300,10 @@
 			isa = PBXGroup;
 			children = (
 				3D4416F7231D1E07001A0696 /* SDL.xcodeproj */,
-				3DA7D657231D241A00B5DB3A /* engine.xcodeproj */,
-				3D44160C231D1358001A0696 /* menu.xcodeproj */,
-				3D4413C0231D104D001A0696 /* client.xcodeproj */,
-				3D4410D9231D0697001A0696 /* server.xcodeproj */,
+				3D2DCC1C23321B2A00ADBA6B /* client.xcodeproj */,
+				3D2DCC2223321B2B00ADBA6B /* engine.xcodeproj */,
+				3D2DCC1023321B2A00ADBA6B /* menu.xcodeproj */,
+				3D2DCC1623321B2A00ADBA6B /* server.xcodeproj */,
 				3DA7D7F3231D263600B5DB3A /* nanogl.xcodeproj */,
 				3D5E35E922776A480073D791 /* Info.plist */,
 				FD77A0040E26BC0500F39101 /* CSMoE-iOS */,
@@ -310,6 +358,38 @@
 				FDF0D71D0E12D2AB00247964 /* CoreAudio.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3D2DCC1123321B2A00ADBA6B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3D2DCC1523321B2A00ADBA6B /* libmenu.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3D2DCC1723321B2A00ADBA6B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3D2DCC1B23321B2A00ADBA6B /* libserver.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3D2DCC1D23321B2A00ADBA6B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3D2DCC2123321B2B00ADBA6B /* libclient.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3D2DCC2323321B2B00ADBA6B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3D2DCC2723321B2B00ADBA6B /* libxash.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		3D3EE8A4228F195200A695FE /* util */ = {
@@ -369,22 +449,6 @@
 			path = controller;
 			sourceTree = "<group>";
 		};
-		3D4410DA231D0697001A0696 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3D4410DE231D0697001A0696 /* libserver.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		3D4413C1231D104D001A0696 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3D4413C5231D104D001A0696 /* libclient.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3D4416F8231D1E07001A0696 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -394,22 +458,6 @@
 				3D44170A231D1E07001A0696 /* libSDL2.dylib */,
 				3D44170C231D1E07001A0696 /* libSDLmain.a */,
 				3D44170E231D1E07001A0696 /* libSDLmain.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		3DA7D646231D206C00B5DB3A /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3DA7D64B231D206C00B5DB3A /* libmenu.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		3DA7D658231D241A00B5DB3A /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3DA7D65C231D241A00B5DB3A /* libxash.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -466,6 +514,14 @@
 						DevelopmentTeam = S7JUSAWPG8;
 						ProvisioningStyle = Automatic;
 					};
+					3D2DCBF6233209E300ADBA6B = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Automatic;
+					};
+					3D2DCBFD23320D5D00ADBA6B = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CSMoE-iOS" */;
@@ -483,16 +539,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 3D4413C1231D104D001A0696 /* Products */;
-					ProjectRef = 3D4413C0231D104D001A0696 /* client.xcodeproj */;
+					ProductGroup = 3D2DCC1D23321B2A00ADBA6B /* Products */;
+					ProjectRef = 3D2DCC1C23321B2A00ADBA6B /* client.xcodeproj */;
 				},
 				{
-					ProductGroup = 3DA7D658231D241A00B5DB3A /* Products */;
-					ProjectRef = 3DA7D657231D241A00B5DB3A /* engine.xcodeproj */;
+					ProductGroup = 3D2DCC2323321B2B00ADBA6B /* Products */;
+					ProjectRef = 3D2DCC2223321B2B00ADBA6B /* engine.xcodeproj */;
 				},
 				{
-					ProductGroup = 3DA7D646231D206C00B5DB3A /* Products */;
-					ProjectRef = 3D44160C231D1358001A0696 /* menu.xcodeproj */;
+					ProductGroup = 3D2DCC1123321B2A00ADBA6B /* Products */;
+					ProjectRef = 3D2DCC1023321B2A00ADBA6B /* menu.xcodeproj */;
 				},
 				{
 					ProductGroup = 3DA7D7F4231D263600B5DB3A /* Products */;
@@ -503,30 +559,46 @@
 					ProjectRef = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
 				},
 				{
-					ProductGroup = 3D4410DA231D0697001A0696 /* Products */;
-					ProjectRef = 3D4410D9231D0697001A0696 /* server.xcodeproj */;
+					ProductGroup = 3D2DCC1723321B2A00ADBA6B /* Products */;
+					ProjectRef = 3D2DCC1623321B2A00ADBA6B /* server.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* CSMoE-iOS */,
+				3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */,
+				3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3D4410DE231D0697001A0696 /* libserver.a */ = {
+		3D2DCC1523321B2A00ADBA6B /* libmenu.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmenu.a;
+			remoteRef = 3D2DCC1423321B2A00ADBA6B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3D2DCC1B23321B2A00ADBA6B /* libserver.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libserver.a;
-			remoteRef = 3D4410DD231D0697001A0696 /* PBXContainerItemProxy */;
+			remoteRef = 3D2DCC1A23321B2A00ADBA6B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D4413C5231D104D001A0696 /* libclient.a */ = {
+		3D2DCC2123321B2B00ADBA6B /* libclient.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libclient.a;
-			remoteRef = 3D4413C4231D104D001A0696 /* PBXContainerItemProxy */;
+			remoteRef = 3D2DCC2023321B2B00ADBA6B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3D2DCC2723321B2B00ADBA6B /* libxash.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libxash.a;
+			remoteRef = 3D2DCC2623321B2B00ADBA6B /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		3D441704231D1E07001A0696 /* libSDL2.a */ = {
@@ -571,20 +643,6 @@
 			remoteRef = 3D44170D231D1E07001A0696 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7D64B231D206C00B5DB3A /* libmenu.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libmenu.a;
-			remoteRef = 3DA7D64A231D206C00B5DB3A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DA7D65C231D241A00B5DB3A /* libxash.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libxash.a;
-			remoteRef = 3DA7D65B231D241A00B5DB3A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		3DA7D7F8231D263600B5DB3A /* libnanogl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -624,6 +682,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		3D2DCBFA233209ED00ADBA6B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${SRCROOT}/cmake-build-${CONFIGURATION}/CMakeCache.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cmake -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DSDL2_INCLUDE_DIR=\"${SRCROOT}/../SDL2/include\" -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${BUILT_PRODUCTS_DIR}/cmake-build\"\n";
+		};
+		3D2DCC0123320D9600ADBA6B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${BUILT_PRODUCTS_DIR}/cmake-build/cl_dll/libclient.a",
+				"${BUILT_PRODUCTS_DIR}/cmake-build/dlls/libserver.a",
+				"${BUILT_PRODUCTS_DIR}/cmake-build/mainui_cpp/libmenu.a",
+				"${BUILT_PRODUCTS_DIR}/cmake-build/engine/libxash.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${BUILT_PRODUCTS_DIR}/cmake-build\" && cmake --build . -j 8\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -646,6 +746,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3D2DCC0323320DCF00ADBA6B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */;
+			targetProxy = 3D2DCC0223320DCF00ADBA6B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
@@ -677,6 +785,38 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
+		};
+		3D2DCBF8233209E300ADBA6B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3D2DCBF9233209E300ADBA6B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		3D2DCBFF23320D5D00ADBA6B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		3D2DCC0023320D5D00ADBA6B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
 		};
 		3D6C2EFE229841B200DACF3E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -792,6 +932,24 @@
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
 				3D6C2EFF229841B200DACF3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D2DCBF7233209E300ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-gen-csmoe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D2DCBF8233209E300ADBA6B /* Debug */,
+				3D2DCBF9233209E300ADBA6B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D2DCBFE23320D5D00ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-build-csmoe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D2DCBFF23320D5D00ADBA6B /* Debug */,
+				3D2DCC0023320D5D00ADBA6B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
