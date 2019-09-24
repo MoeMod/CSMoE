@@ -67,6 +67,7 @@ void CBalrog7::Precache(void)
 {
 	PRECACHE_MODEL("models/v_balrog7.mdl");
 	PRECACHE_MODEL("models/w_balrog7.mdl");
+	PRECACHE_MODEL("models/p_balrog7.mdl");
 	
 
 	PRECACHE_SOUND("weapons/balrog7-1.wav");
@@ -107,7 +108,7 @@ BOOL CBalrog7::Deploy(void)
 	m_iShotsFired = 0;
 	iShellOn = 1;
 
-	return DefaultDeploy("models/v_balrog7.mdl", "models/p_balrog7.mdl", BALROG7_DRAW, "balrog7", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_balrog7.mdl", "models/p_balrog7.mdl", BALROG7_DRAW, "m249", UseDecrement() != FALSE);
 }
 
 void CBalrog7::PrimaryAttack(void)
@@ -222,24 +223,24 @@ void CBalrog7::RadiusDamage(Vector vecAiming , float flDamage)
 	WRITE_COORD(vecAiming[1]);
 	WRITE_COORD(vecAiming[2]);
 	WRITE_SHORT(m_iModelExplo);
-	WRITE_BYTE(10);
+	WRITE_BYTE(15);
 	WRITE_BYTE(16);
-	WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES);
+	WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS);
 	MESSAGE_END();
 
-	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY);
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 	WRITE_BYTE(TE_EXPLOSION);
 	WRITE_COORD(vecAiming[0]);
 	WRITE_COORD(vecAiming[1]);
-	WRITE_COORD(vecAiming[2] + 20);
+	WRITE_COORD(vecAiming[2] + 20.0);
 	WRITE_SHORT(m_iBalrog7Explo);
 	WRITE_BYTE(10);
-	WRITE_BYTE(16);
-	WRITE_BYTE(TE_EXPLFLAG_NONE);
+	WRITE_BYTE(1);
+	WRITE_BYTE(TE_EXPLFLAG_NOSOUND | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS);
 	MESSAGE_END();
+
 }
 #endif
-
 void CBalrog7::ItemPostFrame()
 {	
 	if (!(this->m_pPlayer->pev->button & IN_ATTACK))
