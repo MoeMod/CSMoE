@@ -22,6 +22,10 @@ GNU General Public License for more details.
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include <numeric>
+#include <functional>
+
+#include "nodiscard.h"
 
 using EventListener = std::shared_ptr<void>;
 template<class F>
@@ -40,73 +44,107 @@ class EventDispatcher<R(Args...)>
 		using type = T & ;
 	};
 	template<class T>
-	struct ParseArg<T &&>
-	{
-		template<class = void> struct Error;
-		using type = typename Error<>::not_allowed_to_move_arg;
-	};
+	struct ParseArg<T &&>;
 
+	// 使用函数指针进行类型擦除（不使用虚表）
 	struct ICallable
 	{
-		// NOT using vtable any more! 
-		ICallable(void(ICallable::*p)(typename ParseArg<Args>::type...) const) : pfn(p) {}
-		void(ICallable::* const pfn)(typename ParseArg<Args>::type...) const = nullptr;
-		void operator()(typename ParseArg<Args>::type...args) const
+	public:
+		explicit ICallable(R(ICallable::*p)(typename ParseArg<Args>::type...)) : pfn(p) {}
+		R operator()(typename ParseArg<Args>::type...args)
 		{
-			(this->*pfn)(args...);
+			//assert(pfn != nullptr && pfn != &ICallable::operator());
+			return (this->*pfn)(args...);
 		}
+	private:
+		R(ICallable::* const pfn)(typename ParseArg<Args>::type...);
 	};
-	template<class F, class = void>
-	struct CCallable : ICallable
+
+	template<class F>
+	struct FunctionHolder
 	{
-		template<class RealF>
-		CCallable(RealF &&f) :
-			ICallable(static_cast<void(ICallable::*)(typename ParseArg<Args>::type...) const>(&CCallable::operator())),
-			m_Function(std::forward<RealF>(f))
-		{}
 		const F m_Function;
-		void operator()(typename ParseArg<Args>::type...args) const
+		R operator()(typename ParseArg<Args>::type...args)
 		{
-			m_Function(args...);
+			return m_Function(args...);
 		}
 	};
-	// empty base-class optimization for F...
-	template<class F>
-	struct CCallable<F, typename std::enable_if<std::is_empty<F>::value>::type> : ICallable, private F
+
+	// 如果F是空类直接继承F作为空基类，否则用FunctionHolder<F>装下
+	// ICallable必须是第一基类才能进行成员函数指针的转型
+	template<class F, class MyFunctionHolder = typename std::conditional<std::is_empty<F>::value && !std::is_final<F>::value, F, FunctionHolder<F>>::type>
+	class CCallable : public ICallable, private MyFunctionHolder
 	{
+	public:
 		template<class RealF>
-		CCallable(RealF &&f) :
-			ICallable{ static_cast<void(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) },
-			F(std::forward<RealF>(f))
+		explicit CCallable(RealF &&f) :
+				ICallable( static_cast<R(ICallable::*)(typename ParseArg<Args>::type...)>(&CCallable::operator()) ),
+				MyFunctionHolder{ std::forward<RealF>(f) }
 		{}
-		void operator()(typename ParseArg<Args>::type...args) const
+		R operator()(typename ParseArg<Args>::type...args)
 		{
-			F::operator()(args...);
+			return MyFunctionHolder::operator()(args...);
 		}
 	};
-public:
-	// dont move args!
-	void dispatch(typename ParseArg<Args>::type...args)
+
+private:
+	// 找出还存在的订阅集合并且返回
+	std::vector<std::shared_ptr<ICallable>> makeCallableSet() const
 	{
-		v.erase(std::remove_if(v.begin(), v.end(), [&](const std::weak_ptr<ICallable> &wpf) {
-			auto spf = wpf.lock();
-			if (!spf)
-				return true;
-			(*spf)(args...);
-			return false;
-		}), v.end());
+		std::vector<std::shared_ptr<ICallable>> sv(v.size());
+		// 将弱引用变成强引用
+		std::transform(v.begin(), v.end(), sv.begin(), std::mem_fn(&std::weak_ptr<ICallable>::lock));
+		// 去掉已经失效的订阅
+		sv.erase(std::remove(sv.begin(), sv.end(), nullptr), sv.end());
+		return sv;
 	}
-	// note that the lifespan of EventListener object keeps the callback
-	template<class F>
-	/*[[nodiscard]]*/ EventListener subscribe(F &&f)
+	// 用新的订阅集合替换之前的（按值传递是故意的）
+	void applyCallableSet(std::vector<std::weak_ptr<ICallable>> new_v) noexcept(std::is_nothrow_move_assignable<decltype(new_v)>::value)
 	{
-		auto sp = std::make_shared<CCallable<typename std::remove_reference<F>::type>>(std::forward<F>(f));
-		v.emplace_back(sp);
-		return sp;
+		v = std::move(new_v);
 	}
 
-	template<class C, class Ret, class...ArgsListener>
-	/*[[nodiscard]]*/ EventListener subscribe(Ret (C::*pmem_fn)(ArgsListener...), C *pthis)
+public:
+	// TODO 非线程安全
+	// 发布订阅，无视返回值（可能以任意回调函数抛出异常中断）
+	void dispatch(typename ParseArg<Args>::type...args)
+	{
+		const std::vector<std::shared_ptr<ICallable>> sv = makeCallableSet();
+		std::for_each(sv.begin(), sv.end(), [&args...](const std::shared_ptr<ICallable> &sp) { return (*sp)(args...); });
+		applyCallableSet({ sv.begin(), sv.end() });
+	}
+	// 发布订阅，并将调用的结果拷贝至out
+	// 注意：用conditional将R转换为依赖名才能进行SFINAE
+	template<class OutputIter, class = typename std::enable_if<!std::is_void<typename std::conditional<false, OutputIter, R>::type>::value>::type>
+	void dispatch_copy(typename ParseArg<Args>::type...args, OutputIter out)
+	{
+		const std::vector<std::shared_ptr<ICallable>> sv = makeCallableSet();
+		std::transform(sv.begin(), sv.end(), out, [&args...](const std::shared_ptr<ICallable> &sp) { return (*sp)(args...); });
+		applyCallableSet({ sv.begin(), sv.end() });
+	}
+	// 发布订阅，并使用map-reduce产生结果
+	// 注意：用conditional将R转换为依赖名才能进行SFINAE
+	template<class Mapper, class Reducer, class ResultType, class = typename std::enable_if<!std::is_void<typename std::conditional<false, ResultType, R>::type>::value>::type>
+	ResultType dispatch_map_reduce(typename ParseArg<Args>::type...args, Mapper mapper, Reducer reducer, ResultType init)
+	{
+		const std::vector<std::shared_ptr<ICallable>> sv = makeCallableSet();
+		const ResultType Result = std::inner_product(sv.begin(), sv.end(), sv.begin(), std::move(init), reducer,
+		                                             [mapper, &args...](const std::shared_ptr<ICallable> &sp, const std::shared_ptr<ICallable> &) { return mapper( (*sp)(args...) ); }
+		);
+		applyCallableSet({ sv.begin(), sv.end() });
+		return Result;
+	}
+	// 注册订阅普通回调函数，EventListener析构时订阅自动注销
+	template<class RealF>
+	NODISCARD EventListener subscribe(RealF &&f)
+	{
+		auto sp = std::make_shared<CCallable<typename std::decay<RealF>::type>>(std::forward<RealF>(f));
+		v.emplace_back(sp);
+		return std::move(sp);
+	}
+	// 注册订阅类成员函数
+	template<class C, class M>
+	NODISCARD EventListener subscribe(M C::*pmem_fn, C *pthis)
 	{
 		return subscribe([pmem_fn, pthis](typename ParseArg<Args>::type...args) { return (pthis->*pmem_fn)(args...); });
 	}
