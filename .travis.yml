@@ -108,6 +108,7 @@ jobs:
         repo: MoeMod/CSMoE
       overwrite: true
       skip_cleanup: true
+      prerelease: true
   - stage: build
     name: Build for Windows MSVC
     cache: ccache

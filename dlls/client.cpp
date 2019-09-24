@@ -2734,7 +2734,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 	{
 		int slot = Q_atoi(CMD_ARGV_(1));
 
-		if (player->m_iJoiningState == JOINED || (player->m_iMenu != SPECTATOR && player->m_iMenu != TERRORIST))
+		if (player->m_iJoiningState == JOINED || (player->m_iMenu != Menu_ChooseAppearance && player->m_iMenu != Menu_ChooseTeam))
 		{
 			if (slot == 10)
 			{
