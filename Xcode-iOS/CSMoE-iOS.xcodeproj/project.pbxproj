@@ -64,6 +64,8 @@
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
 		3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D670D7D227EE1210030B7D1 /* AppDelegate.m */; };
 		3D6C2F0F22988F6A00DACF3E /* OptionsSubAboutTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */; };
+		3D9CE41C2334B7F400758AC5 /* UnzipStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */; };
+		3D9CE42D2334BC0500758AC5 /* UnzipViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
@@ -232,6 +234,9 @@
 		3D670D7F227F05E80030B7D1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptionsSubAboutTableViewController.h; sourceTree = "<group>"; };
 		3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OptionsSubAboutTableViewController.m; sourceTree = "<group>"; };
+		3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = UnzipStoryboard.storyboard; sourceTree = "<group>"; };
+		3D9CE42B2334BC0500758AC5 /* UnzipViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnzipViewController.h; sourceTree = "<group>"; };
+		3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnzipViewController.m; sourceTree = "<group>"; };
 		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3DA7D7F3231D263600B5DB3A /* nanogl.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = nanogl.xcodeproj; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
@@ -411,6 +416,7 @@
 				3D11D3E9228F40AC00393F66 /* LandScapePicker.h */,
 				3D11D3EA228F40C900393F66 /* LandScapePicker.m */,
 				3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */,
+				3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -445,6 +451,8 @@
 				3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */,
 				3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */,
 				3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */,
+				3D9CE42B2334BC0500758AC5 /* UnzipViewController.h */,
+				3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -659,6 +667,7 @@
 			files = (
 				3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */,
 				3D3EE8A3228F193400A695FE /* maps in Resources */,
+				3D9CE41C2334B7F400758AC5 /* UnzipStoryboard.storyboard in Resources */,
 				3DC1E4B32289743100114D80 /* iTunesWindow.png in Resources */,
 				3DC1E4AA2289683200114D80 /* page1_en.png in Resources */,
 				3DC1E4CB228AE57200114D80 /* MainStoryboard.storyboard in Resources */,
@@ -734,6 +743,7 @@
 				3D11D3F1228F560F00393F66 /* MapDetailViewController.m in Sources */,
 				3D094FB4228F1D3B00F168C2 /* NewGameViewController.m in Sources */,
 				3D11D3EE228F484F00393F66 /* GameDirViewController.m in Sources */,
+				3D9CE42D2334BC0500758AC5 /* UnzipViewController.m in Sources */,
 				3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */,
 				3D11D3F4228F58D600393F66 /* MapMasterTableViewController.m in Sources */,
 				3D11D3FB22917BFC00393F66 /* SettingsSplitViewController.m in Sources */,
