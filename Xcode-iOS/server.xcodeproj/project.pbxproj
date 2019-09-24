@@ -12,6 +12,7 @@
 		3D1D534623312DA700D26B94 /* z4b_cannontiger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */; };
 		3D1D534723312DA700D26B94 /* z4b_infinityx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */; };
 		3D1D534823312DA700D26B94 /* z4b_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */; };
+		3D3D5A0A233A7A0F005E4B6A /* knife_dragonsword.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */; };
 		3D44116F231D06CD001A0696 /* triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E2231D06C5001A0696 /* triggers.cpp */; };
 		3D441170231D06CD001A0696 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E5231D06C5001A0696 /* items.cpp */; };
 		3D441171231D06CD001A0696 /* spectator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410ED231D06C5001A0696 /* spectator.cpp */; };
@@ -250,6 +251,7 @@
 		3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_cannontiger.cpp; sourceTree = "<group>"; };
 		3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_infinityx.cpp; sourceTree = "<group>"; };
 		3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m134heroi.cpp; sourceTree = "<group>"; };
+		3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knife_dragonsword.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libserver.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libserver.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D4410DF231D06C5001A0696 /* spectator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spectator.h; sourceTree = "<group>"; };
 		3D4410E0231D06C5001A0696 /* decals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = decals.h; sourceTree = "<group>"; };
@@ -1209,6 +1211,7 @@
 				3D1D533F23312DA700D26B94 /* z4b_facelessvoid.cpp */,
 				3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */,
 				3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */,
+				3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1620,6 +1623,7 @@
 				3D441323231D0789001A0696 /* wpn_wa2000.cpp in Sources */,
 				3D441195231D06CD001A0696 /* doors.cpp in Sources */,
 				3D4412E0231D0789001A0696 /* mod_zbb.cpp in Sources */,
+				3D3D5A0A233A7A0F005E4B6A /* knife_dragonsword.cpp in Sources */,
 				3D441318231D0789001A0696 /* z4b_Frequency9.cpp in Sources */,
 				3D441199231D06CD001A0696 /* mpstubb.cpp in Sources */,
 				3D44135C231D0789001A0696 /* cs_bot_learn.cpp in Sources */,
