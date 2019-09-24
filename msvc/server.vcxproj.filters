@@ -595,12 +595,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_cannontiger.cpp">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_cannonplasma.cpp">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\player\player_account.cpp">
       <Filter>dlls\player</Filter>
     </ClCompile>
@@ -667,9 +661,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\wpn_shared\wpn_infinityx.cpp">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
@@ -734,6 +725,15 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m134heroi.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_facelessvoid.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
+    <ClCompile Include="knife_dragonsword.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>

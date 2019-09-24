@@ -168,6 +168,7 @@ void 	item_suit	( entvars_t *pev );
 void 	item_thighpack	( entvars_t *pev );
 void 	knife_dualsword	( entvars_t *pev );
 void 	knife_skullaxe	( entvars_t *pev );
+void 	knife_dragonsword(entvars_t *pev);
 void 	knife_zombi	( entvars_t *pev );
 void 	light	( entvars_t *pev );
 void 	light_environment	( entvars_t *pev );
@@ -425,6 +426,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "item_thighpack", (void *)item_thighpack },
 		{ "knife_dualsword", (void *)knife_dualsword },
 		{ "knife_skullaxe", (void *)knife_skullaxe },
+		{ "knife_dragonsword", (void *)knife_dragonsword },
 		{ "knife_zombi", (void *)knife_zombi },
 		{ "light", (void *)light },
 		{ "light_environment", (void *)light_environment },

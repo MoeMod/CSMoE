@@ -240,6 +240,7 @@
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\public\MemPool.cpp" />
     <ClCompile Include="..\public\unicode_strtools.cpp" />
+    <ClCompile Include="knife_dragonsword.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\bspfile.h" />
