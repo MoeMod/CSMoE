@@ -152,6 +152,7 @@
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
     <ClCompile Include="..\dlls\weapons_precache.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
@@ -240,7 +241,6 @@
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\public\MemPool.cpp" />
     <ClCompile Include="..\public\unicode_strtools.cpp" />
-    <ClCompile Include="knife_dragonsword.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\bspfile.h" />
