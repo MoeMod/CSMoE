@@ -1243,7 +1243,7 @@ autocomplete_list_t cmd_list[] =
 { "cd", Cmd_GetCdCommands },
 { "md5", Cmd_GetFilesList },
 { "crc32", Cmd_GetFilesList },
-{ NULL }, // terminator
+{ NULL, NULL }, // terminator
 };
 
 /*
