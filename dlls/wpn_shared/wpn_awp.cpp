@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_awp.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -158,7 +162,7 @@ void CAWP::AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_338MAG, 115, 0.99, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_338MAG, GetDamage(), 0.99, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -217,6 +221,18 @@ float CAWP::GetMaxSpeed(void)
 		return 210;
 
 	return 150;
+}
+
+float CAWP::GetDamage() const
+{
+	float flDamage = 115.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 265.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 265.0f;
+#endif
+	return flDamage;
 }
 
 }

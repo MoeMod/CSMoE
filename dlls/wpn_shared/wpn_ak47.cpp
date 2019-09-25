@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_ak47.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -131,7 +135,7 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, 36, 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, GetDamage(), 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -190,4 +194,15 @@ void CAK47::WeaponIdle(void)
 	SendWeaponAnim(AK47_IDLE1, UseDecrement() != FALSE);
 }
 
+float CAK47::GetDamage() const
+{
+	float flDamage = 36.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 42.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 42.0f;
+#endif
+	return flDamage;
+}
 } // namespace cl/sv

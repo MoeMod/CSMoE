@@ -41,7 +41,7 @@ public:
 
 public:
 	void DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
-
+	float GetDamage() const;
 	int m_iShell;
 
 private:

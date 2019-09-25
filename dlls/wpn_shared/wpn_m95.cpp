@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_m95.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -157,7 +161,7 @@ void CM95::M95Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 4, BULLET_PLAYER_338MAG, M95_DAMAGE, M95_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 4, BULLET_PLAYER_338MAG, GetDamage(), M95_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -215,4 +219,15 @@ float CM95::GetMaxSpeed(void)
 	return M95_MAX_SPEED_ZOOM;
 }
 
+float CM95::GetDamage() const
+{
+	float flDamage = 120.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 399.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 399.0f;
+#endif
+	return flDamage;
+}
 }

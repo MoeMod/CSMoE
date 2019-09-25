@@ -13,7 +13,6 @@ namespace sv {
 //as50
 #define AS50_MAX_SPEED		205
 #define AS50_MAX_SPEED_ZOOM	160
-#define AS50_DAMAGE		115
 #define AS50_RANGE_MODIFER	0.98
 #define AS50_RELOAD_TIME	3.0s
 #define AS50_ARMOR_RATIO_MODIFIER	1.7
@@ -49,7 +48,7 @@ public:
 
 public:
 	void AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 
 private:

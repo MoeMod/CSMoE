@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_wa2000.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -160,7 +164,7 @@ void CWA2000::WA2000Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, 110, 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, GetDamage(), 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -225,4 +229,15 @@ float CWA2000::GetMaxSpeed(void)
 	return 150;
 }
 
+float CWA2000::GetDamage() const
+{
+	float flDamage = 109.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 145.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 109.0f;
+#endif
+	return flDamage;
+}
 }

@@ -41,7 +41,7 @@ public:
 
 public:
 	void AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 
 private:

@@ -41,7 +41,7 @@ public:
 
 public:
 	void G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float CG3SG1::GetDamage() const;
 	int m_iShell;
 
 private:

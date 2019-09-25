@@ -41,6 +41,7 @@ public:
 
 public:
 	void FiveSevenFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
+	float CFiveSeven::GetDamage() const;
 	NOXREF void MakeBeam();
 	NOXREF void BeamUpdate();
 

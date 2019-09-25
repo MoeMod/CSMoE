@@ -12,7 +12,6 @@ namespace sv {
 
 //m249
 #define M249_MAX_SPEED            220
-#define M249_DAMAGE            32
 #define M249_RANGE_MODIFER        0.97
 #define M249_RELOAD_TIME        4.7
 
@@ -40,7 +39,7 @@ public:
 
 public:
 	void M249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 	int iShellOn;
 

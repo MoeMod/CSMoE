@@ -1,6 +1,6 @@
 /***
-*
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	wpn_balrog7.cpp
+*	Copyright (c) 2019, JustANoobQAQ.
 *
 *	This product contains software technology licensed from Id
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
@@ -252,11 +252,22 @@ float CBalrog7::GetDamage()
 {
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZBS)
-		return 600.0;
+		return 35.0f;
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		return 400.0;
+		return 35.0f;
 #endif
-	return 105.0;
+	return 35.0f;
+}
+
+float CBalrog7::BalrogDamage()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 600.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 400.0f;
+#endif
+	return 105.0f;
 }
 
 void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -291,7 +302,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 32, 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -307,8 +318,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	{
 
 		iShootTime = 0;
-		float flDamage = GetDamage();
-		int bitsDamageType;
+		float flDamage = BalrogDamage();
 		CBaseEntity *pevAttacker = this->m_pPlayer;
 		auto vecAiming = Get_Aiming(pevAttacker);
 
