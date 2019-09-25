@@ -40,7 +40,7 @@ public:
 
 public:
 	void MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 	int iShellOn;
 

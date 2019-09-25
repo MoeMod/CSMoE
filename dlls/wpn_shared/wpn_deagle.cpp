@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_deagle.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -163,7 +167,7 @@ void CDEAGLE::DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, 54, 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -213,4 +217,15 @@ void CDEAGLE::WeaponIdle(void)
 		SendWeaponAnim(SHIELDGUN_DRAWN_IDLE, UseDecrement() != FALSE);
 }
 
+float CDEAGLE::GetDamage() const
+{
+	float flDamage = 56.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 70.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 70.0f;
+#endif
+	return flDamage;
+}
 }

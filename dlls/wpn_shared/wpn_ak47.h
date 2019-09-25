@@ -41,7 +41,7 @@ public:
 
 public:
 	void AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 	int iShellOn;
 

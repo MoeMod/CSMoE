@@ -1,6 +1,6 @@
 /*
-knife_skullaxe.cpp
-Copyright (C) 2019 Moemod Hyakuya
+knife_dragonsword.cpp
+Copyright (C) 2019 JustANoobQAQ
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ namespace sv {
 			m_iSwing = 0;
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_pPlayer->m_bShieldDrawn = false;
+			m_flTimeWeaponIdle = 1.5s;
 			return Base::Deploy();
 		}
 
@@ -168,7 +169,6 @@ namespace sv {
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-		m_iSwing++;
 		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 95, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 		case HIT_NONE:
@@ -195,7 +195,7 @@ namespace sv {
 		}
 		}
 #endif
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+
 		SetThink(nullptr);
 
 		//return fDidHit;
@@ -242,10 +242,8 @@ namespace sv {
 		}
 #endif
 
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 		SetThink(nullptr);
 
 		//return fDidHit;
 	}
-
 }

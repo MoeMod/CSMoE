@@ -40,7 +40,7 @@ public:
 
 public:
 	void ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
-
+	float GetDamage() const;
 public:
 	int m_iShell;
 	unsigned short m_usFireELITE_LEFT;

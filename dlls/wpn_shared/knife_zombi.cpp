@@ -115,6 +115,7 @@ void CKnife_Zombi::SecondaryAttack(void)
 {
 	Stab(TRUE);
 	pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.35s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
 void CKnife_Zombi::WeaponIdle(void)

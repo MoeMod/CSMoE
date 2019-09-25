@@ -43,7 +43,7 @@ public:
 
 public:
 	void WA2000Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 public:
 	int m_iShell;
 
