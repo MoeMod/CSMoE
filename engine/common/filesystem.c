@@ -1268,7 +1268,7 @@ static qboolean FS_WriteGameInfo( const char *filepath, gameinfo_t *GameInfo )
 		FS_Printf( f, "version\t\t%g\n", GameInfo->version );
 
 	if( GameInfo->size != 0 )
-		FS_Printf( f, "size\t\t%i\n", (int)GameInfo->size );
+		FS_Printf( f, "size\t\t%i\n", GameInfo->size );
 
 	if( Q_strlen( GameInfo->game_url ))
 		FS_Printf( f, "url_info\t\t\"%s\"\n", GameInfo->game_url );
@@ -1716,7 +1716,7 @@ static qboolean FS_ParseGameInfo( const char *gamedir, gameinfo_t *GameInfo )
 		}
 		else if( roGameInfoTime > rwGameInfoTime )
 		{
-			char *afile_ro = (char *)FS_LoadDirectFile( filepath_ro, NULL );
+			char *afile_ro = FS_LoadDirectFile( filepath_ro, NULL );
 
 			if( afile_ro )
 			{

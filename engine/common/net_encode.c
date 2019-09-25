@@ -304,7 +304,7 @@ D( "weapon_data_t", wd_fields ),
 D( "entity_state_t", ent_fields ),
 D( "entity_state_player_t", ent_fields ),
 D( "custom_entity_state_t", ent_fields ),
-{ NULL, NULL },
+{ NULL },
 };
 #undef D
 

@@ -31,7 +31,7 @@ qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize )
 
 	if( filesize != 768 )
 	{
-		MsgDev( D_ERROR, "Image_LoadPAL: (%s) have invalid size (%d should be %d)\n", name, (int)filesize, 768 );
+		MsgDev( D_ERROR, "Image_LoadPAL: (%s) have invalid size (%d should be %d)\n", name, filesize, 768 );
 		return false;
 	}
 
@@ -303,7 +303,7 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize )
 
 	if( filesize < sizeof( lmp ) + pixels )
 	{
-		MsgDev( D_ERROR, "Image_LoadLMP: file (%s) have invalid size %d\n", name, (int)filesize );
+		MsgDev( D_ERROR, "Image_LoadLMP: file (%s) have invalid size %d\n", name, filesize );
 		return false;
 	}
 

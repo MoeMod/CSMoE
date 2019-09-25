@@ -922,11 +922,7 @@ Host_Crash_f
 */
 static void Host_Crash_f( void )
 {
-#if __APPLE__
-	__builtin_trap();
-#else
 	*(int *)0 = 0xffffffff;
-#endif
 }
 /*
 =================
