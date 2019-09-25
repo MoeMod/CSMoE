@@ -13,7 +13,6 @@ namespace sv {
 //sg550
 #define SG550_MAX_SPEED			210
 #define SG550_MAX_SPEED_ZOOM		150
-#define SG550_DAMAGE			70
 #define SG550_RANGE_MODIFER		0.98
 #define SG550_RELOAD_TIME		3.35
 
@@ -41,7 +40,7 @@ public:
 
 public:
 	void SG550Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 public:
 	int m_iShell;
 

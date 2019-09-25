@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_fiveseven.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -221,4 +225,15 @@ void CFiveSeven::WeaponIdle(void)
 	}
 }
 
+float CFiveSeven::GetDamage() const
+{
+	float flDamage = 20.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 20.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 20.0f;
+#endif
+	return flDamage;
+}
 }

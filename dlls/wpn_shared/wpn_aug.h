@@ -40,7 +40,7 @@ public:
 
 public:
 	void AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 	int m_iShell;
 	int iShellOn;
 

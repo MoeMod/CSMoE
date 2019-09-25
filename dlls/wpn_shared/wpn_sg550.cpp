@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_sg550.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -151,7 +155,7 @@ void CSG550::SG550Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 70, 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -216,4 +220,15 @@ float CSG550::GetMaxSpeed(void)
 	return 150;
 }
 
+float CSG550::GetDamage() const
+{
+	float flDamage = 70.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 84.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 84.0f;
+#endif
+	return flDamage;
+}
 }

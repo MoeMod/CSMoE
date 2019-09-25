@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_aug.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -147,7 +151,7 @@ void CAUG::AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 32, 0.96, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.96, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -206,4 +210,15 @@ void CAUG::WeaponIdle(void)
 	SendWeaponAnim(AUG_IDLE1, UseDecrement() != FALSE);
 }
 
+float CAUG::GetDamage() const
+{
+	float flDamage = 32.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 70.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 70.0f;
+#endif
+	return flDamage;
+}
 }

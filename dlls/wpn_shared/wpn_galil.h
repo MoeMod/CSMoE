@@ -40,7 +40,7 @@ public:
 
 public:
 	void GalilFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+	float GetDamage() const;
 public:
 	int m_iShell;
 	int iShellOn;

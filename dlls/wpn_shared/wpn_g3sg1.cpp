@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_g3sg1.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -153,7 +157,7 @@ void CG3SG1::G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, 80, 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, GetDamage(), 0.98, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -218,4 +222,15 @@ float CG3SG1::GetMaxSpeed(void)
 	return 150;
 }
 
+float CG3SG1::GetDamage() const
+{
+	float flDamage = 80.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 80.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 80.0f;
+#endif
+	return flDamage;
+}
 }
