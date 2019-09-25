@@ -16,7 +16,7 @@ public:
 	static constexpr const auto & WeaponIdleTime = 20s;
 
 public:
-	void WeaponIdle(void)
+	void WeaponIdle(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		wpn.ResetEmptySound();
