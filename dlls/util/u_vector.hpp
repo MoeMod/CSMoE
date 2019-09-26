@@ -18,6 +18,8 @@ GNU General Public License for more details.
 
 #include <utility>
 #include <numeric>
+#include <array>
+#include <type_traits>
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -304,16 +306,16 @@ template<class T, std::size_t N> struct VectorBase : VectorBase_Gen<T, N, std::m
 	{
 		return DotProduct(v1.Make2D(), v2.Make2D());
 	}
+
+	constexpr bool IsNull() const
+	{
+		return LengthSquared() == T{};
+	}
 };
 
 template<class T> constexpr VectorBase<T, 3> CrossProduct(VectorBase<T, 3> a, VectorBase<T, 3> b)
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
-}
-
-template<class VecType> typename VecType::value_type AngleBetweenVectors(VecType a, VecType b)
-{
-	return acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
 }
 
 }

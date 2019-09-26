@@ -683,7 +683,7 @@ void EV_HLDM_FireBullets(int idx,
 
 	for ( iShot = 1; iShot <= cShots; iShot++ )
 	{
-		Vector vecShotSrc = vecSrc;
+		Vector vecShotSrc(vecSrc);
 		int iShotPenetration = iPenetration;
 		Vector vecDir, vecEnd;
 

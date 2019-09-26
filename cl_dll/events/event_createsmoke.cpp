@@ -55,7 +55,7 @@ void EV_CreateSmoke(event_args_s *args)
 		for( int i = 0; i < SMOKE_CLOUDS; i++ )
 		{
 			// randomize smoke cloud position
-			Vector org = args->origin;
+			Vector org(args->origin);
 			org.x += Com_RandomFloat(-100.0f, 100.0f);
 			org.y += Com_RandomFloat(-100.0f, 100.0f);
 			org.z += 30; 
