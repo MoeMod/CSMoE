@@ -48,9 +48,8 @@ public:
 
 public:
 	void Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-	void RadiusDamage(Vector vecAiming, float flDamage);
 	float GetDamage();
-	float BalrogDamage();
+	Vector Get_Aiming(CBaseEntity *pevAttacker);
 	int m_iShell;
 	int iShellOn;
 	int m_iModelExplo;
