@@ -1,3 +1,5 @@
+#include <memory>
+
 /*
 zb2_zclass_tank.cpp - CSMoE Gameplay server : Zombie Mod 2
 Copyright (C) 2019 Moemod Yanase
@@ -30,7 +32,7 @@ namespace sv {
 
 CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "zombi_origin" : "zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -59,6 +61,8 @@ void CZombieClass_Default::InitHUD() const
 void CZombieClass_Default::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 290;
+	if (m_pZombieSkill)
+		m_pZombieSkill->ResetMaxSpeed();
 }
 
 float CZombieClass_Default::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const

@@ -16,7 +16,7 @@ namespace sv {
 // It will allocate the class and entity if necessary
 //
 template<class T>
-auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+NODISCARD auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// call from mp to create entity ?
 	if (pev == nullptr)
@@ -40,7 +40,7 @@ auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_bas
 // pEntityVars should point to entvars_t, but can have different static type to deduce T
 // deprecated
 template<class T>
-DEPRECATED auto GetClassPtr(T *a) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+NODISCARD DEPRECATED auto GetClassPtr(T *a) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// this is the real type...
 	entvars_t *pev = reinterpret_cast<entvars_t *>(a);
@@ -48,7 +48,7 @@ DEPRECATED auto GetClassPtr(T *a) noexcept -> typename std::enable_if<std::is_ba
 }
 
 template<class T>
-T *CreateClassPtr()
+NODISCARD T *CreateClassPtr()
 {
 	return GetClassPtr<T>(nullptr);
 }

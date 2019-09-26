@@ -9,7 +9,17 @@
 namespace sv {
 enginefuncs_t g_engfuncs;
 globalvars_t *gpGlobals;
+
+// time_point implementation
+namespace moe{
+auto EngineClock::now() -> time_point
+{
+	return gpGlobals->time;
 }
+}
+
+}
+
 
 #if defined (_MSC_VER) && (_MSC_VER > 1000) && !defined(_WIN64)
 	#pragma comment (linker, "/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1")

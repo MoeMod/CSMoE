@@ -34,6 +34,7 @@ namespace cl {
 			static constexpr bool is_steady = false;
 			static time_point now();
 
+			/*
 			struct TimePointConverter
 			{
 				time_point tp;
@@ -48,19 +49,19 @@ namespace cl {
 			};
 
 			// ADL should find those friends
-			friend TimePointConverter operator+(time_point a, float b) noexcept
+			DEPRECATED friend TimePointConverter operator+(time_point a, float b) noexcept
 			{
 				return { a + duration(b) };
 			}
-			friend TimePointConverter operator-(time_point a, float b) noexcept
+			DEPRECATED friend TimePointConverter operator-(time_point a, float b) noexcept
 			{
 				return { a - duration(b) };
 			}
-			friend TimePointConverter operator+(float a, time_point b) noexcept
+			DEPRECATED friend TimePointConverter operator+(float a, time_point b) noexcept
 			{
 				return { duration(a) + b };
 			}
-			/*
+
 			DEPRECATED friend constexpr bool operator>(time_point a, float b) noexcept { return a.time_since_epoch().count() > b; }
 			DEPRECATED friend constexpr bool operator>=(time_point a, float b) noexcept { return a.time_since_epoch().count() >= b; }
 			DEPRECATED friend constexpr bool operator<(time_point a, float b) noexcept { return a.time_since_epoch().count() < b; }
