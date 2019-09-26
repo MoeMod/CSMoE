@@ -4,8 +4,6 @@
 #pragma once
 #endif
 
-class Vector; // vector.h
-
 #ifdef CLIENT_DLL
 namespace cl {
 #else

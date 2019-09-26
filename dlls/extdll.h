@@ -71,7 +71,6 @@ typedef int BOOL;
 									// Vector class
 #include "vector.h"
 									// Defining it as a (bogus) struct helps enforce type-checking
-#define vec3_t Vector
 
 #include "util/u_time.hpp"
 
@@ -81,6 +80,7 @@ using namespace sv::moe;
 using namespace cl::moe;
 #endif
 
+#define vec3_t Vector
 #define time_point_t EngineClock::time_point
 #define duration_t EngineClock::duration
 

@@ -862,8 +862,8 @@ void CHostage::Touch(CBaseEntity *pOther)
 			return;
 	}
 
-	vPush = (pev->origin - pOther->pev->origin).Make2D();
-	pev->velocity = pev->velocity + NormalizeMulScalar<float, float, float>(vPush, pushForce);
+	vPush = (pev->origin - pOther->pev->origin).Make2D().Normalize();
+	pev->velocity = pev->velocity + Vector(vPush.x * pushForce, vPush.y * pushForce, 0);
 }
 
 void CHostage::DoFollow()

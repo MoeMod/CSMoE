@@ -269,9 +269,7 @@ node_index_t CLocalNav::GetBestNode(Vector &vecOrigin, Vector &vecDest)
 			float flDistToDest;
 			float flZDiff = -1.0;
 
-			flDistFromStart = LengthSubtract
-				<float, float,
-				float, float>(vecDest, nodeCurrent->vecLoc);
+			flDistFromStart = (nodeCurrent->vecLoc - vecDest).Length();
 
 			flDistToDest = nodeCurrent->vecLoc.z - vecDest.z;
 			if (flDistToDest >= 0.0)
@@ -433,7 +431,7 @@ node_index_t CLocalNav::FindDirectPath(Vector &vecStart, Vector &vecDest, float 
 	Vector vecNodeLoc;
 	node_index_t nindexLast;
 
-	vecPathDir = NormalizeSubtract<float, float, float, float>(vecStart, vecDest);
+	vecPathDir = (vecDest - vecStart).Normalize();
 	vecActualDest = vecDest - (vecPathDir * flTargetRadius);
 
 	if (PathTraversable(vecStart, vecActualDest, fNoMonsters) == PATH_TRAVERSABLE_EMPTY)
@@ -490,7 +488,7 @@ int CLocalNav::PathTraversable(Vector &vecSource, Vector &vecDest, int fNoMonste
 	vecSrcTmp = vecSource;
 	vecDestTmp = vecDest - vecSource;
 
-	vecDir = vecDestTmp.NormalizePrecision();
+	vecDir = vecDestTmp.Normalize();
 	vecDir.z = 0;
 
 	flTotal = vecDestTmp.Length2D();
