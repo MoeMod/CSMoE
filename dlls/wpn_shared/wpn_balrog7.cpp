@@ -45,7 +45,6 @@ public:
 		Precache();
 
 		SET_MODEL(this->edict(), "sprites/balrogcritical.spr");
-		RadiusDamage(this->pev->origin, BalrogDamage());
 		pev->origin[2] += 24.0f;
 		pev->rendermode = kRenderTransAdd; // 5;
 		pev->renderfx = kRenderFxNone;
@@ -78,101 +77,9 @@ public:
 	void Precache() override
 	{
 		PRECACHE_MODEL("sprites/balrogcritical.spr");
-		PRECACHE_MODEL("sprites/eexplo.spr");
 	}
 
-	float BalrogDamage()
-	{
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			return 600.0f;
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 400.0f;
-#endif
-		return 105.0f;
-	}
-
-	void RadiusDamage(Vector vecAiming, float flDamage)
-	{
-		float flRadius = 85.0f;
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flRadius = 140.0f;
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flRadius = 125.0f;
-#endif		
-		const Vector vecSrc = pev->origin;
-		entvars_t * const pevAttacker = VARS(pev->owner);
-		entvars_t * const pevInflictor = this->pev;
-		int bitsDamageType = DMG_BULLET;
-
-		TraceResult tr;
-		const float falloff = flRadius ? flDamage / flRadius : 1;
-		const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-		CBaseEntity *pEntity = NULL;
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-		{
-			if (pEntity->pev->takedamage != DAMAGE_NO)
-			{
-				if (bInWater && !pEntity->pev->waterlevel)
-					continue;
-
-				if (!bInWater && pEntity->pev->waterlevel == 3)
-					continue;
-
-				if (pEntity->IsBSPModel())
-					continue;
-
-				if (pEntity->pev == pevAttacker)
-					continue;
-
-				Vector vecSpot = pEntity->BodyTarget(vecSrc);
-				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-				{
-					if (tr.fStartSolid)
-					{
-						tr.vecEndPos = vecSrc;
-						tr.flFraction = 0;
-					}
-					float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-					flAdjustedDamage = Q_max(0, flAdjustedDamage);
-
-					if (tr.flFraction == 1.0f)
-					{
-						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-					}
-					else
-					{
-						tr.iHitgroup = HITGROUP_CHEST;
-						ClearMultiDamage();
-						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-						ApplyMultiDamage(pevInflictor, pevAttacker);
-					}
-
-					/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-					if (pVictim->m_bIsZombie) // Zombie Knockback...
-					{
-					ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-					}*/
-				}
-			}
-		}
-
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_EXPLOSION);
-		WRITE_COORD(vecAiming[0]);
-		WRITE_COORD(vecAiming[1]);
-		WRITE_COORD(vecAiming[2]);
-		WRITE_SHORT(MODEL_INDEX("sprites/eexplo.spr"));
-		WRITE_BYTE(12);
-		WRITE_BYTE(30);
-		WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS);
-		MESSAGE_END();
-
-	}
+	
 	time_point_t flife;
 
 
@@ -229,7 +136,7 @@ void CBalrog7::Precache(void)
 	PRECACHE_MODEL("models/v_balrog7.mdl");
 	PRECACHE_MODEL("models/w_balrog7.mdl");
 	PRECACHE_MODEL("models/p_balrog7.mdl");
-	
+	PRECACHE_MODEL("sprites/eexplo.spr");
 
 	PRECACHE_SOUND("weapons/balrog7-1.wav");
 	PRECACHE_SOUND("weapons/balrog7_exp.wav");
@@ -330,6 +237,101 @@ float CBalrog7::GetDamage()
 	return 36.0f;
 }
 
+#ifndef CLIENT_DLL
+float CBalrog7::BalrogDamage()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 600.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 400.0f;
+#endif
+	return 105.0f;
+}
+
+void CBalrog7::RadiusDamage(Vector vecAiming, float flDamage)
+{
+	float flRadius = 85.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flRadius = 140.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flRadius = 125.0f;
+#endif		
+	const Vector vecSrc = vecAiming;
+	entvars_t * const pevAttacker = VARS(pev->owner);
+	entvars_t * const pevInflictor = this->pev;
+	int bitsDamageType = DMG_BULLET;
+
+	TraceResult tr;
+	const float falloff = flRadius ? flDamage / flRadius : 1;
+	const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+	CBaseEntity *pEntity = NULL;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage != DAMAGE_NO)
+		{
+			if (bInWater && !pEntity->pev->waterlevel)
+				continue;
+
+			if (!bInWater && pEntity->pev->waterlevel == 3)
+				continue;
+
+			if (pEntity->IsBSPModel())
+				continue;
+
+			if (pEntity->pev == pevAttacker)
+				continue;
+
+			Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+			{
+				if (tr.fStartSolid)
+				{
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0;
+				}
+				float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+				flAdjustedDamage = Q_max(0, flAdjustedDamage);
+
+				if (tr.flFraction == 1.0f)
+				{
+					pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+				}
+				else
+				{
+					tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+				}
+
+				/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+				if (pVictim->m_bIsZombie) // Zombie Knockback...
+				{
+				ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
+				}*/
+			}
+		}
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_EXPLOSION);
+	WRITE_COORD(vecAiming[0]);
+	WRITE_COORD(vecAiming[1]);
+	WRITE_COORD(vecAiming[2]);
+	WRITE_SHORT(MODEL_INDEX("sprites/eexplo.spr"));
+	WRITE_BYTE(12);
+	WRITE_BYTE(30);
+	WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS);
+	MESSAGE_END();
+
+}
+#endif
+
 void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
@@ -380,7 +382,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		iShootTime = 0;
 		CBaseEntity *pevAttacker = this->m_pPlayer;
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
-
+		RadiusDamage(vecShootPosition, BalrogDamage());
 		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{

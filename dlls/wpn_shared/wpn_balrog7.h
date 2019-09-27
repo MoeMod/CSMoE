@@ -49,6 +49,8 @@ public:
 public:
 	void Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();
+	float BalrogDamage();
+	void RadiusDamage(Vector vecAiming, float flDamage);
 	Vector Get_ShootPosition(CBaseEntity *pevAttacker, Vector vecSrc,Vector vecDir);
 	int m_iShell;
 	int iShellOn;
