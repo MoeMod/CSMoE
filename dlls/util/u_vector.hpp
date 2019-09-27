@@ -114,12 +114,12 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	}
 	// make it template cast operator function for lower priority
 	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
-	operator R *() &
+	operator R *()
 	{
 		return data();
 	}
 	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
-	operator const R *() const &
+	operator const R *() const
 	{
 		return data();
 	}
