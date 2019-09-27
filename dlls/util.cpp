@@ -15,6 +15,7 @@ unsigned int glSeed;
 
 #include <string>
 #include <functional>
+#include <utility>
 
 namespace sv {
 
@@ -593,9 +594,9 @@ void UTIL_MakeInvVectors(const Vector &vec, globalvars_t *pgv)
 
 	pgv->v_right = pgv->v_right * -1;
 
-	SWAP(pgv->v_forward.y, pgv->v_right.x);
-	SWAP(pgv->v_forward.z, pgv->v_up.x);
-	SWAP(pgv->v_right.z, pgv->v_up.y);
+	std::swap(pgv->v_forward.y, pgv->v_right.x);
+	std::swap(pgv->v_forward.z, pgv->v_up.x);
+	std::swap(pgv->v_right.z, pgv->v_up.y);
 }
 
 void UTIL_EmitAmbientSound(edict_t *entity, const Vector &vecOrigin, const char *samp, float vol, float attenuation, int fFlags, int pitch)

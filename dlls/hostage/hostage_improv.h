@@ -376,7 +376,7 @@ public:
 			return true;
 
 		to = entity->pev->origin - m_improv->GetCentroid();
-		range = to.NormalizeInPlace<float>();
+		range = to.NormalizeInPlace();
 		CBasePlayer *player = static_cast<CBasePlayer *>(entity);
 
 		const float spring = 50.0f;

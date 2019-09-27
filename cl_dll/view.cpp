@@ -958,7 +958,7 @@ void V_GetChaseOrigin( float * angles, float * origin, float distance, float * r
 	AngleVectors( angles, forward, right, up );
 	forward = -forward;
 
-	vecStart = origin;
+	vecStart = Vector(origin);
 	vecEnd = vecStart + forward * distance;
 
 	int ignoreent = -1;	// first, ignore no entity

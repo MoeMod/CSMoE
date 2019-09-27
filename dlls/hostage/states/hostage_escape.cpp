@@ -206,7 +206,7 @@ void HostageEscapeState::OnUpdate(CHostageImprov *improv)
 		}
 
 		const float farRange = 750.0f;
-		if ((player->pev->origin - improv->GetCentroid().IsLengthGreaterThan(farRange)))
+		if ((player->pev->origin - improv->GetCentroid()).IsLengthGreaterThan(farRange))
 		{
 			improv->Frighten(CHostageImprov::NERVOUS);
 
