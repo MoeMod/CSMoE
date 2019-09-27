@@ -152,6 +152,7 @@ void 	gibshooter	( entvars_t *pev );
 void 	grenade	( entvars_t *pev );
 void 	gungnir_projectile	( entvars_t *pev );
 void 	gungnir_spear	( entvars_t *pev );
+void 	balrog7_explosion(entvars_t *pev);
 void 	hostage_entity	( entvars_t *pev );
 void 	info_bomb_target	( entvars_t *pev );
 void 	info_hostage_rescue	( entvars_t *pev );
@@ -410,6 +411,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "grenade", (void *)grenade },
 		{ "gungnir_projectile", (void *)gungnir_projectile },
 		{ "gungnir_spear", (void *)gungnir_spear },
+		{ "balrog7_explosion", (void *)balrog7_explosion },
 		{ "hostage_entity", (void *)hostage_entity },
 		{ "info_bomb_target", (void *)info_bomb_target },
 		{ "info_hostage_rescue", (void *)info_hostage_rescue },
