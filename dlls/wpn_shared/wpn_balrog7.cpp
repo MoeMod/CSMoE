@@ -179,6 +179,7 @@ public:
 protected:
 	void Remove()
 	{
+		SetThink(nullptr);
 		pev->effects |= EF_NODRAW; // 0x80u
 		return UTIL_Remove(this);
 	}
@@ -293,21 +294,18 @@ void CBalrog7::SecondaryAttack(void)
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
-Vector CBalrog7::Get_Aiming(CBaseEntity *pevAttacker)
+Vector CBalrog7::Get_ShootPosition(CBaseEntity *pevAttacker, Vector Start, Vector Aiming)
 {
-	Vector start, view_ofs, end;
-	start = pevAttacker->pev->origin;
-	view_ofs = pevAttacker->pev->view_ofs;
-	start = start + view_ofs;
+	Vector end;
 
 	end = pevAttacker->pev->v_angle;
 	UTIL_MakeVectors(end);
 	end = gpGlobals->v_forward;
-	end = end * 8120.0;
-	end = start + end;
+	end = end * 8192.0;
+	end = Start + end;
 
 	TraceResult tr;
-	UTIL_TraceLine(start, end, dont_ignore_monsters, pevAttacker->edict(), &tr);
+	UTIL_TraceLine(Start, end, dont_ignore_monsters, pevAttacker->edict(), &tr);
 	end = tr.vecEndPos;
 
 	return end;
@@ -381,9 +379,9 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 
 		iShootTime = 0;
 		CBaseEntity *pevAttacker = this->m_pPlayer;
-		auto vecAiming = Get_Aiming(pevAttacker);
+		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
 
-		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecAiming, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{
 			pEnt->Spawn();
