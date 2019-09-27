@@ -228,7 +228,7 @@ void CHostageImprov::MoveTowards(const Vector &pos, float deltaT)
 	move = (pos - GetFeet());
 	move.z = 0;
 
-	if (!move.IsZero())
+	if (!move.IsZero(0.01f))
 	{
 		move.NormalizeInPlace();
 	}
@@ -436,7 +436,7 @@ bool CHostageImprov::IsFriendInTheWay(CBaseEntity *myFriend, const Vector &goalP
 	if (!(pos - friendFeet).IsLengthLessThan(friendRadius))
 		return false;
 
-	if (!myFriend->pev->velocity.IsZero())
+	if (!myFriend->pev->velocity.IsZero(0.01f))
 	{
 		if (DotProduct(myFriend->pev->velocity, m_hostage->pev->velocity) >= 0.0)
 			return false;

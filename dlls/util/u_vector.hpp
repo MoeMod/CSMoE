@@ -34,33 +34,42 @@ struct VectorBase_Gen;
 template<class T, std::size_t N, std::size_t...I>
 struct VectorBase_Gen<T, N, std::index_sequence<I...>>
 {
-	constexpr VectorBase_Gen() : data{}
+	constexpr VectorBase_Gen() : m_data{}
 	{
 	}
-	constexpr explicit VectorBase_Gen(decltype(I, T())...args) : data{args...}
+	constexpr explicit VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
 	explicit VectorBase_Gen(InputIter arr)
 	{
-		std::copy_n(arr, N, data.begin());
+		std::copy_n(arr, N, m_data.begin());
 	}
 
-	std::array<T, N> data;
+	std::array<T, N> m_data;
 
-	constexpr T &operator[](std::size_t i)
+	T &operator[](std::size_t i)
 	{
-		return data[i];
+		return m_data[i];
 	}
 	constexpr const T &operator[](std::size_t i) const
 	{
-		return data[i];
+		return m_data[i];
 	}
+	T *data()
+	{
+		return m_data.data();
+	}
+	const T *data() const
+	{
+		return m_data.data();
+	}
+
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
 	{
-		std::copy(data.begin(), data.end(), arr);
+		std::copy(m_data.begin(), m_data.end(), arr);
 	}
 	void CopyToArray(T *arr) const
 	{
@@ -86,6 +95,7 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	}
 	T x;
 	T y;
+
 	T &operator[](std::size_t i)
 	{
 		return (i == 0) ? x : y;
@@ -94,13 +104,24 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	{
 		return (i == 0) ? x : y;
 	}
-	operator T *()
+	T *data()
 	{
 		return &x;
 	}
-	operator const T *() const
+	const T *data() const
 	{
 		return &x;
+	}
+	// make it template cast operator function for lower priority
+	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	operator R *() &
+	{
+		return data();
+	}
+	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	operator const R *() const &
+	{
+		return data();
 	}
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
@@ -134,6 +155,7 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 	T x;
 	T y;
 	T z;
+
 	T &operator[](std::size_t i)
 	{
 		return (i == 0) ? x : ((i == 1) ? y : z);
@@ -142,13 +164,24 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 	{
 		return (i == 0) ? x : ((i == 1) ? y : z);
 	}
-	operator T *()
+	T *data()
 	{
 		return &x;
 	}
-	operator const T *() const
+	const T *data() const
 	{
 		return &x;
+	}
+	// make it template cast operator function for lower priority
+	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	operator R *()
+	{
+		return data();
+	}
+	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	operator const R *() const
+	{
+		return data();
 	}
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
@@ -190,10 +223,15 @@ constexpr VecType valdiv_impl(VecType vec, typename VecType::value_type val, std
 {
 	return {(vec[I] / val)...};
 }
+
 #if __cplusplus >= 201703L
 template<class Ret, class...Args> constexpr Ret Sum(Args...args)
 {
 	return (... + args);
+}
+template<class...Args> constexpr bool And(Args...args)
+{
+	return (... && args);
 }
 #else
 template<class Ret, class First>
@@ -206,14 +244,28 @@ constexpr Ret Sum(First a, Args...args)
 {
 	return a + Sum<Ret>(args...);
 }
+constexpr bool And(bool a)
+{
+	return a;
+}
+template<class...Args>
+constexpr bool And(bool a, Args...args)
+{
+	return a && And(args...);
+}
 #endif
 template<class VecType, std::size_t...I>
-typename VecType::value_type DotProduct_impl(VecType v1, VecType v2, std::index_sequence<I...>)
+constexpr bool equal_impl(VecType v1, VecType v2, std::index_sequence<I...>)
+{
+	return And((v1[I] == v2[I])...);
+}
+template<class VecType, std::size_t...I>
+constexpr typename VecType::value_type DotProduct_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
 	return Sum<typename VecType::value_type>((v1[I] * v2[I])...);
 }
 template<class VecType, std::size_t...I>
-typename VecType::value_type LengthSquared_impl(VecType vec, std::index_sequence<I...>)
+constexpr typename VecType::value_type LengthSquared_impl(VecType vec, std::index_sequence<I...>)
 {
 	return Sum<typename VecType::value_type>((vec[I] * vec[I])...);
 }
@@ -235,6 +287,14 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 	template<std::size_t I> friend const T &get(const VectorBase &v) { return v.get<I>(); }
 	template<std::size_t I> friend const T &&get(const VectorBase &&v) { return std::move(v).template get<I>(); }
 
+	constexpr bool operator==(VectorBase v) const
+	{
+		return equal_impl(*this, v, std::make_index_sequence<N>());
+	}
+	constexpr bool operator!=(VectorBase v) const
+	{
+		return !equal_impl(*this, v, std::make_index_sequence<N>());
+	}
 	constexpr VectorBase operator+(VectorBase v) const
 	{
 		return add_impl(*this, v, std::make_index_sequence<N>());
@@ -255,7 +315,7 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 	{
 		return valmul_impl(*this, fl, std::make_index_sequence<N>());
 	}
-	constexpr VectorBase operator/(float fl) const
+	constexpr VectorBase operator/(T fl) const
 	{
 		return valdiv_impl(*this, fl, std::make_index_sequence<N>());
 	}
@@ -280,7 +340,7 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return *this = *this / fl;
 	}
 
-	friend T DotProduct(VectorBase v1, VectorBase v2)
+	friend constexpr T DotProduct(VectorBase v1, VectorBase v2)
 	{
 		return DotProduct_impl(v1, v2, std::make_index_sequence<N>());
 	}
@@ -322,14 +382,14 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return flLen;
 	}
 
-	constexpr bool IsZero(T tolerance = 0.01f) const
+	constexpr bool IsZero(T tolerance) const
 	{
 		return LengthSquared() > tolerance;
 	}
 
 	constexpr VectorBase<T, 2> Make2D() const
 	{
-		return VectorBase<T, 2>((*this)[0], (*this)[1]);
+		return {(*this)[0], (*this)[1]};
 	}
 
 	T Length2D()
@@ -337,7 +397,7 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return Make2D().Length();
 	}
 
-	friend T DotProduct2D(VectorBase v1, VectorBase v2)
+	friend constexpr T DotProduct2D(VectorBase v1, VectorBase v2)
 	{
 		return DotProduct(v1.Make2D(), v2.Make2D());
 	}
@@ -345,6 +405,10 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 	constexpr bool IsNull() const
 	{
 		return LengthSquared() == T{};
+	}
+	explicit constexpr operator bool()
+	{
+		return !IsNull();
 	}
 };
 
