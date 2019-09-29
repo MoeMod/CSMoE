@@ -102,6 +102,14 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
+
+	PRECACHE_MODEL("models/v_knife_zombi.mdl");
+	PRECACHE_MODEL("models/v_knife_zombis.mdl");
+
+	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
+	PRECACHE_MODEL("models/player/speed_zombi_origin/speed_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/speed_zombi_host/speed_zombi_host.mdl");
 }
 
 }

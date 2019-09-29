@@ -109,4 +109,14 @@ void CZombieClass_Default::DeathSound_Zombie()
 	}
 }
 
+std::string CZombieClass_Default::GetZombieKnifeViewModel() const
+{
+	return "models/v_knife_zombi.mdl";
+}
+
+std::string CZombieClass_Default::GetZombieBombViewModel() const
+{
+	return "models/v_zombibomb.mdl";
+}
+
 }

@@ -31,6 +31,8 @@ public:
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override;
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
+	std::string GetZombieKnifeViewModel() const override;
+	std::string GetZombieBombViewModel() const override;
 };
 
 }

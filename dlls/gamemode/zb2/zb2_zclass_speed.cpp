@@ -1,3 +1,5 @@
+#include <memory>
+
 /*
 zb2_zclass_speed.cpp - CSMoE Gameplay server : Zombie Mod 2
 Copyright (C) 2019 Moemod Yanase
@@ -30,9 +32,9 @@ namespace sv {
 
 CZombieClass_Speed::CZombieClass_Speed(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pZombieSkill.reset(new CZombieSkill_ZombieCrazy(m_pPlayer));
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 
-	const char *szModel = iEvolutionLevel ? "zombi_origin" : "zombi_host";
+	const char *szModel = iEvolutionLevel ? "speed_zombi_origin" : "speed_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
 
 	static char szModelPath[64];
@@ -112,6 +114,16 @@ void CZombieClass_Speed::DeathSound_Zombie()
 		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
 		default:break;
 	}
+}
+
+std::string CZombieClass_Speed::GetZombieKnifeViewModel() const
+{
+	return "models/v_knife_zombis.mdl";
+}
+
+std::string CZombieClass_Speed::GetZombieBombViewModel() const
+{
+	return "models/v_zombibomb-s.mdl";
 }
 
 }
