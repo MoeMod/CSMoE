@@ -77,7 +77,7 @@ void CZombieSkill_ZombieCrazy::Activate()
 		case SKILL_STATUS_USING:
 		case SKILL_STATUS_FREEZING:
 			char buf[16];
-			sprintf(buf, "%d", static_cast<int>(m_flTimeZombieSkillNext.time_since_epoch() /1s - gpGlobals->time.time_since_epoch() /1s));
+			sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
 				"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
 				buf

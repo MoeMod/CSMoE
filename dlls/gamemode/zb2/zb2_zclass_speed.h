@@ -24,15 +24,14 @@ namespace sv {
 class CZombieClass_Speed : public CBaseZombieClass_ZB2
 {
 public:
-	explicit CZombieClass_Speed(CBasePlayer *player, ZombieLevel lv);
+	CZombieClass_Speed(CBasePlayer *player, ZombieLevel lv);
 	void InitHUD() const override;
 	void ResetMaxSpeed() const override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override;
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override;
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
-	std::string GetZombieKnifeViewModel() const override;
-	std::string GetZombieBombViewModel() const override;
+	void OnWeaponDeploy(CBasePlayerItem *item) override;
 };
 
 }

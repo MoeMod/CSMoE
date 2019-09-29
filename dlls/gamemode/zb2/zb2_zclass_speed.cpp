@@ -116,14 +116,23 @@ void CZombieClass_Speed::DeathSound_Zombie()
 	}
 }
 
-std::string CZombieClass_Speed::GetZombieKnifeViewModel() const
+void CZombieClass_Speed::OnWeaponDeploy(CBasePlayerItem *item)
 {
-	return "models/v_knife_zombis.mdl";
-}
-
-std::string CZombieClass_Speed::GetZombieBombViewModel() const
-{
-	return "models/v_zombibomb-s.mdl";
+	switch(item->m_iId)
+	{
+		case WEAPON_KNIFE:
+		{
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_knife_zombis.mdl");
+			break;
+		}
+		case WEAPON_HEGRENADE:
+		{
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-s.mdl");
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 }

@@ -430,10 +430,7 @@ BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
 {
 	BOOL ret = CPlayerModStrategy_Default::DeployWeapon(item);
 
-	if(item->m_iId == WEAPON_KNIFE)
-	{
-		m_pPlayer->pev->viewmodel = ALLOC_STRING(m_pCharacter_ZB2->GetZombieKnifeViewModel().c_str());
-	}
+	m_pCharacter_ZB2->OnWeaponDeploy(item);
 
 	return ret;
 }
