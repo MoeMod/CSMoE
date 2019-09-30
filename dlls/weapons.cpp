@@ -1241,7 +1241,7 @@ void CBasePlayerWeapon::ReloadSound()
 	CBaseEntity *pPlayer = NULL;
 	float distance;
 
-	m_pPlayer->pev->origin = origin;
+	m_pPlayer->pev->origin.CopyToArray(origin);
 
 	while ((pPlayer = (CBasePlayer *)UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
 	{
