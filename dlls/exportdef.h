@@ -1,11 +1,18 @@
-#ifndef EXPORTDEF_H
-#define EXPORTDEF_H
 
 #ifdef EXPORT
 #undef EXPORT
 #endif
 #ifdef DLLEXPORT
 #undef DLLEXPORT
+#endif
+#ifdef _DLLEXPORT
+#undef _DLLEXPORT
+#endif
+#ifdef C_DLLEXPORT
+#undef C_DLLEXPORT
+#endif
+#ifdef EXT_FUNC
+#undef EXT_FUNC
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
@@ -27,4 +34,3 @@
 #define C_DLLEXPORT extern "C" DLLEXPORT
 #define EXT_FUNC /*FORCE_STACK_ALIGN*/
 
-#endif // EXPORTDEF_H

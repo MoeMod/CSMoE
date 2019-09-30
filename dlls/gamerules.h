@@ -60,9 +60,6 @@
 // marked with the ITEM_FLAG_LIMITINWORLD will delay their respawn
 #define ENTITY_INTOLERANCE			100
 
-#define MAX_MOTD_CHUNK				60
-#define MAX_MOTD_LENGTH				1536 // (MAX_MOTD_CHUNK * 4)
-
 // custom enum
 #define	WINNER_NONE			0
 #define WINNER_DRAW			1

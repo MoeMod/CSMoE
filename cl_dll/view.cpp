@@ -7,10 +7,6 @@
 
 // view/refresh setup functions
 
-#ifdef _WIN32
-#include "basetypes.h"
-#endif
-
 #include <string.h>
 
 #include "hud.h"
@@ -374,7 +370,7 @@ V_DropPunchAngle
 
 =============
 */
-void V_DropPunchAngle ( float frametime, float *ev_punchangle )
+void V_DropPunchAngle ( float frametime, vec3_t &ev_punchangle )
 {
 	float	len;
 

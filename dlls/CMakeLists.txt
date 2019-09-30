@@ -22,7 +22,11 @@
 
 cmake_minimum_required(VERSION 3.1.3)
 
-project (SERVER)
+if(XASH_PCH)
+	project (server CXX CXXPCH)
+else()
+	project (server)
+endif()
 set(CMAKE_CXX_STANDARD 14)
 
 if (APPLE OR ANDROID)
@@ -364,4 +368,13 @@ endif()
 
 if(NOT XASH_STATIC_GAMELIB)
 	install( TARGETS ${SERVER_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${SERVER_INSTALL_DIR})
+endif()
+
+if(XASH_PCH)
+	target_precompiled_header(${SERVER_LIBRARY} stdafx.h)
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES
+			CXX_STANDARD ${CMAKE_CXX_STANDARD}
+			CXX_STANDARD_REQUIRED YES
+			CXX_EXTENSIONS NO
+			)
 endif()

@@ -22,7 +22,11 @@
 
 cmake_minimum_required(VERSION 3.1.3)
 
-project (client)
+if(XASH_PCH)
+	project (client CXX CXXPCH)
+else()
+	project (client)
+endif()
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -305,4 +309,13 @@ endif()
 
 if(NOT XASH_STATIC_GAMELIB)
 	install( TARGETS ${CLIENT_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/${GAMEDIR}/${CLIENT_INSTALL_DIR} )
+endif()
+
+if(XASH_PCH)
+	target_precompiled_header(${CLIENT_LIBRARY} stdafx.h)
+	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
+			CXX_STANDARD ${CMAKE_CXX_STANDARD}
+			CXX_STANDARD_REQUIRED YES
+			CXX_EXTENSIONS NO
+			)
 endif()

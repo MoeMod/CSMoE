@@ -19,6 +19,14 @@ namespace sv {
 #define ANIM_SWIM_2 9
 #define ANIM_FIRST_DEATH_SEQUENCE 101
 
+void AngleMatrix( const float *angles, float (*matrix)[4] );
+static void VectorCopy( const float *in, float *out )
+{
+	out[0] = in[0];
+	out[1] = in[1];
+	out[2] = in[2];
+}
+
 /*
 * Globals initialization
 */

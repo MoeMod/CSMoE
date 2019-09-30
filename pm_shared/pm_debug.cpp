@@ -13,8 +13,12 @@
 *
 ****/
 
-#include "basetypes.h"
+#ifdef vec3_t
+#undef vec3_t
+#endif
 #include "mathlib.h"
+
+#include "basetypes.h"
 #include "const.h"
 #include "usercmd.h"
 #include "pm_defs.h"

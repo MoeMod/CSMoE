@@ -7852,7 +7852,7 @@ void CBasePlayer::ClearAutoBuyData()
 
 void CBasePlayer::AddAutoBuyData(const char *str)
 {
-	int len = Q_strlen(m_autoBuyString);
+	auto len = Q_strlen(m_autoBuyString);
 
 	if (len < MAX_AUTOBUY_LENGTH - 1)
 	{

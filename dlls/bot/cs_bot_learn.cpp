@@ -13,7 +13,6 @@
 #include "vehicle.h"
 #include "globals.h"
 
-// CSBOT and Nav
 #include "bot_include.h"
 
 namespace sv {

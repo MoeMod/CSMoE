@@ -73,7 +73,6 @@ private:
 
 #include "const.h"
 #include "edict.h"
-#include "eiface.h"
 #include "enginecallback.h"
 
 #include "stddef.h"

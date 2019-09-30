@@ -1,10 +1,10 @@
 #include "extdll.h"
-#include "UtlVector.h"
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
 
 #include "shared_util.h"
+#include "UtlVector.h"
 
 namespace sv {
 

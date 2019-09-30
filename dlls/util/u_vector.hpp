@@ -16,6 +16,7 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_VECTOR_HPP
 #define PROJECT_U_VECTOR_HPP
 
+#include <math.h>
 #include <utility>
 #include <numeric>
 #include <array>
@@ -415,6 +416,26 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 template<class T> constexpr VectorBase<T, 3> CrossProduct(VectorBase<T, 3> a, VectorBase<T, 3> b)
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+}
+
+template<class T, std::size_t N> T AngleBetweenVectors(VectorBase<T, N> a, VectorBase<T, N> b)
+{
+	return acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
+}
+
+template<class T, std::size_t N> constexpr T VectorNormalize(VectorBase<T, N> &in)
+{
+	return in.NormalizeInPlace();
+}
+
+template<class T, std::size_t N> constexpr bool VectorCompare(VectorBase<T, N> a,  VectorBase<T, N> b)
+{
+	return a == b;
+}
+
+template<class T, std::size_t N> constexpr VectorBase<T, N> &VectorCopy(VectorBase<T, N> in,  VectorBase<T, N> &out)
+{
+	return out = in;
 }
 
 }

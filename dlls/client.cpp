@@ -23,47 +23,7 @@
 #include "unicode_strtools.h"
 #include "debug.h"
 
-#include "pm_shared.h"
-#include "utllinkedlist.h"
-
-// CSBOT and Nav
-#include "game_shared/GameEvent.h"		// Game event enum used by career mode, tutor system, and bots
-#include "game_shared/bot/bot_util.h"
-#include "game_shared/bot/simple_state_machine.h"
-
-#include "game_shared/steam_util.h"
-
-#include "game_shared/bot/bot_manager.h"
-#include "game_shared/bot/bot_constants.h"
-#include "game_shared/bot/bot.h"
-
-#include "game_shared/shared_util.h"
-#include "game_shared/bot/bot_profile.h"
-
-#include "game_shared/bot/nav.h"
-#include "game_shared/bot/improv.h"
-#include "game_shared/bot/nav_node.h"
-#include "game_shared/bot/nav_area.h"
-#include "game_shared/bot/nav_file.h"
-#include "game_shared/bot/nav_path.h"
-
-#include "airtank.h"
-#include "h_ai.h"
-#include "h_cycler.h"
-#include "h_battery.h"
-
-// Hostage
-#include "hostage/hostage.h"
-#include "hostage/hostage_localnav.h"
-
-#include "bot/cs_bot.h"
-
-// Tutor
-#include "tutor.h"
-#include "tutor_base_states.h"
-#include "tutor_base_tutor.h"
-#include "tutor_cs_states.h"
-#include "tutor_cs_tutor.h"
+#include "bot_include.h"
 
 #include "gamemode/mods.h"
 #include "player/player_model.h"
@@ -4767,16 +4727,16 @@ int EXT_FUNC GetHullBounds(int hullnumber, float *mins, float *maxs)
 	switch (hullnumber)
 	{
 		case 0: // Normal player
-			Q_memcpy(mins, (float*)VEC_HULL_MIN, sizeof(vec3_t));
-			Q_memcpy(maxs, (float*)VEC_HULL_MAX, sizeof(vec3_t));
+			VEC_HULL_MIN.CopyToArray(mins);
+			VEC_HULL_MAX.CopyToArray(maxs);
 			return TRUE;
 		case 1: // Crouched player
-			Q_memcpy(mins, (float*)VEC_DUCK_HULL_MIN, sizeof(vec3_t));
-			Q_memcpy(maxs, (float*)VEC_DUCK_HULL_MAX, sizeof(vec3_t));
+			VEC_DUCK_HULL_MIN.CopyToArray(mins);
+			VEC_DUCK_HULL_MAX.CopyToArray(maxs);
 			return TRUE;
 		case 2: // Point based hull
-			Q_memcpy(mins, (float*)Vector(0, 0, 0), sizeof(vec3_t));
-			Q_memcpy(maxs, (float*)Vector(0, 0, 0), sizeof(vec3_t));
+			Vector(0, 0, 0).CopyToArray(mins);
+			Vector(0, 0, 0).CopyToArray(maxs);
 			return TRUE;
 		default:
 			return FALSE;

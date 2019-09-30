@@ -12,6 +12,13 @@ endif()
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
+option(XASH_PCH "Enable PCH support." OFF)
+
+if(XASH_PCH)
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler/")
+	include(CMakePCHCompiler)
+endif()
+
 if(XASH_STATIC_GAMELIB)
 	add_definitions(-DXASH_STATIC_GAMELIB=1)
 endif()
