@@ -113,7 +113,7 @@ void AngleVectorsTranspose( const vec3_t angles, vec3_t forward, vec3_t right, v
 	}
 }
 
-void AngleMatrix( const vec3_t angles, float (*matrix)[4] )
+void AngleMatrix( const float *angles, float (*matrix)[4] )
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;
