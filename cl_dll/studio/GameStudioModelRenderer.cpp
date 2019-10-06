@@ -47,6 +47,10 @@
 #define ANIM_FIRST_EMOTION_SEQUENCE 198
 #define ANIM_LAST_EMOTION_SEQUENCE 207
 
+using cl::QuaternionMatrix;
+using cl::ConcatTransforms;
+using cl::MatrixCopy;
+
 CGameStudioModelRenderer g_StudioRenderer;
 
 int g_rseq;

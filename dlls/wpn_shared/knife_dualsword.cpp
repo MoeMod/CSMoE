@@ -823,8 +823,6 @@ public:
 		{
 			const Vector vecNewOrigin = vecOrigin3[0];
 			const Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
-			Vector vecAngles;
-			VectorAngles(vecNewVelocity, vecAngles);
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
 			WRITE_BYTE(TE_PROJECTILE);
@@ -843,8 +841,6 @@ public:
 		{
 			const Vector vecNewOrigin = vecOrigin3[0];
 			const Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
-			Vector vecAngles;
-			VectorAngles(vecNewVelocity, vecAngles);
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
 			WRITE_BYTE(TE_PROJECTILE);

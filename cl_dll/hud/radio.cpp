@@ -131,7 +131,7 @@ void CHudRadio::Voice(int entindex, bool bTalking)
 	spr = gEngfuncs.pEventAPI->EV_FindModelIndex( "sprites/voiceicon.spr" );
 	if( !spr ) return;
 
-	temp = gEngfuncs.pEfxAPI->R_DefaultSprite( vec3_origin, spr, 0 );
+	temp = gEngfuncs.pEfxAPI->R_DefaultSprite( {}, spr, 0 );
 	if( !temp ) return;
 
 	pplayer->talking = true; // sprite is created

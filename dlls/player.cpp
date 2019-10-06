@@ -2668,7 +2668,7 @@ void CBasePlayer::GiveShield(bool bDeploy)
 			if (m_rgAmmo[ pWeapon->m_iPrimaryAmmoType ] > 0)
 				pWeapon->Holster();
 
-			if (!pWeapon->Deploy())
+			if (!m_pModStrategy->DeployWeapon(pWeapon))
 				pWeapon->RetireWeapon();
 		}
 	}
@@ -2735,7 +2735,7 @@ void CBasePlayer::DropShield(bool bDeploy)
 	RemoveShield();
 
 	if (m_pActiveItem && bDeploy)
-		m_pActiveItem->Deploy();
+		m_pModStrategy->DeployWeapon(m_pActiveItem);
 
 	UTIL_MakeVectors(pev->angles);
 
@@ -5076,7 +5076,7 @@ NOXREF void CBasePlayer::SelectNextItem(int iItem)
 	{
 		UpdateShieldCrosshair(true);
 
-		m_pActiveItem->Deploy();
+		m_pModStrategy->DeployWeapon(m_pActiveItem);
 		m_pActiveItem->UpdateItemInfo();
 
 		ResetMaxSpeed();
@@ -5137,7 +5137,7 @@ void CBasePlayer::SelectItem(const char *pstr)
 		m_bShieldDrawn = false;
 		UpdateShieldCrosshair(true);
 
-		m_pActiveItem->Deploy();
+		m_pModStrategy->DeployWeapon(m_pActiveItem);
 		m_pActiveItem->UpdateItemInfo();
 
 		ResetMaxSpeed();
@@ -5185,7 +5185,7 @@ void CBasePlayer::SelectLastItem()
 	m_pActiveItem = m_pLastItem;
 	m_pLastItem = pTemp;
 
-	m_pActiveItem->Deploy();
+	m_pModStrategy->DeployWeapon(m_pActiveItem);
 	m_pActiveItem->UpdateItemInfo();
 
 	UpdateShieldCrosshair(true);
@@ -7150,7 +7150,7 @@ BOOL CBasePlayer::SwitchWeapon(CBasePlayerItem *pWeapon)
 	CBasePlayerItem *pTemp = m_pActiveItem;
 	m_pActiveItem = pWeapon;
 	m_pLastItem = pTemp;
-	pWeapon->Deploy();
+	m_pModStrategy->DeployWeapon(pWeapon);
 
 	if (pWeapon->m_pPlayer)
 	{
@@ -7852,7 +7852,7 @@ void CBasePlayer::ClearAutoBuyData()
 
 void CBasePlayer::AddAutoBuyData(const char *str)
 {
-	int len = Q_strlen(m_autoBuyString);
+	auto len = Q_strlen(m_autoBuyString);
 
 	if (len < MAX_AUTOBUY_LENGTH - 1)
 	{

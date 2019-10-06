@@ -76,8 +76,6 @@ constexpr int HUD_DRAW = (1 << 0);
 constexpr int HUD_THINK = (1 << 1);
 constexpr int HUD_ACTIVE = (HUD_DRAW | HUD_THINK);
 constexpr int HUD_INTERMISSION = (1 << 2);
-constexpr size_t MAX_PLAYER_NAME_LENGTH = 32;
-constexpr size_t MAX_MOTD_LENGTH = 1536;
 
 //
 //-----------------------------------------------------

@@ -89,6 +89,9 @@ using namespace cl::moe;
 #include "edict.h"
 
 									// Shared header describing protocol between engine and DLLs
+#ifdef DLLEXPORT
+#undef DLLEXPORT
+#endif
 #include "eiface.h"
 #undef DLLEXPORT
 #include "exportdef.h"

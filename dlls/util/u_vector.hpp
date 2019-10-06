@@ -16,6 +16,8 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_VECTOR_HPP
 #define PROJECT_U_VECTOR_HPP
 
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <utility>
 #include <numeric>
 #include <array>
@@ -201,27 +203,27 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 template<class VecType, std::size_t...I>
 constexpr VecType add_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return {(v1[I] + v2[I])...};
+	return {(v1.template get<I>() + v2.template get<I>())...};
 }
 template<class VecType, std::size_t...I>
 constexpr VecType sub_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return {(v1[I] - v2[I])...};
+	return {(v1.template get<I>() - v2.template get<I>())...};
 }
 template<class VecType, std::size_t...I>
 constexpr VecType neg_impl(VecType vec, std::index_sequence<I...>)
 {
-	return {(-vec[I])...};
+	return {(-vec.template get<I>())...};
 }
 template<class VecType, std::size_t...I>
 constexpr VecType valmul_impl(VecType vec, typename VecType::value_type val, std::index_sequence<I...>)
 {
-	return {(vec[I] * val)...};
+	return {(vec.template get<I>() * val)...};
 }
 template<class VecType, std::size_t...I>
 constexpr VecType valdiv_impl(VecType vec, typename VecType::value_type val, std::index_sequence<I...>)
 {
-	return {(vec[I] / val)...};
+	return {(vec.template get<I>() / val)...};
 }
 
 #if __cplusplus >= 201703L
@@ -257,17 +259,17 @@ constexpr bool And(bool a, Args...args)
 template<class VecType, std::size_t...I>
 constexpr bool equal_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return And((v1[I] == v2[I])...);
+	return And((v1.template get<I>() == v2.template get<I>())...);
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type DotProduct_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return Sum<typename VecType::value_type>((v1[I] * v2[I])...);
+	return Sum<typename VecType::value_type>((v1.template get<I>() * v2.template get<I>())...);
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type LengthSquared_impl(VecType vec, std::index_sequence<I...>)
 {
-	return Sum<typename VecType::value_type>((vec[I] * vec[I])...);
+	return Sum<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...);
 }
 
 template<class T, std::size_t N>
@@ -415,6 +417,26 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 template<class T> constexpr VectorBase<T, 3> CrossProduct(VectorBase<T, 3> a, VectorBase<T, 3> b)
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+}
+
+template<class T, std::size_t N> T AngleBetweenVectors(VectorBase<T, N> a, VectorBase<T, N> b)
+{
+	return acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
+}
+
+template<class T, std::size_t N> constexpr T VectorNormalize(VectorBase<T, N> &in)
+{
+	return in.NormalizeInPlace();
+}
+
+template<class T, std::size_t N> constexpr bool VectorCompare(VectorBase<T, N> a,  VectorBase<T, N> b)
+{
+	return a == b;
+}
+
+template<class T, std::size_t N> constexpr VectorBase<T, N> &VectorCopy(VectorBase<T, N> in,  VectorBase<T, N> &out)
+{
+	return out = in;
 }
 
 }

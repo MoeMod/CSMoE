@@ -73,14 +73,15 @@ private:
 
 #include "const.h"
 #include "edict.h"
-#include "eiface.h"
 #include "enginecallback.h"
 
 #include "stddef.h"
 
-//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
-//#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))
-#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
+//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
+static inline const char *STRING(ptrdiff_t offset)
+{
+	return gpGlobals->pStringBase + offset;
+}
 
 #if !defined XASH_64BIT || defined(CLIENT_DLL)
 //#define MAKE_STRING(str)	((int)(long int)str - (int)(long int)STRING(0))

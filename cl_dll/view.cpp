@@ -7,13 +7,11 @@
 
 // view/refresh setup functions
 
-#ifdef _WIN32
-#include "basetypes.h"
-#endif
-
 #include <string.h>
 
 #include "hud.h"
+
+#include "pm_math.h"
 
 #include "cl_util.h"
 #include "cvardef.h"
@@ -39,16 +37,6 @@
 #include "com_model.h"
 #include "kbutton.h"
 #include "input.h"
-
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
-
-namespace cl { // pm_math.cpp
-	void NormalizeAngles(vec_t angles[3]);
-	float Distance(const vec_t v1[3], const vec_t v2[3]);
-	void VectorAngles(const vec_t forward[3], vec_t angles[3]);
-};
 
 namespace cl {
 
@@ -374,7 +362,7 @@ V_DropPunchAngle
 
 =============
 */
-void V_DropPunchAngle ( float frametime, float *ev_punchangle )
+void V_DropPunchAngle ( float frametime, vec3_t &ev_punchangle )
 {
 	float	len;
 

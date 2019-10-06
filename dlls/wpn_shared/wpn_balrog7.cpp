@@ -181,7 +181,7 @@ void CBalrog7::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		Balrog7Fire(0.05 + (0.2) * m_flAccuracy, 0.1145s, FALSE);
-	else if (m_pPlayer->pev->flags , FL_DUCKING)
+	else if (!FBitSet(m_pPlayer->pev->flags , FL_DUCKING))
 		Balrog7Fire(0.01 + (0.02) * m_flAccuracy, 0.1145s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 195)
 		Balrog7Fire(0.035 + (0.03) * m_flAccuracy, 0.1145s, FALSE);

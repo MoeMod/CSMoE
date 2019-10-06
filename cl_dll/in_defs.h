@@ -8,15 +8,7 @@
 #if !defined( IN_DEFSH )
 #define IN_DEFSH
 
-enum : size_t
-{
-	// up / down
-	PITCH = 0,
-	// left / right
-	YAW = 1,
-	// fall over
-	ROLL = 2
-};
+#include "angledef.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -36,40 +36,36 @@
 #include "player/hintmessage.h"
 #include "weapons.h"
 
-#define MIN_BUY_TIME			15	// the minimum threshold values for cvar mp_buytime 15 sec's
+constexpr auto MIN_BUY_TIME =			15;	// the minimum threshold values for cvar mp_buytime 15 sec's
 
-#define MAX_BUFFER_MENU			175
-#define MAX_BUFFER_MENU_BRIEFING	50
+constexpr auto MAX_BUFFER_MENU =			175;
+constexpr auto MAX_BUFFER_MENU_BRIEFING =	50;
 
-#define MAX_PLAYER_NAME_LENGTH		32
-#define MAX_AUTOBUY_LENGTH		256
-#define MAX_REBUY_LENGTH		256
+constexpr size_t MAX_RECENT_PATH =			20;
 
-#define MAX_RECENT_PATH			20
+constexpr duration_t SUITUPDATETIME =			3.5s;
+constexpr duration_t SUITFIRSTUPDATETIME =		0.1s;
 
-#define SUITUPDATETIME			3.5s
-#define SUITFIRSTUPDATETIME		0.1
+constexpr float PLAYER_FATAL_FALL_SPEED =		1100.0f;
+constexpr float PLAYER_MAX_SAFE_FALL_SPEED =	500.0f;
+constexpr float PLAYER_USE_RADIUS =		64.0f;
 
-#define PLAYER_FATAL_FALL_SPEED		1100.0f
-#define PLAYER_MAX_SAFE_FALL_SPEED	500.0f
-#define PLAYER_USE_RADIUS		64.0f
+constexpr float ARMOR_RATIO =			0.5; // Armor Takes 50% of the damage
+constexpr float ARMOR_BONUS	=   		0.5; // Each Point of Armor is work 1/x points of health
 
-#define ARMOR_RATIO			0.5 // Armor Takes 50% of the damage
-#define ARMOR_BONUS			0.5 // Each Point of Armor is work 1/x points of health
-
-#define FLASH_DRAIN_TIME		1.2s // 100 units/3 minutes
-#define FLASH_CHARGE_TIME		0.2s // 100 units/20 seconds  (seconds per unit)
+constexpr duration_t FLASH_DRAIN_TIME =		1.2s; // 100 units/3 minutes
+constexpr duration_t FLASH_CHARGE_TIME =		0.2s; // 100 units/20 seconds  (seconds per unit)
 
 // damage per unit per second.
-#define DAMAGE_FOR_FALL_SPEED		100.0f / (PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED)
-#define PLAYER_MIN_BOUNCE_SPEED		350.0f
+constexpr float DAMAGE_FOR_FALL_SPEED =		100.0f / (PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED);
+constexpr float PLAYER_MIN_BOUNCE_SPEED =		350.0f;
 
 // won't punch player's screen/make scrape noise unless player falling at least this fast.
-#define PLAYER_FALL_PUNCH_THRESHHOLD	250.0f
+constexpr float PLAYER_FALL_PUNCH_THRESHHOLD =	250.0f;
 
 // Money blinks few of times on the freeze period
 // NOTE: It works for CZ
-#define MONEY_BLINK_AMOUNT		30
+constexpr auto MONEY_BLINK_AMOUNT =		30;
 
 #define PFLAG_ONLADDER			(1<<0)
 #define PFLAG_ONSWING			(1<<0)

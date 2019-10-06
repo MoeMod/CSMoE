@@ -32,43 +32,10 @@
 #include "com_weapons.h"
 #include "draw_util.h"
 
+#include "weapons_const.h"
+
 using namespace cl;
 
-enum WeaponIdType
-{
-	WEAPON_NONE,
-	WEAPON_P228,
-	WEAPON_GLOCK,
-	WEAPON_SCOUT,
-	WEAPON_HEGRENADE,
-	WEAPON_XM1014,
-	WEAPON_C4,
-	WEAPON_MAC10,
-	WEAPON_AUG,
-	WEAPON_SMOKEGRENADE,
-	WEAPON_ELITE,
-	WEAPON_FIVESEVEN,
-	WEAPON_UMP45,
-	WEAPON_SG550,
-	WEAPON_GALIL,
-	WEAPON_FAMAS,
-	WEAPON_USP,
-	WEAPON_GLOCK18,
-	WEAPON_AWP,
-	WEAPON_MP5N,
-	WEAPON_M249,
-	WEAPON_M3,
-	WEAPON_M4A1,
-	WEAPON_TMP,
-	WEAPON_G3SG1,
-	WEAPON_FLASHBANG,
-	WEAPON_DEAGLE,
-	WEAPON_SG552,
-	WEAPON_AK47,
-	WEAPON_KNIFE,
-	WEAPON_P90,
-	WEAPON_SHIELDGUN = 99
-};
 //#include "vgui_TeamFortressViewport.h"
 
 #ifndef __linux__
@@ -155,7 +122,7 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 		char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
 		char szSpriteName[32]{};
 		int x, y, w, h;
-		if (sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+		if (buffer && sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
 		{
 			sprintf(sz, "sprites/%s.spr", szSpriteName);
 			pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);

@@ -26,7 +26,7 @@ extern "C++"
 #include "demo_api.h"
 #include "event_api.h"
 
-#include "studio_util.h"
+#include "pm_math.h"
 
 #include "screenfade.h"
 #include "draw_util.h"

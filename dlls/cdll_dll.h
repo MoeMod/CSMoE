@@ -174,4 +174,10 @@ enum VGUIMenuSlot
 #define MENU_NUMERICAL_MENU -1
 // -- cs16client extension end -- //
 
+constexpr size_t MAX_PLAYER_NAME_LENGTH =		32;
+constexpr size_t MAX_AUTOBUY_LENGTH =		256;
+constexpr size_t MAX_REBUY_LENGTH =		256;
+constexpr size_t MAX_MOTD_CHUNK = 60;
+constexpr size_t MAX_MOTD_LENGTH = 1536;
+
 #endif // CDLL_DLL_H
