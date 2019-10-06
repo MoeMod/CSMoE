@@ -11,6 +11,8 @@
 
 #include "hud.h"
 
+#include "pm_math.h"
+
 #include "cl_util.h"
 #include "cvardef.h"
 #include "usercmd.h"
@@ -35,16 +37,6 @@
 #include "com_model.h"
 #include "kbutton.h"
 #include "input.h"
-
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
-
-namespace cl { // pm_math.cpp
-	void NormalizeAngles(vec_t angles[3]);
-	float Distance(const vec_t v1[3], const vec_t v2[3]);
-	void VectorAngles(const vec_t forward[3], vec_t angles[3]);
-};
 
 namespace cl {
 

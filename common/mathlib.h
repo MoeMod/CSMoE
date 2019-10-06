@@ -13,54 +13,24 @@
 *
 ****/
 // mathlib.h
-
+#pragma once
+#ifndef MATHLIB_H
+#define MATHLIB_H
 #include <math.h>
 
 typedef float vec_t;
-#ifndef vec3_t
+typedef vec_t vec2_t[2];
 typedef vec_t vec3_t[3];
-#endif
 typedef vec_t vec4_t[4];	// x,y,z,w
-typedef vec_t vec5_t[5];
 
-typedef short vec_s_t;
-typedef vec_s_t vec3s_t[3];
-typedef vec_s_t vec4s_t[4];	// x,y,z,w
-typedef vec_s_t vec5s_t[5];
-
-typedef	int	fixed4_t;
-typedef	int	fixed8_t;
-typedef	int	fixed16_t;
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
 
-#ifdef __cplusplus
-# ifdef min
-#  undef min
-# endif
-
-# ifdef max
-#  undef max
-# endif
-
-# ifdef clamp
-#  undef clamp
-# endif
-#endif
-
 struct mplane_s;
 
-#if defined(CLIENT_DLL)
-namespace cl {
-#elif defined(SERVER_DLL)
-namespace sv {
-#elif defined(__cplusplus)
-extern "C++" {
-#endif
-
-	extern vec3_t vec3_origin;
-	extern	int nanmask;
+extern vec3_t vec3_origin;
+extern	int nanmask;
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
@@ -73,64 +43,42 @@ extern "C++" {
 #define VectorCopy(a,b) {(b)[0]=(a)[0];(b)[1]=(a)[1];(b)[2]=(a)[2];}
 #define VectorClear(a) {(a)[0]=0.0;(a)[1]=0.0;(a)[2]=0.0;}
 
-	void VectorMA(const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc);
+void VectorMA (const vec3_t veca, float scale, const vec3_t vecb, vec3_t vecc);
 
-	vec_t _DotProduct(vec3_t v1, vec3_t v2);
-	void _VectorSubtract(vec3_t veca, vec3_t vecb, vec3_t out);
-	void _VectorAdd(vec3_t veca, vec3_t vecb, vec3_t out);
-	void _VectorCopy(vec3_t in, vec3_t out);
+vec_t _DotProduct (vec3_t v1, vec3_t v2);
+void _VectorSubtract (vec3_t veca, vec3_t vecb, vec3_t out);
+void _VectorAdd (vec3_t veca, vec3_t vecb, vec3_t out);
+void _VectorCopy (vec3_t in, vec3_t out);
 
-	int VectorCompare(const vec3_t v1, const vec3_t v2);
-	float Length(const vec3_t v);
-	void CrossProduct(const vec3_t v1, const vec3_t v2, vec3_t cross);
-	float VectorNormalize(vec3_t v);		// returns vector length
-	void VectorInverse(vec3_t v);
-	void VectorScale(const vec3_t in, vec_t scale, vec3_t out);
-	int Q_log2(int val);
+int VectorCompare (const vec3_t v1, const vec3_t v2);
+float Length (const vec3_t v);
+void CrossProduct (const vec3_t v1, const vec3_t v2, vec3_t cross);
+float VectorNormalize (vec3_t v);		// returns vector length
+void VectorInverse (vec3_t v);
+void VectorScale (const vec3_t in, vec_t scale, vec3_t out);
 
-	void R_ConcatRotations(float in1[3][3], float in2[3][3], float out[3][3]);
-	void R_ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4]);
+void R_ConcatRotations (float in1[3][3], float in2[3][3], float out[3][3]);
+void R_ConcatTransforms (float in1[3][4], float in2[3][4], float out[3][4]);
 
-	// Here are some "manual" INLINE routines for doing floating point to integer conversions
-	extern short new_cw, old_cw;
-
-	typedef union DLONG {
-		int		i[2];
-		double	d;
-		float	f;
-	} DLONG;
-
-	extern DLONG	dlong;
-
-
-
-	void FloorDivMod(double numer, double denom, int *quotient,
-		int *rem);
-	fixed16_t Invert24To16(fixed16_t val);
-	int GreatestCommonDivisor(int i1, int i2);
-
-	void AngleVectors(const float *angles, float *forward, float *right, float *up);
-	void AngleVectorsTranspose(const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
+void AngleVectors (const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
+void AngleVectorsTranspose (const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 #define AngleIVectors	AngleVectorsTranspose
 
-	void AngleMatrix(const float *angles, float(*matrix)[4]);
-	void AngleIMatrix(const vec3_t angles, float(*matrix)[4]);
-	void VectorTransform(const vec_t *in1, float (*in2)[4], vec_t *out);
+void AngleMatrix (const vec3_t angles, float (*matrix)[4] );
+void AngleIMatrix (const vec3_t angles, float (*matrix)[4] );
+void VectorTransform (const vec3_t in1, float in2[3][4], vec3_t out);
 
-	void NormalizeAngles(vec3_t angles);
-	void InterpolateAngles(vec3_t start, vec3_t end, vec3_t output, float frac);
-	float AngleBetweenVectors(const vec3_t v1, const vec3_t v2);
+void NormalizeAngles( vec3_t angles );
+void InterpolateAngles( vec3_t start, vec3_t end, vec3_t output, float frac );
+float AngleBetweenVectors( const vec3_t v1, const vec3_t v2 );
 
+void VectorMatrix( vec3_t forward, vec3_t right, vec3_t up);
+void VectorAngles( const vec3_t forward, vec3_t angles );
 
-	void VectorMatrix(vec3_t forward, vec3_t right, vec3_t up);
-	void VectorAngles(const vec3_t forward, vec3_t angles);
+int InvertMatrix( const float * m, float *out );
 
-	int InvertMatrix(const float * m, float *out);
-
-	int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct mplane_s *plane);
-	float	anglemod(float a);
-
-
+int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct mplane_s *plane);
+float	anglemod(float a);
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)	\
 	(((p)->type < 3)?						\
@@ -147,7 +95,4 @@ extern "C++" {
 	)										\
 	:										\
 		BoxOnPlaneSide( (emins), (emaxs), (p)))
-
-#ifdef __cplusplus
-}
-#endif
+#endif // MATHLIB_H

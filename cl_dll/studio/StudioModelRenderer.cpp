@@ -39,6 +39,7 @@
 
 #include "event_api.h"
 #include "pm_defs.h"
+#include "pm_math.h"
 
 #include "com_weapons.h"
 

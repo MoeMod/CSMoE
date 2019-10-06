@@ -16,9 +16,9 @@
 #ifdef vec3_t
 #undef vec3_t
 #endif
-#include "mathlib.h"
 
 #include "basetypes.h"
+#include "pm_math.h"
 #include "const.h"
 #include "usercmd.h"
 #include "pm_defs.h"
@@ -944,7 +944,7 @@ int PM_ClipVelocity(vec3_t in, vec3_t normal, vec3_t out, float overbounce)
 
 	// Determine how far along plane to slide based on incoming direction.
 	// Scale by overbounce factor.
-	backoff = _DotProduct(in, normal) * overbounce;
+	backoff = DotProduct(in, normal) * overbounce;
 
 	for (i = 0; i < 3; i++)
 	{
@@ -1136,7 +1136,7 @@ int PM_FlyMove(void)
 					if (j != i)
 					{
 						// Are we now moving against this plane?
-						if (_DotProduct(pmove->velocity, planes[j]) < 0)
+						if (DotProduct(pmove->velocity, planes[j]) < 0)
 							break;	// not ok
 					}
 				if (j == numplanes)  // Didn't have to clip, so we're ok
@@ -1159,7 +1159,7 @@ int PM_FlyMove(void)
 					break;
 				}
 				CrossProduct(planes[0], planes[1], dir);
-				d = _DotProduct(dir, pmove->velocity);
+				d = DotProduct(dir, pmove->velocity);
 				VectorScale(dir, d, pmove->velocity);
 			}
 
@@ -1167,7 +1167,7 @@ int PM_FlyMove(void)
 			// if original velocity is against the original velocity, stop dead
 			// to avoid tiny occilations in sloping corners
 			//
-			if (_DotProduct(pmove->velocity, primal_velocity) <= 0)
+			if (DotProduct(pmove->velocity, primal_velocity) <= 0)
 			{
 				//Con_DPrintf( "Back\n" );
 				VectorCopy(vec3_origin, pmove->velocity);
@@ -1204,7 +1204,7 @@ void PM_Accelerate(vec3_t wishdir, float wishspeed, float accel)
 		return;
 
 	// See if we are changing direction a bit
-	currentspeed = _DotProduct(pmove->velocity, wishdir);
+	currentspeed = DotProduct(pmove->velocity, wishdir);
 
 	// Reduce wishspeed by the amount of veer.
 	addspeed = wishspeed - currentspeed;
@@ -1504,7 +1504,7 @@ void PM_AirAccelerate(vec3_t wishdir, float wishspeed, float accel)
 	if (wishspd > 30)
 		wishspd = 30;
 	// Determine veer amount
-	currentspeed = _DotProduct(pmove->velocity, wishdir);
+	currentspeed = DotProduct(pmove->velocity, wishdir);
 	// See how much to add
 	addspeed = wishspd - currentspeed;
 	// If not adding any, done.
@@ -1997,7 +1997,7 @@ void PM_SpectatorMove(void)
 		speed = Length(pmove->velocity);
 		if (speed < 1)
 		{
-			VectorCopy(vec3_origin, pmove->velocity)
+			VectorCopy(vec3_origin, pmove->velocity);
 		}
 		else
 		{
@@ -2041,7 +2041,7 @@ void PM_SpectatorMove(void)
 			wishspeed = pmove->movevars->spectatormaxspeed;
 		}
 
-		currentspeed = _DotProduct(pmove->velocity, wishdir);
+		currentspeed = DotProduct(pmove->velocity, wishdir);
 		addspeed = wishspeed - currentspeed;
 		if (addspeed <= 0)
 			return;
@@ -2453,7 +2453,7 @@ void PM_LadderMove(physent_t *pLadder)
 				VectorNormalize(perp);
 
 				// decompose velocity into ladder plane
-				normal = _DotProduct(velocity, trace.plane.normal);
+				normal = DotProduct(velocity, trace.plane.normal);
 				// This is the velocity into the face of the ladder
 				VectorScale(trace.plane.normal, normal, cross);
 
@@ -2664,7 +2664,7 @@ void PM_Physics_Toss()
 			pmove->velocity[2] = 0;
 		}
 
-		vel = _DotProduct(pmove->velocity, pmove->velocity);
+		vel = DotProduct(pmove->velocity, pmove->velocity);
 
 		// Con_DPrintf( "%f %f: %.0f %.0f %.0f\n", vel, trace.fraction, ent->velocity[0], ent->velocity[1], ent->velocity[2] );
 
@@ -2678,7 +2678,7 @@ void PM_Physics_Toss()
 			VectorScale(pmove->velocity, (1.0 - trace.fraction) * pmove->frametime * 0.9, move);
 			trace = PM_PushEntity(move);
 		}
-		VectorSubtract(pmove->velocity, base, pmove->velocity)
+		VectorSubtract(pmove->velocity, base, pmove->velocity);
 	}
 
 	// check for in water
@@ -2942,7 +2942,7 @@ void PM_CheckWaterJump(void)
 	VectorNormalize(flatforward);
 
 	// Are we backing into water from steps or something?  If so, don't pop forward
-	if (curspeed != 0.0 && (_DotProduct(flatvelocity, flatforward) < 0.0))
+	if (curspeed != 0.0 && (DotProduct(flatvelocity, flatforward) < 0.0))
 		return;
 
 	VectorCopy(pmove->origin, vecStart);
@@ -3060,7 +3060,7 @@ float PM_CalcRoll(vec3_t angles, vec3_t velocity, float rollangle, float rollspe
 
 	AngleVectors(angles, forward, right, up);
 
-	side = _DotProduct(velocity, right);
+	side = DotProduct(velocity, right);
 
 	sign = side < 0 ? -1 : 1;
 
