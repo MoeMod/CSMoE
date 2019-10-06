@@ -246,22 +246,22 @@ float AngleBetweenVectors( const vec3_t v1, const vec3_t v2 )
 	if( !l1 || !l2 )
 		return 0.0f;
 
-	angle = acos( DotProduct( v1, v2 ) / ( l1 * l2 ) );
+	angle = acos( _DotProduct( const_cast<float *>(v1), const_cast<float *>(v2) ) / ( l1 * l2 ) );
 	angle = ( angle  * 180.0f ) / M_PI;
 
 	return angle;
 }
 
-float _DotProduct( const vec3_t v1, const vec3_t v2 )
+float _DotProduct( vec3_t v1, vec3_t v2 )
 {
 	return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
-void VectorTransform( const vec3_t in1, float in2[3][4], vec3_t out )
+void VectorTransform(const vec_t *in1, float (*in2)[4], vec_t *out)
 {
-	out[0] = _DotProduct( in1, in2[0] ) + in2[0][3];
-	out[1] = _DotProduct( in1, in2[1] ) + in2[1][3];
-	out[2] = _DotProduct( in1, in2[2] ) + in2[2][3];
+	out[0] = _DotProduct( const_cast<float *>(in1), in2[0] ) + in2[0][3];
+	out[1] = _DotProduct( const_cast<float *>(in1), in2[1] ) + in2[1][3];
+	out[2] = _DotProduct( const_cast<float *>(in1), in2[2] ) + in2[2][3];
 }
 
 int VectorCompare( const vec3_t v1, const vec3_t v2 )

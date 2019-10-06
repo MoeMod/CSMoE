@@ -115,7 +115,7 @@ extern "C++" {
 
 	void AngleMatrix(const float *angles, float(*matrix)[4]);
 	void AngleIMatrix(const vec3_t angles, float(*matrix)[4]);
-	void VectorTransform(const vec3_t in1, float in2[3][4], vec3_t out);
+	void VectorTransform(const vec_t *in1, float (*in2)[4], vec_t *out);
 
 	void NormalizeAngles(vec3_t angles);
 	void InterpolateAngles(vec3_t start, vec3_t end, vec3_t output, float frac);

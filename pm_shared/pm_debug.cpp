@@ -196,9 +196,9 @@ void PM_DrawPhysEntBBox(int num, int pcolor, float life)
 			for (j = 0; j < 8; j++)
 			{
 				VectorCopy(p[j], tmp);
-				p[j][0] = DotProduct  ( tmp, forward );
-				p[j][1] = DotProduct ( tmp, right );
-				p[j][2] = DotProduct  ( tmp, up );
+				p[j][0] = _DotProduct  ( tmp, forward );
+				p[j][1] = _DotProduct ( tmp, right );
+				p[j][2] = _DotProduct  ( tmp, up );
 			}
 		}
 
