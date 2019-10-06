@@ -109,7 +109,7 @@ extern "C++" {
 	fixed16_t Invert24To16(fixed16_t val);
 	int GreatestCommonDivisor(int i1, int i2);
 
-	void AngleVectors(const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
+	void AngleVectors(const float *angles, float *forward, float *right, float *up);
 	void AngleVectorsTranspose(const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 #define AngleIVectors	AngleVectorsTranspose
 
