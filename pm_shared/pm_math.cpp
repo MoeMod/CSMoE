@@ -37,11 +37,13 @@ int nanmask = 255 << 23;
 
 vec3_t vec3_origin = { 0,0,0 };
 
+/*
 float anglemod( float a )
 {
 	a = ( 360.0 / 65536 ) * ( (int)( a * ( 65536 / 360.0 ) ) & 65535 );
 	return a;
 }
+*/
 
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up )
 {
