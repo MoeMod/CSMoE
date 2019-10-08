@@ -647,12 +647,8 @@ CMonster::CMonster() : CHostage(),
 	m_flTimeLastActive(0.0s), 
 	m_pMonsterStrategy(new CMonsterModStrategy_Default(this))
 {
-	MonsterManager().OnEntityAdd(this);
-}
-
-CMonster::~CMonster()
-{
-	MonsterManager().OnEntityRemove(this);
+	m_pLifeCycleHolder = std::make_shared<CMonster *>(this);
+	MonsterManager().OnEntityAdd(m_pLifeCycleHolder);
 }
 
 void CMonster::IdleThink()
@@ -783,7 +779,7 @@ bool CMonster::CheckSequence()
 	// sequence settings.
 	if (gpGlobals->time >= m_flFlinchTime)
 	{
-		if (pev->velocity.Length() > 15)
+		if (pev->velocity.IsLengthGreaterThan(15))
 		{
 			SetAnimation(MONSTERANIM_WALK);
 		}

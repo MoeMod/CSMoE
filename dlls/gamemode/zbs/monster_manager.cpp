@@ -14,18 +14,27 @@ namespace sv {
 class CMonsterManager::impl_t
 {
 public:
-	std::vector<CMonster *> m_vecEntities;
+	std::vector<std::weak_ptr<CMonster *>> m_vecEntities;
 	size_t m_iMaxEntitiesNum;
 	float m_flAutoGcRatio;
+
 	void ResizeEntities(size_t new_size)
 	{
 		if (m_vecEntities.size() <= new_size)
 			return;
 
-		std::nth_element(m_vecEntities.begin(), m_vecEntities.begin() + new_size, m_vecEntities.end(),
-		                 [](CMonster *a, CMonster *b) { return a->m_flTimeLastActive > b->m_flTimeLastActive; });
-		std::for_each(m_vecEntities.begin() + new_size, m_vecEntities.end(),
-		              std::bind(&CBaseEntity::Killed, std::placeholders::_1, nullptr, GIB_NORMAL));
+		std::vector<std::shared_ptr<CMonster *>> vecAvailable;
+		std::transform(m_vecEntities.begin(), m_vecEntities.end(), std::back_inserter(vecAvailable),
+				[](const std::weak_ptr<CMonster *> &p) { return p.lock(); });
+		vecAvailable.erase(std::remove(vecAvailable.begin(), vecAvailable.end(), nullptr), vecAvailable.end());
+
+		std::nth_element(vecAvailable.begin(), vecAvailable.begin() + new_size, vecAvailable.end(),
+				[](const std::shared_ptr<CMonster *> &a, const std::shared_ptr<CMonster *> &b) { return (*a)->m_flTimeLastActive > (*b)->m_flTimeLastActive; });
+
+		std::for_each(vecAvailable.begin() + new_size, vecAvailable.end(),
+				[](const std::shared_ptr<CMonster *> &e) {(*e)->Killed(nullptr, GIB_NORMAL);});
+
+		m_vecEntities.assign(vecAvailable.begin(), vecAvailable.end());
 	}
 
 	void AutoResizeCheck()
@@ -48,27 +57,16 @@ CMonsterManager::~CMonsterManager() // frees the pimpl
 
 }
 
-void CMonsterManager::OnEntityAdd(CMonster *ent)
+void CMonsterManager::OnEntityAdd(std::shared_ptr<CMonster *> &holder)
 {
+	assert(holder != nullptr);
 	pimpl->AutoResizeCheck();
-	pimpl->m_vecEntities.push_back(ent);
-}
-
-void CMonsterManager::OnEntityRemove(CMonster *ent)
-{
-	auto &v = pimpl->m_vecEntities;
-	v.erase(std::find(v.begin(), v.end(), ent), v.end());
+	pimpl->m_vecEntities.push_back(holder);
 }
 
 size_t CMonsterManager::EntityCount()
 {
 	return pimpl->m_vecEntities.size();
-}
-
-void CMonsterManager::EntityForEach(std::function<void(CMonster *)> functor)
-{
-	auto &v = pimpl->m_vecEntities;
-	std::for_each(v.begin(), v.end(), functor);
 }
 
 void CMonsterManager::SetMaxNumOfEntity(size_t what)
