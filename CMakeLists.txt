@@ -12,7 +12,7 @@ endif()
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
-option(XASH_PCH "Enable PCH support." OFF)
+option(XASH_PCH "Enable PCH support." ON)
 
 if(XASH_PCH)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler/")

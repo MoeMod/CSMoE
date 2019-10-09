@@ -1503,6 +1503,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../cl_dll/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					../cl_dll,
 					../cl_dll/hud,
@@ -1542,6 +1544,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../cl_dll/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					../cl_dll,
 					../cl_dll/hud,

@@ -1811,6 +1811,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../dlls/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					..,
 					../common/,
@@ -1851,6 +1853,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../dlls/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					..,
 					../common/,

@@ -24,12 +24,10 @@ public:
 
 private:
 	friend class CMonster;
-	void OnEntityAdd(CMonster *ent);
-	void OnEntityRemove(CMonster *ent);
+	void OnEntityAdd(std::shared_ptr<CMonster *> &holder);
 
 public:
 	size_t EntityCount();
-	void EntityForEach(std::function<void(CMonster *)> functor);
 
 public: // max monster num settings
 	void SetMaxNumOfEntity(size_t what);

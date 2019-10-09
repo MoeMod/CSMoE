@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+namespace sv{
+
 class SteamFile
 {
 public:
@@ -78,6 +80,8 @@ inline bool SteamFile::Read(void *data, int length)
 	}
 
 	return true;
+}
+
 }
 
 #endif // STEAM_UTIL_H

@@ -82,7 +82,6 @@ public:
 
 	// RAII support to prevent memory leak.
 	CMonster();
-	~CMonster() override;
 
 public:
 	int LookupSequence(const char *label);
@@ -123,7 +122,7 @@ public:
 
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
-
+	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
 };
 
 }
