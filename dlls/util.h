@@ -167,12 +167,6 @@ constexpr Vector VEC_DUCK_HULL_MIN =	Vector(-16, -16, -18);
 constexpr Vector VEC_DUCK_HULL_MAX =	Vector(16, 16, 32);
 constexpr Vector VEC_DUCK_VIEW =		Vector(0, 0, 12);
 
-#define PLAYBACK_EVENT(flags, who, index)\
-		PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
-
-#define PLAYBACK_EVENT_DELAY(flags, who, index, delay)\
-		PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
-
 #ifdef CLIENT_DLL
 #include "cs_wpn/bte_weapons.h"
 #include "cs_wpn/bte_weapons_register.h"
@@ -271,6 +265,9 @@ namespace cl {
 #else
 namespace sv {
 #endif
+
+inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
 
 inline void MAKE_STRING_CLASS(const char *str, entvars_t *pev)
 {

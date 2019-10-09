@@ -4634,9 +4634,10 @@ void CHalfLifeMultiplay::ChangeLevel()
 void CHalfLifeMultiplay::SendMOTDToClient(edict_t *client)
 {
 	// read from the MOTD.txt file
-	int length, char_count = 0;
-	char *pFileList;
-	char *aFileList = pFileList = (char *)LOAD_FILE_FOR_ME((char *)CVAR_GET_STRING("motdfile"), &length);
+	int length = 0;
+	size_t char_count = 0;
+	char * const aFileList = (char *)LOAD_FILE_FOR_ME((char *)CVAR_GET_STRING("motdfile"), &length);
+	char *pFileList = aFileList;
 
 	// send the server name
 	MESSAGE_BEGIN(MSG_ONE, gmsgServerName, NULL, client);
