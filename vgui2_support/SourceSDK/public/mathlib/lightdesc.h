@@ -10,7 +10,7 @@
 #include <mathlib/ssemath.h>
 #endif
 
-#include <vector.h>
+#include "SourceSDK/vector.h"
 
 //-----------------------------------------------------------------------------
 // Light structure

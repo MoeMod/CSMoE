@@ -46,25 +46,6 @@ namespace vgui2 {
 	//SRC only defines
 	//These types aren't used in GoldSource. - Solokiller
 	struct Vertex_t;
-	/*
-	struct Vertex_t
-	{
-		Vertex_t() {}
-		Vertex_t( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
-		void Init( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
-
-		Vector2D	m_Position;
-		Vector2D	m_TexCoord;
-	};
-	*/
 
 	/*
 	enum FontDrawType_t

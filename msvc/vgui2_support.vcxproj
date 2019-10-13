@@ -186,6 +186,7 @@
     <ClInclude Include="..\vgui2_support\interfaces\vgui\IVGui.h" />
     <ClInclude Include="..\vgui2_support\interfaces\vgui\KeyCode.h" />
     <ClInclude Include="..\vgui2_support\interfaces\vgui\MouseCode.h" />
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\Vertex_t.h" />
     <ClInclude Include="..\vgui2_support\interfaces\vgui\VGUI2.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls_simple\controls.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls_simple\Panel.h" />

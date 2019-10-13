@@ -10,7 +10,7 @@
 //#ifdef _WIN32
 
 #include <xmmintrin.h>
-#include <vector.h>
+#include "SourceSDK/vector.h"
 
 #ifdef POSIX
 typedef int int32;

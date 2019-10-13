@@ -4170,6 +4170,27 @@ void TextEntry::SetDrawLanguageIDAtLeft( bool state )
 	m_bDrawLanguageIDAtLeft = state;
 }
 
+void TextEntry::SetBackgroundSkin(IScheme* pScheme, char* szSkin)
+{
+	char buffer[64];
+	auto va = [&buffer](const char* format, auto...args) { sprintf(buffer, format, args...); return buffer; };
+	const char *resourceString = pScheme->GetResourceString(va("TextEntry/%sTopLeft", szSkin));
+
+	if (resourceString[0])
+	{
+		m_bImageBackground = true;
+		m_pTopBackground[0] = scheme()->GetImage(resourceString, true);
+		m_pTopBackground[1] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sTopCenter", szSkin)), true);
+		m_pTopBackground[2] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sTopRight", szSkin)), true);
+		m_pCenterBackground[0] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sMiddleLeft", szSkin)), true);
+		m_pCenterBackground[1] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sMiddleCenter", szSkin)), true);
+		m_pCenterBackground[2] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sMiddleRight", szSkin)), true);
+		m_pBottomBackground[0] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sBottomLeft", szSkin)), true);
+		m_pBottomBackground[1] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sBottomCenter", szSkin)), true);
+		m_pBottomBackground[2] = scheme()->GetImage(pScheme->GetResourceString(va("TextEntry/%sBottomRight", szSkin)), true);
+	}
+}
+
 bool TextEntry::GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& msglist )
 {
 	menu->AddMenuItem( "replace", "#TextEntry_ReplaceText", "replace", this );

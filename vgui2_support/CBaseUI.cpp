@@ -1,8 +1,8 @@
 #include <vector>
 #include <string.h>
-#include <vgui_api.h>
-#include "wrect.h"
-#include "cl_dll.h"
+
+#include "vgui_api.h"
+#include "cdll_int.h"
 
 #include "entity_state.h"
 #include "usercmd.h"
@@ -24,6 +24,7 @@
 #include "BaseUISurface.h"
 
 extern cldll_func_t gClDllFuncs;
+extern cl_enginefunc_t gEngfuncs;
 
 IClientVGUI *staticClient;
 vgui2::IInputInternal *g_pInputInternal;

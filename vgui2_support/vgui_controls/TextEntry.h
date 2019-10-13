@@ -219,6 +219,8 @@ public:
 	// By default, we draw the language shortname on the right hand side of the control
 	void SetDrawLanguageIDAtLeft( bool state );
 
+	void SetBackgroundSkin(IScheme* pScheme, char* szSkin);
+
 	virtual bool GetDropContextMenu( Menu *menu, CUtlVector< KeyValues * >& data );
 	virtual bool IsDroppable( CUtlVector< KeyValues * >& data );
 	virtual void OnPanelDropped( CUtlVector< KeyValues * >& data );

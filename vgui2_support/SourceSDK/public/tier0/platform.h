@@ -423,13 +423,13 @@ typedef void * HINSTANCE;
 #endif
 
 // When we port to 64 bit, we'll have to resolve the int, ptr vs size_t 32/64 bit problems...
-#if !defined( _WIN64 ) && defined( WIN32 )
+#if !defined( _WIN64 ) && defined( _WIN32 )
 #pragma warning( disable : 4267 )	// conversion from 'size_t' to 'int', possible loss of data
 #pragma warning( disable : 4311 )	// pointer truncation from 'char *' to 'int'
 #pragma warning( disable : 4312 )	// conversion from 'unsigned int' to 'memhandle_t' of greater size
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
 //Ported from Source 2013. - Solokiller
 #define _mkdir(dir) mkdir( dir, S_IRWXU | S_IRWXG | S_IRWXO )
 #endif

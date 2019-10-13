@@ -58,6 +58,12 @@
     <Filter Include="public">
       <UniqueIdentifier>{3b9d1c81-47fa-4ca9-a462-51e928dbd118}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\vgui2">
+      <UniqueIdentifier>{40859b7f-001c-47a2-af08-ee7fd0ba85f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cl_dll\vgui2\Viewport">
+      <UniqueIdentifier>{21f87b03-7d1d-4a0d-8866-08953fc287a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -687,14 +693,47 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_strongknifex.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\cl_dll\events\event_m134heroi.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_m134heroi.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_facelessvoid.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
-    <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_facelessvoid.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m134heroi.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_m134heroi.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CBaseViewport.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CClientMOTD.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CClientVGUI.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CGameUITestPanel.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CHudViewPort.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\KeyValuesCompat.cpp">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\vgui2\CBackGroundPanel.cpp">
+      <Filter>cl_dll\vgui2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1082,8 +1121,53 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CBaseViewport.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CClientMOTD.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CClientVGUI.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CHudViewPort.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IGameUIPanel.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IViewport.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\IViewportPanel.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\KeyValuesCompat.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\CBackGroundPanel.h">
+      <Filter>cl_dll\vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\ICSViewPortMsgs.h">
+      <Filter>cl_dll\vgui2\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPort.h">
+      <Filter>cl_dll\vgui2\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPortMsgs.h">
+      <Filter>cl_dll\vgui2\Viewport</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

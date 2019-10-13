@@ -68,6 +68,8 @@ namespace vgui2 {
 		virtual class Panel * GetPanel(VPANEL, const char  *) = 0;
 		virtual bool IsEnabled(VPANEL) = 0;
 		virtual void SetEnabled(VPANEL, bool) = 0;
+		virtual IClientPanel* Client(VPANEL vguiPanel) = 0;
+		virtual const char* GetModuleName(VPANEL vguiPanel) = 0;
 
 	public:
 		// deadipanel.cpp

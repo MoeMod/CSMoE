@@ -861,6 +861,30 @@ const char *Button::GetDescription( void )
 }
 
 //-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+void Button::SetCustomBorderScheme(IScheme* pScheme, char* szBorder)
+{
+	char buffer[64];
+	auto va = [&buffer](const char* format, auto...args) { sprintf(buffer, format, args...); return buffer; };
+	const char* enableImage = pScheme->GetResourceString(va("%sLeftC", szBorder));
+
+	if (enableImage[0])
+	{
+		_imageBackground = true;
+		_depressedImage[0] = scheme()->GetImage(enableImage, true);
+		_depressedImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterC", szBorder)), true);
+		_depressedImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightC", szBorder)), true);
+		_defaultImage[0] = scheme()->GetImage(pScheme->GetResourceString(va("%sLeftN", szBorder)), true);
+		_defaultImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterN", szBorder)), true);
+		_defaultImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightN", szBorder)), true);
+		_armedImage[0] = scheme()->GetImage(pScheme->GetResourceString(va("%sLeftO", szBorder)), true);
+		_armedImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterO", szBorder)), true);
+		_armedImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightO", szBorder)), true);
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void Button::OnSetState(int state)

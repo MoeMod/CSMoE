@@ -6,6 +6,12 @@
 
 #define PROTECTED_THINGS_DISABLE
 
+#include <direct.h>
+#include <stdio.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "DirectorySelectDialog.h"
 #include "Button.h"
 #include "ComboBox.h"
@@ -20,12 +26,6 @@
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-
-#include <direct.h>
-#include <stdio.h>
-#include <io.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

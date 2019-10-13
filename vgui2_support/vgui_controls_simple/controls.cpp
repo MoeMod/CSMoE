@@ -20,7 +20,6 @@ namespace vgui2
 	vgui2::IVGui *g_pVGuiInterface = NULL;
 	vgui2::IPanel *g_pPanelInterface = NULL;
 	vgui2::ILocalize *g_pLocalizeInterface = NULL;
-	vgui2::IKeyValues *g_pKeyValuesInterface = NULL;
 	IFileSystem *g_pFileSystemInterface = NULL;
 
 	vgui2::IInput *input() {
@@ -49,10 +48,6 @@ namespace vgui2
 
 	vgui2::ILocalize *localize() {
 		return g_pLocalizeInterface;
-	}
-
-	vgui2::IKeyValues *keyvalues() {
-		return g_pKeyValuesInterface;
 	}
 	
 	IFileSystem *filesystem() {
@@ -94,15 +89,9 @@ namespace vgui2
 		g_pInputInterface = (IInput *)InitializeInterface(VGUI_INPUT_INTERFACE_VERSION, factoryList, numFactories);
 		g_pLocalizeInterface = (ILocalize *)InitializeInterface(VGUI_LOCALIZE_INTERFACE_VERSION, factoryList, numFactories);
 		g_pFileSystemInterface = (IFileSystem *)InitializeInterface(FILESYSTEM_INTERFACE_VERSION, factoryList, numFactories);
-		g_pKeyValuesInterface = (IKeyValues *)InitializeInterface(VGUI_KEYVALUES_INTERFACE_VERSION, factoryList, numFactories);
 
 		if (!g_pVGuiInterface) {
 			return false;
-		}
-
-		if (g_pKeyValuesInterface) {
-			// TODO: implement KeyValues
-			g_pKeyValuesInterface->RegisterSizeofKeyValues(24);
 		}
 
 		g_pVGuiInterface->Init(factoryList, numFactories);

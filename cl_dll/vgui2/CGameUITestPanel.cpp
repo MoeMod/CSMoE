@@ -3,6 +3,7 @@
 #include "IEngineVgui.h"
 #include "CBaseViewport.h"
 #include "cl_dll.h"
+#include "hud.h"
 #include "cl_util.h"
 
 static void __CmdFunc_OpenGameUITestPanel()

@@ -1,9 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
-#include "wrect.h"
+#include "vgui_api.h"
 #include "cdll_int.h"
-
-#include <vgui_api.h>
 
 #include <vector>
 

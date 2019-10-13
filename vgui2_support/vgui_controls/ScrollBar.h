@@ -27,7 +27,7 @@ class ScrollBarSlider;
 //-----------------------------------------------------------------------------
 class ScrollBar : public Panel
 {
-	DECLARE_CLASS_SIMPLE( ScrollBar, Panel );
+	DECLARE_CLASS_SIMPLE(ScrollBar, Panel);
 
 public:
 	ScrollBar(Panel *parent, const char *panelName, bool vertical);
@@ -39,7 +39,7 @@ public:
 	virtual int     GetValue();
 
 	// Set the rangeof numbers the slider can scroll through
-	virtual void    SetRange(int min,int max);
+	virtual void    SetRange(int min, int max);
 
 	virtual void    GetRange(int &min, int &max);
 
@@ -59,7 +59,7 @@ public:
 	virtual bool    HasFullRange();
 
 	// Setup the indexed scroll bar button with the input params.
-	virtual void    SetButton(Button* button,int index);
+	virtual void    SetButton(Button* button, int index);
 	// Return the indexed scroll bar button
 	virtual Button *GetButton(int index);
 	// Set up the slider.

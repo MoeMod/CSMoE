@@ -9,10 +9,14 @@
 #define MATH_BASE_H
 
 #include <math.h>
-#include "basetypes.h"
-#include "SourceSDK/public/Vector.h"
-#include "SourceSDK/public/Vector2D.h"
+#include "tier0/basetypes.h"
+#include "mathlib/Vector.h"
+#include "mathlib/Vector2D.h"
 #include "tier0/dbg.h"
+
+#include <algorithm>
+using std::min;
+using std::max;
 
 #ifdef _WIN32
 #define FORCEINLINE_MATH FORCEINLINE
@@ -585,7 +589,7 @@ template<> FORCEINLINE_TEMPLATE QAngleByValue Lerp<QAngleByValue>( float flPerce
 #if !( __linux__ && __GNUC__ >= 7 ) 
 // Swap two of anything.
 template <class T> 
-FORCEINLINE_TEMPLATE void swap( T& x, T& y )
+FORCEINLINE_TEMPLATE void SWAP( T& x, T& y )
 {
 	T temp = x;
 	x = y;

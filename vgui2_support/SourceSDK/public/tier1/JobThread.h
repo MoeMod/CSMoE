@@ -242,7 +242,7 @@ protected:
 	AsyncStatus_t		m_status;
 	AsyncJobPriority_t	m_priority;
 	int					m_queueID;
-	CThreadMutex		m_mutex;
+	CThreadFastMutex	m_mutex; // MoeMod : changed from CThreadMutex, or you will get a link error !
 	CAsyncJobFuliller *	m_pFulfiller;
 
 private:

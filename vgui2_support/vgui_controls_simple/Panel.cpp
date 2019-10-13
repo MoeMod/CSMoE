@@ -1,6 +1,5 @@
 #include <string.h>
 #include "wrect.h"
-#include "cl_dll.h"
 #include "vgui/IVGui.h"
 #include "vgui/IPanel.h"
 #include "vgui/ISurface.h"

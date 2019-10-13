@@ -352,8 +352,9 @@ static int __cdecl DefaultSortFunc(
 	}
 	else    // its an imagePanel column
 	{
-	   	const ImagePanel *s1 = reinterpret_cast<ImagePanel *>(p1->kv->GetPtr(col, ""));
-		const ImagePanel *s2 = reinterpret_cast<ImagePanel *>(p2->kv->GetPtr(col, ""));
+		char s[] = "";
+	   	const ImagePanel *s1 = reinterpret_cast<ImagePanel *>(p1->kv->GetPtr(col, s));
+		const ImagePanel *s2 = reinterpret_cast<ImagePanel *>(p2->kv->GetPtr(col, s));
 
 		if (s1 < s2)
 		{

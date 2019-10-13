@@ -147,5 +147,8 @@
     <ClInclude Include="..\vgui2_support\vgui_controls_simple\controls.h">
       <Filter>vgui2_support\vgui_controls_simple</Filter>
     </ClInclude>
+    <ClInclude Include="..\vgui2_support\interfaces\vgui\Vertex_t.h">
+      <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

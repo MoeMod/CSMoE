@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SourceSDK">
+      <UniqueIdentifier>{9f4fc843-008e-4e1f-a93d-a1cc83f4e963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceSDK\tier1">
+      <UniqueIdentifier>{9c48cf6d-376b-4792-a673-0ffb5bcde6a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceSDK\public">
+      <UniqueIdentifier>{0894df7b-8bd2-4772-b431-49002ae93a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceSDK\public\tier0">
+      <UniqueIdentifier>{839ad410-a51a-4691-bec7-ff945aecbe12}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vgui2_support\SourceSDK\public\tier0\memoverride.cpp">
+      <Filter>SourceSDK\public\tier0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\checksum_crc.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\checksum_md5.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\ConVar.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\DataManager.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\Diff.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\generichash.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\JobThread.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\KeyValues.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\MemPool.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\netadr.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\processor_detect.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\RangeCheckedVar.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\StringPool.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\strtools.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\tier1.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\TokenReader.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlBuffer.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlString.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\UtlSymbol.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\xboxstubs.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\bitbuf.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\byteswap.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\tier1\CharacterSet.cpp">
+      <Filter>SourceSDK\tier1</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

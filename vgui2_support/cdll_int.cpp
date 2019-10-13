@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
-#include "wrect.h"
+
+#include "vgui_api.h"
 #include "cdll_int.h"
 
 #include "entity_state.h"
@@ -16,6 +17,7 @@
 
 cl_enginefunc_t gEngfuncs;
 cldll_func_t gClDllFuncs;
+void(*gClDllFuncs_F)(void*) = nullptr;
 
 void VGui_Startup(int width, int height);
 
@@ -53,15 +55,15 @@ int Initialize(cl_enginefunc_t *pEnginefuncs, int iVersion) {
 		return 0;
 	}
 
-	void(*F)(void *) = (void(*)(void *))Sys_GetProcAddress(pClDllModule, "F");
+	gClDllFuncs_F = (void(*)(void *))Sys_GetProcAddress(pClDllModule, "F");
 
-	if (!F) {
+	if (!gClDllFuncs_F) {
 		return 0;
 	}
 	g_pfnMobilityInterface = static_cast<int(*)(mobile_engfuncs_t *)>(Sys_GetProcAddress(pClDllModule, "HUD_MobilityInterface"));
 	modfuncs_t modfuncs;
 	gClDllFuncs.pfnInitialize = (INITIALIZE_FUNC)&modfuncs;
-	F(&gClDllFuncs);
+	gClDllFuncs_F(&gClDllFuncs);
 	pEnginefuncs->COM_ExpandFilename = Engfunc_Hooks::COM_ExpandFileName;
 	pEnginefuncs->pfnDrawSetTextColor = Engfunc_Hooks::pfnDrawSetTextColor;
 	
@@ -129,6 +131,8 @@ void IN_ClientLookEvent(float relyaw, float relpitch)
 } // namespace ClientDLL_Hooks
 
 extern "C" void EXPORT_FUNCTION F(void *pv) {
+	if (gClDllFuncs_F)
+		gClDllFuncs_F(pv);
 	*reinterpret_cast<cldll_func_t *>(pv) = {
 		ClientDLL_Hooks::Initialize,
 		[] { gClDllFuncs.pfnInit(); },

@@ -1,6 +1,4 @@
-#include <string.h>
-#include "wrect.h"
-#include "cl_dll.h"
+
 #include "CGameUIFuncs.h"
 
 using namespace vgui2;

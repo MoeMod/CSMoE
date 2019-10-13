@@ -4,8 +4,6 @@
 #include "tier1/KeyValues.h"
 #include "KeyValuesCompat.h"
 
-using vgui2::IKeyValues;
-
 IKeyValues* g_pKeyValuesInterface = nullptr;
 
 class CKeyValuesWrapper : public IKeyValuesSystem
@@ -61,7 +59,7 @@ bool KV_InitKeyValuesSystem( CreateInterfaceFn* pFactories, int iNumFactories )
 		if (!pFactories[i])
 			continue;
 
-		IKeyValues *result = reinterpret_cast<IKeyValues *>(pFactories[i](VGUI_KEYVALUES_INTERFACE_VERSION, NULL));
+		IKeyValues *result = reinterpret_cast<IKeyValues *>(pFactories[i](KEYVALUES_INTERFACE_VERSION, NULL));
 		if (result)
 		{
 			g_pKeyValuesInterface = result;

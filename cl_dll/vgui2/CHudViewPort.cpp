@@ -86,8 +86,8 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 	
 	if (Q_strcmp("ClientMOTD", pszName) == 0)
 	{
-		if(!m_pMOTD)
-			m_pMOTD = new CClientMOTD(this);
+		//if(!m_pMOTD)
+		//	m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)

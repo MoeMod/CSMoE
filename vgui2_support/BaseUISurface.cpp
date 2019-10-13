@@ -1,14 +1,16 @@
 #include <vector>
 #include <string.h>
-#include <vgui_api.h>
-#include "wrect.h"
-#include "cl_dll.h"
+
+#include "vgui_api.h"
+#include "cdll_int.h"
+
 #include "BaseUISurface.h"
 #include "vgui/IPanel.h"
 #include "vgui/IInput.h"
 #include "vgui_controls_simple/controls.h"
 
 extern vguiapi_t *g_api;
+extern cl_enginefunc_t gEngfuncs;
 
 bool BaseUISurface::m_bTranslateExtendedKeys;
 

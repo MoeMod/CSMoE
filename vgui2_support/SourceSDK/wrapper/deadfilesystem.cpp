@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "basetypes.h"
-#include "unicode_strtools.h"
+#include "../public/unicode_strtools.h"
 
 extern IFileSystem *g_pFullFileSystem;
 

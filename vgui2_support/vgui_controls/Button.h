@@ -126,6 +126,8 @@ public:
 	// Set key focused button border attributes.
 	virtual void SetKeyFocusBorder(IBorder *border);
 
+	virtual void SetCustomBorderScheme(IScheme* pScheme, char* szBorder);
+
 	// Set the command to send when the button is pressed
 	// Set the panel to send the command to with AddActionSignalTarget()
 	virtual void SetCommand( const char *command );

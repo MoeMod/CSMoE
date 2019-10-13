@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="vgui2">
+      <UniqueIdentifier>{9dbb1240-de0a-44a5-96a8-7df09c4b107a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2\vgui_surfacelib">
+      <UniqueIdentifier>{b4a0fddf-b88a-40d5-b749-ee1e13a955c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vguimatsurface">
+      <UniqueIdentifier>{82a02317-cb0c-469e-8890-a697999766e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui_controls">
+      <UniqueIdentifier>{e86730ff-9dcf-4e18-abfd-7e473822b66d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceSDK">
+      <UniqueIdentifier>{f21f799a-d376-4466-9214-81d50c201388}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_key_translation.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\VGuiKeyValues.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\VPanel.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\VPanelWrapper.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\Bitmap.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\Border.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\HtmlWindow.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\input.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\LocalizedStringTable.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\MemoryBitmap.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\Scheme.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\system_win32.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\UnicodeFileHelpers.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui.cpp">
+      <Filter>vgui2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.cpp">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.cpp">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.cpp">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vguimatsurface\Clip2D.cpp">
+      <Filter>vguimatsurface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui_controls\controls.cpp">
+      <Filter>vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\SourceSDK\FileSystem_Helpers.cpp">
+      <Filter>SourceSDK</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_key_translation.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\VGuiKeyValues.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\VPanel.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\Bitmap.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\Border.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\HtmlWindow.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\input.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\LocalizedStringTable.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\Memorybitmap.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\system_win32.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\UnicodeFileHelpers.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.h">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.h">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.h">
+      <Filter>vgui2\vgui_surfacelib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vguimatsurface\Clip2D.h">
+      <Filter>vguimatsurface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\VPanelWrapper.h">
+      <Filter>vgui2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui_controls\Controls.h">
+      <Filter>vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\SourceSDK\FileSystem_Helpers.h">
+      <Filter>SourceSDK</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
