@@ -9,6 +9,7 @@
 
 #include "hud.h"
 #include "parsemsg.h"
+#include "CCSBackGroundPanel.h"
 
 void CHudViewport::ApplySchemeSettings(vgui2::IScheme *pScheme)
 {
@@ -80,14 +81,22 @@ void CHudViewport::CreateDefaultPanels()
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
 }
 
+void CHudViewport::CreateBackGround()
+{
+	m_pBackGround = new CCSBackGroundPanel(this);
+
+	m_pBackGround->SetZPos(-20); // send it to the back 
+	m_pBackGround->SetVisible(false);
+}
+
 IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 {
 	IViewportPanel* pPanel = nullptr;
 	
 	if (Q_strcmp("ClientMOTD", pszName) == 0)
 	{
-		//if(!m_pMOTD)
-		//	m_pMOTD = new CClientMOTD(this);
+		if(!m_pMOTD)
+			m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)

@@ -11,12 +11,6 @@
     <Filter Include="vgui2_support\interfaces\vgui">
       <UniqueIdentifier>{2b4349e1-e116-4a65-a32a-da0985cc6e51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vgui2_support\vgui_controls_simple">
-      <UniqueIdentifier>{366eb1a8-6bf1-4191-be98-63dce218b38a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vgui2_support\vgui_controls">
-      <UniqueIdentifier>{e4ea098b-878e-445e-a6cc-fb0d217d8360}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vgui2_support\SourceSDK">
       <UniqueIdentifier>{e5e02363-8605-4bc0-9859-1dcb75543e62}</UniqueIdentifier>
     </Filter>
@@ -45,12 +39,6 @@
     </ClCompile>
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp">
       <Filter>vgui2_support\SourceSDK\tier1</Filter>
-    </ClCompile>
-    <ClCompile Include="..\vgui2_support\vgui_controls_simple\Panel.cpp">
-      <Filter>vgui2_support\vgui_controls_simple</Filter>
-    </ClCompile>
-    <ClCompile Include="..\vgui2_support\vgui_controls_simple\controls.cpp">
-      <Filter>vgui2_support\vgui_controls_simple</Filter>
     </ClCompile>
     <ClCompile Include="..\vgui2_support\SourceSDK\mathlib\mathlib.cpp">
       <Filter>vgui2_support\SourceSDK\mathlib</Filter>
@@ -140,12 +128,6 @@
     </ClInclude>
     <ClInclude Include="..\vgui2_support\interfaces\vgui\ISchemeManager.h">
       <Filter>vgui2_support\interfaces\vgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vgui2_support\vgui_controls_simple\Panel.h">
-      <Filter>vgui2_support\vgui_controls_simple</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vgui2_support\vgui_controls_simple\controls.h">
-      <Filter>vgui2_support\vgui_controls_simple</Filter>
     </ClInclude>
     <ClInclude Include="..\vgui2_support\interfaces\vgui\Vertex_t.h">
       <Filter>vgui2_support\interfaces\vgui</Filter>

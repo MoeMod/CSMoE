@@ -2,6 +2,7 @@
 #define CBASEUI_H
 
 #include "IBaseUI.h"
+#include "IEngineVgui.h"
 
 class CBaseUI : public IBaseUI {
 public:
@@ -25,6 +26,23 @@ private:
 	CSysModule *m_hVGuiModule;
 	CSysModule *m_hChromeModule;
 	CSysModule *m_hClientModule;
+};
+
+class CEngineVGui : public IEngineVGui
+{
+public:
+	CEngineVGui() = default;
+	virtual ~CEngineVGui() = default;
+
+	vgui2::VPANEL GetPanel(VGUIPANEL type) override;
+	bool SteamRefreshLogin(const char* password, bool isSecure) override;
+	bool SteamProcessCall(bool* finished, TSteamProgress* progress, TSteamError* steamError) override;
+
+	void SetEngineVisible(bool state);
+
+private:
+	bool m_bVisible = true;
+	//SteamHandle_t m_hRefreshLoginHandle = 0;
 };
 
 #endif // CBASEUI_H

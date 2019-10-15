@@ -7,7 +7,8 @@
 #include "BaseUISurface.h"
 #include "vgui/IPanel.h"
 #include "vgui/IInput.h"
-#include "vgui_controls_simple/controls.h"
+#include "vgui/IInputInternal.h"
+#include "vgui_controls/controls.h"
 
 extern vguiapi_t *g_api;
 extern cl_enginefunc_t gEngfuncs;

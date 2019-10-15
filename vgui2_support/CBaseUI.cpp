@@ -19,8 +19,8 @@
 #include "vgui/ISystem.h"
 #include "vgui/IClientVGUI.h"
 #include "vgui/IInputInternal.h"
-#include "vgui_controls_simple/controls.h"
-#include "vgui_controls_simple/Panel.h"
+#include "vgui_controls/controls.h"
+#include "vgui_controls/Panel.h"
 #include "BaseUISurface.h"
 
 extern cldll_func_t gClDllFuncs;
@@ -35,8 +35,12 @@ class CEnginePanel *staticClientDLLPanel;
 
 class CEnginePanel : public vgui2::Panel {
 public:
-	CEnginePanel() {
-		vgui2::Panel::Panel();
+	CEnginePanel() : Panel() {
+		m_bCanFocus = true;
+	}
+
+	CEnginePanel(Panel* parent, const char* panelName) : Panel(parent, panelName)
+	{
 		m_bCanFocus = true;
 	}
 
@@ -93,7 +97,9 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 
 	vgui2::filesystem()->AddSearchPath(".", "BASE");
 	vgui2::filesystem()->AddSearchPath("platform", "PLATFORM");
+	vgui2::filesystem()->AddSearchPath("cstrike", "GAME");
 	vgui2::filesystem()->AddSearchPath(gEngfuncs.pfnGetGameDirectory(), "GAME");
+	vgui2::filesystem()->AddSearchPath("cstrike", "GAMECONFIG");
 	vgui2::filesystem()->AddSearchPath(gEngfuncs.pfnGetGameDirectory(), "GAMECONFIG");
 	vgui2::filesystem()->AddSearchPath("valve", "GAME_FALLBACK");
 
@@ -107,7 +113,24 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 }
 
 void CBaseUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion) {
+	
 	staticPanel = new CStaticPanel();
+	staticPanel->SetCursor(vgui2::dc_none);
+
+	{
+		const auto color = staticPanel->GetBgColor();
+
+		//Set alpha to maximum.
+		staticPanel->SetBgColor(Color(color.r(), color.g(), color.b(), 0xFF));
+	}
+
+	staticPanel->SetBounds(0, 0, 40, 30);
+
+	staticPanel->SetPaintBorderEnabled(false);
+	staticPanel->SetPaintBackgroundEnabled(false);
+	staticPanel->SetPaintEnabled(false);
+
+	staticPanel->SetCursor(vgui2::dc_none);
 	staticPanel->SetVisible(true);
 	staticPanel->SetZPos(0);
 
@@ -134,22 +157,40 @@ void CBaseUI::Start(struct cl_enginefuncs_s *engineFuncs, int interfaceVersion) 
 	vgui2::ivgui()->Start();
 	vgui2::ivgui()->SetSleep(false);
 
-	staticClientDLLPanel = new CEnginePanel();
+	staticClientDLLPanel = new CEnginePanel(staticPanel, "BaseClientPanel");
+
+	{
+		Color color = staticClientDLLPanel->GetBgColor();
+
+		//Set alpha to maximum.
+		staticClientDLLPanel->SetBgColor(Color(color.r(), color.g(), color.b(), 0xFF));
+	}
+
+	staticClientDLLPanel->SetPaintBorderEnabled(false);
+	staticClientDLLPanel->SetPaintBackgroundEnabled(false);
+	staticClientDLLPanel->SetPaintEnabled(false);
+	
 	staticClientDLLPanel->SetVisible(true);
+	staticClientDLLPanel->SetCursor(vgui2::dc_none);
+
+	//Draw above static panel.
 	staticClientDLLPanel->SetZPos(25);
 
 	if (staticClient) {
 		staticClient->Initialize(m_FactoryList, m_iNumFactories);
+		staticSurface->SetVGUI2MouseControl(true);
 	}
 
-	staticPanel->SetScheme("ClientScheme");
+	staticClientDLLPanel->SetScheme("ClientScheme");
 
 	if (staticClient) {
 		staticClient->Start();
+		staticClient->SetParent(staticClientDLLPanel->GetVPanel());
 	}
 
 	int wide, tall;
 	staticSurface->GetScreenSize(wide, tall);
+	
 	staticPanel->SetBounds(0, 0, wide, tall);
 	staticClientDLLPanel->SetBounds(0, 0, wide, tall);
 
@@ -191,7 +232,9 @@ void CBaseUI::Paint(int x, int y, int right, int bottom) {
 	staticSurface->SetScreenBounds(x, y, right - x, bottom - y);
 	staticPanel->SetBounds(0, 0, right, bottom);
 	staticClientDLLPanel->SetBounds(0, 0, right, bottom);
-	staticPanel->PerformApplySchemeSettings();
+	//staticPanel->PerformApplySchemeSettings();
+	//staticPanel->InvalidateLayout(false, true);
+	static_cast<vgui2::IClientPanel*>( staticPanel )->Think();
 	vgui2::surface()->PaintTraverse(staticSurface->GetEmbeddedPanel());
 }
 
@@ -207,4 +250,42 @@ void CBaseUI::HideConsole() {
 void CBaseUI::ShowConsole() {
 }
 
+vgui2::VPANEL CEngineVGui::GetPanel(VGUIPANEL type)
+{
+	switch (type)
+	{
+	default:
+	case PANEL_ROOT:		return staticPanel->GetVPanel();
+	case PANEL_CLIENTDLL:	return staticClientDLLPanel->GetVPanel();
+	//case PANEL_GAMEUIDLL:	return staticGameUIPanel->GetVPanel();
+	case PANEL_GAMEUIDLL:	return NULL;
+	}
+	return NULL;
+}
+
+bool CEngineVGui::SteamRefreshLogin(const char* password, bool isSecure)
+{
+	return true;
+}
+
+bool CEngineVGui::SteamProcessCall(bool* finished, TSteamProgress* progress, TSteamError* steamError)
+{
+	return true;
+}
+
+void CEngineVGui::SetEngineVisible(bool state)
+{
+	m_bVisible = state;
+#if 0
+	if (!g_bIsDedicatedServer)
+	{
+		if (state)
+			ClientDLL_ActivateMouse();
+		else
+			ClientDLL_DeactivateMouse();
+	}
+#endif
+}
+
 EXPOSE_SINGLE_INTERFACE(CBaseUI, IBaseUI, BASEUI_INTERFACE_VERSION);
+EXPOSE_SINGLE_INTERFACE(CEngineVGui, IEngineVGui, VENGINE_VGUI_VERSION);

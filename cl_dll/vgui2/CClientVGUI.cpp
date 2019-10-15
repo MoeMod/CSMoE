@@ -109,7 +109,7 @@ void CClientVGUI::Start()
 
 #if 0
 	vgui2::Frame* pFrame = new vgui2::Frame(nullptr, "TestFrame");
-	//pFrame->SetParent(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
+	pFrame->SetParent(engineVgui()->GetPanel(PANEL_CLIENTDLL));
 	pFrame->SetProportional(false);
 	pFrame->SetTitleBarVisible(true);
 	pFrame->SetMinimizeButtonVisible(false);

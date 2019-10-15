@@ -115,7 +115,9 @@ public:
 	bool AddNewGameUIPanel(IGameUIPanel* pPanel);
 	IGameUIPanel* FindGameUIPanelByName(const char* pszName);
 
-private:
+	virtual void CreateBackGround();
+
+protected:
 	int m_OldSize[ 2 ] = { -1, -1 };
 	int m_nRootSize[ 2 ] = { -1, -1 };
 

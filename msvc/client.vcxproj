@@ -159,9 +159,11 @@
     <ClCompile Include="..\cl_dll\vgui2\CBaseViewport.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CClientMOTD.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CClientVGUI.cpp" />
+    <ClCompile Include="..\cl_dll\vgui2\CCSBackGroundPanel.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CGameUITestPanel.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\CHudViewPort.cpp" />
     <ClCompile Include="..\cl_dll\vgui2\KeyValuesCompat.cpp" />
+    <ClCompile Include="..\cl_dll\vgui2\vgui_int.cpp" />
     <ClCompile Include="..\cl_dll\vgui_parser.cpp" />
     <ClCompile Include="..\cl_dll\view.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp" />
@@ -294,12 +296,14 @@
     <ClInclude Include="..\cl_dll\vgui2\CBaseViewport.h" />
     <ClInclude Include="..\cl_dll\vgui2\CClientMOTD.h" />
     <ClInclude Include="..\cl_dll\vgui2\CClientVGUI.h" />
+    <ClInclude Include="..\cl_dll\vgui2\CCSBackGroundPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\CGameUITestPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\CHudViewPort.h" />
     <ClInclude Include="..\cl_dll\vgui2\IGameUIPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\IViewport.h" />
     <ClInclude Include="..\cl_dll\vgui2\IViewportPanel.h" />
     <ClInclude Include="..\cl_dll\vgui2\KeyValuesCompat.h" />
+    <ClInclude Include="..\cl_dll\vgui2\vgui_int.h" />
     <ClInclude Include="..\cl_dll\vgui2\Viewport\ICSViewPortMsgs.h" />
     <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPort.h" />
     <ClInclude Include="..\cl_dll\vgui2\Viewport\IViewPortMsgs.h" />

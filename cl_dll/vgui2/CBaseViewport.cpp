@@ -1,6 +1,3 @@
-//TODO: Need to merge the vector classes - Solokiller
-#define VECTOR2D_H
-
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui_controls/AnimationController.h>
@@ -66,10 +63,7 @@ void CBaseViewport::Start()
 	// recreate all the default panels
 	RemoveAllPanels();
 
-	m_pBackGround = new CBackGroundPanel( nullptr );
-
-	m_pBackGround->SetZPos( -20 ); // send it to the back 
-	m_pBackGround->SetVisible( false );
+	CreateBackGround();
 
 	CreateDefaultPanels();
 
@@ -85,7 +79,7 @@ void CBaseViewport::SetParent( vgui2::VPANEL parent )
 	//NOTE: the engine doesn't set the root to be proportional so it will override our settings. We must restore our settings here. - Solokiller
 	SetProportional( bIsProportional );
 
-	m_pBackGround->SetParent( parent );
+	//m_pBackGround->SetParent( parent );
 
 	for( int i = 0; i< m_Panels.Count(); i++ )
 	{
@@ -187,11 +181,7 @@ void CBaseViewport::OnScreenSizeChanged( int iOldWide, int iOldTall )
 	// recreate all the default panels
 	RemoveAllPanels();
 
-	m_pBackGround = new CBackGroundPanel( nullptr );
-
-	m_pBackGround->SetZPos( -20 ); // send it to the back 
-	m_pBackGround->SetVisible( false );
-
+	CreateBackGround();
 	CreateDefaultPanels();
 
 	vgui2::ipanel()->MoveToBack( m_pBackGround->GetVPanel() ); // really send it to the back 
@@ -485,4 +475,12 @@ IGameUIPanel *CBaseViewport::FindGameUIPanelByName(const char *pszName)
 	}
 
 	return nullptr;
+}
+
+void CBaseViewport::CreateBackGround()
+{
+	m_pBackGround = new CBackGroundPanel(this);
+
+	m_pBackGround->SetZPos(-20); // send it to the back 
+	m_pBackGround->SetVisible(false);
 }

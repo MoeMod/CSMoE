@@ -34,7 +34,7 @@
 #include "html/ichromehtmlwrapper.h"
 
 #include "FileSystem.h"
-#include "../vgui2/src/vgui_key_translation.h"
+#include "vgui2/vgui_key_translation.h"
 
 #undef PostMessage
 #undef MessageBox

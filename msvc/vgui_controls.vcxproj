@@ -22,7 +22,7 @@
     <ClInclude Include="..\vgui2_support\SourceSDK\Color.h" />
     <ClInclude Include="..\vgui2_support\SourceSDK\filesystem.h" />
     <ClInclude Include="..\vgui2_support\SourceSDK\FileSystem_Helpers.h" />
-    <ClInclude Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.h" />
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_key_translation.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\AnalogBar.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\AnimatingImagePanel.h" />
     <ClInclude Include="..\vgui2_support\vgui_controls\AnimationController.h" />
@@ -98,12 +98,12 @@
   <ItemGroup>
     <ClCompile Include="..\vgui2_support\SourceSDK\FileSystem_Helpers.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\public\tier0\memoverride.cpp" />
-    <ClCompile Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadfilesystem.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadinput.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadipanel.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadscheme.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\wrapper\deadsurface.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_key_translation.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\AnalogBar.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\AnimatingImagePanel.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_controls\AnimationController.cpp" />

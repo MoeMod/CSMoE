@@ -29,6 +29,7 @@ public:
 	void HideClientUI() override;
 
 	void CreateDefaultPanels() override;
+	void CreateBackGround() override;
 
 	IViewportPanel* CreatePanelByName(const char* pszName) override;
 	IGameUIPanel* CreateGameUIPanelByName(const char* pszName) override;

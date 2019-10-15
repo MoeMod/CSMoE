@@ -16,11 +16,8 @@
     <Filter Include="SourceSDK\wrapper">
       <UniqueIdentifier>{efaf5bd6-e913-45bb-8554-9dee758d9bae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SourceSDK\vgui2">
+    <Filter Include="vgui2">
       <UniqueIdentifier>{4f0460d0-ae77-486e-af44-59e6a42920a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SourceSDK\vgui2\src">
-      <UniqueIdentifier>{5420af44-d20c-4ebb-9580-28141bc292fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -240,14 +237,14 @@
     <ClInclude Include="..\vgui2_support\SourceSDK\Color.h">
       <Filter>SourceSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.h">
-      <Filter>SourceSDK\vgui2\src</Filter>
-    </ClInclude>
     <ClInclude Include="..\vgui2_support\vgui_controls\CircularProgressBar.h">
       <Filter>vgui_controls</Filter>
     </ClInclude>
     <ClInclude Include="..\vgui2_support\vgui_controls\RotatingProgressBar.h">
       <Filter>vgui_controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_key_translation.h">
+      <Filter>vgui2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -470,14 +467,14 @@
     <ClCompile Include="..\vgui2_support\SourceSDK\public\tier0\memoverride.cpp">
       <Filter>SourceSDK\public\tier0</Filter>
     </ClCompile>
-    <ClCompile Include="..\vgui2_support\SourceSDK\vgui2\src\vgui_key_translation.cpp">
-      <Filter>SourceSDK\vgui2\src</Filter>
-    </ClCompile>
     <ClCompile Include="..\vgui2_support\vgui_controls\CircularProgressBar.cpp">
       <Filter>vgui_controls</Filter>
     </ClCompile>
     <ClCompile Include="..\vgui2_support\vgui_controls\RotatingProgressBar.cpp">
       <Filter>vgui_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_key_translation.cpp">
+      <Filter>vgui2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
