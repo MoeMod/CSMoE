@@ -1494,7 +1494,7 @@ public:
 		// only use two-way connections
 		if (!area->GetParent() || area->IsConnected(area->GetParent(), NUM_DIRECTIONS))
 		{
-			if (m_forward.IsZero())
+			if (m_forward.IsZero(0.01f))
 			{
 				m_targetArea[ m_targetAreaCount++ ] = area;
 			}

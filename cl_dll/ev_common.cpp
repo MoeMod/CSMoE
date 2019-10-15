@@ -73,7 +73,7 @@ void EV_GetDefaultShellInfo( event_args_t *args, float *origin, float *velocity,
 {
 	int idx = args->entindex;
 
-	vec3_t view_ofs = { 0, 0, DEFAULT_VIEWHEIGHT };
+	vec3_t view_ofs ( 0, 0, DEFAULT_VIEWHEIGHT );
 	if ( EV_IsPlayer( idx ) )
 	{
 		if ( EV_IsLocal( idx ) )

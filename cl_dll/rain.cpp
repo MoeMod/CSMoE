@@ -26,7 +26,7 @@
 #include "parsemsg.h"
 #include "com_model.h"
 
-#include "studio/studio_util.h"
+#include "pm_math.h"
 
 #include <new>
 

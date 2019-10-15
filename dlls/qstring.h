@@ -1,71 +1,63 @@
 /*
-*
-*   This program is free software; you can redistribute it and/or modify it
-*   under the terms of the GNU General Public License as published by the
-*   Free Software Foundation; either version 2 of the License, or (at
-*   your option) any later version.
-*
-*   This program is distributed in the hope that it will be useful, but
-*   WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*   General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program; if not, write to the Free Software Foundation,
-*   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
-*   In addition, as a special exception, the author gives permission to
-*   link the code of this program with the Half-Life Game Engine ("HL
-*   Engine") and Modified Game Libraries ("MODs") developed by Valve,
-*   L.L.C ("Valve").  You must obey the GNU General Public License in all
-*   respects for all of the code used other than the HL Engine and MODs
-*   from Valve.  If you modify this file, you may extend this exception
-*   to your version of the file, but you are not obligated to do so.  If
-*   you do not wish to do so, delete this exception statement from your
-*   version.
-*
+qstring.h
+Copyright (C) 2019 Moemod Hymei
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 */
 
 #pragma once
-
-#define QSTRING_DEFINE
-
-
-#ifdef CLIENT_DLL
-using cl::g_engfuncs;
-#else
-using sv::g_engfuncs;
-#endif
-
-#define iStringNull		0u	// Testing strings for nullity
-// constexpr unsigned int iStringNull = { 0 };
 
 // Quake string (helper class)
 class QString final
 {
 public:
-	using qstring_t = unsigned int;
+	using qstring_t = int;
 
-	QString() : m_string(iStringNull) {};
-	QString(qstring_t string) : m_string(string) {};
+	constexpr QString() noexcept : m_string(0) {};
+	constexpr QString(qstring_t string) noexcept : m_string(string) {};
 
-	bool IsNull() const;
-	bool IsNullOrEmpty() const;
+	constexpr bool IsNull() const noexcept
+	{
+		return m_string == 0;
+	}
+	bool IsNullOrEmpty() const noexcept;
 
 	// Copy the array
-	QString &operator=(const QString &other);
+	//QString &operator=(const QString &other) noexcept = default;
 
-	bool operator==(qstring_t string) const;
-	bool operator==(const QString &s) const;
-	bool operator==(const char *pszString) const;
+	constexpr bool operator==(qstring_t string) const noexcept
+	{
+		return m_string == string;
+	}
+	constexpr bool operator==(const QString &s) const noexcept
+	{
+		return m_string == s.m_string;
+	}
+	DEPRECATED bool operator==(const char *pszString) const noexcept;
 
-	operator const char *() const;
-	operator unsigned int() const;
-	const char *str() const;
+	DEPRECATED operator const char *() const noexcept
+	{
+		return str();
+	}
+	constexpr operator qstring_t() const noexcept
+	{
+		return m_string;
+	}
+	const char *str() const noexcept;
 
 private:
 	qstring_t m_string;
 };
+
+constexpr QString iStringNull {};	// Testing strings for nullity
 
 #ifdef USE_QSTRING
 #define string_t QString
@@ -73,26 +65,33 @@ private:
 
 #include "const.h"
 #include "edict.h"
-#include "eiface.h"
 #include "enginecallback.h"
 
 #include "stddef.h"
 
-//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (unsigned int)(offset)))
-//#define MAKE_STRING(str) ((unsigned int)(str) - (unsigned int)(STRING(0)))
-#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
+//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
+inline const char *STRING(string_t offset)
+{
+	return gpGlobals->pStringBase + (ptrdiff_t)(offset);
+}
 
 #if !defined XASH_64BIT || defined(CLIENT_DLL)
 //#define MAKE_STRING(str)	((int)(long int)str - (int)(long int)STRING(0))
-static inline int MAKE_STRING(const char *szValue)
+inline string_t MAKE_STRING(const char *szValue)
 {
 	ptrdiff_t ptrdiff = szValue - STRING(0);
 	return (int)ptrdiff;
 }
 #else
-static inline int MAKE_STRING(const char *szValue)
+inline string_t MAKE_STRING(const char *szValue)
 {
-	long long ptrdiff = szValue - STRING(0);
+	ptrdiff_t ptrdiff = szValue - STRING(0);
 	if (ptrdiff > INT_MAX || ptrdiff < INT_MIN)
 		return ALLOC_STRING(szValue);
 	else
@@ -100,49 +99,19 @@ static inline int MAKE_STRING(const char *szValue)
 }
 #endif
 
-// Inlines
-inline bool QString::IsNull() const
-{
-	return m_string == iStringNull;
 }
 
-inline bool QString::IsNullOrEmpty() const
+inline bool QString::IsNullOrEmpty() const noexcept
 {
 	return IsNull() || (&gpGlobals->pStringBase[m_string])[0] == '\0';
 }
 
-inline QString &QString::operator=(const QString &other)
+inline bool QString::operator==(const char *pszString) const noexcept
 {
-	m_string = other.m_string;
-	return (*this);
+	return Q_strcmp(str(), pszString) == 0;
 }
 
-inline bool QString::operator==(qstring_t string) const
-{
-	return m_string == string;
-}
-
-inline bool QString::operator==(const QString &s) const
-{
-	return m_string == s.m_string;
-}
-
-inline bool QString::operator==(const char *pszString) const
-{
-	return Q_strcmp(&gpGlobals->pStringBase[m_string], pszString) == 0;
-}
-
-inline const char *QString::str() const
+inline const char *QString::str() const noexcept
 {
 	return &gpGlobals->pStringBase[m_string];
-}
-
-inline QString::operator const char *() const
-{
-	return str();
-}
-
-inline QString::operator unsigned int() const
-{
-	return m_string;
 }

@@ -105,6 +105,8 @@ typedef int BOOL;
 #define HUMAN_GIB_COUNT		6
 #define ALIEN_GIB_COUNT		4
 
+template<class T> class CUtlVector;
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -153,23 +155,17 @@ using sv::gpGlobals;
 #define SPAWNFLAG_NOTOUCH		1
 #define SPAWNFLAG_DROIDONLY		4
 
-#define VEC_HULL_MIN_Z		Vector(0, 0, -36)
-#define VEC_DUCK_HULL_MIN_Z	Vector(0, 0, -18)
+constexpr Vector VEC_HULL_MIN_Z =		Vector(0, 0, -36);
+constexpr Vector VEC_DUCK_HULL_MIN_Z =	Vector(0, 0, -18);
 
-#define VEC_HULL_MIN		Vector(-16, -16, -36)
-#define VEC_HULL_MAX		Vector(16, 16, 36)
+constexpr Vector VEC_HULL_MIN =		Vector(-16, -16, -36);
+constexpr Vector VEC_HULL_MAX =		Vector(16, 16, 36);
 
-#define VEC_VIEW		Vector(0, 0, 17)
+constexpr Vector VEC_VIEW =		Vector(0, 0, 17);
 
-#define VEC_DUCK_HULL_MIN	Vector(-16, -16, -18)
-#define VEC_DUCK_HULL_MAX	Vector(16, 16, 32)
-#define VEC_DUCK_VIEW		Vector(0, 0, 12)
-
-#define PLAYBACK_EVENT(flags, who, index)\
-		PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
-
-#define PLAYBACK_EVENT_DELAY(flags, who, index, delay)\
-		PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0)
+constexpr Vector VEC_DUCK_HULL_MIN =	Vector(-16, -16, -18);
+constexpr Vector VEC_DUCK_HULL_MAX =	Vector(16, 16, 32);
+constexpr Vector VEC_DUCK_VIEW =		Vector(0, 0, 12);
 
 #ifdef CLIENT_DLL
 #include "cs_wpn/bte_weapons.h"
@@ -269,6 +265,9 @@ namespace cl {
 #else
 namespace sv {
 #endif
+
+inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
 
 inline void MAKE_STRING_CLASS(const char *str, entvars_t *pev)
 {
@@ -485,9 +484,7 @@ char *UTIL_dtos1(int d);
 char *UTIL_dtos2(int d);
 //NOXREF char *UTIL_dtos3(int d);
 //NOXREF char *UTIL_dtos4(int d);
-#ifdef UTLVECTOR_H
 void UTIL_ShowMessageArgs(const char *pString, CBaseEntity *pPlayer, CUtlVector<char*> *args, bool isHint = false);
-#endif
 void UTIL_ShowMessage(const char *pString, CBaseEntity *pEntity, bool isHint = false);
 void UTIL_ShowMessageAll(const char *pString, bool isHint = false);
 void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore,

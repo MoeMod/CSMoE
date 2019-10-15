@@ -7,9 +7,7 @@
 #include "scriptevent.h"
 #include "player.h"
 
-#define PITCH	0	// up/down
-#define YAW	1	// left/right
-#define ROLL	2	// fall over
+#include "pm_math.h"
 
 namespace sv {
 

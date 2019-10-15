@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
+#include "wpn_knife.h"
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -145,8 +146,6 @@ private:
 };
 
 LINK_ENTITY_TO_CLASS(z4b_Frequency9, CKnifeFrequency9)
-
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *pflMins, float *pfkMaxs, edict_t *pEntity);
 
 void CKnifeFrequency9::PrimaryAttack(void)
 {

@@ -13,8 +13,12 @@
 *
 ****/
 
+#ifdef vec3_t
+#undef vec3_t
+#endif
+
 #include "basetypes.h"
-#include "mathlib.h"
+#include "pm_math.h"
 #include "const.h"
 #include "usercmd.h"
 #include "pm_defs.h"
@@ -55,15 +59,15 @@ playermove_t *pmove = NULL;
 
 // Ducking time
 #define TIME_TO_DUCK		0.4
-#define VEC_DUCK_HULL_MIN	-18
-#define VEC_DUCK_HULL_MAX	18
-#define VEC_DUCK_VIEW		12
+#define VEC_DUCK_HULL_MIN_Z	-18
+#define VEC_DUCK_HULL_MAX_Z	18
+#define VEC_DUCK_VIEW_Z		12
 #define PM_DEAD_VIEWHEIGHT	-8
 #define MAX_CLIMB_SPEED		200
 #define STUCK_MOVEUP		1
 #define STUCK_MOVEDOWN		-1
-#define VEC_HULL_MIN		-36
-#define VEC_HULL_MAX		36
+#define VEC_HULL_MIN_Z		-36
+#define VEC_HULL_MAX_Z		36
 #define VEC_VIEW		17
 #define	STOP_EPSILON		0.1
 
@@ -1993,7 +1997,7 @@ void PM_SpectatorMove(void)
 		speed = Length(pmove->velocity);
 		if (speed < 1)
 		{
-			VectorCopy(vec3_origin, pmove->velocity)
+			VectorCopy(vec3_origin, pmove->velocity);
 		}
 		else
 		{
@@ -2252,7 +2256,7 @@ void PM_Duck(void)
 				if (((float)pmove->flDuckTime / 1000.0 <= (1.0 - TIME_TO_DUCK)) || (pmove->onground == -1))
 				{
 					pmove->usehull = 1;
-					pmove->view_ofs[2] = VEC_DUCK_VIEW;
+					pmove->view_ofs[2] = VEC_DUCK_VIEW_Z;
 
 					pmove->flags |= FL_DUCKING;
 					pmove->bInDuck = false;
@@ -2268,10 +2272,10 @@ void PM_Duck(void)
 				}
 				else
 				{
-					float fMore = (VEC_DUCK_HULL_MIN - VEC_HULL_MIN);
+					float fMore = (VEC_DUCK_HULL_MIN_Z - VEC_HULL_MIN_Z);
 
 					duckFraction = PM_SplineFraction(time, (1.0 / TIME_TO_DUCK));
-					pmove->view_ofs[2] = ((VEC_DUCK_VIEW - fMore) * duckFraction) + (VEC_VIEW * (1 - duckFraction));
+					pmove->view_ofs[2] = ((VEC_DUCK_VIEW_Z - fMore) * duckFraction) + (VEC_VIEW * (1 - duckFraction));
 				}
 			}
 		}
@@ -2333,7 +2337,7 @@ void PM_Duck(void)
 	//			if( ( (float)pmove->flDuckTime / 1000.0 <= ( 1.0 - TIME_TO_DUCK ) ) || ( pmove->onground == -1 ) )
 	//			{
 	//				pmove->usehull = 1;
-	//				pmove->view_ofs[2] = VEC_DUCK_VIEW;
+	//				pmove->view_ofs[2] = VEC_DUCK_VIEW_Z;
 	//				pmove->flags |= FL_DUCKING;
 	//				pmove->bInDuck = false;
 
@@ -2353,11 +2357,11 @@ void PM_Duck(void)
 	//			}
 	//			else
 	//			{
-	//				float fMore = VEC_DUCK_HULL_MIN - VEC_HULL_MIN;
+	//				float fMore = VEC_DUCK_HULL_MIN_Z - VEC_HULL_MIN_Z;
 
 	//				// Calc parametric time
 	//				duckFraction = PM_SplineFraction( time, (1.0/TIME_TO_DUCK) );
-	//				pmove->view_ofs[2] = ( ( VEC_DUCK_VIEW - fMore ) * duckFraction ) + ( VEC_VIEW * ( 1 - duckFraction ) );
+	//				pmove->view_ofs[2] = ( ( VEC_DUCK_VIEW_Z - fMore ) * duckFraction ) + ( VEC_VIEW * ( 1 - duckFraction ) );
 	//			}
 	//		}
 	//	}
@@ -2401,14 +2405,14 @@ void PM_LadderMove(physent_t *pLadder)
 	if (trace.fraction != 1.0)
 	{
 		float forward = 0, right = 0;
-		vec3_t vpn, v_right;
+		vec3_t vpn, v_right, v_up;
 		float flSpeed = MAX_CLIMB_SPEED;
 
 		// they shouldn't be able to move faster than their maxspeed
 		if (flSpeed > pmove->maxspeed)
 			flSpeed = pmove->maxspeed;
 
-		AngleVectors(pmove->angles, vpn, v_right, NULL);
+		AngleVectors(pmove->angles, vpn, v_right, v_up);
 
 		if (pmove->flags & FL_DUCKING)
 			flSpeed *= PLAYER_DUCKING_MULTIPLIER;
@@ -2674,7 +2678,7 @@ void PM_Physics_Toss()
 			VectorScale(pmove->velocity, (1.0 - trace.fraction) * pmove->frametime * 0.9, move);
 			trace = PM_PushEntity(move);
 		}
-		VectorSubtract(pmove->velocity, base, pmove->velocity)
+		VectorSubtract(pmove->velocity, base, pmove->velocity);
 	}
 
 	// check for in water

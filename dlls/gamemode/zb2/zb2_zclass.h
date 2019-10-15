@@ -28,6 +28,7 @@ public:
 	virtual void ActivateSkill(ZombieSkillSlot which) = 0;
 	virtual void InitHUD() const = 0;
 	virtual ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const = 0;
+	virtual void OnWeaponDeploy(CBasePlayerItem *item) = 0;
 };
 
 class CHuman_ZB2 : public CHuman_ZB1, public IZombieModeCharacter_ZB2_Extra
@@ -44,6 +45,7 @@ public:
 
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override {}
 	void DeathSound_Zombie() override {}
+	void OnWeaponDeploy(CBasePlayerItem *item) override {}
 
 protected:
 	class impl_t;

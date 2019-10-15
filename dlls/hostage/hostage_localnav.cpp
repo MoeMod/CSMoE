@@ -14,51 +14,7 @@
 #include "vehicle.h"
 #include "globals.h"
 
-#include "pm_shared.h"
-#include "utllinkedlist.h"
-
-// CSBOT and Nav
-#include "game_shared/GameEvent.h"		// Game event enum used by career mode, tutor system, and bots
-#include "game_shared/bot/bot_util.h"
-#include "game_shared/bot/simple_state_machine.h"
-
-#include "game_shared/steam_util.h"
-
-#include "game_shared/bot/bot_manager.h"
-#include "game_shared/bot/bot_constants.h"
-#include "game_shared/bot/bot.h"
-
-#include "game_shared/shared_util.h"
-#include "game_shared/bot/bot_profile.h"
-
-#include "game_shared/bot/nav.h"
-#include "game_shared/bot/improv.h"
-#include "game_shared/bot/nav_node.h"
-#include "game_shared/bot/nav_area.h"
-#include "game_shared/bot/nav_file.h"
-#include "game_shared/bot/nav_path.h"
-
-#include "airtank.h"
-#include "h_ai.h"
-#include "h_cycler.h"
-#include "h_battery.h"
-
-// Hostage
-#include "hostage/hostage.h"
-#include "hostage/hostage_localnav.h"
-
-#include "bot/cs_bot.h"
-
-// Tutor
-#include "tutor.h"
-#include "tutor_base_states.h"
-#include "tutor_base_tutor.h"
-#include "tutor_cs_states.h"
-#include "tutor_cs_tutor.h"
-
-#include "gamerules.h"
-#include "career_tasks.h"
-#include "maprules.h"
+#include "bot_include.h"
 
 namespace sv {
 
@@ -269,9 +225,7 @@ node_index_t CLocalNav::GetBestNode(Vector &vecOrigin, Vector &vecDest)
 			float flDistToDest;
 			float flZDiff = -1.0;
 
-			flDistFromStart = LengthSubtract
-				<float, float,
-				float, float>(vecDest, nodeCurrent->vecLoc);
+			flDistFromStart = (nodeCurrent->vecLoc - vecDest).Length();
 
 			flDistToDest = nodeCurrent->vecLoc.z - vecDest.z;
 			if (flDistToDest >= 0.0)
@@ -433,7 +387,7 @@ node_index_t CLocalNav::FindDirectPath(Vector &vecStart, Vector &vecDest, float 
 	Vector vecNodeLoc;
 	node_index_t nindexLast;
 
-	vecPathDir = NormalizeSubtract<float, float, float, float>(vecStart, vecDest);
+	vecPathDir = (vecDest - vecStart).Normalize();
 	vecActualDest = vecDest - (vecPathDir * flTargetRadius);
 
 	if (PathTraversable(vecStart, vecActualDest, fNoMonsters) == PATH_TRAVERSABLE_EMPTY)
@@ -490,7 +444,7 @@ int CLocalNav::PathTraversable(Vector &vecSource, Vector &vecDest, int fNoMonste
 	vecSrcTmp = vecSource;
 	vecDestTmp = vecDest - vecSource;
 
-	vecDir = vecDestTmp.NormalizePrecision();
+	vecDir = vecDestTmp.Normalize();
 	vecDir.z = 0;
 
 	flTotal = vecDestTmp.Length2D();

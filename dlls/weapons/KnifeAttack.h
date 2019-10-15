@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #ifndef CLIENT_DLL
 namespace sv {
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *pflMins, float *pfkMaxs, edict_t *pEntity);
+void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity);
 
 enum hit_result_t
 {

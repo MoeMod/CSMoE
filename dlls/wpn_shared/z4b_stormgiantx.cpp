@@ -179,8 +179,6 @@ private:
 
 LINK_ENTITY_TO_CLASS(z4b_stormgiantx, CKnifeStormgiantX)
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, float *pflMins, float *pfkMaxs, edict_t *pEntity);
-
 void CKnifeStormgiantX::PrimaryAttack(void)
 {
 #ifndef CLIENT_DLL

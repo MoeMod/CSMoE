@@ -45,6 +45,7 @@
 #include "bte_weapons.h"
 
 #include "minmax.h"
+#include "exportdef.h"
 
 extern int g_rseq;
 extern int g_gaitseq;

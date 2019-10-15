@@ -75,6 +75,7 @@ public:
 	void OnSpawn() override;
 	void OnThink() override;
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
+	BOOL DeployWeapon(CBasePlayerItem *item) override;
 
 protected:
 	virtual bool CanUseZombieSkill();

@@ -63,7 +63,7 @@ public:
 
 	virtual void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) = 0;
 	virtual void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) = 0;
-
+	virtual BOOL DeployWeapon(CBasePlayerItem *item) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -94,6 +94,8 @@ public:
 
 	void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) override;
 	void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) override;
+
+	BOOL DeployWeapon(CBasePlayerItem *item) override { return item->Deploy(); }
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

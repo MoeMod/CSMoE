@@ -316,7 +316,6 @@
 		3D441400231D1132001A0696 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		3D441401231D1132001A0696 /* eventscripts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eventscripts.h; sourceTree = "<group>"; };
 		3D441402231D1132001A0696 /* in_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = in_defs.h; sourceTree = "<group>"; };
-		3D441403231D1132001A0696 /* util_vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = util_vector.h; sourceTree = "<group>"; };
 		3D441404231D1132001A0696 /* com_weapons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = com_weapons.h; sourceTree = "<group>"; };
 		3D441405231D1132001A0696 /* overview.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = overview.cpp; sourceTree = "<group>"; };
 		3D441406231D1132001A0696 /* draw_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = draw_util.cpp; sourceTree = "<group>"; };
@@ -718,7 +717,6 @@
 				3D441400231D1132001A0696 /* view.cpp */,
 				3D441401231D1132001A0696 /* eventscripts.h */,
 				3D441402231D1132001A0696 /* in_defs.h */,
-				3D441403231D1132001A0696 /* util_vector.h */,
 				3D441404231D1132001A0696 /* com_weapons.h */,
 				3D441405231D1132001A0696 /* overview.cpp */,
 				3D441406231D1132001A0696 /* draw_util.cpp */,
@@ -1505,6 +1503,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../cl_dll/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					../cl_dll,
 					../cl_dll/hud,
@@ -1544,6 +1544,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = ../cl_dll/stdafx.h;
 				HEADER_SEARCH_PATHS = (
 					../cl_dll,
 					../cl_dll/hud,

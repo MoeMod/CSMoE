@@ -29,8 +29,8 @@ GNU General Public License for more details.
 
 #include <algorithm>
 #include <vector>
-#include <dlls/gamemode/zb2/zb2_zclass.h>
-#include <dlls/util/u_range.hpp>
+#include <gamemode/zb2/zb2_zclass.h>
+#include <util/u_range.hpp>
 
 namespace sv {
 
@@ -424,6 +424,15 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 void CPlayerModStrategy_ZB2::EvolutionSound() const
 {
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
+}
+
+BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
+{
+	BOOL ret = CPlayerModStrategy_Default::DeployWeapon(item);
+
+	m_pCharacter_ZB2->OnWeaponDeploy(item);
+
+	return ret;
 }
 
 }
