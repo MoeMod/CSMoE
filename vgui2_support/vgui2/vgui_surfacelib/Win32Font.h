@@ -3,7 +3,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define OEMRESOURCE
+#include "winsani_in.h"
 #include <windows.h>
+#include "winsani_out.h"
 #include "tier1/utlrbtree.h"
 
 #ifdef GetCharABCWidths

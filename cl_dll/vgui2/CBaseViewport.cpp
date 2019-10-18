@@ -437,7 +437,7 @@ void CBaseViewport::ReloadScheme( const char* pszFromFile )
 	InvalidateLayout( true, true );
 
 	// reset the hud
-	gHUD.MsgFunc_ResetHUD(nullptr, 0, nullptr);
+	//gHUD.MsgFunc_ResetHUD(nullptr, 0, nullptr);
 }
 
 IGameUIPanel *CBaseViewport::CreateGameUIPanelByName(const char *pszName)

@@ -10,6 +10,10 @@
 #include "vgui/IInputInternal.h"
 #include "vgui_controls/controls.h"
 
+#include "filesystem.h"
+#include "LoadBMP.h"
+#include "LoadTGA.h"
+
 extern vguiapi_t *g_api;
 extern cl_enginefunc_t gEngfuncs;
 
@@ -305,19 +309,40 @@ class vgui2::IHTML *BaseUISurface::CreateHTMLWindow(class vgui2::IHTMLEvents *, 
 }
 
 void BaseUISurface::PaintHTMLWindow(class vgui2::IHTML *) {
-	//
+	// TODO
 }
 
 void BaseUISurface::DeleteHTMLWindow(class vgui2::IHTML *) {
-	//
+	// TODO
 }
 
-void BaseUISurface::DrawSetTextureFile(int, const char  *, int, bool) {
-	// gEngfuncs.Con_DPrintf((char *)"DrawSetTextureFile ");
+void BaseUISurface::DrawSetTextureFile(int id, const char  * filename, int hardwareFilter, bool forceReload) {
+	// TODO
+	//gEngfuncs.Con_DPrintf("DrawSetTextureFile ");
+	//
+
+	char name[512];
+	snprintf(name, sizeof(name), "%s.tga", filename);
+	int width, height;
+	static byte buffer[1024 * 1024 * 4];
+
+	if (!LoadTGA(name, buffer, sizeof(buffer), &width, &height))
+	{
+		snprintf(name, sizeof(name), "%s.bmp", filename);
+
+		if (!LoadBMP(name, buffer, sizeof(buffer), &width, &height))
+		{
+			DrawSetTexture(id);
+			return;
+		}
+	}
+
+	DrawSetTextureRGBA(id, buffer, width, height, hardwareFilter, forceReload);
 }
 
 void BaseUISurface::DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload) {
 	g_api->UploadTexture(id, (const char *)rgba, wide, tall);
+	DrawSetTexture(id);
 }
 
 void BaseUISurface::DrawSetTexture(int id) {
@@ -869,6 +894,28 @@ void BaseUISurface::InternalSolveTraverse(vgui2::VPANEL panel) {
 			InternalSolveTraverse(child);
 		}
 	}
+}
+
+void BaseUISurface::DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter)
+{
+	DrawSetTextureRGBA(id, rgba, wide, tall, hardwareFilter, true);
+}
+
+void BaseUISurface::DrawSetSubTextureRGBA(int textureID, int drawX, int drawY, const byte* rgba, int subTextureWide, int subTextureTall)
+{
+	//DrawSetSubTextureRGBA(textureID, drawX, drawY, rgba, subTextureWide, subTextureTall);
+
+	/*
+	qglTexSubImage2D(
+		GL_TEXTURE_2D,
+		0,
+		drawX, drawY,
+		subTextureWide, subTextureTall,
+		GL_RGBA, GL_UNSIGNED_BYTE,
+		rgba
+	);
+	*/
+	return g_api->UploadTextureBlock(textureID, drawX, drawY, rgba, subTextureWide, subTextureTall);
 }
 
 EXPOSE_SINGLE_INTERFACE(BaseUISurface, ISurface, VGUI_SURFACE_INTERFACE_VERSION);

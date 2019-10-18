@@ -32,9 +32,6 @@
     <ClCompile Include="..\vgui2_support\vgui2\vgui.cpp" />
     <ClCompile Include="..\vgui2_support\vgui2\VGuiKeyValues.cpp" />
     <ClCompile Include="..\vgui2_support\vgui2\vgui_key_translation.cpp" />
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.cpp" />
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.cpp" />
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.cpp" />
     <ClCompile Include="..\vgui2_support\vgui2\VPanel.cpp" />
     <ClCompile Include="..\vgui2_support\vgui2\VPanelWrapper.cpp" />
     <ClCompile Include="..\vgui2_support\vguimatsurface\Clip2D.cpp" />
@@ -53,9 +50,6 @@
     <ClInclude Include="..\vgui2_support\vgui2\vgui.h" />
     <ClInclude Include="..\vgui2_support\vgui2\VGuiKeyValues.h" />
     <ClInclude Include="..\vgui2_support\vgui2\vgui_key_translation.h" />
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.h" />
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.h" />
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.h" />
     <ClInclude Include="..\vgui2_support\vgui2\VPanel.h" />
     <ClInclude Include="..\vgui2_support\vgui2\VPanelWrapper.h" />
     <ClInclude Include="..\vgui2_support\vguimatsurface\Clip2D.h" />

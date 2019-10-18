@@ -37,6 +37,9 @@
     <Filter Include="engine\platform\sdl">
       <UniqueIdentifier>{e1e4056c-fa78-4289-9042-877d1fe349a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine\platform\winrt">
+      <UniqueIdentifier>{cb142baa-c257-4e9f-9487-27a4c9176b19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\client\gl_vidnt.h">
@@ -185,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="..\engine\common\IceKey.hpp">
       <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\platform\winrt\DeviceListener.h">
+      <Filter>engine\platform\winrt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\platform\winrt\SurfaceDial.h">
+      <Filter>engine\platform\winrt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -589,6 +598,12 @@
     </ClCompile>
     <ClCompile Include="..\engine\client\gl_rstrobe.c">
       <Filter>engine\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\platform\winrt\SurfaceDial.cpp">
+      <Filter>engine\platform\winrt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\platform\winrt\DeviceListener.cpp">
+      <Filter>engine\platform\winrt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

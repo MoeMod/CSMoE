@@ -5,7 +5,7 @@ namespace vgui2
 
 int ISurface::DrawGetTextureId(char const *filename)
 {
-	return 0;
+	return -1;
 }
 
 bool ISurface::DrawGetTextureFile(int id, char *filename, int maxlen)

@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include "platform/macos/TouchBar.h"
 #endif
 
+#if defined(SDL_VIDEO_DRIVER_WINDOWS) && defined(NTDDI_WIN10_RS1)
+#include "platform/winrt/SurfaceDial.h"
+#endif
+
 typedef enum
 {
 	rserr_ok,
@@ -323,6 +327,17 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 	TouchBar_Install();
+#endif
+
+#if defined(SDL_VIDEO_DRIVER_WINDOWS) && defined(NTDDI_WIN10_RS1)
+	{
+		SDL_SysWMinfo wminfo;
+		SDL_VERSION(&wminfo.version);
+		if (SDL_GetWindowWMInfo(host.hWnd, &wminfo))
+		{
+			SurfaceDial_Install(wminfo.info.win.window);
+		}
+	}
 #endif
 
 	return true;

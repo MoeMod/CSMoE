@@ -1,187 +1,196 @@
-#include <malloc.h>
-#include <IEngineSurface.h>
-#include "Renderer/qgl.h"
-#include "Renderer/LoadTGA.h"
+#include <vector>
+#include <string.h>
 
 #include "FontTextureCache.h"
+#include "vgui2/vgui_surfacelib/FontManager.h"
 
-extern IEngineSurface *g_pEngineSurface;
+#include "vgui_api.h"
+#include "cdll_int.h"
+#include "BaseUISurface.h"
 
-CFontTextureCache g_FontTextureCache;
+extern BaseUISurface* staticSurface;
 
-#define TEXTURE_PAGE_WIDTH 256
-#define TEXTURE_PAGE_HEIGHT 256
-
-int CFontTextureCache::s_pFontPageSize[FONT_PAGE_SIZE_COUNT] =
+bool CFontTextureCache::CacheEntryLessFunc(const cacheentry_t& lhs, const cacheentry_t& rhs)
 {
-	16,
-	32,
-	64,
-	128,
-};
+	if (lhs.font < rhs.font)
+		return true;
 
-CFontTextureCache::CFontTextureCache(void): m_CharCache(0, 256, CacheEntryLessFunc)
+	if (lhs.font > rhs.font)
+		return false;
+
+	return lhs.wch < rhs.wch;
+}
+
+CFontTextureCache::CFontTextureCache()
+	: m_CharCache(0, 256, &CFontTextureCache::CacheEntryLessFunc)
+	, m_PageList()
 {
-	CacheEntry_t listHead = { 0, 0 };
+	cacheentry_t listHead;
+
+	memset(&listHead, 0, sizeof(listHead));
+
 	m_LRUListHeadIndex = m_CharCache.Insert(listHead);
 
 	m_CharCache[m_LRUListHeadIndex].nextEntry = m_LRUListHeadIndex;
 	m_CharCache[m_LRUListHeadIndex].prevEntry = m_LRUListHeadIndex;
-
-	for (int i = 0; i < FONT_PAGE_SIZE_COUNT; ++i)
-		m_pCurrPage[i] = -1;
 }
 
-CFontTextureCache::~CFontTextureCache(void)
+CFontTextureCache::~CFontTextureCache()
 {
 }
 
-bool CFontTextureCache::GetTextureForChar(HFont font, wchar_t wch, int *textureID, float **texCoords)
+bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int& pageIndex, int& drawX, int& drawY, int& twide, int& ttall)
 {
-	static CacheEntry_t cacheitem;
+	pageIndex = m_PageList.Count() - 1;
+
+	int iHeight;
+
+	if (charTall <= 16)
+	{
+		iHeight = 16;
+	}
+	else
+	{
+		iHeight = 0;
+
+		for (int i = 0; i < 32 && iHeight < charTall; ++i)
+		{
+			iHeight = 1 << i;
+		}
+	}
+
+	if (iHeight > 256)
+	{
+		return false;
+	}
+
+	page_t* pPage;
+
+	if (pageIndex < 0 ||
+		(pPage = &m_PageList[pageIndex], pPage->fontHeight != iHeight) ||
+		(
+		(((pPage->nextY + iHeight) - pPage->tall) > 0) &&
+			(pPage->nextX + charWide) >= pPage->wide
+			)
+		)
+	{
+		pageIndex = m_PageList.AddToTail();
+
+		pPage = &m_PageList[pageIndex];
+
+		pPage->textureID = staticSurface->CreateNewTextureID(false);
+
+		pPage->fontHeight = iHeight;
+		pPage->wide = 256;
+		pPage->tall = 256;
+		pPage->nextX = 0;
+		pPage->nextY = 0;
+
+		byte rgba[512 * 512];
+
+		memset(rgba, 0, sizeof(rgba));
+
+		staticSurface->DrawSetTextureRGBAWithAlphaChannel(
+			pPage->textureID,
+			rgba,
+			pPage->wide, pPage->tall,
+			false
+		);
+	}
+
+	if (pPage->nextX + charWide >= pPage->tall)
+	{
+		pPage->nextX = 0;
+		pPage->nextY += pPage->fontHeight;
+	}
+
+	drawX = pPage->nextX;
+	drawY = pPage->nextY;
+	twide = pPage->wide;
+	ttall = pPage->tall;
+
+	pPage->nextX += charWide;
+
+	return true;
+}
+
+bool CFontTextureCache::GetTextureForChar(vgui2::HFont font, wchar_t wch, int* textureID, float* texCoords)
+{
+	cacheentry_t cacheitem;
+
+	memset(&cacheitem, 0, sizeof(cacheitem));
 
 	cacheitem.font = font;
 	cacheitem.wch = wch;
 
-	HCacheEntry cacheHandle = m_CharCache.Find(cacheitem);
+	auto index = m_CharCache.Find(cacheitem);
 
-	if (m_CharCache.IsValidIndex(cacheHandle))
+	if (index == m_CharCache.InvalidIndex())
 	{
-		int page = m_CharCache[cacheHandle].page;
-		*textureID = m_PageList[page].textureID;
-		*texCoords = m_CharCache[cacheHandle].texCoords;
-		return true;
-	}
+		auto pFont = FontManager().GetFontForChar(font, wch);
 
-	CWin32Font *winFont = FontManager().GetFontForChar(font, wch);
+		if (!pFont)
+			return false;
 
-	if (!winFont)
-		return false;
+		const auto fontTall = pFont->GetHeight();
 
-	int fontTall = winFont->GetHeight();
-	int a, b, c;
-	winFont->GetCharABCWidths(wch, a, b, c);
+		int a, b, c;
 
-	int fontWide = b;
-	int page, drawX, drawY, twide, ttall;
+		pFont->GetCharABCWidths(wch, a, b, c);
 
-	if (!AllocatePageForChar(fontWide, fontTall, page, drawX, drawY, twide, ttall))
-		return false;
+		int fontWide = b;
 
-	int nByteCount = s_pFontPageSize[FONT_PAGE_SIZE_COUNT - 1] * s_pFontPageSize[FONT_PAGE_SIZE_COUNT - 1] * 4;
-	unsigned char* rgba = (unsigned char *)_alloca(nByteCount);
-	memset(rgba, 0, nByteCount);
-	winFont->GetCharRGBA(wch, 0, 0, fontWide, fontTall, rgba);
-
-	g_pEngineSurface->drawSetTexture(m_PageList[page].textureID);
-	g_pEngineSurface->drawSetSubTextureRGBA(m_PageList[page].textureID, drawX, drawY, rgba, fontWide, fontTall);
-
-	cacheitem.page = page;
-
-	double adjust = 0.0f;
-	cacheitem.texCoords[0] = (float)((double)drawX / ((double)twide + adjust));
-	cacheitem.texCoords[1] = (float)((double)drawY / ((double)ttall + adjust));
-	cacheitem.texCoords[2] = (float)((double)(drawX + fontWide) / (double)twide);
-	cacheitem.texCoords[3] = (float)((double)(drawY + fontTall) / (double)ttall);
-	m_CharCache.Insert(cacheitem);
-
-	*textureID = m_PageList[page].textureID;
-	*texCoords = cacheitem.texCoords;
-	return true;
-}
-
-bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int &pageIndex, int &drawX, int &drawY, int &twide, int &ttall)
-{
-	int nPageType = ComputePageType(charTall);
-	pageIndex = m_pCurrPage[nPageType];
-
-	int nNextX = 0;
-	bool bNeedsNewPage = true;
-
-	if (pageIndex > -1)
-	{
-		Page_t &page = m_PageList[pageIndex];
-		nNextX = page.nextX + charWide;
-
-		if (nNextX > page.wide)
+		if (pFont->GetUnderlined())
 		{
-			page.nextX = 0;
-			nNextX = charWide;
-			page.nextY += page.fontHeight + 1;
+			fontWide = a + b + c;
 		}
 
-		bNeedsNewPage = ((page.nextY + page.fontHeight + 1) > page.tall);
+		int page, drawX, drawY, twide, ttall;
+
+		if (!AllocatePageForChar(fontWide, fontTall, page, drawX, drawY, twide, ttall))
+			return false;
+
+		const auto size = 4 * fontWide * fontTall;
+
+		auto pBuffer = reinterpret_cast<byte*>(stackalloc(size + 15));
+
+		auto pDest = AlignValue(pBuffer, 16);
+
+		if (size >= 4)
+			memset(pDest, 0, size);
+
+		pFont->GetCharRGBA(wch, 0, 0, fontWide, fontTall, pDest);
+
+		auto& pageData = m_PageList[page];
+
+		staticSurface->DrawSetTexture(pageData.textureID);
+
+		staticSurface->DrawSetSubTextureRGBA(
+			pageData.textureID,
+			drawX, drawY,
+			pDest,
+			fontWide, fontTall
+		);
+
+		cacheitem.page = page;
+
+		cacheitem.texCoords[0] = static_cast<double>(drawX) / twide;
+		cacheitem.texCoords[1] = static_cast<double>(drawY) / ttall;
+		cacheitem.texCoords[2] = static_cast<double>(drawX + fontWide) / twide;
+		cacheitem.texCoords[3] = static_cast<double>(drawY + fontTall) / ttall;
+
+		index = m_CharCache.Insert(cacheitem);
 	}
 
-	if (bNeedsNewPage)
-	{
-		pageIndex = m_PageList.AddToTail();
-		Page_t &newPage = m_PageList[pageIndex];
-		m_pCurrPage[nPageType] = pageIndex;
+	const auto& cacheData = m_CharCache[index];
+	const auto& pageData = m_PageList[cacheData.page];
 
-		newPage.textureID = g_pEngineSurface->createNewTextureID();
-		newPage.fontHeight = s_pFontPageSize[nPageType];
-		newPage.wide = 256;
-		newPage.tall = 256;
-		newPage.nextX = 0;
-		newPage.nextY = 0;
+	*textureID = pageData.textureID;
 
-		nNextX = charWide;
+	texCoords[0] = cacheData.texCoords[0];
+	texCoords[1] = cacheData.texCoords[1];
+	texCoords[2] = cacheData.texCoords[2];
+	texCoords[3] = cacheData.texCoords[3];
 
-		unsigned char rgba[256 * 256 * 4];
-		memset(rgba, 0, sizeof(rgba));
-		g_pEngineSurface->drawSetTextureRGBA(newPage.textureID, rgba, newPage.wide, newPage.tall, false, true);
-	}
-
-	Page_t &page = m_PageList[pageIndex];
-	drawX = page.nextX;
-	drawY = page.nextY;
-	twide = page.wide;
-	ttall = page.tall;
-
-	page.nextX = nNextX + 1;
 	return true;
-}
-
-int CFontTextureCache::ComputePageType(int charTall) const
-{
-	for (int i = 0; i < FONT_PAGE_SIZE_COUNT; ++i)
-	{
-		if (charTall < s_pFontPageSize[i])
-			return i;
-	}
-
-	return -1;
-}
-
-bool CFontTextureCache::CacheEntryLessFunc(CacheEntry_t const &lhs, CacheEntry_t const &rhs)
-{
-	if (lhs.font < rhs.font)
-		return true;
-	else if (lhs.font > rhs.font)
-		return false;
-
-	return (lhs.wch < rhs.wch);
-}
-
-void CFontTextureCache::DumpPageTextures(void)
-{
-	byte *pixels = new byte[TEXTURE_PAGE_WIDTH * TEXTURE_PAGE_HEIGHT * 3];
-
-	for (int i = 0; i < FONT_PAGE_SIZE_COUNT; ++i)
-	{
-		int pageIndex = m_pCurrPage[i];
-
-		if (pageIndex > -1)
-		{
-			qglBindTexture(GL_TEXTURE_2D, m_PageList[pageIndex].textureID);
-			qglGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
-			char filename[MAX_PATH];
-			sprintf(filename, "fonttexture_%d.tga", i + i);
-			WriteTGA(pixels, TEXTURE_PAGE_WIDTH, TEXTURE_PAGE_HEIGHT, filename);
-		}
-	}
-
-	delete pixels;
 }

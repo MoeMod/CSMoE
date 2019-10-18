@@ -149,6 +149,7 @@ public:
 	void InternalThinkTraverse(vgui2::VPANEL);	
 	void InternalSchemeSettingsTraverse(vgui2::VPANEL, bool);
 	void SetScreenInfo(SCREENINFO *scrinfo);
+	void DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter);
 
 private:
 	void SetupPaintState(const paintState_t &paintState);

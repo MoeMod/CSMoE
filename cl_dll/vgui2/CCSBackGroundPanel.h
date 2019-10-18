@@ -19,10 +19,9 @@ public:
 	void SetTitleText(const char* text);
 
 public:
-	void PaintBackground(void);
-	void Activate(void);
-	void ApplySchemeSettings(vgui2::IScheme* pScheme);
-	void PerformLayout(void);
+	void Activate(void) override;
+	void ApplySchemeSettings(vgui2::IScheme* pScheme) override;
+	void PerformLayout(void) override;
 
 private:
 	vgui2::CBitmapImagePanel* m_pTopLeftPanel;

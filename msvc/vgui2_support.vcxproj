@@ -22,34 +22,34 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{7E719095-7557-4336-99FC-44803D2A5AE0}</ProjectGuid>
     <RootNamespace>vgui2support</RootNamespace>
-    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -73,23 +73,23 @@
     <TargetName>vgui_support</TargetName>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);</LibraryPath>
+    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>vgui_support</TargetName>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);</LibraryPath>
+    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x64);$(WindowsSdk_71A_LibraryPath_x64);</LibraryPath>
+    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x64);$(WindowsSdk_71A_LibraryPath_x64);</LibraryPath>
+    <LibraryPath>$(OutDir);..\vgui2_support\SourceSDK\lib\public;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -102,7 +102,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,7 +117,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -135,7 +135,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,7 +154,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vstdlib.lib;tier0.lib;tier1.lib;vgui_controls.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -162,8 +162,14 @@
     <ClCompile Include="..\vgui2_support\CBaseUI.cpp" />
     <ClCompile Include="..\vgui2_support\cdll_int.cpp" />
     <ClCompile Include="..\vgui2_support\CGameUIFuncs.cpp" />
+    <ClCompile Include="..\vgui2_support\LoadBMP.cpp" />
+    <ClCompile Include="..\vgui2_support\LoadTGA.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\mathlib\mathlib.cpp" />
     <ClCompile Include="..\vgui2_support\SourceSDK\tier1\interface.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.cpp" />
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.cpp" />
+    <ClCompile Include="..\vgui2_support\vguimatsurface\FontTextureCache.cpp" />
     <ClCompile Include="..\vgui2_support\vgui_int.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -196,6 +202,12 @@
     <ClInclude Include="..\vgui2_support\interfaces\vgui\MouseCode.h" />
     <ClInclude Include="..\vgui2_support\interfaces\vgui\Vertex_t.h" />
     <ClInclude Include="..\vgui2_support\interfaces\vgui\VGUI2.h" />
+    <ClInclude Include="..\vgui2_support\LoadBMP.h" />
+    <ClInclude Include="..\vgui2_support\LoadTGA.h" />
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.h" />
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.h" />
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.h" />
+    <ClInclude Include="..\vgui2_support\vguimatsurface\FontTextureCache.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

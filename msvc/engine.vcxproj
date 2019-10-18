@@ -67,6 +67,8 @@
     <ClInclude Include="..\engine\common\system.h" />
     <ClInclude Include="..\engine\common\world.h" />
     <ClInclude Include="..\engine\platform\sdl\events.h" />
+    <ClInclude Include="..\engine\platform\winrt\DeviceListener.h" />
+    <ClInclude Include="..\engine\platform\winrt\SurfaceDial.h" />
     <ClInclude Include="..\engine\server\server.h" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +195,8 @@
     <ClCompile Include="..\engine\platform\sdl\snd_sdl.c" />
     <ClCompile Include="..\engine\platform\sdl\vid_sdl.c" />
     <ClCompile Include="..\engine\platform\win32\con_win.c" />
+    <ClCompile Include="..\engine\platform\winrt\DeviceListener.cpp" />
+    <ClCompile Include="..\engine\platform\winrt\SurfaceDial.cpp" />
     <ClCompile Include="..\engine\server\sv_client.c" />
     <ClCompile Include="..\engine\server\sv_cmds.c" />
     <ClCompile Include="..\engine\server\sv_custom.c" />
@@ -221,7 +225,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -234,13 +238,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141_xp</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -264,27 +268,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>xash_sdl</TargetName>
-    <LibraryPath>../SDL2/lib/x86;$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);</LibraryPath>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <LibraryPath>../SDL2/lib/x86;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>xash_sdl</TargetName>
-    <LibraryPath>../SDL2/lib/x86;$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);</LibraryPath>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <LibraryPath>../SDL2/lib/x86;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>../SDL2/lib/x64;$(VC_LibraryPath_x64);$(WindowsSdk_71A_LibraryPath_x64);</LibraryPath>
     <TargetName>xash_sdl</TargetName>
+    <LibraryPath>../SDL2/lib/x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>../SDL2/lib/x64;$(VC_LibraryPath_x64);$(WindowsSdk_71A_LibraryPath_x64);</LibraryPath>
     <TargetName>xash_sdl</TargetName>
+    <LibraryPath>../SDL2/lib/x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

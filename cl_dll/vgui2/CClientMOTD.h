@@ -36,7 +36,7 @@ public:
 
 	virtual void Activate( const char* title, const char* msg );
 	virtual void ActivateHtml( const char* title, const char* msg );
-	//virtual void Activate( const wchar_t* title, const wchar_t* msg );
+	virtual void Activate( const wchar_t* title, const wchar_t* msg );
 
 	//IViewportPanel overrides
 	const char *GetName() override
@@ -61,6 +61,7 @@ public:
 	}
 
 	void ShowPanel( bool state ) override;
+	void SetVisible(bool state) override;
 
 	// VGUI functions:
 	vgui2::VPANEL GetVPanel() override final

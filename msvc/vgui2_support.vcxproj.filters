@@ -20,6 +20,15 @@
     <Filter Include="vgui2_support\SourceSDK\mathlib">
       <UniqueIdentifier>{39bb7923-7eaf-4e72-9019-851412a318cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vgui2_support\vguimatsurface">
+      <UniqueIdentifier>{f02f4d02-7d1f-4cb3-b9b7-3be5e1af380b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\vgui2">
+      <UniqueIdentifier>{743feda4-c5d9-4472-9010-8f99f797fdb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vgui2_support\vgui2\vgui_surfacelib">
+      <UniqueIdentifier>{e2f1c196-5811-4bb8-8d35-8c2e8b953ba4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\vgui2_support\BaseUISurface.cpp">
@@ -42,6 +51,24 @@
     </ClCompile>
     <ClCompile Include="..\vgui2_support\SourceSDK\mathlib\mathlib.cpp">
       <Filter>vgui2_support\SourceSDK\mathlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\LoadTGA.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\LoadBMP.cpp">
+      <Filter>vgui2_support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vguimatsurface\FontTextureCache.cpp">
+      <Filter>vgui2_support\vguimatsurface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.cpp">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.cpp">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.cpp">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +158,24 @@
     </ClInclude>
     <ClInclude Include="..\vgui2_support\interfaces\vgui\Vertex_t.h">
       <Filter>vgui2_support\interfaces\vgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\LoadBMP.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\LoadTGA.h">
+      <Filter>vgui2_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vguimatsurface\FontTextureCache.h">
+      <Filter>vgui2_support\vguimatsurface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.h">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.h">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.h">
+      <Filter>vgui2_support\vgui2\vgui_surfacelib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

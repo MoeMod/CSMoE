@@ -14,8 +14,10 @@
 #include <FileSystem.h>
 #include "vgui/ISurface.h"
 #include "vgui_controls/controls.h"
+#include "render_api.h"
 
 cl_enginefunc_t gEngfuncs;
+render_api_t gRenderAPI;
 cldll_func_t gClDllFuncs;
 void(*gClDllFuncs_F)(void*) = nullptr;
 
@@ -97,7 +99,14 @@ void *GetClientFactory() {
 }
 
 int HUD_GetRenderInterface(int version, struct render_api_s *renderfuncs, struct render_interface_s *callback) 
-{ 
+{
+	if (version != CL_RENDER_INTERFACE_VERSION)
+	{
+		return false;
+	}
+
+	gRenderAPI = *renderfuncs;
+	
 	if(gClDllFuncs.pfnGetRenderInterface)
 		return gClDllFuncs.pfnGetRenderInterface(version, renderfuncs, callback); 
 	return 0;

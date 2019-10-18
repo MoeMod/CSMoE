@@ -7,7 +7,6 @@
 #include <interface.h>
 #include <vgui/ILocalize.h>
 #include "FileSystem.h"
-//#include "strtools.h"
 #include "IGameUIFuncs.h"
 
 #include "CClientVGUI.h"
@@ -139,7 +138,7 @@ void CClientMOTD::Activate( const char* title, const char* msg )
 	BaseClass::Activate();
 
 	SetTitle( title, false );
-	//SetControlString( "serverName", title );
+	SetControlString( "serverName", title );
 
 	m_pMessage->SetText(msg);
 }
@@ -154,7 +153,7 @@ void CClientMOTD::ActivateHtml( const char* title, const char* msg )
 	BaseClass::Activate();
 
 	SetTitle( title, false );
-	//SetControlString( "serverName", title );
+	SetControlString( "serverName", title );
 
 	const char* pszURL = msg;
 
@@ -190,7 +189,7 @@ void CClientMOTD::ActivateHtml( const char* title, const char* msg )
 		m_iScoreBoardKey = gameUIFuncs()->GetVGUI2KeyCodeForBind( "showscores" );
 }
 
-#if 0
+#if 1
 void CClientMOTD::Activate( const wchar_t* title, const wchar_t* msg )
 {
 	char localURL[ MAX_HTML_FILENAME_LENGTH + 7 ];
@@ -261,6 +260,12 @@ void CClientMOTD::ShowPanel( bool state )
 		SetMouseInputEnabled( false );
 		SetKeyBoardInputEnabled( false );
 	}
+}
+
+void CClientMOTD::SetVisible(bool state)
+{
+	g_pViewport->ShowBackGround(state);
+	BaseClass::SetVisible(state);
 }
 
 void CClientMOTD::RemoveTempFile()

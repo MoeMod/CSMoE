@@ -4,9 +4,6 @@
     <Filter Include="vgui2">
       <UniqueIdentifier>{9dbb1240-de0a-44a5-96a8-7df09c4b107a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vgui2\vgui_surfacelib">
-      <UniqueIdentifier>{b4a0fddf-b88a-40d5-b749-ee1e13a955c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vguimatsurface">
       <UniqueIdentifier>{82a02317-cb0c-469e-8890-a697999766e8}</UniqueIdentifier>
     </Filter>
@@ -60,15 +57,6 @@
     <ClCompile Include="..\vgui2_support\vgui2\vgui.cpp">
       <Filter>vgui2</Filter>
     </ClCompile>
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.cpp">
-      <Filter>vgui2\vgui_surfacelib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.cpp">
-      <Filter>vgui2\vgui_surfacelib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.cpp">
-      <Filter>vgui2\vgui_surfacelib</Filter>
-    </ClCompile>
     <ClCompile Include="..\vgui2_support\vguimatsurface\Clip2D.cpp">
       <Filter>vguimatsurface</Filter>
     </ClCompile>
@@ -115,15 +103,6 @@
     </ClInclude>
     <ClInclude Include="..\vgui2_support\vgui2\vgui.h">
       <Filter>vgui2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontManager.h">
-      <Filter>vgui2\vgui_surfacelib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\Win32Font.h">
-      <Filter>vgui2\vgui_surfacelib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vgui2_support\vgui2\vgui_surfacelib\FontAmalgam.h">
-      <Filter>vgui2\vgui_surfacelib</Filter>
     </ClInclude>
     <ClInclude Include="..\vgui2_support\vguimatsurface\Clip2D.h">
       <Filter>vguimatsurface</Filter>
