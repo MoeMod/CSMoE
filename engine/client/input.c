@@ -499,6 +499,10 @@ void IN_ToggleClientMouse( int newstate, int oldstate )
 #endif
 		if( cls.initialized )
 			clgame.dllFuncs.IN_ActivateMouse();
+
+#if defined(XASH_SDL) && defined(XASH_WINRT)
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+#endif
 	}
 
 	if( ( newstate == key_menu || newstate == key_console || newstate == key_message ) && ( !CL_IsBackgroundMap() || CL_IsBackgroundDemo()))

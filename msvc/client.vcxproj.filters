@@ -375,9 +375,6 @@
     <ClCompile Include="..\cl_dll\input.cpp">
       <Filter>cl_dll</Filter>
     </ClCompile>
-    <ClCompile Include="..\cl_dll\inputw32.cpp">
-      <Filter>cl_dll</Filter>
-    </ClCompile>
     <ClCompile Include="..\cl_dll\overview.cpp">
       <Filter>cl_dll</Filter>
     </ClCompile>
@@ -695,6 +692,9 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\input_xash3d.cpp">
+      <Filter>cl_dll</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

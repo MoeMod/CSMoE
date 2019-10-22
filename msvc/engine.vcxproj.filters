@@ -37,6 +37,12 @@
     <Filter Include="engine\platform\sdl">
       <UniqueIdentifier>{e1e4056c-fa78-4289-9042-877d1fe349a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="gl-wes-v2">
+      <UniqueIdentifier>{b49aea71-bdce-44d8-8043-941ef6d77ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gl-wes-v2\src">
+      <UniqueIdentifier>{8e1fe642-496b-42d5-b6f1-eaf828578a6a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\client\gl_vidnt.h">
@@ -185,6 +191,45 @@
     </ClInclude>
     <ClInclude Include="..\engine\common\IceKey.hpp">
       <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\common\library_static.h">
+      <Filter>engine\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_config.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_fragment.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_gl.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_gl_arb.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_gl_defines.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_glu.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_matrix.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_shader.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_state.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\wes_begin.h">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gl-wes-v2\src\context.h">
+      <Filter>gl-wes-v2\src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -440,9 +485,6 @@
     <ClCompile Include="..\engine\common\launcher.c">
       <Filter>engine\common</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\common\library.c">
-      <Filter>engine\common</Filter>
-    </ClCompile>
     <ClCompile Include="..\engine\common\masterlist.c">
       <Filter>engine\common</Filter>
     </ClCompile>
@@ -589,6 +631,30 @@
     </ClCompile>
     <ClCompile Include="..\engine\client\gl_rstrobe.c">
       <Filter>engine\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\common\library_static.c">
+      <Filter>engine\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_fragment.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_matrix.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_shader.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_state.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_texture.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes.c">
+      <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gl-wes-v2\src\wes_begin.c">
+      <Filter>gl-wes-v2\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

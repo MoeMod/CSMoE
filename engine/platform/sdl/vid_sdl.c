@@ -185,7 +185,7 @@ void VID_RestoreScreenResolution( void )
 }
 #endif
 
-#if defined(_WIN32) && !defined(XASH_64BIT) // ICO support only for Win32
+#if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 static void WIN_SetWindowIcon( HICON ico )
 {
 	SDL_SysWMinfo wminfo;
@@ -254,7 +254,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		VID_RestoreScreenResolution();
 	}
 
-#if defined(_WIN32) && !defined(XASH_64BIT) // ICO support only for Win32
+#if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 	if( FS_FileExists( GI->iconpath, true ) )
 	{
 		HICON ico;
@@ -294,7 +294,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 
 			FS_FreeImage( icon );
 		}
-#if defined(_WIN32) && !defined(XASH_64BIT) // ICO support only for Win32
+#if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 		else
 		{
 			WIN_SetWindowIcon( LoadIcon( host.hInst, MAKEINTRESOURCE( 101 ) ) );

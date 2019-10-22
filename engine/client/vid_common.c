@@ -927,7 +927,7 @@ void GL_RemoveCommands( void )
 	Cmd_RemoveCommand( "texturelist" );
 }
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( XASH_WINRT ) // win32 only, no ned for uwp
 typedef enum _XASH_DPI_AWARENESS
 {
 	XASH_DPI_UNAWARE = 0,
@@ -1098,7 +1098,7 @@ qboolean R_Init( void )
 
 	GL_SetDefaultState();
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( XASH_WINRT ) // win32 only, no ned for uwp
 	Win_SetDPIAwareness( );
 #endif
 

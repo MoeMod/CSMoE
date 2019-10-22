@@ -1779,7 +1779,7 @@ void FS_LoadGameInfo( const char *rootfolder )
 
 	// clear any old paths
 	FS_ClearSearchPath();
-
+	
 	// validate gamedir
 	for( i = 0; i < SI.numgames; i++ )
 	{
@@ -1788,7 +1788,7 @@ void FS_LoadGameInfo( const char *rootfolder )
 	}
 
 	if( i == SI.numgames )
-		Sys_Error( "Couldn't find game directory '%s'\n", gs_basedir );
+		Sys_Error( "Couldn't find game directory '%s' at \n %s", gs_basedir, host.rootdir );
 
 	SI.GameInfo = SI.games[i];
 	if( !Sys_GetParmFromCmdLine( "-dll", SI.gamedll ) )
@@ -2189,7 +2189,15 @@ Look for a existing folder
 */
 qboolean FS_SysFolderExists( const char *path )
 {
-#ifdef _WIN32
+#ifdef XASH_WINRT
+	struct _finddata_t n_file;
+	// ask for the directory listing handle
+	const intptr_t hFile = _findfirst(path, &n_file);
+	if (hFile == -1)
+		return 0;
+	_findclose(hFile);
+	return 1;
+#elif defined( _WIN32 )
 	DWORD	dwFlags = GetFileAttributes( path );
 
 	return ( dwFlags != -1 ) && ( dwFlags & FILE_ATTRIBUTE_DIRECTORY );
