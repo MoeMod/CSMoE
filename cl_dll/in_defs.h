@@ -16,7 +16,7 @@
 #endif
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(XASH_WINRT)
 #include <WinUser.h>
 #else
 #ifndef PORT_H
