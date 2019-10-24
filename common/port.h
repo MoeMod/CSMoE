@@ -162,8 +162,10 @@ GNU General Public License for more details.
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
 	#include <limits.h>
 
-#if defined(WINAPI_FAMILY) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#ifdef WINAPI_FAMILY
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
 #define XASH_WINRT
+#endif
 #endif
 	
 #if defined(_MSC_VER) && (_MSC_VER < 1700) 
