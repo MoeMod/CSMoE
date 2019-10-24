@@ -11,12 +11,12 @@
 #include "angledef.h"
 
 #ifdef WINAPI_FAMILY
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
 #define XASH_WINRT
 #endif
 #endif
 
-#ifndef XASH_WINRT
+#ifdef _WIN32
 #include <WinUser.h>
 #else
 #ifndef PORT_H
