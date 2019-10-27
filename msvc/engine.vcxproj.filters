@@ -43,6 +43,9 @@
     <Filter Include="gl-wes-v2\src">
       <UniqueIdentifier>{8e1fe642-496b-42d5-b6f1-eaf828578a6a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine\platform\winrt">
+      <UniqueIdentifier>{c29f6150-d2f9-4a67-bf99-d9f1f4934f8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\client\gl_vidnt.h">
@@ -230,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="..\gl-wes-v2\src\context.h">
       <Filter>gl-wes-v2\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\platform\winrt\winrt_fullscreenmode.h">
+      <Filter>engine\platform\winrt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -655,6 +661,9 @@
     </ClCompile>
     <ClCompile Include="..\gl-wes-v2\src\wes_begin.c">
       <Filter>gl-wes-v2\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\platform\winrt\winrt_fullscreenmode.cpp">
+      <Filter>engine\platform\winrt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

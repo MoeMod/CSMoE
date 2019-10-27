@@ -68,6 +68,7 @@
     <ClInclude Include="..\engine\common\system.h" />
     <ClInclude Include="..\engine\common\world.h" />
     <ClInclude Include="..\engine\platform\sdl\events.h" />
+    <ClInclude Include="..\engine\platform\winrt\winrt_fullscreenmode.h" />
     <ClInclude Include="..\engine\server\server.h" />
     <ClInclude Include="..\gl-wes-v2\src\context.h" />
     <ClInclude Include="..\gl-wes-v2\src\wes.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\engine\platform\sdl\snd_sdl.c" />
     <ClCompile Include="..\engine\platform\sdl\vid_sdl.c" />
     <ClCompile Include="..\engine\platform\win32\con_win.c" />
+    <ClCompile Include="..\engine\platform\winrt\winrt_fullscreenmode.cpp" />
     <ClCompile Include="..\engine\server\sv_client.c" />
     <ClCompile Include="..\engine\server\sv_cmds.c" />
     <ClCompile Include="..\engine\server\sv_custom.c" />

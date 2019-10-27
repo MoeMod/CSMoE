@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include "platform/macos/TouchBar.h"
 #endif
 
+#if defined(XASH_WINRT)
+#include "platform/winrt/winrt_fullscreenmode.h"
+#endif
+
 typedef enum
 {
 	rserr_ok,
@@ -325,6 +329,17 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	TouchBar_Install();
 #endif
 
+#if defined(XASH_WINRT)
+	{
+		SDL_SysWMinfo wminfo;
+		SDL_VERSION(&wminfo.version);
+		if (SDL_GetWindowWMInfo(host.hWnd, &wminfo))
+		{
+			WinRT_FullscreenMode_Install(wminfo.info.winrt.window);
+		}
+	}
+#endif
+	
 	return true;
 }
 
