@@ -1,0 +1,154 @@
+﻿<UserControl x:Class="Launcher.Shell" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Launcher" xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Presentation="using:Launcher.Presentation" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" d:DesignHeight="640" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Style x:Key="MenuListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TabNavigation" Value="Local" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0:0:0.25" />
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemListLowColor}" Storyboard.TargetName="LayoutRoot" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled" />
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="PressedBackground" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="SelectionStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0:0:0.25" />
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Unselected" />
+                                    <VisualState x:Name="Selected">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemListAccentHighColor}" Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                            <ColorAnimation To="White" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="(ContentPresenter.Foreground).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="SelectedUnfocused">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemListAccentMediumColor}" Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                            <ColorAnimation To="White" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="(ContentPresenter.Foreground).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="SelectedDisabled">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemBaseMediumColor}" Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                            <ColorAnimation To="{ThemeResource SystemBaseLowColor}" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="(ContentPresenter.Foreground).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="SelectedPointerOver">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemListAccentHighColor}" Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                            <ColorAnimation To="White" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="(ContentPresenter.Foreground).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="SelectedPressed">
+                                        <Storyboard>
+                                            <ColorAnimation To="{ThemeResource SystemListAccentHighColor}" Storyboard.TargetName="InnerGrid" Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" />
+                                            <ColorAnimation To="White" Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="(ContentPresenter.Foreground).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="FocusStates">
+                                    <VisualState x:Name="Focused">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="FocusVisualWhite" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                            <DoubleAnimation Storyboard.TargetName="FocusVisualBlack" Storyboard.TargetProperty="Opacity" To="1" Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unfocused" />
+                                    <VisualState x:Name="PointerFocused" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Grid x:Name="InnerGrid" Background="Transparent">
+                                <Rectangle x:Name="PressedBackground" Fill="{ThemeResource ListBoxItemPressedBackgroundThemeBrush}" Opacity="0" />
+                                <ContentPresenter x:Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTransitions="{TemplateBinding ContentTransitions}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" />
+                                <Rectangle x:Name="FocusVisualWhite" Stroke="{ThemeResource FocusVisualWhiteStrokeThemeBrush}" StrokeEndLineCap="Square" StrokeDashArray="1,1" Opacity="0" StrokeDashOffset=".5" />
+                                <Rectangle x:Name="FocusVisualBlack" Stroke="{ThemeResource FocusVisualBlackStrokeThemeBrush}" StrokeEndLineCap="Square" StrokeDashArray="1,1" Opacity="0" StrokeDashOffset="1.5" />
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Background="{ThemeResource SystemChromeMediumColor}">
+            <Button Content="&#xE700;" Command="{x:Bind ViewModel.ToggleSplitViewPaneCommand}" Style="{StaticResource IconButtonStyle}" />
+            <TextBlock Text="Counter-Strike Mobile-oriented Edition" Style="{StaticResource AppTitleTextBlockStyle}" />
+        </StackPanel>
+
+        <local:SwipeableSplitView x:Name="SplitView" Grid.Row="1" IsSwipeablePaneOpen="{x:Bind ViewModel.IsSplitViewPaneOpen, Mode=TwoWay}">
+            <SplitView.Pane>
+                <ListBox ItemsSource="{x:Bind ViewModel.MenuItems}" SelectedItem="{x:Bind ViewModel.SelectedMenuItem, Mode=TwoWay, Converter={StaticResource ObjectToMenuItemConverter}}" ItemContainerStyle="{StaticResource MenuListBoxItemStyle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="Presentation:MenuItem">
+                            <StackPanel Orientation="Horizontal" Height="48">
+                                <TextBlock Grid.RowSpan="2" Text="{x:Bind Icon, Mode=OneWay}" Style="{StaticResource IconTextBlockStyle}" />
+                                <TextBlock Grid.Column="1" Text="{x:Bind Title, Mode=OneWay}" Style="{StaticResource MenuTitleTextBlockStyle}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Frame x:Name="Frame" SourcePageType="{x:Bind ViewModel.SelectedPageType, Mode=TwoWay}" />
+            </SplitView.Content>
+        </local:SwipeableSplitView>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="768" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="CompactInline" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="true" />
+                        <Setter Target="SplitView.IsSwipeablePaneOpen" Value="true" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="512" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="CompactOverlay" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="false" />
+                        <Setter Target="SplitView.IsSwipeablePaneOpen" Value="false" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="HideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SplitView.DisplayMode" Value="Overlay" />
+                        <Setter Target="SplitView.IsPaneOpen" Value="false" />
+                        <Setter Target="SplitView.IsSwipeablePaneOpen" Value="false" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</UserControl>

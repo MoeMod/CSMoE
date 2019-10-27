@@ -1,0 +1,156 @@
+﻿<Page x:Class="Launcher.Pages.NewGame" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Launcher.Pages" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core" xmlns:Media="using:Microsoft.Xaml.Interactions.Media">
+
+  <SwapChainBackgroundPanel Name="BgPanel" >
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Pivot Name="NewGamePivot">
+            <PivotItem Header="Gameplay" >
+                <ScrollViewer Style="{StaticResource PageScrollViewerStyle}">
+                    <StackPanel Name="GameplayStack">
+                        <StackPanel>
+                            <TextBlock Text="Room Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,10,100,10"/>
+                            <TextBlock Text="GameMode" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="20,10,0,10">
+                                <ComboBox Name ="GameModeComboBox" SelectionChanged="GameModeComboBox_SelectionChanged" >
+                                    <ComboBoxItem Content="Default" IsSelected="True" />
+                                    <ComboBoxItem Content="Team Death Match" />
+                                    <ComboBoxItem Content="Death Match" />
+                                    <ComboBoxItem Content="Zombie Mod 1" />
+                                    <ComboBoxItem Content="Zombie Scenario" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <TextBlock Text="Map" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="20,10,0,10">
+                                <ComboBox Name ="MapComboBox" SelectionChanged="MapComboBox_SelectionChanged" >
+                                    <ComboBoxItem Content="Random" IsSelected="True" />
+                                    <ComboBoxItem Content="Dust" />
+                                    <ComboBoxItem Content="Dust II" />
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="BOT Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,10,100,10"/>
+                            <TextBlock  Text="Enable BOT" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Margin="20,10,0,10">
+                                 <ToggleSwitch Name="BotEnabled" IsOn="False" Toggled="BotEnabled_Toggled"/>
+                            </StackPanel>
+
+                            <StackPanel Name="BOTConfigPanel" Visibility="Collapsed">
+                            
+                                <TextBlock  Text="BOT Quota" VerticalAlignment="Center"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="20,10,0,10">
+                                    <TextBox Name="BOTQuota" InputScope="Number" MaxLength="2" PlaceholderText="Enter BOT Num" Text="0"/>
+                                </StackPanel>
+
+
+                                <TextBlock  Text="BOT Difficulty" VerticalAlignment="Center"/>
+
+                                <StackPanel Orientation="Vertical" Margin="20,10,0,10">
+                                    <RadioButton Name="RadioButton_Easy" Content="Easy"  GroupName="Group_BOT_Difficulty"/>
+                                    <RadioButton Name="RadioButton_Normal"  Content="Normal" GroupName="Group_BOT_Difficulty" />
+                                    <RadioButton Name="RadioButton_Hard"  Content="Hard" GroupName="Group_BOT_Difficulty" />
+                                    <RadioButton Name="RadioButton_Elite"  Content="Elite" GroupName="Group_BOT_Difficulty" />
+                                </StackPanel>
+                            
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
+            <PivotItem Header="Server">
+                
+            </PivotItem>
+
+            <PivotItem Header="BOT">
+                <ScrollViewer Style="{StaticResource PageScrollViewerStyle}">
+                    <StackPanel Name="BOTStack">
+
+                        <StackPanel>
+                            <TextBlock Text="BOT Advance Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,10,100,10"/>
+
+                            <TextBlock  Text="BOT Name Prefix" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Margin="20,10,0,10">
+                                <TextBox Name="BOTNamePrefix" Text="[BOT]"/>
+                            </StackPanel>
+
+                            <TextBlock Text="BOT JoinTeam" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="20,10,0,10">
+                                <ComboBox Name ="BOTJoinTeamComboBox" >
+                                    <ComboBoxItem Content="Random" IsSelected="True" />
+                                    <ComboBoxItem Content="CT" />
+                                    <ComboBoxItem Content="T" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <TextBlock Text="BOT Voice" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="20,10,0,10">
+                                <ComboBox Name ="BOTVoiceComboBox" >
+                                    <ComboBoxItem Content="Normal" IsSelected="True" />
+                                    <ComboBoxItem Content="Minimal" />
+                                    <ComboBoxItem Content="Standard radio" />
+                                    <ComboBoxItem Content="Off" />
+                                </ComboBox>
+                            </StackPanel>
+
+                            <CheckBox Name="BotJoinAfterPlayerCheckBox" Content="Bots join after a player joins" IsChecked="True"/>
+                            <CheckBox Name="BotFollowPlayerCheckBox" Content="Bots defer goals to humans" IsChecked="False"/>
+                            <CheckBox Name="BotRoguerCheckBox" Content="Bots can go rogue" IsChecked="True"/>
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock Text="BOT Weapon Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,10,100,10" />
+                            <TextBlock  Text="Bots can use" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" Margin="20,10,0,10">
+                                <CheckBox Name="CheckBox_BotUsePistols" Content="Pistols" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseShotguns" Content="Shotguns" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseSMG" Content="Submachine guns" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseRifles" Content="Rifles" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseMG" Content="Machine guns" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseGrenades" Content="Grenades" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseSnipers" Content="Sniper rifles" IsChecked="True"/>
+                                <CheckBox Name="CheckBox_BotUseShields" Content="Shields" IsChecked="False" IsEnabled="False"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+        </Pivot>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates">
+                <VisualState x:Name="WideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="768" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="GameplayStack.Orientation" Value="Horizontal" />
+                        <Setter Target="BOTStack.Orientation" Value="Horizontal" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="HideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="GameplayStack.Orientation" Value="Vertical" />
+                        <Setter Target="BOTStack.Orientation" Value="Vertical" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        
+    </Grid>
+  </SwapChainBackgroundPanel>
+
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="StartGameBtn" Label="Start Game" Icon="Accept" Click="StartGameBtn_Click" />
+            <AppBarButton x:Name="CancelSelectionBtn" Label="Cancel" Icon="Cancel" Click="CancelSelectionBtn_Click" />
+        </CommandBar>
+    </Page.BottomAppBar>
+
+    
+</Page>

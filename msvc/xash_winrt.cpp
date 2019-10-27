@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <Windows.h>
 #include <vector>
+#include <Inspectable.h>
 
 typedef void(*pfnChangeGame)(const char *progname);
 typedef int(*pfnInit)(int argc, char **argv, const char *progname, int bChangeGame, pfnChangeGame func);
@@ -15,4 +16,9 @@ int main(int argc, char **argv)
 	Host_Main(av.size(), av.data(), "csmoe", 0, NULL);
 
 	return 0;
+}
+
+extern "C" int __declspec(dllexport) WinRT_InitWithXaml(Windows::UI::Xaml::Controls::SwapChainBackgroundPanel ^ hwnd)
+{
+	return SDL_WinRTRunApp(SDL_main, reinterpret_cast<void *>(hwnd));
 }

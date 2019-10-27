@@ -1,0 +1,28 @@
+﻿<Page x:Class="Launcher.Pages.WelcomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Launcher.Pages" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <ScrollViewer Style="{StaticResource PageScrollViewerStyle}">
+            <StackPanel>
+                <TextBlock Text="Readme" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock Style="{StaticResource ParagraphTextBlockStyle}" Margin="0,1,0,12">
+                    <Run Text="You can download new version from " /><Hyperlink NavigateUri="https://github.com/MoeMod/CSBTE-Mobile/releases"><Run Text="Github" /></Hyperlink><Run Text=" Baidu." /><LineBreak />
+                    <LineBreak />
+                    <Run Text="Installation -" FontSize="21.333" FontWeight="Bold" /><LineBreak />
+                    <Run Text="• A" /><LineBreak />
+                    <Run Text="• B" /><LineBreak />
+                    <Run Text="• C" /><LineBreak />
+                    <Run Text="Changelog -" FontSize="21.333" FontWeight="Bold" /><LineBreak />
+                	<Run Text="• A" /><LineBreak />
+                	<Run Text="• B" /><LineBreak />
+                    <Run Text="• C" /><LineBreak />
+                </TextBlock>
+
+                <TextBlock Text="Game Path" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock x:Name="GamePathLabel" Text="" />
+                <Button Name="BrowseButton" Content="Browse" Click="BrowseButton_Click"/>
+
+            </StackPanel>
+
+        </ScrollViewer>
+    </Grid>
+</Page>
