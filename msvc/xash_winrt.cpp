@@ -9,11 +9,10 @@ extern "C" int Host_Main(int szArgc, char** szArgv, const char* szGameDir, int c
 
 int main(int argc, char **argv)
 {
-	std::vector<char*> av(argv, argv + argc);
-	char ext[3][32] = { "-game", "csmoe", "-console" };
-	std::copy(std::begin(ext), std::end(ext), std::back_inserter(av));
+	std::vector<char*> av{ "-game", "csmoe", "-console", "-developer" };
+	std::copy_n(argv, argc, std::back_inserter(av));
 	
-	Host_Main(argc, argv, "csmoe", 0, NULL);
+	Host_Main(av.size(), av.data(), "csmoe", 0, NULL);
 
 	return 0;
 }
