@@ -28,7 +28,7 @@ GNU General Public License for more details.
 #endif
 
 #if defined(XASH_WINRT)
-#include "platform/winrt/winrt_fullscreenmode.h"
+#include "platform/winrt/winrt_interop.h"
 #endif
 
 typedef enum
@@ -335,8 +335,9 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		SDL_VERSION(&wminfo.version);
 		if (SDL_GetWindowWMInfo(host.hWnd, &wminfo))
 		{
-			WinRT_FullscreenMode_Install(wminfo.info.winrt.window);
+			WinRT_FullscreenMode_Install(wminfo.info.winrt.window, fullscreen);
 		}
+		WinRT_BackButton_Install();
 	}
 #endif
 	

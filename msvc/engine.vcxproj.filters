@@ -234,7 +234,7 @@
     <ClInclude Include="..\gl-wes-v2\src\context.h">
       <Filter>gl-wes-v2\src</Filter>
     </ClInclude>
-    <ClInclude Include="..\engine\platform\winrt\winrt_fullscreenmode.h">
+    <ClInclude Include="..\engine\platform\winrt\winrt_interop.h">
       <Filter>engine\platform\winrt</Filter>
     </ClInclude>
   </ItemGroup>
@@ -662,7 +662,7 @@
     <ClCompile Include="..\gl-wes-v2\src\wes_begin.c">
       <Filter>gl-wes-v2\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\platform\winrt\winrt_fullscreenmode.cpp">
+    <ClCompile Include="..\engine\platform\winrt\winrt_interop.cpp">
       <Filter>engine\platform\winrt</Filter>
     </ClCompile>
   </ItemGroup>
