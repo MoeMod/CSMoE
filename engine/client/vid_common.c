@@ -23,6 +23,10 @@ GNU General Public License for more details.
 #include "input.h"
 #include "gl_vidnt.h"
 
+#if defined(XASH_WINRT)
+#include "platform/winrt/winrt_interop.h"
+#endif
+
 extern convar_t *renderinfo;
 convar_t	*gl_allow_software;
 convar_t	*gl_extensions;
@@ -657,6 +661,10 @@ void R_SaveVideoMode( int w, int h )
 		glState.wideScreen = vidmode[vid_mode->integer].wideScreen;
 
 	MsgDev( D_NOTE, "Set: [%dx%d]\n", w, h );
+
+#ifdef XASH_WINRT
+	WinRT_SaveVideoMode(w, h);
+#endif
 }
 
 

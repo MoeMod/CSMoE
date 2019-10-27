@@ -6,8 +6,11 @@
 #include <windows.System.h>
 
 #include "winrt_interop.h"
+extern "C" {
 #include "common.h"
 #include "keydefs.h"
+#include "gl_local.h"
+}
 
 using namespace Microsoft::WRL;
 using namespace Microsoft::WRL::Wrappers;
@@ -15,7 +18,7 @@ using namespace ABI::Windows::Foundation;
 using namespace ABI::Windows::UI::Core;
 using namespace ABI::Windows::UI::ViewManagement;
 
-void WinRT_FullscreenMode_Install(IInspectable * hwnd, BOOL fullscreen)
+void WinRT_FullscreenMode_Install(boolean fullscreen)
 {
 	HRESULT hr;
 	ComPtr<ICoreWindowStatic> coreWindowStatic;
@@ -35,23 +38,36 @@ void WinRT_FullscreenMode_Install(IInspectable * hwnd, BOOL fullscreen)
 	hr = Windows::Foundation::GetActivationFactory(
 		HStringReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
 		&applicationViewStatics3);
-	hr = applicationViewStatics3->put_PreferredLaunchWindowingMode(fullscreen ? ApplicationViewWindowingMode_FullScreen : ApplicationViewWindowingMode_Auto);
-
 
 	ComPtr <IApplicationView> appView;
-	hr = applicationViewStatics2->GetForCurrentView(&appView);
-	if (SUCCEEDED(hr))
+	if (hr = applicationViewStatics2->GetForCurrentView(&appView), SUCCEEDED(hr))
 	{
 		ComPtr <IApplicationView3> appView3;
-		hr = appView.As(&appView3);
-		if (SUCCEEDED(hr))
+		if (hr = appView.As(&appView3), SUCCEEDED(hr))
 		{
-			//boolean success;
-			//hr = appView3->TryEnterFullScreenMode(&success);
-
+			if(fullscreen)
+			{
+				boolean success;
+				hr = appView3->TryEnterFullScreenMode(&success);
+			}
+			
 			// disable the system gestures...
 			hr = appView3->put_FullScreenSystemOverlayMode(FullScreenSystemOverlayMode_Minimal);
 		}
+	}
+}
+
+void WinRT_SaveVideoMode(int w, int h)
+{
+	HRESULT hr;
+	ComPtr<IApplicationViewStatics3> applicationViewStatics3;
+	hr = Windows::Foundation::GetActivationFactory(
+		HStringReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
+		&applicationViewStatics3);
+	if(SUCCEEDED(hr))
+	{
+		hr = applicationViewStatics3->put_PreferredLaunchViewSize(Size{ (float)w,(float)h });
+		hr = applicationViewStatics3->put_PreferredLaunchWindowingMode(vid_fullscreen->integer ? ApplicationViewWindowingMode_FullScreen : ApplicationViewWindowingMode_PreferredLaunchViewSize);
 	}
 }
 
