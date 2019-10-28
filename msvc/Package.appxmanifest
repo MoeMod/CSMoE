@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp rescap">
-  <Identity Name="22dd433e-6da9-4561-9b90-214b1cfe902e" Publisher="CN=MoeMod" Version="1.0.1.0" />
+  <Identity Name="CSMoE-UWP" Publisher="CN=MoeMod" Version="1.0.0.0" />
+  <mp:PhoneIdentity PhoneProductId="22dd433e-6da9-4561-9b90-214b1cfe902e" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>CSMoE-UWP</DisplayName>
     <PublisherDisplayName>Xiaobaibai</PublisherDisplayName>
@@ -8,7 +9,6 @@
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
   <Resources>
     <Resource Language="x-generate" />
@@ -20,6 +20,9 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Images\SplashScreen.png" BackgroundColor="white"/>
         <uap:LockScreen BadgeLogo="Images\BadgeLogo.png" Notification="badgeAndTileText"/>
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>
