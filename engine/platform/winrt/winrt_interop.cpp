@@ -1,7 +1,5 @@
 
-#include <wrl\implements.h>
-#include <wrl\module.h>
-#include <wrl\event.h>
+#include <wrl.h>
 #include <windows.ui.ViewManagement.h>
 #include <windows.System.h>
 
@@ -86,7 +84,7 @@ void WinRT_BackButton_Install()
 		&systemNavigationManagerStatics);
 
 	ComPtr<ISystemNavigationManager> systemNavigationManager;
-	systemNavigationManagerStatics->GetForCurrentView(&systemNavigationManager);
+	hr = systemNavigationManagerStatics->GetForCurrentView(&systemNavigationManager);
 
 	
 	ComPtr<ISystemNavigationManager2> systemNavigationManager2;

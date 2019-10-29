@@ -144,7 +144,7 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\input_touch.cpp" />
-    <ClCompile Include="..\cl_dll\input_xash3d.cpp" />
+    <ClCompile Include="..\cl_dll\input_winrt.cpp" />
     <ClCompile Include="..\cl_dll\in_camera.cpp" />
     <ClCompile Include="..\cl_dll\overview.cpp" />
     <ClCompile Include="..\cl_dll\parsemsg.cpp" />
@@ -304,8 +304,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
@@ -320,7 +318,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
