@@ -52,6 +52,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 1500.0f, 1000.0f, 1500.0f, 860.0f, 0.8f }; }
+	const char *GetCSModelName() override { return "models/w_svdex.mdl"; }
 
 public:
 	void SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
