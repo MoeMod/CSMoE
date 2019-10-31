@@ -382,6 +382,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "func_rot_button", (void *)func_rot_button },
 		{ "func_rotating", (void *)func_rotating },
 		{ "func_snow", (void *)func_snow },
+		{ "svdex_grenade", (void *)svdex_grenade },
 		{ "func_tank", (void *)func_tank },
 		{ "func_tankcontrols", (void *)func_tankcontrols },
 		{ "func_tanklaser", (void *)func_tanklaser },
