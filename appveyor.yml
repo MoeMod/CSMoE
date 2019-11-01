@@ -9,6 +9,8 @@ before_build:
       Expand-Archive -Path 'SDL2.zip' -DestinationPath '.' -Force
 
       ren SDL2-2.0.10 SDL2
+      
+      nuget restore msvc/csmoe.sln
 build:
   project: msvc/csmoe.sln
   parallel: true
