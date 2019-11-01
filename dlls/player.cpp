@@ -5085,6 +5085,9 @@ NOXREF void CBasePlayer::SelectNextItem(int iItem)
 
 void CBasePlayer::SelectItem(const char *pstr)
 {
+	if (m_pActiveItem && !m_pActiveItem->CanHolster())
+		return;
+
 	if (!pstr)
 	{
 		return;

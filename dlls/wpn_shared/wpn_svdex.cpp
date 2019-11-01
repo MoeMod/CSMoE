@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
+#include "monsters.h"
 #include "wpn_svdex.h"
 
 #ifdef CLIENT_DLL
@@ -26,6 +27,187 @@ namespace cl {
 namespace sv {
 #endif
 
+#ifndef CLIENT_DLL
+	class CSVDEXGrenade : public CBaseEntity
+	{
+	public:
+		void Spawn() override
+		{
+			Precache();
+
+			m_fSequenceLoops = 0;
+			//ph26 = 0;
+			SetThink(&CSVDEXGrenade::OnThink);
+			SetTouch(&CSVDEXGrenade::OnTouch);
+			SET_MODEL(this->edict(), "models/w_hegrenade.mdl");
+
+			//ph32 = ?
+			pev->gravity = 0.58;
+			pev->framerate = 10;
+			pev->scale = 0.2;
+			pev->solid = SOLID_BBOX; // 2
+			pev->movetype = MOVETYPE_BOUNCE; // 9
+			pev->nextthink = gpGlobals->time + 0.0099999998s;
+			m_flMaxFrames = 300.0;
+			/*
+			v9 = 0x40800000;
+			v10 = 0x40800000;
+			v11 = 0x40800000;
+			v6 = 80000000800000008000000080000000h ^ 0x40800000;
+			v7 = 80000000800000008000000080000000h ^ 0x40800000;
+			v8 = 80000000800000008000000080000000h ^ 0x40800000;
+			return UTIL_SetSize((int)v4, (int)&v6, (int)&v9);
+			*/
+			UTIL_SetSize(pev, { -4, -4, -4 }, { 4, 4, 4 });
+		}
+
+		void Precache() override
+		{
+			PRECACHE_MODEL("models/w_hegrenade.mdl");
+		}
+
+		KnockbackData GetKnockBackData()
+		{
+			return { 2000.0, 1250.0, 1000.0, 1750.0 };
+		}
+
+		void EXPORT OnTouch(CBaseEntity *pOther)
+		{
+			if (pev->owner == pOther->edict())
+				return;
+
+			CBaseEntity *pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer *pAttackePlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackePlayer = static_cast<CBasePlayer *>(pAttacker);
+
+			if (pAttackePlayer &&
+				pOther->pev->takedamage != DAMAGE_NO &&
+				pOther->IsAlive()
+				)
+			{
+				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
+				TraceResult tr;
+				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+				tr.iHitgroup = HITGROUP_CHEST; // ...
+
+				ClearMultiDamage();
+				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+			}
+
+			RadiusDamage();
+		}
+
+		void EXPORT OnThink()
+		{
+			
+		}
+
+		void RadiusDamage()
+		{
+			const float flRadius = m_flExplodeRadius;
+			const float flDamage = m_flExplodeDamage;
+			const Vector vecSrc = pev->origin;
+			entvars_t * const pevAttacker = VARS(pev->owner);
+			entvars_t * const pevInflictor = this->pev;
+			int bitsDamageType = DMG_BULLET;
+
+			TraceResult tr;
+			const float falloff = flRadius ? flDamage / flRadius : 1;
+			const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+			CBaseEntity *pEntity = NULL;
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+			{
+				if (pEntity->pev->takedamage != DAMAGE_NO)
+				{
+					if (bInWater && !pEntity->pev->waterlevel)
+						continue;
+
+					if (!bInWater && pEntity->pev->waterlevel == 3)
+						continue;
+
+					if (pEntity->IsBSPModel())
+						continue;
+
+					/*if (pEntity->pev == pevAttacker)
+						continue;*/
+
+					Vector vecSpot = pEntity->BodyTarget(vecSrc);
+					UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+					if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+					{
+						if (tr.fStartSolid)
+						{
+							tr.vecEndPos = vecSrc;
+							tr.flFraction = 0;
+						}
+						float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
+						flAdjustedDamage = Q_max(0, flAdjustedDamage);
+
+						if (tr.flFraction == 1.0f)
+						{
+							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+						}
+						else
+						{
+							tr.iHitgroup = HITGROUP_CHEST;
+							ClearMultiDamage();
+							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+							ApplyMultiDamage(pevInflictor, pevAttacker);
+						}
+
+						/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+						if (pVictim->m_bIsZombie) // Zombie Knockback...
+						{
+							ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
+						}*/
+					}
+				}
+			}
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(MODEL_INDEX("sprites/eexplo.spr"));
+			WRITE_BYTE(25);
+			WRITE_BYTE(30);
+			WRITE_BYTE(TE_EXPLFLAG_NONE);
+			MESSAGE_END();
+
+			return Remove();
+		}
+
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam)
+		{
+			std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
+			pev->velocity = std::move(vecVelocity);
+		}
+
+		int m_fSequenceLoops;
+		time_point_t m_flAnimEndTime;
+		float m_flMaxFrames;
+		float m_flTouchDamage;
+		float m_flExplodeDamage;
+		float m_flExplodeRadius;
+		TeamName m_iTeam;
+
+	protected:
+		void Remove()
+		{
+			SetThink(nullptr);
+			SetTouch(nullptr);
+			pev->effects |= EF_NODRAW; // 0x80u
+			return UTIL_Remove(this);
+		}
+	};
+	LINK_ENTITY_TO_CLASS(svdex_grenade, CSVDEXGrenade)
+#endif
 enum svdex_e
 {
 	SVDEX_IDLEA,
@@ -51,6 +233,7 @@ void CSVDEX::Spawn(void)
 	SET_MODEL(ENT(pev), "models/w_svdex.mdl");
 
 	m_iDefaultAmmo = 20;  //????
+	//m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 10;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	m_bDelayFire = true;
@@ -84,8 +267,8 @@ int CSVDEX::GetItemInfo(ItemInfo *p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556Nato";
 	p->iMaxAmmo1 = MAX_AMMO_556NATO;
-	p->pszAmmo2 = NULL;
-	p->iMaxAmmo2 = -1;
+	p->pszAmmo2 = "50AE";
+	p->iMaxAmmo2 = 10;
 	p->iMaxClip = 20;
 	p->iSlot = 0;
 	p->iPosition = 6;
@@ -163,16 +346,6 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	if (m_flAccuracy > 1)
 		m_flAccuracy = 1;
 
-	if (m_iClip <= 0)
-	{
-		if (m_fFireOnEmpty)
-		{
-			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
-		}
-
-		return;
-	}
 
 	m_iClip--;
 #ifndef CLIENT_DLL
@@ -213,7 +386,7 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
-	if (m_iClip <= 0)
+	/*if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -223,7 +396,7 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 
 		return;
 	}
-
+	*/
 	//m_iClip--;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -234,8 +407,17 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;	// 1000
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;	// 512
 
-	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir;
+
+#ifndef CLIENT_DLL
+	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10;
+	CSVDEXGrenade *pEnt = static_cast<CSVDEXGrenade *>(CBaseEntity::Create("svdex_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+	if (pEnt)
+	{
+		pEnt->Init(gpGlobals->v_forward * 1000, 0, 900.0, 300, m_pPlayer->m_iTeam);
+	}
+#endif
 
 	//vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 490, 0.99, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
@@ -255,7 +437,7 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 }
 
 void CSVDEX::Reload(void)

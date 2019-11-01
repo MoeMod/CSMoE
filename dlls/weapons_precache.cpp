@@ -157,8 +157,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_scarh");
 	UTIL_PrecacheOtherWeapon("weapon_m14ebr");
 	UTIL_PrecacheOtherWeapon("weapon_balrog7");
+	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
-
+	UTIL_PrecacheOtherWeapon("weapon_m2");
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");
 	UTIL_PrecacheOtherWeapon("weapon_gungnir");

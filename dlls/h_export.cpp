@@ -153,6 +153,8 @@ void 	grenade	( entvars_t *pev );
 void 	gungnir_projectile	( entvars_t *pev );
 void 	gungnir_spear	( entvars_t *pev );
 void 	balrog7_explosion(entvars_t *pev);
+void 	svdex_grenade(entvars_t *pev);
+void 	weapon_svdex(entvars_t *pev);
 void 	hostage_entity	( entvars_t *pev );
 void 	info_bomb_target	( entvars_t *pev );
 void 	info_hostage_rescue	( entvars_t *pev );
@@ -252,6 +254,7 @@ void 	weapon_knife	( entvars_t *pev );
 void 	weapon_kriss	( entvars_t *pev );
 void 	weapon_m14ebr	( entvars_t *pev );
 void 	weapon_balrog7	(entvars_t *pev);
+void 	weapon_m2(entvars_t *pev);
 void 	weapon_gatling	(entvars_t *pev);
 void 	weapon_m1887	( entvars_t *pev );
 void 	weapon_m249	( entvars_t *pev );
@@ -412,6 +415,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "gungnir_projectile", (void *)gungnir_projectile },
 		{ "gungnir_spear", (void *)gungnir_spear },
 		{ "balrog7_explosion", (void *)balrog7_explosion },
+		{ "svdex_grenade", (void *)svdex_grenade },
 		{ "hostage_entity", (void *)hostage_entity },
 		{ "info_bomb_target", (void *)info_bomb_target },
 		{ "info_hostage_rescue", (void *)info_hostage_rescue },
@@ -509,8 +513,10 @@ static dllexport_t switch_server_exports[] = {
 		{ "weapon_k1a", (void *)weapon_k1a },
 		{ "weapon_knife", (void *)weapon_knife },
 		{ "weapon_kriss", (void *)weapon_kriss },
+		{ "weapon_svdex", (void *)weapon_svdex },
 		{ "weapon_m14ebr", (void *)weapon_m14ebr },
 		{ "weapon_balrog7", (void *)weapon_balrog7 },
+		{ "weapon_m2", (void *)weapon_m2 },
 		{ "weapon_gatling", (void *)weapon_gatling },
 		{ "weapon_m1887", (void *)weapon_m1887 },
 		{ "weapon_m249", (void *)weapon_m249 },

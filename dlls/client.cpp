@@ -3262,7 +3262,9 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "weapon_")) != NULL) && (pstr == pcmd))
 			{
-				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
+			if (!player->m_pActiveItem->CanHolster())
+				return;
+			GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (((pstr = Q_strstr(pcmd, "knife_")) != NULL) && (pstr == pcmd))
 			{

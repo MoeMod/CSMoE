@@ -231,6 +231,7 @@
 		3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139E231D0E6E001A0696 /* pm_debug.cpp */; };
 		3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413AA231D0E9E001A0696 /* MemPool.cpp */; };
 		3D4413BF231D0E9E001A0696 /* unicode_strtools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413B0231D0E9E001A0696 /* unicode_strtools.cpp */; };
+		3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB002365F205002114A0 /* wpn_m2.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -729,6 +730,7 @@
 		3D4413BB231D0E9E001A0696 /* MemPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemPool.h; sourceTree = "<group>"; };
 		3D4413BC231D0E9E001A0696 /* EventDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventDispatcher.h; sourceTree = "<group>"; };
 		3D4413BD231D0E9E001A0696 /* UtlVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtlVector.h; sourceTree = "<group>"; };
+		3D4CBB002365F205002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1118,6 +1120,7 @@
 				3D44123B231D0788001A0696 /* wpn_m14ebr.h */,
 				3D44123C231D0788001A0696 /* wpn_g3sg1.h */,
 				3D44123D231D0788001A0696 /* wpn_dynamic.cpp */,
+				3D4CBB002365F205002114A0 /* wpn_m2.cpp */,
 				3D44123E231D0788001A0696 /* wpn_deagled.cpp */,
 				3D44123F231D0788001A0696 /* wpn_m3.cpp */,
 				3D441240231D0788001A0696 /* wpn_usp.cpp */,
@@ -1540,6 +1543,7 @@
 				3D441346231D0789001A0696 /* cs_bot_radio.cpp in Sources */,
 				3D44131B231D0789001A0696 /* wpn_scarl.cpp in Sources */,
 				3D44133E231D0789001A0696 /* wpn_scout.cpp in Sources */,
+				3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */,
 				3D441347231D0789001A0696 /* cs_bot_pathfind.cpp in Sources */,
 				3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */,
 				3D441310231D0789001A0696 /* wpn_balrog7.cpp in Sources */,
