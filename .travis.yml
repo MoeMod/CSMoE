@@ -121,17 +121,17 @@ jobs:
     script:
     - sh scripts/build_windows_engine.sh
   - stage: build
-	name: Packing game resources
-	os: windows
-	before_script:
-	- curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
-    - unzip steamcmd.zip
-	script:
-	- git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
-    - ./steamcmd.exe +login anonymous +force_install_dir ./ +app_set_config 90 mod cstrike +app_update 90 +quit
-	- cp CSMoE-GameDir/csmoe steamapps/common/Half-Life
-	- zip -r CSMoE-CD-GameDir-Full.zip steamapps/common/Half-Life/*
-	before_deploy:
+    name: Packing game resources
+    os: windows
+    before_script:
+      - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
+      - unzip steamcmd.zip
+    script:
+      - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
+      - ./steamcmd.exe +login anonymous +force_install_dir ./ +app_set_config 90 mod cstrike +app_update 90 +quit
+      - cp CSMoE-GameDir/csmoe steamapps/common/Half-Life
+      - zip -r CSMoE-CD-GameDir-Full.zip steamapps/common/Half-Life/*
+    before_deploy:
       # Set up git user name and tag this commit
       - git config --local user.name "CSMoE-Deployer"
       - git config --local user.email "824395314@qq.com"
