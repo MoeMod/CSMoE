@@ -2,34 +2,46 @@
 [English](#Counter-Strike_Mobile-oriented_Edition) | [中文(简体)](#关于本项目) 
 
 ## Counter-Strike Mobile-oriented Edition
-Here are the source code of engine, server, client (windows and linux only). \
-For Android or iOS launcher, check them in other repo. \
-CSMoE is a combination of CS1.6 mods that are implemented based on Xash3D engine, \
-aiming to act like CSO (aka CS:NZ), however the traditional one in pre-2009. \
-Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x64), Android(ARMv7,x86), iOS(ARMv7,ARM64).
+CSMoE is a project that based on Xash3D Engine and CS1.6 Mods to restore like Counter-Strike Online (CSO) or Counter-Strike Nexon: Studio (CSN:S known as CSN:Z)
 
-## Features
+What makes this special, Because CSMoE are cross-platform designed. Here are some Supported Platform
+* Windows (x86 and x64)
+* MacOS (x64)
+* Linux (x86)
+* Android (ARMv7 and x86)
+* iOS (ARMv7 and ARM64)
+
+This project having CSMoE's Engine, Server and Client (Windows and Linux only).
+For Android and iOS Game Launcher, check them in my other repo.
+
+## Current Features
 * [x] New HUD elements (ScoreBoard, KillerEffects, C4 follow icons, Custom Crosshair)
-* [x] GameMode : TeamDeathmatch (TDM)
+* [x] GameMode : Team Deathmatch (TDM)
 * [x] GameMode : Deathmatch (DM) with BOT support
 * [x] GameMode : Zombie Mod 1
 * [x] GameMode : Zombie Mod 2
 * [ ] GameMode : Zombie United
-* [x] GameMode : Zombie Mod 3 (classic)
-* [x] GameMode : Zombie Scenario (classic) with BOT support
+* [x] GameMode : Zombie Mod 3 (Classic)
+* [x] GameMode : Zombie Scenario (Classic) with BOT support
 * [ ] GameMode : GunDeath
 * [ ] GameMode : Zombie Mod 4
 
-## Difference from other CSO-like mods now
-* No more dominating weapons and immortal player classes
+## Differ with other CSO-like mods
+* No dominating weapons and immortal player classes
 * Simplified gameplay
 * Without AMXX, all C/C++ native code instead
-* No VGUI2 support, English only
-* Low-end system requirements
+* No VGUI2 support
+* English only
+* Support low-end system
 * Cross-platform
 * Fully open-source under GPLv3 licence
 
 ## Tested systems
+### Windows 10 (1809) - Surface Book 2 (2017)
+* Specs : Intel Core i5-8650U, NVIDIA GTX 1050, 8 GB
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(3000 x 2000), Sound
+* Result : 60 fps
 ### Windows 10 (1703) - Surface Pro 5 (2017)
 * Specs : Intel Core i5-7300U, Intel HD620, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
@@ -58,43 +70,43 @@ Cross-platform designed, it can be run on Windows(x86,x64), Linux(x86), macOS(x6
 
 ## Installation
 ### Windows
-1. download ***-win32-i386 and ***-GameDir and extract them together
-2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csmoe locates
-4. run csmoe_win32.exe \
+1. Download ***-win32-i386 and ***-GameDir and extract them together
+2. Purchase and download Counter-Strike on Steam
+3. Copy cstrike and valve directory to where the csmoe locates
+4. Run csmoe_win32.exe \
 Note : If you get errors about MSVCR140.dll and so on, install Microsoft VC++ Redist on \
 https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 ### Linux
-1. download ***-linux-i386 and ***-GameDir and extract them together
-2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csmoe locates
-4. launch terminal, cd to the dir, type 
+1. Download ***-linux-i386 and ***-GameDir and extract them together
+2. Purchase and download Counter-Strike on Steam
+3. Copy cstrike and valve directory to where the csmoe locates
+4. Launch terminal, cd to the dir, type 
   sudo chmod +x xash3d
 5. type the cmd below to run the game
   bash csmoe_linux.sh \
 Note : You may need to install libSDL2 and other dependencies.
 ### Android
-1. download ***-GameDir and extract it into an empty folder on your phone
-2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csmoe locates
-4. download and install ***-Android.apk
-5. run the game and follow the instructions
+1. Download ***-GameDir and extract it into an empty folder on your phone
+2. Purchase and download Counter-Strike on Steam
+3. Copy cstrike and valve directory to where the csmoe locates
+4. Download and install ***-Android.apk
+5. Run the game and follow the instructions
 ### iOS
-1. download and install the ipa using Impactor 
+1. Download and install the ipa using Impactor 
   * armv7 for iPhone 5, iPad 4, iPod Touch 5 or earlier
   * arm64 for iPhone 5s, iPad Air 1, iPod Touch 6 or newer
-2. download ***-GameDir and extract it
-3. purchase and download Counter-Strike on Steam
-4. find cstrike and valve directory in steamapps
-5. launch iTunes and select the APP in file sharing
-6. drag csmoe, cstrike, valve into iTunes
-7. run the app on the SpringBoard \
+2. Download ***-GameDir and extract it
+3. Purchase and download Counter-Strike on Steam
+4. Find cstrike and valve directory in steamapps
+5. Launch iTunes and select the APP in file sharing
+6. Drag csmoe, cstrike, valve into iTunes
+7. Run the app on the SpringBoard \
 Note : Thanks to the fxxking App Store limitations, you must reinstall it every week or it will crash (no need to recopy resources).
 ### macOS
-1. download ***-macos-x64 and ***-GameDir and extract them together
-2. purchase and download Counter-Strike on Steam
-3. copy cstrike and valve directory to where the csmoe locates
-4. run csmoe_macos.sh with Terminal \
+1. Download ***-macos-x64 and ***-GameDir and extract them together
+2. Purchase and download Counter-Strike on Steam
+3. Copy cstrike and valve directory to where the csmoe locates
+4. Run csmoe_macos.sh with Terminal \
 Note : If it results in a black window, try to drag it and then the menu will appear.
 
 ## Building
@@ -102,8 +114,15 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 - This project uses C++11 standard, and please ensure that your compiler supports it.
 - Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 ### Windows
+- Requirement:
+  - Visual Studio 2017 above
+  - Universal Windows Platform Deployment (UWP)
+  - C++ Deployment
+  - Windows SDK (10.0.18362.0 as known as 1803) (Maybe require VS2019 to download and install it?)
+- Now Windows project will building UWP application instead of normal application, so make sure you are Windows 10 and installed UWP Developing in Visual Studio
+- If you still want building normal application, please use CMAKE to create project file.
 - Visual Studio 2017 projects can be found in msvc/csmoe.sln
-- Download SDL2-devel-2.0.10-VC.zip from http://www.libsdl.org/ and put them into SDL2/
+- Download SDL2-2.0.10.zip from http://www.libsdl.org/download-2.0.php and rename folder to SDL2/
 - It should be OK to build with both x86 and x64. \
   Note : You can also use cmake to build with mingw, etc.
 ### macOS & Linux
@@ -118,18 +137,19 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 - arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
 ### iOS
 - Xcode projects can be found in Xcode-iOS/CSMoE-iOS.xcodeproj
-- Download SDL2-2.0.10.zip from http://www.libsdl.org/ and put them into SDL2/
+- Download SDL2-2.0.10.zip from http://www.libsdl.org/download-2.0.php and put them into SDL2/
 - supports both armv7, arm64.
 
 ## License
 This repo is licensed under GPLv3 license, check LICENSE file for details.
 
 ## Contributing
-* star / fork
-* explain what's wrong & what's to be added
-* commit a possibe solution \
+* Feel free to star/fork this project.
+* * explain what's wrong and what's to be added
+* commit a possible solution
+* Make pull request if there are fixed something that we have not fix yet
 
- For non-developers, turn to QQ group 3266216 for more information.
+For non-developers, turn to QQ group 3266216 for more information.
  
  
 ## 关于本项目
@@ -161,6 +181,11 @@ CSMoE 可以跨平台运行, 支持的平台包括: Windows(x86,x64), Linux(x86)
 * 遵循 GPL v3 协议完全开源
 
 ## 已测试平台
+### Windows 10 (1809) - Surface Book 2 (2017)
+* Specs : Intel Core i5-8650U, NVIDIA GTX 1050, 8 GB
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(3000 x 2000), Sound
+* Result : 60 fps
 ### Windows 10 (1703) - Surface Pro 5 (2017)
 * Specs : Intel Core i5-7300U, Intel HD620, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
@@ -233,8 +258,9 @@ Note : 如果运行后黑屏, 试试看拖拉窗口, 之后菜单应该就出来
 - 本项目使用 C++11 基础, 请确保你的编译器支持它.
 - 已测试的编译器 : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 ### Windows
+- 由于PR #133缘故, 以后的Windows项目会编译成UWP以代替Win32, 请确保你是Windows 10用户以及安装了UWP开发
 - Visual Studio 2017 项目的路径为 msvc/csmoe.sln
-- 下载 SDL2-devel-2.0.9-VC.zip 通过 http://www.libsdl.org/ 并将它们放到 SDL2/
+- 下载 SDL2-devel-2.0.9-VC.zip (http://www.libsdl.org/download-2.0.php) 并将它们放到 SDL2/
 - 一般来说这样就可以在 x86 和 x64 环境下正常运行了. \
   Note : 你也可以通过 cmake 来载入工程, 通过 mingw, 类似的软件.
 ### macOS & Linux
