@@ -73,7 +73,7 @@ jobs:
     - sh scripts/build_osx_engine.sh;
   - stage: build
     name: Build for iOS and deploy
-	os: osx
+    os: osx
     osx_image: xcode11
     language: objective-c
     before_script:
