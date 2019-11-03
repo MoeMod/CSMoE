@@ -13,15 +13,15 @@ jobs:
       - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
       - unzip -o steamcmd.zip -d SteamCMD
     script:
-      #- mkdir -p hlds/steamapps
-      #- cp HLDS-appmanifest/CounterStrike/*.acf hlds/steamapps/
+      #- mkdir -p CSMoE-Full/steamapps
+      #- cp HLDS-appmanifest/CounterStrike/*.acf CSMoE-Full/steamapps/
       - cd SteamCMD
-      - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "First attempt... (0x10E expected)"
-      - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Second attempt...(success expected)"
-      - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Third attempt..."
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "First attempt... (0x10E expected)"
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Second attempt...(success expected)"
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Third attempt..."
       - cd ..
-      - cp -r CSMoE-GameDir/csmoe hlds/
-      - zip -r CSMoE-CD-GameDir-Full.zip hlds/*
+      - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
+      - zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
     before_deploy:
       # Set up git user name and tag this commit
       - git config --local user.name "CSMoE-Deployer"
