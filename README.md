@@ -113,6 +113,7 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 ### Generic
 - This project uses C++11 standard, and please ensure that your compiler supports it.
 - Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
+- 
 ### Windows
 - Requirement:
   - Visual Studio 2017 above
@@ -123,35 +124,37 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 - If you still want building normal application, please use CMAKE to create project file.
 - Visual Studio 2017 projects can be found in msvc/csmoe.sln
 - Download SDL2-2.0.10.zip from http://www.libsdl.org/download-2.0.php and rename folder to SDL2/
-- It should be OK to build with both x86 and x64. \
+- It should be OK to build with both x86 and x64.
   Note : You can also use cmake to build with mingw, etc.
+
 ### macOS & Linux
 - Build with CMake
 - ~~Set SDL2_PATH to where the SDL2 locates~~
 - Install packages : libfontconfig1-dev libsdl2-dev
 - It should be OK to build with both x86 and x64.
+  
 ### Android
 - Put this repo into jni/src/xash3d
 - ~~Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version~~
 - Build APK with Android Studio, tested with Android SDK level 28 and Android NDK r20
 - arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
+
 ### iOS
 - Xcode projects can be found in Xcode-iOS/CSMoE-iOS.xcodeproj
 - Download SDL2-2.0.10.zip from http://www.libsdl.org/download-2.0.php and put them into SDL2/
-- supports both armv7, arm64.
+- Supports armv7 and arm64
 
 ## License
 This repo is licensed under GPLv3 license, check LICENSE file for details.
 
 ## Contributing
 * Feel free to star/fork this project.
-* * explain what's wrong and what's to be added
-* commit a possible solution
+* Explain what's wrong and solution
+* Commit and push a possible solution
 * Make pull request if there are fixed something that we have not fix yet
 
-For non-developers, turn to QQ group 3266216 for more information.
- 
- 
+For non-developers, join QQ group 3266216 for more information.
+
 ## 关于本项目
 本项目提供了 Counter-Strike Mobile-oriented Edition(下称'CSMoE')的 引擎, 服务端, 以及客户端的源代码(仅Windows及Linux). \
 关于 Android 系统或 iOs 系统的 CSMoE 启动器, 请查看其他项目. \
