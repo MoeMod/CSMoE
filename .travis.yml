@@ -5,6 +5,38 @@ git:
 jobs:
   include:
   - stage: build
+    name: Packing game resources
+    os: windows
+    before_script:
+	  - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
+      - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
+      - unzip -o steamcmd.zip -d SteamCMD
+    script:
+	  - cd SteamCMD
+      - ./steamcmd.exe +login anonymous +force_install_dir ../GameDir-Full +app_set_config 90 mod cstrike +app_update 90 +quit
+	  - cd ..
+      - cp CSMoE-GameDir/csmoe GameDir-Full/
+      - zip -r CSMoE-CD-GameDir-Full.zip GameDir-Full/*
+    before_deploy:
+      # Set up git user name and tag this commit
+      - git config --local user.name "CSMoE-Deployer"
+      - git config --local user.email "824395314@qq.com"
+      - export TRAVIS_TAG=continuous
+      - git tag --force $TRAVIS_TAG
+      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git push travis-deploy-public --tags --force
+    deploy:
+      provider: releases
+      api_key: ${GITHUB_TOKEN}
+      file:
+        - CSMoE-CD-GameDir-Full.zip
+      on:
+        branch: master
+        repo: MoeMod/CSMoE
+      overwrite: true
+      skip_cleanup: true
+      prerelease: true
+  - stage: build
     name: Build for Linux amd64
     os: linux
     dist: bionic
@@ -41,6 +73,7 @@ jobs:
     - sh scripts/build_osx_engine.sh;
   - stage: build
     name: Build for iOS and deploy
+	os: osx
     osx_image: xcode11
     language: objective-c
     before_script:
@@ -120,33 +153,3 @@ jobs:
     - mv SDL2-2.0.10 SDL2
     script:
     - sh scripts/build_windows_engine.sh
-  - stage: build
-    name: Packing game resources
-    os: windows
-    before_script:
-      - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
-      - unzip steamcmd.zip
-    script:
-      - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
-      - ./steamcmd.exe +login anonymous +force_install_dir ./ +app_set_config 90 mod cstrike +app_update 90 +quit
-      - cp CSMoE-GameDir/csmoe steamapps/common/Half-Life
-      - zip -r CSMoE-CD-GameDir-Full.zip steamapps/common/Half-Life/*
-    before_deploy:
-      # Set up git user name and tag this commit
-      - git config --local user.name "CSMoE-Deployer"
-      - git config --local user.email "824395314@qq.com"
-      - export TRAVIS_TAG=continuous
-      - git tag --force $TRAVIS_TAG
-      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
-      - git push travis-deploy-public --tags --force
-    deploy:
-      provider: releases
-      api_key: ${GITHUB_TOKEN}
-      file:
-        - CSMoE-CD-GameDir-Full.zip
-      on:
-        branch: master
-        repo: MoeMod/CSMoE
-      overwrite: true
-      skip_cleanup: true
-      prerelease: true
