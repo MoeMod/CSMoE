@@ -14,7 +14,7 @@ jobs:
       - unzip -o steamcmd.zip -d SteamCMD
     script:
       #- mkdir -p hlds/steamapps
-	  #- cp HLDS-appmanifest/CounterStrike/*.acf hlds/steamapps/
+      #- cp HLDS-appmanifest/CounterStrike/*.acf hlds/steamapps/
       - cd SteamCMD
       - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "First attempt... (0x10E expected)"
       - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Second attempt...(success expected)"
