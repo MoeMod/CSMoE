@@ -21,7 +21,9 @@ jobs:
       - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_set_config 90 mod cstrike validate +app_update 90 +quit || echo "Third attempt..."
       - cd ..
       - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
-      - zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
+      #- zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
+      #- tar czvf CSMoE-CD-GameDir-Full.tar.gz CSMoE-Full
+      - 7z a -t7z -r CSMoE-CD-GameDir-Full.7z CSMoE-Full
     before_deploy:
       # Set up git user name and tag this commit
       - git config --local user.name "CSMoE-Deployer"
@@ -34,7 +36,7 @@ jobs:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-GameDir-Full.zip
+        - CSMoE-CD-GameDir-Full.7z
       on:
         branch: master
         repo: MoeMod/CSMoE
