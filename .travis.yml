@@ -13,7 +13,7 @@ jobs:
       - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
       - unzip -o steamcmd.zip -d SteamCMD
     script:
-      - mkdir hlds/steamapps
+      - mkdir -p hlds/steamapps
       - cp HLDS-appmanifest/CounterStrike/*.acf hlds/steamapps/
       - cd SteamCMD
       - ./steamcmd.exe +login anonymous +force_install_dir ../hlds +app_set_config 90 mod cstrike +app_update 90 +quit
