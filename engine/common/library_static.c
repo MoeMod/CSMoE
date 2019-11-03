@@ -16,6 +16,7 @@
 #include "common.h"
 #include "library.h"
 #include "library_static.h"
+#include "server.h"
 
 typedef struct dll_s
 {
@@ -87,7 +88,7 @@ int LS_dlclose( void *handle )
 }
 
 char *LS_dlerror( void );
-
+#if 0
 int LS_dladdr( const void *addr, Dl_info *info )
 {
 	dll_t *d = NULL;
@@ -108,7 +109,7 @@ int LS_dladdr( const void *addr, Dl_info *info )
 	}
 	return 0;
 }
-
+#endif
 // export registering api for all dlls //
 
 int dll_register( const char *name, dllexport_t *exports )

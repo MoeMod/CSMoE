@@ -23,8 +23,8 @@
 #include "view.h"
 #include "input.h"
 
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_gamecontroller.h>
+#include <SDL_mouse.h>
+#include <SDL_gamecontroller.h>
 
 #define MOUSE_BUTTON_COUNT 5
 
@@ -191,7 +191,11 @@ DWORD WINAPI MousePos_ThreadFunction( LPVOID p )
 IN_ActivateMouse
 ===========
 */
-void DLLEXPORT IN_ActivateMouse (void)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_ActivateMouse_CL(void)
+#else
+void DLLEXPORT  IN_ActivateMouse(void)
+#endif
 {
 	if (mouseinitialized)
 	{
@@ -210,7 +214,11 @@ void DLLEXPORT IN_ActivateMouse (void)
 IN_DeactivateMouse
 ===========
 */
-void DLLEXPORT IN_DeactivateMouse (void)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_DeactivateMouse_CL(void)
+#else
+void DLLEXPORT  IN_DeactivateMouse(void)
+#endif
 {
 	if (mouseinitialized)
 	{
@@ -343,7 +351,11 @@ void IN_ResetMouse( void )
 IN_MouseEvent
 ===========
 */
-void DLLEXPORT IN_MouseEvent (int mstate)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT IN_MouseEvent_CL(int mstate)
+#else
+void DLLEXPORT IN_MouseEvent(int mstate)
+#endif
 {
 	int		i;
 

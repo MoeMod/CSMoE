@@ -10,8 +10,14 @@
 
 #include "angledef.h"
 
-#ifdef _WIN32
-#include <windows.h>
+#ifdef WINAPI_FAMILY
+#if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
+#define XASH_WINRT
+#endif
+#endif
+
+#if defined(_WIN32) && !defined(XASH_WINRT)
+#include <WinUser.h>
 #else
 #ifndef PORT_H
 typedef struct point_s{

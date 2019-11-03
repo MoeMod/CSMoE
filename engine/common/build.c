@@ -69,7 +69,9 @@ const char *Q_buildos( void )
 {
 	const char *osname;
 
-#if defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(XASH_WINRT)
+	osname = "WinRT";
+#elif defined(_WIN32) && defined(_MSC_VER)
 	osname = "Win32";
 #elif defined(_WIN32) && defined(__MINGW32__)
 	osname = "Win32-MinGW";

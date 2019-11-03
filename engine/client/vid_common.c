@@ -23,6 +23,10 @@ GNU General Public License for more details.
 #include "input.h"
 #include "gl_vidnt.h"
 
+#if defined(XASH_WINRT)
+#include "platform/winrt/winrt_interop.h"
+#endif
+
 extern convar_t *renderinfo;
 convar_t	*gl_allow_software;
 convar_t	*gl_extensions;
@@ -657,6 +661,10 @@ void R_SaveVideoMode( int w, int h )
 		glState.wideScreen = vidmode[vid_mode->integer].wideScreen;
 
 	MsgDev( D_NOTE, "Set: [%dx%d]\n", w, h );
+
+#ifdef XASH_WINRT
+	WinRT_SaveVideoMode(w, h);
+#endif
 }
 
 
@@ -927,7 +935,7 @@ void GL_RemoveCommands( void )
 	Cmd_RemoveCommand( "texturelist" );
 }
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( XASH_WINRT ) // win32 only, no ned for uwp
 typedef enum _XASH_DPI_AWARENESS
 {
 	XASH_DPI_UNAWARE = 0,
@@ -1098,7 +1106,7 @@ qboolean R_Init( void )
 
 	GL_SetDefaultState();
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( XASH_WINRT ) // win32 only, no ned for uwp
 	Win_SetDPIAwareness( );
 #endif
 

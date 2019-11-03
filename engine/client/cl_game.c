@@ -1818,7 +1818,7 @@ GetWindowCenterX
 static int GAME_EXPORT pfnGetWindowCenterX( void )
 {
 	int x = 0;
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( XASH_WINRT )
 	if( m_ignore->integer )
 	{
 		POINT pos;
@@ -1843,7 +1843,7 @@ GetWindowCenterY
 static int GAME_EXPORT pfnGetWindowCenterY( void )
 {
 	int y = 0;
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( XASH_WINRT )
 	if( m_ignore->integer )
 	{
 		POINT pos;

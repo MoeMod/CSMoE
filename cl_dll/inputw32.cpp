@@ -32,9 +32,13 @@ int	g_iVisibleMouse = 0;
 
 extern "C" 
 {
-	void DLLEXPORT IN_ActivateMouse( void );
-	void DLLEXPORT IN_DeactivateMouse( void );
-	void DLLEXPORT IN_MouseEvent (int mstate);
+#ifdef XASH_STATIC_GAMELIB
+	
+#else
+	void DLLEXPORT IN_ActivateMouse(void);
+	void DLLEXPORT IN_DeactivateMouse(void);
+	void DLLEXPORT IN_MouseEvent(int mstate);
+#endif
 	void DLLEXPORT IN_Accumulate (void);
 	void DLLEXPORT IN_ClearStates (void);
 }
@@ -76,13 +80,15 @@ int			mouse_oldbuttonstate;
 POINT		current_pos;
 int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
 
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 static int	restore_spi;
 static int	originalmouseparms[3], newmouseparms[3] = {0, 0, 1};
+static int	mouseparmsvalid;
+#endif
 static int	mouseactive;
 int			mouseinitialized;
-static int	mouseparmsvalid;
 static int	mouseshowtoggle = 1;
-
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 // joystick defines and variables
 // where should defines be moved?
 #define JOY_ABSOLUTE_AXIS	0x00000000		// control like a joystick
@@ -104,6 +110,7 @@ enum _ControlList
 	AxisTurn
 };
 
+
 DWORD dwAxisFlags[JOY_MAX_AXES] =
 {
 	JOY_RETURNX,
@@ -113,6 +120,7 @@ DWORD dwAxisFlags[JOY_MAX_AXES] =
 	JOY_RETURNU,
 	JOY_RETURNV
 };
+
 
 DWORD	dwAxisMap[ JOY_MAX_AXES ];
 DWORD	dwControlMap[ JOY_MAX_AXES ];
@@ -151,6 +159,9 @@ DWORD		joy_flags;
 DWORD		joy_numbuttons;
 
 static JOYINFOEX	ji;
+#else
+cvar_t* in_joystick;
+#endif
 
 /*
 ===========
@@ -174,12 +185,18 @@ void Force_CenterView_f (void)
 IN_ActivateMouse
 ===========
 */
-void DLLEXPORT IN_ActivateMouse (void)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_ActivateMouse_CL(void)
+#else
+void DLLEXPORT  IN_ActivateMouse(void)
+#endif
 {
 	if (mouseinitialized)
 	{
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 		if (mouseparmsvalid)
 			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0);
+#endif
 		mouseactive = 1;
 	}
 }
@@ -189,12 +206,18 @@ void DLLEXPORT IN_ActivateMouse (void)
 IN_DeactivateMouse
 ===========
 */
-void DLLEXPORT IN_DeactivateMouse (void)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT  IN_DeactivateMouse_CL(void)
+#else
+void DLLEXPORT  IN_DeactivateMouse(void)
+#endif
 {
 	if (mouseinitialized)
 	{
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 		if (restore_spi)
 			SystemParametersInfo (SPI_SETMOUSE, 0, originalmouseparms, 0);
+#endif
 
 		mouseactive = 0;
 	}
@@ -211,6 +234,7 @@ void IN_StartupMouse (void)
 		return; 
 
 	mouseinitialized = 1;
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	mouseparmsvalid = SystemParametersInfo (SPI_GETMOUSE, 0, originalmouseparms, 0);
 
 	if (mouseparmsvalid)
@@ -231,7 +255,7 @@ void IN_StartupMouse (void)
 			newmouseparms[2] = originalmouseparms[2];
 		}
 	}
-
+#endif
 	mouse_buttons = MOUSE_BUTTON_COUNT;
 }
 
@@ -274,7 +298,11 @@ void IN_ResetMouse( void )
 IN_MouseEvent
 ===========
 */
-void DLLEXPORT IN_MouseEvent (int mstate)
+#ifdef XASH_STATIC_GAMELIB
+void DLLEXPORT IN_MouseEvent_CL(int mstate)
+#else
+void DLLEXPORT IN_MouseEvent(int mstate)
+#endif
 {
 	int		i;
 
@@ -442,7 +470,7 @@ void DLLEXPORT IN_ClearStates (void)
 	my_accum = 0;
 	mouse_oldbuttonstate = 0;
 }
-
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* 
 =============== 
 IN_StartupJoystick 
@@ -911,7 +939,14 @@ void IN_JoyMove ( float frametime, usercmd_t *cmd )
 	gEngfuncs.SetViewAngles( (float *)viewangles );
 
 }
+#else
+void IN_Commands(void)
+{
 
+}
+
+
+#endif
 /*
 ===========
 IN_Move
@@ -923,8 +958,9 @@ void IN_Move ( float frametime, usercmd_t *cmd)
 	{
 		IN_MouseMove ( frametime, cmd);
 	}
-
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	IN_JoyMove ( frametime, cmd);
+#endif
 }
 
 /*
@@ -937,7 +973,10 @@ void IN_Init (void)
 	m_filter				= gEngfuncs.pfnRegisterVariable ( "m_filter","0", FCVAR_ARCHIVE );
 	sensitivity				= gEngfuncs.pfnRegisterVariable ( "sensitivity","3", FCVAR_ARCHIVE ); // user mouse sensitivity setting.
 
+	IN_StartupMouse();
+
 	in_joystick				= gEngfuncs.pfnRegisterVariable ( "joystick","0", FCVAR_ARCHIVE );
+#if !defined(WINAPI_FAMILY) || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	joy_name				= gEngfuncs.pfnRegisterVariable ( "joyname", "joystick", 0 );
 	joy_advanced			= gEngfuncs.pfnRegisterVariable ( "joyadvanced", "0", 0 );
 	joy_advaxisx			= gEngfuncs.pfnRegisterVariable ( "joyadvaxisx", "0", 0 );
@@ -960,6 +999,6 @@ void IN_Init (void)
 	gEngfuncs.pfnAddCommand ("force_centerview", Force_CenterView_f);
 	gEngfuncs.pfnAddCommand ("joyadvancedupdate", Joy_AdvancedUpdate_f);
 
-	IN_StartupMouse ();
 	IN_StartupJoystick ();
+#endif
 }
