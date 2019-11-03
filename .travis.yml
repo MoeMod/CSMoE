@@ -8,13 +8,13 @@ jobs:
     name: Packing game resources
     os: windows
     before_script:
-	  - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
+      - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
       - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
       - unzip -o steamcmd.zip -d SteamCMD
     script:
-	  - cd SteamCMD
+      - cd SteamCMD
       - ./steamcmd.exe +login anonymous +force_install_dir ../GameDir-Full +app_set_config 90 mod cstrike +app_update 90 +quit
-	  - cd ..
+      - cd ..
       - cp CSMoE-GameDir/csmoe GameDir-Full/
       - zip -r CSMoE-CD-GameDir-Full.zip GameDir-Full/*
     before_deploy:
