@@ -4,15 +4,24 @@
 ## Counter-Strike Mobile-oriented Edition
 CSMoE is a project that based on Xash3D Engine and CS1.6 Mods to restore like Counter-Strike Online (CSO) or Counter-Strike Nexon: Studio (CSN:S known as CSN:Z)
 
-What makes this special, Because CSMoE are cross-platform designed. Here are some Supported Platform
-* Windows (x86 and x64)
-* MacOS (x64)
-* Linux (x86)
-* Android (ARMv7 and x86)
-* iOS (ARMv7 and ARM64)
+What makes this special, Because CSMoE are cross-platform designed. Here are some supported platforms and archs matrix
 
-This project having CSMoE's Engine, Server and Client (Windows and Linux only).
-For Android and iOS Game Launcher, check them in my other repo.
+| |x86 | x64 | armv7 | arm64 |
+|:----:|:----:|:----:|:----:|:----:|
+| Windows Desktop|√|√|?|?
+| Windows 10 UWP|√|√|?|?
+| macOS|?|√|×|×
+| Linux|√|√|?|?
+| Android|√|√|√|√
+| iOS|√|√|√|√
+
+``` 
+√ - confirmed to run
+? - may builds
+× - not supported
+```
+
+This project includes CSMoE's Engine, Server and Client. Android, iOS, Windows UWP apps are also bundled.
 
 ## Current Features
 * [x] New HUD elements (ScoreBoard, KillerEffects, C4 follow icons, Custom Crosshair)
@@ -30,19 +39,19 @@ For Android and iOS Game Launcher, check them in my other repo.
 * No dominating weapons and immortal player classes
 * Simplified gameplay
 * Without AMXX, all C/C++ native code instead
-* No VGUI2 support
+* Lightweight implement, VGUI2-less
 * English only
 * Support low-end system
 * Cross-platform
 * Fully open-source under GPLv3 licence
 
 ## Tested systems
-### Windows 10 (1809) - Surface Book 2 (2017)
+### Windows 10 UWP (1809) - Surface Book 2 (2017)
 * Specs : Intel Core i5-8650U, NVIDIA GTX 1050, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
 * Output : Display(3000 x 2000), Sound
 * Result : 60 fps
-### Windows 10 (1703) - Surface Pro 5 (2017)
+### Windows 10 Desktop (1703) - Surface Pro 5 (2017)
 * Specs : Intel Core i5-7300U, Intel HD620, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
 * Output : Display(2736 x 1824 PixelSense), Sound
@@ -95,6 +104,7 @@ Note : You may need to install libSDL2 and other dependencies.
 1. Download and install the ipa using Impactor 
   * armv7 for iPhone 5, iPad 4, iPod Touch 5 or earlier
   * arm64 for iPhone 5s, iPad Air 1, iPod Touch 6 or newer
+  * universal for both armv7 and arm64
 2. Download ***-GameDir and extract it
 3. Purchase and download Counter-Strike on Steam
 4. Find cstrike and valve directory in steamapps
@@ -111,12 +121,12 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 
 ## Building
 ### Generic
-- This project uses C++11 standard, and please ensure that your compiler supports it.
+- This project uses C++14 standard, and please ensure that your compiler supports it.
 - Tested compilers : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
 - 
 ### Windows
 - Requirement:
-  - Visual Studio 2017 above
+  - Visual Studio 2017 or above
   - Universal Windows Platform Deployment (UWP)
   - C++ Deployment
   - Windows SDK (10.0.18362.0 as known as 1803) (Maybe require VS2019 to download and install it?)
@@ -129,15 +139,12 @@ Note : If it results in a black window, try to drag it and then the menu will ap
 
 ### macOS & Linux
 - Build with CMake
-- ~~Set SDL2_PATH to where the SDL2 locates~~
 - Install packages : libfontconfig1-dev libsdl2-dev
 - It should be OK to build with both x86 and x64.
   
 ### Android
-- Put this repo into jni/src/xash3d
-- ~~Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version~~
+- Android Studio project is in the Android folder
 - Build APK with Android Studio, tested with Android SDK level 28 and Android NDK r20
-- arm64-v8a is not supported. Please build armeabi-v7a, x86 only.
 
 ### iOS
 - Xcode projects can be found in Xcode-iOS/CSMoE-iOS.xcodeproj
@@ -242,12 +249,13 @@ Note : 你可能需要安装 libSDL2 以及其他需求插件
 1. 使用 Impactor 下载并安装 ipa
   * armv7 <- iPhone 5, iPad 4, iPod Touch 5 及更早的平台
   * arm64 <- iPhone 5s, iPad Air 1, iPod Touch 6 及更早的平台
+  * universal <- armv7与arm64通用
 2. 下载并解压 ***-GameDir
 3. 在 Steam 上购买并下载 Counter-Strike (请支持正版!)
 4. 在 'steamapps' 目录下找到 'cstrike' 和 'valve' 目录
 5. 运行 iTunes 并在分享文件内选择 APP
 6. 将 csmoe, cstrike, valve 拉到 iTunes 内
-7. 在 SpringBoard 运行 CSMoE \
+7. 在桌面运行 CSMoE \
 Note : 由于傻逼 AppStore 的限制, 你必须每周安装一次 CSMoE , 否则它会崩溃 (不需要重新复制资源).
 ### macOS
 1. 下载 ***-macos-x64 和 ***-GameDir 并将他们解压到一起
@@ -258,26 +266,24 @@ Note : 如果运行后黑屏, 试试看拖拉窗口, 之后菜单应该就出来
 
 ## 工程
 ### 通常
-- 本项目使用 C++11 基础, 请确保你的编译器支持它.
+- 本项目使用 C++14 标准, 请确保你的编译器支持它.
 - 已测试的编译器 : MSVC 19.10, AppleClang 10, ICC 19, GCC 8.1
-### Windows
+### Windows 10 UWP
 - 由于PR #133缘故, 以后的Windows项目会编译成UWP以代替Win32, 请确保你是Windows 10用户以及安装了UWP开发
 - Visual Studio 2017 项目的路径为 msvc/csmoe.sln
-- 下载 SDL2-devel-2.0.9-VC.zip (http://www.libsdl.org/download-2.0.php) 并将它们放到 SDL2/
+- 下载 SDL2-2.0.10.zip (http://www.libsdl.org/download-2.0.php) 并将它们放到 SDL2/
 - 一般来说这样就可以在 x86 和 x64 环境下正常运行了. \
-  Note : 你也可以通过 cmake 来载入工程, 通过 mingw, 类似的软件.
+  Note : 你也可以通过 cmake 来构建 Win32 桌面版.
 ### macOS & Linux
 - 通过 CMake 载入工程
-- ~~Set SDL2_PATH to where the SDL2 locates~~
 - 安装包 : libfontconfig1-dev libsdl2-dev
 - 一般来说这样就可以在 x86 和 x64 环境下正常运行了.
 ### Android
-- 将该项目放入 jni/src/xash3d
-- ~~Build APK with elipse, Android SDK level 21, Android NDK r12b or maybe newer version~~
-- 通过 Android Studio 来 Build App, 用 Android SDK level 28 和 Android NDK r20 测试.
-- arm64-v8a 暂不支持. 请在 armeabi-v7a, x86 环境下 Build.
+- 安卓 APP 项目在 Android 文件夹内
+- 通过 Android Studio 来构建 App, 建议使用 Android SDK level 28 和 Android NDK r20 测试.
 ### iOS
-- 请参考 mittorn/xash3d-ios
+- iOS APP 项目在 Xcode-iOS 文件夹内
+- 通过 Xcode 打开项目并编译、部署、调试
 - 支持 armv7, arm64.
 
 ## 协议
