@@ -50,7 +50,7 @@ namespace sv {
 
 	LINK_ENTITY_TO_CLASS(weapon_m2, CM2)
 
-		void CM2::Spawn(void)
+	void CM2::Spawn(void)
 	{
 		pev->classname = MAKE_STRING("weapon_m2");
 
@@ -62,6 +62,7 @@ namespace sv {
 		m_flAccuracy = 0.35;
 		m_iShotsFired = 0;
 		m_bDelayFire = true;
+		m_iWeaponState = 0;
 
 		FallInit();
 	}
@@ -113,10 +114,8 @@ namespace sv {
 		m_flAccuracy = 0.35;
 		m_iShotsFired = 0;
 
-		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
-			return DefaultDeploy("models/v_m2.mdl", "models/p_m2.mdl", M2_DRAWA, "m249", UseDecrement() != FALSE);
-		else
-			return DefaultDeploy("models/v_m2.mdl", "models/p_m2.mdl", M2_DRAWA, "m249", UseDecrement() != FALSE);
+		m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
+		return DefaultDeploy("models/v_m2.mdl", "models/p_m2.mdl", M2_DRAWA, "m249", UseDecrement() != FALSE);
 	}
 	void CM2::SwitchThink(void)
 	{
@@ -129,7 +128,6 @@ namespace sv {
 	{
 		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		{
-			
 			if (m_iClip)
 				SendWeaponAnim(M2_CHANGEB, UseDecrement() != FALSE);
 			else
@@ -139,7 +137,7 @@ namespace sv {
 			}
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.8s;
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.8s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.8s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4s;
 			fTime = gpGlobals->time;
 			SetThink(&CM2::SwitchThink);
 			pev->nextthink = gpGlobals->time + 3.8s;
@@ -160,7 +158,7 @@ namespace sv {
 				strcpy(m_pPlayer->m_szAnimExtention, "m249");
 			
 			}	
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.7s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 4.7s;
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 4.7s;
 			m_pPlayer->ResetMaxSpeed();
@@ -238,13 +236,14 @@ namespace sv {
 
 		}
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-		int flags;
+		int flags = 0;
+/*
 #ifdef CLIENT_WEAPONS
 		flags = FEV_NOTHOST;
 #else
 		flags = 0;
 #endif
-
+*/
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM2, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), (m_iWeaponState & WPNSTATE_M4A1_SILENCED) ? true : false, FALSE);
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
@@ -313,7 +312,7 @@ namespace sv {
 			return;
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
-
+#ifndef CLIENT_DLL
 		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		{
 			m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_m2_2.mdl");
@@ -331,6 +330,7 @@ namespace sv {
 			else
 				SendWeaponAnim(M2_IDLEA_EMPTY, UseDecrement() != FALSE);
 		}
+#endif
 	}
 
 	float CM2::GetDamageA()
