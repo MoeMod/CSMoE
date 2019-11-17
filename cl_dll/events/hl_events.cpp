@@ -90,6 +90,8 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireM134HeroI);
 	DECLARE_EVENT(FireM134HeroI_EgonFire);
 	DECLARE_EVENT(FireM134HeroI_EgonStop);
+	DECLARE_EVENT(FireDeagleB);
+	DECLARE_EVENT(FireXM2010PC);
 /*
 ======================
 Game_HookEvents
@@ -177,6 +179,8 @@ void Game_HookEvents( void )
 	HOOK_EVENT(m134heroi, FireM134HeroI);
 	HOOK_EVENT(m134heroi_fire, FireM134HeroI_EgonFire);
 	HOOK_EVENT(m134heroi_stop, FireM134HeroI_EgonStop);
+	HOOK_EVENT(deagleb, FireDeagleB);
+	HOOK_EVENT(xm2010pc, FireXM2010PC);
 }
 
 }

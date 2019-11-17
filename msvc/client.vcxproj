@@ -43,6 +43,7 @@
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_deagleb.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
     <ClCompile Include="..\cl_dll\events\event_decal_reset.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_left.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="..\cl_dll\events\event_vehicle.cpp" />
     <ClCompile Include="..\cl_dll\events\event_wa2000.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm1014.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_xm2010pc.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_xm8s.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m134heroi.cpp" />
@@ -222,6 +224,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
@@ -233,6 +236,7 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_xm2010pc.cpp" />
     <ClCompile Include="..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />

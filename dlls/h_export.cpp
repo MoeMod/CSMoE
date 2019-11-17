@@ -290,6 +290,7 @@ void 	worldspawn	( entvars_t *pev );
 void 	zbsbreak	( entvars_t *pev );
 void 	z4b_cannontiger	( entvars_t *pev );
 void 	z4b_cannonplasma	( entvars_t *pev );
+void 	z4b_deagleb	( entvars_t *pev );
 void 	z4b_facelessvoid	( entvars_t *pev );
 void 	z4b_Frequency9	( entvars_t *pev );
 void 	z4b_infinityx	( entvars_t *pev );
@@ -299,6 +300,8 @@ void 	z4b_nataknifedx	( entvars_t *pev );
 void 	z4b_oppovivo	( entvars_t *pev );
 void 	z4b_stormgiantx	( entvars_t *pev );
 void 	z4b_strongknifex	( entvars_t *pev );
+void 	z4b_xm2010pc	( entvars_t *pev );
+void 	z4b_xm2010pc_crystal( entvars_t *pev );
 void 	zombiespawn	( entvars_t *pev );
 }
 
@@ -553,6 +556,7 @@ static dllexport_t switch_server_exports[] = {
 		{ "z4b_Frequency9", (void *)z4b_Frequency9 },
 		{ "z4b_cannontiger", (void *)z4b_cannontiger },
 		{ "z4b_cannonplasma", (void *)z4b_cannonplasma },
+		{ "z4b_deagleb", (void *)z4b_deagleb },
 		{ "z4b_infinityx", (void *)z4b_infinityx },
 		{ "z4b_lc_sword", (void *)z4b_lc_sword },
 		{ "z4b_m134heroi", (void *)z4b_m134heroi },
@@ -560,6 +564,8 @@ static dllexport_t switch_server_exports[] = {
 		{ "z4b_oppovivo", (void *)z4b_oppovivo },
 		{ "z4b_stormgiantx", (void *)z4b_stormgiantx },
 		{ "z4b_strongknifex", (void *)z4b_strongknifex },
+		{ "z4b_xm2010pc", (void *)z4b_xm2010pc },
+		{ "z4b_xm2010pc_crystal", (void *)z4b_xm2010pc_crystal },
 		{ "zbsbreak", (void *)zbsbreak },
 		{ "zombiespawn", (void *)zombiespawn },
 		{ nullptr, nullptr }

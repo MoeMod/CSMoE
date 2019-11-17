@@ -216,6 +216,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_cannonplasma.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_cannontiger.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_infinityx.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_xm2010pc.cpp" />
     <ClCompile Include="..\game_shared\bot\bot.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_manager.cpp" />
     <ClCompile Include="..\game_shared\bot\bot_profile.cpp" />
@@ -417,8 +419,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />

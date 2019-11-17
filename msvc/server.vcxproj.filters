@@ -751,6 +751,12 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_xm2010pc.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\basetypes.h">
@@ -1471,12 +1477,6 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannontiger.h">
-      <Filter>dlls\wpn_shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_cannonplasma.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\weapons_precache.h">
