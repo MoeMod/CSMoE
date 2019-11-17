@@ -171,12 +171,12 @@ constexpr Vector VEC_DUCK_VIEW =		Vector(0, 0, 12);
 #include "cs_wpn/bte_weapons.h"
 #include "cs_wpn/bte_weapons_register.h"
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	namespace detail { CBTEClientWeapons_AutoRegister<DLLClassName> g_BTEClientWeapons_AutoRegister_##mapClassName(#mapClassName); }
+	namespace detail { namespace SV_AutoRegister_##mapClassName { volatile CBTEClientWeapons_AutoRegister<DLLClassName> obj(#mapClassName); } }
 #else
 #include "cbase/cbase_entity_factory.h"
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
 	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
-	namespace detail { namespace SV_AutoRegister_##mapClassName { static MoE_Entity_AutoRegister<DLLClassName> obj( mapClassName, #mapClassName ); } }
+	namespace detail { namespace SV_AutoRegister_##mapClassName { volatile MoE_Entity_AutoRegister<DLLClassName> obj( mapClassName, #mapClassName ); } }
 #endif
 
 typedef enum
