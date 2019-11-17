@@ -232,6 +232,8 @@
 		3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413AA231D0E9E001A0696 /* MemPool.cpp */; };
 		3D4413BF231D0E9E001A0696 /* unicode_strtools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413B0231D0E9E001A0696 /* unicode_strtools.cpp */; };
 		3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB002365F205002114A0 /* wpn_m2.cpp */; };
+		3DB36A232381894D00BE2343 /* z4b_deagleb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */; };
+		3DB36A242381894D00BE2343 /* z4b_xm2010pc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -731,6 +733,8 @@
 		3D4413BC231D0E9E001A0696 /* EventDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventDispatcher.h; sourceTree = "<group>"; };
 		3D4413BD231D0E9E001A0696 /* UtlVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtlVector.h; sourceTree = "<group>"; };
 		3D4CBB002365F205002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
+		3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_deagleb.cpp; sourceTree = "<group>"; };
+		3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_xm2010pc.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1215,6 +1219,8 @@
 				3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */,
 				3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */,
 				3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */,
+				3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */,
+				3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1485,6 +1491,7 @@
 				3D441190231D06CD001A0696 /* pathcorner.cpp in Sources */,
 				3D44119D231D06CD001A0696 /* h_ai.cpp in Sources */,
 				3D441353231D0789001A0696 /* cs_bot_idle.cpp in Sources */,
+				3DB36A232381894D00BE2343 /* z4b_deagleb.cpp in Sources */,
 				3D44130C231D0789001A0696 /* wpn_dynamic.cpp in Sources */,
 				3D441366231D0789001A0696 /* hostage_improv.cpp in Sources */,
 				3D4412FA231D0789001A0696 /* z4b_strongknifex.cpp in Sources */,
@@ -1618,6 +1625,7 @@
 				3D4412ED231D0789001A0696 /* player_knockback.cpp in Sources */,
 				3D4412D3231D0789001A0696 /* zb2_skill_zombie.cpp in Sources */,
 				3D44133D231D0789001A0696 /* wpn_tar21.cpp in Sources */,
+				3DB36A242381894D00BE2343 /* z4b_xm2010pc.cpp in Sources */,
 				3D4412E1231D0789001A0696 /* mod_base.cpp in Sources */,
 				3D4412F1231D0789001A0696 /* player_mod_strategy.cpp in Sources */,
 				3D441185231D06CD001A0696 /* bmodels.cpp in Sources */,

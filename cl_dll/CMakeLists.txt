@@ -147,6 +147,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_nataknifedx.cpp
 	../dlls/wpn_shared/z4b_facelessvoid.cpp
 	../dlls/wpn_shared/z4b_m134heroi.cpp
+	../dlls/wpn_shared/z4b_deagleb.cpp
+	../dlls/wpn_shared/z4b_xm2010pc.cpp
 	)
 
 set (HUD_SRCS
