@@ -2,6 +2,7 @@
 #include <wrl.h>
 #include <windows.ui.ViewManagement.h>
 #include <windows.applicationmodel.core.h>
+#include <windows.graphics.display.h>
 #include <windows.System.h>
 
 #include "winrt_interop.h"
@@ -18,6 +19,7 @@ using namespace ABI::Windows::UI;
 using namespace ABI::Windows::UI::Core;
 using namespace ABI::Windows::UI::ViewManagement;
 using namespace ABI::Windows::ApplicationModel::Core;
+using namespace ABI::Windows::Graphics::Display;
 
 class ColorReference : public RuntimeClass<RuntimeClassFlags<WinRt>, __FIReference_1_Windows__CUI__CColor>
 {
@@ -157,4 +159,26 @@ void WinRT_BackButton_Install()
 	auto callback = Callback<__FIEventHandler_1_Windows__CUI__CCore__CBackRequestedEventArgs>(WinRT_OnBackRequested);
 	EventRegistrationToken token;
 	hr = systemNavigationManager->add_BackRequested(callback.Get(), &token);
+}
+
+float WinRT_GetDisplayDPI()
+{
+	HRESULT hr;
+	ComPtr<IDisplayInformationStatics> displayInformationStatics;
+	hr = Windows::Foundation::GetActivationFactory(
+		HStringReference(RuntimeClass_Windows_Graphics_Display_DisplayInformation).Get(),
+		&displayInformationStatics);
+
+	ComPtr<IDisplayInformation> displayInformation;
+	hr = displayInformationStatics->GetForCurrentView(&displayInformation);
+
+	ResolutionScale resolutionScale;
+	hr = displayInformation->get_ResolutionScale(&resolutionScale);
+
+	double rawPixelsPerViewPixel = 0.0;
+	ComPtr<IDisplayInformation2> displayInformation2;
+	hr = displayInformation.As<IDisplayInformation2>(&displayInformation2);
+	hr = displayInformation2->get_RawPixelsPerViewPixel(&rawPixelsPerViewPixel);
+
+	return static_cast<float>(rawPixelsPerViewPixel);
 }
