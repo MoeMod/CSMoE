@@ -1793,7 +1793,9 @@ void FS_LoadGameInfo( const char *rootfolder )
 
 	if( i == SI.numgames )
 	{
+#ifdef XASH_WINRT
 		WinRT_OpenGameFolderWithExplorer();
+#endif
 		Sys_Error("Couldn't find game directory '%s' at \n %s", gs_basedir, host.rootdir);
 	}
 

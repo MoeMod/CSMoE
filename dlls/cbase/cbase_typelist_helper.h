@@ -17,6 +17,12 @@ GNU General Public License for more details.
 
 #include <type_traits>
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+
 template<class...Ts> struct TypeList {};
 
 template<class, class> struct TypeList_Append;
@@ -27,6 +33,8 @@ template<template<class...> class L, class...Ts> struct TypeList_Size < L<Ts...>
 // specialize on every new line to append new type
 template<std::size_t Line> struct CurrentList : CurrentList<Line - 1> {};
 template<> struct CurrentList<0> { using type = TypeList<>; };
+
+}
 
 #define TL_ADD(_Ty) DECLEAR_ENTITY_CLASS(_Ty) template<> struct CurrentList<__LINE__> { using type = typename TypeList_Append<typename CurrentList<__LINE__ - 1>::type, _Ty>::type; };
 #define TL_END(_Ls) using _Ls = typename CurrentList<__LINE__ - 1>::type;
