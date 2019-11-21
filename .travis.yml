@@ -5,6 +5,46 @@ git:
 jobs:
   include:
   - stage: build
+    name: Packing game resources
+    os: windows
+    before_script:
+      - git clone --recursive https://github.com/MoeMod/CSMoE-GameDir
+      - git clone --recursive https://github.com/dgibbs64/HLDS-appmanifest
+      - curl https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip -o steamcmd.zip
+      - unzip -o steamcmd.zip -d SteamCMD
+    script:
+      - mkdir -p CSMoE-Full/steamapps
+      - cd SteamCMD
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "First attempt... (0x10E expected)"
+      - cp -f ../HLDS-appmanifest/CounterStrike/*.acf ../CSMoE-Full/steamapps/
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "Second attempt...(success expected)"
+      - rm -f ../CSMoE-Full/steamapps/*.acf
+      - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "Third attempt..."
+      - cd ..
+      - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
+      #- zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
+      #- tar czvf CSMoE-CD-GameDir-Full.tar.gz CSMoE-Full
+      - 7z a -t7z -r CSMoE-CD-GameDir-Full.7z CSMoE-Full
+    before_deploy:
+      # Set up git user name and tag this commit
+      - git config --local user.name "CSMoE-Deployer"
+      - git config --local user.email "824395314@qq.com"
+      - export TRAVIS_TAG=continuous
+      - git tag --force $TRAVIS_TAG
+      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git push travis-deploy-public --tags --force
+    deploy:
+      provider: releases
+      api_key: ${GITHUB_TOKEN}
+      file:
+        - CSMoE-CD-GameDir-Full.7z
+      on:
+        branch: master
+        repo: MoeMod/CSMoE
+      overwrite: true
+      skip_cleanup: true
+      prerelease: true
+  - stage: build
     name: Build for Linux amd64
     os: linux
     dist: bionic
@@ -41,6 +81,7 @@ jobs:
     - sh scripts/build_osx_engine.sh;
   - stage: build
     name: Build for iOS and deploy
+    os: osx
     osx_image: xcode11
     language: objective-c
     before_script:

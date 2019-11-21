@@ -325,3 +325,4 @@ debug/
 /cmake-build-*
 CMakeSettings.json
 /SDL2
+msvc/BundleArtifacts/

@@ -18,23 +18,34 @@ GNU General Public License for more details.
 #include "cbase.h"
 
 #include "cbase_entity_factory.h"
+#include "cbase_typelist.h"
 
 #include <unordered_map>
 #include <string>
 
 namespace sv {
 
-using MapType = std::unordered_map<std::string, void (*)(entvars_s *)>;
+using MapType = std::unordered_map<std::string, EntityMetaData>;
 
-static MapType &MapSingleton()
+namespace detail
 {
-	static MapType x;
-	return x;
+	template<class...MdTypes>
+	MapType WeaponEntityFindList_CreateImpl(const MdTypes&...mds)
+	{
+		return { { mds.ClassName, mds }... };
+	}
+
+	template<class...Types>
+	MapType WeaponEntityFindList_Create(TypeList<Types...>)
+	{
+		return WeaponEntityFindList_CreateImpl(GetEntityMetaDataFor(type_identity<Types>())...);
+	}
 }
-
-void MoE_EntityRegister(void (*pfn)(entvars_s *), const char *name)
+	
+static const MapType &MapSingleton()
 {
-	MapSingleton().emplace(name, pfn);
+	static const MapType x = detail::WeaponEntityFindList_Create(AllEntityTypeList());
+	return x;
 }
 
 int MoE_EntityFactory(edict_t *pent, const char *szName )
@@ -63,7 +74,7 @@ int MoE_EntityFactory(edict_t *pent, const char *szName )
 		return -1; // WTF ? eat that exception and return...
 	}
 	 */
-    iter->second(pev);
+    (*iter->second.GetClassPtr)(pev);
 
 	return 0; // OK
 }

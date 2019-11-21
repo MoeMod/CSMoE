@@ -161,6 +161,12 @@ GNU General Public License for more details.
 	#define CLIENTDLL "client"ARCH_SUFFIX"." OS_LIB_EXT
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
 	#include <limits.h>
+
+#ifdef WINAPI_FAMILY
+#if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
+#define XASH_WINRT
+#endif
+#endif
 	
 #if defined(_MSC_VER) && (_MSC_VER < 1700) 
 #include <math.h>

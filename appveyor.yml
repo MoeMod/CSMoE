@@ -4,11 +4,13 @@ before_build:
   - ps: >-
       git submodule update --init --recursive --force
 
-      Invoke-WebRequest -uri 'https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip' -OutFile 'SDL2.zip'
+      Invoke-WebRequest -uri 'https://www.libsdl.org/release/SDL2-2.0.10.zip' -OutFile 'SDL2.zip'
 
       Expand-Archive -Path 'SDL2.zip' -DestinationPath '.' -Force
 
       ren SDL2-2.0.10 SDL2
+      
+      nuget restore msvc/csmoe.sln
 build:
   project: msvc/csmoe.sln
   parallel: true

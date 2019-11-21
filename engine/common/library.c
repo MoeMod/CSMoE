@@ -56,7 +56,36 @@ char *Com_OffsetNameForFunction( void *function )
 }
 #endif
 
-#ifndef _WIN32
+#ifdef XASH_WINRT
+
+void* Com_LoadLibrary(const char* dllname, int build_ordinals_table)
+{
+	wchar_t buffer[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, dllname, -1, buffer, MAX_PATH);
+	return LoadPackagedLibrary(buffer, 0);
+}
+void Com_FreeLibrary(void* hInstance)
+{
+	FreeLibrary(hInstance);
+}
+
+
+void* Com_GetProcAddress(void* hInstance, const char* name)
+{
+	return GetProcAddress(hInstance, name);
+}
+
+void* Com_FunctionFromName(void* hInstance, const char* name)
+{
+	return GetProcAddress(hInstance, name);
+}
+
+const char* Com_NameForFunction(void* hInstance, void* function)
+{
+	return NULL;
+}
+
+#elif !defined(_WIN32)
 
 #ifdef __ANDROID__
 #include "platform/android/dlsym-weak.h"

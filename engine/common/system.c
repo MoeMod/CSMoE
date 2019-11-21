@@ -39,6 +39,9 @@ extern char **environ;
 #include <time.h>
 #endif
 #include "menu_int.h" // _UPDATE_PAGE macro
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
 
 
 qboolean	error_on_exit = false;	// arg for exit();
@@ -290,7 +293,9 @@ returns username for current profile
 */
 char *Sys_GetCurrentUser( void )
 {
-#if defined(_WIN32)
+#if defined( XASH_WINRT)
+	return "Player";
+#elif defined(_WIN32)
 
 	static string	s_userName;
 	unsigned long size = sizeof( s_userName );
@@ -365,11 +370,15 @@ Sys_ShellExecute
 */
 void Sys_ShellExecute( const char *path, const char *parms, qboolean shouldExit )
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 	if( !Q_strcmp( path, GENERIC_UPDATE_PAGE ) || !Q_strcmp( path, PLATFORM_UPDATE_PAGE ))
 		path = XASH_UPDATE_PAGE;
 
-	ShellExecute( NULL, "open", path, parms, NULL, SW_SHOW );
+#ifdef XASH_WINRT
+	WinRT_ShellExecute(path);
+#else
+	ShellExecute(NULL, "open", path, parms, NULL, SW_SHOW);
+#endif
 #elif __EMSCRIPTEN__
 	EM_ASM_INT({
 				if( confirm( "Open game page?\n"+Pointer_stringify($0) ) )
@@ -513,7 +522,7 @@ qboolean _Sys_GetParmFromCmdLine( char *parm, char *out, size_t size )
 
 void Sys_SendKeyEvents( void )
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(XASH_WINRT)
 	MSG	msg;
 
 	while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ))
@@ -551,7 +560,17 @@ qboolean Sys_LoadLibrary( dll_info_t *dll )
 			*func->func = NULL;
 	}
 
-	if( !dll->link ) dll->link = LoadLibrary ( dll->name ); // environment pathes
+	if (!dll->link)
+	{
+#ifdef XASH_WINRT
+		wchar_t buffer[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, dll->name, -1, buffer, MAX_PATH);
+
+		dll->link = LoadPackagedLibrary(buffer, 0); // environment pathes
+#else
+		dll->link = LoadLibrary(dll->name); // environment pathes
+#endif
+	}
 
 	// no DLL found
 	if( !dll->link )
@@ -618,7 +637,7 @@ wait for 'Esc' key will be hit
 */
 void Sys_WaitForQuit( void )
 {
-#ifdef _WIN32
+#if defined (_WIN32) && !defined(XASH_WINRT)
 	MSG	msg;
 
 #ifdef XASH_W32CON

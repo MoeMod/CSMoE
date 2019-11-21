@@ -182,8 +182,8 @@ void CBaseDoor::KeyValue(KeyValueData *pkvd)
 LINK_ENTITY_TO_CLASS (func_door, CBaseDoor);
 
 // func_water - same as a door.
-
-LINK_ENTITY_TO_CLASS (func_water, CBaseDoor);
+class CFuncWater : public CBaseDoor {};
+LINK_ENTITY_TO_CLASS (func_water, CFuncWater);
 
 void CBaseDoor::Spawn()
 {

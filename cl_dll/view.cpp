@@ -937,7 +937,7 @@ void V_SmoothInterpolateAngles( float * startAngle, float * endAngle, float * fi
 void V_GetChaseOrigin( float * angles, float * origin, float distance, float * returnvec )
 {
 	Vector vecStart, vecEnd;
-	pmtrace_t *trace;
+	pmtrace_t *trace = nullptr;
 	int maxLoops = 8;
 
 	Vector forward, right, up;

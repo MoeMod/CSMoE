@@ -156,9 +156,6 @@
     <ClInclude Include="..\mainui_cpp\font\StbFont.h">
       <Filter>Source Files\font</Filter>
     </ClInclude>
-    <ClInclude Include="..\mainui_cpp\font\WinAPIFont.h">
-      <Filter>Source Files\font</Filter>
-    </ClInclude>
     <ClInclude Include="..\mainui_cpp\font\BaseFontBackend.h">
       <Filter>Source Files\font</Filter>
     </ClInclude>
@@ -372,9 +369,6 @@
       <Filter>Source Files\menus\dynamic</Filter>
     </ClCompile>
     <ClCompile Include="..\mainui_cpp\font\StbFont.cpp">
-      <Filter>Source Files\font</Filter>
-    </ClCompile>
-    <ClCompile Include="..\mainui_cpp\font\WinAPIFont.cpp">
       <Filter>Source Files\font</Filter>
     </ClCompile>
     <ClCompile Include="..\mainui_cpp\font\BaseFontBackend.cpp">

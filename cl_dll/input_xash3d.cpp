@@ -4,12 +4,9 @@
 #include "kbutton.h"
 #include "keydefs.h"
 #include "input.h"
+#include "in_defs.h"
 
 using namespace cl;
-
-#define	PITCH	0
-#define	YAW		1
-#define	ROLL	2 
 
 cvar_t	*cl_laddermode;
 cvar_t	*sensitivity;
