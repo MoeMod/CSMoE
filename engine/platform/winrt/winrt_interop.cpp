@@ -7,6 +7,9 @@
 #include <Windows.ApplicationModel.UserDataAccounts.SystemAccess.h>
 #include <Windows.Graphics.Display.h>
 #include <Windows.System.h>
+#include <windows.Storage.h>
+#include <windows.Storage.Pickers.h>
+#include <windows.Storage.AccessCache.h>
 
 #include <thread>
 
@@ -31,6 +34,9 @@ using namespace ABI::Windows::ApplicationModel::Core;
 using namespace ABI::Windows::ApplicationModel::UserDataAccounts;
 using namespace ABI::Windows::Graphics::Display;
 using namespace ABI::Windows::System;
+using namespace ABI::Windows::Storage;
+using namespace ABI::Windows::Storage::Pickers;
+using namespace ABI::Windows::Storage::AccessCache;
 
 #if 0
 class ColorReference : public RuntimeClass<RuntimeClassFlags<WinRt>, __FIReference_1_Windows__CUI__CColor>
@@ -301,4 +307,32 @@ void WinRT_ShellExecute(const char* path)
 
 	AsyncStatus result = await_get_result(futureLaunchUriResult);
 	
+}
+
+void WinRT_OpenGameFolderWithExplorer()
+{
+	HRESULT hr;
+	ComPtr<IApplicationDataStatics> applicationDataStatics;
+	hr = GetActivationFactory(
+		HStringReference(RuntimeClass_Windows_Storage_ApplicationData).Get(),
+		&applicationDataStatics);
+
+	ComPtr<IApplicationData> applicationData;
+	hr = applicationDataStatics->get_Current(&applicationData);
+
+	ComPtr<IStorageFolder> localFolder;
+	hr = applicationData->get_LocalFolder(&localFolder);
+
+	ComPtr<ILauncherStatics> launcherStatics;
+	hr = GetActivationFactory(
+		HStringReference(RuntimeClass_Windows_System_Launcher).Get(),
+		&launcherStatics);
+
+	ComPtr<ILauncherStatics3> launcherStatics3;
+	hr = launcherStatics.As<ILauncherStatics3>(&launcherStatics3);
+
+	ComPtr <IAsyncOperation<bool>> futureLaunchResult;
+	hr = launcherStatics3->LaunchFolderAsync(localFolder.Get(), &futureLaunchResult);
+
+	AsyncStatus result = await_get_result(futureLaunchResult);
 }

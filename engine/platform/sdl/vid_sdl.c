@@ -394,7 +394,7 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 	if (hud_scale->value == 0.0f)
 	{
 		float dpi = 0.0f;
-		boolean success = false;
+		qboolean success = false;
 #if defined(XASH_WINRT)
 		dpi = WinRT_GetDisplayDPI();
 		success = dpi > 0.0f;
