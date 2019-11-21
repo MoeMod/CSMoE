@@ -1667,7 +1667,8 @@ void CTriggerTeleport::Spawn()
 	SetTouch(&CTriggerTeleport::TeleportTouch);
 }
 
-LINK_ENTITY_TO_CLASS(info_teleport_destination, CPointEntity);
+class CTeleportDest : public CPointEntity {};
+LINK_ENTITY_TO_CLASS(info_teleport_destination, CTeleportDest);
 
 LINK_ENTITY_TO_CLASS(func_buyzone, CBuyZone);
 
@@ -2245,13 +2246,14 @@ void CTriggerCamera::Move()
 	pev->velocity = ((pev->movedir * pev->speed) * fraction) + (pev->velocity * (1 - fraction));
 }
 
-LINK_ENTITY_TO_CLASS(env_snow, CWeather);
-
-LINK_ENTITY_TO_CLASS(func_snow, CWeather);
-
-LINK_ENTITY_TO_CLASS(env_rain, CWeather);
-
-LINK_ENTITY_TO_CLASS(func_rain, CWeather);
+class CWeatherEnvSnow : public CWeather {};
+class CWeatherFuncSnow : public CWeather {};
+class CWeatherEnvRain : public CWeather {};
+class CWeatherFuncRain : public CWeather {};
+LINK_ENTITY_TO_CLASS(env_snow, CWeatherEnvSnow);
+LINK_ENTITY_TO_CLASS(func_snow, CWeatherFuncSnow);
+LINK_ENTITY_TO_CLASS(env_rain, CWeatherEnvRain);
+LINK_ENTITY_TO_CLASS(func_rain, CWeatherFuncRain);
 
 void CWeather::Spawn()
 {

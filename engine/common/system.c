@@ -39,6 +39,9 @@ extern char **environ;
 #include <time.h>
 #endif
 #include "menu_int.h" // _UPDATE_PAGE macro
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
 
 
 qboolean	error_on_exit = false;	// arg for exit();
@@ -367,11 +370,15 @@ Sys_ShellExecute
 */
 void Sys_ShellExecute( const char *path, const char *parms, qboolean shouldExit )
 {
-#if defined(_WIN32) && !defined(XASH_WINRT)
+#if defined(_WIN32)
 	if( !Q_strcmp( path, GENERIC_UPDATE_PAGE ) || !Q_strcmp( path, PLATFORM_UPDATE_PAGE ))
 		path = XASH_UPDATE_PAGE;
 
-	ShellExecute( NULL, "open", path, parms, NULL, SW_SHOW );
+#ifdef XASH_WINRT
+	WinRT_ShellExecute(path);
+#else
+	ShellExecute(NULL, "open", path, parms, NULL, SW_SHOW);
+#endif
 #elif __EMSCRIPTEN__
 	EM_ASM_INT({
 				if( confirm( "Open game page?\n"+Pointer_stringify($0) ) )

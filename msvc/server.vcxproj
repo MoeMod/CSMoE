@@ -283,6 +283,8 @@
     <ClInclude Include="..\dlls\cbase\cbase_locksound.h" />
     <ClInclude Include="..\dlls\cbase\cbase_memory.h" />
     <ClInclude Include="..\dlls\cbase\cbase_physint.h" />
+    <ClInclude Include="..\dlls\cbase\cbase_typelist.h" />
+    <ClInclude Include="..\dlls\cbase\cbase_typelist_helper.h" />
     <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\client.h" />
     <ClInclude Include="..\dlls\common.h" />

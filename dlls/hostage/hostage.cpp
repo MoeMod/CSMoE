@@ -27,8 +27,8 @@ CHostageManager *g_pHostages = NULL;
 int g_iHostageNumber = 0;
 
 LINK_ENTITY_TO_CLASS(hostage_entity, CHostage);
-
-LINK_ENTITY_TO_CLASS(monster_scientist, CHostage);
+class CScientist : public CHostage{};
+LINK_ENTITY_TO_CLASS(monster_scientist, CScientist);
 
 CHostage::CHostage()
 {

@@ -110,7 +110,8 @@ void CLight::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType
 	}
 }
 
-LINK_ENTITY_TO_CLASS(light_spot, CLight);
+class CLightSpot : public CLight {};
+LINK_ENTITY_TO_CLASS(light_spot, CLightSpot);
 
 LINK_ENTITY_TO_CLASS(light_environment, CEnvLight);
 

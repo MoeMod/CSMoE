@@ -13,28 +13,55 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PROJECT_CBASE_ENTITY_REGISTER_H
-#define PROJECT_CBASE_ENTITY_REGISTER_H
+#pragma once
 
+#ifndef CLIENT_DLL
 typedef struct edict_s edict_t;
 typedef struct entvars_s entvars_t;
+#endif
 
-namespace sv {
+template<class T> struct type_identity { using type = T; };
 
-void MoE_EntityRegister(void (*pfn)(entvars_t *), const char *name);
-int MoE_EntityFactory(edict_t *pent, const char *szName );
+#ifdef CLIENT_DLL
+namespace cl {
+class CBasePlayerWeapon;
 
-template<class T>
-class MoE_Entity_AutoRegister
+struct EntityMetaData
 {
-public:
-	MoE_Entity_AutoRegister(void (*pfn)(entvars_t *), const char *name)
-	{
-		MoE_EntityRegister(pfn, name);
-	}
+	int DeclearLine;
+	const char* ClassName;
+	CBasePlayerWeapon* PlaceHolderEntity;
 };
-
 }
+#else
+namespace sv {
+int MoE_EntityFactory(edict_t* pent, const char* szName);
 
+struct EntityMetaData
+{
+	int DeclearLine;
+	const char* ClassName;
+	void(* GetClassPtr)(entvars_t*);
+};
+}
+#endif
 
-#endif //PROJECT_CBASE_ENTITY_REGISTER_H
+#ifdef CLIENT_DLL
+#include "cs_wpn/bte_weapons_register.h"
+#define DECLEAR_ENTITY_CLASS(DLLClassName) \
+	class DLLClassName; \
+	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_() { return __LINE__; } \
+	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(); \
+	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
+#else
+#define DECLEAR_ENTITY_CLASS(DLLClassName) \
+	class DLLClassName; \
+	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_() { return __LINE__; } \
+	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(); \
+	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
+	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(), #mapClassName, &mapClassName }; }
+#endif
