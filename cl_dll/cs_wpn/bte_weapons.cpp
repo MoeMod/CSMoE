@@ -16,21 +16,34 @@
 #include <string>
 #include <map>
 
+#include "cbase/cbase_typelist.h"
+
 /*
 	Weapon Registers
 */
 namespace cl {
 
-class CBTEClientWeapons::WeaponEntityFindList_t : public std::map<std::string, CBasePlayerWeapon *(*)()> {};
-
-auto CBTEClientWeapons::WeaponEntityFindList() -> WeaponEntityFindList_t &
+using WeaponEntityFindList_t = std::map<std::string, EntityMetaData>;
+	
+namespace detail
 {
-	static WeaponEntityFindList_t x;
-	return x;
+	template<class...MdTypes>
+	WeaponEntityFindList_t WeaponEntityFindList_CreateImpl(const MdTypes &...mds)
+	{
+		return { { mds.ClassName, mds }... };
+	}
+	
+	template<class...Types>
+	WeaponEntityFindList_t WeaponEntityFindList_Create(TypeList<Types...>)
+	{
+		return WeaponEntityFindList_CreateImpl(GetEntityMetaDataFor(type_identity<Types>())...);
+	}
 }
-void CBTEClientWeapons::AddToFindList(const char *name, CBasePlayerWeapon *(*pfn)())
+
+static const WeaponEntityFindList_t &WeaponEntityFindList()
 {
-	WeaponEntityFindList().emplace(name, pfn);
+	static const auto singleton = detail::WeaponEntityFindList_Create(AllEntityTypeList());
+	return singleton;
 }
 
 /*
@@ -46,7 +59,7 @@ void CBTEClientWeapons::PrepEntity(CBasePlayer *pWeaponOwner)
 {
 	for (auto &kv : WeaponEntityFindList())
 	{
-		CBasePlayerWeapon *pEntity = kv.second();
+		CBasePlayerWeapon *pEntity = kv.second.PlaceHolderEntity;
 
 		if (pWeaponOwner)
 		{
@@ -63,7 +76,7 @@ void CBTEClientWeapons::ActiveWeapon(const char *name)
 	auto iter = WeaponEntityFindList().find({ name });
 	if (iter != WeaponEntityFindList().end())
 	{
-		m_pActiveWeapon = iter->second();
+		m_pActiveWeapon = iter->second.PlaceHolderEntity;
 
 		ItemInfo info;
 		memset(&info, 0, sizeof(ItemInfo));

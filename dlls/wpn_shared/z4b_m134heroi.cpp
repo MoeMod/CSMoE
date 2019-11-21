@@ -54,7 +54,7 @@ public:
 	static constexpr const char *W_Model = "models/z4b/w_m134heroi.mdl";
 	static constexpr const char *EventFile = "events/m134heroi.sc";
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-	static constexpr const char *ClassName = "weapon_m134heroi";
+	static constexpr const char *ClassName = "z4b_m134heroi";
 	static constexpr const char *AnimExtension = "m134";
 	static constexpr int MaxClip = 200;
 

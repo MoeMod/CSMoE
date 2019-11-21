@@ -1563,5 +1563,11 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m2.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\dlls\cbase\cbase_typelist.h">
+      <Filter>dlls\cbase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\cbase\cbase_typelist_helper.h">
+      <Filter>dlls\cbase</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

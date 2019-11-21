@@ -335,7 +335,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		SDL_VERSION(&wminfo.version);
 		if (SDL_GetWindowWMInfo(host.hWnd, &wminfo))
 		{
-			WinRT_FullscreenMode_Install(wminfo.info.winrt.window, fullscreen);
+			WinRT_FullscreenMode_Install(fullscreen);
 		}
 		WinRT_BackButton_Install();
 	}
@@ -388,6 +388,23 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 		else glState.wideScreen = false;
 
 		SCR_VidInit();
+	}
+
+	// Automatically set HUD scale to DPI
+	if (hud_scale->value == 0.0f)
+	{
+		float dpi = 0.0f;
+		qboolean success = false;
+#if defined(XASH_WINRT)
+		dpi = WinRT_GetDisplayDPI();
+		success = dpi > 0.0f;
+#else
+		int display = SDL_GetWindowDisplayIndex(host.hWnd);
+		// MoeMod : why returning 0 on success???
+		success = !SDL_GetDisplayDPI(display, &dpi, NULL, NULL);
+#endif
+		if (success)
+			Cvar_SetFloat("hud_scale", dpi);
 	}
 }
 

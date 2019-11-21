@@ -362,7 +362,8 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS(env_lightning, CLightning);
-LINK_ENTITY_TO_CLASS(env_beam, CLightning);
+class CEnvBeam : public CLightning {};
+LINK_ENTITY_TO_CLASS(env_beam, CEnvBeam);
 
 #if _DEBUG
 class CTripBeam : public CLightning

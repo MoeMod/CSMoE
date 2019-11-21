@@ -988,7 +988,8 @@ TYPEDESCRIPTION CEnvSpark::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE(CEnvSpark, CBaseEntity);
 LINK_ENTITY_TO_CLASS(env_spark, CEnvSpark);
-LINK_ENTITY_TO_CLASS(env_debris, CEnvSpark);
+class CEnvDebris : public CEnvSpark {};
+LINK_ENTITY_TO_CLASS(env_debris, CEnvDebris);
 
 void CEnvSpark::Spawn(void)
 {
