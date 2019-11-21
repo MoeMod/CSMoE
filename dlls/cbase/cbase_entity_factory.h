@@ -32,6 +32,8 @@ struct EntityMetaData
 	const char* ClassName;
 	CBasePlayerWeapon* PlaceHolderEntity;
 };
+
+template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 1; }
 }
 #else
 namespace sv {
@@ -43,6 +45,8 @@ struct EntityMetaData
 	const char* ClassName;
 	void(* GetClassPtr)(entvars_t*);
 };
+
+template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 2; }
 }
 #endif
 
@@ -50,18 +54,18 @@ struct EntityMetaData
 #include "cs_wpn/bte_weapons_register.h"
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \
-	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_() { return __LINE__; } \
+	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
 	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(); \
-	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
+	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
+	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
 #else
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \
-	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_() { return __LINE__; } \
+	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
 	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern inline int ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(); \
 	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
-	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { ADD_ ## DLLClassName ## _IN_cbase_typelist_h_(), #mapClassName, &mapClassName }; }
+	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
+	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, &mapClassName }; }
 #endif
