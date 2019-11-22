@@ -125,6 +125,7 @@ void CCannonPlasma::Spawn(void)
 {
 	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
+	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
 
 void CCannonPlasma::Precache(void)
