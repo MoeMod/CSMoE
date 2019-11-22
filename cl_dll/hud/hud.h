@@ -169,7 +169,7 @@ public:
 	CHudUserCmd(Rebuy);
 	CHudUserCmd(Autobuy);
 
-	bool FHasSecondaryAmmo() { return m_pWeapon && m_pWeapon->iAmmo2Type > 0; }
+	bool FHasSecondaryAmmo() const;
 
 public:
 	float m_fFade;

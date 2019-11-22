@@ -37,9 +37,9 @@ namespace sv {
 
 			m_fSequenceLoops = 0;
 			//ph26 = 0;
-			SetThink(&CSVDEXGrenade::OnThink);
+			SetThink(&CSVDEXGrenade::IgniteThink);
 			SetTouch(&CSVDEXGrenade::OnTouch);
-			SET_MODEL(this->edict(), "models/w_hegrenade.mdl");
+			SET_MODEL(this->edict(), "models/shell_svdex.mdl");
 
 			//ph32 = ?
 			pev->gravity = 0.58;
@@ -47,23 +47,18 @@ namespace sv {
 			pev->scale = 0.2;
 			pev->solid = SOLID_BBOX; // 2
 			pev->movetype = MOVETYPE_BOUNCE; // 9
-			pev->nextthink = gpGlobals->time + 0.0099999998s;
+			pev->nextthink = gpGlobals->time + 0.1s;
+			m_flRemoveTime = gpGlobals->time + 5s;
 			m_flMaxFrames = 300.0;
-			/*
-			v9 = 0x40800000;
-			v10 = 0x40800000;
-			v11 = 0x40800000;
-			v6 = 80000000800000008000000080000000h ^ 0x40800000;
-			v7 = 80000000800000008000000080000000h ^ 0x40800000;
-			v8 = 80000000800000008000000080000000h ^ 0x40800000;
-			return UTIL_SetSize((int)v4, (int)&v6, (int)&v9);
-			*/
 			UTIL_SetSize(pev, { -4, -4, -4 }, { 4, 4, 4 });
+
+			pev->classname = MAKE_STRING("d_svdex");
 		}
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("models/w_hegrenade.mdl");
+			PRECACHE_MODEL("models/shell_svdex.mdl");
+			m_iSprEffect = PRECACHE_MODEL("sprites/laserbeam.spr");
 		}
 
 		KnockbackData GetKnockBackData()
@@ -100,9 +95,35 @@ namespace sv {
 			RadiusDamage();
 		}
 
-		void EXPORT OnThink()
+		void EXPORT IgniteThink()
 		{
-			
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_BEAMFOLLOW);
+			WRITE_SHORT(this->entindex());
+			WRITE_SHORT(m_iSprEffect);
+			WRITE_BYTE(40);
+			WRITE_BYTE(5);
+			WRITE_BYTE(200);
+			WRITE_BYTE(200);
+			WRITE_BYTE(200);
+			WRITE_BYTE(200);
+			MESSAGE_END();
+
+			SetThink(&CSVDEXGrenade::FollowThink);
+			pev->nextthink = gpGlobals->time + 100ms;
+		}
+
+		void EXPORT FollowThink(void)
+		{
+			UTIL_MakeAimVectors(pev->angles);
+
+			pev->angles = UTIL_VecToAngles(gpGlobals->v_forward);
+			pev->nextthink = gpGlobals->time + 100ms;
+
+			if(gpGlobals->time > m_flRemoveTime)
+			{
+				Remove();
+			}
 		}
 
 		void RadiusDamage()
@@ -160,11 +181,11 @@ namespace sv {
 							ApplyMultiDamage(pevInflictor, pevAttacker);
 						}
 
-						/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+						CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 						if (pVictim->m_bIsZombie) // Zombie Knockback...
 						{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-						}*/
+							ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 800.0f, 800.0, 800.0f, 800.0f, 0.5f });
+						}
 					}
 				}
 			}
@@ -190,12 +211,13 @@ namespace sv {
 		}
 
 		int m_fSequenceLoops;
-		time_point_t m_flAnimEndTime;
+		time_point_t m_flRemoveTime;
 		float m_flMaxFrames;
 		float m_flTouchDamage;
 		float m_flExplodeDamage;
 		float m_flExplodeRadius;
 		TeamName m_iTeam;
+		int m_iSprEffect;
 
 	protected:
 		void Remove()
@@ -233,7 +255,7 @@ void CSVDEX::Spawn(void)
 	SET_MODEL(ENT(pev), "models/w_svdex.mdl");
 
 	m_iDefaultAmmo = 20;  //????
-	//m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 10;
+	m_iDefaultAmmo2 = 10;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	m_bDelayFire = true;
@@ -244,6 +266,7 @@ void CSVDEX::Spawn(void)
 void CSVDEX::Precache(void)
 {
 	PRECACHE_MODEL("models/v_svdex.mdl");
+	PRECACHE_MODEL("models/p_svdex.mdl");
 	PRECACHE_MODEL("models/w_svdex.mdl");
 
 	PRECACHE_SOUND("weapons/svdex-1.wav");
@@ -260,6 +283,10 @@ void CSVDEX::Precache(void)
 
 	m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireSVDEX = PRECACHE_EVENT(1, "events/svdex.sc");
+
+#ifndef CLIENT_DLL
+	UTIL_PrecacheOther("svdex_grenade");
+#endif
 }
 
 int CSVDEX::GetItemInfo(ItemInfo *p)
@@ -267,7 +294,7 @@ int CSVDEX::GetItemInfo(ItemInfo *p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556Nato";
 	p->iMaxAmmo1 = MAX_AMMO_556NATO;
-	p->pszAmmo2 = "50AE";
+	p->pszAmmo2 = "SVDEXGrenade"; // whatever it is, it can't be bought
 	p->iMaxAmmo2 = 10;
 	p->iMaxClip = 20;
 	p->iSlot = 0;
@@ -290,6 +317,24 @@ BOOL CSVDEX::Deploy(void)
 	return DefaultDeploy("models/v_svdex.mdl", "models/p_svdex.mdl", SVDEX_DRAWA, "rifle", UseDecrement() != FALSE);
 }
 
+void CSVDEX::Holster(int skiplocal)
+{
+#ifndef CLIENT_DLL
+	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_M4A1_SILENCED) == 0);
+#endif
+	return CBasePlayerWeapon::Holster(skiplocal);
+}
+
+int CSVDEX::ExtractAmmo(CBasePlayerWeapon* pWeapon)
+{
+	if (m_iDefaultAmmo2)
+	{
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iDefaultAmmo2;
+		m_iDefaultAmmo2 = 0;
+	}
+	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+}
+
 void CSVDEX::SecondaryAttack(void)
 {
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
@@ -305,6 +350,9 @@ void CSVDEX::SecondaryAttack(void)
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
 
+#ifndef CLIENT_DLL
+	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_M4A1_SILENCED) == 0);
+#endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.9s;
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2s;
@@ -314,12 +362,6 @@ void CSVDEX::PrimaryAttack(void)
 {
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
-		/*if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			SVDEXFire(0.035 + (0.4) * m_flAccuracy, 0.0875s, FALSE);
-		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			SVDEXFire(0.035 + (0.07) * m_flAccuracy, 0.0875s, FALSE);
-		else
-			SVDEXFire((0.025) * m_flAccuracy, 0.0875s, FALSE);*/
 		SVDEXFire2(3.0s, FALSE);
 	}
 	else
@@ -346,6 +388,16 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	if (m_flAccuracy > 1)
 		m_flAccuracy = 1;
 
+	if (m_iClip <= 0)
+	{
+		if (m_fFireOnEmpty)
+		{
+			PlayEmptySound();
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
+		}
+
+		return;
+	}
 
 	m_iClip--;
 #ifndef CLIENT_DLL
@@ -386,7 +438,7 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
-	/*if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
 	{
 		if (m_fFireOnEmpty)
 		{
@@ -396,8 +448,8 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 
 		return;
 	}
-	*/
-	//m_iClip--;
+	--m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType];
+	
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -411,25 +463,20 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10;
+	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
 	CSVDEXGrenade *pEnt = static_cast<CSVDEXGrenade *>(CBaseEntity::Create("svdex_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
-		pEnt->Init(gpGlobals->v_forward * 1000, 0, 900.0, 300, m_pPlayer->m_iTeam);
+		pEnt->Init(gpGlobals->v_forward * 1000 + gpGlobals->v_up * 135, 0, 900.0, 300, m_pPlayer->m_iTeam);
 	}
 #endif
 
 	//vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 490, 0.99, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
+	int flags = 0;
 
-	const bool bEmpty = false;
+	const bool bEmpty = m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 0;
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSVDEX, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, bEmpty);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
