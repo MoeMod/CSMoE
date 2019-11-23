@@ -37,6 +37,10 @@ GNU General Public License for more details.
 #include <unistd.h>
 #endif
 
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
+
 #define FILE_BUFF_SIZE		2048
 #define PAK_LOAD_OK			0
 #define PAK_LOAD_COULDNT_OPEN		1
@@ -1788,7 +1792,12 @@ void FS_LoadGameInfo( const char *rootfolder )
 	}
 
 	if( i == SI.numgames )
-		Sys_Error( "Couldn't find game directory '%s' at \n %s", gs_basedir, host.rootdir );
+	{
+#ifdef XASH_WINRT
+		WinRT_OpenGameFolderWithExplorer();
+#endif
+		Sys_Error("Couldn't find game directory '%s' at \n %s", gs_basedir, host.rootdir);
+	}
 
 	SI.GameInfo = SI.games[i];
 	if( !Sys_GetParmFromCmdLine( "-dll", SI.gamedll ) )

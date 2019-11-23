@@ -62,17 +62,18 @@ LINK_ENTITY_TO_CLASS(info_null, CNullEntity);
 
 // These are the new entry points to entities.
 
-LINK_ENTITY_TO_CLASS(info_player_deathmatch, CBaseDMStart);
-
-LINK_ENTITY_TO_CLASS(info_player_start, CPointEntity);
-
-LINK_ENTITY_TO_CLASS(info_vip_start, CBaseDMStart);
-
-LINK_ENTITY_TO_CLASS(info_landmark, CPointEntity);
-
-LINK_ENTITY_TO_CLASS(info_hostage_rescue, CPointEntity);
-
-LINK_ENTITY_TO_CLASS(info_bomb_target, CPointEntity);
+class CDMStart : public CBaseDMStart {};
+class CPlayerStart : public CPointEntity {};
+class CVIPStart : public CDMStart {};
+class CLandMark : public CPointEntity {};
+class CHostageRescuePoint : public CPointEntity {};
+class CBombTargetPoint : public CPointEntity {};
+LINK_ENTITY_TO_CLASS(info_player_deathmatch, CDMStart);
+LINK_ENTITY_TO_CLASS(info_player_start, CPlayerStart);
+LINK_ENTITY_TO_CLASS(info_vip_start, CVIPStart);
+LINK_ENTITY_TO_CLASS(info_landmark, CLandMark);
+LINK_ENTITY_TO_CLASS(info_hostage_rescue, CHostageRescuePoint);
+LINK_ENTITY_TO_CLASS(info_bomb_target, CBombTargetPoint);
 
 void CBaseDMStart::KeyValue(KeyValueData *pkvd)
 {

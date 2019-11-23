@@ -175,6 +175,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_infinityex1");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex2");
 	UTIL_PrecacheOtherWeapon("z4b_m134heroi");
+	UTIL_PrecacheOtherWeapon("z4b_deagleb");
+	UTIL_PrecacheOtherWeapon("z4b_xm2010pc");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

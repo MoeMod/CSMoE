@@ -9,25 +9,15 @@ class CBasePlayerWeapon;
 void InitializeWeaponEntity(CBasePlayerWeapon *pEntity, entvars_t *pev); // bte_weapons.cpp
 
 template<class T>
-class CBTEClientWeapons_AutoRegister
+CBasePlayerWeapon* WeaponEntityPlaceHolderFactory() // Static
 {
-public:
-	CBTEClientWeapons_AutoRegister(const char *name)
-	{
-		BTEClientWeapons().AddToFindList(name, WeaponEntityPlaceHolderFactory);
-	}
+	static T w;
+	static entvars_t ev;
 
-private:
-	static CBasePlayerWeapon *WeaponEntityPlaceHolderFactory() // Static
-	{
-		static T w;
-		static entvars_t ev;
+	CBasePlayerWeapon* pEntity = &w;
+	InitializeWeaponEntity(pEntity, &ev);
 
-		CBasePlayerWeapon *pEntity = &w;
-		InitializeWeaponEntity(pEntity, &ev);
-
-		return pEntity;
-	}
-};
+	return pEntity;
+}
 
 }
