@@ -316,11 +316,11 @@ void CM134HeroI::SpecialAttack(  )
     Vector vecSrc = m_pPlayer->GetGunPosition();
 
     int flags;
-//#if defined( CLIENT_WEAPONS )
-//    flags = FEV_NOTHOST;
-//#else
+#if defined( CLIENT_WEAPONS )
+    flags = FEV_NOTHOST;
+#else
     flags = 0;
-//#endif
+#endif
 
     switch( m_fireState )
     {

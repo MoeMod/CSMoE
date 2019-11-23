@@ -1114,7 +1114,12 @@ int CHudAmmo::Draw(float flTime)
 		return 1;
 
 	// place it here, so pretty dynamic crosshair will work even in spectator!
-	if( gHUD.m_iFOV > 40 )
+	if (gHUD.m_iHideHUDDisplay & HIDEHUD_CROSSHAIR)
+	{
+		SetCrosshair(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim, 255, 255, 255);
+		switchCrosshairType = true;
+	}
+	else if( gHUD.m_iFOV > 40 )
 	{
 		if( switchCrosshairType )
 		{
@@ -1846,4 +1851,9 @@ client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes
 	}
 
 	return NULL;
+}
+
+bool CHudAmmo::FHasSecondaryAmmo() const
+{
+	return m_pWeapon && (m_pWeapon->iAmmo2Type > 0) && (gWR.CountAmmo(m_pWeapon->iAmmo2Type) > 0);
 }

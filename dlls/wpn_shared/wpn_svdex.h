@@ -38,6 +38,8 @@ public:
 	void Precache() override;
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
+	void Holster(int skiplocal) override;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 	float GetMaxSpeed() override { return SVDEX_MAX_SPEED; }
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
@@ -60,6 +62,7 @@ public:
 
 	int m_iShell;
 	int iShellOn;
+	int m_iDefaultAmmo2;
 
 private:
 	unsigned short m_usFireSVDEX;
