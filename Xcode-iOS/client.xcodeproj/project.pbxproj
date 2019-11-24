@@ -227,6 +227,10 @@
 		3D44160A231D1164001A0696 /* wpn_scout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4415C1231D1164001A0696 /* wpn_scout.cpp */; };
 		3D4CBB032365F214002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB022365F213002114A0 /* wpn_m2.cpp */; };
 		3D4CBB052365F220002114A0 /* event_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB042365F220002114A0 /* event_m2.cpp */; };
+		3DA638E2238AE965007D26EC /* z4b_dmp7a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */; };
+		3DA638E3238AE965007D26EC /* z4b_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */; };
+		3DA638E4238AE965007D26EC /* z4b_awpnvidia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E1238AE965007D26EC /* z4b_awpnvidia.cpp */; };
+		3DA638E6238AE98F007D26EC /* event_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E5238AE98F007D26EC /* event_m4a1razer.cpp */; };
 		3DB36A1B2381892600BE2343 /* event_deagleb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A192381892600BE2343 /* event_deagleb.cpp */; };
 		3DB36A1C2381892600BE2343 /* event_xm2010pc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A1A2381892600BE2343 /* event_xm2010pc.cpp */; };
 		3DB36A1F2381894000BE2343 /* z4b_deagleb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A1D2381894000BE2343 /* z4b_deagleb.cpp */; };
@@ -603,6 +607,12 @@
 		3D4415C2231D1164001A0696 /* wpn_p90.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_p90.h; sourceTree = "<group>"; };
 		3D4CBB022365F213002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
 		3D4CBB042365F220002114A0 /* event_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_m2.cpp; path = ../../cl_dll/events/event_m2.cpp; sourceTree = "<group>"; };
+		3DA638DD238AE964007D26EC /* z4b_m4a1razer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_m4a1razer.h; sourceTree = "<group>"; };
+		3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_dmp7a1x.cpp; sourceTree = "<group>"; };
+		3DA638DF238AE964007D26EC /* z4b_dmp7a1x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_dmp7a1x.h; sourceTree = "<group>"; };
+		3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1razer.cpp; sourceTree = "<group>"; };
+		3DA638E1238AE965007D26EC /* z4b_awpnvidia.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_awpnvidia.cpp; sourceTree = "<group>"; };
+		3DA638E5238AE98F007D26EC /* event_m4a1razer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m4a1razer.cpp; sourceTree = "<group>"; };
 		3DB36A192381892600BE2343 /* event_deagleb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_deagleb.cpp; sourceTree = "<group>"; };
 		3DB36A1A2381892600BE2343 /* event_xm2010pc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_xm2010pc.cpp; sourceTree = "<group>"; };
 		3DB36A1D2381894000BE2343 /* z4b_deagleb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_deagleb.cpp; sourceTree = "<group>"; };
@@ -834,6 +844,7 @@
 				3D1D53492331356800D26B94 /* event_m134heroi.cpp */,
 				3DB36A192381892600BE2343 /* event_deagleb.cpp */,
 				3DB36A1A2381892600BE2343 /* event_xm2010pc.cpp */,
+				3DA638E5238AE98F007D26EC /* event_m4a1razer.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1123,6 +1134,11 @@
 				3D3D5A07233A79FF005E4B6A /* knife_dragonsword.cpp */,
 				3DB36A1D2381894000BE2343 /* z4b_deagleb.cpp */,
 				3DB36A1E2381894000BE2343 /* z4b_xm2010pc.cpp */,
+				3DA638E1238AE965007D26EC /* z4b_awpnvidia.cpp */,
+				3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */,
+				3DA638DF238AE964007D26EC /* z4b_dmp7a1x.h */,
+				3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */,
+				3DA638DD238AE964007D26EC /* z4b_m4a1razer.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1193,6 +1209,7 @@
 				3D441540231D1133001A0696 /* zbs.cpp in Sources */,
 				3D4414E3231D1133001A0696 /* event_mp7a1p.cpp in Sources */,
 				3D441529231D1133001A0696 /* zb2.cpp in Sources */,
+				3DA638E3238AE965007D26EC /* z4b_m4a1razer.cpp in Sources */,
 				3D4413BF231D0E9E001A0696 /* unicode_strtools.cpp in Sources */,
 				3D4415CC231D1164001A0696 /* wpn_xm8s.cpp in Sources */,
 				3D4415C6231D1164001A0696 /* z4b_strongknifex.cpp in Sources */,
@@ -1334,6 +1351,7 @@
 				3D44153C231D1133001A0696 /* sniperscope.cpp in Sources */,
 				3D4415C5231D1164001A0696 /* wpn_anaconda.cpp in Sources */,
 				3D44152E231D1133001A0696 /* geiger.cpp in Sources */,
+				3DA638E6238AE98F007D26EC /* event_m4a1razer.cpp in Sources */,
 				3D4415CF231D1164001A0696 /* wpn_mg36.cpp in Sources */,
 				3D4415EC231D1164001A0696 /* wpn_cannon.cpp in Sources */,
 				3D4415C4231D1164001A0696 /* wpn_fiveseven.cpp in Sources */,
@@ -1383,6 +1401,7 @@
 				3D44150C231D1133001A0696 /* event_galil.cpp in Sources */,
 				3D44160A231D1164001A0696 /* wpn_scout.cpp in Sources */,
 				3D4415D0231D1164001A0696 /* wpn_xm1014.cpp in Sources */,
+				3DA638E2238AE965007D26EC /* z4b_dmp7a1x.cpp in Sources */,
 				3D4415D5231D1164001A0696 /* wpn_elite.cpp in Sources */,
 				3D4415D8231D1164001A0696 /* wpn_dynamic.cpp in Sources */,
 				3D44150D231D1133001A0696 /* event_anaconda.cpp in Sources */,
@@ -1401,6 +1420,7 @@
 				3D4415DB231D1164001A0696 /* wpn_usp.cpp in Sources */,
 				3D441503231D1133001A0696 /* event_g3sg1.cpp in Sources */,
 				3D4414DA231D1133001A0696 /* event_aug.cpp in Sources */,
+				3DA638E4238AE965007D26EC /* z4b_awpnvidia.cpp in Sources */,
 				3D4415FE231D1164001A0696 /* z4b_stormgiantx.cpp in Sources */,
 				3D4414D0231D1133001A0696 /* event_sg550.cpp in Sources */,
 				3D1D533D23312D7800D26B94 /* z4b_facelessvoid.cpp in Sources */,
