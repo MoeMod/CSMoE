@@ -271,6 +271,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_m134heroi.cpp
 	../dlls/wpn_shared/z4b_deagleb.cpp
 	../dlls/wpn_shared/z4b_xm2010pc.cpp
+	../dlls/wpn_shared/z4b_dmp7a1x.cpp
+	../dlls/wpn_shared/z4b_m4a1razer.cpp
+	../dlls/wpn_shared/z4b_awpnvidia.cpp
 	)
 
 set(PM_SRCS

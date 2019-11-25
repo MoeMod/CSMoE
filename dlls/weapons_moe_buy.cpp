@@ -86,8 +86,11 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 												  {"z4b_oppovivo",      "Dual Light Stick",    0, KNIFE_SLOT, UNASSIGNED},
 												  {"z4b_stormgiantx",      "Storm Giant's Hammer",    0, KNIFE_SLOT, UNASSIGNED},
 												  {"z4b_m134heroi",      "M134 CORE-i7",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-												  {"z4b_deagleb",      "D.Eagle Born Beast",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_deagleb",      "D.Eagle Born Beast",    700, PISTOL_SLOT, UNASSIGNED},
 												  {"z4b_xm2010pc",      "XM2010 Crystal-P",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_awpnvidia",      "AWP-NVIDIA",    4650, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1razer",      "M4A1-Razer",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_dmp7a1x",      "Dual SMG-N7",    2350, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 };
 

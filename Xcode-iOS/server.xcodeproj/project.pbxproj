@@ -232,6 +232,9 @@
 		3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413AA231D0E9E001A0696 /* MemPool.cpp */; };
 		3D4413BF231D0E9E001A0696 /* unicode_strtools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413B0231D0E9E001A0696 /* unicode_strtools.cpp */; };
 		3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB002365F205002114A0 /* wpn_m2.cpp */; };
+		3DA638DA238AE954007D26EC /* z4b_dmp7a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */; };
+		3DA638DB238AE954007D26EC /* z4b_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */; };
+		3DA638DC238AE954007D26EC /* z4b_awpnvidia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */; };
 		3DB36A232381894D00BE2343 /* z4b_deagleb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */; };
 		3DB36A242381894D00BE2343 /* z4b_xm2010pc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */; };
 /* End PBXBuildFile section */
@@ -733,6 +736,11 @@
 		3D4413BC231D0E9E001A0696 /* EventDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventDispatcher.h; sourceTree = "<group>"; };
 		3D4413BD231D0E9E001A0696 /* UtlVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtlVector.h; sourceTree = "<group>"; };
 		3D4CBB002365F205002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
+		3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_dmp7a1x.cpp; sourceTree = "<group>"; };
+		3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1razer.cpp; sourceTree = "<group>"; };
+		3DA638D7238AE954007D26EC /* z4b_m4a1razer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_m4a1razer.h; sourceTree = "<group>"; };
+		3DA638D8238AE954007D26EC /* z4b_dmp7a1x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_dmp7a1x.h; sourceTree = "<group>"; };
+		3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_awpnvidia.cpp; sourceTree = "<group>"; };
 		3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_deagleb.cpp; sourceTree = "<group>"; };
 		3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_xm2010pc.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1221,6 +1229,11 @@
 				3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */,
 				3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */,
 				3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */,
+				3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */,
+				3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */,
+				3DA638D8238AE954007D26EC /* z4b_dmp7a1x.h */,
+				3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */,
+				3DA638D7238AE954007D26EC /* z4b_m4a1razer.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1553,6 +1566,7 @@
 				3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */,
 				3D441347231D0789001A0696 /* cs_bot_pathfind.cpp in Sources */,
 				3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */,
+				3DA638DA238AE954007D26EC /* z4b_dmp7a1x.cpp in Sources */,
 				3D441310231D0789001A0696 /* wpn_balrog7.cpp in Sources */,
 				3D441364231D0789001A0696 /* hostage_animate.cpp in Sources */,
 				3D441313231D0789001A0696 /* wpn_m14ebr.cpp in Sources */,
@@ -1615,6 +1629,7 @@
 				3D44130A231D0789001A0696 /* knife_zombi.cpp in Sources */,
 				3D441354231D0789001A0696 /* cs_bot_move_to.cpp in Sources */,
 				3D441359231D0789001A0696 /* cs_bot_vision.cpp in Sources */,
+				3DA638DB238AE954007D26EC /* z4b_m4a1razer.cpp in Sources */,
 				3D44117D231D06CD001A0696 /* weapons.cpp in Sources */,
 				3D44116F231D06CD001A0696 /* triggers.cpp in Sources */,
 				3D44138D231D0DEE001A0696 /* shared_util.cpp in Sources */,
@@ -1678,6 +1693,7 @@
 				3D441320231D0789001A0696 /* wpn_cannon.cpp in Sources */,
 				3D441348231D0789001A0696 /* cs_bot_event.cpp in Sources */,
 				3D44133C231D0789001A0696 /* wpn_hegrenade.cpp in Sources */,
+				3DA638DC238AE954007D26EC /* z4b_awpnvidia.cpp in Sources */,
 				3D441179231D06CD001A0696 /* weapons_msg.cpp in Sources */,
 				3D4412F0231D0789001A0696 /* player_spawnpoint.cpp in Sources */,
 				3D441172231D06CD001A0696 /* ammo.cpp in Sources */,

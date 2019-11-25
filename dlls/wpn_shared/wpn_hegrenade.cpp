@@ -99,7 +99,8 @@ BOOL CHEGrenade::Deploy(void)
 
 BOOL CHEGrenade::CanHolster(void)
 {
-	return m_flStartThrow != invalid_time_point;
+	//return m_flStartThrow != invalid_time_point;
+	return CBasePlayerWeapon::CanHolster();
 }
 
 void CHEGrenade::Holster(int skiplocal)

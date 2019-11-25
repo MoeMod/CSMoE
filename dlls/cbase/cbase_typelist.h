@@ -102,6 +102,9 @@ TL_ADD(CKnifeOppoVivo)
 TL_ADD(CKnifeStormgiantX)
 TL_ADD(CKnifeStrongKnifeX)
 TL_ADD(CXM2010PC)
+TL_ADD(CAWPNvidia)
+TL_ADD(CM4A1Razer)
+TL_ADD(CZ4B_MP7A1DX)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -287,6 +290,7 @@ TL_ADD(CSupplyBox)
 TL_ADD(CZombieSpawn)
 TL_ADD(CZBSBreak)
 TL_ADD(CXM2010PC_Crystal)
+TL_ADD(CM4A1RazerGrenade)
 #endif
 
 TL_END(AllEntityTypeList)

@@ -1,6 +1,6 @@
 /*
-wpn_svdex.cpp - CSMoE Gameplay server : Zombie Hero
-Copyright (C) 2019 TmNine!~
+z4b_m4a1razer.cpp - 
+Copyright (C) 2019 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,7 +19,10 @@ GNU General Public License for more details.
 #include "player.h"
 #include "weapons.h"
 #include "monsters.h"
-#include "wpn_svdex.h"
+#include "z4b_m4a1razer.h"
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -28,7 +31,7 @@ namespace sv {
 #endif
 
 #ifndef CLIENT_DLL
-	class CSVDEXGrenade : public CBaseEntity
+	class CM4A1RazerGrenade : public CBaseEntity
 	{
 	public:
 		void Spawn() override
@@ -37,33 +40,38 @@ namespace sv {
 
 			m_fSequenceLoops = 0;
 			//ph26 = 0;
-			SetThink(&CSVDEXGrenade::IgniteThink);
-			SetTouch(&CSVDEXGrenade::OnTouch);
-			SET_MODEL(this->edict(), "models/shell_svdex.mdl");
+			SetThink(&CM4A1RazerGrenade::IgniteThink);
+			SetTouch(&CM4A1RazerGrenade::OnTouch);
+			SET_MODEL(this->edict(), "sprites/plasmaroll.spr");
 
 			//ph32 = ?
-			pev->gravity = 0.58;
+			pev->rendermode = kRenderTransAdd;
+			pev->renderamt = 250;
+			pev->scale = 1.0 - float(m_iType) * 0.4;
 			pev->framerate = 10;
 			pev->scale = 0.2;
-			pev->solid = SOLID_BBOX; // 2
-			pev->movetype = MOVETYPE_BOUNCE; // 9
+			pev->angles = { RANDOM_FLOAT(-60, 60), RANDOM_FLOAT(-60, 60) , RANDOM_FLOAT(-60, 60) };
+			pev->solid = SOLID_TRIGGER;
+			pev->movetype = MOVETYPE_FLY;
 			pev->nextthink = gpGlobals->time + 0.1s;
-			m_flRemoveTime = gpGlobals->time + 5s;
+			m_flRemoveTime = gpGlobals->time + 500ms;
 			m_flMaxFrames = 300.0;
 			UTIL_SetSize(pev, { -4, -4, -4 }, { 4, 4, 4 });
 
-			pev->classname = MAKE_STRING("d_svdex");
+			pev->classname = MAKE_STRING("d_m4a1razer");
 		}
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("models/shell_svdex.mdl");
-			m_iSprEffect = PRECACHE_MODEL("sprites/laserbeam.spr");
+			PRECACHE_MODEL("sprites/plasmaroll.spr");
+			PRECACHE_SOUND("weapons/plasmagun_exp.wav");
+			m_iSprEffect = PRECACHE_MODEL("sprites/lgtning.spr");
+			m_iSprExplo = PRECACHE_MODEL("sprites/plasmabomb.spr");
 		}
 
 		KnockbackData GetKnockBackData()
 		{
-			return { 2000.0, 1250.0, 1000.0, 1750.0 };
+			return {  };
 		}
 
 		void EXPORT OnTouch(CBaseEntity *pOther)
@@ -93,6 +101,7 @@ namespace sv {
 			}
 
 			RadiusDamage();
+			Remove();
 		}
 
 		void EXPORT IgniteThink()
@@ -101,15 +110,15 @@ namespace sv {
 			WRITE_BYTE(TE_BEAMFOLLOW);
 			WRITE_SHORT(this->entindex());
 			WRITE_SHORT(m_iSprEffect);
-			WRITE_BYTE(40);
-			WRITE_BYTE(5);
+			WRITE_BYTE(30);
+			WRITE_BYTE(12);
+			WRITE_BYTE(30);
 			WRITE_BYTE(200);
-			WRITE_BYTE(200);
-			WRITE_BYTE(200);
+			WRITE_BYTE(30);
 			WRITE_BYTE(200);
 			MESSAGE_END();
 
-			SetThink(&CSVDEXGrenade::FollowThink);
+			SetThink(&CM4A1RazerGrenade::FollowThink);
 			pev->nextthink = gpGlobals->time + 100ms;
 		}
 
@@ -117,12 +126,48 @@ namespace sv {
 		{
 			UTIL_MakeAimVectors(pev->angles);
 
-			pev->angles = UTIL_VecToAngles(gpGlobals->v_forward);
-			pev->nextthink = gpGlobals->time + 100ms;
+			pev->scale += 0.01;
 
+			constexpr auto Frames = 33;
+			pev->frame = (static_cast<int>(pev->frame) + 1) % Frames;
+			pev->nextthink = gpGlobals->time + 45ms;
+			
 			if(gpGlobals->time > m_flRemoveTime)
 			{
-				Remove();
+				if (m_iType == 2)
+				{
+					if ((pev->renderamt -= 15) < 5)
+					{
+						Remove();
+					}
+				}
+				else
+				{
+					// separation
+					RadiusDamage();
+					
+					const Vector vecForward = m_vecStartVelocity.Normalize();
+					const Vector vecRight = CrossProduct(vecForward, { 0.0f, 0.0f, 1.0f });
+					const Vector vecUp = CrossProduct(vecRight, vecForward);
+
+					auto f = [this](Vector vecNewOrigin) {
+						CM4A1RazerGrenade* pEntity = CreateClassPtr<CM4A1RazerGrenade>();
+						if(pEntity)
+						{
+							pEntity->pev->owner = pev->owner;
+							pEntity->pev->origin = vecNewOrigin;
+							DispatchSpawn(pEntity->edict());
+							pEntity->Init(m_vecStartVelocity, 0, g_pModRunning->DamageTrack() == DT_NONE ? 20 : 650, 180, m_iTeam, m_iType + 1);
+						}
+						return pEntity;
+					};
+
+					f(pev->origin - (vecUp) * 35);
+					f(pev->origin + (vecRight * sqrt(3) / 2 + vecUp / 2) * 50);
+					f(pev->origin + (-vecRight * sqrt(3) / 2 + vecUp / 2) * 35);
+
+					Remove();
+				}
 			}
 		}
 
@@ -194,20 +239,21 @@ namespace sv {
 			WRITE_BYTE(TE_EXPLOSION);
 			WRITE_COORD(pev->origin.x);
 			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_SHORT(MODEL_INDEX("sprites/eexplo.spr"));
-			WRITE_BYTE(25);
+			WRITE_COORD(pev->origin.z + 5);
+			WRITE_SHORT(m_iSprExplo);
+			WRITE_BYTE(m_iType ? 5 : 8);
 			WRITE_BYTE(30);
-			WRITE_BYTE(TE_EXPLFLAG_NONE);
+			WRITE_BYTE(TE_EXPLFLAG_NOSOUND | TE_EXPLFLAG_NOPARTICLES);
 			MESSAGE_END();
 
-			return Remove();
+			EMIT_SOUND_DYN(edict(), CHAN_AUTO, "weapons/plasmagun_exp.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 		}
 
-		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam)
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam, int type = 0)
 		{
 			std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
-			pev->velocity = std::move(vecVelocity);
+			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
+			m_iType = type;
 		}
 
 		int m_fSequenceLoops;
@@ -218,6 +264,9 @@ namespace sv {
 		float m_flExplodeRadius;
 		TeamName m_iTeam;
 		int m_iSprEffect;
+		int m_iSprExplo;
+		Vector m_vecStartVelocity;
+		int m_iType;
 
 	protected:
 		void Remove()
@@ -228,33 +277,34 @@ namespace sv {
 			return UTIL_Remove(this);
 		}
 	};
-	LINK_ENTITY_TO_CLASS(svdex_grenade, CSVDEXGrenade)
+	LINK_ENTITY_TO_CLASS(m4a1razer_grenade, CM4A1RazerGrenade)
 #endif
-enum svdex_e
+enum
 {
-	SVDEX_IDLEA,
-	SVDEX_SHOOTA,
-	SVDEX_RELOAD,
-	SVDEX_DRAWA,
-	SVDEX_IDLEB,
-	SVDEX_SHOOTB_1,
-	SVDEX_SHOOTB_LAST,
-	SVDEX_DRAWB,
-	SVDEX_MOVE_GRENADE,
-	SVDEX_MOVE_CARBINE
+	ANIM_IDLEB = 0,
+	ANIM_SHOOTB1,
+	ANIM_SHOOTB2,
+	ANIM_RELOADB,
+	ANIM_DRAWB,
+	ANIM_CHANGEA,
+	ANIM_IDLE,
+	ANIM_SHOOT,
+	ANIM_RELOAD,
+	ANIM_DRAW,
+	ANIM_CHANGEB,
 };
 
-LINK_ENTITY_TO_CLASS(weapon_svdex, CSVDEX)
+LINK_ENTITY_TO_CLASS(z4b_m4a1razer, CM4A1Razer)
 
-void CSVDEX::Spawn(void)
+void CM4A1Razer::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_svdex");
+	pev->classname = MAKE_STRING("z4b_m4a1razer");
 
 	Precache();
-	m_iId = WEAPON_AK47;
-	SET_MODEL(ENT(pev), "models/w_svdex.mdl");
+	m_iId = WEAPON_M4A1;
+	SET_MODEL(ENT(pev), "models/z4b/w_m4a1razer.mdl");
 
-	m_iDefaultAmmo = 20;  //????
+	m_iDefaultAmmo = 30;
 	m_iDefaultAmmo2 = 10;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
@@ -263,40 +313,30 @@ void CSVDEX::Spawn(void)
 	FallInit();
 }
 
-void CSVDEX::Precache(void)
+void CM4A1Razer::Precache(void)
 {
-	PRECACHE_MODEL("models/v_svdex.mdl");
-	PRECACHE_MODEL("models/p_svdex.mdl");
-	PRECACHE_MODEL("models/w_svdex.mdl");
+	PRECACHE_MODEL("models/z4b/p_m4a1razer.mdl");
+	PRECACHE_MODEL("models/z4b/v_m4a1razer.mdl");
+	PRECACHE_MODEL("models/z4b/w_m4a1razer.mdl");
 
-	PRECACHE_SOUND("weapons/svdex-1.wav");
-	PRECACHE_SOUND("weapons/svdex-launcher.wav");
-	PRECACHE_SOUND("weapons/svdex_exp.wav");
-	PRECACHE_SOUND("weapons/svdex_foley1.wav");
-	PRECACHE_SOUND("weapons/svdex_foley2.wav");
-	PRECACHE_SOUND("weapons/svdex_foley3.wav");
-	PRECACHE_SOUND("weapons/svdex_foley4.wav");
-	PRECACHE_SOUND("weapons/svdex_draw.wav");
-	PRECACHE_SOUND("weapons/svdex_clipon.wav");
-	PRECACHE_SOUND("weapons/svdex_clipin.wav");
-	PRECACHE_SOUND("weapons/svdex_clipout.wav");
+	PRECACHE_SOUND("weapons/balrog9_charge_finish1.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
-	m_usFireSVDEX = PRECACHE_EVENT(1, "events/svdex.sc");
+	m_usFireSVDEX = PRECACHE_EVENT(1, "events/m4a1razer.sc");
 
 #ifndef CLIENT_DLL
-	UTIL_PrecacheOther("svdex_grenade");
+	UTIL_PrecacheOther("m4a1razer_grenade");
 #endif
 }
 
-int CSVDEX::GetItemInfo(ItemInfo *p)
+int CM4A1Razer::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556Nato";
 	p->iMaxAmmo1 = MAX_AMMO_556NATO;
-	p->pszAmmo2 = "SVDEXGrenade"; // whatever it is, it can't be bought
+	p->pszAmmo2 = "M4A1RazerGrenade"; // whatever it is, it can't be bought
 	p->iMaxAmmo2 = 10;
-	p->iMaxClip = 20;
+	p->iMaxClip = 30;
 	p->iSlot = 0;
 	p->iPosition = 6;
 	p->iId = m_iId = WEAPON_M4A1;
@@ -306,26 +346,26 @@ int CSVDEX::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-BOOL CSVDEX::Deploy(void)
+BOOL CM4A1Razer::Deploy(void)
 {
 	m_bDelayFire = true;
 	iShellOn = 1;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 
-	m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
-	return DefaultDeploy("models/v_svdex.mdl", "models/p_svdex.mdl", SVDEX_DRAWA, "rifle", UseDecrement() != FALSE);
-}
-
-void CSVDEX::Holster(int skiplocal)
-{
 #ifndef CLIENT_DLL
 	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_M4A1_SILENCED) == 0);
 #endif
+	
+	return DefaultDeploy("models/z4b/v_m4a1razer.mdl", "models/z4b/p_m4a1razer.mdl", m_iWeaponState & WPNSTATE_M4A1_SILENCED ? ANIM_DRAWB : ANIM_DRAW, "rifle", UseDecrement() != FALSE);
+}
+
+void CM4A1Razer::Holster(int skiplocal)
+{
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
 
-int CSVDEX::ExtractAmmo(CBasePlayerWeapon* pWeapon)
+int CM4A1Razer::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 {
 	if (m_iDefaultAmmo2)
 	{
@@ -335,55 +375,51 @@ int CSVDEX::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
 
-void CSVDEX::SecondaryAttack(void)
+void CM4A1Razer::SecondaryAttack(void)
 {
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
 		m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
-		SendWeaponAnim(SVDEX_MOVE_CARBINE, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_CHANGEA, UseDecrement() != FALSE);
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
 	else
 	{
 		m_iWeaponState |= WPNSTATE_M4A1_SILENCED;
-		SendWeaponAnim(SVDEX_MOVE_GRENADE, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_CHANGEB, UseDecrement() != FALSE);
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
 
 #ifndef CLIENT_DLL
 	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_M4A1_SILENCED) == 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.9s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.2s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2s;
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2s;
 }
 
-void CSVDEX::PrimaryAttack(void)
+void CM4A1Razer::PrimaryAttack(void)
 {
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
-		SVDEXFire2(3.0s, FALSE);
+		SVDEXFire2(3.5s, FALSE);
 	}
 	else
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			SVDEXFire1(0.8, 0.346s, FALSE);
+			SVDEXFire1(0.035 + (0.4) * m_flAccuracy, 0.09s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 140)
-			SVDEXFire1(0.15, 0.346s, FALSE);
-		else if (m_pPlayer->pev->velocity.Length2D() > 10)
-			SVDEXFire1(0.1, 0.346s, FALSE);
-		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			SVDEXFire1(0.003, 0.346s, FALSE);
+			SVDEXFire1(0.035 + (0.07) * m_flAccuracy, 0.09s, FALSE);
 		else
-			SVDEXFire1(0.007, 0.346s, FALSE);
+			SVDEXFire1((0.025) * m_flAccuracy, 0.09s, FALSE);
 	}
 }
 
-void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+void CM4A1Razer::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
-	m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired * m_iShotsFired) / 200) + 0.35;
+	m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired * m_iShotsFired) / 220) + 0.32;
 
 	if (m_flAccuracy > 1)
 		m_flAccuracy = 1;
@@ -400,6 +436,16 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	}
 
 	m_iClip--;
+
+	bool bCharge = false;
+	if(m_iShotsFired == 18 && m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < 10)
+	{
+		// give ammo
+		++m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType];
+		bCharge = true;
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_finish1.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+	}
+	
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -412,7 +458,7 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir;
 
-	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 490, 0.99, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 33, 0.96, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
 	int flags;
@@ -422,7 +468,7 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSVDEX, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireSVDEX, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, bCharge);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -430,11 +476,17 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
-	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 0.55, 1.0);
-	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -0.65, 0.95);
+	if (m_pPlayer->pev->velocity.Length2D() > 0)
+		KickBack(0.7, 0.275, 0.425, 0.0335, 3.5, 2.5, 8);
+	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+		KickBack(1.5, 0.9, 0.4, 0.3, 7.0, 4.5, 8);
+	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		KickBack(0.5, 0.12, 0.24, 0.001, 3.15, 2.1, 6);
+	else
+		KickBack(0.595, 0.225, 0.32, 0.0115, 3.25, 2.1, 7);
 }
 
-void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
+void CM4A1Razer::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 
@@ -464,10 +516,11 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 #ifndef CLIENT_DLL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
-	CSVDEXGrenade *pEnt = static_cast<CSVDEXGrenade *>(CBaseEntity::Create("svdex_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+	CM4A1RazerGrenade *pEnt = static_cast<CM4A1RazerGrenade *>(CBaseEntity::Create("m4a1razer_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
-		pEnt->Init(gpGlobals->v_forward * 1000 + gpGlobals->v_up * 135, 0, 900.0, 300, m_pPlayer->m_iTeam);
+		float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 50 : 1750;
+		pEnt->Init(gpGlobals->v_forward * 1000, 0, g_pModRunning->DamageTrack() == DT_NONE ? 50 : 1750, 300, m_pPlayer->m_iTeam);
 	}
 #endif
 
@@ -484,10 +537,10 @@ void CSVDEX::SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime + 0.2s;
 }
 
-void CSVDEX::Reload(void)
+void CM4A1Razer::Reload(void)
 {
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		return;
@@ -495,8 +548,7 @@ void CSVDEX::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 
-
-	if (DefaultReload(20, SVDEX_RELOAD, 3.8s))
+	if (DefaultReload(30, ANIM_RELOAD, 3.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -507,7 +559,7 @@ void CSVDEX::Reload(void)
 	}
 }
 
-void CSVDEX::WeaponIdle(void)
+void CM4A1Razer::WeaponIdle(void)
 {
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -518,9 +570,9 @@ void CSVDEX::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
-		SendWeaponAnim(SVDEX_IDLEB, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_IDLEB, UseDecrement() != FALSE);
 	else
-		SendWeaponAnim(SVDEX_IDLEA, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 }
 
 }

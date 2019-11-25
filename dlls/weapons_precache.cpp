@@ -177,6 +177,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_m134heroi");
 	UTIL_PrecacheOtherWeapon("z4b_deagleb");
 	UTIL_PrecacheOtherWeapon("z4b_xm2010pc");
+	UTIL_PrecacheOtherWeapon("z4b_m4a1razer");
+	UTIL_PrecacheOtherWeapon("z4b_awpnvidia");
+	UTIL_PrecacheOtherWeapon("z4b_dmp7a1x");
 
 	if (g_pGameRules->IsDeathmatch())
 	{
