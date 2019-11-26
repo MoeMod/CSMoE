@@ -91,6 +91,9 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 												  {"z4b_awpnvidia",      "AWP-NVIDIA",    4650, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"z4b_m4a1razer",      "M4A1-Razer",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"z4b_dmp7a1x",      "Dual SMG-N7",    2350, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1x",      "M4A1 Shadow Runner",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_ak47x",      "AK47 KNIFE-BORN BEAST",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1mw",      "M4A1 S-Transformer",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 };
 

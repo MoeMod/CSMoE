@@ -93,6 +93,9 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireDeagleB);
 	DECLARE_EVENT(FireXM2010PC);
 	DECLARE_EVENT(FireM4A1Razer);
+	DECLARE_EVENT(FireM4A1X);
+	DECLARE_EVENT(FireM4A1MW);
+	DECLARE_EVENT(FireAK47X);
 /*
 ======================
 Game_HookEvents
@@ -183,6 +186,9 @@ void Game_HookEvents( void )
 	HOOK_EVENT(deagleb, FireDeagleB);
 	HOOK_EVENT(xm2010pc, FireXM2010PC);
 	HOOK_EVENT(m4a1razer, FireM4A1Razer);
+	HOOK_EVENT(m4a1x, FireM4A1X);
+	HOOK_EVENT(m4a1mw, FireM4A1MW);
+	HOOK_EVENT(ak47x, FireAK47X);
 }
 
 }
