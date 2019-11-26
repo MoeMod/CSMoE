@@ -92,12 +92,12 @@ void EV_FireM4A1X( event_args_t *args )
 		Vector vecEnd = vecSrc + vecDirShooting * 2048;
 
 		int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/lgtning.spr");
-		BEAM* pBeam1 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.2f, 2.0f, 0.0f, 60.0f / 255.0f, 2.5f, 0.0f, 0.1f, 0.164f, 0.828f, 1.0f);
-		BEAM* pBeam2 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.4f, 2.5f, 0.0f, 40.0f / 255.0f, 2.5f, 0.0f, 0.1f, 0.164f, 0.828f, 1.0f);
-		BEAM* pBeam3 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.6f, 3.0f, 0.0f, 20.0f / 255.0f, 2.5f, 0.0f, 0.1f, 0.164f, 0.828f, 1.0f);
-		if (pBeam1) pBeam1->flags |= FBEAM_FADEIN;
-		if (pBeam2) pBeam2->flags |= FBEAM_FADEIN;
-		if (pBeam3) pBeam3->flags |= FBEAM_FADEIN;
+		BEAM* pBeam1 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.2f, 2.0f, 0.0f, 60.0f, 2.5f, 0.0f, 0.1f, 42, 212, 255);
+		BEAM* pBeam2 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.4f, 2.5f, 0.0f, 40.0f, 2.5f, 0.0f, 0.1f, 42, 212, 255);
+		BEAM* pBeam3 = gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.6f, 3.0f, 0.0f, 20.0f, 2.5f, 0.0f, 0.1f, 42, 212, 255);
+		//if (pBeam1) pBeam1->flags |= FBEAM_FADEIN;
+		//if (pBeam2) pBeam2->flags |= FBEAM_FADEIN;
+		//if (pBeam3) pBeam3->flags |= FBEAM_FADEIN;
 	}
 }
 

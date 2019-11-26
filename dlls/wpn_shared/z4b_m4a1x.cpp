@@ -79,6 +79,12 @@ namespace sv {
     /*static constexpr*/ int Penetration = 1;
     KnockbackData KnockBack = { 550.0f, 800.0f, 450.0f, 350.0f, 0.3f };
 
+	BOOL Deploy() override
+	{
+		BOOL result = Base::Deploy();
+		return result;
+	}
+    	
 	void Precache() override
 	{
 		PRECACHE_MODEL("sprites/lgtning.spr");
@@ -93,13 +99,13 @@ namespace sv {
 #else
 		flags = 0;
 #endif
-		bool bmode = m_pPlayer->m_iFOV != 90;
+		bool bmode = m_pPlayer->pev->fov != 90;
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), bmode, FALSE);
 	}
     	
 	void PrimaryAttack() override
 	{
-		if (m_pPlayer->m_iFOV != 90)
+		if (m_pPlayer->pev->fov != 90)
 		{
 			CycleTime = CycleTime2;
 			Penetration = 9;
@@ -114,7 +120,7 @@ namespace sv {
     	
 	float GetDamage()
 	{
-		if (m_pPlayer->m_iFOV != 90)
+		if (m_pPlayer->pev->fov != 90)
 		{
 			float flDamage = 33;
 #ifndef CLIENT_DLL
@@ -131,7 +137,7 @@ namespace sv {
     	
 	void Recoil(void)
 	{
-		if (m_pPlayer->m_iFOV != 90)
+		if (m_pPlayer->pev->fov != 90)
 		{
 			if (m_pPlayer->pev->velocity.Length2D() > 0)
 				KickBack(0.6f, 0.25f, 0.4f, 0.03f, 3.5f, 2.3f, 7);
@@ -157,7 +163,7 @@ namespace sv {
 
 	KnockbackData GetKnockBackData() override
     {
-		if (m_pPlayer->m_iFOV != 90)
+		if (m_pPlayer->pev->fov != 90)
 			return { 450.0f, 350.0f, 400.0f, 200.0f, 0.4f };
 		return Base::GetKnockBackData();
 	}
