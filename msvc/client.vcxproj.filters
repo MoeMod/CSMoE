@@ -738,6 +738,24 @@
     <ClCompile Include="..\cl_dll\events\event_m4a1razer.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1x.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1mw.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_m4a1x.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\z4b_ak47x.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_m4a1mw.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_ak47x.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -907,9 +925,6 @@
     </ClInclude>
     <ClInclude Include="..\cl_dll\cs_wpn\bte_weapons.h">
       <Filter>cl_dll\cs_wpn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h">
-      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h">
       <Filter>dlls\wpn_shared</Filter>

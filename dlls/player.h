@@ -230,11 +230,8 @@ class CBasePlayer : public CBaseMonster
 {
 public:
 #ifdef CLIENT_DLL
-	CBasePlayer() : m_rebuyString(nullptr) {}
-	~CBasePlayer()
-	{
-		delete[] m_rebuyString;
-	}
+	CBasePlayer() = default;
+	~CBasePlayer() = default;
 #else
 	CBasePlayer();
 	~CBasePlayer() override;
@@ -683,7 +680,7 @@ public:
 	int m_blindAlpha;
 	time_point_t m_allowAutoFollowTime;
 	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
-	char *m_rebuyString;
+	std::unique_ptr<char []> m_rebuyString;
 	RebuyStruct m_rebuyStruct;
 	bool m_bIsInRebuy;
 	time_point_t m_flLastUpdateTime;

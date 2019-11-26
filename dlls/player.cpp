@@ -160,14 +160,11 @@ entvars_t *g_pevLastInflictor;
 
 LINK_ENTITY_TO_CLASS(player, CBasePlayer);
 
-CBasePlayer::CBasePlayer() : m_rebuyString(nullptr) 
+CBasePlayer::CBasePlayer()
 {
 	g_pModRunning->InstallPlayerModStrategy(this);
 }
-CBasePlayer::~CBasePlayer()
-{
-	delete[] m_rebuyString;
-}
+CBasePlayer::~CBasePlayer() = default;
 
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
@@ -7874,11 +7871,8 @@ void CBasePlayer::InitRebuyData(const char *str)
 	}
 
 	// god bless the fucking new[] and delete[]
-	char *new_buyString = new char[Q_strlen(str) + 1];
-	delete[] m_rebuyString;
-	m_rebuyString = new_buyString;
-	Q_strcpy(m_rebuyString, str);
-	m_rebuyString[ Q_strlen(str) ] = '\0';
+	m_rebuyString.reset(new char[Q_strlen(str) + 1]{});
+	Q_strcpy(m_rebuyString.get(), str);
 }
 
 void CBasePlayer::AutoBuy()
@@ -8494,7 +8488,7 @@ void CBasePlayer::BuildRebuyStruct()
 
 void CBasePlayer::Rebuy()
 {
-	char *fileData = m_rebuyString;
+	char *fileData = m_rebuyString.get();
 	char *token;
 
 	m_bIsInRebuy = true;

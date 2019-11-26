@@ -32,6 +32,7 @@
     <ClCompile Include="..\cl_dll\events.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47l.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_ak47x.cpp" />
     <ClCompile Include="..\cl_dll\events\event_anaconda.cpp" />
     <ClCompile Include="..\cl_dll\events\event_as50.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
@@ -67,7 +68,9 @@
     <ClCompile Include="..\cl_dll\events\event_m249.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m3.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m4a1.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m4a1mw.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m4a1razer.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m4a1x.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg3.cpp" />
@@ -225,11 +228,14 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_ak47x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_awpnvidia.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_dmp7a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1mw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1razer.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
@@ -307,7 +313,6 @@
     <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
