@@ -83,6 +83,7 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireGatling);
 	DECLARE_EVENT(FireBalrog7);
 	DECLARE_EVENT(FireM2);
+	DECLARE_EVENT(FireStarchaserar);
 	DECLARE_EVENT(FireInfinityS);
 	DECLARE_EVENT(FireGungnir);
 	DECLARE_EVENT(FireAnaconda);
@@ -174,6 +175,7 @@ void Game_HookEvents( void )
 	HOOK_EVENT(gatling, FireGatling);
 	HOOK_EVENT(balrog7, FireBalrog7);
 	HOOK_EVENT(m2, FireM2);
+	HOOK_EVENT(starchaserar, FireStarchaserar);
 	HOOK_EVENT(infinityss, FireInfinityS);
 	HOOK_EVENT(infinitysb, FireInfinityS);
 	HOOK_EVENT(infinitysr, FireInfinityS);

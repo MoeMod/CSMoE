@@ -775,6 +775,9 @@
     <ClCompile Include="..\dlls\wpn_shared\z4b_ak47x.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\basetypes.h">
@@ -1591,6 +1594,9 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\z4b_m4a1razer.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>

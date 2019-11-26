@@ -206,6 +206,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
@@ -464,6 +465,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
