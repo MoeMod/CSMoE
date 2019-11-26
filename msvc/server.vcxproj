@@ -216,11 +216,14 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_ak47x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_awpnvidia.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_dmp7a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1mw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1razer.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />

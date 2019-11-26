@@ -13,6 +13,12 @@
 		3D1D533D23312D7800D26B94 /* z4b_facelessvoid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533B23312D7800D26B94 /* z4b_facelessvoid.cpp */; };
 		3D1D533E23312D7800D26B94 /* z4b_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D533C23312D7800D26B94 /* z4b_m134heroi.cpp */; };
 		3D1D534A2331356800D26B94 /* event_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D53492331356800D26B94 /* event_m134heroi.cpp */; };
+		3D1F7FED238D3A5B00626FD7 /* event_ak47x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FEA238D3A5A00626FD7 /* event_ak47x.cpp */; };
+		3D1F7FEE238D3A5B00626FD7 /* event_m4a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FEB238D3A5A00626FD7 /* event_m4a1x.cpp */; };
+		3D1F7FEF238D3A5B00626FD7 /* event_m4a1mw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FEC238D3A5A00626FD7 /* event_m4a1mw.cpp */; };
+		3D1F7FF3238D3A8000626FD7 /* z4b_m4a1mw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */; };
+		3D1F7FF4238D3A8000626FD7 /* z4b_m4a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */; };
+		3D1F7FF5238D3A8000626FD7 /* z4b_ak47x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */; };
 		3D3D5A08233A79FF005E4B6A /* knife_dragonsword.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D5A07233A79FF005E4B6A /* knife_dragonsword.cpp */; };
 		3D4413A2231D0E6E001A0696 /* pm_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139C231D0E6E001A0696 /* pm_math.cpp */; };
 		3D4413A3231D0E6E001A0696 /* pm_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139D231D0E6E001A0696 /* pm_shared.cpp */; };
@@ -256,6 +262,12 @@
 		3D1D533B23312D7800D26B94 /* z4b_facelessvoid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_facelessvoid.cpp; sourceTree = "<group>"; };
 		3D1D533C23312D7800D26B94 /* z4b_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m134heroi.cpp; sourceTree = "<group>"; };
 		3D1D53492331356800D26B94 /* event_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m134heroi.cpp; sourceTree = "<group>"; };
+		3D1F7FEA238D3A5A00626FD7 /* event_ak47x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_ak47x.cpp; sourceTree = "<group>"; };
+		3D1F7FEB238D3A5A00626FD7 /* event_m4a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m4a1x.cpp; sourceTree = "<group>"; };
+		3D1F7FEC238D3A5A00626FD7 /* event_m4a1mw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m4a1mw.cpp; sourceTree = "<group>"; };
+		3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1mw.cpp; sourceTree = "<group>"; };
+		3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1x.cpp; sourceTree = "<group>"; };
+		3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_ak47x.cpp; sourceTree = "<group>"; };
 		3D3D5A07233A79FF005E4B6A /* knife_dragonsword.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knife_dragonsword.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libclient.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D441399231D0E6E001A0696 /* pm_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pm_defs.h; sourceTree = "<group>"; };
@@ -845,6 +857,9 @@
 				3DB36A192381892600BE2343 /* event_deagleb.cpp */,
 				3DB36A1A2381892600BE2343 /* event_xm2010pc.cpp */,
 				3DA638E5238AE98F007D26EC /* event_m4a1razer.cpp */,
+				3D1F7FEA238D3A5A00626FD7 /* event_ak47x.cpp */,
+				3D1F7FEC238D3A5A00626FD7 /* event_m4a1mw.cpp */,
+				3D1F7FEB238D3A5A00626FD7 /* event_m4a1x.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1139,6 +1154,9 @@
 				3DA638DF238AE964007D26EC /* z4b_dmp7a1x.h */,
 				3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */,
 				3DA638DD238AE964007D26EC /* z4b_m4a1razer.h */,
+				3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */,
+				3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */,
+				3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1230,6 +1248,7 @@
 				3DB36A1B2381892600BE2343 /* event_deagleb.cpp in Sources */,
 				3D441521231D1133001A0696 /* zb3.cpp in Sources */,
 				3D4414E8231D1133001A0696 /* event_usp.cpp in Sources */,
+				3D1F7FED238D3A5B00626FD7 /* event_ak47x.cpp in Sources */,
 				3D44152F231D1133001A0696 /* scenariostatus.cpp in Sources */,
 				3D4415E2231D1164001A0696 /* wpn_m249.cpp in Sources */,
 				3D4414E4231D1133001A0696 /* event_createexplo.cpp in Sources */,
@@ -1238,6 +1257,7 @@
 				3D4415E4231D1164001A0696 /* z4b_Frequency9.cpp in Sources */,
 				3D4414C5231D1133001A0696 /* com_weapons.cpp in Sources */,
 				3D44152A231D1133001A0696 /* spectator_gui.cpp in Sources */,
+				3D1F7FF5238D3A8000626FD7 /* z4b_ak47x.cpp in Sources */,
 				3D441502231D1133001A0696 /* event_mp5n.cpp in Sources */,
 				3D4414B8231D1133001A0696 /* ev_common.cpp in Sources */,
 				3D4414E6231D1133001A0696 /* event_elite_right.cpp in Sources */,
@@ -1252,6 +1272,7 @@
 				3D4414BB231D1133001A0696 /* tri.cpp in Sources */,
 				3D4414B5231D1133001A0696 /* input.cpp in Sources */,
 				3DB36A1C2381892600BE2343 /* event_xm2010pc.cpp in Sources */,
+				3D1F7FF4238D3A8000626FD7 /* z4b_m4a1x.cpp in Sources */,
 				3D4414EA231D1133001A0696 /* event_cannonplasma.cpp in Sources */,
 				3D4414EF231D1133001A0696 /* event_ump45.cpp in Sources */,
 				3D4414D2231D1133001A0696 /* event_deagled.cpp in Sources */,
@@ -1299,6 +1320,7 @@
 				3D4415C8231D1164001A0696 /* wpn_deagle.cpp in Sources */,
 				3D4415ED231D1164001A0696 /* wpn_mp7a1p.cpp in Sources */,
 				3D4414F4231D1133001A0696 /* event_awp.cpp in Sources */,
+				3D1F7FF3238D3A8000626FD7 /* z4b_m4a1mw.cpp in Sources */,
 				3D4414E2231D1133001A0696 /* event_cannon.cpp in Sources */,
 				3D441508231D1133001A0696 /* event_xm1014.cpp in Sources */,
 				3D4415E6231D1164001A0696 /* wpn_mp7a1c.cpp in Sources */,
@@ -1306,6 +1328,7 @@
 				3D4415EB231D1164001A0696 /* wpn_scarh.cpp in Sources */,
 				3D4415F1231D1164001A0696 /* wpn_ak47.cpp in Sources */,
 				3D44153F231D1133001A0696 /* zbs_level.cpp in Sources */,
+				3D1F7FEE238D3A5B00626FD7 /* event_m4a1x.cpp in Sources */,
 				3D4414E1231D1133001A0696 /* ev_cs16.cpp in Sources */,
 				3DB36A202381894000BE2343 /* z4b_xm2010pc.cpp in Sources */,
 				3D4415E3231D1164001A0696 /* wpn_kriss.cpp in Sources */,
@@ -1407,6 +1430,7 @@
 				3D44150D231D1133001A0696 /* event_anaconda.cpp in Sources */,
 				3D441512231D1133001A0696 /* input_touch.cpp in Sources */,
 				3D4414E7231D1133001A0696 /* hl_events.cpp in Sources */,
+				3D1F7FEF238D3A5B00626FD7 /* event_m4a1mw.cpp in Sources */,
 				3D4415D2231D1164001A0696 /* wpn_infinityex1.cpp in Sources */,
 				3D441523231D1133001A0696 /* hud_scoreboard_legacy.cpp in Sources */,
 				3D4414C3231D1133001A0696 /* entity.cpp in Sources */,
