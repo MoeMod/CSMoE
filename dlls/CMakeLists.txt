@@ -261,6 +261,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
+	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp
