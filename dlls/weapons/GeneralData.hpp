@@ -62,7 +62,7 @@ constexpr KnockbackData BuildKnockbackData(const float(&kbd)[5])
 }
 
 template<class CFinal, class CBase = CBaseTemplateWeapon>
-class TGeneralData : public CBase
+class TGeneralData : public TCheckAccuracyBoundary<CFinal, CBase>
 {
 public:
 	//	static constexpr auto P_Model = "";
@@ -70,7 +70,7 @@ public:
 	//	static constexpr auto W_Model = "";
 	static constexpr float ArmorRatioModifier = 1.0f;
 	//	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-	static constexpr float MaxSpeed = 250;
+	// static constexpr float MaxSpeed = 250;
 	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
 	//  static constexpr const char *ClassName = "weapon_???";
 
@@ -103,14 +103,14 @@ public:
 	void Spawn(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::pev->classname = MAKE_STRING(wpn.ClassName);
+		CBase::pev->classname = MAKE_STRING(df::ClassName::Get(wpn));
 
 		wpn.Precache();
-		CBase::m_iId = wpn.WeaponId;
-		SET_MODEL(ENT(CBase::pev), wpn.W_Model);
+		CBase::m_iId = df::WeaponId::Get(wpn);
+		SET_MODEL(ENT(CBase::pev), df::W_Model::Get(wpn));
 
-		SetDefaultAmmo_impl(&wpn);
-		SetDefaultAccuracy_impl(&wpn);
+		SetDefaultAmmo_impl(df::MaxClip::Has(wpn));
+		SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 		CBase::m_iShotsFired = 0;
 
 		wpn.FallInit();
@@ -121,17 +121,20 @@ public:
 	void Precache(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		if (wpn.P_Model && wpn.P_Model[0])
-			PRECACHE_MODEL(const_cast<char *>(wpn.P_Model));
-		if (wpn.V_Model && wpn.V_Model[0])
-			PRECACHE_MODEL(const_cast<char *>(wpn.V_Model));
-		if (wpn.W_Model && wpn.W_Model[0])
-			PRECACHE_MODEL(const_cast<char *>(wpn.W_Model));
+		auto p = df::P_Model::Get(wpn);
+		auto v = df::V_Model::Get(wpn);
+		auto w = df::W_Model::Get(wpn);
+		if (p && p[0])
+			PRECACHE_MODEL(p);
+		if (v && v[0])
+			PRECACHE_MODEL(v);
+		if (w && w[0])
+			PRECACHE_MODEL(w);
 
 		CBase::Precache();
 	}
 
-	int iItemSlot() override { return static_cast<CFinal &>(*this).ItemSlot; }
+	int iItemSlot() override { return df::ItemSlot::Get(static_cast<CFinal &>(*this)); }
 
 	KnockbackData GetKnockBackData() override {
 		CFinal &wpn = static_cast<CFinal &>(*this);
@@ -139,14 +142,14 @@ public:
 	}
 
 	const char *GetCSModelName() override { return static_cast<CFinal &>(*this).W_Model; }
-	float GetMaxSpeed() override { return static_cast<CFinal &>(*this).MaxSpeed; }
+	float GetMaxSpeed() override { return df::MaxSpeed::Get(static_cast<CFinal &>(*this)); }
 
 private:
 	// sfinae call
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(wpn.KnockBack, KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(df::KnockBack::Get(wpn), KnockbackData())
 	{
-		return BuildKnockbackData(wpn.KnockBack);
+		return BuildKnockbackData(df::KnockBack::Get(wpn));
 	}
 	template<class ClassToFind = CFinal>
 	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
@@ -155,18 +158,16 @@ private:
 	}
 
 private:
-	void SetDefaultAccuracy_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
+	constexpr void SetDefaultAccuracy_impl(std::false_type) {}
+	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = wpn.AccuracyDefault;
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
 	}
-	void SetDefaultAmmo_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultAmmo_impl(ClassToFind *p) -> decltype(&ClassToFind::MaxClip, void())
+	constexpr void SetDefaultAmmo_impl(std::false_type) {}
+	void SetDefaultAmmo_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_iDefaultAmmo = wpn.MaxClip;
+		CBase::m_iDefaultAmmo = df::MaxClip::Get(wpn);
 	}
 };

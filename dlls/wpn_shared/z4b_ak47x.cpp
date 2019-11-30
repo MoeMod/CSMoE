@@ -20,14 +20,67 @@ GNU General Public License for more details.
 #include "weapons.h"
 
 #include "weapons/WeaponTemplate.hpp"
+#include "weapons/RadiusDamage.hpp"
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
 
+using namespace WeaponTemplate::Varibles;
+
+struct Z4B_AK47X_WeaponData
+{
+	static constexpr const auto &DefaultReloadTime = 2.0s;
+	static constexpr int ZoomFOV = 80;
+	static constexpr const char* V_Model = "models/z4b/v_ak47x.mdl";
+	static constexpr const char* P_Model = "models/z4b/pw_ak47x.mdl";
+	static constexpr const char* W_Model = "models/z4b/pw_ak47x.mdl";
+	static constexpr const char *EventFile = "events/ak47x.sc";
+	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
+	static constexpr const char *ClassName = "z4b_ak47x";
+	static constexpr const char *AnimExtension = "ak47";
+	static constexpr int MaxClip = 35;
+	enum
+	{
+		ANIM_IDLE1 = 0,
+		ANIM_RELOAD,
+		ANIM_DRAW,
+		ANIM_SHOOT1,
+		ANIM_SHOOT2,
+		ANIM_SHOOT3
+	};
+	static constexpr float MaxSpeed = 235;
+	static constexpr float ArmorRatioModifier = 1.4f;
+	static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.04;
+	static constexpr const auto& SpreadCalcWalking = 0.07 * A + 0.04;
+	static constexpr const auto& SpreadCalcDucking = 0.0 * A;
+	static constexpr const auto& SpreadCalcDefault = 0.0275 * A;
+	static constexpr const auto &CycleTime = 0.09s;
+	static constexpr int DamageDefault = 36;
+	static constexpr int DamageZB = 57;
+	static constexpr int DamageZBS = 57;
+	static constexpr const auto& AccuracyCalc = (N * N * N / 200.0) + 0.35;
+	static constexpr float AccuracyDefault = 0.2;
+	static constexpr float AccuracyMax = 1.25;
+	static constexpr float RangeModifier = 0.98;
+	static constexpr auto BulletType = BULLET_PLAYER_762MM;
+	static constexpr int Penetration = 2;
+	KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
+
+	KickBackData KickBackWalking = { 0.9f, 0.35f, 0.225f, 0.05f, 5.5f, 2.5f, 8 };
+	KickBackData KickBackNotOnGround = { 1.5f, 0.9f, 0.4f, 0.3f, 7.0f, 4.5f, 8 };
+	KickBackData KickBackDucking = { 0.55f, 0.3f, 0.12f, 0.023f, 3.5f, 1.15f, 8 };
+	KickBackData KickBackDefault = { 0.665f, 0.35f, 0.155f, 0.035f, 4.0f, 1.55f, 7 };
+
+	static constexpr auto RadiusDamageRadius = 90;
+	KnockbackData RadiusDamageKnockback = { 800.0f, 1000.0, 650.0f, 500.0f, 0.9f };
+
+};
+
 #ifndef CLIENT_DLL
-	class CZ4B_AK47XGrenade : public CBaseEntity
+	class CZ4B_AK47XGrenade : public CBaseEntity, public Z4B_AK47X_WeaponData
 	{
 	public:
 		void Spawn() override
@@ -61,11 +114,6 @@ namespace sv {
 			m_iSprExplo = PRECACHE_MODEL("sprites/laserminigun_hit3.spr");
 		}
 
-		KnockbackData GetKnockBackData()
-		{
-			return {  };
-		}
-
 		void EXPORT OnTouch(CBaseEntity* pOther)
 		{
 			if (pev->owner == pOther->edict())
@@ -92,7 +140,18 @@ namespace sv {
 				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 			}
 
-			RadiusDamage();
+			RadiusDamage(*this, pev->origin, this, pev->owner);
+
+			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_SPRITE);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(m_iSprExplo);	// sprite index
+			WRITE_BYTE(6);			// scale in 0.1's
+			WRITE_BYTE(70);			// brightness
+			MESSAGE_END();
+
 			Remove();
 		}
 
@@ -121,84 +180,9 @@ namespace sv {
 			}
 		}
 
-		void RadiusDamage()
+		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, TeamName iTeam, int type = 0)
 		{
-			const float flRadius = m_flExplodeRadius;
-			const float flDamage = m_flExplodeDamage;
-			const Vector vecSrc = pev->origin;
-			entvars_t* const pevAttacker = VARS(pev->owner);
-			entvars_t* const pevInflictor = this->pev;
-			int bitsDamageType = DMG_BULLET;
-
-			TraceResult tr;
-			const float falloff = flRadius ? flDamage / flRadius : 1;
-			const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-			CBaseEntity* pEntity = NULL;
-			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-			{
-				if (pEntity->pev->takedamage != DAMAGE_NO)
-				{
-					if (bInWater && !pEntity->pev->waterlevel)
-						continue;
-
-					if (!bInWater && pEntity->pev->waterlevel == 3)
-						continue;
-
-					if (pEntity->IsBSPModel())
-						continue;
-
-					/*if (pEntity->pev == pevAttacker)
-						continue;*/
-
-					Vector vecSpot = pEntity->BodyTarget(vecSrc);
-					UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-					if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-					{
-						if (tr.fStartSolid)
-						{
-							tr.vecEndPos = vecSrc;
-							tr.flFraction = 0;
-						}
-						float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-						flAdjustedDamage = Q_max(0, flAdjustedDamage);
-
-						if (tr.flFraction == 1.0f)
-						{
-							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-						}
-						else
-						{
-							tr.iHitgroup = HITGROUP_CHEST;
-							ClearMultiDamage();
-							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-							ApplyMultiDamage(pevInflictor, pevAttacker);
-						}
-
-						CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
-						if (pVictim->m_bIsZombie) // Zombie Knockback...
-						{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 800.0f, 1000.0, 650.0f, 500.0f, 0.9f });
-						}
-					}
-				}
-			}
-
-			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-			WRITE_BYTE(TE_SPRITE);
-			WRITE_COORD(pev->origin.x);
-			WRITE_COORD(pev->origin.y);
-			WRITE_COORD(pev->origin.z);
-			WRITE_SHORT(m_iSprExplo);	// sprite index
-			WRITE_BYTE(6);			// scale in 0.1's
-			WRITE_BYTE(70);			// brightness
-			MESSAGE_END();
-		}
-
-		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam, int type = 0)
-		{
-			std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
+			std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
 			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
 			m_iType = type;
 		}
@@ -207,8 +191,7 @@ namespace sv {
 		time_point_t m_flRemoveTime;
 		float m_flMaxFrames;
 		float m_flTouchDamage;
-		float m_flExplodeDamage;
-		float m_flExplodeRadius;
+		float RadiusDamageAmount;
 		TeamName m_iTeam;
 		int m_iSprEffect;
 		int m_iSprExplo;
@@ -240,50 +223,10 @@ namespace sv {
 			TRecoilKickBack,
             TWeaponIdleDefault,
             TGetDamageDefault
-    >
+    >, public Z4B_AK47X_WeaponData
     {
     public:
-    static constexpr const auto &DefaultReloadTime = 2.0s;
-    static constexpr int ZoomFOV = 80;
-	static constexpr const char* V_Model = "models/z4b/v_ak47x.mdl";
-	static constexpr const char* P_Model = "models/z4b/pw_ak47x.mdl";
-	static constexpr const char* W_Model = "models/z4b/pw_ak47x.mdl";
-    static constexpr const char *EventFile = "events/ak47x.sc";
-    static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-    static constexpr const char *ClassName = "z4b_ak47x";
-    static constexpr const char *AnimExtension = "ak47";
-    static constexpr int MaxClip = 35;
-	enum
-	{
-		ANIM_IDLE1 = 0,
-		ANIM_RELOAD,
-		ANIM_DRAW,
-		ANIM_SHOOT1,
-		ANIM_SHOOT2,
-		ANIM_SHOOT3
-	};
-	static constexpr float MaxSpeed = 235;
-	static constexpr float ArmorRatioModifier = 1.4f;
-	static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.04;
-	static constexpr const auto& SpreadCalcWalking = 0.07 * A + 0.04;
-	static constexpr const auto& SpreadCalcDucking = 0.0 * A;
-	static constexpr const auto& SpreadCalcDefault = 0.0275 * A;
-    static constexpr const auto &CycleTime = 0.09s;
-    static constexpr int DamageDefault = 36;
-    static constexpr int DamageZB = 57;
-    static constexpr int DamageZBS = 57;
-	static constexpr const auto& AccuracyCalc = (N * N * N / 200.0) + 0.35;
-	static constexpr float AccuracyDefault = 0.2;
-	static constexpr float AccuracyMax = 1.25;
-    static constexpr float RangeModifier = 0.98;
-    static constexpr auto BulletType = BULLET_PLAYER_762MM;
-    static constexpr int Penetration = 2;
-    KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
 
-	KickBackData KickBackWalking = { 0.9f, 0.35f, 0.225f, 0.05f, 5.5f, 2.5f, 8 };
-	KickBackData KickBackNotOnGround = { 1.5f, 0.9f, 0.4f, 0.3f, 7.0f, 4.5f, 8 };
-	KickBackData KickBackDucking = { 0.55f, 0.3f, 0.12f, 0.023f, 3.5f, 1.15f, 8 };
-	KickBackData KickBackDefault = { 0.665f, 0.35f, 0.155f, 0.035f, 4.0f, 1.55f, 7 };
 
 	void PrimaryAttack(void) override
 	{
@@ -334,7 +277,7 @@ namespace sv {
 		{
 			float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 24 : 240;
 			float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 40 : 400;
-			pEnt->Init(gpGlobals->v_forward * 1000, flTouchDamage, flExplodeDamage, 90, m_pPlayer->m_iTeam);
+			pEnt->Init(gpGlobals->v_forward * 1000, flTouchDamage, flExplodeDamage, m_pPlayer->m_iTeam);
 		}
 #endif
 

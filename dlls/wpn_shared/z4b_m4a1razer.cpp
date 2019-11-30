@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "weapons.h"
 #include "monsters.h"
 #include "z4b_m4a1razer.h"
+#include "weapons/RadiusDamage.hpp"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
@@ -173,67 +174,7 @@ namespace sv {
 
 		void RadiusDamage()
 		{
-			const float flRadius = m_flExplodeRadius;
-			const float flDamage = m_flExplodeDamage;
-			const Vector vecSrc = pev->origin;
-			entvars_t * const pevAttacker = VARS(pev->owner);
-			entvars_t * const pevInflictor = this->pev;
-			int bitsDamageType = DMG_BULLET;
-
-			TraceResult tr;
-			const float falloff = flRadius ? flDamage / flRadius : 1;
-			const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-			CBaseEntity *pEntity = NULL;
-			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-			{
-				if (pEntity->pev->takedamage != DAMAGE_NO)
-				{
-					if (bInWater && !pEntity->pev->waterlevel)
-						continue;
-
-					if (!bInWater && pEntity->pev->waterlevel == 3)
-						continue;
-
-					if (pEntity->IsBSPModel())
-						continue;
-
-					/*if (pEntity->pev == pevAttacker)
-						continue;*/
-
-					Vector vecSpot = pEntity->BodyTarget(vecSrc);
-					UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-					if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-					{
-						if (tr.fStartSolid)
-						{
-							tr.vecEndPos = vecSrc;
-							tr.flFraction = 0;
-						}
-						float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-						flAdjustedDamage = Q_max(0, flAdjustedDamage);
-
-						if (tr.flFraction == 1.0f)
-						{
-							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-						}
-						else
-						{
-							tr.iHitgroup = HITGROUP_CHEST;
-							ClearMultiDamage();
-							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-							ApplyMultiDamage(pevInflictor, pevAttacker);
-						}
-
-						CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-						if (pVictim->m_bIsZombie) // Zombie Knockback...
-						{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 800.0f, 800.0, 800.0f, 800.0f, 0.5f });
-						}
-					}
-				}
-			}
+			::sv::RadiusDamage(*this, pev->origin, this, pev->owner);
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 			WRITE_BYTE(TE_EXPLOSION);
@@ -251,7 +192,7 @@ namespace sv {
 
 		void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, TeamName iTeam, int type = 0)
 		{
-			std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
+			std::tie(m_flTouchDamage, RadiusDamageAmount, RadiusDamageRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, iTeam);
 			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
 			m_iType = type;
 		}
@@ -260,8 +201,9 @@ namespace sv {
 		time_point_t m_flRemoveTime;
 		float m_flMaxFrames;
 		float m_flTouchDamage;
-		float m_flExplodeDamage;
-		float m_flExplodeRadius;
+		float RadiusDamageAmount;
+		float RadiusDamageRadius;
+		const KnockbackData RadiusDamageKnockback = { 800.0f, 800.0, 800.0f, 800.0f, 0.5f };
 		TeamName m_iTeam;
 		int m_iSprEffect;
 		int m_iSprExplo;

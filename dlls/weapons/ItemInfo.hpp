@@ -396,9 +396,9 @@ constexpr ItemInfo BuildItemInfo(ClassToFind &wpn, const StaticItemInfo &ii)
 			ii.iMaxAmmo1,
 			ii.szAmmo2,
 			ii.iMaxAmmo2,
-			wpn.ClassName,
-			wpn.MaxClip,
-			wpn.WeaponId,
+			df::ClassName::Get(wpn),
+			df::MaxClip::Get(wpn),
+			df::WeaponId::Get(wpn),
 			ii.iFlags,
 			ii.iWeight
 	};
@@ -414,9 +414,9 @@ constexpr ItemInfo BuildItemInfo(ClassToFind &wpn)
 			StaticItemInfo::iMaxAmmo1,
 			StaticItemInfo::szAmmo2,
 			StaticItemInfo::iMaxAmmo2,
-			wpn.ClassName,
-			wpn.MaxClip,
-			wpn.WeaponId,
+			df::ClassName::Get(wpn),
+			df::MaxClip::Get(wpn),
+			df::WeaponId::Get(wpn),
 			StaticItemInfo::iFlags,
 			StaticItemInfo::iWeight
 	};
@@ -472,7 +472,7 @@ public:
 	template<class ClassToFind = CFinal>
 	static constexpr auto BuildItemInfoFrom(ClassToFind &wpn) -> decltype(&ClassToFind::ItemInfoData, ItemInfo())
 	{
-		return BuildItemInfo(wpn, wpn.ItemInfoData);
+		return BuildItemInfo(wpn, df::ItemInfoData::Get(wpn));
 	}
 	// otherwise build from ItemInfoData_t
 	template<class ClassToFind = CFinal>

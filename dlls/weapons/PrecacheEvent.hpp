@@ -20,7 +20,7 @@ public:
 	void Precache(void) override
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
-		m_usFire = PRECACHE_EVENT(1, wpn.EventFile);
+		m_usFire = PRECACHE_EVENT(1, df::EventFile::Get(wpn));
 		CBase::Precache();
 	}
 

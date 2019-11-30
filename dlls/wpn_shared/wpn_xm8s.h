@@ -48,7 +48,7 @@ public:
 	static constexpr auto ClassName = "weapon_xm8s";
 	static constexpr auto MaxClip = 30;
 	static constexpr const auto &DefaultReloadTime = 3.2s;
-	static constexpr auto DefaultAccuracy = 0.2;
+	static constexpr auto AccuracyDefault = 0.2;
 	static constexpr auto ZoomFOV = 25;
 
 	enum

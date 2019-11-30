@@ -28,7 +28,7 @@ public:
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
 		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
-			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
+			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
 		else if (PrimaryAttackImpl_Walking(&wpn))
 			void(); // do nothing
 		else if (PrimaryAttackImpl_Ducking(&wpn))
@@ -36,7 +36,7 @@ public:
 		else if (PrimaryAttackImpl_Zoomed(&wpn))
 			void(); // do nothing
 		else
-			wpn.Fire(wpn.SpreadCalcDefault(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
+			wpn.Fire(wpn.SpreadCalcDefault(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
 
 		return CBase::PrimaryAttack();
 	}
@@ -49,9 +49,9 @@ private:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 
-		if(CBase::m_pPlayer->pev->velocity.Length2D() > wpn.PrimaryAttackWalkingMiniumSpeed)
+		if(CBase::m_pPlayer->pev->velocity.Length2D() > df::PrimaryAttackWalkingMiniumSpeed::Get(wpn))
 		{
-			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
+			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
 			return true;
 		}
 
@@ -67,7 +67,7 @@ private:
 
 		if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
 		{
-			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), wpn.CycleTime, FALSE);
+			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
 			return true;
 		}
 
@@ -83,7 +83,7 @@ private:
 
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
-			wpn.Fire(wpn.SpreadCalcZoomed(A = CBase::m_flAccuracy), wpn.CycleTimeZoomed, FALSE);
+			wpn.Fire(wpn.SpreadCalcZoomed(A = CBase::m_flAccuracy), df::CycleTimeZoomed::Get(wpn), FALSE);
 			return true;
 		}
 

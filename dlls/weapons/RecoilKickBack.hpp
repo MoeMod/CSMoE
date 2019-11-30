@@ -52,13 +52,13 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (CBase::m_pPlayer->pev->velocity.Length2D() > 0)
-			KickBack(wpn.KickBackWalking);
+			KickBack(df::KickBackWalking::Get(wpn));
 		else if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
-			KickBack(wpn.KickBackNotOnGround);
+			KickBack(df::KickBackNotOnGround::Get(wpn));
 		else if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
-			KickBack(wpn.KickBackDucking);
+			KickBack(df::KickBackDucking::Get(wpn));
 		else
-			KickBack(wpn.KickBackDefault);
+			KickBack(df::KickBackDefault::Get(wpn));
 
 	}
 };

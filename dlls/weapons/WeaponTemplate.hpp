@@ -39,7 +39,10 @@ struct CBaseTemplateWeapon : CBasePlayerWeapon
 	// ...
 };
 
+#include "WeaponTemplateDetails.hpp"
+#include "WeaponTemplateDataFields.hpp"
 #include "WeaponDataVaribles.hpp"
+#include "CheckAccuracyBoundary.hpp"
 #include "GeneralData.hpp"
 #include "PrecacheEvent.hpp"
 #include "ItemInfo.hpp"

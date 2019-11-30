@@ -21,8 +21,8 @@ public:
 	void SecondaryAttack(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		const int fov1 = wpn.ZoomFOV1;
-		const int fov2 = wpn.ZoomFOV2;
+		const int fov1 = df::ZoomFOV1::Get(wpn);
+		const int fov2 = df::ZoomFOV2::Get(wpn);
 
 		if(CBase::m_pPlayer->m_iFOV == 90)
 			CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = fov1;

@@ -19,15 +19,15 @@ public:
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		if (wpn.DefaultReload(
-			wpn.MaxClip,
-			wpn.ANIM_RELOAD,
-			wpn.DefaultReloadTime
+			df::MaxClip::Get(wpn),
+			df::ANIM_RELOAD::Get(wpn),
+			df::DefaultReloadTime::Get(wpn)
 		))
 		{
 #ifndef CLIENT_DLL
 			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-			SetDefaultAccuracy_impl(&wpn);
+			SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 			CBase::m_iShotsFired = 0;
 			CBase::m_bDelayFire = false;
 
@@ -50,11 +50,10 @@ private:
 		}
 	}
 
-	void SetDefaultAccuracy_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
+	void SetDefaultAccuracy_impl(std::false_type) {}
+	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = wpn.AccuracyDefault;
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
 	}
 };

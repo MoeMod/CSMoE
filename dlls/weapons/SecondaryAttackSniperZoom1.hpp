@@ -22,7 +22,7 @@ public:
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		switch (CBase::m_pPlayer->m_iFOV)
 		{
-		case 90: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = wpn.ZoomFOV; break;
+			case 90: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = df::ZoomFOV::Get(wpn); break;
 		default: CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = 90; break;
 		}
 

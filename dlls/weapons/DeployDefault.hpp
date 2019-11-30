@@ -18,34 +18,33 @@ class TDeployDefault : public CBase
 {
 public:
 	//static constexpr float DefaultDeployTime = 0.75f;
-	//static constexpr float DefaultAccuracy = 0.2f;
+	//static constexpr float AccuracyDefault = 0.2f;
 
 public:
 	BOOL Deploy(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		SetDefaultAccuracy_impl(&wpn);
+		SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 		CBase::m_iShotsFired = 0;
 
-		BOOL result = wpn.DefaultDeploy(wpn.V_Model, wpn.P_Model, wpn.ANIM_DRAW, wpn.AnimExtension, wpn.UseDecrement() != FALSE);
+		BOOL result = wpn.DefaultDeploy(df::V_Model::Get(wpn), df::P_Model::Get(wpn), df::ANIM_DRAW::Get(wpn), df::AnimExtension::Get(wpn), wpn.UseDecrement() != FALSE);
 
-		SetDefaultDeployTime_impl(&wpn);
+		SetDefaultDeployTime_impl(df::DefaultDeployTime::Has(wpn));
 		return result;
 	}
 
-	void SetDefaultAccuracy_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
+private:
+	void SetDefaultAccuracy_impl(std::false_type) {}
+	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = wpn.AccuracyDefault;
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
 	}
 
-	void SetDefaultDeployTime_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultDeployTime_impl(ClassToFind *p) -> decltype(&ClassToFind::DefaultDeployTime, void())
+	void SetDefaultDeployTime_impl(std::false_type) {}
+	void SetDefaultDeployTime_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_pPlayer->m_flNextAttack = wpn.DefaultDeployTime;
+		CBase::m_pPlayer->m_flNextAttack = df::DefaultDeployTime::Get(wpn);
 	}
 };
