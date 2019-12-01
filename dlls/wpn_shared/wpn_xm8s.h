@@ -74,6 +74,7 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 450.0f, 400.0f, 400.0f, 200.0f, 0.5f }; }
 	const char *GetCSModelName() override { return "models/w_xm8.mdl"; }
+	constexpr const CXM8SharpShooter &WeaponTemplateDataSource() const { return *this; }
 
 #ifndef CLIENT_DLL
 	virtual void ItemPostFrame() override;

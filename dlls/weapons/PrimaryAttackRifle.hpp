@@ -26,9 +26,10 @@ public:
 	void PrimaryAttack(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
-			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
+			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 		else if (PrimaryAttackImpl_Walking(&wpn))
 			void(); // do nothing
 		else if (PrimaryAttackImpl_Ducking(&wpn))
@@ -36,7 +37,7 @@ public:
 		else if (PrimaryAttackImpl_Zoomed(&wpn))
 			void(); // do nothing
 		else
-			wpn.Fire(wpn.SpreadCalcDefault(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
+			wpn.Fire(wpn.SpreadCalcDefault(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 
 		return CBase::PrimaryAttack();
 	}
@@ -48,10 +49,11 @@ private:
 	auto PrimaryAttackImpl_Walking(ClassToFind *) -> decltype(&ClassToFind::SpreadCalcWalking, &ClassToFind::PrimaryAttackWalkingMiniumSpeed, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
-		if(CBase::m_pPlayer->pev->velocity.Length2D() > df::PrimaryAttackWalkingMiniumSpeed::Get(wpn))
+		if(CBase::m_pPlayer->pev->velocity.Length2D() > df::PrimaryAttackWalkingMiniumSpeed::Get(data))
 		{
-			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
+			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 			return true;
 		}
 
@@ -64,10 +66,11 @@ private:
 	auto PrimaryAttackImpl_Ducking(ClassToFind *) -> decltype(&ClassToFind::SpreadCalcDucking, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
 		{
-			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), df::CycleTime::Get(wpn), FALSE);
+			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 			return true;
 		}
 
@@ -80,10 +83,11 @@ private:
 	auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
-			wpn.Fire(wpn.SpreadCalcZoomed(A = CBase::m_flAccuracy), df::CycleTimeZoomed::Get(wpn), FALSE);
+			wpn.Fire(wpn.SpreadCalcZoomed(A = CBase::m_flAccuracy), df::CycleTimeZoomed::Get(data), FALSE);
 			return true;
 		}
 

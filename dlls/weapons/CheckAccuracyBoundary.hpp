@@ -31,16 +31,18 @@ private:
 	void CheckAccuracyBoundaryMin(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		if (CBase::m_flAccuracy < df::AccuracyMin::Get(wpn))
-			CBase::m_flAccuracy = df::AccuracyMin::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		if (CBase::m_flAccuracy < df::AccuracyMin::Get(data))
+			CBase::m_flAccuracy = df::AccuracyMin::Get(data);
 	}
 	constexpr void CheckAccuracyBoundaryMin(std::false_type) {}
 
 	void CheckAccuracyBoundaryMax(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		if (CBase::m_flAccuracy > df::AccuracyMax::Get(wpn))
-			CBase::m_flAccuracy = df::AccuracyMax::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		if (CBase::m_flAccuracy > df::AccuracyMax::Get(data))
+			CBase::m_flAccuracy = df::AccuracyMax::Get(data);
 	}
 	constexpr void CheckAccuracyBoundaryMax(std::false_type) {}
 };

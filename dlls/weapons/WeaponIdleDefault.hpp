@@ -16,6 +16,7 @@ public:
 	void WeaponIdle(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		wpn.ResetEmptySound();
 
 		CBase::m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -24,8 +25,8 @@ public:
 			return CBase::WeaponIdle();
 
 
-		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + df::WeaponIdleTime::Get(wpn);
-		wpn.SendWeaponAnim(df::ANIM_IDLE1::Get(wpn), wpn.UseDecrement() != FALSE);
+		CBase::m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + df::WeaponIdleTime::Get(data);
+		wpn.SendWeaponAnim(df::ANIM_IDLE1::Get(data), wpn.UseDecrement() != FALSE);
 
 		return CBase::WeaponIdle();
 	}

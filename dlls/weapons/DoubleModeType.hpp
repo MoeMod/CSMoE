@@ -30,24 +30,26 @@ public:
 		CBase::Spawn();
 
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		CBase::m_pLink = nullptr;
 		CBase::m_iSwing = 0;
 
-		if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(wpn))
+		if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(data))
 		{
-			CBase::current_ammo = CBase::m_iDefaultAmmo = df::MaxClip::Get(wpn);
+			CBase::current_ammo = CBase::m_iDefaultAmmo = df::MaxClip::Get(data);
 		}
 	}
 
 	void ItemPostFrame() override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		CBase::m_iSwing = 0;
 		
 		if (CBase::m_pLink)
 			CBase::m_pLink->m_iSwing = 1;
 
-		if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(wpn))
+		if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(data))
 		{
 			CBase::current_ammo = CBase::m_iClip;
 		}
@@ -69,6 +71,7 @@ public:
 	{
 		CBase::AttachToPlayer(pPlayer);
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
 		// find the linked weapon
 		while (!CBase::m_pLink)
@@ -78,7 +81,7 @@ public:
 				CBasePlayerItem *pItem = CBase::m_pPlayer->m_rgpPlayerItems[i];
 				while (pItem != NULL)
 				{
-					if (!Q_stricmp(pItem->pszName(), df::DoubleMode_LinkedWeaponClassName::Get(wpn)))
+					if (!Q_stricmp(pItem->pszName(), df::DoubleMode_LinkedWeaponClassName::Get(data)))
 					{
 						CBase::m_pLink = pItem;
 
@@ -90,7 +93,7 @@ public:
 				}
 			}
 			if (!CBase::m_pLink)
-				pPlayer->GiveNamedItem(df::DoubleMode_LinkedWeaponClassName::Get(wpn));
+				pPlayer->GiveNamedItem(df::DoubleMode_LinkedWeaponClassName::Get(data));
 
 		}
 	}
@@ -104,6 +107,7 @@ public:
 	BOOL Deploy(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		CBase::m_flAccuracy = df::AccuracyDefault::Try(wpn, 0.2);
 		CBase::m_iShotsFired = 0;
 
@@ -111,16 +115,16 @@ public:
 
 		if (CBase::m_iSwing)
 		{
-			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(wpn), df::P_Model::Get(wpn), df::ANIM_CHANGE::Get(wpn), df::AnimExtension::Get(wpn), wpn.UseDecrement() != FALSE);
-			CBase::m_pPlayer->m_flNextAttack = df::DoubleMode_ChangeTime::Get(wpn);
+			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_CHANGE::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
+			CBase::m_pPlayer->m_flNextAttack = df::DoubleMode_ChangeTime::Get(data);
 			// sync ammo
-			if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(wpn))
+			if /*constexpr*/ (df::DoubleMode_SyncAmmo::Get(data))
 				if (CBase::m_pLink)
 					CBase::m_iClip = CBase::m_pLink->current_ammo;
 		}
 		else
 		{
-			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(wpn), df::P_Model::Get(wpn), df::ANIM_CHANGE::Get(wpn), df::AnimExtension::Get(wpn), wpn.UseDecrement() != FALSE);
+			BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_CHANGE::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
 			CBase::m_pPlayer->m_flNextAttack = df::DefaultDeployTime::Try(wpn, 0.75s);
 		}
 

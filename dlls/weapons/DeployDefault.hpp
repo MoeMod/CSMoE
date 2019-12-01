@@ -24,10 +24,11 @@ public:
 	BOOL Deploy(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 		CBase::m_iShotsFired = 0;
 
-		BOOL result = wpn.DefaultDeploy(df::V_Model::Get(wpn), df::P_Model::Get(wpn), df::ANIM_DRAW::Get(wpn), df::AnimExtension::Get(wpn), wpn.UseDecrement() != FALSE);
+		BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_DRAW::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
 
 		SetDefaultDeployTime_impl(df::DefaultDeployTime::Has(wpn));
 		return result;
@@ -38,13 +39,15 @@ private:
 	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(data);
 	}
 
 	void SetDefaultDeployTime_impl(std::false_type) {}
 	void SetDefaultDeployTime_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_pPlayer->m_flNextAttack = df::DefaultDeployTime::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_pPlayer->m_flNextAttack = df::DefaultDeployTime::Get(data);
 	}
 };

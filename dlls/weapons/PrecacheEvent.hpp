@@ -20,7 +20,8 @@ public:
 	void Precache(void) override
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
-		m_usFire = PRECACHE_EVENT(1, df::EventFile::Get(wpn));
+		auto &&data = wpn.WeaponTemplateDataSource();
+		m_usFire = PRECACHE_EVENT(1, df::EventFile::Get(data));
 		CBase::Precache();
 	}
 

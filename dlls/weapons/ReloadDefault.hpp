@@ -18,10 +18,11 @@ public:
 	void Reload(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		if (wpn.DefaultReload(
-			df::MaxClip::Get(wpn),
-			df::ANIM_RELOAD::Get(wpn),
-			df::DefaultReloadTime::Get(wpn)
+			df::MaxClip::Get(data),
+			df::ANIM_RELOAD::Get(data),
+			df::DefaultReloadTime::Get(data)
 		))
 		{
 #ifndef CLIENT_DLL
@@ -43,6 +44,7 @@ private:
 	auto ReloadCheckZoom(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
@@ -54,6 +56,7 @@ private:
 	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(data);
 	}
 };

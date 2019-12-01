@@ -103,11 +103,12 @@ public:
 	void Spawn(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::pev->classname = MAKE_STRING(df::ClassName::Get(wpn));
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::pev->classname = MAKE_STRING(df::ClassName::Get(data));
 
 		wpn.Precache();
-		CBase::m_iId = df::WeaponId::Get(wpn);
-		SET_MODEL(ENT(CBase::pev), df::W_Model::Get(wpn));
+		CBase::m_iId = df::WeaponId::Get(data);
+		SET_MODEL(ENT(CBase::pev), df::W_Model::Get(data));
 
 		SetDefaultAmmo_impl(df::MaxClip::Has(wpn));
 		SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
@@ -121,9 +122,10 @@ public:
 	void Precache(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		auto p = df::P_Model::Get(wpn);
-		auto v = df::V_Model::Get(wpn);
-		auto w = df::W_Model::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		auto p = df::P_Model::Get(data);
+		auto v = df::V_Model::Get(data);
+		auto w = df::W_Model::Get(data);
 		if (p && p[0])
 			PRECACHE_MODEL(p);
 		if (v && v[0])
@@ -134,22 +136,24 @@ public:
 		CBase::Precache();
 	}
 
-	int iItemSlot() override { return df::ItemSlot::Get(static_cast<CFinal &>(*this)); }
+	int iItemSlot() override { return df::ItemSlot::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
 
 	KnockbackData GetKnockBackData() override {
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		return BuildKnockbackDataFrom(wpn);
 	}
 
-	const char *GetCSModelName() override { return static_cast<CFinal &>(*this).W_Model; }
-	float GetMaxSpeed() override { return df::MaxSpeed::Get(static_cast<CFinal &>(*this)); }
+	const char *GetCSModelName() override { return df::W_Model::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
+	float GetMaxSpeed() override { return df::MaxSpeed::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
+
+	CFinal &WeaponTemplateDataSource() { return static_cast<CFinal &>(*this); }
 
 private:
 	// sfinae call
 	template<class ClassToFind = CFinal>
-	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(df::KnockBack::Get(wpn), KnockbackData())
+	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(df::KnockBack::Get(wpn.WeaponTemplateDataSource()), KnockbackData())
 	{
-		return BuildKnockbackData(df::KnockBack::Get(wpn));
+		return BuildKnockbackData(df::KnockBack::Get(wpn.WeaponTemplateDataSource()));
 	}
 	template<class ClassToFind = CFinal>
 	constexpr auto BuildKnockbackDataFrom(ClassToFind &wpn) const -> decltype(typename ClassToFind::KnockBack_t(), KnockbackData())
@@ -162,12 +166,14 @@ private:
 	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = df::AccuracyDefault::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(data);
 	}
 	constexpr void SetDefaultAmmo_impl(std::false_type) {}
 	void SetDefaultAmmo_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_iDefaultAmmo = df::MaxClip::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_iDefaultAmmo = df::MaxClip::Get(data);
 	}
 };

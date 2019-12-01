@@ -22,19 +22,22 @@ private:
 	float GetDamage_ZB()
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
-		return df::DamageZB::Try(wpn, df::DamageDefault::Get(wpn));
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageZB::Try(wpn, df::DamageDefault::Get(data));
 	}
 
 	float GetDamage_ZBS()
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
-		return df::DamageZB::Try(wpn, df::DamageDefault::Get(wpn));
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageZB::Try(wpn, df::DamageDefault::Get(data));
 	}
 
 	float GetDamage_Default()
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
-		return df::DamageDefault::Get(wpn);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageDefault::Get(data);
 	}
 
 public:

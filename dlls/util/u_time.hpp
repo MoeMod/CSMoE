@@ -32,7 +32,7 @@ namespace cl {
 			using duration = std::chrono::duration<rep, period>;
 			using time_point = std::chrono::time_point<EngineClock>;
 			static constexpr bool is_steady = false;
-			static time_point now();
+			static time_point now() noexcept;
 
 			/*
 			struct TimePointConverter
@@ -78,13 +78,13 @@ namespace cl {
 		};
 		using namespace std::chrono_literals;
 
-		inline EngineClock::time_point get_gametime()
+		inline EngineClock::time_point get_gametime() noexcept
 		{
 			return EngineClock::now();
 		}
 
-		constexpr EngineClock::duration zero_duration{};
-		constexpr EngineClock::time_point invalid_time_point{};
+		constexpr EngineClock::duration zero_duration = EngineClock::duration::zero();
+		constexpr EngineClock::time_point invalid_time_point = EngineClock::time_point(zero_duration);
 
 		static_assert(sizeof(EngineClock::duration) == sizeof(float) && sizeof(EngineClock::time_point) == sizeof(float), "EngineClock has not the same layout with engine.");
 
