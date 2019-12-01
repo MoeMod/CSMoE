@@ -43,11 +43,11 @@ struct DynamicRadiusDamageArgs
 };
 
 namespace df {
-GENERATE_TEMPLATE_GETTER(RadiusDamageRadius)
-GENERATE_TEMPLATE_GETTER(RadiusDamageAmount)
-GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageBitsDamageType, DMG_BULLET)
-GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageKnockback, nullptr)
-GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageCanHeadshot, false)
+DF_GENERATE_TEMPLATE_GETTER(RadiusDamageRadius)
+DF_GENERATE_TEMPLATE_GETTER(RadiusDamageAmount)
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageBitsDamageType, DMG_BULLET)
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageKnockback, nullptr)
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(RadiusDamageCanHeadshot, false)
 }
 
 namespace detail {

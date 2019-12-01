@@ -44,7 +44,7 @@ public:
 
 		if (CBase::m_flLastFire != invalid_time_point)
 		{
-			CBase::m_flAccuracy -= wpn.AccuracyCalc(T = ((gpGlobals->time - CBase::m_flLastFire) / 1s));
+			CBase::m_flAccuracy = df::AccuracyCalc::Get(data)(A = CBase::m_flAccuracy)(T = ((gpGlobals->time - CBase::m_flLastFire) / 1s));
 			wpn.CheckAccuracyBoundary();
 		}
 
@@ -75,7 +75,7 @@ public:
 		const float flDistance = df::Distance::Get(data);
 		const int iPenetration = df::Penetration::Get(data);
 		const Bullet iBulletType = df::BulletType::Get(data);
-		const int iDamage = df::Damage::Get(data);
+		const int iDamage = wpn.GetDamage();
 		const float flRangeModifier = df::RangeModifier::Get(data);
 		const BOOL bPistol = df::ItemSlot::Get(data) == PISTOL_SLOT;
 		Vector vecSrc = CBase::m_pPlayer->GetGunPosition();

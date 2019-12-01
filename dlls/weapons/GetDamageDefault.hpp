@@ -23,14 +23,14 @@ private:
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
-		return df::DamageZB::Try(wpn, df::DamageDefault::Get(data));
+		return df::DamageZB::Try(data, df::DamageDefault::Get(data));
 	}
 
 	float GetDamage_ZBS()
 	{
 		auto &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
-		return df::DamageZB::Try(wpn, df::DamageDefault::Get(data));
+		return df::DamageZB::Try(data, df::DamageDefault::Get(data));
 	}
 
 	float GetDamage_Default()

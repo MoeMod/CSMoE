@@ -26,7 +26,7 @@ namespace df
 {
     using detail::priority_tag;
 // must be used in namespace detail
-#define GENERATE_TEMPLATE_GETTER(FieldName) namespace FieldName {\
+#define DF_GENERATE_TEMPLATE_GETTER(FieldName) namespace FieldName {\
     namespace impl { \
         template<class T> constexpr auto Get_impl(T &&data, priority_tag<2>) -> decltype(data.FieldName) { return data.FieldName; } \
         template<class T> constexpr auto Get_impl(T &&data, priority_tag<3>) -> decltype(data.Get##FieldName ()) { return data.Get##FieldName (); } \
@@ -46,11 +46,11 @@ namespace df
     using impl::Try; \
     }
 
-#define GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(FieldName, DefaultValue) namespace FieldName { \
+#define DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(FieldName, DefaultValue) namespace FieldName { \
     namespace impl { \
         template<class T> constexpr auto Get_impl(T &&data, priority_tag<1>) -> decltype(DefaultValue) { return DefaultValue; }; \
     } \
     } \
-	GENERATE_TEMPLATE_GETTER(FieldName)
+	DF_GENERATE_TEMPLATE_GETTER(FieldName)
 
 }

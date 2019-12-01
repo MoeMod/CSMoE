@@ -29,15 +29,15 @@ public:
 		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
-			wpn.Fire(wpn.SpreadCalcNotOnGround(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
-		else if (PrimaryAttackImpl_Walking(&wpn))
+			wpn.Fire(df::SpreadCalcNotOnGround::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
+		else if (PrimaryAttackImpl_Walking(df::SpreadCalcWalking::Has(data) && df::PrimaryAttackWalkingMiniumSpeed::Has(data)))
 			void(); // do nothing
-		else if (PrimaryAttackImpl_Ducking(&wpn))
+		else if (PrimaryAttackImpl_Ducking(df::SpreadCalcDucking::Has(data)))
 			void(); // do nothing
-		else if (PrimaryAttackImpl_Zoomed(&wpn))
+		else if (PrimaryAttackImpl_Zoomed(df::SpreadCalcZoomed::Has(data), df::CycleTimeZoomed::Has(data)), &wpn)
 			void(); // do nothing
 		else
-			wpn.Fire(wpn.SpreadCalcDefault(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
+			wpn.Fire(df::SpreadCalcDefault::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 
 		return CBase::PrimaryAttack();
 	}
@@ -45,15 +45,14 @@ public:
 private:
 	// sfinae query for whether the weapon has SpreadCalcWalking.
 	static constexpr bool PrimaryAttackImpl_Walking(...) { return false; }
-	template<class ClassToFind = CFinal>
-	auto PrimaryAttackImpl_Walking(ClassToFind *) -> decltype(&ClassToFind::SpreadCalcWalking, &ClassToFind::PrimaryAttackWalkingMiniumSpeed, bool())
+	bool PrimaryAttackImpl_Walking(std::true_type, std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if(CBase::m_pPlayer->pev->velocity.Length2D() > df::PrimaryAttackWalkingMiniumSpeed::Get(data))
 		{
-			wpn.Fire(wpn.SpreadCalcWalking(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
+			wpn.Fire(df::SpreadCalcWalking::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 			return true;
 		}
 
@@ -62,15 +61,14 @@ private:
 
 	// sfinae query for whether the weapon has SpreadCalcDucking.
 	static constexpr bool PrimaryAttackImpl_Ducking(...) { return false; }
-	template<class ClassToFind = CFinal>
-	auto PrimaryAttackImpl_Ducking(ClassToFind *) -> decltype(&ClassToFind::SpreadCalcDucking, bool())
+	bool PrimaryAttackImpl_Ducking(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
 		{
-			wpn.Fire(wpn.SpreadCalcDucking(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
+			wpn.Fire(df::SpreadCalcDucking::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
 			return true;
 		}
 
@@ -80,14 +78,14 @@ private:
 	// sfinae query for whether the weapon has/is zoom.
 	static constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
 	template<class ClassToFind = CFinal>
-	auto PrimaryAttackImpl_Zoomed(ClassToFind *) -> decltype(&ClassToFind::Rec_SecondaryAttack_HasZoom, &ClassToFind::SpreadCalcZoomed, &ClassToFind::CycleTimeZoomed, bool())
+	auto PrimaryAttackImpl_Zoomed(std::true_type, std::true_type, ClassToFind *) -> decltype(&ClassToFind::CycleTimeZoomed, bool())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
 
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
-			wpn.Fire(wpn.SpreadCalcZoomed(A = CBase::m_flAccuracy), df::CycleTimeZoomed::Get(data), FALSE);
+			wpn.Fire(df::SpreadCalcZoomed::Get(data)(A = CBase::m_flAccuracy), df::CycleTimeZoomed::Get(data), FALSE);
 			return true;
 		}
 

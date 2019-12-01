@@ -28,7 +28,8 @@ namespace cl {
 namespace sv {
 #endif
 
-using namespace WeaponTemplate::Varibles;
+using WeaponTemplate::Varibles::A;
+using WeaponTemplate::Varibles::T;
 
 struct SerializableWeaponData
 {
