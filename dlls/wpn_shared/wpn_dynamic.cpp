@@ -30,6 +30,7 @@ namespace sv {
 
 using WeaponTemplate::Varibles::A;
 using WeaponTemplate::Varibles::T;
+using WeaponTemplate::Varibles::N;
 
 struct SerializableWeaponData
 {
