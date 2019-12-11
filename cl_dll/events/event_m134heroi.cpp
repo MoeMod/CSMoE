@@ -29,7 +29,7 @@
 
 namespace cl {
 
-static const char *SOUND_NAME = "weapons/m134ex-1.wav";
+static const char *SOUND_NAME = "weapons/m134-1.wav";
 
 	enum
 	{

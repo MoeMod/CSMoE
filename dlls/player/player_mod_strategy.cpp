@@ -178,14 +178,14 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	{
 	case CT:
 		m_pPlayer->GiveNamedItem("knife_dragonsword");
-		//m_pPlayer->GiveNamedItem("weapon_svdex");
+		//m_pPlayer->GiveNamedItem("weapon_m134");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
 		m_pPlayer->GiveNamedItem("knife_dragonsword");
-		//m_pPlayer->GiveNamedItem("weapon_svdex");
+		//m_pPlayer->GiveNamedItem("weapon_m134");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
