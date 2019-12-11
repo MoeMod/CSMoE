@@ -19,6 +19,8 @@
 		3D1F7FF3238D3A8000626FD7 /* z4b_m4a1mw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */; };
 		3D1F7FF4238D3A8000626FD7 /* z4b_m4a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */; };
 		3D1F7FF5238D3A8000626FD7 /* z4b_ak47x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */; };
+		3D1F8001238EDA7100626FD7 /* wpn_starchaserar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FFF238EDA7100626FD7 /* wpn_starchaserar.cpp */; };
+		3D1F8003238EDAA200626FD7 /* event_starchaserar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F8002238EDAA200626FD7 /* event_starchaserar.cpp */; };
 		3D3D5A08233A79FF005E4B6A /* knife_dragonsword.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D5A07233A79FF005E4B6A /* knife_dragonsword.cpp */; };
 		3D4413A2231D0E6E001A0696 /* pm_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139C231D0E6E001A0696 /* pm_math.cpp */; };
 		3D4413A3231D0E6E001A0696 /* pm_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D44139D231D0E6E001A0696 /* pm_shared.cpp */; };
@@ -268,6 +270,9 @@
 		3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1mw.cpp; sourceTree = "<group>"; };
 		3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1x.cpp; sourceTree = "<group>"; };
 		3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_ak47x.cpp; sourceTree = "<group>"; };
+		3D1F7FFF238EDA7100626FD7 /* wpn_starchaserar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_starchaserar.cpp; sourceTree = "<group>"; };
+		3D1F8000238EDA7100626FD7 /* wpn_starchaserar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_starchaserar.h; sourceTree = "<group>"; };
+		3D1F8002238EDAA200626FD7 /* event_starchaserar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_starchaserar.cpp; sourceTree = "<group>"; };
 		3D3D5A07233A79FF005E4B6A /* knife_dragonsword.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knife_dragonsword.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libclient.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D441399231D0E6E001A0696 /* pm_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pm_defs.h; sourceTree = "<group>"; };
@@ -860,6 +865,7 @@
 				3D1F7FEA238D3A5A00626FD7 /* event_ak47x.cpp */,
 				3D1F7FEC238D3A5A00626FD7 /* event_m4a1mw.cpp */,
 				3D1F7FEB238D3A5A00626FD7 /* event_m4a1x.cpp */,
+				3D1F8002238EDAA200626FD7 /* event_starchaserar.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1157,6 +1163,8 @@
 				3D1F7FF2238D3A8000626FD7 /* z4b_ak47x.cpp */,
 				3D1F7FF0238D3A8000626FD7 /* z4b_m4a1mw.cpp */,
 				3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */,
+				3D1F7FFF238EDA7100626FD7 /* wpn_starchaserar.cpp */,
+				3D1F8000238EDA7100626FD7 /* wpn_starchaserar.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1388,6 +1396,7 @@
 				3D44153A231D1133001A0696 /* health.cpp in Sources */,
 				3D441600231D1164001A0696 /* wpn_g3sg1.cpp in Sources */,
 				3D441504231D1133001A0696 /* event_tar21.cpp in Sources */,
+				3D1F8003238EDAA200626FD7 /* event_starchaserar.cpp in Sources */,
 				3D441506231D1133001A0696 /* event_glock18.cpp in Sources */,
 				3D441531231D1133001A0696 /* train.cpp in Sources */,
 				3D4414B6231D1133001A0696 /* rain.cpp in Sources */,
@@ -1419,6 +1428,7 @@
 				3D4415D7231D1164001A0696 /* knife_skullaxe.cpp in Sources */,
 				3D44152B231D1133001A0696 /* ammo.cpp in Sources */,
 				3D4415C3231D1164001A0696 /* wpn_sg552.cpp in Sources */,
+				3D1F8001238EDA7100626FD7 /* wpn_starchaserar.cpp in Sources */,
 				3D441604231D1164001A0696 /* wpn_infinitys.cpp in Sources */,
 				3D441527231D1133001A0696 /* money.cpp in Sources */,
 				3D44150C231D1133001A0696 /* event_galil.cpp in Sources */,
