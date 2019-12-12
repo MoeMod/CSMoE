@@ -32,6 +32,7 @@
     <ClCompile Include="..\cl_dll\events.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ak47l.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_ak47x.cpp" />
     <ClCompile Include="..\cl_dll\events\event_anaconda.cpp" />
     <ClCompile Include="..\cl_dll\events\event_as50.cpp" />
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
@@ -61,12 +62,16 @@
     <ClCompile Include="..\cl_dll\events\event_k1a.cpp" />
     <ClCompile Include="..\cl_dll\events\event_knife.cpp" />
     <ClCompile Include="..\cl_dll\events\event_kriss.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m134.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m14ebr.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m1887.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m2.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m249.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m3.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m4a1.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m4a1mw.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m4a1razer.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m4a1x.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg3.cpp" />
@@ -82,6 +87,7 @@
     <ClCompile Include="..\cl_dll\events\event_scout.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg550.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sg552.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_starchaserar.cpp" />
     <ClCompile Include="..\cl_dll\events\event_svdex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp" />
     <ClCompile Include="..\cl_dll\events\event_thompson.cpp" />
@@ -192,6 +198,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m2.cpp" />
@@ -214,6 +221,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
@@ -224,8 +232,14 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8s.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_ak47x.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_awpnvidia.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_deagleb.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_dmp7a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_Frequency9.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1mw.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1razer.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\z4b_m4a1x.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_stormgiantx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_lc_sword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\z4b_nataknifedx.cpp" />
@@ -303,7 +317,6 @@
     <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_ak47l.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
@@ -327,6 +340,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m2.h" />
@@ -346,6 +360,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
@@ -354,8 +369,9 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
-    <ClInclude Include="..\dlls\wpn_shared\wpn_xm8c.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h" />
+    <ClInclude Include="..\dlls\wpn_shared\z4b_dmp7a1x.h" />
+    <ClInclude Include="..\dlls\wpn_shared\z4b_m4a1razer.h" />
     <ClInclude Include="..\engine\cdll_int.h" />
     <ClInclude Include="..\engine\custom.h" />
     <ClInclude Include="..\engine\edict.h" />

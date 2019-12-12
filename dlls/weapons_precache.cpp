@@ -157,8 +157,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_scarh");
 	UTIL_PrecacheOtherWeapon("weapon_m14ebr");
 	UTIL_PrecacheOtherWeapon("weapon_balrog7");
+	UTIL_PrecacheOtherWeapon("weapon_m134");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
+	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
 	UTIL_PrecacheOtherWeapon("weapon_m2");
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");
@@ -177,6 +179,12 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_m134heroi");
 	UTIL_PrecacheOtherWeapon("z4b_deagleb");
 	UTIL_PrecacheOtherWeapon("z4b_xm2010pc");
+	UTIL_PrecacheOtherWeapon("z4b_m4a1razer");
+	UTIL_PrecacheOtherWeapon("z4b_awpnvidia");
+	UTIL_PrecacheOtherWeapon("z4b_dmp7a1x");
+	UTIL_PrecacheOtherWeapon("z4b_m4a1x");
+	UTIL_PrecacheOtherWeapon("z4b_m4a1mw");
+	UTIL_PrecacheOtherWeapon("z4b_ak47x");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

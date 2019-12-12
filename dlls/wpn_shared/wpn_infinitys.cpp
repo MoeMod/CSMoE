@@ -28,7 +28,8 @@ namespace cl {
 namespace sv {
 #endif
 
-using namespace WeaponTemplate::Varibles;
+using WeaponTemplate::Varibles::A;
+using WeaponTemplate::Varibles::T;
 
 struct InfinitySS_WeaponData
 {
@@ -62,7 +63,7 @@ public:
 	static constexpr int DamageZB = 69;
 	static constexpr int DamageZBS = 69;
 	static constexpr float AccuracyDefault = 0.9f;
-	static constexpr const auto & AccuracyCalc = (0.35 - T) * 0.175;
+	static constexpr const auto & AccuracyCalc = A - (0.35 - T) * 0.175;
 	static constexpr float AccuracyMin = 0.5;
 	static constexpr float AccuracyMax = 0.9;
 	static constexpr float RangeModifier = 0.8;
@@ -85,7 +86,7 @@ struct InfinitySR_WeaponData : InfinitySS_WeaponData
 	static constexpr int DamageZBS = 62;
 	static constexpr int MaxClip = 15;
 	static constexpr const auto & SpreadCalcDefault = 0.11 * (1 - A);
-	static constexpr const auto & AccuracyCalc = (0.35 - T) * 0.25;
+	static constexpr const auto & AccuracyCalc = A - (0.35 - T) * 0.25;
 	static constexpr const auto &CycleTime = 0.175s;
 };
 
@@ -100,7 +101,7 @@ struct InfinitySB_WeaponData : InfinitySS_WeaponData
 	static constexpr int DamageZB = 79;
 	static constexpr int DamageZBS = 79;
 	static constexpr const auto & SpreadCalcDefault = 0.125 * (1 - A);
-	static constexpr const auto & AccuracyCalc = (0.35 - T) * 0.25;
+	static constexpr const auto & AccuracyCalc = A - (0.35 - T) * 0.25;
 	static constexpr const auto &CycleTime = 0.225s;
 };
 

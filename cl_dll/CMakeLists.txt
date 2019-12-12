@@ -132,6 +132,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
+	../dlls/wpn_shared/wpn_m134.cpp
+	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/wpn_svdex.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
@@ -149,6 +151,12 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_m134heroi.cpp
 	../dlls/wpn_shared/z4b_deagleb.cpp
 	../dlls/wpn_shared/z4b_xm2010pc.cpp
+	../dlls/wpn_shared/z4b_dmp7a1x.cpp
+	../dlls/wpn_shared/z4b_m4a1razer.cpp
+	../dlls/wpn_shared/z4b_awpnvidia.cpp
+	../dlls/wpn_shared/z4b_m4a1x.cpp
+	../dlls/wpn_shared/z4b_m4a1mw.cpp
+	../dlls/wpn_shared/z4b_ak47x.cpp
 	)
 
 set (HUD_SRCS

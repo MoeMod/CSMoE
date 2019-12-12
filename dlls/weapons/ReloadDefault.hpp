@@ -18,16 +18,17 @@ public:
 	void Reload(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		if (wpn.DefaultReload(
-			wpn.MaxClip,
-			wpn.ANIM_RELOAD,
-			wpn.DefaultReloadTime
+			df::MaxClip::Get(data),
+			df::ANIM_RELOAD::Get(data),
+			df::DefaultReloadTime::Get(data)
 		))
 		{
 #ifndef CLIENT_DLL
 			CBase::m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-			SetDefaultAccuracy_impl(&wpn);
+			SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 			CBase::m_iShotsFired = 0;
 			CBase::m_bDelayFire = false;
 
@@ -43,6 +44,7 @@ private:
 	auto ReloadCheckZoom(ClassToFind *) -> decltype(ClassToFind::Rec_SecondaryAttack_HasZoom, void())
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		if (CBase::m_pPlayer->pev->fov != 90)
 		{
 			CBase::m_pPlayer->pev->fov = CBase::m_pPlayer->m_iFOV = wpn.Ref_GetMinZoomFOV();
@@ -50,11 +52,11 @@ private:
 		}
 	}
 
-	void SetDefaultAccuracy_impl(...) {}
-	template<class ClassToFind = CFinal>
-	auto SetDefaultAccuracy_impl(ClassToFind *p) -> decltype(&ClassToFind::AccuracyDefault, void())
+	void SetDefaultAccuracy_impl(std::false_type) {}
+	void SetDefaultAccuracy_impl(std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		CBase::m_flAccuracy = wpn.AccuracyDefault;
+		auto &&data = wpn.WeaponTemplateDataSource();
+		CBase::m_flAccuracy = df::AccuracyDefault::Get(data);
 	}
 };

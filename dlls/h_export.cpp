@@ -13,7 +13,7 @@ globalvars_t *gpGlobals;
 
 // time_point implementation
 namespace moe{
-auto EngineClock::now() -> time_point
+auto EngineClock::now() noexcept -> time_point
 {
 	return gpGlobals->time;
 }

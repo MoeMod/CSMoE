@@ -12,6 +12,10 @@
 		3D1D534623312DA700D26B94 /* z4b_cannontiger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */; };
 		3D1D534723312DA700D26B94 /* z4b_infinityx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */; };
 		3D1D534823312DA700D26B94 /* z4b_m134heroi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */; };
+		3D1F7FF9238D3A8F00626FD7 /* z4b_m4a1mw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF6238D3A8E00626FD7 /* z4b_m4a1mw.cpp */; };
+		3D1F7FFA238D3A8F00626FD7 /* z4b_m4a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF7238D3A8E00626FD7 /* z4b_m4a1x.cpp */; };
+		3D1F7FFB238D3A8F00626FD7 /* z4b_ak47x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FF8238D3A8E00626FD7 /* z4b_ak47x.cpp */; };
+		3D1F7FFE238EDA6200626FD7 /* wpn_starchaserar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D1F7FFC238EDA6200626FD7 /* wpn_starchaserar.cpp */; };
 		3D3D5A0A233A7A0F005E4B6A /* knife_dragonsword.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */; };
 		3D44116F231D06CD001A0696 /* triggers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E2231D06C5001A0696 /* triggers.cpp */; };
 		3D441170231D06CD001A0696 /* items.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4410E5231D06C5001A0696 /* items.cpp */; };
@@ -232,6 +236,10 @@
 		3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413AA231D0E9E001A0696 /* MemPool.cpp */; };
 		3D4413BF231D0E9E001A0696 /* unicode_strtools.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4413B0231D0E9E001A0696 /* unicode_strtools.cpp */; };
 		3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB002365F205002114A0 /* wpn_m2.cpp */; };
+		3D7BEBAC23A2A1620029565E /* wpn_m134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D7BEBAB23A2A1610029565E /* wpn_m134.cpp */; };
+		3DA638DA238AE954007D26EC /* z4b_dmp7a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */; };
+		3DA638DB238AE954007D26EC /* z4b_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */; };
+		3DA638DC238AE954007D26EC /* z4b_awpnvidia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */; };
 		3DB36A232381894D00BE2343 /* z4b_deagleb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */; };
 		3DB36A242381894D00BE2343 /* z4b_xm2010pc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */; };
 /* End PBXBuildFile section */
@@ -254,6 +262,11 @@
 		3D1D534123312DA700D26B94 /* z4b_cannontiger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_cannontiger.cpp; sourceTree = "<group>"; };
 		3D1D534223312DA700D26B94 /* z4b_infinityx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_infinityx.cpp; sourceTree = "<group>"; };
 		3D1D534323312DA700D26B94 /* z4b_m134heroi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m134heroi.cpp; sourceTree = "<group>"; };
+		3D1F7FF6238D3A8E00626FD7 /* z4b_m4a1mw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1mw.cpp; sourceTree = "<group>"; };
+		3D1F7FF7238D3A8E00626FD7 /* z4b_m4a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1x.cpp; sourceTree = "<group>"; };
+		3D1F7FF8238D3A8E00626FD7 /* z4b_ak47x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_ak47x.cpp; sourceTree = "<group>"; };
+		3D1F7FFC238EDA6200626FD7 /* wpn_starchaserar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_starchaserar.cpp; sourceTree = "<group>"; };
+		3D1F7FFD238EDA6200626FD7 /* wpn_starchaserar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_starchaserar.h; sourceTree = "<group>"; };
 		3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knife_dragonsword.cpp; sourceTree = "<group>"; };
 		3D4410C7231D066B001A0696 /* libserver.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libserver.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D4410DF231D06C5001A0696 /* spectator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spectator.h; sourceTree = "<group>"; };
@@ -733,6 +746,13 @@
 		3D4413BC231D0E9E001A0696 /* EventDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventDispatcher.h; sourceTree = "<group>"; };
 		3D4413BD231D0E9E001A0696 /* UtlVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UtlVector.h; sourceTree = "<group>"; };
 		3D4CBB002365F205002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
+		3D7BEBAA23A2A1610029565E /* wpn_m134.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_m134.h; sourceTree = "<group>"; };
+		3D7BEBAB23A2A1610029565E /* wpn_m134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m134.cpp; sourceTree = "<group>"; };
+		3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_dmp7a1x.cpp; sourceTree = "<group>"; };
+		3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_m4a1razer.cpp; sourceTree = "<group>"; };
+		3DA638D7238AE954007D26EC /* z4b_m4a1razer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_m4a1razer.h; sourceTree = "<group>"; };
+		3DA638D8238AE954007D26EC /* z4b_dmp7a1x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_dmp7a1x.h; sourceTree = "<group>"; };
+		3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_awpnvidia.cpp; sourceTree = "<group>"; };
 		3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_deagleb.cpp; sourceTree = "<group>"; };
 		3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_xm2010pc.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1221,6 +1241,18 @@
 				3D3D5A09233A7A0E005E4B6A /* knife_dragonsword.cpp */,
 				3DB36A212381894D00BE2343 /* z4b_deagleb.cpp */,
 				3DB36A222381894D00BE2343 /* z4b_xm2010pc.cpp */,
+				3DA638D9238AE954007D26EC /* z4b_awpnvidia.cpp */,
+				3DA638D5238AE954007D26EC /* z4b_dmp7a1x.cpp */,
+				3DA638D8238AE954007D26EC /* z4b_dmp7a1x.h */,
+				3DA638D6238AE954007D26EC /* z4b_m4a1razer.cpp */,
+				3DA638D7238AE954007D26EC /* z4b_m4a1razer.h */,
+				3D1F7FF8238D3A8E00626FD7 /* z4b_ak47x.cpp */,
+				3D1F7FF6238D3A8E00626FD7 /* z4b_m4a1mw.cpp */,
+				3D1F7FF7238D3A8E00626FD7 /* z4b_m4a1x.cpp */,
+				3D1F7FFC238EDA6200626FD7 /* wpn_starchaserar.cpp */,
+				3D1F7FFD238EDA6200626FD7 /* wpn_starchaserar.h */,
+				3D7BEBAB23A2A1610029565E /* wpn_m134.cpp */,
+				3D7BEBAA23A2A1610029565E /* wpn_m134.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1535,6 +1567,7 @@
 				3D441302231D0789001A0696 /* wpn_flashbang.cpp in Sources */,
 				3D441192231D06CD001A0696 /* game.cpp in Sources */,
 				3D441170231D06CD001A0696 /* items.cpp in Sources */,
+				3D1F7FFB238D3A8F00626FD7 /* z4b_ak47x.cpp in Sources */,
 				3D441311231D0789001A0696 /* wpn_m4a1.cpp in Sources */,
 				3D441355231D0789001A0696 /* cs_bot_follow.cpp in Sources */,
 				3D441175231D06CD001A0696 /* plane.cpp in Sources */,
@@ -1551,10 +1584,13 @@
 				3D44131B231D0789001A0696 /* wpn_scarl.cpp in Sources */,
 				3D44133E231D0789001A0696 /* wpn_scout.cpp in Sources */,
 				3D4CBB012365F205002114A0 /* wpn_m2.cpp in Sources */,
+				3D1F7FFE238EDA6200626FD7 /* wpn_starchaserar.cpp in Sources */,
 				3D441347231D0789001A0696 /* cs_bot_pathfind.cpp in Sources */,
 				3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */,
+				3DA638DA238AE954007D26EC /* z4b_dmp7a1x.cpp in Sources */,
 				3D441310231D0789001A0696 /* wpn_balrog7.cpp in Sources */,
 				3D441364231D0789001A0696 /* hostage_animate.cpp in Sources */,
+				3D1F7FFA238D3A8F00626FD7 /* z4b_m4a1x.cpp in Sources */,
 				3D441313231D0789001A0696 /* wpn_m14ebr.cpp in Sources */,
 				3D4412E7231D0789001A0696 /* monster_manager.cpp in Sources */,
 				3D441303231D0789001A0696 /* wpn_mg36.cpp in Sources */,
@@ -1615,6 +1651,7 @@
 				3D44130A231D0789001A0696 /* knife_zombi.cpp in Sources */,
 				3D441354231D0789001A0696 /* cs_bot_move_to.cpp in Sources */,
 				3D441359231D0789001A0696 /* cs_bot_vision.cpp in Sources */,
+				3DA638DB238AE954007D26EC /* z4b_m4a1razer.cpp in Sources */,
 				3D44117D231D06CD001A0696 /* weapons.cpp in Sources */,
 				3D44116F231D06CD001A0696 /* triggers.cpp in Sources */,
 				3D44138D231D0DEE001A0696 /* shared_util.cpp in Sources */,
@@ -1634,6 +1671,7 @@
 				3D4411A0231D06CD001A0696 /* cbase.cpp in Sources */,
 				3D441323231D0789001A0696 /* wpn_wa2000.cpp in Sources */,
 				3D441195231D06CD001A0696 /* doors.cpp in Sources */,
+				3D7BEBAC23A2A1620029565E /* wpn_m134.cpp in Sources */,
 				3D4412E0231D0789001A0696 /* mod_zbb.cpp in Sources */,
 				3D3D5A0A233A7A0F005E4B6A /* knife_dragonsword.cpp in Sources */,
 				3D441318231D0789001A0696 /* z4b_Frequency9.cpp in Sources */,
@@ -1648,6 +1686,7 @@
 				3D4412FC231D0789001A0696 /* wpn_deagle.cpp in Sources */,
 				3D44117E231D06CD001A0696 /* client.cpp in Sources */,
 				3D441186231D06CD001A0696 /* career_tasks.cpp in Sources */,
+				3D1F7FF9238D3A8F00626FD7 /* z4b_m4a1mw.cpp in Sources */,
 				3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */,
 				3D441177231D06CD001A0696 /* weapons_buy.cpp in Sources */,
 				3D44117B231D06CD001A0696 /* tutor.cpp in Sources */,
@@ -1678,6 +1717,7 @@
 				3D441320231D0789001A0696 /* wpn_cannon.cpp in Sources */,
 				3D441348231D0789001A0696 /* cs_bot_event.cpp in Sources */,
 				3D44133C231D0789001A0696 /* wpn_hegrenade.cpp in Sources */,
+				3DA638DC238AE954007D26EC /* z4b_awpnvidia.cpp in Sources */,
 				3D441179231D06CD001A0696 /* weapons_msg.cpp in Sources */,
 				3D4412F0231D0789001A0696 /* player_spawnpoint.cpp in Sources */,
 				3D441172231D06CD001A0696 /* ammo.cpp in Sources */,

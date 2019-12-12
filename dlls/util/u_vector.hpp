@@ -114,17 +114,6 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	{
 		return &x;
 	}
-	// make it template cast operator function for lower priority
-	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
-	operator R *()
-	{
-		return data();
-	}
-	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
-	operator const R *() const
-	{
-		return data();
-	}
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
 	{
@@ -175,12 +164,12 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 		return &x;
 	}
 	// make it template cast operator function for lower priority
-	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	template<class R, class = typename std::enable_if<std::is_same<T *, R *>::value || std::is_same<void *, R *>::value>::type>
 	operator R *()
 	{
 		return data();
 	}
-	template<class R, class = typename std::enable_if<std::is_convertible<T *, R *>::value>::type>
+	template<class R, class = typename std::enable_if<std::is_same<T *, R *>::value || std::is_same<void *, R *>::value>::type>
 	operator const R *() const
 	{
 		return data();
@@ -236,24 +225,15 @@ template<class...Args> constexpr bool And(Args...args)
 	return (... && args);
 }
 #else
-template<class Ret, class First>
-constexpr Ret Sum(First a)
+template<class Ret, class...Args> constexpr Ret Sum(Args...args)
 {
-	return a;
+	Ret result = {};
+	return void(std::initializer_list<Ret>{ (result += args)... }), result;
 }
-template<class Ret, class First, class...Args>
-constexpr Ret Sum(First a, Args...args)
+template<class...Args> constexpr bool And(Args...args)
 {
-	return a + Sum<Ret>(args...);
-}
-constexpr bool And(bool a)
-{
-	return a;
-}
-template<class...Args>
-constexpr bool And(bool a, Args...args)
-{
-	return a && And(args...);
+	bool result = true;
+	return void(std::initializer_list<bool>{ (result = (result && args))... }), result;
 }
 #endif
 template<class VecType, std::size_t...I>

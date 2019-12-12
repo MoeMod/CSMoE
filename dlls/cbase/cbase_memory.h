@@ -57,8 +57,9 @@ NODISCARD T *CreateClassPtr()
 template<class Result, class T>
 constexpr auto static_ent_cast(T *p)
 -> typename std::enable_if<
-		std::is_base_of<typename std::remove_cv<typename std::remove_pointer<Result>::type>::type, typename std::remove_cv<T>::type>::value ||
-		std::is_base_of<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value,
+		(std::is_base_of<typename std::remove_cv<typename std::remove_pointer<Result>::type>::type, typename std::remove_cv<T>::type>::value ||
+		std::is_base_of<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value) &&
+		!std::is_same<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value,
 		Result
 >::type
 {
@@ -70,7 +71,8 @@ template<class Result, class T>
 constexpr auto static_ent_cast(T *p)
 -> typename std::enable_if<
 		std::is_base_of<CBaseEntity, typename std::remove_cv<T>::type>::value &&
-		std::is_same<Result, entvars_t *>::value,
+		std::is_same<Result, entvars_t *>::value &&
+		!std::is_same<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value,
 		Result
 >::type
 {
@@ -82,7 +84,8 @@ template<class Result, class T>
 constexpr auto static_ent_cast(T *p)
 -> typename std::enable_if<
 		std::is_base_of<CBaseEntity, typename std::remove_cv<T>::type>::value &&
-		std::is_same<Result, edict_t *>::value,
+		std::is_same<Result, edict_t *>::value &&
+		!std::is_same<typename std::remove_cv<T>::type, typename std::remove_cv<typename std::remove_pointer<Result>::type>::type>::value,
 		Result
 >::type
 {
@@ -101,6 +104,14 @@ template<class Result>
 Result static_ent_cast(std::nullptr_t)
 {
 	return nullptr;
+}
+
+
+// * => *
+template<class Result>
+Result static_ent_cast(Result p)
+{
+	return p;
 }
 
 // CBaseEntity * <=> CBasePlayer *

@@ -52,7 +52,9 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 
                                                   {"weapon_m14ebr",      "M14 EBR",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  { "weapon_balrog7",      "Balrog7",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_starchaserar",      "Starchaserar",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 												  { "weapon_m2",      "M2",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_m134",      "M134",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 												  { "weapon_gatling",      "Gatling",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
                                                   {"weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -86,8 +88,14 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 												  {"z4b_oppovivo",      "Dual Light Stick",    0, KNIFE_SLOT, UNASSIGNED},
 												  {"z4b_stormgiantx",      "Storm Giant's Hammer",    0, KNIFE_SLOT, UNASSIGNED},
 												  {"z4b_m134heroi",      "M134 CORE-i7",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-												  {"z4b_deagleb",      "D.Eagle Born Beast",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_deagleb",      "D.Eagle Born Beast",    700, PISTOL_SLOT, UNASSIGNED},
 												  {"z4b_xm2010pc",      "XM2010 Crystal-P",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_awpnvidia",      "AWP-NVIDIA",    4650, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1razer",      "M4A1-Razer",    4250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_dmp7a1x",      "Dual SMG-N7",    2350, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1x",      "M4A1 Shadow Runner",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_ak47x",      "AK47 KNIFE-BORN BEAST",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"z4b_m4a1mw",      "M4A1 S-Transformer",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 };
 
