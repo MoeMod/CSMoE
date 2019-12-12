@@ -62,7 +62,7 @@ private:
 public:
 	static constexpr auto MaxClip = 20;
 	static constexpr const auto &DefaultReloadTime = 3.6s;
-	static constexpr auto DefaultAccuracy = 0;
+	static constexpr auto AccuracyDefault = 0;
 	static constexpr int ZoomFOV = 50;
 
 	static constexpr const char *V_Model = "models/v_mp7a1.mdl";

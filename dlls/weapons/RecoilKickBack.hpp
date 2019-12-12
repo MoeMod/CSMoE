@@ -42,23 +42,25 @@ class TRecoilKickBack : public CBase
 {
 public:
 	using CBasePlayerWeapon::KickBack;
-	void KickBack(const KickBackData &data)
+	void KickBack(const KickBackData &kickback)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		return wpn.KickBack(data.up_base, data.lateral_base, data.up_modifier, data.lateral_modifier, data.up_max, data.lateral_max, data.direction_change);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return wpn.KickBack(kickback.up_base, kickback.lateral_base, kickback.up_modifier, kickback.lateral_modifier, kickback.up_max, kickback.lateral_max, kickback.direction_change);
 	}
 
 	void Recoil(void)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		if (CBase::m_pPlayer->pev->velocity.Length2D() > 0)
-			KickBack(wpn.KickBackWalking);
+			KickBack(df::KickBackWalking::Get(data));
 		else if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
-			KickBack(wpn.KickBackNotOnGround);
+			KickBack(df::KickBackNotOnGround::Get(data));
 		else if (FBitSet(CBase::m_pPlayer->pev->flags, FL_DUCKING))
-			KickBack(wpn.KickBackDucking);
+			KickBack(df::KickBackDucking::Get(data));
 		else
-			KickBack(wpn.KickBackDefault);
+			KickBack(df::KickBackDefault::Get(data));
 
 	}
 };

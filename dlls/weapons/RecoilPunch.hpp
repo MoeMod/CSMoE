@@ -16,9 +16,11 @@ public:
 	void Recoil(void)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
-		CBase::m_pPlayer->pev->punchangle[0] += wpn.RecoilPunchAngleDelta[0];
-		CBase::m_pPlayer->pev->punchangle[1] += wpn.RecoilPunchAngleDelta[1];
-		CBase::m_pPlayer->pev->punchangle[2] += wpn.RecoilPunchAngleDelta[2];
+		const auto punch = df::RecoilPunchAngleDelta::Get(data);
+		CBase::m_pPlayer->pev->punchangle[0] += punch[0];
+		CBase::m_pPlayer->pev->punchangle[1] += punch[1];
+		CBase::m_pPlayer->pev->punchangle[2] += punch[2];
 	}
 };

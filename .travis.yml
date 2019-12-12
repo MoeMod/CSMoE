@@ -70,6 +70,7 @@ jobs:
     name: Build for macOS
     cache: ccache
     os: osx
+    osx_image: xcode11
     language: cpp
     compiler: clang
     before_script:

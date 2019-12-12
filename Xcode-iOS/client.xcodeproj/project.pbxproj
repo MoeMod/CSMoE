@@ -235,6 +235,8 @@
 		3D44160A231D1164001A0696 /* wpn_scout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4415C1231D1164001A0696 /* wpn_scout.cpp */; };
 		3D4CBB032365F214002114A0 /* wpn_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB022365F213002114A0 /* wpn_m2.cpp */; };
 		3D4CBB052365F220002114A0 /* event_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB042365F220002114A0 /* event_m2.cpp */; };
+		3D7BEBA623A2A1420029565E /* event_m134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D7BEBA523A2A1420029565E /* event_m134.cpp */; };
+		3D7BEBA923A2A1550029565E /* wpn_m134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D7BEBA723A2A1540029565E /* wpn_m134.cpp */; };
 		3DA638E2238AE965007D26EC /* z4b_dmp7a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */; };
 		3DA638E3238AE965007D26EC /* z4b_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */; };
 		3DA638E4238AE965007D26EC /* z4b_awpnvidia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E1238AE965007D26EC /* z4b_awpnvidia.cpp */; };
@@ -624,6 +626,9 @@
 		3D4415C2231D1164001A0696 /* wpn_p90.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_p90.h; sourceTree = "<group>"; };
 		3D4CBB022365F213002114A0 /* wpn_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m2.cpp; sourceTree = "<group>"; };
 		3D4CBB042365F220002114A0 /* event_m2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = event_m2.cpp; path = ../../cl_dll/events/event_m2.cpp; sourceTree = "<group>"; };
+		3D7BEBA523A2A1420029565E /* event_m134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m134.cpp; sourceTree = "<group>"; };
+		3D7BEBA723A2A1540029565E /* wpn_m134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m134.cpp; sourceTree = "<group>"; };
+		3D7BEBA823A2A1550029565E /* wpn_m134.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_m134.h; sourceTree = "<group>"; };
 		3DA638DD238AE964007D26EC /* z4b_m4a1razer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_m4a1razer.h; sourceTree = "<group>"; };
 		3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_dmp7a1x.cpp; sourceTree = "<group>"; };
 		3DA638DF238AE964007D26EC /* z4b_dmp7a1x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_dmp7a1x.h; sourceTree = "<group>"; };
@@ -866,6 +871,7 @@
 				3D1F7FEC238D3A5A00626FD7 /* event_m4a1mw.cpp */,
 				3D1F7FEB238D3A5A00626FD7 /* event_m4a1x.cpp */,
 				3D1F8002238EDAA200626FD7 /* event_starchaserar.cpp */,
+				3D7BEBA523A2A1420029565E /* event_m134.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1165,6 +1171,8 @@
 				3D1F7FF1238D3A8000626FD7 /* z4b_m4a1x.cpp */,
 				3D1F7FFF238EDA7100626FD7 /* wpn_starchaserar.cpp */,
 				3D1F8000238EDA7100626FD7 /* wpn_starchaserar.h */,
+				3D7BEBA723A2A1540029565E /* wpn_m134.cpp */,
+				3D7BEBA823A2A1550029565E /* wpn_m134.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1352,6 +1360,7 @@
 				3D1D533823312D6000D26B94 /* z4b_cannonplasma.cpp in Sources */,
 				3D441500231D1133001A0696 /* event_famas.cpp in Sources */,
 				3D441602231D1164001A0696 /* wpn_p228.cpp in Sources */,
+				3D7BEBA623A2A1420029565E /* event_m134.cpp in Sources */,
 				3D4415DF231D1164001A0696 /* wpn_m14ebr.cpp in Sources */,
 				3D441519231D1133001A0696 /* status_icons.cpp in Sources */,
 				3D441513231D1133001A0696 /* in_camera.cpp in Sources */,
@@ -1362,6 +1371,7 @@
 				3D4413A4231D0E6E001A0696 /* pm_debug.cpp in Sources */,
 				3D441601231D1164001A0696 /* wpn_thompson.cpp in Sources */,
 				3D4413A2231D0E6E001A0696 /* pm_math.cpp in Sources */,
+				3D7BEBA923A2A1550029565E /* wpn_m134.cpp in Sources */,
 				3D4413BE231D0E9E001A0696 /* MemPool.cpp in Sources */,
 				3D4414B0231D1133001A0696 /* StudioModelRenderer.cpp in Sources */,
 				3D4414D3231D1133001A0696 /* event_balrog7.cpp in Sources */,

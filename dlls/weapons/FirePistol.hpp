@@ -34,6 +34,7 @@ public:
 	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 
 		flCycleTime -= 0.075s;
 		CBase::m_iShotsFired++;
@@ -43,9 +44,8 @@ public:
 
 		if (CBase::m_flLastFire != invalid_time_point)
 		{
-			CBase::m_flAccuracy -= wpn.AccuracyCalc(T = ((gpGlobals->time - CBase::m_flLastFire) / 1s));
-			CheckAccuracyBoundaryMin(&wpn);
-			CheckAccuracyBoundaryMax(&wpn);
+			CBase::m_flAccuracy = df::AccuracyCalc::Get(data)(A = CBase::m_flAccuracy)(T = ((gpGlobals->time - CBase::m_flLastFire) / 1s));
+			wpn.CheckAccuracyBoundary();
 		}
 
 		CBase::m_flLastFire = gpGlobals->time;
@@ -72,12 +72,12 @@ public:
 		CBase::m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 		CBase::m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
-		const float flDistance = wpn.Distance;
-		const int iPenetration = wpn.Penetration;
-		const Bullet iBulletType = wpn.BulletType;
+		const float flDistance = df::Distance::Get(data);
+		const int iPenetration = df::Penetration::Get(data);
+		const Bullet iBulletType = df::BulletType::Get(data);
 		const int iDamage = wpn.GetDamage();
-		const float flRangeModifier = wpn.RangeModifier;
-		const BOOL bPistol = wpn.ItemSlot == PISTOL_SLOT;
+		const float flRangeModifier = df::RangeModifier::Get(data);
+		const BOOL bPistol = df::ItemSlot::Get(data) == PISTOL_SLOT;
 		Vector vecSrc = CBase::m_pPlayer->GetGunPosition();
 		Vector vecDir = CBase::m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, flDistance, iPenetration, iBulletType, iDamage, flRangeModifier, CBase::m_pPlayer->pev, bPistol, CBase::m_pPlayer->random_seed);
 
@@ -100,34 +100,14 @@ public:
 	void FireEvent(const Vector &vecDir)
 	{
 		int flags = 0;
-		/*
 #ifdef CLIENT_WEAPONS
 		flags = FEV_NOTHOST;
 #else
 		flags = 0;
 #endif
-		 */
 
 		CFinal &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
 		PLAYBACK_EVENT_FULL(flags, CBase::m_pPlayer->edict(), wpn.m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(CBase::m_pPlayer->pev->punchangle.x * 100), static_cast<int>(CBase::m_pPlayer->pev->punchangle.y * 100), CBase::m_iClip != 0, FALSE);
 	}
-
-private:
-	template<class ClassToCheck = CFinal>
-	auto CheckAccuracyBoundaryMin(ClassToCheck *p) -> decltype(&ClassToCheck::AccuracyMin, void())
-	{
-		CFinal &wpn = static_cast<CFinal &>(*this);
-		if (CBase::m_flAccuracy < wpn.AccuracyMin)
-			CBase::m_flAccuracy = wpn.AccuracyMin;
-	}
-	void CheckAccuracyBoundaryMin(...) {}
-
-	template<class ClassToCheck = CFinal>
-	auto CheckAccuracyBoundaryMax(ClassToCheck *p) -> decltype(&ClassToCheck::AccuracyMax, void())
-	{
-		CFinal &wpn = static_cast<CFinal &>(*this);
-		if (CBase::m_flAccuracy > wpn.AccuracyMax)
-			CBase::m_flAccuracy = wpn.AccuracyMax;
-	}
-	void CheckAccuracyBoundaryMax(...) {}
 };

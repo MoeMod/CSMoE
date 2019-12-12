@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "weapons.h"
 
 #include "weapons/WeaponTemplate.hpp"
+#include "weapons/RadiusDamage.hpp"
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -75,6 +76,9 @@ namespace sv {
     static constexpr int Penetration = 1;
 	std::array<float, 3> RecoilPunchAngleDelta = { -3, 0, 0 };
     KnockbackData KnockBack = { 4000.0f, 600.0f, 1000.0f, 600.0f, 0.2f };
+
+    static constexpr auto RadiusDamageRadius = 88;
+    KnockbackData RadiusDamageKnockback = { 3000.0f, 700.0f, 1200.0f, 700.0f, 0.4f };
 
 	void Precache() override
 	{
@@ -144,73 +148,14 @@ namespace sv {
 		Recoil();
 	}
 
+
 	void Make_Explosion(const Vector& vecShootingSrc, const Vector& vecDir)
 	{
 #ifndef CLIENT_DLL
-		const float flRadius = 88;
-		const float flDamage = GetExplodeDamage();
-		
-		entvars_t* const pevAttacker = m_pPlayer->pev;
-		entvars_t* const pevInflictor = m_pPlayer->pev;
-		int bitsDamageType = DMG_BULLET;
-
 		TraceResult tr;
-		UTIL_TraceLine(vecShootingSrc, vecShootingSrc + vecDir * 8192, dont_ignore_monsters, ENT(pevAttacker), &tr);
+		UTIL_TraceLine(vecShootingSrc, vecShootingSrc + vecDir * 8192, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 		const Vector vecSrc = tr.vecEndPos;
-
-		const float falloff = flRadius ? flDamage / flRadius : 1;
-		const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-		CBaseEntity* pEntity = NULL;
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-		{
-			if (pEntity->pev->takedamage != DAMAGE_NO)
-			{
-				if (bInWater && !pEntity->pev->waterlevel)
-					continue;
-
-				if (!bInWater && pEntity->pev->waterlevel == 3)
-					continue;
-
-				if (pEntity->IsBSPModel())
-					continue;
-
-				if (pEntity->pev == pevAttacker)
-					continue;
-
-				Vector vecSpot = pEntity->BodyTarget(vecSrc);
-				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-				{
-					if (tr.fStartSolid)
-					{
-						tr.vecEndPos = vecSrc;
-						tr.flFraction = 0;
-					}
-					float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-					flAdjustedDamage = Q_max(0, flAdjustedDamage);
-
-					if (tr.flFraction == 1.0f)
-					{
-						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-					}
-					else
-					{
-						tr.iHitgroup = HITGROUP_CHEST;
-						ClearMultiDamage();
-						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-						ApplyMultiDamage(pevInflictor, pevAttacker);
-					}
-
-					CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-					if (pVictim->m_bIsZombie) // Zombie Knockback...
-					{
-						ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 3000.0f, 700.0f, 1200.0f, 700.0f, 0.4f });
-					}
-				}
-			}
-		}
+		RadiusDamage(*this, vecSrc, m_pPlayer, m_pPlayer);
 
 		int id = m_pPlayer->entindex();
 		
@@ -279,7 +224,7 @@ namespace sv {
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	}
     	
-	float GetExplodeDamage() const
+	float GetRadiusDamageAmount() const
 	{
 		float flDamage = 50.f;
 #ifndef CLIENT_DLL

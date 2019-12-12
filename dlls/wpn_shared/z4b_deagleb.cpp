@@ -30,7 +30,8 @@ namespace cl {
 namespace sv {
 #endif
 
-using namespace WeaponTemplate::Varibles;
+using WeaponTemplate::Varibles::A;
+using WeaponTemplate::Varibles::T;
 
 struct CDeagleShura_WeaponData
 {
@@ -66,7 +67,7 @@ public:
 	static constexpr int DamageZB = 80;
 	static constexpr int DamageZBS = 80;
 	static constexpr float AccuracyDefault = 0.9f;
-	static constexpr const auto & AccuracyCalc = (0.4 - T) * 0.35;
+	static constexpr const auto & AccuracyCalc = A - (0.4 - T) * 0.35;
 	static constexpr float AccuracyMin = 0.0;
 	static constexpr float AccuracyMax = 0.9;
 	static constexpr float RangeModifier = 0.87;

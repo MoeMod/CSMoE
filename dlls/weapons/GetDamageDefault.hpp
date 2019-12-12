@@ -19,47 +19,40 @@ template<class CFinal, class CBase = CBaseTemplateWeapon>
 class TGetDamageDefault : public CBase
 {
 private:
-	template<class ClassToCheck>
-	auto GetDamage_ZB(ClassToCheck *p) -> decltype(ClassToCheck::DamageZB)
+	float GetDamage_ZB()
 	{
-		return static_cast<CFinal &>(*this).DamageZB;
-	}
-	template<class ClassToCheck = CFinal>
-	auto GetDamage_ZB(...) -> decltype(ClassToCheck::DamageDefault)
-	{
-		return static_cast<CFinal &>(*this).DamageDefault;
+		auto &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageZB::Try(data, df::DamageDefault::Get(data));
 	}
 
-	template<class ClassToCheck>
-	auto GetDamage_ZBS(ClassToCheck *p) -> decltype(ClassToCheck::DamageZBS)
+	float GetDamage_ZBS()
 	{
-		return static_cast<CFinal &>(*this).DamageZBS;
+		auto &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageZB::Try(data, df::DamageDefault::Get(data));
 	}
-	template<class ClassToCheck = CFinal>
-	auto GetDamage_ZBS(...) -> decltype(ClassToCheck::DamageDefault)
+
+	float GetDamage_Default()
 	{
-		return static_cast<CFinal &>(*this).DamageDefault;
+		auto &wpn = static_cast<CFinal &>(*this);
+		auto &&data = wpn.WeaponTemplateDataSource();
+		return df::DamageDefault::Get(data);
 	}
 
 public:
 #ifndef CLIENT_DLL
-	template<class ClassToFind = CFinal>
-	auto GetDamage() -> typename std::common_type<
-			decltype(this->GetDamage_ZB(static_cast<ClassToFind *>(this))),
-			decltype(this->GetDamage_ZBS(static_cast<ClassToFind *>(this))) ,
-			decltype(ClassToFind::DamageDefault)
-		>::type
+	float GetDamage()
 	{
-		return	g_pModRunning->DamageTrack() == DT_ZB ? GetDamage_ZB(static_cast<CFinal *>(this)) : (
-			g_pModRunning->DamageTrack() == DT_ZBS ? GetDamage_ZBS(static_cast<CFinal *>(this)) :
-			static_cast<CFinal &>(*this).DamageDefault);
+		return	g_pModRunning->DamageTrack() == DT_ZB ? GetDamage_ZB() : (
+			g_pModRunning->DamageTrack() == DT_ZBS ? GetDamage_ZBS() :
+			GetDamage_Default());
 	}
 
 #else
-	template<class ClassToFind = CFinal>
-	auto GetDamage(void) -> decltype(ClassToFind::DamageDefault)
+	float GetDamage()
 	{
-		return static_cast<CFinal &>(*this).DamageDefault;
+		return GetDamage_Default();
 	}
 #endif
 

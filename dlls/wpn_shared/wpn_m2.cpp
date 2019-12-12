@@ -86,7 +86,7 @@ namespace sv {
 		PRECACHE_SOUND("weapons/m2_foley2.wav");
 		PRECACHE_SOUND("weapons/m2_open.wav");
 
-		m_iShell = PRECACHE_MODEL("models/rshell.mdl");
+		m_iShell = PRECACHE_MODEL("models/shell762_m134.mdl");
 		m_usFireM2 = PRECACHE_EVENT(1, "events/m2.sc");
 	}
 
