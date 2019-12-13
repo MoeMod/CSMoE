@@ -59,7 +59,7 @@ namespace sv {
 		ANIM_SHOOT2,
 		ANIM_SHOOT3
 	};
-    static constexpr float MaxSpeed = 235;
+    static constexpr float PlayerMaxSpeed = 235;
     static constexpr float ArmorRatioModifier = 1.4f;
     static constexpr const auto &SpreadCalcNotOnGround = 0.4*A + 0.035;
     static constexpr const auto &SpreadCalcWalking = 0.025*A + 0.07;

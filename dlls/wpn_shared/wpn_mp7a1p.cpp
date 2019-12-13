@@ -74,7 +74,7 @@ public:
 	static constexpr const char *AnimExtension = "pistol";
 
 	KnockbackData KnockBack = {250.0f, 200.0f, 250.0f, 90.0f, 0.7f};
-	static constexpr float MaxSpeed = 250;
+	static constexpr float PlayerMaxSpeed = 250;
 
 	enum
 	{
