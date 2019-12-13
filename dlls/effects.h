@@ -15,22 +15,21 @@
 #ifndef EFFECTS_H
 #define EFFECTS_H
 
-#define SF_BEAM_STARTON 0x0001
-#define SF_BEAM_TOGGLE 0x0002
-#define SF_BEAM_RANDOM 0x0004
-#define SF_BEAM_RING 0x0008
-#define SF_BEAM_SPARKSTART 0x0010
-#define SF_BEAM_SPARKEND 0x0020
-#define SF_BEAM_DECALS 0x0040
-#define SF_BEAM_SHADEIN 0x0080
-#define SF_BEAM_SHADEOUT 0x0100
-#define SF_BEAM_TEMPORARY 0x8000
-
-#define SF_SPRITE_STARTON 0x0001
-#define SF_SPRITE_ONCE 0x0002
-#define SF_SPRITE_TEMPORARY 0x8000
-
 namespace sv {
+
+constexpr int SF_BEAM_STARTON = 0x0001;
+constexpr int SF_BEAM_TOGGLE = 0x0002;
+constexpr int SF_BEAM_RANDOM = 0x0004;
+constexpr int SF_BEAM_RING = 0x0008;
+constexpr int SF_BEAM_SPARKSTART = 0x0010;
+constexpr int SF_BEAM_SPARKEND = 0x0020;
+constexpr int SF_BEAM_DECALS = 0x0040;
+constexpr int SF_BEAM_SHADEIN = 0x0080;
+constexpr int SF_BEAM_SHADEOUT = 0x0100;
+constexpr int SF_BEAM_TEMPORARY = 0x8000;
+constexpr int SF_SPRITE_STARTON = 0x0001;
+constexpr int SF_SPRITE_ONCE = 0x0002;
+constexpr int SF_SPRITE_TEMPORARY = 0x8000;
 
 class CSprite : public CPointEntity
 {
@@ -203,9 +202,7 @@ public:
 	}
 };
 
-#define SF_MESSAGE_ONCE 0x0001
-#define SF_MESSAGE_ALL 0x0002
-
+constexpr int SF_MESSAGE_ONCE = 0x0001; constexpr int SF_MESSAGE_ALL = 0x0002;
 class CLaser : public CBeam
 {
 public:

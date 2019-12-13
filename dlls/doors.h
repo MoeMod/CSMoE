@@ -36,21 +36,21 @@
 
 namespace sv {
 
-#define DOOR_SENTENCEWAIT        6
-#define DOOR_SOUNDWAIT            3
-#define BUTTON_SOUNDWAIT        0.5
+constexpr auto DOOR_SENTENCEWAIT = 6s;
+constexpr auto DOOR_SOUNDWAIT = 3s;
+constexpr auto BUTTON_SOUNDWAIT = 0.5s;
 
-#define SF_DOOR_ROTATE_Y        0
-#define SF_DOOR_START_OPEN        1
-#define SF_DOOR_ROTATE_BACKWARDS    2
-#define SF_DOOR_PASSABLE        8
-#define SF_DOOR_ONEWAY            16
-#define SF_DOOR_NO_AUTO_RETURN        32
-#define SF_DOOR_ROTATE_Z        64
-#define SF_DOOR_ROTATE_X        128
-#define SF_DOOR_USE_ONLY        256        // door must be opened by player's use button.
-#define SF_DOOR_NOMONSTERS        512        // Monster can't open
-#define SF_DOOR_SILENT            0x80000000
+constexpr int SF_DOOR_ROTATE_Y = 0;
+constexpr int SF_DOOR_START_OPEN = 1;
+constexpr int SF_DOOR_ROTATE_BACKWARDS = 2;
+constexpr int SF_DOOR_PASSABLE = 8;
+constexpr int SF_DOOR_ONEWAY = 16;
+constexpr int SF_DOOR_NO_AUTO_RETURN = 32;
+constexpr int SF_DOOR_ROTATE_Z = 64;
+constexpr int SF_DOOR_ROTATE_X = 128;
+constexpr int SF_DOOR_USE_ONLY = 256;        // door must be opened by player's use button.
+constexpr int SF_DOOR_NOMONSTERS = 512;        // Monster can't open
+constexpr int SF_DOOR_SILENT = 0x80000000;
 
 class CBaseDoor : public CBaseToggle
 {

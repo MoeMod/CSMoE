@@ -13,10 +13,10 @@
 #include "globals.h"
 #include "bmodels.h"
 
-#define SF_GIBSHOOTER_REPEATABLE 1
-#define SF_FUNNEL_REVERSE 1
-
 namespace sv {
+
+constexpr int SF_GIBSHOOTER_REPEATABLE = 1;
+constexpr int SF_FUNNEL_REVERSE = 1;
 
 LINK_ENTITY_TO_CLASS(info_target, CPointEntity);
 
@@ -55,8 +55,7 @@ TYPEDESCRIPTION CBubbling::m_SaveData[] =
 
 IMPLEMENT_SAVERESTORE(CBubbling, CBaseEntity);
 
-#define SF_BUBBLES_STARTOFF 0x0001
-
+constexpr int SF_BUBBLES_STARTOFF = 0x0001;
 void CBubbling::Spawn(void)
 {
 	Precache();
@@ -1559,11 +1558,7 @@ public:
 
 LINK_ENTITY_TO_CLASS(env_blood, CBlood);
 
-#define SF_BLOOD_RANDOM 0x0001
-#define SF_BLOOD_STREAM 0x0002
-#define SF_BLOOD_PLAYER 0x0004
-#define SF_BLOOD_DECAL 0x0008
-
+constexpr int SF_BLOOD_RANDOM = 0x0001; constexpr int SF_BLOOD_STREAM = 0x0002; constexpr int SF_BLOOD_PLAYER = 0x0004; constexpr int SF_BLOOD_DECAL = 0x0008;
 void CBlood::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
@@ -1663,10 +1658,7 @@ public:
 
 LINK_ENTITY_TO_CLASS(env_shake, CShake);
 
-#define SF_SHAKE_EVERYONE 0x0001
-#define SF_SHAKE_DISRUPT 0x0002
-#define SF_SHAKE_INAIR 0x0004
-
+constexpr int SF_SHAKE_EVERYONE = 0x0001; constexpr int SF_SHAKE_DISRUPT = 0x0002; constexpr int SF_SHAKE_INAIR = 0x0004;
 void CShake::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
@@ -1719,10 +1711,7 @@ public:
 
 LINK_ENTITY_TO_CLASS(env_fade, CFade);
 
-#define SF_FADE_IN 0x0001
-#define SF_FADE_MODULATE 0x0002
-#define SF_FADE_ONLYONE 0x0004
-
+constexpr int SF_FADE_IN = 0x0001; constexpr int SF_FADE_MODULATE = 0x0002; constexpr int SF_FADE_ONLYONE = 0x0004;
 void CFade::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
