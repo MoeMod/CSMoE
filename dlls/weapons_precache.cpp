@@ -7,61 +7,31 @@
 #include "weapons_precache.h"
 
 #include "cbase/cbase_memory.h"
+#include "cbase/cbase_typelist.h"
 
 
 // called by worldspawn
 namespace sv {
 
-template<class T>
-void W_PrecacheOther()
+bool Weapons_PrecacheOne(const char *classname)
 {
-	auto pEntity = CreateClassPtr<T>();
-	if (!pEntity)
-	{
-		ALERT(at_console, "NULL Ent (%s) in UTIL_PrecacheOther\n", typeid(T).name());
-		return;
-	}
-
-	pEntity->Precache();
-
-	REMOVE_ENTITY(pEntity->edict());
+	if(!Q_strnicmp(classname, "weapon_", 7) || !Q_strnicmp(classname, "knife_", 6) || !Q_strnicmp(classname, "z4b_", 4))
+		return UTIL_PrecacheOtherWeapon(classname), true;
+	else if(!Q_strnicmp(classname, "ammo_", 5) || !Q_strnicmp(classname, "item_", 5))
+		return UTIL_PrecacheOther(classname), true;
+	return false;
 }
 
-template<class T>
-void PrecacheOtherWeapon()
+bool Weapons_PrecacheOne(const EntityMetaData& md)
 {
-	auto pEntity = CreateClassPtr<T>();
-	if (!pEntity)
-	{
-		ALERT(at_console, "NULL Ent (%s) in UTIL_PrecacheOther\n", typeid(T).name());
-		return;
-	}
+	return Weapons_PrecacheOne(md.ClassName);
+}
 
-	pEntity->Precache();
-
-	if (pEntity != NULL)
-	{
-		ItemInfo II;
-		Q_memset(&II, 0, sizeof(II));
-
-		pEntity->Precache();
-		if (((CBasePlayerItem *)pEntity)->GetItemInfo(&II))
-		{
-			CBasePlayerItem::ItemInfoArray[ II.iId ] = II;
-
-			if (II.pszAmmo1 != NULL && *II.pszAmmo1 != '\0')
-			{
-				AddAmmoNameToAmmoRegistry(II.pszAmmo1);
-			}
-
-			if (II.pszAmmo2 != NULL && *II.pszAmmo2 != '\0')
-			{
-				AddAmmoNameToAmmoRegistry(II.pszAmmo2);
-			}
-		}
-	}
-
-	REMOVE_ENTITY(pEntity->edict());
+template<class...Types>
+std::size_t Weapons_PrecacheAll(TypeList<Types...>)
+{
+	auto il = { Weapons_PrecacheOne(GetEntityMetaDataFor(type_identity<Types>()))... };
+	return std::count(il.begin(), il.end(), true);
 }
 
 void W_Precache()
@@ -71,120 +41,7 @@ void W_Precache()
 	giAmmoIndex = 0;
 
 	// custom items...
-
-	// common world objects
-	UTIL_PrecacheOther("item_suit");
-	UTIL_PrecacheOther("item_battery");
-	UTIL_PrecacheOther("item_antidote");
-	UTIL_PrecacheOther("item_security");
-	UTIL_PrecacheOther("item_longjump");
-	UTIL_PrecacheOther("item_kevlar");
-	UTIL_PrecacheOther("item_assaultsuit");
-	UTIL_PrecacheOther("item_thighpack");
-
-	// awp magnum
-	UTIL_PrecacheOtherWeapon("weapon_awp");
-	UTIL_PrecacheOther("ammo_338magnum");
-
-	UTIL_PrecacheOtherWeapon("weapon_g3sg1");
-	UTIL_PrecacheOtherWeapon("weapon_ak47");
-	UTIL_PrecacheOtherWeapon("weapon_scout");
-	UTIL_PrecacheOther("ammo_762nato");
-
-	// m249
-	UTIL_PrecacheOtherWeapon("weapon_m249");
-	UTIL_PrecacheOther("ammo_556natobox");
-
-	UTIL_PrecacheOtherWeapon("weapon_m4a1");
-	UTIL_PrecacheOtherWeapon("weapon_sg552");
-	UTIL_PrecacheOtherWeapon("weapon_aug");
-	UTIL_PrecacheOtherWeapon("weapon_sg550");
-	UTIL_PrecacheOther("ammo_556nato");
-
-	// shotgun
-	UTIL_PrecacheOtherWeapon("weapon_m3");
-	UTIL_PrecacheOtherWeapon("weapon_xm1014");
-	UTIL_PrecacheOther("ammo_buckshot");
-
-	UTIL_PrecacheOtherWeapon("weapon_usp");
-	UTIL_PrecacheOtherWeapon("weapon_mac10");
-	UTIL_PrecacheOtherWeapon("weapon_ump45");
-	UTIL_PrecacheOther("ammo_45acp");
-
-	UTIL_PrecacheOtherWeapon("weapon_fiveseven");
-	UTIL_PrecacheOtherWeapon("weapon_p90");
-	UTIL_PrecacheOther("ammo_57mm");
-
-	// deagle
-	UTIL_PrecacheOtherWeapon("weapon_deagle");
-	UTIL_PrecacheOther("ammo_50ae");
-
-	// p228
-	UTIL_PrecacheOtherWeapon("weapon_p228");
-	UTIL_PrecacheOther("ammo_357sig");
-
-	// knife
-	UTIL_PrecacheOtherWeapon("weapon_knife");
-
-	UTIL_PrecacheOtherWeapon("weapon_glock18");
-	UTIL_PrecacheOtherWeapon("weapon_mp5navy");
-	UTIL_PrecacheOtherWeapon("weapon_tmp");
-	UTIL_PrecacheOtherWeapon("weapon_elite");
-	UTIL_PrecacheOther("ammo_9mm");
-
-	UTIL_PrecacheOtherWeapon("weapon_flashbang");
-	UTIL_PrecacheOtherWeapon("weapon_hegrenade");
-	UTIL_PrecacheOtherWeapon("weapon_smokegrenade");
-	UTIL_PrecacheOtherWeapon("weapon_c4");
-	UTIL_PrecacheOtherWeapon("weapon_galil");
-	UTIL_PrecacheOtherWeapon("weapon_famas");
-
-	UTIL_PrecacheOtherWeapon("weapon_mp7a1d");
-	UTIL_PrecacheOther("ammo_46mm");
-	UTIL_PrecacheOtherWeapon("weapon_ak47l");
-	UTIL_PrecacheOtherWeapon("weapon_deagled");
-	UTIL_PrecacheOtherWeapon("weapon_wa2000");
-	UTIL_PrecacheOtherWeapon("weapon_m95");
-	UTIL_PrecacheOtherWeapon("weapon_as50");
-	UTIL_PrecacheOther("ammo_50bmg");
-	UTIL_PrecacheOtherWeapon("weapon_kriss");
-	UTIL_PrecacheOtherWeapon("weapon_thompson");
-	UTIL_PrecacheOtherWeapon("weapon_m1887");
-	UTIL_PrecacheOtherWeapon("weapon_tar21");
-	UTIL_PrecacheOtherWeapon("weapon_xm8c");
-	UTIL_PrecacheOtherWeapon("weapon_xm8s");
-	UTIL_PrecacheOtherWeapon("weapon_scarl");
-	UTIL_PrecacheOtherWeapon("weapon_scarh");
-	UTIL_PrecacheOtherWeapon("weapon_m14ebr");
-	UTIL_PrecacheOtherWeapon("weapon_balrog7");
-	UTIL_PrecacheOtherWeapon("weapon_m134");
-	UTIL_PrecacheOtherWeapon("weapon_svdex");
-	UTIL_PrecacheOtherWeapon("weapon_gatling");
-	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
-	UTIL_PrecacheOtherWeapon("weapon_m2");
-	UTIL_PrecacheOtherWeapon("weapon_cannon");
-	UTIL_PrecacheOther("ammo_cannon");
-	UTIL_PrecacheOtherWeapon("weapon_gungnir");
-	UTIL_PrecacheOther("ammo_gungnir");
-	UTIL_PrecacheOtherWeapon("knife_skullaxe");
-	UTIL_PrecacheOtherWeapon("knife_dragonsword");
-	UTIL_PrecacheOtherWeapon("weapon_infinityss");
-	UTIL_PrecacheOtherWeapon("weapon_infinitysb");
-	UTIL_PrecacheOtherWeapon("weapon_infinitysr");
-	UTIL_PrecacheOtherWeapon("weapon_mp7a1c");
-	UTIL_PrecacheOtherWeapon("weapon_mp7a1p");
-	UTIL_PrecacheOtherWeapon("knife_zombi");
-	UTIL_PrecacheOtherWeapon("weapon_infinityex1");
-	UTIL_PrecacheOtherWeapon("weapon_infinityex2");
-	UTIL_PrecacheOtherWeapon("z4b_m134heroi");
-	UTIL_PrecacheOtherWeapon("z4b_deagleb");
-	UTIL_PrecacheOtherWeapon("z4b_xm2010pc");
-	UTIL_PrecacheOtherWeapon("z4b_m4a1razer");
-	UTIL_PrecacheOtherWeapon("z4b_awpnvidia");
-	UTIL_PrecacheOtherWeapon("z4b_dmp7a1x");
-	UTIL_PrecacheOtherWeapon("z4b_m4a1x");
-	UTIL_PrecacheOtherWeapon("z4b_m4a1mw");
-	UTIL_PrecacheOtherWeapon("z4b_ak47x");
+	auto count = Weapons_PrecacheAll(AllEntityTypeList());
 
 	if (g_pGameRules->IsDeathmatch())
 	{
