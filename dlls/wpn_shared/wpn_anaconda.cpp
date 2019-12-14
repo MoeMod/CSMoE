@@ -28,7 +28,8 @@ namespace cl {
 namespace sv {
 #endif
 
-using namespace WeaponTemplate::Varibles;
+using WeaponTemplate::Varibles::A;
+using WeaponTemplate::Varibles::T;
 
 struct CAnaconda_WeaponData
 {
@@ -62,7 +63,7 @@ public:
 	static constexpr int DamageZB = 76;
 	static constexpr int DamageZBS = 76;
 	static constexpr float AccuracyDefault = 0.9f;
-	static constexpr const auto & AccuracyCalc = (0.4 - T) * 0.3;
+	static constexpr const auto & AccuracyCalc = A - (0.4 - T) * 0.3;
 	static constexpr float AccuracyMin = 0.5;
 	static constexpr float AccuracyMax = 0.9;
 	static constexpr float RangeModifier = 0.8;

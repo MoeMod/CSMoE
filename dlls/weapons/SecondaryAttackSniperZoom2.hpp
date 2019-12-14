@@ -15,14 +15,15 @@ class TSecondaryAttackSniperZoom2 : public CBase
 public:
 
 	static constexpr auto Rec_SecondaryAttack_HasZoom = true;
-	int Ref_GetMinZoomFOV() { return static_cast<CFinal &>(*this).ZoomFOV2; }
+	int Ref_GetMinZoomFOV() { return df::ZoomFOV2::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
 
 public:
 	void SecondaryAttack(void) override
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
-		const int fov1 = wpn.ZoomFOV1;
-		const int fov2 = wpn.ZoomFOV2;
+		auto &&data = wpn.WeaponTemplateDataSource();
+		const int fov1 = df::ZoomFOV1::Get(data);
+		const int fov2 = df::ZoomFOV2::Get(data);
 
 		if(CBase::m_pPlayer->m_iFOV == 90)
 			CBase::m_pPlayer->m_iFOV = CBase::m_pPlayer->pev->fov = fov1;

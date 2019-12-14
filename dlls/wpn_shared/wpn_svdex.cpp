@@ -63,7 +63,7 @@ namespace sv {
 
 		KnockbackData GetKnockBackData()
 		{
-			return { 2000.0, 1250.0, 1000.0, 1750.0 };
+			return { 2000.0f, 1250.0f, 1000.0f, 1750.0f, 1.0f };
 		}
 
 		void EXPORT OnTouch(CBaseEntity *pOther)

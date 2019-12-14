@@ -1433,7 +1433,7 @@ extern "C" void DLLEXPORT HUD_PostRunCmd( local_state_t *from, local_state_t *to
 
 // time_point implementation
 namespace moe{
-auto EngineClock::now() -> time_point
+auto EngineClock::now() noexcept -> time_point
 {
 	return gpGlobals->time;
 }

@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "weapons.h"
 
 #include "weapons/WeaponTemplate.hpp"
+#include "weapons/RadiusDamage.hpp"
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -55,7 +56,7 @@ public:
 
 		int id = 0;
 		CBasePlayer* owner = nullptr;
-		if(owner = dynamic_ent_cast<CBasePlayer *>(pev->owner))
+		if((owner = dynamic_ent_cast<CBasePlayer *>(pev->owner)) != nullptr)
 		{
 			id = owner->entindex();
 		}
@@ -139,16 +140,13 @@ public:
 		m_iSprEffect2 = PRECACHE_MODEL("sprites/z4b/ef_xm2010pc.spr");
 	}
 
-	KnockbackData GetKnockBackData()
-	{
-		return { 0.0, 0.0, 0.0, 0.0, 1.0 };
-	}
-
 	void EXPORT OnTouch(CBaseEntity* pOther)
 	{
 		if (TouchEntity(pOther))
 		{
-			RadiusDamage();
+			std::vector<edict_t *> vecEntDamaged;
+			RadiusDamage(*this, pev->origin, this, pev->owner, std::back_inserter(vecEntDamaged));
+			MakeExplosionEffect();
 			Remove();
 		}
 	}
@@ -185,70 +183,8 @@ public:
 		return pOther->IsBSPModel() || pOther->pev->team != m_iTeam;
 	}
 
-	void RadiusDamage()
+	void MakeExplosionEffect()
 	{
-		const float flRadius = m_flExplodeRadius;
-		const float flDamage = m_flExplodeDamage;
-		const Vector vecSrc = pev->origin;
-		entvars_t* const pevAttacker = VARS(pev->owner);
-		entvars_t* const pevInflictor = this->pev;
-		int bitsDamageType = DMG_BULLET;
-
-		TraceResult tr;
-		const float falloff = flRadius ? flDamage / flRadius : 1;
-		const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-		CBaseEntity* pEntity = NULL;
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-		{
-			if (pEntity->pev->takedamage != DAMAGE_NO)
-			{
-				if (bInWater && !pEntity->pev->waterlevel)
-					continue;
-
-				if (!bInWater && pEntity->pev->waterlevel == 3)
-					continue;
-
-				if (pEntity->IsBSPModel())
-					continue;
-
-				if (pEntity->pev == pevAttacker)
-					continue;
-
-				Vector vecSpot = pEntity->BodyTarget(vecSrc);
-				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-				{
-					if (tr.fStartSolid)
-					{
-						tr.vecEndPos = vecSrc;
-						tr.flFraction = 0;
-					}
-					float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
-					flAdjustedDamage = Q_max(0, flAdjustedDamage);
-
-					if (tr.flFraction == 1.0f)
-					{
-						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-					}
-					else
-					{
-						tr.iHitgroup = HITGROUP_CHEST;
-						ClearMultiDamage();
-						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-						ApplyMultiDamage(pevInflictor, pevAttacker);
-					}
-
-					/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-					if (pVictim->m_bIsZombie) // Zombie Knockback...
-					{
-						ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-					}*/
-				}
-			}
-		}
-
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_EXPLODEMODEL);
 		WRITE_COORD(pev->origin.x);
@@ -280,14 +216,11 @@ public:
 		WRITE_BYTE(200);
 		WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES);
 		MESSAGE_END();
-
-		
-		return Remove();
 	}
 
-	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flExplodeRadius, CBasePlayer *player)
+	void Init(Vector vecVelocity, float flTouchDamage, CBasePlayer *player)
 	{
-		std::tie(m_flTouchDamage, m_flExplodeDamage, m_flExplodeRadius, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, flExplodeRadius, player->m_iTeam);
+		std::tie(m_flTouchDamage, m_iTeam) = std::make_tuple(flTouchDamage, player->m_iTeam);
 		pev->velocity = std::move(vecVelocity);
 		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
 		m_vecStartOrigin = pev->origin;
@@ -305,6 +238,21 @@ public:
 	time_point_t m_flReturnTime;
 	Vector m_vecStartOrigin;
 	Vector m_vecStartVelocity;
+
+
+	float GetRadiusDamageAmount() const {
+		float flDamage = 50;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 9.5f;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage *= 5.5f;
+#endif
+		return flDamage;
+	}
+	static constexpr auto RadiusDamageBitsDamageType = DMG_BULLET;
+	static constexpr auto RadiusDamageRadius = 233;
+	const KnockbackData RadiusDamageKnockback = { 0.0, 0.0, 0.0, 0.0, 1.0 };
 
 protected:
 	void Remove()
@@ -441,7 +389,7 @@ namespace sv {
 		CXM2010PC_Crystal* pEnt = static_cast<CXM2010PC_Crystal*>(CBaseEntity::Create("z4b_xm2010pc_crystal", vecSrcA, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{
-			pEnt->Init(gpGlobals->v_forward * 800, GetDamage(), GetExplodeDamage(), 233, m_pPlayer);
+			pEnt->Init(gpGlobals->v_forward * 800, GetDamage(), m_pPlayer);
 		}
 #endif
 		
@@ -470,18 +418,6 @@ namespace sv {
 #endif
 
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
-	}
-
-	float GetExplodeDamage() const
-	{
-		float flDamage = 50;
-#ifndef CLIENT_DLL
-		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 9.5f;
-		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage *= 5.5f;
-#endif
-		return flDamage;
 	}
 };
 LINK_ENTITY_TO_CLASS(z4b_xm2010pc, CXM2010PC)
