@@ -34,7 +34,7 @@ public:
 			void(); // do nothing
 		else if (PrimaryAttackImpl_Ducking(df::SpreadCalcDucking::Has(data)))
 			void(); // do nothing
-		else if (PrimaryAttackImpl_Zoomed(df::SpreadCalcZoomed::Has(data), df::CycleTimeZoomed::Has(data)), &wpn)
+		else if (PrimaryAttackImpl_Zoomed(df::SpreadCalcZoomed::Has(data), df::CycleTimeZoomed::Has(data)))
 			void(); // do nothing
 		else
 			wpn.Fire(df::SpreadCalcDefault::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
@@ -77,8 +77,7 @@ private:
 
 	// sfinae query for whether the weapon has/is zoom.
 	static constexpr bool PrimaryAttackImpl_Zoomed(...) { return false; }
-	template<class ClassToFind = CFinal>
-	auto PrimaryAttackImpl_Zoomed(std::true_type, std::true_type, ClassToFind *) -> decltype(&ClassToFind::CycleTimeZoomed, bool())
+	bool PrimaryAttackImpl_Zoomed(std::true_type, std::true_type)
 	{
 		CFinal &wpn = static_cast<CFinal &>(*this);
 		auto &&data = wpn.WeaponTemplateDataSource();
