@@ -30,7 +30,7 @@ public:
 
 		if (!FBitSet(CBase::m_pPlayer->pev->flags, FL_ONGROUND))
 			wpn.Fire(df::SpreadCalcNotOnGround::Get(data)(A = CBase::m_flAccuracy), df::CycleTime::Get(data), FALSE);
-		else if (PrimaryAttackImpl_Walking(df::SpreadCalcWalking::Has(data) && df::PrimaryAttackWalkingMiniumSpeed::Has(data)))
+		else if (PrimaryAttackImpl_Walking(df::SpreadCalcWalking::Has(data), df::PrimaryAttackWalkingMiniumSpeed::Has(data)))
 			void(); // do nothing
 		else if (PrimaryAttackImpl_Ducking(df::SpreadCalcDucking::Has(data)))
 			void(); // do nothing
