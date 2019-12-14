@@ -34,13 +34,13 @@
 
 namespace sv {
 
-#define SF_TANK_ACTIVE            0x0001
-#define SF_TANK_PLAYER            0x0002
-#define SF_TANK_HUMANS            0x0004
-#define SF_TANK_ALIENS            0x0008
-#define SF_TANK_LINEOFSIGHT        0x0010
-#define SF_TANK_CANCONTROL        0x0020
-#define SF_TANK_SOUNDON            0x8000
+constexpr int SF_TANK_ACTIVE = 0x0001;
+constexpr int SF_TANK_PLAYER = 0x0002;
+constexpr int SF_TANK_HUMANS = 0x0004;
+constexpr int SF_TANK_ALIENS = 0x0008;
+constexpr int SF_TANK_LINEOFSIGHT = 0x0010;
+constexpr int SF_TANK_CANCONTROL = 0x0020;
+constexpr int SF_TANK_SOUNDON = 0x8000;
 
 enum TANKBULLET
 {

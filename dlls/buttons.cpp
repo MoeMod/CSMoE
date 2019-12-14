@@ -9,12 +9,12 @@
 namespace sv {
 
 
-#define SF_BUTTON_DONTMOVE 1
-#define SF_ROTBUTTON_NOTSOLID 1
-#define SF_BUTTON_TOGGLE 32
-#define SF_BUTTON_SPARK_IF_OFF 64
-#define SF_BUTTON_TOUCH_ONLY 256
-#define SF_GLOBAL_SET 1
+constexpr int SF_BUTTON_DONTMOVE = 1;
+constexpr int SF_ROTBUTTON_NOTSOLID = 1;
+constexpr int SF_BUTTON_TOGGLE = 32;
+constexpr int SF_BUTTON_SPARK_IF_OFF = 64;
+constexpr int SF_BUTTON_TOUCH_ONLY = 256;
+constexpr int SF_GLOBAL_SET = 1;
 
 class CEnvGlobal : public CPointEntity
 {
@@ -128,8 +128,7 @@ void CMultiSource::KeyValue(KeyValueData *pkvd)
 		CPointEntity::KeyValue(pkvd);
 }
 
-#define SF_MULTI_INIT 1
-
+constexpr int SF_MULTI_INIT = 1;
 void CMultiSource::Spawn(void)
 {
 	pev->solid = SOLID_NOT;
@@ -729,8 +728,7 @@ void CRotButton::Spawn(void)
 		SetTouch(&CBaseButton::ButtonTouch);
 }
 
-#define SF_MOMENTARY_DOOR 0x0001
-
+constexpr int SF_MOMENTARY_DOOR = 0x0001;
 class CMomentaryRotButton : public CBaseToggle
 {
 public:
@@ -1055,9 +1053,7 @@ void EXPORT CEnvSpark::SparkStop(CBaseEntity *pActivator, CBaseEntity *pCaller, 
 	SetThink(NULL);
 }
 
-#define SF_BTARGET_USE 0x0001
-#define SF_BTARGET_ON 0x0002
-
+constexpr int SF_BTARGET_USE = 0x0001; constexpr int SF_BTARGET_ON = 0x0002;
 class CButtonTarget : public CBaseEntity
 {
 public:

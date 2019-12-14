@@ -48,3 +48,4 @@ constexpr DamageType_t DMG_SLOWFREEZE = (1 << 22);		// in a subzero freezer
 constexpr DamageType_t DMG_MORTAR = (1 << 23);			// Hit by air raid (done to distinguish grenade from mortar)
 constexpr DamageType_t DMG_EXPLOSION = (1 << 24);
 
+constexpr int WEAPON_IS_ONTARGET = 0x40;
