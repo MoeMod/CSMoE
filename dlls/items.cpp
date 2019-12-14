@@ -14,6 +14,8 @@
 
 namespace sv {
 
+constexpr float MAX_NORMAL_BATTERY = 100.0f;
+
 LINK_ENTITY_TO_CLASS(world_items, CWorldItem);
 
 void CWorldItem::KeyValue(KeyValueData *pkvd)

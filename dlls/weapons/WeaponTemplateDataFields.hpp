@@ -43,7 +43,7 @@ DF_GENERATE_TEMPLATE_GETTER(DamageZBS) // TGetDamageDefault
 DF_GENERATE_TEMPLATE_GETTER(RangeModifier) // TFirePistol TFireRifle
 DF_GENERATE_TEMPLATE_GETTER(BulletType) // TFirePistol TFireRifle
 DF_GENERATE_TEMPLATE_GETTER(ItemSlot) // TFirePistol TFireRifle TGeneralData
-DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(MaxSpeed, 250) // TGeneralData
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(PlayerMaxSpeed, 250) // TGeneralData
 DF_GENERATE_TEMPLATE_GETTER(KnockBack) // TGeneralData
 DF_GENERATE_TEMPLATE_GETTER(ClassName) // TGeneralData TGetItemInfoDefault
 DF_GENERATE_TEMPLATE_GETTER(WeaponId) // TGeneralData TGetItemInfoDefault

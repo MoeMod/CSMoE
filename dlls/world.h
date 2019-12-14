@@ -34,8 +34,7 @@
 
 namespace sv {
 
-#define SF_DECAL_NOTINDEATHMATCH    2048
-
+constexpr int SF_DECAL_NOTINDEATHMATCH = 2048;
 class CWorld : public CBaseEntity
 {
 public:

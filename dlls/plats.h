@@ -32,21 +32,20 @@
 #pragma once
 #endif
 
-#define SF_PLAT_TOGGLE		0x0001
-
 #define TRAIN_STARTPITCH	60
 #define TRAIN_MAXPITCH		200
 #define TRAIN_MAXSPEED		1000
 
-#define SF_TRACK_ACTIVATETRAIN	0x00000001
-#define SF_TRACK_RELINK		0x00000002
-#define SF_TRACK_ROTMOVE	0x00000004
-#define SF_TRACK_STARTBOTTOM	0x00000008
-#define SF_TRACK_DONT_MOVE	0x00000010
-
 #define FGUNTARGET_START_ON	0x0001
 
 namespace sv {
+
+constexpr int SF_PLAT_TOGGLE = 0x0001;
+constexpr int SF_TRACK_ACTIVATETRAIN = 0x00000001;
+constexpr int SF_TRACK_RELINK = 0x00000002;
+constexpr int SF_TRACK_ROTMOVE = 0x00000004;
+constexpr int SF_TRACK_STARTBOTTOM = 0x00000008;
+constexpr int SF_TRACK_DONT_MOVE = 0x00000010;
 
 class CBasePlatTrain: public CBaseToggle
 {

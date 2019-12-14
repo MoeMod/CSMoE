@@ -52,9 +52,9 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 	duration_t flsoundwait;
 
 	if (fbutton)
-		flsoundwait = BUTTON_SOUNDWAIT * 1s;
+		flsoundwait = BUTTON_SOUNDWAIT;
 	else
-		flsoundwait = DOOR_SOUNDWAIT * 1s;
+		flsoundwait = DOOR_SOUNDWAIT;
 
 	if (flocked) {
 		int fplaysound = (pls->sLockedSound && gpGlobals->time > pls->flwaitSound);
@@ -84,7 +84,7 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 
 			// make sure we don't keep calling last sentence in list
 			pls->bEOFLocked = (iprev == pls->iLockedSentence);
-			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT * 1s;
+			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT;
 		}
 	} else {
 		// UNLOCKED SOUND
@@ -115,7 +115,7 @@ void PlayLockSounds(entvars_t *pev, locksound_t *pls, int flocked, int fbutton)
 
 			// make sure we don't keep calling last sentence in list
 			pls->bEOFUnlocked = (iprev == pls->iUnlockedSentence);
-			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT * 1s;
+			pls->flwaitSentence = gpGlobals->time + DOOR_SENTENCEWAIT;
 		}
 	}
 }

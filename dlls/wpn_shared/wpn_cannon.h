@@ -52,7 +52,7 @@ public:
 	};
 
 	static constexpr int MaxClip = -1;
-	static constexpr float MaxSpeed = 230;
+	static constexpr float PlayerMaxSpeed = 230;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 
 	KnockbackData KnockBack = { 1100.f, 500.f, 700.f, 400.f, 0.9f };

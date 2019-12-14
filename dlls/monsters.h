@@ -31,18 +31,18 @@ typedef enum
 }
 HitBoxGroup;
 
-#define SF_MONSTER_WAIT_TILL_SEEN 1
-#define SF_MONSTER_GAG 2
-#define SF_MONSTER_HITMONSTERCLIP 4
-#define SF_MONSTER_PRISONER 16
-#define SF_MONSTER_WAIT_FOR_SCRIPT 128
-#define SF_MONSTER_PREDISASTER 256
-#define SF_MONSTER_FADECORPSE 512
-#define SF_MONSTER_FALL_TO_GROUND 0x80000000
-#define SF_MONSTER_TURRET_AUTOACTIVATE 32
-#define SF_MONSTER_TURRET_STARTINACTIVE 64
-
 namespace sv {
+
+constexpr int SF_MONSTER_WAIT_TILL_SEEN = 1;
+constexpr int SF_MONSTER_GAG = 2;
+constexpr int SF_MONSTER_HITMONSTERCLIP = 4;
+constexpr int SF_MONSTER_PRISONER = 16;
+constexpr int SF_MONSTER_WAIT_FOR_SCRIPT = 128;
+constexpr int SF_MONSTER_PREDISASTER = 256;
+constexpr int SF_MONSTER_FADECORPSE = 512;
+constexpr int SF_MONSTER_FALL_TO_GROUND = 0x80000000;
+constexpr int SF_MONSTER_TURRET_AUTOACTIVATE = 32;
+constexpr int SF_MONSTER_TURRET_STARTINACTIVE = 64;
 
 extern void UTIL_MoveToOrigin(edict_t *pent, const Vector &vecGoal, float flDist, int iMoveType);
 Vector VecCheckToss(entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float flGravityAdj = 1);

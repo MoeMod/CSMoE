@@ -40,37 +40,34 @@
 #define MAX_ITEM_COUNTS				32
 #define MAX_ENTITY				512	// We can only ever move 512 entities across a transition
 
-// triggers
-#define	SF_TRIGGER_ALLOWMONSTERS		1	// monsters allowed to fire this trigger
-#define	SF_TRIGGER_NOCLIENTS			2	// players not allowed to fire this trigger
-#define SF_TRIGGER_PUSHABLES			4	// only pushables can fire this trigger
-
-#define	SF_TRIGGER_PUSH_START_OFF		2	// spawnflag that makes trigger_push spawn turned OFF
-#define SF_TRIGGER_HURT_TARGETONCE		1	// Only fire hurt target once
-#define	SF_TRIGGER_HURT_START_OFF		2	// spawnflag that makes trigger_push spawn turned OFF
-#define	SF_TRIGGER_HURT_NO_CLIENTS		8	// spawnflag that makes trigger_push spawn turned OFF
-#define SF_TRIGGER_HURT_CLIENTONLYFIRE		16	// trigger hurt will only fire its target if it is hurting a client
-#define SF_TRIGGER_HURT_CLIENTONLYTOUCH		32	// only clients may touch this trigger.
-
-#define SF_AUTO_FIREONCE			0x0001
-#define SF_RELAY_FIREONCE			0x0001
-#define SF_ENDSECTION_USEONLY			0x0001
-
-#define SF_MULTIMAN_CLONE			0x80000000
-#define SF_MULTIMAN_THREAD			0x00000001
-
-#define SF_CHANGELEVEL_USEONLY			0x0002
-#define SF_CAMERA_PLAYER_POSITION		1
-#define SF_CAMERA_PLAYER_TARGET			2
-#define SF_CAMERA_PLAYER_TAKECONTROL		4
-
-// Flags to indicate masking off various render parameters that are normally copied to the targets
-#define SF_RENDER_MASKFX	(1 << 0)
-#define SF_RENDER_MASKAMT	(1 << 1)
-#define SF_RENDER_MASKMODE	(1 << 2)
-#define SF_RENDER_MASKCOLOR	(1 << 3)
-
 namespace sv {
+
+// triggers
+constexpr int SF_TRIGGER_ALLOWMONSTERS = 1; // monsters allowed to fire this trigger
+constexpr int SF_TRIGGER_NOCLIENTS = 2; // players not allowed to fire this trigger
+constexpr int SF_TRIGGER_PUSHABLES = 4; // only pushables can fire this trigger
+
+constexpr int SF_TRIGGER_PUSH_START_OFF = 2; // spawnflag that makes trigger_push spawn turned OFF
+constexpr int SF_TRIGGER_HURT_TARGETONCE = 1; // Only fire hurt target once
+constexpr int SF_TRIGGER_HURT_START_OFF = 2; // spawnflag that makes trigger_push spawn turned OFF
+constexpr int SF_TRIGGER_HURT_NO_CLIENTS = 8; // spawnflag that makes trigger_push spawn turned OFF
+constexpr int SF_TRIGGER_HURT_CLIENTONLYFIRE = 16; // trigger hurt will only fire its target if it is hurting a client
+constexpr int SF_TRIGGER_HURT_CLIENTONLYTOUCH = 32; // only clients may touch this trigger.
+
+constexpr int SF_AUTO_FIREONCE = 0x0001;
+constexpr int SF_RELAY_FIREONCE = 0x0001;
+constexpr int SF_ENDSECTION_USEONLY = 0x0001;
+constexpr int SF_MULTIMAN_CLONE = 0x80000000;
+constexpr int SF_MULTIMAN_THREAD = 0x00000001;
+constexpr int SF_CHANGELEVEL_USEONLY = 0x0002;
+constexpr int SF_CAMERA_PLAYER_POSITION = 1;
+constexpr int SF_CAMERA_PLAYER_TARGET = 2;
+constexpr int SF_CAMERA_PLAYER_TAKECONTROL = 4;
+// Flags to indicate masking off various render parameters that are normally copied to the targets
+constexpr int SF_RENDER_MASKFX = (1 << 0);
+constexpr int SF_RENDER_MASKAMT = (1 << 1);
+constexpr int SF_RENDER_MASKMODE = (1 << 2);
+constexpr int SF_RENDER_MASKCOLOR = (1 << 3);
 
 class CClientFog : public CBaseEntity
 {

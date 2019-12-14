@@ -64,7 +64,7 @@ namespace sv {
     static constexpr auto ANIM_IDLE1 = M249_IDLE1,
             ANIM_RELOAD = M249_RELOAD,
             ANIM_DRAW = M249_DRAW;
-    static constexpr float MaxSpeed = 230;
+    static constexpr float PlayerMaxSpeed = 230;
     static constexpr float ArmorRatioModifier = 0.25f;
     static constexpr const auto &SpreadCalcNotOnGround = 0.05*A + 0.05;
     static constexpr const auto &SpreadCalcWalking = 0.042*A + 0.02;
