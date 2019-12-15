@@ -185,6 +185,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m134.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134ex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m2.cpp" />
@@ -192,9 +194,11 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m4a1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
@@ -448,6 +452,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m134.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134ex.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m2.h" />
@@ -455,8 +461,10 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
