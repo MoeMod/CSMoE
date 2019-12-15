@@ -210,7 +210,7 @@ void CM134ex::ItemPostFrame()
 			}
 		}
 
-		if ((m_iM134State == WPNSTATE_M134_SPINNING || m_iM134State == WPNSTATE_M134_SPIN_UP) && m_flNextPrimaryAttack <= 0.0s)
+		else if ((m_iM134State == WPNSTATE_M134_SPINNING || m_iM134State == WPNSTATE_M134_SPIN_UP) && m_flNextPrimaryAttack <= 0.0s)
 		{
 			if (m_pPlayer->pev->weaponanim != M134_FIRE_LOOP)
 			{

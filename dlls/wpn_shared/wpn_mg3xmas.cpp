@@ -18,7 +18,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_mg3.h"
+#include "wpn_mg3xmas.h"
 
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -39,17 +39,17 @@ enum m249_e
 	M249_DRAW
 };
 
-LINK_ENTITY_TO_CLASS(weapon_mg3, CMG3)
+LINK_ENTITY_TO_CLASS(weapon_mg3xmas, CMG3xmas)
 
 static const int MG3_AMMO_GIVE = 200;
 
-void CMG3::Spawn(void)
+void CMG3xmas::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_mg3");
+	pev->classname = MAKE_STRING("weapon_mg3xmas");
 
 	Precache();
 	m_iId = WEAPON_P90;
-	SET_MODEL(ENT(pev), "models/w_mg3.mdl");
+	SET_MODEL(ENT(pev), "models/w_mg3xmas.mdl");
 
 	m_iDefaultAmmo = MG3_AMMO_GIVE;
 	m_flAccuracy = 0.2;
@@ -58,11 +58,11 @@ void CMG3::Spawn(void)
 	FallInit();
 }
 
-void CMG3::Precache(void)
+void CMG3xmas::Precache(void)
 {
-	PRECACHE_MODEL("models/v_mg3.mdl");
-	PRECACHE_MODEL("models/w_mg3.mdl");
-	PRECACHE_MODEL("models/p_mg3.mdl");
+	PRECACHE_MODEL("models/v_mg3xmas.mdl");
+	PRECACHE_MODEL("models/w_mg3xmas.mdl");
+	PRECACHE_MODEL("models/p_mg3xmas.mdl");
 	PRECACHE_SOUND("weapons/mg3-1.wav");
 	PRECACHE_SOUND("weapons/mg3-2.wav");
 	PRECACHE_SOUND("weapons/mg3_clipout.wav");
@@ -72,10 +72,10 @@ void CMG3::Precache(void)
 	PRECACHE_SOUND("weapons/mg3_close.wav");
 
 	m_iShell = PRECACHE_MODEL("models/pshell.mdl");
-	m_usFireMG3 = PRECACHE_EVENT(1, "events/mg3.sc");
+	m_usFireMG3xmas = PRECACHE_EVENT(1, "events/mg3xmas.sc");
 }
 
-int CMG3::GetItemInfo(ItemInfo *p)
+int CMG3xmas::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556NatoBox";
@@ -92,24 +92,24 @@ int CMG3::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-BOOL CMG3::Deploy(void)
+BOOL CMG3xmas::Deploy(void)
 {
 	iShellOn = 1;
 
-	return DefaultDeploy("models/v_mg3.mdl", "models/p_mg3.mdl", M249_DRAW, "m249", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_mg3xmas.mdl", "models/p_mg3xmas.mdl", M249_DRAW, "m249", UseDecrement() != FALSE);
 }
 
-void CMG3::PrimaryAttack(void)
+void CMG3xmas::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MG3Fire(0.045 + (0.5) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire(0.045 + (0.5) * m_flAccuracy, 0.095s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		MG3Fire(0.045 + (0.095) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire(0.045 + (0.095) * m_flAccuracy, 0.095s, FALSE);
 	else
-		MG3Fire((0.03) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire((0.03) * m_flAccuracy, 0.095s, FALSE);
 }
 
-void CMG3::MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+void CMG3xmas::MG3xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -150,7 +150,7 @@ void CMG3::MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireMG3, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireMG3xmas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
@@ -169,7 +169,7 @@ void CMG3::MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		KickBack(0.4, 0.15, 0.525, 0.015, 2.5, 0.5, 3);
 }
 
-void CMG3::Reload(void)
+void CMG3xmas::Reload(void)
 {
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
@@ -185,7 +185,7 @@ void CMG3::Reload(void)
 	}
 }
 
-void CMG3::WeaponIdle(void)
+void CMG3xmas::WeaponIdle(void)
 {
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -197,7 +197,7 @@ void CMG3::WeaponIdle(void)
 	SendWeaponAnim(M249_IDLE1, UseDecrement() != FALSE);
 }
 
-float CMG3::GetDamage() const
+float CMG3xmas::GetDamage() const
 {
 	float flDamage = 33.0f;
 #ifndef CLIENT_DLL
