@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" IgnorableNamespaces="uap mp rescap">
-  <Identity Name="CSMoE-UWP" Publisher="CN=MoeMod" Version="1.0.0.0" />
+  <Identity Name="14205NekoMeow.CSMoE" Publisher="CN=704A0E16-E2D4-4E23-8129-762EE5B83320" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="22dd433e-6da9-4561-9b90-214b1cfe902e" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>CSMoE-UWP</DisplayName>
-    <PublisherDisplayName>Xiaobaibai</PublisherDisplayName>
+    <DisplayName>CSMoE</DisplayName>
+    <PublisherDisplayName>NekoMeow</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
