@@ -792,6 +792,9 @@
     <ClCompile Include="..\cl_dll\events\event_mg3xmas.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\stdafx.cpp">
+      <Filter>cl_dll</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -1198,6 +1201,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\stdafx.h">
+      <Filter>cl_dll</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

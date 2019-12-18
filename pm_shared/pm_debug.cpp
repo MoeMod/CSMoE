@@ -87,10 +87,11 @@ void PM_ShowClipBox( void )
 	}
 
 	// Show our BBOX in particles.
+/*
 	PM_DrawBBox( pmove->player_mins[pmove->usehull], pmove->player_maxs[pmove->usehull], org, pmove->server ? 132 : 0, 0.1 );
 
 	PM_ParticleLine( org, org, pmove->server ? 132 : 0, 0.1, 5.0 );
-/*
+
 	{
 		int i;
 		for ( i = 0; i < pmove->numphysent; i++ )
