@@ -63,6 +63,8 @@
     <ClCompile Include="..\cl_dll\events\event_knife.cpp" />
     <ClCompile Include="..\cl_dll\events\event_kriss.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m134.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m134ex.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m134xmas.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m14ebr.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m1887.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m2.cpp" />
@@ -73,9 +75,11 @@
     <ClCompile Include="..\cl_dll\events\event_m4a1razer.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m4a1x.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_m95xmas.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg3.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg36.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_mg3xmas.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp5n.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp" />
@@ -159,6 +163,12 @@
     <ClCompile Include="..\cl_dll\parsemsg.cpp" />
     <ClCompile Include="..\cl_dll\rain.cpp" />
     <ClCompile Include="..\cl_dll\r_texture.cpp" />
+    <ClCompile Include="..\cl_dll\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\cl_dll\studio\GameStudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\StudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\studio_util.cpp" />
@@ -199,6 +209,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m134.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134ex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m2.cpp" />
@@ -206,9 +218,11 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m4a1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
@@ -300,6 +314,7 @@
     <ClInclude Include="..\cl_dll\parsemsg.h" />
     <ClInclude Include="..\cl_dll\rain.h" />
     <ClInclude Include="..\cl_dll\r_texture.h" />
+    <ClInclude Include="..\cl_dll\stdafx.h" />
     <ClInclude Include="..\cl_dll\studio\GameStudioModelRenderer.h" />
     <ClInclude Include="..\cl_dll\studio\StudioModelRenderer.h" />
     <ClInclude Include="..\cl_dll\studio\studio_util.h" />
@@ -341,6 +356,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m134.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134ex.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m2.h" />
@@ -348,8 +365,10 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
@@ -472,8 +491,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -482,6 +500,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -498,8 +518,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -508,6 +527,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -525,8 +546,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -536,6 +556,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -555,8 +577,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -566,6 +587,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

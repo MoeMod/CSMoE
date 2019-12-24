@@ -18,7 +18,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_m134.h"
+#include "wpn_m134ex.h"
 
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m134_e
+enum m134ex_e
 {
 	M134_IDLE1,
 	M134_DRAW,
@@ -43,15 +43,15 @@ enum m134_e
 	M134_FIRE_LOOP,
 };
 
-LINK_ENTITY_TO_CLASS(weapon_m134, CM134)
+LINK_ENTITY_TO_CLASS(weapon_m134ex, CM134ex)
 
-void CM134::Spawn(void)
+void CM134ex::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_m134");
+	pev->classname = MAKE_STRING("weapon_m134ex");
 
 	Precache();
 	m_iId = WEAPON_M249;
-	SET_MODEL(ENT(pev), "models/w_m134.mdl");
+	SET_MODEL(ENT(pev), "models/w_m134ex.mdl");
 
 	m_iDefaultAmmo = M134_DEFAULT_GIVE;
 	m_flAccuracy = 0.0;
@@ -60,14 +60,13 @@ void CM134::Spawn(void)
 	FallInit();
 }
 
-void CM134::Precache(void)
+void CM134ex::Precache(void)
 {
-	PRECACHE_MODEL("models/v_m134.mdl");
-	PRECACHE_MODEL("models/w_m134.mdl");
-	PRECACHE_MODEL("models/p_m134.mdl");
+	PRECACHE_MODEL("models/v_m134ex.mdl");
+	PRECACHE_MODEL("models/w_m134ex.mdl");
+	PRECACHE_MODEL("models/p_m134ex.mdl");
 
-	PRECACHE_SOUND("weapons/m134-1.wav");
-	PRECACHE_SOUND("weapons/m134-2.wav");
+	PRECACHE_SOUND("weapons/m134ex-1.wav");
 	PRECACHE_SOUND("weapons/m134_boxout.wav");
 	PRECACHE_SOUND("weapons/m134_boxin.wav");
 	PRECACHE_SOUND("weapons/m134_chain.wav");
@@ -78,13 +77,14 @@ void CM134::Precache(void)
 	PRECACHE_SOUND("weapons/m134_spindown.wav");
 	PRECACHE_SOUND("weapons/m134_spinup.wav");
 	PRECACHE_SOUND("weapons/m134_pinpull.wav");
+	PRECACHE_SOUND("weapons/m134ex_spin.wav");
 
 	PRECACHE_MODEL("models/shell762_m134.mdl");
 	PRECACHE_MODEL("models/shell762_m134_01.mdl");
-	m_usFireM134 = PRECACHE_EVENT(1, "events/m134.sc");
+	m_usFireM134ex = PRECACHE_EVENT(1, "events/m134ex.sc");
 }
 
-int CM134::GetItemInfo(ItemInfo *p)
+int CM134ex::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556NatoBox";
@@ -101,31 +101,29 @@ int CM134::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-BOOL CM134::Deploy(void)
+BOOL CM134ex::Deploy(void)
 {
 	m_flAccuracy = 0.0;
 	m_iShotsFired = 0;
 	iShellOn = 1;
 	m_iWeaponState = WPNSTATE_M134_IDLE;
 
-	return DefaultDeploy("models/v_m134.mdl", "models/p_m134.mdl", M134_DRAW, "m134", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_m134ex.mdl", "models/p_m134ex.mdl", M134_DRAW, "m134ex", UseDecrement() != FALSE);
 }
 
-void CM134::PrimaryAttack(void)
+void CM134ex::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		M134Fire(0.065 + (0.75) * m_flAccuracy, 0.06155s, FALSE);
+		M134exFire(0.065 + (0.75) * m_flAccuracy, 0.06155s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		M134Fire(0.045 + (0.095) * m_flAccuracy, 0.06155s, FALSE);
+		M134exFire(0.045 + (0.095) * m_flAccuracy, 0.06155s, FALSE);
 	else
-		M134Fire((0.04) * m_flAccuracy, 0.06155s, FALSE);
+		M134exFire((0.04) * m_flAccuracy, 0.06155s, FALSE);
 }
 
-void CM134::ItemPostFrame()
+void CM134ex::ItemPostFrame()
 {
-	m_iButton = m_pPlayer->pev->button;
-
-	if (m_iButton & IN_ATTACK)
+	if (m_pPlayer->pev->button & IN_ATTACK)
 	{
 		if (!m_iClip && m_iM134State == WPNSTATE_M134_SPINNING)
 		{
@@ -134,7 +132,7 @@ void CM134::ItemPostFrame()
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iM134State = WPNSTATE_M134_IDLE;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+			m_pPlayer->pev->button &= ~IN_ATTACK;
 		}
 		if (m_iM134State == WPNSTATE_M134_IDLE)
 		{
@@ -143,10 +141,10 @@ void CM134::ItemPostFrame()
 				SendWeaponAnim(M134_FIRE_READY, UseDecrement() != FALSE);
 				EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/m134_spinup.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				m_pPlayer->pev->maxspeed = M134_FIRE_MAX_SPEED;
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.06s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.06s;
 				m_iM134State = WPNSTATE_M134_SPIN_UP;
-				m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+				m_pPlayer->pev->button &= ~IN_ATTACK;
 			}
 		}
 
@@ -164,10 +162,10 @@ void CM134::ItemPostFrame()
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iM134State = WPNSTATE_M134_SPIN_UP;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+			m_pPlayer->pev->button &= ~IN_ATTACK;
 		}
 	}
-	else if(!(m_iButton & IN_ATTACK2))
+	else if(!(m_pPlayer->pev->button & IN_ATTACK2))
 	{
 		if (m_iM134State == WPNSTATE_M134_SPIN_UP)
 		{
@@ -177,7 +175,7 @@ void CM134::ItemPostFrame()
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 			m_iM134State = WPNSTATE_M134_IDLE;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+			m_pPlayer->pev->button &= ~IN_ATTACK;
 		}
 
 		if (m_iM134State == WPNSTATE_M134_SPINNING)
@@ -187,20 +185,47 @@ void CM134::ItemPostFrame()
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iM134State = WPNSTATE_M134_SPIN_DOWN;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+			m_pPlayer->pev->button &= ~IN_ATTACK;
 		}
 
 		if (m_iM134State == WPNSTATE_M134_SPIN_DOWN && m_flNextPrimaryAttack <= 0.0s)
 		{
 			m_pPlayer->pev->maxspeed = M134_MAX_SPEED;
 			m_iM134State = WPNSTATE_M134_IDLE;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
+			m_pPlayer->pev->button &= ~IN_ATTACK;
+		}
+	}
+	if (m_pPlayer->pev->button & IN_ATTACK2 && m_iClip)
+	{
+		if (m_iM134State == WPNSTATE_M134_IDLE)
+		{
+			if (m_flNextPrimaryAttack <= 0.0s)
+			{
+				SendWeaponAnim(M134_FIRE_READY, UseDecrement() != FALSE);
+				m_pPlayer->pev->maxspeed = M134_FIRE_MAX_SPEED;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60.0s;
+				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.8s;
+				m_iM134State = WPNSTATE_M134_SPIN_UP;
+				m_pPlayer->pev->button &= ~IN_ATTACK2;
+			}
+		}
+
+		else if ((m_iM134State == WPNSTATE_M134_SPINNING || m_iM134State == WPNSTATE_M134_SPIN_UP) && m_flNextPrimaryAttack <= 0.0s)
+		{
+			if (m_pPlayer->pev->weaponanim != M134_FIRE_LOOP)
+			{
+				SendWeaponAnim(M134_FIRE_LOOP, UseDecrement() != FALSE);
+			}
+			m_pPlayer->pev->maxspeed = M134_FIRE_MAX_SPEED;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60.0s;
+			m_iM134State = WPNSTATE_M134_SPIN_UP;
+			m_pPlayer->pev->button &= ~IN_ATTACK2;
 		}
 	}
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
-void CM134::M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+void CM134ex::M134exFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -241,7 +266,7 @@ void CM134::M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM134, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireM134ex, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
@@ -260,7 +285,7 @@ void CM134::M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		KickBack(0.025, 0.025, 0.045, 0.015, 2.55, 1.15, 1);
 }
 
-void CM134::Reload(void)
+void CM134ex::Reload(void)
 {
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
@@ -276,7 +301,7 @@ void CM134::Reload(void)
 	}
 }
 
-void CM134::WeaponIdle(void)
+void CM134ex::WeaponIdle(void)
 {
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -287,7 +312,7 @@ void CM134::WeaponIdle(void)
 	SendWeaponAnim(M134_IDLE1, UseDecrement() != FALSE);
 }
 
-float CM134::GetDamage() const
+float CM134ex::GetDamage() const
 {
 	float flDamage = 37.0f;
 #ifndef CLIENT_DLL

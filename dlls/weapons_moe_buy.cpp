@@ -51,11 +51,12 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_mp7a1c",      "MP7A1",                 2150, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
                                                   {"weapon_m14ebr",      "M14 EBR",               3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-												  { "weapon_balrog7",      "Balrog7",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
-												  { "weapon_starchaserar",      "Starchaserar",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_balrog7",      "BALROG-VII",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_starchaserar",      "Star Chaser AR",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 												  { "weapon_m2",      "M2",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
-												  { "weapon_m134",      "M134",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
-												  { "weapon_gatling",      "Gatling",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_m134",      "M134 Minigun",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_m134ex",      "M134 Predator",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_gatling",      "Volcano",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
                                                   {"weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_tar21",       "TAR-21",                3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -66,9 +67,12 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_as50",        "AS50",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
                                                   {"weapon_mg3",         "MG-3",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_mg3xmas",         "MG3 Xmas Edition",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+											   	  {"weapon_m95xmas",         "M95 Xmas Edition",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_m134xmas",         "M134 Xmas Edition",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_mg36",         "MG-36",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
-                                                  {"weapon_cannon",      "Blackdragon Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+                                                  {"weapon_cannon",      "Black Dragon Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_gungnir",     "Gungnir",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 						 
