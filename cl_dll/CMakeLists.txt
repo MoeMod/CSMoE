@@ -137,6 +137,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m134xmas.cpp
 	../dlls/wpn_shared/wpn_mg3xmas.cpp
 	../dlls/wpn_shared/wpn_m95xmas.cpp
+	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/wpn_svdex.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
