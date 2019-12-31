@@ -34,7 +34,7 @@ public:
 	// activation on constructor in order to RAII
 };
 
-class CHuman_ZB1 : public BasePlayerExtra, public IZombieModeCharacter
+class CHuman_ZB1 : public BasePlayerExtra, virtual public IZombieModeCharacter
 {
 public:
 	explicit CHuman_ZB1(CBasePlayer *player); // player_zombie.cpp
@@ -46,7 +46,7 @@ public:
 	void DeathSound_Zombie() override {}
 };
 
-class CZombie_ZB1 : public BasePlayerExtra, public IZombieModeCharacter
+class CZombie_ZB1 : public BasePlayerExtra, virtual public IZombieModeCharacter
 {
 public:
 	explicit CZombie_ZB1(CBasePlayer *player, ZombieLevel lv); // player_zombie.cpp

@@ -68,10 +68,10 @@ public:
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
 
-class CPlayerModStrategy_Default : public BasePlayerExtra, public IBasePlayerModStrategy
+class CPlayerModStrategy_Default : public BasePlayerExtra, virtual public IBasePlayerModStrategy
 {
 public:
-	explicit CPlayerModStrategy_Default(CBasePlayer *p) : BasePlayerExtra(p), IBasePlayerModStrategy() {}
+	explicit CPlayerModStrategy_Default(CBasePlayer *p) : BasePlayerExtra(p) {}
 
 	void OnThink() override {}
 	void OnSpawn() override {}

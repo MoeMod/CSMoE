@@ -32,9 +32,11 @@ class CBaseEntity;
 
 class CBasePlayer; // player.h
 
-class IBaseMod : public CHalfLifeMultiplay, ruleof350::unique
+class IBaseMod
 {
 public:
+	virtual ~IBaseMod() = default;
+
 	virtual DamageTrack_e DamageTrack() { return DT_NONE; }
 	virtual void InstallPlayerModStrategy(CBasePlayer *player);
 	virtual float
@@ -46,11 +48,16 @@ public:
 	virtual int ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther) { return 1; }
 };
 
-template<class CBase = IBaseMod>
+class CBaseModDefault : public CHalfLifeMultiplay, ruleof350::unique, virtual public IBaseMod
+{
+
+};
+
+template<class CBase = CBaseModDefault>
 class TBaseMod_RemoveObjects : public CBase
 {
-	friend BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(IBaseMod *mod, CBaseEntity *pEntity);
-	friend void _IBaseMod_RemoveObjects_CheckMapConditions_impl(IBaseMod *mod);
+	friend BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(CHalfLifeMultiplay *mod, CBaseEntity *pEntity);
+	friend void _IBaseMod_RemoveObjects_CheckMapConditions_impl(CHalfLifeMultiplay *mod);
 
 public: // CHalfLifeMultiplay
 	BOOL IsAllowedToSpawn(CBaseEntity *pEntity) override
@@ -66,10 +73,10 @@ protected:
 	using Base = TBaseMod_RemoveObjects;
 };
 
-template<class CBase = IBaseMod>
+template<class CBase = CBaseModDefault>
 class TBaseMod_RandomSpawn : public CBase
 {
-	friend edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(IBaseMod *mod, CBasePlayer *pPlayer);
+	friend edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, CBasePlayer *pPlayer);
 
 public: // CHalfLifeMultiplay
 	edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer) override

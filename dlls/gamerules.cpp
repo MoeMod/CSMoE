@@ -142,7 +142,7 @@ CGameRules *InstallGameRules()
 
 	//return new CHalfLifeMultiplay;
 	InstallBteMod(gamemode.string);
-	return g_pModRunning;
+	return dynamic_cast<CHalfLifeMultiplay *>(g_pModRunning);
 }
 
 }
