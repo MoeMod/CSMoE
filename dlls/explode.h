@@ -32,14 +32,14 @@
 #pragma once
 #endif
 
-#define SF_ENVEXPLOSION_NODAMAGE	(1<<0)	// when set, ENV_EXPLOSION will not actually inflict damage
-#define SF_ENVEXPLOSION_REPEATABLE	(1<<1)	// can this entity be refired?
-#define SF_ENVEXPLOSION_NOFIREBALL	(1<<2)	// don't draw the fireball
-#define SF_ENVEXPLOSION_NOSMOKE		(1<<3)	// don't draw the smoke
-#define SF_ENVEXPLOSION_NODECAL		(1<<4)	// don't make a scorch mark
-#define SF_ENVEXPLOSION_NOSPARKS	(1<<5)	// don't make a scorch mark
-
 namespace sv {
+
+constexpr int SF_ENVEXPLOSION_NODAMAGE =    (1<<0);	// when set, ENV_EXPLOSION will not actually inflict damage
+constexpr int SF_ENVEXPLOSION_REPEATABLE =	(1<<1);	// can this entity be refired?
+constexpr int SF_ENVEXPLOSION_NOFIREBALL =	(1<<2);	// don't draw the fireball
+constexpr int SF_ENVEXPLOSION_NOSMOKE =		(1<<3);	// don't draw the smoke
+constexpr int SF_ENVEXPLOSION_NODECAL =		(1<<4);	// don't make a scorch mark
+constexpr int SF_ENVEXPLOSION_NOSPARKS =	(1<<5);	// don't make a scorch mark
 
 class CShower : public CBaseEntity
 {

@@ -260,60 +260,23 @@ void UTIL_PrecacheOtherWeapon(const char *szClassname)
 
 	CBaseEntity *pEntity = CBaseEntity::Instance(VARS(pent));
 
-	if (pEntity != NULL)
+	if (pEntity != nullptr)
 	{
 		ItemInfo II;
 		Q_memset(&II, 0, sizeof(II));
 
 		pEntity->Precache();
-		if (((CBasePlayerItem *)pEntity)->GetItemInfo(&II))
+		CBasePlayerItem *pItem = dynamic_ent_cast<CBasePlayerItem *>(pEntity);
+		if (pItem != nullptr && pItem->GetItemInfo(&II))
 		{
 			CBasePlayerItem::ItemInfoArray[ II.iId ] = II;
 
-			if (II.pszAmmo1 != NULL && *II.pszAmmo1 != '\0')
+			if (II.pszAmmo1 != nullptr && *II.pszAmmo1 != '\0')
 			{
 				AddAmmoNameToAmmoRegistry(II.pszAmmo1);
 			}
 
-			if (II.pszAmmo2 != NULL && *II.pszAmmo2 != '\0')
-			{
-				AddAmmoNameToAmmoRegistry(II.pszAmmo2);
-			}
-		}
-	}
-
-	REMOVE_ENTITY(pent);
-}
-
-NOXREF void UTIL_PrecacheOtherWeapon2(const char *szClassname)
-{
-	edict_t *pent = CREATE_NAMED_ENTITY(MAKE_STRING(szClassname));
-
-	if (FNullEnt(pent))
-	{
-		ALERT(at_console, "NULL Ent in UTIL_PrecacheOtherWeapon\n");
-		return;
-	}
-
-	CBaseEntity *pEntity = CBaseEntity::Instance(VARS(pent));
-
-	if (pEntity != NULL)
-	{
-		ItemInfo II;
-		Q_memset(&II, 0, sizeof(II));
-
-		pEntity->Precache();
-
-		if (((CBasePlayerItem *)pEntity)->GetItemInfo(&II))
-		{
-			CBasePlayerItem::ItemInfoArray[ II.iId ] = II;
-
-			if (II.pszAmmo1 != NULL && *II.pszAmmo1 != '\0')
-			{
-				AddAmmoNameToAmmoRegistry(II.pszAmmo1);
-			}
-
-			if (II.pszAmmo2 != NULL && *II.pszAmmo2 != '\0')
+			if (II.pszAmmo2 != nullptr && *II.pszAmmo2 != '\0')
 			{
 				AddAmmoNameToAmmoRegistry(II.pszAmmo2);
 			}

@@ -164,6 +164,12 @@
     <ClCompile Include="..\cl_dll\parsemsg.cpp" />
     <ClCompile Include="..\cl_dll\rain.cpp" />
     <ClCompile Include="..\cl_dll\r_texture.cpp" />
+    <ClCompile Include="..\cl_dll\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\cl_dll\studio\GameStudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\StudioModelRenderer.cpp" />
     <ClCompile Include="..\cl_dll\studio\studio_util.cpp" />
@@ -310,6 +316,7 @@
     <ClInclude Include="..\cl_dll\parsemsg.h" />
     <ClInclude Include="..\cl_dll\rain.h" />
     <ClInclude Include="..\cl_dll\r_texture.h" />
+    <ClInclude Include="..\cl_dll\stdafx.h" />
     <ClInclude Include="..\cl_dll\studio\GameStudioModelRenderer.h" />
     <ClInclude Include="..\cl_dll\studio\StudioModelRenderer.h" />
     <ClInclude Include="..\cl_dll\studio\studio_util.h" />
@@ -487,8 +494,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -497,6 +503,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -513,8 +521,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -523,6 +530,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -540,8 +549,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -551,6 +559,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -570,8 +580,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -581,6 +590,8 @@
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

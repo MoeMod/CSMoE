@@ -38,40 +38,50 @@
 #include "weapons_msg.h"
 #include "player/player_knockback.h"
 
-#define MAX_WEAPONS			32
-#define MAX_NORMAL_BATTERY		100.0f
+#include <cstdint>
 
-#define ITEM_FLAG_SELECTONEMPTY		1
-#define ITEM_FLAG_NOAUTORELOAD		2
-#define ITEM_FLAG_NOAUTOSWITCHEMPTY	4
-#define ITEM_FLAG_LIMITINWORLD		8
-#define ITEM_FLAG_EXHAUSTIBLE		16	// A player can totally exhaust their ammo supply and lose this weapon
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
 
-#define WEAPON_IS_ONTARGET		0x40
+constexpr int ITEM_FLAG_SELECTONEMPTY = 1;
+constexpr int ITEM_FLAG_NOAUTORELOAD = 2;
+constexpr int ITEM_FLAG_NOAUTOSWITCHEMPTY = 4;
+constexpr int ITEM_FLAG_LIMITINWORLD = 8;
+constexpr int ITEM_FLAG_EXHAUSTIBLE = 16;    // A player can totally exhaust their ammo supply and lose this weapon
 
-#define ARMOR_TYPE_EMPTY		0
-#define ARMOR_TYPE_KEVLAR		1	// Armor
-#define ARMOR_TYPE_HELMET		2	// Armor and helmet
+enum
+{
+	ARMOR_TYPE_EMPTY = 0,
+	ARMOR_TYPE_KEVLAR = 1,  // Armor
+	ARMOR_TYPE_HELMET = 2,  // Armor and helmet
+};
 
 // the maximum amount of ammo each weapon's clip can hold
-#define WEAPON_NOCLIP			-1
+constexpr int WEAPON_NOCLIP = -1;
 
-#define LOUD_GUN_VOLUME			1000
-#define NORMAL_GUN_VOLUME		600
-#define QUIET_GUN_VOLUME		200
+enum
+{
+	BIG_EXPLOSION_VOLUME = 2048,
+	NORMAL_EXPLOSION_VOLUME = 1024,
+	SMALL_EXPLOSION_VOLUME = 512,
+	LOUD_GUN_VOLUME = 1000,
+	NORMAL_GUN_VOLUME = 600,
+	QUIET_GUN_VOLUME = 200,
+	WEAPON_ACTIVITY_VOLUME = 64
+};
 
-#define BRIGHT_GUN_FLASH		512
-#define NORMAL_GUN_FLASH		256
-#define DIM_GUN_FLASH			128
-
-#define BIG_EXPLOSION_VOLUME		2048
-#define NORMAL_EXPLOSION_VOLUME		1024
-#define SMALL_EXPLOSION_VOLUME		512
-
-#define WEAPON_ACTIVITY_VOLUME		64
+enum
+{
+	BRIGHT_GUN_FLASH = 512,
+	NORMAL_GUN_FLASH = 256,
+	DIM_GUN_FLASH = 128
+};
 
 // spawn flags
-#define SF_DETONATE			0x0001	// Grenades flagged with this will be triggered when the owner calls detonateSatchelCharges
+constexpr int SF_DETONATE = 0x0001; // Grenades flagged with this will be triggered when the owner calls detonateSatchelCharges
 
 // custom enum
 enum ArmouryItemPack
@@ -117,6 +127,8 @@ struct AmmoInfo
 	const char *pszName;
 	int iId;
 };
+
+}
 
 #ifndef CLIENT_DLL
 namespace sv {

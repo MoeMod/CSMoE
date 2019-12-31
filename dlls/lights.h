@@ -32,9 +32,9 @@
 #pragma once
 #endif
 
-#define SF_LIGHT_START_OFF		1
-
 namespace sv {
+
+constexpr int SF_LIGHT_START_OFF = 1;
 
 class CLight: public CPointEntity
 {

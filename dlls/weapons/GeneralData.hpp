@@ -70,7 +70,7 @@ public:
 	//	static constexpr auto W_Model = "";
 	static constexpr float ArmorRatioModifier = 1.0f;
 	//	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
-	// static constexpr float MaxSpeed = 250;
+	// static constexpr float PlayerMaxSpeed = 250;
 	//  static constexpr WeaponIdType WeaponId = WEAPON_NONE;
 	//  static constexpr const char *ClassName = "weapon_???";
 
@@ -144,7 +144,7 @@ public:
 	}
 
 	const char *GetCSModelName() override { return df::W_Model::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
-	float GetMaxSpeed() override { return df::MaxSpeed::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
+	float GetMaxSpeed() override { return df::PlayerMaxSpeed::Get(static_cast<CFinal &>(*this).WeaponTemplateDataSource()); }
 
 	CFinal &WeaponTemplateDataSource() { return static_cast<CFinal &>(*this); }
 

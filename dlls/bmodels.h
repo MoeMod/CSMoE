@@ -32,21 +32,6 @@
 #pragma once
 #endif
 
-#define SF_PENDULUM_SWING	2		// spawnflag that makes a pendulum a rope swing.
-
-#define SF_BRUSH_ACCDCC		16		// brush should accelerate and decelerate when toggled
-#define SF_BRUSH_HURT		32		// rotating brush that inflicts pain based on rotation speed
-#define SF_ROTATING_NOT_SOLID	64		// some special rotating objects are not solid.
-
-#define SF_WALL_START_OFF	0x0001
-
-#define SF_CONVEYOR_VISUAL	0x0001
-#define SF_CONVEYOR_NOTSOLID	0x0002
-
-#define SF_WORLD_DARK		0x0001		// Fade from black at startup
-#define SF_WORLD_TITLE		0x0002		// Display game title at startup
-#define SF_WORLD_FORCETEAM	0x0004		// Force teams
-
 #define FANPITCHMIN		30
 #define FANPITCHMAX		100
 
@@ -57,6 +42,20 @@
 
 // This is just a solid wall if not inhibited
 namespace sv {
+
+constexpr int SF_PENDULUM_SWING = 2; 	// spawnflag that makes a pendulum a rope swing.
+
+constexpr int SF_BRUSH_ACCDCC = 16; 	// brush should accelerate and decelerate when toggled
+constexpr int SF_BRUSH_HURT = 32; 	// rotating brush that inflicts pain based on rotation speed
+constexpr int SF_ROTATING_NOT_SOLID = 64; 	// some special rotating objects are not solid.
+
+constexpr int SF_WALL_START_OFF = 0x0001;
+constexpr int SF_CONVEYOR_VISUAL = 0x0001;
+constexpr int SF_CONVEYOR_NOTSOLID = 0x0002;
+constexpr int SF_WORLD_DARK = 0x0001; 	// Fade from black at startup
+constexpr int SF_WORLD_TITLE = 0x0002; 	// Display game title at startup
+constexpr int SF_WORLD_FORCETEAM = 0x0004; 	// Force teams
+
 class CFuncWall : public CBaseEntity
 {
 public:
