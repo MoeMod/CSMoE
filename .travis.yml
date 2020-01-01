@@ -35,7 +35,7 @@ jobs:
       - export TRAVIS_TAG=continuous
       - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
       - git tag --delete $TRAVIS_TAG
-      - git push travis-deploy-public --tags --force
+      - git push travis-deploy-public --delete $TRAVIS_TAG
       - git tag --force $TRAVIS_TAG
       - git push travis-deploy-public --tags --force
     deploy:
