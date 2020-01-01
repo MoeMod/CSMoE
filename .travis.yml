@@ -4,7 +4,7 @@ git:
   submodules: true
 jobs:
   include:
-  - stage: build
+  - stage: prepare cache
     name: Packing game resources
     os: windows
     before_script:
@@ -46,6 +46,7 @@ jobs:
       prerelease: true
   - stage: build
     name: Build for Linux amd64
+    arch: amd64
     os: linux
     dist: bionic
     cache: ccache
@@ -67,7 +68,29 @@ jobs:
     script:
     - sh scripts/build_portable_linux_engine.sh;
   - stage: build
-    name: Build for macOS
+    name: Build for Linux arm64
+    arch: arm64
+    os: linux
+    dist: bionic
+    cache: ccache
+    language: cpp
+    compiler: gcc
+    sudo: true
+    addons:
+      apt:
+        packages:
+        - cmake
+        - x11-utils
+        - libgl1-mesa-dev
+        - libegl1-mesa-dev
+        - libgles2-mesa-dev
+    before_script:
+    - sudo apt-get install libsdl2-dev
+    - sudo apt-get install libsdl2-image-dev
+    script:
+    - sh scripts/build_portable_linux_engine.sh;
+  - stage: build
+    name: Build for macOS amd64
     cache: ccache
     os: osx
     osx_image: xcode11
@@ -152,7 +175,7 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for Windows MSVC
+    name: Build for Win32 amd64 MSVC/CMake
     cache: ccache
     os: windows
     language: cpp
