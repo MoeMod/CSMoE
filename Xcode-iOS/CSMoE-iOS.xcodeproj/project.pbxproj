@@ -14,6 +14,7 @@
 				3D2DCBFA233209ED00ADBA6B /* Run Script */,
 			);
 			dependencies = (
+				3D4DAA2623BD00EB00F575C1 /* PBXTargetDependency */,
 			);
 			name = "cmake-gen-csmoe";
 			productName = "cmake-mkdir-csmoe";
@@ -145,6 +146,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 3D2DCBFD23320D5D00ADBA6B;
 			remoteInfo = "cmake-build-csmoe";
+		};
+		3D4DAA2523BD00EB00F575C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FD6526620DE8FCCB002AD96B;
+			remoteInfo = "libSDL-iOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -612,7 +620,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DSDL2_INCLUDE_DIR=\"${SRCROOT}/../SDL2/include\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${BUILT_PRODUCTS_DIR}/cmake-build\"\n";
+			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DSDL2_LIBRARY=\"${BUILT_PRODUCTS_DIR}/libSDL2.a\" -DSDL2_INCLUDE_DIR=\"${SRCROOT}/../SDL2/include\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${BUILT_PRODUCTS_DIR}/cmake-build\"\n";
 		};
 		3D2DCC0123320D9600ADBA6B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -671,6 +679,11 @@
 			isa = PBXTargetDependency;
 			target = 3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */;
 			targetProxy = 3D4DAA1123BCEF0900F575C1 /* PBXContainerItemProxy */;
+		};
+		3D4DAA2623BD00EB00F575C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libSDL-iOS";
+			targetProxy = 3D4DAA2523BD00EB00F575C1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
