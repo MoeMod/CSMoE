@@ -120,7 +120,7 @@ jobs:
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.10 SDL2
     script:
-    - set -o pipefail && xcodebuild archive -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS -configuration Release -archivePath ./CSMoE-iOS.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
+    - set -o pipefail && xcodebuild archive -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS -configuration Release -archivePath ./CSMoE-iOS.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/csmoe-ios.app Payload/
     before_deploy:

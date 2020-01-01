@@ -11,7 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 3D2DCBF7233209E300ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-gen-csmoe" */;
 			buildPhases = (
-				3D2DCBFA233209ED00ADBA6B /* ShellScript */,
+				3D2DCBFA233209ED00ADBA6B /* Run Script */,
 			);
 			dependencies = (
 			);
@@ -595,7 +595,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3D2DCBFA233209ED00ADBA6B /* ShellScript */ = {
+		3D2DCBFA233209ED00ADBA6B /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -604,14 +604,15 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"${SRCROOT}/cmake-build-${CONFIGURATION}/CMakeCache.txt",
+				"$(BUILT_PRODUCTS_DIR)/cmake-build/CMakeCache.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DSDL2_INCLUDE_DIR=\"${SRCROOT}/../SDL2/include\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${BUILT_PRODUCTS_DIR}/cmake-build\"\n";
+			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DSDL2_INCLUDE_DIR=\"${SRCROOT}/../SDL2/include\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${BUILT_PRODUCTS_DIR}/cmake-build\"\n";
 		};
 		3D2DCC0123320D9600ADBA6B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -625,10 +626,10 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"${BUILT_PRODUCTS_DIR}/cmake-build/cl_dll/libclient.a",
-				"${BUILT_PRODUCTS_DIR}/cmake-build/dlls/libserver.a",
-				"${BUILT_PRODUCTS_DIR}/cmake-build/mainui_cpp/libmenu.a",
-				"${BUILT_PRODUCTS_DIR}/cmake-build/engine/libxash.a",
+				"$(BUILT_PRODUCTS_DIR)/cmake-build/cl_dll/libclient.a",
+				"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls/libserver.a",
+				"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp/libmenu.a",
+				"$(BUILT_PRODUCTS_DIR)/cmake-build/engine/libxash.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -697,10 +698,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/cl_dll",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/dlls",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/engine",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/cl_dll",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
 				PRODUCT_NAME = "csmoe-ios";
@@ -800,10 +801,10 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/cl_dll",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/dlls",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/engine",
-					"${BUILT_PRODUCTS_DIR}/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/cl_dll",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
 				PRODUCT_NAME = "csmoe-ios";
