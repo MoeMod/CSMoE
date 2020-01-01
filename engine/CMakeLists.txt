@@ -350,7 +350,7 @@ endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-	find_package(SDL2 REQUIRED)
+	find_package(SDL2)
 	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
 	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
