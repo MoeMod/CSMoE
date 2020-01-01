@@ -245,6 +245,8 @@
 		3D4CBB052365F220002114A0 /* event_m2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D4CBB042365F220002114A0 /* event_m2.cpp */; };
 		3D7BEBA623A2A1420029565E /* event_m134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D7BEBA523A2A1420029565E /* event_m134.cpp */; };
 		3D7BEBA923A2A1550029565E /* wpn_m134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D7BEBA723A2A1540029565E /* wpn_m134.cpp */; };
+		3D83D5F423BBB58A001E4487 /* event_janus7xmas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D83D5F323BBB589001E4487 /* event_janus7xmas.cpp */; };
+		3D83D5F723BBB5A0001E4487 /* wpn_janus7xmas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D83D5F623BBB5A0001E4487 /* wpn_janus7xmas.cpp */; };
 		3DA638E2238AE965007D26EC /* z4b_dmp7a1x.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */; };
 		3DA638E3238AE965007D26EC /* z4b_m4a1razer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E0238AE965007D26EC /* z4b_m4a1razer.cpp */; };
 		3DA638E4238AE965007D26EC /* z4b_awpnvidia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA638E1238AE965007D26EC /* z4b_awpnvidia.cpp */; };
@@ -649,6 +651,9 @@
 		3D7BEBA523A2A1420029565E /* event_m134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_m134.cpp; sourceTree = "<group>"; };
 		3D7BEBA723A2A1540029565E /* wpn_m134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_m134.cpp; sourceTree = "<group>"; };
 		3D7BEBA823A2A1550029565E /* wpn_m134.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_m134.h; sourceTree = "<group>"; };
+		3D83D5F323BBB589001E4487 /* event_janus7xmas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_janus7xmas.cpp; sourceTree = "<group>"; };
+		3D83D5F523BBB59F001E4487 /* wpn_janus7xmas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wpn_janus7xmas.h; sourceTree = "<group>"; };
+		3D83D5F623BBB5A0001E4487 /* wpn_janus7xmas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wpn_janus7xmas.cpp; sourceTree = "<group>"; };
 		3DA638DD238AE964007D26EC /* z4b_m4a1razer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_m4a1razer.h; sourceTree = "<group>"; };
 		3DA638DE238AE964007D26EC /* z4b_dmp7a1x.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = z4b_dmp7a1x.cpp; sourceTree = "<group>"; };
 		3DA638DF238AE964007D26EC /* z4b_dmp7a1x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = z4b_dmp7a1x.h; sourceTree = "<group>"; };
@@ -896,6 +901,7 @@
 				3D1C7B9A23A6905500FAC624 /* event_m134ex.cpp */,
 				3D1C7B9923A6905500FAC624 /* event_m134xmas.cpp */,
 				3D1C7BB723A6911500FAC624 /* event_mg3xmas.cpp */,
+				3D83D5F323BBB589001E4487 /* event_janus7xmas.cpp */,
 			);
 			path = events;
 			sourceTree = "<group>";
@@ -1205,6 +1211,8 @@
 				3D1C7BA223A6908800FAC624 /* wpn_m134xmas.h */,
 				3D1C7BA323A6908800FAC624 /* wpn_mg3xmas.cpp */,
 				3D1C7B9F23A6908800FAC624 /* wpn_mg3xmas.h */,
+				3D83D5F623BBB5A0001E4487 /* wpn_janus7xmas.cpp */,
+				3D83D5F523BBB59F001E4487 /* wpn_janus7xmas.h */,
 			);
 			path = wpn_shared;
 			sourceTree = "<group>";
@@ -1421,6 +1429,7 @@
 				3D441511231D1133001A0696 /* bte_weapons.cpp in Sources */,
 				3DB36A1F2381894000BE2343 /* z4b_deagleb.cpp in Sources */,
 				3D441606231D1164001A0696 /* z4b_nataknifedx.cpp in Sources */,
+				3D83D5F423BBB58A001E4487 /* event_janus7xmas.cpp in Sources */,
 				3D44150B231D1133001A0696 /* event_gatling.cpp in Sources */,
 				3D4415EA231D1164001A0696 /* wpn_infinity.cpp in Sources */,
 				3D4414FD231D1133001A0696 /* event_k1a.cpp in Sources */,
@@ -1464,6 +1473,7 @@
 				3D4415F5231D1164001A0696 /* wpn_p90.cpp in Sources */,
 				3D4414DD231D1133001A0696 /* event_p228.cpp in Sources */,
 				3D441536231D1133001A0696 /* hud_spectator.cpp in Sources */,
+				3D83D5F723BBB5A0001E4487 /* wpn_janus7xmas.cpp in Sources */,
 				3D4415FC231D1164001A0696 /* wpn_ak47l.cpp in Sources */,
 				3D4415F2231D1164001A0696 /* wpn_ump45.cpp in Sources */,
 				3D4414D7231D1133001A0696 /* event_mp7a1c.cpp in Sources */,
