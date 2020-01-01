@@ -2,6 +2,8 @@ language: cpp
 git:
   depth: 50
   submodules: true
+exclude:
+  - if: branch = continous
 jobs:
   include:
   - stage: prepare cache
@@ -22,16 +24,19 @@ jobs:
       - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "Third attempt..."
       - cd ..
       - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
+      # skip zipping stage to save time when dev
+    before_deploy:
       #- zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
       #- tar czvf CSMoE-CD-GameDir-Full.tar.gz CSMoE-Full
       - 7z a -t7z -r CSMoE-CD-GameDir-Full.7z CSMoE-Full
-    before_deploy:
       # Set up git user name and tag this commit
       - git config --local user.name "CSMoE-Deployer"
       - git config --local user.email "824395314@qq.com"
       - export TRAVIS_TAG=continuous
-      - git tag --force $TRAVIS_TAG
       - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git tag --delete $TRAVIS_TAG
+      - git push travis-deploy-public --tags --force
+      - git tag --force $TRAVIS_TAG
       - git push travis-deploy-public --tags --force
     deploy:
       provider: releases
@@ -65,6 +70,7 @@ jobs:
     - export ARCH=x86_64
     - sudo apt-get install libsdl2-dev
     - sudo apt-get install libsdl2-image-dev
+    - sudo apt-get install libfontconfig1-dev
     script:
     - sh scripts/build_portable_linux_engine.sh;
   - stage: build
@@ -87,6 +93,7 @@ jobs:
     before_script:
     - sudo apt-get install libsdl2-dev
     - sudo apt-get install libsdl2-image-dev
+    - sudo apt-get install libfontconfig1-dev
     script:
     - sh scripts/build_portable_linux_engine.sh;
   - stage: build
@@ -116,15 +123,8 @@ jobs:
     - set -o pipefail && xcodebuild archive -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS -configuration Release -archivePath ./CSMoE-iOS.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO | xcpretty
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/csmoe-ios.app Payload/
-    - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
     before_deploy:
-      # Set up git user name and tag this commit
-      - git config --local user.name "CSMoE-Deployer"
-      - git config --local user.email "824395314@qq.com"
-      - export TRAVIS_TAG=continuous
-      - git tag --force $TRAVIS_TAG
-      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
-      - git push travis-deploy-public --tags --force
+      - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
@@ -155,13 +155,6 @@ jobs:
     - "./gradlew assembleRelease"
     - cd ..
     before_deploy:
-      # Set up git user name and tag this commit
-      - git config --local user.name "CSMoE-Deployer"
-      - git config --local user.email "824395314@qq.com"
-      - export TRAVIS_TAG=continuous
-      - git tag --force $TRAVIS_TAG
-      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
-      - git push travis-deploy-public --tags --force
       - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned.apk
     deploy:
       provider: releases
