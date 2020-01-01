@@ -15,11 +15,15 @@ namespace sv {
 #define MG3_DAMAGE			35
 #define MG3_RANGE_MODIFER		0.79
 #define MG3_RELOAD_TIME		4.8
-#define SIGNAL_SHOTS_COUNT 100
+#define	JANUS7_STATE_B 1
+#define	JANUS7_STATE_A 0
+#define SIGNAL_SHOTS_COUNT 10
 #define SIGNAL_SHOTS_COUNT_ZB 110
 #define SIGNAL_SHOTS_COUNT_ZS 120
 #define WEAPON_CLIP 200
 #define	WEAPON_TIME_RELOAD 4.73s
+
+
 
 class CJanus7xmas : public CBasePlayerWeapon
 {
@@ -49,7 +53,6 @@ public:
 	void Janus7xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void Janus7Lighting();
 	BOOL IsSignal();
-	BOOL IsWallBetweenPoints(Vector vecStart, Vector vecEnd);
 	BOOL IsTargetAvailable(CBasePlayer *m_pPlayer, CBaseEntity *pEntity, Vector vecSrc);
 	float GetDamage() const;
 	float GetDamageB() const;
@@ -57,7 +60,6 @@ public:
 	int m_iShell;
 	int m_iSprSmokePuff;
 	int m_iSprBeam;
-	int m_iJanus7State;
 	int iShellOn;
 	int iTarget;
 
