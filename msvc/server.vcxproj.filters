@@ -793,8 +793,8 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3xmas.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\stdafx.cpp">
-      <Filter>dlls</Filter>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_janus7xmas.cpp">
+      <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1632,8 +1632,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\stdafx.h">
-      <Filter>dlls</Filter>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_janus7xmas.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

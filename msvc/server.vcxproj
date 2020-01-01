@@ -187,6 +187,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_janus7xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
@@ -455,6 +456,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_janus7xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
