@@ -65,6 +65,7 @@ namespace sv {
 
 		m_iDefaultAmmo = MG3_AMMO_GIVE;
 		m_flAccuracy = 0.2;
+		m_iShotsCount = 0;
 		m_iShotsFired = 0;
 
 		FallInit();
@@ -105,15 +106,12 @@ namespace sv {
 
 		return 1;
 	}
-	BOOL CJanus7xmas::IsSignal()
-	{
-		return m_iShotsCount >= SIGNAL_SHOTS_COUNT;
-	}
+
 
 	BOOL CJanus7xmas::Deploy(void)
 	{
 		iShellOn = 1;
-		if (m_iJanus7State)
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		{
 			return DefaultDeploy("models/v_janus7xmas.mdl", "models/p_janus7xmas.mdl", ANIM_DRAWB, "m249", UseDecrement() != FALSE);
 		}
@@ -127,33 +125,32 @@ namespace sv {
 
 	void CJanus7xmas::ItemPostFrame(void)
 	{
-		if (m_pPlayer->pev->button & IN_ATTACK2 && m_flNextPrimaryAttack <= 0.0s && !m_fInReload)
+		if (m_pPlayer->pev->button & IN_ATTACK2 && m_pPlayer->m_flNextAttack <= 0.0s && !m_fInReload)
 		{
 			m_pPlayer->pev->button &= ~IN_ATTACK2;
 			SecondaryAttack();
 		}
-
-		if (IsSignal() && gpGlobals->time > m_flLastFire + 9.0s)
+		if (IsSignal() && (gpGlobals->time > m_flLastFire + 9.0s))
 		{
 			m_iShotsCount = 0;
 			m_flTimeWeaponIdle = 0.0s;
 		}
-		else if (m_iJanus7State && gpGlobals->time > m_flLastFire + 15.0s)
+		else if (m_iWeaponState & WPNSTATE_M4A1_SILENCED && (gpGlobals->time > m_flLastFire + 15.0s))
 		{
 			m_iShotsCount = 0;
 			SendWeaponAnim(ANIM_CHANGEA, UseDecrement() != FALSE);
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.5s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
-			m_iJanus7State = 0;
+			m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
 		}
-
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
 	void CJanus7xmas::PrimaryAttack(void)
 	{
-		if (m_iJanus7State)
+
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		{
 			Janus7Lighting();
 		}
@@ -172,19 +169,22 @@ namespace sv {
 				m_flLastFire = gpGlobals->time;
 			}
 		}
+
 	}
 
 	void CJanus7xmas::SecondaryAttack(void)
 	{
-		if (IsSignal() && !m_iJanus7State)
+
+		if (IsSignal() && !(m_iWeaponState & WPNSTATE_M4A1_SILENCED))
 		{
 			SendWeaponAnim(ANIM_CHANGEB, UseDecrement() != FALSE);
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.0s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.0s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
-			m_iJanus7State = 1;
+			m_iWeaponState |= WPNSTATE_M4A1_SILENCED;
 			m_flLastFire = gpGlobals->time;
 		}
+
 	}
 
 	void CJanus7xmas::Janus7xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -221,14 +221,16 @@ namespace sv {
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
-		int flags;
+/*		int flags;
 #ifdef CLIENT_WEAPONS
 		flags = FEV_NOTHOST;
 #else
 		flags = 0;
 #endif
-
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireJanus7xmas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
+*/
+#ifndef CLIENT_DLL
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireJanus7xmas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
+#endif		
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
@@ -330,7 +332,7 @@ namespace sv {
 		m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH; // 512
 
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.075s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 			KickBack(1.5, 0.55, 0.3, 0.3, 6.0, 5.0, 5);
@@ -373,14 +375,6 @@ namespace sv {
 		return true;
 	}
 
-	BOOL CJanus7xmas::IsWallBetweenPoints(Vector vecStart, Vector vecEnd)
-	{
-		TraceResult tr;
-		UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-		if (tr.flFraction == 1.0)
-			return FALSE;
-		return TRUE;
-	}
 
 
 	void CJanus7xmas::Reload(void)
@@ -388,7 +382,7 @@ namespace sv {
 		if (m_pPlayer->ammo_556natobox <= 0)
 			return;
 
-		if (m_iJanus7State)
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 			return;
 
 		if (IsSignal())
@@ -418,17 +412,22 @@ namespace sv {
 
 	}
 
+	BOOL CJanus7xmas::IsSignal()
+	{
+		return m_iShotsCount >= SIGNAL_SHOTS_COUNT_ZB;
+	}
+
 	void CJanus7xmas::WeaponIdle(void)
 	{
 		ResetEmptySound();
-		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/null.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
 
 		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 			return;
-		if (m_iJanus7State)
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		{
 			SendWeaponAnim(ANIM_IDLEB, UseDecrement() != FALSE);
+			EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/null.wav", 0.8, ATTN_NORM, 0, PITCH_NORM);
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		}
 		else if (IsSignal())
