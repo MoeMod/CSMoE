@@ -16,9 +16,9 @@ GNU General Public License for more details.
 #import <AppKit/AppKit.h>
 
 #include "common.h"
-#include "crtlib.h"
 #include <string>
 #include <sstream>
+#include <utility>
 
 // This example shows how to create and populate touch bars for Qt applications.
 // Two approaches are demonstrated: creating a global touch bar for the entire
@@ -38,12 +38,12 @@ static NSTouchBarItemIdentifier CrosshairTypeItemIdentifier = @"com.csmoe.Crossh
 static NSTouchBarItemIdentifier CustomizeItemIdentifier = @"com.csmoe.CustomizeItemIdentifier";
 static NSTouchBarItemIdentifier CrosshairTypeScrubberItemIdentifier = @"com.csmoe.CrosshairTypeScrubberItemIdentifier";
 static NSTouchBarItemIdentifier CrosshairColorPickerItemIdentifier = @"com.csmoe.CrosshairColorPickerItemIdentifier";
-static NSTouchBarItemIdentifier RightHandButtonItemIdentifier = @"com.myapp.RightHandButtonItemIdentifier";
-static NSTouchBarItemIdentifier FastSwitchButtonItemIdentifier = @"com.myapp.FastSwitchButtonItemIdentifier";
-static NSTouchBarItemIdentifier AutoSwitchButtonItemIdentifier = @"com.myapp.AutoSwitchButtonItemIdentifier";
-static NSTouchBarItemIdentifier ShadowButtonItemIdentifier = @"com.myapp.ShadowButtonItemIdentifier";
-static NSTouchBarItemIdentifier WeatherButtonItemIdentifier = @"com.myapp.WeatherButtonItemIdentifier";
-static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentifier";
+static NSTouchBarItemIdentifier RightHandButtonItemIdentifier = @"com.csmoe.CvarToggleButtonItemIdentifier.cl_crosshair_color";
+static NSTouchBarItemIdentifier FastSwitchButtonItemIdentifier = @"com.csmoe.CvarToggleButtonItemIdentifier.hud_fastswitch";
+static NSTouchBarItemIdentifier AutoSwitchButtonItemIdentifier = @"com.csmoe.CvarToggleButtonItemIdentifier._cl_autowepswitch";
+static NSTouchBarItemIdentifier ShadowButtonItemIdentifier = @"com.csmoe.CvarToggleButtonItemIdentifier.cl_shadows";
+static NSTouchBarItemIdentifier WeatherButtonItemIdentifier = @"com.csmoe.CvarToggleButtonItemIdentifier.cl_weather";
+static NSTouchBarItemIdentifier TextItemIdentifier = @"com.csmoe.TextItemIdentifier";
 
 @interface CrosshairTypeScrubberDelegate : NSResponder <NSScrubberDelegate, NSScrubberDataSource>
 @property (strong) NSArray *fontNames;
@@ -76,6 +76,7 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 
 @interface CrosshairTypeTouchBarItem: NSCustomTouchBarItem
 
+@property(nonatomic, retain) CrosshairTypeScrubberDelegate *scrubberDelegate;
 @end
 @implementation CrosshairTypeTouchBarItem
 
@@ -84,9 +85,10 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	if (self) {
 
 		CrosshairTypeScrubberDelegate *scrubberDelegate = [[CrosshairTypeScrubberDelegate alloc] init];
+		[self setScrubberDelegate:scrubberDelegate];
 		scrubberDelegate.fontNames = @[@"Cross", @"Cross + Dot", @"Circle + Dot", @"Cross + Circle + Dot", @"Dot Only"];
 
-		NSScrubber *scrubber = [[[NSScrubber alloc] init] autorelease];
+		NSScrubber *scrubber = [[NSScrubber alloc] init];
 		scrubber.scrubberLayout = [[NSScrubberFlowLayout alloc] init];
 		//scrubber.mode = NSScrubberModeFree;
 		scrubber.continuous = true;
@@ -104,29 +106,76 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	return self;
 }
 
+@end
 
+@interface CvarButtonCallback : NSObject
+-(instancetype) initWithCvar:(const char *)cvar Button:(NSButton *)button;
+-(SEL) selector;
+-(void) updateButtonState;
+@property (weak) NSButton *button;
+@property std::string cvar;
+@end
+@implementation CvarButtonCallback
+-(IBAction) action:(id)sender
+{
+	Cbuf_AddText( ([self cvar] + '\n' ).c_str() );
+}
+- (instancetype)initWithCvar:(const char *)cvar Button:(NSButton *)button
+{
+	if([super init])
+	{
+		[self setButton:button];
+		[self setCvar:cvar];
+		return self;
+	}
+	return nil;
+}
+- (SEL)selector {
+	return @selector(action:);
+}
+-(void) updateButtonState {
+}
+@end
+
+@interface CvarToggleButtonCallback : CvarButtonCallback
+@end
+@implementation CvarToggleButtonCallback
+-(IBAction) action:(id)sender
+{
+	BOOL isOn = static_cast<BOOL>([self button].state);
+	Cvar_SetFloat([self cvar].c_str(), isOn);
+}
+-(void) updateButtonState
+{
+	self.button.state = Cvar_VariableInteger(self.cvar.c_str()) ? NSControlStateValueOn : NSControlStateValueOff;
+}
 @end
 
 // The TouchBarProvider class implements the NSTouchBarDelegate protocol, as
 // well as app and window delegate protocols.
 @interface TouchBarProvider: NSResponder <NSTouchBarDelegate, NSApplicationDelegate, NSWindowDelegate>
 
+-(instancetype) init;
+
 @property (strong) NSSliderTouchBarItem *touchBarMouseSensitivity;
 @property (strong) NSSliderTouchBarItem *touchBarMouseZoomSensitivityRatio;
 @property (strong) NSColorPickerTouchBarItem *touchBarCrosshairColor;
 
-@property (strong) NSButton *touchBarButtonRightHanded;
-@property (strong) NSButton *touchBarButtonAutoSwitch;
-@property (strong) NSButton *touchBarButtonFastSwitch;
-@property (strong) NSButton *touchBarButtonWeather;
-@property (strong) NSButton *touchBarButtonShadow;
-@property (strong) NSButton *touchBarButtonMouseFilter;
+@property (strong) NSMapTable<NSTouchBarItemIdentifier, CvarToggleButtonCallback *> *callbackMap;
 
-@property (strong) NSObject *qtDelegate;
+@property (strong) id previousDelegate;
 
 @end
 
 @implementation TouchBarProvider
+- (instancetype)init {
+	self = [super init];
+	if(self)
+	{
+		self.callbackMap = [[NSMapTable alloc] init];
+	}
+	return self;
+}
 
 - (NSTouchBar *)makeTouchBar
 {
@@ -145,15 +194,38 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 			CrosshairGroupItemIdentifier,
 			NSTouchBarItemIdentifierFlexibleSpace,
 			CustomizeItemIdentifier
-    //      Button1Identifier,
-    //      Button2Identifier,
-    //      Button3Identifier,
-    //      Button4Identifier
 	];
 
 	bar.escapeKeyReplacementItemIdentifier = EscapeButtonItemIdentifier;
 
 	return bar;
+}
+
+- (NSTouchBarItem *)buttonWithCvarButtonCallback:(CvarButtonCallback *)callback Identifier:(NSTouchBarItemIdentifier)identifier Title:(NSString *)title
+{
+	NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
+	NSButton *button = [NSButton buttonWithTitle:title target:callback action:[callback selector]];
+	[callback setButton:button];
+
+	[button setButtonType: NSButtonTypePushOnPushOff];
+	button.allowsMixedState = NO;
+	button.imageHugsTitle = true;
+
+	[callback updateButtonState];
+
+	item.view =  button;
+	return item;
+}
+
+- (NSTouchBarItem *)cvarToggleButtonTouchBarItemWithIdentifier:(NSTouchBarItemIdentifier)identifier Cvar:(const char *)cvar Title:(NSString *)title
+{
+	CvarToggleButtonCallback *callback = [[self callbackMap] objectForKey:identifier];
+	if(!callback)
+	{
+		callback = [[CvarToggleButtonCallback alloc] initWithCvar:cvar Button:nil];
+		[[self callbackMap] setObject:callback forKey:identifier];
+	}
+	return [self buttonWithCvarButtonCallback:callback Identifier:identifier Title:title];
 }
 
 - (NSTouchBarItem *)touchBar:(NSTouchBar *)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
@@ -202,18 +274,9 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 		return self.touchBarMouseZoomSensitivityRatio;
 	}
 	else if ([identifier isEqualToString:MouseFilterButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Filter"];
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-		self.touchBarButtonMouseFilter = [[NSButton buttonWithTitle:title target:self
-		                                  action:@selector(buttonMouseFilterClicked)] autorelease];
-
-		[self.touchBarButtonMouseFilter setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonMouseFilter.allowsMixedState = NO;
-		self.touchBarButtonMouseFilter.imageHugsTitle = true;
-
-		self.touchBarButtonMouseFilter.state = Cvar_VariableInteger("m_filter") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonMouseFilter;
+		constexpr const char *cvar = "m_filter";
+		NSString *title= @"Filter";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:CrosshairGroupItemIdentifier]) {
@@ -282,96 +345,40 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 		return item;
 	}
 	else if ([identifier isEqualToString:RightHandButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Right-hand"];
-
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-
-		self.touchBarButtonRightHanded = [[NSButton buttonWithTitle:title target:self
-		                                           action:@selector(buttonRighthandedClicked)] autorelease];
-
-		[self.touchBarButtonRightHanded setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonRightHanded.allowsMixedState = NO;
-		self.touchBarButtonRightHanded.imageHugsTitle = true;
-
-		self.touchBarButtonRightHanded.state = Cvar_VariableInteger("hand") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonRightHanded;
+		constexpr const char *cvar = "hand";
+		NSString *title= @"Right-hand";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:AutoSwitchButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Auto-switch"];
-
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-
-		self.touchBarButtonAutoSwitch = [[NSButton buttonWithTitle:title target:self
-		                                                     action:@selector(buttonAutoSwitchClicked)] autorelease];
-
-		[self.touchBarButtonAutoSwitch setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonAutoSwitch.allowsMixedState = NO;
-		self.touchBarButtonAutoSwitch.imageHugsTitle = true;
-
-		self.touchBarButtonAutoSwitch.state = Cvar_VariableInteger("_cl_autowepswitch") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonAutoSwitch;
+		constexpr const char *cvar = "_cl_autowepswitch";
+		NSString *title= @"Auto-switch";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:FastSwitchButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Fast-switch"];
-
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-
-		self.touchBarButtonFastSwitch = [[NSButton buttonWithTitle:title target:self
-		                                                     action:@selector(buttonFastSwitchClicked)] autorelease];
-
-		[self.touchBarButtonFastSwitch setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonFastSwitch.allowsMixedState = NO;
-		self.touchBarButtonFastSwitch.imageHugsTitle = true;
-
-		self.touchBarButtonFastSwitch.state = Cvar_VariableInteger("hud_fastswitch") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonFastSwitch;
+		constexpr const char *cvar = "hud_fastswitch";
+		NSString *title= @"Fast-switch";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:ShadowButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Shadow"];
-
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-
-		self.touchBarButtonShadow = [[NSButton buttonWithTitle:title target:self
-		                                                    action:@selector(buttonShadowClicked)] autorelease];
-
-		[self.touchBarButtonShadow setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonShadow.allowsMixedState = NO;
-		self.touchBarButtonShadow.imageHugsTitle = true;
-
-		self.touchBarButtonShadow.state = Cvar_VariableInteger("cl_shadows") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonShadow;
+		constexpr const char *cvar = "cl_shadows";
+		NSString *title= @"Shadow";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:WeatherButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Weather"];
-
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-
-		self.touchBarButtonWeather = [[NSButton buttonWithTitle:title target:self
-		                                                    action:@selector(buttonWeatherClicked)] autorelease];
-
-		[self.touchBarButtonWeather setButtonType: NSButtonTypePushOnPushOff];
-		self.touchBarButtonWeather.allowsMixedState = NO;
-		self.touchBarButtonWeather.imageHugsTitle = true;
-
-		self.touchBarButtonWeather.state = Cvar_VariableInteger("cl_weather") ? NSControlStateValueOn : NSControlStateValueOff;
-
-		item.view =  self.touchBarButtonWeather;
+		constexpr const char *cvar = "cl_weather";
+		NSString *title= @"Weather";
+		auto item = [self cvarToggleButtonTouchBarItemWithIdentifier:identifier Cvar:cvar Title:title];
 		return item;
 	}
 	else if ([identifier isEqualToString:EscapeButtonItemIdentifier]) {
-		NSString *title=[[NSString alloc]initWithString:@"Menu"];
+		NSString *title = @"Menu";
 
-		NSCustomTouchBarItem *item = [[[NSCustomTouchBarItem alloc] initWithIdentifier:identifier] autorelease];
-		NSButton *button = [[NSButton buttonWithTitle:title target:self
-		                                           action:@selector(buttonESCClicked)] autorelease];
+		NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
+		NSButton *button = [NSButton buttonWithTitle:title target:self action:@selector(buttonESCClicked)];
 
 		NSImage *img = [NSImage imageNamed:NSImageNameTouchBarSidebarTemplate];
 		button.image = img;
@@ -384,21 +391,21 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 
 - (void)installAsDelegateForWindow:(NSWindow *)window
 {
-	_qtDelegate = window.delegate; // Save current delegate for forwarding
-	window.delegate = self;
+	[self setPreviousDelegate:[window delegate]]; // Save current delegate for forwarding
+	[window setDelegate: self];
 }
 
 - (void)installAsDelegateForApplication:(NSApplication *)application
 {
-	_qtDelegate = application.delegate; // Save current delegate for forwarding
-	application.delegate = self;
+	[self setPreviousDelegate:[application delegate]]; // Save current delegate for forwarding
+	[application setDelegate:self];
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
 	// We want to forward to the qt delegate. Respond to selectors it
 	// responds to in addition to selectors this instance resonds to.
-	return [_qtDelegate respondsToSelector:aSelector] || [super respondsToSelector:aSelector];
+	return [[self previousDelegate] respondsToSelector:aSelector] || [super respondsToSelector:aSelector];
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation
@@ -406,7 +413,7 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 	// Forward to the existing delegate. This function is only called for selectors
 	// this instance does not responds to, which means that the qt delegate
 	// must respond to it (due to the respondsToSelector implementation above).
-	[anInvocation invokeWithTarget:_qtDelegate];
+	[anInvocation invokeWithTarget:[self previousDelegate]];
 }
 
 - (void)sensitivityDidChange
@@ -417,12 +424,6 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 - (void)sensitivityZoomRatioDidChange
 {
 	Cvar_SetFloat("zoom_sensitivity_ratio", self.touchBarMouseZoomSensitivityRatio.slider.floatValue);
-}
-
-- (void)buttonMouseFilterClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonMouseFilter.state);
-	Cvar_SetFloat("m_filter", isOn);
 }
 
 - (void)crosshairColorClicked
@@ -438,36 +439,6 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.myapp.TextItemIdentif
 			static_cast<int>(b * 255)
 	);
 	Cvar_Set("cl_crosshair_color", buffer);
-}
-
-- (void)buttonRighthandedClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonRightHanded.state);
-	Cvar_SetFloat("hand", isOn);
-}
-
-- (void)buttonAutoSwitchClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonAutoSwitch.state);
-	Cvar_SetFloat("_cl_autowepswitch", isOn);
-}
-
-- (void)buttonFastSwitchClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonFastSwitch.state);
-	Cvar_SetFloat("hud_fastswitch", isOn);
-}
-
-- (void)buttonShadowClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonFastSwitch.state);
-	Cvar_SetFloat("cl_shadows", isOn);
-}
-
-- (void)buttonWeatherClicked
-{
-	BOOL isOn = static_cast<BOOL>(self.touchBarButtonFastSwitch.state);
-	Cvar_SetFloat("cl_weather", isOn);
 }
 
 - (void)buttonESCClicked

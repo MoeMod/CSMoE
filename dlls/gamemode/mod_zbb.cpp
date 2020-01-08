@@ -412,7 +412,7 @@ void CMod_ZombieBaseBuilder::InstallPlayerModStrategy(CBasePlayer *player)
 BOOL CMod_ZombieBaseBuilder::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
 {
 	// skip zb1 infection...
-	return IBaseMod::FPlayerCanTakeDamage(pPlayer, pAttacker);
+	return CHalfLifeMultiplay::FPlayerCanTakeDamage(pPlayer, pAttacker);
 }
 
 }

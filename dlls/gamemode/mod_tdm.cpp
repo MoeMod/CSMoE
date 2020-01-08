@@ -134,7 +134,7 @@ void CMod_TeamDeathMatch::Think(void)
 
 void CMod_TeamDeathMatch::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
 {
-	IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
+	CHalfLifeMultiplay::PlayerKilled(pVictim, pKiller, pInflictor);
 
 	CBasePlayer *peKiller = NULL;
 	CBaseEntity *ktmp = CBaseEntity::Instance(pKiller);
@@ -222,7 +222,7 @@ void CMod_TeamDeathMatch::UpdateGameMode(CBasePlayer *pPlayer)
 
 void CMod_TeamDeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 {
-	IBaseMod::PlayerSpawn(pPlayer);
+	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
 
 	// Give Armor
