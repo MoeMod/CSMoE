@@ -87,7 +87,7 @@ elseif(APPLE)
 
 	set(CPACK_BINARY_DRAGNDROP ON)
 	include(CPack)
-	add_custom_target(csmoe_cpack_dmg ALL
+	add_custom_target(csmoe_cpack_dmg
 			COMMAND "cpack"
 			DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating DMG file")
 

@@ -112,7 +112,10 @@ jobs:
     - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
-    - sh scripts/build_osx_engine.sh;
+    - mkdir -p osx-build && cd osx-build
+    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - cmake --build --target csmoe_cpack_dmg -j 4
+    - cd ..
     before_deploy:
     - cp osx-build/CSMoE-macOS-x86_64.dmg CSMoE-CD-macOS-x86_64-unsigned-Full.dmg
     deploy:
