@@ -109,7 +109,7 @@ jobs:
     - mkdir -p ~/Library/Frameworks
     - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
     - brew install p7zip
-    - curl -s https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z > CSMoE-CD-GameDir-Full.7z
+    - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - sh scripts/build_osx_engine.sh;
