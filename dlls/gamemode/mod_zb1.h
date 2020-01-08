@@ -102,7 +102,7 @@ public:
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
 };
 
-class CZB1CountdownDelegate : public ICountdownDelegate
+class CZB1CountdownDelegate : virtual public ICountdownDelegate
 {
 public:
 	CZB1CountdownDelegate(CMod_Zombi* mod) : m_pMod(mod) {}

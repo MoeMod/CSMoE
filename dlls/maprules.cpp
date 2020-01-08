@@ -509,7 +509,7 @@ void CGamePlayerEquip::KeyValue(KeyValueData *pkvd)
 
 	if (!pkvd->fHandled)
 	{
-		for (int i = 0; i < MAX_EQUIP; ++i)
+		for (std::size_t i = 0; i < MAX_EQUIP; ++i)
 		{
 			if (FStringNull(m_weaponNames[i]))
 			{
@@ -550,7 +550,7 @@ void CGamePlayerEquip::EquipPlayer(CBaseEntity *pEntity)
 	if (!pPlayer)
 		return;
 
-	for (int i = 0; i < MAX_EQUIP; ++i)
+	for (std::size_t i = 0; i < MAX_EQUIP; ++i)
 	{
 		if (FStringNull(m_weaponNames[i]))
 			break;

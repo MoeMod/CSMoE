@@ -31,7 +31,7 @@ static const char* s_szCountDownSound[11] = {
 
 void CModCountdownHelper::Think()
 {
-	int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - m_pMod->m_fRoundCount.time_since_epoch() /1s);
+	int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - g_pGameRules->m_fRoundCount.time_since_epoch() /1s);
 
 	if (iCountDown != m_iLastCountDown)
 	{
@@ -68,13 +68,13 @@ void CModCountdownHelper::Think()
 
 bool CModCountdownHelper::IsExpired() const
 {
-	const int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - m_pMod->m_fRoundCount.time_since_epoch() /1s);
+	const int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - g_pGameRules->m_fRoundCount.time_since_epoch() /1s);
 	return iCountDown > m_iTotalCounts;
 }
 
 bool CModCountdownHelper::IsFreezePeriod() const
 {
-	return m_pMod->IsFreezePeriod();
+	return g_pGameRules->IsFreezePeriod();
 }
 
 }

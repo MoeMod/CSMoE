@@ -3229,7 +3229,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			else if (FStrEq(pcmd, "drop"))
 			{
 				// player is dropping an item.
-				if (g_pModRunning->ClientCommand(player, "BTE_ZombieSkill1") || player->m_pModStrategy->ClientCommand("BTE_ZombieSkill1"))
+				if (g_pGameRules->ClientCommand(player, "BTE_ZombieSkill1") || player->m_pModStrategy->ClientCommand("BTE_ZombieSkill1"))
 				{
 					// ...
 				}

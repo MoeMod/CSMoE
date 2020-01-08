@@ -99,7 +99,7 @@ private:
 	CMod_ZombieMod2 * const m_pModZB2;
 
 	//std::unique_ptr<IZombieSkill> m_pZombieSkill;
-	std::shared_ptr<IZombieModeCharacter_ZB2_Extra> m_pCharacter_ZB2;
+	std::shared_ptr<IZombieModeCharacter_ZB2> m_pCharacter_ZB2;
 	EngineClock::time_point m_flTimeNextZombieHealthRecovery;
 	int m_iZombieInfections;
 };

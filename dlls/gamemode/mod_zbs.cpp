@@ -170,12 +170,12 @@ void CMod_ZombieScenario::CheckMapConditions()
 void CMod_ZombieScenario::RestartRound()
 {
 	ClearZombieNPC();
-	IBaseMod::RestartRound();
+	CHalfLifeMultiplay::RestartRound();
 }
 
 void CMod_ZombieScenario::PlayerSpawn(CBasePlayer *pPlayer)
 {
-	IBaseMod::PlayerSpawn(pPlayer);
+	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
 }
 
 void CMod_ZombieScenario::WaitingSound()
@@ -271,8 +271,6 @@ void CMod_ZombieScenario::Think()
 			CVAR_SET_FLOAT("mp_winlimit", 0);
 		}
 	}
-
-	//return IBaseMod::Think();
 
 	if (FRoundStarted() && !m_bRoundTerminating)
 	{
