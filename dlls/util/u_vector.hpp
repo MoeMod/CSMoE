@@ -18,6 +18,7 @@ GNU General Public License for more details.
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <math.h>
 #include <utility>
 #include <numeric>
 #include <array>
