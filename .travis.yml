@@ -24,6 +24,46 @@ jobs:
       - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "Third attempt..."
       - cd ..
       - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
+      - rm -rf CSMoE-Full/valve/cl_dlls
+      - rm -rf CSMoE-Full/valve/dlls
+      - rm -rf CSMoE-Full/valve/maps
+      - rm -rf CSMoE-Full/valve/media
+      - rm -rf CSMoE-Full/valve/models/v_*.mdl
+      - rm -rf CSMoE-Full/valve/models/player
+      - rm -rf CSMoE-Full/valve/sound/agrunt
+      - rm -rf CSMoE-Full/valve/sound/aslave
+      - rm -rf CSMoE-Full/valve/sound/barnacle
+      - rm -rf CSMoE-Full/valve/sound/barney
+      - rm -rf CSMoE-Full/valve/sound/bullchicken
+      - rm -rf CSMoE-Full/valve/sound/boid
+      - rm -rf CSMoE-Full/valve/sound/fvox
+      - rm -rf CSMoE-Full/valve/sound/garg
+      - rm -rf CSMoE-Full/valve/sound/gman
+      - rm -rf CSMoE-Full/valve/sound/gonarch
+      - rm -rf CSMoE-Full/valve/sound/headcrab
+      - rm -rf CSMoE-Full/valve/sound/hgrunt
+      - rm -rf CSMoE-Full/valve/sound/holo
+      - rm -rf CSMoE-Full/valve/sound/hornet
+      - rm -rf CSMoE-Full/valve/sound/houndeye
+      - rm -rf CSMoE-Full/valve/sound/ichy
+      - rm -rf CSMoE-Full/valve/sound/leech
+      - rm -rf CSMoE-Full/valve/sound/nihilanth
+      - rm -rf CSMoE-Full/valve/sound/roach
+      - rm -rf CSMoE-Full/valve/sound/scientist
+      - rm -rf CSMoE-Full/valve/sound/squeek
+      - rm -rf CSMoE-Full/valve/sound/tentacle
+      - rm -rf CSMoE-Full/valve/sound/tride
+      - rm -rf CSMoE-Full/valve/sound/vox
+      - rm -rf CSMoE-Full/valve/sound/x
+      - rm -rf CSMoE-Full/valve/overviews
+      - rm -rf CSMoE-Full/valve/resource/background
+      - rm -rf CSMoE-Full/cstrike/cl_dlls
+      - rm -rf CSMoE-Full/cstrike/dlls
+      - rm -rf CSMoE-Full/cstrike/models/shield
+      - rm -rf CSMoE-Full/cstrike/models/player
+      - rm -rf CSMoE-Full/cstrike/models/player.mdl
+      - rm -rf CSMoE-Full/cstrike/models/v_*.mdl
+      - mv CSMoE-Full/cstrike/maps CSMoE-Full/csmoe/
       # skip zipping stage to save time when dev
     before_deploy:
       #- zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
