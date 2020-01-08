@@ -114,7 +114,7 @@ jobs:
     script:
     - mkdir -p osx-build && cd osx-build
     - cmake -DCMAKE_BUILD_TYPE=Release ../
-    - cmake --build --target csmoe_cpack_dmg -j 4
+    - cmake --build . --target csmoe_cpack_dmg -j 4
     - cd ..
     before_deploy:
     - cp osx-build/CSMoE-macOS-x86_64.dmg CSMoE-CD-macOS-x86_64-unsigned-Full.dmg
