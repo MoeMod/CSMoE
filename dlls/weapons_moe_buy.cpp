@@ -69,6 +69,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
                                                   {"weapon_mg3",         "MG-3",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_mg3xmas",         "MG3 Xmas Edition",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 											   	  {"weapon_m95xmas",         "M95 Xmas Edition",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_janus7xmas",         "Janus-7 Xmas Edition",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_m134xmas",         "M134 Xmas Edition",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_mg36",         "MG-36",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 

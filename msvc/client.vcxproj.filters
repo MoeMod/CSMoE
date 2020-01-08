@@ -792,8 +792,11 @@
     <ClCompile Include="..\cl_dll\events\event_mg3xmas.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
-    <ClCompile Include="..\cl_dll\stdafx.cpp">
-      <Filter>cl_dll</Filter>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_janus7xmas.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_janus7xmas.cpp">
+      <Filter>cl_dll\events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1202,8 +1205,8 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\cl_dll\stdafx.h">
-      <Filter>cl_dll</Filter>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_janus7xmas.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
