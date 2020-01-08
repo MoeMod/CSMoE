@@ -244,13 +244,13 @@ using std::abs;
 using std::acos;
 using std::fma;
 
-template<class A, class B, class...Rest> inline auto hypot(A a, B b, Rest...args) -> decltype(hypot(a, b), typename std::common_type<A, B, Rest...>::type()) {
-	return hypot(hypot(a, b), args...);
-}
+template<class T> inline T hypot(T x) { return abs(x); }
 template<class...Args> inline auto hypot(Args...args) -> typename std::common_type<Args...>::type {
 	return sqrt(sum_args<typename std::common_type<Args...>::type>((args * args)...));
 }
-template<class T> inline T hypot(T x) { return abs(x); }
+template<class A, class B, class C, class...Rest> inline auto hypot(A a, B b, C c, Rest...args) -> decltype(hypot(a, b), typename std::common_type<A, B, C, Rest...>::type()) {
+	return hypot(hypot(a, b), hypot(c, args...));
+}
 
 template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
 	return 1 / sqrt(x);
