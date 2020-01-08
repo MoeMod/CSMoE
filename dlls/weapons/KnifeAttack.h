@@ -59,6 +59,11 @@ KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bi
 		CBaseEntity *pHit = CBaseEntity::Instance(tr.pHit);
 		if (pHit && pHit->pev->takedamage != DAMAGE_NO) {
 			const float flAdjustedDamage = flDamage;
+
+			UTIL_MakeVectors(pHit->pev->angles);
+			if (DotProduct((tr.vecEndPos - vecSrc).Normalize().Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+				flDamage *= 3.0;
+
 			ClearMultiDamage();
 			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 			ApplyMultiDamage(pevInflictor, pevAttacker);
