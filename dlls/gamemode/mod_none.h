@@ -12,7 +12,7 @@
 
 namespace sv {
 
-class CMod_None : public IBaseMod
+class CMod_None : public CBaseModDefault
 {
 public:
 	CMod_None() {}

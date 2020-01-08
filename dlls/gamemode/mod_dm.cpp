@@ -130,7 +130,7 @@ void CMod_DeathMatch::Think(void)
 
 void CMod_DeathMatch::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
 {
-	// IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
+	// CHalfLifeMultiplay::PlayerKilled(pVictim, pKiller, pInflictor);
 	// overrides it!
 
 	DeathNotice(pVictim, pKiller, pInflictor);
@@ -290,7 +290,7 @@ void CMod_DeathMatch::UpdateGameMode(CBasePlayer *pPlayer)
 
 void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 {
-	IBaseMod::PlayerSpawn(pPlayer);
+	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
 
 	// Give Armor

@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 namespace sv {
 
-class IZombieModeCharacter_ZB2_Extra
+class IZombieModeCharacter_ZB2 : virtual public IZombieModeCharacter
 {
 public:
 	virtual float HealthRecoveryAmount() const = 0;
@@ -31,7 +31,7 @@ public:
 	virtual void OnWeaponDeploy(CBasePlayerItem *item) = 0;
 };
 
-class CHuman_ZB2 : public CHuman_ZB1, public IZombieModeCharacter_ZB2_Extra
+class CHuman_ZB2 : public CHuman_ZB1, virtual public IZombieModeCharacter_ZB2
 {
 public:
 	explicit CHuman_ZB2(CBasePlayer *player);
@@ -54,7 +54,7 @@ protected:
 
 class IZombieSkill;
 
-class CBaseZombieClass_ZB2 : public CZombie_ZB1, public IZombieModeCharacter_ZB2_Extra
+class CBaseZombieClass_ZB2 : public CZombie_ZB1, virtual public IZombieModeCharacter_ZB2
 {
 public:
 	explicit CBaseZombieClass_ZB2(CBasePlayer *player, ZombieLevel lv) : CZombie_ZB1(player, lv) {}

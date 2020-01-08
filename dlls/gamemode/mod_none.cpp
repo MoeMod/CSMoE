@@ -14,7 +14,7 @@ namespace sv {
 
 void CMod_None::CheckMapConditions()
 {
-	IBaseMod::CheckMapConditions();
+	CBaseModDefault::CheckMapConditions();
 	m_mapBombZones.clear();
 	if (m_bMapHasBombZone)
 	{

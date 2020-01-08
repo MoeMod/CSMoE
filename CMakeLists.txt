@@ -1,10 +1,10 @@
-
+project(csmoe)
 cmake_minimum_required(VERSION  2.8.0)
 
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(IOS)
+if(APPLE)
 	option(XASH_STATIC_GAMELIB "Build static game library" ON)
 else()
 	option(XASH_STATIC_GAMELIB "Build static game library" OFF)
@@ -71,6 +71,8 @@ endif()
 if(NOT ${CMAKE_INSTALL_PREFIX})
 	if(WIN32)
 		set (CMAKE_INSTALL_PREFIX "D:/CSMoE")
+	elseif(APPLE)
+		set(CMAKE_INSTALL_PREFIX "/Applications")
 	else()
 		set (CMAKE_INSTALL_PREFIX "~/CSMoE/")
 	endif()
