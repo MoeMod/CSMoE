@@ -20,14 +20,14 @@
 #include "weapons.h"
 #include "wpn_gatling.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
-#endif
-
-#ifndef CLIENT_DLL
-#include "gamemode/mods.h"
 #endif
 
 enum gatling_e
