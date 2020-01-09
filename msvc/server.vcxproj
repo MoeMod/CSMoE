@@ -217,6 +217,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_scout.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_sgdrill.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
@@ -418,6 +419,7 @@
     <ClInclude Include="..\dlls\weapons\ItemInfo.hpp" />
     <ClInclude Include="..\dlls\weapons\PrecacheEvent.hpp" />
     <ClInclude Include="..\dlls\weapons\PrimaryAttackRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\RadiusDamage.hpp" />
     <ClInclude Include="..\dlls\weapons\RecoilKickBack.hpp" />
     <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
@@ -483,6 +485,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_scout.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_sgdrill.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />

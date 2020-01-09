@@ -163,6 +163,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m95xmas");
 	UTIL_PrecacheOtherWeapon("weapon_mg3xmas");
 	UTIL_PrecacheOtherWeapon("weapon_janus7xmas");
+	UTIL_PrecacheOtherWeapon("weapon_sgdrill");
+	UTIL_PrecacheOther("ammo_sgdrill");
 	UTIL_PrecacheOtherWeapon("weapon_mg3");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");

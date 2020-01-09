@@ -146,6 +146,21 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity *pOther);
 };
 
+class CSgdrillAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity *pOther);
+};
+
+class C12GaugeAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity *pOther);
+};
 }
 
 #endif // AMMO_H

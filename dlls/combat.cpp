@@ -1423,8 +1423,9 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
 
 			if (iDamage) {
-				pEntity->TraceAttack(pevAttacker, iDamage, vecDir, &tr,
-				                     DMG_BULLET | ((iDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB));
+				float flDamage = ((1 - tr.flFraction) * iDamage);
+				pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr,
+				                     DMG_BULLET);
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 				DecalGunshot(&tr, iBulletType, false, pev, false);
 			} else {
