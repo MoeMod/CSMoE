@@ -26,6 +26,10 @@ namespace cl {
 namespace sv {
 #endif
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 enum sgdrill_e
 {
 	SGDRILL_IDLE,
