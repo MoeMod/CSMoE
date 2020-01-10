@@ -26,6 +26,7 @@ public:
 	float GetMaxSpeed() override { return XM1014_MAX_SPEED; }
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
+	int GetPrimaryAttackDamage() const;
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
@@ -37,6 +38,9 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 750.0f, 550.0f, 650.0f, 500.0f, 0.4f }; }
 	const char *GetCSModelName() override { return "models/w_gatling.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_12gauge" , 65 }; }
+#endif
 
 public:
 	int m_iShell;

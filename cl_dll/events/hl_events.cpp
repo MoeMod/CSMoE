@@ -82,6 +82,7 @@ int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
 	DECLARE_EVENT(FireMG3xmas);
 	DECLARE_EVENT(FireM95xmas);
 	DECLARE_EVENT(FireJanus7xmas);
+	DECLARE_EVENT(FireSgdrill);
 	DECLARE_EVENT(FireM134xmas);
 	DECLARE_EVENT(FireM14EBR);
 	DECLARE_EVENT(FireGatling);
@@ -180,6 +181,7 @@ void Game_HookEvents( void )
 	HOOK_EVENT(mg3xmas, FireMG3xmas);
 	HOOK_EVENT(m95xmas, FireM95xmas);
 	HOOK_EVENT(janus7xmas, FireJanus7xmas);
+	HOOK_EVENT(sgdrill, FireSgdrill);
 	HOOK_EVENT(m134xmas, FireM134xmas);
 	HOOK_EVENT(m14ebr, FireM14EBR);
 	HOOK_EVENT(gatling, FireGatling);

@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_gatling.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -69,8 +73,8 @@ void CGatling::Precache(void)
 int CGatling::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "buckshot";
-	p->iMaxAmmo1 = MAX_AMMO_BUCKSHOT;
+	p->pszAmmo1 = "12gauge";
+	p->iMaxAmmo1 = 80;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = GATLING_MAX_CLIP;
@@ -119,7 +123,7 @@ void CGatling::PrimaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(7, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0);
+	m_pPlayer->FireBullets(7, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -146,10 +150,14 @@ void CGatling::PrimaryAttack(void)
 		m_flTimeWeaponIdle = 0.75s;
 
 
-	if (m_pPlayer->pev->flags & FL_ONGROUND)
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 3, 5);
+	if (m_pPlayer->pev->velocity.Length2D() > 0)
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 1, 3.0, 4.0);
+	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 5.0, 6.0);
+	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 1.5, 2.0);
 	else
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 10);
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 2.0, 3.0);
 }
 
 void CGatling::Reload(void)
@@ -176,6 +184,18 @@ void CGatling::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(GATLING_IDLE, UseDecrement() != FALSE);
 	
+}
+
+int CGatling::GetPrimaryAttackDamage() const
+{
+	int iDamage = 22;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		iDamage = 32;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		iDamage = 32;
+#endif
+	return iDamage;
 }
 
 }

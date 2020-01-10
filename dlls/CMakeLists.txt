@@ -229,6 +229,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_deagled.cpp
 	../dlls/wpn_shared/wpn_as50.cpp
 	../dlls/wpn_shared/wpn_cannon.cpp
+	../dlls/wpn_shared/wpn_sgdrill.cpp
 	../dlls/wpn_shared/z4b_cannontiger.cpp
 	../dlls/wpn_shared/z4b_cannonplasma.cpp
 	../dlls/wpn_shared/wpn_infinity.cpp
