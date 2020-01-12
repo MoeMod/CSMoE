@@ -209,17 +209,20 @@ jobs:
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
+    - sudo apt-get install p7zip-full
+    - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
+    - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - cd Android
     - "./gradlew assembleRelease"
     - cd ..
     before_deploy:
-      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned.apk
+      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-Full-unsigned.apk
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-Android-arm64-unsigned.apk
+        - CSMoE-CD-Android-arm64-Full-unsigned.apk
       on:
         branch: master
         repo: MoeMod/CSMoE

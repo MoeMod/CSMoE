@@ -8,6 +8,7 @@ import javax.microedition.khronos.egl.*;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.AssetManager;
 import android.view.*;
 import android.os.*;
 import android.util.*;
@@ -25,8 +26,13 @@ import android.database.*;
 
 import android.view.inputmethod.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.*;
 import java.lang.reflect.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.security.MessageDigest;
 
@@ -48,9 +54,6 @@ public class XashActivity extends Activity {
 	protected static View mTextEdit;
 	protected static ViewGroup mLayout;
 	
-	private static boolean mUseRoDir;
-	private static String mWriteDir;
-	
 	public static EngineSurface mSurface;
 	public static String mArgv[];
 	public static final int sdk = Integer.valueOf( Build.VERSION.SDK );
@@ -71,8 +74,6 @@ public class XashActivity extends Activity {
 
 	private static boolean mHasVibrator;
 	private int mReturingWithResultCode = 0;
-	
-	private static int FPICKER_RESULT = 2;
 	
 
 	// Joystick constants
@@ -130,72 +131,10 @@ public class XashActivity extends Activity {
 			setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
 			
 		mPref = this.getSharedPreferences( "engine", 0 );
-		
-		mUseRoDir = mPref.getBoolean("use_rodir", false);
-		mWriteDir = mPref.getString("writedir", FWGSLib.getExternalFilesDir( this ));
-		
-		// just in case
-		if( mWriteDir.length() == 0 )
-		{
-			mWriteDir = FWGSLib.getExternalFilesDir( this );
-		}
-		
-		if( mPref.getBoolean( "folderask", true ) )
-		{
-			Log.v( TAG, "folderask == true. Opening FPicker..." );
-		
-			Intent intent = new Intent( this, in.celest.xash3d.FPicker.class );
-			startActivityForResult( intent, FPICKER_RESULT );
-		}
-		else
-		{
-			Log.v( TAG, "folderask == false. Checking write permission..." );
 
-			// check write permission and run engine, if possible
-			String basedir = FWGSLib.getStringExtraFromIntent( getIntent(), "basedir", mPref.getString( "basedir", "/sdcard/xash/" ) );
-			checkWritePermission( basedir );
-		}
+		launchSurfaceAndEngine();
 	}
-	
-	@Override
-	public void onActivityResult( int requestCode, int resultCode, Intent resultData ) 
-	{
-		if( resultCode != RESULT_OK )
-		{
-			Log.v( TAG, "onActivityResult: result is not OK. ReqCode: " + requestCode + ". ResCode: " + resultCode );
-		}
-		else
-		{
-			// it's not possible to create dialogs here
-			// so most work will be done after Activity resuming, in onPostResume()
-			mReturingWithResultCode = requestCode;
-			if( requestCode == FPICKER_RESULT )
-			{
-				String newBaseDir = resultData.getStringExtra( "GetPath" );
-				setNewBasedir( newBaseDir );
-				setFolderAsk( this, false ); // don't ask on next run
-				Log.v( TAG, "Got new basedir from FPicker: " + newBaseDir );
-			}
-		}
-	}
-	
-	@Override
-	public void onPostResume()
-	{
-		super.onPostResume();
-		
-		if( mReturingWithResultCode != 0 )
-		{
-			if( mReturingWithResultCode == FPICKER_RESULT )
-			{
-				String basedir = mPref.getString( "basedir", "/sdcard/xash/" );
-				checkWritePermission( basedir );
-			}
-			
-			mReturingWithResultCode = 0;
-		}
-	}
-	
+
 		// Events
 	@Override
 	protected void onPause() {
@@ -274,116 +213,6 @@ public class XashActivity extends Activity {
 		{
 			mImmersiveMode.apply();
 		}
-	}
-	
-	public static void setFolderAsk( Context ctx, Boolean b )
-	{
-		SharedPreferences pref = ctx.getSharedPreferences( "engine", 0 );
-		
-		if( pref.getBoolean( "folderask", true ) == b )
-			return;
-	
-		SharedPreferences.Editor editor = pref.edit();
-		
-		editor.putBoolean( "folderask", b );
-		editor.commit();
-	}
-	
-	private void setNewBasedir( String baseDir )
-	{
-		SharedPreferences.Editor editor = mPref.edit();
-		
-		editor.putString( "basedir", baseDir );
-		editor.commit();
-	}
-	
-	
-	private DialogInterface.OnClickListener folderAskEnable = new DialogInterface.OnClickListener()
-	{
-		@Override
-		public void onClick( DialogInterface dialog, int whichButton ) 
-		{
-			XashActivity act = XashActivity.this;
-			act.setFolderAsk( XashActivity.this, true );
-			act.finish();
-		}
-	};
-	
-	private void checkWritePermission( String basedir )
-	{
-		Log.v( TAG, "Checking write permissions..." );
-		
-		String testDir = mUseRoDir ? mWriteDir : basedir;
-
-		if( nativeTestWritePermission( testDir ) == 0 )
-		{
-			Log.v( TAG, "First check has failed!" );
-			
-			String msg = null;
-			
-			if( sdk > 20 )
-			{
-				// 5.0 and higher _allows_ writing to SD card, but have broken fopen()/open() call. So, no Xash here. F*ck you, Google!
-				msg = getString( R.string.lollipop_write_fail_msg );
-			}
-			else if( sdk > 18 )
-			{
-				// 4.4 and 4.4W does not allow SD card write at all
-				msg = getString( R.string.kitkat_write_fail_msg );
-			}
-			else
-			{
-				// Read-only filesystem
-				// Logically should be never reached
-				msg = getString( R.string.readonly_fs_fail_msg );
-			}
-			
-			new AlertDialog.Builder( this )
-				.setTitle( R.string.write_failed )
-				.setMessage( msg )
-				.setPositiveButton( R.string.ok, folderAskEnable )
-				.setNegativeButton( R.string.convert_to_rodir, new DialogInterface.OnClickListener()
-					{
-						public void onClick( DialogInterface dialog, int whichButton )
-						{
-							XashActivity.this.convertToRodir();
-						}
-					})
-				.setCancelable( false )
-				.show();
-		}
-		else
-		{
-			// everything is normal, so launch engine
-			launchSurfaceAndEngine();
-		}
-	}
-	
-	private void convertToRodir()
-	{
-		mWriteDir = FWGSLib.getExternalFilesDir(this);
-
-		new AlertDialog.Builder( this )
-			.setTitle( R.string.convert_to_rodir )
-			.setMessage( String.format( getString( R.string.rodir_warning ), mWriteDir ) )
-			.setNegativeButton( R.string.cancel, folderAskEnable )
-			.setPositiveButton( R.string.ok, new DialogInterface.OnClickListener()
-			{
-				@Override
-				public void onClick( DialogInterface dialog, int whichButton )
-				{
-					XashActivity.mUseRoDir = true;
-														
-					SharedPreferences.Editor editor = XashActivity.this.mPref.edit();
-					editor.putBoolean("use_rodir", XashActivity.mUseRoDir);
-					editor.putString("writedir", XashActivity.mWriteDir);
-					editor.commit();
-					
-					XashActivity.this.launchSurfaceAndEngine();
-				}
-			})
-			.setCancelable( false )
-			.show();		
 	}
 	
 	private void launchSurfaceAndEngine()
@@ -471,9 +300,10 @@ public class XashActivity extends Activity {
 		String argv       = FWGSLib.getStringExtraFromIntent( intent, "argv", mPref.getString( "argv", "-dev 3 -log" ) );
 		String gamelibdir = FWGSLib.getStringExtraFromIntent( intent, "gamelibdir", enginedir );
 		String gamedir    = FWGSLib.getStringExtraFromIntent( intent, "gamedir", "csmoe" );
-		String basedir    = FWGSLib.getStringExtraFromIntent( intent, "basedir", mPref.getString( "basedir", "/sdcard/xash/" ) );
+		String basedir    = FWGSLib.getStringExtraFromIntent( intent, "basedir", mPref.getString( "basedir", FWGSLib.getDefaultXashPath(this) ) );
+		//String assetsdir  = "file:///android_asset/";
 		String gdbsafe    = intent.getStringExtra( "gdbsafe" );
-		
+
 		/*bIsCstrike = ( gamedir.equals("cstrike") || gamedir.equals("czero") || gamedir.equals("czeror") );
 		
 		if( bIsCstrike )
@@ -499,20 +329,9 @@ public class XashActivity extends Activity {
 		
 		mArgv = argv.split( " " );
 
-		
-		if( mUseRoDir )
-		{
-			Log.d( TAG, "Enabled RoDir: " + basedir + " -> " + mWriteDir );
-		
-			setenv( "XASH3D_RODIR",   basedir,   true );
-			setenv( "XASH3D_BASEDIR", mWriteDir, true );
-		}
-		else
-		{
-			Log.d( TAG, "Disabled RoDir: " + basedir );
-			
-			setenv( "XASH3D_BASEDIR", basedir,   true );
-		}
+		// TODO(MoeMod) : bundle res
+		//setenv( "XASH3D_RODIR",   assetsdir,   true );
+		setenv( "XASH3D_BASEDIR", basedir, true );
 		setenv( "XASH3D_ENGLIBDIR",  enginedir,  true );
 		setenv( "XASH3D_GAMELIBDIR", gamelibdir, true );
 		setenv( "XASH3D_GAMEDIR",    gamedir,    true );
@@ -999,18 +818,8 @@ public class XashActivity extends Activity {
 		final Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(path));
 		mSingleton.startActivity(intent);
 	}
-}
 
 
-/**
- Simple nativeInit() runnable
- */
-class XashMain implements Runnable 
-{
-	public void run()
-	{
-		XashActivity.nativeInit( XashActivity.mArgv );
-	}
 }
 
 /**
@@ -1111,7 +920,12 @@ class EngineSurface extends SurfaceView implements SurfaceHolder.Callback, View.
 		// Now start up the C app thread
 		if( mEngThread == null ) 
 		{
-			mEngThread = new Thread( new XashMain(), "EngineThread" );
+			mEngThread = new Thread( new Runnable() {
+				public void run()
+				{
+					XashActivity.nativeInit( XashActivity.mArgv );
+				}
+			}, "EngineThread" );
 			mEngThread.start();
 		}
 		resizing = false;
