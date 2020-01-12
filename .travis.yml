@@ -178,17 +178,20 @@ jobs:
     - curl -s http://libsdl.org/release/SDL2-2.0.10.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.10 SDL2
+    - brew install p7zip
+    - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
+    - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - set -o pipefail && xcodebuild archive -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS -configuration Release -archivePath ./CSMoE-iOS.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/csmoe-ios.app Payload/
     before_deploy:
-      - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
+      - zip -r CSMoE-CD-iOS-universal-unsigned-Full.ipa Payload
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-iOS-universal-unsigned.ipa
+        - CSMoE-CD-iOS-universal-unsigned-Full.ipa
       on:
         branch: master
         repo: MoeMod/CSMoE
