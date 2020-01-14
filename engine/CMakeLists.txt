@@ -283,7 +283,7 @@ endif()
 add_definitions(-DXASH_FORCEINLINE)
 
 # Important, as HLSDK and engine shares some symbol names!
-if(NOT WIN32 AND NOT IOS) # Windows by default have hidden visibility and better linker
+if(NOT WIN32) # Windows by default have hidden visibility and better linker
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
