@@ -29,7 +29,7 @@
 #include "player/player_model.h"
 #include "player/player_mod_strategy.h"
 #include "player/player_zombie.h"
-#include "weapons_moe_buy.h"
+#include "weapons_buy.h"
 
 #include <tuple>
 

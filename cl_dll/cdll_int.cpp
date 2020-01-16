@@ -439,8 +439,9 @@ extern "C" void DLLEXPORT F(void *pv) {
 		HUD_GetRenderInterface,	// Xash3D pfnGetRenderInterface
 		nullptr,	// Xash3D pfnClipMoveToEntity
 		IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
-		nullptr,	// SDL Xash pfnMoveEvent
-		nullptr	// SDL Xash pfnLookEvent
+		IN_ClientMoveEvent,	// SDL Xash pfnMoveEvent
+		IN_ClientLookEvent,	// SDL Xash pfnLookEvent
+		HUD_OnGUI,	// SDL Xash pfnOnGUI
 	};
 
 	*pcldll_func = cldll_func;
@@ -505,7 +506,8 @@ extern "C" void DLLEXPORT F(void *pv) {
 			nullptr,	// Xash3D pfnClipMoveToEntity
 			IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
 			nullptr,	// SDL Xash pfnMoveEvent
-			nullptr	// SDL Xash pfnLookEvent
+			nullptr,	// SDL Xash pfnLookEvent
+		    HUD_OnGUI,	// SDL Xash pfnOnGUI
 	};
 
 	*pcldll_func = cldll_func;
@@ -559,10 +561,9 @@ static dllexport_t switch_client_exports[] = {
 	{ "HUD_GetStudioModelInterface", (void*)HUD_GetStudioModelInterface },
 	{ "HUD_DirectorMessage", (void*)HUD_DirectorMessage },
 	{ "HUD_VoiceStatus", (void*)HUD_VoiceStatus },
-#ifndef _WIN32
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
-#endif
+	{ "HUD_OnGUI", (void*)HUD_OnGUI },
 	{ NULL, NULL },
 };
 

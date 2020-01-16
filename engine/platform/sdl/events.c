@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include "sound.h"
 #include "gl_vidnt.h"
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 extern convar_t *vid_fullscreen;
 extern convar_t *snd_mute_losefocus;
 static int wheelbutton;
@@ -178,6 +182,10 @@ SDLash_InputEvent
 */
 static void SDLash_InputEvent( SDL_TextInputEvent input )
 {
+#ifdef XASH_IMGUI
+	if(ImGui_ImplGL_CharCallbackUTF( input.text ))
+		return;
+#endif
 	int i;
 
 	// Pass characters one by one to Con_CharEvent
@@ -272,6 +280,15 @@ static void SDLash_EventFilter( SDL_Event *event )
 #else
 		SDLash_MouseEvent( event->button );
 #endif
+#ifdef XASH_IMGUI
+		{
+			if (event->button.button == SDL_BUTTON_LEFT && ImGui_ImplGL_MouseButtonCallback(0, false)) break;
+			if (event->button.button == SDL_BUTTON_RIGHT && ImGui_ImplGL_MouseButtonCallback(1, false)) break;
+			if (event->button.button == SDL_BUTTON_MIDDLE && ImGui_ImplGL_MouseButtonCallback(2, false)) break;
+			if (event->button.button == SDL_BUTTON_X1 && ImGui_ImplGL_MouseButtonCallback(3, false)) break;
+			if (event->button.button == SDL_BUTTON_X2 && ImGui_ImplGL_MouseButtonCallback(4, false)) break;
+		}
+#endif
 		break;
 	case SDL_MOUSEBUTTONDOWN:
 #ifdef TOUCHEMU
@@ -284,6 +301,15 @@ static void SDLash_EventFilter( SDL_Event *event )
 		IN_DeactivateMouse();
 #else
 		SDLash_MouseEvent( event->button );
+#endif
+#ifdef XASH_IMGUI
+			{
+				if (event->button.button == SDL_BUTTON_LEFT && ImGui_ImplGL_MouseButtonCallback(0, true)) break;
+				if (event->button.button == SDL_BUTTON_RIGHT && ImGui_ImplGL_MouseButtonCallback(1, true)) break;
+				if (event->button.button == SDL_BUTTON_MIDDLE && ImGui_ImplGL_MouseButtonCallback(2, true)) break;
+				if (event->button.button == SDL_BUTTON_X1 && ImGui_ImplGL_MouseButtonCallback(3, true)) break;
+				if (event->button.button == SDL_BUTTON_X2 && ImGui_ImplGL_MouseButtonCallback(4, true)) break;
+			}
 #endif
 		break;
 

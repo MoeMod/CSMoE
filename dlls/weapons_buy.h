@@ -197,6 +197,9 @@ bool IsSecondaryWeapon(int id);
 WeaponInfoStruct *GetWeaponInfo(int weaponID);
 bool CanBuyWeaponByMaptype(int playerTeam, WeaponIdType weaponID, bool useAssasinationRestrictions);
 
+class CBasePlayer;
+bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand);
+
 }
 #endif // CLIENT_DLL
 

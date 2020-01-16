@@ -25,8 +25,8 @@ typedef struct point_s{
 	int y;
 } POINT;
 #endif
-#define GetCursorPos(x)
-#define SetCursorPos(x,y)
+inline void GetCursorPos(...) {}
+inline void SetCursorPos(...) {}
 #endif
 
 #endif
