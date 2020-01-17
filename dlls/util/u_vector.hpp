@@ -24,6 +24,10 @@ GNU General Public License for more details.
 #include <array>
 #include <type_traits>
 
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+
 #ifndef CLIENT_DLL
 namespace sv {
 #else
@@ -249,12 +253,23 @@ template<class T> inline T hypot(T x) { return abs(x); }
 template<class...Args> inline auto hypot(Args...args) -> typename std::common_type<Args...>::type {
 	return sqrt(sum_args<typename std::common_type<Args...>::type>((args * args)...));
 }
-template<class A, class B, class C, class...Rest> inline auto hypot(A a, B b, C c, Rest...args) -> decltype(hypot(a, b), typename std::common_type<A, B, C, Rest...>::type()) {
-	return hypot(hypot(a, b), hypot(c, args...));
-}
 
 template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
 	return 1 / sqrt(x);
+}
+
+inline float rsqrt(float x)
+{
+#ifdef __SSE__
+    return _mm_rsqrt_ps(_mm_set1_ps(x))[0];
+#else
+    float xhalf = 0.5f * x;
+    int i = *(int *)&x;
+    i = 0x5f3759df - (i>>1);
+    x = *(float *)&i;
+    x = x * (1.5f - xhalf * x * x);
+    return x;
+#endif
 }
 
 }
@@ -285,12 +300,12 @@ inline typename VecType::value_type LengthReverse_impl(VecType vec, std::index_s
 	return moe_math_util::rsqrt( moe_math_util::sum_args<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...) );
 }
 template<class VecType, std::size_t...I>
-constexpr VecType fma_impl(VecType x, typename VecType::value_type y, VecType z, std::index_sequence<I...>)
+inline VecType fma_impl(VecType x, typename VecType::value_type y, VecType z, std::index_sequence<I...>)
 {
 	return { moe_math_util::fma(x.template get<I>(), y, z.template get<I>())... };
 }
 template<class VecType, std::size_t...I>
-constexpr VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, std::index_sequence<I...>)
+inline VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, std::index_sequence<I...>)
 {
 	return { moe_math_util::fma(x, y.template get<I>(), z.template get<I>())... };
 }
@@ -380,6 +395,18 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return fma_impl(x, y, z, std::make_index_sequence<N>());
 	}
 
+    // t*(b-a) + a;
+	friend VectorBase lerp(VectorBase a, VectorBase b, T t)
+	{
+		return fma(t, b - a, a);
+	}
+
+    // 0.5*(b-a) + a;
+	friend VectorBase midpoint(VectorBase a, VectorBase b)
+	{
+		return (b - a) / 2 + a;
+	}
+
 	constexpr T LengthSquared() const
 	{
 		return LengthSquared_impl(*this, std::make_index_sequence<N>());
@@ -407,7 +434,7 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 
 	VectorBase Normalize() const
 	{
-		return *this / LengthReverse();
+		return *this * LengthReverse();
 	}
 
 	T NormalizeInPlace()
