@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include <SDL_keyboard.h>
 #endif
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 typedef enum
 {
 	touch_command, // just tap a button
@@ -1843,6 +1847,12 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 			Key_Event( K_MOUSE1, false );
 		return 0;
 	}
+
+#ifdef XASH_IMGUI
+	{
+		ImGui_ImplGL_TouchCallback(type, fingerID, x, y, dx, dy, pressure);
+	}
+#endif
 
 
 	if( VGui_IsActive() )

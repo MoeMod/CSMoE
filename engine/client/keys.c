@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include <platform/sdl/events.h>
 #endif
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 typedef struct key_s
 {
 	qboolean		down;
@@ -602,6 +606,10 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 	{
 		keys[key].repeats = 0;
 	}
+#ifdef XASH_IMGUI
+	if(ImGui_ImplGL_KeyEvent( key, down ))
+		return;
+#endif
 
 	VGui_KeyEvent( key, down );
 	Touch_KeyEvent( key, down );
