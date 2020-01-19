@@ -278,6 +278,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	else
 #endif // _WIN32 && !XASH_64BIT
 	{
+#ifndef TARGET_OS_MAC
 		Q_strcpy( iconpath, GI->iconpath );
 		FS_StripExtension( iconpath );
 		FS_DefaultExtension( iconpath, ".tga") ;
@@ -298,6 +299,8 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 
 			FS_FreeImage( icon );
 		}
+#endif
+
 #if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 		else
 		{

@@ -217,8 +217,7 @@ static qboolean Sys_DebuggerPresent(void)
 #define DEBUG_BREAK \
 	if( Sys_DebuggerPresent() ) { __asm__("int $3"); }
 #else
-#define DEBUG_BREAK \
-	if( Sys_DebuggerPresent() ) { __asm__("trap"); }
+#define DEBUG_BREAK 
 #endif // __i386__
 
 #endif // __APPLE__

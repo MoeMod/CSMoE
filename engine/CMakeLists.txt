@@ -22,6 +22,8 @@
 cmake_minimum_required(VERSION  2.8.0)
 project(XASH_ENGINE C)
 
+set(CMAKE_CXX_STANDARD 14)
+
 set(XASH_ENGINE xash) # Lib name
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
@@ -281,7 +283,7 @@ endif()
 add_definitions(-DXASH_FORCEINLINE)
 
 # Important, as HLSDK and engine shares some symbol names!
-if(NOT WIN32 AND NOT IOS) # Windows by default have hidden visibility and better linker
+if(NOT WIN32) # Windows by default have hidden visibility and better linker
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
@@ -291,7 +293,7 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(IOS)
+if(APPLE)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
@@ -348,7 +350,9 @@ endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-	find_package(SDL2 REQUIRED)
+	if(NOT IOS AND NOT ANDROID)
+		find_package(SDL2)
+	endif()
 	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
 	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
@@ -393,6 +397,8 @@ endif()
 
 if(APPLE)
 	target_link_libraries(${XASH_ENGINE} "-framework AppKit -framework AudioToolBox")
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

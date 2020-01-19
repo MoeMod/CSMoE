@@ -229,8 +229,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_deagled.cpp
 	../dlls/wpn_shared/wpn_as50.cpp
 	../dlls/wpn_shared/wpn_cannon.cpp
-		wpn_shared/z4b_cannontiger.cpp
-		wpn_shared/z4b_cannonplasma.cpp
+	../dlls/wpn_shared/wpn_sgdrill.cpp
+	../dlls/wpn_shared/z4b_cannontiger.cpp
+	../dlls/wpn_shared/z4b_cannonplasma.cpp
 	../dlls/wpn_shared/wpn_infinity.cpp
 	../dlls/wpn_shared/wpn_k1a.cpp
 	../dlls/wpn_shared/wpn_kriss.cpp
@@ -261,7 +262,12 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
+	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_m134.cpp
+	../dlls/wpn_shared/wpn_m134xmas.cpp
+	../dlls/wpn_shared/wpn_mg3xmas.cpp
+	../dlls/wpn_shared/wpn_m95xmas.cpp
+	../dlls/wpn_shared/wpn_m134ex.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp

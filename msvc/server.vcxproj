@@ -135,6 +135,12 @@
     <ClCompile Include="..\dlls\sound.cpp" />
     <ClCompile Include="..\dlls\soundent.cpp" />
     <ClCompile Include="..\dlls\spectator.cpp" />
+    <ClCompile Include="..\dlls\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\dlls\subs.cpp" />
     <ClCompile Include="..\dlls\training_gamerules.cpp" />
     <ClCompile Include="..\dlls\triggers.cpp" />
@@ -181,11 +187,13 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex2.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinitys.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_janus7xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_k1a.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_knife.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_kriss.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m134.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m134ex.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m134xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m14ebr.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m1887.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m2.cpp" />
@@ -193,9 +201,11 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_m3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m4a1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_m95.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_m95xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mac10.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_mg3xmas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
@@ -207,6 +217,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_scout.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg550.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sg552.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_sgdrill.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
@@ -378,6 +389,7 @@
     <ClInclude Include="..\dlls\sound.h" />
     <ClInclude Include="..\dlls\soundent.h" />
     <ClInclude Include="..\dlls\spectator.h" />
+    <ClInclude Include="..\dlls\stdafx.h" />
     <ClInclude Include="..\dlls\subs.h" />
     <ClInclude Include="..\dlls\talkmonster.h" />
     <ClInclude Include="..\dlls\training_gamerules.h" />
@@ -407,6 +419,7 @@
     <ClInclude Include="..\dlls\weapons\ItemInfo.hpp" />
     <ClInclude Include="..\dlls\weapons\PrecacheEvent.hpp" />
     <ClInclude Include="..\dlls\weapons\PrimaryAttackRifle.hpp" />
+    <ClInclude Include="..\dlls\weapons\RadiusDamage.hpp" />
     <ClInclude Include="..\dlls\weapons\RecoilKickBack.hpp" />
     <ClInclude Include="..\dlls\weapons\RecoilPunch.hpp" />
     <ClInclude Include="..\dlls\weapons\ReloadDefault.hpp" />
@@ -445,11 +458,13 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityex2.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinityx.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_janus7xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_k1a.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_knife.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_kriss.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m134.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m134ex.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m134xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m14ebr.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m1887.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m2.h" />
@@ -457,8 +472,10 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_m3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_m95.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_m95xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />
@@ -468,6 +485,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_scout.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg550.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sg552.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_sgdrill.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
@@ -630,8 +648,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -666,8 +686,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -697,8 +719,10 @@
       <FloatingPointModel>Precise</FloatingPointModel>
       <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -725,8 +749,10 @@
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>

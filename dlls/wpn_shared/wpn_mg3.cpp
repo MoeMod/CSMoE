@@ -96,17 +96,17 @@ BOOL CMG3::Deploy(void)
 {
 	iShellOn = 1;
 
-	return DefaultDeploy("models/v_mg3.mdl", "models/p_mg3.mdl", M249_DRAW, "mg3", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_mg3.mdl", "models/p_mg3.mdl", M249_DRAW, "m249", UseDecrement() != FALSE);
 }
 
 void CMG3::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MG3Fire(0.045 + (0.5) * m_flAccuracy, 0.07s, FALSE);
+		MG3Fire(0.045 + (0.5) * m_flAccuracy, 0.095s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		MG3Fire(0.045 + (0.095) * m_flAccuracy, 0.07s, FALSE);
+		MG3Fire(0.045 + (0.095) * m_flAccuracy, 0.095s, FALSE);
 	else
-		MG3Fire((0.03) * m_flAccuracy, 0.07s, FALSE);
+		MG3Fire((0.03) * m_flAccuracy, 0.095s, FALSE);
 }
 
 void CMG3::MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)

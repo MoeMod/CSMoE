@@ -87,20 +87,18 @@ BOOL CMod_Zombi::ClientConnected(edict_t *pEntity, const char *pszName, const ch
 {
 	CLIENT_COMMAND(pEntity, "mp3 loop sound/Zombi_Ambience.mp3\n");
 
-	return IBaseMod::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
+	return CHalfLifeMultiplay::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 }
 
 void CMod_Zombi::ClientDisconnected(edict_t *pClient)
 {
 	CLIENT_COMMAND(pClient, "mp3 stop\n");
 
-	IBaseMod::ClientDisconnected(pClient);
+	return CHalfLifeMultiplay::ClientDisconnected(pClient);
 }
 
 void CMod_Zombi::Think()
 {
-	//IBaseMod::Think();
-
 	m_Countdown.Think();
 	if(!m_Countdown.IsExpired())
 		TeamCheck();
@@ -280,7 +278,7 @@ void CMod_Zombi::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_
 	{
 		pVictim->m_iDeaths++;
 	}
-	return IBaseMod::PlayerKilled(pVictim, pKiller, pInflictor);
+	return CHalfLifeMultiplay::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 
 void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
@@ -429,8 +427,8 @@ void CMod_Zombi::RestartRound()
 	TeamCheck();
 
 	CVAR_SET_FLOAT("mp_autoteambalance", 0.0f);
-	
-	IBaseMod::RestartRound();
+
+	CHalfLifeMultiplay::RestartRound();
 	m_bTCantBuy = false;
 }
 
@@ -452,7 +450,7 @@ void CMod_Zombi::PlayerSpawn(CBasePlayer *pPlayer)
 {
 	pPlayer->m_bIsZombie = false;
 	pPlayer->m_bNotKilled = false;
-	IBaseMod::PlayerSpawn(pPlayer);
+	CHalfLifeMultiplay::PlayerSpawn(pPlayer);
 	pPlayer->AddAccount(16000);
 
 	// Open buy menu on spawn

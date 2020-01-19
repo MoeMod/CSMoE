@@ -47,16 +47,27 @@ const char *IOS_GetDocsDir()
 	return dir;
 }
 
+const char *IOS_GetBundleDir()
+{
+	NSString *path = [[NSBundle mainBundle] bundlePath];
+	
+	static char c_path[256];
+	strcpy(c_path, [[path stringByAppendingPathComponent:@"/CSMoE-Full"] UTF8String]);
+	
+	//NSLog(@"IOS_GetBundleDir: %s", c_path);
+	
+	return c_path;
+}
+
 BOOL IOS_IsResourcesReady()
 {
-	static NSString *path = nil;
-	if(!path)
-		path = [NSString stringWithUTF8String:IOS_GetDocsDir()];
+	NSString *doc = [NSString stringWithUTF8String:IOS_GetDocsDir()];
+	NSString *bundle = [NSString stringWithUTF8String:IOS_GetBundleDir()];
 	
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	return	[fileManager fileExistsAtPath:[path stringByAppendingPathComponent:@"csmoe"]] &&
-			[fileManager fileExistsAtPath:[path stringByAppendingPathComponent:@"cstrike"]] &&
-			[fileManager fileExistsAtPath:[path stringByAppendingPathComponent:@"valve"]];
+	return 	([fileManager fileExistsAtPath:[doc stringByAppendingPathComponent:@"csmoe"]] || [fileManager fileExistsAtPath:[bundle stringByAppendingPathComponent:@"csmoe"]]) &&
+			([fileManager fileExistsAtPath:[doc stringByAppendingPathComponent:@"cstrike"]] || [fileManager fileExistsAtPath:[bundle stringByAppendingPathComponent:@"cstrike"]]) &&
+			([fileManager fileExistsAtPath:[doc stringByAppendingPathComponent:@"valve"]] || [fileManager fileExistsAtPath:[bundle stringByAppendingPathComponent:@"valve"]]);
 }
 
 void IOS_PrepareView()
@@ -96,7 +107,7 @@ void IOS_LaunchDialog( void )
 	{
 		IOS_SetDefaultArgs();
 	}
-	
+
 	// wating for starting
 	@autoreleasepool {
 		while( g_iStartGameStatus == XGS_WAITING ) {

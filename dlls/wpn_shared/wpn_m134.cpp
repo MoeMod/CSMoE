@@ -127,7 +127,7 @@ void CM134::ItemPostFrame()
 
 	if (m_iButton & IN_ATTACK)
 	{
-		if (!m_iClip && m_iM134State == WPNSTATE_M134_SPINNING) //没子弹的情况
+		if (!m_iClip && m_iM134State == WPNSTATE_M134_SPINNING)
 		{
 			SendWeaponAnim(M134_FIRE_AFTER, UseDecrement() != FALSE);
 			m_pPlayer->pev->maxspeed = M134_MAX_SPEED;
@@ -156,7 +156,7 @@ void CM134::ItemPostFrame()
 			m_iM134State = WPNSTATE_M134_SPINNING;
 		}
 
-		if (m_iM134State == WPNSTATE_M134_SPIN_DOWN && m_iClip)   // Nice 重新振作起来
+		if (m_iM134State == WPNSTATE_M134_SPIN_DOWN && m_iClip)
 		{
 			SendWeaponAnim(M134_FIRE_CHANGE, UseDecrement() != FALSE);
 			EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/m134_spinup.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -197,36 +197,6 @@ void CM134::ItemPostFrame()
 			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK;
 		}
 	}
-	/*if (m_iButton & IN_ATTACK2 && m_iClip)
-	{
-		if (m_iM134State == WPNSTATE_M134_IDLE)
-		{
-			if (m_flNextPrimaryAttack <= 0.0s)
-			{
-				SendWeaponAnim(M134_FIRE_READY, UseDecrement() != FALSE);
-				m_pPlayer->pev->maxspeed = M134_FIRE_MAX_SPEED;
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.8s;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60.0s;
-				m_iM134State = WPNSTATE_M134_SPIN_UP;
-				m_pPlayer->pev->button = m_iButton & ~IN_ATTACK2;
-				return CBasePlayerWeapon::ItemPostFrame();
-			}
-		}
-
-		if ((m_iM134State == WPNSTATE_M134_SPINNING || m_iM134State == WPNSTATE_M134_SPIN_UP) && m_flNextPrimaryAttack <= 0.0s && m_iClip)
-		{
-			if (m_pPlayer->pev->weaponanim != M134_FIRE_LOOP)
-			{
-				SendWeaponAnim(M134_FIRE_LOOP, UseDecrement() != FALSE);
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60.0s;
-			}
-			m_pPlayer->pev->maxspeed = M134_FIRE_MAX_SPEED;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 60.0s;
-			m_iM134State = WPNSTATE_M134_SPIN_UP;
-			m_pPlayer->pev->button = m_iButton & ~IN_ATTACK2;
-			return CBasePlayerWeapon::ItemPostFrame();
-		}
-	}*/
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 

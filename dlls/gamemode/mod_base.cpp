@@ -20,7 +20,7 @@ void IBaseMod::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy = std::move(up);
 }
 
-void _IBaseMod_RemoveObjects_CheckMapConditions_impl(IBaseMod *mod)
+void _IBaseMod_RemoveObjects_CheckMapConditions_impl(CHalfLifeMultiplay *mod)
 {
 	//CHalfLifeMultiplay::CheckMapConditions();
 	
@@ -50,7 +50,7 @@ void _IBaseMod_RemoveObjects_CheckMapConditions_impl(IBaseMod *mod)
 	}*/
 }
 
-BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(IBaseMod *mod, CBaseEntity *pEntity) {
+BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(CHalfLifeMultiplay *mod, CBaseEntity *pEntity) {
 	if (!Q_strcmp(STRING(pEntity->pev->classname), "func_bomb_target") ||
 	    !Q_strcmp(STRING(pEntity->pev->classname), "info_bomb_target")) {
 		return FALSE;
@@ -70,7 +70,7 @@ BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(IBaseMod *mod, CBaseEntity *p
 	return TRUE;
 }
 
-edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(IBaseMod *mod, CBasePlayer *pPlayer)
+edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, CBasePlayer *pPlayer)
 {
 	// completely rewrites it
 
