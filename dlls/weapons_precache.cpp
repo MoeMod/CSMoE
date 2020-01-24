@@ -157,15 +157,18 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_scarh");
 	UTIL_PrecacheOtherWeapon("weapon_m14ebr");
 	UTIL_PrecacheOtherWeapon("weapon_balrog7");
+	UTIL_PrecacheOtherWeapon("weapon_anaconda");
 	UTIL_PrecacheOtherWeapon("weapon_m134");
 	UTIL_PrecacheOtherWeapon("weapon_m134ex");
 	UTIL_PrecacheOtherWeapon("weapon_m134xmas");
 	UTIL_PrecacheOtherWeapon("weapon_m95xmas");
 	UTIL_PrecacheOtherWeapon("weapon_mg3xmas");
 	UTIL_PrecacheOtherWeapon("weapon_janus7xmas");
+	UTIL_PrecacheOtherWeapon("weapon_chainsaw");
 	UTIL_PrecacheOtherWeapon("weapon_sgdrill");
 	UTIL_PrecacheOther("ammo_sgdrill");
 	UTIL_PrecacheOtherWeapon("weapon_mg3");
+	UTIL_PrecacheOtherWeapon("weapon_mg36");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
 	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
@@ -184,6 +187,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_zombi");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex1");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex2");
+	UTIL_PrecacheOtherWeapon("z4b_infinityx");
 	UTIL_PrecacheOtherWeapon("z4b_m134heroi");
 	UTIL_PrecacheOtherWeapon("z4b_deagleb");
 	UTIL_PrecacheOtherWeapon("z4b_xm2010pc");

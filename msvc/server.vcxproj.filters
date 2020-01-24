@@ -800,6 +800,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sgdrill.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\basetypes.h">
@@ -1645,6 +1648,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\weapons\RadiusDamage.hpp">
       <Filter>dlls\weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h">
+      <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
