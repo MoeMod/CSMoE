@@ -21,6 +21,10 @@
 #include "weapons/KnifeAttack.h"
 #include "wpn_chainsaw.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -186,7 +190,6 @@ void CChainsaw::PrimaryAttack(void)
 			KickBack(0.175 ,0.04, 0.03, 0.01, 1.5, 1.0, 0);
 		else
 			KickBack(0.2, 0.2, 0.035, 0.015, 2.0, 1.25, 0);
-
 }
 
 void CChainsaw::ItemPostFrame(void)
@@ -248,9 +251,10 @@ void CChainsaw::ItemPostFrame(void)
 			//attack2
 		}
 	}
-
+	
 	pev->button &= ~IN_ATTACK2;
 	pev->button &= ~IN_ATTACK;
+	
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
@@ -392,10 +396,10 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 				ApplyMultiDamage(pevInflictor, pevAttacker);
 
 
-				//获取被击中实体pEntity的索引,作为PlayBackEvent的iParam1，到event里用，该怎么写获取
+				
 				PLAYBACK_EVENT_FULL(0, ENT(pEntity->pev), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 1, iAnim, m_iClip > 0);
 
-				//对僵尸击退处理
+	
 				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{

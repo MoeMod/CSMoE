@@ -97,6 +97,7 @@
     <ClCompile Include="..\cl_dll\events\event_starchaserar.cpp" />
     <ClCompile Include="..\cl_dll\events\event_svdex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_tbarrel.cpp" />
     <ClCompile Include="..\cl_dll\events\event_thompson.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tmp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ump45.cpp" />
@@ -244,6 +245,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_tbarrel.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ump45.cpp" />
@@ -391,6 +393,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_tbarrel.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ump45.h" />

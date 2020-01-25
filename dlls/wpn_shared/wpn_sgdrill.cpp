@@ -95,12 +95,12 @@ BOOL CSgdrill::Deploy(void)
 
 int CSgdrill::GetPrimaryAttackDamage() const
 	{
-		int iDamage = 29;
+		int iDamage = 22;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			iDamage = 45;
+			iDamage = 42;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			iDamage = 45;
+			iDamage = 42;
 #endif
 		return iDamage;
 	}

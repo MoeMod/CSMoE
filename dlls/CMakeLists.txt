@@ -257,6 +257,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_infinityex2.cpp
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
+	../dlls/wpn_shared/wpn_tbarrel.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
