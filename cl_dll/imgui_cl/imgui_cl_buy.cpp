@@ -1,6 +1,6 @@
 /*
 imgui_cl_buy.cpp
-Copyright (C) 2019 Moemod Haoyuan
+Copyright (C) 2020 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ GNU General Public License for more details.
 namespace cl {
 
 struct CImGuiBuyMenu::impl_t {
-    bool draw = true;
+    bool draw = false;
 };
 
 CImGuiBuyMenu::CImGuiBuyMenu() : pimpl(std::make_unique<impl_t>()) {

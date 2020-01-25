@@ -1,6 +1,6 @@
 /*
 imgui_cl_main.cpp
-Copyright (C) 2019 Moemod Haoyuan
+Copyright (C) 2020 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 
     static CImGuiBuyMenu buy;
     ImGui::SetCurrentContext(context);
-    static bool show_demo_window = true;
+    static bool show_demo_window = false;
     /*
     static float f = 0.0f;
     static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);

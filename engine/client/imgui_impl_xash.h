@@ -22,7 +22,7 @@ GNU General Public License for more details.
 extern "C" {
 #endif
 
-bool ImGui_ImplGL_Init(void);
+qboolean ImGui_ImplGL_Init(void);
 void ImGui_ImplGL_Shutdown(void);
 void ImGui_ImplGL_NewFrame(void);
 void ImGui_ImplGL_Render(void);
@@ -30,13 +30,13 @@ void ImGui_ImplGL_OnGUI(void);
 
 // Use if you want to reset your rendering device without losing ImGui state.
 void ImGui_ImplGL_InvalidateDeviceObjects(void);
-bool ImGui_ImplGL_CreateDeviceObjects(void);
+qboolean ImGui_ImplGL_CreateDeviceObjects(void);
 
 // Provided here if you want to chain callbacks yourself. You may also handle inputs yourself and use those as a reference.
-bool ImGui_ImplGL_MouseButtonCallback(int button, int action);
-bool ImGui_ImplGL_KeyEvent( int key, int down );
-bool ImGui_ImplGL_CharCallbackUTF(const char *c);
-bool ImGui_ImplGL_MouseMove(int x, int y);
+qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action);
+qboolean ImGui_ImplGL_KeyEvent( int key, int down );
+qboolean ImGui_ImplGL_CharCallbackUTF(const char *c);
+qboolean ImGui_ImplGL_MouseMove(int x, int y);
 
 void ImGui_ImplGL_TouchCallback(touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure);
 

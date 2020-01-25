@@ -1,6 +1,6 @@
 /*
 imgui_impl_xash.cpp
-Copyright (C) 2019 Moemod Haoyuan
+Copyright (C) 2020 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ extern "C" {
 #include "imgui.h"
 #include "imgui_impl_xash.h"
 #include "imgui_internal.h"
+#include "imgui_lcsm_warning.h"
 
 #include <keydefs.h>
 #include <utility>
@@ -129,7 +130,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 // -action
 //    1:down 0:up
 //=============
-bool ImGui_ImplGL_MouseButtonCallback(int button, int action)
+qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (button >= 0 && button < 5)
@@ -166,7 +167,7 @@ static void ScrollCallback(double xoffset, double yoffset)
 	g_MouseWheel += (float)yoffset; // Use fractional mouse wheel.
 }
 
-bool ImGui_ImplGL_KeyEvent( int key, qboolean down )
+qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 {
 	ImGuiIO& io = ImGui::GetIO();
 	// IMGUI input
@@ -199,14 +200,14 @@ void ImGui_ImplGL_CharCallback(unsigned int c)
 		io.AddInputCharacter(c);
 }
 
-bool ImGui_ImplGL_CharCallbackUTF(const char *c)
+qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharactersUTF8(c);
 	return io.WantTextInput;
 }
 
-bool ImGui_ImplGL_CreateDeviceObjects(void)
+qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
@@ -269,7 +270,7 @@ void ImGui_ImplGL_ReloadFonts()
 	Mem_Free( t );
 }
 
-bool ImGui_ImplGL_Init(void)
+qboolean ImGui_ImplGL_Init(void)
 {
     g_EngineContext = ImGui::CreateContext();
     ImGui::SetCurrentContext(g_EngineContext);
@@ -439,7 +440,7 @@ void ImGui_ImplGL_NewFrame(void)
 	ImGui::NewFrame();
 }
 
-bool ImGui_ImplGL_MouseMove(int x, int y)
+qboolean ImGui_ImplGL_MouseMove(int x, int y)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	g_MouseLastPos[0] = (float)x;
@@ -462,16 +463,15 @@ void ImGui_ImplGL_Render(void)
 void Engine_OnGUI(struct ImGuiContext *context)
 {
 	ImGui::SetCurrentContext(context);
-
+	ImGui_LCSM_OnGUI();
 }
 
 void ImGui_ImplGL_OnGUI(void)
 {
-	Engine_OnGUI(g_EngineContext);
-
 	if(clgame.dllFuncs.pfnOnGUI)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
 
+	Engine_OnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_TouchCallback(touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure)

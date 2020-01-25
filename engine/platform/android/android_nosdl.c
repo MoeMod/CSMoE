@@ -379,7 +379,7 @@ void Android_RunEvents()
 	events.count = 0; // no more events
 
 #ifdef XASH_IMGUI
-	if(!ImGui_ImplGL_CharCallbackUTF( input.text )) {
+	if(!ImGui_ImplGL_CharCallbackUTF( events.inputtext )) {
 #endif
 
 	// text input handled separately to allow unicode symbols
