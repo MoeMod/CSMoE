@@ -19,6 +19,7 @@ extern "C" {
 #include "gl_local.h"
 #include "input.h"
 }
+#include "minmax.h"
 
 #include "imgui.h"
 #include "imgui_impl_xash.h"
@@ -28,6 +29,7 @@ extern "C" {
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
+#include <memory>
 
 // Data
 double g_Time = 0.0;
