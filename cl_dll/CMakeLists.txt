@@ -143,6 +143,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_tbarrel.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/wpn_svdex.cpp
+	../dlls/wpn_shared/knife_katana.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
 	../dlls/wpn_shared/z4b_infinityx.cpp

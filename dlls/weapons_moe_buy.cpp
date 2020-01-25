@@ -82,6 +82,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 
 						 
                                                   {"weapon_knife", "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
+												  {"knife_katana",     "Katana",               0,    KNIFE_SLOT,          UNASSIGNED},
                                                   {"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED},
 												  { "knife_dragonsword",     "Green Dragon Crescent Blade",               0,    KNIFE_SLOT,          UNASSIGNED },
                                                   {"knife_dualsword",    "Dual Sword Phantom Slayer",0, KNIFE_SLOT,          UNASSIGNED},

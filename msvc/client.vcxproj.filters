@@ -817,6 +817,9 @@
     <ClCompile Include="..\cl_dll\events\event_tbarrel.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\knife_katana.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">

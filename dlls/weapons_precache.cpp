@@ -179,6 +179,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_gungnir");
 	UTIL_PrecacheOther("ammo_gungnir");
 	UTIL_PrecacheOtherWeapon("knife_skullaxe");
+	UTIL_PrecacheOtherWeapon("knife_katana");
 	UTIL_PrecacheOtherWeapon("knife_dragonsword");
 	UTIL_PrecacheOtherWeapon("weapon_infinityss");
 	UTIL_PrecacheOtherWeapon("weapon_infinitysb");

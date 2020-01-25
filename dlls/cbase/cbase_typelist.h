@@ -26,6 +26,7 @@ namespace sv {
 TL_ADD(CKnifeDragonsword)
 TL_ADD(CKnifeDualsword)
 TL_ADD(CKnifeSkullAxe)
+TL_ADD(CKnifeKatana)
 TL_ADD(CKnife_Zombi)
 TL_ADD(CAK47)
 TL_ADD(CAK47_Long)
