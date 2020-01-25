@@ -21,6 +21,10 @@
 #include "weapons/KnifeAttack.h"
 #include "wpn_chainsaw.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
