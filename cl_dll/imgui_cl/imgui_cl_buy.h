@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #define CSMOE_IMGUI_CL_BUY_H
 
 #include <memory>
+namespace cl {
 
 class CImGuiBuyMenu {
 public:
@@ -28,5 +29,7 @@ private:
     struct impl_t;
     const std::unique_ptr<impl_t> pimpl;
 };
+
+}
 
 #endif //CSMOE_IMGUI_CL_BUY_H

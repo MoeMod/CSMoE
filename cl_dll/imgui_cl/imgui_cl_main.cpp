@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "cl_dll.h"
 #include "imgui_cl_buy.h"
 
+namespace cl {
 
 extern "C"
 void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
@@ -58,4 +59,6 @@ void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
     }
 
     buy.OnGUI();
+}
+
 }

@@ -4,6 +4,7 @@
 #include "player.h"
 #include "monsters.h"
 #include "weapons.h"
+#include "client.h"
 #include "weapons_moe_buy.h"
 
 namespace sv {
