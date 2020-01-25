@@ -90,7 +90,6 @@ public:
 
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
-	void WeaponIdle() override;
 	void SecondaryAttack() override;
 	void DelaySecondaryAttack();
 	BOOL CanDrop() override { return false; }
