@@ -245,6 +245,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_xm8c.cpp
 	../dlls/wpn_shared/wpn_xm8s.cpp
 	../dlls/wpn_shared/knife_skullaxe.cpp
+	../dlls/wpn_shared/knife_katana.cpp
 	../dlls/wpn_shared/knife_dragonsword.cpp
 	../dlls/wpn_shared/wpn_gungnir.cpp
 	../dlls/wpn_shared/wpn_mg3.cpp
@@ -255,14 +256,15 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m14ebr.cpp
 	../dlls/wpn_shared/wpn_infinityex1.cpp
 	../dlls/wpn_shared/wpn_infinityex2.cpp
-	../dlls/wpn_shared/z4b_infinityx.cpp
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
+	../dlls/wpn_shared/wpn_tbarrel.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
 	../dlls/wpn_shared/wpn_janus7xmas.cpp
+	../dlls/wpn_shared/wpn_chainsaw.cpp
 	../dlls/wpn_shared/wpn_m134.cpp
 	../dlls/wpn_shared/wpn_m134xmas.cpp
 	../dlls/wpn_shared/wpn_mg3xmas.cpp
@@ -274,6 +276,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_lc_sword.cpp
 	../dlls/wpn_shared/z4b_oppovivo.cpp
 	../dlls/wpn_shared/z4b_strongknifex.cpp
+	../dlls/wpn_shared/z4b_infinityx.cpp
 	../dlls/wpn_shared/z4b_nataknifedx.cpp
 	../dlls/wpn_shared/z4b_facelessvoid.cpp
 	../dlls/wpn_shared/z4b_m134heroi.cpp

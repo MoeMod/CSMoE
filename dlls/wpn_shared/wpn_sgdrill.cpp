@@ -95,12 +95,12 @@ BOOL CSgdrill::Deploy(void)
 
 int CSgdrill::GetPrimaryAttackDamage() const
 	{
-		int iDamage = 29;
+		int iDamage = 22;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			iDamage = 45;
+			iDamage = 42;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			iDamage = 45;
+			iDamage = 42;
 #endif
 		return iDamage;
 	}
@@ -110,9 +110,9 @@ float CSgdrill::GetSecondaryAttackDamage() const
 		float flDamage = 115.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 11.0f;
+			flDamage *= 6.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage *= 11.0f;
+			flDamage *= 6.0f;
 #endif
 		return flDamage;
 	}
@@ -201,10 +201,10 @@ void CSgdrill::SecondaryAttack(void)
 #endif
 	SendWeaponAnim(SGDRILL_SLASH, UseDecrement() != FALSE);
 	SetThink(&CSgdrill::DelaySecondaryAttack);
-	pev->nextthink = gpGlobals->time + 0.65s;
+	pev->nextthink = gpGlobals->time + 0.6s;
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/sgdrill_slash.wav", VOL_NORM, ATTN_NORM, 0, 94);
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.65s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.65s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.7s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.3s;
 	m_flNextResetModel = gpGlobals->time + 1.2s;
 }
 
@@ -218,7 +218,6 @@ void CSgdrill::DelaySecondaryAttack()
 	KnifeAttack(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 155, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
 #endif
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.3s;
 	SetThink(nullptr);
 }
 void CSgdrill::ItemPostFrame()

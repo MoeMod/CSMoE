@@ -409,4 +409,27 @@ BOOL C12GaugeAmmo::AddAmmo(CBaseEntity *pOther)
 
 LINK_ENTITY_TO_CLASS(ammo_12gauge, C12GaugeAmmo);
 
+void CChainsawOil::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CChainsawOil::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CChainsawOil::AddAmmo(CBaseEntity *pOther)
+{
+	if (pOther->GiveAmmo(50, "chainsawoil", 200) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_chainsaw, CChainsawOil);
 }

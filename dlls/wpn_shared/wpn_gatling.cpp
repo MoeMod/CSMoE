@@ -56,6 +56,7 @@ void CGatling::Precache(void)
 {
 	PRECACHE_MODEL("models/v_gatling.mdl");
 	PRECACHE_MODEL("models/w_gatling.mdl");
+	PRECACHE_MODEL("models/p_gatling.mdl");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 
@@ -188,12 +189,12 @@ void CGatling::WeaponIdle(void)
 
 int CGatling::GetPrimaryAttackDamage() const
 {
-	int iDamage = 22;
+	int iDamage = 18;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		iDamage = 32;
+		iDamage = 26;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		iDamage = 32;
+		iDamage = 26;
 #endif
 	return iDamage;
 }
