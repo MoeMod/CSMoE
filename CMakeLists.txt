@@ -35,13 +35,8 @@ if(XASH_IMGUI)
 			imgui/imgui_draw.cpp
 			imgui/imgui_widgets.cpp
 			imgui/imgui.cpp)
-	if(XASH_STATIC_GAMELIB)
-		add_library(imgui STATIC ${IMGUI_SRC})
-		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
-	else()
-		add_library(imgui SHARED ${IMGUI_SRC})
-		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
-	endif()
+	add_library(imgui STATIC ${IMGUI_SRC})
+	target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
 endif()
 
 if (APPLE OR ANDROID)

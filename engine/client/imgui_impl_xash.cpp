@@ -376,7 +376,7 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 	colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
 }
 
-extern "C" extern qboolean	in_mouseactive;
+extern "C" { extern qboolean	in_mouseactive; }
 void ImGui_ImplGL_NewFrame(void)
 {
 	if (!g_FontTexture)
