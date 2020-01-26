@@ -99,6 +99,7 @@ DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 	{ "ak47",		WEAPON_AK47,		"#AK47" },
 	{ "cv47",		WEAPON_AK47,		"#AK47" },
 	{ "scout",		WEAPON_SCOUT,		NULL },
+	{ "chainsawoil",		WEAPON_SCOUT,		NULL },
 	{ "sg552",		WEAPON_SG552,		"#SG552" },
 	{ "krieg552",		WEAPON_SG552,		"#SG552" },
 	{ "awp",		WEAPON_AWP,		NULL },

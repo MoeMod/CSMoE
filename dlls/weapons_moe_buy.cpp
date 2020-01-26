@@ -70,6 +70,8 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 												  {"weapon_mg3xmas",         "MG3 Xmas Edition",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 											   	  {"weapon_m95xmas",         "M95 Xmas Edition",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_janus7xmas",         "Janus-7 Xmas Edition",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_chainsaw",         "Ripper",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_tbarrel",         "Triple Barrel Shotgun",                  2600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_sgdrill",         "Magnum Drill",                 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 												  {"weapon_m134xmas",         "M134 Xmas Edition",                  7000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -80,6 +82,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 
 						 
                                                   {"weapon_knife", "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
+												  {"knife_katana",     "Katana",               0,    KNIFE_SLOT,          UNASSIGNED},
                                                   {"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED},
 												  { "knife_dragonsword",     "Green Dragon Crescent Blade",               0,    KNIFE_SLOT,          UNASSIGNED },
                                                   {"knife_dualsword",    "Dual Sword Phantom Slayer",0, KNIFE_SLOT,          UNASSIGNED},
