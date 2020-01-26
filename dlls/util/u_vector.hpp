@@ -17,11 +17,16 @@ GNU General Public License for more details.
 #define PROJECT_U_VECTOR_HPP
 
 #define _USE_MATH_DEFINES
+#include <cmath>
 #include <math.h>
 #include <utility>
 #include <numeric>
 #include <array>
 #include <type_traits>
+
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -188,7 +193,6 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 
 };
 
-
 template<class VecType, std::size_t...I>
 constexpr VecType add_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
@@ -215,41 +219,95 @@ constexpr VecType valdiv_impl(VecType vec, typename VecType::value_type val, std
 	return {(vec.template get<I>() / val)...};
 }
 
+namespace moe_math_util {
+
 #if __cplusplus >= 201703L
-template<class Ret, class...Args> constexpr Ret Sum(Args...args)
+template<class Ret, class...Args> constexpr Ret sum_args(Args...args)
 {
 	return (... + args);
 }
-template<class...Args> constexpr bool And(Args...args)
+template<class...Args> constexpr bool and_args(Args...args)
 {
 	return (... && args);
 }
 #else
-template<class Ret, class...Args> constexpr Ret Sum(Args...args)
+template<class Ret, class...Args> constexpr Ret sum_args(Args...args)
 {
 	Ret result = {};
 	return void(std::initializer_list<Ret>{ (result += args)... }), result;
 }
-template<class...Args> constexpr bool And(Args...args)
+template<class...Args> constexpr bool and_args(Args...args)
 {
 	bool result = true;
 	return void(std::initializer_list<bool>{ (result = (result && args))... }), result;
 }
 #endif
+
+using std::hypot;
+using std::sqrt;
+using std::abs;
+using std::acos;
+using std::fma;
+
+template<class T> inline T hypot(T x) { return abs(x); }
+template<class...Args> inline auto hypot(Args...args) -> typename std::common_type<Args...>::type {
+	return sqrt(sum_args<typename std::common_type<Args...>::type>((args * args)...));
+}
+
+template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
+	return 1 / sqrt(x);
+}
+
+inline float rsqrt(float x)
+{
+#ifdef __SSE__
+    return _mm_rsqrt_ps(_mm_set1_ps(x))[0];
+#else
+    float xhalf = 0.5f * x;
+    int i = *(int *)&x;
+    i = 0x5f3759df - (i>>1);
+    x = *(float *)&i;
+    x = x * (1.5f - xhalf * x * x);
+    return x;
+#endif
+}
+
+}
+
 template<class VecType, std::size_t...I>
 constexpr bool equal_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return And((v1.template get<I>() == v2.template get<I>())...);
+	return moe_math_util::and_args((v1.template get<I>() == v2.template get<I>())...);
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type DotProduct_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return Sum<typename VecType::value_type>((v1.template get<I>() * v2.template get<I>())...);
+	return moe_math_util::sum_args<typename VecType::value_type>((v1.template get<I>() * v2.template get<I>())...);
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type LengthSquared_impl(VecType vec, std::index_sequence<I...>)
 {
-	return Sum<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...);
+	return moe_math_util::sum_args<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...);
+}
+template<class VecType, std::size_t...I>
+inline typename VecType::value_type Length_impl(VecType vec, std::index_sequence<I...>)
+{
+	return moe_math_util::hypot(vec.template get<I>()...);
+}
+template<class VecType, std::size_t...I>
+inline typename VecType::value_type LengthReverse_impl(VecType vec, std::index_sequence<I...>)
+{
+	return moe_math_util::rsqrt( moe_math_util::sum_args<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...) );
+}
+template<class VecType, std::size_t...I>
+inline VecType fma_impl(VecType x, typename VecType::value_type y, VecType z, std::index_sequence<I...>)
+{
+	return { moe_math_util::fma(x.template get<I>(), y, z.template get<I>())... };
+}
+template<class VecType, std::size_t...I>
+inline VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, std::index_sequence<I...>)
+{
+	return { moe_math_util::fma(x, y.template get<I>(), z.template get<I>())... };
 }
 
 template<class T, std::size_t N>
@@ -327,6 +385,28 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return DotProduct_impl(v1, v2, std::make_index_sequence<N>());
 	}
 
+	// (a*b)+c
+	friend VectorBase fma(VectorBase x, T y, VectorBase z)
+	{
+		return fma_impl(x, y, z, std::make_index_sequence<N>());
+	}
+	friend VectorBase fma(T x, VectorBase y, VectorBase z)
+	{
+		return fma_impl(x, y, z, std::make_index_sequence<N>());
+	}
+
+    // t*(b-a) + a;
+	friend VectorBase lerp(VectorBase a, VectorBase b, T t)
+	{
+		return fma(t, b - a, a);
+	}
+
+    // 0.5*(b-a) + a;
+	friend VectorBase midpoint(VectorBase a, VectorBase b)
+	{
+		return (b - a) / 2 + a;
+	}
+
 	constexpr T LengthSquared() const
 	{
 		return LengthSquared_impl(*this, std::make_index_sequence<N>());
@@ -344,15 +424,17 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 
 	T Length() const
 	{
-		return sqrt(LengthSquared());
+		return Length_impl(*this, std::make_index_sequence<N>());
+	}
+
+	T LengthReverse() const
+	{
+		return LengthReverse_impl(*this, std::make_index_sequence<N>());
 	}
 
 	VectorBase Normalize() const
 	{
-		auto flLen = Length();
-		if (!flLen)
-			return {};
-		return *this / flLen;
+		return *this * LengthReverse();
 	}
 
 	T NormalizeInPlace()
@@ -364,7 +446,7 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 		return flLen;
 	}
 
-	constexpr bool IsZero(T tolerance) const
+	constexpr bool IsZero(T tolerance = std::numeric_limits<T>::epsilon()) const
 	{
 		return LengthSquared() > tolerance;
 	}
@@ -401,7 +483,7 @@ template<class T> constexpr VectorBase<T, 3> CrossProduct(VectorBase<T, 3> a, Ve
 
 template<class T, std::size_t N> T AngleBetweenVectors(VectorBase<T, N> a, VectorBase<T, N> b)
 {
-	return acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
+	return moe_math_util::acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
 }
 
 template<class T, std::size_t N> constexpr T VectorNormalize(VectorBase<T, N> &in)
@@ -417,6 +499,16 @@ template<class T, std::size_t N> constexpr bool VectorCompare(VectorBase<T, N> a
 template<class T, std::size_t N> constexpr VectorBase<T, N> &VectorCopy(VectorBase<T, N> in,  VectorBase<T, N> &out)
 {
 	return out = in;
+}
+
+template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(VectorBase<T, N> a, T scale, VectorBase<T, N> b, VectorBase<T, N> &out)
+{
+	return out = fma(a, scale, b);
+}
+
+template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(T scale, VectorBase<T, N> a, VectorBase<T, N> b, VectorBase<T, N> &out)
+{
+	return out = fma(scale, a, b);
 }
 
 }

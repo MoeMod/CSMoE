@@ -26,6 +26,7 @@ extern enum XashGameStatus_e
 extern int g_iArgc;
 extern char **g_pszArgv;
 const char *IOS_GetDocsDir();
+const char *IOS_GetBundleDir();
 void IOS_SetDefaultArgs();
 BOOL IOS_IsResourcesReady();
 

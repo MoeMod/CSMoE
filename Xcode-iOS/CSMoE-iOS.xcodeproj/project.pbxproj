@@ -57,6 +57,7 @@
 		3D4DAA0E23BCEE3900F575C1 /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA9FB23BCEB0D00F575C1 /* libmenu.a */; };
 		3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
 		3D4DAA1923BCF1C100F575C1 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DAA1823BCF1C100F575C1 /* libserver.a */; };
+		3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */ = {isa = PBXBuildFile; fileRef = 3D5099DA23CB0F7900F75CEA /* CSMoE-Full */; };
 		3D5E35DC227768B10073D791 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35D6227768B10073D791 /* Icon.png */; };
 		3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35E1227768E40073D791 /* extras_cstrike.pak */; };
 		3D5E35E4227768E40073D791 /* extras.pak in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35E2227768E40073D791 /* extras.pak */; };
@@ -189,6 +190,7 @@
 		3D4DA9FB23BCEB0D00F575C1 /* libmenu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmenu.a; sourceTree = "<group>"; };
 		3D4DAA0223BCEC7C00F575C1 /* libxash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxash.a; sourceTree = "<group>"; };
 		3D4DAA1823BCF1C100F575C1 /* libserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libserver.a; sourceTree = "<group>"; };
+		3D5099DA23CB0F7900F75CEA /* CSMoE-Full */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "CSMoE-Full"; path = "../CSMoE-Full"; sourceTree = "<group>"; };
 		3D525D7722252AAB00DD9932 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		3D5E35D6227768B10073D791 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Icon.png; sourceTree = "<group>"; };
 		3D5E35E1227768E40073D791 /* extras_cstrike.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = extras_cstrike.pak; path = Resources/extras_cstrike.pak; sourceTree = "<group>"; };
@@ -286,6 +288,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				3D5099DA23CB0F7900F75CEA /* CSMoE-Full */,
 				3D3EE89D228F193400A695FE /* maps */,
 				3DC1E4A62289683100114D80 /* iTunes.png */,
 				3DC1E4A72289683100114D80 /* MacBook.png */,
@@ -595,6 +598,7 @@
 				3D5E35E4227768E40073D791 /* extras.pak in Resources */,
 				3D5E35DC227768B10073D791 /* Icon.png in Resources */,
 				3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */,
+				3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */,
 				3D11D3E3228F38FA00393F66 /* NewGameStoryboard.storyboard in Resources */,
 				3D670D69227A30620030B7D1 /* Launch.png in Resources */,
 			);
@@ -693,6 +697,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = S7JUSAWPG8;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -796,6 +801,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = S7JUSAWPG8;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
