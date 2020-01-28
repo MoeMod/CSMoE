@@ -15,8 +15,14 @@ import android.widget.*;
 import in.celest.xash3d.csbtem.*;
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.json.*;
 import android.preference.*;
+
+import androidx.loader.content.Loader;
+
 import su.xash.fwgslib.*;
 
 public class LauncherActivity extends Activity 
@@ -26,15 +32,14 @@ public class LauncherActivity extends Activity
 	public final static String UPDATE_LINK = "https://api.github.com/repos/FWGS/xash3d-android-project/releases"; // releases/latest doesn't return prerelease and drafts
 	static SharedPreferences mPref;
 	
-	static EditText cmdArgs, resPath, writePath, resScale, resWidth, resHeight;
-	static ToggleButton useVolume, resizeWorkaround, useRoDir;
-	static CheckBox	immersiveMode, useRoDirAuto;
+	static EditText cmdArgs, resScale, resWidth, resHeight;
+	static ToggleButton useVolume, resizeWorkaround;
+	static CheckBox	immersiveMode;
 	static TextView tvResPath, resResult;
 	static RadioButton radioScale, radioCustom;
 	static RadioGroup scaleGroup;
 	static CheckBox resolution;
 	static Spinner pixelSpinner;
-	static LinearLayout rodirSettings; // to easy show/hide
 	
 	static int mEngineWidth, mEngineHeight;
 
@@ -71,8 +76,6 @@ public class LauncherActivity extends Activity
 		mPref        = getSharedPreferences("engine", 0);
 		cmdArgs      = (EditText) findViewById(R.id.cmdArgs);
 		useVolume    = (ToggleButton) findViewById( R.id.useVolume );
-		resPath      = (EditText) findViewById( R.id.cmd_path );
-		//updateToBeta = (CheckBox)findViewById( R.id.check_betas );
 		pixelSpinner = (Spinner) findViewById( R.id.pixelSpinner );
 		resizeWorkaround = (ToggleButton) findViewById( R.id.enableResizeWorkaround );
 		tvResPath    = (TextView) findViewById( R.id.textView_path );
@@ -85,10 +88,6 @@ public class LauncherActivity extends Activity
 		radioScale = (RadioButton) findViewById(R.id.resolution_scale_r);
 		scaleGroup = (RadioGroup) findViewById( R.id.scale_group );
 		resResult = (TextView) findViewById( R.id.resolution_result );
-		writePath = (EditText) findViewById( R.id.cmd_path_rw );
-		useRoDir = (ToggleButton) findViewById( R.id.use_rodir );
-		useRoDirAuto = (CheckBox) findViewById( R.id.use_rodir_auto );
-		rodirSettings = (LinearLayout) findViewById( R.id.rodir_settings );
 		
 		final String[] list = {
 			"32 bit (RGBA8888)",
@@ -101,15 +100,6 @@ public class LauncherActivity extends Activity
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, list);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		pixelSpinner.setAdapter(adapter);
-		Button selectFolderButton = ( Button ) findViewById( R.id.button_select );
-		selectFolderButton.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v) 
-			{
-				selectFolder(v);
-			}
-		});
 		((Button)findViewById( R.id.button_launch )).setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -132,9 +122,6 @@ public class LauncherActivity extends Activity
 		cmdArgs.setText(mPref.getString("argv","-dev 3 -log"));
 		pixelSpinner.setSelection(mPref.getInt("pixelformat", 0));
 		resizeWorkaround.setChecked(mPref.getBoolean("enableResizeWorkaround", true));
-		useRoDir.setChecked( mPref.getBoolean("use_rodir", false) );
-		useRoDirAuto.setChecked( mPref.getBoolean("use_rodir_auto", true) );
-		writePath.setText(mPref.getString("writedir", FWGSLib.getExternalFilesDir(this)));
 		resolution.setChecked( mPref.getBoolean("resolution_fixed", false ) );
 		
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -182,15 +169,6 @@ public class LauncherActivity extends Activity
 			}
 		});
 		
-		useRoDir.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged( CompoundButton v, boolean isChecked )
-			{
-				hideRodirSettings( !isChecked );
-			}
-		});
-		
 		
 		if( sdk >= 19 )
 		{
@@ -200,34 +178,9 @@ public class LauncherActivity extends Activity
 		{
 			immersiveMode.setVisibility(View.GONE); // not available
 		}
-		
-		resPath.setOnFocusChangeListener( new View.OnFocusChangeListener()
-		{
-			@Override
-			public void onFocusChange(View v, boolean hasFocus)
-			{
-				updatePath( resPath.getText().toString() );
-				
-				// I know what I am doing, so don't ask me about folder!
-				XashActivity.setFolderAsk( LauncherActivity.this, false );
-			}
-		} );
-		
-		useRoDirAuto.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener()
-		{
-			@Override
-			public void onCheckedChanged( CompoundButton b, boolean isChecked )
-			{
-				if( isChecked )
-				{
-					writePath.setText( FWGSLib.getExternalFilesDir( LauncherActivity.this ) );
-				}
-				writePath.setEnabled( !isChecked );
-			}
-		});
+
 
 		hideResolutionSettings( !resolution.isChecked() );
-		hideRodirSettings( !useRoDir.isChecked() );
 		updateResolutionResult();
 		toggleResolutionFields();
 	}
@@ -236,28 +189,17 @@ public class LauncherActivity extends Activity
 	public void onResume()
 	{
 		super.onResume();
-		
-		useRoDir.setChecked( mPref.getBoolean("use_rodir", false) );
-		useRoDirAuto.setChecked( mPref.getBoolean("use_rodir_auto", true) );
-		writePath.setText(mPref.getString("writedir", FWGSLib.getExternalFilesDir(this)));
-		
-		hideRodirSettings( !useRoDir.isChecked() );
 	}
 
 	void updatePath( String text )
 	{
 		tvResPath.setText(getString(R.string.text_res_path) + ":\n" + text );
-		resPath.setText(text);
+		checkExtractAssets();
 	}
 	
 	void hideResolutionSettings( boolean hide )
 	{
 		scaleGroup.setVisibility( hide ? View.GONE : View.VISIBLE );
-	}
-	
-	void hideRodirSettings( boolean hide )
-	{
-		rodirSettings.setVisibility( hide ? View.GONE : View.VISIBLE );
 	}
 		
 	TextWatcher resTextChangeWatcher = new TextWatcher()
@@ -324,10 +266,6 @@ public class LauncherActivity extends Activity
 		SharedPreferences.Editor editor = mPref.edit();
 		editor.putString("argv", cmdArgs.getText().toString());
 		editor.putBoolean("usevolume",useVolume.isChecked());
-		editor.putBoolean("use_rodir", useRoDir.isChecked() );
-		editor.putBoolean("use_rodir_auto", useRoDirAuto.isChecked() );
-		editor.putString("writedir", writePath.getText().toString());
-		editor.putString("basedir", resPath.getText().toString());
 		editor.putInt("pixelformat", pixelSpinner.getSelectedItemPosition());
 		editor.putBoolean("enableResizeWorkaround",resizeWorkaround.isChecked());
 		editor.putBoolean("resolution_fixed", resolution.isChecked());
@@ -368,68 +306,6 @@ public class LauncherActivity extends Activity
 		});
 	}
 
-	public void selectFolder(View view)
-	{
-		Intent intent = new Intent(this, in.celest.xash3d.FPicker.class);
-		startActivityForResult(intent, 42);
-		resPath.setEnabled(false);
-		XashActivity.setFolderAsk( this, false );
-	}
-	
-	public void selectRwFolder(View view)
-	{
-		Intent intent = new Intent(this, in.celest.xash3d.FPicker.class);
-		startActivityForResult(intent, 43);
-		writePath.setEnabled(false);
-		XashActivity.setFolderAsk( this, false );
-	}
-
-
-	public void onActivityResult(int requestCode, int resultCode, Intent resultData) 
-	{
-		switch(requestCode)
-		{
-		case 42:
-		{
-			if (resultCode == RESULT_OK) 
-			{
-				try	
-				{
-					if( resPath == null )
-						return;
-					updatePath(resultData.getStringExtra("GetPath"));
-					resPath.setEnabled( true );
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			resPath.setEnabled(true);
-			break;
-		}
-		case 43:
-		{
-			if (resultCode == RESULT_OK) 
-			{
-				try	
-				{
-					if( writePath == null )
-						return;
-					writePath.setText(resultData.getStringExtra("GetPath"));
-					writePath.setEnabled( true );
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			writePath.setEnabled(true);
-			break;
-		}
-		}
-	}
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -457,4 +333,109 @@ public class LauncherActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
+	List<String> getAssetsFileList(String path) throws IOException {
+		List<String> result = new LinkedList<>();
+
+		String[] fileNames = getAssets().list(path);
+
+		if (fileNames != null && fileNames.length > 0) {
+			for (String s : fileNames)
+				result.addAll(getAssetsFileList(path.isEmpty() ? s : path + "/" + s));
+		} else {
+			result.add(path);
+		}
+		return result;
+	}
+
+	public void checkExtractAssets() {
+		try {
+			List<String> list = getAssetsFileList("");
+
+			if( mPref.getInt( "assetscount", 0 ) != list.size() ) {
+				Thread t = new Thread(new AssetCopyHandler(this, list));
+				t.start();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class AssetCopyHandler implements Runnable {
+
+	final ProgressDialog pd;
+	final Context context;
+	final List<String> fileList;
+
+	public AssetCopyHandler(Context ctx, List<String> l) {
+		context = ctx;
+		fileList = l;
+		pd = new ProgressDialog(context);
+
+		pd.setMessage("Preparing...");
+		pd.setTitle("Copying game assets");
+		pd.setCancelable(false);
+
+		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		pd.show();
+	}
+
+	Handler progressHandler = new Handler(new Handler.Callback() {
+		@Override
+		public boolean handleMessage(Message msg) {
+			if(msg.what == 0)
+				pd.setMax(msg.arg1);
+			else if(msg.what == 1)
+			{
+				pd.incrementProgressBy(msg.arg1);
+				pd.setMessage((String)msg.obj);
+			}
+			else if(msg.what == 2)
+				pd.dismiss();
+			else if(msg.what == 3)
+				new AlertDialog.Builder( context )
+						.setTitle( "Error copying game assets" )
+						.setMessage( (String)msg.obj )
+						.setPositiveButton( "Ok", null)
+						.setCancelable( false )
+						.show();
+			return true;
+		}
+	});
+
+
+	@Override
+	public void run() {
+		try {
+			Message.obtain(progressHandler,0, fileList.size(), 0).sendToTarget();
+			String savePath = context.getExternalFilesDir(null).getPath();
+			byte[] buffer = new byte[1024];
+			for(String s : fileList) {
+
+				InputStream is = context.getAssets().open(s);
+
+				File file = new File(savePath + "/" + s);
+				if(!file.exists()) {
+					file.getParentFile().mkdirs();
+					file.createNewFile();
+				}
+				FileOutputStream fos = new FileOutputStream(file,false);
+				int byteCount = 0;
+				while ((byteCount = is.read(buffer)) != -1) {
+					fos.write(buffer, 0, byteCount);
+				}
+				fos.flush();
+				is.close();
+				fos.close();
+
+				Message.obtain(progressHandler,1, 1, 0, s).sendToTarget();
+			}
+			LauncherActivity.mPref.edit().putInt( "assetscount", fileList.size() ).apply();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Message.obtain(progressHandler,3, e.getMessage()).sendToTarget();
+		}
+		Message.obtain(progressHandler,2, 0, 0).sendToTarget();
+	}
 }

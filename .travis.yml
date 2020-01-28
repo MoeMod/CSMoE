@@ -24,6 +24,46 @@ jobs:
       - ./steamcmd.exe +login anonymous +force_install_dir ../CSMoE-Full +app_update 90 +app_set_config 90 mod cstrike validate +quit || echo "Third attempt..."
       - cd ..
       - cp -r CSMoE-GameDir/csmoe CSMoE-Full/
+      - rm -rf CSMoE-Full/valve/cl_dlls
+      - rm -rf CSMoE-Full/valve/dlls
+      - rm -rf CSMoE-Full/valve/maps
+      - rm -rf CSMoE-Full/valve/media
+      - rm -rf CSMoE-Full/valve/models/v_*.mdl
+      - rm -rf CSMoE-Full/valve/models/player
+      - rm -rf CSMoE-Full/valve/sound/agrunt
+      - rm -rf CSMoE-Full/valve/sound/aslave
+      - rm -rf CSMoE-Full/valve/sound/barnacle
+      - rm -rf CSMoE-Full/valve/sound/barney
+      - rm -rf CSMoE-Full/valve/sound/bullchicken
+      - rm -rf CSMoE-Full/valve/sound/boid
+      - rm -rf CSMoE-Full/valve/sound/fvox
+      - rm -rf CSMoE-Full/valve/sound/garg
+      - rm -rf CSMoE-Full/valve/sound/gman
+      - rm -rf CSMoE-Full/valve/sound/gonarch
+      - rm -rf CSMoE-Full/valve/sound/headcrab
+      - rm -rf CSMoE-Full/valve/sound/hgrunt
+      - rm -rf CSMoE-Full/valve/sound/holo
+      - rm -rf CSMoE-Full/valve/sound/hornet
+      - rm -rf CSMoE-Full/valve/sound/houndeye
+      - rm -rf CSMoE-Full/valve/sound/ichy
+      - rm -rf CSMoE-Full/valve/sound/leech
+      - rm -rf CSMoE-Full/valve/sound/nihilanth
+      - rm -rf CSMoE-Full/valve/sound/roach
+      - rm -rf CSMoE-Full/valve/sound/scientist
+      - rm -rf CSMoE-Full/valve/sound/squeek
+      - rm -rf CSMoE-Full/valve/sound/tentacle
+      - rm -rf CSMoE-Full/valve/sound/tride
+      - rm -rf CSMoE-Full/valve/sound/vox
+      - rm -rf CSMoE-Full/valve/sound/x
+      - rm -rf CSMoE-Full/valve/overviews
+      - rm -rf CSMoE-Full/valve/resource/background
+      - rm -rf CSMoE-Full/cstrike/cl_dlls
+      - rm -rf CSMoE-Full/cstrike/dlls
+      - rm -rf CSMoE-Full/cstrike/models/shield
+      - rm -rf CSMoE-Full/cstrike/models/player
+      - rm -rf CSMoE-Full/cstrike/models/player.mdl
+      - rm -rf CSMoE-Full/cstrike/models/v_*.mdl
+      - mv CSMoE-Full/cstrike/maps CSMoE-Full/csmoe/
       # skip zipping stage to save time when dev
     before_deploy:
       #- zip -r CSMoE-CD-GameDir-Full.zip CSMoE-Full
@@ -138,17 +178,20 @@ jobs:
     - curl -s http://libsdl.org/release/SDL2-2.0.10.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.10 SDL2
+    - brew install p7zip
+    - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
+    - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - set -o pipefail && xcodebuild archive -project Xcode-iOS/CSMoE-iOS.xcodeproj -scheme CSMoE-iOS -configuration Release -archivePath ./CSMoE-iOS.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/csmoe-ios.app Payload/
     before_deploy:
-      - zip -r CSMoE-CD-iOS-universal-unsigned.ipa Payload
+      - zip -r CSMoE-CD-iOS-universal-unsigned-Full.ipa Payload
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-iOS-universal-unsigned.ipa
+        - CSMoE-CD-iOS-universal-unsigned-Full.ipa
       on:
         branch: master
         repo: MoeMod/CSMoE
@@ -169,17 +212,20 @@ jobs:
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
+    - sudo apt-get install p7zip-full
+    - curl -fLO https://github.com/MoeMod/CSMoE/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
+    - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - cd Android
     - "./gradlew assembleRelease"
     - cd ..
     before_deploy:
-      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned.apk
+      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-Full-unsigned.apk
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-Android-arm64-unsigned.apk
+        - CSMoE-CD-Android-arm64-Full-unsigned.apk
       on:
         branch: master
         repo: MoeMod/CSMoE

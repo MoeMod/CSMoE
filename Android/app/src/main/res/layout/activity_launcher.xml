@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/layout_launcher"
 	android:layout_width="match_parent"
@@ -53,74 +54,39 @@
 				<FrameLayout
 					android:id="@android:id/tabcontent"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content">
+					android:layout_height="match_parent">
 
 					<LinearLayout
 						android:id="@+id/tab1"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
+						android:layout_height="match_parent"
 						android:layout_margin="10dp"
 						android:orientation="vertical"
-						android:text="@string/text_tab1"
-						android:weightSum="0.6">
+						android:text="@string/text_tab1" >
+
+						<Space
+							android:layout_width="match_parent"
+							android:layout_height="64dp"
+							android:visibility="visible"
+							tools:visibility="visible" />
+
+						<ImageView
+							android:id="@+id/imageView"
+							android:layout_width="match_parent"
+							android:layout_height="128dp"
+							android:src="@drawable/csmoe" />
+
+						<Space
+							android:layout_width="match_parent"
+							android:layout_height="64dp" />
 
 						<TextView
-							android:id="@+id/textView_path1"
+							android:id="@+id/textView_path"
 							android:layout_width="fill_parent"
-							android:layout_height="40dp"
-							android:layout_marginLeft="10dp"
-							android:layout_marginTop="10dp"
-							android:layout_marginRight="10dp"
-							android:layout_marginBottom="2dp"
-							android:gravity="center_vertical|center_horizontal"
-							android:text="@string/text_res_tittle2"
-							android:textAppearance="?android:attr/textAppearanceMedium"
-							android:textSize="20sp" />
-
-						<LinearLayout
-							android:layout_width="match_parent"
-							android:layout_height="match_parent"
+							android:layout_height="wrap_content"
 							android:layout_margin="10dp"
-							android:orientation="vertical"
-							android:weightSum="1">
-
-							<TextView
-								android:layout_width="fill_parent"
-								android:layout_height="wrap_content"
-								android:layout_margin="10dp"
-								android:layout_marginTop="5dp"
-								android:text="@string/volume"
-								android:textAppearance="?android:attr/textAppearanceMedium" />
-
-							<ToggleButton
-								android:id="@+id/useVolume"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:layout_margin="10dp"
-								android:layout_marginTop="5dp"
-								android:text="nothing"
-								android:textOff="@string/no_volume"
-								android:textOn="@string/use_volume" />
-
-							<TextView
-								android:id="@+id/textView_path"
-								android:layout_width="fill_parent"
-								android:layout_height="wrap_content"
-								android:layout_margin="10dp"
-								android:text="@string/text_res_path"
-								android:textAppearance="?android:attr/textAppearanceMedium" />
-
-							<Button
-								android:id="@+id/button_select"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:layout_gravity="bottom"
-								android:layout_margin="10dp"
-								android:layout_marginTop="5dp"
-								android:onClick="selectFolder"
-								android:text="@string/select_folder" />
-
-						</LinearLayout>
+							android:text="@string/text_res_path"
+							android:textAppearance="?android:attr/textAppearanceMedium" />
 					</LinearLayout>
 
 					<LinearLayout
@@ -174,93 +140,19 @@
 								android:layout_width="fill_parent"
 								android:layout_height="wrap_content"
 								android:layout_margin="10dp"
-								android:text="@string/text_res_path"
+								android:layout_marginTop="5dp"
+								android:text="@string/volume"
 								android:textAppearance="?android:attr/textAppearanceMedium" />
 
-							<LinearLayout
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:layout_margin="10dp"
-								android:layout_marginTop="5dp"
-								android:orientation="horizontal"
-								android:weightSum="1">
-
-								<EditText
-									android:id="@+id/cmd_path"
-									android:layout_width="0dp"
-									android:layout_height="wrap_content"
-									android:layout_gravity="center_vertical"
-									android:layout_weight="1"
-									android:inputType="text"
-									android:maxLines="1"
-									android:scrollHorizontally="true" />
-
-								<Button
-									android:id="@+id/cmd_path_select"
-									android:layout_width="40dp"
-									android:layout_height="wrap_content"
-									android:layout_gravity="center_vertical|end"
-									android:onClick="selectFolder"
-									android:text="..." />
-							</LinearLayout>
-
 							<ToggleButton
-								android:id="@+id/use_rodir"
-								android:layout_width="match_parent"
-								android:layout_height="wrap_content"
-								android:layout_margin="10dp"
-								android:textOff="@string/no_rodir"
-								android:textOn="@string/use_rodir" />
-
-							<LinearLayout
-								android:id="@+id/rodir_settings"
+								android:id="@+id/useVolume"
 								android:layout_width="match_parent"
 								android:layout_height="wrap_content"
 								android:layout_margin="10dp"
 								android:layout_marginTop="5dp"
-								android:orientation="vertical"
-								android:weightSum="1">
-
-								<TextView
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:text="@string/text_res_rw_path"
-									android:textAppearance="?android:attr/textAppearanceMedium" />
-
-								<CheckBox
-									android:id="@+id/use_rodir_auto"
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:layout_marginTop="5dp"
-									android:layout_marginBottom="10dp"
-									android:text="@string/use_rodir_auto" />
-
-								<LinearLayout
-									android:layout_width="match_parent"
-									android:layout_height="wrap_content"
-									android:layout_marginTop="5dp"
-									android:orientation="horizontal"
-									android:weightSum="1">
-
-									<EditText
-										android:id="@+id/cmd_path_rw"
-										android:layout_width="0dp"
-										android:layout_height="wrap_content"
-										android:layout_gravity="center_vertical"
-										android:layout_weight="1"
-										android:inputType="text"
-										android:maxLines="1"
-										android:scrollHorizontally="true" />
-
-									<Button
-										android:id="@+id/cmd_path_rw_select"
-										android:layout_width="40dp"
-										android:layout_height="wrap_content"
-										android:layout_gravity="center_vertical|end"
-										android:onClick="selectRwFolder"
-										android:text="..." />
-								</LinearLayout>
-							</LinearLayout>
+								android:text="nothing"
+								android:textOff="@string/no_volume"
+								android:textOn="@string/use_volume" />
 
 							<LinearLayout
 								android:layout_width="match_parent"

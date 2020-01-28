@@ -1085,6 +1085,13 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 		{
 			Q_strncpy( host.rodir, roDir, sizeof( host.rodir ) );
 		}
+#if TARGET_OS_IOS
+		else
+		{
+			const char *IOS_GetBundleDir();
+			Q_strncpy( host.rodir, IOS_GetBundleDir(), sizeof( host.rodir ));
+		}
+#endif
 	}
 
 	if( !Sys_CheckParm( "-disablehelp" ) )
