@@ -361,6 +361,15 @@ void CBow::PrimaryAttack(void)
 	}
 #endif
 
+	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+		KickBack(1.0, 1.0, 0.5, 0.5, 5.0, 5.0, 5.0);
+	else if (m_pPlayer->pev->velocity.Length2D() > 0)
+		KickBack(0.3, 0.3, 0.07, 0.07, 2.0, 2.0, 4.0);
+	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		KickBack(0.2, 0.2, 0.01, 0.01, 0.5, 0.5, 4.0);
+	else
+		KickBack(0.2, 0.2, 0.01, 0.01, 0.7, 0.7, 3.0);
+
 	pev->iuser1 = 0;
 	fFinishTime = invalid_time_point;
 }
@@ -445,6 +454,16 @@ void CBow::ItemPostFrame(void)
 			m_pPlayer->pev->button &= ~IN_ATTACK;
 			m_pPlayer->pev->button &= ~IN_ATTACK2;
 			pev->iuser1 = 0;
+
+			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+				KickBack(1.0, 1.0, 0.5, 0.5, 5.0, 5.0, 5.0);
+			else if (m_pPlayer->pev->velocity.Length2D() > 0)
+				KickBack(0.3, 0.3, 0.07, 0.07, 2.0, 2.0, 4.0);
+			else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+				KickBack(0.2, 0.2, 0.01, 0.01, 0.5, 0.5, 4.0);
+			else
+				KickBack(0.2, 0.2, 0.01, 0.01, 0.7, 0.7, 3.0);
+
 			return CBasePlayerWeapon::ItemPostFrame();
 		}
 		case 2:
@@ -478,6 +497,16 @@ void CBow::ItemPostFrame(void)
 			}
 			pev->punchangle[0] -= 5.0;
 			pev->iuser1 = 0;
+
+			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+				KickBack(1.0, 1.0, 0.5, 0.5, 5.0, 5.0, 5.0);
+			else if (m_pPlayer->pev->velocity.Length2D() > 0)
+				KickBack(0.3, 0.3, 0.07, 0.07, 2.0, 2.0, 4.0);
+			else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+				KickBack(0.2, 0.2, 0.01, 0.01, 0.5, 0.5, 4.0);
+			else
+				KickBack(0.2, 0.2, 0.01, 0.01, 0.7, 0.7, 3.0);
+
 			m_pPlayer->pev->button &= ~IN_ATTACK;
 			m_pPlayer->pev->button &= ~IN_ATTACK2;
 			return CBasePlayerWeapon::ItemPostFrame();
