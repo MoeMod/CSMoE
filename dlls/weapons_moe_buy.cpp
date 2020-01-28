@@ -57,6 +57,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 												  { "weapon_m134",      "M134 Minigun",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 												  { "weapon_m134ex",      "M134 Predator",               7000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 												  { "weapon_gatling",      "Volcano",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+												  { "weapon_bow",      "BOW",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
                                                   {"weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
                                                   {"weapon_tar21",       "TAR-21",                3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},

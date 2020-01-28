@@ -262,6 +262,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
+	../dlls/wpn_shared/wpn_bow.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
 	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_chainsaw.cpp

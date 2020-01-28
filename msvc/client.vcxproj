@@ -38,6 +38,7 @@
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_balrog7.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_bow.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_bow.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp" />
@@ -345,6 +347,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_bow.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h" />
