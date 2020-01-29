@@ -159,6 +159,8 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_buy.cpp" />
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_main.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\input_touch.cpp" />
     <ClCompile Include="..\cl_dll\input_winrt.cpp" />
@@ -317,6 +319,7 @@
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
+    <ClInclude Include="..\cl_dll\imgui_cl\imgui_cl_buy.h" />
     <ClInclude Include="..\cl_dll\input.h" />
     <ClInclude Include="..\cl_dll\in_defs.h" />
     <ClInclude Include="..\cl_dll\kbutton.h" />
