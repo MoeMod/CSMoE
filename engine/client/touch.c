@@ -1809,6 +1809,13 @@ static int Touch_ControlsEvent( touchEventType type, int fingerID, float x, floa
 int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure )
 {
 
+#ifdef XASH_IMGUI
+	if(ImGui_ImplGL_TouchCallback(type, fingerID, x, y, dx, dy, pressure))
+	{
+		return 0;
+	}
+#endif
+
 	// simulate menu mouse click
 	if( cls.key_dest != key_game && !touch_in_menu->integer )
 	{
@@ -1847,12 +1854,6 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 			Key_Event( K_MOUSE1, false );
 		return 0;
 	}
-
-#ifdef XASH_IMGUI
-	{
-		ImGui_ImplGL_TouchCallback(type, fingerID, x, y, dx, dy, pressure);
-	}
-#endif
 
 
 	if( VGui_IsActive() )
