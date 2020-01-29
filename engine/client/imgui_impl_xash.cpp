@@ -101,7 +101,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 			}
 			else
 			{
-				pglBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+				//pglBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+				GL_Bind( XASH_TEXTURE0, (ptrdiff_t)pcmd->TextureId );
 				pglScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
 				pglDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
 			}
@@ -209,30 +210,49 @@ qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 	return io.WantTextInput;
 }
 
+#define GL_UNPACK_ROW_LENGTH			0x0CF2
+
 qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
 	unsigned char* pixels;
-	int width, height;
+	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
 
 	// Upload texture to graphics system
-	GLint last_texture;
-	pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	//glGenTextures(1, &g_FontTexture);
-	g_FontTexture = 888888;	// UNDONE: create texture by surface()->CreateNewTextureId()
-	pglBindTexture(GL_TEXTURE_2D, g_FontTexture);
-	pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	pglTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	//GLint last_texture;
+	//pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+	//pglGenTextures(1, &g_FontTexture);
+	//g_FontTexture = 888888;	// UNDONE: create texture by surface()->CreateNewTextureId()
+	rgbdata_t	r_image;
+	char	texName[32];
+
+	Q_strncpy( texName, "*imgui_font", sizeof( texName ) );
+	Q_memset( &r_image, 0, sizeof( r_image ));
+
+	r_image.width = width;
+	r_image.height = height;
+	r_image.depth = bytes_per_pixel;
+	r_image.type = PF_RGBA_32;
+	r_image.size = r_image.width * r_image.height * r_image.depth;
+	r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
+	r_image.buffer = (byte *)pixels;
+
+	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	auto i = GL_LoadTextureInternal( "*imgui_font", &r_image, (texFlags_t)TF_IMAGE, false );
+	g_FontTexture = i;
+	//GL_Bind(XASH_TEXTURE0, i);
+	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//pglTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Store our identifier
-	io.Fonts->TexID = (void *)(intptr_t)g_FontTexture;
+	io.Fonts->TexID = (void *)(ptrdiff_t)g_FontTexture;
 
 	// Restore state
-	pglBindTexture(GL_TEXTURE_2D, last_texture);
+	//pglBindTexture(GL_TEXTURE_2D, last_texture);
 
 	return true;
 }
@@ -242,7 +262,7 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 	if (g_FontTexture)
 	{
 		//glDeleteTextures(1, &g_FontTexture);	// !!!
-		ImGui::GetIO().Fonts->TexID = 0;
+		ImGui::GetIO().Fonts->TexID = nullptr;
 		g_FontTexture = 0;
 	}
 }
@@ -476,7 +496,13 @@ void ImGui_ImplGL_OnGUI(void)
 	Engine_OnGUI(g_EngineContext);
 }
 
-void ImGui_ImplGL_TouchCallback(touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure)
+#define TO_SCRN_Y(x) (scr_height->integer * (x))
+#define TO_SCRN_X(x) (scr_width->integer * (x))
+
+qboolean ImGui_ImplGL_TouchCallback(touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure)
 {
-	// TODO
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplGL_MouseMove(TO_SCRN_X(x), TO_SCRN_Y(y));
+	ImGui_ImplGL_MouseButtonCallback(0, type != event_up);
+	return io.WantCaptureMouse;
 }
