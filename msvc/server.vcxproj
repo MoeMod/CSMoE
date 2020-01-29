@@ -160,6 +160,7 @@
     <ClCompile Include="..\dlls\world.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\knife_katana.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_skullaxe.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_zombi.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ak47.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
@@ -222,6 +224,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_tbarrel.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_thompson.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ump45.cpp" />
@@ -443,6 +446,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
@@ -490,6 +494,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_tbarrel.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_thompson.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ump45.h" />
@@ -556,8 +561,8 @@
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
