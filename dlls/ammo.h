@@ -177,6 +177,14 @@ public:
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity *pOther);
 };
+
+class C44Magnum : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity *pOther);
+};
 }
 
 #endif // AMMO_H

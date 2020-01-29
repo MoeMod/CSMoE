@@ -81,7 +81,7 @@ int CDeagleD::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "50AE";
-	p->iMaxAmmo1 = MAX_AMMO_50AE;
+	p->iMaxAmmo1 = 105;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = DEAGLED_MAXCLIP;

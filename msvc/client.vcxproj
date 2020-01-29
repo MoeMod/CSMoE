@@ -49,6 +49,7 @@
     <ClCompile Include="..\cl_dll\events\event_deagleb.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
     <ClCompile Include="..\cl_dll\events\event_decal_reset.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_desperado.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_left.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_right.cpp" />
     <ClCompile Include="..\cl_dll\events\event_famas.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_desperado.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_famas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_fiveseven.cpp" />
@@ -353,6 +355,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_desperado.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_famas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_fiveseven.h" />

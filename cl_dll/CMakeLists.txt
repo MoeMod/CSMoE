@@ -133,6 +133,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
 	../dlls/wpn_shared/wpn_bow.cpp
+	../dlls/wpn_shared/wpn_desperado.cpp
 	../dlls/wpn_shared/wpn_m134.cpp
 	../dlls/wpn_shared/wpn_m134ex.cpp
 	../dlls/wpn_shared/wpn_m134xmas.cpp

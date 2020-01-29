@@ -126,12 +126,13 @@ namespace sv {
 				pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
 				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 
-				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pOther);
+				/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pOther);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
 					ApplyKnockbackData(pVictim, vecDirection, { 1500, 500, 700, 600, 0.4f });
-					pev->renderamt = 0.0;
-				}
+					
+				}*/
+				pev->renderamt = 0.0;
 				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 
@@ -349,7 +350,7 @@ void CBow::PrimaryAttack(void)
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-
+	m_iMode = 0;
 #ifndef CLIENT_DLL
 	Vector vecArrowAngle;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
@@ -357,7 +358,7 @@ void CBow::PrimaryAttack(void)
 	CBowArrow *pEnt = static_cast<CBowArrow *>(CBaseEntity::Create("bow_arrow", m_pPlayer->GetGunPosition(), Stock_Get_Velocity_Angle(gpGlobals->v_forward * 2000, vecArrowAngle), ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
-		pEnt->Init(gpGlobals->v_forward * 2000, GetPrimaryAttackDamage(), m_pPlayer->m_iTeam, 1, 0.15);
+		pEnt->Init(gpGlobals->v_forward * 2000, GetPrimaryAttackDamage(), m_pPlayer->m_iTeam, m_iMode, 0.15);
 	}
 #endif
 
@@ -439,7 +440,7 @@ void CBow::ItemPostFrame(void)
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.7s;
 			}
 			EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? "weapons/bow-shoot1.wav" : "weapons/bow-shoot1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
+			m_iMode = 0;
 #ifndef CLIENT_DLL
 			Vector vecArrowAngle;
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
@@ -447,7 +448,7 @@ void CBow::ItemPostFrame(void)
 			CBowArrow *pEnt = static_cast<CBowArrow *>(CBaseEntity::Create("bow_arrow", m_pPlayer->GetGunPosition(), Stock_Get_Velocity_Angle(gpGlobals->v_forward * 2200, vecArrowAngle), ENT(m_pPlayer->pev)));
 			if (pEnt)
 			{
-				pEnt->Init(gpGlobals->v_forward * 2200, GetPrimaryAttackDamage(), m_pPlayer->m_iTeam, 1, 0.15);
+				pEnt->Init(gpGlobals->v_forward * 2200, GetPrimaryAttackDamage(), m_pPlayer->m_iTeam, m_iMode, 0.15);
 			}
 #endif
 			pev->punchangle[0] -= 3.0;
@@ -479,6 +480,7 @@ void CBow::ItemPostFrame(void)
 			m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 			Vector vecSrc = m_pPlayer->GetGunPosition();
+			m_iMode = 1;
 			Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0f, 8192, 7, BULLET_PLAYER_556MM, GetSecondaryAttackDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireBow, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);

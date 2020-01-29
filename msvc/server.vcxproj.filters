@@ -812,6 +812,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_bow.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_desperado.cpp">
+      <Filter>dlls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\basetypes.h">
@@ -1666,6 +1669,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_bow.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_desperado.h">
+      <Filter>dlls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

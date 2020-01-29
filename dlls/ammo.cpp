@@ -456,4 +456,28 @@ BOOL CChainsawOil::AddAmmo(CBaseEntity *pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_chainsaw, CChainsawOil);
+
+void C44Magnum::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C44Magnum::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C44Magnum::AddAmmo(CBaseEntity *pOther)
+{
+	if (pOther->GiveAmmo(14, "44magnum", 200) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_44magnum, C44Magnum);
 }

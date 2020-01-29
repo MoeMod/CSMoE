@@ -72,6 +72,7 @@ static MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {{"weapon_infinity",    "Infini
 											   	  {"weapon_m95xmas",         "M95 Xmas Edition",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_janus7xmas",         "Janus-7 Xmas Edition",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_chainsaw",         "Ripper",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+												  {"weapon_desperado",         "Python Desperado",                  1500, PISTOL_SLOT, UNASSIGNED},
 												  {"weapon_tbarrel",         "Triple Barrel Shotgun",                  2600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 												  {"weapon_sgdrill",         "Magnum Drill",                 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 

@@ -37,12 +37,18 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 2500, 900, 1000, 900, 0.25f}; }
+	int m_iMode;
+	KnockbackData GetKnockBackData() override 
+	{ 
+		if (m_iMode)
+			return { 2500, 500, 700, 600, 0.4f };
+		else
+			return { 1500, 900, 1000, 900, 0.25f };
+	}
 	const char *GetCSModelName() override { return "models/w_bow.mdl"; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_bow" , 200 }; }
 #endif
-
 	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override;
 	int m_iShell;
 	time_point_t fFinishTime;
