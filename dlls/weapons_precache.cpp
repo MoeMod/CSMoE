@@ -165,6 +165,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_mg3xmas");
 	UTIL_PrecacheOtherWeapon("weapon_janus7xmas");
 	UTIL_PrecacheOtherWeapon("weapon_chainsaw");
+	UTIL_PrecacheOtherWeapon("weapon_desperado");
 	UTIL_PrecacheOtherWeapon("weapon_tbarrel");
 	UTIL_PrecacheOtherWeapon("weapon_sgdrill");
 	UTIL_PrecacheOther("ammo_sgdrill");
@@ -172,10 +173,12 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_mg36");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
+	UTIL_PrecacheOtherWeapon("weapon_bow");
 	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
 	UTIL_PrecacheOtherWeapon("weapon_m2");
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");
+	UTIL_PrecacheOther("ammo_bow");
 	UTIL_PrecacheOtherWeapon("weapon_gungnir");
 	UTIL_PrecacheOther("ammo_gungnir");
 	UTIL_PrecacheOtherWeapon("knife_skullaxe");
