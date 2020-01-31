@@ -46,6 +46,9 @@
     <Filter Include="engine\platform\winrt">
       <UniqueIdentifier>{c29f6150-d2f9-4a67-bf99-d9f1f4934f8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="engine\client\imgui">
+      <UniqueIdentifier>{b8f4cd5c-1b67-4574-b381-aa072b1ee6ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\client\gl_vidnt.h">
@@ -236,6 +239,12 @@
     </ClInclude>
     <ClInclude Include="..\engine\platform\winrt\winrt_interop.h">
       <Filter>engine\platform\winrt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\client\imgui_impl_xash.h">
+      <Filter>engine\client\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\client\imgui_lcsm_warning.h">
+      <Filter>engine\client\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -664,6 +673,12 @@
     </ClCompile>
     <ClCompile Include="..\engine\platform\winrt\winrt_interop.cpp">
       <Filter>engine\platform\winrt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\client\imgui_lcsm_warning.cpp">
+      <Filter>engine\client\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\client\imgui_impl_xash.cpp">
+      <Filter>engine\client\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

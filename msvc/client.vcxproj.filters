@@ -58,6 +58,9 @@
     <Filter Include="public">
       <UniqueIdentifier>{3b9d1c81-47fa-4ca9-a462-51e928dbd118}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cl_dll\imgui_cl">
+      <UniqueIdentifier>{3e72edbc-2fa9-4470-b233-939925a305d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cl_dll\events\ev_cs16.cpp">
@@ -820,6 +823,12 @@
     <ClCompile Include="..\dlls\wpn_shared\knife_katana.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_main.cpp">
+      <Filter>cl_dll\imgui_cl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_buy.cpp">
+      <Filter>cl_dll\imgui_cl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -1239,6 +1248,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_tbarrel.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cl_dll\imgui_cl\imgui_cl_buy.h">
+      <Filter>cl_dll\imgui_cl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
