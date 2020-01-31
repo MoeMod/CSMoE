@@ -25,16 +25,6 @@ else()
 	set(XASH_IMGUI OFF)
 endif()
 
-if(XASH_IMGUI)
-	set(IMGUI_SRC
-#			imgui/imgui_demo.cpp
-			imgui/imgui_draw.cpp
-			imgui/imgui_widgets.cpp
-			imgui/imgui.cpp)
-	add_library(imgui STATIC ${IMGUI_SRC})
-	target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
-endif()
-
 if (APPLE OR ANDROID)
 	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof)
 	set (CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
@@ -103,6 +93,16 @@ endif()
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
+
+if(XASH_IMGUI)
+    set(IMGUI_SRC
+#			imgui/imgui_demo.cpp
+            imgui/imgui_draw.cpp
+            imgui/imgui_widgets.cpp
+            imgui/imgui.cpp)
+    add_library(imgui STATIC ${IMGUI_SRC})
+    target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+endif()
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
