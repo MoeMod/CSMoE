@@ -170,11 +170,13 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_bow.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_desperado.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_famas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_fiveseven.cpp" />
@@ -444,11 +446,13 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_bow.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_desperado.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_famas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_fiveseven.h" />
@@ -561,7 +565,7 @@
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

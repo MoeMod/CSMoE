@@ -38,6 +38,7 @@
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_balrog7.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_bow.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannonplasma.cpp" />
@@ -48,6 +49,7 @@
     <ClCompile Include="..\cl_dll\events\event_deagleb.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
     <ClCompile Include="..\cl_dll\events\event_decal_reset.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_desperado.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_left.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_right.cpp" />
     <ClCompile Include="..\cl_dll\events\event_famas.cpp" />
@@ -194,11 +196,13 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_aug.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_awp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_balrog7.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_bow.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_c4.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_cannon.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_chainsaw.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagle.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_deagled.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_desperado.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_elite.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_famas.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_fiveseven.cpp" />
@@ -348,11 +352,13 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_aug.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_awp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_balrog7.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_bow.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_c4.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_cannon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_chainsaw.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagle.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_deagled.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_desperado.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_elite.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_famas.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_fiveseven.h" />
@@ -430,7 +436,7 @@
     <RootNamespace>hl_cdll</RootNamespace>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
     <WindowsTargetPlatformMinVersion>10.0.17763.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
