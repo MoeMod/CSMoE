@@ -4,11 +4,7 @@ cmake_minimum_required(VERSION  2.8.0)
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(APPLE OR ANDROID)
-	option(XASH_STATIC_GAMELIB "Build static game library" ON)
-else()
-	option(XASH_STATIC_GAMELIB "Build static game library" OFF)
-endif()
+option(XASH_STATIC_GAMELIB "Build static game library" ON)
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
@@ -60,6 +56,7 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	add_compile_options(-Wpedantic)
+	add_compile_options(-fPIC)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
