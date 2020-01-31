@@ -60,6 +60,11 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	GLint last_viewport[4]; pglGetIntegerv(GL_VIEWPORT, last_viewport);
 	GLint last_scissor_box[4]; pglGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
 	//pglPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
+	GLboolean last_enable_blend = pglIsEnabled(GL_BLEND);
+	GLboolean last_enable_cull_face = pglIsEnabled(GL_CULL_FACE);
+	GLboolean last_enable_depth_test = pglIsEnabled(GL_DEPTH_TEST);
+	GLboolean last_enable_scissor_test = pglIsEnabled(GL_SCISSOR_TEST);
+
 	pglEnable(GL_BLEND);
 	pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	pglDisable(GL_CULL_FACE);
@@ -120,6 +125,12 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 //	pglMatrixMode(GL_PROJECTION);
 //	pglPopMatrix();
 	//pglPopAttrib();
+
+	if (last_enable_blend) pglEnable(GL_BLEND); else pglDisable(GL_BLEND);
+	if (last_enable_cull_face) pglEnable(GL_CULL_FACE); else pglDisable(GL_CULL_FACE);
+	if (last_enable_depth_test) pglEnable(GL_DEPTH_TEST); else pglDisable(GL_DEPTH_TEST);
+	if (last_enable_scissor_test) pglEnable(GL_SCISSOR_TEST); else pglDisable(GL_SCISSOR_TEST);
+
 	pglPolygonMode(GL_FRONT, last_polygon_mode[0]); pglPolygonMode(GL_BACK, last_polygon_mode[1]);
 //	pglViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 	pglScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
@@ -322,6 +333,7 @@ qboolean ImGui_ImplGL_Init(void)
 
 	//io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableSetMousePos;
 	io.IniFilename = nullptr;
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
