@@ -234,6 +234,15 @@ set(PM_SRCS
 	../pm_shared/pm_math.cpp
 )
 
+if(XASH_IMGUI)
+	set(IMGUI_SRCS
+			imgui_cl/imgui_cl_main.cpp
+			imgui_cl/imgui_cl_buy.cpp)
+	add_definitions(-DXASH_IMGUI)
+else()
+	set(IMGUI_SRCS )
+endif()
+
 set (CLDLL_SOURCES
 	./cdll_int.cpp
     ./demo.cpp
@@ -258,6 +267,7 @@ set (CLDLL_SOURCES
 	${CLWEAPON_SRCS}
 	${HLWPN_SRCS}
 	${STUDIORENDER_SRCS}
+	${IMGUI_SRCS}
 )
 
 include_directories (
@@ -312,6 +322,10 @@ add_definitions( -D_CS16CLIENT_ENABLE_GSRC_SUPPORT
 	 )
 
 target_link_libraries( ${CLIENT_LIBRARY} ${CMAKE_DL_LIBS} )
+
+if(XASH_IMGUI)
+	target_link_libraries( ${CLIENT_LIBRARY} imgui )
+endif()
 
 if(ANDROID OR IOS)
 	set_target_properties(${CLIENT_LIBRARY} PROPERTIES

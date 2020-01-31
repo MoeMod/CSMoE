@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include <SDL_keyboard.h>
 #endif
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 typedef enum
 {
 	touch_command, // just tap a button
@@ -1804,6 +1808,13 @@ static int Touch_ControlsEvent( touchEventType type, int fingerID, float x, floa
 
 int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx, float dy, float pressure )
 {
+
+#ifdef XASH_IMGUI
+	if(ImGui_ImplGL_TouchCallback(type, fingerID, x, y, dx, dy, pressure))
+	{
+		return 0;
+	}
+#endif
 
 	// simulate menu mouse click
 	if( cls.key_dest != key_game && !touch_in_menu->integer )

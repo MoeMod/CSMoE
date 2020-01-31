@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include <errno.h>
 convar_t *android_sleep;
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 #ifndef JAVA_EXPORT
 #define JAVA_EXPORT // a1ba: workaround for my IDE, where Java files are not included
 #endif
@@ -374,6 +378,10 @@ void Android_RunEvents()
 
 	events.count = 0; // no more events
 
+#ifdef XASH_IMGUI
+	if(!ImGui_ImplGL_CharCallbackUTF( events.inputtext )) {
+#endif
+
 	// text input handled separately to allow unicode symbols
 	for( i = 0; events.inputtext[i]; i++ )
 	{
@@ -399,6 +407,11 @@ void Android_RunEvents()
 		// otherwise just push it by char, text render will decode unicode strings
 		CL_CharEvent( ch );
 	}
+
+#ifdef XASH_IMGUI
+	}
+#endif
+
 	events.inputtext[0] = 0; // no more text
 
 	jnimouse.x += events.mousex;

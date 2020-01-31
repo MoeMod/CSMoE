@@ -30,6 +30,10 @@ GNU General Public License for more details.
 #include "windows.h"
 #endif
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 Xash_Cursor*	in_mousecursor;
 qboolean	in_mouseactive;				// false when not focus app
 qboolean	in_mouseinitialized;
@@ -632,6 +636,11 @@ void IN_MouseMove( void )
 #endif
 #endif
 
+#ifdef XASH_IMGUI
+	if(ImGui_ImplGL_MouseMove( current_pos.x, current_pos.y ))
+		return;
+#endif
+
 	VGui_MouseMove( current_pos.x, current_pos.y );
 
 	if( !UI_IsVisible() )
@@ -719,7 +728,7 @@ void IN_MouseEvent( int mstate )
 		{
 			Key_Event( K_MOUSE1 + i, false );
 		}
-	}	
+	}
 
 	in_mouse_oldbuttonstate = mstate;
 }

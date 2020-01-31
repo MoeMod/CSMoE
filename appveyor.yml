@@ -2,7 +2,9 @@ version: 1.0.{build}
 image: Visual Studio 2017
 build_script:
   - ps: >-
-      git submodule update --init --recursive --force
+      mkdir cmake
+      
+      git submodule update --init --recursive
 
       Invoke-WebRequest -uri 'https://www.libsdl.org/release/SDL2-2.0.10.zip' -OutFile 'SDL2.zip'
 

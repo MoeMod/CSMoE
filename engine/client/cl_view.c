@@ -24,7 +24,9 @@ GNU General Public License for more details.
 
 #include "touch.h" // IN_TouchDraw( )
 #include "joyinput.h" // Joy_DrawOnScreenKeyboard( )
-
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
 
 /*
 ===============
@@ -426,7 +428,7 @@ void V_PostRender( void )
 		CL_DrawDemoRecording();
 		R_ShowTextures();
 		CL_DrawHUD( CL_CHANGELEVEL );
-		
+
 		Con_DrawConsole();
 		UI_UpdateMenu( host.realtime );
 		SCR_DrawNetGraph();
@@ -434,6 +436,14 @@ void V_PostRender( void )
 #if 0
 		Joy_DrawOnScreenKeyboard();
 #endif
+#ifdef XASH_IMGUI
+		ImGui_ImplGL_NewFrame();
+
+        ImGui_ImplGL_OnGUI();
+
+		ImGui_ImplGL_Render();
+#endif
+
 		Con_DrawDebug(); // must be last
 		S_ExtraUpdate();
 	}

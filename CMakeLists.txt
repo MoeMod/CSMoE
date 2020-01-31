@@ -4,11 +4,7 @@ cmake_minimum_required(VERSION  2.8.0)
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(APPLE)
-	option(XASH_STATIC_GAMELIB "Build static game library" ON)
-else()
-	option(XASH_STATIC_GAMELIB "Build static game library" OFF)
-endif()
+option(XASH_STATIC_GAMELIB "Build static game library" ON)
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
@@ -21,6 +17,12 @@ endif()
 
 if(XASH_STATIC_GAMELIB)
 	add_definitions(-DXASH_STATIC_GAMELIB=1)
+endif()
+
+if(NOT XASH_DEDICATED)
+	option(XASH_IMGUI "Imgui support for CSMoE" ON)
+else()
+	set(XASH_IMGUI OFF)
 endif()
 
 if (APPLE OR ANDROID)
@@ -44,6 +46,7 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	add_compile_options(-Wpedantic)
+	add_compile_options(-fPIC)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -90,6 +93,16 @@ endif()
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
+
+if(XASH_IMGUI)
+    set(IMGUI_SRC
+#			imgui/imgui_demo.cpp
+            imgui/imgui_draw.cpp
+            imgui/imgui_widgets.cpp
+            imgui/imgui.cpp)
+    add_library(imgui STATIC ${IMGUI_SRC})
+    target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+endif()
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
