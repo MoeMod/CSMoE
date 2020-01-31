@@ -409,6 +409,30 @@ BOOL C12GaugeAmmo::AddAmmo(CBaseEntity *pOther)
 
 LINK_ENTITY_TO_CLASS(ammo_12gauge, C12GaugeAmmo);
 
+void CBowArrowAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBowArrowAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBowArrowAmmo::AddAmmo(CBaseEntity *pOther)
+{
+	if (pOther->GiveAmmo(5, "bowarrow", 60) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_bow, CBowArrowAmmo);
+
 void CChainsawOil::Spawn()
 {
 	Precache();
@@ -432,4 +456,28 @@ BOOL CChainsawOil::AddAmmo(CBaseEntity *pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_chainsaw, CChainsawOil);
+
+void C44Magnum::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C44Magnum::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C44Magnum::AddAmmo(CBaseEntity *pOther)
+{
+	if (pOther->GiveAmmo(14, "44magnum", 200) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_44magnum, C44Magnum);
 }
