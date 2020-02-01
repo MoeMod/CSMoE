@@ -50,6 +50,9 @@ typedef float GLmatrix[16];
 #define GL_PROJECTION_MATRIX			0x0BA7
 #define GL_TEXTURE_MATRIX			0x0BA8
 
+#define GL_VIEWPORT				0x0BA2
+#define GL_POLYGON_MODE				0x0B40
+
 #define GL_DONT_CARE			0x1100
 #define GL_FASTEST				0x1101
 #define GL_NICEST				0x1102

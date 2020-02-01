@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "engine", "engine.vcxproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL2-UWP", "..\SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj", "{89E9B32E-A86A-47C3-A948-D2B1622925CE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IMGUI", "IMGUI.vcxproj", "{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -84,6 +86,14 @@ Global
 		{89E9B32E-A86A-47C3-A948-D2B1622925CE}.Release|x64.Build.0 = Release|x64
 		{89E9B32E-A86A-47C3-A948-D2B1622925CE}.Release|x86.ActiveCfg = Release|Win32
 		{89E9B32E-A86A-47C3-A948-D2B1622925CE}.Release|x86.Build.0 = Release|Win32
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Debug|x64.ActiveCfg = Debug|x64
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Debug|x64.Build.0 = Debug|x64
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Debug|x86.ActiveCfg = Debug|Win32
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Debug|x86.Build.0 = Debug|Win32
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Release|x64.ActiveCfg = Release|x64
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Release|x64.Build.0 = Release|x64
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Release|x86.ActiveCfg = Release|Win32
+		{4DD6BE25-A8AF-483E-B71F-28BC7FEEF9F8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

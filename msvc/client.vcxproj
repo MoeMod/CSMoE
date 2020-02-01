@@ -161,6 +161,8 @@
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_level.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_roundclear.cpp" />
     <ClCompile Include="..\cl_dll\hud\zbs\zbs_scoreboard.cpp" />
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_buy.cpp" />
+    <ClCompile Include="..\cl_dll\imgui_cl\imgui_cl_main.cpp" />
     <ClCompile Include="..\cl_dll\input.cpp" />
     <ClCompile Include="..\cl_dll\input_touch.cpp" />
     <ClCompile Include="..\cl_dll\input_winrt.cpp" />
@@ -321,6 +323,7 @@
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_level.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_roundclear.h" />
     <ClInclude Include="..\cl_dll\hud\zbs\zbs_scoreboard.h" />
+    <ClInclude Include="..\cl_dll\imgui_cl\imgui_cl_buy.h" />
     <ClInclude Include="..\cl_dll\input.h" />
     <ClInclude Include="..\cl_dll\in_defs.h" />
     <ClInclude Include="..\cl_dll\kbutton.h" />
@@ -514,7 +517,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\imgui;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -524,7 +527,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <SubSystem>Windows</SubSystem>
@@ -541,7 +544,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\public;..\common;..\pm_shared;..\engine;..\imgui;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -551,7 +554,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <SubSystem>Windows</SubSystem>
@@ -570,7 +573,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;NDEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\common;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\imgui;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -582,7 +585,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <SubSystem>Windows</SubSystem>
@@ -601,7 +604,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;NDEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dlls;..\cl_dll\studio;..\cl_dll\hud;..\cl_dll;..\public;..\public\tier1;..\SDL2\include;..\vgui2_support\SourceSDK\public;..\;..\common;..\pm_shared;..\engine;..\imgui;..\utils\vgui\include;..\game_shared;..\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -613,7 +616,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imgui.lib;wsock32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
       <SubSystem>Windows</SubSystem>

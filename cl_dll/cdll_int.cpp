@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*
+*	This product contains software technology licensed from Id
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -55,8 +55,8 @@ void IN_Commands( void );
 void Input_Shutdown (void);
 
 /*
-========================== 
-    Initialize
+==========================
+	Initialize
 
 Called when the DLL is first loaded.
 ==========================
@@ -188,7 +188,7 @@ int DLLEXPORT HUD_VidInit( void )
 	HUD_Init
 
 Called whenever the client connects
-to a server.  Reinitializes all 
+to a server.  Reinitializes all
 the hud variables.
 ==========================
 */
@@ -440,7 +440,8 @@ extern "C" void DLLEXPORT F(void *pv) {
 		nullptr,	// Xash3D pfnClipMoveToEntity
 		IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
 		nullptr,	// SDL Xash pfnMoveEvent
-		nullptr	// SDL Xash pfnLookEvent
+		nullptr,	// SDL Xash pfnLookEvent
+		HUD_OnGUI,	// SDL Xash pfnOnGUI
 	};
 
 	*pcldll_func = cldll_func;
@@ -505,7 +506,8 @@ extern "C" void DLLEXPORT F(void *pv) {
 			nullptr,	// Xash3D pfnClipMoveToEntity
 			IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
 			nullptr,	// SDL Xash pfnMoveEvent
-			nullptr	// SDL Xash pfnLookEvent
+			nullptr,	// SDL Xash pfnLookEvent
+			HUD_OnGUI,	// SDL Xash pfnOnGUI
 	};
 
 	*pcldll_func = cldll_func;
@@ -563,6 +565,7 @@ static dllexport_t switch_client_exports[] = {
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
 #endif
+	{ "HUD_OnGUI", (void*)HUD_OnGUI },
 	{ NULL, NULL },
 };
 
