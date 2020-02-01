@@ -52,7 +52,7 @@ void EV_FireChainsaw(event_args_s *args)
 
 	int    idx = args->entindex;
 	Vector origin( args->origin );
-	Vector angles( args->origin);
+    Vector angles( args->angles );
 	Vector forward, right, up;
 
 	AngleVectors( angles, forward, right, up );
@@ -146,7 +146,7 @@ void EV_FireChainsaw(event_args_s *args)
 		forward, right,	up,
 		1, vecSrc, vecAiming,
 		Vector(0, 0, 0), args->fparam1, BULLET_PLAYER_CROWBAR,
-		0 );
+		1 );
 }
 
 }

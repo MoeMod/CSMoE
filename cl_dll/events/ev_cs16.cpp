@@ -1,17 +1,17 @@
-/***
-*
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
-*	
-*	This product contains software technology licensed from Id 
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
-*	All Rights Reserved.
-*
-*   Use, distribution, and modification of this source code and/or resulting
-*   object code is restricted to non-commercial enhancements to products from
-*   Valve LLC.  All other use, distribution, or modification is prohibited
-*   without written permission from Valve LLC.
-*
-****/
+/*
+ev_cs16.cpp
+Copyright (C) 2020 Moemod Haoyuan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
 
 #ifdef _WIN32
 #include "port.h"
@@ -113,7 +113,7 @@ void EV_HLDM_NewExplode( float x, float y, float z, float ScaleExplode1 )
 
 }
 
-char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType, bool& isSky )
+char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType )
 {
 	// hit the world, try to play sound based on texture material type
 	char chTextureType = CHAR_TEX_CONCRETE;
@@ -132,7 +132,6 @@ char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *ve
 	//
 
 	chTextureType = 0;
-	isSky = false;
 
 	// Player
 	if ( entity >= 1 && entity <= gEngfuncs.GetMaxClients() )
@@ -150,16 +149,13 @@ char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *ve
 			strncpy( texname, pTextureName, sizeof( texname ) );
 			pTextureName = texname;
 
-			if( !strcmp( pTextureName, "sky" ) )
-			{
-				isSky = true;
-			}
 			// strip leading '-0' or '+0~' or '{' or '!'
-			else if (*pTextureName == '-' || *pTextureName == '+')
+			if (*pTextureName == '-' || *pTextureName == '+')
 			{
 				pTextureName += 2;
 			}
-			else if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
+
+			if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
 			{
 				pTextureName++;
 			}
@@ -355,93 +351,93 @@ void EV_HLDM_GunshotDecalTrace( pmtrace_t *pTrace, char *decalName, char chTextu
 	}
 }
 
-
-void EV_WallPuff_Wind( struct tempent_s *te, float frametime, float currenttime )
+void EV_SmokeRise_Wind(tempent_s *pEntity, float frametime, float currenttime)
 {
-	static bool xWindDirection = true;
-	static bool yWindDirection = true;
-	static float xWindMagnitude;
-	static float yWindMagnitude;
-
-	if ( te->entity.curstate.frame > 7.0 )
+	static vec3_t velocity;
+	static int iSmokeDirectionX = 1, iSmokeDirectionY = 1;	// Default = 1, not constant...
+	if (pEntity->entity.curstate.frame > 7.0)
 	{
-		te->entity.baseline.origin.x = 0.97 * te->entity.baseline.origin.x;
-		te->entity.baseline.origin.y = 0.97 * te->entity.baseline.origin.y;
-		te->entity.baseline.origin.z = 0.97 * te->entity.baseline.origin.z + 0.7;
-		if ( te->entity.baseline.origin.z > 70.0 )
-			te->entity.baseline.origin.z = 70.0;
-	}
+		pEntity->entity.baseline.origin *= 0.97;
+		pEntity->entity.baseline.origin.z += 0.7;
 
-	if ( te->entity.curstate.frame > 6.0 )
-	{
-		xWindMagnitude += 0.075;
-		if ( xWindMagnitude > 5.0 )
-			xWindMagnitude = 5.0;
-
-		yWindMagnitude += 0.075;
-		if ( yWindMagnitude > 5.0 )
-			yWindMagnitude = 5.0;
-
-		if( xWindDirection )
-			te->entity.baseline.origin.x += xWindMagnitude;
-		else
-			te->entity.baseline.origin.x -= xWindMagnitude;
-
-		if( yWindDirection )
-			te->entity.baseline.origin.y += yWindMagnitude;
-		else
-			te->entity.baseline.origin.y -= yWindMagnitude;
-
-		if ( !Com_RandomLong(0, 10) && yWindMagnitude > 3.0 )
+		if (pEntity->entity.baseline.origin.z > 70.0)
 		{
-			yWindMagnitude = 0;
-			yWindDirection = !yWindDirection;
+			pEntity->entity.curstate.origin.z = 70.0;
 		}
-		if ( !Com_RandomLong(0, 10) && xWindMagnitude > 3.0 )
+	}
+	if (pEntity->entity.curstate.frame > 6.0)
+	{
+		velocity.x += 0.075;
+		if (velocity.x > 5.0)
+			velocity.x = 5.0;
+
+		if (!iSmokeDirectionX)
+			pEntity->entity.baseline.origin.x -= velocity.x;
+		else
+			pEntity->entity.baseline.origin.x += velocity.x;
+
+		velocity.y += 0.075;
+		if (velocity.y > 5.0)
+			velocity.y = 5.0;
+
+		if (!iSmokeDirectionY)
+			pEntity->entity.baseline.origin.y -= velocity.y;
+		else
+			pEntity->entity.baseline.origin.y += velocity.y;
+
+		if (!gEngfuncs.pfnRandomLong(0, 10))
 		{
-			xWindMagnitude = 0;
-			xWindDirection = !xWindDirection;
+			if (velocity.y > 3.0)
+			{
+				velocity.y = 0.0;
+				iSmokeDirectionY = 1 - iSmokeDirectionY;
+			}
+		}
+
+		if (!gEngfuncs.pfnRandomLong(0, 10))
+		{
+			if (velocity.x > 3.0)
+			{
+				velocity.x = 0.0;
+				iSmokeDirectionX = 1 - iSmokeDirectionX;
+			}
 		}
 	}
 }
 
-void EV_SmokeRise( struct tempent_s *te, float frametime, float currenttime )
+void EV_SmokeRise_Wind_Expand(tempent_s *pEntity, float frametime, float currenttime)
 {
-	if ( te->entity.curstate.frame > 7.0 )
-	{
-		te->entity.baseline.origin = 0.97f * te->entity.baseline.origin;
-		te->entity.baseline.origin.z += 0.7f;
+	if (pEntity->entity.curstate.renderamt >= 75)
+		pEntity->entity.curstate.renderamt -= gEngfuncs.pfnRandomLong(0, 9) == 0;
+	if (pEntity->entity.curstate.scale < pEntity->entity.baseline.fuser1)
+		pEntity->entity.curstate.scale *= 1.025;
+}
 
-		if( te->entity.baseline.origin.z > 70.0f )
-			te->entity.baseline.origin.z = 70.0f;
+void EV_SmokeRise(tempent_s *pEntity, float frametime, float currenttime)
+{
+	if (pEntity->entity.curstate.frame > 7.0)
+	{
+		pEntity->entity.baseline.origin *= 0.97;
+		pEntity->entity.baseline.origin.z += 0.7;
+
+		if (pEntity->entity.baseline.origin.z > 70.0)
+		{
+			pEntity->entity.curstate.origin.z = 70.0;
+		}
 	}
 }
 
-void EV_HugWalls(TEMPENTITY *te, pmtrace_s *ptr)
+void EV_HugWalls(tempent_s *pEntity, pmtrace_t *tr)
 {
-	Vector norm = te->entity.baseline.origin.Normalize();
-	float len = te->entity.baseline.origin.Length();
+	float flLength = pEntity->entity.baseline.origin.Length();
 
-	Vector v =
-	{
-		ptr->plane.normal.y * norm.x - norm.y * ptr->plane.normal.x,
-		ptr->plane.normal.x * norm.z - norm.x * ptr->plane.normal.z,
-		ptr->plane.normal.z * norm.y - norm.z * ptr->plane.normal.y
-	};
-	Vector v2 =
-	{
-		ptr->plane.normal.y * v.z - v.y * ptr->plane.normal.x,
-		ptr->plane.normal.x * v.x - v.z * ptr->plane.normal.z,
-		ptr->plane.normal.z * v.y - v.x * ptr->plane.normal.y
-	};
+	if (flLength > 2000.0)
+		flLength = 2000.0;
+	vec3_t vecResult = pEntity->entity.baseline.origin.Normalize();
 
-	if( len <= 2000.0f )
-		len *= 1.5;
-	else len = 3000.0f;
-
-	te->entity.baseline.origin.x = v2.z * len * 1.5;
-	te->entity.baseline.origin.y = v2.y * len * 1.5;
-	te->entity.baseline.origin.z = v2.x * len * 1.5;
+	pEntity->entity.baseline.origin.x = ((tr->plane.normal.x * vecResult.z - tr->plane.normal.z * vecResult.x) * tr->plane.normal.z - (tr->plane.normal.y * vecResult.z - tr->plane.normal.x * vecResult.y) * tr->plane.normal.y) * flLength * 1.5;
+	pEntity->entity.baseline.origin.y = ((tr->plane.normal.y * vecResult.z - tr->plane.normal.x * vecResult.y) * tr->plane.normal.x - (tr->plane.normal.z * vecResult.y - tr->plane.normal.y * vecResult.z) * tr->plane.normal.z) * flLength * 1.5;
+	pEntity->entity.baseline.origin.z = ((tr->plane.normal.z * vecResult.y - tr->plane.normal.y * vecResult.z) * tr->plane.normal.y - (tr->plane.normal.x * vecResult.z - tr->plane.normal.z * vecResult.x) * tr->plane.normal.x) * flLength * 1.5;
 }
 
 void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, float scale, int r, int g, int b , bool wind, Vector velocity, int framerate )
@@ -452,44 +448,44 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 
 	switch( type )
 	{
-	case SMOKE_WALLPUFF:
-		if( !gHUD.fastsprites->value )
-		{
-			strcpy( path, "sprites/wall_puff1.spr" );
+		case SMOKE_WALLPUFF:
+			if( !gHUD.fastsprites->value )
+			{
+				strcpy( path, "sprites/wall_puff1.spr" );
 
-			path[17] += Com_RandomLong(0, 3); // randomize a bit
-		}
-		else
-		{
-			strcpy( path, "sprites/fast_wallpuff1.spr" );
-			te = gEngfuncs.pEfxAPI->R_DefaultSprite( origin,
-								gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/fast_wallpuff1.spr"), 30.0f );
-		}
-		break;
-	case SMOKE_RIFLE:
-		strcpy( path, "sprites/rifle_smoke1.spr" );
-		path[19] += Com_RandomLong(0, 2); // randomize a bit
-
-
-		break;
-	case SMOKE_PISTOL:
-		strcpy( path, "sprites/pistol_smoke1.spr" );
-		path[20] += Com_RandomLong(0, 1);  // randomize a bit
+				path[17] += Com_RandomLong(0, 3); // randomize a bit
+			}
+			else
+			{
+				strcpy( path, "sprites/fast_wallpuff1.spr" );
+				te = gEngfuncs.pEfxAPI->R_DefaultSprite( origin,
+														 gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/fast_wallpuff1.spr"), 30.0f );
+			}
+			break;
+		case SMOKE_RIFLE:
+			strcpy( path, "sprites/rifle_smoke1.spr" );
+			path[19] += Com_RandomLong(0, 2); // randomize a bit
 
 
-		break;
-	case SMOKE_BLACK:
-		strcpy( path, "sprites/black_smoke1.spr" );
-		path[19] += Com_RandomLong(0, 3); // randomize a bit
+			break;
+		case SMOKE_PISTOL:
+			strcpy( path, "sprites/pistol_smoke1.spr" );
+			path[20] += Com_RandomLong(0, 1);  // randomize a bit
 
 
-		break;
-	default:
-		assert(("Unknown smoketype!"));
+			break;
+		case SMOKE_BLACK:
+			strcpy( path, "sprites/black_smoke1.spr" );
+			path[19] += Com_RandomLong(0, 3); // randomize a bit
+
+
+			break;
+		default:
+			assert(("Unknown smoketype!"));
 	}
 
 	if( wind )
-		callback = EV_WallPuff_Wind;
+		callback = EV_SmokeRise_Wind;
 	else
 		callback = EV_SmokeRise;
 
@@ -519,64 +515,185 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 	}
 }
 
-
-void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r, int g, int b, bool bCreateWallPuff, bool bCreateSparks, char cTextureType, bool isSky)
+void EV_HLDM_CreateSmoke(float *origin, float *dir, int speed, float scale, int r, int g, int b, int iSmokeType, float *base_velocity, bool bWind, int framerate)
 {
-	physent_t *pe;
-
-	if( isSky )
-		return; // don't try to draw decals, spawn wall puff on skybox?
-
-	pe = gEngfuncs.pEventAPI->EV_GetPhysent( pTrace->ent );
-
-	if ( pe && pe->solid == SOLID_BSP )
+	char model[256];
+	int model_index;
+	TEMPENTITY *te;
+	switch (iSmokeType)
 	{
-		EV_HLDM_GunshotDecalTrace( pTrace, EV_HLDM_DamageDecal( pe ), cTextureType );
+		case 1:
+			strcpy(model, "sprites/black_smoke1.spr");
 
-		// create sparks
-		if( gHUD.cl_weapon_sparks && gHUD.cl_weapon_sparks->value && bCreateSparks )
-		{
-			Vector dir = pTrace->plane.normal;
-			dir.x = dir.x * dir.x * gEngfuncs.pfnRandomFloat( 4.0f, 12.0f );
-			dir.y = dir.y * dir.y * gEngfuncs.pfnRandomFloat( 4.0f, 12.0f );
-			dir.z = dir.z * dir.z * gEngfuncs.pfnRandomFloat( 4.0f, 12.0f );
-			gEngfuncs.pEfxAPI->R_StreakSplash( pTrace->endpos, dir, 4, Com_RandomLong( 5, 10 ), dir.z, -75.0f, 75.0f );
-		}
-
-		// create wallpuff
-		if( gHUD.cl_weapon_wallpuff && gHUD.cl_weapon_wallpuff->value && bCreateWallPuff )
-		{
-			/*TEMPENTITY *te = NULL;
-			if( gHUD.fastsprites && !gHUD.fastsprites->value )
+			switch (gEngfuncs.pfnRandomLong(0, 3))
 			{
-				char path[] = "sprites/wall_puff1.spr";
+				case 0:
+					model[19] = '1';
+					break;
+				case 1:
+					model[19] = '2';
+					break;
+				case 2:
+					model[19] = '3';
+					break;
+				case 3:
+					model[19] = '4';
+					break;
+			}
 
-				path[17] += Com_RandomLong(0, 3);
-				te = gEngfuncs.pEfxAPI->R_DefaultSprite( pTrace->endpos,
-									gEngfuncs.pEventAPI->EV_FindModelIndex(path), 30.0f );
+			model_index = gEngfuncs.pEventAPI->EV_FindModelIndex(model);
+
+			if (gEngfuncs.pfnGetCvarFloat("fastsprites") > 1.0)
+			{
+				model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/fast_wallpuff1.spr");
+			}
+
+			if (!model_index)
+				model_index = 293;
+			break;
+
+		case 2:
+			switch (gEngfuncs.pfnRandomLong(0, 3))
+			{
+				case 0:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/wall_puff1.spr");
+					break;
+				case 1:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/wall_puff2.spr");
+					break;
+				case 2:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/wall_puff3.spr");
+					break;
+				case 3:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/wall_puff4.spr");
+					break;
+			}
+			break;
+
+		case 3:
+			if (gEngfuncs.pfnRandomLong(0, 1))
+				model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/pistol_smoke1.spr");
+			else
+				model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/pistol_smoke2.spr");
+			break;
+
+		case 4:
+			switch (gEngfuncs.pfnRandomLong(0, 2))
+			{
+				case 0:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/rifle_smoke1.spr");
+				case 1:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/rifle_smoke2.spr");
+				case 2:
+					model_index = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/rifle_smoke3.spr");
+			}
+			break;
+	}
+
+	te = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, model_index, framerate);
+
+	if (te)
+	{
+		te->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+		te->entity.curstate.scale = scale + gEngfuncs.pfnRandomFloat(0.0, scale / 2.0);
+
+		if (iSmokeType > 1)
+		{
+			te->callback = bWind ? EV_SmokeRise_Wind : EV_SmokeRise;
+			te->entity.curstate.rendermode = kRenderTransAdd;
+			te->entity.curstate.renderamt = 150;
+			te->entity.curstate.renderfx = kRenderFxFadeSlow;
+		}
+		else
+		{
+			if (gEngfuncs.pfnGetCvarFloat("fastsprites") == 1.0)
+			{
+				te->entity.curstate.rendermode = kRenderTransAdd;
+				te->entity.curstate.renderamt = 200;
 			}
 			else
 			{
-				te = gEngfuncs.pEfxAPI->R_DefaultSprite( pTrace->endpos,
-									gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/fast_wallpuff1.spr"), 30.0f );
+				if (gEngfuncs.pfnGetCvarFloat("fastsprites") > 1.0)
+				{
+					te->entity.curstate.rendermode = kRenderNormal;
+				}
+				else
+				{
+					te->entity.curstate.rendermode = kRenderTransAlpha;
+					te->entity.curstate.renderamt = 200;
+				}
 			}
 
-			if( te )
-			{
-				te->callback = EV_WallPuff_Wind;
-				te->hitcallback = EV_HugWalls;
-				te->flags |= FTENT_COLLIDEALL | FTENT_CLIENTCUSTOM;
-				te->entity.curstate.rendermode = kRenderTransAdd;
-				te->entity.curstate.rendercolor.r = r;
-				te->entity.curstate.rendercolor.g = g;
-				te->entity.curstate.rendercolor.b = b;
-				te->entity.curstate.renderamt = Com_RandomLong( 100, 180 );
-				te->entity.curstate.scale = 0.5;
-				te->entity.baseline.origin = (25 + Com_RandomLong( 0, 4 ) ) * pTrace->plane.normal;
-			}*/
+			te->callback = EV_SmokeRise_Wind_Expand;
+			te->entity.baseline.fuser1 = (iSmokeType == 1) ? 1.0 : 8.5;
 
-			EV_CS16Client_CreateSmoke( SMOKE_WALLPUFF, pTrace->endpos, pTrace->plane.normal, 25, 0.5, r, g, b, true );
+			if (gEngfuncs.pfnGetCvarFloat("fastsprites") > 1.0)
+				te->entity.baseline.fuser1 -= 3.0;
 		}
+
+		te->hitcallback = EV_HugWalls;
+		te->entity.curstate.rendercolor.r = r;
+		te->entity.curstate.rendercolor.g = g;
+		te->entity.curstate.rendercolor.b = b;
+
+		if (speed)
+		{
+			speed += gEngfuncs.pfnRandomLong(0, 5);
+		}
+
+		if (origin[0] != dir[0] && origin[1] != dir[1] && origin[2] != dir[2])
+		{
+			te->entity.origin.x = origin[0];
+			te->entity.origin.y = origin[1];
+			te->entity.origin.z = origin[2];
+
+			te->entity.baseline.origin.x = dir[0] * speed;
+			te->entity.baseline.origin.y = dir[1] * speed;
+			te->entity.baseline.origin.z = dir[2] * speed;
+
+			if (base_velocity)
+			{
+				te->entity.baseline.origin.x = dir[0] * speed + 0.9 * base_velocity[0];
+				te->entity.baseline.origin.y = dir[1] * speed + 0.9 * base_velocity[1];
+				te->entity.baseline.origin.z = dir[2] * speed + 0.5 * base_velocity[2];
+			}
+		}
+	}
+}
+
+void EV_HLDM_DecalGunshot(pmtrace_t *pTrace, int iBulletType, float scale, int r, int g, int b, bool bStreakSplash, char cTextureType)
+{
+	int iColorIndex;
+	char *decalname;
+
+	physent_t *pe = gEngfuncs.pEventAPI->EV_GetPhysent(pTrace->ent);
+
+	if (pe && pe->solid == SOLID_BSP)
+	{
+		if (bStreakSplash)
+		{
+			int iStreakCount = gEngfuncs.pfnRandomLong(15, 30);
+
+			switch (iBulletType)
+			{
+				default:
+					iColorIndex = 30;
+					break;
+			}
+
+			gEngfuncs.pEfxAPI->R_StreakSplash(pTrace->endpos, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal, iColorIndex, iStreakCount, gEngfuncs.pfnRandomFloat(4.0, 10.0) * pTrace->plane.normal[2], -75, 75);
+		}
+
+		switch (iBulletType)
+		{
+			default:
+				decalname = EV_HLDM_DamageDecal(pe);
+				break;
+		}
+
+		EV_HLDM_GunshotDecalTrace(pTrace, decalname, cTextureType);
+		EV_HLDM_CreateSmoke(pTrace->endpos + pTrace->plane.normal * 5.0, pTrace->plane.normal, 25, scale, r, g, b, 2, NULL, true, 35);
+		//EV_CS16Client_CreateSmoke( SMOKE_WALLPUFF, pTrace->endpos, pTrace->plane.normal, 25, 0.5, r, g, b, true );
 	}
 }
 
@@ -657,143 +774,321 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 	}
 }
 
+int EV_HLDM_CheckTracer(int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount)
+{
+	int tracer = 0;
+	int i;
+	qboolean player = idx >= 1 && idx <= gEngfuncs.GetMaxClients() ? true : false;
+
+	if (iTracerFreq != 0 && ((*tracerCount)++ % iTracerFreq) == 0)
+	{
+		vec3_t vecTracerSrc;
+
+		if (player)
+		{
+			vec3_t offset(0, 0, -4);
+
+			// adjust tracer position for player
+			for (i = 0; i < 3; i++)
+			{
+				vecTracerSrc[i] = vecSrc[i] + offset[i] + right[i] * 2 + forward[i] * 16;
+			}
+		}
+		else
+		{
+			VectorCopy(vecSrc, vecTracerSrc);
+		}
+
+		if (iTracerFreq != 1)		// guns that always trace also always decal
+			tracer = 1;
+
+		gEngfuncs.pEfxAPI->R_TracerEffect(vecTracerSrc, end);
+	}
+
+	return tracer;
+}
 
 
-/*
-================
-EV_HLDM_FireBullets
-
-Go to the trouble of combining multiple pellets into a single damage call.
-================
-*/
-void EV_HLDM_FireBullets(int idx,
-						 float *forward, float *right, float *up,
-						 int cShots,
-						 float *vecSrc, float *vecDirShooting, float *vecSpread,
-						 float flDistance, int iBulletType, int iPenetration)
+void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, int iPenetration, int iAttachment, bool lefthand, float srcofs)
 {
 	int i;
 	pmtrace_t tr;
-	int iShot;
+	int tracer;
 	int iPenetrationPower;
 	float flPenetrationDistance;
-	bool isSky;
+	float flCurrentDistance;
+	vec3_t vecStart;
+	char chTextureType = CHAR_TEX_GRATE;
+	float flScale = 0.4;
+	float flTempDistance;
+	int iSourcePenetration = iPenetration;
+	int r = 40, g = 40, b = 40;
+	BOOL bCreatedEffects = FALSE;
 
-	EV_DescribeBulletTypeParameters( iBulletType, iPenetrationPower, flPenetrationDistance );
+	EV_DescribeBulletTypeParameters(iBulletType, iPenetrationPower, flPenetrationDistance);
 
-	for ( iShot = 1; iShot <= cShots; iShot++ )
+	if (lefthand == 0)
 	{
-		Vector vecShotSrc(vecSrc);
-		int iShotPenetration = iPenetration;
-		Vector vecDir, vecEnd;
-
-		if ( iBulletType == BULLET_PLAYER_BUCKSHOT )
-		{
-			//We randomize for the Shotgun.
-			float x, y, z;
-			do {
-				x = gEngfuncs.pfnRandomFloat(-0.5,0.5) + gEngfuncs.pfnRandomFloat(-0.5,0.5);
-				y = gEngfuncs.pfnRandomFloat(-0.5,0.5) + gEngfuncs.pfnRandomFloat(-0.5,0.5);
-				z = x*x+y*y;
-			} while (z > 1);
-
-			for ( i = 0 ; i < 3; i++ )
-			{
-				vecDir[i] = vecDirShooting[i] + x * vecSpread[0] * right[ i ] + y * vecSpread[1] * up [ i ];
-				vecEnd[i] = vecShotSrc[ i ] + flDistance * vecDir[ i ];
-			}
-		}
-		else //But other guns already have their spread randomized in the synched spread.
-		{
-			for ( i = 0 ; i < 3; i++ )
-			{
-				vecDir[i] = vecDirShooting[i] + vecSpread[0] * right[ i ] + vecSpread[1] * up [ i ];
-				vecEnd[i] = vecShotSrc[ i ] + flDistance * vecDir[ i ];
-			}
-		}
-
-		gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction( false, true );
-
-		// Store off the old count
-		gEngfuncs.pEventAPI->EV_PushPMStates();
-
-		// Now add in all of the players.
-		gEngfuncs.pEventAPI->EV_SetSolidPlayers ( idx - 1 );
-
-		while (iShotPenetration != 0)
-		{
-			gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
-			gEngfuncs.pEventAPI->EV_PlayerTrace( vecShotSrc, vecEnd, 0, -1, &tr );
-
-			float flCurrentDistance = tr.fraction * flDistance;
-
-			if( flCurrentDistance == 0.0f )
-			{
-				break;
-			}
-
-			if ( flCurrentDistance > flPenetrationDistance )
-				iShotPenetration = 0;
-			else iShotPenetration--;
-
-			char cTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecShotSrc, vecEnd, iBulletType, isSky );
-			bool bSparks = true;
-			int r_smoke, g_smoke, b_smoke;
-			r_smoke = g_smoke = b_smoke = 40;
-
-			switch (cTextureType)
-			{
-			case CHAR_TEX_METAL:
-				iPenetrationPower *= 0.15;
-				break;
-			case CHAR_TEX_CONCRETE:
-				r_smoke = g_smoke = b_smoke = 65;
-				iPenetrationPower *= 0.25;
-				break;
-			case CHAR_TEX_VENT:
-			case CHAR_TEX_GRATE:
-				iPenetrationPower *= 0.5;
-				break;
-			case CHAR_TEX_TILE:
-				iPenetrationPower *= 0.65;
-				break;
-			case CHAR_TEX_COMPUTER:
-				iPenetrationPower *= 0.4;
-				break;
-			case CHAR_TEX_WOOD:
-				bSparks = false;
-				r_smoke = 75;
-				g_smoke = 42;
-				b_smoke = 15;
-				break;
-			}
-
-			// do damage, paint decals
-			EV_HLDM_DecalGunshot( &tr, iBulletType, 0, r_smoke, g_smoke, b_smoke, true, bSparks, cTextureType, isSky );
-
-			if(/* iBulletType == BULLET_PLAYER_BUCKSHOT ||*/ iShotPenetration <= 0 )
-			{
-				break;
-			}
-
-			flDistance = (flDistance - flCurrentDistance) * 0.5;
-			for( int i = 0; i < 3; i++ )
-			{
-				vecShotSrc[i] = tr.endpos[i]  + iPenetrationPower * vecDir[i];
-				vecEnd[i]     = vecShotSrc[i] + flDistance        * vecDir[i];
-			}
-
-
-			// trace back, so we will have a decal on the other side of solid area
-			pmtrace_t trOriginal;
-			gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
-			gEngfuncs.pEventAPI->EV_PlayerTrace(vecShotSrc, vecSrc, 0, -1, &trOriginal);
-			if( !trOriginal.startsolid )
-				EV_HLDM_DecalGunshot( &trOriginal, iBulletType, 0, r_smoke, g_smoke, b_smoke, true, bSparks, cTextureType, isSky );
-		}
-		gEngfuncs.pEventAPI->EV_PopPMStates();
+		vecSrc[0] -= right[0] * srcofs;
+		vecSrc[1] -= right[1] * srcofs;
+		vecSrc[2] -= right[2] * srcofs;
+	}
+	else
+	{
+		vecSrc[0] += right[0] * srcofs;
+		vecSrc[1] += right[1] * srcofs;
+		vecSrc[2] += right[2] * srcofs;
 	}
 
+	int iPower = iPenetrationPower * 2;
+	bool bStreakSplash = false;
+
+	int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/laserbeam.spr");
+
+	if (cShots >= 1)
+	{
+		VectorCopy(vecSrc, vecStart);
+		int iShots = cShots;
+		float x, y, z;
+		vec3_t vecDir, vecEnd;
+
+		while (iShots > 0)
+		{
+			if (iBulletType == BULLET_PLAYER_BUCKSHOT)
+			{
+				do
+				{
+					x = gEngfuncs.pfnRandomFloat(-0.5, 0.5) + gEngfuncs.pfnRandomFloat(-0.5, 0.5);
+					y = gEngfuncs.pfnRandomFloat(-0.5, 0.5) + gEngfuncs.pfnRandomFloat(-0.5, 0.5);
+					z = x*x + y*y;
+				} while (z > 1);
+				for (i = 0; i < 3; i++)
+				{
+					vecDir[i] = vecDirShooting[i] + x * vecSpread[0] * right[i] + y * vecSpread[1] * up[i];
+					vecEnd[i] = vecSrc[i] + flDistance * vecDir[i];
+				}
+			}
+			else
+			{
+				for (i = 0; i < 3; i++)
+				{
+					vecDir[i] = vecDirShooting[i] + vecSpread[0] * right[i] + vecSpread[1] * up[i];
+					vecEnd[i] = vecSrc[i] + flDistance * vecDir[i];
+				}
+			}
+
+			iPenetration = iSourcePenetration;
+			bCreatedEffects = FALSE;
+
+			gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(false, true);
+			gEngfuncs.pEventAPI->EV_PushPMStates();
+			gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
+			gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+			bStreakSplash = false;
+
+			while (iPenetration > 0)
+			{
+				gEngfuncs.pEventAPI->EV_PlayerTrace(vecStart, vecEnd, PM_NORMAL, -1, &tr);
+
+				tracer = EV_HLDM_CheckTracer(idx, vecStart, vecEnd, forward, right, iBulletType, iTracerFreq, tracerCount);
+				flCurrentDistance = tr.fraction * flDistance;
+				if (flCurrentDistance <= 0.0)
+					break;
+
+				if (!bCreatedEffects)
+				{
+					bCreatedEffects = TRUE;
+					vec3_t source;
+					if (EV_IsLocal(idx))
+						source = gEngfuncs.GetViewModel()->attachment[iAttachment];
+					else
+						source = gEngfuncs.GetEntityByIndex(idx)->attachment[0];
+
+					if (cl_tracereffect->value)
+						gEngfuncs.pEfxAPI->R_TracerParticles(source, (tr.endpos - source).Normalize() * 6000, (tr.endpos - source).Length() / 6000);
+					if (cl_gunbubbles->value)
+					{
+						Vector end, dir;
+						dir = vecDir;
+
+						for (int i = 0; i < 3; i++)
+						{
+							end[i] = tr.endpos[i] - 5.0 * vecDir[i];
+						}
+
+						if (gEngfuncs.PM_PointContents(end, NULL) == CONTENTS_WATER)
+						{
+							int sModelIndexBubbles = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/bubble.spr");
+
+							if (cl_gunbubbles->value == 2)
+							{
+								cl_entity_t *ent;
+								vec3_t src(vecSrc);
+
+								if (EV_IsLocal(idx))
+								{
+									ent = gEngfuncs.GetViewModel();
+									src = ent->attachment[iAttachment];
+									dir = (end - src).Normalize();
+								}
+
+								vec3_t dir = (end - src).Normalize();
+
+								float height, distance;
+
+								if (gEngfuncs.PM_PointContents(src, NULL) == CONTENTS_WATER)
+								{
+									height = src.z - end.z;
+									distance = (end - src).Length();
+
+									if (height < 20)
+										height = 20;
+								}
+								else
+								{
+									Vector test = end;
+
+									while (gEngfuncs.PM_PointContents(test, NULL) == CONTENTS_WATER)
+									{
+										test.z += 2;
+									}
+
+									height = test.z - end.z - 5 - 2;
+									distance = (end - src).Length();
+
+									src = end - dir * (height / (src.z - end.z) * distance);
+								}
+
+								int count = (src - end).Length() / 8;
+
+								if (count && height)
+									gEngfuncs.pEfxAPI->R_BubbleTrail(src, end, height, sModelIndexBubbles, count, 2.0);
+							}
+							else
+							{
+								Vector mins, maxs;
+								mins.x = tr.endpos[0] - 2.0;
+								mins.y = tr.endpos[1] - 2.0;
+								mins.z = tr.endpos[2] - 2.0;
+								maxs.x = tr.endpos[0] + 15.0;
+								maxs.y = tr.endpos[1] + 15.0;
+								maxs.z = tr.endpos[2] + 15.0;
+
+								gEngfuncs.pEfxAPI->R_Bubbles(mins, maxs, 20, sModelIndexBubbles, 10, 2.0);
+							}
+						}
+					}
+				}
+
+				iPenetration--;
+				if (flCurrentDistance > flPenetrationDistance)
+					iPenetration = 0;
+				flTempDistance = flCurrentDistance;
+				switch (iBulletType)
+				{
+					case BULLET_PLAYER_9MM:
+						if (!tracer)
+							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
+						break;
+					case BULLET_PLAYER_BUCKSHOT:
+						break;
+					case BULLET_PLAYER_MP5:
+						if (!tracer)
+							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
+						break;
+					case BULLET_PLAYER_357:
+						if (!tracer)
+							chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
+						break;
+					default:
+						chTextureType = EV_HLDM_PlayTextureSound(idx, &tr, vecStart, vecEnd, iBulletType);
+						break;
+				}
+
+				switch (chTextureType)
+				{
+					case CHAR_TEX_METAL:
+						bStreakSplash = true;
+						flCurrentDistance = iPower * 0.15;
+						iPower = flCurrentDistance;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					case CHAR_TEX_CONCRETE:
+						bStreakSplash = true;
+						r = g = b = 65;
+						flCurrentDistance = iPower * 0.25;
+						iPower = flCurrentDistance;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					case CHAR_TEX_GRATE:
+					case CHAR_TEX_VENT:
+						bStreakSplash = true;
+						flCurrentDistance = iPower * 0.5;
+						iPower = flCurrentDistance;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					case CHAR_TEX_TILE:
+						bStreakSplash = true;
+						flCurrentDistance = iPower * 0.65;
+						iPower = flCurrentDistance;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					case CHAR_TEX_COMPUTER:
+						bStreakSplash = true;
+						flCurrentDistance = iPower * 0.4;
+						iPower = flCurrentDistance;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					case CHAR_TEX_WOOD:
+						bStreakSplash = false;
+						r = 75;
+						g = 42;
+						b = 15;
+						flScale = 0.5;
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+					default:
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+						break;
+				}
+
+				if (!iPenetration)
+					break;
+				flDistance = (flDistance - flTempDistance) * 0.5;
+				vecStart = iPower * vecDir + tr.endpos - vecDir;
+				vecEnd = vecDir * flDistance + vecStart;
+
+				float flDepth = 1.0;
+
+				if (iPower > 1)
+				{
+					while (1)
+					{
+						gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+						gEngfuncs.pEventAPI->EV_PlayerTrace(tr.endpos + vecDir * flDepth, tr.endpos + vecDir * flDepth * 2, PM_NORMAL, -1, &tr);
+						if (tr.startsolid)
+						{
+							if (tr.inopen)
+								break;
+						}
+						flDepth += 1.0;
+						if (flDepth >= iPower)
+							break;
+					}
+					if (flDepth < iPower)
+						EV_HLDM_DecalGunshot(&tr, iBulletType, flScale, r, g, b, bStreakSplash, chTextureType);
+				}
+				continue;
+			}
+			gEngfuncs.pEventAPI->EV_PopPMStates();
+			iShots--;
+		}
+	}
+}
+
+void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iPenetration)
+{
+    return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, 0, 0, iPenetration, 0, false, 0.0f);
 }
 
 void EV_CS16Client_KillEveryRound( TEMPENTITY *te, float frametime, float current_time )
