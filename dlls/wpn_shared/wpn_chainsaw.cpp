@@ -141,55 +141,7 @@ void CChainsaw::SecondaryAttack(void)
 
 void CChainsaw::PrimaryAttack(void)
 {
-	if (m_iClip <= 0)
-	{
-		if (m_fFireOnEmpty)
-		{
-			PlayEmptySound();
-			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
-		}
-
-		return;
-	}
-
-	m_iClip--;
-
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-#ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-
-#ifndef CLIENT_DLL
- hit_result_t iCallBack = KnifeAttack(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), CHAINSAW_DISTANCE_A, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
-#endif
-
-
-#ifndef CLIENT_DLL
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, CHAINSAW_DISTANCE_A, 0.0, 0, 0, iCallBack != HIT_NONE, TRUE);
-	/*MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, m_pPlayer->pev);
-	WRITE_SHORT((1 << 12) * 5);
-	WRITE_SHORT(1);
-	WRITE_SHORT((1 << 12) * 5);
-	MESSAGE_END();*/
-#endif
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.063s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0s;
-
-#ifndef CLIENT_DLL
-	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
-		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
-#endif
-
-//m_pPlayer->pev->velocity[2] = 0.0;
-		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			KickBack(1.0, 0.4, 0.2, 0.15, 3.0, 2.0, 0);
-		else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			KickBack(0.3, 0.3, 0.05, 0.02, 2.5, 1.5, 0);
-		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			KickBack(0.175 ,0.04, 0.03, 0.01, 1.5, 1.0, 0);
-		else
-			KickBack(0.2, 0.2, 0.035, 0.015, 2.0, 1.25, 0);
+	return;
 }
 
 void CChainsaw::ItemPostFrame(void)
@@ -234,6 +186,55 @@ void CChainsaw::ItemPostFrame(void)
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
 					//attack loop
+					if (m_iClip <= 0)
+					{
+						if (m_fFireOnEmpty)
+						{
+							PlayEmptySound();
+							m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.2s;
+						}
+
+						return;
+					}
+
+					m_iClip--;
+
+					UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+					Vector vecSrc = m_pPlayer->GetGunPosition();
+				#ifndef CLIENT_DLL
+					m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+				#endif
+
+				#ifndef CLIENT_DLL
+					hit_result_t iCallBack = KnifeAttack(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), CHAINSAW_DISTANCE_A, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
+				#endif
+
+
+				#ifndef CLIENT_DLL
+					PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, CHAINSAW_DISTANCE_A, 0.0, 0, 0, iCallBack != HIT_NONE, TRUE);
+					/*MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, m_pPlayer->pev);
+					WRITE_SHORT((1 << 12) * 5);
+					WRITE_SHORT(1);
+					WRITE_SHORT((1 << 12) * 5);
+					MESSAGE_END();*/
+				#endif
+					m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.063s;
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 5.0s;
+
+				#ifndef CLIENT_DLL
+					if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+						m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
+				#endif
+
+		//m_pPlayer->pev->velocity[2] = 0.0;
+				if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+					KickBack(1.0, 0.4, 0.2, 0.15, 3.0, 2.0, 0);
+				else if (m_pPlayer->pev->velocity.Length2D() > 0)
+					KickBack(0.3, 0.3, 0.05, 0.02, 2.5, 1.5, 0);
+				else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+					KickBack(0.175 ,0.04, 0.03, 0.01, 1.5, 1.0, 0);
+				else
+					KickBack(0.2, 0.2, 0.035, 0.015, 2.0, 1.25, 0);
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
 				case 2:
