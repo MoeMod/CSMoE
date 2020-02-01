@@ -13,34 +13,15 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifdef _WIN32
-#include "port.h"
-#endif
+#include "events.h"
 
-
-
-#include "hud.h"
-#include "cl_util.h"
-#include "const.h"
-#include "entity_state.h"
-#include "cl_entity.h"
-#include "entity_types.h"
-#include "usercmd.h"
-
-extern "C"
-{
 #include "pm_defs.h"
 #include "pm_materials.h"
-}
 
 #include "pm_shared.h"
 
-#include "eventscripts.h"
-#include "ev_hldm.h"
-
 #include "r_efx.h"
 #include "triangleapi.h"
-#include "event_api.h"
 #include "event_args.h"
 #include "in_defs.h"
 
