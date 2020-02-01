@@ -90,7 +90,7 @@ void EV_FireChainsaw(event_args_s *args)
 			{
 				//no ammo
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(args->iparam1 ?  ANIM_SLASH3 :  ANIM_SLASH4, 2);
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_ITEM, args->iparam1 ? (args->bparam2 ? "weapons/chainsaw_slash1.wav" : "weapons/chainsaw_slash3.wav") : (!args->bparam2 ? "weapons/chainsaw_slash2.wav" : "weapons/chainsaw_slash4.wav"), 1.0, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 15));
+				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_ITEM, args->iparam1 ? "weapons/chainsaw_slash3.wav" : "weapons/chainsaw_slash4.wav", 1.0, ATTN_NORM, 0, 94 + gEngfuncs.pfnRandomLong(0, 15));
 			}
 		}
 	}
