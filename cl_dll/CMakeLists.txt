@@ -152,6 +152,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
+	../dlls/wpn_shared/wpn_gunkata.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp
