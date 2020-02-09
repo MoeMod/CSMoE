@@ -22,7 +22,7 @@ auto EngineClock::now() noexcept -> time_point
 }
 
 
-#if defined (_MSC_VER) && (_MSC_VER > 1000) && !defined(_WIN64)
+#if defined (_MSC_VER) && (_MSC_VER > 1000) && defined(_M_IX86)
 	#pragma comment (linker, "/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1")
 	#pragma comment (linker, "/SECTION:.data,RW")
 #endif
