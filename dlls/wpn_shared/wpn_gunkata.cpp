@@ -1,6 +1,6 @@
 /*
-wpn_anaconda.cpp @ codename LCSM
-Copyright (C) 2019 Moemod Hymei
+wpn_anaconda.cpp
+Copyright (C) 2020 Moemod Haoyuan
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -165,12 +165,13 @@ public:
 	{
 		m_flAccuracy = AccuracyDefault;
 
-
+#ifndef CLIENT_DLL
 		m_iMode_pev_iuser1 = 0; // (this + 292) = 0
 		m_flNextSpecialAttack1_pev_fuser1 = time_point_t::max(); // 0x7F7FFFFF; // 320
 		m_flNextSpecialAttack5_pev_teleport_time = time_point_t::max(); // 0x7F7FFFFF; // 336
 		m_flNextSpecialAttack9_pev_dmg_save = time_point_t::max(); // 0x7F7FFFFF; // 352
 		m_flNextSpecialAttack11_pev_speed = time_point_t::max(); // 0x7F7FFFFF; // 360
+#endif
 
 		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 		m_pPlayer->m_bShieldDrawn = false;
@@ -195,6 +196,7 @@ public:
 
 	void SecondaryAttack() override // int __usercall sub_1026EED0@<eax>(int a1@<ecx>, double a2@<st0>)
 	{
+#ifndef CLIENT_DLL
 		if(m_iMode_pev_iuser1 != 1)
 		{
 			if(m_iClip > 0)
@@ -204,6 +206,7 @@ public:
 			}
 
 		}
+#endif
 	}
 
 	void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -226,14 +229,18 @@ public:
 		if(!GetLRMode())
 		{
 			iShootAnim = 4;
+#ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
 		}
 		else
 		{
 
 			iShootAnim = 2;
+#ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+#endif
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.53s;
 		}
 
@@ -310,6 +317,7 @@ public:
 
 	void ItemPostFrame() override
 	{
+#ifndef CLIENT_DLL
 		switch(m_iMode_pev_iuser1)
 		{
 			case GUNKATA_MODE_B:
@@ -551,16 +559,17 @@ public:
 				break;
 			}
 		}
+#endif
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
 	void RadiusAttack1()
 	{
+#ifndef CLIENT_DLL
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 
-#ifndef CLIENT_DLL
 		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetDamage(GUNKATA_MODE_B), 220, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 			case HIT_PLAYER:
@@ -582,6 +591,7 @@ public:
 
 	void RadiusAttack2()
 	{
+#ifndef CLIENT_DLL
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
@@ -605,6 +615,7 @@ public:
 				player->pev->velocity.z = +200.0f;
 			}
 		}
+#endif
 	}
 
 	bool HasSecondaryAttack() override { return true; }
@@ -616,6 +627,7 @@ public:
 		a2 = iAnim2;
 	}
 
+#ifndef CLIENT_DLL
 	int m_iMode_pev_iuser1;
 	EHANDLE m_pEntity_pev_waterlevel;
 	int m_iStatus2_pev_watertype;
@@ -632,6 +644,7 @@ public:
 	time_point_t m_flNextSpecialAttack9_pev_dmg_save;
 	time_point_t m_flNextSpecialAttack10_pev_dmgtime;
 	time_point_t m_flNextSpecialAttack11_pev_speed;
+#endif
 
 };
 LINK_ENTITY_TO_CLASS(weapon_gunkata, CGunkata)

@@ -47,6 +47,8 @@ void InterpolateAngles(float *start, float *end, float *output, float frac);
 float	vJumpOrigin[3];
 float	vJumpAngles[3];
 
+
+extern engine_studio_api_t IEngineStudio;
 }
 
 #ifdef XASH_STATIC_GAMELIB
@@ -56,8 +58,6 @@ int DLLEXPORT CL_IsThirdPerson( void );
 #endif
 
 using namespace cl;
-
-extern engine_studio_api_t IEngineStudio;
 
 /*
 The view is allowed to move slightly from it's true position for bobbing,
