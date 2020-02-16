@@ -6,6 +6,33 @@ exclude:
   - if: branch = continous
 jobs:
   include:
+  - stage: publish
+    name: Retag and publish game
+    arch: arm64
+    os: linux
+    dist: bionic
+    if: branch = master
+    script: skip
+    before_deploy:
+      # Set up git user name and tag this commit
+      - git config --local user.name "CSMoE-Deployer"
+      - git config --local user.email "824395314@qq.com"
+      - export TRAVIS_TAG=continuous
+      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
+      - git tag --delete $TRAVIS_TAG || echo "tag not exists..."
+      - git push travis-deploy-public --delete $TRAVIS_TAG
+      - git tag --force $TRAVIS_TAG
+      - git push travis-deploy-public --tags --force
+    deploy:
+      provider: script
+      api_key: ${GITHUB_TOKEN}
+      script: echo "I am publishing !!!"
+      on:
+        branch: master
+        repo: MoeMod/CSMoE
+      overwrite: true
+      skip_cleanup: true
+      prerelease: true
   - stage: build
     name: Build for Linux amd64
     arch: amd64
@@ -160,30 +187,3 @@ jobs:
     - mv SDL2-2.0.10 SDL2
     script:
     - sh scripts/build_windows_engine.sh
-  - stage: publish
-    name: Retag and publish game
-    arch: arm64
-    os: linux
-    dist: bionic
-    if: branch = master
-    script: skip
-    before_deploy:
-      # Set up git user name and tag this commit
-      - git config --local user.name "CSMoE-Deployer"
-      - git config --local user.email "824395314@qq.com"
-      - export TRAVIS_TAG=continuous
-      - git remote add travis-deploy-public https://${GITHUB_TOKEN}@github.com/MoeMod/CSMoE.git
-      - git tag --delete $TRAVIS_TAG || echo "tag not exists..."
-      - git push travis-deploy-public --delete $TRAVIS_TAG
-      - git tag --force $TRAVIS_TAG
-      - git push travis-deploy-public --tags --force
-    deploy:
-      provider: script
-      api_key: ${GITHUB_TOKEN}
-      script: echo "I am publishing !!!"
-      on:
-        branch: master
-        repo: MoeMod/CSMoE
-      overwrite: true
-      skip_cleanup: true
-      prerelease: true

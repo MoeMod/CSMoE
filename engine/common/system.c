@@ -155,7 +155,7 @@ qboolean Sys_DebuggerPresent( void )
 #endif // __i386__
 // __linux__/__FreeBSD__/__NetBSD__/__OpenBSD__
 
-#elif defined(_WIN32) && !defined(XASH_64BIT)
+#elif defined(_WIN32) && defined(_M_IX86) && !defined(XASH_64BIT)
 
 #ifdef _MSC_VER
 BOOL WINAPI IsDebuggerPresent(void);

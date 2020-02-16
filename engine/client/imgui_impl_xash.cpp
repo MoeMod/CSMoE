@@ -146,6 +146,8 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 //=============
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
+	if (!g_EngineContext)
+		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	if (button >= 0 && button < 5)
 	{
@@ -183,6 +185,8 @@ static void ScrollCallback(double xoffset, double yoffset)
 
 qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 {
+	if (!g_EngineContext)
+		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	// IMGUI input
 	switch (key)
@@ -209,6 +213,8 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 
 void ImGui_ImplGL_CharCallback(unsigned int c)
 {
+	if (!g_EngineContext)
+		return void();
 	ImGuiIO& io = ImGui::GetIO();
 	if (c > 0 && c < 0x10000)
 		io.AddInputCharacter(c);
@@ -216,6 +222,8 @@ void ImGui_ImplGL_CharCallback(unsigned int c)
 
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 {
+	if (!g_EngineContext)
+		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharactersUTF8(c);
 	return io.WantTextInput;
@@ -349,6 +357,8 @@ qboolean ImGui_ImplGL_Init(void)
 
 void ImGui_ImplGL_Shutdown(void)
 {
+	if (!g_EngineContext)
+		return void();
 	ImGui_ImplGL_InvalidateDeviceObjects();
     ImGui::DestroyContext(std::exchange(g_EngineContext, nullptr));
 	//ImGui::Shutdown();
