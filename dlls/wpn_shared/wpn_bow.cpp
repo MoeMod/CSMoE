@@ -136,9 +136,9 @@ namespace sv {
 				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 
-			SetThink(&CBowArrow::FadeOut);
+			SetThink(&CBaseEntity::SUB_StartFadeOut);
 			pev->nextthink = gpGlobals->time + 6.0s;
-			pev->rendermode = kRenderTransAlpha;
+			pev->rendermode = kRenderNormal;
 			pev->renderamt = 255.0;
 
 			if (pOther->IsBSPModel())
@@ -156,8 +156,7 @@ namespace sv {
 				pev->animtime = gpGlobals->time;
 				pev->framerate = 1.0;
 				pev->sequence = 0;
-				pev->rendermode = kRenderTransAlpha;
-				SetThink(&CBowArrow::FadeOut);
+				SetThink(&CBaseEntity::SUB_StartFadeOut);
 				pev->nextthink = gpGlobals->time + 3.5s;
 				pev->renderamt = 255.0;
 				pev->movetype = MOVETYPE_NONE;
@@ -215,18 +214,6 @@ namespace sv {
 			pev->effects |= EF_NODRAW; // 0x80u
 			return UTIL_Remove(this);
 		}
-
-		void FadeOut()
-		{	
-			pev->renderamt -= 3.5;
-			if (pev->renderamt <= 0.0)
-			{
-				pev->flags |= FL_KILLME;
-				Remove();
-				return;
-			}
-			pev->nextthink = gpGlobals->time + 0.01s;
-		}		
 
 	};
 

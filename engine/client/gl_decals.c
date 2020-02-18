@@ -141,6 +141,17 @@ static decal_t *R_DecalAlloc( decal_t *pdecal )
 }
 
 //-----------------------------------------------------------------------------
+// find decal image and grab size from it
+//-----------------------------------------------------------------------------
+static void R_GetDecalDimensions( int texture, int *width, int *height )
+{
+	if( width ) *width = 1;	// to avoid divide by zero
+	if( height ) *height = 1;
+
+	R_GetTextureParms( width, height, texture );
+}
+
+//-----------------------------------------------------------------------------
 // compute the decal basis based on surface normal, and preferred saxis
 //-----------------------------------------------------------------------------
 void R_DecalComputeBasis( msurface_t *surf, vec3_t pSAxis, vec3_t textureSpaceBasis[3] )
@@ -190,7 +201,7 @@ void R_SetupDecalTextureSpaceBasis( decal_t *pDecal, msurface_t *surf, int textu
 
 	// Compute the non-scaled decal basis
 	R_DecalComputeBasis( surf, sAxis, textureSpaceBasis );
-	R_GetTextureParms( &width, &height, texture );
+	R_GetDecalDimensions( texture, &width, &height );
 
 	// world width of decal = ptexture->width / pDecal->scale
 	// world height of decal = ptexture->height / pDecal->scale
@@ -436,7 +447,7 @@ static decal_t *R_DecalIntersect( decalinfo_t *decalinfo, msurface_t *surf, int 
 	texture = decalinfo->m_iTexture;
 	
 	// precalculate the extents of decalinfo's decal in world space.
-	R_GetTextureParms( &mapSize[0], &mapSize[1], texture );
+	R_GetDecalDimensions( texture, &mapSize[0], &mapSize[1] );
 	VectorScale( decalinfo->m_Basis[0], ((mapSize[0] / decalinfo->m_scale) * 0.5f), decalExtents[0] );
 	VectorScale( decalinfo->m_Basis[1], ((mapSize[1] / decalinfo->m_scale) * 0.5f), decalExtents[1] );
 
@@ -887,7 +898,7 @@ void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, vec3_t pos
 	decalInfo.m_Entity = entityIndex;
 	decalInfo.m_Flags = flags;
 
-	R_GetTextureParms( &width, &height, textureIndex );
+	R_GetDecalDimensions( textureIndex, &width, &height );
 
 	decalInfo.m_Size = width >> 1;
 	if(( height >> 1 ) > decalInfo.m_Size )

@@ -80,6 +80,7 @@
 		3DC1E4BF2289F18500114D80 /* Steam.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4BE2289F18500114D80 /* Steam.png */; };
 		3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */; };
 		3DC1E4CB228AE57200114D80 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4CA228AE57200114D80 /* MainStoryboard.storyboard */; };
+		3DF2719E23D45158005D151E /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF2719523D4511C005D151E /* libimgui.a */; };
 		495E1A1A1E13199A0022E4AA /* launchdialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 495E1A191E13199A0022E4AA /* launchdialog.m */; };
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
@@ -219,6 +220,7 @@
 		3DC1E4BE2289F18500114D80 /* Steam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Steam.png; path = Resources/Steam.png; sourceTree = "<group>"; };
 		3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TutorStoryboard.storyboard; sourceTree = "<group>"; };
 		3DC1E4CA228AE57200114D80 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		3DF2719523D4511C005D151E /* libimgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui.a; path = "cmake-build/libimgui.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		495E1A191E13199A0022E4AA /* launchdialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = launchdialog.m; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -237,6 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D4DAA0B23BCEE1900F575C1 /* libSDL2.a in Frameworks */,
+				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
 				3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */,
 				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
 				3D4DAA0E23BCEE3900F575C1 /* libmenu.a in Frameworks */,
@@ -406,6 +409,7 @@
 		3D4DA95923BCEA2F00F575C1 /* cmake-build */ = {
 			isa = PBXGroup;
 			children = (
+				3DF2719523D4511C005D151E /* libimgui.a */,
 				3D4DA95A23BCEA4700F575C1 /* cl_dll */,
 				3D4DA95B23BCEAA000F575C1 /* dlls */,
 				3D4DA95E23BCEAFB00F575C1 /* engine */,
@@ -720,6 +724,7 @@
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
 				PRODUCT_NAME = "csmoe-ios";
@@ -824,6 +829,7 @@
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
 				PRODUCT_NAME = "csmoe-ios";

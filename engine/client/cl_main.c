@@ -26,6 +26,10 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "library.h"
 
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
+
 #define MAX_TOTAL_CMDS		16
 #define MIN_CMD_RATE		10.0
 #define MAX_CMD_BUFFER		4000
@@ -2347,6 +2351,10 @@ void CL_Init( void )
 	Con_Init();
 	CL_InitLocal();
 
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_Init();
+#endif
+
 	R_Init();	// init renderer
 	S_Init();	// init sound
 
@@ -2401,6 +2409,9 @@ void CL_Shutdown( void )
 		Host_WriteOpenGLConfig ();
 		Host_WriteVideoConfig ();
 	}
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_Shutdown();
+#endif
 	Touch_Shutdown();
 	CL_CloseDemoHeader();
 	IN_Shutdown ();

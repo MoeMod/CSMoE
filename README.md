@@ -9,11 +9,11 @@ What makes this special, Because CSMoE are cross-platform designed. Here are som
 | |x86 | x64 | armv7 | arm64 |
 |:----:|:----:|:----:|:----:|:----:|
 | Windows Desktop|√|√|?|?
-| Windows 10 UWP|√|√|?|?
+| Windows 10 UWP|×|√|√|?
 | macOS|?|√|×|×
 | Linux|√|√|?|?
 | Android|√|√|√|√
-| iOS|√|√|√|√
+| iOS|×|×|√|√
 
 ``` 
 √ - confirmed to run
