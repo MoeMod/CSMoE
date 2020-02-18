@@ -163,5 +163,123 @@ float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 	return 1.0f;
 }
 
+//Speed Zombie
+CZombieSkill_ZombieHide::CZombieSkill_ZombieHide(CBasePlayer *player) : CZombieSkill_Base(player)
+{
+
+}
+
+void CZombieSkill_ZombieHide::Think()
+{
+	CZombieSkill_Base::Think();
+	float flInvisibleAlpha = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 100 : 50;
+
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEffect)
+	{
+		OnHideEffect();
+	}
+	//Fade start
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time < m_flTimeZombieSkillEnd - GetDurationTime() + 0.5s)
+	{
+		
+		m_pPlayer->pev->renderamt += (255.0 - flInvisibleAlpha) * (m_flTimeZombieSkillEnd - GetDurationTime() + 0.5s - gpGlobals->time) / 0.5s;
+	}
+
+	if (m_flTimeZombieSkillEnd > gpGlobals->time && m_flTimeZombieSkillEnd - gpGlobals->time < 5.0s)
+	{
+		m_pPlayer->pev->renderamt += (255.0 - flInvisibleAlpha) * (5.0s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 5.0s;
+	}
+
+}
+
+void CZombieSkill_ZombieHide::Activate()
+{
+	if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+	{
+		switch (m_iZombieSkillStatus)
+		{
+		case SKILL_STATUS_USING:
+		case SKILL_STATUS_FREEZING:
+			char buf[16];
+			sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
+				"The 'Hide' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
+				buf
+			); // #CSO_WaitCoolTimeNormal
+
+			break;
+		case SKILL_STATUS_USED:
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Hide' skill can only be used once per round."); // #CSO_CantSprintUsed
+			break;
+		default:
+			break;
+		}
+
+		return;
+	}
+
+	m_iZombieSkillStatus = SKILL_STATUS_USING;
+	m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+	m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
+
+	m_pPlayer->pev->rendermode = kRenderTransAlpha;
+	m_pPlayer->pev->gravity = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.8 : 0.64;
+	m_pPlayer->pev->renderamt = 255.0;
+	m_pPlayer->pev->skin = 1;
+
+	m_pPlayer->ResetMaxSpeed();
+
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pressure_female.wav", VOL_NORM, ATTN_NORM);
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+	WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+	WRITE_BYTE(ZOMBIE_SKILL_HIDE);
+	WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+	WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+	MESSAGE_END();
+}
+
+void CZombieSkill_ZombieHide::ResetMaxSpeed()
+{
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+		m_pPlayer->pev->maxspeed = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 180 : 250;
+}
+
+void CZombieSkill_ZombieHide::OnSkillEnd()
+{
+	m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+
+	m_pPlayer->pev->gravity = 0.64;
+	m_pPlayer->pev->renderamt = 255.0;
+	m_pPlayer->pev->skin = 0;
+	m_pPlayer->ResetMaxSpeed();
+}
+
+void CZombieSkill_ZombieHide::OnHideEffect()
+{
+	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
+
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pressure_female.wav", VOL_NORM, ATTN_NORM);
+
+}
+
+duration_t CZombieSkill_ZombieHide::GetDurationTime() const
+{
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 10s : 20s;
+}
+
+duration_t CZombieSkill_ZombieHide::GetCooldownTime() const
+{
+	return 35s;
+}
+
+float CZombieSkill_ZombieHide::GetDamageRatio() const
+{
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+		return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 1.1 : 1.0;
+	return 1.0f;
+}
+
 }
 

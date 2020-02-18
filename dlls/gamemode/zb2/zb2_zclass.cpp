@@ -39,7 +39,7 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 
 const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer *, ZombieLevel)> g_FindList[] = {
 		{"tank", MakeZombieClass<CZombieClass_Default> },
-//		{"speed", MakeZombieClass<CZombieClass_Speed> }
+		{"speed", MakeZombieClass<CZombieClass_Speed> }
 };
 constexpr auto NUM_ZCLASSES = std::extent<decltype(g_FindList)>::value;
 

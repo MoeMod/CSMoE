@@ -96,6 +96,26 @@ protected:
 	EngineClock::time_point m_flTimeZombieSkillEffect;
 };
 
+class CZombieSkill_ZombieHide : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieHide(CBasePlayer *player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	void OnHideEffect();
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeZombieSkillEffect;
+};
+
 }
 
 
