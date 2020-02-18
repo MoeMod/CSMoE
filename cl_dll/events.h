@@ -60,6 +60,7 @@ extern int g_iPShell;
 extern int g_iRShell;
 extern int g_iShotgunShell;
 extern int g_iBlackSmoke;
+extern cvar_t *cl_gunbubbles, *cl_tracereffect;
 
 
 void Game_HookEvents( void );
