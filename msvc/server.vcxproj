@@ -164,7 +164,6 @@
     <ClCompile Include="..\dlls\weapons.cpp" />
     <ClCompile Include="..\dlls\weapons_buy.cpp" />
     <ClCompile Include="..\dlls\weapons_data.cpp" />
-    <ClCompile Include="..\dlls\weapons_moe_buy.cpp" />
     <ClCompile Include="..\dlls\weapons_msg.cpp" />
     <ClCompile Include="..\dlls\weapons_precache.cpp" />
     <ClCompile Include="..\dlls\world.cpp" />
