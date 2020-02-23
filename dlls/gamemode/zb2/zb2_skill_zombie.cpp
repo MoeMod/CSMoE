@@ -179,15 +179,23 @@ void CZombieSkill_ZombieHide::Think()
 		OnHideEffect();
 	}
 	//Fade start
-	if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time < m_flTimeZombieSkillEnd - GetDurationTime() + 0.5s)
+	
+	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 	{
+		float flAlpha = flInvisibleAlpha;
 		
-		m_pPlayer->pev->renderamt += (255.0 - flInvisibleAlpha) * (m_flTimeZombieSkillEnd - GetDurationTime() + 0.5s - gpGlobals->time) / 0.5s;
-	}
+		if (m_flInvisiable - gpGlobals->time > 0.0s)
+		{
+			flAlpha += (255.0 - flInvisibleAlpha) * ((m_flInvisiable - gpGlobals->time) / 0.5s);
+		}
 
-	if (m_flTimeZombieSkillEnd > gpGlobals->time && m_flTimeZombieSkillEnd - gpGlobals->time < 5.0s)
-	{
-		m_pPlayer->pev->renderamt += (255.0 - flInvisibleAlpha) * (5.0s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 5.0s;
+		if (m_flTimeZombieSkillEnd > gpGlobals->time && m_flTimeZombieSkillEnd - gpGlobals->time < 0.5s)
+		{
+			flAlpha += (255.0 - flInvisibleAlpha) * ((0.5s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 0.5s);
+		}
+		m_pPlayer->pev->rendermode = kRenderTransAlpha;
+		m_pPlayer->pev->renderamt = flAlpha;
+		
 	}
 
 }
@@ -222,6 +230,7 @@ void CZombieSkill_ZombieHide::Activate()
 	m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 	m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 	m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
+	m_flInvisiable = gpGlobals->time + 0.5s;
 
 	m_pPlayer->pev->rendermode = kRenderTransAlpha;
 	m_pPlayer->pev->gravity = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.8 : 0.64;

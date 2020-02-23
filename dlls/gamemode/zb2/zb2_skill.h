@@ -114,6 +114,7 @@ protected:
 	duration_t GetCooldownTime() const;
 
 	EngineClock::time_point m_flTimeZombieSkillEffect;
+	EngineClock::time_point m_flInvisiable;
 };
 
 }
