@@ -724,7 +724,7 @@ void Sys_Error( const char *format, ... )
 #endif
 		Sys_Print( text );	// print error message
 		MSGBOX( text );
-		Sys_WaitForQuit();
+		Sys_Quit();
 	}
 	else
 	{

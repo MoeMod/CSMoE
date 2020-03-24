@@ -51,14 +51,8 @@ template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 2; }
 #endif
 
 #ifdef CLIENT_DLL
-#include "cs_wpn/bte_weapons_register.h"
-#define DECLEAR_ENTITY_CLASS(DLLClassName) \
-	class DLLClassName; \
-	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
-#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
+#define DECLEAR_ENTITY_CLASS(DLLClassName)
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName)
 #else
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \

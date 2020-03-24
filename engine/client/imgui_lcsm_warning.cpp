@@ -44,36 +44,38 @@ void ImGui_LCSM_OnGUI(void)
 
 	if (ImGui::Begin("CSMoE LCSM Warning", &lcsm_enabled, ImGuiWindowFlags_NoResize)) {
 		ImGui::Text("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)");
-		ImGui::Text("°æÈ¨ËùÓĞ£ºBTE Team|CSMoE Team|°Ù¶Ècsoldjb°É");
-		ImGui::Text("±¾ÓÎÏ·²ÉÓÃGPLv3Ğ­ÒéÍêÈ«¿ªÔ´Ãâ·Ñ£¬ÇëÎğÊ¹ÓÃ±¾ÓÎÏ·½øĞĞÈÎºÎĞÎÊ½µÄÓ¯Àû");
-		ImGui::Text("ÉùÃ÷£ºÈÎºÎÌá¹©ÊÕ·Ñ·şÎñµÄÉÌ¼Ò¾ù·Ç¹Ù·½£¬ÎÒÃÇ²»¶Ô·Ç¹Ù·½°æ±¾Ìá¹©ÈÎºÎ¼¼Êõµ£±£¡£");
-		ImGui::Text("\tÈç³öÏÖÈÎºÎÒâÍâ£¨°üÀ¨µ«²»ÏŞÓÚËÀ»ú¡¢À¶ÆÁ¡¢Ëø»ú¡¢banºÅ¡¢ÖĞ¶¾¡¢±ä×©¡¢±¬Õ¨µÈ£©ºó¹û×Ô¸º¡£");
+		ImGui::Text("ç‰ˆæƒæ‰€æœ‰ï¼šBTE Team|CSMoE Team|ç™¾åº¦csoldjbå§");
+		ImGui::Text("æœ¬æ¸¸æˆé‡‡ç”¨GPLv3åè®®å®Œå…¨å¼€æºå…è´¹ï¼Œè¯·å‹¿ä½¿ç”¨æœ¬æ¸¸æˆè¿›è¡Œä»»ä½•å½¢å¼çš„ç›ˆåˆ©");
+		ImGui::Text("å£°æ˜ï¼šä»»ä½•æä¾›æ”¶è´¹æœåŠ¡çš„å•†å®¶å‡éå®˜æ–¹ï¼Œæˆ‘ä»¬ä¸å¯¹éå®˜æ–¹ç‰ˆæœ¬æä¾›ä»»ä½•æŠ€æœ¯æ‹…ä¿ã€‚");
+		ImGui::Text("\tå¦‚å‡ºç°ä»»ä½•æ„å¤–ï¼ˆåŒ…æ‹¬ä½†ä¸é™äºæ­»æœºã€è“å±ã€é”æœºã€banå·ã€ä¸­æ¯’ã€å˜ç –ã€çˆ†ç‚¸ç­‰ï¼‰åæœè‡ªè´Ÿã€‚");
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
-		ImGui::TextColored(warning_color, "------------------ÌØ±ğÉùÃ÷----------------");
-		ImGui::TextColored(warning_color, "1.EC¾«Ó¢ÉçËùÎ½¡°CSÆÆ¼ë¡±¡°CSÉñÆ÷Ê±´ú¡±¾ùÎªµÁ°æÓÎÏ·£¬ÎÒÃÇÇ¿ÁÒÇ´ÔğµÁ°æÓÎÏ·µÄĞĞÎª");
-		ImGui::TextColored(warning_color, "2.Wilson£¨ÕæÃû£ºÁõ³Î£©¶ñÒâÉêÇëÔ­CS:BTEÓÎÏ·Öø×÷È¨²¢¼ÓÃÜÓÎÏ·ºóÀûÓÃÖø×÷È¨ÔÚÌÔ±¦Ó¯Àû");
-		ImGui::TextColored(warning_color, "ÌÔ±¦µêÆÌ£ºÑó´ĞÊıÂëÉÌ³Ç|ÌÔ±¦Ãû£ºØ­µÍµ÷Éİ»ªÓĞÄÚº­|BÕ¾ID£º½ø¿ÚèÖèÖ×Ó|Ìù°ÉID:liu1340567980");
-		ImGui::TextColored(warning_color, "ÏÖÔÚ´Ë½ÒÂ¶Áõ³Î£ºÒ»¸öÍêÈ«µÄ²å¼şĞ¡°×£¬¿¿ÍøÉÏ¶«Æ´Î÷´Õ´úÂë£¬»òÖ±½Ó°áÔËÍâÍøµÄ¸üĞÂ¼ÓÈëÓÎÏ·¡£");
-		ImGui::TextColored(warning_color, "µ«ÒòÆä³ÖÓĞÔ­CSBTE°æÈ¨ÎÒÃÇÎŞ·¨Î¬È¨¡£Ï£Íû¹ã´óÍøÓÑ²ÁÁÁÑÛ¾¦£¬²»Òª±»ÎŞ³ÜĞ¡ÈËÆ­×ß½ğÇ®ÓëĞÅÈÎ£¡");
-		ImGui::TextColored(warning_color, "3.CSMoEËùÊ¹ÓÃµÄËØ²Ä¾ùÎªÈÈĞÄÍøÓÑÕûÀí¶øÀ´£¬½ö¹©Ñ§Ï°¡¢½»Á÷ÓëĞÀÉÍ£¬ÇëÓÚÏÂÔØºó24Ğ¡Ê±ÄÚÉ¾³ı£¡");
-		ImGui::TextColored(warning_color, "------------------------------------------");
+		ImGui::TextColored(warning_color, "-----------------------------------ç‰¹åˆ«å£°æ˜---------------------------------");
+		ImGui::TextColored(warning_color, "1.ECç²¾è‹±ç¤¾æ‰€è°“â€œCSç ´èŒ§â€â€œCSç¥å™¨æ—¶ä»£â€å‡ä¸ºç›—ç‰ˆæ¸¸æˆï¼Œæˆ‘ä»¬å¼ºçƒˆè°´è´£ç›—ç‰ˆæ¸¸æˆçš„è¡Œä¸º");
+		ImGui::TextColored(warning_color, "2.Wilsonï¼ˆçœŸåï¼šåˆ˜æ¾„ï¼‰æ¶æ„ç”³è¯·åŸCS:BTEæ¸¸æˆè‘—ä½œæƒå¹¶åŠ å¯†æ¸¸æˆååˆ©ç”¨è‘—ä½œæƒåœ¨æ·˜å®ç›ˆåˆ©");
+		ImGui::TextColored(warning_color, "æ·˜å®åº—é“ºï¼šæ´‹è‘±æ•°ç å•†åŸ|æ·˜å®åï¼šä¸¨ä½è°ƒå¥¢åæœ‰å†…æ¶µ|Bç«™IDï¼šè¿›å£æŸšæŸšå­|è´´å§ID:liu1340567980");
+		ImGui::TextColored(warning_color, "ç°åœ¨æ­¤æ­éœ²åˆ˜æ¾„ï¼šä¸€ä¸ªå®Œå…¨çš„æ’ä»¶å°ç™½ï¼Œé ç½‘ä¸Šä¸œæ‹¼è¥¿å‡‘ä»£ç ï¼Œæˆ–ç›´æ¥æ¬è¿å¤–ç½‘çš„æ›´æ–°åŠ å…¥æ¸¸æˆã€‚");
+		ImGui::TextColored(warning_color, "ä½†å› å…¶æŒæœ‰åŸCSBTEç‰ˆæƒæˆ‘ä»¬æ— æ³•ç»´æƒã€‚å¸Œæœ›å¹¿å¤§ç½‘å‹æ“¦äº®çœ¼ç›ï¼Œä¸è¦è¢«æ— è€»å°äººéª—èµ°é‡‘é’±ä¸ä¿¡ä»»ï¼");
+		ImGui::TextColored(warning_color, "3.CSMoEæ‰€ä½¿ç”¨çš„ç´ æå‡ä¸ºçƒ­å¿ƒç½‘å‹æ•´ç†è€Œæ¥ï¼Œä»…ä¾›å­¦ä¹ ã€äº¤æµä¸æ¬£èµï¼Œè¯·äºä¸‹è½½å24å°æ—¶å†…åˆ é™¤ï¼");
+		ImGui::TextColored(warning_color, "----------------------------------------------------------------------------");
 		/*
-		ImGui::Text("ÇëÔÚÏÂ·½ÊäÈë£º¡¸ÎÒÍ¬Òâ¡¹´ú±íÄúÒÑ¾­Ã÷È·ÒÔÉÏÉùÃ÷¡£");
-		ImGui::Text("·ñÔòÇë°´ÏÂ¡°ÍË³ö¡±°´Å¥ÍË³öÓÎÏ·");
+		ImGui::Text("è¯·åœ¨ä¸‹æ–¹è¾“å…¥ï¼šã€Œæˆ‘åŒæ„ã€ä»£è¡¨æ‚¨å·²ç»æ˜ç¡®ä»¥ä¸Šå£°æ˜ã€‚");
+		ImGui::Text("å¦åˆ™è¯·æŒ‰ä¸‹â€œé€€å‡ºâ€æŒ‰é’®é€€å‡ºæ¸¸æˆ");
 
 		static char buf[256];
 		static bool enabled = 0;
-		ImGui::InputTextWithHint("    ", "ÎÒÍ¬Òâ", buf, sizeof(buf), 0, [](ImGuiInputTextCallbackData *data){
+		ImGui::InputTextWithHint("    ", "æˆ‘åŒæ„", buf, sizeof(buf), 0, [](ImGuiInputTextCallbackData *data){
 			return 0;
 		});
 
-		if(ImGui::Selectable("½øÈëÓÎÏ·", false, !!strcmp(buf, "ÎÒÍ¬Òâ") ? ImGuiSelectableFlags_Disabled : 0, ImGuiUtils::GetScaledSize({0, 36})))
+		if(ImGui::Selectable("è¿›å…¥æ¸¸æˆ", false, !!strcmp(buf, "æˆ‘åŒæ„") ? ImGuiSelectableFlags_Disabled : 0, ImGuiUtils::GetScaledSize({0, 36})))
 		 */
-		if (ImGui::Button("½øÈëÓÎÏ·", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		ImGui::NewLine();
+		ImGui::SameLine(ImGui::GetWindowSize().x * 1 / 4 - 80);
+		if (ImGui::Button("è¿›å…¥æ¸¸æˆ", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			lcsm_enabled = false;
 		}
-		ImGui::SameLine(ImGui::GetWindowSize().x / 2);
-		if (ImGui::Button("ÍË³öÓÎÏ·", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		ImGui::SameLine(ImGui::GetWindowSize().x / 2 + 80);
+		if (ImGui::Button("é€€å‡ºæ¸¸æˆ", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			exit(0);
 		}
 		ImGui::End();

@@ -29,7 +29,7 @@ set(CMAKE_CXX_STANDARD 14)
 # SDL2 provides it's own crossplatform main() implementation and simple message boxes
 # Win32 uses WinMain() implemented in launcher code and system message boxes
 # Otherwise it prints errors in stdin.
-if(XASH_SDL AND NOT WIN32)
+if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE YES) # Link SDL2main also
 	find_package(SDL2 REQUIRED)
 	include_directories(${SDL2_INCLUDE_DIR})
@@ -41,10 +41,9 @@ include_directories(
 )
 
 if(WIN32)
-	add_executable(${XASH_LAUNCHER} WIN32 xash.c game.rc)
-	target_link_libraries(${XASH_LAUNCHER} ${CMAKE_DL_LIBS})
-	set_target_properties(${XASH_LAUNCHER} PROPERTIES
-		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
+	add_executable(${XASH_LAUNCHER} WIN32 xash_static.cpp game.rc)
+	target_link_libraries(${XASH_LAUNCHER} xash)
+	set_target_properties(${XASH_LAUNCHER} PROPERTIES OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
 	install( TARGETS ${XASH_LAUNCHER} DESTINATION ${CMAKE_INSTALL_PREFIX} )
 elseif(APPLE)
 	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.icns")
@@ -99,6 +98,6 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	install( TARGETS ${XASH_LAUNCHER} DESTINATION ${CMAKE_INSTALL_PREFIX} )
 endif()
 
-if(XASH_SDL AND NOT WIN32)
+if(XASH_SDL)
 	target_link_libraries(${XASH_LAUNCHER} ${SDL2_LIBRARY})
 endif()

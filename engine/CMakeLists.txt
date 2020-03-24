@@ -302,7 +302,7 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(APPLE)
+if(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
@@ -313,8 +313,7 @@ else()
 endif()
 
 if(XASH_STATIC_GAMELIB)
-	#target_link_libraries(${XASH_ENGINE} xashmenu)
-	target_link_libraries(${XASH_ENGINE} xashmenu client server)
+	target_link_libraries(${XASH_ENGINE} client hymenu)
 endif()
 
 if(MSVC)
@@ -362,20 +361,26 @@ endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-	if(NOT IOS AND NOT ANDROID)
-		find_package(SDL2)
-	endif()
-	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
-	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
-	if(MSVC)
-		string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-		install(FILES ${SDL2_DLL}
-				CONFIGURATIONS Debug
-				DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-		install(FILES ${SDL2_DLL}
-				CONFIGURATIONS Release
-				DESTINATION ${LIB_INSTALL_DIR}/Release/)
+	if(XASH_VCPKG)
+		find_package(SDL2 CONFIG REQUIRED)
+		target_link_libraries(${XASH_ENGINE} PUBLIC SDL2::SDL2)
+	else()
+		if(NOT IOS AND NOT ANDROID)
+			find_package(SDL2)
+		endif()
+		target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
+		include_directories(${SDL2_INCLUDE_DIR})
+		add_definitions(-DXASH_SDL)
+		if(MSVC)
+			string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
+			install(FILES ${SDL2_DLL}
+					CONFIGURATIONS Debug
+					DESTINATION ${LIB_INSTALL_DIR}/Debug/)
+			install(FILES ${SDL2_DLL}
+					CONFIGURATIONS Release
+					DESTINATION ${LIB_INSTALL_DIR}/Release/)
+		endif()
 	endif()
 endif()
 

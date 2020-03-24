@@ -59,6 +59,9 @@ set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 if(MSVC)
 	add_definitions(-D_USING_V110_SDK71_)
 endif()
+if(MSVC)
+	add_compile_options(/utf-8)
+endif()
 
 if(APPLE)
 	add_definitions(-DHAVE_STDINT_H)
@@ -73,7 +76,7 @@ endif()
 
 if(NOT ${CMAKE_INSTALL_PREFIX})
 	if(WIN32)
-		set (CMAKE_INSTALL_PREFIX "D:/CSMoE")
+		set (CMAKE_INSTALL_PREFIX "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Half-Life")
 	elseif(APPLE)
 		set(CMAKE_INSTALL_PREFIX "/Applications")
 	else()
@@ -95,20 +98,25 @@ set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
 if(XASH_IMGUI)
-    set(IMGUI_SRC
-#			imgui/imgui_demo.cpp
-            imgui/imgui_draw.cpp
-            imgui/imgui_widgets.cpp
-            imgui/imgui.cpp)
-    add_library(imgui STATIC ${IMGUI_SRC})
-    target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+	if(XASH_VCPKG)
+		find_package(imgui CONFIG REQUIRED)
+		add_library(imgui INTERFACE)
+		target_link_libraries(imgui INTERFACE imgui::imgui)
+	else()
+		set(IMGUI_SRC
+	#			imgui/imgui_demo.cpp
+				imgui/imgui_draw.cpp
+				imgui/imgui_widgets.cpp
+				imgui/imgui.cpp)
+		add_library(imgui STATIC ${IMGUI_SRC})
+		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+	endif()
 endif()
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
-	ADD_SUBDIRECTORY(mainui_cpp)
+	ADD_SUBDIRECTORY(hymenu)
 endif()
-ADD_SUBDIRECTORY(dlls)
 ADD_SUBDIRECTORY(engine)
 if(NOT XASH_SINGLE_BINARY AND NOT ANDROID AND NOT IOS)
 	ADD_SUBDIRECTORY(game_launch)
