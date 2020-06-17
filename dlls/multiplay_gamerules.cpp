@@ -1990,6 +1990,7 @@ void CHalfLifeMultiplay::RestartRound()
 			player->RoundRespawn();
 		}
 
+
 		// Gooseman : The following code fixes the HUD icon bug
 		// by removing the C4 and DEFUSER icons from the HUD regardless
 		// for EVERY player (regardless of what team they're on)

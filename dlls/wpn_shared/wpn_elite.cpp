@@ -104,10 +104,9 @@ int CELITE::GetItemInfo(ItemInfo *p)
 BOOL CELITE::Deploy(void)
 {
 	m_flAccuracy = 0.88;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	if (!(m_iClip & 1))
 		m_iWeaponState |= WPNSTATE_ELITE_LEFT;
-
 	return DefaultDeploy("models/v_elite.mdl", "models/p_elite.mdl", ELITE_DRAW, "dualpistols", UseDecrement() != FALSE);
 }
 
@@ -203,7 +202,7 @@ void CELITE::Reload(void)
 {
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + ELITE_RELOAD_TIME;
 	if (DefaultReload(ELITE_MAX_CLIP, ELITE_RELOAD, 4.5s))
 	{
 #ifndef CLIENT_DLL
@@ -242,5 +241,23 @@ float CELITE::GetDamage() const
 		flDamage = 36.0f;
 #endif
 	return flDamage;
+}
+
+void CELITE::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(16, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
 }
 }

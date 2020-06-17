@@ -14,7 +14,8 @@ namespace sv {
 #define TMP_MAX_SPEED			250
 #define TMP_DAMAGE			20
 #define TMP_RANGE_MODIFER		0.85
-#define TMP_RELOAD_TIME			2.12
+#define TMP_RELOAD_TIME			2.12s
+#define TMP_INSPECT_TIME			4.48s
 
 class CTMP : public CBasePlayerWeapon
 {
@@ -27,6 +28,8 @@ public:
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return TMP_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -43,6 +46,7 @@ public:
 public:
 	int m_iShell;
 	int iShellOn;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireTMP;

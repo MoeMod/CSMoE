@@ -93,6 +93,11 @@ int CHudStatusIcons::Draw( float flTime )
 
 				DrawUtils::Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}
+			else if (gHUD.m_csgohud->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
+			{
+					SPR_Set(m_IconList[i].spr, 255, 255, 255);
+					SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 193, &m_IconList[i].rc);
+			}
 			else
 			{
 				SPR_Set(m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b);

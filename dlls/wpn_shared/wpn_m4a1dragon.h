@@ -1,5 +1,5 @@
-#ifndef WPN_FAMAS_H
-#define WPN_FAMAS_H
+#ifndef WPN_M4A1_H
+#define WPN_M4A1_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -10,28 +10,28 @@ namespace cl {
 namespace sv {
 #endif
 
-//Famas
-#define FAMAS_MAX_SPEED		240
-#define FAMAS_RELOAD_TIME	3.3s
-#define FAMAS_DAMAGE		30
-#define FAMAS_DAMAGE_BURST	34
-#define FAMAS_INSPECT_TIME		4.48s
-#define FAMAS_RANGE_MODIFER	0.96
+//m4a1
+#define M4A1_MAX_SPEED		230
+#define M4A1_DAMAGE		32
+#define M4A1_DAMAGE_SIL		33
+#define M4A1_RANGE_MODIFER      0.97
+#define M4A1_RANGE_MODIFER_SIL  0.95
+#define M4A1_RELOAD_TIME	3.05s
+#define M4A1_INSPECT_TIME		4.48s
 
-class CFamas : public CBasePlayerWeapon
+class CM4A1Dragon : public CBasePlayerWeapon
 {
 public:
 	void Spawn() override;
 	void Precache() override;
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
-	float GetMaxSpeed() override { return FAMAS_MAX_SPEED; }
+	float GetMaxSpeed() override { return M4A1_MAX_SPEED; }
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
-	void Inspect() override;
-	duration_t GetInspectTime() override { return FAMAS_INSPECT_TIME; }
+	const char* GetCSModelName() override { return "models/w_m4a1dragon.mdl"; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -43,12 +43,13 @@ public:
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 
 public:
-	void FamasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim, BOOL bFireBurst);
-	float GetDamage() const;
-public:
+	void M4A1DragonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+
 	int m_iShell;
-	time_point_t m_NextInspect;
 	int iShellOn;
+
+private:
+	unsigned short m_usFireM4A1Dragon;
 };
 
 }

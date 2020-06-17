@@ -24,6 +24,7 @@ private:
 
 	wrect_t m_rcNumber_Large[10];
 	wrect_t m_rcNumber_Small[10];
+	wrect_t m_rcNumber_csgo[10];
 
 	int m_iOriginalBG;
 	int m_iTeamDeathBG;
@@ -38,4 +39,13 @@ private:
 	int m_iText_1st;
 	int m_iText_Kill;
 	int m_iText_Round;
+	int m_iNum_csgo;
+	UniqueTexture m_pTexture_Board;
+
+	int m_HUD_timer;
+	int m_iTime;
+	float m_fStartTime;
+	bool m_bPanicColorChange;
+	float m_flPanicTime;
+	int m_closestRight;
 };

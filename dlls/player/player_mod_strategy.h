@@ -60,7 +60,6 @@ public:
 	virtual bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) = 0;
 	virtual bool CanDropWeapon(const char *pszItemName = nullptr) = 0;
 	virtual void GiveDefaultItems() = 0;
-
 	virtual void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) = 0;
 	virtual void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) = 0;
 	virtual BOOL DeployWeapon(CBasePlayerItem *item) = 0;
@@ -86,7 +85,7 @@ public:
 	void DeathSound() override;
 
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override { return iOriginalMax; }
-	bool ClientCommand(const char *pcmd) override { return false; }
+	bool ClientCommand(const char *pcmd) override { return false;}
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override { return flDamage; }
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return false; }
 	bool CanDropWeapon(const char *pszItemName) override { return true; }

@@ -21,6 +21,7 @@ GNU General Public License for more details.
 
 #include "player/player_mod_strategy.h"
 #include "gamemode/zb2/zb2_const.h"
+#include "gamemode/mod_zb1.h"
 
 namespace sv {
 
@@ -107,6 +108,7 @@ public:
 	void ResetMaxSpeed()  override;
 	void OnSkillEnd() override;
 	float GetDamageRatio() const override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
 
 protected:
 	void OnHideEffect();

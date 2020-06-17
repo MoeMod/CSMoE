@@ -158,14 +158,25 @@ void CPlayerModStrategy_Default::Pain(int m_LastHitGroup, bool HasArmour)
 
 void CPlayerModStrategy_Default::DeathSound()
 {
-	// temporarily using pain sounds for death sounds
-	switch (RANDOM_LONG(1, 4))
+	//if csgo_mode_enabled
+	if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
 	{
-	case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
-	case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
-	case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
-	default:break;
+		if (m_pPlayer->m_LastHitGroup == HITGROUP_HEAD)
+		{
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/csgo_headshot.wav", VOL_NORM, ATTN_NORM);
+		}
+	}
+	else
+	{
+		// temporarily using pain sounds for death sounds
+		switch (RANDOM_LONG(1, 4))
+		{
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die1.wav", VOL_NORM, ATTN_NORM); break;
+		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die2.wav", VOL_NORM, ATTN_NORM); break;
+		case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/die3.wav", VOL_NORM, ATTN_NORM); break;
+		case 4: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "player/death6.wav", VOL_NORM, ATTN_NORM); break;
+		default:break;
+		}
 	}
 }
 

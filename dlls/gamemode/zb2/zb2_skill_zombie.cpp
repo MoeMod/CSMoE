@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_skill.h"
 #include "zb2_zclass.h"
 #include "player/player_zombie.h"
+#include "entity_state.h"
 
 namespace sv {
 
@@ -180,7 +181,7 @@ void CZombieSkill_ZombieHide::Think()
 	}
 	//Fade start
 	
-	if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+	/*if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 	{
 		float flAlpha = flInvisibleAlpha;
 		
@@ -196,7 +197,38 @@ void CZombieSkill_ZombieHide::Think()
 		m_pPlayer->pev->rendermode = kRenderTransAlpha;
 		m_pPlayer->pev->renderamt = flAlpha;
 		
+	}*/
+
+}
+
+int CZombieSkill_ZombieHide::AddToFullPack_Post(struct entity_state_s *state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	float flInvisibleAlpha = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 100 : 50;
+	if (player)
+	{
+		CBaseEntity* pEntity = CBaseEntity::Instance(ent);
+		auto id = pEntity->entindex();
+		if (id >= 1 && id <= 32 && m_iZombieSkillStatus == SKILL_STATUS_USING)
+		{
+			float flAlpha = flInvisibleAlpha;
+
+			if (m_flInvisiable - gpGlobals->time > 0.0s)
+			{
+				flAlpha += (255.0 - flInvisibleAlpha) * ((m_flInvisiable - gpGlobals->time) / 0.5s);
+			}
+
+			if (m_flTimeZombieSkillEnd > gpGlobals->time && m_flTimeZombieSkillEnd - gpGlobals->time < 0.5s)
+			{
+				flAlpha += (255.0 - flInvisibleAlpha) * ((0.5s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 0.5s);
+			}
+
+			state->rendermode = kRenderTransAlpha;
+			state->renderamt = flAlpha;
+
+		}
 	}
+
+	return 1;
 
 }
 

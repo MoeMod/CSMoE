@@ -108,12 +108,15 @@ BOOL CP228::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield())
 		return DefaultDeploy("models/shield/v_shield_p228.mdl", "models/shield/p_shield_p228.mdl", P228_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_p228.mdl", "models/p_p228.mdl", P228_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CP228::PrimaryAttack(void)
@@ -207,7 +210,7 @@ void CP228::Reload(void)
 		iAnim = P228_SHIELD_RELOAD;
 	else
 		iAnim = P228_RELOAD;
-
+	m_NextInspect = gpGlobals->time + P228_RELOAD_TIME;
 	if (DefaultReload(P228_MAX_CLIP, iAnim, 2.7s))
 	{
 #ifndef CLIENT_DLL
@@ -242,4 +245,21 @@ void CP228::WeaponIdle(void)
 	}
 }
 
+void CP228::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(7, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
+}
 }

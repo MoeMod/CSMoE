@@ -18,7 +18,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_knife.h"
+#include "wpn_knifedragon.h"
 
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -33,7 +33,7 @@ namespace sv {
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
-LINK_ENTITY_TO_CLASS(weapon_knife, CKnife)
+LINK_ENTITY_TO_CLASS(knife_knifedragon, CKnifeDragon)
 
 enum knife_e
 {
@@ -58,7 +58,7 @@ enum knife_shield_e
 	KNIFE_SHIELD_DOWN
 };
 
-void CKnife::Spawn(void)
+void CKnifeDragon::Spawn(void)
 {
 	Precache();
 	m_iId = WEAPON_KNIFE;
@@ -70,31 +70,25 @@ void CKnife::Spawn(void)
 	FallInit();
 }
 
-void CKnife::Precache(void)
+void CKnifeDragon::Precache(void)
 {
-	PRECACHE_MODEL("models/texturewpn/v_knife2.mdl");
-	PRECACHE_MODEL("models/texturewpn/v_knife3.mdl");
-	PRECACHE_MODEL("models/texturewpn/v_knife4.mdl");
-	PRECACHE_MODEL("models/v_knife.mdl");
+
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_knife.mdl");
 #endif
-	PRECACHE_MODEL("models/w_knife.mdl");
+	PRECACHE_MODEL("models/p_knifedragon.mdl");
+	PRECACHE_MODEL("models/v_knifedragon.mdl");
 
-	PRECACHE_SOUND("weapons/knife_deploy1.wav");
-	PRECACHE_SOUND("weapons/knife_hit1.wav");
-	PRECACHE_SOUND("weapons/knife_hit2.wav");
-	PRECACHE_SOUND("weapons/knife_hit3.wav");
-	PRECACHE_SOUND("weapons/knife_hit4.wav");
-	PRECACHE_SOUND("weapons/knife_slash1.wav");
-	PRECACHE_SOUND("weapons/knife_slash2.wav");
-	PRECACHE_SOUND("weapons/knife_stab.wav");
-	PRECACHE_SOUND("weapons/knife_hitwall1.wav");
+	PRECACHE_SOUND("weapons/knifedragon_draw.wav");
+	PRECACHE_SOUND("weapons/knifedragon_hit1.wav");
+	PRECACHE_SOUND("weapons/knifedragon_slash.wav");
+	PRECACHE_SOUND("weapons/knifedragon_stab.wav");
+	PRECACHE_SOUND("weapons/knifedragon_wall.wav");
 
-	m_usKnife = PRECACHE_EVENT(1, "events/knife.sc");
+	m_usKnife = PRECACHE_EVENT(1, "events/knifedragon.sc");
 }
 
-int CKnife::GetItemInfo(ItemInfo *p)
+int CKnifeDragon::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = NULL;
@@ -110,22 +104,15 @@ int CKnife::GetItemInfo(ItemInfo *p)
 
 	return 1;
 }
-static const char* WEAPON_NAME[] =
-{
-	"models/v_knife.mdl",
-	"models/texturewpn/v_knife2.mdl",
-	"models/texturewpn/v_knife3.mdl",
-	"models/texturewpn/v_knife4.mdl"
-};
-BOOL CKnife::Deploy(void)
+
+BOOL CKnifeDragon::Deploy(void)
 {
 	
-	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_deploy1.wav", 0.3, 2.4);
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knifedragon_draw.wav", 0.3, 2.4);
 
 	m_fMaxSpeed = 250;
 	m_iSwing = 0;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-	m_NextInspect = gpGlobals->time + 0.75s;
 	m_pPlayer->m_bShieldDrawn = false;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
@@ -133,16 +120,16 @@ BOOL CKnife::Deploy(void)
 	else
 #endif
 	{
-		return DefaultDeploy(WEAPON_NAME[0], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_knifedragon.mdl", "models/p_knifedragon.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
 	}
 }
 
-void CKnife::Holster(int skiplocal)
+void CKnifeDragon::Holster(int skiplocal)
 {
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 }
 
-void CKnife::WeaponAnimation(int iAnimation)
+void CKnifeDragon::WeaponAnimation(int iAnimation)
 {
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -154,56 +141,13 @@ void CKnife::WeaponAnimation(int iAnimation)
 	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usKnife, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, iAnimation, 2, 3, 4);
 }
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity)
-{
-	TraceResult trTemp;
-	float flDistance = 1000000;
-	const float *pflMinMaxs[2] = { pflMins, pfkMaxs };
-	Vector vecHullEnd = tr.vecEndPos;
 
-	vecHullEnd = vecSrc + ((vecHullEnd - vecSrc) * 2);
-	TRACE_LINE(vecSrc, vecHullEnd, dont_ignore_monsters, pEntity, &trTemp);
-
-	if (trTemp.flFraction < 1)
-	{
-		tr = trTemp;
-		return;
-	}
-
-	for (int i = 0; i < 2; i++)
-	{
-		for (int j = 0; j < 2; j++)
-		{
-			for (int k = 0; k < 2; k++)
-			{
-				Vector vecEnd;
-				vecEnd.x = vecHullEnd.x + pflMinMaxs[i][0];
-				vecEnd.y = vecHullEnd.y + pflMinMaxs[j][1];
-				vecEnd.z = vecHullEnd.z + pflMinMaxs[k][2];
-
-				TRACE_LINE(vecSrc, vecEnd, dont_ignore_monsters, pEntity, &trTemp);
-
-				if (trTemp.flFraction < 1)
-				{
-					float flThisDistance = (trTemp.vecEndPos - vecSrc).Length();
-
-					if (flThisDistance < flDistance)
-					{
-						tr = trTemp;
-						flDistance = flThisDistance;
-					}
-				}
-			}
-		}
-	}
-}
-
-void CKnife::PrimaryAttack(void)
+void CKnifeDragon::PrimaryAttack(void)
 {
 	Swing(TRUE);
 }
 
-void CKnife::SetPlayerShieldAnim(void)
+void CKnifeDragon::SetPlayerShieldAnim(void)
 {
 	if (m_pPlayer->HasShield() == true)
 	{
@@ -214,7 +158,7 @@ void CKnife::SetPlayerShieldAnim(void)
 	}
 }
 
-void CKnife::ResetPlayerShieldAnim(void)
+void CKnifeDragon::ResetPlayerShieldAnim(void)
 {
 	if (m_pPlayer->HasShield() == true)
 	{
@@ -223,7 +167,7 @@ void CKnife::ResetPlayerShieldAnim(void)
 	}
 }
 
-bool CKnife::ShieldSecondaryFire(int up_anim, int down_anim)
+bool CKnifeDragon::ShieldSecondaryFire(int up_anim, int down_anim)
 {
 	if (m_pPlayer->HasShield() == false)
 		return false;
@@ -255,7 +199,7 @@ bool CKnife::ShieldSecondaryFire(int up_anim, int down_anim)
 	return true;
 }
 
-void CKnife::SecondaryAttack(void)
+void CKnifeDragon::SecondaryAttack(void)
 {
 	if (ShieldSecondaryFire(KNIFE_SHIELD_UP, KNIFE_SHIELD_DOWN) == true)
 		return;
@@ -264,17 +208,17 @@ void CKnife::SecondaryAttack(void)
 	pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.35s;
 }
 
-void CKnife::Smack(void)
+void CKnifeDragon::Smack(void)
 {
 	DecalGunshot(&m_trHit, BULLET_PLAYER_CROWBAR, false, m_pPlayer->pev, false);
 }
 
-void CKnife::SwingAgain(void)
+void CKnifeDragon::SwingAgain(void)
 {
 	Swing(FALSE);
 }
 
-void CKnife::WeaponIdle(void)
+void CKnifeDragon::WeaponIdle(void)
 {
 	ResetEmptySound();
  	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -289,7 +233,7 @@ void CKnife::WeaponIdle(void)
 	}
 }
 
-int CKnife::Swing(int fFirst)
+int CKnifeDragon::Swing(int fFirst)
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -298,7 +242,6 @@ int CKnife::Swing(int fFirst)
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-	m_flLastFire = gpGlobals->time;
 	if (tr.flFraction >= 1)
 	{
 		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
@@ -339,10 +282,7 @@ int CKnife::Swing(int fFirst)
 
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 
-			if (RANDOM_LONG(0, 1))
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			else
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knifedragon_slash.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -406,13 +346,8 @@ int CKnife::Swing(int fFirst)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
 			{
-				switch (RANDOM_LONG(0, 3))
-				{
-					case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_hit1.wav", VOL_NORM, ATTN_NORM); break;
-					case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_hit2.wav", VOL_NORM, ATTN_NORM); break;
-					case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_hit3.wav", VOL_NORM, ATTN_NORM); break;
-					case 3: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_hit4.wav", VOL_NORM, ATTN_NORM); break;
-				}
+
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knifedragon_hit1.wav", VOL_NORM, ATTN_NORM); 
 
 				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 
@@ -430,14 +365,14 @@ int CKnife::Swing(int fFirst)
 		if (fHitWorld)
 		{
 			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3));
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knifedragon_wall.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3));
 		}
 #endif
 
 		m_trHit = tr;
 		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 
-		SetThink(&CKnife::Smack);
+		SetThink(&CKnifeDragon::Smack);
 		pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.2s;
 		SetPlayerShieldAnim();
 	}
@@ -445,7 +380,7 @@ int CKnife::Swing(int fFirst)
 	return fDidHit;
 }
 
-int CKnife::Stab(int fFirst)
+int CKnifeDragon::Stab(int fFirst)
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -479,10 +414,7 @@ int CKnife::Stab(int fFirst)
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
 
-			if (RANDOM_LONG(0, 1))
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			else
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knifedragon_slash.wav", VOL_NORM, ATTN_NORM, 0, 94);
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -541,7 +473,7 @@ int CKnife::Stab(int fFirst)
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
 			{
-				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_stab.wav", VOL_NORM, ATTN_NORM);
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knifedragon_stab.wav", VOL_NORM, ATTN_NORM);
 				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 
 				if (!pEntity->IsAlive())
@@ -558,39 +490,18 @@ int CKnife::Stab(int fFirst)
 		if (fHitWorld)
 		{
 			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_hitwall1.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3));
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knifedragon_wall.wav", VOL_NORM, ATTN_NORM, 0, 98 + RANDOM_LONG(0, 3));
 		}
 #endif
 
 		m_trHit = tr;
 		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 
-		SetThink(&CKnife::Smack);
+		SetThink(&CKnifeDragon::Smack);
 		pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.2s;
 	}
 
 	return fDidHit;
 }
-void CKnife::ChangeModel()
-{
-	if (m_SeqModel >= 3)
-		m_SeqModel = 0;
-	m_SeqModel += 1;
-	Deploy();
-}
 
-void CKnife::Inspect()
-{
-
-	if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
-	{
-#ifndef CLIENT_DLL
-		SendWeaponAnim(RANDOM_LONG(8, 10), 0);
-#endif
-		m_NextInspect = gpGlobals->time + GetInspectTime();
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-		m_flLastFire = invalid_time_point;
-	}
-
-}
 }

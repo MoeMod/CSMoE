@@ -16,7 +16,8 @@ namespace sv {
 #define M4A1_DAMAGE_SIL		33
 #define M4A1_RANGE_MODIFER      0.97
 #define M4A1_RANGE_MODIFER_SIL  0.95
-#define M4A1_RELOAD_TIME	3.05
+#define M4A1_RELOAD_TIME	3.05s
+#define M4A1_INSPECT_TIME		4.48s
 
 class CM4A1 : public CBasePlayerWeapon
 {
@@ -29,6 +30,8 @@ public:
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return M4A1_INSPECT_TIME; }
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
@@ -44,6 +47,7 @@ public:
 	void M4A1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
+	time_point_t m_NextInspect;
 	int iShellOn;
 
 private:
