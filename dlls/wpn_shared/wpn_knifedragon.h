@@ -17,7 +17,7 @@ namespace sv {
 #define KNIFE_MAX_SPEED_SHIELD		180
 #define KNIFE_INSPECT_TIME		4.48s
 
-class CKnife : public CBasePlayerWeapon
+class CKnifeDragon : public CBasePlayerWeapon
 {
 public:
 	void Spawn() override;
@@ -29,9 +29,6 @@ public:
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	int iItemSlot() override { return KNIFE_SLOT; }
 	void PrimaryAttack() override;
-	void Inspect() override;
-	duration_t GetInspectTime() override { return KNIFE_INSPECT_TIME; }
-	void ChangeModel() override;
 	void SecondaryAttack() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -58,8 +55,6 @@ public:
 public:
 	TraceResult m_trHit;
 	unsigned short m_usKnife;
-	int m_SeqModel;
-	time_point_t m_NextInspect;
 };
 
 void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *mins, const float *maxs, edict_t *pEntity);

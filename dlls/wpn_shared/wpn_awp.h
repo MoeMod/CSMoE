@@ -15,7 +15,8 @@ namespace sv {
 #define AWP_MAX_SPEED_ZOOM	150
 #define AWP_DAMAGE		115
 #define AWP_RANGE_MODIFER	0.99
-#define AWP_RELOAD_TIME		2.5
+#define AWP_RELOAD_TIME		2.5s
+#define AWP_INSPECT_TIME		4.48s
 
 class CAWP : public CBasePlayerWeapon
 {
@@ -26,6 +27,8 @@ public:
 	BOOL Deploy() override;
 	float GetMaxSpeed() override;
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	duration_t GetInspectTime() override { return AWP_INSPECT_TIME; }
+	void Inspect() override;
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
@@ -43,6 +46,7 @@ public:
 	void AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;
 	int m_iShell;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireAWP;

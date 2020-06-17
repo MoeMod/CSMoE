@@ -554,6 +554,7 @@ void CWorld::Precache()
 
 	PRECACHE_SOUND("weapons/ric_metal-1.wav");
 	PRECACHE_SOUND("weapons/ric_metal-2.wav");
+	PRECACHE_SOUND("player/blind.wav");
 	PRECACHE_SOUND("weapons/ric_conc-1.wav");
 	PRECACHE_SOUND("weapons/ric_conc-2.wav");
 

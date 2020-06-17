@@ -15,7 +15,8 @@ namespace sv {
 #define SG552_MAX_SPEED_ZOOM		200
 #define SG552_DAMAGE			33
 #define SG552_RANGE_MODIFER		0.955
-#define SG552_RELOAD_TIME		3
+#define SG552_RELOAD_TIME		3s
+#define SG552_INSPECT_TIME		4.48s
 
 class CSG552 : public CBasePlayerWeapon
 {
@@ -29,6 +30,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return SG552_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -44,6 +47,7 @@ public:
 
 	int m_iShell;
 	int iShellOn;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireSG552;

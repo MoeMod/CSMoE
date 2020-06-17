@@ -25,6 +25,7 @@ int CHudScoreBoardLegacy::VidInit(void)
 	m_iUnitehBG = gHUD.GetSpriteIndex("SBUnitehBG");
 	m_iNum_L = gHUD.GetSpriteIndex("SBNum_L");
 	m_iNum_S = gHUD.GetSpriteIndex("SBNum_S");
+	m_iNum_csgo = gHUD.GetSpriteIndex("csgo_number");
 	m_iText_CT = gHUD.GetSpriteIndex("SBText_CT");
 	m_iText_T = gHUD.GetSpriteIndex("SBText_T");
 	m_iText_TR = gHUD.GetSpriteIndex("SBText_TR");
@@ -33,7 +34,8 @@ int CHudScoreBoardLegacy::VidInit(void)
 	m_iText_1st = gHUD.GetSpriteIndex("SBText_1st");
 	m_iText_Kill = gHUD.GetSpriteIndex("SBText_Kill");
 	m_iText_Round = gHUD.GetSpriteIndex("SBText_Round");
-
+	R_InitTexture(m_pTexture_Board, "resource/hud/csgo/board");
+	BuildHudNumberRect(m_iNum_csgo, m_rcNumber_csgo, 21, 30, 1, 1);
 	BuildHudNumberRect(m_iNum_L, m_rcNumber_Large, 13, 13, 1, 1);
 	BuildHudNumberRect(m_iNum_S, m_rcNumber_Small, 10, 10, 1, 1);
 
@@ -59,6 +61,97 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 	int bgWidth = (bgRect.right - bgRect.left);
 	int bgY = 2;
 	int bgX = (ScreenWidth - bgWidth) / 2;
+
+	int aliveCT = gHUD.m_Scoreboard.m_iTeamAlive_CT;
+	int aliveT = gHUD.m_Scoreboard.m_iTeamAlive_T;
+	int textWidth_CTAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, aliveCT);
+	int textWidth_TAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, aliveT);
+	int scoreCT = gHUD.m_Scoreboard.m_iTeamScore_CT;
+	int scoreT = gHUD.m_Scoreboard.m_iTeamScore_T;
+	int scoreMax = gHUD.m_Scoreboard.m_iTeamScore_Max;
+	int roundNumber = scoreMax ? scoreMax : scoreT + scoreCT + 1;
+
+	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
+	{
+		int x = ScreenWidth / 2;
+		bgY = 5;
+		int y = 5;
+		const float flScale = 0.0f;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+		m_pTexture_Board->Bind();
+		DrawUtils::Draw2DQuadScaled(x - 240 / 2, y, x + 240 / 2, y + 70);
+
+		if (scoreCT >= 100)
+		{
+			int textWidth_CT = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large, DHN_3DIGITS | DHN_2DIGITS | DHN_DRAWZERO, scoreCT);
+
+			if (textWidth_CT > 0)
+
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, (ScreenWidth) / 2 - 39, bgY + 50, DHN_3DIGITS | DHN_DRAWZERO, scoreCT, 100, 134, 142);
+		}
+		else if (scoreCT >= 10)
+		{
+			int textWidth_CT = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large, DHN_2DIGITS | DHN_DRAWZERO, scoreCT);
+
+			if (textWidth_CT > 0)
+
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, (ScreenWidth) / 2 - 39, bgY + 50, DHN_2DIGITS | DHN_DRAWZERO, scoreCT, 100, 134, 142);
+		}
+		else
+		{
+			int textWidth_CT = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large, DHN_DRAWZERO, scoreCT);
+
+			if (textWidth_CT > 0)
+
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, (ScreenWidth) / 2 - 33, bgY + 50, DHN_DRAWZERO, scoreCT, 100, 134, 142);
+		}
+
+		if (scoreT >= 100)
+		{
+			int textWidth_T = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large, DHN_3DIGITS | DHN_DRAWZERO, scoreT);
+
+			if (textWidth_T > 0)
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, ((ScreenWidth) / 2) + 39 - (textWidth_T / 2), bgY + 50, DHN_3DIGITS | DHN_DRAWZERO, scoreT, 172, 154, 111);
+		}
+		else if (scoreT >= 10)
+		{
+			int textWidth_T = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large, DHN_2DIGITS | DHN_DRAWZERO, scoreT);
+
+			if (textWidth_T > 0)
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, ((ScreenWidth) / 2) + 39 - textWidth_T, bgY + 50, DHN_2DIGITS | DHN_DRAWZERO, scoreT, 172, 154, 111);
+		}
+		else
+		{
+			int textWidth_T = GetHudNumberWidth(m_iNum_L, m_rcNumber_Large,  DHN_DRAWZERO, scoreT);
+
+			if (textWidth_T > 0)
+				DrawHudNumber(m_iNum_L, m_rcNumber_Large, ((ScreenWidth) / 2) + 39 - textWidth_T, bgY + 50, DHN_DRAWZERO, scoreT, 172, 154, 111);
+		}
+
+		textWidth_CTAlive = GetHudNumberWidth(m_iNum_csgo, m_rcNumber_csgo, DHN_2DIGITS | DHN_DRAWZERO, aliveCT);
+		textWidth_TAlive = GetHudNumberWidth(m_iNum_csgo, m_rcNumber_csgo, DHN_2DIGITS | DHN_DRAWZERO, aliveT);
+		if (textWidth_TAlive > 0)
+		{
+			if(aliveCT >= 10)
+				DrawHudNumber(m_iNum_csgo, m_rcNumber_csgo, (ScreenWidth) / 2 - 111, bgY + 20, DHN_2DIGITS | DHN_DRAWZERO, aliveCT, 128 * 255, 128 * 255, 128 * 255);
+			else
+				DrawHudNumber(m_iNum_csgo, m_rcNumber_csgo, (ScreenWidth) / 2 - 100, bgY + 20, DHN_DRAWZERO, aliveCT, 128 * 255, 128 * 255, 128 * 255);
+		}
+	
+		if (textWidth_CTAlive > 0)
+		{
+			if (aliveT >= 10)
+				DrawHudNumber(m_iNum_csgo, m_rcNumber_csgo, (ScreenWidth) / 2 + 111 - textWidth_TAlive, bgY + 20, DHN_2DIGITS | DHN_DRAWZERO, aliveT, 128 * 255, 128 * 255, 128 * 255);
+			else
+			{
+				DrawHudNumber(m_iNum_csgo, m_rcNumber_csgo, (ScreenWidth) / 2 + 100 - 19, bgY + 20, DHN_DRAWZERO, aliveT, 128 * 255, 128 * 255, 128 * 255);
+			}
+		}
+
+		return 1;
+	}
 
 	if (bgSprite)
 	{
@@ -96,16 +189,8 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 		SPR_DrawAdditive(0, (ScreenWidth) / 2 + 27, bgY + 11, &textRect);
 	}
 
-	int aliveCT = gHUD.m_Scoreboard.m_iTeamAlive_CT;
-	int aliveT = gHUD.m_Scoreboard.m_iTeamAlive_T;
-	int textWidth_CTAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, aliveCT);
-	int textWidth_TAlive = GetHudNumberWidth(m_iNum_S, m_rcNumber_Small, DHN_2DIGITS | DHN_DRAWZERO, aliveT);
-	int scoreCT = gHUD.m_Scoreboard.m_iTeamScore_CT;
-	int scoreT = gHUD.m_Scoreboard.m_iTeamScore_T;
-	int scoreMax = gHUD.m_Scoreboard.m_iTeamScore_Max;
-	int roundNumber = scoreMax ? scoreMax : scoreT + scoreCT + 1;
+//Caculate HudNumber
 	
-
 	if (gHUD.m_iModRunning == MOD_DM)
 	{
 		int best_player = gHUD.m_Scoreboard.FindBestPlayer();

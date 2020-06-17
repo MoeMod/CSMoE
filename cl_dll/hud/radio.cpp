@@ -56,8 +56,10 @@ int CHudRadio::Init( )
 
 void Broadcast( const char *msg, int pitch )
 {
-	if ( msg[0] == '%' && msg[1] == '!' )
-		gEngfuncs.pfnPlaySoundVoiceByName( &const_cast<char *>(msg)[1], 1.0f, pitch );
+	if (msg[0] == '%' && msg[1] == '!')
+	{
+		gEngfuncs.pfnPlaySoundVoiceByName(&const_cast<char*>(msg)[1], 1.0f, pitch);
+	}
 	else
 		gEngfuncs.pfnPlaySoundVoiceByName(const_cast<char *>(msg), 1.0f, pitch );
 }

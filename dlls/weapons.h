@@ -276,7 +276,6 @@ public:
 	CBaseEntity *Respawn() override;
 	virtual int AddToPlayer(CBasePlayer *pPlayer);
 #endif
-
 	virtual int AddDuplicate(CBasePlayerItem *pItem) { return FALSE; }
 	virtual int GetItemInfo(ItemInfo *p) { return 0; }
 	virtual BOOL CanDeploy() { return TRUE; }
@@ -300,13 +299,18 @@ public:
 	virtual void Drop();
 	virtual void Kill();
 	virtual void AttachToPlayer(CBasePlayer *pPlayer);
+	virtual void CheckWeapon(CBasePlayer* pPlayer, CBasePlayerItem* pItem);
 #endif
+	
 	virtual int PrimaryAmmoIndex() { return -1; }
 	virtual int SecondaryAmmoIndex() { return -1; }
 	virtual int UpdateClientData(CBasePlayer *pPlayer) { return 0; }
 	virtual CBasePlayerItem *GetWeaponPtr() { return NULL; }
 	virtual float GetMaxSpeed() { return 260.0f; }
 	virtual int iItemSlot() { return 0; }
+	virtual void Inspect() {};
+	virtual void ChangeModel() {};
+	virtual duration_t GetInspectTime() { return 10.0s; }
 
 public:
 #ifdef CLIENT_DLL
@@ -430,6 +434,9 @@ public:
 	virtual void RetireWeapon();
 	virtual BOOL ShouldWeaponIdle() { return FALSE; }
 	virtual BOOL UseDecrement() { return FALSE; }
+	virtual void Inspect() {};
+	virtual void ChangeModel() {};
+	virtual duration_t GetInspectTime() { return 4.5s; }
 
 public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);

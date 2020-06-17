@@ -32,7 +32,7 @@ namespace sv {
 
 CZombieClass_Speed::CZombieClass_Speed(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHide>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "speed_zombi_origin" : "speed_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -100,8 +100,8 @@ void CZombieClass_Speed::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
 {
 	switch (RANDOM_LONG(0, 1))
 	{
-		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_01.wav", VOL_NORM, ATTN_NORM); break;
-		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_02.wav", VOL_NORM, ATTN_NORM); break;
+		case 0: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_female_1.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_hurt_female_2.wav", VOL_NORM, ATTN_NORM); break;
 		default:break;
 	}
 }
@@ -110,8 +110,8 @@ void CZombieClass_Speed::DeathSound_Zombie()
 {
 	switch (RANDOM_LONG(1, 2))
 	{
-		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+		case 1: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_female_1.wav", VOL_NORM, ATTN_NORM); break;
+		case 2: EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_death_female_2.wav", VOL_NORM, ATTN_NORM); break;
 		default:break;
 	}
 }

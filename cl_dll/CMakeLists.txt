@@ -140,6 +140,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_mg3xmas.cpp
 	../dlls/wpn_shared/wpn_sgdrill.cpp
 	../dlls/wpn_shared/wpn_m95xmas.cpp
+	../dlls/wpn_shared/wpn_m4a1dragon.cpp
+	../dlls/wpn_shared/wpn_ak47dragon.cpp
+	../dlls/wpn_shared/wpn_knifedragon.cpp
 	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_chainsaw.cpp
 	../dlls/wpn_shared/wpn_tbarrel.cpp

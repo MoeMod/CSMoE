@@ -87,10 +87,14 @@ int CSG552::GetItemInfo(ItemInfo *p)
 
 BOOL CSG552::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_sg552.mdl", "models/p_sg552.mdl", SG552_DRAW, "mp5", UseDecrement() != FALSE);
 }
 
@@ -163,7 +167,7 @@ void CSG552::SG552Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
+	m_flLastFire = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.04, 4.25, 2.5, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -178,7 +182,7 @@ void CSG552::Reload(void)
 {
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + SG552_RELOAD_TIME;
 	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, 3s))
 	{
 #ifndef CLIENT_DLL
@@ -212,6 +216,24 @@ float CSG552::GetMaxSpeed(void)
 		return 235;
 
 	return 200;
+}
+
+void CSG552::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
 }
 
 }

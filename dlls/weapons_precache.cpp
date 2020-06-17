@@ -146,6 +146,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_wa2000");
 	UTIL_PrecacheOtherWeapon("weapon_m95");
 	UTIL_PrecacheOtherWeapon("weapon_as50");
+	UTIL_PrecacheOtherWeapon("weapon_m4a1dragon");
+	UTIL_PrecacheOtherWeapon("weapon_ak47dragon");
+	UTIL_PrecacheOtherWeapon("knife_knifedragon");
 	UTIL_PrecacheOther("ammo_50bmg");
 	UTIL_PrecacheOtherWeapon("weapon_kriss");
 	UTIL_PrecacheOtherWeapon("weapon_thompson");
@@ -160,6 +163,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_anaconda");
 	UTIL_PrecacheOtherWeapon("weapon_m134");
 	UTIL_PrecacheOtherWeapon("weapon_m134ex");
+	UTIL_PrecacheOtherWeapon("weapon_k1a");
 	UTIL_PrecacheOtherWeapon("weapon_m134xmas");
 	UTIL_PrecacheOtherWeapon("weapon_m95xmas");
 	UTIL_PrecacheOtherWeapon("weapon_mg3xmas");

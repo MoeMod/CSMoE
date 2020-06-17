@@ -140,6 +140,7 @@ public:
 	void CalcCrosshairColor();
 
 	int DrawWList(float flTime);
+	int DrawWpnList(float flTime);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
 	CHudMsgFunc(AmmoX);
@@ -177,7 +178,7 @@ public:
 	WEAPON *m_pWeapon;
 	int	m_HUD_bucket0;
 	int m_HUD_selection;
-
+	UniqueTexture m_pTexture_Black;
 	int m_iAlpha;
 	int m_R, m_G, m_B;
 	int m_cvarR, m_cvarG, m_cvarB;
@@ -403,6 +404,7 @@ private:
 private:
 	SharedTexture m_killBg[3];
 	SharedTexture m_deathBg[3];
+	SharedTexture m_defaultBg[3];
 	int m_KM_Number0;
 	int m_KM_Number1;
 	int m_KM_Number2;
@@ -479,6 +481,7 @@ public:
 	int Init( void );
 	int VidInit( void );
 	int Draw(float flTime);
+	int DrawBar(int x, int y, int width, int height, float f, int& r, int& g, int& b, int& a);
 	void InitHUDData( void );
 	CHudMsgFunc(Battery);
 	CHudMsgFunc(ArmorType);
@@ -493,6 +496,7 @@ private:
 	CClientSprite m_hFull[VestHelm + 1];
 	int	  m_iBat;
 	float m_fFade;
+	UniqueTexture m_pTexture_Black;
 	int	  m_iHeight;		// width of the battery innards
 };
 
@@ -656,6 +660,7 @@ private:
 	int m_iDelta;
 	int m_iBlinkAmt;
 	float m_fBlinkTime;
+	UniqueTexture m_pTexture_Black;
 	float m_fFade;
 	CClientSprite m_hDollar;
 	CClientSprite m_hPlus;
@@ -703,6 +708,7 @@ private:
 	bool m_bPanicColorChange;
 	float m_flPanicTime;
 	int m_closestRight;
+	UniqueTexture m_pTexture_Black;
 };
 //
 //-----------------------------------------------------
@@ -910,6 +916,7 @@ public:
 	int		m_iRes;
 	cvar_t *m_pCvarDraw;
 	cvar_t *cl_shadows;
+	cvar_t *m_csgohud;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -994,6 +1001,7 @@ public:
 
 	// sprite indexes
 	int m_HUD_number_0;
+
 
 	char m_szServerName[64];
 

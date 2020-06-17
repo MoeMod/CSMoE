@@ -18,7 +18,7 @@
 #include "cbase.h"
 #include "player.h"
 #include "weapons.h"
-#include "wpn_ak47.h"
+#include "wpn_ak47dragon.h"
 
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
@@ -37,18 +37,19 @@ enum ak47_e
 	AK47_DRAW,
 	AK47_SHOOT1,
 	AK47_SHOOT2,
-	AK47_SHOOT3
+	AK47_SHOOT3,
+	AK47_RELOADD,
 };
 
-LINK_ENTITY_TO_CLASS(weapon_ak47, CAK47)
+LINK_ENTITY_TO_CLASS(weapon_ak47dragon, CAK47Dragon)
 
-void CAK47::Spawn(void)
+void CAK47Dragon::Spawn(void)
 {
-	pev->classname = MAKE_STRING("weapon_ak47");
+	pev->classname = MAKE_STRING("weapon_ak47dragon");
 
 	Precache();
 	m_iId = WEAPON_AK47;
-	SET_MODEL(ENT(pev), "models/w_ak47.mdl");
+	SET_MODEL(ENT(pev), "models/w_ak47dragon.mdl");
 
 	m_iDefaultAmmo = AK47_DEFAULT_GIVE;
 	m_flAccuracy = 0.2;
@@ -57,10 +58,11 @@ void CAK47::Spawn(void)
 	FallInit();
 }
 
-void CAK47::Precache(void)
+void CAK47Dragon::Precache(void)
 {
-	PRECACHE_MODEL("models/v_ak47.mdl");
-	PRECACHE_MODEL("models/w_ak47.mdl");
+	PRECACHE_MODEL("models/v_ak47dragon.mdl");
+	PRECACHE_MODEL("models/p_ak47dragon.mdl");
+	PRECACHE_MODEL("models/w_ak47dragon.mdl");
 
 	PRECACHE_SOUND("weapons/ak47-1.wav");
 	PRECACHE_SOUND("weapons/ak47-2.wav");
@@ -69,10 +71,10 @@ void CAK47::Precache(void)
 	PRECACHE_SOUND("weapons/ak47_boltpull.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
-	m_usFireAK47 = PRECACHE_EVENT(1, "events/ak47.sc");
+	m_usFireAK47Dragon = PRECACHE_EVENT(1, "events/ak47dragon.sc");
 }
 
-int CAK47::GetItemInfo(ItemInfo *p)
+int CAK47Dragon::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "762Nato";
@@ -89,31 +91,26 @@ int CAK47::GetItemInfo(ItemInfo *p)
 	return 1;
 }
 
-BOOL CAK47::Deploy(void)
+BOOL CAK47Dragon::Deploy(void)
 {
-#ifndef CLIENT_DLL
-	if (m_pPlayer->IsAlive())
-		CheckWeapon(m_pPlayer, this);
-#endif
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-	m_NextInspect = gpGlobals->time + 0.75s;
-	return DefaultDeploy("models/v_ak47.mdl", "models/p_ak47.mdl", AK47_DRAW, "ak47", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_ak47dragon.mdl", "models/p_ak47dargon.mdl", AK47_DRAW, "ak47", UseDecrement() != FALSE);
 	
 }
 
-void CAK47::PrimaryAttack(void)
+void CAK47Dragon::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AK47Fire(0.04 + (0.4) * m_flAccuracy, 0.0955s, FALSE);
+		AK47DragonFire(0.04 + (0.4) * m_flAccuracy, 0.0955s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		AK47Fire(0.04 + (0.07) * m_flAccuracy, 0.0955s, FALSE);
+		AK47DragonFire(0.04 + (0.07) * m_flAccuracy, 0.0955s, FALSE);
 	else
-		AK47Fire((0.0275), 0.0955s, FALSE);
+		AK47DragonFire((0.0275), 0.0955s, FALSE);
 }
 
-void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
+void CAK47Dragon::AK47DragonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
@@ -149,7 +146,7 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireAK47, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireAK47Dragon, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
@@ -159,7 +156,6 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_tLastFire = gpGlobals->time;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -172,23 +168,40 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		KickBack(1.0, 0.375, 0.175, 0.0375, 5.75, 1.75, 8);
 }
 
-void CAK47::Reload(void)
+void CAK47Dragon::Reload(void)
 {
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
-	m_NextInspect = gpGlobals->time + AK47_RELOAD_TIME;
-	if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, 2.45s))
+
+	CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*) m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+	if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "knife_knifedragon"))
 	{
+		if (DefaultReload(AK47_MAX_CLIP, AK47_RELOADD, 1.75s))
+		{
 #ifndef CLIENT_DLL
-		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+			m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
-		m_flAccuracy = 0.2;
-		m_iShotsFired = 0;
-		m_bDelayFire = false;
+			m_flAccuracy = 0.2;
+			m_iShotsFired = 0;
+			m_bDelayFire = false;
+		}
+	}
+	else
+	{
+		if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, 2.45s))
+		{
+#ifndef CLIENT_DLL
+			m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+			m_flAccuracy = 0.2;
+			m_iShotsFired = 0;
+			m_bDelayFire = false;
+		}
 	}
 }
 
-void CAK47::WeaponIdle(void)
+void CAK47Dragon::WeaponIdle(void)
 {
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -200,7 +213,7 @@ void CAK47::WeaponIdle(void)
 	SendWeaponAnim(AK47_IDLE1, UseDecrement() != FALSE);
 }
 
-float CAK47::GetDamage() const
+float CAK47Dragon::GetDamage() const
 {
 	float flDamage = 36.0f;
 #ifndef CLIENT_DLL
@@ -212,21 +225,4 @@ float CAK47::GetDamage() const
 	return flDamage;
 }
 
-void CAK47::Inspect()
-{
-
-	if (!m_fInReload)
-	{
-		if (m_tLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
-		{
-#ifndef CLIENT_DLL
-			SendWeaponAnim(6, 0);
-#endif
-			m_NextInspect = gpGlobals->time + GetInspectTime();
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_tLastFire = invalid_time_point;
-		}
-	}
-
-}
 } // namespace cl/sv

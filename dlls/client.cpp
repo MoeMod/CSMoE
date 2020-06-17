@@ -2445,6 +2445,34 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			Host_Say(pEntity, 0);
 		}
 	}
+	else if (FStrEq(pcmd, "inspect"))
+	{
+		if ((int)CVAR_GET_FLOAT("mp_csgoinspect"))
+		{
+			if (gpGlobals->time >= player->m_flLastCommandTime[7])
+			{
+				player->m_flLastCommandTime[7] = gpGlobals->time + 0.3s;
+				if (!player->m_bIsZombie)
+				{
+					player->m_pActiveItem->Inspect();
+				}
+			}
+		}
+	}
+	else if (FStrEq(pcmd, "changemodel"))
+	{
+		if ((int)CVAR_GET_FLOAT("mp_csgoinspect"))
+		{
+			if (gpGlobals->time >= player->m_flLastCommandTime[7])
+			{
+				player->m_flLastCommandTime[7] = gpGlobals->time + 0.3s;
+				if (!player->m_bIsZombie)
+				{
+					player->m_pActiveItem->ChangeModel();
+				}
+			}
+		}
+	}
 	else if (FStrEq(pcmd, "say_team"))
 	{
 		if (gpGlobals->time >= player->m_flLastCommandTime[1])
@@ -3662,6 +3690,7 @@ void ClientPrecache()
 	PRECACHE_SOUND("player/bhit_flesh-3.wav");
 	PRECACHE_SOUND("player/bhit_kevlar-1.wav");
 	PRECACHE_SOUND("player/bhit_helmet-1.wav");
+	PRECACHE_SOUND("player/csgo_headshot.wav");
 	PRECACHE_SOUND("player/die1.wav");
 	PRECACHE_SOUND("player/die2.wav");
 	PRECACHE_SOUND("player/die3.wav");

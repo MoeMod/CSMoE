@@ -14,7 +14,8 @@ namespace sv {
 #define GLOCK18_MAX_SPEED		250
 #define GLOCK18_DAMAGE			25
 #define GLOCK18_RANGE_MODIFER		0.75
-#define GLOCK18_RELOAD_TIME		2.2
+#define GLOCK18_RELOAD_TIME		2.2s
+#define GLOCK18_INSPECT_TIME		4.48s
 
 class CGLOCK18 : public CBasePlayerWeapon
 {
@@ -27,6 +28,8 @@ public:
 	int iItemSlot() override { return PISTOL_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return GLOCK18_INSPECT_TIME; }
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
@@ -45,6 +48,7 @@ public:
 public:
 	int m_iShell;
 	bool m_bBurstFire;
+	time_point_t m_NextInspect;
 };
 
 }

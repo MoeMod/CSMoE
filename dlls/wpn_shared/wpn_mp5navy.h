@@ -14,7 +14,8 @@ namespace sv {
 #define MP5N_MAX_SPEED			250
 #define MP5N_DAMAGE			26
 #define MP5N_RANGE_MODIFER		0.84
-#define MP5N_RELOAD_TIME		2.63
+#define MP5N_RELOAD_TIME		2.63s
+#define MP5N_INSPECT_TIME		4.48s
 
 class CMP5N : public CBasePlayerWeapon
 {
@@ -28,6 +29,8 @@ public:
 	void PrimaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return MP5N_INSPECT_TIME; }
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
@@ -41,6 +44,7 @@ public:
 	void MP5NFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 
 	int m_iShell;
+	time_point_t m_NextInspect;
 	int iShellOn;
 
 private:

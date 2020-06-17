@@ -307,6 +307,7 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	auto sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, "random");
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
+	m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 
 	sp->InitHUD();
 	sp->ResetMaxSpeed();
