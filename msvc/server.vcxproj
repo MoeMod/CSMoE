@@ -196,6 +196,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_gatling.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_glock18.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gunkata.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_hegrenade.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinity.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_infinityex1.cpp" />
@@ -696,7 +697,6 @@
       <Optimization>Full</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -708,6 +708,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -735,7 +736,6 @@
       <Optimization>Full</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -747,6 +747,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -785,6 +786,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -812,12 +814,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -843,12 +845,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
-      <AdditionalOptions>/arch:IA32 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -879,6 +881,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>

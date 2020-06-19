@@ -35,7 +35,6 @@ endif()
 option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
 option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
 option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
-option(XASH_STATIC "Static build. Implicitly enables XASH_SINGLE_BINARY." OFF)
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)

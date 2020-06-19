@@ -10,6 +10,12 @@ option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) #
 
 option(XASH_PCH "Enable PCH support." ON)
 
+if(WIN32)
+	option(XASH_VCPKG "Enable VCPKG support." ON)
+else()
+	option(XASH_VCPKG "Enable VCPKG support." OFF)
+endif()
+
 if(XASH_PCH)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler/")
 	include(CMakePCHCompiler)

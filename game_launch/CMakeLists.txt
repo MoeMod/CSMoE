@@ -41,7 +41,37 @@ include_directories(
 )
 
 if(WIN32)
-	add_executable(${XASH_LAUNCHER} WIN32 xash_static.cpp game.rc)
+
+	if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+		set(APP_MANIFEST_FILE "${CMAKE_SOURCE_DIR}/msvc/Package.appxmanifest")
+		configure_file(
+			${APP_MANIFEST_NAME}
+			${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
+			@ONLY
+		)
+
+		set(CONTENT_FILES "")
+		set(ASSET_FILES "")
+
+		file(GLOB_RECURSE PATHED_ICON_FILES "${CMAKE_SOURCE_DIR}/msvc/Images/*.png")
+		foreach(PATHED ${PATHED_ICON_FILES})
+			list(APPEND ASSET_FILES ${PATHED})
+		endforeach()
+		set_property(SOURCE ${APP_MANIFEST_NAME} ${CONTENT_FILES} ${ASSET_FILES} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+		set_property(SOURCE ${ASSET_FILES} PROPERTY VS_DEPLOYMENT_LOCATION "Assets")
+
+		set_target_properties(${XASH_LAUNCHER} PROPERTIES VS_CPPWINRT true)
+		set_target_properties(${XASH_LAUNCHER} PROPERTIES VS_GLOBAL_ROOTNAMESPACE "CSMoE-UWP")
+		set_target_properties(${XASH_LAUNCHER} PROPERTIES VS_WINDOWS_TARGET_PLATFORM_MIN_VERSION 10.0.15063.0)
+
+		add_executable(${XASH_LAUNCHER} xash_static.cpp ${APP_MANIFEST_FILE} ${CONTENT_FILES} ${ASSET_FILES})
+		target_link_libraries(${XASH_LAUNCHER} PRIVATE WindowsApp)
+		set_property(TARGET ${XASH_LAUNCHER} PROPERTY VS_WINRT_COMPONENT TRUE)
+		set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${XASH_LAUNCHER})
+	else()
+		add_executable(${XASH_LAUNCHER} WIN32 xash_static.cpp game.rc)
+	endif()
+	
 	target_link_libraries(${XASH_LAUNCHER} xash)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
 		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game

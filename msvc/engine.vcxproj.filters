@@ -685,5 +685,6 @@
     <None Include="..\engine\common\soundlib\libmpg\libmpg.dsp">
       <Filter>engine\common\soundlib\libmpg</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -293,7 +293,7 @@ returns username for current profile
 char *Sys_GetCurrentUser( void )
 {
 #if defined( XASH_WINRT)
-	return "Player";
+	return WinRT_GetUserName();
 #elif defined(_WIN32)
 
 	static string	s_userName;
