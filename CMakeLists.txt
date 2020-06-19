@@ -60,6 +60,10 @@ if(MSVC)
 	add_definitions(-D_USING_V110_SDK71_)
 endif()
 
+if(MSVC)
+	add_compile_options(/utf-8)
+endif()
+
 if(APPLE)
 	add_definitions(-DHAVE_STDINT_H)
 endif()
@@ -95,13 +99,19 @@ set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
 if(XASH_IMGUI)
-    set(IMGUI_SRC
-#			imgui/imgui_demo.cpp
-            imgui/imgui_draw.cpp
-            imgui/imgui_widgets.cpp
-            imgui/imgui.cpp)
-    add_library(imgui STATIC ${IMGUI_SRC})
-    target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+    if(XASH_VCPKG)
+		find_package(imgui CONFIG REQUIRED)
+		add_library(imgui INTERFACE)
+		target_link_libraries(imgui INTERFACE imgui::imgui)
+	else()
+		set(IMGUI_SRC
+	#			imgui/imgui_demo.cpp
+				imgui/imgui_draw.cpp
+				imgui/imgui_widgets.cpp
+				imgui/imgui.cpp)
+		add_library(imgui STATIC ${IMGUI_SRC})
+		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
+	endif()
 endif()
 
 if(NOT XASH_DEDICATED)

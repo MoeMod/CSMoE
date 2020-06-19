@@ -23,7 +23,6 @@ extern "C" {
 
 #include "imgui.h"
 #include "imgui_impl_xash.h"
-#include "imgui_internal.h"
 #include "imgui_lcsm_warning.h"
 
 #include <keydefs.h>
@@ -41,6 +40,11 @@ GLuint g_FontTexture = 0;
 float g_ImGUI_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
+
+template<typename T> static inline T ImLerp(T a, T b, float t) { return (T)(a + (b - a) * t); }
+static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t) { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
+static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t) { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
+static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t) { return ImVec4(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t); }
 
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
