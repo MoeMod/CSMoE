@@ -24,6 +24,7 @@ extern "C" {
 #include "imgui.h"
 #include "imgui_impl_xash.h"
 #include "imgui_lcsm_warning.h"
+#include "imgui_console.h"
 
 #include <keydefs.h>
 #include <utility>
@@ -212,7 +213,7 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 			KeyCallback(key, down);
 			break;
 	}
-	return io.WantCaptureKeyboard;
+	return io.WantCaptureKeyboard || io.WantCaptureMouse;
 }
 
 void ImGui_ImplGL_CharCallback(unsigned int c)
@@ -299,20 +300,30 @@ void ImGui_ImplGL_ReloadFonts()
 	int		i;
 
 	t = FS_Search( "resource/font/*.ttf", true, false );
-	if( !t ) return;
-
-	for( i = 0; i < t->numfilenames; i++ )
+	if (t)
 	{
-		const char *filename = t->filenames[i];
-		fs_offset_t length = 0;
-		auto file = FS_LoadFile(filename, &length, false);
-		std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
-		memcpy(new_ptr.get(), file, length);
-		Mem_Free( std::exchange(file, nullptr) );
-		auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		for (i = 0; i < t->numfilenames; i++)
+		{
+			const char* filename = t->filenames[i];
+			fs_offset_t length = 0;
+			auto file = FS_LoadFile(filename, &length, false);
+			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
+			memcpy(new_ptr.get(), file, length);
+			Mem_Free(std::exchange(file, nullptr));
+			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		}
+		Mem_Free(t);
+	}
+	else
+	{
+#ifdef _WIN32
+		char buffer[MAX_PATH];
+		GetSystemDirectoryA(buffer, sizeof(buffer));
+		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
+		auto font = io.Fonts->AddFontFromFileTTF(buffer, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+#endif
 	}
 
-	Mem_Free( t );
 }
 
 qboolean ImGui_ImplGL_Init(void)
@@ -454,7 +465,7 @@ void ImGui_ImplGL_NewFrame(void)
 	ImGui::GetStyle() = nst;
 
 	// Setup time step
-	double current_time = cl.time;
+	double current_time = Sys_DoubleTime();
 	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f / 60.0f);
 	io.DeltaTime = io.DeltaTime > 0.0f ? io.DeltaTime : 0.0f;	// NOTE: ??? Must be greater than zero
 	g_Time = current_time;
@@ -512,12 +523,15 @@ void Engine_OnGUI(struct ImGuiContext *context)
 {
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
+	ImGui_Console_OnGUI();
 }
 
 void ImGui_ImplGL_OnGUI(void)
 {
 	if(clgame.dllFuncs.pfnOnGUI)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
+	if (menu.dllFuncs.pfnOnGUI)
+		menu.dllFuncs.pfnOnGUI(g_EngineContext);
 
 	Engine_OnGUI(g_EngineContext);
 }

@@ -220,6 +220,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
 set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
+	client/imgui_console.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES

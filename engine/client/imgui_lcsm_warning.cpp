@@ -21,12 +21,12 @@ GNU General Public License for more details.
 static bool lcsm_enabled = true;
 
 namespace ImGuiUtils {
-	void CenterNextWindow(ImGuiCond cond = 0) {
+	inline void CenterNextWindow(ImGuiCond cond = 0) {
 		auto& io = ImGui::GetIO();
 		const auto& ds = io.DisplaySize;
 		ImGui::SetNextWindowPos(ImVec2(ds.x / 2, ds.y / 2), cond, ImVec2(0.5f, 0.5f));
 	}
-	ImVec2 GetScaledSize(ImVec2 in)
+	inline ImVec2 GetScaledSize(ImVec2 in)
 	{
 		auto& io = ImGui::GetIO();
 		float scale = std::max(1.0f, io.FontGlobalScale * 2);
@@ -49,14 +49,14 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::Text("声明：任何提供收费服务的商家均非官方，我们不对非官方版本提供任何技术担保。");
 		ImGui::Text("\t如出现任何意外（包括但不限于死机、蓝屏、锁机、ban号、中毒、变砖、爆炸等）后果自负。");
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
-		ImGui::TextColored(warning_color, "------------------特别声明----------------");
+		ImGui::TextColored(warning_color, "-----------------------------------特别声明---------------------------------");
 		ImGui::TextColored(warning_color, "1.EC精英社所谓“CS破茧”“CS神器时代”均为盗版游戏，我们强烈谴责盗版游戏的行为");
 		ImGui::TextColored(warning_color, "2.Wilson（真名：刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利");
 		ImGui::TextColored(warning_color, "淘宝店铺：洋葱数码商城|淘宝名：丨低调奢华有内涵|B站ID：进口柚柚子|贴吧ID:liu1340567980");
 		ImGui::TextColored(warning_color, "现在此揭露刘澄：一个完全的插件小白，靠网上东拼西凑代码，或直接搬运外网的更新加入游戏。");
 		ImGui::TextColored(warning_color, "但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！");
 		ImGui::TextColored(warning_color, "3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！");
-		ImGui::TextColored(warning_color, "------------------------------------------");
+		ImGui::TextColored(warning_color, "----------------------------------------------------------------------------");
 		/*
 		ImGui::Text("请在下方输入：「我同意」代表您已经明确以上声明。");
 		ImGui::Text("否则请按下“退出”按钮退出游戏");
@@ -69,10 +69,12 @@ void ImGui_LCSM_OnGUI(void)
 
 		if(ImGui::Selectable("进入游戏", false, !!strcmp(buf, "我同意") ? ImGuiSelectableFlags_Disabled : 0, ImGuiUtils::GetScaledSize({0, 36})))
 		 */
+		ImGui::NewLine();
+		ImGui::SameLine(ImGui::GetWindowSize().x * 1 / 4 - 80);
 		if (ImGui::Button("进入游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			lcsm_enabled = false;
 		}
-		ImGui::SameLine(ImGui::GetWindowSize().x / 2);
+		ImGui::SameLine(ImGui::GetWindowSize().x / 2 + 80);
 		if (ImGui::Button("退出游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			exit(0);
 		}
