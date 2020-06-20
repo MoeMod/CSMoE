@@ -50,20 +50,6 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 	int keynum = key.keysym.scancode;
 	qboolean numLock = SDL_GetModState() & KMOD_NUM;
 
-	if( SDL_IsTextInputActive() && down )
-	{
-		if( SDL_GetModState() & KMOD_CTRL )
-		{
-			if( keynum >= SDL_SCANCODE_A && keynum <= SDL_SCANCODE_Z )
-			{
-				keynum = keynum - SDL_SCANCODE_A + 1;
-				CL_CharEvent( keynum );
-			}
-
-			return;
-		}
-	}
-
 #define DECLARE_KEY_RANGE( min, max, repl ) \
 	if( keynum >= (min) && keynum <= (max) ) \
 	{ \
@@ -152,6 +138,24 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 		}
 		default:
 			if( down ) MsgDev( D_INFO, "SDLash_KeyEvent: Unknown key: %s = %i\n", SDL_GetScancodeName( keynum ), keynum );
+			return;
+		}
+	}
+
+#ifdef XASH_IMGUI
+	if (ImGui_ImplGL_KeyEvent(keynum, down))
+		return;
+#endif
+
+	if (SDL_IsTextInputActive() && down)
+	{
+		if (SDL_GetModState() & KMOD_CTRL)
+		{
+			if (keynum >= SDL_SCANCODE_A && keynum <= SDL_SCANCODE_Z)
+			{
+				keynum = keynum - SDL_SCANCODE_A + 1;
+				CL_CharEvent(keynum);
+			}
 			return;
 		}
 	}
@@ -247,6 +251,9 @@ static void SDLash_EventFilter( SDL_Event *event )
 
 	if( wheelbutton )
 	{
+#if XASH_IMGUI
+		if (!ImGui_ImplGL_KeyEvent(wheelbutton, true))
+#endif
 		Key_Event( wheelbutton, false );
 		wheelbutton = 0;
 	}
@@ -315,6 +322,9 @@ static void SDLash_EventFilter( SDL_Event *event )
 
 	case SDL_MOUSEWHEEL:
 		wheelbutton = event->wheel.y < 0 ? K_MWHEELDOWN : K_MWHEELUP;
+#if XASH_IMGUI
+		if (!ImGui_ImplGL_KeyEvent(wheelbutton, true))
+#endif
 		Key_Event( wheelbutton, true );
 		break;
 

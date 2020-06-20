@@ -606,10 +606,6 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 	{
 		keys[key].repeats = 0;
 	}
-#ifdef XASH_IMGUI
-	if(ImGui_ImplGL_KeyEvent( key, down ))
-		return;
-#endif
 
 	VGui_KeyEvent( key, down );
 	Touch_KeyEvent( key, down );

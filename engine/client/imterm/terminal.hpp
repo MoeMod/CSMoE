@@ -309,6 +309,10 @@ namespace ImTerm {
 			m_allow_y_resize = allowed;
 		}
 
+		void set_should_take_focus(bool x = true) noexcept {
+			m_should_take_focus = x;
+		}
+
 	    // executes a statement, simulating user input
 	    // returns false if given string is too long to be interpreted
 	    // if true is returned, any text inputed by the user is overridden

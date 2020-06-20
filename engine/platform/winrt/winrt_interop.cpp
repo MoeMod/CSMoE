@@ -9,6 +9,7 @@
 #include <winrt/Windows.Storage.h>
 #include <winrt/Windows.Storage.Pickers.h>
 #include <winrt/Windows.Storage.AccessCache.h>
+#include <winrt/Windows.ApplicationModel.DataTransfer.h>
 
 #include <SDL_Video.h>
 
@@ -22,6 +23,7 @@ extern "C" {
 }
 
 #include <functional>
+#include <future>
 
 using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Foundation::Collections;
@@ -36,16 +38,21 @@ using namespace winrt::Windows::System;
 using namespace winrt::Windows::Storage;
 using namespace winrt::Windows::Storage::Pickers;
 using namespace winrt::Windows::Storage::AccessCache;
+using namespace winrt::Windows::ApplicationModel::DataTransfer;
 
 void WinRT_FullscreenMode_Install(int fullscreen)
 {
 	auto coreWindow = CoreWindow::GetForCurrentThread();
 	auto appView = ApplicationView::GetForCurrentView();
-	
+	/*
 	coreWindow.SizeChanged([appView](auto, auto e) {
 		if(bool tablet_mode = UIViewSettings::GetForCurrentView().UserInteractionMode() == UserInteractionMode::Touch)
 			Cvar_Set("fullscreen", "1");
 	});
+	*/
+	if (fullscreen)
+		appView.TryEnterFullScreenMode();
+	appView.FullScreenSystemOverlayMode(FullScreenSystemOverlayMode::Minimal);
 
 	auto titleBar = appView.TitleBar();
 	Color red = { 255, 232, 16, 35 };
@@ -118,4 +125,21 @@ void WinRT_ShellExecute(const char* path)
 void WinRT_OpenGameFolderWithExplorer()
 {
 	Launcher::LaunchFolderAsync(ApplicationData::Current().LocalFolder()).get();
+}
+
+void WinRT_SetClipboardData(const char* buffer, size_t size)
+{
+	DataPackage dp;
+	dp.SetText(winrt::to_hstring(std::string_view(buffer, size)));
+	Clipboard::SetContent(dp);
+}
+
+void WinRT_GetClipboardData(char* buffer, size_t size)
+{
+	DataPackageView con = Clipboard::GetContent();
+	if (con.Contains(StandardDataFormats::Text()))
+	{
+		auto hstr = std::async(std::launch::async, [con] { return con.GetTextAsync().get(); }).get();
+		winrt::to_string(hstr).copy(buffer, size);
+	}
 }

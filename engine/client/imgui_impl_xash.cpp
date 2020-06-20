@@ -354,6 +354,10 @@ qboolean ImGui_ImplGL_Init(void)
 	io.KeyMap[ImGuiKey_Y] = 'y';
 	io.KeyMap[ImGuiKey_Z] = 'z';
 
+	io.SetClipboardTextFn = [](void* user_data, const char* text) { Sys_SetClipboardData((const byte *)text, strlen(text)); };
+	io.GetClipboardTextFn = [](void* user_data) -> const char * { return Sys_GetClipboardData(); };
+	io.ClipboardUserData = nullptr;
+
 	//io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableSetMousePos;
 	io.IniFilename = nullptr;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;

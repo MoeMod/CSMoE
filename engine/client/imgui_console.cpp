@@ -140,7 +140,7 @@ struct TerminalHelper {
 };
 
 static std::string s_term_arg;
-static ImTerm::terminal<TerminalHelper> s_term(s_term_arg, "CSMoE Console");
+static ImTerm::terminal<TerminalHelper> s_term(s_term_arg, "CSMoE 控制台");
 
 void ImGui_Console_UpdateCommandList()
 {
@@ -230,20 +230,28 @@ void ImGui_Console_Clear()
 
 void ImGui_Console_OnGUI(void)
 {
-	bool enabled = cls.key_dest == key_console;
+	static bool enabled = false;
+
+	bool set_focus = false;
+	if(!std::exchange(enabled, cls.key_dest == key_console))
+		s_term.set_should_take_focus(set_focus = true);
+
 	if (!enabled)
 		return;
-
+	
 	ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
 	ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Appearing);
 
 	ImGui::CaptureMouseFromApp();
-	s_term.show({  }, &enabled);
+	ImGui::CaptureKeyboardFromApp();
 
-	if (!enabled && cls.key_dest == key_console)
+	if (!s_term.show({  }, &enabled) || !enabled)
 	{
 		if (cls.state == ca_active && !cl.background)
 			Key_SetKeyDest(key_game);
 		else UI_SetActiveMenu(true);
 	}
+
+	if(set_focus)
+		s_term.set_should_take_focus(false);
 }

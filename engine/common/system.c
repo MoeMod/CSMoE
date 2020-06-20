@@ -236,7 +236,9 @@ char *Sys_GetClipboardData( void )
 
 	data[0] = '\0';
 
-#ifdef XASH_SDL
+#ifdef XASH_WINRT
+	WinRT_GetClipboardData(data, 1024);
+#elif defined XASH_SDL
 	buffer = SDL_GetClipboardText();
 	if( buffer )
 	{
@@ -256,7 +258,9 @@ write screenshot into clipboard
 */
 void Sys_SetClipboardData( const byte *buffer, size_t size )
 {
-#ifdef XASH_SDL
+#ifdef XASH_WINRT
+	WinRT_SetClipboardData((const char *)buffer, size);
+#elif defined XASH_SDL
 	SDL_SetClipboardText((char *)buffer);
 #endif
 }
