@@ -242,9 +242,6 @@ void ImGui_Console_OnGUI(void)
 	ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
 	ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Appearing);
 
-	ImGui::CaptureMouseFromApp();
-	ImGui::CaptureKeyboardFromApp();
-
 	if (!s_term.show({  }, &enabled) || !enabled)
 	{
 		if (cls.state == ca_active && !cl.background)
