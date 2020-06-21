@@ -24,6 +24,7 @@
 #include <utility>
 #include <optional>
 #include <array>
+#include <memory>
 #include <imgui.h>
 
 #include "utils.hpp"
