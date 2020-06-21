@@ -99,12 +99,15 @@ BOOL CDEAGLE::Deploy(void)
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
 	m_fMaxSpeed = 250;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_deagle.mdl", "models/shield/p_shield_deagle.mdl", DEAGLE_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_deagle.mdl", "models/p_deagle.mdl", DEAGLE_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CDEAGLE::PrimaryAttack(void)
@@ -193,7 +196,7 @@ void CDEAGLE::Reload(void)
 {
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + DEAGLE_RELOAD_TIME;
 	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, 2.2s))
 	{
 #ifndef CLIENT_DLL
@@ -227,5 +230,23 @@ float CDEAGLE::GetDamage() const
 		flDamage = 70.0f;
 #endif
 	return flDamage;
+}
+
+void CDEAGLE::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(RANDOM_LONG(6, 7), 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
 }
 }

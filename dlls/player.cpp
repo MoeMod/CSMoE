@@ -1810,6 +1810,7 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
 		WRITE_SHORT(m_iClientHealth); // WRITE_BYTE
+		WRITE_SHORT(pev->max_health);
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pev);
@@ -3128,7 +3129,8 @@ void CBasePlayer::Disappear()
 
 	m_iClientHealth = 0;
 	MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
-		WRITE_SHORT(m_iClientHealth); // WRITE_BYTE
+		WRITE_SHORT(m_iClientHealth);// WRITE_BYTE 
+		WRITE_SHORT(pev->max_health);
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pev);
@@ -5824,6 +5826,13 @@ BOOL CBasePlayer::RemovePlayerItem(CBasePlayerItem *pItem)
 		pPrev->m_pNext = pItem->m_pNext;
 		return TRUE;
 	}
+	if ((int)CVAR_GET_FLOAT("mp_csgobackweapon"))
+	{
+		if (pItem->iItemSlot() == 1)
+		{
+			pItem->CheckWeapon(this, this->m_pActiveItem);
+		}
+	}
 	return FALSE;
 }
 
@@ -6193,6 +6202,7 @@ void CBasePlayer::UpdateClientData()
 		// send "health" update message
 		MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
 			WRITE_SHORT(iHealth); // WRITE_BYTE
+			WRITE_SHORT(pev->max_health);
 		MESSAGE_END();
 
 		m_iClientHealth = (int)pev->health;

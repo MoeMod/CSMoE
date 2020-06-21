@@ -87,6 +87,11 @@ int CM3::GetItemInfo(ItemInfo *p)
 
 BOOL CM3::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_m3.mdl", "models/p_m3.mdl", M3_DRAW, "shotgun", UseDecrement() != FALSE);
 }
 
@@ -118,7 +123,7 @@ void CM3::PrimaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-
+	m_flLastFire = gpGlobals->time;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(9, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0);
@@ -235,4 +240,20 @@ void CM3::WeaponIdle(void)
 	}
 }
 
+void CM3::Inspect()
+{
+	if (!m_fInSpecialReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(7, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
+}
 }

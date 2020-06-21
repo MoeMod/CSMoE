@@ -258,6 +258,9 @@ void Android_RunEvents()
 			break;
 
 		case event_key_down:
+#ifdef XASH_IMGUI
+			if (!ImGui_ImplGL_KeyEvent(events.queue[i].arg, true))
+#endif
 			Key_Event( events.queue[i].arg, true );
 
 			if( events.queue[i].arg == K_AUX31 || events.queue[i].arg == K_AUX29 )
@@ -267,6 +270,9 @@ void Android_RunEvents()
 			}
 			break;
 		case event_key_up:
+#ifdef XASH_IMGUI
+			if(!ImGui_ImplGL_KeyEvent( events.queue[i].arg, false ))
+#endif
 			Key_Event( events.queue[i].arg, false );
 
 			if( events.queue[i].arg == K_AUX31 || events.queue[i].arg == K_AUX29 )
@@ -399,6 +405,11 @@ void Android_RunEvents()
 		// some keyboards may send enter as text
 		if( ch == '\n' )
 		{
+#ifdef XASH_IMGUI
+			// dont use && or ||
+			if(ImGui_ImplGL_KeyEvent( K_ENTER, true ) + ImGui_ImplGL_KeyEvent(K_ENTER, false))
+				continue;
+#endif
 			Key_Event( K_ENTER, true );
 			Key_Event( K_ENTER, false );
 			continue;

@@ -21,6 +21,8 @@
 #if !defined (GAMESTUDIOMODELRENDERER_H)
 #define GAMESTUDIOMODELRENDERER_H
 
+namespace cl {
+
 enum BoneIndex
 {
 	BONE_HEAD,
@@ -81,5 +83,7 @@ private:
 };
 
 extern CGameStudioModelRenderer g_StudioRenderer;
+
+}
 
 #endif

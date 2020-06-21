@@ -940,6 +940,7 @@ void CBasePlayerItem::Holster(int skiplocal)
 
 void CBasePlayerItem::AttachToPlayer(CBasePlayer *pPlayer)
 {
+	PRECACHE_MODEL("models/backweapons2.mdl");
 	pev->movetype = MOVETYPE_FOLLOW;
 	pev->solid = SOLID_NOT;
 	pev->aiment = pPlayer->edict();
@@ -952,8 +953,84 @@ void CBasePlayerItem::AttachToPlayer(CBasePlayer *pPlayer)
 	pev->nextthink = gpGlobals->time + 0.1s;
 
 	SetTouch(NULL);
+
+	if ((int)CVAR_GET_FLOAT("mp_csgobackweapon"))
+	{
+		if (pPlayer->IsAlive())
+		{
+			SET_MODEL(edict(), "models/backweapons2.mdl");
+			if (!Q_strcmp(STRING(pev->classname), "weapon_ak47"))
+				pev->body = BACKWEAPON_AK47;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_aug"))
+				pev->body = BACKWEAPON_AUG;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_awp"))
+				pev->body = BACKWEAPON_AWP;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_mp5navy"))
+				pev->body = BACKWEAPON_MP5;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_p90"))
+				pev->body = BACKWEAPON_P90;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_galil"))
+				pev->body = BACKWEAPON_GALIL;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_m4a1"))
+			{
+				/*if (pCurrent->m_iWeaponState & WPNSTATE_M4A1_SILENCED)
+					pev->body = BACKWEAPON_M4A1_SILENCED;
+				else*/
+				pev->body = BACKWEAPON_M4A1_UNSILENCED;
+			}
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_sg550"))
+				pev->body = BACKWEAPON_SG550;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_sg552"))
+				pev->body = BACKWEAPON_SG552;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_scout"))
+				pev->body = BACKWEAPON_SCOUT;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_xm1014"))
+				pev->body = BACKWEAPON_XM1014;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_m3"))
+				pev->body = BACKWEAPON_M3;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_g3sg1"))
+				pev->body = BACKWEAPON_G3SG1;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_m249"))
+				pev->body = BACKWEAPON_M249;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_famas"))
+				pev->body = BACKWEAPON_FAMAS;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_ump45"))
+				pev->body = BACKWEAPON_UMP45;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_tmp"))
+				pev->body = BACKWEAPON_TMP;
+			else if (!Q_strcmp(STRING(pev->classname), "weapon_mac10"))
+				pev->body = BACKWEAPON_MAC10;
+			else
+				pev->body = BACKWEAPON_NONE;
+
+			if (pPlayer->m_pActiveItem != this)
+			{
+				CBasePlayerItem* pWeapon = pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+				if(pWeapon != NULL)
+					CheckWeapon(pPlayer, pWeapon);
+			}
+		}
+	}
+
+
 }
 
+void CBasePlayerItem::CheckWeapon(CBasePlayer* pPlayer , CBasePlayerItem* pItem = NULL)
+{
+	CBasePlayerItem* pWeapon = pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+	while (pWeapon != NULL)
+	{
+		if (pWeapon == pItem)
+		{
+			pWeapon->pev->effects = EF_NODRAW;
+		}
+		else
+		{
+			pWeapon->pev->effects = 0;
+		}
+		pWeapon = pWeapon->m_pNext;
+	}
+}
 // CALLED THROUGH the newly-touched weapon's instance. The existing player weapon is pOriginal
 
 int CBasePlayerWeapon::AddDuplicate(CBasePlayerItem *pOriginal)
@@ -1253,6 +1330,12 @@ void CBasePlayerWeapon::Holster(int skiplocal)
 	m_fInReload = FALSE;
 	m_pPlayer->pev->viewmodel = 0;
 	m_pPlayer->pev->weaponmodel = 0;
+
+	if ((int)CVAR_GET_FLOAT("mp_csgobackweapon"))
+	{
+		if (m_pPlayer->IsAlive())
+			CheckWeapon(m_pPlayer, NULL);
+	}
 }
 
 void CBasePlayerAmmo::Spawn()

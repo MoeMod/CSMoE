@@ -8,7 +8,8 @@
 #define AK47_MAX_SPEED			221
 #define AK47_DAMAGE			36
 #define AK47_RANGE_MODIFER		0.98
-#define AK47_RELOAD_TIME		2.45
+#define AK47_RELOAD_TIME		2.45s
+#define AK47_INSPECT_TIME		4.48s
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -28,7 +29,9 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override {}
 	void Reload() override;
-	void WeaponIdle() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return AK47_INSPECT_TIME;}
+	void WeaponIdle()override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
@@ -44,6 +47,8 @@ public:
 	float GetDamage() const;
 	int m_iShell;
 	int iShellOn;
+	time_point_t m_NextInspect;
+	time_point_t m_tLastFire;
 
 private:
 	unsigned short m_usFireAK47;

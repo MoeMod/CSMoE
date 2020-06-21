@@ -919,7 +919,6 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 						alpha = pPlayer->m_blindAlpha;
 				}
 			}
-
 			UTIL_ScreenFade(pPlayer, Vector(255, 255, 255), fadeTime, fadeHold, alpha, 0);
 
 			for (int i = 1; i <= gpGlobals->maxClients; ++i) {
@@ -932,7 +931,10 @@ void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker,
 					UTIL_ScreenFade(pObserver, Vector(255, 255, 255), fadeTime, fadeHold, alpha, 0);
 				}
 			}
-
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "player/blind.wav", VOL_NORM, ATTN_NORM);
+			}
 			pPlayer->Blind(fadeTime * 0.33, fadeHold, fadeTime, alpha);
 
 			if (TheBots != NULL) {

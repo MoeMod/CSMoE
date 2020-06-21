@@ -156,6 +156,7 @@ jobs:
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
+    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.10.2.4988404"
     - sudo apt-get install p7zip-full
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z

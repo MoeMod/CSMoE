@@ -72,6 +72,9 @@ void CKnife::Spawn(void)
 
 void CKnife::Precache(void)
 {
+	PRECACHE_MODEL("models/texturewpn/v_knife2.mdl");
+	PRECACHE_MODEL("models/texturewpn/v_knife3.mdl");
+	PRECACHE_MODEL("models/texturewpn/v_knife4.mdl");
 	PRECACHE_MODEL("models/v_knife.mdl");
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_knife.mdl");
@@ -107,21 +110,31 @@ int CKnife::GetItemInfo(ItemInfo *p)
 
 	return 1;
 }
-
+static const char* WEAPON_NAME[] =
+{
+	"models/v_knife.mdl",
+	"models/texturewpn/v_knife2.mdl",
+	"models/texturewpn/v_knife3.mdl",
+	"models/texturewpn/v_knife4.mdl"
+};
 BOOL CKnife::Deploy(void)
 {
+	
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_deploy1.wav", 0.3, 2.4);
 
 	m_fMaxSpeed = 250;
 	m_iSwing = 0;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
+	m_NextInspect = gpGlobals->time + 0.75s;
 	m_pPlayer->m_bShieldDrawn = false;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_knife.mdl", "models/shield/p_shield_knife.mdl", KNIFE_SHIELD_DRAW, "shieldknife", UseDecrement() != FALSE);
 	else
 #endif
-		return DefaultDeploy("models/v_knife.mdl", "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+	{
+		return DefaultDeploy(WEAPON_NAME[0], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+	}
 }
 
 void CKnife::Holster(int skiplocal)
@@ -285,7 +298,7 @@ int CKnife::Swing(int fFirst)
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
+	m_flLastFire = gpGlobals->time;
 	if (tr.flFraction >= 1)
 	{
 		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
@@ -438,7 +451,7 @@ int CKnife::Stab(int fFirst)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 32;
-
+	m_flLastFire = gpGlobals->time;
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
@@ -558,5 +571,26 @@ int CKnife::Stab(int fFirst)
 
 	return fDidHit;
 }
+void CKnife::ChangeModel()
+{
+	if (m_SeqModel >= 3)
+		m_SeqModel = 0;
+	m_SeqModel += 1;
+	Deploy();
+}
 
+void CKnife::Inspect()
+{
+
+	if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+	{
+#ifndef CLIENT_DLL
+		SendWeaponAnim(RANDOM_LONG(8, 10), 0);
+#endif
+		m_NextInspect = gpGlobals->time + GetInspectTime();
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		m_flLastFire = invalid_time_point;
+	}
+
+}
 }

@@ -86,10 +86,14 @@ int CUMP45::GetItemInfo(ItemInfo *p)
 
 BOOL CUMP45::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0;
 	m_bDelayFire = false;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_ump45.mdl", "models/p_ump45.mdl", UMP45_DRAW, "carbine", UseDecrement() != FALSE);
 }
 
@@ -150,7 +154,7 @@ void CUMP45::UMP45Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
+	m_flLastFire = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.125, 0.65, 0.55, 0.0475, 5.5, 4.0, 10);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -165,7 +169,7 @@ void CUMP45::Reload(void)
 {
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + UMP45_RELOAD_TIME;
 	if (DefaultReload(UMP45_MAX_CLIP, UMP45_RELOAD, 3.5s))
 	{
 #ifndef CLIENT_DLL
@@ -188,4 +192,21 @@ void CUMP45::WeaponIdle(void)
 	SendWeaponAnim(UMP45_IDLE1, UseDecrement() != FALSE);
 }
 
+void CUMP45::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
+}
 }

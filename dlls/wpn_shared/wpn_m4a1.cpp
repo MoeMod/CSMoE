@@ -57,6 +57,12 @@ void CM4A1::Spawn(void)
 	m_iDefaultAmmo = M4A1_DEFAULT_GIVE;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
+#ifndef CLIENT_DLL
+	if ((int)CVAR_GET_FLOAT("mp_csgosilencedwpn"))
+	{
+		m_iWeaponState |= WPNSTATE_M4A1_SILENCED;
+	}
+#endif
 	m_bDelayFire = true;
 
 	FallInit();
@@ -74,8 +80,6 @@ void CM4A1::Precache(void)
 	PRECACHE_SOUND("weapons/m4a1_clipout.wav");
 	PRECACHE_SOUND("weapons/m4a1_boltpull.wav");
 	PRECACHE_SOUND("weapons/m4a1_deploy.wav");
-	PRECACHE_SOUND("weapons/m4a1_silencer_on.wav");
-	PRECACHE_SOUND("weapons/m4a1_silencer_off.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireM4A1 = PRECACHE_EVENT(1, "events/m4a1.sc");
@@ -100,11 +104,15 @@ int CM4A1::GetItemInfo(ItemInfo *p)
 
 BOOL CM4A1::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_bDelayFire = true;
 	iShellOn = 1;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		return DefaultDeploy("models/v_m4a1.mdl", "models/p_m4a1.mdl", M4A1_DRAW, "rifle", UseDecrement() != FALSE);
 	else
@@ -113,6 +121,8 @@ BOOL CM4A1::Deploy(void)
 
 void CM4A1::SecondaryAttack(void)
 {
+	m_flLastFire = invalid_time_point;
+	m_NextInspect = gpGlobals->time + 2s;
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
 		m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
@@ -125,7 +135,6 @@ void CM4A1::SecondaryAttack(void)
 		SendWeaponAnim(M4A1_ATTACH_SILENCER, UseDecrement() != FALSE);
 		strcpy(m_pPlayer->m_szAnimExtention, "rifle");
 	}
-
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2s;
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2s;
@@ -210,7 +219,7 @@ void CM4A1::M4A1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-
+	m_flLastFire = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.045, 3.75, 3.0, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -227,7 +236,7 @@ void CM4A1::Reload(void)
 		return;
 
 	int iAnim;
-
+	m_NextInspect = gpGlobals->time + M4A1_RELOAD_TIME;
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		iAnim = M4A1_RELOAD;
 	else
@@ -260,4 +269,22 @@ void CM4A1::WeaponIdle(void)
 		SendWeaponAnim(M4A1_UNSIL_IDLE, UseDecrement() != FALSE);
 }
 
+void CM4A1::Inspect()
+{
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
+				SendWeaponAnim(14, 0);
+			else
+				SendWeaponAnim(15, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+}
 }

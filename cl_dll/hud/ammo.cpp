@@ -27,11 +27,13 @@
 #include <string.h>
 #include <stdio.h>
 
+
+
 #include "ammohistory.h"
 #include "eventscripts.h"
 #include "com_weapons.h"
 #include "draw_util.h"
-
+#include "triangleapi.h"
 #include "weapons_const.h"
 
 using namespace cl;
@@ -268,7 +270,7 @@ WEAPON* WeaponsResource :: GetNextActivePos( int iSlot, int iSlotPos )
 }
 
 
-int giBucketHeight, giBucketWidth, giABHeight, giABWidth; // Ammo Bar width and height
+int giBucketHeight, giBucketWidth, giABHeight, giABWidth, g_iSelectionWidth, g_iSelectionHeight; // Ammo Bar width and height
 
 HSPRITE ghsprBuckets;					// Sprite for top row of weapons menu
 
@@ -385,12 +387,14 @@ int CHudAmmo::VidInit(void)
 	m_HUD_bucket0 = gHUD.GetSpriteIndex( "bucket1" );
 	m_HUD_selection = gHUD.GetSpriteIndex( "selection" );
 
+	g_iSelectionWidth = gHUD.GetSpriteRect(m_HUD_selection).right - gHUD.GetSpriteRect(m_HUD_selection).left;
+	g_iSelectionHeight = gHUD.GetSpriteRect(m_HUD_selection).bottom - gHUD.GetSpriteRect(m_HUD_selection).top;
 	ghsprBuckets = gHUD.GetSprite(m_HUD_bucket0);
 	giBucketWidth = gHUD.GetSpriteRect(m_HUD_bucket0).right - gHUD.GetSpriteRect(m_HUD_bucket0).left;
 	giBucketHeight = gHUD.GetSpriteRect(m_HUD_bucket0).bottom - gHUD.GetSpriteRect(m_HUD_bucket0).top;
 
 	gHR.iHistoryGap = max( gHR.iHistoryGap, gHUD.GetSpriteRect(m_HUD_bucket0).bottom - gHUD.GetSpriteRect(m_HUD_bucket0).top);
-
+	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blacka");
 	// If we've already loaded weapons, let's get new sprites
 	gWR.LoadAllWeaponSprites();
 
@@ -1143,15 +1147,18 @@ int CHudAmmo::Draw(float flTime)
 
 	// Draw Weapon Menu
 	DrawWList(flTime);
+	
 
 	// Draw ammo pickup history
-	gHR.DrawAmmoHistory( flTime );
+	if (!gHUD.m_csgohud->value)
+		gHR.DrawAmmoHistory( flTime );
 
 	if (!m_pWeapon)
 		return 0;
 
 	WEAPON *pw = m_pWeapon; // shorthand
-
+	if (gHUD.m_csgohud->value)
+		DrawWpnList(flTime);
 	// SPR_Draw Ammo
 	if ((pw->iAmmoType < 0) && (pw->iAmmo2Type < 0))
 		return 0;
@@ -1168,10 +1175,19 @@ int CHudAmmo::Draw(float flTime)
 	// Does this weapon have a clip?
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight/2;
 
+	if (gHUD.m_csgohud->value)
+	{
+		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
+		x = ScreenWidth - (8 * AmmoWidth) - iIconWidth;
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
+		m_pTexture_Black->Bind();
+		DrawUtils::Draw2DQuadScaled(x, y - gHUD.m_iFontHeight / 2, x + (8 * AmmoWidth) + iIconWidth, ScreenHeight);
+	}
 	// Does weapon have any ammo at all?
 	if (m_pWeapon->iAmmoType > 0)
 	{
-		DrawUtils::UnpackRGB(r, g, b, RGB_YELLOWISH);
+		DrawUtils::UnpackRGB(r, g, b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
 		DrawUtils::ScaleColors(r, g, b, a);
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
@@ -1181,13 +1197,14 @@ int CHudAmmo::Draw(float flTime)
 			// room for the number and the '|' and the current ammo
 			
 			x = ScreenWidth - (8 * AmmoWidth) - iIconWidth;
+	
 			x = DrawUtils::DrawHudNumber(x, y, iFlags | DHN_3DIGITS, pw->iClip, r, g, b);
 
 			int iBarWidth =  AmmoWidth/10;
 
 			x += AmmoWidth/2;
 
-			DrawUtils::UnpackRGB(r,g,b, RGB_YELLOWISH);
+			DrawUtils::UnpackRGB(r,g,b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
 
 			// draw the | bar
 			FillRGBA(x, y, iBarWidth, gHUD.m_iFontHeight, r, g, b, a);
@@ -1382,7 +1399,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	m_iAmmoLastCheck = g_iShotsFired;
 	m_flCrosshairDistance = max( m_flCrosshairDistance, (float)iDistance );
 	iLength = (m_flCrosshairDistance - iDistance) * 0.5 + 5;
-	
+
 	if ( m_iAlpha > 255 )
 		m_iAlpha = 255;
 	
@@ -1824,6 +1841,109 @@ int CHudAmmo::DrawWList(float flTime)
 
 }
 
+//
+// Draw Weapon Menu
+//
+int CHudAmmo::DrawWpnList(float flTime)
+{
+	int r, g, b, x, y, a, i;
+
+
+	a = 128; //!!!
+	x = ScreenWidth - g_iSelectionWidth * 1.1; //!!!;
+	y = ScreenHeight - g_iSelectionHeight * 7;
+
+	// Draw all of the buckets
+	for (i = 0; i < MAX_WEAPON_SLOTS; i++)
+	{
+		// If this is the active slot, draw the bigger pictures,
+		// otherwise just draw boxes
+
+		WEAPON* p = gWR.GetFirstPos(i);
+		for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
+		{
+			p = gWR.GetWeaponSlot(i, iPos);
+
+			if (!p || !p->iId)
+				continue;
+
+
+			// if active, then we must have ammo.
+			if (gWR.HasAmmo(p))
+			{
+				DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+				DrawUtils::ScaleColors(r, g, b, 192);
+			}
+			else
+			{
+				DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
+				DrawUtils::ScaleColors(r, g, b, 128);
+			}
+
+			if (p == m_pWeapon)
+			{
+				SPR_Set(p->hActive, r, g, b);
+				SPR_DrawAdditive(0, x, y, &p->rcActive);
+
+				SPR_Set(gHUD.GetSprite(m_HUD_selection), r, g, b);
+				SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_selection));
+			}
+			else
+			{
+				// Draw Weapon if Red if no ammo
+				SPR_Set(p->hInactive, r, g, b);
+				SPR_DrawAdditive(0, x, y, &p->rcInactive);							
+			}
+
+
+			// Draw Ammo Bar
+
+			DrawAmmoBar(p, x + giABWidth / 2, y, giABWidth, giABHeight);
+
+			x -= p->rcActive.right - p->rcActive.left - 5;
+		}
+		x = ScreenWidth - g_iSelectionWidth * 1.1;
+		y += g_iSelectionHeight * 1.2;
+	}
+
+		/*{
+			// Draw Row of weapons.
+			for (i = 0; i < MAX_WEAPON_SLOTS; i++)
+			{
+				y = giBucketHeight + 10;
+				DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+
+				for (int iPos = 0; iPos < MAX_WEAPON_POSITIONS; iPos++)
+				{
+					WEAPON* p = gWR.GetWeaponSlot(i, iPos);
+
+					if (!p || !p->iId)
+						continue;
+
+					if (gWR.HasAmmo(p))
+					{
+						DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+						a = 128;
+					}
+					else
+					{
+						DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
+						a = 96;
+					}
+
+					FillRGBA(x, y, giBucketWidth, giBucketHeight, r, g, b, a);
+
+					y += giBucketHeight + 5;
+				}
+
+				
+				}
+			}
+		}*/
+
+		return 1;
+
+}
 
 /*
 =================================
@@ -1835,7 +1955,7 @@ in the given sprite list 'pList'
 iCount is the number of items in the pList
 =================================
 */
-client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes, int iCount)
+client_sprite_t* GetSpriteList(client_sprite_t* pList, const char* psz, int iRes, int iCount)
 {
 	if (!pList)
 		return NULL;

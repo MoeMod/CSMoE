@@ -147,7 +147,9 @@ wrect_t HUD_GetSpriteRect( int index )
 }
 
 vec3_t g_ColorBlue	= { 0.6, 0.8, 1.0 };
-vec3_t g_ColorRed		= { 1.0, 0.25, 0.25 };
+vec3_t g_ColorcsgoBlue = { 0.45, 0.63, 0.82 };
+vec3_t g_ColorcsgoRed		= { 0.93, 0.78, 0.38 };
+vec3_t g_ColorRed = { 1.0, 0.25, 0.25 };
 vec3_t g_ColorGreen	= { 0.6, 1.0, 0.6 };
 vec3_t g_ColorYellow	= { 1.0, 0.7, 0.0 };
 vec3_t g_ColorGrey	= { 0.8, 0.8, 0.8 };

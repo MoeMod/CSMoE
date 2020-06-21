@@ -15,7 +15,8 @@ namespace sv {
 #define SCOUT_MAX_SPEED_ZOOM		220
 #define SCOUT_DAMAGE			75
 #define SCOUT_RANGE_MODIFER		0.98
-#define SCOUT_RELOAD_TIME		2
+#define SCOUT_RELOAD_TIME		2s
+#define SCOUT_INSPECT_TIME		4.48s
 
 class CSCOUT : public CBasePlayerWeapon
 {
@@ -29,6 +30,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return SCOUT_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -42,6 +45,7 @@ public:
 public:
 	void SCOUTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	int m_iShell;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireScout;

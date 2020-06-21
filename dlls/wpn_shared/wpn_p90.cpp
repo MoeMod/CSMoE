@@ -88,10 +88,15 @@ int CP90::GetItemInfo(ItemInfo *p)
 
 BOOL CP90::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
+
 	m_iShotsFired = 0;
 	m_bDelayFire = false;
 	m_flAccuracy = 0.2;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_p90.mdl", "models/p_p90.mdl", P90_DRAW, "carbine", UseDecrement() != FALSE);
 }
 
@@ -153,7 +158,7 @@ void CP90::P90Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
+	m_flLastFire = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.9, 0.45, 0.35, 0.04, 5.25, 3.5, 4);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -168,7 +173,7 @@ void CP90::Reload(void)
 {
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + P90_RELOAD_TIME;
 	if (DefaultReload(P90_MAX_CLIP, P90_RELOAD, 3.4s))
 	{
 #ifndef CLIENT_DLL
@@ -191,4 +196,21 @@ void CP90::WeaponIdle(void)
 	SendWeaponAnim(P90_IDLE1, UseDecrement() != FALSE);
 }
 
+void CP90::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
+}
 }

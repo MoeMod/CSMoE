@@ -270,8 +270,12 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m134xmas.cpp
 	../dlls/wpn_shared/wpn_mg3xmas.cpp
 	../dlls/wpn_shared/wpn_m95xmas.cpp
+	../dlls/wpn_shared/wpn_m4a1dragon.cpp
+	../dlls/wpn_shared/wpn_ak47dragon.cpp
+	../dlls/wpn_shared/wpn_knifedragon.cpp
 	../dlls/wpn_shared/wpn_m134ex.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
+	../dlls/wpn_shared/wpn_gunkata.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp

@@ -14,7 +14,8 @@ namespace sv {
 #define FIVESEVEN_MAX_SPEED		250
 #define FIVESEVEN_DAMAGE		20
 #define FIVESEVEN_RANGE_MODIFER		0.885
-#define FIVESEVEN_RELOAD_TIME		2.7
+#define FIVESEVEN_RELOAD_TIME		2.7s
+#define FIVESEVEN_INSPECT_TIME		4.48s
 
 class CFiveSeven : public CBasePlayerWeapon
 {
@@ -28,6 +29,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return FIVESEVEN_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -47,6 +50,7 @@ public:
 
 public:
 	int m_iShell;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireFiveSeven;

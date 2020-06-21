@@ -43,7 +43,7 @@
 
 #include "com_weapons.h"
 
-using namespace cl;
+namespace cl {
 
 extern CGameStudioModelRenderer g_StudioRenderer;
 extern engine_studio_api_t IEngineStudio;
@@ -1449,4 +1449,6 @@ void CStudioModelRenderer::StudioDrawShadow( Vector origin, float scale )
 	p4.z = pmtrace.endpos.z + 2.0f + pmtrace.plane.normal.x + pmtrace.plane.normal.y;
 
 	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1, p2, p3, p4 );
+}
+
 }

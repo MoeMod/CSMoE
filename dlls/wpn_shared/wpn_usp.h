@@ -15,7 +15,8 @@ namespace sv {
 #define USP_DAMAGE		34
 #define USP_DAMAGE_SIL		30
 #define USP_RANGE_MODIFER	0.79
-#define USP_RELOAD_TIME		2.7
+#define USP_RELOAD_TIME		2.7s
+#define USP_INSPECT_TIME		4.48s
 
 class CUSP : public CBasePlayerWeapon
 {
@@ -28,6 +29,8 @@ public:
 	int iItemSlot() override { return PISTOL_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return USP_INSPECT_TIME; }
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
@@ -43,6 +46,7 @@ public:
 public:
 	void USPFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	NOXREF void MakeBeam();
+	time_point_t m_NextInspect;
 	NOXREF void BeamUpdate();
 
 	int m_iShell;

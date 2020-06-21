@@ -14,7 +14,8 @@ namespace sv {
 #define MAC10_MAX_SPEED			250
 #define MAC10_DAMAGE			29
 #define MAC10_RANGE_MODIFER		0.82
-#define MAC10_RELOAD_TIME		3.15
+#define MAC10_RELOAD_TIME		3.15s
+#define MAC10_INSPECT_TIME		4.48s
 
 class CMAC10 : public CBasePlayerWeapon
 {
@@ -28,6 +29,8 @@ public:
 	void PrimaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return MAC10_INSPECT_TIME; }
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
@@ -42,6 +45,7 @@ public:
 
 	int m_iShell;
 	int iShellOn;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireMAC10;

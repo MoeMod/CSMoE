@@ -98,12 +98,15 @@ BOOL CFiveSeven::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_fiveseven.mdl", "models/shield/p_shield_fiveseven.mdl", FIVESEVEN_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_fiveseven.mdl", "models/p_fiveseven.mdl", FIVESEVEN_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CFiveSeven::PrimaryAttack(void)
@@ -190,7 +193,7 @@ void CFiveSeven::Reload(void)
 {
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
-
+	m_NextInspect = gpGlobals->time + FIVESEVEN_RELOAD_TIME;
 	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, 2.7s))
 	{
 #ifndef CLIENT_DLL
@@ -235,5 +238,23 @@ float CFiveSeven::GetDamage() const
 		flDamage = 20.0f;
 #endif
 	return flDamage;
+}
+
+void CFiveSeven::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			m_flLastFire = invalid_time_point;
+		}
+	}
+
 }
 }

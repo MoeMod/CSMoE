@@ -137,11 +137,12 @@ CGameRules *InstallGameRules()
 	SERVER_COMMAND("exec game.cfg\n");
 	SERVER_EXECUTE();
 
+	InstallBteMod(gamemode.string);
+
 	if (!gpGlobals->deathmatch)
 		return new CHalfLifeTraining;
 
 	//return new CHalfLifeMultiplay;
-	InstallBteMod(gamemode.string);
 	return dynamic_cast<CHalfLifeMultiplay *>(g_pModRunning);
 }
 

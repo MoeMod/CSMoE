@@ -59,6 +59,9 @@ cvar_t *cl_gunbubbles, *cl_tracereffect;
 	DECLARE_EVENT(FireMP7A1D_Right);
 	DECLARE_EVENT(FireWA2000);
 	DECLARE_EVENT(FireM95);
+	DECLARE_EVENT(FireM4A1Dragon);
+	DECLARE_EVENT(FireAK47Dragon);
+	DECLARE_EVENT(KnifeDragon);
 	DECLARE_EVENT(FireAS50);
 	DECLARE_EVENT(FireKRISS);
 	DECLARE_EVENT(FireTHOMPSON);
@@ -109,6 +112,7 @@ cvar_t *cl_gunbubbles, *cl_tracereffect;
 	DECLARE_EVENT(FireM4A1X);
 	DECLARE_EVENT(FireM4A1MW);
 	DECLARE_EVENT(FireAK47X);
+	DECLARE_EVENT(FireGunkata);
 /*
 ======================
 Game_HookEvents
@@ -185,6 +189,9 @@ void Game_HookEvents( void )
 	HOOK_EVENT(mg3, FireMG3);
 	HOOK_EVENT(mg3xmas, FireMG3xmas);
 	HOOK_EVENT(m95xmas, FireM95xmas);
+	HOOK_EVENT(m4a1dragon, FireM4A1Dragon);
+	HOOK_EVENT(ak47dragon, FireAK47Dragon);
+	HOOK_EVENT(knifedragon, KnifeDragon);
 	HOOK_EVENT(janus7xmas, FireJanus7xmas);
 	HOOK_EVENT(chainsaw, FireChainsaw);
 	HOOK_EVENT(desperado, FireDesperado);
@@ -214,6 +221,7 @@ void Game_HookEvents( void )
 	HOOK_EVENT(m4a1x, FireM4A1X);
 	HOOK_EVENT(m4a1mw, FireM4A1MW);
 	HOOK_EVENT(ak47x, FireAK47X);
+	HOOK_EVENT(gunkata, FireGunkata);
 
 	cl_gunbubbles = gEngfuncs.pfnRegisterVariable("cl_gunbubbles", "2", FCVAR_ARCHIVE);
 	cl_tracereffect = gEngfuncs.pfnRegisterVariable("cl_tracereffect", "0", FCVAR_ARCHIVE);

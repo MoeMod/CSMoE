@@ -15,7 +15,8 @@ namespace sv {
 #define G3SG1_MAX_SPEED_ZOOM	150
 #define G3SG1_DAMAGE		80
 #define G3SG1_RANGE_MODIFER	0.98
-#define G3SG1_RELOAD_TIME	3.5
+#define G3SG1_RELOAD_TIME	3.5s
+#define G3SG1_INSPECT_TIME		4.48s
 
 class CG3SG1 : public CBasePlayerWeapon
 {
@@ -29,6 +30,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return G3SG1_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -43,6 +46,7 @@ public:
 	void G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;
 	int m_iShell;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireG3SG1;
