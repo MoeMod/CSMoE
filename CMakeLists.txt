@@ -10,11 +10,7 @@ option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) #
 
 option(XASH_PCH "Enable PCH support." ON)
 
-if(WIN32)
-	option(XASH_VCPKG "Enable VCPKG support." ON)
-else()
-	option(XASH_VCPKG "Enable VCPKG support." OFF)
-endif()
+option(XASH_VCPKG "Enable VCPKG support." OFF)
 
 if(XASH_PCH)
 	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler/")
@@ -105,7 +101,8 @@ set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
 if(XASH_IMGUI)
-    if(XASH_VCPKG)
+	# TODO : since vcpkg doesn't provide with imgui_internal.h, just use our own one
+    if(XASH_VCPKG AND FALSE)
 		find_package(imgui CONFIG REQUIRED)
 		add_library(imgui INTERFACE)
 		target_link_libraries(imgui INTERFACE imgui::imgui)

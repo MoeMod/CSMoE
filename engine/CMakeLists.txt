@@ -22,7 +22,7 @@
 cmake_minimum_required(VERSION  2.8.0)
 project(XASH_ENGINE C)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set(XASH_ENGINE xash) # Lib name
 
