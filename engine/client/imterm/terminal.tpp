@@ -1029,33 +1029,7 @@ std::pair<bool, std::string> terminal<TerminalHelper>::resolve_history_reference
 	state current_state = state::nothing;
 
 	auto resolve = [&](std::string_view history_request, bool add_escaping = true) -> bool {
-		bool local_modified{};
-		std::optional<std::string> solved = resolve_history_reference(history_request, local_modified);
-		if (!solved) {
-			return false;
-		}
-
-		auto is_space_lbd = [&solved, this](char c) {
-			return is_space({&c, static_cast<unsigned>(&solved.value()[solved->size() - 1] + 1 - &c)}) > 0;
-		};
-
-		modified |= local_modified;
-		if (add_escaping) {
-			if (solved->empty()) {
-				ans += R"("")";
-			} else if (std::find_if(solved->begin(), solved->end(), is_space_lbd) != solved->end()) {
-				ans += '"';
-				ans += *solved;
-				ans += '"';
-			} else {
-				ans += *solved;
-			}
-		} else {
-			ans += *solved;
-		}
-		substr_beg = std::next(it);
-		current_state = state::nothing;
-		return true;
+		return false;
 	};
 
 	const char* const end = str.data() + str.size();
@@ -1231,23 +1205,6 @@ int terminal<TerminalHelper>::command_line_callback(ImGuiInputTextCallbackData* 
 			if (excl == m_command_buffer.data() + data->CursorPos - 1 && m_command_buffer[data->CursorPos - 2] == '!') {
 				--excl;
 			}
-			bool modified{};
-			std::string_view reference{excl, static_cast<unsigned>(m_command_buffer.data() + data->CursorPos - excl)};
-			std::optional<std::string> val = resolve_history_reference(reference, modified);
-			if (!modified) {
-				return 0;
-			}
-
-			if (reference.substr(reference.size() - 2) != ":*" && reference.find(':') != std::string_view::npos) {
-				auto is_space_lbd = [&val, this] (char c) {
-					return is_space({&c, static_cast<unsigned>(&val.value()[val->size()] + 1 - &c)}) > 0;
-				};
-
-				if (std::find_if(val->begin(), val->end(), is_space_lbd) != val->end()) {
-					val = '"' + std::move(*val) + '"';
-				}
-			}
-			auto_complete_buffer(std::move(*val), static_cast<unsigned>(reference.size()));
 
 			return 0;
 		}
