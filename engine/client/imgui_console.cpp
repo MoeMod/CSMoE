@@ -244,8 +244,14 @@ void ImGui_Console_OnGUI(void)
 	if (!enabled)
 		return;
 	
-	ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-	ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Appearing);
+	if (set_focus)
+	{
+		ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
+		//ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Always);
+		auto size = ImGuiUtils::GetScaledSize(ImVec2(640, 480));
+		s_term.set_width(size.x);
+		s_term.set_height(size.y);
+	}
 
 	if (!s_term.show({  }, &enabled) || !enabled)
 	{

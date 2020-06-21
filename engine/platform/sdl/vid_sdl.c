@@ -399,14 +399,7 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 	{
 		float dpi = 0.0f;
 		qboolean success = false;
-#if defined(XASH_WINRT)
-		dpi = WinRT_GetDisplayDPI();
-		success = dpi > 0.0f;
-#else
-		int display = SDL_GetWindowDisplayIndex(host.hWnd);
-		// MoeMod : why returning 0 on success???
-		success = !SDL_GetDisplayDPI(display, &dpi, NULL, NULL);
-#endif
+		success = VID_GetDPI(&dpi);
 		if (success)
 			Cvar_SetFloat("hud_scale", dpi);
 	}
@@ -552,6 +545,23 @@ qboolean VID_SetMode( void )
 		}
 	}
 	return true;
+}
+
+qboolean VID_GetDPI(float* out)
+{
+	float dpi;
+	qboolean success;
+#if defined(XASH_WINRT)
+	dpi = WinRT_GetDisplayDPI();
+	success = dpi > 0.0f;
+#else
+	int display = SDL_GetWindowDisplayIndex(host.hWnd);
+	// MoeMod : why returning 0 on success???
+	success = !SDL_GetDisplayDPI(display, &dpi, NULL, NULL);
+#endif
+	if (success && out)
+		*out = dpi;
+	return success;
 }
 
 #endif // XASH_VIDEO
