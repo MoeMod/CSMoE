@@ -23,6 +23,7 @@
 #include <optional>
 #include <iterator>
 #include <algorithm>
+#include <cstring>
 #ifdef IMTERM_ENABLE_REGEX
 #include <regex>
 #endif
