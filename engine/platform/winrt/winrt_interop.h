@@ -16,6 +16,11 @@ void WinRT_OpenGameFolderWithExplorer();
 void WinRT_SetClipboardData(const char* buffer, size_t size);
 void WinRT_GetClipboardData(char* buffer, size_t size);
 
+// related to window, not scaled
+void WinRT_ImeSetInputScreenPos(int x, int y);
+void WinRT_ImeCreateContext();
+void WinRT_ImeEnableTextInput(int enable, int force);
+
 #ifdef __cplusplus
 }
 #endif

@@ -31,6 +31,15 @@ extern "C" {
 #include <algorithm>
 #include <memory>
 
+#ifdef XASH_SDL
+#include <SDL.h>
+#include <SDL_syswm.h>
+#endif
+
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
+
 // Data
 double g_Time = 0.0;
 bool g_MouseJustPressed[5] = { false, false, false, false, false };
@@ -278,6 +287,18 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	// Restore state
 	//pglBindTexture(GL_TEXTURE_2D, last_texture);
 
+	// fix IME
+#ifdef XASH_SDL
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+#if defined _WIN32 && !defined XASH_WINRT
+	io.ImeWindowHandle = wmInfo.info.win.window;
+#elif defined XASH_WINRT
+	io.ImeSetInputScreenPosFn = [](int x, int y) { WinRT_ImeSetInputScreenPos(x , y); };
+#endif
+#endif
+
 	return true;
 }
 
@@ -364,9 +385,6 @@ qboolean ImGui_ImplGL_Init(void)
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
-#ifdef _WIN32
-	io.ImeWindowHandle = NULL;
-#endif
 
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();

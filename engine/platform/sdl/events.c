@@ -186,27 +186,7 @@ SDLash_InputEvent
 */
 static void SDLash_InputEvent( SDL_TextInputEvent input )
 {
-#ifdef XASH_IMGUI
-	if(ImGui_ImplGL_CharCallbackUTF( input.text ))
-		return;
-#endif
-	int i;
-
-	// Pass characters one by one to Con_CharEvent
-	for(i = 0; input.text[i]; ++i)
-	{
-		int ch;
-
-		if( !Q_stricmp( cl_charset->string, "utf-8" ) )
-			ch = (unsigned char)input.text[i];
-		else
-			ch = Con_UtfProcessCharForce( (unsigned char)input.text[i] );
-
-		if( !ch )
-			continue;
-
-		CL_CharEvent( ch );
-	}
+	CL_CharEventUTF(input.text);
 }
 
 /*

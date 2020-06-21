@@ -67,7 +67,7 @@ struct TerminalHelper {
 			return {};
 
 		static command_type current;
-		current = { prefix, "", CommandCallback };
+		current = { prefix, "", CommandCallback, CompleteNullCallback };
 
 		std::vector<command_type_cref> ret;
 		for (auto first = m_Commands.lower_bound({ prefix }); first != m_Commands.end(); ++first)
@@ -104,6 +104,11 @@ struct TerminalHelper {
 	}
 
 	static std::vector<std::string> CompleteCmdCallback(ImTerm::argument_t<term_t>& arg)
+	{
+		return {};
+	}
+
+	static std::vector<std::string> CompleteNullCallback(ImTerm::argument_t<term_t>& arg)
 	{
 		return {};
 	}
