@@ -637,8 +637,14 @@ void IN_MouseMove( void )
 #endif
 
 #ifdef XASH_IMGUI
-	if(ImGui_ImplGL_MouseMove( current_pos.x, current_pos.y ))
+	if (ImGui_ImplGL_MouseMove(current_pos.x, current_pos.y))
+	{
+#ifdef XASH_SDL
+		SDL_ShowCursor( SDL_TRUE );
+#endif
+		IN_ActivateCursor();
 		return;
+	}
 #endif
 
 	VGui_MouseMove( current_pos.x, current_pos.y );

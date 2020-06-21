@@ -66,4 +66,5 @@ DF_GENERATE_TEMPLATE_GETTER(SpreadCalcNotOnGround) // TPrimaryAttackRifle
 DF_GENERATE_TEMPLATE_GETTER(SpreadCalcWalking) // TPrimaryAttackRifle
 DF_GENERATE_TEMPLATE_GETTER(SpreadCalcDucking) // TPrimaryAttackRifle
 DF_GENERATE_TEMPLATE_GETTER(SpreadCalcZoomed) // TPrimaryAttackRifle
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(PlayerAttackAnimation, PLAYER_ATTACK1) // TFirePistol
 }

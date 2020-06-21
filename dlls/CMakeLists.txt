@@ -183,7 +183,6 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_tank.cpp
 	./gamemode/zb2/zb2_zclass_speed.cpp
 	./gamemode/mod_zbb.cpp
-	./weapons_moe_buy.cpp
 	./weapons_precache.cpp
 	./gamemode/zbb/zbb_basebuilder.cpp
 	./gamemode/zbb/zbb_ghost.cpp
@@ -276,6 +275,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_knifedragon.cpp
 	../dlls/wpn_shared/wpn_m134ex.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
+	../dlls/wpn_shared/wpn_gunkata.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp

@@ -246,6 +246,9 @@
     <ClInclude Include="..\engine\client\imgui_lcsm_warning.h">
       <Filter>engine\client\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="..\engine\client\imgui_console.h">
+      <Filter>engine\client\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\engine\client\gl_warp.c">
@@ -680,10 +683,14 @@
     <ClCompile Include="..\engine\client\imgui_impl_xash.cpp">
       <Filter>engine\client\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\engine\client\imgui_console.cpp">
+      <Filter>engine\client\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\engine\common\soundlib\libmpg\libmpg.dsp">
       <Filter>engine\common\soundlib\libmpg</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

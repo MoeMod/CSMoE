@@ -46,7 +46,6 @@
     <ClCompile Include="xash_winrt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="Microsoft.UniversalCRT.Debug, Version=10.0.17763.0" />
     <SDKReference Include="Microsoft.VCLibs.Desktop, Version=14.0" />
   </ItemGroup>
   <ItemGroup>
