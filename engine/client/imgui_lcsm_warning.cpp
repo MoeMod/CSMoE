@@ -39,10 +39,8 @@ void ImGui_LCSM_OnGUI(void)
 	if (!lcsm_enabled)
 		return;
 
-	ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-	ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 320)), ImGuiCond_Appearing);
-
-	if (ImGui::Begin("CSMoE LCSM Warning", &lcsm_enabled, ImGuiWindowFlags_NoResize)) {
+	ImGui::OpenPopup("CSMoE LCSM Warning");
+	if (ImGui::BeginPopupModal("CSMoE LCSM Warning", &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::Text("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)");
 		ImGui::Text("版权所有：BTE Team|CSMoE Team|百度csoldjb吧");
 		ImGui::Text("本游戏采用GPLv3协议完全开源免费，请勿使用本游戏进行任何形式的盈利");
@@ -78,6 +76,6 @@ void ImGui_LCSM_OnGUI(void)
 		if (ImGui::Button("退出游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			exit(0);
 		}
-		ImGui::End();
+		ImGui::EndPopup();
 	}
 }
