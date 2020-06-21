@@ -341,6 +341,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 			WinRT_FullscreenMode_Install(fullscreen);
 		}
 		WinRT_BackButton_Install();
+		WinRT_ImeCreateContext();
 	}
 #endif
 	

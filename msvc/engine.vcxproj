@@ -35,6 +35,7 @@
     <ClInclude Include="..\engine\client\gl_local.h" />
     <ClInclude Include="..\engine\client\gl_static.h" />
     <ClInclude Include="..\engine\client\gl_vidnt.h" />
+    <ClInclude Include="..\engine\client\imgui_console.h" />
     <ClInclude Include="..\engine\client\imgui_impl_xash.h" />
     <ClInclude Include="..\engine\client\imgui_lcsm_warning.h" />
     <ClInclude Include="..\engine\client\input.h" />
@@ -130,6 +131,7 @@
     <ClCompile Include="..\engine\client\gl_sprite.c" />
     <ClCompile Include="..\engine\client\gl_studio.c" />
     <ClCompile Include="..\engine\client\gl_warp.c" />
+    <ClCompile Include="..\engine\client\imgui_console.cpp" />
     <ClCompile Include="..\engine\client\imgui_impl_xash.cpp" />
     <ClCompile Include="..\engine\client\imgui_lcsm_warning.cpp" />
     <ClCompile Include="..\engine\client\input.c" />
@@ -246,6 +248,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\engine\common\soundlib\libmpg\libmpg.dsp" />
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -362,10 +365,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
     <Link>
@@ -378,10 +384,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
     <Link>
@@ -393,11 +402,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui.lib;SDL2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -410,10 +422,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;XASH_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -429,10 +444,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;XASH_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -447,11 +465,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XASH_IMGUI;XASH_STATIC_GAMELIB;XASH_WES;XASH_GLES;XASH_BUILD_COMMIT="$(Configuration)";XASH_VGUI;XASH_SDL;XASH_FORCEINLINE;XASH_FASTSTR;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;XASH_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -460,6 +481,5 @@
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

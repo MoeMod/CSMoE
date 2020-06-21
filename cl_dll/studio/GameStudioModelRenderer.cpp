@@ -47,9 +47,7 @@
 #define ANIM_FIRST_EMOTION_SEQUENCE 198
 #define ANIM_LAST_EMOTION_SEQUENCE 207
 
-using cl::QuaternionMatrix;
-using cl::ConcatTransforms;
-using cl::MatrixCopy;
+namespace cl {
 
 CGameStudioModelRenderer g_StudioRenderer;
 
@@ -1100,6 +1098,8 @@ r_studio_interface_t studio =
 	R_StudioDrawPlayer,
 };
 
+}
+
 /*
 ====================
 HUD_GetStudioModelInterface
@@ -1112,13 +1112,13 @@ int DLLEXPORT HUD_GetStudioModelInterface( int version, struct r_studio_interfac
 		return 0;
 
 	// Point the engine to our callbacks
-	*ppinterface = &studio;
+	*ppinterface = &cl::studio;
 
 	// Copy in engine helper functions
-	IEngineStudio = *pstudio;
+	cl::IEngineStudio = *pstudio;
 
 	// Initialize local variables, etc.
-	R_StudioInit();
+	cl::R_StudioInit();
 
 	// Success
 	return 1;

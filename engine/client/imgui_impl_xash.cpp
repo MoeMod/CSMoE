@@ -23,13 +23,22 @@ extern "C" {
 
 #include "imgui.h"
 #include "imgui_impl_xash.h"
-#include "imgui_internal.h"
 #include "imgui_lcsm_warning.h"
+#include "imgui_console.h"
 
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
 #include <memory>
+
+#ifdef XASH_SDL
+#include <SDL.h>
+#include <SDL_syswm.h>
+#endif
+
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
 
 // Data
 double g_Time = 0.0;
@@ -41,6 +50,11 @@ GLuint g_FontTexture = 0;
 float g_ImGUI_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
+
+template<typename T> static inline T ImLerp(T a, T b, float t) { return (T)(a + (b - a) * t); }
+static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t) { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
+static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t) { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
+static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t) { return ImVec4(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t); }
 
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
@@ -208,7 +222,7 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 			KeyCallback(key, down);
 			break;
 	}
-	return io.WantCaptureKeyboard;
+	return io.WantCaptureKeyboard || io.WantCaptureMouse;
 }
 
 void ImGui_ImplGL_CharCallback(unsigned int c)
@@ -273,6 +287,18 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	// Restore state
 	//pglBindTexture(GL_TEXTURE_2D, last_texture);
 
+	// fix IME
+#ifdef XASH_SDL
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+#if defined _WIN32 && !defined XASH_WINRT
+	io.ImeWindowHandle = wmInfo.info.win.window;
+#elif defined XASH_WINRT
+	io.ImeSetInputScreenPosFn = [](int x, int y) { WinRT_ImeSetInputScreenPos(x , y); };
+#endif
+#endif
+
 	return true;
 }
 
@@ -295,20 +321,30 @@ void ImGui_ImplGL_ReloadFonts()
 	int		i;
 
 	t = FS_Search( "resource/font/*.ttf", true, false );
-	if( !t ) return;
-
-	for( i = 0; i < t->numfilenames; i++ )
+	if (t)
 	{
-		const char *filename = t->filenames[i];
-		fs_offset_t length = 0;
-		auto file = FS_LoadFile(filename, &length, false);
-		std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
-		memcpy(new_ptr.get(), file, length);
-		Mem_Free( std::exchange(file, nullptr) );
-		auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		for (i = 0; i < t->numfilenames; i++)
+		{
+			const char* filename = t->filenames[i];
+			fs_offset_t length = 0;
+			auto file = FS_LoadFile(filename, &length, false);
+			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
+			memcpy(new_ptr.get(), file, length);
+			Mem_Free(std::exchange(file, nullptr));
+			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		}
+		Mem_Free(t);
+	}
+	else
+	{
+#ifdef _WIN32
+		char buffer[MAX_PATH];
+		GetSystemDirectoryA(buffer, sizeof(buffer));
+		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
+		auto font = io.Fonts->AddFontFromFileTTF(buffer, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+#endif
 	}
 
-	Mem_Free( t );
 }
 
 qboolean ImGui_ImplGL_Init(void)
@@ -339,15 +375,16 @@ qboolean ImGui_ImplGL_Init(void)
 	io.KeyMap[ImGuiKey_Y] = 'y';
 	io.KeyMap[ImGuiKey_Z] = 'z';
 
+	io.SetClipboardTextFn = [](void* user_data, const char* text) { Sys_SetClipboardData((const byte *)text, strlen(text)); };
+	io.GetClipboardTextFn = [](void* user_data) -> const char * { return Sys_GetClipboardData(); };
+	io.ClipboardUserData = nullptr;
+
 	//io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableSetMousePos;
 	io.IniFilename = nullptr;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
-#ifdef _WIN32
-	io.ImeWindowHandle = NULL;
-#endif
 
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();
@@ -450,7 +487,7 @@ void ImGui_ImplGL_NewFrame(void)
 	ImGui::GetStyle() = nst;
 
 	// Setup time step
-	double current_time = cl.time;
+	double current_time = Sys_DoubleTime();
 	io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f / 60.0f);
 	io.DeltaTime = io.DeltaTime > 0.0f ? io.DeltaTime : 0.0f;	// NOTE: ??? Must be greater than zero
 	g_Time = current_time;
@@ -508,12 +545,15 @@ void Engine_OnGUI(struct ImGuiContext *context)
 {
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
+	ImGui_Console_OnGUI();
 }
 
 void ImGui_ImplGL_OnGUI(void)
 {
 	if(clgame.dllFuncs.pfnOnGUI)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
+	if (menu.dllFuncs.pfnOnGUI)
+		menu.dllFuncs.pfnOnGUI(g_EngineContext);
 
 	Engine_OnGUI(g_EngineContext);
 }

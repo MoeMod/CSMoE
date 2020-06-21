@@ -72,31 +72,31 @@ void CImGuiBuyMenu::OnGUI() {
 	const bool CT = g_iTeamNumber != TEAM_TERRORIST;
 
 
-	ImGui::Begin("¹ºÂòÎäÆ÷");
-	ImGui::Text("½ö¹©²âÊÔÊ¹ÓÃ");
+	ImGui::Begin("è´­ä¹°æ­¦å™¨");
+	ImGui::Text("ä»…ä¾›æµ‹è¯•ä½¿ç”¨");
 	static int CurItem = 0;
 	ImGui::SetNextItemOpen(CurItem == 1);
-	if (ImGui::CollapsingHeader("ÊÖÇ¹"))
+	if (ImGui::CollapsingHeader("æ‰‹æžª"))
 	{
 		ImGuiWpn::WeaponSection("1. USP45", "usp");
 		ImGuiWpn::WeaponSection("2. Glock", "glock");
 		ImGuiWpn::WeaponSection("3. P228", "p228");
-		ImGuiWpn::WeaponSection("4. É³Ä®Ö®Ó¥", "deagle");
+		ImGuiWpn::WeaponSection("4. æ²™æ¼ ä¹‹é¹°", "deagle");
 		if(CT)
 			ImGuiWpn::WeaponSection("5. FiveSeven", "fiveseven");
 		else
-			ImGuiWpn::WeaponSection("5. Ë«³ÖElites", "elites");
+			ImGuiWpn::WeaponSection("5. åŒæŒElites", "elites");
 		CurItem = 1;
 	}
 	ImGui::SetNextItemOpen(CurItem == 2);
-	if (ImGui::CollapsingHeader("É¢µ¯Ç¹"))
+	if (ImGui::CollapsingHeader("æ•£å¼¹æžª"))
 	{
 		ImGuiWpn::WeaponSection("1. M3", "m3");
 		ImGuiWpn::WeaponSection("2. XM1014", "xm1014");
 		CurItem = 2;
 	}
 	ImGui::SetNextItemOpen(CurItem == 3);
-	if (ImGui::CollapsingHeader("³å·æÇ¹"))
+	if (ImGui::CollapsingHeader("å†²é”‹æžª"))
 	{
 		if(CT)
 			ImGuiWpn::WeaponSection("1. TMP", "tmp");
@@ -108,7 +108,7 @@ void CImGuiBuyMenu::OnGUI() {
 		CurItem = 3;
 	}
 	ImGui::SetNextItemOpen(CurItem == 4);
-	if (ImGui::CollapsingHeader("×Ô¶¯²½Ç¹"))
+	if (ImGui::CollapsingHeader("è‡ªåŠ¨æ­¥æžª"))
 	{
 		if(CT)
 		{
@@ -132,40 +132,40 @@ void CImGuiBuyMenu::OnGUI() {
 		CurItem = 4;
 	}
 	ImGui::SetNextItemOpen(CurItem == 5);
-	if (ImGui::CollapsingHeader("»úÇ¹"))
+	if (ImGui::CollapsingHeader("æœºæžª"))
 	{
 		ImGuiWpn::WeaponSection("1. M249", "m249");
 		CurItem = 5;
 	}
-	ImGuiWpn::WeaponSection("Ö÷ÎäÆ÷µ¯Ò©", "primammo");
-	ImGuiWpn::WeaponSection("¸±ÎäÆ÷µ¯Ò©", "secammo");
+	ImGuiWpn::WeaponSection("ä¸»æ­¦å™¨å¼¹è¯", "primammo");
+	ImGuiWpn::WeaponSection("å‰¯æ­¦å™¨å¼¹è¯", "secammo");
 	ImGui::SetNextItemOpen(CurItem == 8);
-	if (ImGui::CollapsingHeader("×°±¸"))
+	if (ImGui::CollapsingHeader("è£…å¤‡"))
 	{
-		ImGuiWpn::WeaponSection("1. ·Àµ¯ÒÂ", "vest");
-		ImGuiWpn::WeaponSection("2. ·Àµ¯ÒÂ+·Àµ¯Í·¿ø", "vesthelm");
-		ImGuiWpn::WeaponSection("3. ÉÁ¹âµ¯", "flash");
-		ImGuiWpn::WeaponSection("4. ¸ß±¬ÊÖÀ×", "hegren");
-		ImGuiWpn::WeaponSection("5. ÑÌÎíµ¯", "sgren");
+		ImGuiWpn::WeaponSection("1. é˜²å¼¹è¡£", "vest");
+		ImGuiWpn::WeaponSection("2. é˜²å¼¹è¡£+é˜²å¼¹å¤´ç›”", "vesthelm");
+		ImGuiWpn::WeaponSection("3. é—ªå…‰å¼¹", "flash");
+		ImGuiWpn::WeaponSection("4. é«˜çˆ†æ‰‹é›·", "hegren");
+		ImGuiWpn::WeaponSection("5. çƒŸé›¾å¼¹", "sgren");
 		if(CT)
 		{
-			ImGuiWpn::WeaponSection("6. ²ðµ¯Æ÷", "defuser");
-			ImGuiWpn::WeaponSection("7. Ò¹ÊÓÒÇ", "nvgs");
-			//ImGuiWpn::WeaponSection("8. ·À±¬¶Ü", "shield");
+			ImGuiWpn::WeaponSection("6. æ‹†å¼¹å™¨", "defuser");
+			ImGuiWpn::WeaponSection("7. å¤œè§†ä»ª", "nvgs");
+			//ImGuiWpn::WeaponSection("8. é˜²çˆ†ç›¾", "shield");
 		}
 		else
 		{
-			ImGuiWpn::WeaponSection("6. Ò¹ÊÓÒÇ", "nvgs");
+			ImGuiWpn::WeaponSection("6. å¤œè§†ä»ª", "nvgs");
 		}
 		CurItem = 8;
 	}
 	ImGui::SetNextItemOpen(CurItem == 9);
-	if (ImGui::CollapsingHeader("½üÉíÎäÆ÷"))
+	if (ImGui::CollapsingHeader("è¿‘èº«æ­¦å™¨"))
 	{
-		ImGuiWpn::WeaponSection("1. º£±ª¶Ìµ¶");
+		ImGuiWpn::WeaponSection("1. æµ·è±¹çŸ­åˆ€");
 		CurItem = 9;
 	}
-	if (ImGuiWpn::WeaponSection("¹Ø±Õ"))
+	if (ImGuiWpn::WeaponSection("å…³é—­"))
 		pimpl->draw = false;
 
 	//ImGui::PopStyleVar(ImGuiStyleVar_SelectableTextAlign);

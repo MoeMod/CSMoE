@@ -1,17 +1,22 @@
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/Windows.UI.Text.h>
+#include <winrt/Windows.UI.Text.Core.h>
+#include <winrt/Windows.UI.ViewManagement.h>
+#include <winrt/Windows.Applicationmodel.Core.h>
+#include <winrt/Windows.ApplicationModel.UserDataAccounts.h>
+#include <winrt/Windows.ApplicationModel.UserDataAccounts.Provider.h>
+#include <winrt/Windows.ApplicationModel.UserDataAccounts.SystemAccess.h>
+#include <winrt/Windows.Graphics.Display.h>
+#include <winrt/Windows.System.h>
+#include <winrt/Windows.Storage.h>
+#include <winrt/Windows.Storage.Pickers.h>
+#include <winrt/Windows.Storage.AccessCache.h>
+#include <winrt/Windows.ApplicationModel.DataTransfer.h>
 
-#include <wrl.h>
-#include <Windows.UI.ViewManagement.h>
-#include <Windows.applicationmodel.Core.h>
-#include <Windows.ApplicationModel.UserDataAccounts.h>
-#include <Windows.ApplicationModel.UserDataAccounts.Provider.h>
-#include <Windows.ApplicationModel.UserDataAccounts.SystemAccess.h>
-#include <Windows.Graphics.Display.h>
-#include <Windows.System.h>
-#include <windows.Storage.h>
-#include <windows.Storage.Pickers.h>
-#include <windows.Storage.AccessCache.h>
+#include <msctf.h>
+#include <ctffunc.h>
 
-#include <thread>
+#include <SDL_Video.h>
 
 #include "winrt_interop.h"
 extern "C" {
@@ -22,258 +27,95 @@ extern "C" {
 	void Key_Event(int key, int down);
 }
 
-using namespace Microsoft::WRL;
-using namespace Microsoft::WRL::Wrappers;
-using namespace ABI::Windows::Foundation;
-using namespace ABI::Windows::Foundation::Collections;
-using namespace ABI::Windows::UI;
-using namespace ABI::Windows::UI::Core;
-using namespace ABI::Windows::UI::ViewManagement;
-using namespace ABI::Windows::ApplicationModel;
-using namespace ABI::Windows::ApplicationModel::Core;
-using namespace ABI::Windows::ApplicationModel::UserDataAccounts;
-using namespace ABI::Windows::Graphics::Display;
-using namespace ABI::Windows::System;
-using namespace ABI::Windows::Storage;
-using namespace ABI::Windows::Storage::Pickers;
-using namespace ABI::Windows::Storage::AccessCache;
+#include <functional>
+#include <future>
 
-#if 0
-class ColorReference : public RuntimeClass<RuntimeClassFlags<WinRt>, __FIReference_1_Windows__CUI__CColor>
+using namespace winrt::Windows::Foundation;
+using namespace winrt::Windows::Foundation::Collections;
+using namespace winrt::Windows::UI;
+using namespace winrt::Windows::UI::Core;
+using namespace winrt::Windows::UI::Text;
+using namespace winrt::Windows::UI::Text::Core;
+using namespace winrt::Windows::UI::ViewManagement;
+using namespace winrt::Windows::ApplicationModel;
+using namespace winrt::Windows::ApplicationModel::Core;
+using namespace winrt::Windows::ApplicationModel::UserDataAccounts;
+using namespace winrt::Windows::Graphics::Display;
+using namespace winrt::Windows::System;
+using namespace winrt::Windows::Storage;
+using namespace winrt::Windows::Storage::Pickers;
+using namespace winrt::Windows::Storage::AccessCache;
+using namespace winrt::Windows::ApplicationModel::DataTransfer;
+
+void WinRT_FullscreenMode_Install(int fullscreen)
 {
-public:
-	HRESULT get_Value(Color* value) override { return *value = color, S_OK; }
-	Color color;
-private:
-	~ColorReference() {}
-};
-#endif
+	auto coreWindow = CoreWindow::GetForCurrentThread();
+	auto appView = ApplicationView::GetForCurrentView();
+	/*
+	coreWindow.SizeChanged([appView](auto, auto e) {
+		if(bool tablet_mode = UIViewSettings::GetForCurrentView().UserInteractionMode() == UserInteractionMode::Touch)
+			Cvar_Set("fullscreen", "1");
+	});
+	*/
+	if (fullscreen)
+		appView.TryEnterFullScreenMode();
+	appView.FullScreenSystemOverlayMode(FullScreenSystemOverlayMode::Minimal);
 
-void WinRT_FullscreenMode_Install(boolean fullscreen)
-{
-	HRESULT hr;
-	ComPtr<ICoreWindowStatic> coreWindowStatic;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_UI_Core_CoreWindow).Get(),
-		&coreWindowStatic);
+	auto titleBar = appView.TitleBar();
+	Color red = { 255, 232, 16, 35 };
+	Color red2 = { 255, 181, 113, 113 };
+	Color red3 = { 255, 188, 47, 46 };
+	Color red4 = { 255, 241, 112, 122 };
+	Color white = { 255, 255, 255, 255 };
+	Color black = { 255, 0, 0, 0 };
+	titleBar.BackgroundColor(red3);
+	titleBar.ButtonBackgroundColor(red3);
+	titleBar.ButtonInactiveBackgroundColor(red2);
+	titleBar.InactiveBackgroundColor(red2);
+	titleBar.ButtonHoverBackgroundColor(red);
+	titleBar.ButtonPressedBackgroundColor(red4);
 
-	ComPtr<ICoreWindow> coreWindow;
-	hr = coreWindowStatic->GetForCurrentThread(&coreWindow);
+	titleBar.ForegroundColor(white);
+	titleBar.ButtonForegroundColor(white);
+	titleBar.ButtonHoverForegroundColor(white);
+	titleBar.ButtonPressedForegroundColor(black);
+	titleBar.ButtonInactiveForegroundColor(white);
+	titleBar.InactiveForegroundColor(white);
 
-	ComPtr<IApplicationViewStatics2> applicationViewStatics2;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
-		&applicationViewStatics2);
-
-	ComPtr<IApplicationViewStatics3> applicationViewStatics3;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
-		&applicationViewStatics3);
-
-	ComPtr <IApplicationView> appView;
-	if (hr = applicationViewStatics2->GetForCurrentView(&appView), SUCCEEDED(hr))
-	{
-		ComPtr <IApplicationView3> appView3;
-		if (hr = appView.As(&appView3), SUCCEEDED(hr))
-		{
-			if(fullscreen)
-			{
-				boolean success;
-				hr = appView3->TryEnterFullScreenMode(&success);
-			}
-			
-			// disable the system gestures...
-			hr = appView3->put_FullScreenSystemOverlayMode(FullScreenSystemOverlayMode_Minimal);
-
-			// change title bar color
-#if 0
-			ComPtr<IApplicationViewTitleBar> titleBar;
-			if(hr = appView3->get_TitleBar(&titleBar), SUCCEEDED(hr))
-			{
-				ComPtr<IColorHelperStatics> colorHelperStatics;
-				hr = Windows::Foundation::GetActivationFactory(
-					HStringReference(RuntimeClass_Windows_UI_Core_CoreWindow).Get(),
-					&colorHelperStatics);
-
-				static ComPtr<ColorReference> red; hr = MakeAndInitialize<ColorReference>(&red); red->color = { 255, 232, 16, 35 };
-				static ComPtr<ColorReference> red2; hr = MakeAndInitialize<ColorReference>(&red2); red2->color = { 255, 181, 113, 113 };
-				static ComPtr<ColorReference> red3; hr = MakeAndInitialize<ColorReference>(&red3); red3->color = { 255, 188, 47, 46 };
-				static ComPtr<ColorReference> red4; hr = MakeAndInitialize<ColorReference>(&red4); red4->color = { 255, 241, 112, 122 };
-				static ComPtr<ColorReference> white; hr = MakeAndInitialize<ColorReference>(&white); white->color = { 255, 255, 255, 255 };
-				static ComPtr<ColorReference> black; hr = MakeAndInitialize<ColorReference>(&black); black->color = { 255, 0, 0, 0 };
-				
-				hr = titleBar->put_BackgroundColor(red3.Get());
-				hr = titleBar->put_ButtonBackgroundColor(red3.Get());
-				hr = titleBar->put_ButtonInactiveBackgroundColor(red2.Get());
-				hr = titleBar->put_InactiveBackgroundColor(red2.Get());
-				hr = titleBar->put_ButtonHoverBackgroundColor(red.Get());
-				hr = titleBar->put_ButtonPressedBackgroundColor(red4.Get());
-				
-				hr = titleBar->put_ForegroundColor(white.Get());
-				hr = titleBar->put_ButtonForegroundColor(white.Get());
-				hr = titleBar->put_ButtonHoverForegroundColor(white.Get());
-				hr = titleBar->put_ButtonPressedForegroundColor(black.Get());
-				hr = titleBar->put_ButtonInactiveForegroundColor(white.Get());
-				hr = titleBar->put_InactiveForegroundColor(white.Get());
-			}
-#endif
-			// extend window
-			ComPtr<ICoreApplication> coreApplication;
-			hr = Windows::Foundation::GetActivationFactory(
-				HStringReference(RuntimeClass_Windows_ApplicationModel_Core_CoreApplication).Get(),
-				&coreApplication);
-
-			ComPtr<ICoreApplicationView> coreApplicationView;
-			hr = coreApplication->GetCurrentView(&coreApplicationView);
-
-			ComPtr<ICoreApplicationView3> coreApplicationView3;
-			hr = coreApplicationView.As(&coreApplicationView3);
-
-			ComPtr<ICoreApplicationViewTitleBar> coreApplicationViewTitleBar;
-			hr = coreApplicationView3->get_TitleBar(&coreApplicationViewTitleBar);
-
-			hr = coreApplicationViewTitleBar->put_ExtendViewIntoTitleBar(false);
-		}
-	}
+	auto coreApplicationView = CoreApplication::GetCurrentView();
+	coreApplicationView.TitleBar().ExtendViewIntoTitleBar(false);
 }
 
 void WinRT_SaveVideoMode(int w, int h)
 {
-	HRESULT hr;
-	ComPtr<IApplicationViewStatics3> applicationViewStatics3;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_UI_ViewManagement_ApplicationView).Get(),
-		&applicationViewStatics3);
-	if(SUCCEEDED(hr))
-	{
-		hr = applicationViewStatics3->put_PreferredLaunchViewSize(Size{ (float)w,(float)h });
-		hr = applicationViewStatics3->put_PreferredLaunchWindowingMode(vid_fullscreen->value != 0.0f ? ApplicationViewWindowingMode_FullScreen : ApplicationViewWindowingMode_PreferredLaunchViewSize);
-	}
+	ApplicationView::PreferredLaunchViewSize(Size{ (float)w,(float)h });
+	ApplicationView::PreferredLaunchWindowingMode(vid_fullscreen->value != 0.0f ? ApplicationViewWindowingMode::FullScreen : ApplicationViewWindowingMode::PreferredLaunchViewSize);
 }
 
-HRESULT WinRT_OnBackRequested(IInspectable *sender, IBackRequestedEventArgs *e)
+void WinRT_OnBackRequested(const BackRequestedEventArgs &e)
 {
 	Key_Event(K_ESCAPE, 1);
-	return S_OK;
 }
 
 void WinRT_BackButton_Install()
 {
-	HRESULT hr;
-	ComPtr<ISystemNavigationManagerStatics> systemNavigationManagerStatics;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_UI_Core_SystemNavigationManager).Get(),
-		&systemNavigationManagerStatics);
-
-	ComPtr<ISystemNavigationManager> systemNavigationManager;
-	hr = systemNavigationManagerStatics->GetForCurrentView(&systemNavigationManager);
-
-	
-	ComPtr<ISystemNavigationManager2> systemNavigationManager2;
-	if(hr = systemNavigationManager.As(&systemNavigationManager2), SUCCEEDED(hr))
-	{
-		systemNavigationManager2->put_AppViewBackButtonVisibility(AppViewBackButtonVisibility_Visible);
-	}
-	
-	auto callback = Callback<__FIEventHandler_1_Windows__CUI__CCore__CBackRequestedEventArgs>(WinRT_OnBackRequested);
-	EventRegistrationToken token;
-	hr = systemNavigationManager->add_BackRequested(callback.Get(), &token);
+	auto systemNavigationManager = SystemNavigationManager::GetForCurrentView();
+	systemNavigationManager.AppViewBackButtonVisibility(AppViewBackButtonVisibility::Visible);
+	[[maybe_unused]] winrt::event_token ev = systemNavigationManager.BackRequested(std::bind(WinRT_OnBackRequested, std::placeholders::_2));
 }
 
 float WinRT_GetDisplayDPI()
 {
-	HRESULT hr;
-	ComPtr<IDisplayInformationStatics> displayInformationStatics;
-	hr = Windows::Foundation::GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_Graphics_Display_DisplayInformation).Get(),
-		&displayInformationStatics);
-
-	ComPtr<IDisplayInformation> displayInformation;
-	hr = displayInformationStatics->GetForCurrentView(&displayInformation);
-
-	ResolutionScale resolutionScale;
-	hr = displayInformation->get_ResolutionScale(&resolutionScale);
-
-	double rawPixelsPerViewPixel = 0.0;
-	ComPtr<IDisplayInformation2> displayInformation2;
-	hr = displayInformation.As<IDisplayInformation2>(&displayInformation2);
-	hr = displayInformation2->get_RawPixelsPerViewPixel(&rawPixelsPerViewPixel);
-
+	auto displayInformation = DisplayInformation::GetForCurrentView();
+	ResolutionScale resolutionScale = displayInformation.ResolutionScale();
+	double rawPixelsPerViewPixel = displayInformation.RawPixelsPerViewPixel();
 	return static_cast<float>(rawPixelsPerViewPixel);
 }
 
-template<class T>
-AsyncStatus await_get_result(ComPtr<IAsyncOperation<T>> aso)
-{
-	HRESULT hr;
-	ComPtr<IAsyncInfo> pAsyncInfo;
-	hr = aso.As<IAsyncInfo>(&pAsyncInfo);
-
-	AsyncStatus asyncStatus;
-	
-	while (1)
-	{
-		hr = pAsyncInfo->get_Status(&asyncStatus);
-
-		if (SUCCEEDED(hr) && (asyncStatus != AsyncStatus::Started))
-			break;
-
-		SwitchToThread();
-	}
-
-	return asyncStatus;
-}
-
-// !!! requires Capability contacts, appointments
 char *WinRT_GetUserName()
 {
-	HRESULT hr;
 	static char buffer[1024] = "Player";
-
-	ComPtr<IUserDataAccountManagerStatics> userDataAccountManagerStatics;
-	hr = GetActivationFactory(HStringReference(RuntimeClass_Windows_ApplicationModel_UserDataAccounts_UserDataAccountManager).Get(), &userDataAccountManagerStatics);
-
-	ComPtr<IAsyncOperation<UserDataAccountStore*>> futureUserDataAccountStore;
-	hr = userDataAccountManagerStatics->RequestStoreAsync(UserDataAccounts::UserDataAccountStoreAccessType_AllAccountsReadOnly, &futureUserDataAccountStore);
-
-	if (await_get_result(futureUserDataAccountStore) != Completed)
-		return buffer;
-
-	ComPtr<IUserDataAccountStore> userDataAccountStore;
-	hr = futureUserDataAccountStore->GetResults(&userDataAccountStore);
-
-	ComPtr < IAsyncOperation<IVectorView<UserDataAccount*>*> > futurevecUserDataAccounts;
-	hr = userDataAccountStore->FindAccountsAsync(&futurevecUserDataAccounts);
-
-	if (await_get_result(futurevecUserDataAccounts) != Completed)
-		return buffer;
-	
-	ComPtr<IVectorView<UserDataAccount*>> vecUserDataAccounts;
-	hr = futurevecUserDataAccounts->GetResults(&vecUserDataAccounts);
-
-	{
-		unsigned int size = 0;
-		hr = vecUserDataAccounts->get_Size(&size);
-		for (unsigned int i = 0; i < size; ++i)
-		{
-			ComPtr<IUserDataAccount> item = nullptr;
-			hr = vecUserDataAccounts->GetAt(i, &item);
-
-			ComPtr<IUserDataAccount3> item3 = nullptr;
-			hr = item.As<IUserDataAccount3>(&item3);
-			
-			HSTRING husername = nullptr;
-			hr = item->get_UserDisplayName(&husername);
-			HString username;
-			username.Attach(husername);
-
-			unsigned len = 0;
-			const wchar_t* wstr = username.GetRawBuffer(&len);
-
-			WideCharToMultiByte(CP_ACP, 0, wstr, -1, buffer, 1024, NULL, FALSE);
-		}
-	}
-
+	// TODO
 	return buffer;
 }
 
@@ -282,57 +124,265 @@ void WinRT_ShellExecute(const char* path)
 	wchar_t buffer[1024]{};
 	MultiByteToWideChar(CP_ACP, 0, path, -1, buffer, 1024);
 
-	HRESULT hr;
-	ComPtr<ILauncherOptions> launcherOptions;
-	hr = ActivateInstance(
-		HStringReference(RuntimeClass_Windows_System_LauncherOptions).Get(),
-		&launcherOptions);
-	//hr = launcherOptions->put_DisplayApplicationPicker(true);
-
-	ComPtr<ILauncherStatics> launcherStatics;
-	hr = GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_System_Launcher).Get(),
-		&launcherStatics);
-
-	ComPtr<IUriRuntimeClassFactory> uriRuntimeClassFactory;
-	hr = GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_Foundation_Uri).Get(),
-		&uriRuntimeClassFactory);
-	
-	ComPtr<IUriRuntimeClass> uri;
-	hr = uriRuntimeClassFactory->CreateUri(HStringReference(buffer).Get(), &uri);
-
-	ComPtr <IAsyncOperation<bool>> futureLaunchUriResult;
-	hr = launcherStatics->LaunchUriWithOptionsAsync(uri.Get(), launcherOptions.Get(), &futureLaunchUriResult);
-
-	AsyncStatus result = await_get_result(futureLaunchUriResult);
-	
+	Uri uri(buffer);
+	LauncherOptions launcherOptions;
+	Launcher::LaunchUriAsync(uri, launcherOptions).get();
 }
 
 void WinRT_OpenGameFolderWithExplorer()
 {
+	Launcher::LaunchFolderAsync(ApplicationData::Current().LocalFolder()).get();
+}
+
+void WinRT_SetClipboardData(const char* buffer, size_t size)
+{
+	DataPackage dp;
+	dp.SetText(winrt::to_hstring(std::string_view(buffer, size)));
+	Clipboard::SetContent(dp);
+}
+
+void WinRT_GetClipboardData(char* buffer, size_t size)
+{
+	DataPackageView con = Clipboard::GetContent();
+	if (con.Contains(StandardDataFormats::Text()))
+	{
+		auto hstr = std::async(std::launch::async, [con] { return con.GetTextAsync().get(); }).get();
+		winrt::to_string(hstr).copy(buffer, size);
+	}
+}
+
+static std::shared_ptr<CoreTextEditContext> s_pImeContext;
+static bool s_ImeContextCompositionStarted = false;
+static std::string s_textUpdating;
+static float s_inputX;
+static float s_inputY;
+
+// Sink receives event notifications
+class CUIElementSink : public ITfUIElementSink
+{
+public:
+	CUIElementSink(ITfThreadMgr2* tm) : _cRef(0), m_tm(tm) { m_tm->AddRef(); }
+	~CUIElementSink() = default;
+
+	// IUnknown
+	STDMETHODIMP QueryInterface(REFIID riid, void** ppvObj)
+	{
+		if (!ppvObj)
+			return E_INVALIDARG;
+
+		*ppvObj = nullptr;
+
+		if (IsEqualIID(riid, IID_IUnknown))
+		{
+			*ppvObj = static_cast<IUnknown*>(static_cast<ITfUIElementSink*>(this));
+		}
+		else if (IsEqualIID(riid, __uuidof(ITfUIElementSink)))
+		{
+			*ppvObj = (ITfUIElementSink*)this;
+		}
+
+		if (*ppvObj)
+		{
+			AddRef();
+			return S_OK;
+		}
+
+		return E_NOINTERFACE;
+	}
+	STDMETHODIMP_(ULONG) AddRef(void) { return ++_cRef; }
+	STDMETHODIMP_(ULONG) Release(void) {
+		LONG cr = --_cRef;
+		if (_cRef == 0)
+		{
+			delete this;
+		}
+		return cr;
+	}
+
+	// ITfUIElementSink
+	//   Notifications for Reading Window events. We could process candidate as well, but we'll use IMM for simplicity sake.
+	STDMETHODIMP BeginUIElement(DWORD dwUIElementId, BOOL* pbShow)
+	{
+		*pbShow = TRUE;
+		return S_OK;
+	}
+	STDMETHODIMP UpdateUIElement(DWORD dwUIElementId)
+	{
+		auto pElement = GetUIElement(dwUIElementId);
+
+		ITfCandidateListUIElement* pcandidate = nullptr;
+		pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void**)&pcandidate);
+
+		UINT count;
+		pcandidate->GetCount(&count);
+
+		std::vector<std::wstring> current_candidates;
+		for (UINT i = 0; i < count; ++i)
+		{
+			BSTR bstr;
+			pcandidate->GetString(i, &bstr);
+			current_candidates.push_back(bstr ? bstr : L"");
+		}
+
+		pcandidate->Release();
+		pElement->Release();
+		return S_OK;
+	}
+	STDMETHODIMP EndUIElement(DWORD dwUIElementId)
+	{
+		return S_OK;
+	}
+
+protected:
+	ITfUIElement* GetUIElement(DWORD dwUIElementId)
+	{
+		ITfUIElementMgr* puiem;
+		ITfUIElement* pElement = nullptr;
+
+		m_tm->QueryInterface(__uuidof(ITfUIElementMgr), (void**)&puiem);
+		puiem->GetUIElement(dwUIElementId, &pElement);
+		puiem->Release();
+
+		return pElement;
+	}
+
+private:
+	LONG _cRef;
+	ITfThreadMgr2* m_tm;
+};
+static std::shared_ptr<CUIElementSink> s_pTsfSink;
+static DWORD m_dwUIElementSinkCookie;
+
+static void SetupSinks()
+{
+	// ITfThreadMgrEx is available on Vista or later.
 	HRESULT hr;
-	ComPtr<IApplicationDataStatics> applicationDataStatics;
-	hr = GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_Storage_ApplicationData).Get(),
-		&applicationDataStatics);
+	ITfThreadMgr2* m_tm;
+	hr = CoCreateInstance(CLSID_TF_ThreadMgr, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITfThreadMgr2), (void**)&m_tm);
 
-	ComPtr<IApplicationData> applicationData;
-	hr = applicationDataStatics->get_Current(&applicationData);
+	// ready to start interacting
+	TfClientId cid;// not used
+	hr = m_tm->ActivateEx(&cid, 0);
 
-	ComPtr<IStorageFolder> localFolder;
-	hr = applicationData->get_LocalFolder(&localFolder);
+	// Setup sinks
+	ITfSource* srcTm;
+	hr = m_tm->QueryInterface(__uuidof(ITfSource), (void**)&srcTm);
 
-	ComPtr<ILauncherStatics> launcherStatics;
-	hr = GetActivationFactory(
-		HStringReference(RuntimeClass_Windows_System_Launcher).Get(),
-		&launcherStatics);
+	s_pTsfSink = std::make_shared<CUIElementSink>(m_tm);
 
-	ComPtr<ILauncherStatics3> launcherStatics3;
-	hr = launcherStatics.As<ILauncherStatics3>(&launcherStatics3);
+	m_tm->Release();
 
-	ComPtr <IAsyncOperation<bool>> futureLaunchResult;
-	hr = launcherStatics3->LaunchFolderAsync(localFolder.Get(), &futureLaunchResult);
+	// Sink for reading window change
+	hr = srcTm->AdviseSink(__uuidof(ITfUIElementSink), (ITfUIElementSink*)s_pTsfSink.get(), &m_dwUIElementSinkCookie);
+	srcTm->Release();
+}
 
-	AsyncStatus result = await_get_result(futureLaunchResult);
+// Reference : https://social.msdn.microsoft.com/Forums/zh-CN/d1fadb61-6f8b-4ce3-8c30-b93dfca38d7a/uwp-229142030929992-ccx-20195307212101924314textbox?forum=window10app
+void WinRT_ImeCreateContext()
+{
+	auto manager = CoreTextServicesManager::GetForCurrentView();
+	s_pImeContext = std::make_shared<CoreTextEditContext>(manager.CreateEditContext());
+	auto& s_ImeContext = *s_pImeContext;
+	s_pImeContext->InputPaneDisplayPolicy(CoreTextInputPaneDisplayPolicy::Automatic);
+	s_pImeContext->InputScope(CoreTextInputScope::Text);
+
+	s_pImeContext->CompositionStarted([](CoreTextEditContext, CoreTextCompositionStartedEventArgs)
+			{
+				s_ImeContextCompositionStarted = true;
+			});
+
+	s_pImeContext->CompositionCompleted([](CoreTextEditContext, CoreTextCompositionCompletedEventArgs args)
+			{
+				CL_CharEventUTF(std::exchange(s_textUpdating, {}).c_str());
+				s_ImeContextCompositionStarted = false;
+			});
+
+	s_pImeContext->FocusRemoved([](CoreTextEditContext, IInspectable)
+			{
+			});
+
+	s_pImeContext->FormatUpdating([](CoreTextEditContext, CoreTextFormatUpdatingEventArgs)
+			{
+			});
+
+	s_pImeContext->LayoutRequested([](CoreTextEditContext, CoreTextLayoutRequestedEventArgs args)
+			{
+				auto vb = ApplicationView::GetForCurrentView().VisibleBounds();
+				float dpi = WinRT_GetDisplayDPI();
+				float x = vb.X * dpi;
+				float y = (vb.Y + CoreApplication::GetCurrentView().TitleBar().Height()) * dpi;
+
+				Rect rc;
+				rc.X = float(s_inputX) + x;
+				rc.Y = float(s_inputY) + y + 16 * dpi; // add some random offset
+				rc.Width = float(1);
+				rc.Height = float(1);
+				args.Request().LayoutBounds().TextBounds(rc);
+			});
+
+	s_pImeContext->NotifyFocusLeaveCompleted([](CoreTextEditContext, IInspectable)
+			{
+			});
+
+	s_pImeContext->SelectionRequested([](CoreTextEditContext, CoreTextSelectionRequestedEventArgs)
+			{
+			});
+
+	s_pImeContext->SelectionUpdating([](CoreTextEditContext, CoreTextSelectionUpdatingEventArgs)
+			{
+			});
+
+	s_pImeContext->TextRequested([](CoreTextEditContext, CoreTextTextRequestedEventArgs args)
+			{
+			});
+
+	s_pImeContext->TextUpdating([](CoreTextEditContext, CoreTextTextUpdatingEventArgs args)
+			{
+				auto text = winrt::to_string(args.Text());
+				if (s_ImeContextCompositionStarted)
+					s_textUpdating = text;
+				else
+					CL_CharEventUTF(text.c_str());
+			});
+
+	// Get CTF Candidate List
+	SetupSinks();
+}
+
+void WinRT_ImeSetInputScreenPos(int x, int y)
+{
+	std::tie(s_inputX, s_inputY) = std::make_tuple(x, y);
+	s_pImeContext->NotifyLayoutChanged();
+}
+
+void WinRT_ImeEnableTextInput(int enable, int force)
+{
+	if (force)
+	{
+		if (enable)
+		{
+			InputPane::GetForCurrentView().Visible(true);
+			s_pImeContext->NotifyFocusEnter();
+		}
+		else
+		{
+			InputPane::GetForCurrentView().Visible(false);
+			s_pImeContext->NotifyFocusLeave();
+		}
+	}
+	else if (enable)
+	{
+		if (!host.textmode)
+		{
+			InputPane::GetForCurrentView().TryShow();
+			s_pImeContext->NotifyFocusEnter();
+		}
+		host.textmode = true;
+	}
+	else
+	{
+		InputPane::GetForCurrentView().TryHide();
+		s_pImeContext->NotifyFocusLeave();
+		host.textmode = false;
+	}
 }

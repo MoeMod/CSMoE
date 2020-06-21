@@ -35,7 +35,6 @@ endif()
 option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
 option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
 option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
-option(XASH_STATIC "Static build. Implicitly enables XASH_SINGLE_BINARY." OFF)
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
@@ -221,6 +220,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
 set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
+	client/imgui_console.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
@@ -302,7 +302,7 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(APPLE)
+if(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
@@ -362,20 +362,26 @@ endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
-	if(NOT IOS AND NOT ANDROID)
-		find_package(SDL2)
-	endif()
-	target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
-	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
-	if(MSVC)
-		string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-		install(FILES ${SDL2_DLL}
-				CONFIGURATIONS Debug
-				DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-		install(FILES ${SDL2_DLL}
-				CONFIGURATIONS Release
-				DESTINATION ${LIB_INSTALL_DIR}/Release/)
+	if(XASH_VCPKG)
+		find_package(SDL2 CONFIG REQUIRED)
+		target_link_libraries(${XASH_ENGINE} PUBLIC SDL2::SDL2)
+	else()
+		if(NOT IOS AND NOT ANDROID)
+			find_package(SDL2)
+		endif()
+		target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
+		include_directories(${SDL2_INCLUDE_DIR})
+		add_definitions(-DXASH_SDL)
+		if(MSVC)
+			string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
+			install(FILES ${SDL2_DLL}
+					CONFIGURATIONS Debug
+					DESTINATION ${LIB_INSTALL_DIR}/Debug/)
+			install(FILES ${SDL2_DLL}
+					CONFIGURATIONS Release
+					DESTINATION ${LIB_INSTALL_DIR}/Release/)
+		endif()
 	endif()
 endif()
 
