@@ -70,6 +70,10 @@ if(WIN32)
 		set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${XASH_LAUNCHER})
 	else()
 		add_executable(${XASH_LAUNCHER} WIN32 xash_static.cpp game.rc)
+		if(XASH_SDL)
+			# add missing libs
+			target_link_libraries(${XASH_LAUNCHER} version.lib hid.lib winmm.lib setupapi.lib)
+		endif()
 	endif()
 	
 	target_link_libraries(${XASH_LAUNCHER} xash)

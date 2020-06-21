@@ -247,6 +247,12 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
+if(NOT WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+	set(INPUT_SRCS ./input_xash3d.cpp)
+else()
+	set(INPUT_SRCS ./inputw32.cpp)
+endif()
+
 set (CLDLL_SOURCES
 	./cdll_int.cpp
     ./demo.cpp
@@ -257,14 +263,13 @@ set (CLDLL_SOURCES
     ./tri.cpp
 	./util.cpp
 	./view.cpp
-	./input_xash3d.cpp
-	#./input_sdl.cpp
     ./vgui_parser.cpp
     ../public/unicode_strtools.cpp
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
 
+	${INPUT_SRCS}
 	${PM_SRCS}
 	${HUD_SRCS}
 	${WEAPONEVENT_SRCS}
