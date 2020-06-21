@@ -17,6 +17,10 @@ if(XASH_PCH)
 	include(CMakePCHCompiler)
 endif()
 
+if(XASH_PCH AND XASH_VCPKG)
+	message(FATAL_ERROR "XASH_PCH and XASH_VCPKG are not compatible")
+endif()
+
 if(XASH_STATIC_GAMELIB)
 	add_definitions(-DXASH_STATIC_GAMELIB=1)
 endif()

@@ -2,15 +2,10 @@ version: 1.0.{build}
 image: Visual Studio 2019
 build_script:
   - ps: >-
-      
       git submodule update --init --recursive
-
       Invoke-WebRequest -uri 'https://www.libsdl.org/release/SDL2-2.0.12.zip' -OutFile 'SDL2.zip'
-
       Expand-Archive -Path 'SDL2.zip' -DestinationPath '.' -Force
-
       ren SDL2-2.0.12 SDL2
-      
+      (Get-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj) | %{$_ -replace "<PlatformToolset>v140</PlatformToolset>", "<PlatformToolset>v142</PlatformToolset>"} | %{$_ -replace "<WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>", "<WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>"} | Set-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj
       nuget restore msvc/csmoe.sln
-
       msbuild "C:\projects\csmoe\msvc\csmoe.sln" /m /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:AppxBundle=false

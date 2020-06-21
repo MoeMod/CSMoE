@@ -19,10 +19,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-cmake_minimum_required(VERSION  2.8.0)
+cmake_minimum_required(VERSION  3.10.0)
 project(XASH_ENGINE C)
 
 set(CMAKE_CXX_STANDARD 17)
+
+# fix C++17 register
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+	add_compile_options(-Wno-register)
+endif()
 
 set(XASH_ENGINE xash) # Lib name
 
