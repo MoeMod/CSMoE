@@ -47,14 +47,14 @@
 #include "minmax.h"
 #include "exportdef.h"
 
+extern int g_iUser1;
+
+namespace cl {
+
 extern int g_rseq;
 extern int g_gaitseq;
 extern Vector g_clorg;
 extern Vector g_clang;
-
-extern int g_iUser1;
-
-namespace cl {
 
 extern globalvars_t *gpGlobals;
 extern bool g_bGlockBurstMode;

@@ -155,6 +155,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_dualsword.cpp
 	../dlls/wpn_shared/wpn_anaconda.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
+	../dlls/wpn_shared/wpn_gunkata.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp
@@ -246,6 +247,12 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
+if(NOT WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+	set(INPUT_SRCS ./input_xash3d.cpp)
+else()
+	set(INPUT_SRCS ./inputw32.cpp)
+endif()
+
 set (CLDLL_SOURCES
 	./cdll_int.cpp
     ./demo.cpp
@@ -256,14 +263,13 @@ set (CLDLL_SOURCES
     ./tri.cpp
 	./util.cpp
 	./view.cpp
-	./input_xash3d.cpp
-	#./input_sdl.cpp
     ./vgui_parser.cpp
     ../public/unicode_strtools.cpp
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
 
+	${INPUT_SRCS}
 	${PM_SRCS}
 	${HUD_SRCS}
 	${WEAPONEVENT_SRCS}

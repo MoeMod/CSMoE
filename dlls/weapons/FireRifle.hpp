@@ -55,7 +55,7 @@ public:
 		CBase::m_iClip--;
 		CBase::m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
-		CBase::m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		CBase::m_pPlayer->SetAnimation(df::PlayerAttackAnimation::Get(data));
 #endif
 
 		UTIL_MakeVectors(CBase::m_pPlayer->pev->v_angle + CBase::m_pPlayer->pev->punchangle);

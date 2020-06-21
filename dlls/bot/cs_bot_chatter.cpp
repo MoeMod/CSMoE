@@ -362,9 +362,10 @@ char *BotPhrase::GetSpeakable(int bankIndex, duration_t *duration) const
 // Randomly shuffle the speakable order
 void BotPhrase::Randomize()
 {
+	std::random_device rd;
 	for (size_t i = 0; i < m_voiceBank.size(); i++)
 	{
-		std::random_shuffle(m_voiceBank[i]->begin(), m_voiceBank[i]->end());
+		std::shuffle(m_voiceBank[i]->begin(), m_voiceBank[i]->end(), rd);
 	}
 }
 
