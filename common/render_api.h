@@ -214,7 +214,7 @@ typedef struct render_api_s
 	void		(*GL_Reserved0)( void );	// for potential interface expansion without broken compatibility
 	void		(*GL_Reserved1)( void );
 	void		(*GL_Reserved2)( void );
-	void		(*GL_Reserved3)( void );
+	void		(*GL_Scissor)(int enable, int x, int y, int width, int height);
 		
 	// Misc renderer functions
 	void		(*GL_DrawParticles)( const float *vieworg, const float *fwd, const float *rt, const float *up, unsigned int clipFlags );
