@@ -19,11 +19,11 @@
 #include <imgui_internal.h>
 #include <array>
 #include <cctype>
-#include <charconv>
 #include <map>
 #include <optional>
 #include <iterator>
 #include <algorithm>
+#include <cstring>
 #ifdef IMTERM_ENABLE_REGEX
 #include <regex>
 #endif
@@ -1030,33 +1030,7 @@ std::pair<bool, std::string> terminal<TerminalHelper>::resolve_history_reference
 	state current_state = state::nothing;
 
 	auto resolve = [&](std::string_view history_request, bool add_escaping = true) -> bool {
-		bool local_modified{};
-		std::optional<std::string> solved = resolve_history_reference(history_request, local_modified);
-		if (!solved) {
-			return false;
-		}
-
-		auto is_space_lbd = [&solved, this](char c) {
-			return is_space({&c, static_cast<unsigned>(&solved.value()[solved->size() - 1] + 1 - &c)}) > 0;
-		};
-
-		modified |= local_modified;
-		if (add_escaping) {
-			if (solved->empty()) {
-				ans += R"("")";
-			} else if (std::find_if(solved->begin(), solved->end(), is_space_lbd) != solved->end()) {
-				ans += '"';
-				ans += *solved;
-				ans += '"';
-			} else {
-				ans += *solved;
-			}
-		} else {
-			ans += *solved;
-		}
-		substr_beg = std::next(it);
-		current_state = state::nothing;
-		return true;
+		return false;
 	};
 
 	const char* const end = str.data() + str.size();
@@ -1172,111 +1146,8 @@ std::pair<bool, std::string> terminal<TerminalHelper>::resolve_history_reference
 template <typename TerminalHelper>
 std::optional<std::string> terminal<TerminalHelper>::resolve_history_reference(std::string_view str, bool& modified) const noexcept {
 	modified = false;
-
-	if (str.empty() || str[0] != '!') {
-		return std::string{str.begin(), str.end()};
-	}
-
-	if (str.size() < 2) {
-		return {};
-	}
-
-	if (str[1] == '!') {
-		if (m_command_history.empty() || str.size() != 2) {
-			return {};
-		} else {
-			modified = true;
-			return {m_command_history.back()};
-		}
-	}
-
-	// ![stuff]
-	unsigned int backward_jump = 1;
-	unsigned int char_idx = 1;
-	if (str[1] == '-') {
-		if (str.size() <= 2 || !is_digit(str[2])) {
-			return {};
-		}
-
-		unsigned int val{0};
-		std::from_chars_result res = std::from_chars(str.data() + 2, str.data() + str.size(), val, 10);
-		if (val == 0) {
-			return {}; // val == 0  <=> (garbage input || user inputted 0)
-		}
-
-		backward_jump = val;
-		char_idx = static_cast<unsigned int>(res.ptr - str.data());
-	}
-
-	if (m_command_history.size() < backward_jump) {
-		return {};
-	}
-
-	if (char_idx >= str.size()) {
-		modified = true;
-		return m_command_history[m_command_history.size() - backward_jump];
-	}
-
-	if (str[char_idx] != ':') {
-		return {};
-	}
-
-
-	++char_idx;
-	if (str.size() <= char_idx) {
-		return {};
-	}
-
-	if (str[char_idx] == '*') {
-		modified = true;
-		const std::string& cmd = m_command_history[m_command_history.size() - backward_jump];
-
-		int sp_count = 0;
-		auto is_space_lbd = [&sp_count, &cmd, this] (char c) {
-			if (sp_count > 0) {
-				--sp_count;
-				return true;
-			}
-			sp_count = is_space({&c, static_cast<unsigned>(&*cmd.end() - &c)});
-			if (sp_count > 0) {
-				--sp_count;
-				return true;
-			}
-			return false;
-		};
-
-		auto first_non_space = std::find_if_not(cmd.begin(), cmd.end(), is_space_lbd);
-		sp_count = 0;
-		auto first_space = std::find_if(first_non_space, cmd.end(), is_space_lbd);
-		sp_count = 0;
-		first_non_space = std::find_if_not(first_space, cmd.end(), is_space_lbd);
-
-		if (first_non_space == cmd.end()) {
-			return std::string{""};
-		}
-		return std::string{first_non_space, cmd.end()};
-	}
-
-	if (!is_digit(str[char_idx])) {
-		return {};
-	}
-
-	unsigned int val1{};
-	std::from_chars_result res1 = std::from_chars(str.data() + char_idx, str.data() + str.size(), val1, 10);
-	if (!misc::success(res1.ec) || res1.ptr != str.data() + str.size()) { // either unsuccessful or we didn't reach the end of the string
-		return {};
-	}
-
-	const std::string& cmd = m_command_history[m_command_history.size() - backward_jump]; // 1 <= backward_jump <= command_history.size()
-	std::optional<std::vector<std::string>> args = split_by_space(cmd);
-
-	if (!args || args->size() <= val1) {
-		return {};
-	}
-
-	modified = true;
-	return (*args)[val1];
-
+	// MoeMod : removed.
+	return {};
 }
 
 template <typename TerminalHelper>
@@ -1335,23 +1206,6 @@ int terminal<TerminalHelper>::command_line_callback(ImGuiInputTextCallbackData* 
 			if (excl == m_command_buffer.data() + data->CursorPos - 1 && m_command_buffer[data->CursorPos - 2] == '!') {
 				--excl;
 			}
-			bool modified{};
-			std::string_view reference{excl, static_cast<unsigned>(m_command_buffer.data() + data->CursorPos - excl)};
-			std::optional<std::string> val = resolve_history_reference(reference, modified);
-			if (!modified) {
-				return 0;
-			}
-
-			if (reference.substr(reference.size() - 2) != ":*" && reference.find(':') != std::string_view::npos) {
-				auto is_space_lbd = [&val, this] (char c) {
-					return is_space({&c, static_cast<unsigned>(&val.value()[val->size()] + 1 - &c)}) > 0;
-				};
-
-				if (std::find_if(val->begin(), val->end(), is_space_lbd) != val->end()) {
-					val = '"' + std::move(*val) + '"';
-				}
-			}
-			auto_complete_buffer(std::move(*val), static_cast<unsigned>(reference.size()));
 
 			return 0;
 		}

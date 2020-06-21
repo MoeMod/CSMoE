@@ -471,16 +471,23 @@ void ImGui_ImplGL_NewFrame(void)
 	// Setup display size (assume the size of the game window is never changed)
 	io.DisplaySize = ImVec2((float)glState.width, (float)glState.height);
 	//io.DisplayFramebufferScale = ImVec2((float)glState.width / (float)si.iWidth, (float)glState.height / (float)si.iHeight);
-	float new_dpi = 2;
+	float new_dpi = hud_scale->value;
+	if (new_dpi == 0)
+		new_dpi = 2;
 	if(g_ImGUI_DPI != new_dpi)
 	{
 		g_ImGUI_DPI = new_dpi;
 	}
 	nst.WindowMenuButtonPosition = ImGuiDir_None;
-	nst.WindowTitleAlign = {0.5, 0.5};
 	nst.WindowPadding = {16, 16};
 	nst.WindowMinSize = {400, 300};
+#ifdef _WIN32
+	nst.WindowTitleAlign = { 0.0, 0.5 };
+	nst.WindowRounding = 0.0f;
+#else
+	nst.WindowTitleAlign = { 0.5, 0.5 };
 	nst.WindowRounding = 8.0f;
+#endif
 	nst.FramePadding = {16, 9};
 	nst.ScaleAllSizes(g_ImGUI_DPI);
 	io.FontGlobalScale = g_ImGUI_DPI / 2;

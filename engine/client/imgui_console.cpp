@@ -30,7 +30,7 @@ extern "C" {
 #include "imterm/terminal.hpp"
 #include "imterm/terminal_helpers.hpp"
 
-extern "C" extern convar_t* cvar_vars;
+extern "C" { extern convar_t* cvar_vars; }
 typedef struct cmd_s
 {
 	char* name; // must be first, to match cvar_t
@@ -165,12 +165,12 @@ void ImGui_Console_Init()
 	// ^7 for normal
 }
 
-void ImGui_Console_PrintSegment(std::string_view sv, std::optional<ImTerm::message::severity::severity_t> opt_color)
+void ImGui_Console_PrintSegment(std::string_view sv, const ImTerm::message::severity::severity_t *color = nullptr)
 {
-	if (opt_color.has_value())
+	if (color)
 	{
 		ImTerm::message msg;
-		msg.severity = opt_color.value();
+		msg.severity = *color;
 		msg.value = sv;
 		msg.color_beg = 0;
 		msg.color_end = sv.size();
@@ -187,7 +187,8 @@ void ImGui_Console_PrintSegment(std::string_view sv, std::optional<ImTerm::messa
 void ImGui_Console_Print(const char* txt)
 {
 	std::string_view sv = txt;
-	std::optional<ImTerm::message::severity::severity_t> last_color = std::nullopt;
+	static ImTerm::message::severity::severity_t color_var;
+	ImTerm::message::severity::severity_t *last_color = nullptr;
 	for (auto seg = sv.find_first_of("^\n"); seg != sv.npos; seg = sv.find_first_of("^\n"))
 	{
 		if (sv[seg] == '^' && seg != sv.size() - 1)
@@ -197,9 +198,9 @@ void ImGui_Console_Print(const char* txt)
 				ImGui_Console_PrintSegment(sv.substr(0, seg), last_color);
 
 				if (sv[seg + 1] == '7')
-					last_color.reset();
+					last_color = nullptr;
 				else
-					last_color = static_cast<ImTerm::message::severity::severity_t>(sv[seg + 1] - '1');
+					last_color = &(color_var = static_cast<ImTerm::message::severity::severity_t>(sv[seg + 1] - '1'));
 
 				sv = sv.substr(seg + 2);
 				continue;
@@ -244,8 +245,14 @@ void ImGui_Console_OnGUI(void)
 	if (!enabled)
 		return;
 	
-	ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-	ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Appearing);
+	if (set_focus)
+	{
+		ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
+		//ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Always);
+		auto size = ImGuiUtils::GetScaledSize(ImVec2(640, 480));
+		s_term.set_width(size.x);
+		s_term.set_height(size.y);
+	}
 
 	if (!s_term.show({  }, &enabled) || !enabled)
 	{
