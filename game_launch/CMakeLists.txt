@@ -98,7 +98,7 @@ if(WIN32)
 
 	include(CPack)
 	add_custom_target(csmoe_cpack_nsis
-		COMMAND "cpack" "-V"
+		COMMAND "cpack.exe" "-V"
 		DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS file")
 
 elseif(APPLE)
