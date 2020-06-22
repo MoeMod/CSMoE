@@ -35,6 +35,7 @@ version.
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
+#include "gamemode/mods_const.h"
 #include <string.h>
 #include "vgui_parser.h"
 #include "draw_util.h"
@@ -86,7 +87,10 @@ int CHudMoney::Draw(float flTime)
 	if (gHUD.m_csgohud->value)
 	{
 		x = 5;
-		y = 200;
+		if (gHUD.m_iModRunning != MOD_NONE)
+			y = 0.175 * ScreenWidth * gHUD.m_flScale + (m_hDollar.rect.bottom - m_hDollar.rect.top) * 2;
+		else
+			y = 200;
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
