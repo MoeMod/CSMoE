@@ -9,6 +9,7 @@
 #include <ref_params.h>
 
 #include "hud_radar_modern.h"
+#include "draw_util.h"
 
 #include <string>
 
@@ -29,9 +30,9 @@ CHudRadarModern::CHudRadarModern(void) : m_OverviewData()
 	m_iLastWide = 0;
 
 	cl_newradar_size = CVAR_CREATE("cl_newradar_size", "0.175", FCVAR_ARCHIVE);
-	cl_newradar_r = CVAR_CREATE("cl_newradar_r", "0.8", FCVAR_ARCHIVE);
-	cl_newradar_g = CVAR_CREATE("cl_newradar_g", "0.8", FCVAR_ARCHIVE);
-	cl_newradar_b = CVAR_CREATE("cl_newradar_b", "0.8", FCVAR_ARCHIVE);
+	cl_newradar_r = CVAR_CREATE("cl_newradar_r", "1", FCVAR_ARCHIVE);
+	cl_newradar_g = CVAR_CREATE("cl_newradar_g", "1", FCVAR_ARCHIVE);
+	cl_newradar_b = CVAR_CREATE("cl_newradar_b", "1", FCVAR_ARCHIVE);
 	cl_newradar_a = CVAR_CREATE("cl_newradar_a", "0.75", FCVAR_ARCHIVE);
 
 }
@@ -90,7 +91,6 @@ void CHudRadarModern::Reset(void)
 
 void CHudRadarModern::Think(void)
 {
-	//int wide = cl_newradar_size->value * ScreenWidth;
 
 }
 
@@ -115,15 +115,13 @@ static inline char *FileExtension(char *in)
 
 void CHudRadarModern::LoadMapSprites(void)
 {
-	// hack...
-	char *ext = FileExtension(m_OverviewData.image);
-	if (ext)
-		ext[-1] = '\0';
-
-	m_pOverViewTexture = R_LoadTextureUnique(m_OverviewData.image);
-
-	if (ext)
-		ext[-1] = '.';
+	// right now only support for one map layer
+	if (m_OverviewData.image[0])
+	{
+		m_MapSprite = gEngfuncs.LoadMapSprite(m_OverviewData.image);
+	}
+	else
+		m_MapSprite = NULL; // the standard "unknown map" sprite will be used instead
 }
 
 bool CHudRadarModern::LoadOverviewInfo(const char* fileName, overview_t* data)
@@ -217,7 +215,7 @@ error:
 
 int CHudRadarModern::Draw(float time)
 {
-	if (!m_pOverViewTexture)
+	if (!m_MapSprite)
 		return 0;
 
 	if (!gHUD.m_pCvarDraw->value)
@@ -246,82 +244,118 @@ int CHudRadarModern::Draw(float time)
 	}
 #endif
 
-	int wide, tall;
-	tall = wide = cl_newradar_size->value * ScreenWidth;
-	int x = 0, y = 0;
-
-	float xStep, yStep;
-	float xUpStep, yUpStep, xRightStep, yRightStep;
-
-	const float viewzoom = 10.0;
-
-	const float flScreenAspect = 4.0f / 3.0f;
-	float angles = (gHUD.m_vecAngles[1] + 90.0) * (M_PI / 180.0);
-
-	if (m_OverviewData.rotated)
+	int sx, sy, wide, tall;
+	sx = sy = 0;
+	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
+	
 	{
-		angles -= M_PI / 2.0;
+		float angles, xTemp, yTemp, viewzoom;
+		float screenaspect, xs, ys, xStep, yStep, x, y, z;
+		int ix, iy, i, xTiles, yTiles, frame, numframes;
+		float xUpStep, yUpStep, xRightStep, yRightStep;
+		float xIn, yIn, xOut, yOut;
+
+		viewzoom = 10.0;
+
+		i = m_MapSprite->numframes / (4 * 3);
+		i = sqrt(float(i));
+
+		xTiles = i * 4;
+		yTiles = i * 3;
+
+		screenaspect = 4.0f / 3.0f;
+		angles = (gHUD.m_vecAngles[1] + 90.0) * (M_PI / 180.0);
+		xs = gHUD.m_Spectator.m_OverviewData.origin[0];
+		ys = gHUD.m_Spectator.m_OverviewData.origin[1];
+		z = 0;
+
+		frame = 0;
+		numframes = m_MapSprite->numframes;
+
+		if (m_OverviewData.rotated)
+		{
+			angles -= M_PI / 2.0;
+			xTemp = 3 + gHUD.m_Spectator.m_OverviewData.zoom * (1.0 / 1024.0) * ys - (1.0 / 1024) * gHUD.m_Spectator.m_OverviewData.zoom * gHUD.m_vecOrigin[1];
+			yTemp = -(-4 + gHUD.m_Spectator.m_OverviewData.zoom * (1.0 / 1024.0) * xs - (1.0 / 1024) * gHUD.m_Spectator.m_OverviewData.zoom * gHUD.m_vecOrigin[0]);
+		}
+		else
+		{
+			xTemp = 3 + gHUD.m_Spectator.m_OverviewData.zoom * (1.0 / 1024.0) * xs - (1.0 / 1024) * gHUD.m_Spectator.m_OverviewData.zoom * gHUD.m_vecOrigin[0];
+			yTemp = 4 + gHUD.m_Spectator.m_OverviewData.zoom * (1.0 / 1024.0) * ys - (1.0 / 1024) * gHUD.m_Spectator.m_OverviewData.zoom * gHUD.m_vecOrigin[1];
+		}
+
+		xStep = (2 * 4096.0f / viewzoom) / xTiles;
+		yStep = -(2 * 4096.0f / (viewzoom * screenaspect)) / yTiles;
+
+		xUpStep = cos(angles + (M_PI / 2)) * yStep;
+		yUpStep = sin(angles + (M_PI / 2)) * yStep;
+		xRightStep = cos(angles) * xStep;
+		yRightStep = sin(angles) * xStep;
+
+		xOut = wide * 0.5 - (xTemp * xRightStep) - (yTemp * xUpStep);
+		yOut = tall * 0.5 - (xTemp * yRightStep) - (yTemp * yUpStep);
+
+		//glScissor(x, ScreenHeight - tall - y, wide, tall);
+		//glEnable(GL_SCISSOR_TEST);
+		if (g_iXash)
+			gRenderAPI.GL_Scissor(1, sx, TrueHeight - tall - sy, wide, tall);
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
+		gEngfuncs.pTriAPI->CullFace(TRI_NONE);
+		gEngfuncs.pTriAPI->Color4f(cl_newradar_r->value, cl_newradar_g->value, cl_newradar_b->value, cl_newradar_a->value);
+
+		for (ix = 0; ix < yTiles; ix++)
+		{
+			xIn = xOut;
+			yIn = yOut;
+
+			for (iy = 0; iy < xTiles; iy++)
+			{
+				x = xIn;
+				y = yIn;
+
+				if (frame >= numframes)
+					break;
+
+				gEngfuncs.pTriAPI->SpriteTexture(m_MapSprite, frame);
+				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+				gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+				gEngfuncs.pTriAPI->Vertex3f(x, y, 0.0);
+				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+				gEngfuncs.pTriAPI->Vertex3f(x + xRightStep, y + yRightStep, 0.0);
+				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+				gEngfuncs.pTriAPI->Vertex3f(x + xRightStep + xUpStep, y + yRightStep + yUpStep, 0.0);
+				gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+				gEngfuncs.pTriAPI->Vertex3f(x + xUpStep, y + yUpStep, 0.0);
+				gEngfuncs.pTriAPI->End();
+
+				frame++;
+
+				xIn += xUpStep;
+				yIn += yUpStep;
+			}
+
+			xOut += xRightStep;
+			yOut += yRightStep;
+		}
+		//glDisable(GL_SCISSOR_TEST);
+		if (g_iXash)
+			gRenderAPI.GL_Scissor(0, 0, 0, 0, 0);
 	}
 
-	Vector2D vecPlayerOrigin(gHUD.m_vecOrigin[0], gHUD.m_vecOrigin[1]);
-	Vector2D vecOverViewOrigin(m_OverviewData.originX, m_OverviewData.originY);
-	float scaleX = 8192.0f / m_OverviewData.zoom / m_pOverViewTexture->w();
-	float scaleY = 8192.0f / m_OverviewData.zoom / flScreenAspect / m_pOverViewTexture->h();
-	Vector2D vecDelta(vecOverViewOrigin.x / scaleX, vecOverViewOrigin.y / scaleY);
+	DrawUtils::DrawOutlinedRect(sx / gHUD.m_flScale, sy / gHUD.m_flScale, wide / gHUD.m_flScale, tall / gHUD.m_flScale, 0, 0, 0, 255);
 
-	Vector2D vecOverViewImageOrigin;
-	vecOverViewImageOrigin.x = m_pOverViewTexture->w() / 2.0f;
-	vecOverViewImageOrigin.y = m_pOverViewTexture->h() / 2.0f;
-
-	if (m_OverviewData.rotated)
-	{
-		vecDelta.x = -vecDelta.x;
-	}
-	Vector2D vecTexOrigin = vecOverViewImageOrigin - vecDelta;
-
-	xStep = (2 * 4096.0f / viewzoom);
-	yStep = -(2 * 4096.0f / (viewzoom * flScreenAspect));
-
-	xUpStep = cos(angles + (M_PI / 2)) * yStep;
-	yUpStep = sin(angles + (M_PI / 2)) * yStep;
-	xRightStep = cos(angles) * xStep;
-	yRightStep = sin(angles) * xStep;
-
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
-	gEngfuncs.pTriAPI->Color4f(cl_newradar_r->value, cl_newradar_g->value, cl_newradar_b->value, cl_newradar_a->value);
-
-	Vector2D vecTexOriginNormalized = vecTexOrigin.Normalize();
-	Vector2D a = vecTexOriginNormalized + Vector2D(xUpStep, yUpStep) - Vector2D(xRightStep, yRightStep);
-	Vector2D b = vecTexOriginNormalized - Vector2D(xUpStep, yUpStep) - Vector2D(xRightStep, yRightStep);
-	Vector2D c = vecTexOriginNormalized - Vector2D(xUpStep, yUpStep) + Vector2D(xRightStep, yRightStep);
-	Vector2D d = vecTexOriginNormalized - Vector2D(xUpStep, yUpStep) - Vector2D(xRightStep, yRightStep);
-
-	// TODO : calc Radar TexCoord2f ...
-
-	m_pOverViewTexture->Bind();
-	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-	gEngfuncs.pTriAPI->TexCoord2f(a.x, a.y);
-	gEngfuncs.pTriAPI->Vertex3f(x, y, 0.0);
-	gEngfuncs.pTriAPI->TexCoord2f(b.x, b.y);
-	gEngfuncs.pTriAPI->Vertex3f(x, y + tall, 0.0);
-	gEngfuncs.pTriAPI->TexCoord2f(c.x, c.y);
-	gEngfuncs.pTriAPI->Vertex3f(x + wide, y + tall, 0.0);
-	gEngfuncs.pTriAPI->TexCoord2f(d.x, d.y);
-	gEngfuncs.pTriAPI->Vertex3f(x + wide, y, 0.0);
-	gEngfuncs.pTriAPI->End();
+	// TODO : localization
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 	gEngfuncs.pTriAPI->Color4f(1, 0.62745f, 0, 1.0f);
 
-	struct model_s *model = (struct model_s *)gEngfuncs.GetSpritePointer(m_hsprCamera);
+	struct model_s* model = (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprCamera);
 	gEngfuncs.pTriAPI->SpriteTexture(model, 0);
-
+	
 	float cameraScale = 2;
 	int cameraWide = gEngfuncs.pfnSPR_Width(m_hsprCamera, 0) * cameraScale;
 	int cameraHeight = gEngfuncs.pfnSPR_Height(m_hsprCamera, 0) * cameraScale;
-
-	// TODO : calc overview TexCoord2f
 
 	gEngfuncs.pTriAPI->Begin(TRI_TRIANGLES);
 	gEngfuncs.pTriAPI->TexCoord2f(1, 1);
@@ -588,7 +622,7 @@ bool CHudRadarModern::IsValidEntity(cl_entity_s *pEntity)
 bool CHudRadarModern::CalcPoint(float *origin, int &screenX, int &screenY, int &scale)
 {
 	int wide, tall;
-	tall = wide = cl_newradar_size->value * ScreenWidth;
+	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
 
 	float dx = origin[0] - gHUD.m_vecOrigin[0];
 	float dy = origin[1] - gHUD.m_vecOrigin[1];
@@ -664,7 +698,7 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	}
 
 	int wide, tall;
-	tall = wide = cl_newradar_size->value * ScreenWidth;
+	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
 	if (x < 0 || x > wide || y < 0 || y > tall)
 		return;
 

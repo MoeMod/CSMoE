@@ -176,11 +176,17 @@ public:
 		if ( drawStroke )
 		{
 			// TODO: remove this hardcoded hardcore
-			FillRGBA( x + 1,        y,            wide - 1, 1,        255, 140, 0, 255 );
-			FillRGBA( x,            y,            1,        tall - 1, 255, 140, 0, 255 );
-			FillRGBA( x + wide - 1, y + 1,        1,        tall - 1, 255, 140, 0, 255 );
-			FillRGBA( x,            y + tall - 1, wide - 1, 1,        255, 140, 0, 255 );
+			DrawOutlinedRect(x, y, wide, tall, 255, 140, 0, 255);
 		}
+	}
+
+	static inline void DrawOutlinedRect(int x, int y, int wide, int tall,
+		int r = 0, int g = 0, int b = 0, int a = 255)
+	{
+		FillRGBABlend(x + 1, y, wide - 1, 1, r, g, b, a);
+		FillRGBABlend(x, y, 1, tall - 1, r, g, b, a);
+		FillRGBABlend(x + wide - 1, y + 1, 1, tall - 1, r, g, b, a);
+		FillRGBABlend(x, y + tall - 1, wide - 1, 1, r, g, b, a);
 	}
 
 	static void Draw2DQuad( float x1, float y1, float x2, float y2 );

@@ -278,6 +278,7 @@ void GL_FrontFace( GLenum front );
 void GL_TextureTarget( uint target );
 void GL_Cull( GLenum cull );
 void R_ShowTextures( void );
+void GL_Scissor(int enable, int x, int y, int width, int height);
 
 //
 // gl_cull.c

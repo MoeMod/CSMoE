@@ -280,4 +280,18 @@ void R_Set2DMode( qboolean enable )
 
 	}
 }
+
+void GL_Scissor(int enable, int x, int y, int width, int height)
+{
+	if (enable)
+	{
+		pglScissor(x, y, width, height);
+		pglEnable(GL_SCISSOR_TEST);
+	}
+	else
+	{
+		pglDisable(GL_SCISSOR_TEST);
+	}
+}
+
 #endif // XASH_DEDICATED

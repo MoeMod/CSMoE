@@ -1685,7 +1685,7 @@ static render_api_t gRenderAPI =
 	NULL,
 	NULL,
 	NULL,
-	NULL,
+	GL_Scissor,
 	CL_DrawParticlesExternal,
 	(void*)R_EnvShot,
 	COM_CompareFileTime,
