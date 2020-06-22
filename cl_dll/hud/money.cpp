@@ -86,7 +86,7 @@ int CHudMoney::Draw(float flTime)
 	if (gHUD.m_csgohud->value)
 	{
 		x = 5;
-		y = 200;
+		y = 0.175 * ScreenWidth * gHUD.m_flScale + (m_hDollar.rect.bottom - m_hDollar.rect.top) * 2;
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
