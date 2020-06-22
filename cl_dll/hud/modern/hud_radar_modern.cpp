@@ -94,25 +94,6 @@ void CHudRadarModern::Think(void)
 
 }
 
-static inline char *FileExtension(char *in)
-{
-	const char *separator = strrchr(in, '/');
-	const char *backslash = strrchr(in, '\\');
-
-	if (!separator || separator < backslash)
-		separator = backslash;
-
-	const char *colon = strrchr(in, ':');
-
-	if (!separator || separator < colon)
-		separator = colon;
-
-	char *dot = strrchr(in, '.');
-	if (dot == NULL || (separator && (dot < separator)))
-		return NULL;
-	return dot + 1;
-}
-
 void CHudRadarModern::LoadMapSprites(void)
 {
 	// right now only support for one map layer

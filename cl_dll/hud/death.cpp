@@ -565,7 +565,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	// Get the Victim's name
 	const char *victim_name = NULL;
 	// If victim is -1, the killer killed a specific, non-player object (like a sentrygun)
-	if ( ((char)victim) != -1 )
+	if ( ((signed char)victim) != -1 )
 		victim_name = g_PlayerInfoList[ victim ].name;
 	if ( !victim_name )
 	{
@@ -580,7 +580,7 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	}
 
 	// Is it a non-player object kill?
-	if ( ((char)victim) == -1 )
+	if ( ((signed char)victim) == -1 )
 	{
 		rgDeathNoticeList[i].bNonPlayerKill = true;
 
