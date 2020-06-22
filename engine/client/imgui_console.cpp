@@ -118,7 +118,7 @@ struct TerminalHelper {
 		for (convar_t* var = cvar_vars; var; var = var->next)
 		{
 			const char* name = var->name;
-			const char* desc = var->description ? var->description : "";
+			const char* desc = ""; // TODO : var->description is not initialized
 			m_Commands.insert({ name, desc, CommandCallback, CompleteCvarCallback });
 		}
 
