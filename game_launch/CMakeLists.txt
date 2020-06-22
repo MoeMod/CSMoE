@@ -85,7 +85,7 @@ if(WIN32)
 	set(CPACK_PACKAGE_VENDOR "MoeMod")
 	set(CPACK_PACKAGE_FILE_NAME "CSMoE-Win32-${CMAKE_SYSTEM_PROCESSOR}")
 	set(CPACK_PACKAGE_INSTALL_DIRECTORY "CSMoE")
-	set(CPACK_PACKAGE_EXECUTABLES "..\\csmoe_win32" "${CPACK_PACKAGE_NAME}")
+	set(CPACK_PACKAGE_EXECUTABLES "..\\\\csmoe_win32" "${CPACK_PACKAGE_NAME}")
 	set(CPACK_CREATE_DESKTOP_LINKS ${XASH_LAUNCHER})
 	set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 	set(CPACK_NSIS_MODIFY_PATH OFF)
@@ -98,10 +98,8 @@ if(WIN32)
 
 	include(CPack)
 	add_custom_target(csmoe_cpack_nsis
-		COMMAND "echo" "Cleaning NSIS file"
-		COMMAND "rd" "/s" "/q" "_CPack_Packages" "||" "echo" "Not Found, ignore..."
 		COMMAND "cpack" "-V"
-		DEPENDS ${XASH_LAUNCHER} COMMENT "Generating NSIS file")
+		DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS file")
 
 elseif(APPLE)
 	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.icns")
