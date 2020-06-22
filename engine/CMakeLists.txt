@@ -19,8 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-cmake_minimum_required(VERSION  3.10.0)
-project(XASH_ENGINE C)
+cmake_minimum_required(VERSION  3.6.0)
+project(XASH_ENGINE C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -307,7 +307,9 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(XASH_STATIC_GAMELIB)
+if(ANDROID)
+	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
+elseif(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
