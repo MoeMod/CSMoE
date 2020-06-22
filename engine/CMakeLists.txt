@@ -380,12 +380,7 @@ if(XASH_SDL)
 		add_definitions(-DXASH_SDL)
 		if(MSVC)
 			string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-			install(FILES ${SDL2_DLL}
-					CONFIGURATIONS Debug
-					DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-			install(FILES ${SDL2_DLL}
-					CONFIGURATIONS Release
-					DESTINATION ${LIB_INSTALL_DIR}/Release/)
+			install(FILES ${SDL2_DLL} DESTINATION ".")
 		endif()
 	endif()
 endif()
@@ -476,8 +471,6 @@ else()
 	endif()
 endif()
 
-install( TARGETS ${XASH_ENGINE} DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-if(XASH_SDL)
-	install(FILES ${SDL2_DLL} DESTINATION ${CMAKE_INSTALL_PREFIX})
+if( NOT XASH_STATIC_GAMELIB )
+	install( TARGETS ${XASH_ENGINE} DESTINATION ".")
 endif()
