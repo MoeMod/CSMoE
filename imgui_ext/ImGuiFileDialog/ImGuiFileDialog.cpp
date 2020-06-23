@@ -42,7 +42,7 @@ SOFTWARE.
 #ifndef PATH_MAX
 #define PATH_MAX 260
 #endif
-#elif defined(LINUX) or defined(APPLE)
+#else
 #define stricmp strcasecmp
 #include <sys/types.h>
 #include <dirent.h>
@@ -253,7 +253,7 @@ namespace igfd
 
 #ifdef WIN32
 				CreateDirectoryA(name.c_str(), nullptr);
-#elif defined(LINUX) or defined(APPLE)
+#else
 				char buffer[PATH_MAX] = {};
 				snprintf(buffer, PATH_MAX, "mkdir -p %s", name.c_str());
 				const int dir_err = std::system(buffer);
@@ -1266,7 +1266,7 @@ namespace igfd
 			}
 			else
 			{
-#ifdef LINUX
+#ifndef _WIN32
 				if (s_fs_root == m_CurrentPath)
 				{
 					newPath = m_CurrentPath + vInfos.fileName;
@@ -1275,7 +1275,7 @@ namespace igfd
 				{
 #endif
 					newPath = m_CurrentPath + PATH_SEP + vInfos.fileName;
-#ifdef LINUX
+#ifndef _WIN32
 				}
 #endif
 			}
@@ -1740,23 +1740,13 @@ namespace igfd
 
 		if (nullptr != dir)
 		{
-/*
-#ifdef WIN32
-			size_t numchar = GetFullPathNameA(path.c_str(), PATH_MAX - 1, real_path, nullptr);
-#elif defined(LINUX) or defined(APPLE)
-			char *numchar = realpath(path.c_str(), real_path);
-#endif		
-			if (numchar != 0)
-			{
-				m_CurrentPath = real_path;
-*/
 				m_CurrentPath = path;
 				if (m_CurrentPath[m_CurrentPath.size() - 1] == PATH_SEP)
 				{
 					m_CurrentPath = m_CurrentPath.substr(0, m_CurrentPath.size() - 1);
 				}
 				m_CurrentPath_Decomposition = splitStringToVector(m_CurrentPath, PATH_SEP, false);
-#if defined(UNIX) // UNIX is LINUX or APPLE
+#ifndef _WIN32
 				m_CurrentPath_Decomposition.insert(m_CurrentPath_Decomposition.begin(), std::string(1u, PATH_SEP));
 #endif
 				if (!m_CurrentPath_Decomposition.empty())
@@ -1797,7 +1787,7 @@ namespace igfd
 			{
 #ifdef WIN32
 				m_CurrentPath = *vIter + PATH_SEP + m_CurrentPath;
-#elif defined(LINUX) or defined(APPLE)
+#else
 				if (*vIter == s_fs_root)
 				{
 					m_CurrentPath = *vIter + m_CurrentPath;
@@ -1815,7 +1805,7 @@ namespace igfd
 
 			if (vIter == m_CurrentPath_Decomposition.begin())
 			{
-#if defined(UNIX) // UNIX is LINUX or APPLE
+#ifndef _WIN32
 				if (m_CurrentPath[0] != PATH_SEP)
 					m_CurrentPath = PATH_SEP + m_CurrentPath;
 #endif
