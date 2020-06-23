@@ -178,8 +178,8 @@ namespace igfd
 	public:
 		static ImGuiFileDialog* Instance()
 		{
-			static auto *_instance = new ImGuiFileDialog();
-			return _instance;
+			static ImGuiFileDialog _instance;
+			return &_instance;
 		}
 
 	protected:
