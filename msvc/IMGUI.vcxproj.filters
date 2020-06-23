@@ -5,10 +5,27 @@
     <ClCompile Include="..\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\imgui\imgui.cpp" />
+    <ClCompile Include="..\imgui_ext\ImGuiFileDialog\ImGuiFileDialog.cpp">
+      <Filter>imgui_ext\ImGuiFileDialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\imgui\imgui_internal.h" />
     <ClInclude Include="..\imgui\imconfig.h" />
     <ClInclude Include="..\imgui\imgui.h" />
+    <ClInclude Include="..\imgui_ext\ImGuiFileDialog\ImGuiFileDialog.h">
+      <Filter>imgui_ext\ImGuiFileDialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui_ext\ImGuiFileDialog\ImGuiFileDialogConfig.h">
+      <Filter>imgui_ext\ImGuiFileDialog</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="imgui_ext">
+      <UniqueIdentifier>{feccfff9-dbb1-4bd4-adcd-ca95d43b81e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui_ext\ImGuiFileDialog">
+      <UniqueIdentifier>{2a5e570d-3e35-4173-9c2e-c959c51041dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
