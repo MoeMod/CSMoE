@@ -104,6 +104,8 @@ set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
+set(CMAKE_CXX_STANDARD 17)
+
 if(XASH_IMGUI)
 	# TODO : since vcpkg doesn't provide with imgui_internal.h, just use our own one
     if(XASH_VCPKG AND FALSE)
