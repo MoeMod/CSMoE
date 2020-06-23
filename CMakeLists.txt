@@ -123,6 +123,9 @@ if(XASH_IMGUI)
 		imgui_ext/ImGuiFileDialog/ImGuiFileDialog.cpp
 		)
 	target_include_directories(imgui_ext PUBLIC ${CMAKE_SOURCE_DIR}/imgui_ext)
+	if(WIN32)
+		target_include_directories(imgui_ext PRIVATE ${CMAKE_SOURCE_DIR}/imgui_ext/dirent)
+	endif()
 	target_link_libraries(imgui_ext PUBLIC imgui)
 endif()
 
