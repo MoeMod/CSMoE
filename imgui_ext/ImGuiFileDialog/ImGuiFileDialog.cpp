@@ -254,14 +254,7 @@ namespace igfd
 #ifdef WIN32
 				CreateDirectoryA(name.c_str(), nullptr);
 #else
-				char buffer[PATH_MAX] = {};
-				snprintf(buffer, PATH_MAX, "mkdir -p %s", name.c_str());
-				const int dir_err = std::system(buffer);
-				if (dir_err == -1)
-				{
-					std::cout << "Error creating directory " << name << std::endl;
-					res = false;
-				}
+				mkdir(name.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
 			}
 		}
