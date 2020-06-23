@@ -15,6 +15,7 @@ GNU General Public License for more details.
 
 #include "imgui_console.h"
 #include "imgui.h"
+#include "imgui_utils.h"
 
 extern "C" {
 #include "client.h"
@@ -39,20 +40,6 @@ typedef struct cmd_s
 	char* desc;
 	int          flags;
 } cmd_t;
-
-namespace ImGuiUtils {
-	inline void CenterNextWindow(ImGuiCond cond = 0) {
-		auto& io = ImGui::GetIO();
-		const auto& ds = io.DisplaySize;
-		ImGui::SetNextWindowPos(ImVec2(ds.x / 2, ds.y / 2), cond, ImVec2(0.5f, 0.5f));
-	}
-	inline ImVec2 GetScaledSize(ImVec2 in)
-	{
-		auto& io = ImGui::GetIO();
-		float scale = std::max(1.0f, io.FontGlobalScale * 2);
-		return { in.x * scale, in.y * scale };
-	}
-}
 
 struct TerminalHelper {
 

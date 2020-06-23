@@ -119,6 +119,11 @@ if(XASH_IMGUI)
 		add_library(imgui STATIC ${IMGUI_SRC})
 		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
 	endif()
+	add_library(imgui_ext STATIC 
+		imgui_ext/ImGuiFileDialog/ImGuiFileDialog.cpp
+		)
+	target_include_directories(imgui_ext PUBLIC ${CMAKE_SOURCE_DIR}/imgui_ext)
+	target_link_libraries(imgui_ext PUBLIC imgui)
 endif()
 
 if(NOT XASH_DEDICATED)

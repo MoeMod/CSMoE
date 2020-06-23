@@ -226,6 +226,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
 	client/imgui_console.cpp
+	client/imgui_sprview.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
@@ -364,7 +365,7 @@ if(XASH_DEDICATED)
 endif()
 
 if(XASH_IMGUI)
-	target_link_libraries(${XASH_ENGINE} imgui)
+	target_link_libraries(${XASH_ENGINE} imgui imgui_ext)
 endif()
 
 if(XASH_SDL)
