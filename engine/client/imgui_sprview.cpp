@@ -40,11 +40,8 @@ static HSPRITE g_spr = 0;
 static int cur_frame = 0;
 static float last_update;
 static float framerate = 15;
-
-void ImGui_SprView_Init()
-{
-	
-}
+static bool playing = true;
+static bool loop = true;
 
 static void OpenFile(std::string abs_path)
 {
@@ -63,19 +60,61 @@ static void OpenFile(std::string abs_path)
 		recent_open.erase(recent_open.begin(), recent_open.end() - 5);
 }
 
+static void Con_SprView_f()
+{
+	enabled = true;
+
+	if (Cmd_Argc() >= 2)
+	{
+		OpenFile(Cmd_Argv(1));
+	}
+}
+
+void ImGui_SprView_Init()
+{
+	Cmd_AddCommand("sprview", Con_SprView_f, "open sprview");
+}
+
 void ImGui_SprView_OnGUI(void)
 {
 	if (!enabled)
 		return;
+
+	int spr = g_spr;
+	int frameWidth = 0, frameHeight = 0, numFrames = 0;
+	int texture = 0;
+	if (spr)
+	{
+		model_t* pSprite = &clgame.sprites[spr];
+		R_GetSpriteParms(&frameWidth, &frameHeight, &numFrames, cur_frame, pSprite);
+		texture = R_GetSpriteTexture(pSprite, cur_frame);
+
+		if (!texture)
+		{
+			fs_offset_t size;
+			byte* buf = FS_LoadFile(pSprite->name, &size, false);
+
+			qboolean loaded;
+			Mod_LoadSpriteModel(pSprite, buf, &loaded, 0);
+		}
+	}
+
 	if (ImGui::Begin("SprView", &enabled, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar))
 	{
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Open", "Ctrl+O"))
+				if (ImGui::MenuItem("Open File"))
 				{
 					igfd::ImGuiFileDialog::Instance()->OpenModal("SprView - Open", "SprView - Open", ".spr", ".");
+				}
+
+				if (ImGui::MenuItem("Close File"))
+				{
+					g_spr = 0;
+					cur_frame = 0;
+					last_update = 0;
 				}
 
 				if (ImGui::BeginMenu("Open Recent"))
@@ -90,43 +129,42 @@ void ImGui_SprView_OnGUI(void)
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::MenuItem("Quit", "Ctrl+Q"))
+				if (ImGui::MenuItem("Quit"))
 				{
 					enabled = false;
 				}
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("View"))
+			{
+				ImGui::MenuItem("Playing", "", &playing);
+				ImGui::MenuItem("Loop", "", &loop);
+				ImGui::DragFloat("Framerate", &framerate, 0.2f, 1.0f, std::numeric_limits<float>::max(), "%.0f fps");
+
+				ImGui::SliderInt("Current Frame", &cur_frame, 0, numFrames - 1);
+
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenuBar();
 		}
 
-		if (g_spr)
+		if (spr)
 		{
 			auto [x1, y1] = ImGui::GetWindowContentRegionMin();
 			auto [x2, y2] = ImGui::GetWindowContentRegionMax();
 
-			model_t* pSprite = &clgame.sprites[g_spr];
-
-			int frameWidth, frameHeight, numFrames;
-			R_GetSpriteParms(&frameWidth, &frameHeight, &numFrames, cur_frame, pSprite);
-
-			if (ImGui::GetTime() > last_update + 1 / framerate)
+			if (playing && ImGui::GetTime() > last_update + 1 / framerate)
 			{
-				cur_frame = ++cur_frame % numFrames;
+				if(loop)
+					cur_frame = ++cur_frame % numFrames;
+				else
+					cur_frame = std::min(cur_frame + 1, numFrames - 1);
+
 				last_update = ImGui::GetTime();
 			}
 
-			int texture = R_GetSpriteTexture(pSprite, cur_frame);
-
-			if (!texture)
-			{
-				fs_offset_t size;
-				byte* buf = FS_LoadFile(pSprite->name, &size, false);
-
-				qboolean loaded;
-				Mod_LoadSpriteModel(pSprite, buf, &loaded, 0);
-			}
-
-			ImGui::Image((ImTextureID)texture, ImGuiUtils::GetScaledSize(ImVec2(frameWidth, frameHeight)));
+			if(texture)
+				ImGui::Image((ImTextureID)texture, ImGuiUtils::GetScaledSize(ImVec2(frameWidth, frameHeight)));
 		}
 
 		ImGui::End();
