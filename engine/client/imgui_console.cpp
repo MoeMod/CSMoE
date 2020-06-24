@@ -82,10 +82,13 @@ struct TerminalHelper {
 	{
 		convar_t* var = Cvar_FindVar(arg.command_line.front().c_str());
 		std::vector<std::string> ret;
-		if (var->string)
-			ret.emplace_back(var->string);
-		if (var->reset_string)
-			ret.emplace_back(var->reset_string);
+		if (var)
+		{
+			if (var->string)
+				ret.emplace_back(var->string);
+			if (var->reset_string)
+				ret.emplace_back(var->reset_string);
+		}
 
 		return ret;
 	}
