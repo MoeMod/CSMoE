@@ -25,6 +25,7 @@ extern "C" {
 #include "imgui_impl_xash.h"
 #include "imgui_lcsm_warning.h"
 #include "imgui_console.h"
+#include "imgui_imewindow.h"
 #include "imgui_sprview.h"
 
 #include <keydefs.h>
@@ -295,10 +296,9 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
 #if defined _WIN32 && !defined XASH_WINRT
 	io.ImeWindowHandle = wmInfo.info.win.window;
-#elif defined XASH_WINRT
-	io.ImeSetInputScreenPosFn = [](int x, int y) { WinRT_ImeSetInputScreenPos(x , y); };
 #endif
 #endif
+	io.ImeSetInputScreenPosFn = [](int x, int y) { IME_SetInputScreenPos(x, y); };
 
 	return true;
 }
@@ -391,6 +391,7 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_ImplGL_ReloadFonts();
 
 	ImGui_Console_Init();
+	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
 
 	return true;
@@ -557,6 +558,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
 	ImGui_Console_OnGUI();
+	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
 }
 
