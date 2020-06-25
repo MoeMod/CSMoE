@@ -76,7 +76,7 @@ void EV_FireBow(event_args_s *args)
 	EV_GetGunPosition(args, vecSrc, origin);
 	VectorCopy(forward, vecAiming);
 
-	EV_HLDM_FireBullets(idx, forward, right, up, 1, EV_IsLocal(idx) ? ent->attachment[0] : vecSrc, vecAiming, Vector(0, 0, 0), 8192, BULLET_PLAYER_338MAG, 0);
+	EV_HLDM_FireBullets(idx, forward, right, up, 1, EV_IsLocal(idx) ? ent->attachment[0] : vecSrc, vecAiming, Vector(0, 0, 0), 8192, BULLET_PLAYER_338MAG, 7);
 
 	gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, args->iparam1 ? "sound/weapons/bow_charge_shoot2.wav" : "sound/weapons/weapons/bow_charge_shoot1_empty.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
