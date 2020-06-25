@@ -133,7 +133,7 @@ BOOL CKnife::Deploy(void)
 	else
 #endif
 	{
-		return DefaultDeploy(WEAPON_NAME[0], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+		return DefaultDeploy(WEAPON_NAME[m_SeqModel], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
 	}
 }
 
@@ -574,7 +574,7 @@ int CKnife::Stab(int fFirst)
 void CKnife::ChangeModel()
 {
 	if (m_SeqModel >= 3)
-		m_SeqModel = 0;
+		m_SeqModel = -1;
 	m_SeqModel += 1;
 	Deploy();
 }
