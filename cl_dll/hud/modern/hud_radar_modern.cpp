@@ -7,7 +7,7 @@
 #include <triangleapi.h>
 #include <cl_entity.h>
 #include <ref_params.h>
-
+#include "gamemode/mods_const.h"
 #include "hud_radar_modern.h"
 #include "draw_util.h"
 
@@ -53,6 +53,8 @@ int CHudRadarModern::VidInit(void)
 
 	m_HUD_radar = gHUD.GetSpriteIndex("radar");
 	m_HUD_radaropaque = gHUD.GetSpriteIndex("radaropaque");
+
+	m_hRadarSupplybox.SetSpriteByName("radar_item");
 
 	m_hrad = &gHUD.GetSpriteRect(m_HUD_radar);
 	m_hradopaque = &gHUD.GetSpriteRect(m_HUD_radaropaque);
@@ -492,62 +494,107 @@ int CHudRadarModern::Draw(float time)
 		}
 	}
 
-	for (int i = 0; i <= MAX_HOSTAGES; i++)
+	
+	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
 	{
-		if ((g_HostageInfo[i].dead) || (g_HostageInfo[i].radarflashtime == -1))
-			continue;
-
-		int r, g, b;
-		HSPRITE hspr = 0;
-		int scale = 8;
-		int rx, ry;
-		float yaw = 0;
-
-		if (g_HostageInfo[i].radarflashtime != -1.0 && flTime > g_HostageInfo[i].radarflashtime && g_HostageInfo[i].radarflashes > 0)
+		if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
 		{
-			g_HostageInfo[i].radarflashtime = flTime + g_PlayerExtraInfo[i].radarflashtimedelta;
-			g_HostageInfo[i].radarflashes--;
-			g_HostageInfo[i].nextflash = !g_HostageInfo[i].nextflash;
+			for (int i = 0; i < MAX_HOSTAGES; i++)
+			{
+				if (g_HostageInfo[i].dead)
+					continue;
+
+				HSPRITE hspr = m_hRadarSupplybox.spr;
+				int scale = 8;
+				int rx, ry;
+				float yaw = 0;
+
+				cl_entity_t* ent = m_pHostages[i];
+				vec3_t* origin;
+				bool valid;
+
+				if (!IsValidEntity(ent))
+				{
+					valid = false;
+					origin = &g_HostageInfo[i].origin;
+				}
+				else
+				{
+					valid = true;
+					origin = &ent->origin;
+				}
+
+				if (!CalcPoint(*origin, rx, ry, scale))
+				{
+					if (valid)
+						yaw = gHUD.m_vecAngles[1] - ent->angles[1];
+				}
+				//DrawSprite(rx, ry, hspr, yaw, scale, 200, 200, 200, 255);
+				SPR_Set(hspr, 133, 247, 255);
+				SPR_DrawAdditive(0, rx, ry, &m_hRadarSupplybox.rect);
+			}
 		}
-
-		if (g_HostageInfo[i].nextflash && g_HostageInfo[i].radarflashes > 0)
+	}
+	else
+	{
+		for (int i = 0; i <= MAX_HOSTAGES; i++)
 		{
-			r = 255;
-			g = 255;
-			b = 255;
-			hspr = m_hsprHostage;
+			if ((g_HostageInfo[i].dead) || (g_HostageInfo[i].radarflashtime == -1))
+				continue;
 
-			if (g_HostageInfo[i].dead)
+			int r, g, b;
+			HSPRITE hspr = 0;
+			int scale = 8;
+			int rx, ry;
+			float yaw = 0;
+
+			if (g_HostageInfo[i].radarflashtime != -1.0 && flTime > g_HostageInfo[i].radarflashtime && g_HostageInfo[i].radarflashes > 0)
+			{
+				g_HostageInfo[i].radarflashtime = flTime + g_PlayerExtraInfo[i].radarflashtimedelta;
+				g_HostageInfo[i].radarflashes--;
+				g_HostageInfo[i].nextflash = !g_HostageInfo[i].nextflash;
+			}
+
+			if (g_HostageInfo[i].nextflash && g_HostageInfo[i].radarflashes > 0)
 			{
 				r = 255;
 				g = 255;
 				b = 255;
-			}
+				hspr = m_hsprHostage;
 
-			cl_entity_t *ent = m_pHostages[i];
-			vec3_t *origin;
-			bool valid;
+				if (g_HostageInfo[i].dead)
+				{
+					r = 255;
+					g = 255;
+					b = 255;
+				}
 
-			if (!IsValidEntity(ent))
-			{
-				valid = false;
-				origin = &g_HostageInfo[i].origin;
-			}
-			else
-			{
-				valid = true;
-				origin = &ent->origin;
-			}
+				cl_entity_t* ent = m_pHostages[i];
+				vec3_t* origin;
+				bool valid;
 
-			if (!CalcPoint(*origin, rx, ry, scale))
-			{
-				if (valid)
-					yaw = gHUD.m_vecAngles[1] - ent->angles[1];
-			}
+				if (!IsValidEntity(ent))
+				{
+					valid = false;
+					origin = &g_HostageInfo[i].origin;
+				}
+				else
+				{
+					valid = true;
+					origin = &ent->origin;
+				}
 
-			DrawSprite(rx, ry, hspr, yaw, scale, r, g, b, 255);
+				if (!CalcPoint(*origin, rx, ry, scale))
+				{
+					if (valid)
+						yaw = gHUD.m_vecAngles[1] - ent->angles[1];
+				}
+
+				DrawSprite(rx, ry, hspr, yaw, scale, r, g, b, 255);
+			}
 		}
 	}
+	
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 	return 1;
