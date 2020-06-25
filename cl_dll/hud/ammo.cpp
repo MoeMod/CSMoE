@@ -409,6 +409,11 @@ int CHudAmmo::VidInit(void)
 		giABHeight = 2;
 	}
 
+	m_flLastBuffHit = 0.0;
+	m_hBuffHit = SPR_Load("sprites/ishot.spr");
+
+	m_iBuffHitHeight = SPR_Height(m_hBuffHit, 0);
+	m_iBuffHitWidth = SPR_Width(m_hBuffHit, 0);
 	return 1;
 }
 
@@ -1148,6 +1153,11 @@ int CHudAmmo::Draw(float flTime)
 	// Draw Weapon Menu
 	DrawWList(flTime);
 	
+	if (m_flLastBuffHit > flTime)
+	{
+		SPR_Set(m_hBuffHit, 255, 0, 0);
+		SPR_DrawAdditive(0, ScreenWidth / 2 - m_iBuffHitWidth / 2, ScreenHeight / 2 - m_iBuffHitHeight / 2, NULL);
+	}
 
 	// Draw ammo pickup history
 	if (!gHUD.m_csgohud->value)
@@ -1155,7 +1165,7 @@ int CHudAmmo::Draw(float flTime)
 
 	if (!m_pWeapon)
 		return 0;
-
+	 
 	WEAPON *pw = m_pWeapon; // shorthand
 	if (gHUD.m_csgohud->value)
 		DrawWpnList(flTime);
