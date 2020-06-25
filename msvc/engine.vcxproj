@@ -38,6 +38,7 @@
     <ClInclude Include="..\engine\client\imgui_console.h" />
     <ClInclude Include="..\engine\client\imgui_impl_xash.h" />
     <ClInclude Include="..\engine\client\imgui_lcsm_warning.h" />
+    <ClInclude Include="..\engine\client\imgui_sprview.h" />
     <ClInclude Include="..\engine\client\input.h" />
     <ClInclude Include="..\engine\client\joyinput.h" />
     <ClInclude Include="..\engine\client\sound.h" />
@@ -134,6 +135,7 @@
     <ClCompile Include="..\engine\client\imgui_console.cpp" />
     <ClCompile Include="..\engine\client\imgui_impl_xash.cpp" />
     <ClCompile Include="..\engine\client\imgui_lcsm_warning.cpp" />
+    <ClCompile Include="..\engine\client\imgui_sprview.cpp" />
     <ClCompile Include="..\engine\client\input.c" />
     <ClCompile Include="..\engine\client\input_evdevkey.c" />
     <ClCompile Include="..\engine\client\joyinput.c" />
@@ -371,7 +373,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
     <Link>
@@ -390,7 +392,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link />
     <Link>
@@ -409,7 +411,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>imgui.lib;SDL2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -428,7 +430,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -450,7 +452,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -472,7 +474,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../engine;../engine/common;../engine/common/imagelib;../engine/common/soundlib;../engine/client;../engine/client/vgui;../engine/server;../common;../pm_shared;../SDL2/include;../nanogl;../nanogl/GL;../imgui;../imgui_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

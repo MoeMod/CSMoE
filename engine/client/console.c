@@ -864,10 +864,6 @@ void Con_Init( void )
 	Cmd_AddCommand( "messagemode", Con_MessageMode_f, "enable message mode \"say\"" );
 	Cmd_AddCommand( "messagemode2", Con_MessageMode2_f, "enable message mode \"say_team\"" );
 
-#if XASH_IMGUI
-	ImGui_Console_Init();
-#endif
-
 	MsgDev( D_NOTE, "Console initialized.\n" );
 	con.initialized = true;
 }
