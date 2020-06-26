@@ -2350,7 +2350,15 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					animDesired = LookupSequence("gut_flinch");
 					break;
 			}
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")) && pev->flags & FL_DUCKING)
+			{
+				if(speed)
+					Q_strcat(szAnim, "_crouchrun");
+				else
+					Q_strcat(szAnim, "_crouch_idle");
 
+				m_Activity = m_IdealActivity;
+			}
 			if (animDesired == -1)
 				animDesired = 0;
 
