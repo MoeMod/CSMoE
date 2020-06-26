@@ -771,8 +771,8 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 
 void Key_EnableTextInput( qboolean enable, qboolean force )
 {
-#ifdef XASH_WINRT
-	WinRT_ImeEnableTextInput(enable, force);
+#ifdef _WIN32
+	IME_SetIMEEnabled(enable, force);
 #elif XASH_INPUT == INPUT_SDL
 	SDLash_EnableTextInput( enable, force );
 #elif XASH_INPUT == INPUT_ANDROID

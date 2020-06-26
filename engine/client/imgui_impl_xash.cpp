@@ -18,6 +18,7 @@ extern "C" {
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
+#include "input_ime.h"
 }
 #include "minmax.h"
 
@@ -296,9 +297,10 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
 #if defined _WIN32 && !defined XASH_WINRT
 	io.ImeWindowHandle = wmInfo.info.win.window;
-#endif
+	io.ImeSetInputScreenPosFn; // use default
 #endif
 	io.ImeSetInputScreenPosFn = [](int x, int y) { IME_SetInputScreenPos(x, y); };
+#endif
 
 	return true;
 }

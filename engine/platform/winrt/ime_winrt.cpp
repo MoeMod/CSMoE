@@ -1,3 +1,18 @@
+/*
+ime_winrt.cpp
+Copyright (C) 2020 Moemod Haoyuan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Text.h>
 #include <winrt/Windows.UI.Text.Core.h>
@@ -245,7 +260,7 @@ static void SetupSinks()
 }
 
 // Reference : https://social.msdn.microsoft.com/Forums/zh-CN/d1fadb61-6f8b-4ce3-8c30-b93dfca38d7a/uwp-229142030929992-ccx-20195307212101924314textbox?forum=window10app
-void WinRT_ImeCreateContext()
+void IME_CreateContext()
 {
 	auto manager = CoreTextServicesManager::GetForCurrentView();
 	s_pImeContext = std::make_shared<CoreTextEditContext>(manager.CreateEditContext());
@@ -342,7 +357,7 @@ void WinRT_ImeCreateContext()
 const char* IME_GetCompositionString()
 {
 	static char buf[4096];
-	return strcpy(buf, winrt::to_string(s_textCompleted).c_str());
+	return strncpy(buf, winrt::to_string(s_textCompleted).c_str(), sizeof(buf));
 }
 
 void IME_SetInputScreenPos(int x, int y)
@@ -357,7 +372,7 @@ void IME_GetInputScreenPos(int *x, int *y)
 	if (y) *y = s_inputY;
 }
 
-void WinRT_ImeEnableTextInput(int enable, int force)
+void IME_SetIMEEnabled(int enable, int force)
 {
 	if (force)
 	{

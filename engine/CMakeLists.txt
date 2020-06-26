@@ -142,6 +142,7 @@ endif()
 
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
+	./platform/win32/ime_win32.cpp
 )
 
 set(XASH_ENGINE_SDL_SOURCES
@@ -226,6 +227,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
 	client/imgui_console.cpp
+	client/imgui_imewindow.cpp
 	client/imgui_sprview.cpp
 )
 
