@@ -111,6 +111,11 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombis.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideimos2.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideimos_host.mdl");
+
+	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
+	PRECACHE_MODEL("models/v_zombibomb-deimos_host.mdl");
+	PRECACHE_MODEL("models/v_zombibomb-s.mdl");
+
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
 	PRECACHE_MODEL("models/player/speed_zombi_origin/speed_zombi_origin.mdl");

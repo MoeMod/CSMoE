@@ -223,6 +223,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_usp.cpp
 	../dlls/wpn_shared/wpn_xm1014.cpp
 	../dlls/wpn_shared/knife_zombi.cpp
+	../dlls/wpn_shared/zombiebomb.cpp
 	../dlls/wpn_shared/wpn_ak47l.cpp
 	../dlls/wpn_shared/wpn_mp7a1d.cpp
 	../dlls/wpn_shared/wpn_deagled.cpp
