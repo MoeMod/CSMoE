@@ -257,12 +257,14 @@ static LRESULT ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         case WM_IME_STARTCOMPOSITION:
         {
             //OnIMEStartComposition();
+            ClearCandidateList();
             [[fallthrouth]];
         }
 
         case WM_IME_ENDCOMPOSITION:
         {
             //OnIMEEndComposition();
+            ClearCandidateList();
             [[fallthrouth]];
         }
 
