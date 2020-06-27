@@ -182,6 +182,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass.cpp
 	./gamemode/zb2/zb2_zclass_tank.cpp
 	./gamemode/zb2/zb2_zclass_speed.cpp
+	./gamemode/zb2/zb2_zclass_deimos2.cpp
 	./gamemode/mod_zbb.cpp
 	./weapons_precache.cpp
 	./gamemode/zbb/zbb_basebuilder.cpp
@@ -223,7 +224,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_usp.cpp
 	../dlls/wpn_shared/wpn_xm1014.cpp
 	../dlls/wpn_shared/knife_zombi.cpp
-	../dlls/wpn_shared/zombiebomb.cpp
+	../dlls/wpn_shared/wpn_zombiebomb.cpp
 	../dlls/wpn_shared/wpn_ak47l.cpp
 	../dlls/wpn_shared/wpn_mp7a1d.cpp
 	../dlls/wpn_shared/wpn_deagled.cpp
