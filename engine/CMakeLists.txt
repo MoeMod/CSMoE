@@ -168,6 +168,7 @@ set(XASH_ENGINE_APPLE_SOURCES
 else()
 set(XASH_ENGINE_APPLE_SOURCES
 	platform/macos/TouchBar.mm
+	platform/macos/vid_macos.mm
 	platform/ime_stub.cpp
 )
 endif()
@@ -264,7 +265,7 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
 if(XASH_SINGLE_BINARY)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES} platform/macos/vid_macos.mm platform/macos/vid_macos.h)
 endif()
 
 

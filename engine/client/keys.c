@@ -16,6 +16,7 @@ GNU General Public License for more details.
 
 #include "common.h"
 #include "input.h"
+#include "input_ime.h"
 #include "client.h"
 #include "joyinput.h"
 #include "touch.h"

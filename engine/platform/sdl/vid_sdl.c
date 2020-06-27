@@ -26,6 +26,7 @@ GNU General Public License for more details.
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 #include "platform/macos/TouchBar.h"
+#include "platform/macos/vid_macos.h"
 #endif
 
 #if defined(XASH_WINRT)
@@ -571,6 +572,9 @@ qboolean VID_GetDPI(float* out)
 			}
 		}
 	}
+#elif defined(SDL_VIDEO_DRIVER_COCOA)
+	success = true;
+	dpi = MacOS_GetDPI();
 #else
 	int display = SDL_GetWindowDisplayIndex(host.hWnd);
 	// MoeMod : why returning 0 on success???

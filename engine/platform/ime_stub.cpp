@@ -13,13 +13,20 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
+extern "C" {
 #include "common.h"
 #include "input_ime.h"
+#include "gl_vidnt.h"
 
 #ifdef XASH_SDL
 #include <SDL_keyboard.h>
 #include <platform/sdl/events.h>
 #endif
+
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+#include "platform/macos/vid_macos.h"
+#endif
+}
 
 const char* IME_GetCompositionString()
 {
@@ -59,7 +66,17 @@ const char* IME_GetCandidate(size_t i)
 void IME_SetInputScreenPos(int x, int y)
 {
 #ifdef XASH_SDL
-	SDL_Rect rect = { x, y };
+	// dont know why macos should scale again
+#ifdef __APPLE__
+	y += 16;
+	if(float dpi; VID_GetDPI(&dpi))
+	{
+		x /= dpi;
+		y /= dpi;
+	}
+#endif
+
+	SDL_Rect rect = { x, y, 0, 0 };
 	SDL_SetTextInputRect(&rect);
 #endif
 }
