@@ -555,6 +555,21 @@ qboolean VID_GetDPI(float* out)
 #if defined(XASH_WINRT)
 	dpi = WinRT_GetDisplayDPI();
 	success = dpi > 0.0f;
+#elif defined(_WIN32)
+	{
+		SDL_SysWMinfo wmInfo;
+		SDL_VERSION(&wmInfo.version);
+		SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+		{
+			HWND hwnd = wmInfo.info.win.window;
+			int res = GetDpiForWindow(hwnd);
+			if (res)
+			{
+				success = true;
+				dpi = res / 96.0f;
+			}
+		}
+	}
 #else
 	int display = SDL_GetWindowDisplayIndex(host.hWnd);
 	// MoeMod : why returning 0 on success???
