@@ -2007,8 +2007,32 @@ void Radio1(CBasePlayer *player, int slot)
 
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
-
-	switch (slot) {
+	if (player->m_bIsZombie)
+	{
+		switch (slot) {
+		case 1:
+			player->Radio("%!MRAD_COVERME_ZB", "#Cover_me");
+			break;
+		case 2:
+			player->Radio("%!MRAD_TAKEPOINT_ZB", "#You_take_the_point");
+			break;
+		case 3:
+			player->Radio("%!MRAD_POSITION_ZB", "#Hold_this_position");
+			break;
+		case 4:
+			player->Radio("%!MRAD_REGROUP_ZB", "#Regroup_team");
+			break;
+		case 5:
+			player->Radio("%!MRAD_FOLLOWME_ZB", "#Follow_me");
+			break;
+		case 6:
+			player->Radio("%!MRAD_HITASSIST_ZB", "#Taking_fire");
+			break;
+		}
+	}
+	else
+	{
+		switch (slot) {
 		case 1:
 			player->Radio("%!MRAD_COVERME", "#Cover_me");
 			break;
@@ -2027,8 +2051,8 @@ void Radio1(CBasePlayer *player, int slot)
 		case 6:
 			player->Radio("%!MRAD_HITASSIST", "#Taking_fire");
 			break;
+		}
 	}
-
 	if (TheBots != NULL) {
 		TheBots->OnEvent((GameEventType) (EVENT_START_RADIO_1 + slot), player);
 	}
@@ -2047,7 +2071,32 @@ void Radio2(CBasePlayer *player, int slot)
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
-	switch (slot) {
+	if (player->m_bIsZombie)
+	{
+		switch (slot) {
+		case 1:
+			player->Radio("%!MRAD_GO_ZB", "#Go_go_go");
+			break;
+		case 2:
+			player->Radio("%!MRAD_FALLBACK_ZB", "#Team_fall_back");
+			break;
+		case 3:
+			player->Radio("%!MRAD_STICKTOG_ZB", "#Stick_together_team");
+			break;
+		case 4:
+			player->Radio("%!MRAD_GETINPOS_ZB", "#Get_in_position_and_wait");
+			break;
+		case 5:
+			player->Radio("%!MRAD_STORMFRONT_ZB", "#Storm_the_front");
+			break;
+		case 6:
+			player->Radio("%!MRAD_REPORTIN_ZB", "#Report_in_team");
+			break;
+		}
+	}
+	else
+	{
+		switch (slot) {
 		case 1:
 			player->Radio("%!MRAD_GO", "#Go_go_go");
 			break;
@@ -2066,6 +2115,7 @@ void Radio2(CBasePlayer *player, int slot)
 		case 6:
 			player->Radio("%!MRAD_REPORTIN", "#Report_in_team");
 			break;
+		}
 	}
 
 	if (TheBots != NULL) {
@@ -2086,7 +2136,45 @@ void Radio3(CBasePlayer *player, int slot)
 	player->m_iRadioMessages--;
 	player->m_flRadioTime = gpGlobals->time + 1.5s;
 
-	switch (slot) {
+	if (player->m_bIsZombie)
+	{
+		switch (slot) {
+		case 1:
+			if (RANDOM_LONG(0, 1))
+				player->Radio("%!MRAD_AFFIRM_ZB", "#Affirmative");
+			else
+				player->Radio("%!MRAD_ROGER_ZB", "#Roger_that");
+
+			break;
+		case 2:
+			player->Radio("%!MRAD_ENEMYSPOT_ZB", "#Enemy_spotted");
+			break;
+		case 3:
+			player->Radio("%!MRAD_BACKUP_ZB", "#Need_backup");
+			break;
+		case 4:
+			player->Radio("%!MRAD_CLEAR_ZB", "#Sector_clear");
+			break;
+		case 5:
+			player->Radio("%!MRAD_INPOS_ZB", "#In_position");
+			break;
+		case 6:
+			player->Radio("%!MRAD_REPRTINGIN_ZB", "#Reporting_in");
+			break;
+		case 7:
+			player->Radio("%!MRAD_BLOW_ZB", "#Get_out_of_there");
+			break;
+		case 8:
+			player->Radio("%!MRAD_NEGATIVE_ZB", "#Negative");
+			break;
+		case 9:
+			player->Radio("%!MRAD_ENEMYDOWN_ZB", "#Enemy_down");
+			break;
+		}
+	}
+	else
+	{
+		switch (slot) {
 		case 1:
 			if (RANDOM_LONG(0, 1))
 				player->Radio("%!MRAD_AFFIRM", "#Affirmative");
@@ -2118,6 +2206,7 @@ void Radio3(CBasePlayer *player, int slot)
 		case 9:
 			player->Radio("%!MRAD_ENEMYDOWN", "#Enemy_down");
 			break;
+		}
 	}
 
 	if (TheBots != NULL) {
