@@ -21,11 +21,6 @@ GNU General Public License for more details.
 #include "touch.h"
 #include "vgui_draw.h"
 
-#ifdef XASH_SDL
-#include <SDL_keyboard.h>
-#include <platform/sdl/events.h>
-#endif
-
 #ifdef XASH_IMGUI
 #include "imgui_impl_xash.h"
 #endif
@@ -771,13 +766,7 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 
 void Key_EnableTextInput( qboolean enable, qboolean force )
 {
-#ifdef _WIN32
 	IME_SetIMEEnabled(enable, force);
-#elif XASH_INPUT == INPUT_SDL
-	SDLash_EnableTextInput( enable, force );
-#elif XASH_INPUT == INPUT_ANDROID
-	Android_EnableTextInput( enable, force );
-#endif
 #if 0
 	Joy_EnableTextInput( enable, force );
 #endif

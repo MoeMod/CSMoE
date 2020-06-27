@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 #include "input.h"
+#include "input_ime.h"
 #include "gl_vidnt.h"
 #include <SDL.h>
 #include <SDL_syswm.h>

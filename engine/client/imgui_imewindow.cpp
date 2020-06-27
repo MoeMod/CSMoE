@@ -86,9 +86,7 @@ void ImGui_ImeWindow_OnGUI(void)
         }
     }
 
-    int x, y;
-    IME_GetInputScreenPos(&x, &y);
-    ImVec2 target_screen_pos = ImVec2(x, y);
+    ImVec2 target_screen_pos = ImGui::GetCurrentContext()->PlatformImePos;
 
     std::vector<const char*> candidate_list;
     auto candidate_count = IME_GetCandidateListCount();

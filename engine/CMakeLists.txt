@@ -156,16 +156,19 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/vid_android.c
    platform/android/android_nosdl.c
    platform/android/snd_opensles.c
+   platform/ime_stub.cpp
 )
 
 if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
 	common/launcher.c
 	platform/iOS/TapicEngine.mm
+	platform/ime_stub.cpp
 )
 else()
 set(XASH_ENGINE_APPLE_SOURCES
 	platform/macos/TouchBar.mm
+	platform/ime_stub.cpp
 )
 endif()
 

@@ -23,7 +23,6 @@ size_t IME_GetCandidateListSelectedItem();
 int IME_CandidateListStartsAtOne();
 const char* IME_GetCandidate(size_t i);
 void IME_SetInputScreenPos(int x, int y);
-void IME_GetInputScreenPos(int *x, int *y);
 int IME_ShouldShowBuiltInCandidateWindow();
 void IME_CreateContext();
 void IME_SetIMEEnabled(int enable, int force);
