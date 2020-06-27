@@ -195,12 +195,17 @@ void CFlashbang::WeaponIdle(void)
 	if (m_flStartThrow != invalid_time_point)
 	{
 #ifndef CLIENT_DLL
-		switch (RANDOM_LONG(0, 2))
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
 		{
-		case 0:m_pPlayer->Radio("%!MRAD_FLASHBANG01", "#Flashbang_out"); break;
-		case 1:m_pPlayer->Radio("%!MRAD_FLASHBANG02", "#Flashbang_out"); break;
-		case 2:m_pPlayer->Radio("%!MRAD_FLASHBANG03", "#Flashbang_out"); break;
-		}	
+			switch (RANDOM_LONG(0, 2))
+			{
+			case 0:m_pPlayer->Radio("%!MRAD_FLASHBANG01", "#Flashbang_out"); break;
+			case 1:m_pPlayer->Radio("%!MRAD_FLASHBANG02", "#Flashbang_out"); break;
+			case 2:m_pPlayer->Radio("%!MRAD_FLASHBANG03", "#Flashbang_out"); break;
+			}
+		}
+		else
+			m_pPlayer->Radio("%!MRAD_FIREINHOLE", "#Fire_in_the_hole");
 #endif
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 

@@ -202,13 +202,18 @@ void CHEGrenade::WeaponIdle(void)
 	if (m_flStartThrow != invalid_time_point)
 	{
 #ifndef CLIENT_DLL
-		switch (RANDOM_LONG(0, 3))
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
 		{
-		case 0:m_pPlayer->Radio("%!MRAD_FIREINHOLE1", "#Fire_in_the_hole"); break;
-		case 1:m_pPlayer->Radio("%!MRAD_FIREINHOLE2", "#Fire_in_the_hole"); break;
-		case 2:m_pPlayer->Radio("%!MRAD_FIREINHOLE3", "#Fire_in_the_hole"); break;
-		case 3:m_pPlayer->Radio("%!MRAD_FIREINHOLE4", "#Fire_in_the_hole"); break;
+			switch (RANDOM_LONG(0, 3))
+			{
+			case 0:m_pPlayer->Radio("%!MRAD_FIREINHOLE1", "#Fire_in_the_hole"); break;
+			case 1:m_pPlayer->Radio("%!MRAD_FIREINHOLE2", "#Fire_in_the_hole"); break;
+			case 2:m_pPlayer->Radio("%!MRAD_FIREINHOLE3", "#Fire_in_the_hole"); break;
+			case 3:m_pPlayer->Radio("%!MRAD_FIREINHOLE4", "#Fire_in_the_hole"); break;
+			}
 		}
+		else
+			m_pPlayer->Radio("%!MRAD_FIREINHOLE", "#Fire_in_the_hole");
 #endif
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
