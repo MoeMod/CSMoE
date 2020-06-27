@@ -119,6 +119,27 @@ protected:
 	EngineClock::time_point m_flInvisiable;
 };
 
+class CZombieSkill_ZombieCrazy2 : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieCrazy2(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	void OnCrazy2Effect();
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeZombieSkillEffect;
+	EngineClock::time_point m_flInvisiable;
+};
+
 }
 
 
