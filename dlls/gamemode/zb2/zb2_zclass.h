@@ -42,8 +42,6 @@ public:
 	void Think() override;
 	void ResetMaxSpeed() const override;
 	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
-	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override {}
-	void DeathSound_Zombie() override {}
 	void OnWeaponDeploy(CBasePlayerItem *item) override {}
 
 protected:
