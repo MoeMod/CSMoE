@@ -184,12 +184,14 @@ public:
 	int m_cvarR, m_cvarG, m_cvarB;
 	int m_iCurrentCrosshair;
 	int m_iCrosshairScaleBase;
+	int m_iBuffHitWidth, m_iBuffHitHeight;
 	float m_flCrosshairDistance;
 	bool m_bAdditive;
 	bool m_bObserverCrosshair ;
 	bool m_bDrawCrosshair;
 	int m_iAmmoLastCheck;
-
+	float m_flLastHitTime, m_flLastBuffHit;
+	
 	cvar_t *m_pClCrosshairColor;
 	cvar_t *m_pClCrosshairTranslucent;
 	cvar_t *m_pClCrosshairSize;
@@ -198,6 +200,12 @@ public:
 	cvar_t *m_pHud_DrawHistory_Time;
 
 	cvar_t *cl_crosshair_type;
+	//HSPRITE m_hBuffHit;
+	model_s* m_hBuffHit;
+	inline void HitForBuff(float flTime)
+	{
+		m_flLastBuffHit = flTime + 0.1;
+	}
 };
 
 //

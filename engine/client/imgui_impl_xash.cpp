@@ -18,6 +18,7 @@ extern "C" {
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
+#include "input_ime.h"
 }
 #include "minmax.h"
 
@@ -25,6 +26,8 @@ extern "C" {
 #include "imgui_impl_xash.h"
 #include "imgui_lcsm_warning.h"
 #include "imgui_console.h"
+#include "imgui_imewindow.h"
+#include "imgui_sprview.h"
 
 #include <keydefs.h>
 #include <utility>
@@ -294,9 +297,9 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
 #if defined _WIN32 && !defined XASH_WINRT
 	io.ImeWindowHandle = wmInfo.info.win.window;
-#elif defined XASH_WINRT
-	io.ImeSetInputScreenPosFn = [](int x, int y) { WinRT_ImeSetInputScreenPos(x , y); };
+	io.ImeSetInputScreenPosFn; // use default
 #endif
+	io.ImeSetInputScreenPosFn = [](int x, int y) { IME_SetInputScreenPos(x, y); };
 #endif
 
 	return true;
@@ -388,6 +391,10 @@ qboolean ImGui_ImplGL_Init(void)
 
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();
+
+	ImGui_Console_Init();
+	ImGui_ImeWindow_Init();
+	ImGui_SprView_Init();
 
 	return true;
 }
@@ -553,6 +560,8 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
 	ImGui_Console_OnGUI();
+	ImGui_ImeWindow_OnGUI();
+	ImGui_SprView_OnGUI();
 }
 
 void ImGui_ImplGL_OnGUI(void)

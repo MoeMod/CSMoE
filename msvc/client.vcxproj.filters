@@ -865,6 +865,9 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_gunkata.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\dlls\wpn_shared\wpn_zombiebomb.cpp">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">
@@ -1301,6 +1304,9 @@
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_m4a1dragon.h">
+      <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\wpn_shared\wpn_zombiebomb.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
   </ItemGroup>

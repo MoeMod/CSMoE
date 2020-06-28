@@ -133,7 +133,7 @@ BOOL CKnife::Deploy(void)
 	else
 #endif
 	{
-		return DefaultDeploy(WEAPON_NAME[0], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+		return DefaultDeploy(WEAPON_NAME[m_SeqModel], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
 	}
 }
 
@@ -295,10 +295,9 @@ int CKnife::Swing(int fFirst)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
-
 	TraceResult tr;
+	m_NextInspect = gpGlobals->time;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-	m_flLastFire = gpGlobals->time;
 	if (tr.flFraction >= 1)
 	{
 		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
@@ -451,7 +450,7 @@ int CKnife::Stab(int fFirst)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 32;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
@@ -574,7 +573,7 @@ int CKnife::Stab(int fFirst)
 void CKnife::ChangeModel()
 {
 	if (m_SeqModel >= 3)
-		m_SeqModel = 0;
+		m_SeqModel = -1;
 	m_SeqModel += 1;
 	Deploy();
 }
@@ -582,14 +581,13 @@ void CKnife::ChangeModel()
 void CKnife::Inspect()
 {
 
-	if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+	if (gpGlobals->time > m_NextInspect)
 	{
 #ifndef CLIENT_DLL
 		SendWeaponAnim(RANDOM_LONG(8, 10), 0);
 #endif
 		m_NextInspect = gpGlobals->time + GetInspectTime();
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-		m_flLastFire = invalid_time_point;
 	}
 
 }

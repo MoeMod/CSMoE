@@ -15,6 +15,7 @@ GNU General Public License for more details.
 
 #include "imgui_console.h"
 #include "imgui.h"
+#include "imgui_utils.h"
 
 extern "C" {
 #include "client.h"
@@ -39,20 +40,6 @@ typedef struct cmd_s
 	char* desc;
 	int          flags;
 } cmd_t;
-
-namespace ImGuiUtils {
-	inline void CenterNextWindow(ImGuiCond cond = 0) {
-		auto& io = ImGui::GetIO();
-		const auto& ds = io.DisplaySize;
-		ImGui::SetNextWindowPos(ImVec2(ds.x / 2, ds.y / 2), cond, ImVec2(0.5f, 0.5f));
-	}
-	inline ImVec2 GetScaledSize(ImVec2 in)
-	{
-		auto& io = ImGui::GetIO();
-		float scale = std::max(1.0f, io.FontGlobalScale * 2);
-		return { in.x * scale, in.y * scale };
-	}
-}
 
 struct TerminalHelper {
 
@@ -95,10 +82,13 @@ struct TerminalHelper {
 	{
 		convar_t* var = Cvar_FindVar(arg.command_line.front().c_str());
 		std::vector<std::string> ret;
-		if (var->string)
-			ret.emplace_back(var->string);
-		if (var->reset_string)
-			ret.emplace_back(var->reset_string);
+		if (var)
+		{
+			if (var->string)
+				ret.emplace_back(var->string);
+			if (var->reset_string)
+				ret.emplace_back(var->reset_string);
+		}
 
 		return ret;
 	}
@@ -118,7 +108,7 @@ struct TerminalHelper {
 		for (convar_t* var = cvar_vars; var; var = var->next)
 		{
 			const char* name = var->name;
-			const char* desc = var->description ? var->description : "";
+			const char* desc = ""; // TODO : var->description is not initialized
 			m_Commands.insert({ name, desc, CommandCallback, CompleteCvarCallback });
 		}
 

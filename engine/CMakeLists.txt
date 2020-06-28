@@ -19,8 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-cmake_minimum_required(VERSION  3.10.0)
-project(XASH_ENGINE C)
+cmake_minimum_required(VERSION  3.6.0)
+project(XASH_ENGINE C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -142,6 +142,7 @@ endif()
 
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
+	./platform/win32/ime_win32.cpp
 )
 
 set(XASH_ENGINE_SDL_SOURCES
@@ -155,16 +156,20 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/vid_android.c
    platform/android/android_nosdl.c
    platform/android/snd_opensles.c
+   platform/ime_stub.cpp
 )
 
 if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
 	common/launcher.c
 	platform/iOS/TapicEngine.mm
+	platform/ime_stub.cpp
 )
 else()
 set(XASH_ENGINE_APPLE_SOURCES
 	platform/macos/TouchBar.mm
+	platform/macos/vid_macos.mm
+	platform/ime_stub.cpp
 )
 endif()
 
@@ -226,6 +231,8 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
 	client/imgui_console.cpp
+	client/imgui_imewindow.cpp
+	client/imgui_sprview.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
@@ -258,7 +265,7 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
 if(XASH_SINGLE_BINARY)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES} platform/macos/vid_macos.mm platform/macos/vid_macos.h)
 endif()
 
 
@@ -307,7 +314,9 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(XASH_STATIC_GAMELIB)
+if(ANDROID)
+	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
+elseif(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
@@ -362,7 +371,7 @@ if(XASH_DEDICATED)
 endif()
 
 if(XASH_IMGUI)
-	target_link_libraries(${XASH_ENGINE} imgui)
+	target_link_libraries(${XASH_ENGINE} imgui imgui_ext)
 endif()
 
 if(XASH_SDL)

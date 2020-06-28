@@ -55,7 +55,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_xm8c",        "XM8",                   3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_tar21",       "TAR-21",                3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-
 	{"weapon_m95",         "Barrett M95",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 	{"weapon_wa2000",      "WA2000",                4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},

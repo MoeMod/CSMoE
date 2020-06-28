@@ -970,6 +970,16 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			// moved to weapons_data.cpp
 			flRatio += flShieldRatio;
 			flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
+
+			if (!FNullEnt(ENT(pevInflictor)) && !teamAttack)
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
+
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw"))
+				{
+					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
+				}
+			}
 		}
 
 		if (pAttack->m_pActiveItem && Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData())) // Zombie Knockback...
@@ -1935,6 +1945,11 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					TheBots->OnEvent(EVENT_PLAYER_JUMPED, this);
 				}
 			}
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{		
+				m_Activity = m_IdealActivity;
+				pev->gaitsequence = hopSeq;
+			}
 			break;
 		}
 		case PLAYER_SUPERJUMP:
@@ -1943,6 +1958,12 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				m_IdealActivity = m_Activity;
 			else
 				m_IdealActivity = ACT_LEAP;
+
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{	
+				m_Activity = m_IdealActivity;
+				pev->gaitsequence = hopSeq;
+			}
 			break;
 		}
 		case PLAYER_DIE:
@@ -1963,6 +1984,11 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					TheBots->OnEvent(EVENT_WEAPON_FIRED, this);
 				}
 			}
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				m_Activity = m_IdealActivity;
+				m_flLastFired = gpGlobals->time;
+			}
 			break;
 		}
 		case PLAYER_ATTACK2:
@@ -1976,6 +2002,11 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				{
 					TheBots->OnEvent(EVENT_WEAPON_FIRED, this);
 				}
+			}
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				m_Activity = m_IdealActivity;
+				m_flLastFired = gpGlobals->time;
 			}
 			break;
 		}
@@ -1996,7 +2027,26 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		case PLAYER_IDLE:
 		case PLAYER_WALK:
 		{
-			if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP))
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				if (m_Activity != ACT_HOP && m_Activity != ACT_LEAP)
+				{
+					if (pev->waterlevel > 1)
+					{
+						if (speed < 10.0)
+							m_IdealActivity = ACT_HOVER;
+						else
+							m_IdealActivity = ACT_SWIM;
+					}
+					else
+						m_IdealActivity = ACT_WALK;
+				}
+				else if (pev->flags & FL_ONGROUND)
+					m_IdealActivity = ACT_WALK;
+				break;
+				
+			}
+			else if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP))
 			{
 				if (pev->waterlevel <= 1)
 					m_IdealActivity = ACT_WALK;
@@ -2028,9 +2078,13 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		case ACT_HOP:
 		case ACT_LEAP:
 		{
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				animDesired = LookupSequence("ref_aim_knife_jump");
+				break;
+			}
 			if (m_Activity == m_IdealActivity)
-				return;
-
+				return;		
 			switch (m_Activity)
 			{
 			case ACT_RANGE_ATTACK1:	Q_strcpy(szAnim, "ref_shoot_"); break;
@@ -2060,14 +2114,29 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		}
 		case ACT_RANGE_ATTACK1:
 		{
-			m_flLastFired = gpGlobals->time;
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				pev->frame = 0;
+				if (pev->flags & FL_DUCKING)
+					Q_strcpy(szAnim, "crouch_shoot_");
+				else
+					Q_strcpy(szAnim, "ref_shoot_");
 
-			if (pev->flags & FL_DUCKING)
-				Q_strcpy(szAnim, "crouch_shoot_");
+				Q_strcat(szAnim, m_szAnimExtention);
+				animDesired = LookupSequence(szAnim);
+				break;
+			}
 			else
-				Q_strcpy(szAnim, "ref_shoot_");
+			{
+				m_flLastFired = gpGlobals->time;
 
-			Q_strcat(szAnim, m_szAnimExtention);
+				if (pev->flags & FL_DUCKING)
+					Q_strcpy(szAnim, "crouch_shoot_");
+				else
+					Q_strcpy(szAnim, "ref_shoot_");
+
+				Q_strcat(szAnim, m_szAnimExtention);
+			}
 			animDesired = LookupSequence(szAnim);
 			if (animDesired == -1)
 				animDesired = 0;
@@ -2081,14 +2150,28 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		}
 		case ACT_RANGE_ATTACK2:
 		{
-			m_flLastFired = gpGlobals->time;
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+			{
+				if (pev->flags & FL_DUCKING)
+					Q_strcpy(szAnim, "crouch_shoot2_");
+				else
+					Q_strcpy(szAnim, "ref_shoot2_");
 
-			if (pev->flags & FL_DUCKING)
-				Q_strcpy(szAnim, "crouch_shoot2_");
+				Q_strcat(szAnim, m_szAnimExtention);
+				animDesired = LookupSequence(szAnim);
+				break;
+			}
 			else
-				Q_strcpy(szAnim, "ref_shoot2_");
+			{
+				m_flLastFired = gpGlobals->time;
 
-			Q_strcat(szAnim, m_szAnimExtention);
+				if (pev->flags & FL_DUCKING)
+					Q_strcpy(szAnim, "crouch_shoot2_");
+				else
+					Q_strcpy(szAnim, "ref_shoot2_");
+
+				Q_strcat(szAnim, m_szAnimExtention);
+			}
 			animDesired = LookupSequence(szAnim);
 			if (animDesired == -1)
 				animDesired = 0;
@@ -2144,7 +2227,42 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				&& (m_Activity != ACT_LARGE_FLINCH || m_fSequenceFinished)
 				&& (m_Activity != ACT_RELOAD || m_fSequenceFinished))
 			{
-				if (speed <= 135.0f || m_flLastFired + 4.0s >= gpGlobals->time)
+				if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")))
+				{
+					if (pev->flags & FL_DUCKING)
+					{
+
+						Q_strcpy(szAnim, "crouch_aim_");
+						Q_strcat(szAnim, m_szAnimExtention);
+
+						if(speed)
+							Q_strcat(szAnim, "_crouchrun");
+						else
+							Q_strcat(szAnim, "_crouch_idle");
+					}
+					else
+					{
+						Q_strcpy(szAnim, "ref_aim_");
+						Q_strcat(szAnim, m_szAnimExtention);
+
+						if (speed >= 200.0)
+							Q_strcat(szAnim, "_run");
+						else if (speed)
+							Q_strcat(szAnim, "_walk");
+						else
+							Q_strcat(szAnim, "_idle1");
+					}
+					m_Activity = ACT_WALK;
+
+					animDesired = LookupSequence(szAnim);
+
+					if (speed > 200.0f)
+						pev->gaitsequence = LookupActivity(ACT_RUN);
+					else
+						pev->gaitsequence = LookupActivity(ACT_WALK);
+					break;
+				}
+				else if (speed <= 135.0f || m_flLastFired + 4.0s >= gpGlobals->time)
 				{
 					if (pev->flags & FL_DUCKING)
 						Q_strcpy(szAnim, "crouch_aim_");
@@ -2232,7 +2350,15 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 					animDesired = LookupSequence("gut_flinch");
 					break;
 			}
+			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")) && pev->flags & FL_DUCKING)
+			{
+				if(speed)
+					Q_strcat(szAnim, "_crouchrun");
+				else
+					Q_strcat(szAnim, "_crouch_idle");
 
+				m_Activity = m_IdealActivity;
+			}
 			if (animDesired == -1)
 				animDesired = 0;
 
@@ -2399,7 +2525,24 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 		}
 	}
 
-	if (pev->gaitsequence != hopSeq && pev->gaitsequence != leapSeq)
+	if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")) && pev->gaitsequence != hopSeq && pev->gaitsequence != leapSeq && pev->flags & FL_ONGROUND)
+	{
+		if (pev->flags & FL_DUCKING)
+		{
+			if (speed)
+				pev->gaitsequence = LookupActivity(ACT_CROUCH);
+			else
+				pev->gaitsequence = LookupActivity(ACT_CROUCHIDLE);
+		}
+		else if (speed > 200.0)
+			pev->gaitsequence = LookupActivity(ACT_RUN);
+		else if (speed > 0)
+			pev->gaitsequence = LookupActivity(ACT_WALK);
+		else
+			pev->gaitsequence = LookupActivity(ACT_IDLE);
+		
+	}
+	else if (pev->gaitsequence != hopSeq && pev->gaitsequence != leapSeq)
 	{
 		if (pev->flags & FL_DUCKING)
 		{
@@ -2447,7 +2590,14 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 			}
 		}
 	}
-	if (pev->sequence != animDesired)
+
+	if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")) && pev->sequence != animDesired && animDesired > 0)
+	{
+		pev->sequence = animDesired;
+		pev->frame = 0;
+		ResetSequenceInfo();
+	}
+	else if (pev->sequence != animDesired)
 	{
 		pev->sequence = animDesired;
 		pev->frame = 0;

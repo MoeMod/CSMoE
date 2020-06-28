@@ -194,6 +194,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_mp7a1c");
 	UTIL_PrecacheOtherWeapon("weapon_mp7a1p");
 	UTIL_PrecacheOtherWeapon("knife_zombi");
+	UTIL_PrecacheOtherWeapon("weapon_zombibomb");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex1");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex2");
 	UTIL_PrecacheOtherWeapon("z4b_infinityx");
@@ -227,6 +228,7 @@ void W_Precache()
 	g_sModelIndexFireball3 = PRECACHE_MODEL("sprites/fexplo.spr");
 	g_sModelIndexFireball4 = PRECACHE_MODEL("sprites/fexplo1.spr");
 	g_sModelIndexRadio = PRECACHE_MODEL("sprites/radio.spr");
+	g_sModelIndexZombiebomb_exp = PRECACHE_MODEL("sprites/zombiebomb_exp.spr");
 
 	g_sModelIndexCTGhost = PRECACHE_MODEL("sprites/b-tele1.spr");
 	g_sModelIndexTGhost = PRECACHE_MODEL("sprites/c-tele1.spr");
@@ -246,6 +248,7 @@ void W_Precache()
 	PRECACHE_SOUND("weapons/grenade_hit1.wav");	// grenade
 	PRECACHE_SOUND("weapons/grenade_hit2.wav");	// grenade
 	PRECACHE_SOUND("weapons/grenade_hit3.wav");	// grenade
+	PRECACHE_SOUND("zombi/zombi_bomb_exp.wav");	// grenade
 
 	PRECACHE_SOUND("weapons/bullet_hit1.wav");	// hit by bullet
 	PRECACHE_SOUND("weapons/bullet_hit2.wav");	// hit by bullet

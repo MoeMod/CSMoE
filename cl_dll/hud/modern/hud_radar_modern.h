@@ -69,6 +69,9 @@ private:
 	HSPRITE m_hRadar;
 	HSPRITE m_hRadaropaque;
 
+private:
+	CClientSprite m_hRadarSupplybox;
+
 	// Thanks to crsky
 	struct overview_t {
 		char map[64];

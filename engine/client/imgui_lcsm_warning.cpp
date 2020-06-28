@@ -15,24 +15,11 @@ GNU General Public License for more details.
 
 #include "imgui_lcsm_warning.h"
 #include "imgui.h"
+#include "imgui_utils.h"
 
 #include <algorithm>
 
 static bool lcsm_enabled = true;
-
-namespace ImGuiUtils {
-	inline void CenterNextWindow(ImGuiCond cond = 0) {
-		auto& io = ImGui::GetIO();
-		const auto& ds = io.DisplaySize;
-		ImGui::SetNextWindowPos(ImVec2(ds.x / 2, ds.y / 2), cond, ImVec2(0.5f, 0.5f));
-	}
-	inline ImVec2 GetScaledSize(ImVec2 in)
-	{
-		auto& io = ImGui::GetIO();
-		float scale = std::max(1.0f, io.FontGlobalScale * 2);
-		return { in.x * scale, in.y * scale };
-	}
-}
 
 void ImGui_LCSM_OnGUI(void)
 {

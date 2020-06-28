@@ -109,7 +109,7 @@ BOOL CDesperado::Deploy(void)
 	m_iShotsFired = 0;
 	m_fMaxSpeed = 250.0f;
 
-	if (!m_iClip)
+	if (!m_iClip && (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0))
 	{
 		if (pev->iuser1)
 		{

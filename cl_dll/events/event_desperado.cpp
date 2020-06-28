@@ -68,11 +68,12 @@ void EV_FireDesperado( event_args_t *args )
 	cl_entity_t *ent = gEngfuncs.GetViewModel();
 	AngleVectors( angles, forward, right, up );
 
-	/*if (effect & (1 << EVENT_BUFFAKM4HIT))
+	if (args->bparam1)
 	{
-		HudAmmo().HitForBuff(cl.time);
+		gHUD.m_Ammo.HitForBuff(gHUD.m_flTime);
+		return;
 	}
-	*/
+
 	if ( EV_IsLocal( idx ) )
 	{
 		++g_iShotsFired;
