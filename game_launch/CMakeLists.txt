@@ -79,7 +79,34 @@ if(WIN32)
 	target_link_libraries(${XASH_LAUNCHER} xash)
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
 		OUTPUT_NAME csmoe_win32) # Change name to your gamedir, if you building a standalone game
-	install( TARGETS ${XASH_LAUNCHER} DESTINATION ${CMAKE_INSTALL_PREFIX} )
+
+	set(CPACK_GENERATOR "NSIS")
+	set(CPACK_PACKAGE_NAME "CSMoE")
+	set(CPACK_PACKAGE_VENDOR "MoeMod")
+	set(CPACK_PACKAGE_FILE_NAME "CSMoE-Win32-${CMAKE_GENERATOR_PLATFORM}")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "CSMoE")
+	set(CPACK_PACKAGE_EXECUTABLES "..\\\\csmoe_win32" "${CPACK_PACKAGE_NAME}")
+	set(CPACK_CREATE_DESKTOP_LINKS ${XASH_LAUNCHER})
+	set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+	set(CPACK_NSIS_MODIFY_PATH OFF)
+	set(CPACK_NSIS_MUI_FINISHPAGE_RUN ${XASH_LAUNCHER})
+
+	install(TARGETS ${XASH_LAUNCHER} DESTINATION ".")
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/csmoe DESTINATION "." OPTIONAL)
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/cstrike DESTINATION "." OPTIONAL)
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/valve DESTINATION "." OPTIONAL)
+
+	include(CPack)
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		add_custom_target(csmoe_cpack_nsis
+			COMMAND "cpack.exe" "--config" "CPackConfig.cmake" "-G" "NSIS64" "-V"
+			DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS x64")
+	else()
+		add_custom_target(csmoe_cpack_nsis
+			COMMAND "cpack.exe" "--config" "CPackConfig.cmake" "-G" "NSIS" "-V"
+			DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS x86")
+	endif()
+
 elseif(APPLE)
 	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.icns")
 	set_source_files_properties(${APP_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)

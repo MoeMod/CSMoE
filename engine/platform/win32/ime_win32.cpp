@@ -219,7 +219,7 @@ static void OnIMEChangeCandidates()
 
 static WNDPROC g_ImeWndProc;
 static char s_szInputBuffer[4096];
-static LRESULT ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
+static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
     switch (uMsg)
