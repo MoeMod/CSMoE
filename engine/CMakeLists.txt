@@ -142,6 +142,7 @@ endif()
 
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
+	./platform/win32/ime_win32.cpp
 )
 
 set(XASH_ENGINE_SDL_SOURCES
@@ -155,16 +156,20 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/vid_android.c
    platform/android/android_nosdl.c
    platform/android/snd_opensles.c
+   platform/ime_stub.cpp
 )
 
 if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
 	common/launcher.c
 	platform/iOS/TapicEngine.mm
+	platform/ime_stub.cpp
 )
 else()
 set(XASH_ENGINE_APPLE_SOURCES
 	platform/macos/TouchBar.mm
+	platform/macos/vid_macos.mm
+	platform/ime_stub.cpp
 )
 endif()
 
@@ -226,6 +231,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
 	client/imgui_console.cpp
+	client/imgui_imewindow.cpp
 	client/imgui_sprview.cpp
 )
 
@@ -259,7 +265,7 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
 if(XASH_SINGLE_BINARY)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES} platform/macos/vid_macos.mm platform/macos/vid_macos.h)
 endif()
 
 

@@ -252,6 +252,12 @@
     <ClInclude Include="..\engine\client\imgui_sprview.h">
       <Filter>engine\client\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="..\engine\client\input_ime.h">
+      <Filter>engine\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\engine\client\imgui_imewindow.h">
+      <Filter>engine\client\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\engine\client\gl_warp.c">
@@ -690,6 +696,12 @@
       <Filter>engine\client\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\engine\client\imgui_sprview.cpp">
+      <Filter>engine\client\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\platform\winrt\ime_winrt.cpp">
+      <Filter>engine\platform\winrt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\engine\client\imgui_imewindow.cpp">
       <Filter>engine\client\imgui</Filter>
     </ClCompile>
   </ItemGroup>

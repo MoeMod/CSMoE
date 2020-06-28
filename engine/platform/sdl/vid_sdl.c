@@ -19,12 +19,14 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 #include "input.h"
+#include "input_ime.h"
 #include "gl_vidnt.h"
 #include <SDL.h>
 #include <SDL_syswm.h>
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 #include "platform/macos/TouchBar.h"
+#include "platform/macos/vid_macos.h"
 #endif
 
 #if defined(XASH_WINRT)
@@ -341,9 +343,10 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 			WinRT_FullscreenMode_Install(fullscreen);
 		}
 		WinRT_BackButton_Install();
-		WinRT_ImeCreateContext();
 	}
 #endif
+
+	IME_CreateContext();
 	
 	return true;
 }
@@ -554,6 +557,24 @@ qboolean VID_GetDPI(float* out)
 #if defined(XASH_WINRT)
 	dpi = WinRT_GetDisplayDPI();
 	success = dpi > 0.0f;
+#elif defined(_WIN32)
+	{
+		SDL_SysWMinfo wmInfo;
+		SDL_VERSION(&wmInfo.version);
+		SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+		{
+			HWND hwnd = wmInfo.info.win.window;
+			int res = GetDpiForWindow(hwnd);
+			if (res)
+			{
+				success = true;
+				dpi = res / 96.0f;
+			}
+		}
+	}
+#elif defined(SDL_VIDEO_DRIVER_COCOA)
+	success = true;
+	dpi = MacOS_GetDPI();
 #else
 	int display = SDL_GetWindowDisplayIndex(host.hWnd);
 	// MoeMod : why returning 0 on success???
