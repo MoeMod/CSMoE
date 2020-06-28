@@ -184,6 +184,7 @@ jobs:
     language: cpp
     before_script:
     - choco install nsis
+    - rm C:/ProgramData/chocolatey/bin/cpack.exe
     - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
     - unzip SDL2.zip
     - mv SDL2-2.0.12 SDL2
