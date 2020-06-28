@@ -165,12 +165,12 @@ jobs:
     - "./gradlew assembleRelease"
     - cd ..
     before_deploy:
-      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-Full-unsigned.apk
+      - cp Android/app/build/outputs/apk/release/app-release-unsigned.apk CSMoE-CD-Android-arm64-unsigned-Full.apk
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-Android-arm64-Full-unsigned.apk
+        - CSMoE-CD-Android-arm64-unsigned-Full.apk
       on:
         branch: master
         repo: MoeMod/CSMoE
@@ -191,17 +191,23 @@ jobs:
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
-    - mkdir -p win-build && cd win-build
+    - mkdir -p win-build-x64 && cd win-build-x64
     - cmake -A "x64" -DCMAKE_BUILD_TYPE=Release ../
     - cmake --build . --config Release --target csmoe_cpack_nsis
     - cd ..
+    - mkdir -p win-build-x86 && cd win-build-x86
+    - cmake -A "Win32" -DCMAKE_BUILD_TYPE=Release ../
+    - cmake --build . --config Release --target csmoe_cpack_nsis
+    - cd ..
     before_deploy:
-    - cp win-build/CSMoE-Win32-AMD64.exe CSMoE-CD-Win32-x64-Full.exe
+    - cp win-build-x64/CSMoE-Win32-x64.exe CSMoE-CD-Win32-x64-Full.exe
+    - cp win-build-x86/CSMoE-Win32-Win32.exe CSMoE-CD-Win32-x86-Full.exe
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
         - CSMoE-CD-Win32-x64-Full.exe
+        - CSMoE-CD-Win32-x86-Full.exe
       on:
         branch: master
         repo: MoeMod/CSMoE
