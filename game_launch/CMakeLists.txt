@@ -97,9 +97,15 @@ if(WIN32)
 	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/valve DESTINATION "." OPTIONAL)
 
 	include(CPack)
-	add_custom_target(csmoe_cpack_nsis
-		COMMAND "cpack.exe" "-V"
-		DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS file")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		add_custom_target(csmoe_cpack_nsis
+			COMMAND "cpack.exe" "--config" "CPackConfig.cmake" "-G" "NSIS64" "-V"
+			DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS x64")
+	else()
+		add_custom_target(csmoe_cpack_nsis
+			COMMAND "cpack.exe" "--config" "CPackConfig.cmake" "-G" "NSIS" "-V"
+			DEPENDS ${XASH_LAUNCHER} WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" COMMENT "Generating NSIS x86")
+	endif()
 
 elseif(APPLE)
 	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.icns")
