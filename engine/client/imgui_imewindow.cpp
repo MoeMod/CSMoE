@@ -44,9 +44,9 @@ void ImGui_ImeWindow_OnGUI(void)
     static ImVec2 window_pos_pivot = ImVec2();
 
     /*
-       #1 Candidate List Window ¤ÎÎ»ÖÃ¤Ëév¤¹¤ë±£³Ö
-       Candidate List ¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Ë¡¢¥¦¥£¥ó¥É¥¦Î»ÖÃ¤ò„Ó¤«¤µ¤Ê¤¤¡£
-       ¥¯¥ê¥Ã¥¯áá¤Ë¡¢TextInput¤òÍ¢¤µ¤»¤ë„IÀí
+       #1 Candidate List Window ã®ä½ç½®ã«é–¢ã™ã‚‹ä¿æŒ
+       Candidate List ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã«ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã‚’å‹•ã‹ã•ãªã„ã€‚
+       ã‚¯ãƒªãƒƒã‚¯å¾Œã«ã€TextInputã‚’å¾©å¸°ã•ã›ã‚‹å‡¦ç†
        see #1
     */
     static ImGuiID candidate_window_root_id = 0;
@@ -55,7 +55,7 @@ void ImGui_ImeWindow_OnGUI(void)
     static ImGuiID lastTextInputActiveId = 0;
     static ImGuiID lastTextInputFocusId = 0;
 
-    // Candidate Window ¤ò¥Õ¥©©`¥«¥¹¤·¤Æ¤¤¤ë•r¤Ï Window ¤ÎÎ»ÖÃ¤ò²Ù×÷¤·¤Ê¤¤ 
+    // Candidate Window ã‚’ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã—ã¦ã„ã‚‹æ™‚ã¯ Window ã®ä½ç½®ã‚’æ“ä½œã—ãªã„ 
     if (!(candidate_window_root_id &&
         ((ImGui::GetCurrentContext()->NavWindow ? ImGui::GetCurrentContext()->NavWindow->RootWindow->ID : 0u) == candidate_window_root_id))) {
 
@@ -66,7 +66,7 @@ void ImGui_ImeWindow_OnGUI(void)
         const ImGuiContext* const currentContext = ImGui::GetCurrentContext();
         IM_ASSERT(currentContext || !"ImGui::GetCurrentContext() return nullptr.");
         if (currentContext) {
-            // mouse press ¤·¤Æ¤ëég¤Ï¡¢ActiveID ¤¬ÇĞ¤êÌæ¤ï¤ë¤Î¤Ç¡¢
+            // mouse press ã—ã¦ã‚‹é–“ã¯ã€ActiveID ãŒåˆ‡ã‚Šæ›¿ã‚ã‚‹ã®ã§ã€
             if (!ImGui::IsMouseClicked(0)) {
                 if ((currentContext->WantTextInputNextFrame != -1) ? (!!(currentContext->WantTextInputNextFrame)) : false) {
                     if ((!!currentContext->NavWindow) &&
@@ -104,8 +104,8 @@ void ImGui_ImeWindow_OnGUI(void)
         std::vector<const char*> listbox_items = {};
         int candidate_selection = 0;
 
-        /* ¥Ú©`¥¸¤Ë·Ö¸î¤·¤Ş¤¹ */
-        // TODO:candidate_window_num ¤Î‚¤Ë×¢Òâ 0 ³ıËã¤Î¿ÉÄÜĞÔ¤¬¤¢¤ë¡£
+        /* ãƒšãƒ¼ã‚¸ã«åˆ†å‰²ã—ã¾ã™ */
+        // TODO:candidate_window_num ã®å€¤ã«æ³¨æ„ 0 é™¤ç®—ã®å¯èƒ½æ€§ãŒã‚ã‚‹ã€‚
         if (candidate_window_num)
         {
             int candidate_page = ((int)selection) / candidate_window_num;
@@ -124,8 +124,7 @@ void ImGui_ImeWindow_OnGUI(void)
             std::copy(begin_ite, end_ite, std::back_inserter(listbox_items));
         }
 
-        /* ¤â¤· candidate window ¤¬»­Ãæ¤ÎÍâ¤Ë³ö¤ë¤³¤È¤¬¤¢¤ë¤Î¤Ê¤é¤Ğ¡¢ÉÏ¤Ë±íÊ¾¤¹¤ë */
-        const float candidate_window_width = 233;
+        /* ã‚‚ã— candidate window ãŒç”»é¢ã®å¤–ã«å‡ºã‚‹ã“ã¨ãŒã‚ã‚‹ã®ãªã‚‰ã°ã€ä¸Šã«è¡¨ç¤ºã™ã‚‹ */
         const float candidate_window_height =
             ((ImGui::GetStyle().FramePadding.y * 2) +
                 ((ImGui::GetTextLineHeightWithSpacing()) * (std::min<int>(10, std::size(listbox_items)) + 3)));
@@ -150,7 +149,7 @@ void ImGui_ImeWindow_OnGUI(void)
                 static_cast<int>(std::size(listbox_items)),
                 std::min<int>(10, std::size(listbox_items)))) {
 
-                int i = 0; // for ¤Î×îáá¤Ç¡¢i ¤ò¥¤¥ó¥¯¥ê¥á¥ó¥È¤·¤Æ¤¤¤ë¤Î¤Ç¡¢×¢Òâ 
+                int i = 0; // for ã®æœ€å¾Œã§ã€i ã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã—ã¦ã„ã‚‹ã®ã§ã€æ³¨æ„ 
                 for (const char*& listbox_item : listbox_items) {
                     ImGui::Text("%d.", i + IME_CandidateListStartsAtOne());
                     ImGui::SameLine();
@@ -168,32 +167,32 @@ void ImGui_ImeWindow_OnGUI(void)
                         }
 
                         /*
-                          ImmNotifyIME (hImc, NI_SELECTCANDIDATESTR, 0, candidate_page* candidate_window_num + i)); ¤ò¤·¤¿¤¤¤Î¤À¤¬¡¢
-                          Vista ÒÔ½µ ImmNotifyIME ¤Ï NI_SELECTCANDIDATESTR ¤Ï¥µ¥İ©`¥È¤µ¤ì¤Ê¤¤¡£
-                          @see IMM32»¥“QĞÔÇéˆó.doc from Microsoft
+                          ImmNotifyIME (hImc, NI_SELECTCANDIDATESTR, 0, candidate_page* candidate_window_num + i)); ã‚’ã—ãŸã„ã®ã ãŒã€
+                          Vista ä»¥é™ ImmNotifyIME ã¯ NI_SELECTCANDIDATESTR ã¯ã‚µãƒãƒ¼ãƒˆã•ã‚Œãªã„ã€‚
+                          @see IMM32äº’æ›æ€§æƒ…å ±.doc from Microsoft
 
-                          ¤½¤³¤Ç¡¢DXUTguiIME.cpp (¤«¤Ä¤ÆÊ¹¤ï¤ì¤Æ¤¤¤¿ DXUT ¤Î gui IME „IÀí²¿ ¬FÔÚ¤Ï¡¢deprecated ’Q¤¤¤Ç¡¢
-                          https://github.com/microsoft/DXUT ¤Ç´_ÕJ³öÀ´¤ë
-                          µ±Ô“¤Î¥³©`¥É¤Ï¡¢https://github.com/microsoft/DXUT/blob/master/Optional/DXUTguiIME.cpp )
-                          ¤ò´_ÕJ¤·¤¿¤È¤³¤í
+                          ãã“ã§ã€DXUTguiIME.cpp (ã‹ã¤ã¦ä½¿ã‚ã‚Œã¦ã„ãŸ DXUT ã® gui IME å‡¦ç†éƒ¨ ç¾åœ¨ã¯ã€deprecated æ‰±ã„ã§ã€
+                          https://github.com/microsoft/DXUT ã§ç¢ºèªå‡ºæ¥ã‚‹
+                          å½“è©²ã®ã‚³ãƒ¼ãƒ‰ã¯ã€https://github.com/microsoft/DXUT/blob/master/Optional/DXUTguiIME.cpp )
+                          ã‚’ç¢ºèªã—ãŸã¨ã“ã‚
 
-                          L.380¤«¤é ¤Ç Candidate List ¤ò¥¯¥ê¥Ã¥¯¤·¤¿¤È¤­¤Î¥³©`¥É¤¬¤¢¤ë
+                          L.380ã‹ã‚‰ ã§ Candidate List ã‚’ã‚¯ãƒªãƒƒã‚¯ã—ãŸã¨ãã®ã‚³ãƒ¼ãƒ‰ãŒã‚ã‚‹
 
-                          ¤É¤¦¤·¤Æ¤¤¤ë¤«¤È¤¤¤¦¤È SendKey ¤Ç¡¢Ê¸Ó¡¥«©`¥½¥ë¥­©`¤òËÍ¤ë¤³¤È¤Ç¡¢Candidate List¤«¤é¤Îßx’k¤òĞĞ¤Ã¤Æ¤¤¤ë¡£
-                          £¨¤Ê¤ó¤È¤¤¤¦¤³¤È£¿£¡£©
+                          ã©ã†ã—ã¦ã„ã‚‹ã‹ã¨ã„ã†ã¨ SendKey ã§ã€çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«ã‚­ãƒ¼ã‚’é€ã‚‹ã“ã¨ã§ã€Candidate Listã‹ã‚‰ã®é¸æŠã‚’è¡Œã£ã¦ã„ã‚‹ã€‚
+                          ï¼ˆãªã‚“ã¨ã„ã†ã“ã¨ï¼Ÿï¼ï¼‰
 
-                          ¤³¤ì¤ò¸ù’‡¤Ë SendKey ¤òÀûÓÃ¤·¤¿¥³©`¥É¤ò×÷³É¤¹¤ë¡£
+                          ã“ã‚Œã‚’æ ¹æ‹ ã« SendKey ã‚’åˆ©ç”¨ã—ãŸã‚³ãƒ¼ãƒ‰ã‚’ä½œæˆã™ã‚‹ã€‚
                         */
                         {
                             /*
-                              ¤³¤ì¤Ç¡¢ßx’k¤µ¤ì¤¿‰ä“QºòÑa¤¬Ä©Î²¤ÎˆöºÏ¤Ï´_¶¨¡¢
-                              ¤½¤¦¤Ç¤Ê¤¤ˆöºÏ¤Ï¡¢´Î¤Î‰ä“QÎÄ¹¤òßx’k¤µ¤»¤¿¤¤¤Î¤Ç¤¢¤ë¤¬¡¢
-                              keybd_event ¤Ç×´‘B¤òËÍ¤Ã¤Æ¤¤¤ë¤Î¤Ç¡¢PostMessage ¤Ç¤½¤Î„IÀí¤òßW¤é¤»¤ë
-                              ¤³¤Î request_candidate_list_str_commit ¤Ï¡¢ WM_IME_COMPOSITION ¤Î×îáá¤Ç¥Á¥§¥Ã¥¯¤µ¤ì
-                              WM_APP + 200 ¤ò PostMessage ¤·¤Æ¡¢¤½¤³¤ÇŒgëH¤Î´_¶¨„Ó×÷¤¬ĞĞ¤ï¤ì¤ë¡£
+                              ã“ã‚Œã§ã€é¸æŠã•ã‚ŒãŸå¤‰æ›å€™è£œãŒæœ«å°¾ã®å ´åˆã¯ç¢ºå®šã€
+                              ãã†ã§ãªã„å ´åˆã¯ã€æ¬¡ã®å¤‰æ›æ–‡ç¯€ã‚’é¸æŠã•ã›ãŸã„ã®ã§ã‚ã‚‹ãŒã€
+                              keybd_event ã§çŠ¶æ…‹ã‚’é€ã£ã¦ã„ã‚‹ã®ã§ã€PostMessage ã§ãã®å‡¦ç†ã‚’é…ã‚‰ã›ã‚‹
+                              ã“ã® request_candidate_list_str_commit ã¯ã€ WM_IME_COMPOSITION ã®æœ€å¾Œã§ãƒã‚§ãƒƒã‚¯ã•ã‚Œ
+                              WM_APP + 200 ã‚’ PostMessage ã—ã¦ã€ãã“ã§å®Ÿéš›ã®ç¢ºå®šå‹•ä½œãŒè¡Œã‚ã‚Œã‚‹ã€‚
                             */
 
-                            // TODO : ÉÏÆÁ
+                            // TODO : ä¸Šå±
                             /*
                             if (candidate_selection == i) {
                                 OutputDebugStringW(L"complete\n");
@@ -220,15 +219,13 @@ void ImGui_ImeWindow_OnGUI(void)
                 ImGui::ListBoxFooter();
             }
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-            ImGui::Text(completed);
+            ImGui::TextUnformatted(completed);
             ImGui::PopStyleColor();
 
-            // #1 ¤³¤³¤Ç×÷¤ë¥¦¥£¥ó¥É¥¦¤¬¥Õ¥©©`¥«¥¹¤ò³Ö¤Ã¤¿¤È¤­¤Ë¤Ï¡¢¥¦¥£¥ó¥É¥¦¤ÎÎ»ÖÃ¤ò‰ä¸ü¤·¤Æ¤Ï¤¤¤±¤Ê¤¤¡£
+            // #1 ã“ã“ã§ä½œã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’æŒã£ãŸã¨ãã«ã¯ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’å¤‰æ›´ã—ã¦ã¯ã„ã‘ãªã„ã€‚
             candidate_window_root_id = ImGui::GetCurrentWindowRead()->RootWindow->ID;
             ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());
         }
         ImGui::End();
     }
-
-    return;
 }
