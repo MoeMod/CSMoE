@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "csgo_sawedoff.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -126,7 +130,7 @@ void CSawedoff::PrimaryAttack(void)
 	m_NextInspect = gpGlobals->time;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(9, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0);
+	m_pPlayer->FireBullets(9, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
 #endif
 
 	int flags;
@@ -238,6 +242,18 @@ void CSawedoff::WeaponIdle(void)
 		else
 			SendWeaponAnim(SAWEDOFF_IDLE, UseDecrement() != FALSE);
 	}
+}
+
+int CSawedoff::GetPrimaryAttackDamage() const
+{
+	int iDamage = 32;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		iDamage = 42;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		iDamage = 42;
+#endif
+	return iDamage;
 }
 
 void CSawedoff::Inspect()

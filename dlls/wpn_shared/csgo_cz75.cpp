@@ -19,7 +19,6 @@
 #include "player.h"
 #include "weapons.h"
 #include "csgo_cz75.h"
-#include "gamemode/mods_const.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif

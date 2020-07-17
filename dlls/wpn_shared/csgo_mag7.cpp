@@ -202,7 +202,7 @@ void CMag7::WeaponIdle(void)
 
 int CMag7::GetPrimaryAttackDamage() const
 {
-	int iDamage = 26;
+	int iDamage = 30;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 		iDamage = 40;

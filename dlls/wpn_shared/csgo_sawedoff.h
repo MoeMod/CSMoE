@@ -28,6 +28,7 @@ public:
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void Reload() override;
+	int GetPrimaryAttackDamage() const;
 	void Inspect() override;
 	duration_t GetInspectTime() override { return SAWEDOFF_INSPECT_TIME; }
 	void WeaponIdle() override;

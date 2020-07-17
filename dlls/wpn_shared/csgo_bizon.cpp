@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "csgo_bizon.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
