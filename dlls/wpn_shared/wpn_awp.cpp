@@ -168,7 +168,7 @@ void CAWP::AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_338MAG, GetDamage(), 0.99, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
@@ -247,14 +247,13 @@ void CAWP::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(6, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

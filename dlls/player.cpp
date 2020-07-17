@@ -981,10 +981,14 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				}
 			}
 		}
-
+		CBaseEntity* DmgEntity = GetClassPtr<CBaseEntity>(pevInflictor);
 		if (pAttack->m_pActiveItem && Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData())) // Zombie Knockback...
 		{
 			// already handled.
+		}
+		else if (!Q_strcmp(STRING(DmgEntity->pev->classname), "molotov_fire") && pev == pAttacker->pev)
+		{
+			//do nothing
 		}
 		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
 		{
@@ -1015,7 +1019,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	// Armor
 	// armor doesn't protect against fall or drown damage!
-	if (pev->armorvalue != 0.0f && !(bitsDamageType & (DMG_DROWN | DMG_FALL)) && IsArmored(m_LastHitGroup))
+	if (pev->armorvalue != 0.0f && !(bitsDamageType & (DMG_DROWN | DMG_FALL | DMG_BURN)) && IsArmored(m_LastHitGroup))
 	{
 		float flNew = flRatio * flDamage;
 		float flArmor = (flDamage - flNew) * flBonus;
@@ -4854,6 +4858,24 @@ void CBasePlayer::Spawn()
 		default:
 			break;
 		}
+	}
+	if (m_pActiveItem != NULL)
+	{		
+		if (!Q_strcmp(STRING(m_pActiveItem->pev->classname), "weapon_aug"))
+		{
+			pev->viewmodel = MAKE_STRING("models/v_aug.mdl");
+#ifndef CLIENT_DLL
+			UpdateShieldCrosshair(TRUE);
+#endif
+		}
+		else if ((!Q_strcmp(STRING(m_pActiveItem->pev->classname), "weapon_sg552")))
+		{
+			pev->viewmodel = MAKE_STRING("models/v_sg552.mdl");
+#ifndef CLIENT_DLL
+			UpdateShieldCrosshair(TRUE);
+#endif
+		}
+			
 	}
 
 	m_iFOV = DEFAULT_FOV;

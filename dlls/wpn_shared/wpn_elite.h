@@ -15,7 +15,7 @@ namespace sv {
 #define ELITE_RELOAD_TIME	4.5s
 #define ELITE_DAMAGE		36
 #define ELITE_RANGE_MODIFER	0.75
-#define ELITE_INSPECT_TIME		4.48s
+#define ELITE_INSPECT_TIME		4.52s
 
 class CELITE : public CBasePlayerWeapon
 {

@@ -175,6 +175,12 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_sgdrill");
 	UTIL_PrecacheOtherWeapon("weapon_mg3");
 	UTIL_PrecacheOtherWeapon("weapon_mg36");
+	UTIL_PrecacheOtherWeapon("csgo_mag7");
+	UTIL_PrecacheOtherWeapon("csgo_negev");
+	UTIL_PrecacheOtherWeapon("csgo_sawedoff");
+	UTIL_PrecacheOtherWeapon("csgo_bizon");
+	UTIL_PrecacheOtherWeapon("csgo_tec9");
+	UTIL_PrecacheOtherWeapon("csgo_cz75");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
 	UTIL_PrecacheOtherWeapon("weapon_bow");

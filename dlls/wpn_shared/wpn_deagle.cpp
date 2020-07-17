@@ -146,7 +146,7 @@ void CDEAGLE::DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 	}
 
 	m_flLastFire = gpGlobals->time;
-
+	m_NextInspect = gpGlobals->time;
 	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
@@ -237,14 +237,23 @@ void CDEAGLE::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
-			SendWeaponAnim(RANDOM_LONG(6, 7), 0);
+			if (RANDOM_LONG(0, 7))
+			{
+				SendWeaponAnim(6, 0);
+				m_NextInspect = gpGlobals->time + GetInspectTime();
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			}
+			else
+			{
+				SendWeaponAnim(7, 0);
+				m_NextInspect = gpGlobals->time + GetInspectTime() + 2.84s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime() + 2.84s;
+			}
 #endif
-			m_NextInspect = gpGlobals->time + GetInspectTime();
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
+			
 		}
 	}
 

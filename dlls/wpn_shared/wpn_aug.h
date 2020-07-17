@@ -11,11 +11,12 @@ namespace sv {
 #endif
 
 //AUG
+#define SPECIALSCOPE		0
 #define AUG_MAX_SPEED			240
 #define AUG_DAMAGE			32
 #define AUG_RANGE_MODIFER		0.96
 #define AUG_RELOAD_TIME			3.3s
-#define AUG_INSPECT_TIME			4.48s
+#define AUG_INSPECT_TIME			3.47s
 
 class CAUG : public CBasePlayerWeapon
 {
@@ -30,6 +31,9 @@ public:
 	duration_t GetInspectTime() override { return AUG_INSPECT_TIME; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+#if SPECIALSCOPE
+	void SpecialScope();
+#endif
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {

@@ -13,7 +13,7 @@ namespace sv {
 //m3
 #define M3_MAX_SPEED		230
 #define M3_CONE_VECTOR		Vector(0.0675, 0.0675, 0.0)	// special shotgun spreads
-#define M3_INSPECT_TIME		4.48s
+#define M3_INSPECT_TIME		4.50s
 
 class CM3 : public CBasePlayerWeapon
 {

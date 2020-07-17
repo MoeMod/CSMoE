@@ -13,7 +13,7 @@ namespace sv {
 //xm1014
 #define XM1014_MAX_SPEED	240
 #define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
-#define XM1014_INSPECT_TIME		4.48s
+#define XM1014_INSPECT_TIME		4.44s
 
 class CXM1014 : public CBasePlayerWeapon
 {

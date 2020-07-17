@@ -29,7 +29,7 @@
 
 namespace cl {
 
-static const char *SOUND_NAME = "weapons/mg3-1";
+static const char *SOUND_NAME = "weapons/mg3-1.wav";
 
 enum m249_e
 {

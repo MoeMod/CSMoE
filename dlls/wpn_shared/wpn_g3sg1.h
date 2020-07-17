@@ -16,7 +16,7 @@ namespace sv {
 #define G3SG1_DAMAGE		80
 #define G3SG1_RANGE_MODIFER	0.98
 #define G3SG1_RELOAD_TIME	3.5s
-#define G3SG1_INSPECT_TIME		4.48s
+#define G3SG1_INSPECT_TIME		3.69s
 
 class CG3SG1 : public CBasePlayerWeapon
 {

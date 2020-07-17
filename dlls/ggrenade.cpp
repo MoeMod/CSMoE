@@ -14,6 +14,7 @@
 #include "globals.h"
 
 #include "bot_include.h"
+#include <engine\common\mathlib.h>
 
 namespace sv {
 
@@ -1040,6 +1041,236 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb.mdl");
 
 	return pGrenade;
+}
+
+
+CGrenade* CGrenade::ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent)
+{
+	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
+	pGrenade->Spawn();
+
+	UTIL_SetOrigin(pGrenade->pev, vecStart);
+	pGrenade->pev->velocity = vecVelocity;
+	pGrenade->pev->angles = pevOwner->angles;
+	pGrenade->pev->owner = ENT(pevOwner);
+	pGrenade->m_usEvent = usEvent;
+	pGrenade->m_bLightSmoke = false;
+	pGrenade->m_bDetonated = false;
+	pGrenade->SetTouch(&CGrenade::FB_BounceTouch);
+	pGrenade->pev->dmgtime = gpGlobals->time + time;
+	pGrenade->SetThink(&CGrenade::FB_TumbleThink);
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
+
+	if (time < 0.1s)
+	{
+		pGrenade->pev->nextthink = gpGlobals->time;
+		pGrenade->pev->velocity = Vector(0, 0, 0);
+	}
+
+	pGrenade->pev->sequence = RANDOM_LONG(4, 6);
+	pGrenade->pev->framerate = 1.0f;
+	pGrenade->m_bJustBlew = true;
+	pGrenade->pev->gravity = 0.5f;
+	pGrenade->pev->friction = 0.8f;
+
+	SET_MODEL(ENT(pGrenade->pev), "models/w_molotov.mdl");
+	pGrenade->pev->dmg = 35.0f;
+
+	return pGrenade;
+}
+
+void CGrenade::FB_BounceTouch(CBaseEntity* pOther)
+{
+	// don't hit the guy that launched this grenade
+	if (pOther->edict() == pev->owner)
+		return;
+
+	if (FClassnameIs(pOther->pev, "func_breakable"))
+	{
+		return;
+	}
+	// don't detonate on ladders
+	if (FClassnameIs(pOther->pev, "func_ladder"))
+	{
+		return;
+	}
+
+
+	// this is my heuristic for modulating the grenade velocity because grenades dropped purely vertical
+	// or thrown very far tend to slow down too quickly for me to always catch just by testing velocity.
+	// trimming the Z velocity a bit seems to help quite a bit.
+	Vector vecTestVelocity;
+	vecTestVelocity = pev->velocity;
+	vecTestVelocity.z *= 0.7f;
+
+	if (!m_fRegisteredSound && vecTestVelocity.Length() <= 60.0f)
+	{
+		// grenade is moving really slow. It's probably very close to where it will ultimately stop moving.
+		// go ahead and emit the danger sound.
+
+		// register a radius louder than the explosion, so we make sure everyone gets out of the way
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, pev->dmg / 0.4f, 0.3s);
+		m_fRegisteredSound = TRUE;
+	}
+
+	if (pev->flags & FL_ONGROUND)
+	{
+		// add a bit of static friction
+		pev->velocity = pev->velocity * 0.8f;
+		pev->sequence = RANDOM_LONG(1, 1);	// TODO: what?
+	}
+	else
+	{
+		if (m_iBounceCount < 5)
+		{
+			// play bounce sound
+			BounceSound();
+		}
+
+		if (m_iBounceCount >= 10)
+		{
+			pev->groundentity = ENT(0);
+			pev->flags |= FL_ONGROUND;
+			pev->velocity = g_vecZero;
+		}
+
+		++m_iBounceCount;
+	}
+
+	pev->framerate = pev->velocity.Length() / 200.0f;
+
+	if (pev->framerate > 1)
+	{
+		pev->framerate = 1.0f;
+	}
+	else if (pev->framerate < 0.5f)
+	{
+		pev->framerate = 0.0f;
+	}
+
+	Vector vecSpot;// trace starts here!
+	TraceResult tr;
+
+	vecSpot = pev->origin + Vector(0, 0, 8);
+	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -40), ignore_monsters, ENT(pev), &tr);
+	if (tr.flFraction < 1)
+	{
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+		if (pHit->IsPlayer())
+		{
+			return;
+		}
+		else
+		{
+			// only detonate on surfaces less steep than this
+			const float kMinCos = cosf(DEG2RAD(30.0));
+			if (tr.vecPlaneNormal.z >= kMinCos)
+			{
+				CGrenade::FB_Detonate();
+			}
+		}
+	}
+
+}
+
+
+void CGrenade::FB_TumbleThink()
+{
+	if (!IsInWorld())
+	{
+		UTIL_Remove(this);
+		return;
+	}
+
+	StudioFrameAdvance();
+	pev->nextthink = gpGlobals->time + 0.1s;
+
+	if (pev->dmgtime - 1s < gpGlobals->time)
+	{
+		CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin + pev->velocity * (pev->dmgtime - gpGlobals->time).count(), 400, 0.1s);
+	}
+
+	if (pev->dmgtime <= gpGlobals->time)
+	{
+		CGrenade::FB_Detonate();
+	}
+
+	if (pev->waterlevel != 0)
+	{
+		pev->velocity = pev->velocity * 0.5f;
+		pev->framerate = 0.2f;
+	}
+}
+
+void CGrenade::FB_Detonate()
+{
+	TraceResult tr;
+	Vector vecSpot;// trace starts here!
+
+	vecSpot = pev->origin + Vector(0, 0, 8);
+	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -40), ignore_monsters, ENT(pev), &tr);
+	FB_Explode(&tr, DMG_EXPLOSION);
+}
+
+void CGrenade::FB_Explode(TraceResult* pTrace, int bitsDamageType)
+{
+	pev->model = iStringNull; // invisible
+	pev->solid = SOLID_NOT; // intangible
+	pev->takedamage = DAMAGE_NO;
+
+	switch (RANDOM_LONG(0, 2))
+	{
+	case 0:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit1.wav", 0.25, ATTN_NORM); break;
+	case 1:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit2.wav", 0.25, ATTN_NORM); break;
+	case 2:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit3.wav", 0.25, ATTN_NORM); break;
+	}
+
+	entvars_t* pevOwner;
+	if (pev->owner)
+		pevOwner = VARS(pev->owner);
+	else
+		pevOwner = NULL;
+
+	if (TheBots != NULL)
+	{
+		TheBots->OnEvent(EVENT_HE_GRENADE_EXPLODED, CBaseEntity::Instance(pev->owner));
+	}
+
+	Vector origin;
+	origin = pev->origin;
+	origin[2] += 25.0;
+
+	Vector forward = { 1, 0, 0 };
+	Vector right = { 0, 1, 0 };
+	Vector up = { 0, 0, 1 };
+
+	int num = 3;
+	float range = 100.0;
+	float f = range / num;
+	for (int i = -num; i <= num; i++)	//i= -5 10·Ý»ðÑæ
+	{
+		for (int j = -num; j <= num; j++) //ÓÖ10·Ý
+		{
+			Vector origin2 = origin;
+			origin2 = origin2 + forward * i * f + right * j * f;
+
+			if ((origin2 - origin).Length2D() > range)
+				continue;
+
+			//origin2[2] += ((i == 0 && j == 0) ? 45.0 : 5.0);
+
+			origin2[0] += RANDOM_FLOAT(-7.0, 7.0);
+			origin2[1] += RANDOM_FLOAT(-7.0, 7.0);
+			origin2[2] += 5.0;
+
+			Create("molotov_explosion", origin2, pTrace->vecPlaneNormal, pev->owner);
+		}
+	}
+
+	pev->effects = EF_NODRAW;
+	pev->flags |= FL_KILLME;
+
+	
 }
 
 void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)

@@ -815,9 +815,9 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	{
 		for (i = 0; i < 3; i++)
 		{
-			view->origin[i] += bob * 0.1 * pparams->right[i];
-			view->origin[i] -= bob1 * 2.5 * pparams->forward[i];
-			view->origin[i] -= bob1 * 0.7 * pparams->up[i];
+			view->origin[i] += bob * 0.25 * pparams->right[i];
+			view->origin[i] -= bob1 * 0.75 * pparams->forward[i];
+			view->origin[i] -= bob1 * 0.5 * pparams->up[i];
 		}
 		
 	}

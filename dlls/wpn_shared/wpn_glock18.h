@@ -15,7 +15,7 @@ namespace sv {
 #define GLOCK18_DAMAGE			25
 #define GLOCK18_RANGE_MODIFER		0.75
 #define GLOCK18_RELOAD_TIME		2.2s
-#define GLOCK18_INSPECT_TIME		4.48s
+#define GLOCK18_INSPECT_TIME		5.17s
 
 class CGLOCK18 : public CBasePlayerWeapon
 {

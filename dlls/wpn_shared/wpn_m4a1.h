@@ -17,7 +17,7 @@ namespace sv {
 #define M4A1_RANGE_MODIFER      0.97
 #define M4A1_RANGE_MODIFER_SIL  0.95
 #define M4A1_RELOAD_TIME	3.05s
-#define M4A1_INSPECT_TIME		4.48s
+#define M4A1_INSPECT_TIME		4.85s
 
 class CM4A1 : public CBasePlayerWeapon
 {
