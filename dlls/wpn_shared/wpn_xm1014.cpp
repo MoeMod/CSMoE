@@ -119,7 +119,7 @@ void CXM1014::PrimaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(6, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0725, 0.0725, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0);
@@ -245,14 +245,13 @@ void CXM1014::Inspect()
 
 	if (!m_fInSpecialReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(7, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

@@ -87,6 +87,12 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_hegrenade.cpp
 	../dlls/wpn_shared/wpn_knife.cpp
 	../dlls/wpn_shared/wpn_m249.cpp
+	../dlls/wpn_shared/csgo_mag7.cpp
+	../dlls/wpn_shared/csgo_negev.cpp
+	../dlls/wpn_shared/csgo_bizon.cpp
+	../dlls/wpn_shared/csgo_cz75.cpp
+	../dlls/wpn_shared/csgo_tec9.cpp
+	../dlls/wpn_shared/csgo_sawedoff.cpp
 	../dlls/wpn_shared/wpn_m3.cpp
 	../dlls/wpn_shared/wpn_m4a1.cpp
 	../dlls/wpn_shared/wpn_mac10.cpp
@@ -144,6 +150,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m4a1dragon.cpp
 	../dlls/wpn_shared/wpn_ak47dragon.cpp
 	../dlls/wpn_shared/wpn_knifedragon.cpp
+	../dlls/wpn_shared/wpn_molotov.cpp
 	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_chainsaw.cpp
 	../dlls/wpn_shared/wpn_tbarrel.cpp

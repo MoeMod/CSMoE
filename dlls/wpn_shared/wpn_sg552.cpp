@@ -33,7 +33,10 @@ enum sg552_e
 	SG552_DRAW,
 	SG552_SHOOT1,
 	SG552_SHOOT2,
-	SG552_SHOOT3
+	SG552_SHOOT3,
+	SG552_INSPECT,
+	SG552_AIM,
+	SG552_BACK
 };
 
 LINK_ENTITY_TO_CLASS(weapon_sg552, CSG552)
@@ -57,7 +60,9 @@ void CSG552::Precache(void)
 {
 	PRECACHE_MODEL("models/v_sg552.mdl");
 	PRECACHE_MODEL("models/w_sg552.mdl");
-
+#if SPECIALSCOPE
+	PRECACHE_MODEL("models/v_sigscope.mdl");
+#endif
 	PRECACHE_SOUND("weapons/sg552-1.wav");
 	PRECACHE_SOUND("weapons/sg552-2.wav");
 	PRECACHE_SOUND("weapons/sg552_clipout.wav");
@@ -100,13 +105,55 @@ BOOL CSG552::Deploy(void)
 
 void CSG552::SecondaryAttack(void)
 {
+#if SPECIALSCOPE
+	if (m_pPlayer->m_iFOV != 90)
+	{
+		SpecialScope();
+		SendWeaponAnim(SG552_BACK, 0);
+		m_NextInspect = gpGlobals->time + 0.16s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+	}
+	else
+	{
+		SendWeaponAnim(SG552_AIM, 0);
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+		SetThink(&CSG552::SpecialScope);
+		pev->nextthink = gpGlobals->time + 0.16s;
+	}
+#else
 	if (m_pPlayer->m_iFOV != 90)
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+#endif
 }
+
+#if SPECIALSCOPE
+void CSG552::SpecialScope()
+{
+	if (m_pPlayer->m_iFOV != 90)
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(TRUE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sg552.mdl");
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+	}
+	else
+	{
+
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(FALSE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sigscope.mdl");
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
+	}
+}
+#endif
 
 void CSG552::PrimaryAttack(void)
 {
@@ -167,7 +214,7 @@ void CSG552::SG552Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.04, 4.25, 2.5, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -183,6 +230,25 @@ void CSG552::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + SG552_RELOAD_TIME;
+#if SPECIALSCOPE
+	if (m_pPlayer->m_iFOV != 90)
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(TRUE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sg552.mdl");
+	}
+	if (DefaultReload(AUG_MAX_CLIP, SG552_RELOAD, 3.3s))
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+		m_flAccuracy = 0;
+		m_iShotsFired = 0;
+		m_bDelayFire = false;
+	}
+#else
 	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, 3s))
 	{
 #ifndef CLIENT_DLL
@@ -196,6 +262,7 @@ void CSG552::Reload(void)
 		m_iShotsFired = 0;
 		m_bDelayFire = false;
 	}
+#endif
 }
 
 void CSG552::WeaponIdle(void)
@@ -223,14 +290,13 @@ void CSG552::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect && m_pPlayer->m_iFOV == 90)
 		{
 #ifndef CLIENT_DLL
-			SendWeaponAnim(6, 0);
+			SendWeaponAnim(SG552_INSPECT, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

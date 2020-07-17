@@ -158,7 +158,7 @@ void CP90::P90Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.9, 0.45, 0.35, 0.04, 5.25, 3.5, 4);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -201,14 +201,13 @@ void CP90::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(6, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

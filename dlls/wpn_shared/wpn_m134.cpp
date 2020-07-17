@@ -287,7 +287,7 @@ void CM134::WeaponIdle(void)
 	SendWeaponAnim(M134_IDLE1, UseDecrement() != FALSE);
 }
 
-float CM134::GetDamage() const
+float CM134::GetDamage()
 {
 	float flDamage = 37.0f;
 #ifndef CLIENT_DLL

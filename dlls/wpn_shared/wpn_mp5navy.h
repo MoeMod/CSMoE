@@ -15,7 +15,7 @@ namespace sv {
 #define MP5N_DAMAGE			26
 #define MP5N_RANGE_MODIFER		0.84
 #define MP5N_RELOAD_TIME		2.63s
-#define MP5N_INSPECT_TIME		4.48s
+#define MP5N_INSPECT_TIME		5.37s
 
 class CMP5N : public CBasePlayerWeapon
 {

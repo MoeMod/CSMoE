@@ -15,7 +15,7 @@ namespace sv {
 #define GALIL_DAMAGE			30
 #define GALIL_RANGE_MODIFER		0.98
 #define GALIL_RELOAD_TIME		2.45s
-#define GALIL_INSPECT_TIME		4.48s
+#define GALIL_INSPECT_TIME		3.67s
 class CGalil : public CBasePlayerWeapon
 {
 public:

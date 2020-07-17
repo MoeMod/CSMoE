@@ -15,7 +15,7 @@ namespace sv {
 #define DEAGLE_DAMAGE		54
 #define DEAGLE_RANGE_MODIFER	0.81
 #define DEAGLE_RELOAD_TIME	2.2s
-#define	DEAGLE_INSPECT_TIME 4.48s
+#define	DEAGLE_INSPECT_TIME 5.7s
 
 class CDEAGLE : public CBasePlayerWeapon
 {

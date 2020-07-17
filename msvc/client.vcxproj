@@ -47,6 +47,7 @@
     <ClCompile Include="..\cl_dll\events\event_aug.cpp" />
     <ClCompile Include="..\cl_dll\events\event_awp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_balrog7.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_bizon.cpp" />
     <ClCompile Include="..\cl_dll\events\event_bow.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannon.cpp" />
     <ClCompile Include="..\cl_dll\events\event_cannontiger.cpp" />
@@ -54,6 +55,7 @@
     <ClCompile Include="..\cl_dll\events\event_chainsaw.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createexplo.cpp" />
     <ClCompile Include="..\cl_dll\events\event_createsmoke.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_cz75.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagle.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagleb.cpp" />
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
@@ -93,6 +95,7 @@
     <ClCompile Include="..\cl_dll\events\event_m95.cpp" />
     <ClCompile Include="..\cl_dll\events\event_m95xmas.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mac10.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_mag7.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg3.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg36.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mg3xmas.cpp" />
@@ -100,8 +103,10 @@
     <ClCompile Include="..\cl_dll\events\event_mp7a1c.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1d.cpp" />
     <ClCompile Include="..\cl_dll\events\event_mp7a1p.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_negev.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p228.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p90.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_sawedoff.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scarh.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scarl.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scout.cpp" />
@@ -112,6 +117,7 @@
     <ClCompile Include="..\cl_dll\events\event_svdex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tar21.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tbarrel.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_tec9.cpp" />
     <ClCompile Include="..\cl_dll\events\event_thompson.cpp" />
     <ClCompile Include="..\cl_dll\events\event_tmp.cpp" />
     <ClCompile Include="..\cl_dll\events\event_ump45.cpp" />
@@ -198,6 +204,12 @@
     <ClCompile Include="..\cl_dll\util.cpp" />
     <ClCompile Include="..\cl_dll\vgui_parser.cpp" />
     <ClCompile Include="..\cl_dll\view.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_bizon.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_cz75.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_mag7.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_negev.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_sawedoff.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_tec9.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_katana.cpp" />
@@ -254,6 +266,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg36.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mg3xmas.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_molotov.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp5navy.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1c.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_mp7a1d.cpp" />
@@ -366,6 +379,12 @@
     <ClInclude Include="..\common\render_api.h" />
     <ClInclude Include="..\dlls\cdll_dll.h" />
     <ClInclude Include="..\dlls\gamemode\zb2\zb2_const.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_bizon.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_cz75.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_mag7.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_negev.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_sawedoff.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_tec9.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47dragon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
@@ -411,6 +430,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_mac10.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mg3xmas.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_molotov.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp5navy.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_mp7a1d.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_p228.h" />

@@ -92,6 +92,7 @@ int CKnife_Zombi::GetItemInfo(ItemInfo *p)
 {
 	CKnife::GetItemInfo(p);
 	p->pszName = "weapon_knife";
+	p->iWeight = 5;
 
 	return 1;
 }

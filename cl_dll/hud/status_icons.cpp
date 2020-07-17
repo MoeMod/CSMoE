@@ -97,7 +97,7 @@ int CHudStatusIcons::Draw( float flTime )
 			{
 					SPR_Set(m_IconList[i].spr, 255, 255, 255);
 					if(gHUD.m_iModRunning != MOD_NONE)
-						SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 0.175 * ScreenWidth * gHUD.m_flScale + 43, &m_IconList[i].rc);
+						SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 0.175 * ScreenWidth + 43 , &m_IconList[i].rc);
 					else
 						SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 200, &m_IconList[i].rc);
 			}

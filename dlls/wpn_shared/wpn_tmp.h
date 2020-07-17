@@ -15,7 +15,7 @@ namespace sv {
 #define TMP_DAMAGE			20
 #define TMP_RANGE_MODIFER		0.85
 #define TMP_RELOAD_TIME			2.12s
-#define TMP_INSPECT_TIME			4.48s
+#define TMP_INSPECT_TIME			5.84s
 
 class CTMP : public CBasePlayerWeapon
 {

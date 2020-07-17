@@ -16,7 +16,7 @@ namespace sv {
 #define AWP_DAMAGE		115
 #define AWP_RANGE_MODIFER	0.99
 #define AWP_RELOAD_TIME		2.5s
-#define AWP_INSPECT_TIME		4.48s
+#define AWP_INSPECT_TIME		5.04s
 
 class CAWP : public CBasePlayerWeapon
 {

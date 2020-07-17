@@ -37,7 +37,10 @@ enum aug_e
 	AUG_DRAW,
 	AUG_SHOOT1,
 	AUG_SHOOT2,
-	AUG_SHOOT3
+	AUG_SHOOT3,
+	AUG_INSPECT,
+	AUG_AIM,
+	AUG_BACK
 };
 
 LINK_ENTITY_TO_CLASS(weapon_aug, CAUG)
@@ -45,7 +48,6 @@ LINK_ENTITY_TO_CLASS(weapon_aug, CAUG)
 void CAUG::Spawn(void)
 {
 	pev->classname = MAKE_STRING("weapon_aug");
-
 	Precache();
 	m_iId = WEAPON_AUG;
 	SET_MODEL(ENT(pev), "models/w_aug.mdl");
@@ -61,7 +63,10 @@ void CAUG::Precache(void)
 {
 	PRECACHE_MODEL("models/v_aug.mdl");
 	PRECACHE_MODEL("models/w_aug.mdl");
-
+	PRECACHE_MODEL("models/w_aug.mdl");
+#if SPECIALSCOPE
+	PRECACHE_MODEL("models/v_augscope.mdl");
+#endif
 	PRECACHE_SOUND("weapons/aug-1.wav");
 	PRECACHE_SOUND("weapons/aug_clipout.wav");
 	PRECACHE_SOUND("weapons/aug_clipin.wav");
@@ -105,14 +110,53 @@ BOOL CAUG::Deploy(void)
 
 void CAUG::SecondaryAttack(void)
 {
+#if SPECIALSCOPE
+	if (m_pPlayer->m_iFOV != 90)
+	{
+		SpecialScope();
+		SendWeaponAnim(AUG_BACK, 0);
+		m_NextInspect = gpGlobals->time + 0.16s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+	}
+	else
+	{
+		SendWeaponAnim(AUG_AIM, 0);
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+		SetThink(&CAUG::SpecialScope);
+		pev->nextthink = gpGlobals->time + 0.16s;	
+	}
+#else
 	if (m_pPlayer->m_iFOV != 90)
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
 
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+#endif
 }
-
+#if SPECIALSCOPE
+void CAUG::SpecialScope()
+{
+	if (m_pPlayer->m_iFOV != 90)
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(TRUE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_aug.mdl");
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+	}
+	else
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(FALSE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_augscope.mdl");
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 55;
+	}
+}
+#endif
 void CAUG::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -165,6 +209,7 @@ void CAUG::AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 #endif
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireAug, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
@@ -172,7 +217,7 @@ void CAUG::AUGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.275, 0.05, 4.0, 2.5, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -188,6 +233,25 @@ void CAUG::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + AUG_RELOAD_TIME;
+#if SPECIALSCOPE
+	if (m_pPlayer->m_iFOV != 90)
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->UpdateShieldCrosshair(TRUE);
+#endif
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_aug.mdl");
+	}
+	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3s))
+	{
+#ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+#endif
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+		m_flAccuracy = 0;
+		m_iShotsFired = 0;
+		m_bDelayFire = false;
+	}
+#else
 	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3s))
 	{
 #ifndef CLIENT_DLL
@@ -200,6 +264,7 @@ void CAUG::Reload(void)
 		m_iShotsFired = 0;
 		m_bDelayFire = false;
 	}
+#endif
 }
 
 void CAUG::WeaponIdle(void)
@@ -209,9 +274,9 @@ void CAUG::WeaponIdle(void)
 
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
-
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(AUG_IDLE1, UseDecrement() != FALSE);
+
 }
 
 float CAUG::GetDamage() const
@@ -231,14 +296,13 @@ void CAUG::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect && m_pPlayer->m_iFOV == 90)
 		{
 #ifndef CLIENT_DLL
-			SendWeaponAnim(6, 0);
+			SendWeaponAnim(AUG_INSPECT, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

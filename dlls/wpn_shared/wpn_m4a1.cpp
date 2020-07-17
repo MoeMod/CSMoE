@@ -219,7 +219,7 @@ void CM4A1::M4A1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1.0, 0.45, 0.28, 0.045, 3.75, 3.0, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -273,7 +273,7 @@ void CM4A1::Inspect()
 {
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
@@ -283,7 +283,6 @@ void CM4A1::Inspect()
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 }
