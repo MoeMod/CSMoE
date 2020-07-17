@@ -14,7 +14,6 @@
 #include "globals.h"
 
 #include "bot_include.h"
-#include <engine\common\mathlib.h>
 
 namespace sv {
 
@@ -1163,7 +1162,7 @@ void CGrenade::FB_BounceTouch(CBaseEntity* pOther)
 		else
 		{
 			// only detonate on surfaces less steep than this
-			const float kMinCos = cosf(DEG2RAD(30.0));
+			const float kMinCos = cosf(30.0f * M_PI /180.0f);
 			if (tr.vecPlaneNormal.z >= kMinCos)
 			{
 				CGrenade::FB_Detonate();
