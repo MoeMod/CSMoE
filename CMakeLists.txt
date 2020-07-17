@@ -59,15 +59,32 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	add_compile_options(-Wno-unused-private-field)
 endif()
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
-# force xp build
 if(MSVC)
+	# force xp build
 	add_definitions(-D_USING_V110_SDK71_)
-endif()
 
-if(MSVC)
+	# MultiByte charset
 	add_compile_options(/utf-8)
+
+	# static CRT
+	if(XASH_STATIC_GAMELIB)
+		set(CompilerFlags
+			CMAKE_CXX_FLAGS
+			CMAKE_CXX_FLAGS_DEBUG
+			CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_MINSIZEREL
+			CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS
+			CMAKE_C_FLAGS_DEBUG
+			CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_MINSIZEREL
+			CMAKE_C_FLAGS_RELWITHDEBINFO
+			)
+		foreach(CompilerFlag ${CompilerFlags})
+		  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+		endforeach()
+	endif()
 endif()
 
 if(APPLE)
@@ -90,6 +107,8 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 		set (CMAKE_INSTALL_PREFIX "~/CSMoE/")
 	endif()
 endif()
+
+set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
