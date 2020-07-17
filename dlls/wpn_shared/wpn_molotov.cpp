@@ -19,6 +19,10 @@
 #include "player.h"
 #include "weapons.h"
 #include "wpn_molotov.h"
+#include "monsters.h"
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
