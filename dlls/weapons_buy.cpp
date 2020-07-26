@@ -101,7 +101,6 @@ DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 	{ "ak47",		WEAPON_AK47,		"#AK47" },
 	{ "cv47",		WEAPON_AK47,		"#AK47" },
 	{ "scout",		WEAPON_SCOUT,		NULL },
-	{ "chainsawoil",		WEAPON_SCOUT,		NULL },
 	{ "sg552",		WEAPON_SG552,		"#SG552" },
 	{ "krieg552",		WEAPON_SG552,		"#SG552" },
 	{ "awp",		WEAPON_AWP,		NULL },
@@ -508,6 +507,9 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 				break;
 			case KNIFE_SLOT:
 				if (pPlayer->m_rgpPlayerItems[KNIFE_SLOT]) {
+					if (!strcmp(iter->pszClassName, "csgo_zeus"))
+					{ }
+					else
 					pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
 				}
 				break;

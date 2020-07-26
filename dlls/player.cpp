@@ -975,7 +975,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol"))
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -988,6 +988,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else if (!Q_strcmp(STRING(DmgEntity->pev->classname), "molotov_fire") && pev == pAttacker->pev)
 		{
+			if (g_pGameRules->IsTeamplay() && pAttack->m_iTeam == m_iTeam && !bAttackFFA)
+			{
+				flDamage /= 0.35;
+			}
+			
 			//do nothing
 		}
 		else if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
@@ -1019,7 +1024,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	// Armor
 	// armor doesn't protect against fall or drown damage!
-	if (pev->armorvalue != 0.0f && !(bitsDamageType & (DMG_DROWN | DMG_FALL | DMG_BURN)) && IsArmored(m_LastHitGroup))
+	if (pev->armorvalue != 0.0f && !(bitsDamageType & (DMG_DROWN | DMG_FALL)) && IsArmored(m_LastHitGroup))
 	{
 		float flNew = flRatio * flDamage;
 		float flArmor = (flDamage - flNew) * flBonus;
@@ -1201,7 +1206,7 @@ void CBasePlayer::PackDeadPlayerItems()
 					}
 				}
 				// drop a grenade after death
-				else if (pPlayerItem->iItemSlot() == GRENADE_SLOT && g_bIsCzeroGame)
+				else if (pPlayerItem->iItemSlot() == GRENADE_SLOT && g_bIsCzeroGame && !this->m_bIsZombie)
 					packPlayerItem(this, pPlayerItem, true);
 
 				pPlayerItem = pPlayerItem->m_pNext;

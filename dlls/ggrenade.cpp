@@ -1219,9 +1219,9 @@ void CGrenade::FB_Explode(TraceResult* pTrace, int bitsDamageType)
 
 	switch (RANDOM_LONG(0, 2))
 	{
-	case 0:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit1.wav", 0.25, ATTN_NORM); break;
-	case 1:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit2.wav", 0.25, ATTN_NORM); break;
-	case 2:	EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/molotov_hit3.wav", 0.25, ATTN_NORM); break;
+	case 0:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/molotov_hit1.wav", 0.25, ATTN_NORM); break;
+	case 1:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/molotov_hit2.wav", 0.25, ATTN_NORM); break;
+	case 2:	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/molotov_hit3.wav", 0.25, ATTN_NORM); break;
 	}
 
 	entvars_t* pevOwner;

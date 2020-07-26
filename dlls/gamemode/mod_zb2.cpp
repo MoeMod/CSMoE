@@ -199,6 +199,16 @@ void CMod_ZombieMod2::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *a
 	m_eventInfection.dispatch(player, attacker);
 }
 
+int CMod_ZombieMod2::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	CBaseEntity* pEntity = CBaseEntity::Instance(ent);
+	if (pEntity && pEntity->IsPlayer())
+	{
+		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity);	
+	}
+	return 1;
+}
+
 void CMod_ZombieMod2::InstallPlayerModStrategy(CBasePlayer *player)
 {
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB2(player, this));

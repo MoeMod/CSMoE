@@ -37,7 +37,7 @@ namespace sv {
 		void Spawn() override
 		{
 			Precache();
-			pev->classname = MAKE_STRING("molotov_fire");
+			pev->classname = MAKE_STRING("molotov");
 
 			switch (RANDOM_LONG(0, 2))
 			{
@@ -129,7 +129,7 @@ namespace sv {
 			const Vector vecSrc = vecAiming;
 			entvars_t* const pevAttacker = VARS(pev->owner);
 			entvars_t* const pevInflictor = this->pev;
-			int bitsDamageType = DMG_BURN;
+			int bitsDamageType = DMG_FALL;
 
 			TraceResult tr;
 			const float falloff = flRadius ? flDamage / flRadius : 1;
@@ -207,11 +207,6 @@ void CMolotov::Spawn(void)
 	Precache();
 	m_iId = WEAPON_SMOKEGRENADE;
 	SET_MODEL(ENT(pev), "models/w_molotov.mdl");
-	PRECACHE_SOUND("weapons/molotov-1.wav");
-	PRECACHE_SOUND("weapons/molotov-2.wav");
-	PRECACHE_SOUND("weapons/molotov_hit1.wav");
-	PRECACHE_SOUND("weapons/molotov_hit2.wav");
-	PRECACHE_SOUND("weapons/molotov_hit3.wav");
 
 	pev->dmg = 4;
 	m_iDefaultAmmo = SMOKEGRENADE_DEFAULT_GIVE;
@@ -226,11 +221,14 @@ void CMolotov::Precache(void)
 {
 	PRECACHE_MODEL("models/v_molotov.mdl");
 	PRECACHE_MODEL("models/p_molotov.mdl");
+	PRECACHE_SOUND("weapons/molotov-1.wav");
+	PRECACHE_SOUND("weapons/molotov-2.wav");
+	PRECACHE_SOUND("weapons/molotov_hit1.wav");
+	PRECACHE_SOUND("weapons/molotov_hit2.wav");
+	PRECACHE_SOUND("weapons/molotov_hit3.wav");
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_smokegrenade.mdl");
 #endif
-
-	PRECACHE_SOUND("weapons/pinpull.wav");
 }
 
 int CMolotov::GetItemInfo(ItemInfo *p)

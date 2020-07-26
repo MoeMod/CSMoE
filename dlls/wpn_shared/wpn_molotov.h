@@ -26,6 +26,7 @@ public:
 	virtual void Holster(int skiplocal);
 	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
 	virtual int iItemSlot() { return GRENADE_SLOT; }
+	const char* GetCSModelName() override { return "models/w_molotov.mdl"; }
 	virtual void PrimaryAttack();
 	virtual void SecondaryAttack();
 	virtual void WeaponIdle();

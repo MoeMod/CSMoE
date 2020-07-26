@@ -102,9 +102,16 @@ int CHudRadar::Draw(float time)
 	auto& modern = pimpl->get<CHudRadarModern>();
 	auto& legacy = pimpl->get<CHudRadarLegacy>();
 	if (modern.Available() && gHUD.m_iModRunning != MOD_NONE)
+	{	
 		modern.Draw(time);
+		gHUD.m_bMordenRadar = TRUE;
+	}
 	else
+	{
+		
 		legacy.Draw(time);
+		gHUD.m_bMordenRadar = FALSE;
+	}
 
 	return 1;
 }

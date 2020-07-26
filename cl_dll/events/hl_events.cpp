@@ -118,7 +118,9 @@ cvar_t *cl_gunbubbles, *cl_tracereffect;
 	DECLARE_EVENT(FireCz75);
 	DECLARE_EVENT(FireSawedoff);
 	DECLARE_EVENT(FireTec9);
+	DECLARE_EVENT(FireStg44);
 	DECLARE_EVENT(FireGunkata);
+	DECLARE_EVENT(FireVoidpistol);
 /*
 ======================
 Game_HookEvents
@@ -234,6 +236,8 @@ void Game_HookEvents( void )
 	HOOK_EVENT(tec9, FireTec9);
 	HOOK_EVENT(sawedoff, FireSawedoff);
 	HOOK_EVENT(gunkata, FireGunkata);
+	HOOK_EVENT(stg44, FireStg44);
+	HOOK_EVENT(voidpistol, FireVoidpistol);
 
 	cl_gunbubbles = gEngfuncs.pfnRegisterVariable("cl_gunbubbles", "2", FCVAR_ARCHIVE);
 	cl_tracereffect = gEngfuncs.pfnRegisterVariable("cl_tracereffect", "0", FCVAR_ARCHIVE);

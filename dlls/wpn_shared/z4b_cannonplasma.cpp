@@ -111,7 +111,7 @@ static inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, 
 				{
 					tr.iHitgroup = HITGROUP_CHEST;
 					ClearMultiDamage();
-					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					pEntity->TraceAttack(pevAttacker, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
 				}
 			}

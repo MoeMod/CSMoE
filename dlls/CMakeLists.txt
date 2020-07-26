@@ -214,6 +214,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/csgo_bizon.cpp
 	../dlls/wpn_shared/csgo_cz75.cpp
 	../dlls/wpn_shared/csgo_tec9.cpp
+	../dlls/wpn_shared/csgo_zeus.cpp
+	../dlls/wpn_shared/weapon_stg44.cpp
+	../dlls/wpn_shared/weapon_voidpistol.cpp
 	../dlls/wpn_shared/csgo_sawedoff.cpp
 	../dlls/wpn_shared/wpn_m3.cpp
 	../dlls/wpn_shared/wpn_m4a1.cpp
