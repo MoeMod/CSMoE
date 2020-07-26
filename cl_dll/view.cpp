@@ -110,8 +110,8 @@ cvar_t	v_iroll_level		= {"v_iroll_level", "0.1", 0, 0.1, NULL};
 cvar_t	v_ipitch_level		= {"v_ipitch_level", "0.3", 0, 0.3, NULL};
 
 float	v_idlescale;  // used by TFC for concussion grenade effect
-TEMPENTITY* g_pDualSwordEffect1 = nullptr;
-TEMPENTITY* g_pDualSwordEffect2 = nullptr;
+/*TEMPENTITY* g_pDualSwordEffect1 = nullptr;
+TEMPENTITY* g_pDualSwordEffect2 = nullptr;*/
 #ifdef XASH_64BIT
 #define BAD_ENT_PTR 0xFFFFFFFFFFFFFFFF
 #else
@@ -652,7 +652,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	// view is the weapon model (only visible from inside body)
 	view = gEngfuncs.GetViewModel();
 
-	if (g_PlayerExtraInfo[idx].dead && !g_iUser2)
+	/*if (g_PlayerExtraInfo[idx].dead && !g_iUser2)
 	{
 		if (g_pDualSwordEffect1)
 		{
@@ -727,7 +727,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 				}
 			}
 		}
-	}
+	}*/
 	// transform the view offset by the model's matrix to get the offset from
 	// model origin for the view
 	bob = V_CalcBob ( pparams );
