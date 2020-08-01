@@ -221,11 +221,11 @@ Note : 你可能需要安装 libSDL2 以及其他需求插件
 ### iOS
 1. 在 Steam 上购买并下载 Counter-Strike 1.6 (请支持正版!)
 2. 下载客户端和资源并解压到一起
-1. 使用 Impactor 安装 ipa
+3. 使用 Impactor 安装 ipa
   * armv7 <- iPhone 5, iPad 4, iPod Touch 5 及更早的平台
   * arm64 <- iPhone 5s, iPad Air 1, iPod Touch 6 及更早的平台
   * universal <- armv7与arm64通用
-3. 寻找 steamapps\common\Half-Life里的 'cstrike' 和 'valve' 和 GameDir\csmoe 目录
+4. 寻找 steamapps\common\Half-Life里的 'cstrike' 和 'valve' 和 GameDir\csmoe 目录
 5. 运行 iTunes 并在分享文件内选择 APP
 6. 将 csmoe, cstrike, valve 拉到 iTunes 内
 7. 在桌面运行 CSMoE \
