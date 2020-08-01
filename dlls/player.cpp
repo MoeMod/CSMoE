@@ -543,12 +543,34 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 
 		case HITGROUP_HEAD:
 		{
+			
 			if (m_iKevlar == ARMOR_TYPE_HELMET && !m_bIsZombie)
 			{
 				bShouldBleed = false;
 				bShouldSpark = true;
 			}
 
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				bShouldBleed = true;
+				flDamage *= 4;
+				if (bShouldPunch && m_iKevlar != ARMOR_TYPE_HELMET && !m_bIsZombie)
+				{
+					pev->punchangle.x = flDamage * -0.5;
+
+					if (pev->punchangle.x < -12)
+						pev->punchangle.x = -12;
+
+					pev->punchangle.z = flDamage * RANDOM_FLOAT(-1, 1);
+
+					if (pev->punchangle.z < -9)
+						pev->punchangle.z = -9;
+
+					else if (pev->punchangle.z > 9)
+						pev->punchangle.z = 9;
+				}
+				break;
+			}
 			flDamage *= 4;
 			if (bShouldPunch && bShouldBleed)
 			{
@@ -574,6 +596,19 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				bShouldBleed = true;
+				if (bShouldPunch && m_iKevlar == ARMOR_TYPE_EMPTY && !m_bIsZombie)
+				{
+					pev->punchangle.x = flDamage * -0.1;
+
+					if (pev->punchangle.x < -4)
+						pev->punchangle.x = -4;
+				}
+				break;
+			}
+
 			else if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.1;
@@ -590,6 +625,19 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
 
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				bShouldBleed = true;
+				if (bShouldPunch && m_iKevlar == ARMOR_TYPE_EMPTY && !m_bIsZombie)
+				{
+					pev->punchangle.x = flDamage * -0.1;
+
+					if (pev->punchangle.x < -4)
+						pev->punchangle.x = -4;
+				}
+				break;
+			}
+
 			else if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.1;
@@ -604,6 +652,11 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 		{
 			if (m_iKevlar != ARMOR_TYPE_EMPTY && !m_bIsZombie)
 				bShouldBleed = false;
+
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				bShouldBleed = true;
+			}
 
 			break;
 		}
@@ -986,7 +1039,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		{
 			// already handled.
 		}
-		else if (!Q_strcmp(STRING(DmgEntity->pev->classname), "molotov_fire") && pev == pAttacker->pev)
+		else if (!Q_strcmp(STRING(DmgEntity->pev->classname), "molotov") && pev == pAttacker->pev)
 		{
 			if (g_pGameRules->IsTeamplay() && pAttack->m_iTeam == m_iTeam && !bAttackFFA)
 			{
