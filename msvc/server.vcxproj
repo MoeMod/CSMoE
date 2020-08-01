@@ -172,6 +172,7 @@
     <ClCompile Include="..\dlls\wpn_shared\csgo_cz75.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_sawedoff.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_tec9.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_zeus.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dragonsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_dualsword.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\knife_katana.cpp" />
@@ -245,6 +246,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_sgdrill.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_smokegrenade.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_starchaserar.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_stg44.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_svdex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tar21.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_tbarrel.cpp" />
@@ -252,6 +254,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_tmp.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_ump45.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_usp.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_voidpistol.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_wa2000.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm1014.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_xm8c.cpp" />
@@ -467,6 +470,7 @@
     <ClInclude Include="..\dlls\wpn_shared\csgo_cz75.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_sawedoff.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_tec9.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_zeus.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ak47dragon.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_as50.h" />
@@ -528,6 +532,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_sgdrill.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_smokegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_starchaserar.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_stg44.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_svdex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tar21.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_tbarrel.h" />
@@ -535,6 +540,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_tmp.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_ump45.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_usp.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_voidpistol.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_wa2000.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm1014.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_xm8s.h" />

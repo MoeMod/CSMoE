@@ -87,7 +87,7 @@ int CHudMoney::Draw(float flTime)
 	if (gHUD.m_csgohud->value)
 	{
 		x = 5;
-		if (gHUD.m_iModRunning != MOD_NONE)
+		if (gHUD.m_bMordenRadar)
 			y = 0.175 * ScreenWidth  + (m_hDollar.rect.bottom - m_hDollar.rect.top) * 2;
 		else
 			y = 200;

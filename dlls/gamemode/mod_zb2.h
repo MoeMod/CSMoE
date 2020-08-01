@@ -42,6 +42,7 @@ public:
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 	void PlayerThink(CBasePlayer *pPlayer) override;
 	BOOL ClientCommand(CBasePlayer *pPlayer, const char *pcmd) override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)  override;
 
 public: // IBaseMod
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
