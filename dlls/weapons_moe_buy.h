@@ -69,7 +69,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"csgo_sawedoff",         "Sawed-Off",                  1100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"csgo_tec9",         "Tec-9",                  500, PISTOL_SLOT, UNASSIGNED},
 	{"csgo_bizon",         "PP-Bizon",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	//{"csgo_zeus",         "Zeus x27",                  200, KNIFE_SLOT, UNASSIGNED},
+	{"csgo_zeus",         "Zeus x27",                  200, KNIFE_SLOT, UNASSIGNED},
 	{"weapon_ak47dragon",         "AK47 Dragon",                  2500, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"knife_knifedragon",         "Dragon Knife",                  0, KNIFE_SLOT, UNASSIGNED},
 	{"z4b_infinityx", "Yet Another Infinity",     1500, PISTOL_SLOT,         UNASSIGNED},
