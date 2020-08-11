@@ -152,7 +152,7 @@ endif()
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
-	ADD_SUBDIRECTORY(mainui_cpp)
+	ADD_SUBDIRECTORY(mainui_imgui)
 endif()
 ADD_SUBDIRECTORY(dlls)
 ADD_SUBDIRECTORY(engine)
