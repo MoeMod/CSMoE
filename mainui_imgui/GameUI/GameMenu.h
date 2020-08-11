@@ -21,12 +21,13 @@ namespace ui {
 
     class GameMenu {
     public:
-        explicit GameMenu(GameUI *parent) : m_pParent(parent) {}
+        explicit GameMenu(GameUI *parent) : m_pParent(parent), m_bShowDemoWindow(false) {}
 
         void OnGUI();
 
     private:
         GameUI *m_pParent;
+        bool m_bShowDemoWindow;
     };
 
 }

@@ -29,6 +29,8 @@ namespace ui {
         const auto& ds = io.DisplaySize;
         ImGui::SetNextWindowPos(ImVec2(50, ds.y - 50), ImGuiCond_Always, ImVec2(0.0f, 1.0f));
 
+        static bool s_showDemoWindow = false;
+
         if(ImGui::Begin("GameMenu", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
         {
             ImGui::TextUnformatted("Counter-Strike Mobile-oriented Edition");
@@ -56,6 +58,10 @@ namespace ui {
             {
                 EngFuncs::ClientCmd(true, "sprview\n");
             }
+            if (ImGui::Button("ImGui Demo", ItemSize))
+            {
+                m_bShowDemoWindow = true;
+            }
             if (ImGui::Button("Quit", ItemSize))
             {
                 ImGui::OpenPopup("Quit Confirm");
@@ -79,6 +85,9 @@ namespace ui {
 
             ImGui::End();
         }
+
+        if(m_bShowDemoWindow)
+            ImGui::ShowDemoWindow(&m_bShowDemoWindow);
     }
 
 
