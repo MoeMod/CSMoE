@@ -52,6 +52,10 @@ namespace ui {
             {
                 // TODO
             }
+            if (ImGui::Button("SprView", ItemSize))
+            {
+                EngFuncs::ClientCmd(true, "sprview\n");
+            }
             if (ImGui::Button("Quit", ItemSize))
             {
                 ImGui::OpenPopup("Quit Confirm");
