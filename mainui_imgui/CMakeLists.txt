@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.10.2)
 project (mainui_imgui)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(MAINUI_LIBRARY xashmenu)
 
 include_directories (./ ../common ../engine ../pm_shared ../mainui)
-add_library (${MAINUI_LIBRARY} STATIC
+set (MAINUI_SOURCES
 	udll_int.cpp
 		Utils.cpp
 	UIFuncs.cpp
@@ -15,6 +15,13 @@ add_library (${MAINUI_LIBRARY} STATIC
 	GameUI/GameUI.cpp
 	GameUI/GameMenu.cpp
 )
+
+if(XASH_STATIC_GAMELIB)
+	add_library (${MAINUI_LIBRARY} STATIC ${MAINUI_SOURCES})
+else()
+	add_library (${MAINUI_LIBRARY} SHARED ${MAINUI_SOURCES})
+endif()
+
 target_link_libraries(${MAINUI_LIBRARY} imgui imgui_ext)
 
 # Name library as it named in Unkle Mike's Xash3D

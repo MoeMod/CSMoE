@@ -207,7 +207,6 @@ jobs:
       api_key: ${GITHUB_TOKEN}
       file:
         - CSMoE-CD-Win32-x64-Full.exe
-        - CSMoE-CD-Win32-x86-Full.exe
       on:
         branch: master
         repo: MoeMod/CSMoE
