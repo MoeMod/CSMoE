@@ -17,6 +17,7 @@ GNU General Public License for more details.
 #include <imgui_utils.h>
 #include <Utils.h>
 #include "GameMenu.h"
+#include "GameUI.h"
 
 #include "enginecallback_menu.h"
 
@@ -44,15 +45,15 @@ namespace ui {
             }
             if (ImGui::Button("New Game", ItemSize))
             {
-                // TODO
+                m_pParent->OpenCreateGameDialog();
             }
             if (ImGui::Button("Find Servers", ItemSize))
             {
-                // TODO
+                m_pParent->OpenServerBrowser();
             }
             if (ImGui::Button("Options", ItemSize))
             {
-                // TODO
+                m_pParent->OpenOptionsDialog();
             }
             if (ImGui::Button("SprView", ItemSize))
             {

@@ -17,8 +17,22 @@ GNU General Public License for more details.
 #include "GameMenu.h"
 #include "Utils.h"
 #include "enginecallback_menu.h"
+#include "IGameDialog.h"
+#include "OptionsDialog.h"
+
+#include <vector>
+#include <memory>
+#include <functional>
+#include <imgui.h>
 
 namespace ui {
+
+    struct DialogEntry
+    {
+        std::string name;
+        std::shared_ptr<IGameDialog> dialog;
+        bool enabled = true;
+    };
 
     struct GameUI::impl_t {
 
@@ -28,6 +42,7 @@ namespace ui {
 
         bool activated = false;
         GameMenu menu;
+        std::vector<DialogEntry> m_vecSubDialogs;
     };
 
     GameUI::GameUI() : pimpl(std::make_unique<impl_t>(this)) {
@@ -47,6 +62,16 @@ namespace ui {
         {
             OnDrawBackground();
             pimpl->menu.OnGUI();
+
+            for(auto &entry : pimpl->m_vecSubDialogs)
+            {
+                if(ImGui::Begin(entry.name.c_str(), &entry.enabled, ImGuiWindowFlags_AlwaysAutoResize))
+                {
+                    entry.dialog->OnGUI();
+                    ImGui::End();
+                }
+            }
+            pimpl->m_vecSubDialogs.erase(std::stable_partition(pimpl->m_vecSubDialogs.begin(), pimpl->m_vecSubDialogs.end(), std::mem_fn(&DialogEntry::enabled)), pimpl->m_vecSubDialogs.end());
         }
     }
 
@@ -58,6 +83,28 @@ namespace ui {
     void GameUI::SetActivate(bool x)
     {
         pimpl->activated = x;
+    }
+
+    void GameUI::PushDialog(std::string name, std::shared_ptr<IGameDialog> dialog)
+    {
+        auto iter = std::find_if(pimpl->m_vecSubDialogs.begin(), pimpl->m_vecSubDialogs.end(), std::bind(std::equal_to<std::string>(), std::bind(&DialogEntry::name, std::placeholders::_1), name));
+        if(iter == pimpl->m_vecSubDialogs.end())
+            pimpl->m_vecSubDialogs.emplace_back(DialogEntry{ name, std::move(dialog) });
+    }
+
+    void GameUI::OpenCreateGameDialog()
+    {
+        // TODO
+    }
+
+    void GameUI::OpenServerBrowser()
+    {
+        // TODO
+    }
+
+    void GameUI::OpenOptionsDialog()
+    {
+        PushDialog("Options", std::make_shared<OptionsDialog>());
     }
 
 

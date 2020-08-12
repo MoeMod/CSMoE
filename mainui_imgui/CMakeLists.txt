@@ -8,12 +8,13 @@ set(MAINUI_LIBRARY xashmenu)
 include_directories (./ ../common ../engine ../pm_shared ../mainui)
 set (MAINUI_SOURCES
 	udll_int.cpp
-		Utils.cpp
+	Utils.cpp
 	UIFuncs.cpp
  	UIFuncs.cpp
 
 	GameUI/GameUI.cpp
 	GameUI/GameMenu.cpp
+	GameUI/OptionsDialog.cpp
 )
 
 if(XASH_STATIC_GAMELIB)
