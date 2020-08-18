@@ -12,4 +12,4 @@
 	url = https://github.com/MoeMod/gl-wes-v2
 [submodule "imgui"]
 	path = imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/MoeMod/imgui
