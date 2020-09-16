@@ -27,6 +27,7 @@ extern "C" {
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <iterator>
 
 static bool show_ime_candidate_list = true;
 

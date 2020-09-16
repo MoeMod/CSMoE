@@ -324,12 +324,15 @@ void CPlayerModStrategy_ZB1::Event_OnBecomeZombie(CBasePlayer *who, ZombieLevel 
 
 void CPlayerModStrategy_ZB1::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	m_pCharacter = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+	auto sp = std::make_shared<CZombie_ZB1>(m_pPlayer, iEvolutionLevel);
+	m_pCharacter = sp;
+	m_pZombieZB1 = sp;
 }
 
 void CPlayerModStrategy_ZB1::BecomeHuman()
 {
 	m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
+	m_pZombieZB1 = nullptr;
 }
 
 CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp)
@@ -347,15 +350,15 @@ float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars
 
 void CPlayerModStrategy_ZB1::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if(m_pPlayer->m_bIsZombie)
-		return m_pCharacter->Pain_Zombie(m_LastHitGroup, HasArmour);
+	if(m_pZombieZB1)
+		return m_pZombieZB1->Pain_Zombie(m_LastHitGroup, HasArmour);
 	return CPlayerModStrategy_Zombie::Pain(m_LastHitGroup, HasArmour);
 }
 
 void CPlayerModStrategy_ZB1::DeathSound()
 {
-	if(m_pPlayer->m_bIsZombie)
-		return m_pCharacter->DeathSound_Zombie();
+	if(m_pZombieZB1)
+		return m_pZombieZB1->DeathSound_Zombie();
 	return CPlayerModStrategy_Zombie::DeathSound();
 }
 

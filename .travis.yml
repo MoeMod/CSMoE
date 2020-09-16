@@ -178,7 +178,38 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for Win32 amd64 MSVC/CMake and deploy
+    name: Build for Win32 x86 MSVC/CMake and deploy
+    cache: ccache
+    os: windows
+    language: cpp
+    before_script:
+    - choco install nsis
+    - rm C:/ProgramData/chocolatey/bin/cpack.exe
+    - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
+    - unzip SDL2.zip
+    - mv SDL2-2.0.12 SDL2
+    - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
+    - 7z x CSMoE-CD-GameDir-Full.7z
+    script:
+    - mkdir -p win-build-x86 && cd win-build-x86
+    - cmake -A "Win32" -DCMAKE_BUILD_TYPE=Release ../
+    - cmake --build . --config Release --target csmoe_cpack_nsis
+    - cd ..
+    before_deploy:
+    - cp win-build-x86/CSMoE-Win32-Win32.exe CSMoE-CD-Win32-x86-Full.exe
+    deploy:
+      provider: releases
+      api_key: ${GITHUB_TOKEN}
+      file:
+        - CSMoE-CD-Win32-x86-Full.exe
+      on:
+        branch: master
+        repo: MoeMod/CSMoE
+      overwrite: true
+      skip_cleanup: true
+      prerelease: true
+  - stage: build
+    name: Build for Win32 x64 MSVC/CMake and deploy
     cache: ccache
     os: windows
     language: cpp
@@ -195,19 +226,13 @@ jobs:
     - cmake -A "x64" -DCMAKE_BUILD_TYPE=Release ../
     - cmake --build . --config Release --target csmoe_cpack_nsis
     - cd ..
-    - mkdir -p win-build-x86 && cd win-build-x86
-    - cmake -A "Win32" -DCMAKE_BUILD_TYPE=Release ../
-    - cmake --build . --config Release --target csmoe_cpack_nsis
-    - cd ..
     before_deploy:
     - cp win-build-x64/CSMoE-Win32-x64.exe CSMoE-CD-Win32-x64-Full.exe
-    - cp win-build-x86/CSMoE-Win32-Win32.exe CSMoE-CD-Win32-x86-Full.exe
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
         - CSMoE-CD-Win32-x64-Full.exe
-        - CSMoE-CD-Win32-x86-Full.exe
       on:
         branch: master
         repo: MoeMod/CSMoE

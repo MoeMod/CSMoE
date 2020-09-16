@@ -5,6 +5,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="gamedir.props">
+      <Filter>GameDir</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\SDL2\src\main\winrt\SDL_winrt_main_NonXAML.cpp" />
@@ -13,6 +16,9 @@
   <ItemGroup>
     <Filter Include="Images">
       <UniqueIdentifier>{dbe72e44-9332-4ce5-9cb3-cb6a8d91c26b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameDir">
+      <UniqueIdentifier>{b6ef6dcc-e35f-4295-9935-c1c5a0ab4c2e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

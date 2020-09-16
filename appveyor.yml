@@ -9,6 +9,10 @@ build_script:
       Expand-Archive -Path 'SDL2.zip' -DestinationPath '.' -Force
       
       ren SDL2-2.0.12 SDL2
+
+      mkdir CSMoE-Full\csmoe
+      mkdir CSMoE-Full\cstrike
+      mkdir CSMoE-Full\valve
       
       nuget restore msvc/csmoe.sln
       

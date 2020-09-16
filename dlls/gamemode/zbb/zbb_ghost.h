@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 namespace sv {
 
-class CGhost_ZBB : public BasePlayerExtra, public IZombieModeCharacter, public IZombieModeCharacter_ZBB_ExtraDelegate
+class CGhost_ZBB : public BasePlayerExtra, virtual public IZombieModeCharacter, virtual public IZombieClass_ZB1, virtual public IZombieModeCharacter_ZBB_ExtraDelegate
 {
 public:
 	explicit CGhost_ZBB(CBasePlayer *player);

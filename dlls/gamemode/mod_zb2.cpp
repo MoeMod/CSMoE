@@ -314,9 +314,16 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	auto sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, "random");
-	m_pCharacter_ZB2 = sp;
-	m_pCharacter = sp;
+	std::shared_ptr<IZombieModeCharacter_ZB2> sp = m_pCharacter_ZB2;
+	if (!m_pZombieZB1)
+	{
+		auto new_sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, "random");
+		m_pCharacter_ZB2 = new_sp;
+		m_pCharacter = new_sp;
+		m_pZombieZB1 = new_sp;
+		sp = std::move(new_sp);
+	}
+
 	m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 
 	sp->InitHUD();
