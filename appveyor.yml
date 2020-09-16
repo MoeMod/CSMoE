@@ -16,6 +16,6 @@ build_script:
       
       nuget restore msvc/csmoe.sln
       
-      (Get-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj) | %{$_ -replace "<PlatformToolset>v140</PlatformToolset>", "<PlatformToolset>v142</PlatformToolset>"} | %{$_ -replace "<WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>", "<WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>"} | Set-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj
+      (Get-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj) | %{$_ -replace "<PlatformToolset>v140</PlatformToolset>", "<PlatformToolset>v142</PlatformToolset>"} | %{$_ -replace "<WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>", "<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>"} | Set-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj
       
       & msbuild "C:\projects\csmoe\msvc\csmoe.sln" /m /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:AppxBundle=false

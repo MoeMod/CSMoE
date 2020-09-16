@@ -49,11 +49,9 @@ Now CI not building. Build it by yourself.
 
 1. Purchase and download Counter-Strike 1.6 on Steam
 2. Download client and resource and extract them out
-3. Install *.appx or *.appxbundle
-4. Launch from Start Menu.
-5. See Xash Error writen AppData path. (First time only.)
-6. Copy steamapps\common\Half-Life cstrike and valve directory and GameDir\csmoe to where the AppData shown on Xash Error (First time and Update Only.)
-7. Launch.
+3. Install the .cer to system-wide Trusted Root Certification Authorities certificate store
+4. Install *.appx or *.appxbundle
+5. Launch from Start Menu.
 
 ### Linux
 1. Purchase and download Counter-Strike 1.6 on Steam
@@ -249,6 +247,7 @@ Note: 由于Impactor至今未更新，所以iOS 13以上都没办法安装，请
 - 由于#133 缘故, 请使用CMake来生成Win32项目. 
 - 下载 SDL2-2.0.10.zip (http://www.libsdl.org/download-2.0.php) 并将文件夹改成SDL2放到目录里
 - 通过CMake生成路径打开sln即可
+- 本项目需要使用OpenGL 1.1，因此不支持arm32及arm64原生编译，arm64可利用x86模拟器运行。
 
 ### macOS & Linux
 - 通过 CMake 载入工程
@@ -286,9 +285,9 @@ Note: 由于Impactor至今未更新，所以iOS 13以上都没办法安装，请
 ## Platforms
 | |x86 | x64 | armv7 | arm64 |
 |:----:|:----:|:----:|:----:|:----:|
-| Windows Desktop|√|√|?|?
+| Windows Desktop|√|√|×|×
 | Windows 10 UWP|×|√|√|?
-| macOS|?|√|×|×
+| macOS|?|√|×|?
 | Linux|√|√|?|?
 | iOS|×|×|√|√
 | Android|√|√|√|√
@@ -300,11 +299,21 @@ Note: 由于Impactor至今未更新，所以iOS 13以上都没办法安装，请
 ```
 
 ## Benchmark
-### Windows 10 UWP (1809) - Surface Book 2 (2017)
+### Windows 10 UWP x64 - Surface Book 2 (2017)
 * Specs : Intel Core i5-8650U, NVIDIA GTX 1050, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
 * Output : Display(3000 x 2000), Sound
 * Result : 60 fps
+### Windows 10 UWP ARM32 - Surface Pro X (2019)
+* Specs : Microsoft SQ1 (aka 8cx)
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(2880 x 1920), Sound
+* Result : ~50 fps - Good enough.
+### Windows 10 UWP ARM32 - Surface RT (2012)
+* Specs : Nvidia Tegra 2
+* Input : Mouse, Keyboard, Touchpad, Touchscreen
+* Output : Display(1366 x 768), Sound
+* Result : 3 fps - A little closer to playable
 ### Windows 10 Desktop (1703) - Surface Pro 5 (2017)
 * Specs : Intel Core i5-7300U, Intel HD620, 8 GB
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
