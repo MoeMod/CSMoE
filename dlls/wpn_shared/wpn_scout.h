@@ -16,7 +16,7 @@ namespace sv {
 #define SCOUT_DAMAGE			75
 #define SCOUT_RANGE_MODIFER		0.98
 #define SCOUT_RELOAD_TIME		2s
-#define SCOUT_INSPECT_TIME		4.48s
+#define SCOUT_INSPECT_TIME		5.08s
 
 class CSCOUT : public CBasePlayerWeapon
 {

@@ -217,6 +217,7 @@ void CGLOCK18::GLOCK18Fire(float flSpread, duration_t flCycleTime, BOOL fUseBurs
 	}
 
 	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -337,14 +338,13 @@ void CGLOCK18::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(13, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

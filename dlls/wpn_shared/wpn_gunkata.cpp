@@ -185,7 +185,7 @@ public:
 
 	int GetANIM_DRAW() const { return GetLRMode() ? ANIM_DRAW1:ANIM_DRAW2; }
 
-	int GetANIM_IDLE1() const { return !GetLRMode() ? ANIM_IDLE:ANIM_IDLE2; }
+	int GetANIM_IDLE1() const { return GetLRMode() ? ANIM_IDLE:ANIM_IDLE2; }
 
 	PLAYER_ANIM GetPlayerAttackAnimation() const { return !GetLRMode() ? PLAYER_ATTACK1 : PLAYER_ATTACK2; }
 
@@ -280,7 +280,7 @@ public:
 #else
 		flags = 0;
 #endif
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
 		SendWeaponAnim(iShootAnim, UseDecrement() != FALSE);
 
 		Recoil();

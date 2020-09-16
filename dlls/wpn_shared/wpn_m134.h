@@ -45,7 +45,7 @@ public:
 
 public:
 	void M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-	float GetDamage() const;
+	float GetDamage();
 	int m_iShell;
 	int iShellOn;
 	int m_iButton;

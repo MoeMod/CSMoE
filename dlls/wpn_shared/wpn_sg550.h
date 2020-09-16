@@ -15,7 +15,7 @@ namespace sv {
 #define SG550_MAX_SPEED_ZOOM		150
 #define SG550_RANGE_MODIFER		0.98
 #define SG550_RELOAD_TIME		3.35s
-#define SG550_INSPECT_TIME		4.48s
+#define SG550_INSPECT_TIME		4.20s
 
 class CSG550 : public CBasePlayerWeapon
 {

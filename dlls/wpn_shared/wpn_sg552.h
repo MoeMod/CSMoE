@@ -11,6 +11,7 @@ namespace sv {
 #endif
 
 //sg552
+#define SPECIALSCOPE		0
 #define SG552_MAX_SPEED			235
 #define SG552_MAX_SPEED_ZOOM		200
 #define SG552_DAMAGE			33
@@ -30,6 +31,9 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+#if SPECIALSCOPE
+	void SpecialScope();
+#endif
 	void Inspect() override;
 	duration_t GetInspectTime() override { return SG552_INSPECT_TIME; }
 	void WeaponIdle() override;

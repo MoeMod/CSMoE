@@ -159,7 +159,7 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-	m_tLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -217,14 +217,13 @@ void CAK47::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_tLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(6, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_tLastFire = invalid_time_point;
 		}
 	}
 

@@ -15,7 +15,7 @@ namespace sv {
 #define KNIFE_WALLHIT_VOLUME		512
 #define KNIFE_MAX_SPEED			250
 #define KNIFE_MAX_SPEED_SHIELD		180
-#define KNIFE_INSPECT_TIME		4.48s
+#define KNIFE_INSPECT_TIME		4.92s
 
 class CKnife : public CBasePlayerWeapon
 {

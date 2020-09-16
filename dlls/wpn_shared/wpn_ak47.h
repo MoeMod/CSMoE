@@ -48,7 +48,6 @@ public:
 	int m_iShell;
 	int iShellOn;
 	time_point_t m_NextInspect;
-	time_point_t m_tLastFire;
 
 private:
 	unsigned short m_usFireAK47;

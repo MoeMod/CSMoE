@@ -16,7 +16,7 @@ namespace sv {
 #define USP_DAMAGE_SIL		30
 #define USP_RANGE_MODIFER	0.79
 #define USP_RELOAD_TIME		2.7s
-#define USP_INSPECT_TIME		4.48s
+#define USP_INSPECT_TIME		5.89s
 
 class CUSP : public CBasePlayerWeapon
 {

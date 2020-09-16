@@ -584,7 +584,31 @@ void CKnife::Inspect()
 	if (gpGlobals->time > m_NextInspect)
 	{
 #ifndef CLIENT_DLL
-		SendWeaponAnim(RANDOM_LONG(8, 10), 0);
+		switch (RANDOM_LONG(8, 10))
+		{
+			case 8:
+			{
+				SendWeaponAnim(8, 0);
+				m_NextInspect = gpGlobals->time + GetInspectTime();
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			}
+			case 9:
+			{
+				SendWeaponAnim(9, 0);
+				m_NextInspect = gpGlobals->time + 4.74s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.74s;
+			}
+			case 10:
+			{
+				SendWeaponAnim(10, 0);
+				m_NextInspect = gpGlobals->time + 4.31s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.31s;
+			}
+		}
+		
+
+
+
 #endif
 		m_NextInspect = gpGlobals->time + GetInspectTime();
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();

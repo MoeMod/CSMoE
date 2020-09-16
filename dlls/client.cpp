@@ -2543,7 +2543,8 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				player->m_flLastCommandTime[7] = gpGlobals->time + 0.3s;
 				if (!player->m_bIsZombie)
 				{
-					player->m_pActiveItem->Inspect();
+					if(player->m_pActiveItem != NULL)
+						player->m_pActiveItem->Inspect();
 				}
 			}
 		}
@@ -3388,6 +3389,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}
 			else if (((pstr = Q_strstr(pcmd, "z4b_")) != NULL) && (pstr == pcmd))
+			{
+				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
+			}
+			else if (((pstr = Q_strstr(pcmd, "csgo_")) != NULL) && (pstr == pcmd))
 			{
 				GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}

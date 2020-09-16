@@ -15,7 +15,7 @@ namespace sv {
 #define UMP45_DAMAGE			30
 #define UMP45_RANGE_MODIFER		0.82
 #define UMP45_RELOAD_TIME		3.5s
-#define UMP45_INSPECT_TIME		4.48s
+#define UMP45_INSPECT_TIME		5.44s
 
 class CUMP45 : public CBasePlayerWeapon
 {

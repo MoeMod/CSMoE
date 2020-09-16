@@ -15,7 +15,7 @@ namespace sv {
 #define FAMAS_RELOAD_TIME	3.3s
 #define FAMAS_DAMAGE		30
 #define FAMAS_DAMAGE_BURST	34
-#define FAMAS_INSPECT_TIME		4.48s
+#define FAMAS_INSPECT_TIME		3.52s
 #define FAMAS_RANGE_MODIFER	0.96
 
 class CFamas : public CBasePlayerWeapon

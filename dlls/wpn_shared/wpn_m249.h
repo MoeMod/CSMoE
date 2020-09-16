@@ -14,7 +14,7 @@ namespace sv {
 #define M249_MAX_SPEED            220
 #define M249_RANGE_MODIFER        0.97
 #define M249_RELOAD_TIME        4.7s
-#define M249_INSPECT_TIME		4.48s
+#define M249_INSPECT_TIME		6.9s
 
 class CM249 : public CBasePlayerWeapon
 {

@@ -110,7 +110,8 @@ cvar_t	v_iroll_level		= {"v_iroll_level", "0.1", 0, 0.1, NULL};
 cvar_t	v_ipitch_level		= {"v_ipitch_level", "0.3", 0, 0.3, NULL};
 
 float	v_idlescale;  // used by TFC for concussion grenade effect
-
+/*TEMPENTITY* g_pDualSwordEffect1 = nullptr;
+TEMPENTITY* g_pDualSwordEffect2 = nullptr;*/
 #ifdef XASH_64BIT
 #define BAD_ENT_PTR 0xFFFFFFFFFFFFFFFF
 #else
@@ -624,6 +625,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 {
 	cl_entity_t		*ent, *view;
 	int				i;
+	int idx;
 	vec3_t			angles;
 	float			bob, waterOffset, bob1;
 	static viewinterp_t		ViewInterp;
@@ -644,11 +646,88 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	{
 		// ent is the player model ( visible when out of body )
 		ent = gEngfuncs.GetLocalPlayer();
+		idx = gEngfuncs.GetLocalPlayer()->index;
 	}
 
 	// view is the weapon model (only visible from inside body)
 	view = gEngfuncs.GetViewModel();
 
+	/*if (g_PlayerExtraInfo[idx].dead && !g_iUser2)
+	{
+		if (g_pDualSwordEffect1)
+		{
+			g_pDualSwordEffect1->die = 0.0;
+			g_pDualSwordEffect1 = NULL;
+		}
+		if (g_pDualSwordEffect2)
+		{
+			g_pDualSwordEffect2->die = 0.0;
+			g_pDualSwordEffect2 = NULL;
+		}
+	}
+
+	if (view)
+	{
+		if (view->model->name)
+		{
+			if (strstr(view->model->name, "v_dualsword"))
+			{	
+				if (!g_pDualSwordEffect1)
+				{
+					struct model_s* model;
+
+					model = IEngineStudio.Mod_ForName("sprites/ef_dualsword_left.spr", 0);
+
+					g_pDualSwordEffect1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(view->attachment[1], model);
+
+					g_pDualSwordEffect1->entity.curstate.rendermode = kRenderTransAdd;
+					g_pDualSwordEffect1->entity.curstate.renderamt = 255;
+					g_pDualSwordEffect1->entity.curstate.renderfx = 0;
+					g_pDualSwordEffect1->entity.curstate.scale = 0.036;
+					g_pDualSwordEffect1->entity.curstate.framerate = 20;
+
+					g_pDualSwordEffect1->frameMax = 30;
+					g_pDualSwordEffect1->die = gHUD.m_flTime + 9999.0f;
+
+					g_pDualSwordEffect1->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+
+				if (!g_pDualSwordEffect2)
+				{
+					struct model_s* model;
+
+					model = IEngineStudio.Mod_ForName("sprites/ef_dualsword_right.spr", 0);
+
+
+					g_pDualSwordEffect2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(view->attachment[0], model);
+
+					g_pDualSwordEffect2->entity.curstate.rendermode = kRenderTransAdd;
+					g_pDualSwordEffect2->entity.curstate.renderamt = 255;
+					g_pDualSwordEffect2->entity.curstate.renderfx = 0;
+					g_pDualSwordEffect2->entity.curstate.scale = 0.036;
+					g_pDualSwordEffect2->entity.curstate.framerate = 20;
+
+					g_pDualSwordEffect2->frameMax = 30;
+					g_pDualSwordEffect2->die = gHUD.m_flTime + 9999.0f;
+
+					g_pDualSwordEffect2->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+				else
+				{
+					if (g_pDualSwordEffect1)
+					{
+						g_pDualSwordEffect1->die = 0.0;
+						g_pDualSwordEffect1 = nullptr;
+					}
+					if (g_pDualSwordEffect2)
+					{
+						g_pDualSwordEffect2->die = 0.0;
+						g_pDualSwordEffect2 = nullptr;
+					}
+				}
+			}
+		}
+	}*/
 	// transform the view offset by the model's matrix to get the offset from
 	// model origin for the view
 	bob = V_CalcBob ( pparams );
@@ -815,9 +894,9 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	{
 		for (i = 0; i < 3; i++)
 		{
-			view->origin[i] += bob * 0.1 * pparams->right[i];
-			view->origin[i] -= bob1 * 2.5 * pparams->forward[i];
-			view->origin[i] -= bob1 * 0.7 * pparams->up[i];
+			view->origin[i] += bob * 0.25 * pparams->right[i];
+			view->origin[i] -= bob1 * 0.75 * pparams->forward[i];
+			view->origin[i] -= bob1 * 0.5 * pparams->up[i];
 		}
 		
 	}

@@ -15,7 +15,7 @@ namespace sv {
 #define P228_DAMAGE		32
 #define P228_RANGE_MODIFER	0.8
 #define P228_RELOAD_TIME	2.7s
-#define P228_INSPECT_TIME		4.48s
+#define P228_INSPECT_TIME		5.17s
 
 class CP228 : public CBasePlayerWeapon
 {

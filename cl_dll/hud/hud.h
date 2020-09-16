@@ -1006,6 +1006,7 @@ public:
 	int	m_fPlayerDead;
 	int m_iIntermission;
 	int m_iNoConsolePrint;
+	bool m_bMordenRadar;
 
 	// sprite indexes
 	int m_HUD_number_0;

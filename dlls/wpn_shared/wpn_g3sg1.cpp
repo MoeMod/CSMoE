@@ -137,7 +137,7 @@ void CG3SG1::G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	else
 		m_flAccuracy = 0.98;
 
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -243,14 +243,13 @@ void CG3SG1::Inspect()
 
 	if (!m_fInReload)
 	{
-		if (m_flLastFire != invalid_time_point || gpGlobals->time > m_NextInspect)
+		if (gpGlobals->time > m_NextInspect)
 		{
 #ifndef CLIENT_DLL
 			SendWeaponAnim(5, 0);
 #endif
 			m_NextInspect = gpGlobals->time + GetInspectTime();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-			m_flLastFire = invalid_time_point;
 		}
 	}
 

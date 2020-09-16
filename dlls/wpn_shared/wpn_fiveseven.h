@@ -15,7 +15,7 @@ namespace sv {
 #define FIVESEVEN_DAMAGE		20
 #define FIVESEVEN_RANGE_MODIFER		0.885
 #define FIVESEVEN_RELOAD_TIME		2.7s
-#define FIVESEVEN_INSPECT_TIME		4.48s
+#define FIVESEVEN_INSPECT_TIME		5.20s
 
 class CFiveSeven : public CBasePlayerWeapon
 {

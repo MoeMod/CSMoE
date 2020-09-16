@@ -15,7 +15,7 @@ namespace sv {
 #define P90_DAMAGE		21
 #define P90_RANGE_MODIFER	0.885
 #define P90_RELOAD_TIME		3.4s
-#define P90_INSPECT_TIME		4.48s
+#define P90_INSPECT_TIME		4.24s
 
 class CP90 : public CBasePlayerWeapon
 {
