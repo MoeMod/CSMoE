@@ -5,13 +5,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="..\CSMoE-Full\csmoe">
-      <Filter>GameDir</Filter>
-    </None>
-    <None Include="..\CSMoE-Full\cstrike">
-      <Filter>GameDir</Filter>
-    </None>
-    <None Include="..\CSMoE-Full\valve">
+    <None Include="gamedir.props">
       <Filter>GameDir</Filter>
     </None>
   </ItemGroup>
