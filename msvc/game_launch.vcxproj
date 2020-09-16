@@ -47,9 +47,6 @@
     <ClCompile Include="xash_winrt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <SDKReference Include="Microsoft.VCLibs.Desktop, Version=14.0" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj">
       <Project>{89e9b32e-a86a-47c3-a948-d2b1622925ce}</Project>
     </ProjectReference>
@@ -75,9 +72,9 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <AppContainerApplication>true</AppContainerApplication>
     <ApplicationType>Windows Store</ApplicationType>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
-    <WindowsTargetPlatformMinVersion>10.0.18362.0</WindowsTargetPlatformMinVersion>
+    <WindowsTargetPlatformMinVersion>10.0.10240.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="gamedir.props" />
