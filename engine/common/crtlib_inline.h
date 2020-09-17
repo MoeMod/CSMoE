@@ -1,7 +1,7 @@
 // align checks
 #ifdef XASH_FASTSTR
 
-#define ALIGNOF(x) ( ( unsigned long int )(x) & ( sizeof( int ) - 1) )
+#define ALIGNOF(x) ( ( uintptr_t )(x) & ( sizeof( int ) - 1) )
 #define IS_UNALIGNED(x) (ALIGNOF(x) != 0)
 #define HAS_NULL(x) ( ( ( x - lomagic ) & himagic ) != 0 )
 
@@ -23,11 +23,6 @@
 #endif
 #ifndef XASH_SKIPCRTLIB
 #ifdef XASH_FASTSTR
-
-// align checks
-#define ALIGNOF(x) ( ( unsigned long int )(x) & ( sizeof( int ) - 1) )
-#define IS_UNALIGNED(x) (ALIGNOF(x) != 0)
-#define HAS_NULL(x) ( ( ( x - lomagic ) & himagic ) != 0 )
 xash_force_inline NOASAN int Q_strlen( const char *string )
 {
 	register const char	*pchr = string;
