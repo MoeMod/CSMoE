@@ -167,7 +167,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Configuration)\</OutDir>
     <TargetName>imgui</TargetName>
-    <IntDir>$(Configuration)\</IntDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <TargetName>imgui</TargetName>
