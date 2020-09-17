@@ -16,7 +16,7 @@ build_script:
       
       nuget restore msvc/csmoe.sln
 
-      cp -r msvc\packages\ANGLE.WindowsStore.2.1.13\bin\UAP\ARM msvc\packages\ANGLE.WindowsStore.Servo.2.1.20\bin\UAP\
+      cp -r msvc\packages\ANGLE.WindowsStore.2.1.13\bin\UAP\ARM msvc\packages\ANGLE.WindowsStore.Servo.2.1.20\bin\UAP\ 
       ren msvc\packages\ANGLE.WindowsStore.Servo.2.1.20\bin\UAP\x86 Win32
       
       (Get-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj) | %{$_ -replace "<PlatformToolset>v140</PlatformToolset>", "<PlatformToolset>v142</PlatformToolset>"} | %{$_ -replace "<WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>", "<WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>"} | Set-Content SDL2\VisualC-WinRT\UWP_VS2015\SDL-UWP.vcxproj
