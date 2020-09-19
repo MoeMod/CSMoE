@@ -10,7 +10,7 @@ build_script:
 
       ren SDL2-2.0.12 SDL2
 
-      Invoke-WebRequest -uri 'https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z' -OutFile 'CSMoE-CD-GameDir-Full.zip'
+      Invoke-WebRequest -uri 'https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z' -OutFile 'CSMoE-CD-GameDir-Full.7z'
 
       7z x CSMoE-CD-GameDir-Full.7z
       
