@@ -5,14 +5,11 @@ build_script:
       git submodule update --init --recursive
       
       Invoke-WebRequest -uri 'https://www.libsdl.org/release/SDL2-2.0.12.zip' -OutFile 'SDL2.zip'
-      
       Expand-Archive -Path 'SDL2.zip' -DestinationPath '.' -Force
-      
       ren SDL2-2.0.12 SDL2
 
-      mkdir CSMoE-Full\csmoe
-      mkdir CSMoE-Full\cstrike
-      mkdir CSMoE-Full\valve
+      Invoke-WebRequest -uri 'https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z' -OutFile 'CSMoE-CD-GameDir-Full.zip'
+      7z x CSMoE-CD-GameDir-Full.7z
       
       nuget restore msvc/csmoe.sln
 
