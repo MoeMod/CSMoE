@@ -100,7 +100,6 @@ public:
 	virtual void BecomeHuman();
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
-	std::shared_ptr<IZombieClass_ZB1> m_pZombieZB1;
 };
 
 class CZB1CountdownDelegate : virtual public ICountdownDelegate

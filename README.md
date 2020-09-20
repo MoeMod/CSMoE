@@ -286,7 +286,7 @@ Note: 由于Impactor至今未更新，所以iOS 13以上都没办法安装，请
 | |x86 | x64 | armv7 | arm64 |
 |:----:|:----:|:----:|:----:|:----:|
 | Windows Desktop|√|√|×|×
-| Windows 10 UWP|×|√|√|?
+| Windows 10 UWP|×|√|√|√
 | macOS|?|√|×|?
 | Linux|√|√|?|?
 | iOS|×|×|√|√
@@ -304,11 +304,11 @@ Note: 由于Impactor至今未更新，所以iOS 13以上都没办法安装，请
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
 * Output : Display(3000 x 2000), Sound
 * Result : 60 fps
-### Windows 10 UWP ARM32 - Surface Pro X (2019)
+### Windows 10 UWP ARM64 - Surface Pro X (2019)
 * Specs : Microsoft SQ1 (aka 8cx)
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
 * Output : Display(2880 x 1920), Sound
-* Result : ~50 fps - Good enough.
+* Result : ~60 fps - Good enough.
 ### Windows 10 UWP ARM32 - Surface RT (2012)
 * Specs : Nvidia Tegra 2
 * Input : Mouse, Keyboard, Touchpad, Touchscreen
