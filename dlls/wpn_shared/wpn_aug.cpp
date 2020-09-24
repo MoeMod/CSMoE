@@ -125,7 +125,7 @@ void CAUG::SecondaryAttack(void)
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.16s;
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 		SetThink(&CAUG::SpecialScope);
-		pev->nextthink = gpGlobals->time + 0.16s;	
+		pev->nextthink = gpGlobals->time + 0.15s;	
 	}
 #else
 	if (m_pPlayer->m_iFOV != 90)

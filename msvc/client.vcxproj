@@ -76,6 +76,7 @@
     <ClCompile Include="..\cl_dll\events\event_g3sg1.cpp" />
     <ClCompile Include="..\cl_dll\events\event_galil.cpp" />
     <ClCompile Include="..\cl_dll\events\event_gatling.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_gatlingex.cpp" />
     <ClCompile Include="..\cl_dll\events\event_glock18.cpp" />
     <ClCompile Include="..\cl_dll\events\event_gungnir.cpp" />
     <ClCompile Include="..\cl_dll\events\event_gunkata.cpp" />
@@ -114,6 +115,7 @@
     <ClCompile Include="..\cl_dll\events\event_negev.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p228.cpp" />
     <ClCompile Include="..\cl_dll\events\event_p90.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_r8.cpp" />
     <ClCompile Include="..\cl_dll\events\event_sawedoff.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scarh.cpp" />
     <ClCompile Include="..\cl_dll\events\event_scarl.cpp" />
@@ -220,6 +222,7 @@
     <ClCompile Include="..\dlls\wpn_shared\csgo_cz75.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_mag7.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_negev.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\csgo_r8.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_sawedoff.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_tec9.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\csgo_zeus.cpp" />
@@ -250,6 +253,7 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_g3sg1.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_galil.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_gatling.cpp" />
+    <ClCompile Include="..\dlls\wpn_shared\wpn_gatlingex.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_glock18.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_gungnir.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_gunkata.cpp" />
@@ -398,6 +402,7 @@
     <ClInclude Include="..\dlls\wpn_shared\csgo_cz75.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_mag7.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_negev.h" />
+    <ClInclude Include="..\dlls\wpn_shared\csgo_r8.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_sawedoff.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_tec9.h" />
     <ClInclude Include="..\dlls\wpn_shared\csgo_zeus.h" />
@@ -421,6 +426,7 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_g3sg1.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_galil.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_gatling.h" />
+    <ClInclude Include="..\dlls\wpn_shared\wpn_gatlingex.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_glock18.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_hegrenade.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_infinity.h" />

@@ -131,7 +131,7 @@ void CZeus::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_zeus");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_FLASHBANG;
 	SET_MODEL(ENT(pev), "models/w_zeus.mdl");
 	m_iClip = -1;
 	m_iDefaultAmmo = 1;
@@ -157,9 +157,9 @@ int CZeus::GetItemInfo(ItemInfo *p)
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = -1;
-	p->iSlot = 1;
+	p->iSlot = 3;
 	p->iPosition = 9;
-	p->iId = m_iId = WEAPON_DEAGLE;
+	p->iId = m_iId = WEAPON_FLASHBANG;
 	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
 	p->iWeight = FLASHBANG_WEIGHT;
 
@@ -225,9 +225,9 @@ void CZeus::Holster(int skiplocal)
 {
 	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]<=0)
+	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
-		m_pPlayer->pev->weapons &= ~(1 << WEAPON_DEAGLE);
+		m_pPlayer->pev->weapons &= ~(1 << WEAPON_FLASHBANG);
 		DestroyItem();
 	}
 }
@@ -311,6 +311,11 @@ int CZeus::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 		return TRUE;
 	}
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
+}
+
+BOOL CZeus::CanDeploy(void)
+{
+	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
 }
 
 }

@@ -24,6 +24,7 @@ public:
 	virtual BOOL CanDrop() { return FALSE; }
 	virtual BOOL CanHolster();
 	virtual BOOL Deploy();
+	const char* GetCSModelName() override { return "models/w_zombibomb.mdl"; }
 	virtual void Holster(int skiplocal);
 	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
 	virtual int iItemSlot() { return GRENADE_SLOT; }

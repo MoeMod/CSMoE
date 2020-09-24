@@ -679,7 +679,7 @@ void CVoidpistol::PrimaryAttack(void)
 }
 bool CVoidpistol::IsModeCEnabled(int iCharging)
 {
-	return iCharging > 70;
+	return iCharging > 20;
 }
 
 void CVoidpistol::VoidpistolFireC(void)
@@ -702,12 +702,25 @@ void CVoidpistol::VoidpistolFireC(void)
 			if (pEntity->pev == m_pPlayer->pev)
 				continue;
 
+			if (pEntity->IsBSPModel())
+				continue;
+
 			if (pEntity->IsPlayer() && g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
 			{
 				SendWeaponAnim(VOIDPISTOL_SHOOT_BLACKHOLE_B, UseDecrement() != FALSE);
 				m_flNextSecondaryAttack = m_flNextPrimaryAttack = 1.03s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
 				m_iMode = VOIDPISTOL_MODEB;
+				break;
+				
+			}
+			else
+			{
+				SendWeaponAnim(VOIDPISTOL_SHOOT_BLACKHOLE_A, UseDecrement() != FALSE);
+				m_flNextSecondaryAttack = m_flNextPrimaryAttack = 1.03s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
+				m_iMode = VOIDPISTOL_MODEA;
+				break;
 			}
 		}
 	}
