@@ -143,7 +143,7 @@ void EV_FireVoidpistol( event_args_t *args )
 					pEnt->entity.curstate.scale = 0.5;
 					pEnt->entity.curstate.renderamt = 255;
 					pEnt->die = gHUD.m_flTime + 1.5;
-					pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
+					pEnt->flags |= FTENT_SPRANIMATE;
 				}
 				break;
 			}
@@ -179,7 +179,7 @@ void EV_FireVoidpistol( event_args_t *args )
 					pEnt->entity.curstate.rendermode = kRenderTransAdd;
 					pEnt->entity.curstate.renderamt = 255;
 					pEnt->die = gHUD.m_flTime + 1.53;
-					pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
+					pEnt->flags |= FTENT_SPRANIMATE;
 
 				}
 				break;

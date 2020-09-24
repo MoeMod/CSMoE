@@ -472,7 +472,7 @@ int CVoidpistol::GetItemInfo(ItemInfo *p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "voidpistolammo";
 	p->iMaxAmmo1 = 100;
-	p->pszAmmo2 = "SVDEXGrenade";
+	p->pszAmmo2 = "VoidpistolProjectile";
 	p->iMaxAmmo2 = 0;
 	p->iMaxClip = VOIDPISTOL_MAX_CLIP;
 	p->iSlot = 1;
@@ -679,7 +679,7 @@ void CVoidpistol::PrimaryAttack(void)
 }
 bool CVoidpistol::IsModeCEnabled(int iCharging)
 {
-	return iCharging > 20;
+	return iCharging > 70;
 }
 
 void CVoidpistol::VoidpistolFireC(void)

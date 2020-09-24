@@ -58,7 +58,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_wa2000",      "WA2000",                4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_as50",        "AS50",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_stg44",        "STG-44",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	//{"weapon_gatlingex",        "GatlingEX",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+
 	{"weapon_mg3",         "MG-3",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_mg3xmas",         "MG3 Xmas Edition",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_molotov",         "Molotov",                  600, GRENADE_SLOT, UNASSIGNED},
@@ -90,6 +90,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_balrog7",      "BALROG-VII",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_starchaserar",      "Star Chaser AR",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_gunkata",	 "Dual Beretta Gunslinger",			  1500,  PISTOL_SLOT,         UNASSIGNED},
+	{"weapon_gatlingex",        "Infernal Cannon",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},

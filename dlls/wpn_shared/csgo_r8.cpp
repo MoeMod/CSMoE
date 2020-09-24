@@ -104,7 +104,14 @@ BOOL CR8::Deploy(void)
 {
 	m_flAccuracy = 0.92;
 	m_NextInspect = gpGlobals->time + 0.75s;
-	return DefaultDeploy(m_pPlayer->m_iTeam == CT ? "models/v_r8.mdl" : "models/alt/v_r8.mdl", "models/p_r8.mdl", RANDOM_LONG(DRAW, DRAW_ALT), "onehanded", UseDecrement() != FALSE);
+
+	if (DefaultDeploy(m_pPlayer->m_iTeam == CT ? "models/v_r8.mdl" : "models/alt/v_r8.mdl", "models/p_r8.mdl", RANDOM_LONG(DRAW, DRAW_ALT), "onehanded", UseDecrement() != FALSE))
+	{
+		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.04s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.04s;
+		return TRUE;
+	}
+	return FALSE;
 }
 
 void CR8::PrimaryAttack(void)
