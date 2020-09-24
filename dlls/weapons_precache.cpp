@@ -149,6 +149,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m4a1dragon");
 	UTIL_PrecacheOtherWeapon("weapon_ak47dragon");
 	UTIL_PrecacheOtherWeapon("weapon_stg44");
+	UTIL_PrecacheOtherWeapon("weapon_gatlingex");
 	UTIL_PrecacheOtherWeapon("knife_knifedragon");
 	UTIL_PrecacheOther("ammo_50bmg");
 	UTIL_PrecacheOtherWeapon("weapon_kriss");
@@ -183,6 +184,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("csgo_tec9");
 	UTIL_PrecacheOtherWeapon("csgo_zeus");
 	UTIL_PrecacheOtherWeapon("csgo_cz75");
+	UTIL_PrecacheOtherWeapon("csgo_r8");
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
 	UTIL_PrecacheOtherWeapon("weapon_bow");

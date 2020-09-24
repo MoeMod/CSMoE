@@ -169,7 +169,7 @@ void CStg44::Reload(void)
 {
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
-	if (DefaultReload(AK47_MAX_CLIP, STG44_RELOAD, 2.45s));
+	if (DefaultReload(AK47_MAX_CLIP, STG44_RELOAD, 2.45s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

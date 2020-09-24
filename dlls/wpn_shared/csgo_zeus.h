@@ -19,8 +19,9 @@ public:
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
 	float GetMaxSpeed() override { return 250; }
-	int iItemSlot() override { return KNIFE_SLOT; }
+	int iItemSlot() override { return GRENADE_SLOT; }
 	bool HasSecondaryAttack() override { return FALSE; }
+	virtual BOOL CanDeploy();
 	void PrimaryAttack() override;
 	//BOOL CanDeploy() override;
 	void PrimaryAttack_Post();
