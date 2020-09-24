@@ -336,6 +336,7 @@ TL_ADD(CZ4B_AK47XGrenade)
 TL_ADD(CZ4B_M4A1MWGrenade)
 TL_ADD(CVoidpistolBlackhole)
 TL_ADD(CVoidpistolProjectile)
+TL_ADD(CGatlingexProjectile)
 #endif
 
 TL_END(AllEntityTypeList)

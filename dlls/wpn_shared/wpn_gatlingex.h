@@ -13,8 +13,8 @@ namespace sv {
 //xm1014
 #define XM1014_MAX_SPEED	220
 #define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
-#define	GATLING_DEFAULT_GIVE 40
-#define	GATLING_MAX_CLIP 40
+#define	GATLING_DEFAULT_GIVE 45
+#define	GATLING_MAX_CLIP 45
 
 class CGatlingex : public CBasePlayerWeapon
 {
@@ -25,6 +25,8 @@ public:
 	BOOL Deploy() override;
 	float GetMaxSpeed() override { return XM1014_MAX_SPEED; }
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
+	bool HasSecondaryAttack() override { return true; }
+	void SecondaryAttack() override;
 	void PrimaryAttack() override;
 	int GetPrimaryAttackDamage() const;
 	void Reload() override;
@@ -44,6 +46,10 @@ public:
 
 public:
 	int m_iShell;
+	int m_iDefaultAmmo2;
+	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
+	float FireBallDamage() const;
+	int m_iBulletFired;
 
 private:
 	unsigned short m_usFireGatlingex;

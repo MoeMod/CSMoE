@@ -26,8 +26,13 @@
 *
 */
 #include "events.h"
+#include "studio.h"
+#include "r_studioint.h"
+#include <string>
 
 namespace cl {
+
+extern engine_studio_api_t IEngineStudio;
 
 enum gatling_e
 {
@@ -35,62 +40,94 @@ enum gatling_e
 	GATLING_FIRE1,
 	GATLING_FIRE2,
 	GATLING_RELOAD,
-	GATLING_DRAW
+	GATLING_DRAW,
+	GATLINGEX_FIREBALL
 };
 
-static const char *SOUNDS_NAME = "weapons/gatling-1.wav";
+static const char* SOUNDS_NAME[] =
+{
+	"weapons/gatlingex-1.wav", "weapons/gatlingex-2.wav"
+};
 
-void EV_FireGatlingex(event_args_s *args)
+void EV_FireGatlingex(event_args_s* args)
 {
 	vec3_t ShellVelocity;
 	vec3_t ShellOrigin;
 	vec3_t vecSrc, vecAiming;
 	int    idx = args->entindex;
-	Vector origin( args->origin );
+	Vector origin(args->origin);
 	Vector angles(
 		args->iparam1 / 100.0f + args->angles[0],
 		args->iparam2 / 100.0f + args->angles[1],
 		args->angles[2]
-		);
-	Vector velocity( args->velocity );
+	);
+	Vector velocity(args->velocity);
 	Vector forward, right, up;
 
-	AngleVectors( angles, forward, right, up );
-
-	if ( EV_IsLocal( idx ) )
+	AngleVectors(angles, forward, right, up);
+	if (args->bparam2)
 	{
-		++g_iShotsFired;
-		EV_MuzzleFlash();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(GATLING_FIRE1, GATLING_FIRE2), 2);
-		if( !gHUD.cl_righthand->value )
+		if (args->bparam1)
 		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, -11.0, 0);
+			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_gatlingex_explosion.spr", false);
+			if (pModel)
+			{
+				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/gatlingex-2_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 30.0;
+
+				pEnt->entity.curstate.scale = 1.0;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 1.33;
+				pEnt->flags |= FTENT_SPRANIMATE;
+
+			}
 		}
 		else
 		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, 11.0, 0);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(GATLINGEX_FIREBALL, 2);
+			PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
 		}
 	}
 	else
 	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
+		if (EV_IsLocal(idx))
+		{
+
+			++g_iShotsFired;
+			EV_MuzzleFlash();
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(GATLING_FIRE1, GATLING_FIRE2), 2);
+			if (!gHUD.cl_righthand->value)
+			{
+				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, -11.0, 0);
+			}
+			else
+			{
+				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, 11.0, 0);
+			}
+		}
+		else
+		{
+			EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
+		}
+
+		EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], g_iShotgunShell, TE_BOUNCE_SHELL);
+
+		PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
+
+		EV_GetGunPosition(args, vecSrc, origin);
+		VectorCopy(forward, vecAiming);
+		Vector vSpread;
+
+		vSpread.x = 0.0725;
+		vSpread.y = 0.0725;
+		EV_HLDM_FireBullets(idx,
+			forward, right, up,
+			6, vecSrc, vecAiming,
+			vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
+			1);
 	}
-
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iShotgunShell, TE_BOUNCE_SHELL);
-
-	PLAY_EVENT_SOUND( SOUNDS_NAME );
-
-	EV_GetGunPosition( args, vecSrc, origin );
-	VectorCopy( forward, vecAiming );
-	Vector vSpread;
-	
-	vSpread.x = 0.0725;
-	vSpread.y = 0.0725;
-	EV_HLDM_FireBullets( idx,
-		forward, right,	up,
-		6, vecSrc, vecAiming,
-		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
-		1 );
 }
-
 }
