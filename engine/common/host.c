@@ -1091,6 +1091,13 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 			const char *IOS_GetBundleDir();
 			Q_strncpy( host.rodir, IOS_GetBundleDir(), sizeof( host.rodir ));
 		}
+#elif defined XASH_WINRT
+		else
+		{
+			size_t len = Q_strncpy(host.rodir, SDL_WinRTGetFSPathUTF8(SDL_WINRT_PATH_INSTALLED_LOCATION), sizeof(host.rodir));
+			host.rodir[len] = '\\';
+			host.rodir[len + 1] = '\0';
+		}
 #endif
 	}
 
@@ -1163,9 +1170,6 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 #endif
 
 #ifdef XASH_WINRT
-	strcpy(host.rootdir, SDL_WinRTGetFSPathUTF8(SDL_WINRT_PATH_LOCAL_FOLDER));
-	strcpy(host.rodir, SDL_WinRTGetFSPathUTF8(SDL_WINRT_PATH_INSTALLED_LOCATION));
-
 	if (!host.rootdir[0] || SetCurrentDirectory(SDL_WinRTGetFSPathUNICODE(SDL_WINRT_PATH_LOCAL_FOLDER)) != 0)
 		MsgDev(D_INFO, "%s is working directory now\n", host.rootdir);
 	else

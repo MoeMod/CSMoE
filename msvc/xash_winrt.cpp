@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <Windows.h>
 #include <vector>
+#include <iterator>
 
 typedef void(*pfnChangeGame)(const char *progname);
 typedef int(*pfnInit)(int argc, char **argv, const char *progname, int bChangeGame, pfnChangeGame func);

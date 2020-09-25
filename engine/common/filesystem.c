@@ -1623,8 +1623,14 @@ void FS_ParseGenericGameInfo( gameinfo_t *GameInfo, const char *buf, const qbool
 	}
 
 	// make sure what gamedir is really exist
-	if( !FS_SysFolderExists( va( "%s"PATH_SPLITTER"%s", host.rootdir, GameInfo->falldir )))
+	do {
+		if (host.rodir[0] && FS_SysFolderExists(va("%s"PATH_SPLITTER"%s", host.rodir, GameInfo->falldir)))
+			break;
+		if (FS_SysFolderExists(va("%s"PATH_SPLITTER"%s", host.rootdir, GameInfo->falldir)))
+			break;
+
 		GameInfo->falldir[0] = '\0';
+	} while (0);
 }
 
 /*
