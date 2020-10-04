@@ -15,7 +15,7 @@
 namespace sv {
 
 // presets for runtime pitch and vol modulation of ambient sounds
-UNTESTED dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
+dynpitchvol_t rgdpvpreset[CDPVPRESETMAX] =
 {
 	// pitch prun	pstart	spinup	spindwn	volrun	volstrt	fadein	fadeout	lfotype	lforate	lfomodp modvol	cspnup	cspnct	pitch	spupsv	spdwnsv	pfrac	vol	fdinsv	fdotsv	volfrac	lfofrac	lfomult
 	{ 1,	255,	75,	95,	95,	10,	1,	50,	95,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0 },

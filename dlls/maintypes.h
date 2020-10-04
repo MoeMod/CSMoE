@@ -32,22 +32,11 @@
 #pragma once
 #endif
 
-//#include "mathlib.h"
-
 #include "deprecated.h"
 #include "nodiscard.h"
 
 // Has no references on multiplayer library CS.
 #define NOXREF
-// Function body is not implemented.
-#define NOBODY
-// Function is not tested at all.
-#define UNTESTED
-// Function is doubt reversed
-#define TODOBODY
-
-#define BIT(n) (1<<(n))
-
 
 typedef int string_t;		// from engine's pr_comp.h;
 typedef int EOFFSET;
