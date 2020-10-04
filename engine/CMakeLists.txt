@@ -40,6 +40,12 @@ endif()
 option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
 option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
 option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
+if(WIN32)
+	option(XASH_QINDIEGL    "Use QindieGL(D3D9). Only avaible on Win32" OFF)
+endif()
+if(XASH_QINDIEGL)
+	set(XASH_QINDIEGL_SRC "${CMAKE_SOURCE_DIR}/3rdparty/QindieGL" CACHE PATH "QindieGL path")
+endif()
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
@@ -299,6 +305,51 @@ elseif(XASH_WES)
 
 	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/ ${XASH_WES_SRC}/src/)
 	add_definitions(-DXASH_WES)
+elseif(XASH_QINDIEGL)
+	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES 
+		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_blend.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_clip.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_combiners.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_eval.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_extension.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_feedback.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_get.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_global.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_immediate.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_light.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_lists.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_material.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_matrix.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_matrix_stack.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_misc.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_object.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_pixels.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_state.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_stencil.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_texgen.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_texture.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_wrapper.cpp
+	)
+	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
+		message(FATAL_ERROR "Clone QindieGL sources to engine folder!")
+	endif()
+
+	find_package(DirectX REQUIRED)
+	if(NOT ${DirectX9_FOUND})
+		message(FATAL_ERROR "DirectX SDK not found! Please install DirectX SDK from https://www.microsoft.com/en-us/download/details.aspx?id=6812")
+	endif()
+
+	add_library(UniversalDXSDK INTERFACE)
+	#target_include_directories(UniversalDXSDK INTERFACE "${CMAKE_SOURCE_DIR}/3rdparty/UniversalDXSDK/Include")
+	
+	add_library(QindieGL STATIC ${XASH_ENGINE_GLESWRAP_SOURCES})
+	target_include_directories(QindieGL PRIVATE ${DirectX9_INCLUDE_DIR})
+	target_include_directories(QindieGL PRIVATE ${XASH_QINDIEGL_SRC}/code)
+	target_include_directories(QindieGL PUBLIC ${XASH_QINDIEGL_SRC}/code/gl_headers)
+	target_compile_definitions(QindieGL PUBLIC -DXASH_QINDIEGL)
+
+	target_link_libraries(QindieGL PRIVATE UniversalDXSDK ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXGUID_LIBRARY} ${DirectX9_DXERR_LIBRARY})
 endif()
 
 add_definitions(-DXASH_FORCEINLINE)
@@ -396,6 +447,11 @@ endif()
 
 if(XASH_GLES)
 	add_definitions(-DXASH_GLES -DXASH_GL_STATIC)
+endif()
+
+if(XASH_QINDIEGL)
+	add_definitions(-DXASH_D3D -DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
+	target_link_libraries(${XASH_ENGINE} QindieGL)
 endif()
 
 if(XASH_SAILFISH)

@@ -882,6 +882,10 @@ qboolean GL_CreateContext( void )
 #ifdef XASH_NANOGL
 	nanoGL_Init();
 #endif
+#ifdef XASH_QINDIEGL
+	void QindieGL_Init(void);
+	QindieGL_Init();
+#endif
 
 	if( ( glw_state.context = SDL_GL_CreateContext( host.hWnd ) ) == NULL)
 	{
@@ -942,6 +946,11 @@ qboolean GL_DeleteContext( void )
 		glw_state.context = NULL;
 	}
 
+#ifdef XASH_QINDIEGL
+	void QindieGL_Destroy(void);
+	QindieGL_Destroy();
+#endif
+	
 	return false;
 }
 

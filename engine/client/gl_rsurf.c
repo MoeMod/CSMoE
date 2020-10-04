@@ -1778,6 +1778,7 @@ void R_DrawStaticBrushes( void )
 	}
 }
 
+#ifndef XASH_QINDIEGL
 /*
 ==============================
 
@@ -3331,6 +3332,34 @@ qboolean R_AddSurfToVBO( msurface_t *surf, qboolean buildlightmap )
 	}
 	return false;
 }
+#else
+
+qboolean R_AddSurfToVBO(msurface_t* surf, qboolean buildlightmap)
+{
+	return false;
+}
+
+void R_DrawVBO(qboolean drawlightmaps, qboolean drawtextures)
+{
+	
+}
+
+void R_ClearVBO()
+{
+	
+}
+
+void R_AddDecalVBO(decal_t* pdecal, msurface_t* surf)
+{
+	
+}
+
+void R_GenerateVBO()
+{
+	
+}
+
+#endif // #ifndef XASH_QINDIEGL
 
 
 /*
@@ -3656,7 +3685,9 @@ void R_DrawWorld( void )
 
 	R_DrawStaticBrushes();
 
+#ifndef XASH_QINDIEGL
 	R_DrawVBO( !r_fullbright->integer && !!cl.worldmodel->lightdata, true );
+#endif
 
 	R_DrawTextureChains();
 
