@@ -480,7 +480,7 @@ void GL_UpdateSwapInterval( void )
 	if( gl_swapInterval->modified )
 	{
 		gl_swapInterval->modified = false;
-#ifdef XASH_QINDIEGL
+#ifndef XASH_QINDIEGL
 		if( SDL_GL_SetSwapInterval( gl_swapInterval->integer ) )
 			MsgDev( D_ERROR, "SDL_GL_SetSwapInterval: %s\n", SDL_GetError( ) );
 #else
