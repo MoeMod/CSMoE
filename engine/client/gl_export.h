@@ -775,6 +775,13 @@ typedef float GLmatrix[16];
 #define ERROR_INVALID_VERSION_ARB		0x2095
 #define ERROR_INVALID_PROFILE_ARB		0x2096
 
+#define GL_RED_BITS                       0x0D52
+#define GL_GREEN_BITS                     0x0D53
+#define GL_BLUE_BITS                      0x0D54
+#define GL_ALPHA_BITS                     0x0D55
+#define GL_DEPTH_BITS                     0x0D56
+#define GL_STENCIL_BITS                   0x0D57
+
 #ifdef XASH_GL_STATIC
 #include "gl_static.h"
 #else

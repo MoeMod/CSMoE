@@ -330,6 +330,7 @@ elseif(XASH_QINDIEGL)
 		${XASH_QINDIEGL_SRC}/code/d3d_texgen.cpp
 		${XASH_QINDIEGL_SRC}/code/d3d_texture.cpp
 		${XASH_QINDIEGL_SRC}/code/d3d_wrapper.cpp
+		${XASH_QINDIEGL_SRC}/msvc/opengl32.def
 	)
 	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
 		message(FATAL_ERROR "Clone QindieGL sources to engine folder!")
@@ -339,9 +340,6 @@ elseif(XASH_QINDIEGL)
 	if(NOT ${DirectX9_FOUND})
 		message(FATAL_ERROR "DirectX SDK not found! Please install DirectX SDK from https://www.microsoft.com/en-us/download/details.aspx?id=6812")
 	endif()
-
-	add_library(UniversalDXSDK INTERFACE)
-	#target_include_directories(UniversalDXSDK INTERFACE "${CMAKE_SOURCE_DIR}/3rdparty/UniversalDXSDK/Include")
 	
 	add_library(QindieGL STATIC ${XASH_ENGINE_GLESWRAP_SOURCES})
 	target_include_directories(QindieGL PRIVATE ${DirectX9_INCLUDE_DIR})
@@ -349,7 +347,8 @@ elseif(XASH_QINDIEGL)
 	target_include_directories(QindieGL PUBLIC ${XASH_QINDIEGL_SRC}/code/gl_headers)
 	target_compile_definitions(QindieGL PUBLIC -DXASH_QINDIEGL)
 
-	target_link_libraries(QindieGL PRIVATE UniversalDXSDK ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXGUID_LIBRARY} ${DirectX9_DXERR_LIBRARY})
+	target_link_libraries(QindieGL PUBLIC ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXGUID_LIBRARY} ${DirectX9_DXERR_LIBRARY} legacy_stdio_definitions)
+	# install( TARGETS QindieGL DESTINATION ".")
 endif()
 
 add_definitions(-DXASH_FORCEINLINE)

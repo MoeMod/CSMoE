@@ -1338,7 +1338,10 @@ void R_EndFrame( void )
 	else
 		R_Set2DMode( false );
 
-#ifdef XASH_SDL
+#ifdef XASH_QINDIEGL
+	BOOL WINAPI wrap_wglSwapBuffers(HDC);
+	wrap_wglSwapBuffers(NULL);
+#elif defined(XASH_SDL)
 	SDL_GL_SwapWindow( host.hWnd );
 #elif defined __ANDROID__ // For direct android backend
 	Android_SwapBuffers();

@@ -790,12 +790,13 @@ static void GL_SetDefaults( void )
 	GL_FrontFace( 0 );
 
 	R_SetTextureParameters();
-
+#if !defined(XASH_QINDIEGL)
 	pglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	pglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
 	pglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	pglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+#endif
 }
 
 /*

@@ -264,7 +264,7 @@ void GL_MultiTexCoord2f( GLenum texture, GLfloat s, GLfloat t )
 	{
 		pglMultiTexCoord2f( texture + GL_TEXTURE0_ARB, s, t );
 	}
-#if !defined(XASH_NANOGL) && !defined(XASH_WES) && !defined(XASH_QINDIEGL)
+#if !defined(XASH_NANOGL) && !defined(XASH_WES)
 	else if( pglMTexCoord2fSGIS )
 	{
 		pglMTexCoord2fSGIS( texture + GL_TEXTURE0_SGIS, s, t );
