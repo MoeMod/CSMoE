@@ -174,9 +174,15 @@ void CP90::Reload(void)
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + P90_RELOAD_TIME;
-	if (DefaultReload(P90_MAX_CLIP, P90_RELOAD, 3.4s))
+	if (DefaultReload(P90_MAX_CLIP, P90_RELOAD, P90_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.5s;
+			m_flTimeWeaponIdle = P90_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + P90_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.2;

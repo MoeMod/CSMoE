@@ -284,10 +284,16 @@ void CGLOCK18::Reload(void)
 	else
 		iAnim = GLOCK18_RELOAD2;
 	m_NextInspect = gpGlobals->time + GLOCK18_RELOAD_TIME;
-	if (DefaultReload(GLOCK18_MAX_CLIP, iAnim, 2.2s))
+	if (DefaultReload(GLOCK18_MAX_CLIP, iAnim, GLOCK18_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.0s;
+			m_flTimeWeaponIdle = GLOCK18_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + GLOCK18_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.9;
 	}

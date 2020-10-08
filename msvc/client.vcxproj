@@ -69,6 +69,7 @@
     <ClCompile Include="..\cl_dll\events\event_deagled.cpp" />
     <ClCompile Include="..\cl_dll\events\event_decal_reset.cpp" />
     <ClCompile Include="..\cl_dll\events\event_desperado.cpp" />
+    <ClCompile Include="..\cl_dll\events\event_effects.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_left.cpp" />
     <ClCompile Include="..\cl_dll\events\event_elite_right.cpp" />
     <ClCompile Include="..\cl_dll\events\event_famas.cpp" />

@@ -271,10 +271,16 @@ void CUSP::Reload(void)
 	else
 		iAnim = USP_UNSIL_RELOAD;
 	m_NextInspect = gpGlobals->time + USP_RELOAD_TIME;
-	if (DefaultReload(USP_MAX_CLIP, iAnim, 2.7s))
+	if (DefaultReload(USP_MAX_CLIP, iAnim, USP_RELOAD_TIME))
 	{
 
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.7s;
+			m_flTimeWeaponIdle = USP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + USP_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.92;

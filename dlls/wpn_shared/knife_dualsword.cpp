@@ -448,7 +448,7 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	const Vector vecSrc = m_pPlayer->GetGunPosition();
 	const Vector vecDir = gpGlobals->v_forward;
-	{
+	/*{
 		TraceResult tr;
 		Vector vecEnd = vecSrc + vecDir.Normalize() * flAngle;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
@@ -472,9 +472,9 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 			WRITE_BYTE(150); // noise
 			MESSAGE_END();
 		}
-	}
+	}*/
 
-	switch (KnifeAttack3(vecSrc, vecDir, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack4(vecSrc, vecDir, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev,TRUE))
 	{
 	case HIT_NONE:
 	{
@@ -537,7 +537,7 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	const Vector vecSrc = m_pPlayer->GetGunPosition();
 	const Vector vecDir = gpGlobals->v_forward;
-	{
+	/*{
 		TraceResult tr;
 		Vector vecEnd = vecSrc + vecDir.Normalize() * flAngle;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
@@ -561,13 +561,13 @@ void CKnifeDualsword::DelaySecondaryAttack()
 			WRITE_BYTE(150); // noise
 			MESSAGE_END();
 		}
-	}
+	}*/
 
 	char buffer[64];
 	sprintf(buffer, "weapons/dualsword_slash_%d.wav", v8 + 1);
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, 94);
 
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, FALSE))
 	{
 	case HIT_NONE:
 	{

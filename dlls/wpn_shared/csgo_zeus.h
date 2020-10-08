@@ -19,22 +19,22 @@ public:
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
 	float GetMaxSpeed() override { return 250; }
-	int iItemSlot() override { return GRENADE_SLOT; }
+	int iItemSlot() override { return KNIFE_SLOT; }
 	bool HasSecondaryAttack() override { return FALSE; }
 	virtual BOOL CanDeploy();
+	BOOL CanDrop() override { return TRUE; }
 	void PrimaryAttack() override;
 	//BOOL CanDeploy() override;
 	void PrimaryAttack_Post();
 	void WeaponIdle() override;
 	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
-	void Holster(int skiplocal) override;
 	const char *GetCSModelName() override { return "models/w_zeus.mdl"; }
 	float GetPrimaryAttackDamage() const;
 	
 #ifndef CLIENT_DLL
-	/*virtual void ItemPostFrame() override;
+	virtual void ItemPostFrame() override;
 	~CZeus();
-	virtual void AttachToPlayer(CBasePlayer* pPlayer) override;*/
+	virtual void AttachToPlayer(CBasePlayer* pPlayer) override;
 	hit_result_t ZeusAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bitsDamageType,
 		entvars_t* pevInflictor, entvars_t* pevAttacker);
 #endif

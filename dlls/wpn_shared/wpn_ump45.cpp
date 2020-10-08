@@ -170,9 +170,15 @@ void CUMP45::Reload(void)
 	if (m_pPlayer->ammo_45acp <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + UMP45_RELOAD_TIME;
-	if (DefaultReload(UMP45_MAX_CLIP, UMP45_RELOAD, 3.5s))
+	if (DefaultReload(UMP45_MAX_CLIP, UMP45_RELOAD, UMP45_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.42s;
+			m_flTimeWeaponIdle = UMP45_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + UMP45_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0;

@@ -242,9 +242,15 @@ void CM4A1::Reload(void)
 	else
 		iAnim = M4A1_UNSIL_RELOAD;
 
-	if (DefaultReload(M4A1_MAX_CLIP, iAnim, 3.05s))
+	if (DefaultReload(M4A1_MAX_CLIP, iAnim, M4A1_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.84s;
+			m_flTimeWeaponIdle = M4A1_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + M4A1_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.2;

@@ -194,10 +194,16 @@ void CAWP::Reload(void)
 	if (m_pPlayer->ammo_338mag <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + AWP_RELOAD_TIME;
-	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, 2.5s))
+	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, AWP_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = AWP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AWP_RELOAD_TIME;
+		}
 #endif
 		if (m_pPlayer->pev->fov != 90)
 		{

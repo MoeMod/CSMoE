@@ -442,6 +442,7 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("models/shield/v_shield_voidpistol.mdl");
 #endif
 	PRECACHE_MODEL("models/w_voidpistol.mdl");
+	PRECACHE_MODEL("models/p_voidpistol.mdl");
 
 	PRECACHE_MODEL("sprites/ef_blackhole01.spr"); //charing spr attached to model
 	PRECACHE_MODEL("sprites/ef_blackhole02.spr");
@@ -449,7 +450,7 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("sprites/ef_blackhole04.spr");//infront of the gun charing finished
 	PRECACHE_MODEL("models/ef_blackhole_projectile.mdl");
 
-	PRECACHE_MODEL("models/ef_blackhole_star.spr"); //muzzleflash
+	PRECACHE_MODEL("sprites/ef_blackhole_star.spr"); //muzzleflash
 
 	PRECACHE_MODEL("models/ef_blackhole.mdl");
 	
@@ -897,19 +898,24 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	
+
 #ifndef CLIENT_DLL	
+	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed, 1);
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecDir, missile, ENT(m_pPlayer->pev), &tr);
 	{
 		if (tr.flFraction < 1.0)
 		{
 			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+			
 			if (pHit->IsPlayer())
 			{
-				if (g_pGameRules->PlayerRelationship(m_pPlayer, pHit) == GR_TEAMMATE)
+				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pHit->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
+				if (g_pGameRules->PlayerRelationship(m_pPlayer, pHit) != GR_TEAMMATE)
 					m_iCharging++;
 			}
+				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
 		}
 	}
 	if (IsModeCEnabled(m_iCharging))

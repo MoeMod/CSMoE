@@ -185,10 +185,16 @@ void CSG550::Reload(void)
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + SG550_RELOAD_TIME;
-	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, 3.35s))
+	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, SG550_RELOAD_TIME))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.28s;
+			m_flTimeWeaponIdle = SG550_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SG550_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 

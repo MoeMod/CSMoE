@@ -195,10 +195,16 @@ void CFiveSeven::Reload(void)
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + FIVESEVEN_RELOAD_TIME;
-	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, 2.7s))
+	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, FIVESEVEN_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = FIVESEVEN_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + FIVESEVEN_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.92;
 	}

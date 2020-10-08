@@ -177,10 +177,16 @@ void CAK47::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + AK47_RELOAD_TIME;
-	if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, 2.45s))
+	if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, AK47_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.9s;
+			m_flTimeWeaponIdle = AK47_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AK47_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.2;
 		m_iShotsFired = 0;

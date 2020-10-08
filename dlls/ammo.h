@@ -138,6 +138,14 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity *pOther);
 };
 
+class CZeusAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
 class CGungnirAmmo : public CBasePlayerAmmo
 {
 public:

@@ -503,12 +503,17 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 				DropPrimary(pPlayer);
 				break;
 			case PISTOL_SLOT :
-				DropSecondary(pPlayer);
+				if (!strcmp(iter->pszClassName, "csgo_zeus"))
+				{
+				}
+				else
+					DropSecondary(pPlayer);
 				break;
 			case KNIFE_SLOT:
 				if (pPlayer->m_rgpPlayerItems[KNIFE_SLOT]) {
 					if (!strcmp(iter->pszClassName, "csgo_zeus"))
-					{ }
+					{
+					}
 					else
 					pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
 				}

@@ -182,9 +182,15 @@ void CSCOUT::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + SCOUT_RELOAD_TIME;
-	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, 2s))
+	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, SCOUT_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.67s;
+			m_flTimeWeaponIdle = SCOUT_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SCOUT_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 

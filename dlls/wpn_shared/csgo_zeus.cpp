@@ -131,7 +131,7 @@ void CZeus::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_zeus");
 
 	Precache();
-	m_iId = WEAPON_FLASHBANG;
+	m_iId = WEAPON_ELITE;
 	SET_MODEL(ENT(pev), "models/w_zeus.mdl");
 	m_iClip = -1;
 	m_iDefaultAmmo = 1;
@@ -152,14 +152,14 @@ void CZeus::Precache(void)
 int CZeus::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "762Nato";
+	p->pszAmmo1 = "ZeusAmmo";
 	p->iMaxAmmo1 = 1;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = -1;
-	p->iSlot = 3;
-	p->iPosition = 9;
-	p->iId = m_iId = WEAPON_FLASHBANG;
+	p->iSlot = 2;
+	p->iPosition = 2;
+	p->iId = m_iId = WEAPON_ELITE;
 	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
 	p->iWeight = FLASHBANG_WEIGHT;
 
@@ -213,31 +213,19 @@ void CZeus::PrimaryAttack(void)
 	}
 	}
 #endif
-
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-		m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.6s;
+#ifndef CLIENT_DLL
+	m_pPlayer->DropPlayerItem(STRING(this->pev->classname));
+#endif
 
-	return;
 }
 
-void CZeus::Holster(int skiplocal)
-{
-	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
-
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-	{
-		m_pPlayer->pev->weapons &= ~(1 << WEAPON_FLASHBANG);
-		DestroyItem();
-	}
-}
-/*
 #ifndef CLIENT_DLL
 void CZeus::AttachToPlayer(CBasePlayer* pPlayer)
 {
 	CBasePlayerWeapon::AttachToPlayer(pPlayer);
 
-	// find the linked weapon
+	/*// find the linked weapon
 	while (!m_pLink)
 	{
 		for (int i = 0; i < MAX_ITEM_TYPES; ++i)
@@ -259,20 +247,28 @@ void CZeus::AttachToPlayer(CBasePlayer* pPlayer)
 		if (!m_pLink)
 			pPlayer->GiveNamedItem("weapon_scarh");
 
-	}
+	}*/
+}
+
+void CZeus::ItemPostFrame()
+{
+	/*m_iSwing = 0;
+	if (m_pLink)
+		m_pLink->m_iSwing = 1;*/
+	return CBasePlayerWeapon::ItemPostFrame();
 }
 
 CZeus::~CZeus()
 {
-	CBaseEntity* pOther = m_pLink;
+	/*CBaseEntity* pOther = m_pLink;
 	if (pOther && pOther->m_pLink == this)
 	{
 		pOther->m_pLink = m_pLink = nullptr;
 		pOther->SUB_Remove();
-	}
+	}*/
 }
 #endif
-*/
+
 void CZeus::WeaponIdle(void)
 {
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())

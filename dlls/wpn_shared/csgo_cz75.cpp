@@ -203,7 +203,14 @@ void CCz75::Reload(void)
 		{
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_RELOAD);
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				m_pPlayer->m_flNextAttack = 1.26s;
+				m_flTimeWeaponIdle = CZ75_RELOAD_TIME_2 + 0.5s;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + CZ75_RELOAD_TIME_2;
+			}
 #endif
+		
 			m_flAccuracy = 0.92;
 		}
 		m_NextInspect = gpGlobals->time + CZ75_RELOAD_TIME_2;
@@ -215,7 +222,14 @@ void CCz75::Reload(void)
 		{
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_RELOAD);
+			if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+			{
+				m_pPlayer->m_flNextAttack = 1.3s;
+				m_flTimeWeaponIdle = CZ75_RELOAD_TIME_1 + 0.5s;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + CZ75_RELOAD_TIME_1;
+			}
 #endif
+			
 			m_flAccuracy = 0.92;
 		}
 		m_NextInspect = gpGlobals->time + CZ75_RELOAD_TIME_1;
