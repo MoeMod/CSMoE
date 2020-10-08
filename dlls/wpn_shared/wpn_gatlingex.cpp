@@ -288,7 +288,7 @@ void CGatlingex::Precache(void)
 	PRECACHE_MODEL("models/w_gatlingex.mdl");
 	PRECACHE_MODEL("models/p_gatlingex.mdl");
 
-	PRECACHE_MODEL("sprites/ef_gatlingex_explosion.spr");
+	PRECACHE_MODEL("sprites/ef_gatlingex_star.spr");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 
@@ -398,7 +398,7 @@ void CGatlingex::PrimaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(7, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
+	m_pPlayer->FireBullets2(7, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage(), NULL, 1);
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS

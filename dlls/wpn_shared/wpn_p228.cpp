@@ -212,9 +212,15 @@ void CP228::Reload(void)
 	else
 		iAnim = P228_RELOAD;
 	m_NextInspect = gpGlobals->time + P228_RELOAD_TIME;
-	if (DefaultReload(P228_MAX_CLIP, iAnim, 2.7s))
+	if (DefaultReload(P228_MAX_CLIP, iAnim, P228_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.57s;
+			m_flTimeWeaponIdle = P228_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + P228_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.9;

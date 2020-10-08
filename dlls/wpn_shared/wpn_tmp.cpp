@@ -167,9 +167,15 @@ void CTMP::Reload(void)
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + TMP_RELOAD_TIME;
-	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, 2.12s))
+	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, TMP_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.44s;
+			m_flTimeWeaponIdle = TMP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + TMP_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.2;

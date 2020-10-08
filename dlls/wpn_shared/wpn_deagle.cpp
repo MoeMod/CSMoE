@@ -197,10 +197,16 @@ void CDEAGLE::Reload(void)
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + DEAGLE_RELOAD_TIME;
-	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, 2.2s))
+	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, DEAGLE_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.63s;
+			m_flTimeWeaponIdle = DEAGLE_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + DEAGLE_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.9;
 	}

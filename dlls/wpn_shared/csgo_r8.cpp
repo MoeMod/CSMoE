@@ -269,7 +269,14 @@ void CR8::Reload(void)
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.96s;
+			m_flTimeWeaponIdle = R8_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + R8_RELOAD_TIME;
+		}
 #endif
+		
 		m_flAccuracy = 0.92;
 	}
 }

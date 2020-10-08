@@ -188,11 +188,17 @@ void CG3SG1::Reload(void)
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + G3SG1_RELOAD_TIME;
-	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, 3.5s))
+	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, G3SG1_RELOAD_TIME))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.53s;
+			m_flTimeWeaponIdle = G3SG1_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + G3SG1_RELOAD_TIME;
+		}
 #endif
 
 		if (m_pPlayer->pev->fov != 90)

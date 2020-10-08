@@ -241,10 +241,16 @@ void CAUG::Reload(void)
 #endif
 		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_aug.mdl");
 	}
-	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3s))
+	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, AUG_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = AUG_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AUG_RELOAD_TIME;
+		}
 #endif
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 		m_flAccuracy = 0;
@@ -252,10 +258,16 @@ void CAUG::Reload(void)
 		m_bDelayFire = false;
 	}
 #else
-	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, 3.3s))
+	if (DefaultReload(AUG_MAX_CLIP, AUG_RELOAD, AUG_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = AUG_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AUG_RELOAD_TIME;
+		}
 #endif
 		if (m_pPlayer->m_iFOV != 90)
 			SecondaryAttack();

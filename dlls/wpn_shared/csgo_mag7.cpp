@@ -175,16 +175,20 @@ void CMag7::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(MAG7_DEFAULT_GIVE, MAG7_RELOAD, 1.2s))
+	if (DefaultReload(MAG7_DEFAULT_GIVE, MAG7_RELOAD, 2.44s))
 	{
 		
 #ifndef CLIENT_DLL
-		
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.28s;
+			m_flTimeWeaponIdle = 3.64s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 2.44s;
+		}
 #endif
+	
 	}
-	m_pPlayer->m_flNextAttack = 2.44s;
-	m_flTimeWeaponIdle = 2.94s;
 }
 
 void CMag7::WeaponIdle(void)

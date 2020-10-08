@@ -169,9 +169,15 @@ void CMP5N::Reload(void)
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
 	m_NextInspect = gpGlobals->time + MP5N_RELOAD_TIME;
-	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, 2.63s))
+	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, MP5N_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.68s;
+			m_flTimeWeaponIdle = MP5N_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + MP5N_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0;

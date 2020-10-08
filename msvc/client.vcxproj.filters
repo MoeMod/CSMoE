@@ -934,6 +934,9 @@
     <ClCompile Include="..\cl_dll\events\event_r8.cpp">
       <Filter>cl_dll\events</Filter>
     </ClCompile>
+    <ClCompile Include="..\cl_dll\events\event_effects.cpp">
+      <Filter>cl_dll\events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\cvardef.h">

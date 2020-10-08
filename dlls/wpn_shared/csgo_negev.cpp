@@ -183,18 +183,23 @@ void CNegev::Reload(void)
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
 
-	if (DefaultReload( 150, NEGEV_RELOAD, 3.8s))
+	if (DefaultReload( 150, NEGEV_RELOAD, 5.64s))
 	{
 		
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 3.92s;
+			m_flTimeWeaponIdle = 6.64s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 5.64s;
+		}
 #endif
+		
 		m_flAccuracy = 0.2;
 		m_bDelayFire = false;
 		m_iShotsFired = 0;
 	}
-	m_pPlayer->m_flNextAttack = 5.64s;
-	m_flTimeWeaponIdle = 6.14s;
 }
 
 void CNegev::WeaponIdle(void)

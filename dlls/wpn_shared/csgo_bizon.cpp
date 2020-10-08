@@ -185,8 +185,15 @@ void CBizon::Reload(void)
 	if (DefaultReload(BIZON_MAX_CLIP, BIZON_RELOAD, BIZON_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.43s;
+			m_flTimeWeaponIdle = BIZON_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + BIZON_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
+		
 		m_flAccuracy = 0.2;
 		m_iShotsFired = 0;
 	}

@@ -179,6 +179,121 @@ KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 
 	return result;
 }
+
+inline hit_result_t
+KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
+	entvars_t* pevInflictor, entvars_t* pevAttacker, bool IsPrimaryAttack)
+{
+	TraceResult tr;
+	hit_result_t result = HIT_NONE;
+
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+	if (tr.flFraction >= 1) {
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+
+		if (tr.flFraction < 1) {
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (!pHit || pHit->IsBSPModel()) {
+				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
+			}
+
+			vecEnd = tr.vecEndPos;
+		}
+	}
+
+	if (tr.flFraction < 1) {
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+		if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO) {
+			const float flAdjustedDamage = flDamage;
+			ClearMultiDamage();
+			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+			ApplyMultiDamage(pevInflictor, pevAttacker);
+		}
+
+		float flVol = 1;
+		BOOL fHitWorld = TRUE;
+		if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE) {
+			flVol = 0.1f;
+			fHitWorld = FALSE;
+		}
+
+		if (fHitWorld) {
+			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
+			if(IsPrimaryAttack)
+			{ 
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+			}
+			else
+			{
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+			}
+			result = HIT_WALL;
+		}
+	}
+
+	CBaseEntity* pEntity = nullptr;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr) {
+		if (pEntity->pev->takedamage != DAMAGE_NO) {
+			if (pEntity->IsBSPModel())
+				continue;
+
+			if (pEntity->pev == pevAttacker)
+				continue;
+
+			Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			vecSpot.z = vecEnd.z;
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
+				continue;
+
+			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict()) {
+				if (tr.fStartSolid) {
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0;
+				}
+
+				if (tr.flFraction == 1.0f) {
+					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+				}
+
+				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
+
+				UTIL_MakeVectors(pEntity->pev->angles);
+				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+					flDamage *= 3.0;
+
+				ClearMultiDamage();
+				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
+				ApplyMultiDamage(pevInflictor, pevAttacker);
+
+				if (IsPrimaryAttack)
+				{
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+				}
+				else
+				{
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+				}
+				result = HIT_PLAYER;
+			}
+		}
+	}
+
+	return result;
+}
 }
 #endif
 

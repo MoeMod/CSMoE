@@ -176,8 +176,14 @@ void CTec9::Reload(void)
 	if (DefaultReload(TEC9_MAX_CLIP, TEC9_RELOAD, TEC9_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.38s;
+			m_flTimeWeaponIdle = TEC9_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + TEC9_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
-#endif
+#endif	
 		m_flAccuracy = 0.88;
 	}
 }

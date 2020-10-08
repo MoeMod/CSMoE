@@ -238,9 +238,15 @@ void CSG552::Reload(void)
 #endif
 		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sg552.mdl");
 	}
-	if (DefaultReload(AUG_MAX_CLIP, SG552_RELOAD, 3.3s))
+	if (DefaultReload(AUG_MAX_CLIP, SG552_RELOAD, SG552_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.86s;
+			m_flTimeWeaponIdle = SG552_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SG552_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
@@ -249,9 +255,15 @@ void CSG552::Reload(void)
 		m_bDelayFire = false;
 	}
 #else
-	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, 3s))
+	if (DefaultReload(SG552_MAX_CLIP, SG552_RELOAD, SG552_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.86s;
+			m_flTimeWeaponIdle = SG552_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SG552_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 
