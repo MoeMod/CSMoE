@@ -1339,7 +1339,7 @@ void R_EndFrame( void )
 		R_Set2DMode( false );
 
 #ifdef XASH_QINDIEGL
-	BOOL WINAPI wrap_wglSwapBuffers(HDC);
+	BOOL wrap_wglSwapBuffers(HDC);
 	wrap_wglSwapBuffers(NULL);
 #elif defined(XASH_SDL)
 	SDL_GL_SwapWindow( host.hWnd );

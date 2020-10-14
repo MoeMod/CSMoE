@@ -52,10 +52,8 @@ option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and
 
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
-	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
 else()
-	option(XASH_SDL "Enable SDL." ON)
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
 endif()
 
@@ -347,7 +345,7 @@ elseif(XASH_QINDIEGL)
 	target_include_directories(QindieGL PUBLIC ${XASH_QINDIEGL_SRC}/code/gl_headers)
 	target_compile_definitions(QindieGL PUBLIC -DXASH_QINDIEGL)
 
-	target_link_libraries(QindieGL PUBLIC ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXGUID_LIBRARY} ${DirectX9_DXERR_LIBRARY} legacy_stdio_definitions)
+	target_link_libraries(QindieGL PUBLIC ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXERR_LIBRARY} legacy_stdio_definitions)
 	# install( TARGETS QindieGL DESTINATION ".")
 endif()
 
@@ -427,21 +425,8 @@ endif()
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 	add_definitions(-DXASH_SDL)
-	if(XASH_VCPKG)
-		find_package(SDL2 CONFIG REQUIRED)
-		target_link_libraries(${XASH_ENGINE} PUBLIC SDL2::SDL2)
-	else()
-		if(NOT IOS AND NOT ANDROID)
-			find_package(SDL2)
-		endif()
-		target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
-		include_directories(${SDL2_INCLUDE_DIR})
-		add_definitions(-DXASH_SDL)
-		if(MSVC)
-			string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-			install(FILES ${SDL2_DLL} DESTINATION "." OPTIONAL)
-		endif()
-	endif()
+	
+	target_link_libraries(${XASH_ENGINE} sdl2)
 endif()
 
 if(XASH_GLES)

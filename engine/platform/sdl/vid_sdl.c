@@ -54,7 +54,10 @@ void *SDL_GetVideoDevice( void );
 static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
 {
 #ifdef XASH_QINDIEGL
-	return SDL_GetWindowSize(window, w, h);
+	//return SDL_GetWindowSize(window, w, h);
+	GLint params[4]; pglGetIntegerv(GL_VIEWPORT, params);
+	*w = params[2];
+	*h = params[3];
 #else
 	return SDL_GL_GetDrawableSize(window, w, h);
 #endif

@@ -20,13 +20,9 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.10.2)
 
-if(XASH_PCH)
-	project (client CXX CXXPCH)
-else()
-	project (client)
-endif()
+project (client)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -371,10 +367,5 @@ if(NOT XASH_STATIC_GAMELIB)
 endif()
 
 if(XASH_PCH)
-	target_precompiled_header(${CLIENT_LIBRARY} stdafx.h)
-	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
-			CXX_STANDARD ${CMAKE_CXX_STANDARD}
-			CXX_STANDARD_REQUIRED YES
-			CXX_EXTENSIONS NO
-			)
+	target_precompile_headers(${CLIENT_LIBRARY} PRIVATE stdafx.h)
 endif()

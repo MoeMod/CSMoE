@@ -148,7 +148,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	if (last_enable_depth_test) pglEnable(GL_DEPTH_TEST); else pglDisable(GL_DEPTH_TEST);
 	if (last_enable_scissor_test) pglEnable(GL_SCISSOR_TEST); else pglDisable(GL_SCISSOR_TEST);
 
-	pglPolygonMode(GL_FRONT, last_polygon_mode[0]); pglPolygonMode(GL_BACK, last_polygon_mode[1]);
+	pglPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
 //	pglViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 	pglScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }

@@ -402,7 +402,7 @@ void EXPORT *GL_GetProcAddress( const char *name )
 #if defined( XASH_NANOGL )
 	void *func = nanoGL_GetProcAddress(name);
 #elif defined( XASH_QINDIEGL )
-	PROC WINAPI wrap_wglGetProcAddress(LPCSTR s);
+	PROC wrap_wglGetProcAddress(LPCSTR s);
 	void* func = wrap_wglGetProcAddress(name);
 #else
 	void *func = SDL_GL_GetProcAddress(name);
@@ -484,7 +484,7 @@ void GL_UpdateSwapInterval( void )
 		if( SDL_GL_SetSwapInterval( gl_swapInterval->integer ) )
 			MsgDev( D_ERROR, "SDL_GL_SetSwapInterval: %s\n", SDL_GetError( ) );
 #else
-		BOOL WINAPI wglSwapInterval(int interval);
+		BOOL wglSwapInterval(int interval);
 		wglSwapInterval(gl_swapInterval->integer);
 #endif
 	}
@@ -897,7 +897,7 @@ qboolean GL_CreateContext( void )
 #endif
 #ifdef XASH_QINDIEGL
 	void QindieGL_Init(void);
-	HGLRC WINAPI wrap_wglCreateContext(HDC hdc);
+	HGLRC wrap_wglCreateContext(HDC hdc);
 	QindieGL_Init();
 
 	SDL_SysWMinfo wmInfo;
@@ -957,7 +957,7 @@ GL_UpdateContext
 qboolean GL_UpdateContext( void )
 {
 #ifdef XASH_QINDIEGL
-	BOOL WINAPI wrap_wglMakeCurrent(HDC hdc, HGLRC hglrc);
+	BOOL wrap_wglMakeCurrent(HDC hdc, HGLRC hglrc);
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
@@ -990,8 +990,8 @@ GL_DeleteContext
 qboolean GL_DeleteContext( void )
 {
 #ifdef XASH_QINDIEGL
-	HGLRC WINAPI wrap_wglGetCurrentContext();
-	BOOL WINAPI wrap_wglDeleteContext(HGLRC hglrc);
+	HGLRC wrap_wglGetCurrentContext();
+	BOOL wrap_wglDeleteContext(HGLRC hglrc);
 	wrap_wglDeleteContext(wrap_wglGetCurrentContext());
 	void QindieGL_Destroy(void);
 	QindieGL_Destroy();

@@ -4,9 +4,6 @@
 [submodule "nanogl"]
 	path = nanogl
 	url = https://github.com/MoeMod/nanogl
-[submodule "cmake/CMakePCHCompiler"]
-	path = cmake/CMakePCHCompiler
-	url = https://github.com/nanoant/CMakePCHCompiler
 [submodule "gl-wes-v2"]
 	path = gl-wes-v2
 	url = https://github.com/MoeMod/gl-wes-v2

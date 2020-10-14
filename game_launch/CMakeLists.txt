@@ -31,8 +31,6 @@ set(CMAKE_CXX_STANDARD 14)
 # Otherwise it prints errors in stdin.
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE YES) # Link SDL2main also
-	find_package(SDL2 REQUIRED)
-	include_directories(${SDL2_INCLUDE_DIR})
 	add_definitions(-DXASH_SDL)
 endif()
 
@@ -161,5 +159,5 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 if(XASH_SDL)
-	target_link_libraries(${XASH_LAUNCHER} ${SDL2_LIBRARY})
+	target_link_libraries(${XASH_LAUNCHER} sdl2)
 endif()

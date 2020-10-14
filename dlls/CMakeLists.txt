@@ -20,13 +20,9 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.10.2)
 
-if(XASH_PCH)
-	project (server CXX CXXPCH)
-else()
-	project (server)
-endif()
+project (server)
 set(CMAKE_CXX_STANDARD 14)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -410,10 +406,5 @@ if(NOT XASH_STATIC_GAMELIB)
 endif()
 
 if(XASH_PCH)
-	target_precompiled_header(${SERVER_LIBRARY} stdafx.h)
-	set_target_properties(${SERVER_LIBRARY} PROPERTIES
-			CXX_STANDARD ${CMAKE_CXX_STANDARD}
-			CXX_STANDARD_REQUIRED YES
-			CXX_EXTENSIONS NO
-			)
+	target_precompile_headers(${SERVER_LIBRARY} PRIVATE stdafx.h)
 endif()

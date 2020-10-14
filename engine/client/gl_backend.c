@@ -204,7 +204,7 @@ void GL_SelectTexture( GLint tmu )
 		if( tmu < glConfig.max_texture_coords )
 			pglClientActiveTextureARB( tmu + GL_TEXTURE0_ARB );
 	}
-#if !defined(XASH_NANOGL) && !defined(XASH_WES) && !defined(XASH_QINDIEGL)
+#if !defined(XASH_NANOGL) && !defined(XASH_WES)
 	else if( pglSelectTextureSGIS )
 	{
 		pglSelectTextureSGIS( tmu + GL_TEXTURE0_SGIS );
