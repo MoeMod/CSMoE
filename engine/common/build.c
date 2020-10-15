@@ -83,6 +83,12 @@ const char *Q_buildos( void )
 	osname = "HaikuOS";
 #elif defined(__linux__)
 	osname = "Linux";
+#elif defined(__APPLE__) && ( TARGET_IPHONE_SIMULATOR )
+	osname = "iOS-Simulator";
+#elif defined(__APPLE__) && ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+	osname = "iOS";
+#elif defined(__APPLE__) && ( TARGET_OS_OSX || TARGET_OS_MAC )
+	osname = "macOS";
 #elif defined(__APPLE__)
 	osname = "Apple";
 #elif defined(__FreeBSD__)
@@ -116,7 +122,7 @@ const char *Q_buildarch( void )
 #elif defined(__i386__) || defined(_X86_) || defined(_M_IX86)
 	archname = "i386";
 #elif defined(__aarch64__) || defined(_M_ARM64)
-	archname = "aarch64";
+	archname = "arm64";
 #elif defined __arm__ || defined _M_ARM
 	archname = "arm";
 #elif defined __mips__
