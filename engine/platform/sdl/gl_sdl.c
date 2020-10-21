@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "mod_local.h"
 #include "gl_vidnt.h"
 #include <SDL.h>
+#include <SDL_syswm.h>
 #ifdef XASH_NANOGL
 #include <GL/nanogl.h>
 #endif
@@ -400,6 +401,9 @@ void EXPORT *GL_GetProcAddress( const char *name )
 {
 #if defined( XASH_NANOGL )
 	void *func = nanoGL_GetProcAddress(name);
+#elif defined( XASH_QINDIEGL )
+	PROC wrap_wglGetProcAddress(LPCSTR s);
+	void* func = wrap_wglGetProcAddress(name);
 #else
 	void *func = SDL_GL_GetProcAddress(name);
 #endif
@@ -476,8 +480,13 @@ void GL_UpdateSwapInterval( void )
 	if( gl_swapInterval->modified )
 	{
 		gl_swapInterval->modified = false;
+#ifndef XASH_QINDIEGL
 		if( SDL_GL_SetSwapInterval( gl_swapInterval->integer ) )
 			MsgDev( D_ERROR, "SDL_GL_SetSwapInterval: %s\n", SDL_GetError( ) );
+#else
+		BOOL wglSwapInterval(int interval);
+		wglSwapInterval(gl_swapInterval->integer);
+#endif
 	}
 }
 
@@ -495,6 +504,9 @@ GL_SetupAttributes
 */
 void GL_SetupAttributes()
 {
+#ifdef XASH_QINDIEGL
+	// stub
+#else
 	int samples;
 
 #if !defined(_WIN32)
@@ -599,6 +611,7 @@ void GL_SetupAttributes()
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 	}
+#endif
 }
 
 #ifdef XASH_GLES
@@ -882,13 +895,39 @@ qboolean GL_CreateContext( void )
 #ifdef XASH_NANOGL
 	nanoGL_Init();
 #endif
+#ifdef XASH_QINDIEGL
+	void QindieGL_Init(void);
+	HGLRC wrap_wglCreateContext(HDC hdc);
+	QindieGL_Init();
 
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+	HWND hwnd = wmInfo.info.win.window;
+	if ((glw_state.context = wrap_wglCreateContext(GetDC(hwnd))) == NULL)
+	{
+		MsgDev(D_ERROR, "GL_CreateContext: QindieGL wrap_wglCreateContext failed\n");
+		return GL_DeleteContext();
+	}
+
+	pglGetIntegerv(GL_RED_BITS, &colorBits[0]);
+	pglGetIntegerv(GL_GREEN_BITS, &colorBits[1]);
+	pglGetIntegerv(GL_BLUE_BITS, &colorBits[2]);
+	glConfig.color_bits = colorBits[0] + colorBits[1] + colorBits[2];
+	pglGetIntegerv(GL_ALPHA_BITS, &glConfig.alpha_bits);
+	pglGetIntegerv(GL_DEPTH_BITS, &glConfig.depth_bits);
+	pglGetIntegerv(GL_STENCIL_BITS, &glConfig.stencil_bits);
+	glState.stencilEnabled = glConfig.stencil_bits ? true : false;
+
+	pglGetIntegerv(GL_SAMPLES_ARB, &glConfig.msaasamples);
+	
+#else
 	if( ( glw_state.context = SDL_GL_CreateContext( host.hWnd ) ) == NULL)
 	{
 		MsgDev(D_ERROR, "GL_CreateContext: %s\n", SDL_GetError());
 		return GL_DeleteContext();
 	}
-
+	
 	SDL_GL_GetAttribute( SDL_GL_RED_SIZE, &colorBits[0] );
 	SDL_GL_GetAttribute( SDL_GL_GREEN_SIZE, &colorBits[1] );
 	SDL_GL_GetAttribute( SDL_GL_BLUE_SIZE, &colorBits[2] );
@@ -900,7 +939,8 @@ qboolean GL_CreateContext( void )
 	glState.stencilEnabled = glConfig.stencil_bits ? true : false;
 
 	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &glConfig.msaasamples );
-
+	
+#endif
 #ifdef XASH_WES
 	void wes_init();
 	wes_init();
@@ -916,11 +956,24 @@ GL_UpdateContext
 */
 qboolean GL_UpdateContext( void )
 {
+#ifdef XASH_QINDIEGL
+	BOOL wrap_wglMakeCurrent(HDC hdc, HGLRC hglrc);
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+	HWND hwnd = wmInfo.info.win.window;
+	if(!wrap_wglMakeCurrent(GetDC(hwnd), glw_state.context))
+	{
+		MsgDev(D_ERROR, "GL_UpdateContext: QindieGL wrap_wglMakeCurrent failed");
+		return GL_DeleteContext();
+	}
+#else
 	if(!( SDL_GL_MakeCurrent( host.hWnd, glw_state.context ) ) )
 	{
 		MsgDev(D_ERROR, "GL_UpdateContext: %s", SDL_GetError());
 		return GL_DeleteContext();
 	}
+#endif
 
 	return true;
 }
@@ -936,12 +989,20 @@ GL_DeleteContext
 */
 qboolean GL_DeleteContext( void )
 {
-	if( glw_state.context )
+#ifdef XASH_QINDIEGL
+	HGLRC wrap_wglGetCurrentContext();
+	BOOL wrap_wglDeleteContext(HGLRC hglrc);
+	wrap_wglDeleteContext(wrap_wglGetCurrentContext());
+	void QindieGL_Destroy(void);
+	QindieGL_Destroy();
+#else
+	if (glw_state.context)
 	{
 		SDL_GL_DeleteContext(glw_state.context);
 		glw_state.context = NULL;
 	}
-
+#endif
+	
 	return false;
 }
 
@@ -972,13 +1033,18 @@ qboolean R_Init_OpenGL( void )
 	if( glw_state.safe < SAFE_NO || glw_state.safe > SAFE_DONTCARE  )
 		return false;
 
-	GL_SetupAttributes();
 
+#ifdef XASH_QINDIEGL
+	
+#else
+	GL_SetupAttributes();
+	
 	if( SDL_GL_LoadLibrary( EGL_LIB ) )
 	{
-		MsgDev( D_ERROR, "Couldn't initialize OpenGL: %s\n", SDL_GetError());
+		MsgDev(D_ERROR, "Couldn't initialize OpenGL: %s\n", SDL_GetError());
 		return false;
 	}
+#endif
 
 	return VID_SetMode();
 }
@@ -995,7 +1061,11 @@ void R_Free_OpenGL( void )
 
 	VID_DestroyWindow ();
 
+#ifdef XASH_QINDIEGL
+
+#else
 	SDL_GL_UnloadLibrary ();
+#endif
 
 	// now all extensions are disabled
 	Q_memset( glConfig.extension, 0, sizeof( glConfig.extension[0] ) * GL_EXTCOUNT );

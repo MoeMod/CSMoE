@@ -88,18 +88,20 @@ find_path(SDL2_INCLUDE_DIR SDL.h
 	PATHS ${SDL2_SEARCH_PATHS}
 )
 
-if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-	set(SDL2_LIBRARY_PATH_SUFFIXES
-		lib
-		lib/x86_64-linux-gnu
-		lib/x64
-	)
-else()
-	set(SDL2_LIBRARY_PATH_SUFFIXES
-		lib
-		lib/i386-linux-gnu
-		lib/x86
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		set(SDL2_LIBRARY_PATH_SUFFIXES
+			lib
+			lib/x86_64-linux-gnu
+			lib/x64
 		)
+	else()
+		set(SDL2_LIBRARY_PATH_SUFFIXES
+			lib
+			lib/i386-linux-gnu
+			lib/x86
+			)
+	endif()
 endif()
 
 find_library(SDL2_LIBRARY_TEMP
