@@ -159,6 +159,8 @@ if(XASH_SDL)
 	if(XASH_VCPKG)
 		find_package(SDL2 CONFIG REQUIRED)
 		target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
+	elseif(IOS)
+		target_include_directories(sdl2 INTERFACE "${CMAKE_SOURCE_DIR}/SDL2/include")
 	else()
 		find_package(SDL2 QUIET)
 

@@ -9,7 +9,7 @@
 	url = https://github.com/MoeMod/gl-wes-v2
 [submodule "imgui"]
 	path = imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/MoeMod/imgui
 [submodule "3rdparty/QindieGL"]
 	path = 3rdparty/QindieGL
 	url = https://github.com/MoeMod/QindieGL

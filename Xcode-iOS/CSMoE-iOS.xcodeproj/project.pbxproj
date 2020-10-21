@@ -86,6 +86,7 @@
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
 		FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA34D31D8B5E5600915323 /* AVFoundation.framework */; };
 		FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96EDF0DEFC9DC00FAF19F /* QuartzCore.framework */; };
@@ -226,6 +227,7 @@
 		495E1A191E13199A0022E4AA /* launchdialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = launchdialog.m; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FAE0E9691BAF96A00098DFA4 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
@@ -240,6 +242,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */,
 				3D4DAA0B23BCEE1900F575C1 /* libSDL2.a in Frameworks */,
 				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
@@ -317,6 +320,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B646751B253FE21E00F557B8 /* CoreBluetooth.framework */,
 				3D37322E229488AA00713C9C /* GLKit.framework */,
 				3D0FC1DB2278310100D9A961 /* libc++.tbd */,
 				3D525D7722252AAB00DD9932 /* Metal.framework */,

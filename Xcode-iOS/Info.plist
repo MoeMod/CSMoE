@@ -54,6 +54,8 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>CSMoE requires bluetooth permission for built-in SDL2 library.</string>
 	<key>UISupportsDocumentBrowser</key>
 	<true/>
 </dict>
