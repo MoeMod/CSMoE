@@ -26,6 +26,7 @@
 #include "triggers.h"
 
 #include "com_model.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 

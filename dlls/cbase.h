@@ -22,7 +22,6 @@
 #include "const/const_server.h"
 
 #include "saverestore.h"
-//#include "schedule.h"
 #include "monsterevent.h"
 
 #include <UtlVector.h>
@@ -55,30 +54,6 @@ extern "C" EXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfac
 extern "C" EXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion);
 
 namespace sv {
-
-typedef enum
-{
-	CLASSNAME
-}
-hash_types_e;
-
-typedef struct hash_item_s
-{
-	entvars_t *pev;
-	struct hash_item_s *next;
-	struct hash_item_s *lastHash;
-	int pevIndex;
-}
-hash_item_t;
-
-extern CUtlVector<hash_item_t> stringsHashTable;
-
-int CaseInsensitiveHash(const char *string, int iBounds);
-void EmptyEntityHashTable(void);
-void AddEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
-void RemoveEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
-void printEntities(void);
-void loopPerformance(void);
 
 extern int DispatchSpawn(edict_t *pent);
 extern void DispatchKeyValue(edict_t *pentKeyvalue, KeyValueData *pkvd);
@@ -119,16 +94,13 @@ class CBasePlayer;
 
 #include "ehandle.h"
 
-#include "ruleof350.h"
-#include <functional> // why not use c++11 std::function?
-
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
 
-class CBaseEntity : ruleof350::unique
+class CBaseEntity
 {
 #ifndef CLIENT_DLL
 public:
@@ -351,11 +323,7 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-#ifdef CLIENT_DLL
-	entvars_t * pev;
-#else
-	entvars_t * const pev;
-#endif
+	entvars_t* pev;
 	CBaseEntity *m_pGoalEnt;
 	CBaseEntity *m_pLink;
 	void (CBaseEntity::*m_pfnThink)(void);
@@ -543,11 +511,6 @@ public:
 };
 
 } // namespace sv | cl
-
-namespace sv {
-class CCineMonster;
-class CSound;
-}
 
 #include "basemonster.h"
 

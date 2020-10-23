@@ -6,11 +6,10 @@
 #include "animation.h"
 #include "weapons.h"
 #include "player.h"
-
+#include "cbase/cbase_hash.h"
 #include "h_cycler.h"
 
 #include "arraysize.h"
-#include <chrono>
 
 namespace sv {
 

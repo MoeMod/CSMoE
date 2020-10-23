@@ -16,6 +16,7 @@
 #include "world.h"
 
 #include "debug.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 

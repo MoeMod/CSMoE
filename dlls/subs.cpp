@@ -6,6 +6,7 @@
 #include "nodes.h"
 #include "doors.h"
 #include "subs.h"
+#include "cbase/cbase_hash.h"
 
 namespace sv {
 
