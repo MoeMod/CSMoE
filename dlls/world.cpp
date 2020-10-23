@@ -17,6 +17,7 @@
 #include "game.h"
 #include "gamemode/mods.h"
 #include "player/csdm_randomspawn.h"
+#include "cbase/cbase_hash.h"
 
 namespace sv {
 

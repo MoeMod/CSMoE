@@ -140,7 +140,15 @@ struct MULTIDAMAGE
 	int type;
 };
 
-class CArmoury: public CBaseEntity
+template<> struct PrivateData<class CArmoury, CBaseEntity>
+{
+	int m_iItem;
+	int m_iCount;
+	int m_iInitialCount;
+	bool m_bAlreadyCounted;
+};
+
+class CArmoury: public CBaseEntity, public PrivateData<class CArmoury, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -150,12 +158,6 @@ public:
    
 public:
 	void EXPORT ArmouryTouch(CBaseEntity *pOther);
-
-public:
-	int m_iItem;
-	int m_iCount;
-	int m_iInitialCount;
-	bool m_bAlreadyCounted;
 };
 
 }
@@ -169,7 +171,35 @@ namespace sv {
 
 class CBasePlayer;
 
-class CGrenade: public CBaseMonster
+template<> struct PrivateData<class CGrenade, CBaseMonster>
+{
+	bool m_bStartDefuse;
+	bool m_bIsC4;
+	EntityHandle<CBasePlayer> m_pBombDefuser;
+	time_point_t m_flDefuseCountDown;
+	time_point_t m_flC4Blow;
+	duration_t m_flNextFreqInterval;
+	time_point_t m_flNextBeep;
+	time_point_t m_flNextFreq;
+	const char *m_sBeepName;
+	float m_fAttenu;
+	time_point_t m_flNextBlink;
+	time_point_t m_fNextDefuse;
+	bool m_bJustBlew;
+	int m_iTeam;
+	int m_iCurWave;
+	edict_t *m_pentCurBombTarget;
+	int m_SGSmoke;
+	int m_angle;
+	unsigned short m_usEvent;
+	bool m_bLightSmoke;
+	bool m_bDetonated;
+	Vector m_vSmokeDetonate;
+	int m_iBounceCount;
+	BOOL m_fRegisteredSound;
+};
+
+class CGrenade: public CBaseMonster, public PrivateData<class CGrenade, CBaseMonster>
 {
 public:
 	void Spawn() override;
@@ -242,34 +272,16 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
-
-	bool m_bStartDefuse;
-	bool m_bIsC4;
-	EntityHandle<CBasePlayer> m_pBombDefuser;
-	time_point_t m_flDefuseCountDown;
-	time_point_t m_flC4Blow;
-	duration_t m_flNextFreqInterval;
-	time_point_t m_flNextBeep;
-	time_point_t m_flNextFreq;
-	const char *m_sBeepName;
-	float m_fAttenu;
-	time_point_t m_flNextBlink;
-	time_point_t m_fNextDefuse;
-	bool m_bJustBlew;
-	int m_iTeam;
-	int m_iCurWave;
-	edict_t *m_pentCurBombTarget;
-	int m_SGSmoke;
-	int m_angle;
-	unsigned short m_usEvent;
-	bool m_bLightSmoke;
-	bool m_bDetonated;
-	Vector m_vSmokeDetonate;
-	int m_iBounceCount;
-	BOOL m_fRegisteredSound;
 };
 
-class CBasePlayerItem : public CBaseAnimating
+template<> struct PrivateData<class CBasePlayerItem, CBaseAnimating>
+{
+	CBasePlayer *m_pPlayer;
+	CBasePlayerItem *m_pNext;
+	WeaponIdType m_iId;
+};
+
+class CBasePlayerItem : public CBaseAnimating, public PrivateData<class CBasePlayerItem, CBaseAnimating>
 {
 public:
 
@@ -376,13 +388,48 @@ public:
 	static TYPEDESCRIPTION m_SaveData[3];
 	static ItemInfo ItemInfoArray[MAX_WEAPONS];
 	static AmmoInfo AmmoInfoArray[MAX_AMMO_SLOTS];
-
-	CBasePlayer *m_pPlayer;
-	CBasePlayerItem *m_pNext;
-	WeaponIdType m_iId;
 };
 
-class CBasePlayerWeapon : public CBasePlayerItem
+template<> struct PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
+{
+	int m_iPlayEmptySound;
+	int m_fFireOnEmpty;
+	duration_t m_flNextPrimaryAttack;
+	duration_t m_flNextSecondaryAttack;
+	duration_t m_flTimeWeaponIdle;
+	int m_iPrimaryAmmoType;
+	int m_iSecondaryAmmoType;
+	int m_iClip;
+	int m_iClientClip;
+	int m_iClientWeaponState;
+	int m_fInReload;
+	int m_fInSpecialReload;
+	int m_iDefaultAmmo;
+	int m_iShellId;
+	float m_fMaxSpeed;
+	bool m_bDelayFire;
+	int m_iDirection;
+	bool m_bSecondarySilencerOn;
+	float m_flAccuracy;
+	time_point_t m_flLastFire;
+	int m_iShotsFired;
+	Vector m_vVecAiming;
+	string_t model_name;
+	time_point_t m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
+	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
+	time_point_t m_flFamasShoot;
+	int m_iFamasShotsFired;
+	float m_fBurstSpread;
+	int m_iWeaponState;
+	duration_t m_flNextReload;
+	time_point_t m_flDecreaseShotsFired;
+	unsigned short m_usFireGlock18;
+	unsigned short m_usFireFamas;
+	duration_t m_flPrevPrimaryAttack;
+	time_point_t m_flLastFireTime;
+};
+
+class CBasePlayerWeapon : public CBasePlayerItem, public PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
 {
 public:
 #ifdef CLIENT_DLL
@@ -475,42 +522,6 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
-
-	int m_iPlayEmptySound;
-	int m_fFireOnEmpty;
-	duration_t m_flNextPrimaryAttack;
-	duration_t m_flNextSecondaryAttack;
-	duration_t m_flTimeWeaponIdle;
-	int m_iPrimaryAmmoType;
-	int m_iSecondaryAmmoType;
-	int m_iClip;
-	int m_iClientClip;
-	int m_iClientWeaponState;
-	int m_fInReload;
-	int m_fInSpecialReload;
-	int m_iDefaultAmmo;
-	int m_iShellId;
-	float m_fMaxSpeed;
-	bool m_bDelayFire;
-	int m_iDirection;
-	bool m_bSecondarySilencerOn;
-	float m_flAccuracy;
-	time_point_t m_flLastFire;
-	int m_iShotsFired;
-	Vector m_vVecAiming;
-	string_t model_name;
-	time_point_t m_flGlock18Shoot;                // time to shoot the remaining bullets of the glock18 burst fire
-	int m_iGlock18ShotsFired;            // used to keep track of the shots fired during the Glock18 burst fire mode.
-	time_point_t m_flFamasShoot;
-	int m_iFamasShotsFired;
-	float m_fBurstSpread;
-	int m_iWeaponState;
-	duration_t m_flNextReload;
-	time_point_t m_flDecreaseShotsFired;
-	unsigned short m_usFireGlock18;
-	unsigned short m_usFireFamas;
-	duration_t m_flPrevPrimaryAttack;
-	time_point_t m_flLastFireTime;
 };
 
 }
@@ -518,7 +529,12 @@ public:
 #ifndef CLIENT_DLL
 namespace sv {
 
-class CBasePlayerAmmo: public CBaseEntity
+template<> struct PrivateData<class CBasePlayerAmmo, CBaseEntity>
+{
+
+};
+
+class CBasePlayerAmmo: public CBaseEntity, public PrivateData<class CBasePlayerAmmo, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -530,7 +546,16 @@ public:
 	void EXPORT Materialize();
 };
 
-class CWeaponBox: public CBaseEntity
+template<> struct PrivateData<class CWeaponBox, CBaseEntity>
+{
+	CBasePlayerItem *m_rgpPlayerItems[ MAX_ITEM_TYPES ];
+	int m_rgiszAmmo[ MAX_AMMO_SLOTS ];
+	int m_rgAmmo[ MAX_AMMO_SLOTS ];
+	int m_cAmmoTypes;
+	bool m_bIsBomb;
+};
+
+class CWeaponBox: public CBaseEntity, public PrivateData<class CWeaponBox, CBaseEntity>
 {
 public:
 	void Spawn() override;
@@ -555,12 +580,6 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[4];
-
-	CBasePlayerItem *m_rgpPlayerItems[ MAX_ITEM_TYPES ];
-	int m_rgiszAmmo[ MAX_AMMO_SLOTS ];
-	int m_rgAmmo[ MAX_AMMO_SLOTS ];
-	int m_cAmmoTypes;
-	bool m_bIsBomb;
 };
 
 #ifdef ENABLE_SHIELD

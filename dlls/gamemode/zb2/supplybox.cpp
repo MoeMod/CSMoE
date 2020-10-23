@@ -4,6 +4,7 @@
 #include "player.h"
 #include "weapons.h"
 #include "client.h"
+#include "cbase/cbase_hash.h"
 
 #include "supplybox.h"
 #include "gamemode/mods.h"

@@ -13,6 +13,7 @@
 #include "game.h"
 #include "sound.h"
 #include "globals.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 
