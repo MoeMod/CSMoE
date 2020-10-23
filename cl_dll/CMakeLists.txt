@@ -24,7 +24,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project (client)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
