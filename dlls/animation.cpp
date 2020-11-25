@@ -1,13 +1,11 @@
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
-#include "animation.h"
-#include "saverestore.h"
-
-#include "scriptevent.h"
 #include "player.h"
 
 #include "pm_math.h"
+#include "animation.h"
+#include "scriptevent.h"
 
 namespace sv {
 

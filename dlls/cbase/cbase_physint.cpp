@@ -48,7 +48,7 @@ static constexpr physics_interface_t gPhysicsInterface =
 	NULL
 };
 
-DLL_GLOBAL server_physics_api_t g_physfuncs = {};
+[[hlsdk::dll_global]] server_physics_api_t g_physfuncs = {};
 
 }
 

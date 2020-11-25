@@ -36,8 +36,8 @@ namespace sv {
 	/*
 	* Globals initialization
 	*/
-	DLL_GLOBAL BotProfileManager* TheBotProfiles = NULL;
-	DLL_GLOBAL const char* BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
+	[[hlsdk::dll_global]] BotProfileManager* TheBotProfiles = NULL;
+	[[hlsdk::dll_global]] const char* BotDifficultyName[] = { "EASY", "NORMAL", "HARD", "EXPERT", NULL };
 
 	// Generates a filename-decorated skin name
 

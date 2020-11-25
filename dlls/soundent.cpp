@@ -7,7 +7,7 @@
 
 namespace sv {
 
-DLL_GLOBAL CSoundEnt *pSoundEnt;
+[[hlsdk::dll_global]] CSoundEnt *pSoundEnt;
 
 LINK_ENTITY_TO_CLASS(soundent, CSoundEnt);
 

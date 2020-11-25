@@ -7,8 +7,8 @@
 namespace sv {
 
 // global vars
-DLL_GLOBAL CBaseEntity *g_pLastSpawn;
-DLL_GLOBAL CBaseEntity *g_pLastCTSpawn, *g_pLastTerroristSpawn;
+[[hlsdk::dll_global]] CBaseEntity *g_pLastSpawn;
+[[hlsdk::dll_global]] CBaseEntity *g_pLastCTSpawn, *g_pLastTerroristSpawn;
 
 // utils
 inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }

@@ -26,8 +26,8 @@ namespace sv
 namespace sv {
 
 void EntvarsKeyvalue(entvars_t *pev, KeyValueData *pkvd);
-extern DLL_GLOBAL Vector g_vecAttackDir;
-extern DLL_GLOBAL int g_iSkillLevel;
+extern [[hlsdk::dll_global]] Vector g_vecAttackDir;
+extern [[hlsdk::dll_global]] int g_iSkillLevel;
 
 CUtlVector<hash_item_t> stringsHashTable;
 CMemoryPool hashItemMemPool(sizeof(hash_item_t), 64);

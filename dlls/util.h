@@ -32,8 +32,6 @@
 #pragma once
 #endif
 
-#include "basetypes.h"
-#include <string.h>
 #ifndef ACTIVITY_H
 #include "activity.h"
 #endif
@@ -42,68 +40,13 @@
 #include "enginecallback.h"
 #endif
 
-#ifdef CLIENT_DLL
-#include <UtlVector.h>
-#else
-#include <vector>
-#endif
+#include "util/util_const.h"
 
-#define _LOG_TRACE\
-	static int iNumPassed = 0;\
-	printf2(__FUNCTION__":: iNumPassed - %d", iNumPassed++);
+constexpr int &SetBits(int &flBitVector, int bits) { return  ((flBitVector) = (int)(flBitVector) | (bits)); }
+constexpr int& ClearBits(int& flBitVector, int bits) { return  ((flBitVector) = (int)(flBitVector) & ~(bits)); }
+constexpr int FBitSet(int flBitVector, int bit) { return ((int)(flBitVector) & (bit)); }
 
-#define _LOG_TRACE2\
-	static int iNumPassedt = 0;\
-	printf2(__FUNCTION__":: iNumPassed - %d", iNumPassedt++);\
-	_logf(__FUNCTION__":: iNumPassed - %d", iNumPassedt++);
-
-#define eoNullEntity		0	// Testing the three types of "entity" for nullity
-
-#define cchMapNameMost		32
-
-#define CBSENTENCENAME_MAX	16
-#define CVOXFILESENTENCEMAX	1536	// max number of sentences in game. NOTE: this must match CVOXFILESENTENCEMAX in engine\sound.h
-
-#define GROUP_OP_AND		0
-#define GROUP_OP_NAND		1
-
-
-#define WRITEKEY_INT(pf, szKeyName, iKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%d\"\n", szKeyName, iKeyValue)
-#define WRITEKEY_FLOAT(pf, szKeyName, flKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%f\"\n", szKeyName, flKeyValue)
-#define WRITEKEY_STRING(pf, szKeyName, szKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%s\"\n", szKeyName, szKeyValue)
-#define WRITEKEY_VECTOR(pf, szKeyName, flX, flY, flZ) ENGINE_FPRINTF(pf, "\"%s\" \"%f %f %f\"\n", szKeyName, flX, flY, flZ)
-
-#define SetBits(flBitVector, bits) ((flBitVector) = (int)(flBitVector) | (bits))
-#define ClearBits(flBitVector, bits) ((flBitVector) = (int)(flBitVector) & ~(bits))
-#define FBitSet(flBitVector, bit) ((int)(flBitVector) & (bit))
-
-#define FILE_GLOBAL
-#define DLL_GLOBAL
 #define CONSTANT
-
-typedef int EOFFSET;
-typedef int BOOL;
-
-// Dot products for view cone checking
-
-#define VIEW_FIELD_FULL		-1.0		// +-180 degrees
-#define VIEW_FIELD_WIDE		-0.7		// +-135 degrees 0.1 // +-85 degrees, used for full FOV checks
-#define VIEW_FIELD_NARROW	0.7		// +-45 degrees, more narrow check used to set up ranged attacks
-#define VIEW_FIELD_ULTRA_NARROW	0.9		// +-25 degrees, more narrow check used to set up ranged attacks
-
-#define SND_SPAWNING		(1<<8)		// duplicated in protocol.h we're spawing, used in some cases for ambients
-#define SND_STOP		(1<<5)		// duplicated in protocol.h stop sound
-#define SND_CHANGE_VOL		(1<<6)		// duplicated in protocol.h change sound vol
-#define SND_CHANGE_PITCH	(1<<7)		// duplicated in protocol.h change sound pitch
-
-#define DONT_BLEED		-1
-#define BLOOD_COLOR_RED		(byte)247
-#define BLOOD_COLOR_YELLOW	(byte)195
-#define BLOOD_COLOR_GREEN	BLOOD_COLOR_YELLOW
-
-#define GERMAN_GIB_COUNT	4
-#define HUMAN_GIB_COUNT		6
-#define ALIEN_GIB_COUNT		4
 
 template<class T> class CUtlVector;
 
@@ -112,7 +55,7 @@ namespace cl {
 #else
 namespace sv {
 #endif
-extern DLL_GLOBAL const Vector g_vecZero;
+extern const Vector g_vecZero;
 extern globalvars_t *gpGlobals;
 }
 
@@ -124,94 +67,11 @@ using sv::gpGlobals;
 
 #include "qstring.h"
 
-#define LANGUAGE_ENGLISH	0
-#define LANGUAGE_GERMAN		1
-#define LANGUAGE_FRENCH		2
-#define LANGUAGE_BRITISH	3
 
-#define SVC_TEMPENTITY		23
-#define SVC_INTERMISSION	30
-#define SVC_CDTRACK		32
-#define SVC_WEAPONANIM		35
-#define SVC_ROOMTYPE		37
-#define SVC_DIRECTOR		51
-
-constexpr int SF_TRIG_PUSH_ONCE = 1;
-// func_rotating
-constexpr int SF_BRUSH_ROTATE_Y_AXIS = 0;
-constexpr int SF_BRUSH_ROTATE_INSTANT = 1;
-constexpr int SF_BRUSH_ROTATE_BACKWARDS = 2;
-constexpr int SF_BRUSH_ROTATE_Z_AXIS = 4;
-constexpr int SF_BRUSH_ROTATE_X_AXIS = 8;
-constexpr int SF_PENDULUM_AUTO_RETURN = 16;
-constexpr int SF_PENDULUM_PASSABLE = 32;
-constexpr int SF_BRUSH_ROTATE_SMALLRADIUS = 128;
-constexpr int SF_BRUSH_ROTATE_MEDIUMRADIUS = 256;
-constexpr int SF_BRUSH_ROTATE_LARGERADIUS = 512;
-#define SPAWNFLAG_NOMESSAGE		1
-#define SPAWNFLAG_NOTOUCH		1
-#define SPAWNFLAG_DROIDONLY		4
-
-constexpr Vector VEC_HULL_MIN_Z =		Vector(0, 0, -36);
-constexpr Vector VEC_DUCK_HULL_MIN_Z =	Vector(0, 0, -18);
-
-constexpr Vector VEC_HULL_MIN =		Vector(-16, -16, -36);
-constexpr Vector VEC_HULL_MAX =		Vector(16, 16, 36);
-
-constexpr Vector VEC_VIEW =		Vector(0, 0, 17);
-
-constexpr Vector VEC_DUCK_HULL_MIN =	Vector(-16, -16, -18);
-constexpr Vector VEC_DUCK_HULL_MAX =	Vector(16, 16, 32);
-constexpr Vector VEC_DUCK_VIEW =		Vector(0, 0, 12);
 
 #include "cbase/cbase_entity_factory.h"
 
-typedef enum
-{
-	ignore_monsters = 1,
-	dont_ignore_monsters = 0,
-	missile = 2
 
-} IGNORE_MONSTERS;
-
-typedef enum
-{
-	ignore_glass = 1,
-	dont_ignore_glass = 0
-
-} IGNORE_GLASS;
-
-enum
-{
-	point_hull = 0,
-	human_hull = 1,
-	large_hull = 2,
-	head_hull = 3
-};
-
-typedef enum
-{
-	MONSTERSTATE_NONE = 0,
-	MONSTERSTATE_IDLE,
-	MONSTERSTATE_COMBAT,
-	MONSTERSTATE_ALERT,
-	MONSTERSTATE_HUNT,
-	MONSTERSTATE_PRONE,
-	MONSTERSTATE_SCRIPT,
-	MONSTERSTATE_PLAYDEAD,
-	MONSTERSTATE_DEAD
-
-} MONSTERSTATE;
-
-// Things that toggle (buttons/triggers/doors) need this
-typedef enum
-{
-	TS_AT_TOP,
-	TS_AT_BOTTOM,
-	TS_GOING_UP,
-	TS_GOING_DOWN,
-
-} TOGGLE_STATE;
 
 typedef struct hudtextparms_s
 {
@@ -303,7 +163,7 @@ inline EOFFSET OFFSET(const entvars_t *pev)
 inline entvars_t *VARS(edict_t *pent)
 {
 	if (!pent)
-		return NULL;
+		return nullptr;
 
 	return &pent->v;
 }
@@ -334,11 +194,11 @@ inline BOOL FNullEnt(EOFFSET eoffset)
 }
 inline BOOL FNullEnt(const edict_t *pent)
 {
-	return pent == NULL || FNullEnt(OFFSET(pent));
+	return pent == nullptr || FNullEnt(OFFSET(pent));
 }
 inline BOOL FNullEnt(entvars_t *pev)
 {
-	return pev == NULL || FNullEnt(OFFSET(pev));
+	return pev == nullptr || FNullEnt(OFFSET(pev));
 }
 
 inline BOOL FStringNull(int iString)
@@ -412,9 +272,9 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 class CBaseEntity;
 
 #ifndef CLIENT_WEAPONS
-std::chrono::duration<float> UTIL_WeaponTimeBase(void);
+duration_t UTIL_WeaponTimeBase(void);
 #else
-constexpr std::chrono::duration<float> UTIL_WeaponTimeBase(void) { return 0s; }
+constexpr duration_t UTIL_WeaponTimeBase(void) { return {}; }
 #endif
 unsigned int U_Random();
 void U_Srand(unsigned int seed);
@@ -433,7 +293,7 @@ int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, con
 CBaseEntity *UTIL_FindEntityInSphere(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
 CBaseEntity *UTIL_FindEntityByString_Old(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue);
 CBaseEntity *UTIL_FindEntityByString(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue);
-extern CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *pStartEntity, const char *szName);
+CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *pStartEntity, const char *szName);
 CBaseEntity *UTIL_FindEntityByTargetname(CBaseEntity *pStartEntity, const char *szName);
 //NOXREF CBaseEntity *UTIL_FindEntityGeneric(const char *szWhatever, const Vector &vecSrc, float flRadius);
 CBaseEntity *UTIL_PlayerByIndex(int playerIndex);
@@ -453,17 +313,17 @@ void UTIL_ScreenFadeWrite(const ScreenFade &fade, CBaseEntity *pEntity);
 #endif
 
 void UTIL_ScreenFadeAll(const Vector &color, duration_t fadeTime, duration_t fadeHold, int alpha, int flags);
-void UTIL_ScreenFade(CBaseEntity *pEntity, const Vector &color, duration_t fadeTime, duration_t fadeHold = 0.0s, int alpha = 0,
+void UTIL_ScreenFade(CBaseEntity* pEntity, const Vector& color, duration_t fadeTime, duration_t fadeHold = {}, int alpha = 0,
                      int flags = 0);
 
 void UTIL_HudMessage(CBaseEntity *pEntity, const hudtextparms_t &textparms, const char *pMessage);
 void UTIL_HudMessageAll(const hudtextparms_t &textparms, const char *pMessage);
-void UTIL_ClientPrintAll(int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL,
-                         const char *param3 = NULL, const char *param4 = NULL);
+void UTIL_ClientPrintAll(int msg_dest, const char *msg_name, const char *param1 = nullptr, const char *param2 = nullptr,
+                         const char *param3 = nullptr, const char *param4 = nullptr);
 
-extern void
-ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL,
-            const char *param3 = NULL, const char *param4 = NULL);
+void
+ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = nullptr, const char *param2 = nullptr,
+            const char *param3 = nullptr, const char *param4 = nullptr);
 
 //NOXREF void UTIL_SayText(const char *pText, CBaseEntity *pEntity);
 void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity);
@@ -478,7 +338,7 @@ void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTER
                     TraceResult *ptr);
 void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,
                     edict_t *pentIgnore, TraceResult *ptr);
-extern void
+void
 UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore,
                TraceResult *ptr);
 void
@@ -541,8 +401,8 @@ void UTIL_MakeVectors(const Vector &vecAngles);
 int UTIL_SharedRandomLong(unsigned int seed, int low, int high);
 float UTIL_SharedRandomFloat(unsigned int seed, float low, float high);
 
-inline CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *, const char*) { return NULL; }
-inline void ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL) { }
+inline CBaseEntity *UTIL_FindEntityByClassname(CBaseEntity *, const char*) { return nullptr; }
+inline void ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = nullptr, const char *param2 = nullptr, const char *param3 = nullptr, const char *param4 = nullptr) { }
 inline void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr) {}
 void UTIL_TraceLine(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore,
                     TraceResult *ptr);

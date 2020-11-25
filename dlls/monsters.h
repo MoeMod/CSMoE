@@ -48,10 +48,10 @@ extern void UTIL_MoveToOrigin(edict_t *pent, const Vector &vecGoal, float flDist
 Vector VecCheckToss(entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float flGravityAdj = 1);
 Vector VecCheckThrow(entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flGravityAdj = 1);
 
-extern DLL_GLOBAL Vector g_vecAttackDir;
-extern DLL_GLOBAL CONSTANT float g_flMeleeRange;
-extern DLL_GLOBAL CONSTANT float g_flMediumRange;
-extern DLL_GLOBAL CONSTANT float g_flLongRange;
+extern [[hlsdk::dll_global]] Vector g_vecAttackDir;
+extern [[hlsdk::dll_global]] CONSTANT float g_flMeleeRange;
+extern [[hlsdk::dll_global]] CONSTANT float g_flMediumRange;
+extern [[hlsdk::dll_global]] CONSTANT float g_flLongRange;
 
 extern void EjectBrass(const Vector &vecOrigin, const Vector &vecLeft, const Vector &vecVelocity, float rotation, int model, int soundtype, int entityIndex);
 extern void EjectBrass2(const Vector &vecOrigin, const Vector &vecVelocity, float rotation, int model, int soundtype, entvars_t *pev);

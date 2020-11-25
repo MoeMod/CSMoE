@@ -21,9 +21,9 @@
 
 namespace sv {
 
-DLL_GLOBAL edict_t *g_pBodyQueueHead;
-DLL_GLOBAL CGlobalState gGlobalState;
-DLL_GLOBAL float g_flWeaponCheat;
+	[[hlsdk::dll_global]] edict_t *g_pBodyQueueHead;
+	[[hlsdk::dll_global]] CGlobalState gGlobalState;
+	[[hlsdk::dll_global]] float g_flWeaponCheat;
 
 extern void BotPrecache(); // bot_utils.cpp
 

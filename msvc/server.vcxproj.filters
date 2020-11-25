@@ -80,6 +80,9 @@
     <Filter Include="dlls\util">
       <UniqueIdentifier>{89ff163d-57f3-4352-894b-39719b236c0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="modules">
+      <UniqueIdentifier>{c4d5fb35-7f4b-48b4-be7e-ab396a9dd243}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dlls\h_export.cpp">
@@ -793,7 +796,6 @@
     <ClCompile Include="..\dlls\wpn_shared\wpn_janus7xmas.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\dlls\stdafx.cpp" />
     <ClCompile Include="..\dlls\wpn_shared\wpn_sgdrill.cpp">
       <Filter>dlls\wpn_shared</Filter>
     </ClCompile>
@@ -865,6 +867,36 @@
     </ClCompile>
     <ClCompile Include="..\dlls\wpn_shared\wpn_gatlingex.cpp">
       <Filter>dlls\wpn_shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\csmoe.sv.cbase.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\csmoe.sv.extdll.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.edict.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.eiface.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.types.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.consts.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.progdefs.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\csmoe.sv.util.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.cvardef.ixx">
+      <Filter>modules</Filter>
+    </ClCompile>
+    <ClCompile Include="..\modules\xash3d.custom.ixx">
+      <Filter>modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1705,7 +1737,6 @@
     <ClInclude Include="..\dlls\wpn_shared\wpn_janus7xmas.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\dlls\stdafx.h" />
     <ClInclude Include="..\dlls\wpn_shared\wpn_sgdrill.h">
       <Filter>dlls\wpn_shared</Filter>
     </ClInclude>
@@ -1771,6 +1802,9 @@
     </ClInclude>
     <ClInclude Include="..\dlls\wpn_shared\wpn_gatlingex.h">
       <Filter>dlls\wpn_shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dlls\util\util_const.h">
+      <Filter>dlls\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

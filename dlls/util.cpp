@@ -20,8 +20,8 @@ unsigned int glSeed;
 
 namespace sv {
 
-DLL_GLOBAL int g_groupmask = 0;
-DLL_GLOBAL int g_groupop = 0;
+[[hlsdk::dll_global]] int g_groupmask = 0;
+[[hlsdk::dll_global]] int g_groupop = 0;
 
 NOXREF UTIL_GroupTrace::UTIL_GroupTrace(int groupmask, int op)
 {

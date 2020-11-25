@@ -152,16 +152,6 @@
     <ClCompile Include="..\dlls\sound.cpp" />
     <ClCompile Include="..\dlls\soundent.cpp" />
     <ClCompile Include="..\dlls\spectator.cpp" />
-    <ClCompile Include="..\dlls\stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\dlls\subs.cpp" />
     <ClCompile Include="..\dlls\training_gamerules.cpp" />
     <ClCompile Include="..\dlls\triggers.cpp" />
@@ -301,6 +291,16 @@
     <ClCompile Include="..\game_shared\bot\nav_path.cpp" />
     <ClCompile Include="..\game_shared\shared_util.cpp" />
     <ClCompile Include="..\game_shared\voice_gamemgr.cpp" />
+    <ClCompile Include="..\modules\csmoe.sv.cbase.ixx" />
+    <ClCompile Include="..\modules\csmoe.sv.util.ixx" />
+    <ClCompile Include="..\modules\csmoe.sv.extdll.ixx" />
+    <ClCompile Include="..\modules\xash3d.consts.ixx" />
+    <ClCompile Include="..\modules\xash3d.custom.ixx" />
+    <ClCompile Include="..\modules\xash3d.cvardef.ixx" />
+    <ClCompile Include="..\modules\xash3d.progdefs.ixx" />
+    <ClCompile Include="..\modules\xash3d.types.ixx" />
+    <ClCompile Include="..\modules\xash3d.edict.ixx" />
+    <ClCompile Include="..\modules\xash3d.eiface.ixx" />
     <ClCompile Include="..\pm_shared\pm_debug.cpp" />
     <ClCompile Include="..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\pm_shared\pm_shared.cpp" />
@@ -431,7 +431,6 @@
     <ClInclude Include="..\dlls\sound.h" />
     <ClInclude Include="..\dlls\soundent.h" />
     <ClInclude Include="..\dlls\spectator.h" />
-    <ClInclude Include="..\dlls\stdafx.h" />
     <ClInclude Include="..\dlls\subs.h" />
     <ClInclude Include="..\dlls\talkmonster.h" />
     <ClInclude Include="..\dlls\training_gamerules.h" />
@@ -443,6 +442,7 @@
     <ClInclude Include="..\dlls\tutor_cs_states.h" />
     <ClInclude Include="..\dlls\tutor_cs_tutor.h" />
     <ClInclude Include="..\dlls\util.h" />
+    <ClInclude Include="..\dlls\util\util_const.h" />
     <ClInclude Include="..\dlls\util\u_ebobase.hpp" />
     <ClInclude Include="..\dlls\util\u_functor.hpp" />
     <ClInclude Include="..\dlls\util\u_iterator.hpp" />
@@ -764,7 +764,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -773,12 +773,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -804,7 +807,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -813,12 +816,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -844,7 +850,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -853,12 +859,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -884,7 +893,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Full</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -893,12 +902,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -924,15 +936,18 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -956,15 +971,18 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -988,15 +1006,18 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>
@@ -1020,15 +1041,18 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\;$(ProjectDir)\..\common;$(ProjectDir)\..\dlls;$(ProjectDir)\..\engine;$(ProjectDir)\..\public;$(ProjectDir)\..\public\tier1;$(ProjectDir)\..\game_shared;$(ProjectDir)\..\pm_shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MODULE_CSMOE_SV;XASH_STATIC_GAMELIB;SERVER_DLL;CLIENT_WEAPONS;DEDICATED;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>5030</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>

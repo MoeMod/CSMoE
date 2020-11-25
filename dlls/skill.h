@@ -111,9 +111,9 @@ struct skilldata_t
 	float plrArm;
 };
 
-extern DLL_GLOBAL skilldata_t gSkillData;
+extern [[hlsdk::dll_global]] skilldata_t gSkillData;
 float GetSkillCvar(char *pName);
-extern DLL_GLOBAL int g_iSkillLevel;
+extern [[hlsdk::dll_global]] int g_iSkillLevel;
 
 enum{
 	SKILL_EASY = 1,

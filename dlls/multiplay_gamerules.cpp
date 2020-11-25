@@ -27,10 +27,10 @@ namespace sv {
 */
 #define COM_TOKEN_LEN				1500
 static char mp_com_token[ COM_TOKEN_LEN ];
-DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
+[[hlsdk::dll_global]] cvar_t *sv_clienttrace = NULL;
 
-DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
-DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
+[[hlsdk::dll_global]] CCStrikeGameMgrHelper g_GameMgrHelper;
+[[hlsdk::dll_global]] CHalfLifeMultiplay *g_pMPGameRules = NULL;
 
 bool IsBotSpeaking()
 {

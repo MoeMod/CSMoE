@@ -24,7 +24,7 @@ namespace sv {
 /*
 * Globals initialization
 */
-DLL_GLOBAL CBotManager *TheBots = NULL;
+[[hlsdk::dll_global]] CBotManager *TheBots = NULL;
 
 time_point_t CCSBotManager::m_flNextCVarCheck = invalid_time_point;
 bool CCSBotManager::m_isMapDataLoaded = false;

@@ -5,7 +5,7 @@
 
 namespace sv {
 
-DLL_GLOBAL skilldata_t gSkillData;
+[[hlsdk::dll_global]] skilldata_t gSkillData;
 
 // take the name of a cvar, tack a digit for the skill level
 // on, and return the value.of that Cvar

@@ -34,7 +34,7 @@ GNU General Public License for more details.
 
 namespace sv {
 
-DLL_GLOBAL IBaseMod *g_pModRunning = nullptr;
+[[hlsdk::dll_global]] IBaseMod *g_pModRunning = nullptr;
 
 template<class T>
 IBaseMod *DefaultFactory()

@@ -10,7 +10,7 @@
 
 namespace sv {
 
-DLL_GLOBAL CGraph WorldGraph;
+[[hlsdk::dll_global]] CGraph WorldGraph;
 
 void CGraph::InitGraph()
 {

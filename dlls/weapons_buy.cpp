@@ -12,7 +12,7 @@ namespace sv {
 /*
 * Globals initialization
 */
-DLL_GLOBAL AutoBuyInfoStruct g_autoBuyInfo[] =
+[[hlsdk::dll_global]] AutoBuyInfoStruct g_autoBuyInfo[] =
 {
 	{ AUTOBUYCLASS_PRIMARY|AUTOBUYCLASS_RIFLE,		"galil",	"weapon_galil" },
 	{ AUTOBUYCLASS_PRIMARY|AUTOBUYCLASS_RIFLE,		"ak47",		"weapon_ak47" },
@@ -51,7 +51,7 @@ DLL_GLOBAL AutoBuyInfoStruct g_autoBuyInfo[] =
 	{ AUTOBUYCLASS_NONE, NULL, NULL }
 };
 
-DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
+[[hlsdk::dll_global]] WeaponAliasInfo weaponAliasInfo[] =
 {
 	{ "p228",	WEAPON_P228 },
 	{ "???",	WEAPON_GLOCK },
@@ -94,7 +94,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ NULL,		WEAPON_NONE }
 };
 
-DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
+[[hlsdk::dll_global]] WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 {
 	{ "galil",		WEAPON_GALIL,		"#Galil" },
 	{ "defender",		WEAPON_GALIL,		"#Galil" },
@@ -141,7 +141,7 @@ DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
 	{ NULL,			WEAPON_NONE,		NULL }
 };
 
-DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
+[[hlsdk::dll_global]] WeaponClassAliasInfo weaponClassAliasInfo[] =
 {
 	{ "p228",	WEAPONCLASS_PISTOL },
 	{ "???",	WEAPONCLASS_PISTOL },
@@ -191,7 +191,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ NULL,		WEAPONCLASS_NONE }
 };
 
-DLL_GLOBAL WeaponInfoStruct weaponInfo[] =
+[[hlsdk::dll_global]] WeaponInfoStruct weaponInfo[] =
 {
 	{ WEAPON_P228,		P228_PRICE,		AMMO_357SIG_PRICE,	AMMO_357SIG_BUY,	P228_MAX_CLIP,		MAX_AMMO_357SIG,	AMMO_357SIG,		"weapon_p228" },
 	{ WEAPON_GLOCK,		GLOCK18_PRICE,		AMMO_9MM_PRICE,		AMMO_9MM_BUY,		GLOCK18_MAX_CLIP,	MAX_AMMO_9MM,		AMMO_9MM,		"weapon_glock18" },
@@ -223,7 +223,7 @@ DLL_GLOBAL WeaponInfoStruct weaponInfo[] =
 };
 
 // Given an alias, return the associated weapon ID
-DLL_GLOBAL WeaponIdType AliasToWeaponID(const char *alias)
+[[hlsdk::dll_global]] WeaponIdType AliasToWeaponID(const char *alias)
 {
 	if (alias != NULL)
 	{

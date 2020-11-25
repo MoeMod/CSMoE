@@ -11,7 +11,7 @@
 
 namespace sv {
 
-DLL_GLOBAL CBaseTutor *TheTutor = NULL;
+[[hlsdk::dll_global]] CBaseTutor *TheTutor = NULL;
 
 TutorMessageEvent::TutorMessageEvent(int mid, int duplicateID, time_point_t time, duration_t lifetime, int priority)
 {
