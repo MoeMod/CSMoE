@@ -2807,7 +2807,6 @@ NOXREF void CBasePlayer::ThrowWeapon(const char *pszItemName)
 	}
 }
 
-#ifdef ENABLE_SHIELD
 
 LINK_ENTITY_TO_CLASS(weapon_shield, CWShield);
 
@@ -2861,11 +2860,10 @@ void CWShield::Touch(CBaseEntity *pOther)
 	}
 }
 
-#endif // ENABLE_SHIELD
 
 void CBasePlayer::GiveShield(bool bDeploy)
 {
-#ifdef ENABLE_SHIELD
+
 	m_bOwnsShield = true;
 	m_bHasPrimary = true;
 
@@ -2884,9 +2882,7 @@ void CBasePlayer::GiveShield(bool bDeploy)
 	}
 	
 	pev->gamestate = 0;
-#else
-	assert(0 && "CBasePlayer::GiveShield called when ENABLE_SHIELD not set");
-#endif
+
 }
 
 void CBasePlayer::RemoveShield()
@@ -2906,7 +2902,6 @@ void CBasePlayer::DropShield(bool bDeploy)
 {
 	if (!HasShield())
 		return;
-#ifdef ENABLE_SHIELD
 	if (m_pActiveItem && !m_pActiveItem->CanHolster())
 		return;
 
@@ -2960,17 +2955,13 @@ void CBasePlayer::DropShield(bool bDeploy)
 	pShield->pev->nextthink = gpGlobals->time + 300s;
 
 	pShield->SetCantBePickedUpByUser(this, 2.0);
-#endif // ENABLE_SHIELD
 }
 
 bool CBasePlayer::HasShield()
 {
-#ifdef ENABLE_SHIELD
+
 	return m_bOwnsShield;
-#else
-	assert(m_bOwnsShield == false);
-	return false;
-#endif
+
 }
 
 NOXREF void CBasePlayer::ThrowPrimary()
