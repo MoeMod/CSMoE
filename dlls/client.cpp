@@ -841,7 +841,6 @@ void DropPrimary(CBasePlayer *pPlayer)
 bool CanBuyThis(CBasePlayer *pPlayer, int iWeapon)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
-#ifdef ENABLE_SHIELD
 	if (pPlayer->HasShield() && iWeapon == WEAPON_ELITE)
 	{
 		return false;
@@ -856,11 +855,6 @@ bool CanBuyThis(CBasePlayer *pPlayer, int iWeapon)
 	{
 		return false;
 	}
-#else
-	if (iWeapon == WEAPON_SHIELDGUN) {
-		return false;
-	}
-#endif
 	if (pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT] != NULL &&
 	    pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT]->m_iId == iWeapon) {
 		if (g_bClientPrintEnable) {
