@@ -847,7 +847,7 @@ void terminal<TerminalHelper>::show_autocomplete() noexcept {
 
 		ImGui::SetNextWindowBgAlpha(0.9f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-		ImGui::SetNextWindowFocus();
+		//ImGui::SetNextWindowFocus();
 
 		ImVec2 auto_complete_pos = ImGui::GetItemRectMin();
 
