@@ -128,12 +128,15 @@ BOOL CGLOCK18::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_glock18.mdl", "models/shield/p_shield_glock18.mdl", GLOCK18_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_glock18.mdl", "models/p_glock18.mdl", RANDOM_LONG(0, 1) ? GLOCK18_DRAW : GLOCK18_DRAW2, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CGLOCK18::SecondaryAttack(void)
@@ -214,6 +217,7 @@ void CGLOCK18::GLOCK18Fire(float flSpread, duration_t flCycleTime, BOOL fUseBurs
 	}
 
 	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -279,11 +283,17 @@ void CGLOCK18::Reload(void)
 		iAnim = GLOCK18_RELOAD;
 	else
 		iAnim = GLOCK18_RELOAD2;
-
-	if (DefaultReload(GLOCK18_MAX_CLIP, iAnim, 2.2s))
+	m_NextInspect = gpGlobals->time + GLOCK18_RELOAD_TIME;
+	if (DefaultReload(GLOCK18_MAX_CLIP, iAnim, GLOCK18_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.0s;
+			m_flTimeWeaponIdle = GLOCK18_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + GLOCK18_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.9;
 	}
@@ -329,4 +339,20 @@ void CGLOCK18::WeaponIdle(void)
 	}
 }
 
+void CGLOCK18::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(13, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

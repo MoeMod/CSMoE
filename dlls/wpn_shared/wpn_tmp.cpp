@@ -85,11 +85,15 @@ int CTMP::GetItemInfo(ItemInfo *p)
 
 BOOL CTMP::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_iShotsFired = 0;
 	m_bDelayFire = false;
 	m_flAccuracy = 0.2;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_tmp.mdl", "models/p_tmp.mdl", TMP_DRAW, "onehanded", UseDecrement() != FALSE);
 }
 
@@ -147,7 +151,7 @@ void CTMP::TMPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
+	m_NextInspect = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -162,10 +166,16 @@ void CTMP::Reload(void)
 {
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
-
-	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, 2.12s))
+	m_NextInspect = gpGlobals->time + TMP_RELOAD_TIME;
+	if (DefaultReload(TMP_MAX_CLIP, TMP_RELOAD, TMP_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.44s;
+			m_flTimeWeaponIdle = TMP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + TMP_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.2;
@@ -185,4 +195,20 @@ void CTMP::WeaponIdle(void)
 	SendWeaponAnim(TMP_IDLE1, UseDecrement() != FALSE);
 }
 
+void CTMP::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

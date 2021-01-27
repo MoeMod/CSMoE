@@ -20,13 +20,9 @@
 # SOFTWARE.
 #
 
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.10.2)
 
-if(XASH_PCH)
-	project (client CXX CXXPCH)
-else()
-	project (client)
-endif()
+project (client)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -70,8 +66,36 @@ set (CLWEAPON_SRCS
 	./cs_wpn/cs_weapons.cpp
 )
 
-file (GLOB HLWPN_SRCS
-	../dlls/wpn_shared/wpn_*.cpp
+set ( HLWPN_SRCS
+	../dlls/wpn_shared/wpn_ak47.cpp
+	../dlls/wpn_shared/wpn_aug.cpp
+	../dlls/wpn_shared/wpn_awp.cpp
+	../dlls/wpn_shared/wpn_c4.cpp
+	../dlls/wpn_shared/wpn_deagle.cpp
+	../dlls/wpn_shared/wpn_elite.cpp
+	../dlls/wpn_shared/wpn_famas.cpp
+	../dlls/wpn_shared/wpn_fiveseven.cpp
+	../dlls/wpn_shared/wpn_flashbang.cpp
+	../dlls/wpn_shared/wpn_g3sg1.cpp
+	../dlls/wpn_shared/wpn_galil.cpp
+	../dlls/wpn_shared/wpn_glock18.cpp
+	../dlls/wpn_shared/wpn_hegrenade.cpp
+	../dlls/wpn_shared/wpn_knife.cpp
+	../dlls/wpn_shared/wpn_m249.cpp
+	../dlls/wpn_shared/wpn_m3.cpp
+	../dlls/wpn_shared/wpn_m4a1.cpp
+	../dlls/wpn_shared/wpn_mac10.cpp
+	../dlls/wpn_shared/wpn_mp5navy.cpp
+	../dlls/wpn_shared/wpn_p228.cpp
+	../dlls/wpn_shared/wpn_p90.cpp
+	../dlls/wpn_shared/wpn_scout.cpp
+	../dlls/wpn_shared/wpn_sg550.cpp
+	../dlls/wpn_shared/wpn_sg552.cpp
+	../dlls/wpn_shared/wpn_smokegrenade.cpp
+	../dlls/wpn_shared/wpn_tmp.cpp
+	../dlls/wpn_shared/wpn_ump45.cpp
+	../dlls/wpn_shared/wpn_usp.cpp
+	../dlls/wpn_shared/wpn_xm1014.cpp
 	)
 
 set (HUD_SRCS
@@ -147,6 +171,8 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
+set(INPUT_SRCS ./input_xash3d.cpp)
+
 set (CLDLL_SOURCES
 	./cdll_int.cpp
     ./demo.cpp
@@ -157,14 +183,13 @@ set (CLDLL_SOURCES
     ./tri.cpp
 	./util.cpp
 	./view.cpp
-	./input_xash3d.cpp
-	#./input_sdl.cpp
     ./vgui_parser.cpp
     ../public/unicode_strtools.cpp
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
 
+	${INPUT_SRCS}
 	${PM_SRCS}
 	${HUD_SRCS}
 	${WEAPONEVENT_SRCS}
@@ -253,10 +278,5 @@ if(NOT XASH_STATIC_GAMELIB)
 endif()
 
 if(XASH_PCH)
-	target_precompiled_header(${CLIENT_LIBRARY} stdafx.h)
-	set_target_properties(${CLIENT_LIBRARY} PROPERTIES
-			CXX_STANDARD ${CMAKE_CXX_STANDARD}
-			CXX_STANDARD_REQUIRED YES
-			CXX_EXTENSIONS NO
-			)
+	target_precompile_headers(${CLIENT_LIBRARY} PRIVATE stdafx.h)
 endif()

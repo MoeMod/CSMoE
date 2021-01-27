@@ -83,6 +83,11 @@ int CSCOUT::GetItemInfo(ItemInfo *p)
 
 BOOL CSCOUT::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
+	m_NextInspect = gpGlobals->time + 0.75s;
 	if (DefaultDeploy("models/v_scout.mdl", "models/p_scout.mdl", SCOUT_DRAW, "rifle", UseDecrement() != FALSE))
 	{
 		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25s;
@@ -161,7 +166,7 @@ void CSCOUT::SCOUTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 #else
 	flags = 0;
 #endif
-
+	m_NextInspect = gpGlobals->time;
 	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireScout, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x * 1000, vecDir.y * 1000, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
@@ -176,10 +181,16 @@ void CSCOUT::Reload(void)
 {
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
-
-	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, 2s))
+	m_NextInspect = gpGlobals->time + SCOUT_RELOAD_TIME;
+	if (DefaultReload(SCOUT_MAX_CLIP, SCOUT_RELOAD, SCOUT_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.67s;
+			m_flTimeWeaponIdle = SCOUT_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SCOUT_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 
@@ -214,4 +225,20 @@ float CSCOUT::GetMaxSpeed(void)
 	return 220;
 }
 
+void CSCOUT::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(5, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

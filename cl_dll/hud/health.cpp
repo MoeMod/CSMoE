@@ -30,6 +30,8 @@
 
 #include "draw_util.h"
 #include "const/const_client.h"
+#include "triangleapi.h"
+
 
 DECLARE_MESSAGE(m_Health, Health )
 DECLARE_MESSAGE(m_Health, Damage )
@@ -126,7 +128,7 @@ int CHudHealth::VidInit(void)
 
 	m_HUD_dmg_bio = gHUD.GetSpriteIndex( "dmg_bio" ) + 1;
 	m_HUD_cross = gHUD.GetSpriteIndex( "cross" );
-
+	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/blackleft");
 	giDmgHeight = gHUD.GetSpriteRect(m_HUD_dmg_bio).right - gHUD.GetSpriteRect(m_HUD_dmg_bio).left;
 	giDmgWidth = gHUD.GetSpriteRect(m_HUD_dmg_bio).bottom - gHUD.GetSpriteRect(m_HUD_dmg_bio).top;
 
@@ -139,9 +141,11 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	BufferReader reader( pszName, pbuf, iSize );
 	//int x = reader.ReadByte();
 	int x = m_iHealth;
-	if (iSize == 2)
+	
+	if (iSize == 4)
 	{
 		x = reader.ReadShort();
+		m_iMaxHealth = reader.ReadShort();
 	}
 	else
 	{
@@ -149,7 +153,7 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	}
 
 	m_iFlags |= HUD_DRAW;
-
+	
 	// Only update the fade if we've changed health
 	if (x != m_iHealth)
 	{
@@ -206,22 +210,38 @@ int CHudHealth:: MsgFunc_ScoreAttrib(const char *pszName,  int iSize, void *pbuf
 }
 // Returns back a color from the
 // Green <-> Yellow <-> Red ramp
-void CHudHealth::GetPainColor( int &r, int &g, int &b, int &a )
+void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 {
 #if 0
 	int iHealth = m_iHealth;
 
 	if (iHealth > 25)
 		iHealth -= 25;
-	else if ( iHealth < 0 )
+	else if (iHealth < 0)
 		iHealth = 0;
 	g = iHealth * 255 / 100;
 	r = 255 - g;
 	b = 0;
 #else
-	if( m_iHealth <= 15 )
+	if (m_iHealth > 25)
+	{
+		DrawUtils::UnpackRGB(r, g, b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
+	}
+	else
+	{
+		r = 250;
+		g = 0;
+		b = 0;
+	}
+	if (gHUD.m_csgohud->value)
+		a = 255;
+	if (m_iHealth <= 15 && !gHUD.m_csgohud->value)
 	{
 		a = 255; // If health is getting low, make it bright red
+	}
+	else if (m_iHealth <= 25 && gHUD.m_csgohud->value)
+	{
+		a = 255;
 	}
 	else
 	{
@@ -233,30 +253,29 @@ void CHudHealth::GetPainColor( int &r, int &g, int &b, int &a )
 			if (m_fFade <= 0)
 			{
 				m_fFade = 0;
-				a = MIN_ALPHA;
+				if (!gHUD.m_csgohud->value)
+					a = MIN_ALPHA;
 			}
 			else
 			{
-				// Fade the health number back to dim
-				a = MIN_ALPHA +  (m_fFade/FADE_TIME) * 128;
+				if (gHUD.m_csgohud->value)
+				{
+					r = 255;
+					g = 255 - (m_fFade / FADE_TIME) * 255;
+					b = 255 - (m_fFade / FADE_TIME) * 255;
+				}
+				else
+					a = MIN_ALPHA +  (m_fFade/FADE_TIME) * 128; // Fade the health number back to dim
 			}
 		}
 		else
 		{
-			a = MIN_ALPHA;
+			if (!gHUD.m_csgohud->value)
+				a = MIN_ALPHA;
 		}
 	}
 
-	if (m_iHealth > 25)
-	{
-		DrawUtils::UnpackRGB(r,g,b, RGB_YELLOWISH);
-	}
-	else
-	{
-		r = 250;
-		g = 0;
-		b = 0;
-	}
+	
 #endif 
 }
 
@@ -276,8 +295,9 @@ int CHudHealth::Draw(float flTime)
 void CHudHealth::DrawHealthBar( float flTime )
 {
 	int r, g, b;
-	int a = 0, x, y;
+	int a = 0, x, y, x1;
 	int HealthWidth;
+	int HealthHeight;
 
 	GetPainColor( r, g, b, a );
 	DrawUtils::ScaleColors(r, g, b, a );
@@ -285,11 +305,23 @@ void CHudHealth::DrawHealthBar( float flTime )
 	// Only draw health if we have the suit.
 	if (gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)))
 	{
+		HealthHeight = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).bottom - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).top;
 		HealthWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
 		int CrossWidth = gHUD.GetSpriteRect(m_HUD_cross).right - gHUD.GetSpriteRect(m_HUD_cross).left;
 
 		y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 		x = CrossWidth /2;
+
+		if (gHUD.m_csgohud->value)
+		{
+			gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+			if(m_iHealth <= 25)
+				gEngfuncs.pTriAPI->Color4ub(250, 0, 0, 70);
+			else
+				gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 100);
+			m_pTexture_Black->Bind();
+			DrawUtils::Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight);
+		}
 
 		SPR_Set(gHUD.GetSprite(m_HUD_cross), r, g, b);
 		SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_cross));
@@ -298,7 +330,40 @@ void CHudHealth::DrawHealthBar( float flTime )
 
 		x = DrawUtils::DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iHealth, r, g, b);
 		//x = DrawUtils::DrawHudNumber2(x, y, m_iHealth, r, g, b);
+
+		
+
+		if (gHUD.m_csgohud->value)
+		{
+			float f = (float)m_iHealth / (float)m_iMaxHealth;
+			x = DrawBar(x + HealthWidth / 2, y + 2.5, HealthWidth * 5, HealthHeight * 0.8, f, r, g, b, a); //  height 20 number 25
+		}
+
 	}
+}
+
+int CHudHealth::DrawBar(int x, int y, int width, int height, float f, int& r, int& g, int& b, int& a)
+{
+
+	f = bound(0, f, 1);
+	int w = f * width;
+	if (f > 0.25)
+	{
+		// Always show at least one pixel if we have ammo.
+		FillRGBA(x, y, w, height, r, g, b, a);
+		x += w;
+		width -= w;
+	}
+	else
+	{
+		if (w <= 0)
+			w = 1;
+		FillRGBA(x, y, w, height, r, g, b, a);
+		x += w;
+		width -= w;
+	}
+
+	return (x + width);
 }
 
 void CHudHealth::CalcDamageDirection( Vector vecFrom )

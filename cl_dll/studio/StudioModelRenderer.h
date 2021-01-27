@@ -19,6 +19,8 @@
 #ifndef STUDIOMODELRENDERER_H
 #define STUDIOMODELRENDERER_H
 
+namespace cl {
+
 class CStudioModelRenderer
 {
 public:
@@ -93,5 +95,7 @@ public:
 	float (*m_pbonetransform)[MAXSTUDIOBONES][3][4];
 	float (*m_plighttransform)[MAXSTUDIOBONES][3][4];
 };
+
+}
 
 #endif

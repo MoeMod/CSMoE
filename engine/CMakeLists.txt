@@ -19,10 +19,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-cmake_minimum_required(VERSION  2.8.0)
-project(XASH_ENGINE C)
+cmake_minimum_required(VERSION  3.6.0)
+project(XASH_ENGINE C CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+
+# fix C++17 register
+if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+	add_compile_options(-Wno-register)
+endif()
 
 set(XASH_ENGINE xash) # Lib name
 
@@ -35,17 +40,20 @@ endif()
 option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
 option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
 option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
-option(XASH_STATIC "Static build. Implicitly enables XASH_SINGLE_BINARY." OFF)
+if(WIN32)
+	option(XASH_QINDIEGL    "Use QindieGL(D3D9). Only avaible on Win32" OFF)
+endif()
+if(XASH_QINDIEGL)
+	set(XASH_QINDIEGL_SRC "${CMAKE_SOURCE_DIR}/3rdparty/QindieGL" CACHE PATH "QindieGL path")
+endif()
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
 
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
-	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
 else()
-	option(XASH_SDL "Enable SDL." ON)
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
 endif()
 
@@ -138,6 +146,7 @@ endif()
 
 set(XASH_ENGINE_WIN32_SOURCES
 	./platform/win32/con_win.c
+	./platform/win32/ime_win32.cpp
 )
 
 set(XASH_ENGINE_SDL_SOURCES
@@ -151,16 +160,20 @@ set(XASH_ENGINE_ANDROID_SOURCES
    platform/android/vid_android.c
    platform/android/android_nosdl.c
    platform/android/snd_opensles.c
+   platform/ime_stub.cpp
 )
 
 if(IOS)
 set(XASH_ENGINE_APPLE_SOURCES
 	common/launcher.c
 	platform/iOS/TapicEngine.mm
+	platform/ime_stub.cpp
 )
 else()
 set(XASH_ENGINE_APPLE_SOURCES
 	platform/macos/TouchBar.mm
+	platform/macos/vid_macos.mm
+	platform/ime_stub.cpp
 )
 endif()
 
@@ -221,6 +234,9 @@ set(XASH_ENGINE_CLIENT_SOURCES
 set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_impl_xash.cpp
 	client/imgui_lcsm_warning.cpp
+	client/imgui_console.cpp
+	client/imgui_imewindow.cpp
+	client/imgui_sprview.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
@@ -253,7 +269,7 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
 if(XASH_SINGLE_BINARY)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES} platform/macos/vid_macos.mm platform/macos/vid_macos.h)
 endif()
 
 
@@ -287,6 +303,50 @@ elseif(XASH_WES)
 
 	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/ ${XASH_WES_SRC}/src/)
 	add_definitions(-DXASH_WES)
+elseif(XASH_QINDIEGL)
+	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES 
+		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_blend.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_clip.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_combiners.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_eval.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_extension.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_feedback.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_get.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_global.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_immediate.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_light.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_lists.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_material.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_matrix.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_matrix_stack.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_misc.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_object.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_pixels.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_state.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_stencil.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_texgen.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_texture.cpp
+		${XASH_QINDIEGL_SRC}/code/d3d_wrapper.cpp
+		${XASH_QINDIEGL_SRC}/msvc/opengl32.def
+	)
+	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
+		message(FATAL_ERROR "Clone QindieGL sources to engine folder!")
+	endif()
+
+	find_package(DirectX REQUIRED)
+	if(NOT ${DirectX9_FOUND})
+		message(FATAL_ERROR "DirectX SDK not found! Please install DirectX SDK from https://www.microsoft.com/en-us/download/details.aspx?id=6812")
+	endif()
+	
+	add_library(QindieGL STATIC ${XASH_ENGINE_GLESWRAP_SOURCES})
+	target_include_directories(QindieGL PRIVATE ${DirectX9_INCLUDE_DIR})
+	target_include_directories(QindieGL PRIVATE ${XASH_QINDIEGL_SRC}/code)
+	target_include_directories(QindieGL PUBLIC ${XASH_QINDIEGL_SRC}/code/gl_headers)
+	target_compile_definitions(QindieGL PUBLIC -DXASH_QINDIEGL)
+
+	target_link_libraries(QindieGL PUBLIC ${DirectX9_LIBRARY} ${DirectX9_D3DX9_LIBRARY} ${DirectX9_DXERR_LIBRARY} legacy_stdio_definitions)
+	# install( TARGETS QindieGL DESTINATION ".")
 endif()
 
 add_definitions(-DXASH_FORCEINLINE)
@@ -302,7 +362,9 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
-if(XASH_STATIC_GAMELIB)
+if(ANDROID)
+	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
+elseif(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
@@ -313,7 +375,7 @@ else()
 endif()
 
 if(XASH_STATIC_GAMELIB)
-	target_link_libraries(${XASH_ENGINE} client hymenu)
+	target_link_libraries(${XASH_ENGINE} hymenu client)
 endif()
 
 if(MSVC)
@@ -356,36 +418,23 @@ if(XASH_DEDICATED)
 endif()
 
 if(XASH_IMGUI)
-	target_link_libraries(${XASH_ENGINE} imgui)
+	target_link_libraries(${XASH_ENGINE} imgui imgui_ext)
 endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 	add_definitions(-DXASH_SDL)
-	if(XASH_VCPKG)
-		find_package(SDL2 CONFIG REQUIRED)
-		target_link_libraries(${XASH_ENGINE} PUBLIC SDL2::SDL2)
-	else()
-		if(NOT IOS AND NOT ANDROID)
-			find_package(SDL2)
-		endif()
-		target_link_libraries(${XASH_ENGINE} ${SDL2_LIBRARY})
-		include_directories(${SDL2_INCLUDE_DIR})
-		add_definitions(-DXASH_SDL)
-		if(MSVC)
-			string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-			install(FILES ${SDL2_DLL}
-					CONFIGURATIONS Debug
-					DESTINATION ${LIB_INSTALL_DIR}/Debug/)
-			install(FILES ${SDL2_DLL}
-					CONFIGURATIONS Release
-					DESTINATION ${LIB_INSTALL_DIR}/Release/)
-		endif()
-	endif()
+	
+	target_link_libraries(${XASH_ENGINE} sdl2)
 endif()
 
 if(XASH_GLES)
 	add_definitions(-DXASH_GLES -DXASH_GL_STATIC)
+endif()
+
+if(XASH_QINDIEGL)
+	add_definitions(-DXASH_D3D -DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
+	target_link_libraries(${XASH_ENGINE} QindieGL)
 endif()
 
 if(XASH_SAILFISH)
@@ -470,8 +519,6 @@ else()
 	endif()
 endif()
 
-install( TARGETS ${XASH_ENGINE} DESTINATION ${CMAKE_INSTALL_PREFIX})
-
-if(XASH_SDL)
-	install(FILES ${SDL2_DLL} DESTINATION ${CMAKE_INSTALL_PREFIX})
+if( NOT XASH_STATIC_GAMELIB )
+	install( TARGETS ${XASH_ENGINE} DESTINATION ".")
 endif()

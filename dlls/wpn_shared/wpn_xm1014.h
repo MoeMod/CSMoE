@@ -13,6 +13,7 @@ namespace sv {
 //xm1014
 #define XM1014_MAX_SPEED	240
 #define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
+#define XM1014_INSPECT_TIME		4.44s
 
 class CXM1014 : public CBasePlayerWeapon
 {
@@ -25,6 +26,8 @@ public:
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return XM1014_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -37,6 +40,7 @@ public:
 
 public:
 	int m_iShell;
+	time_point_t m_NextInspect;
 	duration_t m_flPumpTime;
 
 private:

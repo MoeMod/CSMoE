@@ -19,12 +19,14 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "mod_local.h"
 #include "input.h"
+#include "input_ime.h"
 #include "gl_vidnt.h"
 #include <SDL.h>
 #include <SDL_syswm.h>
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
 #include "platform/macos/TouchBar.h"
+#include "platform/macos/vid_macos.h"
 #endif
 
 #if defined(XASH_WINRT)
@@ -48,6 +50,18 @@ void VID_StartupGamma( void )
 void R_ChangeDisplaySettingsFast( int width, int height );
 
 void *SDL_GetVideoDevice( void );
+
+static void SDLCALL GL_GetDrawableSize(SDL_Window* window, int* w, int* h)
+{
+#ifdef XASH_QINDIEGL
+	//return SDL_GetWindowSize(window, w, h);
+	GLint params[4]; pglGetIntegerv(GL_VIEWPORT, params);
+	*w = params[2];
+	*h = params[3];
+#else
+	return SDL_GL_GetDrawableSize(window, w, h);
+#endif
+}
 
 #if 0
 #ifdef _WIN32
@@ -97,7 +111,7 @@ qboolean VID_SetScreenResolution( int width, int height )
 	SDL_ShowWindow( host.hWnd );
 	SDL_SetWindowSize( host.hWnd, got.w, got.h );
 
-	SDL_GL_GetDrawableSize( host.hWnd, &got.w, &got.h );
+	GL_GetDrawableSize( host.hWnd, &got.w, &got.h );
 
 	R_ChangeDisplaySettingsFast( got.w, got.h );
 	SDL_HideWindow( fakewnd );
@@ -151,7 +165,7 @@ qboolean VID_SetScreenResolution( int width, int height )
 	{
 		SDL_DestroyWindow( host.hWnd );
 		host.hWnd = SDL_CreateWindow(wndname, 0, 0, width, height, wndFlags | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_GRABBED );
-		SDL_GL_MakeCurrent( host.hWnd, glw_state.context );
+		GL_UpdateContext(  );
 		recreate = false;
 	}
 #endif
@@ -166,7 +180,7 @@ qboolean VID_SetScreenResolution( int width, int height )
 	SDL_SetWindowGrab( host.hWnd, SDL_TRUE );
 	SDL_SetWindowSize( host.hWnd, got.w, got.h );
 
-	SDL_GL_GetDrawableSize( host.hWnd, &got.w, &got.h );
+	GL_GetDrawableSize( host.hWnd, &got.w, &got.h );
 
 	R_ChangeDisplaySettingsFast( got.w, got.h );
 	return true;
@@ -325,7 +339,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 			return false;		
 	}
 
-	SDL_GL_GetDrawableSize( host.hWnd, &width, &height );
+	GL_GetDrawableSize( host.hWnd, &width, &height );
 	R_ChangeDisplaySettingsFast( width, height );
 
 #if defined(SDL_VIDEO_DRIVER_COCOA)
@@ -343,6 +357,8 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		WinRT_BackButton_Install();
 	}
 #endif
+
+	IME_CreateContext();
 	
 	return true;
 }
@@ -398,14 +414,7 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 	{
 		float dpi = 0.0f;
 		qboolean success = false;
-#if defined(XASH_WINRT)
-		dpi = WinRT_GetDisplayDPI();
-		success = dpi > 0.0f;
-#else
-		int display = SDL_GetWindowDisplayIndex(host.hWnd);
-		// MoeMod : why returning 0 on success???
-		success = !SDL_GetDisplayDPI(display, &dpi, NULL, NULL);
-#endif
+		success = VID_GetDPI(&dpi);
 		if (success)
 			Cvar_SetFloat("hud_scale", dpi);
 	}
@@ -458,13 +467,13 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 #endif
 		SDL_SetWindowBordered( host.hWnd, true );
 		SDL_SetWindowSize( host.hWnd, width, height );
-		SDL_GL_GetDrawableSize( host.hWnd, &width, &height );
+		GL_GetDrawableSize( host.hWnd, &width, &height );
 		R_ChangeDisplaySettingsFast( width, height );
 	}
 	else
 	{
 		SDL_SetWindowSize( host.hWnd, width, height );
-		SDL_GL_GetDrawableSize( host.hWnd, &width, &height );
+		GL_GetDrawableSize( host.hWnd, &width, &height );
 		R_ChangeDisplaySettingsFast( width, height );
 	}
 
@@ -551,6 +560,41 @@ qboolean VID_SetMode( void )
 		}
 	}
 	return true;
+}
+
+qboolean VID_GetDPI(float* out)
+{
+	float dpi;
+	qboolean success;
+#if defined(XASH_WINRT)
+	dpi = WinRT_GetDisplayDPI();
+	success = dpi > 0.0f;
+#elif defined(_WIN32)
+	{
+		SDL_SysWMinfo wmInfo;
+		SDL_VERSION(&wmInfo.version);
+		SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+		{
+			HWND hwnd = wmInfo.info.win.window;
+			int res = GetDpiForWindow(hwnd);
+			if (res)
+			{
+				success = true;
+				dpi = res / 96.0f;
+			}
+		}
+	}
+#elif defined(SDL_VIDEO_DRIVER_COCOA)
+	success = true;
+	dpi = MacOS_GetDPI();
+#else
+	int display = SDL_GetWindowDisplayIndex(host.hWnd);
+	// MoeMod : why returning 0 on success???
+	success = !SDL_GetDisplayDPI(display, &dpi, NULL, NULL);
+#endif
+	if (success && out)
+		*out = dpi;
+	return success;
 }
 
 #endif // XASH_VIDEO

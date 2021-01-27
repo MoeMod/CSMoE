@@ -91,6 +91,13 @@ int CAWP::GetItemInfo(ItemInfo *p)
 
 BOOL CAWP::Deploy(void)
 {
+
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
+	m_NextInspect = gpGlobals->time + 1s;
+
 	if (DefaultDeploy("models/v_awp.mdl", "models/p_awp.mdl", AWP_DRAW, "rifle", UseDecrement() != FALSE))
 	{
 		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.45s;
@@ -161,7 +168,7 @@ void CAWP::AWPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_flEjectBrass = gpGlobals->time + 0.55s;
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
-
+	m_NextInspect = gpGlobals->time;
 	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_338MAG, GetDamage(), 0.99, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
@@ -186,11 +193,17 @@ void CAWP::Reload(void)
 {
 	if (m_pPlayer->ammo_338mag <= 0)
 		return;
-
-	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, 2.5s))
+	m_NextInspect = gpGlobals->time + AWP_RELOAD_TIME;
+	if (DefaultReload(AWP_MAX_CLIP, AWP_RELOAD, AWP_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = AWP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AWP_RELOAD_TIME;
+		}
 #endif
 		if (m_pPlayer->pev->fov != 90)
 		{
@@ -233,6 +246,23 @@ float CAWP::GetDamage() const
 		flDamage = 265.0f;
 #endif
 	return flDamage;
+}
+
+void CAWP::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 
 }

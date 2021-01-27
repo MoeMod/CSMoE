@@ -87,10 +87,14 @@ int CMP5N::GetItemInfo(ItemInfo *p)
 
 BOOL CMP5N::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
+	m_NextInspect = gpGlobals->time + 0.75s;
 	m_flAccuracy = 0;
 	m_bDelayFire = false;
 	iShellOn = 1;
-
 	return DefaultDeploy("models/v_mp5.mdl", "models/p_mp5.mdl", MP5N_DRAW, "mp5", UseDecrement() != FALSE);
 }
 
@@ -149,7 +153,7 @@ void CMP5N::MP5NFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-
+	m_NextInspect = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(0.9, 0.475, 0.35, 0.0425, 5.0, 3.0, 6);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -164,10 +168,16 @@ void CMP5N::Reload(void)
 {
 	if (m_pPlayer->ammo_9mm <= 0)
 		return;
-
-	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, 2.63s))
+	m_NextInspect = gpGlobals->time + MP5N_RELOAD_TIME;
+	if (DefaultReload(MP5N_MAX_CLIP, MP5N_RELOAD, MP5N_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.68s;
+			m_flTimeWeaponIdle = MP5N_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + MP5N_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0;
@@ -187,4 +197,20 @@ void CMP5N::WeaponIdle(void)
 	SendWeaponAnim(MP5N_IDLE1, UseDecrement() != FALSE);
 }
 
+void CMP5N::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

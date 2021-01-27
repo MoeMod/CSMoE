@@ -14,7 +14,8 @@ namespace sv {
 #define UMP45_MAX_SPEED			250
 #define UMP45_DAMAGE			30
 #define UMP45_RANGE_MODIFER		0.82
-#define UMP45_RELOAD_TIME		3.5
+#define UMP45_RELOAD_TIME		3.5s
+#define UMP45_INSPECT_TIME		5.44s
 
 class CUMP45 : public CBasePlayerWeapon
 {
@@ -27,6 +28,8 @@ public:
 	int iItemSlot() override { return PRIMARY_WEAPON_SLOT; }
 	void PrimaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return UMP45_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -43,6 +46,7 @@ public:
 public:
 	int m_iShell;
 	int iShellOn;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireUMP45;

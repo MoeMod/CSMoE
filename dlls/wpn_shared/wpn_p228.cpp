@@ -108,12 +108,15 @@ BOOL CP228::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield())
 		return DefaultDeploy("models/shield/v_shield_p228.mdl", "models/shield/p_shield_p228.mdl", P228_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_p228.mdl", "models/p_p228.mdl", P228_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CP228::PrimaryAttack(void)
@@ -152,6 +155,7 @@ void CP228::P228Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	}
 
 	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -207,10 +211,16 @@ void CP228::Reload(void)
 		iAnim = P228_SHIELD_RELOAD;
 	else
 		iAnim = P228_RELOAD;
-
-	if (DefaultReload(P228_MAX_CLIP, iAnim, 2.7s))
+	m_NextInspect = gpGlobals->time + P228_RELOAD_TIME;
+	if (DefaultReload(P228_MAX_CLIP, iAnim, P228_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.57s;
+			m_flTimeWeaponIdle = P228_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + P228_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.9;
@@ -242,4 +252,20 @@ void CP228::WeaponIdle(void)
 	}
 }
 
+void CP228::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(7, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

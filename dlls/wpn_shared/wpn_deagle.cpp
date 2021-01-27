@@ -99,12 +99,15 @@ BOOL CDEAGLE::Deploy(void)
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
 	m_fMaxSpeed = 250;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_deagle.mdl", "models/shield/p_shield_deagle.mdl", DEAGLE_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_deagle.mdl", "models/p_deagle.mdl", DEAGLE_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CDEAGLE::PrimaryAttack(void)
@@ -143,7 +146,7 @@ void CDEAGLE::DEAGLEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 	}
 
 	m_flLastFire = gpGlobals->time;
-
+	m_NextInspect = gpGlobals->time;
 	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
@@ -193,11 +196,17 @@ void CDEAGLE::Reload(void)
 {
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
-
-	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, 2.2s))
+	m_NextInspect = gpGlobals->time + DEAGLE_RELOAD_TIME;
+	if (DefaultReload(DEAGLE_MAX_CLIP, DEAGLE_RELOAD, DEAGLE_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.63s;
+			m_flTimeWeaponIdle = DEAGLE_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + DEAGLE_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.9;
 	}
@@ -227,5 +236,32 @@ float CDEAGLE::GetDamage() const
 		flDamage = 70.0f;
 #endif
 	return flDamage;
+}
+
+void CDEAGLE::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			if (RANDOM_LONG(0, 7))
+			{
+				SendWeaponAnim(6, 0);
+				m_NextInspect = gpGlobals->time + GetInspectTime();
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+			}
+			else
+			{
+				SendWeaponAnim(7, 0);
+				m_NextInspect = gpGlobals->time + GetInspectTime() + 2.84s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime() + 2.84s;
+			}
+#endif
+			
+		}
+	}
+
 }
 }

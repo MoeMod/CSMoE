@@ -92,10 +92,14 @@ int CM249::GetItemInfo(ItemInfo *p)
 
 BOOL CM249::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_m249.mdl", "models/p_m249.mdl", M249_DRAW, "m249", UseDecrement() != FALSE);
 }
 
@@ -158,7 +162,7 @@ void CM249::M249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
-
+	m_NextInspect = gpGlobals->time;
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
 		KickBack(1.8, 0.65, 0.45, 0.125, 5.0, 3.5, 8);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -173,10 +177,16 @@ void CM249::Reload(void)
 {
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
-
-	if (DefaultReload(M249_MAX_CLIP, M249_RELOAD, 4.7s))
+	m_NextInspect = gpGlobals->time + M249_RELOAD_TIME;
+	if (DefaultReload(M249_MAX_CLIP, M249_RELOAD, M249_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 3.73s;
+			m_flTimeWeaponIdle = M249_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + M249_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.2;
@@ -207,5 +217,22 @@ float CM249::GetDamage() const
 		flDamage = 37.0f;
 #endif
 	return flDamage;
+}
+
+void CM249::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(5, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 }

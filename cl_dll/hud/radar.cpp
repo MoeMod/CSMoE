@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "triangleapi.h"
 
 #include "hud_sub_impl.h"
+#include "gamemode/mods_const.h"
 
 #include "legacy/hud_radar_legacy.h"
 #include "modern/hud_radar_modern.h"
@@ -36,7 +37,7 @@ DECLARE_MESSAGE( m_Radar, Location )
 
 char g_szLocation[2048];
 
-struct CHudRadar::impl_t : THudSubDispatcher<CHudRadarLegacy> {};
+struct CHudRadar::impl_t : THudSubDispatcher<CHudRadarLegacy, CHudRadarModern> {};
 
 CHudRadar::CHudRadar() = default;
 CHudRadar::~CHudRadar() = default;
@@ -97,7 +98,21 @@ int CHudRadar::VidInit(void)
 
 int CHudRadar::Draw(float time)
 {
-	pimpl->for_each(&IBaseHudSub::Draw, time);
+	//pimpl->for_each(&IBaseHudSub::Draw, time);
+	auto& modern = pimpl->get<CHudRadarModern>();
+	auto& legacy = pimpl->get<CHudRadarLegacy>();
+	if (modern.Available() && gHUD.m_iModRunning != MOD_NONE)
+	{	
+		modern.Draw(time);
+		gHUD.m_bMordenRadar = TRUE;
+	}
+	else
+	{
+		
+		legacy.Draw(time);
+		gHUD.m_bMordenRadar = FALSE;
+	}
+
 	return 1;
 }
 

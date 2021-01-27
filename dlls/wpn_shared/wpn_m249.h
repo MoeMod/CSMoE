@@ -13,7 +13,8 @@ namespace sv {
 //m249
 #define M249_MAX_SPEED            220
 #define M249_RANGE_MODIFER        0.97
-#define M249_RELOAD_TIME        4.7
+#define M249_RELOAD_TIME        4.7s
+#define M249_INSPECT_TIME		6.9s
 
 class CM249 : public CBasePlayerWeapon
 {
@@ -27,6 +28,8 @@ public:
 	void PrimaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return M249_INSPECT_TIME; }
 	BOOL UseDecrement() override
 	{
 #ifdef CLIENT_WEAPONS
@@ -41,6 +44,7 @@ public:
 	void M249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;
 	int m_iShell;
+	time_point_t m_NextInspect;
 	int iShellOn;
 
 private:

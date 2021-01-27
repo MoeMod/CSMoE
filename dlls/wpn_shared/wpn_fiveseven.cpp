@@ -98,12 +98,15 @@ BOOL CFiveSeven::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
+	m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
 	if (m_pPlayer->HasShield() != false)
 		return DefaultDeploy("models/shield/v_shield_fiveseven.mdl", "models/shield/p_shield_fiveseven.mdl", FIVESEVEN_DRAW, "shieldgun", UseDecrement() != FALSE);
 	else
 #endif
+	{
 		return DefaultDeploy("models/v_fiveseven.mdl", "models/p_fiveseven.mdl", FIVESEVEN_DRAW, "onehanded", UseDecrement() != FALSE);
+	}
 }
 
 void CFiveSeven::PrimaryAttack(void)
@@ -142,6 +145,7 @@ void CFiveSeven::FiveSevenFire(float flSpread, duration_t flCycleTime, BOOL fUse
 	}
 
 	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -190,11 +194,17 @@ void CFiveSeven::Reload(void)
 {
 	if (m_pPlayer->ammo_57mm <= 0)
 		return;
-
-	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, 2.7s))
+	m_NextInspect = gpGlobals->time + FIVESEVEN_RELOAD_TIME;
+	if (DefaultReload(FIVESEVEN_MAX_CLIP, FIVESEVEN_RELOAD, FIVESEVEN_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.2s;
+			m_flTimeWeaponIdle = FIVESEVEN_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + FIVESEVEN_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.92;
 	}
@@ -235,5 +245,22 @@ float CFiveSeven::GetDamage() const
 		flDamage = 20.0f;
 #endif
 	return flDamage;
+}
+
+void CFiveSeven::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 }

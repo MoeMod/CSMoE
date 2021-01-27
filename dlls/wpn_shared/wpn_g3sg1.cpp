@@ -87,8 +87,12 @@ int CG3SG1::GetItemInfo(ItemInfo *p)
 
 BOOL CG3SG1::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0.2;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_g3sg1.mdl", "models/p_g3sg1.mdl", G3SG1_DRAW, "mp5", UseDecrement() != FALSE);
 }
 
@@ -133,7 +137,7 @@ void CG3SG1::G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	else
 		m_flAccuracy = 0.98;
 
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -168,7 +172,7 @@ void CG3SG1::G3SG1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 
 	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireG3SG1, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
-
+	m_flLastFire = gpGlobals->time;
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
@@ -183,12 +187,18 @@ void CG3SG1::Reload(void)
 {
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
-
-	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, 3.5s))
+	m_NextInspect = gpGlobals->time + G3SG1_RELOAD_TIME;
+	if (DefaultReload(G3SG1_MAX_CLIP, G3SG1_RELOAD, G3SG1_RELOAD_TIME))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.53s;
+			m_flTimeWeaponIdle = G3SG1_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + G3SG1_RELOAD_TIME;
+		}
 #endif
 
 		if (m_pPlayer->pev->fov != 90)
@@ -232,5 +242,22 @@ float CG3SG1::GetDamage() const
 		flDamage = 80.0f;
 #endif
 	return flDamage;
+}
+
+void CG3SG1::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(5, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 }

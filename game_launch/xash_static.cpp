@@ -1,5 +1,6 @@
 #include <SDL.h>
 #include <vector>
+#include <iterator>
 #if _WIN32
 #include <Windows.h>
 #endif

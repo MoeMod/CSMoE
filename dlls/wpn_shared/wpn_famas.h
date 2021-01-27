@@ -12,9 +12,10 @@ namespace sv {
 
 //Famas
 #define FAMAS_MAX_SPEED		240
-#define FAMAS_RELOAD_TIME	3.3
+#define FAMAS_RELOAD_TIME	3.3s
 #define FAMAS_DAMAGE		30
 #define FAMAS_DAMAGE_BURST	34
+#define FAMAS_INSPECT_TIME		3.52s
 #define FAMAS_RANGE_MODIFER	0.96
 
 class CFamas : public CBasePlayerWeapon
@@ -29,6 +30,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return FAMAS_INSPECT_TIME; }
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -44,6 +47,7 @@ public:
 	float GetDamage() const;
 public:
 	int m_iShell;
+	time_point_t m_NextInspect;
 	int iShellOn;
 };
 

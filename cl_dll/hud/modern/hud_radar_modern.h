@@ -6,6 +6,7 @@
 #endif
 
 #include "hud_sub.h"
+#include "com_model.h"
 
 #include "r_texture.h"
 
@@ -29,6 +30,8 @@ public:
 	bool IsValidEntity(cl_entity_s *pEntity);
 	bool CalcPoint(float *origin, int &screenX, int &screenY, int &scale);
 	void DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scale, int r, int g, int b, int a);
+
+	bool Available() const { return m_MapSprite != nullptr; }
 
 public:
 	cvar_t *cl_newradar_size;
@@ -66,6 +69,9 @@ private:
 	HSPRITE m_hRadar;
 	HSPRITE m_hRadaropaque;
 
+private:
+	CClientSprite m_hRadarSupplybox;
+
 	// Thanks to crsky
 	struct overview_t {
 		char map[64];
@@ -77,9 +83,8 @@ private:
 	};
 	bool LoadOverviewInfo(const char* fileName, overview_t* data);
 
-
 	overview_t m_OverviewData;
-	UniqueTexture m_pOverViewTexture;
+	model_t *m_MapSprite;
 	void LoadMapSprites(void);
 };
 

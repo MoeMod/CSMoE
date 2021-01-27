@@ -65,6 +65,7 @@
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
 		3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D670D7D227EE1210030B7D1 /* AppDelegate.m */; };
 		3D6C2F0F22988F6A00DACF3E /* OptionsSubAboutTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */; };
+		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3D9CE41C2334B7F400758AC5 /* UnzipStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */; };
 		3D9CE42D2334BC0500758AC5 /* UnzipViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
@@ -85,6 +86,7 @@
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
 		FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA34D31D8B5E5600915323 /* AVFoundation.framework */; };
 		FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96EDF0DEFC9DC00FAF19F /* QuartzCore.framework */; };
@@ -204,6 +206,7 @@
 		3D670D7F227F05E80030B7D1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptionsSubAboutTableViewController.h; sourceTree = "<group>"; };
 		3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OptionsSubAboutTableViewController.m; sourceTree = "<group>"; };
+		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui_ext.a; path = "cmake-build/libimgui_ext.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = UnzipStoryboard.storyboard; sourceTree = "<group>"; };
 		3D9CE42B2334BC0500758AC5 /* UnzipViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnzipViewController.h; sourceTree = "<group>"; };
 		3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnzipViewController.m; sourceTree = "<group>"; };
@@ -224,6 +227,7 @@
 		495E1A191E13199A0022E4AA /* launchdialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = launchdialog.m; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FAE0E9691BAF96A00098DFA4 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
@@ -238,7 +242,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */,
 				3D4DAA0B23BCEE1900F575C1 /* libSDL2.a in Frameworks */,
+				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
 				3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */,
 				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
@@ -314,6 +320,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B646751B253FE21E00F557B8 /* CoreBluetooth.framework */,
 				3D37322E229488AA00713C9C /* GLKit.framework */,
 				3D0FC1DB2278310100D9A961 /* libc++.tbd */,
 				3D525D7722252AAB00DD9932 /* Metal.framework */,
@@ -410,6 +417,7 @@
 			isa = PBXGroup;
 			children = (
 				3DF2719523D4511C005D151E /* libimgui.a */,
+				3D8777BD24A26819006806BF /* libimgui_ext.a */,
 				3D4DA95A23BCEA4700F575C1 /* cl_dll */,
 				3D4DA95B23BCEAA000F575C1 /* dlls */,
 				3D4DA95E23BCEAFB00F575C1 /* engine */,

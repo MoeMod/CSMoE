@@ -18,17 +18,30 @@ extern "C" {
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
+#include "input_ime.h"
 }
 #include "minmax.h"
 
 #include "imgui.h"
 #include "imgui_impl_xash.h"
 #include "imgui_lcsm_warning.h"
+#include "imgui_console.h"
+#include "imgui_imewindow.h"
+#include "imgui_sprview.h"
 
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
 #include <memory>
+
+#ifdef XASH_SDL
+#include <SDL.h>
+#include <SDL_syswm.h>
+#endif
+
+#ifdef XASH_WINRT
+#include "platform/winrt/winrt_interop.h"
+#endif
 
 // Data
 double g_Time = 0.0;
@@ -135,7 +148,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	if (last_enable_depth_test) pglEnable(GL_DEPTH_TEST); else pglDisable(GL_DEPTH_TEST);
 	if (last_enable_scissor_test) pglEnable(GL_SCISSOR_TEST); else pglDisable(GL_SCISSOR_TEST);
 
-	pglPolygonMode(GL_FRONT, last_polygon_mode[0]); pglPolygonMode(GL_BACK, last_polygon_mode[1]);
+	pglPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
 //	pglViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
 	pglScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
@@ -277,6 +290,18 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	// Restore state
 	//pglBindTexture(GL_TEXTURE_2D, last_texture);
 
+	// fix IME
+#ifdef XASH_SDL
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
+#if defined _WIN32 && !defined XASH_WINRT
+	io.ImeWindowHandle = wmInfo.info.win.window;
+	io.ImeSetInputScreenPosFn; // use default
+#endif
+	io.ImeSetInputScreenPosFn = [](int x, int y) { IME_SetInputScreenPos(x, y); };
+#endif
+
 	return true;
 }
 
@@ -317,7 +342,7 @@ void ImGui_ImplGL_ReloadFonts()
 	{
 #ifdef _WIN32
 		char buffer[MAX_PATH];
-		GetSystemDirectory(buffer, sizeof(buffer));
+		GetSystemDirectoryA(buffer, sizeof(buffer));
 		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
 		auto font = io.Fonts->AddFontFromFileTTF(buffer, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
 #endif
@@ -353,18 +378,23 @@ qboolean ImGui_ImplGL_Init(void)
 	io.KeyMap[ImGuiKey_Y] = 'y';
 	io.KeyMap[ImGuiKey_Z] = 'z';
 
+	io.SetClipboardTextFn = [](void* user_data, const char* text) { Sys_SetClipboardData((const byte *)text, strlen(text)); };
+	io.GetClipboardTextFn = [](void* user_data) -> const char * { return Sys_GetClipboardData(); };
+	io.ClipboardUserData = nullptr;
+
 	//io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableSetMousePos;
 	io.IniFilename = nullptr;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
-#ifdef _WIN32
-	io.ImeWindowHandle = NULL;
-#endif
 
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();
+
+	ImGui_Console_Init();
+	ImGui_ImeWindow_Init();
+	ImGui_SprView_Init();
 
 	return true;
 }
@@ -448,16 +478,23 @@ void ImGui_ImplGL_NewFrame(void)
 	// Setup display size (assume the size of the game window is never changed)
 	io.DisplaySize = ImVec2((float)glState.width, (float)glState.height);
 	//io.DisplayFramebufferScale = ImVec2((float)glState.width / (float)si.iWidth, (float)glState.height / (float)si.iHeight);
-	float new_dpi = 2;
+	float new_dpi = hud_scale->value;
+	if (new_dpi == 0)
+		new_dpi = 2;
 	if(g_ImGUI_DPI != new_dpi)
 	{
 		g_ImGUI_DPI = new_dpi;
 	}
 	nst.WindowMenuButtonPosition = ImGuiDir_None;
-	nst.WindowTitleAlign = {0.5, 0.5};
 	nst.WindowPadding = {16, 16};
 	nst.WindowMinSize = {400, 300};
+#ifdef _WIN32
+	nst.WindowTitleAlign = { 0.0, 0.5 };
+	nst.WindowRounding = 0.0f;
+#else
+	nst.WindowTitleAlign = { 0.5, 0.5 };
 	nst.WindowRounding = 8.0f;
+#endif
 	nst.FramePadding = {16, 9};
 	nst.ScaleAllSizes(g_ImGUI_DPI);
 	io.FontGlobalScale = g_ImGUI_DPI / 2;
@@ -522,13 +559,16 @@ void Engine_OnGUI(struct ImGuiContext *context)
 {
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
+	ImGui_Console_OnGUI();
+	ImGui_ImeWindow_OnGUI();
+	ImGui_SprView_OnGUI();
 }
 
 void ImGui_ImplGL_OnGUI(void)
 {
 	if(clgame.dllFuncs.pfnOnGUI)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
-	if(menu.dllFuncs.pfnOnGUI)
+	if (menu.dllFuncs.pfnOnGUI)
 		menu.dllFuncs.pfnOnGUI(g_EngineContext);
 
 	Engine_OnGUI(g_EngineContext);

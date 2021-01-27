@@ -68,7 +68,12 @@ void CUSP::Spawn(void)
 	Precache();
 	m_iId = WEAPON_USP;
 	SET_MODEL(ENT(pev), "models/w_usp.mdl");
-
+#ifndef CLIENT_DLL
+	if ((int)CVAR_GET_FLOAT("mp_csgosilencedwpn"))
+	{
+		m_iWeaponState |= WPNSTATE_USP_SILENCED;
+	}
+#endif
 	m_iDefaultAmmo = USP_DEFAULT_GIVE;
 	m_flAccuracy = 0.92;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
@@ -121,23 +126,28 @@ BOOL CUSP::Deploy(void)
    m_flAccuracy = 0.92f;
    m_fMaxSpeed = 250.0f;
    m_pPlayer->m_bShieldDrawn = false;
+   m_NextInspect = gpGlobals->time + 0.75s;
 #ifdef ENABLE_SHIELD
    if (m_pPlayer->HasShield())
    {
       m_iWeaponState &= ~WPNSTATE_USP_SILENCED;
       return DefaultDeploy("models/shield/v_shield_usp.mdl", "models/shield/p_shield_usp.mdl", USP_SHIELD_DRAW, "shieldgun", UseDecrement() != FALSE);
    }
+   else
 #endif
-   if (m_iWeaponState & WPNSTATE_USP_SILENCED)
-      return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_DRAW, "onehanded", UseDecrement() != FALSE);
-   return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_UNSIL_DRAW, "onehanded", UseDecrement() != FALSE);
+   {
+		if (m_iWeaponState & WPNSTATE_USP_SILENCED)
+			return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_DRAW, "onehanded", UseDecrement() != FALSE);
+		else
+			return DefaultDeploy("models/v_usp.mdl", "models/p_usp.mdl", USP_UNSIL_DRAW, "onehanded", UseDecrement() != FALSE);
+   }
 }
 
 void CUSP::SecondaryAttack(void)
 {
 	if (ShieldSecondaryFire(USP_SHIELD_UP, USP_SHIELD_DOWN) == true)
 		return;
-
+	m_NextInspect = gpGlobals->time + 3s;
 	if (m_iWeaponState & WPNSTATE_USP_SILENCED)
 	{
 		m_iWeaponState &= ~WPNSTATE_USP_SILENCED;
@@ -150,7 +160,7 @@ void CUSP::SecondaryAttack(void)
 		SendWeaponAnim(USP_ATTACH_SILENCER, UseDecrement() != FALSE);
 		strcpy(m_pPlayer->m_szAnimExtention, "onehanded");
 	}
-
+	
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3s;
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3s;
@@ -201,7 +211,7 @@ void CUSP::USPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	}
 
 	m_flLastFire = gpGlobals->time;
-
+	m_NextInspect = gpGlobals->time;
 	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
@@ -260,11 +270,17 @@ void CUSP::Reload(void)
 		iAnim = USP_RELOAD;
 	else
 		iAnim = USP_UNSIL_RELOAD;
-
-	if (DefaultReload(USP_MAX_CLIP, iAnim, 2.7s))
+	m_NextInspect = gpGlobals->time + USP_RELOAD_TIME;
+	if (DefaultReload(USP_MAX_CLIP, iAnim, USP_RELOAD_TIME))
 	{
 
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.7s;
+			m_flTimeWeaponIdle = USP_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + USP_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 		m_flAccuracy = 0.92;
@@ -300,4 +316,24 @@ void CUSP::WeaponIdle(void)
 	}
 }
 
+
+void CUSP::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			if (m_iWeaponState & WPNSTATE_USP_SILENCED)
+				SendWeaponAnim(16, 0);
+			else
+				SendWeaponAnim(17, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

@@ -90,12 +90,16 @@ int CFamas::GetItemInfo(ItemInfo *p)
 
 BOOL CFamas::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_iShotsFired = 0;
 	m_iFamasShotsFired = 0;
 	m_flFamasShoot = invalid_time_point;
 	m_flAccuracy = 0.2;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_famas.mdl", "models/p_famas.mdl", FAMAS_DRAW, "carbine", UseDecrement() != FALSE);
 }
 
@@ -190,7 +194,7 @@ void CFamas::FamasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim,
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
-
+	m_NextInspect = gpGlobals->time;
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
 		KickBack(1, 0.45, 0.275, 0.05, 4, 2.5, 7);
 	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
@@ -212,11 +216,17 @@ void CFamas::Reload(void)
 {
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
-
-	if (DefaultReload(FAMAS_MAX_CLIP, FAMAS_RELOAD, 3.3s))
+	m_NextInspect = gpGlobals->time + FAMAS_RELOAD_TIME;
+	if (DefaultReload(FAMAS_MAX_CLIP, FAMAS_RELOAD, FAMAS_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.67s;
+			m_flTimeWeaponIdle = FAMAS_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + FAMAS_RELOAD_TIME;
+		}
 #endif
 		if (m_pPlayer->m_iFOV != 90)
 			SecondaryAttack();
@@ -239,4 +249,20 @@ void CFamas::WeaponIdle(void)
 	SendWeaponAnim(FAMAS_IDLE1, UseDecrement() != FALSE);
 }
 
+void CFamas::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
+}
 }

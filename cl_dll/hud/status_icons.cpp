@@ -25,7 +25,7 @@
 #include "parsemsg.h"
 #include "event_api.h"
 #include "com_weapons.h"
-
+#include "gamemode/mods_const.h"
 #include "draw_util.h"
 #include "triangleapi.h"
 
@@ -92,6 +92,14 @@ int CHudStatusIcons::Draw( float flTime )
 					m_tgaC4[0]->Bind();
 
 				DrawUtils::Draw2DQuadScaled(x, y, x + 58, y + 55);
+			}
+			else if (gHUD.m_csgohud->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
+			{
+					SPR_Set(m_IconList[i].spr, 255, 255, 255);
+					if(gHUD.m_bMordenRadar)
+						SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 0.175 * ScreenWidth + 43 , &m_IconList[i].rc);
+					else
+						SPR_DrawAdditive(0, (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 7, 200, &m_IconList[i].rc);
 			}
 			else
 			{

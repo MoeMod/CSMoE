@@ -87,8 +87,12 @@ int CSG550::GetItemInfo(ItemInfo *p)
 
 BOOL CSG550::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0.2;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_sg550.mdl", "models/p_sg550.mdl", SG550_DRAW, "rifle", UseDecrement() != FALSE);
 }
 
@@ -131,7 +135,7 @@ void CSG550::SG550Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 			m_flAccuracy = 0.98;
 	}
 
-	m_flLastFire = gpGlobals->time;
+	m_NextInspect = gpGlobals->time;
 
 	if (m_iClip <= 0)
 	{
@@ -171,7 +175,7 @@ void CSG550::SG550Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
-
+	m_flLastFire = gpGlobals->time;
 	m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 4, 1.5, 1.75) + m_pPlayer->pev->punchangle.x * 0.25;
 	m_pPlayer->pev->punchangle.y += UTIL_SharedRandomFloat(m_pPlayer->random_seed + 5, -1.0, 1.0);
 }
@@ -180,11 +184,17 @@ void CSG550::Reload(void)
 {
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
-
-	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, 3.35s))
+	m_NextInspect = gpGlobals->time + SG550_RELOAD_TIME;
+	if (DefaultReload(SG550_MAX_CLIP, SG550_RELOAD, SG550_RELOAD_TIME))
 	{
 		m_flAccuracy = 0.2;
 #ifndef CLIENT_DLL
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 2.28s;
+			m_flTimeWeaponIdle = SG550_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + SG550_RELOAD_TIME;
+		}
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
 #endif
 
@@ -230,5 +240,22 @@ float CSG550::GetDamage() const
 		flDamage = 84.0f;
 #endif
 	return flDamage;
+}
+
+void CSG550::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(5, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 }

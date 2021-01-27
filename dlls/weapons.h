@@ -191,14 +191,17 @@ public:
 #ifndef CLIENT_DLL
 	static CGrenade *ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time);
 	static CGrenade *ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
+	static CGrenade* ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
 	static CGrenade *ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity);
 	static CGrenade *ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
+	static CGrenade* ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
 	static CGrenade *ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity);
 #else
 	static CGrenade *ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time) { return NULL; }
 	static CGrenade *ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) { return NULL; }
 	static CGrenade *ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity) { return NULL; }
 	static CGrenade *ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent) { return NULL; }
+	static CGrenade *ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent) { return NULL; }
 	static CGrenade *ShootSatchelCharge(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity) { return NULL; }
 #endif
 	NOXREF static void UseSatchelCharges(entvars_t *pevOwner, SATCHELCODE code);
@@ -207,6 +210,8 @@ public:
 	void Explode(TraceResult *pTrace, int bitsDamageType);
 	void Explode2(TraceResult *pTrace, int bitsDamageType);
 	void Explode3(TraceResult *pTrace, int bitsDamageType);
+	void FB_Explode(TraceResult* pTrace, int bitsDamageType);
+	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker);
 	NOXREF void SG_Explode(TraceResult *pTrace, int bitsDamageType);
 
 	void EXPORT Smoke();
@@ -223,10 +228,15 @@ public:
 	void EXPORT PreDetonate();
 	void EXPORT Detonate();
 	void EXPORT SG_Detonate();
+	void EXPORT FB_Detonate();
+	void EXPORT FB_BounceTouch(CBaseEntity* pOther);
 	void EXPORT Detonate2();
 	void EXPORT Detonate3();
+	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	void EXPORT TumbleThink();
+	void EXPORT FB_TumbleThink();
+	void EXPORT ZombieBomb_TumbleThink();
 	void EXPORT SG_TumbleThink();
 	void EXPORT C4Think();
 
@@ -276,7 +286,6 @@ public:
 	CBaseEntity *Respawn() override;
 	virtual int AddToPlayer(CBasePlayer *pPlayer);
 #endif
-
 	virtual int AddDuplicate(CBasePlayerItem *pItem) { return FALSE; }
 	virtual int GetItemInfo(ItemInfo *p) { return 0; }
 	virtual BOOL CanDeploy() { return TRUE; }
@@ -300,13 +309,18 @@ public:
 	virtual void Drop();
 	virtual void Kill();
 	virtual void AttachToPlayer(CBasePlayer *pPlayer);
+	virtual void CheckWeapon(CBasePlayer* pPlayer, CBasePlayerItem* pItem);
 #endif
+	
 	virtual int PrimaryAmmoIndex() { return -1; }
 	virtual int SecondaryAmmoIndex() { return -1; }
 	virtual int UpdateClientData(CBasePlayer *pPlayer) { return 0; }
 	virtual CBasePlayerItem *GetWeaponPtr() { return NULL; }
 	virtual float GetMaxSpeed() { return 260.0f; }
 	virtual int iItemSlot() { return 0; }
+	virtual void Inspect() {};
+	virtual void ChangeModel() {};
+	virtual duration_t GetInspectTime() { return 10.0s; }
 
 public:
 #ifdef CLIENT_DLL
@@ -430,6 +444,9 @@ public:
 	virtual void RetireWeapon();
 	virtual BOOL ShouldWeaponIdle() { return FALSE; }
 	virtual BOOL UseDecrement() { return FALSE; }
+	virtual void Inspect() override {};
+	virtual void ChangeModel() override {};
+	virtual duration_t GetInspectTime() override { return 4.5s; }
 
 public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
@@ -581,6 +598,7 @@ extern short g_sModelIndexBloodSpray;
 extern short g_sModelIndexSmokePuff;
 extern short g_sModelIndexFireball2;
 extern short g_sModelIndexFireball3;
+extern short g_sModelIndexZombiebomb_exp;
 extern short g_sModelIndexFireball4;
 extern short g_sModelIndexCTGhost;
 extern short g_sModelIndexTGhost;

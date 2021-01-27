@@ -91,11 +91,16 @@ int CAK47::GetItemInfo(ItemInfo *p)
 
 BOOL CAK47::Deploy(void)
 {
+#ifndef CLIENT_DLL
+	if (m_pPlayer->IsAlive())
+		CheckWeapon(m_pPlayer, this);
+#endif
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-
+	m_NextInspect = gpGlobals->time + 0.75s;
 	return DefaultDeploy("models/v_ak47.mdl", "models/p_ak47.mdl", AK47_DRAW, "ak47", UseDecrement() != FALSE);
+	
 }
 
 void CAK47::PrimaryAttack(void)
@@ -154,6 +159,7 @@ void CAK47::AK47Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
+	m_NextInspect = gpGlobals->time;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.9s;
 
 	if (m_pPlayer->pev->velocity.Length2D() > 0)
@@ -170,11 +176,17 @@ void CAK47::Reload(void)
 {
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;
-
-	if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, 2.45s))
+	m_NextInspect = gpGlobals->time + AK47_RELOAD_TIME;
+	if (DefaultReload(AK47_MAX_CLIP, AK47_RELOAD, AK47_RELOAD_TIME))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
+		if ((int)CVAR_GET_FLOAT("mp_csgospecialeffect"))
+		{
+			m_pPlayer->m_flNextAttack = 1.9s;
+			m_flTimeWeaponIdle = AK47_RELOAD_TIME + 0.5s;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + AK47_RELOAD_TIME;
+		}
 #endif
 		m_flAccuracy = 0.2;
 		m_iShotsFired = 0;
@@ -204,5 +216,22 @@ float CAK47::GetDamage() const
 		flDamage = 42.0f;
 #endif
 	return flDamage;
+}
+
+void CAK47::Inspect()
+{
+
+	if (!m_fInReload)
+	{
+		if (gpGlobals->time > m_NextInspect)
+		{
+#ifndef CLIENT_DLL
+			SendWeaponAnim(6, 0);
+#endif
+			m_NextInspect = gpGlobals->time + GetInspectTime();
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
+		}
+	}
+
 }
 } // namespace cl/sv

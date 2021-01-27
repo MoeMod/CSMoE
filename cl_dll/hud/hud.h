@@ -140,6 +140,7 @@ public:
 	void CalcCrosshairColor();
 
 	int DrawWList(float flTime);
+	int DrawWpnList(float flTime);
 	CHudMsgFunc(CurWeapon);
 	CHudMsgFunc(WeaponList);
 	CHudMsgFunc(AmmoX);
@@ -177,18 +178,20 @@ public:
 	WEAPON *m_pWeapon;
 	int	m_HUD_bucket0;
 	int m_HUD_selection;
-
+	UniqueTexture m_pTexture_Black;
 	int m_iAlpha;
 	int m_R, m_G, m_B;
 	int m_cvarR, m_cvarG, m_cvarB;
 	int m_iCurrentCrosshair;
 	int m_iCrosshairScaleBase;
+	int m_iBuffHitWidth, m_iBuffHitHeight;
 	float m_flCrosshairDistance;
 	bool m_bAdditive;
 	bool m_bObserverCrosshair ;
 	bool m_bDrawCrosshair;
 	int m_iAmmoLastCheck;
-
+	float m_flLastHitTime, m_flLastBuffHit;
+	
 	cvar_t *m_pClCrosshairColor;
 	cvar_t *m_pClCrosshairTranslucent;
 	cvar_t *m_pClCrosshairSize;
@@ -197,6 +200,12 @@ public:
 	cvar_t *m_pHud_DrawHistory_Time;
 
 	cvar_t *cl_crosshair_type;
+	//HSPRITE m_hBuffHit;
+	model_s* m_hBuffHit;
+	inline void HitForBuff(float flTime)
+	{
+		m_flLastBuffHit = flTime + 0.1;
+	}
 };
 
 //
@@ -403,6 +412,7 @@ private:
 private:
 	SharedTexture m_killBg[3];
 	SharedTexture m_deathBg[3];
+	SharedTexture m_defaultBg[3];
 	int m_KM_Number0;
 	int m_KM_Number1;
 	int m_KM_Number2;
@@ -479,6 +489,7 @@ public:
 	int Init( void );
 	int VidInit( void );
 	int Draw(float flTime);
+	int DrawBar(int x, int y, int width, int height, float f, int& r, int& g, int& b, int& a);
 	void InitHUDData( void );
 	CHudMsgFunc(Battery);
 	CHudMsgFunc(ArmorType);
@@ -493,6 +504,7 @@ private:
 	CClientSprite m_hFull[VestHelm + 1];
 	int	  m_iBat;
 	float m_fFade;
+	UniqueTexture m_pTexture_Black;
 	int	  m_iHeight;		// width of the battery innards
 };
 
@@ -656,6 +668,7 @@ private:
 	int m_iDelta;
 	int m_iBlinkAmt;
 	float m_fBlinkTime;
+	UniqueTexture m_pTexture_Black;
 	float m_fFade;
 	CClientSprite m_hDollar;
 	CClientSprite m_hPlus;
@@ -703,6 +716,7 @@ private:
 	bool m_bPanicColorChange;
 	float m_flPanicTime;
 	int m_closestRight;
+	UniqueTexture m_pTexture_Black;
 };
 //
 //-----------------------------------------------------
@@ -910,6 +924,7 @@ public:
 	int		m_iRes;
 	cvar_t *m_pCvarDraw;
 	cvar_t *cl_shadows;
+	cvar_t *m_csgohud;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -991,9 +1006,11 @@ public:
 	int	m_fPlayerDead;
 	int m_iIntermission;
 	int m_iNoConsolePrint;
+	bool m_bMordenRadar;
 
 	// sprite indexes
 	int m_HUD_number_0;
+
 
 	char m_szServerName[64];
 

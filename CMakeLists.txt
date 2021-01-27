@@ -1,5 +1,5 @@
 project(csmoe)
-cmake_minimum_required(VERSION  2.8.0)
+cmake_minimum_required(VERSION  3.10.2)
 
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -8,11 +8,22 @@ option(XASH_STATIC_GAMELIB "Build static game library" ON)
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
-option(XASH_PCH "Enable PCH support." ON)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
+	option(XASH_PCH "Enable PCH support." ON)
+endif()
+
+option(XASH_VCPKG "Enable VCPKG support." OFF)
+
+if(XASH_DEDICATED)
+	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+else()
+	option(XASH_SDL "Enable SDL." ON)
+endif()
 
 if(XASH_PCH)
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/CMakePCHCompiler/")
-	include(CMakePCHCompiler)
+	if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
+		message(FATAL_ERROR "PCH is not supported. Please update to CMake 3.16 or higher.")
+	endif()
 endif()
 
 if(XASH_STATIC_GAMELIB)
@@ -53,11 +64,32 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	add_compile_options(-Wno-unused-private-field)
 endif()
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
-# force xp build
 if(MSVC)
+	# force xp build
 	add_definitions(-D_USING_V110_SDK71_)
+
+	# MultiByte charset
+	add_compile_options(/utf-8)
+
+	# static CRT
+	if(XASH_STATIC_GAMELIB)
+		set(CompilerFlags
+			CMAKE_CXX_FLAGS
+			CMAKE_CXX_FLAGS_DEBUG
+			CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_MINSIZEREL
+			CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS
+			CMAKE_C_FLAGS_DEBUG
+			CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_MINSIZEREL
+			CMAKE_C_FLAGS_RELWITHDEBINFO
+			)
+		foreach(CompilerFlag ${CompilerFlags})
+		  string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+		endforeach()
+	endif()
 endif()
 if(MSVC)
 	add_compile_options(/utf-8)
@@ -84,6 +116,8 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 	endif()
 endif()
 
+set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
+
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
@@ -94,11 +128,13 @@ else()
 endif()
 
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
-set(SDL_SHARED true)
 set(XASH_LIBDL true)
 
+set(CMAKE_CXX_STANDARD 17)
+
 if(XASH_IMGUI)
-	if(XASH_VCPKG)
+	# TODO : since vcpkg doesn't provide with imgui_internal.h, just use our own one
+    if(XASH_VCPKG AND FALSE)
 		find_package(imgui CONFIG REQUIRED)
 		add_library(imgui INTERFACE)
 		target_link_libraries(imgui INTERFACE imgui::imgui)
@@ -111,6 +147,47 @@ if(XASH_IMGUI)
 		add_library(imgui STATIC ${IMGUI_SRC})
 		target_include_directories(imgui PUBLIC ${CMAKE_SOURCE_DIR}/imgui)
 	endif()
+	add_library(imgui_ext STATIC 
+		imgui_ext/ImGuiFileDialog/ImGuiFileDialog.cpp
+		)
+	target_include_directories(imgui_ext PUBLIC ${CMAKE_SOURCE_DIR}/imgui_ext)
+	if(WIN32)
+		target_include_directories(imgui_ext PRIVATE ${CMAKE_SOURCE_DIR}/imgui_ext/dirent)
+	endif()
+	target_link_libraries(imgui_ext PUBLIC imgui)
+endif()
+
+if(XASH_SDL)
+	add_library(sdl2 INTERFACE)
+	if(XASH_VCPKG)
+		find_package(SDL2 CONFIG REQUIRED)
+		if(XASH_STATIC_GAMELIB)
+			target_link_libraries(sdl2 INTERFACE SDL2::SDL2-static)
+		else()
+			target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
+		endif()
+	elseif(IOS)
+		target_include_directories(sdl2 INTERFACE "${CMAKE_SOURCE_DIR}/SDL2/include")
+	else()
+		find_package(SDL2 QUIET)
+
+		if(SDL2_FOUND)
+			target_link_libraries(sdl2 INTERFACE ${SDL2_LIBRARY})
+			target_include_directories(sdl2 INTERFACE ${SDL2_INCLUDE_DIR})
+			if(MSVC)
+				string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
+				install(FILES ${SDL2_DLL} DESTINATION "." OPTIONAL)
+			endif()
+		else()
+			if(MSVC)
+				add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
+			endif()
+			set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
+			add_subdirectory(SDL2 EXCLUDE_FROM_ALL)
+			target_link_libraries(sdl2 INTERFACE SDL2-static)
+		endif()
+	endif()
+
 endif()
 
 if(NOT XASH_DEDICATED)

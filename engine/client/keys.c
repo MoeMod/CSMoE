@@ -16,15 +16,11 @@ GNU General Public License for more details.
 
 #include "common.h"
 #include "input.h"
+#include "input_ime.h"
 #include "client.h"
 #include "joyinput.h"
 #include "touch.h"
 #include "vgui_draw.h"
-
-#ifdef XASH_SDL
-#include <SDL_keyboard.h>
-#include <platform/sdl/events.h>
-#endif
 
 #ifdef XASH_IMGUI
 #include "imgui_impl_xash.h"
@@ -606,10 +602,6 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 	{
 		keys[key].repeats = 0;
 	}
-#ifdef XASH_IMGUI
-	if(ImGui_ImplGL_KeyEvent( key, down ))
-		return;
-#endif
 
 	VGui_KeyEvent( key, down );
 	Touch_KeyEvent( key, down );
@@ -775,11 +767,7 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 
 void Key_EnableTextInput( qboolean enable, qboolean force )
 {
-#if XASH_INPUT == INPUT_SDL
-	SDLash_EnableTextInput( enable, force );
-#elif XASH_INPUT == INPUT_ANDROID
-	Android_EnableTextInput( enable, force );
-#endif
+	IME_SetIMEEnabled(enable, force);
 #if 0
 	Joy_EnableTextInput( enable, force );
 #endif
@@ -887,4 +875,30 @@ void CL_CharEvent( int ch )
 	}
 
 }
+
+void CL_CharEventUTF(const char* str)
+{
+#ifdef XASH_IMGUI
+	if (ImGui_ImplGL_CharCallbackUTF(str))
+		return;
+#endif
+	int i;
+
+	// Pass characters one by one to Con_CharEvent
+	for (i = 0; str[i]; ++i)
+	{
+		int ch;
+
+		if (!Q_stricmp(cl_charset->string, "utf-8"))
+			ch = (unsigned char)str[i];
+		else
+			ch = Con_UtfProcessCharForce((unsigned char)str[i]);
+
+		if (!ch)
+			continue;
+
+		CL_CharEvent(ch);
+	}
+}
+
 #endif

@@ -1338,7 +1338,10 @@ void R_EndFrame( void )
 	else
 		R_Set2DMode( false );
 
-#ifdef XASH_SDL
+#ifdef XASH_QINDIEGL
+	BOOL wrap_wglSwapBuffers(HDC);
+	wrap_wglSwapBuffers(NULL);
+#elif defined(XASH_SDL)
 	SDL_GL_SwapWindow( host.hWnd );
 #elif defined __ANDROID__ // For direct android backend
 	Android_SwapBuffers();
@@ -1685,7 +1688,7 @@ static render_api_t gRenderAPI =
 	NULL,
 	NULL,
 	NULL,
-	NULL,
+	GL_Scissor,
 	CL_DrawParticlesExternal,
 	(void*)R_EnvShot,
 	COM_CompareFileTime,

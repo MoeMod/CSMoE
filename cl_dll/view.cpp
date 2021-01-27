@@ -47,6 +47,8 @@ void InterpolateAngles(float *start, float *end, float *output, float frac);
 float	vJumpOrigin[3];
 float	vJumpAngles[3];
 
+
+extern engine_studio_api_t IEngineStudio;
 }
 
 #ifdef XASH_STATIC_GAMELIB
@@ -56,8 +58,6 @@ int DLLEXPORT CL_IsThirdPerson( void );
 #endif
 
 using namespace cl;
-
-extern engine_studio_api_t IEngineStudio;
 
 /*
 The view is allowed to move slightly from it's true position for bobbing,
@@ -92,6 +92,8 @@ cvar_t	*scr_ofsz;
 cvar_t	*v_centermove;
 cvar_t	*v_centerspeed;
 
+cvar_t  *cl_csgoviewmode;
+cvar_t	*cl_weaponlag;
 cvar_t	*cl_bobcycle;
 cvar_t	*cl_bob;
 cvar_t	*cl_bobup;
@@ -108,7 +110,8 @@ cvar_t	v_iroll_level		= {"v_iroll_level", "0.1", 0, 0.1, NULL};
 cvar_t	v_ipitch_level		= {"v_ipitch_level", "0.3", 0, 0.3, NULL};
 
 float	v_idlescale;  // used by TFC for concussion grenade effect
-
+/*TEMPENTITY* g_pDualSwordEffect1 = nullptr;
+TEMPENTITY* g_pDualSwordEffect2 = nullptr;*/
 #ifdef XASH_64BIT
 #define BAD_ENT_PTR 0xFFFFFFFFFFFFFFFF
 #else
@@ -184,6 +187,7 @@ float V_CalcBob ( struct ref_params_s *pparams )
 	static float	lasttime;
 	vec3_t	vel;
 
+	cl_entity_t* viewentity = gEngfuncs.GetLocalPlayer();
 
 	if ( pparams->onground == -1 ||
 		 pparams->time == lasttime )
@@ -216,8 +220,122 @@ float V_CalcBob ( struct ref_params_s *pparams )
 	bob = bob * 0.3 + bob * 0.7 * sin(cycle);
 	bob = min( bob, 4.0f );
 	bob = max( bob, -7.0f );
+	//bob += DotProduct(viewentity->curstate->velocity, forward) / pev->maxspeed
 	return bob;
 
+}
+
+float V_CalcBob1(struct ref_params_s* pparams)
+{
+	static	double	bobtime;
+	static float	bob;
+	float	cycle;
+	static float	lasttime;
+	vec3_t	vel;
+
+	cl_entity_t* viewentity = gEngfuncs.GetLocalPlayer();
+
+	if (pparams->onground == -1 ||
+		pparams->time == lasttime)
+	{
+		// just use old value
+		return bob;
+	}
+
+	lasttime = pparams->time;
+
+	bobtime += pparams->frametime;
+	/*cycle = bobtime - (int)(bobtime / cl_bobcycle->value) * cl_bobcycle->value;
+	cycle /= cl_bobcycle->value;
+
+	if (cycle < cl_bobup->value)
+	{
+		cycle = M_PI * cycle / cl_bobup->value;
+	}
+	else
+	{
+		cycle = M_PI + M_PI * (cycle - cl_bobup->value) / (1.0 - cl_bobup->value);
+	}
+	*/
+	// bob is proportional to simulated velocity in the xy plane
+	// (don't count Z, or jumping messes it up)
+	VectorCopy(pparams->simvel, vel);
+	vel[2] = 0;
+
+	bob = sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * cl_bob->value;
+	//bob = bob * 0.3 + bob * 0.7 * tanh(cycle);
+	/*bob = min(bob, 4.0f);
+	bob = max(bob, -7.0f);*/
+	//bob += DotProduct(viewentity->curstate->velocity, forward) / pev->maxspeed
+	return bob;
+
+}
+
+//
+// V_CalcViewModelLag
+//
+void V_CalcViewModelLag(ref_params_t* pparams, Vector& origin, Vector& angles, const Vector& original_angles)
+{
+	static Vector m_vecLastFacing;
+	Vector vOriginalOrigin = origin;
+	Vector vOriginalAngles = angles;
+
+	// Calculate our drift
+	Vector forward, right, up;
+
+	AngleVectors(angles, forward, right, up);
+
+	if (pparams->frametime != 0.0f)	// not in paused
+	{
+		Vector vDifference;
+
+		vDifference = forward - m_vecLastFacing;
+
+		float flSpeed = 5.0f;
+
+		// If we start to lag too far behind, we'll increase the "catch up" speed.
+		// Solves the problem with fast cl_yawspeed, m_yaw or joysticks rotating quickly.
+		// The old code would slam lastfacing with origin causing the viewmodel to pop to a new position
+		float flDiff = vDifference.Length();
+
+		if ((flDiff > cl_weaponlag->value) && (cl_weaponlag->value > 0.0f))
+		{
+			float flScale = flDiff / cl_weaponlag->value;
+			flSpeed *= flScale;
+		}
+
+		// FIXME:  Needs to be predictable?
+		m_vecLastFacing = m_vecLastFacing + vDifference * (flSpeed * pparams->frametime);
+		// Make sure it doesn't grow out of control!!!
+		m_vecLastFacing = m_vecLastFacing.Normalize();
+		origin = origin + (vDifference * -1.0f) * flSpeed;
+	}
+
+	AngleVectors(original_angles, forward, right, up);
+
+	float pitch = original_angles[PITCH];
+
+	if (pitch > 180.0f)
+	{
+		pitch -= 360.0f;
+	}
+	else if (pitch < -180.0f)
+	{
+		pitch += 360.0f;
+	}
+
+	if (cl_weaponlag->value <= 0.0f)
+	{
+		origin = vOriginalOrigin;
+		angles = vOriginalAngles;
+	}
+	else
+	{
+		// FIXME: These are the old settings that caused too many exposed polys on some models
+		origin = origin + forward * (-pitch * 0.035f);
+		origin = origin + right * (-pitch * 0.03f);
+		origin = origin + up * (-pitch * 0.02f);
+	}
 }
 
 /*
@@ -507,8 +625,9 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 {
 	cl_entity_t		*ent, *view;
 	int				i;
+	int idx;
 	vec3_t			angles;
-	float			bob, waterOffset;
+	float			bob, waterOffset, bob1;
 	static viewinterp_t		ViewInterp;
 
 	static float oldz = 0;
@@ -527,14 +646,96 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	{
 		// ent is the player model ( visible when out of body )
 		ent = gEngfuncs.GetLocalPlayer();
+		idx = gEngfuncs.GetLocalPlayer()->index;
 	}
 
 	// view is the weapon model (only visible from inside body)
 	view = gEngfuncs.GetViewModel();
 
+	/*if (g_PlayerExtraInfo[idx].dead && !g_iUser2)
+	{
+		if (g_pDualSwordEffect1)
+		{
+			g_pDualSwordEffect1->die = 0.0;
+			g_pDualSwordEffect1 = NULL;
+		}
+		if (g_pDualSwordEffect2)
+		{
+			g_pDualSwordEffect2->die = 0.0;
+			g_pDualSwordEffect2 = NULL;
+		}
+	}
+
+	if (view)
+	{
+		if (view->model->name)
+		{
+			if (strstr(view->model->name, "v_dualsword"))
+			{	
+				if (!g_pDualSwordEffect1)
+				{
+					struct model_s* model;
+
+					model = IEngineStudio.Mod_ForName("sprites/ef_dualsword_left.spr", 0);
+
+					g_pDualSwordEffect1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(view->attachment[1], model);
+
+					g_pDualSwordEffect1->entity.curstate.rendermode = kRenderTransAdd;
+					g_pDualSwordEffect1->entity.curstate.renderamt = 255;
+					g_pDualSwordEffect1->entity.curstate.renderfx = 0;
+					g_pDualSwordEffect1->entity.curstate.scale = 0.036;
+					g_pDualSwordEffect1->entity.curstate.framerate = 20;
+
+					g_pDualSwordEffect1->frameMax = 30;
+					g_pDualSwordEffect1->die = gHUD.m_flTime + 9999.0f;
+
+					g_pDualSwordEffect1->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+
+				if (!g_pDualSwordEffect2)
+				{
+					struct model_s* model;
+
+					model = IEngineStudio.Mod_ForName("sprites/ef_dualsword_right.spr", 0);
+
+
+					g_pDualSwordEffect2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(view->attachment[0], model);
+
+					g_pDualSwordEffect2->entity.curstate.rendermode = kRenderTransAdd;
+					g_pDualSwordEffect2->entity.curstate.renderamt = 255;
+					g_pDualSwordEffect2->entity.curstate.renderfx = 0;
+					g_pDualSwordEffect2->entity.curstate.scale = 0.036;
+					g_pDualSwordEffect2->entity.curstate.framerate = 20;
+
+					g_pDualSwordEffect2->frameMax = 30;
+					g_pDualSwordEffect2->die = gHUD.m_flTime + 9999.0f;
+
+					g_pDualSwordEffect2->flags |= FTENT_PERSIST | FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+				}
+				else
+				{
+					if (g_pDualSwordEffect1)
+					{
+						g_pDualSwordEffect1->die = 0.0;
+						g_pDualSwordEffect1 = nullptr;
+					}
+					if (g_pDualSwordEffect2)
+					{
+						g_pDualSwordEffect2->die = 0.0;
+						g_pDualSwordEffect2 = nullptr;
+					}
+				}
+			}
+		}
+	}*/
 	// transform the view offset by the model's matrix to get the offset from
 	// model origin for the view
 	bob = V_CalcBob ( pparams );
+	if (cl_csgoviewmode->value)
+	{
+		bob1 = V_CalcBob1(pparams);
+	}
+	
 
 	// refresh position
 	VectorCopy ( pparams->simorg, pparams->vieworg );
@@ -677,6 +878,8 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 		VectorCopy ( pparams->cl_viewangles, view->angles );
 	}
 
+	Vector lastAngles = view->angles = pparams->cl_viewangles;
+
 	// set up gun position
 	V_CalcGunAngle ( pparams );
 
@@ -687,13 +890,25 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 
 	// Let the viewmodel shake at about 10% of the amplitude
 	gEngfuncs.V_ApplyShake( view->origin, view->angles, 0.9 );
-
-	for ( i = 0; i < 3; i++ )
+	if (cl_csgoviewmode->value)
 	{
-		view->origin[ i ] += bob * 0.4 * pparams->forward[ i ];
+		for (i = 0; i < 3; i++)
+		{
+			view->origin[i] += bob * 0.25 * pparams->right[i];
+			view->origin[i] -= bob1 * 0.75 * pparams->forward[i];
+			view->origin[i] -= bob1 * 0.5 * pparams->up[i];
+		}
+		
 	}
+	else
+	{
+		for (i = 0; i < 3; i++)
+		{
+			view->origin[i] += bob * 0.4 * pparams->forward[i];
+		}
+	}
+	
 	view->origin[2] += bob;
-
 	// throw in a little tilt.
 	view->angles[YAW]   -= bob * 0.5;
 	view->angles[ROLL]  -= bob * 1;
@@ -722,7 +937,10 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 	{
 		view->origin[2] += 0.5;
 	}
-
+	if (cl_csgoviewmode->value)
+	{
+		V_CalcViewModelLag(pparams, view->origin, view->angles, lastAngles);
+	}
 	// Don't allow viewmodel, if we are in sniper scope
 	if( gHUD.m_iFOV <= 40 )
 		view->model = NULL;
@@ -1742,10 +1960,11 @@ void V_Init (void)
 
 	v_centermove		= gEngfuncs.pfnRegisterVariable( "v_centermove", "0.15", 0 );
 	v_centerspeed		= gEngfuncs.pfnRegisterVariable( "v_centerspeed","500", 0 );
-
+	cl_weaponlag		= gEngfuncs.pfnRegisterVariable("cl_weaponlag", "0.3", 0);
 	cl_bobcycle			= gEngfuncs.pfnRegisterVariable( "cl_bobcycle","0.8", 0 );// best default for my experimental gun wag (sjb)
 	cl_bob				= gEngfuncs.pfnRegisterVariable( "cl_bob","0.01", 0 );// best default for my experimental gun wag (sjb)
 	cl_bobup			= gEngfuncs.pfnRegisterVariable( "cl_bobup","0.5", 0 );
+	cl_csgoviewmode		= gEngfuncs.pfnRegisterVariable("cl_csgoviewmode", "0", 0);
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
 }

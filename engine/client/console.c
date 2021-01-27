@@ -21,6 +21,10 @@ GNU General Public License for more details.
 #include "qfont.h"
 #include "server.h" // Log_Printf( , ... )
 
+#if XASH_IMGUI
+#include "imgui_console.h"
+#endif
+
 convar_t	*con_notifytime;
 convar_t	*scr_conspeed;
 convar_t	*con_fontsize;
@@ -120,6 +124,9 @@ Con_Clear_f
 */
 void Con_Clear( void )
 {
+#if XASH_IMGUI
+	ImGui_Console_Clear();
+#endif
 	int	i;
 
 	if( !con.initialized )
@@ -896,6 +903,9 @@ If no console is visible, the text will appear at the top of the game window
 */
 void Con_Print( const char *txt )
 {
+#if XASH_IMGUI
+	ImGui_Console_Print(txt);
+#endif
 	int	y, c, l, color;
 
 	// client not running

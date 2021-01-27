@@ -14,7 +14,8 @@ namespace sv {
 #define P228_MAX_SPEED		250
 #define P228_DAMAGE		32
 #define P228_RANGE_MODIFER	0.8
-#define P228_RELOAD_TIME	2.7
+#define P228_RELOAD_TIME	2.7s
+#define P228_INSPECT_TIME		5.17s
 
 class CP228 : public CBasePlayerWeapon
 {
@@ -27,6 +28,8 @@ public:
 	int iItemSlot() override { return PISTOL_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
+	void Inspect() override;
+	duration_t GetInspectTime() override { return P228_INSPECT_TIME; }
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {
@@ -46,6 +49,7 @@ public:
 
 public:
 	int m_iShell;
+	time_point_t m_NextInspect;
 
 private:
 	unsigned short m_usFireP228;

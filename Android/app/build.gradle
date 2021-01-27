@@ -15,7 +15,9 @@ android {
                         "-DXASH_NANOGL=1",
                         "-DXASH_NANOGL_SRC=" + file('../../nanogl/'),
                         "-DXASH_STATIC_GAMELIB=1",
-                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0"
+                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0",
+                        "-DXASH_PCH=0"
+                version "3.10.2"
             }
         }
         ndk {
@@ -38,7 +40,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-
+            version "3.10.2"
         }
     }
     sourceSets {
