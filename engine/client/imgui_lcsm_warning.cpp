@@ -19,7 +19,7 @@ GNU General Public License for more details.
 
 #include <algorithm>
 
-static bool lcsm_enabled = true;
+static bool lcsm_enabled = false;
 
 void ImGui_LCSM_OnGUI(void)
 {
