@@ -237,6 +237,15 @@ void ImGui_ImplGL_CharCallback(unsigned int c)
 		io.AddInputCharacter(c);
 }
 
+qboolean ImGui_ImplGL_CharCallback(int c)
+{
+	if (!g_EngineContext)
+		return false;
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddInputCharacter((unsigned)c);
+	return io.WantTextInput;
+}
+
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
 {
 	if (!g_EngineContext)

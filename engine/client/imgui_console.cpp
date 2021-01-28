@@ -224,33 +224,76 @@ void ImGui_Console_Clear()
 	s_term.clear();
 }
 
+static bool enabled = false;
+
+void ImGui_ToggleConsole(qboolean x)
+{
+	enabled = x;
+}
+
+std::vector<std::function<void()>> pfnCallbackOnGUI;
+
+int ImGui_Console_AddGenericString(int x, int y, const char* string, rgba_t setColor)
+{
+	if (!ImGui::GetDrawListSharedData()->Font)
+		return 0;
+	pfnCallbackOnGUI.push_back([x, y, setColor, stdstr = std::string(string)]()
+		{
+			auto col = ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
+			auto shadow_col = ImColor(int(setColor[0] * 0.55), int(setColor[1] * 0.34), int(setColor[2] * 0.11), setColor[3]);
+			auto shadow_col2 = ImColor(0, 0, 0, setColor[3]);
+			ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+			drawlist->AddText(ImVec2(x - 1, y - 1), shadow_col, stdstr.c_str());
+			drawlist->AddText(ImVec2(x - 1, y + 1), shadow_col, stdstr.c_str());
+			drawlist->AddText(ImVec2(x + 1, y - 1), shadow_col, stdstr.c_str());
+			drawlist->AddText(ImVec2(x + 1, y + 1), shadow_col, stdstr.c_str());
+			drawlist->AddText(ImVec2(x + 2, y + 2), shadow_col2, stdstr.c_str());
+			drawlist->AddText(ImVec2(x, y), col, stdstr.c_str());
+		});
+	return static_cast<int>(ImGui::CalcTextSize(string).x);
+}
+
+void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height)
+{
+	ImVec2 size = {};
+	if (ImGui::GetDrawListSharedData()->Font)
+	{
+		size = ImGui::CalcTextSize(pText);
+	}
+	if (length) *length = size.x;
+	if (height) *height = size.y;
+}
+
 void ImGui_Console_OnGUI(void)
 {
-	static bool enabled = false;
 
 	bool set_focus = false;
-	if(!std::exchange(enabled, cls.key_dest == key_console))
-		s_term.set_should_take_focus(set_focus = true);
+	//if(!std::exchange(enabled, cls.key_dest == key_console))
+	//	s_term.set_should_take_focus(set_focus = true);
 
-	if (!enabled)
-		return;
+	if (enabled)
+	{
+		if (set_focus)
+		{
+			ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
+			//ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Always);
+			auto size = ImGuiUtils::GetScaledSize(ImVec2(640, 480));
+			s_term.set_width(size.x);
+			s_term.set_height(size.y);
+		}
+
+		if (!s_term.show({  }, &enabled) || !enabled)
+		{
+			if (cls.state == ca_active && !cl.background)
+				Key_SetKeyDest(key_game);
+			else UI_SetActiveMenu(true);
+		}
+
+		if (set_focus)
+			s_term.set_should_take_focus(false);
+	}
 	
-	if (set_focus)
-	{
-		ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
-		//ImGui::SetNextWindowSize(ImGuiUtils::GetScaledSize(ImVec2(640, 480)), ImGuiCond_Always);
-		auto size = ImGuiUtils::GetScaledSize(ImVec2(640, 480));
-		s_term.set_width(size.x);
-		s_term.set_height(size.y);
-	}
-
-	if (!s_term.show({  }, &enabled) || !enabled)
-	{
-		if (cls.state == ca_active && !cl.background)
-			Key_SetKeyDest(key_game);
-		else UI_SetActiveMenu(true);
-	}
-
-	if(set_focus)
-		s_term.set_should_take_focus(false);
+	for (const auto& f : pfnCallbackOnGUI)
+		f();
+	pfnCallbackOnGUI.clear();
 }

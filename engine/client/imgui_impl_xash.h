@@ -35,6 +35,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void);
 // Provided here if you want to chain callbacks yourself. You may also handle inputs yourself and use those as a reference.
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action);
 qboolean ImGui_ImplGL_KeyEvent( int key, int down );
+qboolean ImGui_ImplGL_CharCallback(int c);
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c);
 qboolean ImGui_ImplGL_MouseMove(int x, int y);
 

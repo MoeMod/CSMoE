@@ -1675,9 +1675,14 @@ void Con_DrawNotify( void )
 			clgame.dllFuncs.pfnChatInputPosition( &start, &v );
 
 		Q_snprintf( buf, sizeof( buf ), "%s: ", con.chat_cmd );
-
+		
+#ifdef XASH_IMGUI
+		ImGui_Console_DrawStringLen(buf, &len, NULL);
+		ImGui_Console_AddGenericString(start, 0, buf, g_color_table[7]);
+#else
 		Con_DrawStringLen( buf, &len, NULL );
 		Con_DrawString( start, v, buf, g_color_table[7] );
+#endif
 
 		Field_DrawInputLine( start + len, v, &con.chat );
 	}
@@ -1759,14 +1764,20 @@ void Con_DrawSolidConsole( float frac, qboolean fill )
 		byte	*color = g_color_table[7];
 		int	stringLen, width = 0, charH;
 
-		Q_snprintf( curbuild, MAX_STRING, "Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
+		Q_snprintf( curbuild, MAX_STRING, "柑橘CitruS Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
 			XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ) );
+#ifdef XASH_IMGUI
+		ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
+		start = scr_width->integer - stringLen;
+		ImGui_Console_AddGenericString(start, 0, curbuild, color);
+#else
 		Con_DrawStringLen( curbuild, &stringLen, &charH );
 		start = scr_width->integer - stringLen;
 		stringLen = Con_StringLength( curbuild );
 
 		for( i = 0; i < stringLen; i++ )
 			width += Con_DrawCharacter( start + width, 0, curbuild[i], color );
+#endif
 
 		host.force_draw_version_time = 0;
 	}
@@ -1933,10 +1944,16 @@ void Con_DrawVersion( void )
 	}
 
 	if( host.force_draw_version || draw_version )
-		Q_snprintf( curbuild, MAX_STRING, "Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
+		Q_snprintf( curbuild, MAX_STRING, "柑橘CitruS Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
 					XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ) );
 	else Q_snprintf( curbuild, MAX_STRING, "v%i/%s build %i %s %s-%s", PROTOCOL_VERSION,
 					 XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ));
+
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
+	start = scr_width->integer - stringLen;
+	ImGui_Console_AddGenericString(start, 0, curbuild, color);
+#else
 	Con_DrawStringLen( curbuild, &stringLen, &charH );
 	start = scr_width->integer - stringLen * 1.05f;
 	stringLen = Con_StringLength( curbuild );
@@ -1944,6 +1961,7 @@ void Con_DrawVersion( void )
 
 	for( i = 0; i < stringLen; i++ )
 		width += Con_DrawCharacter( start + width, height, curbuild[i], color );
+#endif
 }
 
 /*
@@ -2035,41 +2053,7 @@ void Con_VidInit( void )
 	Con_CheckResize();
 	Con_InvalidateFonts();
 
-	// loading console image
-	if( host.developer )
-	{
-		if( scr_width->integer < 640 )
-		{
-			if( FS_FileExists( "cached/conback400", false ))
-				con.background = GL_LoadTexture( "cached/conback400", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/conback", NULL, 0, TF_IMAGE, NULL );
-		}
-		else
-		{
-			if( FS_FileExists( "cached/conback640", false ))
-				con.background = GL_LoadTexture( "cached/conback640", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/conback", NULL, 0, TF_IMAGE, NULL );
-		}
-	}
-	else
-	{
-		if( scr_width->integer < 640 )
-		{
-			if( FS_FileExists( "cached/loading400", false ))
-				con.background = GL_LoadTexture( "cached/loading400", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/loading", NULL, 0, TF_IMAGE, NULL );
-		}
-		else
-		{
-			if( FS_FileExists( "cached/loading640", false ))
-				con.background = GL_LoadTexture( "cached/loading640", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/loading", NULL, 0, TF_IMAGE, NULL );
-		}
-	}
-
-	// missed console image will be replaced as white (GoldSrc rules)
-	if( con.background == tr.defaultTexture || con.background == 0 )
-		con.background = tr.whiteTexture;
+	con.background = tr.whiteTexture;
 
 	Con_LoadConchars();
 }
