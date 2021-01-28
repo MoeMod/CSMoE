@@ -275,11 +275,11 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 #if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 	if( FS_FileExists( GI->iconpath, true ) )
 	{
-		HICON ico;
+		HICON ico = NULL;
 		char	localPath[MAX_PATH];
 
 		Q_snprintf( localPath, sizeof( localPath ), "%s/%s", GI->gamefolder, GI->iconpath );
-		ico = (HICON)LoadImage( NULL, localPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE|LR_DEFAULTSIZE );
+		//ico = (HICON)LoadImage( NULL, localPath, IMAGE_ICON, 0, 0, LR_LOADFROMFILE|LR_DEFAULTSIZE );
 
 		if( !ico )
 		{
