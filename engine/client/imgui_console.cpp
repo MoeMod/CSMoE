@@ -233,43 +233,123 @@ void ImGui_ToggleConsole(qboolean x)
 
 std::vector<std::function<void()>> pfnCallbackOnGUI;
 
-int ImGui_Console_AddGenericString(int x, int y, const char* string, rgba_t setColor)
+ImColor RGBAtoImColor(rgba_t setColor)
+{
+	return ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
+}
+
+int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t setColor)
 {
 	if (!ImGui::GetDrawListSharedData()->Font)
 		return 0;
-	pfnCallbackOnGUI.push_back([x, y, setColor, stdstr = std::string(string)]()
+
+	TextAdjustSize( &x0, &y0, NULL, NULL);
+
+	static auto print_segment = [](int x, int y, std::string_view sv, ImColor col)
+	{
+		ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+		auto shadow_col = ImColor(col.Value.x * 0.55, col.Value.y * 0.34, col.Value.z * 0.11, col.Value.w);
+		auto shadow_col2 = ImColor(0.f, 0.f, 0.f, col.Value.w);
+		drawlist->AddText(ImVec2(x - 1, y - 1), shadow_col, sv.data(), sv.data() + sv.length());
+		drawlist->AddText(ImVec2(x - 1, y + 1), shadow_col, sv.data(), sv.data() + sv.length());
+		drawlist->AddText(ImVec2(x + 1, y - 1), shadow_col, sv.data(), sv.data() + sv.length());
+		drawlist->AddText(ImVec2(x + 1, y + 1), shadow_col, sv.data(), sv.data() + sv.length());
+		drawlist->AddText(ImVec2(x + 2, y + 2), shadow_col2, sv.data(), sv.data() + sv.length());
+		drawlist->AddText(ImVec2(x, y), col, sv.data(), sv.data() + sv.length());
+	};
+
+	static auto text_size = [](std::string_view sv) { return ImGui::CalcTextSize(sv.data(), sv.data() + sv.length()); };
+
+	extern rgba_t g_color_table[8];
+
+	std::shared_ptr<std::string> spstr = std::make_shared< std::string>(string);
+	std::string_view sv = *spstr;
+	ImColor col = RGBAtoImColor(setColor);
+	ImColor last_color = col;
+	int x = x0, y = y0;
+	auto find_str = "^\n\x01\x02\x03\x04\x05\x06\x07";
+	for (auto seg = sv.find_first_of(find_str); seg != sv.npos; seg = sv.find_first_of(find_str))
+	{
+		if (sv[seg] == '^' && seg != sv.size() - 1 && sv[seg + 1] >= '1' && sv[seg + 1] <= '7')
 		{
-			auto col = ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
-			auto shadow_col = ImColor(int(setColor[0] * 0.55), int(setColor[1] * 0.34), int(setColor[2] * 0.11), setColor[3]);
-			auto shadow_col2 = ImColor(0, 0, 0, setColor[3]);
-			ImDrawList* drawlist = ImGui::GetForegroundDrawList();
-			drawlist->AddText(ImVec2(x - 1, y - 1), shadow_col, stdstr.c_str());
-			drawlist->AddText(ImVec2(x - 1, y + 1), shadow_col, stdstr.c_str());
-			drawlist->AddText(ImVec2(x + 1, y - 1), shadow_col, stdstr.c_str());
-			drawlist->AddText(ImVec2(x + 1, y + 1), shadow_col, stdstr.c_str());
-			drawlist->AddText(ImVec2(x + 2, y + 2), shadow_col2, stdstr.c_str());
-			drawlist->AddText(ImVec2(x, y), col, stdstr.c_str());
-		});
-	return static_cast<int>(ImGui::CalcTextSize(string).x);
+			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			auto size = text_size(sv.substr(0, seg));
+			x += size.x;
+
+			if (sv[seg + 1] == '7')
+				last_color = col;
+			else
+				last_color = RGBAtoImColor(g_color_table[sv[seg + 1] - '0']);
+
+			sv = sv.substr(seg + 2);
+			continue;
+		}
+		else if (sv[seg] >= '\x01' && sv[seg] <= '\x07' && seg != sv.size() - 1)
+		{
+			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			auto size = text_size(sv.substr(0, seg));
+			x += size.x;
+			// ignored
+			/*
+			if (sv[seg] == '\x07')
+				last_color = col;
+			else
+				last_color = RGBAtoImColor(g_color_table[sv[seg] - '\x00']);
+			*/
+			sv = sv.substr(seg + 1);
+			continue;
+		}
+		else if (sv[seg] == '\n' && seg != sv.size() - 1)
+		{
+			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			auto size = text_size(sv.substr(0, seg));
+			y += size.y;
+			x = x0;
+			sv = sv.substr(seg + 1);
+			continue;
+		}
+		break;
+	}
+	if (!sv.empty())
+	{
+		pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv, last_color](){ print_segment(x, y, sv2, last_color); });
+		auto size = text_size(sv);
+		x += size.x;
+	}
+
+	//float xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
+	return x - x0;
 }
 
 void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height)
 {
 	ImVec2 size = {};
+	std::string filter_str;
+	for(const char* p = pText; *p; ++p)
+	{
+		if (p[0] == '^' && p[1] >= '1' && p[1] <= '7')
+			p += 2;
+		if (p[0] >= '\x01' && p[0] <= '\x07')
+			p += 1;
+		filter_str.push_back(*p);
+	}
 	if (ImGui::GetDrawListSharedData()->Font)
 	{
-		size = ImGui::CalcTextSize(pText);
+		size = ImGui::CalcTextSize(filter_str.c_str(), filter_str.c_str() + filter_str.length());
 	}
 	if (length) *length = size.x;
 	if (height) *height = size.y;
+	TextAdjustSize(NULL, NULL, length, height);
 }
 
 void ImGui_Console_OnGUI(void)
 {
-
 	bool set_focus = false;
 	//if(!std::exchange(enabled, cls.key_dest == key_console))
 	//	s_term.set_should_take_focus(set_focus = true);
+
+	if (cls.key_dest == key_game)
+		enabled = false;
 
 	if (enabled)
 	{

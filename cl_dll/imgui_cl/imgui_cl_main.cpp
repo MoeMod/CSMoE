@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "cl_dll.h"
 #include "imgui_cl_buy.h"
+#include "imgui_cl_menu.h"
 
 namespace cl {
 
@@ -60,6 +61,7 @@ void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 	 */
 
     buy.OnGUI();
+	ImGuiCL_Menu_OnGUI();
 }
 
 }

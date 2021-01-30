@@ -97,6 +97,11 @@ int CHudMenu :: Draw( float flTime )
 		}
 	}
 
+#ifdef XASH_IMGUI
+	// we have imgui one
+	return 1;
+#endif
+	
 	// don't draw the menu if the scoreboard is being shown
 	//if ( gViewPort && gViewPort->IsScoreBoardVisible() )
 		//return 1;

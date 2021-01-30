@@ -690,10 +690,11 @@ void IN_MouseEvent( int mstate )
 		else
 			SDL_ShowCursor( SDL_FALSE );
 
-		if( x < host.window_center_x / 2 ||
-			y < host.window_center_y / 2 ||
-			x > host.window_center_x + host.window_center_x / 2 ||
-			y > host.window_center_y + host.window_center_y / 2 )
+		int division = 32; // 2
+		if( x < host.window_center_x - host.window_center_x / division ||
+			y < host.window_center_y - host.window_center_y / division ||
+			x > host.window_center_x + host.window_center_x / division ||
+			y > host.window_center_y + host.window_center_y / division)
 		{
 			SDL_WarpMouseInWindow(host.hWnd, host.window_center_x, host.window_center_y);
 			ignore = 1; // next mouse event will be mouse warp

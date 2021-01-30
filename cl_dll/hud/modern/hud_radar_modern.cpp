@@ -730,6 +730,8 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	if (x < 0 || x > wide || y < 0 || y > tall)
 		return;
 
+	scale *= gHUD.m_flScale;
+
 	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
 	gEngfuncs.pTriAPI->Color4ub(r, g, b, a);
 
