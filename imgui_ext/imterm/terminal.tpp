@@ -862,7 +862,8 @@ void terminal<TerminalHelper>::show_autocomplete() noexcept {
 		ImGui::SetNextWindowPos(auto_complete_pos);
 		ImGui::SetNextWindowSizeConstraints({0.f, 0.f}, auto_complete_max_size);
 		if (ImGui::Begin("##terminal:auto_complete", nullptr, overlay_flags)) {
-
+		
+			ImGui::BringWindowToDisplayFront(ImGui::GetCurrentWindow());
 			auto print_separator = [this]() {
 				ImGui::SameLine(0.f, 0.f);
 				int pop = try_push_style(ImGuiCol_Text, m_colors.auto_complete_separator);
