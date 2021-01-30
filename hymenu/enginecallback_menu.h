@@ -91,7 +91,8 @@ public:
 	{ engfuncs.pfnPIC_DisableScissor(); }
 
 	// screen handlers
-	static void	FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a );
+	static inline void	FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
+	{ return engfuncs.pfnFillRGBA(x, y, width, height, r, g, b, a); }
 
 	// cvar handlers
 	static inline cvar_t*	CvarRegister( const char *szName, const char *szValue, int flags )
