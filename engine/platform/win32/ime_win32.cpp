@@ -121,6 +121,11 @@ static void ClearCandidateList()
     selected_candicate = 0;
 }
 
+static void CompositionString()
+{
+    comp_str.clear();
+}
+
 static void UpdateCandidateList(const CANDIDATELIST* const src, const size_t src_size)
 {
     assert(nullptr != src);
@@ -437,5 +442,9 @@ void IME_SetIMEEnabled(int enable, int force)
     if (enable)
         SDL_StartTextInput();
     else
+    {
+        ClearCandidateList();
+        CompositionString();
         SDL_StopTextInput();
+    }
 }

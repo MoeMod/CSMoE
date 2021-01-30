@@ -32,6 +32,10 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "sound.h"		// SND_STOP_LOOPING
 
+#if XASH_IMGUI
+#include "imgui_console.h"
+#endif
+
 #define MAX_LINELENGTH		80
 #define MAX_TEXTCHANNELS	8		// must be power of two (GoldSrc uses 4 channels)
 #define TEXT_MSGNAME	"TextMessage%i"
@@ -615,6 +619,12 @@ void CL_DrawCenterPrint( void )
 	y = clgame.centerPrint.y; // start y
 	colorDefault = g_color_table[7];
 	pText = clgame.centerPrint.message;
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen(pText, &x, &y);
+	x = scr_width->integer / 2 - x / 2;
+	y = scr_height->integer / 4;
+	ImGui_Console_AddGenericString(x, y, pText, colorDefault);
+#else
 	Con_DrawCharacterLen( 0, NULL, &charHeight );
 	
 	for( i = 0; i < clgame.centerPrint.lines; i++ )
@@ -647,6 +657,7 @@ void CL_DrawCenterPrint( void )
 		}
 		y += charHeight;
 	}
+#endif
 }
 
 /*
@@ -1744,7 +1755,11 @@ int GAME_EXPORT pfnDrawConsoleString( int x, int y, char *string )
 	if( !string || !*string ) return 0; // silent ignore
 	clgame.ds.adjust_size = true;
 	Con_SetFont( con_fontsize->integer );
-	drawLen = Con_DrawString( x, y, string, clgame.ds.textColor );
+#ifdef XASH_IMGUI
+	drawLen = ImGui_Console_AddGenericString(x, y, string, clgame.ds.textColor);
+#else
+	drawLen = Con_DrawString(x, y, string, clgame.ds.textColor);
+#endif
 	Vector4Copy( g_color_table[7], clgame.ds.textColor );
 	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
@@ -1778,7 +1793,11 @@ compute string length in screen pixels
 void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 {
 	Con_SetFont( con_fontsize->integer );
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen( pText, length, height );
+#else
 	Con_DrawStringLen( pText, length, height );
+#endif
 	Con_RestoreFont();
 }
 
