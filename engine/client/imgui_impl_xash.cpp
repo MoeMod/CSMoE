@@ -473,7 +473,7 @@ qboolean ImGui_ImplGL_Init(void)
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
+	io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
 
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Init();
@@ -646,13 +646,13 @@ qboolean ImGui_ImplGL_MouseMove(int x, int y)
 void ImGui_ImplGL_Render(void)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Render();
 	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	//pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	//pglClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	//pglClear(GL_COLOR_BUFFER_BIT);
 	//pglUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
-	ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
+	//ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
+	ImGui::Render();
 }
 
 void Engine_OnGUI(struct ImGuiContext *context)

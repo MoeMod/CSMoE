@@ -231,8 +231,6 @@ void ImGui_ToggleConsole(qboolean x)
 	enabled = x;
 }
 
-std::vector<std::function<void()>> pfnCallbackOnGUI;
-
 ImColor RGBAtoImColor(rgba_t setColor)
 {
 	return ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
@@ -262,8 +260,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 
 	extern rgba_t g_color_table[8];
 
-	std::shared_ptr<std::string> spstr = std::make_shared< std::string>(string);
-	std::string_view sv = *spstr;
+	std::string_view sv = string;
 	ImColor col = RGBAtoImColor(setColor);
 	ImColor last_color = col;
 	int x = x0, y = y0;
@@ -272,7 +269,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 	{
 		if (sv[seg] == '^' && seg != sv.size() - 1 && sv[seg + 1] >= '1' && sv[seg + 1] <= '7')
 		{
-			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			print_segment(x, y, sv.substr(0, seg), last_color);
 			auto size = text_size(sv.substr(0, seg));
 			x += size.x;
 
@@ -286,7 +283,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 		}
 		else if (sv[seg] >= '\x01' && sv[seg] <= '\x07' && seg != sv.size() - 1)
 		{
-			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			print_segment(x, y, sv.substr(0, seg), last_color);
 			auto size = text_size(sv.substr(0, seg));
 			x += size.x;
 			// ignored
@@ -301,7 +298,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 		}
 		else if (sv[seg] == '\n' && seg != sv.size() - 1)
 		{
-			pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv.substr(0, seg), last_color](){ print_segment(x, y, sv2, last_color); });
+			print_segment(x, y, sv.substr(0, seg), last_color);
 			auto size = text_size(sv.substr(0, seg));
 			y += size.y;
 			x = x0;
@@ -312,7 +309,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 	}
 	if (!sv.empty())
 	{
-		pfnCallbackOnGUI.push_back([spstr, x, y, sv2 = sv, last_color](){ print_segment(x, y, sv2, last_color); });
+		print_segment(x, y, sv, last_color);
 		auto size = text_size(sv);
 		x += size.x;
 	}
@@ -351,18 +348,15 @@ int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor)
 
 	ImColor col = RGBAtoImColor(setColor);
 	auto pos = ImVec2(x, y);
-	pfnCallbackOnGUI.push_back([pos, col, ch]()
-	{
-		ImFont* font = ImGui::GetDrawListSharedData()->Font;
-		ImDrawList* drawlist = ImGui::GetForegroundDrawList();
-		drawlist->PushTextureID(font->ContainerAtlas->TexID);
-		ImGuiIO& io = ImGui::GetIO();
-		extern float g_ImGUI_DPI;
-		font->RenderChar(drawlist, font->FontSize * io.FontGlobalScale, pos, col, ch);
-	});
+	
+	ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+	drawlist->PushTextureID(font->ContainerAtlas->TexID);
 	ImGuiIO& io = ImGui::GetIO();
+	font->RenderChar(drawlist, font->FontSize * io.FontGlobalScale, pos, col, ch);
+		
 	int w = font->GetCharAdvance(ch) * io.FontGlobalScale; // / io.FontGlobalScale;
 	TextAdjustSizeReverse(NULL, NULL, &w, NULL);
+
 	return w;
 }
 
@@ -394,8 +388,4 @@ void ImGui_Console_OnGUI(void)
 
 	if (cls.key_dest == key_game)
 		enabled = false;
-	
-	for (const auto& f : pfnCallbackOnGUI)
-		f();
-	pfnCallbackOnGUI.clear();
 }
