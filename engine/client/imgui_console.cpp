@@ -339,7 +339,31 @@ void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height)
 	}
 	if (length) *length = size.x;
 	if (height) *height = size.y;
-	TextAdjustSize(NULL, NULL, length, height);
+	TextAdjustSizeReverse(NULL, NULL, length, height);
+}
+
+int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor)
+{
+	ImFont* font = ImGui::GetDrawListSharedData()->Font;
+	if (!font)
+		return 0;
+	TextAdjustSize(&x, &y, NULL, NULL);
+
+	ImColor col = RGBAtoImColor(setColor);
+	auto pos = ImVec2(x, y);
+	pfnCallbackOnGUI.push_back([pos, col, ch]()
+	{
+		ImFont* font = ImGui::GetDrawListSharedData()->Font;
+		ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+		drawlist->PushTextureID(font->ContainerAtlas->TexID);
+		ImGuiIO& io = ImGui::GetIO();
+		extern float g_ImGUI_DPI;
+		font->RenderChar(drawlist, font->FontSize * io.FontGlobalScale, pos, col, ch);
+	});
+	ImGuiIO& io = ImGui::GetIO();
+	int w = font->GetCharAdvance(ch) * io.FontGlobalScale; // / io.FontGlobalScale;
+	TextAdjustSizeReverse(NULL, NULL, &w, NULL);
+	return w;
 }
 
 void ImGui_Console_OnGUI(void)
@@ -347,9 +371,6 @@ void ImGui_Console_OnGUI(void)
 	bool set_focus = false;
 	//if(!std::exchange(enabled, cls.key_dest == key_console))
 	//	s_term.set_should_take_focus(set_focus = true);
-
-	if (cls.key_dest == key_game)
-		enabled = false;
 
 	if (enabled)
 	{
@@ -362,16 +383,17 @@ void ImGui_Console_OnGUI(void)
 			s_term.set_height(size.y);
 		}
 
-		if (!s_term.show({  }, &enabled) || !enabled)
+		if (!s_term.show({  }, &enabled))
 		{
-			if (cls.state == ca_active && !cl.background)
-				Key_SetKeyDest(key_game);
-			else UI_SetActiveMenu(true);
+			Key_SetKeyDest(key_menu);
 		}
 
 		if (set_focus)
 			s_term.set_should_take_focus(false);
 	}
+
+	if (cls.key_dest == key_game)
+		enabled = false;
 	
 	for (const auto& f : pfnCallbackOnGUI)
 		f();

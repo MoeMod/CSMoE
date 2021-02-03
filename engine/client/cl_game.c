@@ -457,6 +457,23 @@ void TextAdjustSize( int *x, int *y, int *w, int *h )
 	if( w ) *w *= xscale;
 	if( h ) *h *= yscale;
 }
+void TextAdjustSizeReverse(int* x, int* y, int* w, int* h)
+{
+	float	xscale, yscale;
+
+	ASSERT(x || y || w || h);
+
+	if (!clgame.ds.adjust_size) return;
+
+	// scale for screen sizes
+	xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
+	yscale = scr_height->value / (float)clgame.scrInfo.iHeight;
+
+	if (x) *x /= xscale;
+	if (y) *y /= yscale;
+	if (w) *w /= xscale;
+	if (h) *h /= yscale;
+}
 
 /*
 ====================
@@ -1724,8 +1741,15 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	if( !cls.creditsFont.valid )
 		return 0;
 
+#ifdef XASH_IMGUI
+	clgame.ds.adjust_size = true;
+	rgba_t rgb = { r,g,b,255 };
+	int w = ImGui_Console_DrawChar(x, y, number, rgb);
+	clgame.ds.adjust_size = false;
+	return w;
+#else
 	number &= 255;
-
+	
 	if( hud_utf8->integer )
 		number = Con_UtfProcessChar( number );
 
@@ -1739,6 +1763,7 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
+#endif
 }
 
 /*
@@ -1793,11 +1818,13 @@ compute string length in screen pixels
 void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 {
 	Con_SetFont( con_fontsize->integer );
+	clgame.ds.adjust_size = true;
 #ifdef XASH_IMGUI
 	ImGui_Console_DrawStringLen( pText, length, height );
 #else
 	Con_DrawStringLen( pText, length, height );
 #endif
+	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
 }
 
@@ -2819,6 +2846,12 @@ pfnVGUI2DrawCharacter
 */
 static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned int font )
 {
+#ifdef XASH_IMGUI
+	clgame.ds.adjust_size = true;
+	int w = ImGui_Console_DrawChar(x, y, number, g_color_table[7]);
+	clgame.ds.adjust_size = false;
+	return w;
+#else
 	if( !cls.creditsFont.valid )
 		return 0;
 
@@ -2836,6 +2869,7 @@ static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned
 	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
+#endif
 }
 
 /*
@@ -2849,7 +2883,10 @@ static int GAME_EXPORT pfnVGUI2DrawCharacterAdditive( int x, int y, int ch, int 
 	if( !hud_utf8->integer )
 		ch = Con_UtfProcessChar( ch );
 
-	return pfnDrawCharacter( x, y, ch, r, g, b );
+	clgame.ds.adjust_size = true;
+	int w = pfnDrawCharacter( x, y, ch, r, g, b );
+	clgame.ds.adjust_size = false;
+	return w;
 }
 
 /*

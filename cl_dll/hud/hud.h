@@ -539,7 +539,7 @@ private:
 const int maxHUDMessages = 16;
 struct message_parms_t
 {
-	client_textmessage_t	*pMessage;
+	std::shared_ptr<client_textmessage_t> pMessage;
 	float	time;
 	int x, y;
 	int	totalWidth, totalHeight;
@@ -589,14 +589,14 @@ public:
 	int YPosition( float y, int height );
 
 	void MessageAdd( const char *pName, float time );
-	void MessageAdd(client_textmessage_t * newMessage );
-	void MessageDrawScan( client_textmessage_t *pMessage, float time );
+	void MessageAdd(const client_textmessage_t & newMessage );
+	void MessageDrawScan(std::shared_ptr<client_textmessage_t> pMessage, float time );
 	void MessageScanStart( void );
 	void MessageScanNextChar( void );
 	void Reset( void );
 
 private:
-	client_textmessage_t		*m_pMessages[maxHUDMessages];
+	std::shared_ptr<client_textmessage_t>m_pMessages[maxHUDMessages];
 	float						m_startTime[maxHUDMessages];
 	message_parms_t				m_parms;
 	float						m_gameTitleTime;

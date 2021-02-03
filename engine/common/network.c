@@ -1232,7 +1232,7 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 
 	// sequenced packets are shown in netchan, so just show oob
 	if( net_showpackets->integer && *(int *)data == -1 )
-		MsgDev( D_INFO, "send packet %4u\n", length );
+		MsgDev( D_INFO, "send packet %4u\n", (unsigned)length );
 
 	if( to.type == NA_LOOPBACK )
 	{
@@ -2068,7 +2068,7 @@ void HTTP_Run( void )
 	if( curfile->state < HTTP_REQUEST ) // Request not formatted
 	{
 		http.query_length = Q_snprintf( http.buf, BUFSIZ,
-			"GET %s%s HTTP/1.0\r\n"
+			"GET %s%s HTTP/1.1\r\n"
 			"Host: %s\r\n"
 			"User-Agent: %s\r\n\r\n", server->path,
 			curfile->path, server->host, http_useragent->string );

@@ -288,7 +288,7 @@ public:
 #else
 	static inline void EnableTextInput( int enable ) { }
 #endif
-	static int UtfProcessChar( int ch );
+	static int UtfProcessChar(int ch) { return ch; }
 	static int UtfMoveLeft( const char *str, int pos );
 	static int UtfMoveRight( const char *str, int pos, int length );
 };
