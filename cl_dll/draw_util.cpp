@@ -33,10 +33,14 @@ version.
 #include "triangleapi.h"
 #include <string.h>
 
+#include "unicode_strtools.h"
+
 float DrawUtils::color[3];
 
 #define IsColorString( p )	( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
+#define IsColorStringW( p )	( p && *( p ) == L'^' && *(( p ) + 1) && *(( p ) + 1) >= L'0' && *(( p ) + 1 ) <= L'9' )
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
+#define ColorIndexW( c )	((( c ) - L'0' ) & 7 )
 
 // console color typeing
 static byte g_color_table[][4] =
@@ -57,36 +61,37 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 	if (!str)
 		return 1;
 
-	char *szIt = (char *)str;
+	wchar_t wstr[1024];
+	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
+	
+	wchar_t* szIt = wstr;
+	
 	// draw the string until we hit the null character or a newline character
-	for ( ; *szIt != 0 && *szIt != '\n'; szIt++ )
+	for ( ; *szIt != 0 && *szIt != L'\n'; szIt++ )
 	{
-		int next = xpos + gHUD.GetCharWidth((unsigned char)*szIt); // variable-width fonts look cool
-		if ( next > iMaxX )
-			return xpos;
-
 		if ( *szIt == '\\' && *( szIt + 1 ) != '\n' && *( szIt + 1 ) != 0 )
 		{
 			// an escape character
 
 			switch ( *( ++szIt ) )
 			{
-			case 'y':
+			case L'y':
 				UnpackRGB( r, g, b, RGB_YELLOWISH );
 				continue;
-			case 'w':
+			case L'w':
 				r = g = b = 255;
 				continue;
-			case 'd':
+			case L'd':
 				continue;
-			case 'R':
+			case L'R':
 				//if( drawing ) return xpos;
 				//return DrawHudStringReverse( iMaxX, ypos, first_xpos, szIt, r, g, b, true ); // set 'drawing' to true, to stop when '\R' is catched
-				xpos = iMaxX - gHUD.GetCharWidth('M') * 10;
-				++szIt;
+				//xpos = iMaxX - gHUD.GetCharWidth('M') * 10;
+				//++szIt;
+				continue;
 			}
 		}
-		else if( IsColorString( szIt ) )
+		else if( IsColorStringW( szIt ) )
 		{
 			szIt++;
 			if( gHUD.hud_colored->value )
@@ -105,53 +110,54 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 }
 
 
-int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *szString, int r, int g, int b, float scale, bool drawing )
+int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char * str, int r, int g, int b, float scale, bool drawing )
 {
-	// iterate throug the string in reverse
-	for ( signed int i = strlen( szString ); i >= 0; i-- )
-	{
-		int next = xpos - gHUD.GetCharWidth((unsigned char)szString[i]); // variable-width fonts look cool
-		if ( next < iMinX )
-			return xpos;
-		xpos = next;
+	wchar_t wstr[1024];
+	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
 
+	if (!wstr[0])
+		return 0;
+	
+	// iterate throug the string in reverse
+	for ( signed int i = wcslen(wstr); i > 0; i-- )
+	{
 		if ( i > 1 )
 		{
-			if( szString[i - 1] == '\\' )
+			if(wstr[i - 1] == L'\\' )
 			{
 				// an escape character
 
-				switch ( szString[i] )
+				switch (wstr[i] )
 				{
-				case 'y':
+				case L'y':
 					UnpackRGB( r, g, b, RGB_YELLOWISH );
 					break;
-				case 'w':
+				case L'w':
 					r = g = b = 255;
 					break;
-				case 'R':
+				case L'R':
 				//if( drawing ) return xpos;
 				//else return DrawHudString( iMinX, ypos, first_xpos, &szString[i - 1], r, g, b, true ); // set 'drawing' to true, to stop when '\R' is catched
 				//xpos = iMinX + gHUD.m_scrinfo.charWidths['M'] * i ;
-				case 'd':
+				case L'd':
 					break;
 				}
 				continue;
 			}
-			else if( IsColorString( szString - 1 ) )
+			else if( IsColorStringW( wstr - 1 ) )
 			{
 				if( gHUD.hud_colored->value )
 				{
-					r = g_color_table[ColorIndex( *szString )][0];
-					g = g_color_table[ColorIndex( *szString )][1];
-					b = g_color_table[ColorIndex( *szString )][2];
+					r = g_color_table[ColorIndexW( *wstr )][0];
+					g = g_color_table[ColorIndexW( *wstr )][1];
+					b = g_color_table[ColorIndexW( *wstr )][2];
 				}
 				i--;
 				continue;
 			}
 		}
 
-		TextMessageDrawChar( xpos, ypos, szString[i], r, g, b, scale );
+		xpos -= TextMessageDrawChar( xpos, ypos, wstr[i - 1], r, g, b, scale );
 	}
 
 	return xpos;
