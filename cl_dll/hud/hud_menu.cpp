@@ -26,6 +26,9 @@
 #include "draw_util.h"
 
 #include "gamemode/mods_const.h"
+#ifdef XASH_IMGUI
+#include "imgui_cl/imgui_cl_menu.h"
+#endif
 
 //#include "vgui_TeamFortressViewport.h"
 
@@ -99,6 +102,7 @@ int CHudMenu :: Draw( float flTime )
 
 #ifdef XASH_IMGUI
 	// we have imgui one
+	cl::ImGuiCL_Menu_OnGUI();
 	return 1;
 #endif
 	

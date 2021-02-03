@@ -17,7 +17,6 @@ GNU General Public License for more details.
 #include "hud.h"
 #include "cl_util.h"
 #include "cl_dll.h"
-#include "imgui_cl_buy.h"
 #include "imgui_cl_menu.h"
 
 namespace cl {
@@ -25,8 +24,6 @@ namespace cl {
 extern "C"
 void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 {
-
-    static CImGuiBuyMenu buy;
     ImGui::SetCurrentContext(context);
 	/*
 	static bool show_demo_window = false;
@@ -59,9 +56,6 @@ void DLLEXPORT HUD_OnGUI( struct ImGuiContext *context )
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
 	 */
-
-    buy.OnGUI();
-	ImGuiCL_Menu_OnGUI();
 }
 
 }
