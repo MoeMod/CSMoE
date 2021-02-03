@@ -54,6 +54,8 @@ float g_ImGUI_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
 
+bool g_bShowDemoWindow = false;
+
 template<typename T> static inline T ImLerp(T a, T b, float t) { return (T)(a + (b - a) * t); }
 static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t) { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
 static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t) { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
@@ -338,6 +340,11 @@ void ImGui_ImplGL_ReloadFonts()
 	search_t		*t;
 	int		i;
 
+	float size_pixels = 14 * 2; // 14 * 2
+
+	if (size_pixels <= 0.0f)
+		return;
+	
 	t = FS_Search( "resource/font/*.ttf", true, false );
 	if (t)
 	{
@@ -349,7 +356,7 @@ void ImGui_ImplGL_ReloadFonts()
 			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
 			memcpy(new_ptr.get(), file, length);
 			Mem_Free(std::exchange(file, nullptr));
-			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		Mem_Free(t);
 	}
@@ -359,7 +366,7 @@ void ImGui_ImplGL_ReloadFonts()
 		char buffer[MAX_PATH];
 		GetSystemDirectoryA(buffer, sizeof(buffer));
 		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
-		auto font = io.Fonts->AddFontFromFileTTF(buffer, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		auto font = io.Fonts->AddFontFromFileTTF(buffer, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
 #endif
 	}
 
@@ -416,6 +423,19 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
 }
 #endif
 
+void Cmd_ImGui_f()
+{
+	if(Cmd_Argc() < 2)
+	{
+		Con_Print("Usage : imgui demo\n");
+		return;
+	}
+	if(!strcmp(Cmd_Argv(1), "demo"))
+	{
+		g_bShowDemoWindow = true;
+	}
+}
+
 qboolean ImGui_ImplGL_Init(void)
 {
     g_EngineContext = ImGui::CreateContext();
@@ -465,6 +485,8 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+
+	Cmd_AddCommand("imgui", Cmd_ImGui_f, "imgui demo");
 
 	return true;
 }
@@ -640,6 +662,8 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_Console_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	if(g_bShowDemoWindow)
+		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }
 
 void ImGui_ImplGL_OnGUI(void)

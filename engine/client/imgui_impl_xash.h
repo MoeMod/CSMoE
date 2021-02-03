@@ -27,6 +27,7 @@ void ImGui_ImplGL_Shutdown(void);
 void ImGui_ImplGL_NewFrame(void);
 void ImGui_ImplGL_Render(void);
 void ImGui_ImplGL_OnGUI(void);
+void ImGui_ImplGL_ReloadFonts(void);
 
 // Use if you want to reset your rendering device without losing ImGui state.
 void ImGui_ImplGL_InvalidateDeviceObjects(void);

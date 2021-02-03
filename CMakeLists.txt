@@ -126,7 +126,7 @@ if(XASH_IMGUI)
 		target_link_libraries(imgui INTERFACE imgui::imgui)
 	else()
 		set(IMGUI_SRC
-	#			imgui/imgui_demo.cpp
+				imgui/imgui_demo.cpp
 				imgui/imgui_draw.cpp
 				imgui/imgui_widgets.cpp
 				imgui/imgui.cpp)

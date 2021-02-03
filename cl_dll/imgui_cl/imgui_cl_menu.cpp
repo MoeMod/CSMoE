@@ -20,10 +20,10 @@ namespace cl {
 			std::string_view menu_sv = g_szMenuString;
 			
 			auto nlc = std::count(menu_sv.begin(), menu_sv.end(), '\n');
-			int y = ScreenHeight - 40; // make sure it is above the say text
+			int y = ScreenHeight / 2 - 40; // make sure it is above the say text
 			int x = 20;
 
-			ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_Always, ImVec2(0, 0.5));
+			ImGui::SetNextWindowPos(ImGuiUtils::GetScaledSize(ImVec2(x, y)), ImGuiCond_Always, ImVec2(0, 0.5));
 			ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 255, 255, 255).Value);
 			ImGui::PushStyleColor(ImGuiCol_Border, ImColor(255, 255, 255, 0).Value);
 			ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImColor(255, 255, 255, 0).Value);
@@ -103,23 +103,17 @@ namespace cl {
 						new_line = true;
 						sv = sv.substr(seg + 1);
 					}
-					else if (sv[seg] == '\r')
-					{
-						// ignored
-						new_line = true;
-						sv = sv.substr(seg + 1);
-					}
 				}
 				if (!sv.empty())
 				{
 					new_line = true;
 					ImGui::TextUnformatted(sv.data(), sv.data() + sv.length());
 				}
-			}
-			ImGui::PopStyleVar(1);
-			ImGui::PopStyleColor(7);
+				ImGui::PopStyleVar(1);
+				ImGui::PopStyleColor(7);
 
-			ImGui::End();
+				ImGui::End();
+			}
 		}
 	}
 

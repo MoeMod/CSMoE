@@ -3,12 +3,17 @@
 #include "imgui_utils.h"
 #include "Utils.h"
 
+#include "ConnectProgress.h"
+#include "OptionsDialog.h"
+
 int UI_VidInit(void)
 {
 	return 0;
 }
 void UI_Init(void)
 {
+	ui::ConnectProgress_Init();
+	ui::OptionsDialog_Init();
 
 }
 void UI_Shutdown(void)
@@ -100,20 +105,44 @@ void UI_OnGUI(struct ImGuiContext* context)
 			{
 				EngFuncs::ClientCmd(false, "disconnect\n");
 			}
+			if (!CL_IsActive() && ImGui::Button("连接柑橘CitruS测试服务器", ImVec2(-1, 0)))
+			{
+				EngFuncs::ClientCmd(false, "connect z4.moemod.com:27015\n");
+			}
 			if (ImGui::Button("打开控制台", ImVec2(-1, 0)))
 			{
 				EngFuncs::KEY_SetDest(KEY_CONSOLE);
 			}
+			if (ImGui::Button("游戏设置", ImVec2(-1, 0)))
+			{
+				ui::OptionsDialog_SetVisible(true);
+			}
 			if (ImGui::Button("退出游戏", ImVec2(-1, 0)))
 			{
-				EngFuncs::ClientCmd(false, "quit\n");
+				ImGui::OpenPopup("Quit?");
 			}
+
+			if (ImGui::BeginPopupModal("Quit?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("你确定要退出游戏吗？\n\n");
+				ImGui::Separator();
+
+				if (ImGui::Button("退出", ImVec2(120, 0))) { EngFuncs::ClientCmd(false, "quit\n"); }
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("取消", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+			
 			ImGui::End();
 		}
 		if(!open)
 		{
 			EngFuncs::KEY_SetDest(KEY_GAME);
 		}
+
+		ui::ConnectProgress_OnGUI();
+		ui::OptionsDialog_OnGui();
 	}
 }
 extern "C" EXPORT void AddTouchButtonToList(const char* name, const char* texture, const char* command, unsigned char* color, int flags)
