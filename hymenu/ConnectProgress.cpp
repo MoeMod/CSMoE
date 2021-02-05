@@ -127,7 +127,31 @@ namespace ui
 
 			ImGui::OpenPopup(sTitleString);
 			ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-			if (ImGui::BeginPopupModal(sTitleString, NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+			ImGui::SetNextWindowSize(ImVec2(512, -1), ImGuiCond_Always);
+			if (ImGui::BeginPopupModal(sTitleString, NULL)) {
+
+				const float orig_radius = 128.f;
+				static float angle = 0.0f;
+				float radius = orig_radius;
+				float time = ImGui::GetTime();
+				float k_time = 2;
+				static float quick_time;
+				if(m_iState != STATE_NONE)
+				{
+					quick_time = time * k_time;
+					angle += ImGui::GetIO().DeltaTime * 300.0f;
+					angle = fmodf(angle, 360.0f);
+				}
+				if ((int)quick_time % 3)
+				{
+					radius = orig_radius * 0.75;
+				}
+				else
+				{
+					radius = orig_radius * 0.75 - sin(quick_time * M_PI) * orig_radius * 0.25;
+				}
+				
+				ImGuiUtils::CitrusLogo("cirtus logo", ImGuiUtils::GetScaledSize(ImVec2(-1, orig_radius)), ImGuiUtils::GetScaledValue(radius), angle);
 
 				ImGui::TextUnformatted(sDownloadString);
 				ImGui::TextUnformatted(sCommonString);

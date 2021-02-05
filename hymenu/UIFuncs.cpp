@@ -21,6 +21,10 @@ void UI_Shutdown(void)
 {
 
 }
+static void DrawBackground()
+{
+	EngFuncs::FillRGBA(0, 0, ScreenWidth, ScreenHeight, 255, 255, 255, 255);
+}
 void UI_UpdateMenu(float flTime)
 {
 	if (CL_IsInMenu())
@@ -36,11 +40,12 @@ void UI_UpdateMenu(float flTime)
 		else
 		{
 			ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
-			EngFuncs::FillRGBA(0, 0, ScreenWidth, ScreenHeight, 255, 255, 255, 255);
+			DrawBackground();
 			x = ImGui::Begin("柑橘CitruS", NULL, ImGuiWindowFlags_NoResize);
 		}
 		if (x)
 		{
+			ImGuiUtils::CitrusLogo("cirtus logo", ImGuiUtils::GetScaledSize(ImVec2(-1, 128)), ImGuiUtils::GetScaledValue(128 * 0.75));
 			if (CL_IsActive() && ImGui::Button("返回游戏", ImVec2(-1, 0)))
 			{
 				open = false;
