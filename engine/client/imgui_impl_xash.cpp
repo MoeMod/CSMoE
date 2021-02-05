@@ -368,6 +368,9 @@ void ImGui_ImplGL_ReloadFonts()
 		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
 		auto font = io.Fonts->AddFontFromFileTTF(buffer, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
 #endif
+#ifdef TARGET_OS_MAC
+		auto font = io.Fonts->AddFontFromFileTTF("/System/Library/Fonts/PingFang.ttc", size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
+#endif
 	}
 
 }

@@ -227,7 +227,7 @@ void CHud :: Init( void )
 	m_iNoConsolePrint = 0;
 	m_szServerName[0] = 0;
 
-	Localize_Init();
+	//Localize_Init();
 
 	// fullscreen overlays
 	m_SniperScope.Init();
