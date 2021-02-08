@@ -6,5 +6,5 @@ add_library (hymenu STATIC
 	udll_int.cpp
 	Utils.cpp
 	UIFuncs.cpp
- "ConnectProgress.cpp" "ConnectProgress.h" "OptionsDialog.cpp" "OptionsDialog.h")
+ "ConnectProgress.cpp" "ConnectProgress.h" "OptionsDialog.cpp" "OptionsDialog.h" "SimpleLogin.cpp" "SimpleLogin.h")
 target_link_libraries(hymenu imgui imgui_ext)

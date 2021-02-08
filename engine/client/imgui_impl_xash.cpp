@@ -666,13 +666,26 @@ void Engine_OnGUI(struct ImGuiContext *context)
 		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }
 
-void ImGui_ImplGL_OnGUI(void)
+void ImGui_ImplGL_Client_OnGUI(void)
 {
-	if(clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
+	auto drawlist = ImGui::GetBackgroundDrawList();
+	drawlist->AddDrawCmd();
+	if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
+}
+
+void ImGui_ImplGL_Menu_OnGUI(void)
+{
+	auto drawlist = ImGui::GetBackgroundDrawList();
+	drawlist->AddDrawCmd();
 	if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
 		menu.dllFuncs.pfnOnGUI(g_EngineContext);
+}
 
+void ImGui_ImplGL_Engine_OnGUI(void)
+{
+	auto drawlist = ImGui::GetBackgroundDrawList();
+	drawlist->AddDrawCmd();
 	Engine_OnGUI(g_EngineContext);
 }
 

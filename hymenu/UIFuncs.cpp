@@ -5,6 +5,7 @@
 
 #include "ConnectProgress.h"
 #include "OptionsDialog.h"
+#include "SimpleLogin.h"
 
 extern "C" qboolean CL_IsInMenu(void);
 
@@ -16,6 +17,7 @@ void UI_Init(void)
 {
 	ui::ConnectProgress_Init();
 	ui::OptionsDialog_Init();
+	ui::SimpleLogin_Init();
 }
 void UI_Shutdown(void)
 {
@@ -29,13 +31,12 @@ void UI_UpdateMenu(float flTime)
 {
 	if (CL_IsInMenu())
 	{
-		bool open = true;
 		bool x = false;
 		if (CL_IsActive())
 		{
 			ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
 			EngFuncs::FillRGBA(0, 0, ScreenWidth, ScreenHeight, 0, 0, 0, 50);
-			x = ImGui::Begin("柑橘CitruS", &open, ImGuiWindowFlags_NoResize);
+			x = ImGui::Begin("柑橘CitruS", NULL, ImGuiWindowFlags_NoResize);
 		}
 		else
 		{
@@ -45,10 +46,11 @@ void UI_UpdateMenu(float flTime)
 		}
 		if (x)
 		{
-			ImGuiUtils::CitrusLogo("cirtus logo", ImGuiUtils::GetScaledSize(ImVec2(-1, 128)), ImGuiUtils::GetScaledValue(128 * 0.75));
+			if (!CL_IsActive())
+				ImGuiUtils::CitrusLogo("cirtus logo", ImGuiUtils::GetScaledSize(ImVec2(-1, 128)), ImGuiUtils::GetScaledValue(128 * 0.75));
 			if (CL_IsActive() && ImGui::Button("返回游戏", ImVec2(-1, 0)))
 			{
-				open = false;
+				EngFuncs::KEY_SetDest(KEY_GAME);
 			}
 			if (CL_IsActive() && ImGui::Button("断开连接", ImVec2(-1, 0)))
 			{
@@ -76,22 +78,19 @@ void UI_UpdateMenu(float flTime)
 				ImGui::Text("你确定要退出游戏吗？\n\n");
 				ImGui::Separator();
 
-				if (ImGui::Button("退出", ImVec2(120, 0))) { EngFuncs::ClientCmd(false, "quit\n"); }
+				if (ImGui::Button("退出", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { EngFuncs::ClientCmd(false, "quit\n"); }
 				ImGui::SetItemDefaultFocus();
 				ImGui::SameLine();
-				if (ImGui::Button("取消", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (ImGui::Button("取消", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
 				ImGui::EndPopup();
 			}
 
 			ImGui::End();
 		}
-		if (!open)
-		{
-			EngFuncs::KEY_SetDest(KEY_GAME);
-		}
 
 		ui::ConnectProgress_OnGUI();
 		ui::OptionsDialog_OnGui();
+		ui::SimpleLogin_OnGui();
 	}
 }
 void UI_KeyEvent(int key, int down)
