@@ -113,6 +113,11 @@ namespace ui {
                 if (ImGui::BeginTabItem("鼠标"))
                 {
                     ImGui::TextUnformatted("鼠标 Page");
+                    float sensitivity_value = EngFuncs::GetCvarFloat("sensitivity");
+                    if (ImGui::SliderFloat("鼠标灵敏度", &sensitivity_value, 0.0f, 20.0f))
+                    {
+                        EngFuncs::CvarSetValue("sensitivity", sensitivity_value);
+                    }
                     // TODO
                     ImGui::EndTabItem();
                 }
@@ -120,13 +125,36 @@ namespace ui {
                 if (ImGui::BeginTabItem("音频"))
                 {
                     ImGui::TextUnformatted("音频 Page");
+                    float volume_value = EngFuncs::GetCvarFloat("volume");
+                    if (ImGui::SliderFloat("声音效果音量", &volume_value, 0.0f, 1.0f))
+                    {
+                        EngFuncs::CvarSetValue("volume", volume_value);
+                    }
+
+                    float MP3Volume_value = EngFuncs::GetCvarFloat("MP3Volume");
+                    if (ImGui::SliderFloat("MP3音量", &MP3Volume_value, 0.0f, 1.0f))
+                    {
+                        EngFuncs::CvarSetValue("MP3Volume", MP3Volume_value);
+                    }
+
                     // TODO
                     ImGui::EndTabItem();
                 }
 
                 if (ImGui::BeginTabItem("视频"))
                 {
-                    ImGui::TextUnformatted("视频 Page");
+                    ImGui::TextUnformatted("视频 Page");   
+                    float gamma_value = EngFuncs::GetCvarFloat("gamma");               
+                    if (ImGui::SliderFloat("亮度", &gamma_value, 1.8f, 3.0f))
+                    {
+                        EngFuncs::CvarSetValue("gamma", gamma_value);
+                    }
+
+                    float brightness_value = EngFuncs::GetCvarFloat("brightness");
+                    if (ImGui::SliderFloat("灰度（需要重启游戏）", &brightness_value, 0.0f, 2.0f))
+                    {
+                        EngFuncs::CvarSetValue("brightness", brightness_value);
+                    }
                     // TODO
                     ImGui::EndTabItem();
                 }
