@@ -244,6 +244,11 @@ Con_MessageMode_f
 */
 void Con_MessageMode_f( void )
 {
+#ifdef XASH_IMGUI
+	int UI_HandleMessageMode_f(void);
+	if (UI_HandleMessageMode_f())
+		return;
+#endif
 	if( Cmd_Argc() == 2 )
 		Q_strncpy( con.chat_cmd, Cmd_Argv( 1 ), sizeof( con.chat_cmd ));
 	else Q_strncpy( con.chat_cmd, "say", sizeof( con.chat_cmd ));

@@ -808,7 +808,9 @@ void Key_SetKeyDest( int key_dest )
 		break;
 	case key_console:
 #ifdef XASH_IMGUI
+		Key_EnableTextInput(false, false);
 		ImGui_ToggleConsole(true);
+		cls.key_dest = key_menu;
 #else
 		Key_EnableTextInput( true, false );
 		cls.key_dest = key_console;
