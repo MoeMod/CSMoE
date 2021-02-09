@@ -95,53 +95,29 @@ public:
 
 	static inline int DrawConsoleString(int x, int y, const char *string)
 	{
-		if ( gHUD.hud_textmode->value )
-		{
-			int ret  = DrawHudString( x, y, 9999, (char *)string, color[0] * 255, color[1] * 255, color[2] * 255 );
-			color[0] = color[1] = color[2] = 1.0f;
-			return ret;
-		}
-		else
-			return gEngfuncs.pfnDrawConsoleString( x, y, (char *)string );
+		return gEngfuncs.pfnDrawConsoleString(x, y, (char*)string);
 	}
 
 	static inline void SetConsoleTextColor( float r, float g, float b )
 	{
-		if ( gHUD.hud_textmode->value )
-			color[0] = r, color[1] = g, color[2] = b;
-		else
-			gEngfuncs.pfnDrawSetTextColor( r, g, b );
+		gEngfuncs.pfnDrawSetTextColor(r, g, b);
 	}
 
 	static inline void SetConsoleTextColor( unsigned char r, unsigned char g, unsigned char b )
 	{
-		if ( gHUD.hud_textmode->value )
-			color[0] = r / 255.0f, color[1] = g / 255.0f, color[2] = b / 255.0f;
-		else
-			gEngfuncs.pfnDrawSetTextColor( r / 255.0f, g / 255.0f, b / 255.0f );
+		gEngfuncs.pfnDrawSetTextColor(r / 255.0f, g / 255.0f, b / 255.0f);
 	}
 
 	static inline int ConsoleStringLen(  const char *szIt )
 	{
-		if ( !g_iXash || gHUD.hud_textmode->value )
-		{
-			return HudStringLen( (char *)szIt );
-		}
-		else
-		{
-			int _width;
-
-			gEngfuncs.pfnDrawConsoleStringLen( szIt, &_width, NULL );
-			return _width;
-		}
+		int _width;
+		gEngfuncs.pfnDrawConsoleStringLen(szIt, &_width, NULL);
+		return _width;
 	}
 
 	static inline void ConsoleStringSize( const char *szIt, int *width, int *height )
 	{
-		if (!g_iXash || gHUD.hud_textmode->value )
-			*height = 13, *width = HudStringLen( (char *)szIt );
-		else
-			gEngfuncs.pfnDrawConsoleStringLen( szIt, width, height );
+		gEngfuncs.pfnDrawConsoleStringLen(szIt, width, height);
 	}
 
 	static inline int TextMessageDrawChar( int x, int y, int number, int r, int g, int b, float scale = 0.0f )
@@ -191,10 +167,6 @@ public:
 
 	static void Draw2DQuad( float x1, float y1, float x2, float y2 );
 	static void Draw2DQuadScaled(float x1, float y1, float x2, float y2) { return Draw2DQuad(x1 * gHUD.m_flScale, y1 * gHUD.m_flScale, x2 * gHUD.m_flScale, y2 * gHUD.m_flScale); }
-
-private:
-	// console string color
-	static float color[3];
 };
 
 #endif // DRAW_UTIL_H

@@ -35,8 +35,6 @@ version.
 
 #include "unicode_strtools.h"
 
-float DrawUtils::color[3];
-
 #define IsColorString( p )	( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 #define IsColorStringW( p )	( p && *( p ) == L'^' && *(( p ) + 1) && *(( p ) + 1) >= L'0' && *(( p ) + 1 ) <= L'9' )
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
