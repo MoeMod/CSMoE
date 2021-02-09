@@ -368,7 +368,7 @@ float V_CalcRoll (vec3_t angles, vec3_t velocity, float rollangle, float rollspe
 	}
 	return side * sign;
 }
-#if 0
+
 typedef struct pitchdrift_s
 {
 	float		pitchvel;
@@ -467,7 +467,7 @@ void V_DriftPitch ( struct ref_params_s *pparams )
 		pparams->cl_viewangles[PITCH] -= move;
 	}
 }
-#endif
+
 /*
 ==============================================================================
 						VIEW RENDERING
