@@ -192,14 +192,16 @@ CSimpleMap sayTextFmt[] =
 int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
-	char szBuf[3][64] {  };
+	char szBuf[6][256] {  };
 
 	int client_index = reader.ReadByte();		// the client who spoke the message
 	strncpy( szBuf[0], reader.ReadString(), sizeof(szBuf[0]));
 	strncpy( szBuf[1], reader.ReadString(), sizeof(szBuf[1]));
 	strncpy( szBuf[2], reader.ReadString(), sizeof(szBuf[2]));
+	strncpy( szBuf[3], reader.ReadString(), sizeof(szBuf[3]));
+	strncpy( szBuf[4], reader.ReadString(), sizeof(szBuf[4]));
 
-	const char *fmt =  "\x02%s";
+	const char *fmt = szBuf[0];
 	int i = 0;
 	for( i = CHAT_CT; i < CHAT_NAME_CHANGE; i++ )
 	{
@@ -210,6 +212,13 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 		}
 	}
 
+	if (client_index > 0 && szBuf[1][0] == '\0')
+	{
+		GetPlayerInfo(client_index, &g_PlayerInfoList[client_index]);
+		const char* pName = g_PlayerInfoList[client_index].name;
+		if(pName && pName[0])
+			strncpy(szBuf[1], pName, sizeof(szBuf[1]));
+	}
 
 #if 1
 	// If text is sent from dead player or spectator
@@ -227,20 +236,7 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 #endif
 
 	char dst[256];
-	if( i == CHAT_NAME_CHANGE )
-	{
-		snprintf( dst, sizeof( dst ), fmt, szBuf[1], szBuf[2]);
-	}
-	else if( szBuf[1][0] == '\0' && szBuf[2][0] == '\0' )
-	{
-		snprintf( dst, sizeof( dst ), fmt, szBuf[0] );
-	}
-	else
-	{
-		GetPlayerInfo( client_index, &g_PlayerInfoList[client_index] );
-		const char *pName = g_PlayerInfoList[client_index].name;
-		snprintf( dst, sizeof( dst ), fmt, pName, szBuf[2]);
-	}
+	snprintf(dst, sizeof(dst), fmt, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
 	SayTextPrint( dst, strlen(dst),  client_index );
 	
 	return 1;

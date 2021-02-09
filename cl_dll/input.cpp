@@ -520,12 +520,10 @@ void IN_ScoreUp(void)
 void IN_MLookUp (void)
 {
 	KeyUp( &in_mlook );
-#if 0
 	if ( !( in_mlook.state & 1 ) && lookspring->value )
 	{
 		V_StartPitchDrift();
 	}
-#endif
 }
 
 /*
@@ -613,7 +611,7 @@ void CL_AdjustAngles ( float frametime, float *viewangles )
 	}
 	if (in_klook.state & 1)
 	{
-		//V_StopPitchDrift ();
+		V_StopPitchDrift ();
 		viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_forward);
 		viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_back);
 	}
@@ -623,10 +621,10 @@ void CL_AdjustAngles ( float frametime, float *viewangles )
 	
 	viewangles[PITCH] -= speed*cl_pitchspeed->value * up;
 	viewangles[PITCH] += speed*cl_pitchspeed->value * down;
-#if 0
+
 	if (up || down)
 		V_StopPitchDrift ();
-#endif
+
 	if (viewangles[PITCH] > cl_pitchdown->value)
 		viewangles[PITCH] = cl_pitchdown->value;
 	if (viewangles[PITCH] < -cl_pitchup->value)
@@ -691,13 +689,8 @@ void DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int activ
 			}
 		}	
 
-		// adjust for speed key
-		if ( in_speed.state & 1 )
-		{
-			cmd->forwardmove *= cl_movespeedkey->value;
-			cmd->sidemove *= cl_movespeedkey->value;
-			cmd->upmove *= cl_movespeedkey->value;
-		}
+		// Allow mice and other controllers to add their inputs
+		IN_Move(frametime, cmd);
 
 		// clip to maxspeed
 		spd = gEngfuncs.GetClientMaxspeed();
@@ -715,8 +708,13 @@ void DLLEXPORT CL_CreateMove ( float frametime, struct usercmd_s *cmd, int activ
 			}
 		}
 
-		// Allow mice and other controllers to add their inputs
-		IN_Move ( frametime, cmd );
+		// adjust for speed key
+		if (in_speed.state & 1)
+		{
+			cmd->forwardmove *= cl_movespeedkey->value;
+			cmd->sidemove *= cl_movespeedkey->value;
+			cmd->upmove *= cl_movespeedkey->value;
+		}
 	}
 
 	cmd->impulse = in_impulse;
@@ -968,7 +966,7 @@ void InitInput (void)
 	cl_forwardspeed		= gEngfuncs.pfnRegisterVariable ( "cl_forwardspeed", "400", FCVAR_ARCHIVE );
 	cl_backspeed		= gEngfuncs.pfnRegisterVariable ( "cl_backspeed", "400", FCVAR_ARCHIVE );
 	cl_sidespeed		= gEngfuncs.pfnRegisterVariable ( "cl_sidespeed", "400", 0 );
-	cl_movespeedkey		= gEngfuncs.pfnRegisterVariable ( "cl_movespeedkey", "0.3", 0 );
+	cl_movespeedkey		= gEngfuncs.pfnRegisterVariable ( "cl_movespeedkey", "0.52", 0 );
 	cl_pitchup			= gEngfuncs.pfnRegisterVariable ( "cl_pitchup", "89", 0 );
 	cl_pitchdown		= gEngfuncs.pfnRegisterVariable ( "cl_pitchdown", "89", 0 );
 

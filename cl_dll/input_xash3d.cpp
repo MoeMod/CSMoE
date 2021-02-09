@@ -5,6 +5,7 @@
 #include "keydefs.h"
 #include "input.h"
 #include "in_defs.h"
+#include "view.h"
 
 using namespace cl;
 
@@ -156,12 +157,10 @@ void IN_Move( float frametime, usercmd_t *cmd )
 	}
 	//if(ac_forwardmove || ac_sidemove)
 	//gEngfuncs.Con_Printf("Move: %f %f %f %f\n", ac_forwardmove, ac_sidemove, rel_pitch, rel_yaw);
-#if 0
 	if( in_mlook.state & 1 )
 	{
 		V_StopPitchDrift();
 	}
-#endif
 
 	if( CL_IsDead( ) )
 	{
@@ -215,11 +214,6 @@ void IN_Move( float frametime, usercmd_t *cmd )
 		IN_ToggleButtons( ac_forwardmove / ac_movecount, ac_sidemove / ac_movecount );
 		if( ac_forwardmove ) cmd->forwardmove  = ac_forwardmove * cl_forwardspeed->value / ac_movecount;
 		if( ac_sidemove ) cmd->sidemove  = ac_sidemove * cl_sidespeed->value / ac_movecount;
-		if (in_speed.state & 1)
-		{
-			cmd->forwardmove *= cl_movespeedkey->value;
-			cmd->sidemove *= cl_movespeedkey->value;
-		}
 	}
 	
 	ac_sidemove = ac_forwardmove = rel_pitch = rel_yaw = 0;
