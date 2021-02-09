@@ -245,7 +245,7 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 
 	static auto print_segment = [](int x, int y, std::string_view sv, ImColor col)
 	{
-		ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
 		auto shadow_col = ImColor(col.Value.x * 0.55, col.Value.y * 0.34, col.Value.z * 0.11, col.Value.w);
 		auto shadow_col2 = ImColor(0.f, 0.f, 0.f, col.Value.w);
 		drawlist->AddText(ImVec2(x - 1, y - 1), shadow_col, sv.data(), sv.data() + sv.length());
@@ -349,7 +349,7 @@ int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor)
 	ImColor col = RGBAtoImColor(setColor);
 	auto pos = ImVec2(x, y);
 	
-	ImDrawList* drawlist = ImGui::GetForegroundDrawList();
+	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
 	drawlist->PushTextureID(font->ContainerAtlas->TexID);
 	ImGuiIO& io = ImGui::GetIO();
 	font->RenderChar(drawlist, font->FontSize * io.FontGlobalScale, pos, col, ch);
