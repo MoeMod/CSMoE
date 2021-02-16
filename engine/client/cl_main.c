@@ -975,7 +975,7 @@ void CL_Connect_f( void )
 
 	NET_Config( true, !cl_nat->integer ); // allow remote
 
-	Msg( "server %s\n", server );
+	//Msg( "server %s\n", server );
 	CL_Disconnect();
 
 	HTTP_Clear_f();

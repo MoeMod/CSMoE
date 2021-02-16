@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "imgui_utils.h"
 #include "hud.h"
+#include "cl_util.h"
 
 #define MAX_MENU_STRING	512
 

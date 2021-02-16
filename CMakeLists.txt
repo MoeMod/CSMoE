@@ -5,9 +5,10 @@ cmake_minimum_required(VERSION  3.10.2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
-	option(XASH_PCH "Enable PCH support." ON)
+	option(XASH_PCH "Enable PCH support." OFF)
 endif()
 
 option(XASH_VCPKG "Enable VCPKG support." OFF)
