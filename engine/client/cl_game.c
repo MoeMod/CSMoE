@@ -1743,7 +1743,8 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 
 #ifdef XASH_IMGUI
 	clgame.ds.adjust_size = true;
-	rgba_t rgb = { r,g,b,255 };
+	int a = max(r, max(g, b));
+	rgba_t rgb = { r,g,b,a };
 	int w = ImGui_Console_DrawChar(x, y, number, rgb);
 	clgame.ds.adjust_size = false;
 	return w;

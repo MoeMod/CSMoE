@@ -117,7 +117,7 @@ if(NOT SDL2_LIBRARY_TEMP AND NOT WIN32)
 		OUTPUT_VARIABLE SDL2_LIBRARY_TEMP
 		OUTPUT_STRIP_TRAILING_WHITESPACE)
 	if(SDL2_CONFIG_RETVAL)
-		message(SEND_ERROR "sdl2-config --libs returned code ${SDL2_CONFIG_RETVAL}. Check that sdl2-config is working.")
+		message(WARNING "sdl2-config --libs returned code ${SDL2_CONFIG_RETVAL}. Check that sdl2-config is working.")
 	endif()
 endif()
 
