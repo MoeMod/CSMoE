@@ -996,6 +996,20 @@ void Win_SetDPIAwareness( void )
 		else MsgDev( D_NOTE, "SetDPIAwareness: Can't load user32.dll\n" );
 	}
 }
+
+float WIN_GetDpiForWindow(HWND hwnd)
+{
+    HMODULE hModule;
+    static UINT (__stdcall *pfnGetDpiForWindow)(HWND hwnd) = NULL;
+
+    if( ( hModule = LoadLibrary( "user32.dll" ) ) ) {
+        if (pfnGetDpiForWindow || (pfnGetDpiForWindow = ( UINT (__stdcall *)(HWND) )(GetProcAddress(hModule, "GetDpiForWindow")))) {
+            return pfnGetDpiForWindow(hwnd);
+        }
+    }
+    return 96.0f;
+}
+
 #endif
 
 /*
