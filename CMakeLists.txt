@@ -172,6 +172,10 @@ if(XASH_SDL)
 
 endif()
 
+add_library(qrcode INTERFACE)
+target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
+target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src)
+
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
 	ADD_SUBDIRECTORY(mainui_cpp)
