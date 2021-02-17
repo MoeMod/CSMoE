@@ -391,9 +391,10 @@ if(MINGW OR LINUX)
 	add_definitions(-DGDB_BREAK)
 elseif(WIN32 AND NOT XASH_64BIT)
 	add_definitions( -DDBGHELP ) # dbghelp crashhandler
-	if(MINGW)
-		target_link_libraries(${XASH_ENGINE} -luser32 -lkernel32 -lgdi32 -ldbghelp -lpsapi)
-	endif()
+endif()
+
+if(MINGW)
+	target_link_libraries(${XASH_ENGINE} -luser32 -lkernel32 -lgdi32 -ldbghelp -lpsapi -lcomctl32)
 endif()
 
 if(NOT WIN32 OR XASH_64BIT)

@@ -14,7 +14,6 @@
 				3D2DCBFA233209ED00ADBA6B /* Run Script */,
 			);
 			dependencies = (
-				3D4DAA2623BD00EB00F575C1 /* PBXTargetDependency */,
 			);
 			name = "cmake-gen-csmoe";
 			productName = "cmake-mkdir-csmoe";
@@ -53,10 +52,7 @@
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
 		3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D37322E229488AA00713C9C /* GLKit.framework */; };
 		3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DAA0223BCEC7C00F575C1 /* libxash.a */; };
-		3D4DAA0B23BCEE1900F575C1 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D441704231D1E07001A0696 /* libSDL2.a */; };
-		3D4DAA0E23BCEE3900F575C1 /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA9FB23BCEB0D00F575C1 /* libmenu.a */; };
 		3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
-		3D4DAA1923BCF1C100F575C1 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DAA1823BCF1C100F575C1 /* libserver.a */; };
 		3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */ = {isa = PBXBuildFile; fileRef = 3D5099DA23CB0F7900F75CEA /* CSMoE-Full */; };
 		3D5E35DC227768B10073D791 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35D6227768B10073D791 /* Icon.png */; };
 		3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35E1227768E40073D791 /* extras_cstrike.pak */; };
@@ -87,6 +83,9 @@
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
+		B663772525DD88AB00564BD5 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B663770325DD884E00564BD5 /* libSDL2.a */; };
+		B663772E25DD893900564BD5 /* libhymenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B663772D25DD893900564BD5 /* libhymenu.a */; };
+		B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B663773825DD89D000564BD5 /* CoreHaptics.framework */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
 		FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA34D31D8B5E5600915323 /* AVFoundation.framework */; };
 		FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96EDF0DEFC9DC00FAF19F /* QuartzCore.framework */; };
@@ -102,48 +101,6 @@
 			remoteGlobalIDString = 3D2DCBF6233209E300ADBA6B;
 			remoteInfo = "cmake-gen-csmoe";
 		};
-		3D441703231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FD6526630DE8FCCB002AD96B;
-			remoteInfo = "libSDL-iOS";
-		};
-		3D441705231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 52ED1E5C222889500061FCE0;
-			remoteInfo = "libSDL-iOS-dylib";
-		};
-		3D441707231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FAB598141BB5C1B100BE72C5;
-			remoteInfo = "libSDL-tvOS";
-		};
-		3D441709231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F3E3C7572241389A007D243C;
-			remoteInfo = "libSDL-tvOS-dylib";
-		};
-		3D44170B231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F3E3C65222406928007D243C;
-			remoteInfo = "libSDLmain-iOS";
-		};
-		3D44170D231D1E07001A0696 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F3E3C75F224138AE007D243C;
-			remoteInfo = "libSDLmain-tvOS";
-		};
 		3D4DAA1123BCEF0900F575C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -151,12 +108,96 @@
 			remoteGlobalIDString = 3D2DCBFD23320D5D00ADBA6B;
 			remoteInfo = "cmake-build-csmoe";
 		};
-		3D4DAA2523BD00EB00F575C1 /* PBXContainerItemProxy */ = {
+		B66376FA25DD884E00564BD5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FD6526620DE8FCCB002AD96B;
-			remoteInfo = "libSDL-iOS";
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BECDF66C0761BA81005FE872;
+			remoteInfo = Framework;
+		};
+		B66376FC25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88B5423E2437C00DCD162;
+			remoteInfo = "Framework-iOS";
+		};
+		B66376FE25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88D1523E24BED00DCD162;
+			remoteInfo = "Framework-tvOS";
+		};
+		B663770025DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BECDF6B30761BA81005FE872;
+			remoteInfo = "Static Library";
+		};
+		B663770225DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88E5423E24D3B00DCD162;
+			remoteInfo = "Static Library-iOS";
+		};
+		B663770425DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A769B23D23E259AE00872273;
+			remoteInfo = "Static Library-tvOS";
+		};
+		B663770625DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DB31407717554B71006C0E22;
+			remoteInfo = "Shared Library";
+		};
+		B663770825DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FCEB323E25AB700529352;
+			remoteInfo = "Shared Library-iOS";
+		};
+		B663770A25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FD06C23E25AC700529352;
+			remoteInfo = "Shared Library-tvOS";
+		};
+		B663770C25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BECDF6BE0761BA81005FE872;
+			remoteInfo = "Standard DMG";
+		};
+		B663770E25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB8C23E4C74400529352;
+			remoteInfo = hidapi;
+		};
+		B663771025DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB4923E399AC00529352;
+			remoteInfo = "hidapi-iOS";
+		};
+		B663771225DD884E00564BD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB6E23E3A2C900529352;
+			remoteInfo = "hidapi-tvOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -188,11 +229,8 @@
 		3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsSplitViewController.m; sourceTree = "<group>"; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3D3EE89D228F193400A695FE /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = Resources/maps; sourceTree = "<group>"; };
-		3D4416F7231D1E07001A0696 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = "../SDL2/Xcode-iOS/SDL/SDL.xcodeproj"; sourceTree = "<group>"; };
 		3D4DA95623BCE9C800F575C1 /* libclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclient.a; sourceTree = "<group>"; };
-		3D4DA9FB23BCEB0D00F575C1 /* libmenu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmenu.a; sourceTree = "<group>"; };
 		3D4DAA0223BCEC7C00F575C1 /* libxash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxash.a; sourceTree = "<group>"; };
-		3D4DAA1823BCF1C100F575C1 /* libserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libserver.a; sourceTree = "<group>"; };
 		3D5099DA23CB0F7900F75CEA /* CSMoE-Full */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "CSMoE-Full"; path = "../CSMoE-Full"; sourceTree = "<group>"; };
 		3D525D7722252AAB00DD9932 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		3D5E35D6227768B10073D791 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Icon.png; sourceTree = "<group>"; };
@@ -228,6 +266,9 @@
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		B66376EA25DD884E00564BD5 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = ../SDL2/Xcode/SDL/SDL.xcodeproj; sourceTree = "<group>"; };
+		B663772D25DD893900564BD5 /* libhymenu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libhymenu.a; sourceTree = "<group>"; };
+		B663773825DD89D000564BD5 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FAE0E9691BAF96A00098DFA4 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
@@ -242,13 +283,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */,
+				B663772525DD88AB00564BD5 /* libSDL2.a in Frameworks */,
 				B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */,
-				3D4DAA0B23BCEE1900F575C1 /* libSDL2.a in Frameworks */,
 				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
 				3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */,
 				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
-				3D4DAA0E23BCEE3900F575C1 /* libmenu.a in Frameworks */,
 				3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */,
 				3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */,
 				3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */,
@@ -257,13 +298,13 @@
 				FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */,
 				FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */,
 				FDF0D7AB0E12D53800247964 /* CoreAudio.framework in Frameworks */,
+				B663772E25DD893900564BD5 /* libhymenu.a in Frameworks */,
 				FDF0D7AC0E12D53800247964 /* AudioToolbox.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */,
 				FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */,
 				49C4D60720781DAB00855677 /* GameController.framework in Frameworks */,
-				3D4DAA1923BCF1C100F575C1 /* libserver.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,9 +323,9 @@
 			isa = PBXGroup;
 			children = (
 				3D4DA95923BCEA2F00F575C1 /* cmake-build */,
-				3D4416F7231D1E07001A0696 /* SDL.xcodeproj */,
 				3D5E35E922776A480073D791 /* Info.plist */,
 				FD77A0040E26BC0500F39101 /* CSMoE-iOS */,
+				B66376EA25DD884E00564BD5 /* SDL.xcodeproj */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -320,6 +361,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B663773825DD89D000564BD5 /* CoreHaptics.framework */,
 				B646751B253FE21E00F557B8 /* CoreBluetooth.framework */,
 				3D37322E229488AA00713C9C /* GLKit.framework */,
 				3D0FC1DB2278310100D9A961 /* libc++.tbd */,
@@ -400,28 +442,14 @@
 			path = controller;
 			sourceTree = "<group>";
 		};
-		3D4416F8231D1E07001A0696 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				3D441704231D1E07001A0696 /* libSDL2.a */,
-				3D441706231D1E07001A0696 /* libSDL2.dylib */,
-				3D441708231D1E07001A0696 /* libSDL2.a */,
-				3D44170A231D1E07001A0696 /* libSDL2.dylib */,
-				3D44170C231D1E07001A0696 /* libSDLmain.a */,
-				3D44170E231D1E07001A0696 /* libSDLmain.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		3D4DA95923BCEA2F00F575C1 /* cmake-build */ = {
 			isa = PBXGroup;
 			children = (
 				3DF2719523D4511C005D151E /* libimgui.a */,
 				3D8777BD24A26819006806BF /* libimgui_ext.a */,
 				3D4DA95A23BCEA4700F575C1 /* cl_dll */,
-				3D4DA95B23BCEAA000F575C1 /* dlls */,
 				3D4DA95E23BCEAFB00F575C1 /* engine */,
-				3D4DA9A223BCEB0C00F575C1 /* mainui_cpp */,
+				B663772C25DD892000564BD5 /* hymenu */,
 			);
 			path = "cmake-build";
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -434,14 +462,6 @@
 			path = cl_dll;
 			sourceTree = "<group>";
 		};
-		3D4DA95B23BCEAA000F575C1 /* dlls */ = {
-			isa = PBXGroup;
-			children = (
-				3D4DAA1823BCF1C100F575C1 /* libserver.a */,
-			);
-			path = dlls;
-			sourceTree = "<group>";
-		};
 		3D4DA95E23BCEAFB00F575C1 /* engine */ = {
 			isa = PBXGroup;
 			children = (
@@ -450,12 +470,32 @@
 			path = engine;
 			sourceTree = "<group>";
 		};
-		3D4DA9A223BCEB0C00F575C1 /* mainui_cpp */ = {
+		B66376EB25DD884E00564BD5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3D4DA9FB23BCEB0D00F575C1 /* libmenu.a */,
+				B66376FB25DD884E00564BD5 /* SDL2.framework */,
+				B66376FD25DD884E00564BD5 /* SDL2.framework */,
+				B66376FF25DD884E00564BD5 /* SDL2.framework */,
+				B663770125DD884E00564BD5 /* libSDL2.a */,
+				B663770325DD884E00564BD5 /* libSDL2.a */,
+				B663770525DD884E00564BD5 /* libSDL2.a */,
+				B663770725DD884E00564BD5 /* libSDL2.dylib */,
+				B663770925DD884E00564BD5 /* libSDL2.dylib */,
+				B663770B25DD884E00564BD5 /* libSDL2.dylib */,
+				B663770D25DD884E00564BD5 /* SDL2 */,
+				B663770F25DD884E00564BD5 /* hidapi.framework */,
+				B663771125DD884E00564BD5 /* hidapi.framework */,
+				B663771325DD884E00564BD5 /* hidapi.framework */,
 			);
-			path = mainui_cpp;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B663772C25DD892000564BD5 /* hymenu */ = {
+			isa = PBXGroup;
+			children = (
+				B663772D25DD893900564BD5 /* libhymenu.a */,
+			);
+			path = hymenu;
 			sourceTree = "<group>";
 		};
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
@@ -500,8 +540,8 @@
 				LastUpgradeCheck = 1030;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = S7JUSAWPG8;
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = W3VCJL89CL;
+						ProvisioningStyle = Manual;
 					};
 					3D2DCBF6233209E300ADBA6B = {
 						CreatedOnToolsVersion = 10.3;
@@ -528,8 +568,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 3D4416F8231D1E07001A0696 /* Products */;
-					ProjectRef = 3D4416F7231D1E07001A0696 /* SDL.xcodeproj */;
+					ProductGroup = B66376EB25DD884E00564BD5 /* Products */;
+					ProjectRef = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -542,46 +582,95 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3D441704231D1E07001A0696 /* libSDL2.a */ = {
+		B66376FB25DD884E00564BD5 /* SDL2.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SDL2.framework;
+			remoteRef = B66376FA25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B66376FD25DD884E00564BD5 /* SDL2.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SDL2.framework;
+			remoteRef = B66376FC25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B66376FF25DD884E00564BD5 /* SDL2.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SDL2.framework;
+			remoteRef = B66376FE25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663770125DD884E00564BD5 /* libSDL2.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libSDL2.a;
-			remoteRef = 3D441703231D1E07001A0696 /* PBXContainerItemProxy */;
+			remoteRef = B663770025DD884E00564BD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D441706231D1E07001A0696 /* libSDL2.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDL2.dylib;
-			remoteRef = 3D441705231D1E07001A0696 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3D441708231D1E07001A0696 /* libSDL2.a */ = {
+		B663770325DD884E00564BD5 /* libSDL2.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libSDL2.a;
-			remoteRef = 3D441707231D1E07001A0696 /* PBXContainerItemProxy */;
+			remoteRef = B663770225DD884E00564BD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D44170A231D1E07001A0696 /* libSDL2.dylib */ = {
+		B663770525DD884E00564BD5 /* libSDL2.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
+			path = libSDL2.a;
+			remoteRef = B663770425DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663770725DD884E00564BD5 /* libSDL2.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
 			path = libSDL2.dylib;
-			remoteRef = 3D441709231D1E07001A0696 /* PBXContainerItemProxy */;
+			remoteRef = B663770625DD884E00564BD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D44170C231D1E07001A0696 /* libSDLmain.a */ = {
+		B663770925DD884E00564BD5 /* libSDL2.dylib */ = {
 			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDLmain.a;
-			remoteRef = 3D44170B231D1E07001A0696 /* PBXContainerItemProxy */;
+			fileType = "compiled.mach-o.dylib";
+			path = libSDL2.dylib;
+			remoteRef = B663770825DD884E00564BD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3D44170E231D1E07001A0696 /* libSDLmain.a */ = {
+		B663770B25DD884E00564BD5 /* libSDL2.dylib */ = {
 			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDLmain.a;
-			remoteRef = 3D44170D231D1E07001A0696 /* PBXContainerItemProxy */;
+			fileType = "compiled.mach-o.dylib";
+			path = libSDL2.dylib;
+			remoteRef = B663770A25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663770D25DD884E00564BD5 /* SDL2 */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = SDL2;
+			remoteRef = B663770C25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663770F25DD884E00564BD5 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B663770E25DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663771125DD884E00564BD5 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B663771025DD884E00564BD5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B663771325DD884E00564BD5 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B663771225DD884E00564BD5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -696,11 +785,6 @@
 			target = 3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */;
 			targetProxy = 3D4DAA1123BCEF0900F575C1 /* PBXContainerItemProxy */;
 		};
-		3D4DAA2623BD00EB00F575C1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "libSDL-iOS";
-			targetProxy = 3D4DAA2523BD00EB00F575C1 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -708,9 +792,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = S7JUSAWPG8;
+				DEVELOPMENT_TEAM = W3VCJL89CL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -731,12 +815,12 @@
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/cl_dll",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
-					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/hymenu",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = "csmoe-ios";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = citrus;
 			};
 			name = Debug;
 		};
@@ -813,9 +897,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = S7JUSAWPG8;
+				DEVELOPMENT_TEAM = W3VCJL89CL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -836,12 +920,12 @@
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/cl_dll",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/dlls",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build/engine",
-					"$(BUILT_PRODUCTS_DIR)/cmake-build/mainui_cpp",
+					"$(BUILT_PRODUCTS_DIR)/cmake-build/hymenu",
 					"$(BUILT_PRODUCTS_DIR)/cmake-build",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.csmoe;
+				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = "csmoe-ios";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = citrus;
 			};
 			name = Release;
 		};

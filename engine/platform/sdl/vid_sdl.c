@@ -577,7 +577,8 @@ qboolean VID_GetDPI(float* out)
 		SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
 		{
 			HWND hwnd = wmInfo.info.win.window;
-			int res = GetDpiForWindow(hwnd);
+            float WIN_GetDpiForWindow(HWND hwnd);
+			int res = WIN_GetDpiForWindow(hwnd);
 			if (res)
 			{
 				success = true;

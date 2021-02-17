@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>CSMoE</string>
+	<string>柑橘CitruS</string>
 	<key>CFBundleDocumentTypes</key>
 	<array/>
 	<key>CFBundleExecutable</key>
@@ -26,6 +26,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>CSMoE requires bluetooth permission for built-in SDL2 library.</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -54,8 +56,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>CSMoE requires bluetooth permission for built-in SDL2 library.</string>
 	<key>UISupportsDocumentBrowser</key>
 	<true/>
 </dict>

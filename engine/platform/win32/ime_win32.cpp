@@ -154,10 +154,10 @@ static void UpdateCandidateList(const CANDIDATELIST* const src, const size_t src
     page_size = src->dwPageSize;
 }
 
- // ¤½¤ì¤¾¤ì UTF-8 ¤Ë‰ä“Q¤¹¤ë¤¿¤á¤Ë¥é¥à¥ÀévÊýÓÃÒâ¤¹¤ë
+ // ï¿½ï¿½ï¿½ì¤¾ï¿½ï¿½ UTF-8 ï¿½Ë‰ï¿½Qï¿½ï¿½ï¿½ë¤¿ï¿½ï¿½Ë¥ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½â¤¹ï¿½ï¿½
 /*
-    std::wstring ¤ò std::unique_ptr<char[]> ¤Ë UTF-8 ¤Înull ½K¶ËÎÄ×ÖÁÐ¤Ë¤·¤Æ‰ä“Q¤¹¤ë
-    ÒýÊý¤¬¿ÕÎÄ×ÖÁÐ¤ÎˆöºÏ¤Ï nullptr ¤¬Èë¤ë
+    std::wstring ï¿½ï¿½ std::unique_ptr<char[]> ï¿½ï¿½ UTF-8 ï¿½ï¿½null ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¤Ë¤ï¿½ï¿½Æ‰ï¿½Qï¿½ï¿½ï¿½ï¿½
+    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¤Îˆï¿½ï¿½Ï¤ï¿½ nullptr ï¿½ï¿½ï¿½ï¿½ï¿½
 */
 static std::string to_utf8(const std::wstring& arg) {
     std::string utf8buf;
@@ -282,8 +282,8 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                 }
                 if (lParam & GCS_COMPSTR) {
 
-                    /* Ò»¶ÎëAÄ¿¤Ç IME ¤«¤é ¥ï¥¤¥ÉÎÄ×Ö¤ÇÎÄ×ÖÁÐ¤ò¤â¤é¤Ã¤Æ¤¯¤ë */
-                    /* ¤³¤ì¤Ï¥Ð¥¤¥È…gÎ»¤Ç¤ä¤ê¤È¤ê¤¹¤ë¤Î¤Ç¡¢×¢Òâ */
+                    /* Ò»ï¿½ï¿½ï¿½AÄ¿ï¿½ï¿½ IME ï¿½ï¿½ï¿½ï¿½ ï¿½ï¥¤ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¤ï¿½ï¿½ï¿½Ã¤Æ¤ï¿½ï¿½ï¿½ */
+                    /* ï¿½ï¿½ï¿½ï¿½Ï¥Ð¥ï¿½ï¿½È…gÎ»ï¿½Ç¤ï¿½ï¿½È¤ê¤¹ï¿½ï¿½Î¤Ç¡ï¿½×¢ï¿½ï¿½ */
                     const DWORD compstr_length_in_byte = ImmGetCompositionStringW(hImc, GCS_COMPSTR, nullptr, 0);
                     switch (compstr_length_in_byte) {
                     case IMM_ERROR_NODATA:
@@ -291,7 +291,7 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                         break;
                     default:
                     {
-                        /* ¥Ð¥¤¥È…gÎ»¤Ç¤â¤é¤Ã¤Æ¤­¤¿¤Î¤Ç¡¢wchar_t …gÎ»¤ËÖ±¤·¤Æ¡¢ nullÎÄ×Ö¤ÎÓàÔ£¤ò¼Ó¤¨¤Æ¥Ð¥Ã¥Õ¥¡¤òÓÃÒâ¤¹¤ë */
+                        /* ï¿½Ð¥ï¿½ï¿½È…gÎ»ï¿½Ç¤ï¿½ï¿½Ã¤Æ¤ï¿½ï¿½ï¿½ï¿½Î¤Ç¡ï¿½wchar_t ï¿½gÎ»ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Æ¡ï¿½ nullï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½Ô£ï¿½ï¿½Ó¤ï¿½ï¿½Æ¥Ð¥Ã¥Õ¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â¤¹ï¿½ï¿½ */
                         size_t const buf_length_in_wchar = (size_t(compstr_length_in_byte) / sizeof(wchar_t)) + 1;
                         assert(0 < buf_length_in_wchar);
                         std::unique_ptr<wchar_t[]> buf{ new wchar_t[buf_length_in_wchar] };
@@ -312,7 +312,7 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                                 std::wstring comp_unconveted;
                                 size_t begin = 0;
                                 size_t end = 0;
-                                // ‰ä“Qœg¤ß¤òÈ¡¤ê³ö¤¹
+                                // ï¿½ï¿½Qï¿½gï¿½ß¤ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½
                                 for (end = begin; end < attribute_end; ++end) {
                                     if ((ATTR_TARGET_CONVERTED == attribute_vec[end] ||
                                         ATTR_TARGET_NOTCONVERTED == attribute_vec[end])) {
@@ -322,9 +322,9 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                                         comp_converted.push_back(buf[end]);
                                     }
                                 }
-                                // ‰ä“Qœg¤ß¤ÎîIÓò[begin,end) 
+                                // ï¿½ï¿½Qï¿½gï¿½ß¤ï¿½ï¿½Iï¿½ï¿½[begin,end) 
 
-                                // ‰ä“QÖÐ¤ÎÎÄ×ÖÁÐ¤òÈ¡¤ê³ö¤¹
+                                // ï¿½ï¿½Qï¿½Ð¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¤ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½
                                 for (begin = end; end < attribute_end; ++end) {
                                     if (!(ATTR_TARGET_CONVERTED == attribute_vec[end] ||
                                         ATTR_TARGET_NOTCONVERTED == attribute_vec[end])) {
@@ -334,9 +334,9 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                                         comp_target.push_back(buf[end]);
                                     }
                                 }
-                                // ‰ä“QÖÐ¤ÎîIÓò [begin,end)
+                                // ï¿½ï¿½Qï¿½Ð¤ï¿½ï¿½Iï¿½ï¿½ [begin,end)
 
-                                // Î´‰ä“Q¤ÎÎÄ×ÖÁÐ¤òÈ¡¤ê³ö¤¹
+                                // Î´ï¿½ï¿½Qï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¤ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½
                                 for (; end < attribute_end; ++end) {
                                     comp_unconveted.push_back(buf[end]);
                                 }
@@ -353,9 +353,9 @@ static LRESULT CALLBACK ImeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                 OnIMEChangeCandidates();
             }
     #if defined( UNICODE )
-            // UNICODE ˜‹³É¤Î•r¤Ë¤Ï¡¢DefWindowProc ¤ÇÖ±½ÓIME¤ËÎü…§¤µ¤»¤Æ´óÕÉ·ò
+            // UNICODE ï¿½ï¿½ï¿½É¤Î•rï¿½Ë¤Ï¡ï¿½DefWindowProc ï¿½ï¿½Ö±ï¿½ï¿½IMEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ï¿½É·ï¿½
             return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
-            // ¥Þ¥ë¥Á¥Ð¥¤¥È ˜‹³É¤Î•r¤Ë¤Ï¡¢Window ¥µ¥Ö¥¯¥é¥¹¤Î ¥×¥í¥·©`¥¸¥ã¤¬„IÀí¤¹¤ë¤Î¤Ç¡¢ DefSubclassProc ¤¹¤ë±ØÒª¤¬¤¢¤ë¡£
+            // ï¿½Þ¥ï¿½ï¿½ï¿½Ð¥ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½É¤Î•rï¿½Ë¤Ï¡ï¿½Window ï¿½ï¿½ï¿½Ö¥ï¿½ï¿½é¥¹ï¿½ï¿½ ï¿½×¥ï¿½ï¿½`ï¿½ï¿½ï¿½ã¤¬ï¿½Iï¿½ï¿½ï¿½ï¿½Î¤Ç¡ï¿½ DefSubclassProc ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ë¡£
     #else
             return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
     #endif 
