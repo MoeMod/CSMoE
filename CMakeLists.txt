@@ -1,6 +1,8 @@
 project(csmoe)
 cmake_minimum_required(VERSION  3.10.2)
 
+add_definitions(-DENABLE_SHIELD)
+
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
