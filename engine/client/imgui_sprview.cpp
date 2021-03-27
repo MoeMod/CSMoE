@@ -33,7 +33,7 @@ extern "C" {
 
 
 
-static bool enabled = true;
+static bool enabled = false;
 static std::vector<std::string> recent_open;
 
 static HSPRITE g_spr = 0;

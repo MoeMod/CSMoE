@@ -781,9 +781,6 @@ Key_SetKeyDest
 */
 void Key_SetKeyDest( int key_dest )
 {
-#ifdef XASH_IMGUI
-	if(key_dest != key_console)
-#endif
 	IN_ToggleClientMouse( key_dest, cls.key_dest );
 
 	switch( key_dest )
@@ -807,14 +804,8 @@ void Key_SetKeyDest( int key_dest )
 		cls.key_dest = key_menu;
 		break;
 	case key_console:
-#ifdef XASH_IMGUI
-		Key_EnableTextInput(false, false);
-		ImGui_ToggleConsole(true);
-		cls.key_dest = key_menu;
-#else
 		Key_EnableTextInput( true, false );
 		cls.key_dest = key_console;
-#endif
 		break;
 	case key_message:
 		Key_EnableTextInput( true, false );

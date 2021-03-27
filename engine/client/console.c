@@ -1533,8 +1533,11 @@ void Con_DrawInput( void )
 	x = QCHAR_WIDTH; // room for ']'
 	y = con.vislines - ( con.curFont->charHeight * 2 );
 	colorDefault = g_color_table[ColorIndex( COLOR_DEFAULT )];
-
+#ifdef XASH_IMGUI
+    x += ImGui_Console_AddGenericString( QCHAR_WIDTH >> 1, y, "xash3d >", colorDefault );
+#else
 	Con_DrawCharacter( QCHAR_WIDTH >> 1, y, ']', colorDefault );
+#endif
 	Field_DrawInputLine( x, y, &con.input );
 }
 
