@@ -191,6 +191,7 @@ typedef struct
 	int	(*pfnCreditsActive)( void );	// unused
 	void	(*pfnFinalCredits)( void );	// show credits + game end
 	void (*pfnOnGUI)(struct ImGuiContext* context);
+	int (*pfnHandleMessageMode_f)( void );
 } UI_FUNCTIONS;
 
 typedef int (*MENUAPI)( UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t* engfuncs, ui_globalvars_t *pGlobals );

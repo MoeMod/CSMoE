@@ -919,6 +919,7 @@ void UI_CharEvent( int key );
 qboolean UI_MouseInRect( void );
 qboolean UI_IsVisible( void );
 void UI_AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags );
+int UI_HandleMessageMode_f(void);
 void pfnPIC_Set( HIMAGE hPic, int r, int g, int b, int a );
 void pfnPIC_Draw( int x, int y, int width, int height, const wrect_t *prc );
 void pfnPIC_DrawTrans( int x, int y, int width, int height, const wrect_t *prc );
