@@ -366,15 +366,15 @@ endif()
 
 if(ANDROID)
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
-elseif(XASH_SINGLE_BINARY) # Set executable or library
-	add_definitions(-DSINGLE_BINARY)
-	add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
 elseif(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY)
 	if(XASH_SDL)
 		add_definitions(-DXASH_SDLMAIN)
 	endif()
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
+elseif(XASH_SINGLE_BINARY) # Set executable or library
+	add_definitions(-DSINGLE_BINARY)
+	add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
 else()
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
 endif()

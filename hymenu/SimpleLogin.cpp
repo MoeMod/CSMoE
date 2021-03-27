@@ -26,7 +26,7 @@ namespace ui {
 	static char desc[128];
 	static char button_text[32] = "确认";
 
-	extern "C" int UI_HandleMessageMode_f(void)
+	int UI_HandleMessageMode_f(void)
 	{
 		if (!strcmp(EngFuncs::CmdArgv(1), "login"))
 		{
