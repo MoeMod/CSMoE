@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-               BuildableName = "&#x67d1;&#x6a58;CSMoE.app"
+               BuildableName = "CSMoE.app"
                BlueprintName = "CSMoE-iOS"
                ReferencedContainer = "container:CSMoE-iOS.xcodeproj">
             </BuildableReference>
@@ -31,7 +31,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "&#x67d1;&#x6a58;CSMoE.app"
+            BuildableName = "CSMoE.app"
             BlueprintName = "CSMoE-iOS"
             ReferencedContainer = "container:CSMoE-iOS.xcodeproj">
          </BuildableReference>
@@ -54,7 +54,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "&#x67d1;&#x6a58;CSMoE.app"
+            BuildableName = "CSMoE.app"
             BlueprintName = "CSMoE-iOS"
             ReferencedContainer = "container:CSMoE-iOS.xcodeproj">
          </BuildableReference>
@@ -71,7 +71,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "1D6058900D05DD3D006BFB54"
-            BuildableName = "&#x67d1;&#x6a58;CSMoE.app"
+            BuildableName = "CSMoE.app"
             BlueprintName = "CSMoE-iOS"
             ReferencedContainer = "container:CSMoE-iOS.xcodeproj">
          </BuildableReference>

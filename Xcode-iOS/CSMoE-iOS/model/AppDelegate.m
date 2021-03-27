@@ -23,61 +23,10 @@
  */
 
 @interface SDLUIKitDelegate(category)
-- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
-- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler;
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window;
 @end
 
 @implementation SDLUIKitDelegate(category)
-- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-	NSMutableArray *arrShortcutItem = [NSMutableArray new];
-	
-	UIApplicationShortcutItem *shoreItem1 = [[UIApplicationShortcutItem alloc]
-											 initWithType:@"com.moemod.csmoe.Continue"
-											 localizedTitle:@"Continue"
-											 localizedSubtitle:nil
-											 icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypePlay]
-											 userInfo:nil];
-	[arrShortcutItem addObject:shoreItem1];
-	
-	UIApplicationShortcutItem *shoreItem2 = [[UIApplicationShortcutItem alloc]
-											 initWithType:@"com.moemod.csmoe.MainMenu"
-											 localizedTitle:@"Main Menu"
-											 localizedSubtitle:@""
-											 icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeHome]
-											 userInfo:nil];
-	[arrShortcutItem addObject:shoreItem2];
-	
-	/*
-	UIApplicationShortcutItem *shoreItem3 = [[UIApplicationShortcutItem alloc]
-											 initWithType:@"com.moemod.csmoe.CreateGame"
-											 localizedTitle:@"Create Game"
-											 localizedSubtitle:@""
-											 icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeAdd]
-											 userInfo:nil];
-	[arrShortcutItem addObject:shoreItem3];
-	*/
-	
-	[UIApplication sharedApplication].shortcutItems = arrShortcutItem;
-	return TRUE;
-}
-- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL succeeded))completionHandler
-{
-	if(!shortcutItem)
-		return;
-	
-	if([shortcutItem.type isEqualToString:@"com.moemod.csmoe.Continue"])
-	{
-		// ...
-	}
-	else if([shortcutItem.type isEqualToString:@"com.moemod.csmoe.MainMenu"])
-	{
-		IOS_SetDefaultArgs();
-		
-		g_iStartGameStatus = XGS_SKIP;
-		
-	}
-}
 
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
 	if(![[[UIDevice currentDevice] model] isEqualToString:@"iPad"] && g_iStartGameStatus == XGS_START)

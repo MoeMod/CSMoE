@@ -170,12 +170,14 @@
 
 - (IBAction)OnInstallationFinishComfirmed:(id)sender
 {
+	/*
 	UIViewController *vc = self;
 	while (vc.presentingViewController) {
 		vc = vc.presentingViewController;
 	}
 	[vc dismissViewControllerAnimated:YES completion:nil];
-
+	 */
+	g_iStartGameStatus = XGS_START;
 }
 
 /*

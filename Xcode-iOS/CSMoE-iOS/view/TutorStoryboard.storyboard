@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="iax-gR-erQ">
-    <device id="retina6_1" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="iax-gR-erQ">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -68,7 +66,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o6g-jR-GcM">
-                                    <rect key="frame" x="0.0" y="30" width="375" height="37.5"/>
+                                    <rect key="frame" x="0.0" y="30" width="375" height="20.5"/>
                                     <attributedString key="attributedText">
                                         <fragment content=" Counter-Strike Mobile-oriented Edition ">
                                             <attributes>
@@ -382,7 +380,7 @@
                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="55k-53-a7f">
                                     <rect key="frame" x="177.5" y="537" width="20" height="20"/>
                                 </activityIndicatorView>
-                                <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yXb-LY-bFP">
+                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yXb-LY-bFP">
                                     <rect key="frame" x="0.0" y="532" width="375" height="30"/>
                                     <constraints>
                                         <constraint firstAttribute="height" relation="lessThanOrEqual" constant="40" id="VvY-OY-B6J"/>
@@ -428,14 +426,14 @@
         </scene>
     </scenes>
     <resources>
-        <image name="GetCSMoEResouce.png" width="842" height="418"/>
-        <image name="Launch.png" width="256" height="256"/>
+        <image name="GetCSMoEResouce.png" width="421" height="209"/>
+        <image name="Launch.png" width="96" height="96"/>
         <image name="MacBookiTunes.png" width="2100" height="1500"/>
         <image name="PowerCable.png" width="640" height="2648"/>
         <image name="Steam.png" width="512" height="512"/>
-        <image name="iTunes.png" width="256" height="256"/>
-        <image name="iTunesWindow.png" width="1054" height="662"/>
-        <image name="page1_en.png" width="480" height="310"/>
+        <image name="iTunes.png" width="128" height="128"/>
+        <image name="iTunesWindow.png" width="527" height="331"/>
+        <image name="page1_en.png" width="360" height="232.5"/>
         <image name="page2_en.png" width="480" height="310"/>
     </resources>
 </document>

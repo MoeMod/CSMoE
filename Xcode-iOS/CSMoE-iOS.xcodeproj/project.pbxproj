@@ -36,17 +36,7 @@
 		1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
-		3D094FB4228F1D3B00F168C2 /* NewGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D094FAE228F1D3A00F168C2 /* NewGameViewController.m */; };
-		3D094FB5228F1D3B00F168C2 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D094FB0228F1D3B00F168C2 /* MainViewController.m */; };
 		3D094FB6228F1D3B00F168C2 /* TutorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D094FB1228F1D3B00F168C2 /* TutorViewController.m */; };
-		3D094FBF228F1F2900F168C2 /* TGAlib.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D094FBE228F1F2900F168C2 /* TGAlib.m */; };
-		3D11D3E3228F38FA00393F66 /* NewGameStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D11D3E2228F38FA00393F66 /* NewGameStoryboard.storyboard */; };
-		3D11D3EB228F40C900393F66 /* LandScapePicker.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3EA228F40C900393F66 /* LandScapePicker.m */; };
-		3D11D3EE228F484F00393F66 /* GameDirViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3ED228F484F00393F66 /* GameDirViewController.m */; };
-		3D11D3F1228F560F00393F66 /* MapDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3F0228F560F00393F66 /* MapDetailViewController.m */; };
-		3D11D3F4228F58D600393F66 /* MapMasterTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3F3228F58D600393F66 /* MapMasterTableViewController.m */; };
-		3D11D3F82291732300393F66 /* SettingsStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */; };
-		3D11D3FB22917BFC00393F66 /* SettingsSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */; };
 		3D3EE8A3228F193400A695FE /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 3D3EE89D228F193400A695FE /* maps */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
@@ -60,10 +50,7 @@
 		3D5E35EC22776A8D0073D791 /* LaunchScreenStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */; };
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
 		3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D670D7D227EE1210030B7D1 /* AppDelegate.m */; };
-		3D6C2F0F22988F6A00DACF3E /* OptionsSubAboutTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */; };
 		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
-		3D9CE41C2334B7F400758AC5 /* UnzipStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */; };
-		3D9CE42D2334BC0500758AC5 /* UnzipViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
@@ -76,7 +63,7 @@
 		3DC1E4BD2289EA9E00114D80 /* GetCSMoEResouce.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4B72289EA9E00114D80 /* GetCSMoEResouce.png */; };
 		3DC1E4BF2289F18500114D80 /* Steam.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4BE2289F18500114D80 /* Steam.png */; };
 		3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */; };
-		3DC1E4CB228AE57200114D80 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4CA228AE57200114D80 /* MainStoryboard.storyboard */; };
+		3DC8946F260FAC5600F7A4A5 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */; };
 		3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE829A7260F8F00009DABD0 /* Assets.xcassets */; };
 		3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAED19260F846D0045F79B /* libmenu.a */; };
 		3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAEE6D260F8B340045F79B /* libserver.a */; };
@@ -208,27 +195,9 @@
 		1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* CSMoE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSMoE.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		3D094FAE228F1D3A00F168C2 /* NewGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewGameViewController.m; sourceTree = "<group>"; };
 		3D094FAF228F1D3B00F168C2 /* TutorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorViewController.h; sourceTree = "<group>"; };
-		3D094FB0228F1D3B00F168C2 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		3D094FB1228F1D3B00F168C2 /* TutorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorViewController.m; sourceTree = "<group>"; };
-		3D094FB2228F1D3B00F168C2 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
-		3D094FB3228F1D3B00F168C2 /* NewGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewGameViewController.h; sourceTree = "<group>"; };
-		3D094FB8228F1F1300F168C2 /* TGAlib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TGAlib.h; sourceTree = "<group>"; };
-		3D094FBE228F1F2900F168C2 /* TGAlib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TGAlib.m; sourceTree = "<group>"; };
 		3D0FC1DB2278310100D9A961 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		3D11D3E2228F38FA00393F66 /* NewGameStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NewGameStoryboard.storyboard; sourceTree = "<group>"; };
-		3D11D3E9228F40AC00393F66 /* LandScapePicker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LandScapePicker.h; sourceTree = "<group>"; };
-		3D11D3EA228F40C900393F66 /* LandScapePicker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LandScapePicker.m; sourceTree = "<group>"; };
-		3D11D3EC228F484F00393F66 /* GameDirViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameDirViewController.h; sourceTree = "<group>"; };
-		3D11D3ED228F484F00393F66 /* GameDirViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameDirViewController.m; sourceTree = "<group>"; };
-		3D11D3EF228F560F00393F66 /* MapDetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapDetailViewController.h; sourceTree = "<group>"; };
-		3D11D3F0228F560F00393F66 /* MapDetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapDetailViewController.m; sourceTree = "<group>"; };
-		3D11D3F2228F58D600393F66 /* MapMasterTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapMasterTableViewController.h; sourceTree = "<group>"; };
-		3D11D3F3228F58D600393F66 /* MapMasterTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapMasterTableViewController.m; sourceTree = "<group>"; };
-		3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsStoryboard.storyboard; sourceTree = "<group>"; };
-		3D11D3F922917BFC00393F66 /* SettingsSplitViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsSplitViewController.h; sourceTree = "<group>"; };
-		3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsSplitViewController.m; sourceTree = "<group>"; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		3D3EE89D228F193400A695FE /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = Resources/maps; sourceTree = "<group>"; };
 		3D4DA95623BCE9C800F575C1 /* libclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclient.a; sourceTree = "<group>"; };
@@ -244,12 +213,7 @@
 		3D670D78227D901F0030B7D1 /* launcherdialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = launcherdialog.h; sourceTree = "<group>"; };
 		3D670D7D227EE1210030B7D1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3D670D7F227F05E80030B7D1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptionsSubAboutTableViewController.h; sourceTree = "<group>"; };
-		3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OptionsSubAboutTableViewController.m; sourceTree = "<group>"; };
 		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui_ext.a; path = "cmake-build/libimgui_ext.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = UnzipStoryboard.storyboard; sourceTree = "<group>"; };
-		3D9CE42B2334BC0500758AC5 /* UnzipViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UnzipViewController.h; sourceTree = "<group>"; };
-		3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UnzipViewController.m; sourceTree = "<group>"; };
 		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
 		3DC1E4A32289683100114D80 /* page1_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = page1_en.png; path = Resources/page1_en.png; sourceTree = "<group>"; };
@@ -262,7 +226,7 @@
 		3DC1E4B72289EA9E00114D80 /* GetCSMoEResouce.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = GetCSMoEResouce.png; path = Resources/GetCSMoEResouce.png; sourceTree = "<group>"; };
 		3DC1E4BE2289F18500114D80 /* Steam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Steam.png; path = Resources/Steam.png; sourceTree = "<group>"; };
 		3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TutorStoryboard.storyboard; sourceTree = "<group>"; };
-		3DC1E4CA228AE57200114D80 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
 		3DE829A7260F8F00009DABD0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		3DEAED19260F846D0045F79B /* libmenu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmenu.a; sourceTree = "<group>"; };
 		3DEAEE6D260F8B340045F79B /* libserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libserver.a; sourceTree = "<group>"; };
@@ -389,26 +353,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3D3EE8A4228F195200A695FE /* util */ = {
-			isa = PBXGroup;
-			children = (
-				3D094FB8228F1F1300F168C2 /* TGAlib.h */,
-				3D094FBE228F1F2900F168C2 /* TGAlib.m */,
-			);
-			path = util;
-			sourceTree = "<group>";
-		};
 		3D3EE8A6228F197200A695FE /* view */ = {
 			isa = PBXGroup;
 			children = (
 				3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */,
-				3DC1E4CA228AE57200114D80 /* MainStoryboard.storyboard */,
+				3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */,
 				3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */,
-				3D11D3E2228F38FA00393F66 /* NewGameStoryboard.storyboard */,
-				3D11D3E9228F40AC00393F66 /* LandScapePicker.h */,
-				3D11D3EA228F40C900393F66 /* LandScapePicker.m */,
-				3D11D3F72291732300393F66 /* SettingsStoryboard.storyboard */,
-				3D9CE41B2334B7F400758AC5 /* UnzipStoryboard.storyboard */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -427,24 +377,8 @@
 		3D3EE8A9228F1C6300A695FE /* controller */ = {
 			isa = PBXGroup;
 			children = (
-				3D094FB2228F1D3B00F168C2 /* MainViewController.h */,
-				3D094FB0228F1D3B00F168C2 /* MainViewController.m */,
-				3D094FB3228F1D3B00F168C2 /* NewGameViewController.h */,
-				3D094FAE228F1D3A00F168C2 /* NewGameViewController.m */,
 				3D094FAF228F1D3B00F168C2 /* TutorViewController.h */,
 				3D094FB1228F1D3B00F168C2 /* TutorViewController.m */,
-				3D11D3EC228F484F00393F66 /* GameDirViewController.h */,
-				3D11D3ED228F484F00393F66 /* GameDirViewController.m */,
-				3D11D3EF228F560F00393F66 /* MapDetailViewController.h */,
-				3D11D3F0228F560F00393F66 /* MapDetailViewController.m */,
-				3D11D3F2228F58D600393F66 /* MapMasterTableViewController.h */,
-				3D11D3F3228F58D600393F66 /* MapMasterTableViewController.m */,
-				3D11D3F922917BFC00393F66 /* SettingsSplitViewController.h */,
-				3D11D3FA22917BFC00393F66 /* SettingsSplitViewController.m */,
-				3D6C2F0D22988F6A00DACF3E /* OptionsSubAboutTableViewController.h */,
-				3D6C2F0E22988F6A00DACF3E /* OptionsSubAboutTableViewController.m */,
-				3D9CE42B2334BC0500758AC5 /* UnzipViewController.h */,
-				3D9CE42C2334BC0500758AC5 /* UnzipViewController.m */,
 			);
 			path = controller;
 			sourceTree = "<group>";
@@ -530,7 +464,6 @@
 				3D3EE8A9228F1C6300A695FE /* controller */,
 				3D3EE8A7228F19A900A695FE /* model */,
 				3D3EE8A6228F197200A695FE /* view */,
-				3D3EE8A4228F195200A695FE /* util */,
 			);
 			path = "CSMoE-iOS";
 			sourceTree = "<group>";
@@ -707,12 +640,11 @@
 			files = (
 				3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */,
 				3D3EE8A3228F193400A695FE /* maps in Resources */,
-				3D9CE41C2334B7F400758AC5 /* UnzipStoryboard.storyboard in Resources */,
 				3DC1E4B32289743100114D80 /* iTunesWindow.png in Resources */,
 				3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */,
 				3DC1E4AA2289683200114D80 /* page1_en.png in Resources */,
-				3DC1E4CB228AE57200114D80 /* MainStoryboard.storyboard in Resources */,
 				3DC1E4AC2289683200114D80 /* page2_en.png in Resources */,
+				3DC8946F260FAC5600F7A4A5 /* MainStoryboard.storyboard in Resources */,
 				3DC1E4A82289683200114D80 /* PowerCable.png in Resources */,
 				3D5E35EC22776A8D0073D791 /* LaunchScreenStoryboard.storyboard in Resources */,
 				3DC1E4B52289B93000114D80 /* PowerCable2.png in Resources */,
@@ -720,13 +652,11 @@
 				3DC1E4AE2289683200114D80 /* MacBook.png in Resources */,
 				3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */,
 				3DC1E4BD2289EA9E00114D80 /* GetCSMoEResouce.png in Resources */,
-				3D11D3F82291732300393F66 /* SettingsStoryboard.storyboard in Resources */,
 				3DC1E4BF2289F18500114D80 /* Steam.png in Resources */,
 				3D5E35E4227768E40073D791 /* extras.pak in Resources */,
 				3D5E35DC227768B10073D791 /* Icon.png in Resources */,
 				3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */,
 				3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */,
-				3D11D3E3228F38FA00393F66 /* NewGameStoryboard.storyboard in Resources */,
 				3D670D69227A30620030B7D1 /* Launch.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -782,19 +712,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				495E1A1A1E13199A0022E4AA /* launchdialog.m in Sources */,
-				3D11D3EB228F40C900393F66 /* LandScapePicker.m in Sources */,
-				3D11D3F1228F560F00393F66 /* MapDetailViewController.m in Sources */,
-				3D094FB4228F1D3B00F168C2 /* NewGameViewController.m in Sources */,
-				3D11D3EE228F484F00393F66 /* GameDirViewController.m in Sources */,
-				3D9CE42D2334BC0500758AC5 /* UnzipViewController.m in Sources */,
 				3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */,
-				3D11D3F4228F58D600393F66 /* MapMasterTableViewController.m in Sources */,
-				3D11D3FB22917BFC00393F66 /* SettingsSplitViewController.m in Sources */,
-				3D094FBF228F1F2900F168C2 /* TGAlib.m in Sources */,
 				3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */,
-				3D094FB5228F1D3B00F168C2 /* MainViewController.m in Sources */,
 				3D094FB6228F1D3B00F168C2 /* TutorViewController.m in Sources */,
-				3D6C2F0F22988F6A00DACF3E /* OptionsSubAboutTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
