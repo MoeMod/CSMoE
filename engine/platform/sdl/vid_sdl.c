@@ -503,7 +503,7 @@ qboolean VID_SetMode( void )
 	{
 		SDL_DisplayMode mode;
 #if !defined DEFAULT_MODE_WIDTH || !defined DEFAULT_MODE_HEIGHT
-		SDL_GetDesktopDisplayMode( 0, &mode );
+		SDL_GetCurrentDisplayMode( 0, &mode );
 #else
 		mode.w = DEFAULT_MODE_WIDTH;
 		mode.h = DEFAULT_MODE_HEIGHT;
