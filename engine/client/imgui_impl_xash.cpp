@@ -476,15 +476,15 @@ qboolean ImGui_ImplGL_Init(void)
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
+	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
 
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Init();
 #endif
-	
+
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();
-	
+
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
@@ -502,7 +502,7 @@ void ImGui_ImplGL_Shutdown(void)
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Shutdown();
 #endif
-	
+
 	ImGui_ImplGL_InvalidateDeviceObjects();
     ImGui::DestroyContext(std::exchange(g_EngineContext, nullptr));
 	//ImGui::Shutdown();
@@ -649,13 +649,13 @@ qboolean ImGui_ImplGL_MouseMove(int x, int y)
 void ImGui_ImplGL_Render(void)
 {
 	ImGuiIO& io = ImGui::GetIO();
+    ImGui::Render();
 	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	//pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	//pglClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	//pglClear(GL_COLOR_BUFFER_BIT);
 	//pglUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
-	//ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
-	ImGui::Render();
+	ImGui_ImplGL_RenderDrawLists(ImGui::GetDrawData());
 }
 
 void Engine_OnGUI(struct ImGuiContext *context)
@@ -671,24 +671,18 @@ void Engine_OnGUI(struct ImGuiContext *context)
 
 void ImGui_ImplGL_Client_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Menu_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
 		menu.dllFuncs.pfnOnGUI(g_EngineContext);
 }
 
 void ImGui_ImplGL_Engine_OnGUI(void)
 {
-	auto drawlist = ImGui::GetBackgroundDrawList();
-	drawlist->AddDrawCmd();
 	Engine_OnGUI(g_EngineContext);
 }
 

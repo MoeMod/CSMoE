@@ -570,9 +570,6 @@ void SCR_LoadCreditsFont( void )
 		cls.creditsFont.valid = true;
 	}
 	if( buffer ) Mem_Free( buffer );
-#ifdef XASH_IMGUI
-	ImGui_ImplGL_ReloadFonts();
-#endif
 }
 
 void SCR_InstallParticlePalette( void )

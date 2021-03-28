@@ -37,7 +37,6 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		3D094FB6228F1D3B00F168C2 /* TutorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D094FB1228F1D3B00F168C2 /* TutorViewController.m */; };
-		3D3EE8A3228F193400A695FE /* maps in Resources */ = {isa = PBXBuildFile; fileRef = 3D3EE89D228F193400A695FE /* maps */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
 		3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D37322E229488AA00713C9C /* GLKit.framework */; };
@@ -45,11 +44,8 @@
 		3D4DAA0F23BCEEBB00F575C1 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
 		3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */ = {isa = PBXBuildFile; fileRef = 3D5099DA23CB0F7900F75CEA /* CSMoE-Full */; };
 		3D5E35DC227768B10073D791 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35D6227768B10073D791 /* Icon.png */; };
-		3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35E1227768E40073D791 /* extras_cstrike.pak */; };
-		3D5E35E4227768E40073D791 /* extras.pak in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35E2227768E40073D791 /* extras.pak */; };
 		3D5E35EC22776A8D0073D791 /* LaunchScreenStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */; };
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
-		3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D670D7D227EE1210030B7D1 /* AppDelegate.m */; };
 		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
@@ -199,20 +195,15 @@
 		3D094FB1228F1D3B00F168C2 /* TutorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TutorViewController.m; sourceTree = "<group>"; };
 		3D0FC1DB2278310100D9A961 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		3D3EE89D228F193400A695FE /* maps */ = {isa = PBXFileReference; lastKnownFileType = folder; name = maps; path = Resources/maps; sourceTree = "<group>"; };
 		3D4DA95623BCE9C800F575C1 /* libclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclient.a; sourceTree = "<group>"; };
 		3D4DAA0223BCEC7C00F575C1 /* libxash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxash.a; sourceTree = "<group>"; };
 		3D5099DA23CB0F7900F75CEA /* CSMoE-Full */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "CSMoE-Full"; path = "../CSMoE-Full"; sourceTree = "<group>"; };
 		3D525D7722252AAB00DD9932 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		3D5E35D6227768B10073D791 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Icon.png; sourceTree = "<group>"; };
-		3D5E35E1227768E40073D791 /* extras_cstrike.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = extras_cstrike.pak; path = Resources/extras_cstrike.pak; sourceTree = "<group>"; };
-		3D5E35E2227768E40073D791 /* extras.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = extras.pak; path = Resources/extras.pak; sourceTree = "<group>"; };
 		3D5E35E922776A480073D791 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreenStoryboard.storyboard; sourceTree = "<group>"; };
 		3D670D68227A30620030B7D1 /* Launch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Launch.png; path = Resources/Launch.png; sourceTree = "<group>"; };
 		3D670D78227D901F0030B7D1 /* launcherdialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = launcherdialog.h; sourceTree = "<group>"; };
-		3D670D7D227EE1210030B7D1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		3D670D7F227F05E80030B7D1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui_ext.a; path = "cmake-build/libimgui_ext.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
@@ -310,7 +301,6 @@
 			children = (
 				3DE829A7260F8F00009DABD0 /* Assets.xcassets */,
 				3D5099DA23CB0F7900F75CEA /* CSMoE-Full */,
-				3D3EE89D228F193400A695FE /* maps */,
 				3DC1E4A62289683100114D80 /* iTunes.png */,
 				3DC1E4A72289683100114D80 /* MacBook.png */,
 				3DC1E4B72289EA9E00114D80 /* GetCSMoEResouce.png */,
@@ -321,9 +311,7 @@
 				3DC1E4B22289743100114D80 /* iTunesWindow.png */,
 				3DC1E4BE2289F18500114D80 /* Steam.png */,
 				3DC1E4A12289683000114D80 /* PowerCable.png */,
-				3D5E35E1227768E40073D791 /* extras_cstrike.pak */,
 				3D670D68227A30620030B7D1 /* Launch.png */,
-				3D5E35E2227768E40073D791 /* extras.pak */,
 				3D5E35D6227768B10073D791 /* Icon.png */,
 			);
 			name = Resources;
@@ -368,8 +356,6 @@
 			children = (
 				495E1A191E13199A0022E4AA /* launchdialog.m */,
 				3D670D78227D901F0030B7D1 /* launcherdialog.h */,
-				3D670D7D227EE1210030B7D1 /* AppDelegate.m */,
-				3D670D7F227F05E80030B7D1 /* AppDelegate.h */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -639,7 +625,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */,
-				3D3EE8A3228F193400A695FE /* maps in Resources */,
 				3DC1E4B32289743100114D80 /* iTunesWindow.png in Resources */,
 				3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */,
 				3DC1E4AA2289683200114D80 /* page1_en.png in Resources */,
@@ -653,9 +638,7 @@
 				3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */,
 				3DC1E4BD2289EA9E00114D80 /* GetCSMoEResouce.png in Resources */,
 				3DC1E4BF2289F18500114D80 /* Steam.png in Resources */,
-				3D5E35E4227768E40073D791 /* extras.pak in Resources */,
 				3D5E35DC227768B10073D791 /* Icon.png in Resources */,
-				3D5E35E3227768E40073D791 /* extras_cstrike.pak in Resources */,
 				3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */,
 				3D670D69227A30620030B7D1 /* Launch.png in Resources */,
 			);
@@ -713,7 +696,6 @@
 			files = (
 				495E1A1A1E13199A0022E4AA /* launchdialog.m in Sources */,
 				3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */,
-				3D670D7E227EE1210030B7D1 /* AppDelegate.m in Sources */,
 				3D094FB6228F1D3B00F168C2 /* TutorViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -740,6 +722,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = W3VCJL89CL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -847,6 +830,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = W3VCJL89CL;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

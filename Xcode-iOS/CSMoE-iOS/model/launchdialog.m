@@ -87,10 +87,20 @@ void IOS_PrepareView()
 
 void IOS_SetDefaultArgs()
 {
-	static char *args[64] = { "xash", "-dev", "5", "-log", "-game", "csmoe"};
+	static char width_str[32] = "0";
+	static char height_str[32] = "0";
+	static char *args[64] = { "xash", "-dev", "5", "-log", "-game", "csmoe", "-width", width_str, "-height", height_str };
+	
+	CGRect rect_screen = [[UIScreen mainScreen]bounds];
+    CGSize size_screen = rect_screen.size;
+	CGFloat scale_screen = [UIScreen mainScreen].scale;
+	CGFloat width = size_screen.width * scale_screen;
+	CGFloat height = size_screen.height * scale_screen;
+	sprintf(width_str, "%d", (int)width);
+	sprintf(height_str, "%d", (int)height);
 	
 	g_pszArgv = args;
-	g_iArgc = 6;
+	g_iArgc = 10;
 }
 
 void IOS_LaunchDialog( void )

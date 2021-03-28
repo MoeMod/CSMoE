@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina6_5" orientation="portrait" appearance="light"/>
+    <device id="ipad9_7" orientation="landscape" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
@@ -13,18 +13,18 @@
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Logo" translatesAutoresizingMaskIntoConstraints="NO" id="7VC-k6-gDU">
-                                <rect key="frame" x="79" y="220" width="256" height="256"/>
+                                <rect key="frame" x="384" y="156" width="256" height="256"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="256" id="ekj-6k-chI"/>
                                     <constraint firstAttribute="height" constant="256" id="hnK-c7-Bbf"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="柑橘 CSMoE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IKR-G6-Eg3">
-                                <rect key="frame" x="108.33333333333333" y="696" width="197.33333333333337" height="43"/>
+                                <rect key="frame" x="413.5" y="568" width="197" height="43"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="36"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <nil key="highlightedColor"/>
@@ -34,10 +34,17 @@
                         <constraints>
                             <constraint firstItem="IKR-G6-Eg3" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="bottom" constant="-200" id="6x4-cY-LQh"/>
                             <constraint firstItem="IKR-G6-Eg3" firstAttribute="centerX" secondItem="7VC-k6-gDU" secondAttribute="centerX" id="DhP-n2-3Cb"/>
-                            <constraint firstItem="7VC-k6-gDU" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-100" id="aTh-Lz-q7r"/>
+                            <constraint firstItem="7VC-k6-gDU" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-100" id="aTh-Lz-q7r">
+                                <variation key="heightClass=compact" constant="0.0"/>
+                            </constraint>
                             <constraint firstItem="7VC-k6-gDU" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="ai9-XJ-OLC"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="heightClass=compact">
+                            <mask key="subviews">
+                                <exclude reference="IKR-G6-Eg3"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -46,6 +53,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Logo" width="233.33332824707031" height="233.33332824707031"/>
+        <image name="Logo" width="350" height="350"/>
     </resources>
 </document>

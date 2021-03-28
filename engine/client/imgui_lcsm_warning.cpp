@@ -26,6 +26,7 @@ void ImGui_LCSM_OnGUI(void)
 	if (!lcsm_enabled)
 		return;
 
+	ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
 	ImGui::OpenPopup("CSMoE LCSM Warning");
 	if (ImGui::BeginPopupModal("CSMoE LCSM Warning", &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::Text("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)");
