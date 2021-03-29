@@ -119,7 +119,7 @@ jobs:
     before_script:
     - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
-    - mv SDL2-2.0.10 SDL2
+    - mv SDL2-2.0.14 SDL2
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
