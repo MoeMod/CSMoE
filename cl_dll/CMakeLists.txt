@@ -258,11 +258,7 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
-if(NOT WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-	set(INPUT_SRCS ./input_xash3d.cpp)
-else()
-	set(INPUT_SRCS ./inputw32.cpp)
-endif()
+set(INPUT_SRCS ./input_xash3d.cpp)
 
 set (CLDLL_SOURCES
 	./cdll_int.cpp
