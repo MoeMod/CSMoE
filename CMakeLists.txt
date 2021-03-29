@@ -179,7 +179,7 @@ target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
 	ADD_SUBDIRECTORY(mainui_cpp)
-	ADD_SUBDIRECTORY(hymenu)
+#	ADD_SUBDIRECTORY(hymenu)
 endif()
 ADD_SUBDIRECTORY(dlls)
 ADD_SUBDIRECTORY(engine)

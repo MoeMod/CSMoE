@@ -86,7 +86,7 @@ jobs:
     language: cpp
     compiler: clang
     before_script:
-    - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
+    - curl -s https://www.libsdl.org/release/SDL2-2.0.14.dmg > SDL2.dmg
     - hdiutil attach SDL2.dmg
     - mkdir -p ~/Library/Frameworks
     - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
@@ -117,7 +117,7 @@ jobs:
     osx_image: xcode11
     language: objective-c
     before_script:
-    - curl -s http://libsdl.org/release/SDL2-2.0.10.tar.gz > SDL2.tar.gz
+    - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.10 SDL2
     - brew install p7zip

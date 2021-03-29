@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.10.2)
 project (hymenu)
 
 include_directories (../common ../engine ../pm_shared ../mainui)
