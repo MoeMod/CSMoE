@@ -4026,7 +4026,7 @@ static rgbdata_t *R_InitSolidColorTexture( texFlags_t *flags, int color )
 	r_image.type = PF_RGB_24;
 	r_image.size = r_image.width * r_image.height * 3;
 
-	*flags = TF_NOPICMIP|TF_UNCOMPRESSED;
+	*flags = TF_NOMIPMAP|TF_NOPICMIP|TF_UNCOMPRESSED;
 
 	data2D[0] = data2D[1] = data2D[2] = color;
 	return &r_image;
@@ -4242,7 +4242,7 @@ static rgbdata_t *R_InitAttenTexture3D( texFlags_t *flags )
 static rgbdata_t *R_InitDlightTexture( texFlags_t *flags )
 {
 	// solid color texture
-	r_image.width = BLOCK_SIZE_DEFAULT; 
+	r_image.width = BLOCK_SIZE_DEFAULT;
 	r_image.height = BLOCK_SIZE_DEFAULT;
 	r_image.flags = IMAGE_HAS_COLOR;
 	r_image.type = PF_RGBA_32;
@@ -4259,7 +4259,7 @@ static rgbdata_t *R_InitDlightTexture( texFlags_t *flags )
 static rgbdata_t *R_InitDlightTexture2( texFlags_t *flags )
 {
 	// solid color texture
-	r_image.width = BLOCK_SIZE_MAX; 
+	r_image.width = BLOCK_SIZE_MAX;
 	r_image.height = BLOCK_SIZE_MAX;
 	r_image.flags = IMAGE_HAS_COLOR;
 	r_image.type = PF_RGBA_32;
@@ -4475,7 +4475,7 @@ static rgbdata_t *R_InitVSDCTCubemap( texFlags_t *flags )
 		0x00, 0x00, 0x99, 0xFF, // -Z: <0, 0>, <1.5, 2.5>
 	};
 
-	*flags = (TF_NOPICMIP|TF_UNCOMPRESSED|TF_NEAREST|TF_CUBEMAP|TF_CLAMP);
+	*flags = (TF_NOPICMIP|TF_UNCOMPRESSED|TF_NEAREST|TF_CUBEMAP|TF_CLAMP|TF_NOMIPMAP);
 
 	r_image.width = r_image.height = 1;
 	r_image.size = r_image.width * r_image.height * 4 * 6;

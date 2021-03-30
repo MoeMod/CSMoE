@@ -21,6 +21,9 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "qfont.h"
 #include "library.h"
+#ifdef XASH_IMGUI
+#include "imgui_impl_xash.h"
+#endif
 
 convar_t *scr_centertime;
 convar_t *scr_loading;
@@ -692,7 +695,7 @@ void SCR_Init( void )
 	cl_testlights = Cvar_Get( "cl_testlights", "0", 0, "test dynamic lights" );
 	cl_envshot_size = Cvar_Get( "cl_envshot_size", "256", CVAR_ARCHIVE, "envshot size of cube side" );
 	scr_dark = Cvar_Get( "v_dark", "0", 0, "starts level from dark screen" );
-	scr_viewsize = Cvar_Get( "viewsize", "120", CVAR_ARCHIVE, "screen size" );
+	scr_viewsize = Cvar_Get( "viewsize", "120", CVAR_READ_ONLY, "screen size" );
 	// register our commands
 	Cmd_AddCommand( "timerefresh", SCR_TimeRefresh_f, "turn quickly and print rendering statistcs" );
 	Cmd_AddCommand( "skyname", CL_SetSky_f, "set new skybox by basename" );

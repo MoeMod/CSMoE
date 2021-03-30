@@ -244,6 +244,8 @@ Con_MessageMode_f
 */
 void Con_MessageMode_f( void )
 {
+	if (UI_HandleMessageMode_f())
+		return;
 	if( Cmd_Argc() == 2 )
 		Q_strncpy( con.chat_cmd, Cmd_Argv( 1 ), sizeof( con.chat_cmd ));
 	else Q_strncpy( con.chat_cmd, "say", sizeof( con.chat_cmd ));
@@ -1285,14 +1287,23 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 		hideChar = edit->cursor - prestep; // skip this char
 	
 	// draw it
+#ifdef XASH_IMGUI
+	ImGui_Console_AddGenericString(x, y, str, colorDefault);
+#else
 	Con_DrawGenericString( x, y, str, colorDefault, false, hideChar );
+#endif
 
 	// draw the cursor
 	if((int)( host.realtime * 4 ) & 1 ) return; // off blink
 
 	// calc cursor position
 	str[edit->cursor - prestep] = 0;
-	Con_DrawStringLen( str, &curPos, NULL );
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen(str, &curPos, NULL);
+#else
+	Con_DrawStringLen(str, &curPos, NULL);
+#endif
+	
 	Con_UtfProcessChar( 0 );
 
 	if( host.key_overstrike && cursorChar )
@@ -1302,12 +1313,21 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 		pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA );
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+#ifdef XASH_IMGUI
+		char str[2] = { (char)cursorChar, '\0' };
+		ImGui_Console_AddGenericString(x + curPos, y, str, colorDefault);
+#else
 		Con_DrawGenericChar( x + curPos, y, cursorChar, colorDefault );
+#endif
 	}
 	else
 	{
 		Con_UtfProcessChar( 0 );
+#ifdef XASH_IMGUI
+		ImGui_Console_AddGenericString(x + curPos, y, "_", colorDefault);
+#else
 		Con_DrawCharacter( x + curPos, y, '_', colorDefault );
+#endif
 	}
 }
 
@@ -1513,8 +1533,11 @@ void Con_DrawInput( void )
 	x = QCHAR_WIDTH; // room for ']'
 	y = con.vislines - ( con.curFont->charHeight * 2 );
 	colorDefault = g_color_table[ColorIndex( COLOR_DEFAULT )];
-
+#ifdef XASH_IMGUI
+    x += ImGui_Console_AddGenericString( QCHAR_WIDTH >> 1, y, "xash3d >", colorDefault );
+#else
 	Con_DrawCharacter( QCHAR_WIDTH >> 1, y, ']', colorDefault );
+#endif
 	Field_DrawInputLine( x, y, &con.input );
 }
 
@@ -1570,7 +1593,11 @@ int Con_DrawDebugLines( void )
 			int	x, len;
 			int	fontTall = 0;
 
+#ifdef XASH_IMGUI
+			ImGui_Console_DrawStringLen(con.notify[i].szNotify, &len, &fontTall);
+#else
 			Con_DrawStringLen( con.notify[i].szNotify, &len, &fontTall );
+#endif
 			x = scr_width->integer - max( defaultX, len ) - 10;
 			fontTall += 1;
 
@@ -1579,7 +1606,11 @@ int Con_DrawDebugLines( void )
 
 			count++;
 			y = 20 + fontTall * i;
+#ifdef XASH_IMGUI
+			ImGui_Console_AddGenericString(x, y, con.notify[i].szNotify, con.notify[i].color);
+#else
 			Con_DrawString( x, y, con.notify[i].szNotify, con.notify[i].color );
+#endif
 		}
 	}
 
@@ -1675,9 +1706,14 @@ void Con_DrawNotify( void )
 			clgame.dllFuncs.pfnChatInputPosition( &start, &v );
 
 		Q_snprintf( buf, sizeof( buf ), "%s: ", con.chat_cmd );
-
+		
+#ifdef XASH_IMGUI
+		ImGui_Console_DrawStringLen(buf, &len, NULL);
+		ImGui_Console_AddGenericString(start, v, buf, g_color_table[7]);
+#else
 		Con_DrawStringLen( buf, &len, NULL );
 		Con_DrawString( start, v, buf, g_color_table[7] );
+#endif
 
 		Field_DrawInputLine( start + len, v, &con.chat );
 	}
@@ -1759,14 +1795,20 @@ void Con_DrawSolidConsole( float frac, qboolean fill )
 		byte	*color = g_color_table[7];
 		int	stringLen, width = 0, charH;
 
-		Q_snprintf( curbuild, MAX_STRING, "Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
+		Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
 			XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ) );
+#ifdef XASH_IMGUI
+		ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
+		start = scr_width->integer - stringLen;
+		ImGui_Console_AddGenericString(start, 0, curbuild, color);
+#else
 		Con_DrawStringLen( curbuild, &stringLen, &charH );
 		start = scr_width->integer - stringLen;
 		stringLen = Con_StringLength( curbuild );
 
 		for( i = 0; i < stringLen; i++ )
 			width += Con_DrawCharacter( start + width, 0, curbuild[i], color );
+#endif
 
 		host.force_draw_version_time = 0;
 	}
@@ -1932,11 +1974,14 @@ void Con_DrawVersion( void )
 			host.force_draw_version = false;
 	}
 
-	if( host.force_draw_version || draw_version )
-		Q_snprintf( curbuild, MAX_STRING, "Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
-					XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ) );
-	else Q_snprintf( curbuild, MAX_STRING, "v%i/%s build %i %s %s-%s", PROTOCOL_VERSION,
-					 XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ));
+	Q_snprintf(curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
+		XASH_VERSION, Q_buildnum(), Q_buildcommit(), Q_buildos(), Q_buildarch());
+
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
+	start = scr_width->integer - stringLen;
+	ImGui_Console_AddGenericString(start, 0, curbuild, color);
+#else
 	Con_DrawStringLen( curbuild, &stringLen, &charH );
 	start = scr_width->integer - stringLen * 1.05f;
 	stringLen = Con_StringLength( curbuild );
@@ -1944,6 +1989,7 @@ void Con_DrawVersion( void )
 
 	for( i = 0; i < stringLen; i++ )
 		width += Con_DrawCharacter( start + width, height, curbuild[i], color );
+#endif
 }
 
 /*
@@ -2035,41 +2081,7 @@ void Con_VidInit( void )
 	Con_CheckResize();
 	Con_InvalidateFonts();
 
-	// loading console image
-	if( host.developer )
-	{
-		if( scr_width->integer < 640 )
-		{
-			if( FS_FileExists( "cached/conback400", false ))
-				con.background = GL_LoadTexture( "cached/conback400", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/conback", NULL, 0, TF_IMAGE, NULL );
-		}
-		else
-		{
-			if( FS_FileExists( "cached/conback640", false ))
-				con.background = GL_LoadTexture( "cached/conback640", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/conback", NULL, 0, TF_IMAGE, NULL );
-		}
-	}
-	else
-	{
-		if( scr_width->integer < 640 )
-		{
-			if( FS_FileExists( "cached/loading400", false ))
-				con.background = GL_LoadTexture( "cached/loading400", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/loading", NULL, 0, TF_IMAGE, NULL );
-		}
-		else
-		{
-			if( FS_FileExists( "cached/loading640", false ))
-				con.background = GL_LoadTexture( "cached/loading640", NULL, 0, TF_IMAGE, NULL );
-			else con.background = GL_LoadTexture( "cached/loading", NULL, 0, TF_IMAGE, NULL );
-		}
-	}
-
-	// missed console image will be replaced as white (GoldSrc rules)
-	if( con.background == tr.defaultTexture || con.background == 0 )
-		con.background = tr.whiteTexture;
+	con.background = tr.whiteTexture;
 
 	Con_LoadConchars();
 }

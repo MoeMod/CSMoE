@@ -655,6 +655,22 @@ void UI_AddTouchButtonToList( const char *name, const char *texture, const char 
 }
 
 /*
+=======================
+UI_HandleMessageMode_f
+
+send messagemode handler to menu
+=======================
+*/
+int UI_HandleMessageMode_f( void )
+{
+	if( menu.dllFuncs.pfnHandleMessageMode_f )
+	{
+		return menu.dllFuncs.pfnHandleMessageMode_f();
+	}
+	return 0;
+}
+
+/*
 ====================
 pfnGetPlayerModel
 

@@ -975,7 +975,7 @@ void CL_Connect_f( void )
 
 	NET_Config( true, !cl_nat->integer ); // allow remote
 
-	Msg( "server %s\n", server );
+	//Msg( "server %s\n", server );
 	CL_Disconnect();
 
 	HTTP_Clear_f();
@@ -2095,7 +2095,7 @@ void CL_InitLocal( void )
 	Q_memset( &cls.serveradr, 0, sizeof( cls.serveradr ) );
 
 	// register our variables
-	cl_predict = Cvar_Get( "cl_predict", "0", CVAR_ARCHIVE, "enable client movement prediction" );
+	cl_predict = Cvar_Get( "cl_predict", "1", CVAR_READ_ONLY, "enable client movement prediction" );
 	cl_crosshair = Cvar_Get( "crosshair", "1", CVAR_ARCHIVE, "show weapon chrosshair" );
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0, "disable delta-compression for usercommands" );
 	cl_idealpitchscale = Cvar_Get( "cl_idealpitchscale", "0.8", 0, "how much to look up/down slopes and stairs when not using freelook" );

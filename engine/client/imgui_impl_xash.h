@@ -26,7 +26,10 @@ qboolean ImGui_ImplGL_Init(void);
 void ImGui_ImplGL_Shutdown(void);
 void ImGui_ImplGL_NewFrame(void);
 void ImGui_ImplGL_Render(void);
-void ImGui_ImplGL_OnGUI(void);
+void ImGui_ImplGL_Client_OnGUI(void);
+void ImGui_ImplGL_Menu_OnGUI(void);
+void ImGui_ImplGL_Engine_OnGUI(void);
+void ImGui_ImplGL_ReloadFonts(void);
 
 // Use if you want to reset your rendering device without losing ImGui state.
 void ImGui_ImplGL_InvalidateDeviceObjects(void);
@@ -35,6 +38,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void);
 // Provided here if you want to chain callbacks yourself. You may also handle inputs yourself and use those as a reference.
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action);
 qboolean ImGui_ImplGL_KeyEvent( int key, int down );
+qboolean ImGui_ImplGL_CharCallback(int c);
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c);
 qboolean ImGui_ImplGL_MouseMove(int x, int y);
 

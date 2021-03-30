@@ -32,6 +32,10 @@ GNU General Public License for more details.
 #include "vgui_draw.h"
 #include "sound.h"		// SND_STOP_LOOPING
 
+#if XASH_IMGUI
+#include "imgui_console.h"
+#endif
+
 #define MAX_LINELENGTH		80
 #define MAX_TEXTCHANNELS	8		// must be power of two (GoldSrc uses 4 channels)
 #define TEXT_MSGNAME	"TextMessage%i"
@@ -453,6 +457,23 @@ void TextAdjustSize( int *x, int *y, int *w, int *h )
 	if( w ) *w *= xscale;
 	if( h ) *h *= yscale;
 }
+void TextAdjustSizeReverse(int* x, int* y, int* w, int* h)
+{
+	float	xscale, yscale;
+
+	ASSERT(x || y || w || h);
+
+	if (!clgame.ds.adjust_size) return;
+
+	// scale for screen sizes
+	xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
+	yscale = scr_height->value / (float)clgame.scrInfo.iHeight;
+
+	if (x) *x /= xscale;
+	if (y) *y /= yscale;
+	if (w) *w /= xscale;
+	if (h) *h /= yscale;
+}
 
 /*
 ====================
@@ -615,6 +636,12 @@ void CL_DrawCenterPrint( void )
 	y = clgame.centerPrint.y; // start y
 	colorDefault = g_color_table[7];
 	pText = clgame.centerPrint.message;
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen(pText, &x, &y);
+	x = scr_width->integer / 2 - x / 2;
+	y = scr_height->integer / 4;
+	ImGui_Console_AddGenericString(x, y, pText, colorDefault);
+#else
 	Con_DrawCharacterLen( 0, NULL, &charHeight );
 	
 	for( i = 0; i < clgame.centerPrint.lines; i++ )
@@ -647,6 +674,7 @@ void CL_DrawCenterPrint( void )
 		}
 		y += charHeight;
 	}
+#endif
 }
 
 /*
@@ -1713,8 +1741,16 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	if( !cls.creditsFont.valid )
 		return 0;
 
+#ifdef XASH_IMGUI
+	clgame.ds.adjust_size = true;
+	int a = max(r, max(g, b));
+	rgba_t rgb = { r,g,b,a };
+	int w = ImGui_Console_DrawChar(x, y, number, rgb);
+	clgame.ds.adjust_size = false;
+	return w;
+#else
 	number &= 255;
-
+	
 	if( hud_utf8->integer )
 		number = Con_UtfProcessChar( number );
 
@@ -1728,6 +1764,7 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
+#endif
 }
 
 /*
@@ -1744,7 +1781,11 @@ int GAME_EXPORT pfnDrawConsoleString( int x, int y, char *string )
 	if( !string || !*string ) return 0; // silent ignore
 	clgame.ds.adjust_size = true;
 	Con_SetFont( con_fontsize->integer );
-	drawLen = Con_DrawString( x, y, string, clgame.ds.textColor );
+#ifdef XASH_IMGUI
+	drawLen = ImGui_Console_AddGenericString(x, y, string, clgame.ds.textColor);
+#else
+	drawLen = Con_DrawString(x, y, string, clgame.ds.textColor);
+#endif
 	Vector4Copy( g_color_table[7], clgame.ds.textColor );
 	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
@@ -1778,7 +1819,13 @@ compute string length in screen pixels
 void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 {
 	Con_SetFont( con_fontsize->integer );
+	clgame.ds.adjust_size = true;
+#ifdef XASH_IMGUI
+	ImGui_Console_DrawStringLen( pText, length, height );
+#else
 	Con_DrawStringLen( pText, length, height );
+#endif
+	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
 }
 
@@ -2800,6 +2847,12 @@ pfnVGUI2DrawCharacter
 */
 static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned int font )
 {
+#ifdef XASH_IMGUI
+	clgame.ds.adjust_size = true;
+	int w = ImGui_Console_DrawChar(x, y, number, g_color_table[7]);
+	clgame.ds.adjust_size = false;
+	return w;
+#else
 	if( !cls.creditsFont.valid )
 		return 0;
 
@@ -2817,6 +2870,7 @@ static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned
 	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
+#endif
 }
 
 /*
@@ -2830,7 +2884,10 @@ static int GAME_EXPORT pfnVGUI2DrawCharacterAdditive( int x, int y, int ch, int 
 	if( !hud_utf8->integer )
 		ch = Con_UtfProcessChar( ch );
 
-	return pfnDrawCharacter( x, y, ch, r, g, b );
+	clgame.ds.adjust_size = true;
+	int w = pfnDrawCharacter( x, y, ch, r, g, b );
+	clgame.ds.adjust_size = false;
+	return w;
 }
 
 /*

@@ -26,6 +26,11 @@ void ImGui_Console_OnGUI(void);
 void ImGui_Console_Print(const char* txt);
 void ImGui_Console_Clear();
 void ImGui_Console_UpdateCommandList();
+void ImGui_ToggleConsole(qboolean x);
+int ImGui_Console_AddGenericString(int x, int y, const char* string, rgba_t setColor);
+void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height);
+
+int ImGui_Console_DrawChar(int x, int y, int ch, rgba_t setColor);
 
 #ifdef __cplusplus
 }

@@ -671,6 +671,8 @@ int CHudAmmo::MsgFunc_CurWeapon(const char *pszName, int iSize, void *pbuf )
 	else
 	{
 		iClip = reader.ReadByte();
+		if (iClip == 255)
+			iClip = -1;
 	}
 
 

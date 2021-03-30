@@ -144,10 +144,12 @@ else()
 	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.c)
 endif()
 
-set(XASH_ENGINE_WIN32_SOURCES
-	./platform/win32/con_win.c
-	./platform/win32/ime_win32.cpp
-)
+if(NOT XASH_DEDICATED)
+	set(XASH_ENGINE_WIN32_SOURCES
+		./platform/win32/con_win.c
+		./platform/win32/ime_win32.cpp
+	)
+endif()
 
 set(XASH_ENGINE_SDL_SOURCES
 	./platform/sdl/events.c
@@ -269,7 +271,7 @@ set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
 if(XASH_SINGLE_BINARY)
-set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES} platform/macos/vid_macos.mm platform/macos/vid_macos.h)
+set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
 endif()
 
 
@@ -365,7 +367,10 @@ endif()
 if(ANDROID)
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
 elseif(XASH_STATIC_GAMELIB)
-	add_definitions(-DSINGLE_BINARY -DXASH_SDLMAIN)
+	add_definitions(-DSINGLE_BINARY)
+	if(XASH_SDL)
+		add_definitions(-DXASH_SDLMAIN)
+	endif()
 	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
 elseif(XASH_SINGLE_BINARY) # Set executable or library
 	add_definitions(-DSINGLE_BINARY)
@@ -386,10 +391,11 @@ endif()
 if(MINGW OR LINUX)
 	add_definitions(-DGDB_BREAK)
 elseif(WIN32 AND NOT XASH_64BIT)
-	add_definitions( -DDBGHELP -DXASH_W32CON) # dbghelp crashhandler
-	if(MINGW)
-		target_link_libraries(${XASH_ENGINE} -luser32 -lkernel32 -lgdi32 -ldbghelp -lpsapi)
-	endif()
+	add_definitions( -DDBGHELP ) # dbghelp crashhandler
+endif()
+
+if(MINGW)
+	target_link_libraries(${XASH_ENGINE} -luser32 -lkernel32 -lgdi32 -ldbghelp -lpsapi -lcomctl32)
 endif()
 
 if(NOT WIN32 OR XASH_64BIT)
@@ -504,6 +510,7 @@ elseif(NOT WIN32)
 	else()
 		target_link_libraries(${XASH_ENGINE} -lm -lpthread -lnetwork)
 	endif()
+	# For single binary builds we change name to game_launch's executable name
 	# For single binary builds we change name to game_launch's executable name
 	if(XASH_SINGLE_BINARY)
 		set_target_properties(${XASH_ENGINE} PROPERTIES

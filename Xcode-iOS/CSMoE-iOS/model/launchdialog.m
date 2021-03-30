@@ -23,7 +23,7 @@
 char *g_szLibrarySuffix = NULL;
 float g_iOSVer;
 
-enum XashGameStatus_e g_iStartGameStatus = XGS_WAITING;
+enum XashGameStatus_e g_iStartGameStatus = XGS_SKIP;
 
 void IOS_StartBackgroundTask()
 {
@@ -75,7 +75,7 @@ void IOS_PrepareView()
 	UIWindow *window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
 	NSBundle *bundle = [NSBundle mainBundle];
-	NSString *storyboardName = [bundle objectForInfoDictionaryKey:@"UIMainStoryboardFile"];
+	NSString *storyboardName = @"TutorStoryboard";// [bundle objectForInfoDictionaryKey:@"UIMainStoryboardFile"];
 	
 	UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:bundle];
 	UIViewController * controller = storyboard.instantiateInitialViewController;
@@ -87,10 +87,20 @@ void IOS_PrepareView()
 
 void IOS_SetDefaultArgs()
 {
-	static char *args[64] = { "xash", "-dev", "5", "-log", "-game", "csmoe"};
+	static char width_str[32] = "0";
+	static char height_str[32] = "0";
+	static char *args[64] = { "xash", "-dev", "5", "-log", "-game", "csmoe", "-width", width_str, "-height", height_str };
+	
+	CGRect rect_screen = [[UIScreen mainScreen]bounds];
+    CGSize size_screen = rect_screen.size;
+	CGFloat scale_screen = [UIScreen mainScreen].scale;
+	CGFloat width = size_screen.width * scale_screen;
+	CGFloat height = size_screen.height * scale_screen;
+	sprintf(width_str, "%d", (int)width);
+	sprintf(height_str, "%d", (int)height);
 	
 	g_pszArgv = args;
-	g_iArgc = 6;
+	g_iArgc = 10;
 }
 
 void IOS_LaunchDialog( void )
@@ -99,13 +109,10 @@ void IOS_LaunchDialog( void )
 	g_iOSVer = [ver floatValue];
 	NSLog(@"System Version is %@",ver);
 	
-	if(g_iStartGameStatus == XGS_WAITING)
+	if(!IOS_IsResourcesReady())
 	{
+		g_iStartGameStatus = XGS_WAITING;
 		IOS_PrepareView();
-	}
-	else
-	{
-		IOS_SetDefaultArgs();
 	}
 
 	// wating for starting
@@ -114,6 +121,8 @@ void IOS_LaunchDialog( void )
 			[[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
 		}
 	}
+	
+	IOS_SetDefaultArgs();
 	
 	// iOS Settings...
 	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");

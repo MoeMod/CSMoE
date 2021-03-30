@@ -13,3 +13,6 @@
 [submodule "3rdparty/QindieGL"]
 	path = 3rdparty/QindieGL
 	url = https://github.com/MoeMod/QindieGL
+[submodule "3rdparty/QRCode"]
+	path = 3rdparty/QRCode
+	url = https://github.com/ricmoo/QRCode

@@ -54,6 +54,8 @@ float g_ImGUI_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
 
+bool g_bShowDemoWindow = false;
+
 template<typename T> static inline T ImLerp(T a, T b, float t) { return (T)(a + (b - a) * t); }
 static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, float t) { return ImVec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t); }
 static inline ImVec2 ImLerp(const ImVec2& a, const ImVec2& b, const ImVec2& t) { return ImVec2(a.x + (b.x - a.x) * t.x, a.y + (b.y - a.y) * t.y); }
@@ -161,9 +163,13 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 // -action
 //    1:down 0:up
 //=============
+
+extern "C" { extern qboolean	in_mouseactive; }
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	if (!g_EngineContext)
+		return false;
+	if (cls.key_dest == key_game)
 		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	if (button >= 0 && button < 5)
@@ -204,6 +210,8 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 {
 	if (!g_EngineContext)
 		return false;
+	if (cls.key_dest == key_game)
+		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	// IMGUI input
 	switch (key)
@@ -225,7 +233,7 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 			KeyCallback(key, down);
 			break;
 	}
-	return io.WantCaptureKeyboard || io.WantCaptureMouse;
+	return io.WantCaptureKeyboard;
 }
 
 void ImGui_ImplGL_CharCallback(unsigned int c)
@@ -235,6 +243,15 @@ void ImGui_ImplGL_CharCallback(unsigned int c)
 	ImGuiIO& io = ImGui::GetIO();
 	if (c > 0 && c < 0x10000)
 		io.AddInputCharacter(c);
+}
+
+qboolean ImGui_ImplGL_CharCallback(int c)
+{
+	if (!g_EngineContext)
+		return false;
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddInputCharacter((unsigned)c);
+	return io.WantTextInput;
 }
 
 qboolean ImGui_ImplGL_CharCallbackUTF(const char *c)
@@ -323,6 +340,11 @@ void ImGui_ImplGL_ReloadFonts()
 	search_t		*t;
 	int		i;
 
+	float size_pixels = 14 * 2; // 14 * 2
+
+	if (size_pixels <= 0.0f)
+		return;
+	
 	t = FS_Search( "resource/font/*.ttf", true, false );
 	if (t)
 	{
@@ -334,7 +356,7 @@ void ImGui_ImplGL_ReloadFonts()
 			std::unique_ptr<void, decltype(&ImGui::MemFree)> new_ptr(ImGui::MemAlloc(length + 1), ImGui::MemFree);
 			memcpy(new_ptr.get(), file, length);
 			Mem_Free(std::exchange(file, nullptr));
-			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+			auto font = io.Fonts->AddFontFromMemoryTTF(new_ptr.release(), length, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
 		}
 		Mem_Free(t);
 	}
@@ -344,10 +366,77 @@ void ImGui_ImplGL_ReloadFonts()
 		char buffer[MAX_PATH];
 		GetSystemDirectoryA(buffer, sizeof(buffer));
 		strcat(buffer, "\\..\\Fonts\\simhei.ttf");
-		auto font = io.Fonts->AddFontFromFileTTF(buffer, 14 * 2, NULL, io.Fonts->GetGlyphRangesChineseFull());
+		auto font = io.Fonts->AddFontFromFileTTF(buffer, size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
+#endif
+#ifdef TARGET_OS_MAC
+		auto font = io.Fonts->AddFontFromFileTTF("/System/Library/Fonts/PingFang.ttc", size_pixels, NULL, io.Fonts->GetGlyphRangesChineseFull());
 #endif
 	}
 
+}
+
+#ifdef XASH_SDL
+
+static SDL_Cursor* g_MouseCursors[ImGuiMouseCursor_COUNT] = {};
+
+static void ImGui_ImplSDL2_Init()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;       // We can honor GetMouseCursor() values (optional)
+	io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;        // We can honor io.WantSetMousePos requests (optional, rarely used)
+	
+	// Load mouse cursors
+	g_MouseCursors[ImGuiMouseCursor_Arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	g_MouseCursors[ImGuiMouseCursor_TextInput] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	g_MouseCursors[ImGuiMouseCursor_ResizeAll] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNS] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	g_MouseCursors[ImGuiMouseCursor_ResizeEW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+	g_MouseCursors[ImGuiMouseCursor_Hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+	g_MouseCursors[ImGuiMouseCursor_NotAllowed] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+}
+
+void ImGui_ImplSDL2_Shutdown()
+{
+	// Destroy SDL mouse cursors
+	for (ImGuiMouseCursor cursor_n = 0; cursor_n < ImGuiMouseCursor_COUNT; cursor_n++)
+		SDL_FreeCursor(g_MouseCursors[cursor_n]);
+	memset(g_MouseCursors, 0, sizeof(g_MouseCursors));
+}
+
+static void ImGui_ImplSDL2_UpdateMouseCursor()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
+		return;
+
+	ImGuiMouseCursor imgui_cursor = ImGui::GetMouseCursor();
+	if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
+	{
+		// Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
+		SDL_ShowCursor(SDL_FALSE);
+	}
+	else
+	{
+		// Show OS mouse cursor
+		SDL_SetCursor(g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
+		SDL_ShowCursor(SDL_TRUE);
+	}
+}
+#endif
+
+void Cmd_ImGui_f()
+{
+	if(Cmd_Argc() < 2)
+	{
+		Con_Print("Usage : imgui demo\n");
+		return;
+	}
+	if(!strcmp(Cmd_Argv(1), "demo"))
+	{
+		g_bShowDemoWindow = true;
+	}
 }
 
 qboolean ImGui_ImplGL_Init(void)
@@ -389,12 +478,18 @@ qboolean ImGui_ImplGL_Init(void)
 	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	//io.RenderDrawListsFn = ImGui_ImplGL_RenderDrawLists;
 
+#ifdef XASH_SDL
+	ImGui_ImplSDL2_Init();
+#endif
+
 	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
 	ImGui_ImplGL_ReloadFonts();
 
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+
+	Cmd_AddCommand("imgui", Cmd_ImGui_f, "imgui demo");
 
 	return true;
 }
@@ -403,6 +498,11 @@ void ImGui_ImplGL_Shutdown(void)
 {
 	if (!g_EngineContext)
 		return void();
+
+#ifdef XASH_SDL
+	ImGui_ImplSDL2_Shutdown();
+#endif
+
 	ImGui_ImplGL_InvalidateDeviceObjects();
     ImGui::DestroyContext(std::exchange(g_EngineContext, nullptr));
 	//ImGui::Shutdown();
@@ -462,7 +562,6 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 	colors[ImGuiCol_ModalWindowDimBg]       = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
 }
 
-extern "C" { extern qboolean	in_mouseactive; }
 void ImGui_ImplGL_NewFrame(void)
 {
 	if (!g_FontTexture)
@@ -527,6 +626,10 @@ void ImGui_ImplGL_NewFrame(void)
 	if(io.WantTextInput)
 		Key_EnableTextInput(true, false);
 
+#ifdef XASH_SDL
+	ImGui_ImplSDL2_UpdateMouseCursor();
+#endif
+
 	// Hide OS mouse cursor if ImGui is drawing it
 	//if( !io.MouseDrawCursor ) IN_ActivateMouse( false );
 	//else IN_DeactivateMouse();
@@ -546,9 +649,9 @@ qboolean ImGui_ImplGL_MouseMove(int x, int y)
 void ImGui_ImplGL_Render(void)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	ImGui::Render();
+    ImGui::Render();
 	//ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	//pglViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	//pglClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
 	//pglClear(GL_COLOR_BUFFER_BIT);
 	//pglUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound
@@ -562,15 +665,24 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_Console_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	if(g_bShowDemoWindow)
+		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }
 
-void ImGui_ImplGL_OnGUI(void)
+void ImGui_ImplGL_Client_OnGUI(void)
 {
-	if(clgame.dllFuncs.pfnOnGUI)
+	if (clgame.dllFuncs.pfnOnGUI && cls.key_dest == key_game)
 		clgame.dllFuncs.pfnOnGUI(g_EngineContext);
-	if (menu.dllFuncs.pfnOnGUI)
-		menu.dllFuncs.pfnOnGUI(g_EngineContext);
+}
 
+void ImGui_ImplGL_Menu_OnGUI(void)
+{
+	if (menu.dllFuncs.pfnOnGUI && cls.key_dest == key_menu)
+		menu.dllFuncs.pfnOnGUI(g_EngineContext);
+}
+
+void ImGui_ImplGL_Engine_OnGUI(void)
+{
 	Engine_OnGUI(g_EngineContext);
 }
 

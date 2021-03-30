@@ -382,6 +382,10 @@ qboolean V_PreRender( void )
 	
 	R_BeginFrame( !cl.refdef.paused );
 
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_NewFrame();
+#endif
+
 	return true;
 }
 
@@ -427,9 +431,15 @@ void V_PostRender( void )
 		SV_DrawOrthoTriangles();
 		CL_DrawDemoRecording();
 		R_ShowTextures();
+#ifdef XASH_IMGUI
+		ImGui_ImplGL_Client_OnGUI();
+#endif
 		CL_DrawHUD( CL_CHANGELEVEL );
 
 		Con_DrawConsole();
+#ifdef XASH_IMGUI
+		ImGui_ImplGL_Menu_OnGUI();
+#endif
 		UI_UpdateMenu( host.realtime );
 		SCR_DrawNetGraph();
 		Con_DrawVersion();
@@ -437,16 +447,16 @@ void V_PostRender( void )
 		Joy_DrawOnScreenKeyboard();
 #endif
 #ifdef XASH_IMGUI
-		ImGui_ImplGL_NewFrame();
-
-        ImGui_ImplGL_OnGUI();
-
-		ImGui_ImplGL_Render();
+		ImGui_ImplGL_Engine_OnGUI();
 #endif
 
 		Con_DrawDebug(); // must be last
 		S_ExtraUpdate();
 	}
+
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_Render();
+#endif
 
 	SCR_MakeScreenShot();
 	R_EndFrame();

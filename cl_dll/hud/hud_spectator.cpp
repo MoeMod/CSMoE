@@ -630,7 +630,7 @@ void CHudSpectator::DirectorMessage( int iSize, void *pbuf )
 		msg->pMessage = m_HUDMessageText[m_lastHudMessage];
 		msg->pName	  = "HUD_MESSAGE";
 
-		gHUD.m_Message.MessageAdd( msg );
+		gHUD.m_Message.MessageAdd( *msg );
 
 		m_lastHudMessage++;
 		m_lastHudMessage %= MAX_SPEC_HUD_MESSAGES;

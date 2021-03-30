@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "parsemsg.h"
 #include "vgui_parser.h"
+#include "unicode_strtools.h"
 #include "draw_util.h"
 
 DECLARE_MESSAGE( m_Message, HudText )
@@ -58,7 +59,7 @@ int CHudMessage::VidInit( void )
 
 void CHudMessage::Reset( void )
 {
- 	memset( m_pMessages, 0, sizeof( m_pMessages[0] ) * maxHUDMessages );
+	std::fill(std::begin(m_pMessages), std::end(m_pMessages), nullptr);
 	memset( m_startTime, 0, sizeof( m_startTime[0] ) * maxHUDMessages );
 	
 	m_gameTitleTime = 0;
@@ -244,36 +245,19 @@ void CHudMessage::MessageScanStart( void )
 }
 
 
-void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
+void CHudMessage::MessageDrawScan(std::shared_ptr<client_textmessage_t> pMessage, float time )
 {
-	int i, j, length, width;
-	const char *pText;
-	unsigned char line[80];
+	int i, j;
+	const char* pText = pMessage->pMessage;
 
-	pText = pMessage->pMessage;
 	// Count lines
 	m_parms.lines = 1;
 	m_parms.time = time;
 	m_parms.pMessage = pMessage;
-	length = 0;
-	width = 0;
-	m_parms.totalWidth = 0;
-	while ( *pText )
-	{
-		if ( *pText == '\n' )
-		{
-			m_parms.lines++;
-			if ( width > m_parms.totalWidth )
-				m_parms.totalWidth = width;
-			width = 0;
-		}
-		else
-			width += gHUD.GetCharWidth((unsigned char)*pText);
-		pText++;
-		length++;
-	}
-	m_parms.length = length;
-	m_parms.totalHeight = (m_parms.lines * gHUD.GetCharHeight());
+
+	DrawUtils::ConsoleStringSize(pText, &m_parms.totalWidth, &m_parms.totalHeight);
+	m_parms.length = strlen(pText);
+	m_parms.lines = std::count(pText, pText + m_parms.length, '\n') + 1;
 
 
 	m_parms.y = YPosition( pMessage->y, m_parms.totalHeight );
@@ -287,28 +271,33 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 	{
 		m_parms.lineLength = 0;
 		m_parms.width = 0;
+		char line[80];
 		while ( *pText && *pText != '\n' )
 		{
-			unsigned char c = *pText;
+			char c = *pText;
 			line[m_parms.lineLength] = c;
-			m_parms.width += gHUD.GetCharWidth(c);
 			m_parms.lineLength++;
 			pText++;
 		}
 		pText++;		// Skip LF
-		line[m_parms.lineLength] = 0;
+		line[m_parms.lineLength] = '\0';
+		int lineHeight;
+		DrawUtils::ConsoleStringSize(line, &m_parms.width, &lineHeight);
+		wchar_t wline[80];
+		cl::Q_UTF8ToUTF16(line, wline, 80, STRINGCONVERT_SKIP);
 
 		m_parms.x = XPosition( pMessage->x, m_parms.width, m_parms.totalWidth );
 
-		for ( j = 0; j < m_parms.lineLength; j++ )
+		for ( j = 0; wline[j]; j++ )
 		{
-			m_parms.text = line[j];
-			int next = m_parms.x + gHUD.GetCharWidth( m_parms.text );
+			m_parms.text = wline[j];
 			MessageScanNextChar();
 			
-			if ( m_parms.x >= 0 && m_parms.y >= 0 && next <= ScreenWidth )
-				DrawUtils::TextMessageDrawChar( m_parms.x, m_parms.y, m_parms.text, m_parms.r, m_parms.g, m_parms.b );
-			m_parms.x = next;
+			if ( m_parms.x >= 0 && m_parms.y >= 0 )
+			{
+				auto width = DrawUtils::TextMessageDrawChar(m_parms.x, m_parms.y, m_parms.text, m_parms.r, m_parms.g, m_parms.b);
+				m_parms.x += width;
+			}
 		}
 
 		m_parms.y += gHUD.GetCharHeight();
@@ -319,7 +308,7 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 int CHudMessage::Draw( float fTime )
 {
 	int i, drawn;
-	client_textmessage_t *pMessage;
+	std::shared_ptr<client_textmessage_t> pMessage;
 	float endTime;
 
 	drawn = 0;
@@ -408,8 +397,7 @@ int CHudMessage::Draw( float fTime )
 					delete[] m_pMessages[i]->pName;
 					delete[] m_pMessages[i]->pMessage;
 				}
-				delete m_pMessages[i];
-				m_pMessages[i] = NULL;
+				m_pMessages[i] = nullptr;
 			}
 		}
 	}
@@ -427,7 +415,7 @@ int CHudMessage::Draw( float fTime )
 void CHudMessage::MessageAdd( const char *pName, float time )
 {
 	int i,j;
-	client_textmessage_t *tempMessage;
+	const client_textmessage_t *tempMessage = nullptr;
 
 	for ( i = 0; i < maxHUDMessages; i++ )
 	{
@@ -439,7 +427,7 @@ void CHudMessage::MessageAdd( const char *pName, float time )
 			else
 				tempMessage = TextMessageGet( pName );
 
-			client_textmessage_t *message = new client_textmessage_t;
+			std::shared_ptr<client_textmessage_t> message = std::make_shared<client_textmessage_t>();
 			if( tempMessage )
 			{
 				*message = *tempMessage;
@@ -497,8 +485,7 @@ void CHudMessage::MessageAdd( const char *pName, float time )
 							delete[] m_pMessages[j]->pName;
 							delete[] m_pMessages[j]->pMessage;
 						}
-						delete m_pMessages[j];
-						m_pMessages[j] = NULL;
+						m_pMessages[j] = nullptr;
 					}
 				}
 			}
@@ -542,7 +529,7 @@ int CHudMessage::MsgFunc_GameTitle( const char *pszName,  int iSize, void *pbuf 
 	return 1;
 }
 
-void CHudMessage::MessageAdd(client_textmessage_t * newMessage )
+void CHudMessage::MessageAdd(const client_textmessage_t &newMessage )
 {
 	m_parms.time = gHUD.m_flTime;
 
@@ -553,7 +540,7 @@ void CHudMessage::MessageAdd(client_textmessage_t * newMessage )
 	{
 		if ( !m_pMessages[i] )
 		{
-			m_pMessages[i] = newMessage;
+			m_pMessages[i] = std::make_shared<client_textmessage_t>(newMessage);
 			m_startTime[i] = gHUD.m_flTime;
 			return;
 		}

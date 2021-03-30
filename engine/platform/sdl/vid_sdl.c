@@ -271,11 +271,11 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	{
 		VID_RestoreScreenResolution();
 	}
-
+#if 0
 #if defined(_WIN32) && !defined(XASH_64BIT) && !defined( XASH_WINRT ) // ICO support only for Win32
 	if( FS_FileExists( GI->iconpath, true ) )
 	{
-		HICON ico;
+		HICON ico = NULL;
 		char	localPath[MAX_PATH];
 
 		Q_snprintf( localPath, sizeof( localPath ), "%s/%s", GI->gamefolder, GI->iconpath );
@@ -322,6 +322,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		}
 #endif
 	}
+#endif
 
 	SDL_ShowWindow( host.hWnd );
 	if( !glw_state.initialized )
@@ -502,7 +503,7 @@ qboolean VID_SetMode( void )
 	{
 		SDL_DisplayMode mode;
 #if !defined DEFAULT_MODE_WIDTH || !defined DEFAULT_MODE_HEIGHT
-		SDL_GetDesktopDisplayMode( 0, &mode );
+		SDL_GetCurrentDisplayMode( 0, &mode );
 #else
 		mode.w = DEFAULT_MODE_WIDTH;
 		mode.h = DEFAULT_MODE_HEIGHT;
@@ -576,7 +577,8 @@ qboolean VID_GetDPI(float* out)
 		SDL_GetWindowWMInfo(host.hWnd, &wmInfo);
 		{
 			HWND hwnd = wmInfo.info.win.window;
-			int res = GetDpiForWindow(hwnd);
+            float WIN_GetDpiForWindow(HWND hwnd);
+			int res = WIN_GetDpiForWindow(hwnd);
 			if (res)
 			{
 				success = true;
