@@ -32,8 +32,9 @@ void *CBaseEntity::operator new(size_t stAllocateBlock, entvars_t *newpev) noexc
 
 // No way to ban creating auto var anymore... 
 // However, entity can only create by GetClassPtr<T>(nullptr), CREATE_NAMED_ENTITY,  or new T;
-CBaseEntity::CBaseEntity() : pev(g_pCachedEntVarsPtr.exchange(nullptr))
+CBaseEntity::CBaseEntity()
 {
+	pev = g_pCachedEntVarsPtr.exchange(nullptr);
 	assert(pev != nullptr);
 	assert("auto var of CBaseEntity is not allowed!" && (g_CreateEntityLock.try_lock() == false));
 	g_CreateEntityLock.unlock();

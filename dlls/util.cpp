@@ -10,6 +10,7 @@
 #include "gamerules.h"
 #include "sound.h"
 #include "globals.h"
+#include "cbase/cbase_hash.h"
 
 unsigned int glSeed;
 

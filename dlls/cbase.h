@@ -22,7 +22,6 @@
 #include "const/const_server.h"
 
 #include "saverestore.h"
-//#include "schedule.h"
 #include "monsterevent.h"
 
 #include <UtlVector.h>
@@ -55,30 +54,6 @@ extern "C" EXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfac
 extern "C" EXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion);
 
 namespace sv {
-
-typedef enum
-{
-	CLASSNAME
-}
-hash_types_e;
-
-typedef struct hash_item_s
-{
-	entvars_t *pev;
-	struct hash_item_s *next;
-	struct hash_item_s *lastHash;
-	int pevIndex;
-}
-hash_item_t;
-
-extern CUtlVector<hash_item_t> stringsHashTable;
-
-int CaseInsensitiveHash(const char *string, int iBounds);
-void EmptyEntityHashTable(void);
-void AddEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
-void RemoveEntityHashValue(entvars_t *pev, const char *value, hash_types_e fieldType);
-void printEntities(void);
-void loopPerformance(void);
 
 extern int DispatchSpawn(edict_t *pent);
 extern void DispatchKeyValue(edict_t *pentKeyvalue, KeyValueData *pkvd);
@@ -128,7 +103,46 @@ namespace cl {
 namespace sv {
 #endif
 
-class CBaseEntity : ruleof350::unique
+template<class ThisClass, class BaseClass> struct PrivateData;
+
+template<> struct PrivateData<class CBaseEntity, void>
+{
+    entvars_t * pev;
+	CBaseEntity *m_pGoalEnt;
+	CBaseEntity *m_pLink;
+	void (CBaseEntity::*m_pfnThink)(void);
+	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
+	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
+	int current_ammo;
+	int currentammo;
+	int maxammo_buckshot;
+	int ammo_buckshot;
+	int maxammo_9mm;
+	int ammo_9mm;
+	int maxammo_556nato;
+	int ammo_556nato;
+	int maxammo_556natobox;
+	int ammo_556natobox;
+	int maxammo_762nato;
+	int ammo_762nato;
+	int maxammo_45acp;
+	int ammo_45acp;
+	int maxammo_50ae;
+	int ammo_50ae;
+	int maxammo_338mag;
+	int ammo_338mag;
+	int maxammo_57mm;
+	int ammo_57mm;
+	int maxammo_357sig;
+	int ammo_357sig;
+	time_point_t m_flStartThrow;
+	time_point_t m_flReleaseThrow;
+	int m_iSwing;
+	bool has_disconnected;
+};
+
+class CBaseEntity : ruleof350::unique, public PrivateData<class CBaseEntity, void>
 {
 #ifndef CLIENT_DLL
 public:
@@ -349,45 +363,6 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
-
-public:
-#ifdef CLIENT_DLL
-	entvars_t * pev;
-#else
-	entvars_t * const pev;
-#endif
-	CBaseEntity *m_pGoalEnt;
-	CBaseEntity *m_pLink;
-	void (CBaseEntity::*m_pfnThink)(void);
-	void (CBaseEntity::*m_pfnTouch)(CBaseEntity *pOther);
-	void (CBaseEntity::*m_pfnUse)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
-	void (CBaseEntity::*m_pfnBlocked)(CBaseEntity *pOther);
-	int current_ammo;
-	int currentammo;
-	int maxammo_buckshot;
-	int ammo_buckshot;
-	int maxammo_9mm;
-	int ammo_9mm;
-	int maxammo_556nato;
-	int ammo_556nato;
-	int maxammo_556natobox;
-	int ammo_556natobox;
-	int maxammo_762nato;
-	int ammo_762nato;
-	int maxammo_45acp;
-	int ammo_45acp;
-	int maxammo_50ae;
-	int ammo_50ae;
-	int maxammo_338mag;
-	int ammo_338mag;
-	int maxammo_57mm;
-	int ammo_57mm;
-	int maxammo_357sig;
-	int ammo_357sig;
-	time_point_t m_flStartThrow;
-	time_point_t m_flReleaseThrow;
-	int m_iSwing;
-	bool has_disconnected;
 };
 
 } // namespace sv | cl
@@ -413,7 +388,13 @@ namespace cl {
 namespace sv {
 #endif
 
-class CBaseDelay : public CBaseEntity
+template<> struct PrivateData<class CBaseDelay, CBaseEntity>
+{
+    duration_t m_flDelay;
+    int m_iszKillTarget;
+};
+
+class CBaseDelay : public CBaseEntity, public PrivateData<class CBaseDelay, CBaseEntity>
 {
 public:
 #ifdef CLIENT_DLL
@@ -434,13 +415,18 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
-
-public:
-	duration_t m_flDelay;
-	int m_iszKillTarget;
 };
 
-class CBaseAnimating : public CBaseDelay
+template<> struct PrivateData<class CBaseAnimating, CBaseDelay>
+{
+	float m_flFrameRate;
+	float m_flGroundSpeed;
+	time_point_t m_flLastEventCheck;
+	BOOL m_fSequenceFinished;
+	BOOL m_fSequenceLoops;
+};
+
+class CBaseAnimating : public CBaseDelay, public PrivateData<class CBaseAnimating, CBaseDelay>
 {
 public:
 #ifdef CLIENT_DLL
@@ -474,16 +460,32 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[];
-
-public:
-	float m_flFrameRate;
-	float m_flGroundSpeed;
-	time_point_t m_flLastEventCheck;
-	BOOL m_fSequenceFinished;
-	BOOL m_fSequenceLoops;
 };
 
-class CBaseToggle : public CBaseAnimating
+template<> struct PrivateData<class CBaseToggle, CBaseAnimating>
+{
+	TOGGLE_STATE m_toggle_state;
+	time_point_t m_flActivateFinished;
+	float m_flMoveDistance;
+	duration_t m_flWait;
+	float m_flLip;
+	float m_flTWidth;
+	float m_flTLength;
+	Vector m_vecPosition1;
+	Vector m_vecPosition2;
+	Vector m_vecAngle1;
+	Vector m_vecAngle2;
+	int m_cTriggersLeft;
+	float m_flHeight;
+	EHANDLE m_hActivator;
+	void (CBaseToggle::*m_pfnCallWhenMoveDone)(void);
+	Vector m_vecFinalDest;
+	Vector m_vecFinalAngle;
+	int m_bitsDamageInflict;
+	string_t m_sMaster;
+};
+
+class CBaseToggle : public CBaseAnimating, public PrivateData<class CBaseToggle, CBaseAnimating>
 {
 public:
 #ifdef CLIENT_DLL
@@ -514,27 +516,6 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 
 public:
-	TOGGLE_STATE m_toggle_state;
-	time_point_t m_flActivateFinished;
-	float m_flMoveDistance;
-	duration_t m_flWait;
-	float m_flLip;
-	float m_flTWidth;
-	float m_flTLength;
-	Vector m_vecPosition1;
-	Vector m_vecPosition2;
-	Vector m_vecAngle1;
-	Vector m_vecAngle2;
-	int m_cTriggersLeft;
-	float m_flHeight;
-	EHANDLE m_hActivator;
-	void (CBaseToggle::*m_pfnCallWhenMoveDone)(void);
-	Vector m_vecFinalDest;
-	Vector m_vecFinalAngle;
-	int m_bitsDamageInflict;
-	string_t m_sMaster;
-
-public:
 	template <typename T>
 	auto SetMoveDone(void (T::*pfn)(void)) -> typename std::enable_if<std::is_base_of<CBaseToggle, T>::value>::type
 	{
@@ -543,11 +524,6 @@ public:
 };
 
 } // namespace sv | cl
-
-namespace sv {
-class CCineMonster;
-class CSound;
-}
 
 #include "basemonster.h"
 

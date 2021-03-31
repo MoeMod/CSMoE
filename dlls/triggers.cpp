@@ -11,6 +11,7 @@
 #include "triggers.h"
 #include "globals.h"
 #include "game.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 

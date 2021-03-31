@@ -30,6 +30,7 @@
 #include "player/player_mod_strategy.h"
 #include "player/player_zombie.h"
 #include "weapons_buy.h"
+#include "cbase/cbase_hash.h"
 
 #include <tuple>
 
