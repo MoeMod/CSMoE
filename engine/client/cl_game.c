@@ -2454,6 +2454,11 @@ static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, float *vstart
 	return PM_TraceSurface( pe, vstart, vend );
 }
 
+static unsigned short GAME_EXPORT pfnGetCurrentEventIndex(void)
+{
+	return cl.events.cur_event;
+}
+
 /*
 =============
 pfnStopAllSounds
@@ -3847,6 +3852,7 @@ static event_api_t gEventApi =
 	CL_PlayerTraceExt,
 	CL_SoundFromIndex,
 	pfnTraceSurface,
+	pfnGetCurrentEventIndex,
 };
 
 static demo_api_t gDemoApi =

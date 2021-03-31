@@ -14,6 +14,10 @@
 ****/
 #include "events.h"
 
+#ifdef XASH_LUASH
+#include "luash_cl/ev_lua.h"
+#endif
+
 namespace cl {
 
 int g_iRShell, g_iPShell, g_iBlackSmoke, g_iShotgunShell;
@@ -244,6 +248,10 @@ void Game_HookEvents( void )
 	HOOK_EVENT(r8, FireR8);
 	HOOK_EVENT(voidpistol, FireVoidpistol);
 	HOOK_EVENT(wpneffects, WpnEffects);
+
+#ifdef XASH_LUASH
+	Lua_HookEvents();
+#endif
 
 	cl_gunbubbles = gEngfuncs.pfnRegisterVariable("cl_gunbubbles", "2", FCVAR_ARCHIVE);
 	cl_tracereffect = gEngfuncs.pfnRegisterVariable("cl_tracereffect", "0", FCVAR_ARCHIVE);

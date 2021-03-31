@@ -475,8 +475,8 @@ public:
 	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override;
 	int GiveAmmo(int iAmount, const char *szName, int iMax) override;
 #endif
-	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
-	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
+	//void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
+	//void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
 	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
 	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO && pev->health > 0.0f); }
 	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }

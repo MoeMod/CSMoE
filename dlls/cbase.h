@@ -148,12 +148,9 @@ class CBaseEntity : ruleof350::unique, public PrivateData<class CBaseEntity, voi
 public:
 	static void CheckEntityDestructor(CBaseEntity *pEntity);
 	CBaseEntity();
-
-	virtual ~CBaseEntity();
 #else
 public:
 	CBaseEntity() = default;
-	~CBaseEntity() = default;
 #endif
 
 public:
@@ -212,8 +209,13 @@ public:
 	virtual int DamageDecal(int bitsDamageType);
 #endif
 	virtual void SetToggleState(int state) {}
-	virtual void StartSneaking(void) {}
-	virtual void StopSneaking(void) {}
+	void StartSneaking(void) = delete;
+	void StopSneaking(void) = delete;
+#ifndef CLIENT_DLL
+	virtual ~CBaseEntity();
+#else
+	virtual ~CBaseEntity() = default;
+#endif
 	virtual BOOL OnControls(entvars_t *onpev) { return FALSE; }
 	virtual BOOL IsSneaking(void) { return FALSE; }
 	virtual BOOL IsAlive(void) { return (pev->deadflag == DEAD_NO) && pev->health > 0; }

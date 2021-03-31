@@ -258,6 +258,15 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
+if(XASH_LUASH)
+	set(LUASH_SRCS
+		luash_cl/lua_cl.cpp
+		luash_cl/ev_lua.cpp
+	)
+else()
+	set(LUASH_SRCS )
+endif()
+
 set(INPUT_SRCS ./input_xash3d.cpp)
 
 set (CLDLL_SOURCES
@@ -284,6 +293,7 @@ set (CLDLL_SOURCES
 	${HLWPN_SRCS}
 	${STUDIORENDER_SRCS}
 	${IMGUI_SRCS}
+	${LUASH_SRCS}
 )
 
 include_directories (
@@ -341,6 +351,10 @@ target_link_libraries( ${CLIENT_LIBRARY} ${CMAKE_DL_LIBS} )
 
 if(XASH_IMGUI)
 	target_link_libraries( ${CLIENT_LIBRARY} imgui imgui_ext )
+endif()
+
+if(XASH_LUASH)
+	target_link_libraries( ${CLIENT_LIBRARY} luash)
 endif()
 
 if(ANDROID OR IOS)

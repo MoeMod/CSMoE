@@ -35,6 +35,10 @@
 #include "cdll_exp.h"
 #include "events.h"
 
+#ifdef XASH_LUASH
+#include "luash_cl/lua_cl.h"
+#endif
+
 extern "C"
 {
 #include "pmtrace.h"
@@ -87,6 +91,9 @@ void DLLEXPORT HUD_Shutdown( void )
 	gHUD.Shutdown();
 	Input_Shutdown();
 	Localize_Free();
+#ifdef XASH_LUASH
+	LuaCL_Shutdown();
+#endif
 }
 
 
@@ -195,6 +202,9 @@ the hud variables.
 
 void DLLEXPORT HUD_Init( void )
 {
+#ifdef XASH_LUASH
+	LuaCL_Init();
+#endif
 	InitInput();
 	gHUD.Init();
 	//Scheme_Init();
