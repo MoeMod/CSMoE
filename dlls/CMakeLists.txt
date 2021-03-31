@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 project (server)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -187,6 +187,7 @@ set(HLDLL_SRCS
 	./cbase/cbase_entity_factory.cpp
 	./cbase/cbase_physint.cpp
 	./gamemode/zbb/zbb_zombie.cpp
+	./refl/cbase_export.cpp
 	)
 
 set (HLWPN_SRCS

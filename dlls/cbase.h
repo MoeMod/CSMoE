@@ -94,9 +94,6 @@ class CBasePlayer;
 
 #include "ehandle.h"
 
-#include "ruleof350.h"
-#include <functional> // why not use c++11 std::function?
-
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -142,7 +139,7 @@ template<> struct PrivateData<class CBaseEntity, void>
 	bool has_disconnected;
 };
 
-class CBaseEntity : ruleof350::unique, public PrivateData<class CBaseEntity, void>
+class CBaseEntity : public PrivateData<class CBaseEntity, void>
 {
 #ifndef CLIENT_DLL
 public:

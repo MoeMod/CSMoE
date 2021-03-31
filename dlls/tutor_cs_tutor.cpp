@@ -8,6 +8,8 @@
 
 #include "bot_include.h"
 
+#include <functional>
+
 namespace sv {
 
 /*

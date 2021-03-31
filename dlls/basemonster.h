@@ -82,7 +82,7 @@ public:
 	virtual void Look(int iDistance) { }
 	virtual CBaseEntity *BestVisibleEnemy(void) { return NULL; }
 	virtual BOOL FInViewCone(CBaseEntity *pEntity) { return FALSE; }
-	virtual BOOL FInViewCone(Vector *pOrigin) { return FALSE; }
+	virtual BOOL FInViewCone(const Vector *pOrigin) { return FALSE; }
 #else
 	virtual void ReportAIState(void);
 	virtual void MonsterInitDead(void);
