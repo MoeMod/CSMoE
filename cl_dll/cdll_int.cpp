@@ -571,8 +571,10 @@ static dllexport_t switch_client_exports[] = {
 	{ "HUD_GetStudioModelInterface", (void*)HUD_GetStudioModelInterface },
 	{ "HUD_DirectorMessage", (void*)HUD_DirectorMessage },
 	{ "HUD_VoiceStatus", (void*)HUD_VoiceStatus },
+#ifndef _WIN32
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
+#endif
 	{ "HUD_OnGUI", (void*)HUD_OnGUI },
 	{ NULL, NULL },
 };
