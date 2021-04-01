@@ -85,7 +85,7 @@ namespace cl
 		lua_settop(L, 1);
 		// #1 = require path
 
-		lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
+		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED"); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE
 
 		lua_getfield(L, 2, ModuleName);
