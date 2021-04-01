@@ -250,7 +250,7 @@ void Game_HookEvents( void )
 	HOOK_EVENT(wpneffects, WpnEffects);
 
 #ifdef XASH_LUASH
-	Lua_HookEvents();
+	LuaCL_HookEvents();
 #endif
 
 	cl_gunbubbles = gEngfuncs.pfnRegisterVariable("cl_gunbubbles", "2", FCVAR_ARCHIVE);

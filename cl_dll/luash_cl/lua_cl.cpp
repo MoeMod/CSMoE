@@ -8,6 +8,8 @@
 #include <string>
 #include <cassert>
 
+#include "ev_lua.h"
+
 namespace cl
 {
 	static lua_State *L;
@@ -106,7 +108,7 @@ namespace cl
 		byte* buffer = gEngfuncs.COM_LoadFile(path.c_str(), 5, &length);
 		if(!buffer)
 		{
-			gEngfuncs.Con_Printf("%s Error: lua module (%s) not found", __FUNCTION__, ModuleName);
+			gEngfuncs.Con_Printf("%s Error: lua module (%s) not found\n", __FUNCTION__, ModuleName);
 			return 0;
 		}
 		
@@ -121,10 +123,10 @@ namespace cl
 		errc = lua_pcall(L, 1, 1, 0);
 		// #3 = result / errormsg
 
-		if(!errc)
+		if(errc)
 		{
 			const char* msg = lua_tostring(L, -1);
-			gEngfuncs.Con_Printf("%s Error: lua module (%s) loaded failed: %s", __FUNCTION__, ModuleName, msg);
+			gEngfuncs.Con_Printf("%s Error: lua module (%s) loaded failed: %s\n", __FUNCTION__, ModuleName, msg);
 			return 0;
 		}
 
@@ -133,7 +135,7 @@ namespace cl
 			lua_setfield(L, 2, ModuleName);
 			// #2 = _G.LUA_LOADED_TABLE
 			
-			gEngfuncs.Con_DPrintf("%s Log: lua module (%s) loaded succ", __FUNCTION__, ModuleName);
+			gEngfuncs.Con_DPrintf("%s Log: lua module (%s) loaded succ\n", __FUNCTION__, ModuleName);
 		}
 
 		lua_getfield(L, 2, ModuleName);
@@ -152,5 +154,11 @@ namespace cl
 		}
 		gEngfuncs.Con_Printf("\n");
 		return 0;
+	}
+
+	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index)
+	{
+		if (type == t_eventscript)
+			LuaCL_OnPrecacheEvent(name, index);
 	}
 }

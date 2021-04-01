@@ -1,4 +1,5 @@
 #pragma once
+#include "custom.h"
 
 typedef struct lua_State lua_State;
 
@@ -11,4 +12,6 @@ namespace cl
 	
 	int LuaCL_GlobalRequire(lua_State* L);
 	int LuaCL_GlobalPrint(lua_State* L);
+
+	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index);
 }

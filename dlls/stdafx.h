@@ -33,7 +33,6 @@ GNU General Public License for more details.
 
 #include "gamemode/mods.h"
 
-#include "util/u_ebobase.hpp"
 #include "util/u_functor.hpp"
 #include "util/u_iterator.hpp"
 #include "util/u_range.hpp"

@@ -109,6 +109,7 @@ static dllfunc_t cdll_new_exports[] = 	// allowed only in SDK 2.3 and higher
 { "IN_ClientMoveEvent", (void **)&clgame.dllFuncs.pfnMoveEvent}, // Xash3D ext
 { "IN_ClientLookEvent", (void **)&clgame.dllFuncs.pfnLookEvent}, // Xash3D ext
 { "HUD_OnGUI", (void **)&clgame.dllFuncs.pfnOnGUI}, // Xash3D ext
+{ "CL_OnPrecache", (void **)&clgame.dllFuncs.CL_OnPrecache}, // Xash3D ext
 { NULL, NULL }
 };
 

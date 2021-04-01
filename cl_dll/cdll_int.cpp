@@ -378,6 +378,18 @@ int DLLEXPORT HUD_MobilityInterface( mobile_engfuncs_t *mobileapi )
 
 /*
 ========================
+HUD_MobilityInterface
+========================
+*/
+void DLLEXPORT CL_OnPrecache(int type, const char* name, int index)
+{
+#ifdef XASH_LUASH
+	LuaCL_OnPrecache((resourcetype_t)type, name, index);
+#endif
+}
+
+/*
+========================
 ClientFactory
 
 This function is never called, but it has to exist in order for the engine to load stuff from the client. - Solokiller
@@ -452,6 +464,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 		nullptr,	// SDL Xash pfnMoveEvent
 		nullptr,	// SDL Xash pfnLookEvent
 		HUD_OnGUI,	// SDL Xash pfnOnGUI
+		CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
@@ -518,6 +531,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 			nullptr,	// SDL Xash pfnMoveEvent
 			nullptr,	// SDL Xash pfnLookEvent
 			HUD_OnGUI,	// SDL Xash pfnOnGUI
+			CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
@@ -576,6 +590,7 @@ static dllexport_t switch_client_exports[] = {
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
 #endif
 	{ "HUD_OnGUI", (void*)HUD_OnGUI },
+	{ "CL_OnPrecache", (void*)CL_OnPrecache },
 	{ NULL, NULL },
 };
 
