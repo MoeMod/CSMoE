@@ -49,7 +49,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>>
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
-	explicit VectorBase_Gen(InputIter arr)
+	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
 	{
 		std::copy_n(arr, N, m_data.begin());
 	}
@@ -95,7 +95,7 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
-	explicit VectorBase_Gen(InputIter arr)
+	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
 	{
 		x = *arr++;
 		y = *arr++;
@@ -134,7 +134,7 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 template<class T>
 struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 {
-	constexpr VectorBase_Gen() : x{}, y{}
+	constexpr VectorBase_Gen() : x{}, y{}, z{}
 	{
 	}
 	constexpr VectorBase_Gen(T x1, T y1, T z1) : x{x1}, y{y1}, z{z1}
@@ -142,7 +142,7 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
-	explicit VectorBase_Gen(InputIter arr)
+	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type* = nullptr)
 	{
 		x = *arr++;
 		y = *arr++;

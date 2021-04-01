@@ -288,7 +288,8 @@ set (CLDLL_SOURCES
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
-
+	
+	${LUASH_SRCS}
 	${INPUT_SRCS}
 	${PM_SRCS}
 	${HUD_SRCS}
@@ -297,7 +298,6 @@ set (CLDLL_SOURCES
 	${HLWPN_SRCS}
 	${STUDIORENDER_SRCS}
 	${IMGUI_SRCS}
-	${LUASH_SRCS}
 )
 
 include_directories (

@@ -38,7 +38,8 @@ namespace cl
 
 		lua_call(L, 1, 1);
 		// #1 = function EV_FireXXX
-		
+
+		luash::Push(L, *args);
 		lua_call(L, 1, 0);
 		// #0
 	}

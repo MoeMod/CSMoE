@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION  3.10.2)
 
-include(FindLua)
 find_package(LuaJit REQUIRED)
 
 add_library(luash INTERFACE)

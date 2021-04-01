@@ -17,18 +17,13 @@ GNU General Public License for more details.
 #define PROJECT_U_ITERATOR_HPP
 
 #include <iterator>
-#include "u_ebobase.hpp"
+#include "meta/EBOBase.hpp"
 
-namespace cxx14 {
-	template<class T, class U = T>
-	T exchange(T& obj, U&& new_value)
-	{
-		T old_value = std::move(obj);
-		obj = std::forward<U>(new_value);
-		return old_value;
-	}
-}
-
+#ifndef CLIENT_DLL
+namespace sv {
+#else
+namespace cl {
+#endif
 namespace moe {
 namespace iterator {
 	/*
@@ -57,7 +52,7 @@ namespace iterator {
 		Enum_Iterator &operator++() noexcept { return (m_pCurrent = EBOBase<Enumer>::get()(m_pCurrent)), *this; }
 
 		const Enum_Iterator operator++(int) noexcept {
-			return Enum_Iterator(cxx14::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
+			return Enum_Iterator(std::exchange(m_pCurrent, EBOBase<Enumer>::get()(m_pCurrent)));
 		}
 
 		constexpr reference operator*() const noexcept { return m_pCurrent; }
@@ -73,5 +68,5 @@ namespace iterator {
 }
 }
 
-
+}
 #endif //PROJECT_U_ITERATOR_HPP

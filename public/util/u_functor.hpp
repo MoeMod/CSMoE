@@ -16,7 +16,11 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_FUNCTOR_HPP
 #define PROJECT_U_FUNCTOR_HPP
 
+#ifndef CLIENT_DLL
 namespace sv {
+#else
+namespace cl {
+#endif
 namespace moe {
 	// !!! BOT's classname is not "player", so UTIL_FindEntityByClassname(p, "player") CANNOT enum players
 	struct Enumer_Player

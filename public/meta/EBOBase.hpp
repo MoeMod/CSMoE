@@ -18,22 +18,19 @@ GNU General Public License for more details.
 
 // use EBO here to reduce sizeof(vector), etc...
 // TODO : get rid of EBO-base using boost::compressed_pair
-namespace moe
+template<class Empty>
+class EBOBase : private Empty
 {
-	template<class Empty>
-	class EBOBase : private Empty
+protected:
+	constexpr EBOBase(const Empty& alloc) : Empty(alloc) {}
+	Empty& get()
 	{
-	protected:
-		constexpr EBOBase(const Empty &alloc) : Empty(alloc) {}
-		Empty &get()
-		{
-			return *this;
-		}
-		const Empty &get() const
-		{
-			return *this;
-		}
-	};
-}
+		return *this;
+	}
+	const Empty& get() const
+	{
+		return *this;
+	}
+};
 
 #endif //PROJECT_U_EBOBASE_HPP

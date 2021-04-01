@@ -16,15 +16,18 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_RANGE_HPP
 #define PROJECT_U_RANGE_HPP
 
+#include "meta/EBOBase.hpp"
 #include "u_iterator.hpp"
 #include "u_functor.hpp"
-#include "u_ebobase.hpp"
 
+#ifndef CLIENT_DLL
 namespace sv {
+#else
+namespace cl {
+#endif
 namespace moe {
 	namespace range
 	{
-		using namespace ::moe;
 		using iterator::Enum_Iterator;
 		template<class Enumer>
 		struct EntityList : private EBOBase<Enumer>
