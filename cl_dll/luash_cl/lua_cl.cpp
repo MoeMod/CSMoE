@@ -4,6 +4,7 @@
 #include "lua_cl.h"
 
 #include "luash.hpp"
+#include "luash_vectorlib.hpp"
 
 #include <string>
 #include <cassert>

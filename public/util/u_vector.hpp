@@ -16,9 +16,7 @@ GNU General Public License for more details.
 #ifndef PROJECT_U_VECTOR_HPP
 #define PROJECT_U_VECTOR_HPP
 
-#define _USE_MATH_DEFINES
 #include <cmath>
-#include <math.h>
 #include <utility>
 #include <numeric>
 #include <array>
@@ -27,6 +25,8 @@ GNU General Public License for more details.
 #ifdef __SSE__
 #include <xmmintrin.h>
 #endif
+
+#include "angledef.h"
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -509,6 +509,42 @@ template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(VectorBase<T,
 template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(T scale, VectorBase<T, N> a, VectorBase<T, N> b, VectorBase<T, N> &out)
 {
 	return out = fma(scale, a, b);
+}
+	
+template<class T> void AngleVectors(VectorBase<T, 3> angles, VectorBase<T, 3> &forward, VectorBase<T, 3>& right, VectorBase<T, 3>& up)
+{
+	auto sp = sin(DEG2RAD(angles[PITCH]));
+	auto sy = sin(DEG2RAD(angles[YAW]));
+	auto sr = sin(DEG2RAD(angles[ROLL]));
+	auto cp = cos(DEG2RAD(angles[PITCH]));
+	auto cy = cos(DEG2RAD(angles[YAW]));
+	auto cr = cos(DEG2RAD(angles[ROLL]));
+	forward = { cp * cy, cp * sy, -sp };
+	right = { (-sr * sp * cy + -cr * -sy), (-sr * sp * sy + -cr * cy), (-sr * cp) };
+	up = { (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp) };
+}
+
+template<class T> void VectorAngles(VectorBase<T, 3> forward, VectorBase<T, 3>& angles)
+{
+	if (forward[1] == 0 && forward[0] == 0)
+	{
+		// fast case
+		angles[YAW] = 0;
+		if (forward[2] > 0)
+			angles[PITCH] = 90;
+		else angles[PITCH] = 270;
+	}
+	else
+	{
+		angles[YAW] = RAD2DEG(atan2(forward[1], forward[0]));
+		if (angles[YAW] < 0) angles[YAW] += 360;
+
+		float tmp = hypot(forward[0], forward[1]);
+		angles[PITCH] = RAD2DEG(atan2(forward[2], tmp));
+		if (angles[PITCH] < 0) angles[PITCH] += 360;
+	}
+
+	angles[ROLL] = 0;
 }
 
 }
