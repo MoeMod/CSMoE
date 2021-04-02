@@ -15,7 +15,10 @@ namespace cl {
 			// #2 = 1
 			lua_gettable(L, -2);
 			// #2 = vec[1]
-			out[1] = lua_tonumber(L, -1);
+			if (lua_isnil(L, -1))
+				out[0] = 0;
+			else
+				out[0] = lua_tonumber(L, -1);
 			lua_pop(L, 1);
 			// #1 = vec
 
@@ -23,7 +26,10 @@ namespace cl {
 			// #2 = 2
 			lua_gettable(L, -2);
 			// #2 = vec[2]
-			out[2] = lua_tonumber(L, -1);
+			if (lua_isnil(L, -1))
+				out[1] = 0;
+			else
+				out[1] = lua_tonumber(L, -1);
 			lua_pop(L, 1);
 			// #1 = vec
 
@@ -31,7 +37,10 @@ namespace cl {
 			// #2 = 3
 			lua_gettable(L, -2);
 			// #2 = vec[3]
-			out[3] = lua_tonumber(L, -1);
+			if (lua_isnil(L, -1))
+				out[2] = 0;
+			else
+				out[2] = lua_tonumber(L, -1);
 			lua_pop(L, 1);
 			// #1 = vec
 

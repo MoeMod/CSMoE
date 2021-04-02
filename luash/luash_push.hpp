@@ -83,7 +83,7 @@ namespace cl {
 		{
 			template<std::size_t...I, class...Args> void PushStructImpl(lua_State* L, std::index_sequence<I...>, Args &&...args)
 			{
-				(lua_newtable(L), ..., (lua_pushinteger(L, I), Push(L, std::forward<Args>(args)), lua_settable(L, -3)));
+				(lua_newtable(L), ..., (lua_pushinteger(L, I + 1), Push(L, std::forward<Args>(args)), lua_settable(L, -3)));
 			}
 		}
 		template<class T> auto PushStruct(lua_State* L, T&& v) -> typename std::enable_if<std::is_aggregate<typename std::decay<T>::type>::value>::type

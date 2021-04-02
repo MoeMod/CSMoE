@@ -28,9 +28,24 @@ namespace cl
 	void LuaCL_Init()
 	{
 		L = luaL_newstate();
-		luaL_openlibs(L);
+
+		// we should ban some dangerous libs
+		luaopen_base(L);
+		luaopen_math(L);
+		luaopen_string(L);
+		luaopen_table(L);
+		//luaopen_io(L);
+		//luaopen_os(L);
+		//luaopen_package(L);
+		luaopen_debug(L);
+		luaopen_bit(L);
+		luaopen_jit(L);
+		//luaopen_ffi(L);
+		
 		lua_register(L, "require", LuaCL_GlobalRequire);
 		lua_register(L, "print", LuaCL_GlobalPrint);
+
+		LuaCL_OpenEventScripts(L);
 
 		gEngfuncs.pfnAddCommand("luacl", Cmd_LuaCL);
 	}
@@ -135,12 +150,12 @@ namespace cl
 		{
 			lua_setfield(L, 2, ModuleName);
 			// #2 = _G.LUA_LOADED_TABLE
-			
-			gEngfuncs.Con_DPrintf("%s Log: lua module (%s) loaded succ\n", __FUNCTION__, ModuleName);
 		}
 
 		lua_getfield(L, 2, ModuleName);
 		// #3 = LUA_LOADED_TABLE[ModuleName]
+		
+		gEngfuncs.Con_DPrintf("%s Log: lua module (%s) loaded succ\n", __FUNCTION__, ModuleName);
 		return 1;
 	}
 

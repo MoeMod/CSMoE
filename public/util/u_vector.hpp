@@ -526,21 +526,21 @@ template<class T> void AngleVectors(VectorBase<T, 3> angles, VectorBase<T, 3> &f
 
 template<class T> void VectorAngles(VectorBase<T, 3> forward, VectorBase<T, 3>& angles)
 {
-	if (forward[1] == 0 && forward[0] == 0)
+	if (forward.x == 0 && forward.y == 0)
 	{
 		// fast case
 		angles[YAW] = 0;
-		if (forward[2] > 0)
+		if (forward.z > 0)
 			angles[PITCH] = 90;
 		else angles[PITCH] = 270;
 	}
 	else
 	{
-		angles[YAW] = RAD2DEG(atan2(forward[1], forward[0]));
+		angles[YAW] = RAD2DEG(atan2(forward.y, forward.x));
 		if (angles[YAW] < 0) angles[YAW] += 360;
 
-		float tmp = hypot(forward[0], forward[1]);
-		angles[PITCH] = RAD2DEG(atan2(forward[2], tmp));
+		float tmp = hypot(forward.x, forward.y);
+		angles[PITCH] = RAD2DEG(atan2(forward.z, tmp));
 		if (angles[PITCH] < 0) angles[PITCH] += 360;
 	}
 
