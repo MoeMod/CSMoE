@@ -458,8 +458,9 @@ void Touch_SetClientOnly( qboolean state )
 	}
 	else
 	{
+		IN_ActivateMouse(false);
 		SDL_ShowCursor( false );
-		SDL_GetRelativeMouseState( 0, 0 );
+		SDL_SetRelativeMouseMode( SDL_TRUE );
 	}
 #endif
 }

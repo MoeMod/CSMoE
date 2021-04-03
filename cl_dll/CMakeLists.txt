@@ -267,10 +267,10 @@ else()
 	set(LUASH_SRCS )
 endif()
 
-if(NOT WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-	set(INPUT_SRCS ./input_xash3d.cpp)
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+	set(INPUT_SRCS ./input_winrt.cpp)
 else()
-	set(INPUT_SRCS ./inputw32.cpp)
+	set(INPUT_SRCS ./input_xash3d.cpp)
 endif()
 
 set (CLDLL_SOURCES
