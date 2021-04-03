@@ -91,6 +91,7 @@ namespace cl {
 			StructApply(v, [L](auto &&...args)  {
 				detail::PushStructImpl(L, std::make_index_sequence<sizeof...(args)>(), std::forward<decltype(args)>(args)...);
 			});
+			CallOnStructCreate<typename std::decay<T>::type>(L);
 		}
 
 		namespace detail
