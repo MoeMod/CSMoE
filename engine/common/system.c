@@ -525,7 +525,7 @@ qboolean _Sys_GetParmFromCmdLine( char *parm, char *out, size_t size )
 
 void Sys_SendKeyEvents( void )
 {
-#if defined(_WIN32) && !defined(XASH_WINRT)
+#ifdef XASH_W32CON
 	MSG	msg;
 
 	while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ))
@@ -640,12 +640,10 @@ wait for 'Esc' key will be hit
 */
 void Sys_WaitForQuit( void )
 {
-#if defined (_WIN32) && !defined(XASH_WINRT)
-	MSG	msg;
-
 #ifdef XASH_W32CON
+	MSG	msg;
+	
 	Wcon_RegisterHotkeys();
-#endif
 
 	msg.message = 0;
 
@@ -720,7 +718,7 @@ void Sys_Error( const char *format, ... )
 #endif
 	}
 
-	if( host.developer > 0 || host.state != HOST_FRAME )
+	if( host.developer > 0 )
 	{
 #ifdef XASH_W32CON
 		Wcon_ShowConsole( true );
