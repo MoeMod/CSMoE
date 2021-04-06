@@ -6,7 +6,8 @@ target_link_libraries(luajit INTERFACE ${LUAJIT_LIBRARIES})
 target_include_directories(luajit INTERFACE ${LUAJIT_INCLUDE_DIR})
 
 find_package(nameof CONFIG REQUIRED)
-add_library(nameof ALIAS nameof::nameof)
+add_library(nameof INTERFACE)
+target_link_libraries(nameof INTERFACE nameof::nameof)
 
 add_library(luash INTERFACE)
 target_include_directories(luash INTERFACE "${CMAKE_SOURCE_DIR}/luash")

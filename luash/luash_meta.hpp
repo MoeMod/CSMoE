@@ -20,16 +20,12 @@ namespace cl {
 
 			return 1;
 		}
-		
-		template<class T>
-		int CallOnStructCreate(lua_State* L)
-		{
-			// #1 = target lua struct
-			auto struct_name = nameof::nameof_short_type<T>();
 
+		inline int CallOnNamedStructCreate(lua_State* L, std::string_view struct_name)
+		{
 			RequireMeta(L);
 			// #2 = core/meta
-			
+
 			lua_getfield(L, -1, "OnStructCreate");
 			// #3 = meta.SetStructMetaTable
 
@@ -41,8 +37,8 @@ namespace cl {
 
 			lua_pushlstring(L, struct_name.data(), struct_name.size());
 			// #6 = struct_name
-			
-			if(int errc = lua_pcall(L, 3, 0, 0))
+
+			if (int errc = lua_pcall(L, 3, 0, 0))
 			{
 				const char* errmsg = lua_tostring(L, -1);
 				// #2 = errmsg
@@ -51,6 +47,14 @@ namespace cl {
 			// #2 = core/meta
 			lua_pop(L, 1);
 			return 0;
+		}
+		
+		template<class T>
+		int CallOnStructCreate(lua_State* L)
+		{
+			// #1 = target lua struct
+			auto struct_name = nameof::nameof_short_type<T>();
+			return CallOnNamedStructCreate(L, struct_name);
 		}
 	}
 }
