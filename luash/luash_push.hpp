@@ -26,7 +26,7 @@ namespace cl {
 		{
 			lua_pushnumber(L, std::chrono::duration_cast<std::chrono::duration<T, std::ratio<1>>>(x).count());
 		}
-		template<class T, class Duration> auto PushFloat(lua_State* L, std::chrono::time_point<Duration> x) -> decltype(PushFloat(L, x.time_since_epoch()))
+		template<class Clock, class Duration> auto PushFloat(lua_State* L, const std::chrono::time_point<Clock, Duration> &x) -> typename std::enable_if<std::is_floating_point<typename Duration::rep>::value>::type
 		{
 			PushFloat(L, x.time_since_epoch());
 		}
