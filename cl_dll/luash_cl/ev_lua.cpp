@@ -156,12 +156,10 @@ namespace cl
 			return 0;
 
 		Vector ShellOrigin;
-		lua_pushvalue(L, 1);
-		luash::PopVector(L, ShellOrigin);
+		luash::GetVector(L, 1, ShellOrigin);
 		
 		Vector ShellVelocity;
-		lua_pushvalue(L, 2);
-		luash::PopVector(L, ShellVelocity);
+		luash::GetVector(L, 2, ShellVelocity);
 		
 		float rotation = lua_tonumber(L, 3);
 		int shell = lua_tointeger(L, 4);
@@ -183,8 +181,7 @@ namespace cl
 		int idx = lua_tointeger(L, 1);
 
 		Vector origin;
-		lua_pushvalue(L, 2);
-		luash::PopVector(L, origin);
+		luash::GetVector(L, 2, origin);
 		
 		int channel = lua_tointeger(L, 3);
 		const char* sample = lua_tostring(L, 4);
@@ -215,25 +212,19 @@ namespace cl
 		int idx = lua_tointeger(L, 1);
 
 		Vector forward;
-		lua_pushvalue(L, 2);
-		luash::PopVector(L, forward);
+		luash::GetVector(L, 2, forward);
 		Vector right;
-		lua_pushvalue(L, 3);
-		luash::PopVector(L, right);
+		luash::GetVector(L, 3, right);
 		Vector up;
-		lua_pushvalue(L, 4);
-		luash::PopVector(L, up);
+		luash::GetVector(L, 4, up);
 
 		int cShots = lua_tointeger(L, 5);
 		Vector vecSrc;
-		lua_pushvalue(L, 6);
-		luash::PopVector(L, vecSrc);
+		luash::GetVector(L, 6, vecSrc);
 		Vector vecDirShooting;
-		lua_pushvalue(L, 7);
-		luash::PopVector(L, vecDirShooting);
+		luash::GetVector(L, 7, vecDirShooting);
 		Vector vecSpread;
-		lua_pushvalue(L, 8);
-		luash::PopVector(L, vecSpread);
+		luash::GetVector(L, 8, vecSpread);
 
 		
 		float flDistance = lua_tonumber(L, 9);

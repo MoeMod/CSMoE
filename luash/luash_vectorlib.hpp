@@ -16,8 +16,7 @@ namespace luash
 			return 0;
 		}
 		Vector angles;
-		lua_pushvalue(L, 1);
-		PopVector(L, angles);
+		GetVector(L, 1, angles);
 		Vector f, r, u;
 		AngleVectors(angles, f, r, u);
 		
@@ -35,8 +34,7 @@ namespace luash
 			return 0;
 		}
 		Vector forward;
-		lua_pushvalue(L, 1);
-		PopVector(L, forward);
+		GetVector(L, 1, forward);
 		Vector angles;
 		VectorAngles(forward, angles);
 		

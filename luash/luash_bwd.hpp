@@ -11,5 +11,9 @@ namespace cl {
 		{
 			return detail::PushImpl(L, std::forward<T>(what));
 		}
+		template<class T> auto Get(lua_State* L, int N, T &out)
+		{
+			return detail::GetImpl(L, N, out);
+		}
 	}
 }
