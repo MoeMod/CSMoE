@@ -15,5 +15,10 @@ namespace cl {
 		{
 			return detail::GetImpl(L, N, out);
 		}
+		template<class T> void RegisterGlobal(lua_State* L, const char* name, T&& what)
+		{
+			Push(L, std::forward<T>(what));
+			lua_setglobal(L, name);
+		}
 	}
 }

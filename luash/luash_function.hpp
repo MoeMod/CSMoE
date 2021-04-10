@@ -10,28 +10,39 @@ namespace cl {
 		namespace detail
 		{
 			template<class Ret, class...Args, std::size_t...I>
-			void PushFunctionDecl(std::index_sequence<I...>, Ret(*pfn)(Args...))
+			constexpr lua_CFunction TransformFunctionDecl(std::index_sequence<I...>, lua_State* L, Ret(*pfn)(Args...))
 			{
-				lua_CFunction f = [](lua_State* L) -> int
+				return +[](lua_State* L) -> int
 				{
-					if (lua_gettop(L) < sizeof...(I))
+					if (int argn = lua_gettop(L); argn < sizeof...(I))
+					{
+						luaL_error(L, "bad function call with unmatched args, excepted %d got %d", static_cast<int>(sizeof...(I)), argn);
 						return 0;
-					const int arg_offset = 1;
-					Ret (*pfn)(Args...) = lua_topointer(L, 1);
+					}
+					Ret (*pfn)(Args...) = static_cast<Ret(*)(Args...)>(lua_touserdata(L, lua_upvalueindex(1)));
 					
 					std::tuple<typename std::remove_const<typename std::remove_reference<Args>::type>::type...> args;
-					(..., Get(L, I + 1 + arg_offset, std::get<I>(args)));
-					Ret ret = (*pfn)(std::get<I>(args));
-					Push(L, std::move(ret));
-					return 1;
+					(..., Get(L, I + 1, std::get<I>(args)));
+					if constexpr (std::is_void_v<Ret>)
+					{
+						(*pfn)(std::get<I>(std::move(args))...);
+						return 0;
+					}
+					else
+					{
+						Ret ret = (*pfn)(std::get<I>(std::move(args))...);
+						Push(L, std::move(ret));
+						return 1;
+					}
 				};
-				lua_pushcfunction(L, f);
 			}
 		}
 		template<class Ret, class...Args>
-		void PushFunctionDecl(Ret (*pfn)(Args...))
+		void PushFunction(lua_State * L, Ret (*pfn)(Args...))
 		{
-			detail::PushFunctionDecl(std::index_sequence_for<Args...>(), pfn);
+			lua_CFunction f = detail::TransformFunctionDecl(std::index_sequence_for<Args...>(), L, pfn);
+			lua_pushlightuserdata(L, pfn);
+			lua_pushcclosure(L, f, 1);
 		}
 	}
 }

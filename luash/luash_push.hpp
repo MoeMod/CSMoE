@@ -13,8 +13,11 @@ namespace cl {
 			template<class T> auto operator()(T&& in) { return Push(L, std::forward<T>(in)); }
 			lua_State* const L;
 		};
-		
-		template<class T> auto PushInteger(lua_State* L, T x) -> typename std::enable_if<std::is_integral<T>::value>::type
+		template<class T> auto PushBoolean(lua_State* L, T x) -> typename std::enable_if<std::is_same<T, bool>::value>::type
+		{
+			lua_pushboolean(L, x);
+		}
+		template<class T> auto PushInteger(lua_State* L, T x) -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value>::type
 		{
 			lua_pushinteger(L, x);
 		}
@@ -96,6 +99,10 @@ namespace cl {
 
 		namespace detail
 		{
+			template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<7>) -> decltype(PushBoolean(L, x))
+			{
+				return PushBoolean(L, x);
+			}
 			template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<6>) -> decltype(PushEnum(L, x))
 			{
 				return PushEnum(L, x);
@@ -112,13 +119,17 @@ namespace cl {
 			{
 				return PushString(L, std::forward<T>(x));
 			}
-			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<3>) -> decltype(PushEntity(L, std::forward<T>(x)))
+			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<4>) -> decltype(PushEntity(L, std::forward<T>(x)))
 			{
 				return PushEntity(L, std::forward<T>(x));
 			}
-			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<3>) -> decltype(PushVector(L, std::forward<T>(x)))
+			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<4>) -> decltype(PushVector(L, std::forward<T>(x)))
 			{
 				return PushVector(L, std::forward<T>(x));
+			}
+			template<class T> auto PushUnknownImpl(lua_State* L, T&& x, PriorityTag<4>) -> decltype(PushFunction(L, std::forward<T>(x)))
+			{
+				return PushFunction(L, std::forward<T>(x));
 			}
 			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<2>) -> decltype(PushArray(L, std::forward<T>(x)))
 			{

@@ -281,19 +281,19 @@ namespace cl
 
 	int LuaCL_OpenEventScripts(lua_State *L)
 	{
-		lua_register(L, "EV_IsLocal", LucCL_EV_IsLocal);
-		lua_register(L, "EV_IsPlayer", LucCL_EV_IsPlayer);
-		lua_register(L, "EV_MuzzleFlash", LucCL_EV_MuzzleFlash);
-		lua_register(L, "EV_WeaponAnimation", LucCL_EV_WeaponAnimation);
+		luash::RegisterGlobal(L, "EV_IsLocal", EV_IsLocal);
+		luash::RegisterGlobal(L, "EV_IsPlayer", EV_IsPlayer);
+		luash::RegisterGlobal(L, "EV_MuzzleFlash", EV_MuzzleFlash);
+		luash::RegisterGlobal(L, "EV_WeaponAnimation", gEngfuncs.pEventAPI->EV_WeaponAnimation);
 		lua_register(L, "EV_LocalPlayerViewheight", LucCL_EV_LocalPlayerViewheight);
 		lua_register(L, "EV_EjectBrass", LuaCL_EV_EjectBrass);
 		lua_register(L, "EV_PlaySound", LuaCL_EV_PlaySound);
-		lua_register(L, "EV_FindModelIndex", LuaCL_EV_FindModelIndex);
+		luash::RegisterGlobal(L, "EV_FindModelIndex", gEngfuncs.pEventAPI->EV_FindModelIndex);
 		lua_register(L, "EV_HLDM_FireBullets", LuaCL_EV_HLDM_FireBullets);
 		lua_register(L, "EV_AddShotsFired", LuaCL_EV_AddShotsFired);
 		lua_register(L, "EV_IsRightHand", LuaCL_EV_IsRightHand);
-		lua_register(L, "RandomLong", LuaCL_RandomLong);
-		lua_register(L, "RandomFloat", LuaCL_RandomFloat);
+		luash::RegisterGlobal(L, "RandomLong", RANDOM_LONG);
+		luash::RegisterGlobal(L, "RandomFloat", RANDOM_FLOAT);
 		return 0;
 	}
 }

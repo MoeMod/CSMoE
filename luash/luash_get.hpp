@@ -8,7 +8,11 @@ namespace cl {
 #endif
 	namespace luash
 	{
-		template<class T> auto GetInt(lua_State* L, int N, T &x) -> typename std::enable_if<std::is_integral<T>::value>::type
+		template<class T> void GetBoolean(lua_State* L, int N, bool& x)
+		{
+			x = lua_toboolean(L, N);
+		}
+		template<class T> auto GetInteger(lua_State* L, int N, T &x) -> typename std::enable_if<std::is_integral<T>::value>::type
 		{
 			x = lua_tointeger(L, N);
 		}
@@ -50,7 +54,7 @@ namespace cl {
 		template<class T> auto GetEntity(lua_State* L, int N, T &ent) -> typename std::enable_if<std::is_invocable<moe::convert::ConvertFunc<T, edict_t*>, T>::value>::type
 		{
 			int id = 0;
-			ToInt(L, N, id);
+			GetInt(L, N, id);
 			ent = ent_cast<T>(id);
 		}
 		inline void GetVector(lua_State *L, int N, Vector &out)
@@ -141,6 +145,10 @@ namespace cl {
 
 		namespace detail
 		{
+			template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<7>) -> decltype(GetBoolean(L, N, x))
+			{
+				return GetBoolean(L, N, x);
+			}
 			template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<6>) -> decltype(GetEnum(L, N, x))
 			{
 				return GetEnum(L, N, x);
