@@ -54,7 +54,7 @@ namespace cl {
 		template<class T> auto GetEntity(lua_State* L, int N, T &ent) -> typename std::enable_if<std::is_invocable<moe::convert::ConvertFunc<T, edict_t*>, T>::value>::type
 		{
 			int id = 0;
-			GetInt(L, N, id);
+			GetInteger(L, N, id);
 			ent = ent_cast<T>(id);
 		}
 		inline void GetVector(lua_State *L, int N, Vector &out)

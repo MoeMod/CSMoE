@@ -90,6 +90,7 @@ jobs:
     - hdiutil attach SDL2.dmg
     - mkdir -p ~/Library/Frameworks
     - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z

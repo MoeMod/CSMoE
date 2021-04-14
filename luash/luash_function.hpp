@@ -19,7 +19,7 @@ namespace cl {
 						luaL_error(L, "bad function call with unmatched args, excepted %d got %d", static_cast<int>(sizeof...(I)), argn);
 						return 0;
 					}
-					Ret (*pfn)(Args...) = static_cast<Ret(*)(Args...)>(lua_touserdata(L, lua_upvalueindex(1)));
+					Ret (*pfn)(Args...) = reinterpret_cast<Ret(*)(Args...)>(lua_touserdata(L, lua_upvalueindex(1)));
 					
 					std::tuple<typename std::remove_const<typename std::remove_reference<Args>::type>::type...> args;
 					(..., Get(L, I + 1, std::get<I>(args)));
@@ -41,7 +41,7 @@ namespace cl {
 		void PushFunction(lua_State * L, Ret (*pfn)(Args...))
 		{
 			lua_CFunction f = detail::TransformFunctionDecl(std::index_sequence_for<Args...>(), L, pfn);
-			lua_pushlightuserdata(L, pfn);
+			lua_pushlightuserdata(L, reinterpret_cast<void *>(f));
 			lua_pushcclosure(L, f, 1);
 		}
 	}
