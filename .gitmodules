@@ -19,6 +19,3 @@
 [submodule "3rdparty/luajit-cmake"]
 	path = 3rdparty/luajit-cmake
 	url = https://github.com/zhaozg/luajit-cmake
-[submodule "3rdparty/LuaJIT"]
-	path = 3rdparty/LuaJIT
-	url = https://github.com/WohlSoft/LuaJIT

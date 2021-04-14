@@ -91,6 +91,7 @@ jobs:
     - mkdir -p ~/Library/Frameworks
     - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -121,6 +122,8 @@ jobs:
     - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
     - mv SDL2-2.0.14 SDL2
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -129,12 +132,12 @@ jobs:
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/CSMoE.app Payload/
     before_deploy:
-      - zip -r CSMoE-CD-iOS-universal-unsigned-Full.ipa Payload
+      - zip -r CSMoE-CD-iOS-arm64-unsigned-Full.ipa Payload
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-iOS-universal-unsigned-Full.ipa
+        - CSMoE-CD-iOS-arm64-unsigned-Full.ipa
       on:
         repo: MoeMod/CSMoE
         tags: true
