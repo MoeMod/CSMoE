@@ -34,10 +34,14 @@ public:
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
 
+
 public:
 	int TouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy);
+	cvar_t* m_TouchSwitch;
 
 protected:
 	class impl_t;
 	impl_t *pimpl;
+
+	
 };

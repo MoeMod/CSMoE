@@ -80,6 +80,9 @@ public:
 
 int CHudMoeTouch::Init(void)
 {
+	m_TouchSwitch = CVAR_CREATE("cl_moetouchswitch", "0", FCVAR_ARCHIVE);
+	if (!m_TouchSwitch->value)
+		return 0;
 	pimpl = new CHudMoeTouch::impl_t;
 
 	m_iFlags |= HUD_ACTIVE;
