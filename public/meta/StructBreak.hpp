@@ -12,7 +12,7 @@ namespace detail {
     template<class T, class ApplyFunc> auto StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
         auto &&[ENUM_PARAMS(x, N)] = std::forward<T>(my_struct); \
         return std::invoke(f, ENUM_PARAMS(x, N)); \
-    }; \
+    } \
 
     ENUM_FOR_EACH(APPLYER_DEF, 128)
 #undef APPLYER_DEF

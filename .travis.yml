@@ -58,7 +58,7 @@ jobs:
     script:
     - mkdir -p linux-build-amd64 && cd linux-build-amd64
     - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-    - cmake --build . -j 4
+    - cmake --build .
     - cd ..
   - stage: build
     name: Build for Linux arm64
@@ -86,13 +86,13 @@ jobs:
     script:
     - mkdir -p linux-build-arm64 && cd linux-build-arm64
     - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
-    - cmake --build . -j 4
+    - cmake --build .
     - cd ..
   - stage: build
     name: Build for macOS amd64 and deploy
     cache: ccache
     os: osx
-    osx_image: xcode11.3
+    osx_image: xcode12.2
     language: cpp
     compiler: clang
     before_script:
@@ -126,7 +126,7 @@ jobs:
   - stage: build
     name: Build for iOS and deploy
     os: osx
-    osx_image: xcode11.3
+    osx_image: xcode12.2
     language: objective-c
     before_script:
     - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
