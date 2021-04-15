@@ -187,7 +187,6 @@ set(HLDLL_SRCS
 	./cbase/cbase_entity_factory.cpp
 	./cbase/cbase_physint.cpp
 	./gamemode/zbb/zbb_zombie.cpp
-	./refl/cbase_export.cpp
 	)
 
 set (HLWPN_SRCS

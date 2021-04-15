@@ -23,7 +23,7 @@ template<class T, class ApplyFunc>
 auto StructApply(T&& my_struct, ApplyFunc f)
 {
     return detail::StructApply_impl(std::forward<T>(my_struct), f, StructMemberCount<typename std::decay<T>::type>());
-};
+}
 
 // StructTransformMeta : 把结构体各成员的类型作为变长参数调用元函数MetaFunc
 template<class T, template<class...> class MetaFunc> struct StructTransformMeta
