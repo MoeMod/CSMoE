@@ -62,7 +62,6 @@
 		3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE829A7260F8F00009DABD0 /* Assets.xcassets */; };
 		3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAED19260F846D0045F79B /* libmenu.a */; };
 		3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAEE6D260F8B340045F79B /* libserver.a */; };
-		3DEAEE73260F8BED0045F79B /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAED35260F87720045F79B /* libSDL2.a */; };
 		3DF2719E23D45158005D151E /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF2719523D4511C005D151E /* libimgui.a */; };
 		495E1A1A1E13199A0022E4AA /* launchdialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 495E1A191E13199A0022E4AA /* launchdialog.m */; };
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
@@ -70,6 +69,7 @@
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		B62AADA826274FB800F77FE7 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
 		B62AADB9262752D900F77FE7 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B62AADB8262752D900F77FE7 /* libluajit.a */; };
+		B62AAE402629E55D00F77FE7 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B62AAE162629E35A00F77FE7 /* libSDL2.a */; };
 		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
 		B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B663773825DD89D000564BD5 /* CoreHaptics.framework */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
@@ -94,96 +94,96 @@
 			remoteGlobalIDString = 3D2DCBFD23320D5D00ADBA6B;
 			remoteInfo = "cmake-build-csmoe";
 		};
-		3DEAED30260F87720045F79B /* PBXContainerItemProxy */ = {
+		B62AAE0D2629E35A00F77FE7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A7D88B5423E2437C00DCD162;
-			remoteInfo = "Framework-iOS";
-		};
-		3DEAED32260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A7D88D1523E24BED00DCD162;
-			remoteInfo = "Framework-tvOS";
-		};
-		3DEAED34260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A7D88E5423E24D3B00DCD162;
-			remoteInfo = "Static Library-iOS";
-		};
-		3DEAED36260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A769B23D23E259AE00872273;
-			remoteInfo = "Static Library-tvOS";
-		};
-		3DEAED38260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A75FCEB323E25AB700529352;
-			remoteInfo = "Shared Library-iOS";
-		};
-		3DEAED3A260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A75FD06C23E25AC700529352;
-			remoteInfo = "Shared Library-tvOS";
-		};
-		3DEAED3C260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A75FDB8C23E4C74400529352;
-			remoteInfo = hidapi;
-		};
-		3DEAED3E260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A75FDB4923E399AC00529352;
-			remoteInfo = "hidapi-iOS";
-		};
-		3DEAED40260F87720045F79B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = A75FDB6E23E3A2C900529352;
-			remoteInfo = "hidapi-tvOS";
-		};
-		B66376FA25DD884E00564BD5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = BECDF66C0761BA81005FE872;
 			remoteInfo = Framework;
 		};
-		B663770025DD884E00564BD5 /* PBXContainerItemProxy */ = {
+		B62AAE0F2629E35A00F77FE7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88B5423E2437C00DCD162;
+			remoteInfo = "Framework-iOS";
+		};
+		B62AAE112629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88D1523E24BED00DCD162;
+			remoteInfo = "Framework-tvOS";
+		};
+		B62AAE132629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = BECDF6B30761BA81005FE872;
 			remoteInfo = "Static Library";
 		};
-		B663770625DD884E00564BD5 /* PBXContainerItemProxy */ = {
+		B62AAE152629E35A00F77FE7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A7D88E5423E24D3B00DCD162;
+			remoteInfo = "Static Library-iOS";
+		};
+		B62AAE172629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A769B23D23E259AE00872273;
+			remoteInfo = "Static Library-tvOS";
+		};
+		B62AAE192629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = DB31407717554B71006C0E22;
 			remoteInfo = "Shared Library";
 		};
-		B663770C25DD884E00564BD5 /* PBXContainerItemProxy */ = {
+		B62AAE1B2629E35A00F77FE7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FCEB323E25AB700529352;
+			remoteInfo = "Shared Library-iOS";
+		};
+		B62AAE1D2629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FD06C23E25AC700529352;
+			remoteInfo = "Shared Library-tvOS";
+		};
+		B62AAE1F2629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = BECDF6BE0761BA81005FE872;
 			remoteInfo = "Standard DMG";
+		};
+		B62AAE212629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB8C23E4C74400529352;
+			remoteInfo = hidapi;
+		};
+		B62AAE232629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB4923E399AC00529352;
+			remoteInfo = "hidapi-iOS";
+		};
+		B62AAE252629E35A00F77FE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A75FDB6E23E3A2C900529352;
+			remoteInfo = "hidapi-tvOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -227,8 +227,8 @@
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B62AADB8262752D900F77FE7 /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
+		B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = ../3rdparty/SDL2/Xcode/SDL/SDL.xcodeproj; sourceTree = "<group>"; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
-		B66376EA25DD884E00564BD5 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = ../SDL2/Xcode/SDL/SDL.xcodeproj; sourceTree = "<group>"; };
 		B663773825DD89D000564BD5 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -244,17 +244,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DEAEE73260F8BED0045F79B /* libSDL2.a in Frameworks */,
 				B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */,
 				B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */,
-				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
-				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
-				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
 				3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */,
 				3D4416E5231D1B05001A0696 /* GLKit.framework in Frameworks */,
 				3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */,
 				498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */,
-				B62AADB9262752D900F77FE7 /* libluajit.a in Frameworks */,
 				498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */,
 				FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */,
 				FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */,
@@ -262,12 +257,17 @@
 				FDF0D7AC0E12D53800247964 /* AudioToolbox.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
-				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
 				1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */,
 				FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */,
 				49C4D60720781DAB00855677 /* GameController.framework in Frameworks */,
-				3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */,
+				B62AAE402629E55D00F77FE7 /* libSDL2.a in Frameworks */,
+				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
 				B62AADA826274FB800F77FE7 /* libclient.a in Frameworks */,
+				3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */,
+				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
+				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
+				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
+				B62AADB9262752D900F77FE7 /* libluajit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,10 +285,10 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */,
 				3D4DA95923BCEA2F00F575C1 /* cmake-build */,
 				3D5E35E922776A480073D791 /* Info.plist */,
 				FD77A0040E26BC0500F39101 /* CSMoE-iOS */,
-				B66376EA25DD884E00564BD5 /* SDL.xcodeproj */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
@@ -417,22 +417,22 @@
 			path = dlls;
 			sourceTree = "<group>";
 		};
-		B66376EB25DD884E00564BD5 /* Products */ = {
+		B62AADFE2629E35900F77FE7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B66376FB25DD884E00564BD5 /* SDL2.framework */,
-				3DEAED31260F87720045F79B /* SDL2.framework */,
-				3DEAED33260F87720045F79B /* SDL2.framework */,
-				B663770125DD884E00564BD5 /* libSDL2.a */,
-				3DEAED35260F87720045F79B /* libSDL2.a */,
-				3DEAED37260F87720045F79B /* libSDL2.a */,
-				B663770725DD884E00564BD5 /* libSDL2.dylib */,
-				3DEAED39260F87720045F79B /* libSDL2.dylib */,
-				3DEAED3B260F87720045F79B /* libSDL2.dylib */,
-				B663770D25DD884E00564BD5 /* SDL2 */,
-				3DEAED3D260F87720045F79B /* hidapi.framework */,
-				3DEAED3F260F87720045F79B /* hidapi.framework */,
-				3DEAED41260F87720045F79B /* hidapi.framework */,
+				B62AAE0E2629E35A00F77FE7 /* SDL2.framework */,
+				B62AAE102629E35A00F77FE7 /* SDL2.framework */,
+				B62AAE122629E35A00F77FE7 /* SDL2.framework */,
+				B62AAE142629E35A00F77FE7 /* libSDL2.a */,
+				B62AAE162629E35A00F77FE7 /* libSDL2.a */,
+				B62AAE182629E35A00F77FE7 /* libSDL2.a */,
+				B62AAE1A2629E35A00F77FE7 /* libSDL2.dylib */,
+				B62AAE1C2629E35A00F77FE7 /* libSDL2.dylib */,
+				B62AAE1E2629E35A00F77FE7 /* libSDL2.dylib */,
+				B62AAE202629E35A00F77FE7 /* SDL2 */,
+				B62AAE222629E35A00F77FE7 /* hidapi.framework */,
+				B62AAE242629E35A00F77FE7 /* hidapi.framework */,
+				B62AAE262629E35A00F77FE7 /* hidapi.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -506,8 +506,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = B66376EB25DD884E00564BD5 /* Products */;
-					ProjectRef = B66376EA25DD884E00564BD5 /* SDL.xcodeproj */;
+					ProductGroup = B62AADFE2629E35900F77FE7 /* Products */;
+					ProjectRef = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -520,95 +520,95 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3DEAED31260F87720045F79B /* SDL2.framework */ = {
+		B62AAE0E2629E35A00F77FE7 /* SDL2.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = SDL2.framework;
-			remoteRef = 3DEAED30260F87720045F79B /* PBXContainerItemProxy */;
+			remoteRef = B62AAE0D2629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DEAED33260F87720045F79B /* SDL2.framework */ = {
+		B62AAE102629E35A00F77FE7 /* SDL2.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = SDL2.framework;
-			remoteRef = 3DEAED32260F87720045F79B /* PBXContainerItemProxy */;
+			remoteRef = B62AAE0F2629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DEAED35260F87720045F79B /* libSDL2.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDL2.a;
-			remoteRef = 3DEAED34260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED37260F87720045F79B /* libSDL2.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDL2.a;
-			remoteRef = 3DEAED36260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED39260F87720045F79B /* libSDL2.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libSDL2.dylib;
-			remoteRef = 3DEAED38260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED3B260F87720045F79B /* libSDL2.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libSDL2.dylib;
-			remoteRef = 3DEAED3A260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED3D260F87720045F79B /* hidapi.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = hidapi.framework;
-			remoteRef = 3DEAED3C260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED3F260F87720045F79B /* hidapi.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = hidapi.framework;
-			remoteRef = 3DEAED3E260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3DEAED41260F87720045F79B /* hidapi.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = hidapi.framework;
-			remoteRef = 3DEAED40260F87720045F79B /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		B66376FB25DD884E00564BD5 /* SDL2.framework */ = {
+		B62AAE122629E35A00F77FE7 /* SDL2.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = SDL2.framework;
-			remoteRef = B66376FA25DD884E00564BD5 /* PBXContainerItemProxy */;
+			remoteRef = B62AAE112629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		B663770125DD884E00564BD5 /* libSDL2.a */ = {
+		B62AAE142629E35A00F77FE7 /* libSDL2.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libSDL2.a;
-			remoteRef = B663770025DD884E00564BD5 /* PBXContainerItemProxy */;
+			remoteRef = B62AAE132629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		B663770725DD884E00564BD5 /* libSDL2.dylib */ = {
+		B62AAE162629E35A00F77FE7 /* libSDL2.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDL2.a;
+			remoteRef = B62AAE152629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE182629E35A00F77FE7 /* libSDL2.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDL2.a;
+			remoteRef = B62AAE172629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE1A2629E35A00F77FE7 /* libSDL2.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			path = libSDL2.dylib;
-			remoteRef = B663770625DD884E00564BD5 /* PBXContainerItemProxy */;
+			remoteRef = B62AAE192629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		B663770D25DD884E00564BD5 /* SDL2 */ = {
+		B62AAE1C2629E35A00F77FE7 /* libSDL2.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libSDL2.dylib;
+			remoteRef = B62AAE1B2629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE1E2629E35A00F77FE7 /* libSDL2.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libSDL2.dylib;
+			remoteRef = B62AAE1D2629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE202629E35A00F77FE7 /* SDL2 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = SDL2;
-			remoteRef = B663770C25DD884E00564BD5 /* PBXContainerItemProxy */;
+			remoteRef = B62AAE1F2629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE222629E35A00F77FE7 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B62AAE212629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE242629E35A00F77FE7 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B62AAE232629E35A00F77FE7 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		B62AAE262629E35A00F77FE7 /* hidapi.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = hidapi.framework;
+			remoteRef = B62AAE252629E35A00F77FE7 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -731,7 +731,6 @@
 					../engine,
 					../engine/common,
 					../common,
-					../SDL2/include,
 					../,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -742,6 +741,10 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
 					"$(PROJECT_DIR)/cmake-build/**",
+					"$(PROJECT_DIR)/cmake-build/cl_dll",
+					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
+					"$(PROJECT_DIR)/cmake-build/engine",
+					"$(PROJECT_DIR)/cmake-build",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -843,7 +846,6 @@
 					../engine,
 					../engine/common,
 					../common,
-					../SDL2/include,
 					../,
 				);
 				INFOPLIST_FILE = Info.plist;
@@ -854,6 +856,10 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
 					"$(PROJECT_DIR)/cmake-build/**",
+					"$(PROJECT_DIR)/cmake-build/cl_dll",
+					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
+					"$(PROJECT_DIR)/cmake-build/engine",
+					"$(PROJECT_DIR)/cmake-build",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;

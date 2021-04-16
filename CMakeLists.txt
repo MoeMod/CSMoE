@@ -118,8 +118,6 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 	endif()
 endif()
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
-
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
@@ -164,10 +162,6 @@ endif()
 if(XASH_LUASH)
 	add_subdirectory(luash)
 endif()
-
-add_library(qrcode INTERFACE)
-target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
-target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src)
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)

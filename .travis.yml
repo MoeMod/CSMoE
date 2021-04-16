@@ -90,13 +90,12 @@ jobs:
     - cd ..
   - stage: build
     name: Build for macOS amd64 and deploy
-    cache: ccache
     os: osx
     osx_image: xcode12.2
     language: cpp
     compiler: clang
     before_script:
-    - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
+    - curl -s https://www.libsdl.org/release/SDL2-2.0.14.dmg > SDL2.dmg
     - hdiutil attach SDL2.dmg
     - mkdir -p ~/Library/Frameworks
     - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
@@ -107,7 +106,7 @@ jobs:
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - mkdir -p osx-build && cd osx-build
-    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="x86_64" ../
     - cmake --build . --target csmoe_cpack_dmg -j 4
     - cd ..
     before_deploy:
@@ -124,14 +123,14 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for iOS and deploy
+    name: Build for iOS arm64 and deploy
     os: osx
     osx_image: xcode12.2
     language: objective-c
     before_script:
     - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
-    - mv SDL2-2.0.14 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - brew install p7zip
@@ -155,7 +154,7 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for Android and deploy
+    name: Build for Android arm64/amd64 and deploy
     language: android
     dist: trusty
     android:
@@ -199,9 +198,9 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
+    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
     - unzip SDL2.zip
-    - mv SDL2-2.0.12 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
@@ -232,9 +231,9 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
+    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
     - unzip SDL2.zip
-    - mv SDL2-2.0.12 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z

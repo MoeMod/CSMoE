@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
+set(SDL2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
 if(XASH_SDL)
 	add_library(sdl2 INTERFACE)
@@ -8,9 +8,11 @@ if(XASH_SDL)
 		find_package(SDL2 CONFIG REQUIRED)
 		target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
 	elseif(IOS)
-		target_include_directories(sdl2 INTERFACE "${CMAKE_SOURCE_DIR}/SDL2/include")
+		target_include_directories(sdl2 INTERFACE "${SDL2_PATH}/include")
 	else()
-		find_package(SDL2 QUIET)
+		if(NOT CMAKE_CROSSCOMPILING)
+			find_package(SDL2 QUIET)
+		endif()
 
 		if(SDL2_FOUND)
 			target_link_libraries(sdl2 INTERFACE ${SDL2_LIBRARY})

@@ -1000,6 +1000,10 @@ void Touch_Init( void )
 #if defined(XASH_SDL) && defined(__ANDROID__)
 	SDL_SetHint( SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1" );
 #endif
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+    // iOS Settings...
+	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
+#endif
 	touch.initialized = true;
 }
 int pfnGetScreenInfo( SCREENINFO *pscrinfo );
