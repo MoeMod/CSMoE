@@ -92,8 +92,7 @@ jobs:
     name: Build for macOS amd64 and deploy
     os: osx
     osx_image: xcode12.2
-    language: cpp
-    compiler: clang
+    language: objective-c
     before_script:
     - curl -s https://www.libsdl.org/release/SDL2-2.0.14.dmg > SDL2.dmg
     - hdiutil attach SDL2.dmg
@@ -166,7 +165,7 @@ jobs:
       - tools
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
-    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
+    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "ndk-bundle;21.4.7075529"
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.10.2.4988404"
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
