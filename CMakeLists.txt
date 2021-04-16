@@ -6,6 +6,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
+# Desktop or dedicated version options
+if(XASH_DEDICATED)
+	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
+else()
+	option(XASH_SDL "Enable SDL." ON)
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
+endif()
+
+set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
+set(XASH_LIBDL true)
+
+set(CMAKE_CXX_STANDARD 17)
+
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
 	option(XASH_PCH "Enable PCH support." OFF)
 endif()
@@ -120,6 +134,8 @@ set(XASH_LIBDL true)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(3rdparty EXCLUDE_FROM_ALL)
+
 if(XASH_IMGUI)
 	# TODO : since vcpkg doesn't provide with imgui_internal.h, just use our own one
     if(XASH_VCPKG AND FALSE)
@@ -144,57 +160,6 @@ if(XASH_IMGUI)
 	endif()
 	target_link_libraries(imgui_ext PUBLIC imgui)
 endif()
-
-if(XASH_SDL)
-	add_library(sdl2 INTERFACE)
-	if(XASH_VCPKG)
-		find_package(SDL2 CONFIG REQUIRED)
-		target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
-	elseif(IOS)
-		target_include_directories(sdl2 INTERFACE "${CMAKE_SOURCE_DIR}/SDL2/include")
-	else()
-		find_package(SDL2 QUIET)
-
-		if(SDL2_FOUND)
-			target_link_libraries(sdl2 INTERFACE ${SDL2_LIBRARY})
-			target_include_directories(sdl2 INTERFACE ${SDL2_INCLUDE_DIR})
-			if(MSVC)
-				string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-				install(FILES ${SDL2_DLL} DESTINATION "." OPTIONAL)
-			endif()
-		else()
-			if(MSVC)
-				add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
-			endif()
-			set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
-			add_subdirectory(SDL2 EXCLUDE_FROM_ALL)
-			target_link_libraries(sdl2 INTERFACE SDL2-static)
-		endif()
-	endif()
-
-endif()
-
-find_package(LuaJit QUIET)
-if(LuaJit_FOUND)
-	add_library(luajit_3p INTERFACE)
-	target_link_libraries(luajit_3p INTERFACE ${LUAJIT_LIBRARIES})
-	target_include_directories(luajit_3p INTERFACE ${LUAJIT_INCLUDE_DIR})
-else()
-	set(LUAJIT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/LuaJIT")
-	include(${CMAKE_SOURCE_DIR}/3rdparty/luajit-cmake/LuaJIT.cmake)
-
-	add_library(luajit_3p INTERFACE)
-	target_link_libraries(luajit_3p INTERFACE libluajit)
-	target_include_directories(luajit_3p INTERFACE "${LUAJIT_DIR}/src")
-endif()
-
-find_package(nameof CONFIG QUIET)
-if(nameof_FOUND)
-else()
-	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/nameof)
-endif()
-add_library(nameof_3p INTERFACE)
-target_link_libraries(nameof_3p INTERFACE nameof::nameof)
 
 if(XASH_LUASH)
 	add_subdirectory(luash)
