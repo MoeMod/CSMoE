@@ -288,6 +288,7 @@ include_directories(
 )
 
 if(XASH_NANOGL)
+	set(XASH_NANOGL_SRC ${CMAKE_SOURCE_DIR}/nanogl CACHE PATH "NanoGL path")
 	file(GLOB_RECURSE XASH_ENGINE_GLESWRAP_SOURCES ${XASH_NANOGL_SRC}/*.cpp) # NanoGL version
 	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
 		message(FATAL_ERROR "Clone both nanogl sources to engine folder!")

@@ -68,10 +68,10 @@
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		B62AADA826274FB800F77FE7 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
-		B62AADB9262752D900F77FE7 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B62AADB8262752D900F77FE7 /* libluajit.a */; };
 		B62AAE402629E55D00F77FE7 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B62AAE162629E35A00F77FE7 /* libSDL2.a */; };
 		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
 		B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B663773825DD89D000564BD5 /* CoreHaptics.framework */; };
+		B6D007C4262A1B71007A949F /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D007C3262A1B71007A949F /* libluajit.a */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
 		FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA34D31D8B5E5600915323 /* AVFoundation.framework */; };
 		FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96EDF0DEFC9DC00FAF19F /* QuartzCore.framework */; };
@@ -226,10 +226,10 @@
 		495E1A191E13199A0022E4AA /* launchdialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = launchdialog.m; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		B62AADB8262752D900F77FE7 /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SDL.xcodeproj; path = ../3rdparty/SDL2/Xcode/SDL/SDL.xcodeproj; sourceTree = "<group>"; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		B663773825DD89D000564BD5 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
+		B6D007C3262A1B71007A949F /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FAE0E9691BAF96A00098DFA4 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
@@ -254,6 +254,7 @@
 				FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */,
 				FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */,
 				FDF0D7AB0E12D53800247964 /* CoreAudio.framework in Frameworks */,
+				B6D007C4262A1B71007A949F /* libluajit.a in Frameworks */,
 				FDF0D7AC0E12D53800247964 /* AudioToolbox.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -267,7 +268,6 @@
 				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
 				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
-				B62AADB9262752D900F77FE7 /* libluajit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,7 +376,7 @@
 			children = (
 				3DF2719523D4511C005D151E /* libimgui.a */,
 				3D8777BD24A26819006806BF /* libimgui_ext.a */,
-				B62AADB8262752D900F77FE7 /* libluajit.a */,
+				B6D007BC262A1AD4007A949F /* 3rdparty */,
 				3D4DA95A23BCEA4700F575C1 /* cl_dll */,
 				3DEAED46260F8B340045F79B /* dlls */,
 				3D4DA95E23BCEAFB00F575C1 /* engine */,
@@ -435,6 +435,14 @@
 				B62AAE262629E35A00F77FE7 /* hidapi.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B6D007BC262A1AD4007A949F /* 3rdparty */ = {
+			isa = PBXGroup;
+			children = (
+				B6D007C3262A1B71007A949F /* libluajit.a */,
+			);
+			path = 3rdparty;
 			sourceTree = "<group>";
 		};
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
@@ -677,9 +685,9 @@
 				"$(SRCROOT)/cmake-build/dlls/libserver.a",
 				"$(SRCROOT)/cmake-build/mainui_cpp/libmenu.a",
 				"$(SRCROOT)/cmake-build/engine/libxash.a",
-				"$(SRCROOT)/cmake-build/engine/libimgui_ext.a",
-				"$(SRCROOT)/cmake-build/engine/libimgui.a",
-				"$(SRCROOT)/cmake-build/engine/libluajit.a",
+				"$(SRCROOT)/cmake-build/libimgui_ext.a",
+				"$(SRCROOT)/cmake-build/libimgui.a",
+				"$(SRCROOT)/cmake-build/3rdparty/libluajit.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -745,6 +753,7 @@
 					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
 					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
+					"$(PROJECT_DIR)/cmake-build/3rdparty",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -860,6 +869,7 @@
 					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
 					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
+					"$(PROJECT_DIR)/cmake-build/3rdparty",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;

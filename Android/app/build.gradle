@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
@@ -13,11 +12,9 @@ android {
             cmake {
                 arguments "-DXASH_SDL=0",
                         "-DXASH_NANOGL=1",
-                        "-DXASH_NANOGL_SRC=" + file('../../nanogl/'),
                         "-DXASH_STATIC_GAMELIB=1",
-                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0",
-                        "-DXASH_PCH=0"
-                version "3.10.2"
+                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0"
+                version "3.18.1"
             }
         }
         ndk {
@@ -40,7 +37,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-            version "3.10.2"
+            version "3.18.1"
         }
     }
     sourceSets {
@@ -51,6 +48,5 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
 }
