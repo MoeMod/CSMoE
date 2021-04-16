@@ -14,7 +14,7 @@ namespace cl {
 			{
 				return +[](lua_State* L) -> int
 				{
-					if (int argn = lua_gettop(L); argn < sizeof...(I))
+					if (int argn = lua_gettop(L); argn < (int)sizeof...(I))
 					{
 						luaL_error(L, "bad function call with unmatched args, excepted %d got %d", static_cast<int>(sizeof...(I)), argn);
 						return 0;

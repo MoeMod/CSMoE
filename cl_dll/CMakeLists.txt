@@ -26,7 +26,7 @@ project (client)
 
 set(CMAKE_CXX_STANDARD 17)
 
-if (APPLE OR ANDROID)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
