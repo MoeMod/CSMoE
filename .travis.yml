@@ -164,7 +164,7 @@ jobs:
       - tools
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
-    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "ndk-bundle;21.1.6352462"
+    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.18.1"
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
