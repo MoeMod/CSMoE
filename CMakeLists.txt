@@ -6,6 +6,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
+# Desktop or dedicated version options
+if(XASH_DEDICATED)
+	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
+else()
+	option(XASH_SDL "Enable SDL." ON)
+	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
+endif()
+
+set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
+set(XASH_LIBDL true)
+
+set(CMAKE_CXX_STANDARD 17)
+
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
 	option(XASH_PCH "Enable PCH support." OFF)
 endif()
@@ -35,6 +49,8 @@ if(NOT XASH_DEDICATED)
 else()
 	set(XASH_IMGUI OFF)
 endif()
+
+option(XASH_LUASH "LUA support for CSMoE. Expected lua 5.3" ON)
 
 if (APPLE OR ANDROID)
 	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof)
@@ -102,8 +118,6 @@ if(NOT ${CMAKE_INSTALL_PREFIX})
 	endif()
 endif()
 
-set(SDL2_PATH ${CMAKE_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
-
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
@@ -117,6 +131,8 @@ set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(XASH_LIBDL true)
 
 set(CMAKE_CXX_STANDARD 17)
+
+add_subdirectory(3rdparty EXCLUDE_FROM_ALL)
 
 if(XASH_IMGUI)
 	# TODO : since vcpkg doesn't provide with imgui_internal.h, just use our own one
@@ -143,38 +159,9 @@ if(XASH_IMGUI)
 	target_link_libraries(imgui_ext PUBLIC imgui)
 endif()
 
-if(XASH_SDL)
-	add_library(sdl2 INTERFACE)
-	if(XASH_VCPKG)
-		find_package(SDL2 CONFIG REQUIRED)
-		target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
-	elseif(IOS)
-		target_include_directories(sdl2 INTERFACE "${CMAKE_SOURCE_DIR}/SDL2/include")
-	else()
-		find_package(SDL2 QUIET)
-
-		if(SDL2_FOUND)
-			target_link_libraries(sdl2 INTERFACE ${SDL2_LIBRARY})
-			target_include_directories(sdl2 INTERFACE ${SDL2_INCLUDE_DIR})
-			if(MSVC)
-				string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-				install(FILES ${SDL2_DLL} DESTINATION "." OPTIONAL)
-			endif()
-		else()
-			if(MSVC)
-				add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
-			endif()
-			set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
-			add_subdirectory(SDL2 EXCLUDE_FROM_ALL)
-			target_link_libraries(sdl2 INTERFACE SDL2-static)
-		endif()
-	endif()
-
+if(XASH_LUASH)
+	add_subdirectory(luash)
 endif()
-
-add_library(qrcode INTERFACE)
-target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
-target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src)
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)

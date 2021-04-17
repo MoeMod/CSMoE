@@ -994,6 +994,9 @@ void CL_PrecacheModel( sizebuf_t *msg )
 
 	// when we loading map all resources is precached sequentially
 	if( !cl.video_prepped ) return;
+	
+	if (clgame.dllFuncs.CL_OnPrecache)
+		clgame.dllFuncs.CL_OnPrecache(t_model, cl.model_precache[modelIndex], modelIndex);
 
 	Mod_RegisterModel( cl.model_precache[modelIndex], modelIndex );
 }
@@ -1018,6 +1021,9 @@ void CL_PrecacheSound( sizebuf_t *msg )
 
 	// when we loading map all resources is precached sequentially
 	if( !cl.audio_prepped ) return;
+	
+	if (clgame.dllFuncs.CL_OnPrecache)
+		clgame.dllFuncs.CL_OnPrecache(t_sound, cl.sound_precache[soundIndex], soundIndex);
 
 	cl.sound_index[soundIndex] = S_RegisterSound( cl.sound_precache[soundIndex] );
 }
@@ -1040,6 +1046,9 @@ void CL_PrecacheEvent( sizebuf_t *msg )
 
 	Q_strncpy( cl.event_precache[eventIndex], BF_ReadString( msg ), sizeof( cl.event_precache[0] ));
 
+	if (clgame.dllFuncs.CL_OnPrecache)
+		clgame.dllFuncs.CL_OnPrecache(t_eventscript, cl.event_precache[eventIndex], eventIndex);
+	
 	// can be set now
 	CL_SetEventIndex( cl.event_precache[eventIndex], eventIndex );
 }
@@ -1181,6 +1190,12 @@ void CL_ParseResourceList( sizebuf_t *msg )
 		if( reslist.restype[i] == t_sound )
 			CL_CheckingSoundResFile( reslist.resnames[i] );
 		else CL_CheckingResFile( reslist.resnames[i] );
+
+		if (reslist.restype[i] == t_generic)
+		{
+			if (clgame.dllFuncs.CL_OnPrecache)
+				clgame.dllFuncs.CL_OnPrecache(t_generic, reslist.resnames[i], i);
+		}
 	}
 
 	if( !downloadcount )

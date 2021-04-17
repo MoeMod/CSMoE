@@ -16,3 +16,6 @@
 [submodule "3rdparty/QRCode"]
 	path = 3rdparty/QRCode
 	url = https://github.com/ricmoo/QRCode
+[submodule "3rdparty/luajit-cmake"]
+	path = 3rdparty/luajit-cmake
+	url = https://github.com/MoeMod/luajit-cmake

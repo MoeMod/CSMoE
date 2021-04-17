@@ -53,6 +53,9 @@ typedef struct event_api_s
 	void(*EV_PlayerTraceExt)(float *start, float *end, int traceFlags, int(*pfnIgnore)(struct physent_s *pe), struct pmtrace_s *tr);
 	const char *(*EV_SoundForIndex)(int index);
 	struct msurface_s *(*EV_TraceSurface)(int ground, float *vstart, float *vend);
+
+	// CSMoE extension
+	unsigned short(*EV_GetCurrentEventIndex)(void);
 } event_api_t;
 
 #endif

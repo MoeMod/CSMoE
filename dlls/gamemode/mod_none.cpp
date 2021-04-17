@@ -8,6 +8,8 @@
 
 #include "mod_none.h"
 
+#include "bot_include.h"
+
 #include <algorithm>
 
 namespace sv {
@@ -31,7 +33,14 @@ void CMod_None::CheckMapConditions()
 		}
 
 		using EVpair_t = decltype(m_mapBombZones)::value_type;
-		std::sort(m_mapBombZones.begin(), m_mapBombZones.end(), [](const EVpair_t &a, const EVpair_t &b) {return a.first->eoffset() < b.first->eoffset(); });
+		std::sort(m_mapBombZones.begin(), m_mapBombZones.end(), [](const EVpair_t &a, const EVpair_t &b)
+		{
+			//auto get_bombsite_index = [](const Vector &vec) {
+			//	const CCSBotManager::Zone* zone = TheCSBots()->GetZone(&vec);
+			//	return zone ? zone->m_index : 0;
+			//};
+			return a.second.x > b.second.x;
+		});
 	}
 }
 

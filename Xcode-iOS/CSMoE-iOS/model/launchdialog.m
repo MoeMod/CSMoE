@@ -18,8 +18,6 @@
 #include <sys/stat.h>
 #include "launcherdialog.h"
 
-#include <SDL_hints.h>
-
 char *g_szLibrarySuffix = NULL;
 float g_iOSVer;
 
@@ -123,9 +121,6 @@ void IOS_LaunchDialog( void )
 	}
 	
 	IOS_SetDefaultArgs();
-	
-	// iOS Settings...
-	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 	
 	// return back to xash3d
 }

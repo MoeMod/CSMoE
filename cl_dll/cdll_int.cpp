@@ -35,6 +35,10 @@
 #include "cdll_exp.h"
 #include "events.h"
 
+#ifdef XASH_LUASH
+#include "luash_cl/lua_cl.h"
+#endif
+
 extern "C"
 {
 #include "pmtrace.h"
@@ -87,6 +91,9 @@ void DLLEXPORT HUD_Shutdown( void )
 	gHUD.Shutdown();
 	Input_Shutdown();
 	Localize_Free();
+#ifdef XASH_LUASH
+	LuaCL_Shutdown();
+#endif
 }
 
 
@@ -195,6 +202,9 @@ the hud variables.
 
 void DLLEXPORT HUD_Init( void )
 {
+#ifdef XASH_LUASH
+	LuaCL_Init();
+#endif
 	InitInput();
 	gHUD.Init();
 	//Scheme_Init();
@@ -368,6 +378,18 @@ int DLLEXPORT HUD_MobilityInterface( mobile_engfuncs_t *mobileapi )
 
 /*
 ========================
+HUD_MobilityInterface
+========================
+*/
+void DLLEXPORT CL_OnPrecache(int type, const char* name, int index)
+{
+#ifdef XASH_LUASH
+	LuaCL_OnPrecache((resourcetype_t)type, name, index);
+#endif
+}
+
+/*
+========================
 ClientFactory
 
 This function is never called, but it has to exist in order for the engine to load stuff from the client. - Solokiller
@@ -442,6 +464,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 		nullptr,	// SDL Xash pfnMoveEvent
 		nullptr,	// SDL Xash pfnLookEvent
 		HUD_OnGUI,	// SDL Xash pfnOnGUI
+		CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
@@ -508,6 +531,7 @@ extern "C" void DLLEXPORT F(void *pv) {
 			nullptr,	// SDL Xash pfnMoveEvent
 			nullptr,	// SDL Xash pfnLookEvent
 			HUD_OnGUI,	// SDL Xash pfnOnGUI
+			CL_OnPrecache, // CSMoE ext
 	};
 
 	*pcldll_func = cldll_func;
@@ -561,11 +585,10 @@ static dllexport_t switch_client_exports[] = {
 	{ "HUD_GetStudioModelInterface", (void*)HUD_GetStudioModelInterface },
 	{ "HUD_DirectorMessage", (void*)HUD_DirectorMessage },
 	{ "HUD_VoiceStatus", (void*)HUD_VoiceStatus },
-#ifndef _WIN32
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
-#endif
 	{ "HUD_OnGUI", (void*)HUD_OnGUI },
+	{ "CL_OnPrecache", (void*)CL_OnPrecache },
 	{ NULL, NULL },
 };
 

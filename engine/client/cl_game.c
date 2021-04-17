@@ -109,6 +109,7 @@ static dllfunc_t cdll_new_exports[] = 	// allowed only in SDK 2.3 and higher
 { "IN_ClientMoveEvent", (void **)&clgame.dllFuncs.pfnMoveEvent}, // Xash3D ext
 { "IN_ClientLookEvent", (void **)&clgame.dllFuncs.pfnLookEvent}, // Xash3D ext
 { "HUD_OnGUI", (void **)&clgame.dllFuncs.pfnOnGUI}, // Xash3D ext
+{ "CL_OnPrecache", (void **)&clgame.dllFuncs.CL_OnPrecache}, // Xash3D ext
 { NULL, NULL }
 };
 
@@ -2454,6 +2455,11 @@ static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, float *vstart
 	return PM_TraceSurface( pe, vstart, vend );
 }
 
+static unsigned short GAME_EXPORT pfnGetCurrentEventIndex(void)
+{
+	return cl.events.cur_event;
+}
+
 /*
 =============
 pfnStopAllSounds
@@ -3847,6 +3853,7 @@ static event_api_t gEventApi =
 	CL_PlayerTraceExt,
 	CL_SoundFromIndex,
 	pfnTraceSurface,
+	pfnGetCurrentEventIndex,
 };
 
 static demo_api_t gDemoApi =

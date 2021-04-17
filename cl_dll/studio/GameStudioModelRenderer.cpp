@@ -436,7 +436,7 @@ void CGameStudioModelRenderer::StudioEstimateGait(entity_state_t *pplayer)
 	}
 	else
 	{
-		m_pPlayerInfo->gaityaw = (atan2(est_velocity[1], est_velocity[0]) * 180 / M_PI);
+		m_pPlayerInfo->gaityaw = RAD2DEG(atan2(est_velocity[1], est_velocity[0]));
 
 		if (m_pPlayerInfo->gaityaw > 180)
 			m_pPlayerInfo->gaityaw = 180;

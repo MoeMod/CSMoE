@@ -26,6 +26,7 @@
 #include "triggers.h"
 
 #include "com_model.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 
@@ -4945,7 +4946,7 @@ void CBasePlayer::Spawn()
 	m_flNextAttack = zero_duration;
 	m_flgeigerDelay = gpGlobals->time + 2s;
 
-	StartSneaking();
+	//StartSneaking();
 
 	m_iFlashBattery = 99;
 	m_flFlashLightTime = invalid_time_point + 1s;

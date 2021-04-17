@@ -458,8 +458,9 @@ void Touch_SetClientOnly( qboolean state )
 	}
 	else
 	{
+		IN_ActivateMouse(false);
 		SDL_ShowCursor( false );
-		SDL_GetRelativeMouseState( 0, 0 );
+		SDL_SetRelativeMouseMode( SDL_TRUE );
 	}
 #endif
 }
@@ -998,6 +999,10 @@ void Touch_Init( void )
 	touch_enable = Cvar_Get( "touch_enable", DEFAULT_TOUCH_ENABLE, CVAR_ARCHIVE, "enable touch controls" );
 #if defined(XASH_SDL) && defined(__ANDROID__)
 	SDL_SetHint( SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1" );
+#endif
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+    // iOS Settings...
+	SDL_SetHint(SDL_HINT_IOS_HIDE_HOME_INDICATOR, "2");
 #endif
 	touch.initialized = true;
 }

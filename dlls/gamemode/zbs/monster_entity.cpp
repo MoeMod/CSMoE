@@ -9,6 +9,7 @@
 
 #include "monster_entity.h"
 #include "zs_subs.h"
+#include "cbase/cbase_hash.h"
 
 #include "game.h"
 #include "bot_include.h" // nav

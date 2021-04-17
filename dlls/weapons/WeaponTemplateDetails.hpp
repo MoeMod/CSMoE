@@ -30,7 +30,6 @@ namespace df
     namespace impl { \
         template<class T> constexpr auto Get_impl(T &&data, priority_tag<2>) -> decltype(data.FieldName) { return data.FieldName; } \
         template<class T> constexpr auto Get_impl(T &&data, priority_tag<3>) -> decltype(data.Get##FieldName ()) { return data.Get##FieldName (); } \
-        template<class T> constexpr auto Get_impl(T &&data, priority_tag<4>) -> decltype(data.FieldName()) { return data.FieldName (); } \
         template<class T> constexpr auto Get(T &&data) -> decltype(Get_impl(data, priority_tag<5>())) { return Get_impl (data, priority_tag<5>()); } \
         template<class T> constexpr auto Has_impl(T &&data, priority_tag<0>) -> std::false_type { return {}; } \
         template<class T> constexpr auto Has_impl(T &&data, priority_tag<1>) -> decltype(Get(data), std::true_type()) { return {}; } \

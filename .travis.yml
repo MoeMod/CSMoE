@@ -35,7 +35,7 @@ jobs:
     name: Build for Linux amd64
     arch: amd64
     os: linux
-    dist: bionic
+    dist: focal
     cache: ccache
     language: cpp
     compiler: gcc
@@ -53,13 +53,18 @@ jobs:
     - sudo apt-get install libsdl2-dev
     - sudo apt-get install libsdl2-image-dev
     - sudo apt-get install libfontconfig1-dev
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     script:
-    - sh scripts/build_portable_linux_engine.sh;
+    - mkdir -p linux-build-amd64 && cd linux-build-amd64
+    - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+    - cmake --build .
+    - cd ..
   - stage: build
     name: Build for Linux arm64
     arch: arm64
     os: linux
-    dist: bionic
+    dist: focal
     cache: ccache
     language: cpp
     compiler: gcc
@@ -76,26 +81,30 @@ jobs:
     - sudo apt-get install libsdl2-dev
     - sudo apt-get install libsdl2-image-dev
     - sudo apt-get install libfontconfig1-dev
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     script:
-    - sh scripts/build_portable_linux_engine.sh;
+    - mkdir -p linux-build-arm64 && cd linux-build-arm64
+    - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
+    - cmake --build .
+    - cd ..
   - stage: build
     name: Build for macOS amd64 and deploy
-    cache: ccache
     os: osx
-    osx_image: xcode11.3
-    language: cpp
-    compiler: clang
+    osx_image: xcode12.2
+    language: objective-c
     before_script:
-    - curl -s https://www.libsdl.org/release/SDL2-2.0.10.dmg > SDL2.dmg
-    - hdiutil attach SDL2.dmg
-    - mkdir -p ~/Library/Frameworks
-    - cp -r /Volumes/SDL2/SDL2.framework ~/Library/Frameworks/
+    - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
+    - tar xzf SDL2.tar.gz
+    - mv SDL2-2.0.14 3rdparty/SDL2
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
     - mkdir -p osx-build && cd osx-build
-    - cmake -DCMAKE_BUILD_TYPE=Release ../
+    - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="x86_64" ../
     - cmake --build . --target csmoe_cpack_dmg -j 4
     - cd ..
     before_deploy:
@@ -112,14 +121,16 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for iOS and deploy
+    name: Build for iOS arm64 and deploy
     os: osx
-    osx_image: xcode11.3
+    osx_image: xcode12.2
     language: objective-c
     before_script:
     - curl -s http://libsdl.org/release/SDL2-2.0.14.tar.gz > SDL2.tar.gz
     - tar xzf SDL2.tar.gz
-    - mv SDL2-2.0.14 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -128,12 +139,12 @@ jobs:
     - mkdir -p Payload
     - cp -a ./CSMoE-iOS.xcarchive/Products/Applications/CSMoE.app Payload/
     before_deploy:
-      - zip -r CSMoE-CD-iOS-universal-unsigned-Full.ipa Payload
+      - zip -r CSMoE-CD-iOS-arm64-unsigned-Full.ipa Payload
     deploy:
       provider: releases
       api_key: ${GITHUB_TOKEN}
       file:
-        - CSMoE-CD-iOS-universal-unsigned-Full.ipa
+        - CSMoE-CD-iOS-arm64-unsigned-Full.ipa
       on:
         repo: MoeMod/CSMoE
         tags: true
@@ -141,7 +152,7 @@ jobs:
       skip_cleanup: true
       prerelease: true
   - stage: build
-    name: Build for Android and deploy
+    name: Build for Android arm64/amd64 and deploy
     language: android
     dist: trusty
     android:
@@ -154,7 +165,9 @@ jobs:
     before_script:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "patcher;v4"
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager ndk-bundle
-    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.10.2.4988404"
+    - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.18.1" --channel=3
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - sudo apt-get install p7zip-full
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -183,9 +196,11 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
+    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
     - unzip SDL2.zip
-    - mv SDL2-2.0.12 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
@@ -214,9 +229,11 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.12-VC.zip -o SDL2.zip
+    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
     - unzip SDL2.zip
-    - mv SDL2-2.0.12 SDL2
+    - mv SDL2-2.0.14 3rdparty/SDL2
+    - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
+    - git clone https://github.com/Neargye/nameof 3rdparty/nameof
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:

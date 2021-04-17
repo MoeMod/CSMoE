@@ -396,8 +396,8 @@ void R_ChangeDisplaySettingsFast( int width, int height )
 	Cvar_SetFloat("height", height);
 
 	// as we don't recreate window here, update center positions by hand
-	host.window_center_x = glState.width / 2;
-	host.window_center_y = glState.height / 2;
+	host.window_center_x = width / 2;
+	host.window_center_y = height / 2;
 
 	if( glState.width != width || glState.height != height )
 	{

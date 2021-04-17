@@ -132,7 +132,8 @@ public class XashActivity extends Activity {
 			
 		mPref = this.getSharedPreferences( "engine", 0 );
 
-		launchSurfaceAndEngine();
+		if(checkExtractAssets())
+			launchSurfaceAndEngine();
 	}
 
 		// Events
@@ -819,7 +820,38 @@ public class XashActivity extends Activity {
 		mSingleton.startActivity(intent);
 	}
 
+	List<String> getAssetsFileList(String path) throws IOException {
+		List<String> result = new LinkedList<>();
 
+		String[] fileNames = getAssets().list(path);
+
+		if (fileNames != null && fileNames.length > 0) {
+			for (String s : fileNames)
+				result.addAll(getAssetsFileList(path.isEmpty() ? s : path + "/" + s));
+		} else {
+			result.add(path);
+		}
+		return result;
+	}
+
+	public boolean checkExtractAssets() {
+		try {
+			List<String> list = getAssetsFileList("");
+
+			if( mPref.getInt( "assetscount", 0 ) != list.size() ) {
+				Runnable onFinish = new Runnable(){
+					public void run() { launchSurfaceAndEngine(); }
+				};
+				Thread t = new Thread(new AssetCopyHandler(this, list, onFinish));
+				t.start();
+				return false;
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
 }
 
 /**
@@ -1860,5 +1892,89 @@ class JoystickHandler_v14 extends JoystickHandler_v12
 	public int getButtonState( MotionEvent event )
 	{
 		return event.getButtonState();
+	}
+}
+
+class AssetCopyHandler implements Runnable {
+
+	final ProgressDialog pd;
+	final Context context;
+	final List<String> fileList;
+	final Runnable onFinish;
+
+	public AssetCopyHandler(Context ctx, List<String> l, Runnable f) {
+		context = ctx;
+		fileList = l;
+		pd = new ProgressDialog(context);
+		onFinish = f;
+
+		pd.setMessage("Preparing...");
+		pd.setTitle("Copying game assets");
+		pd.setCancelable(false);
+
+		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		pd.show();
+	}
+
+	Handler progressHandler = new Handler(new Handler.Callback() {
+		@Override
+		public boolean handleMessage(Message msg) {
+			if(msg.what == 0)
+				pd.setMax(msg.arg1);
+			else if(msg.what == 1)
+			{
+				pd.incrementProgressBy(msg.arg1);
+				pd.setMessage((String)msg.obj);
+			}
+			else if(msg.what == 2)
+			{
+				pd.dismiss();
+				if(onFinish != null)
+					onFinish.run();
+			}
+			else if(msg.what == 3)
+				new AlertDialog.Builder( context )
+						.setTitle( "Error copying game assets" )
+						.setMessage( (String)msg.obj )
+						.setPositiveButton( "Ok", null)
+						.setCancelable( false )
+						.show();
+			return true;
+		}
+	});
+
+
+	@Override
+	public void run() {
+		try {
+			Message.obtain(progressHandler,0, fileList.size(), 0).sendToTarget();
+			String savePath = context.getExternalFilesDir(null).getPath();
+			byte[] buffer = new byte[1024];
+			for(String s : fileList) {
+
+				InputStream is = context.getAssets().open(s);
+
+				File file = new File(savePath + "/" + s);
+				if(!file.exists()) {
+					file.getParentFile().mkdirs();
+					file.createNewFile();
+				}
+				FileOutputStream fos = new FileOutputStream(file,false);
+				int byteCount = 0;
+				while ((byteCount = is.read(buffer)) != -1) {
+					fos.write(buffer, 0, byteCount);
+				}
+				fos.flush();
+				is.close();
+				fos.close();
+
+				Message.obtain(progressHandler,1, 1, 0, s).sendToTarget();
+			}
+			XashActivity.mPref.edit().putInt( "assetscount", fileList.size() ).apply();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Message.obtain(progressHandler,3, e.getMessage()).sendToTarget();
+		}
+		Message.obtain(progressHandler,2, 0, 0).sendToTarget();
 	}
 }

@@ -136,6 +136,8 @@ qboolean CL_FireEvent( event_info_t *ei )
 
 	if( !ei || !ei->index )
 		return false;
+	
+	cl.events.cur_event = ei->index;
 
 	if( cl_trace_events->integer )
 	{
@@ -176,6 +178,8 @@ qboolean CL_FireEvent( event_info_t *ei )
 		}
 	}
 
+	cl.events.cur_event = 0;
+
 	return false;
 }
 
@@ -205,7 +209,7 @@ void CL_FireEvents( void )
 		// delayed event!
 		if( ei->fire_time && ( ei->fire_time > cl.time ))
 			continue;
-
+		
 		success = CL_FireEvent( ei );
 
 		// zero out the remaining fields

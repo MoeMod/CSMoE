@@ -36,10 +36,6 @@ enum cannon_e
 	ANIM_DRAW,
 };
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
-
 void EV_CannonFireEffect(vec3_t vecSrc, vec3_t vecForward, vec3_t vecVelocity, int idx, int iModel)
 {
 	if (!iModel)
@@ -76,8 +72,8 @@ void EV_CannonFireEffect(vec3_t vecSrc, vec3_t vecForward, vec3_t vecVelocity, i
 		ent->entity.curstate.renderamt = 150;
 		ent->entity.curstate.renderfx = kRenderFxFadeSlow;
 		ran = 10 * gEngfuncs.pfnRandomLong(0, 4) - 2;
-		c = cos(ran * M_PI / 180);
-		s = sin(ran * M_PI / 180);
+		c = cos(DEG2RAD(ran));
+		s = sin(DEG2RAD(ran));
 		ent->entity.origin = vecSrc;
 		ent->entity.baseline.origin.x = (c * vecForward.x - s * vecForward.y) * gEngfuncs.pfnRandomLong(130, 400);
 		ent->entity.baseline.origin.y = (s * vecForward.x + c * vecForward.y) * gEngfuncs.pfnRandomLong(130, 400);

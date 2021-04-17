@@ -65,7 +65,7 @@ template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 2; }
 	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
 	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern "C" EXPORT void mapClassName(entvars_t *pev) { GetClassPtr<DLLClassName>(pev); } \
+	extern "C" EXPORT void mapClassName(entvars_t *pev) { (void)GetClassPtr<DLLClassName>(pev); } \
 	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
 	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, &mapClassName }; }
 #endif

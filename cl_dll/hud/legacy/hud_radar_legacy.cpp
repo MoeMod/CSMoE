@@ -37,10 +37,6 @@ version.
 
 #include "gamemode/mods_const.h"
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
-#endif
-
 static byte	r_RadarCross[8][8] =
 {
 {1,1,0,0,0,0,1,1},

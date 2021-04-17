@@ -26,7 +26,7 @@ project (client)
 
 set(CMAKE_CXX_STANDARD 17)
 
-if (APPLE OR ANDROID)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
@@ -258,10 +258,19 @@ else()
 	set(IMGUI_SRCS )
 endif()
 
-if(NOT WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-	set(INPUT_SRCS ./input_xash3d.cpp)
+if(XASH_LUASH)
+	set(LUASH_SRCS
+		luash_cl/lua_cl.cpp
+		luash_cl/ev_lua.cpp
+	)
 else()
-	set(INPUT_SRCS ./inputw32.cpp)
+	set(LUASH_SRCS )
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+	set(INPUT_SRCS ./input_winrt.cpp)
+else()
+	set(INPUT_SRCS ./input_xash3d.cpp)
 endif()
 
 set (CLDLL_SOURCES
@@ -279,7 +288,8 @@ set (CLDLL_SOURCES
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
-
+	
+	${LUASH_SRCS}
 	${INPUT_SRCS}
 	${PM_SRCS}
 	${HUD_SRCS}
@@ -345,6 +355,10 @@ target_link_libraries( ${CLIENT_LIBRARY} ${CMAKE_DL_LIBS} )
 
 if(XASH_IMGUI)
 	target_link_libraries( ${CLIENT_LIBRARY} imgui imgui_ext )
+endif()
+
+if(XASH_LUASH)
+	target_link_libraries( ${CLIENT_LIBRARY} luash)
 endif()
 
 if(ANDROID OR IOS)

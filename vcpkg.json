@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "csmoe",
+  "version-string": "v22-citrus",
+  "dependencies": [
+    "sdl2",
+    "luajit",
+    "nameof"
+  ]
+}

@@ -12,6 +12,7 @@
 #include "hltv.h"
 #include "game.h"
 #include "globals.h"
+#include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
 
@@ -1246,9 +1247,9 @@ void CGrenade::FB_Explode(TraceResult* pTrace, int bitsDamageType)
 	int num = 3;
 	float range = 100.0;
 	float f = range / num;
-	for (int i = -num; i <= num; i++)	//i= -5 10·Ý»ðÑæ
+	for (int i = -num; i <= num; i++)	//i= -5 10ï¿½Ý»ï¿½ï¿½ï¿½
 	{
-		for (int j = -num; j <= num; j++) //ÓÖ10·Ý
+		for (int j = -num; j <= num; j++) //ï¿½ï¿½10ï¿½ï¿½
 		{
 			Vector origin2 = origin;
 			origin2 = origin2 + forward * i * f + right * j * f;

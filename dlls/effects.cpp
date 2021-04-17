@@ -12,6 +12,7 @@
 #include "subs.h"
 #include "globals.h"
 #include "bmodels.h"
+#include "cbase/cbase_hash.h"
 
 namespace sv {
 

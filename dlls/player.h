@@ -226,7 +226,205 @@ struct WeaponStruct
 
 class CWeaponBox;
 
-class CBasePlayer : public CBaseMonster
+constexpr std::size_t MAX_LOCATION_LENGTH = 32;
+
+template<> struct PrivateData<class CBasePlayer, CBaseMonster>
+{
+	int random_seed;
+	unsigned short m_usPlayerBleed;
+	EHANDLE m_hObserverTarget;
+	time_point_t m_flNextObserverInput;
+	int m_iObserverWeapon;
+	int m_iObserverC4State;
+	bool m_bObserverHasDefuser;
+	int m_iObserverLastMode;
+	time_point_t m_flFlinchTime;
+	time_point_t m_flAnimTime;
+	bool m_bHighDamage;
+	float m_flVelocityModifier;
+	int m_iLastZoom;
+	bool m_bResumeZoom;
+	time_point_t m_flEjectBrass;
+	int m_iKevlar;
+	bool m_bNotKilled;
+	TeamName m_iTeam;
+	CPlayerAccount m_iAccount;
+	bool m_bHasPrimary;
+	time_point_t m_flDeathThrowTime;
+	int m_iThrowDirection;
+	time_point_t m_flLastTalk;
+	bool m_bJustConnected;
+	bool m_bContextHelp;
+	JoinState m_iJoiningState;
+	CBaseEntity *m_pIntroCamera;
+	time_point_t m_fIntroCamTime;
+	time_point_t m_fLastMovement;
+	bool m_bMissionBriefing;
+	bool m_bTeamChanged;
+	ModelName m_iModelName;
+	int m_iTeamKills;
+	int m_iIgnoreGlobalChat;
+	bool m_bHasNightVision;
+	bool m_bNightVisionOn;
+	Vector m_vRecentPath[MAX_RECENT_PATH];
+	time_point_t m_flIdleCheckTime;
+	time_point_t m_flRadioTime;
+	int m_iRadioMessages;
+	bool m_bIgnoreRadio;
+	bool m_bHasC4;
+	bool m_bHasDefuser;
+	bool m_bKilledByBomb;
+	Vector m_vBlastVector;
+	bool m_bKilledByGrenade;
+	CHintMessageQueue m_hintMessageQueue;
+	int m_flDisplayHistory;
+	_Menu m_iMenu;
+	int m_iChaseTarget;
+	CBaseEntity *m_pChaseTarget;
+	float m_fCamSwitch;
+	bool m_bEscaped;
+	bool m_bIsVIP;
+	EngineClock::time_point m_tmNextRadarUpdate;
+	Vector m_vLastOrigin;
+	int m_iCurrentKickVote;
+	time_point_t m_flNextVoteTime;
+	bool m_bJustKilledTeammate;
+	int m_iHostagesKilled;
+	int m_iMapVote;
+	bool m_bCanShoot;
+	time_point_t m_flLastFired;
+	time_point_t m_flLastAttackedTeammate;
+	bool m_bHeadshotKilled;
+	bool m_bPunishedForTK;
+	bool m_bReceivesNoMoneyNextRound;
+	time_point_t m_iTimeCheckAllowed;
+	bool m_bHasChangedName;
+	char m_szNewName[MAX_PLAYER_NAME_LENGTH];
+	bool m_bIsDefusing;
+	time_point_t m_tmHandleSignals;
+	CUnifiedSignals m_signals;
+	edict_t *m_pentCurBombTarget;
+	int m_iPlayerSound;
+	int m_iTargetVolume;
+	int m_iWeaponVolume;
+	int m_iExtraSoundTypes;
+	int m_iWeaponFlash;
+	float m_flStopExtraSoundTime;
+	time_point_t m_flFlashLightTime;
+	int m_iFlashBattery;
+	int m_afButtonLast;
+	int m_afButtonPressed;
+	int m_afButtonReleased;
+	edict_t *m_pentSndLast;
+	float m_flSndRoomtype;
+	float m_flSndRange;
+	float m_flFallVelocity;
+	int m_rgItems[MAX_ITEMS];
+	int m_fNewAmmo;
+	unsigned int m_afPhysicsFlags;
+	time_point_t m_fNextSuicideTime;
+	time_point_t m_flTimeStepSound;
+	time_point_t m_flTimeWeaponIdle;
+	time_point_t m_flSwimTime;
+	time_point_t m_flDuckTime;
+	time_point_t m_flWallJumpTime;
+	time_point_t m_flSuitUpdate;
+	int m_rgSuitPlayList[CSUITPLAYLIST];
+	int m_iSuitPlayNext;
+	int m_rgiSuitNoRepeat[CSUITNOREPEAT];
+	float m_rgflSuitNoRepeatTime[CSUITNOREPEAT];
+	int m_lastDamageAmount;
+	time_point_t m_tbdPrev;
+	float m_flgeigerRange;
+	time_point_t m_flgeigerDelay;
+	int m_igeigerRangePrev;
+	int m_iStepLeft;
+	char m_szTextureName[CBTEXTURENAMEMAX];
+	char m_chTextureType;
+	int m_idrowndmg;
+	int m_idrownrestored;
+	int m_bitsHUDDamage;
+	BOOL m_fInitHUD;
+	BOOL m_fGameHUDInitialized;
+	int m_iTrain;
+	BOOL m_fWeapon;
+	EHANDLE m_pTank;
+	time_point_t m_fDeadTime;
+	BOOL m_fNoPlayerSound;
+	BOOL m_fLongJump;
+	time_point_t m_tSneaking;
+	int m_iUpdateTime;
+	int m_iClientHealth;
+	int m_iClientBattery;
+	int m_iHideHUD;
+	int m_iClientHideHUD;
+	int m_iFOV;
+	int m_iClientFOV;
+	int m_iNumSpawns;
+	CBaseEntity *m_pObserver;
+	CBasePlayerItem *m_rgpPlayerItems[MAX_ITEM_TYPES];
+	CBasePlayerItem *m_pActiveItem;
+	CBasePlayerItem *m_pClientActiveItem;
+	CBasePlayerItem *m_pLastItem;
+	int m_rgAmmo[MAX_AMMO_SLOTS];
+	int m_rgAmmoLast[MAX_AMMO_SLOTS];
+	Vector m_vecAutoAim;
+	BOOL m_fOnTarget;
+	int m_iDeaths;
+	int m_izSBarState[SBAR_END];
+	time_point_t m_flNextSBarUpdateTime;
+	time_point_t m_flStatusBarDisappearDelay;
+	char m_SbarString0[SBAR_STRING_SIZE];
+	int m_lastx;
+	int m_lasty;
+	int m_nCustomSprayFrames;
+	time_point_t m_flNextDecalTime;
+	char m_szTeamName[TEAM_NAME_LENGTH];
+	int m_modelIndexPlayer;
+	char m_szAnimExtention[32];
+	int m_iGaitsequence;
+	float m_flGaitframe;
+	float m_flGaityaw;
+	Vector m_prevgaitorigin;
+	float m_flPitch;
+	float m_flYaw;
+	float m_flGaitMovement;
+	int m_iAutoWepSwitch;
+	bool m_bVGUIMenus;
+	bool m_bShowHints;
+	bool m_bShieldDrawn;
+	bool m_bOwnsShield;
+	bool m_bWasFollowing;
+	time_point_t m_flNextFollowTime;
+	float m_flYawModifier;
+	time_point_t m_blindUntilTime;
+	time_point_t m_blindStartTime;
+	duration_t m_blindHoldTime;
+	duration_t m_blindFadeTime;
+	int m_blindAlpha;
+	time_point_t m_allowAutoFollowTime;
+	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
+	std::unique_ptr<char []> m_rebuyString;
+	RebuyStruct m_rebuyStruct;
+	bool m_bIsInRebuy;
+	time_point_t m_flLastUpdateTime;
+	char m_lastLocation[MAX_LOCATION_LENGTH];
+	time_point_t m_progressStart;
+	time_point_t m_progressEnd;
+	bool m_bObserverAutoDirector;
+	bool m_canSwitchObserverModes;
+	float m_heartBeatTime;
+	float m_intenseTimestamp;
+	float m_silentTimestamp;
+	MusicState m_musicState;
+	time_point_t m_flLastCommandTime[8];
+	bool m_bIsZombie;
+	bool m_bSpawnProtection; // pack bools
+	ZombieLevel m_iZombieLevel;
+	time_point_t m_flTimeSpawnProctionExpires;
+};
+
+class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
 {
 public:
 #ifdef CLIENT_DLL
@@ -277,8 +475,8 @@ public:
 	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override;
 	int GiveAmmo(int iAmount, const char *szName, int iMax) override;
 #endif
-	void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
-	void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
+	//void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
+	//void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
 	BOOL IsSneaking() override { return m_tSneaking <= gpGlobals->time; }
 	BOOL IsAlive() override { return (pev->deadflag == DEAD_NO && pev->health > 0.0f); }
 	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }
@@ -496,204 +694,8 @@ public:
 		//m_intenseTimestamp = gpGlobals->time;
 	}
 public:
-	enum
-	{
-		MaxLocationLen = 32
-	};
-
-	int random_seed;
-	unsigned short m_usPlayerBleed;
-	EHANDLE m_hObserverTarget;
-	time_point_t m_flNextObserverInput;
-	int m_iObserverWeapon;
-	int m_iObserverC4State;
-	bool m_bObserverHasDefuser;
-	int m_iObserverLastMode;
-	time_point_t m_flFlinchTime;
-	time_point_t m_flAnimTime;
-	bool m_bHighDamage;
-	float m_flVelocityModifier;
-	int m_iLastZoom;
-	bool m_bResumeZoom;
-	time_point_t m_flEjectBrass;
-	int m_iKevlar;
-	bool m_bNotKilled;
-	TeamName m_iTeam;
-	CPlayerAccount m_iAccount;
-	bool m_bHasPrimary;
-	time_point_t m_flDeathThrowTime;
-	int m_iThrowDirection;
-	time_point_t m_flLastTalk;
-	bool m_bJustConnected;
-	bool m_bContextHelp;
-	JoinState m_iJoiningState;
-	CBaseEntity *m_pIntroCamera;
-	time_point_t m_fIntroCamTime;
-	time_point_t m_fLastMovement;
-	bool m_bMissionBriefing;
-	bool m_bTeamChanged;
-	ModelName m_iModelName;
-	int m_iTeamKills;
-	int m_iIgnoreGlobalChat;
-	bool m_bHasNightVision;
-	bool m_bNightVisionOn;
-	Vector m_vRecentPath[MAX_RECENT_PATH];
-	time_point_t m_flIdleCheckTime;
-	time_point_t m_flRadioTime;
-	int m_iRadioMessages;
-	bool m_bIgnoreRadio;
-	bool m_bHasC4;
-	bool m_bHasDefuser;
-	bool m_bKilledByBomb;
-	Vector m_vBlastVector;
-	bool m_bKilledByGrenade;
-	CHintMessageQueue m_hintMessageQueue;
-	int m_flDisplayHistory;
-	_Menu m_iMenu;
-	int m_iChaseTarget;
-	CBaseEntity *m_pChaseTarget;
-	float m_fCamSwitch;
-	bool m_bEscaped;
-	bool m_bIsVIP;
-	EngineClock::time_point m_tmNextRadarUpdate;
-	Vector m_vLastOrigin;
-	int m_iCurrentKickVote;
-	time_point_t m_flNextVoteTime;
-	bool m_bJustKilledTeammate;
-	int m_iHostagesKilled;
-	int m_iMapVote;
-	bool m_bCanShoot;
-	time_point_t m_flLastFired;
-	time_point_t m_flLastAttackedTeammate;
-	bool m_bHeadshotKilled;
-	bool m_bPunishedForTK;
-	bool m_bReceivesNoMoneyNextRound;
-	time_point_t m_iTimeCheckAllowed;
-	bool m_bHasChangedName;
-	char m_szNewName[MAX_PLAYER_NAME_LENGTH];
-	bool m_bIsDefusing;
-	time_point_t m_tmHandleSignals;
-	CUnifiedSignals m_signals;
-	edict_t *m_pentCurBombTarget;
-	int m_iPlayerSound;
-	int m_iTargetVolume;
-	int m_iWeaponVolume;
-	int m_iExtraSoundTypes;
-	int m_iWeaponFlash;
-	float m_flStopExtraSoundTime;
-	time_point_t m_flFlashLightTime;
-	int m_iFlashBattery;
-	int m_afButtonLast;
-	int m_afButtonPressed;
-	int m_afButtonReleased;
-	edict_t *m_pentSndLast;
-	float m_flSndRoomtype;
-	float m_flSndRange;
-	float m_flFallVelocity;
-	int m_rgItems[MAX_ITEMS];
-	int m_fNewAmmo;
-	unsigned int m_afPhysicsFlags;
-	time_point_t m_fNextSuicideTime;
-	time_point_t m_flTimeStepSound;
-	time_point_t m_flTimeWeaponIdle;
-	time_point_t m_flSwimTime;
-	time_point_t m_flDuckTime;
-	time_point_t m_flWallJumpTime;
-	time_point_t m_flSuitUpdate;
-	int m_rgSuitPlayList[CSUITPLAYLIST];
-	int m_iSuitPlayNext;
-	int m_rgiSuitNoRepeat[CSUITNOREPEAT];
-	float m_rgflSuitNoRepeatTime[CSUITNOREPEAT];
-	int m_lastDamageAmount;
-	time_point_t m_tbdPrev;
-	float m_flgeigerRange;
-	time_point_t m_flgeigerDelay;
-	int m_igeigerRangePrev;
-	int m_iStepLeft;
-	char m_szTextureName[CBTEXTURENAMEMAX];
-	char m_chTextureType;
-	int m_idrowndmg;
-	int m_idrownrestored;
-	int m_bitsHUDDamage;
-	BOOL m_fInitHUD;
-	BOOL m_fGameHUDInitialized;
-	int m_iTrain;
-	BOOL m_fWeapon;
-	EHANDLE m_pTank;
-	time_point_t m_fDeadTime;
-	BOOL m_fNoPlayerSound;
-	BOOL m_fLongJump;
-	time_point_t m_tSneaking;
-	int m_iUpdateTime;
-	int m_iClientHealth;
-	int m_iClientBattery;
-	int m_iHideHUD;
-	int m_iClientHideHUD;
-	int m_iFOV;
-	int m_iClientFOV;
-	int m_iNumSpawns;
-	CBaseEntity *m_pObserver;
-	CBasePlayerItem *m_rgpPlayerItems[MAX_ITEM_TYPES];
-	CBasePlayerItem *m_pActiveItem;
-	CBasePlayerItem *m_pClientActiveItem;
-	CBasePlayerItem *m_pLastItem;
-	int m_rgAmmo[MAX_AMMO_SLOTS];
-	int m_rgAmmoLast[MAX_AMMO_SLOTS];
-	Vector m_vecAutoAim;
-	BOOL m_fOnTarget;
-	int m_iDeaths;
-	int m_izSBarState[SBAR_END];
-	time_point_t m_flNextSBarUpdateTime;
-	time_point_t m_flStatusBarDisappearDelay;
-	char m_SbarString0[SBAR_STRING_SIZE];
-	int m_lastx;
-	int m_lasty;
-	int m_nCustomSprayFrames;
-	time_point_t m_flNextDecalTime;
-	char m_szTeamName[TEAM_NAME_LENGTH];
 
 	static TYPEDESCRIPTION m_playerSaveData[40];
-
-	/*protected:*/
-	int m_modelIndexPlayer;
-	char m_szAnimExtention[32];
-	int m_iGaitsequence;
-
-	float m_flGaitframe;
-	float m_flGaityaw;
-	Vector m_prevgaitorigin;
-	float m_flPitch;
-	float m_flYaw;
-	float m_flGaitMovement;
-	int m_iAutoWepSwitch;
-	bool m_bVGUIMenus;
-	bool m_bShowHints;
-	bool m_bShieldDrawn;
-	bool m_bOwnsShield;
-	bool m_bWasFollowing;
-	time_point_t m_flNextFollowTime;
-	float m_flYawModifier;
-	time_point_t m_blindUntilTime;
-	time_point_t m_blindStartTime;
-	duration_t m_blindHoldTime;
-	duration_t m_blindFadeTime;
-	int m_blindAlpha;
-	time_point_t m_allowAutoFollowTime;
-	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
-	std::unique_ptr<char []> m_rebuyString;
-	RebuyStruct m_rebuyStruct;
-	bool m_bIsInRebuy;
-	time_point_t m_flLastUpdateTime;
-	char m_lastLocation[MaxLocationLen];
-	time_point_t m_progressStart;
-	time_point_t m_progressEnd;
-	bool m_bObserverAutoDirector;
-	bool m_canSwitchObserverModes;
-	float m_heartBeatTime;
-	float m_intenseTimestamp;
-	float m_silentTimestamp;
-	MusicState m_musicState;
-	time_point_t m_flLastCommandTime[8];
 
 public:
 #ifdef CLIENT_DLL
@@ -707,12 +709,6 @@ public:
 	void SpawnProtection_Check();
 	void SpawnProtection_Start(duration_t flTime);
 	void SpawnProtection_End();
-
-public:
-	bool m_bIsZombie;
-	bool m_bSpawnProtection; // pack bools
-	ZombieLevel m_iZombieLevel;
-	time_point_t m_flTimeSpawnProctionExpires;
 
 public:
 #ifndef CLIENT_DLL

@@ -13,6 +13,7 @@
 #include "gamemode/mods.h"
 
 #include "game_shared/perf_counter.h"
+#include "cbase/cbase_hash.h"
 
 //extern "C"
 namespace sv

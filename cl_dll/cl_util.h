@@ -201,11 +201,3 @@ constexpr auto bound(MinType min, NumType num, MaxType max) -> typename std::com
 	return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));
 }
 
-#ifdef M_PI
-#undef M_PI
-#endif
-constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
-
-constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
-constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }
-
