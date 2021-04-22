@@ -1,8 +1,4 @@
-#ifndef WPN_MG3_H
-#define WPN_MG3_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -27,6 +23,7 @@ namespace sv {
 
 class CJanus7xmas : public CBasePlayerWeapon
 {
+	enum Janus7xmas_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -68,5 +65,3 @@ private:
 };
 
 }
-
-#endif

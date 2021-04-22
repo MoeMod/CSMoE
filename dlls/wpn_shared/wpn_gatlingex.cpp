@@ -259,7 +259,7 @@ namespace sv {
 		LINK_ENTITY_TO_CLASS(gatlingex_projectile, CGatlingexProjectile)
 #endif
 
-enum gatlingex_e
+enum CGatlingex::gatlingex_e
 {
 	GATLINGEX_IDLE,
 	GATLINGEX_FIRE1,

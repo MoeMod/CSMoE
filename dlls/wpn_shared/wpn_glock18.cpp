@@ -30,7 +30,7 @@ namespace sv {
 extern bool g_bGlockBurstMode;
 #endif
 
-enum glock18_e
+enum CGLOCK18::glock18_e
 {
 	GLOCK18_IDLE1,
 	GLOCK18_IDLE2,

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sgdrill_e
+enum CSgdrill::sgdrill_e
 {
 	SGDRILL_IDLE,
 	SGDRILL_FIRE,

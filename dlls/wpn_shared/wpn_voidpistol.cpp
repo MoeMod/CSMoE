@@ -25,17 +25,17 @@
 #include "gamemode/mods.h"
 #endif
 
-enum blackhole_anim
-{
-	BLACKHOLE_START,
-	BLACKHOLE_LOOP,
-	BLACKHOLE_END
-	};
 
 #ifndef CLIENT_DLL
 namespace sv {
 	class CVoidpistolBlackhole : public CBaseEntity
 	{
+		enum blackhole_anim
+		{
+			BLACKHOLE_START,
+			BLACKHOLE_LOOP,
+			BLACKHOLE_END
+		};
 	public:
 		void Spawn() override
 		{
@@ -388,7 +388,7 @@ namespace sv {
 #endif
 
 
-enum voidpistol_e
+enum CVoidpistol::voidpistol_e
 {
 	VOIDPISTOL_IDLEA,
 	VOIDPISTOL_IDLEB,
@@ -410,7 +410,7 @@ enum voidpistol_e
 	VOIDPISTOL_DRAWC
 };
 
-enum voidpistol_mode
+enum CVoidpistol::voidpistol_mode
 {
 	VOIDPISTOL_MODEA,
 	VOIDPISTOL_MODEB,

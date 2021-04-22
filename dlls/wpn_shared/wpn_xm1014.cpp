@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum xm1014_e
+enum CXM1014::xm1014_e
 {
 	XM1014_IDLE,
 	XM1014_FIRE1,

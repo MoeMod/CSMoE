@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-	enum M2_e
+	enum CM2::M2_e
 	{
 		M2_IDLEA,
 		M2_IDLEB,

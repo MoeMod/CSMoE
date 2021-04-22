@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum galil_e
+enum CGalil::galil_e
 {
 	GALIL_IDLE1,
 	GALIL_RELOAD,

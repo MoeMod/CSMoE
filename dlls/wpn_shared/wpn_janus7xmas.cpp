@@ -32,7 +32,7 @@ namespace sv {
 
 	class CBeam;
 
-	enum Janus7xmas_e
+	enum CJanus7xmas::Janus7xmas_e
 	{
 		ANIM_IDLE = 0,
 		ANIM_RELOAD,

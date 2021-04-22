@@ -1,8 +1,4 @@
-#ifndef WPN_ELITE_H
-#define WPN_ELITE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,7 @@ namespace sv {
 
 class CR8 : public CBasePlayerWeapon
 {
+	enum R8_E;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -56,5 +53,3 @@ public:
 };
 
 }
-
-#endif

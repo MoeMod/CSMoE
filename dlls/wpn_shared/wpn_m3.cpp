@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m3_e
+enum CM3::m3_e
 {
 	M3_IDLE,
 	M3_FIRE1,

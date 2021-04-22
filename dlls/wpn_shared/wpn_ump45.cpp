@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum ump45_e
+enum CUMP45::ump45_e
 {
 	UMP45_IDLE1,
 	UMP45_RELOAD,

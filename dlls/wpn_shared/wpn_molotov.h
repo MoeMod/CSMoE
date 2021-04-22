@@ -1,8 +1,4 @@
-#ifndef WPN_SMOKEGRENADE_H
-#define WPN_SMOKEGRENADE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -16,6 +12,7 @@ namespace sv {
 
 class CMolotov : public CBasePlayerWeapon
 {
+	enum molotov_e;
 public:
 	virtual void Spawn();
 	virtual void Precache();
@@ -47,5 +44,3 @@ public:
 };
 
 }
-
-#endif

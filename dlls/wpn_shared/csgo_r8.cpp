@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum R8_E
+enum CR8::R8_E
 {
 	IDLE,
 	DRAW,

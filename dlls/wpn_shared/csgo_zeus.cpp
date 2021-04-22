@@ -30,13 +30,13 @@ namespace cl {
 #else
 namespace sv {
 #endif
-
-enum zeus_e
+enum CZeus::zeus_e
 {
 	ANIM_IDLE,
 	ANIM_SHOOT,
-    ANIM_DRAW
+	ANIM_DRAW
 };
+
 #ifndef CLIENT_DLL
 hit_result_t CZeus::ZeusAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bitsDamageType,
 	entvars_t* pevInflictor, entvars_t* pevAttacker)

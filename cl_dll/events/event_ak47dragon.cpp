@@ -27,8 +27,8 @@
 */
 #include "events.h"
 
-namespace cl {
-
+namespace cl::event::ak47dragon {
+	
 enum ak47_e
 {
 	AK47_IDLE1 = 0,

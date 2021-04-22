@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum mp5n_e
+enum CMP5N::mp5n_e
 {
 	MP5N_IDLE1,
 	MP5N_RELOAD,

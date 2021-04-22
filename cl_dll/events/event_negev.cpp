@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::negev {
 
 static const char *SOUND_NAME = "weapons/csgo_ports/negev/negev-1.wav";
 

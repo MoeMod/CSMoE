@@ -1,8 +1,4 @@
-#ifndef WPN_SG552_H
-#define WPN_SG552_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,7 @@ namespace sv {
 
 class CSG552 : public CBasePlayerWeapon
 {
+	enum sg552_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -58,5 +55,3 @@ private:
 };
 
 }
-
-#endif

@@ -190,7 +190,7 @@ namespace sv {
 #endif
 
 
-enum molotov_e
+enum CMolotov::molotov_e
 {
 	SMOKEGRENADE_IDLE,
 	SMOKEGRENADE_PINPULL,

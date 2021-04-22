@@ -13,11 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef WPN_M4A1RAZER_H
-#define WPN_M4A1RAZER_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -63,5 +59,3 @@ private:
 };
 
 }
-
-#endif

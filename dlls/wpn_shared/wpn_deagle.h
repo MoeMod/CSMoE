@@ -1,8 +1,4 @@
-#ifndef WPN_DEAGLE_H
-#define WPN_DEAGLE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,7 @@ namespace sv {
 
 class CDEAGLE : public CBasePlayerWeapon
 {
+	enum deagle_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +50,3 @@ private:
 };
 
 }
-
-#endif

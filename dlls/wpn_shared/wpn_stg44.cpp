@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum stg44_e
+enum CStg44::stg44_e
 {
 	STG44_IDLE1,
 	STG44_RELOAD,

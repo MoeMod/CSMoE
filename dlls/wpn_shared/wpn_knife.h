@@ -1,8 +1,4 @@
-#ifndef WPN_KNIFE_H
-#define WPN_KNIFE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -11,14 +7,13 @@ namespace sv {
 #endif
 
 //knife
-#define KNIFE_BODYHIT_VOLUME		128
-#define KNIFE_WALLHIT_VOLUME		512
 #define KNIFE_MAX_SPEED			250
 #define KNIFE_MAX_SPEED_SHIELD		180
 #define KNIFE_INSPECT_TIME		4.92s
 
 class CKnife : public CBasePlayerWeapon
 {
+	enum knife_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -65,5 +60,3 @@ public:
 void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *mins, const float *maxs, edict_t *pEntity);
 
 }
-
-#endif

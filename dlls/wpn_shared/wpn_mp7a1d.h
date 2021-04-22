@@ -1,8 +1,4 @@
-#ifndef WPN_MP7A1D_H
-#define WPN_MP7A1D_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -12,6 +8,7 @@ namespace sv {
 
 class CMP7A1D : public CBasePlayerWeapon
 {
+	enum elite_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -48,5 +45,3 @@ public:
 };
 
 }
-
-#endif

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m95xmas_e
+enum CM95xmas::m95xmas_e
 {
 	M95_IDLE,
 	M95_SHOOT1,

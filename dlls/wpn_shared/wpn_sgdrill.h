@@ -1,8 +1,4 @@
-#ifndef WPN_XM1014_H
-#define WPN_XM1014_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -16,11 +12,9 @@ namespace sv {
 #define	SGDRILL_DEFAULT_GIVE 35
 #define	SGDRILL_MAX_CLIP 35
 
-#define KNIFE_BODYHIT_VOLUME 128
-#define KNIFE_WALLHIT_VOLUME 512
-
 class CSgdrill : public CBasePlayerWeapon
 {
+	enum sgdrill_e;
 public:
 	
 	void Spawn() override;
@@ -65,5 +59,3 @@ private:
 };
 
 }
-
-#endif

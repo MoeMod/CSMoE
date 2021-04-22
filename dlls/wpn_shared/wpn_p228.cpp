@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum p228_e
+enum CP228::p228_e
 {
 	P228_IDLE,
 	P228_SHOOT1,

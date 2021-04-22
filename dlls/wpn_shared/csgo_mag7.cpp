@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum mag7_e
+enum CMag7::mag7_e
 {
 	MAG7_IDLE,
 	MAG7_FIRE1,

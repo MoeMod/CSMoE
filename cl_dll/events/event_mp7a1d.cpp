@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::mp7a1d {
 
 enum elite_e
 {

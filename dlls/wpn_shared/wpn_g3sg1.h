@@ -1,8 +1,4 @@
-#ifndef WPN_G3SG1_H
-#define WPN_G3SG1_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -20,6 +16,7 @@ namespace sv {
 
 class CG3SG1 : public CBasePlayerWeapon
 {
+	enum g3sg1_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +50,3 @@ private:
 };
 
 }
-
-#endif

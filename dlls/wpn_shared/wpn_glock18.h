@@ -1,8 +1,4 @@
-#ifndef WPN_GLOCK18_H
-#define WPN_GLOCK18_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,7 @@ namespace sv {
 
 class CGLOCK18 : public CBasePlayerWeapon
 {
+	enum glock18_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +49,3 @@ public:
 };
 
 }
-
-#endif

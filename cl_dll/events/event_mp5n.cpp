@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::mp5n {
 
 enum mp5n_e
 {

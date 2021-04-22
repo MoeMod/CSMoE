@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::cannonplasma {
 
 enum cannonplasma_e
 {

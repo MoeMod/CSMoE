@@ -1,8 +1,4 @@
-#ifndef WPN_MP5NAVY_H
-#define WPN_MP5NAVY_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,7 @@ namespace sv {
 
 class CMP5N : public CBasePlayerWeapon
 {
+	enum mp5n_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +49,3 @@ private:
 };
 
 }
-
-#endif

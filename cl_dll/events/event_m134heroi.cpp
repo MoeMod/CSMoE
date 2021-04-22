@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::m134heroi {
 
 static const char *SOUND_NAME = "weapons/m134-1.wav";
 

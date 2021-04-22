@@ -1,8 +1,4 @@
-#ifndef WPN_M14EBR_H
-#define WPN_M14EBR_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,7 @@ namespace sv {
 
 class CM14EBR : public CBasePlayerWeapon
 {
+	enum m14ebr_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +48,3 @@ private:
 };
 
 }
-
-#endif

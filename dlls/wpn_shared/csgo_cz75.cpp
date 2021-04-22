@@ -29,7 +29,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum cz75_e
+enum CCz75::cz75_e
 {
 	CZ75_IDLE_1,
 	CZ75_IDLE_2,

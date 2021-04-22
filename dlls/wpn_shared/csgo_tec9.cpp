@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tec9_e
+enum CTec9::tec9_e
 {
 	TEC9_IDLE,
 	TEC9_RELOAD,

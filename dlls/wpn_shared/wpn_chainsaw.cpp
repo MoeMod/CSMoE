@@ -31,7 +31,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum chainsaw_e
+enum CChainsaw::chainsaw_e
 {
 	ANIM_IDLE,
     ANIM_DRAW,

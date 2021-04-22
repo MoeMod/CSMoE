@@ -261,4 +261,7 @@ enum BackPrimaryWeapons
 	BACKWEAPON_M4A1_UNSILENCED
 };
 
+#define KNIFE_BODYHIT_VOLUME 128
+#define KNIFE_WALLHIT_VOLUME 512
+
 #endif

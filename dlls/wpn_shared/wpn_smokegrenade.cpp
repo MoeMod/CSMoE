@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum smokegrenade_e
+enum CSmokeGrenade::smokegrenade_e
 {
 	SMOKEGRENADE_IDLE,
 	SMOKEGRENADE_PINPULL,

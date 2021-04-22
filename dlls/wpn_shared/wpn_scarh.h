@@ -1,8 +1,4 @@
-#ifndef WPN_AK47_H
-#define WPN_AK47_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -12,6 +8,7 @@ namespace sv {
 
 class CSCARHeavy : public CBasePlayerWeapon
 {
+	enum scar_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +50,3 @@ private:
 };
 
 }
-
-#endif

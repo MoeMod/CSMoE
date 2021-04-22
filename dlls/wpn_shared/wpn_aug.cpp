@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum aug_e
+enum CAUG::aug_e
 {
 	AUG_IDLE1,
 	AUG_RELOAD,

@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m4a1_e
+enum CM4A1::m4a1_e
 {
 	M4A1_IDLE,
 	M4A1_SHOOT1,

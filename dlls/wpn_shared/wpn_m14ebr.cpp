@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m14ebr_e
+enum CM14EBR::m14ebr_e
 {
 	M14EBR_IDLE1,
 	M14EBR_RELOAD,

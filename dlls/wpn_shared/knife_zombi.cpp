@@ -26,11 +26,9 @@ namespace cl {
 namespace sv {
 #endif
 
-#define KNIFE_BODYHIT_VOLUME 128
-#define KNIFE_WALLHIT_VOLUME 512
-
 class CKnife_Zombi : public CKnife
 {
+	enum knife_e;
 public:
 	void Precache() override;
 	int GetItemInfo(ItemInfo *p) override;
@@ -55,7 +53,7 @@ public:
 
 LINK_ENTITY_TO_CLASS(knife_zombi, CKnife_Zombi)
 
-enum knife_e
+enum CKnife_Zombi::knife_e
 {
 	KNIFE_IDLE,
 	KNIFE_ATTACK1HIT,

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tbarrel_e
+enum CTbarrel::tbarrel_e
 {
 	ANIM_IDLE,
 	ANIM_FIRE1,

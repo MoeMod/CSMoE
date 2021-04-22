@@ -1,8 +1,4 @@
-#ifndef WPN_USP_H
-#define WPN_USP_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -20,6 +16,7 @@ namespace sv {
 
 class CUSP : public CBasePlayerWeapon
 {
+	enum usp_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -56,5 +53,3 @@ private:
 };
 
 }
-
-#endif

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum fiveseven_e
+enum CFiveSeven::fiveseven_e
 {
 	FIVESEVEN_IDLE,
 	FIVESEVEN_SHOOT1,

@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::sawedoff {
 
 enum sawedoff_e
 {

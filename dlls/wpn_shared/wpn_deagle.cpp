@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum deagle_e
+enum CDEAGLE::deagle_e
 {
 	DEAGLE_IDLE1,
 	DEAGLE_SHOOT1,

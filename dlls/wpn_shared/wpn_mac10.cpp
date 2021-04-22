@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum mac10_e
+enum CMAC10::mac10_e
 {
 	MAC10_IDLE1,
 	MAC10_RELOAD,

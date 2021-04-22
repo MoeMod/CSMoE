@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum elite_e
+enum CZ4B_MP7A1DX::elite_e
 {
 	ELITE_IDLE,
 	ELITE_IDLE_LEFTEMPTY,

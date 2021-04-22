@@ -29,7 +29,7 @@
 
 #include <string.h>
 
-namespace cl {
+namespace cl::event::vehicle {
 
 static const char *SOUNDS_NAME[] =
 {

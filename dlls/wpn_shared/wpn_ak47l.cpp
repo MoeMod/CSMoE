@@ -27,16 +27,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum ak47_e
-{
-	AK47_IDLE1,
-	AK47_RELOAD,
-	AK47_DRAW,
-	AK47_SHOOT1,
-	AK47_SHOOT2,
-	AK47_SHOOT3
-};
-
 class CAK47_Long : public LinkWeaponTemplate<CAK47_Long,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
@@ -51,6 +41,15 @@ class CAK47_Long : public LinkWeaponTemplate<CAK47_Long,
 	TGetDamageDefault
 >
 {
+	enum ak47_e
+	{
+		AK47_IDLE1,
+		AK47_RELOAD,
+		AK47_DRAW,
+		AK47_SHOOT1,
+		AK47_SHOOT2,
+		AK47_SHOOT3
+	};
 public:
 	static constexpr const auto &DefaultReloadTime = 2.45s;
 	static constexpr int ZoomFOV = 55;

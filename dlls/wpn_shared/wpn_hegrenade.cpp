@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum hegrenade_e
+enum CHEGrenade::hegrenade_e
 {
 	HEGRENADE_IDLE,
 	HEGRENADE_PULLPIN,

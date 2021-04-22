@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum zombiebomb_e
+enum CZombieBomb::zombiebomb_e
 {
 	HEGRENADE_IDLE,
 	HEGRENADE_PULLPIN,

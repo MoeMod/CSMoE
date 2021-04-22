@@ -1,8 +1,4 @@
-#ifndef WPN_SCOUT_H
-#define WPN_SCOUT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -24,6 +20,7 @@ namespace sv {
 
 class CChainsaw : public CBasePlayerWeapon
 {
+	enum chainsaw_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -67,5 +64,3 @@ private:
 };
 
 }
-
-#endif

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum scar_e
+enum CScarLight::scar_e
 {
 	SCARL_IDLE1,
 	SCARL_RELOAD,

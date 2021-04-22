@@ -30,12 +30,9 @@ namespace cl {
 namespace sv {
 #endif
 
-#define KNIFE_BODYHIT_VOLUME 128
-#define KNIFE_WALLHIT_VOLUME 512
-
 LINK_ENTITY_TO_CLASS(knife_knifedragon, CKnifeDragon)
 
-enum knife_e
+enum CKnifeDragon::knife_e
 {
 	KNIFE_IDLE,
 	KNIFE_ATTACK1HIT,

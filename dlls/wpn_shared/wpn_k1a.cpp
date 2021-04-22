@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum k1a_e
+enum CK1a::k1a_e
 {
 	K1A_IDLE1,
 	K1A_RELOAD,

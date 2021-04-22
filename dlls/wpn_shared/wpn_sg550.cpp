@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sg550_e
+enum CSG550::sg550_e
 {
 	SG550_IDLE,
 	SG550_SHOOT,

@@ -37,7 +37,7 @@ enum event_effect
 	EVENT_VOIDPISTOL
 };
 
-namespace cl {
+namespace cl::event::wpneffects {
 
 extern engine_studio_api_t IEngineStudio;
 

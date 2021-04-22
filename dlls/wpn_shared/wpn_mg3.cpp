@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m249_e
+enum CMG3::m249_e
 {
 	M249_IDLE1,
 	M249_SHOOT1,

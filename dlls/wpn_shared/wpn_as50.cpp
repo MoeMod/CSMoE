@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum as50_e
+enum CAS50::as50_e
 {
 	AS50_IDLE,
 	AS50_SHOOT1,

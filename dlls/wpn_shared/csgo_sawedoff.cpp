@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sawedoff_e
+enum CSawedoff::sawedoff_e
 {
 	SAWEDOFF_IDLE,
 	SAWEDOFF_FIRE1,

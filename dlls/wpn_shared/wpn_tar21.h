@@ -1,8 +1,4 @@
-#ifndef WPN_TAR21_H
-#define WPN_TAR21_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,7 @@ namespace sv {
 
 class CTAR21 : public CBasePlayerWeapon
 {
+	enum tar21_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -57,5 +54,3 @@ private:
 };
 
 }
-
-#endif

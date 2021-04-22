@@ -1,8 +1,4 @@
-#ifndef WPN_BALROG7_H
-#define WPN_BALROG7_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,7 @@ namespace sv {
 
 class CBalrog7 : public CBasePlayerWeapon
 {
+	enum balrog7_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -62,5 +59,3 @@ private:
 };
 
 }
-
-#endif

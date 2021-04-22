@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum awp_e
+enum CAWP::awp_e
 {
 	AWP_IDLE,
 	AWP_SHOOT1,

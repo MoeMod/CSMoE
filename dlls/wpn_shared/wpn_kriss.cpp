@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum kriss_e
+enum CKRISS::kriss_e
 {
 	KRISS_IDLE,
 	KRISS_SHOOT1,

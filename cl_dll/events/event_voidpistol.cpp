@@ -30,7 +30,7 @@
 #include "r_studioint.h"
 #include <string>
 
-namespace cl {
+namespace cl::event::voidpistol {
 
 extern engine_studio_api_t IEngineStudio;
 

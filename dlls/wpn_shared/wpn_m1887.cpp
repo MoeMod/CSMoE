@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m1887_e
+enum CM1887::m1887_e
 {
 	M1887_IDLE,
 	M1887_FIRE1,

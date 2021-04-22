@@ -27,6 +27,7 @@ namespace sv {
 
 class CZ4B_MP7A1DX : public CBasePlayerWeapon
 {
+	enum elite_e;
 public:
 	void Spawn() override;
 	void Precache() override;

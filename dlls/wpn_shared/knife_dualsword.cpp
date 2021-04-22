@@ -34,9 +34,6 @@ namespace cl {
 namespace sv {
 #endif
 
-#define KNIFE_BODYHIT_VOLUME 128
-#define KNIFE_WALLHIT_VOLUME 512
-
 class CKnifeDualsword: public LinkWeaponTemplate<CKnifeDualsword,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type

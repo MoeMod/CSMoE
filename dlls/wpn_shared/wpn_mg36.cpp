@@ -27,15 +27,6 @@ namespace cl {
 namespace sv {
 #endif
 
-    enum m249_e
-            {
-        M249_IDLE1,
-        M249_SHOOT1,
-        M249_SHOOT2,
-        M249_RELOAD,
-        M249_DRAW
-    };
-
     class CMG36 : public LinkWeaponTemplate<CMG36,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_M249>::template type,
@@ -50,6 +41,14 @@ namespace sv {
             TGetDamageDefault
     >
     {
+        enum m249_e
+        {
+            M249_IDLE1,
+            M249_SHOOT1,
+            M249_SHOOT2,
+            M249_RELOAD,
+            M249_DRAW
+        };
     public:
     static constexpr const auto &DefaultReloadTime = 3.9s;
     static constexpr int ZoomFOV = 65;

@@ -1,8 +1,4 @@
-#ifndef WPN_AK47_H
-#define WPN_AK47_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 //AK47
 #define AK47_MAX_SPEED			221
@@ -18,6 +14,7 @@ namespace sv {
 
 class CAK47Dragon : public CBasePlayerWeapon
 {
+	enum ak47_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +48,3 @@ private:
 };
 
 }
-
-#endif

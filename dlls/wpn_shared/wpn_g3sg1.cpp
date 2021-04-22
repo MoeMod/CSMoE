@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum g3sg1_e
+enum CG3SG1::g3sg1_e
 {
 	G3SG1_IDLE,
 	G3SG1_SHOOT,

@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum scout_e
+enum CSCOUT::scout_e
 {
 	SCOUT_IDLE,
 	SCOUT_SHOOT,

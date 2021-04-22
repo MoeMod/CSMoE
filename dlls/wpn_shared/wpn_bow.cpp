@@ -220,7 +220,7 @@ namespace sv {
 	LINK_ENTITY_TO_CLASS(bow_arrow, CBowArrow);
 #endif
 
-enum bow_e
+enum CBow::bow_e
 {
 	ANIM_IDLE,
 	ANIM_IDLE_EMPTY,

@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::glock18 {
 bool g_bGlockBurstMode = false;
 
 enum glock18_e

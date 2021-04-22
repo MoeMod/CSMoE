@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum wa2000_e
+enum CWA2000::wa2000_e
 {
 	WA2000_IDLE,
 	WA2000_SHOOT,

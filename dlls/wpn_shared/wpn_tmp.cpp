@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tmp_e
+enum CTMP::tmp_e
 {
 	TMP_IDLE1,
 	TMP_RELOAD,

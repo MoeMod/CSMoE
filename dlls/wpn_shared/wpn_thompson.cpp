@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum thompson_e
+enum CTHOMPSON::thompson_e
 {
 	THOMPSON_IDLE,
 	THOMPSON_SHOOT1,

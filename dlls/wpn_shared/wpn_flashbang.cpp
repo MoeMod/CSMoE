@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum flashbang_e
+enum CFlashbang::flashbang_e
 {
 	FLASHBANG_IDLE,
 	FLASHBANG_PULLPIN,

@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::xm2010pc {
 
 enum awp_e
 {

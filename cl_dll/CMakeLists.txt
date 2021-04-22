@@ -314,7 +314,7 @@ include_directories (
 	)
 
 if(XASH_STATIC_GAMELIB)
-	add_library (${CLIENT_LIBRARY} STATIC ${CLDLL_SOURCES})
+	add_library (${CLIENT_LIBRARY} STATIC ${CLDLL_SOURCES} "events/eventdef.h")
 else()
 	add_library (${CLIENT_LIBRARY} SHARED ${CLDLL_SOURCES})
 endif()

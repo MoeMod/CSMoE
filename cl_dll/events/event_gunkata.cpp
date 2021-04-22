@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "r_studioint.h"
 #include <string>
 
-namespace cl {
+namespace cl::event::gunkata {
 
 extern engine_studio_api_t IEngineStudio;
 

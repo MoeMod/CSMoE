@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum famas_e
+enum CFamas::famas_e
 {
 	FAMAS_IDLE1,
 	FAMAS_RELOAD,

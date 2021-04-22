@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum p90_e
+enum CP90::p90_e
 {
 	P90_IDLE1,
 	P90_RELOAD,

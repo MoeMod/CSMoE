@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum ak47_e
+enum CAK47Dragon::ak47_e
 {
 	AK47_IDLE1,
 	AK47_RELOAD,

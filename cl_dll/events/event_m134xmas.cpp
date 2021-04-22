@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::m134xmas {
 
 enum m134xmas_e
 {

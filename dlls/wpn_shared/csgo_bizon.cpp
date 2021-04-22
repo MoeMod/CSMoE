@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum bizon_e
+enum CBizon::bizon_e
 {
 	BIZON_IDLE1,
 	BIZON_RELOAD,

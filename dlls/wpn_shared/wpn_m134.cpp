@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m134_e
+enum CM134::m134_e
 {
 	M134_IDLE1,
 	M134_DRAW,

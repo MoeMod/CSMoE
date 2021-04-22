@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::m4a1dragon {
 
 enum m4a1_e
 {

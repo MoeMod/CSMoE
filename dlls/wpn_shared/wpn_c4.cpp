@@ -33,7 +33,7 @@ namespace sv {
 extern bool g_bInBombZone;
 #endif
 
-enum c4_e
+enum CC4::c4_e
 {
 	C4_IDLE1,
 	C4_DRAW,

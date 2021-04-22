@@ -1,8 +1,4 @@
-#ifndef WPN_XM1014_H
-#define WPN_XM1014_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,7 @@ namespace sv {
 
 class CMag7 : public CBasePlayerWeapon
 {
+	enum mag7_e;
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +48,3 @@ private:
 };
 
 }
-
-#endif

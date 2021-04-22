@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum elite_e
+enum CDeagleD::elite_e
 {
 	ELITE_IDLE,
 	ELITE_IDLE_LEFTEMPTY,

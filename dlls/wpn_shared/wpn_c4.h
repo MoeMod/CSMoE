@@ -1,8 +1,4 @@
-#ifndef WPN_C4_H
-#define WPN_C4_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -17,6 +13,7 @@ namespace sv {
 
 class CC4 : public CBasePlayerWeapon
 {
+	enum c4_e;
 public:
 	virtual void Spawn();
 	virtual void Precache();
@@ -48,5 +45,3 @@ private:
 };
 
 }
-
-#endif

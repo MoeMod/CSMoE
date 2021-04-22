@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tar21_e
+enum CTAR21::tar21_e
 {
 	TAR21_IDLE1,
 	TAR21_RELOAD,

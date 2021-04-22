@@ -230,7 +230,7 @@ namespace sv {
 	};
 	LINK_ENTITY_TO_CLASS(svdex_grenade, CSVDEXGrenade)
 #endif
-enum svdex_e
+enum CSVDEX::svdex_e
 {
 	SVDEX_IDLEA,
 	SVDEX_SHOOTA,

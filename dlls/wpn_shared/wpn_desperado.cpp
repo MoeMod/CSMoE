@@ -31,7 +31,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum desperado_e
+enum CDesperado::desperado_e
 {
 	ANIM_IDLE_M = 0,
 	ANIM_RUN_START_M,

@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum starchaserar_e
+enum CStarchaserar::starchaserar_e
 {
 	STARCHASERAR_IDLE1,
 	STARCHASERAR_RELOAD,

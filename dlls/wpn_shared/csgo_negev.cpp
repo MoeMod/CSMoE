@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum negev_e
+enum CNegev::negev_e
 {
 	NEGEV_IDLE1,
 	NEGEV_SHOOT1,

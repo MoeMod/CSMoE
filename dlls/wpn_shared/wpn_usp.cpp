@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum usp_e
+enum CUSP::usp_e
 {
 	USP_IDLE,
 	USP_SHOOT1,

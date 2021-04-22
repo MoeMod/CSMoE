@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sg552_e
+enum CSG552::sg552_e
 {
 	SG552_IDLE1,
 	SG552_RELOAD,

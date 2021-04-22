@@ -30,7 +30,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum gatling_e
+enum CGatling::gatling_e
 {
 	GATLING_IDLE,
 	GATLING_FIRE1,

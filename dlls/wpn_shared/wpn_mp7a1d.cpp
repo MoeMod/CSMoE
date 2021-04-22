@@ -26,7 +26,7 @@ namespace cl {
 namespace sv {
 #endif
 
-enum elite_e
+enum CMP7A1D::elite_e
 {
 	ELITE_IDLE,
 	ELITE_IDLE_LEFTEMPTY,
