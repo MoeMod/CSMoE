@@ -26,18 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CM3::m3_e
-{
-	M3_IDLE,
-	M3_FIRE1,
-	M3_FIRE2,
-	M3_RELOAD,
-	M3_PUMP,
-	M3_START_RELOAD,
-	M3_DRAW,
-	M3_HOLSTER
-};
-
 LINK_ENTITY_TO_CLASS(weapon_m3, CM3)
 
 void CM3::Spawn(void)

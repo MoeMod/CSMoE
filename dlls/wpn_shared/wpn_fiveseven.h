@@ -15,7 +15,15 @@ namespace sv {
 
 class CFiveSeven : public CBasePlayerWeapon
 {
-	enum fiveseven_e;
+	enum fiveseven_e
+    {
+        FIVESEVEN_IDLE,
+        FIVESEVEN_SHOOT1,
+        FIVESEVEN_SHOOT2,
+        FIVESEVEN_SHOOT_EMPTY,
+        FIVESEVEN_RELOAD,
+        FIVESEVEN_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

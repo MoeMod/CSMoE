@@ -21,6 +21,8 @@
 
 #define WEAPON_FLAGS_SELECTONEMPTY	1
 
+extern int HISTORY_DRAW_TIME;
+
 struct WEAPON
 {
 	char	szName[MAX_WEAPON_NAME];

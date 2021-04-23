@@ -15,7 +15,15 @@ namespace sv {
 
 class CNegev : public CBasePlayerWeapon
 {
-	enum negev_e;
+    enum negev_e
+    {
+        NEGEV_IDLE1,
+        NEGEV_SHOOT1,
+        NEGEV_SHOOT2,
+        NEGEV_RELOAD,
+        NEGEV_DRAW,
+        NEGEV_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

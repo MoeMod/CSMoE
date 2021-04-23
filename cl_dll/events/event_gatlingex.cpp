@@ -30,9 +30,11 @@
 #include "r_studioint.h"
 #include <string>
 
-namespace cl::event::gatlingex {
+namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
 
-extern engine_studio_api_t IEngineStudio;
+namespace cl::event::gatlingex {
 
 enum gatling_e
 {

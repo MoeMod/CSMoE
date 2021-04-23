@@ -30,19 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CAUG::aug_e
-{
-	AUG_IDLE1,
-	AUG_RELOAD,
-	AUG_DRAW,
-	AUG_SHOOT1,
-	AUG_SHOOT2,
-	AUG_SHOOT3,
-	AUG_INSPECT,
-	AUG_AIM,
-	AUG_BACK
-};
-
 LINK_ENTITY_TO_CLASS(weapon_aug, CAUG)
 
 void CAUG::Spawn(void)

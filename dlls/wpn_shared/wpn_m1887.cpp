@@ -26,20 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CM1887::m1887_e
-{
-	M1887_IDLE,
-	M1887_FIRE1,
-	M1887_FIRE2,
-	M1887_FIRE3,
-	M1887_FIRE4,
-	M1887_FIRE5,
-	M1887_RELOAD,
-	M1887_PUMP,
-	M1887_START_RELOAD,
-	M1887_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_m1887, CM1887)
 
 const int M1887_MAX_CLIP = 8;

@@ -30,9 +30,11 @@
 #include "r_studioint.h"
 #include <string>
 
-namespace cl::event::voidpistol {
+namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
 
-extern engine_studio_api_t IEngineStudio;
+namespace cl::event::voidpistol {
 
 enum voidpistol_e
 {

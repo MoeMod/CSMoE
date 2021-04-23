@@ -30,25 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CR8::R8_E
-{
-	IDLE,
-	DRAW,
-	DRAW_ALT,
-	PREPARE,
-	UNPREPARE,
-	FIRE,
-	DRYFIRE,
-	ALT1,
-	ALT2,
-	ALT3,
-	LOOKAT01,
-	RELOAD,
-	LOOKAT01_STICKER,
-	LOOKAT01_STICKER_LOOP
-
-};
-
 LINK_ENTITY_TO_CLASS(csgo_r8, CR8)
 
 void CR8::Spawn(void)

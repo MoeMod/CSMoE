@@ -189,15 +189,6 @@ namespace sv {
 	LINK_ENTITY_TO_CLASS(molotov_explosion, CMolotovExplosion);
 #endif
 
-
-enum CMolotov::molotov_e
-{
-	SMOKEGRENADE_IDLE,
-	SMOKEGRENADE_PINPULL,
-	SMOKEGRENADE_THROW,
-	SMOKEGRENADE_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_molotov, CMolotov)
 
 void CMolotov::Spawn(void)

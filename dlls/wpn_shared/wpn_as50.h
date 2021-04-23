@@ -17,7 +17,15 @@ namespace sv {
 
 class CAS50 : public CBasePlayerWeapon
 {
-	enum as50_e;
+	enum as50_e
+    {
+        AS50_IDLE,
+        AS50_SHOOT1,
+        AS50_SHOOT2,
+        AS50_SHOOT3,
+        AS50_RELOAD,
+        AS50_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

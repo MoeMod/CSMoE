@@ -12,7 +12,13 @@ namespace sv {
 
 class CFlashbang : public CBasePlayerWeapon
 {
-	enum flashbang_e;
+	enum flashbang_e
+    {
+        FLASHBANG_IDLE,
+        FLASHBANG_PULLPIN,
+        FLASHBANG_THROW,
+        FLASHBANG_DRAW
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();

@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "weapons/KnifeAttack.h"
 
 #ifndef CLIENT_DLL
+#include "soundent.h"
 #include "gamemode/mods.h"
 #endif
 

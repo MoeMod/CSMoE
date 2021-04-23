@@ -14,7 +14,14 @@ namespace sv {
 
 class CSgdrill : public CBasePlayerWeapon
 {
-	enum sgdrill_e;
+	enum sgdrill_e
+    {
+        SGDRILL_IDLE,
+        SGDRILL_FIRE,
+        SGDRILL_SLASH,
+        SGDRILL_RELOAD,
+        SGDRILL_DRAW
+    };
 public:
 	
 	void Spawn() override;

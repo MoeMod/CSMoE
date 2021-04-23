@@ -32,25 +32,6 @@ namespace sv {
 
 	class CBeam;
 
-	enum CJanus7xmas::Janus7xmas_e
-	{
-		ANIM_IDLE = 0,
-		ANIM_RELOAD,
-		ANIM_DRAW,
-		ANIM_SHOOT1,
-		ANIM_SHOOT2,
-		ANIM_SHOOT_SIGNAL,
-		ANIM_CHANGEB,
-		ANIM_IDLEB,
-		ANIM_DRAWB,
-		ANIM_SHOOTB1,
-		ANIM_SHOOTB2,
-		ANIM_CHANGEA,
-		ANIM_IDLE_SIGNAL,
-		ANIM_RELOAD_SIGNAL,
-		ANIM_DRAW_SIGNAL,
-	};
-
 	LINK_ENTITY_TO_CLASS(weapon_janus7xmas, CJanus7xmas)
 
 		static const int MG3_AMMO_GIVE = 200;

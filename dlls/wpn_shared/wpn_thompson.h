@@ -16,7 +16,14 @@ namespace sv {
 
 class CTHOMPSON : public CBasePlayerWeapon
 {
-	enum thompson_e;
+	enum thompson_e
+    {
+        THOMPSON_IDLE,
+        THOMPSON_SHOOT1,
+        THOMPSON_SHOOT2,
+        THOMPSON_RELOAD,
+        THOMPSON_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

@@ -17,7 +17,18 @@ namespace sv {
 
 class CSG552 : public CBasePlayerWeapon
 {
-	enum sg552_e;
+	enum sg552_e
+    {
+        SG552_IDLE1,
+        SG552_RELOAD,
+        SG552_DRAW,
+        SG552_SHOOT1,
+        SG552_SHOOT2,
+        SG552_SHOOT3,
+        SG552_INSPECT,
+        SG552_AIM,
+        SG552_BACK
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

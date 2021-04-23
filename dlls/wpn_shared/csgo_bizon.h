@@ -16,7 +16,16 @@ namespace sv {
 
 class CBizon : public CBasePlayerWeapon
 {
-	enum bizon_e;
+	enum bizon_e
+    {
+        BIZON_IDLE1,
+        BIZON_RELOAD,
+        BIZON_DRAW,
+        BIZON_SHOOT1,
+        BIZON_SHOOT2,
+        BIZON_SHOOT3,
+        BIZON_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

@@ -31,22 +31,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CChainsaw::chainsaw_e
-{
-	ANIM_IDLE,
-    ANIM_DRAW,
-    ANIM_DRAW_EMPTY,
-    ANIM_ATTACK_BEGIN,
-    ANIM_ATTACK_LOOP,
-    ANIM_ATTACK_END,
-    ANIM_RELOAD,
-    ANIM_SLASH1,
-    ANIM_SLASH2,
-    ANIM_SLASH3,
-    ANIM_SLASH4,
-    ANIM_IDLE_EMPTY
-};
-
 LINK_ENTITY_TO_CLASS(weapon_chainsaw, CChainsaw)
 
 void CChainsaw::Spawn(void)

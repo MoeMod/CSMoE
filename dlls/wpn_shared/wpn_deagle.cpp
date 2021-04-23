@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CDEAGLE::deagle_e
-{
-	DEAGLE_IDLE1,
-	DEAGLE_SHOOT1,
-	DEAGLE_SHOOT2,
-	DEAGLE_SHOOT_EMPTY,
-	DEAGLE_RELOAD,
-	DEAGLE_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_deagle, CDEAGLE)
 
 void CDEAGLE::Spawn(void)

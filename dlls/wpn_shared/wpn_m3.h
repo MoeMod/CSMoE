@@ -13,7 +13,17 @@ namespace sv {
 
 class CM3 : public CBasePlayerWeapon
 {
-	enum m3_e;
+	enum m3_e
+    {
+        M3_IDLE,
+        M3_FIRE1,
+        M3_FIRE2,
+        M3_RELOAD,
+        M3_PUMP,
+        M3_START_RELOAD,
+        M3_DRAW,
+        M3_HOLSTER
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

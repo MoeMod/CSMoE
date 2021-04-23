@@ -16,7 +16,14 @@ namespace sv {
 
 class CG3SG1 : public CBasePlayerWeapon
 {
-	enum g3sg1_e;
+	enum g3sg1_e
+    {
+        G3SG1_IDLE,
+        G3SG1_SHOOT,
+        G3SG1_SHOOT2,
+        G3SG1_RELOAD,
+        G3SG1_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

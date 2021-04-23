@@ -14,7 +14,15 @@ namespace sv {
 
 class CStarchaserar : public CBasePlayerWeapon
 {
-	enum starchaserar_e;
+	enum starchaserar_e
+    {
+        STARCHASERAR_IDLE1,
+        STARCHASERAR_RELOAD,
+        STARCHASERAR_DRAW,
+        STARCHASERAR_SHOOT1,
+        STARCHASERAR_SHOOT2,
+        STARCHASERAR_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

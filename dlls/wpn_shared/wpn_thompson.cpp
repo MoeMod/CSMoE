@@ -26,15 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CTHOMPSON::thompson_e
-{
-	THOMPSON_IDLE,
-	THOMPSON_SHOOT1,
-	THOMPSON_SHOOT2,
-	THOMPSON_RELOAD,
-	THOMPSON_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_thompson, CTHOMPSON)
 
 const int THOMPSON_MAXCLIP = 50;

@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CSG550::sg550_e
-{
-	SG550_IDLE,
-	SG550_SHOOT,
-	SG550_SHOOT2,
-	SG550_RELOAD,
-	SG550_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_sg550, CSG550)
 
 void CSG550::Spawn(void)

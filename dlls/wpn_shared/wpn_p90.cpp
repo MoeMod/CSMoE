@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CP90::p90_e
-{
-	P90_IDLE1,
-	P90_RELOAD,
-	P90_DRAW,
-	P90_SHOOT1,
-	P90_SHOOT2,
-	P90_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_p90, CP90)
 
 void CP90::Spawn(void)

@@ -13,7 +13,29 @@ namespace sv {
 
 class CKnife : public CBasePlayerWeapon
 {
-	enum knife_e;
+	enum knife_e
+    {
+        KNIFE_IDLE,
+        KNIFE_ATTACK1HIT,
+        KNIFE_ATTACK2HIT,
+        KNIFE_DRAW,
+        KNIFE_STABHIT,
+        KNIFE_STABMISS,
+        KNIFE_MIDATTACK1HIT,
+        KNIFE_MIDATTACK2HIT
+    };
+
+    enum knife_shield_e
+    {
+        KNIFE_SHIELD_IDLE,
+        KNIFE_SHIELD_SLASH,
+        KNIFE_SHIELD_ATTACKHIT,
+        KNIFE_SHIELD_DRAW,
+        KNIFE_SHIELD_UPIDLE,
+        KNIFE_SHIELD_UP,
+        KNIFE_SHIELD_DOWN
+    };
+
 public:
 	void Spawn() override;
 	void Precache() override;

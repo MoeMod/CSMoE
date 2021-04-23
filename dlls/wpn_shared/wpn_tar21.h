@@ -15,7 +15,15 @@ namespace sv {
 
 class CTAR21 : public CBasePlayerWeapon
 {
-	enum tar21_e;
+	enum tar21_e
+    {
+        TAR21_IDLE1,
+        TAR21_RELOAD,
+        TAR21_DRAW,
+        TAR21_SHOOT1,
+        TAR21_SHOOT2,
+        TAR21_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

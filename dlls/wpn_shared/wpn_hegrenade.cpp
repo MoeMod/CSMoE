@@ -26,14 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CHEGrenade::hegrenade_e
-{
-	HEGRENADE_IDLE,
-	HEGRENADE_PULLPIN,
-	HEGRENADE_THROW,
-	HEGRENADE_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_hegrenade, CHEGrenade)
 
 void CHEGrenade::Spawn(void)

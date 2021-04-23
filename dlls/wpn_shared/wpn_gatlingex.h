@@ -14,7 +14,15 @@ namespace sv {
 
 class CGatlingex : public CBasePlayerWeapon
 {
-	enum gatlingex_e;
+	enum gatlingex_e
+    {
+        GATLINGEX_IDLE,
+        GATLINGEX_FIRE1,
+        GATLINGEX_FIRE2,
+        GATLINGEX_RELOAD,
+        GATLINGEX_DRAW,
+        GATLINGEX_FIREBALL
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

@@ -26,17 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CP228::p228_e
-{
-	P228_IDLE,
-	P228_SHOOT1,
-	P228_SHOOT2,
-	P228_SHOOT3,
-	P228_SHOOT_EMPTY,
-	P228_RELOAD,
-	P228_DRAW
-};
-
 enum p228_shield_e
 {
 	P228_SHIELD_IDLE,

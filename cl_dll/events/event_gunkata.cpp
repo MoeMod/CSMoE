@@ -19,10 +19,11 @@ GNU General Public License for more details.
 #include "r_studioint.h"
 #include <string>
 
+namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
+
 namespace cl::event::gunkata {
-
-extern engine_studio_api_t IEngineStudio;
-
 enum
 {
 	ANIM_IDLE = 0, //6.0

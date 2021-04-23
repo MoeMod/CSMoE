@@ -17,7 +17,23 @@ namespace sv {
 
 class CM4A1 : public CBasePlayerWeapon
 {
-	enum m4a1_e;
+	enum m4a1_e
+    {
+        M4A1_IDLE,
+        M4A1_SHOOT1,
+        M4A1_SHOOT2,
+        M4A1_SHOOT3,
+        M4A1_RELOAD,
+        M4A1_DRAW,
+        M4A1_ATTACH_SILENCER,
+        M4A1_UNSIL_IDLE,
+        M4A1_UNSIL_SHOOT1,
+        M4A1_UNSIL_SHOOT2,
+        M4A1_UNSIL_SHOOT3,
+        M4A1_UNSIL_RELOAD,
+        M4A1_UNSIL_DRAW,
+        M4A1_DETACH_SILENCER
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

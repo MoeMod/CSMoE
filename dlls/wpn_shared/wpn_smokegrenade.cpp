@@ -26,14 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CSmokeGrenade::smokegrenade_e
-{
-	SMOKEGRENADE_IDLE,
-	SMOKEGRENADE_PINPULL,
-	SMOKEGRENADE_THROW,
-	SMOKEGRENADE_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_smokegrenade, CSmokeGrenade)
 
 void CSmokeGrenade::Spawn(void)

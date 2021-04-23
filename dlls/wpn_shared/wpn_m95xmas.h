@@ -15,7 +15,14 @@ namespace sv {
 
 class CM95xmas : public CBasePlayerWeapon
 {
-	enum m95xmas_e;
+	enum m95xmas_e
+    {
+        M95_IDLE,
+        M95_SHOOT1,
+        M95_SHOOT2,
+        M95_RELOAD,
+        M95_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

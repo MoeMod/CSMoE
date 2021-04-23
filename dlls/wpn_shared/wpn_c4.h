@@ -13,7 +13,13 @@ namespace sv {
 
 class CC4 : public CBasePlayerWeapon
 {
-	enum c4_e;
+	enum c4_e
+    {
+        C4_IDLE1,
+        C4_DRAW,
+        C4_DROP,
+        C4_ARM
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();

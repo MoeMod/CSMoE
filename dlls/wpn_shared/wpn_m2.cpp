@@ -30,24 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-	enum CM2::M2_e
-	{
-		M2_IDLEA,
-		M2_IDLEB,
-		M2_DRAWA,
-		M2_DRAW_EMPTY,
-		M2_CHANGEA,
-		M2_CHANGEA_EMPTY,
-		M2_CHANGEB,
-		M2_CHANGEB_EMPTY,
-		M2_RELOADA,
-		M2_RELOADB,
-		M2_SHOOTA,
-		M2_SHOOTB,
-		M2_IDLEA_EMPTY,
-		M2_IDLEB_EMPTY,
-	};
-
 	LINK_ENTITY_TO_CLASS(weapon_m2, CM2)
 
 	void CM2::Spawn(void)

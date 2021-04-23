@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CNegev::negev_e
-{
-	NEGEV_IDLE1,
-	NEGEV_SHOOT1,
-	NEGEV_SHOOT2,
-	NEGEV_RELOAD,
-	NEGEV_DRAW,
-	NEGEV_INSPECT
-};
-
 LINK_ENTITY_TO_CLASS(csgo_negev, CNegev)
 
 static const int NEGEV_AMMO_GIVE = 150;

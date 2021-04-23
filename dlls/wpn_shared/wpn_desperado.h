@@ -12,7 +12,25 @@ namespace sv {
 
 class CDesperado : public CBasePlayerWeapon
 {
-	enum desperado_e;
+	enum desperado_e
+    {
+        ANIM_IDLE_M = 0,
+        ANIM_RUN_START_M,
+        ANIM_RUN_IDLE_M,
+        ANIM_RUN_END_M,
+        ANIM_DRAW_M,
+        ANIM_SHOOT_M,
+        ANIM_RELOAD_M,
+        ANIM_SWAB_M,	// Gold
+        ANIM_IDLE_W,
+        ANIM_RUN_START_W,
+        ANIM_RUN_IDLE_W,
+        ANIM_RUN_END_W,
+        ANIM_DRAW_W,
+        ANIM_SHOOT_W,
+        ANIM_RELOAD_W,
+        ANIM_SWAB_W	// Blue
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

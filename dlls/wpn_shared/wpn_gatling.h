@@ -14,7 +14,14 @@ namespace sv {
 
 class CGatling : public CBasePlayerWeapon
 {
-	enum gatling_e;
+	enum gatling_e
+    {
+        GATLING_IDLE,
+        GATLING_FIRE1,
+        GATLING_FIRE2,
+        GATLING_RELOAD,
+        GATLING_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

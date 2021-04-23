@@ -259,16 +259,6 @@ namespace sv {
 		LINK_ENTITY_TO_CLASS(gatlingex_projectile, CGatlingexProjectile)
 #endif
 
-enum CGatlingex::gatlingex_e
-{
-	GATLINGEX_IDLE,
-	GATLINGEX_FIRE1,
-	GATLINGEX_FIRE2,
-	GATLINGEX_RELOAD,
-	GATLINGEX_DRAW,
-	GATLINGEX_FIREBALL
-};
-
 LINK_ENTITY_TO_CLASS(weapon_gatlingex, CGatlingex)
 
 void CGatlingex::Spawn(void)

@@ -12,7 +12,13 @@ namespace sv {
 
 class CZombieBomb : public CBasePlayerWeapon
 {
-	enum zombiebomb_e;
+	enum zombiebomb_e
+    {
+        HEGRENADE_IDLE,
+        HEGRENADE_PULLPIN,
+        HEGRENADE_THROW,
+        HEGRENADE_DRAW
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();

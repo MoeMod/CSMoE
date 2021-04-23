@@ -14,7 +14,16 @@ namespace sv {
 
 class CAK47Dragon : public CBasePlayerWeapon
 {
-	enum ak47_e;
+	enum ak47_e
+    {
+        AK47_IDLE1,
+        AK47_RELOAD,
+        AK47_DRAW,
+        AK47_SHOOT1,
+        AK47_SHOOT2,
+        AK47_SHOOT3,
+        AK47_RELOADD,
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

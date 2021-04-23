@@ -89,7 +89,7 @@ void EV_FireDeagleD( event_args_s *args, int sequence )
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
 	Vector vSpread;
-	
+
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
 	EV_HLDM_FireBullets( idx,
@@ -99,13 +99,21 @@ void EV_FireDeagleD( event_args_s *args, int sequence )
 		2 );
 }
 
+}
+
+namespace cl::event::deagled_left {
 void EV_FireDeagleD_Left(event_args_s *args)
 {
+    using namespace cl::event::deagled;
 	EV_FireDeagleD( args, Com_RandomLong( ELITE_SHOOTLEFT1, ELITE_SHOOTLEFT4 ));
 }
 
+}
+
+namespace cl::event::deagled_right {
 void EV_FireDeagleD_Right( event_args_s *args )
 {
+    using namespace cl::event::deagled;
 	EV_FireDeagleD( args, Com_RandomLong( ELITE_SHOOTRIGHT1, ELITE_SHOOTRIGHT4 ));
 }
 

@@ -15,7 +15,17 @@ namespace sv {
 
 class CSawedoff : public CBasePlayerWeapon
 {
-	enum sawedoff_e;
+    enum sawedoff_e
+    {
+        SAWEDOFF_IDLE,
+        SAWEDOFF_FIRE1,
+        SAWEDOFF_FIRE2,
+        SAWEDOFF_RELOAD,
+        SAWEDOFF_PUMP,
+        SAWEDOFF_START_RELOAD,
+        SAWEDOFF_DRAW,
+        SAWEDOFF_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

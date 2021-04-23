@@ -26,19 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CSG552::sg552_e
-{
-	SG552_IDLE1,
-	SG552_RELOAD,
-	SG552_DRAW,
-	SG552_SHOOT1,
-	SG552_SHOOT2,
-	SG552_SHOOT3,
-	SG552_INSPECT,
-	SG552_AIM,
-	SG552_BACK
-};
-
 LINK_ENTITY_TO_CLASS(weapon_sg552, CSG552)
 
 void CSG552::Spawn(void)

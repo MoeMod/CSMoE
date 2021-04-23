@@ -14,7 +14,14 @@ namespace sv {
 
 class CTbarrel : public CBasePlayerWeapon
 {
-	enum tbarrel_e;
+	enum tbarrel_e
+    {
+        ANIM_IDLE,
+        ANIM_FIRE1,
+        ANIM_FIRE2,
+        ANIM_RELOAD,
+        ANIM_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

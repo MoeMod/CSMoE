@@ -89,7 +89,7 @@ void EV_FireMP7A1D( event_args_s *args, int sequence )
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
 	Vector vSpread;
-	
+
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
 	EV_HLDM_FireBullets( idx,
@@ -98,14 +98,20 @@ void EV_FireMP7A1D( event_args_s *args, int sequence )
 		vSpread, 8192.0, BULLET_PLAYER_9MM,
 		2 );
 }
+}
 
+namespace cl::event::mp7a1d_left {
 void EV_FireMP7A1D_Left(event_args_s *args)
 {
+    using namespace cl::event::mp7a1d;
 	EV_FireMP7A1D( args, Com_RandomLong( ELITE_SHOOTLEFT1, ELITE_SHOOTLEFT4 ));
 }
 
+}
+namespace cl::event::mp7a1d_right {
 void EV_FireMP7A1D_Right( event_args_s *args )
 {
+    using namespace cl::event::mp7a1d;
 	EV_FireMP7A1D( args, Com_RandomLong( ELITE_SHOOTRIGHT1, ELITE_SHOOTRIGHT4 ));
 }
 

@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CMag7::mag7_e
-{
-	MAG7_IDLE,
-	MAG7_FIRE1,
-	MAG7_FIRE2,
-	MAG7_RELOAD,
-	MAG7_DRAW,
-	MAG7_INSPECT,
-};
-
 LINK_ENTITY_TO_CLASS(csgo_mag7, CMag7)
 
 void CMag7::Spawn(void)

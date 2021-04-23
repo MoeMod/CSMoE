@@ -104,15 +104,6 @@ protected:
 
 LINK_ENTITY_TO_CLASS(balrog7_explosion, CBalrog7Explosion);
 #endif
-enum CBalrog7::balrog7_e
-{
-	BALROG7_IDLE1,
-	BALROG7_SHOOT1,
-	BALROG7_SHOOT2,
-	BALROG7_SHOOT3,
-	BALROG7_RELOAD,
-	BALROG7_DRAW
-};
 
 LINK_ENTITY_TO_CLASS(weapon_balrog7, CBalrog7)
 

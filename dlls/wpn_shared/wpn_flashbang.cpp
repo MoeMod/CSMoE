@@ -26,13 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CFlashbang::flashbang_e
-{
-	FLASHBANG_IDLE,
-	FLASHBANG_PULLPIN,
-	FLASHBANG_THROW,
-	FLASHBANG_DRAW
-};
 
 LINK_ENTITY_TO_CLASS(weapon_flashbang, CFlashbang)
 

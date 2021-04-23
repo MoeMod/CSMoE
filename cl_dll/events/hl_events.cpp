@@ -47,7 +47,7 @@ void Game_HookEvents( void )
 {
 #define HOOK_EVENT( x, y ) gEngfuncs.pfnHookEvent( "events/" #x ".sc", EV_##y )
 #include "eventdef.h"
-#undef
+#undef HOOK_EVENT
 
 #ifdef XASH_LUASH
 	LuaCL_HookEvents();

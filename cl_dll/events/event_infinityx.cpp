@@ -87,7 +87,7 @@ void EV_FireInfinityX( event_args_s *args, int sequence, int direction )
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
 	Vector vSpread;
-	
+
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
 	EV_HLDM_FireBullets( idx,
@@ -97,6 +97,10 @@ void EV_FireInfinityX( event_args_s *args, int sequence, int direction )
 		2 );
 }
 
+}
+
+namespace cl::event::infinityx_left {
+using namespace cl::event::infinityx;
 void EV_FireInfinityX_Left(event_args_s *args)
 {
 	if(!args->bparam1)
@@ -107,6 +111,10 @@ void EV_FireInfinityX_Left(event_args_s *args)
 		EV_FireInfinityX(args, ANIM_SP_SHOOT_LEFT2, 0);
 }
 
+}
+
+namespace cl::event::infinityx_right {
+using namespace cl::event::infinityx;
 void EV_FireInfinityX_Right( event_args_s *args )
 {
 	if (!args->bparam1)

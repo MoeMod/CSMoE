@@ -33,14 +33,6 @@ namespace sv {
 extern bool g_bInBombZone;
 #endif
 
-enum CC4::c4_e
-{
-	C4_IDLE1,
-	C4_DRAW,
-	C4_DROP,
-	C4_ARM
-};
-
 LINK_ENTITY_TO_CLASS(weapon_c4, CC4)
 
 void CC4::Spawn(void)

@@ -14,7 +14,15 @@ namespace sv {
 
 class CStg44 : public CBasePlayerWeapon
 {
-	enum stg44_e;
+	enum stg44_e
+    {
+        STG44_IDLE1,
+        STG44_RELOAD,
+        STG44_DRAW,
+        STG44_SHOOT1,
+        STG44_SHOOT2,
+        STG44_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

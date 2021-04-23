@@ -15,7 +15,15 @@ namespace sv {
 
 class CMAC10 : public CBasePlayerWeapon
 {
-	enum mac10_e;
+	enum mac10_e
+    {
+        MAC10_IDLE1,
+        MAC10_RELOAD,
+        MAC10_DRAW,
+        MAC10_SHOOT1,
+        MAC10_SHOOT2,
+        MAC10_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

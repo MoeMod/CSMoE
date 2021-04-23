@@ -12,7 +12,13 @@ namespace sv {
 
 class CMolotov : public CBasePlayerWeapon
 {
-	enum molotov_e;
+	enum molotov_e
+    {
+        SMOKEGRENADE_IDLE,
+        SMOKEGRENADE_PINPULL,
+        SMOKEGRENADE_THROW,
+        SMOKEGRENADE_DRAW
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();

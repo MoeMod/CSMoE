@@ -17,7 +17,16 @@ namespace sv {
 
 class CBalrog7 : public CBasePlayerWeapon
 {
-	enum balrog7_e;
+	enum balrog7_e
+    {
+        BALROG7_IDLE1,
+        BALROG7_SHOOT1,
+        BALROG7_SHOOT2,
+        BALROG7_SHOOT3,
+        BALROG7_RELOAD,
+        BALROG7_DRAW
+    };
+
 public:
 	void Spawn() override;
 	void Precache() override;

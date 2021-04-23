@@ -14,7 +14,13 @@ namespace sv {
 
 class CM14EBR : public CBasePlayerWeapon
 {
-	enum m14ebr_e;
+	enum m14ebr_e
+    {
+        M14EBR_IDLE1,
+        M14EBR_RELOAD,
+        M14EBR_DRAW,
+        M14EBR_SHOOT1
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

@@ -8,7 +8,25 @@ namespace sv {
 
 class CMP7A1D : public CBasePlayerWeapon
 {
-	enum elite_e;
+	enum elite_e
+    {
+        ELITE_IDLE,
+        ELITE_IDLE_LEFTEMPTY,
+        ELITE_SHOOTLEFT1,
+        ELITE_SHOOTLEFT2,
+        ELITE_SHOOTLEFT3,
+        ELITE_SHOOTLEFT4,
+        ELITE_SHOOTLEFT5,
+        ELITE_SHOOTLEFTLAST,
+        ELITE_SHOOTRIGHT1,
+        ELITE_SHOOTRIGHT2,
+        ELITE_SHOOTRIGHT3,
+        ELITE_SHOOTRIGHT4,
+        ELITE_SHOOTRIGHT5,
+        ELITE_SHOOTRIGHTLAST,
+        ELITE_RELOAD,
+        ELITE_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

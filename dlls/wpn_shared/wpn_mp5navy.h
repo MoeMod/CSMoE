@@ -15,7 +15,15 @@ namespace sv {
 
 class CMP5N : public CBasePlayerWeapon
 {
-	enum mp5n_e;
+	enum mp5n_e
+    {
+        MP5N_IDLE1,
+        MP5N_RELOAD,
+        MP5N_DRAW,
+        MP5N_SHOOT1,
+        MP5N_SHOOT2,
+        MP5N_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

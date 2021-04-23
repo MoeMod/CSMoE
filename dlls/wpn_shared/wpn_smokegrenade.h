@@ -12,7 +12,13 @@ namespace sv {
 
 class CSmokeGrenade : public CBasePlayerWeapon
 {
-	enum smokegrenade_e;
+	enum smokegrenade_e
+    {
+        SMOKEGRENADE_IDLE,
+        SMOKEGRENADE_PINPULL,
+        SMOKEGRENADE_THROW,
+        SMOKEGRENADE_DRAW
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();

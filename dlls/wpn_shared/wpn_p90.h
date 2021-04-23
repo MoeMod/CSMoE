@@ -15,7 +15,15 @@ namespace sv {
 
 class CP90 : public CBasePlayerWeapon
 {
-	enum p90_e;
+	enum p90_e
+    {
+        P90_IDLE1,
+        P90_RELOAD,
+        P90_DRAW,
+        P90_SHOOT1,
+        P90_SHOOT2,
+        P90_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

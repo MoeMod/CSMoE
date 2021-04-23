@@ -10,7 +10,23 @@ namespace sv {
 
 class CBow : public CBasePlayerWeapon
 {
-	enum bow_e;
+	enum bow_e
+    {
+        ANIM_IDLE,
+        ANIM_IDLE_EMPTY,
+        ANIM_SHOOT1,
+        ANIM_SHOOT1_EMPTY,
+        ANIM_DRAW,
+        ANIM_DRAW_EMPTY,
+        ANIM_CHARGE_START1,
+        ANIM_CHARGE_FINISH1,
+        ANIM_CHARGE_IDLE1,
+        ANIM_CHARGE_IDLE2,
+        ANIM_CHARGE_SHOOT1,
+        ANIM_CHARGE_SHOOT1_EMPTY,
+        ANIM_CHARGE_SHOOT2,
+        ANIM_CHARGE_SHOOT2_EMPTY
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

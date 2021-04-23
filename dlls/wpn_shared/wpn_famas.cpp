@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CFamas::famas_e
-{
-	FAMAS_IDLE1,
-	FAMAS_RELOAD,
-	FAMAS_DRAW,
-	FAMAS_SHOOT1,
-	FAMAS_SHOOT2,
-	FAMAS_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_famas, CFamas)
 
 void CFamas::Spawn(void)

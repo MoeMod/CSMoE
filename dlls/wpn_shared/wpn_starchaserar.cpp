@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CStarchaserar::starchaserar_e
-{
-	STARCHASERAR_IDLE1,
-	STARCHASERAR_RELOAD,
-	STARCHASERAR_DRAW,
-	STARCHASERAR_SHOOT1,
-	STARCHASERAR_SHOOT2,
-	STARCHASERAR_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_starchaserar, CStarchaserar)
 
 void CStarchaserar::Spawn(void)
@@ -294,7 +284,7 @@ void CStarchaserar::StarchaserarFire(float flSpread, duration_t flCycleTime, BOO
 		tDelta += gpGlobals->time - tWorldTime;
 	}
 
-	if (tNextAttack > 1.0s || (gpGlobals->time - tWorldTime > 1.0s) || tDelta > 1.0s)	//¿ÉÒÔ¶àÉäÒ»´Î
+	if (tNextAttack > 1.0s || (gpGlobals->time - tWorldTime > 1.0s) || tDelta > 1.0s)	//ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 	{
 		tNextAttack = 0.0s;
 		tDelta = 0.0s;

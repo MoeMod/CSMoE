@@ -92,3 +92,24 @@ void EV_FireInfinityS(event_args_t *args)
 }
 
 }
+
+namespace cl::event::infinityss {
+    void EV_FireInfinitySS(event_args_t *args)
+    {
+        return cl::event::infinitys::EV_FireInfinityS(args);
+    }
+}
+
+namespace cl::event::infinitysr {
+    void EV_FireInfinitySR(event_args_t *args)
+    {
+        return cl::event::infinitys::EV_FireInfinityS(args);
+    }
+}
+
+namespace cl::event::infinitysb {
+    void EV_FireInfinitySB(event_args_t *args)
+    {
+        return cl::event::infinitys::EV_FireInfinityS(args);
+    }
+}

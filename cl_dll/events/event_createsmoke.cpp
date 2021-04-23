@@ -29,7 +29,7 @@
 
 #include "com_model.h"
 
-namespace cl::event::smoke {
+namespace cl::event::createsmoke {
 
 #define SMOKE_CLOUDS 20
 

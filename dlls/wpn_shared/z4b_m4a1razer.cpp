@@ -221,20 +221,6 @@ namespace sv {
 	};
 	LINK_ENTITY_TO_CLASS(m4a1razer_grenade, CM4A1RazerGrenade)
 #endif
-enum
-{
-	ANIM_IDLEB = 0,
-	ANIM_SHOOTB1,
-	ANIM_SHOOTB2,
-	ANIM_RELOADB,
-	ANIM_DRAWB,
-	ANIM_CHANGEA,
-	ANIM_IDLE,
-	ANIM_SHOOT,
-	ANIM_RELOAD,
-	ANIM_DRAW,
-	ANIM_CHANGEB,
-};
 
 LINK_ENTITY_TO_CLASS(z4b_m4a1razer, CM4A1Razer)
 

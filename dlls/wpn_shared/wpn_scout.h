@@ -16,7 +16,14 @@ namespace sv {
 
 class CSCOUT : public CBasePlayerWeapon
 {
-	enum scout_e;
+	enum scout_e
+    {
+        SCOUT_IDLE,
+        SCOUT_SHOOT,
+        SCOUT_SHOOT2,
+        SCOUT_RELOAD,
+        SCOUT_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

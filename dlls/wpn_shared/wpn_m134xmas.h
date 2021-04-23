@@ -17,7 +17,18 @@ namespace sv {
 
 class CM134xmas : public CBasePlayerWeapon
 {
-	enum m134xmas_e;
+	enum m134xmas_e
+    {
+        M134_IDLE1,
+        M134_DRAW,
+        M134_RELOAD,
+        M134_FIRE_READY,
+        M134_SHOOT,
+        M134_FIRE_AFTER,
+        M134_FIRE_CHANGE,
+        M134_IDLE_CHANGE,
+        M134_FIRE_LOOP,
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

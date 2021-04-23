@@ -16,7 +16,15 @@ namespace sv {
 
 class CFamas : public CBasePlayerWeapon
 {
-	enum famas_e;
+	enum famas_e
+    {
+        FAMAS_IDLE1,
+        FAMAS_RELOAD,
+        FAMAS_DRAW,
+        FAMAS_SHOOT1,
+        FAMAS_SHOOT2,
+        FAMAS_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

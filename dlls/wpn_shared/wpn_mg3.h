@@ -14,7 +14,14 @@ namespace sv {
 
 class CMG3 : public CBasePlayerWeapon
 {
-	enum m249_e;
+	enum m249_e
+    {
+        M249_IDLE1,
+        M249_SHOOT1,
+        M249_SHOOT2,
+        M249_RELOAD,
+        M249_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

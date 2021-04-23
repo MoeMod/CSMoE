@@ -14,7 +14,15 @@ namespace sv {
 
 class CMag7 : public CBasePlayerWeapon
 {
-	enum mag7_e;
+    enum mag7_e
+    {
+        MAG7_IDLE,
+        MAG7_FIRE1,
+        MAG7_FIRE2,
+        MAG7_RELOAD,
+        MAG7_DRAW,
+        MAG7_INSPECT,
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

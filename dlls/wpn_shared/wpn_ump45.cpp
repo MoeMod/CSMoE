@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CUMP45::ump45_e
-{
-	UMP45_IDLE1,
-	UMP45_RELOAD,
-	UMP45_DRAW,
-	UMP45_SHOOT1,
-	UMP45_SHOOT2,
-	UMP45_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_ump45, CUMP45)
 
 void CUMP45::Spawn(void)

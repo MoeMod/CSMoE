@@ -16,7 +16,18 @@ namespace sv {
 
 class CAUG : public CBasePlayerWeapon
 {
-	enum aug_e;
+	enum aug_e
+    {
+        AUG_IDLE1,
+        AUG_RELOAD,
+        AUG_DRAW,
+        AUG_SHOOT1,
+        AUG_SHOOT2,
+        AUG_SHOOT3,
+        AUG_INSPECT,
+        AUG_AIM,
+        AUG_BACK
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

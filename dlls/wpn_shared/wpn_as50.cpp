@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum CAS50::as50_e
-{
-	AS50_IDLE,
-	AS50_SHOOT1,
-	AS50_SHOOT2,
-	AS50_SHOOT3,
-	AS50_RELOAD,
-	AS50_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_as50, CAS50)
 
 const int AS50_MAXCLIP = 5;

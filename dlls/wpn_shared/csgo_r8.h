@@ -15,7 +15,24 @@ namespace sv {
 
 class CR8 : public CBasePlayerWeapon
 {
-	enum R8_E;
+    enum R8_E
+    {
+        IDLE,
+        DRAW,
+        DRAW_ALT,
+        PREPARE,
+        UNPREPARE,
+        FIRE,
+        DRYFIRE,
+        ALT1,
+        ALT2,
+        ALT3,
+        LOOKAT01,
+        RELOAD,
+        LOOKAT01_STICKER,
+        LOOKAT01_STICKER_LOOP
+
+    };
 public:
 	void Spawn() override;
 	void Precache() override;

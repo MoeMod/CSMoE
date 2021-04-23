@@ -16,7 +16,15 @@ namespace sv {
 
 class CAWP : public CBasePlayerWeapon
 {
-	enum awp_e;
+	enum awp_e
+    {
+        AWP_IDLE,
+        AWP_SHOOT1,
+        AWP_SHOOT2,
+        AWP_SHOOT3,
+        AWP_RELOAD,
+        AWP_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
