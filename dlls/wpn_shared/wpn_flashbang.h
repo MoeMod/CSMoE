@@ -1,8 +1,4 @@
-#ifndef WPN_FLASHBANG_H
-#define WPN_FLASHBANG_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -16,6 +12,13 @@ namespace sv {
 
 class CFlashbang : public CBasePlayerWeapon
 {
+	enum flashbang_e
+    {
+        FLASHBANG_IDLE,
+        FLASHBANG_PULLPIN,
+        FLASHBANG_THROW,
+        FLASHBANG_DRAW
+    };
 public:
 	virtual void Spawn();
 	virtual void Precache();
@@ -49,5 +52,3 @@ public:
 };
 
 }
-
-#endif

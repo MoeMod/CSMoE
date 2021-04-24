@@ -25,16 +25,18 @@ bool bMouseInUse = false;
 extern Vector dead_viewangles;
 extern bool evdev_open;
 
-#define F 1U<<0	// Forward
-#define B 1U<<1	// Back
-#define L 1U<<2	// Left
-#define R 1U<<3	// Right
-#define T 1U<<4	// Forward stop
-#define S 1U<<5	// Side stop
+inline namespace input_xash3d {
+constexpr auto F = 1U<<0;	// Forward
+constexpr auto B = 1U<<1;	// Back
+constexpr auto L = 1U<<2;	// Left
+constexpr auto R = 1U<<3;	// Right
+constexpr auto T = 1U<<4;	// Forward stop
+constexpr auto S = 1U<<5;	// Side stop
 
 #define BUTTON_DOWN		1
 #define IMPULSE_DOWN	2
 #define IMPULSE_UP		4
+}
 
 bool CL_IsDead();
 

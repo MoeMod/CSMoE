@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::createexplo {
 
 void EV_CreateExplo(event_args_s *args)
 {

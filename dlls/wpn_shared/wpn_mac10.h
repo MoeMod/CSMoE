@@ -1,8 +1,4 @@
-#ifndef WPN_MAC10_H
-#define WPN_MAC10_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CMAC10 : public CBasePlayerWeapon
 {
+	enum mac10_e
+    {
+        MAC10_IDLE1,
+        MAC10_RELOAD,
+        MAC10_DRAW,
+        MAC10_SHOOT1,
+        MAC10_SHOOT2,
+        MAC10_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +57,3 @@ private:
 };
 
 }
-
-#endif

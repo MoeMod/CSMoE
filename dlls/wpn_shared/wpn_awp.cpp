@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum awp_e
-{
-	AWP_IDLE,
-	AWP_SHOOT1,
-	AWP_SHOOT2,
-	AWP_SHOOT3,
-	AWP_RELOAD,
-	AWP_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_awp, CAWP)
 
 void CAWP::Spawn(void)

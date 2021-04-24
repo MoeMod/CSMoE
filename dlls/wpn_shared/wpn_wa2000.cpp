@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum wa2000_e
-{
-	WA2000_IDLE,
-	WA2000_SHOOT,
-	WA2000_SHOOT2,
-	WA2000_RELOAD,
-	WA2000_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_wa2000, CWA2000)
 
 const int WA2000_MAX_CLIP = 12;

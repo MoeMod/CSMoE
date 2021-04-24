@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m95xmas_e
-{
-	M95_IDLE,
-	M95_SHOOT1,
-	M95_SHOOT2,
-	M95_RELOAD,
-	M95_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_m95xmas, CM95xmas)
 
 const int M95_MAXCLIP = 5;

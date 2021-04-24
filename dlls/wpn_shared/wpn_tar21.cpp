@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tar21_e
-{
-	TAR21_IDLE1,
-	TAR21_RELOAD,
-	TAR21_DRAW,
-	TAR21_SHOOT1,
-	TAR21_SHOOT2,
-	TAR21_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_tar21, CTAR21)
 
 const int TAR21_MAX_CLIP = 30;

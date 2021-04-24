@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #include "events.h"
 
-namespace cl {
+namespace cl::event::gungnir {
 
 enum
 {

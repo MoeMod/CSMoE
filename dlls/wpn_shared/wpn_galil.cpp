@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum galil_e
-{
-	GALIL_IDLE1,
-	GALIL_RELOAD,
-	GALIL_DRAW,
-	GALIL_SHOOT1,
-	GALIL_SHOOT2,
-	GALIL_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_galil, CGalil)
 
 void CGalil::Spawn(void)

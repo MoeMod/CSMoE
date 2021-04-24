@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum k1a_e
-{
-	K1A_IDLE1,
-	K1A_RELOAD,
-	K1A_DRAW,
-	K1A_SHOOT1,
-	K1A_SHOOT2,
-	K1A_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_k1a, CK1a)
 
 const int K1A_MAXCLIP = 30;

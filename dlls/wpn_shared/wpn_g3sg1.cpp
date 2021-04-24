@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum g3sg1_e
-{
-	G3SG1_IDLE,
-	G3SG1_SHOOT,
-	G3SG1_SHOOT2,
-	G3SG1_RELOAD,
-	G3SG1_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_g3sg1, CG3SG1)
 
 void CG3SG1::Spawn(void)

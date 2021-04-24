@@ -1,8 +1,4 @@
-#ifndef WPN_K1A_H
-#define WPN_K1A_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,15 @@ namespace sv {
 
 class CK1a : public CBasePlayerWeapon
 {
+	enum k1a_e
+    {
+        K1A_IDLE1,
+        K1A_RELOAD,
+        K1A_DRAW,
+        K1A_SHOOT1,
+        K1A_SHOOT2,
+        K1A_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +56,3 @@ private:
 };
 
 }
-
-#endif

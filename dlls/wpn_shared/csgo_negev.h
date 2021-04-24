@@ -1,8 +1,4 @@
-#ifndef WPN_MG3_H
-#define WPN_MG3_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CNegev : public CBasePlayerWeapon
 {
+    enum negev_e
+    {
+        NEGEV_IDLE1,
+        NEGEV_SHOOT1,
+        NEGEV_SHOOT2,
+        NEGEV_RELOAD,
+        NEGEV_DRAW,
+        NEGEV_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +58,3 @@ private:
 };
 
 }
-
-#endif

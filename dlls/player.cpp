@@ -4686,8 +4686,6 @@ pt_end:
 
 // checks if the spot is clear of players
 
-inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
-
 bool CBasePlayer::SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot)
 {
 	edict_t *player = edict();

@@ -112,9 +112,6 @@ DLL_GLOBAL int gmsgZB2Msg = 0;
 DLL_GLOBAL int gmsgZB3Msg = 0;
 DLL_GLOBAL int gmsgGunDeath = 0;
 
-// utils
-inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
-
 // main code
 
 void LinkUserMessages()

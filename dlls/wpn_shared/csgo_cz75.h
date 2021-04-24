@@ -1,8 +1,4 @@
-#ifndef WPN_FIVESEVEN_H
-#define WPN_FIVESEVEN_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,21 @@ namespace sv {
 
 class CCz75 : public CBasePlayerWeapon
 {
+	enum cz75_e
+    {
+        CZ75_IDLE_1,
+        CZ75_IDLE_2,
+        CZ75_DRAW_1,
+        CZ75_DRAW_2,
+        CZ75_SHOOT_1,
+        CZ75_SHOOT_2,
+        CZ75_SHOOT_EMPTY_1,
+        CZ75_SHOOT_EMPTY_2,
+        CZ75_RELOAD_1,
+        CZ75_RELOAD_2,
+        CZ75_INSPECT_1,
+        CZ75_INSPECT_2
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -59,5 +70,3 @@ private:
 };
 
 }
-
-#endif

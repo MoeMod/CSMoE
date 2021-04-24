@@ -1,8 +1,4 @@
-#ifndef WPN_GALIL_H
-#define WPN_GALIL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -12,6 +8,24 @@ namespace sv {
 
 class CScarLight : public CBasePlayerWeapon
 {
+	enum scar_e
+    {
+        SCARL_IDLE1,
+        SCARL_RELOAD,
+        SCARL_DRAW,
+        SCARL_SHOOT1,
+        SCARL_SHOOT2,
+        SCARL_SHOOT3,
+        CHANGE_SCARL,
+        SCARH_IDLE1,
+        SCARH_RELOAD,
+        SCARH_DRAW,
+        SCARH_SHOOT1,
+        SCARH_SHOOT2,
+        SCARH_SHOOT3,
+        CHANGE_SCARH,
+    };
+
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -54,5 +68,3 @@ private:
 };
 
 }
-
-#endif

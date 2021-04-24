@@ -38,16 +38,15 @@
 #include <string>
 
 // for localized titles.txt strings
-using namespace std;
 using namespace cl;
-typedef unordered_map< string, char* > CDict;
+typedef std::unordered_map< std::string, char* > CDict;
 
 CDict gTitlesTXT;
 
 const char *Localize( const char *szStr )
 {
 	StripEndNewlineFromString( (char *)szStr );
-	auto got = gTitlesTXT.find( string(szStr) );
+	auto got = gTitlesTXT.find(std::string(szStr) );
 
 	// if iterator points to end, then 'key' not found in dictionary
 	if( got == gTitlesTXT.end() )
@@ -102,7 +101,7 @@ void Localize_Init( )
 					size_t iLen = strlen( szLocString ) + 1;
 					char *szLocCopyString = new char[iLen];
 					strncpy(szLocCopyString, szLocString, iLen );
-					gTitlesTXT[ string(token) ] = szLocCopyString;
+					gTitlesTXT[std::string(token) ] = szLocCopyString;
 				}
 			}
 		}

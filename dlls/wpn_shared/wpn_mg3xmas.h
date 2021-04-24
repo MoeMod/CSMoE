@@ -1,8 +1,4 @@
-#ifndef WPN_MG3_H
-#define WPN_MG3_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,14 @@ namespace sv {
 
 class CMG3xmas : public CBasePlayerWeapon
 {
+	enum m249_e
+    {
+        M249_IDLE1,
+        M249_SHOOT1,
+        M249_SHOOT2,
+        M249_RELOAD,
+        M249_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -49,5 +53,3 @@ private:
 };
 
 }
-
-#endif

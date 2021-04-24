@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::m95xmas {
 
 enum m95xmas_e
 {

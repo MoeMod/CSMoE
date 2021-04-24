@@ -1,8 +1,4 @@
-#ifndef WPN_P228_H
-#define WPN_P228_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,16 @@ namespace sv {
 
 class CP228 : public CBasePlayerWeapon
 {
+	enum p228_e
+    {
+        P228_IDLE,
+        P228_SHOOT1,
+        P228_SHOOT2,
+        P228_SHOOT3,
+        P228_SHOOT_EMPTY,
+        P228_RELOAD,
+        P228_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -56,5 +62,3 @@ private:
 };
 
 }
-
-#endif

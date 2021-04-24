@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::k1a {
 
 enum k1a_e
 {

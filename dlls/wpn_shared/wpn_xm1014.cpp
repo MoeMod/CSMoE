@@ -26,17 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum xm1014_e
-{
-	XM1014_IDLE,
-	XM1014_FIRE1,
-	XM1014_FIRE2,
-	XM1014_RELOAD,
-	XM1014_PUMP,
-	XM1014_START_RELOAD,
-	XM1014_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_xm1014, CXM1014)
 
 void CXM1014::Spawn(void)

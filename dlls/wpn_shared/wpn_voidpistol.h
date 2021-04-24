@@ -1,8 +1,4 @@
-#ifndef WPN_VOIDPISTOL_H
-#define WPN_VOIDPISTOL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,32 @@ namespace sv {
 
 class CVoidpistol : public CBasePlayerWeapon
 {
+	enum voidpistol_e
+    {
+        VOIDPISTOL_IDLEA,
+        VOIDPISTOL_IDLEB,
+        VOIDPISTOL_IDLEC,
+        VOIDPISTOL_SHOOTA,
+        VOIDPISTOL_SHOOTB,
+        VOIDPISTOL_SHOOTC,
+        VOIDPISTOL_SHOOT_BLACKHOLE_A,
+        VOIDPISTOL_SHOOT_BLACKHOLE_B,
+        VOIDPISTOL_RELOADA,
+        VOIDPISTOL_RELOADB,
+        VOIDPISTOL_RELOADC,
+        VOIDPISTOL_SCANNING_ON,
+        VOIDPISTOL_SCANNING_OFF,
+        VOIDPISTOL_CHANGEAC,
+        VOIDPISTOL_CHANGEBC,
+        VOIDPISTOL_DRAWA,
+        VOIDPISTOL_DRAWB,
+        VOIDPISTOL_DRAWC
+    };
+	enum voidpistol_mode
+    {
+        VOIDPISTOL_MODEA,
+        VOIDPISTOL_MODEB,
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -69,5 +91,3 @@ public:
 };
 
 }
-
-#endif

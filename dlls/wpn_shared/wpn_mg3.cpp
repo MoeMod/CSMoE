@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m249_e
-{
-	M249_IDLE1,
-	M249_SHOOT1,
-	M249_SHOOT2,
-	M249_RELOAD,
-	M249_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_mg3, CMG3)
 
 static const int MG3_AMMO_GIVE = 200;

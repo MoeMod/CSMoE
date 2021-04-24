@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::p228 {
 
 enum p228_e
 {

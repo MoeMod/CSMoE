@@ -29,17 +29,6 @@ namespace cl {
 #else
 namespace sv {
 #endif
-
-enum ak47_e
-{
-	AK47_IDLE1,
-	AK47_RELOAD,
-	AK47_DRAW,
-	AK47_SHOOT1,
-	AK47_SHOOT2,
-	AK47_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_ak47, CAK47)
 
 void CAK47::Spawn(void)

@@ -30,17 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum bizon_e
-{
-	BIZON_IDLE1,
-	BIZON_RELOAD,
-	BIZON_DRAW,
-	BIZON_SHOOT1,
-	BIZON_SHOOT2,
-	BIZON_SHOOT3,
-	BIZON_INSPECT
-};
-
 LINK_ENTITY_TO_CLASS(csgo_bizon, CBizon)
 
 void CBizon::Spawn(void)

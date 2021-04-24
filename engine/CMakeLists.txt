@@ -354,11 +354,6 @@ endif()
 
 add_definitions(-DXASH_FORCEINLINE)
 
-# Important, as HLSDK and engine shares some symbol names!
-if(NOT WIN32) # Windows by default have hidden visibility and better linker
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
-endif()
-
 # ----- Conditions -----
 
 if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version that requires SSE
@@ -432,7 +427,7 @@ endif()
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 	add_definitions(-DXASH_SDL)
-	
+
 	target_link_libraries(${XASH_ENGINE} sdl2)
 endif()
 
@@ -527,6 +522,9 @@ else()
 			OUTPUT_NAME "xash_sdl")
 	endif()
 endif()
+
+# engine doesnt support unity build now
+set_target_properties(${XASH_ENGINE} PROPERTIES UNITY_BUILD OFF)
 
 if( NOT XASH_STATIC_GAMELIB )
 	install( TARGETS ${XASH_ENGINE} DESTINATION ".")

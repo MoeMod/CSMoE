@@ -20,9 +20,10 @@ GNU General Public License for more details.
 #include <string>
 
 namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
 
-extern engine_studio_api_t IEngineStudio;
-
+namespace cl::event::gunkata {
 enum
 {
 	ANIM_IDLE = 0, //6.0

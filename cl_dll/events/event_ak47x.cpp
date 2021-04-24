@@ -14,17 +14,17 @@ GNU General Public License for more details.
 */
 #include "events.h"
 
-namespace cl {
-
-	enum
-	{
-		ANIM_IDLE1 = 0,
-		ANIM_RELOAD,
-		ANIM_DRAW,
-		ANIM_SHOOT1,
-		ANIM_SHOOT2,
-		ANIM_SHOOT3
-	};
+namespace cl::event::ak47x {
+	
+enum
+{
+	ANIM_IDLE1 = 0,
+	ANIM_RELOAD,
+	ANIM_DRAW,
+	ANIM_SHOOT1,
+	ANIM_SHOOT2,
+	ANIM_SHOOT3
+};
 
 static const char *SOUNDS_NAME[] =
 {

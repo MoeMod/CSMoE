@@ -21,7 +21,8 @@ set(XASH_LIBDL true)
 set(CMAKE_CXX_STANDARD 17)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
-	option(XASH_PCH "Enable PCH support." OFF)
+	option(XASH_PCH "Enable PCH support." ON)
+	option(XASH_UNITY_BUILD "Enable Unity Build support." ON)
 endif()
 
 option(XASH_VCPKG "Enable VCPKG support." OFF)
@@ -38,6 +39,14 @@ if(XASH_PCH)
 	if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
 		message(FATAL_ERROR "PCH is not supported. Please update to CMake 3.16 or higher.")
 	endif()
+	add_definitions(-DXASH_PCH=1)
+endif()
+
+if(XASH_UNITY_BUILD)
+	if(${CMAKE_VERSION} VERSION_LESS "3.16.0")
+		message(FATAL_ERROR "Unity build is not supported. Please update to CMake 3.16 or higher.")
+	endif()
+	add_definitions(-DXASH_UNITY_BUILD=1)
 endif()
 
 if(XASH_STATIC_GAMELIB)
@@ -58,6 +67,11 @@ elseif(MSVC)
 
 else()
 	add_compile_options( -Wall -Wextra -Wno-unused-parameter -Wl,--no-undefined )
+endif()
+
+# Important, as HLSDK and engine shares some symbol names!
+if(NOT WIN32) # Windows by default have hidden visibility and better linker
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -157,6 +171,10 @@ if(XASH_IMGUI)
 		target_include_directories(imgui_ext PRIVATE ${CMAKE_SOURCE_DIR}/imgui_ext/dirent)
 	endif()
 	target_link_libraries(imgui_ext PUBLIC imgui)
+	if(XASH_UNITY_BUILD)
+		set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
+		set_target_properties(imgui_ext PROPERTIES UNITY_BUILD ON)
+	endif()
 endif()
 
 if(XASH_LUASH)

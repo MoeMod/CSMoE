@@ -24,9 +24,6 @@ typedef struct
 	entity_state_t	entities[MAX_VISIBLE_PACKET];	
 } sv_ents_t;
 
-static byte *clientpvs;	// FatPVS
-static byte *clientphs;	// FatPHS
-
 int	c_fullsend;	// just a debug counter
 
 /*
@@ -64,6 +61,9 @@ static void SV_AddEntitiesToPacket( edict_t *pViewEnt, edict_t *pClient, client_
 	sv_client_t	*cl = NULL;
 	entity_state_t	*state;
 	int		e, player;
+
+	static byte* clientpvs;	// FatPVS
+	static byte* clientphs;	// FatPHS
 
 	// during an error shutdown message we may need to transmit
 	// the shutdown message after the server has shutdown, so

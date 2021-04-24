@@ -13,11 +13,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef PROJECT_KNIFEATTACK_H
-#define PROJECT_KNIFEATTACK_H
-
+#pragma once
 
 #ifndef CLIENT_DLL
+#include "monsters.h"
+
 namespace sv {
 
 void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity);
@@ -294,8 +294,91 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 
 	return result;
 }
+
+inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, entvars_t* pevAttacker)
+{
+	TraceResult tr;
+
+	const float falloff = flRadius ? flDamage / flRadius : 1;
+	const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	Vector vecEnd = vecSrc + vecDir.Normalize() * flAngleDegrees;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+	if (tr.flFraction >= 1)
+	{
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+
+		if (tr.flFraction < 1)
+		{
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO)
+			{
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
+				ClearMultiDamage();
+				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+				ApplyMultiDamage(pevInflictor, pevAttacker);
+			}
+			vecEnd = tr.vecEndPos;
+		}
+	}
+
+	CBaseEntity* pEntity = NULL;
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage != DAMAGE_NO)
+		{
+			if (bInWater && !pEntity->pev->waterlevel)
+				continue;
+
+			if (!bInWater && pEntity->pev->waterlevel == 3)
+				continue;
+
+			if (pEntity->IsBSPModel())
+				continue;
+
+			if (pEntity->pev == pevAttacker)
+				continue;
+
+			Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
+				continue;
+
+			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+			{
+				if (tr.fStartSolid)
+				{
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0;
+				}
+
+				float flAdjustedDamage = flDamage - (tr.vecEndPos - vecSrc).Length() * falloff;
+				flAdjustedDamage = Q_max(0, flAdjustedDamage);
+
+				if (tr.flFraction == 1.0f)
+				{
+					pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+				}
+				else
+				{
+					tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevAttacker, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+				}
+			}
+		}
+	}
+	return vecDir;
+}
 }
 #endif
 
-
-#endif //PROJECT_KNIFEATTACK_H

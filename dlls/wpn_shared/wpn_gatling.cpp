@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum gatling_e
-{
-	GATLING_IDLE,
-	GATLING_FIRE1,
-	GATLING_FIRE2,
-	GATLING_RELOAD,
-	GATLING_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_gatling, CGatling)
 
 void CGatling::Spawn(void)

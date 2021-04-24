@@ -1,8 +1,4 @@
-#ifndef WPN_FAMAS_H
-#define WPN_FAMAS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -20,6 +16,15 @@ namespace sv {
 
 class CFamas : public CBasePlayerWeapon
 {
+	enum famas_e
+    {
+        FAMAS_IDLE1,
+        FAMAS_RELOAD,
+        FAMAS_DRAW,
+        FAMAS_SHOOT1,
+        FAMAS_SHOOT2,
+        FAMAS_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +57,3 @@ public:
 };
 
 }
-
-#endif

@@ -1,8 +1,4 @@
-#ifndef WPN_GALIL_H
-#define WPN_GALIL_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,15 @@ namespace sv {
 #define GALIL_INSPECT_TIME		3.67s
 class CGalil : public CBasePlayerWeapon
 {
+	enum galil_e
+    {
+        GALIL_IDLE1,
+        GALIL_RELOAD,
+        GALIL_DRAW,
+        GALIL_SHOOT1,
+        GALIL_SHOOT2,
+        GALIL_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +58,3 @@ private:
 };
 
 }
-
-#endif

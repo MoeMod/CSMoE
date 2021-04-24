@@ -31,8 +31,10 @@
 #include <string>
 
 namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
 
-extern engine_studio_api_t IEngineStudio;
+namespace cl::event::gatlingex {
 
 enum gatling_e
 {

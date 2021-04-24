@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::janus7xmas {
 
 static const char *SOUND_NAME = "weapons/janus7-1.wav";
 

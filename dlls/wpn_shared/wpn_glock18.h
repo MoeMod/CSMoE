@@ -1,8 +1,4 @@
-#ifndef WPN_GLOCK18_H
-#define WPN_GLOCK18_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,36 @@ namespace sv {
 
 class CGLOCK18 : public CBasePlayerWeapon
 {
+	enum glock18_e
+    {
+        GLOCK18_IDLE1,
+        GLOCK18_IDLE2,
+        GLOCK18_IDLE3,
+        GLOCK18_SHOOT,
+        GLOCK18_SHOOT2,
+        GLOCK18_SHOOT3,
+        GLOCK18_SHOOT_EMPTY,
+        GLOCK18_RELOAD,
+        GLOCK18_DRAW,
+        GLOCK18_HOLSTER,
+        GLOCK18_ADD_SILENCER,
+        GLOCK18_DRAW2,
+        GLOCK18_RELOAD2
+    };
+
+    enum glock18_shield_e
+    {
+        GLOCK18_SHIELD_IDLE1,
+        GLOCK18_SHIELD_SHOOT,
+        GLOCK18_SHIELD_SHOOT2,
+        GLOCK18_SHIELD_SHOOT_EMPTY,
+        GLOCK18_SHIELD_RELOAD,
+        GLOCK18_SHIELD_DRAW,
+        GLOCK18_SHIELD_IDLE,
+        GLOCK18_SHIELD_UP,
+        GLOCK18_SHIELD_DOWN
+    };
+
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +78,3 @@ public:
 };
 
 }
-
-#endif

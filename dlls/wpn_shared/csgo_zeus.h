@@ -1,8 +1,4 @@
-#ifndef WPN_SCOUT_H
-#define WPN_SCOUT_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -13,6 +9,12 @@ namespace sv {
 
 class CZeus : public CBasePlayerWeapon
 {
+	enum zeus_e
+    {
+        ANIM_IDLE,
+        ANIM_SHOOT,
+        ANIM_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +54,3 @@ public:;
 };
 
 }
-
-#endif

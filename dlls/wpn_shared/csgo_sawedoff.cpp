@@ -30,18 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sawedoff_e
-{
-	SAWEDOFF_IDLE,
-	SAWEDOFF_FIRE1,
-	SAWEDOFF_FIRE2,
-	SAWEDOFF_RELOAD,
-	SAWEDOFF_PUMP,
-	SAWEDOFF_START_RELOAD,
-	SAWEDOFF_DRAW,
-	SAWEDOFF_INSPECT
-};
-
 LINK_ENTITY_TO_CLASS(csgo_sawedoff, CSawedoff)
 
 void CSawedoff::Spawn(void)

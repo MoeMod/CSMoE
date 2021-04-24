@@ -1,8 +1,4 @@
-#ifndef WPN_M1887_H
-#define WPN_M1887_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -16,6 +12,19 @@ namespace sv {
 
 class CM1887 : public CBasePlayerWeapon
 {
+	enum m1887_e
+    {
+        M1887_IDLE,
+        M1887_FIRE1,
+        M1887_FIRE2,
+        M1887_FIRE3,
+        M1887_FIRE4,
+        M1887_FIRE5,
+        M1887_RELOAD,
+        M1887_PUMP,
+        M1887_START_RELOAD,
+        M1887_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -46,5 +55,3 @@ private:
 };
 
 }
-
-#endif

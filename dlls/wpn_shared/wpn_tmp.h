@@ -1,8 +1,4 @@
-#ifndef WPN_TMP_H
-#define WPN_TMP_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CTMP : public CBasePlayerWeapon
 {
+	enum tmp_e
+    {
+        TMP_IDLE1,
+        TMP_RELOAD,
+        TMP_DRAW,
+        TMP_SHOOT1,
+        TMP_SHOOT2,
+        TMP_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +58,3 @@ private:
 };
 
 }
-
-#endif

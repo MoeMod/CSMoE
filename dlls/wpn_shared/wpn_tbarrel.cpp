@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tbarrel_e
-{
-	ANIM_IDLE,
-	ANIM_FIRE1,
-	ANIM_FIRE2,
-	ANIM_RELOAD,
-	ANIM_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_tbarrel, CTbarrel)
 
 void CTbarrel::Spawn(void)

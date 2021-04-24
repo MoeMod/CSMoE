@@ -26,15 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum scout_e
-{
-	SCOUT_IDLE,
-	SCOUT_SHOOT,
-	SCOUT_SHOOT2,
-	SCOUT_RELOAD,
-	SCOUT_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_scout, CSCOUT)
 
 void CSCOUT::Spawn(void)

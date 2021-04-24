@@ -1,8 +1,4 @@
-#ifndef WPN_UMP45_H
-#define WPN_UMP45_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CUMP45 : public CBasePlayerWeapon
 {
+	enum ump45_e
+    {
+        UMP45_IDLE1,
+        UMP45_RELOAD,
+        UMP45_DRAW,
+        UMP45_SHOOT1,
+        UMP45_SHOOT2,
+        UMP45_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +58,3 @@ private:
 };
 
 }
-
-#endif

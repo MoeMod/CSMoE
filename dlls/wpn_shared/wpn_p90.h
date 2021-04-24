@@ -1,8 +1,4 @@
-#ifndef WPN_P90_H
-#define WPN_P90_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CP90 : public CBasePlayerWeapon
 {
+	enum p90_e
+    {
+        P90_IDLE1,
+        P90_RELOAD,
+        P90_DRAW,
+        P90_SHOOT1,
+        P90_SHOOT2,
+        P90_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +57,3 @@ private:
 };
 
 }
-
-#endif

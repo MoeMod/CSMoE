@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::m134heroi {
 
 static const char *SOUND_NAME = "weapons/m134-1.wav";
 
@@ -93,7 +93,7 @@ void EV_FireM134HeroI(event_args_s *args)
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );
 	Vector vSpread;
-	
+
 	vSpread.x = args->fparam1;
 	vSpread.y = args->fparam2;
 	EV_HLDM_FireBullets( idx,
@@ -102,7 +102,6 @@ void EV_FireM134HeroI(event_args_s *args)
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
 }
-
 
 //======================
 //	    EGON END
@@ -120,6 +119,11 @@ enum EGON_FIREMODE { FIRE_NARROW, FIRE_WIDE};
 
 BEAM *pBeam;
 BEAM *pBeam2;
+}
+
+namespace cl::event::m134heroi_fire {
+
+using namespace cl::event::m134heroi;
 
 void EV_FireM134HeroI_EgonFire( event_args_t *args )
 {
@@ -210,6 +214,12 @@ void EV_FireM134HeroI_EgonFire( event_args_t *args )
         }
     }
 }
+
+}
+
+namespace cl::event::m134heroi_stop {
+
+using namespace cl::event::m134heroi;
 
 void EV_FireM134HeroI_EgonStop( event_args_t *args )
 {

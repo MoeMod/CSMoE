@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum mac10_e
-{
-	MAC10_IDLE1,
-	MAC10_RELOAD,
-	MAC10_DRAW,
-	MAC10_SHOOT1,
-	MAC10_SHOOT2,
-	MAC10_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_mac10, CMAC10)
 
 void CMAC10::Spawn(void)

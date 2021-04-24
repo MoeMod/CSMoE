@@ -1,8 +1,4 @@
-#ifndef WPN_AWP_H
-#define WPN_AWP_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -20,6 +16,15 @@ namespace sv {
 
 class CAWP : public CBasePlayerWeapon
 {
+	enum awp_e
+    {
+        AWP_IDLE,
+        AWP_SHOOT1,
+        AWP_SHOOT2,
+        AWP_SHOOT3,
+        AWP_RELOAD,
+        AWP_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +58,3 @@ private:
 };
 
 }
-
-#endif

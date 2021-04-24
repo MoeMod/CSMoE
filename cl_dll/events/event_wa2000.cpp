@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::wa2000 {
 
 enum wa2000_e
 {

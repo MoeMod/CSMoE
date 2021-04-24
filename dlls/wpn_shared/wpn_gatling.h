@@ -1,8 +1,4 @@
-#ifndef WPN_XM1014_H
-#define WPN_XM1014_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,14 @@ namespace sv {
 
 class CGatling : public CBasePlayerWeapon
 {
+	enum gatling_e
+    {
+        GATLING_IDLE,
+        GATLING_FIRE1,
+        GATLING_FIRE2,
+        GATLING_RELOAD,
+        GATLING_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -50,5 +54,3 @@ private:
 };
 
 }
-
-#endif

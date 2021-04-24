@@ -1,8 +1,4 @@
-#ifndef WPN_KRISS_H
-#define WPN_KRISS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -22,6 +18,23 @@ namespace sv {
 
 class CKRISS : public CBasePlayerWeapon
 {
+	enum kriss_e
+    {
+        KRISS_IDLE,
+        KRISS_SHOOT1,
+        KRISS_SHOOT2,
+        KRISS_SHOOT3,
+        KRISS_RELOAD,
+        KRISS_DRAW,
+        KRISS_ATTACH_SILENCER,
+        KRISS_UNSIL_IDLE,
+        KRISS_UNSIL_SHOOT1,
+        KRISS_UNSIL_SHOOT2,
+        KRISS_UNSIL_SHOOT3,
+        KRISS_UNSIL_RELOAD,
+        KRISS_UNSIL_DRAW,
+        KRISS_DETACH_SILENCER
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -55,5 +68,3 @@ private:
 };
 
 }
-
-#endif

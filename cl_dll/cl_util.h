@@ -111,10 +111,6 @@ inline void PlaySound( const char *szSound, float vol ) { gEngfuncs.pfnPlaySound
 inline void PlaySound( int iSound, float vol ) { gEngfuncs.pfnPlaySoundByIndex( iSound, vol ); }
 
 #include "minmax.h"
-#ifndef __APPLE__
-// template functions are considered after non-template functions, so it will not conflict with math.h
-template<class T> constexpr T fabs(T x) { return ((x) > 0 ? (x) : 0 - (x)); }
-#endif
 
 #ifdef VectorSubtract
 #undef VectorSubtract

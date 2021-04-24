@@ -1,8 +1,4 @@
-#ifndef WPN_AUG_H
-#define WPN_AUG_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -18,6 +14,15 @@ namespace sv {
 
 class CStarchaserar : public CBasePlayerWeapon
 {
+	enum starchaserar_e
+    {
+        STARCHASERAR_IDLE1,
+        STARCHASERAR_RELOAD,
+        STARCHASERAR_DRAW,
+        STARCHASERAR_SHOOT1,
+        STARCHASERAR_SHOOT2,
+        STARCHASERAR_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -55,5 +60,3 @@ private:
 };
 
 }
-
-#endif

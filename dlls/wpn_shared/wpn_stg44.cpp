@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum stg44_e
-{
-	STG44_IDLE1,
-	STG44_RELOAD,
-	STG44_DRAW,
-	STG44_SHOOT1,
-	STG44_SHOOT2,
-	STG44_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_stg44, CStg44)
 
 void CStg44::Spawn(void)

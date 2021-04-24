@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum mp5n_e
-{
-	MP5N_IDLE1,
-	MP5N_RELOAD,
-	MP5N_DRAW,
-	MP5N_SHOOT1,
-	MP5N_SHOOT2,
-	MP5N_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_mp5navy, CMP5N)
 
 void CMP5N::Spawn(void)

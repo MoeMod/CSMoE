@@ -26,16 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tmp_e
-{
-	TMP_IDLE1,
-	TMP_RELOAD,
-	TMP_DRAW,
-	TMP_SHOOT1,
-	TMP_SHOOT2,
-	TMP_SHOOT3
-};
-
 LINK_ENTITY_TO_CLASS(weapon_tmp, CTMP)
 
 void CTMP::Spawn(void)

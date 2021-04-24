@@ -364,6 +364,8 @@ public:
 	static TYPEDESCRIPTION m_SaveData[];
 };
 
+inline int FNullEnt(CBaseEntity* ent) { return (!ent) || FNullEnt(ent->edict()); }
+
 } // namespace sv | cl
 
 #include "cbase/cbase_memory.h"

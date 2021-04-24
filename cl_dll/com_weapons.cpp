@@ -161,22 +161,6 @@ void HUD_PlaybackEvent( int flags, const edict_t *pInvoker, unsigned short event
 								bparam1, bparam2 );
 }
 
-
-
-/*
-=====================
-UTIL_WeaponTimeBase
-
-Always 0.0 on client, even if not predicting weapons ( won't get called
- in that case )
-=====================
-*/
-inline std::chrono::duration<float> UTIL_WeaponTimeBase( void )
-{
-	return {};
-}
-
-
 static unsigned int glSeed = 0;
 
 unsigned int seed_table[ 256 ] =

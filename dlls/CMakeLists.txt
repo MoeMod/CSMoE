@@ -408,3 +408,7 @@ endif()
 if(XASH_PCH)
 	target_precompile_headers(${SERVER_LIBRARY} PRIVATE stdafx.h)
 endif()
+
+if(XASH_UNITY_BUILD)
+	set_target_properties(${SERVER_LIBRARY} PROPERTIES UNITY_BUILD ON)
+endif()

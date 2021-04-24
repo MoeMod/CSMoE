@@ -1,8 +1,4 @@
-#ifndef WPN_M4A1_H
-#define WPN_M4A1_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,25 @@ namespace sv {
 
 class CM4A1Dragon : public CBasePlayerWeapon
 {
+	enum m4a1_e
+    {
+        M4A1_IDLE,
+        M4A1_SHOOT1,
+        M4A1_SHOOT2,
+        M4A1_SHOOT3,
+        M4A1_RELOAD,
+        M4A1_DRAW,
+        M4A1_ATTACH_SILENCER,
+        M4A1_UNSIL_IDLE,
+        M4A1_UNSIL_SHOOT1,
+        M4A1_UNSIL_SHOOT2,
+        M4A1_UNSIL_SHOOT3,
+        M4A1_UNSIL_RELOAD,
+        M4A1_UNSIL_DRAW,
+        M4A1_DETACH_SILENCER,
+        M4A1_RELOADD,
+        M4A1_UNSIL_RELOADD
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -53,5 +68,3 @@ private:
 };
 
 }
-
-#endif

@@ -1,8 +1,4 @@
-#ifndef WPN_FIVESEVEN_H
-#define WPN_FIVESEVEN_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,15 @@ namespace sv {
 
 class CFiveSeven : public CBasePlayerWeapon
 {
+	enum fiveseven_e
+    {
+        FIVESEVEN_IDLE,
+        FIVESEVEN_SHOOT1,
+        FIVESEVEN_SHOOT2,
+        FIVESEVEN_SHOOT_EMPTY,
+        FIVESEVEN_RELOAD,
+        FIVESEVEN_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -57,5 +62,3 @@ private:
 };
 
 }
-
-#endif

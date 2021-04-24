@@ -1,8 +1,4 @@
-#ifndef WPN_M3_H
-#define WPN_M3_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,17 @@ namespace sv {
 
 class CSawedoff : public CBasePlayerWeapon
 {
+    enum sawedoff_e
+    {
+        SAWEDOFF_IDLE,
+        SAWEDOFF_FIRE1,
+        SAWEDOFF_FIRE2,
+        SAWEDOFF_RELOAD,
+        SAWEDOFF_PUMP,
+        SAWEDOFF_START_RELOAD,
+        SAWEDOFF_DRAW,
+        SAWEDOFF_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +58,3 @@ private:
 };
 
 }
-
-#endif

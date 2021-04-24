@@ -1,8 +1,4 @@
-#ifndef WPN_SG550_H
-#define WPN_SG550_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #include "weapons/WeaponTemplate.hpp"
 
@@ -94,5 +90,3 @@ private:
 };
 
 }
-
-#endif

@@ -1,8 +1,4 @@
-#ifndef WPN_STG44_H
-#define WPN_STG44_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 //Stg44
 #define STG44_MAX_SPEED			221
@@ -18,6 +14,15 @@ namespace sv {
 
 class CStg44 : public CBasePlayerWeapon
 {
+	enum stg44_e
+    {
+        STG44_IDLE1,
+        STG44_RELOAD,
+        STG44_DRAW,
+        STG44_SHOOT1,
+        STG44_SHOOT2,
+        STG44_SHOOT3
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -50,5 +55,3 @@ private:
 };
 
 }
-
-#endif

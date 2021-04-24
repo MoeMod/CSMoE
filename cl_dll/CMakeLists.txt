@@ -314,7 +314,7 @@ include_directories (
 	)
 
 if(XASH_STATIC_GAMELIB)
-	add_library (${CLIENT_LIBRARY} STATIC ${CLDLL_SOURCES})
+	add_library (${CLIENT_LIBRARY} STATIC ${CLDLL_SOURCES} "events/eventdef.h")
 else()
 	add_library (${CLIENT_LIBRARY} SHARED ${CLDLL_SOURCES})
 endif()
@@ -384,4 +384,8 @@ endif()
 
 if(XASH_PCH)
 	target_precompile_headers(${CLIENT_LIBRARY} PRIVATE stdafx.h)
+endif()
+
+if(XASH_UNITY_BUILD)
+	set_target_properties(${CLIENT_LIBRARY} PROPERTIES UNITY_BUILD ON)
 endif()

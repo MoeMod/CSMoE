@@ -13,11 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef WPN_SVDEX_H
-#define WPN_SVDEX_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -33,6 +29,19 @@ namespace sv {
 
 class CSVDEX : public CBasePlayerWeapon
 {
+	enum svdex_e
+    {
+        SVDEX_IDLEA,
+        SVDEX_SHOOTA,
+        SVDEX_RELOAD,
+        SVDEX_DRAWA,
+        SVDEX_IDLEB,
+        SVDEX_SHOOTB_1,
+        SVDEX_SHOOTB_LAST,
+        SVDEX_DRAWB,
+        SVDEX_MOVE_GRENADE,
+        SVDEX_MOVE_CARBINE
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -69,5 +78,3 @@ private:
 };
 
 }
-
-#endif

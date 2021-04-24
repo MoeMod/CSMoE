@@ -1,8 +1,4 @@
-#ifndef WPN_AS50_H
-#define WPN_AS50_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -21,6 +17,15 @@ namespace sv {
 
 class CAS50 : public CBasePlayerWeapon
 {
+	enum as50_e
+    {
+        AS50_IDLE,
+        AS50_SHOOT1,
+        AS50_SHOOT2,
+        AS50_SHOOT3,
+        AS50_RELOAD,
+        AS50_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -56,5 +61,3 @@ private:
 };
 
 }
-
-#endif

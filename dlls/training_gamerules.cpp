@@ -61,8 +61,6 @@ void CHalfLifeTraining::HostageDied()
 	}
 }
 
-inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
-
 edict_t *CHalfLifeTraining::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
 {
 	CBaseEntity *pSpot = UTIL_FindEntityByClassname(NULL, "info_player_start");

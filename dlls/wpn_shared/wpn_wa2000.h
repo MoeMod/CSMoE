@@ -1,8 +1,4 @@
-#ifndef WPN_WA2000_H
-#define WPN_WA2000_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,14 @@ namespace sv {
 
 class CWA2000 : public CBasePlayerWeapon
 {
+	enum wa2000_e
+    {
+        WA2000_IDLE,
+        WA2000_SHOOT,
+        WA2000_SHOOT2,
+        WA2000_RELOAD,
+        WA2000_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -52,5 +56,3 @@ private:
 };
 
 }
-
-#endif

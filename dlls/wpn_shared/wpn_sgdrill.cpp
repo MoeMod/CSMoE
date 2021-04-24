@@ -30,15 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum sgdrill_e
-{
-	SGDRILL_IDLE,
-	SGDRILL_FIRE,
-	SGDRILL_SLASH,
-	SGDRILL_RELOAD,
-	SGDRILL_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_sgdrill, CSgdrill)
 
 void CSgdrill::Spawn(void)

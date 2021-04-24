@@ -1,8 +1,4 @@
-#ifndef WPN_M95_H
-#define WPN_M95_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,14 @@ namespace sv {
 
 class CM95 : public CBasePlayerWeapon
 {
+	enum m95_e
+    {
+        M95_IDLE,
+        M95_SHOOT1,
+        M95_SHOOT2,
+        M95_RELOAD,
+        M95_DRAW
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -54,5 +58,3 @@ private:
 };
 
 }
-
-#endif

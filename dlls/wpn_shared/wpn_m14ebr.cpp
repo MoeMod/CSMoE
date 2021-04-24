@@ -26,14 +26,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum m14ebr_e
-{
-	M14EBR_IDLE1,
-	M14EBR_RELOAD,
-	M14EBR_DRAW,
-	M14EBR_SHOOT1
-};
-
 LINK_ENTITY_TO_CLASS(weapon_m14ebr, CM14EBR)
 
 const int M14EBR_MAXCLIP = 20;

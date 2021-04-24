@@ -30,18 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum tec9_e
-{
-	TEC9_IDLE,
-	TEC9_RELOAD,
-	TEC9_DRAW,
-	TEC9_SHOOT1,
-	TEC9_SHOOT2,
-	TEC9_SHOOT3,
-	TEC9_INSPECT
-
-};
-
 LINK_ENTITY_TO_CLASS(csgo_tec9, CTec9)
 
 void CTec9::Spawn(void)

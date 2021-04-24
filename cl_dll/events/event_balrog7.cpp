@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::balrog7 {
 
 enum balrog7_e
 {

@@ -27,7 +27,7 @@
 */
 #include "events.h"
 
-namespace cl {
+namespace cl::event::mg3xmas {
 
 static const char *SOUND_NAME = "weapons/mg3-1.wav";
 

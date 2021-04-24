@@ -10,9 +10,6 @@ namespace sv {
 DLL_GLOBAL CBaseEntity *g_pLastSpawn;
 DLL_GLOBAL CBaseEntity *g_pLastCTSpawn, *g_pLastTerroristSpawn;
 
-// utils
-inline int FNullEnt(CBaseEntity *ent) { return (!ent) || FNullEnt(ent->edict()); }
-
 // main code
 
 BOOL IsSpawnPointValid(CBaseEntity *pPlayer, CBaseEntity *pSpot)

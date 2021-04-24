@@ -30,16 +30,6 @@ namespace cl {
 namespace sv {
 #endif
 
-enum fiveseven_e
-{
-	FIVESEVEN_IDLE,
-	FIVESEVEN_SHOOT1,
-	FIVESEVEN_SHOOT2,
-	FIVESEVEN_SHOOT_EMPTY,
-	FIVESEVEN_RELOAD,
-	FIVESEVEN_DRAW
-};
-
 LINK_ENTITY_TO_CLASS(weapon_fiveseven, CFiveSeven)
 
 void CFiveSeven::Spawn(void)

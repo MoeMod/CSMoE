@@ -13,11 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef WPN_M4A1RAZER_H
-#define WPN_M4A1RAZER_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -27,6 +23,20 @@ namespace sv {
 
 class CM4A1Razer : public CBasePlayerWeapon
 {
+    enum m4a1razer_e
+    {
+        ANIM_IDLEB = 0,
+        ANIM_SHOOTB1,
+        ANIM_SHOOTB2,
+        ANIM_RELOADB,
+        ANIM_DRAWB,
+        ANIM_CHANGEA,
+        ANIM_IDLE,
+        ANIM_SHOOT,
+        ANIM_RELOAD,
+        ANIM_DRAW,
+        ANIM_CHANGEB,
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -63,5 +73,3 @@ private:
 };
 
 }
-
-#endif

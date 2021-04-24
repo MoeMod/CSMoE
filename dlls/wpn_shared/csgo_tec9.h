@@ -1,8 +1,4 @@
-#ifndef WPN_ELITE_H
-#define WPN_ELITE_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -19,6 +15,17 @@ namespace sv {
 
 class CTec9 : public CBasePlayerWeapon
 {
+	enum tec9_e
+    {
+        TEC9_IDLE,
+        TEC9_RELOAD,
+        TEC9_DRAW,
+        TEC9_SHOOT1,
+        TEC9_SHOOT2,
+        TEC9_SHOOT3,
+        TEC9_INSPECT
+
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -51,5 +58,3 @@ public:
 };
 
 }
-
-#endif

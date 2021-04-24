@@ -50,22 +50,30 @@ template<class T> int REMEMBER_TO_ADD_IN_cbase_typelist_h_() { return 2; }
 }
 #endif
 
+#ifndef XASH_UNITY_BUILD
+#define DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName) template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>();
+#define LINK_ENTITY_TO_REMINDER(DLLClassName) extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>();
+#else
+#define DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName)
+#define LINK_ENTITY_TO_REMINDER(DLLClassName)
+#endif
+
 #ifdef CLIENT_DLL
 #include "cs_wpn/bte_weapons_register.h"
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \
-	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
+	DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName) \
+	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>);
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
+	LINK_ENTITY_TO_REMINDER(DLLClassName) \
 	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, WeaponEntityPlaceHolderFactory<DLLClassName>() }; }
 #else
 #define DECLEAR_ENTITY_CLASS(DLLClassName) \
 	class DLLClassName; \
-	template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
-	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>); 
+	DECLEAR_ENTITY_CLASS_REMINDER(DLLClassName); \
+	extern EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>);
 #define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
 	extern "C" EXPORT void mapClassName(entvars_t *pev) { (void)GetClassPtr<DLLClassName>(pev); } \
-	extern template int REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(); \
+	LINK_ENTITY_TO_REMINDER(DLLClassName) \
 	EntityMetaData GetEntityMetaDataFor(type_identity<DLLClassName>) { return { REMEMBER_TO_ADD_IN_cbase_typelist_h_<DLLClassName>(), #mapClassName, &mapClassName }; }
 #endif

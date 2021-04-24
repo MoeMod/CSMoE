@@ -31,7 +31,7 @@
 
 float g_flRoundTime = 0.0f;
 
-namespace cl {
+namespace cl::event::decal_reset {
 
 void EV_DecalReset(event_args_s *args)
 {

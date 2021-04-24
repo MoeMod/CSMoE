@@ -30,16 +30,19 @@
 #include "r_studioint.h"
 #include <string>
 
-enum event_effect
-{
-	EVENT_GATLINGRX,
-	EVENT_DUALSWORD,
-	EVENT_VOIDPISTOL
-};
 
 namespace cl {
+    extern engine_studio_api_t IEngineStudio;
+}
 
-extern engine_studio_api_t IEngineStudio;
+namespace cl::event::wpneffects {
+
+enum event_effect
+{
+    EVENT_GATLINGRX,
+    EVENT_DUALSWORD,
+    EVENT_VOIDPISTOL
+};
 
 static const char* SOUNDS_NAME[] =
 {

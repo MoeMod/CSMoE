@@ -1,8 +1,4 @@
-#ifndef WPN_P90_H
-#define WPN_P90_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -20,6 +16,16 @@ namespace sv {
 
 class CBizon : public CBasePlayerWeapon
 {
+	enum bizon_e
+    {
+        BIZON_IDLE1,
+        BIZON_RELOAD,
+        BIZON_DRAW,
+        BIZON_SHOOT1,
+        BIZON_SHOOT2,
+        BIZON_SHOOT3,
+        BIZON_INSPECT
+    };
 public:
 	void Spawn() override;
 	void Precache() override;
@@ -54,5 +60,3 @@ private:
 };
 
 }
-
-#endif

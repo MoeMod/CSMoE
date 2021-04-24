@@ -27,8 +27,8 @@
 */
 #include "events.h"
 
-namespace cl {
-
+namespace cl::event::anaconda {
+	
 enum deagle_e
 {
 	DEAGLE_IDLE1 = 0,
