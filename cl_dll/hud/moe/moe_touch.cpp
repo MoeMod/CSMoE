@@ -81,8 +81,6 @@ public:
 int CHudMoeTouch::Init(void)
 {
 	m_TouchSwitch = CVAR_CREATE("cl_moetouchswitch", "0", FCVAR_ARCHIVE);
-	if (!m_TouchSwitch->value)
-		return 0;
 	pimpl = new CHudMoeTouch::impl_t;
 
 	m_iFlags |= HUD_ACTIVE;
@@ -100,7 +98,7 @@ int CHudMoeTouch::VidInit(void)
 
 int CHudMoeTouch::Draw(float time)
 {
-	if (!pimpl->m_bActive)
+	if (!pimpl->m_bActive || !m_TouchSwitch->value)
 		return 0;
 	
 	const int x = ScreenWidth * pimpl->m_flX;
@@ -208,7 +206,7 @@ int CHudMoeTouch::Draw(float time)
 
 void CHudMoeTouch::Think(void)
 {
-	if (!pimpl->m_bActive)
+	if (!pimpl->m_bActive || !m_TouchSwitch->value)
 		return;
 
 	if (pimpl->m_fingerID >= 0)
@@ -286,7 +284,7 @@ void CHudMoeTouch::Think(void)
 		pimpl->m_flMinX = std::min(pimpl->m_flMinX, pimpl->m_flX);
 
 		// slow down dy
-		if (abs(pimpl->m_flDy) < 0.1)
+		if (std::abs(pimpl->m_flDy) < 0.1)
 			pimpl->m_flDy = 0.0f;
 		else if (pimpl->m_flDy > 0)
 			pimpl->m_flDy -= 0.05f;
@@ -341,6 +339,9 @@ void CHudMoeTouch::Shutdown(void)
 
 int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y, float dx, float dy)
 {
+    if(!m_TouchSwitch->value)
+        return 0;
+
 	if (pimpl->m_fingerID >= 0)
 	{
 		if (fingerID == pimpl->m_fingerID)

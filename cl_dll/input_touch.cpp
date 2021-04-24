@@ -10,7 +10,7 @@ extern "C" {
 int DLLEXPORT IN_ClientTouchEvent(int type_id, int fingerID, float x, float y, float dx, float dy)
 {
 	touchEventType type = static_cast<touchEventType>(type_id);
-	if (gHUD.m_MoeTouch.TouchEvent(type, fingerID, x, y, dx, dy))
+	if (gHUD.m_MoeTouch.TouchEvent(type, fingerID, x, y, dx, dy) && gHUD.m_MoeTouch.m_TouchSwitch->value)
 		return 1;
 
 	return 0;
