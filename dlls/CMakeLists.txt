@@ -187,6 +187,7 @@ set(HLDLL_SRCS
 	./cbase/cbase_entity_factory.cpp
 	./cbase/cbase_physint.cpp
 	./gamemode/zbb/zbb_zombie.cpp
+	./luash_mp/luamp.cpp
 	)
 
 set (HLWPN_SRCS
@@ -328,12 +329,21 @@ set(PUBLIC_SRCS
 	../public/MemPool.cpp
     )
 
+if(XASH_LUASH)
+	set(LUASH_SRCS
+		luash_sv/luamp.cpp
+	)
+else()
+	set(LUASH_SRCS )
+endif()
+
 set (SERVER_SOURCES
 	${HLWPN_SRCS}
 	${HLDLL_SRCS}
 	${PM_SRCS}
 	${GAME_SHARED_SRCS}
 	${PUBLIC_SRCS}
+	${LUASH_SRCS}
 )
 
 include_directories (
@@ -345,7 +355,8 @@ include_directories (
 	../public/tier1/
 	../dlls/
 	../game_shared/)
-
+	
+	
 if(XASH_STATIC_GAMELIB)
 	add_library (${SERVER_LIBRARY} STATIC ${SERVER_SOURCES})
 else()
@@ -392,6 +403,10 @@ add_definitions(
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
+
+if(XASH_LUASH)
+	target_link_libraries( ${SERVER_LIBRARY} luash)
+endif()
 
 if(ANDROID OR IOS)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES
