@@ -19,13 +19,14 @@ if(XASH_SDL)
 			target_include_directories(sdl2 INTERFACE ${SDL2_INCLUDE_DIR})
 			if(MSVC)
 				string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-				install(FILES ${SDL2_DLL} DESTINATION "." OPTIONAL)
+				install(FILES ${SDL2_LIBRARY} DESTINATION "." OPTIONAL)
 			endif()
 		else()
 			if(MSVC)
 				add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
 			endif()
 			set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
+			set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
 			add_subdirectory(SDL2 EXCLUDE_FROM_ALL)
 			target_link_libraries(sdl2 INTERFACE SDL2-static)
 		endif()
