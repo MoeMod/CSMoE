@@ -196,8 +196,8 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
-    - unzip SDL2.zip
+    - curl -s http://libsdl.org/release/SDL2-2.0.14.zip > SDL2-2.0.14.zip
+    - unzip SDL2-2.0.14.zip
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
@@ -229,8 +229,8 @@ jobs:
     before_script:
     - choco install nsis
     - rm C:/ProgramData/chocolatey/bin/cpack.exe
-    - curl http://libsdl.org/release/SDL2-devel-2.0.14-VC.zip -o SDL2.zip
-    - unzip SDL2.zip
+    - curl -s http://libsdl.org/release/SDL2-2.0.14.zip > SDL2-2.0.14.zip
+    - unzip SDL2-2.0.14.zip
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
