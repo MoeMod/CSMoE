@@ -17,7 +17,8 @@ GNU General Public License for more details.
 #include "imgui.h"
 #include "imgui_utils.h"
 
-#include <algorithm>
+#define JM_XORSTR_DISABLE_AVX_INTRINSICS
+#include <xorstr.hpp>
 
 static bool lcsm_enabled = true;
 
@@ -27,22 +28,22 @@ void ImGui_LCSM_OnGUI(void)
 		return;
 
 	ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
-	ImGui::OpenPopup("CSMoE LCSM Warning");
-	if (ImGui::BeginPopupModal("CSMoE LCSM Warning", &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)");
-		ImGui::Text("版权所有：BTE Team|CSMoE Team|百度csoldjb吧");
-		ImGui::Text("本游戏采用GPLv3协议完全开源免费，请勿使用本游戏进行任何形式的盈利");
-		ImGui::Text("声明：任何提供收费服务的商家均非官方，我们不对非官方版本提供任何技术担保。");
-		ImGui::Text("\t如出现任何意外（包括但不限于死机、蓝屏、锁机、ban号、中毒、变砖、爆炸等）后果自负。");
+	ImGui::OpenPopup(xorstr_("CSMoE LCSM Warning"));
+	if (ImGui::BeginPopupModal(xorstr_("CSMoE LCSM Warning"), &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text(xorstr_("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)"));
+		ImGui::Text(xorstr_("版权所有：BTE Team|CSMoE Team|百度csoldjb吧"));
+		ImGui::Text(xorstr_("本游戏采用GPLv3协议完全开源免费，请勿使用本游戏进行任何形式的盈利"));
+		ImGui::Text(xorstr_("声明：任何提供收费服务的商家均非官方，我们不对非官方版本提供任何技术担保。"));
+		ImGui::Text(xorstr_("\t如出现任何意外（包括但不限于死机、蓝屏、锁机、ban号、中毒、变砖、爆炸等）后果自负。"));
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
-		ImGui::TextColored(warning_color, "-----------------------------------特别声明---------------------------------");
-		ImGui::TextColored(warning_color, "1.EC精英社所谓“CS破茧”“CS神器时代”均为盗版游戏，我们强烈谴责盗版游戏的行为");
-		ImGui::TextColored(warning_color, "2.Wilson（真名：刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利");
-		ImGui::TextColored(warning_color, "淘宝店铺：洋葱数码商城|淘宝名：丨低调奢华有内涵|B站ID：进口柚柚子|贴吧ID:liu1340567980");
-		ImGui::TextColored(warning_color, "现在此揭露刘澄：一个完全的插件小白，靠网上东拼西凑代码，或直接搬运外网的更新加入游戏。");
-		ImGui::TextColored(warning_color, "但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！");
-		ImGui::TextColored(warning_color, "3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！");
-		ImGui::TextColored(warning_color, "----------------------------------------------------------------------------");
+		ImGui::TextColored(warning_color, xorstr_("-----------------------------------特别声明---------------------------------"));
+		ImGui::TextColored(warning_color, xorstr_("1.EC精英社所谓“CS破茧”“CS神器时代”均为盗版游戏，我们强烈谴责盗版游戏的行为"));
+		ImGui::TextColored(warning_color, xorstr_("2.Wilson（真名：刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利"));
+		ImGui::TextColored(warning_color, xorstr_("淘宝店铺：洋葱数码商城|淘宝名：丨低调奢华有内涵|B站ID：进口柚柚子|贴吧ID:liu1340567980"));
+		ImGui::TextColored(warning_color, xorstr_("现在此揭露刘澄：一个完全的插件小白，靠网上东拼西凑代码，或直接搬运外网的更新加入游戏。"));
+		ImGui::TextColored(warning_color, xorstr_("但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！"));
+		ImGui::TextColored(warning_color, xorstr_("3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！"));
+		ImGui::TextColored(warning_color, xorstr_("----------------------------------------------------------------------------"));
 		/*
 		ImGui::Text("请在下方输入：「我同意」代表您已经明确以上声明。");
 		ImGui::Text("否则请按下“退出”按钮退出游戏");
@@ -57,11 +58,11 @@ void ImGui_LCSM_OnGUI(void)
 		 */
 		ImGui::NewLine();
 		ImGui::SameLine(ImGui::GetWindowSize().x * 1 / 4 - 80);
-		if (ImGui::Button("进入游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		if (ImGui::Button(xorstr_("进入游戏"), ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			lcsm_enabled = false;
 		}
 		ImGui::SameLine(ImGui::GetWindowSize().x / 2 + 80);
-		if (ImGui::Button("退出游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		if (ImGui::Button(xorstr_("退出游戏"), ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			exit(0);
 		}
 		ImGui::EndPopup();

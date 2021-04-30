@@ -57,6 +57,8 @@ else()
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
 endif()
 
+option(XASH_SKIPCRTLIB "Use system crtlib" ON)
+
 set(XASH_ENGINE_SOURCES 
 	common/avikit.c
 	common/build.c
@@ -360,6 +362,10 @@ if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version t
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
 
+if(XASH_SKIPCRTLIB)
+	add_definitions(-DXASH_SKIPCRTLIB)
+endif()
+
 if(ANDROID)
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
 elseif(XASH_STATIC_GAMELIB)
@@ -423,6 +429,8 @@ endif()
 if(XASH_IMGUI)
 	target_link_libraries(${XASH_ENGINE} imgui imgui_ext)
 endif()
+
+target_link_libraries(${XASH_ENGINE} xorstr_3p)
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed

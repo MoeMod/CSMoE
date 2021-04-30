@@ -35,7 +35,7 @@ if(XASH_SDL)
 endif()
 
 find_package(LuaJit QUIET)
-if(LuaJit_FOUND AND FALSE) # we are using our own luajit and build from source.
+if(LuaJit_FOUND) # we are using our own luajit and build from source.
 	add_library(luajit_3p INTERFACE)
 	target_link_libraries(luajit_3p INTERFACE ${LUAJIT_LIBRARIES})
 	target_include_directories(luajit_3p INTERFACE ${LUAJIT_INCLUDE_DIR})
@@ -57,6 +57,15 @@ else()
 endif()
 add_library(nameof_3p INTERFACE)
 target_link_libraries(nameof_3p INTERFACE nameof::nameof)
+
+find_path(XORSTR_INCLUDE_DIRS "xorstr.hpp" HINTS "${CMAKE_SOURCE_DIR}/3rdparty/xorstr/include")
+if(XORSTR_INCLUDE_DIRS MATCHES "XORSTR_INCLUDE_DIRS-NOTFOUND")
+	message(FATAL_ERROR "<3rdparty/xorstr> NOT FOUND! => \n git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr")
+else()
+	message(STATUS "<3rdparty/xorstr> ${XORSTR_INCLUDE_DIRS}")
+	add_library(xorstr_3p INTERFACE)
+	target_include_directories(xorstr_3p INTERFACE ${XORSTR_INCLUDE_DIRS})
+endif()
 
 add_library(qrcode INTERFACE)
 target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
