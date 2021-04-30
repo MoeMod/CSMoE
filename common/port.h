@@ -138,6 +138,7 @@ GNU General Public License for more details.
 
 	#define strcasecmp _stricmp
 	#define strncasecmp _strnicmp
+	#define strcasestr StrStrIA
 	#define open _open
 	#define read _read
 
@@ -163,6 +164,10 @@ GNU General Public License for more details.
 	#define CLIENTDLL "client"ARCH_SUFFIX"." OS_LIB_EXT
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
 	#include <limits.h>
+
+	#include <io.h>
+	#include <shlwapi.h>
+	#pragma comment(lib,"shlwapi.lib")
 
 #ifdef WINAPI_FAMILY
 #if (!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP))
