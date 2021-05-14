@@ -205,7 +205,7 @@ inline int Q_strlen(const char* str)
 {
 	if (!str)
 		return 0;
-	return strlen(str);
+	return (int)(strlen(str));
 }
 #endif
 #define copystring( s ) _copystring( host.mempool, s, __FILE__, __LINE__ )

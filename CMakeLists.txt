@@ -18,6 +18,7 @@ endif()
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(XASH_LIBDL true)
 
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
@@ -67,6 +68,11 @@ elseif(MSVC)
 
 else()
 	add_compile_options( -Wall -Wextra -Wno-unused-parameter -Wl,--no-undefined )
+endif()
+
+option(XASH_SIMD "Vector SIMD support - Warning ABI broken" OFF)
+if(XASH_SIMD)
+	add_definitions(-DXASH_SIMD=1)
 endif()
 
 # Important, as HLSDK and engine shares some symbol names!

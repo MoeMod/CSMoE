@@ -30,38 +30,45 @@ const matrix3x4 matrix3x4_identity =
 
 ========================================================================
 */
-void Matrix3x4_VectorTransform( cmatrix3x4 in, const float v[3], float out[3] )
+void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3];
-	out[1] = v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3];
-	out[2] = v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3],
+		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3],
+		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3]
+	);
 }
 
-void Matrix3x4_VectorITransform( cmatrix3x4 in, const float v[3], float out[3] )
+void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-	vec3_t	dir;
+	vec3_t dir;
+	vec3_t in3;
+	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
+	VectorSubtract(v, in3, dir);
 
-	dir[0] = v[0] - in[0][3];
-	dir[1] = v[1] - in[1][3];
-	dir[2] = v[2] - in[2][3];
-
-	out[0] = dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0];
-	out[1] = dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1];
-	out[2] = dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2];
+	VectorSet(out,
+		dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
+		dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
+		dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2],
+		);
 }
 
-void Matrix3x4_VectorRotate( cmatrix3x4 in, const float v[3], float out[3] )
+void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2];
-	out[1] = v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2];
-	out[2] = v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2],
+		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2],
+		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2]
+	);
 }
 
-void Matrix3x4_VectorIRotate( cmatrix3x4 in, const float v[3], float out[3] )
+void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0];
-	out[1] = v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1];
-	out[2] = v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0],
+		v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1],
+		v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2]
+	);
 }
 
 void Matrix3x4_ConcatTransforms( matrix3x4 out, cmatrix3x4 in1, cmatrix3x4 in2 )
@@ -87,11 +94,9 @@ void Matrix3x4_SetOrigin( matrix3x4 out, float x, float y, float z )
 	out[2][3] = z;
 }
 
-void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, float *out )
+void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out )
 {
-	out[0] = in[0][3];
-	out[1] = in[1][3];
-	out[2] = in[2][3];
+	VectorSet(out, in[0][3], in[1][3], in[2][3]);
 }
 
 void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec3_t origin )
@@ -107,7 +112,7 @@ void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec
 	out[0][2] = 2.0f * quaternion[0] * quaternion[2] + 2.0f * quaternion[3] * quaternion[1];
 	out[1][2] = 2.0f * quaternion[1] * quaternion[2] - 2.0f * quaternion[3] * quaternion[0];
 	out[2][2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
-
+	
 	out[0][3] = origin[0];
 	out[1][3] = origin[1];
 	out[2][3] = origin[2];
@@ -116,7 +121,7 @@ void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec
 void Matrix3x4_CreateFromEntity( matrix3x4 out, const vec3_t angles, const vec3_t origin, float scale )
 {
 	float	angle, sr, sp, sy, cr, cp, cy;
-
+	
 	if( angles[ROLL] )
 	{
 #ifdef XASH_VECTORIZE_SINCOS
@@ -206,15 +211,16 @@ void Matrix3x4_CreateFromEntity( matrix3x4 out, const vec3_t angles, const vec3_
 	}
 }
 
-void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t out, float *dist )
+void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
 	float	scale = sqrt( in[0][0] * in[0][0] + in[0][1] * in[0][1] + in[0][2] * in[0][2] );
 	float	iscale = 1.0f / scale;
-
-	out[0] = (normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale;
-	out[1] = (normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale;
-	out[2] = (normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale;
-	*dist = d * scale + ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
+	VectorSet(out,
+		(normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale,
+		(normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale,
+		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
+	);
+	*dist = d * scale + (out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
 }
 
 void Matrix3x4_Invert_Simple( matrix3x4 out, cmatrix3x4 in1 )
@@ -258,38 +264,45 @@ const matrix4x4 matrix4x4_identity =
 
 ========================================================================
 */
-void Matrix4x4_VectorTransform( cmatrix4x4 in, const float v[3], float out[3] )
+void Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3];
-	out[1] = v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3];
-	out[2] = v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2] + in[0][3],
+		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2] + in[1][3],
+		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2] + in[2][3]
+		);
 }
 
-void Matrix4x4_VectorITransform( cmatrix4x4 in, const float v[3], float out[3] )
+void Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-	vec3_t	dir;
+	vec3_t dir;
+	vec3_t in3;
+	VectorSet(in3, in[0][3], in[1][3], in[2][3]);
+	VectorSubtract(v, in3, dir);
 
-	dir[0] = v[0] - in[0][3];
-	dir[1] = v[1] - in[1][3];
-	dir[2] = v[2] - in[2][3];
-
-	out[0] = dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0];
-	out[1] = dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1];
-	out[2] = dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2];
+	VectorSet(out,
+		dir[0] * in[0][0] + dir[1] * in[1][0] + dir[2] * in[2][0],
+		dir[0] * in[0][1] + dir[1] * in[1][1] + dir[2] * in[2][1],
+		dir[0] * in[0][2] + dir[1] * in[1][2] + dir[2] * in[2][2],
+		);
 }
 
-void Matrix4x4_VectorRotate( cmatrix4x4 in, const float v[3], float out[3] )
+void Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2];
-	out[1] = v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2];
-	out[2] = v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[0][1] + v[2] * in[0][2],
+		v[0] * in[1][0] + v[1] * in[1][1] + v[2] * in[1][2],
+		v[0] * in[2][0] + v[1] * in[2][1] + v[2] * in[2][2]
+	);
 }
 
-void Matrix4x4_VectorIRotate( cmatrix4x4 in, const float v[3], float out[3] )
+void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out )
 {
-	out[0] = v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0];
-	out[1] = v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1];
-	out[2] = v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2];
+	VectorSet(out,
+		v[0] * in[0][0] + v[1] * in[1][0] + v[2] * in[2][0],
+		v[0] * in[0][1] + v[1] * in[1][1] + v[2] * in[2][1],
+		v[0] * in[0][2] + v[1] * in[1][2] + v[2] * in[2][2]
+	);
 }
 
 void Matrix4x4_ConcatTransforms( matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 )
@@ -451,48 +464,58 @@ void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_
 	}
 }
 
-void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t angles, vec3_t origin )
+void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin )
 {
 	float xyDist = sqrt( in[0][0] * in[0][0] + in[1][0] * in[1][0] );
 
 	// enough here to get angles?
 	if( xyDist > 0.001f )
 	{
-		angles[0] = RAD2DEG( atan2( -in[2][0], xyDist ));
-		angles[1] = RAD2DEG( atan2( in[1][0], in[0][0] ));
-		angles[2] = RAD2DEG( atan2( in[2][1], in[2][2] ));
+		VectorSet(angles,
+			RAD2DEG(atan2(-in[2][0], xyDist)),
+			RAD2DEG(atan2(in[1][0], in[0][0])),
+			RAD2DEG(atan2(in[2][1], in[2][2]))
+		);
 	}
 	else	// forward is mostly Z, gimbal lock
 	{
-		angles[0] = RAD2DEG( atan2( -in[2][0], xyDist ));
-		angles[1] = RAD2DEG( atan2( -in[0][1], in[1][1] ));
-		angles[2] = 0.0f;
+		VectorSet(angles,
+			RAD2DEG( atan2( -in[2][0], xyDist )),
+			RAD2DEG( atan2( -in[0][1], in[1][1] )),
+			0.0f
+		);
 	}
 
-	origin[0] = in[0][3];
-	origin[1] = in[1][3];
-	origin[2] = in[2][3];
+	VectorSet(origin,
+		in[0][3],
+		in[1][3],
+		in[2][3]
+	);
 }
 
-void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t out, float *dist )
+void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
 	float	scale = sqrt( in[0][0] * in[0][0] + in[0][1] * in[0][1] + in[0][2] * in[0][2] );
 	float	iscale = 1.0f / scale;
-
-	out[0] = (normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale;
-	out[1] = (normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale;
-	out[2] = (normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale;
+	
+	VectorSet(out,
+		(normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale,
+		(normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale,
+		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
+	);
 	*dist = d * scale + ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
 }
 
-void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t out, float *dist )
+void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist )
 {
 	float scale = sqrt( in[0][0] * in[0][0] + in[0][1] * in[0][1] + in[0][2] * in[0][2] );
 	float iscale = 1.0f / scale;
-
-	out[0] = (normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale;
-	out[1] = (normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale;
-	out[2] = (normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale;
+	
+	VectorSet(out,
+		(normal[0] * in[0][0] + normal[1] * in[0][1] + normal[2] * in[0][2]) * iscale,
+		(normal[0] * in[1][0] + normal[1] * in[1][1] + normal[2] * in[1][2]) * iscale,
+		(normal[0] * in[2][0] + normal[1] * in[2][1] + normal[2] * in[2][2]) * iscale
+	);
 	*dist = d * scale - ( out[0] * in[0][3] + out[1] * in[1][3] + out[2] * in[2][3] );
 }
 

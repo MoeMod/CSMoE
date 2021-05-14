@@ -35,6 +35,7 @@ typedef int (*pfnUserMsgHook)(const char *pszName, int iSize, void *pbuf);
 
 #include "../dlls/vector.h" // dlls/vector.h
 #define vec3_t Vector
+#define vec3_t_ref Vector &
 
 #include "../engine/cdll_int.h"
 #include "../dlls/cdll_dll.h"

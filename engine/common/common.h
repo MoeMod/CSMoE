@@ -275,8 +275,8 @@ typedef struct gameinfo_s
 	char		sp_entity[32];	// e.g. info_player_start
 	char		mp_entity[32];	// e.g. info_player_deathmatch
 
-	float		client_mins[MAX_MAP_HULLS][3];	// 4 hulls allowed
-	float		client_maxs[MAX_MAP_HULLS][3];	// 4 hulls allowed
+	vec3_t		client_mins[MAX_MAP_HULLS];	// 4 hulls allowed
+	vec3_t		client_maxs[MAX_MAP_HULLS];	// 4 hulls allowed
 
 	char		ambientsound[NUM_AMBIENTS][64];	// quake ambient sounds
 	int		soundclip_dist;			// custom distance to clip sound
@@ -976,8 +976,8 @@ int COM_ExpandFilename( const char *fileName, char *nameOutBuffer, int nameOutBu
 struct pmtrace_s *PM_TraceLine( float *start, float *end, int flags, int usehull, int ignore_pe );
 void SV_StartSound( edict_t *ent, int chan, const char *sample, float vol, float attn, int flags, int pitch );
 void SV_StartMusic( const char *curtrack, const char *looptrack, fs_offset_t position );
-void SV_CreateDecal( struct sizebuf_s *msg, const float *origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
-void SV_CreateStudioDecal( struct sizebuf_s *msg, const float *origin, const float *start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
+void SV_CreateDecal( struct sizebuf_s *msg, const vec3_t origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
+void SV_CreateStudioDecal( struct sizebuf_s *msg, const vec3_t origin, const vec3_t start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
 struct sizebuf_s *SV_GetReliableDatagram( void );
 qboolean SV_RestoreCustomDecal( struct decallist_s *entry, edict_t *pEdict, qboolean adjacent );
 int R_CreateDecalList( struct decallist_s *pList, qboolean changelevel );

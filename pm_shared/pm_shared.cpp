@@ -13,11 +13,6 @@
 *
 ****/
 
-#ifdef vec3_t
-#undef vec3_t
-#endif
-
-#include "basetypes.h"
 #include "pm_math.h"
 #include "const.h"
 #include "usercmd.h"
@@ -1414,7 +1409,6 @@ Handles both ground friction and water friction
 */
 void PM_Friction(void)
 {
-	float *vel;
 	float speed, newspeed, control;
 	float friction;
 	float drop;
@@ -1425,7 +1419,7 @@ void PM_Friction(void)
 		return;
 
 	// Get velocity
-	vel = pmove->velocity;
+	auto vel = pmove->velocity;
 
 	// Calculate speed
 	speed = sqrt(vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);

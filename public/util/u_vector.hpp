@@ -35,11 +35,11 @@ namespace cl {
 #endif
 namespace moe {
 
-template<class T, std::size_t N, class Seq>
+template<class T, std::size_t N, class Seq, std::size_t Align>
 struct VectorBase_Gen;
 
-template<class T, std::size_t N, std::size_t...I>
-struct VectorBase_Gen<T, N, std::index_sequence<I...>>
+template<class T, std::size_t N, std::size_t...I, std::size_t Align>
+struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 {
 	constexpr VectorBase_Gen() : m_data{}
 	{
@@ -54,7 +54,7 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>>
 		std::copy_n(arr, N, m_data.begin());
 	}
 
-	std::array<T, N> m_data;
+	alignas(Align) std::array<T, N> m_data;
 
 	T &operator[](std::size_t i)
 	{
@@ -84,24 +84,28 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>>
 	}
 };
 
-template<class T>
-struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
+template<class T, std::size_t Align> struct alignas(Align) VectorBase2_Data
 {
-	constexpr VectorBase_Gen() : x{}, y{}
+	T x;
+	T y;
+};
+
+template<class T, std::size_t Align>
+struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>, Align> : VectorBase2_Data<T, Align>
+{
+	constexpr VectorBase_Gen() : VectorBase2_Data<T, Align>{}
 	{
 	}
-	constexpr VectorBase_Gen(T x1, T y1) : x{x1}, y{y1}
+	constexpr VectorBase_Gen(T x1, T y1) : VectorBase2_Data<T, Align>{x1, y1}
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
 	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
 	{
-		x = *arr++;
-		y = *arr++;
+		this->x = *arr++;
+		this->y = *arr++;
 	}
-	T x;
-	T y;
 
 	T &operator[](std::size_t i)
 	{
@@ -131,42 +135,46 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>>
 	}
 };
 
-template<class T>
-struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
+template<class T, std::size_t Align> struct alignas(Align) VectorBase3_Data
 {
-	constexpr VectorBase_Gen() : x{}, y{}, z{}
+	T x;
+	T y;
+	T z;
+};
+
+template<class T, std::size_t Align>
+struct alignas(Align) VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>, Align> : VectorBase3_Data<T, Align>
+{
+	constexpr VectorBase_Gen() : VectorBase3_Data<T, Align>{}
 	{
 	}
-	constexpr VectorBase_Gen(T x1, T y1, T z1) : x{x1}, y{y1}, z{z1}
+	constexpr VectorBase_Gen(T x1, T y1, T z1) : VectorBase3_Data<T, Align>{ x1, y1, z1 }
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
 	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type* = nullptr)
 	{
-		x = *arr++;
-		y = *arr++;
-		z = *arr++;
+		this->x = *arr++;
+		this->y = *arr++;
+		this->z = *arr++;
 	}
-	T x;
-	T y;
-	T z;
-
+	
 	T &operator[](std::size_t i)
 	{
-		return (i == 0) ? x : ((i == 1) ? y : z);
+		return (i == 0) ? this->x : ((i == 1) ? this->y : this->z);
 	}
 	constexpr const T &operator[](std::size_t i) const
 	{
-		return (i == 0) ? x : ((i == 1) ? y : z);
+		return (i == 0) ? this->x : ((i == 1) ? this->y : this->z);
 	}
 	T *data()
 	{
-		return &x;
+		return &this->x;
 	}
 	const T *data() const
 	{
-		return &x;
+		return &this->x;
 	}
 	// make it template cast operator function for lower priority
 	template<class R, class = typename std::enable_if<std::is_same<T *, R *>::value || std::is_same<void *, R *>::value>::type>
@@ -182,15 +190,14 @@ struct VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>>
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
 	{
-		*arr++ = x;
-		*arr++ = y;
-		*arr++ = z;
+		*arr++ = this->x;
+		*arr++ = this->y;
+		*arr++ = this->z;
 	}
 	void CopyToArray(T *arr) const
 	{
 		return CopyToIter(arr);
 	}
-
 };
 
 template<class VecType, std::size_t...I>
@@ -221,28 +228,6 @@ constexpr VecType valdiv_impl(VecType vec, typename VecType::value_type val, std
 
 namespace moe_math_util {
 
-#if __cplusplus >= 201703L
-template<class Ret, class...Args> constexpr Ret sum_args(Args...args)
-{
-	return (... + args);
-}
-template<class...Args> constexpr bool and_args(Args...args)
-{
-	return (... && args);
-}
-#else
-template<class Ret, class...Args> constexpr Ret sum_args(Args...args)
-{
-	Ret result = {};
-	return void(std::initializer_list<Ret>{ (result += args)... }), result;
-}
-template<class...Args> constexpr bool and_args(Args...args)
-{
-	bool result = true;
-	return void(std::initializer_list<bool>{ (result = (result && args))... }), result;
-}
-#endif
-
 using std::hypot;
 using std::sqrt;
 using std::abs;
@@ -251,25 +236,11 @@ using std::fma;
 
 template<class T> inline T hypot(T x) { return abs(x); }
 template<class...Args> inline auto hypot(Args...args) -> typename std::common_type<Args...>::type {
-	return sqrt(sum_args<typename std::common_type<Args...>::type>((args * args)...));
+	return sqrt(... + (args * args));
 }
 
 template<class T> inline auto rsqrt(T x) -> decltype(1 / sqrt(x)) {
 	return 1 / sqrt(x);
-}
-
-inline float rsqrt(float x)
-{
-#ifdef __SSE__
-    return _mm_rsqrt_ps(_mm_set1_ps(x))[0];
-#else
-    float xhalf = 0.5f * x;
-    int i = *(int *)&x;
-    i = 0x5f3759df - (i>>1);
-    x = *(float *)&i;
-    x = x * (1.5f - xhalf * x * x);
-    return x;
-#endif
 }
 
 }
@@ -277,17 +248,17 @@ inline float rsqrt(float x)
 template<class VecType, std::size_t...I>
 constexpr bool equal_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return moe_math_util::and_args((v1.template get<I>() == v2.template get<I>())...);
+	return (... && (v1.template get<I>() == v2.template get<I>()));
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type DotProduct_impl(VecType v1, VecType v2, std::index_sequence<I...>)
 {
-	return moe_math_util::sum_args<typename VecType::value_type>((v1.template get<I>() * v2.template get<I>())...);
+	return (... + (v1.template get<I>() * v2.template get<I>()));
 }
 template<class VecType, std::size_t...I>
 constexpr typename VecType::value_type LengthSquared_impl(VecType vec, std::index_sequence<I...>)
 {
-	return moe_math_util::sum_args<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...);
+	return (... + (vec.template get<I>() * vec.template get<I>()));
 }
 template<class VecType, std::size_t...I>
 inline typename VecType::value_type Length_impl(VecType vec, std::index_sequence<I...>)
@@ -297,7 +268,7 @@ inline typename VecType::value_type Length_impl(VecType vec, std::index_sequence
 template<class VecType, std::size_t...I>
 inline typename VecType::value_type LengthReverse_impl(VecType vec, std::index_sequence<I...>)
 {
-	return moe_math_util::rsqrt( moe_math_util::sum_args<typename VecType::value_type>((vec.template get<I>() * vec.template get<I>())...) );
+	return moe_math_util::rsqrt((... + (vec.template get<I>() * vec.template get<I>())));
 }
 template<class VecType, std::size_t...I>
 inline VecType fma_impl(VecType x, typename VecType::value_type y, VecType z, std::index_sequence<I...>)
@@ -310,10 +281,10 @@ inline VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, st
 	return { moe_math_util::fma(x, y.template get<I>(), z.template get<I>())... };
 }
 
-template<class T, std::size_t N>
-struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
+template<class T, std::size_t N, std::size_t Align = alignof(float)>
+struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>, Align>
 {
-	using Base = VectorBase_Gen<T, N, std::make_index_sequence<N>>;
+	using Base = VectorBase_Gen<T, N, std::make_index_sequence<N>, Align>;
 	using Base::Base;
 
 	using value_type = T;
@@ -476,42 +447,42 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 	}
 };
 
-template<class T> constexpr VectorBase<T, 3> CrossProduct(VectorBase<T, 3> a, VectorBase<T, 3> b)
+template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProduct(VectorBase<T, 3, Align> a, VectorBase<T, 3, Align> b)
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
 
-template<class T, std::size_t N> T AngleBetweenVectors(VectorBase<T, N> a, VectorBase<T, N> b)
+template<class T, std::size_t N, std::size_t Align> T AngleBetweenVectors(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b)
 {
 	return moe_math_util::acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
 }
 
-template<class T, std::size_t N> constexpr T VectorNormalize(VectorBase<T, N> &in)
+template<class T, std::size_t N, std::size_t Align> constexpr T VectorNormalize(VectorBase<T, N, Align> &in)
 {
 	return in.NormalizeInPlace();
 }
 
-template<class T, std::size_t N> constexpr bool VectorCompare(VectorBase<T, N> a,  VectorBase<T, N> b)
+template<class T, std::size_t N, std::size_t Align> constexpr bool VectorCompare(VectorBase<T, N, Align> a,  VectorBase<T, N, Align> b)
 {
 	return a == b;
 }
 
-template<class T, std::size_t N> constexpr VectorBase<T, N> &VectorCopy(VectorBase<T, N> in,  VectorBase<T, N> &out)
+template<class T, std::size_t N, std::size_t Align> constexpr VectorBase<T, N, Align> &VectorCopy(VectorBase<T, N, Align> in,  VectorBase<T, N, Align> &out)
 {
 	return out = in;
 }
 
-template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(VectorBase<T, N> a, T scale, VectorBase<T, N> b, VectorBase<T, N> &out)
+template<class T, std::size_t N, std::size_t Align> inline VectorBase<T, N, Align> &VectorMA(VectorBase<T, N, Align> a, T scale, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	return out = fma(a, scale, b);
 }
 
-template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(T scale, VectorBase<T, N> a, VectorBase<T, N> b, VectorBase<T, N> &out)
+template<class T, std::size_t N, std::size_t Align> inline VectorBase<T, N, Align> &VectorMA(T scale, VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	return out = fma(scale, a, b);
 }
 	
-template<class T> void AngleVectors(VectorBase<T, 3> angles, VectorBase<T, 3> &forward, VectorBase<T, 3>& right, VectorBase<T, 3>& up)
+template<class T, std::size_t Align> void AngleVectors(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
 {
 	auto sp = sin(DEG2RAD(angles[PITCH]));
 	auto sy = sin(DEG2RAD(angles[YAW]));
@@ -524,7 +495,7 @@ template<class T> void AngleVectors(VectorBase<T, 3> angles, VectorBase<T, 3> &f
 	up = { (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp) };
 }
 
-template<class T> void VectorAngles(VectorBase<T, 3> forward, VectorBase<T, 3>& angles)
+template<class T, std::size_t Align> void VectorAngles(VectorBase<T, 3, Align> forward, VectorBase<T, 3, Align>& angles)
 {
 	if (forward.x == 0 && forward.y == 0)
 	{
@@ -552,11 +523,11 @@ template<class T> void VectorAngles(VectorBase<T, 3> forward, VectorBase<T, 3>& 
 
 namespace std {
 #ifndef CLIENT_DLL
-template<class T, std::size_t N> class tuple_size<::sv::moe::VectorBase<T, N>> : public std::integral_constant<std::size_t, N> {};
-template<class T, std::size_t N, std::size_t I> class tuple_element<I, ::sv::moe::VectorBase<T, N>> { public: using type = T; };
+template<class T, std::size_t N, std::size_t Align> class tuple_size<::sv::moe::VectorBase<T, N, Align>> : public std::integral_constant<std::size_t, N> {};
+template<class T, std::size_t N, std::size_t I, std::size_t Align> class tuple_element<I, ::sv::moe::VectorBase<T, N, Align>> { public: using type = T; };
 #else
-template<class T, std::size_t N> class tuple_size<::cl::moe::VectorBase<T, N>> : public std::integral_constant<std::size_t, N> {};
-template<class T, std::size_t N, std::size_t I> class tuple_element<I, ::cl::moe::VectorBase<T, N>> { public: using type = T; };
+template<class T, std::size_t N, std::size_t Align> class tuple_size<::cl::moe::VectorBase<T, N, Align>> : public std::integral_constant<std::size_t, N> {};
+template<class T, std::size_t N, std::size_t I, std::size_t Align> class tuple_element<I, ::cl::moe::VectorBase<T, N, Align>> { public: using type = T; };
 #endif
 }
 

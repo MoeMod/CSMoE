@@ -59,13 +59,13 @@ namespace cl {
 			return PushInteger(L, id);
 		}
 		namespace detail {
-			template<class T, std::size_t N, std::size_t...I>
-			inline void PushVectorImpl(lua_State* L, const moe::VectorBase<T, N>& x, std::index_sequence<I...>)
+			template<class T, std::size_t N, std::size_t...I, std::size_t Align>
+			inline void PushVectorImpl(lua_State* L, const moe::VectorBase<T, N, Align>& x, std::index_sequence<I...>)
 			{
 				(lua_newtable(L), ..., (lua_pushinteger(L, I + 1), Push(L, x[I]), lua_settable(L, -3)));
 			}
 		}
-		template<class T, std::size_t N> void PushVector(lua_State* L, const moe::VectorBase<T, N>& x)
+		template<class T, std::size_t N, std::size_t Align> void PushVector(lua_State* L, const moe::VectorBase<T, N, Align>& x)
 		{
 			detail::PushVectorImpl(L, x, std::make_index_sequence<N>());
 		}

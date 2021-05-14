@@ -611,10 +611,10 @@ void SV_InitEdict( edict_t *pEdict );
 const char *SV_ClassName( const edict_t *e );
 void SV_SetModel( edict_t *ent, const char *name );
 void SV_CopyTraceToGlobal( trace_t *trace );
-void SV_SetMinMaxSize( edict_t *e, const float *min, const float *max );
+void SV_SetMinMaxSize( edict_t *e, const vec3_t min, const vec3_t max );
 edict_t* SV_FindEntityByString( edict_t *pStartEdict, const char *pszField, const char *pszValue );
-void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
+void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin,
+	const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 void SV_PlaybackReliableEvent( sizebuf_t *msg, word eventindex, float delay, event_args_t *args );
 void SV_BaselineForEntity( edict_t *pEdict );
 void SV_WriteEntityPatch( const char *filename );
@@ -639,8 +639,8 @@ void SV_CreateStaticEntity( struct sizebuf_s *msg, sv_static_entity_t *ent );
 edict_t* pfnPEntityOfEntIndex( int iEntIndex );
 int pfnIndexOfEdict( const edict_t *pEdict );
 void SV_UpdateBaseVelocity( edict_t *ent );
-byte *pfnSetFatPVS( const float *org );
-byte *pfnSetFatPAS( const float *org );
+byte *pfnSetFatPVS( const vec3_t org );
+byte *pfnSetFatPAS( const vec3_t org );
 int pfnPrecacheModel( const char *s );
 int pfnNumberOfEntities( void );
 int pfnDropToFloor( edict_t* e );

@@ -23,7 +23,7 @@ PM_RecursiveSurfCheck
 
 ==================
 */
-msurface_t *PM_RecursiveSurfCheck( model_t *model, mnode_t *node, vec3_t p1, vec3_t p2 )
+msurface_t *PM_RecursiveSurfCheck( model_t *model, mnode_t *node, const vec3_t p1, const vec3_t p2 )
 {
 	float		t1, t2, frac;
 	int		side, ds, dt;
@@ -74,8 +74,11 @@ msurface_t *PM_RecursiveSurfCheck( model_t *model, mnode_t *node, vec3_t p1, vec
 
 	for( i = 0; i < node->numsurfaces; i++, surf++ )
 	{
-		ds = (int)((float)DotProduct( mid, surf->texinfo->vecs[0] ) + surf->texinfo->vecs[0][3] );
-		dt = (int)((float)DotProduct( mid, surf->texinfo->vecs[1] ) + surf->texinfo->vecs[1][3] );
+		vec3_t tv0, tv1;
+		VectorSet( tv0, surf->texinfo->vecs[0][0], surf->texinfo->vecs[0][1], surf->texinfo->vecs[0][2]);
+		VectorSet( tv0, surf->texinfo->vecs[1][0], surf->texinfo->vecs[1][1], surf->texinfo->vecs[1][2]);
+		ds = (int)((float)DotProduct( mid, tv0 ) + surf->texinfo->vecs[0][3] );
+		dt = (int)((float)DotProduct( mid, tv1 ) + surf->texinfo->vecs[1][3] );
 
 		if( ds >= surf->texturemins[0] && dt >= surf->texturemins[1] )
 		{

@@ -18,6 +18,12 @@ constexpr float anglemod( float a )
 #ifdef M_PI
 #undef M_PI
 #endif
+#ifdef RAD2DEG
+#undef RAD2DEG
+#endif
+#ifdef DEG2RAD
+#undef DEG2RAD
+#endif
 constexpr auto M_PI = 3.14159265358979323846;	// matches value in gcc v2 math.h
 constexpr float RAD2DEG(float x) { return (x) * static_cast<float>(180.f / M_PI); }
 constexpr float DEG2RAD(float x) { return (x) * static_cast<float>(M_PI / 180.f); }

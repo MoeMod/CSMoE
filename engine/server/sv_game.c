@@ -87,7 +87,7 @@ void SV_SysError( const char *error_string )
 	Log_Printf ("FATAL ERROR (shutting down): %s\n", error_string);
 }
 
-void SV_SetMinMaxSize( edict_t *e, const float *min, const float *max )
+void SV_SetMinMaxSize( edict_t *e, const vec3_t min, const vec3_t max )
 {
 	int	i;
 
@@ -225,16 +225,16 @@ Check visibility through client camera, portal camera, etc
 qboolean SV_CheckClientVisiblity( sv_client_t *cl, const byte *mask )
 {
 	int	i, leafnum, clientnum;
-	float	*viewOrg = NULL;
+	vec3_t viewOrg;
 
 	if( !mask ) return true; // full visibility
 
 	clientnum = cl - svs.clients;
-	viewOrg = viewPoint[clientnum];
+	VectorCopy(viewPoint[clientnum], viewOrg);
 
 	// Invasion issues: wrong camera position received in ENGINE_SET_PVS
 	if( cl->pViewEntity && !VectorCompare( viewOrg, cl->pViewEntity->v.origin ))
-		viewOrg = cl->pViewEntity->v.origin;
+		VectorCopy(cl->pViewEntity->v.origin, viewOrg);
 
 	// -1 is because pvs rows are 1 based, not 0 based like leafs
 	leafnum = Mod_PointLeafnum( viewOrg ) - 1;
@@ -426,7 +426,7 @@ SV_CreateDecal
 NOTE: static decals only accepted when game is loading
 =======================
 */
-void SV_CreateDecal( sizebuf_t *msg, const float *origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale )
+void SV_CreateDecal( sizebuf_t *msg, const vec3_t origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale )
 {
 	if( msg == &sv.signon && sv.state != ss_loading )
 		return;
@@ -453,7 +453,7 @@ SV_CreateStudioDecal
 NOTE: static decals only accepted when game is loading
 =======================
 */
-void SV_CreateStudioDecal( sizebuf_t *msg, const float *origin, const float *start, int decalIndex, int entityIndex, int modelIndex, int flags, modelstate_t *state )
+void SV_CreateStudioDecal( sizebuf_t *msg, const vec3_t origin, const vec3_t start, int decalIndex, int entityIndex, int modelIndex, int flags, modelstate_t *state )
 {
 	if( msg == &sv.signon && sv.state != ss_loading )
 		return;
@@ -461,9 +461,6 @@ void SV_CreateStudioDecal( sizebuf_t *msg, const float *origin, const float *sta
 	// bad model or bad entity (e.g. changelevel)
 	if( !entityIndex || !modelIndex )
 		return;
-
-	ASSERT( origin );
-	ASSERT( start );
 
 	// this can happen if serialized map contains 4096 static decals...
 	if(( BF_GetNumBytesWritten( msg ) + 30 ) >= BF_GetMaxBytes( msg ))
@@ -1072,15 +1069,15 @@ void SV_BaselineForEntity( edict_t *pEdict )
 	int		usehull, player;
 	int		modelindex;
 	entity_state_t	baseline;
-	float		*mins, *maxs;
+	vec3_t mins, maxs;
 	sv_client_t	*cl;
 
 	if( pEdict->v.flags & FL_CLIENT && ( cl = SV_ClientFromEdict( pEdict, false )))
 	{
 		usehull = ( pEdict->v.flags & FL_DUCKING ) ? true : false;
 		modelindex = cl->modelindex ? cl->modelindex : pEdict->v.modelindex;
-		mins = svgame.player_mins[usehull]; 
-		maxs = svgame.player_maxs[usehull]; 
+		VectorCopy(svgame.player_mins[usehull], mins);
+		VectorCopy(svgame.player_maxs[usehull], maxs);
 		player = true;
 	}
 	else
@@ -1092,8 +1089,8 @@ void SV_BaselineForEntity( edict_t *pEdict )
 			return; // invisible
 
 		modelindex = pEdict->v.modelindex;
-		mins = pEdict->v.mins; 
-		maxs = pEdict->v.maxs; 
+		VectorCopy(pEdict->v.mins, mins);
+		VectorCopy(pEdict->v.maxs, maxs);
 		player = false;
 	}
 
@@ -1218,14 +1215,14 @@ pfnSetSize
 
 =================
 */
-void GAME_EXPORT pfnSetSize( edict_t *e, const float *rgflMin, const float *rgflMax )
+void GAME_EXPORT pfnSetSize( edict_t *e, const vec3_t rgflMin, const vec3_t rgflMax )
 {
 	if( !SV_IsValidEdict( e ))
 	{
 		MsgDev( D_WARN, "SV_SetSize: invalid entity %s\n", SV_ClassName( e ));
 		return;
 	}
-
+	
 	SV_SetMinMaxSize( e, rgflMin, rgflMax );
 }
 
@@ -1290,7 +1287,7 @@ pfnVecToYaw
 
 =================
 */
-float GAME_EXPORT pfnVecToYaw( const float *rgflVector )
+float GAME_EXPORT pfnVecToYaw( const vec3_t rgflVector )
 {
 	if( !rgflVector ) return 0.0f;
 	return SV_VecToYaw( rgflVector );
@@ -1302,7 +1299,7 @@ pfnMoveToOrigin
 
 =================
 */
-void GAME_EXPORT pfnMoveToOrigin( edict_t *ent, const float *pflGoal, float dist, int iMoveType )
+void GAME_EXPORT pfnMoveToOrigin( edict_t *ent, const vec3_t pflGoal, float dist, int iMoveType )
 {
 	if( !SV_IsValidEdict( ent ))
 	{
@@ -1315,7 +1312,7 @@ void GAME_EXPORT pfnMoveToOrigin( edict_t *ent, const float *pflGoal, float dist
 		MsgDev( D_WARN, "SV_MoveToOrigin: invalid goal pos\n" );
 		return;
 	}
-
+	
 	SV_MoveToOrigin( ent, pflGoal, dist, iMoveType );
 }
 
@@ -1332,7 +1329,7 @@ void GAME_EXPORT pfnChangeYaw( edict_t* ent )
 		MsgDev( D_WARN, "SV_ChangeYaw: invalid entity %s\n", SV_ClassName( ent ));
 		return;
 	}
-
+	
 	ent->v.angles[YAW] = SV_AngleMod( ent->v.ideal_yaw, ent->v.angles[YAW], ent->v.yaw_speed );
 }
 
@@ -1349,7 +1346,7 @@ void GAME_EXPORT pfnChangePitch( edict_t* ent )
 		MsgDev( D_WARN, "SV_ChangePitch: invalid entity %s\n", SV_ClassName( ent ));
 		return;
 	}
-
+	
 	ent->v.angles[PITCH] = SV_AngleMod( ent->v.idealpitch, ent->v.angles[PITCH], ent->v.pitch_speed );	
 }
 
@@ -1671,7 +1668,7 @@ pfnMakeVectors
 
 ==============
 */
-void GAME_EXPORT pfnMakeVectors( const float *rgflVector )
+void GAME_EXPORT pfnMakeVectors( const vec3_t rgflVector )
 {
 	AngleVectors( rgflVector, svgame.globals->v_forward, svgame.globals->v_right, svgame.globals->v_up );
 }
@@ -1792,7 +1789,7 @@ int GAME_EXPORT pfnDropToFloor( edict_t* e )
 		MsgDev( D_ERROR, "SV_DropToFloor: invalid entity %s\n", SV_ClassName( e ));
 		return 0;
 	}
-
+	
 	VectorCopy( e->v.origin, end );
 	end[2] -= 256;
 
@@ -1855,7 +1852,7 @@ pfnSetOrigin
 
 =================
 */
-void GAME_EXPORT pfnSetOrigin( edict_t *e, const float *rgflOrigin )
+void GAME_EXPORT pfnSetOrigin( edict_t *e, const vec3_t rgflOrigin )
 {
 	if( !SV_IsValidEdict( e ))
 	{
@@ -2051,7 +2048,7 @@ void SV_StartSoundEx( edict_t *ent, int chan, const char *sample, float vol, flo
 
 	BF_WriteWord( &sv.multicast, entityIndex );
 	BF_WriteVec3Coord( &sv.multicast, origin );
-
+	
 	SV_Send( msg_dest, origin, ent, excludeSource );
 }
 
@@ -2072,7 +2069,7 @@ pfnEmitAmbientSound
 
 =================
 */
-void GAME_EXPORT pfnEmitAmbientSound( edict_t *ent, float *pos, const char *sample, float vol, float attn, int flags, int pitch )
+void GAME_EXPORT pfnEmitAmbientSound( edict_t *ent, vec3_t_ref pos, const char *sample, float vol, float attn, int flags, int pitch )
 {
 	int 	number = 0, sound_idx;
 	int	msg_dest = MSG_PAS_R;
@@ -2165,12 +2162,12 @@ pfnTraceLine
 
 =================
 */
-static void GAME_EXPORT pfnTraceLine( const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr )
+static void GAME_EXPORT pfnTraceLine( const vec3_t v1, const vec3_t v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr )
 {
 	trace_t	trace;
 
 	if( !ptr ) return;
-
+	
 	trace = SV_Move( v1, vec3_origin, vec3_origin, v2, fNoMonsters, pentToSkip );
 	if( !SV_IsValidEdict( trace.ent )) trace.ent = svgame.edicts;
 	SV_ConvertTrace( ptr, &trace );
@@ -2204,9 +2201,9 @@ pfnTraceHull
 
 =================
 */
-static void GAME_EXPORT pfnTraceHull( const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr )
+static void GAME_EXPORT pfnTraceHull( const vec3_t v1, const vec3_t v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr )
 {
-	float	*mins, *maxs;
+	vec3_t mins, maxs;
 	trace_t	trace;
 
 	if( !ptr ) return;
@@ -2214,9 +2211,9 @@ static void GAME_EXPORT pfnTraceHull( const float *v1, const float *v2, int fNoM
 	if( hullNumber < 0 || hullNumber > 3 )
 		hullNumber = 0;
 
-	mins = sv.worldmodel->hulls[hullNumber].clip_mins;
-	maxs = sv.worldmodel->hulls[hullNumber].clip_maxs;
-
+	VectorCopy(sv.worldmodel->hulls[hullNumber].clip_mins, mins);
+	VectorCopy(sv.worldmodel->hulls[hullNumber].clip_maxs, maxs);
+	
 	trace = SV_Move( v1, mins, maxs, v2, fNoMonsters, pentToSkip );
 	SV_ConvertTrace( ptr, &trace );
 }
@@ -2227,7 +2224,7 @@ pfnTraceMonsterHull
 
 =============
 */
-static int GAME_EXPORT pfnTraceMonsterHull( edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr )
+static int GAME_EXPORT pfnTraceMonsterHull( edict_t *pEdict, const vec3_t v1, const vec3_t v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr )
 {
 	trace_t	trace;
 
@@ -2236,7 +2233,7 @@ static int GAME_EXPORT pfnTraceMonsterHull( edict_t *pEdict, const float *v1, co
 		MsgDev( D_WARN, "SV_TraceMonsterHull: invalid entity %s\n", SV_ClassName( pEdict ));
 		return 1;
 	}
-
+	
 	trace = SV_Move( v1, pEdict->v.mins, pEdict->v.maxs, v2, fNoMonsters, pentToSkip );
 	if( ptr ) SV_ConvertTrace( ptr, &trace );
 
@@ -2251,9 +2248,9 @@ pfnTraceModel
 
 =============
 */
-static void GAME_EXPORT pfnTraceModel( const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr )
+static void GAME_EXPORT pfnTraceModel( const vec3_t v1, const vec3_t v2, int hullNumber, edict_t *pent, TraceResult *ptr )
 {
-	float	*mins, *maxs;
+	vec3_t mins, maxs;
 	trace_t	trace;
 
 	if( !ptr ) return;
@@ -2267,8 +2264,8 @@ static void GAME_EXPORT pfnTraceModel( const float *v1, const float *v2, int hul
 	if( hullNumber < 0 || hullNumber > 3 )
 		hullNumber = 0;
 
-	mins = sv.worldmodel->hulls[hullNumber].clip_mins;
-	maxs = sv.worldmodel->hulls[hullNumber].clip_maxs;
+	VectorCopy(sv.worldmodel->hulls[hullNumber].clip_mins, mins);
+	VectorCopy(sv.worldmodel->hulls[hullNumber].clip_maxs, maxs);
 
 	if( pent->v.solid == SOLID_CUSTOM )
 	{
@@ -2282,7 +2279,7 @@ static void GAME_EXPORT pfnTraceModel( const float *v1, const float *v2, int hul
 		int oldsolid = pent->v.solid;
 		pent->v.movetype = MOVETYPE_PUSH;
 		pent->v.solid = SOLID_BSP;
-
+		
       		SV_ClipMoveToEntity( pent, v1, mins, maxs, v2, &trace );
 
 		pent->v.movetype = oldmovetype;
@@ -2303,14 +2300,14 @@ pfnTraceTexture
 returns texture basename
 =============
 */
-static const char *GAME_EXPORT pfnTraceTexture( edict_t *pTextureEntity, const float *v1, const float *v2 )
+static const char *GAME_EXPORT pfnTraceTexture( edict_t *pTextureEntity, const vec3_t v1, const vec3_t v2 )
 {
 	if( !SV_IsValidEdict( pTextureEntity ))
 	{
 		MsgDev( D_WARN, "TraceTexture: invalid entity %s\n", SV_ClassName( pTextureEntity ));
 		return NULL;
 	}
-
+	
 	return SV_TraceTexture( pTextureEntity, v1, v2 );
 }
 
@@ -2333,14 +2330,14 @@ pfnGetAimVector
 NOTE: speed is unused
 =============
 */
-void GAME_EXPORT pfnGetAimVector( edict_t* ent, float speed, float *rgflReturn )
+void GAME_EXPORT pfnGetAimVector( edict_t* ent, float speed, vec3_t_ref rgflReturn )
 {
 	edict_t		*check;
 	vec3_t		start, dir, end, bestdir;
 	float		dist, bestdist;
 	int		i, j;
 	trace_t		tr;
-
+	
 	VectorCopy( svgame.globals->v_forward, rgflReturn );	// assume failure if it returns early
 
 	if( !SV_IsValidEdict( ent ) || (ent->v.flags & FL_FAKECLIENT))
@@ -2368,8 +2365,9 @@ void GAME_EXPORT pfnGetAimVector( edict_t* ent, float speed, float *rgflReturn )
       		if( check->v.flags & FL_FAKECLIENT ) continue;
 		if( ent->v.team > 0 && ent->v.team == check->v.team ) continue;
 		if( check == ent ) continue;
-		for( j = 0; j < 3; j++ )
-			end[j] = check->v.origin[j] + 0.5f * (check->v.mins[j] + check->v.maxs[j]);
+		vec3_t center;
+		VectorAverage(check->v.mins, check->v.maxs, center);
+		VectorAdd(check->v.origin, center, end);
 		VectorSubtract( end, start, dir );
 		VectorNormalize( dir );
 		dist = DotProduct( dir, svgame.globals->v_forward );
@@ -2381,7 +2379,7 @@ void GAME_EXPORT pfnGetAimVector( edict_t* ent, float speed, float *rgflReturn )
 			VectorCopy( dir, bestdir );
 		}
 	}
-
+	
 	VectorCopy( bestdir, rgflReturn );
 }
 
@@ -2442,7 +2440,7 @@ pfnParticleEffect
 Make sure the event gets sent to all clients
 =================
 */
-void GAME_EXPORT pfnParticleEffect( const float *org, const float *dir, float color, float count )
+void GAME_EXPORT pfnParticleEffect( const vec3_t org, const float *dir, float color, float count )
 {
 	int	i, v;
 
@@ -2514,7 +2512,7 @@ pfnPointContents
 
 =============
 */
-static int GAME_EXPORT pfnPointContents( const float *rgflVector )
+static int GAME_EXPORT pfnPointContents( const vec3_t rgflVector )
 {
 	if( !rgflVector ) return CONTENTS_NONE;
 	return SV_PointContents( rgflVector );
@@ -2528,7 +2526,7 @@ pfnMessageBegin
 
 =============
 */
-void GAME_EXPORT pfnMessageBegin( int msg_dest, int msg_num, const float *pOrigin, edict_t *ed )
+void GAME_EXPORT pfnMessageBegin( int msg_dest, int msg_num, const vec3_t pOrigin, edict_t *ed )
 {
 	int	i, iSize;
 
@@ -2602,7 +2600,7 @@ pfnMessageEnd
 void GAME_EXPORT pfnMessageEnd( void )
 {
 	const char	*name = "Unknown";
-	float		*org = NULL;
+	vec3_t_ref org = NULL;
 
 	if( svgame.msg_name ) name = svgame.msg_name;
 	if( !svgame.msg_started ) Host_Error( "MessageEnd: called with no active message\n" );
@@ -2940,7 +2938,7 @@ pfnBuildSoundMsg
 Customizable sound message
 =============
 */
-void GAME_EXPORT pfnBuildSoundMsg( edict_t *pSource, int chan, const char *samp, float fvol, float attn, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *pSend )
+void GAME_EXPORT pfnBuildSoundMsg( edict_t *pSource, int chan, const char *samp, float fvol, float attn, int fFlags, int pitch, int msg_dest, int msg_type, const vec3_t pOrigin, edict_t *pSend )
 {
 	pfnMessageBegin( msg_dest, msg_type, pOrigin, pSend );
 	SV_BuildSoundMsg( pSource, chan, samp, fvol * 255, attn, fFlags, pitch, pOrigin );
@@ -3682,14 +3680,14 @@ pfnStaticDecal
 
 =============
 */
-void GAME_EXPORT pfnStaticDecal( const float *origin, int decalIndex, int entityIndex, int modelIndex )
+void GAME_EXPORT pfnStaticDecal( const vec3_t origin, int decalIndex, int entityIndex, int modelIndex )
 {
 	if( !origin )
 	{
 		MsgDev( D_ERROR, "SV_StaticDecal: NULL origin. Ignored\n" );
 		return;
 	}
-
+	
 	SV_CreateDecal( &sv.signon, origin, decalIndex, entityIndex, modelIndex, FDECAL_PERMANENT, 1.0f );
 }
 
@@ -3806,7 +3804,7 @@ pfnRunPlayerMove
 
 =============
 */
-void GAME_EXPORT pfnRunPlayerMove( edict_t *pClient, const float *v_angle, float fmove, float smove, float upmove, word buttons, byte impulse, byte msec )
+void GAME_EXPORT pfnRunPlayerMove( edict_t *pClient, const vec3_t v_angle, float fmove, float smove, float upmove, word buttons, byte impulse, byte msec )
 {
 	sv_client_t	*cl, *oldcl;
 	usercmd_t		cmd;
@@ -4015,8 +4013,8 @@ pfnPlaybackEvent
 
 =============
 */
-void GAME_EXPORT SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
+void GAME_EXPORT SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin,
+	const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	sv_client_t	*cl;
 	event_state_t	*es;
@@ -4045,7 +4043,7 @@ void GAME_EXPORT SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word 
 	}
 
 	Q_memset( &args, 0, sizeof( args ));
-
+	
 	if( origin && !VectorIsNull( origin ))
 	{
 		VectorCopy( origin, args.origin );
@@ -4227,7 +4225,7 @@ The client will interpolate the view position,
 so we can't use a single PVS point
 =============
 */
-byte *GAME_EXPORT pfnSetFatPVS( const float *org )
+byte *GAME_EXPORT pfnSetFatPVS( const vec3_t org )
 {
 	if( !sv.worldmodel->visdata || sv_novis->integer || !org || CL_DisableVisibility( ))
 		return Mod_DecompressVis( NULL );
@@ -4279,7 +4277,7 @@ The client will interpolate the hear position,
 so we can't use a single PHS point
 =============
 */
-byte *GAME_EXPORT pfnSetFatPAS( const float *org )
+byte *GAME_EXPORT pfnSetFatPAS( const vec3_t org )
 {
 	if( !sv.worldmodel->visdata || sv_novis->integer || !org || CL_DisableVisibility( ))
 		return Mod_DecompressVis( NULL );
@@ -4305,9 +4303,9 @@ byte *GAME_EXPORT pfnSetFatPAS( const float *org )
 		if( svs.currentPlayer->edict->v.flags & FL_DUCKING )
 		{
 			VectorSubtract( svgame.pmove->player_mins[0], svgame.pmove->player_mins[1], offset );
-			VectorSubtract( org, offset, viewPos );
+			VectorSubtract(  org, offset, viewPos );
 		}
-		else VectorCopy( org, viewPos );
+		else VectorCopy(  org, viewPos );
 
 		// build a new PHS frame
 		Q_memset( bitvector, 0, fatbytes );
@@ -4317,7 +4315,7 @@ byte *GAME_EXPORT pfnSetFatPAS( const float *org )
 	else
 	{
 		// merge PVS
-		SV_AddToFatPVS( org, DVIS_PHS, sv.worldmodel->nodes );
+		SV_AddToFatPVS(  org, DVIS_PHS, sv.worldmodel->nodes );
 	}
 
 	return bitvector;
@@ -4508,7 +4506,7 @@ pfnForceUnmodified
 
 =============
 */
-void GAME_EXPORT pfnForceUnmodified( FORCE_TYPE type, float *mins, float *maxs, const char *filename )
+void GAME_EXPORT pfnForceUnmodified( FORCE_TYPE type, vec3_t_ref mins, vec3_t_ref maxs, const char *filename )
 {
 	sv_consistency_t	*pData;
 	int		i;

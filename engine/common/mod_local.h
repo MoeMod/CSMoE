@@ -138,10 +138,10 @@ struct wadlist_s *Mod_WadList( void );
 void Mod_InitStudioAPI( void );
 void Mod_InitStudioHull( void );
 void Mod_ResetStudioAPI( void );
-qboolean Mod_GetStudioBounds( const char *name, vec3_t mins, vec3_t maxs );
-void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, float *org, float *ang );
-void Mod_GetBonePosition( const edict_t *e, int iBone, float *org, float *ang );
-hull_t *Mod_HullForStudio( model_t *m, float frame, int seq, vec3_t ang, vec3_t org, vec3_t size, byte *pcnt, byte *pbl, int *hitboxes, edict_t *ed );
+qboolean Mod_GetStudioBounds( const char *name, vec3_t_ref mins, vec3_t_ref maxs );
+void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, vec3_t_ref org, vec3_t_ref ang );
+void Mod_GetBonePosition( const edict_t *e, int iBone, vec3_t_ref org, vec3_t_ref ang );
+hull_t *Mod_HullForStudio( model_t *m, float frame, int seq, const vec3_t ang, const vec3_t org, const vec3_t size, byte *pcnt, byte *pbl, int *hitboxes, edict_t *ed );
 int Mod_HitgroupForStudioHull( int index );
 
 #endif//MOD_LOCAL_H

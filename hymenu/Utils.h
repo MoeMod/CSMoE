@@ -24,14 +24,12 @@ GNU General Public License for more details.
 #include "keydefs.h"
 //#include "FontManager.h"
 #include "BMPUtils.h"
+#include "angledef.h"
 
 #define FILE_GLOBAL	static
 #define DLL_GLOBAL
 
 #define MAX_INFO_STRING	256	// engine limit
-
-#define RAD2DEG( x )	((float)(x) * (float)(180.f / M_PI))
-#define DEG2RAD( x )	((float)(x) * (float)(M_PI / 180.f))
 
 //
 // How did I ever live without ASSERT?

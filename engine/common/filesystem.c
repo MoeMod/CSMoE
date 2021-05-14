@@ -1322,14 +1322,9 @@ static qboolean FS_WriteGameInfo( const char *filepath, gameinfo_t *GameInfo )
 
 	for( i = 0; i < 4; i++ )
 	{
-		float	*min, *max;
-
 		if( i && ( VectorIsNull( GameInfo->client_mins[i] ) || VectorIsNull( GameInfo->client_maxs[i] )))
 			continue;
-
-		min = GameInfo->client_mins[i];
-		max = GameInfo->client_maxs[i];
-		FS_Printf( f, "hull%i\t\t( %g %g %g ) ( %g %g %g )\n", i, min[0], min[1], min[2], max[0], max[1], max[2] );
+		FS_Printf( f, "hull%i\t\t( %g %g %g ) ( %g %g %g )\n", i, VectorUnpack(GameInfo->client_mins[i]), VectorUnpack(GameInfo->client_maxs[i]));
 	}
 
 	if( GameInfo->max_edicts > 0 )
@@ -1588,8 +1583,12 @@ void FS_ParseGenericGameInfo( gameinfo_t *GameInfo, const char *buf, const qbool
 				}
 				else
 				{
-					FS_ParseVector( &pfile, GameInfo->client_mins[hullNum], 3 );
-					FS_ParseVector( &pfile, GameInfo->client_maxs[hullNum], 3 );
+					vec_t mins[3];
+					vec_t maxs[3];
+					FS_ParseVector( &pfile, mins, 3 );
+					FS_ParseVector( &pfile, maxs, 3 );
+					VectorSet(GameInfo->client_mins[hullNum], mins[0], mins[1], mins[2]);
+					VectorSet(GameInfo->client_maxs[hullNum], maxs[0], maxs[1], maxs[2]);
 				}
 			}
 			else if( !Q_strnicmp( token, "ambient", 7 ))

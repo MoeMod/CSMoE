@@ -199,8 +199,8 @@ typedef struct playermove_s
 	int		(*RandomLong)( int lLow, int lHigh );
 	float		(*RandomFloat)( float flLow, float flHigh );
 	int		(*PM_GetModelType)( struct model_s *mod );
-	void		(*PM_GetModelBounds)( struct model_s *mod, float *mins, float *maxs );
-	void		*(*PM_HullForBsp)( physent_t *pe, float *offset );
+	void		(*PM_GetModelBounds)( struct model_s *mod, vec3_t_ref mins, vec3_t_ref maxs );
+	void		*(*PM_HullForBsp)( physent_t *pe, vec3_t_ref offset );
 	float		(*PM_TraceModel)( physent_t *pEnt, float *start, float *end, trace_t *trace );
 	int		(*COM_FileSize)( char *filename );
 	byte		*(*COM_LoadFile)( const char *path, int usehunk, int *pLength );

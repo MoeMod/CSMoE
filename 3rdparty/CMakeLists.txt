@@ -50,8 +50,6 @@ endif()
 
 if(XASH_VCPKG)
 	find_package(nameof CONFIG QUIET)
-endif()
-if(nameof_FOUND)
 else()
 	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/nameof EXCLUDE_FROM_ALL)
 endif()

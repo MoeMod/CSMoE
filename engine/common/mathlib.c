@@ -267,8 +267,8 @@ void SinFastVector3(float r1, float r2, float r3,
 	*s2 = s4f_z(sin_vector);
 }
 #endif
-
-float VectorNormalizeLength2( const vec3_t v, vec3_t out )
+#ifndef XASH_SIMD
+float VectorNormalizeLength2( const vec3_t v, vec3_t_ref out )
 {
 	float	length, ilength;
 
@@ -286,7 +286,7 @@ float VectorNormalizeLength2( const vec3_t v, vec3_t out )
 	return length;
 }
 
-void VectorVectors( const vec3_t forward, vec3_t right, vec3_t up )
+void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up )
 {
 	float	d;
 
@@ -299,14 +299,14 @@ void VectorVectors( const vec3_t forward, vec3_t right, vec3_t up )
 	VectorNormalize( right );
 	CrossProduct( right, forward, up );
 }
-
+#endif
 /*
 =================
 AngleVectors
 
 =================
 */
-void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up )
+void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up )
 {
 	static float	sr, sp, sy, cr, cp, cy;
 
@@ -322,23 +322,17 @@ void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right
 
 	if( forward )
 	{
-		forward[0] = cp * cy;
-		forward[1] = cp * sy;
-		forward[2] = -sp;
+		VectorSet(forward, cp * cy, cp * sy, -sp);
 	}
 
 	if( right )
 	{
-		right[0] = (-1.0f * sr * sp * cy + -1.0f * cr * -sy );
-		right[1] = (-1.0f * sr * sp * sy + -1.0f * cr * cy );
-		right[2] = (-1.0f * sr * cp);
+		VectorSet(right, (-1.0f * sr * sp * cy + -1.0f * cr * -sy), (-1.0f * sr * sp * sy + -1.0f * cr * cy), (-1.0f * sr * cp));
 	}
 
 	if( up )
 	{
-		up[0] = (cr * sp * cy + -sr * -sy );
-		up[1] = (cr * sp * sy + -sr * cy );
-		up[2] = (cr * cp);
+		VectorSet(up, (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp));
 	}
 }
 
@@ -348,16 +342,16 @@ VectorAngles
 
 =================
 */
-void VectorAngles( const float *forward, float *angles )
+void VectorAngles( vec3_t forward, vec3_t_ref angles )
 {
 	float	tmp, yaw, pitch;
 
-	if( !forward || !angles )
+	if( !angles )
 	{
 		if( angles ) VectorClear( angles );
 		return;
 	}
-
+	
 	if( forward[1] == 0 && forward[0] == 0 )
 	{
 		// fast case
@@ -370,12 +364,12 @@ void VectorAngles( const float *forward, float *angles )
 	{
 		yaw = ( atan2( forward[1], forward[0] ) * 180 / M_PI );
 		if( yaw < 0 ) yaw += 360;
-
+		
 		tmp = sqrt( forward[0] * forward[0] + forward[1] * forward[1] );
 		pitch = ( atan2( forward[2], tmp ) * 180 / M_PI );
 		if( pitch < 0 ) pitch += 360;
 	}
-
+	
 	VectorSet( angles, pitch, yaw, 0 ); 
 }
 
@@ -385,10 +379,10 @@ VectorsAngles
 
 =================
 */
-void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles )
+void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles )
 {
 	float	pitch, cpitch, yaw, roll;
-
+	
 	pitch = -asin( forward[2] );
 	cpitch = cos( pitch );
 
@@ -405,10 +399,8 @@ void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, v
 		yaw = RAD2DEG( atan2( right[0], -right[1] ));
 		roll = 180.0f;
 	}
-
-	angles[PITCH] = pitch;
-	angles[YAW] = yaw;
-	angles[ROLL] = roll;
+	
+	VectorSet(angles, pitch, yaw, roll);
 }
 
 /*
@@ -416,7 +408,7 @@ void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, v
 InterpolateAngles
 =================
 */
-void InterpolateAngles( vec3_t start, vec3_t end, vec3_t out, float frac )
+void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref out, float frac )
 {
 	float	d, ang1, ang2;
 	int i;
@@ -428,7 +420,7 @@ void InterpolateAngles( vec3_t start, vec3_t end, vec3_t out, float frac )
 
 		if( d > 180.0f ) d -= 360.0f;
 		else if( d < -180.0f ) d += 360.0f;
-
+		
 		out[i] = ang2 + d * frac;
 	}
 }
@@ -441,11 +433,11 @@ void InterpolateAngles( vec3_t start, vec3_t end, vec3_t out, float frac )
 ClearBounds
 =================
 */
-void ClearBounds( vec3_t mins, vec3_t maxs )
+void ClearBounds( vec3_t_ref mins, vec3_t_ref maxs )
 {
 	// make bogus range
-	mins[0] = mins[1] = mins[2] =  999999.0f;
-	maxs[0] = maxs[1] = maxs[2] = -999999.0f;
+	VectorSet(mins, 999999.0f, 999999.0f, 999999.0f);
+	VectorSet(maxs, -999999.0f, -999999.0f, -999999.0f);
 }
 
 /*
@@ -453,8 +445,12 @@ void ClearBounds( vec3_t mins, vec3_t maxs )
 AddPointToBounds
 =================
 */
-void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs )
+void AddPointToBounds( const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs )
 {
+#ifdef XASH_SIMD
+	VectorMins(v, mins, mins);
+	VectorMaxs(v, maxs, maxs);
+#else
 	float	val;
 	int	i;
 
@@ -464,6 +460,7 @@ void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs )
 		if( val < mins[i] ) mins[i] = val;
 		if( val > maxs[i] ) maxs[i] = val;
 	}
+#endif
 }
 
 /*
@@ -473,9 +470,14 @@ BoundsIntersect
 */
 qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 )
 {
-	if( mins1[0] > maxs2[0] || mins1[1] > maxs2[1] || mins1[2] > maxs2[2] )
+	// TODO : SIMD
+	vec3_t maxs2_sub_mins1;
+	vec3_t maxs1_sub_mins2;
+	VectorSubtract(maxs2, mins1, maxs2_sub_mins1);
+	VectorSubtract(maxs1, mins2, maxs1_sub_mins2);
+	if(maxs2_sub_mins1[0] < 0 || maxs2_sub_mins1[1] < 0 || maxs2_sub_mins1[2] < 0)
 		return false;
-	if( maxs1[0] < mins2[0] || maxs1[1] < mins2[1] || maxs1[2] < mins2[2] )
+	if(maxs1_sub_mins2[0] < 0 || maxs1_sub_mins2[1] < 0 || maxs1_sub_mins2[2] < 0)
 		return false;
 	return true;
 }
@@ -487,10 +489,22 @@ BoundsAndSphereIntersect
 */
 qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius )
 {
-	if( mins[0] > origin[0] + radius || mins[1] > origin[1] + radius || mins[2] > origin[2] + radius )
+	vec3_t radius3;
+	VectorSet(radius3, radius, radius, radius);
+	vec3_t temp;
+	
+	VectorAdd(origin, radius3, temp);
+	VectorSubtract(temp, mins, temp);
+	// temp = origin + radius - mins
+	if( temp[0] < 0 || temp[1] < 0 || temp[2] < 0 )
 		return false;
-	if( maxs[0] < origin[0] - radius || maxs[1] < origin[1] - radius || maxs[2] < origin[2] - radius )
+	
+	VectorSubtract(origin, radius3, temp);
+	VectorAdd(temp, maxs, temp);
+	// temp = origin - radius + maxs
+	if( temp[0] > 0 || temp[1] > 0 || temp[2] > 0 )
 		return false;
+	
 	return true;
 }
 
@@ -502,12 +516,20 @@ RadiusFromBounds
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
 {
 	vec3_t	corner;
+#ifdef XASH_SIMD
+	vec3_t mins_abs;
+	vec3_t maxs_abs;
+	VectorAbs(mins, mins_abs);
+	VectorAbs(maxs, maxs_abs);
+	VectorMaxs(mins_abs, maxs_abs, corner);
+#else
 	int	i;
 
 	for( i = 0; i < 3; i++ )
 	{
 		corner[i] = fabs( mins[i] ) > fabs( maxs[i] ) ? fabs( mins[i] ) : fabs( maxs[i] );
 	}
+#endif
 	return VectorLength( corner );
 }
 
@@ -516,7 +538,7 @@ float RadiusFromBounds( const vec3_t mins, const vec3_t maxs )
 RotatePointAroundVector
 ====================
 */
-void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees )
+void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees )
 {
 	float	t0, t1;
 	float	angle, c, s;
@@ -555,7 +577,7 @@ AngleQuaternion
 
 ====================
 */
-void AngleQuaternion( const vec3_t angles, vec4_t q )
+void AngleQuaternion( const vec3_t angles, vec4_t_ref q )
 {
 	float	sr, sp, sy, cr, cp, cy;
 
@@ -565,7 +587,7 @@ void AngleQuaternion( const vec3_t angles, vec4_t q )
 		&cy, &cp, &cr);
 #else
 	float	angle;
-
+	
 	angle = angles[2] * 0.5f;
 	SinCos( angle, &sy, &cy );
 	angle = angles[1] * 0.5f;
@@ -586,7 +608,7 @@ QuaternionSlerp
 
 ====================
 */
-void QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t qt )
+void QuaternionSlerp( const vec4_t p, vec4_t_ref q, float t, vec4_t_ref qt )
 {
 	float	omega, sclp, sclq;
 	float	cosom, sinom;
