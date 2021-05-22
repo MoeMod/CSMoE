@@ -177,31 +177,31 @@ int Q_strlen( const char *string );
 #include "crtlib_inline.h"
 #endif
 #else
-inline size_t Q_strncat(char* dst, const char* src, size_t size)
+static inline size_t Q_strncat(char* dst, const char* src, size_t size)
 {
 	if (!dst || !src || !size)
 		return 0;
 	return strlen(strncat(dst, src, size));
 }
-inline size_t Q_strncpy(char* dst, const char* src, size_t size)
+static inline size_t Q_strncpy(char* dst, const char* src, size_t size)
 {
 	if (!dst || !src || !size)
 		return 0;
 	return strlen(strncpy(dst, src, size));
 }
-inline size_t Q_strcat(char* dst, const char* src)
+static inline size_t Q_strcat(char* dst, const char* src)
 {
 	if (!dst || !src)
 		return 0;
 	return strlen(strcat(dst, src));
 }
-inline size_t Q_strcpy(char* dst, const char* src)
+static inline size_t Q_strcpy(char* dst, const char* src)
 {
 	if (!dst || !src)
 		return 0;
 	return strlen(strcpy(dst, src));
 }
-inline int Q_strlen(const char* str)
+static inline int Q_strlen(const char* str)
 {
 	if (!str)
 		return 0;
@@ -232,19 +232,19 @@ int Q_strcmp( const char *s1, const char *s2 );
 #endif
 
 #else // XASH_SKIPCRTLIB
-inline const char *Q_strchr( const char *s, char c )
+static inline const char *Q_strchr( const char *s, char c )
 {
 	if( !s )
 		return NULL;
 	return strchr( s, c );
 }
-inline const char *Q_strrchr( const char *s, char c )
+static inline const char *Q_strrchr( const char *s, char c )
 {
 	if( !s )
 		return NULL;
 	return strrchr( s, c );
 }
-inline int Q_stricmp( const char *s1, const char *s2 )
+static inline int Q_stricmp( const char *s1, const char *s2 )
 {
 	if( s1 == NULL )
 	{
@@ -258,7 +258,7 @@ inline int Q_stricmp( const char *s1, const char *s2 )
 	}
 	return strcasecmp( s1, s2 );
 }
-inline int Q_strnicmp( const char *s1, const char *s2, int n )
+static inline int Q_strnicmp( const char *s1, const char *s2, int n )
 {
 	if( s1 == NULL )
 	{
@@ -272,7 +272,7 @@ inline int Q_strnicmp( const char *s1, const char *s2, int n )
 	}
 	return strncasecmp( s1, s2, n );
 }
-inline int Q_strcmp( const char *s1, const char *s2 )
+static inline int Q_strcmp( const char *s1, const char *s2 )
 {
 	if( s1 == NULL )
 	{
@@ -286,7 +286,7 @@ inline int Q_strcmp( const char *s1, const char *s2 )
 	}
 	return strcmp( s1, s2 );
 }
-inline int Q_strncmp( const char *s1, const char *s2, int n )
+static inline int Q_strncmp( const char *s1, const char *s2, int n )
 {
 	if( s1 == NULL )
 	{
