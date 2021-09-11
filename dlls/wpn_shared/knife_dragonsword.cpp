@@ -122,7 +122,7 @@ namespace sv {
 
 	LINK_ENTITY_TO_CLASS(knife_dragonsword, CKnifeDragonsword)
 
-		void CKnifeDragonsword::SecondaryAttack(void)
+	void CKnifeDragonsword::SecondaryAttack(void)
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);

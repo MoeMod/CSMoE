@@ -54,8 +54,8 @@ struct DeathNoticeItem
 
 #define MAX_DEATHNOTICES	4
 static int DEATHNOTICE_DISPLAY_TIME = 6;
-static int KILLEFFECT_DISPLAY_TIME = 4;
-static int KILLICON_DISPLAY_TIME = 1;
+static int KILLEFFECT_DISPLAY_TIME = 3;
+static float KILLICON_DISPLAY_TIME = 0.75f;
 
 #define DEATHNOTICE_TOP		32
 
@@ -265,7 +265,8 @@ int CHudDeathNotice :: Draw( float flTime )
 		if (gHUD.m_flTime < m_killEffectTime)
 		{
 			int r = 255, g = 255, b = 255;
-			float alpha = (m_killEffectTime - gHUD.m_flTime) / KILLEFFECT_DISPLAY_TIME;
+			float alpha = 3.0f * (m_killEffectTime - gHUD.m_flTime) / KILLEFFECT_DISPLAY_TIME;
+			if (alpha > 1) alpha = 1.0f;
 			int numIndex = -1;
 
 			if (alpha > 0)
@@ -314,26 +315,28 @@ int CHudDeathNotice :: Draw( float flTime )
 					iconWidth = gHUD.GetSpriteRect(m_KM_Icon_Head).right - gHUD.GetSpriteRect(m_KM_Icon_Head).left;
 					iconHeight = gHUD.GetSpriteRect(m_KM_Icon_Head).bottom - gHUD.GetSpriteRect(m_KM_Icon_Head).top;
 
+					int fix = 0;
 					if (m_multiKills == 1)
-						numWidth += 10;
+						fix = 10;
 
-					y = (25.0 * 0.01 * ScreenHeight) - (iconHeight + textHeight) * 0.5;
-					x = (50.0 * 0.01 * ScreenWidth) - (numHeight + textWidth) * 0.5;
+					x = (50.0f * 0.01f * ScreenWidth) - (numHeight + textWidth) * 0.5f;
+					y = (20.0f * 0.01f * ScreenHeight);
 
 					SPR_Set(gHUD.GetSprite(numIndex), r, g, b);
-					SPR_DrawAdditive(0, x, y - (gHUD.GetSpriteRect(numIndex).bottom + gHUD.GetSpriteRect(m_KM_KillText).top - gHUD.GetSpriteRect(m_KM_KillText).bottom - gHUD.GetSpriteRect(numIndex).top) * 0.6, &gHUD.GetSpriteRect(numIndex));
+					SPR_DrawAdditive(0, x + fix, y - numHeight / 1.8, &gHUD.GetSpriteRect(numIndex));
 
 					SPR_Set(gHUD.GetSprite(m_KM_KillText), r, g, b);
-					SPR_DrawAdditive(0, x + numWidth, y, &gHUD.GetSpriteRect(m_KM_KillText));
+					SPR_DrawAdditive(0, x + numWidth + 3 * fix, y - textHeight / 2, &gHUD.GetSpriteRect(m_KM_KillText));
 
-					x = (50.0 * 0.01 * ScreenWidth) - (iconWidth) * 0.5;
-					y = y + textHeight;
+					x = (50.0f * 0.01f * ScreenWidth) - (iconWidth) * 0.5f;
+					y = y + iconHeight / 8;
 
 					m_killIconTime = min(m_killIconTime, gHUD.m_flTime + KILLICON_DISPLAY_TIME);
 
 					if (m_showIcon)
 					{
-						alpha = (m_killIconTime - gHUD.m_flTime) / KILLICON_DISPLAY_TIME;
+						alpha = 2.0f * (m_killIconTime - gHUD.m_flTime) / KILLICON_DISPLAY_TIME;
+						if (alpha > 1) alpha = 1.0f;
 
 						if (alpha > 0)
 						{

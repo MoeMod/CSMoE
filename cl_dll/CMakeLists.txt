@@ -26,7 +26,7 @@ project (client)
 
 set(CMAKE_CXX_STANDARD 17)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 elseif(MSVC)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
@@ -121,6 +121,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_k1a.cpp
 	../dlls/wpn_shared/wpn_kriss.cpp
 	../dlls/wpn_shared/wpn_m95.cpp
+	../dlls/wpn_shared/wpn_buffsg552ex.cpp
 	../dlls/wpn_shared/wpn_m1887.cpp
 	../dlls/wpn_shared/wpn_scarh.cpp
 	../dlls/wpn_shared/wpn_scarl.cpp
@@ -131,6 +132,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_xm8s.cpp
 	../dlls/wpn_shared/knife_skullaxe.cpp
 	../dlls/wpn_shared/knife_dragonsword.cpp
+	../dlls/wpn_shared/knife_dgaxe.cpp
 	../dlls/wpn_shared/wpn_gungnir.cpp
 	../dlls/wpn_shared/wpn_mg3.cpp
 	../dlls/wpn_shared/wpn_mp7a1c.cpp
@@ -165,6 +167,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_anaconda.cpp
 	../dlls/wpn_shared/wpn_mg36.cpp
 	../dlls/wpn_shared/wpn_gunkata.cpp
+	../dlls/wpn_shared/z4b_m37se.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp
@@ -211,6 +214,9 @@ set (HUD_SRCS
 	./hud/money.cpp
 	./hud/flashlight.cpp
 	./hud/death.cpp
+	./hud/showwin.cpp
+	./hud/hit_dgaxe.cpp
+	./hud/hit_indicator.cpp
 	./hud/saytext.cpp
 	./hud/spectator_gui.cpp
 	./hud/followicon.cpp

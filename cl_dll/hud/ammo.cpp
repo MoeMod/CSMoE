@@ -114,23 +114,33 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
-
-	if (!strncmp(pWeapon->szName, "knife_", 6))
+	if (strncmp(pWeapon->szName, "knife_dgaxe", 11))
 	{
-		char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
-		char szSpriteName[32]{};
-		int x, y, w, h;
-		if (buffer && sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{
-			sprintf(sz, "sprites/%s.spr", szSpriteName);
-			pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);
-			pWeapon->rcInactive = pWeapon->rcActive = { x, x + w, y, y + h };
 
-			gHR.iHistoryGap = max(gHR.iHistoryGap, pWeapon->rcActive.bottom - pWeapon->rcActive.top);
+			client_sprite_t* pList = SPR_GetList(sz, &i);
+
+			if (!pList)
+				return;
+
+			client_sprite_t* p;
+
+			char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
+			char szSpriteName[32]{};
+			int x, y, w, h;
+			if (buffer && sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+			{
+				sprintf(sz, "sprites/%s.spr", szSpriteName);
+				pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);
+				pWeapon->rcInactive = pWeapon->rcActive = { x, x + w, y, y + h };
+
+				gHR.iHistoryGap = max(gHR.iHistoryGap, pWeapon->rcActive.bottom - pWeapon->rcActive.top);
+			}
+
+			gEngfuncs.COM_FreeFile(buffer);
+			return;
 		}
-
-		gEngfuncs.COM_FreeFile(buffer);
-		return;
 	}
 
 	client_sprite_t *pList = SPR_GetList(sz, &i);
@@ -340,7 +350,7 @@ int CHudAmmo::Init(void)
 	m_pClCrosshairTranslucent = CVAR_CREATE( "cl_crosshair_translucent", "1", FCVAR_ARCHIVE );
 	m_pClCrosshairSize = CVAR_CREATE( "cl_crosshair_size", "auto", FCVAR_ARCHIVE );
 	m_pClDynamicCrosshair = CVAR_CREATE("cl_dynamiccrosshair", "1", FCVAR_ARCHIVE);
-	cl_crosshair_type = CVAR_CREATE("cl_crosshair_type", "0", FCVAR_ARCHIVE);
+	cl_crosshair_type = CVAR_CREATE("cl_crosshair_type", "1", FCVAR_ARCHIVE);
 
 	m_iFlags = HUD_DRAW | HUD_THINK; //!!!
 	m_R = 50;

@@ -108,6 +108,9 @@ extern int gmsgBotProgress;
 extern int gmsgBrass;
 extern int gmsgFog;
 extern int gmsgShowTimer;
+extern int gmsgShowWin;
+extern int gmsgDgaxe;
+extern int gmsgHitMsg;
 
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;

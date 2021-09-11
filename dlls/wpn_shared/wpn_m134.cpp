@@ -66,6 +66,8 @@ void CM134::Precache(void)
 	PRECACHE_SOUND("weapons/m134_spinup.wav");
 	PRECACHE_SOUND("weapons/m134_pinpull.wav");
 
+	PRECACHE_MODEL("sprites/muzzleflash6.spr");
+	PRECACHE_MODEL("sprites/muzzleflash7.spr");
 	PRECACHE_MODEL("models/shell762_m134.mdl");
 	PRECACHE_MODEL("models/shell762_m134_01.mdl");
 	m_usFireM134 = PRECACHE_EVENT(1, "events/m134.sc");

@@ -71,11 +71,16 @@ float CZombieClass_Default::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
-bool CZombieClass_Default::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
+bool CZombieClass_Default::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
 	// knife knockback
-	if(attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
-		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
+
+	if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+	{
+		//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
+		
+	}
 
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);

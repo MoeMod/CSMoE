@@ -55,6 +55,9 @@ void CDesperado::Precache(void)
 	PRECACHE_MODEL("models/p_desperado_m.mdl");
 	PRECACHE_MODEL("models/p_desperado_w.mdl");
 
+	PRECACHE_MODEL("sprites/muzzleflash59.spr");
+	PRECACHE_MODEL("sprites/muzzleflash60.spr");
+
 	PRECACHE_SOUND("weapons/dprd-1.wav");
 	PRECACHE_SOUND("weapons/dprd_reload_m.wav");
 

@@ -87,11 +87,37 @@ void EV_FireVoidpistol( event_args_t *args )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		
+		//cl_entity_t* ent = gEngfuncs.GetViewModel();
 		if((args->iparam2))
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTA, 2);
 		else
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1 ? VOIDPISTOL_SHOOTC : VOIDPISTOL_SHOOTB, 2);
+
+		/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash140.spr", false);
+		if (pModel)
+		{
+
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
+
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0;
+
+			pEnt->entity.curstate.scale = 0.04;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.baseline.origin = Vector(0, 0, 0);
+			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+			pEnt->entity.curstate.solid = SOLID_NOT;
+
+			pEnt->die = gHUD.m_flTime + 0.4;
+			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				cl_entity_t* ent = gEngfuncs.GetViewModel();
+				pEnt->entity.origin = ent->attachment[0];
+			};
+
+		}*/
 
 		if (!gHUD.cl_righthand->value)
 		{

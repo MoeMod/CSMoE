@@ -114,6 +114,16 @@ void CHEGrenade::PrimaryAttack(void)
 	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
 		return;
 
+#if EnableSecondaryAttack
+	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	{
+		m_flStartThrow = gpGlobals->time;
+		m_flReleaseThrow = invalid_time_point;
+		pev->iuser1 = 0;
+		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
+	}
+#else
 	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
 	{
 		m_flStartThrow = gpGlobals->time;
@@ -121,6 +131,7 @@ void CHEGrenade::PrimaryAttack(void)
 		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 	}
+#endif
 }
 
 void CHEGrenade::SetPlayerShieldAnim(void)
@@ -180,7 +191,20 @@ bool CHEGrenade::ShieldSecondaryFire(int up_anim, int down_anim)
 
 void CHEGrenade::SecondaryAttack(void)
 {
+#if EnableSecondaryAttack
+	if (m_flStartThrow == invalid_time_point && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
+	{
+		m_flStartThrow = gpGlobals->time;
+		m_flReleaseThrow = invalid_time_point;
+		pev->iuser1 = 1;	//low
+		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
+	}
+	
+#else
 	ShieldSecondaryFire(SHIELDGUN_DRAW, SHIELDGUN_DRAWN_IDLE);
+#endif
+
 }
 
 void CHEGrenade::WeaponIdle(void)
@@ -207,6 +231,44 @@ void CHEGrenade::WeaponIdle(void)
 		else
 			m_pPlayer->Radio("%!MRAD_FIREINHOLE", "#Fire_in_the_hole");
 #endif
+		
+#if EnableSecondaryAttack
+		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
+
+		if (angThrow.x < 0)
+			angThrow.x = -10 + angThrow.x * ((90 - 10) / 90.0);
+		else
+			angThrow.x = -10 + angThrow.x * ((90 + 10) / 90.0);
+
+		float flVel = (90 - angThrow.x) * 6;	
+
+		UTIL_MakeVectors(angThrow);
+		Vector vecSrc, vecThrow;
+		
+		if (pev->iuser1)
+		{
+			if (flVel > 233)
+				flVel = 233;
+
+			vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
+			vecSrc.z -= m_pPlayer->pev->view_ofs.z * 1.5;
+			vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
+
+			SendWeaponAnim(4, UseDecrement() != FALSE);
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4s;
+		}
+		else
+		{
+			if (flVel > 1100)
+				flVel = 1100;
+
+			vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
+			vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
+
+			SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4s;
+		}
+#else
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
 		if (angThrow.x < 0)
@@ -222,10 +284,13 @@ void CHEGrenade::WeaponIdle(void)
 		UTIL_MakeVectors(angThrow);
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
+
+#endif
 		auto time = 1.5s;
 		CGrenade::ShootTimed2(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion);
 
-		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
+		
 		SetPlayerShieldAnim();
 
 #ifndef CLIENT_DLL
@@ -233,11 +298,11 @@ void CHEGrenade::WeaponIdle(void)
 #endif
 		m_flStartThrow = invalid_time_point;
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
+		
 		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-			m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 		ResetPlayerShieldAnim();
 		return;

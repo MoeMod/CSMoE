@@ -234,19 +234,57 @@ fired during this frame, handle the event by it's tag ( e.g., muzzleflash, sound
 */
 void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct cl_entity_s *entity )
 {
+	int iAttachment = -1;
+	
 	switch( event->event )
 	{
 	case 5001:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[0], atoi( event->options) );
+		iAttachment = 0;
 		break;
 	case 5011:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[1], atoi( event->options) );
+		iAttachment = 1;
 		break;
 	case 5021:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[2], atoi( event->options) );
+		iAttachment = 2;
 		break;
 	case 5031:
-		gEngfuncs.pEfxAPI->R_MuzzleFlash( (float *)&entity->attachment[3], atoi( event->options) );
+		iAttachment = 3;
+		break;
+	case 5041:
+		iAttachment = 4;
+		break;
+	case 5051:
+		iAttachment = 5;
+		break;
+	case 5061:
+		iAttachment = 6;
+		break;
+	case 5071:
+		iAttachment = 7;
+		break;
+	case 5081:
+		iAttachment = 8;
+		break;
+	case 5091:
+		iAttachment = 9;
+		break;
+	case 5101:
+		iAttachment = 10;
+		break;
+	case 5111:
+		iAttachment = 11;
+		break;
+	case 5121:
+		iAttachment = 12;
+		break;
+	case 5131:
+		iAttachment = 13;
+		break;
+	case 5141:
+		iAttachment = 14;
+		break;
+	case 5151:
+		iAttachment = 15;
 		break;
 	case 5002:
 		gEngfuncs.pEfxAPI->R_SparkEffect( (float *)&entity->attachment[0], atoi( event->options), -100, 100 );
@@ -257,6 +295,9 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		break;
 	default:
 		break;
+	}
+	if (iAttachment > -1 && iAttachment < 16) {
+		gEngfuncs.pEfxAPI->R_MuzzleFlash(entity->index, iAttachment, event->options);
 	}
 }
 

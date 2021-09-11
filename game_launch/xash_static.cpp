@@ -1,4 +1,6 @@
+#ifdef XASH_SDL
 #include <SDL.h>
+#endif
 #include <vector>
 #include <algorithm>
 #include <iterator>

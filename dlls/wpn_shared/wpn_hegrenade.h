@@ -9,6 +9,7 @@ namespace sv {
 //hegrenade
 #define HEGRENADE_MAX_SPEED		250
 #define HEGRENADE_MAX_SPEED_SHIELD	180
+#define EnableSecondaryAttack	1
 
 class CHEGrenade : public CBasePlayerWeapon
 {

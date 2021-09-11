@@ -428,6 +428,7 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("sprites/ef_blackhole_start.spr");//shooting project
 	PRECACHE_MODEL("sprites/ef_blackhole_loop.spr");
 	PRECACHE_MODEL("sprites/ef_blackhole_end.spr");
+	PRECACHE_MODEL("sprites/muzzleflash140.spr");
 
 
 
@@ -872,7 +873,8 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 	
 
 #ifndef CLIENT_DLL	
-	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed, 1);
+	int iEffect = 1;
+	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed, &iEffect, m_pPlayer);
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecDir, missile, ENT(m_pPlayer->pev), &tr);
 	{

@@ -26,8 +26,13 @@
 *
 */
 #include "events.h"
+/*#include "studio.h"
+#include "r_studioint.h"
+#include <string>*/
 
 namespace cl::event::balrog7 {
+
+//extern engine_studio_api_t IEngineStudio;
 
 enum balrog7_e
 {
@@ -63,8 +68,37 @@ void EV_FireBalrog7(event_args_s *args)
 
 	if ( EV_IsLocal( args->entindex ) )
 	{
+		/*if (args->bparam2)
+		{
+			cl_entity_t* ent = gEngfuncs.GetViewModel();
+			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash20.spr", false);
+			if (pModel)
+			{
+				for (int i = 0; i < 3; i = i + 2)
+				{
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[i], pModel);
+
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
+
+					pEnt->entity.curstate.scale = 0.08;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+					pEnt->entity.curstate.solid = SOLID_NOT;
+
+					pEnt->die = gHUD.m_flTime + 0.02;
+					pEnt->flags |= FTENT_SPRANIMATE;
+				}
+			}
+		}*/
 		++g_iShotsFired;
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(BALROG7_SHOOT1, BALROG7_SHOOT3), 2);
+		if (args->bparam2)
+		{
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(BALROG7_SHOOT3, 2);
+		}
+		else
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(BALROG7_SHOOT1, BALROG7_SHOOT2), 2);
 		PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )

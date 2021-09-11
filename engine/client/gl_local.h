@@ -310,6 +310,7 @@ void R_UploadStretchRaw( int texture, int cols, int rows, int width, int height,
 void R_SetTextureParameters( void );
 gltexture_t *R_GetTexture( GLenum texnum );
 void GL_SetTextureType( GLenum texnum, GLenum type );
+int GL_LoadTexture_DDS(char* name, GLvoid* data, int type, int size, int w, int h);
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
 int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update );
 byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int out_h, qboolean isNormalMap );

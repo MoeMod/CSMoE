@@ -1482,6 +1482,81 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 GL_LoadTexture
 ================
 */
+int GL_LoadTexture_DDS(char *name, GLvoid* data, int type, int size, int w, int h)
+{
+	gltexture_t* tex;
+	rgbdata_t* pic;
+	uint		i, hash;
+	uint		picFlags = 0;
+
+	if (!name || !name[0] || !glw_state.initialized)
+		return 0;
+
+	if (Q_strlen(name) >= sizeof(r_textures[0].name))
+	{
+		MsgDev(D_ERROR, "GL_LoadTexture: too long name %s\n", name);
+		return 0;
+	}
+
+	// see if already loaded
+	hash = Com_HashKey(name, TEXTURES_HASH_SIZE);
+
+	for (tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash)
+	{
+		if (!Q_stricmp(tex->name, name))
+		{
+			// prolonge registration
+			tex->cacheframe = world.load_sequence;
+			return (tex - r_textures);
+		}
+	}
+
+	// find a free texture slot
+	if (r_numTextures == MAX_TEXTURES)
+		Host_Error("GL_LoadTexture: MAX_TEXTURES limit exceeds\n");
+
+	// find a free texture_t slot
+	for (i = 0, tex = r_textures; i < r_numTextures; i++, tex++)
+		if (!tex->name[0]) break;
+
+	if (i == r_numTextures)
+	{
+		if (r_numTextures == MAX_TEXTURES)
+			Host_Error("GL_LoadTexture: MAX_TEXTURES limit exceeds\n");
+		r_numTextures++;
+	}
+
+	pglBindTexture(GL_TEXTURE_2D, i);
+	switch (type)
+	{
+	case 1:
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT, w, h, 0, size, data);
+		break;
+	case 2:
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, w, h, 0, size, data);
+		break;
+	case 3:
+		pglCompressedTexImage2DARB(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, size, data);
+		break;
+	}
+
+	pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	pglBindTexture(GL_TEXTURE_2D, 0);
+
+	tex = &r_textures[i];
+	Q_strncpy(tex->name, name, sizeof(tex->name));
+
+	// add to hash table
+	hash = Com_HashKey(tex->name, TEXTURES_HASH_SIZE);
+	tex->nextHash = r_texturesHashTable[hash];
+	r_texturesHashTable[hash] = tex;
+
+	// NOTE: always return texnum as index in array or engine will stop work !!!
+	return i;
+}
+
+
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter )
 {
 	gltexture_t	*tex;

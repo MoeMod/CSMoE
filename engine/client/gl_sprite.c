@@ -49,20 +49,178 @@ void R_SpriteInit( void )
 
 /*
 ====================
-R_SpriteLoadFrame
+R_SpriteLoadFrame_DDS
 
 upload a single frame
 ====================
 */
-static byte *R_SpriteLoadFrame( model_t *mod, byte *pin, mspriteframe_t **ppframe, int num )
+static byte *R_SpriteLoadFrame_DDS( model_t *mod, byte *pin, mspriteframe_t **ppframe, int num )
 {
-	dspriteframe_t	pinframe;
+#define DDPF_ALPHAPIXELS    0x000001
+#define DDPF_ALPHA            0x000002
+#define DDPF_FOURCC            0x000004
+#define DDPF_RGB            0x000040
+#define DDPF_YUV            0x000200
+#define DDPF_LUMINANCE        0x020000
+
+#define D3DFMT_DXT1    (('D'<<0)|('X'<<8)|('T'<<16)|('1'<<24))
+#define D3DFMT_DXT3    (('D'<<0)|('X'<<8)|('T'<<16)|('3'<<24))
+#define D3DFMT_DXT5    (('D'<<0)|('X'<<8)|('T'<<16)|('5'<<24))
+
+#define SIZE_OF_DXT1(width, height)    ( max(1, ( (width + 3) >> 2 ) ) * max(1, ( (height + 3) >> 2 ) ) * 8 )
+#define SIZE_OF_DXT2(width, height)    ( max(1, ( (width + 3) >> 2 ) ) * max(1, ( (height + 3) >> 2 ) ) * 16 )
+
+
+#define DDSD_CAPS            0x000001
+#define DDSD_HEIGHT            0x000002
+#define DDSD_WIDTH            0x000004
+#define DDSD_PITCH            0x000008
+#define DDSD_PIXELFORMAT    0x001000
+#define DDSD_MIPMAPCOUNT    0x020000
+#define DDSD_LINEARSIZE        0x080000
+#define DDSD_DEPTH            0x800000
+
+	typedef struct
+	{
+		DWORD    dwSize;
+		DWORD    dwFlags;
+		DWORD    dwFourCC;
+		DWORD    dwRGBBitCount;
+		DWORD    dwRBitMask;
+		DWORD    dwGBitMask;
+		DWORD    dwBBitMask;
+		DWORD    dwABitMask;
+	} DDS_PIXELFORMAT;
+
+	typedef struct
+	{
+		DWORD            dwSize;
+		DWORD            dwFlags;
+		DWORD            dwHeight;
+		DWORD            dwWidth;
+		DWORD            dwPitchOrLinearSize;
+		DWORD            dwDepth;
+		DWORD            dwMipMapCount;
+		DWORD            dwReserved1[11];
+		DDS_PIXELFORMAT    ddspf;
+		DWORD            dwCaps;
+		DWORD            dwCaps2;
+		DWORD            dwCaps3;
+		DWORD            dwCaps4;
+		DWORD            dwReserved2;
+	} DDS_HEADER;
+
+	typedef struct
+	{
+		DWORD        dwMagic;
+		DDS_HEADER    Header;
+	} DDS_FILEHEADER;
+
+	DDS_FILEHEADER* header;
+	DWORD            compressFormat;
+	GLuint            texnum;
+	GLvoid* data;
+	GLsizei            imageSize;
+
+	header = (DDS_FILEHEADER*)pin;
+
+	if (header->dwMagic != 0x20534444) {
+		printf("bad dds file\n");
+		return 0;
+	}
+
+	if (header->Header.dwSize != 124) {
+		printf("bad header size\n");
+		return 0;
+	}
+
+	if (!(header->Header.dwFlags & DDSD_LINEARSIZE)) {
+		printf("bad file type\n");
+		return 0;
+	}
+
+	if (!(header->Header.ddspf.dwFlags & DDPF_FOURCC)) {
+		printf("bad pixel format\n");
+		return 0;
+	}
+
+	compressFormat = header->Header.ddspf.dwFourCC;
+
+	if (compressFormat != D3DFMT_DXT1 &&
+		compressFormat != D3DFMT_DXT3 &&
+		compressFormat != D3DFMT_DXT5) {
+		printf("bad compress format\n");
+		return 0;
+	}
+
+	int type = 0;
+	switch (compressFormat)
+	{
+	case D3DFMT_DXT1:
+		type = 1;
+		imageSize = SIZE_OF_DXT1(header->Header.dwWidth, header->Header.dwHeight);
+		break;
+	case D3DFMT_DXT3:
+		type = 2;
+		imageSize = SIZE_OF_DXT2(header->Header.dwWidth, header->Header.dwHeight);
+		break;
+	case D3DFMT_DXT5:
+		type = 3;
+		imageSize = SIZE_OF_DXT2(header->Header.dwWidth, header->Header.dwHeight);
+		break;
+	}
+
+
+	data = (GLvoid*)(header + 1);    // header data skipped
+
+	////////////////////////////
+
 	mspriteframe_t	*pspriteframe;
 	char		texname[128], sprname[128];
 	qboolean		load_external = false;
 	int		gl_texturenum = 0;
+	
+	// build unique frame name
+	if( mod->flags & 256 ) // it's a HUD sprite
+	{
+		Q_snprintf( texname, sizeof( texname ), "#HUD/%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10 );
+		gl_texturenum = GL_LoadTexture( texname, pin, imageSize, r_texFlags, NULL );
+	}
+	else
+	{	
+		if( !load_external )
+		{
+			Q_snprintf( texname, sizeof( texname ), "#%s_%s_%i%i.dds", mod->name, group_suffix, num / 10, num % 10 );
+			gl_texturenum = GL_LoadTexture_DDS(texname, data, type, imageSize, header->Header.dwWidth, header->Header.dwHeight);
+		}
+		else MsgDev( D_NOTE, "loading HQ: %s\n", texname );
+	}	
 
-	Q_memcpy( &pinframe, pin, sizeof(dspriteframe_t));
+	// setup frame description
+	pspriteframe = Mem_Alloc( mod->mempool, sizeof( mspriteframe_t ));
+	pspriteframe->width = header->Header.dwWidth;
+	pspriteframe->height = header->Header.dwHeight;
+	pspriteframe->up = 0.5 * header->Header.dwHeight;
+	pspriteframe->left = -0.5 * header->Header.dwWidth;
+	pspriteframe->down = -0.5 * header->Header.dwHeight;
+	pspriteframe->right = 0.5 * header->Header.dwWidth;
+	pspriteframe->gl_texturenum = gl_texturenum;
+	*ppframe = pspriteframe;
+
+	GL_SetTextureType( pspriteframe->gl_texturenum, TEX_SPRITE );
+
+	return ( pin + sizeof(DDS_FILEHEADER) + imageSize);
+}
+
+static byte* R_SpriteLoadFrame(model_t* mod, byte* pin, mspriteframe_t** ppframe, int num)
+{
+	dspriteframe_t	pinframe;
+	mspriteframe_t* pspriteframe;
+	char		texname[128], sprname[128];
+	qboolean		load_external = false;
+	int		gl_texturenum = 0;
+
+	Q_memcpy(&pinframe, pin, sizeof(dspriteframe_t));
 
 	LittleLongSW(pinframe.origin[0]);
 	LittleLongSW(pinframe.origin[1]);
@@ -70,38 +228,38 @@ static byte *R_SpriteLoadFrame( model_t *mod, byte *pin, mspriteframe_t **ppfram
 	LittleLongSW(pinframe.height);
 
 	// build unique frame name
-	if( mod->flags & 256 ) // it's a HUD sprite
+	if (mod->flags & 256) // it's a HUD sprite
 	{
-		Q_snprintf( texname, sizeof( texname ), "#HUD/%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10 );
-		gl_texturenum = GL_LoadTexture( texname, pin, pinframe.width * pinframe.height, r_texFlags, NULL );
+		Q_snprintf(texname, sizeof(texname), "#HUD/%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10);
+		gl_texturenum = GL_LoadTexture(texname, pin, pinframe.width * pinframe.height, r_texFlags, NULL);
 	}
 	else
 	{
 		// partially HD-textures support
-		if( Mod_AllowMaterials() && !Q_strcmp( group_suffix, "one" ))
+		if (Mod_AllowMaterials() && !Q_strcmp(group_suffix, "one"))
 		{
-			Q_strncpy( sprname, mod->name, sizeof( sprname ));
-			FS_StripExtension( sprname );
+			Q_strncpy(sprname, mod->name, sizeof(sprname));
+			FS_StripExtension(sprname);
 
-			Q_snprintf( texname, sizeof( texname ), "materials/%s/frame%i%i.tga", sprname, num / 10, num % 10 );
+			Q_snprintf(texname, sizeof(texname), "materials/%s/frame%i%i.tga", sprname, num / 10, num % 10);
 
-			if( FS_FileExists( texname, false ))
-				gl_texturenum = GL_LoadTexture( texname, NULL, 0, r_texFlags, NULL );
+			if (FS_FileExists(texname, false))
+				gl_texturenum = GL_LoadTexture(texname, NULL, 0, r_texFlags, NULL);
 
-			if( gl_texturenum )
+			if (gl_texturenum)
 				load_external = true; // sucessfully loaded
 		}
 
-		if( !load_external )
+		if (!load_external)
 		{
-			Q_snprintf( texname, sizeof( texname ), "#%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10 );
-			gl_texturenum = GL_LoadTexture( texname, pin, pinframe.width * pinframe.height, r_texFlags, NULL );
+			Q_snprintf(texname, sizeof(texname), "#%s_%s_%i%i.spr", mod->name, group_suffix, num / 10, num % 10);
+			gl_texturenum = GL_LoadTexture(texname, pin, pinframe.width * pinframe.height, r_texFlags, NULL);
 		}
-		else MsgDev( D_NOTE, "loading HQ: %s\n", texname );
-	}	
+		else MsgDev(D_NOTE, "loading HQ: %s\n", texname);
+	}
 
 	// setup frame description
-	pspriteframe = Mem_Alloc( mod->mempool, sizeof( mspriteframe_t ));
+	pspriteframe = Mem_Alloc(mod->mempool, sizeof(mspriteframe_t));
 	pspriteframe->width = pinframe.width;
 	pspriteframe->height = pinframe.height;
 	pspriteframe->up = pinframe.origin[1];
@@ -111,10 +269,11 @@ static byte *R_SpriteLoadFrame( model_t *mod, byte *pin, mspriteframe_t **ppfram
 	pspriteframe->gl_texturenum = gl_texturenum;
 	*ppframe = pspriteframe;
 
-	GL_SetTextureType( pspriteframe->gl_texturenum, TEX_SPRITE );
+	GL_SetTextureType(pspriteframe->gl_texturenum, TEX_SPRITE);
 
-	return ( pin + sizeof(dspriteframe_t) + pinframe.width * pinframe.height );
+	return (pin + sizeof(dspriteframe_t) + pinframe.width * pinframe.height);
 }
+
 
 /*
 ====================
@@ -171,10 +330,11 @@ load sprite model
 */
 void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags )
 {
-	dsprite_t		pin;
-	short		numi;
-	msprite_t		*psprite;
+	dsprite_t		pin;  //spr 头文件
+	short		numi;      //record colors
+	msprite_t		*psprite;   //记录当前帧的数据块
 	int		i, size;
+	BOOL is_dds_mode = false;
 
 	if( loaded ) *loaded = false;
 	Q_memcpy(&pin, buffer, sizeof(dsprite_t));
@@ -188,7 +348,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		return;
 	}
 
-	if( i != SPRITE_VERSION )
+	if( i != SPRITE_VERSION  && i != SPRITE_VERSION_DDS)
 	{
 		MsgDev( D_ERROR, "%s has wrong version number (%i should be %i)\n", mod->name, i, SPRITE_VERSION );
 		return;
@@ -196,7 +356,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 
 	mod->mempool = Mem_AllocPool( va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
-	psprite = Mem_Alloc( mod->mempool, size );
+	psprite = Mem_Alloc( mod->mempool, size );  
 	mod->cache.data = psprite;	// make link to extradata
 
 	psprite->type = LittleLong(pin.type);
@@ -210,7 +370,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 	mod->maxs[0] = mod->maxs[1] = LittleLong(pin.bounds[0]) / 2;
 	mod->mins[2] = -LittleLong(pin.bounds[1]) / 2;
 	mod->maxs[2] = LittleLong(pin.bounds[1]) / 2;
-	buffer += sizeof(dsprite_t);
+	buffer += sizeof(dsprite_t);   //头读取完毕
 	Q_memcpy(&numi, buffer, sizeof(short));
 	LittleShortSW(numi);
 
@@ -221,38 +381,44 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		psprite->numframes = 0;
 		return;
 	}
-
-	if( numi == 256 )
-	{	
-		rgbdata_t	*pal;
-
-		buffer += sizeof(short);
-
-		// install palette
-		switch( psprite->texFormat )
-		{
-		case SPR_ADDITIVE:
-			pal = FS_LoadImage( "#normal.pal", buffer, 768 );
-			break;
-		case SPR_INDEXALPHA:
-			pal = FS_LoadImage( "#decal.pal", buffer, 768 ); 
-			break;
-		case SPR_ALPHTEST:		
-			pal = FS_LoadImage( "#transparent.pal", buffer, 768 );
-			break;
-		case SPR_NORMAL:
-		default:
-			pal = FS_LoadImage( "#normal.pal", buffer, 768 );
-			break;
-		}
-
-		buffer += 768;
-		FS_FreeImage( pal ); // palette installed, no reason to keep this data
+	if (i == SPRITE_VERSION_DDS) {
+		is_dds_mode = true;
+		psprite->synctype = 233;					
+		psprite->facecull = SPR_CULL_NONE;
 	}
-	else 
-	{
-		MsgDev( D_ERROR, "%s has wrong number of palette colors %i (should be 256)\n", mod->name, numi );
-		return;
+	else {
+		if (numi == 256)
+		{
+			rgbdata_t* pal;
+
+			buffer += sizeof(short);
+
+			// install palette
+			switch (psprite->texFormat)
+			{
+			case SPR_ADDITIVE:
+				pal = FS_LoadImage("#normal.pal", buffer, 768);
+				break;
+			case SPR_INDEXALPHA:
+				pal = FS_LoadImage("#decal.pal", buffer, 768);
+				break;
+			case SPR_ALPHTEST:
+				pal = FS_LoadImage("#transparent.pal", buffer, 768);
+				break;
+			case SPR_NORMAL:
+			default:
+				pal = FS_LoadImage("#normal.pal", buffer, 768);
+				break;
+			}
+
+			buffer += 768; //读下一个数据块
+			FS_FreeImage(pal); // palette installed, no reason to keep this data
+		}
+		else
+		{
+			MsgDev(D_ERROR, "%s has wrong number of palette colors %i (should be 256)\n", mod->name, numi);
+			return;
+		}
 	}
 
 	if( psprite->numframes < 1 )
@@ -261,25 +427,31 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		return;
 	}
 
-	for( i = 0; i < psprite->numframes; i++ )
+	for( i = 0; i < psprite->numframes; i++ ) //依次读取每一帧的数据
 	{
-		frametype_t frametype = *buffer;
-		psprite->frames[i].type = LittleLong(frametype);
+		if (is_dds_mode) {
+			Q_strncpy(group_suffix, "one", sizeof(group_suffix));
+			buffer = R_SpriteLoadFrame_DDS(mod, buffer, &psprite->frames[i].frameptr, i);
+		}
+		else {
+			frametype_t frametype = *buffer;
+			psprite->frames[i].type = LittleLong(frametype);  //每一帧开头记录一个帧属性
 
-		switch( frametype )
-		{
-		case FRAME_SINGLE:
-			Q_strncpy( group_suffix, "one", sizeof( group_suffix ));
-			buffer = R_SpriteLoadFrame( mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i );
-			break;
-		case FRAME_GROUP:
-			Q_strncpy( group_suffix, "grp", sizeof( group_suffix ));
-			buffer = R_SpriteLoadGroup( mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i );
-			break;
-		case FRAME_ANGLED:
-			Q_strncpy( group_suffix, "ang", sizeof( group_suffix ));
-			buffer = R_SpriteLoadGroup( mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i );
-			break;
+			switch (frametype)
+			{
+			case FRAME_SINGLE:
+				Q_strncpy(group_suffix, "one", sizeof(group_suffix));
+				buffer = R_SpriteLoadFrame(mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i);
+				break;
+			case FRAME_GROUP:
+				Q_strncpy(group_suffix, "grp", sizeof(group_suffix));
+				buffer = R_SpriteLoadGroup(mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i);
+				break;
+			case FRAME_ANGLED:
+				Q_strncpy(group_suffix, "ang", sizeof(group_suffix));
+				buffer = R_SpriteLoadGroup(mod, buffer + sizeof(int), &psprite->frames[i].frameptr, i);
+				break;
+			}
 		}
 		if( !buffer ) break; // technically an error
 	}
@@ -941,7 +1113,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		{
 			if( parent->model->type == mod_studio && e->curstate.body > 0 )
 			{
-				int num = bound( 1, e->curstate.body, MAXSTUDIOATTACHMENTS );
+				int num = bound( 1, e->curstate.body, MAXSTUDIOATTACHMENTS );  //gr3
 				VectorCopy( parent->attachment[num-1], origin );
 			}
 			else VectorCopy( parent->origin, origin );
@@ -1069,12 +1241,22 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	if( psprite->facecull == SPR_CULL_NONE )
 		GL_Cull( GL_NONE );
 		
+	if (psprite->synctype == 233)
+	{
+		pglEnable(GL_TEXTURE_2D);
+		pglBindTexture(GL_TEXTURE_2D, frame->gl_texturenum);
+
+		pglEnable(GL_BLEND);
+		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		pglDepthMask(GL_FALSE);
+	}
+
 	if( oldframe == frame )
 	{
 		// draw the single non-lerped frame
-		pglColor4f( color[0], color[1], color[2], flAlpha );
-		GL_Bind( XASH_TEXTURE0, frame->gl_texturenum );
-		R_DrawSpriteQuad( frame, origin, v_right, v_up, scale );
+		pglColor4f(color[0], color[1], color[2], flAlpha);
+		if(psprite->synctype != 233) GL_Bind(XASH_TEXTURE0, frame->gl_texturenum);
+		R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);	
 	}
 	else
 	{
@@ -1082,18 +1264,17 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		lerp = bound( 0.0f, lerp, 1.0f );
 		ilerp = 1.0f - lerp;
 
-		if( ilerp != 0.0f )
+		if (ilerp != 0.0f)
 		{
-			pglColor4f( color[0], color[1], color[2], flAlpha * ilerp );
-			GL_Bind( XASH_TEXTURE0, oldframe->gl_texturenum );
-			R_DrawSpriteQuad( oldframe, origin, v_right, v_up, scale );
+			pglColor4f(color[0], color[1], color[2], flAlpha * ilerp);
+			if (psprite->synctype != 233)GL_Bind(XASH_TEXTURE0, oldframe->gl_texturenum);
+			R_DrawSpriteQuad(oldframe, origin, v_right, v_up, scale);
 		}
-
-		if( lerp != 0.0f )
+		if (lerp != 0.0f)
 		{
-			pglColor4f( color[0], color[1], color[2], flAlpha * lerp );
-			GL_Bind( XASH_TEXTURE0, frame->gl_texturenum );
-			R_DrawSpriteQuad( frame, origin, v_right, v_up, scale );
+			pglColor4f(color[0], color[1], color[2], flAlpha * lerp);
+			if (psprite->synctype != 233)GL_Bind(XASH_TEXTURE0, frame->gl_texturenum);
+			R_DrawSpriteQuad(frame, origin, v_right, v_up, scale);
 		}
 	}
 

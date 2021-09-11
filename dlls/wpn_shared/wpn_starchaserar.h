@@ -47,6 +47,9 @@ public:
 	void StarchaserarFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void RadiusDamage(Vector vecAiming, float flDamage);
 	const char *GetCSModelName() override { return "models/w_starchaserar.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "556Nato" , 200 }; }
+#endif
 	Vector Get_ShootPosition(CBaseEntity *pevAttacker, Vector vecSrc);
 	float GetDamage() const;
 	int m_iShell;

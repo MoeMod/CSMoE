@@ -767,12 +767,12 @@ void StudioCalcBoneAdj(float dadt, float *adj, const byte *pcontroller1, const b
 
 void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q)
 {
-	int j, k;
+	int k = 0;
 	vec4_t q1, q2;
 	vec3_t angle1, angle2;
 	mstudioanimvalue_t *panimvalue;
 
-	for (j = 0; j < 3; j++)
+	for (int j = 0; j < 3; j++)
 	{
 		if (panim->offset[j + 3] == 0)
 		{

@@ -112,6 +112,7 @@ struct Z4B_M4A1MW_WeaponData
 		void Precache() override
 		{
 			PRECACHE_MODEL("sprites/z4b/m4a1mw_laser.spr");
+			PRECACHE_MODEL("sprites/muzzleflash43.spr");
 			PRECACHE_SOUND("weapons/m4a1mw_hit.wav");
 			m_iSprExplo = PRECACHE_MODEL("sprites/z4b/m4a1mw_hit.spr");
 		}

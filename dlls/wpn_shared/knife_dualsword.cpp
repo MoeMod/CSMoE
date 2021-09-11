@@ -361,7 +361,7 @@ void CKnifeDualsword::PrimaryAttack(void)
 {
 	if (m_iuser3 == 1)
 	{
-		SendWeaponAnim(12);
+		SendWeaponAnim(12);	//switch to blue
 		m_weaponanim = 12;
 
 		m_iuser3 = 0;
@@ -372,7 +372,7 @@ void CKnifeDualsword::PrimaryAttack(void)
 	}
 	else if (m_iuser3 != 3 || m_sequence != 1)
 	{
-		DelayPrimaryAttack();
+		DelayPrimaryAttack();		//m_sequence = 5;
 	}
 	else
 	{

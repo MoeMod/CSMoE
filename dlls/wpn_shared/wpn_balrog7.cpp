@@ -128,6 +128,7 @@ void CBalrog7::Precache(void)
 	PRECACHE_MODEL("models/w_balrog7.mdl");
 	PRECACHE_MODEL("models/p_balrog7.mdl");
 	PRECACHE_MODEL("sprites/eexplo.spr");
+	PRECACHE_MODEL("sprites/muzzleflash20.spr");
 
 	PRECACHE_SOUND("weapons/balrog7-1.wav");
 	PRECACHE_SOUND("weapons/balrog7_exp.wav");
@@ -357,12 +358,6 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
 #ifndef CLIENT_DLL
 	int iShootTime;
 	iShootTime = pev->iuser1;
@@ -374,6 +369,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		CBaseEntity *pevAttacker = this->m_pPlayer;
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
 		RadiusDamage(vecShootPosition, BalrogDamage());
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
 		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{
@@ -381,11 +377,12 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		}
 		//RadiusDamage(vecAiming , flDamage);
 	}
+	else
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 	iShootTime++;
 	pev->iuser1 = iShootTime;
 #endif
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBalrog7, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 

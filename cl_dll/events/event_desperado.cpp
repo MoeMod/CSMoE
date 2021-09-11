@@ -26,8 +26,14 @@
 *
 */
 #include "events.h"
+/*#include "studio.h"
+#include "r_studioint.h"
+#include <string>*/
+
 
 namespace cl::event::desperado {
+
+//extern engine_studio_api_t IEngineStudio;
 
 enum desperado_e
 {
@@ -81,9 +87,62 @@ void EV_FireDesperado( event_args_t *args )
 		EV_MuzzleFlash();
 
 		if (!args->bparam2)
+		{
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT_M, 2);
+			/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash60.spr", false);
+			if (pModel)
+			{
+
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
+
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 90.0;
+				pEnt->entity.curstate.scale = 0.09;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.baseline.origin = Vector(0, 0, 0);
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+
+				pEnt->die = gHUD.m_flTime + 0.15;
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* ent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = ent->attachment[0];
+				};
+			}*/
+
+		}
+
 		else
+		{
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT_W, 2);
+			/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash59.spr", false);
+			if (pModel)
+			{
+
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[2], pModel);
+
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 90.0;
+				pEnt->entity.curstate.scale = 0.09;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.baseline.origin = Vector(0, 0, 0);
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+
+				pEnt->die = gHUD.m_flTime + 0.15;
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* ent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = ent->attachment[2];
+				};
+			}*/
+
+		}
 
 		if (gHUD.cl_gunsmoke->value)
 		{

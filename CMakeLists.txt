@@ -122,16 +122,6 @@ else()
 	message(STATUS "Building for 32 Bit")
 endif()
 
-if(NOT ${CMAKE_INSTALL_PREFIX})
-	if(WIN32)
-		set (CMAKE_INSTALL_PREFIX "D:/CSMoE")
-	elseif(APPLE)
-		set(CMAKE_INSTALL_PREFIX "/Applications")
-	else()
-		set (CMAKE_INSTALL_PREFIX "~/CSMoE/")
-	endif()
-endif()
-
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL

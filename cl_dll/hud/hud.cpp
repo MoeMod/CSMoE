@@ -259,12 +259,16 @@ void CHud :: Init( void )
 	m_Flash.Init();
 	m_Message.Init();
 	m_StatusBar.Init();
+	m_Dgaxe.Init();
+	m_ShowWin.Init();
 	m_DeathNotice.Init();
 	m_TextMessage.Init();
 	m_FollowIcon.Init();
 	m_MOTD.Init();
 	m_scenarioStatus.Init();
 	m_HeadName.Init();
+	
+	m_HitIndicator.Init();
 
 	// all things that have own background and must be drawn last
 	m_ProgressBar.Init();

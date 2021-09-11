@@ -168,7 +168,12 @@ void CMod_Zombi::HumanWin()
 	for(CBasePlayer *player : moe::range::PlayersList())
 		CLIENT_COMMAND(player->edict(), "spk win_human\n");
 
-	EndRoundMessage("HumanWin", ROUND_CTS_WIN);
+	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
+	WRITE_BYTE(2);
+	WRITE_BYTE(5);
+	MESSAGE_END();*/
+
+	EndRoundMessage("Human Win", ROUND_CTS_WIN);
 	TerminateRound(5s, WINSTATUS_CTS);
 	RoundEndScore(WINSTATUS_CTS);
 
@@ -181,6 +186,11 @@ void CMod_Zombi::ZombieWin()
 	//Broadcast("terwin");
 	for(CBasePlayer *player : moe::range::PlayersList())
 		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
+
+	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
+	WRITE_BYTE(3);
+	WRITE_BYTE(5);
+	MESSAGE_END();*/
 
 	EndRoundMessage("Zombie Win", ROUND_TERRORISTS_WIN);
 	TerminateRound(5s, WINSTATUS_TERRORISTS);
@@ -374,6 +384,9 @@ void CMod_Zombi::PickZombieOrigin()
 	moe::range::PlayersList list;
 	std::vector<CBasePlayer *> players {list.begin(), list.end()};
 	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
+
+	if (players.empty())
+		return;
 
 	// randomize player list
 	std::shuffle(players.begin(), players.end(), std::random_device());

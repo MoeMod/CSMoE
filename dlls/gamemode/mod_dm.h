@@ -36,6 +36,9 @@ public:
 	int CalcLeaderFrags();
 	bool CheckWinLimitDM();
 	void UpdateTeamScores();
+
+	class CMultiplayGameMgrHelper;
+	static CMultiplayGameMgrHelper m_GameMgrHelper;
 };
 
 }

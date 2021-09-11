@@ -13,8 +13,14 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 #include "events.h"
+/*#include "studio.h"
+#include "r_studioint.h"
+#include <string>*/
+
 
 namespace cl::event::m4a1mw {
+
+//extern engine_studio_api_t IEngineStudio;
 
 	enum
 	{
@@ -49,10 +55,32 @@ namespace cl::event::m4a1mw {
 
 		AngleVectors(angles, forward, right, up);
 
+		//cl_entity_t* ent = gEngfuncs.GetViewModel();
+
 		if (EV_IsLocal(idx))
 		{
 			++g_iShotsFired;
 			EV_MuzzleFlash();
+
+			/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash43.spr", false);
+			if (pModel)
+			{
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
+
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 30.0;
+
+				pEnt->entity.curstate.scale = 0.04;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+
+				pEnt->die = gHUD.m_flTime + 0.01;
+				pEnt->flags |= FTENT_SPRANIMATE;
+
+			}*/
+
 			if (args->bparam1)
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
 			else

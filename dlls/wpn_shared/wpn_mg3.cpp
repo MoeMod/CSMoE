@@ -54,6 +54,7 @@ void CMG3::Precache(void)
 	PRECACHE_MODEL("models/v_mg3.mdl");
 	PRECACHE_MODEL("models/w_mg3.mdl");
 	PRECACHE_MODEL("models/p_mg3.mdl");
+	PRECACHE_MODEL("sprites/muzzleflash5.spr");
 	PRECACHE_SOUND("weapons/mg3-1.wav");
 	PRECACHE_SOUND("weapons/mg3-2.wav");
 	PRECACHE_SOUND("weapons/mg3_clipout.wav");

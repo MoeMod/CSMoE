@@ -26,8 +26,13 @@
 *
 */
 #include "events.h"
+/*#include "studio.h"
+#include "r_studioint.h"
+#include <string>*/
 
 namespace cl::event::negev {
+
+//extern engine_studio_api_t IEngineStudio;
 
 static const char *SOUND_NAME = "weapons/csgo_ports/negev/negev-1.wav";
 
@@ -56,10 +61,29 @@ void EV_FireNegev(event_args_s *args)
 	Vector forward, right, up;
 	AngleVectors( angles, forward, right, up );
 
+	//cl_entity_t* ent = gEngfuncs.GetViewModel();
+
 	if ( EV_IsLocal( args->entindex ) )
 	{
 		++g_iShotsFired;
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(M249_SHOOT1, M249_SHOOT2), 2);
+		/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash5.spr", false);
+		if (pModel)
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
+
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0;
+
+			pEnt->entity.curstate.scale = 0.4;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+			pEnt->entity.curstate.solid = SOLID_NOT;
+
+			pEnt->die = gHUD.m_flTime + 0.01;
+			pEnt->flags |= FTENT_SPRANIMATE;
+		}*/
 		EV_MuzzleFlash();
 		if( !gHUD.cl_righthand->value )
 		{

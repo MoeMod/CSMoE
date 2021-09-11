@@ -187,6 +187,7 @@ set(HLDLL_SRCS
 	./cbase/cbase_entity_factory.cpp
 	./cbase/cbase_physint.cpp
 	./gamemode/zbb/zbb_zombie.cpp
+	./refl/cbase_export.cpp
 	)
 
 set (HLWPN_SRCS
@@ -245,6 +246,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_k1a.cpp
 	../dlls/wpn_shared/wpn_kriss.cpp
 	../dlls/wpn_shared/wpn_m95.cpp
+	../dlls/wpn_shared/wpn_buffsg552ex.cpp
 	../dlls/wpn_shared/wpn_m1887.cpp
 	../dlls/wpn_shared/wpn_scarh.cpp
 	../dlls/wpn_shared/wpn_scarl.cpp
@@ -256,6 +258,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_skullaxe.cpp
 	../dlls/wpn_shared/knife_katana.cpp
 	../dlls/wpn_shared/knife_dragonsword.cpp
+	../dlls/wpn_shared/knife_dgaxe.cpp
 	../dlls/wpn_shared/wpn_gungnir.cpp
 	../dlls/wpn_shared/wpn_mg3.cpp
 	../dlls/wpn_shared/wpn_desperado.cpp
@@ -286,6 +289,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m134ex.cpp
 	../dlls/wpn_shared/wpn_starchaserar.cpp
 	../dlls/wpn_shared/wpn_gunkata.cpp
+	../dlls/wpn_shared/z4b_m37se.cpp
 	../dlls/wpn_shared/z4b_Frequency9.cpp
 	../dlls/wpn_shared/z4b_stormgiantx.cpp
 	../dlls/wpn_shared/z4b_lc_sword.cpp

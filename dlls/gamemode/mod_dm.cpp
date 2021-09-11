@@ -12,7 +12,7 @@
 
 namespace sv {
 
-class CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
+class CMod_DeathMatch::CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
 {
 public:
 	virtual bool		CanPlayerHearPlayer(CBasePlayer *pListener, CBasePlayer *pTalker)
@@ -28,7 +28,7 @@ public:
 		return true;
 	}
 };
-static CMultiplayGameMgrHelper g_GameMgrHelper;
+CMod_DeathMatch::CMultiplayGameMgrHelper CMod_DeathMatch::m_GameMgrHelper;
 
 void CMod_DeathMatch::InstallPlayerModStrategy(CBasePlayer *player)
 {
@@ -46,7 +46,7 @@ void CMod_DeathMatch::InstallPlayerModStrategy(CBasePlayer *player)
 
 CMod_DeathMatch::CMod_DeathMatch()
 {
-	m_VoiceGameMgr.Init(&g_GameMgrHelper, gpGlobals->maxClients);
+	m_VoiceGameMgr.Init(&m_GameMgrHelper, gpGlobals->maxClients);
 
 	m_flIntermissionEndTime = invalid_time_point;
 	m_flIntermissionStartTime = invalid_time_point;

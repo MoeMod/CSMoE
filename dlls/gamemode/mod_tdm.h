@@ -30,6 +30,8 @@ public: // CHalfLifeMultiplay
 
 public:
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
+	class CMultiplayGameMgrHelper;
+	static CMultiplayGameMgrHelper m_GameMgrHelper;
 };
 
 }

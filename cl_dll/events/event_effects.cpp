@@ -39,15 +39,21 @@ namespace cl::event::wpneffects {
 
 enum event_effect
 {
-    EVENT_GATLINGRX,
-    EVENT_DUALSWORD,
-    EVENT_VOIDPISTOL
+	EVENT_GATLINGRX,
+	EVENT_DUALSWORD,
+	EVENT_VOIDPISTOL,
+	EVENT_BUFFSG552EX,
+	EVENT_DGAXE,
 };
 
-static const char* SOUNDS_NAME[] =
+enum buffsg552ex_slash_e
 {
-	"weapons/gatlingex-1.wav", "weapons/gatlingex-2.wav"
+	EF_SLASH1,
+	EF_SLASH2,
+	EF_SLASH3,
+	EF_SLASH_BIG,
 };
+
 
 void EV_WpnEffects(event_args_s* args)
 {
@@ -210,6 +216,88 @@ void EV_WpnEffects(event_args_s* args)
 
 			break;
 		}
+		case EVENT_BUFFSG552EX:
+		{
+			static const char* SLASH_SOUND[] =
+			{
+				"weapons/buffsg552ex_claw_1.wav", "weapons/buffsg552ex_claw_2.wav", "weapons/buffsg552ex_claw_3.wav", "weapons/buffsg552ex_claw_4.wav"
+			};
+
+			model_s* pModel;
+			switch (args->iparam2)
+			{
+			case EF_SLASH1:
+			{
+				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash1.spr", false); break;
+			}
+			case EF_SLASH2:
+			{
+				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash2.spr", false); break;
+			}
+			case EF_SLASH3:
+			{
+				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash3.spr", false); break;
+			}
+			case EF_SLASH_BIG:
+			{
+				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash_big.spr", false); break;
+			}
+			default: return;
+			}
+			if (pModel)
+			{
+				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, SLASH_SOUND[args->iparam2], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				pEnt->flags |= FTENT_SPRANIMATE;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 30.0;
+
+				pEnt->entity.curstate.rendermode = kRenderTransAlpha;
+				pEnt->entity.curstate.scale = 0.5;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 0.7;
+	
+			}
+			return;
+		}
+		case EVENT_DGAXE:
+		{
+			if (args->bparam2)
+			{
+				struct model_s* pModel = IEngineStudio.Mod_ForName("models/ef_scorpion_hole.mdl", false);
+				if (pModel)
+				{
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+					pEnt->entity.curstate.sequence = 1;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 1.0;
+					pEnt->tentOffset = Vector(0, 0, -32);
+					pEnt->die = gHUD.m_flTime + 0.69;
+					pEnt->clientIndex = idx;
+					pEnt->flags |= FTENT_PLYRATTACHMENT;
+				}
+
+			}
+			else
+			{
+				model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_dgaxe_smoke.spr", false);
+				if (pModel)
+				{
+					origin[2] += 32;
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+					pEnt->flags |= FTENT_SPRANIMATE;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 30.0;
+
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.scale = 1.0;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->die = gHUD.m_flTime + 0.67;
+
+				}
+			}
+		}
+
 		default:break;
 		}
 }

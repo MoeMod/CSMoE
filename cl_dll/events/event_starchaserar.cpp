@@ -26,8 +26,14 @@
 *
 */
 #include "events.h"
+/*#include "studio.h"
+#include "r_studioint.h"
+#include <string>*/
+
 
 namespace cl::event::starchaserar {
+
+//extern engine_studio_api_t IEngineStudio;
 
 enum starchaserar_e
 {
@@ -55,12 +61,35 @@ void EV_FireStarchaserar( struct event_args_s *args )
 	Vector velocity( args->velocity );
 	Vector forward, right, up;
 	AngleVectors( angles, forward, right, up );
-
+	//cl_entity_t* ent = gEngfuncs.GetViewModel();
 	if ( EV_IsLocal( idx ) )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(STARCHASERAR_SHOOT1, STARCHASERAR_SHOOT3), 2);
+		/*struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash76.spr", false);
+		if (pModel)
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
+
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0;
+
+			pEnt->entity.curstate.scale = 0.04;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.baseline.origin = Vector(0, 0, 0);
+			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+			pEnt->entity.curstate.solid = SOLID_NOT;
+
+			pEnt->die = gHUD.m_flTime + 0.13;
+			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				cl_entity_t* ent = gEngfuncs.GetViewModel();
+				pEnt->entity.origin = ent->attachment[0];
+			};
+		}*/
 		if( !gHUD.cl_righthand->value )
 		{
 			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 17.0, -8.0, -14.0, 0);

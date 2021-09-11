@@ -787,6 +787,73 @@ private:
 //-----------------------------------------------------
 //
 
+class CHudShowWin : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void Reset(void);
+	void Shutdown();
+	CHudMsgFunc(ShowWin);
+
+
+private:
+	float wide, height;
+	float m_flDisplayTime;
+	int iType;
+	SharedTexture m_pCurTexture[4];
+};
+
+
+//
+//-----------------------------------------------------
+//
+
+class CHudHitIndicator : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void InitHUDData(void);
+	void Reset(void);
+	void Shutdown();
+	void Draw2DQuad_Custom(float x, float y, float scale, int num, int iTexID, int alpha);
+	CHudMsgFunc(HitMsg);
+
+private:
+	cvar_t* hud_hitindicator_style;
+	int current_style;
+	SharedTexture m_iTex[4];
+
+
+};
+
+//
+//-----------------------------------------------------
+//
+
+class CHudDgaxe : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void Reset(void);
+	void Shutdown();
+	CHudMsgFunc(Dgaxe);
+
+private:
+	float wide, height;
+	int iType;
+	SharedTexture m_pCurTexture[3];
+};
+
+//
+//-----------------------------------------------------
+//
+
 class CHudSpectatorGui: public CHudBase
 {
 public:
@@ -960,6 +1027,9 @@ public:
 	CHudMessage     m_Message;
 	CHudStatusBar   m_StatusBar;
 	CHudDeathNotice m_DeathNotice;
+	CHudShowWin m_ShowWin;
+	CHudDgaxe m_Dgaxe;
+	CHudHitIndicator m_HitIndicator;
 	CHudSayText     m_SayText;
 	CHudMenu        m_Menu;
 	CHudAmmoSecondary m_AmmoSecondary;

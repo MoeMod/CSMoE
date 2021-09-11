@@ -44,6 +44,9 @@ DLL_GLOBAL int gmsgLogo = 0;
 DLL_GLOBAL int gmsgWeaponList = 0;
 DLL_GLOBAL int gmsgAmmoX = 0;
 DLL_GLOBAL int gmsgDeathMsg = 0;
+DLL_GLOBAL int gmsgShowWin = 0;
+DLL_GLOBAL int gmsgDgaxe = 0;
+DLL_GLOBAL int gmsgHitMsg = 0;
 DLL_GLOBAL int gmsgScoreAttrib = 0;
 DLL_GLOBAL int gmsgScoreInfo = 0;
 DLL_GLOBAL int gmsgTeamInfo = 0;
@@ -199,6 +202,8 @@ void LinkUserMessages()
 	gmsgFog = REG_USER_MSG("Fog", 7);
 	gmsgShowTimer = REG_USER_MSG("ShowTimer", 0);
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
+	gmsgShowWin = REG_USER_MSG("ShowWin", -1);
+	gmsgDgaxe = REG_USER_MSG("Dgaxe", -1);
 
 	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);
@@ -206,6 +211,9 @@ void LinkUserMessages()
 	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
 	gmsgZB3Msg = REG_USER_MSG("ZB3Msg", -1);
 	gmsgGunDeath = REG_USER_MSG("GunDeath", -1);
+
+	//gr
+	gmsgHitMsg = REG_USER_MSG("HitMsg", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)

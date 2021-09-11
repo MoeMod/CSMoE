@@ -294,6 +294,9 @@ void CGatlingex::Precache(void)
 	PRECACHE_SOUND("weapons/gatlingex_draw.wav");
 	PRECACHE_SOUND("weapons/gatlingex_draw.wav");
 
+	PRECACHE_MODEL("sprites/muzzleflash138.spr");
+	PRECACHE_MODEL("sprites/muzzleflash139.spr");
+
 	m_usFireGatlingex = PRECACHE_EVENT(1, "events/gatlingex.sc");
 }
 

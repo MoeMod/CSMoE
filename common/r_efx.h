@@ -139,7 +139,7 @@ struct efx_api_s
 	void		( *R_LargeFunnel )				( float * org, int reverse );
 	void		( *R_LavaSplash )				( float * org );
 	void		( *R_MultiGunshot )				( float * org, float * dir, float * noise, int count, int decalCount, int *decalIndices );
-	void		( *R_MuzzleFlash )				( float *pos1, int type );
+	void		( *R_MuzzleFlash )				( int index, int iAttachment, const char *type );
 	void		( *R_ParticleBox )				( float *mins, float *maxs, unsigned char r, unsigned char g, unsigned char b, float life );
 	void		( *R_ParticleBurst )			( float * pos, int size, int color, float life );
 	void		( *R_ParticleExplosion )		( float * org );

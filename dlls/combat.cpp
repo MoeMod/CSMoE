@@ -1867,7 +1867,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 Vector
 CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread, float flDistance, int iPenetration,
 	int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol,
-	int shared_rand, int iWeaponType)
+	int shared_rand, int* iWeaponType, CBasePlayer *pPlayer)
 {
 	int iOriginalPenetration = iPenetration;
 	int iPenetrationPower;
@@ -2009,11 +2009,26 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		}
 		if (tr.flFraction != 1.0f) {
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-			switch (iWeaponType)
+			switch (*iWeaponType)
 			{
 			case 1:
 			{
 				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
+				break;
+			}
+			case 2:
+			{
+				if (pEntity->pev->takedamage != DAMAGE_NO)
+				{
+					if (pEntity->IsBSPModel())
+						break;
+
+					if (pEntity->IsPlayer() && g_pGameRules->PlayerRelationship(pPlayer, pEntity) == GR_TEAMMATE)
+						break;
+
+					*iWeaponType = 0;
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 3, (int)RANDOM_LONG(0, 3), TRUE, FALSE);
+				}
 				break;
 			}
 			}

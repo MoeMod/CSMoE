@@ -1370,7 +1370,7 @@ static void R_StudioCalcAttachments( void )
 	for( i = 0; i < m_pStudioHeader->numattachments; i++ )
 	{
 		Matrix3x4_VectorTransform( g_lighttransform[pAtt[i].bone], pAtt[i].org, RI.currententity->attachment[i] );
-		VectorSubtract( RI.currententity->attachment[i], RI.currententity->origin, localOrg );
+		VectorSubtract( RI.currententity->attachment[i], RI.currententity->origin, localOrg ); //gr2
 		Matrix3x4_OriginFromMatrix( g_lighttransform[pAtt[i].bone], bonepos );
 		VectorSubtract( localOrg, bonepos, forward );	// make forward
 		VectorNormalizeFast( forward );

@@ -34,7 +34,7 @@ TEMPENTS MANAGEMENT
 
 ==============================================================
 */
-#define MAX_MUZZLEFLASH		4
+#define MAX_MUZZLEFLASH		256
 #define SHARD_VOLUME		12.0f	// on shard ever n^3 units
 #define SF_FUNNEL_REVERSE		1
 
@@ -42,6 +42,8 @@ TEMPENTITY	*cl_active_tents;
 TEMPENTITY	*cl_free_tents;
 TEMPENTITY	*cl_tempents = NULL;		// entities pool
 int		cl_muzzleflash[MAX_MUZZLEFLASH];	// muzzle flashes
+
+TEMPENTITY* g_pMuzzleFlashEnt[MAXSTUDIOATTACHMENTS];
 
 /*
 ================
@@ -69,6 +71,12 @@ void CL_RegisterMuzzleFlashes( void )
 	cl_muzzleflash[2] = CL_FindModelIndex( "sprites/muzzleflash3.spr" );
 	cl_muzzleflash[3] = CL_FindModelIndex( "sprites/muzzleflash.spr" );
 
+	char str[128];
+	for (int i = 4; i < MAX_MUZZLEFLASH; i++) {
+		sprintf(str,"sprites/muzzleflash%d.spr",i);
+		cl_muzzleflash[i] = CL_FindModelIndex(str);
+	}
+	
 	// update registration for shellchrome
 	cls.hChromeSprite = pfnSPR_Load( "sprites/shellchrome.spr" );
 }
@@ -749,6 +757,16 @@ void GAME_EXPORT CL_RocketFlare( const vec3_t pos )
 	pTemp->flags |= FTENT_SPRANIMATE;
 }
 
+void ResetMuz(struct tempent_s* ent, float frametime, float currenttime)
+{
+	cl_entity_t* parent = CL_GetEntityByIndex(ent->entity.curstate.aiment);
+	if (ent->entity.curstate.weaponmodel != parent->curstate.weaponmodel) {
+		ent->entity.curstate.renderamt = 0;
+		ent->die = cl.time; 
+	}
+}
+
+
 /*
 ==============
 CL_MuzzleFlash
@@ -756,43 +774,130 @@ CL_MuzzleFlash
 Do muzzleflash
 ==============
 */
-void GAME_EXPORT CL_MuzzleFlash( const vec3_t pos, int type )
+void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *type )
 {
-	TEMPENTITY	*pTemp;
+	TEMPENTITY	*pTemp = g_pMuzzleFlashEnt[iAttachment];
 	int		index, modelIndex, frameCount;
 	float		scale;
+	float framerate;
+	float life;
+	float fR;
+	float angle;
+	float frame;
 
-	index = bound( 0, type % 5, MAX_MUZZLEFLASH - 1 );
-	scale = (type / 10) * 0.1f;
+	cl_entity_t* parent = CL_GetEntityByIndex(clientindex);
+	
+	char* p = NULL;
+
+	p = strchr(type, 'S');
+	if (p == NULL) {
+		scale = (atoi(type) / 10) * 0.1f;
+		index = bound(0, atoi(type)%5, 4 - 1);
+	}
+	else {
+		scale = (atof(p) / 10) * 0.1f;
+		index = bound(0, atoi(type+2), MAX_MUZZLEFLASH - 1);
+	}
+	
+	if (p != NULL) sscanf(p + 1, "%f", &scale);
 	if( scale == 0.0f ) scale = 0.5f;
+	
+	p = strchr(type, 'P');
+	if (p == NULL) {
+		framerate = 10.0f;
+	}
+	else {
+		sscanf(p + 1, "%f", &framerate);
+	}
+
+	
 
 	modelIndex = cl_muzzleflash[index];
 	if( !modelIndex ) return;
 
 	Mod_GetFrames( modelIndex, &frameCount );
 
+	p = strchr(type, 'T');
+	if (p == NULL) {
+		life = 0.01f;
+	}
+	else {
+		sscanf(p + 1, "%f", &life);
+		if (life >= (frameCount - 1) / framerate)  life = (frameCount - 1) / framerate;
+	}
+
+	p = strchr(type, 'F');
+	if (p == NULL) {
+		frame = Com_RandomLong(0, frameCount - 1);
+	}
+	else {
+		sscanf(p + 1, "%f", &frame);
+	}
+
+
 	// must set position for right culling on render
-	pTemp = CL_TempEntAllocHigh( pos, Mod_Handle( modelIndex ));
+	pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle( modelIndex ));
 	if( !pTemp ) return;
 	pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->entity.curstate.renderamt = 255;
-	pTemp->entity.curstate.framerate = 10;
+	pTemp->entity.curstate.framerate = framerate;
 	pTemp->entity.curstate.renderfx = 0;
-	pTemp->die = cl.time + 0.01; // die at next frame
-	pTemp->entity.curstate.frame = Com_RandomLong( 0, frameCount - 1 );
+	pTemp->die = cl.time + life; // loop only once
+	//pTemp->entity.curstate.frame = Com_RandomLong( 0, frameCount - 1 );
+	pTemp->entity.curstate.frame = frame;
 	pTemp->flags |= FTENT_SPRANIMATE|FTENT_SPRANIMATELOOP;
+	pTemp->entity.curstate.movetype = MOVETYPE_FOLLOW;
+	pTemp->entity.curstate.aiment = clientindex;
 	pTemp->frameMax = frameCount - 1;
+	pTemp->entity.curstate.body = iAttachment+1;
+
+	pTemp->entity.curstate.weaponmodel = parent->curstate.weaponmodel;
+
+	pTemp->flags |= FTENT_CLIENTCUSTOM;
+	pTemp->callback = ResetMuz;
 
 	if( index == 0 )
 	{
 		// Rifle flash
 		pTemp->entity.curstate.scale = scale * Com_RandomFloat( 0.5f, 0.6f );
-		pTemp->entity.angles[2] = 90 * Com_RandomLong( 0, 3 );
+		
+		p = strchr(type, 'R');
+		if (p == NULL) {
+			pTemp->entity.angles[2] = 90 * Com_RandomLong(0, 3);
+		}
+		else
+		{
+			sscanf(p + 1, "%f", &fR);
+			if (fR == 2.5 || fR == 2 || fR == 1)
+				angle = M_PI * (float)Com_RandomLong(0, 360) / 360;
+			else if (fR == 1.5)
+				angle = M_PI * (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
+			else
+				angle = 0;
+
+			pTemp->entity.angles[2] = angle;
+		}
 	}
 	else
 	{
 		pTemp->entity.curstate.scale = scale;
-		pTemp->entity.angles[2] = Com_RandomLong( 0, 359 );
+		
+		p = strchr(type, 'R');
+		if (p == NULL) {
+			pTemp->entity.angles[2] = Com_RandomLong(0, 359);
+		}
+		else
+		{
+			sscanf(p + 1, "%f", &fR);
+			if (fR == 2.5 || fR == 2 || fR == 1)
+				angle = M_PI * (float)Com_RandomLong(0, 360) / 360;
+			else if (fR == 1.5)
+				angle = M_PI * (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
+			else
+				angle = 0;
+
+			pTemp->entity.angles[2] = angle;
+		}
 	}
 
 	// play playermodel muzzleflashes only for mirror pass
@@ -801,6 +906,7 @@ void GAME_EXPORT CL_MuzzleFlash( const vec3_t pos, int type )
 
 	CL_TEntAddEntity( &pTemp->entity );
 }
+
 
 /*
 ==============
