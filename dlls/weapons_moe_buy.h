@@ -65,7 +65,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_molotov",         "Molotov",                  600, GRENADE_SLOT, UNASSIGNED},
 	{"weapon_m95xmas",         "M95 Xmas Edition",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_m4a1dragon",         "M4A1 Dragon",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	{"z4b_m37se",         "M37SE",                  2700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+	//{"z4b_m37se",         "M37SE",                  2700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"csgo_negev",         "Negev",                  1700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"csgo_mag7",         "MAG-7",                  1800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED},

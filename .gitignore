@@ -331,3 +331,4 @@ CMakeSettings.json
 /SDL2
 msvc/BundleArtifacts/
 /CSMoE-Full
+/out

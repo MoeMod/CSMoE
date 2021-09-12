@@ -297,15 +297,6 @@ void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy = std::move(up);
 }
 
-bool CPlayerModStrategy_ZB1::CanPlayerBuy(bool display)
-{
-	// is the player alive?
-	if (m_pPlayer->pev->deadflag != DEAD_NO)
-		return false;
-
-	return !m_pPlayer->m_bIsZombie;
-}
-
 int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax)
 {
 	int ret = iOriginalMax * 2;
@@ -406,6 +397,7 @@ void CMod_Zombi::PickZombieOrigin()
 
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
+	player->m_ZombieClass = "random";
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 0.5f));
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f));
@@ -493,6 +485,11 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
+			if (!Q_strcmp(pPlayer->m_pActiveItem->pszName(), "knife_dgaxe") && pPlayer->pev->iuser5 == 1)
+			{
+				iReturn = false;
+				return iReturn;
+			}
 			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}

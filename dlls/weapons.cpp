@@ -1206,7 +1206,7 @@ BOOL CBasePlayerWeapon::CanDeploy()
 	return TRUE;
 }
 
-BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal)
+BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal, duration_t fDelay, duration_t flTimeWeaponIdle)
 {
 	if (!CanDeploy())
 		return FALSE;
@@ -1218,8 +1218,8 @@ BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWea
 	Q_strcpy(m_pPlayer->m_szAnimExtention, szAnimExt);
 	SendWeaponAnim(iAnim, skiplocal);
 
-	m_pPlayer->m_flNextAttack = 0.75s;
-	m_flTimeWeaponIdle = 1.5s;
+	m_pPlayer->m_flNextAttack = fDelay;
+	m_flTimeWeaponIdle = flTimeWeaponIdle;
 	m_flLastFireTime = invalid_time_point;
 	m_flDecreaseShotsFired = gpGlobals->time;
 

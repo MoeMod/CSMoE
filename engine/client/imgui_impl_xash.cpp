@@ -29,6 +29,7 @@ extern "C" {
 #include "imgui_console.h"
 #include "imgui_imewindow.h"
 #include "imgui_sprview.h"
+#include "imgui_connectprogress.h"
 
 #include <keydefs.h>
 #include <utility>
@@ -484,6 +485,7 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
+	ImGui_ConnectProgress_Init();
 
 	Cmd_AddCommand("imgui", Cmd_ImGui_f, "imgui demo");
 
@@ -659,6 +661,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui::SetCurrentContext(context);
 	ImGui_LCSM_OnGUI();
 	ImGui_Console_OnGUI();
+	ImGui_ConnectProgress_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
 	if(g_bShowDemoWindow)

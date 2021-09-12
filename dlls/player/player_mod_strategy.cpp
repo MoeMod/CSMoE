@@ -22,6 +22,10 @@ GNU General Public License for more details.
 #include "entity_state.h"
 #include "player_mod_strategy.h"
 #include "gamemode/mods.h"
+#include "weapons_moe_buy.h"
+
+#include <vector>
+#include <algorithm>
 
 namespace sv {
 
@@ -188,15 +192,13 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("knife_dgaxe");
-		m_pPlayer->GiveNamedItem("weapon_desperado");
-		m_pPlayer->GiveNamedItem("weapon_buffsg552ex");
+		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_buffsg552ex");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
@@ -354,7 +356,23 @@ float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entv
 void CPlayerModStrategy_Zombie::GiveDefaultItems()
 {
 	if (!m_pPlayer->m_bIsZombie)
-		return CPlayerModStrategy_Default::GiveDefaultItems();
+	{
+		//return CPlayerModStrategy_Default::GiveDefaultItems();
+	
+		m_pPlayer->RemoveAllItems(FALSE);
+		m_pPlayer->m_bHasPrimary = false;
+
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
+		{
+			std::vector<MoEWeaponBuyInfo_s> candidate_list;
+			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			m_pPlayer->GiveNamedItem(info.pszClassName);
+			GiveSlotAmmo(m_pPlayer, iSlot);
+		}
+		return;
+	}
 	
 	m_pPlayer->RemoveAllItems(FALSE);
 	m_pPlayer->m_bHasPrimary = false;
@@ -372,6 +390,75 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 	m_pPlayer->m_bHasNightVision = true;
 	SendItemStatus(m_pPlayer);
 	
+}
+
+bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
+{
+	// is the player alive?
+	if (m_pPlayer->pev->deadflag != DEAD_NO)
+		return false;
+
+	//return !m_pPlayer->m_bIsZombie;
+	// random weapon now, DONT BUY!!!
+	return false;
+}
+
+bool CPlayerModStrategy_Zombie::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon)
+{
+	// Ensure that the weapon uses ammo
+	int nAmmo = weapon->PrimaryAmmoIndex();
+	if (nAmmo == -1) {
+		return false;
+	}
+
+	WeaponBuyAmmoConfig config = weapon->GetBuyAmmoConfig();
+	const char* classname = config.classname;
+
+	if (!classname) {
+		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
+		return false;
+	}
+
+	// Can only buy if the player does not already have full ammo
+	int iMax = weapon->iMaxAmmo1();
+	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(classname, iMax)) {
+		return false;
+	}
+
+	// Purchase the ammo if the player has enough money
+	player->GiveNamedItem(classname);
+	return true;
+}
+
+bool CPlayerModStrategy_Zombie::GiveSlotAmmo(CBasePlayer* player, int nSlot)
+{
+	if (nSlot < PRIMARY_WEAPON_SLOT || nSlot > PISTOL_SLOT) {
+		return false;
+	}
+
+	// Buy one ammo clip for all weapons in the given slot
+	//
+	//  nSlot == 1 : Primary weapons
+	//  nSlot == 2 : Secondary weapons
+
+	CBasePlayerItem* pItem = player->m_rgpPlayerItems[nSlot];
+
+	if (player->HasShield()) {
+		if (player->m_rgpPlayerItems[PISTOL_SLOT])
+			pItem = player->m_rgpPlayerItems[PISTOL_SLOT];
+	}
+
+	if (pItem != NULL) {
+		while (GiveGunAmmo(player, pItem)) {
+			pItem = pItem->m_pNext;
+
+			if (!pItem) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 }

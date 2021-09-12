@@ -53,6 +53,7 @@ std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, Zo
 	{
 		std::random_device rd;
 		const std::size_t N = std::uniform_int_distribution<size_t>(0, NUM_ZCLASSES - 1)(rd);
+		player->m_ZombieClass = g_FindList[N].first;
 		return g_FindList[N].second(player, lv);
 	}
 

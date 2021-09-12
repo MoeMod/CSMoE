@@ -1015,6 +1015,8 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t
 
 	f = StudioEstimateFrame(frame, pseqdesc);
 	subframe = (int)f;
+	if (subframe < 0)
+		subframe = 0;
 	f -= subframe;
 
 	StudioCalcBoneAdj(0, adj, pcontroller, pcontroller, 0);

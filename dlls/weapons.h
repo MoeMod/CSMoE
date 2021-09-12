@@ -499,7 +499,7 @@ public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
 	BOOL AddSecondaryAmmo(int iCount, char *szName, int iMaxCarry);
 	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt,
-	                   int skiplocal = 0);
+	                   int skiplocal = 0, duration_t fDelay = 0.75s, duration_t m_flTimeWeaponIdle = 1.5s);
 	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
 	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,

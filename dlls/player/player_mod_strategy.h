@@ -107,7 +107,11 @@ public:
 	void DeathSound() override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void GiveDefaultItems() override;
+	bool CanPlayerBuy(bool display) override;
 
+protected:
+	bool CPlayerModStrategy_Zombie::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon);
+	bool CPlayerModStrategy_Zombie::GiveSlotAmmo(CBasePlayer* player, int nSlot);
 };
 
 }

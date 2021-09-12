@@ -80,7 +80,6 @@ class CPlayerModStrategy_ZB1 : public CPlayerModStrategy_Zombie
 public:
 	CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *mp);
 	void CheckBuyZone() override { m_pPlayer->m_signals.Signal(SIGNAL_BUY); };
-	bool CanPlayerBuy(bool display) override;
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override;
 
 	void OnSpawn() override;

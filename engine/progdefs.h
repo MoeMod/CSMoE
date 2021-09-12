@@ -201,6 +201,7 @@ typedef struct entvars_s
 	int		iuser2;
 	int		iuser3;
 	int		iuser4;
+	int		iuser5; //no damage for knife_dgaxe
 	float		fuser1;
 	float		fuser2;
 	float		fuser3;

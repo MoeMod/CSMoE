@@ -57,11 +57,13 @@ public:
 	float GetDamage();
 	float BalrogDamage();
 	void RadiusDamage(Vector vecAiming, float flDamage);
-	Vector Get_ShootPosition(CBaseEntity *pevAttacker, Vector vecSrc,Vector vecDir);
+	Vector Get_ShootPosition(Vector vecSrc, Vector vecDirShooting, float flSpread, float flDistance, int random_seed);
 	int m_iShell;
 	int iShellOn;
 	int m_iModelExplo;
 	int m_iBalrog7Explo;
+	int m_iChargeShotsFired;
+	int m_iTargetShotsFired;
 
 private:
 	unsigned short m_usFireBalrog7;

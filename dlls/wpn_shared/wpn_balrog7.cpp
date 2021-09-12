@@ -171,16 +171,23 @@ BOOL CBalrog7::Deploy(void)
 
 void CBalrog7::PrimaryAttack(void)
 {
+	duration_t flCycleTime;
+
+	if (m_pPlayer->pev->fov != 90)
+		flCycleTime = 0.15s;
+	else
+		flCycleTime = 0.115s;
+
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		Balrog7Fire(0.05 + (0.2) * m_flAccuracy, 0.1145s, FALSE);
-	else if (!FBitSet(m_pPlayer->pev->flags , FL_DUCKING))
-		Balrog7Fire(0.01 + (0.02) * m_flAccuracy, 0.1145s, FALSE);
+		Balrog7Fire(m_flAccuracy * 0.2 + 0.05, flCycleTime, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 195)
-		Balrog7Fire(0.035 + (0.03) * m_flAccuracy, 0.1145s, FALSE);
-	else if (m_pPlayer->pev->fov == 65)
-		Balrog7Fire((0.01) * m_flAccuracy + 0.02, 0.135s, FALSE);
-	else	
-		Balrog7Fire(0.021, 0.1145s, FALSE);	
+		Balrog7Fire(m_flAccuracy * 0.03 + 0.035, flCycleTime, FALSE);
+	else if (m_pPlayer->pev->fov != 90)
+		Balrog7Fire(m_flAccuracy * 0.01 + 0.02, flCycleTime, FALSE);
+	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		Balrog7Fire(m_flAccuracy * 0.02 + 0.01, flCycleTime, FALSE);
+	else
+		Balrog7Fire(m_flAccuracy * 0.0 + 0.021, flCycleTime, FALSE);
 }
 
 void CBalrog7::SecondaryAttack(void)
@@ -190,31 +197,47 @@ void CBalrog7::SecondaryAttack(void)
 	else
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 65;
 
+	m_pPlayer->ResetMaxSpeed();
+	EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4, 0, PITCH_NORM);
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 }
 
-Vector CBalrog7::Get_ShootPosition(CBaseEntity *pevAttacker, Vector Start, Vector Aiming)
+Vector CBalrog7::Get_ShootPosition(Vector vecSrc, Vector vecDirShooting, float flSpread, float flDistance, int random_seed)
 {
-	Vector end;
+	Vector vecRight = gpGlobals->v_right;
+	Vector vecUp = gpGlobals->v_up;
 
-	end = pevAttacker->pev->v_angle;
-	UTIL_MakeVectors(end);
-	end = gpGlobals->v_forward;
-	end = end * 8192.0;
-	end = Start + end;
+	float x, y, z;
+
+	if (IsPlayer())
+	{
+		x = UTIL_SharedRandomFloat(random_seed, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 1, -0.5, 0.5);
+		y = UTIL_SharedRandomFloat(random_seed + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 3, -0.5, 0.5);
+	}
+	else
+	{
+		do
+		{
+			x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+			y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+			z = x * x + y * y;
+		} while (z > 1);
+	}
 
 	TraceResult tr;
-	UTIL_TraceLine(Start, end, dont_ignore_monsters, pevAttacker->edict(), &tr);
-	end = tr.vecEndPos;
+	Vector vecDir = vecDirShooting + x * flSpread * vecRight + y * flSpread * vecUp;
+	Vector vecEnd = vecSrc + vecDir * flDistance;
 
-	return end;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+
+	return tr.vecEndPos;
 }
 
 
 void CBalrog7::ItemPostFrame()
 {	
 	if (!(this->m_pPlayer->pev->button & IN_ATTACK))
-		pev->iuser1 = 0;
+		m_iChargeShotsFired = 0;
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
@@ -328,7 +351,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
-	m_flAccuracy = ((m_iShotsFired * m_iShotsFired * m_iShotsFired) / 175.0) + 0.4;
+	m_flAccuracy = (m_iShotsFired * m_iShotsFired * m_iShotsFired) / 190.0 + 0.3;
 
 	if (m_flAccuracy > 0.9)
 		m_flAccuracy = 0.9;
@@ -352,22 +375,25 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
+	float flRangeModifier;
+
+	if (m_pPlayer->m_iFOV == 90)
+		flRangeModifier = 0.97;
+	else
+		flRangeModifier = 0.98;
+
 	m_pPlayer->m_iWeaponVolume = NORMAL_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), flRangeModifier, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 #ifndef CLIENT_DLL
-	int iShootTime;
-	iShootTime = pev->iuser1;
-
-	if (iShootTime > 10)
+	m_iChargeShotsFired++;
+	if (m_iChargeShotsFired == m_iTargetShotsFired)
 	{
-
-		iShootTime = 0;
-		CBaseEntity *pevAttacker = this->m_pPlayer;
-		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
+		m_iChargeShotsFired = 0;
+		auto vecShootPosition = Get_ShootPosition(vecSrc, gpGlobals->v_forward, 0.0, 8192, m_pPlayer->random_seed);
 		RadiusDamage(vecShootPosition, BalrogDamage());
 		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
 		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
@@ -375,13 +401,11 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		{
 			pEnt->Spawn();
 		}
+		m_iTargetShotsFired = RANDOM_LONG(7, 11);
 		//RadiusDamage(vecAiming , flDamage);
 	}
 	else
 		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
-
-	iShootTime++;
-	pev->iuser1 = iShootTime;
 #endif
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
@@ -393,13 +417,16 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		KickBack(1.1, 0.3, 0.2, 0.06, 4, 2.5, 8);
+		KickBack(1.5, 0.55, 0.3, 0.3, 6.0, 5.0, 5);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		KickBack(1.5, 0.55, 0.3, 0.3, 6, 5, 5);
+		KickBack(1.1, 0.3, 0.2, 0.06, 4.0, 2.5, 8);
+	else if (m_pPlayer->pev->fov != 90)
+		KickBack(0.6, 0.2, 0.08, 0.0, 2.0, 0.2, 10);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		KickBack(0.75, 0.1, 0.1, 0.01, 3.5, 1.2, 9);
+		KickBack(0.75, 0.1, 0.1, 0.018, 3.5, 1.2, 9);
 	else
 		KickBack(0.8, 0.2, 0.18, 0.02, 3.2, 2.25, 7);
+
 }
 
 void CBalrog7::Reload(void)

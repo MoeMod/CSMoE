@@ -3214,7 +3214,8 @@ void SV_ExecuteClientCommand( sv_client_t *cl, char *s )
 			break;
 		}
 	}
-
+#ifdef XASH_DEDICATED
+	// ent_create is only useable in dedicated server to avoid pupils
 	if( !u->name && sv_enttools_enable->integer && !sv.background )
 	{
 		for( u = enttoolscmds; u->name; u++ )
@@ -3231,7 +3232,7 @@ void SV_ExecuteClientCommand( sv_client_t *cl, char *s )
 			}
 		}
 	}
-
+#endif
 	if( !u->name && sv.state == ss_active )
 	{
 		qboolean isFullUpdate = !Q_strcmp( Cmd_Argv( 0 ), "fullupdate");

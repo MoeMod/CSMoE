@@ -16,10 +16,57 @@ GNU General Public License for more details.
 #include "imgui_lcsm_warning.h"
 #include "imgui.h"
 #include "imgui_utils.h"
+extern "C" {
+#include "common.h"
+#include "crtlib.h"
+}
 
 #include <algorithm>
 
 static bool lcsm_enabled = true;
+
+static bool CheckIsNameValid(const char* name)
+{
+	if (!name || !*name)
+		return false;
+
+	// exclude some default names, that may be set from engine or just come with config files
+	static struct
+	{
+		const char* name;
+		bool substring;
+	} prohibitedNames[] =
+	{
+	{ "default", false, },
+	{ "unnamed", false, },
+	{ "Player", false, },
+	{ "<Warrior> Player", false, },
+	{ "Shinji", false, },
+	{ "CSDuragiCOM", true },
+	{ "Nero Claudius", true }, // *purrrt* you found a secret area!
+	{ "CSWGE", true },
+	};
+
+	for (size_t i = 0; i < ARRAYSIZE(prohibitedNames); i++)
+	{
+		if (prohibitedNames[i].substring)
+		{
+			if (strstr(name, prohibitedNames[i].name))
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (!stricmp(name, prohibitedNames[i].name))
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
 
 void ImGui_LCSM_OnGUI(void)
 {
@@ -43,6 +90,10 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::TextColored(warning_color, "但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！");
 		ImGui::TextColored(warning_color, "3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！");
 		ImGui::TextColored(warning_color, "----------------------------------------------------------------------------");
+		ImColor tipssss_color(0.3f, 0.6f, 0.2f, 1.0f);
+		ImGui::TextColored(tipssss_color, "----------------------------------------------------------------------------");
+		ImGui::TextColored(tipssss_color, "柑橘CSMoE现已开设联机服供大家体验，您可以加群706711420体验，或点击下方按钮进服~~~");
+		ImGui::TextColored(tipssss_color, "----------------------------------------------------------------------------");
 		/*
 		ImGui::Text("请在下方输入：「我同意」代表您已经明确以上声明。");
 		ImGui::Text("否则请按下“退出”按钮退出游戏");
@@ -55,10 +106,24 @@ void ImGui_LCSM_OnGUI(void)
 
 		if(ImGui::Selectable("进入游戏", false, !!strcmp(buf, "我同意") ? ImGuiSelectableFlags_Disabled : 0, ImGuiUtils::GetScaledSize({0, 36})))
 		 */
+
+		ImGui::TextUnformatted("请修改您的名称后再进服联机：");
+		char buf[32] = {};
+		strncpy(buf, Cvar_VariableString("name"), 32);
+		ImGui::SameLine();
+		if (ImGui::InputText("name", buf, 32, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, [](ImGuiInputTextCallbackData* data)
+			{
+				return (int)CheckIsNameValid(data->Buf);
+			}))
+		{
+			Cvar_Set("name", buf);
+		}
+
 		ImGui::NewLine();
 		ImGui::SameLine(ImGui::GetWindowSize().x * 1 / 4 - 80);
-		if (ImGui::Button("进入游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		if (ImGui::Button("进入柑橘联机服", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
 			lcsm_enabled = false;
+			Cbuf_AddText("connect z4cs.com:5555\n");
 		}
 		ImGui::SameLine(ImGui::GetWindowSize().x / 2 + 80);
 		if (ImGui::Button("退出游戏", ImGuiUtils::GetScaledSize({ 160, 36 }))) {
