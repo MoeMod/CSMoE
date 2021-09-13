@@ -35,7 +35,7 @@ if(XASH_SDL)
 endif()
 
 find_package(LuaJit QUIET)
-if(LuaJit_FOUND AND FALSE) # we are using our own luajit and build from source.
+if(LuaJit_FOUND) # we are using our own luajit and build from source.
 	add_library(luajit_3p INTERFACE)
 	target_link_libraries(luajit_3p INTERFACE ${LUAJIT_LIBRARIES})
 	target_include_directories(luajit_3p INTERFACE ${LUAJIT_INCLUDE_DIR})
@@ -50,13 +50,28 @@ endif()
 
 if(XASH_VCPKG)
 	find_package(nameof CONFIG QUIET)
-endif()
-if(nameof_FOUND)
 else()
 	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/nameof EXCLUDE_FROM_ALL)
 endif()
 add_library(nameof_3p INTERFACE)
 target_link_libraries(nameof_3p INTERFACE nameof::nameof)
+
+if(XASH_VCPKG)
+	find_package(cpuinfo CONFIG QUIET)
+	add_library(cpuinfo_3p INTERFACE)
+	target_link_libraries(cpuinfo_3p INTERFACE cpuinfo::cpuinfo)
+else()
+	set(CPUINFO_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+	set(CPUINFO_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+	set(CPUINFO_BUILD_MOCK_TESTS OFF CACHE BOOL "" FORCE)
+	set(CPUINFO_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
+	set(CPUINFO_BUILD_PKG_CONFIG OFF CACHE BOOL "" FORCE)
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/cpuinfo EXCLUDE_FROM_ALL)
+	add_library(cpuinfo_3p INTERFACE)
+	target_link_libraries(cpuinfo_3p INTERFACE cpuinfo)
+endif()
+
+
 
 add_library(qrcode INTERFACE)
 target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)

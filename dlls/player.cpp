@@ -1127,7 +1127,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	// as an int (zero) and think the player is dead! (this will incite a clientside screentilt, etc)
 	fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
 
-
+#ifdef XASH_DEDICATED
 	//gr
 	//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
 	if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
@@ -1138,6 +1138,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
 	}
+#endif
 
 	if (fTookDamage > 0)
 	{

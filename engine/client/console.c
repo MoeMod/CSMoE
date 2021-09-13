@@ -20,6 +20,9 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "qfont.h"
 #include "server.h" // Log_Printf( , ... )
+#include "cpu.h"
+
+#include <SDL_cpuinfo.h>
 
 #if XASH_IMGUI
 #include "imgui_console.h"
@@ -1796,7 +1799,7 @@ void Con_DrawSolidConsole( float frac, qboolean fill )
 		int	stringLen, width = 0, charH;
 
 		Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D FWGS %i/%s build %i %s %s-%s", PROTOCOL_VERSION,
-			XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ) );
+			XASH_VERSION, Q_buildnum( ), Q_buildcommit( ), Q_buildos( ), Q_buildarch( ));
 #ifdef XASH_IMGUI
 		ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
 		start = scr_width->integer - stringLen;
@@ -1981,6 +1984,25 @@ void Con_DrawVersion( void )
 	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
 	start = scr_width->integer - stringLen;
 	ImGui_Console_AddGenericString(start, 0, curbuild, color);
+
+	// draw cpu info
+	int ram = Cpu_GetInstalledRamMegaBytes();
+	if (ram > 0)
+	{
+		Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%d MB RAM)\nGPU: %s",
+			Cpu_GetName(),
+			ram,
+			glConfig.renderer_string);
+	}
+	else
+	{
+		Q_snprintf(curbuild, MAX_STRING, "CPU: %s \nGPU: %s",
+			Cpu_GetName(),
+			glConfig.renderer_string);
+	}
+	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
+	start = scr_width->integer - stringLen;
+	ImGui_Console_AddGenericString(start, scr_height->integer - charH, curbuild, color);
 #else
 	Con_DrawStringLen( curbuild, &stringLen, &charH );
 	start = scr_width->integer - stringLen * 1.05f;

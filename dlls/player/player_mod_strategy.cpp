@@ -362,7 +362,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
 
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
@@ -371,6 +371,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			m_pPlayer->GiveNamedItem(info.pszClassName);
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}
+		m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		return;
 	}
 	
@@ -403,7 +404,7 @@ bool CPlayerModStrategy_Zombie::CanPlayerBuy(bool display)
 	return false;
 }
 
-bool CPlayerModStrategy_Zombie::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon)
+bool IBasePlayerModStrategy::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon)
 {
 	// Ensure that the weapon uses ammo
 	int nAmmo = weapon->PrimaryAmmoIndex();
@@ -430,7 +431,7 @@ bool CPlayerModStrategy_Zombie::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem
 	return true;
 }
 
-bool CPlayerModStrategy_Zombie::GiveSlotAmmo(CBasePlayer* player, int nSlot)
+bool IBasePlayerModStrategy::GiveSlotAmmo(CBasePlayer* player, int nSlot)
 {
 	if (nSlot < PRIMARY_WEAPON_SLOT || nSlot > PISTOL_SLOT) {
 		return false;

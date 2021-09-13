@@ -399,8 +399,8 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 {
 	player->m_ZombieClass = "random";
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
-	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 0.5f));
-	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 0.5f));
+	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
 
 	InfectionSound();
 	PRECACHE_SOUND("zombi/human_death_01.wav");
@@ -485,11 +485,6 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
-			if (!Q_strcmp(pPlayer->m_pActiveItem->pszName(), "knife_dgaxe") && pPlayer->pev->iuser5 == 1)
-			{
-				iReturn = false;
-				return iReturn;
-			}
 			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}

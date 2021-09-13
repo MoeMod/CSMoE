@@ -57,6 +57,8 @@ else()
 	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
 endif()
 
+option(XASH_CPUINFO "Build with cpuinfo support" ON)
+
 set(XASH_ENGINE_SOURCES 
 	common/avikit.c
 	common/build.c
@@ -119,6 +121,7 @@ set(XASH_ENGINE_SOURCES
 	common/Sequence.c
 	common/IceKey.cpp
 	common/mod_decryptor.cpp 
+	common/cpu.c 
 
 
 	server/sv_client.c
@@ -239,6 +242,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_console.cpp
 	client/imgui_imewindow.cpp
 	client/imgui_sprview.cpp
+	client/imgui_connectprogress.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
@@ -437,6 +441,12 @@ endif()
 if(XASH_QINDIEGL)
 	add_definitions(-DXASH_D3D -DXASH_GL_STATIC -D__MULTITEXTURE_SUPPORT__)
 	target_link_libraries(${XASH_ENGINE} QindieGL)
+endif()
+
+if(XASH_CPUINFO)
+	add_definitions(-DXASH_CPUINFO=1)
+
+	target_link_libraries(${XASH_ENGINE} cpuinfo_3p)
 endif()
 
 if(XASH_SAILFISH)

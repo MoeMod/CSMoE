@@ -27,6 +27,10 @@ GNU General Public License for more details.
 #include "zb2_zclass_tank.h"
 #include "zb2_zclass_speed.h"
 #include "zb2_zclass_deimos2.h"
+#include "zb2_zclass_deimos.h"
+#include "zb2_zclass_pc.h"
+#include "zb2_zclass_heavy.h"
+#include "zb2_zclass_heal.h"
 #include <random>
 
 namespace sv {
@@ -39,8 +43,12 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 
 const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer *, ZombieLevel)> g_FindList[] = {
 		{"tank", MakeZombieClass<CZombieClass_Default> },
-		//{"speed", MakeZombieClass<CZombieClass_Speed> },
+		{"speed", MakeZombieClass<CZombieClass_Speed> },
 		{"deimos2", MakeZombieClass<CZombieClass_Deimos2> },
+		{"deimos", MakeZombieClass<CZombieClass_Deimos> },
+		{"heal", MakeZombieClass<CZombieClass_Heal> },
+		{"heavy", MakeZombieClass<CZombieClass_Heavy> },
+		{"pc", MakeZombieClass<CZombieClass_Pc> },
 };
 constexpr auto NUM_ZCLASSES = std::extent<decltype(g_FindList)>::value;
 

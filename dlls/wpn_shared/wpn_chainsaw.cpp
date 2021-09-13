@@ -40,7 +40,7 @@ void CChainsaw::Spawn(void)
 	Precache();
 	m_iId = WEAPON_SCOUT;
 	SET_MODEL(ENT(pev), "models/w_chainsaw.mdl");
-
+	m_bSlash = 0;
 	m_iDefaultAmmo = CHAINSAW_MAX_CLIP;
 	FallInit();
 }
@@ -188,7 +188,7 @@ void CChainsaw::ItemPostFrame(void)
 				#ifndef CLIENT_DLL
 					m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 				#endif
-
+					m_bSlash = 0;
 				#ifndef CLIENT_DLL
 					hit_result_t iCallBack = KnifeAttack(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), CHAINSAW_DISTANCE_A, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
 				#endif
@@ -297,6 +297,16 @@ float CChainsaw::GetSecondaryAttackDamage() const
 	return flDamage;
 }
 
+void CChainsaw::AddKickRate(Vector vecSrc, float amount, float boost)
+{
+	//from AE
+	Vector vecDir = (pev->origin - vecSrc).Normalize();
+
+	pev->velocity.x += vecDir.x * amount;
+	pev->velocity.y += vecDir.y * amount;
+	pev->velocity.z += boost;
+}
+
 #ifndef CLIENT_DLL
 hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
 	entvars_t *pevInflictor, entvars_t *pevAttacker, BOOL iAnim)
@@ -376,6 +386,7 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 
 				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
 
+				m_bSlash = 1;
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
@@ -384,11 +395,13 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 				
 				PLAYBACK_EVENT_FULL(0, ENT(pEntity->pev), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 1, iAnim, m_iClip > 0);
 
-	
+				if (!pEntity->IsPlayer())
+					continue;
+
 				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
-					ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 700, 1600, 1300, 400, 1.0f });
+					AddKickRate(m_pPlayer->pev->origin, 3200, 120);
 				}
 				result = HIT_PLAYER;
 

@@ -17,17 +17,30 @@ namespace sv {
 static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 {
 	{ "NightVision", [](CBasePlayer *p) {
-			p->AddAccount(16000);
-			BuyItem(p, MENU_SLOT_ITEM_NVG);
-			p->AddAccount(16000);
-			p->m_bNightVisionOn = false;
-			p->ClientCommand("nightvision");
+		if (!(p->m_flDisplayHistory & DHF_NIGHTVISION))
+		{
+			p->HintMessage("#Hint_use_nightvision");
+			p->m_flDisplayHistory |= DHF_NIGHTVISION;
+		}
+		EMIT_SOUND(ENT(p->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+		p->m_bHasNightVision = true;
+		SendItemStatus(p);
 		}
 	},
 	{ "Grenades, Ammo Set", [](CBasePlayer *p) {
-			p->AddAccount(16000);
+			
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
 
-			while (BuyAmmo(p, PRIMARY_WEAPON_SLOT, false))
+			p->GiveNamedItem("weapon_hegrenade");
+			p->GiveNamedItem("weapon_smokegrenade");
+			p->GiveNamedItem("weapon_flashbang");
+			p->GiveNamedItem("weapon_flashbang");
+			
+			//p->AddAccount(16000);
+			/*while (BuyAmmo(p, PRIMARY_WEAPON_SLOT, false))
 				;
 			while (BuyAmmo(p, PISTOL_SLOT, false))
 				;
@@ -36,7 +49,7 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 			BuyItem(p, MENU_SLOT_ITEM_HEGREN);
 			BuyItem(p, MENU_SLOT_ITEM_SMOKEGREN);
 
-			p->AddAccount(16000);
+			p->AddAccount(16000);*/
 		}
 	},
 	{ "Dual MP7A1", [](CBasePlayer *p) {
@@ -57,9 +70,17 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 			DropSecondary(p);
 			p->GiveNamedItem("weapon_deagled");
 			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
-			p->GiveAmmo(iAmount, "762Nato", iAmount);
+			p->GiveAmmo(iAmount, "50AE", iAmount);
+		}
+	},
+	{ "SVDEX", [](CBasePlayer* p) {
+		DropSecondary(p);
+		p->GiveNamedItem("weapon_svdex");
+		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
 	}
+
 };
 
 LINK_ENTITY_TO_CLASS(supplybox, CSupplyBox);

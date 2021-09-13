@@ -715,6 +715,7 @@ public:
 #ifndef CLIENT_DLL
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
+	int iuser1;
 };
 
 }

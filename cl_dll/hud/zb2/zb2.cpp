@@ -35,6 +35,8 @@ public:
 	SharedTexture m_pTexture_RageRetina;
 	SharedTexture m_pTexture_HideRetina;
 	SharedTexture m_pTexture_SprintRetina;
+	SharedTexture m_pTexture_HealRetina;
+	SharedTexture m_pTexture_TrapRetina;
 	SharedTexture m_pTexture_DamageDoubleRetina;
 	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 };
@@ -83,6 +85,10 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_DamageDoubleRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_HIDE)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HideRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
+		else if (skilltype == ZOMBIE_SKILL_HEAL)
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HealRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
+		else if (skilltype == ZOMBIE_SKILL_TRAP)
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		break;
 	}
 		
@@ -110,6 +116,8 @@ int CHudZB2::VidInit()
 	R_InitTexture(pimpl->m_pTexture_RageRetina, "resource/zombi/zombicrazy");
 	R_InitTexture(pimpl->m_pTexture_HideRetina, "resource/zombi/zombihiding");
 	R_InitTexture(pimpl->m_pTexture_SprintRetina, "resource/zombi/zombispeedup");
+	R_InitTexture(pimpl->m_pTexture_HealRetina, "resource/zombi/zombiheal");
+	R_InitTexture(pimpl->m_pTexture_TrapRetina, "resource/zombi/zombitrap");
 	R_InitTexture(pimpl->m_pTexture_DamageDoubleRetina, "resource/zombi/damagedouble");
 	return 1;
 }

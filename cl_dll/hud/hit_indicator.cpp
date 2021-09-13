@@ -269,7 +269,12 @@ int CHudHitIndicator::MsgFunc_HitMsg( const char *pszName, int iSize, void *pbuf
 		//continue;
 
 	//rgHitIndicatorList[i].fOrigin = ent->origin;
-	rgHitIndicatorList[i].fOrigin = ent->attachment[0];
+	//rgHitIndicatorList[i].fOrigin = ent->attachment[0];
+	if (ent->player)
+		rgHitIndicatorList[i].fOrigin = ent->origin;
+	else
+		rgHitIndicatorList[i].fOrigin = ent->attachment[0];
+
 
 	model_t *model = ent->model;
 	if (model)

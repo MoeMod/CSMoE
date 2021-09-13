@@ -47,6 +47,7 @@ GNU General Public License for more details.
 #ifdef XASH_SDL
 #include "platform/sdl/events.h"
 #endif
+#include "cpu.h"
 
 typedef void (*pfnChangeGame)( const char *progname );
 
@@ -1247,6 +1248,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 
 	IN_Init();
 	Key_Init();
+	Cpu_Init();
 }
 
 void Host_FreeCommon( void )

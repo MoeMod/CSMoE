@@ -732,6 +732,7 @@ int CBaseEntity::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	pev->health -= flDamage;
 
+#ifdef XASH_DEDICATED
 	//gr
 	//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit CBase Msg Sending \n");
 	if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {   //not necessary?
@@ -742,7 +743,7 @@ int CBaseEntity::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit CBase Msg Sent \n");
 	}
-
+#endif
 	if (pev->health <= 0)
 	{
 		Killed(pevAttacker, GIB_NORMAL);

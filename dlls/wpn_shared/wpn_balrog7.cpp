@@ -165,6 +165,7 @@ BOOL CBalrog7::Deploy(void)
 	m_flAccuracy = 0.24;
 	m_iShotsFired = 0;
 	iShellOn = 1;
+	m_iTargetShotsFired = RANDOM_LONG(7, 11);
 
 	return DefaultDeploy("models/v_balrog7.mdl", "models/p_balrog7.mdl", BALROG7_DRAW, "m249", UseDecrement() != FALSE);
 }
@@ -237,7 +238,9 @@ Vector CBalrog7::Get_ShootPosition(Vector vecSrc, Vector vecDirShooting, float f
 void CBalrog7::ItemPostFrame()
 {	
 	if (!(this->m_pPlayer->pev->button & IN_ATTACK))
+#ifndef CLIENT_DLL
 		m_iChargeShotsFired = 0;
+#endif
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
@@ -446,6 +449,7 @@ void CBalrog7::Reload(void)
 		m_flAccuracy = 0.24;
 		m_bDelayFire = false;
 		m_iShotsFired = 0;
+		m_iTargetShotsFired = RANDOM_LONG(7, 11);
 	}
 }
 

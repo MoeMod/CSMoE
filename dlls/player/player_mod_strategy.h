@@ -63,6 +63,9 @@ public:
 	virtual void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) = 0;
 	virtual void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) = 0;
 	virtual BOOL DeployWeapon(CBasePlayerItem *item) = 0;
+
+	bool GiveSlotAmmo(CBasePlayer* player, int nSlot);
+	bool GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon);
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -108,10 +111,7 @@ public:
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void GiveDefaultItems() override;
 	bool CanPlayerBuy(bool display) override;
-
-protected:
-	bool CPlayerModStrategy_Zombie::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon);
-	bool CPlayerModStrategy_Zombie::GiveSlotAmmo(CBasePlayer* player, int nSlot);
+	
 };
 
 }

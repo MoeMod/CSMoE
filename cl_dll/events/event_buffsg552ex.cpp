@@ -30,7 +30,7 @@
 #include "r_studioint.h"
 #include <string>
 
-namespace cl {
+namespace cl::event::buffsg552ex {
 
 extern engine_studio_api_t IEngineStudio;
 
@@ -38,7 +38,7 @@ enum sg552_e
 {
 	SG552_IDLE = 0,
 	SG552_RELOAD,
-	SG552_DRAW,
+	SG552_DRAW,	
 	SG552_SHOOT1,
 	SG552_SHOOT2,
 	SG552_SHOOT3

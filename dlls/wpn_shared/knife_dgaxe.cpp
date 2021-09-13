@@ -386,10 +386,6 @@ namespace sv {
 			PRECACHE_MODEL("sprites/muzzleflash202.spr");
 			PRECACHE_MODEL("sprites/muzzleflash203.spr");
 			PRECACHE_MODEL("sprites/muzzleflash204.spr");
-
-			PRECACHE_MODEL("sprites i/ef_dgaxe_explo.spr");
-			PRECACHE_MODEL("sprites/ef_dgaxe_change.spr");
-			PRECACHE_MODEL("sprites/ef_dgaxe_smoke.spr");
 			
 			PRECACHE_SOUND("weapons/dgaxe_idle.wav");
 			PRECACHE_SOUND("weapons/dgaxe_draw.wav");
@@ -449,6 +445,7 @@ namespace sv {
 		int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
 		void ComboThink();
 		void ComboAttack();
+		void Guard();
 		KnockbackData GetKnockBackData() override;
 		BOOL CanDrop() override { return false; }
 		BOOL IsSignal();
@@ -473,6 +470,7 @@ namespace sv {
 		{
 			float flDamage = 45;
 #ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				flDamage *= 5.5f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -571,7 +569,7 @@ namespace sv {
 		{
 		case DGAXE_PRIMARYATTACK:  return { 350.0f, 250.0f, 350.0f, 100.0f, 0.4f };
 		case DGAXE_SECONDARYATTACK: { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.4f }; }
-		case DGAXE_COMBOATTACK: { return { 1700.0f, 1300.0f, 2100.0f, 1000.0f, 1.0f }; }
+		case DGAXE_COMBOATTACK: { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
 		case DGAXE_SKILL1ATTACK: { return { 30.0f, 85.0f, 100.0f, 100.0f, 0.1f }; }
 		case DGAXE_SKILL2ATTACK: { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }
 		default:
@@ -731,15 +729,83 @@ namespace sv {
 
 	void CKnifeDgaxe::ComboAttack()
 	{
-		BOOL fDidHit = FALSE;
+		m_iDamageType = DGAXE_COMBOATTACK;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * 115;
 
+		SetThink(&CKnifeDgaxe::Guard);
+		pev->nextthink = gpGlobals->time + 1.17s;
+
+#ifndef CLIENT_DLL
 		TraceResult tr;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
-#ifndef CLIENT_DLL
+		if (tr.flFraction >= 1.0)
+		{
+			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
+
+			if (tr.flFraction >= 1.0)
+			{
+				return;
+			}
+
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (!pHit || pHit->IsBSPModel())
+			{
+				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(m_pPlayer->pev));
+			}
+
+			vecEnd = tr.vecEndPos;
+		}
+
+		if (tr.flFraction < 1.0)
+		{
+			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+			ClearMultiDamage();
+
+			float flRatio = 1.0;
+
+			if (pEntity && pEntity->IsPlayer())
+			{
+				Vector2D vec2LOS;
+				Vector vecForward = gpGlobals->v_forward;
+
+				UTIL_MakeVectors(pEntity->pev->angles);
+
+				vec2LOS = vecForward.Make2D();
+				vec2LOS = vec2LOS.Normalize();
+
+				if (DotProduct(vec2LOS, gpGlobals->v_forward.Make2D()) > 0.8)
+				{
+					flRatio = 3.0;
+				}
+			}
+
+			pEntity->TraceAttack(m_pPlayer->pev, ComboAttackDamage() * flRatio, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+			{
+				Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+				pPlayer->pev->velocity.x = vecDir2D.x * 1000;
+				pPlayer->pev->velocity.y = vecDir2D.y * 1000;
+				pPlayer->pev->velocity.z = 600;
+			}
+
+			if (pEntity->Classify() == CLASS_PLAYER)
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			else
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		}
+#endif
+
+/*#ifndef CLIENT_DLL
 		m_iDamageType = DGAXE_COMBOATTACK;
 		KnifeAttack3(vecSrc, gpGlobals->v_forward, ComboAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, (int)RANDOM_LONG(0, 3), TRUE, TRUE);
@@ -765,8 +831,15 @@ namespace sv {
 			break;
 		}
 		}
-#endif
+#endif*/
 
+		
+	}
+
+	void CKnifeDgaxe::Guard()
+	{
+		if (m_pPlayer->iuser1 == 1)
+			m_pPlayer->iuser1 = 0;
 		SetThink(nullptr);
 	}
 
@@ -892,7 +965,7 @@ namespace sv {
 					if (m_flTimeNextSkill2 < gpGlobals->time)
 					{
 
-						SendWeaponAnim(DGAXE_SKILL2, UseDecrement() != FALSE);
+						SendWeaponAnim(DGAXE_SKILL1, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL2ATTACK;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));
 						if (pEnt)
@@ -913,8 +986,11 @@ namespace sv {
 				{
 					if (m_flTimeNextSkill1 < gpGlobals->time)
 					{
-						SendWeaponAnim(DGAXE_SKILL1, UseDecrement() != FALSE);
+						SendWeaponAnim(DGAXE_SKILL2, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL1ATTACK;
+						m_pPlayer->iuser1 = 1;
+						SetThink(&CKnifeDgaxe::Guard);
+						pev->nextthink = gpGlobals->time + 2.0s;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));
 						if (pEnt)
 						{
@@ -928,11 +1004,11 @@ namespace sv {
 
 				}
 		}
-		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe);
+		MESSAGE_BEGIN(MSG_ONE,gmsgDgaxe, NULL, m_pPlayer->pev);
 		WRITE_BYTE(m_CrossHairState);
 		MESSAGE_END();
 
-		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoX);
+		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoX, NULL, m_pPlayer->pev);
 		WRITE_BYTE(m_iPrimaryAmmoType);
 		WRITE_SHORT(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 		MESSAGE_END();
@@ -948,6 +1024,7 @@ namespace sv {
 					SetThink(&CKnifeDgaxe::ComboAttack);
 					pev->nextthink = gpGlobals->time + 0.83s;
 
+					m_pPlayer->iuser1 = 1;
 					m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
 					m_flTimeComboCheck = gpGlobals->time;

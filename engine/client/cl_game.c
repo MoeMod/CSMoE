@@ -1820,13 +1820,13 @@ compute string length in screen pixels
 void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 {
 	Con_SetFont( con_fontsize->integer );
-	clgame.ds.adjust_size = true;
 #ifdef XASH_IMGUI
 	ImGui_Console_DrawStringLen( pText, length, height );
 #else
+	clgame.ds.adjust_size = true;
 	Con_DrawStringLen( pText, length, height );
-#endif
 	clgame.ds.adjust_size = false;
+#endif
 	Con_RestoreFont();
 }
 

@@ -1,7 +1,7 @@
 #include <memory>
 
 /*
-zb2_zclass_tank.cpp - CSMoE Gameplay server : Zombie Mod 2
+zb2_zclass_deimos2.cpp - CSMoE Gameplay server : Zombie Mod 2
 Copyright (C) 2019 Moemod Yanase
 
 This program is free software: you can redistribute it and/or modify
@@ -60,7 +60,7 @@ void CZombieClass_Deimos2::InitHUD() const
 
 void CZombieClass_Deimos2::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 300;
+	m_pPlayer->pev->maxspeed = 275;
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
 }

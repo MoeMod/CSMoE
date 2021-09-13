@@ -114,10 +114,11 @@ void CR8::PrimaryAttack(void)
 		return;
 	}
 
+#ifndef CLIENT_DLL
 	SetThink(&CR8::R8FireA);
 	pev->nextthink = gpGlobals->time + 0.01s;
 	SendWeaponAnim(PREPARE, UseDecrement() != FALSE);
-
+#endif
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.0s;
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
@@ -145,6 +146,7 @@ void CR8::SecondaryAttack(void)
 
 void CR8::R8FireA()
 {
+#ifndef CLIENT_DLL
 	if (m_pPlayer->pev->button & IN_ATTACK)
 	{
 		if(m_tPreTime < gpGlobals->time)
@@ -180,7 +182,7 @@ void CR8::R8FireA()
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + gpGlobals->time - m_tPreTime;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	}
-
+#endif
 }
 
 void CR8::R8Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim, BOOL fIsModeA)

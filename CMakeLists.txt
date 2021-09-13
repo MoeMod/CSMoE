@@ -111,6 +111,10 @@ if(MSVC)
 	endif()
 endif()
 
+if(XASH_DEDICATED)
+	add_definitions(-DXASH_DEDICATED)
+endif()
+
 if(APPLE)
 	add_definitions(-DHAVE_STDINT_H)
 endif()

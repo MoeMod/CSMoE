@@ -53,13 +53,13 @@ void CZombieBomb::Precache(void)
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_hegrenade.mdl");
 #endif
-	PRECACHE_SOUND("weapons/zombi_bomb_deploy.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_idle_1.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_idle_2.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_idle_3.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_idle_4.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_pull_1.wav");
-	PRECACHE_SOUND("weapons/zombi_bomb_throw.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_deploy.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_idle_1.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_idle_2.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_idle_3.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_idle_4.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_pull_1.wav");
+	PRECACHE_SOUND("zombi/zombi_bomb_throw.wav");
 
 	m_usCreateExplosion = PRECACHE_EVENT(1, "events/createexplo.sc");
 }

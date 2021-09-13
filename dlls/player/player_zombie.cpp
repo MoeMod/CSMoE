@@ -107,14 +107,21 @@ void PlayerZombie_Precache()
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 
-	PRECACHE_MODEL("models/v_knife_zombi.mdl");
 	PRECACHE_MODEL("models/v_knife_zombis.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideimos2.mdl");
+	PRECACHE_MODEL("models/v_knife_zombideimos.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideimos_host.mdl");
+	PRECACHE_MODEL("models/v_knife_zombih.mdl");
+	PRECACHE_MODEL("models/v_knife_zombihealer.mdl");
+	PRECACHE_MODEL("models/v_knife_zombipc.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos_host.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-s.mdl");
+	PRECACHE_MODEL("models/v_zombibombpc.mdl");
+	PRECACHE_MODEL("models/v_zombibomb-heal.mdl");
+	PRECACHE_MODEL("models/v_zombibomb-h.mdl");
+
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -122,6 +129,15 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/speed_zombi_host/speed_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/deimos_zombi_host/deimos_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/deimos2_zombi_origin/deimos2_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/deimos_zombi_origin/deimos_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/heavy_zombi_host/heavy_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/heavy_zombi_origin/heavy_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/pc_zombi_origin/pc_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/pc_zombi_host/pc_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/heal_zombi_host/heal_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/heal_zombi_origin/heal_zombi_origin.mdl");
+
+
 }
 
 }

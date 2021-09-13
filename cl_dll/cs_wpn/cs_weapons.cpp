@@ -375,7 +375,7 @@ CBasePlayerWeapon :: DefaultDeploy
 
 =====================
 */
-BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal )
+BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt, int skiplocal, duration_t fDelay, duration_t flTimeWeaponIdle)
 {
 	if ( !CanDeploy() )
 		return FALSE;
@@ -384,8 +384,8 @@ BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *sz
 
 	SendWeaponAnim( iAnim, skiplocal );
 
-	m_pPlayer->m_flNextAttack = 0.75s;
-	m_flTimeWeaponIdle = 1.5s;
+	m_pPlayer->m_flNextAttack = fDelay;
+	m_flTimeWeaponIdle = flTimeWeaponIdle;
 	return TRUE;
 }
 

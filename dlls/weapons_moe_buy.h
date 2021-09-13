@@ -55,7 +55,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_scarl",       "Scar",                  3250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_tar21",       "TAR-21",                3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_m95",         "Barrett M95",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	{"weapon_buffsg552ex",         "Buff SG552EX",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_wa2000",      "WA2000",                4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_as50",        "AS50",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_stg44",        "STG-44",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -88,13 +87,16 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_cannon",      "Black Dragon Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_gungnir",     "Gungnir",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"knife_dragonsword",     "Green Dragon Crescent Blade",               0,    KNIFE_SLOT,          UNASSIGNED },
-	{"knife_dgaxe",     "Twin Shadow Axes",               0,    KNIFE_SLOT,          UNASSIGNED },
+	
 	{"knife_dualsword",    "Dual Sword Phantom Slayer",0, KNIFE_SLOT,          UNASSIGNED},
 	{"weapon_balrog7",      "BALROG-VII",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_starchaserar",      "Star Chaser AR",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_gunkata",	 "Dual Beretta Gunslinger",			  1500,  PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_gatlingex",        "Infernal Cannon",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-
+#ifdef XASH_DEDICATED
+	{"knife_dgaxe",     "Twin Shadow Axes",               0,    KNIFE_SLOT,          UNASSIGNED },
+	{"weapon_buffsg552ex",         "Buff SG552EX",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+#endif
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_Frequency9",      "Frequency 9",    0, KNIFE_SLOT, UNASSIGNED},

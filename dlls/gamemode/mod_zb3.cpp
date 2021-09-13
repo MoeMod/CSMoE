@@ -32,7 +32,7 @@ GNU General Public License for more details.
 
 namespace sv {
 
-constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_DEFAULT;
+constexpr auto MORALE_TYPE_GLOBAL = ZB3_MORALE_STRENGTHEN;
 
 CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieHero *mp)
 	:	CPlayerModStrategy_ZB2(player, static_cast<CMod_ZombieMod2 *>(mp)),
@@ -143,9 +143,9 @@ void CPlayerModStrategy_ZB3::OnThink()
 	if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie)
 	{
 		// respawn after 5 secs
-		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 5.0s)
+		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 1.0s)
 		{
-			const float health = max(m_flBackupMaxHealth / 2, 1000);
+			const float health = max(m_flBackupMaxHealth, 1000);
 			const float armor = m_flBackupArmor;
 
 			m_pPlayer->RoundRespawn();
