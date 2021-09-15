@@ -74,8 +74,20 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		}
 	},
 	{ "SVDEX", [](CBasePlayer* p) {
-		DropSecondary(p);
+		DropPrimary(p);
 		p->GiveNamedItem("weapon_svdex");
+		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+		p->GiveAmmo(iAmount, "556Nato", iAmount);
+		}
+	},
+	{ "神鬼开天", [](CBasePlayer* p) {
+		p->RemovePlayerItem(p->m_rgpPlayerItems[KNIFE_SLOT]);
+		p->GiveNamedItem("knife_dgaxe");
+		}
+	},
+	{ "熔火岩狼", [](CBasePlayer* p) {
+		DropPrimary(p);
+		p->GiveNamedItem("weapon_buffsg552ex");
 		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
 		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}

@@ -85,7 +85,7 @@ BOOL CAK47Dragon::Deploy(void)
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-	return DefaultDeploy("models/v_ak47dragon.mdl", "models/p_ak47dargon.mdl", AK47_DRAW, "ak47", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_ak47dragon.mdl", "models/p_ak47dragon.mdl", AK47_DRAW, "ak47", UseDecrement() != FALSE);
 	
 }
 

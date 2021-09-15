@@ -3379,6 +3379,14 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				GetClassPtr<CBasePlayer>(pev)->SelectItem(CMD_ARGV_(1));
 			}
+			else if (FStrEq(pcmd, "weapon_knife"))
+			{
+				if (!player->m_pActiveItem->CanHolster())
+					return;
+				if (player->m_bIsZombie)
+					pcmd = "knife_zombi";
+				player->SelectItem(pcmd);
+			}
 			else if (((pstr = Q_strstr(pcmd, "weapon_")) != NULL) && (pstr == pcmd))
 			{
 			if (!player->m_pActiveItem->CanHolster())

@@ -302,8 +302,7 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 	}
 	else
 	{
-		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
-		SPR_Set(gHUD.GetSprite(iHudIcon), r, g, b);
+		SPR_Set(gHUD.GetSprite(iHudIcon), 255, 193, 147);
 		SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(iHudIcon));
 	}
 

@@ -67,7 +67,8 @@ void CUSP::Precache(void)
 	PRECACHE_SOUND("weapons/usp_slideback.wav");
 
 	m_iShell = PRECACHE_MODEL("models/pshell.mdl");
-	m_usFireUSP = PRECACHE_EVENT(1, "addons/luash/events/event_usp.lua");
+	m_usFireUSP = PRECACHE_EVENT(1, "events/usp.sc");
+	//m_usFireUSP = PRECACHE_EVENT(1, "addons/luash/events/event_usp.lua");
 }
 
 int CUSP::GetItemInfo(ItemInfo *p)

@@ -1403,6 +1403,8 @@ void FS_ParseGenericGameInfo( gameinfo_t *GameInfo, const char *buf, const qbool
 		if( !Q_stricmp( token, isGameInfo ? "title" : "game" ))
 		{
 			pfile = COM_ParseFile( pfile, GameInfo->title );
+			// CSMoE Added
+			sprintf(GameInfo->title, "%s [CitruS Build %d]", "Counter-Strike: Mobile-oriented Edition", Q_buildnum());
 		}
 		// valid for both
 		else if( !Q_stricmp( token, "fallback_dir" ))

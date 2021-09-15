@@ -35,6 +35,9 @@ int CHudZB3Rage::VidInit(void)
 {
 	m_iRageBG = gHUD.GetSpriteIndex("ZB3_RageBg");
 	m_iRageLevel = gHUD.GetSpriteIndex("ZB3_RageLevel");
+	m_iArUpSPR = gHUD.GetSpriteIndex("zb3_arup");
+	m_iHpUpSPR = gHUD.GetSpriteIndex("zb3_hpup");
+	m_iFastRespawnSPR = gHUD.GetSpriteIndex("zb3_fastrespawn");
 
 	for(int i = 0; i < 3; ++i)
 		for (int j = 0; j < 8; ++j)
@@ -70,6 +73,17 @@ int CHudZB3Rage::Draw(float time)
 	int iRageIndex = m_iRageIndex[m_iZombieLevel][m_iRageFrame];
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(iRageIndex), 255, 255, 255);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY - 3, &gHUD.GetSpriteRect(iRageIndex));
+
+	//Zombie Item
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iArUpSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 200, &gHUD.GetSpriteRect(m_iArUpSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHpUpSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 244, &gHUD.GetSpriteRect(m_iHpUpSPR));
+
+	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iFastRespawnSPR), 255, 193, 147);
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 + 75, &gHUD.GetSpriteRect(m_iFastRespawnSPR));
+
 
 	// background bar
 	iX += 76;

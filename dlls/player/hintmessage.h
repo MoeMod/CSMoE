@@ -13,6 +13,7 @@
 *
 ****/
 
+#pragma once
 #include <UtlVector.h>
 
 #ifdef CLIENT_DLL

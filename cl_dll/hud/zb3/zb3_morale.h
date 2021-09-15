@@ -36,4 +36,9 @@ private:
 	int m_iMoraleIconSPR;
 	int m_iMoraleLevelSPR;
 	int m_iMoraleEffectSPR;
+	int m_iHighMoraleSPR;
+	int m_iJumphigherSPR;
+	int m_iAmmoupSPR;
+
+
 };

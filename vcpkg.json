@@ -6,6 +6,7 @@
     "sdl2",
     "luajit",
     "nameof",
-    "cpuinfo"
+    "cpuinfo",
+    "xorstr"
   ]
 }

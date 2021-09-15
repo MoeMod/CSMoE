@@ -18,12 +18,9 @@
 #include "cbase.h"
 #include "monsters.h"
 
-#define PLAYER_H
-#include "weapons.h"
-#undef PLAYER_H
-
 #include "nodes.h"
 #include "player.h"
+#include "weapons.h"
 
 #include "usercmd.h"
 #include "entity_state.h"

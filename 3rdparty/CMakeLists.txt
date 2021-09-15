@@ -71,7 +71,14 @@ else()
 	target_link_libraries(cpuinfo_3p INTERFACE cpuinfo)
 endif()
 
-
+if(XASH_VCPKG)
+	find_path(XORSTR_INCLUDE_DIRS "xorstr.hpp")
+	add_library(xorstr_3p INTERFACE)
+    target_include_directories(xorstr_3p INTERFACE ${XORSTR_INCLUDE_DIRS})
+else()
+	add_library(xorstr_3p INTERFACE)
+    target_include_directories(xorstr_3p INTERFACE "${CMAKE_SOURCE_DIR}/3rdparty/xorstr/include")
+endif()
 
 add_library(qrcode INTERFACE)
 target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)

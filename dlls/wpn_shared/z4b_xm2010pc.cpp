@@ -34,7 +34,7 @@ public:
 		//ph26 = 0;
 		SetThink(&CXM2010PC_Crystal::FlyThink);
 		SetTouch(&CXM2010PC_Crystal::OnTouch);
-		SET_MODEL(this->edict(), "sprites/s_xm2010pc.mdl");
+		SET_MODEL(this->edict(), "models/s_xm2010pc.mdl");
 
 		//ph32 = ?
 		pev->framerate = 10;

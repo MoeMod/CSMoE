@@ -97,7 +97,7 @@ namespace sv {
 		m_iShotsFired = 0;
 
 		m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
-		return DefaultDeploy("models/v_m2.mdl", "models/p_m2.mdl", M2_DRAWA, "m249", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_m2.mdl", "models/p_m2_1.mdl", M2_DRAWA, "m249", UseDecrement() != FALSE);
 	}
 	void CM2::SwitchThink(void)
 	{

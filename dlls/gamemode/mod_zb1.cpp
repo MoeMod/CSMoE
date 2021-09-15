@@ -485,6 +485,18 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
+			
+			if (pPlayer->iuser1 == 1)
+			{
+				if (pPlayer->m_pActiveItem != NULL)
+				{
+					if (!Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
+					{
+						iReturn = false;
+						return iReturn;
+					}
+				}
+			}
 			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}

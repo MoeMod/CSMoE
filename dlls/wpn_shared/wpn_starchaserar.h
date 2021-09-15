@@ -48,7 +48,7 @@ public:
 	void RadiusDamage(Vector vecAiming, float flDamage);
 	const char *GetCSModelName() override { return "models/w_starchaserar.mdl"; }
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "556Nato" , 200 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556nato" , 200 }; }
 #endif
 	Vector Get_ShootPosition(CBaseEntity *pevAttacker, Vector vecSrc);
 	float GetDamage() const;

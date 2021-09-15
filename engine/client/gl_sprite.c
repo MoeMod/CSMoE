@@ -330,11 +330,11 @@ load sprite model
 */
 void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint texFlags )
 {
-	dsprite_t		pin;  //spr Í·ÎÄ¼ş
+	dsprite_t		pin;  //spr å¤´æ–‡ä»¶
 	short		numi;      //record colors
-	msprite_t		*psprite;   //¼ÇÂ¼µ±Ç°Ö¡µÄÊı¾İ¿é
+	msprite_t		*psprite;   //è®°å½•å½“å‰å¸§çš„æ•°æ®å—
 	int		i, size;
-	BOOL is_dds_mode = false;
+	qboolean is_dds_mode = false;
 
 	if( loaded ) *loaded = false;
 	Q_memcpy(&pin, buffer, sizeof(dsprite_t));
@@ -370,7 +370,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 	mod->maxs[0] = mod->maxs[1] = LittleLong(pin.bounds[0]) / 2;
 	mod->mins[2] = -LittleLong(pin.bounds[1]) / 2;
 	mod->maxs[2] = LittleLong(pin.bounds[1]) / 2;
-	buffer += sizeof(dsprite_t);   //Í·¶ÁÈ¡Íê±Ï
+	buffer += sizeof(dsprite_t);   //å¤´è¯»å–å®Œæ¯•
 	Q_memcpy(&numi, buffer, sizeof(short));
 	LittleShortSW(numi);
 
@@ -411,7 +411,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 				break;
 			}
 
-			buffer += 768; //¶ÁÏÂÒ»¸öÊı¾İ¿é
+			buffer += 768; //è¯»ä¸‹ä¸€ä¸ªæ•°æ®å—
 			FS_FreeImage(pal); // palette installed, no reason to keep this data
 		}
 		else
@@ -427,7 +427,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		return;
 	}
 
-	for( i = 0; i < psprite->numframes; i++ ) //ÒÀ´Î¶ÁÈ¡Ã¿Ò»Ö¡µÄÊı¾İ
+	for( i = 0; i < psprite->numframes; i++ ) //ä¾æ¬¡è¯»å–æ¯ä¸€å¸§çš„æ•°æ®
 	{
 		if (is_dds_mode) {
 			Q_strncpy(group_suffix, "one", sizeof(group_suffix));
@@ -435,7 +435,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		}
 		else {
 			frametype_t frametype = *buffer;
-			psprite->frames[i].type = LittleLong(frametype);  //Ã¿Ò»Ö¡¿ªÍ·¼ÇÂ¼Ò»¸öÖ¡ÊôĞÔ
+			psprite->frames[i].type = LittleLong(frametype);  //æ¯ä¸€å¸§å¼€å¤´è®°å½•ä¸€ä¸ªå¸§å±æ€§
 
 			switch (frametype)
 			{

@@ -40,16 +40,22 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 {
 	return std::make_shared<T>(player, lv);
 }
-
+#ifdef XASH_DEDICATED
 const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer *, ZombieLevel)> g_FindList[] = {
 		{"tank", MakeZombieClass<CZombieClass_Default> },
-		{"speed", MakeZombieClass<CZombieClass_Speed> },
 		{"deimos2", MakeZombieClass<CZombieClass_Deimos2> },
+		{"speed", MakeZombieClass<CZombieClass_Speed> },
 		{"deimos", MakeZombieClass<CZombieClass_Deimos> },
 		{"heal", MakeZombieClass<CZombieClass_Heal> },
 		{"heavy", MakeZombieClass<CZombieClass_Heavy> },
 		{"pc", MakeZombieClass<CZombieClass_Pc> },
 };
+#else
+const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+		{"tank", MakeZombieClass<CZombieClass_Default> },
+		{"deimos2", MakeZombieClass<CZombieClass_Deimos2> },
+};
+#endif
 constexpr auto NUM_ZCLASSES = std::extent<decltype(g_FindList)>::value;
 
 std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name)

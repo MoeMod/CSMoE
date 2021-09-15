@@ -22,8 +22,6 @@ GNU General Public License for more details.
 #include "server.h" // Log_Printf( , ... )
 #include "cpu.h"
 
-#include <SDL_cpuinfo.h>
-
 #if XASH_IMGUI
 #include "imgui_console.h"
 #endif

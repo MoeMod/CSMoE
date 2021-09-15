@@ -62,7 +62,7 @@ endif()
 option(XASH_LUASH "LUA support for CSMoE. Expected lua 5.3" ON)
 
 if (APPLE OR ANDROID)
-	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof)
+	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof -Wno-format-security)
 elseif(MSVC)
 
 else()

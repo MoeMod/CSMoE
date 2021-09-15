@@ -40,4 +40,8 @@ private:
 	int m_iRageLevel;
 
 	int m_iRageIndex[3][8];
+
+	int m_iArUpSPR;
+	int m_iHpUpSPR;
+	int m_iFastRespawnSPR;
 };
