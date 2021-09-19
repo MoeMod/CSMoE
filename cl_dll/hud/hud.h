@@ -831,6 +831,24 @@ private:
 };
 
 //
+class CHudHeadIcon : public CHudBase
+{
+public:
+	int Init(void);
+	int VidInit(void);
+	int Draw(float flTime);
+	void Reset(void);
+	void Shutdown();
+	void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale);
+	void R_AttachTentToEntity2(int entity, model_s* pModel, vec3_t offset, float life, int additive, int flags, float scale);
+	CHudMsgFunc(HeadIcon);
+
+private:
+	struct CHudHeadIconItem;
+	
+};
+
+//
 //-----------------------------------------------------
 //
 
@@ -1027,8 +1045,9 @@ public:
 	CHudMessage     m_Message;
 	CHudStatusBar   m_StatusBar;
 	CHudDeathNotice m_DeathNotice;
-	CHudShowWin m_ShowWin;
-	CHudDgaxe m_Dgaxe;
+	CHudShowWin		m_ShowWin;
+	CHudHeadIcon	m_HeadIcon;
+	CHudDgaxe		m_Dgaxe;
 	CHudHitIndicator m_HitIndicator;
 	CHudSayText     m_SayText;
 	CHudMenu        m_Menu;

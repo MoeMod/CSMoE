@@ -373,6 +373,21 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 					ClearMultiDamage();
 					pEntity->TraceAttack(pevAttacker, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
+#ifdef XASH_DEDICATED
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
+						if (pVictim->m_bIsZombie) // fire burn
+						{
+							MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pVictim->pev);
+							WRITE_BYTE(4);	//type
+							WRITE_SHORT(ENTINDEX(pVictim->edict()));	//entity
+							MESSAGE_END();
+						}
+					}
+#endif
+
+					
 				}
 			}
 		}

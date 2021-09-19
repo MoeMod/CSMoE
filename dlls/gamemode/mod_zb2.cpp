@@ -120,7 +120,7 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 		return;
 	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(20.0s, 30.0s);
 
-	RemoveAllSupplybox();
+	//RemoveAllSupplybox();
 
 	int iSupplyboxCount = SupplyboxCount();
 	for (int i = 0; i < iSupplyboxCount; ++i)
@@ -440,6 +440,8 @@ void CPlayerModStrategy_ZB2::EvolutionSound() const
 BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
 {
 	BOOL ret = CPlayerModStrategy_Default::DeployWeapon(item);
+	if (!m_pCharacter_ZB2)
+		return ret;
 
 	m_pCharacter_ZB2->OnWeaponDeploy(item);
 

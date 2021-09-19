@@ -112,7 +112,7 @@ void CM134xmas::ItemPostFrame()
 {
 	m_iButton = m_pPlayer->pev->button;
 
-	if (m_iButton & IN_ATTACK)
+	if (m_iButton & IN_ATTACK && m_pPlayer->m_bCanShoot)
 	{
 		if (!m_iClip && m_iM134State == WPNSTATE_M134_SPINNING)
 		{

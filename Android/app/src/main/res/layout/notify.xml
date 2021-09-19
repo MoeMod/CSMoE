@@ -12,7 +12,7 @@
 		android:layout_marginLeft="8dp"
 		android:layout_marginRight="8dp"
 		android:layout_weight="0"
-		android:src="@drawable/csmoe" />
+		android:src="@mipmap/ic_launcher_foreground" />
 	<TextView
 		android:id="@+id/status_text"
 		android:layout_width="wrap_content"

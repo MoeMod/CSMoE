@@ -32,7 +32,8 @@ namespace sv {
 
 CZombieClass_Heal::CZombieClass_Heal(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pPlayer->m_ZombieClass = "heal";
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHeal>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "heal_zombi_origin" : "heal_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -53,8 +54,8 @@ void CZombieClass_Heal::InitHUD() const
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+	WRITE_BYTE(ZOMBIE_CLASS_HEAL);
+	WRITE_BYTE(ZOMBIE_SKILL_HEAL);
 	MESSAGE_END();
 }
 

@@ -37,6 +37,10 @@ GNU General Public License for more details.
 #include <unistd.h>
 #endif
 
+#if defined __ANDROID__
+#include <android/asset_manager.h>
+#endif
+
 #ifdef XASH_WINRT
 #include "platform/winrt/winrt_interop.h"
 #endif
@@ -75,6 +79,9 @@ struct file_s
 						// Contents buffer
 	fs_offset_t	buff_ind, buff_len;		// buffer current index and length
 	byte		buff[FILE_BUFF_SIZE];	// intermediate buffer
+#if defined __ANDROID__
+	AAsset *asset;
+#endif
 };
 
 byte		*fs_mempool;
@@ -248,6 +255,12 @@ int sel(const struct dirent *d)
 }
 #endif
 
+#if defined __ANDROID__
+static void listdirectory_AndroidAsset(stringlist_t *list, const char *path)
+{
+
+}
+#endif
 
 static void listdirectory( stringlist_t *list, const char *path, qboolean lowercase )
 {
@@ -265,6 +278,28 @@ static void listdirectory( stringlist_t *list, const char *path, qboolean lowerc
 #else
 	DIR *dir;
 	struct dirent *entry;
+#endif
+
+#if defined(__ANDROID__)
+	// handle android asset
+	if(!strcmp(path, "/android_asset"))
+	{
+		Android_AssetList(list, "", stringlistappend);
+	}
+	if(!strncmp(path, "/android_asset/", 15))
+	{
+#if 0
+		AAssetManager *mgr = Android_GetAssetManager();
+		AAssetDir *assetDir = AAssetManager_openDir(mgr, path + 14);
+		const char *d_name = NULL;
+		while( ( d_name = AAssetDir_getNextFileName( assetDir ) ))
+			stringlistappend( list, d_name );
+		AAssetDir_close(assetDir);
+#else
+		Android_AssetList(list, path + 15, stringlistappend);
+#endif
+		return;
+	}
 #endif
 
 #ifdef _WIN32
@@ -322,6 +357,18 @@ emulate WIN32 FS behaviour when opening local file
 */
 const char *FS_FixFileCase( const char *path )
 {
+#if defined(__ANDROID__)
+	// handle android asset
+	if(!strcmp(path, "/android_asset"))
+	{
+		return path;
+	}
+	if(!strncmp(path, "/android_asset/", 15))
+	{
+		// TODO
+		return path;
+	}
+#endif
 #if !defined _WIN32 && !TARGET_OS_IPHONE // assume case insensitive
 	DIR *dir; struct dirent *entry;
 	char path2[PATH_MAX], *fname;
@@ -1722,11 +1769,11 @@ static qboolean FS_ParseGameInfo( const char *gamedir, gameinfo_t *GameInfo )
 		roGameInfoTime = FS_SysFileTime( filepath_ro );
 		rwGameInfoTime = FS_SysFileTime( filepath );
 
-		if( roLibListTime > rwGameInfoTime )
+		if( roLibListTime >= rwGameInfoTime )
 		{
 			haveUpdate = FS_ConvertGameInfo( gamedir, filepath, liblist_ro );
 		}
-		else if( roGameInfoTime > rwGameInfoTime )
+		else if( roGameInfoTime >= rwGameInfoTime )
 		{
 			char *afile_ro = FS_LoadDirectFile( filepath_ro, NULL );
 
@@ -1744,7 +1791,7 @@ static qboolean FS_ParseGameInfo( const char *gamedir, gameinfo_t *GameInfo )
 		}
 	}
 
-	if( !haveUpdate && FS_FileTime( liblist, false ) > FS_FileTime( filepath, false ))
+	if( !haveUpdate && FS_FileTime( liblist, false ) >= FS_FileTime( filepath, false ))
 	{
 		FS_ConvertGameInfo( gamedir, filepath, liblist );
 	}
@@ -2008,6 +2055,18 @@ Internal function used to determine filetime
 */
 static int FS_SysFileTime( const char *filename )
 {
+#if defined __ANDROID__
+	// handle android assets
+	if(!strcmp(filename, "/android_asset"))
+	{
+		return 0;
+	}
+	if(!strncmp(filename, "/android_asset/", 15))
+	{
+		// TODO : android assets's time is not available
+		return 0;
+	}
+#endif
 	struct stat buf;
 
 	if( stat( filename, &buf ) == -1 )
@@ -2089,9 +2148,62 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 		}
 	}
 
+#if defined __ANDROID__
+	// handle android assets
+	if(!strncmp(filepath, "/android_asset/", 15))
+	{
+		AAssetManager *mgr = Android_GetAssetManager();
+		AAsset *asset = AAssetManager_open(mgr, filepath + 15, AASSET_MODE_BUFFER);
+		if(asset == NULL)
+			return NULL;
+
+		file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
+		Q_memset( file, 0, sizeof( *file ));\
+		/*
+#ifdef XASH_64BIT
+		file->handle = AAsset_openFileDescriptor64(asset, &file->offset, &file->real_length);
+#else
+		file->handle = AAsset_openFileDescriptor(asset, &file->offset, &file->real_length);
+#endif
+		*/
+		file->handle = 0;
+		file->offset = 0;
+		file->asset = asset;
+#ifdef XASH_64BIT
+		file->real_length = AAsset_seek64( file->asset, 0, SEEK_END );
+#else
+		file->real_length = AAsset_seek( file->asset, 0, SEEK_END );
+#endif
+		file->filetime = FS_SysFileTime( filepath );
+		file->ungetc = EOF;
+
+
+		// For files opened in append mode, we start at the end of the file
+		if( mod & O_APPEND )
+		{
+			file->position = file->real_length;
+		}
+		else
+		{
+			file->position = 0;
+#ifdef XASH_64BIT
+			AAsset_seek64(file->asset, 0, SEEK_SET);
+#else
+			AAsset_seek(file->asset, 0, SEEK_SET);
+#endif
+		}
+
+		//AAsset_close(asset);
+		return file;
+	}
+#endif
+
 	file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
 	file->filetime = FS_SysFileTime( filepath );
 	file->ungetc = EOF;
+#if defined __ANDROID__
+	file->asset = NULL;
+#endif
 
 	file->handle = open( filepath, mod|opt, 0666 );
 
@@ -2156,6 +2268,9 @@ file_t *FS_OpenPackedFile( pack_t *pack, int pack_ind )
 	file->offset = pfile->offset;
 	file->position = 0;
 	file->ungetc = EOF;
+#if defined __ANDROID__
+	file->asset = NULL;
+#endif
 
 	return file;
 }
@@ -2169,6 +2284,19 @@ Look for a file in the filesystem only
 */
 qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 {
+#if defined __ANDROID__
+	// handle android assets
+	if(!strncmp(path, "/android_asset/", 15))
+	{
+		AAssetManager *mgr = Android_GetAssetManager();
+		AAsset *asset = AAssetManager_open(mgr, path + 15, AASSET_MODE_STREAMING);
+		if(asset == NULL)
+			return false;
+		AAsset_close(asset);
+		return true;
+	}
+#endif
+
 #ifdef _WIN32
 	int desc;
 
@@ -2206,6 +2334,22 @@ Look for a existing folder
 */
 qboolean FS_SysFolderExists( const char *path )
 {
+#if defined __ANDROID__
+	// handle android assets
+	if(!strcmp(path, "/android_asset"))
+	{
+		return true;
+	}
+	if(!strncmp(path, "/android_asset/", 15))
+	{
+		AAssetManager *mgr = Android_GetAssetManager();
+		AAssetDir *assetDir = AAssetManager_openDir(mgr, path + 15);
+		const char *d_name = AAssetDir_getNextFileName( assetDir );
+		AAssetDir_close(assetDir);
+		return d_name != NULL;
+	}
+#endif
+
 #ifdef XASH_WINRT
 	struct _finddata_t n_file;
 	// ask for the directory listing handle
@@ -2487,6 +2631,13 @@ Close a file
 */
 int FS_Close( file_t *file )
 {
+#if defined __ANDROID__
+	if( file->asset )
+	{
+		AAsset_close(file->asset);
+		file->asset = NULL;
+	}
+#endif
 	if( close( file->handle ))
 		return EOF;
 
@@ -2506,6 +2657,12 @@ fs_offset_t FS_Write( file_t *file, const void *data, size_t datasize )
 	fs_offset_t	result;
 
 	if( !file ) return 0;
+
+#if __ANDROID__
+	// cannot write android asset
+	if(file->asset)
+		return 0;
+#endif
 
 	// if necessary, seek to the exact file position we're supposed to be
 	if( file->buff_ind != file->buff_len )
@@ -2574,8 +2731,22 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 	{
 		if( count > (fs_offset_t)buffersize )
 			count = (fs_offset_t)buffersize;
-		lseek( file->handle, file->offset + file->position, SEEK_SET );
-		nb = read (file->handle, &((byte *)buffer)[done], count );
+#if __ANDROID__
+		if(file->asset)
+		{
+#ifdef XASH_64BIT
+			AAsset_seek64( file->asset, file->offset + file->position, SEEK_SET );
+#else
+			AAsset_seek( file->asset, file->offset + file->position, SEEK_SET );
+#endif
+			nb = AAsset_read (file->asset, &((byte *)buffer)[done], count );
+		}
+		else
+#endif
+		{
+			lseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = read (file->handle, &((byte *)buffer)[done], count );
+		}
 
 		if( nb > 0 )
 		{
@@ -2589,8 +2760,26 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 	{
 		if( count > (fs_offset_t)sizeof( file->buff ))
 			count = (fs_offset_t)sizeof( file->buff );
-		lseek( file->handle, file->offset + file->position, SEEK_SET );
-		nb = read( file->handle, file->buff, count );
+
+#if __ANDROID__
+		if(file->asset)
+		{
+#ifdef XASH_64BIT
+			//AAsset_seek64( file->asset, file->offset + file->position, SEEK_SET );
+#else
+			//AAsset_seek( file->asset, file->offset + file->position, SEEK_SET );
+#endif
+			//nb = AAsset_read (file->asset, file->buff, count );
+			const void *internal_buffer = AAsset_getBuffer(file->asset);
+            nb = count;
+			Q_memcpy( file->buff, internal_buffer + file->offset + file->position, count );
+		}
+		else
+#endif
+		{
+			lseek( file->handle, file->offset + file->position, SEEK_SET );
+			nb = read( file->handle, file->buff, count );
+		}
 
 		if( nb > 0 )
 		{
@@ -2653,6 +2842,11 @@ int FS_VPrintf( file_t *file, const char* format, va_list ap )
 	char		*tempbuff;
 
 	if( !file ) return 0;
+#if __ANDROID__
+	// cannot write android asset
+	if(file->asset)
+		return 0;
+#endif
 
 	while( 1 )
 	{
@@ -2739,7 +2933,18 @@ int FS_Seek( file_t *file, fs_offset_t offset, int whence )
 
 	// Purge cached data
 	FS_Purge( file );
-
+#if defined __ANDROID__
+	if ( file->asset )
+	{
+#ifdef XASH_64BIT
+		if( AAsset_seek64( file->asset, file->offset + offset, SEEK_SET ) == -1 )
+#else
+		if( AAsset_seek( file->asset, file->offset + offset, SEEK_SET ) == -1 )
+#endif
+			return -1;
+	}
+	else
+#endif
 	if( lseek( file->handle, file->offset + offset, SEEK_SET ) == -1 )
 		return -1;
 	file->position = offset;
@@ -3722,7 +3927,7 @@ static qboolean W_ReadLumpTable( wfile_t *wad )
 	numlumps = wad->numlumps;
 	wad->numlumps = 0;	// reset it
 
-	if( read( wad->handle, srclumps, lat_size ) != lat_size )
+	if( FS_Read( wad->wadfile, srclumps, lat_size ) != lat_size )
 	{
 		MsgDev( D_ERROR, "W_ReadLumpTable: %s has corrupted lump allocation table\n", wad->filename );
 		W_Close( wad );
@@ -3764,14 +3969,14 @@ byte *W_ReadLump( wfile_t *wad, dlumpinfo_t *lump, fs_offset_t *lumpsizeptr )
 	// no wads loaded
 	if( !wad || !lump ) return NULL;
 
-	if( lseek( wad->handle, lump->filepos, SEEK_SET ) == -1 )
+	if( FS_Seek( wad->wadfile, lump->filepos, SEEK_SET ) == -1 )
 	{
 		MsgDev( D_ERROR, "W_ReadLump: %s is corrupted\n", lump->name );
 		return NULL;
 	}
 
 	buf = (byte *)Mem_Alloc( wad->mempool, lump->disksize );
-	size = read( wad->handle, buf, lump->disksize );
+	size = FS_Read( wad->wadfile, buf, lump->disksize );
 	if( size < lump->disksize )
 	{
 		MsgDev( D_WARN, "W_ReadLump: %s is probably corrupted\n", lump->name );
@@ -3796,24 +4001,20 @@ wfile_t *W_Open( const char *filename, const char *mode )
 	wfile_t		*wad = (wfile_t *)Mem_Alloc( fs_mempool, sizeof( wfile_t ));
 	const char	*comment = "Generated by Xash WadLib. ";
 
-	if( mode[0] == 'a' ) wad->handle = open( filename, O_RDWR|O_BINARY, 0x666 );
-	else if( mode[0] == 'w' ) wad->handle = open( filename, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0x666 );
-	else if( mode[0] == 'r' ) wad->handle = open( filename, O_RDONLY|O_BINARY, 0x666 );
+	wad->wadfile = FS_SysOpen( filename, mode );
 
 #ifndef _WIN32
-	if( wad->handle < 0 )
+	if( !wad->wadfile )
 	{
 		const char *ffilename = FS_FixFileCase( filename );
 		if( ffilename != filename )
 		{
-			if( mode[0] == 'a' ) wad->handle = open( ffilename, O_RDWR|O_BINARY, 0x666 );
-			else if( mode[0] == 'w' ) wad->handle = open( ffilename, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0x666 );
-			else if( mode[0] == 'r' ) wad->handle = open( ffilename, O_RDONLY|O_BINARY, 0x666 );
+			wad->wadfile = FS_SysOpen( filename, mode );
 		}
 	}
 #endif
 
-	if( wad->handle < 0 )
+	if( !wad->wadfile )
 	{
 		W_Close( wad );
 		MsgDev( D_ERROR, "W_Open: couldn't open %s\n", filename );
@@ -3838,19 +4039,19 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		hdr.ident = LittleLong(IDWAD3HEADER);
 		hdr.numlumps = LittleLong(wad->numlumps);
 		hdr.infotableofs = LittleLong(sizeof( dwadinfo_t ));
-		write( wad->handle, &hdr, sizeof( hdr ));
-		write( wad->handle, comment, Q_strlen( comment ) + 1 );
-		wad->infotableofs = tell( wad->handle );
+		FS_Write( wad->wadfile, &hdr, sizeof( hdr ) );
+		FS_Write( wad->wadfile, comment, Q_strlen( comment ) + 1 );
+		wad->infotableofs = FS_Tell( wad->wadfile );
 	}
 	else if( mode[0] == 'r' || mode[0] == 'a' )
 	{
 		if( mode[0] == 'a' )
 		{
-			lseek( wad->handle, 0, SEEK_SET );
+			FS_Seek( wad->wadfile, 0, SEEK_SET );
 			wad->mode = O_APPEND;
 		}
 
-		if( read( wad->handle, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
+		if( FS_Read( wad->wadfile, &header, sizeof( dwadinfo_t )) != sizeof( dwadinfo_t ))
 		{
 			MsgDev( D_ERROR, "W_Open: %s can't read header\n", filename );
 			W_Close( wad );
@@ -3879,7 +4080,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 			wad->mode = O_RDONLY; // set read-only mode
 		}
 		wad->infotableofs = header.infotableofs; // save infotableofs position
-		if( lseek( wad->handle, wad->infotableofs, SEEK_SET ) == -1 )
+		if( FS_Seek( wad->wadfile, wad->infotableofs, SEEK_SET ) == -1 )
 		{
 			MsgDev( D_ERROR, "W_Open: %s can't find lump allocation table\n", filename );
 			W_Close( wad );
@@ -3893,7 +4094,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		{
 			size_t	lat_size = wad->numlumps * sizeof( dlumpinfo_t );
 
-			if( read( wad->handle, wad->lumps, lat_size ) != lat_size )
+			if( FS_Read( wad->wadfile, wad->lumps, lat_size ) != lat_size )
 			{
 				MsgDev( D_ERROR, "W_ReadLumpTable: %s has corrupted lump allocation table\n", wad->filename );
 				W_Close( wad );
@@ -3902,7 +4103,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 
 			// if we are in append mode - we need started from infotableofs poisition
 			// overwrite lumptable as well, we have her copy in wad->lumps
-			lseek( wad->handle, wad->infotableofs, SEEK_SET );
+			FS_Seek( wad->wadfile, wad->infotableofs, SEEK_SET );
 		}
 		else
 		{
@@ -3927,25 +4128,25 @@ void W_Close( wfile_t *wad )
 
 	if( !wad ) return;
 
-	if( wad->handle >= 0 && ( wad->mode == O_APPEND || wad->mode == O_WRONLY ))
+	if( wad->wadfile && ( wad->mode == O_APPEND || wad->mode == O_WRONLY ))
 	{
 		dwadinfo_t	hdr;
 
 		// write the lumpinfo
-		ofs = tell( wad->handle );
-		write( wad->handle, wad->lumps, wad->numlumps * sizeof( dlumpinfo_t ));
+		ofs = FS_Tell( wad->wadfile );
+		FS_Write( wad->wadfile, wad->lumps, wad->numlumps * sizeof( dlumpinfo_t ));
 
 		// write the header
 		hdr.ident = IDWAD3HEADER;
 		hdr.numlumps = wad->numlumps;
 		hdr.infotableofs = ofs;
 
-		lseek( wad->handle, 0, SEEK_SET );
-		write( wad->handle, &hdr, sizeof( hdr ));
+		FS_Seek( wad->wadfile, 0, SEEK_SET );
+		FS_Write( wad->wadfile, &hdr, sizeof( hdr ));
 	}
 
 	Mem_FreePool( &wad->mempool );
-	if( wad->handle >= 0 ) close( wad->handle );
+	if( wad->wadfile ) FS_Close( wad->wadfile );
 	Mem_Free( wad ); // free himself
 }
 

@@ -39,6 +39,7 @@ public:
 	void ItemPostFrame() override;
 	time_point_t m_flNextResetModel;
 	int GetPrimaryAttackDamage() const;
+	void AddKickRate(CBasePlayer* pPlayer, Vector vecSrc, float amount, float boost);
 #ifndef CLIENT_DLL
 	BOOL KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
 		entvars_t *pevInflictor, entvars_t *pevAttacker);
@@ -56,11 +57,18 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 750.0f, 550.0f, 650.0f, 500.0f, 0.4f }; }
+	KnockbackData GetKnockBackData() override
+	{
+		if (m_bSlash)
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+		else
+			return { 750.0f, 550.0f, 650.0f, 500.0f, 0.4f };
+	}
+
 	const char *GetCSModelName() override { return "models/w_sgdrill.mdl"; }
 public:
 	int m_iShell;
-
+	int m_bSlash;
 private:
 	unsigned short m_usFireSgdrill;
 };

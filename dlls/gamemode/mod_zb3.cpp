@@ -140,7 +140,7 @@ float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvar
 
 void CPlayerModStrategy_ZB3::OnThink()
 {
-	if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie)
+	if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie && m_pPlayer->m_iTeam != TEAM_UNASSIGNED && m_pPlayer->m_iTeam != TEAM_SPECTATOR)
 	{
 		// respawn after 5 secs
 		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 1.0s)

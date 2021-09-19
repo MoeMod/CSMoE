@@ -110,7 +110,7 @@ void CM134ex::PrimaryAttack(void)
 
 void CM134ex::ItemPostFrame()
 {
-	if (m_pPlayer->pev->button & IN_ATTACK)
+	if (m_pPlayer->pev->button & IN_ATTACK && m_pPlayer->m_bCanShoot)
 	{
 		if (!m_iClip && m_iM134State == WPNSTATE_M134_SPINNING)
 		{

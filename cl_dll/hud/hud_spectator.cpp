@@ -852,8 +852,8 @@ void CHudSpectator::HandleButtonsDown( int ButtonPressed )
 
 void CHudSpectator::HandleButtonsUp( int ButtonPressed )
 {
-	//if ( !gViewPort )
-	return;
+	// if ( !gViewPort )
+	// return;
 
 	//	if ( !gViewPort->m_pSpectatorPanel->isVisible() )
 	//	return; // don't do anything if not in spectator mode
@@ -1303,44 +1303,50 @@ void CHudSpectator::DrawOverviewEntities()
 		
 		gEngfuncs.pTriAPI->SpriteTexture( hSpriteModel, 0 );
 		gEngfuncs.pTriAPI->RenderMode( kRenderTransTexture );
+		gEngfuncs.pTriAPI->Color4f(1.0, 1.0, 1.0, 1.0);
 
 		// see R_DrawSpriteModel
 		// draws players sprite
 
 		AngleVectors(ent->angles, right, up, NULL );
-
 		VectorCopy(ent->origin,origin);
 
-		gEngfuncs.pTriAPI->Begin( TRI_QUADS );
+		float fScale = 16.0f * sizeScale;
+		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * fScale + right.x * fScale, origin[1] + up.y * fScale + right.y * fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * fScale + right.x * -fScale, origin[1] + up.y * fScale + right.y * -fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(0, 1);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * -fScale + right.x * -fScale, origin[1] + up.y * -fScale + right.y * -fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
+		gEngfuncs.pTriAPI->Vertex3f(origin[0] + up.x * -fScale + right.x * fScale, origin[1] + up.y * -fScale + right.y * fScale, origin[2] * zScale);
+		gEngfuncs.pTriAPI->End();
 
-		gEngfuncs.pTriAPI->Color4f( 1.0, 1.0, 1.0, 1.0 );
+		//gEngfuncs.pTriAPI->TexCoord2f (1, 0);
+		//VectorMA (origin,  16.0f * sizeScale, up, point);
+		//VectorMA (point,   16.0f * sizeScale, right, point);
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (1, 0);
-		VectorMA (origin,  16.0f * sizeScale, up, point);
-		VectorMA (point,   16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
+		//gEngfuncs.pTriAPI->TexCoord2f (0, 0);
+		//VectorMA (origin,  16.0f * sizeScale, up, point);
+		//VectorMA (point,  -16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (0, 0);
+		//gEngfuncs.pTriAPI->TexCoord2f (0,1);
+		//VectorMA (origin, -16.0f * sizeScale, up, point);
+		//VectorMA (point,  -16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		VectorMA (origin,  16.0f * sizeScale, up, point);
-		VectorMA (point,  -16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
+		//gEngfuncs.pTriAPI->TexCoord2f (1,1);
+		//VectorMA (origin, -16.0f * sizeScale, up, point);
+		//VectorMA (point,   16.0f * sizeScale, right, point);
+		//point[2] *= zScale;
+		//gEngfuncs.pTriAPI->Vertex3fv (point);
 
-		gEngfuncs.pTriAPI->TexCoord2f (0,1);
-		VectorMA (origin, -16.0f * sizeScale, up, point);
-		VectorMA (point,  -16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
-
-		gEngfuncs.pTriAPI->TexCoord2f (1,1);
-		VectorMA (origin, -16.0f * sizeScale, up, point);
-		VectorMA (point,   16.0f * sizeScale, right, point);
-		point[2] *= zScale;
-		gEngfuncs.pTriAPI->Vertex3fv (point);
-
-		gEngfuncs.pTriAPI->End ();
+		//gEngfuncs.pTriAPI->End ();
 
 
 		if ( !ent->player)

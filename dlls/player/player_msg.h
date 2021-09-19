@@ -112,6 +112,7 @@ extern int gmsgShowWin;
 extern int gmsgDgaxe;
 extern int gmsgHitMsg;
 
+extern int gmsgHeadIcon;
 extern int gmsgZBSTip;
 extern int gmsgZBSLevel;
 extern int gmsgBTEWeapon;

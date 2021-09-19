@@ -32,6 +32,7 @@ namespace sv {
 
 CZombieClass_Speed::CZombieClass_Speed(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
+	m_pPlayer->m_ZombieClass = "speed";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHide>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "speed_zombi_origin" : "speed_zombi_host";

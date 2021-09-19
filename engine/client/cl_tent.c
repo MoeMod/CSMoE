@@ -792,7 +792,7 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	p = strchr(type, 'S');
 	if (p == NULL) {
 		scale = (atoi(type) / 10) * 0.1f;
-		index = bound(0, atoi(type)%5, 4 - 1);
+		index = bound(0, atoi(type) % 5, 4 - 1);
 	}
 	else {
 		scale = (atof(p) / 10) * 0.1f;
@@ -810,6 +810,16 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		sscanf(p + 1, "%f", &framerate);
 	}
 
+	switch (atoi(type)) {
+		case 127:
+			scale = 0.12f;
+			index = 7;
+			break;
+		case 136:
+			scale = 0.22f;
+			index = 6;
+			break;
+	}
 	
 
 	modelIndex = cl_muzzleflash[index];
@@ -868,10 +878,12 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		else
 		{
 			sscanf(p + 1, "%f", &fR);
-			if (fR == 2.5 || fR == 2 || fR == 1)
-				angle = M_PI * (float)Com_RandomLong(0, 360) / 360;
+			if (fR == 2.5 || fR == 2)
+				angle = Com_RandomLong(0, 359);
+			else if (fR == 1)
+				angle = Com_RandomLong(0, 20);
 			else if (fR == 1.5)
-				angle = M_PI * (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
+				angle = (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
 			else
 				angle = 0;
 
@@ -889,10 +901,12 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		else
 		{
 			sscanf(p + 1, "%f", &fR);
-			if (fR == 2.5 || fR == 2 || fR == 1)
-				angle = M_PI * (float)Com_RandomLong(0, 360) / 360;
+			if (fR == 2.5 || fR == 2)
+				angle = Com_RandomLong(0, 359);
+			else if (fR == 1)
+				angle = Com_RandomLong(0, 20);
 			else if (fR == 1.5)
-				angle = M_PI * (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
+				angle = (float)(Com_RandomLong(0, 1) ? 359.9 - Com_RandomLong(0, 15) : Com_RandomLong(0, 15)) / 360;
 			else
 				angle = 0;
 

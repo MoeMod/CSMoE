@@ -297,14 +297,14 @@ float CChainsaw::GetSecondaryAttackDamage() const
 	return flDamage;
 }
 
-void CChainsaw::AddKickRate(Vector vecSrc, float amount, float boost)
+void CChainsaw::AddKickRate(CBasePlayer* pPlayer, Vector vecSrc, float amount, float boost)
 {
 	//from AE
-	Vector vecDir = (pev->origin - vecSrc).Normalize();
+	Vector vecDir = (pPlayer->pev->origin - vecSrc).Normalize();
 
-	pev->velocity.x += vecDir.x * amount;
-	pev->velocity.y += vecDir.y * amount;
-	pev->velocity.z += boost;
+	pPlayer->pev->velocity.x += vecDir.x * amount;
+	pPlayer->pev->velocity.y += vecDir.y * amount;
+	pPlayer->pev->velocity.z += boost;
 }
 
 #ifndef CLIENT_DLL
@@ -401,7 +401,7 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
-					AddKickRate(m_pPlayer->pev->origin, 3200, 120);
+					AddKickRate(pVictim, m_pPlayer->pev->origin, 3200, 120);
 				}
 				result = HIT_PLAYER;
 

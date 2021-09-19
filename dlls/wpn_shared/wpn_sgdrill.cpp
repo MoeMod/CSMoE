@@ -39,7 +39,7 @@ void CSgdrill::Spawn(void)
 	SET_MODEL(ENT(pev), "models/w_sgdrill.mdl");
 
 	m_iDefaultAmmo = SGDRILL_DEFAULT_GIVE;
-
+	m_bSlash = 0;
 	FallInit();
 }
 
@@ -127,7 +127,7 @@ void CSgdrill::PrimaryAttack(void)
 
 		return;
 	}
-
+	m_bSlash = 0;
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
@@ -220,6 +220,16 @@ void CSgdrill::ItemPostFrame()
 	return CBasePlayerWeapon::ItemPostFrame();
 }
 
+void CSgdrill::AddKickRate(CBasePlayer* pPlayer, Vector vecSrc, float amount, float boost)
+{
+	//from AE
+	Vector vecDir = (pPlayer->pev->origin - vecSrc).Normalize();
+
+	pPlayer->pev->velocity.x += vecDir.x * amount;
+	pPlayer->pev->velocity.y += vecDir.y * amount;
+	pPlayer->pev->velocity.z += boost;
+}
+
 void CSgdrill::WeaponIdle(void)
 {
 	ResetEmptySound();
@@ -310,15 +320,19 @@ BOOL CSgdrill::KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float f
 				}
 
 				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
+				m_bSlash = 1;
 
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
 
-				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+				if (!pEntity->IsPlayer())
+					continue;
+
+				CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
-					ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 700, 1600, 1300, 400, 1.0f });
+					AddKickRate(pVictim, m_pPlayer->pev->origin, 1350, 120);
 				}
 				result = TRUE;
 

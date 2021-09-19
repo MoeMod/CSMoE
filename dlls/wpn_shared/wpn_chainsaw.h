@@ -51,7 +51,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_chainsaw.mdl"; }
 	float GetPrimaryAttackDamage() const;
 	float GetSecondaryAttackDamage() const;
-	void AddKickRate(Vector vecSrc, float amount, float boost);
+	void AddKickRate(CBasePlayer *pPlayer ,Vector vecSrc, float amount, float boost);
 #ifndef CLIENT_DLL
 #include "weapons/KnifeAttack.h"
 	hit_result_t KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
@@ -68,9 +68,9 @@ public:
 	KnockbackData GetKnockBackData() override 
 	{ 
 		if (m_bSlash)
-			return { 290.0f, 85.0f, 150.0f, 150.0f, 0.25f };
-		else
 			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+		else
+			return { 290.0f, 85.0f, 150.0f, 150.0f, 0.25f }; 
 	}
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_chainsaw" , 300 }; }

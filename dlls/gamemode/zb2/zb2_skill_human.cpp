@@ -34,6 +34,8 @@ void HumanSkill_Precache()
 	PRECACHE_SOUND("zombi/speedup.wav");
 	PRECACHE_SOUND("zombi/human_breath_male.wav");
 	PRECACHE_SOUND("zombi/speedup_heartbeat.wav");
+	PRECACHE_MODEL("sprites/zb_skill_headshot.spr");
+	PRECACHE_MODEL("sprites/zb_meleeup.spr");
 }
 
 class SprintSkill : protected CZombieSkill_Base
@@ -150,6 +152,12 @@ public:
 		WRITE_SHORT(5);
 		WRITE_SHORT(-1);
 		MESSAGE_END();
+#ifdef XASH_DEDICATED
+		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
+		WRITE_BYTE(1);	//type
+		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
+		MESSAGE_END();
+#endif
 	}
 
 	void OnSkillEnd() override
@@ -185,6 +193,12 @@ public:
 		WRITE_SHORT(10);
 		WRITE_SHORT(-1);
 		MESSAGE_END();
+#ifdef XASH_DEDICATED
+		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
+		WRITE_BYTE(0);	//type
+		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
+		MESSAGE_END();
+#endif
 	}
 
 	void OnSkillEnd() override

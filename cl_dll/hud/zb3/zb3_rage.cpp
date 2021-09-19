@@ -53,6 +53,9 @@ int CHudZB3Rage::VidInit(void)
 
 int CHudZB3Rage::Draw(float time)
 {
+	if (gEngfuncs.IsSpectateOnly())
+		return 0;
+
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
 	if (!g_PlayerExtraInfo[idx].zombie)
 		return 0;
@@ -76,10 +79,10 @@ int CHudZB3Rage::Draw(float time)
 
 	//Zombie Item
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iArUpSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 200, &gHUD.GetSpriteRect(m_iArUpSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iArUpSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHpUpSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 244, &gHUD.GetSpriteRect(m_iHpUpSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iHpUpSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iFastRespawnSPR), 255, 193, 147);
 	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 + 75, &gHUD.GetSpriteRect(m_iFastRespawnSPR));

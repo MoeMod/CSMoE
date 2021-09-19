@@ -47,6 +47,7 @@ DLL_GLOBAL int gmsgDeathMsg = 0;
 DLL_GLOBAL int gmsgShowWin = 0;
 DLL_GLOBAL int gmsgDgaxe = 0;
 DLL_GLOBAL int gmsgHitMsg = 0;
+DLL_GLOBAL int gmsgHeadIcon = 0;
 DLL_GLOBAL int gmsgScoreAttrib = 0;
 DLL_GLOBAL int gmsgScoreInfo = 0;
 DLL_GLOBAL int gmsgTeamInfo = 0;
@@ -204,6 +205,7 @@ void LinkUserMessages()
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 	gmsgShowWin = REG_USER_MSG("ShowWin", -1);
 	gmsgDgaxe = REG_USER_MSG("Dgaxe", -1);
+	gmsgHeadIcon = REG_USER_MSG("HeadIcon", -1);
 
 	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);
 	gmsgZBSLevel = REG_USER_MSG("ZBSLevel", -1);

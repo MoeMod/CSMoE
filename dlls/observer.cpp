@@ -476,19 +476,19 @@ void CBasePlayer::Observer_SetMode(int iMode)
 		CBaseEntity *pEnt = m_hObserverTarget;
 
 		if (pEnt == this || !pEnt || pEnt->has_disconnected || ((CBasePlayer *)pEnt)->IsObserver() || (pEnt->pev->effects & EF_NODRAW) || (_forcecamera != CAMERA_MODE_SPEC_ANYONE && ((CBasePlayer *)pEnt)->m_iTeam != m_iTeam))
-			m_hObserverTarget = nullptr;
+			m_hObserverTarget = NULL;
 	}
 
 	// set spectator mode
 	pev->iuser1 = iMode;
 
 	// if we are not roaming, we need a valid target to track
-	if (iMode != OBS_ROAMING && m_hObserverTarget == nullptr)
+	if (iMode != OBS_ROAMING && !m_hObserverTarget)
 	{
 		Observer_FindNextPlayer(false);
 
 		// if we didn't find a valid target switch to roaming
-		if (m_hObserverTarget == nullptr)
+		if (!m_hObserverTarget)
 		{
 			ClientPrint(pev, HUD_PRINTCENTER, "#Spec_NoTarget");
 			pev->iuser1 = OBS_ROAMING;

@@ -989,8 +989,15 @@ int SV_CalcPing( sv_client_t *cl )
 	client_frame_t	*frame;
 
 	// bots don't have a real ping
-	if( cl->fakeclient )
+	if (cl->fakeclient)
+	{
+#ifdef XASH_DEDICATED
+		// fake ping for bots
+		return 15 + ((ptrdiff_t)cl->edict / 4 % 20) + sin(host.realtime * 10) * 3;
+#else
 		return 0;
+#endif
+	}
 
 	// client has no frame data
 	if( !cl->frames )

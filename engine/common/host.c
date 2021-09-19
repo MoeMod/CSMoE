@@ -1099,6 +1099,11 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 			host.rodir[len] = '\\';
 			host.rodir[len + 1] = '\0';
 		}
+#elif defined __ANDROID__
+		else
+		{
+			Q_strcpy( host.rodir, "/android_asset/");
+		}
 #endif
 	}
 

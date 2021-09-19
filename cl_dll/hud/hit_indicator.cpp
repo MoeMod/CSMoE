@@ -140,6 +140,9 @@ int CHudHitIndicator:: Draw( float flTime )
 
 			cl_entity_t *ent = gEngfuncs.GetEntityByIndex(pList[i].iVictim);
 			vec3_t origin = ent->origin;
+			if (ent->curstate.solid == SOLID_BSP && !ent->player) {
+				origin = ((ent->curstate.origin + ent->curstate.maxs) + (ent->curstate.origin + ent->curstate.mins)) / 2.0f;
+			}
 			float fixed_offset = (DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime + flTime) / DAMAGENUM_DISPLAY_TIME;
 			if (fixed_offset >= 0.5) fixed_offset = 0.5;
 			fixed_offset *= pList[i].fRange / 10.0f;
@@ -262,19 +265,14 @@ int CHudHitIndicator::MsgFunc_HitMsg( const char *pszName, int iSize, void *pbuf
 	rgHitIndicatorList[i].random_offset = gHUD.m_flScale * 0.1f * (rand() % (ScreenWidth / 2) - (ScreenWidth / 4));
 
 	cl_entity_t *ent = gEngfuncs.GetEntityByIndex(iVictim);
-	rgHitIndicatorList[i].fRange = (gEngfuncs.GetLocalPlayer()->origin - ent->origin).Length();
-	
 
-	//if (!CheckForPlayer(ent))
-		//continue;
+	vec3_t center = ent->origin;
+	if (ent->curstate.solid == SOLID_BSP && !ent->player) {
+		center = ((ent->curstate.origin + ent->curstate.maxs) + (ent->curstate.origin + ent->curstate.mins)) / 2.0f;
+	}
 
-	//rgHitIndicatorList[i].fOrigin = ent->origin;
-	//rgHitIndicatorList[i].fOrigin = ent->attachment[0];
-	if (ent->player)
-		rgHitIndicatorList[i].fOrigin = ent->origin;
-	else
-		rgHitIndicatorList[i].fOrigin = ent->attachment[0];
-
+	rgHitIndicatorList[i].fRange = (gEngfuncs.GetLocalPlayer()->origin - center).Length();
+	rgHitIndicatorList[i].fOrigin = center;
 
 	model_t *model = ent->model;
 	if (model)

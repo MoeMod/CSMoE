@@ -29,6 +29,7 @@ struct MoEWeaponBuyInfo_s
 };
 
 constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
+#ifdef XASH_DEDICATED
 	{"weapon_infinity",    "Infinity Black/Sliver", 1500, PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_infinityex1", "Infinity Red/Sliver",   1500, PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_infinityex2", "Infinity Red/Gold",     1500, PISTOL_SLOT,         UNASSIGNED},
@@ -36,7 +37,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_infinitysr",  "Infinity Red",          600,  PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_infinitysb",  "Infinity Black",        600,  PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_anaconda",	 "Anaconda",			  650,  PISTOL_SLOT,         UNASSIGNED},
-	{"weapon_knife", "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
+
 	{"knife_skullaxe",     "Skull-9",               0,    KNIFE_SLOT,          UNASSIGNED},
 	{"knife_katana",     "Katana",               0,    KNIFE_SLOT,          UNASSIGNED},
 	{"weapon_m1887",       "M1887",                 2800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -93,10 +94,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_starchaserar",      "Star Chaser AR",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_gunkata",	 "Dual Beretta Gunslinger",			  1500,  PISTOL_SLOT,         UNASSIGNED},
 	{"weapon_gatlingex",        "Infernal Cannon",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-#ifdef XASH_DEDICATED
 	{"knife_dgaxe",     "Twin Shadow Axes",               0,    KNIFE_SLOT,          UNASSIGNED },
 	{"weapon_buffsg552ex",         "Buff SG552EX",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-#endif
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_Frequency9",      "Frequency 9",    0, KNIFE_SLOT, UNASSIGNED},
@@ -115,7 +114,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_m4a1x",      "M4A1 Shadow Runner",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_ak47x",      "AK47 KNIFE-BORN BEAST",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_m4a1mw",      "M4A1 S-Transformer",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+#endif
 
+	{"weapon_knife", "Seal Knife",            0,    KNIFE_SLOT,          UNASSIGNED},
 	{"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED},
 	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED},
 	{"weapon_scout",      "Scout",    2750, PRIMARY_WEAPON_SLOT, UNASSIGNED},

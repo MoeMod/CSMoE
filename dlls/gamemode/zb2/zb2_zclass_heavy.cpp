@@ -32,6 +32,7 @@ namespace sv {
 
 CZombieClass_Heavy::CZombieClass_Heavy(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
+	m_pPlayer->m_ZombieClass = "heavy";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "heavy_zombi_origin" : "heavy_zombi_host";

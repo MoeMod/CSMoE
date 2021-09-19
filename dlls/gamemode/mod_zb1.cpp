@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "client.h"
 #include "bmodels.h"
 #include "triggers.h"
+#include "entity_state.h"
 
 #include "mod_zb1.h"
 
@@ -360,6 +361,16 @@ void CPlayerModStrategy_ZB1::DeathSound()
 	return CPlayerModStrategy_Zombie::DeathSound();
 }
 
+void CPlayerModStrategy_ZB1::UpdateClientData(int sendweapons, struct clientdata_s* cd, entvars_t* pevOrg)
+{
+	CPlayerModStrategy_Default::UpdateClientData(sendweapons, cd, pevOrg);
+
+	CBasePlayer* pl = m_pPlayer;
+	entvars_t* pev = pl->pev;
+
+	cd->health = (int)pev->health % 512 == 0 ? pev->health + 1 : pev->health;
+}
+
 size_t CMod_Zombi::ZombieOriginNum()
 {
 	moe::range::PlayersList list;
@@ -441,6 +452,9 @@ void CMod_Zombi::TeamCheck()
 {
 	for(CBasePlayer *player : moe::range::PlayersList())
 	{
+		if (player->m_iTeam == UNASSIGNED || player->m_iTeam == SPECTATOR)
+			continue;
+
 		if ((player->m_bIsZombie && player->m_iTeam != TERRORIST) || (!player->m_bIsZombie && player->m_iTeam != CT))
 		{
 			player->m_iTeam = player->m_bIsZombie ? TERRORIST :CT;

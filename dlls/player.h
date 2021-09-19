@@ -421,7 +421,6 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	bool m_bIsZombie;
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
-	const char* m_ZombieClass;
 	time_point_t m_flTimeSpawnProctionExpires;
 };
 
@@ -716,6 +715,7 @@ public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
 	int iuser1;
+	const char* m_ZombieClass;
 };
 
 }

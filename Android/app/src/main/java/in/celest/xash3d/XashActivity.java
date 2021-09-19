@@ -94,6 +94,7 @@ public class XashActivity extends Activity {
 	public static SharedPreferences mPref = null;
 	private static boolean mUseVolume;
 	public static View mDecorView;
+	public static AssetManager mAssetManager;
 	
 
 	// Load the .so
@@ -132,7 +133,8 @@ public class XashActivity extends Activity {
 			
 		mPref = this.getSharedPreferences( "engine", 0 );
 
-		if(checkExtractAssets())
+		mAssetManager = this.getAssets();
+		//if(checkExtractAssets())
 			launchSurfaceAndEngine();
 	}
 
@@ -818,6 +820,14 @@ public class XashActivity extends Activity {
 	
 		final Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(path));
 		mSingleton.startActivity(intent);
+	}
+
+	// call from c
+	public static AssetManager getAssetManager()
+	{
+		if(XashActivity.mAssetManager != null)
+			return XashActivity.mAssetManager;
+		return XashActivity.mSingleton.getAssets();
 	}
 
 	List<String> getAssetsFileList(String path) throws IOException {

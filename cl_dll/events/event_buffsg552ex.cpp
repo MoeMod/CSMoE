@@ -77,60 +77,14 @@ void EV_FireBuffsg552ex( event_args_t *args )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		//cl_entity_t* ent = gEngfuncs.GetViewModel();
-		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(SG552_SHOOT1, SG552_SHOOT3), 2);
-		/*if (args->bparam1)
+		if (args->bparam1)
 		{
-			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash206.spr", false);
-			if (pModel)
-			{
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
-				
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
-
-				pEnt->entity.curstate.scale = 0.035;
-				pEnt->entity.curstate.rendermode = kRenderTransAlpha;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				
-				pEnt->die = gHUD.m_flTime + 0.76;
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* ent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = ent->attachment[0];
-				};
-			}
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(SG552_SHOOT2, 2);
 		}
 		else
 		{
-			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash205.spr", false);
-			if (pModel)
-			{
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[0], pModel);
-				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 30.0;
-
-				pEnt->entity.curstate.scale = 0.035;
-				pEnt->entity.curstate.rendermode = kRenderTransAlpha;
-				pEnt->entity.curstate.renderamt = 255;			
-				pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				pEnt->entity.curstate.solid = SOLID_NOT;
-				pEnt->die = gHUD.m_flTime + 0.23;
-				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
-
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* ent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = ent->attachment[0];
-				};
-
-			}
-			
-		}*/
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(SG552_SHOOT1, 2);			
+		}
 		if( !gHUD.cl_righthand->value )
 		{
 			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, -10.0, 0);

@@ -829,6 +829,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		if (!FNullEnt(ENT(pevInflictor)))
 			m_vBlastVector = pev->origin - pevInflictor->origin;
 
+		// notify gamerules
+		flDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
 		if (pev->armorvalue != 0.0f && IsArmored(m_LastHitGroup))
 		{
 			float flNew = flRatio * flDamage;
@@ -878,14 +881,23 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				m_bKilledByGrenade = true;
 		}
 
-		// notify gamerules
-		flDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
-
 		LogAttack(pAttack, this, teamAttack, (int)flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 		fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
 
 		if (fTookDamage > 0)
 		{
+#ifdef XASH_DEDICATED
+			//gr
+			//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
+			if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
+				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
+				WRITE_LONG((long)flDamage);
+				WRITE_SHORT(ENTINDEX(edict()));
+				WRITE_BYTE(m_LastHitGroup);
+				MESSAGE_END();
+				//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
+			}
+#endif
 			CHalfLifeMultiplay *mp = g_pGameRules;
 
 			if (TheBots != NULL)
@@ -1081,6 +1093,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 	}
 
+	// notify gamerules
+	flDamage = g_pModRunning->GetAdjustedEntityDamage(this, pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
 	// keep track of amount of damage last sustained
 	m_lastDamageAmount = flDamage;
 
@@ -1127,21 +1142,20 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	// as an int (zero) and think the player is dead! (this will incite a clientside screentilt, etc)
 	fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
 
-#ifdef XASH_DEDICATED
-	//gr
-	//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
-	if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
-		MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
-		WRITE_LONG((long)flDamage);
-		WRITE_SHORT(ENTINDEX(edict()));
-		WRITE_BYTE(m_LastHitGroup);
-		MESSAGE_END();
-		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
-	}
-#endif
-
 	if (fTookDamage > 0)
 	{
+#ifdef XASH_DEDICATED
+		//gr
+		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
+		if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
+			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
+			WRITE_LONG((long)flDamage);
+			WRITE_SHORT(ENTINDEX(edict()));
+			WRITE_BYTE(m_LastHitGroup);
+			MESSAGE_END();
+			//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
+		}
+#endif
 		CHalfLifeMultiplay *mp = g_pGameRules;
 
 		if (TheBots != NULL)
@@ -2418,20 +2432,22 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				case HITGROUP_GENERIC:
 				{
 					if (RANDOM_LONG(0, 1))
-						animDesired = LookupSequence("head_flinch");
+						Q_strcpy(szAnim, "head_flinch");
 					else
-						animDesired = LookupSequence("gut_flinch");
+						Q_strcpy(szAnim, "gut_flinch");
 					break;
 				}
 				case HITGROUP_HEAD:
 				case HITGROUP_CHEST:
-					animDesired = LookupSequence("head_flinch");
+					Q_strcpy(szAnim, "head_flinch");
 					break;
+				/*
 				case HITGROUP_SHIELD:
 					animDesired = 0;
 					break;
+				*/
 				default:
-					animDesired = LookupSequence("gut_flinch");
+					Q_strcpy(szAnim, "gut_flinch");
 					break;
 			}
 			if (m_bIsZombie && (!Q_strcmp(m_szAnimExtention, "knife")) && pev->flags & FL_DUCKING)
@@ -2443,6 +2459,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 				m_Activity = m_IdealActivity;
 			}
+			animDesired = LookupSequence(szAnim);
 			if (animDesired == -1)
 				animDesired = 0;
 

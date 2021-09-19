@@ -262,7 +262,7 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 		// visible when ready
 		if (icon.m_iCurrentSkillStatus == SKILL_STATUS_READY)
 		{
-			SPR_Set(gHUD.GetSprite(m_HUD_zombieGKey), r, g, b);
+			SPR_Set(gHUD.GetSprite(m_HUD_zombieGKey), 255, 193, 147);
 			SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_zombieGKey));
 		}
 		x += w;

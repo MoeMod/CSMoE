@@ -215,6 +215,7 @@ set (HUD_SRCS
 	./hud/flashlight.cpp
 	./hud/death.cpp
 	./hud/showwin.cpp
+	./hud/hud_headicon.cpp
 	./hud/hit_dgaxe.cpp
 	./hud/hit_indicator.cpp
 	./hud/saytext.cpp

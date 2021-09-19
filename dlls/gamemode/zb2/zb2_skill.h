@@ -140,6 +140,26 @@ protected:
 	EngineClock::time_point m_flInvisiable;
 };
 
+class CZombieSkill_ZombieHeal : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieHeal(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeZombieSkillEffect;
+	EngineClock::time_point m_flInvisiable;
+};
+
 }
 
 

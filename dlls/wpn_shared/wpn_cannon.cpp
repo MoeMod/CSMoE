@@ -47,7 +47,7 @@ void CCannon::Precache(void)
 {
 	Base::Precache();
 	PRECACHE_MODEL("sprites/flame_puff01.spr");
-
+	PRECACHE_MODEL("sprites/flame_burn01.spr");
 	PRECACHE_SOUND("weapons/cannon-1.wav");
 
 	m_usFire = PRECACHE_EVENT(1, "events/cannon.sc");

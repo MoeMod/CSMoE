@@ -272,13 +272,6 @@ void CBuffsg552ex::Buffsg552exFireB(float flSpread, duration_t flCycleTime, BOOL
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
 #ifndef CLIENT_DLL
 	int iEffect = 2;
 	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.955, m_pPlayer->pev, FALSE, m_pPlayer->random_seed, &iEffect, m_pPlayer);
@@ -288,8 +281,9 @@ void CBuffsg552ex::Buffsg552exFireB(float flSpread, duration_t flCycleTime, BOOL
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
 		RadiusDamage(vecShootPosition, SlashDamage());
 	}
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
 #endif
+	
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

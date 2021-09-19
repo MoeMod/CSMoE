@@ -127,10 +127,10 @@ set(XASH_ENGINE_SOURCES
 	common/Sequence.c
 	common/IceKey.cpp
 	common/mod_decryptor.cpp 
-	common/cpu.c 
+	common/cpu.c
 
 
-	server/sv_client.c
+		server/sv_client.c
 	server/sv_cmds.c
 	server/sv_custom.c
 	server/sv_frame.c
@@ -516,7 +516,7 @@ if(XASH_USE_STB_SPRINTF)
 endif()
 
 if(ANDROID)
-	target_link_libraries(${XASH_ENGINE} -ldl -llog)
+	target_link_libraries(${XASH_ENGINE} -ldl -llog -landroid)
 elseif(NOT WIN32)
 	if(NOT HAIKU)
 		target_link_libraries(${XASH_ENGINE} -lm -lpthread)

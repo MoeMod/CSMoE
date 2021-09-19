@@ -528,7 +528,7 @@ int CHudRadarModern::Draw(float time)
 				}
 				//DrawSprite(rx, ry, hspr, yaw, scale, 200, 200, 200, 255);
 				SPR_Set(hspr, 133, 247, 255);
-				SPR_DrawAdditive(0, rx, ry, &m_hRadarSupplybox.rect);
+				SPR_DrawAdditive(0, rx / gHUD.m_flScale, ry / gHUD.m_flScale, &m_hRadarSupplybox.rect);
 			}
 		}
 	}

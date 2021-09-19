@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include <jni.h>
 #include <EGL/egl.h> // nanogl
 #include <errno.h>
+#include <android/asset_manager_jni.h>
 convar_t *android_sleep;
 
 #ifdef XASH_IMGUI
@@ -187,6 +188,7 @@ static struct jnimethods_s
 	jmethodID loadID;
 	jmethodID showMouse;
 	jmethodID shellExecute;
+	jmethodID getAssetManager;
 	int width, height;
 } jni;
 
@@ -507,6 +509,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 	jni.loadID = (*env)->GetStaticMethodID(env, jni.actcls, "loadID", "()Ljava/lang/String;");
 	jni.showMouse = (*env)->GetStaticMethodID(env, jni.actcls, "showMouse", "(I)V");
 	jni.shellExecute = (*env)->GetStaticMethodID(env, jni.actcls, "shellExecute", "(Ljava/lang/String;)V");
+	jni.getAssetManager = (*env)->GetStaticMethodID(env, jni.actcls, "getAssetManager", "()Landroid/content/res/AssetManager;");
 
 	nanoGL_Init();
 	/* Run the application. */
@@ -1151,5 +1154,36 @@ void Android_ShellExecute( const char *path, const char *parms )
 	// no need to free jstr
 }
 
+AAssetManager *Android_GetAssetManager()
+{
+	jobject am = (*jni.env)->CallStaticObjectMethod(jni.env, jni.actcls, jni.getAssetManager);
+	return AAssetManager_fromJava(jni.env, am);
+}
+
+void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistappend)( stringlist_t *list, const char *text ))
+{
+	jobject assetManager_object = (*jni.env)->CallStaticObjectMethod(jni.env, jni.actcls, jni.getAssetManager);
+	jmethodID list_method = (*jni.env)->GetMethodID(jni.env, (*jni.env)->GetObjectClass(jni.env, assetManager_object), "list", "(Ljava/lang/String;)[Ljava/lang/String;");
+	jstring path_object = (*jni.env)->NewStringUTF(jni.env, path);
+	jobjectArray files_object = (*jni.env)->CallObjectMethod(jni.env, assetManager_object, list_method, path_object);
+	(*jni.env)->DeleteLocalRef(jni.env, path_object);
+
+	int length = (*jni.env)->GetArrayLength(jni.env, files_object);
+
+	for (int i = 0; i < length; i++)
+	{
+		jstring jstr = (jstring)(*jni.env)->GetObjectArrayElement(jni.env, files_object, i);
+
+		const char * filename = (*jni.env)->GetStringUTFChars(jni.env, jstr, NULL);
+
+		if (filename != NULL)
+		{
+			stringlistappend(list, filename);
+			(*jni.env)->ReleaseStringUTFChars(jni.env, jstr, filename);
+		}
+
+		(*jni.env)->DeleteLocalRef(jni.env, jstr);
+	}
+}
 
 #endif

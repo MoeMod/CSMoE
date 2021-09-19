@@ -73,6 +73,7 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 			p->GiveAmmo(iAmount, "50AE", iAmount);
 		}
 	},
+#ifdef XASH_DEDICATED
 	{ "SVDEX", [](CBasePlayer* p) {
 		DropPrimary(p);
 		p->GiveNamedItem("weapon_svdex");
@@ -92,7 +93,15 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
 	}
-
+#else
+	{ "SVDEX", [](CBasePlayer* p) {
+	DropPrimary(p);
+	p->GiveNamedItem("weapon_svdex");
+	int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+	p->GiveAmmo(iAmount, "556Nato", iAmount);
+		}
+	}
+#endif
 };
 
 LINK_ENTITY_TO_CLASS(supplybox, CSupplyBox);

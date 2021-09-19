@@ -344,7 +344,7 @@ int CHudAmmo::Init(void)
 	Reset();
 
 	m_pHud_DrawHistory_Time = CVAR_CREATE( "hud_drawhistory_time", "5", 0 );
-	m_pHud_FastSwitch = CVAR_CREATE( "hud_fastswitch", "0", FCVAR_ARCHIVE );		// controls whether or not weapons can be selected in one keypress
+	m_pHud_FastSwitch = CVAR_CREATE( "hud_fastswitch", "1", FCVAR_ARCHIVE );		// controls whether or not weapons can be selected in one keypress
 	CVAR_CREATE( "cl_observercrosshair", "1", 0 );
 	m_pClCrosshairColor = CVAR_CREATE( "cl_crosshair_color", "50 250 50", FCVAR_ARCHIVE );
 	m_pClCrosshairTranslucent = CVAR_CREATE( "cl_crosshair_translucent", "1", FCVAR_ARCHIVE );

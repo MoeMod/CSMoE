@@ -261,6 +261,7 @@ void CHud :: Init( void )
 	m_StatusBar.Init();
 	m_Dgaxe.Init();
 	m_ShowWin.Init();
+	m_HeadIcon.Init();
 	m_DeathNotice.Init();
 	m_TextMessage.Init();
 	m_FollowIcon.Init();

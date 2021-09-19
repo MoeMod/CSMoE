@@ -45,4 +45,11 @@ void Android_MouseMove( float *x, float *y );
 void Android_ShowMouse( qboolean show );
 void Android_AddMove( float x, float y);
 
+typedef struct AAssetManager AAssetManager;
+AAssetManager *Android_GetAssetManager();
+
+typedef struct stringlist_s stringlist_t;
+void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistappend)( stringlist_t *list, const char *text ));
+
+
 #endif // ANDROID_MAIN_H

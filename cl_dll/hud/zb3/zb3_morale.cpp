@@ -44,6 +44,9 @@ int CHudZB3Morale::VidInit(void)
 
 int CHudZB3Morale::Draw(float time)
 {
+	if (gEngfuncs.IsSpectateOnly())
+		return 0;
+
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
 	if (g_PlayerExtraInfo[idx].zombie)
 		return 0;
@@ -76,10 +79,10 @@ int CHudZB3Morale::Draw(float time)
 
 	//Human item
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iAmmoupSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 200, &gHUD.GetSpriteRect(m_iAmmoupSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iAmmoupSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iJumphigherSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, 244, &gHUD.GetSpriteRect(m_iJumphigherSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iJumphigherSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHighMoraleSPR), 255, 193, 147);
 	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2  + 75, &gHUD.GetSpriteRect(m_iHighMoraleSPR));
