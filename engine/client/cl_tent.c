@@ -811,6 +811,10 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 	}
 
 	switch (atoi(type)) {
+		case 125:
+			scale = 0.12f;
+			index = 5;
+			break;
 		case 127:
 			scale = 0.12f;
 			index = 7;
@@ -818,6 +822,10 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		case 136:
 			scale = 0.22f;
 			index = 6;
+			break;
+		case 103112:
+			scale = 0.1f;
+			index = 12;
 			break;
 	}
 	
@@ -844,6 +852,13 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 		sscanf(p + 1, "%f", &frame);
 	}
 
+	// svdex
+	switch (atoi(type)) {
+	case 103112:
+		frame = 0;
+		life = 0.4f;
+		break;
+	}
 
 	// must set position for right culling on render
 	pTemp = CL_TempEntAllocHigh(parent->attachment[iAttachment], Mod_Handle( modelIndex ));

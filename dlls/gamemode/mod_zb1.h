@@ -48,6 +48,7 @@ public: // CHalfLifeMultiplay
 	void CheckWinConditions() override;
 	int IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled) override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
+	enum CCSBotManager::GameScenarioType OverrideGameScenario(enum CCSBotManager::GameScenarioType type) override;
 
 public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
@@ -83,8 +84,16 @@ public:
 	int ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax) override;
 
 	void OnSpawn() override;
-	void OnThink() override { m_pCharacter->Think(); return CPlayerModStrategy_Zombie::OnThink(); }
-	void OnResetMaxSpeed() override { m_pCharacter->ResetMaxSpeed(); return CPlayerModStrategy_Zombie::OnResetMaxSpeed(); }
+	void OnThink() override {
+		if(m_pCharacter)
+			m_pCharacter->Think(); 
+		return CPlayerModStrategy_Zombie::OnThink();
+	}
+	void OnResetMaxSpeed() override { 
+		if(m_pCharacter)
+			m_pCharacter->ResetMaxSpeed();
+		return CPlayerModStrategy_Zombie::OnResetMaxSpeed();
+	}
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData &data) override { return m_pCharacter->ApplyKnockback(attacker, data); }
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void Pain(int m_LastHitGroup, bool HasArmour) override;

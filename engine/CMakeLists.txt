@@ -127,6 +127,7 @@ set(XASH_ENGINE_SOURCES
 	common/Sequence.c
 	common/IceKey.cpp
 	common/mod_decryptor.cpp 
+	common/mod_extend_seq.cpp 
 	common/cpu.c
 
 

@@ -16,7 +16,7 @@
 #include "util/u_vector.hpp"
 
 #include "luash_meta.hpp"
-#include "luash_function.hpp"
+#include "luash_ref.hpp"
 #include "luash_push.hpp"
 #include "luash_get.hpp"
-#include "luash_exception.hpp"
+#include "luash_open.hpp"

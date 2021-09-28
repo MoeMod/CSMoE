@@ -167,6 +167,7 @@ void EV_FireGunkata(struct event_args_s *args)
 				pEnt->entity.curstate.sequence = args->iparam1;
 				pEnt->entity.curstate.frame = 0;
 				pEnt->entity.curstate.framerate = 1.0;
+				angles[0] = 0.0f;
 				pEnt->entity.angles = angles;
 
 				pEnt->die = gHUD.m_flTime + args->fparam2;

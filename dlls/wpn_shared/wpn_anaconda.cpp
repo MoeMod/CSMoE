@@ -42,7 +42,7 @@ public:
 	static constexpr const char *W_Model = "models/w_anaconda.mdl";
 	static constexpr const char *EventFile = "events/anaconda.sc";
 	static constexpr const char *ClassName = "weapon_anaconda";
-	static constexpr const char *AnimExtension = "pistol";
+	static constexpr const char *AnimExtension = "onehanded";
 	static constexpr int MaxClip = 7;
 	static constexpr float ArmorRatioModifier = 1.6f;
 	enum

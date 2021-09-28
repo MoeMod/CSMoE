@@ -423,6 +423,16 @@ bool CCSBot::IsBuying() const
 	return false;
 }
 
+// Return true if we are defusing the bomb
+
+bool CCSBot::IsRushingForSupplyBox() const
+{
+	if (m_state == static_cast<const BotState*>(&m_defuseBombState))
+		return true;
+
+	return false;
+}
+
 // Move to potentially distant position
 
 void CCSBot::MoveTo(const Vector *pos, RouteType route)
@@ -454,6 +464,11 @@ void CCSBot::DefuseBomb()
 void CCSBot::InvestigateNoise()
 {
 	SetState(&m_investigateNoiseState);
+}
+
+void CCSBot::RushToSupplyBox()
+{
+	SetState(&m_supplyboxRushState);
 }
 
 }

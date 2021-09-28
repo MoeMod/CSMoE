@@ -192,6 +192,7 @@ set(HLDLL_SRCS
 	./cbase/cbase_physint.cpp
 	./gamemode/zbb/zbb_zombie.cpp
 	./refl/cbase_export.cpp
+	./bot/states/cs_bot_supplybox_rush.cpp
 	)
 
 set (HLWPN_SRCS
@@ -280,6 +281,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_balrog7.cpp
 	../dlls/wpn_shared/wpn_gatling.cpp
 	../dlls/wpn_shared/wpn_bow.cpp
+	../dlls/wpn_shared/wpn_huntbow.cpp
 	../dlls/wpn_shared/wpn_m2.cpp
 	../dlls/wpn_shared/wpn_janus7xmas.cpp
 	../dlls/wpn_shared/wpn_chainsaw.cpp

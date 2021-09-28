@@ -263,7 +263,7 @@ void CMod_ZombieHero::CheckWinConditions()
 	if (m_bFirstConnected && m_iRoundWinStatus != WINNER_NONE)
 		return;
 
-	if (!FInfectionStarted())
+	if (!FInfectionStarted() || m_bRoundTerminating)
 		return;
 
 	moe::range::PlayersList list;

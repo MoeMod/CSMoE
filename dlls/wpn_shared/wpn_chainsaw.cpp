@@ -89,7 +89,7 @@ int CChainsaw::GetItemInfo(ItemInfo *p)
 
 BOOL CChainsaw::Deploy(void)
 {
-	if (DefaultDeploy("models/v_chainsaw.mdl", "models/p_chainsaw.mdl", m_iClip ? ANIM_DRAW : ANIM_DRAW_EMPTY, "rifle", UseDecrement() != FALSE))
+	if (DefaultDeploy("models/v_chainsaw.mdl", "models/p_chainsaw.mdl", m_iClip ? ANIM_DRAW : ANIM_DRAW_EMPTY, "chainsaw", UseDecrement() != FALSE))
 	{
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.2s;
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;

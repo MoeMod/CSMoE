@@ -1917,6 +1917,10 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		iPenetrationPower = 25;
 		flPenetrationDistance = 800;
 		break;
+	case 16:
+		iPenetrationPower = 2000;
+		flPenetrationDistance = 8000;
+		break;
 	default:
 		iPenetrationPower = 0;
 		flPenetrationDistance = 0;
@@ -1965,47 +1969,71 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		char cTextureType = UTIL_TextureHit(&tr, vecSrc, vecEnd);
 		bool bSparks = false;
 
-		switch (cTextureType) {
-		case CHAR_TEX_METAL:
-			bHitMetal = true;
-			bSparks = true;
+		if (*iWeaponType == 3)
+		{
+			switch (cTextureType) {
+			case CHAR_TEX_GRATE:
+			case CHAR_TEX_VENT:
+			case CHAR_TEX_COMPUTER:
+				bHitMetal = true;
+				bSparks = true;
+				iPenetrationPower *= 0.99;
+				flDamageModifier = 0.99;
+				break;
+			case CHAR_TEX_CONCRETE:
+				iPenetrationPower *= 0.8;
+				flDamageModifier = 0.99;
+				break;
+			default:
+				iPenetrationPower *= 0.9;
+				flDamageModifier = 0.99;
+				break;
+			}
+		}
+		else
+		{
+			switch (cTextureType) {
+			case CHAR_TEX_METAL:
+				bHitMetal = true;
+				bSparks = true;
 
-			iPenetrationPower *= 0.15;
-			flDamageModifier = 0.2;
-			break;
-		case CHAR_TEX_CONCRETE:
-			iPenetrationPower *= 0.25;
-			break;
-		case CHAR_TEX_GRATE:
-			bHitMetal = true;
-			bSparks = true;
+				iPenetrationPower *= 0.15;
+				flDamageModifier = 0.2;
+				break;
+			case CHAR_TEX_CONCRETE:
+				iPenetrationPower *= 0.25;
+				break;
+			case CHAR_TEX_GRATE:
+				bHitMetal = true;
+				bSparks = true;
 
-			iPenetrationPower *= 0.5;
-			flDamageModifier = 0.4;
-			break;
-		case CHAR_TEX_VENT:
-			bHitMetal = true;
-			bSparks = true;
+				iPenetrationPower *= 0.5;
+				flDamageModifier = 0.4;
+				break;
+			case CHAR_TEX_VENT:
+				bHitMetal = true;
+				bSparks = true;
 
-			iPenetrationPower *= 0.5;
-			flDamageModifier = 0.45;
-			break;
-		case CHAR_TEX_TILE:
-			iPenetrationPower *= 0.65;
-			flDamageModifier = 0.3;
-			break;
-		case CHAR_TEX_COMPUTER:
-			bHitMetal = true;
-			bSparks = true;
+				iPenetrationPower *= 0.5;
+				flDamageModifier = 0.45;
+				break;
+			case CHAR_TEX_TILE:
+				iPenetrationPower *= 0.65;
+				flDamageModifier = 0.3;
+				break;
+			case CHAR_TEX_COMPUTER:
+				bHitMetal = true;
+				bSparks = true;
 
-			iPenetrationPower *= 0.4;
-			flDamageModifier = 0.45;
-			break;
-		case CHAR_TEX_WOOD:
-			flDamageModifier = 0.6;
-			break;
-		default:
-			break;
+				iPenetrationPower *= 0.4;
+				flDamageModifier = 0.45;
+				break;
+			case CHAR_TEX_WOOD:
+				flDamageModifier = 0.6;
+				break;
+			default:
+				break;
+			}
 		}
 		if (tr.flFraction != 1.0f) {
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
@@ -2030,6 +2058,70 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 3, (int)RANDOM_LONG(0, 3), TRUE, FALSE);
 				}
 				break;
+			}
+			case 3:
+			{
+				if (iPenetration == 7)
+				{
+					EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+					RadiusDamage(pEntity->pev->origin, pPlayer->pev, pPlayer->pev, 1100, 75, CLASS_MACHINE, DMG_BULLET);
+
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+					WRITE_BYTE(TE_EXPLOSION);
+					WRITE_COORD(tr.vecEndPos[0]);
+					WRITE_COORD(tr.vecEndPos[1]);
+					WRITE_COORD(tr.vecEndPos[2]);
+					WRITE_SHORT(MODEL_INDEX("sprites/ef_huntbow_explo.spr"));
+					WRITE_BYTE(8);
+					WRITE_BYTE(30);
+					WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+					MESSAGE_END();
+				}
+				else
+				{
+					if (pEntity->pev->takedamage != DAMAGE_NO)
+					{
+						if (pEntity->IsBSPModel())
+						{
+							EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+							RadiusDamage(pEntity->pev->origin, pPlayer->pev, pPlayer->pev, 1100, 75, CLASS_MACHINE, DMG_BULLET);
+
+							MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+							WRITE_BYTE(TE_EXPLOSION);
+							WRITE_COORD(pEntity->pev->origin[0]);
+							WRITE_COORD(pEntity->pev->origin[1]);
+							WRITE_COORD(pEntity->pev->origin[2]);
+							WRITE_SHORT(MODEL_INDEX("sprites/ef_huntbow_explo.spr"));
+							WRITE_BYTE(8);
+							WRITE_BYTE(30);
+							WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+							MESSAGE_END();
+							break;
+						}
+
+
+						if (pEntity->IsPlayer() && g_pGameRules->PlayerRelationship(pPlayer, pEntity) == GR_TEAMMATE)
+							break;
+
+						EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+						RadiusDamage(pEntity->pev->origin, pPlayer->pev, pPlayer->pev, 1100, 75, CLASS_MACHINE, DMG_BULLET);
+
+						MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+						WRITE_BYTE(TE_EXPLOSION);
+						WRITE_COORD(pEntity->pev->origin[0]);
+						WRITE_COORD(pEntity->pev->origin[1]);
+						WRITE_COORD(pEntity->pev->origin[2]);
+						WRITE_SHORT(MODEL_INDEX("sprites/ef_huntbow_explo.spr"));
+						WRITE_BYTE(8);
+						WRITE_BYTE(30);
+						WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+						MESSAGE_END();
+					}
+				}
+				
 			}
 			}
 
@@ -2067,12 +2159,29 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 
 			float flDistanceModifier;
 			if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration) {
-				iPenetrationPower = 42;
-				flDamageModifier = 0.75;
 				flDistanceModifier = 0.75;
+				if (*iWeaponType == 3)
+				{
+					flDamageModifier = 0.9;
+					iPenetrationPower = 100;
+					flDistanceModifier = 0.95;
+				}
+				else
+				{
+					iPenetrationPower = 42;
+					flDamageModifier = 0.75;
+				}				
 			}
 			else
-				flDistanceModifier = 0.5;
+			{
+				if (*iWeaponType == 3)
+				{
+					flDamageModifier = 0.9;
+					flDistanceModifier = 0.95;
+				}
+				else
+					flDistanceModifier = 0.5;
+			}				
 
 			DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pev, bHitMetal);
 

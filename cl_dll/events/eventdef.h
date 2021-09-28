@@ -72,6 +72,7 @@ HOOK_EVENT(m14ebr, FireM14EBR);
 HOOK_EVENT(gatling, FireGatling);
 HOOK_EVENT(gatlingex, FireGatlingex);
 HOOK_EVENT(bow, FireBow);
+HOOK_EVENT(huntbow, FireHuntbow);
 HOOK_EVENT(balrog7, FireBalrog7);
 HOOK_EVENT(m2, FireM2);
 HOOK_EVENT(m134, FireM134);

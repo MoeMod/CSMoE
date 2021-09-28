@@ -281,7 +281,7 @@ BOOL CBow::Deploy(void)
 	pev->iuser1 = 0;
 	fFinishTime = invalid_time_point;
 
-	return DefaultDeploy("models/v_bow.mdl", "models/p_bow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_DRAW : ANIM_DRAW_EMPTY, "m249", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_bow.mdl", "models/p_bow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_DRAW : ANIM_DRAW_EMPTY, "slingshot", UseDecrement() != FALSE);
 }
 
 int CBow::ExtractAmmo(CBasePlayerWeapon *pWeapon)

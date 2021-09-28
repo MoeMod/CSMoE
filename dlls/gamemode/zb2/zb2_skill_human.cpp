@@ -153,10 +153,11 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 #ifdef XASH_DEDICATED
+		/*
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(1);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();
+		MESSAGE_END();*/
 #endif
 	}
 
@@ -194,10 +195,11 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 #ifdef XASH_DEDICATED
+		/*
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(0);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();
+		MESSAGE_END();*/
 #endif
 	}
 

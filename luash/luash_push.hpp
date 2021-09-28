@@ -73,10 +73,10 @@ namespace cl {
 		using std::end;
 		template<class T> auto PushArray(lua_State* L, T&& v) -> decltype(begin(std::forward<T>(v)), end(std::forward<T>(v)), void())
 		{
+			lua_newtable(L);
 			int i = 0;
 			for(auto &&x : std::forward<T>(v))
 			{
-				lua_newtable(L);
 				lua_pushinteger(L, ++i);
 				Push(L, std::forward<decltype(x)>(x));
 				lua_settable(L, -3);
@@ -95,6 +95,11 @@ namespace cl {
 				detail::PushStructImpl(L, std::make_index_sequence<sizeof...(args)>(), std::forward<decltype(args)>(args)...);
 			});
 			CallOnStructCreate<typename std::decay<T>::type>(L);
+		}
+		template<class T> void PushPointer(lua_State* L, T* ptr)
+		{
+			lua_pushlightuserdata(L, (void *)ptr);
+			CallOnPtrCreate(L, ptr);
 		}
 
 		namespace detail
@@ -127,10 +132,6 @@ namespace cl {
 			{
 				return PushVector(L, std::forward<T>(x));
 			}
-			template<class T> auto PushUnknownImpl(lua_State* L, T&& x, PriorityTag<4>) -> decltype(PushFunction(L, std::forward<T>(x)))
-			{
-				return PushFunction(L, std::forward<T>(x));
-			}
 			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<2>) -> decltype(PushArray(L, std::forward<T>(x)))
 			{
 				return PushArray(L, std::forward<T>(x));
@@ -138,6 +139,10 @@ namespace cl {
 			template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<1>) -> decltype(PushStruct(L, std::forward<T>(x)))
 			{
 				return PushStruct(L, std::forward<T>(x));
+			}
+			template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<0>) -> decltype(PushPointer(L, x))
+			{
+				return PushPointer(L, x);
 			}
 			template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<0>, std::nullptr_t = nullptr) -> typename std::enable_if<std::is_null_pointer<T>::value>::type
 			{

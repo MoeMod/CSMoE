@@ -83,7 +83,7 @@ BOOL CM14EBR::Deploy(void)
 	m_iShotsFired = 0;
 	iShellOn = 1;
 
-	return DefaultDeploy("models/v_m14ebr.mdl", "models/p_m14ebr.mdl", M14EBR_DRAW, "m14ebr", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_m14ebr.mdl", "models/p_m14ebr.mdl", M14EBR_DRAW, "rifle", UseDecrement() != FALSE);
 }
 
 void CM14EBR::PrimaryAttack(void)

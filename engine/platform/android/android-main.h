@@ -51,5 +51,6 @@ AAssetManager *Android_GetAssetManager();
 typedef struct stringlist_s stringlist_t;
 void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistappend)( stringlist_t *list, const char *text ));
 
+float Android_GetDisplayDPI();
 
 #endif // ANDROID_MAIN_H

@@ -16,7 +16,17 @@ namespace sv {
 
 static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 {
-	{ "NightVision", [](CBasePlayer *p) {
+	{ "NightVision && Grenades", [](CBasePlayer *p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
+
+		p->GiveNamedItem("weapon_hegrenade");
+		p->GiveNamedItem("weapon_smokegrenade");
+		p->GiveNamedItem("weapon_flashbang");
+		p->GiveNamedItem("weapon_flashbang");
+
 		if (!(p->m_flDisplayHistory & DHF_NIGHTVISION))
 		{
 			p->HintMessage("#Hint_use_nightvision");
@@ -25,34 +35,14 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		EMIT_SOUND(ENT(p->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
 		p->m_bHasNightVision = true;
 		SendItemStatus(p);
+
 		}
 	},
-	{ "Grenades, Ammo Set", [](CBasePlayer *p) {
-			
+	{ "Dual MP7A1", [](CBasePlayer *p) {
 			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 			{
 				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 			}
-
-			p->GiveNamedItem("weapon_hegrenade");
-			p->GiveNamedItem("weapon_smokegrenade");
-			p->GiveNamedItem("weapon_flashbang");
-			p->GiveNamedItem("weapon_flashbang");
-			
-			//p->AddAccount(16000);
-			/*while (BuyAmmo(p, PRIMARY_WEAPON_SLOT, false))
-				;
-			while (BuyAmmo(p, PISTOL_SLOT, false))
-				;
-			BuyItem(p, MENU_SLOT_ITEM_FLASHGREN);
-			BuyItem(p, MENU_SLOT_ITEM_FLASHGREN);
-			BuyItem(p, MENU_SLOT_ITEM_HEGREN);
-			BuyItem(p, MENU_SLOT_ITEM_SMOKEGREN);
-
-			p->AddAccount(16000);*/
-		}
-	},
-	{ "Dual MP7A1", [](CBasePlayer *p) {
 			DropPrimary(p);
 			p->GiveNamedItem("weapon_mp7a1d");
 			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("46mm", MAX_AMMO_46MM);
@@ -60,6 +50,10 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		}
 	},
 	{ "AK-47 60R", [](CBasePlayer *p) {
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
 			DropPrimary(p);
 			p->GiveNamedItem("weapon_ak47l");
 			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("762Nato", MAX_AMMO_762NATO);
@@ -67,6 +61,10 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		}
 	},
 	{ "Dual Desert Eagle", [](CBasePlayer *p) {
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
 			DropSecondary(p);
 			p->GiveNamedItem("weapon_deagled");
 			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
@@ -75,6 +73,10 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 	},
 #ifdef XASH_DEDICATED
 	{ "SVDEX", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
 		DropPrimary(p);
 		p->GiveNamedItem("weapon_svdex");
 		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
@@ -82,23 +84,32 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		}
 	},
 	{ "神鬼开天", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
 		p->RemovePlayerItem(p->m_rgpPlayerItems[KNIFE_SLOT]);
 		p->GiveNamedItem("knife_dgaxe");
 		}
 	},
 	{ "熔火岩狼", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
 		DropPrimary(p);
 		p->GiveNamedItem("weapon_buffsg552ex");
 		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
 		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
-	}
-#else
-	{ "SVDEX", [](CBasePlayer* p) {
-	DropPrimary(p);
-	p->GiveNamedItem("weapon_svdex");
-	int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-	p->GiveAmmo(iAmount, "556Nato", iAmount);
+	},
+	{ "诅咒缔结Prototype", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
+		DropPrimary(p);
+		p->GiveNamedItem("weapon_huntbow");
 		}
 	}
 #endif
@@ -150,8 +161,8 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	auto &nf = g_SupplyboxItems[RANDOM_LONG(0, std::extent<decltype(g_SupplyboxItems)>::value - 1)];
 	nf.second(p);
 
-	UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 obtained supply item (%s2).", STRING(p->pev->netname), nf.first);
-	ClientPrint(p->pev, HUD_PRINTCENTER, "You obtained supply item (%s1).", nf.first);
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2).", STRING(p->pev->netname), nf.first);
+	ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1).", nf.first);
 	
 	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/get_box.wav", VOL_NORM, ATTN_NORM);
 

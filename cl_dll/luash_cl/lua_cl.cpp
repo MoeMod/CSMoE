@@ -4,12 +4,12 @@
 #include "lua_cl.h"
 
 #include "luash.hpp"
-#include "luash_vectorlib.hpp"
 
 #include <string>
 #include <cassert>
 
 #include "ev_lua.h"
+#include "imgui_lua/imgui_lua.h"
 
 namespace cl
 {
@@ -41,9 +41,15 @@ namespace cl
 		luaopen_bit(L);
 		luaopen_jit(L);
 		//luaopen_ffi(L);
-		
+		luaopen_imgui(L);
+
 		lua_register(L, "require", LuaCL_GlobalRequire);
 		lua_register(L, "print", LuaCL_GlobalPrint);
+
+		luash::OpenLibs(L);
+		luash::RegisterGlobal(L, "engine", &gEngfuncs);
+		luash::RegisterGlobal(L, "render", &gRenderAPI);
+		luash::RegisterGlobal(L, "mobile", &gMobileAPI);
 
 		LuaCL_OpenEventScripts(L);
 
@@ -176,5 +182,38 @@ namespace cl
 	{
 		if (type == t_eventscript)
 			LuaCL_OnPrecacheEvent(name, index);
+	}
+
+	void LuaCL_OnGUI()
+	{
+		lua_State* L = LuaCL_Get();
+
+		lua_getglobal(L, "require");
+		// #1 = require
+
+		lua_pushstring(L, "imgui/client");
+		// #2 = path
+
+		lua_call(L, 1, 1);
+		// #1 = function LuaCL_OnGUI
+
+		if (!lua_isnil(L, -1))
+		{
+			int errc = lua_pcall(L, 0, 0, 0);
+			// #0 on succ
+			// #1 = errmsg on failed
+			if (errc)
+			{
+				const char* msg = lua_tostring(L, -1);
+				gEngfuncs.Con_Printf("%s Error: lua imgui failed: %s", __FUNCTION__, msg);
+				lua_pop(L, 1);
+				// #0
+			}
+		}
+		else
+		{
+			lua_pop(L, 1);
+			// #0
+		}
 	}
 }

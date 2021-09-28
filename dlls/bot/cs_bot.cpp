@@ -287,7 +287,7 @@ void CCSBot::BotTouch(CBaseEntity *other)
 bool CCSBot::IsBusy() const
 {
 	if (IsAttacking() || IsBuying() || IsDefusingBomb() || GetTask() == PLANT_BOMB || GetTask() == RESCUE_HOSTAGES ||
-	    IsSniping()) {
+	    IsSniping() || IsRushingForSupplyBox()) {
 		return true;
 	}
 

@@ -457,12 +457,19 @@ void CBowArrowAmmo::Precache()
 
 BOOL CBowArrowAmmo::AddAmmo(CBaseEntity *pOther)
 {
-	if (pOther->GiveAmmo(5, "bowarrow", 60) == -1) {
-		return FALSE;
+	ItemInfo WeaponInfo;
+	CBasePlayer* player = static_cast<CBasePlayer*>(pOther);
+	if (player->m_pActiveItem != nullptr && player->m_pActiveItem->GetItemInfo(&WeaponInfo))
+	{
+		int iMaxammo = WeaponInfo.iMaxAmmo1;
+		if (pOther->GiveAmmo(5, "bowarrow", iMaxammo) == -1) {
+			return FALSE;
+		}
 	}
 
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
 	return TRUE;
+
 }
 
 LINK_ENTITY_TO_CLASS(ammo_bow, CBowArrowAmmo);

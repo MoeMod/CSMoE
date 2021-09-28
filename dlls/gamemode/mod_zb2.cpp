@@ -156,13 +156,17 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 
 	}
 
+	if (TheBots != NULL)
+	{
+		TheBots->OnEvent(EVENT_SUPPLYBOX_ARRIVE);
+	}
 }
 
 int CMod_ZombieMod2::SupplyboxCount()
 {
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
 	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
-	int iSupplyboxCount = (NumAliveTerrorist + NumAliveCT + NumDeadTerrorist) / 10 + 1;
+	int iSupplyboxCount = (NumAliveTerrorist + NumAliveCT + NumDeadTerrorist) / 10 + 3;
 	return iSupplyboxCount;
 }
 
@@ -317,7 +321,12 @@ void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 	auto sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, m_pPlayer->m_ZombieClass);
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
-	m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
+
+	// fix crash
+	if (m_pPlayer->m_pActiveItem)
+	{
+		m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
+	}
 
 	sp->InitHUD();
 	sp->ResetMaxSpeed();

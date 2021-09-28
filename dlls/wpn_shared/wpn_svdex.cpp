@@ -58,6 +58,7 @@ namespace sv {
 		void Precache() override
 		{
 			PRECACHE_MODEL("models/shell_svdex.mdl");
+			PRECACHE_MODEL("sprites/muzzleflash12.spr");
 			m_iSprEffect = PRECACHE_MODEL("sprites/laserbeam.spr");
 		}
 
@@ -181,6 +182,9 @@ namespace sv {
 							ApplyMultiDamage(pevInflictor, pevAttacker);
 						}
 
+						if (!pEntity->IsPlayer())
+							continue;
+
 						CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 						if (pVictim->m_bIsZombie) // Zombie Knockback...
 						{
@@ -301,6 +305,9 @@ BOOL CSVDEX::Deploy(void)
 	m_iShotsFired = 0;
 
 	m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;
+#ifndef CLIENT_DLL
+	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_M4A1_SILENCED) == 0);
+#endif
 	return DefaultDeploy("models/v_svdex.mdl", "models/p_svdex.mdl", SVDEX_DRAWA, "rifle", UseDecrement() != FALSE);
 }
 

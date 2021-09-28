@@ -32,6 +32,8 @@ class CBaseEntity;
 
 class CBasePlayer; // player.h
 
+class CCSBotManager;
+
 class IBaseMod
 {
 public:
@@ -46,6 +48,7 @@ public:
 	virtual HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType) { return static_cast<HitBoxGroup>(ptr->iHitgroup); }
 	virtual int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet) { return 0; }
 	virtual int ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther) { return 1; }
+	virtual enum CCSBotManager::GameScenarioType OverrideGameScenario(enum CCSBotManager::GameScenarioType type) { return type; }
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, ruleof350::unique, virtual public IBaseMod

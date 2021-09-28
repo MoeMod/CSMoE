@@ -315,7 +315,9 @@ int ImGui_Console_AddGenericString(int x0, int y0, const char* string, rgba_t se
 	}
 
 	//float xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
-	return x - x0;
+	int result = x - x0;
+	TextAdjustSizeReverse(&result, NULL, NULL, NULL);
+	return result;
 }
 
 void ImGui_Console_DrawStringLen(const char* pText, int* length, int* height)

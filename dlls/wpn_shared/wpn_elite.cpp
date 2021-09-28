@@ -87,7 +87,7 @@ BOOL CELITE::Deploy(void)
 	m_NextInspect = gpGlobals->time + 0.75s;
 	if (!(m_iClip & 1))
 		m_iWeaponState |= WPNSTATE_ELITE_LEFT;
-	return DefaultDeploy("models/v_elite.mdl", "models/p_elite.mdl", ELITE_DRAW, "dualpistols", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_elite.mdl", "models/p_elite.mdl", ELITE_DRAW, "dualpistols_1", UseDecrement() != FALSE);
 }
 
 void CELITE::PrimaryAttack(void)

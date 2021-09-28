@@ -715,6 +715,8 @@ public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
 	int iuser1;
+	int iRecorder[33];
+	time_point_t tlLastMarkTime[33];
 	const char* m_ZombieClass;
 };
 

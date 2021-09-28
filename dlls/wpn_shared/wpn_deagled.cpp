@@ -81,24 +81,23 @@ BOOL CDeagleD::Deploy(void)
 	if (!(m_iClip & 1))
 		m_iWeaponState |= WPNSTATE_ELITE_LEFT;
 
-	return DefaultDeploy("models/v_ddeagle.mdl", "models/p_ddeagle.mdl", ELITE_DRAW, "dualpistols", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_ddeagle.mdl", "models/p_ddeagle.mdl", ELITE_DRAW, "dualpistols_1", UseDecrement() != FALSE);
 }
 
 void CDeagleD::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		ELITEFire((1.5) * (1 - m_flAccuracy), 0.25s, FALSE);
+		ELITEFire((1.5) * (1 - m_flAccuracy), 0.125s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		ELITEFire((0.25) * (1 - m_flAccuracy), 0.25s, FALSE);
+		ELITEFire((0.25) * (1 - m_flAccuracy), 0.125s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		ELITEFire((0.115) * (1 - m_flAccuracy), 0.25s, FALSE);
+		ELITEFire((0.115) * (1 - m_flAccuracy), 0.125s, FALSE);
 	else
-		ELITEFire((0.13) * (1 - m_flAccuracy), 0.25s, FALSE);
+		ELITEFire((0.13) * (1 - m_flAccuracy), 0.125s, FALSE);
 }
 
 void CDeagleD::ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
-	flCycleTime -= 0.125s;
 	m_iShotsFired++;
 
 	if (m_iShotsFired > 1)

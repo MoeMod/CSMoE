@@ -634,18 +634,18 @@ void CVoidpistol::PrimaryAttack(void)
 	case VOIDPISTOL_MODEA:
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			VoidpistolFireA((1.5) * (1 - m_flAccuracy), 0.3s, FALSE);
+			VoidpistolFireA((1.5) * (1 - m_flAccuracy), 0.2s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			VoidpistolFireA((0.25) * (1 - m_flAccuracy), 0.3s, FALSE);
+			VoidpistolFireA((0.25) * (1 - m_flAccuracy), 0.2s, FALSE);
 		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			VoidpistolFireA((0.115) * (1 - m_flAccuracy), 0.3s, FALSE);
+			VoidpistolFireA((0.115) * (1 - m_flAccuracy), 0.2s, FALSE);
 		else
-			VoidpistolFireA((0.13) * (1 - m_flAccuracy), 0.3s, FALSE);
+			VoidpistolFireA((0.13) * (1 - m_flAccuracy), 0.2s, FALSE);
 		break;
 	}
 	case VOIDPISTOL_MODEB:
 	{
-		VoidpistolFireB((0.13) * (1 - m_flAccuracy), 0.3s, FALSE); break;
+		VoidpistolFireB((0.13) * (1 - m_flAccuracy), 0.2s, FALSE); break;
 	}
 	}
 #endif

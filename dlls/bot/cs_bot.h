@@ -197,6 +197,9 @@ public:
 
 	bool IsBusy() const;									// return true if we are busy doing something important
 
+	void RushToSupplyBox();
+	bool IsRushingForSupplyBox() const;
+
 	// high-level tasks
 	enum TaskType
 	{
@@ -486,6 +489,7 @@ private:
 	EscapeFromBombState m_escapeFromBombState;
 	FollowState m_followState;
 	UseEntityState m_useEntityState;
+	SupplyBoxRushState m_supplyboxRushState;
 
 	// TODO: Allow multiple simultaneous state machines (look around, etc)
 	void SetState(BotState *state);						// set the current behavior state

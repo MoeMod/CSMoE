@@ -54,7 +54,7 @@ constexpr auto BuildKnockbackData(SequenceHolder<T, Is...>, float flVelocityModi
 }
 constexpr KnockbackData BuildKnockbackData(const KnockbackData &kbd)
 {
-	return { kbd.flOnGround, kbd.flNotOnGround, kbd.flFlying, kbd.flDucking, kbd.flDucking };
+	return { kbd.flOnGround, kbd.flNotOnGround, kbd.flFlying, kbd.flDucking, kbd.flVelocityModifier };
 }
 constexpr KnockbackData BuildKnockbackData(const float(&kbd)[5])
 {

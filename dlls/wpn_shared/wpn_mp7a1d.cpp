@@ -81,7 +81,7 @@ BOOL CMP7A1D::Deploy(void)
 	if (!(m_iClip & 1))
 		m_iWeaponState |= WPNSTATE_ELITE_LEFT;
 
-	return DefaultDeploy("models/v_dmp7a1.mdl", "models/p_dmp7a1.mdl", ELITE_DRAW, "dualpistols", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_dmp7a1.mdl", "models/p_dmp7a1.mdl", ELITE_DRAW, "dualpistols_1", UseDecrement() != FALSE);
 }
 
 void CMP7A1D::PrimaryAttack(void)

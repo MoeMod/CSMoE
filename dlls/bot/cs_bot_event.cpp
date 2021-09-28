@@ -265,6 +265,15 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 			}
 			break;
 		}
+		case EVENT_SUPPLYBOX_ARRIVE:
+		{
+			// fetch the supplybox
+			if (!m_bIsZombie/* && !IsBusy() */)
+			{
+				RushToSupplyBox();
+			}
+			break;
+		}
 		default:
 			break;
 	}

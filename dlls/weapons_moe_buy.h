@@ -82,6 +82,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_janus7xmas",         "Janus-7 Xmas Edition",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_sgdrill",         "Magnum Drill",                 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_bow",      "BOW",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+	{"weapon_huntbow",      "Hunt Bow",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_gatling",      "Volcano",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 	{"weapon_chainsaw",         "Ripper",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_desperado",         "Python Desperado",                  1500, PISTOL_SLOT, UNASSIGNED},

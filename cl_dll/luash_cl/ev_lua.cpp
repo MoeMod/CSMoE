@@ -58,7 +58,7 @@ namespace cl
 			return;
 		}
 		
-		luash::Push(L, *args);
+		luash::Push(L, args);
 		
 		int errc = lua_pcall(L, 1, 0, 0);
 		if(errc)

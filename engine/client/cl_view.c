@@ -363,8 +363,10 @@ qboolean V_PreRender( void )
 	if( !glw_state.initialized )
 		return false;
 
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
 	if( host.state == HOST_NOFOCUS && !( host.force_draw_version && ( host.force_draw_version_time > host.realtime ) ) )
 		return false;
+#endif
 
 	if( host.state == HOST_SLEEP )
 		return false;

@@ -44,6 +44,7 @@ enum event_effect
 	EVENT_VOIDPISTOL,
 	EVENT_BUFFSG552EX,
 	EVENT_DGAXE,
+	EVENT_DUALSWORD_FX,
 };
 
 enum buffsg552ex_slash_e
@@ -297,7 +298,61 @@ void EV_WpnEffects(event_args_s* args)
 				}
 			}
 		}
+		case EVENT_DUALSWORD_FX:
+		{
+			if (!EV_IsLocal(idx))
+				break;
 
+			auto viewent = gEngfuncs.GetViewModel();
+			model_s* pModel = IEngineStudio.Mod_ForName("models/dualswordfx.mdl", false);
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+
+			pEnt->entity.curstate.body = viewent->curstate.body;
+			pEnt->entity.curstate.frame = 0.0f;
+			pEnt->entity.curstate.framerate = 1.0f;
+			pEnt->entity.curstate.animtime = gHUD.m_flTime;
+			pEnt->entity.curstate.sequence = args->iparam2;
+			pEnt->tentOffset = Vector(0, 0, 0);
+			pEnt->bounceFactor = 3;	// ??
+			pEnt->fadeSpeed = 512;
+			pEnt->frameMax = 31;
+
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.baseline.angles = Vector(0, 0, 0);
+
+			if (args->iparam2 != 3)
+			{
+				pEnt->die = gHUD.m_flTime + 1.0;
+				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = viewent->origin;
+					pEnt->entity.angles = viewent->angles;
+					if (currenttime > pEnt->entity.curstate.fuser1)
+						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1) * 255.0f;
+				};
+			}
+			else
+			{
+				pEnt->die = gHUD.m_flTime + 1.5;
+				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = viewent->origin;
+					pEnt->entity.angles = viewent->angles;
+					if (currenttime > pEnt->entity.curstate.fuser1 + 1.0)
+						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1 - 1.0) * 2.0f * 255.0f;
+				};
+			}
+
+
+			pEnt->clientIndex = idx;
+			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_PERSIST;
+
+			break;
+		}
 		default:break;
 		}
 }

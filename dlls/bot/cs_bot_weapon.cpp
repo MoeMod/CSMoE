@@ -140,6 +140,13 @@ void CCSBot::FireWeaponAtEnemy()
 						// fire somewhat quickly
 						timestamp_delta = RandomDuration(0.15s, 0.4s);
 					}
+					CBasePlayerWeapon* weapon = GetActiveWeapon();
+
+					if (weapon != NULL && (!Q_strcmp(STRING(weapon->pev->classname), "weapon_desperado")))
+					{
+						if(IsPistolEmpty())
+							SecondaryAttack();
+					}
 				}
 				// not using a pistol
 				else

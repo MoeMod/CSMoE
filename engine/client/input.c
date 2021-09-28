@@ -453,12 +453,9 @@ void IN_StartupMouse( void )
 
 static void IN_ActivateCursor( void )
 {
-	if( cls.key_dest == key_menu )
-	{
 #ifdef XASH_SDL
-		SDL_SetCursor( in_mousecursor );
+	SDL_SetCursor( in_mousecursor );
 #endif
-	}
 }
 
 void IN_SetCursor( Xash_Cursor* hCursor )
@@ -640,6 +637,7 @@ void IN_MouseMove( void )
 	if (ImGui_ImplGL_MouseMove(current_pos.x, current_pos.y))
 	{
 #ifdef XASH_SDL
+		SDL_SetRelativeMouseMode(SDL_FALSE);
 		SDL_ShowCursor( SDL_TRUE );
 #endif
 		IN_ActivateCursor();
@@ -685,10 +683,23 @@ void IN_MouseEvent( int mstate )
 		static qboolean ignore; // igonre mouse warp event
 		int x, y;
 		SDL_GetMouseState(&x, &y);
-		if( host.mouse_visible )
-			SDL_ShowCursor( SDL_TRUE );
+#ifdef XASH_IMGUI
+		if (host.mouse_visible || ImGui_ImplGL_IsCursorVisible())
+		{
+			SDL_SetRelativeMouseMode(SDL_FALSE);
+			SDL_ShowCursor(SDL_TRUE);
+		}
 		else
-			SDL_ShowCursor( SDL_FALSE );
+		{
+			SDL_SetRelativeMouseMode(SDL_TRUE);
+			SDL_ShowCursor(SDL_FALSE);
+		}
+#else
+		if( host.mouse_visible )
+			SDL_ShowCursor(SDL_TRUE);
+		else
+			SDL_ShowCursor(SDL_FALSE);
+#endif
 
 		int division = 32; // 2
 		if( x < host.window_center_x - host.window_center_x / division ||
@@ -970,6 +981,14 @@ void Host_InputFrame( void )
 			inputstate.lastpitch = pitch;
 			inputstate.lastyaw = yaw;
 		}
+
+#ifdef XASH_IMGUI
+		if (ImGui_ImplGL_IsCursorVisible())
+		{
+			yaw = 0;
+			pitch = 0;
+		}
+#endif
 
 		if( cls.key_dest == key_game )
 		{

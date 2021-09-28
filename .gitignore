@@ -329,6 +329,7 @@ CMakeSettings.json
 /3rdparty/LuaJIT
 /3rdparty/SDL2
 /3rdparty/cpuinfo
+/3rdparty/xorstr
 /SDL2
 msvc/BundleArtifacts/
 /CSMoE-Full

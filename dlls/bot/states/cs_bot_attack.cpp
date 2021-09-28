@@ -61,7 +61,8 @@ void AttackState::OnEnter(CCSBot *me)
 		// decide whether to crouch where we are, or run and gun (if we havent already - see CCSBot::Attack())
 		if (!m_crouchAndHold)
 		{
-			if (enemy != NULL)
+			bool bEnemyIsZombie = (enemy != NULL) && (enemy->IsPlayer() && static_cast<CBasePlayer*>(enemy)->m_bIsZombie) || (enemy->Classify() == CLASS_PLAYER_ALLY);
+			if (enemy != NULL && !bEnemyIsZombie)
 			{
 				const float crouchFarRange = 750.0f;
 				float crouchChance;

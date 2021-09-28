@@ -8,7 +8,7 @@ namespace cl {
 #endif
 	namespace luash
 	{
-		template<class T> void GetBoolean(lua_State* L, int N, bool& x)
+		inline void GetBoolean(lua_State* L, int N, bool& x)
 		{
 			x = lua_toboolean(L, N);
 		}
@@ -35,7 +35,7 @@ namespace cl {
 		template<class T> auto GetEnum(lua_State* L, int N, T &x) -> typename std::enable_if<std::is_enum<T>::value>::type
 		{
 			typename std::underlying_type<T>::type y;
-			GetFloat(L, N, y);
+			GetInteger(L, N, y);
 			x = static_cast<T>(y);
 		}
 		inline void GetString(lua_State* L, int N, const char* &sz)
@@ -115,6 +115,39 @@ namespace cl {
 			lua_pop(L, 1);
 			// #0
 		}
+		template<class T, std::size_t Size> auto GetArray(lua_State* L, int N, T(&arr)[Size])
+		{
+			lua_pushvalue(L, N);
+			// #1 = arr
+			for (std::size_t i = 0; i < Size; ++i)
+			{
+				lua_pushinteger(L, i + 1);
+				// #2 = i + 1
+				lua_gettable(L, -2);
+				// #2 = arr[i+1]
+				Get(L, -1, arr[i]);
+				//
+				lua_pop(L, 1);
+				// #1 = arr
+			}
+			lua_pop(L, 1);
+			// #0
+		}
+		template<class T> auto GetArray(lua_State* L, int N, T& v) -> decltype(v.begin(), v.end(), v.resize(0), void())
+		{
+			lua_pushvalue(L, N); // #1 = arr
+			const auto Size = lua_objlen(L, -1);
+			v.resize(Size);
+			int i = 0;
+			for (auto& x : v)
+			{
+				lua_pushinteger(L, ++i); // #2 = i + 1
+				lua_gettable(L, -2); // #2 = arr[i+1]
+				Get(L, -1, x);
+				lua_pop(L, 1); // #1 = arr
+			}
+			lua_pop(L, 1); // #0
+		}
 		namespace detail
 		{
 			template<std::size_t...I, class...Args> void GetStructImpl(lua_State* L, std::index_sequence<I...>, Args &...args)
@@ -137,10 +170,42 @@ namespace cl {
 			lua_pushvalue(L, N);
 			// #1 = struct
 			StructApply(v, [L](auto &...args) {
-				GetStructImpl(L, std::make_index_sequence<sizeof...(args)>(), args...);
+				detail::GetStructImpl(L, std::make_index_sequence<sizeof...(args)>(), args...);
 				});
 			lua_pop(L, 1);
 			// #0
+		}
+		namespace detail {
+			template<class T> auto GetPointerImpl(lua_State* L, int N, T*& out, std::true_type)
+			{
+				void* ptr = lua_touserdata(L, N);
+				if (const ITypeInterface* ti = GetTypeInterface(L, ptr))
+				{
+					std::type_index src_type = ti->GetTypeID();
+					std::type_index dst_type = typeid(typename std::remove_cv<T>::type);
+					if (src_type == dst_type)
+					{
+						out = reinterpret_cast<T*>(ptr);
+						return;
+					}
+				}
+				out = nullptr;
+			}
+			template<class T> auto GetPointerImpl(lua_State* L, int N, T*& out, std::false_type)
+			{
+				void* ptr = lua_touserdata(L, N);
+				if (const ITypeInterface* ti = GetTypeInterface(L, ptr))
+				{
+					out = reinterpret_cast<T*>(ptr);
+					return;
+				}
+				out = nullptr;
+			}
+		}
+		template<class T>
+		inline auto GetPointer(lua_State* L, int N, T* &out)
+		{
+			return detail::GetPointerImpl(L, N, out, IsCompleteType<T>());
 		}
 
 		namespace detail
@@ -180,6 +245,10 @@ namespace cl {
 			template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<1>) -> decltype(GetStruct(L, N, x))
 			{
 				return GetStruct(L, N, x);
+			}
+			template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<0>) -> decltype(GetPointer(L, N, x))
+			{
+				return GetPointer(L, N, x);
 			}
 			template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<0>, std::nullptr_t = nullptr) -> typename std::enable_if<std::is_null_pointer<T>::value>::type
 			{

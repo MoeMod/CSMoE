@@ -46,7 +46,7 @@ public:
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
-	static constexpr const char *AnimExtension = "skullaxe";
+	static constexpr const char *AnimExtension = "stormgiant";
 	static constexpr const auto &DefaultDeployTime = 0s;
 	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
 
@@ -198,7 +198,7 @@ void CKnifeStormgiantX::SecondaryAttack(void)
 		return;
 	}
 #ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+	m_pPlayer->SetAnimation(PLAYER_ATTACK2);
 #endif
 	SendWeaponAnim(ANIM_MIDSLASH2, UseDecrement() != FALSE);
 
@@ -262,10 +262,6 @@ void CKnifeStormgiantX::DelaySecondaryAttack()
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
-#ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
 
 #ifndef CLIENT_DLL
 	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))

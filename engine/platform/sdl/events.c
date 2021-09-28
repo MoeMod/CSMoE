@@ -142,11 +142,6 @@ static void SDLash_KeyEvent( SDL_KeyboardEvent key, int down )
 		}
 	}
 
-#ifdef XASH_IMGUI
-	if (ImGui_ImplGL_KeyEvent(keynum, down))
-		return;
-#endif
-
 	if (SDL_IsTextInputActive() && down)
 	{
 		if (SDL_GetModState() & KMOD_CTRL)

@@ -840,12 +840,10 @@ public:
 	void Reset(void);
 	void Shutdown();
 	void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale);
-	void R_AttachTentToEntity2(int entity, model_s* pModel, vec3_t offset, float life, int additive, int flags, float scale);
 	CHudMsgFunc(HeadIcon);
 
 private:
-	struct CHudHeadIconItem;
-	
+	SharedTexture m_pTexture_Zombie_s;
 };
 
 //
@@ -860,12 +858,14 @@ public:
 	int Draw(float flTime);
 	void Reset(void);
 	void Shutdown();
+	void DrawHuntbowCrossHair(float x, float y, float wide, float height, int iType);
 	CHudMsgFunc(Dgaxe);
 
 private:
 	float wide, height;
 	int iType;
-	SharedTexture m_pCurTexture[3];
+	int iWeapon;
+	SharedTexture m_pCurTexture[7];
 };
 
 //

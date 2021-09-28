@@ -760,6 +760,14 @@ void IdleState::OnUpdate(CCSBot *me)
 			}
 			break;
 		}
+		case CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION:
+		{
+			if (!me->m_bIsZombie && UTIL_FindEntityByClassname(nullptr, "supplybox") != nullptr)
+			{
+				me->RushToSupplyBox();
+				return;
+			}
+		}
 		// deathmatch
 		default:
 		{

@@ -137,6 +137,9 @@ enum GameEventType : int
 	EVENT_GAME_COMMENCE,			// tell bots the game is commencing (argumens: 1 = NULL, 2 = NULL)
 	EVENT_WEAPON_ZOOMED,			// tell bots the player is switch weapon zoom (argumens: 1 = zoom switcher, 2 = NULL)
 	EVENT_HOSTAGE_CALLED_FOR_HELP,		// tell bots the hostage is talking (argumens: 1 = listener, 2 = NULL)
+
+	EVENT_SUPPLYBOX_ARRIVE,			//
+
 	NUM_GAME_EVENTS,
 };
 

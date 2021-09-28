@@ -190,6 +190,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_svdex");
 	UTIL_PrecacheOtherWeapon("weapon_gatling");
 	UTIL_PrecacheOtherWeapon("weapon_bow");
+	UTIL_PrecacheOtherWeapon("weapon_huntbow");
 	UTIL_PrecacheOtherWeapon("weapon_voidpistol");
 	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
 	UTIL_PrecacheOtherWeapon("weapon_m2");

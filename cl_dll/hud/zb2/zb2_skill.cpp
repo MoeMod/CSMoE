@@ -174,6 +174,18 @@ void CHudZB2_Skill::Reset(void)
 
 int CHudZB2_Skill::Draw(float time)
 {
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
+
 	int iHeight = gHUD.GetSpriteRect(m_HUD_zombirecovery).bottom - gHUD.GetSpriteRect(m_HUD_zombirecovery).top;
 	int x = 0; // iWidth / 2;
 	int y = ScreenHeight - gHUD.m_iFontHeight * 3 / 2 - iHeight;

@@ -44,7 +44,7 @@ public:
 	static constexpr const char *W_Model = "models/z4b/pw_deagleshura.mdl";
 	static constexpr const char *EventFile = "events/deagleb.sc";
 	static constexpr const char *ClassName = "z4b_deagleb";
-	static constexpr const char *AnimExtension = "pistol";
+	static constexpr const char *AnimExtension = "onehanded";
 	static constexpr int MaxClip = 7;
 	static constexpr float ArmorRatioModifier = 1.6f;
 	enum

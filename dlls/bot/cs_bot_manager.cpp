@@ -1109,6 +1109,9 @@ void CCSBotManager::ValidateMapData()
 			isLegacy = false;
 		}
 
+		if (g_pModRunning)
+			m_gameScenario = g_pModRunning->OverrideGameScenario(m_gameScenario);
+
 		if (found)
 		{
 			if (m_zoneCount < MAX_ZONES)

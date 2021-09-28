@@ -189,6 +189,7 @@ static struct jnimethods_s
 	jmethodID showMouse;
 	jmethodID shellExecute;
 	jmethodID getAssetManager;
+	jmethodID getDisplayDPI;
 	int width, height;
 } jni;
 
@@ -510,6 +511,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobject array )
 	jni.showMouse = (*env)->GetStaticMethodID(env, jni.actcls, "showMouse", "(I)V");
 	jni.shellExecute = (*env)->GetStaticMethodID(env, jni.actcls, "shellExecute", "(Ljava/lang/String;)V");
 	jni.getAssetManager = (*env)->GetStaticMethodID(env, jni.actcls, "getAssetManager", "()Landroid/content/res/AssetManager;");
+	jni.getDisplayDPI = (*env)->GetStaticMethodID(env, jni.actcls, "getDisplayDPI", "()F");
 
 	nanoGL_Init();
 	/* Run the application. */
@@ -1184,6 +1186,11 @@ void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistap
 
 		(*jni.env)->DeleteLocalRef(jni.env, jstr);
 	}
+}
+
+float Android_GetDisplayDPI()
+{
+	return (*jni.env)->CallStaticFloatMethod(jni.env, jni.actcls, jni.getDisplayDPI);
 }
 
 #endif

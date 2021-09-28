@@ -583,6 +583,12 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 		MsgDev (D_NOTE, "Keynum %d out of range\n", key);
 		return;
 	}
+
+#ifdef XASH_IMGUI
+	if (ImGui_ImplGL_KeyEvent(key, down))
+		return;
+#endif
+
 	// update auto-repeat status and BUTTON_ANY status
 	keys[key].down = down;
 

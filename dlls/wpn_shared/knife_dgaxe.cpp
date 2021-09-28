@@ -432,7 +432,7 @@ namespace sv {
 			if(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 && m_iHolsterAmmo < 50)
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/dgaxe_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_draw.wav", 0.3, 2.4);
-			return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 ? V_Model_1 : V_Model, P_Model, DGAXE_DRAW, "knife", UseDecrement() != FALSE);
+			return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 ? V_Model_1 : V_Model, P_Model, DGAXE_DRAW, "tomahawk", UseDecrement() != FALSE);
 		}
 
 		int GetItemInfo(ItemInfo* p) override;
@@ -602,6 +602,7 @@ namespace sv {
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		m_iDamageType = DGAXE_PRIMARYATTACK;
 		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 130, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
@@ -682,6 +683,7 @@ namespace sv {
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		m_iDamageType = DGAXE_SECONDARYATTACK;
 		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 130, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
@@ -736,7 +738,7 @@ namespace sv {
 
 		SetThink(&CKnifeDgaxe::Guard);
 		pev->nextthink = gpGlobals->time + 1.17s;
-
+		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 #ifndef CLIENT_DLL
 		TraceResult tr;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
@@ -888,6 +890,7 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe);
+		WRITE_BYTE(0);
 		WRITE_BYTE(3);
 		MESSAGE_END();
 #endif
@@ -953,8 +956,6 @@ namespace sv {
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		CBaseEntity* pevAttacker = this->m_pPlayer;
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, &bHit);
-		Vector vAngle = m_pPlayer->pev->v_angle;
-		vAngle[0] = 0;
 		if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50)
 		{
 			if (bHit)
@@ -964,7 +965,9 @@ namespace sv {
 				{
 					if (m_flTimeNextSkill2 < gpGlobals->time)
 					{
-
+#ifndef CLIENT_DLL
+						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 						SendWeaponAnim(DGAXE_SKILL1, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL2ATTACK;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));
@@ -986,6 +989,9 @@ namespace sv {
 				{
 					if (m_flTimeNextSkill1 < gpGlobals->time)
 					{
+#ifndef CLIENT_DLL
+						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 						SendWeaponAnim(DGAXE_SKILL2, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL1ATTACK;
 						m_pPlayer->iuser1 = 1;
@@ -1005,6 +1011,7 @@ namespace sv {
 				}
 		}
 		MESSAGE_BEGIN(MSG_ONE,gmsgDgaxe, NULL, m_pPlayer->pev);
+		WRITE_BYTE(0);
 		WRITE_BYTE(m_CrossHairState);
 		MESSAGE_END();
 
@@ -1019,6 +1026,10 @@ namespace sv {
 			{
 				if (m_iButton & IN_ATTACK)
 				{
+					Q_strcpy(m_pPlayer->m_szAnimExtention, "hammer");
+#ifndef CLIENT_DLL
+					m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 					SendWeaponAnim(DGAXE_COMBO, UseDecrement() != FALSE);
 					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/dgaxe_combo.wav", VOL_NORM, ATTN_NORM, 0, 94);
 					SetThink(&CKnifeDgaxe::ComboAttack);

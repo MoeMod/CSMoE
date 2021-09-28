@@ -42,7 +42,7 @@ public:
 	static constexpr const char *W_Model = "models/w_infinityss.mdl";
 	static constexpr const char *EventFile = "events/infinityss.sc";
 	static constexpr const char *ClassName = "weapon_infinityss";
-	static constexpr const char *AnimExtension = "pistol";
+	static constexpr const char *AnimExtension = "onehanded";
 	static constexpr int MaxClip = 8;
 	static constexpr float ArmorRatioModifier = 1.5f;
 	enum

@@ -104,7 +104,7 @@ public:
 		m_iModelPetal1 = PRECACHE_MODEL("sprites/petal01_dualsword.spr");
 		m_iModelPetal2 = PRECACHE_MODEL("sprites/petal02_dualsword.spr");
 		m_iModelSkill = PRECACHE_MODEL("models/dualsword_skill.mdl");
-		
+		PRECACHE_MODEL("models/dualswordfx.mdl");
 	}
 
 	int m_iModelLeaf1;
@@ -510,8 +510,10 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 
 void CKnifeDualsword::DelaySecondaryAttack()
 {
+	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 	int v8 = m_waterlevel % 4;
 	SendWeaponAnim(v8 + 1);
+	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 5, v8, FALSE, FALSE);
 	m_weaponanim = v8 + 1;
 
 	if (m_iuser3)

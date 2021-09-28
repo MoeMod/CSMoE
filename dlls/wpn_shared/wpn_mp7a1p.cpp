@@ -71,7 +71,7 @@ public:
 	static constexpr float ArmorRatioModifier = 1.0f;
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 	static constexpr const char *ClassName = "weapon_mp7a1p";
-	static constexpr const char *AnimExtension = "pistol";
+	static constexpr const char *AnimExtension = "onehanded";
 
 	KnockbackData KnockBack = {250.0f, 200.0f, 250.0f, 90.0f, 0.7f};
 	static constexpr float PlayerMaxSpeed = 250;

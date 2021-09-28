@@ -14,4 +14,5 @@ namespace cl
 	int LuaCL_GlobalPrint(lua_State* L);
 
 	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index);
+	void LuaCL_OnGUI();
 }

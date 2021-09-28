@@ -258,5 +258,6 @@
 #define ENUM_PARAMS_253(x) ENUM_PARAMS_252(x), x ## 253
 #define ENUM_PARAMS_254(x) ENUM_PARAMS_253(x), x ## 254
 #define ENUM_PARAMS_255(x) ENUM_PARAMS_254(x), x ## 255
+#define ENUM_PARAMS_256(x) ENUM_PARAMS_255(x), x ## 256
 
 #define ENUM_PARAMS(x, N) ENUM_PARAMS_##N(x)

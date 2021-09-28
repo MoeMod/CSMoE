@@ -53,7 +53,16 @@ int CHudZB3Rage::VidInit(void)
 
 int CHudZB3Rage::Draw(float time)
 {
-	if (gEngfuncs.IsSpectateOnly())
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
 		return 0;
 
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;

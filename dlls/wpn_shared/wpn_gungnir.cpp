@@ -451,10 +451,13 @@ public:
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_BEAMENTPOINT);
-		WRITE_SHORT(this->entindex()); // short (start entity) 
-		WRITE_COORD(m_vecStartOrigin.x); // coord coord coord (end position) 
+		//WRITE_SHORT(this->entindex()); // short (start entity) 
+		WRITE_COORD(m_vecStartOrigin.x);
 		WRITE_COORD(m_vecStartOrigin.y);
 		WRITE_COORD(m_vecStartOrigin.z);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z); // coord coord coord (end position) 
 		WRITE_SHORT(m_iModelLight2); // short (sprite index) 
 		WRITE_BYTE(0); // byte (starting frame) 
 		WRITE_BYTE(30); // byte (frame rate in 0.1's) 
@@ -470,7 +473,8 @@ public:
 
 		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_charge_shoot_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-		CBaseEntity::FireBullets3(pev->origin, (m_vecStartOrigin - pev->origin).Normalize(), 0.0f, (m_vecStartOrigin - pev->origin).Length(), 9, BULLET_NONE, m_flAdditionalDamage, 1.0f, this->pev, FALSE);
+		entvars_t* const pevAttacker = VARS(pev->owner);
+		CBaseEntity::FireBullets3(pev->origin, (m_vecStartOrigin - pev->origin).Normalize(), 0.0f, (m_vecStartOrigin - pev->origin).Length(), 9, BULLET_NONE, m_flAdditionalDamage, 1.0f, pevAttacker, FALSE);
 	}
 
 	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flAdditionalDamage, float flExplodeRadius, TeamName iTeam)
@@ -875,7 +879,7 @@ void CGungnir::ItemPostFrame()
 			else if (v16 != ANIM_SHOOT_B_CHARGE) // 7
 			{
 				SendWeaponAnim(ANIM_SHOOT_B_CHARGE, UseDecrement() != FALSE);
-				Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir");
+				Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir_b");
 				m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gungnirB.mdl");
 				return CBasePlayerWeapon::ItemPostFrame();
 			}

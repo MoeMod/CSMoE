@@ -2,19 +2,17 @@
 
 #include "StructMemberCount.hpp"
 #include "EnumParams.h"
-#include "EnumForEach.h"
-
-#include <functional>
+#include "Repeat.h"
 
 namespace detail {
 
-#define APPLYER_DEF(N) \
+#define APPLYER_DEF(Z,N,DATA) \
     template<class T, class ApplyFunc> auto StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
         auto &&[ENUM_PARAMS(x, N)] = std::forward<T>(my_struct); \
-        return std::invoke(f, ENUM_PARAMS(x, N)); \
+        return f(ENUM_PARAMS(x, N)); \
     } \
 
-    ENUM_FOR_EACH(APPLYER_DEF, 128)
+    REPEAT(200, APPLYER_DEF, ~)
 #undef APPLYER_DEF
 }
 

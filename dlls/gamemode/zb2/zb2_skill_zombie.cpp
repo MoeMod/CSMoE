@@ -497,7 +497,7 @@ namespace sv {
 		float flOldHealth = m_pPlayer->pev->health;
 		m_pPlayer->pev->health += m_pPlayer->pev->max_health * (m_pPlayer->m_iZombieLevel ? 0.3 : 0.1);
 		m_pPlayer->pev->health = min(m_pPlayer->pev->health, m_pPlayer->pev->max_health);
-
+		/*
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(2);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
@@ -506,7 +506,7 @@ namespace sv {
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(3);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();
+		MESSAGE_END();*/
 
 		if (flOldHealth < m_pPlayer->pev->health)
 		{
@@ -572,14 +572,14 @@ namespace sv {
 						player->pev->armorvalue = 1000;
 					EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/td_buff.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
 				}
-
+				
 				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, player->pev);
 				WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 				WRITE_BYTE(ZOMBIE_SKILL_HEAL);
 				WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
 				WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 				MESSAGE_END();
-
+				/*
 				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
 				WRITE_BYTE(2);	//type
 				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
@@ -588,7 +588,7 @@ namespace sv {
 				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
 				WRITE_BYTE(3);	//type
 				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
-				MESSAGE_END();
+				MESSAGE_END();*/
 			}
 		}
 

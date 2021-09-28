@@ -212,7 +212,7 @@ void CMod_Zombi::CheckWinConditions()
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
 	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
 
-	if (!FInfectionStarted())
+	if (!FInfectionStarted() || m_bRoundTerminating)
 		return;
 	
 	if (!NumAliveTerrorist)
@@ -304,6 +304,12 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 
 	// do not *2 for machine-guns.
 	if (Q_strstr(szAmmoClassName, "box"))
+		ret = iOriginalMax;
+
+	if (Q_strstr(szAmmoClassName, "bowarrow"))
+		ret = iOriginalMax;
+
+	if (Q_strstr(szAmmoClassName, "Cannon"))
 		ret = iOriginalMax;
 
 	return ret;
@@ -535,6 +541,11 @@ inline void CZB1CountdownDelegate::OnCountdownEnd()
 {
 	// select zombie
 	m_pMod->PickZombieOrigin();
+}
+
+enum CCSBotManager::GameScenarioType CMod_Zombi::OverrideGameScenario(enum CCSBotManager::GameScenarioType type)
+{
+	return CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION;
 }
 
 }

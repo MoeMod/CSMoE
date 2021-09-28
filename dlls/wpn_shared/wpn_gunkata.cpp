@@ -52,7 +52,7 @@ public:
 	static constexpr const char *W_Model = "models/w_gunkata.mdl";
 	static constexpr const char *EventFile = "events/gunkata.sc";
 	static constexpr const char *ClassName = "weapon_gunkata";
-	static constexpr const char *AnimExtension = "dualpistols";
+	static constexpr const char *AnimExtension = "dualpistols_1";
 	static constexpr int MaxClip = 36;
 	static constexpr float ArmorRatioModifier = 1.7f;
 	static constexpr float AccuracyDefault = 1.1f;
@@ -476,7 +476,6 @@ public:
 					//set_pev(id, ???(pPlayer->pev+304), 0); // (pPlayer->pev) + 304) = 0;
 					//*(_WORD *)(pPlayer + 2308) = v6;
 					//*(float *)(pPlayer + 2304) = *(float *)gametime + 1.1;
-
 
 					m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gunkata.mdl");
 					m_flNextSpecialAttack8_pev_dmg_take =  get_gametime() + 0.63s;

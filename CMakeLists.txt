@@ -159,12 +159,13 @@ if(XASH_IMGUI)
 	endif()
 	add_library(imgui_ext STATIC 
 		imgui_ext/ImGuiFileDialog/ImGuiFileDialog.cpp
+		imgui_ext/imgui_lua/imgui_lua.cpp
 		)
 	target_include_directories(imgui_ext PUBLIC ${CMAKE_SOURCE_DIR}/imgui_ext)
 	if(WIN32)
 		target_include_directories(imgui_ext PRIVATE ${CMAKE_SOURCE_DIR}/imgui_ext/dirent)
 	endif()
-	target_link_libraries(imgui_ext PUBLIC imgui)
+	target_link_libraries(imgui_ext PUBLIC imgui luajit_3p)
 	if(XASH_UNITY_BUILD)
 		set_target_properties(imgui PROPERTIES UNITY_BUILD ON)
 		set_target_properties(imgui_ext PROPERTIES UNITY_BUILD ON)

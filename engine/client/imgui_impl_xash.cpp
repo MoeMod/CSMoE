@@ -166,8 +166,6 @@ qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	if (!g_EngineContext)
 		return false;
-	if (cls.key_dest == key_game)
-		return false;
 	ImGuiIO& io = ImGui::GetIO();
 	if (button >= 0 && button < 5)
 	{
@@ -207,29 +205,34 @@ qboolean ImGui_ImplGL_KeyEvent( int key, qboolean down )
 {
 	if (!g_EngineContext)
 		return false;
-	if (cls.key_dest == key_game)
-		return false;
 	ImGuiIO& io = ImGui::GetIO();
+	bool bIsMouse = false;
 	// IMGUI input
 	switch (key)
 	{
 		case K_MWHEELDOWN:
 			ScrollCallback(0, -1.0);
+			bIsMouse = true;
 			break;
 		case K_MWHEELUP:
 			ScrollCallback(0, 1.0);
+			bIsMouse = true;
 			break;
 		case K_MOUSE1:
 		case K_MOUSE2:
 		case K_MOUSE3:
 		case K_MOUSE4:
 		case K_MOUSE5:
+			bIsMouse = true;
 			//ImGui_ImplGL_MouseButtonCallback(key - K_MOUSE1, 1);
 			break;
 		default:
 			KeyCallback(key, down);
 			break;
 	}
+
+	if(bIsMouse)
+		return io.WantCaptureMouse;
 	return io.WantCaptureKeyboard;
 }
 
@@ -641,6 +644,12 @@ qboolean ImGui_ImplGL_MouseMove(int x, int y)
 	ImGuiIO& io = ImGui::GetIO();
 	g_MouseLastPos[0] = (float)x;
 	g_MouseLastPos[1] = (float)y;
+	return io.WantCaptureMouse;
+}
+
+qboolean ImGui_ImplGL_IsCursorVisible()
+{
+	ImGuiIO& io = ImGui::GetIO();
 	return io.WantCaptureMouse;
 }
 

@@ -862,6 +862,12 @@ public class XashActivity extends Activity {
 		}
 		return true;
 	}
+
+	public static float getDisplayDPI()
+	{
+		DisplayMetrics metrics = XashActivity.getContext().getResources().getDisplayMetrics();
+		return metrics.density;
+	}
 }
 
 /**

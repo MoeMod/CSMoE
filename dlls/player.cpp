@@ -255,6 +255,9 @@ void CBasePlayer::SetPlayerModel(BOOL HasC4)
 	if (Q_strcmp(GET_KEY_VALUE(infobuffer, "model"), model))
 	{
 		SET_CLIENT_KEY_VALUE(entindex(), infobuffer, "model", model);
+		static char szModelPath[64];
+		Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", model, model);
+		SetNewPlayerModel(szModelPath);
 	}
 }
 
@@ -889,7 +892,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 #ifdef XASH_DEDICATED
 			//gr
 			//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
-			if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
+			if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
 				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 				WRITE_LONG((long)flDamage);
 				WRITE_SHORT(ENTINDEX(edict()));
@@ -1041,7 +1044,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow"))
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1147,7 +1150,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 #ifdef XASH_DEDICATED
 		//gr
 		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
-		if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
+		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
 			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 			WRITE_LONG((long)flDamage);
 			WRITE_SHORT(ENTINDEX(edict()));

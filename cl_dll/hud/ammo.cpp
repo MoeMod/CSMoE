@@ -445,6 +445,10 @@ void CHudAmmo::Think(void)
 				}
 				else
 				{
+					WEAPON* p2 = gWR.GetWeaponSlot(p->iSlot, p->iSlotPos);
+					if (p2 && gHUD.m_iWeaponBits & (1 << p2->iId))
+						continue;
+
 					gWR.DropWeapon( p );
 				}
 			}

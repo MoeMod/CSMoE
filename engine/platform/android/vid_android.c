@@ -320,6 +320,13 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	
 	glState.wideScreen = true; // V_AdjustFov will check for widescreen
 
+	// Automatically set HUD scale to DPI
+	if (hud_scale->value == 0.0f)
+	{
+		float dpi = Android_GetDisplayDPI(&dpi);
+		Cvar_SetFloat("hud_scale", dpi);
+	}
+
 	return rserr_ok;
 }
 
