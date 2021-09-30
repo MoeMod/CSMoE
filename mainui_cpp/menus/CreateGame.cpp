@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "SpinControl.h"
 #include "StringArrayModel.h"
+#include "luash_menu/luash_menu.h"
 
 #define ART_BANNER		"gfx/shell/head_creategame"
 
@@ -376,5 +377,6 @@ void UI_CreateGame_Menu( void )
 		return;
 
 	uiCreateGame.Show();
+	ui::LuaUI_Exec("imgui_newgame_open = true");
 }
 ADD_MENU( menu_creategame, UI_CreateGame_Precache, UI_CreateGame_Menu );

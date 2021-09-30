@@ -240,7 +240,7 @@ namespace luash
 			T* pfn = reinterpret_cast<T*>(value);
 
 			// dont support lvalue reference
-			static_assert((... && !std::is_lvalue_reference<Args>::value));
+			static_assert((... && !(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)));
 
 			std::tuple<typename std::remove_const<typename std::remove_reference<Args>::type>::type...> args;
 			(..., Get(L, I + 2, std::get<I>(args)));

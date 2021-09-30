@@ -50,6 +50,7 @@ using namespace cl;
 cl_enginefunc_t gEngfuncs = { };
 render_api_t gRenderAPI = { };
 mobile_engfuncs_t gMobileAPI = { };
+fs_api_t gFileSystemAPI = { };
 CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
 int g_iMobileAPIVersion = 0;
@@ -57,6 +58,10 @@ int g_iMobileAPIVersion = 0;
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
+
+#ifdef XASH_STATIC_GAMELIB
+extern "C" int FS_GetAPI(fs_api_t * g_api);
+#endif
 
 /*
 ==========================
@@ -75,6 +80,8 @@ int DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion )
 	g_iXash = (int)CVAR_GET_FLOAT("build");
 
 	Game_HookEvents();
+
+	FS_GetAPI(&gFileSystemAPI);
 
 	return 1;
 }

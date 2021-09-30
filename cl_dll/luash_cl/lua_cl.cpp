@@ -9,7 +9,10 @@
 #include <cassert>
 
 #include "ev_lua.h"
+#ifdef XASH_IMGUI
 #include "imgui_lua/imgui_lua.h"
+#include "imgui_utils_lua.h"
+#endif
 
 namespace cl
 {
@@ -41,19 +44,22 @@ namespace cl
 		luaopen_bit(L);
 		luaopen_jit(L);
 		//luaopen_ffi(L);
-		luaopen_imgui(L);
 
 		lua_register(L, "require", LuaCL_GlobalRequire);
 		lua_register(L, "print", LuaCL_GlobalPrint);
 
 		luash::OpenLibs(L);
+#ifdef XASH_IMGUI
+		luaopen_imgui(L);
+		ImGuiUtils::LuaOpen_ImGuiUtils(L);
+#endif
 		luash::RegisterGlobal(L, "namespace", "cl");
 		luash::RegisterGlobal(L, "CLIENT_DLL", 1);
 		luash::RegisterGlobal(L, "CLIENT_WEAPONS", 1);
 		luash::RegisterGlobal(L, "engine", &gEngfuncs);
 		luash::RegisterGlobal(L, "render", &gRenderAPI);
 		luash::RegisterGlobal(L, "mobile", &gMobileAPI);
-
+		luash::RegisterGlobal(L, "filesystem", &gFileSystemAPI);
 		LuaCL_OpenEventScripts(L);
 
 		gEngfuncs.pfnAddCommand("luacl", Cmd_LuaCL);

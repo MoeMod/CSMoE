@@ -1387,6 +1387,10 @@ static void UI_UpdateDialog_f( void )
 
 ADD_COMMAND( menu_updatedialog, UI_UpdateDialog_f );
 
+#ifdef XASH_STATIC_GAMELIB
+extern "C" int FS_GetAPI(fs_api_t * g_api);
+#endif
+
 /*
 =================
 UI_Init
@@ -1394,6 +1398,7 @@ UI_Init
 */
 void UI_Init( void )
 {
+	FS_GetAPI(&ui::gFileSystemAPI);
 	// register our cvars and commands
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );

@@ -75,5 +75,6 @@ typedef unsigned int uint;
 typedef unsigned int uint32; //!!!
 
 #include "menu_int.h"
+#include "fs_int.h"
 
 #endif//EXTDLL_H

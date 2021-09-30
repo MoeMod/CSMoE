@@ -9,6 +9,7 @@
 
 #ifdef XASH_IMGUI
 #include "imgui_lua/imgui_lua.h"
+#include "imgui_utils_lua.h"
 #endif
 
 namespace ui
@@ -17,6 +18,7 @@ namespace ui
 
 	static void Cmd_LuaUI()
 	{
+		ImVec2 x;
 		int n = EngFuncs::CmdArgc();
 		for(int i = 1; i<n;++i)
 		{
@@ -41,17 +43,19 @@ namespace ui
 		luaopen_bit(L);
 		luaopen_jit(L);
 		//luaopen_ffi(L);
-#ifdef XASH_IMGUI
-		luaopen_imgui(L);
-#endif
 
 		lua_register(L, "require", LuaUI_GlobalRequire);
 		lua_register(L, "print", LuaUI_GlobalPrint);
 
 		luash::OpenLibs(L);
+#ifdef XASH_IMGUI
+		luaopen_imgui(L);
+		ImGuiUtils::LuaOpen_ImGuiUtils(L);
+#endif
 		luash::RegisterGlobal(L, "namespace", "ui");
 		luash::RegisterGlobal(L, "engfunc", &EngFuncs::engfuncs);
 		luash::RegisterGlobal(L, "textfunc", &EngFuncs::textfuncs);
+		luash::RegisterGlobal(L, "filesystem", &gFileSystemAPI);
 
 		EngFuncs::Cmd_AddCommand("luaui", Cmd_LuaUI);
 	}

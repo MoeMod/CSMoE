@@ -43,6 +43,7 @@ typedef int (*pfnUserMsgHook)(const char *pszName, int iSize, void *pbuf);
 
 #include "render_api.h"
 #include "mobility_int.h"
+#include "fs_int.h"
 
 extern "C"
 {
@@ -98,6 +99,7 @@ void       DLLEXPORT HUD_OnGUI( struct ImGuiContext *context );
 extern cl_enginefunc_t gEngfuncs;
 extern render_api_t gRenderAPI;
 extern mobile_engfuncs_t gMobileAPI;
+extern fs_api_t gFileSystemAPI;
 extern int g_iXash; // indicates buildnum
 extern int g_iMobileAPIVersion; // indicates version. 0 if no mobile API
 #endif // CL_DLL_H

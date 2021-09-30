@@ -26,6 +26,7 @@ ui_textfuncs_t	EngFuncs::textfuncs;
 namespace ui
 {
 ui_globalvars_t	*gpGlobals;
+fs_api_t gFileSystemAPI = { };
 }
 
 CMenu gMenu;
@@ -47,12 +48,12 @@ static UI_FUNCTIONS gFunctionTable =
 	UI_MouseInRect,
 	UI_IsVisible,
 	UI_CreditsActive,
-	UI_FinalCredits
-/*#ifdef XASH_IMGUI
+	UI_FinalCredits,
+#ifdef XASH_IMGUI
 	UI_OnGUI
 #else
 	nullptr
-#endif*/
+#endif
 };
 
 //=======================================================================

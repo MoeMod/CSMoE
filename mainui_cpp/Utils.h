@@ -47,6 +47,7 @@ void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int
 namespace ui
 {
 extern ui_globalvars_t		*gpGlobals;
+extern fs_api_t gFileSystemAPI;
 }
 using ui::gpGlobals;
 
@@ -67,6 +68,7 @@ extern int UI_MouseInRect( void );
 extern int UI_IsVisible( void );
 extern int UI_CreditsActive( void );
 extern void UI_FinalCredits( void );
+extern void UI_OnGUI( struct ImGuiContext * );
 
 #include "cvardef.h"
 
