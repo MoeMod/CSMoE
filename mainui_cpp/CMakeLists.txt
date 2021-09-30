@@ -34,6 +34,10 @@ option(MAINUI_USE_STB "Use stb_truetype.h for rendering(*nix-only)" OFF)
 option(MAINUI_RENDER_PICBUTTON_TEXT "Use custom font render to render picbuttons(experimental)" OFF)
 option(MAINUI_FONT_SCALE "Scale fonts by height" OFF)
 
+if(XASH_IMGUI)
+	set(MAINUI_USE_CUSTOM_FONT_RENDER OFF)
+endif()
+
 set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
 	controls/BaseItem.cpp
@@ -136,6 +140,10 @@ list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
 
+list(APPEND MAINUI_SOURCES
+		luash_menu/luash_menu.cpp
+	)
+
 if(XASH_STATIC_GAMELIB)
 	add_library (${MAINUI_LIBRARY} STATIC ${MAINUI_SOURCES})
 else()
@@ -145,6 +153,7 @@ endif()
 if(XASH_IMGUI)
 	target_link_libraries(${MAINUI_LIBRARY} imgui imgui_ext)
 endif()
+target_link_libraries(${MAINUI_LIBRARY} luash)
 
 if(NOT XASH_SDK)
 	set(XASH_SDK "../")
@@ -164,7 +173,7 @@ if(APPLE)
 	set(MAINUI_USE_STB TRUE)
 endif()
 
-include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ utl/ font/ model/)
+include_directories(${XASH_SDK}/common ${XASH_SDK}/engine ${XASH_SDK}/pm_shared . controls/ menus/ font/ model/ ../public/)
 
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)

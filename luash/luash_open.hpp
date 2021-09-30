@@ -1,19 +1,12 @@
 #pragma once
 
-#ifndef CLIENT_DLL
-namespace sv {
-#else
-namespace cl {
-#endif
-	namespace luash
+namespace luash
+{
+
+	inline int OpenLibs(lua_State* L)
 	{
-
-		int OpenLibs(lua_State* L)
-		{
-			lua_pushcfunction(L, SetupPtrMetaTable);
-			lua_call(L, 0, 0);
-			return 0;
-		}
+		lua_pushcfunction(L, SetupPtrMetaTable);
+		lua_call(L, 0, 0);
+		return 0;
 	}
-
 }

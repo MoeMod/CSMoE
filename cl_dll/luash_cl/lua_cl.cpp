@@ -47,6 +47,9 @@ namespace cl
 		lua_register(L, "print", LuaCL_GlobalPrint);
 
 		luash::OpenLibs(L);
+		luash::RegisterGlobal(L, "namespace", "cl");
+		luash::RegisterGlobal(L, "CLIENT_DLL", 1);
+		luash::RegisterGlobal(L, "CLIENT_WEAPONS", 1);
 		luash::RegisterGlobal(L, "engine", &gEngfuncs);
 		luash::RegisterGlobal(L, "render", &gRenderAPI);
 		luash::RegisterGlobal(L, "mobile", &gMobileAPI);

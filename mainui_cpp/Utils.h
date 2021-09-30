@@ -23,7 +23,6 @@ GNU General Public License for more details.
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
-#include "keydefs.h"
 
 #define FILE_GLOBAL	static
 #define DLL_GLOBAL
@@ -68,7 +67,6 @@ extern int UI_MouseInRect( void );
 extern int UI_IsVisible( void );
 extern int UI_CreditsActive( void );
 extern void UI_FinalCredits( void );
-extern void UI_OnGUI( struct ImGuiContext * );
 
 #include "cvardef.h"
 

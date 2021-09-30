@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "PlayerIntroduceDialog.h"
 #ifdef XASH_IMGUI
-#include "imgui_menu/imgui_menu_msgbox.h"
+#include "imgui_menu/imgui_menu_options.h"
 #endif
 
 #define ART_BANNER			"gfx/shell/head_multi"

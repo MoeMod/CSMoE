@@ -50,6 +50,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "imgui_utils.h"
 #endif
 
+#include "luash_menu/luash_menu.h"
+
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
@@ -1436,6 +1438,8 @@ void UI_Init( void )
 
 	//CR
 	CMenuPicButton::ClearButtonStack();
+
+	ui::LuaUI_Init();
 }
 
 /*
@@ -1447,6 +1451,8 @@ void UI_Shutdown( void )
 {
 	if( !uiStatic.initialized )
 		return;
+
+	ui::LuaUI_Shutdown();
 
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{

@@ -253,32 +253,6 @@ namespace cl
 		return 1;
 	}
 
-	int LuaCL_RandomLong(lua_State* L)
-	{
-		if (lua_gettop(L) < 2)
-			return 0;
-
-		int a = lua_tointeger(L, 1);
-		int b = lua_tointeger(L, 2);
-		
-		int x = RANDOM_LONG(a, b);
-		lua_pushinteger(L, x);
-		return 1;
-	}
-
-	int LuaCL_RandomFloat(lua_State* L)
-	{
-		if (lua_gettop(L) < 2)
-			return 0;
-
-		float a = lua_tonumber(L, 1);
-		float b = lua_tonumber(L, 2);
-		
-		float x = RANDOM_FLOAT(a, b);
-		lua_pushnumber(L, x);
-		return 1;
-	}
-
 	int LuaCL_OpenEventScripts(lua_State *L)
 	{
 		luash::RegisterGlobal(L, "EV_IsLocal", EV_IsLocal);
@@ -292,8 +266,8 @@ namespace cl
 		lua_register(L, "EV_HLDM_FireBullets", LuaCL_EV_HLDM_FireBullets);
 		lua_register(L, "EV_AddShotsFired", LuaCL_EV_AddShotsFired);
 		lua_register(L, "EV_IsRightHand", LuaCL_EV_IsRightHand);
-		luash::RegisterGlobal(L, "RandomLong", RANDOM_LONG);
-		luash::RegisterGlobal(L, "RandomFloat", RANDOM_FLOAT);
+		luash::RegisterGlobal(L, "RandomLong", gEngfuncs.pfnRandomLong);
+		luash::RegisterGlobal(L, "RandomFloat", gEngfuncs.pfnRandomFloat);
 		return 0;
 	}
 }

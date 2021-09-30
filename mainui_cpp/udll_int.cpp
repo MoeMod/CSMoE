@@ -47,12 +47,12 @@ static UI_FUNCTIONS gFunctionTable =
 	UI_MouseInRect,
 	UI_IsVisible,
 	UI_CreditsActive,
-	UI_FinalCredits,
-#ifdef XASH_IMGUI
+	UI_FinalCredits
+/*#ifdef XASH_IMGUI
 	UI_OnGUI
 #else
 	nullptr
-#endif
+#endif*/
 };
 
 //=======================================================================

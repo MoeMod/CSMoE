@@ -15,8 +15,6 @@ GNU General Public License for more details.
 #include "imgui_utils.h"
 
 #include <string_view>
-#include <functional>
-#include <string>
 
 #include "Utils.h"
 
