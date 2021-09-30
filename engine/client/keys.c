@@ -584,6 +584,11 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 		return;
 	}
 
+	if (IME_HandleKeyEvent(key, down))
+	{
+		return;
+	}
+
 #ifdef XASH_IMGUI
 	if (ImGui_ImplGL_KeyEvent(key, down))
 		return;

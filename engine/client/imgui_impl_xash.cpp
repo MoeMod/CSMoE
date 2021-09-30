@@ -48,6 +48,8 @@ extern "C" {
 // Data
 double g_Time = 0.0;
 bool g_MouseJustPressed[5] = { false, false, false, false, false };
+bool g_KeysJustPressed[512];
+
 float g_MouseLastPos[2];
 float g_MouseWheel = 0.0f;
 GLuint g_FontTexture = 0;
@@ -186,9 +188,15 @@ static void KeyCallback(int key, int action)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == 1)
+	{
 		io.KeysDown[key] = true;
+		g_KeysJustPressed[key] = true;
+	}
 	if (action == 0)
-		io.KeysDown[key] = false;
+	{
+		if(!g_KeysJustPressed[key])
+			io.KeysDown[key] = false;
+	}
 
 	io.KeyCtrl = io.KeysDown[K_CTRL];
 	io.KeyShift = io.KeysDown[K_SHIFT];
@@ -637,6 +645,13 @@ void ImGui_ImplGL_NewFrame(void)
 
 	// Start the frame. This call will update the io.WantCaptureMouse, io.WantCaptureKeyboard flag that you can use to dispatch inputs (or not) to your application.
 	ImGui::NewFrame();
+
+	for(int i = 0; i < 512; ++i)
+	{
+		if(g_KeysJustPressed[i])
+			io.KeysDown[i] = false;
+	}
+	std::fill(std::begin(g_KeysJustPressed), std::end(g_KeysJustPressed), false);
 }
 
 qboolean ImGui_ImplGL_MouseMove(int x, int y)

@@ -104,3 +104,8 @@ void IME_SetIMEEnabled(int enable, int force)
 	Android_EnableTextInput(enable, force);
 #endif
 }
+
+int IME_HandleKeyEvent(int key, int down)
+{
+	return 0;
+}

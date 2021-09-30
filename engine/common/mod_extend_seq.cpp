@@ -10,18 +10,29 @@ typedef struct
 }
 studioseqpack_t;
 
-struct file_s
+static void Mod_StudioSeqPackBigEndian(studioseqpack_t* pack)
 {
-	int		handle;			// file descriptor
-	fs_offset_t	real_length;		// uncompressed file size (for files opened in "read" mode)
-	fs_offset_t	position;			// current position in the file
-	fs_offset_t	offset;			// offset into the package (0 if external file)
-	int		ungetc;			// single stored character from ungetc, cleared to EOF when read
-	time_t		filetime;			// pak, wad or real filetime
-						// Contents buffer
-	fs_offset_t	buff_ind, buff_len;		// buffer current index and length
-	byte		buff[FILE_BUFF_SIZE];	// intermediate buffer
-};
+	LittleLongSW(pack->numseq);
+	LittleLongSW(pack->seqindex);
+}
+
+#define SWAP_INTS(type, startfield) \
+for( i = offsetof(type, startfield)/4; i < sizeof(type)/4; i++ ) \
+	LittleLongSW(ibuffer[i])
+
+static void Mod_StudioSeqDescBigEndian(mstudioseqdesc_t* pseqdesc)
+{
+	int* ibuffer = (int*)pseqdesc;
+	int i;
+	SWAP_INTS(mstudioseqdesc_t, fps);
+}
+
+static void Mod_StudioPivotBigEndian(mstudiopivot_t* pivot)
+{
+	int* ibuffer = (int*)pivot;
+	int i;
+	SWAP_INTS(mstudiopivot_t, org);
+}
 
 #define MAX_SEQUENCEPACKS 256
 
@@ -31,21 +42,25 @@ int g_iSequenceNums = 0;
 
 extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 {
+	// flip to native endian
+#ifdef XASH_BIG_ENDIAN
+	Mod_StudioBigEndian(NULL, buffer);
+#endif
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);
 
-	char newname[64];
+	char newname[PATH_MAX];
 	strcpy(newname, mod->name);
 	newname[strlen(newname) - 4] = 0;
 
 	for (int i = 0; i < MAX_SEQUENCEPACKS; i++)
 	{
-		char filename[64];
+		char filename[PATH_MAX];
 		sprintf(filename, "%s%d.seq", newname, i + 1);
 		g_hSequencePack[g_iSequenceNums] = FS_Open(filename, "rb", false);
 		if (!g_hSequencePack[g_iSequenceNums])
 			break;
 
-		g_nSequenceSize[g_iSequenceNums] = g_hSequencePack[g_iSequenceNums]->real_length;
+		g_nSequenceSize[g_iSequenceNums] = FS_FileLength(g_hSequencePack[i]);
 		g_iSequenceNums++;
 	}
 
@@ -60,9 +75,9 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 		{
 			static byte newbuf[0x500000];
 			memset(newbuf, 0, sizeof(newbuf));
-			memcpy(newbuf, buffer, studiohdr->length);
+			memcpy(newbuf, buffer, LittleLong(studiohdr->length));
 			buffer = newbuf;
-			studiohdr = (studiohdr_t*)newbuf;
+			studiohdr = reinterpret_cast<studiohdr_t*>(buffer);
 		}
 
 		mstudiotexture_t* ptexture = (mstudiotexture_t*)((byte*)studiohdr + studiohdr->textureindex);
@@ -95,11 +110,22 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 			if (FS_Read(g_hSequencePack[i], endbuf, g_nSequenceSize[i]) == -1)
 			{
 				FS_Close(g_hSequencePack[i]);
+				g_hSequencePack[i] = nullptr;
 				continue;
 			}
 
 			studioseqpack_t* pack = (studioseqpack_t*)endbuf;
+#ifdef XASH_BIG_ENDIAN
+			Mod_StudioSeqPackBigEndian(pack);
+#endif
 			mstudioseqdesc_t* pseqdesc = (mstudioseqdesc_t*)(endbuf + pack->seqindex);
+
+			for (int j = 0; j < pack->numseq; j++)
+			{
+#ifdef XASH_BIG_ENDIAN
+				Mod_StudioSeqDescBigEndian(&pseqdesc[j]);
+#endif
+			}
 
 			for (int j = 0; j < pack->numseq; j++)
 			{
@@ -160,4 +186,8 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 		g_iSequenceNums = 0;
 	}
 	return buffer;
+	// flip back to file endian
+#ifdef XASH_BIG_ENDIAN
+	Mod_StudioBigEndian(NULL, buffer);
+#endif
 }

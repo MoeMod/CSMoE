@@ -57,10 +57,6 @@ namespace cl {
 			{
 				return std::is_const<T>::value;
 			}
-			int Copy(lua_State* L) const override
-			{
-				return 0;
-			}
 		};
 		namespace detail
 		{
@@ -102,6 +98,8 @@ namespace cl {
 			}
 			int Copy(lua_State* L) const override
 			{
+				std::string type(this->GetTypeName());
+				luaL_error(L, "can not copy unsupported ref type %s", type.c_str());
 				return 0;
 			}
 		};
@@ -215,24 +213,35 @@ namespace cl {
 			}
 		};
 
-		template<class T, class Base, bool = std::is_function<T>::value>
+		namespace detail {
+			template<class T, class = void> struct IsFunctionType : std::false_type {};
+			template<class T> struct IsFunctionType<T, std::void_t<decltype(std::function(std::declval<T>()))>> : std::true_type {};
+		}
+
+		template<class T, class Base, bool = detail::IsFunctionType<T>::value>
 		class TypeInterfaceDecoratorCall : public Base
 		{
 			int MetaCall(lua_State* L) const override
 			{
 				std::string type(this->GetTypeName());
-				luaL_error(L, "attempt to call a non function ptr type %s", type.c_str());
+				luaL_error(L, "attempt to call a non function ref type %s", type.c_str());
 				return 0;
 			}
 		};
-		template<class Ret, class...Args, class Base>
-		class TypeInterfaceDecoratorCall<Ret(Args...), Base, true> : public Base
+		template<class T, class Base>
+		class TypeInterfaceDecoratorCall<T, Base, true> : public Base
 		{
-			template<std::size_t...I>
-			int MetaCallImpl(lua_State* L, std::index_sequence<I...>) const
+			template<std::size_t...I, class Ret, class...Args>
+			int MetaCallImpl2(lua_State* L, std::index_sequence<I...>, TypeIdentity<std::function<Ret(Args...)>>) const
 			{
+				if (int argn = lua_gettop(L); argn - 1 < (int)sizeof...(I))
+				{
+					luaL_error(L, "bad function call with unmatched args, excepted %d got %d", static_cast<int>(sizeof...(I)), argn - 1);
+					return 0;
+				}
+
 				void* value = lua_touserdata(L, 1);
-				Ret(*pfn)(Args...) = reinterpret_cast<Ret(*)(Args...)>(value);
+				T* pfn = reinterpret_cast<T*>(value);
 
 				// dont support lvalue reference
 				static_assert((... && !std::is_lvalue_reference<Args>::value));
@@ -252,9 +261,15 @@ namespace cl {
 				}
 			}
 
+			template<std::size_t...I, class Ret, class...Args>
+			int MetaCallImpl(lua_State* L, TypeIdentity<std::function<Ret(Args...)>> tag) const
+			{
+				return MetaCallImpl2(L, std::index_sequence_for<Args...>(), tag);
+			}
+
 			int MetaCall(lua_State* L) const override
 			{
-				return MetaCallImpl(L, std::index_sequence_for<Args...>());
+				return MetaCallImpl(L, TypeIdentity<decltype(std::function(std::declval<T>()))>());
 			}
 		};
 
@@ -296,6 +311,7 @@ namespace cl {
 			void* value = lua_touserdata(L, 1);
 			if (const ITypeInterface* ti = GetTypeInterface(L, value))
 				return (ti->*pmemfn)(L);
+			luaL_error(L, "unrecognized ref ptr %x", value);
 			return 0;
 		}
 
