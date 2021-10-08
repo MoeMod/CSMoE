@@ -56,9 +56,6 @@ void CStarchaserar::Precache(void)
 	PRECACHE_MODEL("sprites/ef_starchasersr_line.spr");
 	PRECACHE_MODEL("sprites/muzzleflash76.spr");
 
-	PRECACHE_SOUND("weapons/starchaserar_boltpull.wav");
-	PRECACHE_SOUND("weapons/starchaserar_clipout.wav");
-	PRECACHE_SOUND("weapons/starchaserar_clipin.wav");
 	PRECACHE_SOUND("weapons/starchaserar-1.wav");
 	PRECACHE_SOUND("weapons/starchaserar-2.wav");
 	PRECACHE_SOUND("weapons/starchasersr_exp.wav");

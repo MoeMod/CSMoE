@@ -93,7 +93,7 @@ public:
 public:
 	float GetPrimaryAttackDamage() const
 	{
-		float flDamage = 17;
+		float flDamage = 65;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			flDamage *= 9.5f;
@@ -107,7 +107,7 @@ public:
 		float flDamage = 110;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 9.5f;
+			flDamage *= 25.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif

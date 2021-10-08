@@ -159,7 +159,7 @@ void CFiveSeven::FiveSevenFire(float flSpread, duration_t flCycleTime, BOOL fUse
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = DIM_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_57MM, 20, 0.885, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_57MM, 20, 0.885, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS

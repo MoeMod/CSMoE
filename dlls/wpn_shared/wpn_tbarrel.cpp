@@ -51,11 +51,7 @@ void CTbarrel::Precache(void)
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 
-	PRECACHE_SOUND("weapons/qbarrel_clipin1.wav");
-	PRECACHE_SOUND("weapons/qbarrel_clipin2.wav");
-	PRECACHE_SOUND("weapons/qbarrel_clipout1.wav");
 	PRECACHE_SOUND("weapons/qbarrel-1.wav");
-	PRECACHE_SOUND("weapons/qbarrel_draw.wav");
 
 	m_usFireTbarrel = PRECACHE_EVENT(1, "events/tbarrel.sc");
 }
@@ -112,6 +108,7 @@ void CTbarrel::PrimaryAttack(void)
 #endif
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+	m_iInstantShots = 1;
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(6, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
 #endif
@@ -173,7 +170,7 @@ void CTbarrel::SecondaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-
+	m_iInstantShots = m_iClip;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(6 * m_iClip, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());

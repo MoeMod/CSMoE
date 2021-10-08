@@ -464,18 +464,18 @@ BOOL CVoidpistol::Deploy(void)
 	m_fMaxSpeed = 250;
 #ifndef CLIENT_DLL
 	if(IsModeCEnabled(m_iCharging))
-		return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWC, "onehanded", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWC, "onehanded", UseDecrement() != FALSE, 0.2s);
 	else
 	{
 		switch (m_iMode)
 		{
 		case VOIDPISTOL_MODEA:
 		{
-			return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWA, "onehanded", UseDecrement() != FALSE); break;
+			return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWA, "onehanded", UseDecrement() != FALSE, 0.2s); break;
 		}
 		case VOIDPISTOL_MODEB:
 		{
-			return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWB, "onehanded", UseDecrement() != FALSE); break;
+			return DefaultDeploy("models/v_voidpistol.mdl", "models/p_voidpistol.mdl", VOIDPISTOL_DRAWB, "onehanded", UseDecrement() != FALSE, 0.2s); break;
 		}
 		default:
 			return FALSE;
@@ -526,32 +526,6 @@ void CVoidpistol::ItemPostFrame()
 						if (pev->iuser1)
 						{				
 							m_iMode = VOIDPISTOL_MODEB;
-
-
-							/*int iSupplyboxCount = SupplyboxCount();
-							for (int i = 0; i < iSupplyboxCount; ++i)
-							{
-								CSupplyBox* sb = CreateSupplybox();
-								if (!sb)
-									continue;
-								sb->m_iSupplyboxIndex = i + 1;
-
-								for (CBasePlayer* player : moe::range::PlayersList())
-								{
-									if (player->m_bIsZombie)
-										continue;
-
-									MESSAGE_BEGIN(MSG_ALL, gmsgHostagePos, nullptr, player->pev);
-									WRITE_BYTE(1);
-									WRITE_BYTE(sb->m_iSupplyboxIndex);
-									WRITE_COORD(sb->pev->origin.x);
-									WRITE_COORD(sb->pev->origin.y);
-									WRITE_COORD(sb->pev->origin.z);
-									MESSAGE_END();
-								}
-							}*/
-
-
 							return CBasePlayerWeapon::ItemPostFrame();	//already MODE B
 						}
 						pev->iuser1 = 1;
@@ -562,32 +536,6 @@ void CVoidpistol::ItemPostFrame()
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
 				}
-				/*else
-				{
-					if (!IsModeCEnabled(m_iCharging))
-					{
-						if (m_iMode == VOIDPISTOL_MODEA)
-						{
-							return CBasePlayerWeapon::ItemPostFrame();	//already MODE B
-						}
-						m_iMode = VOIDPISTOL_MODEA;
-						SendWeaponAnim(VOIDPISTOL_SCANNING_OFF, 0);
-						m_flNextSecondaryAttack = m_flNextPrimaryAttack = 0.57s;
-						m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.8s;
-						pev->iuser1 = 0;
-					}
-					else
-					{
-						if (pev->iuser1)
-						{
-							return CBasePlayerWeapon::ItemPostFrame();	//already MODE B
-						}
-						pev->iuser1 = 1;
-						SendWeaponAnim(VOIDPISTOL_CHANGEAC, 0);
-						m_flNextSecondaryAttack = m_flNextPrimaryAttack = 0.5s;
-						m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.8s;
-					}
-				}*/
 			}
 			
 		}
@@ -634,18 +582,18 @@ void CVoidpistol::PrimaryAttack(void)
 	case VOIDPISTOL_MODEA:
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			VoidpistolFireA((1.5) * (1 - m_flAccuracy), 0.2s, FALSE);
+			VoidpistolFireA((1.5) * (1 - m_flAccuracy), 0.227s, FALSE);
 		else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			VoidpistolFireA((0.25) * (1 - m_flAccuracy), 0.2s, FALSE);
+			VoidpistolFireA((0.25) * (1 - m_flAccuracy), 0.227s, FALSE);
 		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			VoidpistolFireA((0.115) * (1 - m_flAccuracy), 0.2s, FALSE);
+			VoidpistolFireA((0.115) * (1 - m_flAccuracy), 0.227s, FALSE);
 		else
-			VoidpistolFireA((0.13) * (1 - m_flAccuracy), 0.2s, FALSE);
+			VoidpistolFireA((0.13) * (1 - m_flAccuracy), 0.227s, FALSE);
 		break;
 	}
 	case VOIDPISTOL_MODEB:
 	{
-		VoidpistolFireB((0.13) * (1 - m_flAccuracy), 0.2s, FALSE); break;
+		VoidpistolFireB((0.13) * (1 - m_flAccuracy), 0.227s, FALSE); break;
 	}
 	}
 #endif

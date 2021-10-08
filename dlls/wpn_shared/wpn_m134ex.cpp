@@ -59,12 +59,7 @@ void CM134ex::Precache(void)
 	PRECACHE_SOUND("weapons/m134_chain.wav");
 	PRECACHE_SOUND("weapons/m134_coverup.wav");
 	PRECACHE_SOUND("weapons/m134_coverdown.wav");
-	PRECACHE_SOUND("weapons/m134_clipoff.wav");
-	PRECACHE_SOUND("weapons/m134_clipon.wav");
 	PRECACHE_SOUND("weapons/m134_spindown.wav");
-	PRECACHE_SOUND("weapons/m134_spinup.wav");
-	PRECACHE_SOUND("weapons/m134_pinpull.wav");
-	PRECACHE_SOUND("weapons/m134ex_spin.wav");
 
 	PRECACHE_MODEL("models/shell762_m134.mdl");
 	PRECACHE_MODEL("models/shell762_m134_01.mdl");
@@ -95,7 +90,7 @@ BOOL CM134ex::Deploy(void)
 	iShellOn = 1;
 	m_iWeaponState = WPNSTATE_M134_IDLE;
 
-	return DefaultDeploy("models/v_m134ex.mdl", "models/p_m134ex.mdl", M134_DRAW, "m134ex", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_m134ex.mdl", "models/p_m134ex.mdl", M134_DRAW, "m134", UseDecrement() != FALSE);
 }
 
 void CM134ex::PrimaryAttack(void)

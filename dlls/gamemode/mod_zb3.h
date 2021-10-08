@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_MOD_ZB3_H
 #define PROJECT_MOD_ZB3_H
-
+#pragma once
 #include "mod_zb2.h"
 #include "zb3/zb3_const.h"
 #include "zb3/zb3_morale.h"

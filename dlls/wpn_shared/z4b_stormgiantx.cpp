@@ -48,7 +48,7 @@ public:
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "stormgiant";
 	static constexpr const auto &DefaultDeployTime = 0s;
-	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
+	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
 
 public:
 

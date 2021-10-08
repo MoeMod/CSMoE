@@ -503,7 +503,7 @@ template<class T, std::size_t N> constexpr VectorBase<T, N> &VectorCopy(VectorBa
 
 template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(VectorBase<T, N> a, T scale, VectorBase<T, N> b, VectorBase<T, N> &out)
 {
-	return out = fma(a, scale, b);
+	return out = fma(b, scale, a);
 }
 
 template<class T, std::size_t N> inline VectorBase<T, N> &VectorMA(T scale, VectorBase<T, N> a, VectorBase<T, N> b, VectorBase<T, N> &out)

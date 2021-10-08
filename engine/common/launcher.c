@@ -62,6 +62,10 @@ int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int n
 #endif
 int main( int argc, char** argv )
 {
+#ifdef _WIN32
+	system("chcp 65001");
+	system("cls");
+#endif
 	char gamedir_buf[32] = "";
 	const char *gamedir = getenv("XASH3D_GAMEDIR");
 

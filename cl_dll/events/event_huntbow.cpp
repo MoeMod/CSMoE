@@ -107,32 +107,6 @@ void EV_FireHuntbow(event_args_s *args)
 
 	if (args->iparam2 != 0)
 	{
-		Vector vecBeamStart;
-		Vector vecBeamEnd = vecSrc + forward * 8192;
-
-		if (EV_IsLocal(idx))
-		{
-			vecBeamStart = ent->attachment[0];
-		}
-		else
-		{
-			if (args->ducking)
-			{
-				vecBeamStart = vecSrc + forward * 40 - up * 3;
-			}
-			else
-			{
-				vecBeamStart = vecSrc + forward * 40 - up * 9;
-			}
-		}
-
-
-		int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_huntbow_trail.spr");
-		BEAM* pBeam = gEngfuncs.pEfxAPI->R_BeamPoints(vecBeamStart, vecBeamEnd, iBeamModelIndex, 3.0f, 15.0f, 0.0f, 255.0f, 0.0f, 0.0f, 10.0f, 1.0f, 1.0f, 1.0f);
-
-		if (pBeam)
-			pBeam->flags |= FBEAM_FADEIN;
-
 		Vector vecDirShooting = forward;
 
 		vecSpread.x = args->fparam1;

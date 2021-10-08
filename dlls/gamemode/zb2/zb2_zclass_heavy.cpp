@@ -33,7 +33,7 @@ namespace sv {
 CZombieClass_Heavy::CZombieClass_Heavy(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "heavy";
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePass>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "heavy_zombi_origin" : "heavy_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -46,7 +46,7 @@ CZombieClass_Heavy::CZombieClass_Heavy(CBasePlayer *player, ZombieLevel iEvoluti
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.84f;
+	m_pPlayer->pev->gravity = 0.9f;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -61,12 +61,18 @@ void CZombieClass_Heavy::InitHUD() const
 
 void CZombieClass_Heavy::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 265;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		m_pPlayer->pev->maxspeed = 265;
+	else
+		m_pPlayer->pev->maxspeed = 285;
 }
 
 float CZombieClass_Heavy::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	flDamage *= 0.5;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		flDamage *= 0.5;
+	else
+		flDamage *= 0.4;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -81,13 +87,22 @@ bool CZombieClass_Heavy::ApplyKnockback(CBasePlayer* attacker, const KnockbackDa
 		
 	}
 
-	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 0.3f,
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 0.08f,
 			kbd.flNotOnGround * 0.3f,
-			kbd.flFlying * 0.3f,
-			kbd.flDucking * 0.3f,
-			kbd.flVelocityModifier,
-	});
+			kbd.flFlying * 0.25f,
+			kbd.flDucking * 0.1f,
+			kbd.flVelocityModifier * 0.99f,
+			});
+
+	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 0.05f,
+			kbd.flNotOnGround * 0.25f,
+			kbd.flFlying * 0.2f,
+			kbd.flDucking * 0.05f,
+			kbd.flVelocityModifier * 0.99f,
+		});
 }
 
 void CZombieClass_Heavy::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
@@ -121,6 +136,7 @@ void CZombieClass_Heavy::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-h.mdl");
 			break;

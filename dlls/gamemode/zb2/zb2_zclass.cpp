@@ -31,6 +31,9 @@ GNU General Public License for more details.
 #include "zb2_zclass_pc.h"
 #include "zb2_zclass_heavy.h"
 #include "zb2_zclass_heal.h"
+#include "zb2_zclass_teleport.h"
+#include "zb2_zclass_booster.h"
+#include "zb2_zclass_china.h"
 #include <random>
 
 namespace sv {
@@ -42,13 +45,18 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 }
 #ifdef XASH_DEDICATED
 const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer *, ZombieLevel)> g_FindList[] = {
-		{"tank", MakeZombieClass<CZombieClass_Default> },
+		{"tank", MakeZombieClass<CZombieClass_Default>},
 		{"deimos2", MakeZombieClass<CZombieClass_Deimos2> },
 		{"speed", MakeZombieClass<CZombieClass_Speed> },
 		{"deimos", MakeZombieClass<CZombieClass_Deimos> },
 		{"heal", MakeZombieClass<CZombieClass_Heal> },
 		{"heavy", MakeZombieClass<CZombieClass_Heavy> },
 		{"pc", MakeZombieClass<CZombieClass_Pc> },
+		{"teleport", MakeZombieClass<CZombieClass_Teleport> },
+		{"booster", MakeZombieClass<CZombieClass_Booster> },
+		//{"china", MakeZombieClass<CZombieClass_China> }
+		//{"pass", MakeZombieClass<CZombieClass_Pass> }
+		//{"flying", MakeZombieClass<CZombieClass_Flying> }
 };
 #else
 const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {

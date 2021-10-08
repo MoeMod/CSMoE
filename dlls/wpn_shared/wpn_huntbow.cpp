@@ -47,27 +47,180 @@ namespace sv {
 			Precache();
 
 			SET_MODEL(this->edict(), "models/huntbow_arrow.mdl");
-			SetThink(&CHuntbowArrow::OnThink);
-			SetTouch(&CHuntbowArrow::OnTouch);
+			SetThink(&CHuntbowArrow::PreThink);
+			SetTouch(&CHuntbowArrow::OnTouch);		
 			pev->mins = { -0.1, -0.1, -0.1 };
 			pev->maxs = { 0.1, 0.1, 0.1 };
 			pev->rendermode = kRenderTransAdd; // 5;
 			pev->renderfx = kRenderFxNone;
 			pev->renderamt = 230.0;		
-			pev->nextthink = gpGlobals->time + 0.2s;
+			pev->nextthink = gpGlobals->time + 0.01s;
 			pev->framerate = 1;
 			pev->gravity = 0.5;
-			pev->solid = SOLID_BBOX; // 2
+			pev->solid = SOLID_CUSTOM;
 			pev->movetype = MOVETYPE_FLY; // 9
-
+			m_flStartFadeTime = gpGlobals->time + 2.0s;
 			pev->classname = MAKE_STRING("d_arrow");
+			m_iPenetration = 3;
+			m_iHitWallExp = 1;
 		}
 
+		void PreThink()
+		{
+			SetThink(nullptr);
+			SetThink(&CHuntbowArrow::OnThink);
+			if (!m_iMode)
+			{
+				pev->solid = SOLID_BBOX; // 2
+				pev->nextthink = gpGlobals->time + 0.19s;
+			}				
+			else
+				pev->nextthink = gpGlobals->time + 0.01s;
+		}
 		void EXPORT OnTouch(CBaseEntity *pOther)
 		{
+			if (!m_iMode)				//PrimaryAttack
+			{
+				if (pev->owner == pOther->edict())
+					return;
+				pev->solid = SOLID_NOT;
+
+				int DECAL_SHOT[5];
+				DECAL_SHOT[0] = DECAL_INDEX("{shot1");
+				DECAL_SHOT[1] = DECAL_INDEX("{shot2");
+				DECAL_SHOT[2] = DECAL_INDEX("{shot3");
+				DECAL_SHOT[3] = DECAL_INDEX("{shot4");
+				DECAL_SHOT[4] = DECAL_INDEX("{shot5");
+
+				Vector vecStart, vecAngle, vecForw, vecEnd;
+				vecStart = pev->origin;
+				vecAngle = Get_Velocity_Angle(this, vecAngle);
+
+				UTIL_MakeVectors(vecAngle);
+				vecForw = gpGlobals->v_forward * 20.0;
+				vecEnd = vecStart + vecForw;
+				vecForw = gpGlobals->v_forward * -0.5;
+				vecStart += vecForw;
+
+				CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+				CBasePlayer* pAttackePlayer = nullptr;
+				CBasePlayer* pInflictorPlayer = nullptr;
+
+				if (pAttacker && pAttacker->IsPlayer())
+					pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+
+				TraceResult tr;
+				UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, ENT(pAttackePlayer->pev), &tr);
+
+				if (pAttackePlayer &&
+					pOther->pev->takedamage != DAMAGE_NO &&
+					pOther->IsAlive()
+					)
+				{
+					Vector vecDirection = (pev->velocity).Normalize();
+					if (g_pModRunning->DamageTrack() == DT_ZB)
+					{
+						if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(pAttackePlayer, pOther) != GR_TEAMMATE)
+						{
+							pInflictorPlayer = static_cast<CBasePlayer*>(pOther);
+							if (pInflictorPlayer->tLastMarkTime[ENTINDEX(pAttacker->edict())] + 5s < gpGlobals->time)
+								pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
+							pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] += 1;
+							pInflictorPlayer->tLastMarkTime[ENTINDEX(pAttacker->edict())] = gpGlobals->time;
+
+							
+							MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, NULL, pAttacker->pev);
+							WRITE_BYTE(5);	//type
+							WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict())); //entity
+							WRITE_BYTE(pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())]);
+							MESSAGE_END();
+
+							m_ArrowDamage = m_ArrowDamage + (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] * 70);	//original 300
+							if (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] == 5)
+							{
+								pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
+
+								//pInflictorPlayer->m_pModStrategy->AdjustDamageTaken(this, this->pev->owner, 170, 1);
+
+								pInflictorPlayer->m_flHealthDecreaseAmount = 4;
+								pInflictorPlayer->m_flHealthDecreaseAmount = 170;
+							}
+						}
+					}
+
+					ClearMultiDamage();
+					pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
+					ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+
+					UTIL_MakeVectors(pAttackePlayer->pev->v_angle + pAttackePlayer->pev->punchangle);
+					Vector vecSrc = pAttackePlayer->GetGunPosition();
+					Vector vecRealDir = (pOther->pev->origin - vecSrc).Normalize();
+					int bHitRight;
+
+					if (AngleBetweenVectors(pOther->pev->origin - vecSrc, gpGlobals->v_forward) > 6)	//
+					{
+						if (vecRealDir.x - gpGlobals->v_forward.Normalize().x < 0)	//LEFT
+							bHitRight = 0;
+						else
+							bHitRight = 1;
+
+						MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, pAttackePlayer->pev);
+						WRITE_BYTE(1);
+						WRITE_BYTE(bHitRight + 6);
+						MESSAGE_END();
+					}
+					else
+					{
+						//autoaim
+						if (vecRealDir.x - gpGlobals->v_forward.Normalize().x < 0)	//LEFT
+							bHitRight = 0;
+						else
+							bHitRight = 1;
+
+						MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, pAttackePlayer->pev);
+						WRITE_BYTE(1);
+						WRITE_BYTE(bHitRight + 9);
+						MESSAGE_END();
+					}
+					pev->renderamt = 0.0;
+					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+
+				SetThink(&CBaseEntity::SUB_StartFadeOut);
+				pev->nextthink = gpGlobals->time + 6.0s;
+				pev->rendermode = kRenderNormal;
+				pev->renderamt = 255.0;
+
+				if (pOther->IsBSPModel())
+				{
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, pev->origin);
+					WRITE_BYTE(TE_GUNSHOTDECAL);
+					WRITE_COORD(pev->origin.x);
+					WRITE_COORD(pev->origin.y);
+					WRITE_COORD(pev->origin.z);
+					WRITE_SHORT(0);
+					WRITE_BYTE(DECAL_SHOT[RANDOM_LONG(0, 4)]);
+					MESSAGE_END();
+
+					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					pev->animtime = gpGlobals->time;
+					pev->framerate = 1.0;
+					pev->sequence = 0;
+					SetThink(&CBaseEntity::SUB_StartFadeOut);
+					pev->nextthink = gpGlobals->time + 3.5s;
+					pev->renderamt = 255.0;
+					pev->movetype = MOVETYPE_NONE;
+					return;
+				}
+				else
+					pev->flags |= FL_KILLME;
+
+				pev->movetype = MOVETYPE_NONE;
+			}
+			else
+			{
 			if (pev->owner == pOther->edict())
 				return;
-			pev->solid = SOLID_NOT;
 
 			int DECAL_SHOT[5];
 			DECAL_SHOT[0] = DECAL_INDEX("{shot1");
@@ -76,69 +229,57 @@ namespace sv {
 			DECAL_SHOT[3] = DECAL_INDEX("{shot4");
 			DECAL_SHOT[4] = DECAL_INDEX("{shot5");
 
-			Vector vecStart,vecAngle,vecForw,vecEnd;
+			Vector vecStart, vecAngle, vecForw, vecEnd;
 			vecStart = pev->origin;
 			vecAngle = Get_Velocity_Angle(this, vecAngle);
 
-			UTIL_MakeVectors(vecAngle);		
+			UTIL_MakeVectors(vecAngle);
 			vecForw = gpGlobals->v_forward * 20.0;
 			vecEnd = vecStart + vecForw;
 			vecForw = gpGlobals->v_forward * -0.5;
 			vecStart += vecForw;
 
-			CBaseEntity *pAttacker = CBaseEntity::Instance(pev->owner);
-			CBasePlayer *pAttackePlayer = nullptr;
-			CBasePlayer *pInflictorPlayer = nullptr;
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackePlayer = nullptr;
+			CBasePlayer* pInflictorPlayer = nullptr;
 
 			if (pAttacker && pAttacker->IsPlayer())
-				pAttackePlayer = static_cast<CBasePlayer *>(pAttacker);
-		
+				pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+
 			TraceResult tr;
 			UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, ENT(pAttackePlayer->pev), &tr);
-			
+
 			if (pAttackePlayer &&
 				pOther->pev->takedamage != DAMAGE_NO &&
-				pOther->IsAlive()
+				pOther->IsAlive() &&
+				m_iPenetration
 				)
 			{
 				Vector vecDirection = (pev->velocity).Normalize();
-				if (g_pModRunning->DamageTrack() == DT_ZB)
+				if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(pAttackePlayer, pOther) != GR_TEAMMATE)
 				{
-					if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(pAttackePlayer, pOther) != GR_TEAMMATE)
-					{
-						pInflictorPlayer = static_cast<CBasePlayer*>(pOther);
-						if(pInflictorPlayer->tlLastMarkTime[ENTINDEX(pAttacker->edict())] + 5s < gpGlobals->time)
-							pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
-						pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] += 1;
-						pInflictorPlayer->tlLastMarkTime[ENTINDEX(pAttacker->edict())] = gpGlobals->time;
+					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-						/*
-						MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, NULL, pAttacker->pev);
-						WRITE_BYTE(5);	//type
-						WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict())); //entity
-						WRITE_BYTE(pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())]);
-						MESSAGE_END();*/
+					RadiusDamage3(pev->origin, pAttackePlayer->pev, pAttackePlayer->pev, 550, 75, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
 
-						m_ArrowDamage = m_ArrowDamage + (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] * 100);	//original 300
-						if (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] == 5)
-						{
-							pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
-						}
-					}
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+					WRITE_BYTE(TE_EXPLOSION);
+					WRITE_COORD(tr.vecEndPos[0]);
+					WRITE_COORD(tr.vecEndPos[1]);
+					WRITE_COORD(tr.vecEndPos[2]);
+					WRITE_SHORT(MODEL_INDEX("sprites/ef_huntbow_explo.spr"));
+					WRITE_BYTE(8);
+					WRITE_BYTE(30);
+					WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+					MESSAGE_END();
 				}
 
 				ClearMultiDamage();
 				pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);				
-
-				pev->renderamt = 0.0;
-				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				m_iPenetration--;
+				m_iHitWallExp--;
 			}
-
-			SetThink(&CBaseEntity::SUB_StartFadeOut);
-			pev->nextthink = gpGlobals->time + 6.0s;
-			pev->rendermode = kRenderNormal;
-			pev->renderamt = 255.0;
 
 			if (pOther->IsBSPModel())
 			{
@@ -152,19 +293,32 @@ namespace sv {
 				MESSAGE_END();
 
 				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hit1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				pev->animtime = gpGlobals->time;
-				pev->framerate = 1.0;
-				pev->sequence = 0;
-				SetThink(&CBaseEntity::SUB_StartFadeOut);
-				pev->nextthink = gpGlobals->time + 3.5s;
-				pev->renderamt = 255.0;
-				pev->movetype = MOVETYPE_NONE;
-				return;
-			}
-			else
-				pev->flags |= FL_KILLME;
 
-			pev->movetype = MOVETYPE_NONE;
+				if (m_iHitWallExp)
+				{
+					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+					RadiusDamage3(pev->origin, pAttackePlayer->pev, pAttackePlayer->pev, 550, 75, CLASS_MACHINE, DMG_BULLET, 0, 0, 0, 0);
+
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+					WRITE_BYTE(TE_EXPLOSION);
+					WRITE_COORD(tr.vecEndPos[0]);
+					WRITE_COORD(tr.vecEndPos[1]);
+					WRITE_COORD(tr.vecEndPos[2]);
+					WRITE_SHORT(MODEL_INDEX("sprites/ef_huntbow_explo.spr"));
+					WRITE_BYTE(8);
+					WRITE_BYTE(30);
+					WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+					MESSAGE_END();
+					m_iHitWallExp--;
+					if (m_iHitWallExp == 0)
+						m_flStartFadeTime = gpGlobals->time + 0.6s;
+					//exp		
+				}
+			}
+			}
+			PenetrateStart();
+
 		}
 
 		void Precache() override
@@ -175,26 +329,85 @@ namespace sv {
 
 		void OnThink()
 		{
-			if (pev->waterlevel)
-				SetThink(&CHuntbowArrow::BubbleThink);
+			if (!m_iMode)
+			{
+				if (pev->waterlevel)
+					SetThink(&CHuntbowArrow::BubbleThink);
+				else
+				{
+					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+					WRITE_BYTE(TE_BEAMFOLLOW);
+					WRITE_SHORT(entindex());
+					WRITE_SHORT(m_iBeamModelIndex);
+					WRITE_BYTE(6);
+					WRITE_BYTE(2);
+					WRITE_BYTE(225);
+					WRITE_BYTE(150);
+					WRITE_BYTE(150);
+					WRITE_BYTE(255);
+					MESSAGE_END();
+
+					SetThink(&CHuntbowArrow::FollowThink);
+				}				
+			}
 			else
 			{
+				pev->mins = { -4, -4, -4 };
+				pev->maxs = { 4, 4, 4 };
+				pev->rendermode = kRenderTransAdd; // 5;
+				pev->renderfx = kRenderFxNone;
+				pev->renderamt = 230.0;
+				pev->framerate = 1;
+				pev->gravity = 0.0;
+				SetThink(nullptr);
+				SetThink(&CHuntbowArrow::ArrowThink);
+
 				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 				WRITE_BYTE(TE_BEAMFOLLOW);
-				WRITE_SHORT(entindex());
+				WRITE_SHORT(this->entindex());
 				WRITE_SHORT(m_iBeamModelIndex);
-				WRITE_BYTE(6);
-				WRITE_BYTE(2);
-				WRITE_BYTE(225);
-				WRITE_BYTE(150);
-				WRITE_BYTE(150);
+				WRITE_BYTE(20);
+				WRITE_BYTE(30);
+				WRITE_BYTE(255);
+				WRITE_BYTE(255);
+				WRITE_BYTE(255);
 				WRITE_BYTE(255);
 				MESSAGE_END();
-
-				SetThink(&CHuntbowArrow::FollowThink);
 			}
 
 			pev->nextthink = gpGlobals->time + 0.1s;
+		}
+
+		void PenetrateStart()
+		{
+			pev->origin = pev->origin + m_vecStartVelocity.Normalize() * 42;
+			pev->velocity = {};
+			pev->solid = SOLID_NOT;
+
+			pev->nextthink = gpGlobals->time + 0.05s;
+		}
+
+		void PenetrateEnd()
+		{
+			pev->velocity = m_vecStartVelocity;
+			pev->solid = SOLID_CUSTOM;
+
+			pev->nextthink = gpGlobals->time + 0.001s;
+		}
+
+		void ArrowThink(void)
+		{	
+			if (pev->solid == SOLID_NOT)
+			{
+				PenetrateEnd();
+			}
+			int bHit = 0;
+
+			if (m_flStartFadeTime < gpGlobals->time)
+			{
+				SetThink(&CBaseEntity::SUB_Remove);
+			}
+			pev->nextthink = gpGlobals->time + 0.01s;
 		}
 
 		void FollowThink(void)
@@ -219,15 +432,18 @@ namespace sv {
 		{
 			pev->avelocity.z = avelocity;
 			m_ArrowDamage = flDamage;
-			pev->velocity = std::move(vecVelocity);
+			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
 			m_iTeam = iTeam;
 			m_iMode = iMode;
-
 		}
-
+		Vector m_vecSrc;
+		Vector m_vecStartVelocity;
 		int m_iBeamModelIndex;
 		int m_iMode;
+		int m_iPenetration;
+		int m_iHitWallExp;
 		float m_ArrowDamage;
+		time_point_t m_flStartFadeTime;
 		TeamName m_iTeam;
 	};
 
@@ -247,7 +463,7 @@ void CHuntbow::Spawn(void)
 	m_iShotsFired = 0;
 
 	m_iClip = -1;
-	m_iDefaultAmmo = 150;
+	m_iDefaultAmmo = 250;
 
 	m_flAccuracy = 0.05;
 	m_iShotsFired = 0;
@@ -302,7 +518,7 @@ int CHuntbow::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "bowarrow";
-	p->iMaxAmmo1 = 150;
+	p->iMaxAmmo1 = 250;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = -1;
@@ -331,7 +547,7 @@ BOOL CHuntbow::Deploy(void)
 	WRITE_BYTE(HUNTBOW_AIM_IDLE);
 	MESSAGE_END();
 #endif
-	return DefaultDeploy("models/v_huntbow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 ? "models/p_huntbow_empty.mdl" : "models/p_huntbow.mdl", BOW_DRAW + (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0), "slingshot", UseDecrement() != FALSE, 0.2s, 1.5s);
+	return DefaultDeploy("models/v_huntbow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 ? "models/p_huntbow_empty.mdl" : "models/p_huntbow.mdl", BOW_DRAW + (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0), "slingshot", UseDecrement() != FALSE, 0.3s, 1.5s);
 }
 
 int CHuntbow::ExtractAmmo(CBasePlayerWeapon *pWeapon)
@@ -345,62 +561,6 @@ int CHuntbow::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 	}
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
 }
-
-#ifndef CLIENT_DLL
-void CHuntbow::RadiusDamage(Vector vecAiming, float flDamage, float flRadius)
-{
-	const Vector vecSrc = vecAiming;
-	entvars_t* const pevAttacker = VARS(pev->owner);
-	entvars_t* const pevInflictor = this->pev;
-	int bitsDamageType = DMG_BULLET;
-
-	TraceResult tr;
-	const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-	CBaseEntity* pEntity = NULL;
-	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
-	{
-		if (pEntity->pev->takedamage != DAMAGE_NO)
-		{
-			if (bInWater && !pEntity->pev->waterlevel)
-				continue;
-
-			if (!bInWater && pEntity->pev->waterlevel == 3)
-				continue;
-
-			if (pEntity->IsBSPModel())
-				continue;
-
-			if (pEntity->pev == pevAttacker)
-				continue;
-
-			Vector vecSpot = pEntity->BodyTarget(vecSrc);
-			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
-			{
-				if (tr.fStartSolid)
-				{
-					tr.vecEndPos = vecSrc;
-					tr.flFraction = 0;
-				}
-
-				if (tr.flFraction == 1.0f)
-				{
-					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-				}
-				else
-				{
-					tr.iHitgroup = HITGROUP_CHEST;
-					ClearMultiDamage();
-					pEntity->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-					ApplyMultiDamage(pevInflictor, pevAttacker);
-				}
-			}
-		}
-	}
-}
-#endif
 
 void CHuntbow::PrimaryAttack(void)
 {
@@ -442,16 +602,25 @@ void CHuntbow::ChargedFire(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-
 	UTIL_MakeVectors(m_pPlayer->pev->punchangle + m_pPlayer->pev->v_angle);
+	Vector vecAngle = gpGlobals->v_forward;
+	Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
 	m_pPlayer->m_iWeaponVolume = QUIET_GUN_VOLUME;
 	m_iMode = 1;
 #ifndef CLIENT_DLL
-	int iEffect = 3;
-	Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, 0, 8192, 7, 16, GetSecondaryAttackDamage(), 0.99, m_pPlayer->pev, true, m_pPlayer->random_seed, &iEffect, m_pPlayer);
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, int(m_pPlayer->pev->punchangle.x * 100), 1, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, TRUE);
+	
+	CHuntbowArrow* pEnt = static_cast<CHuntbowArrow*>(CBaseEntity::Create("huntbow_arrow", vecSrc, UTIL_VecToAngles(vecAngle), m_pPlayer->edict()));
+	if (pEnt)
+	{
+		pEnt->Init(gpGlobals->v_forward * 2000, GetSecondaryAttackDamage(), m_pPlayer->m_iTeam, 10.0, m_iMode);
+	}
+
+
+	//int iEffect = 3;
+	//Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, 0, 8192, 7, 16, GetSecondaryAttackDamage(), 0.99, m_pPlayer->pev, true, m_pPlayer->random_seed, &iEffect, m_pPlayer);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, int(m_pPlayer->pev->punchangle.x * 100), 1, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, TRUE);
 #endif
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.28s;
 	m_pPlayer->pev->punchangle.x -= 2.0;
 }
 
@@ -555,15 +724,6 @@ void CHuntbow::Holster(int skiplocal)
 		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
-	/*
-	for (int i = 0; i < 33; i++)
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
-		WRITE_BYTE(6);
-		WRITE_SHORT(i);
-		WRITE_BYTE(0);
-		MESSAGE_END();
-	}*/
 #endif
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -706,14 +866,12 @@ Vector CHuntbow::CalcPositon(Vector vecSrc, Vector vecDir, int *bHit = 0)
 
 		TraceResult tr;
 		UTIL_TraceLine(vecSrc, vecPlayerOrigin, ignore_monsters, m_pPlayer->edict(), &tr);
-		if (tr.flFraction < 1.0 )
+		if (tr.pHit == NULL || tr.pHit != player->edict())
 			continue;
 
 		if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > 6)
 			continue;
-
-
-		
+	
 		float fDelta = (vecPlayerOrigin - m_pPlayer->pev->origin).Length();
 		if (fDelta < dis)
 		{
@@ -821,8 +979,8 @@ void CHuntbow::ItemPostFrame(void)
 
 	switch (bHit)
 	{
-	case 1:m_CrossHairState = HUNTBOW_HIT_LEFT; break;
-	case 2:m_CrossHairState = HUNTBOW_HIT_RIGHT; break;
+	case 1:
+	case 2:
 	case 3:m_CrossHairState = HUNTBOW_AIM_HIT; break;
 	default:
 		m_CrossHairState = HUNTBOW_AIM_IDLE;
@@ -838,7 +996,7 @@ void CHuntbow::ItemPostFrame(void)
 	}
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	ScannerFunc(vecSrc, gpGlobals->v_forward, 900, 180, m_pPlayer->pev, m_iChargeState);
+	ScannerFunc(vecSrc, gpGlobals->v_forward, 1500, 180, m_pPlayer->pev, m_iChargeState);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
 	WRITE_BYTE(1);
@@ -883,9 +1041,9 @@ float CHuntbow::GetSecondaryAttackDamage() const
 	float flDamage = 152.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 1555.0f;
+		flDamage = 1300.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 1555.0f;
+		flDamage = 1300.0f;
 #endif
 	return flDamage;
 }

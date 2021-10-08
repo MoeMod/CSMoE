@@ -187,6 +187,78 @@ static void SetBeamRenderMode( int rendermode )
 
 /*
 ================
+CL_DrawSegsStretch
+general code for drawing beams
+================
+*/
+static void CL_DrawSegsStretch(int modelIndex, float frame, int rendermode, const vec3_t source, const vec3_t delta,
+	float width, float* color)
+{
+	HSPRITE	m_hSprite;
+	beamseg_t	curSeg, nextSeg;
+
+	if (!cl_draw_beams->integer)
+		return;
+
+	m_hSprite = R_GetSpriteTexture(Mod_Handle(modelIndex), frame);
+
+	if (!m_hSprite)
+		return;
+
+	curSeg.alpha = nextSeg.alpha = 1.0f;
+	VectorCopy(color, curSeg.color);
+	VectorCopy(color, nextSeg.color);
+	VectorCopy(source, curSeg.pos);
+	VectorAdd(source, delta, nextSeg.pos);
+
+	SetBeamRenderMode(rendermode);
+	GL_Bind(XASH_TEXTURE0, m_hSprite);
+	pglBegin(GL_TRIANGLE_STRIP);
+
+	// specify the next segment.
+	curSeg.width = nextSeg.width = width * 2.0f;
+	curSeg.texcoord = 0.0f;
+	nextSeg.texcoord = 1.0f;
+
+	// Get a vector that is perpendicular to us and perpendicular to the beam.
+	// This is used to fatten the beam.
+	vec3_t	vNormal, vAveNormal;
+	ComputeNormal(curSeg.pos, nextSeg.pos, vNormal);
+	VectorCopy(vNormal, vAveNormal);
+
+	// draw regular segment
+	vec3_t	vPoint1, vPoint2;
+	VectorMA(curSeg.pos, (curSeg.width * 0.5f), vAveNormal, vPoint1);
+	VectorMA(curSeg.pos, (-curSeg.width * 0.5f), vAveNormal, vPoint2);
+
+	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
+	pglTexCoord2f(0.0f, curSeg.texcoord);
+	pglNormal3fv(vAveNormal);
+	pglVertex3fv(vPoint1);
+
+	pglColor4f(curSeg.color[0], curSeg.color[1], curSeg.color[2], curSeg.alpha);
+	pglTexCoord2f(1.0f, curSeg.texcoord);
+	pglNormal3fv(vAveNormal);
+	pglVertex3fv(vPoint2);
+
+	VectorMA(nextSeg.pos, (nextSeg.width * 0.5f), vAveNormal, vPoint1);
+	VectorMA(nextSeg.pos, (-nextSeg.width * 0.5f), vAveNormal, vPoint2);
+
+	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
+	pglTexCoord2f(0.0f, nextSeg.texcoord);
+	pglNormal3fv(vAveNormal);
+	pglVertex3fv(vPoint1);
+
+	pglColor4f(nextSeg.color[0], nextSeg.color[1], nextSeg.color[2], nextSeg.alpha);
+	pglTexCoord2f(1.0f, nextSeg.texcoord);
+	pglNormal3fv(vAveNormal);
+	pglVertex3fv(vPoint2);
+
+	pglEnd();
+}
+
+/*
+================
 CL_DrawSegs
 general code for drawing beams
 ================
@@ -799,11 +871,21 @@ static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int re
 		saved_nColor[1] = nColor[1];
 		saved_nColor[2] = nColor[2];
 
-		// Transform point into screen space
-		TriWorldToScreen( pHead->org, screen );
+		if (vLast == 0.0f) {
+			// Build world-space normal to screen-space direction vector
+			VectorSubtract(screen, screenLast, tmp);
 
-		// Build world-space normal to screen-space direction vector
-		VectorSubtract( screen, screenLast, tmp );
+			// Transform point into screen space
+			TriWorldToScreen(pHead->org, screen);
+		}
+		else {
+			// Transform point into screen space
+			TriWorldToScreen(pHead->org, screen);
+
+			// Build world-space normal to screen-space direction vector
+			VectorSubtract(screen, screenLast, tmp);
+		}
+
 		// We don't need Z, we're in screen space
 		tmp[2] = 0;
 		VectorNormalize( tmp );
@@ -1287,6 +1369,7 @@ void CL_UpdateBeam( BEAM *pbeam, float frametime )
 	switch( pbeam->type )
 	{
 		case TE_BEAMPOINTS:
+		case TE_BEAMPOINTS_STRETCH:
 			if( CL_CullBeam( pbeam->source, pbeam->target, false ))
 			{
 				pbeam->flags &= ~FBEAM_ISACTIVE; // force to ignore
@@ -1474,6 +1557,9 @@ void CL_DrawBeam( BEAM *pbeam )
 			break;
 		case TE_BEAMHOSE:
 			CL_DrawLaser( pbeam, frame, rendermode, color, pbeam->modelIndex );
+			break;
+		case TE_BEAMPOINTS_STRETCH:
+			CL_DrawSegsStretch(pbeam->modelIndex, frame, rendermode, pbeam->source, pbeam->delta, pbeam->width, color);
 			break;
 		default:
 			MsgDev( D_ERROR, "CL_DrawBeam:  Unknown beam type %i\n", pbeam->type );
@@ -1725,6 +1811,47 @@ BEAM *GAME_EXPORT CL_BeamPoints( const vec3_t start, const vec3_t end, int model
 	else pBeam->segments = VectorLength( pBeam->delta ) * 0.075f + 3; // one per 16 pixels
 
 	CL_UpdateBeam( pBeam, 0.0f );
+
+	return pBeam;
+}
+
+/*
+==============
+CL_BeamPoints_Stretch
+Create beam between two points
+==============
+*/
+BEAM* CL_BeamPoints_Stretch(const vec3_t start, const vec3_t end, int modelIndex, float life, float width,
+	float brightness, int startFrame, float framerate, float r, float g, float b)
+{
+	BEAM* pBeam;
+
+	// need a valid model.
+	if (Mod_GetType(modelIndex) != mod_sprite)
+		return NULL;
+
+	// don't start temporary beams out of the PVS
+	if (life != 0.0f && CL_CullBeam(start, end, true))
+		return NULL;
+
+	pBeam = CL_AllocBeam();
+	if (!pBeam) return NULL;
+
+	pBeam->type = TE_BEAMPOINTS_STRETCH;
+	pBeam->modelIndex = modelIndex;
+	VectorCopy(start, pBeam->source);
+	VectorCopy(end, pBeam->target);
+	pBeam->frame = startFrame;
+	pBeam->frameRate = framerate;
+	Mod_GetFrames(modelIndex, &pBeam->frameCount);
+	if (life == 0.0f) pBeam->flags |= FBEAM_FOREVER;
+	pBeam->die += life;
+	pBeam->width = width;
+	BeamNormalizeColor(pBeam, r, g, b, brightness);
+
+	VectorSubtract(pBeam->target, pBeam->source, pBeam->delta);
+
+	CL_UpdateBeam(pBeam, 0.0f);
 
 	return pBeam;
 }
@@ -2103,6 +2230,24 @@ void CL_ParseViewBeam( sizebuf_t *msg, int beamType )
 		case TE_KILLBEAM:
 			startEnt = BF_ReadShort( msg );
 			CL_BeamKill( startEnt );
+			break;
+		case TE_BEAMPOINTS_STRETCH:
+			start[0] = BF_ReadCoord(msg);
+			start[1] = BF_ReadCoord(msg);
+			start[2] = BF_ReadCoord(msg);
+			end[0] = BF_ReadCoord(msg);
+			end[1] = BF_ReadCoord(msg);
+			end[2] = BF_ReadCoord(msg);
+			modelIndex = BF_ReadShort(msg);
+			startFrame = BF_ReadByte(msg);
+			frameRate = (float)BF_ReadByte(msg);
+			life = (float)(BF_ReadByte(msg) * 0.1f);
+			width = (float)(BF_ReadByte(msg) * 0.1f);
+			r = (float)BF_ReadByte(msg);
+			g = (float)BF_ReadByte(msg);
+			b = (float)BF_ReadByte(msg);
+			brightness = (float)BF_ReadByte(msg);
+			CL_BeamPoints_Stretch(start, end, modelIndex, life, width, brightness, startFrame, frameRate, r, g, b);
 			break;
 	}
 }

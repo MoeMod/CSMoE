@@ -129,6 +129,7 @@ set(XASH_ENGINE_SOURCES
 	common/mod_decryptor.cpp 
 	common/mod_extend_seq.cpp 
 	common/cpu.c
+	common/textconsole.c
 
 
 		server/sv_client.c

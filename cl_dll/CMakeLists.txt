@@ -185,6 +185,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_m4a1x.cpp
 	../dlls/wpn_shared/z4b_m4a1mw.cpp
 	../dlls/wpn_shared/z4b_ak47x.cpp
+	../dlls/wpn_shared/wpn_zombiebomb2.cpp
+	../dlls/wpn_shared/wpn_bendita.cpp
+	../dlls/wpn_shared/wpn_skull5.cpp
+	../dlls/wpn_shared/z4b_k1ases.cpp
+	../dlls/wpn_shared/z4b_m1887se.cpp
 	)
 
 set (HUD_SRCS

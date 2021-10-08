@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "gamemode/zb1/zb1_zclass.h"
 #include "gamemode/zb1/zb1_const.h"
 #include "gamemode/mod_zbb.h"
-
+#pragma once
 namespace sv {
 
 class CZombieClass_ZBB : public CZombie_ZB1, public IZombieModeCharacter_ZBB_ExtraDelegate

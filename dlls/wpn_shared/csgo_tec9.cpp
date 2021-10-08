@@ -137,7 +137,7 @@ void CTec9::Tec9Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_57MM, GetDamage(), 0.75, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_57MM, GetDamage(), 0.75, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS

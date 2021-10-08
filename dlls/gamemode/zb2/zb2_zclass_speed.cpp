@@ -66,15 +66,18 @@ void CZombieClass_Speed::ResetMaxSpeed() const
 
 float CZombieClass_Speed::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	flDamage *= 0.9;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		flDamage *= 1.3;
+	else
+		flDamage *= 1.2;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 bool CZombieClass_Speed::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
 {
 	// knife knockback
-	if(attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
-		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 550, 750, 400, 300, 0.85f });
+	//if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+	//	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 550, 750, 400, 300, 0.85f });
 
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 	{
@@ -84,7 +87,6 @@ bool CZombieClass_Speed::ApplyKnockback(CBasePlayer *attacker, const KnockbackDa
 			kbd.flFlying * 2.f,
 			kbd.flDucking * 3.f,
 			kbd.flVelocityModifier * 0.9f,
-
 		});
 	}
 
@@ -127,6 +129,7 @@ void CZombieClass_Speed::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-s.mdl");
 			break;

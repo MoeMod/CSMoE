@@ -70,7 +70,7 @@ void CMod_Zombi::CheckMapConditions()
 	newfog->pev->rendercolor = { 0,0,0 };
 
 	// light
-	LIGHT_STYLE(0, "g"); // previous one is "f"
+	LIGHT_STYLE(0, "l"); // previous one is "f"
 }
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)

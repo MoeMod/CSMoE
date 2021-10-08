@@ -42,7 +42,15 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 5000.0f, 850.0f, 1450.0f, 850.0f, 0.8f }; }
+	KnockbackData GetKnockBackData() override {
+		switch (m_iInstantShots)
+		{
+		case 1:return { 1200.0f, 650.0f, 700.0f, 800.0f, 0.3f }; break;
+		case 2:return { 1500.0f, 700.0f, 750.0f, 800.0f, 0.8f }; break;
+		case 3:return { 2000.0f, 800.0f, 750.0f, 850.0f, 0.8f }; break;
+		default:return { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
+		}
+	}
 	const char *GetCSModelName() override { return "models/w_tbarrel.mdl"; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_12gauge" , 65 }; }
@@ -50,6 +58,7 @@ public:
 
 public:
 	int m_iShell;
+	int m_iInstantShots;
 
 private:
 	unsigned short m_usFireTbarrel;

@@ -71,10 +71,6 @@ void CBuffsg552ex::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash206.spr");
 
 	PRECACHE_SOUND("weapons/buffsg552ex_shoot1.wav");
-	PRECACHE_SOUND("weapons/buffsg552ex_clipout1.wav");
-	PRECACHE_SOUND("weapons/buffsg552ex_clipin1.wav");
-	PRECACHE_SOUND("weapons/buffsg552ex_clipin2.wav");
-	PRECACHE_SOUND("weapons/buffsg552ex_draw.wav");
 	PRECACHE_SOUND("weapons/buffsg552ex_idle.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
@@ -108,6 +104,7 @@ BOOL CBuffsg552ex::Deploy(void)
 
 void CBuffsg552ex::SecondaryAttack(void)
 {
+#ifndef CLIENT_DLL
 	if (IsSignal())
 	{
 		if (m_pPlayer->m_iFOV != 90)
@@ -120,6 +117,7 @@ void CBuffsg552ex::SecondaryAttack(void)
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 75;
 	}
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+#endif
 }
 
 

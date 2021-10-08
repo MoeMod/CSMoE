@@ -147,6 +147,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m95");
 	UTIL_PrecacheOtherWeapon("weapon_buffsg552ex");
 	UTIL_PrecacheOtherWeapon("weapon_as50");
+	UTIL_PrecacheOtherWeapon("weapon_bendita");
+	UTIL_PrecacheOtherWeapon("weapon_skull5");
+	UTIL_PrecacheOtherWeapon("z4b_k1ases");
+	UTIL_PrecacheOtherWeapon("z4b_m1887se");
 	UTIL_PrecacheOtherWeapon("weapon_m4a1dragon");
 	UTIL_PrecacheOtherWeapon("z4b_m37se");
 	UTIL_PrecacheOtherWeapon("weapon_ak47dragon");
@@ -210,6 +214,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_mp7a1p");
 	UTIL_PrecacheOtherWeapon("knife_zombi");
 	UTIL_PrecacheOtherWeapon("weapon_zombibomb");
+	UTIL_PrecacheOtherWeapon("weapon_zombibomb2");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex1");
 	UTIL_PrecacheOtherWeapon("weapon_infinityex2");
 	UTIL_PrecacheOtherWeapon("z4b_infinityx");
@@ -224,6 +229,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_ak47x");
 	UTIL_PrecacheOtherWeapon("z4b_cannontiger");
 	UTIL_PrecacheOtherWeapon("z4b_cannonplasma");
+	UTIL_PrecacheOtherWeapon("knife_dualsword");
+	UTIL_PrecacheOtherWeapon("weapon_gunkata");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -1549,6 +1549,8 @@ int GL_LoadTexture_DDS(char *name, GLvoid* data, int type, int size, int w, int 
 
 	// add to hash table
 	hash = Com_HashKey(tex->name, TEXTURES_HASH_SIZE);
+	//tex->target = GL_TEXTURE_2D;
+	//tex->texnum = i;
 	tex->nextHash = r_texturesHashTable[hash];
 	r_texturesHashTable[hash] = tex;
 
@@ -1582,6 +1584,9 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 		{
 			// prolonge registration
 			tex->cacheframe = world.load_sequence;
+			if (tex->name[0] != '*')
+				tex->refCount++;
+
 			return (tex - r_textures);
 		}
 	}
@@ -1623,6 +1628,10 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 	tex = &r_textures[i];
 	Q_strncpy( tex->name, name, sizeof( tex->name ));
 	tex->flags = flags;
+
+	// init reference exclude brush model's texture
+	if (tex->name[0] != '*')
+		tex->refCount = 1;
 
 	if( flags & TF_SKYSIDE )
 		tex->texnum = tr.skyboxbasenum++;
@@ -3883,6 +3892,11 @@ void R_FreeImage( gltexture_t *image )
 	{
 		if( image->texnum != 0 )
 			MsgDev( D_ERROR, "trying to free unnamed texture with texnum %i\n", image->texnum );
+		return;
+	}
+
+	if (image->refCount && --image->refCount > 0)
+	{
 		return;
 	}
 

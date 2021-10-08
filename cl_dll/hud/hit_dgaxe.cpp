@@ -58,6 +58,8 @@ enum
 	HUNTBOW_HIT_LEFT,
 	HUNTBOW_HIT_RIGHT,
 	HUNTBOW_AIM_CHARGIN,
+	HUNTBOW_AIM_HIT_LEFT,
+	HUNTBOW_AIM_HIT_RIGHT
 };
 
 int CHudDgaxe::Init()
@@ -77,7 +79,33 @@ int CHudDgaxe::MsgFunc_Dgaxe(const char* pszName, int iSize, void* pbuf)
 
 	iWeapon = reader.ReadByte();
 	iType = reader.ReadByte();
-	
+	switch (iType)
+	{
+	case HUNTBOW_HIT_LEFT:
+	{
+		iStoredType = HUNTBOW_HIT_LEFT;
+		DisplayTime = gHUD.m_flTime + 0.5;
+		break;
+	}
+	case HUNTBOW_HIT_RIGHT:
+	{
+		iStoredType = HUNTBOW_HIT_RIGHT;
+		DisplayTime = gHUD.m_flTime + 0.5;
+		break;
+	}
+	case HUNTBOW_AIM_HIT_LEFT:
+	{
+		iStoredType = HUNTBOW_AIM_HIT_LEFT;
+		DisplayTime = gHUD.m_flTime + 0.5;
+		break;
+	}
+	case HUNTBOW_AIM_HIT_RIGHT:
+	{
+		iStoredType = HUNTBOW_AIM_HIT_RIGHT;
+		DisplayTime = gHUD.m_flTime + 0.5;
+		break;
+	}
+	}
 
 	return 1;
 }
@@ -97,6 +125,7 @@ int CHudDgaxe::VidInit()
 
 void CHudDgaxe::Reset(void)
 {
+	DisplayTime = 0;
 	std::fill(std::begin(m_pCurTexture), std::end(m_pCurTexture), nullptr);
 	VidInit();
 }
@@ -165,8 +194,10 @@ int CHudDgaxe::Draw(float flTime)
 		{
 			return 1;
 		}
-
-		DrawHuntbowCrossHair(iX, iY, wide, height, iType);
+		if(DisplayTime > gHUD.m_flTime)
+			DrawHuntbowCrossHair(iX, iY, wide, height, iStoredType);
+		else
+			DrawHuntbowCrossHair(iX, iY, wide, height, iType);
 	}
 	}
 
@@ -219,7 +250,7 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 				if(i == 4)
 					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
+					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 				m_pCurTexture[i]->Bind();
 				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
 			}
@@ -236,7 +267,7 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 				if (i == 5)
 					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
+					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 				m_pCurTexture[i]->Bind();
 				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
 			}
@@ -251,6 +282,44 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 		{
 			m_pCurTexture[6]->Bind();
 			DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+		}
+		break;
+	}
+	case HUNTBOW_AIM_HIT_LEFT:
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+		for (int i = 3; i <= 5; i++)
+		{
+			if (m_pCurTexture[i])
+			{
+				if (i == 3)
+					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+				else if (i == 4)
+					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+				else
+					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
+				m_pCurTexture[i]->Bind();
+				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+			}
+		}
+		break;
+	}
+	case HUNTBOW_AIM_HIT_RIGHT:
+	{
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+		for (int i = 3; i <= 5; i++)
+		{
+			if (m_pCurTexture[i])
+			{
+				if (i == 3)
+					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+				else if (i == 5)
+					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+				else
+					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
+				m_pCurTexture[i]->Bind();
+				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+			}
 		}
 		break;
 	}

@@ -30,7 +30,7 @@ CHuman_ZB1::CHuman_ZB1(CBasePlayer *player) : BasePlayerExtra(player)
 	m_pPlayer->m_bIsZombie = false;
 	// Give Armor
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health= 1000;
-	//pPlayer->pev->gravity = 0.86f;
+	m_pPlayer->pev->gravity = 0.86f;
 	m_pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 100;
 }
@@ -98,14 +98,33 @@ void PlayerZombie_Precache()
 {
 	PRECACHE_SOUND("zombi/zombi_death_female_1.wav");
 	PRECACHE_SOUND("zombi/zombi_death_female_2.wav");
+	PRECACHE_SOUND("zombi/zombi_death_teleport_1.wav");
+	PRECACHE_SOUND("zombi/zombi_death_teleport_2.wav");
+	PRECACHE_SOUND("zombi/boosterzombie_death1.wav");
+	PRECACHE_SOUND("zombi/boosterzombie_death2.wav");
 	PRECACHE_SOUND("zombi/zombi_death_1.wav");
 	PRECACHE_SOUND("zombi/zombi_death_2.wav");
+	PRECACHE_SOUND("zombi/zombi_chinese_death.wav");
+	PRECACHE_SOUND("zombi/passzombie_death1.wav");
+	PRECACHE_SOUND("zombi/passzombie_death2.wav");
+	PRECACHE_SOUND("zombi/flyzombie_death1.wav");
+	PRECACHE_SOUND("zombi/flyzombie_death2.wav");
+
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_female_1.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_female_2.wav");
+	PRECACHE_SOUND("zombi/boosterzombie_hurt1.wav");
+	PRECACHE_SOUND("zombi/boosterzombie_hurt2.wav");
+	PRECACHE_SOUND("zombi/zombi_chinese_hurt.wav");
+	PRECACHE_SOUND("zombi/passzombie_hurt1.wav");
+	PRECACHE_SOUND("zombi/passzombie_hurt2.wav");
+	PRECACHE_SOUND("zombi/flyzombie_hurt1.wav");
+	PRECACHE_SOUND("zombi/flyzombie_hurt2.wav");
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
+	PRECACHE_SOUND("zombi/zombi_heal_female.wav");
+	PRECACHE_SOUND("zombi/zombi_heal_teleport.wav");
 
 	PRECACHE_MODEL("models/v_knife_zombis.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideimos2.mdl");
@@ -114,6 +133,13 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombih.mdl");
 	PRECACHE_MODEL("models/v_knife_zombihealer.mdl");
 	PRECACHE_MODEL("models/v_knife_zombipc.mdl");
+	PRECACHE_MODEL("models/v_knife_teleport_zombi.mdl");
+	PRECACHE_MODEL("models/v_knife_teleport_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_knife_booster_zombi.mdl");
+	PRECACHE_MODEL("models/v_knife_booster_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_knife_zombichina.mdl");
+	PRECACHE_MODEL("models/v_knife_pass_zombi.mdl");
+	PRECACHE_MODEL("models/v_knife_pass_zombi_host.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -122,7 +148,13 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibombpc.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-heal.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-h.mdl");
-
+	PRECACHE_MODEL("models/v_zombibomb_teleport_zombi.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_teleport_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_booster_zombi.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_booster_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_china.mdl");	
+	PRECACHE_MODEL("models/v_zombibomb_pass_zombi.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_pass_zombi_host.mdl");
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -137,7 +169,19 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/pc_zombi_host/pc_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/heal_zombi_host/heal_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/heal_zombi_origin/heal_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/teleport_zombi_host/teleport_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/teleport_zombi_origin/teleport_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/booster_zombi_host/booster_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/booster_zombi_origin/booster_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/china_zombi_host/china_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/china_zombi_origin/china_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/china_zombi_host/china_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/china_zombi_origin/china_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/pass_zombi_origin/pass_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/pass_zombi_host/pass_zombi_host.mdl");
+	
 
+	
 
 }
 

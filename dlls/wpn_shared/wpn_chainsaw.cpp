@@ -51,21 +51,10 @@ void CChainsaw::Precache(void)
 	PRECACHE_MODEL("models/w_chainsaw.mdl");
 	PRECACHE_MODEL("models/p_chainsaw.mdl");
 
-	PRECACHE_SOUND("weapons/chainsaw_attack1_end.wav");
-	PRECACHE_SOUND("weapons/chainsaw_attack1_start.wav");
-	PRECACHE_SOUND("weapons/chainsaw_attack1_loop.wav");
-	PRECACHE_SOUND("weapons/chainsaw_draw.wav");
-	PRECACHE_SOUND("weapons/chainsaw_draw1.wav");
 	PRECACHE_SOUND("weapons/chainsaw_hit1.wav");
 	PRECACHE_SOUND("weapons/chainsaw_hit2.wav");
 	PRECACHE_SOUND("weapons/chainsaw_hit3.wav");
 	PRECACHE_SOUND("weapons/chainsaw_hit4.wav");
-	PRECACHE_SOUND("weapons/chainsaw_idle.wav");
-	PRECACHE_SOUND("weapons/chainsaw_reload.wav");
-	PRECACHE_SOUND("weapons/chainsaw_slash1.wav");
-	PRECACHE_SOUND("weapons/chainsaw_slash2.wav");
-	PRECACHE_SOUND("weapons/chainsaw_slash3.wav");
-	PRECACHE_SOUND("weapons/chainsaw_slash4.wav");
 
 	m_usFireChainsaw = PRECACHE_EVENT(1, "events/chainsaw.sc");
 }

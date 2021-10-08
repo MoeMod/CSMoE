@@ -84,7 +84,6 @@ void CDesperado::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash60.spr");
 
 	PRECACHE_SOUND("weapons/dprd-1.wav");
-	PRECACHE_SOUND("weapons/dprd_reload_m.wav");
 
 	m_iShell = PRECACHE_MODEL("models/pshell.mdl");
 	m_usFireDesperado = PRECACHE_EVENT(1, "events/desperado.sc");
@@ -208,7 +207,7 @@ void CDesperado::SecondaryAttack(void)
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDirShooting = gpGlobals->v_forward;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 6, BULLET_PLAYER_50AE, GetDamage(), 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 6, BULLET_PLAYER_50AE, GetDamage(), 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -315,7 +314,7 @@ void CDesperado::PrimaryAttack(void)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 6, BULLET_PLAYER_50AE, GetDamage(), 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 6, BULLET_PLAYER_50AE, GetDamage(), 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS

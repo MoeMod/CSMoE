@@ -297,6 +297,7 @@ void EV_WpnEffects(event_args_s* args)
 
 				}
 			}
+			break;
 		}
 		case EVENT_DUALSWORD_FX:
 		{

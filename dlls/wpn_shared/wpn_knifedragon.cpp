@@ -297,9 +297,9 @@ int CKnifeDragon::Swing(int fFirst)
 		ClearMultiDamage();
 		if (pEntity)
 		{
-			float flDamage = 15;
+			float flDamage = 20;
 			if (m_flNextPrimaryAttack + 0.4s < UTIL_WeaponTimeBase())
-				flDamage = 20;
+				flDamage = 25;
 
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
@@ -409,7 +409,7 @@ int CKnifeDragon::Stab(int fFirst)
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-		float flDamage = 65.0;
+		float flDamage = 75.0;
 
 		if (pEntity && pEntity->IsPlayer())
 		{

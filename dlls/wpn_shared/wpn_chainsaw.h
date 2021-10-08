@@ -68,9 +68,9 @@ public:
 	KnockbackData GetKnockBackData() override 
 	{ 
 		if (m_bSlash)
-			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			return { 290.0f, 85.0f, 50.0f, 150.0f, 0.9f };
 		else
-			return { 290.0f, 85.0f, 150.0f, 150.0f, 0.25f }; 
+			return { 290.0f, 85.0f, 50.0f, 150.0f, 0.25f }; 
 	}
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_chainsaw" , 300 }; }

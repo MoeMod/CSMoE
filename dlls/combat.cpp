@@ -1139,6 +1139,77 @@ void RadiusDamage2(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacke
 	}
 }
 
+void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius,
+	int iClassIgnore, int bitsDamageType, bool bHasFalloff, bool bDamageSelf, bool DamageBsp, bool canheadshot)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	float flAdjustedDamage, falloff;
+	Vector vecSpot;
+
+	if (flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0;
+	int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+	// in case grenade is lying on the ground
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	// iterate on all entities in the vicinity.
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL) {
+		if (pEntity->pev->takedamage != DAMAGE_NO) {
+			// UNDONE: this should check a damage mask, not an ignore
+			if (iClassIgnore != CLASS_NONE && pEntity->Classify() == iClassIgnore)
+				continue;
+
+			// blast's don't tavel into or out of water
+			if (bInWater && pEntity->pev->waterlevel == 0)
+				continue;
+
+			if (!bInWater && pEntity->pev->waterlevel == 3)
+				continue;
+
+			if (!DamageBsp && pEntity->IsBSPModel())
+				continue;
+
+			if (!bDamageSelf && pEntity->pev == pevAttacker)
+				continue;
+
+			const Vector vecSpot = pEntity->BodyTarget(vecSrc);
+			TraceResult tr;
+			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+			{
+				if (tr.fStartSolid)
+				{
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0;
+				}
+				float flAdjustedDamage = max(0, flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff);
+				if (bHasFalloff)
+					flAdjustedDamage = flDamage;
+				if (tr.flFraction == 1.0f)
+				{
+					pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+				}
+				else
+				{
+					if (!canheadshot)
+						tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+				}
+			}
+		}
+	}
+}
+
 void CBaseMonster::RadiusDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int iClassIgnore,
                                 int bitsDamageType)
 {
@@ -2122,6 +2193,28 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 					}
 				}
 				
+			}
+			case 4:				//as50 buff
+			{
+				if (pEntity->pev->takedamage != DAMAGE_NO)
+				{
+					if (pEntity->IsPlayer())
+					{		
+						CBasePlayer*  pInflictorPlayer = static_cast<CBasePlayer*>(pEntity);
+						pInflictorPlayer->m_flHealthDecreaseAmount = 5;
+						pInflictorPlayer->m_flHealthDecreaseAmount = 20;
+
+						if (pInflictorPlayer->m_bIsZombie) // fire burn
+						{
+							MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pInflictorPlayer->pev);
+							WRITE_BYTE(8);	//type
+							WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict()));	//entity
+							WRITE_BYTE(5);
+							MESSAGE_END();
+						}
+					}				
+				}
+				break;
 			}
 			}
 

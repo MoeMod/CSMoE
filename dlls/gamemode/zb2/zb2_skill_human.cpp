@@ -142,6 +142,13 @@ public:
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 4.5s;
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw"))
+		{
+			m_flTimeZombieSkillEnd = gpGlobals->time + 5.5s;
+		}
+		
 		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
@@ -153,11 +160,12 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 #ifdef XASH_DEDICATED
-		/*
+
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(1);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();*/
+		WRITE_BYTE(m_flTimeZombieSkillEnd == gpGlobals->time + 5.5s ? 1 : 0);
+		MESSAGE_END();
 #endif
 	}
 
@@ -183,7 +191,7 @@ public:
 			return;
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_flTimeZombieSkillEnd = gpGlobals->time + 10.s;
+		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0s;
 		m_flTimeZombieSkillNext = invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
@@ -195,11 +203,10 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 #ifdef XASH_DEDICATED
-		/*
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(0);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();*/
+		MESSAGE_END();
 #endif
 	}
 

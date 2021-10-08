@@ -33,7 +33,7 @@ namespace sv {
 CZombieClass_Pc::CZombieClass_Pc(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "pc";
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePC>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "pc_zombi_origin" : "pc_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -76,13 +76,22 @@ bool CZombieClass_Pc::ApplyKnockback(CBasePlayer* attacker, const KnockbackData&
 {
 	// knife knockback
 
-	if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+	/*if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 	{
 		//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
 		
-	}
+	}*/
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+
+	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+		kbd.flOnGround * 0.8f,
+		kbd.flNotOnGround * 0.85f,
+		kbd.flFlying * 0.85f,
+		kbd.flDucking * 0.8f,
+		kbd.flVelocityModifier,
+		});
 }
 
 void CZombieClass_Pc::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
@@ -116,6 +125,7 @@ void CZombieClass_Pc::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibombpc.mdl");
 			break;

@@ -565,6 +565,9 @@ public:
 	void RadiusAttack1()
 	{
 #ifndef CLIENT_DLL
+		int anim = m_pPlayer->LookupSequence("gunkata");
+		m_pPlayer->pev->sequence = anim;
+		m_pPlayer->pev->frame = 0;
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();

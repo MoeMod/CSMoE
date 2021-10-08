@@ -14,7 +14,7 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHE
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
@@ -183,7 +183,6 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_pc.cpp
 	./gamemode/zb2/zb2_zclass_heal.cpp
 	./gamemode/zb2/zb2_zclass_heavy.cpp
-	./gamemode/mod_zbb.cpp
 	./weapons_precache.cpp
 	./gamemode/zbb/zbb_basebuilder.cpp
 	./gamemode/zbb/zbb_ghost.cpp
@@ -193,6 +192,12 @@ set(HLDLL_SRCS
 	./gamemode/zbb/zbb_zombie.cpp
 	./refl/cbase_export.cpp
 	./bot/states/cs_bot_supplybox_rush.cpp
+	./gamemode/zb2/zb2_zclass_teleport.cpp
+	./gamemode/mod_zbb.cpp
+	./gamemode/zb2/deimostail.cpp
+	./gamemode/zb2/teleportentity.cpp
+	./gamemode/zb2/zombiebomb.cpp
+	./gamemode/zb2/zb2_zclass_booster.cpp
 	)
 
 set (HLWPN_SRCS
@@ -313,6 +318,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_m4a1x.cpp
 	../dlls/wpn_shared/z4b_m4a1mw.cpp
 	../dlls/wpn_shared/z4b_ak47x.cpp
+	../dlls/wpn_shared/wpn_zombiebomb2.cpp
+	../dlls/wpn_shared/wpn_bendita.cpp
+	../dlls/wpn_shared/wpn_skull5.cpp
+	../dlls/wpn_shared/z4b_k1ases.cpp
+	../dlls/wpn_shared/z4b_m1887se.cpp
 	)
 
 set(PM_SRCS

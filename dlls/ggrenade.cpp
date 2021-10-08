@@ -655,7 +655,7 @@ void CGrenade::ZombieBombExplosion()
 
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "zombi/zombi_bomb_exp.wav", 0.25, ATTN_NORM);
 	entvars_t* pevAttacker = VARS(pev->owner);
-	sv::CGrenade::ZombieBombKnockback(vecSpot, pev, pevAttacker);
+	sv::CGrenade::ZombieBombKnockback(vecSpot, pev, pevAttacker, pev->dmg);
 
 	pev->effects = EF_NODRAW;
 	pev->flags |= FL_KILLME;
@@ -812,6 +812,8 @@ void CGrenade::TumbleThink()
 		{
 			SetThink(&CGrenade::Detonate);
 		}
+		else if(pev->dmg == 999.0f)
+			SetThink(&CGrenade::Detonate);
 		else
 			SetThink(&CGrenade::Detonate3);
 	}
@@ -841,7 +843,7 @@ void CGrenade::ZombieBomb_TumbleThink()
 
 	if (pev->dmgtime <= gpGlobals->time)
 	{
-			SetThink(&CGrenade::ZombieBombExplosion);
+		SetThink(&CGrenade::ZombieBombExplosion);
 	}
 }
 
@@ -929,6 +931,48 @@ NOXREF CGrenade *CGrenade::ShootContact(entvars_t *pevOwner, Vector vecStart, Ve
 
 	pGrenade->pev->dmg = gSkillData.plrDmgM203Grenade;
 	pGrenade->m_bJustBlew = true;
+	return pGrenade;
+}
+
+
+CGrenade* CGrenade::ShootTimed3(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, int iType)
+{
+	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
+	pGrenade->Spawn();
+
+	UTIL_SetOrigin(pGrenade->pev, vecStart);
+	pGrenade->pev->velocity = vecVelocity;
+	pGrenade->pev->angles = pevOwner->angles;
+	pGrenade->pev->owner = ENT(pevOwner);
+
+	pGrenade->m_usEvent = usEvent;
+
+	pGrenade->SetTouch(&CGrenade::BounceTouch);
+
+	pGrenade->pev->dmgtime = gpGlobals->time + time;
+	pGrenade->SetThink(&CGrenade::TumbleThink);
+	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
+
+	pGrenade->pev->sequence = RANDOM_LONG(3, 6);
+	pGrenade->pev->framerate = 1.0f;
+
+	pGrenade->m_bJustBlew = true;
+
+	pGrenade->pev->gravity = 0.55f;
+	pGrenade->pev->friction = 0.7f;
+
+	pGrenade->m_iTeam = iTeam;
+	switch (iType)
+	{
+	case 0:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_zombiebomb.mdl");
+		break;
+	default:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
+		pGrenade->pev->dmg = 100.0f;
+		break;
+	}
+
 	return pGrenade;
 }
 
@@ -1027,6 +1071,8 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->animtime = gpGlobals->time;
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
+	pGrenade->pev->dmg = 998;
+	pGrenade->pev->health = 100;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
 
@@ -1041,6 +1087,80 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb.mdl");
 
 	return pGrenade;
+}
+
+
+CGrenade* CGrenade::ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, float flDamage)
+{
+	CGrenade* pGrenade = ShootTimed3(pevOwner, vecStart, vecVelocity, time, iTeam, usEvent, 0);
+
+	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb2.mdl");
+	pGrenade->pev->dmg = 999;
+	pGrenade->pev->dmgtime = gpGlobals->time + 4.0s;
+	pGrenade->pev->solid = SOLID_TRIGGER;
+	pGrenade->pev->health = flDamage;
+	UTIL_SetSize(pGrenade->pev, Vector(-4, -4, -4), Vector(4, 4, 4));
+	pGrenade->SetTouch(&CGrenade::ZombiBomb2Touch);
+
+	return pGrenade;
+}
+
+
+void CGrenade::ZombiBomb2Touch(CBaseEntity* pOther)
+{
+	if (pOther->IsPlayer())
+	{
+		if (!FBitSet(pev->flags, FL_ONGROUND) && pev->owner == pOther->edict())
+			return;
+
+		if (FBitSet(pev->flags, FL_ONGROUND))
+		{
+			if (((CBasePlayer*)pOther)->m_bIsZombie)
+			{
+				pOther->pev->velocity *= 1.5;
+				pOther->pev->velocity.z = 250;
+			}
+		}
+
+		ZombieBombExplosion();
+
+		pOther->pev->velocity.z *= 0.85;
+	}
+	else
+	{
+		if (FClassnameIs(pOther->pev, "func_breakable") && pOther->pev->rendermode != kRenderNormal)
+		{
+			pev->velocity *= -2;
+		}
+		else
+		{
+			Vector testVelocity = pev->velocity;
+			testVelocity.z *= 0.7;
+
+			if (!m_fRegisteredSound && testVelocity.LengthSquared() <= 3600)
+			{
+				CSoundEnt::InsertSound(bits_SOUND_DANGER, pev->origin, pev->dmg * 2.5, 0.3s);
+				m_fRegisteredSound = TRUE;
+			}
+
+			if (pev->flags & FL_ONGROUND)
+			{
+				pev->velocity *= 0.8;
+				pev->sequence = RANDOM_LONG(1, 1);
+			}
+			else
+			{
+				BounceSound();
+			}
+
+			pev->framerate = pev->velocity.Length() / 200;
+
+			if (pev->framerate > 1)
+				pev->framerate = 1;
+			else if (pev->framerate < 0.5)
+				pev->framerate = 0;
+		}
+	}
 }
 
 
@@ -1691,17 +1811,26 @@ void CGrenade::C4Think()
 }
 
 
-void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker)
+void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float iType )
 {
 	CBaseEntity* pEntity = NULL;
 	TraceResult tr;
-	float flAdjustedDamage, falloff;
+	float flAdjustedDamage, falloff, flRadius, flPower;
 	Vector vecSpot;
-	float flRadius = 350.0;
-	float flDamage,flMul;
+	flRadius = 250.0;
+	flPower = 250.0;
+	
+	if (iType == 999)
+	{
+		flPower = 450;
+		flRadius = 350.0;
+	}
+	
+	float flMul;
 	int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
 	Vector vecVelocityAdd;
-	float flScale;
+	float flMaxKickRate;
+	flAdjustedDamage = pev->health;
 
 	vecSrc.z += 1;
 
@@ -1710,40 +1839,43 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 
 	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL) 	
 	{
+		if (!pEntity->IsAlive())
+			continue;
+
 		Vector vecSub = pEntity->pev->origin - vecSrc;
-		if (vecSub.Length() > 250)
+		if (vecSub.Length() > flRadius)
 			continue;
 		
-		flDamage = (250.0 - vecSub.Length()) / 250;
+		falloff = (flRadius - vecSub.Length()) / flRadius;
 		vecSub *= 1 / vecSub.Length();
-		flMul = flDamage;
 
-		if (flDamage < 0.0)
-			flDamage = flMul = 0.0;
+		if (falloff < 0.0)
+			falloff = 0.0;
 
-		pEntity->TakeDamage(pevInflictor, pevAttacker, 0.0, DMG_BLAST);
+		flAdjustedDamage *= falloff;
+
+		pEntity->TakeDamage(pevInflictor, pevAttacker, 1.0, DMG_BLAST);
+	
 
 		if (pEntity->pev->armorvalue)
 			pEntity->pev->armorvalue -= 1.0;
 		else if (pEntity->pev->health)
 		{
-			pEntity->pev->health -= 1.0;
+			pEntity->pev->health -= flAdjustedDamage;
 			if (pEntity->pev->health <= 0.0)
 			{
 				pEntity->Killed(pEntity->pev, 0);
 			}
 		}
 
-		flScale = RANDOM_LONG(0, 10) / 10.0 + 1.5;
-		flScale *= flRadius;
-
-		if (flScale * flMul <= 420.0)
+		flMaxKickRate = RANDOM_LONG(0, 10) / 10.0 + 1.5 * flPower;
+		if (flPower * 1.2 > flMaxKickRate * falloff)
 		{
-			flScale = 420.0;
-			flMul = 1.0;
+			falloff = 1.0;
+			flMaxKickRate = flPower * 1.2;
 		}
 
-		vecVelocityAdd = vecSub * flScale * flMul;
+		vecVelocityAdd = vecSub * flMaxKickRate * falloff;
 		if (pEntity->pev->flags & FL_ONGROUND)
 		{
 			if (pEntity->pev->flags & FL_DUCKING)
@@ -1753,7 +1885,7 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 			vecVelocityAdd *= 0.9;
 
 		pEntity->pev->velocity += vecVelocityAdd;
-		pEntity->pev->velocity.z *= flMul * 0.75;
+		pEntity->pev->velocity.z *= falloff * 0.75;
 
 		MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgShake, NULL, pEntity->pev);
 		WRITE_SHORT((1 << 12));

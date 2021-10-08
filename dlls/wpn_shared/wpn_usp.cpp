@@ -205,7 +205,7 @@ void CUSP::USPFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
 	int iDamage = (m_iWeaponState & WPNSTATE_USP_SILENCED) ? 30 : 34;
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_45ACP, iDamage, 0.79, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 4096, 1, BULLET_PLAYER_45ACP, iDamage, 0.79, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS

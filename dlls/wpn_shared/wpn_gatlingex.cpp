@@ -286,13 +286,6 @@ void CGatlingex::Precache(void)
 	PRECACHE_SOUND("weapons/gatlingex-2.wav");
 	PRECACHE_SOUND("weapons/gatlingex-2_amb.wav");
 	PRECACHE_SOUND("weapons/gatlingex-2_exp.wav");
-	PRECACHE_SOUND("weapons/gatlingex_clipin1.wav");
-	PRECACHE_SOUND("weapons/gatlingex_clipin2.wav");
-	PRECACHE_SOUND("weapons/gatlingex_clipout1.wav");
-	PRECACHE_SOUND("weapons/gatlingex_clipout2.wav");
-	PRECACHE_SOUND("weapons/gatlingex_boltpull.wav");
-	PRECACHE_SOUND("weapons/gatlingex_draw.wav");
-	PRECACHE_SOUND("weapons/gatlingex_draw.wav");
 
 	PRECACHE_MODEL("sprites/muzzleflash138.spr");
 	PRECACHE_MODEL("sprites/muzzleflash139.spr");
@@ -304,7 +297,7 @@ int CGatlingex::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "12gauge";
-	p->iMaxAmmo1 = 80;
+	p->iMaxAmmo1 = 90;
 	p->pszAmmo2 = "GatlingexProjectile";
 	p->iMaxAmmo2 = 0;
 	p->iMaxClip = GATLING_MAX_CLIP;

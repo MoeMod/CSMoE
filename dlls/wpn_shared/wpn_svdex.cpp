@@ -229,6 +229,12 @@ namespace sv {
 			SetThink(nullptr);
 			SetTouch(nullptr);
 			pev->effects |= EF_NODRAW; // 0x80u
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_KILLBEAM);
+			WRITE_SHORT(this->entindex());
+			MESSAGE_END();
+
 			return UTIL_Remove(this);
 		}
 	};
@@ -263,14 +269,6 @@ void CSVDEX::Precache(void)
 	PRECACHE_SOUND("weapons/svdex-1.wav");
 	PRECACHE_SOUND("weapons/svdex-launcher.wav");
 	PRECACHE_SOUND("weapons/svdex_exp.wav");
-	PRECACHE_SOUND("weapons/svdex_foley1.wav");
-	PRECACHE_SOUND("weapons/svdex_foley2.wav");
-	PRECACHE_SOUND("weapons/svdex_foley3.wav");
-	PRECACHE_SOUND("weapons/svdex_foley4.wav");
-	PRECACHE_SOUND("weapons/svdex_draw.wav");
-	PRECACHE_SOUND("weapons/svdex_clipon.wav");
-	PRECACHE_SOUND("weapons/svdex_clipin.wav");
-	PRECACHE_SOUND("weapons/svdex_clipout.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireSVDEX = PRECACHE_EVENT(1, "events/svdex.sc");
@@ -331,6 +329,8 @@ int CSVDEX::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 
 void CSVDEX::SecondaryAttack(void)
 {
+	if (m_pPlayer->IsBot())
+		return;
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
 		m_iWeaponState &= ~WPNSTATE_M4A1_SILENCED;

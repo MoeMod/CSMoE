@@ -102,14 +102,28 @@ void CAS50::SecondaryAttack(void)
 
 void CAS50::PrimaryAttack(void)
 {
-	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		AS50Fire((0.7) * (1 - m_flAccuracy), 0.4s, FALSE);
-	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		AS50Fire((0.3) * (1 - m_flAccuracy), 0.4s, FALSE);
-	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		AS50Fire((0.03) * (1 - m_flAccuracy), 0.4s, FALSE);
+	if (m_pPlayer->pev->fov != 90)
+	{
+		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+			AS50Fire((0.7) * (1 - m_flAccuracy), 0.45s, FALSE);
+		else if (m_pPlayer->pev->velocity.Length2D() > 0)
+			AS50Fire((0.3) * (1 - m_flAccuracy), 0.45s, FALSE);
+		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			AS50Fire((0.03) * (1 - m_flAccuracy), 0.45s, FALSE);
+		else
+			AS50Fire((0.15) * (1 - m_flAccuracy), 0.45s, FALSE);
+	}
 	else
-		AS50Fire((0.15) * (1 - m_flAccuracy), 0.4s, FALSE);
+	{
+		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+			AS50Fire((0.7) * (1 - m_flAccuracy), 0.4s, FALSE);
+		else if (m_pPlayer->pev->velocity.Length2D() > 0)
+			AS50Fire((0.3) * (1 - m_flAccuracy), 0.4s, FALSE);
+		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			AS50Fire((0.03) * (1 - m_flAccuracy), 0.4s, FALSE);
+		else
+			AS50Fire((0.15) * (1 - m_flAccuracy), 0.4s, FALSE);
+	}
 }
 
 void CAS50::AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -149,7 +163,7 @@ void CAS50::AS50Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, GetDamage(), AS50_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, GetDamage(), AS50_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -222,9 +236,9 @@ float CAS50::GetDamage() const
 	float flDamage = 110.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage =  249.0f;
+		flDamage =  250.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage =  110.0f;
+		flDamage =  160.0f;
 #endif
 	return flDamage;
 }

@@ -43,9 +43,9 @@ public:
 	KnockbackData GetKnockBackData() override
 	{
 		if (pev->iuser1)
-			return { 1250, 1150, 1200, 1100, 0.8f };
+			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
 		else
-			return { 450, 350, 400, 300, 0.3f };		
+			return { 450.0f, 350.0f, 400.0f, 300.0f, 0.3f };		
 	}
 	float GetArmorRatioModifier() override { return 1.2; }
 

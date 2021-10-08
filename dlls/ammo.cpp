@@ -571,6 +571,79 @@ BOOL CDgaxeAmmo::AddAmmo(CBaseEntity* pOther)
 LINK_ENTITY_TO_CLASS(ammo_dgaxe, CDgaxeAmmo);
 
 
+void C50BMGHolyAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C50BMGHolyAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C50BMGHolyAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(7, "50bmgholy", 70) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_50bmgholy, C50BMGHolyAmmo);
+
+void C762NatoBoxAMEAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C762NatoBoxAMEAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C762NatoBoxAMEAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(30, "762natoboxame", 240) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_762natoboxame, C762NatoBoxAMEAmmo);
+
+
+void C556AZAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C556AZAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C556AZAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(30, "556az", 120) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_556az, C556AZAmmo);
+
 
 
 }

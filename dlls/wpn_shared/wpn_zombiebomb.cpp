@@ -36,7 +36,7 @@ void CZombieBomb::Spawn(void)
 
 	SET_MODEL(ENT(pev), "models/w_zombibomb.mdl");
 
-	pev->dmg = 4;
+	pev->dmg = 998;
 	m_iDefaultAmmo = HEGRENADE_DEFAULT_GIVE;
 	m_flStartThrow = invalid_time_point;
 	m_flReleaseThrow = invalid_time_point;
@@ -87,11 +87,6 @@ BOOL CZombieBomb::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
-#ifdef ENABLE_SHIELD
-	if (m_pPlayer->HasShield() != false)
-		return DefaultDeploy("models/shield/v_shield_hegrenade.mdl", "models/shield/p_shield_hegrenade.mdl", HEGRENADE_DRAW, "shieldgren", UseDecrement() != FALSE);
-	else
-#endif
 		return DefaultDeploy("models/v_zombibomb.mdl", "models/p_zombibomb.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
 }
 
@@ -125,68 +120,8 @@ void CZombieBomb::PrimaryAttack(void)
 		m_flStartThrow = gpGlobals->time;
 		m_flReleaseThrow = invalid_time_point;
 		SendWeaponAnim(HEGRENADE_PULLPIN, UseDecrement() != FALSE);
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.4s;
 	}
-}
-
-void CZombieBomb::SetPlayerShieldAnim(void)
-{
-	if (m_pPlayer->HasShield() == true)
-	{
-		if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
-			strcpy(m_pPlayer->m_szAnimExtention, "shield");
-		else
-			strcpy(m_pPlayer->m_szAnimExtention, "shieldgren");
-	}
-}
-
-void CZombieBomb::ResetPlayerShieldAnim(void)
-{
-	if (m_pPlayer->HasShield() == true)
-	{
-		if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
-			strcpy(m_pPlayer->m_szAnimExtention, "shieldgren");
-	}
-}
-
-bool CZombieBomb::ShieldSecondaryFire(int up_anim, int down_anim)
-{
-	if (m_pPlayer->HasShield() == false)
-		return false;
-
-	if (m_flStartThrow != invalid_time_point)
-		return false;
-
-	if (m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
-	{
-		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
-		SendWeaponAnim(down_anim, UseDecrement() != FALSE);
-		strcpy(m_pPlayer->m_szAnimExtention, "shieldgren");
-		m_fMaxSpeed = 250;
-		m_pPlayer->m_bShieldDrawn = false;
-	}
-	else
-	{
-		m_iWeaponState |= WPNSTATE_SHIELD_DRAWN;
-		SendWeaponAnim(up_anim, UseDecrement() != FALSE);
-		strcpy(m_pPlayer->m_szAnimExtention, "shielded");
-		m_fMaxSpeed = 180;
-		m_pPlayer->m_bShieldDrawn = true;
-	}
-
-#ifndef CLIENT_DLL
-	m_pPlayer->UpdateShieldCrosshair((m_iWeaponState & WPNSTATE_SHIELD_DRAWN) == 0);
-	m_pPlayer->ResetMaxSpeed();
-#endif
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.4s;
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.4s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.6s;
-	return true;
-}
-
-void CZombieBomb::SecondaryAttack(void)
-{
-	ShieldSecondaryFire(SHIELDGUN_DRAW, SHIELDGUN_DRAWN_IDLE);
 }
 
 void CZombieBomb::WeaponIdle(void)
@@ -200,7 +135,10 @@ void CZombieBomb::WeaponIdle(void)
 	if (m_flStartThrow != invalid_time_point)
 	{
 #ifndef CLIENT_DLL
-		m_pPlayer->Radio("%!MRAD_FIREINHOLE_ZB", "#Fire_in_the_hole");
+		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+			m_pPlayer->Radio("%!MRAD_FIREINHOLE_ZW ", "#Fire_in_the_hole");
+		else
+			m_pPlayer->Radio("%!MRAD_FIREINHOLE_ZB", "#Fire_in_the_hole");
 #endif
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
@@ -217,7 +155,7 @@ void CZombieBomb::WeaponIdle(void)
 		UTIL_MakeVectors(angThrow);
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
-		auto time = 1.6s;
+		auto time = 1.5s;
 #ifndef CLIENT_DLL
 		CGrenade::ShootZombieBomb(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, NULL);
 #endif
@@ -276,4 +214,10 @@ BOOL CZombieBomb::CanDeploy(void)
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
 }
 
+BOOL CZombieBomb::CanDrop(void)
+{
+	if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
+		return TRUE;
+	return FALSE;
+}
 }

@@ -380,6 +380,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 
 	m_pPlayer->GiveNamedItem("weapon_zombibomb");
 	m_pPlayer->GiveNamedItem("knife_zombi");
+	//m_pPlayer->GiveNamedItem("weapon_zombibomb2");
 	
 
 	if (!(m_pPlayer->m_flDisplayHistory & DHF_NIGHTVISION))

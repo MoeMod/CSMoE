@@ -16,7 +16,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_ZB2_ZCLASS_SPEED_H
 #define PROJECT_ZB2_ZCLASS_SPEED_H
-
+#pragma once
 #include "zb2_zclass.h"
 
 namespace sv {

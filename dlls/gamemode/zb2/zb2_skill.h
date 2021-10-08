@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "player/player_mod_strategy.h"
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/mod_zb1.h"
+#include "wpn_shared/wpn_zombiebomb.h"
 
 namespace sv {
 
@@ -157,7 +158,138 @@ protected:
 	duration_t GetCooldownTime() const;
 
 	EngineClock::time_point m_flTimeZombieSkillEffect;
-	EngineClock::time_point m_flInvisiable;
+};
+
+class CZombieSkill_ZombieDeimos : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieDeimos(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+class CZombieSkill_ZombiePC : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombiePC(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeNextSmoke;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+
+class CZombieSkill_ZombiePass : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombiePass(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	int m_bHasCreateBomb;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+class CZombieSkill_ZombieTeleport : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieTeleport(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+	Vector CalcPositon();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	int m_bHasFireTeleportEntity = 0;
+	EngineClock::time_point m_flTimeBotUseSkill;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+class CZombieSkill_ZombieBooster : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieBooster(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	void Reset() override 
+	{
+		m_flBoostCharge = 0.0;
+		m_iZombieSkillStatus = SKILL_STATUS_USED; 
+		m_flPercent = 0.0;
+	}
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	Vector m_vecVelocity;
+	float m_flBoostCharge = 0.0;
+	float m_flPercent = 0.0;
+	const float m_flMaxpower = 800.0;
+
+	EngineClock::time_point m_flTimeBotUseSkill;
+	EngineClock::time_point m_flTimeNextBoost;
+	EngineClock::time_point m_flTimeChargeCool;
+};
+
+
+class CZombieSkill_ZombieChina : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieChina(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	void OnCrazyEffect();
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeZombieSkillEffect;
 };
 
 }

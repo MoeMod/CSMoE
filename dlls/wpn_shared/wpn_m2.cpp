@@ -339,6 +339,8 @@ namespace sv {
 
 	float CM2::GetMaxSpeed()
 	{
+		if (m_pPlayer->IsBot())
+			return 130;
 		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 			return 1.0;
 		else

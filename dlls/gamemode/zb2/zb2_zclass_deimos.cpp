@@ -33,7 +33,7 @@ namespace sv {
 	CZombieClass_Deimos::CZombieClass_Deimos(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "deimos";
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDeimos>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "deimos_zombi_origin" : "deimos_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -46,7 +46,7 @@ namespace sv {
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.72f;
+	m_pPlayer->pev->gravity = 0.85f;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -66,6 +66,8 @@ void CZombieClass_Deimos::ResetMaxSpeed() const
 
 float CZombieClass_Deimos::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
+	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
+		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -73,21 +75,27 @@ bool CZombieClass_Deimos::ApplyKnockback(CBasePlayer* attacker, const KnockbackD
 {
 	// knife knockback
 
-	if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+	/*if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 	{
 		//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
 		
-	}
+	}*/
 
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
-		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 0.9f,
+			kbd.flNotOnGround * 0.9f,
+			kbd.flFlying * 0.9f,
+			kbd.flDucking * 0.9f,
+			kbd.flVelocityModifier,
+			});
 
 	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 0.7f,
-			kbd.flNotOnGround * 0.75f,
-			kbd.flFlying * 0.75f,
-			kbd.flDucking * 0.7f,
+			kbd.flOnGround * 0.6f,
+			kbd.flNotOnGround * 0.7f,
+			kbd.flFlying * 0.7f,
+			kbd.flDucking * 0.6f,
 			kbd.flVelocityModifier,
 	});
 }
@@ -126,6 +134,7 @@ void CZombieClass_Deimos::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		case WEAPON_SMOKEGRENADE:
 		{
 			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-deimos_host.mdl");
@@ -137,6 +146,5 @@ void CZombieClass_Deimos::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 	}
 }
-
 
 }

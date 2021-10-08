@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_ZCLASS_H
 #define PROJECT_ZCLASS_H
-
+#pragma once
 #include "gamemode/zb1/zb1_zclass.h"
 #include "gamemode/zb2/zb2_const.h"
 

@@ -60,9 +60,9 @@ public:
 	KnockbackData GetKnockBackData() override
 	{
 		if (m_bSlash)
-			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			return { 600.0f, 500.0f, 650.0f, 500.0f, 0.9f };
 		else
-			return { 750.0f, 550.0f, 650.0f, 500.0f, 0.4f };
+			return { 600.0f, 500.0f, 650.0f, 500.0f, 0.35f };
 	}
 
 	const char *GetCSModelName() override { return "models/w_sgdrill.mdl"; }

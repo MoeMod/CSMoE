@@ -132,11 +132,6 @@ void CBalrog7::Precache(void)
 
 	PRECACHE_SOUND("weapons/balrog7-1.wav");
 	PRECACHE_SOUND("weapons/balrog7_exp.wav");
-	PRECACHE_SOUND("weapons/balrog7_clipout1.wav");
-	PRECACHE_SOUND("weapons/balrog7_clipout2.wav");
-	PRECACHE_SOUND("weapons/balrog7_clipin1.wav");
-	PRECACHE_SOUND("weapons/balrog7_clipin2.wav");
-	PRECACHE_SOUND("weapons/balrog7_clipin3.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireBalrog7 = PRECACHE_EVENT(1, "events/balrog7.sc");
@@ -146,8 +141,8 @@ void CBalrog7::Precache(void)
 int CBalrog7::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556NatoBox";
-	p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+	p->pszAmmo1 = "762natoboxame";
+	p->iMaxAmmo1 = 240;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = BALROG7_MAX_CLIP;
@@ -435,7 +430,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 void CBalrog7::Reload(void)
 {
 	
-	if (m_pPlayer->ammo_556natobox <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
 	if (m_pPlayer->m_iFOV != 90)

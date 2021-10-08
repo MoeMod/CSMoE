@@ -16,7 +16,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_ZB2_ZCLASS_HEAVY_H
 #define PROJECT_ZB2_ZCLASS_HEAVY_H
-
+#pragma once
 #include "zb2_zclass.h"
 
 namespace sv {

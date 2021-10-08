@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_MOD_ZBB_H
 #define PROJECT_MOD_ZBB_H
-
+#pragma once
 #include "mod_zb1.h"
 #include <array>
 #include <unordered_map>

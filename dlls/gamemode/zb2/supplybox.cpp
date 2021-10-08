@@ -38,39 +38,6 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 
 		}
 	},
-	{ "Dual MP7A1", [](CBasePlayer *p) {
-			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-			{
-				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-			}
-			DropPrimary(p);
-			p->GiveNamedItem("weapon_mp7a1d");
-			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("46mm", MAX_AMMO_46MM);
-			p->GiveAmmo(iAmount, "46mm", iAmount);
-		}
-	},
-	{ "AK-47 60R", [](CBasePlayer *p) {
-			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-			{
-				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-			}
-			DropPrimary(p);
-			p->GiveNamedItem("weapon_ak47l");
-			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("762Nato", MAX_AMMO_762NATO);
-			p->GiveAmmo(iAmount, "762Nato", iAmount);
-		}
-	},
-	{ "Dual Desert Eagle", [](CBasePlayer *p) {
-			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-			{
-				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-			}
-			DropSecondary(p);
-			p->GiveNamedItem("weapon_deagled");
-			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
-			p->GiveAmmo(iAmount, "50AE", iAmount);
-		}
-	},
 #ifdef XASH_DEDICATED
 	{ "SVDEX", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
@@ -103,7 +70,7 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
 	},
-	{ "诅咒缔结Prototype", [](CBasePlayer* p) {
+	{ "【魂守】猎弓prototype", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 		{
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
@@ -111,7 +78,41 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		DropPrimary(p);
 		p->GiveNamedItem("weapon_huntbow");
 		}
-	}
+	},
+#else
+	{ "Dual MP7A1", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
+		DropPrimary(p);
+		p->GiveNamedItem("weapon_mp7a1d");
+		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("46mm", MAX_AMMO_46MM);
+		p->GiveAmmo(iAmount, "46mm", iAmount);
+		}
+	},
+	{ "AK-47 60R", [](CBasePlayer* p) {
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
+			DropPrimary(p);
+			p->GiveNamedItem("weapon_ak47l");
+			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("762Nato", MAX_AMMO_762NATO);
+			p->GiveAmmo(iAmount, "762Nato", iAmount);
+		}
+	},
+	{ "Dual Desert Eagle", [](CBasePlayer* p) {
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+			{
+				p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			}
+			DropSecondary(p);
+			p->GiveNamedItem("weapon_deagled");
+			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
+			p->GiveAmmo(iAmount, "50AE", iAmount);
+		}
+	},
 #endif
 };
 

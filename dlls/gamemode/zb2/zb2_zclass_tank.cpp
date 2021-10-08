@@ -46,7 +46,7 @@ CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel iEvo
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.83f;
+	m_pPlayer->pev->gravity = 0.8f;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -68,7 +68,8 @@ void CZombieClass_Default::ResetMaxSpeed() const
 
 float CZombieClass_Default::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	flDamage *= 0.9;
+	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
+		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -76,12 +77,12 @@ bool CZombieClass_Default::ApplyKnockback(CBasePlayer* attacker, const Knockback
 {
 	// knife knockback
 
-	if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+	/*if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 	{
 		//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
 		
-	}
+	}*/
 
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
@@ -126,6 +127,7 @@ void CZombieClass_Default::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb.mdl");
 			break;

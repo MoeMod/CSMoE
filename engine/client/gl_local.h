@@ -88,6 +88,9 @@ typedef struct gltexture_s
 	float		xscale;
 	float		yscale;
 
+	// reference count
+	uint		refCount; // 2021.10.01 added.
+
 	struct gltexture_s	*nextHash;
 } gltexture_t;
 

@@ -240,6 +240,7 @@ public:
 		//ph26 = 0;
 		SetTouch(&CGungnirSpear::OnTouch);
 		SetThink(&CGungnirSpear::FlyThink);
+		SET_MODEL(this->edict(), "models/gungnir_missile.mdl");
 
 		//ph32 = ?
 		pev->solid = SOLID_CUSTOM; // 5
@@ -255,7 +256,7 @@ public:
 		WRITE_SHORT(this->entindex());  // short (entity:attachment to follow)
 		WRITE_SHORT(m_iModelLight1);// short (sprite index)
 		WRITE_BYTE(20);// byte (life in 0.1's) 
-		WRITE_BYTE(30);// byte (line width in 0.1's) 
+		WRITE_BYTE(10);// byte (line width in 0.1's) 
 		WRITE_BYTE(255);// byte,byte,byte (color)
 		WRITE_BYTE(255);
 		WRITE_BYTE(255);
@@ -265,6 +266,7 @@ public:
 
 	void Precache() override
 	{
+		PRECACHE_MODEL("models/gungnir_missile.mdl");
 		m_iModelExplo = PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
 		m_iModelLight1 = PRECACHE_MODEL("sprites/ef_gungnir_lightline1.spr");
 		m_iModelLight2 = PRECACHE_MODEL("sprites/ef_gungnir_lightline2.spr");
@@ -450,7 +452,7 @@ public:
 	{
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_BEAMENTPOINT);
+		WRITE_BYTE(TE_BEAMPOINTS_STRETCH);
 		//WRITE_SHORT(this->entindex()); // short (start entity) 
 		WRITE_COORD(m_vecStartOrigin.x);
 		WRITE_COORD(m_vecStartOrigin.y);
@@ -460,21 +462,23 @@ public:
 		WRITE_COORD(pev->origin.z); // coord coord coord (end position) 
 		WRITE_SHORT(m_iModelLight2); // short (sprite index) 
 		WRITE_BYTE(0); // byte (starting frame) 
-		WRITE_BYTE(30); // byte (frame rate in 0.1's) 
+		WRITE_BYTE(10); // byte (frame rate in 0.1's) 
 		WRITE_BYTE(30); // byte (life in 0.1's) 
 		WRITE_BYTE(250); // byte (line width in 0.1's) 
-		WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
+		//WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
 		WRITE_BYTE(255); // byte,byte,byte (color)
 		WRITE_BYTE(255);
 		WRITE_BYTE(255);
 		WRITE_BYTE(255); // byte (brightness)
-		WRITE_BYTE(50); // byte (scroll speed in 0.1's)
+		//WRITE_BYTE(30); // byte (scroll speed in 0.1's)
 		MESSAGE_END();
 
 		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_charge_shoot_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		entvars_t* const pevAttacker = VARS(pev->owner);
 		CBaseEntity::FireBullets3(pev->origin, (m_vecStartOrigin - pev->origin).Normalize(), 0.0f, (m_vecStartOrigin - pev->origin).Length(), 9, BULLET_NONE, m_flAdditionalDamage, 1.0f, pevAttacker, FALSE);
+
+		Remove();
 	}
 
 	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, float flAdditionalDamage, float flExplodeRadius, TeamName iTeam)
@@ -511,6 +515,12 @@ protected:
 		SetThink(nullptr);
 		SetTouch(nullptr);
 		pev->effects |= EF_NODRAW; // 0x80u
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_KILLBEAM);
+		WRITE_SHORT(this->entindex());
+		MESSAGE_END();
+
 		return UTIL_Remove(this);
 	}
 };
@@ -794,10 +804,14 @@ void CGungnir::ShootProjectile()
 void CGungnir::ShootSpear()
 {
 #ifndef CLIENT_DLL
+	Vector vecSpearAngle = UTIL_VecToAngles(gpGlobals->v_forward * 2000);
+	if (vecSpearAngle[0] > 90.0)
+		vecSpearAngle[0] = -(360.0 - vecSpearAngle[0]);
+
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrcA = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10 + gpGlobals->v_right * 5;
 	Vector vecSrcB = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 10 + -gpGlobals->v_right * (-5);
-	CGungnirSpear *pEnt = static_cast<CGungnirSpear *>(CBaseEntity::Create("gungnir_spear", vecSrcA, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+	CGungnirSpear *pEnt = static_cast<CGungnirSpear *>(CBaseEntity::Create("gungnir_spear", vecSrcA, vecSpearAngle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
 		pEnt->Init(gpGlobals->v_forward * 2000, GetDamage_SpearA(), GetDamage_SpearB(), GetDamage_SpearC(), 110, m_pPlayer->m_iTeam);

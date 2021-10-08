@@ -52,12 +52,6 @@ void CGatling::Precache(void)
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 
 	PRECACHE_SOUND("weapons/gatling-1.wav");
-	PRECACHE_SOUND("weapons/gatling_clipin1.wav");
-	PRECACHE_SOUND("weapons/gatling_clipin2.wav");
-	PRECACHE_SOUND("weapons/gatling_clipout1.wav");
-	PRECACHE_SOUND("weapons/gatling_clipout2.wav");
-	PRECACHE_SOUND("weapons/gatling_boltpull.wav");
-	PRECACHE_SOUND("weapons/usas_draw.wav");
 
 	m_usFireGatling = PRECACHE_EVENT(1, "events/gatling.sc");
 }

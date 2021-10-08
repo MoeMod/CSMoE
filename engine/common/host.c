@@ -49,6 +49,95 @@ GNU General Public License for more details.
 #endif
 #include "cpu.h"
 
+#if defined _WIN32 && defined XASH_DEDICATED
+#include "textconsole.h"
+#include <mmsystem.h> // timeGetTime
+#pragma   comment(lib,"winmm.lib")  
+
+CTextConsole console;
+
+double rolling_fps;
+void Host_ComputeFPS(double frametime)
+{
+	rolling_fps = 0.6 * rolling_fps + 0.4 * frametime;
+}
+
+void Host_GetHostInfo(float* fps, int* nActive, int* nMaxPlayers, char* pszMap)
+{
+	if (rolling_fps > 0.0)
+	{
+		*fps = 1.0 / rolling_fps;
+	}
+	else
+	{
+		rolling_fps = 0;
+		*fps = 0;
+	}
+
+	int clients = 0;
+	sv_client_t* cl = svs.clients;
+	if (cl)
+	{
+		for (int i = 0; i < sv_maxclients->integer; i++, cl++)
+		{
+			if (cl->state == cs_spawned)
+				clients++;
+		}
+	}
+
+	*nActive = clients;
+
+	if (pszMap)
+	{
+		if (sv.name[0])
+		{
+			Q_strcpy(pszMap, sv.name);
+		}
+		else
+		{
+			*pszMap = 0;
+		}
+	}
+
+	*nMaxPlayers = sv_maxclients->integer;
+}
+
+void UpdateStatus(int force)
+{
+	static double tLast = 0.0;
+	char szStatus[256];
+	int n = 0, nMax = 0;
+	char szMap[32];
+	float fps = 0.0f;
+
+	double tCurrent = timeGetTime() * 0.001;
+	Host_GetHostInfo(&fps, &n, &nMax, &szMap[0]);
+
+	if (!force)
+	{
+		if ((tCurrent - tLast) < 0.5f)
+			return;
+	}
+
+	tLast = tCurrent;
+	Q_snprintf(szStatus, sizeof(szStatus), "%.1f fps %2i/%2i on %16s", fps, n, nMax, szMap);
+
+	Console_SetStatusLine(szStatus);
+	Console_UpdateStatus();
+}
+
+void ProcessConsoleInput()
+{
+	char* inputLine = Console_GetLine(&console);
+	if (inputLine)
+	{
+		char szBuf[256];
+		Q_snprintf(szBuf, sizeof(szBuf), "%s\n", inputLine);
+		Cbuf_AddText(szBuf);
+	}
+}
+#endif
+
 typedef void (*pfnChangeGame)( const char *progname );
 
 pfnChangeGame	pChangeGame = NULL;
@@ -292,13 +381,30 @@ void Host_FrameLoop()
 {
 #if defined __EMSCRIPTEN__ && !defined EMSCRIPTEN_ASYNC
 	emscripten_cancel_main_loop();
-	emscripten_set_main_loop( Host_RunFrame, 0, 0 );
+	emscripten_set_main_loop(Host_RunFrame, 0, 0);
 #else
+
+#if defined _WIN32 && defined XASH_DEDICATED
+	Console_Init(&console);
+	hinput = GetStdHandle(STD_INPUT_HANDLE);
+	houtput = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+
 	// main window message loop
-	while( !host.crashed && !host.shutdown_issued )
+	while (!host.crashed && !host.shutdown_issued)
 	{
+#if defined _WIN32 && defined XASH_DEDICATED
+		ProcessConsoleInput();
+#endif
 		Host_RunFrame();
+#if defined _WIN32 && defined XASH_DEDICATED
+		UpdateStatus(0);
+#endif
 	}
+
+#if defined _WIN32 && defined XASH_DEDICATED
+	Console_ShutDown(&console);
+#endif
 #endif
 }
 
@@ -448,6 +554,10 @@ void Host_Clear_f( void )
 #endif
 #ifdef XASH_W32CON
 	Wcon_Clear();
+#endif
+
+#if defined _WIN32 && defined XASH_DEDICATED
+	system("cls");
 #endif
 }
 
@@ -784,6 +894,10 @@ void Host_Frame( float time )
 	rand (); // keep the random time dependent
 
 	Sys_SendKeyEvents (); // call WndProc on WIN32
+
+#if defined _WIN32 && defined XASH_DEDICATED
+	Host_ComputeFPS(host.frametime);
+#endif
 
 	Host_InputFrame ();	// input frame
 

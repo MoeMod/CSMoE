@@ -105,3 +105,7 @@ HOOK_EVENT(r8, FireR8);
 HOOK_EVENT(voidpistol, FireVoidpistol);
 HOOK_EVENT(buffsg552ex, FireBuffsg552ex);
 HOOK_EVENT(wpneffects, WpnEffects);
+HOOK_EVENT(bendita, FireBendita);
+HOOK_EVENT(skull5, FireSkull5);
+HOOK_EVENT(k1ases, FireK1ases);
+HOOK_EVENT(m1887se, FireM1887se);

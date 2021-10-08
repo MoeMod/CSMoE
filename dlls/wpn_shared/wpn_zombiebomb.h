@@ -24,7 +24,6 @@ public:
 	virtual void Precache();
 	virtual int GetItemInfo(ItemInfo *p);
 	virtual BOOL CanDeploy();
-	virtual BOOL CanDrop() { return FALSE; }
 	virtual BOOL CanHolster();
 	virtual BOOL Deploy();
 	const char* GetCSModelName() override { return "models/w_zombibomb.mdl"; }
@@ -32,8 +31,8 @@ public:
 	virtual float GetMaxSpeed() { return m_fMaxSpeed; }
 	virtual int iItemSlot() { return GRENADE_SLOT; }
 	virtual void PrimaryAttack();
-	virtual void SecondaryAttack();
 	virtual void WeaponIdle();
+	virtual BOOL CanDrop();
 	virtual BOOL UseDecrement()
 	{
 #ifdef CLIENT_WEAPONS
@@ -44,9 +43,6 @@ public:
 	}
 
 public:
-	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
-	void SetPlayerShieldAnim();
-	void ResetPlayerShieldAnim();
 
 public:
 	unsigned short m_usCreateExplosion;

@@ -1167,13 +1167,16 @@ int CHudAmmo::Draw(float flTime)
 		/*SPR_Set(m_hBuffHit, 255, 0, 0);
 		SPR_DrawAdditive(0, ScreenWidth / 2 - m_iBuffHitWidth / 2, ScreenHeight / 2 - m_iBuffHitHeight / 2, NULL);*/
 
-		int iX = ScreenWidth / 2;
-		int iY = ScreenHeight / 2;
 		int iWidth = ScreenWidth * 0.025f;
+		int iX = ScreenWidth - iWidth / 2;
+		int iY = ScreenHeight - iWidth / 2;
+		
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-
 		gEngfuncs.pTriAPI->SpriteTexture(m_hBuffHit, 0);
-		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
+		DrawUtils::Draw2DQuadScaled(iX, iY, iX + iWidth, iY + iWidth);
+		
+		/*gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 		gEngfuncs.pTriAPI->TexCoord2f(1, 0);
 		gEngfuncs.pTriAPI->Vertex3f(iX + iWidth, iY - iWidth, 0);
 		gEngfuncs.pTriAPI->TexCoord2f(0, 0);
@@ -1182,7 +1185,7 @@ int CHudAmmo::Draw(float flTime)
 		gEngfuncs.pTriAPI->Vertex3f(iX - iWidth, iY + iWidth, 0);
 		gEngfuncs.pTriAPI->TexCoord2f(1, 1);
 		gEngfuncs.pTriAPI->Vertex3f(iX + iWidth, iY + iWidth, 0);
-		gEngfuncs.pTriAPI->End();
+		gEngfuncs.pTriAPI->End();*/
 	}
 
 	// Draw ammo pickup history

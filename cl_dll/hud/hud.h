@@ -200,7 +200,6 @@ public:
 	cvar_t *m_pHud_DrawHistory_Time;
 
 	cvar_t *cl_crosshair_type;
-	//HSPRITE m_hBuffHit;
 	model_s* m_hBuffHit;
 	inline void HitForBuff(float flTime)
 	{
@@ -839,7 +838,7 @@ public:
 	int Draw(float flTime);
 	void Reset(void);
 	void Shutdown();
-	void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale);
+	void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode = 0, float framerate = 1.0);
 	CHudMsgFunc(HeadIcon);
 
 private:
@@ -864,7 +863,9 @@ public:
 private:
 	float wide, height;
 	int iType;
+	int iStoredType;
 	int iWeapon;
+	int DisplayTime;
 	SharedTexture m_pCurTexture[7];
 };
 

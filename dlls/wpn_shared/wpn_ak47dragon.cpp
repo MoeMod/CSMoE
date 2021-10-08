@@ -55,9 +55,6 @@ void CAK47Dragon::Precache(void)
 
 	PRECACHE_SOUND("weapons/ak47-1.wav");
 	PRECACHE_SOUND("weapons/ak47-2.wav");
-	PRECACHE_SOUND("weapons/ak47_clipout.wav");
-	PRECACHE_SOUND("weapons/ak47_clipin.wav");
-	PRECACHE_SOUND("weapons/ak47_boltpull.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireAK47Dragon = PRECACHE_EVENT(1, "events/ak47dragon.sc");

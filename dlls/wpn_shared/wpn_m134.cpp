@@ -60,11 +60,6 @@ void CM134::Precache(void)
 	PRECACHE_SOUND("weapons/m134_chain.wav");
 	PRECACHE_SOUND("weapons/m134_coverup.wav");
 	PRECACHE_SOUND("weapons/m134_coverdown.wav");
-	PRECACHE_SOUND("weapons/m134_clipoff.wav");
-	PRECACHE_SOUND("weapons/m134_clipon.wav");
-	PRECACHE_SOUND("weapons/m134_spindown.wav");
-	PRECACHE_SOUND("weapons/m134_spinup.wav");
-	PRECACHE_SOUND("weapons/m134_pinpull.wav");
 
 	PRECACHE_MODEL("sprites/muzzleflash6.spr");
 	PRECACHE_MODEL("sprites/muzzleflash7.spr");

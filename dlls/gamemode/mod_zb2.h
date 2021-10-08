@@ -52,6 +52,7 @@ public: // IBaseMod
 protected:
 	void MakeSupplyboxThink();
 	void RemoveAllSupplybox();
+	void RemoveAllEntity();
 	CSupplyBox *CreateSupplybox();
 	int SupplyboxCount();
 

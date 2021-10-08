@@ -253,6 +253,21 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 			if (m_enemy == entity && IsUsingKnife())
 			{
 				ForceRun(5.0s);
+				if (m_bIsZombie && this->m_ZombieClass)
+				{
+					if(!stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "speed") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy"))
+						ClientCommand("BTE_ZombieSkill1");
+					if (!stricmp(this->m_ZombieClass, "booster"))
+					{
+						const float skillUseRange = 1400.0f;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+						{
+							ClientCommand("BTE_ZombieSkill1");
+						}
+						ClientCommand("BTE_ZombieSkill1");
+					}
+						
+				}
 
 				if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)
 				{

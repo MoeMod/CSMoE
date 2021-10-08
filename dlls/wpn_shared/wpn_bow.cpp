@@ -452,7 +452,15 @@ void CBow::ItemPostFrame(void)
 			m_iMode = 1;
 			Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.0f, 8192, 7, BULLET_PLAYER_556MM, GetSecondaryAttackDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireBow, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);
+
+			int flags;
+#ifdef CLIENT_WEAPONS
+			flags = FEV_NOTHOST;
+#else
+			flags = 0;
+#endif
+
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBow, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);
 
 			SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_CHARGE_SHOOT2 : ANIM_CHARGE_SHOOT2_EMPTY, UseDecrement() != FALSE);
 

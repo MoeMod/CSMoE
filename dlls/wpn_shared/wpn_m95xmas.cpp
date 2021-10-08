@@ -152,7 +152,7 @@ void CM95xmas::M95xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	m_pPlayer->m_iWeaponVolume = BIG_EXPLOSION_VOLUME;
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 
-	Vector vecDir = FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 4, BULLET_PLAYER_338MAG, GetDamage(), M95_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 4, BULLET_PLAYER_338MAG, GetDamage(), M95_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS

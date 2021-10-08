@@ -53,11 +53,8 @@ void CSgdrill::Precache(void)
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shell_sgdrill.mdl");
 
 	PRECACHE_SOUND("weapons/sgdrill-1.wav");
-	PRECACHE_SOUND("weapons/sgdrill_clipin.wav");
 	PRECACHE_SOUND("weapons/sgdrill_slash.wav");
-	PRECACHE_SOUND("weapons/sgdrill_clipout.wav");
-	PRECACHE_SOUND("weapons/sgdrill_idle.wav");
-	PRECACHE_SOUND("weapons/sgdrill_draw.wav");
+	
 
 	m_usFireSgdrill = PRECACHE_EVENT(1, "events/sgdrill.sc");
 }
@@ -81,7 +78,7 @@ int CSgdrill::GetItemInfo(ItemInfo *p)
 
 BOOL CSgdrill::Deploy(void)
 {
-	return DefaultDeploy("models/v_sgdrill.mdl", "models/p_sgdrill.mdl", SGDRILL_DRAW, "m249", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_sgdrill.mdl", "models/p_sgdrill.mdl", SGDRILL_DRAW, "skull8", UseDecrement() != FALSE);
 }
 
 int CSgdrill::GetPrimaryAttackDamage() const
@@ -186,7 +183,7 @@ void CSgdrill::Reload(void)
 
 void CSgdrill::SecondaryAttack(void)
 {
-	#ifndef CLIENT_DLL
+#ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK2);
 	m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_sgdrill_slash.mdl");
 #endif

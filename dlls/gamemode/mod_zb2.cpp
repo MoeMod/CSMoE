@@ -23,6 +23,8 @@ GNU General Public License for more details.
 
 #include "mod_zb2.h"
 #include "zb2/supplybox.h"
+#include "zb2/teleportentity.h"
+#include "zb2/zombiebomb.h"
 #include "player/csdm_randomspawn.h"
 #include "player/player_mod_strategy.h"
 #include "player/player_zombie.h"
@@ -77,6 +79,7 @@ void CMod_ZombieMod2::PlayerThink(CBasePlayer *pPlayer)
 void CMod_ZombieMod2::RestartRound()
 {
 	RemoveAllSupplybox();
+	RemoveAllEntity();
 	m_flTimeNextMakeSupplybox = gpGlobals->time + RandomDuration(30.0s, 60.0s);
 	return CMod_Zombi::RestartRound();
 }
@@ -180,6 +183,23 @@ void CMod_ZombieMod2::RemoveAllSupplybox()
 		sb->pev->flags |= FL_KILLME;
 		sb->SendPositionMsg();
 		sb->SetThink(&CBaseEntity::SUB_Remove);
+	}
+}
+
+void CMod_ZombieMod2::RemoveAllEntity()
+{
+	CBaseEntity* ent = nullptr;
+	while ((ent = UTIL_FindEntityByClassname(ent, "teleportentity")) != nullptr)
+	{
+		ent->pev->effects |= EF_NODRAW;
+		ent->pev->flags |= FL_KILLME;
+		ent->SetThink(&CBaseEntity::SUB_Remove);
+	}
+	while ((ent = UTIL_FindEntityByClassname(ent, "zombiebomb")) != nullptr)
+	{
+		ent->pev->effects |= EF_NODRAW;
+		ent->pev->flags |= FL_KILLME;
+		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
 }
 
@@ -307,7 +327,15 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 			m_pPlayer->pev->health = std::min(m_pPlayer->pev->max_health, m_pPlayer->pev->health + flRecoverValue);
 
 			// effects
-			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
+			if (m_pPlayer->m_ZombieClass)
+			{
+				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster"))
+					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
+				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
+				else
+					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
+			}
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 			WRITE_BYTE(ZB2_MESSAGE_HEALTH_RECOVERY);
@@ -443,7 +471,13 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 
 void CPlayerModStrategy_ZB2::EvolutionSound() const
 {
-	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
+	if (m_pPlayer->m_ZombieClass)
+	{
+		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution_female.wav", VOL_NORM, ATTN_NORM);
+		else
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
+	}
 }
 
 BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)

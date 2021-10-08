@@ -221,7 +221,9 @@ public:
 #ifndef CLIENT_DLL
 	static CGrenade *ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time);
 	static CGrenade *ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
+	static CGrenade* ShootTimed3(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, int iType);
 	static CGrenade* ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
+	static CGrenade* ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, float flDamage);
 	static CGrenade *ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity);
 	static CGrenade *ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
 	static CGrenade* ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, unsigned short usEvent);
@@ -241,7 +243,7 @@ public:
 	void Explode2(TraceResult *pTrace, int bitsDamageType);
 	void Explode3(TraceResult *pTrace, int bitsDamageType);
 	void FB_Explode(TraceResult* pTrace, int bitsDamageType);
-	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker);
+	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flType);
 	NOXREF void SG_Explode(TraceResult *pTrace, int bitsDamageType);
 
 	void EXPORT Smoke();
@@ -267,6 +269,7 @@ public:
 	void EXPORT TumbleThink();
 	void EXPORT FB_TumbleThink();
 	void EXPORT ZombieBomb_TumbleThink();
+	void EXPORT ZombiBomb2Touch(CBaseEntity* pOther);
 	void EXPORT SG_TumbleThink();
 	void EXPORT C4Think();
 
@@ -355,7 +358,7 @@ public:
 
 public:
 	/* CSBTE Added, in weapons_data.cpp */
-	virtual KnockbackData GetKnockBackData() { return {0.0f, 0.0f, 0.0f, 0.0f, 0.5f}; }
+	virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.5f}; }
 #ifdef CLIENT_DLL
 	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
@@ -648,6 +651,8 @@ extern void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage);
 extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
 extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
 extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
+extern void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType, bool bHasFalloff = 1, bool bDamageSelf = 1, bool DamageBsp = 1, bool canheadshot = 0);
+
 }
 #else
 namespace cl {

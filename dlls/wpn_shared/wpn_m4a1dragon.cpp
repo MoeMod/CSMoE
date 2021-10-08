@@ -53,10 +53,6 @@ void CM4A1Dragon::Precache(void)
 	PRECACHE_SOUND("weapons/m4a1-1.wav");
 	PRECACHE_SOUND("weapons/m4a1_unsil-1.wav");
 	PRECACHE_SOUND("weapons/m4a1_unsil-2.wav");
-	PRECACHE_SOUND("weapons/m4a1_clipin.wav");
-	PRECACHE_SOUND("weapons/m4a1_clipout.wav");
-	PRECACHE_SOUND("weapons/m4a1_boltpull.wav");
-	PRECACHE_SOUND("weapons/m4a1_deploy.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireM4A1Dragon = PRECACHE_EVENT(1, "events/m4a1dragon.sc");

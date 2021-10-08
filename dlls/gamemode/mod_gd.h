@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #ifndef PROJECT_MOD_GD_H
 #define PROJECT_MOD_GD_H
-
+#pragma once
 #include "mod_tdm.h"
 
 #include "EventDispatcher.h"

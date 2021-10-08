@@ -47,7 +47,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "knife";
-	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
+	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
 
 public:
 
@@ -107,7 +107,7 @@ public:
 		float flDamage = 105;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 9.5f;
+			flDamage *= 20.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif

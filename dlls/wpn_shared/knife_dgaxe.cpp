@@ -276,6 +276,7 @@ namespace sv {
 
 		void Precache() override
 		{
+			PRECACHE_MODEL("sprites/ef_dgaxe_explo.spr");		
 			PRECACHE_MODEL("models/dgaxe_summon.mdl");
 		}
 
@@ -386,15 +387,11 @@ namespace sv {
 			PRECACHE_MODEL("sprites/muzzleflash202.spr");
 			PRECACHE_MODEL("sprites/muzzleflash203.spr");
 			PRECACHE_MODEL("sprites/muzzleflash204.spr");
-			
-			PRECACHE_SOUND("weapons/dgaxe_idle.wav");
-			PRECACHE_SOUND("weapons/dgaxe_draw.wav");
+		
 			PRECACHE_SOUND("weapons/dgaxe_combo.wav");
 			PRECACHE_SOUND("weapons/dgaxe_ready.wav");
 
-			PRECACHE_SOUND("weapons/dgaxe_skill1.wav");
 			PRECACHE_SOUND("weapons/dgaxe_skill1_exp.wav"); //zhongpi
-			PRECACHE_SOUND("weapons/dgaxe_skill2.wav");
 			PRECACHE_SOUND("weapons/dgaxe_skill2_exp.wav"); //tuoluo
 
 			PRECACHE_SOUND("weapons/dgaxe_dualslash1.wav"); //left
@@ -450,6 +447,7 @@ namespace sv {
 		BOOL CanDrop() override { return false; }
 		BOOL IsSignal();
 #ifndef CLIENT_DLL
+		BOOL CanHolster() override;
 		Vector Get_ShootPosition(CBaseEntity* pevAttacker, Vector Start, int* bHit);
 		void ItemPostFrame() override;
 #endif
@@ -505,9 +503,9 @@ namespace sv {
 			float flDamage = 95;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 7.5f;
+				flDamage *= 12.5f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage *= 7.5f;
+				flDamage *= 12.5f;
 #endif
 			return flDamage;
 		}
@@ -740,6 +738,8 @@ namespace sv {
 		pev->nextthink = gpGlobals->time + 1.17s;
 		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 #ifndef CLIENT_DLL
+		currentammo = 0;
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, (int)RANDOM_LONG(0, 3), TRUE, TRUE);
 		TraceResult tr;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
@@ -766,76 +766,65 @@ namespace sv {
 		{
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
 
-			ClearMultiDamage();
-
-			float flRatio = 1.0;
-
-			if (pEntity && pEntity->IsPlayer())
+			if (!pEntity || pEntity->IsBSPModel())
 			{
-				Vector2D vec2LOS;
-				Vector vecForward = gpGlobals->v_forward;
+				ClearMultiDamage();
+				pEntity->TraceAttack(m_pPlayer->pev, ComboAttackDamage(), gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			}		
+		}
 
-				UTIL_MakeVectors(pEntity->pev->angles);
+		CBaseEntity* pEntity = nullptr;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 115)) != nullptr) {
+			if (pEntity->pev->takedamage != DAMAGE_NO) {
+				if (pEntity->IsBSPModel())
+					continue;
 
-				vec2LOS = vecForward.Make2D();
-				vec2LOS = vec2LOS.Normalize();
+				if (pEntity->pev == m_pPlayer->pev)
+					continue;
 
-				if (DotProduct(vec2LOS, gpGlobals->v_forward.Make2D()) > 0.8)
-				{
-					flRatio = 3.0;
+				Vector vecSpot = pEntity->BodyTarget(vecSrc);
+				vecSpot.z = vecEnd.z;
+				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(m_pPlayer->pev), &tr);
+
+				if (AngleBetweenVectors(tr.vecEndPos - vecSrc, gpGlobals->v_forward) > 120)
+					continue;
+
+				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict()) {
+					if (tr.fStartSolid) {
+						tr.vecEndPos = vecSrc;
+						tr.flFraction = 0;
+					}
+
+					if (tr.flFraction == 1.0f) {
+						pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, ComboAttackDamage(), DMG_BULLET | DMG_NEVERGIB);
+					}
+
+					Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
+
+					ClearMultiDamage();
+					pEntity->TraceAttack(m_pPlayer->pev, ComboAttackDamage(), vecRealDir, &tr, DMG_BULLET | DMG_NEVERGIB);
+					ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+					CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+					{
+						Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+						pPlayer->pev->velocity.x = vecDir2D.x * 1000;
+						pPlayer->pev->velocity.y = vecDir2D.y * 1000;
+						pPlayer->pev->velocity.z = 600;
+					}
+
+					if (pEntity->Classify() == CLASS_PLAYER)
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					else
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
-
-			pEntity->TraceAttack(m_pPlayer->pev, ComboAttackDamage() * flRatio, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
-
-			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
-			{
-				Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
-
-				pPlayer->pev->velocity.x = vecDir2D.x * 1000;
-				pPlayer->pev->velocity.y = vecDir2D.y * 1000;
-				pPlayer->pev->velocity.z = 600;
-			}
-
-			if (pEntity->Classify() == CLASS_PLAYER)
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			else
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		}
 #endif
-
-/*#ifndef CLIENT_DLL
-		m_iDamageType = DGAXE_COMBOATTACK;
-		KnifeAttack3(vecSrc, gpGlobals->v_forward, ComboAttackDamage(), 115, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, (int)RANDOM_LONG(0, 3), TRUE, TRUE);
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 95, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
-		{
-		case HIT_NONE:
-		{		
-			break;
-		}
-		case HIT_PLAYER:
-		{
-
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-			fDidHit = TRUE;
-			break;
-		}
-		case HIT_WALL:
-		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-			fDidHit = TRUE;
-			break;
-		}
-		}
-#endif*/
-
-		
 	}
 
 	void CKnifeDgaxe::Guard()
@@ -965,11 +954,12 @@ namespace sv {
 				{
 					if (m_flTimeNextSkill2 < gpGlobals->time)
 					{
-#ifndef CLIENT_DLL
 						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
 						SendWeaponAnim(DGAXE_SKILL1, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL2ATTACK;
+						m_pPlayer->iuser1 = 1;
+						SetThink(&CKnifeDgaxe::Guard);
+						pev->nextthink = gpGlobals->time + 2.0s;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));
 						if (pEnt)
 						{
@@ -989,9 +979,7 @@ namespace sv {
 				{
 					if (m_flTimeNextSkill1 < gpGlobals->time)
 					{
-#ifndef CLIENT_DLL
 						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
 						SendWeaponAnim(DGAXE_SKILL2, UseDecrement() != FALSE);
 						m_iDamageType = DGAXE_SKILL1ATTACK;
 						m_pPlayer->iuser1 = 1;
@@ -1027,9 +1015,7 @@ namespace sv {
 				if (m_iButton & IN_ATTACK)
 				{
 					Q_strcpy(m_pPlayer->m_szAnimExtention, "hammer");
-#ifndef CLIENT_DLL
-					m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
+					m_pPlayer->SetAnimation(PLAYER_ATTACK1);			
 					SendWeaponAnim(DGAXE_COMBO, UseDecrement() != FALSE);
 					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/dgaxe_combo.wav", VOL_NORM, ATTN_NORM, 0, 94);
 					SetThink(&CKnifeDgaxe::ComboAttack);
@@ -1041,6 +1027,7 @@ namespace sv {
 					m_flTimeComboCheck = gpGlobals->time;
 					m_flTimeFinalCharge = gpGlobals->time;
 					m_iComboState = DGAXE_COMBO_IDLE;
+					currentammo = 1;
 				}
 			}
 			else
@@ -1055,6 +1042,13 @@ namespace sv {
 		}
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
+
+	BOOL CKnifeDgaxe::CanHolster(void)
+	{
+		if (currentammo)
+			return FALSE;
+		else
+			return TRUE;
+	}
 #endif
-	
 }

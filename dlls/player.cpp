@@ -3908,6 +3908,9 @@ void CBasePlayer::Jump()
 			pev->velocity = pevGround->velocity + pev->velocity;
 		}
 	}
+
+	if (m_bIsZombie && !stricmp(this->m_ZombieClass, "china"))
+		EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "zombi/zombi_chinese_jump.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 }
 
 // This is a glorious hack to find free space when you've crouched into some solid space
@@ -4587,10 +4590,43 @@ void CBasePlayer::UpdatePlayerSound()
 	gpGlobals->v_forward.z = 0;
 }
 
+void CBasePlayer::CheckZombieModeBuff(void)
+{
+	//From CSAE
+	if (m_bIsZombie)
+	{
+		if (m_iHealthDecreaseCount && gpGlobals->time > m_tHealthDecreaseStartTime)
+		{
+			pev->health -= m_flHealthDecreaseAmount;
+
+			if (pev->health > 0)
+			{
+				m_iHealthDecreaseCount--;
+
+				m_tHealthDecreaseStartTime = gpGlobals->time + 1.0s;
+			}
+			else
+			{
+				m_iHealthDecreaseCount = 0;
+				pev->health = 1;
+
+				m_tHealthDecreaseStartTime = invalid_time_point;
+			}
+		}
+	}
+	else
+	{
+		m_tHealthDecreaseStartTime = invalid_time_point;
+		m_flHealthDecreaseAmount = 0;
+		m_tHealthDecreaseInterval = invalid_time_point;
+		m_iHealthDecreaseCount = 0;
+	}
+}
+
 void CBasePlayer::PostThink()
 {
 	m_pModStrategy->OnPostThink();
-
+	CheckZombieModeBuff();
 	// intermission or finale
 	if (g_fGameOver)
 		goto pt_end;
@@ -6987,6 +7023,50 @@ void CBasePlayer::UpdateStatusBar()
 			m_izSBarState[ i ] = newSBarState[ i ];
 		}
 	}
+}
+
+bool CBasePlayer::ReactToDeimosTail()
+{
+	if (m_bIsZombie)
+		return false;
+
+	int enable_antidgaxe = 1;
+
+	if (enable_antidgaxe)
+	{
+		CBasePlayerItem* pKnife = m_rgpPlayerItems[KNIFE_SLOT];
+		if (pKnife)
+		{
+			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx"))
+			{
+				RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
+				GiveNamedItem("weapon_knife");
+				return true;
+			}
+		}
+	}
+
+	CBasePlayerItem* pItem = m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+	if (!pItem)
+		pItem = m_rgpPlayerItems[PISTOL_SLOT];
+
+	if (!pItem)
+	{
+		pItem = m_rgpPlayerItems[KNIFE_SLOT];		//knife
+		if (!pItem)
+			return false;
+		else
+		{
+			RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
+			GiveNamedItem("weapon_knife");
+			return true;
+		}
+	}
+
+	DropPlayerItem(STRING(pItem->pev->classname));
+
+	return true;
 }
 
 void CBasePlayer::DropPlayerItem(const char *pszItemName)
