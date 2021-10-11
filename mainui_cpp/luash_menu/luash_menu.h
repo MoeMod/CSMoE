@@ -13,4 +13,8 @@ namespace ui
 	int LuaUI_GlobalPrint(lua_State* L);
 
 	void LuaUI_OnGUI();
+
+	int LuaUI_OpenFileSystemLib(lua_State* L);
+	int LuaUI_OpenEngfuncLib(lua_State* L);
+	int LuaUI_OpenTextfuncLib(lua_State* L);
 }

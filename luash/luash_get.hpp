@@ -35,7 +35,14 @@ namespace luash
 	}
 	inline void GetString(lua_State* L, int N, const char* &sz)
 	{
-		sz = lua_tostring(L, N);
+		if (void *data = lua_touserdata(L, N))
+		{
+			sz = reinterpret_cast<const char*>(data);
+		}
+		else
+		{
+			sz = lua_tostring(L, N);
+		}
 	}
 	inline void GetString(lua_State* L, int N, std::string& str)
 	{

@@ -30,10 +30,8 @@ namespace luash
 	{
 		return Push(L, static_cast<typename std::underlying_type<T>::type>(x));
 	}
-	inline void PushString(lua_State* L, const char* str)
-	{
-		lua_pushstring(L, str);
-	}
+	inline void PushString(lua_State* L, char* str);
+	inline void PushString(lua_State* L, const char* str);
 	inline void PushString(lua_State* L, const std::string& str)
 	{
 		lua_pushlstring(L, str.c_str(), str.size());
@@ -94,6 +92,14 @@ namespace luash
 	{
 		lua_pushlightuserdata(L, (void *)ptr);
 		CallOnPtrCreate(L, ptr);
+	}
+	inline void PushString(lua_State* L, char* ptr)
+	{
+		PushPointer(L, ptr);
+	}
+	inline void PushString(lua_State* L, const char* ptr)
+	{
+		PushPointer(L, ptr);
 	}
 
 	namespace detail

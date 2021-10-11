@@ -4,7 +4,7 @@
 #include <nameof.hpp>
 #include <typeindex>
 #include <tuple>
-
+#include <unordered_map>
 
 namespace luash
 {
@@ -19,11 +19,17 @@ namespace luash
 		virtual bool IsConst() const = 0;
 		virtual size_t GetMemberCount() const = 0;
 		virtual int Copy(lua_State* L) const = 0;
+		virtual int Assign(lua_State* L) const = 0;
+		virtual int NewCopy(lua_State* L) const = 0;
+		virtual int NewScalar(lua_State* L) const = 0;
+		virtual int NewVector(lua_State* L) const = 0;
+		virtual int DeleteScalar(lua_State* L) const = 0;
+		virtual int DeleteVector(lua_State* L) const = 0;
 		virtual int MetaIndex(lua_State* L) const = 0;
 		virtual int MetaNewIndex(lua_State* L) const = 0;
 		virtual int MetaCall(lua_State* L) const = 0;
+		virtual int MetaToString(lua_State* L) const = 0;
 		/*
-		virtual int MetaToString(lua_State* L) = 0;
 		virtual int MetaCall(lua_State* L) = 0;
 		virtual int MetaAdd(lua_State* L) = 0;
 		virtual int MetaSub(lua_State* L) = 0;
@@ -37,9 +43,6 @@ namespace luash
 		virtual int MetaLe(lua_State* L) = 0;
 		*/
 	};
-
-	template<class T>
-	constexpr const ITypeInterface* CreateTypeInterface();
 
 	template<class T, class Base>
 	class TypeInterfaceDecoratorCommon : public Base
@@ -56,15 +59,6 @@ namespace luash
 	};
 	namespace detail
 	{
-		/*
-		template<class...Ts> struct GetMemberTypeImpl
-		{
-			constexpr auto operator()() const
-			{
-				return std::array<const ITypeInterface*, sizeof...(Ts)>{ CreateTypeInterface<Ts>()... };
-			}
-		};
-		*/
 		template<std::size_t...I, class...Args> bool MetaIndexImpl(lua_State* L, int N, std::index_sequence<I...>, Args &&...args)
 		{
 			return (... || ((I == N - 1) ? (Push(L, std::forward<Args>(args)), true) : false));
@@ -95,8 +89,37 @@ namespace luash
 		int Copy(lua_State* L) const override
 		{
 			std::string type(this->GetTypeName());
-			luaL_error(L, "can not copy unsupported ref type %s", type.c_str());
-			return 0;
+			return luaL_error(L, "can not copy incomplete ref type %s", type.c_str());
+		}
+		int Assign(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not assign incomplete ref type %s", type.c_str());
+		}
+		int NewCopy(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not new incomplete ref type %s", type.c_str());
+		}
+		int NewScalar(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not new incomplete ref type %s", type.c_str());
+		}
+		int NewVector(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not new incomplete ref type %s", type.c_str());
+		}
+		int DeleteScalar(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not delete incomplete ref type %s", type.c_str());
+		}
+		int DeleteVector(lua_State* L) const override
+		{
+			std::string type(this->GetTypeName());
+			return luaL_error(L, "can not delete incomplete ref type %s", type.c_str());
 		}
 	};
 	template<class T, class Base>
@@ -109,12 +132,92 @@ namespace luash
 		}
 		int Copy(lua_State* L) const override
 		{
-			void* value = lua_touserdata(L, 1);
-			T* object = static_cast<T*>(value);
+			auto value = lua_touserdata(L, 1);
+			auto object = static_cast<T*>(value);
 			Push(L, *object);
 			return 1;
 		}
+		int NewCopy(lua_State* L) const override
+		{
+			auto value = lua_touserdata(L, 1);
+			auto object = static_cast<T*>(value);
+			auto new_object = new auto(*object);
+			PushPointer(L, new_object);
+			return 1;
+		}
+		int Assign(lua_State* L) const override
+		{
+			if constexpr (!std::is_copy_assignable_v<T>)
+			{
+				std::string type(this->GetTypeName());
+				return luaL_error(L, "can not assign const ref type %s", type.c_str());
+			}
+			else
+			{
+				auto value = lua_touserdata(L, 1);
+				auto object = static_cast<T*>(value);
+				Get(L, 2, *object);
+				return 1;
+			}
+		}
+		int NewScalar(lua_State* L) const override
+		{
+			auto new_object = new T();
+			PushPointer(L, new_object);
+			return 1;
+		}
+		int NewVector(lua_State* L) const override
+		{
+			auto len = lua_tointeger(L, 1);
+			if (len < 0)
+			{
+				return luaL_error(L, "invalid new[] len %d", (int)len);
+			}
+			auto new_object = new T[len]{};
+			PushPointer(L, new_object);
+			return 1;
+		}
+		int DeleteScalar(lua_State* L) const override
+		{
+			auto value = lua_touserdata(L, 1);
+			auto object = static_cast<T*>(value);
+			delete object;
+			return 0;
+		}
+		int DeleteVector(lua_State* L) const override
+		{
+			auto value = lua_touserdata(L, 1);
+			auto object = static_cast<T*>(value);
+			delete[] object;
+			return 0;
+		}
 	};
+
+	template<class T, class Base>
+	class TypeInterfaceDecoratorToString : public Base
+	{
+		int MetaToString(lua_State* L) const override
+		{
+			auto value = lua_touserdata(L, 1);
+			auto object = static_cast<T*>(value);
+			std::string type(this->GetTypeName());
+			lua_pushfstring(L, "(%s *)0x%x", type.c_str(), object);
+			return 1;
+		}
+	};
+	template<class Base>
+	class TypeInterfaceDecoratorToString<const char, Base> : public Base
+	{
+		int MetaToString(lua_State* L) const override
+		{
+			auto value = lua_touserdata(L, 1);
+			const char* object = static_cast<const char *>(value);
+			lua_pushstring(L, object);
+			return 1;
+		}
+	};
+	template<class Base>
+	class TypeInterfaceDecoratorToString<char, Base> : public TypeInterfaceDecoratorToString<const char, Base> {};
 
 	template<class T, class Base, bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::is_aggregate<typename std::remove_cv<T>::type>>::value>
 	class TypeInterfaceDecoratorIndex : public Base
@@ -130,6 +233,10 @@ namespace luash
 			{
 				if (!strcmp(lua_tostring(L, 2), "Copy"))
 					return this->Copy(L);
+				if (!strcmp(lua_tostring(L, 2), "Assign"))
+					return this->Assign(L);
+				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
+					return this->NewCopy(L);
 				return 0;
 			}
 			return 0;
@@ -155,6 +262,10 @@ namespace luash
 			{
 				if (!strcmp(lua_tostring(L, 2), "Copy"))
 					return this->Copy(L);
+				if (!strcmp(lua_tostring(L, 2), "Assign"))
+					return this->Assign(L);
+				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
+					return this->NewCopy(L);
 
 				lua_getglobal(L, "require"); // #3 = require
 				auto name = nameof::nameof_short_type<typename std::decay<T>::type>();
@@ -274,15 +385,29 @@ namespace luash
 		TypeInterfaceDecoratorIndex<T,
 		TypeInterfaceDecoratorComplete<T,
 		TypeInterfaceDecoratorCall<T,
-		ITypeInterface>>>> {};
-
-	template<class T>
-	constexpr TypeInterface<T> TypeInterfaceSingleton;
-
-	template<class T>
-	constexpr const ITypeInterface* CreateTypeInterface()
+		TypeInterfaceDecoratorToString<T,
+		ITypeInterface>>>>> 
 	{
-		return &TypeInterfaceSingleton<T>;
+	public:
+		TypeInterface();
+	};
+
+	template<class T>
+	inline TypeInterface<T> TypeInterfaceSingleton;
+
+	inline std::unordered_map<std::string_view, const ITypeInterface* > KnownTypeInterfaceMap;
+
+	template<class T>
+	inline TypeInterface<T>::TypeInterface()
+	{
+		KnownTypeInterfaceMap.emplace(this->GetTypeName(), this);
+	}
+
+	template<class T>
+	const ITypeInterface* CreateTypeInterface()
+	{
+		const ITypeInterface* ti = &TypeInterfaceSingleton<T>;
+		return ti;
 	}
 
 	inline const ITypeInterface* GetTypeInterfaceTop(lua_State* L)
@@ -337,8 +462,63 @@ namespace luash
 		lua_setfield(L, -2, "__newindex"); // #2
 		lua_pushcfunction(L, RefValueMetaDispatch<&ITypeInterface::MetaCall>); // #3 = func
 		lua_setfield(L, -2, "__call"); // #2
+		lua_pushcfunction(L, RefValueMetaDispatch<&ITypeInterface::MetaToString>); // #3 = func
+		lua_setfield(L, -2, "__tostring"); // #2
 		lua_setmetatable(L, -2); // #1 = lightuserdata
 		lua_pop(L, 1); // #0
+		return 0;
+	}
+
+	inline int CppNew(lua_State* L)
+	{
+		const char *name = lua_tostring(L, 1);
+		if (auto iter = KnownTypeInterfaceMap.find(name); iter != KnownTypeInterfaceMap.end())
+		{
+			auto ti = iter->second;
+			lua_remove(L, 1);
+			if (auto size = lua_tointeger(L, 1); size > 0)
+			{
+				return ti->NewVector(L);
+			}
+			return ti->NewScalar(L);
+		}
+		luaL_error(L, "unrecognized type %s", name);
+		return 0;
+	}
+
+	inline int CppDelete(lua_State* L)
+	{
+		void* value = lua_touserdata(L, 1);
+		if (const ITypeInterface* ti = GetTypeInterface(L, value))
+		{
+			if (auto size = lua_tointeger(L, 2); size > 0)
+			{
+				return ti->DeleteVector(L);
+			}
+			return ti->DeleteScalar(L);
+		}
+		luaL_error(L, "unrecognized ref ptr %x", value);
+		return 0;
+	}
+
+	template<class...Args> struct TypeList {};
+	using BuiltinTypes = TypeList<bool, char, char16_t, char32_t, wchar_t, short, int, long, long long, float, double, long double>;
+
+	template<class...Args> 
+	inline void SetupBuiltinTypeInterface(TypeList<Args...>)
+	{
+		(..., (CreateTypeInterface<Args>()));
+	}
+
+	inline int SetupCppNewDelete(lua_State* L)
+	{
+		lua_newtable(L); // #1 = table
+		lua_pushcfunction(L, CppNew);
+		lua_setfield(L, -2, "new");
+		lua_pushcfunction(L, CppDelete);
+		lua_setfield(L, -2, "delete");
+		lua_setglobal(L, "cpp");
+		SetupBuiltinTypeInterface(BuiltinTypes());
 		return 0;
 	}
 }

@@ -15,4 +15,9 @@ namespace cl
 
 	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index);
 	void LuaCL_OnGUI();
+
+	int LuaCL_OpenEngfuncLib(lua_State* L);
+	int LuaCL_OpenRenderLib(lua_State* L);
+	int LuaCL_OpenMobileLib(lua_State* L);
+	int LuaCL_OpenFileSystemLib(lua_State* L);
 }

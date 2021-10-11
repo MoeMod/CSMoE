@@ -173,7 +173,7 @@ int CHudHealth:: MsgFunc_Damage(const char *pszName,  int iSize, void *pbuf )
 	int damageTaken = reader.ReadByte();	// health
 	long bitsDamage = reader.ReadLong(); // damage bits
 
-	vec3_t vecFrom;
+	Vector vecFrom;
 
 	for ( int i = 0 ; i < 3 ; i++)
 		vecFrom[i] = reader.ReadCoord();

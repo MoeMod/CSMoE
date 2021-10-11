@@ -102,6 +102,17 @@ set(MAINUI_FONT_RENDER_SOURCES
 	font/BaseFontBackend.cpp
 )
 
+set(MAINUI_LUASH_SOURCES
+	luash_menu/luash_menu.cpp
+	luash_menu/luash_menu_engfunc.cpp
+	luash_menu/luash_menu_textfunc.cpp
+	luash_menu/luash_menu_filesystem.cpp
+)
+
+set_source_files_properties(
+    ${MAINUI_LUASH_SOURCES} PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+)
+
 set(MAINUI_SOURCES
 	utl/unicode_strtools.cpp
 	EventSystem.cpp
@@ -139,10 +150,7 @@ endif()
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
-
-list(APPEND MAINUI_SOURCES
-		luash_menu/luash_menu.cpp
-	)
+list(APPEND MAINUI_SOURCES ${MAINUI_LUASH_SOURCES})
 
 if(XASH_STATIC_GAMELIB)
 	add_library (${MAINUI_LIBRARY} STATIC ${MAINUI_SOURCES})

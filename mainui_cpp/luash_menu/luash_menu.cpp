@@ -1,7 +1,8 @@
+
+#include "keydefs.h"
 #include "Utils.h"
 
 #include "luash_menu.h"
-
 #include "luash.hpp"
 
 #include <string>
@@ -53,9 +54,9 @@ namespace ui
 		ImGuiUtils::LuaOpen_ImGuiUtils(L);
 #endif
 		luash::RegisterGlobal(L, "namespace", "ui");
-		luash::RegisterGlobal(L, "engfunc", &EngFuncs::engfuncs);
-		luash::RegisterGlobal(L, "textfunc", &EngFuncs::textfuncs);
-		luash::RegisterGlobal(L, "filesystem", &gFileSystemAPI);
+		LuaUI_OpenTextfuncLib(L);
+		LuaUI_OpenEngfuncLib(L);
+		LuaUI_OpenFileSystemLib(L);
 
 		EngFuncs::Cmd_AddCommand("luaui", Cmd_LuaUI);
 	}

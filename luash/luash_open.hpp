@@ -7,6 +7,8 @@ namespace luash
 	{
 		lua_pushcfunction(L, SetupPtrMetaTable);
 		lua_call(L, 0, 0);
+		lua_pushcfunction(L, SetupCppNewDelete);
+		lua_call(L, 0, 0);
 		return 0;
 	}
 }

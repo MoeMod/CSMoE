@@ -275,10 +275,18 @@ if(XASH_LUASH)
 	set(LUASH_SRCS
 		luash_cl/lua_cl.cpp
 		luash_cl/ev_lua.cpp
+		luash_cl/luash_cl_engfunc.cpp
+		luash_cl/luash_cl_filesystem.cpp
+		luash_cl/luash_cl_mobile.cpp
+		luash_cl/luash_cl_render.cpp
 	)
 else()
 	set(LUASH_SRCS )
 endif()
+
+set_source_files_properties(
+    ${LUASH_SRCS} PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
 	set(INPUT_SRCS ./input_winrt.cpp)

@@ -332,5 +332,6 @@ CMakeSettings.json
 /3rdparty/xorstr
 /SDL2
 msvc/BundleArtifacts/
+/enc_temp_folder
 /CSMoE-Full
 /out
