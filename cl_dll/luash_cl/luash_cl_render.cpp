@@ -1,8 +1,6 @@
 
 #include "cl_dll.h"
 
-#include "lua_cl.h"
-
 #include "luash.hpp"
 
 #include <string>

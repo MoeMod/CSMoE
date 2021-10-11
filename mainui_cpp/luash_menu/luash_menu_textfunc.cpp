@@ -2,7 +2,6 @@
 #include "keydefs.h"
 #include "Utils.h"
 
-#include "luash_menu.h"
 #include "luash.hpp"
 
 namespace ui

@@ -10,6 +10,7 @@ namespace cl
 	lua_State* LuaCL_Get();
 	void LuaCL_Exec(const char* str);
 	
+	int LuaUI_GlobalReload(lua_State* L);
 	int LuaCL_GlobalRequire(lua_State* L);
 	int LuaCL_GlobalPrint(lua_State* L);
 

@@ -9,6 +9,7 @@ namespace ui
 	lua_State* LuaUI_Get();
 	void LuaUI_Exec(const char* str);
 	
+	int LuaUI_GlobalReload(lua_State* L);
 	int LuaUI_GlobalRequire(lua_State* L);
 	int LuaUI_GlobalPrint(lua_State* L);
 

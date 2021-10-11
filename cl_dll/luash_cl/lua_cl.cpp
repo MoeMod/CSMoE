@@ -7,6 +7,7 @@
 
 #include <string>
 #include <cassert>
+#include <unordered_map>
 
 #include "ev_lua.h"
 #ifdef XASH_IMGUI
@@ -45,6 +46,7 @@ namespace cl
 		luaopen_jit(L);
 		//luaopen_ffi(L);
 
+		lua_register(L, "reload", LuaUI_GlobalReload);
 		lua_register(L, "require", LuaCL_GlobalRequire);
 		lua_register(L, "print", LuaCL_GlobalPrint);
 
@@ -98,6 +100,32 @@ namespace cl
 		}
 		assert(stack_cnt == lua_gettop(L));
 	}
+
+	int LuaUI_GlobalReload(lua_State* L)
+	{
+		int NumParams = lua_gettop(L);
+		if (NumParams < 1)
+		{
+			// reload all
+			lua_newtable(L);
+			lua_setfield(L, LUA_REGISTRYINDEX, "_LOADED");
+			return 0;
+		}
+
+		const char* ModuleName = lua_tostring(L, 1);
+		if (!ModuleName)
+		{
+			// Invalid module name!
+			return 0;
+		}
+
+		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
+		lua_pushnil(L);
+		lua_setfield(L, 2, ModuleName);
+		return 0;
+	}
+
+	std::unordered_map<std::string, fs_offset_t> g_LoadedLuaFileTime;
 	
 	int LuaCL_GlobalRequire(lua_State* L)
 	{
@@ -118,6 +146,27 @@ namespace cl
 		lua_settop(L, 1);
 		// #1 = require path
 
+		std::string path = "addons/luash/";
+		path += ModuleName;
+		if (path.substr(path.size() - 4) != ".lua")
+			path += ".lua";
+		auto time = gFileSystemAPI.FS_FileTime(path.c_str(), true);
+		auto iter = g_LoadedLuaFileTime.find(path);
+		if (iter != g_LoadedLuaFileTime.end())
+		{
+			if (time > g_LoadedLuaFileTime[path])
+			{
+				iter->second = time;
+				lua_pushcfunction(L, LuaUI_GlobalReload);
+				lua_pushvalue(L, 1);
+				lua_call(L, 1, 0);
+			}
+		}
+		else
+		{
+			g_LoadedLuaFileTime.emplace(path, time);
+		}
+
 		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED"); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE
 
@@ -131,10 +180,6 @@ namespace cl
 		lua_pop(L, 1);
 		// #2 = _G.LUA_LOADED_TABLE
 
-		std::string path = "addons/luash/";
-		path += ModuleName;
-		if (path.substr(path.size() - 4) != ".lua")
-			path += ".lua";
 		int length = 0;
 		byte* buffer = gEngfuncs.COM_LoadFile(path.c_str(), 5, &length);
 		if(!buffer)
