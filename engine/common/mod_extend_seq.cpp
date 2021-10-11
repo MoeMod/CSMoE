@@ -73,7 +73,7 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 
 		if (totalsize)
 		{
-			static byte newbuf[0x500000];
+			static byte newbuf[0x5000000];
 			memset(newbuf, 0, sizeof(newbuf));
 			memcpy(newbuf, buffer, LittleLong(studiohdr->length));
 			buffer = newbuf;
@@ -185,9 +185,9 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 
 		g_iSequenceNums = 0;
 	}
-	return buffer;
 	// flip back to file endian
 #ifdef XASH_BIG_ENDIAN
 	Mod_StudioBigEndian(NULL, buffer);
 #endif
+	return buffer;
 }

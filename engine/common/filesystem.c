@@ -357,18 +357,6 @@ emulate WIN32 FS behaviour when opening local file
 */
 const char *FS_FixFileCase( const char *path )
 {
-#if defined(__ANDROID__)
-	// handle android asset
-	if(!strcmp(path, "/android_asset"))
-	{
-		return path;
-	}
-	if(!strncmp(path, "/android_asset/", 15))
-	{
-		// TODO
-		return path;
-	}
-#endif
 #if !defined _WIN32 && !TARGET_OS_IPHONE // assume case insensitive
 	DIR *dir; struct dirent *entry;
 	char path2[PATH_MAX], *fname;
@@ -407,6 +395,19 @@ const char *FS_FixFileCase( const char *path )
 				return path;
 		}
 	}
+
+#if defined(__ANDROID__)
+    // handle android asset
+    if(!strcmp(path, "/android_asset"))
+    {
+        return path;
+    }
+    if(!strncmp(path, "/android_asset/", 15))
+    {
+        Q_strlwr( path, path2 );
+        return va( "%s", path2 );
+    }
+#endif
 
 	//MsgDev( D_NOTE, "FS_FixFileCase: %s\n", path );
 #if 0
@@ -2290,6 +2291,15 @@ qboolean FS_SysFileExists( const char *path, qboolean caseinsensitive )
 	{
 		AAssetManager *mgr = Android_GetAssetManager();
 		AAsset *asset = AAssetManager_open(mgr, path + 15, AASSET_MODE_STREAMING);
+
+        // speedup custom path search
+        if( caseinsensitive && asset == NULL )
+        {
+            const char *fpath = FS_FixFileCase( path );
+            if( fpath != path )
+                asset = AAssetManager_open(mgr, fpath + 15, AASSET_MODE_STREAMING);
+        }
+
 		if(asset == NULL)
 			return false;
 		AAsset_close(asset);

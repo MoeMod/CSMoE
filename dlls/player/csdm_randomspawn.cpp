@@ -75,7 +75,7 @@ bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
 	if (g_vecSpawnCSDM.empty())
 		return false;
 	// randomize those fucking spawn points
-	static std::random_device rd;
+	std::random_device rd;
 	std::shuffle(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), rd);
 	using namespace std::placeholders;
 	// find the first availble one
