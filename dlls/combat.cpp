@@ -1938,7 +1938,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 Vector
 CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread, float flDistance, int iPenetration,
 	int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol,
-	int shared_rand, int* iWeaponType, CBasePlayer *pPlayer)
+	int &iWeaponType, int shared_rand, CBasePlayer *pPlayer)
 {
 	int iOriginalPenetration = iPenetration;
 	int iPenetrationPower;
@@ -2040,7 +2040,7 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		char cTextureType = UTIL_TextureHit(&tr, vecSrc, vecEnd);
 		bool bSparks = false;
 
-		if (*iWeaponType == 3)
+		if (iWeaponType == 3)
 		{
 			switch (cTextureType) {
 			case CHAR_TEX_GRATE:
@@ -2108,7 +2108,7 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		}
 		if (tr.flFraction != 1.0f) {
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-			switch (*iWeaponType)
+			switch (iWeaponType)
 			{
 			case 1:
 			{
@@ -2125,7 +2125,7 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 					if (pEntity->IsPlayer() && g_pGameRules->PlayerRelationship(pPlayer, pEntity) == GR_TEAMMATE)
 						break;
 
-					*iWeaponType = 0;
+					iWeaponType = 0;
 					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 3, (int)RANDOM_LONG(0, 3), TRUE, FALSE);
 				}
 				break;
@@ -2201,10 +2201,8 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 					if (pEntity->IsPlayer())
 					{		
 						CBasePlayer*  pInflictorPlayer = static_cast<CBasePlayer*>(pEntity);
-						pInflictorPlayer->m_flHealthDecreaseAmount = 5;
-						pInflictorPlayer->m_flHealthDecreaseAmount = 20;
 
-						if (pInflictorPlayer->m_bIsZombie) // fire burn
+						if (pInflictorPlayer->m_bIsZombie && !pInflictorPlayer->m_iHealthDecreaseCount) // fire burn
 						{
 							MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pInflictorPlayer->pev);
 							WRITE_BYTE(8);	//type
@@ -2212,6 +2210,9 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 							WRITE_BYTE(5);
 							MESSAGE_END();
 						}
+
+						pInflictorPlayer->m_iHealthDecreaseCount = 5;
+						pInflictorPlayer->m_flHealthDecreaseAmount = 20;
 					}				
 				}
 				break;
@@ -2253,7 +2254,7 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			float flDistanceModifier;
 			if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration) {
 				flDistanceModifier = 0.75;
-				if (*iWeaponType == 3)
+				if (iWeaponType == 3)
 				{
 					flDamageModifier = 0.9;
 					iPenetrationPower = 100;
@@ -2267,7 +2268,7 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 			}
 			else
 			{
-				if (*iWeaponType == 3)
+				if (iWeaponType == 3)
 				{
 					flDamageModifier = 0.9;
 					flDistanceModifier = 0.95;

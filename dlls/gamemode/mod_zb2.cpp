@@ -329,7 +329,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 			// effects
 			if (m_pPlayer->m_ZombieClass)
 			{
-				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster"))
+				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "flying"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
 				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
@@ -473,7 +473,7 @@ void CPlayerModStrategy_ZB2::EvolutionSound() const
 {
 	if (m_pPlayer->m_ZombieClass)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "flying"))
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution_female.wav", VOL_NORM, ATTN_NORM);
 		else
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);

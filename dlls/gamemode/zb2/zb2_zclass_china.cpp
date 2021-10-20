@@ -33,7 +33,7 @@ namespace sv {
 CZombieClass_China::CZombieClass_China(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "china";
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieStiffen>(m_pPlayer);
 
 	const char *szModel = iEvolutionLevel ? "china_zombi_origin" : "china_zombi_host";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
@@ -50,30 +50,28 @@ CZombieClass_China::CZombieClass_China(CBasePlayer *player, ZombieLevel iEvoluti
 	m_pPlayer->ResetMaxSpeed();
 }
 
-void CZombieClass_china::InitHUD() const
+void CZombieClass_China::InitHUD() const
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+	WRITE_BYTE(ZOMBIE_CLASS_CHINA);
+	WRITE_BYTE(ZOMBIE_SKILL_STIFFEN);
 	MESSAGE_END();
 }
 
-void CZombieClass_china::ResetMaxSpeed() const
+void CZombieClass_China::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 285;
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed();
 }
 
-float CZombieClass_china::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
+float CZombieClass_China::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
 	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
 		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
-bool CZombieClass_china::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
+bool CZombieClass_China::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
 	// knife knockback
 
@@ -96,18 +94,18 @@ bool CZombieClass_china::ApplyKnockback(CBasePlayer* attacker, const KnockbackDa
 	});
 }
 
-void CZombieClass_china::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
+void CZombieClass_China::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
 {
-	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_chinese_hurt.wav", VOL_NORM, ATTN_NORM); break;
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_chinese_hurt.wav", VOL_NORM, ATTN_NORM);
 }
 
-void CZombieClass_china::DeathSound_Zombie()
+void CZombieClass_China::DeathSound_Zombie()
 {
-	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_chinese_death.wav", VOL_NORM, ATTN_NORM); break;
+	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_chinese_death.wav", VOL_NORM, ATTN_NORM);
 }
 
 
-void CZombieClass_china::OnWeaponDeploy(CBasePlayerItem *item)
+void CZombieClass_China::OnWeaponDeploy(CBasePlayerItem *item)
 {
 	switch(item->m_iId)
 	{

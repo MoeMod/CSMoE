@@ -508,7 +508,7 @@ public:
 	CNavArea *GetNavArea(const Vector *pos, float beneathLimt = 120.0f) const;	// given a position, return the nav area that IsOverlapping and is *immediately* beneath it
 	CNavArea *GetNavAreaByID(unsigned int id) const;
 	CNavArea *GetNearestNavArea(const Vector *pos, bool anyZ = false) const;
-
+	CNavArea* GetRandomSpawnableArea(void);
 	Place GetPlace(const Vector *pos) const;						// return radio chatter place for given coordinate
 
 private:

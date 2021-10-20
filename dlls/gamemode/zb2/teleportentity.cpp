@@ -65,6 +65,7 @@ void CTeleportEntity::Play_EfTeleport()
 	MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, this->pev);
 	WRITE_BYTE(7);	//type
 	WRITE_SHORT(ENTINDEX(this->edict()));	//entity
+	WRITE_BYTE(1);
 	MESSAGE_END();
 }
 }

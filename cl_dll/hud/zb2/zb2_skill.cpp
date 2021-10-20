@@ -66,9 +66,6 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL
 		"resource/helperhud/heal", // ZOMBIE_SKILL_HEAL,
 		"resource/helperhud/tentacle", // ZOMBIE_SKILL_SHOCK,
 		"resource/helperhud/crazyspeed", // ZOMBIE_SKILL_CRAZY2,
-		"", // ZOMBIE_SKILL_EMPTY
-		"", // ZOMBIE_SKILL_SPRINT
-		"", // ZOMBIE_SKILL_HEADSHOT
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
@@ -101,6 +98,10 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_booster",//ZOMBIE_SKILL_BOOSTER,
 		"resource/zombi/zombieskill_zombiteleport",//ZOMBIE_SKILL_TELEPORT,
 		"resource/zombi/zombieskill_zombiteleport2",//ZOMBIE_SKILL_TELEPORT2,
+		"resource/zombi/zombieskill_zombistiffen",//ZOMBIE_SKILL_CHINA,
+		"resource/zombi/zombieskill_pass",//ZOMBIE_SKILL_PASS
+		"resource/zombi/zombieskill_glide",//ZOMBIE_SKILL_GLIDE
+		"resource/zombi/zombieskill_dive",//ZOMBIE_SKILL_DIVE
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -115,6 +116,9 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_deimos2zb", // ZOMBIE_CLASS_DEIMOS2,
 		"resource/zombi/zombietype_teleportzb",//ZOMBIE_CLASS_TELEPORT,
 		"resource/zombi/zombietype_boosterzb",//ZOMBIE_CLASS_BOOSTER,
+		"resource/zombi/zombietype_chinazb",//ZOMBIE_CLASS_CHINA,
+		"resource/zombi/zombietype_passzb",//ZOMBIE_CLASS_PASS
+		"resource/zombi/zombietype_flyingzb",//ZOMBIE_CLASS_FLYING
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =
@@ -383,7 +387,7 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 
 	x -= m_pTexture_skillslotbg->w() / 2;
 	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
-	{
+	{		
 		const auto &classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
 		if (classicon != nullptr)
 		{
@@ -412,7 +416,6 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
         const int h = m_pTexture_skillslotbg->h();
 		if (skillicon && icon.m_iCurrentSkill >= 0 && icon.m_iCurrentSkill < MAX_ZOMBIE_SKILL)
 		{
-            
 			if (time < icon.m_flTimeSkillReady)
 			{
 				// waiting for freezing
@@ -596,4 +599,10 @@ void CHudZB2_Skill::OnSkillIconChange(ZombieSkillType skill1, ZombieSkillType sk
 		if (icon.m_iCurrentSkill == Skill[i])
 			icon = { Skill[i], SKILL_STATUS_READY, 0.0f, 0.0f, 0.0f };
 	}
+}
+
+void CHudZB2_Skill::OnSkillIconPass(ZombieSkillType skill, ZombieSkillStatus status)
+{
+	auto& icon = m_ZombieSkillHudIcons[0];
+	icon = { skill, status, 0.0f, 0.0f, 0.0f };
 }

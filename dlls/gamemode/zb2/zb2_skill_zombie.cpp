@@ -1,4 +1,4 @@
-/*
+﻿/*
 zb2_skill_zombie.cpp - CSMoE Gameplay server : Zombie Mod 2
 Copyright (C) 2019 Moemod Yanase
 
@@ -47,7 +47,8 @@ namespace sv {
 		PRECACHE_SOUND("zombi/flyzombie_fly_start.wav");
 		PRECACHE_SOUND("zombi/flyzombie_fly_idle.wav");
 		PRECACHE_SOUND("zombi/flyzombie_downhill_start.wav");
-		
+		PRECACHE_SOUND("zombi/boosterzombie_booster.wav");
+
 		PRECACHE_MODEL("sprites/zombihealer.spr");
 		PRECACHE_MODEL("sprites/zombiheal_head.spr");
 		PRECACHE_MODEL("sprites/ef_teleportzombie.spr");
@@ -702,10 +703,10 @@ namespace sv {
 
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/deimos_skill_start.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
 
-			int anim = m_pPlayer->LookupSequence("skill");
-			m_pPlayer->pev->sequence = anim;
-			m_pPlayer->pev->frame = 0;
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.5s;
 
+			m_pPlayer->SetAnimation(PLAYER_IDLE);
 
 			m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
 
@@ -856,10 +857,52 @@ namespace sv {
 	}
 
 	void CZombieSkill_ZombiePass::Think()
-	{
+	{	
+		if (m_pPlayer->IsBot())
+			return CZombieSkill_Base::Think();
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
+		{
+			CBasePlayerWeapon* pWpn = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+			if (pWpn != NULL && pWpn->m_iId == WEAPON_KNIFE)
+			{
+				m_iZombieSkillStatus = SKILL_STATUS_USED;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+				WRITE_BYTE(ZOMBIE_SKILL_PASS);
+				WRITE_BYTE(m_iZombieSkillStatus);
+				MESSAGE_END();
+			}
+			else
+			{ 
+				m_iZombieSkillStatus = SKILL_STATUS_READY;
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+				WRITE_BYTE(ZOMBIE_SKILL_PASS);
+				WRITE_BYTE(m_iZombieSkillStatus);
+				MESSAGE_END();
+			}
+			
+		}
+		else
+		{
+			if(m_pPlayer->pev->health <= 3000)
+				m_iZombieSkillStatus = SKILL_STATUS_USED;
+			else
+				m_iZombieSkillStatus = SKILL_STATUS_READY;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+			WRITE_BYTE(ZOMBIE_SKILL_PASS);
+			WRITE_BYTE(m_iZombieSkillStatus);
+			MESSAGE_END();
+		}
+			
 		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
 			FireZombieSkill();
-		CZombieSkill_Base::Think();
 	}
 
 	void CZombieSkill_ZombiePass::Activate()
@@ -876,8 +919,14 @@ namespace sv {
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
 				break;
 			case SKILL_STATUS_USED:
-				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "You can no longer use [Bloody Blade]. It can only be used once per round."); // #CSO_CantSprintUsed
+			{
+				if(m_pPlayer->pev->health < 3000)
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "因体力不足，无法生成爆弹兽颅");
+				else
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "在拿着红色爆弹兽颅的状态下使用才能触发技能");				
 				break;
+			}
+				
 			default:
 				break;
 			}
@@ -885,10 +934,20 @@ namespace sv {
 			return;
 		}
 
-		if(m_pPlayer->IsBot())
+		if (m_pPlayer->IsBot())
+		{
 			CZombibomb* pBomb = (CZombibomb*)CBaseEntity::Create("zombiebomb", m_pPlayer->pev->origin, m_pPlayer->pev->angles, m_pPlayer->edict());
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+		}
 		else
 		{
+			if (m_flTimeZombieSkillNext > gpGlobals->time)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "正在生成爆弹兽颅...");
+				return;
+			}
 			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 			if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
 			{
@@ -896,36 +955,44 @@ namespace sv {
 				if (pWpn)
 				{
 					if (pWpn != NULL && !Q_strcmp(STRING(pWpn->pev->classname), "weapon_zombibomb"))
-						m_pPlayer->DropPlayerItem(STRING(pWpn->pev->classname));
-						m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
+					{
+						m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
+						m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.2s;
+
+						m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+						pWpn->SendWeaponAnim(4, TRUE);
+						m_pPlayer->m_flNextAttack = 2.1s;
+						pWpn->m_flTimeWeaponIdle = 2.1s;
+						m_flTimeTriggerZombieSkill = gpGlobals->time + 1.1s;
+					}
 				}
 				return;		
 			}
 			else
 			{
+				if (m_pPlayer->pev->health <= 3000)
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "因体力不足，无法生成爆弹兽颅");
+					return;
+				}
+				m_pPlayer->pev->health -= 3000;
 				m_pPlayer->GiveNamedItem("weapon_zombibomb");
 				m_pPlayer->SwitchWeapon(m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT]);
 				CBasePlayerWeapon* pWpn = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
 				if (pWpn)
 				{
 					pWpn->SendWeaponAnim(5, TRUE);
-					pWpn->m_flTimeWeaponIdle = 1.0s;
+					pWpn->m_flTimeWeaponIdle = 2.0s;
 				}
 				m_pPlayer->m_flNextAttack = 2.0s;
+
+				m_flTimeZombieSkillNext = gpGlobals->time + 2.0s;
+
 			}
 				
 		}
-			
-		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
-		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
-		
-		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
-		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
-		WRITE_BYTE(ZOMBIE_SKILL_TRAP);
-		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
-		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
-		MESSAGE_END();
+
 	}
 
 	void CZombieSkill_ZombiePass::ResetMaxSpeed()
@@ -940,17 +1007,26 @@ namespace sv {
 
 	duration_t CZombieSkill_ZombiePass::GetDurationTime() const
 	{
-		return 1.0s;
+		if (m_pPlayer->IsBot())
+			return 1.0s;
+		return 0.0s;
 	}
 
 	duration_t CZombieSkill_ZombiePass::GetCooldownTime() const
 	{
-		return 10.0s;
+		if (m_pPlayer->IsBot())
+			return 15.0s;
+		return 0.0s;
 	}
 
 	void CZombieSkill_ZombiePass::FireZombieSkill()
 	{
-		m_flTimeTriggerZombieSkill = invalid_time_point;
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
+		{
+			m_pPlayer->DropPlayerItem(STRING(pWeapon->pev->classname));
+			m_flTimeTriggerZombieSkill = invalid_time_point;
+		}		
 	}
 	//teleport Zombie
 	CZombieSkill_ZombieTeleport::CZombieSkill_ZombieTeleport(CBasePlayer* player) : CZombieSkill_Base(player)
@@ -1019,22 +1095,18 @@ namespace sv {
 				if (pWeapon)
 				{
 					pWeapon->SendWeaponAnim(8, TRUE);
-					pWeapon->m_flTimeWeaponIdle = 1.0s;
+					pWeapon->m_flTimeWeaponIdle = 2.6s;
 				}
 
-				int anim = m_pPlayer->LookupSequence("skill2");
-				m_pPlayer->pev->sequence = anim;
-				m_pPlayer->pev->frame = 0;			
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill2");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
 
-				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-				WRITE_BYTE(TE_EXPLOSION);
-				WRITE_COORD(m_pPlayer->pev->origin[0]);
-				WRITE_COORD(m_pPlayer->pev->origin[1]);
-				WRITE_COORD(m_pPlayer->pev->origin[2]);
-				WRITE_SHORT(MODEL_INDEX("sprites/ef_teleportzombie.spr"));
-				WRITE_BYTE(5);
-				WRITE_BYTE(30);
-				WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
+				WRITE_BYTE(7);	//type
+				WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
+				WRITE_BYTE(0);
 				MESSAGE_END();
 				
 				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/teleport_skill2.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
@@ -1070,14 +1142,14 @@ namespace sv {
 				if (pWeapon)
 				{
 					pWeapon->SendWeaponAnim(2, TRUE);
-					pWeapon->m_flTimeWeaponIdle = 1.0s;
+					pWeapon->m_flTimeWeaponIdle = 1.4s;
 
-					int anim = m_pPlayer->LookupSequence("skill1");
-					m_pPlayer->pev->sequence = anim;
-					m_pPlayer->pev->frame = 0;
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill1");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
+
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
 
 					m_pPlayer->m_flNextAttack = 1.5s;
-
 					MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 					WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
 					WRITE_BYTE(ZOMBIE_SKILL_TELEPORT2);
@@ -1250,33 +1322,27 @@ namespace sv {
 			CZombieSkill_Base::Think();
 		}
 		else
-		{		
+		{	
+
 			if (m_flPercent < 0.3)
 				m_iZombieSkillStatus = SKILL_STATUS_USED;
 
-			if (m_flTimeNextBoost != invalid_time_point && m_flTimeNextBoost > gpGlobals->time)
-				return;
+			if (m_iTimeAutoCharge <= 0)
+				m_iTimeAutoCharge = 0;
 
-			if (m_flTimeChargeCool > gpGlobals->time)
-				return;
-			
-			m_flTimeNextBoost = invalid_time_point;
-			m_flTimeChargeCool = gpGlobals->time + 0.2s;		//avoid boost too fast
-			m_vecVelocity = m_pPlayer->pev->velocity;
-			float flSpeed = m_vecVelocity.Length();
-			if (flSpeed < 375.0f || m_flBoostCharge >= m_flMaxpower)
-			{
-				//ALERT(at_console, "Your Speed is %f , and now power is %f and percents is %f\n", flSpeed, m_flBoostCharge, m_flPercent);
-				return;
-			}
-			
-			if (flSpeed > 475.0f)
-				flSpeed = 475.0f;
-			m_flBoostCharge += flSpeed - 375.0f;
-			if (m_flBoostCharge >= m_flMaxpower)
-				m_flBoostCharge = m_flMaxpower;
+			if (m_flBoostCharge <= 0)
+				m_flBoostCharge = 0;
 
 			m_flPercent = m_flBoostCharge / m_flMaxpower;
+
+			if (m_iTimeAutoCharge == 5)
+			{
+				m_flBoostCharge += 16;
+				if (m_flBoostCharge >= m_flMaxpower)
+					m_flBoostCharge = m_flMaxpower;
+				m_iTimeAutoCharge = 0;
+			}
+		
 			if (m_flPercent >= 0.3)
 			{
 				m_iZombieSkillStatus = SKILL_STATUS_READY;
@@ -1291,6 +1357,29 @@ namespace sv {
 			{
 				//MESSAGE blink
 			}
+
+			if (m_flTimeNextBoost != invalid_time_point && m_flTimeNextBoost > gpGlobals->time)
+				return;
+
+			if (m_flTimeChargeCool > gpGlobals->time)
+				return;
+					
+			m_flTimeNextBoost = invalid_time_point;
+			m_iTimeAutoCharge++;
+			m_flTimeChargeCool = gpGlobals->time + 0.2s;		//avoid boost too fast
+			m_vecVelocity = m_pPlayer->pev->velocity;
+			float flSpeed = m_vecVelocity.Length();
+			if (flSpeed < 375.0f || m_flBoostCharge >= m_flMaxpower)
+			{
+				//ALERT(at_console, "Your Speed is %f , and now power is %f and percents is %f\n", flSpeed, m_flBoostCharge, m_flPercent);
+				return;
+			}
+			
+			if (flSpeed > 475.0f)
+				flSpeed = 475.0f;
+			m_flBoostCharge += flSpeed - 375.0f;
+			if (m_flBoostCharge >= m_flMaxpower)
+				m_flBoostCharge = m_flMaxpower;
 				//ALERT(at_console, "Your Speed is %f , and now power is %f and percents is %f\n", flSpeed, m_flBoostCharge, m_flPercent);
 		}
 		
@@ -1325,7 +1414,7 @@ namespace sv {
 			m_flBoostCharge = RANDOM_FLOAT(400, 600);
 			m_pPlayer->pev->velocity[0] += m_flBoostCharge * gpGlobals->v_forward[0];
 			m_pPlayer->pev->velocity[1] += m_flBoostCharge * gpGlobals->v_forward[1];
-			m_pPlayer->pev->velocity[2] += m_flBoostCharge;
+			m_pPlayer->pev->velocity[2] += 100;
 			m_iZombieSkillStatus = SKILL_STATUS_USING;
 			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
@@ -1345,10 +1434,13 @@ namespace sv {
 			m_flTimeNextBoost = gpGlobals->time + 1.0s;
 			m_iZombieSkillStatus = SKILL_STATUS_USED;
 		}
-		int anim = m_pPlayer->LookupSequence("skill");
-		m_pPlayer->pev->sequence = anim;
-		m_pPlayer->pev->frame = 0;
+		m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.03s;
 
+		m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/boosterzombie_booster.wav", VOL_NORM, ATTN_NORM);
+		
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_BOOSTER);
@@ -1376,9 +1468,364 @@ namespace sv {
 	duration_t CZombieSkill_ZombieBooster::GetCooldownTime() const
 	{
 		if (m_pPlayer->IsBot())
-			return 20.0s;
+			return 15.0s;
 		else
 			return 0.0s;
 	}
+
+	//China Zombie
+	CZombieSkill_ZombieStiffen::CZombieSkill_ZombieStiffen(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieStiffen::Think()
+	{
+		CZombieSkill_Base::Think();
+
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING && gpGlobals->time > m_flTimeZombieSkillEffect)
+		{
+			OnCrazyEffect();
+		}
+	}
+
+	void CZombieSkill_ZombieStiffen::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
+					"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
+					buf
+				); // #CSO_WaitCoolTimeNormal
+
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
+
+		m_pPlayer->pev->renderfx = kRenderFxGlowShell;
+		m_pPlayer->pev->rendercolor = { 255,0,0 };
+		m_pPlayer->pev->renderamt = 1;
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
+
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pressure.wav", VOL_NORM, ATTN_NORM);
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_STIFFEN);
+		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+		MESSAGE_END();
+	}
+
+	void CZombieSkill_ZombieStiffen::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+
+		m_pPlayer->pev->renderfx = kRenderFxNone;
+		m_pPlayer->pev->rendercolor = { 255,255,255 };
+		m_pPlayer->pev->renderamt = 16;
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+	}
+
+	void CZombieSkill_ZombieStiffen::OnCrazyEffect()
+	{
+		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
+
+		if (RANDOM_LONG(0, 1))
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_1.wav", VOL_NORM, ATTN_NORM);
+		else
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pre_idle_2.wav", VOL_NORM, ATTN_NORM);
+	}
+
+	duration_t CZombieSkill_ZombieStiffen::GetDurationTime() const
+	{
+		return 5.0s;
+	}
+
+	duration_t CZombieSkill_ZombieStiffen::GetCooldownTime() const
+	{
+		return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 15.0s : 10.0s;
+	}
+
+	float CZombieSkill_ZombieStiffen::GetDamageRatio() const
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			return 0.0f;
+		return 1.0f;
+	}
 	
+	//Flying Zombie
+	CZombieSkill_ZombieFlying::CZombieSkill_ZombieFlying(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieFlying::Think()
+	{
+		if (m_pPlayer->IsBot())
+		{
+			if (m_flTimeBotUseSkill != invalid_time_point && m_flTimeBotUseSkill < gpGlobals->time)
+			{
+				Activate();
+				m_flTimeBotUseSkill = invalid_time_point;
+			}
+		}
+		if (m_bIsflying)
+		{
+			switch (m_iFlyingState)
+			{
+			case FLY_START:
+			{
+				if (m_flPlayerAnimTime < gpGlobals->time)
+				{
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_start_loop");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
+					m_iFlyingState = FLY_START_LOOP; break;
+				}
+			}
+			case FLY_START_LOOP:
+			{
+				if (!m_pPlayer->m_iZombieFlying)
+				{
+					m_iFlyingState = SKILL_END;
+					break;
+				}
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_start_loop");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+				if (m_pPlayer->pev->velocity[2] <= 0)
+				{
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_end");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.43s;
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
+					m_iFlyingState = FLY_START_END;
+					m_flPlayerAnimTime = gpGlobals->time + 0.43s;
+				}
+
+				break;
+			}
+			case FLY_START_END: m_iFlyingState = FLY_IDLE; break;
+			case FLY_IDLE:
+			{
+				if (!m_pPlayer->m_iZombieFlying)
+				{
+					m_iFlyingState = SKILL_END;
+					break;
+				}
+				m_pPlayer->pev->gravity = 0.6;
+				if (m_flPlayerAnimTime < gpGlobals->time)
+				{
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_idle");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.83s;
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
+					m_flPlayerAnimTime = gpGlobals->time + 0.83s;
+					EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/flyzombie_fly_idle.wav", VOL_NORM, ATTN_NORM);
+				}
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+				
+				m_pPlayer->pev->velocity = gpGlobals->v_forward * 290;
+				m_pPlayer->pev->velocity[2] = min(m_pPlayer->pev->velocity[2], -40);
+				break;
+			}
+			case DOWNHILL_START:
+			{
+				if (!m_pPlayer->m_iZombieFlying)
+				{
+					m_iFlyingState = SKILL_END;
+					break;
+				}
+				if (m_flPlayerAnimTime < gpGlobals->time)
+				{
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("downhill_loop");
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
+					m_iFlyingState = DOWNHILL_LOOP; break;
+				}
+
+			}
+			case DOWNHILL_LOOP:
+			{
+				if (!m_pPlayer->m_iZombieFlying)
+				{
+					m_iFlyingState = SKILL_END;
+					break;
+				}
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("downhill_loop");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+				m_pPlayer->pev->velocity = gpGlobals->v_forward * 550;
+				m_pPlayer->pev->velocity[2] = min(m_pPlayer->pev->velocity[2], -150);
+
+				if (m_pPlayer->pev->flags & FL_ONGROUND)
+				{
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("downhill_end");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
+					m_pPlayer->SetAnimation(PLAYER_IDLE);
+					m_iFlyingState = DOWNHILL_END;
+				}
+
+				break;
+			}
+			case DOWNHILL_END:
+			{
+				m_pPlayer->pev->gravity = 0.7;
+				m_bIsflying = 0;
+				break;
+			}
+			case SKILL_END:
+			{
+				m_iZombieSkillStatus = SKILL_STATUS_USING;
+				m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+				m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
+				WRITE_BYTE(ZOMBIE_SKILL_GLIDE);
+				MESSAGE_END();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+				WRITE_BYTE(ZOMBIE_SKILL_GLIDE);
+				WRITE_SHORT(-1);
+				WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+				MESSAGE_END();
+
+				m_pPlayer->pev->gravity = 0.7;
+				m_bIsflying = 0;
+				break;
+			}
+			}
+		}
+
+		if (m_iFlyingState < DOWNHILL_START && m_iFlyingState > FLY_START && m_pPlayer->pev->flags & FL_ONGROUND)
+		{
+			m_pPlayer->pev->gravity = 0.7;
+			m_iFlyingState = SKILL_END;
+		}
+
+
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombieFlying::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
+					"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
+					buf
+				); // #CSO_WaitCoolTimeNormal
+
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		if (!m_bIsflying)
+		{
+			m_pPlayer->pev->velocity[2] += 350.0f;
+
+			m_pPlayer->pev->gravity = 0.35;
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_start");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
+			m_flPlayerAnimTime = gpGlobals->time + 0.4s;
+			m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+			m_flTimeBotUseSkill = gpGlobals->time + 1.1s;
+
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/flyzombie_fly_start.wav", VOL_NORM, ATTN_NORM);
+
+			m_iFlyingState = FLY_START;
+			m_bIsflying = 1;
+			m_pPlayer->m_iZombieFlying = 1;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
+			WRITE_BYTE(ZOMBIE_SKILL_DIVE);
+			MESSAGE_END();
+		}
+		else
+		{
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("downhill_start");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.3s;
+			m_flPlayerAnimTime = gpGlobals->time + 0.3s;
+			m_iFlyingState = DOWNHILL_START;
+
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/flyzombie_downhill_start", VOL_NORM, ATTN_NORM);
+			
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
+			WRITE_BYTE(ZOMBIE_SKILL_GLIDE);
+			MESSAGE_END();
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+			WRITE_BYTE(ZOMBIE_SKILL_GLIDE);
+			WRITE_SHORT(3);
+			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+			MESSAGE_END();
+		}
+	}
+
+	void CZombieSkill_ZombieFlying::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+	}
+
+	void CZombieSkill_ZombieFlying::OnCrazyEffect()
+	{
+	}
+
+	duration_t CZombieSkill_ZombieFlying::GetDurationTime() const
+	{
+		return 0.0s;
+	}
+
+	duration_t CZombieSkill_ZombieFlying::GetCooldownTime() const
+	{
+		return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 15.0s : 10.0s;
+	}
+
+	float CZombieSkill_ZombieFlying::GetDamageRatio() const
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			return 0.0f;
+		return 1.0f;
+	}
 }

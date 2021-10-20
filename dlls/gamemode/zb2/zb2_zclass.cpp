@@ -34,6 +34,8 @@ GNU General Public License for more details.
 #include "zb2_zclass_teleport.h"
 #include "zb2_zclass_booster.h"
 #include "zb2_zclass_china.h"
+#include "zb2_zclass_pass.h"
+#include "zb2_zclass_flying.h"
 #include <random>
 
 namespace sv {
@@ -54,13 +56,13 @@ const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlay
 		{"pc", MakeZombieClass<CZombieClass_Pc> },
 		{"teleport", MakeZombieClass<CZombieClass_Teleport> },
 		{"booster", MakeZombieClass<CZombieClass_Booster> },
-		//{"china", MakeZombieClass<CZombieClass_China> }
-		//{"pass", MakeZombieClass<CZombieClass_Pass> }
-		//{"flying", MakeZombieClass<CZombieClass_Flying> }
+		{"china", MakeZombieClass<CZombieClass_China> },
+		{"pass", MakeZombieClass<CZombieClass_Pass> },
+		{"flying", MakeZombieClass<CZombieClass_Flying> },
 };
 #else
 const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-		{"tank", MakeZombieClass<CZombieClass_Default> }
+		{"tank", MakeZombieClass<CZombieClass_Default>}
 };
 #endif
 constexpr auto NUM_ZCLASSES = std::extent<decltype(g_FindList)>::value;

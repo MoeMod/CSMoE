@@ -133,16 +133,16 @@ namespace luash
 		int Copy(lua_State* L) const override
 		{
 			auto value = lua_touserdata(L, 1);
-			auto object = static_cast<T*>(value);
+			auto object = reinterpret_cast<T*>(value);
 			Push(L, *object);
 			return 1;
 		}
 		int NewCopy(lua_State* L) const override
 		{
 			auto value = lua_touserdata(L, 1);
-			auto object = static_cast<T*>(value);
+			auto object = reinterpret_cast<T*>(value);
 			auto new_object = new auto(*object);
-			PushPointer(L, new_object);
+            Push(L, new_object);
 			return 1;
 		}
 		int Assign(lua_State* L) const override
@@ -155,7 +155,7 @@ namespace luash
 			else
 			{
 				auto value = lua_touserdata(L, 1);
-				auto object = static_cast<T*>(value);
+				auto object = reinterpret_cast<T*>(value);
 				Get(L, 2, *object);
 				return 1;
 			}
@@ -163,7 +163,7 @@ namespace luash
 		int NewScalar(lua_State* L) const override
 		{
 			auto new_object = new T();
-			PushPointer(L, new_object);
+			Push(L, new_object);
 			return 1;
 		}
 		int NewVector(lua_State* L) const override
@@ -174,20 +174,20 @@ namespace luash
 				return luaL_error(L, "invalid new[] len %d", (int)len);
 			}
 			auto new_object = new T[len]{};
-			PushPointer(L, new_object);
+            Push(L, new_object);
 			return 1;
 		}
 		int DeleteScalar(lua_State* L) const override
 		{
 			auto value = lua_touserdata(L, 1);
-			auto object = static_cast<T*>(value);
+			auto object = reinterpret_cast<T*>(value);
 			delete object;
 			return 0;
 		}
 		int DeleteVector(lua_State* L) const override
 		{
 			auto value = lua_touserdata(L, 1);
-			auto object = static_cast<T*>(value);
+			auto object = reinterpret_cast<T*>(value);
 			delete[] object;
 			return 0;
 		}
@@ -199,7 +199,7 @@ namespace luash
 		int MetaToString(lua_State* L) const override
 		{
 			auto value = lua_touserdata(L, 1);
-			auto object = static_cast<T*>(value);
+			auto object = reinterpret_cast<T*>(value);
 			std::string type(this->GetTypeName());
 			lua_pushfstring(L, "(%s *)0x%x", type.c_str(), object);
 			return 1;

@@ -255,6 +255,7 @@ public:
 		m_flBoostCharge = 0.0;
 		m_iZombieSkillStatus = SKILL_STATUS_USED; 
 		m_flPercent = 0.0;
+		m_iTimeAutoCharge = 0;
 	}
 
 protected:
@@ -265,6 +266,7 @@ protected:
 	float m_flBoostCharge = 0.0;
 	float m_flPercent = 0.0;
 	const float m_flMaxpower = 800.0;
+	int m_iTimeAutoCharge;
 
 	EngineClock::time_point m_flTimeBotUseSkill;
 	EngineClock::time_point m_flTimeNextBoost;
@@ -272,15 +274,14 @@ protected:
 };
 
 
-class CZombieSkill_ZombieChina : public CZombieSkill_Base
+class CZombieSkill_ZombieStiffen : public CZombieSkill_Base
 {
 public:
-	explicit CZombieSkill_ZombieChina(CBasePlayer* player);
+	explicit CZombieSkill_ZombieStiffen(CBasePlayer* player);
 
 public:
 	void Think() override;
 	void Activate() override;
-	void ResetMaxSpeed()  override;
 	void OnSkillEnd() override;
 	float GetDamageRatio() const override;
 
@@ -289,6 +290,52 @@ protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
 
+	EngineClock::time_point m_flTimeZombieSkillEffect;
+};
+
+enum ZombieFlyingSkillStatus
+{
+	SKILL_END,
+	FLY_START,		//0.4s
+	FLY_START_LOOP,	
+	FLY_START_END,	//0.43s
+	FLY_IDLE,		//0.833s
+	DOWNHILL_START,	//0.333s
+	DOWNHILL_LOOP,
+	DOWNHILL_END,	//1s
+	FLY_BOMB_IDLE,	//0.86s
+	FLY_BOMB_ATTACK,//0.86s
+	FLY_ATTACK,		//0.86s
+};
+
+class CZombieSkill_ZombieFlying : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieFlying(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	void OnCrazyEffect();
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	void Reset() override
+	{
+		m_bIsflying = 0;
+		m_iFlyingState = SKILL_END;
+		m_flPlayerAnimTime = invalid_time_point;
+	}
+
+	int m_bIsflying = 0;;
+	ZombieFlyingSkillStatus m_iFlyingState;
+	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
+	EngineClock::time_point m_flTimeStartFlying = invalid_time_point;
+	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
 	EngineClock::time_point m_flTimeZombieSkillEffect;
 };
 

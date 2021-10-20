@@ -7,7 +7,7 @@
 #include "common.h"
 #include "util.h"
 #include "cbase.h"
-
+#include "bot/cs_bot.h"
 #include "game_shared/steam_util.h"
 
 #include <string>
@@ -72,8 +72,6 @@ void CSDM_ApplyRandomSpawnPoint(CBaseEntity *pEntity, const SpawnPointData & dat
 
 bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
 {
-	if (g_vecSpawnCSDM.empty())
-		return false;
 	// randomize those fucking spawn points
 	std::random_device rd;
 	std::shuffle(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), rd);
@@ -81,7 +79,28 @@ bool CSDM_DoRandomSpawn(CBaseEntity *pEntity)
 	// find the first availble one
 	auto iter = std::find_if(g_vecSpawnCSDM.begin(), g_vecSpawnCSDM.end(), std::bind(CSDM_IsSpawnPointValid, pEntity, _1));
 	if (iter == g_vecSpawnCSDM.end())
-		return false;
+	{
+		CNavArea* area = NULL;
+		int iCircleTime = 0;
+
+		while (area == NULL)
+		{
+			area = TheNavAreaGrid.GetRandomSpawnableArea();
+			iCircleTime++;
+			if (iCircleTime > 10)
+			{
+				return false;
+			}
+		}
+
+		pEntity->pev->origin = *area->GetCenter() + Vector(0, 0, 36);
+		pEntity->pev->v_angle = g_vecZero;
+		pEntity->pev->velocity = g_vecZero;
+		pEntity->pev->punchangle = g_vecZero;
+
+		return true;
+		
+	}
 
 	// sets these item
 	CSDM_ApplyRandomSpawnPoint(pEntity, *iter);

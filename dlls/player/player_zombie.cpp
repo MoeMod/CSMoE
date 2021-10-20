@@ -140,6 +140,9 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombichina.mdl");
 	PRECACHE_MODEL("models/v_knife_pass_zombi.mdl");
 	PRECACHE_MODEL("models/v_knife_pass_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_knife_pass_zombi.mdl");
+	PRECACHE_MODEL("models/v_knife_flyingzombi_host.mdl");
+	PRECACHE_MODEL("models/v_knife_flyingzombi.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -155,6 +158,8 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibomb_china.mdl");	
 	PRECACHE_MODEL("models/v_zombibomb_pass_zombi.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_pass_zombi_host.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_flyingzombi.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_flyingzombi_host.mdl");
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -179,6 +184,8 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/china_zombi_origin/china_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/pass_zombi_origin/pass_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/pass_zombi_host/pass_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/flyingzombi_origin/flyingzombi_origin.mdl");
+	PRECACHE_MODEL("models/player/flyingzombi_host/flyingzombi_host.mdl");
 	
 
 	
