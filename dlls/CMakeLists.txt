@@ -412,6 +412,7 @@ add_definitions(
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
+target_link_libraries( ${SERVER_LIBRARY} luash )
 
 if(ANDROID OR IOS)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES

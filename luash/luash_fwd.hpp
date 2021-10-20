@@ -1,5 +1,7 @@
 #pragma once
 
+typedef struct lua_State lua_State;
+
 namespace luash
 {
 	template<class T> auto Push(lua_State* L, T&&);
@@ -11,4 +13,6 @@ namespace luash
 	class ITypeInterface;
 	template<class T> const ITypeInterface* SetupRefTypeInterface(lua_State* L, T* ptr);
 	template<class T> void ReleaseRefTypeInterface(lua_State* L, T* ptr);
+
+	template<class T, class = void> struct ClassTraits; // ThisClass, BaseClass, Members
 }

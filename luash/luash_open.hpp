@@ -2,13 +2,5 @@
 
 namespace luash
 {
-
-	inline int OpenLibs(lua_State* L)
-	{
-		lua_pushcfunction(L, SetupPtrMetaTable);
-		lua_call(L, 0, 0);
-		lua_pushcfunction(L, SetupCppNewDelete);
-		lua_call(L, 0, 0);
-		return 0;
-	}
+	int OpenLibs(lua_State* L);
 }

@@ -7,7 +7,7 @@
 namespace detail {
 
 #define APPLYER_DEF(Z,N,DATA) \
-    template<class T, class ApplyFunc> auto StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
+    template<class T, class ApplyFunc> decltype(auto) StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
         auto &&[ENUM_PARAMS(x, N)] = std::forward<T>(my_struct); \
         return f(ENUM_PARAMS(x, N)); \
     } \
@@ -18,7 +18,7 @@ namespace detail {
 
 // StructApply : 把结构体解包为变长参数调用可调用对象f
 template<class T, class ApplyFunc>
-auto StructApply(T&& my_struct, ApplyFunc f)
+decltype(auto) StructApply(T&& my_struct, ApplyFunc f)
 {
     return detail::StructApply_impl(std::forward<T>(my_struct), f, StructMemberCount<typename std::decay<T>::type>());
 }

@@ -205,44 +205,66 @@ namespace luash
 	{
 		return detail::GetPointerImpl(L, N, out, IsCompleteType<T>());
 	}
-
+	// just unsupported
+	template<class C, class U> void GetMemberPointer(lua_State* L, int N, U C::* &mem_ptr)
+	{
+		mem_ptr = nullptr;
+	}
+	template<class C, class U> void GetMemberPointer(lua_State* L, int N, const U C::* &const_mem_ptr)
+	{
+		const_mem_ptr = nullptr;
+	}
+	/*
+	template<class C, class R, class...A> void GetMemberPointer(lua_State* L, int N, R(C::* &mem_fn_ptr)(A...))
+	{
+		mem_fn_ptr = nullptr;
+	}
+	template<class C, class R, class...A> void GetMemberPointer(lua_State* L, int N, R(C::* &const_mem_fn_ptr)(A...) const)
+	{
+		const_mem_fn_ptr = nullptr;
+	}
+	*/
 	namespace detail
 	{
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<7>) -> decltype(GetBoolean(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<8>) -> decltype(GetBoolean(L, N, x))
 		{
 			return GetBoolean(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<6>) -> decltype(GetEnum(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<7>) -> decltype(GetEnum(L, N, x))
 		{
 			return GetEnum(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<5>, int = 0) -> decltype(GetInteger(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<6>, int = 0) -> decltype(GetInteger(L, N, x))
 		{
 			return GetInteger(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<5>, float = 0) -> decltype(GetFloat(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<6>, float = 0) -> decltype(GetFloat(L, N, x))
 		{
 			return GetFloat(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<4>) -> decltype(GetString(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<5>) -> decltype(GetString(L, N, x))
 		{
 			return GetString(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<3>) -> decltype(GetEntity(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<4>) -> decltype(GetEntity(L, N, x))
 		{
 			return GetEntity(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<3>) -> decltype(GetVector(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<4>) -> decltype(GetVector(L, N, x))
 		{
 			return GetVector(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<2>) -> decltype(GetArray(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<3>) -> decltype(GetArray(L, N, x))
 		{
 			return GetArray(L, N, x);
 		}
-		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<1>) -> decltype(GetStruct(L, N, x))
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<2>) -> decltype(GetStruct(L, N, x))
 		{
 			return GetStruct(L, N, x);
+		}
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<1>) -> decltype(GetMemberPointer(L, N, x))
+		{
+			return GetMemberPointer(L, N, x);
 		}
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<0>) -> decltype(GetPointer(L, N, x))
 		{

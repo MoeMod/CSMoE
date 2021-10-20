@@ -23,6 +23,8 @@
 
 #include "saverestore.h"
 #include "monsterevent.h"
+#include "luash_fwd.hpp"
+#include "luash_class.hpp"
 
 #include <UtlVector.h>
 
@@ -94,14 +96,13 @@ class CBasePlayer;
 
 #include "ehandle.h"
 
+#include "cbase/cbase_traits.h"
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
 namespace sv {
 #endif
-
-template<class ThisClass, class BaseClass> struct PrivateData;
-
 template<> struct PrivateData<class CBaseEntity, void>
 {
     entvars_t * pev;
@@ -523,6 +524,9 @@ public:
 		m_pfnCallWhenMoveDone = static_cast<void (CBaseToggle::*)(void)>(pfn);
 	}
 };
+
+
+static_assert(luash::GetAmountOfPrivateDataFields<CBaseToggle>::value == 59);
 
 } // namespace sv | cl
 

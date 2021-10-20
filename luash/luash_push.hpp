@@ -93,6 +93,25 @@ namespace luash
 		lua_pushlightuserdata(L, (void *)ptr);
 		CallOnPtrCreate(L, ptr);
 	}
+	// just unsupported
+	template<class T, class U> void PushMemberPointer(lua_State* L, U T::* mem_ptr)
+	{
+		lua_pushnil(L);
+	}
+	template<class T, class U> void PushMemberPointer(lua_State* L, const U T::* const_mem_ptr)
+	{
+		lua_pushnil(L);
+	}
+	/*
+	template<class T, class R, class...A> void PushMemberPointer(lua_State* L, R (T::* mem_fn_ptr)(A...))
+	{
+		lua_pushnil(L);
+	}
+	template<class T, class R, class...A> void PushMemberPointer(lua_State* L, R(T::* const_mem_fn_ptr)(A...) const)
+	{
+		lua_pushnil(L);
+	}
+	*/
 	inline void PushString(lua_State* L, char* ptr)
 	{
 		PushPointer(L, ptr);
@@ -130,13 +149,17 @@ namespace luash
 			return PushVector(L, std::forward<T>(x));
 		}
 #endif
-		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<2>) -> decltype(PushArray(L, std::forward<T>(x)))
+		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<3>) -> decltype(PushArray(L, std::forward<T>(x)))
 		{
 			return PushArray(L, std::forward<T>(x));
 		}
-		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<1>) -> decltype(PushStruct(L, std::forward<T>(x)))
+		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<2>) -> decltype(PushStruct(L, std::forward<T>(x)))
 		{
 			return PushStruct(L, std::forward<T>(x));
+		}
+		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<1>) -> decltype(PushMemberPointer(L, x))
+		{
+			return PushMemberPointer(L, x);
 		}
 		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<0>) -> decltype(PushPointer(L, x))
 		{

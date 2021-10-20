@@ -9,22 +9,17 @@ namespace detail
     template<class T>
     struct any_converter {
         // 不能convert至自身
-        template <class U, class = typename std::enable_if<!std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value>::type> operator U () const noexcept;
+        template <class U, class = typename std::enable_if<!std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value>::type> operator U &&() const noexcept;
     };
 
     template<class T, std::size_t I> struct any_converter_tagged : any_converter<T> {};
 
     // 判断T是否可以使用Args...进行聚合初始化：T{ std::declval<Args>()... }
-    template<class T, class...Args> constexpr auto is_aggregate_constructible_impl(T&&, Args &&...args) -> decltype(T{ {args}... }, std::true_type());
-    // 多加一个重载可以去掉讨厌的clang warning
-    template<class T, class Arg> constexpr auto is_aggregate_constructible_impl(T&&, Arg&& args) -> decltype(T{ args }, std::true_type());
+    template<class T, std::size_t...I> constexpr auto is_aggregate_constructible_with_n_args_impl(T&&, std::index_sequence<I...>) -> decltype(T{ any_converter_tagged<T, I>()... }, std::true_type());
     // 这个函数千万别改成模板函数否则会死机的！
-    constexpr auto is_aggregate_constructible_impl(...)->std::false_type;
+    constexpr auto is_aggregate_constructible_with_n_args_impl(...)->std::false_type;
 
-    template<class T, class...Args> struct is_aggregate_constructible : decltype(is_aggregate_constructible_impl(std::declval<T>(), std::declval<Args>()...)) {};
-
-    template<class T, class Seq> struct is_aggregate_constructible_with_n_args;
-    template<class T, std::size_t...I> struct is_aggregate_constructible_with_n_args<T, std::index_sequence<I...>> : is_aggregate_constructible<T, any_converter_tagged<T, I>...> {};
+    template<class T, class Seq> struct is_aggregate_constructible_with_n_args : decltype(is_aggregate_constructible_with_n_args_impl(std::declval<T>(), Seq())) {};
     // 这里添加一个元函数是用来支持沙雕GCC的，不知道为什么GCC里面变长模板参数不能作为嵌套的实参展开……
     template<class T, std::size_t N> struct is_aggregate_constructible_with_n_args_ex : is_aggregate_constructible_with_n_args<T, std::make_index_sequence<N>> {};
 
