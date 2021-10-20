@@ -36,4 +36,4 @@ public:
 
 }
 
-#endif //PROJECT_ZB2_ZCLASS_TANK_H
+#endif //PROJECT_ZB2_ZCLASS_CHINA_H

@@ -86,18 +86,21 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::Text(xorstr("声明：任何提供收费服务的商家均非官方，我们不对非官方版本提供任何技术担保。").crypt_get());
 		ImGui::Text(xorstr("\t如出现任何意外（包括但不限于死机、蓝屏、锁机、ban号、中毒、变砖、爆炸等）后果自负。").crypt_get());
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
-		ImGui::TextColored(warning_color, xorstr("-----------------------------------特别声明---------------------------------").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("1.EC精英社所谓“CS破茧”“CS神器时代”均为盗版游戏，我们强烈谴责盗版游戏的行为").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("--------------------------------------------特别声明------------------------------------------").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("1.EC精英社所谓“CS破茧”“CS神器时代”“CS创新纪元”均为盗版游戏，我们强烈谴责盗版游戏的行为").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("2.Wilson（真名：刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("淘宝店铺：洋葱数码商城|淘宝名：丨低调奢华有内涵|B站ID：进口柚柚子|贴吧ID:liu1340567980").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("现在此揭露刘澄：一个完全的插件小白，靠网上东拼西凑代码，或直接搬运外网的更新加入游戏。").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("----------------------------------------------------------------------------").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("4.CS01服务器 利用CSMoE支持中文、小地图作为客户端，用网上偷来的插件收费开服，望各位玩家周知。").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("详情见B站Monster-egg 2021-6-19动态，CSMoE未在应用市场发布，如橘子CSMoE、饕餮、恶煞、王炸均为").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("第三方改版，我们不提供这些版本的支持，CSMoE并没有那些版本的改模武器。").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
 		ImColor tipssss_color(0.3f, 0.6f, 0.2f, 1.0f);
-		ImGui::TextColored(tipssss_color, xorstr("----------------------------------------------------------------------------").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
 		ImGui::TextColored(tipssss_color, xorstr("柑橘CSMoE现已开设联机服供大家体验，您可以加群706711420体验，或点击下方按钮进服~~~").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("----------------------------------------------------------------------------").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
 		/*
 		ImGui::Text("请在下方输入：「我同意」代表您已经明确以上声明。");
 		ImGui::Text("否则请按下“退出”按钮退出游戏");

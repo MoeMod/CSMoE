@@ -446,8 +446,8 @@ namespace sv {
 		KnockbackData GetKnockBackData() override;
 		BOOL CanDrop() override { return false; }
 		BOOL IsSignal();
-#ifndef CLIENT_DLL
 		BOOL CanHolster() override;
+#ifndef CLIENT_DLL	
 		Vector Get_ShootPosition(CBaseEntity* pevAttacker, Vector Start, int* bHit);
 		void ItemPostFrame() override;
 #endif
@@ -670,7 +670,7 @@ namespace sv {
 	void CKnifeDgaxe::SecondaryAttack(void)
 	{
 		m_flTimeComboCheck = gpGlobals->time + 3.0s;
-		if (SlashAnim >= 6)
+		if (SlashAnim >= 7)
 			SlashAnim = 3;
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -722,7 +722,7 @@ namespace sv {
 		}
 		}
 #endif
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.15s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.16s;
 		SlashAnim++;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}
@@ -878,7 +878,7 @@ namespace sv {
 	void CKnifeDgaxe::Holster(int skiplocal)
 	{
 #ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe);
+		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
 		WRITE_BYTE(0);
 		WRITE_BYTE(3);
 		MESSAGE_END();
@@ -1042,13 +1042,16 @@ namespace sv {
 		}
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
+#endif
 
 	BOOL CKnifeDgaxe::CanHolster(void)
 	{
+#ifndef CLIENT_DLL
 		if (currentammo)
 			return FALSE;
 		else
 			return TRUE;
-	}
 #endif
+		return FALSE;
+	}
 }

@@ -255,7 +255,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 				ForceRun(5.0s);
 				if (m_bIsZombie && this->m_ZombieClass)
 				{
-					if(!stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "speed") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy"))
+					if(!stricmp(this->m_ZombieClass, "flying") || !stricmp(this->m_ZombieClass, "china") || !stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "speed") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy"))
 						ClientCommand("BTE_ZombieSkill1");
 					if (!stricmp(this->m_ZombieClass, "booster"))
 					{

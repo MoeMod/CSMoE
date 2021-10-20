@@ -109,3 +109,4 @@ HOOK_EVENT(bendita, FireBendita);
 HOOK_EVENT(skull5, FireSkull5);
 HOOK_EVENT(k1ases, FireK1ases);
 HOOK_EVENT(m1887se, FireM1887se);
+HOOK_EVENT(frequency1, FireFrequency1);

@@ -838,6 +838,7 @@ public:
 	int Draw(float flTime);
 	void Reset(void);
 	void Shutdown();
+	void R_AttachTentToPlayer(int client, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode = 0, float framerate = 1.0);
 	void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode = 0, float framerate = 1.0);
 	CHudMsgFunc(HeadIcon);
 

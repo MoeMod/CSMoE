@@ -179,7 +179,13 @@ int CKnife_Zombi::Swing(int fFirst)
 			}
 
 #ifndef CLIENT_DLL
-			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+			if (m_pPlayer->m_iZombieFlying)		//flying zombie attack anim
+			{
+				m_pPlayer->m_iZombieFlying = 0;
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_attack");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.86s;
+			}
+				m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 		}
 	}

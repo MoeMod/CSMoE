@@ -51,6 +51,8 @@ void CBendita::Precache(void)
 	PRECACHE_MODEL("models/v_bendita.mdl");
 	PRECACHE_MODEL("models/p_bendita.mdl");
 	PRECACHE_MODEL("models/w_bendita.mdl");
+	PRECACHE_MODEL("sprites/holybomb_burn.spr");
+
 
 	PRECACHE_SOUND("weapons/bendita-1.wav");
 	PRECACHE_SOUND("weapons/zoom.wav");
@@ -164,7 +166,7 @@ void CBendita::BenditaFire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	m_pPlayer->m_iWeaponFlash = NORMAL_GUN_FLASH;
 #ifndef CLIENT_DLL
 	int iWeapontype = 4;
-	Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, GetDamage(), BENDITA_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed, &iWeapontype);
+	Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, GetDamage(), BENDITA_RANGE_MODIFER, m_pPlayer->pev, TRUE, iWeapontype, m_pPlayer->random_seed);
 #else
 	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, GetDamage(), BENDITA_RANGE_MODIFER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 #endif

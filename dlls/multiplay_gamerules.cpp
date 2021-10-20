@@ -578,6 +578,8 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	if (g_bIsCzeroGame)
 		InstallTutor(CVAR_GET_FLOAT("tutor_enable") != 0.0f);
 
+	LoadRandomMaps();
+
 	g_pMPGameRules = this;
 }
 
@@ -2621,6 +2623,9 @@ bool CHalfLifeMultiplay::CheckTimeLimit()
 			return true;
 		}
 	}
+
+	// votemap things
+	VoteMapThink();
 
 	return false;
 }
@@ -4695,6 +4700,209 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 {
 	pPlayer->SetPlayerModel(pPlayer->m_bHasC4);
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
+}
+
+bool CHalfLifeMultiplay::CheckCanStartVoteMaps()
+{
+	if (votemap_enabled.value <= 0.0f) {
+		ALERT(at_console, "votemap is disabled\n");
+		return false;
+	}
+
+	if (m_iVoteMapStatus) {
+			ALERT(at_console, "votemap currently in process\n");
+		return false;
+	}
+
+	if (!m_vecVoteMaps.size()) {
+		ALERT(at_console, "votemap list is empty\n");
+		return false;
+	}
+
+	return true;
+}
+
+void SV_Start_VoteMaps()
+{
+	if (!g_pGameRules->CheckCanStartVoteMaps())
+	{
+		if (!g_pGameRules->m_iVoteMapStatus)
+			g_pGameRules->m_flVoteNextThink = gpGlobals->time + 1s;
+		return;
+	}
+
+	ALERT(at_console, "Start voting maps\n");
+	g_pGameRules->m_iVoteMapStatus = 1;
+	g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
+	
+	int iKeys = MENU_KEY_0;
+	char szMenu[512];
+	Q_sprintf(szMenu, "\\y请选择下一张地图:\n\n");
+
+	size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+	for (size_t i = 0; i < length; i++)
+	{
+		iKeys |= (1 << i);
+		Q_sprintf(szMenu, "%s\\w%d.%s\n", szMenu, i + 1, g_pGameRules->m_vecVoteMaps[i].first.c_str());
+	}
+	Q_sprintf(szMenu, "%s\n\w0.退出", szMenu);
+
+	CBaseEntity* pPlayer = NULL;
+	while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
+	{
+		if (FNullEnt(pPlayer->edict()))
+		{
+			break;
+		}
+
+		if (pPlayer->pev->flags == FL_DORMANT)
+		{
+			continue;
+		}
+
+		CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+		if (player->IsBot())
+		{
+			continue;
+		}
+
+		ShowMenu(player, iKeys, -1, 0, szMenu);
+		player->m_iMenu = Menu_VoteMap;
+	}
+}
+
+void CHalfLifeMultiplay::LoadRandomMaps()
+{
+	static bool fFirstTime = true;
+
+	if (fFirstTime) {
+		fFirstTime = false;
+		ADD_SERVER_COMMAND("start_votemap", SV_Start_VoteMaps);
+	}
+
+	m_iVoteMapStatus = 0;
+	m_flVoteNextThink = invalid_time_point;
+	m_vecVoteMaps.clear();
+
+	char* mapcfile = (char*)CVAR_GET_STRING("mapcyclefile");
+	char szBuffer[MAX_RULE_BUFFER];
+	char szMap[32];
+	int length;
+	char* pFileList;
+	char* aFileList = pFileList = (char*)LOAD_FILE_FOR_ME(mapcfile, &length);
+	if (!pFileList || !length)
+		return;
+
+	const char* szCurMap = STRING(gpGlobals->mapname);
+	// the first map name in the file becomes the default
+	while (true)
+	{
+		Q_memset(szBuffer, 0, sizeof(szBuffer));
+
+		pFileList = MP_COM_Parse(pFileList);
+
+		if (Q_strlen(mp_com_token) <= 0)
+			break;
+
+		Q_strcpy(szMap, mp_com_token);
+
+		// Any more tokens on this line?
+		if (MP_COM_TokenWaiting(pFileList))
+		{
+			pFileList = MP_COM_Parse(pFileList);
+			if (Q_strlen(mp_com_token) > 0)
+			{
+				Q_strcpy(szBuffer, mp_com_token);
+			}
+		}
+
+		// skip current map
+		if (!Q_strcmp(szMap, szCurMap))
+		{
+			continue;
+		}
+
+		// Check map
+		if (IS_MAP_VALID(szMap))
+		{
+			m_vecVoteMaps.emplace_back(std::make_pair(szMap, 0));
+		}
+		else
+			ALERT(at_console, "Skipping %s from mapcycle, not a valid map\n", szMap);
+	}
+
+	FREE_FILE(aFileList);
+
+	std::shuffle(m_vecVoteMaps.begin(), m_vecVoteMaps.end(), std::random_device());
+}
+
+void CHalfLifeMultiplay::VoteMapThink()
+{
+	if (m_flVoteNextThink > gpGlobals->time) {
+		return;
+	}
+
+	if (!m_iVoteMapStatus) {
+		if (votemap_enabled.value <= 0.0f || timelimit.value <= 0.0f) {
+			return;
+		}
+
+		if (IsCareer()) {
+			return;
+		}
+
+		auto flLeftTime = g_flTimeLimit - gpGlobals->time;
+		if (flLeftTime < 1.0s || flLeftTime > 129.0s) {
+			return;
+		}
+
+		SV_Start_VoteMaps();
+		return;
+	}
+
+	switch (m_iVoteMapStatus)
+	{
+		// Vote end
+	case 1: {
+		std::sort(m_vecVoteMaps.begin(),
+				  min(m_vecVoteMaps.begin() + MAX_CUSTOM_VOTE_MAPS, m_vecVoteMaps.end()),
+				  [](std::pair<std::string, int> a, std::pair<std::string, int> b) {
+					  return b.second < a.second;
+				  });
+		m_iVoteMapStatus = 2;
+		auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
+		// delay timelimit
+		g_flResetTime = gpGlobals->time + delay;
+
+		char szText[128];
+		sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+		WRITE_BYTE(0);
+		WRITE_STRING(szText);
+		MESSAGE_END();
+
+		ALERT(at_console, "Voting Over. Nextmap will be %s after %.2f secs\n",
+			  m_vecVoteMaps.front().first.c_str(), delay.count());
+		break;
+		// Change map
+	}
+	case 2: {
+		if (!m_bRoundTerminating) {
+			m_flVoteNextThink = gpGlobals->time + 1s;
+			break;
+		}
+		m_iVoteMapStatus = 3;
+		m_flVoteNextThink = gpGlobals->time + 3s;
+		break;
+	}
+	case 3: {
+		m_iVoteMapStatus = 0;
+		CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
+		break;
+		default:
+			break;
+	}
+	}
 }
 
 }

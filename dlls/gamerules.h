@@ -38,6 +38,7 @@
 
 #define MAX_RULE_BUFFER				1024
 #define MAX_VOTE_MAPS				100
+#define MAX_CUSTOM_VOTE_MAPS		5
 #define MAX_VIP_QUEUES				5
 
 #define MAX_BOMB_RADIUS				2048
@@ -460,6 +461,10 @@ public:
 	}
 	void SendMOTDToClient(edict_t *client);
 
+	void LoadRandomMaps();
+	bool CheckCanStartVoteMaps();
+	void VoteMapThink();
+
 private:
 	bool HasRoundTimeExpired();
 	bool IsBombPlanted();
@@ -537,6 +542,10 @@ public:
 	float m_flFadeToBlackValue;
 	CBasePlayer *m_pVIP;
 	CBasePlayer *VIPQueue[MAX_VIP_QUEUES];
+
+	int m_iVoteMapStatus;
+	time_point_t m_flVoteNextThink;
+	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 
 protected:
 	time_point_t m_flIntermissionEndTime;

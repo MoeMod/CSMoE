@@ -229,6 +229,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_ak47x");
 	UTIL_PrecacheOtherWeapon("z4b_cannontiger");
 	UTIL_PrecacheOtherWeapon("z4b_cannonplasma");
+	UTIL_PrecacheOtherWeapon("z4b_frequency1");
 	UTIL_PrecacheOtherWeapon("knife_dualsword");
 	UTIL_PrecacheOtherWeapon("weapon_gunkata");
 

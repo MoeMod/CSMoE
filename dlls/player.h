@@ -727,6 +727,9 @@ public:
 	int m_iHealthDamageType;
 	time_point_t tLastMarkTime[33];
 	const char* m_ZombieClass;
+	time_point_t m_flCustomSequenceUntilTime;
+	int m_iCustomSequence;
+	int m_iZombieFlying;
 };
 
 }

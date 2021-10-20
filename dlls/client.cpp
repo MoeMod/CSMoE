@@ -1306,6 +1306,27 @@ void ZbsUpgrade(CBasePlayer *pPlayer, int iSlot)
 	}
 }
 
+void HandleMenu_VoteMap(CBasePlayer* pPlayer, int iSlot)
+{
+	int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+	if (iSlot < 1 || iSlot > length)
+		return;
+
+	pPlayer->m_iMenu = Menu_OFF;
+	//ALERT(at_console, "select #%d %s %d \n", iSlot, g_pGameRules->m_vecVoteMaps[iSlot-1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot-1].second);
+	if (g_pGameRules->m_iVoteMapStatus != 1)
+		return;
+
+	char szText[128];
+	Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iSlot - 1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot - 1].second);
+	int iClientIndex = pPlayer->entindex();
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+	WRITE_BYTE(iClientIndex);
+	WRITE_STRING(szText);
+	MESSAGE_END();
+
+}
+
 void BuyItem(CBasePlayer *pPlayer, int iSlot)
 {
 	//int iItem = 0;
@@ -3075,6 +3096,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				{
 					ZbsUpgrade(player, slot);
 				}
+				break;
+			}
+			case Menu_VoteMap:
+			{
+				HandleMenu_VoteMap(player, slot);
 				break;
 			}
 

@@ -2106,6 +2106,44 @@ CALL_FUNCTION(GetVersion, const char*)
 PUSH_STRING(ret)
 PUSH_LAST_STRING(ret)
 END_IMGUI_FUNC
+
+// Tab Bars, Tabs
+//IMGUI_API bool          BeginTabBar(const char* str_id, ImGuiTabBarFlags flags = 0);        // create and append into a TabBar
+IMGUI_FUNCTION(BeginTabBar)
+LABEL_ARG(name)
+OPTIONAL_ENUM_ARG(flags, 0)
+CALL_FUNCTION(BeginTabBar, bool, name, flags)
+IF_RET_ADD_END_STACK(14)
+PUSH_BOOL(ret)
+PUSH_LAST_BOOL(ret)
+END_IMGUI_FUNC
+
+//IMGUI_API void          EndTabBar();                                                        // only call EndTabBar() if BeginTabBar() returns true!
+IMGUI_FUNCTION(EndTabBar)
+CALL_FUNCTION_NO_RET(EndTabBar)
+POP_END_STACK(14)
+END_IMGUI_FUNC
+
+//IMGUI_API bool          BeginTabItem(const char* label, bool* p_open = NULL, ImGuiTabItemFlags flags = 0);// create a Tab. Returns true if the Tab is selected.
+IMGUI_FUNCTION(BeginTabItem)
+LABEL_ARG(name)
+OPTIONAL_BOOL_POINTER_ARG(p_open)
+OPTIONAL_ENUM_ARG(flags, 0)
+CALL_FUNCTION(BeginTabItem, bool, name, p_open, flags)
+IF_RET_ADD_END_STACK(15)
+PUSH_BOOL(ret)
+END_BOOL_POINTER(p_open)
+PUSH_LAST_BOOL(ret)
+END_IMGUI_FUNC
+
+//IMGUI_API void          EndTabItem();                                                       // only call EndTabItem() if BeginTabItem() returns true!
+IMGUI_FUNCTION(EndTabItem)
+CALL_FUNCTION_NO_RET(EndTabItem)
+POP_END_STACK(15)
+END_IMGUI_FUNC
+
+//IMGUI_API void          SetTabItemClosed(const char* tab_or_docked_window_label);           // notify TabBar or Docking system of a closed tab/window ahead (useful to reduce visual flicker on reorderable tab bars). For tab-bar: call after BeginTabBar() and before Tab submissions. Otherwise call with a window name.
+
 //    IMGUI_API ImGuiContext* CreateContext(void* (*malloc_fn)(size_t) = NULL, void (*free_fn)(void*) = NULL);
 // Unsupported return type ImGuiContext*
 //    IMGUI_API void          DestroyContext(ImGuiContext* ctx);
@@ -2129,4 +2167,6 @@ END_STACK_OPTION(10, EndPopup)
 END_STACK_OPTION(11, EndDragDropSource)
 END_STACK_OPTION(12, EndDragDropTarget)
 END_STACK_OPTION(13, EndChildFrame)
+END_STACK_OPTION(14, EndTabBar)
+END_STACK_OPTION(15, EndTabItem)
 END_STACK_END

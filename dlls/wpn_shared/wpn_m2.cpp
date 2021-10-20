@@ -357,10 +357,13 @@ namespace sv {
 
 	BOOL CM2::CanHolster()
 	{
+#ifndef CLIENT_DLL	
 		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 			return FALSE;
 		else
 			return TRUE;
+#endif
+		return FALSE;
 	}
 
 }

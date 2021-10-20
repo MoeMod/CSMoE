@@ -278,7 +278,7 @@ void CMod_ZombieScenario::Think()
 		if (gpGlobals->time > m_flNextSpawnNPC)
 		{
 			MakeZombieNPC();
-			m_flNextSpawnNPC = gpGlobals->time + 0.1s;
+			m_flNextSpawnNPC = gpGlobals->time + 1.0s;
 		}
 	}
 

@@ -102,6 +102,9 @@ cvar_t sk_scientist_heal3 = {"sk_scientist_heal3", "0", 0, 0.0f, NULL};
 cvar_t gamemode = {"mp_gamemode", "none", FCVAR_SERVER, 0.0f, NULL};
 cvar_t maxkills = {"mp_maxkills", "150", FCVAR_SERVER, 0.0f, NULL};
 
+cvar_t votemap_enabled = { "mp_votemap_enabled", "1", FCVAR_SERVER, 0.0f, NULL }; // Takes map change for it to turn off / on. (Default: 1)
+cvar_t votemap_tally_delay_time = { "mp_votemap_tally_delay_time", "15", FCVAR_SERVER, 0.0f, NULL }; // Delay between when vote starts and when votes are tallied. (Default: 15)
+
 extern void Bot_RegisterCvars();
 extern void Tutor_RegisterCVars();
 extern void Hostage_RegisterCVars();
@@ -163,6 +166,10 @@ void EXT_FUNC GameDLLInit()
 
 	CVAR_REGISTER(&gamemode);
 	CVAR_REGISTER(&maxkills);
+
+	// votemap
+	CVAR_REGISTER(&votemap_enabled);
+	CVAR_REGISTER(&votemap_tally_delay_time);
 
 	Bot_RegisterCvars();
 	Tutor_RegisterCVars();

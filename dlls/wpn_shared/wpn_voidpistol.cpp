@@ -822,7 +822,7 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 
 #ifndef CLIENT_DLL	
 	int iEffect = 1;
-	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed, &iEffect, m_pPlayer);
+	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(), 0.81, m_pPlayer->pev, TRUE, iEffect, m_pPlayer->random_seed, m_pPlayer);
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecDir, missile, ENT(m_pPlayer->pev), &tr);
 	{

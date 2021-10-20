@@ -159,31 +159,31 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 	{
 	case HUMAN_SKILL_KNIFE2X:
 	{
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_meleeup.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_meleeup.spr"),
 			Vector(0.0, 0.0, 30.0), 10.0, TRUE, flags, 1.0);
 		break;
 	}
 	case HUMAN_SKILL_HEADSHOT:
 	{
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_skill_headshot.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_skill_headshot.spr"),
 			Vector(0.0, 0.0, 30.0), rgIconList[i].iuser1 ? 5.5 : 4.5, TRUE, flags, 1.0);
 		break;
 	}
 	case ZOMBIE_SKILL_HEAL:
 	{
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombihealer.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombihealer.spr"),
 			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
 	case ZOMBIE_SKILL_HEAL_HEAD:
 	{
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombiheal_head.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombiheal_head.spr"),
 			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
 	case CANNON_FLAME_BURN:
 	{
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
 			Vector(Com_RandomFloat(-5.0, 5.0), Com_RandomFloat(-5.0, 5.0), 0.0), 3, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
 		break;
 	}
@@ -197,7 +197,7 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 		case 4: {iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/dmgreiteration04.spr"); break; }
 		case 5: {iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/dmgreiteration05.spr"); break; }
 		}
-		R_AttachTentToEntity(rgIconList[i].iPlayer, iModelIndex,
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, iModelIndex,
 			Vector(0.0, 0.0, 40.0), 1.0, TRUE, flags, 1.0);
 		break;
 	}
@@ -208,14 +208,18 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 	case TELEPORT_MARKEF:
 	{
 		flags = FTENT_PERSIST;
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_teleportzombieout.spr"),
-			Vector(0.0, 0.0, 0.0), 2.0, TRUE, flags, 1.0, kRenderTransAdd, 7.5);
+		if (rgIconList[i].iuser1)
+			R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_teleportzombieout.spr"),
+				Vector(0.0, 0.0, 0.0), 2.0, TRUE, flags, 0.8, kRenderTransAdd, 7.5);
+		else
+			R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_teleportzombie.spr"),
+				Vector(0.0, 0.0, 0.0), 2.0, TRUE, flags, 0.8, kRenderTransAdd, 7.5);
 		break;
 	}
 	case HOLYBOMB_BURN:
 	{
 		float fLife = rgIconList[i].iuser1;
-		R_AttachTentToEntity(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybomb_burn.spr"),
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybomb_burn.spr"),
 			Vector(0.0, 0.0, 30.0), fLife, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
 		break;
 	}
@@ -225,7 +229,45 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 }
 	
 
-void CHudHeadIcon::R_AttachTentToEntity(int client, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
+void CHudHeadIcon::R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
+{
+	if (!modelIndex)
+	{
+		gEngfuncs.Con_Printf("No model %d!\n", modelIndex);
+		return;
+	}
+
+	cl_entity_t* pEnity = gEngfuncs.GetEntityByIndex(entity);
+	if (!pEnity)
+	{
+		gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", entity);
+		return;
+	}
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_DefaultSprite(pEnity->origin + offset, modelIndex, 1.0);
+	if (!pTemp)
+	{
+		gEngfuncs.Con_Printf("No temp ent.\n");
+
+		return;
+	}
+
+	pTemp->entity.curstate.framerate = framerate;
+	pTemp->entity.baseline.renderamt = pTemp->entity.curstate.renderamt = 255;
+	pTemp->tentOffset = offset;
+	pTemp->flags = FTENT_PLYRATTACHMENT | FTENT_SPRANIMATE | flags;
+	pTemp->clientIndex = entity;
+	pTemp->entity.curstate.renderfx = kRenderFxNoDissipation;
+	pTemp->entity.curstate.scale = scale;
+	pTemp->entity.curstate.rendermode = rendermode;
+	if (additive)
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
+	pTemp->die = gHUD.m_flTime + life;
+
+}
+
+
+void CHudHeadIcon::R_AttachTentToPlayer(int client, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
 {
 	if (!modelIndex)
 	{

@@ -136,6 +136,9 @@ extern cvar_t sk_scientist_heal3;
 extern cvar_t gamemode;
 extern cvar_t maxkills;
 
+extern cvar_t votemap_enabled;
+extern cvar_t votemap_tally_delay_time;
+
 void GameDLLInit();
 
 }

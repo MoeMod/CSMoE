@@ -147,6 +147,7 @@ TL_ADD(CBendita)
 TL_ADD(CSkull5)
 TL_ADD(CK1ases)
 TL_ADD(CM1887se)
+TL_ADD(CFrequency1)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

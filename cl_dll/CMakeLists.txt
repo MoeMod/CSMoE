@@ -190,6 +190,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_skull5.cpp
 	../dlls/wpn_shared/z4b_k1ases.cpp
 	../dlls/wpn_shared/z4b_m1887se.cpp
+	../dlls/wpn_shared/z4b_frequency1.cpp
 	)
 
 set (HUD_SRCS

@@ -4903,4 +4903,43 @@ Place CNavAreaGrid::GetPlace(const Vector *pos) const
 	return UNDEFINED_PLACE;
 }
 
+CNavArea* CNavAreaGrid::GetRandomSpawnableArea(void)
+{
+	if (!m_grid)
+		return NULL;
+
+	int listIndex = RANDOM_LONG(0, m_gridSizeX - 1) + RANDOM_LONG(0, m_gridSizeY - 1) * m_gridSizeX;
+	int areaIndex = RANDOM_LONG(0, m_grid[listIndex].size() - 1);
+
+	NavAreaList::const_iterator iter = m_grid[listIndex].begin();
+
+	std::advance(iter, areaIndex);
+
+	if (!m_grid[listIndex].empty())
+	{
+		CNavArea* area = *iter;
+
+		if (area->m_extent.hi.x - area->m_extent.lo.x < 40.0f)
+			return NULL;
+
+		if (area->m_extent.hi.y - area->m_extent.lo.y < 40.0f)
+			return NULL;
+
+		if (area->GetAttributes() & (NAV_CROUCH | NAV_JUMP))
+			return NULL;
+
+		Vector vecSrc = area->m_center + Vector(0, 0, HalfHumanHeight);
+		TraceResult tr;
+
+		UTIL_TraceHull(vecSrc, vecSrc, dont_ignore_monsters, human_hull, NULL, &tr);
+
+		if (tr.pHit != NULL)
+			return NULL;
+
+		return area;
+	}
+
+	return NULL;
+}
+
 }

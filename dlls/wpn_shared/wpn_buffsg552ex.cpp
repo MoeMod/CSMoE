@@ -272,7 +272,7 @@ void CBuffsg552ex::Buffsg552exFireB(float flSpread, duration_t flCycleTime, BOOL
 
 #ifndef CLIENT_DLL
 	int iEffect = 2;
-	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.955, m_pPlayer->pev, FALSE, m_pPlayer->random_seed, &iEffect, m_pPlayer);
+	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.955, m_pPlayer->pev, FALSE, iEffect, m_pPlayer->random_seed, m_pPlayer);
 	if (!iEffect)
 	{
 		CBaseEntity* pevAttacker = this->m_pPlayer;

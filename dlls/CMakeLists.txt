@@ -198,6 +198,9 @@ set(HLDLL_SRCS
 	./gamemode/zb2/teleportentity.cpp
 	./gamemode/zb2/zombiebomb.cpp
 	./gamemode/zb2/zb2_zclass_booster.cpp
+	./gamemode/zb2/zb2_zclass_china.cpp
+	./gamemode/zb2/zb2_zclass_pass.cpp
+	./gamemode/zb2/zb2_zclass_flying.cpp
 	)
 
 set (HLWPN_SRCS
@@ -323,6 +326,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_skull5.cpp
 	../dlls/wpn_shared/z4b_k1ases.cpp
 	../dlls/wpn_shared/z4b_m1887se.cpp
+	../dlls/wpn_shared/z4b_frequency1.cpp
 	)
 
 set(PM_SRCS

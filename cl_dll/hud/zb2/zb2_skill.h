@@ -27,6 +27,7 @@ public:
 	void OnSkillInit(ZombieClassType zclass = ZOMBIE_CLASS_HUMAN, ZombieSkillType skill1 = ZOMBIE_SKILL_EMPTY, ZombieSkillType skill2 = ZOMBIE_SKILL_EMPTY, ZombieSkillType skill3 = ZOMBIE_SKILL_EMPTY, ZombieSkillType skill4 = ZOMBIE_SKILL_EMPTY);
 	void OnSkillActivate(ZombieSkillType skill, float flHoldTime, float flFreezeTime);
 	void OnSkillIconChange(ZombieSkillType skill1, ZombieSkillType skill2, ZombieSkillType skill3, ZombieSkillType skill4);
+	void OnSkillIconPass(ZombieSkillType skill, ZombieSkillStatus status);
 
 protected:
 	cvar_t* touch_enable;

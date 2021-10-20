@@ -36,6 +36,8 @@ class CHuntbow : public CBasePlayerWeapon
 		HUNTBOW_HIT_LEFT,
 		HUNTBOW_HIT_RIGHT,
 		HUNTBOW_AIM_CHARGIN,
+		HUNTBOW_AIM_HIT_LEFT,
+		HUNTBOW_AIM_HIT_RIGHT
 	};
 public:
 	void Spawn() override;
@@ -53,7 +55,7 @@ public:
 	void ItemPostFrame() override;
 	void RadiusDamage(Vector vecAiming, float flDamage, float flRadius);
 	void ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float flAngleDegrees, entvars_t* pevPlayer, int m_iChargeState);
-	Vector CalcPositon(Vector vecSrc, Vector vecDir, int* bHit);
+	Vector CalcPositon(Vector vecSrc, Vector vecDir, int &bHit, int &iTarget);
 #endif
 	float GetPrimaryAttackDamage() const;
 	float GetSecondaryAttackDamage() const;

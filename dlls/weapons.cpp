@@ -468,6 +468,11 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 	{
 		return;
 	}
+	if(!pPlayer->m_bIsZombie)
+	{
+		if (!Q_strcmp(STRING(pev->classname), "weapon_zombibomb"))
+			return;
+	}
 
 	// can I have this?
 	if (!g_pGameRules->CanHavePlayerItem(pPlayer, this))
