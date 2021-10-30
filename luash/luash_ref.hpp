@@ -385,19 +385,20 @@ namespace luash
 			return 0;
 		}
 	};
+
+	template<class T> inline bool PushIfLvRef(lua_State* L, T& obj, std::true_type)
+	{
+		Push(L, obj);
+		return true;
+	}
+	template<class T> constexpr bool PushIfLvRef(lua_State* L, T&& obj, std::false_type)
+	{
+		return false;
+	}
+
 	template<class T, class Base>
 	class TypeInterfaceDecoratorCall<T, Base, true> : public Base
 	{
-		template<class T> inline bool PushIfLvRef(lua_State* L, T& obj, std::true_type) const 
-		{
-			Push(L, obj);
-			return true;
-		}
-		template<class T> constexpr bool PushIfLvRef(lua_State* L, T&& obj, std::false_type) const
-		{
-			return false;
-		}
-
 		template<std::size_t...I, class Ret, class...Args>
 		int MetaCallImpl2(lua_State* L, std::index_sequence<I...>, TypeIdentity<std::function<Ret(Args...)>>) const
 		{

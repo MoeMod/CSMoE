@@ -94,6 +94,15 @@ class CBasePlayer;
 
 }
 
+#ifdef CLIENT_DLL
+namespace cl {
+#else
+namespace sv {
+#endif
+    void PushEntity(lua_State *L, edict_t *p);
+    void GetEntity(lua_State *L, int N, edict_t *&p);
+}
+
 #include "ehandle.h"
 
 #include "cbase/cbase_traits.h"
@@ -103,9 +112,6 @@ namespace cl {
 #else
 namespace sv {
 #endif
-
-void PushEntity(lua_State* L, edict_t* p);
-void GetEntity(lua_State* L, int N, edict_t*& p);
 
 template<> struct PrivateData<class CBaseEntity, void>
 {

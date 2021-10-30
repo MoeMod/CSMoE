@@ -23,6 +23,19 @@ namespace sv {
 	template<class T, class Base = T> class LuaClass;
 	template<class T> class LuaClass<void, T>;
 
+	template<class ResultType> ResultType ReturnFromLuaIfNotVoid(lua_State *L, int pop_num)
+	{
+		ResultType ret;
+		luash::Get(L, -1, ret);
+		lua_pop(L, pop_num);
+		return ret;
+	}
+	template<> void ReturnFromLuaIfNotVoid<void>(lua_State *L, int pop_num)
+	{
+		lua_pop(L, pop_num);
+		return;
+	}
+
 #define CLASS_BEGIN(ClassName, BaseClass) \
 	template<class Base> struct PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>> {}; \
 	template<class Base> struct PrivateData<LuaClass<ClassName, Base>, Base> {}; \
@@ -32,7 +45,6 @@ namespace sv {
 	using ThisClass = ClassName; \
 	static_assert(std::is_base_of<BaseClass, ThisClass>::value || std::is_void<BaseClass>::value); \
 	public:
-	// TUPLE和VARIADIC不支持为空，所以把FunctionName本身也扔进变长参数来占位
 	#define ADD_VIRTUAL_FUNCTION(...) auto BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) NAMED_ARGUMENT(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), __VA_ARGS__) \
 				-> decltype(std::declval<ThisClass>().BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))) override { \
 			using ResultType = decltype(ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))); \
@@ -62,18 +74,7 @@ namespace sv {
 				lua_pop(L, 2); \
 				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
 			} \
-			if constexpr(std::is_void<ResultType>::value) \
-			{ \
-				lua_pop(L, 2); \
-				return; \
-			} \
-			else \
-			{ \
-				ResultType ret; \
-				luash::Get(L, -1, ret); \
-				lua_pop(L, 2); \
-				return ret; \
-			} \
+			return ReturnFromLuaIfNotVoid<ResultType>(L, 2); \
 		}
 	#define ADD_OVERRIDE_VIRTUAL_FUNCTION(...) ADD_VIRTUAL_FUNCTION(__VA_ARGS__)
 	#define ADD_MEMBER_FUNCTION(FunctionName, ...) 
