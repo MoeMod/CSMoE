@@ -1,18 +1,17 @@
 #pragma once
 
 #include "StructMemberCount.hpp"
-#include "EnumParams.h"
-#include "Repeat.h"
+#include <boost/preprocessor.hpp>
 
 namespace detail {
 
 #define APPLYER_DEF(Z,N,DATA) \
     template<class T, class ApplyFunc> decltype(auto) StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
-        auto &&[ENUM_PARAMS(x, N)] = std::forward<T>(my_struct); \
-        return f(ENUM_PARAMS(x, N)); \
+        auto &&[BOOST_PP_ENUM_PARAMS(N, x)] = std::forward<T>(my_struct); \
+        return f(BOOST_PP_ENUM_PARAMS(N, x)); \
     } \
 
-    REPEAT(200, APPLYER_DEF, ~)
+    BOOST_PP_REPEAT(200, APPLYER_DEF, ~)
 #undef APPLYER_DEF
 }
 

@@ -3,6 +3,14 @@
 #include <type_traits>
 #include <utility>
 
+#if 1 
+
+#include <boost/pfr.hpp>
+
+// switch to sth more robust
+template<class T> struct StructMemberCount : boost::pfr::tuple_size<T> {};
+
+#else
 namespace detail
 {
     // 构造一个可以隐式转换为任意类型的类型
@@ -42,3 +50,4 @@ namespace detail
 }
 
 template<class T> struct StructMemberCount : detail::struct_member_count_impl2<T> {};
+#endif

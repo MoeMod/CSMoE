@@ -35,7 +35,7 @@ if(XASH_SDL)
 endif()
 
 find_package(LuaJit QUIET)
-if(LuaJit_FOUND) # we are using our own luajit and build from source.
+if(LuaJit_FOUND AND FALSE) # we are using our own luajit and build from source.
 	add_library(luajit_3p INTERFACE)
 	target_link_libraries(luajit_3p INTERFACE ${LUAJIT_LIBRARIES})
 	target_include_directories(luajit_3p INTERFACE ${LUAJIT_INCLUDE_DIR})
@@ -83,3 +83,6 @@ endif()
 add_library(qrcode INTERFACE)
 target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
 target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/preprocessor EXCLUDE_FROM_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/pfr EXCLUDE_FROM_ALL)

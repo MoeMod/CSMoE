@@ -16,3 +16,9 @@
 [submodule "3rdparty/luajit-cmake"]
 	path = 3rdparty/luajit-cmake
 	url = https://github.com/MoeMod/luajit-cmake
+[submodule "3rdparty/preprocessor"]
+	path = 3rdparty/preprocessor
+	url = https://github.com/boostorg/preprocessor
+[submodule "3rdparty/pfr"]
+	path = 3rdparty/pfr
+	url = https://github.com/boostorg/pfr/

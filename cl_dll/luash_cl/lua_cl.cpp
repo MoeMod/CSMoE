@@ -56,8 +56,12 @@ namespace cl
 		ImGuiUtils::LuaOpen_ImGuiUtils(L);
 #endif
 		luash::RegisterGlobal(L, "namespace", "cl");
+#ifdef CLIENT_DLL
 		luash::RegisterGlobal(L, "CLIENT_DLL", 1);
+#endif
+#ifdef CLIENT_WEAPONS
 		luash::RegisterGlobal(L, "CLIENT_WEAPONS", 1);
+#endif
 		LuaCL_OpenEngfuncLib(L);
 		LuaCL_OpenRenderLib(L);
 		LuaCL_OpenMobileLib(L);
@@ -192,6 +196,13 @@ namespace cl
 
 		errc = luaL_loadbufferx(L, reinterpret_cast<char*>(buffer), length, ModuleName, "bt");
 		// #3 = require function
+
+		if (errc)
+		{
+			const char* msg = lua_tostring(L, -1);
+			gEngfuncs.Con_Printf("%s Error: lua module (%s) loaded failed: %s\n", __FUNCTION__, ModuleName, msg);
+			return 0;
+		}
 
 		lua_pushvalue(L, 1);
 		// #4 = #1 = require path

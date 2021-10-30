@@ -188,6 +188,13 @@ namespace ui
 		errc = luaL_loadbufferx(L, reinterpret_cast<char*>(buffer), length, ModuleName, "bt");
 		// #3 = require function
 
+		if (errc)
+		{
+			const char* msg = lua_tostring(L, -1);
+			Con_Printf("%s Error: lua module (%s) loaded failed: %s\n", __FUNCTION__, ModuleName, msg);
+			return 0;
+		}
+
 		lua_pushvalue(L, 1);
 		// #4 = #1 = require path
 
