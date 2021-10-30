@@ -37,6 +37,7 @@ void MoveToState::OnEnter(CCSBot *me)
 		case CCSBot::FIND_TICKING_BOMB:
 		case CCSBot::DEFUSE_BOMB:
 		case CCSBot::MOVE_TO_LAST_KNOWN_ENEMY_POSITION:
+		case CCSBot::MOVE_TO_ATTACKER_POSITION:
 			route = FASTEST_ROUTE;
 			break;
 
@@ -64,6 +65,17 @@ void MoveToState::OnUpdate(CCSBot *me)
 		// TODO: Account for reaction time so we take some time to realized the enemy is dead
 		CBasePlayer *victim = static_cast<CBasePlayer *>(me->GetTaskEntity());
 		if (victim == NULL || !victim->IsAlive())
+		{
+			me->PrintIfWatched("The enemy I was chasing was killed - giving up.\n");
+			me->Idle();
+			return;
+		}
+	}
+	else if (me->GetTask() == CCSBot::MOVE_TO_ATTACKER_POSITION)
+	{
+		// TODO: Account for reaction time so we take some time to realized the enemy is dead
+		CBasePlayer* victim = static_cast<CBasePlayer*>(me->GetTaskEntity());
+		if (victim == NULL || !victim->IsAlive() || victim->m_bIsZombie)
 		{
 			me->PrintIfWatched("The enemy I was chasing was killed - giving up.\n");
 			me->Idle();

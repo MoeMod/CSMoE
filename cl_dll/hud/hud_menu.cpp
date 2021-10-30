@@ -313,6 +313,7 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 		case MOD_ZE:
 		case MOD_ZB4:
 		case MOD_ZBB:
+		case MOD_ZBZ:
 			// random weapon in zb mode, no need to buy
 			szCmd = "exec touch/buy_zb.cfg";
 			break;

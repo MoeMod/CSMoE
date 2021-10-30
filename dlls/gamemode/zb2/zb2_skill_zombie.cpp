@@ -280,10 +280,12 @@ namespace sv {
 		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 		m_flInvisiable = gpGlobals->time + 0.5s;
 
-		m_pPlayer->pev->rendermode = kRenderTransAlpha;
+		
 		m_pPlayer->pev->gravity = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.8 : 0.64;
-		m_pPlayer->pev->renderamt = 255.0;
-		m_pPlayer->pev->skin = 1;
+		m_pPlayer->pev->rendermode = kRenderTransAlpha;
+		m_pPlayer->pev->renderfx = kRenderFxNone;
+		m_pPlayer->pev->renderamt = 35;
+		m_pPlayer->pev->rendercolor = g_vecZero;
 
 		m_pPlayer->ResetMaxSpeed();
 
@@ -869,21 +871,26 @@ namespace sv {
 			{
 				m_iZombieSkillStatus = SKILL_STATUS_USED;
 
-				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
-				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
-				WRITE_BYTE(ZOMBIE_SKILL_PASS);
-				WRITE_BYTE(m_iZombieSkillStatus);
-				MESSAGE_END();
+				if (m_iZombieSkillStatus != m_iZombieSkillStatusStored)
+				{
+					MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+					WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+					WRITE_BYTE(ZOMBIE_SKILL_PASS);
+					WRITE_BYTE(m_iZombieSkillStatus);
+					MESSAGE_END();
+				}
 			}
 			else
 			{ 
 				m_iZombieSkillStatus = SKILL_STATUS_READY;
-
-				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
-				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
-				WRITE_BYTE(ZOMBIE_SKILL_PASS);
-				WRITE_BYTE(m_iZombieSkillStatus);
-				MESSAGE_END();
+				if (m_iZombieSkillStatus != m_iZombieSkillStatusStored)
+				{
+					MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+					WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+					WRITE_BYTE(ZOMBIE_SKILL_PASS);
+					WRITE_BYTE(m_iZombieSkillStatus);
+					MESSAGE_END();
+				}
 			}
 			
 		}
@@ -894,13 +901,18 @@ namespace sv {
 			else
 				m_iZombieSkillStatus = SKILL_STATUS_READY;
 
-			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
-			WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
-			WRITE_BYTE(ZOMBIE_SKILL_PASS);
-			WRITE_BYTE(m_iZombieSkillStatus);
-			MESSAGE_END();
+			if (m_iZombieSkillStatus != m_iZombieSkillStatusStored)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_PASS);
+				WRITE_BYTE(ZOMBIE_SKILL_PASS);
+				WRITE_BYTE(m_iZombieSkillStatus);
+				MESSAGE_END();
+			}
 		}
 			
+		m_iZombieSkillStatusStored = m_iZombieSkillStatus;
+
 		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
 			FireZombieSkill();
 	}
@@ -1346,13 +1358,20 @@ namespace sv {
 			if (m_flPercent >= 0.3)
 			{
 				m_iZombieSkillStatus = SKILL_STATUS_READY;
-				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
-				WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
-				WRITE_BYTE(ZOMBIE_SKILL_BOOSTER);
-				MESSAGE_END();
+
+				if (m_iZombieSkillStatus != m_iZombieSkillStatusStored)
+				{
+					MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+					WRITE_BYTE(ZB2_MESSAGE_SKILL_ICON_CHANGE);
+					WRITE_BYTE(ZOMBIE_SKILL_BOOSTER);
+					MESSAGE_END();
+				}
 
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "Tip: Can boost");
 			}
+
+			m_iZombieSkillStatusStored = m_iZombieSkillStatus;
+
 			if (m_flPercent = 1.0)
 			{
 				//MESSAGE blink

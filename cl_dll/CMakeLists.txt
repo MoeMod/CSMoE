@@ -191,6 +191,14 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_k1ases.cpp
 	../dlls/wpn_shared/z4b_m1887se.cpp
 	../dlls/wpn_shared/z4b_frequency1.cpp
+	../dlls/wpn_shared/wpn_balrog11.cpp
+	../dlls/wpn_shared/wpn_balrog11b.cpp
+	../dlls/wpn_shared/wpn_balrog11wc.cpp
+	../dlls/wpn_shared/knife_lance.cpp
+	../dlls/wpn_shared/wpn_m249ex.cpp
+	../dlls/wpn_shared/wpn_sfsmg.cpp
+	../dlls/wpn_shared/wpn_sfgun.cpp
+	../dlls/wpn_shared/wpn_sfmg.cpp
 	)
 
 set (HUD_SRCS

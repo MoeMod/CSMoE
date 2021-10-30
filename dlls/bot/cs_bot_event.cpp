@@ -289,6 +289,27 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 			}
 			break;
 		}
+		case EVENT_PLAYER_TOOK_DAMAGE:
+		{
+			if (!other)
+				break;
+			if (!player->m_bIsZombie)
+				break;
+			if (!m_bIsZombie)
+				break;
+			if (IsAttacking())
+				break;
+			if (GetDisposition() != ENGAGE_AND_INVESTIGATE && GetDisposition() != OPPORTUNITY_FIRE)
+				break;
+			if (GetTask() == MOVE_TO_ATTACKER_POSITION)
+				break;
+			if (GetTimeSinceLastSawEnemy() < 2.0s)
+				break;
+
+			SetTask(MOVE_TO_ATTACKER_POSITION, other);
+			MoveTo(&other->pev->origin);
+			break;
+		}
 		default:
 			break;
 	}

@@ -677,7 +677,8 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	{
 		if(!m_bIsZombie)
 			BloodSplat(ptr->vecEndPos, vecDir, ptr->iHitgroup, flDamage * 5);
-		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);			// a little surface blood.
+		SpawnBlood(ptr->vecEndPos, 180, flDamage);	
+		//SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage);			// a little surface blood.
 		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
 	}
 	// they hit a helmet
@@ -884,23 +885,20 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				m_bKilledByGrenade = true;
 		}
 
+#ifdef XASH_DEDICATED
+		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
+			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
+			WRITE_LONG((long)flDamage);
+			WRITE_SHORT(ENTINDEX(edict()));
+			WRITE_BYTE(m_LastHitGroup);
+			MESSAGE_END();
+		}
+#endif
 		LogAttack(pAttack, this, teamAttack, (int)flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 		fTookDamage = CBaseMonster::TakeDamage(pevInflictor, pevAttacker, (int)flDamage, bitsDamageType);
 
 		if (fTookDamage > 0)
 		{
-#ifdef XASH_DEDICATED
-			//gr
-			//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
-			if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
-				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
-				WRITE_LONG((long)flDamage);
-				WRITE_SHORT(ENTINDEX(edict()));
-				WRITE_BYTE(m_LastHitGroup);
-				MESSAGE_END();
-				//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
-			}
-#endif
 			CHalfLifeMultiplay *mp = g_pGameRules;
 
 			if (TheBots != NULL)
@@ -1052,18 +1050,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				{
 					flRatio *= 1.95;
 				}
-			}
+			}		
+		
+		CBaseEntity* pInflictor = GetClassPtr((CBaseEntity*)pevInflictor);
 
-			
-
-			
-		}
-		CBaseEntity* DmgEntity = GetClassPtr<CBaseEntity>(pevInflictor);
-		if (pAttack->m_pActiveItem)
-		{
-			Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
-
-		if (!Q_strcmp(STRING(DmgEntity->pev->classname), "molotov") && pev == pAttacker->pev)
+		if (!Q_strcmp(STRING(pInflictor->pev->classname), "molotov") && pev == pAttacker->pev)
 		{
 			if (g_pGameRules->IsTeamplay() && pAttack->m_iTeam == m_iTeam && !bAttackFFA)
 			{
@@ -1094,6 +1085,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			}
 			SetAnimation(PLAYER_LARGE_FLINCH);
 		}
+
+		Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
+
 		}
 	}
 
@@ -1140,6 +1134,15 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	else
 		Pain(m_LastHitGroup, false);
 
+#ifdef XASH_DEDICATED
+	if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
+		WRITE_LONG((long)flDamage);
+		WRITE_SHORT(ENTINDEX(edict()));
+		WRITE_BYTE(m_LastHitGroup);
+		MESSAGE_END();
+	}
+#endif
 	LogAttack(pAttack, this, teamAttack, flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 
 	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that
@@ -1148,18 +1151,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	if (fTookDamage > 0)
 	{
-#ifdef XASH_DEDICATED
-		//gr
-		//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sending \n");
-		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
-			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
-			WRITE_LONG((long)flDamage);
-			WRITE_SHORT(ENTINDEX(edict()));
-			WRITE_BYTE(m_LastHitGroup);
-			MESSAGE_END();
-			//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
-		}
-#endif
 		CHalfLifeMultiplay *mp = g_pGameRules;
 
 		if (TheBots != NULL)
@@ -2426,7 +2417,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				}
 				else if (FBitSet(pev->flags, FL_DUCKING))
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 					{
 						if (RANDOM_LONG(0, 1))
 							animDesired = LookupSequence("head_flinch_crouch_idle");
@@ -2443,7 +2434,7 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				}
 				else
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 					{
 						if (RANDOM_LONG(0, 1))
 							animDesired = LookupSequence("head_flinch_idle1");
@@ -2469,14 +2460,14 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				}
 				else if (FBitSet(pev->flags, FL_DUCKING))
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 						animDesired = LookupSequence("head_flinch_crouch_idle");
 					else
 						animDesired = LookupSequence("head_flinch_crouchrun");
 				}
 				else
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 						animDesired = LookupSequence("head_flinch_idle1");
 					else
 						animDesired = LookupSequence("head_flinch_run");
@@ -2494,14 +2485,14 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				}
 				else if (FBitSet(pev->flags, FL_DUCKING))
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 						animDesired = LookupSequence("gut_flinch_crouch_idle");
 					else
 						animDesired = LookupSequence("gut_flinch_crouchrun");
 				}
 				else
 				{
-					if (speed <= speedLimit)
+					if (speed == 0)
 						animDesired = LookupSequence("gut_flinch_idle1");
 					else
 						animDesired = LookupSequence("gut_flinch_run");
@@ -7106,14 +7097,14 @@ bool CBasePlayer::ReactToDeimosTail()
 	if (m_bIsZombie)
 		return false;
 
-	int enable_antidgaxe = 1;
+	int enable_antidgaxe = 0;
 
 	if (enable_antidgaxe)
 	{
 		CBasePlayerItem* pKnife = m_rgpPlayerItems[KNIFE_SLOT];
 		if (pKnife)
 		{
-			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx"))
+			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_lance") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx"))
 			{
 				RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
 
@@ -7140,8 +7131,8 @@ bool CBasePlayer::ReactToDeimosTail()
 			return true;
 		}
 	}
-
 	DropPlayerItem(STRING(pItem->pev->classname));
+	m_flNextAttack = UTIL_WeaponTimeBase() + 2.0s;
 
 	return true;
 }

@@ -32,14 +32,14 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(weapon_mg3, CMG3)
 
-static const int MG3_AMMO_GIVE = 200;
+const int MG3_AMMO_GIVE = 200;
 
 void CMG3::Spawn(void)
 {
 	pev->classname = MAKE_STRING("weapon_mg3");
 
 	Precache();
-	m_iId = WEAPON_P90;
+	m_iId = WEAPON_M249;
 	SET_MODEL(ENT(pev), "models/w_mg3.mdl");
 
 	m_iDefaultAmmo = MG3_AMMO_GIVE;
@@ -70,8 +70,8 @@ void CMG3::Precache(void)
 int CMG3::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556NatoBox";
-	p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+	p->pszAmmo1 = "762NatoBox";
+	p->iMaxAmmo1 = 200;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = MG3_AMMO_GIVE;
@@ -166,7 +166,7 @@ void CMG3::Reload(void)
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
 
-	if (DefaultReload( 400, M249_RELOAD, 4.8s))
+	if (DefaultReload(200, M249_RELOAD, 4.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

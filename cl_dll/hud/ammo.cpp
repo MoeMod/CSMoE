@@ -1352,6 +1352,9 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	if( !m_pWeapon )
 		return;
 
+	if (!strcmp(m_pWeapon->szName, "weapon_huntbow"))
+		return;
+
 	weaponid = m_pWeapon->iId;
 
 	if(    weaponid == WEAPON_AWP 

@@ -45,6 +45,9 @@ enum event_effect
 	EVENT_BUFFSG552EX,
 	EVENT_DGAXE,
 	EVENT_DUALSWORD_FX,
+	EVENT_HUNTBOW,
+	EVENT_BALROG11_FOLLOW_ENTITY,
+	EVENT_LANCE
 };
 
 enum buffsg552ex_slash_e
@@ -55,6 +58,66 @@ enum buffsg552ex_slash_e
 	EF_SLASH_BIG,
 };
 
+void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
+{
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
+	if (!ent)
+		return;
+	static int iModelIndex;
+	if(iType)
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
+	else
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+
+	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
+	if (pEnt)
+	{
+		pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEKILL;
+		pEnt->entity.angles.y = gEngfuncs.pfnRandomFloat(-512, 511);
+		pEnt->entity.angles.x = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->entity.angles.z = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->flags |= FTENT_ROTATE;
+		pEnt->entity.curstate.scale = 0.01;
+		pEnt->entity.baseline.fuser1 = 0.3;
+		pEnt->entity.curstate.iuser2 = iType;
+	
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 40.0f;
+		pEnt->entity.curstate.renderfx = kRenderFxNone;
+
+		pEnt->entity.baseline.origin = Vector(0, 0, 0);
+		pEnt->entity.baseline.iuser1 = ent->index;
+		pEnt->entity.curstate.iuser1 = 0;
+		pEnt->clientIndex = ent->curstate.owner;
+
+		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+			if (ent->entity.baseline.fuser1 > ent->entity.curstate.scale)
+				ent->entity.curstate.scale += 0.03;
+
+			cl_entity_t* pEntity;
+			pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
+
+			if (!pEntity)
+			{
+				ent->die = currenttime;
+				return;
+			}
+
+			if (ent->die - currenttime <= frametime * 100 && !ent->entity.curstate.iuser1)
+			{
+				if ((ent->entity.origin - pEntity->origin).Length() < 5)
+					return;
+				CreateBalrog11CannonSingleProjectile(ent, pEntity->origin, pEntity->index, ent->entity.curstate.iuser2);
+				ent->entity.curstate.iuser1 = 1;
+			}
+		};
+		pEnt->hitcallback = [](tempent_s* ent, pmtrace_s* ptr) {
+			ent->entity.baseline.origin *= 0.01f;
+			ent->entity.curstate.framerate = 60;
+
+		};
+	}
+}
 
 void EV_WpnEffects(event_args_s* args)
 {
@@ -73,288 +136,389 @@ void EV_WpnEffects(event_args_s* args)
 
 	AngleVectors(angles, forward, right, up);
 
-		switch (args->iparam1)
+	switch (args->iparam1)
+	{
+	case EVENT_GATLINGRX:
+	{
+		vec3_t vStartOrigin;
+		VectorCopy(args->origin, vStartOrigin);
+
+		for (int i = 0; i < 2; i++)
 		{
-		case EVENT_GATLINGRX:
-		{
-			vec3_t vStartOrigin;
-			VectorCopy(args->origin, vStartOrigin);
+			float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
+			vec3_t vEndOrigin, vBalOrigin, vVelocity;
+			VectorCopy(vStartOrigin, vEndOrigin);
+			vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
+			vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
+			vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
+			VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
+			VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
 
-			for (int i = 0; i < 2; i++)
-			{
-				float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
-				vec3_t vEndOrigin, vBalOrigin, vVelocity;
-				VectorCopy(vStartOrigin, vEndOrigin);
-				vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
-				vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
-				vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
-				VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
-				VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_gatlingex_star.spr", false);
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.baseline.origin = vVelocity;
+			pEnt->entity.curstate.framerate = 2.0;
+			pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+			pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
 
-				model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_gatlingex_star.spr", false);
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.baseline.origin = vVelocity;
-				pEnt->entity.curstate.framerate = 2.0;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
-				pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
-
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					float gravity = -frametime * 140.0;
-					pEnt->entity.baseline.origin[2] += gravity;
-				};
-
-				pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-					pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				};
-			}
-
-			break;
-		}
-		case EVENT_DUALSWORD:
-		{
-				vec3_t vStartOrigin;
-				VectorCopy(args->angles, angles);
-				VectorCopy(args->origin, vStartOrigin);
-
-				const char* szSprite;
-				if (args->bparam1)
-				{
-					if (args->bparam2)
-						szSprite = "sprites/leaf01_dualsword.spr";
-					else
-						szSprite = "sprites/leaf02_dualsword.spr";
-				}
-				else
-				{
-					if (args->bparam2)
-						szSprite = "sprites/petal01_dualsword.spr";
-					else
-						szSprite = "sprites/petal02_dualsword.spr";
-				}
-
-
-
-				for (int i = 0; i < 10; i++)
-				{
-					angles[0] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
-					angles[1] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
-					angles[2] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
-					float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
-					vec3_t vEndOrigin, vBalOrigin, vVelocity;
-					VectorCopy(vStartOrigin, vEndOrigin);
-					vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
-					vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
-					vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
-					VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
-					VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
-
-					model_s* pModel = IEngineStudio.Mod_ForName(szSprite, false);
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vStartOrigin, pModel);
-					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.curstate.rendermode = kRenderNormal;
-					pEnt->entity.baseline.origin = vVelocity;
-					pEnt->entity.angles = angles;
-					pEnt->entity.curstate.framerate = 2.0;
-					pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
-					pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
-					/*gEngfuncs.Con_Printf("vVelocity is x= %f ,y= %f ,z=%f\n", vVelocity[0], vVelocity[1], vVelocity[2]);
-					gEngfuncs.Con_Printf("angles is x= %f ,y= %f ,z=%f\n", angles[0], angles[1], angles[2]);*/
-
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-						float gravity = -frametime * 96.0;
-						pEnt->entity.baseline.origin[2] += gravity;
-						if (pEnt->entity.baseline.origin[1])
-							pEnt->entity.angles -= Vector(6.0, 6.0, 6.0);
-					};
-					pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-						pEnt->entity.baseline.origin = Vector(0, 0, 0);
-
-					};
-				}
-
-			
-			break;
-		}
-		case EVENT_VOIDPISTOL:
-		{
-			vec3_t vStartOrigin;
-			VectorCopy(args->origin, vStartOrigin);
-
-			for (int i = 0; i < 3; i++)
-			{
-				float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
-				vec3_t vEndOrigin, vBalOrigin, vVelocity;
-				VectorCopy(vStartOrigin, vEndOrigin);
-				vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
-				vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
-				vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
-				VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
-				VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
-
-				model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_star.spr", false);
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-				pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->entity.curstate.rendermode = kRenderTransAdd;
-				pEnt->entity.baseline.origin = vVelocity;
-				pEnt->entity.curstate.framerate = 2.0;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);	
-				pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
-
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					float gravity = -frametime * 300.0;
-					pEnt->entity.baseline.origin[2] += gravity;
-				};
-
-				pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
-					pEnt->entity.baseline.origin = Vector(0, 0, 0);
-				};
-			}
-
-			break;
-		}
-		case EVENT_BUFFSG552EX:
-		{
-			static const char* SLASH_SOUND[] =
-			{
-				"weapons/buffsg552ex_claw_1.wav", "weapons/buffsg552ex_claw_2.wav", "weapons/buffsg552ex_claw_3.wav", "weapons/buffsg552ex_claw_4.wav"
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				float gravity = -frametime * 140.0;
+				pEnt->entity.baseline.origin[2] += gravity;
 			};
 
-			model_s* pModel;
-			switch (args->iparam2)
-			{
-			case EF_SLASH1:
-			{
-				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash1.spr", false); break;
-			}
-			case EF_SLASH2:
-			{
-				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash2.spr", false); break;
-			}
-			case EF_SLASH3:
-			{
-				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash3.spr", false); break;
-			}
-			case EF_SLASH_BIG:
-			{
-				pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash_big.spr", false); break;
-			}
-			default: return;
-			}
+			pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+				pEnt->entity.baseline.origin = Vector(0, 0, 0);
+			};
+		}
+
+		break;
+	}
+	case EVENT_DUALSWORD:
+	{
+		vec3_t vStartOrigin;
+		VectorCopy(args->angles, angles);
+		VectorCopy(args->origin, vStartOrigin);
+
+		const char* szSprite;
+		if (args->bparam1)
+		{
+			if (args->bparam2)
+				szSprite = "sprites/leaf01_dualsword.spr";
+			else
+				szSprite = "sprites/leaf02_dualsword.spr";
+		}
+		else
+		{
+			if (args->bparam2)
+				szSprite = "sprites/petal01_dualsword.spr";
+			else
+				szSprite = "sprites/petal02_dualsword.spr";
+		}
+
+
+
+		for (int i = 0; i < 10; i++)
+		{
+			angles[0] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
+			angles[1] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
+			angles[2] = gEngfuncs.pfnRandomFloat(-90.0, 90.0);
+			float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
+			vec3_t vEndOrigin, vBalOrigin, vVelocity;
+			VectorCopy(vStartOrigin, vEndOrigin);
+			vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
+			vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
+			vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
+			VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
+			VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
+
+			model_s* pModel = IEngineStudio.Mod_ForName(szSprite, false);
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vStartOrigin, pModel);
+			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.rendermode = kRenderNormal;
+			pEnt->entity.baseline.origin = vVelocity;
+			pEnt->entity.angles = angles;
+			pEnt->entity.curstate.framerate = 2.0;
+			pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+			pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
+			/*gEngfuncs.Con_Printf("vVelocity is x= %f ,y= %f ,z=%f\n", vVelocity[0], vVelocity[1], vVelocity[2]);
+			gEngfuncs.Con_Printf("angles is x= %f ,y= %f ,z=%f\n", angles[0], angles[1], angles[2]);*/
+
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				float gravity = -frametime * 96.0;
+				pEnt->entity.baseline.origin[2] += gravity;
+				if (pEnt->entity.baseline.origin[1])
+					pEnt->entity.angles -= Vector(6.0, 6.0, 6.0);
+			};
+			pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+				pEnt->entity.baseline.origin = Vector(0, 0, 0);
+
+			};
+		}
+
+
+		break;
+	}
+	case EVENT_VOIDPISTOL:
+	{
+		vec3_t vStartOrigin;
+		VectorCopy(args->origin, vStartOrigin);
+
+		for (int i = 0; i < 3; i++)
+		{
+			float flspeed = gEngfuncs.pfnRandomFloat(5.0, 80.0);
+			vec3_t vEndOrigin, vBalOrigin, vVelocity;
+			VectorCopy(vStartOrigin, vEndOrigin);
+			vEndOrigin[0] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);//Caculate velocity
+			vEndOrigin[1] += gEngfuncs.pfnRandomFloat(-400.0, 400.0);
+			vEndOrigin[2] += gEngfuncs.pfnRandomFloat(-50.0, 500.0);
+			VectorSubtract(vEndOrigin, vStartOrigin, vBalOrigin);
+			VectorScale(vBalOrigin, sqrt(flspeed * flspeed / (vBalOrigin[0] * vBalOrigin[0] + vBalOrigin[1] * vBalOrigin[1] + vBalOrigin[2] * vBalOrigin[2])), vVelocity);
+
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_blackhole_star.spr", false);
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEWORLD;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.baseline.origin = vVelocity;
+			pEnt->entity.curstate.framerate = 2.0;
+			pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.11, 0.13);
+			pEnt->die = gHUD.m_flTime + gEngfuncs.pfnRandomFloat(1.2, 2.2);
+
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				float gravity = -frametime * 300.0;
+				pEnt->entity.baseline.origin[2] += gravity;
+			};
+
+			pEnt->hitcallback = [](tempent_s* pEnt, pmtrace_s* ptr) {
+				pEnt->entity.baseline.origin = Vector(0, 0, 0);
+			};
+		}
+
+		break;
+	}
+	case EVENT_BUFFSG552EX:
+	{
+		static const char* SLASH_SOUND[] =
+		{
+			"weapons/buffsg552ex_claw_1.wav", "weapons/buffsg552ex_claw_2.wav", "weapons/buffsg552ex_claw_3.wav", "weapons/buffsg552ex_claw_4.wav"
+		};
+
+		model_s* pModel;
+		switch (args->iparam2)
+		{
+		case EF_SLASH1:
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash1.spr", false); break;
+		}
+		case EF_SLASH2:
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash2.spr", false); break;
+		}
+		case EF_SLASH3:
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash3.spr", false); break;
+		}
+		case EF_SLASH_BIG:
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_buffsg552ex_slash_big.spr", false); break;
+		}
+		default: return;
+		}
+		if (pModel)
+		{
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, SLASH_SOUND[args->iparam2], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->flags |= FTENT_SPRANIMATE;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0;
+
+			pEnt->entity.curstate.rendermode = kRenderTransAlpha;
+			pEnt->entity.curstate.scale = 0.5;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->die = gHUD.m_flTime + 0.7;
+
+		}
+		break;
+	}
+	case EVENT_DGAXE:
+	{
+		if (!args->iparam2)
+		{
+			model_s* pModel = IEngineStudio.Mod_ForName("models/ef_scorpion_hole.mdl", false);
 			if (pModel)
 			{
-				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_STATIC, SLASH_SOUND[args->iparam2], VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				pEnt->entity.curstate.sequence = 1;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.framerate = 1.0;
+				pEnt->tentOffset = Vector(0, 0, -32);
+				pEnt->die = gHUD.m_flTime + 0.69;
+				pEnt->clientIndex = idx;
+				pEnt->flags |= FTENT_PLYRATTACHMENT;
+			}
+
+		}
+		else if(args->iparam2 == 1)
+		{
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_dgaxe_smoke.spr", false);
+			if (pModel)
+			{
+				//origin[2] += 32;
 				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 				pEnt->flags |= FTENT_SPRANIMATE;
 				pEnt->entity.curstate.frame = 0;
 				pEnt->entity.curstate.framerate = 30.0;
+				pEnt->tentOffset = Vector(0, 0, -32);
 
-				pEnt->entity.curstate.rendermode = kRenderTransAlpha;
-				pEnt->entity.curstate.scale = 0.5;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.scale = 1.0;
 				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 0.7;
-	
+				pEnt->die = gHUD.m_flTime + 0.67;
+
 			}
-			return;
 		}
-		case EVENT_DGAXE:
+		else
 		{
-			if (args->bparam2)
+			model_s* pModel;
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_dgaxe_change.spr", false);
+			if (pModel)
 			{
-				struct model_s* pModel = IEngineStudio.Mod_ForName("models/ef_scorpion_hole.mdl", false);
-				if (pModel)
-				{
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->entity.curstate.sequence = 1;
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 1.0;
-					pEnt->tentOffset = Vector(0, 0, -32);
-					pEnt->die = gHUD.m_flTime + 0.69;
-					pEnt->clientIndex = idx;
-					pEnt->flags |= FTENT_PLYRATTACHMENT;
-				}
+				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+				TEMPENTITY* pEntAttach1 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], pModel);
+				pEntAttach1->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEntAttach1->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
+				pEntAttach1->entity.curstate.frame = 0;
+				pEntAttach1->entity.curstate.framerate = 30.0;
+				pEntAttach1->entity.curstate.rendermode = kRenderTransAdd;
+				pEntAttach1->entity.curstate.renderfx = kRenderFxNone;
+				pEntAttach1->entity.curstate.scale = 0.09;
+				pEntAttach1->entity.curstate.renderamt = 255;
+				pEntAttach1->die = gHUD.m_flTime + 0.5;			
 
+				pEntAttach1->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = viewent->attachment[1];
+				};
+
+				TEMPENTITY* pEntAttach2 = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[2], pModel);
+				pEntAttach2->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEntAttach2->flags |= FTENT_CLIENTCUSTOM | FTENT_PERSIST | FTENT_SPRANIMATE;
+				pEntAttach2->entity.curstate.frame = 0;
+				pEntAttach2->entity.curstate.framerate = 30.0;
+				pEntAttach2->entity.curstate.rendermode = kRenderTransAdd;
+				pEntAttach2->entity.curstate.renderfx = kRenderFxNone;
+				pEntAttach2->entity.curstate.scale = 0.11;
+				pEntAttach2->entity.curstate.renderamt = 255;
+				pEntAttach2->die = gHUD.m_flTime + 0.5;
+			
+				pEntAttach2->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					pEnt->entity.origin = viewent->attachment[2];
+				};
 			}
-			else
-			{
-				model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_dgaxe_smoke.spr", false);
-				if (pModel)
-				{
-					origin[2] += 32;
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->flags |= FTENT_SPRANIMATE;
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
 
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.scale = 1.0;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->die = gHUD.m_flTime + 0.67;
-
-				}
-			}
 			break;
 		}
-		case EVENT_DUALSWORD_FX:
+		break;
+	}
+	case EVENT_DUALSWORD_FX:
+	{
+		if (!EV_IsLocal(idx))
+			break;
+
+		auto viewent = gEngfuncs.GetViewModel();
+		model_s* pModel = IEngineStudio.Mod_ForName("models/dualswordfx.mdl", false);
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+
+		pEnt->entity.curstate.body = viewent->curstate.body;
+		pEnt->entity.curstate.frame = 0.0f;
+		pEnt->entity.curstate.framerate = 1.0f;
+		pEnt->entity.curstate.animtime = gHUD.m_flTime;
+		pEnt->entity.curstate.sequence = args->iparam2;
+		pEnt->tentOffset = Vector(0, 0, 0);
+		pEnt->bounceFactor = 3;	// ??
+		pEnt->fadeSpeed = 512;
+		pEnt->frameMax = 31;
+
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 255;
+		pEnt->entity.baseline.angles = Vector(0, 0, 0);
+
+		if (args->iparam2 != 3)
 		{
-			if (!EV_IsLocal(idx))
-				break;
+			pEnt->die = gHUD.m_flTime + 1.0;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+				pEnt->entity.origin = viewent->origin;
+				pEnt->entity.angles = viewent->angles;
+				if (currenttime > pEnt->entity.curstate.fuser1)
+					pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1) * 255.0f;
+			};
+		}
+		else
+		{
+			pEnt->die = gHUD.m_flTime + 1.5;
+			pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+				pEnt->entity.origin = viewent->origin;
+				pEnt->entity.angles = viewent->angles;
+				if (currenttime > pEnt->entity.curstate.fuser1 + 1.0)
+					pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1 - 1.0) * 2.0f * 255.0f;
+			};
+		}
 
-			auto viewent = gEngfuncs.GetViewModel();
-			model_s* pModel = IEngineStudio.Mod_ForName("models/dualswordfx.mdl", false);
-			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
 
-			pEnt->entity.curstate.body = viewent->curstate.body;
-			pEnt->entity.curstate.frame = 0.0f;
-			pEnt->entity.curstate.framerate = 1.0f;
-			pEnt->entity.curstate.animtime = gHUD.m_flTime;
-			pEnt->entity.curstate.sequence = args->iparam2;
-			pEnt->tentOffset = Vector(0, 0, 0);
-			pEnt->bounceFactor = 3;	// ??
-			pEnt->fadeSpeed = 512;
-			pEnt->frameMax = 31;
+		pEnt->clientIndex = idx;
+		pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+		pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_PERSIST;
 
+		break;
+	}
+	case EVENT_HUNTBOW:
+	{
+		if (args->bparam1)
+		{
+			idx = gEngfuncs.GetLocalPlayer()->index;
+			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(idx);
+			if (pPlayer)
+			{
+				for (int i = 1; i < 33; i++)
+				{
+					if (i == idx)
+						continue;
+
+					cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(i);
+					if (!pEnt)
+						continue;
+
+					float fDelta = (pPlayer->origin - pEnt->origin).Length();
+
+					if (fDelta < 1500)
+						pEnt->curstate.renderfx = kRenderFxWallHack;
+					else
+						pEnt->curstate.renderfx = kRenderFxNone;
+
+				}
+			}
+		}
+		break;
+	}
+	case EVENT_BALROG11_FOLLOW_ENTITY:
+	{
+		CreateBalrog11CannonSingleProjectile(NULL, args->origin, idx, args->iparam2);
+		break;
+	}
+	case EVENT_LANCE:
+	{
+		model_s* pModel;
+		pModel = IEngineStudio.Mod_ForName("sprites/ef_lance_cockpung.spr", false);
+		if (pModel)
+		{
+			gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_AUTO, "weapons/lance_slash3_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			cl_entity_t* viewent = gEngfuncs.GetViewModel();	
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
+			pEnt->flags |= FTENT_SPRANIMATE;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0;
+			pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+			pEnt->entity.curstate.solid = SOLID_TRIGGER;
 			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.scale = 0.5;
 			pEnt->entity.curstate.renderamt = 255;
-			pEnt->entity.baseline.angles = Vector(0, 0, 0);
-
-			if (args->iparam2 != 3)
-			{
-				pEnt->die = gHUD.m_flTime + 1.0;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->origin;
-					pEnt->entity.angles = viewent->angles;
-					if (currenttime > pEnt->entity.curstate.fuser1)
-						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1) * 255.0f;
-				};
-			}
-			else
-			{
-				pEnt->die = gHUD.m_flTime + 1.5;
-				pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					cl_entity_t* viewent = gEngfuncs.GetViewModel();
-					pEnt->entity.origin = viewent->origin;
-					pEnt->entity.angles = viewent->angles;
-					if (currenttime > pEnt->entity.curstate.fuser1 + 1.0)
-						pEnt->entity.curstate.renderamt = 255 - (currenttime - pEnt->entity.curstate.fuser1 - 1.0) * 2.0f * 255.0f;
-				};
-			}
-
-
-			pEnt->clientIndex = idx;
-			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-			pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_FADEOUT | FTENT_PERSIST;
-
-			break;
+			pEnt->die = gHUD.m_flTime + 0.5;
 		}
-		default:break;
-		}
+		
+		break;
+	}
+	default:
+		break;
+	}
 }
+
 }

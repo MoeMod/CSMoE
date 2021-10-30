@@ -32,6 +32,7 @@ public:
 #endif
 	void WeaponIdle() override;
 	int GetCorrectedAnim(int sequence);
+	void AddKickRateToLineTargets(Vector vecSrc, Vector vecDir);
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

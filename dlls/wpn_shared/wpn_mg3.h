@@ -41,6 +41,9 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 		const char *GetCSModelName() override { return "models/w_mg3.mdl"; }
+#ifndef CLIENT_DLL
+		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
+#endif
 
 public:
 	void MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

@@ -60,7 +60,7 @@ int CSkull5::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556az";
-	p->iMaxAmmo1 = 120;
+	p->iMaxAmmo1 = 240;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = SKULL5_MAX_CLIP;

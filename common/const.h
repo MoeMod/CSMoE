@@ -741,7 +741,8 @@ enum
 	kRenderFxDeadPlayer,		// kRenderAmt is the player index
 	kRenderFxExplode,			// Scale up really big!
 	kRenderFxGlowShell,			// Glowing Shell
-	kRenderFxClampMinScale		// Keep this sprite from getting very small (SPRITES only!)
+	kRenderFxClampMinScale,		// Keep this sprite from getting very small (SPRITES only!)
+	kRenderFxWallHack			//Huntbow only
 };
 
 typedef int		func_t;

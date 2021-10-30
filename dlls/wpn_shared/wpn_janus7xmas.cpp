@@ -34,17 +34,17 @@ namespace sv {
 
 	LINK_ENTITY_TO_CLASS(weapon_janus7xmas, CJanus7xmas)
 
-		static const int MG3_AMMO_GIVE = 200;
+	const int JANUS7_AMMO_GIVE = 200;
 
 	void CJanus7xmas::Spawn(void)
 	{
 		pev->classname = MAKE_STRING("weapon_janus7xmas");
 
 		Precache();
-		m_iId = WEAPON_P90;
+		m_iId = WEAPON_M249;
 		SET_MODEL(ENT(pev), "models/w_janus7xmas.mdl");
 
-		m_iDefaultAmmo = MG3_AMMO_GIVE;
+		m_iDefaultAmmo = JANUS7_AMMO_GIVE;
 		m_flAccuracy = 0.2;
 		m_iShotsCount = 0;
 		m_iShotsFired = 0;
@@ -78,7 +78,7 @@ namespace sv {
 		p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = MG3_AMMO_GIVE;
+		p->iMaxClip = JANUS7_AMMO_GIVE;
 		p->iSlot = 0;
 		p->iPosition = 4;
 		p->iId = m_iId = WEAPON_M249;

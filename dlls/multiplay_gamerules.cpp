@@ -4773,6 +4773,7 @@ void SV_Start_VoteMaps()
 
 void CHalfLifeMultiplay::LoadRandomMaps()
 {
+	g_flResetTime = gpGlobals->time;
 	static bool fFirstTime = true;
 
 	if (fFirstTime) {

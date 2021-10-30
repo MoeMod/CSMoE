@@ -109,6 +109,7 @@ void CSGameState::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity 
 	case EVENT_CTS_WIN:
 	case EVENT_ROUND_DRAW:
 		m_isRoundOver = true;
+		m_owner->SetKiller(NULL);
 		break;
 	default:
 		break;

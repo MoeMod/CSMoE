@@ -216,6 +216,15 @@ void CC4::PrimaryAttack(void)
 				WRITE_BYTE(1);
 				MESSAGE_END();
 				UTIL_ClientPrintAll(HUD_PRINTCENTER, "#Bomb_Planted");
+				if (TheBots)
+				{
+					TheBots->OnEvent(EVENT_BOMB_PLANTED, m_pPlayer, pGrenade);
+				}
+
+				if (TheCareerTasks && g_pGameRules->IsCareer() && !m_pPlayer->IsBot())
+				{
+					TheCareerTasks->HandleEvent(EVENT_BOMB_PLANTED, m_pPlayer);
+				}
 
 				UTIL_LogPrintf("\"%s<%i><%s><TERRORIST>\" triggered \"Planted_The_Bomb\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
 				g_pGameRules->m_bBombDropped = false;

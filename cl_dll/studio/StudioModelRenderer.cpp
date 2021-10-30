@@ -1303,6 +1303,13 @@ void CStudioModelRenderer::StudioRenderModel(float *lightdir)
 		StudioRenderFinal();
 	}
 
+	if (iSaveRenderFx == kRenderFxWallHack)
+	{
+		m_pCurrentEntity->curstate.renderfx = kRenderFxWallHack;
+
+		IEngineStudio.SetForceFaceFlags(STUDIO_NF_FLATSHADE);
+		StudioRenderFinal();
+	}
 
 	m_pCurrentEntity->curstate.rendermode = iSaveRenderMode;
 	m_pCurrentEntity->curstate.renderfx = iSaveRenderFx;

@@ -421,7 +421,7 @@ int CHudRadarLegacy::Draw(float flTime)
 	else if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
 	{
 		// draw hostages for CT
-		if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
+		if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 		{
 			for (int i = 0; i < MAX_HOSTAGES; i++)
 			{

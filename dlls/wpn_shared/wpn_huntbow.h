@@ -50,9 +50,10 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Holster(int skiplocal) override;
+	void ItemPostFrame() override;
 #ifndef CLIENT_DLL
 	Vector Get_ShootPosition(CBaseEntity* pevAttacker, Vector Start, int* bHit);
-	void ItemPostFrame() override;
+	
 	void RadiusDamage(Vector vecAiming, float flDamage, float flRadius);
 	void ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float flAngleDegrees, entvars_t* pevPlayer, int m_iChargeState);
 	Vector CalcPositon(Vector vecSrc, Vector vecDir, int &bHit, int &iTarget);
@@ -93,6 +94,7 @@ private:
 	int m_iMode;
 	int m_iChargeState;
 	int m_iChargeSound;
+	int m_CrossHairStateStored;
 	int m_CrossHairState;
 	time_point_t m_flTimeCheckCharge;
 	time_point_t m_flNextTimeCheck;

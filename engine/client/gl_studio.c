@@ -2321,6 +2321,14 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				cl[3] = alpha;
 			}
 
+			if (RI.currententity->curstate.renderfx == kRenderFxWallHack) //kRenderWallHack
+			{
+				cl[0] = alpha;
+				cl[1] = 0;
+				cl[2] = 0;
+				cl[3] = 255;
+			}
+
 			Q_memcpy( g_xarraycolor[g_nNumArrayVerts], cl, sizeof(cl) );
 
 			av = g_xformverts[ptricmds[0]];
@@ -2442,6 +2450,23 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
+		}
+
+		if (RI.currententity->curstate.renderfx == kRenderFxWallHack) {
+			GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
+			pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+			if (g_nForceFaceFlags & STUDIO_NF_FLATSHADE) {
+				alpha = 1.0f;
+				pglDepthFunc(GL_LEQUAL);  //           //draw front first						
+				pglDepthMask(GL_TRUE);
+			}
+			else {
+
+				alpha = 0.5f;
+				pglDepthFunc(GL_GEQUAL);
+				pglDepthMask(GL_FALSE);
+			}
 		}
 
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
@@ -3869,6 +3894,16 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		int	gl_texturenum = 0;
 		do
 		{
+			if (Q_strstr(mod->name, "balrog11b"))
+			{
+				sprintf(texname, "models/texture/@balrog11b_%s.bmp", name);
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+					break;
+				}
+			}
+
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{

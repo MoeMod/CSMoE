@@ -306,6 +306,7 @@ void CHudScoreBoardLegacy::Reset(void)
 		m_iCTTextIndex = m_iText_Kill;
 		break;
 	}
+	case MOD_ZBZ:
 	case MOD_ZB3:
 	case MOD_ZB2:
 	case MOD_ZB1:

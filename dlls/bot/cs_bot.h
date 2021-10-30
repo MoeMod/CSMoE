@@ -224,6 +224,7 @@ public:
 		MOVE_TO_SNIPER_SPOT,
 		SNIPING,
 
+		MOVE_TO_ATTACKER_POSITION,
 		NUM_TASKS
 	};
 
@@ -443,6 +444,10 @@ public:
 	void AdjustSafeTime();							// called when enemy seen to adjust safe time for this round
 	void EXPORT BotTouch(CBaseEntity *other);
 	bool HasAnyAmmo(CBasePlayerWeapon *weapon) const;
+
+
+	CBaseEntity* GetKiller();
+	void SetKiller(CBaseEntity* enemy);
 
 private:
 	friend class CCSBotManager;
@@ -788,6 +793,8 @@ private:
 	void StartSaveProcess();
 	void UpdateSaveProcess();
 	void StartNormalProcess();
+
+	mutable EHANDLE m_killer;				// my killer enemy
 };
 
 // Inlines
@@ -1200,6 +1207,11 @@ inline bool CCSBot::IsNotMoving() const
 inline bool CCSBot::HasAnyAmmo(CBasePlayerWeapon *weapon) const
 {
 	return (weapon->m_iClip != 0 || m_rgAmmo[weapon->m_iPrimaryAmmoType] > 0);
+}
+
+inline CBaseEntity* CCSBot::GetKiller()
+{
+	return m_killer;
 }
 
 class CollectRetreatSpotsFunctor

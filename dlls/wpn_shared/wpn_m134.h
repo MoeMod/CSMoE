@@ -50,6 +50,9 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return {350.0f, 250.0f, 300.0f, 100.0f, 0.6f}; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
+#endif
 
 public:
 	void M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

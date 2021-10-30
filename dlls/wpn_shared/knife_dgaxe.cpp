@@ -59,7 +59,7 @@ namespace sv {
 
 		void Skill()
 		{
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, (int)RANDOM_LONG(0, 3), TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 1, TRUE, FALSE);
 			if (m_iSkill == 1)
 				SetThink(&CDgaxeSummon::Skill2OnStart);	//tuoluoren
 			else
@@ -75,7 +75,6 @@ namespace sv {
 			pev->framerate = 1.0;
 			m_iState = ATTACK1_START;
 			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill1.wav", VOL_NORM, ATTN_NORM);
-			//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usDgaxe, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 
 			SetThink(&CDgaxeSummon::Skill1OnEnd);
 			pev->nextthink = gpGlobals->time + 0.36s;
@@ -104,7 +103,6 @@ namespace sv {
 				WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
 				MESSAGE_END();
 
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usDgaxe, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 			}
 			RadiusDamage(pev->origin, m_SkillDamage, TRUE, m_freq);
 			if (m_freq == 40)
@@ -125,7 +123,6 @@ namespace sv {
 			pev->framerate = 1.0;
 			m_iState = ATTACK2_START;
 			EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill2.wav", VOL_NORM, ATTN_NORM);
-			//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usDgaxe, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 
 			SetThink(&CDgaxeSummon::Skill2OnLoop);
 			pev->nextthink = gpGlobals->time + 0.36s;
@@ -142,7 +139,6 @@ namespace sv {
 				m_freq = 40;
 				m_flLoopTime = gpGlobals->time + 6.8s;
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill2_exp.wav", VOL_NORM, ATTN_NORM);
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usDgaxe, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 			}
 			RadiusDamage(pev->origin, m_SkillDamage, TRUE, m_freq);
 
@@ -170,7 +166,6 @@ namespace sv {
 				pev->framerate = 1.0;
 				m_iState = ATTACK2_END;
 				m_flLoopTime = gpGlobals->time + 0.33s;
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usDgaxe, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 			}
 			pev->renderamt -= 4;
 			pev->nextthink = gpGlobals->time + 0.01s;
@@ -276,8 +271,9 @@ namespace sv {
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("sprites/ef_dgaxe_explo.spr");		
-			PRECACHE_MODEL("models/dgaxe_summon.mdl");
+			PRECACHE_MODEL("sprites/ef_dgaxe_explo.spr");	
+			PRECACHE_MODEL("sprites/ef_dgaxe_smoke.spr");
+			PRECACHE_MODEL("models/dgaxe_summon.mdl");	
 		}
 
 		float m_SkillDamage;
@@ -387,7 +383,8 @@ namespace sv {
 			PRECACHE_MODEL("sprites/muzzleflash202.spr");
 			PRECACHE_MODEL("sprites/muzzleflash203.spr");
 			PRECACHE_MODEL("sprites/muzzleflash204.spr");
-		
+			PRECACHE_MODEL("sprites/ef_dgaxe_change.spr");
+				
 			PRECACHE_SOUND("weapons/dgaxe_combo.wav");
 			PRECACHE_SOUND("weapons/dgaxe_ready.wav");
 
@@ -419,6 +416,12 @@ namespace sv {
 			m_iComboState = DGAXE_COMBO_IDLE;
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_pPlayer->m_bShieldDrawn = false;
+#ifndef CLIENT_DLL
+			MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+			WRITE_BYTE(0);
+			WRITE_BYTE(m_CrossHairState);
+			MESSAGE_END();
+#endif
 			if (m_flTimeHostler != invalid_time_point)
 			{
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.33s;
@@ -426,8 +429,11 @@ namespace sv {
 			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 100)
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = 100;
 
-			if(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 && m_iHolsterAmmo < 50)
+			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 && m_iHolsterAmmo < 50)
+			{
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/dgaxe_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 2, TRUE, FALSE);
+			}
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_draw.wav", 0.3, 2.4);
 			return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 ? V_Model_1 : V_Model, P_Model, DGAXE_DRAW, "tomahawk", UseDecrement() != FALSE);
 		}
@@ -517,11 +523,13 @@ namespace sv {
 		time_point_t m_flTimeNextSkill2;
 		time_point_t m_flTimeComboCheck;
 		time_point_t m_flTimeHostler;
+		time_point_t m_flTimeNextMessage;
 		int m_iDamageType;
 		int m_iComboState;
 		int m_iHolsterAmmo;
 		int m_usDgaxe;
 		int m_CrossHairState;
+		int m_CrossHairStateStored;
 		int SlashAnim;
 		int DualSlashAnim;	
 		int m_iButton;
@@ -537,10 +545,12 @@ namespace sv {
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
 		m_iClip = -1;
-		m_flTimeHostler = invalid_time_point;
+		m_flTimeNextMessage = invalid_time_point;
+		m_flTimeHostler = gpGlobals->time;
 		m_iDefaultAmmo = 0;
 		SlashAnim = 3;
 		DualSlashAnim = 7;
+		m_CrossHairState = m_CrossHairStateStored = DGAXE_AIM_NO;
 		FallInit();
 	}
 
@@ -739,7 +749,7 @@ namespace sv {
 		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 #ifndef CLIENT_DLL
 		currentammo = 0;
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, (int)RANDOM_LONG(0, 3), TRUE, TRUE);
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 0, TRUE, TRUE);
 		TraceResult tr;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
@@ -883,6 +893,7 @@ namespace sv {
 		WRITE_BYTE(3);
 		MESSAGE_END();
 #endif
+		SetThink(nullptr);
 		m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 		m_flTimeHostler = gpGlobals->time;
 		return CBasePlayerWeapon::Holster(skiplocal);
@@ -935,8 +946,11 @@ namespace sv {
 		}
 		if (IsSignal())
 		{
-			if(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 50)
+			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 50)
+			{
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/dgaxe_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				PLAYBACK_EVENT_FULL(FEV_HOSTONLY, ENT(pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 2, TRUE, FALSE);
+			}
 			m_CrossHairState = DGAXE_AIM_OFF;
 			if (m_iButton & IN_ATTACK)
 				m_CrossHairState = DGAXE_AIM_ON_2;
@@ -998,15 +1012,26 @@ namespace sv {
 
 				}
 		}
-		MESSAGE_BEGIN(MSG_ONE,gmsgDgaxe, NULL, m_pPlayer->pev);
-		WRITE_BYTE(0);
-		WRITE_BYTE(m_CrossHairState);
-		MESSAGE_END();
 
-		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoX, NULL, m_pPlayer->pev);
-		WRITE_BYTE(m_iPrimaryAmmoType);
-		WRITE_SHORT(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
-		MESSAGE_END();
+		if (m_flTimeNextMessage < gpGlobals->time)
+		{
+			if (m_CrossHairState != m_CrossHairStateStored)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+				WRITE_BYTE(0);
+				WRITE_BYTE(m_CrossHairState);
+				MESSAGE_END();
+			}
+
+			MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgAmmoX, NULL, m_pPlayer->pev);
+			WRITE_BYTE(m_iPrimaryAmmoType);
+			WRITE_SHORT(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+			MESSAGE_END();
+
+			m_flTimeNextMessage = gpGlobals->time + 0.1s;
+			m_CrossHairStateStored = m_CrossHairState;
+		}
+		
 
 		if (m_iComboState == DGAXE_COMBO_LEFT1)
 		{

@@ -70,13 +70,13 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
 	},
-	{ "【魂守】猎弓prototype", [](CBasePlayer* p) {
+	{ "天罚-龙枪", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 		{
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 		}
-		DropPrimary(p);
-		p->GiveNamedItem("weapon_huntbow");
+		p->RemovePlayerItem(p->m_rgpPlayerItems[KNIFE_SLOT]);
+		p->GiveNamedItem("knife_lance");
 		}
 	},
 #else

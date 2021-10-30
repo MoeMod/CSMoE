@@ -145,7 +145,12 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	{
 		break;
 	}
-	
+
+	case MOD_ZBZ:
+	{
+		// dont break, continue to ZB3...
+		//[fallthrough]];
+	}
 	case MOD_ZB3:
 	{
 		gHUD.m_ZB3.m_iFlags |= HUD_ACTIVE;

@@ -471,7 +471,7 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 		}
 	}*/
 
-	switch (KnifeAttack4(vecSrc, vecDir, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev,TRUE))
+	switch (KnifeAttack4(vecSrc, vecDir, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev,TRUE,1))
 	{
 	case HIT_NONE:
 	{
@@ -566,7 +566,7 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	sprintf(buffer, "weapons/dualsword_slash_%d.wav", v8 + 1);
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, 94);
 
-	switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, FALSE))
+	switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, FALSE, 1))
 	{
 	case HIT_NONE:
 	{

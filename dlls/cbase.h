@@ -526,7 +526,7 @@ public:
 };
 
 
-static_assert(luash::GetAmountOfPrivateDataFields<CBaseToggle>::value == 59);
+static_assert(luash::GetAmountOfPrivateDataFields<CBaseEntity>::value == 33);
 
 } // namespace sv | cl
 

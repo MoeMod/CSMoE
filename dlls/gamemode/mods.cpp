@@ -31,6 +31,7 @@ GNU General Public License for more details.
 #include "mod_zb3.h"
 #include "mod_gd.h"
 #include "mod_zbb.h"
+#include "mod_zbz.h"
 
 namespace sv {
 
@@ -53,7 +54,8 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zb2", DefaultFactory<CMod_ZombieMod2> },
 	{ "zb3", DefaultFactory<CMod_ZombieHero> },
 	{ "gd", DefaultFactory<CMod_GunDeath> },
-	{ "zbb", DefaultFactory<CMod_ZombieBaseBuilder> }
+	{ "zbb", DefaultFactory<CMod_ZombieBaseBuilder> },
+	{ "zbz", DefaultFactory<CMod_ZombieZ> }
 };
 
 void InstallBteMod(const char *name)

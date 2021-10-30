@@ -1,0 +1,87 @@
+/*
+zbz_skill.h - Zombie Z Skill System (Server)
+Copyright (C) 2019 Moemod Hyakuya
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+*/
+
+#ifndef ZBZ_SKILL_H
+#define ZBZ_SKILL_H
+#ifdef _WIN32
+#pragma once
+#endif
+
+#include "player/player_mod_strategy.h"
+#include "gamemode/zbz/zbz_const.h"
+#include "gamemode/mod_zbz.h"
+
+namespace sv {
+
+class IZombieZSkill
+{
+public:
+	virtual ~IZombieZSkill() = 0;
+
+	virtual void OnGetSkill() = 0;
+	virtual void OnThink() = 0;
+	virtual void OnRoundStart() = 0;
+	virtual void OnSpawn() = 0;
+	virtual void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) = 0;
+	virtual float OnAdjustDamageTaken(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) = 0;
+	virtual void OnAdjustDamage(CBasePlayer* attacker, float& flDamage) = 0;
+	virtual void OnInfection(CBasePlayer* victim, CBasePlayer* attacker) = 0;
+	virtual void OnBecomeHuman() = 0;
+	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) = 0;
+	virtual void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) = 0;
+	virtual void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) = 0;
+	virtual void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) = 0;
+
+	virtual bool IsActivate() = 0;
+	virtual char* GetName() const = 0;
+	virtual char* GetDesc() const = 0;
+	virtual ZombieZSkillType GetType() const = 0;
+};
+
+inline IZombieZSkill::~IZombieZSkill() = default;
+
+class CZombieZSkill_Base : public BasePlayerExtra, public IZombieZSkill
+{
+public:
+	explicit CZombieZSkill_Base(CBasePlayer* player) : BasePlayerExtra(player) {}
+
+	void OnGetSkill() override {}
+	void OnThink() override {}
+	void OnRoundStart() override {}
+	void OnSpawn() override {}
+	void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override {}
+	float OnAdjustDamageTaken(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) { return flDamage; }
+	void OnAdjustDamage(CBasePlayer* attacker, float& flDamage) override {}
+	void OnInfection(CBasePlayer* victim, CBasePlayer* attacker) override {}
+	void OnBecomeHuman() override {}
+	void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {}
+	void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) override {}
+	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) override {}
+	void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override {}
+
+	bool IsActivate() override { 
+		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)
+			|| (GetType() == TYPE_ZOMBIE && m_pPlayer->m_bIsZombie);
+	}
+	char* GetName() const override { return ""; };
+	char* GetDesc() const override { return ""; };
+	ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+};
+
+void Skill_Precache();
+std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> HumanSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet);
+}
+
+#endif

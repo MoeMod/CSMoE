@@ -447,6 +447,14 @@ public:
 
 						if(get_gametime() > m_flNextSpecialAttack6_pev_air_finished)
 						{
+#ifndef CLIENT_DLL
+							m_pPlayer->SetAnimation(PLAYER_IDLE);
+							if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+								m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata");							
+							else
+								m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata");
+							m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
+#endif
 							RadiusAttack1();
 							m_flNextSpecialAttack6_pev_air_finished = get_gametime() + 0.082500003s;
 						}
@@ -470,6 +478,16 @@ public:
 				}
 				else // m_iClip <= 0
 				{
+#ifndef CLIENT_DLL
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+				if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata_end");
+				else
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata_end");
+			
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.5s;
+#endif
+				
 					SendWeaponAnim(15, UseDecrement() != FALSE); //(*(void (__cdecl **)(signed int, _DWORD))(*(_DWORD *)a1 + 540))(15, 0);
 					// v6 = sub_104BB1D0(id, "gunkata_end"); // lookup_sequence
 
@@ -565,9 +583,6 @@ public:
 	void RadiusAttack1()
 	{
 #ifndef CLIENT_DLL
-		int anim = m_pPlayer->LookupSequence("gunkata");
-		m_pPlayer->pev->sequence = anim;
-		m_pPlayer->pev->frame = 0;
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();

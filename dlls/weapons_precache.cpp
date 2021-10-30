@@ -232,6 +232,14 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_frequency1");
 	UTIL_PrecacheOtherWeapon("knife_dualsword");
 	UTIL_PrecacheOtherWeapon("weapon_gunkata");
+	UTIL_PrecacheOtherWeapon("weapon_balrog11");
+	UTIL_PrecacheOtherWeapon("weapon_balrog11b");
+	UTIL_PrecacheOtherWeapon("weapon_balrog11wc");
+	UTIL_PrecacheOtherWeapon("knife_lance");
+	UTIL_PrecacheOtherWeapon("weapon_m249ex");
+	UTIL_PrecacheOtherWeapon("weapon_sfsmg");
+	UTIL_PrecacheOtherWeapon("weapon_sfmg");
+	UTIL_PrecacheOtherWeapon("weapon_sfgun");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -42,7 +42,8 @@ enum
 	HUNTBOW_DMGREITERATION,
 	HUNTBOW_MARKZOMBIE,
 	TELEPORT_MARKEF,
-	HOLYBOMB_BURN
+	HOLYBOMB_BURN,
+	LANCE_HIT
 };
 
 struct CHudHeadIconItem
@@ -86,7 +87,7 @@ int CHudHeadIcon:: Draw( float flTime )
 	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL)  )
 		return 1;
 	
-	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3)
+	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		for (int i = 0; i < MAXPLAYER; i++)
 		{
@@ -221,6 +222,13 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 		float fLife = rgIconList[i].iuser1;
 		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybomb_burn.spr"),
 			Vector(0.0, 0.0, 30.0), fLife, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
+		break;
+	}
+	case LANCE_HIT:
+	{
+		flags = FTENT_PERSIST;
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
+			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
 	}

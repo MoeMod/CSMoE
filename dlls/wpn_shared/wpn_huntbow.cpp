@@ -61,7 +61,7 @@ namespace sv {
 			pev->movetype = MOVETYPE_FLY; // 9
 			m_flStartFllowTime = gpGlobals->time + 2.0s;
 			m_flStartFadeTime = gpGlobals->time + 2.0s;
-			pev->classname = MAKE_STRING("d_arrow");
+			pev->classname = MAKE_STRING("huntbow");
 			m_iPenetration = 3;
 			m_iHitWallExp = 1;
 		}
@@ -130,7 +130,7 @@ namespace sv {
 							pInflictorPlayer->tLastMarkTime[ENTINDEX(pAttacker->edict())] = gpGlobals->time;
 
 							
-							MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, NULL, pAttacker->pev);
+							MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgHeadIcon, NULL, pAttacker->pev);
 							WRITE_BYTE(5);	//type
 							WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict())); //entity
 							WRITE_BYTE(pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())]);
@@ -151,38 +151,8 @@ namespace sv {
 
 					ClearMultiDamage();
 					pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-					ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+					ApplyMultiDamage(pev, pAttackePlayer->pev);
 
-					/*UTIL_MakeVectors(pAttackePlayer->pev->v_angle + pAttackePlayer->pev->punchangle);
-					Vector vecSrc = pAttackePlayer->GetGunPosition();
-					Vector vecRealDir = (pOther->pev->origin - vecSrc).Normalize();
-					int bHitRight;
-
-					if (AngleBetweenVectors(pOther->pev->origin - vecSrc, gpGlobals->v_forward) > 6)	//
-					{
-						if (vecRealDir.x - gpGlobals->v_forward.Normalize().x < 0)	//LEFT
-							bHitRight = 0;
-						else
-							bHitRight = 1;
-
-						MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, pAttackePlayer->pev);
-						WRITE_BYTE(1);
-						WRITE_BYTE(bHitRight + 6);
-						MESSAGE_END();
-					}
-					else
-					{
-						//autoaim
-						if (vecRealDir.x - gpGlobals->v_forward.Normalize().x < 0)	//LEFT
-							bHitRight = 0;
-						else
-							bHitRight = 1;
-
-						MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, pAttackePlayer->pev);
-						WRITE_BYTE(1);
-						WRITE_BYTE(bHitRight + 9);
-						MESSAGE_END();
-					}*/
 					pev->renderamt = 0.0;
 					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				}
@@ -261,7 +231,7 @@ namespace sv {
 				{
 					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-					RadiusDamage3(pev->origin, pAttackePlayer->pev, pAttackePlayer->pev, 550, 75, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
+					RadiusDamage3(pev->origin, this->pev, pAttackePlayer->pev, GetSecondaryExpDamage(), 75, CLASS_MACHINE, DMG_EXPLOSION, 1, 0, 0, 0);
 
 					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 					WRITE_BYTE(TE_EXPLOSION);
@@ -277,7 +247,7 @@ namespace sv {
 
 				ClearMultiDamage();
 				pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				ApplyMultiDamage(this->pev, pAttackePlayer->pev);
 				m_iPenetration--;
 				m_iHitWallExp--;
 			}
@@ -299,7 +269,7 @@ namespace sv {
 				{
 					EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/failnaught-2_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-					RadiusDamage3(pev->origin, pAttackePlayer->pev, pAttackePlayer->pev, 550, 75, CLASS_MACHINE, DMG_BULLET, 0, 0, 0, 0);
+					RadiusDamage3(pev->origin, this->pev, pAttackePlayer->pev, GetSecondaryExpDamage(), 75, CLASS_MACHINE, DMG_BULLET, 1, 0, 0, 0);
 
 					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 					WRITE_BYTE(TE_EXPLOSION);
@@ -440,6 +410,18 @@ namespace sv {
 			pev->nextthink = gpGlobals->time + 0.1s;
 		}
 
+		float GetSecondaryExpDamage() const
+		{
+			float flDamage = 30.0f;
+#ifndef CLIENT_DLL
+			if (g_pModRunning->DamageTrack() == DT_ZB)
+				flDamage = 1100.0f;
+			else if (g_pModRunning->DamageTrack() == DT_ZBS)
+				flDamage = 1100.0f;
+#endif
+			return flDamage;
+		}
+
 		void Init(Vector vecVelocity, float flDamage, TeamName iTeam, float avelocity, int iMode, CBasePlayer* pTarget)
 		{
 			pev->avelocity.z = avelocity;
@@ -473,14 +455,13 @@ void CHuntbow::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_huntbow");
 
 	Precache();
-	m_iId = WEAPON_AWP;
+	m_iId = WEAPON_M4A1;
 	SET_MODEL(ENT(pev), "models/w_huntbow.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-
 	m_iClip = -1;
 	m_iDefaultAmmo = 250;
-
+	m_CrossHairStateStored = HUNTBOW_AIM_IDLE;
 	m_flAccuracy = 0.05;
 	m_iShotsFired = 0;
 	m_bDelayFire = false;
@@ -540,7 +521,7 @@ int CHuntbow::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = -1;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_AWP;
+	p->iId = m_iId = WEAPON_M4A1;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 
@@ -556,13 +537,15 @@ BOOL CHuntbow::Deploy(void)
 	m_iShotsFired = 0;
 	m_bDelayFire = false;
 
-
 #ifndef CLIENT_DLL
+	m_pPlayer->UpdateShieldCrosshair(FALSE);
+
 	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
 	WRITE_BYTE(1);
 	WRITE_BYTE(HUNTBOW_AIM_IDLE);
 	MESSAGE_END();
 #endif
+
 	return DefaultDeploy("models/v_huntbow.mdl", m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0 ? "models/p_huntbow_empty.mdl" : "models/p_huntbow.mdl", BOW_DRAW + (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0), "slingshot", UseDecrement() != FALSE, 0.3s, 1.5s);
 }
 
@@ -701,7 +684,7 @@ void CHuntbow::HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeI
 		}	
 	}
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgDgaxe, NULL, m_pPlayer->pev);
 	WRITE_BYTE(1);
 	WRITE_BYTE(m_CrossHairState);
 	MESSAGE_END();
@@ -758,14 +741,14 @@ void CHuntbow::Holster(int skiplocal)
 	WRITE_BYTE(3);
 	MESSAGE_END();
 
-	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	/*for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
 		WRITE_BYTE(6);
 		WRITE_SHORT(iIndex);
 		WRITE_BYTE(0);
 		MESSAGE_END();
-	}
+	}*/
 #endif
 	return CBasePlayerWeapon::Holster(skiplocal);
 }
@@ -1003,6 +986,7 @@ void CHuntbow::ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float f
 		}
 	}
 
+	//use playbackevents instead of message
 	CBaseEntity* pEntity = nullptr;
 	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr)
 	{
@@ -1027,8 +1011,8 @@ void CHuntbow::ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float f
 			if (m_iChargeState == 3 || m_iChargeState == 4)
 			{
 				if (pVictim->m_bIsZombie && pVictim->IsAlive()) // Zombie Scanner
-				{
-					MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
+				{					
+					MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
 					WRITE_BYTE(6);
 					WRITE_SHORT(ENTINDEX(pVictim->edict()));
 					WRITE_BYTE(1);
@@ -1037,7 +1021,7 @@ void CHuntbow::ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float f
 			}
 			else
 			{
-				MESSAGE_BEGIN(MSG_ONE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
+				MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgHeadIcon, nullptr, m_pPlayer->pev);
 				WRITE_BYTE(6);
 				WRITE_SHORT(ENTINDEX(pVictim->edict()));
 				WRITE_BYTE(0);
@@ -1047,9 +1031,10 @@ void CHuntbow::ScannerFunc(Vector vecSrc, Vector vecDir, float flRadius, float f
 		}
 	}
 }
-
+#endif
 void CHuntbow::ItemPostFrame(void)
 {
+#ifndef CLIENT_DLL
 	SetWeaponModel();
 	int bHit = 0;
 	int iTarget = 0;
@@ -1077,18 +1062,31 @@ void CHuntbow::ItemPostFrame(void)
 			m_flNextTimeCheck = gpGlobals->time + 4.0s;
 		}
 	}
-
+#endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	ScannerFunc(vecSrc, gpGlobals->v_forward, 1500, 180, m_pPlayer->pev, m_iChargeState);
+	//ScannerFunc(vecSrc, gpGlobals->v_forward, 1500, 180, m_pPlayer->pev, m_iChargeState);
+	if (m_iChargeState == 3 || m_iChargeState == 4)
+	{
+		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 6, 0, TRUE, FALSE);
+	}
+	else
+	{
+		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 6, 0, FALSE, FALSE);
+	}
+#ifndef CLIENT_DLL
+		if (m_CrossHairState != m_CrossHairStateStored)
+		{
+			MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgDgaxe, NULL, m_pPlayer->pev);
+			WRITE_BYTE(1);
+			WRITE_BYTE(m_CrossHairState);
+			MESSAGE_END();
+		}
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
-	WRITE_BYTE(1);
-	WRITE_BYTE(m_CrossHairState);
-	MESSAGE_END();
-
+		m_CrossHairStateStored = m_CrossHairState;		//message should send once
+#endif
 	return CBasePlayerWeapon::ItemPostFrame();
 }
-#endif
+
 
 void CHuntbow::WeaponIdle(void)
 {

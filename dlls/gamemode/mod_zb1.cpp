@@ -300,17 +300,22 @@ void CMod_Zombi::InstallPlayerModStrategy(CBasePlayer *player)
 
 int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOriginalMax)
 {
-	int ret = iOriginalMax * 2;
-
+	int ret;
 	// do not *2 for machine-guns.
-	if (Q_strstr(szAmmoClassName, "box"))
+
+	if (iOriginalMax < 200)
+		ret = iOriginalMax *= 2;
+
+	ret = int(iOriginalMax * 1.5f);
+
+	if (!strcmp(szAmmoClassName, "bowarrow"))
 		ret = iOriginalMax;
 
-	if (Q_strstr(szAmmoClassName, "bowarrow"))
+	if (!strcmp(szAmmoClassName, "Cannon"))
 		ret = iOriginalMax;
 
-	if (Q_strstr(szAmmoClassName, "Cannon"))
-		ret = iOriginalMax;
+	if (!strcmp(szAmmoClassName, "HEGrenade"))
+		ret = 2;
 
 	return ret;
 }
@@ -415,6 +420,7 @@ void CMod_Zombi::PickZombieOrigin()
 void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker)
 {
 	player->m_ZombieClass = "random";
+	player->pev->sequence = 0;
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;

@@ -46,7 +46,7 @@ public:
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
-	static constexpr const char *AnimExtension = "stormgiant";
+	static constexpr const char *AnimExtension = "skullaxe";
 	static constexpr const auto &DefaultDeployTime = 0s;
 	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
 
@@ -101,6 +101,10 @@ public:
 		m_iSwing = 1;
 		m_pPlayer->m_bShieldDrawn = false;
 
+		Q_strcpy(m_pPlayer->m_szAnimExtention, "stormgiant");
+#ifndef CLIENT_DLL
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 		SetThink(&CKnifeStormgiantX::DeployAttack);
 		pev->nextthink = gpGlobals->time + 0.23s;
 
@@ -197,9 +201,7 @@ void CKnifeStormgiantX::SecondaryAttack(void)
 		m_iSwing = 2;
 		return;
 	}
-#ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK2);
-#endif
+
 	SendWeaponAnim(ANIM_MIDSLASH2, UseDecrement() != FALSE);
 
 	SetThink(&CKnifeStormgiantX::DelaySecondaryAttack);
@@ -262,6 +264,12 @@ void CKnifeStormgiantX::DelaySecondaryAttack()
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "stormgiant");
+#ifndef CLIENT_DLL
+	m_pPlayer->SetAnimation(PLAYER_ATTACK2);
+#endif
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
 
 #ifndef CLIENT_DLL
 	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
@@ -364,9 +372,11 @@ void CKnifeStormgiantX::DeployComboAttackCheck()
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "stormgiant");
 #ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+	m_pPlayer->SetAnimation(PLAYER_ATTACK2);	
 #endif
+	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
 
 #ifndef CLIENT_DLL
 	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 110, 110, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))

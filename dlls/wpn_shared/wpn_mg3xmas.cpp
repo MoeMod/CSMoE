@@ -32,17 +32,17 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(weapon_mg3xmas, CMG3xmas)
 
-static const int MG3_AMMO_GIVE = 200;
+const int MG3XMAS_AMMO_GIVE = 200;
 
 void CMG3xmas::Spawn(void)
 {
 	pev->classname = MAKE_STRING("weapon_mg3xmas");
 
 	Precache();
-	m_iId = WEAPON_P90;
+	m_iId = WEAPON_M249;
 	SET_MODEL(ENT(pev), "models/w_mg3xmas.mdl");
 
-	m_iDefaultAmmo = MG3_AMMO_GIVE;
+	m_iDefaultAmmo = MG3XMAS_AMMO_GIVE;
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 
@@ -69,11 +69,11 @@ void CMG3xmas::Precache(void)
 int CMG3xmas::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556NatoBox";
-	p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+	p->pszAmmo1 = "762NatoBox";
+	p->iMaxAmmo1 = 200;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
-	p->iMaxClip = MG3_AMMO_GIVE;
+	p->iMaxClip = MG3XMAS_AMMO_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
 	p->iId = m_iId = WEAPON_M249;
@@ -165,7 +165,7 @@ void CMG3xmas::Reload(void)
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;
 
-	if (DefaultReload( 400, M249_RELOAD, 4.8s))
+	if (DefaultReload(200, M249_RELOAD, 4.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

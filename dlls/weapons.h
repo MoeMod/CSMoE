@@ -358,7 +358,7 @@ public:
 
 public:
 	/* CSBTE Added, in weapons_data.cpp */
-	virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.5f}; }
+	virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.0f}; }
 #ifdef CLIENT_DLL
 	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
@@ -585,6 +585,33 @@ public:
 	static TYPEDESCRIPTION m_SaveData[4];
 };
 
+class CBalrog11Cannon : public CBaseEntity
+{
+//From CS:AE
+public:
+	void Spawn() override;
+	void Precache() override;
+	void Touch(CBaseEntity* pOther) override;
+
+	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier);
+
+	void EXPORT AnimationThink(void);
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList);
+	void Remove();
+private:
+	time_point_t m_tTimeRemove;
+	Vector m_vecVelocity;
+	Vector m_vecDir;
+	Vector m_vecOrigin;
+	float m_flSpeed;
+	int m_iSign;
+	float m_flDamage;
+	float m_flNumFrames;
+
+	CUtlVector<CBaseEntity*>* m_pEnemyList;
+	CUtlVector<CBaseEntity*>* m_pGroupList;
+};
+
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {
@@ -651,8 +678,8 @@ extern void SpawnBlood(Vector vecSpot, int bloodColor, float flDamage);
 extern int DamageDecal(CBaseEntity *pEntity, int bitsDamageType);
 extern void RadiusFlash(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage);
 extern void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType);
-extern void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType, bool bHasFalloff = 1, bool bDamageSelf = 1, bool DamageBsp = 1, bool canheadshot = 0);
-
+extern void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType, bool bHasFalloff = 1, bool bDamageSelf = 1, bool DamageBsp = 1, int canheadshot = 0, bool bDamageMate = 0, int ExtraKnockBack = 0);
+extern void AddKickRate(CBaseEntity* pEntity, Vector vecSrc, float amount, float boost);
 }
 #else
 namespace cl {

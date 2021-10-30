@@ -182,7 +182,7 @@ KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 
 inline hit_result_t
 KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
-	entvars_t* pevInflictor, entvars_t* pevAttacker, bool IsPrimaryAttack)
+	entvars_t* pevInflictor, entvars_t* pevAttacker,bool IsPrimaryAttack, int iType)
 {
 	TraceResult tr;
 	hit_result_t result = HIT_NONE;
@@ -227,16 +227,23 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 
 		if (fHitWorld) {
 			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-			if(IsPrimaryAttack)
-			{ 
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
-			}
-			else
+			switch (iType)
 			{
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
-			}
+				case 1:	//dualsword
+				{
+					if (IsPrimaryAttack)
+					{
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+					}
+					else
+					{
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+					}
+					break;
+				}
+			}	
 			result = HIT_WALL;
 		}
 	}
@@ -277,15 +284,49 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
 				ApplyMultiDamage(pevInflictor, pevAttacker);
 
-				if (IsPrimaryAttack)
+				switch (iType)
 				{
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
-				}
-				else
-				{
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+					case 1:	//dualsword
+					{
+						if (IsPrimaryAttack)
+						{
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+						}
+						else
+						{
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+						}
+						break;
+					}
+					case 2:		//knife_lance sndatk
+					{
+						if (pEntity->IsPlayer())
+						{
+							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+							if (target->m_bIsZombie)
+							{
+								target->m_flVelocityModifier = 0.9;
+								AddKickRate(target, pevAttacker->origin, 3000, 290);							
+							}
+						}
+						break;
+					}
+					case 3:
+					{
+						if (pEntity->IsPlayer())
+						{
+							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+							if (target->m_bIsZombie)
+							{
+								target->pev->velocity.x = 0;
+								target->pev->velocity.y = 0;
+								target->m_flVelocityModifier = 0.3;
+							}
+						}
+						break;
+					}
 				}
 				result = HIT_PLAYER;
 			}

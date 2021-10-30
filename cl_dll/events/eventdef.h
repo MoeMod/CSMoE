@@ -110,3 +110,8 @@ HOOK_EVENT(skull5, FireSkull5);
 HOOK_EVENT(k1ases, FireK1ases);
 HOOK_EVENT(m1887se, FireM1887se);
 HOOK_EVENT(frequency1, FireFrequency1);
+HOOK_EVENT(balrog11, FireBalrog11);
+HOOK_EVENT(m249ex, FireM249EX);
+HOOK_EVENT(sfgun, FireSFGUN);
+HOOK_EVENT(sfsmg, FireSFSMG);
+HOOK_EVENT(sfmg, FireSFMG);

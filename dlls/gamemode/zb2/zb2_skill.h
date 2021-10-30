@@ -215,6 +215,7 @@ protected:
 	duration_t GetCooldownTime() const;
 
 	int m_bHasCreateBomb;
+	ZombieSkillStatus m_iZombieSkillStatusStored;
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
@@ -269,6 +270,7 @@ protected:
 	int m_iTimeAutoCharge;
 
 	EngineClock::time_point m_flTimeBotUseSkill;
+	ZombieSkillStatus m_iZombieSkillStatusStored;
 	EngineClock::time_point m_flTimeNextBoost;
 	EngineClock::time_point m_flTimeChargeCool;
 };

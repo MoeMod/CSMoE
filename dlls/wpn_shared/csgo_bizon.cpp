@@ -21,6 +21,7 @@
 #include "csgo_bizon.h"
 
 #ifndef CLIENT_DLL
+#include "common/netadr.h"
 #include "gamemode/mods.h"
 #endif
 
@@ -86,6 +87,7 @@ int CBizon::GetItemInfo(ItemInfo *p)
 BOOL CBizon::Deploy(void)
 {
 #ifndef CLIENT_DLL
+	constexpr auto offset = offsetof(netadr_s, ipx);
 	if (m_pPlayer->IsAlive())
 		CheckWeapon(m_pPlayer, this);
 #endif

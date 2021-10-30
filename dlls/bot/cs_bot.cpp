@@ -750,6 +750,9 @@ bool CCSBot::IsHurrying() const
 	    GetGameState()->AreAllHostagesBeingRescued())
 		return true;
 
+	if (ctrl->GetScenario() == CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION)
+		return true;
+
 	return false;
 }
 
@@ -888,6 +891,11 @@ void CCSBot::OnBecomeZombie(ZombieLevel iEvolutionLevel)
 	StopAiming();
 	StopAttacking();
 	Idle();
+}
+
+void CCSBot::SetKiller(CBaseEntity* killer)
+{
+	m_killer = killer;
 }
 
 }

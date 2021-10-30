@@ -307,13 +307,28 @@ void CCSBot::SpawnBot()
 
 	Q_strcpy(m_name, STRING(pev->netname));
 
-	SetState(&m_buyState);
+	if (!m_bIsZombie)
+	{
+		SetState(&m_buyState);
+	}
 	SetTouch(&CCSBot::BotTouch);
 
 	if (!TheNavAreaList.size () && !ctrl->IsLearningMap())
 	{
 		ctrl->SetLearningMapFlag();
 		StartLearnProcess();
+	}
+
+	if (m_killer && TheCSBots()->GetScenario() == CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION)
+	{
+		CBaseEntity* entity = static_cast<CBaseEntity*>(m_killer);
+		CBasePlayer* player = static_cast<CBasePlayer*>(entity);
+		if (!player->m_bIsZombie && player->IsAlive())
+		{
+			SetTask(MOVE_TO_ATTACKER_POSITION, m_killer);
+			MoveTo(&m_killer->pev->origin);
+		}
+		m_killer = NULL;
 	}
 }
 

@@ -217,8 +217,11 @@ namespace sv {
 
 	BOOL CZombieBomb::CanDrop(void)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
-			return TRUE;
+		if (m_pPlayer && m_pPlayer->m_ZombieClass)
+		{
+			if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
+				return TRUE;
+		}
 		return FALSE;
 	}
 }

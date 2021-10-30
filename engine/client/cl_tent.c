@@ -827,8 +827,17 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 			scale = 0.1f;
 			index = 12;
 			break;
+		case 100116:	//sfgun
+			scale = 0.1f;
+			index = 16;
+			break;
+		case 100117:	//sfsmg
+			scale = 0.1f;
+			index = 17;
+			break;
+
 	}
-	
+
 
 	modelIndex = cl_muzzleflash[index];
 	if( !modelIndex ) return;

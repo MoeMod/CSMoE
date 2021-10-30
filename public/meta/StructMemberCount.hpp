@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <utility>
 
-#if 1 
+#ifdef _MSC_VER
 
 #include <boost/pfr.hpp>
 
@@ -17,13 +17,13 @@ namespace detail
     template<class T>
     struct any_converter {
         // 不能convert至自身
-        template <class U, class = typename std::enable_if<!std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value>::type> operator U &&() const noexcept;
+        template <class U, class = typename std::enable_if<!std::is_same<typename std::decay<T>::type, typename std::decay<U>::type>::value>::type> operator U() const noexcept;
     };
 
     template<class T, std::size_t I> struct any_converter_tagged : any_converter<T> {};
 
     // 判断T是否可以使用Args...进行聚合初始化：T{ std::declval<Args>()... }
-    template<class T, std::size_t...I> constexpr auto is_aggregate_constructible_with_n_args_impl(T&&, std::index_sequence<I...>) -> decltype(T{ any_converter_tagged<T, I>()... }, std::true_type());
+    template<class T, std::size_t...I> constexpr auto is_aggregate_constructible_with_n_args_impl(T&&, std::index_sequence<I...>) -> decltype(T{ {any_converter_tagged<T, I>()}... }, std::true_type());
     // 这个函数千万别改成模板函数否则会死机的！
     constexpr auto is_aggregate_constructible_with_n_args_impl(...)->std::false_type;
 

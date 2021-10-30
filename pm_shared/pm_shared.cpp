@@ -141,6 +141,7 @@ static int gcTextures = 0;
 static char grgszTextureName[CTEXTURESMAX][CBTEXTURENAMEMAX];
 static char grgchTextureType[CTEXTURESMAX];
 
+static int g_doubleJump[MAX_CLIENTS];
 int g_onladder = 0;
 
 void PM_SwapTextures(int i, int j)
@@ -1252,6 +1253,8 @@ void PM_WalkMove()
 	float downdist, updist;
 
 	pmtrace_t trace;
+
+	g_doubleJump[pmove->player_index] = 0;
 
 	if (pmove->fuser2 > 0.0)
 	{
@@ -2765,6 +2768,7 @@ void PM_Jump(void)
 	qboolean tfc = false;
 
 	qboolean cansuperjump = false;
+	qboolean doublejump = false;
 
 	if (pmove->dead)
 	{
@@ -2829,19 +2833,24 @@ void PM_Jump(void)
 		return;
 	}
 
+	doublejump = atoi(pmove->PM_Info_ValueForKey(pmove->physinfo, "dbj")) == 1 ? true : false;
 	// No more effect
 	if (pmove->onground == -1)
 	{
-		// Flag that we jumped.
-		// HACK HACK HACK
-		// Remove this when the game .dll no longer does physics code!!!!
-		pmove->oldbuttons |= IN_JUMP;	// don't jump again until released
-		return;		// in air, so no effect
+		if (!doublejump || g_doubleJump[pmove->player_index] > 1)
+		{
+			// Flag that we jumped.
+			// HACK HACK HACK
+			// Remove this when the game .dll no longer does physics code!!!!
+			pmove->oldbuttons |= IN_JUMP;	// don't jump again until released
+			return;		// in air, so no effect
+		}
 	}
 
 	if (pmove->oldbuttons & IN_JUMP)
 		return;		// don't pogo stick
 
+	g_doubleJump[pmove->player_index]++;
 	// In the air now.
 	pmove->onground = -1;
 
