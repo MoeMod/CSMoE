@@ -32,6 +32,8 @@
 #include "weapons_buy.h"
 #include "cbase/cbase_hash.h"
 
+#include "luash_sv/luash_sv.h"
+
 #include <tuple>
 
 namespace sv {
@@ -500,7 +502,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->has_disconnected = false;
 	pPlayer->m_iMenu = Menu_OFF;
 	pPlayer->ClearAutoBuyData();
-	pPlayer->m_rebuyString = NULL;
+	pPlayer->m_rebuyString.clear();
 
 	SET_CLIENT_MAXSPEED(ENT(pPlayer->pev), 1);
 	SET_MODEL(ENT(pPlayer->pev), "models/player.mdl");
@@ -3651,6 +3653,8 @@ void EXT_FUNC ClientUserInfoChanged(edict_t *pEntity, char *infobuffer)
 
 void EXT_FUNC ServerDeactivate()
 {
+	sv::LuaSV_Shutdown();
+
 	// It's possible that the engine will call this function more times than is necessary
 	//  Therefore, only run it one time for each call to ServerActivate
 	if (g_serveractive != 1)
@@ -4756,6 +4760,9 @@ void EXT_FUNC RegisterEncoders()
 	DELTA_ADDENCODER("Entity_Encode", Entity_Encode);
 	DELTA_ADDENCODER("Custom_Encode", Custom_Encode);
 	DELTA_ADDENCODER("Player_Encode", Player_Encode);
+
+	// init before worldspawn
+	sv::LuaSV_Init();
 }
 
 int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)

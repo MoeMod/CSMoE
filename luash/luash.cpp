@@ -9,11 +9,31 @@ namespace luash
 		return KnownTypeInterfaceMapInst;
 	}
 
+	int RequireCoreLuaFunc(lua_State* L)
+	{
+		lua_getglobal(L, "require"); // #1 = require
+
+		lua_pushvalue(L, -1); // #2 = require
+		lua_pushstring(L, "core/luash_struct"); // #3 = path
+		lua_call(L, 1, 0); // #1 = require
+
+		lua_pushvalue(L, -1); // #2 = require
+		lua_pushstring(L, "core/luash_class"); // #3 = path
+		lua_call(L, 1, 0); // #1 = require
+
+		lua_pop(L, 1);
+		return 0;
+	}
+
 	int OpenLibs(lua_State* L)
 	{
+		lua_pushcfunction(L, SetupTypeInterfaceTable);
+		lua_call(L, 0, 0);
 		lua_pushcfunction(L, SetupPtrMetaTable);
 		lua_call(L, 0, 0);
 		lua_pushcfunction(L, SetupCppNewDelete);
+		lua_call(L, 0, 0);
+		lua_pushcfunction(L, RequireCoreLuaFunc);
 		lua_call(L, 0, 0);
 		return 0;
 	}
@@ -77,6 +97,15 @@ namespace luash
 		}
 	}
 
+	int SetupTypeInterfaceTable(lua_State* L)
+	{
+		lua_newtable(L); // #1 = {}
+		lua_setglobal(L, "_LUAOBJECT"); // #0
+		lua_newtable(L); // #1 = {}
+		lua_setglobal(L, "_LUACLASS"); // #0
+		return 0;
+	}
+
 	template<class...Args> struct TypeList {};
 	using BuiltinTypes = TypeList<bool, char, char16_t, char32_t, wchar_t, short, int, long, long long, float, double, long double>;
 
@@ -120,45 +149,110 @@ namespace luash
 		return 0;
 	}
 
-	int RequireMeta(lua_State* L)
+	int CallOnNamedStructCreate(lua_State* L, std::string_view struct_name)
 	{
-		lua_getglobal(L, "require");
-		// #1 = require
+		// #1 = struct
+		lua_pushlstring(L, struct_name.data(), struct_name.size()); // #2 = struct_name
 
-		lua_pushstring(L, "core/luash_meta");
-		// #2 = path
+		lua_getglobal(L, "OnStructCreate");
+		// #3 = OnStructCreate
 
-		lua_call(L, 1, 1);
-		// #1 = meta
-
+		if (int errc = lua_pcall(L, 2, 1, 0))
+		{
+			const char* errmsg = lua_tostring(L, -1);
+			// TODO: print errmsg
+			// #1 = errmsg
+			lua_pop(L, 1);
+			lua_pushnil(L);
+			return 1;
+		}
+		// #1 = result
 		return 1;
 	}
 
-	int CallOnNamedStructCreate(lua_State* L, std::string_view struct_name)
+	int PushLuaObjectByPtr(lua_State* L, void* Ptr)
 	{
-		RequireMeta(L);
-		// #2 = core/meta
-
-		lua_getfield(L, -1, "OnStructCreate");
-		// #3 = meta.SetStructMetaTable
-
-		lua_pushvalue(L, -2);
-		// #4 = core/meta
-
-		lua_pushvalue(L, -4);
-		// #5 = #1
-
-		lua_pushlstring(L, struct_name.data(), struct_name.size());
-		// #6 = struct_name
-
-		if (int errc = lua_pcall(L, 3, 0, 0))
+		assert(Ptr != nullptr);
+		lua_getglobal(L, "_LUAOBJECT"); // #1 = _R._LUAOBJECT
+		assert(!lua_isnil(L, -1));
+		lua_pushlightuserdata(L, Ptr); // #2 = ptr
+		lua_gettable(L, -2); // #2 = LuaObject
+		if (lua_isnil(L, -1))
 		{
-			const char* errmsg = lua_tostring(L, -1);
-			// #2 = errmsg
-			lua_pop(L, 1);
+			lua_pop(L, 2); // #0
+			return 0;
 		}
-		// #2 = core/meta
-		lua_pop(L, 1);
+		else
+		{
+			lua_remove(L, -2); // #1 = LuaObject
+			return 1;
+		}
+	}
+
+	int LinkPtrToLuaObject(lua_State* L, void *Ptr)
+	{
+		assert(lua_istable(L, -1)); // #1 = LuaObject
+		// add this pointer
+		lua_pushlightuserdata(L, Ptr); // #2 = ptr
+		lua_setfield(L, -1, "this"); // #1 = LuaObject
+
+		// #1 = LuaObject
+		lua_getglobal(L, "_LUAOBJECT"); // #2 = _R._LUACLASS
+		assert(!lua_isnil(L, -1));
+		lua_pushlightuserdata(L, Ptr); // #3 = ptr
+		lua_pushvalue(L, -3); //  #4 = LuaObject
+		lua_settable(L, -3);  // #2 = _R._LUACLASS
+		lua_pop(L, 1); // #1 = LuaObject
 		return 0;
+	}
+
+	int RemoveLuaObject(lua_State* L, void* Ptr)
+	{
+		lua_getglobal(L, "_LUAOBJECT"); // #1 = _R._LUACLASS
+		assert(!lua_isnil(L, -1));
+		lua_pushlightuserdata(L, Ptr); // #2 = ptr
+		lua_pushnil(L); // #3 = nil
+		lua_settable(L, -3); // #1 = _R._LUACLASS
+		lua_pop(L, 1); // #0
+		return 0;
+	}
+
+	bool GetPtrByLuaObject(lua_State* L, int N, void*&out)
+	{
+		lua_getfield(L, N, "this");
+		if (lua_isnil(L, -1))
+		{
+			lua_pop(L, 1);
+			return false;
+		}
+		out = lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		return true;
+	}
+
+	void SetupRefTypeInterface(lua_State* L, void* ptr, const ITypeInterface* ti) 
+	{
+		lua_pushlightuserdata(L, (void*)ptr); // #1 = ptr
+		lua_pushlightuserdata(L, (void*)ti); // #2 = interface
+		lua_settable(L, LUA_REGISTRYINDEX); // #0
+	}
+	void ReleaseRefTypeInterface(lua_State* L, void* ptr)
+	{
+		lua_pushlightuserdata(L, (void*)ptr); // #1 = ptr
+		lua_pushnil(L); // #2 = nil
+		lua_settable(L, LUA_REGISTRYINDEX); // #0
+	}
+	const ITypeInterface* GetTypeInterfaceTop(lua_State* L)
+	{
+		// #1 = ptr
+		lua_gettable(L, LUA_REGISTRYINDEX); // #1 = interface
+		const ITypeInterface* ti = reinterpret_cast<const ITypeInterface*>(lua_touserdata(L, -1));
+		lua_pop(L, 1);
+		return ti;
+	}
+	const ITypeInterface* GetTypeInterface(lua_State* L, void* ptr)
+	{
+		lua_pushlightuserdata(L, ptr);
+		return GetTypeInterfaceTop(L);
 	}
 }

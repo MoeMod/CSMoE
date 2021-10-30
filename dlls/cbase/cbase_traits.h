@@ -11,15 +11,17 @@ namespace sv {
 	template<class ThisClass, class BaseClass> struct PrivateData;
 }
 
-namespace detail {
-#ifdef CLIENT_DLL
-	using namespace cl;
-#else
-	using namespace sv;
-#endif
+namespace luash {
+	namespace detail {
+	#ifdef CLIENT_DLL
+			using namespace cl;
+	#else
+			using namespace sv;
+	#endif
 
-	template<class ThisClass, class BaseClass> auto FindBaseClass(ThisClass*, PrivateData<ThisClass, BaseClass>*)->BaseClass;
-	template<class ThisClass, class BaseClass> auto FindPrivateData(ThisClass*, PrivateData<ThisClass, BaseClass>*) -> PrivateData<ThisClass, BaseClass>;
+			template<class ThisClass, class BaseClass> auto FindBaseClass(ThisClass*, PrivateData<ThisClass, BaseClass>*)->BaseClass;
+			template<class ThisClass, class BaseClass> auto FindPrivateData(ThisClass*, PrivateData<ThisClass, BaseClass>*)->PrivateData<ThisClass, BaseClass>;
+	}
 }
 
 template<class T> struct luash::ClassTraits<T, typename std::enable_if<std::is_base_of<

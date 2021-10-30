@@ -14,6 +14,7 @@
 
 #include "game_shared/perf_counter.h"
 #include "cbase/cbase_hash.h"
+#include "luash_sv/luash_sv.h"
 
 //extern "C"
 namespace sv
@@ -305,8 +306,7 @@ void CONSOLE_ECHO_LOGGED(char *pszMsg, ...)
 */
 
 
-
-static DLL_FUNCTIONS gFunctionTable =
+DLL_FUNCTIONS gFunctionTable =
 {
 	GameDLLInit,
 	DispatchSpawn,
@@ -406,6 +406,8 @@ void OnFreeEntPrivateData(edict_t *pEnt)
 	pEntity->UpdateOnRemove();
 	RemoveEntityHashValue(pEntity->pev, STRING(pEntity->pev->classname), CLASSNAME);
 	CBaseEntity::CheckEntityDestructor(pEntity);
+
+	LuaSV_OnEntityRemove(pEntity);
 }
 
 int ShouldCollide(edict_t *pentTouched, edict_t *pentOther)

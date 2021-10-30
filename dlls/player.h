@@ -32,6 +32,8 @@
 #pragma once
 #endif
 
+#include <string>
+
 #include "pm_materials.h"
 #include "player/hintmessage.h"
 #include "weapons.h"
@@ -284,7 +286,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	float m_fCamSwitch;
 	bool m_bEscaped;
 	bool m_bIsVIP;
-	EngineClock::time_point m_tmNextRadarUpdate;
+	time_point_t m_tmNextRadarUpdate;
 	Vector m_vLastOrigin;
 	int m_iCurrentKickVote;
 	time_point_t m_flNextVoteTime;
@@ -404,7 +406,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	int m_blindAlpha;
 	time_point_t m_allowAutoFollowTime;
 	char m_autoBuyString[MAX_AUTOBUY_LENGTH];
-	std::unique_ptr<char []> m_rebuyString;
+	std::string m_rebuyString;
 	RebuyStruct m_rebuyStruct;
 	bool m_bIsInRebuy;
 	time_point_t m_flLastUpdateTime;
@@ -419,9 +421,6 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	MusicState m_musicState;
 	time_point_t m_flLastCommandTime[8];
 	bool m_bIsZombie;
-	bool m_bSpawnProtection; // pack bools
-	ZombieLevel m_iZombieLevel;
-	time_point_t m_flTimeSpawnProctionExpires;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
@@ -714,6 +713,9 @@ public:
 	bool ReactToDeimosTail();
 
 public:
+	bool m_bSpawnProtection; // pack bools
+	ZombieLevel m_iZombieLevel;
+	time_point_t m_flTimeSpawnProctionExpires;
 #ifndef CLIENT_DLL
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif

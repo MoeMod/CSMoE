@@ -13,11 +13,4 @@ namespace luash
 		auto struct_name = nameof::nameof_short_type<T>();
 		return CallOnNamedStructCreate(L, struct_name);
 	}
-
-	template<class T>
-	int CallOnPtrCreate(lua_State* L, T *ptr)
-	{
-		SetupRefTypeInterface(L, ptr);
-		return 0;
-	}
 }

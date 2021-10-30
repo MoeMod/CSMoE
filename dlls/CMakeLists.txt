@@ -359,6 +359,21 @@ set(GAME_SHARED_SRCS
 	../game_shared/bot/nav_path.cpp
     )
 
+set(LUASV_SRCS
+	luash_sv/luash_sv.cpp
+	luash_sv/luash_sv_filesystem.cpp
+	luash_sv/luash_sv_engfunc.cpp
+	luash_sv/luash_sv_dllfunc.cpp
+	luash_sv/luash_sv_glb.cpp
+	luash_sv/luash_sv_luaclass.cpp
+	luash_sv/luash_sv_cppclass.cpp
+	luash_sv/luash_sv_entity.cpp
+)
+
+set_source_files_properties(
+    ${LUASV_SRCS} PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+)
+
 set(PUBLIC_SRCS
 	../public/MemPool.cpp
     )
@@ -369,6 +384,7 @@ set (SERVER_SOURCES
 	${PM_SRCS}
 	${GAME_SHARED_SRCS}
 	${PUBLIC_SRCS}
+	${LUASV_SRCS}
 )
 
 include_directories (
@@ -427,7 +443,7 @@ add_definitions(
 	)
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
-target_link_libraries( ${SERVER_LIBRARY} luash )
+target_link_libraries( ${SERVER_LIBRARY} boost_preprocessor luash )
 
 if(ANDROID OR IOS)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES

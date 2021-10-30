@@ -53,30 +53,22 @@ int MoE_EntityFactory(edict_t *pent, const char *szName )
 	if(!szName || !szName[0])
 		return -1;
 
+	entvars_t* pev = &pent->v;
+
+	if (LuaGetClassPtr(szName, pev))
+		return 1;
+
 	auto &sfmap = MapSingleton();
 	auto iter = sfmap.find(std::string(szName));
-	if(iter == sfmap.end())
+	if(iter != sfmap.end())
 	{
-		ALERT(at_warning, "MoE_EntityFactory() : Unrecognized entity %s \n", szName);
-		return -1; // NOT FOUND
+		(*iter->second.GetClassPtr)(pev);
+		return 0; // OK
 	}
 
-	entvars_t *pev = &pent->v;
 
-	/*
-	try
-	{
-		iter->second(pev);
-	}
-	catch(const std::exception &e)
-	{
-		ALERT(at_warning, "MoE_EntityFactory() : Fail to create %s with exception saying: %s\n", szName, e.what());
-		return -1; // WTF ? eat that exception and return...
-	}
-	 */
-    (*iter->second.GetClassPtr)(pev);
-
-	return 0; // OK
+	ALERT(at_warning, "MoE_EntityFactory() : Unrecognized entity %s \n", szName);
+	return -1; // NOT FOUND
 }
 
 }

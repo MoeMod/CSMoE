@@ -148,8 +148,8 @@ namespace luash
 			return 0;
 		}
 	};
-
-	template<class T, class Base, bool = IsCompleteType<typename std::remove_cv<T>::type>::value, bool = IsSupportedClass<typename std::remove_cv<T>::type>::value>
+	
+	template<class T, class Base, bool = std::conjunction<IsCompleteType<typename std::remove_cv<T>::type>, std::negation<IsSupportedClass<typename std::remove_cv<T>::type>>>::value>
 	class TypeInterfaceDecoratorCopy : public Base
 	{
 	public:
@@ -171,7 +171,7 @@ namespace luash
 	};	
 
 	template<class T, class Base>
-	class TypeInterfaceDecoratorCopy<T, Base, true, false> : public Base
+	class TypeInterfaceDecoratorCopy<T, Base, true> : public Base
 	{
 	public:
 		int Copy(lua_State* L) const override
@@ -205,7 +205,7 @@ namespace luash
 			}
 		}
 	};
-
+	
 	template<class T, class Base>
 	class TypeInterfaceDecoratorToString : public Base
 	{
@@ -388,6 +388,16 @@ namespace luash
 	template<class T, class Base>
 	class TypeInterfaceDecoratorCall<T, Base, true> : public Base
 	{
+		template<class T> inline bool PushIfLvRef(lua_State* L, T& obj, std::true_type) const 
+		{
+			Push(L, obj);
+			return true;
+		}
+		template<class T> constexpr bool PushIfLvRef(lua_State* L, T&& obj, std::false_type) const
+		{
+			return false;
+		}
+
 		template<std::size_t...I, class Ret, class...Args>
 		int MetaCallImpl2(lua_State* L, std::index_sequence<I...>, TypeIdentity<std::function<Ret(Args...)>>) const
 		{
@@ -401,21 +411,21 @@ namespace luash
 			T* pfn = reinterpret_cast<T*>(value);
 
 			// dont support lvalue reference
-			static_assert((... && !(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)));
+			//static_assert((... && !(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)));
 
 			std::tuple<typename std::remove_const<typename std::remove_reference<Args>::type>::type...> args;
 			(..., Get(L, I + 2, std::get<I>(args)));
 			if constexpr (std::is_void_v<Ret>)
 			{
-				(*pfn)(std::get<I>(std::move(args))...);
-				return 0;
+				(*pfn)(std::get<I>(args)...);
 			}
 			else
 			{
-				Ret ret = (*pfn)(std::get<I>(std::move(args))...);
+				Ret ret = (*pfn)(std::get<I>(args)...);
 				Push(L, std::move(ret));
-				return 1;
 			}
+
+			return (!std::is_void_v<Ret> + ... + PushIfLvRef(L, std::get<I>(args), std::bool_constant<(std::is_lvalue_reference<Args>::value && !std::is_const<typename std::remove_reference<Args>::type>::value)>()));
 		}
 
 		template<std::size_t...I, class Ret, class...Args>
@@ -461,20 +471,9 @@ namespace luash
 		return ti;
 	}
 
-	inline const ITypeInterface* GetTypeInterfaceTop(lua_State* L)
-	{
-		// #1 = ptr
-		lua_gettable(L, LUA_REGISTRYINDEX); // #1 = interface
-		const ITypeInterface* ti = reinterpret_cast<const ITypeInterface *>(lua_touserdata(L, -1));
-		lua_pop(L, 1);
-		return ti;
-	}
+	const ITypeInterface* GetTypeInterfaceTop(lua_State* L);
 
-	inline const ITypeInterface* GetTypeInterface(lua_State* L, void* ptr)
-	{
-		lua_pushlightuserdata(L, ptr);
-		return GetTypeInterfaceTop(L);
-	}
+	const ITypeInterface* GetTypeInterface(lua_State* L, void* ptr);
 
 	// function(value, i)
 	template<int(ITypeInterface::* pmemfn)(lua_State*) const> int RefValueMetaDispatch(lua_State* L)
@@ -486,22 +485,7 @@ namespace luash
 		return 0;
 	}
 
-	template<class T> const ITypeInterface* SetupRefTypeInterface(lua_State* L, T* ptr)
-	{
-		const ITypeInterface* ti = CreateTypeInterface<T>();
-		lua_pushlightuserdata(L, (void *)ptr); // #1 = ptr
-		lua_pushlightuserdata(L, (void *)ti); // #2 = interface
-		lua_settable(L, LUA_REGISTRYINDEX); // #0
-		return ti;
-	}
-
-	template<class T> void ReleaseRefTypeInterface(lua_State* L, T* ptr)
-	{
-		lua_pushlightuserdata(L, (void *)ptr); // #1 = ptr
-		lua_pushnil(L); // #2 = nil
-		lua_settable(L, LUA_REGISTRYINDEX); // #0
-	}
-
+	int SetupTypeInterfaceTable(lua_State* L);
 	int SetupBuiltinTypeInterface(lua_State* L);
 	int SetupPtrMetaTable(lua_State* L);
 	int SetupCppNewDelete(lua_State* L);

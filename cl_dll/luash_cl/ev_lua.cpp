@@ -146,7 +146,7 @@ namespace cl
 	{
 		Vector view_ofs;
 		gEngfuncs.pEventAPI->EV_LocalPlayerViewheight(view_ofs);
-		luash::PushVector(L, view_ofs);
+		luash::Push(L, view_ofs);
 		return 1;
 	}
 	
@@ -156,10 +156,10 @@ namespace cl
 			return 0;
 
 		Vector ShellOrigin;
-		luash::GetVector(L, 1, ShellOrigin);
+		luash::Get(L, 1, ShellOrigin);
 		
 		Vector ShellVelocity;
-		luash::GetVector(L, 2, ShellVelocity);
+		luash::Get(L, 2, ShellVelocity);
 		
 		float rotation = lua_tonumber(L, 3);
 		int shell = lua_tointeger(L, 4);
@@ -181,7 +181,7 @@ namespace cl
 		int idx = lua_tointeger(L, 1);
 
 		Vector origin;
-		luash::GetVector(L, 2, origin);
+		luash::Get(L, 2, origin);
 		
 		int channel = lua_tointeger(L, 3);
 		const char* sample = lua_tostring(L, 4);
@@ -212,19 +212,19 @@ namespace cl
 		int idx = lua_tointeger(L, 1);
 
 		Vector forward;
-		luash::GetVector(L, 2, forward);
+		luash::Get(L, 2, forward);
 		Vector right;
-		luash::GetVector(L, 3, right);
+		luash::Get(L, 3, right);
 		Vector up;
-		luash::GetVector(L, 4, up);
+		luash::Get(L, 4, up);
 
 		int cShots = lua_tointeger(L, 5);
 		Vector vecSrc;
-		luash::GetVector(L, 6, vecSrc);
+		luash::Get(L, 6, vecSrc);
 		Vector vecDirShooting;
-		luash::GetVector(L, 7, vecDirShooting);
+		luash::Get(L, 7, vecDirShooting);
 		Vector vecSpread;
-		luash::GetVector(L, 8, vecSpread);
+		luash::Get(L, 8, vecSpread);
 
 		
 		float flDistance = lua_tonumber(L, 9);

@@ -8,11 +8,8 @@
 namespace sv {
 class CBasePlayer;
 
-class CPlayerAccount
+struct CPlayerAccount
 {
-public:
-	CPlayerAccount() : m_iAmount(0), m_iLastAmount(0) {}
-
 	int Get() const
 	{
 		return m_iAmount;
@@ -36,9 +33,8 @@ public:
 	void UpdateHUD(CBasePlayer *player, bool bTrackChange = false) const;
 	void Reset() { m_iAmount = m_iLastAmount = 0; }
 
-private:
-	int m_iAmount;
-	mutable int m_iLastAmount;
+	int m_iAmount = 0;
+	mutable int m_iLastAmount = 0;
 };
 }
 #else

@@ -53,48 +53,6 @@ namespace luash
 		sv = lua_tostring(L, N);
 	}
 	inline void GetNil(lua_State* L, int N, std::nullptr_t& np) {}
-#ifdef vec3_t
-	inline void GetVector(lua_State *L, int N, vec3_t &out)
-	{
-		lua_pushvalue(L, N);
-		// #1 = vec
-		lua_pushnumber(L, 1);
-		// #2 = 1
-		lua_gettable(L, -2);
-		// #2 = vec[1]
-		if (lua_isnil(L, -1))
-			out[0] = 0;
-		else
-			out[0] = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		// #1 = vec
-
-		lua_pushnumber(L, 2);
-		// #2 = 2
-		lua_gettable(L, -2);
-		// #2 = vec[2]
-		if (lua_isnil(L, -1))
-			out[1] = 0;
-		else
-			out[1] = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		// #1 = vec
-
-		lua_pushnumber(L, 3);
-		// #2 = 3
-		lua_gettable(L, -2);
-		// #2 = vec[3]
-		if (lua_isnil(L, -1))
-			out[2] = 0;
-		else
-			out[2] = lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		// #1 = vec
-
-		lua_pop(L, 1);
-		// #0
-	}
-#endif
 	template<class T, std::size_t Size> auto GetArray(lua_State* L, int N, std::array<T, Size>& arr)
 	{
 		lua_pushvalue(L, N);
@@ -173,6 +131,9 @@ namespace luash
 		lua_pop(L, 1);
 		// #0
 	}
+
+	bool GetPtrByLuaObject(lua_State* L, int N, void*&);
+
 	namespace detail {
 		template<class T> auto GetPointerImpl(lua_State* L, int N, T*& out, std::true_type)
 		{
@@ -203,6 +164,11 @@ namespace luash
 	template<class T>
 	inline auto GetPointer(lua_State* L, int N, T* &out)
 	{
+		if (void* ptr = nullptr; GetPtrByLuaObject(L, N, ptr))
+		{
+			out = reinterpret_cast<T*>(ptr);
+			return;
+		}
 		return detail::GetPointerImpl(L, N, out, IsCompleteType<T>());
 	}
 	// just unsupported
@@ -224,8 +190,17 @@ namespace luash
 		const_mem_fn_ptr = nullptr;
 	}
 	*/
+	template<class T> auto GetCustom(lua_State* L, int N, T& x) -> decltype(x.LuaGet(L, N))
+	{
+		return x.LuaGet(L, N);
+	}
+
 	namespace detail
 	{
+		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<10>) -> decltype(GetCustom(L, N, x))
+		{
+			return GetCustom(L, N, x);
+		}
 		template<class T> auto GetUnknownImpl(lua_State* L, int N, T& x, PriorityTag<8>) -> decltype(GetBoolean(L, N, x))
 		{
 			return GetBoolean(L, N, x);

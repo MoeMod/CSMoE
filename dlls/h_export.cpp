@@ -4,12 +4,18 @@
 
 #include "cbase/cbase_physint.h"
 #include "cbase/cbase_typelist.h"
+#include "fs_int.h"
 
 //! Holds engine functionality callbacks
+
+#ifdef XASH_STATIC_GAMELIB
+extern "C" int FS_GetAPI(fs_api_t * g_api);
+#endif
 
 namespace sv {
 enginefuncs_t g_engfuncs;
 globalvars_t *gpGlobals;
+fs_api_t gFileSystemAPI;
 
 // time_point implementation
 namespace moe{
@@ -38,6 +44,7 @@ C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pEnginefuncsTable, global
 {
 	Q_memcpy(&sv::g_engfuncs, pEnginefuncsTable, sizeof(enginefuncs_t));
 	gpGlobals = pGlobals;
+	FS_GetAPI(&sv::gFileSystemAPI);
 }
 
 typedef struct dllexport_s

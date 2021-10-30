@@ -37,10 +37,10 @@ void CHintMessageQueue::Reset()
 {
 	m_tmMessageEnd = invalid_time_point;
 
-	for (int i = 0; i < m_messages.Count(); ++i)
+	for (int i = 0; i < m_messages.size(); ++i)
 		delete m_messages[i];
 
-	m_messages.RemoveAll();
+	m_messages.clear();
 }
 
 void CHintMessageQueue::Update(CBaseEntity *client)
@@ -48,20 +48,20 @@ void CHintMessageQueue::Update(CBaseEntity *client)
 	if (gpGlobals->time <= m_tmMessageEnd)
 		return;
 
-	if (!m_messages.Count())
+	if (m_messages.empty())
 		return;
 
 	CHintMessage *msg = m_messages[0];
 	m_tmMessageEnd = gpGlobals->time + msg->GetDuration();
 	msg->Send(client);
 	delete msg;
-	m_messages.Remove(0);
+	m_messages.erase(m_messages.begin());
 }
 
 bool CHintMessageQueue::AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args)
 {
 	CHintMessage *msg = new CHintMessage(message, isHint, args, duration);
-	m_messages.AddToTail(msg);
+	m_messages.push_back(msg);
 
 	return true;
 }

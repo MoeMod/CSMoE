@@ -15,6 +15,9 @@
 
 #pragma once
 #include <UtlVector.h>
+#include <vector>
+
+typedef struct lua_State lua_State;
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -40,17 +43,18 @@ private:
 	bool m_isHint;
 };
 
-class CHintMessageQueue
+struct CHintMessageQueue
 {
-public:
 	void Reset(void);
 	void Update(CBaseEntity *player);
 	bool AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args);
-	bool IsEmpty(void) { return m_messages.Count() == 0; }
+	bool IsEmpty(void) { return m_messages.empty(); }
 
-private:
+	void LuaPush(lua_State* L) const;
+	void LuaGet(lua_State* L, int N);
+
 	time_point_t m_tmMessageEnd;
-	CUtlVector<CHintMessage *> m_messages;
+	std::vector<CHintMessage *> m_messages;
 };
 
 }

@@ -16,7 +16,7 @@
 #ifndef PROGDEFS_H
 #define PROGDEFS_H
 
-typedef struct
+typedef struct globalvars_s
 {	
 	time_point_t		time;
 	duration_t		frametime;

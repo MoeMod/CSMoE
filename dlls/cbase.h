@@ -103,6 +103,10 @@ namespace cl {
 #else
 namespace sv {
 #endif
+
+void PushEntity(lua_State* L, edict_t* p);
+void GetEntity(lua_State* L, int N, edict_t*& p);
+
 template<> struct PrivateData<class CBaseEntity, void>
 {
     entvars_t * pev;
@@ -524,9 +528,6 @@ public:
 		m_pfnCallWhenMoveDone = static_cast<void (CBaseToggle::*)(void)>(pfn);
 	}
 };
-
-
-static_assert(luash::GetAmountOfPrivateDataFields<CBaseEntity>::value == 33);
 
 } // namespace sv | cl
 

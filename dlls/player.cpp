@@ -8299,8 +8299,7 @@ void CBasePlayer::InitRebuyData(const char *str)
 	}
 
 	// god bless the fucking new[] and delete[]
-	m_rebuyString.reset(new char[Q_strlen(str) + 1]{});
-	Q_strcpy(m_rebuyString.get(), str);
+	m_rebuyString = str;
 }
 
 void CBasePlayer::AutoBuy()
@@ -8916,7 +8915,7 @@ void CBasePlayer::BuildRebuyStruct()
 
 void CBasePlayer::Rebuy()
 {
-	char *fileData = m_rebuyString.get();
+	char *fileData = m_rebuyString.data();
 	char *token;
 
 	m_bIsInRebuy = true;

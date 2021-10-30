@@ -320,6 +320,7 @@ public:
 	virtual void Drop() {}
 	virtual void Kill() {}
 	virtual void AttachToPlayer(CBasePlayer *pPlayer) {}
+	virtual void CheckWeapon(CBasePlayer* pPlayer, CBasePlayerItem* pItem) {}
 #else
 	virtual void Drop();
 	virtual void Kill();
@@ -373,7 +374,7 @@ public:
 public:
 	inline ItemInfo ItemInfoInstance() const
 	{
-		ItemInfo II;
+		ItemInfo II = {};
 		const_cast<CBasePlayerItem *>(this)->GetItemInfo(&II);
 		return II;
 	}
@@ -502,14 +503,18 @@ public:
 	BOOL AddPrimaryAmmo(int iCount, char *szName, int iMaxClip, int iMaxCarry);
 	BOOL AddSecondaryAmmo(int iCount, char *szName, int iMaxCarry);
 	BOOL DefaultDeploy(const char *szViewModel, const char *szWeaponModel, int iAnim, const char *szAnimExt,
-	                   int skiplocal = 0, duration_t fDelay = 0.75s, duration_t m_flTimeWeaponIdle = 1.5s);
+	                   int skiplocal, duration_t fDelay, duration_t m_flTimeWeaponIdle = 1.5s);
+	BOOL DefaultDeploy(const char* szViewModel, const char* szWeaponModel, int iAnim, const char* szAnimExt, int skiplocal = 0) 
+	{
+		return DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal, 0.75s, 1.5s);
+	}
 	int DefaultReload(int iClipSize, int iAnim, duration_t fDelay, int body = 0);
 	void FireRemaining(int &shotsFired, time_point_t &shootTime, BOOL isGlock18);
 	void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max,
 	              float lateral_max, int direction_change);
 	void EjectBrassLate();
-	NOXREF void MakeBeam();
-	NOXREF void BeamUpdate();
+	//void MakeBeam();
+	//void BeamUpdate();
 	void ReloadSound();
 	duration_t GetNextAttackDelay(duration_t delay);
 	//float GetNextAttackDelay2(float delay);

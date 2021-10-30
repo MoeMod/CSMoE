@@ -44,23 +44,6 @@ namespace luash
 	{
 		lua_pushnil(L);
 	}
-#ifdef vec3_t
-	inline void PushVector(lua_State* L, const vec3_t& x)
-	{
-		lua_newtable(L);
-		lua_pushinteger(L, 1);
-		lua_pushnumber(L, x[0]);
-		lua_settable(L, -3);
-
-		lua_pushinteger(L, 2);
-		lua_pushnumber(L, x[1]);
-		lua_settable(L, -3);
-
-		lua_pushinteger(L, 3);
-		lua_pushnumber(L, x[2]);
-		lua_settable(L, -3);
-	}
-#endif
 	using std::begin;
 	using std::end;
 	template<class T> auto PushArray(lua_State* L, T&& v) -> decltype(begin(std::forward<T>(v)), end(std::forward<T>(v)), void())
@@ -88,10 +71,14 @@ namespace luash
 		});
 		CallOnStructCreate<typename std::decay<T>::type>(L);
 	}
+	int PushLuaObjectByPtr(lua_State* L, void* Ptr);
 	template<class T> void PushPointer(lua_State* L, T* ptr)
 	{
-		lua_pushlightuserdata(L, (void *)ptr);
-		CallOnPtrCreate(L, ptr);
+		if (!PushLuaObjectByPtr(L, (void*)ptr))
+		{
+			lua_pushlightuserdata(L, (void*)ptr); // #1 = ptr
+			SetupRefTypeInterface(L, (void*)ptr, CreateTypeInterface<T>());
+		}
 	}
 	// just unsupported
 	template<class T, class U> void PushMemberPointer(lua_State* L, U T::* mem_ptr)
@@ -120,9 +107,17 @@ namespace luash
 	{
 		PushPointer(L, ptr);
 	}
+	template<class T> auto PushCustom(lua_State* L, const T& x) -> decltype(x.LuaPush(L))
+	{
+		return x.LuaPush(L);
+	}
 
 	namespace detail
 	{
+		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<10>) -> decltype(PushCustom(L, x))
+		{
+			return PushCustom(L, x);
+		}
 		template<class T> auto PushUnknownImpl(lua_State* L, T x, PriorityTag<7>) -> decltype(PushBoolean(L, x))
 		{
 			return PushBoolean(L, x);
@@ -143,12 +138,6 @@ namespace luash
 		{
 			return PushString(L, std::forward<T>(x));
 		}
-#ifdef vec3_t
-		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<4>) -> decltype(PushVector(L, std::forward<T>(x)))
-		{
-			return PushVector(L, std::forward<T>(x));
-		}
-#endif
 		template<class T> auto PushUnknownImpl(lua_State* L, T &&x, PriorityTag<3>) -> decltype(PushArray(L, std::forward<T>(x)))
 		{
 			return PushArray(L, std::forward<T>(x));

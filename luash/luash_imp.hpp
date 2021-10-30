@@ -14,4 +14,3 @@
 #include "luash_ref.hpp"
 #include "luash_push.hpp"
 #include "luash_get.hpp"
-#include "luash_open.hpp"

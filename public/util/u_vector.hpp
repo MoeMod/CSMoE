@@ -22,6 +22,8 @@ GNU General Public License for more details.
 #include <array>
 #include <type_traits>
 
+#include "lua.hpp"
+
 #ifdef __SSE__
 #include <xmmintrin.h>
 #endif
@@ -310,6 +312,26 @@ inline VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, st
 	return { moe_math_util::fma(x, y.template get<I>(), z.template get<I>())... };
 }
 
+template<class VecType, std::size_t...I>
+inline void LuaPush_impl(lua_State* L, VecType vec, std::index_sequence<I...>)
+{
+	return (lua_newtable(L), ..., ( // #1 = res
+		lua_pushinteger(L, I + 1), // #2 = 1
+		lua_pushnumber(L, vec.template get<I>()), // #3 = res[1]
+		lua_settable(L, -3) // #1 = res
+	));
+}
+template<class VecType, std::size_t...I>
+inline void LuaGet_impl(lua_State* L, int idx, VecType &vec, std::index_sequence<I...>)
+{
+	return (lua_pushvalue(L, idx), ..., ( // #1 = vec
+		lua_pushnumber(L, I + 1), // #2 = 1
+		lua_gettable(L, -2), // #2 = vec[1]
+		vec.template get<I>() = lua_isnil(L, -1) ? 0 : lua_tonumber(L, -1),
+		lua_pop(L, 1) // #1 = vec
+	)), lua_pop(L, 1); // #0
+}
+
 template<class T, std::size_t N>
 struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 {
@@ -473,6 +495,14 @@ struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>>
 	explicit constexpr operator bool()
 	{
 		return !IsNull();
+	}
+	void LuaPush(lua_State* L) const
+	{
+		return LuaPush_impl(L, *this, std::make_index_sequence<N>());
+	}
+	void LuaGet(lua_State* L, int idx)
+	{
+		return LuaGet_impl(L, idx, *this, std::make_index_sequence<N>());
 	}
 };
 
