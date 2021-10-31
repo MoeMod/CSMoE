@@ -121,7 +121,9 @@ namespace ui
 		return 0;
 	}
 
+#ifdef LUASH_HOT_RELOAD
 	std::unordered_map<std::string, fs_offset_t> g_LoadedLuaFileTime;
+#endif
 	
 	int LuaUI_GlobalRequire(lua_State* L)
 	{
@@ -146,6 +148,7 @@ namespace ui
 		path += ModuleName;
 		if (path.substr(path.size() - 4) != ".lua")
 			path += ".lua";
+#ifdef LUASH_HOT_RELOAD
 		auto time = gFileSystemAPI.FS_FileTime(path.c_str(), true);
 		auto iter = g_LoadedLuaFileTime.find(path);
 		if (iter != g_LoadedLuaFileTime.end())
@@ -162,6 +165,7 @@ namespace ui
 		{
 			g_LoadedLuaFileTime.emplace(path, time);
 		}
+#endif
 
 		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED"); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE

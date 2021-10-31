@@ -285,8 +285,8 @@ namespace luash
 					return this->Assign(L);
 				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
 					return this->NewCopy(L);
+				detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			}
-			detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			void* value = lua_touserdata(L, 1);
 			int N = lua_tointeger(L, 2);
 			T* object = reinterpret_cast<T*>(value);
@@ -297,7 +297,11 @@ namespace luash
 		}
 		int MetaNewIndex(lua_State* L) const override
 		{
-			detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
+
+			if (lua_type(L, 2) == LUA_TSTRING)
+			{
+				detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
+			}
 			void* value = lua_touserdata(L, 1);
 			int N = lua_tointeger(L, 2);
 			T* object = reinterpret_cast<T*>(value);
