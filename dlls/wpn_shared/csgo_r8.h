@@ -58,9 +58,8 @@ public:
 	KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
 	const char* GetCSModelName() override { return "models/w_r8.mdl"; }
 public:
-	void R8FireA();
-	void R8FireB();
 	time_point_t m_tPreTime;
+	bool m_bTicked;
 	void R8Fire(float flSpread, duration_t flCycleTime, BOOL fUseSemi, BOOL fIsModeA);
 	float GetDamage(BOOL fIsModeA);
 	time_point_t m_NextInspect;

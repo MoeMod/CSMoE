@@ -85,6 +85,7 @@ int CHudShowWin::VidInit()
 void CHudShowWin::Reset(void)
 {
 	iType = 0;
+	m_flDisplayTime = 0.0f;
 }
 
 int CHudShowWin::Draw(float flTime)

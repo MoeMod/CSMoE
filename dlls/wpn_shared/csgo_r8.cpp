@@ -85,6 +85,7 @@ BOOL CR8::Deploy(void)
 {
 	m_flAccuracy = 0.92;
 	m_NextInspect = gpGlobals->time + 0.75s;
+	m_bTicked = false;
 
 	if (DefaultDeploy(m_pPlayer->m_iTeam == CT ? "models/v_r8.mdl" : "models/alt/v_r8.mdl", "models/p_r8.mdl", RANDOM_LONG(DRAW, DRAW_ALT), "onehanded", UseDecrement() != FALSE))
 	{
@@ -97,12 +98,7 @@ BOOL CR8::Deploy(void)
 
 void CR8::PrimaryAttack(void)
 {
-	m_iShotsFired++;
 	m_NextInspect = gpGlobals->time;
-
-	if (m_iShotsFired > 1)
-		return;
-
 	if (m_iClip <= 0)
 	{
 		if (m_fFireOnEmpty)
@@ -114,16 +110,26 @@ void CR8::PrimaryAttack(void)
 		return;
 	}
 
-#ifndef CLIENT_DLL
-	SetThink(&CR8::R8FireA);
-	pev->nextthink = gpGlobals->time + 0.01s;
-	SendWeaponAnim(PREPARE, UseDecrement() != FALSE);
-#endif
-
-	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.0s;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
-	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.1s;
-	m_tPreTime = gpGlobals->time + 0.4s;
+	if (!m_bTicked)
+	{
+		m_bTicked = true;
+		#ifndef CLIENT_DLL
+			SendWeaponAnim(PREPARE, UseDecrement() != FALSE);
+		#endif
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+		m_tPreTime = gpGlobals->time + 0.4s;
+	}
+	else if (m_tPreTime <= gpGlobals->time)
+	{
+		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+			R8Fire((0.95) * (1 - m_flAccuracy), 0.6s, FALSE, TRUE);
+		else if (m_pPlayer->pev->velocity.Length2D() > 0)
+			R8Fire((0.2) * (1 - m_flAccuracy), 0.6s, FALSE, TRUE);
+		else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			R8Fire((0.085) * (1 - m_flAccuracy), 0.6s, FALSE, TRUE);
+		else
+			R8Fire((0.073) * (1 - m_flAccuracy), 0.6s, FALSE, TRUE);
+	}
 }
 
 
@@ -135,60 +141,18 @@ void CR8::SecondaryAttack(void)
 		return;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		R8Fire((1.5) * (1 - m_flAccuracy), 1.04s, FALSE, FALSE);
+		R8Fire((2.0) * (1 - m_flAccuracy), 0.45s, FALSE, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		R8Fire((0.25) * (1 - m_flAccuracy), 1.04s, FALSE, FALSE);
+		R8Fire((1.55) * (1 - m_flAccuracy), 0.45s, FALSE, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		R8Fire((0.115) * (1 - m_flAccuracy), 1.04s, FALSE, FALSE);
+		R8Fire((1.315) * (1 - m_flAccuracy), 0.45s, FALSE, FALSE);
 	else
-		R8Fire((0.13) * (1 - m_flAccuracy), 1.04s, FALSE, FALSE);
-}
-
-void CR8::R8FireA()
-{
-#ifndef CLIENT_DLL
-	if (m_pPlayer->pev->button & IN_ATTACK)
-	{
-		if(m_tPreTime < gpGlobals->time)
-		{
-			if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-			{
-				R8Fire((0.95) * (1 - m_flAccuracy), 0.73s, FALSE, TRUE);
-			}
-			else if (m_pPlayer->pev->velocity.Length2D() > 0)
-			{
-				R8Fire((0.15) * (1 - m_flAccuracy), 0.73s, FALSE, TRUE);
-			}
-			else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-			{
-				R8Fire((0.085) * (1 - m_flAccuracy), 0.73s, FALSE, TRUE);
-			}
-			else
-			{
-				R8Fire((0.073) * (1 - m_flAccuracy), 0.73s, FALSE, TRUE);
-			}
-			SetThink(nullptr);
-		}
-		else
-		{
-			m_pPlayer->pev->button &= ~IN_ATTACK;
-			pev->nextthink = gpGlobals->time + 0.01s;
-		}
-	}
-	else
-	{
-		SetThink(nullptr);
-		SendWeaponAnim(UNPREPARE, UseDecrement() != FALSE);
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + gpGlobals->time - m_tPreTime;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
-	}
-#endif
+		R8Fire((1.33) * (1 - m_flAccuracy), 0.45s, FALSE, FALSE);
 }
 
 void CR8::R8Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim, BOOL fIsModeA)
 {
-	
-
+	m_bTicked = false;
 	if (m_flLastFire != invalid_time_point)
 	{
 		m_flAccuracy -= (0.4 - ((gpGlobals->time - m_flLastFire) / 1s)) * 0.35;
@@ -266,6 +230,12 @@ void CR8::Reload(void)
 
 void CR8::WeaponIdle(void)
 {
+	if (m_bTicked) {
+		SendWeaponAnim(UNPREPARE, UseDecrement() != FALSE);
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + gpGlobals->time - m_tPreTime;
+		m_bTicked = false;
+	}
+
 	ResetEmptySound();
 	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
 

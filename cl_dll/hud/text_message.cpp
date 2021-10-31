@@ -200,7 +200,7 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 				char *second = &msg_text[i + 3];
 
 				memmove( first, second, strlen( second ));
-				first[strlen(first)] = '\0';
+				first[strlen(first)-1] = '\0';
 			}
 		}
 	}
