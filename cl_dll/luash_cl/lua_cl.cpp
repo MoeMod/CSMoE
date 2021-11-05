@@ -68,7 +68,32 @@ namespace cl
 		LuaCL_OpenFileSystemLib(L);
 		LuaCL_OpenEventScripts(L);
 
+		LuaSV_ExportCppClass(L);
+		LuaSV_InitEntityFactory(L);
+		lua_register(L, "LINK_ENTITY_TO_CLASS", LuaSV_LinkEntityToClass);
+		lua_register(L, "GetDamageTrack", LuaSV_GetDamageTrack);
+		lua_register(L, "STRING", LuaSV_STRING);
+		lua_register(L, "UTIL_WeaponTimeBase", LuaSV_UTIL_WeaponTimeBase);
+		lua_register(L, "MAKE_STRING", LuaSV_MAKE_STRING);
+
 		gEngfuncs.pfnAddCommand("luacl", Cmd_LuaCL);
+
+		lua_getglobal(L, "require");
+		lua_pushstring(L, "client/init");
+		if (int errc = lua_pcall(L, 1, 0, 0))
+		{
+			const char* msg = lua_tostring(L, -1);
+			gEngfuncs.Con_Printf("%s client init failed: %s", __FUNCTION__, msg);
+			lua_pop(L, 1);
+		}
+	}
+
+	void LuaCL_PrepEntity()
+	{
+#ifdef CLIENT_WEAPONS
+		LuaSV_OpenEngfuncLib(L);
+		LuaSV_OpenGlbLib(L);
+#endif
 	}
 
 	void LuaCL_Shutdown()
@@ -80,6 +105,10 @@ namespace cl
 	lua_State* LuaCL_Get()
 	{
 		return L;
+	}
+	lua_State* LuaSV_Get()
+	{
+		return LuaCL_Get();
 	}
 
 	void LuaCL_Exec(const char *str)
@@ -245,6 +274,11 @@ namespace cl
 		}
 		gEngfuncs.Con_Printf("\n");
 		return 0;
+	}
+
+	void LuaSV_PrintError(const char* msg)
+	{
+		gEngfuncs.Con_Printf("%s: %s", __FUNCTION__, msg);
 	}
 
 	void LuaCL_OnPrecache(resourcetype_t type, const char* name, int index)

@@ -3,9 +3,13 @@
 
 #include "luash.hpp"
 
-namespace sv
-{
-	extern globalvars_t* gpGlobals; // h_export.h
+#ifndef CLIENT_DLL
+namespace sv {
+#else
+namespace cl {
+#endif
+
+	extern globalvars_t* gpGlobals; // h_export.h cs_baseentity.cpp
 	int LuaSV_OpenGlbLib(lua_State* L)
 	{
 		luash::RegisterGlobal(L, "gpGlobals", gpGlobals);

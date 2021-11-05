@@ -18,6 +18,8 @@
 
 #include "cbase/cbase_typelist.h"
 
+#include "luash_cl/lua_cl.h"
+
 /*
 	Weapon Registers
 */
@@ -66,15 +68,23 @@ void CBTEClientWeapons::PrepEntity(CBasePlayer *pWeaponOwner)
 			((CBasePlayerWeapon *)pEntity)->m_pPlayer = pWeaponOwner;
 		}
 	}
-	
+	LuaPrepPredictionWeaponEntity(pWeaponOwner);
 }
 
 void CBTEClientWeapons::ActiveWeapon(const char *name)
 {
 	m_pActiveWeapon = nullptr;
 
-	auto iter = WeaponEntityFindList().find({ name });
-	if (iter != WeaponEntityFindList().end())
+	if (auto ent = LuaGetPredictionWeaponEntity(name))
+	{
+		m_pActiveWeapon = ent;
+
+		ItemInfo info;
+		memset(&info, 0, sizeof(ItemInfo));
+		m_pActiveWeapon->GetItemInfo(&info);
+		g_pWpns[info.iId] = m_pActiveWeapon;
+	}
+	else if (auto iter = WeaponEntityFindList().find({ name }); iter != WeaponEntityFindList().end())
 	{
 		m_pActiveWeapon = iter->second.PlaceHolderEntity;
 

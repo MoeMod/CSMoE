@@ -4,8 +4,12 @@
 
 #include "luash.hpp"
 
-namespace sv
-{
+#ifndef CLIENT_DLL
+namespace sv {
+#else
+namespace cl {
+#endif
+
 	int LuaSV_OpenEngfuncLib(lua_State* L)
 	{
 		luash::RegisterGlobal(L, "engfunc", &g_engfuncs);

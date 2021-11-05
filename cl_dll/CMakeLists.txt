@@ -288,6 +288,12 @@ if(XASH_LUASH)
 		luash_cl/luash_cl_filesystem.cpp
 		luash_cl/luash_cl_mobile.cpp
 		luash_cl/luash_cl_render.cpp
+		../dlls/luash_sv/luash_sv_cppclass.cpp
+		../dlls/luash_sv/luash_sv_luaclass.cpp
+		../dlls/luash_sv/luash_sv_engfunc.cpp
+		../dlls/luash_sv/luash_sv_glb.cpp
+		../dlls/luash_sv/luash_sv_entity.cpp
+		../dlls/luash_sv/luash_sv_util.cpp
 	)
 else()
 	set(LUASH_SRCS )

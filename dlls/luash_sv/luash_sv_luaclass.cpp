@@ -6,10 +6,19 @@
 
 #include "meta/TypeIdentity.h"
 #include "luash.hpp"
-#include "luash_sv/luash_sv.h"
 #include "luash_sv/luash_sv_marco.h"
+#ifndef CLIENT_DLL
+#include "luash_sv/luash_sv.h"
+#else
+#include "luash_cl/lua_cl.h"
+#endif
 
+#ifndef CLIENT_DLL
 namespace sv {
+#else
+namespace cl {
+#endif
+
 	// LuaClass<CBasePlayerWeapon, CBasePlayerWeapon>
 	// LuaClass<CBasePlayerItem, CBasePlayerWeapon>
 	// LuaClass<CBaseAnimating, CBasePlayerWeapon>
@@ -36,15 +45,17 @@ namespace sv {
 		return;
 	}
 
-#define CLASS_BEGIN(ClassName, BaseClass) \
-	template<class Base> struct PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>> {}; \
-	template<class Base> struct PrivateData<LuaClass<ClassName, Base>, Base> {}; \
-	template<class Base> class LuaClass<ClassName, Base> : \
-		public std::conditional<std::is_void<BaseClass>::value, Base, LuaClass<BaseClass, Base>>::type, \
-		public std::conditional<std::is_void<BaseClass>::value, PrivateData<LuaClass<ClassName, Base>, Base>, PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>>>::type { \
-	using ThisClass = ClassName; \
-	static_assert(std::is_base_of<BaseClass, ThisClass>::value || std::is_void<BaseClass>::value); \
-	public:
+	#define CLASS_BEGIN(ClassName, BaseClass) \
+		template<class Base> struct PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>> {}; \
+		template<class Base> struct PrivateData<LuaClass<ClassName, Base>, Base> {}; \
+		template<class Base> class LuaClass<ClassName, Base> : \
+			public std::conditional<std::is_void<BaseClass>::value, Base, LuaClass<BaseClass, Base>>::type, \
+			public std::conditional<std::is_void<BaseClass>::value, PrivateData<LuaClass<ClassName, Base>, Base>, PrivateData<LuaClass<ClassName, Base>, LuaClass<BaseClass, Base>>>::type \
+		{ \
+		using ThisClass = ClassName; \
+		static_assert(std::is_base_of<BaseClass, ThisClass>::value || std::is_void<BaseClass>::value); \
+		public:
+
 	#define ADD_VIRTUAL_FUNCTION(...) auto BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) NAMED_ARGUMENT(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), __VA_ARGS__) \
 				-> decltype(std::declval<ThisClass>().BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))) override { \
 			using ResultType = decltype(ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))); \
@@ -70,7 +81,7 @@ namespace sv {
 				const char *msg = lua_tostring(L, -1); \
 				char buffer[256]; \
 				snprintf(buffer, 256, "LuaClass Vfunc %s Error: %s\n", __FUNCTION__, msg); \
-				SERVER_PRINT(buffer); \
+				LuaSV_PrintError(buffer); \
 				lua_pop(L, 2); \
 				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
 			} \
@@ -90,16 +101,45 @@ namespace sv {
 		luash::SetupRefTypeInterface(L, (void*)ptr, luash::CreateTypeInterface<T>());
 	}
 
+#ifndef CLIENT_DLL
 	template<class T> CBaseEntity* LuaCreateClassPtr(lua_State* L, entvars_t* pev)
 	{
 		LuaClass<T>* ptr = GetClassPtr<LuaClass<T>>(pev);
 		LuaSetupRefTypeInterface<T>(L, ptr);
 		return ptr;
 	}
+#else
+	template<class T> CBaseEntity* LuaGetPlaceHolderEntity(lua_State* L)
+	{
+		static CBaseEntity* ptr = nullptr;
+		if constexpr (std::is_base_of<CBasePlayerWeapon, T>::value)
+		{
+			if (!ptr)
+			{
+				static LuaClass<T> w;
 
+				CBasePlayerWeapon* pEntity = &w;
+
+				LuaSetupRefTypeInterface<T>(L, &w);
+
+				ptr = &w;
+			}
+		}
+		return ptr;
+	}
+#endif
+
+#ifndef CLIENT_DLL
 #define CLASS_BEGIN(ClassName, BaseClass) \
 	template void LuaSetupRefTypeInterface<ClassName>(lua_State* L, CBaseEntity* ptr); \
 	template CBaseEntity* LuaCreateClassPtr<ClassName>(lua_State *L, entvars_t* pev); \
+
+#else
+#define CLASS_BEGIN(ClassName, BaseClass) \
+	template void LuaSetupRefTypeInterface<ClassName>(lua_State* L, CBaseEntity* ptr); \
+	template CBaseEntity* LuaGetPlaceHolderEntity<ClassName>(lua_State *L); \
+
+#endif
 
 #define ADD_VIRTUAL_FUNCTION(FunctionName, ...)
 #define ADD_MEMBER_FUNCTION(FunctionName, ...) 

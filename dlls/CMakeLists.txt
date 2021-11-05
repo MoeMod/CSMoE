@@ -368,6 +368,7 @@ set(LUASV_SRCS
 	luash_sv/luash_sv_luaclass.cpp
 	luash_sv/luash_sv_cppclass.cpp
 	luash_sv/luash_sv_entity.cpp
+	luash_sv/luash_sv_util.cpp
 )
 
 set_source_files_properties(

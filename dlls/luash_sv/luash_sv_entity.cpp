@@ -6,11 +6,24 @@
 
 #include "meta/TypeIdentity.h"
 #include "luash.hpp"
+#ifndef CLIENT_DLL
 #include "luash_sv/luash_sv.h"
+#else
+#include "luash_cl/lua_cl.h"
+#endif
 
+#ifndef CLIENT_DLL
 namespace sv {
+#else
+namespace cl {
+#endif
+
 	std::map<std::string, void (*)(lua_State* L, CBaseEntity* ptr)> g_pfnLuaSetupRefTypeInterfaceMap;
+#ifndef CLIENT_DLL
 	std::map<std::string, CBaseEntity* (*)(lua_State* L, entvars_t* pev)> g_pfnLuaCreateClassPtrMap;
+#else
+	std::map<std::string, CBaseEntity* (*)(lua_State* L)> g_pfnGetPlaceHolderEntityMap;
+#endif
 
 	int LuaSV_LinkEntityToClass(lua_State* L)
 	{
@@ -25,6 +38,7 @@ namespace sv {
 		return 0;
 	}
 
+#ifndef CLIENT_DLL
 	bool LuaGetClassPtr(const char* classname, entvars_t* pev)
 	{
 		lua_State* L = LuaSV_Get();
@@ -63,7 +77,7 @@ namespace sv {
 			const char* msg = lua_tostring(L, -1);
 			char buffer[256];
 			snprintf(buffer, 256, "%s Error: CBaseEntity (%s) create failed: %s\n", __FUNCTION__, classname, msg);
-			SERVER_PRINT(buffer);
+			LuaSV_PrintError(buffer);
 			lua_pop(L, 1);
 			ptr->SUB_Remove();
 			return true;
@@ -74,6 +88,95 @@ namespace sv {
 		lua_pop(L, 4);
 		return true;
 	}
+#else
+	CBasePlayerWeapon* LuaGetPredictionWeaponEntity(const char* classname)
+	{
+		lua_State* L = LuaSV_Get();
+		lua_getglobal(L, "_LUACLASS"); // #1 = _R._LUACLASS
+		assert(!lua_isnil(L, -1));
+		lua_getfield(L, -1, classname); // #2 = LuaClass
+		if (lua_isnil(L, -1))
+		{
+			lua_pop(L, 2);
+			return nullptr;
+		}
+
+		lua_getfield(L, -1, "cppclass"); // #3 = cppclass "CBaseEntity"
+
+		const char* cppClassName = lua_tostring(L, -1);
+
+		auto iter = g_pfnGetPlaceHolderEntityMap.find(cppClassName);
+		if (iter == g_pfnGetPlaceHolderEntityMap.end())
+		{
+			// unknown cpp class
+			lua_pop(L, 3);
+			return nullptr;
+		}
+		CBaseEntity* (*pfnLuaGetPlaceHolderEntityPtr)(lua_State * L) = iter->second;
+
+		CBaseEntity* ptr = pfnLuaGetPlaceHolderEntityPtr(L);
+		if (ptr == nullptr)
+		{
+			// unknown cpp class
+			lua_pop(L, 3);
+			return nullptr;
+		}
+
+		if (luash::PushLuaObjectByPtr(L, ptr))
+		{
+			// already created
+			lua_pop(L, 4);
+			return (CBasePlayerWeapon*)ptr;
+		}
+
+		lua_getglobal(L, "class_new"); // #4 = class_new
+		assert(!lua_isnil(L, -1));
+		lua_pushvalue(L, -3); // #5 = LuaClass
+		lua_pushlightuserdata(L, ptr); // #6 = this
+
+		int errc = lua_pcall(L, 2, 1, 0); // #4 = LuaObject
+		if (errc)
+		{
+			const char* msg = lua_tostring(L, -1);
+			char buffer[256];
+			snprintf(buffer, 256, "%s Error: CBaseEntity (%s) create failed: %s\n", __FUNCTION__, classname, msg);
+			LuaSV_PrintError(buffer);
+			lua_pop(L, 1);
+			ptr->SUB_Remove();
+			return nullptr;
+		}
+
+		luash::LinkPtrToLuaObject(L, ptr); // #4 = LuaObject
+
+		lua_pop(L, 4);
+
+		static entvars_t ev;
+		//InitializeWeaponEntity(ptr, &ev);
+		ptr->pev = &ev;
+		ptr->Precache();
+		ptr->Spawn();
+		return (CBasePlayerWeapon*)ptr;
+	}
+	void LuaPrepPredictionWeaponEntity(CBasePlayer* pWeaponOwner)
+	{
+		lua_State* L = LuaSV_Get();
+		lua_getglobal(L, "_LUACLASS"); // #1 = _R._LUACLASS
+		assert(!lua_isnil(L, -1));
+		lua_pushnil(L);
+		while (lua_next(L, -2))
+		{
+			// -1 = value, -2 = key
+			const char* classname = lua_tostring(L, -2);
+			auto pEntity = LuaGetPredictionWeaponEntity(classname);
+			if (pEntity)
+			{
+				((CBasePlayerWeapon*)pEntity)->m_pPlayer = pWeaponOwner;
+			}
+			lua_pop(L, 1);
+		}
+		lua_pop(L, 1);
+	}
+#endif
 
 	void LuaSV_OnEntityRemove(CBaseEntity* p)
 	{
@@ -98,7 +201,7 @@ namespace sv {
 			const char* msg = lua_tostring(L, -1);
 			char buffer[256];
 			snprintf(buffer, 256, "%s Error: CBaseEntity (%d) delete failed: %s\n", __FUNCTION__, p->entindex(), msg);
-			SERVER_PRINT(buffer);
+			LuaSV_PrintError(buffer);
 			lua_pop(L, 1);
 			return;
 		}
@@ -141,7 +244,7 @@ namespace sv {
 			const char* msg = lua_tostring(L, -1);
 			char buffer[256];
 			snprintf(buffer, 256, "%s Error: CBaseEntity (%s) notify failed: %s\n", __FUNCTION__, cppClassName, msg);
-			SERVER_PRINT(buffer);
+			LuaSV_PrintError(buffer);
 			lua_pop(L, 2);
 			return;
 		}

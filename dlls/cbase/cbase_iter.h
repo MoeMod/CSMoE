@@ -70,19 +70,25 @@ CLASS_BEGIN(CBaseEntity, void)
 	ADD_VIRTUAL_FUNCTION(FVisible, const Vector&)
 
 	ADD_MEMBER_FUNCTION(SUB_Remove)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(SUB_DoNothing)
 	ADD_MEMBER_FUNCTION(SUB_StartFadeOut)
 	ADD_MEMBER_FUNCTION(SUB_FadeOut)
+#endif
 	ADD_MEMBER_FUNCTION(SUB_CallUseToggle)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(SUB_UseTargets, CBaseEntity*, USE_TYPE, float)
 	ADD_MEMBER_FUNCTION(UpdateOnRemove)
 	ADD_MEMBER_FUNCTION(ShouldToggle, USE_TYPE, BOOL)
 	ADD_MEMBER_FUNCTION(FireBullets, ULONG, Vector, Vector, Vector, float, int, int, int, entvars_t*)
+#endif
 	ADD_MEMBER_FUNCTION(FireBullets3, Vector, Vector, float, float, int, int, int, float, entvars_t*, bool, int)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(Intersects, CBaseEntity*)
 	ADD_MEMBER_FUNCTION(MakeDormant)
 	ADD_MEMBER_FUNCTION(IsDormant)
 	ADD_MEMBER_FUNCTION(IsLockedByMaster)
+#endif
 
 	ADD_STATIC_MEMBER_FUNCTION(Instance, edict_t*)
 	ADD_STATIC_MEMBER_FUNCTION(Instance, entvars_t*)
@@ -91,7 +97,9 @@ CLASS_BEGIN(CBaseEntity, void)
 	ADD_MEMBER_FUNCTION(GetMonsterPointer, entvars_t*)
 	ADD_MEMBER_FUNCTION(GetMonsterPointer, edict_t*)
 
+#ifndef CLIENT_DLL
 	ADD_STATIC_MEMBER_FUNCTION(Create, const char*, const Vector&, const Vector&, edict_t*)
+#endif
 
 	ADD_MEMBER_FUNCTION(edict)
 	ADD_MEMBER_FUNCTION(eoffset)
@@ -99,8 +107,10 @@ CLASS_BEGIN(CBaseEntity, void)
 CLASS_END()
 
 CLASS_BEGIN(CBaseDelay, CBaseEntity)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(SUB_UseTargets, CBaseEntity*, USE_TYPE, float)
 	ADD_MEMBER_FUNCTION(DelayThink)
+#endif
 
 	ADD_OVERRIDE_VIRTUAL_FUNCTION(KeyValue, KeyValueData*)
 	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Save, CSave&)
@@ -109,6 +119,7 @@ CLASS_END()
 
 CLASS_BEGIN(CBaseAnimating, CBaseDelay)
 	ADD_VIRTUAL_FUNCTION(HandleAnimEvent, MonsterEvent_t*)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(GetSequenceFlags)
 	ADD_MEMBER_FUNCTION(LookupActivity, int)
 	ADD_MEMBER_FUNCTION(LookupActivityHeaviest, int)
@@ -126,12 +137,14 @@ CLASS_BEGIN(CBaseAnimating, CBaseDelay)
 	ADD_MEMBER_FUNCTION(GetBodygroup, int)
 	ADD_MEMBER_FUNCTION(ExtractBbox, int, float*, float*)
 	ADD_MEMBER_FUNCTION(SetSequenceBox)
+#endif
 
 	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Save, CSave&)
 	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Restore, CRestore&)
 CLASS_END()
 
 CLASS_BEGIN(CBaseToggle, CBaseAnimating)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(LinearMove, Vector, float)
 	ADD_MEMBER_FUNCTION(LinearMoveDone)
 	ADD_MEMBER_FUNCTION(AngularMove, Vector, float)
@@ -140,6 +153,7 @@ CLASS_BEGIN(CBaseToggle, CBaseAnimating)
 	ADD_STATIC_MEMBER_FUNCTION(AxisValue, int, const Vector&)
 	ADD_STATIC_MEMBER_FUNCTION(AxisDir, entvars_t*)
 	ADD_STATIC_MEMBER_FUNCTION(AxisDelta, int, const Vector&, const Vector&)
+#endif
 
 	ADD_OVERRIDE_VIRTUAL_FUNCTION(KeyValue, KeyValueData*)
 	// ADD_OVERRIDE_VIRTUAL_FUNCTION(Save, CSave&)
@@ -217,17 +231,21 @@ CLASS_BEGIN(CBasePlayerWeapon, CBasePlayerItem)
 	ADD_VIRTUAL_FUNCTION(ShouldWeaponIdle)
 	ADD_VIRTUAL_FUNCTION(UseDecrement)
 
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(AddPrimaryAmmo, int, char*, int, int)
 	ADD_MEMBER_FUNCTION(AddSecondaryAmmo, int, char*, int)
+#endif
 	ADD_MEMBER_FUNCTION(DefaultDeploy, const char*, const char*, int, const char*, int)
 	ADD_MEMBER_FUNCTION(DefaultReload, int, int, duration_t, int)
 	ADD_MEMBER_FUNCTION(FireRemaining, int&, time_point_t&, BOOL)
 	ADD_MEMBER_FUNCTION(KickBack, float, float, float, float, float, float, int)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(EjectBrassLate)
 	//ADD_MEMBER_FUNCTION(MakeBeam)
 	//ADD_MEMBER_FUNCTION(BeamUpdate)
 	ADD_MEMBER_FUNCTION(ReloadSound)
 	ADD_MEMBER_FUNCTION(GetNextAttackDelay, duration_t)
+#endif
 	ADD_MEMBER_FUNCTION(HasSecondaryAttack)
 	ADD_MEMBER_FUNCTION(IsPistol)
 	ADD_MEMBER_FUNCTION(SetPlayerShieldAnim)
@@ -270,6 +288,7 @@ CLASS_BEGIN(CBaseMonster, CBaseToggle)
 	ADD_VIRTUAL_FUNCTION(FInViewCone, CBaseEntity*)
 	ADD_VIRTUAL_FUNCTION(FInViewCone, const Vector *)
 
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(MakeIdealYaw, Vector)
 	ADD_MEMBER_FUNCTION(GetSmallFlinchActivity)
 	ADD_MEMBER_FUNCTION(ShouldGibMonster, int)
@@ -283,6 +302,7 @@ CLASS_BEGIN(CBaseMonster, CBaseToggle)
 	ADD_MEMBER_FUNCTION(CheckTraceHullAttack, float, int, int)
 	ADD_MEMBER_FUNCTION(MakeDamageBloodDecal, int, float, TraceResult*, const Vector&)
 	ADD_MEMBER_FUNCTION(BloodSplat, const Vector&, const Vector&, int, int)
+#endif
 
 	ADD_MEMBER_FUNCTION(SetConditions, int)
 	ADD_MEMBER_FUNCTION(ClearConditions, int)
@@ -317,6 +337,7 @@ CLASS_BEGIN(CBasePlayer, CBaseMonster)
 	ADD_VIRTUAL_FUNCTION(Blind, duration_t, duration_t, duration_t, int)
 	ADD_VIRTUAL_FUNCTION(OnTouchingWeapon, CWeaponBox*)
 
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(SpawnClientSideCorpse)
 	ADD_MEMBER_FUNCTION(Observer_FindNextPlayer, bool, const char*)
 	ADD_MEMBER_FUNCTION(Observer_IsValidTarget, int, bool)
@@ -435,11 +456,13 @@ CLASS_BEGIN(CBasePlayer, CBaseMonster)
 	ADD_MEMBER_FUNCTION(DropShield, bool)
 	ADD_MEMBER_FUNCTION(IsHittingShield, Vector&, TraceResult*)
 	ADD_MEMBER_FUNCTION(SelectSpawnSpot, const char*, CBaseEntity*&)
+#endif
 	ADD_MEMBER_FUNCTION(IsReloading)
 	ADD_MEMBER_FUNCTION(IsBlind)
 	ADD_MEMBER_FUNCTION(IsAutoFollowAllowed)
 	ADD_MEMBER_FUNCTION(InhibitAutoFollow, duration_t)
 	ADD_MEMBER_FUNCTION(AllowAutoFollow)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(ClearAutoBuyData)
 	ADD_MEMBER_FUNCTION(AddAutoBuyData, const char *)
 	ADD_MEMBER_FUNCTION(AutoBuy)
@@ -467,8 +490,11 @@ CLASS_BEGIN(CBasePlayer, CBaseMonster)
 	ADD_MEMBER_FUNCTION(RebuyNightVision)
 	ADD_MEMBER_FUNCTION(RebuyArmor)
 	ADD_MEMBER_FUNCTION(UpdateLocation, bool)
+#endif
 	ADD_MEMBER_FUNCTION(SetObserverAutoDirector, bool)
+#ifndef CLIENT_DLL
 	ADD_MEMBER_FUNCTION(IsObservingPlayer, CBasePlayer*)
+#endif
 	ADD_MEMBER_FUNCTION(CanSwitchObserverModes)
 	ADD_MEMBER_FUNCTION(Intense)
 

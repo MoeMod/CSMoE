@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include "fs_int.h"
 
-#include "gamemode/mods.h"
-
 #include "luash_sv.h"
 #include "luash.hpp"
 
@@ -30,26 +28,6 @@ namespace sv
 			const char* str = CMD_ARGV(i);
 			LuaSV_Exec(str);
 		}
-	}
-
-	static int LuaSV_GetDamageTrack(lua_State *L)
-	{
-		auto dt = g_pModRunning->DamageTrack();
-		lua_pushinteger(L, (int)dt);
-		return 1;
-	}
-
-	static int LuaSV_STRING(lua_State* L)
-	{
-		string_t offset = lua_tointeger(L, 1);
-		lua_pushstring(L, STRING(offset));
-		return 1;
-	}
-
-	static int LuaSV_UTIL_WeaponTimeBase(lua_State* L)
-	{
-		luash::Push(L, UTIL_WeaponTimeBase());
-		return 1;
 	}
 
 	void LuaSV_Init()
@@ -87,22 +65,13 @@ namespace sv
 		LuaSV_OpenDllfuncLib(L);
 		LuaSV_OpenGlbLib(L);
 
-		//LuaSV_ExportCppClass(L);
-		lua_pushcfunction(L, LuaSV_ExportCppClass);
-		if (int errc = lua_pcall(L, 0, 0, 0))
-		{
-			const char* msg = lua_tostring(L, -1);
-			char buffer[256];
-			snprintf(buffer, 256, "%s server init failed: %s", __FUNCTION__, msg);
-			SERVER_PRINT(buffer);
-			lua_pop(L, 1);
-		}
-
+		LuaSV_ExportCppClass(L);
 		LuaSV_InitEntityFactory(L);
 		lua_register(L, "LINK_ENTITY_TO_CLASS", LuaSV_LinkEntityToClass);
 		lua_register(L, "GetDamageTrack", LuaSV_GetDamageTrack);
 		lua_register(L, "STRING", LuaSV_STRING);
 		lua_register(L, "UTIL_WeaponTimeBase", LuaSV_UTIL_WeaponTimeBase);
+		lua_register(L, "MAKE_STRING", LuaSV_MAKE_STRING);
 
 		ADD_SERVER_COMMAND("luasv", Cmd_LuaSV);
 
@@ -307,10 +276,8 @@ namespace sv
 		return 0;
 	}
 
-	int LuaSV_InitEntityFactory(lua_State* L)
+	void LuaSV_PrintError(const char* msg)
 	{
-		lua_newtable(L);
-		lua_setfield(L, LUA_REGISTRYINDEX, "_LUACLASS");
-		return 0;
+		SERVER_PRINT(msg);
 	}
 }

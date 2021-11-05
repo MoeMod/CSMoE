@@ -44,6 +44,8 @@
 #include "minmax.h"
 #include "exportdef.h"
 
+#include "luash_cl/lua_cl.h"
+
 extern int g_iUser1;
 
 namespace cl {
@@ -68,6 +70,9 @@ static globalvars_t	Globals = { };
 
 // ref from bte_weapons.cpp
 CBasePlayerWeapon *g_pWpns[ MAX_WEAPONS ];
+
+// Lua handler
+void LuaNotifyCppEntityCreate(const char* cppClassName, CBaseEntity* ptr);
 
 
 // CS Weapon placeholder entities
@@ -836,8 +841,11 @@ void HUD_InitClientWeapons( void )
 	g_engfuncs.pfnRandomFloat		= gEngfuncs.pfnRandomFloat;
 	g_engfuncs.pfnRandomLong		= RandomLong;
 
+	LuaCL_PrepEntity();
+
 	// Allocate a slot for the local player
 	HUD_PrepEntity( &player		, NULL );
+	LuaNotifyCppEntityCreate("CBasePlayer", &player);
 
 	// Allocate slot(s) for each weapon that we are going to be predicting
 	HUD_PrepEntity( &g_P228, &player);
