@@ -60,16 +60,25 @@ namespace luash
 	};
 	namespace detail
 	{
+		// hackme : ref type as pointer when pushed by __index to support a.b.c=2
+		template<class T> auto MetaIndexImpl2(lua_State* L, T&& arg)
+		{
+			if constexpr(std::disjunction<typename std::negation<IsCompleteType<typename std::remove_cv<T>::type>>::type, std::is_aggregate<typename std::remove_cv<T>::type>, IsSupportedClass<typename std::remove_cv<T>::type>>::value)
+				Push(L, &arg);
+			else
+				Push(L, arg);
+			return true;
+		}
 		template<std::size_t...I, class...Args> bool MetaIndexImpl(lua_State* L, int N, std::index_sequence<I...>, Args &&...args)
 		{
-			return (... || ((I == N - 1) ? (Push(L, std::forward<Args>(args)), true) : false));
+			return (... || ((I == N - 1) ? MetaIndexImpl2(L, std::forward<Args>(args)) : false));
 		}
-		template<class T, class...Args> bool MetaNewIndexImpl2(lua_State* L, int N, T &arg)
+		template<class T> bool MetaNewIndexImpl2(lua_State* L, int N, T &arg)
 		{
 			Get(L, 3, arg);
 			return true;
 		}
-		template<class T, class...Args> bool MetaNewIndexImpl2(lua_State* L, int N, const T& arg)
+		template<class T> bool MetaNewIndexImpl2(lua_State* L, int N, const T& arg)
 		{
 			// cannot set const value
 			return false;
@@ -247,18 +256,20 @@ namespace luash
 		{
 			if (lua_type(L, 2) == LUA_TSTRING)
 			{
-				if (!strcmp(lua_tostring(L, 2), "Copy"))
+				if (!strcmp(lua_tostring(L, 2), "self"))
 					return this->Copy(L);
-				if (!strcmp(lua_tostring(L, 2), "Assign"))
-					return this->Assign(L);
-				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
-					return this->NewCopy(L);
 				return 0;
 			}
 			return 0;
 		}
 		int MetaNewIndex(lua_State* L) const override
 		{
+			if (lua_type(L, 2) == LUA_TSTRING)
+			{
+				if (!strcmp(lua_tostring(L, 2), "self"))
+					return this->Assign(L);
+				return 0;
+			}
 			return 0;
 		}
 	};
@@ -279,12 +290,8 @@ namespace luash
 		{
 			if (lua_type(L, 2) == LUA_TSTRING)
 			{
-				if (!strcmp(lua_tostring(L, 2), "Copy"))
+				if (!strcmp(lua_tostring(L, 2), "self"))
 					return this->Copy(L);
-				if (!strcmp(lua_tostring(L, 2), "Assign"))
-					return this->Assign(L);
-				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
-					return this->NewCopy(L);
 				detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			}
 			void* value = lua_touserdata(L, 1);
@@ -300,6 +307,8 @@ namespace luash
 
 			if (lua_type(L, 2) == LUA_TSTRING)
 			{
+				if (!strcmp(lua_tostring(L, 2), "self"))
+					return this->Assign(L);
 				detail::TypeInterfaceStringIndexReplace(this, L, "struct/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			}
 			void* value = lua_touserdata(L, 1);
@@ -308,7 +317,12 @@ namespace luash
 			bool success = StructApply(*object, [L, N](auto &&...args) {
 				return detail::MetaNewIndexImpl(L, N, std::make_index_sequence<sizeof...(args)>(), std::forward<decltype(args)>(args)...);
 				});
-			return success ? 1 : 0;
+			if (!success)
+			{
+				std::string type(this->GetTypeName());
+				return luaL_error(L, "can not assign field %s[%d]", type.c_str(), N);
+			}
+			return success;
 		}
 	};
 
@@ -326,7 +340,7 @@ namespace luash
 		int MetaIndexImpl(lua_State* L, T &objref, std::size_t N, std::index_sequence<I...>) const
 		{
 			static constexpr void (*meta_switch[sizeof...(I)])(lua_State * L, T & objref) = {
-				+[](lua_State* L, T& objref) { Push(L, GetStructMember<I>(objref)); }...
+				+[](lua_State* L, T& objref) { detail::MetaIndexImpl2(L, GetStructMember<I>(objref)); }...
 			};
 			if (N < 1 || N > sizeof...(I))
 				return 0;
@@ -348,12 +362,8 @@ namespace luash
 		{
 			if (lua_type(L, 2) == LUA_TSTRING)
 			{
-				if (!strcmp(lua_tostring(L, 2), "Copy"))
+				if (!strcmp(lua_tostring(L, 2), "self"))
 					return this->Copy(L);
-				if (!strcmp(lua_tostring(L, 2), "Assign"))
-					return this->Assign(L);
-				if (!strcmp(lua_tostring(L, 2), "NewCopy"))
-					return this->NewCopy(L);
 			}
 			detail::TypeInterfaceStringIndexReplace(this, L, "class/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			void* value = lua_touserdata(L, 1);
@@ -364,6 +374,11 @@ namespace luash
 		}
 		int MetaNewIndex(lua_State* L) const override
 		{
+			if (lua_type(L, 2) == LUA_TSTRING)
+			{
+				if (!strcmp(lua_tostring(L, 2), "self"))
+					return this->Assign(L);
+			}
 			detail::TypeInterfaceStringIndexReplace(this, L, "class/", nameof::nameof_short_type<typename std::decay<T>::type>());
 			void* value = lua_touserdata(L, 1);
 			int N = lua_tointeger(L, 2);

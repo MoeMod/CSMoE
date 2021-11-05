@@ -219,6 +219,8 @@ namespace luash
 
 	bool GetPtrByLuaObject(lua_State* L, int N, void*&out)
 	{
+		if (lua_isnil(L, N))
+			return false;
 		lua_getfield(L, N, "this");
 		if (lua_isnil(L, -1))
 		{

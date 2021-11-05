@@ -74,6 +74,8 @@ namespace luash
 	int PushLuaObjectByPtr(lua_State* L, void* Ptr);
 	template<class T> void PushPointer(lua_State* L, T* ptr)
 	{
+		if (!ptr)
+			return lua_pushnil(L);
 		if (!PushLuaObjectByPtr(L, (void*)ptr))
 		{
 			lua_pushlightuserdata(L, (void*)ptr); // #1 = ptr
