@@ -4760,9 +4760,6 @@ void EXT_FUNC RegisterEncoders()
 	DELTA_ADDENCODER("Entity_Encode", Entity_Encode);
 	DELTA_ADDENCODER("Custom_Encode", Custom_Encode);
 	DELTA_ADDENCODER("Player_Encode", Player_Encode);
-
-	// init before worldspawn
-	sv::LuaSV_Init();
 }
 
 int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)

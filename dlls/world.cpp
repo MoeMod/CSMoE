@@ -18,6 +18,7 @@
 #include "gamemode/mods.h"
 #include "player/csdm_randomspawn.h"
 #include "cbase/cbase_hash.h"
+#include "luash_sv/luash_sv.h"
 
 namespace sv {
 
@@ -430,6 +431,9 @@ void EXT_FUNC ResetGlobalState()
 
 	// Init the HUD on a new game / load game
 	gInitHUD = TRUE;
+
+	// init before worldspawn
+	sv::LuaSV_Init();
 }
 
 LINK_ENTITY_TO_CLASS(worldspawn, CWorld);
