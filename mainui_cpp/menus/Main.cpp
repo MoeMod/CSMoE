@@ -30,7 +30,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef XASH_IMGUI
 #include "imgui_menu/imgui_menu_msgbox.h"
-#include "imgui_menu/imgui_menu_options.h"
 #endif
 
 #define ART_MINIMIZE_N	"gfx/shell/min_n"

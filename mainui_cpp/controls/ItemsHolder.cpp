@@ -530,7 +530,7 @@ bool RES_ExpectString( char **data, const char *expect, bool skip = true )
 	return false;
 }
 
-inline bool FreeFile( byte *pfile, const bool retval )
+inline bool FreeFile( void *pfile, const bool retval )
 {
 	EngFuncs::COM_FreeFile( pfile );
 	return retval;
@@ -538,7 +538,7 @@ inline bool FreeFile( byte *pfile, const bool retval )
 
 bool CMenuItemsHolder::LoadRES(const char *filename)
 {
-	byte *pfile = EngFuncs::COM_LoadFile( filename );
+	char *pfile = EngFuncs::COM_LoadFile( filename );
 	char *afile = (char*)pfile;
 	char token[1024];
 

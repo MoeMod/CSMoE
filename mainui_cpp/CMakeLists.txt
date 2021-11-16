@@ -142,7 +142,6 @@ if(XASH_IMGUI)
 	add_definitions(-DXASH_IMGUI)
 	list(APPEND MAINUI_SOURCES
 		imgui_menu/imgui_menu.cpp
-		imgui_menu/imgui_menu_options.cpp
 		imgui_menu/imgui_menu_msgbox.cpp
 	)
 endif()

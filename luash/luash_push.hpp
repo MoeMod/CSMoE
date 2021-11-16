@@ -107,7 +107,7 @@ namespace luash
 	}
 	inline void PushString(lua_State* L, const char* ptr)
 	{
-		PushPointer(L, ptr);
+		lua_pushstring(L, ptr);
 	}
 	template<class T> auto PushCustom(lua_State* L, const T& x) -> decltype(x.LuaPush(L))
 	{

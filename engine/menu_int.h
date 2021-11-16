@@ -65,7 +65,7 @@ typedef struct ui_enginefuncs_s
 	// cvar handlers
 	cvar_t*	(*pfnRegisterVariable)( const char *szName, const char *szValue, int flags );
 	float	(*pfnGetCvarFloat)( const char *szName );
-	char*	(*pfnGetCvarString)( const char *szName );
+	const char*	(*pfnGetCvarString)( const char *szName );
 	void	(*pfnCvarSetString)( const char *szName, const char *szValue );
 	void	(*pfnCvarSetValue)( const char *szName, float flValue );
 
@@ -117,7 +117,7 @@ typedef struct ui_enginefuncs_s
 	void	(*pfnClientJoin)( const struct netadr_s adr );
 	
 	// parse txt files
-	byte*	(*COM_LoadFile)( const char *filename, int *pLength );
+	char*	(*COM_LoadFile)( const char *filename, int *pLength );
 	char*	(*COM_ParseFile)( char *data, char *token );
 	void	(*COM_FreeFile)( void *buffer );
 

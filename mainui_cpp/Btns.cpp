@@ -73,7 +73,7 @@ void UI_LoadBmpButtons( void )
 	memset( uiStatic.buttonsPics, 0, sizeof( uiStatic.buttonsPics ));
 
 	int bmp_filesize, palette_sz = 0;
-	byte *bmp_buffer = EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_filesize );
+	char *bmp_buffer = EngFuncs::COM_LoadFile( ART_BUTTONS_MAIN, &bmp_filesize );
 
 	if( !bmp_buffer || !bmp_filesize )
 	{
@@ -93,7 +93,7 @@ void UI_LoadBmpButtons( void )
 	memcpy( &NewFileHdr, pFileHdr, sizeof( BITMAPFILEHEADER ));
 	memcpy( &NewInfoHdr, pInfoHdr, sizeof( BITMAPINFOHEADER ));
 
-	byte *palette = bmp_buffer + sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
+	char *palette = bmp_buffer + sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
 	if( pInfoHdr->biBitCount <= 8 )
 	{
 		// figure out how many entries are actually in the table
@@ -114,7 +114,7 @@ void UI_LoadBmpButtons( void )
 	int stride = (pInfoHdr->biWidth * pInfoHdr->biBitCount / 8);
 	int cutted_img_sz = ((stride + 3 ) & ~3) * uiStatic.buttons_height;
 	int CuttedBmpSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz + cutted_img_sz;
-	byte *img_data = &bmp_buffer[pFileHdr->bfOffBits + cutted_img_sz * ( pic_count - 1 )];
+	char *img_data = &bmp_buffer[pFileHdr->bfOffBits + cutted_img_sz * ( pic_count - 1 )];
 
 	NewFileHdr.bfSize = CuttedBmpSize;
 	NewFileHdr.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + palette_sz;

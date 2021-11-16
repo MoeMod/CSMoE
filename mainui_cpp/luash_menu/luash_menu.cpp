@@ -180,7 +180,7 @@ namespace ui
 		lua_pop(L, 1);
 		// #2 = _G.LUA_LOADED_TABLE
 		int length = 0;
-		byte* buffer = EngFuncs::COM_LoadFile(path.c_str(), &length);
+		char* buffer = EngFuncs::COM_LoadFile(path.c_str(), &length);
 		if(!buffer)
 		{
 			Con_Printf("%s Error: lua module (%s) not found\n", __FUNCTION__, ModuleName);

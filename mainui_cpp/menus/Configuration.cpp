@@ -24,9 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
 #include "TabView.h"
-#ifdef XASH_IMGUI
-#include "imgui_menu/imgui_menu_options.h"
-#endif
+#include "luash_menu/luash_menu.h"
 
 #define ART_BANNER	     	"gfx/shell/head_config"
 
@@ -95,7 +93,7 @@ CMenuOptions::Menu
 void UI_Options_Menu( void )
 {
 #ifdef XASH_IMGUI
-	ui::OptionsDialog_SetVisible(true);
+	ui::LuaUI_Exec("window_option = true");
 #endif
 	uiOptions.Show();
 }

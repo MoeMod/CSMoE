@@ -136,7 +136,7 @@ typedef struct cl_enginefuncs_s
 	// cvar handlers
 	struct cvar_s *(*pfnRegisterVariable)( const char *szName, const char *szValue, int flags );
 	float	(*pfnGetCvarFloat)( const char *szName );
-	char*	(*pfnGetCvarString)( const char *szName );
+	const char*	(*pfnGetCvarString)( const char *szName );
 
 	// command handlers
 	int	(*pfnAddCommand)( const char *cmd_name, void (*function)(void) );

@@ -180,7 +180,7 @@ public:
 	{  engfuncs.pfnClientJoin( adr ); }
 
 	// parse txt files
-	static inline byte*	COM_LoadFile( const char *filename, int *pLength = 0 )
+	static inline char*	COM_LoadFile( const char *filename, int *pLength = 0 )
 	{ return engfuncs.COM_LoadFile( filename, pLength ); }
 	static inline char*	COM_ParseFile( char *data, char *token )
 	{ return engfuncs.COM_ParseFile( data, token ); }
