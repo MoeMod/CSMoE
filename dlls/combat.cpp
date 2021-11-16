@@ -1265,14 +1265,24 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 							{
 								case 1:	//knife_lance_specialattack
 								{
-									if (target->m_bIsZombie)
-										AddKickRate(target, pAttacker->pev->origin, 1200, 400);
+									if (target->m_bIsZombie && target->m_ZombieClass)
+									{
+										if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+											break;
+										else
+											AddKickRate(target, pAttacker->pev->origin, 1200, 400);
+									}								
 									break;
 								}
 								case 2:	//knife_lance_slash3
 								{
-									if (target->m_bIsZombie)
-										AddKickRate(target, vecSrc, 3000, 220);
+									if (target->m_bIsZombie && target->m_ZombieClass)
+									{
+										if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+											break;
+										else
+											AddKickRate(target, vecSrc, 3000, 220);
+									}
 									break;
 								}
 								case 3:
@@ -1284,6 +1294,8 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 									MESSAGE_END();
 
 									target->m_flVelocityModifier = 0.05;
+									if(target->m_bIsZombie && target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+										target->m_flVelocityModifier = 1.0;
 									break;
 								}
 							}

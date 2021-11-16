@@ -307,12 +307,13 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 	if (!m_pPlayer->IsAlive() || !m_pPlayer->m_bIsZombie)
 		return;
 
-	if (m_pPlayer->pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))
+#if 0
+	if (m_pPlayer->pev->button & (IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT))	//old rule
 	{
 		m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
 		return;
 	}
-
+#endif
 	// cannot recover during using zombie skill.
 	const float flRecoverValue = m_pCharacter_ZB2->HealthRecoveryAmount();
 	if (flRecoverValue <= 0.0f)
@@ -333,6 +334,8 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
 				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
+				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_revival.wav\n");
 				else
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
 			}
@@ -390,6 +393,10 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(CBasePlayer * attacker, flo
 {
 	if (attacker != m_pPlayer)
 		return;
+
+	if (!m_pCharacter_ZB2)
+		return;
+
 	if (!m_pPlayer->m_bIsZombie && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_3) == SKILL_STATUS_USING)
 	{
 		// using knife 2x?
@@ -412,7 +419,11 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(CBasePlayer * attacker, H
 
 void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
+	if (m_pPlayer->m_ZombieClass)
+	{
+		if(stricmp(m_pPlayer->m_ZombieClass, "revival") || !m_pPlayer->m_iZombieRevivalEnabled)
+			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
+	}
 	return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
 }
 

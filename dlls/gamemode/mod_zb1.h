@@ -60,14 +60,14 @@ public:
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void RoundEndScore(int iWinStatus);
 
-protected:
+	BOOL FInfectionStarted();
 	void TeamCheck();
+
+protected:
 	void InfectionSound();
 
 	void HumanWin();
 	void ZombieWin();
-
-	BOOL FInfectionStarted();
 
 	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) { m_eventBecomeZombie.dispatch(player, iEvolutionLevel); }
 

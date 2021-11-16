@@ -65,6 +65,8 @@ namespace sv {
 		{
 			Base::Precache();
 
+			PRECACHE_MODEL("models/ef_dragonsword.mdl");
+			
 			PRECACHE_SOUND("weapons/dragonsword_draw.wav");
 			PRECACHE_SOUND("weapons/skullaxe_wall.wav");
 			PRECACHE_SOUND("weapons/dragonsword_hit1.wav");
@@ -88,6 +90,7 @@ namespace sv {
 			return Base::Deploy();
 		}
 
+		void Spawn() override;
 		float GetMaxSpeed() override { return m_fMaxSpeed; }
 		void PrimaryAttack() override;
 		void SecondaryAttack() override;
@@ -121,6 +124,16 @@ namespace sv {
 	};
 
 	LINK_ENTITY_TO_CLASS(knife_dragonsword, CKnifeDragonsword)
+
+	void CKnifeDragonsword::Spawn()
+	{
+		pev->classname = MAKE_STRING("knife_dragonsword");
+		m_iId = WEAPON_KNIFE;
+		Precache();
+		SET_MODEL(ENT(pev), "models/w_knife.mdl");
+		m_iClip = WEAPON_NOCLIP;
+		FallInit();
+	}
 
 	void CKnifeDragonsword::SecondaryAttack(void)
 	{
@@ -192,6 +205,7 @@ namespace sv {
 		}
 		}
 #endif
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 2, FALSE, FALSE);
 
 		SetThink(nullptr);
 
@@ -238,6 +252,9 @@ namespace sv {
 		}
 		}
 #endif
+		if(iAnim != 2)
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 0, FALSE, FALSE);
+
 
 		SetThink(nullptr);
 

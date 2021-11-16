@@ -67,8 +67,8 @@ void CStarchaserar::Precache(void)
 int CStarchaserar::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556Nato";
-	p->iMaxAmmo1 = 105;
+	p->pszAmmo1 = "556NatoStar";
+	p->iMaxAmmo1 = 150;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = GALIL_MAX_CLIP;
@@ -324,7 +324,7 @@ void CStarchaserar::StarchaserarFire(float flSpread, duration_t flCycleTime, BOO
 
 void CStarchaserar::Reload(void)
 {
-	if (m_pPlayer->ammo_556nato <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
 	if (DefaultReload(AUG_MAX_CLIP, STARCHASERAR_RELOAD, 3.3s))

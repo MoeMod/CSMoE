@@ -732,6 +732,7 @@ public:
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;
 	int m_iZombieFlying;
+	int m_iZombieRevivalEnabled;
 };
 
 }

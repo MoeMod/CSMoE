@@ -266,6 +266,8 @@ public:
 
 	void Precache() override
 	{
+		PRECACHE_MODEL("sprites/muzzleflash65.spr");
+		PRECACHE_MODEL("sprites/muzzleflash81.spr");
 		PRECACHE_MODEL("models/gungnir_missile.mdl");
 		m_iModelExplo = PRECACHE_MODEL("sprites/ef_gungnir_chargeexplo.spr");
 		m_iModelLight1 = PRECACHE_MODEL("sprites/ef_gungnir_lightline1.spr");
@@ -889,14 +891,14 @@ void CGungnir::ItemPostFrame()
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
 				}
-			}
-			else if (v16 != ANIM_SHOOT_B_CHARGE) // 7
-			{
-				SendWeaponAnim(ANIM_SHOOT_B_CHARGE, UseDecrement() != FALSE);
-				Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir_b");
-				m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gungnirB.mdl");
-				return CBasePlayerWeapon::ItemPostFrame();
-			}
+				else if (v16 != ANIM_SHOOT_B_CHARGE) // 7
+				{
+					SendWeaponAnim(ANIM_SHOOT_B_CHARGE, UseDecrement() != FALSE);
+					Q_strcpy(m_pPlayer->m_szAnimExtention, "gungnir_b");
+					m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gungnirB.mdl");
+					return CBasePlayerWeapon::ItemPostFrame();
+				}
+			}	
 		}
 		else
 		{

@@ -36,6 +36,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_china.h"
 #include "zb2_zclass_pass.h"
 #include "zb2_zclass_flying.h"
+#include "zb2_zclass_revival.h"
 #include <random>
 
 namespace sv {
@@ -59,6 +60,7 @@ const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlay
 		{"china", MakeZombieClass<CZombieClass_China> },
 		{"pass", MakeZombieClass<CZombieClass_Pass> },
 		{"flying", MakeZombieClass<CZombieClass_Flying> },
+		{"revival", MakeZombieClass<CZombieClass_Revival> },
 };
 #else
 const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
@@ -136,7 +138,15 @@ ZombieSkillStatus CBaseZombieClass_ZB2::GetSkillStatus(ZombieSkillSlot which) co
 
 float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 {
-	return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
+	if (m_pPlayer->m_ZombieClass)
+	{
+		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+			return 1000;
+		else
+			return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
+	}
+	else
+		return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
 }
 
 CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;

@@ -2261,7 +2261,8 @@ bool BuyGunAmmo(CBasePlayer *player, CBasePlayerItem *weapon, bool bBlinkMoney)
 
 	// Can only buy if the player does not already have full ammo
 	int iMax = weapon->iMaxAmmo1();
-	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(classname, iMax)) {
+	auto psz = weapon->pszAmmo1();
+	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(psz, iMax)) {
 		return false;
 	}
 

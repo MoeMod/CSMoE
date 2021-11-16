@@ -38,6 +38,8 @@
 #include "kbutton.h"
 #include "input.h"
 
+#include "fog.h"
+
 namespace cl {
 
 int PM_GetVisEntInfo(int ent);
@@ -1943,6 +1945,8 @@ void DLLEXPORT V_CalcRefdef( struct ref_params_s *pparams )
 	{
 		V_CalcNormalRefdef ( pparams );
 	}
+
+	gFog.V_CalcRefdef(pparams);
 }
 
 /*

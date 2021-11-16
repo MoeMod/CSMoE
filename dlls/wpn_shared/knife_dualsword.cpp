@@ -52,13 +52,13 @@ public:
 	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 0.6f };
 
 private:
-	int m_iuser1; // iAttackRecord
-	int m_iuser3; // iSkillRecord
-	int m_iuser4; // iPrimaryAttackRecord
-	int m_sequence; // iThinkType
-	time_point_t m_fuser1; // flNextTimeCanHolster
-	int m_weaponanim; // iLastAnim
-	int m_waterlevel; // iSecondaryAttackCount
+	int m_iAttackRecord; // iAttackRecord
+	int m_iSkillRecord; // iSkillRecord
+	int m_iPrimaryAttackRecord; // iPrimaryAttackRecord
+	int m_iThinkType; // iThinkType
+	time_point_t m_flNextTimeCanHolster; // flNextTimeCanHolster
+	int m_iLastAnim; // iLastAnim
+	int m_iSecondaryAttackCount; // iSecondaryAttackCount
 
 
 
@@ -66,7 +66,7 @@ public:
 
 	BOOL CanHolster() override
 	{
-		return gpGlobals->time > m_fuser1;
+		return gpGlobals->time > m_flNextTimeCanHolster;
 	}
 
 	void Precache() override
@@ -115,12 +115,11 @@ public:
 
 	BOOL Deploy() override
 	{
-		m_iuser4 = 1;
-		m_iuser1 = 0;
-		m_sequence = 0;
-		m_fuser1 = invalid_time_point;
-		m_waterlevel = 0;
-		m_iuser3 %= 2;
+		m_iPrimaryAttackRecord = 1;
+		m_iThinkType = 0;
+		m_flNextTimeCanHolster = invalid_time_point;
+		m_iSecondaryAttackCount = 0;
+		m_iSkillRecord %= 2;
 		DestroyEffect();
 
 		m_fMaxSpeed = 250;
@@ -129,19 +128,31 @@ public:
 		m_pPlayer->m_bShieldDrawn = false;
 
 		BOOL result;
-		if(m_iuser1)
-			result = DefaultDeploy(V_Model, P_Model, 11, AnimExtension, UseDecrement() != FALSE);
-		else
-			result = DefaultDeploy(V_Model, P_Model_B, 6, AnimExtension, UseDecrement() != FALSE);
 
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.2s;
+		if (m_iLastAnim <= 5 || m_iLastAnim >= 14 || m_iLastAnim == 6)
+		{
+			result = DefaultDeploy(V_Model, P_Model_B, 6, AnimExtension, UseDecrement() != FALSE, 0.01s, 0.25s);
+			
+		}
+		else if (m_iLastAnim >= 7 || m_iLastAnim <= 11)
+		{
+			result = DefaultDeploy(V_Model, P_Model, 11, AnimExtension, UseDecrement() != FALSE, 0.01s, 0.25s);
+		}
+
+#if 0
+		if(m_iAttackRecord)
+			result = DefaultDeploy(V_Model, P_Model, 11, AnimExtension, UseDecrement() != FALSE, 0.1s, 0.25s);
+		else
+			result = DefaultDeploy(V_Model, P_Model_B, 6, AnimExtension, UseDecrement() != FALSE, 0.1s, 0.25s);
+#endif
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = 0.01s;
 
 		return result;
 	}
 
 	void Holster(int skiplocal) override
 	{
-		m_iuser3 %= 2;
+		m_iSkillRecord %= 2;
 		DestroyEffect();
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.0s;
 		return Base::Holster(skiplocal);
@@ -150,6 +161,7 @@ public:
 	void SpawnEffect();
 	void DestroyEffect();
 
+	void Spawn() override;
 	void WeaponIdle() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
@@ -166,10 +178,19 @@ public:
 
 	float GetPrimaryAttackDamage(int iType) const
 	{
+		/*
 		float flDamage = iType ? 50 : 770;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			flDamage *= 4.5f;
+		else if (g_pModRunning->DamageTrack() == DT_ZBS)
+			flDamage *= 5.5f;
+#endif
+		return flDamage;*/
+		float flDamage = iType ? 50 : 770;
+#ifndef CLIENT_DLL
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 2.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -198,6 +219,18 @@ public:
 
 LINK_ENTITY_TO_CLASS(knife_dualsword, CKnifeDualsword)
 
+void CKnifeDualsword::Spawn()
+{
+	pev->classname = MAKE_STRING("knife_dualsword");
+	m_iId = WEAPON_KNIFE;
+	m_iAttackRecord = 0;
+	m_iLastAnim = 7;
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_knife.mdl");
+	m_iClip = WEAPON_NOCLIP;
+	FallInit();
+}
+
 void CKnifeDualsword::WeaponIdle()
 {
 	if (m_flTimeWeaponIdle > 0.0s)
@@ -205,12 +238,26 @@ void CKnifeDualsword::WeaponIdle()
 
 	ResetEmptySound();
 
-	m_iuser3 %= 2;
+	m_iSkillRecord %= 2;
 
-	m_iuser4 = 0;
-	m_iuser1 = 0;
+	m_iPrimaryAttackRecord = 1;
+	m_iAttackRecord = 0;
 
-	if (m_iuser1 % 2)
+	if (m_iLastAnim <= 5 || m_iLastAnim >= 14 || m_iLastAnim == 6)
+	{
+		SendWeaponAnim(0);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 11, 0, TRUE, FALSE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
+	}
+	else if (m_iLastAnim >= 7 || m_iLastAnim <= 11)
+	{
+		SendWeaponAnim(7);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 11, 0, FALSE, FALSE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0s;
+	}
+
+#if 0
+	if (m_iAttackRecord % 2)
 	{
 		SendWeaponAnim(7);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
@@ -220,6 +267,7 @@ void CKnifeDualsword::WeaponIdle()
 		SendWeaponAnim(0);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0s;
 	}
+#endif
 }
 
 #ifndef CLIENT_DLL
@@ -231,8 +279,8 @@ void CKnifeDualsword::ItemPostFrame()
 	if (gpGlobals->time < pev->nextthink)
 		return Base::ItemPostFrame();
 
-	auto iAttackRecord = m_iuser1;  // 648
-	switch (m_sequence)
+	auto iAttackRecord = m_iAttackRecord;  // 648
+	switch (m_iThinkType)
 	{
 	case 1:
 	{
@@ -242,18 +290,18 @@ void CKnifeDualsword::ItemPostFrame()
 	case 2:
 	{
 		// TEMPENTITY HERE, AFTER SECONDARYATTACK
-		if (m_iuser3 == 11)
+		if (m_iSkillRecord == 11)
 		{
 			//PLAYBACK_EVENT_FULL(FEV_GLOBAL, id, m_usFire[iBteWpn][0], 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 2, EV_DUALSWORD_STAB_END, FALSE, FALSE);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_slash_4_2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			m_sequence = 7;
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_slash_4_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			m_iThinkType = 7;
 			pev->nextthink = gpGlobals->time + (0.65s - 0.53s);
 		}
 		else
 		{
 			//PLAYBACK_EVENT_FULL(FEV_GLOBAL, id, m_usFire[iBteWpn][0], 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 1, EV_DUALSWORD_STAB_END, FALSE, FALSE);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_slash_4_1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			m_sequence = 3;
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_slash_4_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			m_iThinkType = 3;
 			pev->nextthink = gpGlobals->time + 0.77s;
 		}
 		break;
@@ -261,12 +309,12 @@ void CKnifeDualsword::ItemPostFrame()
 	case 3:
 	{
 		SendWeaponAnim(5);
-		m_weaponanim = 5;
+		m_iLastAnim = 5;
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
 		// ADDED
-		m_sequence = 0;
+		m_iThinkType = 0;
 		break;
 	}
 	case 4:
@@ -276,52 +324,52 @@ void CKnifeDualsword::ItemPostFrame()
 	}
 	case 5:
 	{
-		ActPrimaryAttack(m_iuser4);
+		ActPrimaryAttack(m_iPrimaryAttackRecord);
 
 		int int_Skill = -1;
-		switch (m_iuser3)
+		switch (m_iSkillRecord)
 		{
 		case 0:
 		{
-			if (m_iuser4)
+			if (m_iPrimaryAttackRecord)
 				int_Skill = 1;
 			break;
 		}
 		case 5:
 		{
-			if (m_iuser4)
+			if (m_iPrimaryAttackRecord)
 				int_Skill = 6;
 			break;
 		}
 		case 6:
 		{
-			if (!m_iuser4)
+			if (!m_iPrimaryAttackRecord)
 				int_Skill = 7;
 			break;
 		}
 		}
 
-		m_iuser3 = (int_Skill == -1) ? 0 : int_Skill;
-		m_iuser4 = 1 - m_iuser4;
+		m_iSkillRecord = (int_Skill == -1) ? 0 : int_Skill;
+		m_iPrimaryAttackRecord = 1 - m_iPrimaryAttackRecord;
 		break;
 	}
 	case 6:
 	{
 		SendWeaponAnim(10);
-		m_weaponanim = 10;
+		m_iLastAnim = 10;
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 
 		// ADDED
-		m_sequence = 0;
+		m_iThinkType = 0;
 		break;
 	}
 	case 7:
 	{
 		SendWeaponAnim(14);
-		m_weaponanim = 14;
+		m_iLastAnim = 14;
 
-		m_sequence = 8;
+		m_iThinkType = 8;
 		pev->nextthink = gpGlobals->time + 1.0s;
 
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s; // ADDED
@@ -330,25 +378,25 @@ void CKnifeDualsword::ItemPostFrame()
 	case 8:
 	{
 		SendWeaponAnim(15);
-		m_weaponanim = 15;
+		m_iLastAnim = 15;
 
-		m_sequence = 9;
+		m_iThinkType = 9;
 		pev->nextthink = gpGlobals->time + 12.48s; // ???
 		break;
 	}
 	case 9:
 	{
 		SendWeaponAnim(6);
-		m_weaponanim = 6;
+		m_iLastAnim = 6;
 
-		m_iuser3 = 1;
+		m_iSkillRecord = 1;
 
 		// NOT SURE
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.2s;
 
 		// ADDED
-		m_sequence = 0;
+		m_iThinkType = 0;
 		break;
 	}
 	}
@@ -359,24 +407,24 @@ void CKnifeDualsword::ItemPostFrame()
 
 void CKnifeDualsword::PrimaryAttack(void)
 {
-	if (m_iuser3 == 1)
+	if (m_iSkillRecord == 1)
 	{
 		SendWeaponAnim(12);	//switch to blue
-		m_weaponanim = 12;
+		m_iLastAnim = 12;
 
-		m_iuser3 = 0;
+		m_iSkillRecord = 0;
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 		
-		m_sequence = 4;
+		m_iThinkType = 4;
 		pev->nextthink = gpGlobals->time + 0.0s;
 	}
-	else if (m_iuser3 != 3 || m_sequence != 1)
+	else if (m_iSkillRecord != 3 || m_iThinkType != 1)
 	{
-		DelayPrimaryAttack();		//m_sequence = 5;
+		DelayPrimaryAttack();		//m_iThinkType = 5;
 	}
 	else
 	{
-		m_sequence = 4;
+		m_iThinkType = 4;
 		//pev->nextthink = gpGlobals->time + 0.0s;
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 	}
@@ -384,29 +432,29 @@ void CKnifeDualsword::PrimaryAttack(void)
 
 void CKnifeDualsword::SecondaryAttack(void)
 {
-	m_waterlevel = 0;
-	m_iuser4 = 1;
-	if (!m_iuser3)
+	m_iSecondaryAttackCount = 0;
+	m_iPrimaryAttackRecord = 1;
+	if (!m_iSkillRecord)
 	{
 		SendWeaponAnim(13);
-		m_weaponanim = 13;
+		m_iLastAnim = 13;
 
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
-		m_sequence = 1;
+		m_iThinkType = 1;
 		pev->nextthink = gpGlobals->time + 0.0s;
 		return;
 	}
 
 
 	auto int_check = -1;
-	switch (m_iuser3)
+	switch (m_iSkillRecord)
 	{
 	case 1:int_check = 1; break;
 	case 7:int_check = 1; break;
 	}
 	if (int_check == -1)
-		m_iuser3 = 0;
+		m_iSkillRecord = 0;
 #ifndef CLIENT_DLL
 	DelaySecondaryAttack();
 #endif
@@ -414,27 +462,26 @@ void CKnifeDualsword::SecondaryAttack(void)
 
 void CKnifeDualsword::DelayPrimaryAttack()
 {
-	if (m_iuser4 == 0)
+	if (m_iPrimaryAttackRecord == 0)
 	{
 		SendWeaponAnim(9);
-		m_weaponanim = 9;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_iLastAnim = 9;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	}
 	else
 	{
 		SendWeaponAnim(8);
-		m_weaponanim = 8;
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		m_iLastAnim = 8;
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	}
 
-	m_sequence = 5;
+	m_iThinkType = 5;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 	pev->nextthink = gpGlobals->time + 0.25s;
 }
 
 #ifndef CLIENT_DLL
-
 void CKnifeDualsword::ActPrimaryAttack(int iType)
 {
 	const auto flDamage = GetPrimaryAttackDamage(iType);
@@ -481,16 +528,16 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 	case HIT_PLAYER:
 	{
 		if (iType)
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 		fDidHit = TRUE;
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
 		fDidHit = TRUE;
 		break;
@@ -498,35 +545,35 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 	}
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + (iType ? 0.15s : 0.65s);
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iuser3 ? 0.15s : 0.65s);
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + (m_iSkillRecord ? 0.15s : 0.65s);
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
-	m_fuser1 = gpGlobals->time + (iType ? 0.15s : 0.65s);
+	m_flNextTimeCanHolster = gpGlobals->time + (iType ? 0.15s : 0.65s);
 
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
 	pev->nextthink = gpGlobals->time + (iType ? 0.42s : 0.65s);
-	m_sequence = 6;
+	m_iThinkType = 6;
 }
 
 void CKnifeDualsword::DelaySecondaryAttack()
 {
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-	int v8 = m_waterlevel % 4;
+	int v8 = m_iSecondaryAttackCount % 4;
 	SendWeaponAnim(v8 + 1);
 	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 5, v8, FALSE, FALSE);
-	m_weaponanim = v8 + 1;
+	m_iLastAnim = v8 + 1;
 
-	if (m_iuser3)
+	if (m_iSkillRecord)
 	{
-		if (v8 == m_iuser3 - 1)
-			m_iuser3 = (v8 + 2);
-		else if (v8 == m_iuser3 - 7)
-			m_iuser3 = (v8 + 8);
+		if (v8 == m_iSkillRecord - 1)
+			m_iSkillRecord = (v8 + 2);
+		else if (v8 == m_iSkillRecord - 7)
+			m_iSkillRecord = (v8 + 8);
 		else
-			m_iuser3 = (0);
+			m_iSkillRecord = (0);
 	}
 
-	m_waterlevel++;
+	m_iSecondaryAttackCount++;
 
 	const auto flDamage = GetSecondaryAttackDamage(v8);
 	const float flRadius = 120;
@@ -564,7 +611,7 @@ void CKnifeDualsword::DelaySecondaryAttack()
 
 	char buffer[64];
 	sprintf(buffer, "weapons/dualsword_slash_%d.wav", v8 + 1);
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, 94);
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 	switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, FALSE, 1))
 	{
@@ -574,23 +621,28 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	}
 	case HIT_PLAYER:
 	{
-		if (v8 + 1 < 4)
+		int random_sound;
+		/*random_sound = v8 + 1;
+		if (random_sound < 4)
 		{
-			sprintf(buffer, "weapons/dualsword_hit%d.wav", v8 + 1);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, 94);
+			sprintf(buffer, "weapons/dualsword_hit%d.wav", random_sound);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		}
+		else
+		{*/
+		random_sound = RANDOM_FLOAT(1, 3);
+		sprintf(buffer, "weapons/dualsword_hit%d.wav", random_sound);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 		fDidHit = TRUE;
 		break;
 	}
 	case HIT_WALL:
 	{
-		if (v8 + 1 < 4)
-		{
-			sprintf(buffer, "weapons/dualsword_hit%d.wav", v8 + 1);
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, 94);
-		}
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.1;
+		fDidHit = TRUE;
+		break;
 		fDidHit = TRUE;
 		break;
 	}
@@ -599,44 +651,44 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 	SetThink(nullptr);
 
-	if (m_waterlevel < 4)
+	if (m_iSecondaryAttackCount < 4)
 	{
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.0s;
 		m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
 		pev->nextthink = gpGlobals->time + 0.15s;
-		m_sequence = 1;
+		m_iThinkType = 1;
 	}
 	else
 	{
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.65s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 
-		m_fuser1 = gpGlobals->time + 0.65s;
+		m_flNextTimeCanHolster = gpGlobals->time + 0.65s;
 		pev->nextthink = gpGlobals->time + 0.53s;
-		m_sequence = 2;
+		m_iThinkType = 2;
 
 		// (pev_iuser3, this+548) : iSkillRecord
-		if (m_iuser3 == 4)
+		if (m_iSkillRecord == 4)
 		{
-			m_iuser1 = 0;
+			m_iAttackRecord = 0;
 			return;
 		}
 
-		if (m_iuser3 == 11)
+		if (m_iSkillRecord == 11)
 		{
 			//set_pev(iEnt, pev_iuser1, 7);
 			SpawnEffect();
 			return;
 		}
 
-		if (m_iuser3 == 4 || m_iuser1 != 2)
+		if (m_iSkillRecord == 4 || m_iAttackRecord != 2)
 		{
-			m_iuser1 = 0;
+			m_iAttackRecord = 0;
 		}
 		else
 		{
-			m_iuser1 = 3;
+			m_iAttackRecord = 3;
 		}
 	}
 }
@@ -683,6 +735,9 @@ public:
 			SUB_Remove();
 		}
 
+		if(pPlayer->m_pActiveItem != NULL && pPlayer->m_pActiveItem->m_iId != WEAPON_KNIFE && g_pModRunning->DamageTrack() != DT_ZBS)
+			SUB_Remove();
+
 		switch (m_iEffectType)
 		{
 		case 0:
@@ -691,8 +746,8 @@ public:
 			{
 				// TEMPENTITY HERE (90 15 10)
 				// "weapons/dualsword_skill_start.wav"
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, id, m_usFire[iBteWpn][0], 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, EV_DUALSWORD_SKILL_START, FALSE, FALSE);
-				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_start.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 0);
+				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_start.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				m_iEffectType = 1; // this+93(iEffectType)
 				m_flNextEffect = gpGlobals->time + 1.49s;
 			}
@@ -718,8 +773,8 @@ public:
 			{
 				// TEMPENTITY HERE (90 -20 15 10)
 				// "weapons/dualsword_skill_end.wav"
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, id, m_usFire[iBteWpn][0], 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, EV_DUALSWORD_SKILL_END, FALSE, FALSE);
-				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_loop_end.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 1);
+				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_loop_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				m_iEffectType = 4; // this+93(iEffectType)
 				m_flNextEffect = gpGlobals->time + 1.4s; // this+97
 			}
@@ -729,7 +784,7 @@ public:
 		{
 			if (gpGlobals->time > m_flNextEffect)
 			{
-				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_end.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				SetThink(nullptr);
 				SUB_Remove();
 			}
@@ -820,8 +875,8 @@ public:
 		}
 
 		{
-			const Vector vecNewOrigin = vecOrigin3[0];
-			const Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
+			/*Vector vecNewOrigin = vecOrigin3[0];
+			Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
 			WRITE_BYTE(TE_PROJECTILE);
@@ -834,12 +889,18 @@ public:
 			WRITE_SHORT(m_iModelSkillFx1);
 			WRITE_BYTE(1); // (life in 1's)
 			WRITE_BYTE(ENTINDEX(pev->owner)); // (owner)
-			MESSAGE_END();
+			MESSAGE_END();*/
+
+			Vector vecAngle2;
+			vecAngle2[0] = RANDOM_FLOAT(15.0, 30.0);
+			vecAngle2[1] = RANDOM_FLOAT(0.0, 180.0);
+
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin3[0], vecAngle2, 0.0, 0.0, 10, 1, TRUE, 1);
 		}
 
 		{
-			const Vector vecNewOrigin = vecOrigin3[0];
-			const Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
+			/*Vector vecNewOrigin = vecOrigin3[0];
+			Vector vecNewVelocity = (vecOrigin3[1] - vecOrigin3[0]).Normalize();
 
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
 			WRITE_BYTE(TE_PROJECTILE);
@@ -852,7 +913,12 @@ public:
 			WRITE_SHORT(m_iModelSkillFx2);
 			WRITE_BYTE(1); // (life in 1's)
 			WRITE_BYTE(ENTINDEX(pev->owner)); // (owner)
-			MESSAGE_END();
+			MESSAGE_END();*/
+
+			float speed = 1000.0;
+			Vector vecVelocity = (vecOrigin3[1] - vecOrigin3[0]) * (speed / (vecOrigin3[1] - vecOrigin3[0]).Length());
+
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin3[0], vecVelocity, 0.0, 0.0, 10, 2, TRUE, 1);
 		}
 	}
 
@@ -906,13 +972,14 @@ void CKnifeDualsword::SpawnEffect()
 
 	//client_print(id, print_chat, "DualSword_SpawnEffect");
 
-	m_iuser1 = 0;
+	m_iAttackRecord = 0;
 	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 }
 
 void CKnifeDualsword::DestroyEffect()
 {
-	for (CBaseEntity *pEntity : moe::range::EntityList<moe::Enumer_ClassName<CBaseEntity>>("d_dualsword"))
+	CBaseEntity* pEntity = nullptr;
+	while ((pEntity = UTIL_FindEntityByClassname(pEntity, "d_dualsword")) != nullptr)
 	{
 		if (pEntity->pev->owner == m_pPlayer->edict())
 		{
@@ -924,7 +991,7 @@ void CKnifeDualsword::DestroyEffect()
 #else
 void CKnifeDualsword::SpawnEffect()
 {
-	m_iuser1 = 0;
+	m_iAttackRecord = 0;
 	m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.992s;
 }
 void CKnifeDualsword::DestroyEffect() {}

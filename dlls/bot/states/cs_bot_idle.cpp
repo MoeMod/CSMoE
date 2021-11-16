@@ -13,6 +13,7 @@
 #include "globals.h"
 
 #include "bot_include.h"
+#include "map_manager.h"
 
 namespace sv {
 
@@ -762,10 +763,25 @@ void IdleState::OnUpdate(CCSBot *me)
 		}
 		case CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION:
 		{
-			if (!me->m_bIsZombie && UTIL_FindEntityByClassname(nullptr, "supplybox") != nullptr)
+			if (!me->m_bIsZombie)
 			{
-				me->RushToSupplyBox();
-				return;
+				float flChance = RANDOM_FLOAT(0, 100.0f);
+				if (flChance < 20.0f && UTIL_FindEntityByClassname(nullptr, "supplybox") != nullptr)
+				{
+					me->RushToSupplyBox();
+					return;
+				}
+				else if (flChance < 95.0f)
+				{
+					auto area = TheNavAreaGrid.GetNavAreaByID(MapMgr_GetRandomAreaID());
+					if (area != NULL && me->GetTask() != CCSBot::MOVE_TO_SAFE_AREA && !me->IsDefending())
+					{
+						me->SetTask(CCSBot::MOVE_TO_SAFE_AREA);
+						me->MoveTo(area->GetCenter());
+						me->PrintIfWatched("Moving to safe area!\n");
+						return;
+					}
+				}
 			}
 		}
 		// deathmatch

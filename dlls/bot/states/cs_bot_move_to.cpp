@@ -38,6 +38,7 @@ void MoveToState::OnEnter(CCSBot *me)
 		case CCSBot::DEFUSE_BOMB:
 		case CCSBot::MOVE_TO_LAST_KNOWN_ENEMY_POSITION:
 		case CCSBot::MOVE_TO_ATTACKER_POSITION:
+		case CCSBot::MOVE_TO_SAFE_AREA:
 			route = FASTEST_ROUTE;
 			break;
 
@@ -313,6 +314,18 @@ void MoveToState::OnUpdate(CCSBot *me)
 					me->GetChatter()->Say("LostEnemy");
 				}
 				break;
+			}
+			case CCSBot::MOVE_TO_SAFE_AREA:
+			{
+				CNavArea* area = me->GetLastKnownArea();
+				if (!area)
+					break;
+				if (!area->Contains(&m_goalPosition))
+					break;
+
+				me->SetDisposition(CCSBot::OPPORTUNITY_FIRE);
+				me->Defend(area);
+				return;
 			}
 			default:
 				break;

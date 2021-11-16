@@ -123,6 +123,33 @@ void EV_FireGunkata(struct event_args_s *args)
 				//gEngfuncs.pEventAPI->EV_WeaponAnimation(args->iparam1 + 1, 2);
 				float time = gHUD.m_flTime;
 				// !R_AddExtraViewModel({ time, time + args->fparam1, args->iparam1, kRenderNormal, 255 });
+				{
+					if (!ent)
+						return;
+
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempModel(ent->origin, Vector(0, 0, 0), Vector(0, 0, 0), args->fparam1 + 0.2, gEngfuncs.pEventAPI->EV_FindModelIndex("models/v_gunkata.mdl"), 0);
+
+					if (!pEnt)
+						return;
+
+					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+					pEnt->flags |= FTENT_CLIENTCUSTOM;
+
+					pEnt->clientIndex = ent->index;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime + 0.4;
+					pEnt->entity.curstate.sequence = args->iparam1;
+					pEnt->entity.curstate.rendermode = kRenderNormal;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.framerate = 1.0;
+					pEnt->frameMax = 256;
+					pEnt->entity.curstate.frame = 0;
+
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* viewent = gEngfuncs.GetViewModel();
+						pEnt->entity.origin = viewent->origin;
+						pEnt->entity.angles = viewent->angles;
+					};
+				}
 				//R_AddExtraViewModel({ gHUD.m_flTime + 0.2f, gHUD.m_flTime + args->fparam1 + 0.2f, args->iparam1, kRenderNormal, 255 });
 
 				//gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, WeaponData.szSound, 1.0, 0.6, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));

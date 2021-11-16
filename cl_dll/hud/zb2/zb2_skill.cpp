@@ -51,6 +51,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKIL
 		"", // ZOMBIE_SKILL_EMPTY
 		"", // ZOMBIE_SKILL_EMPTY
 		"", // ZOMBIE_SKILL_EMPTY
+		"", // ZOMBIE_SKILL_EMPTY
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL] =
@@ -78,8 +79,9 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLAS
 		"zombiGTER", // ZOMBIE_CLASS_HEAL,
 		"zombiITER", // ZOMBIE_CLASS_DEIMOS,
 		"zombiJTER", // ZOMBIE_CLASS_DEIMOS2,
-		"", // ZOMBIE_CLASS_HUMAN
-		"", // ZOMBIE_CLASS_TANK,
+		"", // ZOMBIE_CLASS_EMPTY
+		"", // ZOMBIE_CLASS_EMPTY,
+		"", // ZOMBIE_CLASS_EMPTY,
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL] =
@@ -102,6 +104,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_pass",//ZOMBIE_SKILL_PASS
 		"resource/zombi/zombieskill_glide",//ZOMBIE_SKILL_GLIDE
 		"resource/zombi/zombieskill_dive",//ZOMBIE_SKILL_DIVE
+		"resource/zombi/zombieskill_zombirevival",//ZOMBIE_SKILL_REVIVAL
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -119,6 +122,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_chinazb",//ZOMBIE_CLASS_CHINA,
 		"resource/zombi/zombietype_passzb",//ZOMBIE_CLASS_PASS
 		"resource/zombi/zombietype_flyingzb",//ZOMBIE_CLASS_FLYING
+		"resource/zombi/zombietype_revivalzb",//ZOMBIE_CLASS_REVIVAL
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

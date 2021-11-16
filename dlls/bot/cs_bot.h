@@ -200,6 +200,9 @@ public:
 	void RushToSupplyBox();
 	bool IsRushingForSupplyBox() const;
 
+	void Defend(CNavArea* area);
+	bool IsDefending() const;
+
 	// high-level tasks
 	enum TaskType
 	{
@@ -225,6 +228,7 @@ public:
 		SNIPING,
 
 		MOVE_TO_ATTACKER_POSITION,
+		MOVE_TO_SAFE_AREA,
 		NUM_TASKS
 	};
 
@@ -495,6 +499,7 @@ private:
 	FollowState m_followState;
 	UseEntityState m_useEntityState;
 	SupplyBoxRushState m_supplyboxRushState;
+	DefendState m_defendState;
 
 	// TODO: Allow multiple simultaneous state machines (look around, etc)
 	void SetState(BotState *state);						// set the current behavior state

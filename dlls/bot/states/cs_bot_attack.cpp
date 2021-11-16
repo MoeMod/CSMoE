@@ -443,7 +443,7 @@ void AttackState::OnUpdate(CCSBot *me)
 	if (!me->IsEnemyVisible() && (notSeenEnemyTime > chaseTime || !m_haveSeenEnemy))
 	{
 		// snipers don't chase their prey - they wait for their prey to come to them
-		if (me->GetTask() == CCSBot::SNIPING)
+		if (me->GetTask() == CCSBot::SNIPING || me->IsDefending())
 		{
 			StopAttacking(me);
 			return;
@@ -476,6 +476,9 @@ void AttackState::OnUpdate(CCSBot *me)
 
 	if (gpGlobals->time > m_reacquireTimestamp)
 		me->FireWeaponAtEnemy();
+
+	if (me->IsDefending())
+		return;
 
 	bool bEnemyIsZombie = (enemy->IsPlayer() && static_cast<CBasePlayer *>(enemy)->m_bIsZombie) || (enemy->Classify() == CLASS_PLAYER_ALLY); // zbs support...
 	// attacking zombie, must moveback

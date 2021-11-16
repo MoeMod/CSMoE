@@ -48,11 +48,13 @@ namespace sv {
 		PRECACHE_SOUND("zombi/flyzombie_fly_idle.wav");
 		PRECACHE_SOUND("zombi/flyzombie_downhill_start.wav");
 		PRECACHE_SOUND("zombi/boosterzombie_booster.wav");
+		PRECACHE_SOUND("zombi/revival_skill1.wav");
 
 		PRECACHE_MODEL("sprites/zombihealer.spr");
 		PRECACHE_MODEL("sprites/zombiheal_head.spr");
 		PRECACHE_MODEL("sprites/ef_teleportzombie.spr");
 		PRECACHE_MODEL("sprites/ef_teleportzombieout.spr");
+		PRECACHE_MODEL("sprites/zombihealer.spr");
 
 	}
 
@@ -616,12 +618,6 @@ namespace sv {
 		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 		MESSAGE_END();
 
-	}
-
-	void CZombieSkill_ZombieHeal::ResetMaxSpeed()
-	{
-		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			m_pPlayer->pev->maxspeed = 300;
 	}
 
 	void CZombieSkill_ZombieHeal::OnSkillEnd()
@@ -1230,12 +1226,26 @@ namespace sv {
 		{
 			if (m_pPlayer->IsBot())
 			{
+#if 0
 				UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 				Vector vecOrigin = CalcPositon();
 				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", vecOrigin, m_pPlayer->pev->angles, m_pPlayer->edict());
 
 				if (!pEnt)
 					return;
+
+				m_flTimeTriggerZombieSkill = invalid_time_point;
+				m_bHasFireTeleportEntity = 1;
+#endif
+				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", m_pPlayer->GetGunPosition(), m_pPlayer->pev->angles, m_pPlayer->edict());
+
+				if (!pEnt)
+					return;
+
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+				Vector vecVelocity;
+				vecVelocity = gpGlobals->v_forward * 1600;
+				pEnt->pev->velocity = vecVelocity;
 
 				m_flTimeTriggerZombieSkill = invalid_time_point;
 				m_bHasFireTeleportEntity = 1;
@@ -1246,7 +1256,7 @@ namespace sv {
 
 				if (!pEnt)
 					return;
-				pEnt->entindex();
+
 				UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 				Vector vecVelocity;
 				vecVelocity = gpGlobals->v_forward * 1200;
@@ -1842,6 +1852,109 @@ namespace sv {
 	}
 
 	float CZombieSkill_ZombieFlying::GetDamageRatio() const
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			return 0.0f;
+		return 1.0f;
+	}
+
+	//Revival Zombie
+	CZombieSkill_ZombieRevival::CZombieSkill_ZombieRevival(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieRevival::Think()
+	{
+		if (m_pPlayer->m_iZombieRevivalEnabled && m_iZombieSkillStatus == SKILL_STATUS_READY)
+			Activate();
+		CZombieSkill_Base::Think();	
+	}
+
+	void CZombieSkill_ZombieRevival::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
+					"The 'Berserk' skill can't be used because the skill is in cooldown. [Remaining Cooldown Time: %s1 sec.]",
+					buf
+				); // #CSO_WaitCoolTimeNormal
+
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		if (!m_pPlayer->m_iZombieRevivalEnabled)
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_RevivalZombi_IsPassive");
+			return;
+		}
+
+		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+			if (pWeapon)
+			{
+				pWeapon->SendWeaponAnim(2, TRUE);
+				pWeapon->m_flTimeWeaponIdle = 1.0s;
+			}	
+		}
+		m_pPlayer->m_flNextAttack = 1.0s;
+		m_pPlayer->pev->velocity.x = 0.0;
+		m_pPlayer->pev->velocity.y = 0.0;
+		m_pPlayer->pev->body = 1;
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_pPlayer->m_iZombieRevivalEnabled = 1;
+		m_pPlayer->ResetMaxSpeed();
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		
+		m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill1");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.0s;
+		m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/revival_skill1.wav", VOL_NORM, ATTN_NORM);
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_REVIVAL);
+		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+		WRITE_SHORT(-1);
+		MESSAGE_END();
+	}
+
+	void CZombieSkill_ZombieRevival::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_USED;
+		m_pPlayer->m_iZombieRevivalEnabled = 0;
+		m_pPlayer->ResetMaxSpeed();
+		m_pPlayer->pev->body = 0;
+	}
+
+	void CZombieSkill_ZombieRevival::ResetMaxSpeed()
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			m_pPlayer->pev->maxspeed = 210;
+	}
+
+	duration_t CZombieSkill_ZombieRevival::GetDurationTime() const
+	{
+		return 5.0s;
+	}
+
+	float CZombieSkill_ZombieRevival::GetDamageRatio() const
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 			return 0.0f;

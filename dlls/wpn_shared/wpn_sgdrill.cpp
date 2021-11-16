@@ -329,7 +329,11 @@ BOOL CSgdrill::KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float f
 				CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
-					AddKickRate(pVictim, m_pPlayer->pev->origin, 1350, 120);
+					if (pVictim->m_ZombieClass)
+					{
+						if (stricmp(pVictim->m_ZombieClass, "revival") || !pVictim->m_iZombieRevivalEnabled)
+							AddKickRate(pVictim, m_pPlayer->pev->origin, 1350, 120);
+					}
 				}
 				result = TRUE;
 

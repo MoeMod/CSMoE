@@ -35,6 +35,7 @@
 #include "demo_api.h"
 #include "vgui_parser.h"
 #include "rain.h"
+#include "fog.h"
 
 #include "camera.h"
 
@@ -278,6 +279,7 @@ void CHud :: Init( void )
 	
 
 	InitRain();
+	gFog.Init();
 
 	cl::BTEClientWeapons().Init();
 
@@ -461,6 +463,8 @@ void CHud :: VidInit( void )
 
 	for( HUDLIST *pList = m_pHudList; pList; pList = pList->pNext )
 		pList->p->VidInit();
+
+	gFog.VidInit();
 
 	if( firstinit && gEngfuncs.CheckParm( "-firsttime", NULL ) )
 	{

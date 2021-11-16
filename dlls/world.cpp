@@ -19,6 +19,7 @@
 #include "player/csdm_randomspawn.h"
 #include "cbase/cbase_hash.h"
 #include "luash_sv/luash_sv.h"
+#include "map_manager.h"
 
 namespace sv {
 
@@ -495,6 +496,8 @@ void CWorld::Precache()
 	}
 	g_pGameRules = (CHalfLifeMultiplay *)InstallGameRules();
 	CSDM_LoadSpawnPoints();
+	MapMgr_LoadMapList();
+	MapMgr_LoadMapSafeArea();
 	
 
 	// UNDONE why is there so much Spawn code in the Precache function? I'll just keep it here

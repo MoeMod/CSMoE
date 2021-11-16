@@ -390,7 +390,11 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 				if (pVictim->m_bIsZombie) // Zombie Knockback...
 				{
-					AddKickRate(pVictim, m_pPlayer->pev->origin, 3200, 120);
+					if (pVictim->m_ZombieClass)
+					{
+						if (stricmp(pVictim->m_ZombieClass, "revival") || !pVictim->m_iZombieRevivalEnabled)
+							AddKickRate(pVictim, m_pPlayer->pev->origin, 3200, 120);
+					}
 				}
 				result = HIT_PLAYER;
 

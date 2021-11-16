@@ -350,7 +350,7 @@ public:
 	}
 	void SetTouch(std::nullptr_t null)
 	{
-		m_pfnThink = null;
+		m_pfnTouch = null;
 	}
 	template <typename T>
 	auto SetUse(void (T::*pfn)(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
@@ -359,7 +359,7 @@ public:
 	}
 	void SetUse(std::nullptr_t null)
 	{
-		m_pfnThink = null;
+		m_pfnUse = null;
 	}
 	template <typename T>
 	auto SetBlocked(void (T::*pfn)(CBaseEntity *pOther)) -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value>::type
@@ -368,7 +368,7 @@ public:
 	}
 	void SetBlocked(std::nullptr_t null)
 	{
-		m_pfnThink = null;
+		m_pfnBlocked = null;
 	}
 
 public:

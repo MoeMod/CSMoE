@@ -240,6 +240,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sfsmg");
 	UTIL_PrecacheOtherWeapon("weapon_sfmg");
 	UTIL_PrecacheOtherWeapon("weapon_sfgun");
+	UTIL_PrecacheOtherWeapon("weapon_qbarrel");
+	UTIL_PrecacheOtherWeapon("weapon_buffm249");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

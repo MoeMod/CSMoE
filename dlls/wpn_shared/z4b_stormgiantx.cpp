@@ -115,6 +115,7 @@ public:
 		return ret;
 	}
 
+	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
@@ -179,6 +180,16 @@ private:
 };
 
 LINK_ENTITY_TO_CLASS(z4b_stormgiantx, CKnifeStormgiantX)
+
+void CKnifeStormgiantX::Spawn()
+{
+	pev->classname = MAKE_STRING("z4b_stormgiantx");
+	m_iId = WEAPON_KNIFE;
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_knife.mdl");
+	m_iClip = WEAPON_NOCLIP;
+	FallInit();
+}
 
 void CKnifeStormgiantX::PrimaryAttack(void)
 {

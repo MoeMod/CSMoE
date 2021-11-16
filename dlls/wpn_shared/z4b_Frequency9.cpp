@@ -105,6 +105,16 @@ public:
 		return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE);
 	}
 
+	void Spawn() override
+	{
+		pev->classname = MAKE_STRING("z4b_Frequency9");
+		m_iId = WEAPON_KNIFE;
+		Precache();
+		SET_MODEL(ENT(pev), "models/w_knife.mdl");
+		m_iClip = WEAPON_NOCLIP;
+		FallInit();
+	}
+
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;

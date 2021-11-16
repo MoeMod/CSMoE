@@ -32,6 +32,7 @@ public:
 	void RestartRound() override;
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void CheckWinConditions() override;
+	BOOL FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker) override;
 
 	const CZB3HumanMorale &HumanMorale() const { return m_Morale; }
 
@@ -63,7 +64,8 @@ public:
 	virtual void Event_OnBecomeHero(CBasePlayer *who);
 	virtual void Event_OnRoundStart();
 
-	bool IsHero() const { return m_pPlayer->m_bIsVIP; }
+	bool IsHero() const { return m_bIsHero; }
+	void SetHero(bool value) { m_bIsHero = value; }
 
 private:
 	CMod_ZombieHero * const m_pModZB3;
@@ -74,6 +76,7 @@ private:
 	EngineClock::time_point m_flDeadTime;
 	float m_flBackupMaxHealth;
 	float m_flBackupArmor;
+	bool m_bIsHero;
 };
 
 }

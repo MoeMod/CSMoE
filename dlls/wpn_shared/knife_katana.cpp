@@ -85,6 +85,7 @@ public:
 		return Base::Deploy();
 	}
 
+	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
@@ -117,6 +118,16 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS(knife_katana, CKnifeKatana)
+
+void CKnifeKatana::Spawn()
+{
+	pev->classname = MAKE_STRING("knife_katana");
+	m_iId = WEAPON_KNIFE;
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_knife.mdl");
+	m_iClip = WEAPON_NOCLIP;
+	FallInit();
+}
 
 void CKnifeKatana::PrimaryAttack(void)
 {

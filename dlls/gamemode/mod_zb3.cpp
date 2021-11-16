@@ -46,7 +46,7 @@ CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieH
 
 void CPlayerModStrategy_ZB3::OnSpawn()
 {
-	m_pPlayer->m_bIsVIP = false;
+	SetHero(false);
 	m_pModZB3->HumanMorale().UpdateHUD(m_pPlayer, MORALE_TYPE_GLOBAL);
 	return CPlayerModStrategy_ZB2::OnSpawn();
 }
@@ -90,8 +90,7 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 
 void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	m_pPlayer->m_bIsVIP = false;
-	
+	SetHero(false);
 	return CPlayerModStrategy_ZB2::BecomeZombie(iEvolutionLevel);
 }
 
@@ -101,7 +100,8 @@ void CPlayerModStrategy_ZB3::Event_OnInfection(CBasePlayer * victim, CBasePlayer
 		return;
 
 	// infection => rage
-	if(victim->m_bIsVIP)
+	auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(victim->m_pModStrategy.get());
+	if (strategy && strategy->IsHero())
 		m_flRagePercent += m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 100 : 50;
 	else
 		m_flRagePercent += m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 40 : 20;
@@ -140,6 +140,9 @@ float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvar
 
 void CPlayerModStrategy_ZB3::OnThink()
 {
+	if (!m_pModZB3->FInfectionStarted() || m_pModZB3->m_bRoundTerminating)
+		return;
+
 	if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie && m_pPlayer->m_iTeam != TEAM_UNASSIGNED && m_pPlayer->m_iTeam != TEAM_SPECTATOR)
 	{
 		// respawn after 5 secs
@@ -167,6 +170,17 @@ void CPlayerModStrategy_ZB3::OnThink()
 
 void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflictor)
 {
+	// Human should respawn as a zombie
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		m_pPlayer->m_ZombieClass = "random";
+		m_pPlayer->m_bHeadshotKilled = false;
+		m_pPlayer->m_bIsZombie = true;
+		m_pPlayer->pev->max_health = 2000.0f;
+		m_pPlayer->pev->armorvalue = 200.0f;
+		m_pModZB3->TeamCheck();
+	}
+
 	m_flDeadTime = gpGlobals->time;
 	m_flBackupMaxHealth = m_pPlayer->pev->max_health;
 	m_flBackupArmor = m_pPlayer->pev->armorvalue;
@@ -181,8 +195,22 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	if (m_pPlayer != who)
 		return;
 
-	// TODO : hero weapons & model
-	m_pPlayer->m_bIsVIP = true;
+	SetHero(true);
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "hero");
+
+	DropPrimary(m_pPlayer);
+	m_pPlayer->GiveNamedItem("weapon_svdex");
+	int iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+	m_pPlayer->GiveAmmo(iAmount, "556Nato", iAmount);
+
+	DropSecondary(m_pPlayer);
+	m_pPlayer->GiveNamedItem("weapon_deagled");
+	iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("50AE", MAX_AMMO_556NATO);
+	m_pPlayer->GiveAmmo(iAmount, "50AE", iAmount);
+
+	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_Hero\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
+	//UTIL_ClientPrintAll(HUD_PRINTTALK, "%s 被选中成为英雄！", STRING(m_pPlayer->pev->netname));
+	UTIL_ClientPrintAll(HUD_PRINTTALK, "%s Become a hero！", STRING(m_pPlayer->pev->netname));
 }
 
 void CPlayerModStrategy_ZB3::Event_OnRoundStart()
@@ -216,7 +244,7 @@ void CMod_ZombieHero::PickZombieOrigin()
 {
 	CMod_Zombi::PickZombieOrigin();
 	// TODO : pick hero
-	// PickHero();
+	PickHero();
 }
 
 void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
@@ -274,6 +302,47 @@ void CMod_ZombieHero::CheckWinConditions()
 		ZombieWin();
 	else if (!iAliveZombie)
 		HumanWin();
+}
+
+BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker)
+{
+	int iReturn = FALSE;
+
+	if (!FInfectionStarted() || m_bRoundTerminating)
+		return FALSE;
+
+	if (!pAttacker || PlayerRelationship(pPlayer, pAttacker) != GR_TEAMMATE)
+	{
+		iReturn = TRUE;
+	}
+
+	if (CVAR_GET_FLOAT("mp_friendlyfire") != 0 || pAttacker == pPlayer)
+	{
+		iReturn = TRUE;
+	}
+
+	CBasePlayer* pAttackerPlayer = dynamic_ent_cast<CBasePlayer*>(pAttacker);
+	do
+	{
+		if (!pAttackerPlayer) break;
+		if (!pAttackerPlayer->m_bIsZombie || pPlayer->m_bIsZombie) break;
+		if (pPlayer->iuser1 == 1 && pPlayer->m_pActiveItem && !Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
+		{
+			iReturn = FALSE;
+			break;
+		}
+
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(pPlayer->m_pModStrategy.get());
+		if (strategy && strategy->IsHero())
+		{
+			iReturn = TRUE;
+			break;
+		}
+		iReturn = FALSE;
+		HumanInfectionByZombie(pPlayer, pAttackerPlayer);
+	} while (false);
+
+	return iReturn;
 }
 
 }

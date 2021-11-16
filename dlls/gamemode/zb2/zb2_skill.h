@@ -149,7 +149,6 @@ public:
 public:
 	void Think() override;
 	void Activate() override;
-	void ResetMaxSpeed()  override;
 	void OnSkillEnd() override;
 	float GetDamageRatio() const override;
 
@@ -339,6 +338,23 @@ protected:
 	EngineClock::time_point m_flTimeStartFlying = invalid_time_point;
 	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
 	EngineClock::time_point m_flTimeZombieSkillEffect;
+};
+
+
+class CZombieSkill_ZombieRevival : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieRevival(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+	void ResetMaxSpeed()  override;
+
+protected:
+	duration_t GetDurationTime() const;
 };
 
 }

@@ -192,14 +192,12 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("weapon_ak47");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("weapon_ak47");
 		m_pPlayer->GiveNamedItem("weapon_knife");
 		m_pPlayer->GiveNamedItem("weapon_glock18");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
@@ -415,22 +413,19 @@ bool IBasePlayerModStrategy::GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* w
 		return false;
 	}
 
-	WeaponBuyAmmoConfig config = weapon->GetBuyAmmoConfig();
-	const char* classname = config.classname;
-
-	if (!classname) {
-		ALERT(at_console, "Tried to buy ammo for an unrecognized gun\n");
-		return false;
-	}
-
 	// Can only buy if the player does not already have full ammo
 	int iMax = weapon->iMaxAmmo1();
-	if (player->m_rgAmmo[nAmmo] >= player->m_pModStrategy->ComputeMaxAmmo(classname, iMax)) {
+	auto psz = weapon->pszAmmo1();
+
+	iMax = player->m_pModStrategy->ComputeMaxAmmo(psz, iMax);
+	if (player->m_rgAmmo[nAmmo] >= iMax) {
 		return false;
 	}
 
 	// Purchase the ammo if the player has enough money
-	player->GiveNamedItem(classname);
+	if (player->GiveAmmo(iMax, psz, iMax) == -1) {
+		return false;
+	}
 	return true;
 }
 
@@ -453,16 +448,12 @@ bool IBasePlayerModStrategy::GiveSlotAmmo(CBasePlayer* player, int nSlot)
 	}
 
 	if (pItem != NULL) {
-		while (GiveGunAmmo(player, pItem)) {
-			pItem = pItem->m_pNext;
-
-			if (!pItem) {
-				return true;
-			}
-		}
+		do {
+			GiveGunAmmo(player, pItem);
+		} while (pItem = pItem->m_pNext);
 	}
 
-	return false;
+	return true;
 }
 
 }

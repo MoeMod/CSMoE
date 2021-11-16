@@ -140,7 +140,7 @@ namespace sv {
 				m_flLoopTime = gpGlobals->time + 6.8s;
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill2_exp.wav", VOL_NORM, ATTN_NORM);
 			}
-			RadiusDamage(pev->origin, m_SkillDamage, TRUE, m_freq);
+			RadiusDamage(pev->origin, m_SkillDamage, FALSE, m_freq);
 
 			if (m_freq == 40)
 			{
@@ -177,7 +177,7 @@ namespace sv {
 
 		}
 
-		void RadiusDamage(Vector vecAiming, float flDamage, bool bIsLoop, int freq)
+		void RadiusDamage(Vector vecAiming, float flDamage, bool bIsSkill1, int freq)
 		{
 			float flRadius = 175.0f;
 			if (g_pModRunning->DamageTrack() == DT_ZBS)
@@ -212,39 +212,53 @@ namespace sv {
 
 					if (!m_pPlayer->m_bIsZombie)
 					{
-						if (bIsLoop)
+						Vector vecSpot = pEntity->BodyTarget(vecSrc);
+						UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+						if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
 						{
-							Vector vecSpot = pEntity->BodyTarget(vecSrc);
-							UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-							if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+							if (tr.fStartSolid)
 							{
-								if (tr.fStartSolid)
+								tr.vecEndPos = vecSrc;
+								tr.flFraction = 0;
+							}
+
+							if (freq == 40)
+							{
+								if (tr.flFraction == 1.0f)
 								{
-									tr.vecEndPos = vecSrc;
-									tr.flFraction = 0;
+									pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+								}
+								else
+								{
+									tr.iHitgroup = HITGROUP_CHEST;
+									ClearMultiDamage();
+									pEntity->TraceAttack(pevAttacker, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+									ApplyMultiDamage(pevInflictor, pevAttacker);
 								}
 
-								if (freq == 40)
+								if (bIsSkill1)
 								{
-									if (tr.flFraction == 1.0f)
+									if (pEntity->IsPlayer())
 									{
-										pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-									}
-									else
-									{
-										tr.iHitgroup = HITGROUP_CHEST;
-										ClearMultiDamage();
-										pEntity->TraceAttack(pevAttacker, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-										ApplyMultiDamage(pevInflictor, pevAttacker);
+										CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+										if (target->m_bIsZombie && target->m_ZombieClass)
+										{
+											if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+											{
+												target->pev->velocity.x = 0;
+												target->pev->velocity.y = 0;
+												target->m_flVelocityModifier = 0.3;
+											}
+										}
 									}
 								}
-								/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-								if (pVictim->m_bIsZombie) // Zombie Knockback...
-								{
-								ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-								}*/
 							}
+							/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
+							if (pVictim->m_bIsZombie) // Zombie Knockback...
+							{
+							ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
+							}*/
 						}				
 					}
 				}
@@ -487,9 +501,9 @@ namespace sv {
 			float flDamage = 70;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 8.5f;
+				flDamage *= 40.5f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage *= 8.5f;
+				flDamage *= 45.5f;
 #endif
 			return flDamage;
 		}
@@ -509,19 +523,17 @@ namespace sv {
 			float flDamage = 95;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 12.5f;
+				flDamage *= 30.5f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage *= 12.5f;
+				flDamage *= 40.5f;
 #endif
 			return flDamage;
 		}
 
 
 		time_point_t m_flTimeNextCharge;
-		time_point_t m_flTimeFinalCharge;
 		time_point_t m_flTimeNextSkill1;
 		time_point_t m_flTimeNextSkill2;
-		time_point_t m_flTimeComboCheck;
 		time_point_t m_flTimeHostler;
 		time_point_t m_flTimeNextMessage;
 		int m_iDamageType;
@@ -546,6 +558,7 @@ namespace sv {
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
 		m_iClip = -1;
 		m_flTimeNextMessage = invalid_time_point;
+		m_iComboState = DGAXE_COMBO_IDLE;
 		m_flTimeHostler = gpGlobals->time;
 		m_iDefaultAmmo = 0;
 		SlashAnim = 3;
@@ -588,17 +601,29 @@ namespace sv {
 
 	void CKnifeDgaxe::PrimaryAttack(void)
 	{
-		if (m_flTimeComboCheck > gpGlobals->time && !bThinking)
+		if (m_iComboState == DGAXE_COMBO_RIGHT)
+			m_iComboState = DGAXE_COMBO_LEFT1;
+		else if (m_iComboState == DGAXE_COMBO_LEFT1)
 		{
-			SetThink(&CKnifeDgaxe::ComboThink);
-			bThinking = TRUE;
-			m_flTimeComboCheck = gpGlobals->time;
-			pev->nextthink = gpGlobals->time + 0.9s;
-		}
-		if (m_iComboState == DGAXE_COMBO_LEFT1)
-		{
+			Q_strcpy(m_pPlayer->m_szAnimExtention, "hammer");
+#ifndef CLIENT_DLL	
+			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+			SendWeaponAnim(DGAXE_COMBO, UseDecrement() != FALSE);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/dgaxe_combo.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			SetThink(&CKnifeDgaxe::ComboAttack);
+			pev->nextthink = gpGlobals->time + 0.83s;
+
+			m_pPlayer->iuser1 = 1;
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
+			m_iComboState = DGAXE_COMBO_IDLE;
+			currentammo = 1;
 			return;
 		}
+		else
+			m_iComboState = DGAXE_COMBO_IDLE;
+
 		if (DualSlashAnim > 8)
 			DualSlashAnim = 7;
 		BOOL fDidHit = FALSE;
@@ -654,17 +679,6 @@ namespace sv {
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}
 
-	void CKnifeDgaxe::ComboThink()
-	{
-		m_iComboState = DGAXE_COMBO_LEFT1;
-		m_flTimeFinalCharge = gpGlobals->time + 0.73s;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.74s;
-		bThinking = FALSE;
-		SetThink(nullptr);
-		/*SetThink(&CKnifeDgaxe::ItemPostFrame);
-		pev->nextthink = gpGlobals->time + 0.01s;*/
-	}
-
 	int CKnifeDgaxe::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 	{
 		if (m_iDefaultAmmo)
@@ -679,7 +693,8 @@ namespace sv {
 
 	void CKnifeDgaxe::SecondaryAttack(void)
 	{
-		m_flTimeComboCheck = gpGlobals->time + 3.0s;
+		if (!m_iComboState)
+			m_iComboState = DGAXE_COMBO_RIGHT;
 		if (SlashAnim >= 7)
 			SlashAnim = 3;
 		BOOL fDidHit = FALSE;
@@ -818,13 +833,16 @@ namespace sv {
 					ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
 					CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie && pPlayer->m_ZombieClass)
 					{
-						Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+						if (stricmp(pPlayer->m_ZombieClass, "revival") || !pPlayer->m_iZombieRevivalEnabled)
+						{
+							Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
 
-						pPlayer->pev->velocity.x = vecDir2D.x * 1000;
-						pPlayer->pev->velocity.y = vecDir2D.y * 1000;
-						pPlayer->pev->velocity.z = 600;
+							pPlayer->pev->velocity.x = vecDir2D.x * 1000;
+							pPlayer->pev->velocity.y = vecDir2D.y * 1000;
+							pPlayer->pev->velocity.z = 600;
+						}
 					}
 
 					if (pEntity->Classify() == CLASS_PLAYER)
@@ -851,6 +869,8 @@ namespace sv {
 
 		if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 			return;
+
+		m_iComboState = DGAXE_COMBO_IDLE;
 
 		if (RANDOM_LONG(0, 5))
 		{
@@ -1030,40 +1050,6 @@ namespace sv {
 
 			m_flTimeNextMessage = gpGlobals->time + 0.1s;
 			m_CrossHairStateStored = m_CrossHairState;
-		}
-		
-
-		if (m_iComboState == DGAXE_COMBO_LEFT1)
-		{
-			if (m_flTimeFinalCharge > gpGlobals->time)
-			{
-				if (m_iButton & IN_ATTACK)
-				{
-					Q_strcpy(m_pPlayer->m_szAnimExtention, "hammer");
-					m_pPlayer->SetAnimation(PLAYER_ATTACK1);			
-					SendWeaponAnim(DGAXE_COMBO, UseDecrement() != FALSE);
-					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/dgaxe_combo.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					SetThink(&CKnifeDgaxe::ComboAttack);
-					pev->nextthink = gpGlobals->time + 0.83s;
-
-					m_pPlayer->iuser1 = 1;
-					m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
-					m_flTimeComboCheck = gpGlobals->time;
-					m_flTimeFinalCharge = gpGlobals->time;
-					m_iComboState = DGAXE_COMBO_IDLE;
-					currentammo = 1;
-				}
-			}
-			else
-				m_iComboState = DGAXE_COMBO_IDLE;
-		}
-		else
-		{
-			if (m_flTimeComboCheck > gpGlobals->time)
-				m_iComboState = DGAXE_COMBO_RIGHT;
-			else
-				m_iComboState = DGAXE_COMBO_IDLE;
 		}
 		return CBasePlayerWeapon::ItemPostFrame();
 	}

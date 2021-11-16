@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "entity_state.h"
 
 #include "mod_zb1.h"
+#include "map_manager.h"
 
 #include <algorithm>
 #include <vector>
@@ -52,22 +53,26 @@ CMod_Zombi::CMod_Zombi() // precache
 void CMod_Zombi::CheckMapConditions()
 {
 	Base::CheckMapConditions();
+	
 	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
 //	CVAR_SET_FLOAT("sv_skycolor_r", 150);
 //	CVAR_SET_FLOAT("sv_skycolor_g", 150);
 //	CVAR_SET_FLOAT("sv_skycolor_b", 150);
 
-	// create fog, however it doesnt work...
 	CBaseEntity *fog = nullptr;
 	while ((fog = UTIL_FindEntityByClassname(fog, "env_fog")) != nullptr)
 	{
 		REMOVE_ENTITY(fog->edict());
 	}
-	CClientFog *newfog = GetClassPtr<CClientFog>(nullptr);
-	MAKE_STRING_CLASS("env_fog", newfog->pev);
-	newfog->Spawn();
-	newfog->m_fDensity = 0.0016f;
-	newfog->pev->rendercolor = { 0,0,0 };
+
+	edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("env_fog"));
+	if (!FNullEnt(pent))
+	{
+		CClientFog* pEntity = static_cast<CClientFog*>(CBaseEntity::Instance(pent));
+		DispatchSpawn(pEntity->edict());
+		pEntity->m_fDensity = 0.00006f;
+		pEntity->pev->rendercolor = { 0,0,0 };
+	}
 
 	// light
 	LIGHT_STYLE(0, "l"); // previous one is "f"
@@ -309,10 +314,10 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 	ret = int(iOriginalMax * 1.5f);
 
 	if (!strcmp(szAmmoClassName, "bowarrow"))
-		ret = iOriginalMax;
+		ret = 60;
 
-	if (!strcmp(szAmmoClassName, "Cannon"))
-		ret = iOriginalMax;
+	if (!strcmp(szAmmoClassName, "CannonAmmo"))
+		ret = 20;
 
 	if (!strcmp(szAmmoClassName, "HEGrenade"))
 		ret = 2;
@@ -410,6 +415,7 @@ void CMod_Zombi::PickZombieOrigin()
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
+		players[i]->pev->sequence = 0;
 	}
 
 	// sound effect

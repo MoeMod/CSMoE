@@ -204,6 +204,9 @@ set(HLDLL_SRCS
 	./balrog11cannon.cpp
 	./gamemode/mod_zbz.cpp
 	./gamemode/zbz/zbz_skill.cpp
+	./map_manager.cpp
+	./bot/states/cs_bot_defend.cpp
+	./gamemode/zb2/zb2_zclass_revival.cpp
 	)
 
 set (HLWPN_SRCS
@@ -338,6 +341,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfsmg.cpp
 	../dlls/wpn_shared/wpn_sfgun.cpp
 	../dlls/wpn_shared/wpn_sfmg.cpp
+	../dlls/wpn_shared/wpn_qbarrel.cpp
+	../dlls/wpn_shared/wpn_buffm249.cpp
 	)
 
 set(PM_SRCS

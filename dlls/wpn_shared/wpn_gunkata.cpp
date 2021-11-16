@@ -166,11 +166,11 @@ public:
 		m_flAccuracy = AccuracyDefault;
 
 #ifndef CLIENT_DLL
-		m_iMode_pev_iuser1 = 0; // (this + 292) = 0
-		m_flNextSpecialAttack1_pev_fuser1 = time_point_t::max(); // 0x7F7FFFFF; // 320
-		m_flNextSpecialAttack5_pev_teleport_time = time_point_t::max(); // 0x7F7FFFFF; // 336
-		m_flNextSpecialAttack9_pev_dmg_save = time_point_t::max(); // 0x7F7FFFFF; // 352
-		m_flNextSpecialAttack11_pev_speed = time_point_t::max(); // 0x7F7FFFFF; // 360
+		m_iMode = 0; // (this + 292) = 0
+		m_flNextSpecialAttack1 = time_point_t::max(); // 0x7F7FFFFF; // 320
+		m_flNextSpecialAttack5 = time_point_t::max(); // 0x7F7FFFFF; // 336
+		m_flNextSpecialAttack9 = time_point_t::max(); // 0x7F7FFFFF; // 352
+		m_flNextSpecialAttack11 = time_point_t::max(); // 0x7F7FFFFF; // 360
 #endif
 
 		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
@@ -197,11 +197,11 @@ public:
 	void SecondaryAttack() override // int __usercall sub_1026EED0@<eax>(int a1@<ecx>, double a2@<st0>)
 	{
 #ifndef CLIENT_DLL
-		if(m_iMode_pev_iuser1 != 1)
+		if(m_iMode != 1)
 		{
 			if(m_iClip > 0)
 			{
-				m_iMode_pev_iuser1 = 1;
+				m_iMode = 1;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = duration_t::max(); // 0x7F7FFFFF;
 			}
 
@@ -280,16 +280,20 @@ public:
 #else
 		flags = 0;
 #endif
-		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
+		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
 		SendWeaponAnim(iShootAnim, UseDecrement() != FALSE);
 
 		Recoil();
+
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 	}
 
 	void Precache() override
 	{
 		//v1 = this;
 		PRECACHE_MODEL("models/p_gunkata2.mdl");
+		PRECACHE_MODEL("sprites/muzzleflash77.spr");
 		/*
         PRECACHE_MODEL("models/ef_gunkata.mdl");
         PRECACHE_MODEL("models/ef_gunkata_man.mdl");
@@ -318,28 +322,28 @@ public:
 	void ItemPostFrame() override
 	{
 #ifndef CLIENT_DLL
-		switch(m_iMode_pev_iuser1)
+		switch(m_iMode)
 		{
 			case GUNKATA_MODE_B:
 			{
-				m_flNextSpecialAttack1_pev_fuser1 = get_gametime();
-				m_flNextSpecialAttack2_pev_fuser2 = get_gametime();
-				m_flNextSpecialAttack3_pev_fuser3 = get_gametime();
-				m_flNextSpecialAttack4_pev_fuser4 = get_gametime();
-				m_flNextSpecialAttack5_pev_teleport_time = get_gametime();
-				m_flNextSpecialAttack6_pev_air_finished = get_gametime();
-				m_flNextSpecialAttack7_pev_pain_finished = get_gametime();
-				m_flNextSpecialAttack8_pev_dmg_take = get_gametime();
-				m_flNextSpecialAttack9_pev_dmg_save = get_gametime();
-				m_flNextSpecialAttack10_pev_dmgtime = get_gametime();
-				m_flNextSpecialAttack11_pev_speed = get_gametime();
+				m_flNextSpecialAttack1 = get_gametime();
+				m_flNextSpecialAttack2 = get_gametime();
+				m_flNextSpecialAttack3 = get_gametime();
+				m_flNextSpecialAttack4 = get_gametime();
+				m_flNextSpecialAttack5 = get_gametime();
+				m_flNextSpecialAttack6 = get_gametime();
+				m_flNextSpecialAttack7 = get_gametime();
+				m_flNextSpecialAttack8 = get_gametime();
+				m_flNextSpecialAttack9 = get_gametime();
+				m_flNextSpecialAttack10 = get_gametime();
+				m_flNextSpecialAttack11 = get_gametime();
 
-				m_flNextSpecialAttack4_pev_fuser4 = get_gametime() + 0.2s;
-				m_flNextSpecialAttack2_pev_fuser2 = get_gametime() + 0.2s;
+				m_flNextSpecialAttack4 = get_gametime() + 0.2s;
+				m_flNextSpecialAttack2 = get_gametime() + 0.2s;
 
-				m_iMode_pev_iuser1 = GUNKATA_MODE_B2;
-				m_iAnim1_pev_iuser3 = 13;
-				m_iAnim2_pev_iuser4 = 11;
+				m_iMode = GUNKATA_MODE_B2;
+				m_iAnim1 = 13;
+				m_iAnim2 = 11;
 				break;
 			}
 			case GUNKATA_MODE_B2:
@@ -348,21 +352,21 @@ public:
 				{
 					if(m_pPlayer->pev->button & IN_ATTACK2)
 					{
-						if(get_gametime() > m_flNextSpecialAttack2_pev_fuser2)
+						if(get_gametime() > m_flNextSpecialAttack2)
 						{
 							float v14 = 1.0f;
-							if(m_iAnim1_pev_iuser3 == 10 || m_iAnim1_pev_iuser3 == 11 || m_iAnim1_pev_iuser3 == 4)
+							if(m_iAnim1 == 10 || m_iAnim1 == 11 || m_iAnim1 == 4)
 							{
 								v14 = 0.7;
 							}
-							else if(m_iAnim1_pev_iuser3 == 2)
+							else if(m_iAnim1 == 2)
 							{
 								v14 = 0.53;
 							}
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	v14,0,iAnim1,0,1,1
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, v14, 0.0, m_iAnim2_pev_iuser4, 0, 1, 1); // show additional vmodel
-							SendWeaponAnim(m_iAnim1_pev_iuser3, UseDecrement() != FALSE);
+							PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, v14, 0.0, m_iAnim2, 0, 1, 1); // show additional vmodel
+							SendWeaponAnim(m_iAnim1, UseDecrement() != FALSE);
 							/*
 							// CGunkata_sub_101710E0(&iAnim1, (int)&v45, iAnim1);
 							if(iAnim1 == iAnim2) // ???
@@ -373,30 +377,31 @@ public:
 								// CGunkata_sub_1004B410((int)*v20, iAnim2);
 							}
 							*/
-							m_iAnim1_pev_iuser3 = m_iAnim2_pev_iuser4;
-							m_iAnim2_pev_iuser4 += 1;
-							if(m_iAnim2_pev_iuser4 == 14)
+							m_iAnim1 = m_iAnim2;
+							m_iAnim2 += 1;
+							if(m_iAnim2 == 14)
 							{
-								m_iAnim2_pev_iuser4 -= 4; // ???
+								m_iAnim2 -= 4; // ???
 							}
-							m_flNextSpecialAttack2_pev_fuser2 = get_gametime() + 0.4s;
+
+							m_flNextSpecialAttack2 = get_gametime() + v14 * 1.0s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack3_pev_fuser3)
+						if(get_gametime() > m_flNextSpecialAttack3)
 						{
 							float v22 = 1.0f;
-							if(m_iAnim1_pev_iuser3 == 10 || m_iAnim1_pev_iuser3 == 11 || m_iAnim1_pev_iuser3 == 4)
+							if(m_iAnim1 == 10 || m_iAnim1 == 11 || m_iAnim1 == 4)
 							{
 								v22 = 0.7;
 							}
-							else if(m_iAnim1_pev_iuser3 == 2)
+							else if(m_iAnim1 == 2)
 							{
 								v22 = 0.53;
 							}
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	v22,0,iAnim1,0,0,1);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, v22, 0.0, m_iAnim2_pev_iuser4, 0, 1, 1); // show additional vmodel
-							SendWeaponAnim(m_iAnim1_pev_iuser3, UseDecrement() != FALSE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, v22, 0.0, m_iAnim2, 0, 1, 1); // show additional vmodel
+							SendWeaponAnim(m_iAnim1, UseDecrement() != FALSE);
 							/*
 							// CGunkata_sub_101710E0(&iAnim1, (int)&v45, iAnim1);
 							if(iAnim1 == iAnim2) // ???
@@ -407,16 +412,16 @@ public:
 								// CGunkata_sub_1004B410((int)*v20, iAnim2);
 							}
 							*/
-							m_iAnim1_pev_iuser3 = m_iAnim2_pev_iuser4;
-							m_iAnim2_pev_iuser4 += 1;
-							if(m_iAnim2_pev_iuser4 == 14)
+							m_iAnim1 = m_iAnim2;
+							m_iAnim2 += 1;
+							if(m_iAnim2 == 14)
 							{
-								m_iAnim2_pev_iuser4 -= 4; // ???
+								m_iAnim2 -= 4; // ???
 							}
-							m_flNextSpecialAttack3_pev_fuser3 = get_gametime() + v22 * 1.0s;
+							m_flNextSpecialAttack3 = get_gametime() + v22 * 1.0s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack1_pev_fuser1)
+						if(get_gametime() > m_flNextSpecialAttack1)
 						{
 							//v26 = id;
 							// CGunkata_sub_10114650(id, 2.03, pEntity); // reload ?
@@ -424,28 +429,28 @@ public:
 							// pPlayer->pev->?(296) = pEntity;
 							// pPlayer->pev->?(304) = 0;
 							//sub_104BB200(pPlayer);
-							m_flNextSpecialAttack1_pev_fuser1 = get_gametime() + 2.03s;
+							m_flNextSpecialAttack1 = get_gametime() + 2.03s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack5_pev_teleport_time)
+						if(get_gametime() > m_flNextSpecialAttack5)
 						{
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	0.87, 0,0,0,0,2);
 							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.87, 0.0, 0, 0, 0, 2);
-							m_flNextSpecialAttack5_pev_teleport_time = get_gametime() + 0.87s;
+							m_flNextSpecialAttack5 = get_gametime() + 0.87s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack4_pev_fuser4)
+						if(get_gametime() > m_flNextSpecialAttack4)
 						{
 							int v26 = 0;
 							if(m_pPlayer->pev->flags & FL_DUCKING)
 								v26 = 6;
-                            m_iStatus2_pev_watertype = m_iAnim2_pev_iuser4 - 10;
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 10.0, 2.0, v26+m_iStatus2_pev_watertype, 4, 0, 4);
-							m_flNextSpecialAttack4_pev_fuser4 = get_gametime() + 0.2s;
+                            m_iStatus2 = m_iAnim2 - 10;
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 10.0, 2.0, v26+m_iStatus2, 4, 0, 4);
+							m_flNextSpecialAttack4 = get_gametime() + 0.2s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack6_pev_air_finished)
+						if(get_gametime() > m_flNextSpecialAttack6)
 						{
 #ifndef CLIENT_DLL
 							m_pPlayer->SetAnimation(PLAYER_IDLE);
@@ -456,13 +461,13 @@ public:
 							m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
 #endif
 							RadiusAttack1();
-							m_flNextSpecialAttack6_pev_air_finished = get_gametime() + 0.082500003s;
+							m_flNextSpecialAttack6 = get_gametime() + 0.082500003s;
 						}
 
-						if(get_gametime() > m_flNextSpecialAttack7_pev_pain_finished)
+						if(get_gametime() > m_flNextSpecialAttack7)
 						{
 							--m_iClip;
-							m_flNextSpecialAttack7_pev_pain_finished = get_gametime() + 0.082500003s;
+							m_flNextSpecialAttack7 = get_gametime() + 0.082500003s;
 						}
 
 						// break;
@@ -472,7 +477,7 @@ public:
 						// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC
 						//	0 ,0, 0, 0, 0, 5);
 						PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 5);
-						m_iMode_pev_iuser1 = GUNKATA_MODE_B4;
+						m_iMode = GUNKATA_MODE_B4;
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
 				}
@@ -496,16 +501,16 @@ public:
 					//*(float *)(pPlayer + 2304) = *(float *)gametime + 1.1;
 
 					m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gunkata.mdl");
-					m_flNextSpecialAttack8_pev_dmg_take =  get_gametime() + 0.63s;
-					m_flNextSpecialAttack9_pev_dmg_save =  get_gametime() + 0.63s;
-					m_flNextSpecialAttack10_pev_dmgtime =  get_gametime() + 1.1s;
-					m_flNextSpecialAttack11_pev_speed =  get_gametime() + 1.1s;
+					m_flNextSpecialAttack8 =  get_gametime() + 0.63s;
+					m_flNextSpecialAttack9 =  get_gametime() + 0.63s;
+					m_flNextSpecialAttack10 =  get_gametime() + 1.1s;
+					m_flNextSpecialAttack11 =  get_gametime() + 1.1s;
 
 
 					// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 					//	0 ,0, 0, 0, 0, 5);
 					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 5);
-					m_iMode_pev_iuser1 = GUNKATA_MODE_B3;
+					m_iMode = GUNKATA_MODE_B3;
 
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
@@ -513,25 +518,25 @@ public:
 			}
 			case GUNKATA_MODE_B3:
 			{
-				if(get_gametime() > m_flNextSpecialAttack8_pev_dmg_take)
+				if(get_gametime() > m_flNextSpecialAttack8)
 				{
 					// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 					//	1.0 ,0.22, 0, 0, 0, 3);
 					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 1.0 ,0.22, 0, 0, 0, 3);
-					m_flNextSpecialAttack8_pev_dmg_take = time_point_t::max(); // 0x7F7FFFFF
+					m_flNextSpecialAttack8 = time_point_t::max(); // 0x7F7FFFFF
 
 				}
 
-				if(get_gametime() > m_flNextSpecialAttack9_pev_dmg_save)
+				if(get_gametime() > m_flNextSpecialAttack9)
 				{
 					RadiusAttack2();
 					if(g_pModRunning->DamageTrack() == DT_NONE)
 					{
-						m_flNextSpecialAttack9_pev_dmg_save = time_point_t::max(); // 0x7F7FFFFF
+						m_flNextSpecialAttack9 = time_point_t::max(); // 0x7F7FFFFF
 					}
 				}
 
-				if(get_gametime() > m_flNextSpecialAttack10_pev_dmgtime)
+				if(get_gametime() > m_flNextSpecialAttack10)
 				{
 					// complete the reload.
 					int delta = Q_min(MaxClip - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
@@ -542,12 +547,12 @@ public:
 					m_pPlayer->TabulateAmmo();
 					m_fInReload = FALSE;
 
-					m_flNextSpecialAttack10_pev_dmgtime = time_point_t::max(); // 0x7F7FFFFF
+					m_flNextSpecialAttack10 = time_point_t::max(); // 0x7F7FFFFF
 				}
 
-				if(get_gametime() > m_flNextSpecialAttack11_pev_speed)
+				if(get_gametime() > m_flNextSpecialAttack11)
 				{
-					m_iMode_pev_iuser1 = GUNKATA_MODE_B4;
+					m_iMode = GUNKATA_MODE_B4;
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
 
@@ -570,7 +575,7 @@ public:
                 */
 
 				SendWeaponAnim(!GetLRMode() ? 9:8, UseDecrement() != FALSE);
-				m_iMode_pev_iuser1 = GUNKATA_MODE_A;
+				m_iMode = GUNKATA_MODE_A;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 				break;
@@ -591,7 +596,7 @@ public:
 		{
 			case HIT_PLAYER:
 			{
-				if (m_iAnim2_pev_iuser4 % 2)
+				if (m_iAnim2 % 2)
 					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/turbulent9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				else
 					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/turbulent9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -645,22 +650,22 @@ public:
 	}
 
 #ifndef CLIENT_DLL
-	int m_iMode_pev_iuser1;
-	EHANDLE m_pEntity_pev_waterlevel;
-	int m_iStatus2_pev_watertype;
-	int m_iAnim1_pev_iuser3;
-	int m_iAnim2_pev_iuser4;
-	time_point_t m_flNextSpecialAttack1_pev_fuser1;
-	time_point_t m_flNextSpecialAttack2_pev_fuser2;
-	time_point_t m_flNextSpecialAttack3_pev_fuser3;
-	time_point_t m_flNextSpecialAttack4_pev_fuser4;
-	time_point_t m_flNextSpecialAttack5_pev_teleport_time;
-	time_point_t m_flNextSpecialAttack6_pev_air_finished;
-	time_point_t m_flNextSpecialAttack7_pev_pain_finished;
-	time_point_t m_flNextSpecialAttack8_pev_dmg_take;
-	time_point_t m_flNextSpecialAttack9_pev_dmg_save;
-	time_point_t m_flNextSpecialAttack10_pev_dmgtime;
-	time_point_t m_flNextSpecialAttack11_pev_speed;
+	int m_iMode;
+	EHANDLE m_pEntity;
+	int m_iStatus2;
+	int m_iAnim1;
+	int m_iAnim2;
+	time_point_t m_flNextSpecialAttack1;
+	time_point_t m_flNextSpecialAttack2;
+	time_point_t m_flNextSpecialAttack3;
+	time_point_t m_flNextSpecialAttack4;
+	time_point_t m_flNextSpecialAttack5;
+	time_point_t m_flNextSpecialAttack6;
+	time_point_t m_flNextSpecialAttack7;
+	time_point_t m_flNextSpecialAttack8;
+	time_point_t m_flNextSpecialAttack9;
+	time_point_t m_flNextSpecialAttack10;
+	time_point_t m_flNextSpecialAttack11;
 #endif
 
 };

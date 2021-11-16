@@ -266,6 +266,20 @@ private:
 	EHANDLE m_entity;
 };
 
+class DefendState : public BotState
+{
+public:
+	virtual void OnEnter(CCSBot* me);
+	virtual void OnUpdate(CCSBot* me);
+	virtual void OnExit(CCSBot* me);
+	virtual const char* GetName() const { return "Defend"; }
+public:
+	void SetDefendArea(CNavArea* area) { m_defendArea = area; }
+private:
+	CNavArea* m_defendArea;
+	CountdownTimer m_checkInterval;
+};
+
 }
 
 #endif

@@ -29,7 +29,7 @@ option(XASH_VCPKG "Enable VCPKG support." OFF)
 
 if(XASH_DEDICATED)
 	set(XASH_SDL  OFF) # Dedicated servers still can use SDL
-	set(XASH_STATIC_GAMELIB OFF)
+	option(XASH_STATIC_GAMELIB "Build static game library" ON)
 else()
 	option(XASH_SDL "Enable SDL." ON)
 	option(XASH_STATIC_GAMELIB "Build static game library" ON)

@@ -199,6 +199,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfsmg.cpp
 	../dlls/wpn_shared/wpn_sfgun.cpp
 	../dlls/wpn_shared/wpn_sfmg.cpp
+	../dlls/wpn_shared/wpn_qbarrel.cpp
+	../dlls/wpn_shared/wpn_buffm249.cpp
 	)
 
 set (HUD_SRCS
@@ -324,7 +326,8 @@ set (CLDLL_SOURCES
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
-	
+	./fog.cpp
+
 	${LUASH_SRCS}
 	${INPUT_SRCS}
 	${PM_SRCS}

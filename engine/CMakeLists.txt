@@ -378,7 +378,11 @@ elseif(XASH_STATIC_GAMELIB)
 	if(XASH_SDL)
 		add_definitions(-DXASH_SDLMAIN)
 	endif()
-	add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
+	if(XASH_SINGLE_BINARY)
+		add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
+	else()
+		add_library(${XASH_ENGINE} STATIC ${XASH_ENGINE_SOURCES})
+	endif()
 elseif(XASH_SINGLE_BINARY) # Set executable or library
 	add_definitions(-DSINGLE_BINARY)
 	add_executable(${XASH_ENGINE} ${XASH_ENGINE_SOURCES})
@@ -388,7 +392,10 @@ endif()
 
 if(XASH_STATIC_GAMELIB)
 	#target_link_libraries(${XASH_ENGINE} xashmenu)
-	target_link_libraries(${XASH_ENGINE} xashmenu client server)
+	target_link_libraries(${XASH_ENGINE} server)
+	if(NOT XASH_DEDICATED)
+		target_link_libraries(${XASH_ENGINE} xashmenu client)
+	endif()
 endif()
 
 if(MSVC)
@@ -534,8 +541,13 @@ elseif(NOT WIN32)
 else()
 	# For Win32 we have split DLL names
 	if(XASH_DEDICATED)
-		set_target_properties(${XASH_ENGINE} PROPERTIES
-			OUTPUT_NAME "xash_dedicated")
+		if(XASH_STATIC_GAMELIB)
+			set_target_properties(${XASH_ENGINE} PROPERTIES
+				OUTPUT_NAME "csmoe_dedicated")
+		else()
+			set_target_properties(${XASH_ENGINE} PROPERTIES
+				OUTPUT_NAME "xash_dedicated")
+		endif()
 	else()
 		set_target_properties(${XASH_ENGINE} PROPERTIES
 			OUTPUT_NAME "xash_sdl")

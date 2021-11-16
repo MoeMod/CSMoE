@@ -115,3 +115,5 @@ HOOK_EVENT(m249ex, FireM249EX);
 HOOK_EVENT(sfgun, FireSFGUN);
 HOOK_EVENT(sfsmg, FireSFSMG);
 HOOK_EVENT(sfmg, FireSFMG);
+HOOK_EVENT(qbarrel, FireQbarrel);
+HOOK_EVENT(buffm249, FireBUFFM249);

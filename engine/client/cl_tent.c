@@ -835,7 +835,10 @@ void GAME_EXPORT CL_MuzzleFlash(int clientindex, int iAttachment, const char *ty
 			scale = 0.1f;
 			index = 17;
 			break;
-
+		case 100073:	//deimos zombie
+			scale = 0.1f;
+			index = 3;
+			break;
 	}
 
 

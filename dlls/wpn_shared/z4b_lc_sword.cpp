@@ -85,6 +85,7 @@ public:
 		return Base::Deploy();
 	}
 
+	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
@@ -118,6 +119,16 @@ public:
 };
 
 LINK_ENTITY_TO_CLASS(z4b_lc_sword, CKnifeLcSword)
+
+void CKnifeLcSword::Spawn()
+{
+	pev->classname = MAKE_STRING("z4b_lc_sword");
+	m_iId = WEAPON_KNIFE;
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_knife.mdl");
+	m_iClip = WEAPON_NOCLIP;
+	FallInit();
+}
 
 void CKnifeLcSword::PrimaryAttack(void)
 {

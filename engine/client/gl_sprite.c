@@ -1190,7 +1190,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		pglAlphaFunc( GL_GEQUAL, 0.5f );
 	}
 
-	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha )
+	if( e->curstate.rendermode == kRenderNormal || e->curstate.rendermode == kRenderTransAlpha || e->curstate.rendermode == kRenderTransAdd)
 		frame = oldframe = R_GetSpriteFrame( model, e->curstate.frame, e->angles[YAW] );
 	else lerp = R_GetSpriteFrameInterpolant( e, &oldframe, &frame );
 

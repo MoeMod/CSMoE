@@ -39,15 +39,26 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		}
 	},
 #ifdef XASH_DEDICATED
-	{ "SVDEX", [](CBasePlayer* p) {
+	{ "【朱雀】M249 缺开火动作属正常", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 		{
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 		}
 		DropPrimary(p);
-		p->GiveNamedItem("weapon_svdex");
-		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-		p->GiveAmmo(iAmount, "556Nato", iAmount);
+		p->GiveNamedItem("weapon_buffm249");
+		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50az", 200);
+		p->GiveAmmo(iAmount, "50az", iAmount);
+		}
+	},
+	{ "【魂狩】猎弓", [](CBasePlayer* p) {
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
+		DropPrimary(p);
+		p->GiveNamedItem("weapon_huntbow");
+		//int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+		//p->GiveAmmo(iAmount, "556Nato", iAmount);
 		}
 	},
 	{ "神鬼开天", [](CBasePlayer* p) {
@@ -59,15 +70,15 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 		p->GiveNamedItem("knife_dgaxe");
 		}
 	},
-	{ "熔火岩狼", [](CBasePlayer* p) {
+	{ "破碎炙炎EX 缺开火动作属正常", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 		{
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 		}
 		DropPrimary(p);
-		p->GiveNamedItem("weapon_buffsg552ex");
-		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-		p->GiveAmmo(iAmount, "556Nato", iAmount);
+		p->GiveNamedItem("weapon_qbarrel");
+		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("buckshot", MAX_AMMO_BUCKSHOT);
+		p->GiveAmmo(iAmount, "buckshot", iAmount);
 		}
 	},
 	{ "天罚-龙枪", [](CBasePlayer* p) {

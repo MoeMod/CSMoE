@@ -33,7 +33,9 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	{
 		Vector dir2 = dir.Normalize();
 		dir2.z = 0.0f;
-		player->pev->velocity = fma(dir2, flKnockbackRatio, player->pev->velocity);
+		//player->pev->velocity = fma(dir2, flKnockbackRatio, player->pev->velocity);
+		player->pev->velocity.x = flKnockbackRatio * dir2.x;
+		player->pev->velocity.y = flKnockbackRatio * dir2.y;
 	}
 
 	if (flVelocityModifier > 0.0)

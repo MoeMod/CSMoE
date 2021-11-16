@@ -246,10 +246,10 @@ void CM134::M134Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 
 void CM134::Reload(void)
 {
-	if (m_pPlayer->ammo_556natobox <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(M249_MAX_CLIP, M134_RELOAD, 5.0s))
+	if (DefaultReload(200, M134_RELOAD, 5.0s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

@@ -243,13 +243,30 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
 
-class C762NatoBox : public CBasePlayerAmmo
+class C762NatoBoxAmmo : public CBasePlayerAmmo
 {
 public:
 	virtual void Spawn();
 	virtual void Precache();
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
+
+class C556NatoStarAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class C50AZAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
 }
 
 #endif // AMMO_H

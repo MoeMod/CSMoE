@@ -427,7 +427,17 @@ bool CCSBot::IsBuying() const
 
 bool CCSBot::IsRushingForSupplyBox() const
 {
-	if (m_state == static_cast<const BotState*>(&m_defuseBombState))
+	if (m_state == static_cast<const BotState*>(&m_supplyboxRushState))
+		return true;
+
+	return false;
+}
+
+// Return true if we are defending the safe area
+
+bool CCSBot::IsDefending() const
+{
+	if (m_state == static_cast<const BotState*>(&m_defendState))
 		return true;
 
 	return false;
@@ -469,6 +479,12 @@ void CCSBot::InvestigateNoise()
 void CCSBot::RushToSupplyBox()
 {
 	SetState(&m_supplyboxRushState);
+}
+
+void CCSBot::Defend(CNavArea* area)
+{
+	m_defendState.SetDefendArea(area);
+	SetState(&m_defendState);
 }
 
 }

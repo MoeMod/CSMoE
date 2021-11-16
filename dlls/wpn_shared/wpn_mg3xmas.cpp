@@ -162,7 +162,7 @@ void CMG3xmas::MG3xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 
 void CMG3xmas::Reload(void)
 {
-	if (m_pPlayer->ammo_556natobox <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
 	if (DefaultReload(200, M249_RELOAD, 4.8s))

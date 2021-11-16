@@ -878,6 +878,14 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
+			if (m_bIsZombie && m_ZombieClass)
+			{
+				if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
+				{
+					m_iZombieRevivalEnabled = 1;
+					return flDamage;
+				}
+			}
 			if (bitsDamageType & DMG_BLAST)
 				m_bKilledByBomb = true;
 
@@ -1042,7 +1050,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249"))
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1143,6 +1151,14 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 	}
 #endif
+	if (m_bIsZombie && m_ZombieClass && flDamage > pev->health)
+	{
+		if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
+		{
+			m_iZombieRevivalEnabled = 1;
+			return flDamage;
+		}
+	}
 	LogAttack(pAttack, this, teamAttack, flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 
 	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that
@@ -2000,13 +2016,17 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 {
 	int animDesired;
 	float speed;
-	const float speedLimit = 135.0f;
+	float speedLimit = 135.0f;
+
 	char szAnim[64];
 	int hopSeq;
 	int leapSeq;
 
 	if (!pev->modelindex)
 		return;
+
+	if (m_bIsZombie)
+		speedLimit = 160.0;
 
 	if (pev->health > 0)
 	{
@@ -5002,6 +5022,7 @@ void CBasePlayer::Spawn()
 	m_iHealthDecreaseCount = 0;
 
 	m_iZombieFlying = 0;
+	m_iZombieRevivalEnabled = 0;
 
 	SpawnProtection_End();
 

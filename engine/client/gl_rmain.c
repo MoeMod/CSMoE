@@ -1001,7 +1001,7 @@ static void R_CheckFog( void )
 
 	RI.fogEnabled = false;
 
-	if( RI.refdef.waterlevel < 2 || !RI.drawWorld || !r_viewleaf )
+	if( RI.refdef.waterlevel < 2 || !RI.drawWorld || !r_viewleaf || !gl_fog->integer )
 		return;
 
 	ent = CL_GetWaterEntity( RI.vieworg );

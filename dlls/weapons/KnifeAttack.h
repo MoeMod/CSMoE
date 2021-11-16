@@ -290,6 +290,20 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 					{
 						if (IsPrimaryAttack)
 						{
+							if (pEntity->IsPlayer())
+							{
+								CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+								if (target->m_bIsZombie && target->m_ZombieClass)
+								{
+									if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+									{
+										target->pev->velocity.x = 0;
+										target->pev->velocity.y = 0;
+										target->m_flVelocityModifier = 0.3;
+									}
+								}
+							}
+
 							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
 							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
 						}
@@ -305,10 +319,13 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 						if (pEntity->IsPlayer())
 						{
 							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-							if (target->m_bIsZombie)
+							if (target->m_bIsZombie && target->m_ZombieClass)
 							{
-								target->m_flVelocityModifier = 0.9;
-								AddKickRate(target, pevAttacker->origin, 3000, 290);							
+								if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+								{
+									target->m_flVelocityModifier = 0.9;
+									AddKickRate(target, pevAttacker->origin, 3000, 290);
+								}
 							}
 						}
 						break;
@@ -318,11 +335,14 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 						if (pEntity->IsPlayer())
 						{
 							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-							if (target->m_bIsZombie)
+							if (target->m_bIsZombie && target->m_ZombieClass)
 							{
-								target->pev->velocity.x = 0;
-								target->pev->velocity.y = 0;
-								target->m_flVelocityModifier = 0.3;
+								if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+								{
+									target->pev->velocity.x = 0;
+									target->pev->velocity.y = 0;
+									target->m_flVelocityModifier = 0.3;
+								}
 							}
 						}
 						break;

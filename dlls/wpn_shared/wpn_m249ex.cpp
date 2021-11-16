@@ -174,7 +174,7 @@ void CM249EX::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(200, M249EX_RELOAD, 3.8s))
+	if (DefaultReload(120, M249EX_RELOAD, 3.8s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

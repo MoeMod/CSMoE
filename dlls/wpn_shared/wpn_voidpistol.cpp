@@ -429,6 +429,7 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("sprites/ef_blackhole_loop.spr");
 	PRECACHE_MODEL("sprites/ef_blackhole_end.spr");
 	PRECACHE_MODEL("sprites/muzzleflash140.spr");
+	PRECACHE_MODEL("sprites/muzzleflash141.spr");
 
 
 
