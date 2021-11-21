@@ -16,12 +16,15 @@ GNU General Public License for more details.
 #include "imgui_lcsm_warning.h"
 #include "imgui.h"
 #include "imgui_utils.h"
+#include "qrcode.h"
 extern "C" {
 #include "common.h"
 #include "crtlib.h"
 #include "eiface.h"
+#include "gl_local.h"
 }
 
+#include <vector>
 #include <algorithm>
 
 #define JM_XORSTR_DISABLE_AVX_INTRINSICS
@@ -80,27 +83,30 @@ void ImGui_LCSM_OnGUI(void)
 	ImGuiUtils::CenterNextWindow(ImGuiCond_Always);
 	ImGui::OpenPopup(xorstr("柑橘 CSMoE LCSM 公告").crypt_get());
 	if (ImGui::BeginPopupModal(xorstr("柑橘 CSMoE LCSM 公告").crypt_get(), &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
-		ImGui::Text(xorstr("Counter-Strike Mobile-oriented Edition (aka CSMoE or CSBTE-Mobile)").crypt_get());
-		ImGui::Text(xorstr("版权所有：BTE Team|CSMoE Team|百度csoldjb吧").crypt_get());
-		ImGui::Text(xorstr("本游戏采用GPLv3协议完全开源免费，请勿使用本游戏进行任何形式的盈利").crypt_get());
-		ImGui::Text(xorstr("声明：任何提供收费服务的商家均非官方，我们不对非官方版本提供任何技术担保。").crypt_get());
-		ImGui::Text(xorstr("\t如出现任何意外（包括但不限于死机、蓝屏、锁机、ban号、中毒、变砖、爆炸等）后果自负。").crypt_get());
+		ImGui::Text(xorstr("柑橘 CSMoE v22 Counter-Strike Mobile-oriented Edition (原名 CSBTE-Mobile)").crypt_get());
+		ImGui::Text(xorstr("版权所有：BTE Team|CSMoE Team|百度csoldjb吧|死神CS社区|Faith Zone|幻夜CS社区|柑橘CitruS").crypt_get());
+		ImGui::Text(xorstr("本游戏采用GPLv3协议完全开源免费，使用本游戏进行任何形式的盈利均为诈骗！").crypt_get());
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
 		ImGui::TextColored(warning_color, xorstr("--------------------------------------------特别声明------------------------------------------").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("1.EC精英社所谓“CS破茧”“CS神器时代”“CS创新纪元”均为盗版游戏，我们强烈谴责盗版游戏的行为").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("2.Wilson（真名：刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("淘宝店铺：洋葱数码商城|淘宝名：丨低调奢华有内涵|B站ID：进口柚柚子|贴吧ID:liu1340567980").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("现在此揭露刘澄：一个完全的插件小白，靠网上东拼西凑代码，或直接搬运外网的更新加入游戏。").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("但因其持有原CSBTE版权我们无法维权。希望广大网友擦亮眼睛，不要被无耻小人骗走金钱与信任！").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("3.CSMoE所使用的素材均为热心网友整理而来，仅供学习、交流与欣赏，请于下载后24小时内删除！").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("4.CS01服务器 利用CSMoE支持中文、小地图作为客户端，用网上偷来的插件收费开服，望各位玩家周知。").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("2.进口柚柚子（刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利并举报B站视频").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("3.CS01服务器 利用CSMoE支持中文、小地图作为客户端，用网上偷来的插件收费开服，望各位玩家周知。").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("详情见B站Monster-egg 2021-6-19动态，CSMoE未在应用市场发布，如橘子CSMoE、饕餮、恶煞、王炸均为").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("第三方改版，我们不提供这些版本的支持，CSMoE并没有那些版本的改模武器。").crypt_get());
+		ImGui::TextColored(warning_color, xorstr("第三方改版，我们不提供这些版本的支持，CSMoE将坚决抵制换膜、开服、倒卖的行为。").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
+
+		ImGui::BeginGroup();
+		ImGui::NewLine();
+		ImGui::SameLine(0, ImGuiUtils::GetScaledValue(80));
+		ImGui::BeginGroup();
 		ImColor tipssss_color(0.3f, 0.6f, 0.2f, 1.0f);
-		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("柑橘CSMoE现已开设联机服供大家体验，您可以加群706711420体验，或点击下方按钮进服~~~").crypt_get());
-		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("柑橘 CSMoE 现已开设免费公益的官方联机服供大家体验").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("您可以加群706711420和爱好者们交流（右边扫码进群）").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("或者直接点击下方按钮进服击剑~~~").crypt_get());
+		ImGui::TextColored(tipssss_color, xorstr("-----------------------------------------------").crypt_get());
+		ImGui::EndGroup();
+
 		/*
 		ImGui::Text("请在下方输入：「我同意」代表您已经明确以上声明。");
 		ImGui::Text("否则请按下“退出”按钮退出游戏");
@@ -114,28 +120,63 @@ void ImGui_LCSM_OnGUI(void)
 		if(ImGui::Selectable("进入游戏", false, !!strcmp(buf, "我同意") ? ImGuiSelectableFlags_Disabled : 0, ImGuiUtils::GetScaledSize({0, 36})))
 		 */
 
-		ImGui::TextUnformatted(xorstr("请修改您的名称后再进服联机：").crypt_get());
+		ImGui::NewLine();
+		ImGui::SameLine(ImGuiUtils::GetScaledValue(40));
 		char buf[32] = {};
 		strncpy(buf, Cvar_VariableString("name"), 32);
-		ImGui::SameLine();
-		if (ImGui::InputText("name", buf, 32, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, [](ImGuiInputTextCallbackData* data)
-			{
-				return (int)CheckIsNameValid(data->Buf);
-			}))
+		if (ImGui::InputText(xorstr("<- 请修改名字后再进服联机").crypt_get(), buf, 32, ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_CallbackCharFilter, [](ImGuiInputTextCallbackData* data)
+		{
+			return (int)CheckIsNameValid(data->Buf);
+		}))
 		{
 			Cvar_Set("name", buf);
 		}
 
 		ImGui::NewLine();
-		ImGui::SameLine(ImGui::GetWindowSize().x * 1 / 4 - 80);
-		if (ImGui::Button(xorstr("进入柑橘联机服").crypt_get(), ImGuiUtils::GetScaledSize({ 160, 36 }))) {
+		ImGui::SameLine(ImGuiUtils::GetScaledValue(80));
+		if (ImGui::Button(xorstr("进入柑橘联机服").crypt_get(), ImGuiUtils::GetScaledSize({ 320, 36 }))) {
 			lcsm_enabled = false;
 			Cbuf_AddText(xorstr("connect z4cs.com:5555\n").crypt_get());
 		}
-		ImGui::SameLine(ImGui::GetWindowSize().x / 2 + 80);
-		if (ImGui::Button(xorstr("退出游戏").crypt_get(), ImGuiUtils::GetScaledSize({ 160, 36 }))) {
-			exit(0);
+
+		ImGui::EndGroup();
+		ImGui::SameLine(0, ImGuiUtils::GetScaledValue(50));
+
+		static ImTextureID qrTexture = 0;
+		if(!qrTexture)
+		{
+			QRCode s_qrcode;
+			std::vector<uint8_t> s_qrCodeBytes;
+			s_qrCodeBytes.resize(qrcode_getBufferSize(9));
+			qrcode_initText(&s_qrcode, s_qrCodeBytes.data(), 9, ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=m-wI8acAT7XurfGiy_2JZy9DBupc1tXe&authKey=ZgiTHa6sHJjpkKqMLE8XQH31pHL1gFGF4mOi3xH5zW6D169YuTGbKJqcRI0B7cVX").crypt_get());
+
+			rgbdata_t	r_image;
+			char	texName[32];
+
+			Q_strncpy( texName, xorstr("*citrus_qrcode").crypt_get(), sizeof( texName ) );
+			Q_memset( &r_image, 0, sizeof( r_image ));
+
+			static std::vector<ImU32> pixels(s_qrcode.size * s_qrcode.size, ImColor(255, 255, 255, 255));
+
+			for (std::uint8_t y = 0; y < s_qrcode.size; y++) {
+				for (std::uint8_t x = 0; x < s_qrcode.size; x++) {
+					if(qrcode_getModule(&s_qrcode, x, y))
+						pixels[x * s_qrcode.size + y] = ImColor(0, 0, 0, 255);
+				}
+			}
+
+			r_image.width = s_qrcode.size;
+			r_image.height = s_qrcode.size;
+			r_image.depth = 4;
+			r_image.type = PF_RGBA_32;
+			r_image.size = r_image.width * r_image.height * r_image.depth;
+			r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
+			r_image.buffer = (byte *)pixels.data();
+
+			qrTexture = (void *)(ptrdiff_t)GL_LoadTextureInternal( xorstr("*citrus_qrcode").crypt_get(), &r_image, (texFlags_t)(TF_IMAGE | TF_NEAREST), false );
 		}
+
+		ImGui::Image(qrTexture, ImGuiUtils::GetScaledSize({ 160, 160 }));
 		ImGui::EndPopup();
 	}
 }
