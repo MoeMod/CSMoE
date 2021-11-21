@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "imgui_lcsm_warning.h"
 #include "imgui.h"
 #include "imgui_utils.h"
-#include "qrcode.h"
+#include "QRCode.h"
 extern "C" {
 #include "common.h"
 #include "crtlib.h"
@@ -145,10 +145,10 @@ void ImGui_LCSM_OnGUI(void)
 		static ImTextureID qrTexture = 0;
 		if(!qrTexture)
 		{
-			QRCode s_qrcode;
+			qrcode::QRCode s_qrcode;
 			std::vector<uint8_t> s_qrCodeBytes;
-			s_qrCodeBytes.resize(qrcode_getBufferSize(9));
-			qrcode_initText(&s_qrcode, s_qrCodeBytes.data(), 9, ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=m-wI8acAT7XurfGiy_2JZy9DBupc1tXe&authKey=ZgiTHa6sHJjpkKqMLE8XQH31pHL1gFGF4mOi3xH5zW6D169YuTGbKJqcRI0B7cVX").crypt_get());
+			s_qrCodeBytes.resize(qrcode::getBufferSize(9));
+			qrcode::initText(&s_qrcode, s_qrCodeBytes.data(), 9, qrcode::ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=m-wI8acAT7XurfGiy_2JZy9DBupc1tXe&authKey=ZgiTHa6sHJjpkKqMLE8XQH31pHL1gFGF4mOi3xH5zW6D169YuTGbKJqcRI0B7cVX").crypt_get());
 
 			rgbdata_t	r_image;
 			char	texName[32];
@@ -160,7 +160,7 @@ void ImGui_LCSM_OnGUI(void)
 
 			for (std::uint8_t y = 0; y < s_qrcode.size; y++) {
 				for (std::uint8_t x = 0; x < s_qrcode.size; x++) {
-					if(qrcode_getModule(&s_qrcode, x, y))
+					if(qrcode::getModule(&s_qrcode, x, y))
 						pixels[x * s_qrcode.size + y] = ImColor(0, 0, 0, 255);
 				}
 			}
