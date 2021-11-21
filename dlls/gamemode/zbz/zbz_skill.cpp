@@ -6,7 +6,7 @@
 
 #include "gamemode/zbz/zbz_const.h"
 #include "gamemode/zbz/zbz_skill.h"
-#include <dlls\weapons\KnifeAttack.h>
+#include "weapons/KnifeAttack.h"
 
 namespace sv {
 	int g_iKnifeMasterSpr;
