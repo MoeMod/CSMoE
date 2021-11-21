@@ -449,6 +449,12 @@ void IN_StartupMouse( void )
 
 	in_mouse_buttons = 8;
 	in_mouseinitialized = true;
+
+
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_MAC || TARGET_OS_OSX )
+	// iOS Settings...
+	SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
+#endif
 }
 
 static void IN_ActivateCursor( void )
@@ -701,6 +707,9 @@ void IN_MouseEvent( int mstate )
 			SDL_ShowCursor(SDL_FALSE);
 #endif
 
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_MAC || TARGET_OS_OSX )
+
+#else
 		int division = 32; // 2
 		if( x < host.window_center_x - host.window_center_x / division ||
 			y < host.window_center_y - host.window_center_y / division ||
@@ -711,6 +720,7 @@ void IN_MouseEvent( int mstate )
 			ignore = 1; // next mouse event will be mouse warp
 			return;
 		}
+#endif
 
 		if ( !ignore )
 		{
