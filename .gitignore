@@ -330,6 +330,7 @@ CMakeSettings.json
 /3rdparty/SDL2
 /3rdparty/cpuinfo
 /3rdparty/xorstr
+/3rdparty/boost_1_72_0
 /SDL2
 msvc/BundleArtifacts/
 /enc_temp_folder

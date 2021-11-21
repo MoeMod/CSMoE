@@ -84,5 +84,9 @@ add_library(qrcode INTERFACE)
 target_sources(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src/qrcode.c)
 target_include_directories(qrcode INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/QRCode/src)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/preprocessor EXCLUDE_FROM_ALL)
-add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/pfr EXCLUDE_FROM_ALL)
+set(FETCHCONTENT_SOURCE_DIR_BOOST ${CMAKE_SOURCE_DIR}/3rdparty/boost_1_72_0)
+add_subdirectory(boost-cmake EXCLUDE_FROM_ALL)
+
+add_library(Boost::pfr ALIAS Boost::boost)
+add_library(Boost::preprocessor ALIAS Boost::boost)
+add_library(Boost::asio ALIAS Boost::boost)
