@@ -19,7 +19,7 @@ void LuaNotifyCppEntityCreate(const char *cppClassName, CBaseEntity* ptr);
 // It will allocate the class and entity if necessary
 //
 template<class T>
-NODISCARD auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
+auto GetClassPtr(entvars_t *pev) noexcept -> typename std::enable_if<std::is_base_of<CBaseEntity, T>::value, T *>::type
 {
 	// call from mp to create entity ?
 	if (pev == nullptr)

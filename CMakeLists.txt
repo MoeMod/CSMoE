@@ -62,7 +62,7 @@ endif()
 option(XASH_LUASH "LUA support for CSMoE. Expected lua 5.3" ON)
 
 if (APPLE OR ANDROID)
-	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof -Wno-format-security)
+	add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-invalid-offsetof -Wno-format-security -Wno-missing-braces -Wno-missing-field-initializers)
 elseif(MSVC)
 
 else()
@@ -71,7 +71,7 @@ endif()
 
 # Important, as HLSDK and engine shares some symbol names!
 if(NOT WIN32) # Windows by default have hidden visibility and better linker
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
+	add_compile_options(-fvisibility=hidden)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)

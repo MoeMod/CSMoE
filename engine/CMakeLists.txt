@@ -395,9 +395,9 @@ endif()
 
 if(XASH_STATIC_GAMELIB)
 	#target_link_libraries(${XASH_ENGINE} xashmenu)
-	target_link_libraries(${XASH_ENGINE} server)
+	target_link_libraries(${XASH_ENGINE} PRIVATE server)
 	if(NOT XASH_DEDICATED)
-		target_link_libraries(${XASH_ENGINE} xashmenu client)
+		target_link_libraries(${XASH_ENGINE} PRIVATE xashmenu client)
 	endif()
 endif()
 

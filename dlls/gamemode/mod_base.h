@@ -26,7 +26,7 @@ GNU General Public License for more details.
 
 #include <memory>
 
-#include "bot-include.h"
+#include "bot_include.h"
 
 namespace sv {
 
