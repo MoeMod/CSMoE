@@ -26,6 +26,8 @@ GNU General Public License for more details.
 
 #include <memory>
 
+#include "bot-include.h"
+
 namespace sv {
 
 class CBaseEntity;

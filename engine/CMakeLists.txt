@@ -64,6 +64,9 @@ else()
 endif()
 
 option(XASH_CPUINFO "Build with cpuinfo support" ON)
+if(IOS)
+	set(XASH_CPUINFO OFF)
+endif()
 
 set(XASH_ENGINE_SOURCES 
 	common/avikit.c
@@ -388,7 +391,7 @@ endif()
 
 if(XASH_STATIC_GAMELIB)
 	#target_link_libraries(${XASH_ENGINE} xashmenu)
-	target_link_libraries(${XASH_ENGINE} xashmenu client server)
+	target_link_libraries(${XASH_ENGINE} PRIVATE xashmenu client server)
 endif()
 
 if(MSVC)
@@ -432,14 +435,14 @@ if(XASH_DEDICATED)
 endif()
 
 if(XASH_IMGUI)
-	target_link_libraries(${XASH_ENGINE} imgui imgui_ext)
+	target_link_libraries(${XASH_ENGINE} PRIVATE imgui imgui_ext)
 endif()
 
 if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 	add_definitions(-DXASH_SDL)
 
-	target_link_libraries(${XASH_ENGINE} sdl2)
+	target_link_libraries(${XASH_ENGINE} PUBLIC sdl2)
 endif()
 
 if(XASH_GLES)
@@ -454,10 +457,10 @@ endif()
 if(XASH_CPUINFO)
 	add_definitions(-DXASH_CPUINFO=1)
 
-	target_link_libraries(${XASH_ENGINE} cpuinfo_3p)
+	target_link_libraries(${XASH_ENGINE} PRIVATE cpuinfo_3p)
 endif()
 
-target_link_libraries(${XASH_ENGINE} xorstr_3p)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
@@ -484,7 +487,7 @@ else()
 endif()
 
 if(APPLE)
-	target_link_libraries(${XASH_ENGINE} "-framework AppKit -framework AudioToolBox")
+	target_link_libraries(${XASH_ENGINE} PUBLIC "-framework AppKit -framework AudioToolBox")
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -fobjc-arc")
 endif()
@@ -518,12 +521,12 @@ if(XASH_USE_STB_SPRINTF)
 endif()
 
 if(ANDROID)
-	target_link_libraries(${XASH_ENGINE} -ldl -llog -landroid)
+	target_link_libraries(${XASH_ENGINE} PUBLIC -ldl -llog -landroid)
 elseif(NOT WIN32)
 	if(NOT HAIKU)
-		target_link_libraries(${XASH_ENGINE} -lm -lpthread)
+		target_link_libraries(${XASH_ENGINE} PUBLIC -lm -lpthread)
 	else()
-		target_link_libraries(${XASH_ENGINE} -lm -lpthread -lnetwork)
+		target_link_libraries(${XASH_ENGINE} PUBLIC -lm -lpthread -lnetwork)
 	endif()
 	# For single binary builds we change name to game_launch's executable name
 	# For single binary builds we change name to game_launch's executable name

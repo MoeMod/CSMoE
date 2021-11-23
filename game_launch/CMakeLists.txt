@@ -106,7 +106,7 @@ if(WIN32)
 	endif()
 
 elseif(APPLE)
-	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.icns")
+	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.png")
 	set_source_files_properties(${APP_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
 	find_library(SDL2_LIBRARY_FILE SDL2)
@@ -118,7 +118,7 @@ elseif(APPLE)
 			OUTPUT_NAME CSMoE) # Change name to your gamedir, if you building a standalone game
 
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in")
-	set_target_properties(${XASH_LAUNCHER} PROPERTIES MACOSX_BUNDLE_ICON_FILE "Icon.icns")
+	set_target_properties(${XASH_LAUNCHER} PROPERTIES MACOSX_BUNDLE_ICON_FILE "Icon.png")
 
 	target_link_libraries(${XASH_LAUNCHER} xash)
 

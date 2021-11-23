@@ -69,7 +69,7 @@ namespace ui
 		L = nullptr;
 	}
 
-	lua_State* LuaCL_Get()
+	lua_State* LuaUI_Get()
 	{
 		return L;
 	}
@@ -229,7 +229,7 @@ namespace ui
 
 	void LuaUI_OnGUI()
 	{
-		lua_State* L = LuaCL_Get();
+		lua_State* L = LuaUI_Get();
 
 		lua_getglobal(L, "require");
 		// #1 = require

@@ -18,7 +18,7 @@ const char* Cpu_GetName(void)
 #ifdef XASH_CPUINFO
 	return cpuinfo_get_package(0)->name;
 #else
-	return "Unknown",
+    return "Unknown";
 #endif
 }
 
