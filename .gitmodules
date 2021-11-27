@@ -13,12 +13,12 @@
 [submodule "3rdparty/luajit-cmake"]
 	path = 3rdparty/luajit-cmake
 	url = https://github.com/MoeMod/luajit-cmake
-[submodule "3rdparty/boost-cmake"]
-	path = 3rdparty/boost-cmake
-	url = https://github.com/Orphis/boost-cmake
 [submodule "3rdparty/openssl-cmake"]
 	path = 3rdparty/openssl-cmake
 	url = https://github.com/janbar/openssl-cmake
 [submodule "3rdparty/json"]
 	path = 3rdparty/json
 	url = https://github.com/nlohmann/json
+[submodule "3rdparty/boost-cmake"]
+	path = 3rdparty/boost-cmake
+	url = https://github.com/ITesserakt/boost-cmake
