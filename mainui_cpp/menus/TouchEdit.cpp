@@ -87,7 +87,7 @@ UI_TouchEdit_KeyFunc
 */
 const char *CMenuTouchEdit::Key( int key, int down )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( down && ui::Key::IsEscape( key ) )
 	{
 		Hide();
 		return uiSoundOut;

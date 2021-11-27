@@ -28,7 +28,7 @@ private:
 
 const char *CMenuConnectionWarning::Key( int key, int down )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( down && ui::Key::IsEscape( key ) )
 	{
 		return uiSoundNull; // handled
 	}

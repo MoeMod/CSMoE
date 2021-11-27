@@ -132,7 +132,7 @@ CMenuYesNoMessageBox::Key
 */
 const char *CMenuYesNoMessageBox::Key(int key, int down)
 {
-	if( UI::Key::IsEscape( key ) && down )
+	if( ui::Key::IsEscape( key ) && down )
 	{
 		Hide();
 		onNegative( this );

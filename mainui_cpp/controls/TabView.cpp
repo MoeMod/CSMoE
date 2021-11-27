@@ -109,8 +109,8 @@ void CMenuTabView::Draw()
 	// draw contents
 	if( m_iCursor >= 0 && m_iCursor < m_numItems )
 	{
-		UI::Scissor::PushScissor( contentOffset, contentSize );
+		ui::Scissor::PushScissor( contentOffset, contentSize );
 			m_pItems[m_iCursor]->Draw();
-		UI::Scissor::PopScissor();
+		ui::Scissor::PopScissor();
 	}
 }

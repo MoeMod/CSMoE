@@ -40,7 +40,7 @@ void CropByPreviousScissors( Point pt, Size sz, int &x, int &y, int &w, int &h )
 	h = outBottom - outTop;
 }
 
-void UI::Scissor::PushScissor(int x, int y, int w, int h)
+void ui::Scissor::PushScissor(int x, int y, int w, int h)
 {
 	if( scissor.iDepth + 1 > MAX_SCISSORS )
 	{
@@ -65,7 +65,7 @@ void UI::Scissor::PushScissor(int x, int y, int w, int h)
 	scissor.iDepth++;
 }
 
-void UI::Scissor::PopScissor()
+void ui::Scissor::PopScissor()
 {
 	if( scissor.iDepth <= 0 )
 	{

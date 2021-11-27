@@ -729,7 +729,7 @@ void CMenuTable::Draw()
 
 
 	// prevent the columns out of rectangle bounds
-	UI::Scissor::PushScissor( boxPos, boxSize );
+	ui::Scissor::PushScissor( boxPos, boxSize );
 	y = boxPos.y;
 
 	for( i = iTopItem; i < m_pModel->GetRows() && i < iNumRows + iTopItem; i++, y += m_scChSize )
@@ -763,5 +763,5 @@ void CMenuTable::Draw()
 		DrawLine( Point( boxPos.x, y ), i, color, forceCol, fillColor );
 	}
 
-	UI::Scissor::PopScissor();
+	ui::Scissor::PopScissor();
 }

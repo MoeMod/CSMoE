@@ -26,7 +26,7 @@ project (MAINUI)
 # By default we require C++11 support.
 # But it can be overriden with -DMY_COMPILER_SUCKS compiler option
 # It's not recommended and may not work(as it's done only for MSVC6 support)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 set(MAINUI_LIBRARY xashmenu)
 option(MAINUI_USE_CUSTOM_FONT_RENDER "Use custom font rendering" ON)
@@ -143,6 +143,7 @@ if(XASH_IMGUI)
 	list(APPEND MAINUI_SOURCES
 		imgui_menu/imgui_menu.cpp
 		imgui_menu/imgui_menu_msgbox.cpp
+		imgui_menu/imgui_menu_server.cpp
 	)
 endif()
 
@@ -158,9 +159,10 @@ else()
 endif()
 
 if(XASH_IMGUI)
-	target_link_libraries(${MAINUI_LIBRARY} imgui imgui_ext)
+	target_link_libraries(${MAINUI_LIBRARY} PRIVATE imgui imgui_ext)
 endif()
-target_link_libraries(${MAINUI_LIBRARY} luash)
+target_link_libraries(${MAINUI_LIBRARY} PRIVATE luash)
+target_link_libraries(${MAINUI_LIBRARY} PRIVATE cqmiao json_3p)
 
 if(NOT XASH_SDK)
 	set(XASH_SDK "../")

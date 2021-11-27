@@ -161,7 +161,7 @@ void CMenuScrollView::Draw()
 
 	Con_NPrintf( 0, "Drawn: %i Skipped: %i", drawn, skipped );
 
-	UI::Scissor::PushScissor( m_scPos, m_scSize );
+	ui::Scissor::PushScissor( m_scPos, m_scSize );
 		CMenuItemsHolder::Draw();
-	UI::Scissor::PopScissor();
+	ui::Scissor::PopScissor();
 }

@@ -185,7 +185,7 @@ const char *CMenuBaseWindow::Key(int key, int down)
 		m_bHoldOffset.y = uiStatic.cursorY;
 	}
 
-	if( down && UI::Key::IsEscape( key ) )
+	if( down && ui::Key::IsEscape( key ) )
 	{
 		Hide( );
 		return uiSoundOut;

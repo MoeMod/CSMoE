@@ -204,7 +204,7 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 #define STR( x ) #x
 #define STR2( x ) STR( x )
 
-namespace UI
+namespace ui
 {
 
 namespace Key

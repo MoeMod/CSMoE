@@ -46,7 +46,7 @@ private:
 
 void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 {
-	if( !UI::Names::CheckIsNameValid( name.GetBuffer() ) )
+	if( !ui::Names::CheckIsNameValid( name.GetBuffer() ) )
 	{
 		msgBox.Show();
 	}
@@ -59,12 +59,12 @@ void CMenuPlayerIntroduceDialog::WriteOrDiscard()
 
 const char *CMenuPlayerIntroduceDialog::Key( int key, int down )
 {
-	if( down && UI::Key::IsEscape( key ) )
+	if( down && ui::Key::IsEscape( key ) )
 	{
 		return uiSoundNull; // handled
 	}
 
-	if( down && UI::Key::IsEnter( key ) && ItemAtCursor() == &name )
+	if( down && ui::Key::IsEnter( key ) && ItemAtCursor() == &name )
 	{
 		WriteOrDiscard();
 	}

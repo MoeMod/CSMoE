@@ -540,7 +540,7 @@ int Con_UtfMoveRight( const char *str, int pos, int length )
 }
 
 
-bool UI::Names::CheckIsNameValid(const char *name)
+bool ui::Names::CheckIsNameValid(const char *name)
 {
 	if( !name || !*name )
 		return false;

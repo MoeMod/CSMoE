@@ -375,7 +375,7 @@ void CMenuPlayerSetup::SetConfig( void )
 
 void CMenuPlayerSetup::SaveAndPopMenu()
 {
-	if( !UI::Names::CheckIsNameValid( name.GetBuffer() ) )
+	if( !ui::Names::CheckIsNameValid( name.GetBuffer() ) )
 	{
 		msgBox.Show();
 		return;
