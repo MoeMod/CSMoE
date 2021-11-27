@@ -6,9 +6,9 @@
 namespace detail {
 
 #define APPLYER_DEF(Z,N,DATA) \
-    template<class T, class ApplyFunc> decltype(auto) StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, N>) { \
-        auto &&[BOOST_PP_ENUM_PARAMS(N, x)] = std::forward<T>(my_struct); \
-        return f(BOOST_PP_ENUM_PARAMS(N, x)); \
+    template<class T, class ApplyFunc> decltype(auto) StructApply_impl(T &&my_struct, ApplyFunc f, std::integral_constant<std::size_t, BOOST_PP_INC(N)>) { \
+        auto &&[BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(N), x)] = std::forward<T>(my_struct); \
+        return f(BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(N), x)); \
     } \
 
     BOOST_PP_REPEAT(200, APPLYER_DEF, ~)

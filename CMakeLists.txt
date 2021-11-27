@@ -91,11 +91,6 @@ if(MSVC)
 	# MultiByte charset
 	add_compile_options(/utf-8)
 
-	# fix asio
-	add_definitions(-DBOOST_ASIO_DISABLE_CONCEPTS -DBOOST_ASIO_HAS_STD_COROUTINE -DBOOST_ASIO_HAS_CO_AWAIT)
-
-	add_compile_options(/await)
-
 	# static CRT
 	if(XASH_STATIC_GAMELIB)
 		set(CompilerFlags
