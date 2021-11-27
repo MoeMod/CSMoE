@@ -29,9 +29,14 @@ if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 	add_compile_options(-Wno-register)
 endif()
 
-set(XASH_ENGINE xash) # Lib name
-
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
+
+if(XASH_DEDICATED)
+	set(XASH_ENGINE xashds) # Lib name
+else()
+	set(XASH_ENGINE xash) # Lib name
+endif()
+
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" ON)
 else()
@@ -163,34 +168,35 @@ if(NOT XASH_DEDICATED)
 		./platform/win32/con_win.c
 		./platform/win32/ime_win32.cpp
 	)
-endif()
 
-set(XASH_ENGINE_SDL_SOURCES
-	./platform/sdl/events.c
-	./platform/sdl/gl_sdl.c
-	./platform/sdl/snd_sdl.c
-	./platform/sdl/vid_sdl.c
-)
+	set(XASH_ENGINE_SDL_SOURCES
+		./platform/sdl/events.c
+		./platform/sdl/gl_sdl.c
+		./platform/sdl/snd_sdl.c
+		./platform/sdl/vid_sdl.c
+	)
 
-set(XASH_ENGINE_ANDROID_SOURCES
-   platform/android/vid_android.c
-   platform/android/android_nosdl.c
-   platform/android/snd_opensles.c
-   platform/ime_stub.cpp
-)
+	set(XASH_ENGINE_ANDROID_SOURCES
+	   platform/android/vid_android.c
+	   platform/android/android_nosdl.c
+	   platform/android/snd_opensles.c
+	   platform/ime_stub.cpp
+	)
 
-if(IOS)
-set(XASH_ENGINE_APPLE_SOURCES
-	common/launcher.c
-	platform/iOS/TapicEngine.mm
-	platform/ime_stub.cpp
-)
-else()
-set(XASH_ENGINE_APPLE_SOURCES
-	platform/macos/TouchBar.mm
-	platform/macos/vid_macos.mm
-	platform/ime_stub.cpp
-)
+	if(IOS)
+	set(XASH_ENGINE_APPLE_SOURCES
+		common/launcher.c
+		platform/iOS/TapicEngine.mm
+		platform/ime_stub.cpp
+	)
+	else()
+	set(XASH_ENGINE_APPLE_SOURCES
+		platform/macos/TouchBar.mm
+		platform/macos/vid_macos.mm
+		platform/ime_stub.cpp
+	)
+	endif()
+
 endif()
 
 set(XASH_ENGINE_CLIENT_SOURCES
@@ -535,31 +541,24 @@ elseif(NOT WIN32)
 	else()
 		target_link_libraries(${XASH_ENGINE} PUBLIC -lm -lpthread -lnetwork)
 	endif()
-	# For single binary builds we change name to game_launch's executable name
-	# For single binary builds we change name to game_launch's executable name
-	if(XASH_SINGLE_BINARY)
+endif()
+
+if(XASH_DEDICATED)
+	if(XASH_STATIC_GAMELIB)
 		set_target_properties(${XASH_ENGINE} PROPERTIES
-			    OUTPUT_NAME "xash3d")
-	endif()
-else()
-	# For Win32 we have split DLL names
-	if(XASH_DEDICATED)
-		if(XASH_STATIC_GAMELIB)
-			set_target_properties(${XASH_ENGINE} PROPERTIES
 				OUTPUT_NAME "csmoe_dedicated")
-		else()
-			set_target_properties(${XASH_ENGINE} PROPERTIES
-				OUTPUT_NAME "xash_dedicated")
-		endif()
 	else()
 		set_target_properties(${XASH_ENGINE} PROPERTIES
-			OUTPUT_NAME "xash_sdl")
+				OUTPUT_NAME "xash_dedicated")
 	endif()
 endif()
 
 # engine doesnt support unity build now
 set_target_properties(${XASH_ENGINE} PROPERTIES UNITY_BUILD OFF)
 
-if( NOT XASH_STATIC_GAMELIB )
+if( NOT XASH_STATIC_GAMELIB OR XASH_SINGLE_BINARY )
 	install( TARGETS ${XASH_ENGINE} DESTINATION ".")
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/csmoe DESTINATION "." OPTIONAL)
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/cstrike DESTINATION "." OPTIONAL)
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/valve DESTINATION "." OPTIONAL)
 endif()
