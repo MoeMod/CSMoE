@@ -488,7 +488,7 @@ if(XASH_DLL_LOADER)
 endif()
 
 if(XASH_LIBDL)
-	target_link_libraries(${XASH_ENGINE} ${CMAKE_DL_LIBS})
+	target_link_libraries(${XASH_ENGINE} PRIVATE ${CMAKE_DL_LIBS})
 else()
 	add_definitions(-DNO_LIBDL)
 endif()

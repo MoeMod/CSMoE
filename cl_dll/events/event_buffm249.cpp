@@ -129,8 +129,8 @@ void EV_FireBUFFM249(event_args_s *args)
 			0,
 			0,
 			1.0,
-			0.4,
-			0.0
+			0.75,
+			0.14
 		);
 
 		if (pBeam)

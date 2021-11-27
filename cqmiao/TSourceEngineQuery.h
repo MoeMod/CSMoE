@@ -24,20 +24,20 @@ public:
 
 	enum class Environment_e : uint8_t
 	{
-		linux = 'l', // for Linux
-		LINUX = 'L', // for Linux, on previous GoldSrc
-		windows = 'w', // for Windows
-		WINDOWS = 'W', // for Windows, on previous GoldSrc
+		ENV_linux = 'l', // for Linux
+		ENV_LINUX = 'L', // for Linux, on previous GoldSrc
+		ENV_windows = 'w', // for Windows
+		ENV_WINDOWS = 'W', // for Windows, on previous GoldSrc
 
-		mac = 'm', // for Mac
-		osx = 'o', // for Mac, the code changed after L4D1
+		ENV_mac = 'm', // for Mac
+		ENV_osx = 'o', // for Mac, the code changed after L4D1
 	};
 
 	friend constexpr const char* EnvironmentName(Environment_e env)
 	{
-		return  (env == Environment_e::linux || env == Environment_e::LINUX) ? "Linux" :
-		        (env == Environment_e::windows || env == Environment_e::WINDOWS) ? "Windows" :
-		        (env == Environment_e::mac || env == Environment_e::osx) ? "macOS" : "Unknown";
+		return  (env == Environment_e::ENV_linux || env == Environment_e::ENV_LINUX) ? "Linux" :
+		        (env == Environment_e::ENV_windows || env == Environment_e::ENV_WINDOWS) ? "Windows" :
+		        (env == Environment_e::ENV_mac || env == Environment_e::ENV_osx) ? "macOS" : "Unknown";
 	}
 
 	enum Visibility_e : uint8_t

@@ -410,6 +410,9 @@ void CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(CBasePlayer * attacker, H
 	if (attacker != m_pPlayer)
 		return;
 
+	if (!m_pCharacter_ZB2)
+		return;
+
 	if (!m_pPlayer->m_bIsZombie && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING)
 	{
 		if (m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
