@@ -11,26 +11,28 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#include <imgui.h>
-#include "imgui_utils.h"
-
-#include "imgui_menu_msgbox.h"
-#include "RequestHTTPS.h"
-
-#include <boost/asio.hpp>
-#include <boost/asio/use_awaitable.hpp>
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/detached.hpp>
-
-#include <nlohmann/json.hpp>
 
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <regex>
 
+#include <boost/asio.hpp>
+#include <boost/asio/use_awaitable.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/ssl.hpp>
+
+#include <nlohmann/json.hpp>
+
+#include <imgui.h>
+#include "imgui_utils.h"
+
+#include "imgui_menu_msgbox.h"
+
 #include "TSourceEngineQuery.h"
 #include "parse_ip.h"
+#include "RequestHTTPS.h"
 
 using namespace std::chrono_literals;
 
@@ -48,30 +50,21 @@ namespace ui {
 		auto j = nlohmann::json::parse(data);
 		auto j2 = j["servers"];
 
-		std::vector<std::string> srv_list;
-		for(auto j : j2)
-		{
-			srv_list.push_back(j);
-		}
-
 		std::vector<boost::asio::awaitable<void> > awaitables;
-		std::transform(srv_list.begin(), srv_list.end(), std::back_inserter(awaitables), [](std::string srv) -> boost::asio::awaitable<void> {
-			auto completion_token = boost::asio::use_awaitable;
-			return boost::asio::async_initiate<decltype(completion_token), void(std::exception_ptr)>([srv](auto &&completion_handler){
-					boost::asio::co_spawn(s_server_ioc, [srv]() mutable -> boost::asio::awaitable<void> {
-						if (auto [host, port] = ParseHostPort(srv); !host.empty()) {
-							boost::asio::ip::udp::resolver resolver(s_server_ioc);
-							auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
-							for (const auto &ep: desc_endpoints) {
-								auto start_req = std::chrono::high_resolution_clock::now();
-								auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep,1s);
-								auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
-								s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(), [ep](auto &entry){ return get<1>(entry) == ep; }), s_servers_list.end());
-								s_servers_list.emplace_back(ping, ep, info);
-							}
+		std::transform(j2.begin(), j2.end(), std::back_inserter(awaitables), [](const std::string& srv) -> boost::asio::awaitable<void> {
+			return boost::asio::co_spawn(s_server_ioc, [srv]() mutable -> boost::asio::awaitable<void> {
+					if (auto [host, port] = ParseHostPort(srv); !host.empty()) {
+						boost::asio::ip::udp::resolver resolver(s_server_ioc);
+						auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
+						for (const auto &ep: desc_endpoints) {
+							auto start_req = std::chrono::high_resolution_clock::now();
+							auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep,1s);
+							auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
+							s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(), [ep](auto &entry){ return get<1>(entry) == ep; }), s_servers_list.end());
+							s_servers_list.emplace_back(ping, ep, info);
 						}
-					}, [completion_handler = std::move(completion_handler)](std::exception_ptr ep) mutable { completion_handler(ep); });
-			}, completion_token);
+					}
+			}, boost::asio::use_awaitable);
 		});
 
 		for(auto &&awaitable : awaitables)
