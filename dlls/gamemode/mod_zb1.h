@@ -53,6 +53,7 @@ public: // CHalfLifeMultiplay
 public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
+	bool CanChangeTeam(CBasePlayer *player, int newTeam_id, int curTeam_id) override;
 
 public:
 	virtual size_t ZombieOriginNum();

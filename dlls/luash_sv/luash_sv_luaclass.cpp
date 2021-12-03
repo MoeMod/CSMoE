@@ -42,7 +42,43 @@ namespace cl {
 	template<> void ReturnFromLuaIfNotVoid<void>(lua_State *L, int pop_num)
 	{
 		lua_pop(L, pop_num);
-		return;
+	}
+
+	bool PreCall(lua_State *L, const char *FuncName, void *CppObject)
+	{
+		luash::PushLuaObjectByPtr(L, CppObject);
+		if(!lua_istable(L, -1))
+		{
+			assert(false && "unable to get luaobject");
+			lua_pop(L, 1);
+			return false;
+		}
+		lua_getfield(L, -1, FuncName);
+		if(!(lua_isfunction(L, -1) && !lua_iscfunction(L, -1)))
+		{
+			lua_pop(L, 2);
+			return false;
+		}
+		lua_pushvalue(L, -2);
+		return true;
+	}
+
+	template<class...Args> void PushArgs(lua_State *L, const Args &...args)
+	{
+		(..., luash::Push(L, args));
+	}
+
+	bool PostCall(lua_State *L, const char *FuncName, int ArgsNum)
+	{
+		if(int errc = lua_pcall(L, ArgsNum, 1, 0))
+		{
+			const char *msg = lua_tostring(L, -1);
+			char buffer[256];
+			snprintf(buffer, 256, "LuaClass Vfunc %s Error: %s\n", FuncName, msg);
+			LuaSV_PrintError(buffer);
+			lua_pop(L, 2);
+		}
+		return true;
 	}
 
 	#define CLASS_BEGIN(ClassName, BaseClass) \
@@ -56,35 +92,15 @@ namespace cl {
 		static_assert(std::is_base_of<BaseClass, ThisClass>::value || std::is_void<BaseClass>::value); \
 		public:
 
-	#define ADD_VIRTUAL_FUNCTION(...) auto BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) NAMED_ARGUMENT(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), __VA_ARGS__) \
+	#define ADD_VIRTUAL_FUNCTION(...) NAMED_ARG_FN_DECL(__VA_ARGS__) \
 				-> decltype(std::declval<ThisClass>().BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))) override { \
 			using ResultType = decltype(ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x))); \
 			lua_State* L = LuaSV_Get(); \
-			luash::PushLuaObjectByPtr(L, (CBaseEntity *)this); \
-			if(!lua_istable(L, -1)) \
-			{ \
-				assert(false && "unable to get luaobject"); \
-				lua_pop(L, 1); \
+			if(!PreCall(L, BOOST_PP_STRINGIZE(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), this)) \
 				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
-			} \
-			lua_getfield(L, -1, BOOST_PP_STRINGIZE(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__))); \
-			if(!(lua_isfunction(L, -1) && !lua_iscfunction(L, -1))) \
-			{ \
-				lua_pop(L, 2); \
+			PushArgs(L BOOST_PP_COMMA_IF(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))) BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
+			if(!PostCall(L, BOOST_PP_STRINGIZE(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))) \
 				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
-			} \
-			lua_pushvalue(L, -2); \
-			auto push_func = [L](auto &&...args) { (..., luash::Push(L, args)); }; \
-			push_func(BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
-			if(int errc = lua_pcall(L, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), 1, 0)) \
-			{ \
-				const char *msg = lua_tostring(L, -1); \
-				char buffer[256]; \
-				snprintf(buffer, 256, "LuaClass Vfunc %s Error: %s\n", __FUNCTION__, msg); \
-				LuaSV_PrintError(buffer); \
-				lua_pop(L, 2); \
-				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
-			} \
 			return ReturnFromLuaIfNotVoid<ResultType>(L, 2); \
 		}
 	#define ADD_OVERRIDE_VIRTUAL_FUNCTION(...) ADD_VIRTUAL_FUNCTION(__VA_ARGS__)

@@ -51,6 +51,7 @@ public:
 	virtual int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet) { return 0; }
 	virtual int ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther) { return 1; }
 	virtual enum CCSBotManager::GameScenarioType OverrideGameScenario(enum CCSBotManager::GameScenarioType type) { return type; }
+	virtual bool CanChangeTeam(CBasePlayer *player, int newTeam_id, int curTeam_id)  { return true; }
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, ruleof350::unique, virtual public IBaseMod

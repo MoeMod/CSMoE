@@ -560,4 +560,9 @@ enum CCSBotManager::GameScenarioType CMod_Zombi::OverrideGameScenario(enum CCSBo
 	return CCSBotManager::SCENARIO_ZOMBIEMOD_INFETCION;
 }
 
+bool CMod_Zombi::CanChangeTeam(CBasePlayer *player, int newTeam_id, int curTeam_id)
+{
+	return ((curTeam_id == UNASSIGNED || curTeam_id == SPECTATOR) && newTeam_id != TERRORIST) || player->IsBot();
+}
+
 }

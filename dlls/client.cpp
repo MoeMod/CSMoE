@@ -1864,6 +1864,12 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 			return FALSE;
 	}
 
+	if (!g_pModRunning->CanChangeTeam(player, team, player->m_iTeam)) {
+		// The specified team is full
+		ClientPrint(player->pev, HUD_PRINTCENTER, "#Only_1_Team_Change");
+		return FALSE;
+	}
+
 	// If the code gets this far, the team is not TEAM_UNASSIGNED
 	// Player is switching to a new team (It is possible to switch to the
 	// same team just to choose a new appearance)
