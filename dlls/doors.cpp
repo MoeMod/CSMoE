@@ -11,6 +11,7 @@
 #include "subs.h"
 #include "sound.h"
 #include "buttons.h"
+#include "decals.h"
 
 #include "bot_include.h"
 
@@ -19,6 +20,45 @@ namespace sv {
 /*
 * Globals initialization
 */
+
+const char* CRotDoor::pSoundsWood[] =
+{
+	"debris/wood1.wav",
+	"debris/wood2.wav",
+	"debris/wood3.wav"
+};
+
+const char* CRotDoor::pSoundsFlesh[] =
+{
+	"debris/flesh1.wav",
+	"debris/flesh2.wav",
+	"debris/flesh3.wav",
+	"debris/flesh5.wav",
+	"debris/flesh6.wav",
+	"debris/flesh7.wav"
+};
+
+const char* CRotDoor::pSoundsMetal[] =
+{
+	"debris/metal1.wav",
+	"debris/metal2.wav",
+	"debris/metal3.wav"
+};
+
+const char* CRotDoor::pSoundsConcrete[] =
+{
+	"debris/concrete1.wav",
+	"debris/concrete2.wav",
+	"debris/concrete3.wav"
+};
+
+const char* CRotDoor::pSoundsGlass[] =
+{
+	"debris/glass1.wav",
+	"debris/glass2.wav",
+	"debris/glass3.wav"
+};
+
 TYPEDESCRIPTION CBaseDoor::m_SaveData[] =
 		{
 				DEFINE_FIELD (CBaseDoor, m_bHealthValue, FIELD_CHARACTER),
@@ -813,6 +853,18 @@ LINK_ENTITY_TO_CLASS (func_door_rotating, CRotDoor);
 
 void CRotDoor::Restart()
 {
+	pev->solid = SOLID_BSP;
+	pev->movetype = MOVETYPE_PUSH;
+	pev->deadflag = DEAD_NO;
+
+	if (pev->spawnflags & SF_BREAK_TRIGGER_ONLY)
+		pev->takedamage = DAMAGE_NO;
+	else
+		pev->takedamage = DAMAGE_YES;
+
+	pev->health = m_flHealth;
+	pev->effects &= ~EF_NODRAW;
+
 	CBaseToggle::AxisDir(pev);
 
 	if (pev->spawnflags & SF_DOOR_ROTATE_BACKWARDS) {
@@ -823,11 +875,7 @@ void CRotDoor::Restart()
 		pev->speed = 100;
 
 	if (pev->spawnflags & SF_DOOR_START_OPEN) {
-		pev->angles = m_vecAngle2;
-
-		Vector vecSav = m_vecAngle1;
-		m_vecAngle2 = m_vecAngle1;
-		m_vecAngle1 = vecSav;
+		pev->angles = m_vecAngle1;
 
 		pev->movedir = pev->movedir * -1;
 	}
@@ -839,6 +887,20 @@ void CRotDoor::Restart()
 void CRotDoor::Spawn()
 {
 	Precache();
+	m_Material = matWood;
+
+	if (pev->spawnflags & SF_BREAK_TRIGGER_ONLY)
+		pev->takedamage = DAMAGE_NO;
+	else
+		pev->takedamage = DAMAGE_YES;
+
+	float flHealth = 1000.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flHealth *= 10.0f;
+
+	pev->health = flHealth;
+	m_flHealth = flHealth;
+	pev->solid = SOLID_BSP;
 
 	// set the axis of rotation
 	CBaseToggle::AxisDir(pev);
@@ -898,6 +960,523 @@ void CRotDoor::SetToggleState(int state)
 		pev->angles = m_vecAngle1;
 
 	UTIL_SetOrigin(pev, pev->origin);
+}
+
+void CRotDoor::Precache()
+{
+	const char* pGibName = NULL;
+
+	switch (m_Material)
+	{
+	case matWood:
+		pGibName = "models/woodgibs.mdl";
+
+		PRECACHE_SOUND("debris/bustcrate1.wav");
+		PRECACHE_SOUND("debris/bustcrate2.wav");
+		break;
+	case matFlesh:
+		pGibName = "models/fleshgibs.mdl";
+
+		PRECACHE_SOUND("debris/bustflesh1.wav");
+		PRECACHE_SOUND("debris/bustflesh2.wav");
+		break;
+	case matComputer:
+		PRECACHE_SOUND("buttons/spark5.wav");
+		PRECACHE_SOUND("buttons/spark6.wav");
+		pGibName = "models/computergibs.mdl";
+
+		PRECACHE_SOUND("debris/bustmetal1.wav");
+		PRECACHE_SOUND("debris/bustmetal2.wav");
+		break;
+	case matGlass:
+	case matUnbreakableGlass:
+		pGibName = "models/glassgibs.mdl";
+
+		PRECACHE_SOUND("debris/bustglass1.wav");
+		PRECACHE_SOUND("debris/bustglass2.wav");
+		break;
+	case matMetal:
+		pGibName = "models/metalplategibs.mdl";
+
+		PRECACHE_SOUND("debris/bustmetal1.wav");
+		PRECACHE_SOUND("debris/bustmetal2.wav");
+		break;
+	case matCinderBlock:
+		pGibName = "models/cindergibs.mdl";
+
+		PRECACHE_SOUND("debris/bustconcrete1.wav");
+		PRECACHE_SOUND("debris/bustconcrete2.wav");
+		break;
+	case matRocks:
+		pGibName = "models/rockgibs.mdl";
+
+		PRECACHE_SOUND("debris/bustconcrete1.wav");
+		PRECACHE_SOUND("debris/bustconcrete2.wav");
+		break;
+	case matCeilingTile:
+		pGibName = "models/ceilinggibs.mdl";
+
+		PRECACHE_SOUND("debris/bustceiling.wav");
+		break;
+	default:
+		break;
+	}
+
+	MaterialSoundPrecache(m_Material);
+
+	if (m_iszGibModel)
+	{
+		pGibName = STRING(m_iszGibModel);
+	}
+
+	if (pGibName != NULL)
+	{
+		m_idShard = PRECACHE_MODEL((char*)pGibName);
+	}
+}
+
+void CRotDoor::DamageSound()
+{
+	int pitch;
+	float fvol;
+	const char* rgpsz[6];
+	int i;
+	int material = m_Material;
+
+	if (RANDOM_LONG(0, 2))
+		pitch = PITCH_NORM;
+	else
+		pitch = 95 + RANDOM_LONG(0, 34);
+
+	fvol = RANDOM_FLOAT(0.75, 1.0);
+
+	if (material == matComputer && RANDOM_LONG(0, 1))
+		material = matMetal;
+
+	switch (material)
+	{
+	case matGlass:
+	case matComputer:
+	case matUnbreakableGlass:
+		rgpsz[0] = "debris/glass1.wav";
+		rgpsz[1] = "debris/glass2.wav";
+		rgpsz[2] = "debris/glass3.wav";
+		i = 3;
+		break;
+
+	case matWood:
+		rgpsz[0] = "debris/wood1.wav";
+		rgpsz[1] = "debris/wood2.wav";
+		rgpsz[2] = "debris/wood3.wav";
+		i = 3;
+		break;
+
+	case matMetal:
+		rgpsz[0] = "debris/metal1.wav";
+		rgpsz[1] = "debris/metal3.wav";
+		rgpsz[2] = "debris/metal2.wav";
+		i = 2;
+		break;
+
+	case matFlesh:
+		rgpsz[0] = "debris/flesh1.wav";
+		rgpsz[1] = "debris/flesh2.wav";
+		rgpsz[2] = "debris/flesh3.wav";
+		rgpsz[3] = "debris/flesh5.wav";
+		rgpsz[4] = "debris/flesh6.wav";
+		rgpsz[5] = "debris/flesh7.wav";
+		i = 6;
+		break;
+
+	case matRocks:
+	case matCinderBlock:
+		rgpsz[0] = "debris/concrete1.wav";
+		rgpsz[1] = "debris/concrete2.wav";
+		rgpsz[2] = "debris/concrete3.wav";
+		i = 3;
+		break;
+
+	case matCeilingTile:
+		// UNDONE: no ceiling tile shard sound yet
+		i = 0;
+		break;
+	}
+
+	if (i)
+	{
+		EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, rgpsz[RANDOM_LONG(0, i - 1)], fvol, ATTN_NORM, 0, pitch);
+	}
+}
+
+const char** CRotDoor::MaterialSoundList(Materials precacheMaterial, int& soundCount)
+{
+	const char** pSoundList = NULL;
+
+	switch (precacheMaterial)
+	{
+	case matWood:
+	{
+		pSoundList = pSoundsWood;
+		soundCount = ARRAYSIZE(pSoundsWood);
+		break;
+	}
+	case matFlesh:
+	{
+		pSoundList = pSoundsFlesh;
+		soundCount = ARRAYSIZE(pSoundsFlesh);
+		break;
+	}
+	case matGlass:
+	case matComputer:
+	case matUnbreakableGlass:
+	{
+		pSoundList = pSoundsGlass;
+		soundCount = ARRAYSIZE(pSoundsGlass);
+		break;
+	}
+	case matMetal:
+	{
+		pSoundList = pSoundsMetal;
+		soundCount = ARRAYSIZE(pSoundsMetal);
+		break;
+	}
+	case matCinderBlock:
+	case matRocks:
+	{
+		pSoundList = pSoundsConcrete;
+		soundCount = ARRAYSIZE(pSoundsConcrete);
+		break;
+	}
+	case matCeilingTile:
+	case matNone:
+	default:
+		soundCount = 0;
+		break;
+	}
+
+	return pSoundList;
+}
+
+void CRotDoor::MaterialSoundPrecache(Materials precacheMaterial)
+{
+	const char** pSoundList;
+	int i, soundCount = 0;
+
+	pSoundList = MaterialSoundList(precacheMaterial, soundCount);
+
+	for (i = 0; i < soundCount; ++i)
+	{
+		PRECACHE_SOUND((char*)pSoundList[i]);
+	}
+}
+
+void CRotDoor::MaterialSoundRandom(edict_t* pEdict, Materials soundMaterial, float volume)
+{
+	int soundCount = 0;
+	const char** pSoundList = MaterialSoundList(soundMaterial, soundCount);
+
+	if (soundCount)
+	{
+		EMIT_SOUND(pEdict, CHAN_BODY, pSoundList[RANDOM_LONG(0, soundCount - 1)], volume, 1.0);
+	}
+}
+
+BOOL CRotDoor::IsBreakable()
+{
+	return m_Material != matUnbreakableGlass;
+}
+
+// Special takedamage for func_door_rotating. Allows us to make
+// exceptions that are breakable-specific
+// bitsDamageType indicates the type of damage sustained ie: DMG_CRUSH
+
+int CRotDoor::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	Vector vecTemp;
+
+	// if Attacker == Inflictor, the attack was a melee or other instant-hit attack.
+	// (that is, no actual entity projectile was involved in the attack so use the shooter's origin).
+	if (pevAttacker == pevInflictor)
+	{
+		vecTemp = pevInflictor->origin - (pev->absmin + (pev->size * 0.5f));
+
+		// if a client hit the breakable with a crowbar, and breakable is crowbar-sensitive, break it now.
+		if ((pevAttacker->flags & FL_CLIENT) && (pev->spawnflags & SF_BREAK_CROWBAR) && (bitsDamageType & DMG_CLUB))
+		{
+			flDamage = pev->health;
+		}
+	}
+	else
+	{
+		// an actual missile was involved.
+		vecTemp = pevInflictor->origin - (pev->absmin + (pev->size * 0.5f));
+	}
+
+	if (!IsBreakable())
+		return 0;
+
+	// Breakables take double damage from the crowbar
+	if (bitsDamageType & DMG_CLUB)
+	{
+		flDamage *= 2.0f;
+	}
+
+	// Boxes / glass / etc. don't take much poison damage, just the impact of the dart - consider that 10%
+	if (bitsDamageType & DMG_POISON)
+	{
+		flDamage *= 0.1f;
+	}
+
+	// this global is still used for glass and other non-monster killables, along with decals.
+	g_vecAttackDir = vecTemp.Normalize();
+
+	// do the damage
+	pev->health -= flDamage;
+	#ifdef XASH_DEDICATED
+	if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 0.0f) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
+		WRITE_LONG((long)flDamage);
+		WRITE_SHORT(ENTINDEX(edict()));
+		WRITE_BYTE(0);
+		MESSAGE_END();
+	}
+	#endif
+	if (pev->health <= 0)
+	{
+		pev->takedamage = DAMAGE_NO;
+		pev->deadflag = DEAD_DEAD;
+		pev->effects = EF_NODRAW;
+
+		Die();
+
+		if (m_flDelay == 0.0s)
+		{
+			m_flDelay = 0.1s;
+		}
+
+		pev->nextthink = pev->ltime + m_flDelay;
+		return 0;
+	}
+
+	// Make a shard noise each time func breakable is hit.
+	// Don't play shard noise if cbreakable actually died.
+	DamageSound();
+	return 1;
+}
+
+void CRotDoor::Die()
+{
+	Vector vecSpot;	// shard origin
+	Vector vecVelocity;	// shard velocity
+	CBaseEntity* pEntity = NULL;
+	char cFlag = 0;
+	int pitch;
+	float fvol;
+
+	pev->takedamage = DAMAGE_NO;
+	pev->deadflag = DEAD_DEAD;
+	pev->effects = EF_NODRAW;
+
+	pitch = 95 + RANDOM_LONG(0, 29);
+
+	if (pitch > 97 && pitch < 103)
+		pitch = 100;
+
+	// The more negative pev->health, the louder
+	// the sound should be.
+	fvol = RANDOM_FLOAT(0.85, 1.0) + (abs((int)pev->health) / 100.0f);
+
+	if (fvol > 1.0f)
+		fvol = 1.0f;
+
+	switch (m_Material)
+	{
+	case matGlass:
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustglass1.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustglass2.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		}
+		cFlag = BREAK_GLASS;
+
+		if (TheBots != NULL)
+		{
+			TheBots->OnEvent(EVENT_BREAK_GLASS, this);
+		}
+		break;
+	case matWood:
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustcrate1.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustcrate2.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		}
+		cFlag = BREAK_WOOD;
+
+		if (TheBots != NULL)
+		{
+			TheBots->OnEvent(EVENT_BREAK_WOOD, this);
+		}
+		break;
+
+	case matMetal:
+	case matComputer:
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustmetal1.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustmetal2.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		}
+		cFlag = BREAK_METAL;
+
+		if (TheBots != NULL)
+		{
+			TheBots->OnEvent(EVENT_BREAK_METAL, this);
+		}
+		break;
+
+	case matFlesh:
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustflesh1.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustflesh2.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		}
+		cFlag = BREAK_FLESH;
+
+		if (TheBots != NULL)
+		{
+			TheBots->OnEvent(EVENT_BREAK_FLESH, this);
+		}
+		break;
+
+	case matCinderBlock:
+	case matRocks:
+		switch (RANDOM_LONG(0, 1))
+		{
+		case 0:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustconcrete1.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		case 1:	EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustconcrete2.wav", fvol, ATTN_NORM, 0, pitch);
+			break;
+		}
+		cFlag = BREAK_CONCRETE;
+
+		if (TheBots != NULL)
+		{
+			TheBots->OnEvent(EVENT_BREAK_CONCRETE, this);
+		}
+		break;
+
+	case matCeilingTile:
+		EMIT_SOUND_DYN(ENT(pev), CHAN_VOICE, "debris/bustceiling.wav", fvol, ATTN_NORM, 0, pitch);
+		break;
+
+	default:
+		break;
+	}
+
+	if (m_Explosion == expDirected)
+	{
+		vecVelocity = g_vecAttackDir * 200.0f;
+	}
+	else
+	{
+		vecVelocity.x = 0;
+		vecVelocity.y = 0;
+		vecVelocity.z = 0;
+	}
+
+	vecSpot = pev->origin + (pev->mins + pev->maxs) * 0.5;
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecSpot);
+	WRITE_BYTE(TE_BREAKMODEL);
+	WRITE_COORD(vecSpot.x);		// position
+	WRITE_COORD(vecSpot.y);
+	WRITE_COORD(vecSpot.z);
+	WRITE_COORD(pev->size.x);	// size
+	WRITE_COORD(pev->size.y);
+	WRITE_COORD(pev->size.z);
+	WRITE_COORD(vecVelocity.x);	// velocity
+	WRITE_COORD(vecVelocity.y);
+	WRITE_COORD(vecVelocity.z);
+	WRITE_BYTE(10);			// randomization
+	WRITE_SHORT(m_idShard);		// model id#
+	WRITE_BYTE(0);			// # of shards, let client decide
+	WRITE_BYTE(25);			// duration, 2.5 seconds
+	WRITE_BYTE(cFlag);		// flags
+	MESSAGE_END();
+
+	float size = pev->size.x;
+
+	if (size < pev->size.y)
+		size = pev->size.y;
+
+	if (size < pev->size.z)
+		size = pev->size.z;
+
+	Vector mins = pev->absmin;
+	Vector maxs = pev->absmax;
+	mins.z = pev->absmax.z;
+	maxs.z += 8;
+
+	CBaseEntity* pList[256];
+	int count = UTIL_EntitiesInBox(pList, ARRAYSIZE(pList), mins, maxs, FL_ONGROUND);
+
+	if (count)
+	{
+		for (int i = 0; i < count; ++i)
+		{
+			pList[i]->pev->flags &= ~FL_ONGROUND;
+			pList[i]->pev->groundentity = NULL;
+		}
+	}
+
+	pev->solid = SOLID_NOT;
+	SUB_UseTargets(NULL, USE_TOGGLE, 0);
+	SetThink(NULL);
+
+	pev->nextthink = pev->ltime + 0.1s;
+}
+
+int CRotDoor::DamageDecal(int bitsDamageType)
+{
+	if (m_Material == matGlass)
+		return DECAL_GLASSBREAK1 + RANDOM_LONG(0, 2);
+
+	if (m_Material == matUnbreakableGlass)
+		return DECAL_BPROOF1;
+
+	return CBaseEntity::DamageDecal(bitsDamageType);
+}
+
+void CRotDoor::KeyValue(KeyValueData* pkvd)
+{
+	// UNDONE_WC: explicitly ignoring these fields, but they shouldn't be in the map file!
+	if (FStrEq(pkvd->szKeyName, "material"))
+	{
+		int i = Q_atoi(pkvd->szValue);
+
+		// 0:glass, 1:metal, 2:flesh, 3:wood
+
+		if (i < 0 || i >= matLastMaterial)
+			m_Material = matWood;
+		else
+			m_Material = (Materials)i;
+
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "gibmodel"))
+	{
+		m_iszGibModel = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CBaseToggle::KeyValue(pkvd);
 }
 
 LINK_ENTITY_TO_CLASS (momentary_door, CMomentaryDoor);

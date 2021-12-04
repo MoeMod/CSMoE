@@ -33,6 +33,7 @@
 #endif
 
 #include "cbase/cbase_locksound.h"
+#include "func_break.h"
 
 namespace sv {
 
@@ -103,8 +104,37 @@ class CRotDoor : public CBaseDoor
 {
 public:
 	virtual void Spawn();
+	virtual void Precache();
 	virtual void Restart();
+	virtual void KeyValue(KeyValueData* pkvd);
 	virtual void SetToggleState(int state);
+	// breakables use an overridden takedamage
+	virtual int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+	virtual int DamageDecal(int bitsDamageType);
+
+public:
+	void DamageSound();
+	BOOL IsBreakable();
+	void EXPORT Die();
+
+	static void MaterialSoundPrecache(Materials precacheMaterial);
+	static void MaterialSoundRandom(edict_t* pEdict, Materials soundMaterial, float volume);
+	static const char** MaterialSoundList(Materials precacheMaterial, int& soundCount);
+
+public:
+	Materials m_Material;
+	Explosions m_Explosion;
+	int m_idShard;
+	float m_angle;
+	int m_iszGibModel;
+	float m_flHealth;
+
+	static const char* pSoundsWood[3];
+	static const char* pSoundsFlesh[6];
+	static const char* pSoundsGlass[3];
+	static const char* pSoundsMetal[3];
+	static const char* pSoundsConcrete[3];
+	static const char* pSpawnObjects[32];
 };
 
 class CMomentaryDoor : public CBaseToggle
