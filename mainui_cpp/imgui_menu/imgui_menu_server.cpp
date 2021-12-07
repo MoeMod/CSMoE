@@ -39,7 +39,6 @@ using namespace std::chrono_literals;
 namespace ui {
 	static bool s_server_first_open = false;
 	static bool s_server_open = false;
-	static bool s_server_loading = false;
 	static boost::asio::io_context s_server_ioc;
 
 	static std::vector<std::tuple<std::chrono::high_resolution_clock::duration, boost::asio::ip::udp::endpoint, TSourceEngineQuery::ServerInfoQueryResult> > s_servers_list;
@@ -84,7 +83,6 @@ namespace ui {
 	boost::asio::awaitable<void> ServerModel_AsyncRefresh()
 	{
 		// https://api.moemod.com/csmoe/masterserver
-		s_server_loading = true;
 		try {
 			std::string result = co_await HTTPS_RequestAsync(s_server_ioc, "GET", "api.moemod.com", "443", "/csmoe/masterserver", boost::asio::use_awaitable);
 			co_await ProcessParseMasterServer(result);
@@ -92,7 +90,6 @@ namespace ui {
 		{
 			MsgBox_Open(std::string("肥肠抱歉，获取服务器列表时发生了错误：\n") + e.what());
 		}
-		s_server_loading = false;
 	}
 
 	void ServerModel_Refresh()
@@ -106,7 +103,6 @@ namespace ui {
 	void Server_Open()
 	{
 		s_server_open = true;
-		ServerModel_Refresh();
 	}
 
 	void Server_OnGui()
@@ -131,7 +127,7 @@ namespace ui {
 				float time = ImGui::GetTime();
 				float k_time = 2;
 				static float quick_time;
-				if(s_server_loading)
+				if(!s_server_ioc.stopped())
 				{
 					quick_time = time * k_time;
 					angle += ImGui::GetIO().DeltaTime * 300.0f;
@@ -150,7 +146,7 @@ namespace ui {
 			}
 
 			ImGui::SameLine();
-			if(!s_server_loading)
+			if(s_server_ioc.stopped())
 			{
 				if(ImGui::Button("全部刷新"))
 				{
@@ -169,10 +165,10 @@ namespace ui {
 
 			ImGui::Columns(4, "serverColumns", false);
 			auto size = ImGui::GetWindowSize();
-			ImGui::SetColumnWidth(0, size.x - 400);
-			ImGui::SetColumnWidth(1, 180);
-			ImGui::SetColumnWidth(2, 80);
-			ImGui::SetColumnWidth(3, 80);
+			ImGui::SetColumnWidth(0, size.x - ImGuiUtils::GetScaledValue(400));
+			ImGui::SetColumnWidth(1, ImGuiUtils::GetScaledValue(180));
+			ImGui::SetColumnWidth(2, ImGuiUtils::GetScaledValue(80));
+			ImGui::SetColumnWidth(3, ImGuiUtils::GetScaledValue(80));
 			static boost::asio::ip::udp::endpoint selected_ep;
 			for(auto &[ping, ep, info] : s_servers_list)
 			{
