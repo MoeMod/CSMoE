@@ -17,7 +17,7 @@ unsigned int MapMgr_GetRandomAreaID();
 struct MapData
 {
 	int map_id;
-	char map_name[32];
+	std::string map_name;
 	char map_filename[32];
 	/*int map_original;
 	int map_deathmode;
@@ -256,16 +256,16 @@ void MapMgr_LoadMapList()
 		map.map_id = atoi(data.c_str());
 
 		std::getline(ss, data, ',');
-		Q_strcpy(map.map_name, data.c_str());
+		map.map_name = data;
 
 		std::getline(ss, data, ',');
-		Q_strcpy(map.map_filename, data.c_str());
+		Q_strncpy(map.map_filename, data.c_str(), sizeof(map.map_filename));
 
 		/*std::getline(ss, data, ',');
-		Q_strcpy(map.bright, data.c_str());
+		Q_strncpy(map.bright, data.c_str(), sizeof(map.bright));
 
 		std::getline(ss, data, ',');
-		Q_strcpy(map.skybox, data.c_str());
+		Q_strncpy(map.skybox, data.c_str(), sizeof(map.skybox));
 
 		std::getline(ss, data, ',');
 		map.density = atof(data.c_str());
