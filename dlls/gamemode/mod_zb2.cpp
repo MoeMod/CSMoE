@@ -201,6 +201,13 @@ void CMod_ZombieMod2::RemoveAllEntity()
 		ent->pev->flags |= FL_KILLME;
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
+	while ((ent = UTIL_FindEntityByClassname(ent, "zombietrap")) != nullptr)
+	{
+		ent->pev->effects |= EF_NODRAW;
+		ent->pev->flags |= FL_KILLME;
+		ent->SetThink(&CBaseEntity::SUB_Remove);
+		ent->SetTouch(NULL);
+	}
 }
 
 CSupplyBox *CMod_ZombieMod2::CreateSupplybox()
@@ -229,6 +236,7 @@ int CMod_ZombieMod2::AddToFullPack_Post(struct entity_state_s* state, int e, edi
 	if (pEntity && pEntity->IsPlayer())
 	{
 		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity);	
+		pPlayer->m_pModStrategy->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 	}
 	return 1;
 }

@@ -175,6 +175,7 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 	{
 		m_pPlayer->m_ZombieClass = "random";
 		m_pPlayer->m_bHeadshotKilled = false;
+		m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
 		m_pPlayer->m_bIsZombie = true;
 		m_pPlayer->pev->max_health = 2000.0f;
 		m_pPlayer->pev->armorvalue = 200.0f;
@@ -196,6 +197,8 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 		return;
 
 	SetHero(true);
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 3000.0f;
+	m_pPlayer->pev->armorvalue = 1000.0f;
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "hero");
 
 	DropPrimary(m_pPlayer);
@@ -205,7 +208,7 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 
 	DropSecondary(m_pPlayer);
 	m_pPlayer->GiveNamedItem("weapon_deagled");
-	iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("50AE", MAX_AMMO_556NATO);
+	iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("50AE", MAX_AMMO_50AE);
 	m_pPlayer->GiveAmmo(iAmount, "50AE", iAmount);
 
 	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_Hero\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
@@ -243,7 +246,6 @@ void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 void CMod_ZombieHero::PickZombieOrigin()
 {
 	CMod_Zombi::PickZombieOrigin();
-	// TODO : pick hero
 	PickHero();
 }
 

@@ -374,6 +374,8 @@ TL_ADD(CZombibomb)
 TL_ADD(CBalrog11Cannon)
 TL_ADD(CLanceFountainFieldAttack)
 TL_ADD(CLanceFountainSpecialAttack)
+TL_ADD(CZombieTrap)
+TL_ADD(CZombiePile)
 #endif
 
 TL_END(AllEntityTypeList)

@@ -173,7 +173,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 #if 1
 	DropPrimary(p);
 	DropSecondary(p);
-	p->RemoveAllItems(FALSE);
+	p->RemoveAllItems(FALSE, false);
 	p->m_bHasPrimary = false;
 
 	const char* weapon_names_view[5];

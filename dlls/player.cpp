@@ -1322,7 +1322,7 @@ void CBasePlayer::GiveDefaultItems()
 	return m_pModStrategy->GiveDefaultItems();
 }
 
-void CBasePlayer::RemoveAllItems(BOOL removeSuit)
+void CBasePlayer::RemoveAllItems(BOOL removeSuit, bool removeAmmo)
 {
 	BOOL bKillProgBar = false;
 	int i;
@@ -1394,8 +1394,11 @@ void CBasePlayer::RemoveAllItems(BOOL removeSuit)
 	else
 		pev->weapons &= ~WEAPON_ALLWEAPONS;
 
-	for (i = 0; i < MAX_AMMO_SLOTS; ++i)
-		m_rgAmmo[i] = 0;
+	if (removeAmmo)
+	{
+		for (i = 0; i < MAX_AMMO_SLOTS; ++i)
+			m_rgAmmo[i] = 0;
+	}
 
 	UpdateClientData();
 
@@ -7142,7 +7145,8 @@ bool CBasePlayer::ReactToDeimosTail()
 
 	if (!pItem)
 	{
-		pItem = m_rgpPlayerItems[KNIFE_SLOT];		//knife
+		return false;
+		/*pItem = m_rgpPlayerItems[KNIFE_SLOT];
 		if (!pItem)
 			return false;
 		else
@@ -7150,7 +7154,7 @@ bool CBasePlayer::ReactToDeimosTail()
 			RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
 			GiveNamedItem("weapon_knife");
 			return true;
-		}
+		}*/
 	}
 	DropPlayerItem(STRING(pItem->pev->classname));
 	m_flNextAttack = UTIL_WeaponTimeBase() + 2.0s;

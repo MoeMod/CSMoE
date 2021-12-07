@@ -228,7 +228,7 @@ public:
 	Knife2xSkill k2x;
 };
 
-CHuman_ZB2::CHuman_ZB2(CBasePlayer * player) : CHuman_ZB1(player), pimpl(std::unique_ptr<impl_t>(new impl_t(player)))
+CHuman_ZB2::CHuman_ZB2(CBasePlayer * player) : CHuman_ZB1(player), pimpl(std::unique_ptr<impl_t>(new impl_t(player))), m_tSlowdown(invalid_time_point)
 {
 
 }
@@ -264,12 +264,29 @@ void CHuman_ZB2::Think()
 
 	if(ENABLE_KNIFE2X)
 		pimpl->k2x.Think();
+
+	if (m_tSlowdown != invalid_time_point && m_tSlowdown <= gpGlobals->time)
+	{
+		m_tSlowdown = invalid_time_point;
+		m_pPlayer->ResetMaxSpeed();
+	}
 }
 
 void CHuman_ZB2::ResetMaxSpeed() const
 {
+	if (beingTrapped > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 1.0f;
+		return;
+	}
+
 	if (ENABLE_KNIFE2X)
 		pimpl->spd.ResetMaxSpeed();
+
+	if (m_tSlowdown > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed *= 0.5f;
+	}
 }
 
 ZombieSkillStatus CHuman_ZB2::GetSkillStatus(ZombieSkillSlot which) const

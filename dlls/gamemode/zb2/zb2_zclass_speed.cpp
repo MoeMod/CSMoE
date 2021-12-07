@@ -139,4 +139,11 @@ void CZombieClass_Speed::OnWeaponDeploy(CBasePlayerItem *item)
 	}
 }
 
+int CZombieClass_Speed::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	int result = CBaseZombieClass_ZB2::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+	if(m_pZombieSkill)
+		result = m_pZombieSkill->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+	return result;
+}
 }

@@ -111,6 +111,8 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/flyzombie_death2.wav");
 	PRECACHE_SOUND("zombi/zombi_revival_death1.wav");
 	PRECACHE_SOUND("zombi/zombi_revival_death2.wav");
+	PRECACHE_SOUND("zombi/zombi_death_stamper_1.wav");
+	PRECACHE_SOUND("zombi/zombi_death_stamper_2.wav");
 
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
@@ -124,7 +126,9 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/flyzombie_hurt1.wav");
 	PRECACHE_SOUND("zombi/flyzombie_hurt2.wav");
 	PRECACHE_SOUND("zombi/zombi_revival_hurt.wav");
-
+	PRECACHE_SOUND("zombi/zombi_hurt_stamper_1.wav");
+	PRECACHE_SOUND("zombi/zombi_hurt_stamper_2.wav");
+	
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_female.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_teleport.wav");
@@ -149,6 +153,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_flyingzombi.mdl");
 	PRECACHE_MODEL("models/v_knife_zombirevival_host.mdl");
 	PRECACHE_MODEL("models/v_knife_zombirevival.mdl");
+	PRECACHE_MODEL("models/v_knife_zombiundertaker.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -168,6 +173,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibomb_flyingzombi_host.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_revival.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_revival_host.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_undertaker.mdl");
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -196,8 +202,8 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/flyingzombi_host/flyingzombi_host.mdl");
 	PRECACHE_MODEL("models/player/revival_zombi_origin/revival_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/revival_zombi_host/revival_zombi_host.mdl");
-	
-
+	PRECACHE_MODEL("models/player/stamper_zombi_origin/stamper_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/stamper_zombi_host/stamper_zombi_host.mdl");
 	
 
 }

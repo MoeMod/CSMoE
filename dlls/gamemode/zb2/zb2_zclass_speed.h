@@ -32,6 +32,7 @@ public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
 	void OnWeaponDeploy(CBasePlayerItem *item) override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 };
 
 }

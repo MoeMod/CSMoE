@@ -202,29 +202,14 @@ Vector CBalrog7::Get_ShootPosition(Vector vecSrc, Vector vecDirShooting, float f
 {
 	Vector vecRight = gpGlobals->v_right;
 	Vector vecUp = gpGlobals->v_up;
-
-	float x, y, z;
-
-	if (IsPlayer())
-	{
-		x = UTIL_SharedRandomFloat(random_seed, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 1, -0.5, 0.5);
-		y = UTIL_SharedRandomFloat(random_seed + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 3, -0.5, 0.5);
-	}
-	else
-	{
-		do
-		{
-			x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-			y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-			z = x * x + y * y;
-		} while (z > 1);
-	}
+	float x = UTIL_SharedRandomFloat(random_seed, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 1, -0.5, 0.5);
+	float y = UTIL_SharedRandomFloat(random_seed + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(random_seed + 3, -0.5, 0.5);
 
 	TraceResult tr;
 	Vector vecDir = vecDirShooting + x * flSpread * vecRight + y * flSpread * vecUp;
 	Vector vecEnd = vecSrc + vecDir * flDistance;
 
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 	return tr.vecEndPos;
 }

@@ -29,7 +29,7 @@ struct CHudZB2_Skill::Config
 {
 	static const char * const ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL];
 	static const char * const ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL];
-	static const char * const ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS];
+	//static const char * const ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS];
 	static const char * const ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL];
 	static const char * const ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS];
 	static const char * const ZOMBIE_ITEM_HUD_ICON[2][3];
@@ -69,20 +69,20 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_TIP[MAX_ZOMBIE_SKILL
 		"resource/helperhud/crazyspeed", // ZOMBIE_SKILL_CRAZY2,
 };
 
-const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
-{
-		"", // ZOMBIE_CLASS_HUMAN
-		"", // ZOMBIE_CLASS_TANK,
-		"zombiDTER", // ZOMBIE_CLASS_SPEED,
-		"zombiETER", // ZOMBIE_CLASS_HEAVY,
-		"zombiFTER", // ZOMBIE_CLASS_PC,
-		"zombiGTER", // ZOMBIE_CLASS_HEAL,
-		"zombiITER", // ZOMBIE_CLASS_DEIMOS,
-		"zombiJTER", // ZOMBIE_CLASS_DEIMOS2,
-		"", // ZOMBIE_CLASS_EMPTY
-		"", // ZOMBIE_CLASS_EMPTY,
-		"", // ZOMBIE_CLASS_EMPTY,
-};
+//const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON[MAX_ZOMBIE_CLASS] =
+//{
+//		"", // ZOMBIE_CLASS_HUMAN
+//		"", // ZOMBIE_CLASS_TANK,
+//		"zombiDTER", // ZOMBIE_CLASS_SPEED,
+//		"zombiETER", // ZOMBIE_CLASS_HEAVY,
+//		"zombiFTER", // ZOMBIE_CLASS_PC,
+//		"zombiGTER", // ZOMBIE_CLASS_HEAL,
+//		"zombiITER", // ZOMBIE_CLASS_DEIMOS,
+//		"zombiJTER", // ZOMBIE_CLASS_DEIMOS2,
+//		"", // ZOMBIE_CLASS_EMPTY
+//		"", // ZOMBIE_CLASS_EMPTY,
+//		"", // ZOMBIE_CLASS_EMPTY,
+//};
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_SKILL] =
 {
@@ -105,6 +105,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_glide",//ZOMBIE_SKILL_GLIDE
 		"resource/zombi/zombieskill_dive",//ZOMBIE_SKILL_DIVE
 		"resource/zombi/zombieskill_zombirevival",//ZOMBIE_SKILL_REVIVAL
+		"resource/zombi/zombieskill_zombipile"//ZOMBIE_SKILL_REVIVAL
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -123,6 +124,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_passzb",//ZOMBIE_CLASS_PASS
 		"resource/zombi/zombietype_flyingzb",//ZOMBIE_CLASS_FLYING
 		"resource/zombi/zombietype_revivalzb",//ZOMBIE_CLASS_REVIVAL
+		"resource/zombi/zombietype_undertakerzb",//ZOMBIE_CLASS_STAMPER
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =
@@ -135,7 +137,7 @@ CHudZB2_Skill::CHudZB2_Skill(void) :  // 0-init
 	m_HUD_zombirecovery(0),
 	m_HUD_zombieGKey(0),
 	m_HUD_SkillIcons{},
-	m_HUD_ClassIcons{},
+	//m_HUD_ClassIcons{},
 	m_flRecoveryBeginTime(0.0f),
 	m_iCurrentClass(ZOMBIE_CLASS_HUMAN),
 	m_ZombieSkillHudIcons{}
@@ -153,11 +155,11 @@ int CHudZB2_Skill::VidInit(void)
 			m_HUD_SkillIcons[i] = gHUD.GetSpriteIndex(Config::ZOMBIE_SKILL_HUD_ICON[i]);
 	}
 
-	for (int i = 0; i < 8; ++i)
+	/*for (int i = 0; i < 8; ++i)
 	{
 		if (Config::ZOMBIE_CLASS_HUD_ICON[i][0] != '\0')
 			m_HUD_ClassIcons[i] = gHUD.GetSpriteIndex(Config::ZOMBIE_CLASS_HUD_ICON[i]);
-	}
+	}*/
 
 	for (int i = 0; i < 11; ++i)
 	{

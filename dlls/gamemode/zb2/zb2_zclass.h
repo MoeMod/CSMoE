@@ -29,6 +29,7 @@ public:
 	virtual void InitHUD() const = 0;
 	virtual ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const = 0;
 	virtual void OnWeaponDeploy(CBasePlayerItem *item) = 0;
+	virtual int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 };
 
 class CHuman_ZB2 : public CHuman_ZB1, virtual public IZombieModeCharacter_ZB2
@@ -45,10 +46,15 @@ public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override {}
 	void DeathSound_Zombie() override {}
 	void OnWeaponDeploy(CBasePlayerItem *item) override {}
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 
 protected:
 	class impl_t;
 	const std::unique_ptr<impl_t> pimpl;
+
+public:
+	time_point_t beingTrapped;
+	time_point_t m_tSlowdown;
 };
 
 class IZombieSkill;
@@ -66,6 +72,7 @@ public:
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & kbd) override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override;
 	ZombieSkillStatus GetSkillStatus(ZombieSkillSlot which) const override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;

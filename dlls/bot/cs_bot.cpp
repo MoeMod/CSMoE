@@ -261,7 +261,7 @@ void CCSBot::BotTouch(CBaseEntity *other)
 		return;
 
 	// See if it's breakable
-	if (FClassnameIs(other->pev, "func_breakable")) {
+	if (FClassnameIs(other->pev, "func_breakable") || FClassnameIs(other->pev, "func_door_rotating")) {
 		Vector center = (other->pev->absmax + other->pev->absmin) / 2.0f;
 		bool breakIt = true;
 

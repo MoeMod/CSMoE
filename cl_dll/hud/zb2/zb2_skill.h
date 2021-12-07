@@ -34,7 +34,7 @@ protected:
 	int m_HUD_zombirecovery;
 	int m_HUD_zombieGKey;
 	int m_HUD_SkillIcons[MAX_ZOMBIE_SKILL];
-	int m_HUD_ClassIcons[MAX_ZOMBIE_CLASS];
+	//int m_HUD_ClassIcons[MAX_ZOMBIE_CLASS];
 	UniqueTexture m_pTexture_SkillTips[MAX_ZOMBIE_SKILL];
 
 	UniqueTexture m_pTexture_skillslotkeybg;

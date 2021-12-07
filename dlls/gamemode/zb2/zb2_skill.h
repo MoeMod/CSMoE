@@ -37,6 +37,7 @@ public:
 	virtual void ResetMaxSpeed() = 0;
 	virtual float GetDamageRatio() const = 0;
 	virtual ZombieSkillStatus GetStatus() const = 0;
+	virtual int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 	
 };
 
@@ -53,6 +54,7 @@ public:
 	void ResetMaxSpeed() override {}
 	float GetDamageRatio() const override { return 1.0f; }
 	ZombieSkillStatus GetStatus() const override {	return m_iZombieSkillStatus; }
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 
 protected:
 	virtual void OnSkillEnd() {}
@@ -109,7 +111,7 @@ public:
 	void ResetMaxSpeed()  override;
 	void OnSkillEnd() override;
 	float GetDamageRatio() const override;
-	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 
 protected:
 	void OnHideEffect();
@@ -355,6 +357,38 @@ public:
 
 protected:
 	duration_t GetDurationTime() const;
+};
+
+class CZombieSkill_ZombieTrap : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieTrap(CBasePlayer* player);
+
+public:
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
+class CZombieSkill_ZombiePile : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombiePile(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
 }

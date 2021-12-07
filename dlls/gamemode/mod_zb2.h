@@ -104,6 +104,31 @@ private:
 	std::shared_ptr<IZombieModeCharacter_ZB2> m_pCharacter_ZB2;
 	EngineClock::time_point m_flTimeNextZombieHealthRecovery;
 	int m_iZombieInfections;
+
+public:
+	void SetTrappedTime(duration_t value) {
+		if (!m_pCharacter_ZB2)
+			return;
+
+		auto human = std::dynamic_pointer_cast<CHuman_ZB2>(m_pCharacter_ZB2);
+		if (!human)
+			return;
+
+		human->beingTrapped = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void SetSlowdownTime(duration_t value) {
+		if (!m_pCharacter_ZB2)
+			return;
+
+		auto human = std::dynamic_pointer_cast<CHuman_ZB2>(m_pCharacter_ZB2);
+		if (!human)
+			return;
+
+		human->m_tSlowdown = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
 };
 
 }

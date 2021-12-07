@@ -158,9 +158,6 @@ void CBalrog11::PrimaryAttack(void)
 
 	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireBalrog11, 0, (float*)&g_vecZero, (float*)&g_vecZero, flVol, 0.0735, 7, m_vVecAiming.x * 100, FALSE, FALSE);
 	
-	if (m_iClip)
-		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125s;
-
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
@@ -266,6 +263,9 @@ void CBalrog11::SecondaryAttack(void)
 #endif
 
 	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBalrog11, 0, (float*)&g_vecZero, (float*)&g_vecZero, 1.0, 0.0735, 7, int(m_vVecAiming.x * 100), TRUE, FALSE);
+
+	if (m_iClip)
+		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125s;
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.35s;
 

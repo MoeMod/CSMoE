@@ -207,6 +207,9 @@ set(HLDLL_SRCS
 	./map_manager.cpp
 	./bot/states/cs_bot_defend.cpp
 	./gamemode/zb2/zb2_zclass_revival.cpp
+	./gamemode/zb2/zombietrap.cpp
+	./gamemode/zb2/zombiepile.cpp
+	./gamemode/zb2/zb2_zclass_stamper.cpp
 	)
 
 set (HLWPN_SRCS

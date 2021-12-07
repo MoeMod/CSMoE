@@ -553,7 +553,7 @@ public:
 	void RenewItems();
 	void PackDeadPlayerItems();
 	void GiveDefaultItems();
-	void RemoveAllItems(BOOL removeSuit);
+	void RemoveAllItems(BOOL removeSuit, bool removeAmmo = true);
 	void SetBombIcon(BOOL bFlash = FALSE);
 	void SetProgressBarTime(int time);
 	void SetProgressBarTime2(int time, duration_t timeElapsed);

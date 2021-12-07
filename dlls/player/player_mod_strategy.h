@@ -66,6 +66,8 @@ public:
 
 	bool GiveSlotAmmo(CBasePlayer* player, int nSlot);
 	bool GiveGunAmmo(CBasePlayer* player, CBasePlayerItem* weapon);
+
+	virtual int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -98,6 +100,8 @@ public:
 	void UpdateClientData(int sendweapons, struct clientdata_s *cd, entvars_t *pevOrg) override;
 
 	BOOL DeployWeapon(CBasePlayerItem *item) override { return item->Deploy(); }
+
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

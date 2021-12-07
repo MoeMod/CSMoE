@@ -21,12 +21,17 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
+
 #include "deimostail.h"
 #include "zombiebomb.h"
 #include "teleportentity.h"
+#include "zombietrap.h"
+#include "zombiepile.h"
 #include "zb2_zclass.h"
+
 #include "player/player_zombie.h"
 #include "entity_state.h"
+
 
 namespace sv {
 
@@ -197,26 +202,6 @@ namespace sv {
 		{
 			OnHideEffect();
 		}
-		//Fade start
-
-		/*if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-		{
-			float flAlpha = flInvisibleAlpha;
-
-			if (m_flInvisiable - gpGlobals->time > 0.0s)
-			{
-				flAlpha += (255.0 - flInvisibleAlpha) * ((m_flInvisiable - gpGlobals->time) / 0.5s);
-			}
-
-			if (m_flTimeZombieSkillEnd > gpGlobals->time && m_flTimeZombieSkillEnd - gpGlobals->time < 0.5s)
-			{
-				flAlpha += (255.0 - flInvisibleAlpha) * ((0.5s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 0.5s);
-			}
-			m_pPlayer->pev->rendermode = kRenderTransAlpha;
-			m_pPlayer->pev->renderamt = flAlpha;
-
-		}*/
-
 	}
 
 	int CZombieSkill_ZombieHide::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
@@ -1959,5 +1944,160 @@ namespace sv {
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
 			return 0.0f;
 		return 1.0f;
+	}
+
+	CZombieSkill_ZombieTrap::CZombieSkill_ZombieTrap(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieTrap::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Trap' skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		CBaseEntity::Create("zombietrap", m_pPlayer->pev->origin, g_vecZero, m_pPlayer->edict());
+
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "zombi/zombi_trapsetup.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_TRAP);
+		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+		MESSAGE_END();
+	}
+
+	void CZombieSkill_ZombieTrap::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+
+	}
+
+	duration_t CZombieSkill_ZombieTrap::GetDurationTime() const
+	{
+		return 1.0s;
+	}
+
+	duration_t CZombieSkill_ZombieTrap::GetCooldownTime() const
+	{
+		switch (m_pPlayer->m_iZombieLevel)
+		{
+		case ZOMBIE_LEVEL_HOST: return 15.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN: return 10.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: return 10.0s; break;
+		}
+	}
+
+	CZombieSkill_ZombiePile::CZombieSkill_ZombiePile(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombiePile::Think()
+	{
+		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
+			FireZombieSkill();
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombiePile::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
+		{
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+			if (pWeapon)
+			{
+				pWeapon->SendWeaponAnim(2, TRUE);
+				pWeapon->m_flTimeWeaponIdle = 1.1s;
+			}
+			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 94;
+			m_pPlayer->m_flNextAttack = 1.1s;
+
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/deimos_skill_start.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.1s;
+
+			m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+			m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+			WRITE_BYTE(ZOMBIE_SKILL_SHOCK);
+			WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+			MESSAGE_END();
+		}
+	}
+
+	void CZombieSkill_ZombiePile::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+	}
+
+	duration_t CZombieSkill_ZombiePile::GetDurationTime() const
+	{
+		return 1.0s;
+	}
+
+	void CZombieSkill_ZombiePile::FireZombieSkill()
+	{
+		CZombiePile::Create(m_pPlayer);
+		m_flTimeTriggerZombieSkill = invalid_time_point;
+	}
+
+	duration_t CZombieSkill_ZombiePile::GetCooldownTime() const
+	{
+		switch (m_pPlayer->m_iZombieLevel)
+		{
+		case ZOMBIE_LEVEL_HOST: return 8.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN: return 6.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: return 6.0s; break;
+		}
 	}
 }

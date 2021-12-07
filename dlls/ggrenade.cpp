@@ -1072,7 +1072,7 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->pev->dmg = 998;
-	pGrenade->pev->health = 100;
+	pGrenade->pev->health = 50;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
 
@@ -1839,6 +1839,8 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 
 	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL) 	
 	{
+		if (!pEntity->IsPlayer())
+			continue;
 		if (!pEntity->IsAlive())
 			continue;
 
@@ -1854,18 +1856,15 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 
 		flAdjustedDamage *= falloff;
 
-		pEntity->TakeDamage(pevInflictor, pevAttacker, 1.0, DMG_BLAST);
-	
-
-		if (pEntity->pev->armorvalue)
-			pEntity->pev->armorvalue -= 1.0;
-		else if (pEntity->pev->health)
+		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+		if (pPlayer && !pPlayer->m_bIsZombie)
 		{
-			pEntity->pev->health -= flAdjustedDamage;
-			if (pEntity->pev->health <= 0.0)
+			if (pPlayer->pev->takedamage != DAMAGE_NO && flAdjustedDamage > 0)
 			{
-				pEntity->Killed(pEntity->pev, 0);
+				pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, DMG_EXPLOSION);
 			}
+			pPlayer->pev->punchangle.x = (RANDOM_LONG(0, 1) ? 1 : -1) * 20.0f * falloff;
+			pPlayer->pev->punchangle.z = (RANDOM_LONG(0, 1) ? 1 : -1) * 35.0f * falloff;
 		}
 
 		flMaxKickRate = RANDOM_LONG(0, 10) / 10.0 + 1.5 * flPower;
@@ -1892,7 +1891,6 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 		WRITE_SHORT((1 << 12) * 2);
 		WRITE_SHORT((1 << 12) * 6);
 		MESSAGE_END();
-
 	}
 }
 
