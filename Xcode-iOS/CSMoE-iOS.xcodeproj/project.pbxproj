@@ -47,6 +47,10 @@
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
 		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
+		3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB534302761091B0052BD7F /* libcqmiao.a */; };
+		3DB5343C276109580052BD7F /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB5343B276109580052BD7F /* libluash.a */; };
+		3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53441276109B10052BD7F /* libcrypto.a */; };
+		3DB53444276109BA0052BD7F /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53443276109BA0052BD7F /* libssl.a */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
 		3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A42289683100114D80 /* MacBookiTunes.png */; };
@@ -80,6 +84,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3D1FBDC42761034C00CFAE9B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F3CB94BA26B5E0A400B9C980;
+			remoteInfo = "SDLmain-iOS";
+		};
+		3D1FBDC62761034C00CFAE9B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62AADFD2629E35900F77FE7 /* SDL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F3CB963826B5E0A600B9C980;
+			remoteInfo = "SDLmain-tvOS";
+		};
 		3D2DCC0223320DCF00ADBA6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
@@ -207,6 +225,10 @@
 		3D670D78227D901F0030B7D1 /* launcherdialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = launcherdialog.h; sourceTree = "<group>"; };
 		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimgui_ext.a; sourceTree = "<group>"; };
 		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
+		3DB534302761091B0052BD7F /* libcqmiao.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcqmiao.a; sourceTree = "<group>"; };
+		3DB5343B276109580052BD7F /* libluash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluash.a; sourceTree = "<group>"; };
+		3DB53441276109B10052BD7F /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		3DB53443276109BA0052BD7F /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
 		3DC1E4A32289683100114D80 /* page1_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = page1_en.png; path = Resources/page1_en.png; sourceTree = "<group>"; };
 		3DC1E4A42289683100114D80 /* MacBookiTunes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MacBookiTunes.png; path = Resources/MacBookiTunes.png; sourceTree = "<group>"; };
@@ -268,6 +290,10 @@
 				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
 				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
+				3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */,
+				3DB53444276109BA0052BD7F /* libssl.a in Frameworks */,
+				3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */,
+				3DB5343C276109580052BD7F /* libluash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +400,9 @@
 		3D4DA95923BCEA2F00F575C1 /* cmake-build */ = {
 			isa = PBXGroup;
 			children = (
+				3DB5343D276109740052BD7F /* 3rdparty */,
+				3DB5343A2761094A0052BD7F /* luash */,
+				3DB53420276108F70052BD7F /* cqmiao */,
 				3DF2719523D4511C005D151E /* libimgui.a */,
 				3D8777BD24A26819006806BF /* libimgui_ext.a */,
 				B6D007BC262A1AD4007A949F /* 3rdparty */,
@@ -401,6 +430,55 @@
 			path = engine;
 			sourceTree = "<group>";
 		};
+		3DB53420276108F70052BD7F /* cqmiao */ = {
+			isa = PBXGroup;
+			children = (
+				3DB534302761091B0052BD7F /* libcqmiao.a */,
+			);
+			path = cqmiao;
+			sourceTree = "<group>";
+		};
+		3DB5343A2761094A0052BD7F /* luash */ = {
+			isa = PBXGroup;
+			children = (
+				3DB5343B276109580052BD7F /* libluash.a */,
+			);
+			path = luash;
+			sourceTree = "<group>";
+		};
+		3DB5343D276109740052BD7F /* 3rdparty */ = {
+			isa = PBXGroup;
+			children = (
+				3DB5343E276109820052BD7F /* openssl-cmake */,
+			);
+			path = 3rdparty;
+			sourceTree = "<group>";
+		};
+		3DB5343E276109820052BD7F /* openssl-cmake */ = {
+			isa = PBXGroup;
+			children = (
+				3DB53440276109990052BD7F /* crypto */,
+				3DB5343F276109930052BD7F /* ssl */,
+			);
+			path = "openssl-cmake";
+			sourceTree = "<group>";
+		};
+		3DB5343F276109930052BD7F /* ssl */ = {
+			isa = PBXGroup;
+			children = (
+				3DB53443276109BA0052BD7F /* libssl.a */,
+			);
+			path = ssl;
+			sourceTree = "<group>";
+		};
+		3DB53440276109990052BD7F /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				3DB53441276109B10052BD7F /* libcrypto.a */,
+			);
+			path = crypto;
+			sourceTree = "<group>";
+		};
 		3DEAECC0260F846D0045F79B /* mainui_cpp */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,6 +498,8 @@
 		B62AADFE2629E35900F77FE7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				3D1FBDC52761034C00CFAE9B /* libSDLmain.a */,
+				3D1FBDC72761034C00CFAE9B /* libSDLmain.a */,
 				B62AAE0E2629E35A00F77FE7 /* SDL2.framework */,
 				B62AAE102629E35A00F77FE7 /* SDL2.framework */,
 				B62AAE122629E35A00F77FE7 /* SDL2.framework */,
@@ -528,6 +608,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		3D1FBDC52761034C00CFAE9B /* libSDLmain.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDLmain.a;
+			remoteRef = 3D1FBDC42761034C00CFAE9B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3D1FBDC72761034C00CFAE9B /* libSDLmain.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDLmain.a;
+			remoteRef = 3D1FBDC62761034C00CFAE9B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		B62AAE0E2629E35A00F77FE7 /* SDL2.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -666,7 +760,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DPLATFORM=OS64 -DSDL2_INCLUDE_DIR=\" ${SRCROOT}/../SDL2/include\" -DSDL2_LIBRARY=\"${BUILT_PRODUCTS_DIR}/libSDL2.a\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
+			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DPLATFORM=OS64 -DSDL2_INCLUDE_DIR=\" ${SRCROOT}/../SDL2/include\" -DSDL2_LIBRARY=\"${BUILT_PRODUCTS_DIR}/libSDL2.a\" -DXASH_PCH=0 -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 		3D2DCC0123320D9600ADBA6B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -742,7 +836,7 @@
 					../,
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -754,6 +848,10 @@
 					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
 					"$(PROJECT_DIR)/cmake-build/3rdparty",
+					"$(PROJECT_DIR)/cmake-build/cqmiao",
+					"$(PROJECT_DIR)/cmake-build/luash",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -831,7 +929,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRELINK_LIBS = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -858,7 +955,7 @@
 					../,
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -870,6 +967,10 @@
 					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
 					"$(PROJECT_DIR)/cmake-build/3rdparty",
+					"$(PROJECT_DIR)/cmake-build/cqmiao",
+					"$(PROJECT_DIR)/cmake-build/luash",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -908,7 +1009,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRELINK_LIBS = "";
 				SDKROOT = iphoneos;

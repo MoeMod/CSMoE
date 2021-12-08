@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include "gamemode/zbz/zbz_const.h"
 #include "gamemode/mod_zbz.h"
 
+#include <set>
+
 namespace sv {
 
 class IZombieZSkill

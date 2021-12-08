@@ -7,7 +7,7 @@
 #include "common.h"
 #include "util.h"
 #include "cbase.h"
-#include "bot/cs_bot.h"
+#include "bot_include.h"
 #include "game_shared/steam_util.h"
 
 #include <string>

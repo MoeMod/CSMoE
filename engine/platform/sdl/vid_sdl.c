@@ -586,6 +586,9 @@ qboolean VID_GetDPI(float* out)
 			}
 		}
 	}
+#elif TARGET_OS_IPHONE
+	success = true;
+	dpi = 2.0f;
 #elif defined(SDL_VIDEO_DRIVER_COCOA)
 	success = true;
 	dpi = MacOS_GetDPI();

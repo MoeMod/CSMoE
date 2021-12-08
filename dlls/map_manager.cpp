@@ -9,6 +9,7 @@
 #include "game_shared/steam_util.h"
 //#include <algorithm>
 //#include "game_shared/bot/nav_area.h"
+#include <unordered_map>
 
 namespace sv {
 

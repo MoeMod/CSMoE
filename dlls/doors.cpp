@@ -13,6 +13,7 @@
 #include "buttons.h"
 #include "decals.h"
 
+#include "gamemode/mods.h"
 #include "bot_include.h"
 
 namespace sv {

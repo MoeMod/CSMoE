@@ -18,6 +18,7 @@
 
 #include <string.h>
 #include <studio.h>
+#include "r_studioint.h"
 #include "draw_util.h"
 #include "calcscreen.h"
 #include "com_model.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #ifndef CLIENT_DLL
 namespace sv {
 #else

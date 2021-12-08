@@ -14,6 +14,7 @@
 #include "vehicle.h"
 #include "globals.h"
 #include "cbase/cbase_hash.h"
+#include "gamemode/mods.h"
 
 #include "debug.h"
 

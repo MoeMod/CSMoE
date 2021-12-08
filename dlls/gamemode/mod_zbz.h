@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "zbz/zbz_skill.h"
 #include "usercmd.h"
 
+#include <set>
+
 namespace sv {
 
 class CMod_ZombieZ : public CMod_ZombieHero
