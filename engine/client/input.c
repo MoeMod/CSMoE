@@ -451,7 +451,7 @@ void IN_StartupMouse( void )
 	in_mouseinitialized = true;
 
 
-#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_MAC || TARGET_OS_OSX )
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_OSX )
 	// iOS Settings...
 	SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1");
 #endif
@@ -629,7 +629,7 @@ void IN_MouseMove( void )
 	// find mouse movement
 #ifdef XASH_SDL
 	SDL_GetMouseState( &current_pos.x, &current_pos.y );
-#ifdef TARGET_OS_MAC
+#ifdef TARGET_OS_OSX
 	int w1, w2, h1, h2;
 	w1 = scr_width->integer;
 	h1 = scr_height->integer;
@@ -707,7 +707,7 @@ void IN_MouseEvent( int mstate )
 			SDL_ShowCursor(SDL_FALSE);
 #endif
 
-#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_MAC || TARGET_OS_OSX )
+#if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_OSX )
 
 #else
 		int division = 32; // 2

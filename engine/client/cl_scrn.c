@@ -675,6 +675,12 @@ void SCR_VidInit( void )
 
 	// restart console size
 	Con_VidInit ();
+
+	// restart imgui
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_InvalidateDeviceObjects();
+	ImGui_ImplGL_CreateDeviceObjects();
+#endif
 }
 
 /*

@@ -1043,10 +1043,14 @@ static void R_CheckVBO( void )
 	dlightmode = "0";
 #endif
 
+#if defined(__ANDROID__) || ( TARGET_OS_IOS || TARGET_OS_IPHONE )
+	disable = true;
+#endif
+
 	if( disable )
 	{
 		// do not keep in config unless dev > 3 and enabled
-		flags = 0;
+		flags = CVAR_READ_ONLY;
 		def = "0";
 	}
 

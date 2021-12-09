@@ -60,6 +60,18 @@ ImGuiContext* g_EngineContext = nullptr;
 
 bool g_bShowDemoWindow = false;
 
+extern "C" byte *imgui_pool = nullptr;
+
+void* ImGui_ImplGL_OperatorNew(size_t sz, void* user_data)
+{
+	return Mem_Alloc(imgui_pool, sz);
+}
+
+void ImGui_ImplGL_OperatorDelete(void* ptr, void* user_data)
+{
+	return ptr ? Mem_Free(ptr) : void();
+}
+
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
 void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 {
@@ -449,6 +461,8 @@ void Cmd_ImGui_f()
 
 qboolean ImGui_ImplGL_Init(void)
 {
+	imgui_pool = Mem_AllocPool("ImGui");
+	ImGui::SetAllocatorFunctions(ImGui_ImplGL_OperatorNew, ImGui_ImplGL_OperatorDelete);
     g_EngineContext = ImGui::CreateContext();
     ImGui::SetCurrentContext(g_EngineContext);
 	ImGui::StyleColorsLight();
@@ -573,11 +587,6 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 
 void ImGui_ImplGL_NewFrame(void)
 {
-	if (!g_FontTexture)
-	{
-		ImGui_ImplGL_CreateDeviceObjects();
-	}
-
 	ImGuiIO& io = ImGui::GetIO();
 
 

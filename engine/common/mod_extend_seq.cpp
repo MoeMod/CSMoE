@@ -1,5 +1,8 @@
 #include "mod_extend_seq.h"
+
+extern "C" {
 #include "studio.h"
+}
 
 #define FILE_BUFF_SIZE		2048
 
@@ -86,10 +89,10 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 		for (int i = 0; i < studiohdr->numtextures; i++)
 			texdatasize += ptexture[i].width * ptexture[i].height + 256 * 3;
 
-		mstudiotexture_t* texbuf = (mstudiotexture_t*)malloc(studiohdr->numtextures * sizeof(mstudiotexture_t));
+		mstudiotexture_t* texbuf = (mstudiotexture_t*)Mem_Alloc( com_studiocache, studiohdr->numtextures * sizeof(mstudiotexture_t));
 		memcpy(texbuf, ptexture, studiohdr->numtextures * sizeof(mstudiotexture_t));
 
-		byte* texdatabuf = (byte*)malloc(texdatasize);
+		byte* texdatabuf = (byte*)Mem_Alloc( com_studiocache, texdatasize);
 		memcpy(texdatabuf, (byte*)studiohdr + studiohdr->texturedataindex, texdatasize);
 
 		int offset = 0;
@@ -180,8 +183,8 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 		endbuf += texdatasize;
 		studiohdr->length = endbuf - (byte*)studiohdr;
 
-		free(texbuf);
-		free(texdatabuf);
+		Mem_Free(texbuf);
+		Mem_Free(texdatabuf);
 
 		g_iSequenceNums = 0;
 	}
