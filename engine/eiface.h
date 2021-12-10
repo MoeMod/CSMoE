@@ -179,8 +179,8 @@ typedef struct enginefuncs_s
 	int	(*pfnRegUserMsg)( const char *pszName, int iSize );
 	void	(*pfnAnimationAutomove)( const edict_t* pEdict, float flTime );
 	void	(*pfnGetBonePosition)( const edict_t* pEdict, int iBone, float *rgflOrigin, float *rgflAngles );
-	unsigned long (*pfnFunctionFromName)( const char *pName );
-	const char *(*pfnNameForFunction)( unsigned long function );
+	void* (*pfnFunctionFromName)( const char *pName );
+	const char *(*pfnNameForFunction)( void* function );
 	void	(*pfnClientPrintf)( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg ); // JOHN: engine callbacks so game DLL can print messages to individual clients
 	void	(*pfnServerPrint)( const char *szMsg );
 	const char *(*pfnCmd_Args)( void );		// these 3 added 
@@ -199,7 +199,7 @@ typedef struct enginefuncs_s
 	byte*	(*pfnLoadFileForMe)( const char *filename, int *pLength );
 	void	(*pfnFreeFile)( void *buffer );
 	void	(*pfnEndSection)( const char *pszSectionName ); // trigger_endsection
-	int	(*pfnCompareFileTime)( char *filename1, char *filename2, int *iCompare );
+	int	(*pfnCompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 	void	(*pfnGetGameDir)( char *szGetGameDir );
 	void	(*pfnCvar_RegisterVariable)( cvar_t *variable );
 	void	(*pfnFadeClientVolume)( const edict_t *pEdict, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds );
@@ -208,7 +208,7 @@ typedef struct enginefuncs_s
 	void	(*pfnRunPlayerMove)( edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, byte msec );
 	int	(*pfnNumberOfEntities)( void );
 	char*	(*pfnGetInfoKeyBuffer)( edict_t *e );			// passing in NULL gets the serverinfo
-	char*	(*pfnInfoKeyValue)( char *infobuffer, const char *key );
+	const char*	(*pfnInfoKeyValue)( const char *infobuffer, const char *key );
 	void	(*pfnSetKeyValue)( char *infobuffer, const char *key, const char *value );
 	void	(*pfnSetClientKeyValue)( int clientIndex, char *infobuffer, const char *key, const char *value );
 	int	(*pfnIsMapValid)( const char *filename );
@@ -221,15 +221,15 @@ typedef struct enginefuncs_s
 	unsigned int (*pfnGetPlayerWONId)( edict_t *e ); // returns the server assigned WONid for this player.  useful for logging frags, etc.  returns -1 if the edict couldn't be found in the list of clients
 
 	// YWB 8/1/99 TFF Physics additions
-	void	(*pfnInfo_RemoveKey)( char *s, const char *key );
+	bool	(*pfnInfo_RemoveKey)( char *s, const char *key );
 	const char *(*pfnGetPhysicsKeyValue)( const edict_t *pClient, const char *key );
 	void	(*pfnSetPhysicsKeyValue)( const edict_t *pClient, const char *key, const char *value );
 	const char *(*pfnGetPhysicsInfoString)( const edict_t *pClient );
 	unsigned short (*pfnPrecacheEvent)( int type, const char*psz );
 	void	(*pfnPlaybackEvent)( int flags, const edict_t *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 	
-	unsigned char *(*pfnSetFatPVS)( float *org );
-	unsigned char *(*pfnSetFatPAS)( float *org );
+	unsigned char* (*pfnSetFatPVS)(const float* org);
+	unsigned char* (*pfnSetFatPAS)(const float* org);
 
 	int	(*pfnCheckVisibility )( const edict_t *entity, unsigned char *pset );
 
@@ -274,7 +274,7 @@ typedef struct enginefuncs_s
 	void	(*pfnResetTutorMessageDecayData)( void );
 	void	(*pfnQueryClientCvarValue)( const edict_t *player, const char *cvarName );
 	void	(*pfnQueryClientCvarValue2)( const edict_t *player, const char *cvarName, int requestID );
-	int	(*CheckParm)( char *parm, char **ppnext );
+	int	(*CheckParm)( const char *parm, const char **ppnext );
 } enginefuncs_t;
 // ONLY ADD NEW FUNCTIONS TO THE END OF THIS STRUCT.  INTERFACE VERSION IS FROZEN AT 138
 	

@@ -535,19 +535,10 @@ typedef struct
 extern int		downloadcount;
 extern int		downloadfileid;
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern client_t		cl;
 extern client_static_t	cls;
 extern clgame_static_t	clgame;
 extern menu_static_t	menu;
-
-#ifdef __cplusplus
-}
-#endif
 
 //
 // cvars
@@ -825,8 +816,8 @@ void CL_ClearEffects( void );
 void CL_ClearEfrags( void );
 void CL_TestLights( void );
 void CL_DrawParticlesExternal( const float *vieworg, const float *fwd, const float *rt, const float *up, uint clipFlags );
-void CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags, float scale );
-void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags );
+void CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags, float scale );
+void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags );
 void CL_PlayerDecal( int textureIndex, int entityIndex, float *pos );
 void CL_InitParticles( void );
 void CL_ClearParticles( void );

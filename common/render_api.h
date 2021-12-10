@@ -94,7 +94,8 @@ typedef enum
 	TEX_SCREENCOPY,	// keep screen copy e.g. for mirror
 	TEX_CUSTOM,	// user created texture
 	TEX_DEPTHMAP	// shadowmap texture
-} texType_t;
+} texType_e;
+typedef int texType_t;
 
 typedef enum
 {
@@ -127,7 +128,8 @@ typedef enum
 	TF_FLOAT		= (1<<26),	// float textures
 	TF_NOCOMPARE	= (1<<27),	// disable comparing for depth textures
 	TF_FLOATDATA	= (1<<28),
-} texFlags_t;
+} texFlags_e;
+typedef int texFlags_t;
 
 typedef struct beam_s BEAM;
 typedef struct particle_s particle_t;
@@ -194,7 +196,7 @@ typedef struct render_api_s
 	void		(*R_EntityRemoveDecals)( struct model_s *mod ); // remove all the decals from specified entity (BSP only)
 
 	// AVIkit support
-	void		*(*AVI_LoadVideo)( const char *filename, int ignore_hwgamma );
+	void		*(*AVI_LoadVideo)( const char *filename, qboolean ignore_hwgamma );
 	int		(*AVI_GetVideoInfo)( void *Avi, long *xres, long *yres, float *duration );
 	long		(*AVI_GetVideoFrameNumber)( void *Avi, float time );
 	byte		*(*AVI_GetVideoFrame)( void *Avi, long frame );

@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 
 
 #ifdef __GNUC__
@@ -100,7 +96,7 @@ void Sys_SetupCrashHandler( void );
 void Sys_RestoreCrashHandler( void );
 void Sys_SetClipboardData( const byte *buffer, size_t size );
 #define Sys_GetParmFromCmdLine( parm, out ) _Sys_GetParmFromCmdLine( parm, out, sizeof( out ))
-qboolean _Sys_GetParmFromCmdLine( char *parm, char *out, size_t size );
+qboolean _Sys_GetParmFromCmdLine( const char *parm, char *out, size_t size );
 void Sys_ShellExecute( const char *path, const char *parms, qboolean exit );
 void Sys_SendKeyEvents( void );
 qboolean Sys_CheckMMX( void );
@@ -138,7 +134,4 @@ char *Wcon_Input( void );
 void Msg( const char *pMsg, ... ) _format(1);
 void MsgDev( int level, const char *pMsg, ... ) _format(2);
 
-#ifdef __cplusplus
-}
-#endif
 #endif//SYSTEM_H

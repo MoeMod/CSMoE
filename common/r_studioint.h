@@ -164,7 +164,7 @@ typedef struct server_studio_api_s
 	void *(*Cache_Check)(struct cache_user_s *c);
 
 	// Load file into cache (can be swapped out on demand)
-	void (*LoadCacheFile)(char *path, struct cache_user_s *cu);
+	void (*LoadCacheFile)(const char *path, struct cache_user_s *cu);
 
 	// Retrieve pointer to studio model data block from a model
 	void *(*Mod_Extradata)(struct model_s *mod);

@@ -72,9 +72,6 @@ typedef struct cldll_func_s
 	int (*pfnTouchEvent)( int type, int fingerID, float x, float y, float dx, float dy );
 	void (*pfnMoveEvent)( float forwardmove, float sidemove );
 	void (*pfnLookEvent)( float relyaw, float relpitch );
-	// CSMoE extension
-	void (*pfnOnGUI)( struct ImGuiContext *context );
-	void (*CL_OnPrecache)(int type, const char* name, int index); // 1=model 2=sound 3=generic 4=event
 } cldll_func_t;
 
 #endif//CDLL_EXP_H

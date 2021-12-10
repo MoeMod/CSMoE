@@ -17,8 +17,6 @@ GNU General Public License for more details.
 #include "imgui.h"
 #include "imgui_utils.h"
 
-#include <algorithm>
-
 static bool lcsm_enabled = true;
 
 void ImGui_LCSM_OnGUI(void)

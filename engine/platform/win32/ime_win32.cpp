@@ -13,11 +13,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "keydefs.h"
 #include "input_ime.h"
-}
+
 #include <WinUser.h>
 #include <SDL.h>
 #include <SDL_version.h>

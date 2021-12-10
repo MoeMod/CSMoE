@@ -43,7 +43,7 @@ typedef struct server_physics_api_s
 	void		( *pfnLinkEdict) ( edict_t *ent, qboolean touch_triggers );
 	double		( *pfnGetServerTime )( void ); // unclamped
 	double		( *pfnGetFrameTime )( void );	// unclamped
-	void*		( *pfnGetModel )( int modelindex );
+	void*		(*pfnGetModel)(int modelindex);
 	areanode_t*	( *pfnGetHeadnode )( void ); // BSP tree for all physic entities
 	int		( *pfnServerState )( void );
 	void		( *pfnHost_Error )( const char *error, ... );	// cause Host Error
@@ -51,11 +51,11 @@ typedef struct server_physics_api_s
 	struct triangleapi_s *pTriAPI;	// draw coliisions etc. Only for local system
 
 	// draw debug messages (must be called from DrawOrthoTriangles). Only for local system
-	int		( *pfnDrawConsoleString )( int x, int y, char *string );
+	int		( *pfnDrawConsoleString )( int x, int y, const char *string );
 	void		( *pfnDrawSetTextColor )( float r, float g, float b );
 	void		( *pfnDrawConsoleStringLen )( const char *string, int *length, int *height );
-	void		( *Con_NPrintf )( int pos, char *fmt, ... );
-	void		( *Con_NXPrintf )( struct con_nprint_s *info, char *fmt, ... );
+	void		( *Con_NPrintf )( int pos, const char *fmt, ... );
+	void		( *Con_NXPrintf )( struct con_nprint_s *info, const char *fmt, ... );
 	const char	*( *pfnGetLightStyle )( int style ); // read custom appreance for selected lightstyle
 	void		( *pfnUpdateFogSettings )( unsigned int packed_fog );
 	char		**(*pfnGetFilesList)( const char *pattern, int *numFiles, int gamedironly );

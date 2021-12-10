@@ -22,7 +22,7 @@ GNU General Public License for more details.
 // EfxAPI
 void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int alpha, float startV, float endV );
 struct particle_s *CL_AllocParticle( void (*callback)( struct particle_s*, float ));
-void CL_Explosion( vec3_t pos, int model, float scale, float framerate, int flags );
+void CL_Explosion( const vec3_t pos, int model, float scale, float framerate, int flags );
 void CL_ParticleExplosion( const vec3_t org );
 void CL_ParticleExplosion2( const vec3_t org, int colorStart, int colorLength );
 void CL_Implosion( const vec3_t end, float radius, int count, float life );
@@ -35,14 +35,14 @@ void CL_RunParticleEffect( const vec3_t org, const vec3_t dir, int color, int co
 void CL_ParticleBurst( const vec3_t org, int size, int color, float life );
 void CL_LavaSplash( const vec3_t org );
 void CL_TeleportSplash( const vec3_t org );
-void CL_RocketTrail( vec3_t start, vec3_t end, int type );
+void CL_RocketTrail( const vec3_t start, const vec3_t end, int type );
 short CL_LookupColor( byte r, byte g, byte b );
 void CL_GetPackedColor( short *packed, short color );
 void CL_SparkleTracer( const vec3_t pos, const vec3_t dir, float vel );
 void CL_StreakTracer( const vec3_t pos, const vec3_t velocity, int colorIndex );
 void CL_TracerEffect( const vec3_t start, const vec3_t end );
-void CL_UserTracerParticle( float *org, float *vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)( struct particle_s* ));
-struct particle_s *CL_TracerParticles( float *org, float *vel, float life );
+void CL_UserTracerParticle( const float *org, const float *vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)( struct particle_s* ));
+struct particle_s* CL_TracerParticles(const float* org, const float* vel, float life);
 void CL_ParticleLine( const vec3_t start, const vec3_t end, byte r, byte g, byte b, float life );
 void CL_ParticleBox( const vec3_t mins, const vec3_t maxs, byte r, byte g, byte b, float life );
 void CL_ShowLine( const vec3_t start, const vec3_t end );
@@ -78,7 +78,7 @@ void CL_SparkStreaks( const vec3_t pos, int count, int velocityMin, int velocity
 void CL_Projectile( const vec3_t origin, const vec3_t velocity, int modelIndex, int life, int owner, void (*hitcallback)( struct tempent_s*, struct pmtrace_s* ));
 void CL_TempSphereModel( const vec3_t pos, float speed, float life, int count, int modelIndex );
 void CL_MultiGunshot( const vec3_t org, const vec3_t dir, const vec3_t noise, int count, int decalCount, int *decalIndices );
-void CL_FireField( float *org, int radius, int modelIndex, int count, int flags, float life );
+void CL_FireField( const float *org, int radius, int modelIndex, int count, int flags, float life );
 void CL_PlayerSprites( int client, int modelIndex, int count, int size );
 void CL_Sprite_WallPuff( struct tempent_s *pTemp, float scale );
 void CL_DebugParticle( const vec3_t pos, byte r, byte g, byte b );
@@ -86,7 +86,7 @@ void CL_RicochetSound( const vec3_t pos );
 struct dlight_s *CL_AllocDlight( int key );
 struct dlight_s *CL_AllocElight( int key );
 void CL_UpdateFlashlight( cl_entity_t *pEnt );
-void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, float *pos, int flags );
+void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags );
 void CL_DecalRemoveAll( int textureIndex );
 int CL_DecalIndexFromName( const char *name );
 int CL_DecalIndex( int id );

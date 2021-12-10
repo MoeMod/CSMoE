@@ -13,11 +13,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
-}
 
 #define HSPRITE WINAPI_HSPRITE
 

@@ -136,7 +136,7 @@ typedef struct cl_enginefuncs_s
 	// cvar handlers
 	struct cvar_s *(*pfnRegisterVariable)( const char *szName, const char *szValue, int flags );
 	float	(*pfnGetCvarFloat)( const char *szName );
-	char*	(*pfnGetCvarString)( const char *szName );
+	const char*	(*pfnGetCvarString)( const char *szName );
 
 	// command handlers
 	int	(*pfnAddCommand)( const char *cmd_name, void (*function)(void) );
@@ -172,7 +172,7 @@ typedef struct cl_enginefuncs_s
 	void	(*Cvar_SetValue)( const char *cvar, float value );
 
 	int       (*Cmd_Argc)( void );	
-	char	*(*Cmd_Argv)( int arg );
+	const char	*(*Cmd_Argv)( int arg );
 	void	(*Con_Printf)( const char *fmt, ... );
 	void	(*Con_DPrintf)( const char *fmt, ... );
 	void	(*Con_NPrintf)( int pos, const char *fmt, ... );
@@ -195,8 +195,8 @@ typedef struct cl_enginefuncs_s
 	void	(*V_CalcShake)( void );
 	void	(*V_ApplyShake)( float *origin, float *angles, float factor );
 
-	int	(*PM_PointContents)( float *point, int *truecontents );
-	int	(*PM_WaterEntity)( float *p );
+	int	(*PM_PointContents)( const float *point, int *truecontents );
+	int	(*PM_WaterEntity)( const float *p );
 	struct pmtrace_s *(*PM_TraceLine)( float *start, float *end, int flags, int usehull, int ignore_pe );
 
 	struct model_s *(*CL_LoadModel)( const char *modelname, int *index );
@@ -222,7 +222,7 @@ typedef struct cl_enginefuncs_s
 	void	(*VGui_ViewportPaintBackground)( int extents[4] );
 
 	byte*	(*COM_LoadFile)( const char *path, int usehunk, int *pLength );
-	char*	(*COM_ParseFile)( const char *data, const char *token );
+	char*	(*COM_ParseFile)( char *data, char *token );
 	void	(*COM_FreeFile)( void *buffer );
 
 	struct triangleapi_s	*pTriAPI;

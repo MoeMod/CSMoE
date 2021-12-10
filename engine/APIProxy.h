@@ -1,7 +1,6 @@
 #ifndef __APIPROXY__
 #define __APIPROXY__
 
-#include "archtypes.h"     // DAL
 #include "netadr.h"
 #include "Sequence.h"
 

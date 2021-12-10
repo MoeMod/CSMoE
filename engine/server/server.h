@@ -483,11 +483,11 @@ extern  convar_t		*sv_userinfo_penalty_attempts;
 //
 // sv_main.c
 //
-void SV_FinalMessage( char *message, qboolean reconnect );
+void SV_FinalMessage(const char* message, bool reconnect);
 void SV_DropClient( sv_client_t *drop );
 void SV_UpdateMovevars( qboolean initialize );
 int SV_CalcPacketLoss( sv_client_t *cl );
-void SV_ExecuteUserCommand (char *s);
+void SV_ExecuteUserCommand (const char *s);
 void SV_InitOperatorCommands( void );
 void SV_KillOperatorCommands( void );
 void SV_PrepWorldFrame( void );
@@ -497,7 +497,7 @@ void Master_Add( void );
 void Master_Heartbeat( void );
 void Master_Packet( void );
 void SV_AddToMaster( netadr_t from, sizebuf_t *msg );
-qboolean SV_ProcessUserAgent( netadr_t from, char *useragent );
+qboolean SV_ProcessUserAgent( netadr_t from, const char *useragent );
 
 //
 // sv_init.c
