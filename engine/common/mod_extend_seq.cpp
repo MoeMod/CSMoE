@@ -1,6 +1,6 @@
-#include "mod_extend_seq.h"
 
 extern "C" {
+#include "mod_extend_seq.h"
 #include "studio.h"
 }
 
