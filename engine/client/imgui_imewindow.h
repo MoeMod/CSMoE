@@ -15,13 +15,5 @@ GNU General Public License for more details.
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void ImGui_ImeWindow_Init();
 void ImGui_ImeWindow_OnGUI(void);
-
-#ifdef __cplusplus
-}
-#endif

@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Framework.h"
 #include "Bitmap.h"
-
+namespace ui {
 #define UI_CREDITS_PATH		"credits.txt"
 #define UI_CREDITS_MAXLINES		2048
 
@@ -258,3 +258,4 @@ void UI_FinalCredits( void )
 }
 
 ADD_MENU( menu_credits, UI_Credits_Precache, UI_Credits_Menu );
+}

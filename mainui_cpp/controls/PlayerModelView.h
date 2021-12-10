@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #include "entity_types.h"
 // HLSDK includes end
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuPlayerModelView : public CMenuBaseItem
 {
 public:
@@ -59,5 +59,5 @@ private:
 
 	int prevCursorX, prevCursorY;
 };
-
+}
 #endif // CMENUPLAYERMODELVIEW_H

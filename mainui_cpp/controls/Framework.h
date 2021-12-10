@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include "BaseWindow.h"
 #include "PicButton.h"
-
+namespace ui {
 #define MAX_FRAMEWORK_PICBUTTONS 16
 
 /*
@@ -53,5 +53,5 @@ protected:
 	CMenuPicButton *m_apBtns[MAX_FRAMEWORK_PICBUTTONS];
 	int m_iBtnsNum;
 };
-
+}
 #endif // FRAMEWORK_H

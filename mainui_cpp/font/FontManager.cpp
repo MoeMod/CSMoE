@@ -28,7 +28,7 @@ GNU General Public License for more details.
 #endif
 
 #include "BitmapFont.h"
-
+namespace ui {
 #if defined __ANDROID__ || defined CS16CLIENT
 #define DEFAULT_MENUFONT "RobotoCondensed"
 #define DEFAULT_CONFONT  "DroidSans"
@@ -530,4 +530,5 @@ HFont CFontBuilder::Create()
 	}
 
 	return g_FontMgr.m_Fonts.AddToTail(font) + 1;
+}
 }

@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #include "WinAPIFont.h"
 
-
+namespace ui {
 bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 {
 	return a.ch < b.ch;
@@ -335,5 +335,5 @@ bool CWinAPIFont::HasChar( int ch ) const
 {
 	return true;
 }
-
+}
 #endif // WIN32

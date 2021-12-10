@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #include "gameinfo.h"
 #include "FontManager.h"
 #include "BMPUtils.h"
+#include "keydefs.h"
 
 #define FILE_GLOBAL	static
 #define DLL_GLOBAL
@@ -48,8 +49,6 @@ namespace ui
 {
 extern ui_globalvars_t		*gpGlobals;
 extern fs_api_t gFileSystemAPI;
-}
-using ui::gpGlobals;
 
 // exports
 extern int UI_VidInit( void );
@@ -149,7 +148,7 @@ extern void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len
 extern void UI_EnableTextInput( bool enable );
 
 void UI_LoadCustomStrings( void );
-const char *L( const char *szStr ); // L means Localize!
+const char *Localize( const char *szStr ); // L means Localize!
 void UI_FreeCustomStrings( void );
 
 #ifdef __APPLE__
@@ -237,4 +236,5 @@ int Con_UtfProcessChar(int in );
 int Con_UtfMoveLeft( const char *str, int pos );
 int Con_UtfMoveRight( const char *str, int pos, int length );
 
+}
 #endif//UTILS_H

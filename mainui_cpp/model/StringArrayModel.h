@@ -3,7 +3,7 @@
 #define STRINGARRAYMODEL_H
 
 #include "BaseArrayModel.h"
-
+namespace ui {
 class CStringArrayModel : public CMenuBaseArrayModel
 {
 public:
@@ -48,5 +48,5 @@ private:
 	} m_u;
 	int m_iOffset;
 };
-
+}
 #endif // STRINGARRAYMODEL_H

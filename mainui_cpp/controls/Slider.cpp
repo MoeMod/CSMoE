@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Slider.h"
 #include "Utils.h"
-
+namespace ui {
 CMenuSlider::CMenuSlider() : BaseClass(), m_flMinValue(), m_flMaxValue(), m_flCurValue(),
 	m_flDrawStep(), m_iNumSteps(), m_flRange(), m_iKeepSlider()
 {
@@ -208,4 +208,5 @@ void CMenuSlider::UpdateEditable()
 	float flValue = EngFuncs::GetCvarFloat( m_szCvarName );
 
 	m_flCurValue = flValue;
+}
 }

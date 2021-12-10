@@ -3,7 +3,7 @@
 #define BASE_ARRAY_MODEL_H
 
 #include "BaseModel.h"
-
+namespace ui {
 class CMenuBaseArrayModel : public CMenuBaseModel
 {
 public:
@@ -21,5 +21,5 @@ public:
 		return GetText( line );
 	}
 };
-
+}
 #endif // BASE_ARRAY_MODEL_H

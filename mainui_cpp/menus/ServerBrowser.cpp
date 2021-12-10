@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Switch.h"
 #include "Field.h"
 #include "utlvector.h"
-
+namespace ui {
 #define ART_BANNER_INET		"gfx/shell/head_inetgames"
 #define ART_BANNER_LAN		"gfx/shell/head_lan"
 #define ART_BANNER_LOCK		"gfx/shell/lock"
@@ -625,3 +625,4 @@ void UI_MenuResetPing_f( void )
 	uiServerBrowser.ResetPing();
 }
 ADD_COMMAND( menu_resetping, UI_MenuResetPing_f );
+}

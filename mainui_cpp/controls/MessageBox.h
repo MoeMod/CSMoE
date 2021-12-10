@@ -17,7 +17,7 @@ GNU General Public License for more details.
 
 #include "BaseWindow.h"
 #include "Action.h"
-
+namespace ui {
 class CMenuMessageBox : public CMenuBaseWindow
 {
 public:
@@ -31,5 +31,5 @@ private:
 
 	CMenuAction dlgMessage;
 };
-
+}
 #endif // MESSAGEBOX_H

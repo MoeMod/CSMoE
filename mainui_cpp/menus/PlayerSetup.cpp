@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "PlayerModelView.h"
 #include "StringArrayModel.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_customize"
 
 #define MAX_PLAYERMODELS	100
@@ -623,3 +623,4 @@ void UI_PlayerSetup_Menu( void )
 
 }
 ADD_MENU( menu_playersetup, UI_PlayerSetup_Precache, UI_PlayerSetup_Menu );
+}

@@ -28,6 +28,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "BtnsBMPTable.h"
 
+namespace ui {
+
 #ifdef _DEBUG
 void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage )
 {
@@ -609,3 +611,4 @@ void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len )
 	*newCommand++ = 0;
 }
 
+}

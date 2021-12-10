@@ -29,7 +29,7 @@ GNU General Public License for more details.
 #define ref_menu_params_t ref_params_t
 #define ref_menu_params_s ref_params_s
 #endif
-
+namespace ui {
 class EngFuncs
 {
 public:
@@ -291,7 +291,7 @@ public:
 	static int UtfMoveLeft( const char *str, int pos );
 	static int UtfMoveRight( const char *str, int pos, int length );
 };
-
+}
 
 // built-in memory manager
 // NOTE: not recommeded to use, because object destruction may be after engine halts

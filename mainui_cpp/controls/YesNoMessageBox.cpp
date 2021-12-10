@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
 #include "Utils.h"
-
+namespace ui {
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
 CMenuYesNoMessageBox::CMenuYesNoMessageBox( bool alert ) : BaseClass( "YesNoMessageBox")
@@ -263,3 +263,4 @@ void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
 	msgBox.Show();
 }
 ADD_COMMAND( menu_showmessagebox, CMenuYesNoMessageBox::UI_ShowMessageBox );
+}

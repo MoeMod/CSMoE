@@ -22,7 +22,7 @@ GNU General Public License for more details.
 #include "Scissor.h"
 #include "BtnsBMPTable.h"
 #include <stdlib.h>
-
+namespace ui {
 // Button stack
 CMenuPicButton *ButtonStack[UI_MAX_MENUDEPTH] = { 0 };
 int		ButtonStackDepth = 0;
@@ -538,4 +538,5 @@ void CMenuPicButton::ClearButtonStack()
 {
 	ButtonStackDepth = 0;
 	memset( ButtonStack, 0, sizeof( ButtonStack ));
+}
 }

@@ -15,15 +15,7 @@ GNU General Public License for more details.
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "common.h"
 
-	void ImGui_ConnectProgress_Init(void);
-	void ImGui_ConnectProgress_OnGUI(void);
-
-#ifdef __cplusplus
-}
-#endif
+void ImGui_ConnectProgress_Init(void);
+void ImGui_ConnectProgress_OnGUI(void);

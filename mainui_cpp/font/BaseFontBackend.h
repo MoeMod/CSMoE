@@ -24,7 +24,7 @@ GNU General Public License for more details.
 #if defined(__ANDROID__) || TARGET_OS_IPHONE || defined(__SAILFISH__) || defined(MAINUI_FONT_SCALE)
 #define SCALE_FONTS
 #endif
-
+namespace ui {
 struct charRange_t
 {
 	int chMin;
@@ -110,6 +110,6 @@ private:
 	friend class CFontManager;
 
 };
-
+}
 
 #endif // BASEFONT_H

@@ -26,7 +26,7 @@ GNU General Public License for more details.
 
 #include "utl/utlmemory.h"
 #include "utl/utlrbtree.h"
-
+namespace ui {
 struct abc_t
 {
 	int ch;
@@ -69,5 +69,5 @@ private:
 	friend class CFontManager;
 	friend int CALLBACK FontEnumProc( const LOGFONT *, const TEXTMETRIC *, DWORD, LPARAM lpParam );
 };
-
+}
 #endif // WINAPIFONT_H

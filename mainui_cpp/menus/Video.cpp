@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Framework.h"
 #include "Bitmap.h"
 #include "PicButton.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_video"
 
 /*
@@ -58,3 +58,4 @@ void UI_Video_Menu( void )
 	video.Show();
 }
 ADD_MENU( menu_video, UI_Video_Precache, UI_Video_Menu );
+}

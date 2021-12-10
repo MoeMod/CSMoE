@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "SpinControl.h"
 #include "Utils.h"
 #include "Scissor.h"
-
+namespace ui {
 CMenuSpinControl::CMenuSpinControl()  : BaseClass(), m_szBackground(),
 		m_szLeftArrow(), m_szRightArrow(), m_szLeftArrowFocus(), m_szRightArrowFocus(),
 		m_flMinValue(0), m_flMaxValue(1), m_flCurValue(0), m_flRange(0.1), m_pModel( NULL ),
@@ -180,9 +180,9 @@ void CMenuSpinControl::Draw( void )
 
 	if( iFlags & QMF_GRAYED )
 	{
-		ui::Scissor::PushScissor( scCenterPos, scCenterBox );
+		Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, uiColorDkGrey, m_scChSize, eTextAlignment, textflags | ETF_FORCECOL );
-		ui::Scissor::PopScissor();
+		Scissor::PopScissor();
 		UI_DrawPic( left, arrow, uiColorDkGrey, m_szLeftArrow );
 		UI_DrawPic( right, arrow, uiColorDkGrey, m_szRightArrow );
 		return; // grayed
@@ -190,9 +190,9 @@ void CMenuSpinControl::Draw( void )
 
 	if(this != m_pParent->ItemAtCursor())
 	{
-		ui::Scissor::PushScissor( scCenterPos, scCenterBox );
+		Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, colorBase, m_scChSize, eTextAlignment, textflags );
-		ui::Scissor::PopScissor();
+		Scissor::PopScissor();
 		UI_DrawPic(left, arrow, colorBase, m_szLeftArrow);
 		UI_DrawPic(right, arrow, colorBase, m_szRightArrow);
 		return;		// No focus
@@ -204,9 +204,9 @@ void CMenuSpinControl::Draw( void )
 
 	if( eFocusAnimation == QM_HIGHLIGHTIFFOCUS )
 	{
-		ui::Scissor::PushScissor( scCenterPos, scCenterBox );
+		Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, colorFocus, m_scChSize, eTextAlignment, textflags );
-		ui::Scissor::PopScissor();
+		Scissor::PopScissor();
 		UI_DrawPic( left, arrow, colorBase, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, colorBase, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
@@ -216,9 +216,9 @@ void CMenuSpinControl::Draw( void )
 
 		color = PackAlpha( colorBase, 255 * (0.5 + 0.5 * sin( (float)uiStatic.realTime / UI_PULSE_DIVISOR )));
 
-		ui::Scissor::PushScissor( scCenterPos, scCenterBox );
+		Scissor::PushScissor( scCenterPos, scCenterBox );
 		UI_DrawString( font, scCenterPos, scCenterBox, m_szDisplay, color, m_scChSize, eTextAlignment, textflags );
-		ui::Scissor::PopScissor();
+		Scissor::PopScissor();
 		UI_DrawPic( left, arrow, (leftFocus) ? color : (int)colorBase, (leftFocus) ? m_szLeftArrowFocus : m_szLeftArrow );
 		UI_DrawPic( right, arrow, (rightFocus) ? color : (int)colorBase, (rightFocus) ? m_szRightArrowFocus : m_szRightArrow );
 	}
@@ -343,4 +343,5 @@ void CMenuSpinControl::Display()
 void CMenuSpinControl::ForceDisplayString(const char *display)
 {
 	Q_strncpy( m_szDisplay, display, CS_SIZE );
+}
 }

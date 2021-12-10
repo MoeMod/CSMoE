@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "YesNoMessageBox.h"
 #include "StringArrayModel.h"
-
+namespace ui {
 #define ART_BANNER	  	"gfx/shell/head_touch_buttons"
 
 class CMenuTouchButtons : public CMenuFramework
@@ -61,7 +61,7 @@ public:
 	char selectedName[256];
 	int curflags;
 
-	
+
 	CMenuPicButton	done;
 	CMenuPicButton	cancel;
 
@@ -557,3 +557,4 @@ void UI_TouchButtons_GetButtonList()
 	uiTouchButtons.model.Update();
 }
 ADD_MENU( menu_touchbuttons, UI_TouchButtons_Precache, UI_TouchButtons_Menu );
+}

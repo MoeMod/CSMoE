@@ -16,15 +16,7 @@ GNU General Public License for more details.
 #ifndef CSMOE_IMGUI_LCSM_WARNING_H
 #define CSMOE_IMGUI_LCSM_WARNING_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void ImGui_LCSM_OnGUI(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif //CSMOE_IMGUI_LCSM_WARNING_H

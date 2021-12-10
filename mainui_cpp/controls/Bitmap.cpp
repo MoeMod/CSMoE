@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #include "PicButton.h" // GetTitleTransFraction
 #include "Utils.h"
 #include "BaseWindow.h"
-
+namespace ui {
 CMenuBitmap::CMenuBitmap() : BaseClass()
 {
 	SetPicture( NULL );
@@ -202,4 +202,5 @@ void CMenuBannerBitmap::VidInit()
 	CMenuPicButton::SetTransPicForLast( EngFuncs::PIC_Load( szPic ) );
 #endif
 #endif // CS16CLIENT
+}
 }

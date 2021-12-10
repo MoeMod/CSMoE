@@ -36,7 +36,7 @@ GNU General Public License for more details.
 #endif
 
 #include "Utils.h"
-
+namespace ui {
 bool ABCCacheLessFunc( const abc_t &a, const abc_t &b )
 {
 	return a.ch < b.ch;
@@ -421,5 +421,5 @@ bool CStbFont::HasChar(int ch) const
 {
 	return true;
 }
-
+}
 #endif // WIN32 && MAINUI_USE_FREETYPE

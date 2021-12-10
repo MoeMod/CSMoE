@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_custom"
 
 #define MAX_MODS		512	// engine limit
@@ -175,7 +175,7 @@ void CMenuCustomGame::_Init( void )
 		if( !stricmp( modListModel.modsDir[i], gMenu.m_gameinfo.gamefolder ) )
 		{
 			modList.SetCurrentIndex( i );
-			if( modList.onChanged ) 
+			if( modList.onChanged )
 				modList.onChanged( &modList );
 			break;
 		}
@@ -206,3 +206,4 @@ void UI_CustomGame_Menu( void )
 	uiCustomGame.Show();
 }
 ADD_MENU( menu_customgame, UI_CustomGame_Precache, UI_CustomGame_Menu );
+}

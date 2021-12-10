@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 #include "BaseMenu.h"
 #include "BaseClientWindow.h"
-
+namespace ui {
 CMenuBaseClientWindow::CMenuBaseClientWindow( const  char *name ) :
 	BaseClass( name )
 {
@@ -40,5 +40,5 @@ const char *CMenuBaseClientWindow::Key(int key, int down)
 	return BaseClass::Key( key, down );
 
 }
-
+}
 

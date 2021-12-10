@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "MessageBox.h"
 #include "Table.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_controls"
 #define MAX_KEYS 256
 
@@ -196,7 +196,7 @@ void CMenuKeysModel::Update( void )
 			if( !pfile ) break;	// technically an error
 
 			if( token[0] == '#' )
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", Localize( token ));
 			else
 				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
@@ -215,7 +215,7 @@ void CMenuKeysModel::Update( void )
 			if( !pfile ) break; // technically an error
 
 			if( token[0] == '#' )
-				snprintf( name[i], sizeof( name[i] ), "^6%s^7", L( token ));
+				snprintf( name[i], sizeof( name[i] ), "^6%s^7", Localize( token ));
 			else
 				snprintf( name[i], sizeof( name[i] ), "^6%s^7", token );
 
@@ -324,7 +324,7 @@ const char *CMenuControls::Key( int key, int down )
 
 		return uiSoundLaunch;
 	}
-	
+
 	return CMenuFramework::Key( key, down );
 }
 
@@ -430,3 +430,4 @@ void UI_Controls_Menu( void )
 	uiControls.Show();
 }
 ADD_MENU( menu_controls, UI_Controls_Precache, UI_Controls_Menu );
+}

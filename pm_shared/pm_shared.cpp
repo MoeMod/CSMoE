@@ -195,7 +195,7 @@ void PM_InitTextureTypes()
 
 	gcTextures = 0;
 
-	pMemFile = pmove->COM_LoadFile("sound/materials.txt", 5, &fileSize);
+	pMemFile = (byte *)pmove->COM_LoadFile("sound/materials.txt", 5, &fileSize);
 	if (!pMemFile)
 		return;
 

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #include "FreeTypeFont.h"
 #include "Utils.h"
-
+namespace ui {
 FT_Library CFreeTypeFont::m_Library;
 
 /* round a 26.6 pixel coordinate to the nearest larger integer */
@@ -292,5 +292,5 @@ bool CFreeTypeFont::HasChar(int ch) const
 {
 	return FT_Get_Char_Index( face, ch ) != 0;
 }
-
+}
 #endif // WIN32 && MAINUI_USE_FREETYPE

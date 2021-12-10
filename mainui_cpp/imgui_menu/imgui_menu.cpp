@@ -6,12 +6,13 @@
 #include "imgui_menu_server.h"
 
 #include "luash_menu/luash_menu.h"
-
+namespace ui{
 void UI_OnGUI(struct ImGuiContext* context)
 {
 	ImGui::SetCurrentContext(context);
 
-	ui::MsgBox_OnGui();
-	ui::Server_OnGui();
-	ui::LuaUI_OnGUI();
+	MsgBox_OnGui();
+	Server_OnGui();
+	LuaUI_OnGUI();
+}
 }

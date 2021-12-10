@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "ItemsHolder.h"
 #include "MessageBox.h"
-
+namespace ui {
 CMenuMessageBox::CMenuMessageBox(const char *name) : BaseClass( name )
 {
 	iFlags |= QMF_INACTIVE;
@@ -41,4 +41,5 @@ void CMenuMessageBox::_Init()
 void CMenuMessageBox::SetMessage( const char *sz )
 {
 	dlgMessage.szName = sz;
+}
 }

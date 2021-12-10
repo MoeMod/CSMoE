@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "Action.h"
 #include "CheckBox.h"
-
+namespace ui {
 #define ART_BANNER			"gfx/shell/head_advoptions"
 
 class CMenuGameOptions : public CMenuFramework
@@ -317,3 +317,4 @@ void UI_GameOptions_Menu( void )
 	uiGameOptions.Show();
 }
 ADD_MENU( menu_gameoptions, UI_GameOptions_Precache, UI_GameOptions_Menu );
+}

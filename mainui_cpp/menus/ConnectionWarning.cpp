@@ -3,7 +3,7 @@
 #include "ConnectionWarning.h"
 #include "PicButton.h"
 #include "Action.h"
-
+namespace ui {
 enum EPresets { EPRESET_NORMAL = 0, EPRESET_DSL, EPRESET_SLOW, EPRESET_LAST };
 
 static class CMenuConnectionWarning : public CMenuBaseWindow
@@ -137,3 +137,4 @@ void UI_ConnectionWarning_f()
 	uiConnectionWarning.Show();
 }
 ADD_COMMAND( menu_connectionwarning, UI_ConnectionWarning_f );
+}

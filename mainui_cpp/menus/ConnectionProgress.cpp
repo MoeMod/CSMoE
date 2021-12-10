@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ProgressBar.h"
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
-
+namespace ui {
 enum EState
 {
 	STATE_NONE,
@@ -174,7 +174,7 @@ void CMenuConnectionProgress::HandleDisconnect( void )
 			m_iSource = SOURCE_CONSOLE;
 		}
 	}
-	
+
 	SetCommonText( "Disconnected." );
 
 	m_iState = STATE_NONE;
@@ -390,3 +390,4 @@ void UI_ConnectionProgress_f( void )
 	uiConnectionProgress.VidInit();
 }
 ADD_COMMAND( menu_connectionprogress, UI_ConnectionProgress_f );
+}

@@ -4209,7 +4209,7 @@ int ReloadMapCycleFile(char *filename, mapcycle_t *cycle)
 			if (IS_MAP_VALID(szMap))
 			{
 				// Create entry
-				char *s;
+				const char *s;
 
 				item = new mapcycle_item_s;
 

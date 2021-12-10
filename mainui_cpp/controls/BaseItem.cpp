@@ -19,7 +19,7 @@ GNU General Public License for more details.
 CMenuBaseItem::CMenuBaseItem
 ==================
 */
-
+namespace ui {
 CMenuBaseItem::CMenuBaseItem()
 {
 	SetNameAndStatus( "", NULL );
@@ -335,4 +335,5 @@ bool CMenuBaseItem::KeyValueData(const char *key, const char *data)
 	// TODO: nomulti, nosingle, nosteam
 
 	return true;
+}
 }

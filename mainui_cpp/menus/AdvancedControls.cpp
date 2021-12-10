@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "CheckBox.h"
 #include "Slider.h"
-
+namespace ui {
 #define ART_BANNER			"gfx/shell/head_advanced"
 
 class CAdvancedControls : public CMenuFramework
@@ -233,3 +233,4 @@ void UI_AdvControls_Menu( void )
 	uiAdvControls.Show();
 }
 ADD_MENU( menu_advcontrols, UI_AdvControls_Precache, UI_AdvControls_Menu );
+}

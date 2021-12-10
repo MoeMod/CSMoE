@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "utils.h"
 #include "keydefs.h"
 
+namespace ui {
 #define ART_BANNER	     	"gfx/shell/head_load"
 
 #define ID_BACKGROUND	0
@@ -93,7 +94,7 @@ static void UI_DeleteDialog( void )
 {
 	// toggle main menu between active\inactive
 	// show\hide remove dialog
-	uiPlayDemo.play.generic.flags ^= QMF_INACTIVE; 
+	uiPlayDemo.play.generic.flags ^= QMF_INACTIVE;
 	uiPlayDemo.remove.generic.flags ^= QMF_INACTIVE;
 	uiPlayDemo.cancel.generic.flags ^= QMF_INACTIVE;
 	uiPlayDemo.demosList.generic.flags ^= QMF_INACTIVE;
@@ -136,7 +137,7 @@ static void UI_PlayDemo_GetDemoList( void )
 	for( i = 0; i < numFiles; i++ )
 	{
 		if( i >= UI_MAXGAMES ) break;
-		
+
 		if( !GET_DEMO_COMMENT( filenames[i], comment ))
 		{
 			if( strlen( comment ))
@@ -203,7 +204,7 @@ static void UI_PlayDemo_Callback( void *self, int event )
 
 	if( event != QM_ACTIVATED )
 		return;
-	
+
 	switch( item->id )
 	{
 	case ID_CANCEL:
@@ -267,7 +268,7 @@ static void UI_PlayDemo_Ownerdraw( void *self )
 		y = LEVELSHOT_Y;
 		w = LEVELSHOT_W;
 		h = LEVELSHOT_H;
-		
+
 		UI_ScaleCoords( &x, &y, &w, &h );
 
 		if( strlen( uiPlayDemo.demoName[uiPlayDemo.demosList.curItem] ))
@@ -461,4 +462,5 @@ void UI_PlayDemo_Menu( void )
 	UI_PlayDemo_Init();
 
 	UI_PushMenu( &uiPlayDemo.menu );
+}
 }

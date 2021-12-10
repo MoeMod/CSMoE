@@ -358,7 +358,11 @@ HRESULT WinRT_OnMouseMoved(IMouseDevice *sender, IMouseEventArgs *e)
 IN_Init
 ===========
 */
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void)
+#else
 void IN_Init (void)
+#endif
 {
 	m_filter				= gEngfuncs.pfnRegisterVariable ( "m_filter","0", FCVAR_ARCHIVE );
 	sensitivity				= gEngfuncs.pfnRegisterVariable ( "sensitivity","3", FCVAR_ARCHIVE ); // user mouse sensitivity setting.
@@ -400,7 +404,11 @@ void IN_Init (void)
 IN_Shutdown
 ===========
 */
-void IN_Shutdown(void)
+#ifdef XASH_STATIC_GAMELIB
+void IN_Shutdown_CL (void)
+#else
+void IN_Shutdown (void)
+#endif
 {
 	IN_DeactivateMouse();
 

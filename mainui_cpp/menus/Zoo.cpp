@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Action.h"
 #include "Field.h"
 #include "ScrollView.h"
-
+namespace ui {
 static class CMenuZoo : public CMenuFramework
 {
 public:
@@ -162,4 +162,5 @@ void UI_Zoo_Menu()
 {
 	UI_Zoo_Precache();
 	g_Zoo.Show();
+}
 }

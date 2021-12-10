@@ -38,9 +38,14 @@ using namespace cl;
 extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
 
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void);
+void IN_Shutdown_CL( void );
+#else
 void IN_Init (void);
-void IN_Move ( float frametime, usercmd_t *cmd);
 void IN_Shutdown( void );
+#endif
+void IN_Move ( float frametime, usercmd_t *cmd);
 void V_Init( void );
 void VectorAngles( const float *forward, float *angles );
 int CL_ButtonBits( int );
@@ -298,7 +303,7 @@ KeyDown
 void KeyDown (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 
 	c = gEngfuncs.Cmd_Argv(1);
 	if (c[0])
@@ -332,7 +337,7 @@ KeyUp
 void KeyUp (kbutton_t *b)
 {
 	int		k;
-	char	*c;
+	const char	*c;
 	
 	c = gEngfuncs.Cmd_Argv(1);
 	if (c[0])
@@ -980,7 +985,12 @@ void InitInput (void)
 	// Initialize third person camera controls.
 	CAM_Init();
 	// Initialize inputs
+
+#ifdef XASH_STATIC_GAMELIB
+	IN_Init_CL();
+#else
 	IN_Init();
+#endif
 	// Initialize keyboard
 	KB_Init();
 	// Initialize view system
@@ -994,6 +1004,10 @@ Input_Shutdown
 */
 void Input_Shutdown (void)
 {
+#ifdef XASH_STATIC_GAMELIB
+	IN_Shutdown_CL();
+#else
 	IN_Shutdown();
+#endif
 	KB_Shutdown();
 }

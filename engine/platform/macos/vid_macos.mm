@@ -17,8 +17,6 @@ GNU General Public License for more details.
 #import <SDL_video.h>
 #import <SDL_syswm.h>
 
-extern "C" {
-
 #include "common.h"
 #include "vid_macos.h"
 
@@ -43,7 +41,5 @@ float MacOS_TitleBarHeight()
 	NSRect frame = NSMakeRect (0, 0, 100, 100);
 	NSRect contentRect = [nsw contentRectForFrameRect: frame];
 	return (frame.size.height - contentRect.size.height);
-}
-
 }
 

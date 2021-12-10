@@ -20,7 +20,7 @@ GNU General Public License for more details.
 #define UI_SLIDER_MAIN		"gfx/shell/slider"
 
 #include "Editable.h"
-
+namespace ui {
 class CMenuSlider : public CMenuEditable
 {
 public:
@@ -64,5 +64,5 @@ private:
 	int m_iSliderOutlineWidth;
 	Size m_scCenterBox;
 };
-
+}
 #endif // MENU_SLIDER_H

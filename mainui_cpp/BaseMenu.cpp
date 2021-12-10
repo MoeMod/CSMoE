@@ -52,6 +52,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "luash_menu/luash_menu.h"
 
+#ifdef XASH_STATIC_GAMELIB
+int FS_GetAPI(fs_api_t * g_api);
+#endif
+
+namespace ui {
 cvar_t		*ui_showmodels;
 cvar_t		*ui_show_window_stack;
 cvar_t		*ui_borderclip;
@@ -1387,10 +1392,6 @@ static void UI_UpdateDialog_f( void )
 
 ADD_COMMAND( menu_updatedialog, UI_UpdateDialog_f );
 
-#ifdef XASH_STATIC_GAMELIB
-extern "C" int FS_GetAPI(fs_api_t * g_api);
-#endif
-
 /*
 =================
 UI_Init
@@ -1398,7 +1399,7 @@ UI_Init
 */
 void UI_Init( void )
 {
-	FS_GetAPI(&ui::gFileSystemAPI);
+	FS_GetAPI(&gFileSystemAPI);
 	// register our cvars and commands
 	ui_showmodels = EngFuncs::CvarRegister( "ui_showmodels", "0", FCVAR_ARCHIVE );
 	ui_show_window_stack = EngFuncs::CvarRegister( "ui_show_window_stack", "0", FCVAR_ARCHIVE );
@@ -1444,7 +1445,7 @@ void UI_Init( void )
 	//CR
 	CMenuPicButton::ClearButtonStack();
 
-	ui::LuaUI_Init();
+	LuaUI_Init();
 }
 
 /*
@@ -1457,7 +1458,7 @@ void UI_Shutdown( void )
 	if( !uiStatic.initialized )
 		return;
 
-	ui::LuaUI_Shutdown();
+	LuaUI_Shutdown();
 
 	for( CMenuEntry *entry = s_pEntries; entry; entry = entry->m_pNext )
 	{
@@ -1468,4 +1469,5 @@ void UI_Shutdown( void )
 	}
 
 	memset( &uiStatic, 0, sizeof( uiStatic_t ));
+}
 }

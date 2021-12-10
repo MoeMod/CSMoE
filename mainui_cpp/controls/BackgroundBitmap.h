@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #define MENU_BACKGROUNDBITMAP_H
 
 #include "Bitmap.h"
-
+namespace ui {
 #define ART_BACKGROUND		"gfx/shell/splash.bmp"
 
 #define MAX_BACKGROUNDS 48 // SC 5.0 have 35 tiled backgrounds!
@@ -70,5 +70,5 @@ private:
 	static bimage_t s_Backgroudns[MAX_BACKGROUNDS];
 
 };
-
+}
 #endif // MENU_BACKGROUNDBITMAP_H

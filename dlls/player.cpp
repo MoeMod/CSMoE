@@ -8007,8 +8007,8 @@ int GetPlayerGaitsequence(const edict_t *pEdict)
 
 void CBasePlayer::SpawnClientSideCorpse()
 {
-	char *infobuffer = GET_INFO_BUFFER(edict());
-	char *pModel = GET_KEY_VALUE(infobuffer, "model");
+	const char *infobuffer = GET_INFO_BUFFER(edict());
+	const char *pModel = GET_KEY_VALUE(infobuffer, "model");
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgSendCorpse);
 		WRITE_STRING(pModel);

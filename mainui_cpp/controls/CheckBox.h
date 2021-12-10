@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #define MENU_CHECKBOX_H
 
 #include "Editable.h"
-
+namespace ui {
 #define UI_CHECKBOX_EMPTY		"gfx/shell/cb_empty"
 #define UI_CHECKBOX_GRAYED		"gfx/shell/cb_disabled"
 #define UI_CHECKBOX_FOCUS		"gfx/shell/cb_over"
@@ -79,5 +79,5 @@ private:
 	Point m_scTextPos;
 	Size m_scTextSize;
 };
-
+}
 #endif // MENU_CHECKBOX_H

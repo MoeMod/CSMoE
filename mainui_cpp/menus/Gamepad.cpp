@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "StringArrayModel.h"
 #include "Action.h"
-
+namespace ui {
 #define ART_BANNER			"gfx/shell/head_gamepad"
 
 enum engineAxis_t
@@ -294,3 +294,4 @@ void UI_GamePad_Menu( void )
 	uiGamePad.Show();
 }
 ADD_MENU( menu_gamepad, UI_GamePad_Precache, UI_GamePad_Menu );
+}

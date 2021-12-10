@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef XASH_IMGUI
 #include "imgui_menu/imgui_menu_msgbox.h"
 #endif
-
+namespace ui {
 #define ART_MINIMIZE_N	"gfx/shell/min_n"
 #define ART_MINIMIZE_F	"gfx/shell/min_f"
 #define ART_MINIMIZE_D	"gfx/shell/min_d"
@@ -110,7 +110,7 @@ void CMenuMain::CMenuMainBanner::Draw()
 void CMenuMain::QuitDialog(void *pExtra)
 {
 #ifdef XASH_IMGUI
-	ui::MsgBox_Open("你确定要退出游戏吗？", std::bind(EngFuncs::ClientCmd, false, "quit\n"));
+	MsgBox_Open("你确定要退出游戏吗？", std::bind(EngFuncs::ClientCmd, false, "quit\n"));
 #else
 	if( CL_IsActive() && EngFuncs::GetCvarFloat( "host_serverstate" ) && EngFuncs::GetCvarFloat( "maxplayers" ) == 1.0f )
 		dialog.SetMessage( MenuStrings[IDS_MAIN_QUITPROMPTINGAME] );
@@ -125,7 +125,7 @@ void CMenuMain::QuitDialog(void *pExtra)
 void CMenuMain::DisconnectDialogCb()
 {
 #ifdef XASH_IMGUI
-	ui::MsgBox_Open("你确定要断开连接吗？", std::bind(EngFuncs::ClientCmd, false, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n"));
+	MsgBox_Open("你确定要断开连接吗？", std::bind(EngFuncs::ClientCmd, false, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n"));
 #else
 	dialog.onPositive.SetCommand( FALSE, "cmd disconnect;endgame disconnect;wait;wait;wait;menu_options;menu_main\n" );
 	dialog.SetMessage( "Really disconnect?" );
@@ -220,7 +220,7 @@ void CMenuMain::_Init( void )
 	bCustomGame = false;
 
 	// console
-	console.SetNameAndStatus( "Console", "Show console" );
+	console.SetNameAndStatus( "Console", "打开控制台" );
 	console.iFlags |= QMF_NOTIFY;
 	console.SetPicture( PC_CONSOLE );
 	SET_EVENT_MULTI( console.onActivated,
@@ -234,7 +234,7 @@ void CMenuMain::_Init( void )
 	resumeGame.iFlags |= QMF_NOTIFY;
 	resumeGame.onActivated = UI_CloseMenu;
 
-	disconnect.SetNameAndStatus( "Disconnect", "Disconnect from server" );
+	disconnect.SetNameAndStatus( "Disconnect", "断开连接" );
 	disconnect.SetPicture( PC_DISCONNECT );
 	disconnect.iFlags |= QMF_NOTIFY;
 	disconnect.onActivated = VoidCb( &CMenuMain::DisconnectDialogCb );
@@ -307,8 +307,8 @@ void CMenuMain::_Init( void )
 	AddItem( configuration );
 	AddItem( multiPlayer );
 
-	AddItem( previews );
-	AddItem( quit );
+	//AddItem( previews );
+	//AddItem( quit );
 	AddItem( minimizeBtn );
 	AddItem( quitButton );
 }
@@ -328,8 +328,8 @@ void CMenuMain::_VidInit( void )
 	//credits.SetCoord( 72, 280 );
 	createGame.SetCoord( 72, 330 );
 
-	configuration.SetCoord( 72, bTrainMap ? 430 : 380 );
-	multiPlayer.SetCoord( 72, bTrainMap ? 480 : 430 );
+	multiPlayer.SetCoord( 72, bTrainMap ? 430 : 380 );
+	configuration.SetCoord( 72, bTrainMap ? 480 : 430 );
 
 	previews.SetCoord( 72, (bCustomGame) ? (bTrainMap ? 580 : 530) : (bTrainMap ? 530 : 480) );
 
@@ -372,3 +372,4 @@ void UI_Main_Menu( void )
 	uiMain.Show();
 }
 ADD_MENU( menu_main, UI_Main_Precache, UI_Main_Menu );
+}

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Table.h"
 #include "Utils.h"
 #include "Scissor.h"
-
+namespace ui {
 #define HEADER_HEIGHT_FRAC 1.75f
 
 CMenuTable::CMenuTable() : BaseClass(),
@@ -729,7 +729,7 @@ void CMenuTable::Draw()
 
 
 	// prevent the columns out of rectangle bounds
-	ui::Scissor::PushScissor( boxPos, boxSize );
+	Scissor::PushScissor( boxPos, boxSize );
 	y = boxPos.y;
 
 	for( i = iTopItem; i < m_pModel->GetRows() && i < iNumRows + iTopItem; i++, y += m_scChSize )
@@ -763,5 +763,6 @@ void CMenuTable::Draw()
 		DrawLine( Point( boxPos.x, y ), i, color, forceCol, fillColor );
 	}
 
-	ui::Scissor::PopScissor();
+	Scissor::PopScissor();
+}
 }

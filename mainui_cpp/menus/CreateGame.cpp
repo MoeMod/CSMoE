@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SpinControl.h"
 #include "StringArrayModel.h"
 #include "luash_menu/luash_menu.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_creategame"
 
 class CMenuMapListModel : public CMenuBaseModel
@@ -162,7 +162,7 @@ void CMenuCreateGame::Begin( CMenuBaseItem *pSelf, void *pExtra )
 
 		char cmd[128], cmd2[256];
 		sprintf( cmd, "exec %s\n", EngFuncs::GetCvarString( "lservercfgfile" ) );
-	
+
 		EngFuncs::ClientCmd( TRUE, cmd );
 
 		// dirty listenserver config form old xash may rewrite maxplayers
@@ -203,7 +203,7 @@ void CMenuMapListModel::Update( void )
 
 	strcpy( mapName[0], "<Random Map>" );
 	mapsDescription[0][0] = 0;
-	
+
 	while(( pfile = EngFuncs::COM_ParseFile( pfile, token )) != NULL )
 	{
 		if( numMaps >= UI_MAXGAMES ) break;
@@ -376,7 +376,11 @@ void UI_CreateGame_Menu( void )
 	if ( gMenu.m_gameinfo.gamemode == GAME_SINGLEPLAYER_ONLY )
 		return;
 
+#if defined(XASH_LUASH) && defined(XASH_IMGUI)
+	LuaUI_Exec("imgui_newgame_open = true");
+#else
 	uiCreateGame.Show();
-	ui::LuaUI_Exec("imgui_newgame_open = true");
+#endif
 }
 ADD_MENU( menu_creategame, UI_CreateGame_Precache, UI_CreateGame_Menu );
+}

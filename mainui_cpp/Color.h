@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #pragma once
 #ifndef COLOR_H
 #define COLOR_H
-
+namespace ui {
 class CColor
 {
 public:
@@ -49,5 +49,5 @@ public:
 private:
 	bool init;
 };
-
+}
 #endif // COLOR_H

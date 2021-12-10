@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Framework.h"
 #include "keydefs.h"
-
+namespace ui {
 class CMenuTouchEdit : public CMenuFramework
 {
 public:
@@ -115,3 +115,4 @@ void UI_TouchEdit_Menu( void )
 	uiTouchEdit.Show();
 }
 ADD_MENU( menu_touchedit, UI_TouchEdit_Precache, UI_TouchEdit_Menu );
+}

@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "SpinControl.h"
 #include "StringArrayModel.h"
-
+namespace ui {
 #define ART_BANNER			"gfx/shell/head_audio"
 
 class CMenuAudio : public CMenuFramework
@@ -215,3 +215,4 @@ void UI_Audio_Menu( void )
 	uiAudio.Show();
 }
 ADD_MENU( menu_audio, UI_Audio_Precache, UI_Audio_Menu );
+}

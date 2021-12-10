@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define SWITCH_H
 
 #include "Editable.h"
-
+namespace ui {
 class CMenuSwitch : public CMenuEditable
 {
 public:
@@ -62,6 +62,6 @@ private:
 	Point m_scTextPos;
 	Size m_scTextSize;
 };
-
+}
 
 #endif // SWITCH_H

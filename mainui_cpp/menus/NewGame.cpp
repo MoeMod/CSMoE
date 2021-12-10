@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "YesNoMessageBox.h"
 #include "keydefs.h"
 #include "MenuStrings.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_newgame"
 
 class CMenuNewGame : public CMenuFramework
@@ -91,7 +91,7 @@ void CMenuNewGame::_Init( void )
 	SET_EVENT( easyCallback, CMenuNewGame::StartGameCb( 1.0f ) );
 	SET_EVENT( normCallback, CMenuNewGame::StartGameCb( 2.0f ) );
 	SET_EVENT( hardCallback, CMenuNewGame::StartGameCb( 3.0f ) );
-	
+
 	CMenuPicButton *easy = AddButton( "Easy", MenuStrings[IDS_NEWGAME_EASYHELP], PC_EASY, easyCallback, QMF_NOTIFY );
 	CMenuPicButton *norm = AddButton( "Medium", MenuStrings[IDS_NEWGAME_MEDIUMHELP], PC_MEDIUM, normCallback, QMF_NOTIFY );
 	CMenuPicButton *hard = AddButton( "Difficult", MenuStrings[IDS_NEWGAME_DIFFICULTHELP], PC_DIFFICULT, hardCallback, QMF_NOTIFY );
@@ -135,3 +135,4 @@ void UI_NewGame_Menu( void )
 	uiNewGame.Show();
 }
 ADD_MENU( menu_newgame, UI_NewGame_Precache, UI_NewGame_Menu );
+}

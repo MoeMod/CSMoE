@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "utl/utlmemory.h"
 #include "utl/utlrbtree.h"
 #include "stb_truetype.h"
-
+namespace ui {
 struct abc_t
 {
 	int ch;
@@ -56,5 +56,5 @@ private:
 
 	friend class CFontManager;
 };
-
+}
 #endif // defined(MAINUI_USE_CUSTOM_FONT_RENDER) && defined(MAINUI_USE_FREETYPE)

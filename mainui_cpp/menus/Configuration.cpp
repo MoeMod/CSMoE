@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "keydefs.h"
 #include "TabView.h"
 #include "luash_menu/luash_menu.h"
-
+namespace ui {
 #define ART_BANNER	     	"gfx/shell/head_config"
 
 class CMenuOptions: public CMenuFramework
@@ -93,8 +93,9 @@ CMenuOptions::Menu
 void UI_Options_Menu( void )
 {
 #ifdef XASH_IMGUI
-	ui::LuaUI_Exec("window_option = true");
+	LuaUI_Exec("window_option = true");
 #endif
 	uiOptions.Show();
 }
 ADD_MENU( menu_options, UI_Options_Precache, UI_Options_Menu );
+}

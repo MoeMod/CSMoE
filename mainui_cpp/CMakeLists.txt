@@ -38,6 +38,10 @@ if(XASH_IMGUI)
 	set(MAINUI_USE_CUSTOM_FONT_RENDER OFF)
 endif()
 
+if(NOT XASH_SDK)
+	set(XASH_SDK "../")
+endif()
+
 set(MAINUI_CONTROLS_SOURCES
 	controls/Framework.cpp
 	controls/BaseItem.cpp
@@ -147,6 +151,8 @@ if(XASH_IMGUI)
 	)
 endif()
 
+add_definitions(-DMAINUI_DLL=1)
+
 list(APPEND MAINUI_SOURCES ${MAINUI_CONTROLS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_MENUS_SOURCES})
 list(APPEND MAINUI_SOURCES ${MAINUI_FONT_RENDER_SOURCES})
@@ -163,10 +169,6 @@ if(XASH_IMGUI)
 endif()
 target_link_libraries(${MAINUI_LIBRARY} PRIVATE luash)
 target_link_libraries(${MAINUI_LIBRARY} PRIVATE cqmiao json_3p)
-
-if(NOT XASH_SDK)
-	set(XASH_SDK "../")
-endif()
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)
@@ -233,7 +235,7 @@ if(XASH_64BIT AND NOT ANDROID AND NOT IOS)
 endif()
 
 if(XASH_UNITY_BUILD)
-	set_target_properties(${MAINUI_LIBRARY} PROPERTIES UNITY_BUILD ON)
+	#set_target_properties(${MAINUI_LIBRARY} PROPERTIES UNITY_BUILD ON)
 endif()
 
 if(NOT XASH_STATIC_GAMELIB)

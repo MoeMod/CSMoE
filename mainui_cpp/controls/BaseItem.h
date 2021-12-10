@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include "BaseMenu.h"
 #include "Color.h"
-
+namespace ui {
 class CMenuItemsHolder;
 class CMenuBaseItem
 {
@@ -195,7 +195,7 @@ protected:
 	Size m_scSize;
 	int m_scChSize;
 };
-
+}
 #include "ItemsHolder.h"
 
 #endif // BASEITEM_H

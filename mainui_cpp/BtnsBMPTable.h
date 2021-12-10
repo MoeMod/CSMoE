@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #ifndef MENU_BTNSBMP_TABLE_H
 #define MENU_BTNSBMP_TABLE_H
-	
+namespace ui {
 enum EDefaultBtns
 {
 	PC_NEW_GAME = 0,
@@ -96,8 +96,8 @@ enum EDefaultBtns
 #define PC_GAMEPAD "gfx/shell/btn_gamepad"
 #define PC_TOUCH   "gfx/shell/btn_touch"
 
-#define BUTTON_NOFOCUS	0 
+#define BUTTON_NOFOCUS	0
 #define BUTTON_FOCUS	1
 #define BUTTON_PRESSED	2
-
+}
 #endif//MENU_BTNSBMP_TABLE_H

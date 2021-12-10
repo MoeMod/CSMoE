@@ -60,7 +60,7 @@ GNU General Public License for more details.
 
 // =====================================================================
 // Main menu interface
-
+namespace ui {
 #ifdef CS16CLIENT
 extern IGameClientExports *g_pClient;
 #endif
@@ -330,5 +330,5 @@ typedef struct
 extern uiFileDialogGlobal_t uiFileDialogGlobal;
 
 extern CMenu gMenu;
-
+}
 #endif // BASEMENU_H

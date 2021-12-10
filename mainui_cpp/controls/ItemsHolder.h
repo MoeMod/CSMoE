@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #define EMBEDITEM_H
 
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuItemsHolder : public CMenuBaseItem
 {
 public:
@@ -100,5 +100,5 @@ protected:
 
 	const char *m_szResFile;
 };
-
+}
 #endif // EMBEDITEM_H

@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Framework.h"
 #include "Bitmap.h"
 #include "PicButton.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_touch"
 
 /*
@@ -61,3 +61,4 @@ void UI_Touch_Menu( void )
 	touch.Show();
 }
 ADD_MENU( menu_touch, UI_Touch_Precache, UI_Touch_Menu );
+}

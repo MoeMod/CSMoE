@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
-
+namespace ui {
 CMenuBaseWindow::CMenuBaseWindow(const char *name) : BaseClass()
 {
 	bAllowDrag = false; // UNDONE
@@ -267,4 +267,5 @@ void CMenuBaseWindow::EnableTransition()
 		bInTransition = true;
 		m_iTransitionStartTime = uiStatic.realTime;
 	}
+}
 }

@@ -16,10 +16,6 @@ GNU General Public License for more details.
 #ifndef COMMON_H
 #define COMMON_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "port.h"
 
 #include "backends.h"
@@ -819,9 +815,9 @@ qboolean SV_Active( void );
 */
 cvar_t *pfnCvar_RegisterVariable( const char *szName, const char *szValue, int flags );
 char *COM_MemFgets( byte *pMemFile, int fileSize, int *filePos, char *pBuffer, int bufferSize );
-byte* COM_LoadFileForMe( const char *filename, int *pLength );
+char* COM_LoadFileForMe( const char *filename, int *pLength );
 cvar_t *pfnCVarGetPointer( const char *szVarName );
-int pfnDrawConsoleString( int x, int y, char *string );
+int pfnDrawConsoleString( int x, int y, const char *string );
 void pfnDrawSetTextColor( float r, float g, float b );
 void pfnDrawConsoleStringLen( const char *pText, int *length, int *height );
 int pfnAddClientCommand( const char *cmd_name, xcommand_t func );
@@ -832,8 +828,8 @@ void pfnGetGameDir( char *szGetGameDir );
 int pfnDecalIndex( const char *m );
 int pfnGetModelType( model_t *mod );
 int pfnIsMapValid( const char *filename );
-void Con_DPrintf( char *fmt, ... ) _format(1);
-void Con_Printf( char *szFmt, ... ) _format(1);
+void Con_DPrintf( const char *fmt, ... ) _format(1);
+void Con_Printf( const char *szFmt, ... ) _format(1);
 int pfnIsInGame( void );
 
 // CS:CS engfuncs (stubs)
@@ -922,7 +918,7 @@ qboolean AVI_GetAudioInfo( movie_state_t *Avi, wavdata_t *snd_info );
 fs_offset_t AVI_GetAudioChunk( movie_state_t *Avi, char *audiodata, long offset, long length );
 void AVI_OpenVideo( movie_state_t *Avi, const char *filename, qboolean load_audio, qboolean ignore_hwgamma, int quiet );
 movie_state_t *AVI_LoadVideo( const char *filename, qboolean load_audio, qboolean ignore_hwgamma );
-movie_state_t *AVI_LoadVideoNoSound( const char *filename, qboolean ignore_hwgamma );
+movie_state_t *AVI_LoadVideoNoSound( const char *filename, bool ignore_hwgamma );
 void AVI_CloseVideo( movie_state_t *Avi );
 qboolean AVI_IsActive( movie_state_t *Avi );
 void AVI_FreeVideo( movie_state_t *Avi );
@@ -967,8 +963,8 @@ void CL_CharEventUTF( const char *str );
 void CL_CharEvent( int ch );
 qboolean CL_DisableVisibility( void );
 int CL_PointContents( const vec3_t point );
-char *COM_ParseFile( char *data, char *token );
-byte *COM_LoadFile( const char *filename, int usehunk, int *pLength );
+char* COM_ParseFile( char* data, char* token);
+char *COM_LoadFile( const char *filename, int usehunk, int *pLength );
 void CL_StudioEvent( struct mstudioevent_s *event, struct cl_entity_s *ent );
 qboolean CL_GetComment( const char *demoname, char *comment );
 void COM_AddAppDirectoryToSearchPath( const char *pszBaseDir, const char *appName );
@@ -1020,13 +1016,13 @@ wavdata_t *SCR_GetMovieInfo( void );
 void SCR_Shutdown( void );
 void Con_Print( const char *txt );
 void Rcon_Print( const char *pMsg );
-void Con_NPrintf( int idx, char *fmt, ... ) _format(2);
-void Con_NXPrintf( struct con_nprint_s *info, char *fmt, ... ) _format(2);
-void UI_NPrintf( int idx, char *fmt, ... ) _format(2);
-void UI_NXPrintf( struct con_nprint_s *info, char *fmt, ... ) _format(2);
-char *Info_ValueForKey( const char *s, const char *key );
+void Con_NPrintf( int idx, const char *fmt, ... ) _format(2);
+void Con_NXPrintf( struct con_nprint_s *info, const char *fmt, ... ) _format(2);
+void UI_NPrintf( int idx, const char *fmt, ... ) _format(2);
+void UI_NXPrintf( struct con_nprint_s *info, const char *fmt, ... ) _format(2);
+const char *Info_ValueForKey( const char *s, const char *key );
 void Info_RemovePrefixedKeys( char *start, char prefix );
-qboolean Info_RemoveKey( char *s, const char *key );
+bool Info_RemoveKey( char *s, const char *key );
 qboolean Info_SetValueForKey( char *s, const char *key, const char *value, size_t maxsize );
 qboolean Info_SetValueForStarKey( char *s, const char *key, const char *value, int maxsize );
 qboolean Info_Validate( const char *s );
@@ -1036,7 +1032,7 @@ char *Cvar_Serverinfo( void );
 void Cmd_WriteVariables( file_t *f );
 qboolean Cmd_CheckMapsList( qboolean fRefresh );
 void Cmd_AutoComplete( char *complete_string );
-void COM_SetRandomSeed( int lSeed );
+void COM_SetRandomSeed( long lSeed );
 int Com_RandomLong( int lMin, int lMax );
 float Com_RandomFloat( float fMin, float fMax );
 void TrimSpace( const char *source, char *dest );\
@@ -1046,7 +1042,7 @@ void UI_SetActiveMenu( qboolean fActive );
 struct cmd_s *Cmd_GetFirstFunctionHandle( void );
 struct cmd_s *Cmd_GetNextFunctionHandle( struct cmd_s *cmd );
 struct cmdalias_s *Cmd_AliasGetList( void );
-char *Cmd_GetName( struct cmd_s *cmd );
+const char *Cmd_GetName( struct cmd_s *cmd );
 cvar_t *Cvar_GetList( void );
 void Cmd_Null_f( void );
 int CSCR_LoadDefaultCVars( const char *scriptfilename );
@@ -1054,7 +1050,7 @@ int CSCR_WriteGameCVars( file_t *cfg, const char *scriptfilename );
 void Com_EscapeCommand( char *newCommand, const char *oldCommand, int len );
 
 
-void HTTP_AddDownload( char *path, int size, qboolean process );
+void HTTP_AddDownload( const char *path, int size, bool process );
 void HTTP_ResetProcessState ( void );
 void HTTP_Init( void );
 void HTTP_Shutdown( void );
@@ -1113,7 +1109,4 @@ byte TextureToGamma( byte b );
 #include <FindDirectory.h>
 #endif
 
-#ifdef __cplusplus
-}
-#endif
 #endif//COMMON_H

@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 #include "TabView.h"
 #include "Scissor.h"
-
+namespace ui {
 CMenuTabView::CMenuTabView() : BaseClass(),
 	m_szTabNames()
 {
@@ -109,8 +109,9 @@ void CMenuTabView::Draw()
 	// draw contents
 	if( m_iCursor >= 0 && m_iCursor < m_numItems )
 	{
-		ui::Scissor::PushScissor( contentOffset, contentSize );
+		Scissor::PushScissor( contentOffset, contentSize );
 			m_pItems[m_iCursor]->Draw();
-		ui::Scissor::PopScissor();
+		Scissor::PopScissor();
 	}
+}
 }

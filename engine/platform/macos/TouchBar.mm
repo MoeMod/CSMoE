@@ -448,7 +448,7 @@ static NSTouchBarItemIdentifier TextItemIdentifier = @"com.csmoe.TextItemIdentif
 
 @end
 
-extern "C" void TouchBar_Install()
+void TouchBar_Install()
 {
 	// Install TouchBarProvider as application delegate
 	TouchBarProvider *touchBarProvider = [[TouchBarProvider alloc] init];

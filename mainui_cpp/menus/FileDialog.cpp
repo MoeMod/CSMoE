@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "StringArrayModel.h"
 #include "PicButton.h"
-
+namespace ui {
 #define ART_BANNER	  	"gfx/shell/head_touchoptions"
 #define ART_GAMMA		"gfx/shell/gamma"
 
@@ -161,3 +161,4 @@ void UI_FileDialog_Menu( void )
 	uiFileDialog.Show();
 }
 ADD_MENU( menu_filedialog, NULL, UI_FileDialog_Menu );
+}

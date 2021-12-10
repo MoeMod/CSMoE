@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Table.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
-
+namespace ui {
 #define ART_BANNER_LOAD "gfx/shell/head_load"
 #define ART_BANNER_SAVE "gfx/shell/head_save"
 
@@ -169,7 +169,7 @@ void CMenuSavesListModel::Update( void )
 	for ( j = 0; j < numFiles; i++, j++ )
 	{
 		if( i >= UI_MAXGAMES ) break;
-		
+
 		if( !EngFuncs::GetSaveComment( filenames[j], comment ))
 		{
 			if( comment[0] )
@@ -402,3 +402,4 @@ void UI_SaveGame_Menu( void )
 }
 ADD_MENU( menu_loadgame, UI_LoadGame_Precache, UI_LoadGame_Menu );
 ADD_MENU( menu_savegame, NULL, UI_SaveGame_Menu );
+}

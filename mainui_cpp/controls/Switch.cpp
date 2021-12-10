@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "BaseMenu.h"
 #include "Switch.h"
-
+namespace ui {
 CMenuSwitch::CMenuSwitch( ) : BaseClass( )
 {
 	bMouseToggle = true;
@@ -233,4 +233,5 @@ void CMenuSwitch::Draw( void )
 void CMenuSwitch::UpdateEditable()
 {
 	m_iState = EngFuncs::GetCvarFloat( m_szCvarName );
+}
 }

@@ -94,7 +94,8 @@ typedef enum
 	TEX_SCREENCOPY,	// keep screen copy e.g. for mirror
 	TEX_CUSTOM,	// user created texture
 	TEX_DEPTHMAP	// shadowmap texture
-} texType_t;
+} texType_e;
+typedef int texType_t;
 
 typedef enum
 {
@@ -127,7 +128,8 @@ typedef enum
 	TF_FLOAT		= (1<<26),	// float textures
 	TF_NOCOMPARE	= (1<<27),	// disable comparing for depth textures
 	TF_FLOATDATA	= (1<<28),
-} texFlags_t;
+} texFlags_e;
+typedef int texFlags_t;
 
 typedef struct beam_s BEAM;
 typedef struct particle_s particle_t;
@@ -159,6 +161,8 @@ typedef struct decallist_s
 
 	modelstate_t	studio_state;	// studio decals only
 } decallist_t;
+
+typedef struct movie_state_s	movie_state_t;
 
 typedef struct render_api_s
 {
@@ -194,13 +198,13 @@ typedef struct render_api_s
 	void		(*R_EntityRemoveDecals)( struct model_s *mod ); // remove all the decals from specified entity (BSP only)
 
 	// AVIkit support
-	void		*(*AVI_LoadVideo)( const char *filename, int ignore_hwgamma );
-	int		(*AVI_GetVideoInfo)( void *Avi, long *xres, long *yres, float *duration );
-	long		(*AVI_GetVideoFrameNumber)( void *Avi, float time );
-	byte		*(*AVI_GetVideoFrame)( void *Avi, long frame );
+	movie_state_t		*(*AVI_LoadVideo)( const char *filename, bool ignore_hwgamma );
+	int		(*AVI_GetVideoInfo)( movie_state_t *Avi, long *xres, long *yres, float *duration );
+	long		(*AVI_GetVideoFrameNumber)( movie_state_t *Avi, float time );
+	byte		*(*AVI_GetVideoFrame)( movie_state_t *Avi, long frame );
 	void		(*AVI_UploadRawFrame)( int texture, int cols, int rows, int width, int height, const byte *data );
-	void		(*AVI_FreeVideo)( void *Avi );
-	int		(*AVI_IsActive)( void *Avi );
+	void		(*AVI_FreeVideo)( movie_state_t *Avi );
+	int		(*AVI_IsActive)( movie_state_t *Avi );
 
 	// glState related calls (must use this instead of normal gl-calls to prevent de-synchornize local states between engine and the client)
 	void		(*GL_Bind)( int tmu, unsigned int texnum );

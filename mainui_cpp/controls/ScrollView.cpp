@@ -1,6 +1,6 @@
 #include "ScrollView.h"
 #include "Scissor.h"
-
+namespace ui {
 CMenuScrollView::CMenuScrollView() : CMenuItemsHolder (),
 	m_bHoldingMouse1( false )
 {
@@ -161,7 +161,8 @@ void CMenuScrollView::Draw()
 
 	Con_NPrintf( 0, "Drawn: %i Skipped: %i", drawn, skipped );
 
-	ui::Scissor::PushScissor( m_scPos, m_scSize );
+	Scissor::PushScissor( m_scPos, m_scSize );
 		CMenuItemsHolder::Draw();
-	ui::Scissor::PopScissor();
+	Scissor::PopScissor();
+}
 }

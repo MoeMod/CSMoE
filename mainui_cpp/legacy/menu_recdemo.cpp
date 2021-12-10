@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "basemenu.h"
 #include "utils.h"
 #include "keydefs.h"
-
+namespace ui {
 #define ART_BANNER	     	"gfx/shell/head_save"
 
 #define ID_BACKGROUND	0
@@ -93,7 +93,7 @@ static void UI_DeleteDialog( void )
 {
 	// toggle main menu between active\inactive
 	// show\hide remove dialog
-	uiRecDemo.record.generic.flags ^= QMF_INACTIVE; 
+	uiRecDemo.record.generic.flags ^= QMF_INACTIVE;
 	uiRecDemo.remove.generic.flags ^= QMF_INACTIVE;
 	uiRecDemo.cancel.generic.flags ^= QMF_INACTIVE;
 	uiRecDemo.demosList.generic.flags ^= QMF_INACTIVE;
@@ -153,7 +153,7 @@ static void UI_RecDemo_GetDemoList( void )
 	for( j = 0; j < numFiles; i++, j++ )
 	{
 		if( i >= UI_MAXGAMES ) break;
-		
+
 		if( !GET_DEMO_COMMENT( filenames[j], comment ))
 		{
 			if( strlen( comment ))
@@ -224,7 +224,7 @@ static void UI_RecDemo_Callback( void *self, int event )
 
 	if( event != QM_ACTIVATED )
 		return;
-	
+
 	switch( item->id )
 	{
 	case ID_CANCEL:
@@ -293,7 +293,7 @@ static void UI_RecDemo_Ownerdraw( void *self )
 		y = LEVELSHOT_Y;
 		w = LEVELSHOT_W;
 		h = LEVELSHOT_H;
-		
+
 		UI_ScaleCoords( &x, &y, &w, &h );
 
 		if( strlen( uiRecDemo.demoName[uiRecDemo.demosList.curItem] ))
@@ -484,4 +484,5 @@ void UI_RecDemo_Menu( void )
 	UI_RecDemo_Init();
 
 	UI_PushMenu( &uiRecDemo.menu );
+}
 }

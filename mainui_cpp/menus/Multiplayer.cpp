@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "imgui_menu/imgui_menu_msgbox.h"
 #include "imgui_menu/imgui_menu_server.h"
 #endif
-
+namespace ui {
 #define ART_BANNER			"gfx/shell/head_multi"
 
 class CMenuMultiplayer : public CMenuFramework
@@ -109,7 +109,7 @@ void UI_MultiPlayer_Menu( void )
 		return;
 #ifdef XASH_IMGUI
 	//ui::MsgBox_Open("是否要连接柑橘服务器？", std::bind(EngFuncs::ClientCmd, false, "connect z4cs.com:5555\n"));
-	ui::Server_Open();
+	Server_Open();
 #else
 	uiMultiPlayer.Show();
 
@@ -124,3 +124,4 @@ void UI_MultiPlayer_Menu( void )
 #endif
 }
 ADD_MENU( menu_multiplayer, UI_MultiPlayer_Precache, UI_MultiPlayer_Menu );
+}

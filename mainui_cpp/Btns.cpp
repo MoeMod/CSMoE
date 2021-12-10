@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "BtnsBMPTable.h"
 #include "port.h"
 #include <string.h>
-
+namespace ui {
 #define ART_BUTTONS_MAIN		"gfx/shell/btns_main.bmp"	// we support bmp only
 
 #if _WIN32
@@ -151,4 +151,5 @@ void UI_LoadBmpButtons( void )
 
 	FREE( raw_img_buff );
 	EngFuncs::COM_FreeFile( bmp_buffer );
+}
 }

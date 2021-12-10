@@ -19,7 +19,7 @@ GNU General Public License for more details.
 
 #include "BaseItem.h"
 #include "BaseModel.h"
-
+namespace ui {
 #define MAX_TABLE_COLUMNS 16
 
 /*
@@ -187,6 +187,6 @@ private:
 
 	CMenuBaseModel *m_pModel;
 };
-
+}
 
 #endif // MENU_TABLE_H

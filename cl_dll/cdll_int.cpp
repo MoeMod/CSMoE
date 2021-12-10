@@ -60,7 +60,7 @@ void IN_Commands( void );
 void Input_Shutdown (void);
 
 #ifdef XASH_STATIC_GAMELIB
-extern "C" int FS_GetAPI(fs_api_t * g_api);
+int FS_GetAPI(fs_api_t * g_api);
 #endif
 
 /*

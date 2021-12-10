@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "ItemsHolder.h"
 #include "Scissor.h"
 #include <string.h>
-
+namespace ui {
 CMenuItemsHolder::CMenuItemsHolder() :
 	BaseClass(), m_iCursor( 0 ), m_iCursorPrev( 0 ), m_pItems( ), m_numItems( 0 ),
 	m_events(), m_numEvents( 0 ), m_bInit( false ),
@@ -645,4 +645,5 @@ bool CMenuItemsHolder::KeyValueData(const char *key, const char *data)
 Point CMenuItemsHolder::GetPositionOffset() const
 {
 	return m_scPos;
+}
 }

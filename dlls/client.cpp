@@ -3604,7 +3604,7 @@ void EXT_FUNC ClientUserInfoChanged(edict_t *pEntity, char *infobuffer)
 
 	CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance(pEntity);
 
-	char *szBufferName = GET_KEY_VALUE(infobuffer, "name");
+	const char *szBufferName = GET_KEY_VALUE(infobuffer, "name");
 	int iClientIndex = pPlayer->entindex();
 
 	// msg everyone if someone changes their name,  and it isn't the first time (changing no name to current name)

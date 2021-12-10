@@ -110,7 +110,7 @@ void Cvar_SetLatched( const char *var_name, const char *value );
 void Cvar_SetFloat( const char *var_name, float value );
 float Cvar_VariableValue( const char *var_name );
 int Cvar_VariableInteger( const char *var_name );
-char *Cvar_VariableString( const char *var_name );
+const char *Cvar_VariableString( const char *var_name );
 void Cvar_DirectSet( cvar_t *var, const char *value );
 void Cvar_Reset( const char *var_name );
 void Cvar_SetCheatState( qboolean force );
@@ -131,8 +131,8 @@ void Cbuf_AddFilterText( const char *text );
 void Cbuf_InsertText( const char *text );
 void Cbuf_Execute (void);
 int Cmd_Argc( void );
-char *Cmd_Args( void );
-char *Cmd_Argv( int arg );
+const char *Cmd_Args( void );
+const char *Cmd_Argv( int arg );
 void Cmd_Init( void );
 void Cmd_Shutdown( void );
 void Cmd_Unlink( int group );
@@ -239,6 +239,18 @@ static inline const char *Q_strchr( const char *s, char c )
 	return strchr( s, c );
 }
 static inline const char *Q_strrchr( const char *s, char c )
+{
+	if( !s )
+		return NULL;
+	return strrchr( s, c );
+}
+static inline char *Q_strchr( char *s, char c )
+{
+	if( !s )
+		return NULL;
+	return strchr( s, c );
+}
+static inline char *Q_strrchr( char *s, char c )
 {
 	if( !s )
 		return NULL;

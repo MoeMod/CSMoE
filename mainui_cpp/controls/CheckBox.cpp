@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "CheckBox.h"
 #include "Utils.h"
-
+namespace ui {
 CMenuCheckBox::CMenuCheckBox() : BaseClass()
 {
 	SetCharSize( QM_DEFAULTFONT );
@@ -190,4 +190,5 @@ void CMenuCheckBox::Draw( void )
 void CMenuCheckBox::UpdateEditable()
 {
 	bChecked = !!EngFuncs::GetCvarFloat( m_szCvarName );
+}
 }

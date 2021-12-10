@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "YesNoMessageBox.h"
 #include "StringArrayModel.h"
-
+namespace ui {
 #define ART_BANNER	  	"gfx/shell/head_touch_options"
 
 static class CMenuTouchOptions : public CMenuFramework
@@ -382,7 +382,7 @@ void CMenuTouchOptions::_Init( void )
 
 	msgBox.SetPositiveButton( "Ok", PC_OK );
 	msgBox.Link( this );
-	
+
 	AddItem( background );
 	AddItem( banner );
 	AddItem( done );
@@ -460,3 +460,4 @@ void UI_TouchOptions_Menu( void )
 	uiTouchOptions.Show();
 }
 ADD_MENU( menu_touchoptions, UI_TouchOptions_Precache, UI_TouchOptions_Menu );
+}

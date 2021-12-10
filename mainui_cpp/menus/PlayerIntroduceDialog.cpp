@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "MessageBox.h"
 #include "Field.h"
 #include "PlayerIntroduceDialog.h"
-
+namespace ui {
 static class CMenuPlayerIntroduceDialog : public CMenuYesNoMessageBox
 {
 public:
@@ -105,4 +105,5 @@ void UI_PlayerIntroduceDialog_Show( CMenuBaseWindow *pCaller )
 {
 	uiIntroduceDialog.pCaller = pCaller;
 	uiIntroduceDialog.Show();
+}
 }

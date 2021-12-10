@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "PlayerModelView.h"
-
+namespace ui {
 CMenuPlayerModelView::CMenuPlayerModelView() : CMenuBaseItem()
 {
 	memset( &refdef, 0, sizeof( refdef ) );
@@ -235,4 +235,5 @@ void CMenuPlayerModelView::CalcFov( )
 	float x = refdef.viewport[2] / tan( DEG2RAD( refdef.fov_x ) * 0.5f );
 	float half_fov_y = atan( refdef.viewport[3] / x );
 	refdef.fov_y = RAD2DEG( half_fov_y ) * 2;
+}
 }

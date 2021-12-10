@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 
 #include "Editable.h"
-
+namespace ui {
 CMenuEditable::CMenuEditable() : BaseClass(),
 	m_szCvarName(), m_eType(), m_bForceUpdate( false ),
 	m_szString(), m_szOriginalString(),
@@ -150,4 +150,4 @@ void CMenuEditable::WriteCvar()
 		}
 	}
 }
-
+}

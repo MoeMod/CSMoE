@@ -30,6 +30,7 @@ GNU General Public License for more details.
 
 #include "imgui_menu_msgbox.h"
 
+#include "enginecallback_menu.h"
 #include "TSourceEngineQuery.h"
 #include "parse_ip.h"
 #include "RequestHTTPS.h"
@@ -37,7 +38,6 @@ GNU General Public License for more details.
 using namespace std::chrono_literals;
 
 namespace ui {
-	static bool s_server_first_open = false;
 	static bool s_server_open = false;
 	static boost::asio::io_context s_server_ioc;
 
@@ -107,10 +107,6 @@ namespace ui {
 
 	void Server_OnGui()
 	{
-		if(!std::exchange(s_server_first_open, true))
-		{
-			Server_Open();
-		}
 		if(!s_server_open)
 			return;
 		ImGui::SetNextWindowSizeConstraints(ImGuiUtils::GetScaledSize({480, 320}), ImGui::GetIO().DisplaySize);

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #define MENU_BITMAP_H
 
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuBitmap : public CMenuBaseItem
 {
 public:
@@ -77,6 +77,6 @@ public:
 	void SetInactive(bool) override { }
 	void ToggleInactive() override { }
 };
-
+}
 
 #endif // MENU_BITMAP_H

@@ -18,8 +18,8 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Utils.h"
 #include "MenuStrings.h"
-#include "unicode_strtools.h"
-
+#include "utl/unicode_strtools.h"
+namespace ui {
 #define EMPTY_STRINGS_1 ""
 #define EMPTY_STRINGS_2 EMPTY_STRINGS_1, EMPTY_STRINGS_1
 #define EMPTY_STRINGS_5 EMPTY_STRINGS_2, EMPTY_STRINGS_2, EMPTY_STRINGS_1
@@ -54,12 +54,12 @@ EMPTY_STRINGS_2, // 182..183
 "Mouse sensitivity", // 184
 EMPTY_STRINGS_1, // 185
 EMPTY_STRINGS_2, // 186..187
-"Return to game.", // 188
-"Start a new game.", // 189
+"返回游戏", // 188
+"单机试玩", // 189
 EMPTY_STRINGS_1,	// 190
 "Load a previously saved game.", // 191
 "Load a saved game, save the current game.", // 192
-"Change game settings, configure controls", // 193
+"游戏设置", // 193
 EMPTY_STRINGS_20, // 194..213
 EMPTY_STRINGS_20, // 214..233
 "Starting a Hazard Course will exit\nany current game, OK to exit?", // 234
@@ -153,10 +153,10 @@ static void UI_InitAliasStrings( void )
 	sprintf( token, "Play %s on the 'difficult' skill setting", gMenu.m_gameinfo.title );
 	MenuStrings[IDS_NEWGAME_DIFFICULTHELP] = StringCopy( token );
 
-	sprintf( token, "Quit playing %s", gMenu.m_gameinfo.title );
+	sprintf( token, "退出 %s", gMenu.m_gameinfo.title );
 	MenuStrings[IDS_MAIN_QUITHELP] = StringCopy( token );
 
-	sprintf( token, "Search for %s servers, configure character", gMenu.m_gameinfo.title );
+	sprintf( token, "联机游戏" );
 	MenuStrings[IDS_MAIN_MULTIPLAYERHELP] = StringCopy( token );
 }
 
@@ -325,7 +325,7 @@ void UI_LoadCustomStrings( void )
 	EngFuncs::COM_FreeFile( afile );
 }
 
-const char *L( const char *szStr ) // L means Localize!
+const char *Localize( const char *szStr ) // L means Localize!
 {
 	if( szStr )
 	{
@@ -345,4 +345,5 @@ const char *L( const char *szStr ) // L means Localize!
 void UI_FreeCustomStrings( void )
 {
 	Localize_Free();
+}
 }

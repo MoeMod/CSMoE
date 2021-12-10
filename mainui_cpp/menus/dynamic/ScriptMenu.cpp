@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Field.h"
 #include "ItemsHolder.h"
 #include "Action.h"
-
+namespace ui {
 #define ART_BANNER_SERVER "gfx/shell/head_advoptions"
 #define ART_BANNER_USER "gfx/shell/head_gameopts"
 #define IGNORE_ALREADY_USED_CVARS 1
@@ -262,7 +262,7 @@ void CMenuScriptConfig::_Init( void )
 
 		editable->iFlags |= QMF_NOTIFY;
 		// editable->szName = var->name;
-		editable->szStatusText = L( var->desc );
+		editable->szStatusText = Localize( var->desc );
 		editable->SetCharSize( QM_SMALLFONT );
 		editable->LinkCvar( var->name, cvarType );
 		editable->iFlags &= ~(QMF_GRAYED|QMF_INACTIVE|QMF_MOUSEONLY);
@@ -364,4 +364,5 @@ bool UI_AdvUserOptions_IsAvailable()
 bool UI_AdvServerOptions_IsAvailable()
 {
 	return staticServerOptions.m_pVars != NULL;
+}
 }

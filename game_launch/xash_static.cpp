@@ -11,7 +11,7 @@
 typedef void(*pfnChangeGame)(const char *progname);
 typedef int(*pfnInit)(int argc, char **argv, const char *progname, int bChangeGame, pfnChangeGame func);
 
-extern "C" int Host_Main(int szArgc, const char** szArgv, const char* szGameDir, int chg, void* callback);
+int Host_Main(int szArgc, const char** szArgv, const char* szGameDir, int chg, pfnChangeGame callback);
 
 #ifdef _WIN32
 int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int nShow)

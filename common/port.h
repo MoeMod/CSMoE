@@ -1,12 +1,10 @@
 /*
 port.h -- Portability Layer for Windows types
 Copyright (C) 2015 Alibek Omarov
-
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -91,6 +89,7 @@ GNU General Public License for more details.
 	#endif
 
 	#define VGUI_SUPPORT_DLL "libvgui_support." OS_LIB_EXT
+	#define VGUI2_SUPPORT_DLL "libvgui2_support." OS_LIB_EXT
 
 	// Windows-specific
 #ifndef __HAIKU__
@@ -160,9 +159,10 @@ GNU General Public License for more details.
 	#undef HSPRITE
 
 	#define OS_LIB_EXT "dll"
-	#define MENUDLL "menu"ARCH_SUFFIX"." OS_LIB_EXT
-	#define CLIENTDLL "client"ARCH_SUFFIX"." OS_LIB_EXT
+	#define MENUDLL "menu" ARCH_SUFFIX "." OS_LIB_EXT
+	#define CLIENTDLL "client" ARCH_SUFFIX "." OS_LIB_EXT
 	#define VGUI_SUPPORT_DLL "../vgui_support." OS_LIB_EXT
+	#define VGUI2_SUPPORT_DLL "../vgui2_support." OS_LIB_EXT
 	#include <limits.h>
 
 	#include <io.h>
@@ -204,5 +204,7 @@ static __inline float cbrt(float f)
 #ifndef USHRT_MAX
 #define USHRT_MAX 65535
 #endif
+
+#include "minmax.h"
 
 #endif // PORT_H

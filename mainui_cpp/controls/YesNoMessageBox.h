@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "ItemsHolder.h"
 #include "BaseWindow.h"
-
+namespace ui {
 class CMenuYesNoMessageBox : public CMenuBaseWindow
 {
 public:
@@ -61,5 +61,5 @@ private:
 	bool m_bSetYes, m_bSetNo;
 	bool m_bIsAlert;
 };
-
+}
 #endif // MENU_GENERICMSGBOX_H

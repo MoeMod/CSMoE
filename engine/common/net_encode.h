@@ -52,8 +52,8 @@ enum
 typedef struct
 {
 	const char	*name;
-	const int		offset;
-	const int		size;
+	const size_t		offset;
+	const size_t		size;
 } delta_field_t;
 
 // one field
@@ -95,7 +95,7 @@ void Delta_Shutdown( void );
 void Delta_InitFields( void );
 int Delta_NumTables( void );
 delta_info_t *Delta_FindStructByIndex( int index );
-void Delta_AddEncoder( char *name, pfnDeltaEncode encodeFunc );
+void Delta_AddEncoder( const char *name, pfnDeltaEncode encodeFunc );
 int Delta_FindField( delta_t *pFields, const char *fieldname );
 void Delta_SetField( delta_t *pFields, const char *fieldname );
 void Delta_UnsetField( delta_t *pFields, const char *fieldname );

@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #define BITMAPFONT_H
 
 #include "BaseFontBackend.h"
-
+namespace ui {
 class CBitmapFont : public CBaseFont
 {
 public:
@@ -39,5 +39,5 @@ private:
 	HIMAGE hImage;
 	int iImageWidth, iImageHeight;
 };
-
+}
 #endif // BITMAPFONT_H

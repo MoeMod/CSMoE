@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "PicButton.h"
 #include "Slider.h"
 #include "CheckBox.h"
-
+namespace ui {
 #define ART_BANNER	  	"gfx/shell/head_vidoptions"
 #define ART_GAMMA		"gfx/shell/gamma"
 
@@ -246,3 +246,4 @@ void UI_VidOptions_Menu( void )
 	uiVidOptions.Show();
 }
 ADD_MENU( menu_vidoptions, UI_VidOptions_Precache, UI_VidOptions_Menu );
+}

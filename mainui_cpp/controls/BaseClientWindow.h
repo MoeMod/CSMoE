@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #define BASECLIENTWINDOW_H
 
 #include "BaseWindow.h"
-
+namespace ui {
 class CMenuBaseClientWindow : public CMenuBaseWindow
 {
 public:
@@ -26,5 +26,5 @@ public:
 
 	const char *Key( int key, int down ) override;
 };
-
+}
 #endif // BASECLIENTWINDOW_H

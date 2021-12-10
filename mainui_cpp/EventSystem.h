@@ -61,6 +61,7 @@ GNU General Public License for more details.
 #ifdef _MSC_VER
 #pragma pointers_to_members( full_generality, virtual_inheritance )  
 #endif
+namespace ui {
 class CMenuBaseItem;
 class CMenuItemsHolder;
 
@@ -159,6 +160,6 @@ private:
 
 	friend class CMenuItemsHolder;
 };
-
+}
 
 #endif // EVENTSYSTEM_H

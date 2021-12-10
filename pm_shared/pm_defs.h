@@ -191,7 +191,7 @@ typedef struct playermove_s
 	void		(*Con_Printf)( const char *fmt, ... );
 	double		(*Sys_FloatTime)( void );
 	void		(*PM_StuckTouch)( int hitent, pmtrace_t *ptraceresult );
-	int		(*PM_PointContents)( float *p, int *truecontents /*filled in if this is non-null*/ );
+	int		(*PM_PointContents)( const float *p, int *truecontents /*filled in if this is non-null*/ );
 	int		(*PM_TruePointContents)( float *p );
 	int		(*PM_HullPointContents)( struct hull_s *hull, int num, float *p );
     pmtrace_t		(*PM_PlayerTrace)( float *start, float *end, int traceFlags, int ignore_pe );
@@ -202,8 +202,8 @@ typedef struct playermove_s
 	void		(*PM_GetModelBounds)( struct model_s *mod, float *mins, float *maxs );
 	void		*(*PM_HullForBsp)( physent_t *pe, float *offset );
 	float		(*PM_TraceModel)( physent_t *pEnt, float *start, float *end, trace_t *trace );
-	int		(*COM_FileSize)( char *filename );
-	byte		*(*COM_LoadFile)( const char *path, int usehunk, int *pLength );
+	int		(*COM_FileSize)( const char *filename );
+	char		*(*COM_LoadFile)( const char *path, int usehunk, int *pLength );
 	void		(*COM_FreeFile)( void *buffer );
 	char		*(*memfgets)( byte *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize );
 

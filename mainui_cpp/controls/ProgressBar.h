@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #define CMENUPROGRESSBAR_H
 
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuProgressBar : public CMenuBaseItem
 {
 public:
@@ -31,5 +31,5 @@ private:
 	float m_flMin, m_flMax, m_flValue;
 	cvar_t *m_pCvar;
 };
-
+}
 #endif // CMENUPROGRESSBAR_H

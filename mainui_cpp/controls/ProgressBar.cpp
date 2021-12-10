@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "ProgressBar.h"
-
+namespace ui {
 CMenuProgressBar::CMenuProgressBar() : BaseClass()
 {
 	m_flMin = 0.0f;
@@ -60,4 +60,5 @@ void CMenuProgressBar::Draw( void )
 
 	// draw the rectangle
 	UI_DrawRectangle( m_scPos, m_scSize, uiInputFgColor );
+}
 }

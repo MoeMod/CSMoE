@@ -282,11 +282,19 @@ void IN_Commands ( void )
 	//gEngfuncs.Con_Printf("IN_Commands\n");
 }
 
-void IN_Shutdown ( void )
+#ifdef XASH_STATIC_GAMELIB
+void IN_Shutdown_CL (void)
+#else
+void IN_Shutdown (void)
+#endif
 {
 }
 // Register cvars and reset data
-void IN_Init( void )
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void)
+#else
+void IN_Init (void)
+#endif
 {
 	sensitivity = gEngfuncs.pfnRegisterVariable ( "sensitivity", "3", FCVAR_ARCHIVE );
 	in_joystick = gEngfuncs.pfnRegisterVariable ( "joystick", "0", FCVAR_ARCHIVE );

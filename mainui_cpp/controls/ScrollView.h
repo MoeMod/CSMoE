@@ -2,7 +2,7 @@
 #define SCROLLVIEW_H
 
 #include "ItemsHolder.h"
-
+namespace ui {
 class CMenuScrollView : public CMenuItemsHolder
 {
 	typedef CMenuItemsHolder BaseClass;
@@ -30,5 +30,5 @@ private:
 	int m_iMax;
 	// float m_flOverScrolling;
 };
-
+}
 #endif // SCROLLVIEW_H

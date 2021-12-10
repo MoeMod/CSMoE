@@ -1,7 +1,7 @@
 #pragma once
 #ifndef FONT_RENDERER_H
 #define FONT_RENDERER_H
-
+namespace ui {
 typedef int HFont; // handle to a font
 
 enum EFontFlags
@@ -107,6 +107,6 @@ private:
 	HFont m_hForceHandle;
 	friend class CFontManager;
 };
-
+}
 
 #endif // FONT_RENDERER_H

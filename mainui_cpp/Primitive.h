@@ -15,7 +15,7 @@ GNU General Public License for more details.
 #pragma once
 #ifndef PRIMITIVE_H
 #define PRIMITIVE_H
-
+namespace ui {
 #define BIT( x ) ( 1U << x )
 
 #ifdef _MSC_VER
@@ -196,5 +196,5 @@ inline Point& Point::operator -=(const Size &a)
 	y -= a.h;
 	return *this;
 }
-
+}
 #endif // PRIMITIVE_H

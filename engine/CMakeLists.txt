@@ -20,7 +20,7 @@
 # SOFTWARE.
 #
 cmake_minimum_required(VERSION  3.6.0)
-project(XASH_ENGINE C CXX)
+project(XASH_ENGINE CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -60,13 +60,7 @@ endif()
 option(XASH_NO_ASYNC_NS_RESOLVE "Disable asynchronous domain name resolving." OFF)
 
 option(XASH_VECTORIZE_SINCOS "Try to use vectorized versions of sin(), cos() and sincos()" ON)
-
-# Desktop or dedicated version options
-if(XASH_DEDICATED)
-	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" ON)
-else()
-	option(XASH_SINGLE_BINARY "Don't build game launcher and build engine as executable" OFF)
-endif()
+option(XASH_SKIPCRTLIB "Use system CRT" ON)
 
 option(XASH_CPUINFO "Build with cpuinfo support" ON)
 if(IOS)
@@ -74,118 +68,116 @@ if(IOS)
 endif()
 
 set(XASH_ENGINE_SOURCES 
-	common/avikit.c
-	common/build.c
-	common/base_cmd.c
-	common/cfgscript.c
-	common/cmd.c
-	common/common.c
-	common/con_utils.c
-	common/crclib.c
-	common/crtlib.c
-	common/cvar.c
-	common/filesystem.c
-	common/host.c
-	common/hpak.c
-	common/infostring.c
-	common/identification.c
-#	common/library.c
-	common/masterlist.c
-	common/mathlib.c
-	common/matrixlib.c
-	common/mod_studio.c
-	common/model.c
-	common/net_buffer.c
-	common/net_chan.c
-	common/net_encode.c
-	common/net_huff.c
-	common/network.c
-	common/pm_surface.c
-	common/pm_trace.c
-	common/random.c
-	common/sys_con.c
-	common/system.c
-	common/titles.c
-	common/world.c
-	common/zone.c
-	common/crashhandler.c
-	common/imagelib/img_bmp.c
-	common/imagelib/img_main.c
-	common/imagelib/img_quant.c
-	common/imagelib/img_tga.c
-	common/imagelib/img_utils.c
-	common/imagelib/img_wad.c
-	common/imagelib/img_dds.c
-	common/soundlib/snd_main.c
-	common/soundlib/snd_mp3.c
-	common/soundlib/snd_utils.c
-	common/soundlib/snd_wav.c
-	common/soundlib/libmpg/dct36.c
-	common/soundlib/libmpg/dct64.c
-	common/soundlib/libmpg/format.c
-	common/soundlib/libmpg/frame.c
-	common/soundlib/libmpg/index.c
-	common/soundlib/libmpg/layer3.c
-	common/soundlib/libmpg/libmpg.c
-	common/soundlib/libmpg/mpg123.c
-	common/soundlib/libmpg/parse.c
-	common/soundlib/libmpg/reader.c
-	common/soundlib/libmpg/synth.c
-	common/soundlib/libmpg/tabinit.c
-	common/Sequence.c
+	common/avikit.cpp
+	common/build.cpp
+	common/base_cmd.cpp
+	common/cfgscript.cpp
+	common/cmd.cpp
+	common/common.cpp
+	common/con_utils.cpp
+	common/crclib.cpp
+	common/crtlib.cpp
+	common/cvar.cpp
+	common/filesystem.cpp
+	common/host.cpp
+	common/hpak.cpp
+	common/infostring.cpp
+	common/identification.cpp
+#	common/library.cpp
+	common/masterlist.cpp
+	common/mathlib.cpp
+	common/matrixlib.cpp
+	common/mod_studio.cpp
+	common/model.cpp
+	common/net_buffer.cpp
+	common/net_chan.cpp
+	common/net_encode.cpp
+	common/net_huff.cpp
+	common/network.cpp
+	common/pm_surface.cpp
+	common/pm_trace.cpp
+	common/random.cpp
+	common/sys_con.cpp
+	common/system.cpp
+	common/titles.cpp
+	common/world.cpp
+	common/zone.cpp
+	common/crashhandler.cpp
+	common/imagelib/img_bmp.cpp
+	common/imagelib/img_main.cpp
+	common/imagelib/img_quant.cpp
+	common/imagelib/img_tga.cpp
+	common/imagelib/img_utils.cpp
+	common/imagelib/img_wad.cpp
+	common/imagelib/img_dds.cpp
+	common/soundlib/snd_main.cpp
+	common/soundlib/snd_mp3.cpp
+	common/soundlib/snd_utils.cpp
+	common/soundlib/snd_wav.cpp
+	common/soundlib/libmpg/dct36.cpp
+	common/soundlib/libmpg/dct64.cpp
+	common/soundlib/libmpg/format.cpp
+	common/soundlib/libmpg/frame.cpp
+	common/soundlib/libmpg/index.cpp
+	common/soundlib/libmpg/layer3.cpp
+	common/soundlib/libmpg/libmpg.cpp
+	common/soundlib/libmpg/mpg123.cpp
+	common/soundlib/libmpg/parse.cpp
+	common/soundlib/libmpg/reader.cpp
+	common/soundlib/libmpg/synth.cpp
+	common/soundlib/libmpg/tabinit.cpp
+	common/Sequence.cpp
 	common/IceKey.cpp
 	common/mod_decryptor.cpp 
 	common/mod_extend_seq.cpp 
-	common/cpu.c
-	common/textconsole.c
-
-
-		server/sv_client.c
-	server/sv_cmds.c
-	server/sv_custom.c
-	server/sv_frame.c
-	server/sv_filter.c
-	server/sv_game.c
-	server/sv_init.c
-	server/sv_main.c
-	server/sv_log.c
-	server/sv_move.c
-	server/sv_phys.c
-	server/sv_pmove.c
-	server/sv_save.c
-	server/sv_world.c
+	common/cpu.cpp
+	common/textconsole.cpp
+	server/sv_client.cpp
+	server/sv_cmds.cpp
+	server/sv_custom.cpp
+	server/sv_frame.cpp
+	server/sv_filter.cpp
+	server/sv_game.cpp
+	server/sv_init.cpp
+	server/sv_main.cpp
+	server/sv_log.cpp
+	server/sv_move.cpp
+	server/sv_phys.cpp
+	server/sv_pmove.cpp
+	server/sv_save.cpp
+	server/sv_world.cpp
 
 )
 
 if(XASH_STATIC_GAMELIB)
-	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.c)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.cpp)
 else()
-	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.c)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.cpp)
 endif()
 
 if(NOT XASH_DEDICATED)
 	set(XASH_ENGINE_WIN32_SOURCES
-		./platform/win32/con_win.c
+		./platform/win32/con_win.cpp
 		./platform/win32/ime_win32.cpp
 	)
 
 	set(XASH_ENGINE_SDL_SOURCES
-		./platform/sdl/events.c
-		./platform/sdl/gl_sdl.c
-		./platform/sdl/snd_sdl.c
-		./platform/sdl/vid_sdl.c
+		./platform/sdl/events.cpp
+		./platform/sdl/gl_sdl.cpp
+		./platform/sdl/snd_sdl.cpp
+		./platform/sdl/vid_sdl.cpp
 	)
 
 	set(XASH_ENGINE_ANDROID_SOURCES
-	   platform/android/vid_android.c
-	   platform/android/android_nosdl.c
-	   platform/android/snd_opensles.c
+	   platform/android/vid_android.cpp
+	   platform/android/android_nosdl.cpp
+	   platform/android/snd_opensles.cpp
 	   platform/ime_stub.cpp
 	)
 
 	if(IOS)
 	set(XASH_ENGINE_APPLE_SOURCES
-		common/launcher.c
+		common/launcher.cpp
 		platform/iOS/TapicEngine.mm
 		platform/ime_stub.cpp
 	)
@@ -200,57 +192,57 @@ if(NOT XASH_DEDICATED)
 endif()
 
 set(XASH_ENGINE_CLIENT_SOURCES
-   client/cl_cmds.c
-   client/cl_demo.c
-   client/cl_events.c
-   client/cl_frame.c
-   client/cl_game.c
-   client/cl_main.c
-   client/cl_menu.c
-   client/cl_mobile.c
-   client/cl_parse.c
-   client/cl_pmove.c
-   client/cl_remap.c
-   client/cl_scrn.c
-   client/cl_tent.c
-   client/cl_video.c
-   client/cl_view.c
-   client/cl_netgraph.c
-   client/gl_backend.c
-   client/gl_beams.c
-   client/gl_cull.c
-   client/gl_decals.c
-   client/gl_draw.c
-   client/gl_image.c
-   client/gl_mirror.c
-   client/gl_refrag.c
-   client/gl_rlight.c
-   client/gl_rmain.c
-   client/gl_rmath.c
-   client/gl_rmisc.c
-   client/gl_rpart.c
-   client/gl_rsurf.c
-   client/gl_rstrobe.c
-   client/gl_sprite.c
-   client/gl_studio.c
-   client/vid_common.c
-   client/gl_warp.c
-   client/joyinput.c
-   client/input.c
-   client/keys.c
-   client/input_evdevkey.c
-   client/console.c
-   client/touch.c
-   client/gamma.c
-   client/s_dsp.c
-   client/s_load.c
-   client/s_main.c
-   client/s_mix.c
-   client/s_mouth.c
-   client/s_stream.c
-   client/s_utils.c
-   client/s_vox.c
-   client/vgui/vgui_draw.c
+   client/cl_cmds.cpp
+   client/cl_demo.cpp
+   client/cl_events.cpp
+   client/cl_frame.cpp
+   client/cl_game.cpp
+   client/cl_main.cpp
+   client/cl_menu.cpp
+   client/cl_mobile.cpp
+   client/cl_parse.cpp
+   client/cl_pmove.cpp
+   client/cl_remap.cpp
+   client/cl_scrn.cpp
+   client/cl_tent.cpp
+   client/cl_video.cpp
+   client/cl_view.cpp
+   client/cl_netgraph.cpp
+   client/gl_backend.cpp
+   client/gl_beams.cpp
+   client/gl_cull.cpp
+   client/gl_decals.cpp
+   client/gl_draw.cpp
+   client/gl_image.cpp
+   client/gl_mirror.cpp
+   client/gl_refrag.cpp
+   client/gl_rlight.cpp
+   client/gl_rmain.cpp
+   client/gl_rmath.cpp
+   client/gl_rmisc.cpp
+   client/gl_rpart.cpp
+   client/gl_rsurf.cpp
+   client/gl_rstrobe.cpp
+   client/gl_sprite.cpp
+   client/gl_studio.cpp
+   client/vid_common.cpp
+   client/gl_warp.cpp
+   client/joyinput.cpp
+   client/input.cpp
+   client/keys.cpp
+   client/input_evdevkey.cpp
+   client/console.cpp
+   client/touch.cpp
+   client/gamma.cpp
+   client/s_dsp.cpp
+   client/s_load.cpp
+   client/s_main.cpp
+   client/s_mix.cpp
+   client/s_mouth.cpp
+   client/s_stream.cpp
+   client/s_utils.cpp
+   client/s_vox.cpp
+   client/vgui/vgui_draw.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES
@@ -263,11 +255,11 @@ set(XASH_ENGINE_IMGUI_SOURCES
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES
-	common/dedicated.c
+	common/dedicated.cpp
 )
 
 set(XASH_ENGINE_LAUNCHER_SOURCES
-	common/launcher.c
+	common/launcher.cpp
 )
 
 if(WIN32)
@@ -378,6 +370,9 @@ add_definitions(-DXASH_FORCEINLINE)
 
 if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version that requires SSE
 	add_definitions(-DVECTORIZE_SINCOS)
+endif()
+if(XASH_SKIPCRTLIB)
+	add_definitions(-DXASH_SKIPCRTLIB)
 endif()
 
 if(ANDROID)

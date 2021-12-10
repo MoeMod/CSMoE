@@ -17,12 +17,11 @@ GNU General Public License for more details.
 #include "imgui.h"
 #include "imgui_utils.h"
 #include "QRCode.h"
-extern "C" {
+
 #include "common.h"
 #include "crtlib.h"
 #include "eiface.h"
 #include "gl_local.h"
-}
 
 #include <vector>
 #include <algorithm>

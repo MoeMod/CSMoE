@@ -17,6 +17,7 @@ GNU General Public License for more details.
 /*
  * Taken from HLSDK 2.3
  */
+namespace ui {
 #define IDS_LANGUAGE                    1
 #define IDS_BORDERLESS_REGFAIL          2
 #define IDS_CHAT_IGNORE_MISLINKED       3
@@ -615,5 +616,5 @@ GNU General Public License for more details.
 #define IDS_LAST                        600
 
 extern const char *MenuStrings[IDS_LAST];
-
+}
 

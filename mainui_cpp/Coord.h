@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma once
 #ifndef COORD_H
 #define COORD_H
-
+namespace ui {
 struct Point
 {
 	Point() { x = y = 0; }
@@ -58,5 +58,5 @@ struct Size
 	int w, h;
 	Size Scale();
 };
-
+}
 #endif // COORD_H

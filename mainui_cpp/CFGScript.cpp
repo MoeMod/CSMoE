@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "enginecallback_menu.h"
 #include "CFGScript.h"
-
+namespace ui {
 #define CVAR_USERINFO BIT(1)
 
 
@@ -193,7 +193,7 @@ bool CSCR_ParseSingleCvar( parserstate_t *ps, scrvardef_t *result )
 		for( int i = 0; entry; entry = entry->next, i++ )
 		{
 
-			result->list.pArray[i] = L( entry->szName );
+			result->list.pArray[i] = Localize( entry->szName );
 		}
 	}
 
@@ -370,4 +370,5 @@ void CSCR_FreeList( scrvardef_t *list )
 		delete i;
 		i = next;
 	}
+}
 }

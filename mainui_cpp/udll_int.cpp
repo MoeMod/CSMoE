@@ -18,16 +18,15 @@ GNU General Public License for more details.
 #include "BaseMenu.h"
 #include "Utils.h"
 
+namespace ui
+{
 ui_enginefuncs_t EngFuncs::engfuncs;
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
 ui_textfuncs_t	EngFuncs::textfuncs;
 #endif
 
-namespace ui
-{
 ui_globalvars_t	*gpGlobals;
 fs_api_t gFileSystemAPI = { };
-}
 
 CMenu gMenu;
 
@@ -55,6 +54,7 @@ static UI_FUNCTIONS gFunctionTable =
 	nullptr
 #endif
 };
+}
 
 //=======================================================================
 //			GetApi
@@ -67,12 +67,12 @@ extern "C" EXPORT int GetMenuAPI(UI_FUNCTIONS *pFunctionTable, ui_enginefuncs_t*
 	}
 
 	// copy HUD_FUNCTIONS table to engine, copy engfuncs table from engine
-	memcpy( pFunctionTable, &gFunctionTable, sizeof( UI_FUNCTIONS ));
-	memcpy( &EngFuncs::engfuncs, pEngfuncsFromEngine, sizeof( ui_enginefuncs_t ));
+	memcpy( pFunctionTable, &ui::gFunctionTable, sizeof( UI_FUNCTIONS ));
+	memcpy( &ui::EngFuncs::engfuncs, pEngfuncsFromEngine, sizeof( ui_enginefuncs_t ));
 #ifndef XASH_DISABLE_FWGS_EXTENSIONS
-	memset( &EngFuncs::textfuncs, 0, sizeof( ui_textfuncs_t ));
+	memset( &ui::EngFuncs::textfuncs, 0, sizeof( ui_textfuncs_t ));
 #endif
-	gpGlobals = pGlobals;
+	ui::gpGlobals = pGlobals;
 
 	return TRUE;
 }
@@ -86,7 +86,7 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 	}
 
 	// copy HUD_FUNCTIONS table to engine, copy engfuncs table from engine
-	memcpy( &EngFuncs::textfuncs, pTextfuncsFromEngine, sizeof( ui_textfuncs_t ));
+	memcpy( &ui::EngFuncs::textfuncs, pTextfuncsFromEngine, sizeof( ui_textfuncs_t ));
 
 	return TRUE;
 }

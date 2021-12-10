@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #define TABWIDGET_H
 
 #include "ItemsHolder.h"
-
+namespace ui {
 class CMenuTabView : public CMenuItemsHolder
 {
 public:
@@ -48,5 +48,5 @@ private:
 
 	Size m_szTab;
 };
-
+}
 #endif // TABWIDGET_H

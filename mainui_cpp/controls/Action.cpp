@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Action.h"
 #include "Utils.h"
 
-
+namespace ui {
 CMenuAction::CMenuAction() : BaseClass()
 {
 	m_szBackground = NULL;
@@ -205,4 +205,5 @@ void CMenuAction::SetBackground(unsigned int color, unsigned int focused )
 	m_szBackground = NULL;
 	m_iBackcolor = color;
 	m_iBackColorFocused = focused;
+}
 }

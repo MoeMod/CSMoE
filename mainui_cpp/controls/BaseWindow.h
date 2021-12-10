@@ -18,7 +18,7 @@ GNU General Public License for more details.
 
 #include "ItemsHolder.h"
 #include "BackgroundBitmap.h"
-
+namespace ui {
 // Base class for windows.
 // Should be used for message boxes, dialogs, root menus(e.g. frameworks)
 class CMenuBaseWindow : public CMenuItemsHolder
@@ -99,5 +99,5 @@ private:
 	bool m_bHolding;
 	Point m_bHoldOffset;
 };
-
+}
 #endif // BASEWINDOW_H

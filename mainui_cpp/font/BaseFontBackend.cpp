@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "FontManager.h"
 #include <math.h>
 #include "Utils.h"
-
+namespace ui {
 bool CBaseFont::GlyphLessFunc( const glyph_t &a, const glyph_t &b )
 {
 	return a.ch < b.ch;
@@ -501,4 +501,5 @@ int CBaseFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int col
 	}
 #endif
 	return width;
+}
 }

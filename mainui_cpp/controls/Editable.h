@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #define MENU_EDITABLE_H
 
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuEditable : public CMenuBaseItem
 {
 public:
@@ -91,5 +91,5 @@ private:
 	// derived class can move it to public and implement
 	virtual void LinkCvar( const char *name );
 };
-
+}
 #endif // MENU_EDITABLE_H

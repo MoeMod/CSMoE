@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #define MENU_ACTION_H
 
 #include "BaseItem.h"
-
+namespace ui {
 class CMenuAction : public CMenuBaseItem
 {
 public:
@@ -43,5 +43,5 @@ private:
 	bool m_bfillBackground;
 	bool forceCalcW, forceCalcY;
 };
-
+}
 #endif // MENU_ACTION_H

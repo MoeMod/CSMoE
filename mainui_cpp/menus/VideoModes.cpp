@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CheckBox.h"
 #include "Action.h"
 #include "YesNoMessageBox.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_vidmodes"
 
 enum
@@ -110,7 +110,7 @@ void CMenuVidModes::SetConfig( )
 	{
 		char cmd[64];
 
-		// vid_setmode is a new command, which does not depends on 
+		// vid_setmode is a new command, which does not depends on
 		// static resolution list but instead uses dynamic resolution
 		// list provided by video backend
 #ifdef NEW_ENGINE_INTERFACE
@@ -125,7 +125,7 @@ void CMenuVidModes::SetConfig( )
 		}
 #endif
 		EngFuncs::ClientCmd( TRUE, cmd );
-		
+
 
 		// have changed resolution, but enable test mode only in fullscreen
 		testMode |= !windowed.bChecked;
@@ -261,3 +261,4 @@ void UI_VidModes_Menu( void )
 	uiVidModes.Show();
 }
 ADD_MENU( menu_vidmodes, UI_VidModes_Precache, UI_VidModes_Menu );
+}

@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "utl/utlvector.h"
 #include "Primitive.h"
 #include "FontRenderer.h"
-
+namespace ui {
 class CBaseFont;
 
 /*
@@ -82,5 +82,5 @@ private:
 #ifndef CLIENT_DLL
 extern CFontManager g_FontMgr;
 #endif
-
+}
 #endif // FONTMANAGER_H

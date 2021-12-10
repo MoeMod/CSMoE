@@ -264,7 +264,11 @@ void IN_StartupMouse (void)
 IN_Shutdown
 ===========
 */
+#ifdef XASH_STATIC_GAMELIB
+void IN_Shutdown_CL (void)
+#else
 void IN_Shutdown (void)
+#endif
 {
 	IN_DeactivateMouse ();
 }
@@ -958,7 +962,11 @@ void IN_Move ( float frametime, usercmd_t *cmd)
 IN_Init
 ===========
 */
+#ifdef XASH_STATIC_GAMELIB
+void IN_Init_CL (void)
+#else
 void IN_Init (void)
+#endif
 {
 	m_filter				= gEngfuncs.pfnRegisterVariable ( "m_filter","0", FCVAR_ARCHIVE );
 	sensitivity				= gEngfuncs.pfnRegisterVariable ( "sensitivity","3", FCVAR_ARCHIVE ); // user mouse sensitivity setting.

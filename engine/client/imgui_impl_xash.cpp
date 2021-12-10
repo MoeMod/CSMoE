@@ -13,13 +13,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-extern "C" {
 #include "common.h"
 #include "client.h"
 #include "gl_local.h"
 #include "input.h"
 #include "input_ime.h"
-}
 #include "minmax.h"
 
 #include "imgui.h"
@@ -175,7 +173,7 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 //    1:down 0:up
 //=============
 
-extern "C" { extern qboolean	in_mouseactive; }
+extern qboolean	in_mouseactive;
 qboolean ImGui_ImplGL_MouseButtonCallback(int button, int action)
 {
 	if (!g_EngineContext)
@@ -352,7 +350,7 @@ void ImGui_ImplGL_InvalidateDeviceObjects(void)
 	}
 }
 
-extern "C" int pfnGetScreenInfo( SCREENINFO *pscrinfo );
+int pfnGetScreenInfo( SCREENINFO *pscrinfo );
 
 void ImGui_ImplGL_ReloadFonts()
 {
@@ -435,13 +433,13 @@ static void ImGui_ImplSDL2_UpdateMouseCursor()
 	if (io.MouseDrawCursor || imgui_cursor == ImGuiMouseCursor_None)
 	{
 		// Hide OS mouse cursor if imgui is drawing it or if it wants no cursor
-		SDL_ShowCursor(SDL_FALSE);
+		//SDL_ShowCursor(SDL_FALSE);
 	}
 	else
 	{
 		// Show OS mouse cursor
 		SDL_SetCursor(g_MouseCursors[imgui_cursor] ? g_MouseCursors[imgui_cursor] : g_MouseCursors[ImGuiMouseCursor_Arrow]);
-		SDL_ShowCursor(SDL_TRUE);
+		//SDL_ShowCursor(SDL_TRUE);
 	}
 }
 #endif

@@ -15,11 +15,11 @@ GNU General Public License for more details.
 #pragma once
 #ifndef CFGSCRIPT_H
 #define CFGSCRIPT_H
-
 #define MAX_STRING 256
 
 #include "StringArrayModel.h"
 
+namespace ui {
 typedef enum
 {
 	T_NONE = 0,
@@ -73,5 +73,5 @@ struct scrvardef_t
 
 scrvardef_t *CSCR_LoadDefaultCVars( const char *scriptfilename, int *count );
 void CSCR_FreeList( scrvardef_t *list );
-
+}
 #endif // CFGSCRIPT_H

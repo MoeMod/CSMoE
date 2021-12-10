@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #include "extdll_menu.h"
 #include "BaseMenu.h"
 #include "Utils.h"
-
+namespace ui {
 void EngFuncs::PIC_Set(HIMAGE hPic, int r, int g, int b, int a)
 {
 	if( uiStatic.enableAlphaFactor )
@@ -92,4 +92,5 @@ int EngFuncs::UtfMoveLeft(const char *str, int pos)
 int EngFuncs::UtfMoveRight(const char *str, int pos, int length)
 {
 	return Con_UtfMoveRight( str, pos, length );
+}
 }

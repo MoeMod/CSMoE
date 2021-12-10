@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "Field.h"
 #include "Utils.h"
 
-
+namespace ui {
 CMenuField::CMenuField() : BaseClass(), szBuffer()
 {
 	bAllowColorstrings = true;
@@ -585,4 +585,5 @@ bool CMenuField::KeyValueData(const char *key, const char *data)
 	}
 
 	return true;
+}
 }

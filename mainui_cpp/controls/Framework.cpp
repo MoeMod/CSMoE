@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 #include "Framework.h"
 #include "PicButton.h"
-
+namespace ui {
 CMenuFramework::CMenuFramework( const char *name ) : BaseClass( name )
 {
 	memset( m_apBtns, 0, sizeof( m_apBtns ) );
@@ -173,4 +173,4 @@ bool CMenuFramework::DrawAnimation(EAnimation anim)
 
 	return b;
 }
-
+}

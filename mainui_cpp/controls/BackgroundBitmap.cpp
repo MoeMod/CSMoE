@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "BackgroundBitmap.h"
 #include "Utils.h"
 #include "BaseWindow.h"
-
+namespace ui {
 bool CMenuBackgroundBitmap::s_bEnableLogoMovie = false;
 Size CMenuBackgroundBitmap::s_BackgroundImageSize;
 int CMenuBackgroundBitmap::s_iBackgroundCount = 0;
@@ -334,4 +334,5 @@ void CMenuBackgroundBitmap::LoadBackground()
 		Con_DPrintf( "Loading old-style background from base succeded\n" );
 		return;
 	}
+}
 }

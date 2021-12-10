@@ -218,7 +218,7 @@ namespace cl
 		// #2 = _G.LUA_LOADED_TABLE
 
 		int length = 0;
-		byte* buffer = gEngfuncs.COM_LoadFile(path.c_str(), 5, &length);
+		char* buffer = gEngfuncs.COM_LoadFile(path.c_str(), 5, &length);
 		if(!buffer)
 		{
 			gEngfuncs.Con_Printf("%s Error: lua module (%s) not found\n", __FUNCTION__, ModuleName);
@@ -227,7 +227,7 @@ namespace cl
 		
 		int errc = 0;
 
-		errc = luaL_loadbufferx(L, reinterpret_cast<char*>(buffer), length, ModuleName, "bt");
+		errc = luaL_loadbufferx(L, buffer, length, ModuleName, "bt");
 		// #3 = require function
 
 		if (errc)

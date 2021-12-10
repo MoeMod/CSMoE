@@ -1,6 +1,6 @@
 #include "BaseMenu.h"
 #include "Scissor.h"
-
+namespace ui {
 #define MAX_SCISSORS 16
 
 static class CScissorState
@@ -40,7 +40,7 @@ void CropByPreviousScissors( Point pt, Size sz, int &x, int &y, int &w, int &h )
 	h = outBottom - outTop;
 }
 
-void ui::Scissor::PushScissor(int x, int y, int w, int h)
+void Scissor::PushScissor(int x, int y, int w, int h)
 {
 	if( scissor.iDepth + 1 > MAX_SCISSORS )
 	{
@@ -65,7 +65,7 @@ void ui::Scissor::PushScissor(int x, int y, int w, int h)
 	scissor.iDepth++;
 }
 
-void ui::Scissor::PopScissor()
+void Scissor::PopScissor()
 {
 	if( scissor.iDepth <= 0 )
 	{
@@ -85,5 +85,5 @@ void ui::Scissor::PopScissor()
 			scissor.sizeStack[scissor.iDepth - 1].h );
 	}
 }
-
+}
 

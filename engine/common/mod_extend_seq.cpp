@@ -1,8 +1,6 @@
 
-extern "C" {
 #include "mod_extend_seq.h"
 #include "studio.h"
-}
 
 #define FILE_BUFF_SIZE		2048
 

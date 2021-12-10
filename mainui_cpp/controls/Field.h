@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #define MENU_FIELD_H
 
 #include "Editable.h"
-
+namespace ui {
 #define UI_MAX_FIELD_LINE		256
 
 class CMenuField : public CMenuEditable
@@ -74,5 +74,5 @@ private:
 
 	bool	m_bOverrideOverstrike;
 };
-
+}
 #endif // MENU_FIELD_H

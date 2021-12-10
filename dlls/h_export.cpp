@@ -9,7 +9,7 @@
 //! Holds engine functionality callbacks
 
 #ifdef XASH_STATIC_GAMELIB
-extern "C" int FS_GetAPI(fs_api_t * g_api);
+int FS_GetAPI(fs_api_t * g_api);
 #endif
 
 namespace sv {

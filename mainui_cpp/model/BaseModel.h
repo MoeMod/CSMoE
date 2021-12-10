@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #define BASE_MODEL_H
 
 #include "extdll_menu.h"
-
+namespace ui {
 enum ECellType
 {
 	CELL_TEXT = 0,
@@ -51,5 +51,5 @@ public:
 	// sorting
 	virtual bool Sort( int column, bool ascend ) { return false; } // false means no sorting support for column
 };
-
+}
 #endif // BASE_MODEL_H

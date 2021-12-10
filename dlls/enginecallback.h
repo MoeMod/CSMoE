@@ -97,7 +97,7 @@ inline int	IS_CAREER_MATCH( void ) { return (*g_engfuncs.pfnIsCareerMatch)(); }
 inline int	GET_LOCALIZED_STRING_LENGTH( const char *label ) { return (*g_engfuncs.pfnGetLocalizedStringLength)(label); }
 inline void	REGISTER_TUTOR_MESSAGE_SHOWN( int mid ) { return (*g_engfuncs.pfnRegisterTutorMessageShown)(mid); }
 inline int	GET_TIMES_TUTOR_MESSAGE_SHOWN( int mid ) { return (*g_engfuncs.pfnGetTimesTutorMessageShown)(mid); }
-inline int	ENG_CHECK_PARM( char *parm, char **ppnext ) { return (*g_engfuncs.CheckParm)(parm, ppnext); }
+inline int	ENG_CHECK_PARM( const char *parm, const char **ppnext ) { return (*g_engfuncs.CheckParm)(parm, ppnext); }
 inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin = nullptr, edict_t *ed = nullptr) { (*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ed); }
 inline void	MESSAGE_END( void ) { return (*g_engfuncs.pfnMessageEnd)(); }
 inline void	WRITE_BYTE( int iValue ) { return (*g_engfuncs.pfnWriteByte)(iValue); }
@@ -130,8 +130,8 @@ inline void	EMIT_AMBIENT_SOUND( edict_t *entity, float *pos, const char *samp, f
 inline void*	GET_MODEL_PTR( edict_t* pEdict ) { return (*g_engfuncs.pfnGetModelPtr)(pEdict); }
 inline int	REG_USER_MSG( const char *pszName, int iSize ) { return (*g_engfuncs.pfnRegUserMsg)(pszName, iSize); }
 inline void	GET_BONE_POSITION( const edict_t* pEdict, int iBone, float *rgflOrigin, float *rgflAngles ) { return (*g_engfuncs.pfnGetBonePosition)(pEdict, iBone, rgflOrigin, rgflAngles); }
-inline unsigned long FUNCTION_FROM_NAME( const char *pName ) { return (*g_engfuncs.pfnFunctionFromName)(pName); }
-inline const char *NAME_FOR_FUNCTION( unsigned long function ) { return (*g_engfuncs.pfnNameForFunction)(function); }
+inline uintptr_t FUNCTION_FROM_NAME( const char *pName ) { return (*g_engfuncs.pfnFunctionFromName)(pName); }
+inline const char *NAME_FOR_FUNCTION( uintptr_t function ) { return (*g_engfuncs.pfnNameForFunction)(function); }
 inline const char *TRACE_TEXTURE( edict_t *pTextureEntity, const float *v1, const float *v2 ) { return (*g_engfuncs.pfnTraceTexture)(pTextureEntity, v1, v2); }
 inline void	CLIENT_PRINTF( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg ) { return (*g_engfuncs.pfnClientPrintf)(pEdict, ptype, szMsg); }
 inline void	SERVER_PRINT( const char *szMsg ) { return (*g_engfuncs.pfnServerPrint)(szMsg); }
@@ -141,7 +141,7 @@ inline int	CMD_ARGC( void ) { return (*g_engfuncs.pfnCmd_Argc)(); }
 inline void	GET_ATTACHMENT( const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles ) { return (*g_engfuncs.pfnGetAttachment)(pEdict, iAttachment, rgflOrigin, rgflAngles); }
 inline void	SET_VIEW( const edict_t *pClient, const edict_t *pViewent ) { return (*g_engfuncs.pfnSetView)(pClient, pViewent); }
 inline void	SET_CROSSHAIRANGLE( const edict_t *pClient, float pitch, float yaw ) { return (*g_engfuncs.pfnCrosshairAngle)(pClient, pitch, yaw); }
-inline byte*	LOAD_FILE_FOR_ME( const char *filename, int *pLength ) { return (*g_engfuncs.pfnLoadFileForMe)(filename, pLength); }
+inline byte*	LOAD_FILE_FOR_ME( const char *filename, int *pLength ) { return (byte*)(*g_engfuncs.pfnLoadFileForMe)(filename, pLength); }
 inline void	FREE_FILE( void *buffer ) { return (*g_engfuncs.pfnFreeFile)(buffer); }
 inline void	END_SECTION( const char *pszSectionName ) { return (*g_engfuncs.pfnEndSection)(pszSectionName); }
 inline int	COMPARE_FILE_TIME( char *filename1, char *filename2, int *iCompare ) { return (*g_engfuncs.pfnCompareFileTime)(filename1, filename2, iCompare); }
@@ -173,10 +173,10 @@ inline void	PLAYER_CNX_STATS( const edict_t *pClient, int *ping, int *packet_los
 inline edict_t	*CREATE_FAKE_CLIENT( const char *netname ) { return (*g_engfuncs.pfnCreateFakeClient)(netname); }
 inline char*	GET_USERINFO( edict_t *e ) { return (*g_engfuncs.pfnGetInfoKeyBuffer)(e); }
 inline char*	GET_INFO_BUFFER( edict_t *e ) { return (*g_engfuncs.pfnGetInfoKeyBuffer)(e); }
-inline char*	GET_KEY_VALUE( char *infobuffer, const char *key ) { return (*g_engfuncs.pfnInfoKeyValue)(infobuffer, key); }
+inline const char*	GET_KEY_VALUE( const char *infobuffer, const char *key ) { return (*g_engfuncs.pfnInfoKeyValue)(infobuffer, key); }
 inline void	SET_KEY_VALUE( char *infobuffer, const char *key, const char *value ) { return (*g_engfuncs.pfnSetKeyValue)(infobuffer, key, value); }
 inline void	SET_CLIENT_KEY_VALUE( int clientIndex, char *infobuffer, const char *key, const char *value ) { return (*g_engfuncs.pfnSetClientKeyValue)(clientIndex, infobuffer, key, value); }
-inline void	REMOVE_KEY_VALUE( char *s, const char *key ) { return (*g_engfuncs.pfnInfo_RemoveKey)(s, key); }
+inline bool	REMOVE_KEY_VALUE( char *s, const char *key ) { return (*g_engfuncs.pfnInfo_RemoveKey)(s, key); }
 inline void	SET_PHYSICS_KEY_VALUE( const edict_t *pClient, const char *key, const char *value ) { return (*g_engfuncs.pfnSetPhysicsKeyValue)(pClient, key, value); }
 
 }

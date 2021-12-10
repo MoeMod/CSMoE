@@ -20,7 +20,7 @@ GNU General Public License for more details.
 
 #include "Editable.h"
 #include "BaseArrayModel.h"
-
+namespace ui {
 class CMenuSpinControl : public CMenuEditable
 {
 public:
@@ -66,5 +66,5 @@ private:
 
 	char m_szDisplay[CS_SIZE];
 };
-
+}
 #endif // MENU_SPINCONTROL_H

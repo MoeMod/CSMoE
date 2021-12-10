@@ -18,7 +18,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #pragma once
-
+namespace ui {
 #define BI_SIZE	40 // size of bitmap info header.
 typedef unsigned short       word;
 
@@ -55,7 +55,7 @@ class CBMP
 {
 public:
 	static CBMP* LoadFile( const char *filename ); // implemented in library!
-	
+
 	CBMP( uint w, uint h )
 	{
 		bmp_t bhdr;
@@ -71,7 +71,7 @@ public:
 		bhdr.bitmapDataOffset = sizeof( bmp_t ) + cbPalBytes;
 		bhdr.bitmapDataSize = bhdr.width * bhdr.height * pixel_size;
 		bhdr.fileSize = bhdr.bitmapDataOffset + bhdr.bitmapDataSize;
-	
+
 		// constant
 		bhdr.reserved0 = 0;
 		bhdr.planes = 1;
@@ -80,12 +80,12 @@ public:
 		bhdr.hRes = bhdr.vRes = 0;
 		bhdr.colors = ( pixel_size == 1 ) ? 256 : 0;
 		bhdr.importantColors = 0;
-	
+
 		data = new byte[bhdr.fileSize];
 		memcpy( data, &bhdr, sizeof( bhdr ));
 		memset( data + bhdr.bitmapDataOffset, 0, bhdr.bitmapDataSize );
 	}
-	
+
 	~CBMP() { if( data ) delete []data; }
 
 	void Increase(uint w, uint h)
@@ -109,7 +109,7 @@ public:
 		byte *newData = new byte[bhdr.fileSize];
 		memcpy( newData, &bhdr, sizeof( bhdr ));
 		memset( newData + bhdr.bitmapDataOffset, 0, sizeof( bhdr.bitmapDataSize ));
-	
+
 		// now copy texture
 		byte *src = GetTextureData();
 		byte *dst = newData + bhdr.bitmapDataOffset;
@@ -139,7 +139,7 @@ public:
 		for( int i = 0; i < 256; i++ )
 		{
 			float t = (float)i/256.0f;
-	
+
 			palette[i].r = (byte)(r * t);
 			palette[i].g = (byte)(g * t);
 			palette[i].b = (byte)(b * t);
@@ -176,3 +176,4 @@ public:
 private:
 	byte    *data;
 };
+}

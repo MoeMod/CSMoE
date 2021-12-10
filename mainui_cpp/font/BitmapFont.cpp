@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #include "BaseFontBackend.h"
 #include "menufont.h"
 #include "BitmapFont.h"
-
+namespace ui {
 CBitmapFont::CBitmapFont() : CBaseFont(), hImage( 0 ) { }
 CBitmapFont::~CBitmapFont() { }
 
@@ -129,4 +129,5 @@ int CBitmapFont::DrawCharacter(int ch, Point pt, int charH, const unsigned int c
 		EngFuncs::PIC_DrawTrans( pt.x, pt.y, charH / 2, charH, &rc );
 
 	return charH / 2;
+}
 }

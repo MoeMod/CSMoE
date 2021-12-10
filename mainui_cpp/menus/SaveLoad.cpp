@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Bitmap.h"
 #include "PicButton.h"
 #include "Action.h"
-
+namespace ui {
 #define ART_BANNER		"gfx/shell/head_saveload"
 
 class CMenuSaveLoad : public CMenuFramework
@@ -94,3 +94,4 @@ void UI_SaveLoad_Menu( void )
 	uiSaveLoad.Show();
 }
 ADD_MENU( menu_saveload, UI_SaveLoad_Precache, UI_SaveLoad_Menu );
+}
