@@ -336,6 +336,11 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 	int		i, size;
 	qboolean is_dds_mode = false;
 
+#if TARGET_OS_IPHONE
+	// dont build mipmap on iOS to reduce memory usage
+	texFlags |= TF_NOPICMIP|TF_NOMIPMAP;
+#endif
+
 	if( loaded ) *loaded = false;
 	Q_memcpy(&pin, buffer, sizeof(dsprite_t));
 	mod->type = mod_sprite;

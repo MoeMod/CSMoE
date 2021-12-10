@@ -3815,6 +3815,11 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 	if( ptexture->flags & STUDIO_NF_NORMALMAP )
 		flags |= (TF_NORMALMAP);
 
+#if TARGET_OS_IPHONE
+	// dont build mipmap on iOS to reduce memory usage
+	flags |= TF_NOPICMIP|TF_NOMIPMAP;
+#endif
+
 	// store some textures for remapping
 	if( !Q_strnicmp( ptexture->name, "DM_Base", 7 ) || !Q_strnicmp( ptexture->name, "remap", 5 ))
 	{
