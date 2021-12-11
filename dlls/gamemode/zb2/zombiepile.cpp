@@ -28,17 +28,16 @@ CZombiePile* CZombiePile::Create(CBasePlayer* player)
 	pEntity->pev->origin = player->GetGunPosition() + gpGlobals->v_forward * 40;
 	pEntity->Slowdown();
 	EMIT_SOUND(ENT(pEntity->pev), CHAN_BODY, "zombi/zombi_stamper_iron_maiden_stamping.wav", 1.0, ATTN_NORM);
+	pEntity->pev->angles = vecAngles;
+	pEntity->m_hOwner = player;
 
 	TraceResult tr;
 	UTIL_TraceHull(pEntity->pev->origin, pEntity->pev->origin, dont_ignore_monsters, (player->pev->flags & FL_DUCKING) ? head_hull : human_hull, pEntity->edict(), &tr);
 	if (tr.fStartSolid || tr.fAllSolid || !tr.fInOpen)
 	{
 		pEntity->Explosion();
-		return pEntity;
 	}
 
-	pEntity->pev->angles = vecAngles;
-	pEntity->m_hOwner = player;
 	DispatchSpawn(pEntity->edict());
 	return pEntity;
 }
@@ -129,6 +128,17 @@ void EXPORT CZombiePile::OnThink()
 
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.2s;
+}
+
+int CZombiePile::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	auto pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+	if (pAttack->IsPlayer() && !pAttack->m_bIsZombie)
+	{
+		flDamage *= 0.1f;
+	}
+	
+	return CBaseAnimating::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 void CZombiePile::Killed(entvars_t* pevAttacker, int iGib)

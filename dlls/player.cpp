@@ -1137,10 +1137,22 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		if (pev->armorvalue <= 0.0f)
 			m_iKevlar = ARMOR_TYPE_EMPTY;
 
+		if (!m_pModStrategy->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+		{
+			return 0;
+		}
+
 		Pain(m_LastHitGroup, true);
 	}
 	else
+	{
+		if (!m_pModStrategy->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType))
+		{
+			return 0;
+		}
+
 		Pain(m_LastHitGroup, false);
+	}
 
 #ifdef XASH_DEDICATED
 	if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
@@ -1159,6 +1171,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			return flDamage;
 		}
 	}
+
 	LogAttack(pAttack, this, teamAttack, flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 
 	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that

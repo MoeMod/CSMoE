@@ -1974,6 +1974,10 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 				iPenetration = 0;
 			}
 
+			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
+				iPenetration = 0;
+			}
+
 			if (tr.iHitgroup == HITGROUP_SHIELD) {
 				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
 				           (RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,

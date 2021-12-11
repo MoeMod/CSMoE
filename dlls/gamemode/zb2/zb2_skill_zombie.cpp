@@ -225,7 +225,7 @@ namespace sv {
 					flAlpha += (255.0 - flInvisibleAlpha) * ((0.5s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 0.5s);
 				}
 
-				state->rendermode = kRenderTransAlpha;
+				state->rendermode = kRenderTransTexture;
 				state->renderamt = flAlpha;
 
 			}
@@ -2083,6 +2083,13 @@ namespace sv {
 	duration_t CZombieSkill_ZombiePile::GetDurationTime() const
 	{
 		return 1.0s;
+	}
+
+	float CZombieSkill_ZombiePile::GetDamageRatio() const
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			return 0.85f;
+		return 1.0f;
 	}
 
 	void CZombieSkill_ZombiePile::FireZombieSkill()

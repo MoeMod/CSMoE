@@ -195,13 +195,23 @@ void CMod_ZombieMod2::RemoveAllEntity()
 		ent->pev->flags |= FL_KILLME;
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
+
 	while ((ent = UTIL_FindEntityByClassname(ent, "zombiebomb")) != nullptr)
 	{
 		ent->pev->effects |= EF_NODRAW;
 		ent->pev->flags |= FL_KILLME;
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
+
 	while ((ent = UTIL_FindEntityByClassname(ent, "zombietrap")) != nullptr)
+	{
+		ent->pev->effects |= EF_NODRAW;
+		ent->pev->flags |= FL_KILLME;
+		ent->SetThink(&CBaseEntity::SUB_Remove);
+		ent->SetTouch(NULL);
+	}
+
+	while ((ent = UTIL_FindEntityByClassname(ent, "zombiepile")) != nullptr)
 	{
 		ent->pev->effects |= EF_NODRAW;
 		ent->pev->flags |= FL_KILLME;

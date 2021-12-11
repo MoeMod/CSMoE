@@ -20,7 +20,7 @@ void CZombieTrap::Spawn(void)
 		RemoveEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
 	}
 
-	MAKE_STRING_CLASS("zombie_trap", pev);
+	MAKE_STRING_CLASS("zombietrap", pev);
 	AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
 
 	pev->movetype = MOVETYPE_PUSHSTEP;

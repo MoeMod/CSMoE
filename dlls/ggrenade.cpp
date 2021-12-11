@@ -1067,15 +1067,15 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 
 	pGrenade->pev->sequence = RANDOM_LONG(1, 3);
 	pGrenade->pev->frame = 0.0;
-	pGrenade->pev->framerate = 10.0f;
+	pGrenade->ResetSequenceInfo();
+	pGrenade->m_fSequenceLoops = TRUE;
+	pGrenade->pev->framerate = 2.0f;
 	pGrenade->pev->animtime = gpGlobals->time;
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->pev->dmg = 998;
 	pGrenade->pev->health = 50;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
-
-
 
 	pGrenade->m_bJustBlew = true;
 

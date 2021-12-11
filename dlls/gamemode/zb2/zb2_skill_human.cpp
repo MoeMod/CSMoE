@@ -228,7 +228,7 @@ public:
 	Knife2xSkill k2x;
 };
 
-CHuman_ZB2::CHuman_ZB2(CBasePlayer * player) : CHuman_ZB1(player), pimpl(std::unique_ptr<impl_t>(new impl_t(player))), m_tSlowdown(invalid_time_point)
+CHuman_ZB2::CHuman_ZB2(CBasePlayer * player) : CHuman_ZB1(player), pimpl(std::unique_ptr<impl_t>(new impl_t(player))), beingTrapped(invalid_time_point), m_tSlowdown(invalid_time_point)
 {
 
 }
