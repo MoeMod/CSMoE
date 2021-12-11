@@ -3094,16 +3094,16 @@ void SV_AllocStringPool( void )
 #ifdef USE_MMAP
 	{
 		size_t pagesize = sysconf( _SC_PAGESIZE );
-		int arrlen = ( str64.maxstringarray * 2 ) & ~( pagesize - 1 );
-		void *base = svgame.dllFuncs.pfnGameInit;
-		void *start = svgame.hInstance - arrlen;
+		size_t arrlen = ( str64.maxstringarray * 2 ) & ~( pagesize - 1 );
+		char *base = (char *)svgame.dllFuncs.pfnGameInit;
+		char *start = (char *)svgame.hInstance - arrlen;
 
 		while( start - base > INT_MIN )
 		{
-			void *mapptr = mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
+			char *mapptr = (char *)mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
 			if( mapptr && mapptr != (void*)-1 && mapptr - base > INT_MIN && mapptr - base < INT_MAX )
 			{
-				ptr = (char *)mapptr;
+				ptr = mapptr;
 				break;
 			}
 			if( mapptr ) munmap( mapptr, arrlen );
@@ -3115,8 +3115,8 @@ void SV_AllocStringPool( void )
 			start = base;
 			while( start - base < INT_MAX )
 			{
-				void *mapptr = mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
-				if( mapptr && mapptr != (void*)-1  && mapptr - base > INT_MIN && mapptr - base < INT_MAX )
+				char *mapptr = (char *)mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
+				if( mapptr && mapptr != (char*)-1  && mapptr - base > INT_MIN && mapptr - base < INT_MAX )
 				{
 					ptr = (char *)mapptr;
 					break;

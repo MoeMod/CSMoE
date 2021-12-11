@@ -1,6 +1,7 @@
 #ifndef GL_STATIC_H
 #define GL_STATIC_H
 
+extern "C" {
 // helper opengl functions
 GLenum glGetError (void);
 const GLubyte * glGetString (GLenum name);
@@ -434,7 +435,7 @@ void glGetQueryObjectuivARB (GLuint id, GLenum pname, GLuint *params);
 void glSelectTextureSGIS ( GLenum );
 void glMTexCoord2fSGIS ( GLenum, GLfloat, GLfloat );
 void glSwapInterval ( int interval );
-
+};
 // mangle to xash3d style
 
 #define pglGetError glGetError

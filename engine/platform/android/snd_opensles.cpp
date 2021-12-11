@@ -182,7 +182,7 @@ static const char *SNDDMA_Android_Init( void )
 	dma.samples = samples * sourceFormat.numChannels;
 	dma.format.speed = freq;
 	snddma_android_size = dma.samples * ( sourceFormat.bitsPerSample >> 3 );
-	dma.buffer = Z_Malloc( snddma_android_size * 2 );
+	dma.buffer = (byte *)Z_Malloc( snddma_android_size * 2 );
 	dma.samplepos = 0;
 	dma.sampleframes = dma.samples / dma.format.channels;
 	dma.format.width = 2;
