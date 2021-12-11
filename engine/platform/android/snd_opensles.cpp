@@ -109,22 +109,22 @@ static const char *SNDDMA_Android_Init( void )
 	if( !handle )
 		return "dlopen for libOpenSLES.so";
 
-	pslCreateEngine = dlsym( handle, "slCreateEngine" );
+	pslCreateEngine = (decltype(pslCreateEngine))dlsym( handle, "slCreateEngine" );
 
 	if( !pslCreateEngine )
 		return "resolve slCreateEngine";
 
-	pSL_IID_ENGINE = dlsym( handle, "SL_IID_ENGINE" );
+	pSL_IID_ENGINE = (decltype(pSL_IID_ENGINE))dlsym( handle, "SL_IID_ENGINE" );
 
 	if( !pSL_IID_ENGINE )
 		return "resolve SL_IID_ENGINE";
 
-	pSL_IID_PLAY = dlsym( handle, "SL_IID_PLAY" );
+	pSL_IID_PLAY = (decltype(pSL_IID_PLAY))dlsym( handle, "SL_IID_PLAY" );
 
 	if( !pSL_IID_PLAY )
 		return "resolve SL_IID_PLAY";
 
-	pSL_IID_BUFFERQUEUE = dlsym( handle, "SL_IID_BUFFERQUEUE" );
+	pSL_IID_BUFFERQUEUE = (decltype(pSL_IID_BUFFERQUEUE))dlsym( handle, "SL_IID_BUFFERQUEUE" );
 
 	if( !pSL_IID_BUFFERQUEUE )
 		return "resolve SL_IID_BUFFERQUEUE";
