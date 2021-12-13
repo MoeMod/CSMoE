@@ -316,7 +316,7 @@ public:
 
 	void TouchWall()
 	{
-		pev->velocity = {};
+		pev->movetype = MOVETYPE_NONE;
 		RadiusDamage();
 	}
 
@@ -921,7 +921,7 @@ void CGungnir::ItemPostFrame()
 				ShootSpear();
 				phs2 = invalid_time_point;
 				Q_strcpy(m_pPlayer->m_szAnimExtention, "m249");
-				m_pPlayer->pev->weaponmodel = MAKE_STRING("models/null.mdl");
+				m_pPlayer->pev->weaponmodel = 0;
 				phs4 = gpGlobals->time + min(3.1199999s, 0.2s);
 				return CBasePlayerWeapon::ItemPostFrame();
 			}

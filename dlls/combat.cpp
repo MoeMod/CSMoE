@@ -1974,10 +1974,6 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 				iPenetration = 0;
 			}
 
-			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
-				iPenetration = 0;
-			}
-
 			if (tr.iHitgroup == HITGROUP_SHIELD) {
 				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
 				           (RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
@@ -2007,6 +2003,15 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 				flDistanceModifier = 0.75;
 			} else
 				flDistanceModifier = 0.5;
+
+			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
+				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
+					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
+					ATTN_NORM);
+				UTIL_Sparks(tr.vecEndPos);
+				iPenetration = 0;
+				flDistanceModifier = 0.0;
+			}
 
 			DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pev, bHitMetal);
 
@@ -2385,6 +2390,15 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 				else
 					flDistanceModifier = 0.5;
 			}				
+
+			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
+				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
+					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
+					ATTN_NORM);
+				UTIL_Sparks(tr.vecEndPos);
+				iPenetration = 0;
+				flDistanceModifier = 0.0;
+			}
 
 			DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pev, bHitMetal);
 

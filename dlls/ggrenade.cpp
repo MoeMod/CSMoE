@@ -832,13 +832,8 @@ void CGrenade::ZombieBomb_TumbleThink()
 		UTIL_Remove(this);
 		return;
 	}
-	if (!pev->frame)
-		pev->animtime = gpGlobals->time;
-	if (pev->velocity)
-		pev->framerate = 10.0;
-	else
-		pev->framerate = 0.0;
 
+	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.05s;
 
 	if (pev->dmgtime <= gpGlobals->time)
@@ -1055,7 +1050,8 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 {
 	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
 	pGrenade->Spawn();
-
+	
+	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb.mdl");
 	UTIL_SetOrigin(pGrenade->pev, vecStart);
 	pGrenade->pev->velocity = vecVelocity;
 	pGrenade->pev->angles = pevOwner->angles;
@@ -1068,9 +1064,8 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->sequence = RANDOM_LONG(1, 3);
 	pGrenade->pev->frame = 0.0;
 	pGrenade->ResetSequenceInfo();
+	pGrenade->pev->framerate = 5.0f;
 	pGrenade->m_fSequenceLoops = TRUE;
-	pGrenade->pev->framerate = 2.0f;
-	pGrenade->pev->animtime = gpGlobals->time;
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->pev->dmg = 998;
@@ -1083,8 +1078,6 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->friction = 0.7f;
 
 	pGrenade->m_iTeam = iTeam;
-
-	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb.mdl");
 
 	return pGrenade;
 }

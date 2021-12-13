@@ -2057,8 +2057,6 @@ namespace sv {
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 94;
 			m_pPlayer->m_flNextAttack = 1.1s;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/deimos_skill_start.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
-
 			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
 			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.1s;
 
@@ -2068,7 +2066,7 @@ namespace sv {
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
-			WRITE_BYTE(ZOMBIE_SKILL_SHOCK);
+			WRITE_BYTE(ZOMBIE_SKILL_STAMPER);
 			WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
 			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 			MESSAGE_END();
@@ -2077,6 +2075,7 @@ namespace sv {
 
 	void CZombieSkill_ZombiePile::OnSkillEnd()
 	{
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
 	}
 

@@ -25,9 +25,7 @@ CZombiePile* CZombiePile::Create(CBasePlayer* player)
 	Vector vecAngles = Vector(0, player->pev->v_angle.y, 0);
 	UTIL_MakeVectors(vecAngles);
 	CZombiePile* pEntity = (CZombiePile*)Instance(pent);
-	pEntity->pev->origin = player->GetGunPosition() + gpGlobals->v_forward * 40;
-	pEntity->Slowdown();
-	EMIT_SOUND(ENT(pEntity->pev), CHAN_BODY, "zombi/zombi_stamper_iron_maiden_stamping.wav", 1.0, ATTN_NORM);
+	pEntity->pev->origin = player->GetGunPosition() + gpGlobals->v_forward * 50;
 	pEntity->pev->angles = vecAngles;
 	pEntity->m_hOwner = player;
 
@@ -35,6 +33,7 @@ CZombiePile* CZombiePile::Create(CBasePlayer* player)
 	UTIL_TraceHull(pEntity->pev->origin, pEntity->pev->origin, dont_ignore_monsters, (player->pev->flags & FL_DUCKING) ? head_hull : human_hull, pEntity->edict(), &tr);
 	if (tr.fStartSolid || tr.fAllSolid || !tr.fInOpen)
 	{
+		pEntity->Slowdown();
 		pEntity->Explosion();
 	}
 
@@ -79,7 +78,7 @@ void CZombiePile::Spawn(void)
 	AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
 
 	SetTouch(NULL);
-	SetThink(&CZombiePile::OnThink);
+	SetThink(&CZombiePile::OnGround);
 	SET_MODEL(ENT(pev), "models/zombipile.mdl");
 
 	pev->deadflag = DEAD_NO;
@@ -102,10 +101,9 @@ void CZombiePile::Spawn(void)
 	pev->sequence = 0;
 	pev->frame = 0;
 	ResetSequenceInfo();
+	m_fSequenceLoops = true;
 	m_flRemoveTime = gpGlobals->time + GetAliveTime();
 	pev->nextthink = gpGlobals->time + 0.2s;
-
-	DROP_TO_FLOOR(edict());
 }
 
 void CZombiePile::Precache(void)
@@ -114,6 +112,30 @@ void CZombiePile::Precache(void)
 	PRECACHE_SOUND("zombi/zombi_stamper_iron_maiden_explosion.wav");
 	PRECACHE_MODEL("models/zombipile.mdl");
 	m_idShard = PRECACHE_MODEL("models/woodgibs.mdl");
+	m_usEvent = PRECACHE_EVENT(1, "addons/luash/events/event_zombiepile.lua");
+}
+
+void EXPORT CZombiePile::OnGround()
+{
+	if (m_flRemoveTime <= gpGlobals->time)
+	{
+		SetThink(NULL);
+		Explosion();
+
+		return;
+	}
+
+	pev->nextthink = gpGlobals->time + 0.01s;
+	if (pev->flags & FL_ONGROUND)
+	{
+		SetThink(&CZombiePile::OnThink);
+		Slowdown();
+		EMIT_SOUND(ENT(pev), CHAN_BODY, "zombi/zombi_stamper_iron_maiden_stamping.wav", 1.0, ATTN_NORM);
+
+		Vector origin = pev->origin;
+		origin[2] -= pev->size[2] * 0.5f;
+		PLAYBACK_EVENT_FULL(0, NULL, m_usEvent, 0.0f, origin, (float*)&g_vecZero, 0.0f, 0.0f, 0, 0, FALSE, FALSE);
+	}
 }
 
 void EXPORT CZombiePile::OnThink()

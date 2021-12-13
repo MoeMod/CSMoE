@@ -11,6 +11,7 @@ public:
 	virtual void Killed(entvars_t* pevAttacker, int iGib);
 
 public:
+	void EXPORT OnGround();
 	void EXPORT OnThink();
 
 public:
@@ -28,6 +29,7 @@ private:
 	EntityHandle <CBasePlayer> m_hOwner;
 	time_point_t m_flRemoveTime;
 	int m_idShard;
+	unsigned short m_usEvent;
 };
 
 }

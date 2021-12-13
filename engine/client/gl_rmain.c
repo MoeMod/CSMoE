@@ -96,7 +96,7 @@ static qboolean R_FollowEntity( cl_entity_t *ent )
 	if( ent->model->type != mod_studio )
 		return false;
 
-	if( ent->curstate.movetype != MOVETYPE_FOLLOW )
+	if( ent->curstate.movetype != MOVETYPE_FOLLOW && ent->curstate.movetype != MOVETYPE_FOLLOWMOVE)
 		return false;
 
 	if( ent->curstate.aiment <= 0 )
@@ -397,7 +397,7 @@ void R_ClearScene( void )
 {
 	tr.num_solid_entities = tr.num_trans_entities = 0;
 	tr.num_static_entities = tr.num_mirror_entities = 0;
-	tr.num_child_entities = 0;
+	tr.num_child_entities = tr.num_delay_entities = 0;
 }
 
 /*
@@ -461,6 +461,15 @@ qboolean R_AddEntity( struct cl_entity_s *clent, int entityType )
 	}
 	else
 	{
+		if (clent->curstate.eflags & EFLAG_AFTER_VIEWMODEL)
+		{
+			if (tr.num_delay_entities >= MAX_VISIBLE_PACKET)
+				return false;
+
+			tr.delay_entities[tr.num_delay_entities++] = clent;
+			return true;
+		}
+
 		// translucent
 		if( tr.num_trans_entities >= MAX_VISIBLE_PACKET )
 			return false;
@@ -1152,19 +1161,27 @@ void R_DrawEntitiesOnList( void )
 		ASSERT( RI.currententity != NULL );
 		ASSERT( RI.currententity->model != NULL );
 
+		if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
+		{
+			pglDepthRange(gldepthmin, gldepthmin + 0.3f * (gldepthmax - gldepthmin));
+		}
 		switch( RI.currentmodel->type )
 		{
 		case mod_brush:
 			R_DrawBrushModel( RI.currententity );
 			break;
 		case mod_studio:
-			R_DrawStudioModel( RI.currententity );
+			R_DrawStudioModel(RI.currententity);
 			break;
 		case mod_sprite:
 			R_DrawSpriteModel( RI.currententity );
 			break;
 		default:
 			break;
+		}
+		if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
+		{
+			pglDepthRange(gldepthmin, gldepthmax);
 		}
 	}
 
@@ -1186,6 +1203,51 @@ void R_DrawEntitiesOnList( void )
 	pglDisable( GL_BLEND );	// Trinity Render issues
 
 	R_DrawViewModel();
+
+	if (tr.num_delay_entities)
+	{
+		pglEnable(GL_BLEND);
+		pglDepthMask(GL_FALSE);
+		glState.drawTrans = true;
+
+		for (i = 0; i < tr.num_delay_entities; i++)
+		{
+			if (RI.refdef.onlyClientDraw)
+				break;
+
+			RI.currententity = tr.delay_entities[i];
+			RI.currentmodel = RI.currententity->model;
+
+			ASSERT(RI.currententity != NULL);
+			ASSERT(RI.currententity->model != NULL);
+
+			if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
+			{
+				pglDepthRange(gldepthmin, gldepthmin + 0.2f * (gldepthmax - gldepthmin));
+			}
+			switch (RI.currentmodel->type)
+			{
+			case mod_brush:
+				R_DrawBrushModel(RI.currententity);
+				break;
+			case mod_studio:
+				R_DrawStudioModel(RI.currententity);
+				break;
+			case mod_sprite:
+				R_DrawSpriteModel(RI.currententity);
+				break;
+			default:
+				break;
+			}
+			if (RI.currententity->curstate.eflags & EFLAG_DEPTH_CHANGED)
+			{
+				pglDepthRange(gldepthmin, gldepthmax);
+			}
+		}
+		glState.drawTrans = false;
+		pglDepthMask(GL_TRUE);
+		pglDisable(GL_BLEND);	// Trinity Render issues
+	}
 
 	CL_ExtraUpdate();
 }

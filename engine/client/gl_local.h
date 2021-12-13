@@ -203,11 +203,13 @@ typedef struct
 	cl_entity_t	*solid_entities[MAX_VISIBLE_PACKET];	// opaque moving or alpha brushes
 	cl_entity_t	*trans_entities[MAX_VISIBLE_PACKET];	// translucent brushes
 	cl_entity_t	*child_entities[MAX_VISIBLE_PACKET];	// entities with MOVETYPE_FOLLOW
+	cl_entity_t *delay_entities[MAX_VISIBLE_PACKET];	// entities draw after viewmodel
 	uint		num_static_entities;
 	uint		num_mirror_entities;
 	uint		num_solid_entities;
 	uint		num_trans_entities;
 	uint		num_child_entities;
+	uint		num_delay_entities;
          
 	// OpenGL matrix states
 	qboolean		modelviewIdentity;
@@ -253,7 +255,7 @@ extern mleaf_t		*r_viewleaf, *r_oldviewleaf;
 extern mleaf_t		*r_viewleaf2, *r_oldviewleaf2;
 extern dlight_t		cl_dlights[MAX_DLIGHTS];
 extern dlight_t		cl_elights[MAX_ELIGHTS];
-#define r_numEntities	(tr.num_solid_entities + tr.num_trans_entities + tr.num_child_entities + tr.num_static_entities)
+#define r_numEntities	(tr.num_solid_entities + tr.num_trans_entities + tr.num_child_entities + tr.num_static_entities + tr.num_delay_entities)
 #define r_numStatics	(r_stats.c_client_ents)
 
 extern struct beam_s	*cl_active_beams;

@@ -79,6 +79,7 @@
 #define MOVETYPE_FOLLOW		12	// track movement of aiment
 #define MOVETYPE_PUSHSTEP		13	// BSP model that needs physics/world collisions (uses nearest hull for world collision)
 #define MOVETYPE_COMPOUND		14	// glue two entities together (simple movewith)
+#define MOVETYPE_FOLLOWMOVE		15	// track movement of aiment
 
 // edict->solid values
 // NOTE: Some movetypes will cause collisions independent of SOLID_NOT/SOLID_TRIGGER when the entity moves
@@ -124,6 +125,8 @@
 
 // entity flags
 #define EFLAG_SLERP			1	// do studio interpolation of this entity
+#define EFLAG_DEPTH_CHANGED		(1<<1)	// prevent model from poking into walls
+#define EFLAG_AFTER_VIEWMODEL		(1<<2)	// draw after view model
 
 //
 // temp entity events

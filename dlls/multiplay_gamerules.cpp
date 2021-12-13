@@ -47,6 +47,8 @@ void SV_Update_Tips_f()
 	WRITE_STRING(szHudText);
 	WRITE_BYTE(0);
 	MESSAGE_END();
+
+	ALERT(at_console, "Server will close for updating, please reconnect after 5 to 10 seconds\n");
 }
 
 bool IsBotSpeaking()
