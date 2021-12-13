@@ -523,4 +523,12 @@ BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
 	return ret;
 }
 
+int CPlayerModStrategy_ZB2::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	if (!m_pCharacter_ZB2)
+		return CPlayerModStrategy_ZB1::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+
+	return m_pCharacter_ZB2->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+}
+
 }

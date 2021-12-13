@@ -78,6 +78,7 @@ public:
 	void OnThink() override;
 	void Pain(int m_LastHitGroup, bool HasArmour) override;
 	BOOL DeployWeapon(CBasePlayerItem *item) override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 
 protected:
 	virtual bool CanUseZombieSkill();

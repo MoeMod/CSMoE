@@ -247,8 +247,8 @@ public:
 		pev->movetype = MOVETYPE_FLY; // 5
 		pev->nextthink = gpGlobals->time + 0.0099999998s;
 		ph7 = gpGlobals->time + 1.0s;
-		ph8 = 300.0;
-		this_1_has_disconnected = 0;
+		//ph8 = 300.0;
+		//this_1_has_disconnected = 0;
 		UTIL_SetSize(pev, { -3, -3, -3 }, { 3, 3, 3 });
 
 		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
@@ -283,35 +283,44 @@ public:
 
 	void EXPORT FlyThink()
 	{
-		if (gpGlobals->time < ph7)
-		{
-			this->pev->nextthink = gpGlobals->time + 0.0099999998s;
-			this_1_m_iSwing = gpGlobals->time;
-
-			if (pev->solid == SOLID_NOT)
-			{
-				PenetrateEnd();
-			}
-		}
-		else
+		if (ph7 <= gpGlobals->time)
 		{
 			TouchWall();
+			return;
+		}
+
+		this->pev->nextthink = gpGlobals->time + 0.0099999998s;
+		if (pev->solid == SOLID_NOT)
+		{
+			PenetrateEnd();
 		}
 	}
 
 	void EXPORT OnTouch(CBaseEntity *pOther)
 	{
-		if (gpGlobals->time <= this_1_m_iSwing)
-		{
-			if (pOther && pOther->IsBSPModel())
-			{
-				TouchWall();
-			}
-			else if (pOther->pev->pContainingEntity != this->pev->owner)
-			{
-				TouchEntity(pOther);
-			}
+		if (pev->owner == pOther->edict())
+			return;
+
+		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+		if (!pOther->IsPlayer() || !pAttacker->IsPlayer()) {
+			TouchWall();
+			return;
 		}
+
+		if (pOther->pev->takedamage != DAMAGE_NO && pOther->IsAlive())
+		{
+			Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
+			TraceResult tr;
+			UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttacker->pev), &tr);
+			tr.iHitgroup = HITGROUP_CHEST; // ...
+
+			ClearMultiDamage();
+			pOther->TraceAttack(pAttacker->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+			ApplyMultiDamage(pAttacker->pev, pAttacker->pev);
+		}
+
+		PenetrateStart();
 	}
 
 	void TouchWall()
@@ -320,43 +329,11 @@ public:
 		RadiusDamage();
 	}
 
-	void TouchEntity(CBaseEntity *pOther)
-	{
-		if (pev->owner == pOther->edict())
-			return;
-
-		CBaseEntity *pAttacker = CBaseEntity::Instance(pev->owner);
-		CBasePlayer *pAttackePlayer = nullptr;
-		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer *>(pAttacker);
-
-		if (pAttackePlayer &&
-			pOther->pev->takedamage != DAMAGE_NO &&
-			pOther->IsAlive()
-			)
-		{
-			Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
-
-			TraceResult tr;
-			UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-			tr.iHitgroup = HITGROUP_CHEST; // ...
-
-			ClearMultiDamage();
-			pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-			ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
-
-			PenetrateStart();
-		}
-		pev->velocity = {};
-	}
-
 	void PenetrateStart()
 	{
 		pev->origin = pev->origin + m_vecStartVelocity.Normalize() * 42;
 		pev->velocity = {};
-		
 		pev->solid = SOLID_NOT;
-
 		pev->nextthink = gpGlobals->time + 0.05s;
 	}
 	
@@ -364,7 +341,6 @@ public:
 	{
 		pev->velocity = m_vecStartVelocity;
 		pev->solid = SOLID_CUSTOM;
-
 		pev->nextthink = gpGlobals->time + 0.001s;
 	}
 	
@@ -445,7 +421,8 @@ public:
 
 		EMIT_SOUND_DYN(this->edict(), CHAN_WEAPON, "weapons/gungnir_charge_shoot_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-		
+		pev->effects |= EF_NODRAW;
+		SetTouch(NULL);
 		SetThink(&CGungnirSpear::AdditionalDamageThink);
 		pev->nextthink = gpGlobals->time + 1.1s;
 	}
@@ -495,9 +472,8 @@ public:
 	int ph5;
 	int ph6;
 	time_point_t ph7;
-	float ph8; // m_pfnThink?
-	time_point_t this_1_m_iSwing;
-	short this_1_has_disconnected;
+	//float ph8; // m_pfnThink?
+	//short this_1_has_disconnected;
 
 	float m_flTouchDamage;
 	float m_flExplodeDamage;

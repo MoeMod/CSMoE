@@ -200,7 +200,7 @@ public:
 	cvar_t *m_pHud_DrawHistory_Time;
 
 	cvar_t *cl_crosshair_type;
-	model_s* m_hBuffHit;
+	HSPRITE m_hBuffHit;
 	inline void HitForBuff(float flTime)
 	{
 		m_flLastBuffHit = flTime + 0.1;

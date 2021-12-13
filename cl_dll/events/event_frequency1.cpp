@@ -107,7 +107,6 @@ void EV_FireFrequency1( event_args_t *args )
 				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
 			}
 		}
-		
 	}
 	else
 	{
@@ -124,6 +123,12 @@ void EV_FireFrequency1( event_args_t *args )
 		1, vecSrc, forward,
 		vSpread, 8192.0, BULLET_PLAYER_50AE,
 		2 );
+
+	const Vector vecDirShooting = (forward + right * vSpread.x + up * vSpread.y).Normalize();
+	Vector vecEnd = vecSrc + vecDirShooting * 2048;
+
+	int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/laserbeam.spr");
+	gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.7f, 4.0f, 0.0f, 40.0f, 23.3f, 0.0f, 0.1f, 75, 150, 150);
 }
 
 }
