@@ -156,6 +156,7 @@ namespace luash
 
 		lua_getglobal(L, "OnStructCreate");
 		// #3 = OnStructCreate
+		lua_insert(L, -3); // #1=OnStructCreate #2=struct #3=struct_name
 
 		if (int errc = lua_pcall(L, 2, 1, 0))
 		{
