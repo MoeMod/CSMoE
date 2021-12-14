@@ -225,7 +225,7 @@ void CMenuMain::_Init( void )
 	console.SetPicture( PC_CONSOLE );
 	SET_EVENT_MULTI( console.onActivated,
 	{
-		//UI_SetActiveMenu( FALSE );
+		UI_SetActiveMenu( FALSE );
 		EngFuncs::KEY_SetDest( KEY_CONSOLE );
 	});
 

@@ -291,7 +291,7 @@ void Con_ToggleConsole_f( void )
 	}
 	else
 	{
-		//UI_SetActiveMenu( false );
+		UI_SetActiveMenu( false );
 		Key_SetKeyDest( key_console );
 	}
 }
