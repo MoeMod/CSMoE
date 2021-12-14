@@ -107,7 +107,7 @@ void SV_DirectConnect( netadr_t from )
 	int		challenge;
 	unsigned int requested_extensions, extensions = 0;
 	edict_t		*ent;
-	char *errorpacket = "print";
+	const char *errorpacket = "print";
 
 	if( Cmd_Argc() > 6 )
 		errorpacket = "errormsg";
@@ -259,6 +259,15 @@ gotnewcl:
 		}
 
 		Q_strncpy( cl->auth_id, id, sizeof( cl->auth_id ) );
+
+		int cl_build = Q_atoi(Info_ValueForKey(newcl->useragent, "b"));
+		if(sv_minclver->integer > 0 && cl_build < sv_minclver->integer)
+		{
+			Netchan_OutOfBandPrint( NS_SERVER, from, "print\nServer requires build version >= %i.\n", sv_minclver->integer );
+			Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\nServer requires build version %i.\n", sv_minclver->integer );
+			Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
+			return;
+		}
 	}
 
 	svs.currentPlayer = newcl;

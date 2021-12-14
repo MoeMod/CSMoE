@@ -254,7 +254,7 @@ int Netchan_CreateFileFragments( qboolean server, netchan_t *chan, const char *f
 void Netchan_Transmit( netchan_t *chan, int lengthInBytes, byte *data );
 void Netchan_TransmitBits( netchan_t *chan, int lengthInBits, byte *data );
 void Netchan_OutOfBand( int net_socket, netadr_t adr, int length, byte *data );
-void Netchan_OutOfBandPrint( int net_socket, netadr_t adr, char *format, ... );
+void Netchan_OutOfBandPrint( int net_socket, netadr_t adr, const char *format, ... );
 qboolean Netchan_Process( netchan_t *chan, sizebuf_t *msg );
 void Netchan_UpdateProgress( netchan_t *chan );
 qboolean Netchan_IncomingReady( netchan_t *chan );
