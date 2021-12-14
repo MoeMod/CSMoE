@@ -890,8 +890,8 @@ void CRotDoor::Restart()
 
 void CRotDoor::Spawn()
 {
-	Precache();
 	m_Material = matWood;
+	Precache();
 
 	if (pev->spawnflags & SF_BREAK_TRIGGER_ONLY)
 		pev->takedamage = DAMAGE_NO;

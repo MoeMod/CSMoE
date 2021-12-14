@@ -420,7 +420,8 @@ void EV_WpnEffects(event_args_s* args)
 				pEntAttach1->entity.curstate.renderfx = kRenderFxNone;
 				pEntAttach1->entity.curstate.scale = 0.09;
 				pEntAttach1->entity.curstate.renderamt = 255;
-				pEntAttach1->die = gHUD.m_flTime + 0.5;			
+				pEntAttach1->die = gHUD.m_flTime + 0.5;
+				pEntAttach1->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 
 				pEntAttach1->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 					cl_entity_t* viewent = gEngfuncs.GetViewModel();
@@ -441,6 +442,7 @@ void EV_WpnEffects(event_args_s* args)
 				pEntAttach2->entity.curstate.scale = 0.11;
 				pEntAttach2->entity.curstate.renderamt = 255;
 				pEntAttach2->die = gHUD.m_flTime + 0.5;
+				pEntAttach2->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 			
 				pEntAttach2->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 					cl_entity_t* viewent = gEngfuncs.GetViewModel();
@@ -484,6 +486,7 @@ void EV_WpnEffects(event_args_s* args)
 			pEnt->entity.curstate.rendermode = kRenderTransAdd;
 			pEnt->entity.curstate.renderamt = 255;
 			pEnt->entity.baseline.angles = Vector(0, 0, 0);
+			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
 
 			if (args->iparam2 != 3)
 			{
@@ -602,34 +605,34 @@ void EV_WpnEffects(event_args_s* args)
 			if (pModel)
 			{
 				cl_entity_t* viewent = gEngfuncs.GetViewModel();
-				Vector vecStartOrigin, vecEndOrigin, vecVelocity;
-				vecStartOrigin = viewent->attachment[i];
-				vecEndOrigin = viewent->attachment[i + 1];
-				float speed = 10.0;
-				vecVelocity = (vecEndOrigin - vecStartOrigin) * (speed / (vecEndOrigin - vecStartOrigin).Length());
-
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vecStartOrigin, pModel);
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[i], pModel);
 
 				if (!pEnt)
 					return;
 
 				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-				pEnt->flags |= FTENT_PERSIST;
+				pEnt->flags |= FTENT_PERSIST | FTENT_CLIENTCUSTOM | FTENT_FADEOUT;
 				pEnt->entity.curstate.frame = 0;
-				pEnt->entity.curstate.framerate = 2.0;
-				//pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-				//pEnt->entity.curstate.aiment = idx;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOWMOVE;
+				pEnt->entity.curstate.aiment = viewent->index;
+				pEnt->entity.curstate.body = i + 1;
 				pEnt->entity.curstate.solid = SOLID_NOT;
 				pEnt->entity.curstate.rendermode = kRenderTransAdd;
 				pEnt->entity.curstate.renderfx = kRenderFxNone;
-				pEnt->entity.baseline.origin = vecVelocity;
-				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.02, 0.04);
-				pEnt->entity.curstate.renderamt = 255;
-				pEnt->die = gHUD.m_flTime + 0.2;
-
-				/*pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-					pEnt->entity.baseline.origin[2] += 1.0;
-				};*/
+				pEnt->entity.curstate.scale = gEngfuncs.pfnRandomFloat(0.005f, 0.01f);
+				pEnt->entity.baseline.renderamt = pEnt->entity.curstate.renderamt = gEngfuncs.pfnRandomFloat(150.0f, 200.0f);
+				pEnt->fadeSpeed = 2.0f;
+				pEnt->die = gHUD.m_flTime + 0.3f;
+				pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					char pModelName[32];
+					int index = Com_RandomLong(0, 4);
+					sprintf(pModelName, "sprites/buffm249_fire0%i.spr", index + 1);
+					pEnt->entity.curstate.modelindex = gEngfuncs.pEventAPI->EV_FindModelIndex(pModelName);
+					pEnt->entity.curstate.frame += frametime * 2;
+					if(pEnt->entity.curstate.scale < 0.03f)
+						pEnt->entity.curstate.scale += frametime * 0.05f;
+				};
 			}
 		}
 		break;
@@ -774,6 +777,7 @@ void EV_WpnEffects(event_args_s* args)
 			pEnt->entity.curstate.renderamt = 255;
 			pEnt->entity.curstate.body = index + 1;
 			pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED|EFLAG_AFTER_VIEWMODEL;
 
 			if (!index)
 				pEnt->die = gHUD.m_flTime + 3.03;
@@ -822,6 +826,7 @@ void EV_WpnEffects(event_args_s* args)
 		pEnt->frameMax = 256;
 		pEnt->entity.curstate.animtime = gHUD.m_flTime + args->fparam2;
 		pEnt->entity.curstate.framerate = 1.0;
+		pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
 
 		int iType = args->iparam2;
 

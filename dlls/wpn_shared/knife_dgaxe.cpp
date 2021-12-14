@@ -962,15 +962,16 @@ namespace sv {
 			{
 				m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]++;
 				m_flTimeNextCharge = gpGlobals->time + 0.3s;
+
+				if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 50)
+				{
+					EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/dgaxe_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 2, TRUE, FALSE);
+				}
 			}
 		}
 		if (IsSignal())
 		{
-			if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] == 50)
-			{
-				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/dgaxe_ready.wav", VOL_NORM, ATTN_NORM, 0, 94);
-				PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 4, 2, TRUE, FALSE);
-			}
 			m_CrossHairState = DGAXE_AIM_OFF;
 			if (m_iButton & IN_ATTACK)
 				m_CrossHairState = DGAXE_AIM_ON_2;

@@ -42,7 +42,7 @@ namespace luash
 	}
 	inline void PushNil(lua_State* L, std::nullptr_t = nullptr)
 	{
-		lua_pushnil(L);
+		lua_pushlightuserdata(L, nullptr);
 	}
 	using std::begin;
 	using std::end;
@@ -75,7 +75,7 @@ namespace luash
 	template<class T> void PushPointer(lua_State* L, T* ptr)
 	{
 		if (!ptr)
-			return lua_pushnil(L);
+			return lua_pushlightuserdata(L, nullptr);
 		if (!PushLuaObjectByPtr(L, (void*)ptr))
 		{
 			lua_pushlightuserdata(L, (void*)ptr); // #1 = ptr
@@ -85,20 +85,20 @@ namespace luash
 	// just unsupported
 	template<class T, class U> void PushMemberPointer(lua_State* L, U T::* mem_ptr)
 	{
-		lua_pushnil(L);
+		lua_pushlightuserdata(L, nullptr);
 	}
 	template<class T, class U> void PushMemberPointer(lua_State* L, const U T::* const_mem_ptr)
 	{
-		lua_pushnil(L);
+		lua_pushlightuserdata(L, nullptr);
 	}
 	/*
 	template<class T, class R, class...A> void PushMemberPointer(lua_State* L, R (T::* mem_fn_ptr)(A...))
 	{
-		lua_pushnil(L);
+		lua_pushlightuserdata(L, nullptr);
 	}
 	template<class T, class R, class...A> void PushMemberPointer(lua_State* L, R(T::* const_mem_fn_ptr)(A...) const)
 	{
-		lua_pushnil(L);
+		lua_pushlightuserdata(L, nullptr);
 	}
 	*/
 	inline void PushString(lua_State* L, char* ptr)

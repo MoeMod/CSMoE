@@ -221,6 +221,29 @@ void CPlayerModStrategy_ZB3::Event_OnRoundStart()
 	m_flRagePercent = 0;
 }
 
+int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	if (m_pPlayer->m_bIsZombie)
+		return 1;
+
+	CBaseEntity* pAttacker = GetClassPtr<CBaseEntity>(pevAttacker);
+	if (!pAttacker->IsPlayer())
+		return 1;
+
+	CBasePlayer* pAttackerPlayer = GetClassPtr<CBasePlayer>(pevAttacker);
+	if (!pAttackerPlayer->m_bIsZombie)
+		return 1;
+
+	if (m_pPlayer->iuser1 == 1 && m_pPlayer->m_pActiveItem && !Q_strcmp(STRING(m_pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
+		return 0;
+
+	if (IsHero() && m_pPlayer->pev->health - flDamage > 0.0f)
+		return 1;
+
+	m_pModZB3->HumanInfectionByZombie(m_pPlayer, pAttackerPlayer);
+	return 0;
+}
+
 void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const
 {
 	if(player)
@@ -323,7 +346,7 @@ BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pA
 		iReturn = TRUE;
 	}
 
-	CBasePlayer* pAttackerPlayer = dynamic_ent_cast<CBasePlayer*>(pAttacker);
+	/*CBasePlayer* pAttackerPlayer = dynamic_ent_cast<CBasePlayer*>(pAttacker);
 	do
 	{
 		if (!pAttackerPlayer) break;
@@ -342,7 +365,7 @@ BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pA
 		}
 		iReturn = FALSE;
 		HumanInfectionByZombie(pPlayer, pAttackerPlayer);
-	} while (false);
+	} while (false);*/
 
 	return iReturn;
 }

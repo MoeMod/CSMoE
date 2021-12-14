@@ -382,6 +382,7 @@ public:
 	void Think() override;
 	void Activate() override;
 	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
 	void FireZombieSkill();
 
 protected:

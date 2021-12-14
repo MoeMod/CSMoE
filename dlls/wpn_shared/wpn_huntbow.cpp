@@ -520,7 +520,7 @@ int CHuntbow::GetItemInfo(ItemInfo *p)
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = -1;
 	p->iSlot = 0;
-	p->iPosition = 4;
+	p->iPosition = 6;
 	p->iId = m_iId = WEAPON_M4A1;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;

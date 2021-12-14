@@ -413,9 +413,9 @@ int CHudAmmo::VidInit(void)
 	}
 
 	m_flLastBuffHit = 0.0;
-	//m_hBuffHit = SPR_Load("sprites/ishot.spr");
-	m_hBuffHit = (struct model_s*)gEngfuncs.GetSpritePointer(gEngfuncs.pfnSPR_Load("sprites/ishot.spr"));
-	/*m_iBuffHitHeight = SPR_Height(m_hBuffHit, 0);
+	m_hBuffHit = SPR_Load("sprites/ishot.spr");
+	/*m_hBuffHit = (struct model_s*)gEngfuncs.GetSpritePointer(gEngfuncs.pfnSPR_Load("sprites/ishot.spr"));
+	m_iBuffHitHeight = SPR_Height(m_hBuffHit, 0);
 	m_iBuffHitWidth = SPR_Width(m_hBuffHit, 0);*/
 	return 1;
 }
@@ -1172,7 +1172,8 @@ int CHudAmmo::Draw(float flTime)
 		int iY = (ScreenHeight - iWidth) / 2;
 		
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-		gEngfuncs.pTriAPI->SpriteTexture(m_hBuffHit, 0);
+		model_t* buffHit = (struct model_s*)gEngfuncs.GetSpritePointer(m_hBuffHit);
+		gEngfuncs.pTriAPI->SpriteTexture(buffHit, 0);
 		
 		gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 		gEngfuncs.pTriAPI->TexCoord2f(0, 0);

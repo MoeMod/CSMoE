@@ -1108,7 +1108,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	VectorCopy( e->origin, origin );	// set render origin
 
 	// do movewith
-	if( e->curstate.aiment > 0 && e->curstate.movetype == MOVETYPE_FOLLOW )
+	if( e->curstate.aiment > 0 && (e->curstate.movetype == MOVETYPE_FOLLOW || e->curstate.movetype == MOVETYPE_FOLLOWMOVE))
 	{
 		cl_entity_t	*parent;
 	
@@ -1118,8 +1118,16 @@ void R_DrawSpriteModel( cl_entity_t *e )
 		{
 			if( parent->model->type == mod_studio && e->curstate.body > 0 )
 			{
-				int num = bound( 1, e->curstate.body, MAXSTUDIOATTACHMENTS );  //gr3
-				VectorCopy( parent->attachment[num-1], origin );
+				if (e->curstate.movetype == MOVETYPE_FOLLOWMOVE)
+				{
+					int num = bound(1, e->curstate.body, MAXSTUDIOATTACHMENTS);
+					VectorLerp(parent->attachment[num - 1], e->curstate.frame, parent->attachment[num], origin);
+				}
+				else
+				{
+					int num = bound(1, e->curstate.body, MAXSTUDIOATTACHMENTS);  //gr3
+					VectorCopy(parent->attachment[num - 1], origin);
+				}
 			}
 			else VectorCopy( parent->origin, origin );
 		}

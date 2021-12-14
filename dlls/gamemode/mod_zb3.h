@@ -60,6 +60,7 @@ public:
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void OnThink() override;
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
 	virtual void Event_OnBecomeHero(CBasePlayer *who);
 	virtual void Event_OnRoundStart();

@@ -201,7 +201,7 @@ void CFrequency1::Frequency1FireSP(float flSpread, duration_t flCycleTime, BOOL 
 	else
 		KickBack(3.0, 2.0, 1.0, 0.7, 8.0, 12.0, 4);
 
-#ifndef CLIENT_DLL
+#if 0
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 2048;
 	Effect_Beam(vecSrc, vecEnd, 7, 50, 75, 150, 150, 4, 998);
 #endif
@@ -269,7 +269,7 @@ void CFrequency1::Frequency1Fire(float flSpread, duration_t flCycleTime, BOOL fU
 #endif
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.8s;
 	m_pPlayer->pev->punchangle.x -= 2;
-#ifndef CLIENT_DLL
+#if 0
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 2048;
 	Effect_Beam(vecSrc, vecEnd, 7, 50, 75, 150, 150, 4, 998);
 #endif

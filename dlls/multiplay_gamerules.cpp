@@ -32,6 +32,25 @@ DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
 DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
 DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
 
+void SV_Update_Tips_f()
+{
+	char szText[128];
+	sprintf(szText, "^2服务器即将关闭更新，请在^3 5~10 ^2秒后重新进入!!");
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+	WRITE_BYTE(0);
+	WRITE_STRING(szText);
+	MESSAGE_END();
+
+	char szHudText[128];
+	sprintf(szHudText, "服务器即将关闭更新，请在5~10 秒后重新进入!!");
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgHudText);
+	WRITE_STRING(szHudText);
+	WRITE_BYTE(0);
+	MESSAGE_END();
+
+	ALERT(at_console, "Server will close for updating, please reconnect after 5 to 10 seconds\n");
+}
+
 bool IsBotSpeaking()
 {
 	for (int i = 1; i <= gpGlobals->maxClients; ++i)
@@ -556,6 +575,7 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 		}
 		ADD_SERVER_COMMAND("perf_test", loopPerformance);
 		ADD_SERVER_COMMAND("print_ent", printEntities);
+		ADD_SERVER_COMMAND("update_tips", SV_Update_Tips_f);
 
 		installedCommands = true;
 	}

@@ -195,13 +195,23 @@ void CMod_ZombieMod2::RemoveAllEntity()
 		ent->pev->flags |= FL_KILLME;
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
+
 	while ((ent = UTIL_FindEntityByClassname(ent, "zombiebomb")) != nullptr)
 	{
 		ent->pev->effects |= EF_NODRAW;
 		ent->pev->flags |= FL_KILLME;
 		ent->SetThink(&CBaseEntity::SUB_Remove);
 	}
+
 	while ((ent = UTIL_FindEntityByClassname(ent, "zombietrap")) != nullptr)
+	{
+		ent->pev->effects |= EF_NODRAW;
+		ent->pev->flags |= FL_KILLME;
+		ent->SetThink(&CBaseEntity::SUB_Remove);
+		ent->SetTouch(NULL);
+	}
+
+	while ((ent = UTIL_FindEntityByClassname(ent, "zombiepile")) != nullptr)
 	{
 		ent->pev->effects |= EF_NODRAW;
 		ent->pev->flags |= FL_KILLME;
@@ -511,6 +521,14 @@ BOOL CPlayerModStrategy_ZB2::DeployWeapon(CBasePlayerItem *item)
 	m_pCharacter_ZB2->OnWeaponDeploy(item);
 
 	return ret;
+}
+
+int CPlayerModStrategy_ZB2::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	if (!m_pCharacter_ZB2)
+		return CPlayerModStrategy_ZB1::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+
+	return m_pCharacter_ZB2->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 }
 
 }

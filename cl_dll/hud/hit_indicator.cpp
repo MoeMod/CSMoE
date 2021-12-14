@@ -96,7 +96,7 @@ int CHudHitIndicator:: VidInit( void )
 	R_InitTexture(m_iTex[3], path);
 	sprintf(path, "resource/floatingdamage/icon_backatk_skin0%d.tga", i);
 	R_InitTexture(m_iTex[4], path);
-	ConsolePrint(" Hit Indicator Numbers tga Loaded!\n");
+
 	return 1;
 }
 

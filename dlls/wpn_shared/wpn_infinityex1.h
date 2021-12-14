@@ -70,7 +70,7 @@ public:
 	}
 	bool HasSecondaryAttack() override { return true; }
 	float GetArmorRatioModifier() override { return 1.0; }
-	const char *GetCSModelName() override { return "models/w_infinityex2.mdl"; }
+	const char *GetCSModelName() override { return "models/w_infinityex1.mdl"; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
 #endif
