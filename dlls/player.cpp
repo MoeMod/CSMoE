@@ -1050,7 +1050,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1mw") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1x") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm4") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffak"))
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -7141,7 +7141,7 @@ bool CBasePlayer::ReactToDeimosTail()
 		CBasePlayerItem* pKnife = m_rgpPlayerItems[KNIFE_SLOT];
 		if (pKnife)
 		{
-			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_lance") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx"))
+			if (!Q_strcmp(STRING(pKnife->pev->classname), "knife_lance") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dgaxe") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_dualsword") || !Q_strcmp(STRING(pKnife->pev->classname), "z4b_stormgiantx") || !Q_strcmp(STRING(pKnife->pev->classname), "knife_stormgiant"))
 			{
 				RemovePlayerItem(m_rgpPlayerItems[KNIFE_SLOT]);
 

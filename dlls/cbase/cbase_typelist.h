@@ -158,6 +158,11 @@ TL_ADD(CSFGUN)
 TL_ADD(CSFSMG)
 TL_ADD(CQbarrel)
 TL_ADD(CBUFFM249)
+TL_ADD(CBuffM4A1)
+TL_ADD(CKnifeStormgiant)
+TL_ADD(CBuffAK47)
+TL_ADD(CBuffAK47Grenade)
+TL_ADD(CBison)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)

@@ -51,6 +51,7 @@ GNU General Public License for more details.
 
 #if defined _WIN32 && defined XASH_DEDICATED
 #include "textconsole.h"
+#include <direct.h>
 #include <mmsystem.h> // timeGetTime
 #pragma   comment(lib,"winmm.lib")  
 

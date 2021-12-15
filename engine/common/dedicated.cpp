@@ -273,12 +273,12 @@ void S_StopAllSounds()
 
 }
 
-void Con_NPrintf( int idx, char *fmt, ... )
+void Con_NPrintf( int idx, const char *fmt, ... )
 {
 
 }
 
-void Con_NXPrintf( struct  con_nprint_s *info, char *fmt, ... )
+void Con_NXPrintf( struct  con_nprint_s *info, const char *fmt, ... )
 {
 
 }
@@ -393,7 +393,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 	}
 
 	// add a point in the center to help keep warp valid
-	poly = Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
+	poly = (glpoly_t *)Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
 	poly->next = warpface->polys;
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
@@ -492,7 +492,7 @@ void GL_SubdivideSurface( msurface_t *fa )
 	SubdividePolygon_r( fa, numverts, verts[0] );
 }
 
-int pfnDrawConsoleString( int x, int y, char *string )
+int pfnDrawConsoleString( int x, int y, const char *string )
 {
 	return 0;
 }
@@ -586,7 +586,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	loadmodel->cache.data = Mem_Alloc( loadmodel->mempool, phdr->length );
 	Q_memcpy( loadmodel->cache.data, buffer, phdr->length );
 
-	phdr = loadmodel->cache.data;
+	phdr = (studiohdr_t *)loadmodel->cache.data;
 
 	// setup bounding box
 	VectorCopy( phdr->bbmin, loadmodel->mins );
@@ -627,7 +627,7 @@ void Mod_UnloadStudioModel( model_t *mod )
 	if( mod->type != mod_studio )
 		return; // not a studio
 
-	pstudio = mod->cache.data;
+	pstudio = (studiohdr_t*)mod->cache.data;
 	if( !pstudio ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );
@@ -669,7 +669,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 
 	mod->mempool = Mem_AllocPool( va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
-	psprite = Mem_Alloc( mod->mempool, size );
+	psprite = (msprite_t *)Mem_Alloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata
 
 	psprite->type = LittleLong(pin.type);
@@ -709,7 +709,7 @@ void Mod_UnloadSpriteModel( model_t *mod )
 	if( mod->type != mod_sprite )
 		return; // not a sprite
 
-	psprite = mod->cache.data;
+	psprite = (msprite_t *)mod->cache.data;
 	if( !psprite ) return; // already freed
 
 	Mem_FreePool( &mod->mempool );

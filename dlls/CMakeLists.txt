@@ -346,6 +346,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfmg.cpp
 	../dlls/wpn_shared/wpn_qbarrel.cpp
 	../dlls/wpn_shared/wpn_buffm249.cpp
+	../dlls/wpn_shared/wpn_pumpkin.cpp
+	../dlls/wpn_shared/wpn_buffm4a1.cpp
+	../dlls/wpn_shared/knife_stormgiant.cpp
+	../dlls/wpn_shared/wpn_buffak47.cpp
+	../dlls/wpn_shared/wpn_bison.cpp
 	)
 
 set(PM_SRCS

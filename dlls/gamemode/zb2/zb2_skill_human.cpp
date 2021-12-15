@@ -285,7 +285,8 @@ void CHuman_ZB2::ResetMaxSpeed() const
 
 	if (m_tSlowdown > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed *= 0.5f;
+		m_pPlayer->pev->gravity = 1.0f;
+		m_pPlayer->pev->maxspeed = 120.0f;
 	}
 }
 

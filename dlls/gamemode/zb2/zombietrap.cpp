@@ -6,6 +6,7 @@
 #include "cbase/cbase_hash.h"
 
 #include "zombietrap.h"
+#include "gamemode/mod_zb2.h"
 
 namespace sv {
 

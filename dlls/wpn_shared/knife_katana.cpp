@@ -188,7 +188,7 @@ void CKnifeKatana::SecondaryAttack(void)
 	pev->nextthink = gpGlobals->time + 0.5s;
 
 	m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
+	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.1s;
 	m_iSwing = 0;
 }

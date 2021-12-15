@@ -242,6 +242,10 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sfgun");
 	UTIL_PrecacheOtherWeapon("weapon_qbarrel");
 	UTIL_PrecacheOtherWeapon("weapon_buffm249");
+	UTIL_PrecacheOtherWeapon("weapon_buffm4");
+	UTIL_PrecacheOtherWeapon("knife_stormgiant");
+	UTIL_PrecacheOtherWeapon("weapon_buffak");
+	UTIL_PrecacheOtherWeapon("weapon_bison");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

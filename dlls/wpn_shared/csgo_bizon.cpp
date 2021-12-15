@@ -57,11 +57,6 @@ void CBizon::Precache(void)
 	PRECACHE_MODEL("models/alt/v_bizon.mdl");
 
 	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon-1.wav");
-	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon_clipout.wav");
-	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon_clipin.wav");
-	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon_boltforward.wav");
-	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon_boltback.wav");
-	PRECACHE_SOUND("weapons/weapons/csgo_ports/bizon/bizon_draw.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireBizon = PRECACHE_EVENT(1, "events/bizon.sc");

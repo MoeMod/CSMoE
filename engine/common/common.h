@@ -402,6 +402,8 @@ typedef struct host_parm_s
 	signed char		draw_decals[MAX_DECALS][CS_SIZE];
 #ifdef XASH_SDL
     SDL_Window*		hWnd;		// main window
+#elif defined(_WIN32)
+	HWND hWnd;
 #else
 	void *hWnd;
 #endif

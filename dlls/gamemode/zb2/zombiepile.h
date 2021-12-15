@@ -21,15 +21,17 @@ public:
 
 private:
 	duration_t GetAliveTime() const { return 10s; }
-	duration_t GetSlowdownTime() const { return 5s; }
-	float GetRange() const { return 150.0f; }
+	duration_t GetSlowdownTime() const { return 3s; }
+	float GetRange() const { return 195.0f; }
 	float GetDamage() const { return 50.0f; }
 	float GetKnockBack() const { return 500.0f; }
 
 	EntityHandle <CBasePlayer> m_hOwner;
 	time_point_t m_flRemoveTime;
 	int m_idShard;
+	int m_idShockWave;
 	unsigned short m_usEvent;
+	bool m_bStomp;
 };
 
 }

@@ -44,7 +44,8 @@ enum
 	HUNTBOW_MARKZOMBIE,
 	TELEPORT_MARKEF,
 	HOLYBOMB_BURN,
-	LANCE_HIT
+	LANCE_HIT,
+	ZOMBIE_SKILL_PILE,
 };
 
 struct CHudHeadIconItem
@@ -230,6 +231,12 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 		flags = FTENT_PERSIST;
 		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
 			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case ZOMBIE_SKILL_PILE:
+	{
+		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zbt_slow.spr"),
+			Vector(0.0, 0.0, 40.0), 3.0, TRUE, flags, 1.0, kRenderTransAdd, 1.0);
 		break;
 	}
 	}

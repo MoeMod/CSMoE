@@ -171,6 +171,11 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 	if (p->m_bIsVIP || p->m_bIsZombie)
 		return;
 #if 1
+	for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+	{
+		p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+	}
+
 	DropPrimary(p);
 	DropSecondary(p);
 	p->RemoveAllItems(FALSE, false);

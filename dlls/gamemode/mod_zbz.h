@@ -23,7 +23,7 @@ GNU General Public License for more details.
 #include <set>
 
 namespace sv {
-
+class CZombieZSkill_Base;
 class CMod_ZombieZ : public CMod_ZombieHero
 {
 public:

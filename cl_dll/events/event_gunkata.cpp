@@ -143,6 +143,7 @@ void EV_FireGunkata(struct event_args_s *args)
 					pEnt->entity.curstate.framerate = 1.0;
 					pEnt->frameMax = 256;
 					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
 
 					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 						cl_entity_t* viewent = gEngfuncs.GetViewModel();

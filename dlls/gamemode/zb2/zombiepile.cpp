@@ -57,12 +57,45 @@ void CZombiePile::Slowdown()
 		if (pPlayer->m_bIsZombie)
 			continue;
 
+		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pPlayer->pev);
+		WRITE_BYTE(10);	//type
+		WRITE_SHORT(ENTINDEX(pPlayer->edict()));	//entity
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pPlayer->pev);
+		WRITE_SHORT(0xA000);
+		WRITE_SHORT(0x1000);
+		WRITE_SHORT(0x6400);
+		MESSAGE_END();
+
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(pPlayer->m_pModStrategy.get());
 		if (strategy)
 		{
 			strategy->SetSlowdownTime(flTime);
 		}
 	}
+
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+	WRITE_BYTE(TE_BEAMDISK);
+	WRITE_COORD(pev->origin.x);
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z - (m_bStomp ? 16 : 32));
+	WRITE_COORD(pev->origin.x);
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z + 500);
+	WRITE_SHORT(m_idShockWave);
+	WRITE_BYTE(0);
+	WRITE_BYTE(0);
+	WRITE_BYTE(4);
+	WRITE_BYTE(35);
+	WRITE_BYTE(0);
+	WRITE_BYTE(255);
+	WRITE_BYTE(255);
+	WRITE_BYTE(230);
+	WRITE_BYTE(60);
+	WRITE_BYTE(0);
+	MESSAGE_END();
+
 }
 
 void CZombiePile::Spawn(void)
@@ -91,11 +124,13 @@ void CZombiePile::Spawn(void)
 	{
 		pev->body = 2;
 		UTIL_SetSize(pev, Vector(-12.0, -12.0, -18.0), Vector(12.0, 12.0, 18.0));
+		m_bStomp = true;
 	}
 	else
 	{
 		pev->body = 1;
 		UTIL_SetSize(pev, Vector(-12.0, -12.0, -36.0), Vector(12.0, 12.0, 36.0));
+		m_bStomp = false;
 	}
 
 	pev->sequence = 0;
@@ -112,6 +147,7 @@ void CZombiePile::Precache(void)
 	PRECACHE_SOUND("zombi/zombi_stamper_iron_maiden_explosion.wav");
 	PRECACHE_MODEL("models/zombipile.mdl");
 	m_idShard = PRECACHE_MODEL("models/woodgibs.mdl");
+	m_idShockWave = PRECACHE_MODEL("sprites/ef_shockwave.spr");
 	m_usEvent = PRECACHE_EVENT(1, "addons/luash/events/event_zombiepile.lua");
 }
 
