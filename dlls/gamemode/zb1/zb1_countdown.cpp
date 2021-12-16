@@ -24,11 +24,6 @@ GNU General Public License for more details.
 
 namespace sv {
 
-static const char* s_szCountDownSound[11] = {
-				"", "one", "two", "three", "four", "five", "six",
-				"seven", "eight", "nine", "ten"
-};
-
 void CModCountdownHelper::Think()
 {
 	int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - g_pGameRules->m_fRoundCount.time_since_epoch() /1s);
@@ -48,12 +43,6 @@ void CModCountdownHelper::Think()
 			{
 				if (m_pDelegate)
 					m_pDelegate->OnCountdownStart();
-
-			}
-			else if (iCurrentCount <= 10)
-			{
-				for (CBasePlayer* player : moe::range::PlayersList())
-					CLIENT_COMMAND(player->edict(), "spk %s\n", s_szCountDownSound[iCurrentCount]);
 
 			}
 		}

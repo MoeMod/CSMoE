@@ -1,0 +1,76 @@
+#pragma once
+
+#include <variant>
+#include <type_traits>
+#include "meta/StructBreak.hpp"
+
+namespace sv {
+	namespace z4 {
+		struct zclass_sound_s {
+			const char *szSoundDeath1;
+			const char *szSoundDeath2;
+			const char *szSoundPain1;
+			const char *szSoundPain2;
+			const char *szSoundDash1;
+			const char *szSoundDash2;
+			const char *szSoundStun;
+			const char *szSkill1;
+			const char *szSkill2;
+		};
+
+		struct zclass_ability_s {
+			float flSpeed;
+			float flGravity;
+			float flKnockback;
+			float flDefense;
+			float flDashSpeed;
+			float flDashGravity;
+			float flDashKnockback;
+			float flDashDefense;
+		};
+	}
+}
+
+#include "z4_zclass_z4normal.hpp"
+
+namespace sv {
+	namespace z4 {
+		using zclass_variant_t = std::variant<
+	        zclass_z4normal
+		>;
+
+		template<class ZC> void Z4_ZClass_Precache_Single()
+		{
+			char buffer[MAX_PATH];
+			sprintf(buffer, "models/player/%s/%s.mdl", ZC::Model, ZC::Model);
+			PRECACHE_MODEL(buffer);
+
+			PRECACHE_MODEL(ZC::V_Model);
+
+			StructApply(ZC::Sound, [](auto...SoundList){
+				(..., (SoundList && PRECACHE_SOUND(SoundList)));
+			});
+		}
+
+		template<class...ZC>
+		void Z4_ZClass_Precache_All(std::type_identity<std::variant<ZC...>>)
+		{
+			(..., Z4_ZClass_Precache_Single<ZC>());
+		}
+		inline void Z4_ZClass_Precache_All()
+		{
+			return Z4_ZClass_Precache_All(std::type_identity<zclass_variant_t>());
+		}
+
+		template<class...ZC> zclass_variant_t Z4_MakeRandomZombie(std::type_identity<std::variant<ZC...>>, CBasePlayer *player)
+		{
+			auto Index = RANDOM_LONG(0, sizeof...(ZC) - 1);
+			constexpr zclass_variant_t(*pfn[sizeof...(ZC)])(CBasePlayer *player) = { [](CBasePlayer *player) -> zclass_variant_t { return ZC(player); }... };
+			return pfn[Index](player);
+		}
+		zclass_variant_t Z4_MakeRandomZombie(CBasePlayer *player)
+		{
+			return Z4_MakeRandomZombie(std::type_identity<zclass_variant_t>(), player);
+		}
+	}
+}

@@ -4,6 +4,7 @@
 #include "player.h"
 #include "client.h"
 #include "cbase/cbase_hash.h"
+#include "gamemode/mod_zb2.h"
 
 #include "zombietrap.h"
 #include "gamemode/mod_zb2.h"

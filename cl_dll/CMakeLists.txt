@@ -24,7 +24,7 @@ cmake_minimum_required(VERSION 3.10.2)
 
 project (client)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if (APPLE OR ANDROID)
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -201,6 +201,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfmg.cpp
 	../dlls/wpn_shared/wpn_qbarrel.cpp
 	../dlls/wpn_shared/wpn_buffm249.cpp
+	../dlls/wpn_shared/knife_zombi_z4.cpp
 	../dlls/wpn_shared/wpn_pumpkin.cpp
 	../dlls/wpn_shared/wpn_buffm4a1.cpp
 	../dlls/wpn_shared/knife_stormgiant.cpp

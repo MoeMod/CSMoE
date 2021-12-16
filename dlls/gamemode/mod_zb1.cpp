@@ -39,7 +39,7 @@ GNU General Public License for more details.
 namespace sv {
 
 CMod_Zombi::CMod_Zombi() // precache
-	: m_Countdown (this, std::unique_ptr<CZB1CountdownDelegate>(new CZB1CountdownDelegate(this)) )
+	: m_Countdown (this, &m_CountdownDelegate )
 {
 	m_Countdown.SetCounts(20);
 
@@ -72,6 +72,7 @@ void CMod_Zombi::CheckMapConditions()
 		DispatchSpawn(pEntity->edict());
 		pEntity->m_fDensity = 0.00006f;
 		pEntity->pev->rendercolor = { 0,0,0 };
+		m_pFogEntity = pEntity;
 	}
 
 	// light
@@ -546,7 +547,18 @@ void CZB1CountdownDelegate::OnCountdownStart()
 
 inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 {
+	static const char* s_szCountDownSound[11] = {
+			"", "one", "two", "three", "four", "five", "six",
+			"seven", "eight", "nine", "ten"
+	};
+
 	UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Zombie Selection: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
+	if (iCurrentCount <= 10)
+	{
+		for (CBasePlayer* player : moe::range::PlayersList())
+			CLIENT_COMMAND(player->edict(), "spk %s\n", s_szCountDownSound[iCurrentCount]);
+
+	}
 }
 
 inline void CZB1CountdownDelegate::OnCountdownEnd()

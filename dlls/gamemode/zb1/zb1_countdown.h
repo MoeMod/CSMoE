@@ -34,18 +34,18 @@ public:
 class CModCountdownHelper
 {
 public:
-	CModCountdownHelper(IBaseMod* mod, std::unique_ptr<ICountdownDelegate> m_pDelegate) : m_pDelegate(std::move(m_pDelegate)), m_pMod(mod), m_iTotalCounts(20), m_iLastCountDown(-1){}
+	CModCountdownHelper(IBaseMod* mod, ICountdownDelegate *m_pDelegate) : m_pDelegate(m_pDelegate), m_pMod(mod), m_iTotalCounts(20), m_iLastCountDown(-1){}
 
 	void Think();
 
 	void SetCounts(int x) { m_iTotalCounts = x; }
-	void SetDelegate(std::unique_ptr<ICountdownDelegate> p) { m_pDelegate = std::move(p); }
+	void SetDelegate(ICountdownDelegate * p) { m_pDelegate = p; }
 
 	bool IsExpired() const;
 	bool IsFreezePeriod() const;
 
 private:
-	std::unique_ptr<ICountdownDelegate> m_pDelegate;
+	ICountdownDelegate *m_pDelegate;
 	IBaseMod* m_pMod;
 	int m_iTotalCounts;
 	int m_iLastCountDown;

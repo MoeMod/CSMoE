@@ -17,6 +17,7 @@ GNU General Public License for more details.
 
 #include <chrono>
 #include <random>
+#include <cmath>
 #include "maintypes.h"
 
 #ifndef CLIENT_DLL
@@ -114,5 +115,10 @@ namespace cl {
 			return RandomDuration(a, b, rd);
 		}
 
+		template<class Rep1, class Rep2, class RetRep = typename std::common_type<Rep1, Rep2>::type>
+		auto LerpDuration(std::chrono::duration<Rep1> a, std::chrono::duration<Rep2> b, RetRep t) -> typename std::enable_if<std::is_floating_point_v<RetRep>, std::chrono::duration<RetRep>>::type
+		{
+			return std::chrono::duration<RetRep>(std::lerp((RetRep)a.count(), (RetRep)b.count(), t));
+		}
 	}
 }

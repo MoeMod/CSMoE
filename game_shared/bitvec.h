@@ -61,8 +61,16 @@ public:
 
 	// Operations on other bit vectors.
 	CBitVec &operator=(CBitVec<NUM_BITS> const &other);
-	bool operator==(CBitVec<NUM_BITS> const &other);
-	bool operator!=(CBitVec<NUM_BITS> const &other);
+	friend bool operator==(CBitVec<NUM_BITS> &self, CBitVec<NUM_BITS> const &other)
+	{
+		for (int i = 0; i < NUM_DWORDS; ++i)
+		{
+			if (self.m_DWords[i] != other.m_DWords[i])
+				return false;
+		}
+
+		return true;
+	}
 
 	// Get underlying dword representations of the bits.
 	int GetNumDWords() { return NUM_DWORDS; }
@@ -141,26 +149,6 @@ inline CBitVecAccessor CBitVec<NUM_BITS>::operator[](int i)
 {
 	assert(i >= 0 && i < GetNumBits());
 	return CBitVecAccessor(m_DWords, i);
-}
-
-/* <2d3b11> ../game_shared/bitvec.h:141 */
-template<int NUM_BITS>
-inline bool CBitVec<NUM_BITS>::operator==(CBitVec<NUM_BITS> const &other)
-{
-	for (int i = 0; i < NUM_DWORDS; ++i)
-	{
-		if (m_DWords[i] != other.m_DWords[i])
-			return false;
-	}
-
-	return true;
-}
-
-/* <2d3b7f> ../game_shared/bitvec.h:152 */
-template<int NUM_BITS>
-inline bool CBitVec<NUM_BITS>::operator!=(CBitVec<NUM_BITS> const &other)
-{
-	return !(*this == other);
 }
 
 /* <2d3bd1> ../game_shared/bitvec.h:165 */

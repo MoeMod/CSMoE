@@ -30,6 +30,21 @@ GNU General Public License for more details.
 
 namespace sv {
 
+class CClientFog;
+
+class CMod_Zombi;
+
+class CZB1CountdownDelegate : virtual public ICountdownDelegate
+{
+public:
+	CZB1CountdownDelegate(CMod_Zombi* mod) : m_pMod(mod) {}
+	void OnCountdownStart() override;
+	void OnCountdownChanged(int iCurrentCount) override;
+	void OnCountdownEnd() override;
+protected:
+	CMod_Zombi* const m_pMod;
+};
+
 class CMod_Zombi : public TBaseMod_RemoveObjects<TBaseMod_RandomSpawn<>>
 {
 public:
@@ -74,7 +89,9 @@ protected:
 
 public:
 	EventDispatcher<void(CBasePlayer *who, ZombieLevel iEvolutionLevel)> m_eventBecomeZombie;
+	CZB1CountdownDelegate m_CountdownDelegate{this};
 	CModCountdownHelper m_Countdown;
+	CClientFog *m_pFogEntity;
 };
 
 class CPlayerModStrategy_ZB1 : public CPlayerModStrategy_Zombie
@@ -110,17 +127,6 @@ public:
 	virtual void BecomeHuman();
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
-};
-
-class CZB1CountdownDelegate : virtual public ICountdownDelegate
-{
-public:
-	CZB1CountdownDelegate(CMod_Zombi* mod) : m_pMod(mod) {}
-	void OnCountdownStart() override;
-	void OnCountdownChanged(int iCurrentCount) override;
-	void OnCountdownEnd() override;
-protected:
-	CMod_Zombi* const m_pMod;
 };
 
 }

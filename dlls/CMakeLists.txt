@@ -23,7 +23,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 project (server)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
@@ -210,6 +210,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zombietrap.cpp
 	./gamemode/zb2/zombiepile.cpp
 	./gamemode/zb2/zb2_zclass_stamper.cpp
+	./gamemode/mod_z4.cpp
 	)
 
 set (HLWPN_SRCS
@@ -346,6 +347,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfmg.cpp
 	../dlls/wpn_shared/wpn_qbarrel.cpp
 	../dlls/wpn_shared/wpn_buffm249.cpp
+	../dlls/wpn_shared/knife_zombi_z4.cpp
 	../dlls/wpn_shared/wpn_pumpkin.cpp
 	../dlls/wpn_shared/wpn_buffm4a1.cpp
 	../dlls/wpn_shared/knife_stormgiant.cpp

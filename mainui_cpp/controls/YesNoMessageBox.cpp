@@ -19,6 +19,11 @@ GNU General Public License for more details.
 #include "PicButton.h"
 #include "YesNoMessageBox.h"
 #include "Utils.h"
+
+#ifdef XASH_IMGUI
+#include "imgui_menu/imgui_menu_msgbox.h"
+#endif
+
 namespace ui {
 static void ToggleInactiveInternalCb( CMenuBaseItem *pSelf, void *pExtra );
 
@@ -237,6 +242,10 @@ void CMenuYesNoMessageBox::UI_ShowMessageBox( void )
 		UI_Main_Menu();
 		UI_SetActiveMenu( TRUE );
 	}
+
+#ifdef XASH_IMGUI
+	return MsgBox_Open(msg);
+#endif
 
 	if( strstr( msg, "m_ignore") || strstr( msg, "touch_enable" ) || strstr( msg, "joy_enable" ) )
 	{

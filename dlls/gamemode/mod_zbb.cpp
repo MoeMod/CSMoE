@@ -35,41 +35,34 @@ GNU General Public License for more details.
 namespace sv {
 
 using namespace moe;
-
-class CZBBCountdownDelegate : public CZB1CountdownDelegate
+CZBBCountdownDelegate::CZBBCountdownDelegate(CMod_ZombieBaseBuilder *mod) : CZB1CountdownDelegate(mod), m_pModZBB(mod)
 {
-public:
-	explicit CZBBCountdownDelegate(CMod_ZombieBaseBuilder *mod) : CZB1CountdownDelegate(mod), m_pModZBB(mod)
-	{
 
-	}
-	void OnCountdownStart() override
+}
+void CZBBCountdownDelegate::OnCountdownStart()
+{
+	m_pModZBB->m_GameStatus = ZBB_GS_BUILDING;
+	//return CZB1CountdownDelegate::OnCountdownStart();
+}
+void CZBBCountdownDelegate::OnCountdownChanged(int iCurrentCount)
+{
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Building Phrase: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
+	//return CZB1CountdownDelegate::OnCountdownChanged(iCurrentCount);
+}
+void CZBBCountdownDelegate::OnCountdownEnd()
+{
+	m_pModZBB->m_GameStatus = ZBB_GS_EVE;
+	// respawn everyone
+	for (CBasePlayer* pPlayer : moe::range::PlayersList())
 	{
-		m_pModZBB->m_GameStatus = ZBB_GS_BUILDING;
-		//return CZB1CountdownDelegate::OnCountdownStart();
-	}
-	void OnCountdownChanged(int iCurrentCount) override
-	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Building Phrase: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
-		//return CZB1CountdownDelegate::OnCountdownChanged(iCurrentCount);
-	}
-	void OnCountdownEnd() override
-	{
-		m_pModZBB->m_GameStatus = ZBB_GS_EVE;
-		// respawn everyone
-		for (CBasePlayer* pPlayer : moe::range::PlayersList())
+		if (pPlayer->IsAlive())
 		{
-			if (pPlayer->IsAlive())
-			{
-				pPlayer->Spawn();
-			}
+			pPlayer->Spawn();
 		}
-		// choose ghosts...
-		CZB1CountdownDelegate::OnCountdownEnd();
 	}
-
-	CMod_ZombieBaseBuilder *m_pModZBB;
-};
+	// choose ghosts...
+	CZB1CountdownDelegate::OnCountdownEnd();
+}
 
 CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() : m_BuildingInterfaces{} // precache
 {
@@ -77,7 +70,7 @@ CMod_ZombieBaseBuilder::CMod_ZombieBaseBuilder() : m_BuildingInterfaces{} // pre
 
 	m_Countdown.SetCounts(20);
 	std::unique_ptr<CZBBCountdownDelegate> pd(new CZBBCountdownDelegate(this));
-	m_Countdown.SetDelegate(std::move(pd));
+	m_Countdown.SetDelegate(&m_CountdownDelegate);
 }
 
 BOOL CMod_ZombieBaseBuilder::IsAllowedToSpawn(CBaseEntity *pEntity)

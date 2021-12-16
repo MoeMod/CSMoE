@@ -47,6 +47,18 @@ public:
 	virtual void PostThink() = 0;
 };
 
+class CMod_ZombieBaseBuilder;
+class CZBBCountdownDelegate : public CZB1CountdownDelegate
+{
+public:
+	explicit CZBBCountdownDelegate(CMod_ZombieBaseBuilder *mod);
+	void OnCountdownStart() override;
+	void OnCountdownChanged(int iCurrentCount) override;
+	void OnCountdownEnd() override;
+
+	CMod_ZombieBaseBuilder *m_pModZBB;
+};
+
 class CMod_ZombieBaseBuilder : public CMod_Zombi
 {
 public:
@@ -72,6 +84,7 @@ public:
 	std::array<IPlayerBuildingDelegate *, MAX_CLIENTS> m_BuildingInterfaces;
 	std::unordered_map<CBaseEntity *, IPlayerBuildingDelegate *> m_BuildingEntities;
 	ZBB_GameStatus_e m_GameStatus;
+	CZBBCountdownDelegate m_CountdownDelegate{this};
 };
 
 }

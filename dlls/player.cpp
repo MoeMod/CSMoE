@@ -1000,6 +1000,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	{
 		pAttack = GetClassPtr<CBasePlayer>(pevAttacker);
 
+		flDamage = pAttack->m_pModStrategy->AdjustDamageGivenToPlayer(pevInflictor, this, flDamage, bitsDamageType);
+
 		bool bAttackFFA = !g_pGameRules->IsTeamplay();
 
 		// warn about team attacks

@@ -3419,7 +3419,10 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				if (!player->m_pActiveItem->CanHolster())
 					return;
 				if (player->m_bIsZombie)
-					pcmd = "knife_zombi";
+				{
+					player->SelectItem("knife_zombi");
+					player->SelectItem("knife_zombi_z4");
+				}
 				player->SelectItem(pcmd);
 			}
 			else if (((pstr = Q_strstr(pcmd, "weapon_")) != NULL) && (pstr == pcmd))
