@@ -107,7 +107,7 @@ void CZombieBomb2::Holster(int skiplocal)
 
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
-		m_pPlayer->pev->weapons &= ~(1 << WEAPON_SMOKEGRENADE);
+		m_pPlayer->RemoveWeapon(m_iId);
 		DestroyItem();
 	}
 

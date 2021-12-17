@@ -187,7 +187,7 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 	case CANNON_FLAME_BURN:
 	{
 		R_AttachTentToPlayer(rgIconList[i].iPlayer, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
-			Vector(Com_RandomFloat(-5.0, 5.0), Com_RandomFloat(-5.0, 5.0), 0.0), 3, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+			Vector(cl::Com_RandomFloat(-5.0, 5.0), cl::Com_RandomFloat(-5.0, 5.0), 0.0), 3, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
 		break;
 	}
 	case HUNTBOW_DMGREITERATION:

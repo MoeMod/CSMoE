@@ -152,7 +152,7 @@ BOOL CItemSuit::MyTouch(CBasePlayer *pPlayer)
 
 	EMIT_SOUND(pPlayer->edict(), CHAN_VOICE, "items/tr_kevlar.wav", VOL_NORM, ATTN_NORM);
 
-	pPlayer->pev->weapons |= (1 << WEAPON_SUIT);
+	pPlayer->AddWeapon(WEAPON_SUIT);
 	pPlayer->m_iHideHUD &= ~(HIDEHUD_HEALTH | HIDEHUD_MONEY);
 
 	return TRUE;

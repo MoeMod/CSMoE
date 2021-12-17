@@ -37,6 +37,7 @@ extern char **environ;
 #else
 #include <stdlib.h>
 #include <time.h>
+#include <shellapi.h>
 #endif
 #include "menu_int.h" // _UPDATE_PAGE macro
 #ifdef XASH_WINRT

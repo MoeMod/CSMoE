@@ -19,6 +19,8 @@
 // this is the max number of items in each bucket
 #define MAX_WEAPON_POSITIONS		19
 
+#include <set>
+
 class WeaponsResource
 {
 private:
@@ -90,6 +92,8 @@ public:
 	int CountAmmo( int iId );
 
 	HSPRITE* GetAmmoPicFromWeapon( int iAmmoId, wrect_t& rect );
+
+	std::set<int> m_setWeaponID;
 };
 
 extern WeaponsResource gWR;

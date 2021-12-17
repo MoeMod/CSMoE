@@ -91,9 +91,10 @@ inline int GetScreenInfo( SCREENINFO *pscrinfo ) { return gEngfuncs.pfnGetScreen
 inline int ServerCmd( const char *szCmdString ) { return gEngfuncs.pfnServerCmd(szCmdString); }
 inline int ClientCmd( const char *szCmdString ) { return gEngfuncs.pfnClientCmd(szCmdString); }
 inline void SetCrosshair( HSPRITE hspr, wrect_t rc, int r, int g, int b ) { return gEngfuncs.pfnSetCrosshair(hspr, rc, r, g, b); }
-inline int Com_RandomLong( int lLow, int lHigh ) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
-inline float Com_RandomFloat( float flLow, float flHigh ) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
-
+namespace cl {
+	inline int Com_RandomLong(int lLow, int lHigh) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
+	inline float Com_RandomFloat(float flLow, float flHigh) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
+}
 extern float color[3]; // hud.cpp
 
 // Gets the height & width of a sprite,  at the specified frame

@@ -106,6 +106,10 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_buffak",      "Buff AK47",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"knife_stormgiant",      "Storm Giant's Hammer",    0, KNIFE_SLOT, UNASSIGNED},
 	{"weapon_bison",         "PP-Bison",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+	{"knife_nataknife",      "Nata Knife",    0, KNIFE_SLOT, UNASSIGNED},
+	{"knife_nataknifed",      "Dual Nata Knife",    0, KNIFE_SLOT, UNASSIGNED},
+	{"knife_thanatos9",      "Thanatos9",    0, KNIFE_SLOT, UNASSIGNED},
+
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_Frequency9",      "Frequency 9",    0, KNIFE_SLOT, UNASSIGNED},

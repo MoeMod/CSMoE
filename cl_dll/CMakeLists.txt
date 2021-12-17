@@ -207,6 +207,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_stormgiant.cpp
 	../dlls/wpn_shared/wpn_buffak47.cpp
 	../dlls/wpn_shared/wpn_bison.cpp
+	../dlls/wpn_shared/knife_strongknife.cpp
+	../dlls/wpn_shared/knife_nataknifed.cpp
+	../dlls/wpn_shared/knife_thanatos9.cpp
 	)
 
 set (HUD_SRCS

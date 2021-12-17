@@ -33,6 +33,7 @@
 #endif
 
 #include <string>
+#include <set>
 
 #include "pm_materials.h"
 #include "player/hintmessage.h"
@@ -700,9 +701,13 @@ public:
 #ifdef CLIENT_DLL
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {}
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return false; }
+	void RemoveWeapon(int iWeaponID) {
+		pev->weapons &= ~(1 << iWeaponID);
+	}
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
+	void RemoveWeapon(int iWeaponID);
 #endif
 
 	void SpawnProtection_Check();
@@ -711,6 +716,8 @@ public:
 
 	void CheckZombieModeBuff(void);
 	bool ReactToDeimosTail();
+	void AddWeapon(int iWeaponID);
+	void ClearWeapon(bool removeSuit = false);
 
 public:
 	bool m_bSpawnProtection; // pack bools
@@ -733,6 +740,7 @@ public:
 	int m_iCustomSequence;
 	int m_iZombieFlying;
 	int m_iZombieRevivalEnabled;
+	std::set<int> m_setWeaponID;
 };
 
 }

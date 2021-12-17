@@ -126,7 +126,7 @@ void CHalfLifeTraining::PlayerThink(CBasePlayer *pPlayer)
 
 			if (FClassnameIs(pWeapon->pev, "weapon_c4"))
 			{
-				pPlayer->pev->weapons &= ~(1 << pWeapon->m_iId);
+				pPlayer->RemoveWeapon(pWeapon->m_iId);
 				pPlayer->RemovePlayerItem(pWeapon);
 				pWeapon->Drop();
 			}

@@ -227,11 +227,11 @@ struct BuffAK47_WeaponData
 	void Precache(void) override
 	{
 		Base::Precache();
-#ifdef CLIENT_DLL
+
 		PRECACHE_MODEL("sprites/muzzleflash40.spr");
 		PRECACHE_MODEL("sprites/muzzleflash41.spr");
 		PRECACHE_MODEL("sprites/muzzleflash42.spr");
-#endif
+
 	}
 
 	void PrimaryAttack(void) override

@@ -257,15 +257,21 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 				{
 					if(!stricmp(this->m_ZombieClass, "flying") || !stricmp(this->m_ZombieClass, "china") || !stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "speed") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy"))
 						ClientCommand("BTE_ZombieSkill1");
+
+					float skillUseRange = 1400.0f;
 					if (!stricmp(this->m_ZombieClass, "booster"))
 					{
-						const float skillUseRange = 1400.0f;
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
-						{
 							ClientCommand("BTE_ZombieSkill1");
-						}
-						ClientCommand("BTE_ZombieSkill1");
 					}
+					else if (!stricmp(this->m_ZombieClass, "resident") || !stricmp(this->m_ZombieClass, "stamper"))
+					{
+						skillUseRange = 140;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+							ClientCommand("BTE_ZombieSkill1");
+					}
+					else
+						ClientCommand("BTE_ZombieSkill1");
 						
 				}
 

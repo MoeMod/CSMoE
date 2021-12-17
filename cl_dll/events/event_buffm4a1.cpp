@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 #include "events.h"
 
-namespace cl::event::buffm4 {
+namespace cl::event::buffm4a1 {
 
 enum
 {
@@ -91,13 +91,13 @@ void EV_FireBuffM4A1( event_args_t *args )
 
 	if (EV_IsLocal(idx))
 	{
-		vecBeamStart = vecSrc + vecSpread.x * right + vecSpread.y * up;
-		vecEnd = vecSrc + 8196.0f * forward + right * vecSpread.x + up * vecSpread.y;
+		vecBeamStart = vecSrc + vSpread.x * right + vSpread.y * up;
+		vecEnd = vecSrc + 8196.0f * forward + right * vSpread.x + up * vSpread.y;
 	}
 	else
 	{
-		vecBeamStart = vecSrc + forward * 40.0 + vecSpread.x * right + vecSpread.y * up - up * 15.0;
-		vecEnd = vecSrc + 8196.0f * forward + right * vecSpread.x + up * vecSpread.y - up * 15.0;
+		vecBeamStart = vecSrc + forward * 40.0 + vSpread.x * right + vSpread.y * up - up * 15.0;
+		vecEnd = vecSrc + 8196.0f * forward + right * vSpread.x + up * vSpread.y - up * 15.0;
 	}
 
 	if(args->bparam1)

@@ -289,6 +289,7 @@ DECLARE_MESSAGE(m_Ammo, HideWeapon) // hides the weapon, ammo, and crosshair dis
 DECLARE_MESSAGE(m_Ammo, ItemPickup)
 DECLARE_MESSAGE(m_Ammo, Crosshair)
 DECLARE_MESSAGE(m_Ammo, Brass)
+DECLARE_MESSAGE(m_Ammo, WeapDrop) // weapon drop
 
 DECLARE_COMMAND(m_Ammo, Slot1)
 DECLARE_COMMAND(m_Ammo, Slot2)
@@ -323,6 +324,7 @@ int CHudAmmo::Init(void)
 	HOOK_MESSAGE(AmmoX);
 	HOOK_MESSAGE(Crosshair);
 	HOOK_MESSAGE(Brass);
+	HOOK_MESSAGE(WeapDrop);
 
 	HOOK_COMMAND("slot1", Slot1);
 	HOOK_COMMAND("slot2", Slot2);
@@ -428,8 +430,34 @@ void CHudAmmo::Think(void)
 {
 	if ( gHUD.m_fPlayerDead )
 		return;
+	
+	if (gHUD.m_bWeaponChanged)
+	{
+		gHUD.m_bWeaponChanged = false;
 
-	if ( gHUD.m_iWeaponBits != gWR.iOldWeaponBits )
+		for (int i = 0; i < MAX_WEAPONS - 1; i++)
+		{
+			WEAPON* p = gWR.GetWeapon(i);
+
+			if (!p)
+				continue;
+
+			std::set<int>::iterator iter = gWR.m_setWeaponID.find(p->iId);
+			if (iter != gWR.m_setWeaponID.end())
+			{
+				gWR.PickupWeapon(p);
+				continue;
+			}
+
+			WEAPON* p2 = gWR.GetWeaponSlot(p->iSlot, p->iSlotPos);
+			if (p2 && gHUD.m_iWeaponBits & (1 << p2->iId))
+				continue;
+
+			gWR.DropWeapon(p);
+		}
+	}
+
+	/*if ( gHUD.m_iWeaponBits != gWR.iOldWeaponBits )
 	{
 		gWR.iOldWeaponBits = gHUD.m_iWeaponBits;
 
@@ -453,7 +481,7 @@ void CHudAmmo::Think(void)
 				}
 			}
 		}
-	}
+	}*/
 
 	if (!gpActiveSel)
 		return;
@@ -617,7 +645,23 @@ int CHudAmmo::MsgFunc_WeapPickup( const char *pszName, int iSize, void *pbuf )
 	int iIndex = reader.ReadByte();
 
 	// Add the weapon to the history
-	gHR.AddToHistory( HISTSLOT_WEAP, iIndex );
+	gHUD.m_bWeaponChanged = true;
+	gHR.AddToHistory(HISTSLOT_WEAP, iIndex);
+	gWR.m_setWeaponID.insert(iIndex);
+
+	return 1;
+}
+
+int CHudAmmo::MsgFunc_WeapDrop(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+	int iIndex = reader.ReadByte();
+	gHUD.m_bWeaponChanged = true;
+	if (!iIndex) {
+		gWR.m_setWeaponID.clear();
+	} else {
+		gWR.m_setWeaponID.erase(iIndex);
+	}
 
 	return 1;
 }

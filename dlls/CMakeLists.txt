@@ -25,14 +25,6 @@ cmake_minimum_required(VERSION 3.10.2)
 project (server)
 set(CMAKE_CXX_STANDARD 20)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
-elseif(MSVC)
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-else()
-set (CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -static-libstdc++")
-endif()
-
 set (SERVER_LIBRARY server)
 
 #--------------
@@ -211,6 +203,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zombiepile.cpp
 	./gamemode/zb2/zb2_zclass_stamper.cpp
 	./gamemode/mod_z4.cpp
+	./gamemode/zb2/zb2_zclass_resident.cpp
 	)
 
 set (HLWPN_SRCS
@@ -353,6 +346,9 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_stormgiant.cpp
 	../dlls/wpn_shared/wpn_buffak47.cpp
 	../dlls/wpn_shared/wpn_bison.cpp
+	../dlls/wpn_shared/knife_strongknife.cpp
+	../dlls/wpn_shared/knife_nataknifed.cpp
+	../dlls/wpn_shared/knife_thanatos9.cpp
 	)
 
 set(PM_SRCS
@@ -429,7 +425,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions(
-		-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
+		-fpermissive -fno-strict-aliasing -fexpensive-optimizations
 		-DLINUX -D_LINUX -DGNUC
 		-Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp -D_snprintf=snprintf
 		-D_alloca=alloca -D_strdup=strdup -D_write=write -DNO_MALLOC_OVERRIDE
@@ -439,7 +435,7 @@ endif()
 
 if(MINGW)
 add_definitions(
-	-fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations
+	-fpermissive -fno-strict-aliasing -fexpensive-optimizations
 	-D_EMULATE_GLIBC -DGNUC
 	-Dstricmp=strcasecmp -D_strnicmp=strncasecmp -Dstrnicmp=strncasecmp
 	-D_alloca=alloca -D_vsnprintf=vsnprintf -DNO_MALLOC_OVERRIDE

@@ -1055,7 +1055,7 @@ int CBasePlayerWeapon::AddDuplicate(CBasePlayerItem *pOriginal)
 int CBasePlayerWeapon::AddToPlayer(CBasePlayer *pPlayer)
 {
 	m_pPlayer = pPlayer;
-	pPlayer->pev->weapons |= (1 << m_iId);
+	pPlayer->AddWeapon(m_iId);
 
 	if (!m_iPrimaryAmmoType)
 	{
@@ -1879,7 +1879,7 @@ BOOL CWeaponBox::PackWeapon(CBasePlayerItem *pWeapon)
 	return TRUE;
 }
 
-int CWeaponBox::PackAmmo(int iszName, int iCount)
+int CWeaponBox::PackAmmo(int iszName, int iCount, int iMaxAmmo)
 {
 	if (!iszName)
 	{
@@ -1888,11 +1888,13 @@ int CWeaponBox::PackAmmo(int iszName, int iCount)
 		return FALSE;
 	}
 
-	int iMaxCarry = MaxAmmoCarry(iszName);
+	if (iMaxAmmo == -1) {
+		iMaxAmmo = MaxAmmoCarry(iszName);
+	}
 
-	if (iMaxCarry != -1 && iCount > 0)
+	if (iMaxAmmo != -1 && iCount > 0)
 	{
-		GiveAmmo(iCount, (char *)STRING(iszName), iMaxCarry);
+		GiveAmmo(iCount, (char *)STRING(iszName), iMaxAmmo);
 		return TRUE;
 	}
 

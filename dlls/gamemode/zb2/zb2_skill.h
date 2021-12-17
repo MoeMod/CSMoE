@@ -392,6 +392,23 @@ protected:
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
+class CZombieSkill_ZombiePenetration : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombiePenetration(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
 }
 
 

@@ -105,12 +105,20 @@ public:
 	int GetDeployAnim();
 	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
 
+	void Holster(int skiplocal) override
+	{
+		m_iSwing = 0;
+		SetThink(NULL);
+		pev->nextthink = invalid_time_point;
+	}
+
 	BOOL Deploy() override
 	{
 		//EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/skullaxe_draw.wav", 0.3, 2.4);
 
 		m_fMaxSpeed = 260;
 		m_flTimeWeaponIdle2 = invalid_time_point;
+		m_pPlayer->m_bShieldDrawn = false;
 
 		if (m_iSwing == -1)
 		{
@@ -132,7 +140,7 @@ public:
 		SetThink(&CKnifeStormgiant::DelayPrimaryAttack);
 		pev->nextthink = gpGlobals->time + 0.23s;
 
-		if (DefaultDeploy("models/v_stormgiant.mdl", "models/p_stormgiant.mdl", GetDeployAnim(), "skullaxe", UseDecrement() != FALSE))
+		if (!DefaultDeploy("models/v_stormgiant.mdl", "models/p_stormgiant.mdl", GetDeployAnim(), "skullaxe", UseDecrement() != FALSE, 0.0s))
 			return FALSE;
 
 		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.23s;
@@ -198,8 +206,8 @@ LINK_ENTITY_TO_CLASS(knife_stormgiant, CKnifeStormgiant)
 
 bool CKnifeStormgiant::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
 {
-#ifndef CLIENT_DLL
 	bool bResult = false;
+#ifndef CLIENT_DLL
 
 	if (pEntity->IsBSPModel())
 	{
@@ -283,9 +291,9 @@ bool CKnifeStormgiant::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker
 		if (!FBitSet(pEntity->pev->flags, FL_DUCKING))
 			CKnifeStormgiant::CreateHitFX(ptr->vecEndPos + Vector(0, 0, 10));
 	}
+#endif
 
 	return bResult;
-#endif
 }
 
 

@@ -621,26 +621,25 @@ IN_Mouse
 */
 void IN_MouseMove( void )
 {
-	POINT	current_pos = {0, 0};
-	
 	if( !in_mouseinitialized || !in_mouseactive || m_ignore->integer )
 		return;
 
 	// find mouse movement
 #ifdef XASH_SDL
-	SDL_GetMouseState( &current_pos.x, &current_pos.y );
+	int x, y;
+	SDL_GetMouseState( &x, &y );
 #ifdef TARGET_OS_OSX
 	int w1, w2, h1, h2;
 	w1 = scr_width->integer;
 	h1 = scr_height->integer;
 	SDL_GetWindowSize( host.hWnd, &w2, &h2 );
-	current_pos.x = (int)((float)current_pos.x * (float)w1 / (float)w2);
-	current_pos.y = (int)((float)current_pos.y * (float)h1 / (float)h2);
+	x = (int)((float)x * (float)w1 / (float)w2);
+	y = (int)((float)y * (float)h1 / (float)h2);
 #endif
 #endif
 
 #ifdef XASH_IMGUI
-	if (ImGui_ImplGL_MouseMove(current_pos.x, current_pos.y))
+	if (ImGui_ImplGL_MouseMove(x, y))
 	{
 #ifdef XASH_SDL
 		SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -651,7 +650,7 @@ void IN_MouseMove( void )
 	}
 #endif
 
-	VGui_MouseMove( current_pos.x, current_pos.y );
+	VGui_MouseMove( x, y );
 
 	if( !UI_IsVisible() )
 		return;
@@ -663,7 +662,7 @@ void IN_MouseMove( void )
 #endif
 
 	// if the menu is visible, move the menu cursor
-	UI_MouseMove( current_pos.x, current_pos.y );
+	UI_MouseMove( x, y );
 
 	IN_ActivateCursor();
 }

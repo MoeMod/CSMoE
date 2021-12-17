@@ -3475,7 +3475,7 @@ void CHalfLifeMultiplay::PlayerSpawn(CBasePlayer *pPlayer)
 		return;
 	}
 
-	pPlayer->pev->weapons |= (1 << WEAPON_SUIT);
+	pPlayer->AddWeapon(WEAPON_SUIT);
 
 	bool addDefault = true;
 	CBaseEntity *pWeaponEntity = NULL;

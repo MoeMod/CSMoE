@@ -16,6 +16,7 @@ GNU General Public License for more details.
 
 #include <string>
 #include <string_view>
+#include <functional>
 
 #include "Utils.h"
 

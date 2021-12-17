@@ -242,9 +242,10 @@ namespace sv {
 
 		BOOL DeployWeapon(CBasePlayerItem *item) override
 		{
-			CPlayerModStrategy_Default::DeployWeapon(item);
+			BOOL ret = CPlayerModStrategy_Default::DeployWeapon(item);
 			if(m_pCharacter_Z4)
 				m_pCharacter_Z4->OnWeaponDeploy(item);
+			return ret;
 		}
 
 		void GiveDefaultItems() override;

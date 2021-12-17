@@ -1062,42 +1062,47 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				}
 			}		
 		
-		CBaseEntity* pInflictor = GetClassPtr((CBaseEntity*)pevInflictor);
+			CBaseEntity* pInflictor = GetClassPtr((CBaseEntity*)pevInflictor);
 
-		if (!Q_strcmp(STRING(pInflictor->pev->classname), "molotov") && pev == pAttacker->pev)
-		{
-			if (g_pGameRules->IsTeamplay() && pAttack->m_iTeam == m_iTeam && !bAttackFFA)
+			if (!Q_strcmp(STRING(pInflictor->pev->classname), "molotov") && pev == pAttacker->pev)
 			{
-				flDamage /= 0.35;
+				if (g_pGameRules->IsTeamplay() && pAttack->m_iTeam == m_iTeam && !bAttackFFA)
+				{
+					flDamage /= 0.35;
+				}
+				//do nothing
 			}
-			//do nothing
-		}
 
-		if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
-		{
-			m_flVelocityModifier = 0.5f;
+			if (!ShouldDoLargeFlinch(m_LastHitGroup, iGunType))
+			{
+				m_flVelocityModifier = 0.5f;
 
-			if (m_LastHitGroup == HITGROUP_HEAD)
-				m_bHighDamage = (flDamage > 60);
+				if (m_LastHitGroup == HITGROUP_HEAD)
+					m_bHighDamage = (flDamage > 60);
+				else
+					m_bHighDamage = (flDamage > 20);
+
+				SetAnimation(PLAYER_FLINCH);
+			}
 			else
-				m_bHighDamage = (flDamage > 20);
-
-			SetAnimation(PLAYER_FLINCH);
-		}
-		else
-		{
-			if (pev->velocity.Length() < 300)
 			{
-				Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
-				pev->velocity = pev->velocity + attack_velocity;
+				if (pev->velocity.Length() < 300)
+				{
+					Vector attack_velocity = (pev->origin - pAttack->pev->origin).Normalize() * 170;
+					pev->velocity = pev->velocity + attack_velocity;
 
-				m_flVelocityModifier = 0.65f;
+					m_flVelocityModifier = 0.65f;
+				}
+				SetAnimation(PLAYER_LARGE_FLINCH);
 			}
-			SetAnimation(PLAYER_LARGE_FLINCH);
-		}
 
-		Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
-
+			if (pevInflictor != pAttack->m_pActiveItem->pev)
+			{
+				CBaseEntity* pInflictor = GetClassPtr<CBaseEntity>(pevInflictor);
+				Knockback(pAttack, pInflictor->GetKnockBackData()); // Zombie Knockback...
+			}
+			else
+				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
 		}
 	}
 
@@ -1279,7 +1284,9 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 
 		if (packAmmo)
 		{
-			pWeaponBox->PackAmmo(MAKE_STRING(CBasePlayerItem::ItemInfoArray[pItem->m_iId].pszAmmo1), pPlayer->m_rgAmmo[pItem->PrimaryAmmoIndex()]);
+			int iMax = pItem->iMaxAmmo1();
+			int iMaxCarry = pPlayer->m_pModStrategy->ComputeMaxAmmo(pItem->pszAmmo1(), iMax);
+			pWeaponBox->PackAmmo(MAKE_STRING(CBasePlayerItem::ItemInfoArray[pItem->m_iId].pszAmmo1), pPlayer->m_rgAmmo[pItem->PrimaryAmmoIndex()], iMaxCarry);
 		}
 		SET_MODEL(ENT(pWeaponBox->pev), modelName);
 	}
@@ -1403,11 +1410,7 @@ void CBasePlayer::RemoveAllItems(BOOL removeSuit, bool removeAmmo)
 
 	pev->viewmodel = 0;
 	pev->weaponmodel = 0;
-
-	if (removeSuit)
-		pev->weapons = 0;
-	else
-		pev->weapons &= ~WEAPON_ALLWEAPONS;
+	ClearWeapon(removeSuit);
 
 	if (removeAmmo)
 	{
@@ -7227,7 +7230,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			}
 
 			// take item off hud
-			pev->weapons &= ~(1 << pWeapon->m_iId);
+			RemoveWeapon(pWeapon->m_iId);
 			g_pGameRules->GetNextBestWeapon(this, pWeapon);
 			UTIL_MakeVectors(pev->angles);
 
@@ -7323,7 +7326,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 				}
 					
 				// take item off hud
-				pev->weapons &= ~(1 << pLinkWeapon->m_iId);
+				RemoveWeapon(pLinkWeapon->m_iId);
 				g_pGameRules->GetNextBestWeapon(this, pLinkWeapon);
 				UTIL_MakeVectors(pev->angles);
 
@@ -7354,9 +7357,9 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 
 				if (iAmmoIndex != -1)
 				{
-					// WTF m_rgAmmo[iAmmoIndex] > 0 ???
-					//pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex] > 0);
-					pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex]);
+					int iMax = pWeapon->iMaxAmmo1();
+					int iMaxCarry = m_pModStrategy->ComputeMaxAmmo(pWeapon->pszAmmo1(), iMax);
+					pWeaponBox->PackAmmo(MAKE_STRING(pWeapon->pszAmmo1()), m_rgAmmo[iAmmoIndex], iMaxCarry);
 					m_rgAmmo[iAmmoIndex] = 0;
 				}
 			}
@@ -9190,4 +9193,30 @@ bool CBasePlayer::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 	return m_pModStrategy->ApplyKnockback(attacker, data); 
 }
 
+void CBasePlayer::AddWeapon(int iWeaponID)
+{
+	pev->weapons |= (1 << iWeaponID);
+	m_setWeaponID.insert(iWeaponID);
+}
+
+void CBasePlayer::RemoveWeapon(int iWeaponID) {
+	pev->weapons &= ~(1 << iWeaponID);
+	m_setWeaponID.erase(iWeaponID);
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);
+	WRITE_BYTE(iWeaponID);
+	MESSAGE_END();
+}
+
+void CBasePlayer::ClearWeapon(bool removeSuit) {
+	if (removeSuit)
+		pev->weapons = 0;
+	else
+		pev->weapons &= ~WEAPON_ALLWEAPONS;
+	m_setWeaponID.clear();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);
+	WRITE_BYTE(WEAPON_NONE);
+	MESSAGE_END();
+}
 }

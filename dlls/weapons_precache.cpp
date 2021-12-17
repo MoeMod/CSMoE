@@ -246,6 +246,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_stormgiant");
 	UTIL_PrecacheOtherWeapon("weapon_buffak");
 	UTIL_PrecacheOtherWeapon("weapon_bison");
+	UTIL_PrecacheOtherWeapon("knife_nataknife");
+	UTIL_PrecacheOtherWeapon("knife_thanatos9");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -359,7 +359,7 @@ public:
 
 public:
 	/* CSBTE Added, in weapons_data.cpp */
-	virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.0f}; }
+	//virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.0f}; }
 #ifdef CLIENT_DLL
 	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
@@ -584,7 +584,7 @@ public:
 
 	BOOL HasWeapon(CBasePlayerItem *pCheckItem);
 	BOOL PackWeapon(CBasePlayerItem *pWeapon);
-	BOOL PackAmmo(int iszName, int iCount);
+	BOOL PackAmmo(int iszName, int iCount, int iMaxAmmo = -1);
 
 public:
 	static TYPEDESCRIPTION m_SaveData[4];

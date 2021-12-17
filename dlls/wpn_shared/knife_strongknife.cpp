@@ -39,7 +39,7 @@ class CKnifeStrongKnife: public LinkWeaponTemplate<CKnifeStrongKnife,
 >
 {
 public:
-	static constexpr const char *ClassName = "knife_strongknife";
+	static constexpr const char *ClassName = "knife_nataknife";
 	static constexpr const char *V_Model = "models/v_strong_knife.mdl";
 	static constexpr const char *P_Model = "models/p_strong_knife.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
@@ -76,7 +76,7 @@ public:
 
 	BOOL Deploy() override
 	{
-		EMIT_SOUND(ENT(p->m_pPlayer->pev), CHAN_ITEM, "weapons/nata_draw.wav", VOL_NORM, ATTN_NORM);
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/nata_draw.wav", VOL_NORM, ATTN_NORM);
 
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
@@ -108,7 +108,7 @@ public:
 		float flDamage = 105;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 4000.0f;
+			flDamage = 3000.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -116,12 +116,12 @@ public:
 	}
 };
 
-LINK_ENTITY_TO_CLASS(knife_strongknife, CKnifeStrongKnife)
+LINK_ENTITY_TO_CLASS(knife_nataknife, CKnifeStrongKnife)
 
 
 void CKnifeStrongKnife::Spawn()
 {
-	pev->classname = MAKE_STRING("knife_strongknife");
+	pev->classname = MAKE_STRING("knife_nataknife");
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");

@@ -46,7 +46,7 @@ CZombieClass_Stamper::CZombieClass_Stamper(CBasePlayer *player, ZombieLevel iEvo
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 800;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.64f;
+	m_pPlayer->pev->gravity = 0.8f;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -61,15 +61,15 @@ void CZombieClass_Stamper::InitHUD() const
 
 void CZombieClass_Stamper::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 285;
+	m_pPlayer->pev->maxspeed = 270;
 }
 
 float CZombieClass_Stamper::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
-		flDamage *= 1.3;
-	else
 		flDamage *= 1.2;
+	else
+		flDamage *= 1.1;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -82,20 +82,20 @@ bool CZombieClass_Stamper::ApplyKnockback(CBasePlayer *attacker, const Knockback
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 	{
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 3.f,
-			kbd.flNotOnGround * 2.f,
-			kbd.flFlying * 2.f,
-			kbd.flDucking * 3.f,
-			kbd.flVelocityModifier * 0.9f,
+			kbd.flOnGround * 0.35f,
+			kbd.flNotOnGround * 0.75f,
+			kbd.flFlying * 0.75f,
+			kbd.flDucking * 0.35f,
+			kbd.flVelocityModifier * 0.95f,
 		});
 	}
 
 	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 2.4f,
-			kbd.flNotOnGround * 1.7f,
-			kbd.flFlying * 1.7f,
-			kbd.flDucking * 2.4f,
-			kbd.flVelocityModifier * 0.9f,
+			kbd.flOnGround * 0.25f,
+			kbd.flNotOnGround * 0.65f,
+			kbd.flFlying * 0.65f,
+			kbd.flDucking * 0.25f,
+			kbd.flVelocityModifier * 0.95f,
 	});
 }
 

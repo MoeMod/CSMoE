@@ -47,8 +47,8 @@ public:
 	virtual void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) = 0;
 
 	virtual bool IsActivate() = 0;
-	virtual char* GetName() const = 0;
-	virtual char* GetDesc() const = 0;
+	virtual const char* GetName() const = 0;
+	virtual const char* GetDesc() const = 0;
 	virtual ZombieZSkillType GetType() const = 0;
 };
 
@@ -77,8 +77,8 @@ public:
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)
 			|| (GetType() == TYPE_ZOMBIE && m_pPlayer->m_bIsZombie);
 	}
-	char* GetName() const override { return ""; };
-	char* GetDesc() const override { return ""; };
+	const char* GetName() const override { return ""; };
+	const char* GetDesc() const override { return ""; };
 	ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 };
 

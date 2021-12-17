@@ -61,7 +61,7 @@ public:
 
 	// Operations on other bit vectors.
 	CBitVec &operator=(CBitVec<NUM_BITS> const &other);
-	friend bool operator==(CBitVec<NUM_BITS> &self, CBitVec<NUM_BITS> const &other)
+	friend bool operator==(CBitVec<NUM_BITS> const &self, CBitVec<NUM_BITS> const &other)
 	{
 		for (int i = 0; i < NUM_DWORDS; ++i)
 		{

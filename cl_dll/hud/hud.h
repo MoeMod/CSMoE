@@ -150,6 +150,7 @@ public:
 	CHudMsgFunc(HideWeapon);
 	CHudMsgFunc(Crosshair);
 	CHudMsgFunc(Brass);
+	CHudMsgFunc(WeapDrop);
 
 
 	void SlotInput( int iSlot );
@@ -1106,6 +1107,7 @@ public:
 	char m_szServerName[64];
 
 	GameMode_e m_iModRunning;
+	bool m_bWeaponChanged;
 
 private:
 	HUDLIST	*m_pHudList;

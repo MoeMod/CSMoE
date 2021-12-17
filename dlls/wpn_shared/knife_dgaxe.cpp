@@ -605,6 +605,7 @@ namespace sv {
 			m_iComboState = DGAXE_COMBO_LEFT1;
 		else if (m_iComboState == DGAXE_COMBO_LEFT1)
 		{
+			m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model_B);
 			Q_strcpy(m_pPlayer->m_szAnimExtention, "hammer");
 #ifndef CLIENT_DLL	
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -761,6 +762,7 @@ namespace sv {
 
 		SetThink(&CKnifeDgaxe::Guard);
 		pev->nextthink = gpGlobals->time + 1.17s;
+		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model);
 		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 #ifndef CLIENT_DLL
 		currentammo = 0;

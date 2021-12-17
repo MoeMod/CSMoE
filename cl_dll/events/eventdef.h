@@ -117,5 +117,5 @@ HOOK_EVENT(sfsmg, FireSFSMG);
 HOOK_EVENT(sfmg, FireSFMG);
 HOOK_EVENT(qbarrel, FireQbarrel);
 HOOK_EVENT(buffm249, FireBUFFM249);
-HOOK_EVENT(buffm4, FireBuffM4A1);
+HOOK_EVENT(buffm4a1, FireBuffM4A1);
 HOOK_EVENT(bison, FireBison);

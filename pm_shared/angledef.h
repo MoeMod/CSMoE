@@ -10,10 +10,11 @@ enum : size_t
 			ROLL = 2
 };
 
-constexpr float anglemod( float a )
-{
-	return ( 360.0f / 65536 ) * ( (int)( a * ( 65536 / 360.0f ) ) & 65535 );
-}
+float anglemod(float a);
+//constexpr float anglemod( float a )
+//{
+//	return ( 360.0f / 65536 ) * ( (int)( a * ( 65536 / 360.0f ) ) & 65535 );
+//}
 
 #ifdef M_PI
 #undef M_PI

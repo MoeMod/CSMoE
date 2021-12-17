@@ -108,7 +108,7 @@ void CC4::Holster(int skiplocal)
 
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 	{
-		m_pPlayer->pev->weapons &= ~(1 << WEAPON_C4);
+		m_pPlayer->RemoveWeapon(m_iId);
 		DestroyItem();
 	}
 

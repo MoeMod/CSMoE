@@ -60,6 +60,7 @@ namespace sv {
 		PRECACHE_MODEL("sprites/ef_teleportzombie.spr");
 		PRECACHE_MODEL("sprites/ef_teleportzombieout.spr");
 		PRECACHE_MODEL("sprites/zombihealer.spr");
+		PRECACHE_MODEL("sprites/zbt_slow.spr");
 
 	}
 
@@ -2105,5 +2106,136 @@ namespace sv {
 		case ZOMBIE_LEVEL_ORIGIN: return 6.0s; break;
 		case ZOMBIE_LEVEL_ORIGIN_LV2: return 6.0s; break;
 		}
+	}
+
+	//Resident Zombie
+	CZombieSkill_ZombiePenetration::CZombieSkill_ZombiePenetration(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombiePenetration::Think()
+	{
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombiePenetration::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER,
+					"技能冷却时间剩余%s1秒",
+					buf
+				); // #CSO_WaitCoolTimeResident
+
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId != WEAPON_KNIFE)
+			m_pPlayer->SwitchWeapon(m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+		if (pWeapon)
+		{
+			pWeapon->SendWeaponAnim(8, TRUE);
+			pWeapon->m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+			pWeapon->m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+			pWeapon->m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+		}
+
+		m_pPlayer->pev->sequence = m_pPlayer->LookupSequence("skill1");
+		m_pPlayer->pev->frame = 0;
+		m_pPlayer->ResetSequenceInfo();
+
+		m_pPlayer->m_flNextAttack = 1.7s;
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.7s;
+
+		TraceResult tr;
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		const float flDistance = 4.0f * 39.37f;
+		Vector vecStart = vecSrc;
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * flDistance;
+
+		for (int i = 5; i > 0; i--)
+		{
+			UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+			if (tr.flFraction >= 1.0f)
+			{
+				UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, m_pPlayer->edict(), &tr);
+
+				if (tr.flFraction >= 1.0f)
+					break;
+			}
+
+			if (FNullEnt(tr.pHit))
+				break;
+
+			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+
+			if (pEntity && pEntity->IsBSPModel())
+				break;
+
+			if (!pEntity->pev->takedamage)
+				break;
+
+			float flFalloff = pow(tr.flFraction, (float)i);
+
+			if (tr.flFraction * flDistance > flDistance)
+				i = 0;
+
+			if (pEntity->IsPlayer() && !((CBasePlayer*)pEntity)->m_bIsZombie)
+			{
+				ClearMultiDamage();
+				pEntity->TraceAttack(m_pPlayer->pev, 2500 * flFalloff, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+			}
+
+			vecStart = tr.vecEndPos + gpGlobals->v_forward * 32;
+		}
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_PENETRATION);
+		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+		MESSAGE_END();
+	}
+
+	void CZombieSkill_ZombiePenetration::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+	}
+
+	duration_t CZombieSkill_ZombiePenetration::GetDurationTime() const
+	{
+		return 0.5s;
+	}
+
+	duration_t CZombieSkill_ZombiePenetration::GetCooldownTime() const
+	{
+		return 180.0s;
 	}
 }

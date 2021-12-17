@@ -89,6 +89,7 @@ CLASS_BEGIN(CBaseEntity, void)
 	ADD_MEMBER_FUNCTION(IsDormant)
 	ADD_MEMBER_FUNCTION(IsLockedByMaster)
 #endif
+	ADD_MEMBER_FUNCTION(GetKnockBackData)
 
 	ADD_STATIC_MEMBER_FUNCTION(Instance, edict_t*)
 	ADD_STATIC_MEMBER_FUNCTION(Instance, entvars_t*)
@@ -192,7 +193,6 @@ CLASS_BEGIN(CBasePlayerItem, CBaseAnimating)
 	ADD_MEMBER_FUNCTION(FallInit)
 	ADD_MEMBER_FUNCTION(CheckRespawn)
 
-	ADD_VIRTUAL_FUNCTION(GetKnockBackData)
 	ADD_VIRTUAL_FUNCTION(GetArmorRatioModifier)
 	ADD_VIRTUAL_FUNCTION(GetCSModelName)
 	ADD_VIRTUAL_FUNCTION(GetBuyAmmoConfig)

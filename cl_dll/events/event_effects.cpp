@@ -740,7 +740,7 @@ void EV_WpnEffects(event_args_s* args)
 	{
 		model_s* pModel;
 		int index;
-		char* pModelName;
+		const char* pModelName;
 		if (args->bparam1)
 		{
 			index = 0;

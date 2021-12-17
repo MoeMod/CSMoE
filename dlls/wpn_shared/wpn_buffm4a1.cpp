@@ -87,12 +87,10 @@ namespace sv {
     	
 	void Precache() override
 	{
-#ifdef CLIENT_DLL
+
 		PRECACHE_MODEL("sprites/muzzleflash43.spr");
 		PRECACHE_MODEL("sprites/muzzleflash44.spr");
 		PRECACHE_MODEL("sprites/muzzleflash45.spr");
-#endif
-		PRECACHE_MODEL("sprites/lgtning.spr");
 		return Base::Precache();
 	}
     	

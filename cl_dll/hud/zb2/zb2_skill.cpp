@@ -105,7 +105,8 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_glide",//ZOMBIE_SKILL_GLIDE
 		"resource/zombi/zombieskill_dive",//ZOMBIE_SKILL_DIVE
 		"resource/zombi/zombieskill_zombirevival",//ZOMBIE_SKILL_REVIVAL
-		"resource/zombi/zombieskill_zombipile"//ZOMBIE_SKILL_REVIVAL
+		"resource/zombi/zombieskill_zombipile",//ZOMBIE_SKILL_STAMPER
+		"resource/zombi/zombieskill_zombipenetration"//ZOMBIE_SKILL_PENETRATION
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -125,6 +126,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_flyingzb",//ZOMBIE_CLASS_FLYING
 		"resource/zombi/zombietype_revivalzb",//ZOMBIE_CLASS_REVIVAL
 		"resource/zombi/zombietype_undertakerzb",//ZOMBIE_CLASS_STAMPER
+		"resource/zombi/zombietype_residentzb",//ZOMBIE_CLASS_RESIDENT
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

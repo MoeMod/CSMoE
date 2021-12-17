@@ -154,6 +154,7 @@ GNU General Public License for more details.
 	#pragma warning(disable : 4054)	// type cast' : from function pointer
 	#pragma warning(disable : 4310)	// cast truncates constant value
 
+	#define WIN32_LEAN_AND_MEAN
 	#define HSPRITE WINAPI_HSPRITE
 		#include <windows.h>
 	#undef HSPRITE

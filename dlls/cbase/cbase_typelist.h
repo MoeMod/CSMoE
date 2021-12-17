@@ -162,8 +162,11 @@ TL_ADD(CKnifeZombiZ4)
 TL_ADD(CBuffM4A1)
 TL_ADD(CKnifeStormgiant)
 TL_ADD(CBuffAK47)
-TL_ADD(CBuffAK47Grenade)
 TL_ADD(CBison)
+TL_ADD(CKnifeStrongKnife)
+TL_ADD(CKnifeNataKnifeD)
+TL_ADD(CKnifeThanatos9)
+
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -382,6 +385,7 @@ TL_ADD(CLanceFountainFieldAttack)
 TL_ADD(CLanceFountainSpecialAttack)
 TL_ADD(CZombieTrap)
 TL_ADD(CZombiePile)
+TL_ADD(CBuffAK47Grenade)
 #endif
 
 TL_END(AllEntityTypeList)

@@ -38,6 +38,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_flying.h"
 #include "zb2_zclass_revival.h"
 #include "zb2_zclass_stamper.h"
+#include "zb2_zclass_resident.h"
 #include <random>
 
 namespace sv {
@@ -63,6 +64,7 @@ const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlay
 		{"flying", MakeZombieClass<CZombieClass_Flying> },
 		{"revival", MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", MakeZombieClass<CZombieClass_Stamper> },
+		//{"resident", MakeZombieClass<CZombieClass_Resident> }
 };
 #else
 const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {

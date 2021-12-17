@@ -21,8 +21,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_BulletDamage(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		char* GetName() const override { return "破甲弹头"; }
-		char* GetDesc() const override { return "增加武器的射击威力。"; } // 射击武器追加（10+1*回合数）的伤害
+		const char* GetName() const override { return "破甲弹头"; }
+		const char* GetDesc() const override { return "增加武器的射击威力。"; } // 射击武器追加（10+1*回合数）的伤害
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
 			if (attacker != m_pPlayer)
@@ -42,8 +42,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_Critical(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		char* GetName() const override { return "致命一击"; }
-		char* GetDesc() const override { return "低概率触发触发致命一击。"; } // 有（4%+0.5%*回合数）的概率追加（100%+2%*回合数）的伤害
+		const char* GetName() const override { return "致命一击"; }
+		const char* GetDesc() const override { return "低概率触发触发致命一击。"; } // 有（4%+0.5%*回合数）的概率追加（100%+2%*回合数）的伤害
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
 			if (attacker != m_pPlayer)
@@ -63,8 +63,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_KnifeMaster(CBasePlayer* player) : CZombieZSkill_Base(player), m_flNextThink(0s) {}
-		char* GetName() const override { return "格斗大师"; };
-		char* GetDesc() const override { return "近战武器加强。"; }; // 近身武器攻击时获得一个（80units60°）的攻击，伤害为（120+40*回合数），击退为（600+30*回合数），定身为（20%+3%*回合数），最大定身50%加成
+		const char* GetName() const override { return "格斗大师"; };
+		const char* GetDesc() const override { return "近战武器加强。"; }; // 近身武器攻击时获得一个（80units60°）的攻击，伤害为（120+40*回合数），击退为（600+30*回合数），定身为（20%+3%*回合数），最大定身50%加成
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
 			if (attacker != m_pPlayer)
@@ -108,8 +108,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_DoubleJump(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		char* GetName() const override { return "二段跳"; }
-		char* GetDesc() const override { return "在空中可以再跳一次。"; }
+		const char* GetName() const override { return "二段跳"; }
+		const char* GetDesc() const override { return "在空中可以再跳一次。"; }
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 		void OnGetSkill() override {
 			SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "dbj", "1");
@@ -120,8 +120,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_Health(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		char* GetName() const override { return "生命补液"; }
-		char* GetDesc() const override { return "增加生命值。"; } // （400+200*回合数）
+		const char* GetName() const override { return "生命补液"; }
+		const char* GetDesc() const override { return "增加生命值。"; } // （400+200*回合数）
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 		void OnBecomeHuman() override {
 			OnGetSkill();
@@ -140,8 +140,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_BombBackpack(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		char* GetName() const override { return "炸弹背包"; }
-		char* GetDesc() const override { return "一定周期自动生成手雷，每（30秒-0.5秒*回合数）生成（1+1*回合数/6）个高爆手雷"; }
+		const char* GetName() const override { return "炸弹背包"; }
+		const char* GetDesc() const override { return "一定周期自动生成手雷，每（30秒-0.5秒*回合数）生成（1+1*回合数/6）个高爆手雷"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnBecomeHuman() override {
 			m_flNextThink = gpGlobals->time + GetBonus();
@@ -207,8 +207,8 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_ExplodeBullet(CBasePlayer* player) : CZombieZSkill_Base(player), m_flNextThink(0s), m_uFiredTimes(0){}
-		char* GetName() const override { return "爆炸弹头"; }
-		char* GetDesc() const override { return "每（30-4*回合数/3）次射击时产生爆炸，爆炸范围64，爆炸的伤害为武器本身的（35%+5%*回合数）"; }
+		const char* GetName() const override { return "爆炸弹头"; }
+		const char* GetDesc() const override { return "每（30-4*回合数/3）次射击时产生爆炸，爆炸范围64，爆炸的伤害为武器本身的（35%+5%*回合数）"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnTraceAttack(CBasePlayer* victim, CBasePlayer* attacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override {
 			if (attacker != m_pPlayer)
