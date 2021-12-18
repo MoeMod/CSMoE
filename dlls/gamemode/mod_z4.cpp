@@ -10,6 +10,7 @@
 #include "bmodels.h"
 #include "triggers.h"
 #include "entity_state.h"
+#include "usercmd.h"
 
 #include "mod_z4.h"
 
@@ -32,7 +33,7 @@ static const char* s_szCountDownSound[11] = {
 };
 
 namespace sv {
-
+	namespace z4 {
 	// DayNight Effect : Dusk & Dark & Dawn
 	constexpr const char *LIGHTSTYLE[7] = { "g", "f", "e", "d", "c", "b", "b" };
 	constexpr float SKY_COLOR[7] = { 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.4 };
@@ -49,6 +50,9 @@ namespace sv {
 		DNS_DARK,
 		DNS_DAWN
 	};
+	}
+	using namespace z4;
+
 	using timer_type = boost::asio::basic_waitable_timer<EngineClock>;
 
 	struct CMod_ZombieIV::round_t
@@ -178,6 +182,8 @@ namespace sv {
 		PRECACHE_SOUND("zombi/zombi_evolution.wav");
 		PRECACHE_SOUND("zombi/zombi_evolution_female.wav");
 
+		z4::Z4_ZClass_Precache_All();
+
 		round = std::make_unique<round_t>(this);
 		m_Countdown.SetDelegate(&m_CountDownDelegate);
 	}
@@ -221,6 +227,9 @@ namespace sv {
 	{
 	public:
 		virtual void OnWeaponDeploy(CBasePlayerItem *item) = 0;
+		virtual void Skill_Dash_Start() = 0;
+		virtual void Skill_Dash_End() = 0;
+		virtual void Skill_Activate() = 0;
 	};
 
 	class CPlayerModStrategy_ZB4 : public CPlayerModStrategy_ZB1
@@ -228,7 +237,7 @@ namespace sv {
 	public:
 		CPlayerModStrategy_ZB4(CBasePlayer *player, CMod_ZombieIV *mp)
 				:	CPlayerModStrategy_ZB1(player, mp),
-				     m_pModZB4(mp)
+				     m_pModZB4(mp), work_guard(boost::asio::make_work_guard(ioc))
 		{}
 		~CPlayerModStrategy_ZB4() = default;
 	public:
@@ -248,6 +257,8 @@ namespace sv {
 			return ret;
 		}
 
+		void CmdStart(struct usercmd_s *cmd, unsigned int random_seed) override;
+
 		void GiveDefaultItems() override;
 		bool ClientCommand(const char *pcmd) override;
 		float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) override;
@@ -256,11 +267,73 @@ namespace sv {
 		bool IsZombie() const { return m_pPlayer->m_bIsZombie; }
 		bool IsAlive() const { return m_pPlayer->IsAlive(); }
 
+
+	public:
+		void OnPressW()
+		{
+			if(m_bDashActivateCheckRunning)
+			{
+				w_press_timer.cancel();
+			}
+			else
+			{
+				boost::asio::co_spawn(ioc, Task_DashActivateCheck(), boost::asio::detached);
+			}
+		}
+
+		void OnReleaseW()
+		{
+			if(m_bDashActivateCheckRunning)
+			{
+				w_release_timer.cancel();
+			}
+		}
+
+		boost::asio::awaitable<void> Task_DashActivateCheck()
+		{
+			m_bDashActivateCheckRunning = true;
+			try {
+				w_release_timer.expires_after(0.15s);
+				try {
+					co_await w_release_timer.async_wait(boost::asio::use_awaitable);
+					m_bDashActivateCheckRunning = false;
+					co_return;
+				} catch(const boost::system::system_error & e) {  }
+
+
+				w_press_timer.expires_after(0.15s);
+				try {
+					co_await w_press_timer.async_wait(boost::asio::use_awaitable);
+					m_bDashActivateCheckRunning = false;
+					co_return;
+				} catch(const boost::system::system_error & e) {  }
+
+				if(m_pCharacter_Z4)
+					m_pCharacter_Z4->Skill_Dash_Start();
+			}
+			catch(const boost::system::system_error & e)
+			{
+				if(e.code() == boost::system::errc::operation_canceled)
+				{
+					// ignored
+				}
+			}
+			m_bDashActivateCheckRunning = false;
+			co_return;
+		}
+
 	public:
 		CMod_ZombieIV * const m_pModZB4;
+		boost::asio::io_context ioc;
+		boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
+		bool m_bHasDashActivateCheck = false;
 		struct adrenaline_t;
 		std::unique_ptr<adrenaline_t> adrenaline;
 		std::shared_ptr<IZombieModeCharacter_Z4> m_pCharacter_Z4;
+
+		bool m_bDashActivateCheckRunning = false;
+		timer_type w_press_timer{ioc};
+		timer_type w_release_timer{ioc};
 	};
 
 	struct CPlayerModStrategy_ZB4::adrenaline_t
@@ -276,6 +349,7 @@ namespace sv {
 		int m_iAdrenaline = 0;
 		bool m_bIsUsingAdrShoot = false;
 		bool m_bIsUsingDash = false;
+		bool m_bIsSlowDown = false;
 
 		void Think()
 		{
@@ -292,19 +366,19 @@ namespace sv {
 				{
 					while(m_bIsUsingAdrShoot || m_bIsUsingDash)
 					{
-						// wait for next frame
-						co_await boost::asio::post(ioc, boost::asio::use_awaitable);
+						timer.expires_after(1s);
+						co_await timer.async_wait(boost::asio::use_awaitable);
 					}
 
 					if(strategy->IsAlive())
 					{
 						if(dns == DNS_DARK && strategy->IsZombie())
 						{
-							Adrenaline_Add(7);
+							Adrenaline_Set(7);
 						}
 						else
 						{
-							Adrenaline_Add(1);
+							Adrenaline_Set(1);
 						}
 					}
 
@@ -321,7 +395,7 @@ namespace sv {
 			}
 		}
 
-		void Adrenaline_Add(int DeltaValue)
+		void Adrenaline_Set(int DeltaValue)
 		{
 			int oldvalue = std::exchange(m_iAdrenaline, std::clamp(m_iAdrenaline + DeltaValue, 0, 120));
 			if(m_iAdrenaline != oldvalue)
@@ -333,6 +407,8 @@ namespace sv {
 
 		void Skill_AdrShoot_Activate()
 		{
+			if(m_bIsUsingAdrShoot)
+				return;
 			if(m_iAdrenaline < 30)
 				return;
 
@@ -344,6 +420,8 @@ namespace sv {
 
 		void Skill_AdrShoot_End()
 		{
+			if(!m_bIsUsingAdrShoot)
+				return;
 			m_bIsUsingAdrShoot = false;
 			// TODO : fire message
 		}
@@ -356,11 +434,17 @@ namespace sv {
 
 				while(m_iAdrenaline > 0)
 				{
-					Adrenaline_Add(-5);
+					if(m_bIsUsingAdrShoot)
+					{
+						Adrenaline_Set(-5);
 
-					timer.expires_after(SKILL_ADRSHOOT_LASTING / 20);
-					co_await timer.async_wait(boost::asio::use_awaitable);
+						timer.expires_after(SKILL_ADRSHOOT_LASTING / 20);
+						co_await timer.async_wait(boost::asio::use_awaitable);
+						continue;
+					}
 				}
+
+				Skill_AdrShoot_End();
 			}
 			catch(const boost::system::system_error & e)
 			{
@@ -379,7 +463,8 @@ namespace sv {
 			strategy(strategy),
 			zclass(z4::Z4_MakeRandomZombie(m_pPlayer))
 		{
-
+			boost::asio::co_spawn(ioc, Task_Dash_SkillConsume(), boost::asio::detached);
+			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
 		}
 
 		float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override { return flDamage; }
@@ -387,6 +472,7 @@ namespace sv {
 		{
 			auto ability = AbilityForZClass();
 			m_pPlayer->pev->maxspeed = strategy->adrenaline->m_bIsUsingDash ? ability.flDashSpeed : ability.flSpeed;
+			m_pPlayer->pev->gravity = strategy->adrenaline->m_bIsUsingDash ? ability.flDashGravity : ability.flGravity;
 		}
 
 		void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override
@@ -424,6 +510,14 @@ namespace sv {
 			}, zclass);
 		}
 
+		void Think() override
+		{
+			ioc.poll();
+			return std::visit([](auto &zc) {
+				return zc.OnThink();
+			}, zclass);
+		}
+
 		z4::zclass_sound_s SoundForZClass() const
 		{
 			return std::visit([](auto &zc) {
@@ -438,9 +532,178 @@ namespace sv {
 			}, zclass);
 		}
 
+		z4::zclass_skill_s SkillForZClass() const
+		{
+			return std::visit([](auto &zc) {
+				return zc.Skill;
+			}, zclass);
+		}
+
+		boost::asio::awaitable<void> Task_Dash_SkillConsume()
+		{
+			try {
+				auto skill = SkillForZClass();
+				timer_type timer(ioc);
+
+				while(true)
+				{
+					timer.expires_after(skill.flDashLasting / 20);
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
+
+					if(strategy->adrenaline->m_bIsUsingDash)
+					{
+						strategy->adrenaline->Adrenaline_Set(-5);
+
+						if(strategy->adrenaline->m_iAdrenaline <= 0)
+							Skill_Dash_End();
+					}
+				}
+			}
+			catch(const boost::system::system_error & e)
+			{
+				if(e.code() == boost::system::errc::operation_canceled)
+				{
+					// ignored
+				}
+			}
+		}
+
+		time_point_t m_flNextSkillActivate = invalid_time_point;
+
+		void Skill_Activate() override
+		{
+			if(strategy->adrenaline->m_bIsUsingAdrShoot || strategy->adrenaline->m_bIsUsingDash)
+				return;
+			if(strategy->adrenaline->m_bIsSlowDown)
+				return;
+			if(gpGlobals->time < m_flNextSkillActivate)
+				return;
+
+			auto Skill = SkillForZClass();
+			if(strategy->adrenaline->m_iAdrenaline < Skill.iSkillConsume)
+				return;
+
+			std::visit([](auto &zc) {
+				return zc.OnSkillActivate();
+			}, zclass);
+
+			m_flNextSkillActivate = gpGlobals->time + Skill.flSkillTimeReset;
+			strategy->adrenaline->Adrenaline_Set(-Skill.iSkillConsume);
+		}
+
+		boost::asio::awaitable<void> Task_Dash_SkillCheck()
+		{
+			try {
+				auto skill = SkillForZClass();
+				auto soundlist = SoundForZClass();
+				timer_type timer(ioc);
+
+				while(true)
+				{
+					timer.expires_after(skill.flDashTimeCheck);
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
+
+					if(strategy->adrenaline->m_bIsUsingDash)
+					{
+						std::visit([](auto &zc) {
+							return zc.OnDashCheck();
+						}, zclass);
+
+						m_pPlayer->ResetMaxSpeed();
+
+						auto skill = SkillForZClass();
+						CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+						if (pWeapon)
+						{
+							pWeapon->SendWeaponAnim(ANIM_DASH_LOOP, TRUE);
+							pWeapon->m_flTimeWeaponIdle = skill.flDashTimeCheck;
+						}
+
+						if(RANDOM_LONG(0, 1))
+							EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash1, VOL_NORM, ATTN_NORM);
+						else
+							EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash2, VOL_NORM, ATTN_NORM);
+
+						m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("dash");
+						m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + skill.flDashTimeCheck;
+					}
+				}
+			}
+			catch(const boost::system::system_error & e)
+			{
+				if(e.code() == boost::system::errc::operation_canceled)
+				{
+					// ignored
+				}
+			}
+		}
+
+		void Skill_Dash_Start() override
+		{
+			if(strategy->adrenaline->m_bIsUsingAdrShoot || strategy->adrenaline->m_bIsUsingDash)
+				return;
+			if(strategy->adrenaline->m_iAdrenaline <= 0)
+				return;
+			if(strategy->adrenaline->m_bIsSlowDown)
+				return;
+
+			strategy->adrenaline->m_bIsUsingDash = true;
+
+			std::visit([](auto &zc) {
+				return zc.OnDashStart();
+			}, zclass);
+
+			m_pPlayer->ResetMaxSpeed();
+
+			auto skill = SkillForZClass();
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+			if (pWeapon)
+			{
+				pWeapon->SendWeaponAnim(ANIM_DASH_START, TRUE);
+				pWeapon->m_flTimeWeaponIdle = skill.flDashTimeCheck;
+			}
+
+		}
+
+		void Skill_Dash_End() override
+		{
+			if(!strategy->adrenaline->m_bIsUsingDash)
+				return;
+			// TODO
+			strategy->adrenaline->m_bIsUsingDash = false;
+
+			std::visit([](auto &zc) {
+				return zc.OnDashEnd();
+			}, zclass);
+
+			m_pPlayer->ResetMaxSpeed();
+
+			auto skill = SkillForZClass();
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+			if (pWeapon)
+			{
+				pWeapon->SendWeaponAnim(ANIM_DASH_END, TRUE);
+				pWeapon->m_flTimeWeaponIdle = skill.flDashTimeCheck;
+			}
+		}
+
 	public:
 		CPlayerModStrategy_ZB4 *strategy;
 		z4::zclass_variant_t zclass;
+		boost::asio::io_context ioc;
+	};
+
+	class CHuman_Z4 : public CHuman_ZB1, virtual public IZombieModeCharacter_Z4
+	{
+	public:
+		CHuman_Z4(CPlayerModStrategy_ZB4 *strategy) : CHuman_ZB1(strategy->m_pPlayer),
+		strategy(strategy)
+		{
+
+		}
+
+	public:
+		CPlayerModStrategy_ZB4 *strategy;
 	};
 
 	void CMod_ZombieIV::InstallPlayerModStrategy(CBasePlayer *player)
@@ -449,11 +712,56 @@ namespace sv {
 		player->m_pModStrategy = std::move(up);
 	}
 
+	void CMod_ZombieIV::InfectionSound()
+	{
+		for(CBasePlayer *player : moe::range::PlayersList())
+			CLIENT_COMMAND(player->edict(), "spk z4/z4_zombi_coming_%d.wav\n", RANDOM_LONG(1, 2));
+	}
+
+	void CMod_ZombieIV::HumanWin()
+	{
+		//Broadcast("ctwin");
+		for(CBasePlayer *player : moe::range::PlayersList())
+			CLIENT_COMMAND(player->edict(), "spk z4/z4_win_human.wav\n");
+
+		/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
+		WRITE_BYTE(2);
+		WRITE_BYTE(5);
+		MESSAGE_END();*/
+
+		EndRoundMessage("--------『人类胜利』--------", ROUND_CTS_WIN);
+		TerminateRound(5s, WINSTATUS_CTS);
+		RoundEndScore(WINSTATUS_CTS);
+
+		++m_iNumCTWins;
+		UpdateTeamScores();
+	}
+
+	void CMod_ZombieIV::ZombieWin()
+	{
+		//Broadcast("terwin");
+		for(CBasePlayer *player : moe::range::PlayersList())
+			CLIENT_COMMAND(player->edict(), "spk z4/z4_win_zombie.wav\n");
+
+		/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
+		WRITE_BYTE(3);
+		WRITE_BYTE(5);
+		MESSAGE_END();*/
+
+		EndRoundMessage("--------『僵尸胜利』--------", ROUND_TERRORISTS_WIN);
+		TerminateRound(5s, WINSTATUS_TERRORISTS);
+		RoundEndScore(WINSTATUS_TERRORISTS);
+
+		++m_iNumTerroristWins;
+		UpdateTeamScores();
+	}
+
 	void CPlayerModStrategy_ZB4::OnThink()
 	{
 		CPlayerModStrategy_ZB1::OnThink();
 		if(adrenaline)
 			adrenaline->Think();
+		ioc.poll();
 	}
 
 	void CPlayerModStrategy_ZB4::GiveDefaultItems()
@@ -496,6 +804,14 @@ namespace sv {
 				return true;
 			}
 		}
+		else
+		{
+			if (!Q_stricmp(pcmd, "z4_zombieskill"))
+			{
+				m_pCharacter_Z4->Skill_Activate();
+				return true;
+			}
+		}
 
 		return false;
 	}
@@ -506,7 +822,7 @@ namespace sv {
 		m_pCharacter = p;
 		m_pCharacter_Z4 = p;
 		adrenaline = std::make_unique<adrenaline_t>(m_pModZB4, this);
-		adrenaline->Adrenaline_Add(100);
+		adrenaline->Adrenaline_Set(100);
 
 		DeployWeapon(m_pPlayer->m_pActiveItem);
 	}
@@ -516,7 +832,7 @@ namespace sv {
 		m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
 		m_pCharacter_Z4 = nullptr; // TODO
 		adrenaline = std::make_unique<adrenaline_t>(m_pModZB4, this);
-		adrenaline->Adrenaline_Add(0);
+		adrenaline->Adrenaline_Set(0);
 	}
 
 	void CPlayerModStrategy_ZB4::OnSpawn()
@@ -537,7 +853,31 @@ namespace sv {
 		return flDamage;
 	}
 
+	void CPlayerModStrategy_ZB4::CmdStart(usercmd_t *cmd, unsigned int random_seed)
+	{
+		CPlayerModStrategy_Default::CmdStart(cmd, random_seed);
+		if(cmd->buttons & IN_FORWARD)
+		{
+			OnPressW();
+		}
+		else
+		{
+			OnReleaseW();
+		}
+		if(!(cmd->buttons & IN_FORWARD) || (cmd->buttons & IN_ATTACK) || (cmd->buttons & IN_DUCK) )
+		{
+			if(m_pCharacter_Z4)
+				m_pCharacter_Z4->Skill_Dash_End();
+		}
+	}
+
 	CZ4CountdownDelegate::CZ4CountdownDelegate(CMod_ZombieIV *mod) : CZB1CountdownDelegate(mod) {}
+
+	void CZ4CountdownDelegate::OnCountdownStart()
+	{
+		for (CBasePlayer* player : moe::range::PlayersList())
+			CLIENT_COMMAND(player->edict(), "spk z4/z4_bgm_resist.wav\n");
+	}
 
 	void CZ4CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 	{

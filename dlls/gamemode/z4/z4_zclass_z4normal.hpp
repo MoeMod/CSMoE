@@ -19,6 +19,9 @@ namespace sv {
 			static constexpr zclass_ability_s Ability = {
 					265.0f, 0.8f, 0.7f, 0.8f, 360.0f, 0.8f, 0.5f, 0.8f
 			};
+			static constexpr zclass_skill_s Skill = {
+					"攀爬", "暴走", 10.0, 25.0, 0.0, 20.0, 15.0s, 0.5s, 11, 0.5s
+			};
 			static constexpr auto Sound_Skill = "zombi/z4/normal/normal_skill.wav";
 
 			CBasePlayer *const m_pPlayer;
@@ -39,6 +42,71 @@ namespace sv {
 				m_pPlayer->pev->armorvalue = 200;
 				m_pPlayer->pev->gravity = 0.7f;
 				m_pPlayer->ResetMaxSpeed();
+			}
+
+			void OnDashStart()
+			{
+				// nothing
+			}
+
+			void OnDashCheck()
+			{
+				// nothing
+			}
+
+			void OnDashEnd()
+			{
+				// nothing
+			}
+
+			time_point_t m_flTimeSkillEnd = invalid_time_point;
+
+			void OnSkillActivate()
+			{
+				if(m_pPlayer->pev->flags & FL_DUCKING)
+					return;
+
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+				Vector vecSrc = m_pPlayer->GetGunPosition();
+				Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
+
+				TraceResult tr;
+				UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+				if(tr.flFraction >= 1.0f)
+					return;
+
+				m_pPlayer->pev->velocity[2] = 300.0f;
+
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+				if (pWeapon)
+				{
+					pWeapon->SendWeaponAnim(ANIM_SKILL, TRUE);
+					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck;
+				}
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill_start");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
+
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, Sound.szSkill1, VOL_NORM, ATTN_NORM);
+
+				m_flTimeSkillEnd = gpGlobals->time + 0.4s;
+			}
+
+			void OnThink()
+			{
+				if(m_flTimeSkillEnd != invalid_time_point && gpGlobals->time > m_flTimeSkillEnd)
+				{
+					m_flTimeSkillEnd = invalid_time_point;
+
+					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+					if (pWeapon)
+					{
+						pWeapon->SendWeaponAnim(ANIM_SKILL_END, TRUE);
+						pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck;
+					}
+
+					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("idle1");
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
+				}
 			}
 		};
 	}

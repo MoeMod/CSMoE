@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #include "weapons.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
+#include "player/player_mod_strategy.h"
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
@@ -94,7 +95,8 @@ public:
 	void Spawn() override;
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	void PrimaryAttack() override;
-	bool HasSecondaryAttack() override { return false; }
+	void SecondaryAttack() override;
+	bool HasSecondaryAttack() override { return true; }
 	BOOL CanDrop() override { return false; }
 
 public:
@@ -171,6 +173,13 @@ void CKnifeZombiZ4::PrimaryAttack(void)
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 400ms;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
+}
+
+void CKnifeZombiZ4::SecondaryAttack()
+{
+#ifndef CLIENT_DLL
+	m_pPlayer->m_pModStrategy->ClientCommand("z4_zombieskill");
+#endif
 }
 
 }

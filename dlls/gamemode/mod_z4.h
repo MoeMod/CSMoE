@@ -15,6 +15,7 @@ namespace sv {
 	public:
 		CZ4CountdownDelegate(CMod_ZombieIV *mod);
 
+		void OnCountdownStart() override;
 		void OnCountdownChanged(int iCurrentCount) override;
 	};
 
@@ -31,6 +32,10 @@ namespace sv {
 		void Think() override;
 		void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker) override;
 		void InstallPlayerModStrategy(CBasePlayer *player) override;
+
+		void InfectionSound() override;
+		void HumanWin() override;
+		void ZombieWin() override;
 
 	public:
 		struct round_t;

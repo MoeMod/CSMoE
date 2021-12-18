@@ -80,10 +80,9 @@ public:
 	void TeamCheck();
 
 protected:
-	void InfectionSound();
-
-	void HumanWin();
-	void ZombieWin();
+	virtual void InfectionSound();
+	virtual void HumanWin();
+	virtual void ZombieWin();
 
 	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) { m_eventBecomeZombie.dispatch(player, iEvolutionLevel); }
 

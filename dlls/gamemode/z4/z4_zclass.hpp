@@ -28,6 +28,31 @@ namespace sv {
 			float flDashKnockback;
 			float flDashDefense;
 		};
+
+		struct zclass_skill_s {
+			const char *szNameSkill;
+			const char *szNameDash;
+			float flRegenDusk, flRegenDark, flRegenDawn, flExtraHealthPercent;
+			duration_t flDashLasting, flDashTimeCheck;
+			int iSkillConsume;
+			duration_t flSkillTimeReset;
+		};
+
+		enum z4_knife_e
+		{
+			ANIM_IDLE1,
+			ANIM_SLASH1,
+			ANIM_SLASH2,
+			ANIM_DRAW,
+			ANIM_STUN_START,
+			ANIM_STUN_END,
+			ANIM_SKILL_START,
+			ANIM_SKILL_END,
+			ANIM_SKILL,
+			ANIM_DASH_START,
+			ANIM_DASH_LOOP,
+			ANIM_DASH_END,
+		};
 	}
 }
 
