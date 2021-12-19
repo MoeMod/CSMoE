@@ -597,9 +597,6 @@ void CL_DecayLights( void );
 
 //=================================================
 
-void CL_PrepVideo( void );
-void CL_PrepSound( void );
-
 //
 // cl_cmds.c
 //
