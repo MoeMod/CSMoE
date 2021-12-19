@@ -30,6 +30,13 @@ GNU General Public License for more details.
 #include "imgui_impl_xash.h"
 #endif
 
+#include <optional>
+#include <chrono>
+#include <boost/asio.hpp>
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/use_awaitable.hpp>
+
 #define MAX_TOTAL_CMDS		16
 #define MIN_CMD_RATE		10.0
 #define MAX_CMD_BUFFER		4000
@@ -1443,6 +1450,22 @@ void CL_ParseNETInfoMessage( netadr_t from, sizebuf_t *msg )
 
 //===================================================================
 
+boost::asio::io_context ioc_cl_main;
+std::optional<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> ioc_cl_main_work_guard;
+
+boost::asio::awaitable<void> CL_CheckFrameSmooth()
+{
+	static std::chrono::high_resolution_clock::time_point last_frame_time;
+	auto now = std::chrono::high_resolution_clock::now();
+	if(now - last_frame_time > std::chrono::duration<double>(host.realframetime))
+	{
+		last_frame_time = now;
+		// yield for next frame
+		co_await boost::asio::post(ioc_cl_main, boost::asio::use_awaitable);
+	}
+	co_return;
+}
+
 /*
 ======================
 CL_PrepSound
@@ -1450,7 +1473,7 @@ CL_PrepSound
 Call before entering a new level, or after changing dlls
 ======================
 */
-void CL_PrepSound( void )
+boost::asio::awaitable<void> CL_PrepSound( void )
 {
 	int	i, sndcount, step;
 
@@ -1460,6 +1483,7 @@ void CL_PrepSound( void )
 	step = sndcount/10;
 
 	S_BeginRegistration();
+	co_await CL_CheckFrameSmooth();
 
 	for( i = 0; i < MAX_SOUNDS - 1 && cl.sound_precache[i+1][0]; i++ )
 	{
@@ -1467,9 +1491,12 @@ void CL_PrepSound( void )
 		Cvar_SetFloat( "scr_loading", scr_loading->value + 5.0f / sndcount );
 		if( step && !( i % step ) && ( cl_allow_levelshots->integer || cl.background ))
 			SCR_UpdateScreen();
+		co_await CL_CheckFrameSmooth();
 	}
 
 	S_EndRegistration();
+
+	co_await CL_CheckFrameSmooth();
 
 	if( host.soundList )
 	{
@@ -1484,6 +1511,7 @@ void CL_PrepSound( void )
 					S_RegisterSound( entry->name ), entry->volume, entry->attenuation,
 					entry->pitch, 0 );
 			}
+			co_await CL_CheckFrameSmooth();
 		}
 	}
 
@@ -1491,6 +1519,8 @@ void CL_PrepSound( void )
 	host.numsounds = 0;
 
 	cl.audio_prepped = true;
+
+	co_return;
 }
 
 /*
@@ -1500,14 +1530,14 @@ CL_PrepVideo
 Call before entering a new level, or after changing dlls
 =================
 */
-void CL_PrepVideo( void )
+boost::asio::awaitable<void> CL_PrepVideo( void )
 {
 	string	mdlname, mapname;
 	int	i, mdlcount, step;
 	int	map_checksum; // dummy
 
 	if( !cl.model_precache[1][0] )
-		return; // no map loaded
+		co_return; // no map loaded
 
 	Cvar_SetFloat( "scr_loading", 0.0f ); // reset progress bar
 	MsgDev( D_NOTE, "CL_PrepVideo: %s\n", clgame.mapname );
@@ -1515,6 +1545,9 @@ void CL_PrepVideo( void )
 	// let the render dll load the map
 	Q_strncpy( mapname, cl.model_precache[1], MAX_STRING );
 	Mod_LoadWorld( mapname, (uint *)&map_checksum, cl.maxclients > 1 );
+
+	co_await CL_CheckFrameSmooth();
+
 	cl.worldmodel = Mod_Handle( 1 ); // get world pointer
 	Cvar_SetFloat( "scr_loading", 25.0f );
 
@@ -1535,6 +1568,8 @@ void CL_PrepVideo( void )
 		Cvar_SetFloat( "scr_loading", scr_loading->value + 75.0f / mdlcount );
 		if( step && !( i % step ) && ( cl_allow_levelshots->integer || cl.background ) )
 			SCR_UpdateScreen();
+
+		co_await CL_CheckFrameSmooth();
 	}
 
 	// update right muzzleflash indexes
@@ -1548,6 +1583,8 @@ void CL_PrepVideo( void )
 	R_NewMap(); // tell the render about new map
 
 	V_SetupOverviewState(); // set overview bounds
+
+	co_await CL_CheckFrameSmooth();
 
 	// must be called after lightmap loading!
 	clgame.dllFuncs.pfnVidInit();
@@ -1598,6 +1635,8 @@ void CL_PrepVideo( void )
 				S_RegisterSound( entry->name ), entry->volume, entry->attenuation,
 				entry->pitch, 0 );
 			}
+
+			co_await CL_CheckFrameSmooth();
 		}
 	}
 
@@ -1611,6 +1650,7 @@ void CL_PrepVideo( void )
 
 	cl.video_prepped = true;
 	cl.force_refdef = true;
+	co_return;
 }
 
 /*
@@ -2033,14 +2073,19 @@ The server will send this command right
 before allowing the client into the server
 =================
 */
-void CL_Precache_f( void )
+boost::asio::awaitable<void> Co_CL_Precache( void )
 {
 	int	spawncount;
 
 	spawncount = Q_atoi( Cmd_Argv( 1 ));
 
-	CL_PrepSound();
-	CL_PrepVideo();
+	//CL_PrepSound();
+	//CL_PrepVideo();
+	auto aw1 = CL_PrepSound();
+	auto aw2 = CL_PrepVideo();
+
+	co_await std::move(aw1);
+	co_await std::move(aw2);
 
 	if( Cmd_Argc() > 2 )
 	{
@@ -2059,6 +2104,13 @@ void CL_Precache_f( void )
 
 	BF_WriteByte( &cls.netchan.message, clc_stringcmd );
 	BF_WriteString( &cls.netchan.message, va( "begin %i\n", spawncount ));
+
+	co_return;
+}
+
+void CL_Precache_f( void )
+{
+	boost::asio::co_spawn(ioc_cl_main, Co_CL_Precache(), boost::asio::detached);
 }
 
 /*
@@ -2285,6 +2337,7 @@ void Host_ClientFrame( void )
 
 	if( cls.initialized )
 	{
+		ioc_cl_main.poll_one();
 		clgame.dllFuncs.pfnFrame( host.frametime );
 
 		// fetch results from server
@@ -2295,8 +2348,8 @@ void Host_ClientFrame( void )
 		// allow sound and video DLL change
 		if( cls.state == ca_active )
 		{
-			if( !cl.video_prepped ) CL_PrepVideo();
-			if( !cl.audio_prepped ) CL_PrepSound();
+			//if( !cl.video_prepped ) CL_PrepVideo();
+			//if( !cl.audio_prepped ) CL_PrepSound();
 		}
 
 		// send a new command message to the server
@@ -2386,6 +2439,9 @@ void CL_Init( void )
 		cl.maxclients = 1; // allow to drawing player in menu
 		cls.olddemonum = -1;
 		cls.demonum = -1;
+
+		ioc_cl_main_work_guard.emplace(boost::asio::make_work_guard(ioc_cl_main));
+		ioc_cl_main.reset();
 	}
 	else
 		Sys_Warn("Could not load client library:\n%s", Com_GetLibraryError());
@@ -2419,6 +2475,9 @@ void CL_Shutdown( void )
 	{
 		CL_UnloadProgs ();
 		cls.initialized = false;
+
+		ioc_cl_main_work_guard.reset();
+		ioc_cl_main.stop();
 	}
 
 	FS_Delete( "demoheader.tmp" ); // remove tmp file
