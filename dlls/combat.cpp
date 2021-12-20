@@ -1161,6 +1161,7 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 		falloff = flDamage / flRadius;
 	else
 		falloff = 1.0;
+
 	int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
 
 	// in case grenade is lying on the ground
@@ -1212,104 +1213,97 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 					tr.vecEndPos = vecSrc;
 					tr.flFraction = 0;
 				}
-				float flAdjustedDamage = max(0, flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff);
-				if (!bHasFalloff)
-					flAdjustedDamage = flDamage;
-				if (tr.flFraction == 1.0f)
+				flAdjustedDamage = bHasFalloff ? max(0, flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff) : flDamage;
+	
+				if (pEntity->IsPlayer())
 				{
-					pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-				}
-				else
-				{
-					if (pEntity->IsPlayer())
+					CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+					CBasePlayer* pAttacker = GetClassPtr<CBasePlayer>(pevAttacker);
+
+					if (canheadshot == 0)		//canheadshot with humanskill(knife execpt)
 					{
-						CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-						CBasePlayer* pAttacker = GetClassPtr<CBasePlayer>(pevAttacker);
-
-						if (canheadshot == 0)		//canheadshot with humanskill(knife execpt)
-						{
-							tr.iHitgroup = HITGROUP_CHEST;
-							ClearMultiDamage();
-							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-							ApplyMultiDamage(pevInflictor, pevAttacker);
-						}
-						else if(canheadshot == -1)	//like balrog11cannon
-							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-						else
-						{
-							//can headshot with traceline like knife_lance
-							TraceResult Pretr = tr;						
-							UTIL_MakeVectors(pAttacker->pev->punchangle + pAttacker->pev->v_angle);
-							Vector vecDirShooting = gpGlobals->v_forward;
-							UTIL_TraceLine(pAttacker->GetGunPosition(), vecDirShooting * flRadius, missile, ENT(pevInflictor), &tr);
-							vecSpot.z = tr.vecEndPos.z;
-							UTIL_TraceLine(pAttacker->GetGunPosition(), vecSpot, missile, ENT(pevInflictor), &tr);
-
-							if (tr.flFraction != 1.0)
-							{
-								ClearMultiDamage();
-								pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (Pretr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-								ApplyMultiDamage(pevInflictor, pevAttacker);
-							}
-							else
-							{
-								ClearMultiDamage();
-								pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (Pretr.vecEndPos - vecSrc).Normalize(), &Pretr, bitsDamageType);
-								ApplyMultiDamage(pevInflictor, pevAttacker);
-							}
-						}
-
-						if (ExtraKnockBack)
-						{
-							switch (ExtraKnockBack)
-							{
-								case 1:	//knife_lance_specialattack
-								{
-									if (target->m_bIsZombie && target->m_ZombieClass)
-									{
-										if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
-											break;
-										else
-											AddKickRate(target, pAttacker->pev->origin, 1200, 400);
-									}								
-									break;
-								}
-								case 2:	//knife_lance_slash3
-								{
-									if (target->m_bIsZombie && target->m_ZombieClass)
-									{
-										if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
-											break;
-										else
-											AddKickRate(target, vecSrc, 3000, 220);
-									}
-									break;
-								}
-								case 3:
-								{
-									MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, target->pev);
-									WRITE_BYTE(9);	//type
-									WRITE_SHORT(ENTINDEX(target->edict()));	//entity
-									WRITE_BYTE(1);
-									MESSAGE_END();
-
-									target->m_flVelocityModifier = 0.05;
-									if(target->m_bIsZombie && target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
-										target->m_flVelocityModifier = 1.0;
-									break;
-								}
-							}
-						}
-					}
-					else
-					{
-						if (!canheadshot)
-							tr.iHitgroup = HITGROUP_CHEST;
+						tr.iHitgroup = HITGROUP_CHEST;
 						ClearMultiDamage();
 						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 						ApplyMultiDamage(pevInflictor, pevAttacker);
 					}
+					else if(canheadshot == -1)	//like balrog11cannon
+						pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+					else
+					{
+						//can headshot with traceline like knife_lance
+						TraceResult Pretr = tr;						
+						UTIL_MakeVectors(pAttacker->pev->punchangle + pAttacker->pev->v_angle);
+						Vector vecDirShooting = gpGlobals->v_forward;
+						UTIL_TraceLine(pAttacker->GetGunPosition(), vecDirShooting * flRadius, missile, ENT(pevInflictor), &tr);
+						vecSpot.z = tr.vecEndPos.z;
+						UTIL_TraceLine(pAttacker->GetGunPosition(), vecSpot, missile, ENT(pevInflictor), &tr);
+
+						if (tr.flFraction != 1.0)
+						{
+							ClearMultiDamage();
+							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (Pretr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+							ApplyMultiDamage(pevInflictor, pevAttacker);
+						}
+						else
+						{
+							ClearMultiDamage();
+							pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (Pretr.vecEndPos - vecSrc).Normalize(), &Pretr, bitsDamageType);
+							ApplyMultiDamage(pevInflictor, pevAttacker);
+						}
+					}
+
+					if (ExtraKnockBack)
+					{
+						switch (ExtraKnockBack)
+						{
+							case 1:	//knife_lance_specialattack
+							{
+								if (target->m_bIsZombie && target->m_ZombieClass)
+								{
+									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+										break;
+									else
+										AddKickRate(target, pAttacker->pev->origin, 1200, 400);
+								}								
+								break;
+							}
+							case 2:	//knife_lance_slash3
+							{
+								if (target->m_bIsZombie && target->m_ZombieClass)
+								{
+									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+										break;
+									else
+										AddKickRate(target, vecSrc, 3000, 220);
+								}
+								break;
+							}
+							case 3:
+							{
+								MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, target->pev);
+								WRITE_BYTE(9);	//type
+								WRITE_SHORT(ENTINDEX(target->edict()));	//entity
+								WRITE_BYTE(1);
+								MESSAGE_END();
+
+								target->m_flVelocityModifier = 0.05;
+								if(target->m_bIsZombie && target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+									target->m_flVelocityModifier = 1.0;
+								break;
+							}
+						}
+					}
 				}
+				else
+				{
+					if (!canheadshot)
+						tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+				}
+				
 			}
 		}
 	}

@@ -51,7 +51,7 @@ static const WeaponEntityFindList_t &WeaponEntityFindList()
 /*
 	Entity Pools
 */
-extern CBasePlayerWeapon *g_pWpns[MAX_WEAPONS]; // cs_weapons.cpp
+extern std::map <int, CBasePlayerWeapon*> g_pWpns; // cs_weapons.cpp
 
 /*
 	CBTEClientWeapons impls

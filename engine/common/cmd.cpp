@@ -1244,7 +1244,7 @@ static void Cmd_Apropos_f( void )
 
 		if( !matchpattern_with_separator( var->name, partial, true, "", false ) )
 		{
-			char *desc;
+			const char *desc;
 
 			if( var->flags & CVAR_EXTDLL )
 				desc = "game cvar";

@@ -80,7 +80,7 @@ void Console_ShutDown(CTextConsole* const pConsole)
 	FreeConsole();
 }
 
-void Console_PrintRaw(char* pszMsg, int nChars)
+void Console_PrintRaw(const char* pszMsg, int nChars)
 {
 	char outputStr[2048];
 	WCHAR unicodeStr[1024];
@@ -98,7 +98,7 @@ void Console_PrintRaw(char* pszMsg, int nChars)
 	WriteFile(houtput, outputStr, nChars ? nChars : Q_strlen(outputStr), NULL, NULL);
 }
 
-void Console_Echo(char* pszMsg, int nChars)
+void Console_Echo(const char* pszMsg, int nChars)
 {
 	Console_PrintRaw(pszMsg, nChars);
 }

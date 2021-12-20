@@ -64,7 +64,7 @@ typedef struct stringlist_s
 
 typedef struct wadtype_s
 {
-	char		*ext;
+	const char		*ext;
 	signed char		type;
 } wadtype_t;
 

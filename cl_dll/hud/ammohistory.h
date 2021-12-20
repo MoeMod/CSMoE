@@ -25,7 +25,7 @@ class WeaponsResource
 {
 private:
 	// Information about weapons & ammo
-	WEAPON		rgWeapons[MAX_WEAPONS];	// Weapons Array
+	std::map<int, WEAPON*> rgWeapons;	// Weapons Array
 
 	// counts of weapons * ammo
 	WEAPON*		rgSlots[MAX_WEAPON_SLOTS+1][MAX_WEAPON_POSITIONS+1];	// The slots currently in use by weapons.  The value is a pointer to the weapon;  if it's NULL, no weapon is there
@@ -34,7 +34,7 @@ private:
 public:
 	void Init( void )
 	{
-		memset( rgWeapons, 0, sizeof rgWeapons );
+		rgWeapons.clear();
 		Reset();
 	}
 
@@ -48,30 +48,43 @@ public:
 ///// WEAPON /////
 	int			iOldWeaponBits;
 
-	WEAPON *GetWeapon( int iId ) { return &rgWeapons[iId]; }
+	WEAPON *GetWeapon( int iId ) { 
+		auto iter = rgWeapons.find(iId);
+		if (iter == rgWeapons.end())
+			return nullptr;
+
+		return iter->second;
+	}
+
 	void AddWeapon( WEAPON *wp ) 
 	{ 
-		rgWeapons[ wp->iId ] = *wp;	
-		LoadWeaponSprites( &rgWeapons[ wp->iId ] );
+		rgWeapons[wp->iId] = wp;
+		LoadWeaponSprites(wp);
 	}
 
 	void PickupWeapon( WEAPON *wp )
 	{
+		if (!wp)
+			return;
+
 		rgSlots[ wp->iSlot ][ wp->iSlotPos ] = wp;
 	}
 
 	void DropWeapon( WEAPON *wp )
 	{
+		if (!wp)
+			return;
+
 		rgSlots[ wp->iSlot ][ wp->iSlotPos ] = NULL;
 	}
 
 	void DropAllWeapons( void )
 	{
-		for ( int i = 0; i < MAX_WEAPONS; i++ )
+		for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 		{
-			if ( rgWeapons[i].iId )
-				DropWeapon( &rgWeapons[i] );
+			DropWeapon(it->second);
 		}
+		rgWeapons.clear();
 	}
 
 	WEAPON* GetWeaponSlot( int slot, int pos ) { return rgSlots[slot][pos]; }
@@ -92,8 +105,6 @@ public:
 	int CountAmmo( int iId );
 
 	HSPRITE* GetAmmoPicFromWeapon( int iAmmoId, wrect_t& rect );
-
-	std::set<int> m_setWeaponID;
 };
 
 extern WeaponsResource gWR;

@@ -41,7 +41,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 1000.0f, 250.0f, 600.0f, 700.0f, 0.9f };}
-	const char* GetCSModelName() override { return "models/w_m1887.mdl"; }
+	const char* GetCSModelName() override { return "models/pw_m1887se.mdl"; }
 
 public:
 	void M1887seFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

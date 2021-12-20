@@ -131,7 +131,7 @@ const char *GAME_EXPORT Cvar_VariableString( const char *var_name )
 Cvar_LookupVars
 ============
 */
-void Cvar_LookupVars( int checkbit, void *buffer, void *ptr, setpair_t callback )
+void Cvar_LookupVars( int checkbit, const char *buffer, void *ptr, setpair_t callback )
 {
 	convar_t	*cvar;
 
@@ -150,7 +150,7 @@ void Cvar_LookupVars( int checkbit, void *buffer, void *ptr, setpair_t callback 
 		}
 		else
 		{
-			char *desc;
+			const char *desc;
 
 			if( cvar->flags & CVAR_EXTDLL )
 				desc = "game cvar";

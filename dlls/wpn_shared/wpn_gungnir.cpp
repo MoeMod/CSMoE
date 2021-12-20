@@ -580,7 +580,8 @@ public:
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return 1092.0;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 304.0;
+			//return 304.0;
+			return 152.0;
 #endif
 		return 20.0;
 	}
@@ -610,7 +611,8 @@ public:
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return 27500.0;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 6900.0;
+			//return 6900.0;
+			return 3400.0;
 #endif
 		return 120.0;
 	}
@@ -620,7 +622,8 @@ public:
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return 2500.0;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 1500.0;
+			//return 1500.0;
+			return 1000.0;
 #endif
 		return 80.0;
 	}
@@ -630,7 +633,8 @@ public:
 		if (g_pModRunning->DamageTrack() == DT_ZBS)
 			return 4100.0;
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			return 2000.0;
+			//return 2000.0;
+			return 1000.0;
 #endif
 		return 50.0;
 	}

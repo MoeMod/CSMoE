@@ -542,9 +542,9 @@ void SV_WaterMove( edict_t *ent );
 // sv_send.c
 //
 void SV_SendClientMessages( void );
-void SV_ClientPrintf( sv_client_t *cl, int level, char *fmt, ... );
-void SV_BroadcastPrintf( int level, char *fmt, ... );
-void SV_BroadcastCommand( char *fmt, ... );
+void SV_ClientPrintf( sv_client_t *cl, int level, const char *fmt, ... );
+void SV_BroadcastPrintf( int level, const char *fmt, ... );
+void SV_BroadcastCommand(const char *fmt, ... );
 
 //
 // sv_client.c
@@ -568,7 +568,7 @@ void SV_ClientThink( sv_client_t *cl, usercmd_t *cmd );
 void SV_ExecuteClientMessage( sv_client_t *cl, sizebuf_t *msg );
 void SV_ConnectionlessPacket( netadr_t from, sizebuf_t *msg );
 edict_t *SV_FakeConnect( const char *netname );
- void SV_ExecuteClientCommand( sv_client_t *cl, char *s );
+ void SV_ExecuteClientCommand( sv_client_t *cl, const char *s );
 void SV_RunCmd( sv_client_t *cl, usercmd_t *ucmd, int random_seed );
 qboolean SV_IsPlayerIndex( int idx );
 void SV_InitClientMove( void );

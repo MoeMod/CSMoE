@@ -440,40 +440,42 @@ public:
 #ifdef CLIENT_DLL
 	void Precache(void) override {}
 	void Restart(void) override {}
-	int Save(CSave &save) override { return 1; }
-	int Restore(CRestore &restore) override { return 1; }
+	int Save(CSave& save) override { return 1; }
+	int Restore(CRestore& restore) override { return 1; }
 #else
 	void Precache() override;
-	int Save(CSave &save) override;
-	int Restore(CRestore &restore) override;
+	int Save(CSave& save) override;
+	int Restore(CRestore& restore) override;
 #endif
 	int ObjectCaps() override { return (CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 #ifdef CLIENT_DLL
 	int Classify() override { return 0; }
 	void
-	TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override {}
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,
-	               int bitsDamageType) override { return 0; }
+		TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override {}
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage,
+		int bitsDamageType) override {
+		return 0;
+	}
 	int TakeHealth(float flHealth, int bitsDamageType) override { return 0; }
 #else
 	int Classify() override;
-	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	int TakeHealth(float flHealth, int bitsDamageType) override;
 #endif
-	void Killed(entvars_t *pevAttacker, int iGib) override;
+	void Killed(entvars_t* pevAttacker, int iGib) override;
 #ifdef CLIENT_DLL
 	void AddPoints(int score, BOOL bAllowNegativeScore) override {}
 	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override {}
-	BOOL AddPlayerItem(CBasePlayerItem *pItem) override { return false; }
-	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override { return false; }
-	int GiveAmmo(int iAmount, const char *szName, int iMax) override { return 0; }
+	BOOL AddPlayerItem(CBasePlayerItem* pItem) override { return false; }
+	BOOL RemovePlayerItem(CBasePlayerItem* pItem) override { return false; }
+	int GiveAmmo(int iAmount, const char* szName, int iMax) override { return 0; }
 #else
 	void AddPoints(int score, BOOL bAllowNegativeScore) override;
 	void AddPointsToTeam(int score, BOOL bAllowNegativeScore) override;
-	BOOL AddPlayerItem(CBasePlayerItem *pItem) override;
-	BOOL RemovePlayerItem(CBasePlayerItem *pItem) override;
-	int GiveAmmo(int iAmount, const char *szName, int iMax) override;
+	BOOL AddPlayerItem(CBasePlayerItem* pItem) override;
+	BOOL RemovePlayerItem(CBasePlayerItem* pItem) override;
+	int GiveAmmo(int iAmount, const char* szName, int iMax) override;
 #endif
 	//void StartSneaking() override { m_tSneaking = gpGlobals->time - 1s; }
 	//void StopSneaking() override { m_tSneaking = gpGlobals->time + 30s; }
@@ -482,13 +484,13 @@ public:
 	BOOL IsPlayer() override { return (pev->flags & FL_SPECTATOR) != FL_SPECTATOR; }
 	BOOL IsNetClient() override { return TRUE; }
 #ifdef CLIENT_DLL
-	const char *TeamID() override { return NULL; }
+	const char* TeamID() override { return NULL; }
 	BOOL FBecomeProne() override { return TRUE; }
 #else
-	const char *TeamID() override;
+	const char* TeamID() override;
 	BOOL FBecomeProne() override;
 #endif
-	Vector BodyTarget(const Vector &posSrc) override { return Center() + pev->view_ofs * RANDOM_FLOAT(0.5, 1.1); }
+	Vector BodyTarget(const Vector& posSrc) override { return Center() + pev->view_ofs * RANDOM_FLOAT(0.5, 1.1); }
 #ifdef CLIENT_DLL
 	int Illumination() override { return 0; }
 #else
@@ -523,22 +525,22 @@ public:
 	virtual Vector GetAutoaimVector(float flDelta);
 	virtual void Blind(duration_t flUntilTime, duration_t flHoldTime, duration_t flFadeTime, int iAlpha);
 #endif
-	virtual void OnTouchingWeapon(CWeaponBox *pWeapon) {}
+	virtual void OnTouchingWeapon(CWeaponBox* pWeapon) {}
 
 public:
 	void SpawnClientSideCorpse();
-	void Observer_FindNextPlayer(bool bReverse, const char *name = NULL);
-	CBaseEntity *Observer_IsValidTarget(int iPlayerIndex, bool bSameTeam);
+	void Observer_FindNextPlayer(bool bReverse, const char* name = NULL);
+	CBaseEntity* Observer_IsValidTarget(int iPlayerIndex, bool bSameTeam);
 	void Observer_HandleButtons();
 	void Observer_SetMode(int iMode);
 	void Observer_CheckTarget();
 	void Observer_CheckProperties();
 	int IsObserver() { return pev->iuser1; }
 	void PlantC4();
-	void Radio(const char *msg_id, const char *msg_verbose = NULL, short pitch = 100, bool showIcon = true);
-	CBasePlayer *GetNextRadioRecipient(CBasePlayer *pStartPlayer);
+	void Radio(const char* msg_id, const char* msg_verbose = NULL, short pitch = 100, bool showIcon = true);
+	CBasePlayer* GetNextRadioRecipient(CBasePlayer* pStartPlayer);
 	void SmartRadio();
-	void ThrowWeapon(const char *pszItemName);
+	void ThrowWeapon(const char* pszItemName);
 	void ThrowPrimary();
 	void AddAccount(int amount, bool bTrackChange = true);
 	void Disappear();
@@ -548,9 +550,9 @@ public:
 	void TabulateAmmo();
 	void Pain(int m_LastHitGroup, bool HasArmour);
 	BOOL IsBombGuy();
-	bool IsLookingAtPosition(Vector *pos, float angleTolerance = 20.0f);
+	bool IsLookingAtPosition(Vector* pos, float angleTolerance = 20.0f);
 	void Reset();
-	void SetScoreboardAttributes(CBasePlayer *destination = NULL);
+	void SetScoreboardAttributes(CBasePlayer* destination = NULL);
 	void RenewItems();
 	void PackDeadPlayerItems();
 	void GiveDefaultItems();
@@ -559,9 +561,9 @@ public:
 	void SetProgressBarTime(int time);
 	void SetProgressBarTime2(int time, duration_t timeElapsed);
 	void SetPlayerModel(BOOL HasC4);
-	void SetNewPlayerModel(const char *modelName);
-	BOOL SwitchWeapon(CBasePlayerItem *pWeapon);
-	void CheckPowerups(entvars_t *pev);
+	void SetNewPlayerModel(const char* modelName);
+	BOOL SwitchWeapon(CBasePlayerItem* pWeapon);
+	void CheckPowerups(entvars_t* pev);
 	bool CanAffordPrimary();
 	bool CanAffordPrimaryAmmo();
 	bool CanAffordSecondaryAmmo();
@@ -580,24 +582,24 @@ public:
 	void UpdatePlayerSound();
 	void DeathSound();
 	void SetAnimation(PLAYER_ANIM playerAnim);
-	void SetWeaponAnimType(const char *szExtention)/* { Q_strcpy(m_szAnimExtention, szExtention); }*/;
+	void SetWeaponAnimType(const char* szExtention)/* { Q_strcpy(m_szAnimExtention, szExtention); }*/;
 	void CheatImpulseCommands(int iImpulse);
 	void StartDeathCam();
 	void StartObserver(Vector vecPosition, Vector vecViewAngle);
 	void HandleSignals();
-	void DropPlayerItem(const char *pszItemName);
-	BOOL HasPlayerItem(CBasePlayerItem *pCheckItem);
-	BOOL HasNamedPlayerItem(const char *pszItemName);
+	void DropPlayerItem(const char* pszItemName);
+	BOOL HasPlayerItem(CBasePlayerItem* pCheckItem);
+	BOOL HasNamedPlayerItem(const char* pszItemName);
 	BOOL HasWeapons();
 	void SelectPrevItem(int iItem);
 	void SelectNextItem(int iItem);
 	void SelectLastItem();
-	void SelectItem(const char *pstr);
+	void SelectItem(const char* pstr);
 	void ItemPreFrame();
 	void ItemPostFrame();
-	void GiveNamedItem(const char *pszName);
+	void GiveNamedItem(const char* pszName);
 	void EnableControl(BOOL fControl);
-	bool HintMessage(const char *pMessage, BOOL bDisplayIfPlayerDead = FALSE, BOOL bOverride = FALSE);
+	bool HintMessage(const char* pMessage, BOOL bDisplayIfPlayerDead = FALSE, BOOL bOverride = FALSE);
 	void SendAmmoUpdate();
 	void SendFOV(int fov);
 	void WaterMove();
@@ -606,27 +608,27 @@ public:
 	void HostageUsed();
 	void JoiningThink();
 	void RemoveLevelText();
-	void MenuPrint(const char *msg);
+	void MenuPrint(const char* msg);
 	void ResetMenu();
 	void SyncRoundTimer();
 	void CheckSuitUpdate();
-	void SetSuitUpdate(const char *name = nullptr, int fgroup = 0, int iNoRepeatTime = 0);
+	void SetSuitUpdate(const char* name = nullptr, int fgroup = 0, int iNoRepeatTime = 0);
 	void UpdateGeigerCounter();
 	void CheckTimeBasedDamage();
-	void BarnacleVictimBitten(entvars_t *pevBarnacle);
+	void BarnacleVictimBitten(entvars_t* pevBarnacle);
 	void BarnacleVictimReleased();
-	static int GetAmmoIndex(const char *psz);
+	static int GetAmmoIndex(const char* psz);
 	int AmmoInventory(int iAmmoIndex);
 	void ResetAutoaim();
-	Vector AutoaimDeflection(Vector &vecSrc, float flDist, float flDelta);
+	Vector AutoaimDeflection(Vector& vecSrc, float flDist, float flDelta);
 	void ForceClientDllUpdate();
-	void DeathMessage(entvars_t *pevAttacker) {};
+	void DeathMessage(entvars_t* pevAttacker) {};
 	void SetCustomDecalFrames(int nFrames);
 	int GetCustomDecalFrames();
 	void InitStatusBar();
 	void UpdateStatusBar();
 	void StudioEstimateGait();
-	void StudioPlayerBlend(int *pBlend, float *pPitch);
+	void StudioPlayerBlend(int* pBlend, float* pPitch);
 	void CalculatePitchBlend();
 	void CalculateYawBlend();
 	void StudioProcessGait();
@@ -635,7 +637,7 @@ public:
 	void ResetStamina();
 	BOOL IsArmored(int nHitGroup);
 	BOOL ShouldDoLargeFlinch(int nHitGroup, int nGunType);
-	void SetPrefsFromUserinfo(char *infobuffer);
+	void SetPrefsFromUserinfo(char* infobuffer);
 	void SendWeatherInfo();
 	void UpdateShieldCrosshair(bool draw);
 	bool HasShield();
@@ -643,11 +645,11 @@ public:
 	void RemoveShield();
 	void DropShield(bool bDeploy = true);
 	void GiveShield(bool bDeploy = true);
-	bool IsHittingShield(Vector &vecDirection, TraceResult *ptr);
-	bool SelectSpawnSpot(const char *pEntClassName, CBaseEntity *&pSpot);
+	bool IsHittingShield(Vector& vecDirection, TraceResult* ptr);
+	bool SelectSpawnSpot(const char* pEntClassName, CBaseEntity*& pSpot);
 	bool IsReloading()
 	{
-		CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_pActiveItem);
+		CBasePlayerWeapon* weapon = static_cast<CBasePlayerWeapon*>(m_pActiveItem);
 
 		if (weapon != NULL && weapon->m_fInReload)
 			return true;
@@ -659,19 +661,19 @@ public:
 	void InhibitAutoFollow(duration_t duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
 	void AllowAutoFollow() { m_allowAutoFollowTime = {}; }
 	void ClearAutoBuyData();
-	void AddAutoBuyData(const char *str);
+	void AddAutoBuyData(const char* str);
 	void AutoBuy();
-	void ClientCommand(const char *cmd, const char *arg1 = NULL, const char *arg2 = NULL, const char *arg3 = NULL);
-	void PrioritizeAutoBuyString(char *autobuyString, const char *priorityString);
-	const char *PickPrimaryCareerTaskWeapon();
-	const char *PickSecondaryCareerTaskWeapon();
-	const char *PickFlashKillWeaponString();
-	const char *PickGrenadeKillWeaponString();
-	bool ShouldExecuteAutoBuyCommand(AutoBuyInfoStruct *commandInfo, bool boughtPrimary, bool boughtSecondary);
-	void PostAutoBuyCommandProcessing(AutoBuyInfoStruct *commandInfo, bool &boughtPrimary, bool &boughtSecondary);
-	void ParseAutoBuyString(const char *string, bool &boughtPrimary, bool &boughtSecondary);
-	AutoBuyInfoStruct *GetAutoBuyCommandInfo(const char *command);
-	void InitRebuyData(const char *str);
+	void ClientCommand(const char* cmd, const char* arg1 = NULL, const char* arg2 = NULL, const char* arg3 = NULL);
+	void PrioritizeAutoBuyString(char* autobuyString, const char* priorityString);
+	const char* PickPrimaryCareerTaskWeapon();
+	const char* PickSecondaryCareerTaskWeapon();
+	const char* PickFlashKillWeaponString();
+	const char* PickGrenadeKillWeaponString();
+	bool ShouldExecuteAutoBuyCommand(AutoBuyInfoStruct* commandInfo, bool boughtPrimary, bool boughtSecondary);
+	void PostAutoBuyCommandProcessing(AutoBuyInfoStruct* commandInfo, bool& boughtPrimary, bool& boughtSecondary);
+	void ParseAutoBuyString(const char* string, bool& boughtPrimary, bool& boughtSecondary);
+	AutoBuyInfoStruct* GetAutoBuyCommandInfo(const char* command);
+	void InitRebuyData(const char* str);
 	void BuildRebuyStruct();
 	void Rebuy();
 	void RebuyPrimaryWeapon();
@@ -686,7 +688,7 @@ public:
 	void RebuyArmor();
 	void UpdateLocation(bool forceUpdate = false);
 	void SetObserverAutoDirector(bool val) { m_bObserverAutoDirector = val; }
-	bool IsObservingPlayer(CBasePlayer *pPlayer);
+	bool IsObservingPlayer(CBasePlayer* pPlayer);
 	bool CanSwitchObserverModes() const { return m_canSwitchObserverModes; }
 	void Intense()
 	{
@@ -700,14 +702,22 @@ public:
 public:
 #ifdef CLIENT_DLL
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {}
-	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data) { return false; }
+	virtual bool Knockback(CBasePlayer* attacker, const KnockbackData& data) { return false; }
 	void RemoveWeapon(int iWeaponID) {
 		pev->weapons &= ~(1 << iWeaponID);
+	}
+
+	void ClearWeapon(bool removeSuit) {
+		if (removeSuit)
+			pev->weapons = 0;
+		else
+			pev->weapons &= ~WEAPON_ALLWEAPONS;
 	}
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
 	void RemoveWeapon(int iWeaponID);
+	void ClearWeapon(bool removeSuit = false);
 #endif
 
 	void SpawnProtection_Check();
@@ -717,7 +727,6 @@ public:
 	void CheckZombieModeBuff(void);
 	bool ReactToDeimosTail();
 	void AddWeapon(int iWeaponID);
-	void ClearWeapon(bool removeSuit = false);
 
 public:
 	bool m_bSpawnProtection; // pack bools

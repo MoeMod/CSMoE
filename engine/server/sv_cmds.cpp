@@ -25,7 +25,7 @@ SV_ClientPrintf
 Sends text across to be displayed if the level passes
 =================
 */
-void SV_ClientPrintf( sv_client_t *cl, int level, char *fmt, ... )
+void SV_ClientPrintf( sv_client_t *cl, int level, const char *fmt, ... )
 {
 	va_list	argptr;
 	char	string[MAX_SYSPATH];
@@ -49,7 +49,7 @@ SV_BroadcastPrintf
 Sends text to all active clients
 =================
 */
-void SV_BroadcastPrintf( int level, char *fmt, ... )
+void SV_BroadcastPrintf( int level, const char *fmt, ... )
 {
 	char		string[MAX_SYSPATH];
 	va_list		argptr;
@@ -84,7 +84,7 @@ SV_BroadcastCommand
 Sends text to all active clients
 =================
 */
-void SV_BroadcastCommand( char *fmt, ... )
+void SV_BroadcastCommand(const char *fmt, ... )
 {
 	va_list	argptr;
 	char	string[MAX_SYSPATH];
@@ -292,7 +292,8 @@ TODO: Make it more convenient. (Timestamp check, temporary file, ...)
 */
 void SV_Maps_f(void)
 {
-	char mapName[256], *seperator = "-------------------";
+	char mapName[256];
+	const char *seperator = "-------------------";
 	auto argStr = Cmd_Argv(1); //Substr
 	int listIndex;
 	search_t *mapList;
@@ -947,7 +948,7 @@ void SV_Status_f( void )
 	for( i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++ )
 	{
 		int	j, l, ping;
-		char	*s;
+		const char	*s;
 
 		if( !cl->state ) continue;
 

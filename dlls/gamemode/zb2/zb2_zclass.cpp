@@ -49,50 +49,59 @@ std::shared_ptr<CBaseZombieClass_ZB2> MakeZombieClass(CBasePlayer *player, Zombi
 	return std::make_shared<T>(player, lv);
 }
 #ifdef XASH_DEDICATED
-const std::pair<const char *, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer *, ZombieLevel)> g_FindList[] = {
-		{"tank", MakeZombieClass<CZombieClass_Default>},
-		{"deimos2", MakeZombieClass<CZombieClass_Deimos2> },
-		{"speed", MakeZombieClass<CZombieClass_Speed> },
-		{"deimos", MakeZombieClass<CZombieClass_Deimos> },
-		{"heal", MakeZombieClass<CZombieClass_Heal> },
-		{"heavy", MakeZombieClass<CZombieClass_Heavy> },
-		{"pc", MakeZombieClass<CZombieClass_Pc> },
-		{"teleport", MakeZombieClass<CZombieClass_Teleport> },
-		{"booster", MakeZombieClass<CZombieClass_Booster> },
-		{"china", MakeZombieClass<CZombieClass_China> },
-		{"pass", MakeZombieClass<CZombieClass_Pass> },
-		{"flying", MakeZombieClass<CZombieClass_Flying> },
-		{"revival", MakeZombieClass<CZombieClass_Revival> },
-		{"stamper", MakeZombieClass<CZombieClass_Stamper> },
-		//{"resident", MakeZombieClass<CZombieClass_Resident> }
+const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+		{"tank", 100, MakeZombieClass<CZombieClass_Default>},
+		{"deimos2", 100, MakeZombieClass<CZombieClass_Deimos2> },
+		{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
+		{"deimos", 100, MakeZombieClass<CZombieClass_Deimos> },
+		{"heal", 100, MakeZombieClass<CZombieClass_Heal> },
+		{"heavy", 100, MakeZombieClass<CZombieClass_Heavy> },
+		{"pc", 100, MakeZombieClass<CZombieClass_Pc> },
+		{"teleport", 100, MakeZombieClass<CZombieClass_Teleport> },
+		{"booster", 100, MakeZombieClass<CZombieClass_Booster> },
+		{"china", 100, MakeZombieClass<CZombieClass_China> },
+		{"pass", 100, MakeZombieClass<CZombieClass_Pass> },
+		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
+		{"revival", 50, MakeZombieClass<CZombieClass_Revival> },
+		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
+		//{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
 };
+
 #else
-const std::pair<const char*, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-		{"tank", MakeZombieClass<CZombieClass_Default>}
+const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+		{"tank", 100, MakeZombieClass<CZombieClass_Default>}
 };
 #endif
+
 constexpr auto NUM_ZCLASSES = std::extent<decltype(g_FindList)>::value;
+
+template <size_t ...N>
+constexpr std::array<unsigned int, NUM_ZCLASSES> MakeZClassWeightList(std::index_sequence<N...>) {
+	return { std::get<1>(g_FindList[N])... };
+}
+auto ZCLASSES_WEIGHT = MakeZClassWeightList(std::make_index_sequence<NUM_ZCLASSES>{});
 
 std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name)
 {
 	if(name == nullptr)
-		return g_FindList[0].second(player, lv);
+		return std::get<2>(g_FindList[0])(player, lv);
 
 	if(!stricmp(name, "random"))
 	{
 		std::random_device rd;
-		const std::size_t N = std::uniform_int_distribution<size_t>(0, NUM_ZCLASSES - 1)(rd);
-		player->m_ZombieClass = g_FindList[N].first;
-		return g_FindList[N].second(player, lv);
+		std::mt19937 gen(rd());
+		const std::size_t N = std::discrete_distribution<>(ZCLASSES_WEIGHT.begin(), ZCLASSES_WEIGHT.end())(gen);
+		player->m_ZombieClass = std::get<0>(g_FindList[N]);
+		return std::get<2>(g_FindList[N])(player, lv);
 	}
 
 	for(auto &&pr : g_FindList)
 	{
-		if(!stricmp(name, pr.first))
-			return pr.second(player, lv);
+		if(!stricmp(name, std::get<0>(pr)))
+			return std::get<2>(pr)(player, lv);
 	}
 
-	return g_FindList[0].second(player, lv);
+	return std::get<2>(g_FindList[0])(player, lv);
 }
 
 void CBaseZombieClass_ZB2::InitHUD() const

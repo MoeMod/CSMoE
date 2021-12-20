@@ -34,7 +34,7 @@ void CM1887se::Spawn(void)
 
 	Precache();
 	m_iId = WEAPON_SCOUT;
-	SET_MODEL(ENT(pev), "models/w_m1887.mdl");
+	SET_MODEL(ENT(pev), "models/pw_m1887se.mdl");
 
 	m_iDefaultAmmo = M1887SE_MAX_CLIP;
 	FallInit();
@@ -43,8 +43,7 @@ void CM1887se::Spawn(void)
 void CM1887se::Precache(void)
 {
 	PRECACHE_MODEL("models/v_m1887se.mdl");
-	PRECACHE_MODEL("models/w_m1887se.mdl");
-	PRECACHE_MODEL("models/p_m1887se.mdl");
+	PRECACHE_MODEL("models/pw_m1887se.mdl");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 
@@ -70,7 +69,7 @@ int CM1887se::GetItemInfo(ItemInfo *p)
 
 BOOL CM1887se::Deploy(void)
 {
-	if (DefaultDeploy("models/v_m1887se.mdl", "models/p_m1887.mdl", M1887_DRAW, "rifle", UseDecrement() != FALSE))
+	if (DefaultDeploy("models/v_m1887se.mdl", "models/pw_m1887se.mdl", M1887_DRAW, "rifle", UseDecrement() != FALSE))
 	{
 		m_flNextPrimaryAttack = m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 1.25s;
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;

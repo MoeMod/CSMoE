@@ -624,9 +624,10 @@ void IN_MouseMove( void )
 	if( !in_mouseinitialized || !in_mouseactive || m_ignore->integer )
 		return;
 
+    int x, y;
+
 	// find mouse movement
 #ifdef XASH_SDL
-	int x, y;
 	SDL_GetMouseState( &x, &y );
 #ifdef TARGET_OS_OSX
 	int w1, w2, h1, h2;

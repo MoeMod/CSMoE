@@ -1824,7 +1824,7 @@ void Mod_BuildSurfacePolygons( msurface_t *surf, mextrasurf_t *info )
 
 	if( surf->texinfo && surf->texinfo->texture )
 		texname = surf->texinfo->texture->name;
-	else texname = "notexture";
+	else texname = (char*)"notexture";
 
 	MsgDev( D_ERROR, "BuildSurfMesh: surface %i (%s) failed to build surfmesh\n", surf - loadmodel->surfaces, texname );
 }
@@ -1884,7 +1884,7 @@ void Mod_TesselatePolygon( msurface_t *surf, model_t *mod, float tessSize )
 
 	if( surf->texinfo && surf->texinfo->texture )
 		texname = surf->texinfo->texture->name;
-	else texname = "notexture";
+	else texname = (char*)"notexture";
 
 	MsgDev( D_ERROR, "BuildSurfMesh: surface %i (%s) failed to build surfmesh\n", surf - loadmodel->surfaces, texname );
 }

@@ -74,10 +74,6 @@ struct BuffAK47_WeaponData
 	KickBackData KickBackNotOnGround = { 1.5f, 0.9f, 0.4f, 0.3f, 7.0f, 4.5f, 8 };
 	KickBackData KickBackDucking = { 0.55f, 0.3f, 0.12f, 0.023f, 3.5f, 1.15f, 8 };
 	KickBackData KickBackDefault = { 0.665f, 0.35f, 0.155f, 0.035f, 4.0f, 1.55f, 7 };
-
-	static constexpr auto RadiusDamageRadius = 90;
-	KnockbackData RadiusDamageKnockback = { 800.0f, 1100.0, 650.0f, 500.0f, 0.9f };
-
 };
 
 #ifndef CLIENT_DLL
@@ -145,23 +141,80 @@ struct BuffAK47_WeaponData
 			if (pAttacker && pAttacker->IsPlayer())
 				pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
 
-			if (pAttackePlayer &&
-				pOther->pev->takedamage != DAMAGE_NO &&
-				pOther->IsAlive()
-				)
+			if (pAttackePlayer)
 			{
-				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+				if (pOther->pev->takedamage != DAMAGE_NO &&pOther->IsAlive())
+				{
+					Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+
+					TraceResult tr;
+					UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+					tr.iHitgroup = HITGROUP_CHEST; // ...
+
+					ClearMultiDamage();
+					pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+					ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				}
 
 				TraceResult tr;
-				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-				tr.iHitgroup = HITGROUP_CHEST; // ...
+				CBaseEntity* pEntity = NULL;
 
-				ClearMultiDamage();
-				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				Vector vecEnd;
+				int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+
+				while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 90.0)) != NULL)
+				{
+					if (pEntity->edict() == pev->owner)
+						continue;
+
+					if (pEntity->IsDormant())
+						continue;
+
+					if (pEntity->pev->takedamage == DAMAGE_NO)
+						continue;
+
+					if (pEntity->Classify() == CLASS_NONE)
+						continue;
+
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+
+						if (pAttackePlayer->m_iTeam == target->m_iTeam)
+								continue;
+					}
+
+					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+						continue;
+
+					vecEnd = pEntity->BodyTarget(pev->origin);
+
+					UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+					if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+						continue;
+
+					int falloff = RadiusDamageAmount / 90.0;
+
+					float flCurrentDamage = max(0, RadiusDamageAmount - (pev->origin - pEntity->pev->origin).Length() * falloff);
+
+					pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
+
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* player = (CBasePlayer*)pEntity;
+
+						if (player->m_bIsZombie)
+						{
+							Vector vecDir = (pev->origin - pAttackePlayer->pev->origin).Normalize();
+
+							player->pev->velocity.x = vecDir.x * 1.0 * 1200.0;
+							player->pev->velocity.y = vecDir.y * 1.0 * 1200.0;
+							player->pev->velocity.z = 1.0 * 100.0;
+						}
+					}
+				}
 			}
-
-			RadiusDamage(*this, pev->origin, this, pev->owner);
 
 			SetTouch(NULL);
 			SetThink(NULL);
@@ -184,6 +237,8 @@ struct BuffAK47_WeaponData
 			m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
 			m_iType = type;
 		}
+
+		KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
 
 		int m_fSequenceLoops;
 		time_point_t m_flRemoveTime;

@@ -270,7 +270,7 @@ void NET_Restart_f( void );
 NET_ErrorString
 ====================
 */
-char *NET_ErrorString( void )
+const char *NET_ErrorString( void )
 {
 	switch( pWSAGetLastError( ))
 	{
@@ -729,7 +729,7 @@ static int NET_StringToSockaddr( const char *s, struct sockaddr *sadr, qboolean 
 char *NET_AdrToString( const netadr_t a )
 {
 	if( a.type == NA_LOOPBACK )
-		return "loopback";
+		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], pNtohs( a.port ));
 #ifdef XASH_IPX
@@ -742,7 +742,7 @@ char *NET_AdrToString( const netadr_t a )
 char *NET_BaseAdrToString( const netadr_t a )
 {
 	if( a.type == NA_LOOPBACK )
-		return "loopback";
+		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3] );
 #ifdef XASH_IPX

@@ -1484,8 +1484,8 @@ void CL_ParseUserMessage( sizebuf_t *msg, int svc_num )
 
 struct stufftexttable_s
 {
-char *command;
-char *description;
+const char *command;
+const char *description;
 float percent;
 float step;
 } stufftexttable[] = {

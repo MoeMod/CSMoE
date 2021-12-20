@@ -119,3 +119,4 @@ HOOK_EVENT(qbarrel, FireQbarrel);
 HOOK_EVENT(buffm249, FireBUFFM249);
 HOOK_EVENT(buffm4a1, FireBuffM4A1);
 HOOK_EVENT(bison, FireBison);
+HOOK_EVENT(y21s1jetgunmd, FireY21s1Jetgunmd);

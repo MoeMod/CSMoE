@@ -148,6 +148,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_buffsg552ex");
 	UTIL_PrecacheOtherWeapon("weapon_as50");
 	UTIL_PrecacheOtherWeapon("weapon_bendita");
+	UTIL_PrecacheOther("ammo_50bmgholy");
 	UTIL_PrecacheOtherWeapon("weapon_skull5");
 	UTIL_PrecacheOtherWeapon("z4b_k1ases");
 	UTIL_PrecacheOtherWeapon("z4b_m1887se");
@@ -171,13 +172,16 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_anaconda");
 	UTIL_PrecacheOtherWeapon("weapon_m134");
 	UTIL_PrecacheOtherWeapon("weapon_m134ex");
+	UTIL_PrecacheOther("ammo_762natobox");
 	UTIL_PrecacheOtherWeapon("weapon_k1a");
 	UTIL_PrecacheOtherWeapon("weapon_m134xmas");
 	UTIL_PrecacheOtherWeapon("weapon_m95xmas");
 	UTIL_PrecacheOtherWeapon("weapon_mg3xmas");
 	UTIL_PrecacheOtherWeapon("weapon_janus7xmas");
 	UTIL_PrecacheOtherWeapon("weapon_chainsaw");
+	UTIL_PrecacheOther("ammo_chainsaw");
 	UTIL_PrecacheOtherWeapon("weapon_desperado");
+	UTIL_PrecacheOther("ammo_44magnum");
 	UTIL_PrecacheOtherWeapon("weapon_tbarrel");
 	UTIL_PrecacheOtherWeapon("weapon_sgdrill");
 	UTIL_PrecacheOther("ammo_sgdrill");
@@ -196,7 +200,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_bow");
 	UTIL_PrecacheOtherWeapon("weapon_huntbow");
 	UTIL_PrecacheOtherWeapon("weapon_voidpistol");
+	UTIL_PrecacheOther("ammo_voidpistol");
 	UTIL_PrecacheOtherWeapon("weapon_starchaserar");
+	UTIL_PrecacheOther("ammo_556natostar");
 	UTIL_PrecacheOtherWeapon("weapon_m2");
 	UTIL_PrecacheOtherWeapon("weapon_cannon");
 	UTIL_PrecacheOther("ammo_cannon");
@@ -207,6 +213,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_katana");
 	UTIL_PrecacheOtherWeapon("knife_dragonsword");
 	UTIL_PrecacheOtherWeapon("knife_dgaxe");
+	UTIL_PrecacheOther("ammo_dgaxe");
 	UTIL_PrecacheOtherWeapon("weapon_infinityss");
 	UTIL_PrecacheOtherWeapon("weapon_infinitysb");
 	UTIL_PrecacheOtherWeapon("weapon_infinitysr");
@@ -235,19 +242,27 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_balrog11");
 	UTIL_PrecacheOtherWeapon("weapon_balrog11b");
 	UTIL_PrecacheOtherWeapon("weapon_balrog11wc");
+	UTIL_PrecacheOther("ammo_buckbcs");
 	UTIL_PrecacheOtherWeapon("knife_lance");
 	UTIL_PrecacheOtherWeapon("weapon_m249ex");
+	UTIL_PrecacheOther("ammo_50az");
 	UTIL_PrecacheOtherWeapon("weapon_sfsmg");
 	UTIL_PrecacheOtherWeapon("weapon_sfmg");
 	UTIL_PrecacheOtherWeapon("weapon_sfgun");
 	UTIL_PrecacheOtherWeapon("weapon_qbarrel");
 	UTIL_PrecacheOtherWeapon("weapon_buffm249");
+	UTIL_PrecacheOther("ammo_762natoboxame");
 	UTIL_PrecacheOtherWeapon("weapon_buffm4");
 	UTIL_PrecacheOtherWeapon("knife_stormgiant");
 	UTIL_PrecacheOtherWeapon("weapon_buffak");
 	UTIL_PrecacheOtherWeapon("weapon_bison");
 	UTIL_PrecacheOtherWeapon("knife_nataknife");
 	UTIL_PrecacheOtherWeapon("knife_thanatos9");
+	UTIL_PrecacheOtherWeapon("weapon_y21s1jetgunmd");
+	UTIL_PrecacheOther("ammo_energycells");
+	UTIL_PrecacheOther("ammo_energybattery");
+	
+	
 
 	if (g_pGameRules->IsDeathmatch())
 	{

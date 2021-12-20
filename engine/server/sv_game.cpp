@@ -3890,7 +3890,7 @@ char *GAME_EXPORT pfnGetInfoKeyBuffer( edict_t *e )
 	if ( ( cl = SV_ClientFromEdict( e, false ) ) == NULL )
 	{
 		MsgDev( D_ERROR, "SV_GetClientUserinfo: client is not connected!\n" );
-		return "";
+		return (char*)("");
 	}
 
 	return cl->userinfo;

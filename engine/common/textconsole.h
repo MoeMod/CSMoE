@@ -72,8 +72,8 @@ void Console_Print(CTextConsole* const pConsole, char* pszMsg);
 
 void Console_SetStatusLine(char* pszStatus);
 void Console_UpdateStatus();
-void Console_PrintRaw(char* pszMsg, int nChars);
-void Console_Echo(char* pszMsg, int nChars);
+void Console_PrintRaw(const char* pszMsg, int nChars);
+void Console_Echo(const char* pszMsg, int nChars);
 char* Console_GetLine(CTextConsole* const pConsole);
 int Console_GetWidth();
 

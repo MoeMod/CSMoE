@@ -37,7 +37,7 @@ enum
 #define CMD_CLIENTDLL	BIT( 1 )		// added by client.dll
 #define CMD_LOCALONLY   BIT( 2 )        // should be executed only from local buffers
 
-typedef void (*setpair_t)( const char *key, const char *value, void *buffer, void *numpairs );
+typedef void (*setpair_t)( const char *key, const char *value, const char *buffer, void *numpairs );
 typedef void (*xcommand_t)( void );
 
 typedef enum
@@ -104,7 +104,7 @@ void Cvar_RegisterVariable( cvar_t *variable );
 convar_t *Cvar_Get( const char *var_name, const char *value, int flags, const char *description );
 void Cvar_Set( const char *var_name, const char *value );
 convar_t *Cvar_Set2( const char *var_name, const char *value, qboolean force );
-void Cvar_LookupVars( int checkbit, void *buffer, void *ptr, setpair_t callback );
+void Cvar_LookupVars( int checkbit, const char *buffer, void *ptr, setpair_t callback );
 void Cvar_FullSet( const char *var_name, const char *value, int flags );
 void Cvar_SetLatched( const char *var_name, const char *value );
 void Cvar_SetFloat( const char *var_name, float value );

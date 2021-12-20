@@ -234,8 +234,8 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 	if (!pAttackerPlayer->m_bIsZombie)
 		return 1;
 
-	if (m_pPlayer->iuser1 == 1 && m_pPlayer->m_pActiveItem && !Q_strcmp(STRING(m_pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
-		return 0;
+	if (m_pPlayer->iuser1 == 1 && m_pPlayer->m_pActiveItem && !Q_strcmp(STRING(m_pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe") && m_pPlayer->pev->health - flDamage > 0.0f)
+		return 1;
 
 	if (IsHero() && m_pPlayer->pev->health - flDamage > 0.0f)
 		return 1;

@@ -124,7 +124,8 @@ public:
 #ifndef CLIENT_DLL
 				if(g_pModRunning->DamageTrack() == DT_ZB)
 				{
-					return 95.0;
+					//return 95.0;
+					return 65.0;
 				}
 				else if(g_pModRunning->DamageTrack() == DT_ZBS)
 				{
@@ -146,7 +147,8 @@ public:
 #ifndef CLIENT_DLL
 			if(g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				return 122.0;
+				//return 122.0;
+				return 75.0;
 			}
 			else if(g_pModRunning->DamageTrack() == DT_ZBS)
 			{

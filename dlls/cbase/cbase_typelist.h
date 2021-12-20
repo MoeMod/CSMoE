@@ -166,6 +166,7 @@ TL_ADD(CBison)
 TL_ADD(CKnifeStrongKnife)
 TL_ADD(CKnifeNataKnifeD)
 TL_ADD(CKnifeThanatos9)
+TL_ADD(CY21s1Jetgunmd)
 
 
 #ifndef CLIENT_DLL
@@ -201,6 +202,8 @@ TL_ADD(CBuckBcsAmmo)
 TL_ADD(C762NatoBoxAmmo)
 TL_ADD(C556NatoStarAmmo)
 TL_ADD(C50AZAmmo)
+TL_ADD(CEnergyCellsAmmo)
+TL_ADD(CEnergyBatteryAmmo)
 TL_ADD(CWeaponBox)
 TL_ADD(CArmoury)
 TL_ADD(CPointEntity)

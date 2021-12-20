@@ -3216,7 +3216,7 @@ ucmd_t enttoolscmds[] =
 SV_ExecuteUserCommand
 ==================
 */
-void SV_ExecuteClientCommand( sv_client_t *cl, char *s )
+void SV_ExecuteClientCommand( sv_client_t *cl, const char *s )
 {
 	ucmd_t	*u;
 

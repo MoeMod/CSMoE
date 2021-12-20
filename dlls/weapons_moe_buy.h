@@ -109,6 +109,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_nataknife",      "Nata Knife",    0, KNIFE_SLOT, UNASSIGNED},
 	{"knife_nataknifed",      "Dual Nata Knife",    0, KNIFE_SLOT, UNASSIGNED},
 	{"knife_thanatos9",      "Thanatos9",    0, KNIFE_SLOT, UNASSIGNED},
+	{"weapon_y21s1jetgunmd",  "Bear Fury Mk. 3",	2000, PISTOL_SLOT, UNASSIGNED},
 
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},

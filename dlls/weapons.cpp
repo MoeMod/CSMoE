@@ -912,14 +912,14 @@ int CBasePlayerItem::AddToPlayer(CBasePlayer *pPlayer)
 {
 	m_pPlayer = pPlayer;
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgWeapPickup, NULL, pPlayer->pev);
-		WRITE_BYTE(m_iId);
-	MESSAGE_END();
-
 	// added for WeaponList update
 	ItemInfo II;
 	GetItemInfo(&II);
 	WriteWeaponInfo(pPlayer, II);
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgWeapPickup, NULL, pPlayer->pev);
+		WRITE_BYTE(m_iId);
+	MESSAGE_END();
 
 	return TRUE;
 }

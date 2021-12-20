@@ -210,10 +210,11 @@ int CKnife_Zombi::Swing(int fFirst)
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
+
 		ClearMultiDamage();
 		if (pEntity)
 		{
-			pEntity->TraceAttack(m_pPlayer->pev, 75, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
+			pEntity->TraceAttack(m_pPlayer->pev, 300, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
 		}
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

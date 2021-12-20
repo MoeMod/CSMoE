@@ -1200,7 +1200,7 @@ GL_CheckForErrors
 void GL_CheckForErrors_( const char *filename, const int fileline )
 {
 	int	err;
-	char	*str;
+	const char	*str;
 
 	if( !gl_check_errors->integer )
 		return;

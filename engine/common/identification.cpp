@@ -361,7 +361,7 @@ int ID_CheckFiles( bloomfilter_t value, const char *prefix, const char *postfix 
 	return count;
 }
 #elif !defined(XASH_WINRT)
-int ID_GetKeyData( HKEY hRootKey, char *subKey, char *value, LPBYTE data, DWORD cbData )
+int ID_GetKeyData( HKEY hRootKey, const char *subKey, const char *value, LPBYTE data, DWORD cbData )
 {
 	HKEY hKey;
 
@@ -377,7 +377,7 @@ int ID_GetKeyData( HKEY hRootKey, char *subKey, char *value, LPBYTE data, DWORD 
 	RegCloseKey( hKey );
 	return 1;
 }
-int ID_SetKeyData( HKEY hRootKey, char *subKey, DWORD dwType, char *value, LPBYTE data, DWORD cbData)
+int ID_SetKeyData( HKEY hRootKey, const char *subKey, DWORD dwType, const char *value, LPBYTE data, DWORD cbData)
 {
 	HKEY hKey;
 	if( RegCreateKey( hRootKey, subKey, &hKey ) != ERROR_SUCCESS )

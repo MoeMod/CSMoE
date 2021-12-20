@@ -118,7 +118,7 @@ void CZombiePile::Spawn(void)
 	pev->takedamage = DAMAGE_YES;
 	pev->health = 400.0f;
 	pev->solid = SOLID_BBOX;
-	pev->movetype = MOVETYPE_TOSS;
+	pev->movetype = MOVETYPE_PUSHSTEP; // MOVETYPE_PUSHSTEP will not ignore by traceline
 
 	if (m_hOwner && m_hOwner->pev->flags & FL_DUCKING)
 	{

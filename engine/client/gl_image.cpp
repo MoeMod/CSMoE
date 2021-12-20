@@ -4588,7 +4588,7 @@ static void R_InitBuiltinTextures( void )
 
 	const struct
 	{
-		char	*name;
+		const char	*name;
 		int	*texnum;
 		rgbdata_t	*(*init)( texFlags_t *flags );
 		int	texType;

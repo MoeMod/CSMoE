@@ -316,7 +316,7 @@ char *Sys_GetCurrentUser( void )
 		return pw->pw_name;
 
 #endif
-	return "Player";
+	return (char*)"Player";
 }
 
 #if (defined(__linux__) && !defined(__ANDROID__)) || defined (__FreeBSD__) || defined (__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__HAIKU__)

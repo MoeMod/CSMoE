@@ -66,10 +66,9 @@ int g_iShotsFired;
 
 void WeaponsResource :: LoadAllWeaponSprites( void )
 {
-	for (int i = 0; i < MAX_WEAPONS; i++)
+	for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 	{
-		if ( rgWeapons[i].iId )
-			LoadWeaponSprites( &rgWeapons[i] );
+		LoadWeaponSprites(it->second);
 	}
 }
 
@@ -430,32 +429,6 @@ void CHudAmmo::Think(void)
 {
 	if ( gHUD.m_fPlayerDead )
 		return;
-	
-	if (gHUD.m_bWeaponChanged)
-	{
-		gHUD.m_bWeaponChanged = false;
-
-		for (int i = 0; i < MAX_WEAPONS - 1; i++)
-		{
-			WEAPON* p = gWR.GetWeapon(i);
-
-			if (!p)
-				continue;
-
-			std::set<int>::iterator iter = gWR.m_setWeaponID.find(p->iId);
-			if (iter != gWR.m_setWeaponID.end())
-			{
-				gWR.PickupWeapon(p);
-				continue;
-			}
-
-			WEAPON* p2 = gWR.GetWeaponSlot(p->iSlot, p->iSlotPos);
-			if (p2 && gHUD.m_iWeaponBits & (1 << p2->iId))
-				continue;
-
-			gWR.DropWeapon(p);
-		}
-	}
 
 	/*if ( gHUD.m_iWeaponBits != gWR.iOldWeaponBits )
 	{
@@ -510,7 +483,21 @@ void CHudAmmo::Think(void)
 
 HSPRITE* WeaponsResource :: GetAmmoPicFromWeapon( int iAmmoId, wrect_t& rect )
 {
-	for ( int i = 0; i < MAX_WEAPONS; i++ )
+	for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
+	{
+		if (it->second->iAmmoType == iAmmoId)
+		{
+			rect = it->second->rcAmmo;
+			return &it->second->hAmmo;
+		}
+		else if (it->second->iAmmo2Type == iAmmoId)
+		{
+			rect = it->second->rcAmmo2;
+			return &it->second->hAmmo2;
+		}
+	}
+
+	/*for ( int i = 0; i < MAX_WEAPONS; i++ )
 	{
 		if ( rgWeapons[i].iAmmoType == iAmmoId )
 		{
@@ -522,7 +509,7 @@ HSPRITE* WeaponsResource :: GetAmmoPicFromWeapon( int iAmmoId, wrect_t& rect )
 			rect = rgWeapons[i].rcAmmo2;
 			return &rgWeapons[i].hAmmo2;
 		}
-	}
+	}*/
 
 	return NULL;
 }
@@ -645,9 +632,8 @@ int CHudAmmo::MsgFunc_WeapPickup( const char *pszName, int iSize, void *pbuf )
 	int iIndex = reader.ReadByte();
 
 	// Add the weapon to the history
-	gHUD.m_bWeaponChanged = true;
 	gHR.AddToHistory(HISTSLOT_WEAP, iIndex);
-	gWR.m_setWeaponID.insert(iIndex);
+	gWR.PickupWeapon(gWR.GetWeapon(iIndex));
 
 	return 1;
 }
@@ -656,11 +642,10 @@ int CHudAmmo::MsgFunc_WeapDrop(const char* pszName, int iSize, void* pbuf)
 {
 	BufferReader reader(pszName, pbuf, iSize);
 	int iIndex = reader.ReadByte();
-	gHUD.m_bWeaponChanged = true;
 	if (!iIndex) {
-		gWR.m_setWeaponID.clear();
+		gWR.DropAllWeapons();
 	} else {
-		gWR.m_setWeaponID.erase(iIndex);
+		gWR.DropWeapon(gWR.GetWeapon(iIndex));
 	}
 
 	return 1;
@@ -787,27 +772,27 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
 	
-	WEAPON Weapon;
+	WEAPON* Weapon = new WEAPON();
 
-	strncpy( Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME );
-	Weapon.iAmmoType = (int)reader.ReadChar();
+	strncpy( Weapon->szName, reader.ReadString(), MAX_WEAPON_NAME );
+	Weapon->iAmmoType = (int)reader.ReadChar();
 	
-	Weapon.iMax1 = reader.ReadByte();
-	if (Weapon.iMax1 == 255)
-		Weapon.iMax1 = -1;
+	Weapon->iMax1 = reader.ReadByte();
+	if (Weapon->iMax1 == 255)
+		Weapon->iMax1 = -1;
 
-	Weapon.iAmmo2Type = reader.ReadChar();
-	Weapon.iMax2 = reader.ReadByte();
-	if (Weapon.iMax2 == 255)
-		Weapon.iMax2 = -1;
+	Weapon->iAmmo2Type = reader.ReadChar();
+	Weapon->iMax2 = reader.ReadByte();
+	if (Weapon->iMax2 == 255)
+		Weapon->iMax2 = -1;
 
-	Weapon.iSlot = reader.ReadChar();
-	Weapon.iSlotPos = reader.ReadChar();
-	Weapon.iId = reader.ReadChar();
-	Weapon.iFlags = reader.ReadByte();
-	Weapon.iClip = 0;
+	Weapon->iSlot = reader.ReadChar();
+	Weapon->iSlotPos = reader.ReadChar();
+	Weapon->iId = reader.ReadChar();
+	Weapon->iFlags = reader.ReadByte();
+	Weapon->iClip = 0;
 
-	gWR.AddWeapon( &Weapon );
+	gWR.AddWeapon( Weapon );
 
 	return 1;
 

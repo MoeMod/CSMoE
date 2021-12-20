@@ -489,8 +489,7 @@ namespace sv {
 			float flDamage = 45;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 5.5f;
+				flDamage *= 4.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage *= 3.5f;
 #endif
@@ -589,7 +588,7 @@ namespace sv {
 		switch (m_iDamageType)
 		{
 		case DGAXE_PRIMARYATTACK:  return { 350.0f, 250.0f, 350.0f, 100.0f, 0.4f };
-		case DGAXE_SECONDARYATTACK: { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.4f }; }
+		case DGAXE_SECONDARYATTACK: { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }
 		case DGAXE_COMBOATTACK: { return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }; }
 		case DGAXE_SKILL1ATTACK: { return { 30.0f, 85.0f, 100.0f, 100.0f, 0.1f }; }
 		case DGAXE_SKILL2ATTACK: { return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f }; }

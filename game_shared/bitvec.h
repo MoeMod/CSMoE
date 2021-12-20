@@ -72,6 +72,13 @@ public:
 		return true;
 	}
 
+#ifndef __cpp_impl_three_way_comparison
+	friend bool operator!=(CBitVec<NUM_BITS> const &self, CBitVec<NUM_BITS> const &other)
+	{
+		return !(self == other);
+	}
+#endif
+
 	// Get underlying dword representations of the bits.
 	int GetNumDWords() { return NUM_DWORDS; }
 	uint32 GetDWord(int i);

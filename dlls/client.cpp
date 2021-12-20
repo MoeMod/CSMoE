@@ -4784,44 +4784,75 @@ int EXT_FUNC GetWeaponData(edict_s *player, struct weapon_data_s *info)
 		return 1;
 	}
 
-	for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	if (pl->pev->iuser1 == OBS_IN_EYE && pl->m_hObserverTarget)
 	{
-		CBasePlayerItem *pPlayerItem = pl->m_rgpPlayerItems[i];
-
-		while (pPlayerItem != NULL)
-		{
-			CBasePlayerWeapon *gun = dynamic_cast<CBasePlayerWeapon *>(pPlayerItem->GetWeaponPtr());
-
-			if (gun != NULL && gun->UseDecrement())
-			{
-				ItemInfo II;
-				Q_memset(&II, 0, sizeof(II));
-				gun->GetItemInfo(&II);
-
-				if (II.iId >= 0 && II.iId < MAX_WEAPONS)
-				{
-					weapon_data_t *item = &info[II.iId];
-
-					item->m_iId = II.iId;
-					item->m_iClip = gun->m_iClip;
-					item->m_flTimeWeaponIdle = max(gun->m_flTimeWeaponIdle, -0.001s) / 1s;
-					item->m_flNextPrimaryAttack = max(gun->m_flNextPrimaryAttack, -0.001s) / 1s;
-					item->m_flNextSecondaryAttack = max(gun->m_flNextSecondaryAttack, -0.001s) / 1s;
-					item->m_flNextReload = max(gun->m_flNextReload, -0.001s) / 1s;
-					item->m_fInReload = gun->m_fInReload;
-					item->m_fInSpecialReload = gun->m_fInSpecialReload;
-					item->m_fInZoom = gun->m_iShotsFired;
-					item->m_fAimedDamage = gun->m_flLastFire.time_since_epoch() / 1s;
-					item->m_iWeaponState = gun->m_iWeaponState;
-					item->fuser2 = gun->m_flStartThrow.time_since_epoch() / 1s;
-					item->fuser3 = gun->m_flReleaseThrow.time_since_epoch() / 1s;
-					item->iuser1 = gun->m_iSwing;
-				}
-			}
-
-			pPlayerItem = pPlayerItem->m_pNext;
-		}
+		pev = pl->m_hObserverTarget->pev;
+		pl = (CBasePlayer*)CBasePlayer::Instance(pev);
 	}
+
+	weapon_data_t* item = &info[0];
+	CBasePlayerWeapon* gun = (CBasePlayerWeapon*)pl->m_pActiveItem;
+
+	memset(item, 0, sizeof(weapon_data_t));
+
+	if (!gun || !gun->IsWeapon() || !gun->UseDecrement())
+		return 1;
+
+	item->m_iId = gun->m_iId;
+	item->m_iClip = gun->m_iClip;
+	item->m_flTimeWeaponIdle = max(gun->m_flTimeWeaponIdle, -0.001s) / 1s;
+	item->m_flNextPrimaryAttack = max(gun->m_flNextPrimaryAttack, -0.001s) / 1s;
+	item->m_flNextSecondaryAttack = max(gun->m_flNextSecondaryAttack, -0.001s) / 1s;
+	item->m_flNextReload = max(gun->m_flNextReload, -0.001s) / 1s;
+	item->m_fInReload = gun->m_fInReload;
+	item->m_fInSpecialReload = gun->m_fInSpecialReload;
+	item->m_fInZoom = gun->m_iShotsFired;
+	item->m_fAimedDamage = gun->m_flLastFire.time_since_epoch() / 1s;
+	item->m_iWeaponState = gun->m_iWeaponState;
+	item->fuser2 = gun->m_flStartThrow.time_since_epoch() / 1s;
+	item->fuser3 = gun->m_flReleaseThrow.time_since_epoch() / 1s;
+	item->iuser1 = gun->m_iSwing;
+	item->iuser2 = gun->pev->body;
+	item->iuser3 = gun->pev->skin;
+
+	//for (int i = 0; i < MAX_ITEM_TYPES; ++i)
+	//{
+	//	CBasePlayerItem *pPlayerItem = pl->m_rgpPlayerItems[i];
+
+	//	while (pPlayerItem != NULL)
+	//	{
+	//		CBasePlayerWeapon *gun = dynamic_cast<CBasePlayerWeapon *>(pPlayerItem->GetWeaponPtr());
+
+	//		if (gun != NULL && gun->UseDecrement())
+	//		{
+	//			ItemInfo II;
+	//			Q_memset(&II, 0, sizeof(II));
+	//			gun->GetItemInfo(&II);
+
+	//			if (II.iId >= 0 && II.iId < MAX_WEAPONS)
+	//			{
+	//				weapon_data_t *item = &info[II.iId];
+
+	//				item->m_iId = II.iId;
+	//				item->m_iClip = gun->m_iClip;
+	//				item->m_flTimeWeaponIdle = max(gun->m_flTimeWeaponIdle, -0.001s) / 1s;
+	//				item->m_flNextPrimaryAttack = max(gun->m_flNextPrimaryAttack, -0.001s) / 1s;
+	//				item->m_flNextSecondaryAttack = max(gun->m_flNextSecondaryAttack, -0.001s) / 1s;
+	//				item->m_flNextReload = max(gun->m_flNextReload, -0.001s) / 1s;
+	//				item->m_fInReload = gun->m_fInReload;
+	//				item->m_fInSpecialReload = gun->m_fInSpecialReload;
+	//				item->m_fInZoom = gun->m_iShotsFired;
+	//				item->m_fAimedDamage = gun->m_flLastFire.time_since_epoch() / 1s;
+	//				item->m_iWeaponState = gun->m_iWeaponState;
+	//				item->fuser2 = gun->m_flStartThrow.time_since_epoch() / 1s;
+	//				item->fuser3 = gun->m_flReleaseThrow.time_since_epoch() / 1s;
+	//				item->iuser1 = gun->m_iSwing;
+	//			}
+	//		}
+
+	//		pPlayerItem = pPlayerItem->m_pNext;
+	//	}
+	//}
 
 	return 1;
 }

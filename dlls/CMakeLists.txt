@@ -349,6 +349,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_strongknife.cpp
 	../dlls/wpn_shared/knife_nataknifed.cpp
 	../dlls/wpn_shared/knife_thanatos9.cpp
+	../dlls/wpn_shared/wpn_y21s1jetgunmd.cpp
 	)
 
 set(PM_SRCS
