@@ -34,6 +34,7 @@ namespace sv {
 		void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 		void InfectionSound() override;
+		void EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker) override;
 		void HumanWin() override;
 		void ZombieWin() override;
 

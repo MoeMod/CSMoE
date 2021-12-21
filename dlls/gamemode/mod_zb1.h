@@ -81,6 +81,7 @@ public:
 
 protected:
 	virtual void InfectionSound();
+	virtual void EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void HumanWin();
 	virtual void ZombieWin();
 

@@ -433,9 +433,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
 
 	InfectionSound();
-	PRECACHE_SOUND("zombi/human_death_01.wav");
-	PRECACHE_SOUND("zombi/human_death_02.wav");
-	EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_01.wav" : "zombi/human_death_02.wav", VOL_NORM, ATTN_NORM);
+	EmitHomoSound(player, attacker);
 
 
 	DeathNotice(player, attacker->pev, attacker->pev);
@@ -452,6 +450,11 @@ void CMod_Zombi::InfectionSound()
 {
 	for(CBasePlayer *player : moe::range::PlayersList())
 		CLIENT_COMMAND(player->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
+}
+
+void CMod_Zombi::EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker)
+{
+	EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/human_death_01.wav" : "zombi/human_death_02.wav", VOL_NORM, ATTN_NORM);
 }
 
 void CMod_Zombi::RestartRound()

@@ -178,9 +178,7 @@ namespace sv {
 
 	CMod_ZombieIV::CMod_ZombieIV() : m_CountDownDelegate(this) // precache
 	{
-		PRECACHE_SOUND("zombi/zombi_box.wav");
-		PRECACHE_SOUND("zombi/zombi_evolution.wav");
-		PRECACHE_SOUND("zombi/zombi_evolution_female.wav");
+		PRECACHE_SOUND("zombi/z4/all/z4human_death_male.wav");
 
 		z4::Z4_ZClass_Precache_All();
 
@@ -716,6 +714,11 @@ namespace sv {
 	{
 		for(CBasePlayer *player : moe::range::PlayersList())
 			CLIENT_COMMAND(player->edict(), "spk z4/z4_zombi_coming_%d.wav\n", RANDOM_LONG(1, 2));
+	}
+
+	void CMod_ZombieIV::EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker)
+	{
+		EMIT_SOUND(ENT(player->pev), CHAN_BODY, RANDOM_LONG(0, 1) ? "zombi/z4/all/z4human_death_male.wav" : "zombi/z4/all/z4human_death_male.wav", VOL_NORM, ATTN_NORM);
 	}
 
 	void CMod_ZombieIV::HumanWin()
