@@ -15,13 +15,9 @@ GNU General Public License for more details.
 
 #import <AudioToolbox/AudioToolbox.h>
 
-extern "C"{
-
 #include "TapicEngine.h"
 
 void TapicEngine_Vibrate(TapicEngineSoundID id)
 {
 	AudioServicesPlaySystemSound(static_cast<SystemSoundID>(id));
-}
-
 }

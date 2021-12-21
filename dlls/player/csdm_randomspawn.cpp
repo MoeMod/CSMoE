@@ -4,9 +4,9 @@
 // MoeMod 2018/7/1
 
 #include "extdll.h"
-#include "common.h"
 #include "util.h"
 #include "cbase.h"
+#include "player.h"
 #include "bot_include.h"
 #include "game_shared/steam_util.h"
 

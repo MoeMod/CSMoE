@@ -14,6 +14,8 @@
 
 #include "mod_z4.h"
 
+#include "util/u_range.hpp"
+
 #include <boost/asio.hpp>
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/asio/awaitable.hpp>
