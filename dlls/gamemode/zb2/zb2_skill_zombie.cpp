@@ -2201,16 +2201,17 @@ namespace sv {
 			if (!pEntity->pev->takedamage)
 				break;
 
-			float flFalloff = pow(tr.flFraction, (float)i);
+			//float flFalloff = pow(tr.flFraction, (float)i);
 
 			if (tr.flFraction * flDistance > flDistance)
 				i = 0;
 
 			if (pEntity->IsPlayer() && !((CBasePlayer*)pEntity)->m_bIsZombie)
 			{
-				ClearMultiDamage();
-				pEntity->TraceAttack(m_pPlayer->pev, 2500 * flFalloff, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
-				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+				pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, 2000, DMG_BULLET | DMG_NEVERGIB);
+				//ClearMultiDamage();
+				//pEntity->TraceAttack(m_pPlayer->pev, 2500 * flFalloff, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+				//ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 			}
 
 			vecStart = tr.vecEndPos + gpGlobals->v_forward * 32;

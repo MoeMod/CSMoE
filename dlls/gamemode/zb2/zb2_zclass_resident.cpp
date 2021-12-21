@@ -34,8 +34,8 @@ CZombieClass_Resident::CZombieClass_Resident(CBasePlayer *player, ZombieLevel iE
 {
 	m_pPlayer->m_ZombieClass = "resident";
 	
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
-	//m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePenetration>(m_pPlayer);
+	//m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePenetration>(m_pPlayer);
 	
 
 	const char *szModel = iEvolutionLevel ? "resident_zombi_origin" : "resident_zombi_host";

@@ -62,7 +62,7 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"china", 100, MakeZombieClass<CZombieClass_China> },
 		{"pass", 100, MakeZombieClass<CZombieClass_Pass> },
 		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
-		{"revival", 50, MakeZombieClass<CZombieClass_Revival> },
+		{"revival", 20, MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
 		//{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
 };
@@ -113,14 +113,22 @@ void CBaseZombieClass_ZB2::InitHUD() const
 
 void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
 {
-	if (m_pZombieSkill && which == SKILL_SLOT_1)
+	if (m_pZombieSkill && GetSkillStatus(SKILL_SLOT_2) != SKILL_STATUS_USING)
+	{
 		m_pZombieSkill->Activate();
+	}
+	else if (m_pZombieSkill2 && GetSkillStatus(SKILL_SLOT_1) != SKILL_STATUS_USING)
+	{
+		m_pZombieSkill2->Activate();
+	}
 }
 
 void CBaseZombieClass_ZB2::Think()
 {
 	if (m_pZombieSkill)
 		m_pZombieSkill->Think();
+	if (m_pZombieSkill2)
+		m_pZombieSkill2->Think();
 	return CZombie_ZB1::Think();
 }
 
@@ -129,6 +137,8 @@ void CBaseZombieClass_ZB2::ResetMaxSpeed() const
 	CZombie_ZB1::ResetMaxSpeed();
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed(); // cans replace result of CZombie_ZB1::ResetMaxSpeed()
+	if (m_pZombieSkill2)
+		m_pZombieSkill2->ResetMaxSpeed(); // cans replace result of CZombie_ZB1::ResetMaxSpeed()
 }
 
 bool CBaseZombieClass_ZB2::ApplyKnockback(CBasePlayer *attacker, const KnockbackData &kbd)
@@ -141,25 +151,37 @@ float CBaseZombieClass_ZB2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t
 {
 	if (m_pZombieSkill)
 		flDamage *= m_pZombieSkill->GetDamageRatio();
+	if (m_pZombieSkill2)
+		flDamage *= m_pZombieSkill2->GetDamageRatio();
 	return CZombie_ZB1::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 ZombieSkillStatus CBaseZombieClass_ZB2::GetSkillStatus(ZombieSkillSlot which) const
 {
-	return m_pZombieSkill && which == SKILL_SLOT_1 ? m_pZombieSkill->GetStatus() : SKILL_STATUS_USED;
+	if (m_pZombieSkill && which == SKILL_SLOT_1)
+	{
+		return m_pZombieSkill->GetStatus();
+	}
+	else if (m_pZombieSkill2 && which == SKILL_SLOT_2)
+	{
+		return m_pZombieSkill2->GetStatus();
+	}
+
+	return SKILL_STATUS_USED;
 }
 
 float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 {
+	if(GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING || GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING)
+		return 0;
+
 	if (m_pPlayer->m_ZombieClass)
 	{
 		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
 			return 1000;
-		else
-			return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
 	}
-	else
-		return m_pZombieSkill->GetStatus() == SKILL_STATUS_USING ? 0 : m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
+		
+	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
 }
 
 CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;

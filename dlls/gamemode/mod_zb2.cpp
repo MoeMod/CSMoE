@@ -268,14 +268,23 @@ CPlayerModStrategy_ZB2::CPlayerModStrategy_ZB2(CBasePlayer *player, CMod_ZombieM
 
 bool CPlayerModStrategy_ZB2::ClientCommand(const char *pcmd)
 {
-	if (!Q_stricmp(pcmd, "BTE_ZombieSkill1") && m_pPlayer->m_bIsZombie)
+	if (m_pPlayer->m_bIsZombie)
 	{
-		if(CanUseZombieSkill())
-			m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_1);
-		return true;
-	}
+		if (!Q_stricmp(pcmd, "BTE_ZombieSkill1"))
+		{
+			if (CanUseZombieSkill())
+				m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_1);
+			return true;
+		}
 
-	if (!m_pPlayer->m_bIsZombie)
+		if (!Q_stricmp(pcmd, "BTE_ZombieSkill2"))
+		{
+			if (CanUseZombieSkill())
+				m_pCharacter_ZB2->ActivateSkill(SKILL_SLOT_2);
+			return true;
+		}
+	}
+	else
 	{
 		if (!Q_stricmp(pcmd, "MoE_HumanSkill1"))
 		{

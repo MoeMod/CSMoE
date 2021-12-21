@@ -76,6 +76,7 @@ public:
 
 protected:
 	std::unique_ptr<IZombieSkill> m_pZombieSkill;
+	std::unique_ptr<IZombieSkill> m_pZombieSkill2;
 };
 
 void ZombieSkill_Precache();
