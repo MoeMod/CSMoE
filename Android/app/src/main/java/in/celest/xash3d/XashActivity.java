@@ -289,9 +289,6 @@ public class XashActivity extends Activity {
 			}
 		}
 
-		if( sdk >= 5 )
-			startService( new Intent( getBaseContext(), XashService.class ) );
-
 		mEngineReady = true;
 	}
 	
@@ -715,46 +712,12 @@ public class XashActivity extends Activity {
 
 	public static void setIcon( String path )
 	{
-		if( fGDBSafe )
-			return;
-		
 		Log.v( TAG, "setIcon(" + path + ")" );
-		if( sdk < 5 )
-			return;
-		
-		try
-		{
-			BitmapFactory.Options o = new BitmapFactory.Options();
-			o.inJustDecodeBounds = true;
-			
-			Bitmap icon = BitmapFactory.decodeFile( path, o );
-			
-			if( icon.getWidth() < 16 )
-				return;
-			
-			XashService.notification.contentView.setImageViewUri( XashService.status_image, Uri.parse( "file://" + path ) );
-			
-			NotificationManager nm = ( NotificationManager )mSingleton.getApplicationContext().getSystemService( Context.NOTIFICATION_SERVICE );
-			nm.notify( 100, XashService.notification );
-		}
-		catch( Exception e )
-		{
-		}
 	}
-	
+
 	public static void setTitle( String title )
 	{
 		Log.v( TAG, "setTitle(" + title + ")" );
-		SharedPreferences.Editor editor = mPref.edit();
-		editor.putBoolean("successfulRun", true);
-		editor.commit();
-		
-		if( sdk < 5 )
-			return;
-		
-		XashService.notification.contentView.setTextViewText( XashService.status_text, title );
-		NotificationManager nm = ( NotificationManager )mSingleton.getApplicationContext().getSystemService( Context.NOTIFICATION_SERVICE );
-		nm.notify( 100, XashService.notification );
 	}
 
 	public static String getAndroidID()

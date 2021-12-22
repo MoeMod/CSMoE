@@ -44,40 +44,22 @@ namespace ui {
 	static std::vector<std::tuple<std::chrono::high_resolution_clock::duration, boost::asio::ip::udp::endpoint, TSourceEngineQuery::ServerInfoQueryResult> > s_servers_list;
 
 	// model
-	boost::asio::awaitable<void> ProcessParseMasterServer(std::string_view data)
+	boost::asio::awaitable<void> ServerModel_AsyncRefreshSingleServer(std::string host, std::string port)
 	{
-		auto j = nlohmann::json::parse(data);
-		auto j2 = j["servers"];
-
-		std::vector<boost::asio::awaitable<void> > awaitables;
-		std::transform(j2.begin(), j2.end(), std::back_inserter(awaitables), [](const std::string& srv) -> boost::asio::awaitable<void> {
-			return boost::asio::co_spawn(s_server_ioc, [srv]() mutable -> boost::asio::awaitable<void> {
-					if (auto [host, port] = ParseHostPort(srv); !host.empty()) {
-						boost::asio::ip::udp::resolver resolver(s_server_ioc);
-						auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
-						for (const auto &ep: desc_endpoints) {
-							auto start_req = std::chrono::high_resolution_clock::now();
-							auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep,1s);
-							auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
-							s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(), [ep](auto &entry){ return get<1>(entry) == ep; }), s_servers_list.end());
-							s_servers_list.emplace_back(ping, ep, info);
-						}
-					}
-			}, boost::asio::use_awaitable);
-		});
-
-		for(auto &&awaitable : awaitables)
+		try {
+			boost::asio::ip::udp::resolver resolver(s_server_ioc);
+			auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
+			for (const auto &ep: desc_endpoints) {
+				auto start_req = std::chrono::high_resolution_clock::now();
+				auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep,1s);
+				auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
+				s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(), [ep](auto &entry){ return get<1>(entry) == ep; }), s_servers_list.end());
+				s_servers_list.emplace_back(ping, ep, info);
+			}
+		} catch(const std::exception &e)
 		{
-			try
-			{
-				co_await std::move(awaitable);
-			}
-			catch(const std::exception &e)
-			{
-
-			}
+			// ignored
 		}
-		co_return;
 	}
 
 	boost::asio::awaitable<void> ServerModel_AsyncRefresh()
@@ -85,7 +67,15 @@ namespace ui {
 		// https://api.moemod.com/csmoe/masterserver
 		try {
 			std::string result = co_await HTTPS_RequestAsync(s_server_ioc, "GET", "api.moemod.com", "443", "/csmoe/masterserver", boost::asio::use_awaitable);
-			co_await ProcessParseMasterServer(result);
+            auto j = nlohmann::json::parse(result);
+            auto j2 = j["servers"];
+
+            for(std::string srv : j2)
+            {
+				if (auto [host, port] = ParseHostPort(srv); !host.empty()) {
+					boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefreshSingleServer(host, port), boost::asio::detached);
+				}
+            }
 		} catch(const std::exception &e)
 		{
 			MsgBox_Open(std::string("肥肠抱歉，获取服务器列表时发生了错误：\n") + e.what());
@@ -94,8 +84,9 @@ namespace ui {
 
 	void ServerModel_Refresh()
 	{
+		s_server_ioc.reset();
+		boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefresh(), boost::asio::detached);
 		s_server_ioc.restart();
-		boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefresh, boost::asio::detached);
 	}
 
 	// view

@@ -444,9 +444,9 @@ nativeSetPause
 =====================================================
 */
 #define DECLARE_JNI_INTERFACE( ret, name, ... ) \
-	JNIEXPORT ret JNICALL Java_in_celest_xash3d_XashActivity_##name( JNIEnv *env, jclass clazz, __VA_ARGS__ )
+	extern "C" JNIEXPORT ret JNICALL Java_in_celest_xash3d_XashActivity_##name( JNIEnv *env, jclass clazz, __VA_ARGS__ )
 #define DECLARE_JNI_INTERFACE_VOID( ret, name ) \
-	JNIEXPORT ret JNICALL Java_in_celest_xash3d_XashActivity_##name( JNIEnv *env, jclass clazz )
+	extern "C" JNIEXPORT ret JNICALL Java_in_celest_xash3d_XashActivity_##name( JNIEnv *env, jclass clazz )
 #include <sys/prctl.h>
 
 DECLARE_JNI_INTERFACE( int, nativeInit, jobjectArray array )
@@ -798,7 +798,7 @@ DECLARE_JNI_INTERFACE( int, nativeTestWritePermission, jstring jPath )
 	return ret;
 }
 
-JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *reserved )
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *reserved )
 {
 	return JNI_VERSION_1_6;
 }

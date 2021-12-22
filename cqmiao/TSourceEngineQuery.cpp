@@ -256,13 +256,11 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 	co_await socket.async_send_to(boost::asio::buffer(request3, sizeof(request3)), endpoint, boost::asio::use_awaitable);
 
 	boost::asio::system_timer ddl(ioc, timeout);
-	boost::asio::co_spawn(ioc, [&ddl, &socket]() -> boost::asio::awaitable<void> {
-		try {
-			co_await ddl.async_wait(boost::asio::use_awaitable);
-			socket.close();
-		}
-		catch (const boost::system::system_error& e) { co_return; } // boost::asio::error::operation_aborted
-	}, boost::asio::detached);
+    ddl.async_wait([&socket](boost::system::error_code e) mutable {
+        if(e)
+            return;
+        socket.close();
+    });
 
 	TSourceEngineQuery::ServerInfoQueryResult result;
 	while (1)
@@ -272,7 +270,10 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 			char buffer[4096];
 			std::size_t reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
 			if (sender_endpoint == endpoint && reply_length > 5)
+			{
+				ddl.cancel();
 				co_return TSourceEngineQuery::MakeServerInfoQueryResultFromBuffer(buffer, reply_length);
+			}
 		}
 		catch (const std::invalid_argument& e) {
 			continue;
@@ -289,13 +290,11 @@ auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc,
 	udp::socket socket(ioc, udp::endpoint(udp::v4(), 0));
 
 	boost::asio::system_timer ddl(ioc, timeout);
-	boost::asio::co_spawn(ioc, [&ddl, &socket]() -> boost::asio::awaitable<void> {
-		try {
-			co_await ddl.async_wait(boost::asio::use_awaitable);
-			socket.close();
-		}
-		catch (const boost::system::system_error& e) { co_return; } // boost::asio::error::operation_aborted
-	}, boost::asio::detached);
+    ddl.async_wait([&socket](boost::system::error_code e) mutable {
+        if(e)
+            return;
+        socket.close();
+    });
 
 	char buffer[4096];
 
