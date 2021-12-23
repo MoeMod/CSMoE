@@ -43,3 +43,7 @@ float MacOS_TitleBarHeight()
 	return (frame.size.height - contentRect.size.height);
 }
 
+void MacOS_OpenURL(const char *url)
+{
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[[NSString alloc] initWithUTF8String:url]]];
+}

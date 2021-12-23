@@ -17,3 +17,4 @@ GNU General Public License for more details.
 
 float MacOS_GetDPI();
 float MacOS_TitleBarHeight();
+void MacOS_OpenURL(const char *url);

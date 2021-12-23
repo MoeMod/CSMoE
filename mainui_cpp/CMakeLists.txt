@@ -148,6 +148,7 @@ if(XASH_IMGUI)
 		imgui_menu/imgui_menu.cpp
 		imgui_menu/imgui_menu_msgbox.cpp
 		imgui_menu/imgui_menu_server.cpp
+		imgui_menu/imgui_menu_update.cpp
 	)
 endif()
 
