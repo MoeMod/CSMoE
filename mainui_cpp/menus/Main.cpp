@@ -30,6 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef XASH_IMGUI
 #include "imgui_menu/imgui_menu_msgbox.h"
+#include "imgui_menu/imgui_menu_update.h"
 #endif
 namespace ui {
 #define ART_MINIMIZE_N	"gfx/shell/min_n"
@@ -311,6 +312,10 @@ void CMenuMain::_Init( void )
 	//AddItem( quit );
 	AddItem( minimizeBtn );
 	AddItem( quitButton );
+
+#ifdef XASH_IMGUI
+	Update_Initiate();
+#endif
 }
 
 /*

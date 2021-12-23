@@ -137,3 +137,8 @@ void IOS_Log(const char *text)
 {
 	NSLog(@"Xash: %@", [NSString stringWithUTF8String:text]);
 }
+
+void IOS_OpenURL(const char *url)
+{
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[[NSString alloc] initWithUTF8String:url]]];
+}

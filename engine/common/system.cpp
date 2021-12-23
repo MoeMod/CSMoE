@@ -389,7 +389,16 @@ void Sys_ShellExecute( const char *path, const char *parms, qboolean shouldExit 
 					document.location.href = Pointer_stringify($0);
 				return 0;
 			}, (int)path );
-#elif (defined(__linux__) && !defined (__ANDROID__)) || defined (__FreeBSD__) || defined (__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
+#elif defined(__APPLE__)
+#if TARGET_OS_IPHONE
+	extern void IOS_OpenURL(const char *url);
+	IOS_OpenURL(path);
+#endif
+#if TARGET_OS_OSX
+	extern void MacOS_OpenURL(const char *url);
+	MacOS_OpenURL(path);
+#endif
+#elif (defined(__linux__) && !defined (__ANDROID__)) || defined (__FreeBSD__) || defined (__NetBSD__) || defined(__OpenBSD__)
 
 	if( !Q_strcmp( path, GENERIC_UPDATE_PAGE ) || !Q_strcmp( path, PLATFORM_UPDATE_PAGE ))
 		path = XASH_UPDATE_PAGE;
