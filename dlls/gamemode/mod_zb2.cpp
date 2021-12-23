@@ -489,29 +489,36 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_iZombieInfections >= 3)
 	{
-		BecomeZombie(ZOMBIE_LEVEL_ORIGIN);
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
-		m_pPlayer->pev->armorvalue = 500.0f;
-
-		EvolutionSound();
+		Evolution(ZOMBIE_LEVEL_ORIGIN);
 	}
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_iZombieInfections >= 5)
 	{
-		BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
-		m_pPlayer->pev->armorvalue = 1000.0f;
-
-		EvolutionSound();
+		Evolution(ZOMBIE_LEVEL_ORIGIN_LV2);
 	}
 
 	UpdatePlayerEvolutionHUD();
 }
 
-void CPlayerModStrategy_ZB2::EvolutionSound() const
+void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 {
+	if (!m_pCharacter_ZB2)
+		return;
+
+	m_iZombieInfections = 0;
+	m_pCharacter_ZB2->Evolution(iEvolutionLevel);
+
+	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
+		m_pPlayer->pev->armorvalue = 500.0f;
+	}
+	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+	{
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
+		m_pPlayer->pev->armorvalue = 1000.0f;
+	}
+
 	if (m_pPlayer->m_ZombieClass)
 	{
 		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "flying"))

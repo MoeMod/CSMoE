@@ -86,6 +86,8 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_HEADSHOT || skilltype == ZOMBIE_SKILL_KNIFE2X)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_DamageDoubleRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
+		else if (skilltype == ZOMBIE_SKILL_JUMPUP)
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_DamageDoubleRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_HIDE)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HideRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_HEAL)
@@ -183,12 +185,12 @@ bool CHudZB2::ActivateSkill(int iSlot)
 {
 	if (iSlot == 5)
 	{
-		gEngfuncs.pfnClientCmd("MoE_HumanSkill1");
+		gEngfuncs.pfnClientCmd("MoE_HumanSkill1;BTE_ZombieSkill2;z4_skill5");
 		return true;
 	}
 	else if (iSlot == 6)
 	{
-		gEngfuncs.pfnClientCmd("MoE_HumanSkill2");
+		gEngfuncs.pfnClientCmd("MoE_HumanSkill2;z4_skill6");
 		return true;
 	}
 	else if (iSlot == 7)

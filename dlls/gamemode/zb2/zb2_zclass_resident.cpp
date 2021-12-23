@@ -34,16 +34,9 @@ CZombieClass_Resident::CZombieClass_Resident(CBasePlayer *player, ZombieLevel iE
 {
 	m_pPlayer->m_ZombieClass = "resident";
 	
-	//m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePenetration>(m_pPlayer);
-	
-
-	const char *szModel = iEvolutionLevel ? "resident_zombi_origin" : "resident_zombi_host";
-	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
-
-	static char szModelPath[64];
-	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
-	m_pPlayer->SetNewPlayerModel(szModelPath);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieJumpUp>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombiePenetration>(m_pPlayer);
+	Evolution(iEvolutionLevel);
 
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
@@ -53,11 +46,24 @@ CZombieClass_Resident::CZombieClass_Resident(CBasePlayer *player, ZombieLevel iE
 	m_pPlayer->ResetMaxSpeed();
 }
 
+void CZombieClass_Resident::Evolution(ZombieLevel iEvolutionLevel)
+{
+	CBaseZombieClass_ZB2::Evolution(iEvolutionLevel);
+
+	const char* szModel = iEvolutionLevel ? "resident_zombi_origin" : "resident_zombi_host";
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+
+	static char szModelPath[64];
+	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	m_pPlayer->SetNewPlayerModel(szModelPath);
+}
+
 void CZombieClass_Resident::InitHUD() const
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_RESIDENT);
+	WRITE_BYTE(ZOMBIE_SKILL_JUMPUP);
 	WRITE_BYTE(ZOMBIE_SKILL_PENETRATION);
 	MESSAGE_END();
 }
@@ -124,6 +130,7 @@ void CZombieClass_Resident::OnWeaponDeploy(CBasePlayerItem *item)
 		case WEAPON_KNIFE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_knife_zombieresident.mdl");
+			break;
 		}
 		case WEAPON_HEGRENADE:
 		case WEAPON_SMOKEGRENADE:

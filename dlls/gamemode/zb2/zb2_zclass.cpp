@@ -64,12 +64,13 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
 		{"revival", 20, MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
-		//{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
+		{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
 };
 
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-		{"tank", 100, MakeZombieClass<CZombieClass_Default>}
+		//{"tank", 100, MakeZombieClass<CZombieClass_Default>}
+		{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
 };
 #endif
 
@@ -102,6 +103,18 @@ std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, Zo
 	}
 
 	return std::get<2>(g_FindList[0])(player, lv);
+}
+
+void CBaseZombieClass_ZB2::Evolution(ZombieLevel iEvolutionLevel)
+{
+	m_pPlayer->m_iZombieLevel = iEvolutionLevel;
+	if (m_pPlayer->m_pActiveItem)
+	{
+		m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
+	}
+
+	//InitHUD();
+	ResetMaxSpeed();
 }
 
 void CBaseZombieClass_ZB2::InitHUD() const

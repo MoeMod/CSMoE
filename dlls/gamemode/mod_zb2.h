@@ -85,7 +85,7 @@ protected:
 	virtual void Zombie_HealthRecoveryThink();
 	virtual void UpdatePlayerEvolutionHUD();
 	virtual void CheckEvolution();
-	virtual void EvolutionSound() const;
+	virtual void Evolution(ZombieLevel iEvolutionLevel);
 
 protected:
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;

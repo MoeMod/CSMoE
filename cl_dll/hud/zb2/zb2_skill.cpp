@@ -106,7 +106,8 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_dive",//ZOMBIE_SKILL_DIVE
 		"resource/zombi/zombieskill_zombirevival",//ZOMBIE_SKILL_REVIVAL
 		"resource/zombi/zombieskill_zombipile",//ZOMBIE_SKILL_STAMPER
-		"resource/zombi/zombieskill_zombipenetration"//ZOMBIE_SKILL_PENETRATION
+		"resource/zombi/zombieskill_zombipenetration",//ZOMBIE_SKILL_PENETRATION
+		"resource/zombi/zombieskill_zombijumpup"//ZOMBIE_SKILL_JUMPUP
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =

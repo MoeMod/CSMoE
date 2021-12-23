@@ -1275,7 +1275,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	if (cmd->weaponselect && (player.pev->deadflag != (DEAD_DISCARDBODY + 1)))
 	{
 		// Switched to a different weapon?
-		if (from->weapondata[0].m_iId == cmd->weaponselect)
+		if (from->weapondata[0].m_iId != cmd->weaponselect)
 		{
 			CBasePlayerWeapon* pNew = g_pWpns[cmd->weaponselect];
 			if (pNew && (pNew != pWeapon))

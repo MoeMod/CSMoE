@@ -56,28 +56,14 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 	if (!m_pPlayer->m_bIsZombie)
 		return;
 
-	float flLastRagePercent = m_flRagePercent;
-	auto iLastLevel = m_pPlayer->m_iZombieLevel;
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST && m_flRagePercent > 100.0f)
 	{
-		BecomeZombie(ZOMBIE_LEVEL_ORIGIN);
-		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
-		m_pPlayer->pev->armorvalue = 500.0f;
-
-		EvolutionSound();
+		Evolution(ZOMBIE_LEVEL_ORIGIN);
 	}
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN && m_flRagePercent > 100.0f)
 	{
-		BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
-		m_flRagePercent = (flLastRagePercent - 100.0f) * 0.5f;
-
-		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
-		m_pPlayer->pev->armorvalue = 1000.0f;
-
-		EvolutionSound();
+		Evolution(ZOMBIE_LEVEL_ORIGIN_LV2);
 	}
 
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
@@ -86,6 +72,12 @@ void CPlayerModStrategy_ZB3::CheckEvolution()
 	}
 
 	UpdatePlayerEvolutionHUD();
+}
+
+void CPlayerModStrategy_ZB3::Evolution(ZombieLevel iEvolutionLevel)
+{
+	m_flRagePercent = (m_flRagePercent - 100.0f) * 0.5f;
+	CPlayerModStrategy_ZB2::Evolution(iEvolutionLevel);
 }
 
 void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)

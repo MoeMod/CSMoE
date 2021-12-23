@@ -32,6 +32,7 @@ public:
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;
 	void DeathSound_Zombie() override;
 	void OnWeaponDeploy(CBasePlayerItem *item) override;
+	void Evolution(ZombieLevel iEvolutionLevel) override;
 	ZombieSkillStatus m_iCrazySkillStatus;
 };
 

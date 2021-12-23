@@ -34,13 +34,7 @@ CZombieClass_Pass::CZombieClass_Pass(CBasePlayer *player, ZombieLevel iEvolution
 {
 	m_pPlayer->m_ZombieClass = "pass";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePass>(m_pPlayer);
-
-	const char *szModel = iEvolutionLevel ? "pass_zombi_origin" : "pass_zombi_host";
-	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
-
-	static char szModelPath[64];
-	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
-	m_pPlayer->SetNewPlayerModel(szModelPath);
+	Evolution(iEvolutionLevel);
 
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
@@ -48,6 +42,18 @@ CZombieClass_Pass::CZombieClass_Pass(CBasePlayer *player, ZombieLevel iEvolution
 	m_pPlayer->pev->armorvalue = 200;
 	m_pPlayer->pev->gravity = 0.7f;
 	m_pPlayer->ResetMaxSpeed();
+}
+
+void CZombieClass_Pass::Evolution(ZombieLevel iEvolutionLevel)
+{
+	CBaseZombieClass_ZB2::Evolution(iEvolutionLevel);
+
+	const char* szModel = iEvolutionLevel ? "pass_zombi_origin" : "pass_zombi_host";
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+
+	static char szModelPath[64];
+	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	m_pPlayer->SetNewPlayerModel(szModelPath);
 }
 
 void CZombieClass_Pass::InitHUD() const

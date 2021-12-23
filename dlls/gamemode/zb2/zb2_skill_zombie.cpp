@@ -1028,6 +1028,48 @@ namespace sv {
 
 	}
 
+	bool CZombieSkill_ZombieTeleport::Is_Hull_Vacant(Vector Origin, int Hull)
+	{
+		/*TraceResult tr;
+		UTIL_TraceHull(Origin, Origin, dont_ignore_monsters, Hull, m_pPlayer->edict(), &tr);
+
+		if (!tr.fStartSolid || !tr.fAllSolid) //if (!get_tr2(tr, TR_StartSolid) || !get_tr2(tr, TR_AllSolid)) get_tr2(tr, TR_InOpen))
+			return true;
+			*/
+		return false;
+	}
+
+	void CZombieSkill_ZombieTeleport::CheckStuck()
+	{
+		/*int hull;
+		hull = m_pPlayer->pev->flags & FL_DUCKING ? head_hull : human_hull;
+
+		if (!Is_Hull_Vacant(m_pPlayer->pev->origin, hull) && !(m_pPlayer->pev->solid & SOLID_NOT))
+		{
+			//if (!is_hull_vacant(origin, hull, player) && !get_user_noclip(player) && !(pev(player, pev_solid) & SOLID_NOT))
+
+			Vector min,vec,vecOrigin;
+
+			min = m_pPlayer->pev->mins;
+			vecOrigin = m_pPlayer->pev->origin;
+			vec[2] = vecOrigin[2];
+
+			for (int i = 0; i < (sizeof(vecSize) / sizeof(Vector)); ++i)
+			{
+				vec[0] = vecOrigin[0] - min[0] * vecSize[i][0];
+				vec[1] = vecOrigin[1] - min[1] * vecSize[i][1];
+				vec[2] = vecOrigin[2] - min[2] * vecSize[i][2];
+
+				if (Is_Hull_Vacant(vec, hull))
+				{
+					m_pPlayer->pev->origin = vec;
+					break;
+				}	
+			}
+		}*/
+	}
+
+
 	void CZombieSkill_ZombieTeleport::Think()
 	{
 		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
@@ -1268,6 +1310,7 @@ namespace sv {
 					else
 						vecEntOrigin[2] += 36.0;
 					m_pPlayer->pev->origin = vecEntOrigin;
+					CheckStuck();
 					m_flTimeBotUseSkill = invalid_time_point;
 					m_flTimeTriggerZombieSkill = invalid_time_point;
 					CBaseEntity* pEntity = NULL;
@@ -2208,10 +2251,9 @@ namespace sv {
 
 			if (pEntity->IsPlayer() && !((CBasePlayer*)pEntity)->m_bIsZombie)
 			{
-				pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, 2000, DMG_BULLET | DMG_NEVERGIB);
-				//ClearMultiDamage();
-				//pEntity->TraceAttack(m_pPlayer->pev, 2500 * flFalloff, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
-				//ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+				ClearMultiDamage();
+				pEntity->TraceAttack(m_pPlayer->pev, 2000, gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
+				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 			}
 
 			vecStart = tr.vecEndPos + gpGlobals->v_forward * 32;
@@ -2238,5 +2280,96 @@ namespace sv {
 	duration_t CZombieSkill_ZombiePenetration::GetCooldownTime() const
 	{
 		return 180.0s;
+	}
+
+
+	CZombieSkill_ZombieJumpUp::CZombieSkill_ZombieJumpUp(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieJumpUp::Think()
+	{
+		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
+			FireZombieSkill();
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombieJumpUp::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+
+	
+		m_iZombieSkillStatus = SKILL_STATUS_USING;
+		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId != WEAPON_KNIFE)
+			m_pPlayer->SwitchWeapon(m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+		if (pWeapon)
+		{
+			pWeapon->SendWeaponAnim(RANDOM_LONG(9, 10), TRUE);
+			pWeapon->m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+			pWeapon->m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+			pWeapon->m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+		}
+
+		m_pPlayer->pev->sequence = m_pPlayer->LookupSequence("skill2");
+		m_pPlayer->pev->frame = 0;
+		m_pPlayer->ResetSequenceInfo();
+
+		m_pPlayer->m_flNextAttack = 1.7s;
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.7s;
+
+		m_flTimeTriggerZombieSkill = gpGlobals->time + 1.5s;
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+		WRITE_BYTE(ZOMBIE_SKILL_JUMPUP);
+		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+		MESSAGE_END();
+		
+	}
+
+	void CZombieSkill_ZombieJumpUp::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+
+		m_pPlayer->pev->gravity = 0.7;
+	}
+
+	duration_t CZombieSkill_ZombieJumpUp::GetDurationTime() const
+	{
+		return 5.5s;
+	}
+
+	void CZombieSkill_ZombieJumpUp::FireZombieSkill()
+	{
+		m_pPlayer->pev->gravity = 0.4f;
+		m_flTimeTriggerZombieSkill = invalid_time_point;
+	}
+
+	duration_t CZombieSkill_ZombieJumpUp::GetCooldownTime() const
+	{
+		return 30.0s;
 	}
 }

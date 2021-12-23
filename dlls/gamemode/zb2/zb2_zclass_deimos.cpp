@@ -30,17 +30,11 @@ GNU General Public License for more details.
 
 namespace sv {
 
-	CZombieClass_Deimos::CZombieClass_Deimos(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
+CZombieClass_Deimos::CZombieClass_Deimos(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "deimos";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDeimos>(m_pPlayer);
-
-	const char *szModel = iEvolutionLevel ? "deimos_zombi_origin" : "deimos_zombi_host";
-	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
-
-	static char szModelPath[64];
-	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
-	m_pPlayer->SetNewPlayerModel(szModelPath);
+	Evolution(iEvolutionLevel);
 
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
@@ -48,6 +42,18 @@ namespace sv {
 	m_pPlayer->pev->armorvalue = 200;
 	m_pPlayer->pev->gravity = 0.85f;
 	m_pPlayer->ResetMaxSpeed();
+}
+
+void CZombieClass_Deimos::Evolution(ZombieLevel iEvolutionLevel)
+{
+	CBaseZombieClass_ZB2::Evolution(iEvolutionLevel);
+
+	const char* szModel = iEvolutionLevel ? "deimos_zombi_origin" : "deimos_zombi_host";
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
+
+	static char szModelPath[64];
+	Q_snprintf(szModelPath, sizeof(szModelPath), "models/player/%s/%s.mdl", szModel, szModel);
+	m_pPlayer->SetNewPlayerModel(szModelPath);
 }
 
 void CZombieClass_Deimos::InitHUD() const
