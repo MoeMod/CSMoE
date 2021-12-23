@@ -94,8 +94,9 @@ void UI_Options_Menu( void )
 {
 #ifdef XASH_IMGUI
 	LuaUI_Exec("window_option = true");
-#endif
+#else
 	uiOptions.Show();
+#endif
 }
 ADD_MENU( menu_options, UI_Options_Precache, UI_Options_Menu );
 }

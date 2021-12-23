@@ -88,15 +88,12 @@ void ImGui_LCSM_OnGUI(void)
 	if (ImGui::BeginPopupModal(xorstr("柑橘 CSMoE LCSM 公告").crypt_get(), &lcsm_enabled, ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::Text(xorstr("柑橘 CSMoE v22 Counter-Strike Mobile-oriented Edition (原名 CSBTE-Mobile)").crypt_get());
 		ImGui::Text(xorstr("版权所有：BTE Team|CSMoE Team|百度csoldjb吧|死神CS社区|Faith Zone|幻夜CS社区|柑橘CitruS").crypt_get());
-		ImGui::Text(xorstr("本游戏采用GPLv3协议完全开源免费，使用本游戏进行任何形式的盈利均为诈骗！").crypt_get());
 		ImColor warning_color(1.0f, 0.2f, 0.2f, 1.0f);
-		ImGui::TextColored(warning_color, xorstr("--------------------------------------------特别声明------------------------------------------").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("1.EC精英社所谓“CS破茧”“CS神器时代”“CS创新纪元”均为盗版游戏，我们强烈谴责盗版游戏的行为").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("2.进口柚柚子（刘澄）恶意申请原CS:BTE游戏著作权并加密游戏后利用著作权在淘宝盈利并举报B站视频").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("3.CS01服务器 利用CSMoE支持中文、小地图作为客户端，用网上偷来的插件收费开服，望各位玩家周知。").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("详情见B站Monster-egg 2021-6-19动态，CSMoE未在应用市场发布，如橘子CSMoE、饕餮、恶煞、王炸均为").crypt_get());
 		ImGui::TextColored(warning_color, xorstr("第三方改版，我们不提供这些版本的支持，CSMoE将坚决抵制换膜、开服、倒卖的行为。").crypt_get());
-		ImGui::TextColored(warning_color, xorstr("-----------------------------------------------------------------------------------------------").crypt_get());
 
 		ImGui::BeginGroup();
 		ImGui::NewLine();

@@ -133,43 +133,22 @@ namespace luash
 	}
 
 	bool GetPtrByLuaObject(lua_State* L, int N, void*&);
-
-	namespace detail {
-		template<class T> auto GetPointerImpl(lua_State* L, int N, T*& out, std::true_type)
-		{
-			void* ptr = lua_touserdata(L, N);
-			if (const ITypeInterface* ti = GetTypeInterface(L, ptr))
-			{
-				std::type_index src_type = ti->GetTypeID();
-				std::type_index dst_type = typeid(typename std::remove_cv<T>::type);
-				if (src_type == dst_type)
-				{
-					out = reinterpret_cast<T*>(ptr);
-					return;
-				}
-			}
-			out = nullptr;
-		}
-		template<class T> auto GetPointerImpl(lua_State* L, int N, T*& out, std::false_type)
-		{
-			void* ptr = lua_touserdata(L, N);
-			if (const ITypeInterface* ti = GetTypeInterface(L, ptr))
-			{
-				out = reinterpret_cast<T*>(ptr);
-				return;
-			}
-			out = nullptr;
-		}
-	}
 	template<class T>
-	inline auto GetPointer(lua_State* L, int N, T* &out)
+	inline void GetPointer(lua_State* L, int N, T* &out)
 	{
 		if (void* ptr = nullptr; GetPtrByLuaObject(L, N, ptr))
 		{
 			out = reinterpret_cast<T*>(ptr);
 			return;
 		}
-		return detail::GetPointerImpl(L, N, out, IsCompleteType<T>());
+		void* ptr = lua_touserdata(L, N);
+		if (const ITypeInterface* ti = GetTypeInterface(L, ptr))
+		{
+			out = reinterpret_cast<T*>(ptr);
+			return;
+		}
+		out = nullptr;
+		return;
 	}
 	// just unsupported
 	template<class C, class U> void GetMemberPointer(lua_State* L, int N, U C::* &mem_ptr)
