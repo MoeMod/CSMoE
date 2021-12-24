@@ -125,20 +125,18 @@ namespace cl {
 		return ptr;
 	}
 #else
-	template<class T> CBaseEntity* LuaGetPlaceHolderEntity(lua_State* L)
+	template<class T> CBaseEntity* LuaNewPlaceHolderEntity(lua_State* L)
 	{
-		static CBaseEntity* ptr = nullptr;
+		CBaseEntity* ptr = nullptr;
 		if constexpr (std::is_base_of<CBasePlayerWeapon, T>::value)
 		{
 			if (!ptr)
 			{
-				static LuaClass<T> w;
+				CBasePlayerWeapon* pEntity = new LuaClass<T>();
 
-				CBasePlayerWeapon* pEntity = &w;
+				LuaSetupRefTypeInterface<T>(L, pEntity);
 
-				LuaSetupRefTypeInterface<T>(L, &w);
-
-				ptr = &w;
+				ptr = pEntity;
 			}
 		}
 		return ptr;
@@ -153,7 +151,7 @@ namespace cl {
 #else
 #define CLASS_BEGIN(ClassName, BaseClass) \
 	template void LuaSetupRefTypeInterface<ClassName>(lua_State* L, CBaseEntity* ptr); \
-	template CBaseEntity* LuaGetPlaceHolderEntity<ClassName>(lua_State *L); \
+	template CBaseEntity* LuaNewPlaceHolderEntity<ClassName>(lua_State *L); \
 
 #endif
 

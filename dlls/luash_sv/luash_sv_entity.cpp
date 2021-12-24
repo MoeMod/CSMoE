@@ -22,7 +22,8 @@ namespace cl {
 #ifndef CLIENT_DLL
 	std::map<std::string, CBaseEntity* (*)(lua_State* L, entvars_t* pev)> g_pfnLuaCreateClassPtrMap;
 #else
-	std::map<std::string, CBaseEntity* (*)(lua_State* L)> g_pfnGetPlaceHolderEntityMap;
+	std::map<std::string, CBaseEntity* (*)(lua_State* L)> g_pfnNewPlaceHolderEntityMap;
+	std::map<std::string, CBaseEntity*> g_pPlaceHolderEntityCache;
 #endif
 
 	int LuaSV_LinkEntityToClass(lua_State* L)
@@ -105,28 +106,28 @@ namespace cl {
 
 		const char* cppClassName = lua_tostring(L, -1);
 
-		auto iter = g_pfnGetPlaceHolderEntityMap.find(cppClassName);
-		if (iter == g_pfnGetPlaceHolderEntityMap.end())
+		if(auto iter = g_pPlaceHolderEntityCache.find(classname); iter != g_pPlaceHolderEntityCache.end())
+		{
+			// already created
+			lua_pop(L, 3);
+			return (CBasePlayerWeapon*)iter->second;
+		}
+
+		auto iter = g_pfnNewPlaceHolderEntityMap.find(cppClassName);
+		if (iter == g_pfnNewPlaceHolderEntityMap.end())
 		{
 			// unknown cpp class
 			lua_pop(L, 3);
 			return nullptr;
 		}
-		CBaseEntity* (*pfnLuaGetPlaceHolderEntityPtr)(lua_State * L) = iter->second;
+		CBaseEntity* (*pfnLuaNewPlaceHolderEntityPtr)(lua_State * L) = iter->second;
 
-		CBaseEntity* ptr = pfnLuaGetPlaceHolderEntityPtr(L);
+		CBaseEntity* ptr = pfnLuaNewPlaceHolderEntityPtr(L);
 		if (ptr == nullptr)
 		{
 			// unknown cpp class
 			lua_pop(L, 3);
 			return nullptr;
-		}
-
-		if (luash::PushLuaObjectByPtr(L, ptr))
-		{
-			// already created
-			lua_pop(L, 4);
-			return (CBasePlayerWeapon*)ptr;
 		}
 
 		lua_getglobal(L, "class_new"); // #4 = class_new
@@ -143,8 +144,11 @@ namespace cl {
 			LuaSV_PrintError(buffer);
 			lua_pop(L, 1);
 			ptr->SUB_Remove();
+			delete ptr;
 			return nullptr;
 		}
+
+		g_pPlaceHolderEntityCache.emplace(classname, ptr);
 
 		luash::LinkPtrToLuaObject(L, ptr); // #4 = LuaObject
 

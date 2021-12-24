@@ -60,7 +60,7 @@ namespace cl {
 
 #else
 #define CLASS_REG() \
-		g_pfnGetPlaceHolderEntityMap.emplace(CurrentClassName, &LuaGetPlaceHolderEntity<ThisClass>); \
+		g_pfnNewPlaceHolderEntityMap.emplace(CurrentClassName, &LuaNewPlaceHolderEntity<ThisClass>); \
 		g_pfnLuaSetupRefTypeInterfaceMap.emplace(CurrentClassName, &LuaSetupRefTypeInterface<ThisClass>); \
 
 #endif

@@ -1404,6 +1404,11 @@ void CGrenade::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useTy
 		m_fNextDefuse = gpGlobals->time + 0.5s;
 		return;
 	}
+	else if ((player->pev->flags & FL_ONGROUND) != FL_ONGROUND) // Defuse should start only on ground
+	{
+		ClientPrint(player->pev, HUD_PRINTCENTER, "#C4_Defuse_Must_Be_On_Ground");
+		return;
+	}
 
 	// freeze the player in place while defusing
 	SET_CLIENT_MAXSPEED(player->edict(), 1);

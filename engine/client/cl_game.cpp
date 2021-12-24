@@ -108,6 +108,8 @@ static dllfunc_t cdll_new_exports[] = 	// allowed only in SDK 2.3 and higher
 { "IN_ClientTouchEvent", (void **)&clgame.dllFuncs.pfnTouchEvent}, // Xash3D ext
 { "IN_ClientMoveEvent", (void **)&clgame.dllFuncs.pfnMoveEvent}, // Xash3D ext
 { "IN_ClientLookEvent", (void **)&clgame.dllFuncs.pfnLookEvent}, // Xash3D ext
+{ "HUD_OnGUI", (void **)&clgame.dllFuncs.pfnOnGUI}, // Xash3D ext
+{ "CL_OnPrecache", (void **)&clgame.dllFuncs.CL_OnPrecache}, // Xash3D ext
 { NULL, NULL }
 };
 
@@ -2174,6 +2176,11 @@ static void GAME_EXPORT pfnPlaySoundByNameAtLocation( const char *szSound, float
 	S_StartSound( origin, 0, CHAN_ITEM, hSound, volume, 1.0, PITCH_NORM, 0 );
 }
 
+static unsigned short GAME_EXPORT pfnGetCurrentEventIndex(void)
+{
+	return cl.events.cur_event;
+}
+
 /*
 =============
 pfnPrecacheEvent
@@ -3843,7 +3850,8 @@ static event_api_t gEventApi =
 	CL_IndexEvent,
 	CL_PlayerTraceExt,
 	CL_SoundFromIndex,
-	pfnTraceSurface
+	pfnTraceSurface,
+	pfnGetCurrentEventIndex,
 };
 
 static demo_api_t gDemoApi =

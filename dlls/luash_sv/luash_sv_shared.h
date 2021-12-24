@@ -35,7 +35,7 @@ namespace cl {
 	template<class T> CBaseEntity* LuaCreateClassPtr(lua_State* L, entvars_t* pev);
 	extern std::map<std::string, CBaseEntity* (*)(lua_State* L, entvars_t* pev)> g_pfnLuaCreateClassPtrMap;
 #else
-	template<class T> CBaseEntity* LuaGetPlaceHolderEntity(lua_State* L);
-	extern std::map<std::string, CBaseEntity* (*)(lua_State* L)> g_pfnGetPlaceHolderEntityMap;
+	template<class T> CBaseEntity* LuaNewPlaceHolderEntity(lua_State* L);
+	extern std::map<std::string, CBaseEntity* (*)(lua_State* L)> g_pfnNewPlaceHolderEntityMap;
 #endif
 }
