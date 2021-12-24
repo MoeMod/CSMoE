@@ -942,6 +942,7 @@ void Touch_Init( void )
 	Touch_AddDefaultButton("attack3", "touch/gfx/attack.tga", "+attack", 0.100000, 0.272617, 0.200000, 0.506288, color, 2, 1, 0);
 	Touch_AddDefaultButton("slot6", "touch_default/key_6.tga", "slot6", 0.620000, 0.155781, 0.680000, 0.272617, color, 2, 1, 0);
 	Touch_AddDefaultButton("slot7", "touch_default/key_7.tga", "slot7", 0.620000, 0.272617, 0.680000, 0.389452, color, 2, 1, 0);
+	Touch_AddDefaultButton("lastinv", "touch/gfx/left.tga", "lastinv", 0.740000, 0.233671, 0.800000, 0.350507, color, 2, 1, 0);
 	
 
 

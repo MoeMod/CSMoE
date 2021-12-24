@@ -438,6 +438,72 @@ protected:
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
+
+class CZombieSkill_ZombieHook : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieHook(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+	void ResetMaxSpeed()  override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+
+class CZombieSkill_ZombieJumpUpM : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieJumpUpM(CBasePlayer* player);
+
+public:
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
+class CZombieSkill_ZombieArmorRecovery : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieArmorRecovery(CBasePlayer* player);
+
+public:
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
+
+class CZombieSkill_ZombieStrengthRecovery : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieStrengthRecovery(CBasePlayer* player);
+
+public:
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
+
 }
 
 

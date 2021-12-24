@@ -34,6 +34,7 @@ CZombieClass_Heavy::CZombieClass_Heavy(CBasePlayer *player, ZombieLevel iEvoluti
 {
 	m_pPlayer->m_ZombieClass = "heavy";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieTrap>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieArmorRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Heavy::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_HEAVY);
 	WRITE_BYTE(ZOMBIE_SKILL_TRAP);
+	WRITE_BYTE(ZOMBIE_SKILL_ARMORRECOVERY);
 	MESSAGE_END();
 }
 

@@ -34,6 +34,7 @@ CZombieClass_Heal::CZombieClass_Heal(CBasePlayer *player, ZombieLevel iEvolution
 {
 	m_pPlayer->m_ZombieClass = "heal";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHeal>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Heal::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_HEAL);
 	WRITE_BYTE(ZOMBIE_SKILL_HEAL);
+	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
 

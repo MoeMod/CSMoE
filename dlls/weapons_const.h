@@ -396,4 +396,18 @@ enum BackPrimaryWeapons
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
+struct WeaponCrosshairData
+{
+	int iAccuracyFlags;
+	int iDistance;
+	int iDeltaDistance;
+	int iAccuracySpeed;
+};
+
+#define ACCURACY_AIR (1 << 0) // accuracy depends on FL_ONGROUND
+#define ACCURACY_SPEED (1 << 1)
+#define ACCURACY_DUCK (1 << 2) // more accurate when ducking
+#define ACCURACY_MULTIPLY_BY_14 (1 << 3) // accuracy multiply to 1.4
+#define ACCURACY_MULTIPLY_BY_14_2 (1 << 4) // accuracy multiply to 1.4
+
 #endif

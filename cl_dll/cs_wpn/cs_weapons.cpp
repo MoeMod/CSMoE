@@ -631,6 +631,170 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 	}
 }
 
+
+int Distances[30][2] =
+{
+{ 8, 3 }, // 0
+{ 4, 3 }, // 1
+{ 5, 3 }, // 2
+{ 8, 3 }, // 3
+{ 9, 4 }, // 4
+{ 6, 3 }, // 5
+{ 9, 3 }, // 6
+{ 3, 3 }, // 7
+{ 8, 3 }, // 8
+{ 4, 3 }, // 9
+{ 8, 3 }, // 10
+{ 6, 3 }, // 11
+{ 5, 3 }, // 12
+{ 4, 3 }, // 13
+{ 4, 3 }, // 14
+{ 8, 3 }, // 15
+{ 8, 3 }, // 16
+{ 8, 3 }, // 17
+{ 6, 3 }, // 18
+{ 6, 3 }, // 19
+{ 8, 6 }, // 20
+{ 4, 3 }, // 21
+{ 7, 3 }, // 22
+{ 6, 4 }, // 23
+{ 8, 3 }, // 24
+{ 8, 3 }, // 25
+{ 5, 3 }, // 26
+{ 4, 4 }, // 27
+{ 7, 3 }, // 28
+{ 7, 3 }, // 29
+};
+
+WeaponCrosshairData CBasePlayerWeapon::GetCrosshairData(void)
+{
+	int result = 0, iDistance = 4, iDeltaDistance = 3, iAccuraySpeed = 0;
+	if (m_iId >= WEAPON_P228 && m_iId <= WEAPON_P90)
+	{
+		iDistance = Distances[m_iId - 1][0];
+		iDeltaDistance = Distances[m_iId - 1][0];
+	}
+
+	switch( m_iId )
+	{
+	case WEAPON_P228:
+		result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
+		break;
+	case WEAPON_GLOCK:
+		break;
+	case WEAPON_SCOUT:
+		break;
+	case WEAPON_HEGRENADE:
+		break;
+	case WEAPON_XM1014:
+		break;
+	case WEAPON_C4:
+		break;
+	case WEAPON_MAC10:
+		result = ACCURACY_AIR;
+		break;
+	case WEAPON_AUG:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_SMOKEGRENADE:
+		break;
+	case WEAPON_ELITE:
+		break;
+	case WEAPON_FIVESEVEN:
+		result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
+		break;
+	case WEAPON_UMP45:
+		result = ACCURACY_AIR;
+		break;
+	case WEAPON_SG550:
+		break;
+	case WEAPON_GALIL:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_FAMAS:
+		if (g_iWeaponFlags & WPNSTATE_FAMAS_BURST_MODE)
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED;
+		}
+		else
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_MULTIPLY_BY_14_2;
+		}
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_USP:
+		if (g_iWeaponFlags & WPNSTATE_USP_SILENCED)
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
+		}
+		else
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK | ACCURACY_MULTIPLY_BY_14;
+		}
+		break;
+	case WEAPON_GLOCK18:
+		if (g_iWeaponFlags & WPNSTATE_GLOCK18_BURST_MODE)
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
+		}
+		else
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK | ACCURACY_MULTIPLY_BY_14_2;
+		}
+		break;
+	case WEAPON_AWP:
+		break;
+	case WEAPON_MP5N:
+		result = ACCURACY_AIR;
+		break;
+	case WEAPON_M249:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_M3:
+		break;
+	case WEAPON_M4A1:
+		if (g_iWeaponFlags & WPNSTATE_USP_SILENCED)
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED;
+		}
+		else
+		{
+			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_MULTIPLY_BY_14;
+		}
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_TMP:
+		result = ACCURACY_AIR;
+		break;
+	case WEAPON_G3SG1:
+		break;
+	case WEAPON_FLASHBANG:
+		break;
+	case WEAPON_DEAGLE:
+		result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
+		break;
+	case WEAPON_SG552:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_AK47:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 140;
+		break;
+	case WEAPON_KNIFE:
+		break;
+	case WEAPON_P90:
+		result = ACCURACY_AIR | ACCURACY_SPEED;
+		iAccuraySpeed = 170;
+		break;
+	}
+
+	return { result, iDistance, iDeltaDistance, iAccuraySpeed };
+}
+
 /*
 =====================
 CBasePlayer::SelectLastItem
@@ -882,78 +1046,13 @@ void HUD_InitClientWeapons( void )
 	BTEClientWeapons().PrepEntity(&player);
 }
 
-
-int GetWeaponAccuracyFlags( int weaponid )
+WeaponCrosshairData GetWeaponCrosshairData(void)
 {
-	int result = 0;
+	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+	if (pActiveBTEWeapon)
+		return pActiveBTEWeapon->GetCrosshairData();
 
-	if( weaponid <= WEAPON_P90 )
-	{
-		switch( weaponid )
-		{
-		case WEAPON_AUG:
-		case WEAPON_GALIL:
-		case WEAPON_M249:
-		case WEAPON_SG552:
-		case WEAPON_AK47:
-		case WEAPON_P90:
-			result = ACCURACY_AIR | ACCURACY_SPEED;
-			break;
-		case WEAPON_P228:
-		case WEAPON_FIVESEVEN:
-		case WEAPON_DEAGLE:
-			result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
-			break;
-		case WEAPON_GLOCK18:
-			if( g_iWeaponFlags & WPNSTATE_GLOCK18_BURST_MODE)
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
-			}
-			else
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK | ACCURACY_MULTIPLY_BY_14_2;
-			}
-			break;
-		case WEAPON_MAC10:
-		case WEAPON_UMP45:
-		case WEAPON_MP5N:
-		case WEAPON_TMP:
-			result = ACCURACY_AIR;
-			break;
-		case WEAPON_M4A1:
-			if(g_iWeaponFlags & WPNSTATE_USP_SILENCED)
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED;
-			}
-			else
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_MULTIPLY_BY_14;
-			}
-			break;
-		case WEAPON_FAMAS:
-			if(g_iWeaponFlags & WPNSTATE_FAMAS_BURST_MODE)
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED;
-			}
-			else
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | (1<<4);
-			}
-			break;
-		case WEAPON_USP:
-			if(g_iWeaponFlags & WPNSTATE_USP_SILENCED)
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
-			}
-			else
-			{
-				result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK | ACCURACY_MULTIPLY_BY_14;
-			}
-			break;
-		}
-	}
-
-	return result;
+	return { 0, 4, 3, 0 };
 }
 
 

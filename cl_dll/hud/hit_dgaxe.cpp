@@ -44,7 +44,8 @@ DECLARE_MESSAGE(m_Dgaxe, Dgaxe)
 enum
 {
 	WPN_DGAXE,
-	WPN_HUNTBOW
+	WPN_HUNTBOW,
+	WPN_SKULLT9
 };
 
 enum
@@ -59,7 +60,9 @@ enum
 	HUNTBOW_HIT_RIGHT,
 	HUNTBOW_AIM_CHARGIN,
 	HUNTBOW_AIM_HIT_LEFT,
-	HUNTBOW_AIM_HIT_RIGHT
+	HUNTBOW_AIM_HIT_RIGHT,
+	SKULLT9_AIM_OFF,
+	SKULLT9_AIM_ON,
 };
 
 int CHudDgaxe::Init()
@@ -198,6 +201,43 @@ int CHudDgaxe::Draw(float flTime)
 			DrawHuntbowCrossHair(iX, iY, wide, height, iStoredType);
 		else
 			DrawHuntbowCrossHair(iX, iY, wide, height, iType);
+	}
+	case WPN_SKULLT9:
+	{
+		switch (iType)
+		{
+		case SKULLT9_AIM_OFF:
+		case SKULLT9_AIM_ON:
+		{
+			wide = 200;
+			height = 200; break;
+		}
+		}
+
+		float x = ScreenWidth / 2;
+		float y = ScreenHeight / 2;
+		const float flScale = 0.0f;
+
+		float iX, iY;
+
+		iX = x - wide / 2;
+		iY = y - height / 2;
+
+		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+		if (iType != 3)
+			m_pCurTexture[iType]->Bind();
+
+		switch (iType)
+		{
+		case SKULLT9_AIM_OFF:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case SKULLT9_AIM_ON:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case AIM_NO: return 1; break;
+		default:
+			break;
+		}
+
+		break;
 	}
 	}
 

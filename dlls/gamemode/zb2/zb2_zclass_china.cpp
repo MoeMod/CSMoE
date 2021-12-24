@@ -34,6 +34,7 @@ CZombieClass_China::CZombieClass_China(CBasePlayer *player, ZombieLevel iEvoluti
 {
 	m_pPlayer->m_ZombieClass = "china";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieStiffen>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set china property
@@ -62,6 +63,7 @@ void CZombieClass_China::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_CHINA);
 	WRITE_BYTE(ZOMBIE_SKILL_STIFFEN);
+	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
 

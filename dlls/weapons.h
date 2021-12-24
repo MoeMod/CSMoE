@@ -527,6 +527,12 @@ public:
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
 	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
+#ifdef CLIENT_DLL
+	virtual WeaponCrosshairData GetCrosshairData();
+#else
+	virtual WeaponCrosshairData GetCrosshairData(void) { return { 0, 0, 0, 0 }; }
+#endif
+
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];

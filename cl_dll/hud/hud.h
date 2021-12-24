@@ -115,6 +115,7 @@ struct HUDLIST {
 #include "zbs/zbs.h"
 #include "zb2/zb2.h"
 #include "zb3/zb3.h"
+#include "z4/z4.h"
 #include "retina.h"
 #include "moe/moe_touch.h"
 
@@ -1075,6 +1076,7 @@ public:
 	CHudZBS	m_ZBS;
 	CHudZB2 m_ZB2;
 	CHudZB3 m_ZB3;
+	CHudZ4 m_ZB4;
 	CHudMoeTouch m_MoeTouch;
 
 	// user messages

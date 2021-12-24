@@ -107,7 +107,12 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_zombirevival",//ZOMBIE_SKILL_REVIVAL
 		"resource/zombi/zombieskill_zombipile",//ZOMBIE_SKILL_STAMPER
 		"resource/zombi/zombieskill_zombipenetration",//ZOMBIE_SKILL_PENETRATION
-		"resource/zombi/zombieskill_zombijumpup"//ZOMBIE_SKILL_JUMPUP
+		"resource/zombi/zombieskill_zombijumpup",//ZOMBIE_SKILL_JUMPUP
+		"resource/zombi/zombieskill_zombihook",//ZOMBIE_SKILL_HOOK
+		"resource/zombi/zombieskill_jumpupm",//ZOMBIE_SKILL_JUMPUPM
+		"resource/zombi/zombieskill_armorrecovery",//ZOMBIE_SKILL_ARMORRECOVERY
+		"resource/zombi/zombieskill_hpbuff",//ZOMBIE_SKILL_HPBUFF
+		"resource/zombi/zombieskill_strengthrecovery"//ZOMBIE_SKILL_STRENGTHRECOVERY
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -128,6 +133,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_revivalzb",//ZOMBIE_CLASS_REVIVAL
 		"resource/zombi/zombietype_undertakerzb",//ZOMBIE_CLASS_STAMPER
 		"resource/zombi/zombietype_residentzb",//ZOMBIE_CLASS_RESIDENT
+		"resource/zombi/zombietype_witchzb",//ZOMBIE_CLASS_WITCH
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =
@@ -178,14 +184,14 @@ int CHudZB2_Skill::VidInit(void)
 
 	for (int i = 0; i < MAX_ZOMBIE_SKILL; ++i)
 	{
-		if (Config::ZOMBIE_SKILL_HUD_ICON_NEW[i][0] != '\0')
+		if (Config::ZOMBIE_SKILL_HUD_ICON_NEW[i] && Config::ZOMBIE_SKILL_HUD_ICON_NEW[i][0] != '\0')
 			if (!m_pTexture_NewSkillIcons[i])
 				m_pTexture_NewSkillIcons[i] = R_LoadTextureUnique(Config::ZOMBIE_SKILL_HUD_ICON_NEW[i]);
 	}
 
 	for (int i = 0; i < MAX_ZOMBIE_CLASS; ++i)
 	{
-		if (Config::ZOMBIE_CLASS_HUD_ICON_NEW[i][0] != '\0')
+		if (Config::ZOMBIE_CLASS_HUD_ICON_NEW[i] && Config::ZOMBIE_CLASS_HUD_ICON_NEW[i][0] != '\0')
 			if (!m_pTexture_NewClassIcons[i])
 				m_pTexture_NewClassIcons[i] = R_LoadTextureUnique(Config::ZOMBIE_CLASS_HUD_ICON_NEW[i]);
 	}

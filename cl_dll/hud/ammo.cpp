@@ -141,6 +141,34 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 			return;
 		}
 	}
+	if (strncmp(pWeapon->szName, "knife_skullt9", 11))
+	{
+		if (!strncmp(pWeapon->szName, "knife_", 6))
+		{
+
+			client_sprite_t* pList = SPR_GetList(sz, &i);
+
+			if (!pList)
+				return;
+
+			client_sprite_t* p;
+
+			char* buffer = (char*)gEngfuncs.COM_LoadFile((char*)sz, 5, nullptr);
+			char szSpriteName[32]{};
+			int x, y, w, h;
+			if (buffer && sscanf(buffer, "%s %d %d %d %d", szSpriteName, &x, &y, &w, &h) == 5)
+			{
+				sprintf(sz, "sprites/%s.spr", szSpriteName);
+				pWeapon->hInactive = pWeapon->hActive = SPR_Load(sz);
+				pWeapon->rcInactive = pWeapon->rcActive = { x, x + w, y, y + h };
+
+				gHR.iHistoryGap = max(gHR.iHistoryGap, pWeapon->rcActive.bottom - pWeapon->rcActive.top);
+			}
+
+			gEngfuncs.COM_FreeFile(buffer);
+			return;
+		}
+	}
 
 	client_sprite_t *pList = SPR_GetList(sz, &i);
 
@@ -1340,43 +1368,11 @@ int CHudAmmo::Draw(float flTime)
 #define SOUTH_YPOS (ScreenHeight / 2 + flCrosshairDistance)
 #define NORTH_SOUTH_XPOS (ScreenWidth / 2)
 
-int Distances[30][2] =
-{
-{ 8, 3 }, // 0
-{ 4, 3 }, // 1
-{ 5, 3 }, // 2
-{ 8, 3 }, // 3
-{ 9, 4 }, // 4
-{ 6, 3 }, // 5
-{ 9, 3 }, // 6
-{ 3, 3 }, // 7
-{ 8, 3 }, // 8
-{ 4, 3 }, // 9
-{ 8, 3 }, // 10
-{ 6, 3 }, // 11
-{ 5, 3 }, // 12
-{ 4, 3 }, // 13
-{ 4, 3 }, // 14
-{ 8, 3 }, // 15
-{ 8, 3 }, // 16
-{ 8, 3 }, // 17
-{ 6, 3 }, // 18
-{ 6, 3 }, // 19
-{ 8, 6 }, // 20
-{ 4, 3 }, // 21
-{ 7, 3 }, // 22
-{ 6, 4 }, // 23
-{ 8, 3 }, // 24
-{ 8, 3 }, // 25
-{ 5, 3 }, // 26
-{ 4, 4 }, // 27
-{ 7, 3 }, // 28
-{ 7, 3 }, // 29
-};
 
 void CHudAmmo::DrawCrosshair( float flTime )
 {
-	int flags, iDeltaDistance, iDistance, iLength, weaponid;
+	WeaponCrosshairData data;
+	int iLength, weaponid;
 	float flCrosshairDistance;
 
 	if( !m_pWeapon )
@@ -1395,59 +1391,31 @@ void CHudAmmo::DrawCrosshair( float flTime )
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
 		return;
-
-	if( weaponid <= 30 )
-	{
-		iDistance = Distances[weaponid - 1][0];
-		iDeltaDistance = Distances[weaponid - 1][1];
-	}
-	else
-	{
-		iDistance = 4;
-		iDeltaDistance = 3;
-	}
 	
-	flags = GetWeaponAccuracyFlags( weaponid );
-	if ( flags && m_pClDynamicCrosshair->value && !(gHUD.m_iHideHUDDisplay & 1) )
+	data = GetWeaponCrosshairData();
+
+	if ( data.iAccuracyFlags && m_pClDynamicCrosshair->value && !(gHUD.m_iHideHUDDisplay & 1) )
 	{
-		if ( g_iPlayerFlags & FL_ONGROUND || !( flags & ACCURACY_AIR ) )
+		if ( g_iPlayerFlags & FL_ONGROUND || !( data.iAccuracyFlags & ACCURACY_AIR ) )
 		{
-			if ( ( g_iPlayerFlags & FL_DUCKING ) && ( flags & ACCURACY_DUCK ) )
+			if ( ( g_iPlayerFlags & FL_DUCKING ) && ( data.iAccuracyFlags & ACCURACY_DUCK ) )
 			{
-				iDistance *= 0.5;
+				data.iDistance *= 0.5;
 			}
 			else
 			{
-				int iWeaponSpeed = 0;
-
-				switch( weaponid )
-				{
-				case WEAPON_P90: // p90
-					iWeaponSpeed = 170;
-					break;
-				case WEAPON_AUG: // aug
-				case WEAPON_GALIL: // galil
-				case WEAPON_FAMAS: // famas
-				case WEAPON_M249: // m249
-				case WEAPON_M4A1: // m4a1
-				case WEAPON_SG552: // sg552
-				case WEAPON_AK47: // ak47
-					iWeaponSpeed = 140;
-					break;
-				}
-
-				if ( (flags & ACCURACY_SPEED) && (g_flPlayerSpeed >= iWeaponSpeed) )
-					iDistance *= 1.5;
+				if ( (data.iAccuracyFlags & ACCURACY_SPEED) && (g_flPlayerSpeed >= data.iAccuracySpeed) )
+					data.iDistance *= 1.5;
 			}
 		}
 		else 
 		{
-			iDistance *= 2;
+			data.iDistance *= 2;
 		}
-		if ( flags & ACCURACY_MULTIPLY_BY_14 )
-			iDistance *= 1.4;
-		if ( flags & ACCURACY_MULTIPLY_BY_14_2 )
-			iDistance *= 1.4;
+		if ( data.iAccuracyFlags & ACCURACY_MULTIPLY_BY_14 )
+			data.iDistance *= 1.4;
+		if ( data.iAccuracyFlags & ACCURACY_MULTIPLY_BY_14_2 )
+			data.iDistance *= 1.4;
 	}
 
 	if ( m_iAmmoLastCheck >= g_iShotsFired )
@@ -1457,7 +1425,7 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	}
 	else
 	{
-		m_flCrosshairDistance = min( m_flCrosshairDistance + iDeltaDistance, 15.0f );
+		m_flCrosshairDistance = min( m_flCrosshairDistance + data.iDeltaDistance, 15.0f );
 		m_iAlpha = max( m_iAlpha - 40, 120 );
 	}
 
@@ -1469,8 +1437,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	CalcCrosshairSize();
 
 	m_iAmmoLastCheck = g_iShotsFired;
-	m_flCrosshairDistance = max( m_flCrosshairDistance, (float)iDistance );
-	iLength = (m_flCrosshairDistance - iDistance) * 0.5 + 5;
+	m_flCrosshairDistance = max( m_flCrosshairDistance, (float)data.iDistance);
+	iLength = (m_flCrosshairDistance - data.iDistance) * 0.5 + 5;
 
 	if ( m_iAlpha > 255 )
 		m_iAlpha = 255;

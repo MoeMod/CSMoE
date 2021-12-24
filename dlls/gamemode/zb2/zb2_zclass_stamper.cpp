@@ -34,6 +34,7 @@ CZombieClass_Stamper::CZombieClass_Stamper(CBasePlayer *player, ZombieLevel iEvo
 {
 	m_pPlayer->m_ZombieClass = "stamper";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePile>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieArmorRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Stamper::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_STAMPER);
 	WRITE_BYTE(ZOMBIE_SKILL_STAMPER);
+	WRITE_BYTE(ZOMBIE_SKILL_ARMORRECOVERY);
 	MESSAGE_END();
 }
 

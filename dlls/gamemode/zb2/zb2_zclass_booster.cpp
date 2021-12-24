@@ -34,6 +34,7 @@ CZombieClass_Booster::CZombieClass_Booster(CBasePlayer *player, ZombieLevel iEvo
 {
 	m_pPlayer->m_ZombieClass = "booster";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieBooster>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieJumpUpM>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Booster::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_BOOSTER);
 	WRITE_BYTE(ZOMBIE_SKILL_BOOSTER);
+	WRITE_BYTE(ZOMBIE_SKILL_JUMPUPM);
 	MESSAGE_END();
 }
 

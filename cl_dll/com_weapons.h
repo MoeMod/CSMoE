@@ -19,11 +19,6 @@
 #define PLAYER_HOLDING_SHIELD (1 << 3)
 
 #define CROSSHAIR_
-#define ACCURACY_AIR (1 << 0) // accuracy depends on FL_ONGROUND
-#define ACCURACY_SPEED (1 << 1)
-#define ACCURACY_DUCK (1 << 2) // more accurate when ducking
-#define ACCURACY_MULTIPLY_BY_14 (1 << 3) // accuracy multiply to 1.4
-#define ACCURACY_MULTIPLY_BY_14_2 (1 << 4) // accuracy multiply to 1.4
 
 #include "weapons_const.h"
 
@@ -48,7 +43,7 @@ int				HUD_GetWeapon( void );
 void			HUD_PlaySound( char *sound, float volume );
 void			HUD_PlaybackEvent( int flags, const struct edict_s *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 //void			HUD_SetMaxSpeed( const struct edict_s *ed, float speed );
-int				GetWeaponAccuracyFlags( int weaponid );
+WeaponCrosshairData				GetWeaponCrosshairData( void );
 
 extern cvar_t *cl_lw;
 

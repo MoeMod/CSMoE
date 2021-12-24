@@ -265,6 +265,8 @@ set (HUD_SRCS
 	./hud/zb3/zb3_morale.cpp
 	./hud/zb3/zb3_rage.cpp
 	./hud/moe/moe_touch.cpp
+	./hud/z4/z4.cpp
+	./hud/z4/z4_energy.cpp
 
 )
 

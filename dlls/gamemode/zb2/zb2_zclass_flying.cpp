@@ -34,6 +34,7 @@ CZombieClass_Flying::CZombieClass_Flying(CBasePlayer *player, ZombieLevel iEvolu
 {
 	m_pPlayer->m_ZombieClass = "flying";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieFlying>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Flying::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_FLYING);
 	WRITE_BYTE(ZOMBIE_SKILL_GLIDE);
+	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
 	MESSAGE_END();
 }
 
@@ -70,6 +72,8 @@ void CZombieClass_Flying::ResetMaxSpeed() const
 	m_pPlayer->pev->maxspeed = 290;
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pZombieSkill2)
+		m_pZombieSkill2->ResetMaxSpeed();
 }
 
 float CZombieClass_Flying::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const

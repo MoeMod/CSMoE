@@ -34,6 +34,7 @@ CZombieClass_Pc::CZombieClass_Pc(CBasePlayer *player, ZombieLevel iEvolutionLeve
 {
 	m_pPlayer->m_ZombieClass = "pc";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePC>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Pc::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_PC);
 	WRITE_BYTE(ZOMBIE_SKILL_SMOKE);
+	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
 

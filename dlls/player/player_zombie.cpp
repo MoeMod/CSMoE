@@ -114,6 +114,8 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_death_stamper_1.wav");
 	PRECACHE_SOUND("zombi/zombi_death_stamper_2.wav");
 	PRECACHE_SOUND("zombi/resident_death.wav");
+	PRECACHE_SOUND("zombi/zombi_death_banshee_1.wav");
+	PRECACHE_SOUND("zombi/zombi_death_banshee_2.wav");
 
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
@@ -131,6 +133,8 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/zombi_hurt_stamper_2.wav");
 	PRECACHE_SOUND("zombi/resident_hurt1.wav");
 	PRECACHE_SOUND("zombi/resident_hurt2.wav");
+	PRECACHE_SOUND("zombi/zombi_hurt_banshee_1.wav");
+	PRECACHE_SOUND("zombi/zombi_hurt_banshee_2.wav");
 	
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_female.wav");
@@ -158,6 +162,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombirevival.mdl");
 	PRECACHE_MODEL("models/v_knife_zombiundertaker.mdl");
 	PRECACHE_MODEL("models/v_knife_zombieresident.mdl");
+	PRECACHE_MODEL("models/v_knife_zombiewitch.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -179,6 +184,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibomb_revival_host.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_undertaker.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_resident.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_witch.mdl");
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -215,6 +221,8 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/witch_zombi_host/witch_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/boomer_zombi_origin/boomer_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/boomer_zombi_host/boomer_zombi_host.mdl");
+	PRECACHE_MODEL("models/player/witch_zombi_origin/witch_zombi_origin.mdl");
+	PRECACHE_MODEL("models/player/witch_zombi_host/witch_zombi_host.mdl");
 	
 
 }

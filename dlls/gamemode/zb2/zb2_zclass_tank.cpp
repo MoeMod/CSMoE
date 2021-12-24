@@ -34,6 +34,7 @@ CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel iEvo
 {
 	m_pPlayer->m_ZombieClass = "tank";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Default::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_TANK);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
 

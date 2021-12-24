@@ -34,6 +34,7 @@ CZombieClass_Deimos2::CZombieClass_Deimos2(CBasePlayer *player, ZombieLevel iEvo
 {
 	m_pPlayer->m_ZombieClass = "deimos2";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCrazy2>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieArmorRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Deimos2::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_DEIMOS2);
 	WRITE_BYTE(ZOMBIE_SKILL_CRAZY2);
+	WRITE_BYTE(ZOMBIE_SKILL_ARMORRECOVERY);
 	MESSAGE_END();
 }
 

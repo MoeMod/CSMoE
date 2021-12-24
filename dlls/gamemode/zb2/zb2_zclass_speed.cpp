@@ -34,6 +34,7 @@ CZombieClass_Speed::CZombieClass_Speed(CBasePlayer *player, ZombieLevel iEvoluti
 {
 	m_pPlayer->m_ZombieClass = "speed";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieHide>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieJumpUpM>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Speed::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_SPEED);
 	WRITE_BYTE(ZOMBIE_SKILL_HIDE);
+	WRITE_BYTE(ZOMBIE_SKILL_JUMPUPM);
 	MESSAGE_END();
 }
 

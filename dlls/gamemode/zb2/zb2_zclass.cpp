@@ -39,6 +39,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_revival.h"
 #include "zb2_zclass_stamper.h"
 #include "zb2_zclass_resident.h"
+#include "zb2_zclass_witch.h"
 #include <random>
 
 namespace sv {
@@ -64,13 +65,13 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
 		{"revival", 20, MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
-		{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
+		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
+		{"witch", 100, MakeZombieClass<CZombieClass_Witch> }
 };
 
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-		//{"tank", 100, MakeZombieClass<CZombieClass_Default>}
-		{"resident", 100, MakeZombieClass<CZombieClass_Resident> }
+	{"tank", 100, MakeZombieClass<CZombieClass_Default>}
 };
 #endif
 
@@ -126,11 +127,11 @@ void CBaseZombieClass_ZB2::InitHUD() const
 
 void CBaseZombieClass_ZB2::ActivateSkill(ZombieSkillSlot which)
 {
-	if (m_pZombieSkill && GetSkillStatus(SKILL_SLOT_2) != SKILL_STATUS_USING)
+	if (m_pZombieSkill && which == SKILL_SLOT_1 && GetSkillStatus(SKILL_SLOT_2) != SKILL_STATUS_USING)
 	{
 		m_pZombieSkill->Activate();
 	}
-	else if (m_pZombieSkill2 && GetSkillStatus(SKILL_SLOT_1) != SKILL_STATUS_USING)
+	else if (m_pZombieSkill2 && which == SKILL_SLOT_2 && GetSkillStatus(SKILL_SLOT_1) != SKILL_STATUS_USING)
 	{
 		m_pZombieSkill2->Activate();
 	}

@@ -34,6 +34,7 @@ CZombieClass_Pass::CZombieClass_Pass(CBasePlayer *player, ZombieLevel iEvolution
 {
 	m_pPlayer->m_ZombieClass = "pass";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombiePass>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieCrazy>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Pass::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_PASS);
 	WRITE_BYTE(ZOMBIE_SKILL_PASS);
+	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
 	MESSAGE_END();
 }
 
@@ -69,6 +71,8 @@ void CZombieClass_Pass::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 290;
 	if (m_pZombieSkill)
+		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pZombieSkill2)
 		m_pZombieSkill->ResetMaxSpeed();
 }
 
