@@ -35,6 +35,7 @@ public:
 	void PrimaryAttack() override;
 	void Reload() override;
 	void WeaponIdle() override;
+	int GetDamage() const;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

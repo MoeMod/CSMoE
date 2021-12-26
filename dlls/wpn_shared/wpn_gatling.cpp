@@ -177,9 +177,9 @@ int CGatling::GetPrimaryAttackDamage() const
 	int iDamage = 18;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		iDamage = 26;
+		iDamage = 30;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		iDamage = 26;
+		iDamage = 30;
 #endif
 	return iDamage;
 }

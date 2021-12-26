@@ -32,6 +32,7 @@ public:
 	void SecondaryAttack() override {}
 	void Reload() override;
 	void WeaponIdle() override;
+	float GetDamage();
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

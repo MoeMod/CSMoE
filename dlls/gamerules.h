@@ -392,6 +392,8 @@ public:
 	virtual void ChangeLevel();
 	virtual void GoToIntermission();
 
+	virtual BOOL TeamFull(int team_id);
+	virtual BOOL TeamStacked(int newTeam_id, int curTeam_id);
 public:
 	// Checks if it still needs players to start a round, or if it has enough players to start rounds.
 	// Starts a round and returns true if there are enough players.
@@ -434,8 +436,6 @@ public:
 	void MarkSpawnSkipped() { m_bSkipSpawn = false; }
 	//NOXREF void PlayerJoinedTeam(CBasePlayer *pPlayer) { }
 	duration_t TimeRemaining() { return duration_t(m_iRoundTimeSecs) - (gpGlobals->time - m_fRoundCount); }
-	BOOL TeamFull(int team_id);
-	BOOL TeamStacked(int newTeam_id, int curTeam_id);
 	bool IsVIPQueueEmpty();
 	bool AddToVIPQueue(CBasePlayer *toAdd);
 

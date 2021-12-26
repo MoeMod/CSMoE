@@ -12,6 +12,7 @@ namespace sv {
 #define FREQUENCY1_RANGE_MODIFER	0.81
 #define FREQUENCY1_RELOAD_TIME	2.2s
 #define FREQUENCY1_MAX_CLIP	6
+#define FREQUENCY1_PENETRATION	9
 
 class CFrequency1 : public CBasePlayerWeapon
 {
@@ -27,9 +28,12 @@ class CFrequency1 : public CBasePlayerWeapon
 		ANIM_SHOOT_SP2,
 		ANIM_HIGHNOON_START,
 		ANIM_HIGHNOON_LOOP,
-		ANIM_HIGHNOON_END_EMPTY,
-		ANIM_HIGHNOON_END_KILL,
-		ANIM_HIGHNOON_SHOOT,
+		ANIM_HIGHNOON_END,
+		ANIM_HIGHNOON_STARTSHOOT,
+		ANIM_HIGHNOON_SHOOT1,
+		ANIM_HIGHNOON_SHOOT2,
+		ANIM_HIGHNOON_SHOOT3,
+		ANIM_FIGHT,
 		ANIM_FLASHBANG,
 		ANIM_DASH,
     };
@@ -38,7 +42,7 @@ public:
 	void Precache() override;
 	int GetItemInfo(ItemInfo *p) override;
 	BOOL Deploy() override;
-	float GetMaxSpeed() override { return m_fMaxSpeed; }
+	float GetMaxSpeed() override;
 	int iItemSlot() override { return PISTOL_SLOT; }
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
@@ -46,6 +50,7 @@ public:
 	void Reload() override;
 	void WeaponIdle() override;
 	void ItemPostFrame() override;
+	void Holster(int skiplocal) override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;
@@ -61,13 +66,27 @@ public:
 public:
 	void Frequency1Fire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	void Frequency1FireSP(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
+	
 	float GetDamage1() const;
 	float GetDamage2() const;
 	float GetDamage3() const;
+	bool CanUseSkill();
+	int m_iUsingSkill;
+	int m_iHolsterAmmo;
+	int m_iIndex;
+	time_point_t m_tAimTime;
+	time_point_t m_flTimeHostler;
+	time_point_t m_flTimeNextCharge;
 	int m_iShell;
 	int m_iDefaultAmmo2;
 	int m_iSprBeam;
+	int m_iIsTarget[33];
+	
 #ifndef CLIENT_DLL
+	void Frequency1HighNoonFire(int iIndex);
+	void CalcIsTarget();
+	bool is_target_avaliable(int iIndex);
+	Vector CalcPositon();
 	void Effect_Beam(Vector vecStart, Vector vecEnd, int iLife, int iBrightness, int r, int g, int b, int iWidth, int iScollSpeed);
 #endif
 private:

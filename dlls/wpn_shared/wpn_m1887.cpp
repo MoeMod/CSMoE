@@ -112,7 +112,7 @@ void CM1887::PrimaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(8, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0);
+	m_pPlayer->FireBullets(8, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
 #endif
 
 	int flags;
@@ -225,5 +225,18 @@ void CM1887::WeaponIdle(void)
 			SendWeaponAnim(M1887_IDLE, UseDecrement() != FALSE);
 	}
 }
+
+int CM1887::GetDamage() const
+{
+	int iDamage = 20;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		iDamage = 22;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		iDamage = 22;
+#endif
+	return iDamage;
+}
+
 
 }

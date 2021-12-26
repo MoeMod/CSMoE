@@ -93,21 +93,21 @@ BOOL CMG3xmas::Deploy(void)
 void CMG3xmas::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		MG3xmasFire(0.045 + (0.5) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire(0.065 + (0.75) * m_flAccuracy, 0.09s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 140)
-		MG3xmasFire(0.045 + (0.095) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire(0.045 + (0.095) * m_flAccuracy, 0.09s, FALSE);
 	else
-		MG3xmasFire((0.03) * m_flAccuracy, 0.095s, FALSE);
+		MG3xmasFire((0.04) * m_flAccuracy, 0.09s, FALSE);
 }
 
 void CMG3xmas::MG3xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
 	m_bDelayFire = true;
 	m_iShotsFired++;
-	m_flAccuracy = ((m_iShotsFired * m_iShotsFired * m_iShotsFired) / 195.0) + 0.4;
+	m_flAccuracy = ((m_iShotsFired * m_iShotsFired * m_iShotsFired) / 170.0) + 0.4;
 
-	if (m_flAccuracy > 0.9)
-		m_flAccuracy = 0.9;
+	if (m_flAccuracy > 1.0)
+		m_flAccuracy = 1.0;
 
 	if (m_iClip <= 0)
 	{
@@ -151,13 +151,13 @@ void CMG3xmas::MG3xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.6s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		KickBack(0.85, 0.65, 0.45, 0.125, 5.0, 3.0, 1);
+		KickBack(1.8, 0.65, 0.45, 0.125, 5.0, 3.5, 8);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		KickBack(0.3125, 0.15, 0.075, 0.06, 4.0, 0.5, 3);
+		KickBack(1.25, 0.5, 0.375, 0.065, 4.0, 3.0, 8);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		KickBack(0.3, 0.125, 0.25, 0.015, 2.5, 0.5, 4);
+		KickBack(0.7, 0.3, 0.225, 0.02, 3.5, 2.0, 9);
 	else
-		KickBack(0.4, 0.15, 0.525, 0.015, 2.5, 0.5, 3);
+		KickBack(0.825, 0.35, 0.35, 0.035, 4.0, 3.5, 9);
 }
 
 void CMG3xmas::Reload(void)
@@ -165,7 +165,7 @@ void CMG3xmas::Reload(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
-	if (DefaultReload(200, M249_RELOAD, 4.8s))
+	if (DefaultReload(200, M249_RELOAD, 4.7s))
 	{
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
@@ -190,12 +190,12 @@ void CMG3xmas::WeaponIdle(void)
 
 float CMG3xmas::GetDamage() const
 {
-	float flDamage = 33.0f;
+	float flDamage = 34.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 35.0f;
+		flDamage = 36.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 35.0f;
+		flDamage = 36.0f;
 #endif
 	return flDamage;
 }

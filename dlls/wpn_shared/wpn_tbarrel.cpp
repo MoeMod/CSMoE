@@ -110,7 +110,7 @@ void CTbarrel::PrimaryAttack(void)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	m_iInstantShots = 1;
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(6, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
+	m_pPlayer->FireBullets(6 * m_iClip, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -119,7 +119,7 @@ void CTbarrel::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, TRUE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0527, 0.0, m_iInstantShots, 7, FALSE, FALSE);
 
 
 
@@ -132,18 +132,24 @@ void CTbarrel::PrimaryAttack(void)
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.165s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25s;
 
-	if (m_pPlayer->pev->velocity.Length2D() > 0)
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 1, 3.0, 4.0);
-	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 5.0, 6.0);
-	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 1.5, 2.0);
+	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+	{
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 7);
+	}
 	else
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 2.0, 3.0);
+	{
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 5, 5);
+	}
 }
 
 void CTbarrel::SecondaryAttack(void)
 {
+	if (m_iClip == 1)
+	{
+		PrimaryAttack();
+
+		return;
+	}
 	if (m_pPlayer->pev->waterlevel == 3)
 	{
 		PlayEmptySound();
@@ -173,7 +179,8 @@ void CTbarrel::SecondaryAttack(void)
 	m_iInstantShots = m_iClip;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets(6 * m_iClip, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage());
+	float flSpread = GetSpread();
+	m_pPlayer->FireBullets(6 * m_iClip, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(flSpread, flSpread, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetDamage());
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -182,7 +189,7 @@ void CTbarrel::SecondaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, GetSpread(), 0.0, m_iInstantShots, 6 * m_iInstantShots, m_iClip != 0, FALSE);
 	m_iClip = 0;
 
 
@@ -195,14 +202,14 @@ void CTbarrel::SecondaryAttack(void)
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.48s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.25s;
 
-	if (m_pPlayer->pev->velocity.Length2D() > 0)
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomFloat(m_pPlayer->random_seed + 1, 3.0, 4.0);
-	else if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 5.0, 6.0);
-	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 1.5, 2.0);
+	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+	{
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 7, 7);
+	}
 	else
-		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 2.0, 3.0);
+	{
+		m_pPlayer->pev->punchangle.x -= UTIL_SharedRandomLong(m_pPlayer->random_seed + 1, 5, 5);
+	}
 }
 
 void CTbarrel::Reload(void)
@@ -231,16 +238,17 @@ void CTbarrel::WeaponIdle(void)
 	
 }
 
-int CTbarrel::GetPrimaryAttackDamage() const
+int CTbarrel::GetDamage()
 {
-	int iDamage = 27;
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		iDamage = 31;
-	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		iDamage = 31;
-#endif
-	return iDamage;
+	float flDamage[4] = { 0.0, 32.0, 32.0, 36.0 };
+	return flDamage[m_iInstantShots];
+}
+
+float CTbarrel::GetSpread()
+{
+	float flSpread[4] = { 0.0, 0.0527, 0.0625, 0.085 };
+
+	return flSpread[m_iInstantShots];
 }
 
 }

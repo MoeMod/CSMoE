@@ -17,7 +17,7 @@ int Host_Main(int szArgc, const char** szArgv, const char* szGameDir, int chg, p
 int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int nShow)
 {
 	WinExec("cd /d %~dp0", SW_NORMAL);
-	WinExec("SimpleUpdater.exe /startupdate /cv \"2.4.5.9\" /url \"https://tzres.blob.core.chinacloudapi.cn/csmoe/win32/{0}\" /infofile \"update_c.xml\" /autokill /forceupdate /hideCheckUI", SW_NORMAL);
+	WinExec("SimpleUpdater.exe /startupdate /cv \"2.4.5.91\" /url \"https://tzres.blob.core.chinacloudapi.cn/csmoe/win32/{0}\" /infofile \"update_c.xml\" /autokill /forceupdate /hideCheckUI", SW_NORMAL);
 	
 	int argc;
 	LPWSTR* lpArgv = CommandLineToArgvW(GetCommandLineW(), &argc);

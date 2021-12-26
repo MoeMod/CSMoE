@@ -41,7 +41,7 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 350.0f,250.0f,300.0f,100.0f,0.6f }; }
+	KnockbackData GetKnockBackData() override { return { 550.0f,250.0f,300.0f,300.0f,0.5f }; }
 
 public:
 	void StarchaserarFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

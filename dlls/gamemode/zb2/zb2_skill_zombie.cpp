@@ -1036,18 +1036,18 @@ namespace sv {
 
 	bool CZombieSkill_ZombieTeleport::Is_Hull_Vacant(Vector Origin, int Hull)
 	{
-		/*TraceResult tr;
+		TraceResult tr;
 		UTIL_TraceHull(Origin, Origin, dont_ignore_monsters, Hull, m_pPlayer->edict(), &tr);
 
 		if (!tr.fStartSolid || !tr.fAllSolid) //if (!get_tr2(tr, TR_StartSolid) || !get_tr2(tr, TR_AllSolid)) get_tr2(tr, TR_InOpen))
 			return true;
-			*/
+			
 		return false;
 	}
 
 	void CZombieSkill_ZombieTeleport::CheckStuck()
 	{
-		/*int hull;
+		int hull;
 		hull = m_pPlayer->pev->flags & FL_DUCKING ? head_hull : human_hull;
 
 		if (!Is_Hull_Vacant(m_pPlayer->pev->origin, hull) && !(m_pPlayer->pev->solid & SOLID_NOT))
@@ -1072,7 +1072,7 @@ namespace sv {
 					break;
 				}	
 			}
-		}*/
+		}
 	}
 
 
@@ -1271,7 +1271,7 @@ namespace sv {
 				m_flTimeTriggerZombieSkill = invalid_time_point;
 				m_bHasFireTeleportEntity = 1;
 #endif
-				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", m_pPlayer->GetGunPosition(), m_pPlayer->pev->angles, m_pPlayer->edict());
+				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", m_pPlayer->GetGunPosition(), { 0,0,0 }, m_pPlayer->edict());
 
 				if (!pEnt)
 					return;
@@ -1286,7 +1286,7 @@ namespace sv {
 			}
 			else
 			{
-				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", m_pPlayer->GetGunPosition(), m_pPlayer->pev->angles, m_pPlayer->edict());
+				CTeleportEntity* pEnt = (CTeleportEntity*)CBaseEntity::Create("teleportentity", m_pPlayer->GetGunPosition(), { 0,0,0 }, m_pPlayer->edict());
 
 				if (!pEnt)
 					return;

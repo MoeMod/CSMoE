@@ -780,4 +780,28 @@ BOOL CEnergyBatteryAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_energybattery, CEnergyBatteryAmmo);
+
+void CSkullT9Ammo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CSkullT9Ammo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CSkullT9Ammo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(5, "skullt9ammo", 100) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_skullt9, CSkullT9Ammo);
 }

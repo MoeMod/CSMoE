@@ -12,4 +12,18 @@ enum ZombieZSkillType : byte
 	TYPE_ZOMBIE
 };
 
+enum ZombieZSkillSkillId : byte
+{
+	Skill_BulletDamage = 1,
+	Skill_Critical,
+	Skill_KnifeMaster,
+	Skill_DoubleJump,
+	Skill_Health,
+	Skill_BombBackpack,
+	Skill_ExplodeBullet,
+	Skill_Speed,
+	Skill_Icarus,
+	Skill_Fanatic,
+};
+
 #endif

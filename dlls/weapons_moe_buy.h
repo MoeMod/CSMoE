@@ -110,6 +110,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_nataknifed",      "Dual Nata Knife",    0, KNIFE_SLOT, UNASSIGNED},
 	{"knife_thanatos9",      "Thanatos9",    0, KNIFE_SLOT, UNASSIGNED},
 	{"weapon_y21s1jetgunmd",  "Bear Fury Mk. 3",	2000, PISTOL_SLOT, UNASSIGNED},
+	{"knife_skullt9",     "【阵风】Skull-T9",               0,    KNIFE_SLOT,          UNASSIGNED },
 
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -130,6 +131,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_m4a1x",      "M4A1 Shadow Runner",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_ak47x",      "AK47 KNIFE-BORN BEAST",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_m4a1mw",      "M4A1 S-Transformer",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
+	{ "z4b_barrettd",        "巴雷特M82A1-毁灭",                  5288, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 
 	{"weapon_ak47l",      "AK-47 60R",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_mp7a1d",      "Dual MP7A1",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED},

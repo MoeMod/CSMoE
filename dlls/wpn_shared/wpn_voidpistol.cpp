@@ -50,6 +50,9 @@ namespace sv {
 			pev->renderfx = kRenderFxNone;
 			pev->renderamt = 255.0;
 			pev->movetype = MOVETYPE_FLY; // 9
+			pev->light_level = 255.0;
+			UTIL_SetSize(pev, Vector(-0.1, -0.1, -0.1), Vector(0.1, 0.1, 0.1));
+			
 			SetThink(&CVoidpistolBlackhole::OnStart);
 			pev->nextthink = gpGlobals->time + 0.01s;
 			pev->classname = MAKE_STRING("voidpistol");
@@ -176,10 +179,26 @@ namespace sv {
 								if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
 								{
 									CBasePlayer* pPlayer;
-									Vector vecPullVelocity;
-									const float power = 8;
+									Vector vecPullVelocity, vecOrigin;
+									const float power = 800;
 									pPlayer = (CBasePlayer*)pEntity;
-									vecPullVelocity = (vecSrc - pPlayer->pev->origin) * power;
+									vecOrigin = vecSrc;
+
+									float fDis = (vecSrc - pPlayer->pev->origin).Length();
+									if (fDis > 200.0)
+									{
+										vecOrigin[0] += RANDOM_LONG(-20, 20);
+										vecOrigin[1] += RANDOM_LONG(-15, 15);
+										vecOrigin[2] += RANDOM_LONG(-10, 10);
+									}
+									else
+									{
+										vecOrigin[0] += RANDOM_LONG(-1, 1);
+										vecOrigin[1] += RANDOM_LONG(-1, 1);
+										vecOrigin[2] += RANDOM_LONG(-1, 1);
+									}
+
+									vecPullVelocity = (vecOrigin - pPlayer->pev->origin).Normalize() * power;
 									pPlayer->pev->velocity = vecPullVelocity;
 								}
 							}
@@ -194,7 +213,7 @@ namespace sv {
 									Vector vecPullVelocity;
 									const float power = 1.3;
 									pPlayer = (CBasePlayer*)pEntity;
-									vecPullVelocity = -(vecSrc - pPlayer->pev->origin) * power;
+									vecPullVelocity = -(vecSrc - pPlayer->pev->origin).Normalize() * power;
 									pPlayer->pev->velocity = vecPullVelocity;
 								}
 							}
@@ -244,7 +263,7 @@ namespace sv {
 			float flDamage = 40.0f;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 500.0f;
+				flDamage = 1500.0f;
 			//flDamage = 750.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1500.0f;
@@ -504,6 +523,18 @@ void CVoidpistol::ItemPostFrame()
 			if (pEntity->IsBSPModel())
 				continue;
 
+			TraceResult tr;
+			UTIL_TraceLine(m_pPlayer->pev->origin, pEntity->pev->origin, missile, m_pPlayer->edict(), &tr);
+
+			if (tr.flFraction < 1.0)
+			{
+				if (!tr.pHit)
+					continue;
+
+				if (tr.pHit != pEntity->edict())
+					continue;
+			}
+
 			if (pEntity->IsPlayer())
 			{
 				if(g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
@@ -715,10 +746,24 @@ void CVoidpistol::VoidpistolFireB(float flSpread, duration_t flCycleTime, BOOL f
 				if (m_iCountPlayer > 10)
 					continue;
 
+				TraceResult tr;
+				UTIL_TraceLine(m_pPlayer->pev->origin, pEntity->pev->origin, missile, m_pPlayer->edict(), &tr);
+
+				if (tr.flFraction < 1.0)
+				{
+					if (!tr.pHit)
+						continue;
+
+					if (tr.pHit != pEntity->edict())
+						continue;
+				}
+
 				if (pEntity->IsPlayer())
 				{
 					if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) == GR_TEAMMATE)
 						continue;
+
+					
 
 					Vector vecSpot = pEntity->BodyTarget(vecSrc);
 					UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(m_pPlayer->pev), &tr);
@@ -935,7 +980,7 @@ float CVoidpistol::GetDamage() const
 	float flDamage = 24.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 24.0f;
+		flDamage = 48.0f;
 		//flDamage = 225.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 390.0f;
@@ -948,10 +993,10 @@ float CVoidpistol::BlackholeDamage() const
 	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 70.0f;
+		flDamage = 140.0f;
 	//flDamage = 375.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 70.0f;
+		flDamage = 750.0f;
 	//flDamage = 750.0f;
 #endif
 	return flDamage;

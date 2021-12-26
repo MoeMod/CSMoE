@@ -135,7 +135,7 @@ void CTHOMPSON::THOMPSONFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir;
 
-	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 1, BULLET_PLAYER_45ACP, THOMPSON_DAMAGE, THOMPSON_RANGE_MODIFER, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 1, BULLET_PLAYER_45ACP, GetDamage(), THOMPSON_RANGE_MODIFER, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
 	int flags;
@@ -190,6 +190,18 @@ void CTHOMPSON::WeaponIdle(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 
 	SendWeaponAnim(THOMPSON_IDLE, UseDecrement() != FALSE);
+}
+
+
+float CTHOMPSON::GetDamage()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 47.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 47.0f;
+#endif
+	return 30.0f;
 }
 
 }

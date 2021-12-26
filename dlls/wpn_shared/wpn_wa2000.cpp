@@ -225,9 +225,9 @@ float CWA2000::GetDamage() const
 	float flDamage = 109.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 145.0f;
+		flDamage = 238.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 109.0f;
+		flDamage = 410.0f;
 #endif
 	return flDamage;
 }

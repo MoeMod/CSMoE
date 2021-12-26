@@ -45,6 +45,7 @@ class CPlayerModStrategy_ZBZ : public CPlayerModStrategy_ZB3
 public:
 	CPlayerModStrategy_ZBZ(CBasePlayer *player, CMod_ZombieZ *mp);
 
+	bool ClientCommand(const char* pcmd) override;
 	void OnSpawn() override;
 	void BecomeHuman() override;
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
@@ -61,14 +62,22 @@ public:
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);
 
 protected:
+	void UpdatePlayerEvolutionHUD() override;
+
+protected:
 	EventListener m_eventTakeDamageListener;
 	EventListener m_eventTraceAttackListener;
+
+public:
+	bool CheckSkill(ZombieZSkillSkillId id) const { return m_setSkillID.find(id) != m_setSkillID.end(); }
+
 private:
 	CMod_ZombieZ* const m_pModZBZ;
 	
 	unsigned int m_iLevel;
 	unsigned int m_iExp;
 	unsigned int m_iPoint;
+	time_point_t m_flSkillDelay;
 	float m_flTakeDamage;
 	float m_flSufferDamage;
 	void AddExp(int exp);

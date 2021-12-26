@@ -32,7 +32,8 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	bool HasSecondaryAttack() override { return true; }
-	int GetPrimaryAttackDamage() const;
+	int GetDamage();
+	float GetSpread();
 	void Reload() override;
 	void WeaponIdle() override;
 	BOOL UseDecrement() override {

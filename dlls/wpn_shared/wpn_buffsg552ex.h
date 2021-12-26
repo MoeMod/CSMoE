@@ -52,6 +52,7 @@ public:
 	void RadiusDamage(Vector vecAiming, float flDamage);
 	Vector Get_ShootPosition(CBaseEntity* pevAttacker, Vector vecSrc, Vector vecDir);
 	float GetDamage();
+	float GetDamageB();
 	float SlashDamage();
 
 	int m_iShell;

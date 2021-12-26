@@ -413,10 +413,11 @@ void CMod_Zombi::PickZombieOrigin()
 	// pick them
 	for (size_t i = 0; i < iNumZombies; ++i)
 	{
+		players[i]->m_ZombieClass = "random";
+		players[i]->pev->sequence = 0;
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
-		players[i]->pev->sequence = 0;
 	}
 
 	// sound effect

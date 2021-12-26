@@ -65,6 +65,9 @@ public: // CHalfLifeMultiplay
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	enum CCSBotManager::GameScenarioType OverrideGameScenario(enum CCSBotManager::GameScenarioType type) override;
 
+	BOOL TeamFull(int team_id) override { return FALSE; }
+	BOOL TeamStacked(int newTeam_id, int curTeam_id) override  { return FALSE; }
+
 public: // IBaseMod
 	DamageTrack_e DamageTrack() override { return DT_ZB; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;

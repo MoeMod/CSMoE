@@ -245,32 +245,157 @@ namespace sv {
 		unsigned int m_uFiredTimes;
 	};
 
+	class ZSkill_Speed : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Speed(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "猎豹"; }
+		const char* GetDesc() const override { return "增加移动速度。"; } // （5+2*回合数）
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnResetMaxSpeed() override {
+			m_pPlayer->pev->maxspeed += GetBonus();
+		}
+		void OnGetSkill() override {
+			m_pPlayer->ResetMaxSpeed();
+		}
+	private:
+		float GetBonus() const { return min(5.0f + 2.0f * g_pGameRules->m_iTotalRoundsPlayed, 300.0f); }
+	};
+
+	class ZSkill_Icarus : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Icarus(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "伊卡洛斯"; }
+		const char* GetDesc() const override { return "持续按下跳跃键，短时间内可以滑翔。跳跃过程中碰撞到其他物体时无法启动。"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) override {
+
+			if (bitsCurButton & ~bitsOldButton & IN_JUMP)
+			{
+				m_sSkillStatus = 0;
+			}
+
+			if (~bitsCurButton & IN_JUMP)
+				return;
+
+			if (m_pPlayer->pev->flags & FL_ONGROUND)
+			{
+				if (m_sSkillStatus <= 1)
+				{
+					m_sSkillStatus = 0;
+					m_flAirTime = invalid_time_point;
+				}
+				return;
+			}
+
+			if (!m_sSkillStatus && m_flAirTime == invalid_time_point)
+			{
+				m_sSkillStatus = 1;
+				m_flAirTime = gpGlobals->time;
+			}
+
+			if (m_sSkillStatus != 1 || m_flCooldown > gpGlobals->time)
+				return;
+
+			if (m_flAirTime + 0.5s <= gpGlobals->time)
+			{
+				Vector vecFwd, vecRight, vecUp;
+				Vector vecAngles;
+				vecAngles = m_pPlayer->pev->v_angle;
+				vecAngles[0] = 0.0f;
+				UTIL_MakeVectorsPrivate(vecAngles, vecFwd, vecRight, vecUp);
+				Vector vecOrigin = m_pPlayer->GetGunPosition() + (vecFwd * 200) + vecRight + (vecUp * 100);
+				float speed = 300.0f;
+				Vector vecVelocity = vecOrigin - m_pPlayer->pev->origin;
+				float num = sqrtf(speed * speed / (vecVelocity.x * vecVelocity.x + vecVelocity.y * vecVelocity.y + vecVelocity.z * vecVelocity.z));
+				vecVelocity.x *= (num * 2.0);
+				vecVelocity.y *= (num * 2.0);
+				vecVelocity.z *= (num / 2.0);
+				m_pPlayer->pev->velocity = vecVelocity;
+				m_sSkillStatus = 2;
+				m_flCooldown = gpGlobals->time + 2s;
+			}
+		}
+
+		void OnGetSkill() override {
+			m_sSkillStatus = 0;
+			m_flAirTime = invalid_time_point;
+		}
+
+	private:
+		short m_sSkillStatus;
+		time_point_t m_flAirTime;
+		time_point_t m_flCooldown;
+	};
+
+	class ZSkill_Fanatic : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Fanatic(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "狂热"; }
+		const char* GetDesc() const override { return "通过战斗与合作变得更加强大。如果是人类，将激活士气系统。如果是僵尸，将激活怒气系统"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+	};
 
 	template<class T>
-	std::shared_ptr<CZombieZSkill_Base> MakeHumanSkill(CBasePlayer* player)
+	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
 		return std::make_shared<T>(player);
 	}
-	const std::map<byte, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> g_SkillList = {
-		{1, MakeHumanSkill<ZSkill_BulletDamage>},
-		{2, MakeHumanSkill<ZSkill_Critical>},
-		{3, MakeHumanSkill<ZSkill_KnifeMaster>},
-		{4, MakeHumanSkill<ZSkill_DoubleJump>},
-		{5, MakeHumanSkill<ZSkill_Health>},
-		{6, MakeHumanSkill<ZSkill_BombBackpack>},
-		{7, MakeHumanSkill<ZSkill_ExplodeBullet>},
+	const std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> g_SkillList[] = {
+		{ Skill_BulletDamage, 100, MakeSkill<ZSkill_BulletDamage> },
+		{ Skill_Critical, 100, MakeSkill<ZSkill_Critical> },
+		{ Skill_KnifeMaster, 100, MakeSkill<ZSkill_KnifeMaster> },
+		{ Skill_DoubleJump, 100, MakeSkill<ZSkill_DoubleJump> },
+		{ Skill_Health, 100, MakeSkill<ZSkill_Health> },
+		{ Skill_BombBackpack, 100, MakeSkill<ZSkill_BombBackpack> },
+		{ Skill_ExplodeBullet, 100, MakeSkill<ZSkill_ExplodeBullet> },
+		{ Skill_Speed, 100, MakeSkill<ZSkill_Speed> },
+		{ Skill_Icarus, 100, MakeSkill<ZSkill_Icarus> },
+		{ Skill_Fanatic, 100, MakeSkill<ZSkill_Fanatic> },
+		// Heroic Presence 英雄出现
+		//{ 10, 100, MakeSkill<ZSkill_Icarus> }, // 合金利爪
+		//{ 11, 100, MakeSkill<ZSkill_Icarus> }, // 钢铁防御
+		// 坚持不懈 受到伤害时低概率忽略定身和击退。但伤害不会减轻
+		// 接触感染 即使不攻击只要身体接触就可以感染。
+		// 爆弹兽颅 受到伤害后生成爆弹兽颅。
+		// 兽颅强化 增加爆弹兽颅的攻击力和击退效果。
+		// 复活 获得复活能力。病毒被驱散后，致命击杀死亡时依旧不能复活。
 	};
 
-	std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> HumanSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet)
+	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;
+
+	template <size_t ...N>
+	constexpr std::array<std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)>, NUM_SKILLS> MakeSkillList(std::index_sequence<N...>) {
+		return { g_SkillList[N]... };
+	}
+	template <size_t ...N>
+	constexpr std::array<unsigned int, NUM_SKILLS> MakeSkillWeightList(std::index_sequence<N...>) {
+		return { std::get<1>(g_SkillList[N])... };
+	}
+	auto SKILL_LIST = MakeSkillList(std::make_index_sequence<NUM_SKILLS>{});
+
+	std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> ZSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet)
 	{
-		std::vector<std::pair<byte, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)>> list{ g_SkillList.begin(), g_SkillList.end() };
-		list.erase(std::remove_if(list.begin(), list.end(), [&](std::pair<byte, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> skillLs) { return skillIDSet.find(skillLs.first) != skillIDSet.end(); }), list.end());
-		auto size = list.size();
+		std::vector<std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)>> list{ SKILL_LIST.begin(), SKILL_LIST.end() };
+		list.erase(std::remove_if(list.begin(), list.end(), [&](std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> skill) { return skillIDSet.find(std::get<0>(skill)) != skillIDSet.end(); }), list.end());
+
+		size_t size = list.size();
 		if (!size)
 			return {};
 
+		std::vector<unsigned int> weight;
+		for (size_t i = 0; i < size; i++)
+		{
+			weight.push_back(std::get<1>(list[i]));
+		}
+
 		std::random_device rd;
-		const std::size_t N = std::uniform_int_distribution<size_t>(0, list.size() - 1)(rd);
-		return { list[N].first, list[N].second(player) };
+		std::mt19937 gen(rd());
+		const std::size_t N = std::discrete_distribution<>(weight.begin(), weight.end())(gen);
+		return { std::get<0>(list[N]), std::get<2>(list[N])(player) };
 	}
 };

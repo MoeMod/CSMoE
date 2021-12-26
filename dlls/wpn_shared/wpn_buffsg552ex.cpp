@@ -140,11 +140,22 @@ float CBuffsg552ex::GetDamage()
 {
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZBS)
-		return 51.0f;
+		return 423.0f;
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		return 36.0f;
+		return 120.0f;
 #endif
-	return 36.0f;
+	return 28.0f;
+}
+
+float CBuffsg552ex::GetDamageB()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 396.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 100.0f;
+#endif
+	return 24.0f;
 }
 
 
@@ -154,7 +165,7 @@ float CBuffsg552ex::SlashDamage()
 	if (g_pModRunning->DamageTrack() == DT_ZBS)
 		return 300.0f;
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		return 200.0f;
+		return 686.0f;
 #endif
 	return 51.0f;
 }
@@ -272,7 +283,7 @@ void CBuffsg552ex::Buffsg552exFireB(float flSpread, duration_t flCycleTime, BOOL
 
 #ifndef CLIENT_DLL
 	int iEffect = 2;
-	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamage(), 0.955, m_pPlayer->pev, FALSE, iEffect, m_pPlayer->random_seed, m_pPlayer);
+	Vector vecDir = m_pPlayer->FireBullets4(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamageB(), 0.955, m_pPlayer->pev, FALSE, iEffect, m_pPlayer->random_seed, m_pPlayer);
 	if (!iEffect)
 	{
 		CBaseEntity* pevAttacker = this->m_pPlayer;
@@ -415,7 +426,7 @@ float CBuffsg552ex::GetMaxSpeed(void)
 	if (m_pPlayer->m_iFOV == 90)
 		return 235;
 
-	return 200;
+	return 210;
 }
 
 

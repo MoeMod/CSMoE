@@ -123,6 +123,8 @@ int CHudDgaxe::VidInit()
 	R_InitTexture(m_pCurTexture[4], "sprites/huntbow_aim_default2.tga");	//left
 	R_InitTexture(m_pCurTexture[5], "sprites/huntbow_aim_default3.tga");	//right
 	R_InitTexture(m_pCurTexture[6], "sprites/huntbow_aim_charging.tga");
+	R_InitTexture(m_pCurTexture[7], "sprites/skullt9_aim_off.tga");
+	R_InitTexture(m_pCurTexture[8], "sprites/skullt9_aim_on.tga");
 	return 1;
 }
 
@@ -209,9 +211,11 @@ int CHudDgaxe::Draw(float flTime)
 		case SKULLT9_AIM_OFF:
 		case SKULLT9_AIM_ON:
 		{
-			wide = 200;
-			height = 200; break;
+			wide = 92;
+			height = 92;
+			break;
 		}
+		case AIM_NO:return 1;
 		}
 
 		float x = ScreenWidth / 2;
@@ -225,14 +229,14 @@ int CHudDgaxe::Draw(float flTime)
 
 		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-		if (iType != 3)
-			m_pCurTexture[iType]->Bind();
+	
+
+		m_pCurTexture[iType-4]->Bind();
 
 		switch (iType)
 		{
 		case SKULLT9_AIM_OFF:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
 		case SKULLT9_AIM_ON:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
-		case AIM_NO: return 1; break;
 		default:
 			break;
 		}

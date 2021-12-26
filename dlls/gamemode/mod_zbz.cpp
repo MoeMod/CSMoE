@@ -30,6 +30,8 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
+// #define __DEBUG
+
 #define SKILL_FUNCTION(skillSet, func, ...) { \
 	for (auto &skill : skillSet) { \
 		skill->func(__VA_ARGS__); \
@@ -56,6 +58,28 @@ namespace sv {
 {
 	
 }
+	
+void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()
+{
+	CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD();
+	/*if (CheckSkill(Skill_Fanatic))
+	{
+	}*/
+}
+
+bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
+{
+
+#ifdef __DEBUG
+	if (!Q_stricmp(pcmd, "zskill"))
+	{
+		m_iPoint = 99;
+		return true;
+	}
+#endif
+
+	return CPlayerModStrategy_ZB3::ClientCommand(pcmd);
+}
 
 void CPlayerModStrategy_ZBZ::OnSpawn()
 {
@@ -78,12 +102,27 @@ void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 void CPlayerModStrategy_ZBZ::Event_OnInfection(CBasePlayer * victim, CBasePlayer * attacker)
 {
 	SKILL_FUNCTION(m_vecSkill, OnInfection, victim, attacker);
-	return CPlayerModStrategy_ZB3::Event_OnInfection(victim, attacker);
+
+	if (CheckSkill(Skill_Fanatic))
+	{
+		CPlayerModStrategy_ZB3::Event_OnInfection(victim, attacker);
+	}
+	else
+	{
+		CPlayerModStrategy_ZB2::Event_OnInfection(victim, attacker);
+	}
 }
 
 float CPlayerModStrategy_ZBZ::AdjustDamageTaken(entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
 {
-	flDamage = CPlayerModStrategy_ZB3::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	if (CheckSkill(Skill_Fanatic))
+	{
+		flDamage = CPlayerModStrategy_ZB3::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	}
+	else
+	{
+		flDamage = CPlayerModStrategy_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	}
 
 	for (auto& skill : m_vecSkill)
 	{
@@ -178,20 +217,27 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 	auto& bitsCurButton = cmd->buttons;
 	auto& bitsOldButton = m_pPlayer->pev->oldbuttons;
 
-	if (bitsCurButton & ~bitsOldButton & IN_USE)
+	if (m_flSkillDelay != invalid_time_point && m_flSkillDelay <= gpGlobals->time)
 	{
-		if (m_iPoint <= 0)
-			return;
+		m_flSkillDelay = invalid_time_point;
+		if (m_pPlayer->IsAlive() && m_pPlayer->m_pActiveItem)
+		{
+			m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
+		}
+	}
 
-		auto data = HumanSkillFactory(m_pPlayer, m_setSkillID);
-		if (data.second == nullptr)
-			return;
-
-		m_iPoint--;
-		m_setSkillID.insert(data.first);
-		m_vecSkill.insert(data.second);
-		ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
-		data.second->OnGetSkill();
+	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0)
+	{
+		auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+		if (data.second != nullptr)
+		{
+			m_flSkillDelay = gpGlobals->time + 1.4s;
+			m_iPoint--;
+			m_setSkillID.insert(data.first);
+			m_vecSkill.insert(data.second);
+			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
+			data.second->OnGetSkill();
+		}
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnButtonEvent, bitsCurButton, bitsOldButton);
@@ -200,6 +246,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 void CPlayerModStrategy_ZBZ::OnResetMaxSpeed() {
 	CPlayerModStrategy_ZB3::OnResetMaxSpeed();
+	SKILL_FUNCTION(m_vecSkill, OnResetMaxSpeed);
 }
 
 CMod_ZombieZ::CMod_ZombieZ()
@@ -245,12 +292,11 @@ float CMod_ZombieZ::GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevI
 
 HitBoxGroup CMod_ZombieZ::GetAdjustedTraceAttackHitgroup(CBaseEntity* victim, entvars_t* pevAttacker, float flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType)
 {
-	HitBoxGroup hbg = CMod_ZombieMod2::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
-
 	CBasePlayer* pVictim = dynamic_ent_cast<CBasePlayer*>(victim);
 	CBasePlayer* pAttacker = dynamic_ent_cast<CBasePlayer*>(pevAttacker);
 	m_eventTraceAttack.dispatch(pVictim, pAttacker, flDamage, vecDir, ptr, bitsDamageType);
-	hbg = static_cast<HitBoxGroup>(ptr->iHitgroup);
+	HitBoxGroup hbg = static_cast<HitBoxGroup>(ptr->iHitgroup);
+	hbg = CMod_ZombieMod2::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 	return hbg;
 }
 

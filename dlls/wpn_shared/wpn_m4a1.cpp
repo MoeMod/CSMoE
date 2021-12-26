@@ -179,11 +179,11 @@ void CM4A1::M4A1Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 	{
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 33, 0.95, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamageA(), 0.95, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	}
 	else
 	{
-		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 32, 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, GetDamageB(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 	}
 
@@ -273,5 +273,27 @@ void CM4A1::Inspect()
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
 		}
 	}
+}
+
+float CM4A1::GetDamageA()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 71.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 53.0f;
+#endif
+	return 32.0f;
+}
+
+float CM4A1::GetDamageB()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 72.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 54.0f;
+#endif
+	return 33.0f;
 }
 }

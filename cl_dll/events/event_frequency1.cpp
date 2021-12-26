@@ -41,9 +41,12 @@ enum frequency1_e
 	ANIM_SHOOT_SP2,
 	ANIM_HIGHNOON_START,
 	ANIM_HIGHNOON_LOOP,
-	ANIM_HIGHNOON_END_EMPTY,
-	ANIM_HIGHNOON_END_KILL,
-	ANIM_HIGHNOON_SHOOT,
+	ANIM_HIGHNOON_END,
+	ANIM_HIGHNOON_STARTSHOOT,
+	ANIM_HIGHNOON_SHOOT1,
+	ANIM_HIGHNOON_SHOOT2,
+	ANIM_HIGHNOON_SHOOT3,
+	ANIM_FIGHT,
 	ANIM_FLASHBANG,
 	ANIM_DASH,
 };
@@ -70,31 +73,15 @@ void EV_FireFrequency1( event_args_t *args )
 	);
 	Vector forward, right, up;
 	AngleVectors( angles, forward, right, up );
+	cl_entity_t* ent;
 
 	if ( EV_IsLocal( idx ) )
 	{
-		if (args->bparam2)		//PrimaryAttack
+		if (args->bparam1)	//highnoon
 		{
 			++g_iShotsFired;
 			EV_MuzzleFlash();
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
-
-			PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
-
-			if (!gHUD.cl_righthand->value)
-			{
-				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, -16.0, 0);
-			}
-			else
-			{
-				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
-			}
-		}
-		else
-		{
-			++g_iShotsFired;
-			EV_MuzzleFlash();
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT_SP1, ANIM_SHOOT_SP2), 2);
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_HIGHNOON_SHOOT1, ANIM_HIGHNOON_SHOOT3), 2);
 
 			PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
 
@@ -107,6 +94,45 @@ void EV_FireFrequency1( event_args_t *args )
 				EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
 			}
 		}
+		else
+		{
+			if (args->bparam2)		//PrimaryAttack
+			{
+				++g_iShotsFired;
+				EV_MuzzleFlash();
+				gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
+
+				PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
+
+				if (!gHUD.cl_righthand->value)
+				{
+					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, -16.0, 0);
+				}
+				else
+				{
+					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
+				}
+			}
+			else
+			{
+				++g_iShotsFired;
+				EV_MuzzleFlash();
+				gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT_SP1, ANIM_SHOOT_SP2), 2);
+
+				PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
+
+				if (!gHUD.cl_righthand->value)
+				{
+					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, -16.0, 0);
+				}
+				else
+				{
+					EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 35.0, -11.0, 16.0, 0);
+				}
+			}
+		}
+		ent = gEngfuncs.GetViewModel();
+		ShellOrigin = ent->attachment[1];
 	}
 	else
 	{
@@ -124,11 +150,14 @@ void EV_FireFrequency1( event_args_t *args )
 		vSpread, 8192.0, BULLET_PLAYER_50AE,
 		2 );
 
-	const Vector vecDirShooting = (forward + right * vSpread.x + up * vSpread.y).Normalize();
-	Vector vecEnd = vecSrc + vecDirShooting * 2048;
+	if (!args->bparam1)
+	{
+		const Vector vecDirShooting = (forward + right * vSpread.x + up * vSpread.y).Normalize();
+		Vector vecEnd = vecSrc + vecDirShooting * 2048;
 
-	int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/laserbeam.spr");
-	gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.7f, 4.0f, 0.0f, 40.0f, 23.3f, 0.0f, 0.1f, 75, 150, 150);
+		int iBeamModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/laserbeam.spr");
+		gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc, vecEnd, iBeamModelIndex, 0.7f, 4.0f, 0.0f, 40.0f, 23.3f, 0.0f, 0.1f, 75, 150, 150);
+	}
 }
 
 }

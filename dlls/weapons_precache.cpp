@@ -66,8 +66,10 @@ void PrecacheOtherWeapon()
 
 void W_Precache()
 {
-	Q_memset(CBasePlayerItem::ItemInfoArray, 0, ARRAYSIZE(CBasePlayerItem::ItemInfoArray));
-	Q_memset(CBasePlayerItem::AmmoInfoArray, 0, ARRAYSIZE(CBasePlayerItem::AmmoInfoArray));
+	Q_memset(CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray));
+	Q_memset(CBasePlayerItem::AmmoInfoArray, 0, sizeof(CBasePlayerItem::AmmoInfoArray));
+	/*Q_memset(CBasePlayerItem::ItemInfoArray, 0, ARRAYSIZE(CBasePlayerItem::ItemInfoArray));
+	Q_memset(CBasePlayerItem::AmmoInfoArray, 0, ARRAYSIZE(CBasePlayerItem::AmmoInfoArray));*/
 	giAmmoIndex = 0;
 
 	// custom items...
@@ -261,6 +263,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_y21s1jetgunmd");
 	UTIL_PrecacheOther("ammo_energycells");
 	UTIL_PrecacheOther("ammo_energybattery");
+	UTIL_PrecacheOtherWeapon("knife_skullt9");
+	UTIL_PrecacheOther("ammo_skullt9");
+	UTIL_PrecacheOtherWeapon("z4b_barrettd");
 	
 	
 

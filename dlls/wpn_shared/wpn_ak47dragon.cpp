@@ -204,9 +204,9 @@ float CAK47Dragon::GetDamage() const
 	float flDamage = 36.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 42.0f;
+		flDamage = 52.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 42.0f;
+		flDamage = 73.0f;
 #endif
 	return flDamage;
 }

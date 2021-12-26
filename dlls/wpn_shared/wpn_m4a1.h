@@ -47,6 +47,8 @@ public:
 	duration_t GetInspectTime() override { return M4A1_INSPECT_TIME; }
 	void Reload() override;
 	void WeaponIdle() override;
+	float GetDamageA();
+	float GetDamageB();
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

@@ -48,6 +48,8 @@ public:
 	void Reload() override;
 	const char* GetCSModelName() override { return "models/w_m4a1dragon.mdl"; }
 	void WeaponIdle() override;
+	float GetDamageA();
+	float GetDamageB();
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
 		return TRUE;

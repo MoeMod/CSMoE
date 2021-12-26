@@ -45,6 +45,7 @@ public:
 	virtual void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) = 0;
 	virtual void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) = 0;
 	virtual void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) = 0;
+	virtual void OnResetMaxSpeed() = 0;
 
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
@@ -72,6 +73,7 @@ public:
 	void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) override {}
 	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) override {}
 	void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override {}
+	void OnResetMaxSpeed() override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)
@@ -83,7 +85,7 @@ public:
 };
 
 void Skill_Precache();
-std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> HumanSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet);
+std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> ZSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet);
 }
 
 #endif

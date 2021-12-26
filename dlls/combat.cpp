@@ -1190,6 +1190,12 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 			if (!bDamageSelf && pEntity->pev == pevAttacker)
 				continue;
 
+			if (ExtraKnockBack == 3)
+			{
+				if ((pEntity->pev->origin - vecSrc).z < -50.0)
+					continue;
+			}
+
 			if (pEntity->IsPlayer())
 			{
 				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
@@ -1264,7 +1270,7 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
 										break;
 									else
-										AddKickRate(target, pAttacker->pev->origin, 1200, 400);
+										AddKickRate(target, pAttacker->pev->origin, 1000, 400);
 								}								
 								break;
 							}
@@ -1275,7 +1281,7 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
 										break;
 									else
-										AddKickRate(target, vecSrc, 3000, 220);
+										AddKickRate(target, vecSrc, 2400, 220);
 								}
 								break;
 							}

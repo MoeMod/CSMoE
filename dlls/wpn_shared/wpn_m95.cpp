@@ -108,15 +108,15 @@ void CM95::SecondaryAttack(void)
 void CM95::PrimaryAttack(void)
 {
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		M95Fire(1.0, 1.5s, FALSE);
+		M95Fire(1.0, 2.0s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 120)
-		M95Fire(0.3, 1.5s, FALSE);
+		M95Fire(0.3, 2.0s, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 10)
-		M95Fire(0.1, 1.5s, FALSE);
+		M95Fire(0.1, 2.0s, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		M95Fire(0.0, 1.5s, FALSE);
+		M95Fire(0.0, 2.0s, FALSE);
 	else
-		M95Fire(0.002, 1.5s, FALSE);
+		M95Fire(0.002, 2.0s, FALSE);
 }
 
 void CM95::M95Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -212,7 +212,7 @@ float CM95::GetMaxSpeed(void)
 
 float CM95::GetDamage() const
 {
-	float flDamage = 120.0f;
+	float flDamage = 115.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 		flDamage = 399.0f;

@@ -123,7 +123,7 @@ void CM14EBR::M14EBRFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAi
 #endif
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, 46, 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, GetDamage(), 0.98, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -180,6 +180,17 @@ void CM14EBR::WeaponIdle(void)
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	SendWeaponAnim(M14EBR_IDLE1, UseDecrement() != FALSE);
+}
+
+float CM14EBR::GetDamage()
+{
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZBS)
+		return 64.0f;
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		return 64.0f;
+#endif
+	return 46.0f;
 }
 
 }

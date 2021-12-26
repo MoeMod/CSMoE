@@ -61,10 +61,7 @@ void EV_FireTbarrel(event_args_s *args)
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		if(args->bparam2)
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_FIRE2, 2);
-		else
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_FIRE1, 2);
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(args->iparam1 == 4 ? ANIM_FIRE2 : ANIM_FIRE1, 2);
 		if( !gHUD.cl_righthand->value )
 		{
 			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 22.0, -9.0, -11.0, 0);
@@ -87,11 +84,11 @@ void EV_FireTbarrel(event_args_s *args)
 	VectorCopy( forward, vecAiming );
 	Vector vSpread;
 	
-	vSpread.x = 0.0725;
-	vSpread.y = 0.0725;
+	vSpread.x = args->fparam1;
+	vSpread.y = args->fparam1;
 	EV_HLDM_FireBullets( idx,
 		forward, right,	up,
-		6, vecSrc, vecAiming,
+		args->iparam2, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_BUCKSHOT,
 		1 );
 }

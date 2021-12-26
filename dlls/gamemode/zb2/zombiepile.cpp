@@ -191,6 +191,10 @@ void EXPORT CZombiePile::OnThink()
 int CZombiePile::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 	auto pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+
+	if (!pAttack)
+		return 0;
+
 	if (pAttack->IsPlayer() && !pAttack->m_bIsZombie)
 	{
 		flDamage *= 0.1f;
