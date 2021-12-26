@@ -3050,8 +3050,8 @@ model_t *Mod_LoadModel( model_t *mod, qboolean crash )
 	switch( LittleLong(*(uint *)buf) )
 	{
 	case IDSTUDIOHEADER:
-		Mod_DecryptModel(mod, buf);
-		Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod, buf), &loaded );
+		Mod_DecryptModel(mod->name, buf);
+		Mod_LoadStudioModel( mod, Mod_LoadExtendSeq(mod->name, buf), &loaded );
 		break;
 	case IDSPRITEHEADER:
 		Mod_LoadSpriteModel( mod, buf, &loaded, 0 );

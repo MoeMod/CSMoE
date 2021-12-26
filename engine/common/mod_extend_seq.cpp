@@ -41,7 +41,7 @@ file_t* g_hSequencePack[MAX_SEQUENCEPACKS];
 fs_offset_t g_nSequenceSize[MAX_SEQUENCEPACKS];
 int g_iSequenceNums = 0;
 
-extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
+byte *Mod_LoadExtendSeq(const char *mod_name, byte *buffer)
 {
 	// flip to native endian
 #ifdef XASH_BIG_ENDIAN
@@ -50,7 +50,7 @@ extern "C" byte *Mod_LoadExtendSeq(model_t *mod, byte *buffer)
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);
 
 	char newname[PATH_MAX];
-	strcpy(newname, mod->name);
+	strcpy(newname, mod_name);
 	newname[strlen(newname) - 4] = 0;
 
 	for (int i = 0; i < MAX_SEQUENCEPACKS; i++)

@@ -290,7 +290,7 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height, &bytes_per_pixel);
+	io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height, &bytes_per_pixel);
 
 	// Upload texture to graphics system
 	//GLint last_texture;
@@ -306,13 +306,13 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	r_image.width = width;
 	r_image.height = height;
 	r_image.depth = bytes_per_pixel;
-	r_image.type = PF_RGBA_32;
+	r_image.type = PF_A_8;
 	r_image.size = r_image.width * r_image.height * r_image.depth;
-	r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
+	r_image.flags = IMAGE_HAS_ALPHA;
 	r_image.buffer = (byte *)pixels;
 
 	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	auto i = GL_LoadTextureInternal( "*imgui_font", &r_image, (texFlags_t)TF_IMAGE, false );
+	auto i = GL_LoadTextureInternal( "*imgui_font", &r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
 	g_FontTexture = i;
 	//GL_Bind(XASH_TEXTURE0, i);
 	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -321,6 +321,9 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 
 	// Store our identifier
 	io.Fonts->TexID = (void *)(ptrdiff_t)g_FontTexture;
+
+	// free memory
+	io.Fonts->ClearTexData();
 
 	// Restore state
 	//pglBindTexture(GL_TEXTURE_2D, last_texture);

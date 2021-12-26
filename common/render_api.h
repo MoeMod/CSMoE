@@ -128,6 +128,7 @@ typedef enum
 	TF_FLOAT		= (1<<26),	// float textures
 	TF_NOCOMPARE	= (1<<27),	// disable comparing for depth textures
 	TF_FLOATDATA	= (1<<28),
+	TF_FONT_ALPHA	= (1<<29),
 } texFlags_e;
 typedef int texFlags_t;
 
