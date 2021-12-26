@@ -20,6 +20,15 @@ GNU General Public License for more details.
 #include "gl_local.h"
 #include "studio.h"
 
+#include <string>
+#include <list>
+#include <map>
+#include <variant>
+#include <optional>
+#include <memory>
+#include "mod_decryptor.h"
+#include "mod_extend_seq.h"
+
 #define TEXTURES_HASH_SIZE	64
 
 static int	r_textureMinFilter = GL_LINEAR_MIPMAP_LINEAR;
@@ -753,6 +762,10 @@ static GLenum GL_TextureFormat( gltexture_t *tex, int *samples )
 			}
 			break;
 		}
+	}
+	else if( tex->flags & TF_FONT_ALPHA )
+	{
+		format = GL_ALPHA;
 	}
 	else if( compress )
 	{
@@ -1734,6 +1747,403 @@ int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, 
 	}
 
 	return (tex - r_textures);
+}
+
+namespace xe {
+	struct texlru_src_external_s {
+		std::string path;
+	};
+	struct texlru_src_internal_s {
+		std::string texture_name;
+		std::string model_name;
+		mstudiotexture_t texture;
+		size_t size;
+	};
+	struct texlru_extdata_s {
+		GLuint texnum;
+		imgfilter_t *filter;
+		std::variant<texlru_src_external_s, texlru_src_internal_s> src;
+	};
+	static std::optional<texlru_extdata_s>	r_texlru[MAX_TEXTURES];
+
+	int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
+	{
+		gltexture_t	*tex;
+		uint		i, hash;
+		uint		picFlags = 0;
+
+		if( !name || !name[0] || !glw_state.initialized )
+			return 0;
+
+		if( Q_strlen( name ) >= sizeof( r_textures[0].name ))
+		{
+			MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
+			return 0;
+		}
+
+		// see if already loaded
+		hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
+
+		for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+		{
+			if( !Q_stricmp( tex->name, name ))
+			{
+				// prolonge registration
+				tex->cacheframe = world.load_sequence;
+				if (tex->name[0] != '*')
+					tex->refCount++;
+
+				return (tex - r_textures);
+			}
+		}
+
+		if( flags & TF_NOFLIP_TGA )
+			picFlags |= IL_DONTFLIP_TGA;
+
+		if( flags & TF_KEEP_8BIT )
+			picFlags |= IL_KEEP_8BIT;
+
+		// set some image flags
+		Image_SetForceFlags( picFlags );
+
+		// HACKHACK: get rid of black vertical line on a 'BlackMesa map'
+		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
+			flags |= TF_NEAREST;
+
+		// find a free texture slot
+		if( r_numTextures == MAX_TEXTURES )
+			Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
+
+		// find a free texture_t slot
+		for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
+			if( !tex->name[0] ) break;
+
+		if( i == r_numTextures )
+		{
+			if( r_numTextures == MAX_TEXTURES )
+				Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
+			r_numTextures++;
+		}
+
+		tex = &r_textures[i];
+		Q_strncpy( tex->name, name, sizeof( tex->name ));
+		tex->flags = (texFlags_t)flags;
+
+		// init reference exclude brush model's texture
+		if (tex->name[0] != '*')
+			tex->refCount = 1;
+
+		if( flags & TF_SKYSIDE )
+			tex->texnum = tr.skyboxbasenum++;
+		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+
+		// add to hash table
+		hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
+		tex->nextHash = r_texturesHashTable[hash];
+		r_texturesHashTable[hash] = tex;
+
+		// add to lru
+		texlru_extdata_s extdata { i, filter, texlru_src_external_s{ name } };
+		r_texlru[i].emplace(std::move(extdata));
+
+		// NOTE: always return texnum as index in array or engine will stop work !!!
+		return i;
+	}
+
+	int TexLru_LoadTextureInternal(const char *name, const char *model_name, mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
+	{
+		gltexture_t	*tex;
+		uint		i, hash;
+		uint		picFlags = 0;
+
+		if( !name || !name[0] || !glw_state.initialized )
+			return 0;
+
+		if( Q_strlen( name ) >= sizeof( r_textures[0].name ))
+		{
+			MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
+			return 0;
+		}
+
+		// see if already loaded
+		hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
+
+		for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+		{
+			if( !Q_stricmp( tex->name, name ))
+			{
+				// prolonge registration
+				tex->cacheframe = world.load_sequence;
+				if (tex->name[0] != '*')
+					tex->refCount++;
+
+				return (tex - r_textures);
+			}
+		}
+
+		if( flags & TF_NOFLIP_TGA )
+			picFlags |= IL_DONTFLIP_TGA;
+
+		if( flags & TF_KEEP_8BIT )
+			picFlags |= IL_KEEP_8BIT;
+
+		// set some image flags
+		Image_SetForceFlags( picFlags );
+
+		// HACKHACK: get rid of black vertical line on a 'BlackMesa map'
+		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
+			flags |= TF_NEAREST;
+
+		// find a free texture slot
+		if( r_numTextures == MAX_TEXTURES )
+			Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
+
+		// find a free texture_t slot
+		for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
+			if( !tex->name[0] ) break;
+
+		if( i == r_numTextures )
+		{
+			if( r_numTextures == MAX_TEXTURES )
+				Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
+			r_numTextures++;
+		}
+
+		tex = &r_textures[i];
+		Q_strncpy( tex->name, name, sizeof( tex->name ));
+		tex->flags = (texFlags_t)flags;
+
+		// init reference exclude brush model's texture
+		if (tex->name[0] != '*')
+			tex->refCount = 1;
+
+		if( flags & TF_SKYSIDE )
+			tex->texnum = tr.skyboxbasenum++;
+		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+
+		// add to hash table
+		hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
+		tex->nextHash = r_texturesHashTable[hash];
+		r_texturesHashTable[hash] = tex;
+
+		// add to lru
+		texlru_extdata_s extdata { i, filter, texlru_src_internal_s{ name, model_name, *ptexture, size } };
+		r_texlru[i].emplace(std::move(extdata));
+
+		// NOTE: always return texnum as index in array or engine will stop work !!!
+		return i;
+	}
+
+	int TexLru_ReleaseTexture(gltexture_t *image)
+	{
+		// release source
+		if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
+			FS_FreeImage( image->original );
+
+		pglDeleteTextures( 1, &image->texnum );
+	}
+
+	struct TexLru_Uploader{
+		gltexture_t	*tex;
+		imgfilter_t *filter;
+		mstudiotexture_t *ptexture;
+		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
+		{
+			int flags = tex->flags;
+			rgbdata_t *pic = FS_LoadImage( src.path.c_str(), nullptr, 0 );
+			if( !pic ) return {}; // couldn't loading image
+
+			// force upload texture as RGB or RGBA (detail textures requires this)
+			if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+			GL_UploadTexture( pic, tex, false, filter );
+			GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+			// set size for external texture
+			ptexture->width = tex->width;
+			ptexture->height = tex->height;
+
+			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+				FS_FreeImage( pic ); // release source texture
+
+			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
+		}
+		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
+		{
+			byte *buf = FS_LoadFile( src.model_name.c_str(), NULL, false );
+			if(!buf)
+				return {};
+
+			Mod_DecryptModel(src.model_name.c_str(), buf);
+			byte *buf2 = Mod_LoadExtendSeq(src.model_name.c_str(), buf);
+			studiohdr_t *phdr = (studiohdr_t *)buf2;
+
+			Image_SetMDLPointer((byte *)phdr + src.texture.index);
+
+			int flags = tex->flags;
+			// hack : expected mstudiotexture_t* as buffer
+			rgbdata_t *pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
+			if( !pic )
+			{
+				Mem_Free( buf );
+				return {}; // couldn't loading image
+			}
+
+			// force upload texture as RGB or RGBA (detail textures requires this)
+			if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
+
+			GL_UploadTexture( pic, tex, false, filter );
+			GL_TexFilter( tex, false ); // update texture filter, wrap etc
+
+			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
+				FS_FreeImage( pic ); // release source texture
+
+			Mem_Free( buf );
+			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
+		}
+	};
+
+	template<class Key, class Value>
+	class lru_cache
+	{
+	public:
+		typedef Key key_type;
+		typedef Value value_type;
+		typedef std::list<key_type> list_type;
+		typedef std::map<
+				key_type,
+				std::pair<value_type, typename list_type::iterator>
+		> map_type;
+
+		lru_cache(size_t capacity)
+				: m_capacity(capacity)
+		{
+		}
+
+		~lru_cache()
+		{
+		}
+
+		size_t size() const
+		{
+			return m_map.size();
+		}
+
+		size_t capacity() const
+		{
+			return m_capacity;
+		}
+
+		bool empty() const
+		{
+			return m_map.empty();
+		}
+
+		bool contains(const key_type &key)
+		{
+			return m_map.find(key) != m_map.end();
+		}
+
+		void insert(const key_type &key, const value_type &value)
+		{
+			auto i = m_map.find(key);
+			if(i == m_map.end()){
+				// insert item into the cache, but first check if it is full
+				if(size() >= m_capacity){
+					// cache is full, evict the least recently used item
+					evict();
+				}
+
+				// insert the new item
+				m_list.push_front(key);
+				m_map[key] = std::make_pair(value, m_list.begin());
+			}
+		}
+
+		void remove(const key_type &key)
+		{
+			auto i = m_map.find(key);
+			auto i2 = i->second.second;
+			m_list.erase(i2);
+			m_map.erase(i);
+		}
+
+		std::optional<value_type> get(const key_type &key)
+		{
+			// lookup value in the cache
+			auto i = m_map.find(key);
+			if(i == m_map.end()){
+				// value not in cache
+				return std::nullopt;
+			}
+
+			// return the value, but first update its place in the most
+			// recently used list
+			auto j = i->second.second;
+			if(j != m_list.begin()){
+				// move item to the front of the most recently used list
+				m_list.erase(j);
+				m_list.push_front(key);
+
+				// update iterator in map
+				j = m_list.begin();
+				const value_type &value = i->second.first;
+				m_map[key] = std::make_pair(value, j);
+
+				// return the value
+				return value;
+			}
+			else {
+				// the item is already at the front of the most recently
+				// used list so just return it
+				return i->second.first;
+			}
+		}
+
+		void clear()
+		{
+			m_map.clear();
+			m_list.clear();
+		}
+
+	private:
+		void evict()
+		{
+			// evict item from the end of most recently used list
+			typename list_type::iterator i = --m_list.end();
+			m_map.erase(*i);
+			m_list.erase(i);
+		}
+
+	private:
+		map_type m_map;
+		list_type m_list;
+		const size_t m_capacity;
+	};
+
+	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(128);
+
+	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
+	{
+		int texnum = ptexture->index;
+		gltexture_t	*tex = &r_textures[texnum];
+		if(!r_texlru[texnum].has_value())
+			return; // unknown texture
+
+		if(textureCache.contains((GLuint)texnum))
+			return; // already present
+
+		auto &lrudata = r_texlru[texnum].value();
+		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
+		textureCache.insert((GLuint)texnum, std::move(deleter));
+	}
+
+	void TexLru_Free( int texnum )
+	{
+		r_texlru[texnum].reset();
+		if(textureCache.contains(texnum))
+			textureCache.remove(texnum);
+	}
 }
 
 /*
@@ -3899,6 +4309,8 @@ void R_FreeImage( gltexture_t *image )
 	{
 		return;
 	}
+
+	xe::TexLru_Free( image->texnum );
 
 	// remove from hash table
 	hash = Com_HashKey( image->name, TEXTURES_HASH_SIZE );

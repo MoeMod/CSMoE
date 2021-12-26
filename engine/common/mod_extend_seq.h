@@ -3,14 +3,7 @@
 
 #include "mod_local.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-	byte* Mod_LoadExtendSeq(model_t *mod, byte *buffer);
+byte* Mod_LoadExtendSeq(const char *mod_name, byte *buffer);
 
-	
-#ifdef __cplusplus
-}
-#endif
 #endif

@@ -3,14 +3,8 @@
 
 #include "mod_local.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-	void Mod_DecryptModel(model_t *mod, byte *buffer);
+	void Mod_DecryptModel(const char *model_name, byte *buffer);
 
-	
-#ifdef __cplusplus
-}
-#endif
+
 #endif

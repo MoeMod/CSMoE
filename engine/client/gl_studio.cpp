@@ -24,6 +24,7 @@ GNU General Public License for more details.
 #include "pm_local.h"
 #include "gl_local.h"
 #include "cl_tent.h"
+#include "gl_texlru.h"
 
 // NOTE: enable this if you want merge both 'model' and 'modelT' files into one model slot.
 // otherwise it's uses two slots in models[] array for models with external textures
@@ -1831,6 +1832,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
+	xe::TexLru_StudioSetupSkin(&ptexture[pskinref[index]]);
 	GL_Bind( XASH_TEXTURE0, ptexture[pskinref[index]].index );
 }
 
@@ -2098,6 +2100,7 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
+			xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -2462,6 +2465,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
+			xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -3906,7 +3910,10 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		Q_snprintf( texname, sizeof( texname ), "materials/%s/%s.tga", mdlname, name );
 
 		if( FS_FileExists( texname, false ))
-			gl_texturenum = GL_LoadTexture( texname, NULL, 0, flags, filter );
+		{
+			//gl_texturenum = GL_LoadTexture( texname, NULL, 0, flags, filter );
+			gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+		}
 
 		if( gl_texturenum )
 		{
@@ -3926,7 +3933,8 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				sprintf(texname, "models/texture/@balrog11b_%s.bmp", name);
 				if (FS_FileExists(texname, false))
 				{
-					gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+					//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 					break;
 				}
 			}
@@ -3934,14 +3942,16 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
-				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
 			if (FS_FileExists(texname, false))
 			{
-				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
 				break;
 			}
 			break;
@@ -3980,7 +3990,8 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		// build the texname
 		Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
-		ptexture->index = GL_LoadTexture( texname, (byte *)ptexture, size, flags, filter );
+		//ptexture->index = GL_LoadTexture( texname, (byte *)ptexture, size, flags, filter );
+		ptexture->index = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
 	}
 	else MsgDev( D_NOTE, "Loading HQ: %s\n", texname );
 

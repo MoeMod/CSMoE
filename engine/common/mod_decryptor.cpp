@@ -57,11 +57,11 @@ void DecryptData(byte *pData, size_t uDataSize)
 	} while (uDataSize);
 }
 
-extern "C" void Mod_DecryptModel(model_t *mod, byte *buffer)
+void Mod_DecryptModel(const char *model_name, byte *buffer)
 {
 	studiohdr_t *studiohdr = reinterpret_cast<studiohdr_t *>(buffer);
 
-	if (!Q_strncmp(mod->name, "models/player", 13))
+	if (!Q_strncmp(model_name, "models/player", 13))
 	{
 		if (studiohdr->numhitboxes == 21)
 			studiohdr->numhitboxes = 20;

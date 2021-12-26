@@ -559,6 +559,7 @@ typedef enum
 	PF_DXT1, // nvidia DXT1 format
 	PF_DXT3, // nvidia DXT3 format
 	PF_DXT5, // nvidia DXT5 format
+	PF_A_8,
 	PF_TOTALCOUNT,	// must be last
 } pixformat_t;
 
