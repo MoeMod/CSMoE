@@ -214,6 +214,7 @@ void CHud :: Init( void )
 	m_ZBS.Init();
 	m_ZB2.Init();
 	m_ZB3.Init();
+	m_ZBZ.Init();
 	m_MoeTouch.Init();
 
 	// chat, death notice, status bars and other

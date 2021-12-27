@@ -29,7 +29,7 @@ void CTeleportEntity::Spawn(void)
 	SetTouch(&CTeleportEntity::OnTouch);
 	SetThink(&CTeleportEntity::OnThink);
 
-	UTIL_SetSize(pev, Vector(-4, -4, -2), Vector(4, 4, 2));
+	UTIL_SetSize(pev, Vector(-5, -5, -2), Vector(5, 5, 2));
 }
 
 void CTeleportEntity::Precache(void)

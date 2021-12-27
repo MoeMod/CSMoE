@@ -106,7 +106,7 @@ BOOL CFrequency1::Deploy(void)
 
 	if (m_flTimeHostler != invalid_time_point)
 	{
-		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.5s;
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.3s;
 	}
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
@@ -141,10 +141,10 @@ void CFrequency1::PrimaryAttack(void)
 void CFrequency1::SecondaryAttack(void)
 {
 	if (CanUseSkill() && m_iClip == 6)
-	{
-		m_pPlayer->ResetMaxSpeed();
+	{		
 		SendWeaponAnim(ANIM_HIGHNOON_START, UseDecrement() != FALSE);
 		m_iUsingSkill = 1;
+		m_pPlayer->ResetMaxSpeed();
 
 		EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "z4/z4_mccree_skill.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
@@ -679,12 +679,24 @@ void CFrequency1::ItemPostFrame()
 								break;
 							}
 							
-							if (m_iClip == 6 && m_iIndex >= gpGlobals->maxClients)
+							if (m_iIndex >= gpGlobals->maxClients)
 							{
-								m_tAimTime = gpGlobals->time + 0.5s;
-								m_iIndex = 0;
-								m_iUsingSkill = 4;
-								break;
+								if (m_iClip == 6)
+								{
+									m_tAimTime = gpGlobals->time + 0.5s;
+									m_iIndex = 0;
+									m_iUsingSkill = 4;
+									break;
+								}
+								else
+								{
+									m_iUsingSkill = 0;
+									m_pPlayer->ResetMaxSpeed();
+									m_tAimTime = invalid_time_point;
+									m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
+									m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+									break;
+								}
 							}
 
 							if (m_iIsTarget[m_iIndex])
@@ -720,8 +732,8 @@ void CFrequency1::ItemPostFrame()
 			{
 				SendWeaponAnim(ANIM_HIGHNOON_LOOP, UseDecrement() != FALSE);
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999s;
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 4.0s;
-				m_tAimTime = gpGlobals->time + 4.0s;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 34.0s;
+				m_tAimTime = gpGlobals->time + 3.0s;
 				m_iUsingSkill = 2;
 			}
 		}
@@ -732,7 +744,7 @@ void CFrequency1::ItemPostFrame()
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
-			m_flTimeNextCharge = gpGlobals->time + 0.5s;
+			m_flTimeNextCharge = gpGlobals->time + 0.3s;
 
 			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 100)
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/skullt9_fx.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -785,10 +797,10 @@ float CFrequency1::GetDamage2() const
 
 float CFrequency1::GetDamage3() const
 {
-	float flDamage = 40.0f;
+	float flDamage = 70.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 180.0f;
+		flDamage = 480.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 280.0f;
 #endif

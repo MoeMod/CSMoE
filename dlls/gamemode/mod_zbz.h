@@ -57,6 +57,7 @@ public:
 	void Event_OnRoundStart() override;
 	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
 	void OnResetMaxSpeed() override;
+	void OnInitHUD() override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);

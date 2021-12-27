@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
-// #define __DEBUG
+//#define __DEBUG
 
 #define SKILL_FUNCTION(skillSet, func, ...) { \
 	for (auto &skill : skillSet) { \
@@ -58,7 +58,22 @@ namespace sv {
 {
 	
 }
-	
+
+void CPlayerModStrategy_ZBZ::OnInitHUD()
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZB3_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(m_iLevel);
+	WRITE_BYTE(m_iExp);
+	WRITE_BYTE(m_iPoint);
+	MESSAGE_END();
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZB3_MESSAGE_SKILL_REMOVE);
+	WRITE_BYTE(0);
+	MESSAGE_END();
+}
+
 void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()
 {
 	CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD();
@@ -187,6 +202,13 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, buf);
 		/*PlaySound(id, g_szSound[0])*/
 	}
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZB3_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(m_iLevel);
+	WRITE_BYTE(m_iExp);
+	WRITE_BYTE(m_iPoint);
+	MESSAGE_END();
 }
 
 void CPlayerModStrategy_ZBZ::Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType)
@@ -217,14 +239,14 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 	auto& bitsCurButton = cmd->buttons;
 	auto& bitsOldButton = m_pPlayer->pev->oldbuttons;
 
-	if (m_flSkillDelay != invalid_time_point && m_flSkillDelay <= gpGlobals->time)
+	/*if (m_flSkillDelay != invalid_time_point && m_flSkillDelay <= gpGlobals->time)
 	{
 		m_flSkillDelay = invalid_time_point;
 		if (m_pPlayer->IsAlive() && m_pPlayer->m_pActiveItem)
 		{
 			m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 		}
-	}
+	}*/
 
 	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0)
 	{
@@ -237,6 +259,11 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_vecSkill.insert(data.second);
 			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
 			data.second->OnGetSkill();
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(ZB3_MESSAGE_SKILL_ADD);
+			WRITE_BYTE(data.first);
+			MESSAGE_END();
 		}
 	}
 

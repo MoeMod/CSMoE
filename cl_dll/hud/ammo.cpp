@@ -113,7 +113,7 @@ void WeaponsResource :: LoadWeaponSprites( WEAPON *pWeapon )
 	pWeapon->hAmmo2 = 0;
 
 	sprintf(sz, "sprites/%s.txt", pWeapon->szName);
-	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 11))
+	if (strncmp(pWeapon->szName, "knife_dgaxe", 11) && strncmp(pWeapon->szName, "knife_skullt9", 13))
 	{
 		if (!strncmp(pWeapon->szName, "knife_", 6))
 		{

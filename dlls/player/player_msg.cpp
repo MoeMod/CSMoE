@@ -114,6 +114,7 @@ DLL_GLOBAL int gmsgZBSLevel = 0;
 DLL_GLOBAL int gmsgBTEWeapon = 0;
 DLL_GLOBAL int gmsgZB2Msg = 0;
 DLL_GLOBAL int gmsgZB3Msg = 0;
+DLL_GLOBAL int gmsgZBZMsg = 0;
 DLL_GLOBAL int gmsgGunDeath = 0;
 DLL_GLOBAL int gmsgWeapDrop = 0;
 
@@ -213,6 +214,7 @@ void LinkUserMessages()
 	gmsgBTEWeapon = REG_USER_MSG("BTEWeapon", -1);
 	gmsgZB2Msg = REG_USER_MSG("ZB2Msg", -1);
 	gmsgZB3Msg = REG_USER_MSG("ZB3Msg", -1);
+	gmsgZBZMsg = REG_USER_MSG("ZBZMsg", -1);
 	gmsgGunDeath = REG_USER_MSG("GunDeath", -1);
 	gmsgHitMsg = REG_USER_MSG("HitMsg", -1);
 	gmsgWeapDrop = REG_USER_MSG("WeapDrop", -1);
