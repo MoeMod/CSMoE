@@ -3,6 +3,7 @@
 #include "util.h"
 #include "cbase.h"
 #include "player.h"
+#include "entity_state.h"
 
 #include "gamemode/zbz/zbz_const.h"
 #include "gamemode/zbz/zbz_skill.h"
@@ -340,6 +341,256 @@ namespace sv {
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 	};
 
+	class ZSkill_HeroicPresence : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_HeroicPresence(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "英雄出现"; }
+		const char* GetDesc() const override { return "拥有概率成为英雄"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+	};
+
+	class ZSkill_SteelSkin : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SteelSkin(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "倾斜盔甲"; }
+		const char* GetDesc() const override { return "受到攻击时，一定概率不受到伤害"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (victim != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+
+			if (m_flTime > gpGlobals->time)
+				flDamage = 0.0f;
+
+			if (RANDOM_FLOAT(0, 1) > 0.01f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
+				return;
+
+			flDamage = 0.0f;
+			m_flTime = gpGlobals->time + 0.01s;
+		}
+	private:
+		time_point_t m_flTime;
+	};
+
+	class ZSkill_EnduranceHave : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_EnduranceHave(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "坚持不懈"; }
+		const char* GetDesc() const override { return "受到攻击时低概率忽略定身和击退"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {
+			if (!IsActivate())
+				return;
+
+			if (m_flTime > gpGlobals->time)
+				data.flFlying = data.flDucking = data.flNotOnGround = data.flVelocityModifier = 0.0f;
+
+			if (RANDOM_FLOAT(0, 1) > 0.01f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
+				return;
+
+			data.flFlying = data.flDucking = data.flNotOnGround = data.flVelocityModifier = 0.0f;
+			m_flTime = gpGlobals->time + 0.01s;
+		}
+	private:
+		time_point_t m_flTime;
+	};
+
+	class ZSkill_ArmonedAdvance : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_ArmonedAdvance(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "猛犸"; }
+		const char* GetDesc() const override { return "缓慢移动时增加防御力。"; } // 缓慢移动0.1秒后降低伤害、击退、定身
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnThink() override {
+			float speed = m_pPlayer->pev->velocity.Length2D();
+			if (speed > 165.0f)
+			{
+				m_Status = 0;
+				return;
+			}
+
+			if (!m_Status)
+			{
+				m_Status = 1;
+				m_flTime = gpGlobals->time + 0.1s;
+				return;
+			}
+
+			if (m_Status != 1 || m_flTime > gpGlobals->time)
+			{
+				return;
+			}
+
+			m_Status = 2;
+		}
+
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (victim != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+			if (m_Status != 2)
+				return;
+
+			flDamage *= GetBonus();
+		}
+
+		void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {
+			if (!IsActivate())
+				return;
+			if (m_Status != 2)
+				return;
+
+			data.flFlying = data.flDucking = data.flNotOnGround *= GetKnockbackBonus();
+			data.flVelocityModifier *= GetVelModifiedBonus();
+		}
+	private:
+		float GetBonus() const { return max(0.0f, 1.0f - (0.1f + 0.02f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetKnockbackBonus() const { return max(0.0f, 1.0f - (0.1f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetVelModifiedBonus() const { return max(0.0f, 1.0f - (0.1f + 0.4f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		time_point_t m_flTime;
+		byte m_Status;
+	};
+
+	class ZSkill_SpeedyCrouch : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SpeedyCrouch(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "脚掌"; }
+		const char* GetDesc() const override { return "蹲下移动是增加速度。"; } // （5+2*回合数）
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnThink() override {
+			if (m_pPlayer->pev->flags & FL_ONGROUND && m_pPlayer->pev->flags & FL_DUCKING)
+			{
+				if (!m_bActivate) {
+					m_bActivate = true;
+					m_pPlayer->ResetMaxSpeed();
+				}
+			}
+			else if(m_bActivate) {
+				m_bActivate = false;
+				m_pPlayer->ResetMaxSpeed();
+			}
+		}
+
+		void OnResetMaxSpeed() override {
+			if(m_bActivate)
+				m_pPlayer->pev->maxspeed += GetBonus();
+		}
+	private:
+		float GetBonus() const { return 4.0f + 2.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+		bool m_bActivate;
+	};
+
+	class ZSkill_SteelBody : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SteelBody(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "钢铁铠甲"; }
+		const char* GetDesc() const override { return "提升防御能力"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (victim != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+
+			flDamage *= GetBonus();
+		}
+	private:
+		float GetBonus() const { return max(0.0f, 1.0f - (0.2f + 0.025f * g_pGameRules->m_iTotalRoundsPlayed)); }
+	};
+
+	class ZSkill_Specialist : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Specialist(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "持之以恒"; }
+		const char* GetDesc() const override { return "解锁人类特殊技能"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+	};
+
+	class ZSkill_StealthReloader : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_StealthReloader(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "换弹透明"; }
+		const char* GetDesc() const override { return "换弹时身体变得透明，如果进行攻击，透明状态立即解除"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override
+		{
+			if (m_flCooldown > gpGlobals->time)
+				return;
+
+			m_flTime = gpGlobals->time + GetBonus();
+			m_flCooldown = gpGlobals->time + GetCooldown();
+		}
+
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (attacker != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+
+			m_flTime = invalid_time_point;
+		}
+
+		void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override
+		{
+			if (!player)
+				return;
+			if (m_flTime <= gpGlobals->time)
+				return;
+
+			state->rendermode = kRenderTransTexture;
+			state->renderamt = 1;
+		}
+	private:
+		duration_t GetBonus() const { return 0.5s + 0.025s * g_pGameRules->m_iTotalRoundsPlayed; }
+		duration_t GetCooldown() const { return 1.25s + 0.025s * g_pGameRules->m_iTotalRoundsPlayed; }
+		time_point_t m_flCooldown;
+		time_point_t m_flTime;
+	};
+
+	class ZSkill_RapidReloader : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_RapidReloader(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "高速填装"; }
+		const char* GetDesc() const override { return "加快武器的填装速度"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override
+		{
+			fDelay *= GetBonus();
+		}
+
+	private:
+		float GetBonus() const { return max(0.0f, 1.0f - (0.32f + 0.022f * g_pGameRules->m_iTotalRoundsPlayed)); }
+	};
+
+	class ZSkill_AmmoReserves : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_AmmoReserves(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "备弹补充"; }
+		const char* GetDesc() const override { return "增加武器的备弹"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override
+		{
+			iMax += GetBonus();
+		}
+	private:
+		int GetBonus() const { return min(999, 50 + 10 * g_pGameRules->m_iTotalRoundsPlayed); }
+	};
+	
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -356,14 +607,18 @@ namespace sv {
 		{ Skill_Speed, 100, MakeSkill<ZSkill_Speed> },
 		{ Skill_Icarus, 100, MakeSkill<ZSkill_Icarus> },
 		{ Skill_Fanatic, 100, MakeSkill<ZSkill_Fanatic> },
-		// Heroic Presence 英雄出现
-		//{ 10, 100, MakeSkill<ZSkill_Icarus> }, // 合金利爪
-		//{ 11, 100, MakeSkill<ZSkill_Icarus> }, // 钢铁防御
-		// 坚持不懈 受到伤害时低概率忽略定身和击退。但伤害不会减轻
-		// 接触感染 即使不攻击只要身体接触就可以感染。
-		// 爆弹兽颅 受到伤害后生成爆弹兽颅。
-		// 兽颅强化 增加爆弹兽颅的攻击力和击退效果。
-		// 复活 获得复活能力。病毒被驱散后，致命击杀死亡时依旧不能复活。
+
+		{ Skill_HeroicPresence, 100, MakeSkill<ZSkill_HeroicPresence> },
+		{ Skill_SteelSkin, 100, MakeSkill<ZSkill_SteelSkin> },
+		{ Skill_EnduranceHave, 100, MakeSkill<ZSkill_EnduranceHave> },
+		{ Skill_ArmonedAdvance, 100, MakeSkill<ZSkill_ArmonedAdvance> },
+		{ Skill_SpeedyCrouch, 100, MakeSkill<ZSkill_SpeedyCrouch> },
+		{ Skill_SteelBody, 100, MakeSkill<ZSkill_SteelBody> },
+		{ Skill_Specialist, 100, MakeSkill<ZSkill_Specialist> },
+		{ Skill_StealthReloader, 100, MakeSkill<ZSkill_StealthReloader> },
+		{ Skill_RapidReloader, 100, MakeSkill<ZSkill_RapidReloader> },
+		{ Skill_AmmoReserves, 100, MakeSkill<ZSkill_AmmoReserves> },
+		
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

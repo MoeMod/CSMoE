@@ -266,6 +266,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_skullt9");
 	UTIL_PrecacheOther("ammo_skullt9");
 	UTIL_PrecacheOtherWeapon("z4b_barrettd");
+	UTIL_PrecacheOtherWeapon("weapon_sfsniper");
+	UTIL_PrecacheOther("ammo_railbeam");
 	
 	
 

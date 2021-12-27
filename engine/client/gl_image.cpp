@@ -1941,6 +1941,8 @@ namespace xe {
 			FS_FreeImage( image->original );
 
 		pglDeleteTextures( 1, &image->texnum );
+
+		return 0;
 	}
 
 	struct TexLru_Uploader{

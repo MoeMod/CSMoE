@@ -81,6 +81,7 @@ public:
 
 	BOOL FInfectionStarted();
 	void TeamCheck();
+	void MakeZombie(CBasePlayer* player, ZombieLevel iEvolutionLevel) { m_eventBecomeZombie.dispatch(player, iEvolutionLevel); }
 
 protected:
 	virtual void InfectionSound();
@@ -88,7 +89,6 @@ protected:
 	virtual void HumanWin();
 	virtual void ZombieWin();
 
-	void MakeZombie(CBasePlayer *player, ZombieLevel iEvolutionLevel) { m_eventBecomeZombie.dispatch(player, iEvolutionLevel); }
 
 public:
 	EventDispatcher<void(CBasePlayer *who, ZombieLevel iEvolutionLevel)> m_eventBecomeZombie;

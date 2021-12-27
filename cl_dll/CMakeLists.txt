@@ -213,6 +213,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_y21s1jetgunmd.cpp
 	../dlls/wpn_shared/knife_skullt9.cpp
 	../dlls/wpn_shared/z4b_barrettd.cpp
+	../dlls/wpn_shared/wpn_sfsniper.cpp
 	)
 
 set (HUD_SRCS

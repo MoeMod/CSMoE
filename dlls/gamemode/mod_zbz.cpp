@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
-//#define __DEBUG
+#define __DEBUG
 
 #define SKILL_FUNCTION(skillSet, func, ...) { \
 	for (auto &skill : skillSet) { \
@@ -74,6 +74,29 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	MESSAGE_END();
 }
 
+int CPlayerModStrategy_ZBZ::ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax)
+{
+	int ret = CPlayerModStrategy_ZB3::ComputeMaxAmmo(szAmmoClassName, iOriginalMax);
+	if (!strcmp(szAmmoClassName, "HEGrenade") || !strcmp(szAmmoClassName, "Flashbang") || !strcmp(szAmmoClassName, "SmokeGrenade"))
+		return ret;
+
+	SKILL_FUNCTION(m_vecSkill, OnComputeMaxAmmo, szAmmoClassName, iOriginalMax, ret);
+	return ret;
+}
+
+int CPlayerModStrategy_ZBZ::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	int result = CPlayerModStrategy_ZB3::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+	SKILL_FUNCTION(m_vecSkill, OnAddToFullPack_Post, state, e, ent, host, hostflags, player, pSet);
+	return result;
+}
+
+duration_t CPlayerModStrategy_ZBZ::OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay)
+{
+	SKILL_FUNCTION(m_vecSkill, OnDefaultReload_Pre, weapon, fDelay);
+	return fDelay;
+}
+
 void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()
 {
 	CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD();
@@ -93,6 +116,20 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 	}
 #endif
 
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		if (!Q_strnicmp(pcmd, "MoE_HumanSkill", 14)) // MoE_HumanSkill[1-4]
+		{
+			if (!CheckSkill(Skill_Specialist))
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
+				return true;
+			}
+			GetCharacter()->ActivateSkill(SKILL_SLOT_1);
+			return true;
+		}
+	}
+
 	return CPlayerModStrategy_ZB3::ClientCommand(pcmd);
 }
 
@@ -111,6 +148,12 @@ void CPlayerModStrategy_ZBZ::BecomeHuman()
 void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	CPlayerModStrategy_ZB3::BecomeZombie(iEvolutionLevel);
+	// this is a bad solution....
+	if (!CheckSkill(Skill_HeroicPresence) && m_pPlayer->m_ZombieClass == "revival")
+	{
+		m_pPlayer->m_ZombieClass = "random";
+		m_pModZBZ->MakeZombie(m_pPlayer, m_pPlayer->m_iZombieLevel);
+	}
 	SKILL_FUNCTION(m_vecSkill, OnBecomeZombie, iEvolutionLevel);
 }
 
@@ -193,6 +236,18 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		m_iPoint++;
 		m_iExp = 0;
 		bLevelUp = true;
+		if (m_pPlayer->IsBot())
+		{
+			auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+			if (data.second != nullptr)
+			{
+				m_flSkillDelay = gpGlobals->time + 1.4s;
+				m_iPoint--;
+				m_setSkillID.insert(data.first);
+				m_vecSkill.insert(data.second);
+				data.second->OnGetSkill();
+			}
+		}
 	}
 
 	if (bLevelUp)
@@ -234,6 +289,11 @@ void CPlayerModStrategy_ZBZ::Event_OnRoundStart()
 	return CPlayerModStrategy_ZB3::Event_OnRoundStart();
 }
 
+//int CPlayerModStrategy_ZBZ::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+//{
+//	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+//}
+
 void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
 {
 	auto& bitsCurButton = cmd->buttons;
@@ -274,6 +334,19 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 void CPlayerModStrategy_ZBZ::OnResetMaxSpeed() {
 	CPlayerModStrategy_ZB3::OnResetMaxSpeed();
 	SKILL_FUNCTION(m_vecSkill, OnResetMaxSpeed);
+}
+
+bool CPlayerModStrategy_ZBZ::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& data)
+{
+	KnockbackData knockback = {
+		data.flOnGround,
+		data.flNotOnGround,
+		data.flFlying,
+		data.flDucking,
+		data.flVelocityModifier
+	};
+	SKILL_FUNCTION(m_vecSkill, OnApplyKnockback, attacker, knockback);
+	return m_pCharacter->ApplyKnockback(attacker, knockback);
 }
 
 CMod_ZombieZ::CMod_ZombieZ()
@@ -325,6 +398,26 @@ HitBoxGroup CMod_ZombieZ::GetAdjustedTraceAttackHitgroup(CBaseEntity* victim, en
 	HitBoxGroup hbg = static_cast<HitBoxGroup>(ptr->iHitgroup);
 	hbg = CMod_ZombieMod2::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 	return hbg;
+}
+
+void CMod_ZombieZ::PickHero()
+{
+	// randomize player list
+	moe::range::PlayersList list;
+	std::random_device rd;
+	std::vector<CBasePlayer*> players(list.begin(), list.end());
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) {
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
+		if (!strategy || !strategy->CheckSkill(Skill_HeroicPresence))
+		{
+			return false;
+		}
+		return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie;
+	}), players.end());
+	std::shuffle(players.begin(), players.end(), rd);
+	// make heroes
+	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
+	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieZ::MakeHero, this, std::placeholders::_1));
 }
 
 }

@@ -50,7 +50,7 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_Fanatic, {TYPE_GENERAL, "狂热" }},
 	{Skill_HeroicPresence, {TYPE_GENERAL, "英雄出现" }},
 	{Skill_AmmoReserves, {TYPE_HUMAN, "备弹补充"}},
-	{Skill_RapidReloader, {TYPE_HUMAN, "快速换弹"}},
+	{Skill_RapidReloader, {TYPE_HUMAN, "高速填装"}},
 	{Skill_StealthReloader, {TYPE_HUMAN, "换弹透明"}},
 	{Skill_FocusedBreakthrough, {TYPE_HUMAN, "正面突击"}},
 	{Skill_Booster, {TYPE_HUMAN, "冲锋推进"}},
@@ -81,6 +81,9 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_Kangaroo, {TYPE_GENERAL, "袋鼠"}},
 };
 
+vec3_t g_ColorActive = { 0.74, 0.87, 0.5 };
+vec3_t g_ColorInactive = { 0.67, 0.65, 0.62 };
+
 int CHudZBZ_Skill::Draw(float time)
 {
 	if (!gHUD.m_pCvarDraw->value)
@@ -100,11 +103,13 @@ int CHudZBZ_Skill::Draw(float time)
 
 	static char text[128];
 	sprintf(text, "Lv.%d Exp:%d/%d", m_iLevel, m_iExp, ((m_iLevel + 1) * 2 * 50));
+	DrawUtils::SetConsoleTextColor(g_ColorActive[0], g_ColorActive[1], g_ColorActive[2]);
 	int len = DrawUtils::ConsoleStringLen(text);
 	DrawUtils::DrawConsoleString(ScreenWidth - len - 5, y, text);
 	y -= 20;
 
 	sprintf(text, "目前已获得进化能力：%zd个", m_SkillList.size());
+	DrawUtils::SetConsoleTextColor(g_ColorActive[0], g_ColorActive[1], g_ColorActive[2]);
 	len = DrawUtils::ConsoleStringLen(text);
 	DrawUtils::DrawConsoleString(ScreenWidth - len - 5, y, text);
 	y -= 40;
@@ -115,7 +120,7 @@ int CHudZBZ_Skill::Draw(float time)
 		if (skill == g_SkillList.end())
 			continue;
 		
-		auto color = (skill->second.first == TYPE_GENERAL) || (skill->second.first == TYPE_ZOMBIE && g_PlayerExtraInfo[idx].zombie) || (skill->second.first == TYPE_HUMAN && !g_PlayerExtraInfo[idx].zombie) ? g_ColorYellow : g_ColorGrey;
+		auto color = (skill->second.first == TYPE_GENERAL) || (skill->second.first == TYPE_ZOMBIE && g_PlayerExtraInfo[idx].zombie) || (skill->second.first == TYPE_HUMAN && !g_PlayerExtraInfo[idx].zombie) ? g_ColorActive : g_ColorInactive;
 		DrawUtils::SetConsoleTextColor(color[0], color[1], color[2]);
 		len = DrawUtils::ConsoleStringLen(skill->second.second);
 		DrawUtils::DrawConsoleString(ScreenWidth - len - 5, y, skill->second.second);

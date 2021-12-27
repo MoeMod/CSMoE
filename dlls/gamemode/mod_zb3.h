@@ -40,7 +40,7 @@ public:
 	EventDispatcher<void()> m_eventRoundStart;
 
 protected:
-	void PickHero();
+	virtual void PickHero();
 	void MakeHero(CBasePlayer *p) { m_eventBecomeHero.dispatch(p); }
 
 	CZB3HumanMorale m_Morale;

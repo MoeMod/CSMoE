@@ -13,6 +13,7 @@
 #include "game.h"
 
 #include "bot_include.h"
+#include "player/player_mod_strategy.h"
 
 namespace sv {
 
@@ -1281,6 +1282,7 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 		return FALSE;
 	}
 
+	fDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
 	m_pPlayer->m_flNextAttack = fDelay;
 
 	ReloadSound();

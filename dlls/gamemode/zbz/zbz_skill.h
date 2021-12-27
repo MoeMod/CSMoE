@@ -46,6 +46,10 @@ public:
 	virtual void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) = 0;
 	virtual void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) = 0;
 	virtual void OnResetMaxSpeed() = 0;
+	virtual void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) = 0;
+	virtual void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
+	virtual void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) = 0;
+	virtual void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) = 0;
 
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
@@ -74,6 +78,10 @@ public:
 	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType) override {}
 	void OnTraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override {}
 	void OnResetMaxSpeed() override {}
+	void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {}
+	void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override {}
+	void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override {}
+	void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

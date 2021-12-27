@@ -121,3 +121,4 @@ HOOK_EVENT(buffm4a1, FireBuffM4A1);
 HOOK_EVENT(bison, FireBison);
 HOOK_EVENT(y21s1jetgunmd, FireY21s1Jetgunmd);
 HOOK_EVENT(barrettd, FireBarrettD);
+HOOK_EVENT(sfsniper, FireSFSniper);

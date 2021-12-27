@@ -804,4 +804,29 @@ BOOL CSkullT9Ammo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_skullt9, CSkullT9Ammo);
+
+
+void CRailBeamAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CRailBeamAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CRailBeamAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(1, "RailBeam", 35) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_railbeam, CRailBeamAmmo);
 }

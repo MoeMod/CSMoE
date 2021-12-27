@@ -97,7 +97,8 @@ protected:
 	EventListener m_eventAdjustDamageListener;
 	EventListener m_eventAdjustHitgroupListener;
 	const std::vector<EventListener> m_eventListeners;
-	
+	std::shared_ptr<IZombieModeCharacter_ZB2> GetCharacter() const { return m_pCharacter_ZB2; }
+
 private:
 	CMod_ZombieMod2 * const m_pModZB2;
 

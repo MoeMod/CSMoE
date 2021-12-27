@@ -60,8 +60,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_as50",        "AS50",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_stg44",        "STG-44",                  3100, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_bendita",        "Bendita",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	{"z4b_k1ases",        "K1ase NST Edition",                  8000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	{"z4b_m1887se",        "M1887 Sniper Edition",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_skull5",        "Skull-5",                  6000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_mg3",         "MG-3",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_mg3xmas",         "MG3 Xmas Edition",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -111,6 +109,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_thanatos9",      "Thanatos9",    0, KNIFE_SLOT, UNASSIGNED},
 	{"weapon_y21s1jetgunmd",  "Bear Fury Mk. 3",	2000, PISTOL_SLOT, UNASSIGNED},
 	{"knife_skullt9",     "【阵风】Skull-T9",               0,    KNIFE_SLOT,          UNASSIGNED },
+	{"weapon_sfsniper",         "雷神",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 
 	{"z4b_cannonplasma",      "Plasma Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_cannontiger",      "Tiger Cannon",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
@@ -131,7 +130,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_m4a1x",      "M4A1 Shadow Runner",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_ak47x",      "AK47 KNIFE-BORN BEAST",    4288, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"z4b_m4a1mw",      "M4A1 S-Transformer",    3600, PRIMARY_WEAPON_SLOT, UNASSIGNED},
-	{ "z4b_barrettd",        "巴雷特M82A1-毁灭",                  5288, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+	{"z4b_barrettd",        "巴雷特M82A1-毁灭",                  5288, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+	{"z4b_k1ases",        "银蝎K1A",                  8000, PRIMARY_WEAPON_SLOT, UNASSIGNED },
+	{"z4b_m1887se",        "M1887 降魔圣焰",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED },
 
 	{"weapon_ak47l",      "AK-47 60R",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"weapon_mp7a1d",      "Dual MP7A1",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED},
