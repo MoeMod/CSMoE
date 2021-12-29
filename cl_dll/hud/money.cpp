@@ -31,7 +31,6 @@ version.
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
-#include "triangleapi.h"
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
@@ -92,10 +91,7 @@ int CHudMoney::Draw(float flTime)
 		else
 			y = 200;
 
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(0, y- 0.5 * gHUD.m_iFontHeight, x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 10, y + 1.5 * gHUD.m_iFontHeight);
+		m_pTexture_Black->Draw2DQuadScaled(0, y- 0.5 * gHUD.m_iFontHeight, x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 10, y + 1.5 * gHUD.m_iFontHeight, 0, 0, 1, 1, 255, 255, 255, 100);
 	}
 	// Does weapon have seconday ammo?
 	if (!gHUD.m_csgohud->value)

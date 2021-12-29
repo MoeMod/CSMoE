@@ -2,8 +2,6 @@
 #include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
-
 #include "calcscreen.h"
 
 #include <tuple>
@@ -50,11 +48,7 @@ int CHudFollowIcon::Draw(float time)
 		float xyScreen[2];
 		if (CalcScreen(m_vecBombTargets[i], xyScreen))
 		{
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-			m_pTexture_BombAB[i]->Bind();
-
-			DrawUtils::Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
+			m_pTexture_BombAB[i]->Draw2DQuadScaled(xyScreen[0] - 15, xyScreen[1] - 25, xyScreen[0] + 16, xyScreen[1] + 26);
 		}
 	}
 
@@ -70,10 +64,7 @@ int CHudFollowIcon::Draw(float time)
 				float xyScreen[2];
 				if (CalcScreen(g_HostageInfo[i].origin, xyScreen))
 				{
-					gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-					m_pTexture_Supplybox->Bind();
-					DrawUtils::Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
+					m_pTexture_Supplybox->Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 					char szBuffer[16];
 					sprintf(szBuffer, "[%im]", static_cast<int>((g_HostageInfo[i].origin - gHUD.m_vecOrigin).Length() / 42.0f));

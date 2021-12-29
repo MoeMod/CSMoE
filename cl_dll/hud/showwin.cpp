@@ -29,7 +29,6 @@ version.
 */
 
 #include "hud.h"
-#include "triangleapi.h"
 #include "r_efx.h"
 #include "cl_util.h"
 
@@ -137,16 +136,12 @@ int CHudShowWin::Draw(float flTime)
 	iX = x - wide / 2;
 	iY = y - height / 2;
 
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-	m_pCurTexture[iType]->Bind();
-
 	switch (iType)
 	{
-	case CT_WIN:DrawUtils::Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
-	case T_WIN:DrawUtils::Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
-	case HUMAN_WIN:DrawUtils::Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
-	case ZOMBIE_WIN:DrawUtils::Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
+	case CT_WIN:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
+	case T_WIN:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
+	case HUMAN_WIN:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
+	case ZOMBIE_WIN:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY * 0.35, iX + wide, iY * 0.35 + height); break;
 	default:
 		break;
 	}

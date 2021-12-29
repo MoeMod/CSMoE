@@ -29,11 +29,7 @@ version.
 */
 
 #include "hud.h"
-#include "triangleapi.h"
-#include "r_efx.h"
 #include "cl_util.h"
-
-#include "draw_util.h"
 
 int CHudSniperScope::Init()
 {
@@ -60,22 +56,14 @@ int CHudSniperScope::Draw(float flTime)
 {
 	if(gHUD.m_iFOV > 40)
 		return 1;
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransColor);
-	gEngfuncs.pTriAPI->Brightness(1.0);
-	gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 255);
-	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
 
-	m_iScopeArc[0]->Bind();
-	DrawUtils::Draw2DQuad(left, 0, centerx, centery);
+	m_iScopeArc[0]->Draw2DQuad(left, 0, centerx, centery, 0, 0, 1, 1, 0, 0, 0, 255);
 
-	m_iScopeArc[1]->Bind();
-	DrawUtils::Draw2DQuad(centerx, 0, right, centery);
+	m_iScopeArc[1]->Draw2DQuad(centerx, 0, right, centery, 0, 0, 1, 1, 0, 0, 0, 255);
 
-	m_iScopeArc[2]->Bind();
-	DrawUtils::Draw2DQuad(centerx, centery, right, TrueHeight);
+	m_iScopeArc[2]->Draw2DQuad(centerx, centery, right, TrueHeight, 0, 0, 1, 1, 0, 0, 0, 255);
 
-	m_iScopeArc[3]->Bind();
-	DrawUtils::Draw2DQuad(left, centery, centerx, TrueHeight);
+	m_iScopeArc[3]->Draw2DQuad(left, centery, centerx, TrueHeight, 0, 0, 1, 1, 0, 0, 0, 255);
 
 	FillRGBABlend( 0, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255 );
 	FillRGBABlend( (ScreenWidth - ScreenHeight) / 2 - 2 + ScreenHeight, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255 );

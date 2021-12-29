@@ -15,8 +15,6 @@ GNU General Public License for more details.
 
 #include "hud.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 #include "retina.h"
 
@@ -74,20 +72,16 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 		a = 0.5f + (modDelta < 0.5f ? modDelta * 2.0f : 2.0f - modDelta * 2.0f) * 0.5f;
 	}
 
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
-	item.pTexture->Bind();
-
 	if (item.type & RETINA_DRAW_TYPE_QUARTER)
 	{
-		DrawUtils::Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2); // �I	
-		DrawUtils::Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2); // �J
-		DrawUtils::Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2); // �L
-		DrawUtils::Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2); // �K
+		item.pTexture->Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �I
+		item.pTexture->Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �J
+		item.pTexture->Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �L
+		item.pTexture->Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �K
 	}
 	else
 	{
-		DrawUtils::Draw2DQuad(0, 0, TrueWidth, TrueHeight);
+		item.pTexture->Draw2DQuad(0, 0, TrueWidth, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255 * a);
 	}
 }
 

@@ -1,8 +1,6 @@
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
 
 #include "zbs.h"
 #include "zbs_level.h"
@@ -32,10 +30,7 @@ int CHudZBSLevel::Draw(float time)
 	int y = ScreenHeight - 220;
 	const float flScale = 0.0f;
 
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-	m_pTexture_ZBSBoard_BG->Bind();
-	DrawUtils::Draw2DQuadScaled(x, y, x + 204, y + 85);
+	m_pTexture_ZBSBoard_BG->Draw2DQuadScaled(x, y, x + 204, y + 85);
 	
 	const int r = 255, g = 255, b = 255;
 
@@ -69,8 +64,7 @@ int CHudZBSLevel::Draw(float time)
 	if (m_iLevel_Wall)
 	{
 		y -= 32;
-		m_pTexture_ZBSBoard_BG_Wall->Bind();
-		DrawUtils::Draw2DQuadScaled(x, y, x + 204, y + 28);
+		m_pTexture_ZBSBoard_BG_Wall->Draw2DQuadScaled(x, y, x + 204, y + 28);
 
 		DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
 		if (m_iLevel_Wall >= 40)

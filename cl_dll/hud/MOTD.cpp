@@ -26,7 +26,6 @@
 #include "cl_util.h"
 #include "parsemsg.h"
 #include "kbutton.h"
-#include "triangleapi.h"
 #include <string.h>
 #include <stdio.h>
 #include "draw_util.h"

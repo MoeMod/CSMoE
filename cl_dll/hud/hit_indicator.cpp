@@ -22,8 +22,6 @@
 #include "calcscreen.h"
 #include "com_model.h"
 
-#include "triangleapi.h"
-
 
 DECLARE_MESSAGE(m_HitIndicator, HitMsg )
 
@@ -57,7 +55,7 @@ int CHudHitIndicator:: Init( void )
 	HOOK_MESSAGE(HitMsg);
 
 	hud_hitindicator_style = CVAR_CREATE( "hud_hitstyle", "2", FCVAR_ARCHIVE);
-	current_style = 3;   //Ä¬ÈÏÓÃÃ«±Ê×ÖÌå
+	current_style = 3;   //Ä¬ï¿½ï¿½ï¿½ï¿½Ã«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	return 1;
 }
 
@@ -287,10 +285,6 @@ void CHudHitIndicator::Draw2DQuad_Custom(float x, float y, float scale, int num,
 	if (!m_iTex[iTexID]->valid()) return;
 	x *= gHUD.m_flScale;    //Xash3D feature
 	y *= gHUD.m_flScale;
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-	gEngfuncs.pTriAPI->Brightness(1.0);
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, alpha);
-	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
 
 	float w = m_iTex[iTexID]->w() / 10.0f / 2.0f, h = m_iTex[iTexID]->h() / 2.0f;
 	w *= scale;
@@ -298,20 +292,5 @@ void CHudHitIndicator::Draw2DQuad_Custom(float x, float y, float scale, int num,
 	w *= gHUD.m_flScale;     //Xash3D feature
 	h *= gHUD.m_flScale;
 
-	m_iTex[iTexID]->Bind();
-	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-
-	gEngfuncs.pTriAPI->TexCoord2f(0.1*num , 0);
-	gEngfuncs.pTriAPI->Vertex3f(x - w, y - h, 0);
-
-	gEngfuncs.pTriAPI->TexCoord2f(0.1*num, 1);
-	gEngfuncs.pTriAPI->Vertex3f(x - w, y + h, 0);
-
-	gEngfuncs.pTriAPI->TexCoord2f(0.1*(num + 1), 1);
-	gEngfuncs.pTriAPI->Vertex3f(x + w, y + h, 0);
-
-	gEngfuncs.pTriAPI->TexCoord2f(0.1*(num + 1), 0);
-	gEngfuncs.pTriAPI->Vertex3f(x + w, y - h, 0);
-
-	gEngfuncs.pTriAPI->End();
+	m_iTex[iTexID]->Draw2DQuad(x - w, y - h, x + w, y + h, 0.1*num , 0, 0.1*(num + 1), 1, 255, 255, 255, alpha);
 }

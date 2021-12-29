@@ -34,6 +34,7 @@ GNU General Public License for more details.
 
 #if XASH_IMGUI
 #include "imgui_console.h"
+#include "imgui_surface.h"
 #endif
 
 #define MAX_LINELENGTH		80
@@ -605,8 +606,12 @@ static void SPR_DrawGeneric( int frame, float x, float y, float width, float hei
 	// scale for screen sizes
 	SPR_AdjustSize( &x, &y, &width, &height );
 	texnum = R_GetSpriteTexture( clgame.ds.pSprite, frame );
+#if XASH_IMGUI
+	ImGui_Surface_DrawImage( texnum, x, y, x + width, y + height, s1, t1, s2, t2,  clgame.ds.spriteColor[0], clgame.ds.spriteColor[1], clgame.ds.spriteColor[2], clgame.ds.spriteColor[3] );
+#else
 	pglColor4ubv( clgame.ds.spriteColor );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, texnum );
+#endif
 }
 
 /*
@@ -719,13 +724,20 @@ void CL_DrawScreenFade( void )
 		iFadeAlpha = bound( 0, iFadeAlpha, sf->fadealpha );
 	}
 
-	pglColor4ub( sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha );
 
+#ifdef XASH_IMGUI
+	if( sf->fadeFlags & FFADE_MODULATE )
+		ImGui_Surface_SetRenderMode( kRenderTransAdd );
+	else ImGui_Surface_SetRenderMode( kRenderTransTexture );
+	ImGui_Surface_DrawRectangle(0, 0, scr_width->integer, scr_height->integer, sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha);
+#else
+	pglColor4ub( sf->fader, sf->fadeg, sf->fadeb, iFadeAlpha );
 	if( sf->fadeFlags & FFADE_MODULATE )
 		GL_SetRenderMode( kRenderTransAdd );
 	else GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( 0, 0, scr_width->integer, scr_height->integer, 0, 0, 1, 1, cls.fillImage );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*
@@ -963,12 +975,20 @@ void CL_DrawCrosshair( void )
 
 	clgame.ds.pSprite = crosshair_state.pCrosshair;
 
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderTransTexture );
+	*(int *)clgame.ds.spriteColor = *(int *)crosshair_state.rgbaCrosshair;
+	ImGui_Surface_EnableScissor( x - 0.5f * width, y - 0.5f * height, width, height );
+	SPR_DrawGeneric( 0, x - 0.5f * width, y - 0.5f * height, -1, -1, &crosshair_state.rcCrosshair );
+	ImGui_Surface_DisableScissor();
+#else
 	GL_SetRenderMode( kRenderTransTexture );
 	*(int *)clgame.ds.spriteColor = *(int *)crosshair_state.rgbaCrosshair;
 
 	SPR_EnableScissor( x - 0.5f * width, y - 0.5f * height, width, height );
 	SPR_DrawGeneric( 0, x - 0.5f * width, y - 0.5f * height, -1, -1, &crosshair_state.rcCrosshair );
 	SPR_DisableScissor();
+#endif
 }
 
 /*
@@ -997,25 +1017,40 @@ static void CL_DrawLoading( float percent )
 
 	if( cl_allow_levelshots->integer )
 	{
+#ifdef XASH_IMGUI
+		ImGui_Surface_SetRenderMode( kRenderTransTexture );
+		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 128, 128, 128, 255 );
+#else
 		pglColor4ub( 128, 128, 128, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.loadingBar );
+#endif
 
 		step = (float)width / 100.0f;
 		right = (int)ceil( percent * step );
 		s2 = (float)right / width;
 		width = right;
-	
+
+#ifdef XASH_IMGUI
+		ImGui_Surface_SetRenderMode( kRenderTransTexture );
+		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, s2, 1, 208, 152, 0, 255 );
+#else
 		pglColor4ub( 208, 152, 0, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, s2, 1, cls.loadingBar );
 		pglColor4ub( 255, 255, 255, 255 );
+#endif
 	}
 	else
 	{
+#ifdef XASH_IMGUI
+		ImGui_Surface_SetRenderMode( kRenderTransTexture );
+		ImGui_Surface_DrawImage( cls.loadingBar, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
+#else
 		pglColor4ub( 255, 255, 255, 255 );
 		GL_SetRenderMode( kRenderTransTexture );
 		R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.loadingBar );
+#endif
 	}
 }
 
@@ -1043,13 +1078,21 @@ static void CL_DrawPause( void )
 	width *= xscale;
 	height *= yscale;
 
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderTransTexture );
+	ImGui_Surface_DrawImage( cls.pauseIcon, x, y, x + width, y + height, 0, 0, 1, 1, 255, 255, 255, 255 );
+#else
 	pglColor4ub( 255, 255, 255, 255 );
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.pauseIcon );
+#endif
 }
 
 void CL_DrawHUD( int state )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderNormal);
+#endif
 	if( state == CL_ACTIVE && !cl.video_prepped )
 		state = CL_LOADING;
 
@@ -1082,6 +1125,9 @@ void CL_DrawHUD( int state )
 		}
 		break;
 	}
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#endif
 }
 
 static void CL_ClearUserMessage( char *pszName, int svc_num )
@@ -1373,9 +1419,13 @@ static void GAME_EXPORT pfnSPR_Set( HSPRITE hPic, int r, int g, int b )
 	clgame.ds.spriteColor[3] = 255;
 
 	// set default state
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderNormal );
+#else
 	pglDisable( GL_BLEND );
 	pglDisable( GL_ALPHA_TEST );
 	pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+#endif
 }
 
 /*
@@ -1386,7 +1436,11 @@ pfnSPR_Draw
 */
 static void GAME_EXPORT pfnSPR_Draw( int frame, int x, int y, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderTransAlpha );
+#else
 	pglEnable( GL_ALPHA_TEST );
+#endif
 	SPR_DrawGeneric( frame, x, y, -1, -1, prc );
 }
 
@@ -1398,7 +1452,11 @@ pfnSPR_DrawHoles
 */
 static void GAME_EXPORT pfnSPR_DrawHoles( int frame, int x, int y, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderTransAlpha );
+#else
 	GL_SetRenderMode( kRenderTransAlpha );
+#endif
 	SPR_DrawGeneric( frame, x, y, -1, -1, prc );
 }
 
@@ -1410,7 +1468,11 @@ pfnSPR_DrawAdditive
 */
 static void GAME_EXPORT pfnSPR_DrawAdditive( int frame, int x, int y, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode( kRenderTransAdd );
+#else
 	GL_SetRenderMode( kRenderTransAdd );
+#endif
 	SPR_DrawGeneric( frame, x, y, -1, -1, prc );
 }
 
@@ -1495,6 +1557,12 @@ pfnFillRGBA
 */
 void GAME_EXPORT CL_FillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
 {
+#ifdef XASH_IMGUI
+	float x1 = x, y1 = y, w1 = width, h1 = height;
+	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
+	ImGui_Surface_SetRenderMode(kRenderTransAdd);
+	ImGui_Surface_DrawRectangle(x1, y1, w1, h1, r, g, b, a);
+#else
 	float x1 = x, y1 = y, w1 = width, h1 = height;
 	r = bound( 0, r, 255 );
 	g = bound( 0, g, 255 );
@@ -1507,6 +1575,7 @@ void GAME_EXPORT CL_FillRGBA( int x, int y, int width, int height, int r, int g,
 	GL_SetRenderMode( kRenderTransAdd );
 	R_DrawStretchPic( x1, y1, w1, h1, 0, 0, 1, 1, cls.fillImage );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*
@@ -1746,7 +1815,8 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	clgame.ds.adjust_size = true;
 	int a = max(r, max(g, b));
 	rgba_t rgb = { (byte)r,(byte)g,(byte)b,(byte)a };
-	int w = ImGui_Console_DrawChar(x, y, number, rgb);
+	ImGui_Surface_SetRenderMode( kRenderTransAdd );
+	int w = ImGui_Surface_DrawChar(x, y, number, r, g, b, a);
 	clgame.ds.adjust_size = false;
 	return w;
 #else
@@ -2829,8 +2899,12 @@ pfnSPR_DrawGeneric
 */
 static void GAME_EXPORT pfnSPR_DrawGeneric( int frame, int x, int y, const wrect_t *prc, int blendsrc, int blenddst, int width, int height )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetCustomBlend( blendsrc, blenddst );
+#else
 	pglEnable( GL_BLEND );
 	pglBlendFunc( blendsrc, blenddst ); // g-cont. are params is valid?
+#endif
 	SPR_DrawGeneric( frame, x, y, width, height, prc );
 }
 
@@ -2855,7 +2929,7 @@ static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned
 {
 #ifdef XASH_IMGUI
 	clgame.ds.adjust_size = true;
-	int w = ImGui_Console_DrawChar(x, y, number, g_color_table[7]);
+	int w = ImGui_Surface_DrawChar(x, y, number, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2], g_color_table[7][3]);
 	clgame.ds.adjust_size = false;
 	return w;
 #else
@@ -3000,6 +3074,12 @@ pfnFillRGBABlend
 */
 void GAME_EXPORT CL_FillRGBABlend( int x, int y, int width, int height, int r, int g, int b, int a )
 {
+#ifdef XASH_IMGUI
+	float x1 = x, y1 = y, w1 = width, h1 = height;
+	SPR_AdjustSize( &x1, &y1, &w1, &h1 );
+	ImGui_Surface_SetRenderMode( kRenderTransTexture );
+	ImGui_Surface_DrawRectangle(x1, y1, w1, h1, r, g, b, a);
+#else
 	float x1 = x, y1 = y, w1 = width, h1 = height;
 	r = bound( 0, r, 255 );
 	g = bound( 0, g, 255 );
@@ -3012,6 +3092,7 @@ void GAME_EXPORT CL_FillRGBABlend( int x, int y, int width, int height, int r, i
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x1, y1, w1, h1, 0, 0, 1, 1, cls.fillImage );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*

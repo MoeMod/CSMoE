@@ -24,8 +24,7 @@
 #include "com_model.h"
 
 #include "events.h"
-#include "triangleapi.h"
-#include <r_efx.h>
+#include "r_efx.h"
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
@@ -103,10 +102,7 @@ int CHudHeadIcon:: Draw( float flTime )
 					float xyScreen[2];
 					if (CalcScreen(ent->origin, xyScreen))
 					{
-						gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-						gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-						m_pTexture_Zombie_s->Bind();
-						DrawUtils::Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
+						m_pTexture_Zombie_s->Draw2DQuadScaled(xyScreen[0] - 18, xyScreen[1] - 18, xyScreen[0] + 19, xyScreen[1] + 19);
 
 						char szBuffer[16];
 						sprintf(szBuffer, "[%im]", static_cast<int>((ent->origin - gHUD.m_vecOrigin).Length() / 42.0f));

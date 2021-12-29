@@ -26,8 +26,6 @@
 #include "event_api.h"
 #include "com_weapons.h"
 #include "gamemode/mods_const.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 using namespace cl;
 
@@ -84,14 +82,10 @@ int CHudStatusIcons::Draw( float flTime )
 			else SPR_Set( m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b );*/
 			if (!strcmp(m_IconList[i].szSpriteName, "c4") && m_tgaC4[0] && m_tgaC4[1])
 			{
-				gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-				gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 				if (g_bInBombZone && ((int)(flTime * 10) % 2))
-					m_tgaC4[1]->Bind();
+					m_tgaC4[1]->Draw2DQuadScaled(x, y, x + 58, y + 55);
 				else
-					m_tgaC4[0]->Bind();
-
-				DrawUtils::Draw2DQuadScaled(x, y, x + 58, y + 55);
+					m_tgaC4[0]->Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}
 			else if (gHUD.m_csgohud->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
 			{

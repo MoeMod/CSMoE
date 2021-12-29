@@ -30,7 +30,6 @@
 
 #include "draw_util.h"
 #include "const/const_client.h"
-#include "triangleapi.h"
 
 
 DECLARE_MESSAGE(m_Health, Health )
@@ -314,13 +313,10 @@ void CHudHealth::DrawHealthBar( float flTime )
 
 		if (gHUD.m_csgohud->value)
 		{
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 			if(m_iHealth <= 25)
-				gEngfuncs.pTriAPI->Color4ub(250, 0, 0, 70);
+				m_pTexture_Black->Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight, 0, 0, 1, 1, 250, 0, 0, 70);
 			else
-				gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 100);
-			m_pTexture_Black->Bind();
-			DrawUtils::Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight);
+				m_pTexture_Black->Draw2DQuadScaled(0, y - gHUD.m_iFontHeight / 2, ScreenWidth / 5 - HealthWidth, ScreenHeight, 0, 0, 1, 1, 0, 0, 0, 100);
 		}
 
 		SPR_Set(gHUD.GetSprite(m_HUD_cross), r, g, b);

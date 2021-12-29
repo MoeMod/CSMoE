@@ -1942,6 +1942,8 @@ namespace xe {
 
 		pglDeleteTextures( 1, &image->texnum );
 
+		Msg("TexLru : swap out texture %s", image->name);
+
 		return 0;
 	}
 
@@ -1968,6 +1970,7 @@ namespace xe {
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				FS_FreeImage( pic ); // release source texture
 
+			Msg("TexLru : load external texture %s\n", src.path.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
@@ -2001,6 +2004,8 @@ namespace xe {
 				FS_FreeImage( pic ); // release source texture
 
 			Mem_Free( buf );
+
+			Msg("TexLru : load internal texture %s from %s\n", src.texture_name.c_str(), src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
 	};

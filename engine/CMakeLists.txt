@@ -252,6 +252,7 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_imewindow.cpp
 	client/imgui_sprview.cpp
 	client/imgui_connectprogress.cpp
+	client/imgui_surface.cpp
 )
 
 set(XASH_ENGINE_DEDICATED_SOURCES

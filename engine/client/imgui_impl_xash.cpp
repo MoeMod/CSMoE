@@ -58,6 +58,8 @@ ImGuiContext* g_EngineContext = nullptr;
 
 bool g_bShowDemoWindow = false;
 
+int g_imguiRenderMode = 0;
+
 extern "C" byte *imgui_pool = nullptr;
 
 void* ImGui_ImplGL_OperatorNew(size_t sz, void* user_data)
@@ -104,6 +106,9 @@ void ImGui_ImplGL_RenderDrawLists(ImDrawData* draw_data)
 	pglEnable(GL_TEXTURE_2D);
 	pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	pglShadeModel(GL_SMOOTH);
+
+	g_imguiRenderMode = kRenderTransTexture;
+	GL_SetRenderMode(kRenderTransTexture);
 
 	// Setup viewport, orthographic projection matrix
 //	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);

@@ -34,7 +34,6 @@ version.
 #include "parsemsg.h"
 
 #include "vgui_parser.h"
-#include "triangleapi.h"
 #include "draw_util.h"
 
 /*
@@ -175,9 +174,7 @@ int CHudSpectatorGui::Draw( float flTime )
 		{
 			if( m_hTimerTexture )
 			{
-				m_hTimerTexture->Bind();
-				gEngfuncs.pTriAPI->RenderMode( kRenderTransAlpha );
-				DrawUtils::Draw2DQuad( (INT_XPOS(12.5) + 10) * gHUD.m_flScale,
+				m_hTimerTexture->Draw2DQuad( (INT_XPOS(12.5) + 10) * gHUD.m_flScale,
 									   (INT_YPOS(2) * 0.5) * gHUD.m_flScale,
 									   (INT_XPOS(12.5) + 10 + gHUD.GetCharHeight() * m_fTextScale) * gHUD.m_flScale,
 									   (INT_YPOS(2) * 0.5 + gHUD.GetCharHeight() * m_fTextScale) * gHUD.m_flScale );

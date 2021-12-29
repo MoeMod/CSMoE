@@ -17,7 +17,6 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "parsemsg.h"
 #include "draw_util.h"
-#include "triangleapi.h"
 
 #include "hud_sub_impl.h"
 #include "gamemode/mods_const.h"

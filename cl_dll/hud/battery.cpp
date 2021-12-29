@@ -22,7 +22,6 @@
 #include "parsemsg.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
 
 DECLARE_MESSAGE( m_Battery, Battery )
 DECLARE_MESSAGE( m_Battery, ArmorType )
@@ -146,10 +145,7 @@ int CHudBattery::Draw( float flTime )
 
 	if (gHUD.m_csgohud->value)
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(0, 0, 0, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(x - ArmorWidth, y - gHUD.m_iFontHeight / 2, x - ArmorWidth + ScreenWidth / 5 - ArmorWidth, ScreenHeight);
+		m_pTexture_Black->Draw2DQuadScaled(x - ArmorWidth, y - gHUD.m_iFontHeight / 2, x - ArmorWidth + ScreenWidth / 5 - ArmorWidth, ScreenHeight, 0, 0, 1, 1, 0, 0, 0, 100);
 	}
 
 	// make sure we have the right sprite handles

@@ -17,7 +17,6 @@ GNU General Public License for more details.
 #include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
 
 #include "zb2.h"
 #include "zb2_skill.h"
@@ -223,7 +222,7 @@ int CHudZB2_Skill::Draw(float time)
 	int y = ScreenHeight - gHUD.m_iFontHeight * 3 / 2 - iHeight;
 
 	x = DrawHealthRecoveryIcon(time, x, y);
-	if (!touch_enable || !touch_enable->value)
+	if (false)
 	{	
 		if (m_iCurrentClass >= ZOMBIE_CLASS_TELEPORT && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 			DrawSkillBoardNew(time);
@@ -383,11 +382,7 @@ void CHudZB2_Skill::DrawSkillTip(float time) const
 		float modDelta = timeDelta - static_cast<float>(static_cast<int>(timeDelta));
 		float a = modDelta < 0.5f ? modDelta * 2.0f : 2.0f - modDelta * 2.0f;
 
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
-		tex->Bind();
-
-		DrawUtils::Draw2DQuadScaled(x - w / 2, y, x + w / 2, y + h);
+		tex->Draw2DQuadScaled(x - w / 2, y, x + w / 2, y + h, 0, 0, 1, 1, 255, 255, 255, 255 * a);
 
 		y += h;
 	}
@@ -398,8 +393,6 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 	int x = ScreenWidth / 2;
 	int y = 58;
 
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-
 	x -= m_pTexture_skillslotbg->w() / 2;
 	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 	{		
@@ -408,17 +401,13 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 		{
 			x -= (classicon->w() + 4) / 2;
 
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-			classicon->Bind();
-			DrawUtils::Draw2DQuadScaled(x, y, x + classicon->w(), y + classicon->h());
+			classicon->Draw2DQuadScaled(x, y, x + classicon->w(), y + classicon->h());
 
 			x += classicon->w() + 4;
 		}
 	}
 
-	gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-	m_pTexture_skillslotbg->Bind();
-	DrawUtils::Draw2DQuadScaled(x, y, x + m_pTexture_skillslotbg->w(), y + m_pTexture_skillslotbg->h());
+	m_pTexture_skillslotbg->Draw2DQuadScaled(x, y, x + m_pTexture_skillslotbg->w(), y + m_pTexture_skillslotbg->h());
 
 	char SkillKey = 'G';
 	if (m_iCurrentClass == ZOMBIE_CLASS_HUMAN)
@@ -439,49 +428,15 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				float center_y = y + h * (1.0f - flPercent);
 
 				// top half
-				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 50);
-				skillicon->Bind();
-
-				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-				// �I (x1, y1)
-				gEngfuncs.pTriAPI->TexCoord2f(0, 0);
-				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, y * gHUD.m_flScale, 0);
-				// �L (x1, y2)
-				gEngfuncs.pTriAPI->TexCoord2f(0, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// �K (x2, y2)
-				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// �J (x2, y1)
-				gEngfuncs.pTriAPI->TexCoord2f(1, 0);
-				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, y * gHUD.m_flScale, 0);
-				gEngfuncs.pTriAPI->End();
+				skillicon->Draw2DQuadScaled(x, y, x+w, center_y, 0, 0, 1, (1.0f - flPercent), 255, 255, 191, 50);
 
 				// bottom half
-				gEngfuncs.pTriAPI->Color4ub(230, 150, 150, 255);
-				skillicon->Bind();
-
-				gEngfuncs.pTriAPI->Begin(TRI_QUADS);
-				// �I (x1, y1)
-				gEngfuncs.pTriAPI->TexCoord2f(0, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				// �L (x1, y2)
-				gEngfuncs.pTriAPI->TexCoord2f(0, 1);
-				gEngfuncs.pTriAPI->Vertex3f(x * gHUD.m_flScale, (y + h) * gHUD.m_flScale, 0);
-				// �K (x2, y2)
-				gEngfuncs.pTriAPI->TexCoord2f(1, 1);
-				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, (y + h) * gHUD.m_flScale, 0);
-				// �J (x2, y1)
-				gEngfuncs.pTriAPI->TexCoord2f(1, (1.0f - flPercent));
-				gEngfuncs.pTriAPI->Vertex3f((x + w) * gHUD.m_flScale, center_y * gHUD.m_flScale, 0);
-				gEngfuncs.pTriAPI->End();
+				skillicon->Draw2DQuadScaled(x, center_y, x+w, (y + h), 0, (1.0f - flPercent), 1, 1, 230, 150, 150, 255);
 			}
 			else if (icon.m_iCurrentSkillStatus == SKILL_STATUS_USED)
 			{
 				// used
-				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 50);
-				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
+				skillicon->Draw2DQuadScaled(x, y, x + w, y + h, 0, 0, 1, 1, 255, 255, 191, 50);
 			}
 			else if (time < icon.m_flTimeSkillBlink)
 			{
@@ -491,25 +446,18 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 				float a = modDelta < 0.5f ? modDelta * 2.0f : 2.0f - modDelta * 2.0f;
 				a = 1.0 - a; // reverse ?
 
-				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 255 * a);
-				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
+				skillicon->Draw2DQuadScaled(x, y, x + w, y + h, 0, 0, 1, 1, 255, 255, 191, 255 * a);
 			}
 			else
 			{
 				// normal
-				gEngfuncs.pTriAPI->Color4ub(255, 255, 191, 255);
-				skillicon->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + w, y + h);
+				skillicon->Draw2DQuadScaled(x, y, x + w, y + h, 0, 0, 1, 1, 255, 255, 191, 255);
 			}
 		}
-		
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-		m_pTexture_skillslotkeybg->Bind();
-		DrawUtils::Draw2DQuadScaled(x - 3, y - 3, x + m_pTexture_skillslotkeybg->w(), y + m_pTexture_skillslotkeybg->h());
 
-		DrawUtils::TextMessageDrawChar(x + 7, y, SkillKey, 100, 100, 100);
+		m_pTexture_skillslotkeybg->Draw2DQuadScaled(x - 3, y - 3, x + m_pTexture_skillslotkeybg->w(), y + m_pTexture_skillslotkeybg->h());
+
+		DrawUtils::TextMessageDrawChar(x + 7, y, SkillKey, 200, 200, 200);
 
 		SkillKey = SkillKey == 'G' ? '5' : SkillKey + 1;
 		x += w;

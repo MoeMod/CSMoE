@@ -1,7 +1,6 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "cl_entity.h"
-#include "triangleapi.h"
 #include "draw_util.h"
 #include "com_model.h"
 #include "calcscreen.h"

@@ -21,7 +21,6 @@ GNU General Public License for more details.
 #include "pm_shared.h"
 
 #include "r_efx.h"
-#include "triangleapi.h"
 #include "event_args.h"
 #include "in_defs.h"
 

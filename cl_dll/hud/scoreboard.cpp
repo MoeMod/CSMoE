@@ -16,7 +16,6 @@ GNU General Public License for more details.
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
-#include "triangleapi.h"
 #include "com_weapons.h"
 #include "cdll_dll.h"
 

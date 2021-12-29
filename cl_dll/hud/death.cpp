@@ -23,8 +23,6 @@
 #include <stdio.h>
 #include "draw_util.h"
 
-#include "triangleapi.h"
-
 float color[3];
 
 DECLARE_MESSAGE( m_DeathNotice, DeathMsg )
@@ -172,9 +170,6 @@ int CHudDeathNotice :: Draw( float flTime )
 			if (!rgDeathNoticeList[i].bSuicide)
 				xMin -= (5 + DrawUtils::ConsoleStringLen(rgDeathNoticeList[i].szKiller));
 
-			gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
-			gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-
 			SharedTexture (*DrawBg)[3] = nullptr;
 			switch (rgDeathNoticeList[i].DrawBg)
 			{
@@ -199,21 +194,18 @@ int CHudDeathNotice :: Draw( float flTime )
 			{
 				if((*DrawBg)[0])
 				{
-					(*DrawBg)[0]->Bind();
-					DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
+					(*DrawBg)[0]->Draw2DQuadScaled(xMin - 3 - xOffset, y, xMin - 3 - xOffset + 3, y + 16);
 				}
 
 				if ((*DrawBg)[1])
 				{
-					(*DrawBg)[1]->Bind();
-					DrawUtils::Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
+					(*DrawBg)[1]->Draw2DQuadScaled(xMin - 3 - xOffset + 3, y, ScreenWidth - (YRES(5) * 3), y + 16);
 				}
 
 
 				if ((*DrawBg)[2])
 				{
-					(*DrawBg)[2]->Bind();
-					DrawUtils::Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
+					(*DrawBg)[2]->Draw2DQuadScaled(ScreenWidth - (YRES(5) * 3), y, ScreenWidth - (YRES(5) * 3) + 3, y + 16);
 				}
 			}
 

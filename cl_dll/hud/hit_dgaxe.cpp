@@ -29,7 +29,6 @@ version.
 */
 
 #include "hud.h"
-#include "triangleapi.h"
 #include "r_efx.h"
 #include "cl_util.h"
 
@@ -164,16 +163,11 @@ int CHudDgaxe::Draw(float flTime)
 		iX = x - wide / 2;
 		iY = y - height / 2;
 
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-		if (iType != 3)
-			m_pCurTexture[iType]->Bind();
-
 		switch (iType)
 		{
-		case DGAXE_AIM_OFF:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
-		case DGAXE_AIM_ON:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
-		case DGAXE_AIM_ON_2:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case DGAXE_AIM_OFF:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case DGAXE_AIM_ON:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case DGAXE_AIM_ON_2:m_pCurTexture[iType]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
 		case AIM_NO: return 1; break;
 		default:
 			break;
@@ -227,16 +221,10 @@ int CHudDgaxe::Draw(float flTime)
 		iX = x - wide / 2;
 		iY = y - height / 2;
 
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-	
-
-		m_pCurTexture[iType-4]->Bind();
-
 		switch (iType)
 		{
-		case SKULLT9_AIM_OFF:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
-		case SKULLT9_AIM_ON:DrawUtils::Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case SKULLT9_AIM_OFF:m_pCurTexture[iType-4]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case SKULLT9_AIM_ON:m_pCurTexture[iType-4]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
 		default:
 			break;
 		}
@@ -256,14 +244,11 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 	{
 	case HUNTBOW_AIM_IDLE:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+				m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height);
 			}
 
 		}
@@ -271,14 +256,11 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 	}
 	case HUNTBOW_AIM_HIT:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+				m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height);
 			}
 
 		}
@@ -286,83 +268,68 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 	}
 	case HUNTBOW_HIT_LEFT:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
 				if(i == 4)
-					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 255, 255, 255);
 			}
 		}
 		break;
 	}
 	case HUNTBOW_HIT_RIGHT:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
 				if (i == 5)
-					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 255, 255, 255);
 			}
 		}
 		break;
 	}
 	case HUNTBOW_AIM_CHARGIN:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
 		if (m_pCurTexture[6])
 		{
-			m_pCurTexture[6]->Bind();
-			DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+			m_pCurTexture[6]->Draw2DQuadScaled(x, y, x + wide, y + height);
 		}
 		break;
 	}
 	case HUNTBOW_AIM_HIT_LEFT:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
 				if (i == 3)
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 255, 255, 255);
 				else if (i == 4)
-					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+				m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 0, 1, 1, 0, 255, 0, 255);
 			}
 		}
 		break;
 	}
 	case HUNTBOW_AIM_HIT_RIGHT:
 	{
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
 		for (int i = 3; i <= 5; i++)
 		{
 			if (m_pCurTexture[i])
 			{
 				if (i == 3)
-					gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 255, 255, 255, 255);
 				else if (i == 5)
-					gEngfuncs.pTriAPI->Color4ub(255, 0, 0, 255);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 255, 0, 0, 255);
 				else
-					gEngfuncs.pTriAPI->Color4ub(0, 255, 0, 255);
-				m_pCurTexture[i]->Bind();
-				DrawUtils::Draw2DQuadScaled(x, y, x + wide, y + height);
+					m_pCurTexture[i]->Draw2DQuadScaled(x, y, x + wide, y + height, 0, 255, 0, 255);
 			}
 		}
 		break;

@@ -1,7 +1,5 @@
 #include "hud.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 #include "hud_scoreboard_legacy.h"
 
@@ -78,10 +76,7 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 		int y = 5;
 		const float flScale = 0.0f;
 
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255);
-		m_pTexture_Board->Bind();
-		DrawUtils::Draw2DQuadScaled(x - 240 / 2, y, x + 240 / 2, y + 70);
+		m_pTexture_Board->Draw2DQuadScaled(x - 240 / 2, y, x + 240 / 2, y + 70);
 
 		if (scoreCT >= 100)
 		{

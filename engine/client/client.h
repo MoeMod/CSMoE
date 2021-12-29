@@ -314,6 +314,7 @@ typedef struct
 
 	// holds text color
 	rgba_t		textColor;
+	rgba_t		picColor;
 } gameui_draw_t;
 
 typedef struct

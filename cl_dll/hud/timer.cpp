@@ -36,7 +36,6 @@ version.
 #include "vgui_parser.h"
 #include <string.h>
 #include "draw_util.h"
-#include "triangleapi.h"
 #include "gamemode/mods_const.h"
 
 DECLARE_MESSAGE( m_Timer, RoundTime )
@@ -110,10 +109,7 @@ int CHudTimer::Draw( float fTime )
 	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
 	{ 
 		y = 5;
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(x - 120 / 2, y, x + 120 / 2, y + 70);
+		m_pTexture_Black->Draw2DQuadScaled(x - 120 / 2, y, x + 120 / 2, y + 70);
 
 		y = 17;
 		

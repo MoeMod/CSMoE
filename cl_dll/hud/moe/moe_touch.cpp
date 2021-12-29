@@ -14,12 +14,8 @@ GNU General Public License for more details.
 */
 
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
 #include "draw_util.h"
-#include "triangleapi.h"
-
-#include "parsemsg.h"
 
 #include "ammohistory.h"
 #include "moe_touch.h"

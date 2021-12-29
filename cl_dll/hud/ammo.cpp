@@ -1248,10 +1248,7 @@ int CHudAmmo::Draw(float flTime)
 	{
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 		x = ScreenWidth - (8 * AmmoWidth) - iIconWidth;
-		gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 100);
-		m_pTexture_Black->Bind();
-		DrawUtils::Draw2DQuadScaled(x, y - gHUD.m_iFontHeight / 2, x + (8 * AmmoWidth) + iIconWidth, ScreenHeight);
+		m_pTexture_Black->Draw2DQuadScaled(x, y - gHUD.m_iFontHeight / 2, x + (8 * AmmoWidth) + iIconWidth, ScreenHeight, 0, 0, 1, 1, 255, 255, 255, 100);
 	}
 	// Does weapon have any ammo at all?
 	if (m_pWeapon->iAmmoType > 0)

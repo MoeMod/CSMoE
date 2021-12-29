@@ -18,7 +18,6 @@
 #include <math.h>
 #include "hud.h"
 #include "cl_util.h"
-#include "triangleapi.h"
 
 #include <string.h>
 #define MAX_LOGO_FRAMES 56

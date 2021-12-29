@@ -1,8 +1,5 @@
 #include "hud.h"
-#include "followicon.h"
 #include "cl_util.h"
-#include "draw_util.h"
-#include "triangleapi.h"
 
 #include "zbs.h"
 #include "zbs_kill.h"
@@ -32,7 +29,6 @@ void CHudZBSKill::Reset(void)
 
 int CHudZBSKill::Draw(float time)
 {
-	gEngfuncs.pTriAPI->RenderMode(kRenderTransTexture);
 	
 	for (auto &flStartTime : m_killTimes)
 	{
@@ -43,12 +39,9 @@ int CHudZBSKill::Draw(float time)
 		int x = ScreenWidth / 2 - 234 / 2;
 		int y = ScreenHeight / 4 - shownTime * 100.0f;
 
-		m_iKillTexture->Bind();
-
 		float a = (flStartTime - gHUD.m_flTime) / ZBS_KILL_DISPLAY_TIME;
-		gEngfuncs.pTriAPI->Color4ub(255, 255, 255, 255 * a);
-		
-		DrawUtils::Draw2DQuadScaled(x, y, x + 234, y + 55);
+
+		m_iKillTexture->Draw2DQuadScaled(x, y, x + 234, y + 55, 0, 0, 1, 1, 255, 255, 255, 255 * a);
 	}
 
 	return 1;

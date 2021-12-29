@@ -24,6 +24,10 @@ GNU General Public License for more details.
 #include "server.h" // !!svgame.hInstance
 #include "gl_vidnt.h"
 
+#ifdef XASH_IMGUI
+#include "imgui_surface.h"
+#endif
+
 static MENUAPI	GetMenuAPI;
 static ADDTOUCHBUTTONTOLIST pfnAddTouchButtonToList;
 static void UI_UpdateUserinfo( void );
@@ -347,8 +351,13 @@ static void PIC_DrawGeneric( float x, float y, float width, float height, const 
 		return;
 
 	PicAdjustSize( &x, &y, &width, &height );
+#ifdef XASH_IMGUI
+	ImGui_Surface_DrawImage(menu.ds.gl_texturenum, x, y, x + width, y + height, s1, t1, s2, t2, menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3]);
+#else
+	pglColor4ub( menu.ds.picColor[0], menu.ds.picColor[1], menu.ds.picColor[2], menu.ds.picColor[3] );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, menu.ds.gl_texturenum );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*
@@ -426,7 +435,7 @@ void pfnPIC_Set( HIMAGE hPic, int r, int g, int b, int a )
 	g = bound( 0, g, 255 );
 	b = bound( 0, b, 255 );
 	a = bound( 0, a, 255 );
-	pglColor4ub( r, g, b, a );
+	MakeRGBA( menu.ds.picColor, r, g, b, a );
 }
 
 /*
@@ -437,8 +446,15 @@ pfnPIC_Draw
 */
 void pfnPIC_Draw( int x, int y, int width, int height, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderNormal);
+#else
 	GL_SetRenderMode( kRenderNormal );
+#endif
 	PIC_DrawGeneric( x, y, width, height, prc );
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#endif
 }
 
 /*
@@ -449,8 +465,15 @@ pfnPIC_DrawTrans
 */
 void pfnPIC_DrawTrans( int x, int y, int width, int height, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#else
 	GL_SetRenderMode( kRenderTransTexture );
+#endif
 	PIC_DrawGeneric( x, y, width, height, prc );
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#endif
 }
 
 /*
@@ -461,8 +484,15 @@ pfnPIC_DrawHoles
 */
 void pfnPIC_DrawHoles( int x, int y, int width, int height, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransAlpha);
+#else
 	GL_SetRenderMode( kRenderTransAlpha );
+#endif
 	PIC_DrawGeneric( x, y, width, height, prc );
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#endif
 }
 
 /*
@@ -473,8 +503,15 @@ pfnPIC_DrawAdditive
 */
 void pfnPIC_DrawAdditive( int x, int y, int width, int height, const wrect_t *prc )
 {
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransAdd);
+#else
 	GL_SetRenderMode( kRenderTransAdd );
+#endif
 	PIC_DrawGeneric( x, y, width, height, prc );
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+#endif
 }
 
 /*
@@ -521,6 +558,11 @@ pfnFillRGBA
 */
 static void pfnFillRGBA( int x, int y, int width, int height, int r, int g, int b, int a )
 {
+#ifdef XASH_IMGUI
+	float x1 = x, y1 = y, w1 = width, h1 = height;
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+	ImGui_Surface_DrawRectangle(x1, y1, w1, h1, r, g, b, a);
+#else
 	r = bound( 0, r, 255 );
 	g = bound( 0, g, 255 );
 	b = bound( 0, b, 255 );
@@ -529,6 +571,7 @@ static void pfnFillRGBA( int x, int y, int width, int height, int r, int g, int 
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, cls.fillImage );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*
@@ -586,7 +629,6 @@ static void pfnDrawCharacter( int ix, int iy, int iwidth, int iheight, int ch, i
 	color[0] = (ulRGBA & 0xFF0000) >> 16;
 	color[1] = (ulRGBA & 0xFF00) >> 8;
 	color[2] = (ulRGBA & 0xFF) >> 0;
-	pglColor4ubv( color );
 
 	col = (ch & 15) * 0.0625f + (0.5f / 256.0f);
 	row = (ch >> 4) * 0.0625f + (0.5f / 256.0f);
@@ -601,9 +643,15 @@ static void pfnDrawCharacter( int ix, int iy, int iwidth, int iheight, int ch, i
 	if( menu.ds.scissor_test && !PIC_Scissor( &x, &y, &width, &height, &s1, &t1, &s2, &t2 ))
 		return;
 
+#ifdef XASH_IMGUI
+	ImGui_Surface_SetRenderMode(kRenderTransTexture);
+	ImGui_Surface_DrawImage(hFont, x, y, x + width, y + height, s1, t1, s2, t2, color[0], color[1], color[2], color[3]);
+#else
+	pglColor4ubv( color );
 	GL_SetRenderMode( kRenderTransTexture );
 	R_DrawStretchPic( x, y, width, height, s1, t1, s2, t2, hFont );
 	pglColor4ub( 255, 255, 255, 255 );
+#endif
 }
 
 /*
