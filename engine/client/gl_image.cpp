@@ -21,8 +21,9 @@ GNU General Public License for more details.
 #include "studio.h"
 
 #include <string>
+#include <vector>
 #include <list>
-#include <map>
+#include <unordered_map>
 #include <variant>
 #include <optional>
 #include <memory>
@@ -33,9 +34,10 @@ GNU General Public License for more details.
 
 static int	r_textureMinFilter = GL_LINEAR_MIPMAP_LINEAR;
 static int	r_textureMagFilter = GL_LINEAR;
-static gltexture_t	r_textures[MAX_TEXTURES];
-static gltexture_t	*r_texturesHashTable[TEXTURES_HASH_SIZE];
-static int	r_numTextures;
+
+std::vector<gltexture_t> r_textures(1);
+std::unordered_map<std::string, int> r_texturesHashTable;
+
 static byte	*scaledImage = NULL;			// pointer to a scaled image
 static byte	data2D[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4];	// intermediate texbuffer
 static rgbdata_t	r_image;					// generic pixelbuffer used for internal textures
@@ -84,6 +86,11 @@ const char *GL_Target( GLenum target )
 	return "??";
 }
 
+size_t R_TextureNum()
+{
+	return r_textures.size();
+}
+
 /*
 =================
 GL_Bind
@@ -95,7 +102,7 @@ void GL_Bind( GLint tmu, GLenum texnum )
 
 	// missed texture ?
 	if( texnum <= 0 ) texnum = tr.defaultTexture;
-	ASSERT( texnum > 0 && texnum < MAX_TEXTURES );
+	ASSERT( texnum > 0 && texnum < R_TextureNum() );
 
 	if( tmu != GL_KEEP_UNIT )
 		GL_SelectTexture( tmu );
@@ -130,7 +137,7 @@ R_GetTexture
 */
 gltexture_t *R_GetTexture( GLenum texnum )
 {
-	ASSERT( texnum < MAX_TEXTURES );
+	ASSERT( texnum < R_TextureNum() );
 	return &r_textures[texnum];
 }
 
@@ -143,7 +150,7 @@ Just for debug (r_showtextures uses it)
 */
 void GL_SetTextureType( GLenum texnum, GLenum type )
 {
-	ASSERT( texnum < MAX_TEXTURES );
+	ASSERT( texnum < R_TextureNum() );
 	r_textures[texnum].texType = type;
 }
 
@@ -373,11 +380,11 @@ void R_SetTextureParameters( void )
 	gl_texture_lodbias->modified = false;
 
 	// change all the existing mipmapped texture objects
-	for( i = 0, texture = r_textures; i < r_numTextures; i++, texture++ )
+	for( auto &texture : r_textures )
 	{
-		if( !texture->texnum ) continue;	// free slot
-		GL_Bind( XASH_TEXTURE0, i );
-		GL_TexFilter( texture, true );
+		if( !texture.texnum ) continue;	// free slot
+		GL_Bind( XASH_TEXTURE0, texture.texnum );
+		GL_TexFilter( &texture, true );
 	}
 }
 
@@ -388,13 +395,12 @@ R_TextureList_f
 */
 void R_TextureList_f( void )
 {
-	gltexture_t	*image;
 	int		i, texCount, bytes = 0;
 
 	Msg( "\n" );
 	Msg("      -w-- -h-- -size- -fmt- type -data-- -encode-- -wrap-- -name--------\n" );
 
-	for( i = texCount = 0, image = r_textures; i < r_numTextures; i++, image++ )
+	for( auto image = r_textures.begin(); image != r_textures.end(); ++image )
 	{
 		if( !image->texnum ) continue;
 
@@ -1490,17 +1496,9 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 	}
 }
 
-/*
-================
-GL_LoadTexture
-================
-*/
-int GL_LoadTexture_DDS(char *name, GLvoid* data, int type, int size, int w, int h)
+int GL_AllocateTextureSlot(const char *name)
 {
-	gltexture_t* tex;
-	rgbdata_t* pic;
-	uint		i, hash;
-	uint		picFlags = 0;
+	int		i;
 
 	if (!name || !name[0] || !glw_state.initialized)
 		return 0;
@@ -1512,32 +1510,40 @@ int GL_LoadTexture_DDS(char *name, GLvoid* data, int type, int size, int w, int 
 	}
 
 	// see if already loaded
-	hash = Com_HashKey(name, TEXTURES_HASH_SIZE);
+	i = GL_FindTexture(name);
 
-	for (tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash)
-	{
-		if (!Q_stricmp(tex->name, name))
-		{
-			// prolonge registration
-			tex->cacheframe = world.load_sequence;
-			return (tex - r_textures);
-		}
-	}
+	if(i > 0)
+		return i;
 
-	// find a free texture slot
-	if (r_numTextures == MAX_TEXTURES)
-		Host_Error("GL_LoadTexture: MAX_TEXTURES limit exceeds\n");
+	r_textures.push_back({});
+	i = r_textures.size() - 1;
+	gltexture_t	*tex = &r_textures.back();
+	Q_strncpy(tex->name, name, sizeof(tex->name));
 
-	// find a free texture_t slot
-	for (i = 0, tex = r_textures; i < r_numTextures; i++, tex++)
-		if (!tex->name[0]) break;
+	// add to hash table
+	tex->target = GL_TEXTURE_2D;
+	tex->texnum = i;
+	tex->refCount = 0;
+	r_texturesHashTable.emplace(name, i);
 
-	if (i == r_numTextures)
-	{
-		if (r_numTextures == MAX_TEXTURES)
-			Host_Error("GL_LoadTexture: MAX_TEXTURES limit exceeds\n");
-		r_numTextures++;
-	}
+	// NOTE: always return texnum as index in array or engine will stop work !!!
+	return i;
+}
+
+/*
+================
+GL_LoadTexture
+================
+*/
+int GL_LoadTexture_DDS(const char *name, GLvoid* data, int type, int size, int w, int h)
+{
+	int i = GL_FindTexture(name);
+	if(i > 0)
+		return i;
+
+	i = GL_AllocateTextureSlot(name);
+	if(!i)
+		return 0;
 
 	pglBindTexture(GL_TEXTURE_2D, i);
 	switch (type)
@@ -1557,17 +1563,6 @@ int GL_LoadTexture_DDS(char *name, GLvoid* data, int type, int size, int w, int 
 	pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	pglBindTexture(GL_TEXTURE_2D, 0);
 
-	tex = &r_textures[i];
-	Q_strncpy(tex->name, name, sizeof(tex->name));
-
-	// add to hash table
-	hash = Com_HashKey(tex->name, TEXTURES_HASH_SIZE);
-	//tex->target = GL_TEXTURE_2D;
-	//tex->texnum = i;
-	tex->nextHash = r_texturesHashTable[hash];
-	r_texturesHashTable[hash] = tex;
-
-	// NOTE: always return texnum as index in array or engine will stop work !!!
 	return i;
 }
 
@@ -1576,33 +1571,15 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 {
 	gltexture_t	*tex;
 	rgbdata_t		*pic;
-	uint		i, hash;
 	uint		picFlags = 0;
 
-	if( !name || !name[0] || !glw_state.initialized )
+	int i = GL_FindTexture(name);
+	if(i > 0)
+		return i;
+
+	i = GL_AllocateTextureSlot(name);
+	if(!i)
 		return 0;
-
-	if( Q_strlen( name ) >= sizeof( r_textures[0].name ))
-	{
-		MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
-		return 0;
-	}
-
-	// see if already loaded
-	hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-	for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
-	{
-		if( !Q_stricmp( tex->name, name ))
-		{
-			// prolonge registration
-			tex->cacheframe = world.load_sequence;
-			if (tex->name[0] != '*')
-				tex->refCount++;
-
-			return (tex - r_textures);
-		}
-	}
 
 	if( flags & TF_NOFLIP_TGA )
 		picFlags |= IL_DONTFLIP_TGA;
@@ -1618,27 +1595,12 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 		flags |= TF_NEAREST;
 
 	pic = FS_LoadImage( name, buf, size );
-	if( !pic ) return 0; // couldn't loading image
+	if( !pic ) return i; // couldn't loading image
 
 	// force upload texture as RGB or RGBA (detail textures requires this)
 	if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
 
-	// find a free texture slot
-	if( r_numTextures == MAX_TEXTURES )
-		Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-
-	// find a free texture_t slot
-	for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
-		if( !tex->name[0] ) break;
-
-	if( i == r_numTextures )
-	{
-		if( r_numTextures == MAX_TEXTURES )
-			Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-		r_numTextures++;
-	}
-
-	tex = &r_textures[i];
+	tex = R_GetTexture(i);
 	Q_strncpy( tex->name, name, sizeof( tex->name ));
 	tex->flags = (texFlags_t)flags;
 
@@ -1656,12 +1618,6 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 	if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 		FS_FreeImage( pic ); // release source texture
 
-	// add to hash table
-	hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
-	tex->nextHash = r_texturesHashTable[hash];
-	r_texturesHashTable[hash] = tex;
-
-	// NOTE: always return texnum as index in array or engine will stop work !!!
 	return i;
 }
 
@@ -1672,34 +1628,22 @@ GL_LoadTextureInternal
 */
 int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update )
 {
-	gltexture_t	*tex;
-	uint		i, hash;
+	int i = 0;
 
 	if( !name || !name[0] || !glw_state.initialized )
 		return 0;
 
-	if( Q_strlen( name ) >= sizeof( r_textures[0].name ) )
+	i = GL_FindTexture(name);
+	if(i > 0 && !update)
 	{
-		MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
-		return 0;
-	}
-
-	// see if already loaded
-	hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-	for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
-	{
-		if( !Q_stricmp( tex->name, name ))
-		{
-			// prolonge registration
-			tex->cacheframe = world.load_sequence;
-			if( update ) break;
-			return (tex - r_textures);
-		}
+		// prolonge registration
+		gltexture_t	*tex = &r_textures[i];
+		tex->cacheframe = world.load_sequence;
+		return i;
 	}
 
 	if( !pic ) return 0; // couldn't loading image
-	if( update && !tex )
+	if( update && i == 0 )
 	{
 		Host_Error( "Couldn't find texture %s for update\n", name );
 	}
@@ -1707,46 +1651,26 @@ int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, 
 	// force upload texture as RGB or RGBA (detail textures requires this)
 	if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
 
-	// find a free texture slot
-	if( r_numTextures == MAX_TEXTURES )
-		Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-
+	gltexture_t *tex = nullptr;
 	if( !update )
 	{
 		// find a free texture_t slot
-		for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
-			if( !tex->name[0] ) break;
-
-		if( i == r_numTextures )
-		{
-			if( r_numTextures == MAX_TEXTURES )
-				Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-			r_numTextures++;
-		}
+		i = GL_AllocateTextureSlot(name);
 
 		tex = &r_textures[i];
-		hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-		Q_strncpy( tex->name, name, sizeof( tex->name ));
 		tex->texnum = i;	// texnum is used for fast acess into r_textures array too
 		tex->flags = flags;
 	}
 	else
 	{
+		tex = &r_textures[i];
 		tex->flags |= flags;
 	}
 
 	GL_UploadTexture( pic, tex, update, NULL );
 	GL_TexFilter( tex, update ); // update texture filter, wrap etc
 
-	if( !update )
-	{
-		// add to hash table
-		hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
-		tex->nextHash = r_texturesHashTable[hash];
-		r_texturesHashTable[hash] = tex;
-	}
-
-	return (tex - r_textures);
+	return i;
 }
 
 namespace xe {
@@ -1760,41 +1684,29 @@ namespace xe {
 		size_t size;
 	};
 	struct texlru_extdata_s {
-		GLuint texnum;
+		int texnum;
 		imgfilter_t *filter;
 		std::variant<texlru_src_external_s, texlru_src_internal_s> src;
 	};
-	static std::optional<texlru_extdata_s>	r_texlru[MAX_TEXTURES];
 
 	int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
 	{
-		gltexture_t	*tex;
-		uint		i, hash;
 		uint		picFlags = 0;
 
 		if( !name || !name[0] || !glw_state.initialized )
 			return 0;
 
-		if( Q_strlen( name ) >= sizeof( r_textures[0].name ))
-		{
-			MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
-			return 0;
-		}
-
 		// see if already loaded
-		hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-		for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+		int i = GL_FindTexture(name);
+		if(i > 0)
 		{
-			if( !Q_stricmp( tex->name, name ))
-			{
-				// prolonge registration
-				tex->cacheframe = world.load_sequence;
-				if (tex->name[0] != '*')
-					tex->refCount++;
+			// prolonge registration
+			gltexture_t	*tex = &r_textures[i];
+			tex->cacheframe = world.load_sequence;
+			if (tex->name[0] != '*')
+				tex->refCount++;
 
-				return (tex - r_textures);
-			}
+			return i;
 		}
 
 		if( flags & TF_NOFLIP_TGA )
@@ -1810,22 +1722,9 @@ namespace xe {
 		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
 			flags |= TF_NEAREST;
 
-		// find a free texture slot
-		if( r_numTextures == MAX_TEXTURES )
-			Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
+		i = GL_AllocateTextureSlot(name);
 
-		// find a free texture_t slot
-		for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
-			if( !tex->name[0] ) break;
-
-		if( i == r_numTextures )
-		{
-			if( r_numTextures == MAX_TEXTURES )
-				Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-			r_numTextures++;
-		}
-
-		tex = &r_textures[i];
+		auto tex = &r_textures[i];
 		Q_strncpy( tex->name, name, sizeof( tex->name ));
 		tex->flags = (texFlags_t)flags;
 
@@ -1837,14 +1736,8 @@ namespace xe {
 			tex->texnum = tr.skyboxbasenum++;
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
-		// add to hash table
-		hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
-		tex->nextHash = r_texturesHashTable[hash];
-		r_texturesHashTable[hash] = tex;
-
 		// add to lru
-		texlru_extdata_s extdata { i, filter, texlru_src_external_s{ name } };
-		r_texlru[i].emplace(std::move(extdata));
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -1852,33 +1745,22 @@ namespace xe {
 
 	int TexLru_LoadTextureInternal(const char *name, const char *model_name, mstudiotexture_t *ptexture, size_t size, int flags, imgfilter_t *filter)
 	{
-		gltexture_t	*tex;
-		uint		i, hash;
 		uint		picFlags = 0;
 
 		if( !name || !name[0] || !glw_state.initialized )
 			return 0;
 
-		if( Q_strlen( name ) >= sizeof( r_textures[0].name ))
-		{
-			MsgDev( D_ERROR, "GL_LoadTexture: too long name %s\n", name );
-			return 0;
-		}
-
 		// see if already loaded
-		hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-		for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+		int i = GL_FindTexture(name);
+		if(i > 0)
 		{
-			if( !Q_stricmp( tex->name, name ))
-			{
-				// prolonge registration
-				tex->cacheframe = world.load_sequence;
-				if (tex->name[0] != '*')
-					tex->refCount++;
+			// prolonge registration
+			gltexture_t	*tex = &r_textures[i];
+			tex->cacheframe = world.load_sequence;
+			if (tex->name[0] != '*')
+				tex->refCount++;
 
-				return (tex - r_textures);
-			}
+			return i;
 		}
 
 		if( flags & TF_NOFLIP_TGA )
@@ -1894,22 +1776,8 @@ namespace xe {
 		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
 			flags |= TF_NEAREST;
 
-		// find a free texture slot
-		if( r_numTextures == MAX_TEXTURES )
-			Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-
-		// find a free texture_t slot
-		for( i = 0, tex = r_textures; i < r_numTextures; i++, tex++ )
-			if( !tex->name[0] ) break;
-
-		if( i == r_numTextures )
-		{
-			if( r_numTextures == MAX_TEXTURES )
-				Host_Error( "GL_LoadTexture: MAX_TEXTURES limit exceeds\n" );
-			r_numTextures++;
-		}
-
-		tex = &r_textures[i];
+		i = GL_AllocateTextureSlot(name);
+		gltexture_t	*tex = &r_textures[i];
 		Q_strncpy( tex->name, name, sizeof( tex->name ));
 		tex->flags = (texFlags_t)flags;
 
@@ -1921,14 +1789,8 @@ namespace xe {
 			tex->texnum = tr.skyboxbasenum++;
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
-		// add to hash table
-		hash = Com_HashKey( tex->name, TEXTURES_HASH_SIZE );
-		tex->nextHash = r_texturesHashTable[hash];
-		r_texturesHashTable[hash] = tex;
-
 		// add to lru
-		texlru_extdata_s extdata { i, filter, texlru_src_internal_s{ name, model_name, *ptexture, size } };
-		r_texlru[i].emplace(std::move(extdata));
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_internal_s{ name, model_name, *ptexture, size } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -1942,7 +1804,7 @@ namespace xe {
 
 		pglDeleteTextures( 1, &image->texnum );
 
-		Msg("TexLru : swap out texture %s", image->name);
+		MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
 
 		return 0;
 	}
@@ -1955,7 +1817,11 @@ namespace xe {
 		{
 			int flags = tex->flags;
 			rgbdata_t *pic = FS_LoadImage( src.path.c_str(), nullptr, 0 );
-			if( !pic ) return {}; // couldn't loading image
+			if( !pic )
+			{
+				MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
+				return {}; // couldn't loading image
+			}
 
 			// force upload texture as RGB or RGBA (detail textures requires this)
 			if( flags & TF_FORCE_COLOR ) pic->flags |= IMAGE_HAS_COLOR;
@@ -1970,14 +1836,17 @@ namespace xe {
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
 				FS_FreeImage( pic ); // release source texture
 
-			Msg("TexLru : load external texture %s\n", src.path.c_str());
+			MsgDev(D_INFO, "TexLru : load external texture %s\n", src.path.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
 		std::shared_ptr<gltexture_t> operator()(texlru_src_internal_s &src) const
 		{
 			byte *buf = FS_LoadFile( src.model_name.c_str(), NULL, false );
 			if(!buf)
-				return {};
+			{
+				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
+				return {}; // couldn't loading image
+			}
 
 			Mod_DecryptModel(src.model_name.c_str(), buf);
 			byte *buf2 = Mod_LoadExtendSeq(src.model_name.c_str(), buf);
@@ -1991,6 +1860,7 @@ namespace xe {
 			if( !pic )
 			{
 				Mem_Free( buf );
+				MsgDev(D_ERROR, "TexLru : fail to load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 				return {}; // couldn't loading image
 			}
 
@@ -2005,7 +1875,7 @@ namespace xe {
 
 			Mem_Free( buf );
 
-			Msg("TexLru : load internal texture %s from %s\n", src.texture_name.c_str(), src.model_name.c_str());
+			MsgDev(D_INFO, "TexLru : load internal texture %s from %s\n", src.texture.name, src.model_name.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
 		}
 	};
@@ -2017,7 +1887,7 @@ namespace xe {
 		typedef Key key_type;
 		typedef Value value_type;
 		typedef std::list<key_type> list_type;
-		typedef std::map<
+		typedef std::unordered_map<
 				key_type,
 				std::pair<value_type, typename list_type::iterator>
 		> map_type;
@@ -2128,26 +1998,27 @@ namespace xe {
 		const size_t m_capacity;
 	};
 
-	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(128);
+	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(256);
 
 	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
 	{
 		int texnum = ptexture->index;
 		gltexture_t	*tex = &r_textures[texnum];
-		if(!r_texlru[texnum].has_value())
+		if(!tex->texlru_extdata)
 			return; // unknown texture
 
 		if(textureCache.contains((GLuint)texnum))
 			return; // already present
 
-		auto &lrudata = r_texlru[texnum].value();
+		auto &lrudata = *tex->texlru_extdata;
 		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
 		textureCache.insert((GLuint)texnum, std::move(deleter));
 	}
 
 	void TexLru_Free( int texnum )
 	{
-		r_texlru[texnum].reset();
+		gltexture_t	*tex = &r_textures[texnum];
+		tex->texlru_extdata = nullptr;
 		if(textureCache.contains(texnum))
 			textureCache.remove(texnum);
 	}
@@ -2214,7 +2085,7 @@ void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor )
 	int		flags = 0;
 
 	if( texnum <= 0 ) return; // missed image
-	ASSERT( texnum > 0 && texnum < MAX_TEXTURES );
+	ASSERT( texnum > 0 && texnum < R_TextureNum() );
 	image = &r_textures[texnum];
 
 	// select mode
@@ -2267,23 +2138,11 @@ int GL_FindTexture( const char *name )
 	if( !name || !name[0] || !glw_state.initialized )
 		return 0;
 
-	if( Q_strlen( name ) >= sizeof( r_textures[0].name ) )
-	{
-		MsgDev( D_ERROR, "GL_FindTexture: too long name %s\n", name );
-		return 0;
-	}
-
 	// see if already loaded
-	hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-	for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+	auto iter = r_texturesHashTable.find(name);
+	if(iter != r_texturesHashTable.end())
 	{
-		if( !Q_stricmp( tex->name, name ))
-		{
-			// prolonge registration
-			tex->cacheframe = world.load_sequence;
-			return (tex - r_textures);
-		}
+		return iter->second;
 	}
 
 	return 0;
@@ -2298,28 +2157,15 @@ Frees image by name
 */
 void GL_FreeImage( const char *name )
 {
-	gltexture_t	*tex;
-	uint		hash;
-
 	if( !name || !name[0] || !glw_state.initialized )
 		return;
 
-	if( Q_strlen( name ) >= sizeof( r_textures[0].name ) )
-	{
-		MsgDev( D_ERROR, "GL_FreeImage: too long name %s\n", name );
-		return;
-	}
-
 	// see if already loaded
-	hash = Com_HashKey( name, TEXTURES_HASH_SIZE );
-
-	for( tex = r_texturesHashTable[hash]; tex != NULL; tex = tex->nextHash )
+	auto iter = r_texturesHashTable.find(name);
+	if(iter != r_texturesHashTable.end())
 	{
-		if( !Q_stricmp( tex->name, name ))
-		{
-			R_FreeImage( tex );
-			return;
-		}
+		int i = iter->second;
+		R_FreeImage( &r_textures[i] );
 	}
 }
 
@@ -2334,7 +2180,7 @@ void GL_FreeTexture( GLenum texnum )
 	if( texnum <= 0 || !glw_state.initialized )
 		return;
 
-	ASSERT( texnum > 0 && texnum < MAX_TEXTURES );
+	ASSERT( texnum > 0 && texnum < R_TextureNum() );
 	R_FreeImage( &r_textures[texnum] );
 }
 #if 0 // Uncle Mike removed this
@@ -4320,20 +4166,10 @@ void R_FreeImage( gltexture_t *image )
 	xe::TexLru_Free( image->texnum );
 
 	// remove from hash table
-	hash = Com_HashKey( image->name, TEXTURES_HASH_SIZE );
-	prev = &r_texturesHashTable[hash];
-
-	while( 1 )
+	auto iter = r_texturesHashTable.find(image->name);
+	if(iter != r_texturesHashTable.end())
 	{
-		cur = *prev;
-		if( !cur ) break;
-
-		if( cur == image )
-		{
-			*prev = cur->nextHash;
-			break;
-		}
-		prev = &cur->nextHash;
+		r_texturesHashTable.erase(iter);
 	}
 
 	// release source
@@ -5065,17 +4901,13 @@ void R_InitImages( void )
 	uint	i, hash;
 	float	f;
 
-	r_numTextures = 0;
 	scaledImage = NULL;
-	Q_memset( r_textures, 0, sizeof( r_textures ));
-	Q_memset( r_texturesHashTable, 0, sizeof( r_texturesHashTable ));
+	r_textures.clear();
+	r_texturesHashTable.clear();
 
 	// create unused 0-entry
-	Q_strncpy( r_textures[0].name, "*unused*", sizeof( r_textures[0].name ));
-	hash = Com_HashKey( r_textures[0].name, TEXTURES_HASH_SIZE );
-	r_textures[0].nextHash = r_texturesHashTable[hash];
-	r_texturesHashTable[hash] = r_textures;
-	r_numTextures = 1;
+	r_textures.resize(1);
+	Q_strcpy( r_textures[0].name, "*unused*");
 
 	// build luminance table
 	for( i = 0; i < 256; i++ )
@@ -5117,15 +4949,14 @@ void R_ShutdownImages( void )
 			pglBindTexture( GL_TEXTURE_CUBE_MAP_ARB, 0 );
 	}
 
-	for( i = 0, image = r_textures; i < r_numTextures; i++, image++ )
+	for( auto &image : r_textures )
 	{
-		if( !image->texnum ) continue;
-		GL_FreeTexture( i );
+		if( !image.texnum ) continue;
+		R_FreeImage( &image );
 	}
 
 	Q_memset( tr.lightmapTextures, 0, sizeof( tr.lightmapTextures ));
-	Q_memset( r_texturesHashTable, 0, sizeof( r_texturesHashTable ));
-	Q_memset( r_textures, 0, sizeof( r_textures ));
-	r_numTextures = 0;
+	r_texturesHashTable.clear();
+	r_textures.clear();
 }
 #endif // XASH_DEDICATED

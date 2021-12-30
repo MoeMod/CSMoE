@@ -825,7 +825,7 @@ void R_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3
 	model_t		*model = NULL;
 	int		width, height;
 
-	if( textureIndex <= 0 || textureIndex >= MAX_TEXTURES )
+	if( textureIndex <= 0 || textureIndex >= R_TextureNum() )
 	{
 		MsgDev( D_ERROR, "Decal has invalid texture!\n" );
 		return;
@@ -1235,7 +1235,7 @@ void R_DecalRemoveAll( int textureIndex )
 	decal_t	*pdecal;
 	int	i;
 
-	if( textureIndex < 0 || textureIndex >= MAX_TEXTURES )
+	if( textureIndex < 0 || textureIndex >= R_TextureNum() )
 	{
 		MsgDev( D_ERROR, "Decal has invalid texture!\n" );
 		return;

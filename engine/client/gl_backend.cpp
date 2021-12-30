@@ -675,6 +675,7 @@ void R_ShowTextures( void )
 	int		charHeight, numTries = 0;
 	static qboolean	showHelp = true;
 	string		shortname;
+	const auto texturenum = R_TextureNum();
 
 	if( !gl_showtextures->integer )
 		return;
@@ -695,28 +696,28 @@ rebuild_page:
 	total = base_w * base_h;
 	start = total * (gl_showtextures->integer - 1);
 	end = total * gl_showtextures->integer;
-	if( end > MAX_TEXTURES ) end = MAX_TEXTURES;
+	if( end > texturenum ) end = texturenum;
 
 	w = glState.width / (float)base_w;
 	h = glState.height / (float)base_h;
 
 	Con_DrawStringLen( NULL, NULL, &charHeight );
 
-	for( i = j = 0; i < MAX_TEXTURES; i++ )
+	for( i = j = 0; i < texturenum; i++ )
 	{
 		image = R_GetTexture( i );
 		if( j == start ) break; // found start
 		if( pglIsTexture( image->texnum )) j++;
 	}
 
-	if( i == MAX_TEXTURES && gl_showtextures->integer != 1 )
+	if( i == texturenum && gl_showtextures->integer != 1 )
 	{
 		// bad case, rewind to one and try again
 		Cvar_SetFloat( "r_showtextures", max( 1, gl_showtextures->integer - 1 ));
 		if( ++numTries < 2 ) goto rebuild_page;	// to prevent infinite loop
 	}
 
-	for( k = 0; i < MAX_TEXTURES; i++ )
+	for( k = 0; i < texturenum; i++ )
 	{
 		if( j == end ) break; // page is full
 

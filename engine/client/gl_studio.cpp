@@ -2047,7 +2047,7 @@ static void R_StudioDrawPoints_legacy( void )
 		else pglDepthMask( GL_FALSE );
 
 		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > MAX_TEXTURES )
+		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
 			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )
@@ -2413,7 +2413,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		else pglDepthMask( GL_FALSE );
 
 		// check bounds
-		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > MAX_TEXTURES )
+		if( ptexture[pskinref[pmesh->skinref]].index < 0 || ptexture[pskinref[pmesh->skinref]].index > R_TextureNum() )
 			ptexture[pskinref[pmesh->skinref]].index = tr.defaultTexture;
 
 		if( g_nForceFaceFlags & STUDIO_NF_CHROME )

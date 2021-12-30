@@ -27,6 +27,9 @@ GNU General Public License for more details.
 #include "protocol.h"
 #include "dlight.h"
 
+#include <memory>
+#include <string>
+
 extern byte	*r_temppool;
 
 #define BLOCK_SIZE		world.block_size	// lightmap blocksize
@@ -60,6 +63,9 @@ extern byte	*r_temppool;
 #define TF_IMAGE		(TF_UNCOMPRESSED|TF_NOPICMIP|TF_NOMIPMAP|TF_CLAMP)
 #define TF_DECAL		(TF_CLAMP|TF_UNCOMPRESSED)
 
+namespace xe {
+	typedef struct texlru_extdata_s texlru_extdata_t;
+}
 typedef struct gltexture_s
 {
 	char		name[256];	// game path, including extension (can be store image programs)
@@ -91,7 +97,7 @@ typedef struct gltexture_s
 	// reference count
 	uint		refCount; // 2021.10.01 added.
 
-	struct gltexture_s	*nextHash;
+	std::unique_ptr<xe::texlru_extdata_t> texlru_extdata;
 } gltexture_t;
 
 // mirror entity
@@ -314,9 +320,10 @@ void R_UploadStretchRaw( int texture, int cols, int rows, int width, int height,
 // gl_image.c
 //
 void R_SetTextureParameters( void );
+size_t R_TextureNum();
 gltexture_t *R_GetTexture( GLenum texnum );
 void GL_SetTextureType( GLenum texnum, GLenum type );
-int GL_LoadTexture_DDS(char* name, GLvoid* data, int type, int size, int w, int h);
+int GL_LoadTexture_DDS(const char* name, GLvoid* data, int type, int size, int w, int h);
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
 int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update );
 byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int out_h, qboolean isNormalMap );

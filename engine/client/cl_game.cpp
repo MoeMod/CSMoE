@@ -3328,7 +3328,7 @@ int GAME_EXPORT TriSpriteTexture( model_t *pSpriteModel, int frame )
 	if(( gl_texturenum = R_GetSpriteTexture( pSpriteModel, frame )) == 0 )
 		return 0;
 
-	if( gl_texturenum <= 0 || gl_texturenum > MAX_TEXTURES )
+	if( gl_texturenum <= 0 || gl_texturenum > R_TextureNum() )
 	{
 		MsgDev( D_ERROR, "TriSpriteTexture: bad index %i\n", gl_texturenum );
 		gl_texturenum = tr.defaultTexture;
