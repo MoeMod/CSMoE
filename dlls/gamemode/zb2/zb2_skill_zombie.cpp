@@ -1411,8 +1411,6 @@ namespace sv {
 					WRITE_BYTE(ZOMBIE_SKILL_BOOSTER);
 					MESSAGE_END();
 				}
-
-				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "Tip: Can boost");
 			}
 
 			m_iZombieSkillStatusStored = m_iZombieSkillStatus;
