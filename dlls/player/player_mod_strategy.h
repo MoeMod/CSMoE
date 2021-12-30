@@ -71,7 +71,7 @@ public:
 	virtual int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) = 0;
 	virtual float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) = 0;
 	virtual duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) = 0;
-
+	virtual float AdjustZombieKnifeRange(bool bStab, float flRange) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -109,7 +109,7 @@ public:
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return 1; }
 	float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) override { return flDamage; }
 	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) { return fDelay; }
-
+	float AdjustZombieKnifeRange(bool bStab, float flRange) { return flRange; }
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

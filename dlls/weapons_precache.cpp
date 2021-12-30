@@ -268,6 +268,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_barrettd");
 	UTIL_PrecacheOtherWeapon("weapon_sfsniper");
 	UTIL_PrecacheOther("ammo_railbeam");
+	UTIL_PrecacheOther("ammo_svdexgrenade");
 	
 	
 

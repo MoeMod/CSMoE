@@ -50,6 +50,7 @@ public:
 	virtual void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 	virtual void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) = 0;
 	virtual void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) = 0;
+	virtual void OnAdjustZombieKnifeRange(bool bStab, float& flRange) = 0;
 
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
@@ -82,6 +83,7 @@ public:
 	void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override {}
 	void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override {}
 	void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override {}
+	void OnAdjustZombieKnifeRange(bool bStab, float& flRange) override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

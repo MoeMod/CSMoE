@@ -180,11 +180,11 @@ namespace sv {
 								{
 									CBasePlayer* pPlayer;
 									Vector vecPullVelocity, vecOrigin;
-									const float power = 800;
+									const float power = 400;
 									pPlayer = (CBasePlayer*)pEntity;
-									vecOrigin = vecSrc;
+									vecOrigin = pev->origin;
 
-									float fDis = (vecSrc - pPlayer->pev->origin).Length();
+									float fDis = (vecOrigin - pPlayer->pev->origin).Length();
 									if (fDis > 200.0)
 									{
 										vecOrigin[0] += RANDOM_LONG(-20, 20);

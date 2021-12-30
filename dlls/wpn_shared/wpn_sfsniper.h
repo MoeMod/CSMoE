@@ -53,6 +53,8 @@ public:
 	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override;
 	int m_iShell;
 	int iShellOn;
+	bool m_bSearchingTarget;
+	bool m_bIsZoomed;
 
 private:
 	unsigned short m_usFireSFSniper;

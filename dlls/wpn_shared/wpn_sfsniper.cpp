@@ -49,10 +49,10 @@ void CSFSniper::Spawn(void)
 	SET_MODEL(ENT(pev), "models/w_sfsniper.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-
+	m_bSearchingTarget = true;
 	m_iClip = -1;
 	m_iDefaultAmmo = 35;
-
+	m_bIsZoomed = false;
 	FallInit();
 }
 
@@ -64,7 +64,7 @@ void CSFSniper::Precache(void)
 
 	PRECACHE_MODEL("models/z4b/v_zoom_A.mdl");
 	PRECACHE_MODEL("models/z4b/v_zoom_B.mdl");
-	PRECACHE_MODEL("sprites/z4b/muzzleflash19.spr");
+	PRECACHE_MODEL("sprites/muzzleflash19.spr");
 	
 	PRECACHE_SOUND("weapons/sfsniper-1.wav");
 	PRECACHE_SOUND("weapons/sfsniper_zoom.wav");
@@ -92,6 +92,8 @@ int CSFSniper::GetItemInfo(ItemInfo *p)
 
 BOOL CSFSniper::Deploy(void)
 {
+	m_bIsZoomed = false;
+
 	if (DefaultDeploy("models/v_sfsniper.mdl", "models/p_sfsniper.mdl", ANIM_DRAW, "rifle", UseDecrement() != FALSE, 1.37s, 1.37s))
 	{
 		if (m_flNextPrimaryAttack < UTIL_WeaponTimeBase())
@@ -135,14 +137,20 @@ void CSFSniper::PrimaryAttack(void)
 
 void CSFSniper::SFSniperFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
+
 	if (m_pPlayer->pev->fov != 90)
 	{
 		m_pPlayer->m_bResumeZoom = true;
 		m_pPlayer->m_iLastZoom = m_pPlayer->m_iFOV;
 		m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90;
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sfsniper.mdl");
+		m_bIsZoomed = true;
 	}
-	else // not zoomed, so bullets diverts more
+	else
+	{ // not zoomed, so bullets diverts more
 		flSpread += 0.01;
+		m_bIsZoomed = false;
+	}
 
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 	{
@@ -174,15 +182,13 @@ void CSFSniper::SFSniperFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSFSniper, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSFSniper, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), m_bIsZoomed, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		m_pPlayer->SetSuitUpdate("!HEV_AMO0", FALSE, 0);
 #endif
-
-	SendWeaponAnim(ANIM_SHOOT1, UseDecrement() != FALSE);
 
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.6s;
 
@@ -191,27 +197,39 @@ void CSFSniper::SFSniperFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 
 void CSFSniper::SecondaryAttack(void)
 {
+
 	switch (m_pPlayer->m_iFOV)
 	{
-	case 90: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 35; break;
-	case 35: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 15; break;
-	default: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90; break;
+	case 90:
+	{
+		m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 35; 
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_zoom_A.mdl");
+		break;
+	}
+	default: 
+	{
+		m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90; 
+		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_sfsniper.mdl");
+		break;
+	}
 	}
 
 	m_pPlayer->ResetMaxSpeed();
 	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/sfsniper_zoom.wav", 0.2, 2.4);
 	m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
+	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
 }
 
 void CSFSniper::ItemPostFrame(void)
 {
+
 	if (m_flNextPrimaryAttack <= UTIL_WeaponTimeBase())
 	{
 		if (m_pPlayer->m_bResumeZoom)
 		{
 			m_pPlayer->m_iFOV = m_pPlayer->m_iLastZoom;
 			m_pPlayer->pev->fov = m_pPlayer->m_iFOV;
-			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zoom_A.mdl");
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_zoom_A.mdl");
 
 			if (m_pPlayer->m_iFOV == m_pPlayer->m_iLastZoom)
 			{
@@ -222,8 +240,8 @@ void CSFSniper::ItemPostFrame(void)
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
 		}
 	}
-
 	return CBasePlayerWeapon::ItemPostFrame();
+
 }
 
 void CSFSniper::Reload(void)
@@ -257,15 +275,24 @@ void CSFSniper::WeaponIdle(void)
 			{
 				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 
-				if (m_pPlayer->m_iTeam == target->m_iTeam)
+				if (m_pPlayer->m_iTeam != target->m_iTeam)
 				{
 					m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_zoom_B.mdl");
-					EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/sfsniper_insight1.wav", VOL_NORM, ATTN_NORM);
+
+					if (m_bSearchingTarget)
+					{
+						EMIT_SOUND(m_pPlayer->edict(), CHAN_WEAPON, "weapons/sfsniper_insight1.wav", VOL_NORM, ATTN_NORM);
+
+						m_bSearchingTarget = false;
+					}
+
 				}
 			}
 			else
 			{
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/z4b/v_zoom_A.mdl");
+
+				m_bSearchingTarget = true;
 			}
 		}
 
@@ -277,7 +304,6 @@ void CSFSniper::WeaponIdle(void)
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 	}
 
-	
 }
 
 float CSFSniper::GetPrimaryAttackDamage() const

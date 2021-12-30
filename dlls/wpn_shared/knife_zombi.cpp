@@ -20,6 +20,11 @@ GNU General Public License for more details.
 #include "weapons.h"
 #include "wpn_knife.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#include "player/player_mod_strategy.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -136,7 +141,11 @@ int CKnife_Zombi::Swing(int fFirst)
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 25;
+	float flRange = 25.0f;
+#ifndef CLIENT_DLL
+	flRange = m_pPlayer->m_pModStrategy->AdjustZombieKnifeRange(false, flRange);
+#endif
+	Vector vecEnd = vecSrc + gpGlobals->v_forward * flRange;
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
@@ -275,7 +284,11 @@ int CKnife_Zombi::Stab(int fFirst)
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 45;
+	float flRange = 45.0f;
+#ifndef CLIENT_DLL
+	flRange = m_pPlayer->m_pModStrategy->AdjustZombieKnifeRange(true, flRange);
+#endif
+	Vector vecEnd = vecSrc + gpGlobals->v_forward * flRange;
 
 	TraceResult tr;
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);

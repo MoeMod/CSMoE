@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
-#define __DEBUG
+// #define __DEBUG
 
 #define SKILL_FUNCTION(skillSet, func, ...) { \
 	for (auto &skill : skillSet) { \
@@ -72,6 +72,12 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	WRITE_BYTE(ZB3_MESSAGE_SKILL_REMOVE);
 	WRITE_BYTE(0);
 	MESSAGE_END();
+}
+
+float CPlayerModStrategy_ZBZ::AdjustZombieKnifeRange(bool bStab, float flRange)
+{
+	SKILL_FUNCTION(m_vecSkill, OnAdjustZombieKnifeRange, bStab, flRange);
+	return flRange;
 }
 
 int CPlayerModStrategy_ZBZ::ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax)
@@ -125,7 +131,21 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
 				return true;
 			}
-			GetCharacter()->ActivateSkill(SKILL_SLOT_1);
+			switch (pcmd[14])
+			{
+			case '1':
+				GetCharacter()->ActivateSkill(SKILL_SLOT_1);
+				break;
+			case '2':
+				GetCharacter()->ActivateSkill(SKILL_SLOT_2);
+				break;
+			case '3':
+				GetCharacter()->ActivateSkill(SKILL_SLOT_3);
+				break;
+			case '4':
+				GetCharacter()->ActivateSkill(SKILL_SLOT_4);
+				break;
+			}
 			return true;
 		}
 	}
@@ -241,7 +261,6 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 			auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
 			if (data.second != nullptr)
 			{
-				m_flSkillDelay = gpGlobals->time + 1.4s;
 				m_iPoint--;
 				m_setSkillID.insert(data.first);
 				m_vecSkill.insert(data.second);
@@ -273,6 +292,11 @@ void CPlayerModStrategy_ZBZ::Event_TraceAttack(CBasePlayer* victim, CBasePlayer*
 
 void CPlayerModStrategy_ZBZ::OnThink()
 {
+	if (IsLadderDisabled() && m_pPlayer->pev->flags & FL_ONGROUND)
+	{
+		SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "drp", "0");
+	}
+
 	SKILL_FUNCTION(m_vecSkill, OnThink);
 	return CPlayerModStrategy_ZB3::OnThink();
 }
@@ -308,12 +332,14 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 		}
 	}*/
 
-	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0)
+	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 	{
 		auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
 		if (data.second != nullptr)
 		{
+#ifndef __DEBUG
 			m_flSkillDelay = gpGlobals->time + 1.4s;
+#endif
 			m_iPoint--;
 			m_setSkillID.insert(data.first);
 			m_vecSkill.insert(data.second);
@@ -410,7 +436,7 @@ void CMod_ZombieZ::PickHero()
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
 		if (!strategy || !strategy->CheckSkill(Skill_HeroicPresence))
 		{
-			return false;
+			return true;
 		}
 		return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie;
 	}), players.end());

@@ -1168,17 +1168,28 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if( switchCrosshairType )
+		if (m_pWeapon->iId == WEAPON_SKULL5 && gHUD.m_iFOV <= 80)
 		{
-			SetCrosshair( 0, nullrc, 0, 0, 0);
-			switchCrosshairType = false;
+			if (!switchCrosshairType)
+			{
+				SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
+				switchCrosshairType = true;
+			}
 		}
-		// draw a dynamic crosshair
-		DrawCrosshair(flTime);
+		else
+		{
+			if (switchCrosshairType)
+			{
+				SetCrosshair(0, nullrc, 0, 0, 0);
+				switchCrosshairType = false;
+			}
+			// draw a dynamic crosshair
+			DrawCrosshair(flTime);
+		}
 	}
 	else
 	{
-		if( !switchCrosshairType )
+		if (!switchCrosshairType)
 		{
 			SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
 			switchCrosshairType = true;
@@ -1347,15 +1358,13 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	if( !m_pWeapon )
 		return;
 
-	if (!strcmp(m_pWeapon->szName, "weapon_huntbow"))
-		return;
-
 	weaponid = m_pWeapon->iId;
 
 	if(    weaponid == WEAPON_AWP 
 		|| weaponid == WEAPON_SCOUT 
 		|| weaponid == WEAPON_SG550 
-		|| weaponid == WEAPON_G3SG1 )
+		|| weaponid == WEAPON_G3SG1
+		|| weaponid == WEAPON_HUNTBOW )
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )

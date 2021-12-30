@@ -2486,6 +2486,10 @@ void PM_LadderMove(physent_t *pLadder)
 
 physent_t *PM_Ladder(void)
 {
+	bool bDropLadder = atoi(pmove->PM_Info_ValueForKey(pmove->physinfo, "drp")) == 1 ? true : false;
+	if (bDropLadder)
+		return NULL;
+
 	int i;
 	physent_t *pe;
 	hull_t *hull;
@@ -2899,11 +2903,12 @@ void PM_Jump(void)
 	{
 		pmove->velocity[2] = sqrt(2 * 800 * 45.0);
 	}
-
+	
 	// from cs16nd
 	if (pmove->fuser2 > 0.0)
 		pmove->velocity[2] *= (100.0 - pmove->fuser2 * 0.001 * 19.0) * 0.01;
 
+	pmove->velocity[2] += atof(pmove->PM_Info_ValueForKey(pmove->physinfo, "kgr"));
 	pmove->fuser2 = 1315.7894;
 
 	// Decay it for simulation

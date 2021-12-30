@@ -395,8 +395,10 @@ void Sys_ShellExecute( const char *path, const char *parms, qboolean shouldExit 
 	IOS_OpenURL(path);
 #endif
 #if TARGET_OS_OSX
+#ifndef XASH_DEDICATED
 	extern void MacOS_OpenURL(const char *url);
 	MacOS_OpenURL(path);
+#endif // !XASH_DEDICATED
 #endif
 #elif (defined(__linux__) && !defined (__ANDROID__)) || defined (__FreeBSD__) || defined (__NetBSD__) || defined(__OpenBSD__)
 

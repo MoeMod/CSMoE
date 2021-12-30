@@ -58,10 +58,26 @@ void EV_FireSFSniper( event_args_t *args )
 	ent = gEngfuncs.GetViewModel();
 
 	AngleVectors( angles, forward, right, up );
+	EV_GetGunPosition(args, vecSrc, origin);
 
 	if (EV_IsLocal(idx))
 	{
-		vecBeamStart = ent->attachment[0];
+		if (args->bparam1)
+		{
+			if (args->ducking)
+			{
+				vecBeamStart = args->origin;
+			}
+			else
+			{
+				vecBeamStart = args->origin;
+			}
+		}
+		else
+			vecBeamStart = ent->attachment[0];
+
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT, 2);
+
 		vecBeamEnd = vecBeamStart + (forward + right * args->fparam1 + up * args->fparam2) * 8192;
 	}
 	else

@@ -87,8 +87,8 @@ void CSkull5::SecondaryAttack(void)
 {
 	switch (m_pPlayer->m_iFOV)
 	{
-		case 90: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 40; break;		//80
-		case 40: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 15; break;		//35
+		case 90: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 80; break;	
+		case 80: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 35; break;
 		default: m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90; break;
 	}
 
@@ -102,13 +102,13 @@ void CSkull5::PrimaryAttack(void)
 	duration_t flCycleTime = m_pPlayer->m_iFOV == 90 ? 0.28s : 0.33s;
 
 	if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
-		Skull5Fire((0.04) * (1 - m_flAccuracy), flCycleTime, FALSE);
+		Skull5Fire(1.0, flCycleTime, FALSE);
 	else if (m_pPlayer->pev->velocity.Length2D() > 0)
-		Skull5Fire(0.06 * (1 - m_flAccuracy), flCycleTime, FALSE);
+		Skull5Fire(0.06, flCycleTime, FALSE);
 	else if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-		Skull5Fire((0.02) * (1 - m_flAccuracy), flCycleTime, FALSE);
+		Skull5Fire(0.02, flCycleTime, FALSE);
 	else
-		Skull5Fire((1 - m_flAccuracy), flCycleTime, FALSE);
+		Skull5Fire(0.04, flCycleTime, FALSE);
 }
 
 void CSkull5::Skull5Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)

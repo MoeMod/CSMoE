@@ -65,9 +65,13 @@ public:
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) override;
 	int ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax) override;
+	float AdjustZombieKnifeRange(bool bStab, float flRange) override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);
+
+	bool IsLadderDisabled() const { return m_bLadderDisabled; }
+	void SetLadderDisabled(bool value) { m_bLadderDisabled = value; }
 
 protected:
 	void UpdatePlayerEvolutionHUD() override;
@@ -88,6 +92,7 @@ private:
 	time_point_t m_flSkillDelay;
 	float m_flTakeDamage;
 	float m_flSufferDamage;
+	bool m_bLadderDisabled;
 	void AddExp(int exp);
 	
 	std::set<std::shared_ptr<CZombieZSkill_Base>> m_vecSkill;

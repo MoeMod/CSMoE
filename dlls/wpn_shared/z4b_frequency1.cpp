@@ -103,6 +103,7 @@ BOOL CFrequency1::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_tAimTime = invalid_time_point;
 	m_iIndex = 1;
+	m_iUsingSkill = 0;
 
 	if (m_flTimeHostler != invalid_time_point)
 	{
@@ -334,6 +335,11 @@ void CFrequency1::Reload(void)
 {
 	if (m_pPlayer->ammo_50ae <= 0)
 		return;
+
+	m_tAimTime = invalid_time_point;
+	m_iUsingSkill = 0;
+	m_iIndex = 1;
+	m_tAimTime = invalid_time_point;
 
 	if (DefaultReload(FREQUENCY1_MAX_CLIP, ANIM_RELOAD, FREQUENCY1_RELOAD_TIME))
 	{
@@ -732,7 +738,7 @@ void CFrequency1::ItemPostFrame()
 			{
 				SendWeaponAnim(ANIM_HIGHNOON_LOOP, UseDecrement() != FALSE);
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 9999s;
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 34.0s;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 3.0s;
 				m_tAimTime = gpGlobals->time + 3.0s;
 				m_iUsingSkill = 2;
 			}
