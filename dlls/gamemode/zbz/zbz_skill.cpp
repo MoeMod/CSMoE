@@ -200,8 +200,8 @@ namespace sv {
 			flags |= (1 << 1);
 			char szFlags[32];
 			UTIL_GetFlags(szFlags, flags);*/
-			char szValue[32];
-			itoa(GetBonus(), szValue, 10);
+			char szValue[16];
+			Q_sprintf(szValue, "%d", GetBonus());
 			SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "kgr", szValue);
 		}
 
