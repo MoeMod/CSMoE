@@ -18,6 +18,7 @@ GNU General Public License for more details.
 #include "cbase.h"
 #include "player.h"
 #include "game.h"
+#include "client.h"
 
 #include "mod_zb3.h"
 #include "player/player_zombie.h"

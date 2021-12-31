@@ -1,5 +1,6 @@
 #include "hud.h"
 #include "cl_util.h"
+#include "draw_util.h"
 
 #include "hud_scoreboard_legacy.h"
 

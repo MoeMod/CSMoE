@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_m1887.h"
 
+#ifndef CLIENT_DLL
+#include "gamemode/mods.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else

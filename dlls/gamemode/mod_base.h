@@ -20,7 +20,6 @@ GNU General Public License for more details.
 #endif
 
 #include "mods.h"
-#include "ruleof350.h"
 
 #include "monsters.h"
 
@@ -54,7 +53,7 @@ public:
 	virtual bool CanChangeTeam(CBasePlayer *player, int newTeam_id, int curTeam_id)  { return true; }
 };
 
-class CBaseModDefault : public CHalfLifeMultiplay, ruleof350::unique, virtual public IBaseMod
+class CBaseModDefault : public CHalfLifeMultiplay, virtual public IBaseMod
 {
 
 };
