@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #define ARCH_SUFFIX
 #endif
 
-#if defined(__ANDROID__) || TARGET_OS_IOS || defined(__SAILFISH__)
+#if defined(__ANDROID__) || defined(TARGET_OS_IOS) || defined(__SAILFISH__)
 #define XASH_MOBILE_PLATFORM
 #endif
 
