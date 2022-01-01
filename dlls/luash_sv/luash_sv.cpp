@@ -11,6 +11,7 @@
 
 #include "luash_sv.h"
 #include "luash.hpp"
+#include "luash_sv/luash_sv_extern.h"
 
 #include <string>
 #include <cassert>

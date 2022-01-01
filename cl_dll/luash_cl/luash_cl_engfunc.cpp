@@ -8,8 +8,7 @@
 #include "ivoicetweak.h"
 
 #include "luash.hpp"
-
-static_assert(StructMemberCount<tempent_s>::value == 16);
+#include "luash_cl_extern.h"
 
 namespace cl
 {

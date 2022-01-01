@@ -7,6 +7,7 @@
 #include "meta/TypeIdentity.h"
 #include "luash.hpp"
 
+#include "luash_sv/luash_sv_extern.h"
 #include "luash_sv/luash_sv_marco.h"
 #ifndef CLIENT_DLL
 #include "luash_sv/luash_sv.h"

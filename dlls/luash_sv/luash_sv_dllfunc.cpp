@@ -2,6 +2,7 @@
 #include "extdll.h"
 
 #include "luash.hpp"
+#include "luash_sv/luash_sv_extern.h"
 
 namespace sv
 {

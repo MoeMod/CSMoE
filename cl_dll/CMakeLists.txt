@@ -313,6 +313,8 @@ if(XASH_LUASH)
 		../dlls/luash_sv/luash_sv_glb.cpp
 		../dlls/luash_sv/luash_sv_entity.cpp
 		../dlls/luash_sv/luash_sv_util.cpp
+		../dlls/luash_sv/luash_sv_extern.cpp
+		luash_cl/luash_cl_extern.cpp
 	)
 else()
 	set(LUASH_SRCS )

@@ -2,9 +2,7 @@
 #include "cl_dll.h"
 
 #include "luash.hpp"
-
-#include <string>
-#include <cassert>
+#include "luash_cl_extern.h"
 
 
 namespace cl

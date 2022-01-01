@@ -3,6 +3,7 @@
 
 #include "lua_cl.h"
 #include "luash.hpp"
+#include "luash_cl_extern.h"
 
 namespace cl
 {

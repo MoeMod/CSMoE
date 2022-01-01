@@ -9,6 +9,7 @@
 #endif
 
 #include "luash.hpp"
+#include "luash_sv/luash_sv_extern.h"
 
 #ifndef CLIENT_DLL
 #include "luash_sv/luash_sv.h"
