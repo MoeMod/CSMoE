@@ -14,6 +14,8 @@ GNU General Public License for more details.
 
 #include <vector>
 #include <string>
+#include <map>
+#include <set>
 #include <algorithm>
 #include <regex>
 
@@ -42,19 +44,38 @@ namespace ui {
 	static boost::asio::io_context s_server_ioc;
 
 	static std::vector<std::tuple<std::chrono::high_resolution_clock::duration, boost::asio::ip::udp::endpoint, TSourceEngineQuery::ServerInfoQueryResult> > s_servers_list;
+	static std::map<boost::asio::ip::udp::endpoint, TSourceEngineQuery::ServerInfoQueryResult> s_serverinfos;
+	static std::map<boost::asio::ip::udp::endpoint, TSourceEngineQuery::PlayerListQueryResult> s_playerlists;
+	static std::map<boost::asio::ip::udp::endpoint, std::chrono::high_resolution_clock::duration> s_ping;
+	static std::optional<boost::asio::ip::udp::endpoint> selected_ep;
+	static std::set<boost::asio::ip::udp::endpoint> s_serverinfo_open;
 
 	// model
+	boost::asio::awaitable<void> ServerModel_AsyncRefreshSingleServer(boost::asio::ip::udp::endpoint ep)
+	{
+		try {
+			auto start_req = std::chrono::high_resolution_clock::now();
+			auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep, 1s);
+			auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
+			s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(),
+			                                    [ep](auto &entry) { return get<1>(entry) == ep; }),
+			                     s_servers_list.end());
+			s_servers_list.emplace_back(ping, ep, info);
+			s_serverinfos[ep] = info;
+			s_ping[ep] = ping;
+		} catch(const std::exception &e)
+		{
+			// ignored
+		}
+	}
+
 	boost::asio::awaitable<void> ServerModel_AsyncRefreshSingleServer(std::string host, std::string port)
 	{
 		try {
 			boost::asio::ip::udp::resolver resolver(s_server_ioc);
 			auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
 			for (const auto &ep: desc_endpoints) {
-				auto start_req = std::chrono::high_resolution_clock::now();
-				auto info = co_await TSourceEngineQuery::Co_GetServerInfoDataAsync(s_server_ioc, ep,1s);
-				auto ping = (std::chrono::high_resolution_clock::now() - start_req) / 2;
-				s_servers_list.erase(std::remove_if(s_servers_list.begin(), s_servers_list.end(), [ep](auto &entry){ return get<1>(entry) == ep; }), s_servers_list.end());
-				s_servers_list.emplace_back(ping, ep, info);
+				co_await ServerModel_AsyncRefreshSingleServer(ep);
 			}
 		} catch(const std::exception &e)
 		{
@@ -89,7 +110,160 @@ namespace ui {
 		s_server_ioc.restart();
 	}
 
+	void ServerModel_Connect(boost::asio::ip::udp::endpoint ep)
+	{
+		char cmd[128];
+		snprintf(cmd, 128, "connect %s:%d", ep.address().to_string().c_str(), (int)ep.port());
+		EngFuncs::ClientCmd(0, cmd);
+	}
+
+	boost::asio::awaitable<void> ServerDetailInfoModel_AsyncRefresh(boost::asio::ip::udp::endpoint ep)
+	{
+		try {
+			auto info = co_await TSourceEngineQuery::Co_GetPlayerListDataAsync(s_server_ioc, ep,1s);
+			s_playerlists[ep] = info;
+		} catch(const std::exception &e)
+		{
+			// ignored
+		}
+	}
+
+	void ServerDetailInfoModel_Refresh(boost::asio::ip::udp::endpoint ep)
+	{
+		s_server_ioc.reset();
+		boost::asio::co_spawn(s_server_ioc, ServerModel_AsyncRefreshSingleServer(ep), boost::asio::detached);
+		boost::asio::co_spawn(s_server_ioc, ServerDetailInfoModel_AsyncRefresh(ep), boost::asio::detached);
+		s_server_ioc.restart();
+	}
+
 	// view
+	void ServerDetailInfo_OnGui(boost::asio::ip::udp::endpoint ep)
+	{
+		if(s_playerlists.find(ep) == s_playerlists.end())
+		{
+			ServerDetailInfoModel_Refresh(ep);
+			s_playerlists.emplace(ep, TSourceEngineQuery::PlayerListQueryResult{});
+		}
+		ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
+		bool open = true;
+		if (ImGui::Begin(("服务器信息 - " + ep.address().to_string()).c_str(), &open))
+		{
+			auto info = s_serverinfos[ep];
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, ImGuiUtils::GetScaledValue(70));
+
+
+			ImGui::TextUnformatted("名称：");
+			ImGui::NextColumn();
+			ImGui::TextUnformatted(info.ServerName.c_str());
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("IP地址：");
+			ImGui::NextColumn();
+			ImGui::TextUnformatted(ep.address().to_string().c_str());
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("游戏：");
+			ImGui::NextColumn();
+			ImGui::TextUnformatted(info.Game.c_str());
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("地图：");
+			ImGui::NextColumn();
+			ImGui::TextUnformatted(info.Map.c_str());
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("玩家：");
+			ImGui::NextColumn();
+			ImGui::Text("%d/%d", info.PlayerCount, info.MaxPlayers);
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("VAC：");
+			ImGui::NextColumn();
+			ImGui::TextUnformatted(info.VAC ? "有" : "无");
+
+			ImGui::NextColumn();
+			ImGui::TextUnformatted("延迟");
+			ImGui::NextColumn();
+			ImGui::Text("%d", static_cast<int>(s_ping[ep] / 1ms));
+
+			ImGui::Columns();
+
+			if(ImGui::BeginChild("PlayerList", ImVec2(0, -ImGuiUtils::GetScaledValue(40)), true))
+			{
+				ImGui::Columns(3, "serverColumns", false);
+				auto size = ImGui::GetWindowSize();
+				ImGui::SetColumnWidth(0, size.x - ImGuiUtils::GetScaledValue(120));
+				ImGui::SetColumnWidth(1, ImGuiUtils::GetScaledValue(30));
+				ImGui::SetColumnWidth(2, ImGuiUtils::GetScaledValue(80));
+
+				auto playerlist = s_playerlists[ep];
+				if(playerlist.Results.index() == 1)
+				{
+					for(const auto &info : get<std::vector<TSourceEngineQuery::PlayerListQueryResult::PlayerInfo_s>>(playerlist.Results))
+					{
+						if(ImGui::Selectable(info.Name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick))
+						{
+							// TODO
+						}
+						ImGui::NextColumn();
+						ImGui::Text("%d", info.Score);
+						ImGui::NextColumn();
+						float dur = info.Duration;
+						int hour = dur / 3600;
+						int min = dur / 60 - 60 * hour;
+						int sec = dur - 60 * min - 3600 * hour;
+						if(hour)
+							ImGui::Text("%2d:%2d:%2d", hour, min, sec);
+						else if(min)
+							ImGui::Text("%2d:%2d", min, sec);
+						else if(sec)
+							ImGui::Text("%2ds", sec);
+
+						ImGui::NextColumn();
+						ImGui::Separator();
+					}
+				}
+
+				ImGui::Columns();
+
+				ImGui::EndChild();
+			}
+
+			ImGui::Separator();
+			ImGui::Columns(3, nullptr, false);
+
+			if(ImGui::Button("进入"))
+			{
+				ServerModel_Connect(selected_ep.value());
+			}
+
+			ImGui::NextColumn();
+
+			if(ImGui::Button("刷新"))
+			{
+				ServerDetailInfoModel_Refresh(ep);
+			}
+
+			ImGui::NextColumn();
+
+			if(ImGui::Button("关闭"))
+			{
+				open = false;
+			}
+			ImGui::NextColumn();
+
+			ImGui::Columns();
+
+			ImGui::End();
+		}
+
+		if(!open)
+		{
+			s_serverinfo_open.erase(ep);
+		}
+
+	}
 
 	void Server_Open()
 	{
@@ -98,6 +272,11 @@ namespace ui {
 
 	void Server_OnGui()
 	{
+		std::vector<boost::asio::ip::udp::endpoint> serverinfo_open2(s_serverinfo_open.begin(), s_serverinfo_open.end());
+		// 不能在遍历出来再遍历
+		for(auto ep : serverinfo_open2)
+			ServerDetailInfo_OnGui(ep);
+
 		if(!s_server_open)
 			return;
 		ImGui::SetNextWindowSizeConstraints(ImGuiUtils::GetScaledSize({480, 320}), ImGui::GetIO().DisplaySize);
@@ -144,6 +323,22 @@ namespace ui {
 			{
 				ImGui::Text("加载中，请稍等。");
 			}
+			ImGui::SameLine();
+			if(selected_ep.has_value())
+			{
+				if(ImGui::Button("服务器信息"))
+				{
+					s_serverinfo_open.emplace(selected_ep.value());
+				}
+			}
+			ImGui::SameLine();
+			if(selected_ep.has_value())
+			{
+				if(ImGui::Button("连接"))
+				{
+					ServerModel_Connect(selected_ep.value());
+				}
+			}
 			ImGui::NewLine();
 
 			std::sort(s_servers_list.begin(), s_servers_list.end(), [](const auto &lhs, const auto &rhs){
@@ -152,11 +347,10 @@ namespace ui {
 
 			ImGui::Columns(4, "serverColumns", false);
 			auto size = ImGui::GetWindowSize();
-			ImGui::SetColumnWidth(0, size.x - ImGuiUtils::GetScaledValue(400));
-			ImGui::SetColumnWidth(1, ImGuiUtils::GetScaledValue(180));
-			ImGui::SetColumnWidth(2, ImGuiUtils::GetScaledValue(80));
-			ImGui::SetColumnWidth(3, ImGuiUtils::GetScaledValue(80));
-			static boost::asio::ip::udp::endpoint selected_ep;
+			ImGui::SetColumnWidth(0, size.x - ImGuiUtils::GetScaledValue(220));
+			ImGui::SetColumnWidth(1, ImGuiUtils::GetScaledValue(100));
+			ImGui::SetColumnWidth(2, ImGuiUtils::GetScaledValue(50));
+			ImGui::SetColumnWidth(3, ImGuiUtils::GetScaledValue(30));
 			for(auto &[ping, ep, info] : s_servers_list)
 			{
 				if(ImGui::Selectable(info.ServerName.c_str(), selected_ep == ep, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick))
@@ -164,9 +358,7 @@ namespace ui {
 					selected_ep = ep;
 					if(ImGui::IsMouseDoubleClicked(ImGuiPopupFlags_MouseButtonLeft))
 					{
-						char cmd[128];
-						snprintf(cmd, 128, "connect %s:%d", ep.address().to_string().c_str(), (int)ep.port());
-						EngFuncs::ClientCmd(0, cmd);
+						ServerModel_Connect(ep);
 					}
 				}
 				ImGui::NextColumn();
