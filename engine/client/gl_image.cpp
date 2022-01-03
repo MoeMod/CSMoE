@@ -1995,7 +1995,7 @@ namespace xe {
 		const size_t m_capacity;
 	};
 
-	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(256);
+	static lru_cache<gltexture_t *, std::shared_ptr<gltexture_t>> textureCache(256);
 
 	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
 	{
@@ -2005,20 +2005,25 @@ namespace xe {
 		if(!tex->texlru_extdata)
 			return; // unknown texture
 
-		if(textureCache.update((GLuint)texnum))
+		if(textureCache.update(tex))
 			return; // already present
 
 		auto &lrudata = *tex->texlru_extdata;
 		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
-		textureCache.insert((GLuint)texnum, std::move(deleter));
+		textureCache.insert(tex, std::move(deleter));
+	}
+
+	void TexLru_Free( gltexture_t *tex )
+	{
+		tex->texlru_extdata = nullptr;
+		if(textureCache.contains(tex))
+			textureCache.remove(tex);
 	}
 
 	void TexLru_Free( int texnum )
 	{
 		gltexture_t	*tex = &r_textures[texnum];
-		tex->texlru_extdata = nullptr;
-		if(textureCache.contains(texnum))
-			textureCache.remove(texnum);
+		return TexLru_Free(tex);
 	}
 }
 
@@ -4161,7 +4166,7 @@ void R_FreeImage( gltexture_t *image )
 		return;
 	}
 
-	xe::TexLru_Free( image->texnum );
+	xe::TexLru_Free( image );
 
 	// remove from hash table
 	auto iter = r_texturesHashTable.find(image->name);
