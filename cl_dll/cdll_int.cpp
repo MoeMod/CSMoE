@@ -164,7 +164,7 @@ void DLLEXPORT HUD_PlayerMoveInit( struct playermove_s *ppmove )
 	PM_Init( ppmove );
 }
 
-char DLLEXPORT HUD_PlayerMoveTexture( char *name )
+char DLLEXPORT HUD_PlayerMoveTexture( const char *name )
 {
 	return PM_FindTextureType( name );
 }

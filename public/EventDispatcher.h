@@ -25,8 +25,6 @@ GNU General Public License for more details.
 #include <numeric>
 #include <functional>
 
-#include "nodiscard.h"
-
 using EventListener = std::shared_ptr<void>;
 template<class F>
 class EventDispatcher;
@@ -136,7 +134,7 @@ public:
 	}
 	// 注册订阅普通回调函数，EventListener析构时订阅自动注销
 	template<class RealF>
-	NODISCARD EventListener subscribe(RealF &&f)
+	[[nodiscard]] EventListener subscribe(RealF &&f)
 	{
 		auto sp = std::make_shared<CCallable<typename std::decay<RealF>::type>>(std::forward<RealF>(f));
 		v.emplace_back(sp);
@@ -144,7 +142,7 @@ public:
 	}
 	// 注册订阅类成员函数
 	template<class C, class M>
-	NODISCARD EventListener subscribe(M C::*pmem_fn, C *pthis)
+	[[nodiscard]] EventListener subscribe(M C::*pmem_fn, C *pthis)
 	{
 		return subscribe([pmem_fn, pthis](typename ParseArg<Args>::type...args) { return (pthis->*pmem_fn)(args...); });
 	}

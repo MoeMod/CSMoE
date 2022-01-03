@@ -749,7 +749,7 @@ enum
 };
 
 typedef int		func_t;
-typedef int		string_t;
+typedef ptrdiff_t		string_t;
 
 //typedef unsigned char	byte;
 typedef unsigned short	word;
