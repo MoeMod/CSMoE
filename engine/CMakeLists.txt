@@ -67,6 +67,8 @@ if(IOS)
 	set(XASH_CPUINFO OFF)
 endif()
 
+option(XASH_SKIPCRTLIB "Use system crtlib" ON)
+
 set(XASH_ENGINE_SOURCES 
 	common/avikit.cpp
 	common/build.cpp
@@ -372,6 +374,10 @@ add_definitions(-DXASH_FORCEINLINE)
 if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version that requires SSE
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
+if(XASH_SKIPCRTLIB)
+	add_definitions(-DXASH_SKIPCRTLIB)
+endif()
+
 if(XASH_SKIPCRTLIB)
 	add_definitions(-DXASH_SKIPCRTLIB)
 endif()

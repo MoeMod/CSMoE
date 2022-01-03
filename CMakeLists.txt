@@ -29,7 +29,7 @@ option(XASH_VCPKG "Enable VCPKG support." OFF)
 
 if(XASH_DEDICATED)
 	set(XASH_SDL  OFF) # Dedicated servers still can use SDL
-	option(XASH_STATIC_GAMELIB "Build static game library" ON)
+	set(XASH_STATIC_GAMELIB OFF)
 else()
 	option(XASH_SDL "Enable SDL." ON)
 	option(XASH_STATIC_GAMELIB "Build static game library" ON)
@@ -67,6 +67,11 @@ elseif(MSVC)
 
 else()
 	add_compile_options( -Wall -Wextra -Wno-unused-parameter -Wl,--no-undefined )
+endif()
+
+option(XASH_SIMD "Vector SIMD support - Warning ABI broken" OFF)
+if(XASH_SIMD)
+	add_definitions(-DXASH_SIMD=1)
 endif()
 
 # Important, as HLSDK and engine shares some symbol names!

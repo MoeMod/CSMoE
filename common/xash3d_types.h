@@ -2,16 +2,41 @@
 #ifndef XASH_TYPES_H
 #define XASH_TYPES_H
 
+#ifndef XASH_ALIGN
+#ifdef __cplusplus
+#define XASH_ALIGN(N) alignas(N)
+#elif defined _MSC_VER
+#define XASH_ALIGN(N) __declspec(align(16))
+#else
+#define XASH_ALIGN(N) __attribute__((aligned (n)))
+#endif
+#endif
+
+#ifdef XASH_SIMD
+#include <xmmintrin.h>
+#define XASH_VECTOR_ALIGN XASH_ALIGN(16)
+#else
+#define XASH_VECTOR_ALIGN
+#endif
+
 typedef unsigned char byte;
 typedef int		sound_t;
 typedef float		vec_t;
 typedef vec_t		vec2_t[2];
+typedef vec_t       *vec2_t_ref;
 
 #ifndef vec3_t
+#ifdef XASH_SIMD
+typedef __m128		vec3_t;
+typedef __m128		*vec3_t_ref;
+#else
 typedef vec_t		vec3_t[3];
+typedef vec_t		*vec3_t_ref;
+#endif
 #endif
 
 typedef vec_t		vec4_t[4];
+typedef vec_t		*vec4_t_ref;
 typedef vec_t		quat_t[4];
 typedef byte		rgba_t[4];	// unsigned byte colorpack
 typedef byte		rgb_t[3];		// unsigned byte colorpack

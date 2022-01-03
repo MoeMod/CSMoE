@@ -86,7 +86,7 @@ void BF_WriteWord( sizebuf_t *bf, int val );
 void BF_WriteLong( sizebuf_t *bf, int val );
 void BF_WriteCoord( sizebuf_t *bf, float val );
 void BF_WriteFloat( sizebuf_t *bf, float val );
-void BF_WriteVec3Coord( sizebuf_t *bf, const float *fa );
+void BF_WriteVec3Coord( sizebuf_t *bf, const vec3_t fa );
 qboolean BF_WriteBytes( sizebuf_t *bf, const void *pBuf, int nBytes );	// same as MSG_WriteData
 qboolean BF_WriteString( sizebuf_t *bf, const char *pStr );		// returns false if it overflows the buffer.
 
@@ -117,7 +117,7 @@ int BF_ReadWord( sizebuf_t *bf );
 int BF_ReadLong( sizebuf_t *bf );
 float BF_ReadCoord( sizebuf_t *bf );
 float BF_ReadFloat( sizebuf_t *bf );
-void BF_ReadVec3Coord( sizebuf_t *bf, vec3_t fa );
+void BF_ReadVec3Coord( sizebuf_t *bf, vec3_t_ref fa );
 qboolean BF_ReadBytes( sizebuf_t *bf, void *pOut, int nBytes );
 char *BF_ReadStringExt( sizebuf_t *bf, qboolean bLine );
 					

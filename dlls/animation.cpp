@@ -968,7 +968,7 @@ float StudioEstimateFrame(float frame, mstudioseqdesc_t *pseqdesc)
 	return (float)(pseqdesc->numframes - 1) * frame / 256;
 }
 
-void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, const vec_t *angles, const vec_t *origin, const byte *pcontroller, const byte *pblending, int iBone, const edict_t *pEdict)
+void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, vec3_t angles, vec3_t origin, const byte *pcontroller, const byte *pblending, int iBone, const edict_t *pEdict)
 {
 	int i, j;
 	float f;

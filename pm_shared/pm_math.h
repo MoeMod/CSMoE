@@ -19,10 +19,7 @@ GNU General Public License for more details.
 #pragma once
 #endif
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include "basetypes.h"
-#include "angledef.h"
+#include "vector.h"
 
 #if defined(CLIENT_DLL)
 namespace cl {

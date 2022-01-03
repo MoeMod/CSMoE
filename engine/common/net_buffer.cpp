@@ -294,7 +294,7 @@ void BF_WriteCoord( sizebuf_t *bf, float val )
 	else BF_WriteShort( bf, (int)( val * 8.0f ));
 }
 
-void BF_WriteVec3Coord( sizebuf_t *bf, const float *fa )
+void BF_WriteVec3Coord( sizebuf_t *bf, const vec3_t fa )
 {
 	BF_WriteCoord( bf, fa[0] );
 	BF_WriteCoord( bf, fa[1] );
@@ -555,11 +555,12 @@ float BF_ReadCoord( sizebuf_t *bf )
 	return (float)(BF_ReadShort( bf ) * ( 1.0f / 8.0f ));
 }
 
-void BF_ReadVec3Coord( sizebuf_t *bf, vec3_t fa )
+void BF_ReadVec3Coord( sizebuf_t *bf, vec3_t_ref fa )
 {
-	fa[0] = BF_ReadCoord( bf );
-	fa[1] = BF_ReadCoord( bf );
-	fa[2] = BF_ReadCoord( bf );
+	float x = BF_ReadCoord( bf );
+	float y = BF_ReadCoord( bf );
+	float z = BF_ReadCoord( bf );
+	VectorSet(fa, x, y, z);
 }
 
 int BF_ReadLong( sizebuf_t *bf )

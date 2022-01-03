@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #define CMENUPLAYERMODELVIEW_H
 
 // HLSDK includes
-#include "mathlib.h"
+#include "xash3d_types.h"
 #include "const.h"
 #include "keydefs.h"
 #include "ref_params.h"

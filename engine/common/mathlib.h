@@ -16,6 +16,9 @@ GNU General Public License for more details.
 #ifndef MATHLIB_H
 #define MATHLIB_H
 
+#ifdef XASH_SIMD
+#include <intrin.h>
+#endif
 #include <math.h>
 
 #ifdef MSC_VER
@@ -72,36 +75,234 @@ GNU General Public License for more details.
 #define nanmask		(255<<23)
 
 #define Q_rint(x)		((x) < 0 ? ((int)((x)-0.5f)) : ((int)((x)+0.5f)))
-#define IS_NAN(x)		(((*(int *)&x)&nanmask)==nanmask)
 
-#define VectorIsNAN(v) (IS_NAN(v[0]) || IS_NAN(v[1]) || IS_NAN(v[2]))	
-#define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
+#define IS_NAN(x)		(((*(int *)&x)&nanmask)==nanmask)
+#define VectorIsNAN(v) (IS_NAN(v[0]) || IS_NAN(v[1]) || IS_NAN(v[2]))
+#define Vector2Subtract(a,b,c) ((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1])
+#define Vector2Add(a,b,c) ((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1])
+#define Vector2Copy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1])
+#define Vector4Copy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
+#define VectorDivide( in, d, out ) VectorScale( in, (1.0f / (d)), out )
+#define Vector2Average(a,b,o)	((o)[0]=((a)[0]+(b)[0])*0.5,(o)[1]=((a)[1]+(b)[1])*0.5)
+#define Vector2Set(v, x, y) ((v)[0]=(x),(v)[1]=(y))
+#define Vector4Set(v, a, b, c, d) ((v)[0]=(a),(v)[1]=(b),(v)[2]=(c),(v)[3] = (d))
+#define Vector2Lerp( v1, lerp, v2, c ) ((c)[0] = (v1)[0] + (lerp) * ((v2)[0] - (v1)[0]), (c)[1] = (v1)[1] + (lerp) * ((v2)[1] - (v1)[1]))
+#define Vector2IsNull( v ) ((v)[0] == 0.0f && (v)[1] == 0.0f)
+
+#ifdef XASH_SIMD
+inline __m128 VectorSgnEx(__m128 a)
+{
+	// 0x7fffffff = ~(-0.0f)
+	__m128 mask = _mm_castsi128_ps(_mm_set_epi32(0x7fffffff, 0x7fffffff, 0x7fffffff, 0));
+	return _mm_and_ps(a, mask);
+}
+#define VectorSgn(a, b) ((b) = VectorSgnEx((a)))
+inline __m128 VectorAbsEx(__m128 a)
+{
+	return _mm_max_ps(_mm_sub_ps(_mm_setzero_ps(), a), a);
+}
+#define VectorAbs(a, b) ((b) = VectorAbsEx((a)))
+inline __m128 VectorCopySignEx(__m128 a, __m128 b)
+{
+	VectorSgn(a, a);
+	VectorAbs(b, b);
+	return _mm_mul_ps(a, b);
+}
+#define VectorCopySign(a, b, c) ((c) = VectorCopySignEx((a), (b)))
+inline __m128 VectorMinsEx(__m128 a, __m128 b)
+{
+	return _mm_min_ps(a, b);
+}
+#define VectorMins(a, b, out) (out) = VectorMinsEx((a), (b))
+inline __m128 VectorMaxsEx(__m128 a, __m128 b)
+{
+	return _mm_max_ps(a, b);
+}
+#define VectorMaxs(a, b, out) (out) = VectorMaxsEx((a), (b))
+inline __m128 VectorClampEx(__m128 v, __m128 a, __m128 b)
+{
+	return _mm_min_ps(_mm_max_ps(a, v), b);
+}
+#define VectorClamp(v, a, b, out) (out) = VectorClampEx((v), (a), (b))
+inline float DotProduct(__m128 a, __m128 b)
+{
+	float res;
+	_mm_store_ss(&res, _mm_dp_ps(a, b, 0x7f));
+	return res;
+}
+inline float DotProductAbs(__m128 a, __m128 b)
+{
+	a = VectorAbsEx(a); // a = abs(a)
+	b = VectorAbsEx(b); // b = abs(b)
+	return DotProduct(a, b);
+}
+inline float DotProductFabs(__m128 a, __m128 b)
+{
+	return DotProductAbs(a, b);
+}
+inline __m128 CrossProductEx(__m128 a, __m128 b)
+{
+	__m128 result = _mm_sub_ps(
+		_mm_mul_ps(b, _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1))),
+		_mm_mul_ps(a, _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1)))
+	);
+	return _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 0, 2, 1));
+}
+#define CrossProduct(a,b,c) (c) = CrossProductEx((a), (b))
+inline __m128 VectorSubtractEx(__m128 a, __m128 b)
+{
+	return _mm_sub_ps(a, b);
+}
+#define VectorSubtract(a,b,c) ((c) = VectorSubtractEx((a), ((b))))
+inline __m128 VectorAddEx(__m128 a, __m128 b)
+{
+	return _mm_add_ps(a, b);
+}
+#define VectorAdd(a,b,c) ((c) = VectorAddEx((a),(b)))
+#define VectorCopy(a,b) ((b) = (a))
+inline __m128 VectorScaleEx(__m128 a, float b)
+{
+	return _mm_mul_ps(a, _mm_load_ps1(&b));
+}
+#define VectorScale(in, scale, out) ((out) = VectorScaleEx((in), (scale)))
+inline float VectorMax(__m128 x)
+{
+	float res;
+	x = _mm_blend_ps(_mm_setzero_ps(), x, 8); // x = { x[0], x[1], x[2], 0 }
+	x = _mm_max_ps(x, x); // x = { max(x[1],x[0]), max(x[3],x[2]), max(x[1],x[0]), max(x[3],x[2]) }
+	x = _mm_max_ps(x, x); // x = { max(x), ... }
+	_mm_store_ss(&res, x); // res = x[0]
+	return res;
+}
+inline qboolean VectorCompare(__m128 a, __m128 b)
+{
+	__m128 c = _mm_cmpeq_ps(a, b); // c = a==b
+	__m128i d = _mm_cvtps_epi32(c); // d = (int)c
+	return _mm_movemask_epi8(_mm_cmpeq_epi32(d, _mm_setzero_si128())) & 0x0FFF;
+}
+inline float simd_Vector3Sum(__m128 x)
+{
+	float res;
+	x = _mm_blend_ps(_mm_setzero_ps(), x, 8); // x = { x[0], x[1], x[2], 0 }
+	x = _mm_hadd_ps(x, x); // x = { x[1]+x[0], x[3]+x[2], x[1]+x[0], x[3]+x[2] }
+	x = _mm_hadd_ps(x, x); // x = { sum(x), ... }
+	_mm_store_ss(&res, x); // res = x[0]
+	return res;
+}
+inline float VectorAvg(__m128 x)
+{
+	return (simd_Vector3Sum(x) / 3);
+}
+inline float DotProduct_sqrt(__m128 a, __m128 b)
+{
+	float res;
+	_mm_store_ss(&res, _mm_sqrt_ss(_mm_dp_ps(a, b, 0x7f)));
+	return res;
+}
+inline float VectorLength(__m128 a)
+{
+	float res;
+	_mm_store_ss(&res, _mm_sqrt_ss(_mm_dp_ps(a, a, 0x7f)));
+	return res;
+}
+inline float VectorLength2(__m128 a)
+{
+	float res;
+	_mm_store_ss(&res, _mm_dp_ps(a, a, 0x7f));
+	return res;
+}
+inline float VectorDistance(__m128 a, __m128 b)
+{
+	return VectorLength(_mm_sub_ps(a, b)); // Length(a-b)
+}
+inline float VectorDistance2(__m128 a, __m128 b)
+{
+	return VectorLength2(_mm_sub_ps(a, b)); // Length2(a-b)
+}
+inline __m128 VectorAverage(__m128 a, __m128 b)
+{
+	__m128 c = _mm_add_ps(a, b);
+	return VectorScaleEx(c, 0.5f); // Length2(a-b)
+}
+#define VectorAverage(a,b,c) (c) = VectorAverage((a), (b))
+inline __m128 VectorLoad(float x, float y, float z)
+{
+	return (__m128) {
+		.m128_f32 = {x, y, z, 0.0f}
+	};
+}
+#define VectorSet(v, x, y, z) ((v) = VectorLoad((x), (y), (z)))
+#define VectorClear(x) ((x) = _mm_setzero_ps())
+inline __m128 VectorLerpEx(__m128 v1, float lerp, __m128 v2)
+{
+	return _mm_add_ps(v1, _mm_mul_ps(_mm_sub_ps(v2, v1), _mm_load_ps1(&lerp)));
+}
+#define VectorLerp( v1, lerp, v2, c ) (c) = VectorLerpEx((v1), (lerp), (v2))
+inline __m128 VectorNormalizeEx(__m128 v)
+{
+	return _mm_mul_ps(v, _mm_rsqrt_ps(_mm_dp_ps(v, v, 0x7f)));
+}
+#define VectorNormalize( v ) (v) = VectorNormalizeEx((v))
+#define VectorNormalize2( v, dest ) (dest) = VectorNormalizeEx((v))
+#define VectorNormalizeFast( v ) VectorNormalize(v)
+#define VectorNormalizeLength( v ) ((v) = VectorNormalizeEx((v)), VectorLength((v)))
+#define VectorNegate(x, y) VectorSubtract(_mm_setzero_ps(), (x), (y))
+#define VectorM(scale1, b1, c) ((c) = VectorScaleEx((b1), (scale1)))
+inline __m128 VectorMAEx(__m128 a, float scale, __m128 b)
+{
+#ifdef XASH_NO_FMA
+	return _mm_add_ps(_mm_mul_ps(a, _mm_load_ps1(&scale)), b);
+#else
+	return _mm_fmadd_ps(a, _mm_load_ps1(&scale), b);
+#endif
+}
+#define VectorMA(a, scale, b, c) ((c) = VectorMAEx((a), (scale), (b)))
+inline __m128 VectorMAMAMEx(float scale1, __m128 b1, float scale2, __m128 b2, float scale3, __m128 b3)
+{
+#ifdef XASH_NO_FMA
+	__m128 c = _mm_mul_ps(b1, _mm_load_ps1(&scale1));
+	c = _mm_add_ps(_mm_mul_ps(b2, _mm_load_ps1(&scale2)), c);
+	c = _mm_add_ps(_mm_mul_ps(b3, _mm_load_ps1(&scale3)), c);
+	return c;
+#else
+	__m128 c = _mm_mul_ps(b1, _mm_load_ps1(&scale1));
+	c = _mm_fmadd_ps(b2, _mm_load_ps1(&scale2), c);
+	c = _mm_fmadd_ps(b3, _mm_load_ps1(&scale3), c);
+	return c;
+#endif
+}
+#define VectorMAMAM(scale1, b1, scale2, b2, scale3, b3, c) ((c) = VectorMAMAMEx((scale1), (b1), (scale2), (b2), (scale3), (b3)))
+qboolean VectorIsNull(__m128 v)
+{
+	return VectorLength(v) == 0.0f;
+}
+#else
+#define VectorTransform1(a, b, f) ((b)[0]=f(a[0]),(b)[1]=f(a[1]),f(b)[2]=(a)[2])
+#define VectorTransform2(a, b, c, f) ((c)[0] = f((a)[0], (b)[0]), (c)[1] = f((a)[1], (b)[1]), (c)[2] = f((a)[2], (b)[2]))
+#define VectorCopySign(a, b, c) VectorTransform2(a, b, c, copysign)
+#define VectorSgn(a, b) VectorCopySign(a, 1.0f, b)
+#define VectorAbs(a, b) VectorTransform1(a, b, abs)
+#define VectorMins(a, b) VectorTransform1(a, b, min)
+#define VectorMaxs(a, b) VectorTransform1(a, b, max)
+#define VectorClamp(a, b) VectorTransform1(a, b, clamp)
 #define DotProductAbs(x,y) (abs((x)[0]*(y)[0])+abs((x)[1]*(y)[1])+abs((x)[2]*(y)[2]))
 #define DotProductFabs(x,y) (fabs((x)[0]*(y)[0])+fabs((x)[1]*(y)[1])+fabs((x)[2]*(y)[2]))
+#define DotProduct(x,y) ((x)[0]*(y)[0]+(x)[1]*(y)[1]+(x)[2]*(y)[2])
 #define CrossProduct(a,b,c) ((c)[0]=(a)[1]*(b)[2]-(a)[2]*(b)[1],(c)[1]=(a)[2]*(b)[0]-(a)[0]*(b)[2],(c)[2]=(a)[0]*(b)[1]-(a)[1]*(b)[0])
-#define Vector2Subtract(a,b,c) ((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1])
 #define VectorSubtract(a,b,c) ((c)[0]=(a)[0]-(b)[0],(c)[1]=(a)[1]-(b)[1],(c)[2]=(a)[2]-(b)[2])
-#define Vector2Add(a,b,c) ((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1])
 #define VectorAdd(a,b,c) ((c)[0]=(a)[0]+(b)[0],(c)[1]=(a)[1]+(b)[1],(c)[2]=(a)[2]+(b)[2])
-#define Vector2Copy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1])
 #define VectorCopy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
-#define Vector4Copy(a,b) ((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 #define VectorScale(in, scale, out) ((out)[0] = (in)[0] * (scale),(out)[1] = (in)[1] * (scale),(out)[2] = (in)[2] * (scale))
 #define VectorCompare(v1,v2)	((v1)[0]==(v2)[0] && (v1)[1]==(v2)[1] && (v1)[2]==(v2)[2])
-#define VectorDivide( in, d, out ) VectorScale( in, (1.0f / (d)), out )
 #define VectorMax(a) ( max((a)[0], max((a)[1], (a)[2])) )
 #define VectorAvg(a) ( ((a)[0] + (a)[1] + (a)[2]) / 3 )
 #define VectorLength(a) ( sqrt( DotProduct( a, a )))
 #define VectorLength2(a) (DotProduct( a, a ))
 #define VectorDistance(a, b) (sqrt( VectorDistance2( a, b )))
 #define VectorDistance2(a, b) (((a)[0] - (b)[0]) * ((a)[0] - (b)[0]) + ((a)[1] - (b)[1]) * ((a)[1] - (b)[1]) + ((a)[2] - (b)[2]) * ((a)[2] - (b)[2]))
-#define Vector2Average(a,b,o)	((o)[0]=((a)[0]+(b)[0])*0.5,(o)[1]=((a)[1]+(b)[1])*0.5)
 #define VectorAverage(a,b,o)	((o)[0]=((a)[0]+(b)[0])*0.5,(o)[1]=((a)[1]+(b)[1])*0.5,(o)[2]=((a)[2]+(b)[2])*0.5)
-#define Vector2Set(v, x, y) ((v)[0]=(x),(v)[1]=(y))
 #define VectorSet(v, x, y, z) ((v)[0]=(x),(v)[1]=(y),(v)[2]=(z))
-#define Vector4Set(v, a, b, c, d) ((v)[0]=(a),(v)[1]=(b),(v)[2]=(c),(v)[3] = (d))
 #define VectorClear(x) ((x)[0]=(x)[1]=(x)[2]=0)
-#define Vector2Lerp( v1, lerp, v2, c ) ((c)[0] = (v1)[0] + (lerp) * ((v2)[0] - (v1)[0]), (c)[1] = (v1)[1] + (lerp) * ((v2)[1] - (v1)[1]))
 #define VectorLerp( v1, lerp, v2, c ) ((c)[0] = (v1)[0] + (lerp) * ((v2)[0] - (v1)[0]), (c)[1] = (v1)[1] + (lerp) * ((v2)[1] - (v1)[1]), (c)[2] = (v1)[2] + (lerp) * ((v2)[2] - (v1)[2]))
 #define VectorNormalize( v ) { float ilength = (float)sqrt(DotProduct(v, v));if (ilength) ilength = 1.0f / ilength;v[0] *= ilength;v[1] *= ilength;v[2] *= ilength; }
 #define VectorNormalize2( v, dest ) {float ilength = (float)sqrt(DotProduct(v,v));if (ilength) ilength = 1.0f / ilength;dest[0] = v[0] * ilength;dest[1] = v[1] * ilength;dest[2] = v[2] * ilength; }
@@ -112,7 +313,7 @@ GNU General Public License for more details.
 #define VectorMA(a, scale, b, c) ((c)[0] = (a)[0] + (scale) * (b)[0],(c)[1] = (a)[1] + (scale) * (b)[1],(c)[2] = (a)[2] + (scale) * (b)[2])
 #define VectorMAMAM(scale1, b1, scale2, b2, scale3, b3, c) ((c)[0] = (scale1) * (b1)[0] + (scale2) * (b2)[0] + (scale3) * (b3)[0],(c)[1] = (scale1) * (b1)[1] + (scale2) * (b2)[1] + (scale3) * (b3)[1],(c)[2] = (scale1) * (b1)[2] + (scale2) * (b2)[2] + (scale3) * (b3)[2])
 #define VectorIsNull( v ) ((v)[0] == 0.0f && (v)[1] == 0.0f && (v)[2] == 0.0f)
-#define Vector2IsNull( v ) ((v)[0] == 0.0f && (v)[1] == 0.0f)
+#endif
 #define MakeRGBA( out, x, y, z, w ) Vector4Set( out, x, y, z, w )
 #define PlaneDist(point,plane) ((plane)->type < 3 ? (point)[(plane)->type] : DotProduct((point), (plane)->normal))
 #define PlaneDiff(point,plane) (((plane)->type < 3 ? (point)[(plane)->type] : DotProduct((point), (plane)->normal)) - (plane)->dist)
@@ -120,6 +321,7 @@ GNU General Public License for more details.
 #define boundmin( num, low )  ( (num) >= (low) ? (num) : (low)  )
 #define bound( low, num, high ) ( boundmin( boundmax(num, high), low ))
 //#define bound( min, num, max ) ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min))
+#define VectorUnpack(v) (v)[0], (v)[1], (v)[2]
 
 float rsqrt( float number );
 float anglemod( const float a );
@@ -153,15 +355,15 @@ void SinCosFastVector2( float r1, float r2,
 #endif
 ;
 #endif
-float VectorNormalizeLength2( const vec3_t v, vec3_t out );
-void VectorVectors( const vec3_t forward, vec3_t right, vec3_t up );
-void VectorAngles( const float *forward, float *angles );
-void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up );
-void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t angles );
-void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
+float VectorNormalizeLength2( const vec3_t v, vec3_t_ref out );
+void VectorVectors( const vec3_t forward, vec3_t_ref right, vec3_t_ref up );
+void VectorAngles( const vec3_t forward, vec3_t_ref angles );
+void AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_ref right, vec3_t_ref up );
+void VectorsAngles( const vec3_t forward, const vec3_t right, const vec3_t up, vec3_t_ref angles );
+void RotatePointAroundVector( vec3_t_ref dst, const vec3_t dir, const vec3_t point, float degrees );
 
-void ClearBounds( vec3_t mins, vec3_t maxs );
-void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
+void ClearBounds(vec3_t_ref mins, vec3_t_ref maxs );
+void AddPointToBounds( const vec3_t v, vec3_t_ref mins, vec3_t_ref maxs );
 qboolean BoundsIntersect( const vec3_t mins1, const vec3_t maxs1, const vec3_t mins2, const vec3_t maxs2 );
 qboolean BoundsAndSphereIntersect( const vec3_t mins, const vec3_t maxs, const vec3_t origin, float radius );
 float RadiusFromBounds( const vec3_t mins, const vec3_t maxs );
@@ -170,7 +372,7 @@ void AngleQuaternion( const vec3_t angles, vec4_t q );
 void QuaternionSlerp( const vec4_t p, vec4_t q, float t, vec4_t qt );
 float RemapVal( float val, float A, float B, float C, float D );
 float ApproachVal( float target, float value, float speed );
-void InterpolateAngles( vec3_t start, vec3_t end, vec3_t output, float frac );
+void InterpolateAngles( const vec3_t start, const vec3_t end, vec3_t_ref output, float frac );
 
 //
 // matrixlib.c
@@ -181,34 +383,34 @@ void InterpolateAngles( vec3_t start, vec3_t end, vec3_t output, float frac );
 #define cmatrix3x4 vec4_t *const
 #define cmatrix4x4 vec4_t *const
 
-void Matrix3x4_VectorTransform( cmatrix3x4 in, const float v[3], float out[3] );
-void Matrix3x4_VectorITransform( cmatrix3x4 in, const float v[3], float out[3] );
-void Matrix3x4_VectorRotate( cmatrix3x4 in, const float v[3], float out[3] );
-void Matrix3x4_VectorIRotate( cmatrix3x4 in, const float v[3], float out[3] );
+void Matrix3x4_VectorTransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix3x4_VectorITransform( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix3x4_VectorRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix3x4_VectorIRotate( cmatrix3x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix3x4_ConcatTransforms( matrix3x4 out, cmatrix3x4 in1, cmatrix3x4 in2 );
 void Matrix3x4_FromOriginQuat( matrix3x4 out, const vec4_t quaternion, const vec3_t origin );
 void Matrix3x4_CreateFromEntity( matrix3x4 out, const vec3_t angles, const vec3_t origin, float scale );
-void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t out, float *dist );
+void Matrix3x4_TransformPositivePlane( cmatrix3x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
 void Matrix3x4_SetOrigin( matrix3x4 out, float x, float y, float z );
 void Matrix3x4_Invert_Simple( matrix3x4 out, cmatrix3x4 in1 );
-void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, float *out );
+void Matrix3x4_OriginFromMatrix( cmatrix3x4 in, vec3_t_ref out );
 
 #define Matrix4x4_LoadIdentity( mat )	Matrix4x4_Copy( mat, matrix4x4_identity )
 #define Matrix4x4_Copy( out, in )	Q_memcpy( out, in, sizeof( matrix4x4 ))
 
-void Matrix4x4_VectorTransform( cmatrix4x4 in, const float v[3], float out[3] );
-void Matrix4x4_VectorITransform( cmatrix4x4 in, const float v[3], float out[3] );
-void Matrix4x4_VectorRotate( cmatrix4x4 in, const float v[3], float out[3] );
-void Matrix4x4_VectorIRotate( cmatrix4x4 in, const float v[3], float out[3] );
+void Matrix4x4_VectorTransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix4x4_VectorITransform( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix4x4_VectorRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
+void Matrix4x4_VectorIRotate( cmatrix4x4 in, const vec3_t v, vec3_t_ref out );
 void Matrix4x4_ConcatTransforms( matrix4x4 out, cmatrix4x4 in1, cmatrix4x4 in2 );
 void Matrix4x4_FromOriginQuat( matrix4x4 out, const vec4_t quaternion, const vec3_t origin );
 void Matrix4x4_CreateFromEntity( matrix4x4 out, const vec3_t angles, const vec3_t origin, float scale );
-void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t out, float *dist );
-void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t out, float *dist );
-void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t angles, vec3_t origin );
+void Matrix4x4_TransformPositivePlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+void Matrix4x4_TransformStandardPlane( cmatrix4x4 in, const vec3_t normal, float d, vec3_t_ref out, float *dist );
+void Matrix4x4_ConvertToEntity( cmatrix4x4 in, vec3_t_ref angles, vec3_t_ref origin );
 void Matrix4x4_SetOrigin( matrix4x4 out, float x, float y, float z );
 void Matrix4x4_Invert_Simple( matrix4x4 out, cmatrix4x4 in1 );
-void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, float *out );
+void Matrix4x4_OriginFromMatrix( cmatrix4x4 in, vec3_t_ref out );
 void Matrix4x4_Transpose( matrix4x4 out, cmatrix4x4 in1 );
 qboolean Matrix4x4_Invert_Full( matrix4x4 out, cmatrix4x4 in1 );
 
