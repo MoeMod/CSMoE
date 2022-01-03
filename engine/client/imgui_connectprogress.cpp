@@ -59,6 +59,8 @@ struct
 	}
 	void HandleStufftext(float flProgress, const char* pszText)
 	{
+		if(!strncmp(pszText, "Getting ", 8))
+			pszText = "正在读取服务器信息...";
 		SetCommonText(pszText);
 		commonProgress = flProgress;
 		m_iState = STATE_CONNECTING;
@@ -68,7 +70,7 @@ struct
 		snprintf(sDownloadString, sizeof(sDownloadString) - 1, "正在下载资源 %s", pszFileName);
 		snprintf(sCommonString, sizeof(sCommonString) - 1, "%d / %d %s", iCurrent + 1, iTotal, comment);
 		m_iState = STATE_DOWNLOAD;
-		commonProgress = (float)iCurrent / iTotal + 0.01f / iTotal * Cvar_VariableValue("scr_download");
+		commonProgress = (float)iCurrent / iTotal + 0.01f / iTotal * scr_download->value;
 	}
 	void SetCommonText(const char* pszText)
 	{
@@ -153,6 +155,16 @@ struct
 			ImGui::TextUnformatted(sDownloadString);
 			ImGui::TextUnformatted(sCommonString);
 			ImGui::ProgressBar(commonProgress, ImGuiUtils::GetScaledSize({ -1, 36 }));
+			ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.00f, 0.45f, 0.00f, 1.00f));
+			if(m_iState == STATE_DOWNLOAD)
+			{
+				ImGui::ProgressBar(scr_download->value / 100.0f, ImGuiUtils::GetScaledSize({ -1, 36 }));
+			}
+			else
+			{
+				ImGui::ProgressBar(scr_loading->value / 100.0f, ImGuiUtils::GetScaledSize({ -1, 36 }));
+			}
+			ImGui::PopStyleColor();
 
 
 			if(m_iState == STATE_NONE)
