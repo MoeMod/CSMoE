@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #include <list>
 #include <unordered_map>
 #include <variant>
-#include <optional>
+#include <numeric>
 #include <memory>
 #include "mod_decryptor.h"
 #include "mod_extend_seq.h"
@@ -1722,6 +1722,13 @@ namespace xe {
 		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
 			flags |= TF_NEAREST;
 
+		rgbdata_t *pic = FS_LoadImage( name, nullptr, 0 );
+		if(!pic)
+		{
+			// texture not found
+			return 0;
+		}
+
 		i = GL_AllocateTextureSlot(name);
 
 		auto tex = &r_textures[i];
@@ -1735,6 +1742,11 @@ namespace xe {
 		if( flags & TF_SKYSIDE )
 			tex->texnum = tr.skyboxbasenum++;
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
+		tex->width = pic->width;
+		tex->height = pic->height;
+
+		// we load texture file just for its width & height, so free it now
+		FS_FreeImage(pic);
 
 		// add to lru
 		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name } });
@@ -1780,6 +1792,8 @@ namespace xe {
 		gltexture_t	*tex = &r_textures[i];
 		Q_strncpy( tex->name, name, sizeof( tex->name ));
 		tex->flags = (texFlags_t)flags;
+		tex->width = ptexture->width;
+		tex->height = ptexture->height;
 
 		// init reference exclude brush model's texture
 		if (tex->name[0] != '*')
@@ -1830,6 +1844,7 @@ namespace xe {
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
 			// set size for external texture
+			ptexture->index = tex->texnum;
 			ptexture->width = tex->width;
 			ptexture->height = tex->height;
 
@@ -1886,10 +1901,10 @@ namespace xe {
 	public:
 		typedef Key key_type;
 		typedef Value value_type;
-		typedef std::list<key_type> list_type;
+		typedef std::vector<key_type> list_type;
 		typedef std::unordered_map<
 				key_type,
-				std::pair<value_type, typename list_type::iterator>
+				value_type
 		> map_type;
 
 		lru_cache(size_t capacity)
@@ -1916,7 +1931,7 @@ namespace xe {
 			return m_map.empty();
 		}
 
-		bool contains(const key_type &key)
+		bool contains(const key_type &key) const
 		{
 			return m_map.find(key) != m_map.end();
 		}
@@ -1932,49 +1947,31 @@ namespace xe {
 				}
 
 				// insert the new item
-				m_list.push_front(key);
-				m_map[key] = std::make_pair(value, m_list.begin());
+				m_list.push_back(key);
+				m_map[key] = value;
 			}
 		}
 
 		void remove(const key_type &key)
 		{
-			auto i = m_map.find(key);
-			auto i2 = i->second.second;
-			m_list.erase(i2);
-			m_map.erase(i);
+			m_list.erase(std::remove(m_list.begin(), m_list.end(), key), m_list.end());
+			m_map.erase(key);
 		}
 
-		std::optional<value_type> get(const key_type &key)
+		bool update(const key_type &key)
 		{
 			// lookup value in the cache
 			auto i = m_map.find(key);
 			if(i == m_map.end()){
 				// value not in cache
-				return std::nullopt;
+				return false;
 			}
 
 			// return the value, but first update its place in the most
 			// recently used list
-			auto j = i->second.second;
-			if(j != m_list.begin()){
-				// move item to the front of the most recently used list
-				m_list.erase(j);
-				m_list.push_front(key);
-
-				// update iterator in map
-				j = m_list.begin();
-				const value_type &value = i->second.first;
-				m_map[key] = std::make_pair(value, j);
-
-				// return the value
-				return value;
-			}
-			else {
-				// the item is already at the front of the most recently
-				// used list so just return it
-				return i->second.first;
-			}
+			auto iter = std::find(m_list.begin(), m_list.end(), key);
+			std::rotate(iter, iter + 1, m_list.end());
+			return true;
 		}
 
 		void clear()
@@ -1987,9 +1984,9 @@ namespace xe {
 		void evict()
 		{
 			// evict item from the end of most recently used list
-			typename list_type::iterator i = --m_list.end();
-			m_map.erase(*i);
-			m_list.erase(i);
+			auto mid = m_list.begin() + m_list.size() / 2;
+			std::for_each(m_list.begin(), mid, [&](const key_type &key){ m_map.erase(key); });
+			m_list.erase(m_list.begin(), mid);
 		}
 
 	private:
@@ -2004,10 +2001,11 @@ namespace xe {
 	{
 		int texnum = ptexture->index;
 		gltexture_t	*tex = &r_textures[texnum];
+
 		if(!tex->texlru_extdata)
 			return; // unknown texture
 
-		if(textureCache.contains((GLuint)texnum))
+		if(textureCache.update((GLuint)texnum))
 			return; // already present
 
 		auto &lrudata = *tex->texlru_extdata;
@@ -4176,6 +4174,7 @@ void R_FreeImage( gltexture_t *image )
 	if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
 		FS_FreeImage( image->original );
 
+	MsgDev( D_INFO, "R_FreeImage %i %s\n", image->texnum, image->name );
 	pglDeleteTextures( 1, &image->texnum );
 	Q_memset( image, 0, sizeof( *image ));
 }
