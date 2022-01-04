@@ -83,7 +83,7 @@ int CSFSniper::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = -1;
 	p->iSlot = 0;
 	p->iPosition = 2;
-	p->iId = m_iId = WEAPON_AWP;
+	p->iId = m_iId = WEAPON_SFSNIPER;
 	p->iFlags = 0;
 	p->iWeight = AWP_WEIGHT;
 

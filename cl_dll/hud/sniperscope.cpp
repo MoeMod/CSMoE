@@ -29,7 +29,18 @@ version.
 */
 
 #include "hud.h"
+#include "triangleapi.h"
+#include "r_efx.h"
 #include "cl_util.h"
+
+
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "weapons.h"
+
+#include "draw_util.h"
+#include <cs_wpn\bte_weapons.h>
 
 int CHudSniperScope::Init()
 {
@@ -54,8 +65,31 @@ int CHudSniperScope::VidInit()
 
 int CHudSniperScope::Draw(float flTime)
 {
-	if(gHUD.m_iFOV > 40)
-		return 1;
+	
+
+	cl::CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+	if (pActiveBTEWeapon)
+	{
+		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5)
+		{
+			if (gHUD.m_iFOV > 80)
+				return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_SFSNIPER)
+		{
+			return 1;
+		}
+		else
+		{
+			if (gHUD.m_iFOV > 40)
+				return 1;
+		}
+	}
+	else
+	{
+		if (gHUD.m_iFOV > 40)
+			return 1;
+	}
 
 	m_iScopeArc[0]->Draw2DQuad(left, 0, centerx, centery, 0, 0, 1, 1, 0, 0, 0, 255);
 

@@ -492,7 +492,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->m_iJoiningState = READINGLTEXT;
 	pPlayer->m_iTeam = UNASSIGNED;
 	pPlayer->pev->fixangle = 1;
-	pPlayer->m_iModelName = MODEL_URBAN;
+	pPlayer->m_iModelName = MODEL_TERROR_URBAN;
 	pPlayer->m_bContextHelp = true;
 	pPlayer->m_bHasNightVision = false;
 	pPlayer->m_iHostagesKilled = 0;
@@ -1571,101 +1571,23 @@ void BuyItem(CBasePlayer *pPlayer, int iSlot)
 void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 {
 	CHalfLifeMultiplay *mp = g_pGameRules;
-	int numSkins = g_bIsCzeroGame ? CZ_NUM_SKIN : CS_NUM_SKIN;
+	int numSkins = PlayerModel_GetNumSkins()-1;
 
 	struct
 	{
 		ModelName model_id;
 		const char *model_name;
-		int model_name_index;
 
 	} appearance;
 
 	Q_memset(&appearance, 0, sizeof(appearance));
 
-	if (player->m_iTeam == TERRORIST) {
-		if ((slot > numSkins || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
-			slot = RANDOM_LONG(1, numSkins);
-		}
-
-		switch (slot) {
-			case 1:
-				appearance.model_id = MODEL_TERROR;
-				appearance.model_name = "terror";
-				break;
-			case 2:
-				appearance.model_id = MODEL_LEET;
-				appearance.model_name = "leet";
-				break;
-			case 3:
-				appearance.model_id = MODEL_ARCTIC;
-				appearance.model_name = "arctic";
-				break;
-			case 4:
-				appearance.model_id = MODEL_GUERILLA;
-				appearance.model_name = "guerilla";
-				break;
-			case 5:
-				if (g_bIsCzeroGame) {
-					appearance.model_id = MODEL_MILITIA;
-					appearance.model_name = "militia";
-					break;
-				}
-			default:
-				if (TheBotProfiles->GetCustomSkinModelname(slot) && player->IsBot()) {
-					appearance.model_name = (char *) TheBotProfiles->GetCustomSkinModelname(slot);
-				} else {
-					appearance.model_id = MODEL_TERROR;
-					appearance.model_name = "terror";
-				}
-				break;
-		}
-
-		// default T model models/player/terror/terror.mdl
-		appearance.model_name_index = 8;
-
-	} else if (player->m_iTeam == CT) {
-		if ((slot > numSkins || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
-			slot = RANDOM_LONG(1, numSkins);
-		}
-
-		switch (slot) {
-			case 1:
-				appearance.model_id = MODEL_URBAN;
-				appearance.model_name = "urban";
-				break;
-			case 2:
-				appearance.model_id = MODEL_GSG9;
-				appearance.model_name = "gsg9";
-				break;
-			case 3:
-				appearance.model_id = MODEL_SAS;
-				appearance.model_name = "sas";
-				break;
-			case 4:
-				appearance.model_id = MODEL_GIGN;
-				appearance.model_name = "gign";
-				break;
-			case 5:
-				if (g_bIsCzeroGame) {
-					appearance.model_id = MODEL_SPETSNAZ;
-					appearance.model_name = "spetsnaz";
-					break;
-				}
-			default:
-				if (TheBotProfiles->GetCustomSkinModelname(slot) && player->IsBot()) {
-					appearance.model_name = (char *) TheBotProfiles->GetCustomSkinModelname(slot);
-				} else {
-					appearance.model_id = MODEL_URBAN;
-					appearance.model_name = "urban";
-				}
-				break;
-		}
-
-		// default CT model models/player/urban/urban.mdl
-		appearance.model_name_index = 9;
+	if ((slot > numSkins || slot < 1) && (!TheBotProfiles->GetCustomSkin(slot) || !player->IsBot())) {
+		slot = RANDOM_LONG(1, numSkins);
 	}
 
+	appearance.model_id = (ModelName)slot;
+	appearance.model_name = PlayerModel_GetApperance(slot, player->m_iTeam);
 	player->ResetMenu();
 
 	// Reset the player's state
@@ -1685,7 +1607,9 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	player->m_iModelName = appearance.model_id;
 
 	SET_CLIENT_KEY_VALUE(player->entindex(), GET_INFO_BUFFER(player->edict()), "model", appearance.model_name);
-	player->SetNewPlayerModel(Client_ApperanceToModel(appearance.model_name_index));
+	char path[128];
+	Client_ApperanceToModel(path, slot, player->m_iTeam);
+	player->SetNewPlayerModel(path);
 
 	if (mp->m_iMapHasVIPSafetyZone == MAP_VIP_SAFETYZONE_UNINITIALIZED) {
 		if ((UTIL_FindEntityByClassname(NULL, "func_vip_safetyzone")) != NULL)

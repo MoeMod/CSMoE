@@ -951,7 +951,7 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 			if (strcmp(view->model->name, "models/z4b/v_zoom_A.mdl") && strcmp(view->model->name, "models/z4b/v_zoom_B.mdl"))
 				view->model = NULL;
 		}
-	}
+	}	
 	else if (gHUD.m_iFOV <= 80)
 	{
 		if (view->model->name)

@@ -20,7 +20,7 @@ namespace sv {
 /*
 * Globals initialization
 */
-ItemInfo CBasePlayerItem::ItemInfoArray[MAX_WEAPONS];
+std::map<int, ItemInfo> CBasePlayerItem::ItemInfoArray;
 AmmoInfo CBasePlayerItem::AmmoInfoArray[MAX_AMMO_SLOTS];
 
 TYPEDESCRIPTION CBasePlayerItem::m_SaveData[] =

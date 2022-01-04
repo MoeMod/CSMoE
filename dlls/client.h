@@ -128,7 +128,7 @@ void respawn(entvars_t *pev, BOOL fCopyCorpse = FALSE);
 void ClientKill(edict_t *pEntity);
 void ShowMenu(CBasePlayer *pPlayer, int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, const char *pszText);
 void ShowVGUIMenu(CBasePlayer *pPlayer, int MenuType, int BitMask, const char *szOldMenu);
-NOXREF C_DLLEXPORT int CountTeams();
+C_DLLEXPORT NOXREF int CountTeams();
 void ListPlayers(CBasePlayer *current);
 C_DLLEXPORT int CountTeamPlayers(int iTeam);
 void ProcessKickVote(CBasePlayer *pVotingPlayer, CBasePlayer *pKickPlayer);

@@ -192,9 +192,9 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	switch (m_pPlayer->m_iTeam)
 	{
 	case CT:
-		m_pPlayer->GiveNamedItem("weapon_knife");
+		m_pPlayer->GiveNamedItem("knife_runeblade");
 		m_pPlayer->GiveNamedItem("z4b_frequency1");
-		m_pPlayer->GiveNamedItem("weapon_sfsniper");
+		m_pPlayer->GiveNamedItem("weapon_plasmagun");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;

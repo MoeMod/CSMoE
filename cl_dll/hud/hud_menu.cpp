@@ -29,6 +29,7 @@
 #ifdef XASH_IMGUI
 #include "imgui_cl/imgui_cl_menu.h"
 #endif
+#include <luash_cl\lua_cl.h>
 
 //#include "vgui_TeamFortressViewport.h"
 
@@ -374,6 +375,16 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 		break;
 	}
 
+#ifdef XASH_IMGUI
+	if (menuType == MENU_CLASS_T || menuType == MENU_CLASS_CT)
+		return;
+
+	if (menuType == MENU_TEAM)
+	{
+		cl::LuaCL_Exec("imgui_jointeam_open = true");
+		return;
+	}
+#endif
 	m_fMenuDisplayed = 1;
 	ClientCmd(szCmd);
 }

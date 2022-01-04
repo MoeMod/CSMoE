@@ -21,7 +21,7 @@ clientdata_t none
 	DEFINE_DELTA( ammo_cells, DT_SIGNED | DT_INTEGER, 10, 1.0 ),
 	DEFINE_DELTA( ammo_rockets, DT_SIGNED | DT_INTEGER, 10, 1.0 ),
 
-	DEFINE_DELTA( m_iId, DT_INTEGER, 5, 1.0 ),
+	DEFINE_DELTA( m_iId, DT_INTEGER, 10, 1.0 ),
 
 	DEFINE_DELTA( punchangle[2], DT_SIGNED | DT_FLOAT, 21, 8.0 ),
 	DEFINE_DELTA( flags, DT_INTEGER, 32, 1.0 ), // Cut to 3 bits?
@@ -236,7 +236,7 @@ weapon_data_t none
 	DEFINE_DELTA( m_fAimedDamage, DT_FLOAT, 22, 1000.0 ),
 	DEFINE_DELTA( m_fInZoom, DT_INTEGER, 8, 1.0 ),
 	DEFINE_DELTA( m_iWeaponState, DT_INTEGER, 7, 1.0 )
-	DEFINE_DELTA( m_iId, DT_INTEGER, 5, 1.0 )
+	DEFINE_DELTA( m_iId, DT_INTEGER, 10, 1.0 )
 	DEFINE_DELTA( fuser1, DT_SIGNED | DT_FLOAT, 22, 1000.0 ),
 	DEFINE_DELTA( fuser2, DT_SIGNED | DT_FLOAT, 22, 128.0  ),
 	DEFINE_DELTA( fuser3, DT_SIGNED | DT_FLOAT, 22, 128.0  ),

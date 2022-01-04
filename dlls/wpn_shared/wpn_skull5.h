@@ -42,6 +42,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 1500.0f, 500.0f, 900.0f, 600.0f, 0.3f }; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 0 }; }
 	const char* GetCSModelName() override { return "models/w_skull5.mdl"; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556az" , 200 }; }

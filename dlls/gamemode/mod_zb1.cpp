@@ -318,6 +318,8 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 		ret = 60;
 	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
 		ret = 20;
+	else if (!strcmp(szAmmoClassName, "RailBeam"))
+		ret = 35;
 	else if (!strcmp(szAmmoClassName, "HEGrenade"))
 		ret = 2;
 	else if (!strcmp(szAmmoClassName, "Flashbang"))

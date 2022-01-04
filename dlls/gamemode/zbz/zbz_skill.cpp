@@ -259,7 +259,7 @@ namespace sv {
 	public:
 		explicit ZSkill_Speed(CBasePlayer* player) : CZombieZSkill_Base(player) {}
 		const char* GetName() const override { return "猎豹"; }
-		const char* GetDesc() const override { return "增加移动速度。"; } // （5+2*回合数）
+		const char* GetDesc() const override { return "增加移动速度。"; } // （8+2*回合数）
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 
 		void OnResetMaxSpeed() override {
@@ -269,7 +269,7 @@ namespace sv {
 			m_pPlayer->ResetMaxSpeed();
 		}
 	private:
-		float GetBonus() const { return min(5.0f + 2.0f * g_pGameRules->m_iTotalRoundsPlayed, 300.0f); }
+		float GetBonus() const { return min(8.0f + 2.0f * g_pGameRules->m_iTotalRoundsPlayed, 300.0f); }
 	};
 
 	class ZSkill_Icarus : public CZombieZSkill_Base
@@ -503,18 +503,16 @@ namespace sv {
 	public:
 		explicit ZSkill_SteelBody(CBasePlayer* player) : CZombieZSkill_Base(player) {}
 		const char* GetName() const override { return "钢铁铠甲"; }
-		const char* GetDesc() const override { return "提升防御能力"; }
+		const char* GetDesc() const override { return "增加护甲"; }
 		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
-		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
-			if (victim != m_pPlayer)
-				return;
-			if (!IsActivate())
-				return;
-
-			flDamage *= GetBonus();
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
+		void OnGetSkill() override {
+			m_pPlayer->pev->armorvalue *= GetBonus();
 		}
 	private:
-		float GetBonus() const { return max(0.0f, 1.0f - (0.2f + 0.025f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetBonus() const { return 1.0f + (0.2f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed); }
 	};
 
 	class ZSkill_Specialist : public CZombieZSkill_Base
@@ -693,7 +691,7 @@ namespace sv {
 			flDamage *= GetBonus();
 		}
 	private:
-		float GetBonus() const { return 1.0f + 0.56f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetBonus() const { return 1.0f + 0.0056f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_ClawEnhacement : public CZombieZSkill_Base

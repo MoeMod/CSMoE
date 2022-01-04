@@ -66,7 +66,8 @@ void PrecacheOtherWeapon()
 
 void W_Precache()
 {
-	Q_memset(CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray));
+	CBasePlayerItem::ItemInfoArray.clear();
+	//Q_memset(CBasePlayerItem::ItemInfoArray, 0, sizeof(CBasePlayerItem::ItemInfoArray));
 	Q_memset(CBasePlayerItem::AmmoInfoArray, 0, sizeof(CBasePlayerItem::AmmoInfoArray));
 	/*Q_memset(CBasePlayerItem::ItemInfoArray, 0, ARRAYSIZE(CBasePlayerItem::ItemInfoArray));
 	Q_memset(CBasePlayerItem::AmmoInfoArray, 0, ARRAYSIZE(CBasePlayerItem::AmmoInfoArray));*/
@@ -269,6 +270,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sfsniper");
 	UTIL_PrecacheOther("ammo_railbeam");
 	UTIL_PrecacheOther("ammo_svdexgrenade");
+	UTIL_PrecacheOtherWeapon("weapon_plasmagun");
+	UTIL_PrecacheOtherWeapon("knife_runeblade");
 	
 	
 

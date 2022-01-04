@@ -854,4 +854,29 @@ BOOL CSVDEXGrenadeAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_svdexgrenade, CSVDEXGrenadeAmmo);
+
+
+void CPlasmaAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CPlasmaAmmo::Precache()
+{
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CPlasmaAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(45, "plasma", 200) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_plasma, CPlasmaAmmo);
 }

@@ -696,7 +696,7 @@ int CHudAmmo::MsgFunc_CurWeapon(const char *pszName, int iSize, void *pbuf )
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int iState = reader.ReadByte();
-	int iId = reader.ReadChar();
+	int iId = reader.ReadByte();
 	
 	// fuck 128 limit
 	int iClip;
@@ -788,7 +788,7 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 
 	Weapon->iSlot = reader.ReadChar();
 	Weapon->iSlotPos = reader.ReadChar();
-	Weapon->iId = reader.ReadChar();
+	Weapon->iId = reader.ReadByte();
 	Weapon->iFlags = reader.ReadByte();
 	Weapon->iClip = 0;
 
@@ -1156,11 +1156,8 @@ int CHudAmmo::Draw(float flTime)
 	int a, x, y, r, g, b;
 	int AmmoWidth;
 	static bool switchCrosshairType = false;
-
+	
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
-		return 1;
-
-	if(!m_pWeapon)
 		return 1;
 
 	// place it here, so pretty dynamic crosshair will work even in spectator!
@@ -1192,6 +1189,9 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else
 	{
+		if (m_pWeapon->iId == WEAPON_SFSNIPER)
+			return 1;
+
 		if (!switchCrosshairType)
 		{
 			SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
@@ -1367,7 +1367,9 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_SCOUT 
 		|| weaponid == WEAPON_SG550 
 		|| weaponid == WEAPON_G3SG1
-		|| weaponid == WEAPON_HUNTBOW )
+		|| weaponid == WEAPON_HUNTBOW
+		|| weaponid == WEAPON_SFSNIPER
+		|| weaponid == WEAPON_SKULL5)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )

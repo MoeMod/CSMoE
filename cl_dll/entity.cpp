@@ -428,10 +428,20 @@ void DLLEXPORT HUD_TempEntUpdate (
 			else if ( pTemp->flags & FTENT_PLYRATTACHMENT )
 			{
 				cl_entity_t *pClient;
+				Vector vecReferencePos;
 
 				pClient = gEngfuncs.GetEntityByIndex( pTemp->clientIndex );
+				if (pTemp->clientIndex >= 1 && pTemp->clientIndex <= gEngfuncs.GetMaxClients())
+				{
+					if (pClient->curstate.messagenum < gEngfuncs.GetLocalPlayer()->curstate.messagenum)
+						vecReferencePos = g_PlayerExtraInfo[pTemp->clientIndex].origin;
+					else
+						vecReferencePos = pClient->origin;
+				}
+				else
+					vecReferencePos = pClient->origin;
 
-				VectorAdd( pClient->origin, pTemp->tentOffset, pTemp->entity.origin );
+				VectorAdd(vecReferencePos, pTemp->tentOffset, pTemp->entity.origin );
 			}
 			else if ( pTemp->flags & FTENT_SINEWAVE )
 			{

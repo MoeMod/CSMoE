@@ -6,10 +6,14 @@
 
 namespace sv {
 
-const char *Client_ApperanceToModel(int iApperance);
+void Client_ApperanceToModel(char* buffer, int iApperance, TeamName iTeam);
 
 void PlayerModel_Precache();
 void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax);
+
+int PlayerModel_GetNumSkins();
+ModelName PlayerModel_GetRandomSkin();
+const char* PlayerModel_GetApperance(int iApperance, TeamName iTeam);
 
 }
 

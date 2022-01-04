@@ -307,6 +307,13 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
 
+class CPlasmaAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
 
 }
 

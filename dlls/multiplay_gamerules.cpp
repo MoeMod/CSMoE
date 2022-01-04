@@ -19,6 +19,7 @@
 #include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
+#include "player/player_model.h"
 
 namespace sv {
 
@@ -2233,34 +2234,8 @@ bool CHalfLifeMultiplay::AddToVIPQueue(CBasePlayer *toAdd)
 void CHalfLifeMultiplay::ResetCurrentVIP()
 {
 	char *infobuffer = GET_INFO_BUFFER(m_pVIP->edict());
-	int numSkins = g_bIsCzeroGame ? CZ_NUM_SKIN : CS_NUM_SKIN;
-
-	switch (RANDOM_LONG(0, numSkins))
-	{
-	case 1:
-		m_pVIP->m_iModelName = MODEL_GSG9;
-		SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", "gsg9");
-		break;
-	case 2:
-		m_pVIP->m_iModelName = MODEL_SAS;
-		SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", "sas");
-		break;
-	case 3:
-		m_pVIP->m_iModelName = MODEL_GIGN;
-		SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", "gign");
-		break;
-	case 4:
-		if (g_bIsCzeroGame)
-		{
-			m_pVIP->m_iModelName = MODEL_SPETSNAZ;
-			SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", "spetsnaz");
-			break;
-		}
-	default:
-		m_pVIP->m_iModelName = MODEL_URBAN;
-		SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", "urban");
-		break;
-	}
+	m_pVIP->m_iModelName = PlayerModel_GetRandomSkin();
+	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerModel_GetApperance(m_pVIP->m_iModelName, m_pVIP->m_iTeam));
 
 	m_pVIP->m_bIsVIP = false;
 	m_pVIP->m_bNotKilled = false;

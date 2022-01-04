@@ -66,7 +66,7 @@ int CSkull5::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = SKULL5_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 3;
-	p->iId = m_iId = WEAPON_G3SG1;
+	p->iId = m_iId = WEAPON_SKULL5;
 	p->iFlags = 0;
 	p->iWeight = G3SG1_WEIGHT;
 

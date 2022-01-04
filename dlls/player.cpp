@@ -42,6 +42,7 @@
 #include "player/player_spawnpoint.h"
 #include "player/player_knockback.h"
 #include "player/player_mod_strategy.h"
+#include "player/player_model.h"
 
 #include <chrono>
 #include <algorithm>
@@ -170,87 +171,7 @@ CBasePlayer::~CBasePlayer() = default;
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
-	const char *model;
-
-	if (m_iTeam == CT)
-	{
-		switch (m_iModelName)
-		{
-		case MODEL_URBAN:
-			model = "urban";
-			break;
-		case MODEL_GSG9:
-			model = "gsg9";
-			break;
-		case MODEL_GIGN:
-			model = "gign";
-			break;
-		case MODEL_SAS:
-			model = "sas";
-			break;
-		case MODEL_VIP:
-			model = "vip";
-			break;
-		case MODEL_SPETSNAZ:
-			if (g_bIsCzeroGame)
-			{
-				model = "spetsnaz";
-				break;
-			}
-		default:
-		{
-			if (IsBot())
-			{
-				model = (char *)TheBotProfiles->GetCustomSkinModelname(m_iModelName);
-				if (!model)
-					model = "urban";
-			}
-			else
-				model = "urban";
-
-			break;
-		}
-		}
-	}
-	else if (m_iTeam == TERRORIST)
-	{
-		switch (m_iModelName)
-		{
-		case MODEL_TERROR:
-			model = "terror";
-			break;
-		case MODEL_LEET:
-			model = "leet";
-			break;
-		case MODEL_ARCTIC:
-			model = "arctic";
-			break;
-		case MODEL_GUERILLA:
-			model = "guerilla";
-			break;
-		case MODEL_MILITIA:
-			if (g_bIsCzeroGame)
-			{
-				model = "militia";
-				break;
-			}
-		default:
-		{
-			if (IsBot())
-			{
-				model = (char *)TheBotProfiles->GetCustomSkinModelname(m_iModelName);
-				if (!model)
-					model = "terror";
-			}
-			else
-				model = "terror";
-
-			break;
-		}
-		}
-	}
-	else
-		model = "urban";
+	const char *model = PlayerModel_GetApperance(m_iModelName, m_iTeam);
 
 	if (Q_strcmp(GET_KEY_VALUE(infobuffer, "model"), model))
 	{
@@ -6788,7 +6709,7 @@ void CBasePlayer::UpdateClientData()
 					continue;
 
 				//if (pPlayer->m_iTeam == m_iTeam)
-				if (g_pGameRules->PlayerRelationship(this, pPlayer) == GR_TEAMMATE)
+				if (g_pGameRules->PlayerRelationship(this, pPlayer) == GR_TEAMMATE || m_bIsZombie)
 				{
 					MESSAGE_BEGIN(MSG_ONE, gmsgRadar, NULL, pPlayer->pev);
 						WRITE_BYTE(entindex());
@@ -7423,74 +7344,12 @@ void CBasePlayer::SwitchTeam()
 	if (m_iTeam == CT)
 	{
 		m_iTeam = TERRORIST;
-
-		switch (m_iModelName)
-		{
-		case MODEL_URBAN:
-			m_iModelName = MODEL_LEET;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "leet");
-			break;
-		case MODEL_GIGN:
-			m_iModelName = MODEL_GUERILLA;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "guerilla");
-			break;
-		case MODEL_SAS:
-			m_iModelName = MODEL_ARCTIC;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "arctic");
-			break;
-		case MODEL_SPETSNAZ:
-			if (g_bIsCzeroGame)
-			{
-				m_iModelName = MODEL_MILITIA;
-				SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "militia");
-				break;
-			}
-		default:
-			if (m_iModelName == MODEL_GSG9 || !IsBot() || !TheBotProfiles->GetCustomSkinModelname(m_iModelName))
-			{
-				m_iModelName = MODEL_TERROR;
-				SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "terror");
-			}
-			break;
-		}
 	}
 	else if (m_iTeam == TERRORIST)
 	{
 		m_iTeam = CT;
-
-		switch (m_iModelName)
-		{
-		case MODEL_TERROR:
-			m_iModelName = MODEL_GSG9;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "gsg9");
-			break;
-
-		case MODEL_ARCTIC:
-			m_iModelName = MODEL_SAS;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "sas");
-			break;
-
-		case MODEL_GUERILLA:
-			m_iModelName = MODEL_GIGN;
-			SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "gign");
-			break;
-
-		case MODEL_MILITIA:
-			if (g_bIsCzeroGame)
-			{
-				m_iModelName = MODEL_SPETSNAZ;
-				SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "spetsnaz");
-				break;
-			}
-		default:
-			if (m_iModelName == MODEL_LEET || !IsBot() || !TheBotProfiles->GetCustomSkinModelname(m_iModelName))
-			{
-				m_iModelName = MODEL_URBAN;
-				SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "urban");
-			}
-			break;
-		}
 	}
+	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iTeam));
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgTeamInfo);
 		WRITE_BYTE(entindex());

@@ -39,6 +39,7 @@
 #include "player/player_knockback.h"
 
 #include <cstdint>
+#include <map>
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -390,7 +391,7 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[3];
-	static ItemInfo ItemInfoArray[MAX_WEAPONS];
+	static std::map<int, ItemInfo> ItemInfoArray;
 	static AmmoInfo AmmoInfoArray[MAX_AMMO_SLOTS];
 };
 
