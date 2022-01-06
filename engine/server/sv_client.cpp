@@ -338,7 +338,7 @@ gotnewcl:
 		svs.last_heartbeat = MAX_HEARTBEAT;
 
 	auto osname = Info_ValueForKey(newcl->useragent, "o");
-	svgame.dllFuncs.pfnClientOperationSystem(cl->edict, osname);
+	svgame.dllFuncs.pfnClientOperationSystem(newcl->edict, osname);
 }
 
 /*
