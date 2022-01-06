@@ -1161,14 +1161,14 @@ int CHudAmmo::Draw(float flTime)
 		return 1;
 
 	// place it here, so pretty dynamic crosshair will work even in spectator!
-	if (gHUD.m_iHideHUDDisplay & HIDEHUD_CROSSHAIR)
+	if (gHUD.m_iHideHUDDisplay & HIDEHUD_CROSSHAIR && m_pWeapon)
 	{
 		SetCrosshair(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim, 255, 255, 255);
 		switchCrosshairType = true;
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if (m_pWeapon->iId == WEAPON_SKULL5 && gHUD.m_iFOV <= 80)
+		if (m_pWeapon && m_pWeapon->iId == WEAPON_SKULL5 && gHUD.m_iFOV <= 80)
 		{
 			if (!switchCrosshairType)
 			{
@@ -1189,10 +1189,10 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else
 	{
-		if (m_pWeapon->iId == WEAPON_SFSNIPER)
+		if (m_pWeapon && m_pWeapon->iId == WEAPON_SFSNIPER)
 			return 1;
 
-		if (!switchCrosshairType)
+		if (m_pWeapon && !switchCrosshairType)
 		{
 			SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
 			switchCrosshairType = true;

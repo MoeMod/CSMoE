@@ -219,6 +219,7 @@ void LinkUserMessages()
 	gmsgGunDeath = REG_USER_MSG("GunDeath", -1);
 	gmsgHitMsg = REG_USER_MSG("HitMsg", -1);
 	gmsgWeapDrop = REG_USER_MSG("WeapDrop", -1);
+	gmsgOperationSystem = REG_USER_MSG("OperationSystem", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)
