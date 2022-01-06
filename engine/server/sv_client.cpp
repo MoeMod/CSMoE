@@ -336,6 +336,9 @@ gotnewcl:
 
 	if( count == 1 || count == sv_maxclients->integer )
 		svs.last_heartbeat = MAX_HEARTBEAT;
+
+	auto osname = Info_ValueForKey(newcl->useragent, "o");
+	svgame.dllFuncs.pfnClientOperationSystem(cl->edict, osname);
 }
 
 /*

@@ -117,6 +117,7 @@ DLL_GLOBAL int gmsgZB3Msg = 0;
 DLL_GLOBAL int gmsgZBZMsg = 0;
 DLL_GLOBAL int gmsgGunDeath = 0;
 DLL_GLOBAL int gmsgWeapDrop = 0;
+DLL_GLOBAL int gmsgOperationSystem = 0;
 
 // main code
 

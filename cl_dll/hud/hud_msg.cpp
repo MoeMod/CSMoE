@@ -201,3 +201,13 @@ int CHud::MsgFunc_ShadowIdx(const char *pszName, int iSize, void *pbuf)
 	g_StudioRenderer.StudioSetShadowSprite(idx);
 	return 1;
 }
+
+int CHud::MsgFunc_OperationSystem(const char* pszName, int iSize, void* pbuf)
+{
+	BufferReader reader(pszName, pbuf, iSize);
+
+	int index = reader.ReadByte();
+	const char *osname = reader.ReadString();
+	strncpy(g_PlayerExtraInfo[index].osname, osname, sizeof(g_PlayerExtraInfo[index].osname));
+	return 1;
+}

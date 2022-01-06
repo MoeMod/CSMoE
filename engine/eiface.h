@@ -475,6 +475,8 @@ typedef struct
 	// Most games right now should return 0, until client-side weapon prediction code is written
 	//  and tested for them.
 	int	(*pfnAllowLagCompensation)( void );
+
+	void	(*pfnClientOperationSystem)(edict_t* pEntity, const char* osname);
 } DLL_FUNCTIONS;
 
 extern DLL_FUNCTIONS		gEntityInterface;

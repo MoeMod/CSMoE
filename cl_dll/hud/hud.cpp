@@ -71,6 +71,7 @@ GHUD_DECLARE_MESSAGE(ResetHUD)
 GHUD_DECLARE_MESSAGE(ViewMode)
 GHUD_DECLARE_MESSAGE(GameMode)
 GHUD_DECLARE_MESSAGE(ShadowIdx)
+GHUD_DECLARE_MESSAGE(OperationSystem)
 
 void __CmdFunc_InputCommandSpecial()
 {
@@ -142,6 +143,7 @@ void CHud :: Init( void )
 
 
 	HOOK_MESSAGE( ShadowIdx );
+	HOOK_MESSAGE( OperationSystem );
 
 	CVAR_CREATE( "_vgui_menus", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );
 	CVAR_CREATE( "_cl_autowepswitch", "1", FCVAR_ARCHIVE | FCVAR_USERINFO );

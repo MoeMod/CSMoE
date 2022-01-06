@@ -202,6 +202,7 @@ int GetHullBounds(int hullnumber, float *mins, float *maxs);
 void CreateInstancedBaselines();
 int InconsistentFile(const edict_t *player, const char *filename, char *disconnect_message);
 int AllowLagCompensation();
+void ClientOperationSystem(edict_t* pEntity, const char* osname);
 
 }
 

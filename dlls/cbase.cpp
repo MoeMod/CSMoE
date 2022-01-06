@@ -357,7 +357,8 @@ DLL_FUNCTIONS gFunctionTable =
 	GetHullBounds,
 	CreateInstancedBaselines,
 	InconsistentFile,
-	AllowLagCompensation
+	AllowLagCompensation,
+	ClientOperationSystem
 };
 
 extern "C" EXPORT int GetEntityAPI(DLL_FUNCTIONS *pFunctionTable, int interfaceVersion)

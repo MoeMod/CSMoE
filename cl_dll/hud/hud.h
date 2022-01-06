@@ -355,6 +355,7 @@ struct extra_player_info_t
 	float radarflashtime;
 	float radarflashtimedelta;
 	char location[32];
+	char osname[32];
 };
 
 struct team_info_t 
@@ -1091,6 +1092,7 @@ public:
 	CHudMsgFunc(SetFOV);
 	CHudMsgFunc(Concuss);
 	CHudMsgFunc(ShadowIdx);
+	CHudMsgFunc(OperationSystem);
 
 	// Screen information
 	SCREENINFO	m_scrinfo;
