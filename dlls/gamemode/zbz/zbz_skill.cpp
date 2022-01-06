@@ -556,7 +556,7 @@ namespace sv {
 			if (m_flTime <= gpGlobals->time)
 				return;
 
-			state->rendermode = kRenderTransTexture;
+			state->rendermode = kRenderTransAlpha;
 			state->renderamt = 1;
 		}
 	private:

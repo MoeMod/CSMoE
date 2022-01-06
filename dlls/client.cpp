@@ -4918,15 +4918,8 @@ int EXT_FUNC AllowLagCompensation()
 
 void EXT_FUNC ClientOperationSystem(edict_t* pEntity, const char* osname)
 {
-	// Is the client spawned yet?
-	if (!pEntity->pvPrivateData)
-		return;
-
-	entvars_t* pev = &pEntity->v;
-	CBasePlayer* player = GetClassPtr<CBasePlayer>(pev);
-
 	MESSAGE_BEGIN(MSG_ALL, gmsgOperationSystem);
-	WRITE_BYTE(ENTINDEX(player->edict()));
+	WRITE_BYTE(ENTINDEX(pEntity));
 	WRITE_STRING(osname);
 	MESSAGE_END();
 	/*if (!Q_strcmp(osname, "WinRT") || !Q_strcmp(osname, "Win32") || !Q_strcmp(osname, "Win32-MinGW") || !Q_strcmp(osname, "Linux") || !Q_strcmp(osname, "macOS"))

@@ -912,12 +912,25 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 
 	StudioSetUpTransform(0);
 
-	if(m_pCurrentEntity == gEngfuncs.GetViewModel() && (gHUD.cl_righthand->value))
+	if(m_pCurrentEntity == gEngfuncs.GetViewModel())
 	{
-		(*m_protationmatrix)[0][1] *= -1;
-		(*m_protationmatrix)[1][1] *= -1;
-		(*m_protationmatrix)[2][1] *= -1;
+		if (gHUD.cl_righthand->value)
+		{
+			(*m_protationmatrix)[0][1] *= -1;
+			(*m_protationmatrix)[1][1] *= -1;
+			(*m_protationmatrix)[2][1] *= -1;
+		}
 
+		cl_entity_t* pLocalPlayer = gEngfuncs.GetLocalPlayer();
+
+		if (g_iUser1 == OBS_IN_EYE)
+			pLocalPlayer = gEngfuncs.GetEntityByIndex(g_iUser2);
+
+		if (pLocalPlayer)
+		{
+			m_pCurrentEntity->curstate.rendermode = pLocalPlayer->curstate.rendermode;
+			m_pCurrentEntity->curstate.renderamt = max(60, pLocalPlayer->curstate.renderamt);
+		}
 		//IEngineStudio.StudioSetCullState(true);
 	}
 

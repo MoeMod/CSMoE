@@ -421,8 +421,9 @@ void GAME_EXPORT GL_SetRenderMode( int mode )
 		pglBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		break;
 	case kRenderTransAlpha:
-		pglDisable( GL_BLEND );
+		pglEnable( GL_BLEND );
 		pglEnable( GL_ALPHA_TEST );
+		pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
 	case kRenderGlow:
 	case kRenderTransAdd:

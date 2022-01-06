@@ -239,7 +239,7 @@ namespace sv {
 					flAlpha += (255.0 - flInvisibleAlpha) * ((0.5s - (m_flTimeZombieSkillEnd - gpGlobals->time)) / 0.5s);
 				}
 
-				state->rendermode = kRenderTransTexture;
+				state->rendermode = kRenderTransAlpha;
 				state->renderamt = flAlpha;
 
 			}
