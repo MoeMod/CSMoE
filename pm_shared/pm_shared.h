@@ -26,7 +26,7 @@ extern "C++" {
 
 void PM_Init( struct playermove_s *ppmove );
 void PM_Move( struct playermove_s *ppmove, int server );
-char PM_FindTextureType( const char *name );
+char PM_FindTextureType( char *name );
 
 #ifdef __cplusplus
 }

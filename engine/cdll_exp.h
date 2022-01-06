@@ -30,7 +30,7 @@ typedef struct cldll_func_s
 	void	(*pfnReset)( void );
 	void	(*pfnPlayerMove)( struct playermove_s *ppmove, int server );
 	void	(*pfnPlayerMoveInit)( struct playermove_s *ppmove );
-	char	(*pfnPlayerMoveTexture)( const char *name );
+	char	(*pfnPlayerMoveTexture)( char *name );
 	void	(*IN_ActivateMouse)( void );
 	void	(*IN_DeactivateMouse)( void );
 	void	(*IN_MouseEvent)( int mstate );

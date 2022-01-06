@@ -75,16 +75,29 @@ namespace cl {
 namespace sv {
 #endif
 
+//#define STRING(offset)   ((const char *)(gpGlobals->pStringBase + (ptrdiff_t)(offset)))
 inline const char *STRING(string_t offset)
 {
-	return gpGlobals->pStringBase + offset;
+	return gpGlobals->pStringBase + (ptrdiff_t)(offset);
 }
 
+#if !defined XASH_64BIT || defined(CLIENT_DLL)
+//#define MAKE_STRING(str)	((int)(long int)str - (int)(long int)STRING(0))
 inline string_t MAKE_STRING(const char *szValue)
 {
 	ptrdiff_t ptrdiff = szValue - STRING(0);
-	return ptrdiff;
+	return (int)ptrdiff;
 }
+#else
+inline string_t MAKE_STRING(const char *szValue)
+{
+	ptrdiff_t ptrdiff = szValue - STRING(0);
+	if (ptrdiff > INT_MAX || ptrdiff < INT_MIN)
+		return ALLOC_STRING(szValue);
+	else
+		return (int)ptrdiff;
+}
+#endif
 
 }
 

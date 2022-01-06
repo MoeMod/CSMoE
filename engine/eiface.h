@@ -124,7 +124,7 @@ typedef struct enginefuncs_s
 	void	(*pfnAngleVectors)( const float *rgflVector, float *forward, float *right, float *up );
 	edict_t*	(*pfnCreateEntity)( void );
 	void	(*pfnRemoveEntity)( edict_t* e );
-	edict_t*	(*pfnCreateNamedEntity)( string_t className );
+	edict_t*	(*pfnCreateNamedEntity)( int className );
 	void	(*pfnMakeStatic)( edict_t *ent );
 	int	(*pfnEntIsOnFloor)( edict_t *e );
 	int	(*pfnDropToFloor)( edict_t* e );
@@ -167,8 +167,8 @@ typedef struct enginefuncs_s
 	void*	(*pfnPvAllocEntPrivateData)( edict_t *pEdict, long cb );
 	void*	(*pfnPvEntPrivateData)( edict_t *pEdict );
 	void	(*pfnFreeEntPrivateData)( edict_t *pEdict );
-	const char *(*pfnSzFromIndex)( string_t iString );
-	string_t	(*pfnAllocString)( const char *szValue );
+	const char *(*pfnSzFromIndex)( int iString );
+	int	(*pfnAllocString)( const char *szValue );
 	struct entvars_s *(*pfnGetVarsOfEnt)( edict_t *pEdict );
 	edict_t*	(*pfnPEntityOfEntOffset)( int iEntOffset );
 	int	(*pfnEntOffsetOfPEntity)( const edict_t *pEdict );
@@ -242,7 +242,7 @@ typedef struct enginefuncs_s
 	void	(*pfnDeltaSetFieldByIndex)( struct delta_s *pFields, int fieldNumber );
 	void	(*pfnDeltaUnsetFieldByIndex)( struct delta_s *pFields, int fieldNumber );
 	void	(*pfnSetGroupMask)( int mask, int op );
-	int	(*pfnCreateInstancedBaseline)( string_t classname, struct entity_state_s *baseline );
+	int	(*pfnCreateInstancedBaseline)( int classname, struct entity_state_s *baseline );
 	void	(*pfnCvar_DirectSet)( struct cvar_s *var, const char *value );
 
 	// Forces the client and server to be running with the same version of the specified file
@@ -445,7 +445,7 @@ typedef struct
 
 	void	(*pfnPM_Move)( struct playermove_s *ppmove, qboolean server );
 	void	(*pfnPM_Init)( struct playermove_s *ppmove );
-	char	(*pfnPM_FindTextureType)( const char *name );
+	char	(*pfnPM_FindTextureType)( char *name );
 	void	(*pfnSetupVisibility)( struct edict_s *pViewEntity, struct edict_s *pClient, unsigned char **pvs, unsigned char **pas );
 	void	(*pfnUpdateClientData) ( const struct edict_s *ent, int sendweapons, struct clientdata_s *cd );
 	int	(*pfnAddToFullPack)( struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet );

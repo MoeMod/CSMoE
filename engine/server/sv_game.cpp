@@ -2993,6 +2993,25 @@ void GAME_EXPORT pfnFreeEntPrivateData( edict_t *pEdict )
 	SV_FreePrivateData( pEdict );
 }
 
+#ifdef XASH_64BIT
+static struct str64_s
+{
+	size_t maxstringarray;
+	qboolean allowdup;
+	char *staticstringarray;
+	char *pstringarray;
+	char *pstringarraystatic;
+	char *pstringbase;
+	char *poldstringbase;
+	char *plast;
+	qboolean dynamic;
+	size_t maxalloc;
+	size_t numdups;
+	size_t numoverflows;
+	size_t totalalloc;
+} str64;
+#endif
+
 /*
 ==================
 SV_EmptyStringPool
@@ -3002,7 +3021,17 @@ Free strings on server stop. Reset string pointer on 64 bits
 */
 void SV_EmptyStringPool( void )
 {
+#ifdef XASH_64BIT
+	if( str64.dynamic ) // switch only after array fill (more space for multiplayer games)
+		str64.pstringbase = str64.pstringarray;
+	else
+	{
+		str64.pstringbase = str64.poldstringbase = str64.pstringarraystatic;
+		str64.plast = str64.pstringbase + 1;
+	}
+#else
 	Mem_EmptyPool( svgame.stringspool );
+#endif
 }
 
 /*
@@ -3016,8 +3045,24 @@ this helps not to lose strings that belongs to static game part
 */
 void SV_SetStringArrayMode( qboolean dynamic )
 {
+#ifdef XASH_64BIT
+	MsgDev( D_NOTE, "SV_SetStringArrayMode(%d) %d\n", dynamic, str64.dynamic );
 
+	if( dynamic == str64.dynamic )
+		return;
+
+	str64.dynamic = dynamic;
+
+	SV_EmptyStringPool();
+#endif
 }
+
+#ifdef XASH_64BIT
+#if !defined(_WIN32) && !defined(__APPLE__)
+#define USE_MMAP
+#include <sys/mman.h>
+#endif
+#endif
 
 /*
 ==================
@@ -3031,13 +3076,97 @@ this case need patched game dll with MAKE_STRING checking ptrdiff size
 */
 void SV_AllocStringPool( void )
 {
+#ifdef XASH_64BIT
+	char *ptr = NULL;
+	string lenstr;
+
+	MsgDev( D_NOTE, "SV_AllocStringPool()\n" );
+	if( Sys_GetParmFromCmdLine( "-str64alloc", lenstr ) )
+	{
+		str64.maxstringarray = Q_atoi( lenstr );
+		if( str64.maxstringarray < 1024 || str64.maxstringarray >= INT_MAX )
+			str64.maxstringarray = 65536;
+	}
+	else str64.maxstringarray = 65536;
+	if( Sys_CheckParm( "-str64dup" ) )
+		str64.allowdup = true;
+
+#ifdef USE_MMAP
+	{
+		size_t pagesize = sysconf( _SC_PAGESIZE );
+		size_t arrlen = ( str64.maxstringarray * 2 ) & ~( pagesize - 1 );
+		char *base = (char *)svgame.dllFuncs.pfnGameInit;
+		char *start = (char *)svgame.hInstance - arrlen;
+
+		while( start - base > INT_MIN )
+		{
+			char *mapptr = (char *)mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
+			if( mapptr && mapptr != (void*)-1 && mapptr - base > INT_MIN && mapptr - base < INT_MAX )
+			{
+				ptr = mapptr;
+				break;
+			}
+			if( mapptr ) munmap( mapptr, arrlen );
+			start -= arrlen;
+		}
+
+		if( !ptr )
+		{
+			start = base;
+			while( start - base < INT_MAX )
+			{
+				char *mapptr = (char *)mmap((void*)((unsigned long)start & ~(pagesize - 1)), arrlen, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0 );
+				if( mapptr && mapptr != (char*)-1  && mapptr - base > INT_MIN && mapptr - base < INT_MAX )
+				{
+					ptr = (char *)mapptr;
+					break;
+				}
+				if( mapptr ) munmap( mapptr, arrlen );
+				start += arrlen;
+			}
+		}
+
+
+		if( ptr )
+		{
+			MsgDev( D_NOTE, "SV_AllocStringPool: Allocated string array near the server library: %p %p\n", base, ptr );
+
+		}
+		else
+		{
+			MsgDev( D_WARN, "SV_AllocStringPool: Failed to allocate string array near the server library!\n" );
+			ptr = str64.staticstringarray = (char *)Mem_Alloc(host.mempool, str64.maxstringarray * 2);
+		}
+	}
+#else
+	ptr = str64.staticstringarray = (char *)Mem_Alloc(host.mempool, str64.maxstringarray * 2);
+#endif
+
+	str64.pstringarray = ptr;
+	str64.pstringarraystatic = ptr + str64.maxstringarray;
+	str64.pstringbase = str64.poldstringbase = ptr;
+	str64.plast = ptr + 1;
+	svgame.globals->pStringBase = ptr;
+#else
 	svgame.stringspool = Mem_AllocPool( "Server Strings" );
 	svgame.globals->pStringBase = "";
+#endif
 }
 
 void SV_FreeStringPool( void )
 {
+#ifdef XASH_64BIT
+	MsgDev( D_NOTE, "SV_FreeStringPool()\n" );
+
+#ifdef USE_MMAP
+	if( str64.pstringarray != str64.staticstringarray )
+		munmap( str64.pstringarray, (str64.maxstringarray * 2) & ~(sysconf( _SC_PAGESIZE ) - 1) );
+	else
+#endif // USE_MMAP
+		Mem_Free( str64.staticstringarray );
+#else
 	Mem_FreePool( &svgame.stringspool );
+#endif
 }
 
 /*
@@ -3056,9 +3185,57 @@ string_t GAME_EXPORT SV_AllocString( const char *szValue )
 
 	if( svgame.physFuncs.pfnAllocString != NULL )
 		return svgame.physFuncs.pfnAllocString( szValue );
+#ifdef XASH_64BIT
+	int cmp = 1;
+
+	if( !str64.allowdup )
+		for( newString = str64.poldstringbase + 1; newString < str64.plast && ( cmp = Q_strcmp( newString, szValue ) ); newString += Q_strlen( newString ) + 1 );
+
+	if( cmp )
+	{
+		uint len = Q_strlen( szValue );
+
+		if( str64.plast - str64.poldstringbase + len + 2 > str64.maxstringarray )
+		{
+			str64.plast = str64.pstringbase + 1;
+			str64.poldstringbase = str64.pstringbase;
+			str64.numoverflows++;
+		}
+
+		//MsgDev( D_NOTE, "SV_AllocString: %ld %s\n", str64.plast - svgame.globals->pStringBase, szValue );
+		Q_memcpy( str64.plast, szValue, len + 1 );
+		str64.totalalloc += len + 1;
+
+		newString = str64.plast;
+		str64.plast += len + 1;
+	}
+	else
+		str64.numdups++;
+		//MsgDev( D_NOTE, "SV_AllocString: dup %ld %s\n", newString - svgame.globals->pStringBase, szValue );
+
+	if( newString - str64.pstringarray > str64.maxalloc )
+		str64.maxalloc = newString - str64.pstringarray;
+
+	return newString - svgame.globals->pStringBase;
+#else
 	newString = _copystring( svgame.stringspool, szValue, __FILE__, __LINE__ );
 	return newString - svgame.globals->pStringBase;
+#endif
 }
+
+#ifdef XASH_64BIT
+void SV_PrintStr64Stats_f( void )
+{
+	Msg( "====================\n" );
+	Msg( "64 bit string pool statistics\n" );
+	Msg( "====================\n" );
+	Msg( "string array size: %lu\n", str64.maxstringarray );
+	Msg( "total alloc %lu\n", str64.totalalloc );
+	Msg( "maximum array usage: %lu\n", str64.maxalloc );
+	Msg( "overflow counter: %lu\n", str64.numoverflows );
+	Msg( "dup string counter: %lu\n", str64.numdups );
+}
+#endif
 
 /*
 =============
@@ -3071,7 +3248,17 @@ string_t SV_MakeString( const char *szValue )
 {
 	if( svgame.physFuncs.pfnMakeString != NULL )
 		return svgame.physFuncs.pfnMakeString( szValue );
+#ifdef XASH_64BIT
+	{
+		long long ptrdiff = szValue - svgame.globals->pStringBase;
+		if( ptrdiff > INT_MAX || ptrdiff < INT_MIN )
+			return SV_AllocString(szValue);
+		else
+			return (int)ptrdiff;
+	}
+#else
 	return szValue - svgame.globals->pStringBase;
+#endif
 }
 
 
@@ -4239,7 +4426,7 @@ pfnCreateInstancedBaseline
 
 =============
 */
-int GAME_EXPORT pfnCreateInstancedBaseline( string_t classname, struct entity_state_s *baseline )
+int GAME_EXPORT pfnCreateInstancedBaseline( int classname, struct entity_state_s *baseline )
 {
 	int	i;
 
@@ -4782,7 +4969,7 @@ qboolean SV_ParseEdict( char **pfile, edict_t *ent )
 		if( !token[0] ) continue;
 
 		// create keyvalue strings
-		pkvd[numpairs].szClassName = classname;	// unknown at this moment
+		pkvd[numpairs].szClassName = (char *)classname;	// unknown at this moment
 		pkvd[numpairs].szKeyName = copystring( keyname );
 		pkvd[numpairs].szValue = copystring( token );
 		pkvd[numpairs].fHandled = false;		

@@ -32,8 +32,20 @@
 #pragma once
 #endif
 
-#define DEPRECATED [[deprecated]]
-#define NODISCARD [[nodiscard]]
-#define NOXREF [[maybe_unused]]
+#include "deprecated.h"
+#include "nodiscard.h"
+
+// Has no references on multiplayer library CS.
+#define NOXREF
+
+typedef int string_t;		// from engine's pr_comp.h;
+typedef int EOFFSET;
+typedef int BOOL;
+
+#ifndef __cplusplus
+typedef enum { false, true }	qboolean;
+#else
+typedef int qboolean;
+#endif
 
 #endif // MAINTYPES_H
