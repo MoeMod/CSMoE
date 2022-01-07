@@ -102,18 +102,18 @@ int CHudTimer::Draw( float fTime )
 
     
     int iWatchWidth = gHUD.GetSpriteRect(m_HUD_timer).right - gHUD.GetSpriteRect(m_HUD_timer).left;
-    
-	int x = ScreenWidth/2;
+	int iNumberWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
+
 	int y = ScreenHeight - 1.5 * gHUD.m_iFontHeight ;
     
 	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
-	{ 
+	{
+		int x = ScreenWidth / 2;
+
 		y = 5;
 		m_pTexture_Black->Draw2DQuadScaled(x - 120 / 2, y, x + 120 / 2, y + 70);
 
 		y = 17;
-		
-		int iWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
 		x = DrawUtils::DrawHudNumber2(x - 46, y, true, 2, minutes, r * 255, g * 255, b * 255);
 		// draw :
 		FillRGBA(x + iWatchWidth / 4 , y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);
@@ -122,22 +122,27 @@ int CHudTimer::Draw( float fTime )
 
 		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 2, y, true, 2, seconds, r * 255, g * 255, b * 255);
 
-		m_closestRight = x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 1.5;
+		m_closestRight = x + (iNumberWidth) * 1.5;
 	}
 	else
 	{
+		int space = iWatchWidth / 4;
+		int x = ScreenWidth / 2 - 2 * space - iNumberWidth * 2;
 		SPR_Set(gHUD.GetSprite(m_HUD_timer), r, g, b);
 		SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_timer));
 
-		int x = ScreenWidth / 2;
-		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 4, y, false, 2, minutes, r, g, b);
+		x += iWatchWidth;
+		x = DrawUtils::DrawHudNumber2(x, y, false, 2, minutes, r, g, b);
+
 		// draw :
-		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
-		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
+		x += space;
+		FillRGBA(x, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
+		FillRGBA(x, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 100);
 
-		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 2, y, true, 2, seconds, r, g, b);
+		x += space;
+		x = DrawUtils::DrawHudNumber2(x, y, true, 2, seconds, r, g, b);
 
-		m_closestRight = x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 1.5;
+		m_closestRight = x + (iNumberWidth) * 1.5;
 	}
 
 	return 1;
