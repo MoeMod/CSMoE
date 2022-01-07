@@ -190,6 +190,7 @@ static struct jnimethods_s
 	jmethodID shellExecute;
 	jmethodID getAssetManager;
 	jmethodID getDisplayDPI;
+	jmethodID logToBugly;
 	int width, height;
 } jni;
 
@@ -502,6 +503,7 @@ DECLARE_JNI_INTERFACE( int, nativeInit, jobjectArray array )
 	jni.shellExecute = env->GetStaticMethodID(jni.actcls, "shellExecute", "(Ljava/lang/String;)V");
 	jni.getAssetManager = env->GetStaticMethodID(jni.actcls, "getAssetManager", "()Landroid/content/res/AssetManager;");
 	jni.getDisplayDPI = env->GetStaticMethodID(jni.actcls, "getDisplayDPI", "()F");
+	jni.logToBugly = env->GetStaticMethodID(jni.actcls, "logToBugly", "(Ljava/lang/String;)V");
 
 	nanoGL_Init();
 	/* Run the application. */
@@ -796,6 +798,11 @@ DECLARE_JNI_INTERFACE( int, nativeTestWritePermission, jstring jPath )
 	env->ReleaseStringUTFChars( jPath, path );
 	
 	return ret;
+}
+
+DECLARE_JNI_INTERFACE_VOID( int, nativeGetBuildVersion )
+{
+	return Q_buildnum();
 }
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *reserved )
@@ -1181,6 +1188,15 @@ void Android_AssetList(stringlist_t *list, const char *path, void (*stringlistap
 float Android_GetDisplayDPI()
 {
 	return jni.env->CallStaticFloatMethod(jni.actcls, jni.getDisplayDPI);
+}
+
+
+void Android_Log(const char *str)
+{
+	__android_log_print( ANDROID_LOG_DEBUG, "Xash", "%s", str );
+
+	jstring jstr = jni.env->NewStringUTF( str );
+	jni.env->CallStaticVoidMethod(jni.actcls, jni.logToBugly, jstr);
 }
 
 #endif

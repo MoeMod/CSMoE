@@ -36,6 +36,9 @@
 		1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		3D0090C02788B2D200E68FC3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090BF2788B2D200E68FC3 /* Security.framework */; };
+		3D0090E62788B7F900E68FC3 /* Bugly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090E52788B7F900E68FC3 /* Bugly.framework */; };
+		3D0090EB2788B84500E68FC3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090EA2788B84500E68FC3 /* libz.tbd */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
 		3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DAA0223BCEC7C00F575C1 /* libxash.a */; };
@@ -46,7 +49,6 @@
 		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3D99F5A3277215DC006EDB62 /* launchdialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A2277215DC006EDB62 /* launchdialog.mm */; };
 		3D99F5A527721613006EDB62 /* TutorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A427721613006EDB62 /* TutorViewController.mm */; };
-		3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */; };
 		3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB534302761091B0052BD7F /* libcqmiao.a */; };
 		3DB5343C276109580052BD7F /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB5343B276109580052BD7F /* libluash.a */; };
 		3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53441276109B10052BD7F /* libcrypto.a */; };
@@ -107,6 +109,9 @@
 		1D3623EB0D0F72F000981E51 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* CSMoE.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSMoE.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		3D0090BF2788B2D200E68FC3 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		3D0090E52788B7F900E68FC3 /* Bugly.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bugly.framework; sourceTree = "<group>"; };
+		3D0090EA2788B84500E68FC3 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		3D094FAF228F1D3B00F168C2 /* TutorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorViewController.h; sourceTree = "<group>"; };
 		3D0FC1DB2278310100D9A961 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -122,7 +127,6 @@
 		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimgui_ext.a; sourceTree = "<group>"; };
 		3D99F5A2277215DC006EDB62 /* launchdialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = launchdialog.mm; sourceTree = "<group>"; };
 		3D99F5A427721613006EDB62 /* TutorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TutorViewController.mm; sourceTree = "<group>"; };
-		3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dummy.cpp; sourceTree = "<group>"; };
 		3DB534302761091B0052BD7F /* libcqmiao.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcqmiao.a; sourceTree = "<group>"; };
 		3DB5343B276109580052BD7F /* libluash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluash.a; sourceTree = "<group>"; };
 		3DB53441276109B10052BD7F /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
@@ -139,7 +143,7 @@
 		3DC1E4BE2289F18500114D80 /* Steam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Steam.png; path = Resources/Steam.png; sourceTree = "<group>"; };
 		3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TutorStoryboard.storyboard; sourceTree = "<group>"; };
 		3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
-		3DDCB14727625A4600BBEC27 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = "cmake-build/3rdparty/SDL/libSDL2.a"; sourceTree = SOURCE_ROOT; };
+		3DDCB14727625A4600BBEC27 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2.a; sourceTree = "<group>"; };
 		3DDCB14C27625BE200BBEC27 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2main.a; sourceTree = "<group>"; };
 		3DDCB15727625D0C00BBEC27 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		3DE829A7260F8F00009DABD0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
@@ -165,8 +169,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3D0090EB2788B84500E68FC3 /* libz.tbd in Frameworks */,
 				3DDCB15C27625D1700BBEC27 /* libc++.tbd in Frameworks */,
 				3DDCB15827625D0C00BBEC27 /* libiconv.tbd in Frameworks */,
+				3D0090C02788B2D200E68FC3 /* Security.framework in Frameworks */,
 				B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */,
 				B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */,
 				3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */,
@@ -178,6 +184,7 @@
 				FDF0D7AB0E12D53800247964 /* CoreAudio.framework in Frameworks */,
 				FDF0D7AC0E12D53800247964 /* AudioToolbox.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				3D0090E62788B7F900E68FC3 /* Bugly.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */,
 				FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */,
@@ -248,6 +255,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3D0090EA2788B84500E68FC3 /* libz.tbd */,
+				3D0090BF2788B2D200E68FC3 /* Security.framework */,
+				3D0090E52788B7F900E68FC3 /* Bugly.framework */,
 				3DDCB15727625D0C00BBEC27 /* libiconv.tbd */,
 				B663773825DD89D000564BD5 /* CoreHaptics.framework */,
 				B646751B253FE21E00F557B8 /* CoreBluetooth.framework */,
@@ -409,7 +419,6 @@
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
 			isa = PBXGroup;
 			children = (
-				3DA7D7F1231D25FA00B5DB3A /* dummy.cpp */,
 				3D3EE8A9228F1C6300A695FE /* controller */,
 				3D3EE8A7228F19A900A695FE /* model */,
 				3D3EE8A6228F197200A695FE /* view */,
@@ -569,7 +578,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DA7D7F2231D25FA00B5DB3A /* dummy.cpp in Sources */,
 				3D99F5A3277215DC006EDB62 /* launchdialog.mm in Sources */,
 				3D99F5A527721613006EDB62 /* TutorViewController.mm in Sources */,
 			);
@@ -605,12 +613,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = (
-					../engine,
-					../engine/common,
-					../common,
-					../,
-				);
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -631,7 +633,6 @@
 					"$(PROJECT_DIR)/cmake-build/luash",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
@@ -731,12 +732,6 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				HEADER_SEARCH_PATHS = (
-					../engine,
-					../engine/common,
-					../common,
-					../,
-				);
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -757,7 +752,6 @@
 					"$(PROJECT_DIR)/cmake-build/luash",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;

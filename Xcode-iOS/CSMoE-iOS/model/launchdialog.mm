@@ -15,11 +15,14 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <Bugly/Bugly.h>
 #include <sys/stat.h>
 #include "launcherdialog.h"
 
 char *g_szLibrarySuffix = NULL;
 float g_iOSVer;
+
+extern int Q_buildnum( void );
 
 enum XashGameStatus_e g_iStartGameStatus = XGS_SKIP;
 
@@ -105,7 +108,12 @@ void IOS_LaunchDialog( void )
 {
 	NSString *ver = [[UIDevice currentDevice] systemVersion];
 	g_iOSVer = [ver floatValue];
-	NSLog(@"System Version is %@",ver);
+	
+	BuglyConfig * config = [[BuglyConfig alloc] init];
+	int version = Q_buildnum();
+	config.version = [NSString stringWithFormat:@"%d", version];
+	config.reportLogLevel = BuglyLogLevelWarn;
+	[Bugly startWithAppId:@"5f4cd68a0b" config:config];
 	
 	if(!IOS_IsResourcesReady())
 	{
@@ -135,7 +143,9 @@ char *IOS_GetUDID( void )
 
 void IOS_Log(const char *text)
 {
-	NSLog(@"Xash: %@", [NSString stringWithUTF8String:text]);
+	NSString *nstext =[NSString stringWithUTF8String:text];
+	NSLog(@"Xash: %@", nstext);
+	BLYLogWarn(@"%@", nstext);
 }
 
 void IOS_OpenURL(const char *url)

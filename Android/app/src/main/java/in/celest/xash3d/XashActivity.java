@@ -44,6 +44,9 @@ import android.provider.Settings.Secure;
 import su.xash.fwgslib.*;
 import android.sax.*;
 
+import com.tencent.bugly.crashreport.BuglyLog;
+import com.tencent.bugly.crashreport.CrashReport;
+
 /**
  Xash Activity
  */
@@ -134,6 +137,12 @@ public class XashActivity extends Activity {
 		mPref = this.getSharedPreferences( "engine", 0 );
 
 		mAssetManager = this.getAssets();
+
+		CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
+		strategy.setAppVersion(String.valueOf(nativeGetBuildVersion()));
+
+		CrashReport.initCrashReport(getApplicationContext(), "39df575b0b", false, strategy);
+
 		//if(checkExtractAssets())
 			launchSurfaceAndEngine();
 	}
@@ -377,6 +386,7 @@ public class XashActivity extends Activity {
 	public static native void nativeJoyButton( int id, byte button, boolean down );
 	public static native int  nativeTestWritePermission( String path );
 	public static native void nativeMouseMove( float x, float y );
+	public static native int  nativeGetBuildVersion();
 	
 	// for future expansion
 	public static native void nativeBall( int id, byte ball, short xrel, short yrel );
@@ -830,6 +840,11 @@ public class XashActivity extends Activity {
 	{
 		DisplayMetrics metrics = XashActivity.getContext().getResources().getDisplayMetrics();
 		return metrics.density;
+	}
+
+	public static void logToBugly(String str)
+	{
+		BuglyLog.w("Xash", str);
 	}
 }
 

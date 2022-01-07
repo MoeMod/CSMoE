@@ -168,7 +168,7 @@ void Sys_PrintLog( const char *pMsg )
 	time( &crt_time );
 	crt_tm = localtime( &crt_time );
 #ifdef __ANDROID__
-	__android_log_print( ANDROID_LOG_DEBUG, "Xash", "%s", pMsg );
+	Android_Log(pMsg);
 #endif
 
 #if TARGET_OS_IOS
