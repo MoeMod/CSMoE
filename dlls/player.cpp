@@ -4906,6 +4906,7 @@ void CBasePlayer::Spawn()
 	SET_PHYSICS_KEY_VALUE(edict(), "slj", "0");
 	SET_PHYSICS_KEY_VALUE(edict(), "hl", "1");
 	SET_PHYSICS_KEY_VALUE(edict(), "drp", "0");
+	SET_PHYSICS_KEY_VALUE(edict(), "kgr", "0");
 	m_hintMessageQueue.Reset();
 
 	m_flVelocityModifier = 1;
