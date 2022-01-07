@@ -29,7 +29,7 @@
 #ifdef XASH_IMGUI
 #include "imgui_cl/imgui_cl_menu.h"
 #endif
-#include <luash_cl\lua_cl.h>
+#include "luash_cl/lua_cl.h"
 
 //#include "vgui_TeamFortressViewport.h"
 
