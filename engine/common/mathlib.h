@@ -17,7 +17,7 @@ GNU General Public License for more details.
 #define MATHLIB_H
 
 #ifdef XASH_SIMD
-#include <intrin.h>
+#include <immintrin.h>
 #endif
 #include <math.h>
 
@@ -227,9 +227,7 @@ inline __m128 VectorAverage(__m128 a, __m128 b)
 #define VectorAverage(a,b,c) (c) = VectorAverage((a), (b))
 inline __m128 VectorLoad(float x, float y, float z)
 {
-	return (__m128) {
-		.m128_f32 = {x, y, z, 0.0f}
-	};
+	return _mm_set_ps(x, y, z, 0.0f);
 }
 #define VectorSet(v, x, y, z) ((v) = VectorLoad((x), (y), (z)))
 #define VectorClear(x) ((x) = _mm_setzero_ps())

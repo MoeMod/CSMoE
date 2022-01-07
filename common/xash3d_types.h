@@ -28,7 +28,7 @@ typedef vec_t       *vec2_t_ref;
 #ifndef vec3_t
 #ifdef XASH_SIMD
 typedef __m128		vec3_t;
-typedef __m128		*vec3_t_ref;
+typedef __m128		&vec3_t_ref;
 #else
 typedef vec_t		vec3_t[3];
 typedef vec_t		*vec3_t_ref;
