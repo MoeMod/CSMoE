@@ -23,8 +23,6 @@ GNU General Public License for more details.
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
-#include "weapons/KnifeAttack.h"
-
 #ifdef CLIENT_DLL
 namespace cl {
 #else

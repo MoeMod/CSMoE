@@ -455,6 +455,140 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 	}
 	return vecDir;
 }
+
+inline
+bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
+{
+#ifndef CLIENT_DLL
+	if (pEntity->IsBSPModel())
+	{
+		UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
+
+		if (ptr->flFraction < 1.0)
+		{
+			if (ptr->pHit)
+			{
+				CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+				if (pHit && pHit == pEntity)
+					return true;
+			}
+		}
+	}
+	else
+	{
+		UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+		if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+		{
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
+
+			return true;
+		}
+		else
+		{
+			Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+			if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
+			{
+				edict_t* peAttacker = pAttacker->edict();
+
+				for (int i = 5; i > 0; i--)
+				{
+					UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+					if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+						return false;
+
+					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+					if (ptr->flFraction < 1.0 || pHit == pEntity)
+						return true;
+
+					if (pHit->IsBSPModel())
+						return false;
+
+					vecSrc = ptr->vecEndPos + vecDir * 5.0;
+				}
+			}
+		}
+	}
+#endif
+	return false;
+}
+
+inline hit_result_t
+ KnifeAttack5(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
+{
+	CBaseEntity* pEntity = NULL;
+	hit_result_t result = HIT_NONE;
+	TraceResult tr;
+	UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+	Vector vecEnd;
+	Vector vecSrc = pAttackPlayer->GetGunPosition();
+
+	Vector vecForward = gpGlobals->v_forward;
+	Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+	float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity == pAttackPlayer)
+			continue;
+
+		if (pEntity->IsDormant())
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+			continue;
+
+		float flRatio = 1.0;
+
+		if (pEntity && pEntity->IsPlayer())
+		{
+			UTIL_MakeVectors(pEntity->pev->angles);
+
+			if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				flRatio = 3.0;
+		}
+
+		pAttackPlayer->m_iWeaponVolume = 128;
+
+		ClearMultiDamage();
+
+		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+		result = HIT_PLAYER;
+	}
+
+	if(!result)
+	{
+		static int calced = 0;
+		static float calcRes = 0.0f;
+
+		if (!(calced & 1))
+		{
+			calced |= 1;
+			calcRes = sqrt(512.0);
+		}
+
+		vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0f)
+			result = HIT_WALL;
+	}
+
+	return result;
+}
+
 }
 #endif
 

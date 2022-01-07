@@ -283,10 +283,10 @@ namespace sv {
 
 		
 		m_pPlayer->pev->gravity = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.8 : 0.64;
-		m_pPlayer->pev->rendermode = kRenderTransAlpha;
+		/*m_pPlayer->pev->rendermode = kRenderTransAlpha;
 		m_pPlayer->pev->renderfx = kRenderFxNone;
 		m_pPlayer->pev->renderamt = 35;
-		m_pPlayer->pev->rendercolor = g_vecZero;
+		m_pPlayer->pev->rendercolor = g_vecZero;*/
 
 		m_pPlayer->ResetMaxSpeed();
 

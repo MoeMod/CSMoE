@@ -48,8 +48,8 @@ namespace sv {
 
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
-		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
+		static constexpr const char* AnimExtension = "sfsword";
+		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.8f };
 
 	public:
 
@@ -71,9 +71,10 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/v_runeblade.mdl");
 			PRECACHE_MODEL("models/p_runeblade.mdl");
+			PRECACHE_MODEL("models/ef_runeblade_swing.mdl");
 
-			PRECACHE_MODEL("sprites/runeblade_ef.spr");
-			PRECACHE_MODEL("sprites/runeblade_ef02.spr");
+			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef.spr");
+			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef02.spr");
 			PRECACHE_MODEL("sprites/runeblade_eye.spr");
 			PRECACHE_MODEL("sprites/ef_runeblade_swing.spr");
 
@@ -81,6 +82,8 @@ namespace sv {
 			PRECACHE_SOUND("weapons/runeblade-slash2.wav");
 			PRECACHE_SOUND("weapons/runeblade_v_charge_attack1.wav");
 			PRECACHE_SOUND("weapons/runeblade_v_charge_attack2.wav");
+			PRECACHE_SOUND("weapons/tomahawk_slash1_hit.wav");
+			PRECACHE_SOUND("weapons/laserminigun_exp2.wav");
 		}
 		
 		BOOL Deploy(void) override
@@ -90,13 +93,13 @@ namespace sv {
 		
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			
-			m_tTimeRestMaxSpeed = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
+			m_flTimeCheckCharge = invalid_time_point;
 			m_pPlayer->m_bShieldDrawn = false;
 
-			if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragonsword", UseDecrement() != FALSE))
+			if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "sfsword", UseDecrement() != FALSE))
 			{
-				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
-				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.2s;
+				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 				return TRUE;
 			}
 		}
@@ -111,19 +114,19 @@ namespace sv {
 		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
 		void OnAttack2Released();
-#ifndef CLIENT_DLL
-		void MaterialSound();
-# endif
+		void CreateHitFX(Vector pos, int iType);
+		bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType);
+
 		BOOL CanDrop() override { return false; }
 		void ItemPostFrame() override;
 
 	public:
 		float GetPrimaryAttackDamage() const
 		{
-			float flDamage = 30;
+			float flDamage = 55;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1836.0f;
+				flDamage = 2618.0f;	//original 1836
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1240.0f;
 #endif
@@ -134,35 +137,30 @@ namespace sv {
 			float flDamage = 70;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1785.0f;
+				flDamage = 3298.0f;	//1785
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage *= 3600.0f;
+				flDamage = 3600.0f;
 #endif
 			return flDamage;
 		}
 
 		float  GetChargeAttackDamage() const
 		{
-			float flDamage = 35;
+			float flDamage = 130;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2465.0f;
+				flDamage = 4573.0f;	//2465
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 1280.0f;
+				flDamage = 4573.0f;
 #endif
 			return flDamage;
 		}
 
 		time_point_t m_flTimeCheckCharge;
-		time_point_t m_tTimeSoundEmit;
-		time_point_t m_tTimeRestMaxSpeed;
-		int m_iDamageType;
+
+		int m_iPrimarySprEffect;
+		int m_iSecondarySprEffect;
 		int m_iState;	//pev_iuser1
-		int m_iState2;	//pev_iuser4
-		int m_iActSlash3;
-		int m_iCheck;	//g_iCheck
-		int m_iFrozen;	//g_Frozen
-		int m_iCheckSpecial;	//CheckSpecial
 	};
 
 	LINK_ENTITY_TO_CLASS(knife_runeblade, CKnifeRuneBlade)
@@ -173,12 +171,9 @@ namespace sv {
 		m_iId = WEAPON_KNIFE;
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
-		m_tTimeRestMaxSpeed = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
+		m_flTimeCheckCharge = invalid_time_point;
 		m_iClip = WEAPON_NOCLIP;
 		m_iState = 0;
-		m_iState2 = 0;
-		m_iCheck = 0;
-		m_iActSlash3 = 0;
 		FallInit();
 	}
 
@@ -199,78 +194,184 @@ namespace sv {
 		return 1;
 	}
 
-#ifndef CLIENT_DLL
-	void CKnifeRuneBlade::MaterialSound()
+
+	bool CKnifeRuneBlade::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType)
 	{
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecEnd = vecSrc + gpGlobals->v_forward * 8192;
-		TraceResult tr;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-		char chTextureType = 0;
-		char szbuffer[64];
-		if (tr.flFraction < 1)
+		bool bResult = false;
+#ifndef CLIENT_DLL
+		if (pEntity->IsBSPModel())
 		{
-			const char* pTextureName;
-			pTextureName = TRACE_TEXTURE(tr.pHit, vecSrc, vecEnd);
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
 
-			if (pTextureName)
+			if (ptr->flFraction < 1.0)
 			{
-				// strip leading '-0' or '+0~' or '{' or '!'
-				if (*pTextureName == '-' || *pTextureName == '+')
-					pTextureName += 2;
-
-				if (*pTextureName == '{' || *pTextureName == '!' || *pTextureName == '~' || *pTextureName == ' ')
-					pTextureName++;
-
-				// '}}'
-				Q_strcpy(szbuffer, pTextureName);
-				szbuffer[CBTEXTURENAMEMAX - 1] = '\0';
-
-				// get texture type
-				chTextureType = TEXTURETYPE_Find(szbuffer);
-			}
-
-			switch (chTextureType)
-			{
-				case CHAR_TEX_METAL:
-				case CHAR_TEX_VENT:
-				case CHAR_TEX_COMPUTER:
-					{
-						if(RANDOM_LONG(0,1))
-							EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_metal1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-						else
-							EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_metal2.wav", VOL_NORM, ATTN_NORM, 0, 94);					
-						break;
-					}
-				case CHAR_TEX_WOOD:
-				case CHAR_TEX_SLOSH:
-					{
-						if (RANDOM_LONG(0, 1))
-							EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-						else
-							EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-						break;
-					}
-				default:
+				if (ptr->pHit)
 				{
-					if (RANDOM_LONG(0, 1))
-						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_metal1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					else
-						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/runeblade_wall_metal2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					break;
+					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+					if (pHit && pHit == pEntity)
+						bResult = true;
 				}
 			}
 		}
+		else
+		{
+			UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+			if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+			{
+				UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
+
+				bResult = true;
+			}
+			else
+			{
+				Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+				if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
+				{
+					edict_t* peAttacker = pAttacker->edict();
+
+					for (int i = 5; i > 0; i--)
+					{
+						UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+						if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+						{
+							break;
+						}
+
+						CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+						if (ptr->flFraction < 1.0 || pHit == pEntity)
+						{
+							bResult = true;
+
+							break;
+						}
+
+						if (pHit->IsBSPModel())
+						{
+							break;
+						}
+
+						vecSrc = ptr->vecEndPos + vecDir * 5.0;
+					}
+			}
+		}
 	}
+
+		//if ((!friendlyfire.value && pEntity->m_iTeam == pAttacker->m_iTeam) || !bResult)
+		if (!bResult)
+			return bResult;
+
+		if (!m_iSwing)
+		{
+			if (pEntity->IsPlayer())
+			{
+				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
+					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
+				else
+					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
+			}
+			else
+			{
+				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
+					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
+				else
+					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
+			}
+		}
 #endif
+
+		return bResult;
+}
+
+
+	void CKnifeRuneBlade::CreateHitFX(Vector pos, int iType)
+	{
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pos.x);
+		WRITE_COORD(pos.y);
+		WRITE_COORD(pos.z);
+		WRITE_SHORT(iType ? m_iSecondarySprEffect : m_iPrimarySprEffect);
+		WRITE_BYTE(iType ? 10 : 3);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+#endif
+	}
 
 	void CKnifeRuneBlade::DelayPrimaryAttack(void)
 	{
 #ifndef CLIENT_DLL		
-	
-#endif
+		m_iSwing = 0;
+		CBaseEntity* pEntity = NULL;
+		BOOL fDidHit = FALSE;
+		TraceResult tr;
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecEnd;
+		Vector vecSrc = m_pPlayer->GetGunPosition();
 
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		float c = cos(200.0 * 0.5 * M_PI / 180.0);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 110.0)) != NULL)
+		{
+			if (pEntity == m_pPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr, 0))
+				continue;
+
+			float flRatio = 1.0;
+
+			if (pEntity && pEntity->IsPlayer())
+			{
+				UTIL_MakeVectors(pEntity->pev->angles);
+
+				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+					flRatio = 3.0;
+			}
+
+			m_pPlayer->m_iWeaponVolume = 128;
+
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+			ClearMultiDamage();
+
+			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			fDidHit = TRUE;
+		}
+
+		if (!fDidHit)
+		{
+			vecEnd = vecSrc + vecForward * 110.0;
+
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+			if (tr.flFraction < 1.0f)
+			{
+				//MaterialSound(&tr, vecSrc, vecEnd);
+				CKnifeRuneBlade::CreateHitFX(tr.vecEndPos, 0);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			}
+		}
+		else
+#endif
 		SetThink(nullptr);
 	}
 
@@ -278,11 +379,16 @@ namespace sv {
 	{
 
 		SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
+#ifndef CLIENT_DLL	
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 		SetThink(&CKnifeRuneBlade::DelayPrimaryAttack);
 		pev->nextthink = gpGlobals->time + 0.35s;
 
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.3s;				
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.85s;
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade-slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;				
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
 	}
 
 	void CKnifeRuneBlade::SecondaryAttack(void)
@@ -290,8 +396,9 @@ namespace sv {
 		if (!m_iState)
 		{
 			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
+
 			m_flTimeCheckCharge = gpGlobals->time + 0.5s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.7s;
 			m_iState = 1;
 		}
 		else
@@ -358,68 +465,177 @@ namespace sv {
 	{
 		switch (m_iState)
 		{
-		case 0:
+		case 1:
 		{
 #ifndef CLIENT_DLL	
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
+			m_iSwing = 0;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
 
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.5s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
-
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade-slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			
 			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 1.0s;
 			break;
 		}
-		case 1:
 		case 2:
 		case 3:
+		case 4:
 		{
+#ifndef CLIENT_DLL	
+			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+			m_iSwing = 0;
 			SendWeaponAnim(ANIM_CHARGE_ATTACK1, UseDecrement() != FALSE);
 
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade_v_charge_attack1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
 			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.35s;
 			break;
 		}
-		case 4:
 		case 5:
 		{
+#ifndef CLIENT_DLL	
+			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
+			m_iSwing = 1;
 			SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
 
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.86s;
-			m_iState2 = 6;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade_v_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-			SetThink(nullptr);
 			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.35s;
+
 			break;
 		}
 		}
+		m_iState = 0;
 	}
 
 	void CKnifeRuneBlade::DelaySecondaryAttack(void)
 	{
-#ifndef CLIENT_DLL		
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+#ifndef CLIENT_DLL
+		float flDamage, flRadius, flAngleDegrees;
+		flAngleDegrees = m_iSwing ? 120 : 60;
+		flDamage = m_iSwing ? GetChargeAttackDamage() : GetSecondaryAttackDamage();
+		flRadius = m_iSwing ? 210 : 120;
+		
+		CBaseEntity* pEntity = NULL;
+		BOOL fDidHit = FALSE;
+		TraceResult tr;
+		
+		Vector vecEnd, vecAngle;
+		vecAngle = m_pPlayer->pev->v_angle;
+		UTIL_MakeVectors(vecAngle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-		switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 150, 90, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev , 0, 2))
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		if (m_iSwing)
 		{
-		case HIT_PLAYER:
-		{
-			
-			break;
+			vecAngle[0] = 360.0 - vecAngle[0];
+			//难看死了还是屏蔽好了=-= PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + vecForward * 50, vecAngle, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
+			CKnifeRuneBlade::CreateHitFX(vecSrc + vecForward * 40, m_iSwing);
 		}
-		case HIT_WALL:
+		float c = cos(flAngleDegrees * 0.5 * M_PI / flRadius);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
 		{
-			MaterialSound();
-			break;
+			if (pEntity == m_pPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, m_iSwing))
+				continue;
+
+			float flRatio = 1.0;
+
+			if (pEntity && pEntity->IsPlayer())
+			{
+				UTIL_MakeVectors(pEntity->pev->angles);
+
+				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+					flRatio = 3.0;
+			}
+
+			m_pPlayer->m_iWeaponVolume = 128;
+
+			if (m_iSwing)
+			{
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			}
+			else
+			{
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			}
+
+			ClearMultiDamage();
+
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+			{
+				Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+				pPlayer->pev->velocity.x = vecDir2D.x * 300;
+				pPlayer->pev->velocity.y = vecDir2D.y * 300;
+				pPlayer->pev->velocity.z = 400;
+
+				pPlayer->m_flVelocityModifier = 0.9;
+			}
+
+			fDidHit = TRUE;
 		}
+
+		if (!fDidHit)
+		{
+			vecEnd = vecSrc + vecForward * 110.0;
+
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+			if (tr.flFraction < 1.0f)
+			{
+				if (m_iSwing)
+				{
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				}
+				else
+				{
+					CKnifeRuneBlade::CreateHitFX(tr.vecEndPos, m_iSwing);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				}
+			}
+			else
+			{
+				if (m_iSwing)
+				{
+					CKnifeRuneBlade::CreateHitFX(vecSrc + vecForward * 55.0, m_iSwing);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				}
+			}
 		}
 #endif
-
+		m_iState = 0;
+		m_iSwing = 0;
 		SetThink(nullptr);
 	}
 
@@ -430,6 +646,7 @@ namespace sv {
 
 	void CKnifeRuneBlade::Holster(int skiplocal)
 	{
+		m_iState = 0;
 		SetThink(nullptr);
 
 		return CBasePlayerWeapon::Holster(skiplocal);
@@ -448,6 +665,7 @@ namespace sv {
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 14, 0, TRUE, FALSE);
 		
 	}
 

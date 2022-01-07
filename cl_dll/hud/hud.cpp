@@ -235,9 +235,8 @@ void CHud :: Init( void )
 	m_MOTD.Init();
 	m_scenarioStatus.Init();
 	m_HeadName.Init();
-	
 	m_HitIndicator.Init();
-
+	m_HudSiFiammo.Init();
 	// all things that have own background and must be drawn last
 	m_ProgressBar.Init();
 	m_Menu.Init();
@@ -608,3 +607,4 @@ void CHud::AddHudElem(CHudBase *phudelem)
 
 	ptemp->pNext = pdl;
 }
+

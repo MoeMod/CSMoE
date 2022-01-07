@@ -142,8 +142,14 @@ namespace sv {
 								{
 									if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
 									{
-										target->pev->velocity.x = 0;
-										target->pev->velocity.y = 0;
+										Vector2D vecDir2D = (target->pev->origin.Make2D() - pAttackePlayer->pev->origin.Make2D()).Normalize();
+
+										target->pev->velocity.x = vecDir2D.x * 600;
+										target->pev->velocity.y = vecDir2D.y * 600;
+										target->pev->velocity.z = 310;
+
+										target->m_flVelocityModifier = 1.0;
+
 									}
 								}
 							}			

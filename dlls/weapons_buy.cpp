@@ -91,6 +91,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "elite",	WEAPON_ELITE },
 	{ "fiveseven",	WEAPON_FIVESEVEN },
 	{ "mp5navy",	WEAPON_MP5N },
+	{ "skull5",	WEAPON_SKULL5 },
+	{ "sfsniper",	WEAPON_SFSNIPER },
+	{ "plasmagun",	WEAPON_PLASMAGUN },
 	{ NULL,		WEAPON_NONE }
 };
 
@@ -188,6 +191,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "rifle",	WEAPONCLASS_RIFLE },
 	{ "sniper",	WEAPONCLASS_SNIPERRIFLE },
 	{ "none",	WEAPONCLASS_NONE },
+	{ "skull5",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
+	{ "plasmagun",	WEAPONCLASS_RIFLE },
 	{ NULL,		WEAPONCLASS_NONE }
 };
 
@@ -312,6 +318,9 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_AK47:
 	case WEAPON_P90:
 	case WEAPON_SHIELDGUN:
+	case WEAPON_SFSNIPER:
+	case WEAPON_PLASMAGUN:
+	case WEAPON_SKULL5:
 		return true;
 	default:
 		break;

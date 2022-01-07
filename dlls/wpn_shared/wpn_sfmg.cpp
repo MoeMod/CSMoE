@@ -87,9 +87,9 @@ BOOL CSFMG::Deploy(void)
 	m_iShotsFired = 0;
 
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
-		return DefaultDeploy("models/v_sfmg.mdl", "models/p_sfmg.mdl", SFMG_DRAWB, "m249", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_sfmg.mdl", "models/p_sfmg.mdl", SFMG_DRAWB, "sfmg", UseDecrement() != FALSE);
 	else
-		return DefaultDeploy("models/v_sfmg.mdl", "models/p_sfmg.mdl", SFMG_DRAWA, "m249", UseDecrement() != FALSE);
+		return DefaultDeploy("models/v_sfmg.mdl", "models/p_sfmg.mdl", SFMG_DRAWA, "sfmg", UseDecrement() != FALSE);
 }
 
 void CSFMG::PrimaryAttack(void)

@@ -31,7 +31,7 @@ namespace sv {
 using WeaponTemplate::Varibles::A;
 using WeaponTemplate::Varibles::N;
 
-struct Plasmagun_WeaponData
+struct PlasmaGun_WeaponData
 {
 	static constexpr const char* V_Model = "models/v_plasmagun.mdl";
 	static constexpr const char* P_Model = "models/p_plasmagun.mdl";
@@ -61,7 +61,7 @@ struct Plasmagun_WeaponData
 };
 
 #ifndef CLIENT_DLL
-	class CPlasmagunGrenade : public CBaseEntity, public Plasmagun_WeaponData
+	class CPlasmaGrenade : public CBaseEntity, public PlasmaGun_WeaponData
 	{
 	public:
 		void Spawn() override
@@ -70,8 +70,8 @@ struct Plasmagun_WeaponData
 
 			m_fSequenceLoops = 0;
 			//ph26 = 0;
-			SetThink(&CPlasmagunGrenade::FollowThink);
-			SetTouch(&CPlasmagunGrenade::OnTouch);
+			SetThink(&CPlasmaGrenade::FollowThink);
+			SetTouch(&CPlasmaGrenade::OnTouch);
 			SET_MODEL(this->edict(), "sprites/plasmaball.spr");
 
 			//ph32 = ?
@@ -79,7 +79,7 @@ struct Plasmagun_WeaponData
 			pev->renderfx = kRenderFxNone;
 			pev->renderamt = 180;
 			pev->framerate = 10;
-			pev->scale = 0.05;
+			pev->scale = 0.25;
 			pev->solid = SOLID_BBOX;
 			pev->movetype = MOVETYPE_FLYMISSILE;
 			pev->nextthink = gpGlobals->time + 0.1s;
@@ -246,17 +246,17 @@ struct Plasmagun_WeaponData
 			return UTIL_Remove(this);
 		}
 	};
-	LINK_ENTITY_TO_CLASS(plasma_grenade, CPlasmagunGrenade)
+	LINK_ENTITY_TO_CLASS(plasma_grenade, CPlasmaGrenade)
 #endif
 
 	
-    class CPlasmagun : public LinkWeaponTemplate< CPlasmagun,
+    class CPlasmaGun : public LinkWeaponTemplate< CPlasmaGun,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
             TPrecacheEvent,
             TDeployDefault,
             TWeaponIdleDefault
-    >, public Plasmagun_WeaponData
+    >, public PlasmaGun_WeaponData
     {
     public:
 
@@ -294,17 +294,31 @@ struct Plasmagun_WeaponData
 	}
 
 
+	void Spawn(void) override
+	{
+		pev->classname = MAKE_STRING("weapon_plasmagun");
+
+		Precache();
+		m_iId = WEAPON_PLASMAGUN;
+		SET_MODEL(ENT(pev), "models/w_plasmagun.mdl");
+		m_flAccuracy = 0.25;
+		m_iShotsFired = 0;
+		m_iDefaultAmmo = 45;
+
+		FallInit();
+	}
+
 	int GetItemInfo(ItemInfo* p) override
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = "plasma";
-		p->iMaxAmmo1 = 45;
+		p->iMaxAmmo1 = 90;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = -1;
+		p->iMaxClip = 45;
 		p->iSlot = 0;
 		p->iPosition = 2;
-		p->iId = m_iId = WEAPON_PLAMAGUN;
+		p->iId = m_iId = WEAPON_PLASMAGUN;
 		p->iFlags = 0;
 		p->iWeight = AUG_WEIGHT;
 
@@ -344,6 +358,8 @@ struct Plasmagun_WeaponData
 
 		m_pPlayer->ResetMaxSpeed();
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/zoom.wav", 0.2, 2.4, 0, PITCH_NORM);
+
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.3s;
 	}
 
 
@@ -390,11 +406,11 @@ struct Plasmagun_WeaponData
 #ifndef CLIENT_DLL
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 		Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
-		CPlasmagunGrenade* pEnt = static_cast<CPlasmagunGrenade*>(CBaseEntity::Create("plasma_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+		CPlasmaGrenade* pEnt = static_cast<CPlasmaGrenade*>(CBaseEntity::Create("plasma_grenade", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{
-			float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 51 : 119;
-			float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 30 : 55;
+			float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 51 : 242;	//119
+			float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 30 : 105;	//55
 			pEnt->Init(gpGlobals->v_forward * 2000, flTouchDamage, flExplodeDamage, m_pPlayer->m_iTeam);
 		}
 #endif
@@ -422,5 +438,5 @@ struct Plasmagun_WeaponData
 			KickBack(0.65, 0.35, 0.25, 0.015, 3.5, 2.25, 7);
 	}
 };
-LINK_ENTITY_TO_CLASS(weapon_Plasma, CPlasmagun)
+LINK_ENTITY_TO_CLASS(weapon_plasmagun, CPlasmaGun)
 }

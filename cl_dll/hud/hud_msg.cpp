@@ -208,6 +208,12 @@ int CHud::MsgFunc_OperationSystem(const char* pszName, int iSize, void* pbuf)
 
 	int index = reader.ReadByte();
 	const char *osname = reader.ReadString();
-	strncpy(g_PlayerExtraInfo[index].osname, osname, sizeof(g_PlayerExtraInfo[index].osname));
+
+	if (!strcmp(osname, "WinRT") || !strcmp(osname, "Win32") || !strcmp(osname, "Win32-MinGW"))
+		g_PlayerExtraInfo[index].os = OS_Windows;
+	else if (!strcmp(osname, "macOS") || !strcmp(osname, "iOS"))
+		g_PlayerExtraInfo[index].os = OS_Apple;
+	else if (!strcmp(osname, "Android"))
+		g_PlayerExtraInfo[index].os = OS_Android;
 	return 1;
 }

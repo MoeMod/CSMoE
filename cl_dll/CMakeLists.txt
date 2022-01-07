@@ -216,6 +216,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sfsniper.cpp
 	../dlls/wpn_shared/knife_runeblade.cpp
 	../dlls/wpn_shared/wpn_plasmagun.cpp
+	../dlls/wpn_shared/knife_janus9.cpp
 	)
 
 set (HUD_SRCS
@@ -274,6 +275,7 @@ set (HUD_SRCS
 	./hud/z4/z4_energy.cpp
 	./hud/zbz/zbz.cpp
 	./hud/zbz/zbz_skill_info.cpp
+	./hud/hud_sifiammo.cpp
 
 )
 

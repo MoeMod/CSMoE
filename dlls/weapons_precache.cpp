@@ -271,7 +271,9 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_railbeam");
 	UTIL_PrecacheOther("ammo_svdexgrenade");
 	UTIL_PrecacheOtherWeapon("weapon_plasmagun");
+	UTIL_PrecacheOther("ammo_plasma");
 	UTIL_PrecacheOtherWeapon("knife_runeblade");
+	UTIL_PrecacheOtherWeapon("knife_janus9");
 	
 	
 

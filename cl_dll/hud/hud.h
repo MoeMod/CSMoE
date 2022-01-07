@@ -355,7 +355,7 @@ struct extra_player_info_t
 	float radarflashtime;
 	float radarflashtimedelta;
 	char location[32];
-	char osname[32];
+	byte os;
 };
 
 struct team_info_t 
@@ -941,6 +941,28 @@ public:
 //-----------------------------------------------------
 //
 
+class CHudSiFiammo : public CHudBase
+{
+public:
+	int Init(void);
+	void Reset(void);
+	void InitHUDData(void);
+	int VidInit(void);
+	void Shutdown(void);
+	int Draw(float flTime);
+	void Draw2DQuad_Custom(float x, float y, float scale, int num, int r, int g, int b, int alpha);
+
+private:
+	SharedTexture m_iTex;
+	cvar_t* hud_sifiammo_style;
+	int current_style;
+};
+
+//
+//-----------------------------------------------------
+//
+
+
 class CHud
 {
 public:
@@ -1055,6 +1077,7 @@ public:
 	CHudHeadIcon	m_HeadIcon;
 	CHudDgaxe		m_Dgaxe;
 	CHudHitIndicator m_HitIndicator;
+	CHudSiFiammo m_HudSiFiammo;
 	CHudSayText     m_SayText;
 	CHudMenu        m_Menu;
 	CHudAmmoSecondary m_AmmoSecondary;

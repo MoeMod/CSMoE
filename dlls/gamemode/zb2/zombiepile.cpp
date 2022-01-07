@@ -259,7 +259,7 @@ void CZombiePile::Explosion()
 			continue;
 
 		vecVelocityAdd = pEntity->pev->origin - pev->origin;
-		float flDist = vecVelocityAdd.Length();
+		flDist = vecVelocityAdd.Length();
 		vecVelocityAdd *= 1 / (flDist / GetKnockBack());
 
 		CBasePlayer* pPlayer = (CBasePlayer*)pEntity;

@@ -30,6 +30,8 @@ GNU General Public License for more details.
 #include "gamemode/mods_const.h"
 
 #include "legacy/hud_scoreboard_legacy.h"
+#include "imgui.h"
+#include "imgui_utils.h"
 
 hud_player_info_t   g_PlayerInfoList[MAX_PLAYERS + 1]; // player info from the engine
 extra_player_info_t	g_PlayerExtraInfo[MAX_PLAYERS + 1]; // additional player info sent directly to the client dll
@@ -128,6 +130,14 @@ int CHudScoreboard::VidInit(void)
 
 	// Load sprites here
 	pimpl->for_each(&IBaseHudSub::VidInit);
+
+	if (!m_pOSTexture[0])
+		R_InitTexture(m_pOSTexture[0], "resource/basic/windows");
+	if (!m_pOSTexture[1])
+		R_InitTexture(m_pOSTexture[1], "resource/basic/apple");
+	if (!m_pOSTexture[2])
+		R_InitTexture(m_pOSTexture[2], "resource/basic/android");
+
 	return 1;
 }
 
@@ -156,6 +166,7 @@ void CHudScoreboard::InitHUDData(void)
 
 void CHudScoreboard::Shutdown(void)
 {
+	std::fill(std::begin(m_pOSTexture), std::end(m_pOSTexture), nullptr);
 	pimpl = nullptr;
 }
 
@@ -320,6 +331,20 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 			
 			//if (m_bHostOwnBuff)
 			//	GL_DrawTGA2(g_Texture[m_iBuffIcon].iTexture, x + 80, y + offsetY - 14, g_Texture[m_iBuffIcon].iWidth, g_Texture[m_iBuffIcon].iHeight, 255);
+			switch (g_PlayerExtraInfo[id].os)
+			{
+			case OS_Windows:
+				m_pOSTexture[0]->Draw2DQuadScaled(x + 105 - 25, y + offsetY, x + 105 - 10, y + offsetY + 15);
+				break;
+			case OS_Apple:
+				m_pOSTexture[1]->Draw2DQuadScaled(x + 105 - 25, y + offsetY, x + 105 - 10, y + offsetY + 15);
+				break;
+			case OS_Android:
+				m_pOSTexture[2]->Draw2DQuadScaled(x + 105 - 25, y + offsetY, x + 105 - 10, y + offsetY + 15);
+				break;;
+			default:
+				break;
+			}
 			DrawUtils::DrawHudString(x + 105, y + offsetY, 1000, g_PlayerInfoList[id].name, r, g, b, flScale);
 
 			sprintf(szBuf, "%d", g_PlayerExtraInfo[id].frags);

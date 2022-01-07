@@ -180,4 +180,11 @@ constexpr size_t MAX_REBUY_LENGTH =		256;
 constexpr size_t MAX_MOTD_CHUNK = 60;
 constexpr size_t MAX_MOTD_LENGTH = 1536;
 
+enum OperationSystem : byte
+{
+	OS_Windows,
+	OS_Apple,
+	OS_Android
+};
+
 #endif // CDLL_DLL_H

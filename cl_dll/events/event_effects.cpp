@@ -52,6 +52,8 @@ enum event_effect
 	EVENT_DUALSWORD_SKILL,
 	EVENT_DUALSWORD_EYE,
 	EVENT_DRAGONSWORDFX,
+	EVENT_RUNEBLADEFX,
+	EVENT_RUNEBLADE_EYE
 };
 
 enum buffsg552ex_slash_e
@@ -852,6 +854,77 @@ void EV_WpnEffects(event_args_s* args)
 			pEnt->entity.angles = viewent->angles;
 		};
 
+		break;
+	}
+	case EVENT_RUNEBLADEFX:
+	{
+		cl_entity_t* viewent = gEngfuncs.GetViewModel();
+		if (!viewent)
+			return;
+
+		model_s* pModel;
+		pModel = IEngineStudio.Mod_ForName("models/ef_runeblade_swing.mdl", 0);
+		if (pModel)
+		{
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin, pModel);
+
+			if (!pEnt)
+				return;
+
+			pEnt->entity.angles = viewent->angles;
+			pEnt->flags &= ~FTENT_GRAVITY;
+			pEnt->entity.curstate.sequence = 0;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.renderamt = 250;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.animtime = gHUD.m_flTime;
+			pEnt->entity.curstate.framerate = 1.0;
+			pEnt->die = gHUD.m_flTime + 0.5;
+
+			
+		}
+		break;
+	}
+	case EVENT_RUNEBLADE_EYE:
+	{
+		model_s* pModel;
+
+		pModel = IEngineStudio.Mod_ForName("sprites/runeblade_eye.spr", false);
+		if (pModel)
+		{
+			cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+			TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[0], pModel);
+
+			if (!pEnt)
+				return;
+
+			pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+			pEnt->entity.curstate.frame = 0.0f;
+			pEnt->entity.curstate.framerate = 30.0f;
+			pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+			pEnt->entity.curstate.aiment = viewent->index;
+
+			pEnt->entity.curstate.solid = SOLID_NOT;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderfx = kRenderFxNone;
+			pEnt->frameMax = 40.0;
+			pEnt->entity.curstate.scale = 0.075f;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.body =  1;
+			pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+			pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+
+			pEnt->die = gHUD.m_flTime + 22;
+
+			pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+				if (viewent->curstate.sequence != 0)
+					pEnt->die = gHUD.m_flTime;
+			};
+		}
 		break;
 	}
 	default:

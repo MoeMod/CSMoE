@@ -65,11 +65,7 @@ public:
 	void Precache() override
 	{
 		Base::Precache();
-
-		PRECACHE_SOUND("weapons/janus9_draw.wav");
-		PRECACHE_SOUND("weapons/janus9_stone1.wav");
-		PRECACHE_SOUND("weapons/janus9_slash1.wav");
-		PRECACHE_SOUND("weapons/janus9_stab1.wav");
+		
 		PRECACHE_SOUND("weapons/fv_hit_01.wav");
 	}
 

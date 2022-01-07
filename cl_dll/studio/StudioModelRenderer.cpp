@@ -929,7 +929,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 		if (pLocalPlayer)
 		{
 			m_pCurrentEntity->curstate.rendermode = pLocalPlayer->curstate.rendermode;
-			m_pCurrentEntity->curstate.renderamt = max(60, pLocalPlayer->curstate.renderamt);
+			m_pCurrentEntity->curstate.renderamt = max(30, pLocalPlayer->curstate.renderamt);
 		}
 		//IEngineStudio.StudioSetCullState(true);
 	}
