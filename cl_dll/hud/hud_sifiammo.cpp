@@ -71,6 +71,7 @@ int CHudSiFiammo:: VidInit( void )
 	case 6: i = 5; break;
 	case 7: i = 6; break;
 	case 8: i = 7; break;
+	case 9: i = 8; break;
 	default: i = 1;
 	}
 	sprintf(path, "resource/floatingdamage/num_nomal_skin0%d.tga", i);
@@ -91,7 +92,7 @@ int CHudSiFiammo:: Draw( float flTime )
 	
 	if ((int)hud_sifiammo_style->value != current_style) {
 		int new_style = (int)hud_sifiammo_style->value;
-		if (new_style >= 2 && new_style <= 8) {
+		if (new_style >= 2 && new_style <= 9) {
 			current_style = new_style;
 			Reset();
 		}
@@ -147,7 +148,7 @@ int CHudSiFiammo:: Draw( float flTime )
 		y = screen[1] - 3 * gHUD.m_flScale;
 		FillRGBABlend(x, y, w, h, 0, 0, 0, 64);
 	}
-	else if ((int)hud_sifiammo_style->value >= 2 && (int)hud_sifiammo_style->value <= 8) {
+	else if ((int)hud_sifiammo_style->value >= 2 && (int)hud_sifiammo_style->value <= 9) {
 	
 		if (gHUD.m_Ammo.m_pWeapon == nullptr) return 1;
 		if (gHUD.m_iFOV <= 40) return 1;
