@@ -42,7 +42,7 @@ int CHudSiFiammo:: Init( void )
 	gHUD.AddHudElem( this );
 	m_iFlags |= HUD_DRAW;
 
-	hud_sifiammo_style = CVAR_CREATE( "hud_sifiammostyle", "2", FCVAR_ARCHIVE);
+	hud_sifiammo_style = CVAR_CREATE( "hud_sifiammostyle", "0", FCVAR_ARCHIVE);
 	current_style = (int)hud_sifiammo_style->value;
 	return 1;
 }
@@ -226,17 +226,11 @@ int CHudSiFiammo:: Draw( float flTime )
 void CHudSiFiammo::Draw2DQuad_Custom(float x, float y, float scale, int num, int r, int g, int b, int alpha) //m_flScale;
 {
 	if (!m_iTex->valid()) return;
-	x *= gHUD.m_flScale;    //Xash3D feature
-	y *= gHUD.m_flScale;
 	
 	gEngfuncs.pTriAPI->Color4ub(r, g, b, alpha);
-
 	float w = m_iTex->w() / 10.0f / 2.0f, h = m_iTex->h() / 2.0f;
 	w *= scale;
 	h *= scale;
-	w *= gHUD.m_flScale;     //Xash3D feature
-	h *= gHUD.m_flScale;
-
-	m_iTex->Draw2DQuadScaled(x - w, y - h, x + w, y + h, 0.1 * num, 0.1 * num, 0.1 * (num + 1), 0.1 * (num + 1));
+	m_iTex->Draw2DQuadScaled(x - w, y - h, x + w, y + h, 0.1 * num, 0, 0.1 * (num + 1), 1);
 }
 
