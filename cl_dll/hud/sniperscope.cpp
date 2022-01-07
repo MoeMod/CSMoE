@@ -40,7 +40,7 @@ version.
 #include "weapons.h"
 
 #include "draw_util.h"
-#include <cs_wpn\bte_weapons.h>
+#include "cs_wpn/bte_weapons.h"
 
 int CHudSniperScope::Init()
 {
