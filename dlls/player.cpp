@@ -7351,6 +7351,7 @@ void CBasePlayer::SwitchTeam()
 	{
 		m_iTeam = CT;
 	}
+	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iTeam);
 	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iTeam));
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgTeamInfo);

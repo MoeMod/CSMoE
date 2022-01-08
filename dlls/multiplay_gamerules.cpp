@@ -2236,6 +2236,7 @@ void CHalfLifeMultiplay::ResetCurrentVIP()
 {
 	char *infobuffer = GET_INFO_BUFFER(m_pVIP->edict());
 	m_pVIP->m_iModelName = PlayerModel_GetRandomSkin();
+	m_pVIP->m_bIsFemale = PlayerModel_IsFemale(m_pVIP->m_iModelName, m_pVIP->m_iTeam);
 	SET_CLIENT_KEY_VALUE(m_pVIP->entindex(), infobuffer, "model", PlayerModel_GetApperance(m_pVIP->m_iModelName, m_pVIP->m_iTeam));
 
 	m_pVIP->m_bIsVIP = false;

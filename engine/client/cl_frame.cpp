@@ -716,7 +716,8 @@ void GAME_EXPORT CL_WeaponAnim( int iAnim, int body )
 	view->latched.prevframe = 0.0f;
 	view->curstate.scale = 1.0f;
 	view->curstate.frame = 0.0f;
-	view->curstate.body = body;
+	if (body != 2) // fix female hand
+		view->curstate.body = body;
 
 #if 0	// g-cont. for GlowShell testing
 	view->curstate.renderfx = kRenderFxGlowShell;

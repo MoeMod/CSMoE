@@ -1219,7 +1219,7 @@ BOOL CBasePlayerWeapon::DefaultDeploy(const char *szViewModel, const char *szWea
 
 	if (!m_pPlayer->m_bIsZombie)
 	{
-		pev->body = m_pPlayer->m_bIsFemale ? 0 : 1;
+		pev->body = m_pPlayer->m_bIsFemale ? 1 : 0;
 	}
 
 	m_pPlayer->TabulateAmmo();

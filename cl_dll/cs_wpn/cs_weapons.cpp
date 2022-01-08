@@ -458,7 +458,7 @@ void CBasePlayerWeapon::SendWeaponAnim( int iAnim, int skiplocal )
 	//gEngfuncs.Con_DPrintf( "Predict::SendWeaponAnim( %i )\n", iAnim );
 
 	m_pPlayer->pev->weaponanim = iAnim;
-	HUD_SendWeaponAnim( iAnim, m_iId, 0, 0 );
+	HUD_SendWeaponAnim( iAnim, m_iId, pev->body, 0 );
 }
 
 void CBasePlayerWeapon::RetireWeapon()
@@ -1255,6 +1255,8 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pWeapon->m_iWeaponState = pfrom->m_iWeaponState;
 	pWeapon->m_flLastFire = time_point_t(duration_t(pfrom->m_fAimedDamage));
 	pWeapon->m_iShotsFired = pfrom->m_fInZoom;
+	pWeapon->pev->body = pfrom->iuser2;
+	pWeapon->pev->skin = pfrom->iuser3;
 
 	/*for ( i = 0; i < MAX_WEAPONS; i++)
 	{
@@ -1426,7 +1428,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	//  over the wire ( fixes some animation glitches )
 	if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim || HUD_GetWeapon() != pWeapon->m_iId))
 		// Force a fixed anim down to viewmodel
-		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, 2, 1);
+		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, pWeapon->pev->body, 1);
 
 	if (pWeapon->m_iPrimaryAmmoType < MAX_AMMO_TYPES)
 	{
@@ -1456,6 +1458,10 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pto->m_iWeaponState = pWeapon->m_iWeaponState;
 	pto->m_fInZoom = pWeapon->m_iShotsFired;
 	pto->m_fAimedDamage = pWeapon->m_flLastFire.time_since_epoch() / 1s;
+
+	// DO NOT let client modify body and skin
+	pto->iuser2 = pfrom->iuser2;
+	pto->iuser3 = pfrom->iuser3;
 
 	// Decrement weapon counters, server does this at same time ( during post think, after doing everything else )
 	pto->m_flNextReload				-= cmd->msec / 1000.0f;
