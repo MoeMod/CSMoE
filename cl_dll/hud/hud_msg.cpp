@@ -205,15 +205,23 @@ int CHud::MsgFunc_ShadowIdx(const char *pszName, int iSize, void *pbuf)
 int CHud::MsgFunc_OperationSystem(const char* pszName, int iSize, void* pbuf)
 {
 	BufferReader reader(pszName, pbuf, iSize);
-
 	int index = reader.ReadByte();
-	const char *osname = reader.ReadString();
-
-	if (!strcmp(osname, "WinRT") || !strcmp(osname, "Win32") || !strcmp(osname, "Win32-MinGW"))
-		g_PlayerExtraInfo[index].os = OS_Windows;
-	else if (!strcmp(osname, "macOS") || !strcmp(osname, "iOS"))
-		g_PlayerExtraInfo[index].os = OS_Apple;
-	else if (!strcmp(osname, "Android"))
-		g_PlayerExtraInfo[index].os = OS_Android;
+	const char* osname = reader.ReadString();
+	if (!index)
+	{
+		for (size_t i = 0; i < MAX_CLIENTS; i++)
+		{
+			g_PlayerExtraInfo[i + 1].os = reader.ReadByte();
+		}
+	}
+	else
+	{
+		if (!strcmp(osname, "WinRT") || !strcmp(osname, "Win32") || !strcmp(osname, "Win32-MinGW"))
+			g_PlayerExtraInfo[index].os = OS_Windows;
+		else if (!strcmp(osname, "macOS") || !strcmp(osname, "iOS"))
+			g_PlayerExtraInfo[index].os = OS_Apple;
+		else if (!strcmp(osname, "Android"))
+			g_PlayerExtraInfo[index].os = OS_Android;
+	}
 	return 1;
 }

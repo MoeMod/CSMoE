@@ -28,7 +28,8 @@ public:
 		SetDefaultAccuracy_impl(df::AccuracyDefault::Has(wpn));
 		CBase::m_iShotsFired = 0;
 
-		BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_DRAW::Get(data), df::AnimExtension::Get(data), wpn.UseDecrement() != FALSE);
+		auto szAnimExtFemale = df::AnimExtensionFemale::Get(data);
+		BOOL result = wpn.DefaultDeploy(df::V_Model::Get(data), df::P_Model::Get(data), df::ANIM_DRAW::Get(data), strlen(szAnimExtFemale) == 0 ? df::AnimExtension::Get(data) : szAnimExtFemale, wpn.UseDecrement() != FALSE);
 
 		SetDefaultDeployTime_impl(df::DefaultDeployTime::Has(wpn));
 		return result;

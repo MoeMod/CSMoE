@@ -600,6 +600,7 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 		InstallTutor(CVAR_GET_FLOAT("tutor_enable") != 0.0f);
 
 	LoadRandomMaps();
+	Q_memset(m_iPlayersOS, OS_Windows, sizeof(m_iPlayersOS));
 
 	g_pMPGameRules = this;
 }
@@ -3256,6 +3257,17 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer *pl)
 			MESSAGE_END();
 		}
 	}
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgOperationSystem, NULL, pl->edict());
+	// Backward compatibility
+	WRITE_BYTE(0);
+	WRITE_STRING("Win32");
+	// Backward compatibility
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		WRITE_BYTE(m_iPlayersOS[i]);
+	}
+	MESSAGE_END();
 }
 
 void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)

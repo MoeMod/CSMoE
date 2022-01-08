@@ -101,7 +101,7 @@ BOOL CY21s1Jetgunmd::Deploy(void)
 	m_tDashTime = invalid_time_point;
 	m_tDashStart = invalid_time_point;
 
-	return DefaultDeploy("models/v_y21s1jetgunmd.mdl", "models/p_y21s1jetgunmd.mdl", ANIM_DRAW, "dualpistols_1", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_y21s1jetgunmd.mdl", "models/p_y21s1jetgunmd.mdl", ANIM_DRAW, m_pPlayer->GetAnimExtDualPistols(), UseDecrement() != FALSE);
 }
 
 

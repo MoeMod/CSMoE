@@ -28,6 +28,7 @@ DF_GENERATE_TEMPLATE_GETTER(V_Model) // TDeployDoubleMode TDeployDefault TGenera
 DF_GENERATE_TEMPLATE_GETTER(P_Model) // TDeployDoubleMode TDeployDefault TGeneralData
 DF_GENERATE_TEMPLATE_GETTER(W_Model) // TGeneralData
 DF_GENERATE_TEMPLATE_GETTER(AnimExtension) // TDeployDoubleMode TDeployDefault
+DF_GENERATE_TEMPLATE_GETTER_WITH_DEFAULT(AnimExtensionFemale, "\0") // TDeployDoubleMode TDeployDefault
 DF_GENERATE_TEMPLATE_GETTER(ANIM_IDLE1) // TWeaponIdleDefault
 DF_GENERATE_TEMPLATE_GETTER(ANIM_CHANGE) // TDeployDoubleMode
 DF_GENERATE_TEMPLATE_GETTER(ANIM_DRAW) // TDeployDoubleMode TDeployDefault

@@ -81,7 +81,7 @@ BOOL CInfinityEX1::Deploy(void)
 	if (!(m_iClip & 1))
 		m_iWeaponState |= WPNSTATE_ELITE_LEFT;
 
-	return DefaultDeploy("models/v_infinityex1.mdl", "models/p_infinityex1.mdl", ANIM_DRAW, "dualpistols_1", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_infinityex1.mdl", "models/p_infinityex1.mdl", ANIM_DRAW, m_pPlayer->GetAnimExtDualPistols(), UseDecrement() != FALSE);
 }
 
 void CInfinityEX1::PrimaryAttack(void)

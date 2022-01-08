@@ -62,9 +62,6 @@ typedef enum
 	MODEL_MILITIA_SPETSNAZ,
 	MODEL_VIP,
 
-	MODEL_ZOMBIE_HOST,
-	MODEL_ZOMBIE_ORIGIN,
-
 } ModelName;
 
 typedef enum

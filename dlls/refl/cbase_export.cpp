@@ -396,6 +396,7 @@ template<> constexpr auto ExportMember<CBasePlayer> = std::tuple {
 	&CBasePlayer::m_bSpawnProtection,
 	&CBasePlayer::m_iZombieLevel,
 	&CBasePlayer::m_flTimeSpawnProctionExpires,
+	&CBasePlayer::m_bIsFemale,
 };
 
 template<> constexpr auto ExportMember<CBasePlayerItem> = std::tuple {

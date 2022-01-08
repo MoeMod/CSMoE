@@ -17,7 +17,7 @@ int Host_Main(int szArgc, const char** szArgv, const char* szGameDir, int chg, p
 int __stdcall WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR cmdLine, int nShow)
 {
 	WinExec("cd /d %~dp0", SW_NORMAL);
-	WinExec("SimpleUpdater.exe /startupdate /cv \"2.4.7.0\" /url \"https://dl.moemod.com/csmoe/updata/{0}\" /infofile \"update.xml\" /autokill /forceupdate /hideCheckUI", SW_NORMAL);
+	WinExec("SimpleUpdater.exe /startupdate /cv \"2.4.7.3\" /url \"https://dl.moemod.com/csmoe/updata/{0}\" /infofile \"update.xml\" /autokill /forceupdate /hideCheckUI", SW_NORMAL);
 	
 	int argc;
 	LPWSTR* lpArgv = CommandLineToArgvW(GetCommandLineW(), &argc);

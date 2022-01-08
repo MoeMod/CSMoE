@@ -14,6 +14,7 @@ void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax);
 int PlayerModel_GetNumSkins();
 ModelName PlayerModel_GetRandomSkin();
 const char* PlayerModel_GetApperance(int iApperance, TeamName iTeam);
+bool PlayerModel_IsFemale(int iApperance, TeamName iTeam);
 
 }
 

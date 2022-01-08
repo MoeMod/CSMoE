@@ -1605,6 +1605,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 
 	player->pev->body = 0;
 	player->m_iModelName = appearance.model_id;
+	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iTeam);
 
 	SET_CLIENT_KEY_VALUE(player->entindex(), GET_INFO_BUFFER(player->edict()), "model", appearance.model_name);
 	char path[128];
@@ -4918,18 +4919,24 @@ int EXT_FUNC AllowLagCompensation()
 
 void EXT_FUNC ClientOperationSystem(edict_t* pEntity, const char* osname)
 {
+	int index = ENTINDEX(pEntity);
 	MESSAGE_BEGIN(MSG_ALL, gmsgOperationSystem);
-	WRITE_BYTE(ENTINDEX(pEntity));
+	WRITE_BYTE(index);
 	WRITE_STRING(osname);
 	MESSAGE_END();
-	/*if (!Q_strcmp(osname, "WinRT") || !Q_strcmp(osname, "Win32") || !Q_strcmp(osname, "Win32-MinGW") || !Q_strcmp(osname, "Linux") || !Q_strcmp(osname, "macOS"))
-		isPC = 1;
 
-	if (!Q_strcmp(osname, "Android"))
-		isPC = 1;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	if (!mp)
+		return;
 
-	if (!Q_strcmp(osname, "iOS"))
-		isPC = 1;*/
+	index -= 1;
+	//if (!strcmp(osname, "WinRT") || !strcmp(osname, "Win32") || !strcmp(osname, "Win32-MinGW"))
+	if (!strcmp(osname, "macOS") || !strcmp(osname, "iOS"))
+		mp->m_iPlayersOS[index] = OS_Apple;
+	else if (!strcmp(osname, "Android"))
+		mp->m_iPlayersOS[index] = OS_Android;
+	else
+		mp->m_iPlayersOS[index] = OS_Windows;
 }
 
 } // namespace sv;

@@ -547,6 +547,8 @@ public:
 	time_point_t m_flVoteNextThink;
 	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 
+	OperationSystem m_iPlayersOS[MAX_CLIENTS];
+
 protected:
 	time_point_t m_flIntermissionEndTime;
 	time_point_t m_flIntermissionStartTime;

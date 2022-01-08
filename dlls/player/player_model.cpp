@@ -24,6 +24,8 @@ static const char *sPlayerModelFiles[] =
 
 struct AppearanceInfo
 {
+	bool isTRFemale;
+	bool isCTFemale;
 	const char* tr;
 	const char* ct;
 };
@@ -32,11 +34,13 @@ static AppearanceInfo gPlayerAppearance[] =
 {
 	// t   ct
 	{NULL, NULL},
-	{"terror", "urban"},
-	{"leet", "gsg9"},
-	{"arctic", "sas"},
-	{"guerilla", "gign"},
-	{"militia", "spetsnaz"},
+	{false, true, "buffclass19s1tr", "buffclass19s1ct"},
+	{true, false, "buffclass19s2tr", "buffclass19s2ct"},
+	{true, true, "buffclass19s3tr", "buffclass19s3ct"},
+	{true, true, "buffclass19s4tr", "buffclass19s4ct"},
+	{true, true, "buffclass20s2tr", "buffclass20s2ct"},
+	{true, true, "buffclass20s3tr", "buffclass20s3ct"},
+	{false, true, "buffclass20s4tr", "buffclass20s4ct"},
 };
 
 constexpr auto NUM_APPEARANCES = std::extent<decltype(gPlayerAppearance)>::value;
@@ -48,6 +52,15 @@ const char* PlayerModel_GetApperance(int iApperance, TeamName iTeam)
 	}
 
 	return (iTeam == TERRORIST) ? gPlayerAppearance[iApperance].tr : gPlayerAppearance[iApperance].ct;
+}
+
+bool PlayerModel_IsFemale(int iApperance, TeamName iTeam)
+{
+	if (iApperance >= NUM_APPEARANCES || iApperance < 1) {
+		iApperance = 1;
+	}
+
+	return (iTeam == TERRORIST) ? gPlayerAppearance[iApperance].isTRFemale : gPlayerAppearance[iApperance].isCTFemale;
 }
 
 ModelName PlayerModel_GetRandomSkin()

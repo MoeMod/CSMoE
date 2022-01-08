@@ -3188,6 +3188,7 @@ void CBasePlayer::MakeVIP()
 {
 	pev->body = 0;
 	m_iModelName = MODEL_VIP;
+	m_bIsFemale = false;
 
 	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", "vip");
 	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_VIP\"\n", STRING(pev->netname), GETPLAYERUSERID(edict()), GETPLAYERAUTHID(edict()));

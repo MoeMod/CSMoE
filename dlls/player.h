@@ -422,6 +422,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	MusicState m_musicState;
 	time_point_t m_flLastCommandTime[8];
 	bool m_bIsZombie;
+	bool m_bIsFemale;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
@@ -727,6 +728,7 @@ public:
 	void CheckZombieModeBuff(void);
 	bool ReactToDeimosTail();
 	void AddWeapon(int iWeaponID);
+	const char* GetAnimExtDualPistols() { return m_bIsFemale ? "dualpistols" : "dualpistols_1"; }
 
 public:
 	bool m_bSpawnProtection; // pack bools
