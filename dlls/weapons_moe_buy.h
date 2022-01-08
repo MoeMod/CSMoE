@@ -102,7 +102,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_skullt9",     "阵风T9",               0,    KNIFE_SLOT,          UNASSIGNED },
 	{"weapon_sfsniper",         "雷神",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"knife_runeblade",      "【魔魂】重剑",    0, KNIFE_SLOT, UNASSIGNED},
-	{"weapon_plasmagun",      "破晓黎明",    0, KNIFE_SLOT, UNASSIGNED},
+	{"weapon_plasmagun",      "破晓黎明",    0, PRIMARY_WEAPON_SLOT, UNASSIGNED},
 	{"knife_janus9",     "灾厄Janus-9",               0,    KNIFE_SLOT,          UNASSIGNED },
 
 	{"z4b_cannonplasma",      "黎明离子炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED},
