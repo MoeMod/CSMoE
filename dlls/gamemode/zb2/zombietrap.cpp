@@ -41,6 +41,7 @@ void CZombieTrap::Precache(void)
 {
 	PRECACHE_MODEL("models/zombitrap.mdl");
 	PRECACHE_SOUND("zombi/zombi_trapped.wav");
+	PRECACHE_SOUND("zombi/zombi_trapped_female.wav");
 	
 }
 
@@ -118,7 +119,7 @@ void EXPORT CZombieTrap::OnTouch(CBaseEntity* pOther)
 	WRITE_SHORT((1 << 14));
 	MESSAGE_END();
 
-	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/zombi_trapped.wav", VOL_NORM, ATTN_NORM);
+	EMIT_SOUND(ENT(p->pev), CHAN_BODY, p->m_bIsFemale ? "zombi/zombi_trapped_female.wav" : "zombi/zombi_trapped.wav", VOL_NORM, ATTN_NORM);
 
 	auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(p->m_pModStrategy.get());
 	if (strategy)

@@ -118,7 +118,7 @@ protected:
 		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0s;
 
 		if (m_bDebuffStatus)
-			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/human_breath_male.wav\n");
+			CLIENT_COMMAND(m_pPlayer->edict(), m_pPlayer->m_bIsFemale ? "spk human_breath_female.wav\n" : "spk zombi/human_breath_male.wav\n");
 		else
 			CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/speedup_heartbeat.wav\n");
 	}
