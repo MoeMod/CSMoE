@@ -1465,7 +1465,7 @@ void CL_DrawTracer( vec3_t start, vec3_t delta, float width, rgb_t color, int al
 	// NOTE: Gotta get the winding right so it's not backface culled
 	// (we need to turn of backface culling for these bad boys)
 
-	GL_SetRenderMode( kRenderTransTexture );
+	GL_SetRenderMode( kRenderTransAdd );
 
 	pglColor4ub( color[0], color[1], color[2], alpha );
 
