@@ -565,7 +565,7 @@ inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 			"seven", "eight", "nine", "ten"
 	};
 
-	UTIL_ClientPrintAll(HUD_PRINTCENTER, "Time Remaining for Zombie Selection: %s1 Sec", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZombiSelectCount", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
 	if (iCurrentCount <= 10)
 	{
 		for (CBasePlayer* player : moe::range::PlayersList())

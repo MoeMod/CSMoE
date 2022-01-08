@@ -417,7 +417,12 @@ struct PlasmaGun_WeaponData
 
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
-		int flags = 0;
+		int flags;
+#ifdef CLIENT_WEAPONS
+		flags = FEV_NOTHOST;
+#else
+		flags = 0;
+#endif
 
 		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
 

@@ -19,7 +19,9 @@ static const char *sPlayerModelFiles[] =
 	"models/player/terror/terror.mdl",
 	"models/player/urban/urban.mdl",
 	"models/player/spetsnaz/spetsnaz.mdl",	// CZ
-	"models/player/militia/militia.mdl"	// CZ
+	"models/player/militia/militia.mdl",	// CZ
+	"models/player/hero/hero.mdl",
+	"models/player/heroine/heroine.mdl"
 };
 
 struct AppearanceInfo

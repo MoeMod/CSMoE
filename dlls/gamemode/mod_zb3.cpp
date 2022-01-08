@@ -192,12 +192,20 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	SetHero(true);
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 3000.0f;
 	m_pPlayer->pev->armorvalue = 1000.0f;
-	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "hero");
+	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", m_pPlayer->m_bIsFemale ? "heroine" : "hero");
 
 	DropPrimary(m_pPlayer);
-	m_pPlayer->GiveNamedItem("weapon_svdex");
-	int iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-	m_pPlayer->GiveAmmo(iAmount, "556Nato", iAmount);
+	int iAmount = 0;
+	if (m_pPlayer->m_bIsFemale) {
+		m_pPlayer->GiveNamedItem("weapon_qbarrel");
+		iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("buckshot", MAX_AMMO_BUCKSHOT);
+		m_pPlayer->GiveAmmo(iAmount, "buckshot", iAmount);
+	}
+	else {
+		m_pPlayer->GiveNamedItem("weapon_svdex");
+		iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
+		m_pPlayer->GiveAmmo(iAmount, "556Nato", iAmount);
+	}
 
 	DropSecondary(m_pPlayer);
 	m_pPlayer->GiveNamedItem("weapon_deagled");
@@ -205,8 +213,8 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	m_pPlayer->GiveAmmo(iAmount, "50AE", iAmount);
 
 	UTIL_LogPrintf("\"%s<%i><%s><CT>\" triggered \"Became_Hero\"\n", STRING(m_pPlayer->pev->netname), GETPLAYERUSERID(m_pPlayer->edict()), GETPLAYERAUTHID(m_pPlayer->edict()));
-	//UTIL_ClientPrintAll(HUD_PRINTTALK, "%s ±»Ñ¡ÖÐ³ÉÎªÓ¢ÐÛ£¡", STRING(m_pPlayer->pev->netname));
-	UTIL_ClientPrintAll(HUD_PRINTTALK, "%s Become a hero£¡", STRING(m_pPlayer->pev->netname));
+	UTIL_ClientPrintAll(HUD_PRINTTALK, "%s è¢«é€‰ä¸­æˆä¸ºè‹±é›„ï¼", STRING(m_pPlayer->pev->netname));
+	//UTIL_ClientPrintAll(HUD_PRINTTALK, "%s Become a heroï¼", STRING(m_pPlayer->pev->netname));
 }
 
 void CPlayerModStrategy_ZB3::Event_OnRoundStart()

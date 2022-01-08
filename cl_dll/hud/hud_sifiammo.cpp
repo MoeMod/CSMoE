@@ -87,8 +87,20 @@ void CHudSiFiammo::Shutdown(void)
 
 int CHudSiFiammo:: Draw( float flTime )
 {
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
+
 	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL)  )
-		return 1;
+		return 0;
+
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
 	
 	if ((int)hud_sifiammo_style->value != current_style) {
 		int new_style = (int)hud_sifiammo_style->value;
