@@ -180,7 +180,7 @@ public:
 		m_pPlayer->m_bShieldDrawn = false;
 		m_fMaxSpeed = 250;
 		int iDeployAnim = GetANIM_DRAW();
-		BOOL ret = DefaultDeploy(V_Model, P_Model, iDeployAnim, AnimExtension, UseDecrement() != FALSE);
+		BOOL ret = DefaultDeploy(V_Model, P_Model, iDeployAnim, m_pPlayer->m_bIsFemale ? AnimExtensionFemale : AnimExtension, UseDecrement() != FALSE);
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.2s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 		return iDeployAnim;
