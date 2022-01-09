@@ -36,6 +36,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_china.h"
 #include "zb2_zclass_pass.h"
 #include "zb2_zclass_flying.h"
+#include "zb2_zclass_nemesis.h"
 #include "zb2_zclass_revival.h"
 #include "zb2_zclass_stamper.h"
 #include "zb2_zclass_resident.h"
@@ -67,6 +68,7 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
 		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
 		{"witch", 100, MakeZombieClass<CZombieClass_Witch> }
+		//{"nemesis", 100, MakeZombieClass<CZombieClass_Nemesis>}
 };
 
 #else

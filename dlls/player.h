@@ -423,6 +423,7 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	time_point_t m_flLastCommandTime[8];
 	bool m_bIsZombie;
 	bool m_bIsFemale;
+	TeamName m_iModelTeam;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>

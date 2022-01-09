@@ -193,6 +193,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_china.cpp
 	./gamemode/zb2/zb2_zclass_pass.cpp
 	./gamemode/zb2/zb2_zclass_flying.cpp
+	./gamemode/zb2/zb2_zclass_nemesis.cpp
 	./balrog11cannon.cpp
 	./gamemode/mod_zbz.cpp
 	./gamemode/zbz/zbz_skill.cpp

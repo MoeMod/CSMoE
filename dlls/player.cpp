@@ -171,7 +171,8 @@ CBasePlayer::~CBasePlayer() = default;
 void CBasePlayer::SetPlayerModel(BOOL HasC4)
 {
 	char *infobuffer = GET_INFO_BUFFER(edict());
-	const char *model = PlayerModel_GetApperance(m_iModelName, m_iTeam);
+	const char *model = PlayerModel_GetApperance(m_iModelName, m_iModelTeam);
+	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
 
 	if (Q_strcmp(GET_KEY_VALUE(infobuffer, "model"), model))
 	{
@@ -7345,14 +7346,15 @@ void CBasePlayer::SwitchTeam()
 
 	if (m_iTeam == CT)
 	{
-		m_iTeam = TERRORIST;
+		m_iTeam = m_iModelTeam = TERRORIST;
+		
 	}
 	else if (m_iTeam == TERRORIST)
 	{
-		m_iTeam = CT;
+		m_iTeam = m_iModelTeam = CT;
 	}
-	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iTeam);
-	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iTeam));
+	m_bIsFemale = PlayerModel_IsFemale(m_iModelName, m_iModelTeam);
+	SET_CLIENT_KEY_VALUE(entindex(), GET_INFO_BUFFER(edict()), "model", PlayerModel_GetApperance(m_iModelName, m_iModelTeam));
 
 	MESSAGE_BEGIN(MSG_ALL, gmsgTeamInfo);
 		WRITE_BYTE(entindex());

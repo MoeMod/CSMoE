@@ -503,6 +503,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->m_iMenu = Menu_OFF;
 	pPlayer->ClearAutoBuyData();
 	pPlayer->m_rebuyString.clear();
+	pPlayer->m_iModelTeam = UNASSIGNED;
 
 	SET_CLIENT_MAXSPEED(ENT(pPlayer->pev), 1);
 	SET_MODEL(ENT(pPlayer->pev), "models/player.mdl");
@@ -1587,7 +1588,7 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 	}
 
 	appearance.model_id = (ModelName)slot;
-	appearance.model_name = PlayerModel_GetApperance(slot, player->m_iTeam);
+	appearance.model_name = PlayerModel_GetApperance(slot, player->m_iModelTeam);
 	player->ResetMenu();
 
 	// Reset the player's state
@@ -1605,11 +1606,11 @@ void HandleMenu_ChooseAppearance(CBasePlayer *player, int slot)
 
 	player->pev->body = 0;
 	player->m_iModelName = appearance.model_id;
-	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iTeam);
+	player->m_bIsFemale = PlayerModel_IsFemale(slot, player->m_iModelTeam);
 
 	SET_CLIENT_KEY_VALUE(player->entindex(), GET_INFO_BUFFER(player->edict()), "model", appearance.model_name);
 	char path[128];
-	Client_ApperanceToModel(path, slot, player->m_iTeam);
+	Client_ApperanceToModel(path, slot, player->m_iModelTeam);
 	player->SetNewPlayerModel(path);
 
 	if (mp->m_iMapHasVIPSafetyZone == MAP_VIP_SAFETYZONE_UNINITIALIZED) {
@@ -1918,6 +1919,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 	player->m_bTeamChanged = true;
 	oldTeam = player->m_iTeam;
 	player->m_iTeam = team;
+	player->m_iModelTeam = team;
 
 	if (TheBots != NULL) {
 		TheBots->OnEvent(EVENT_PLAYER_CHANGED_TEAM, player);

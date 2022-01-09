@@ -115,6 +115,8 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/resident_death.wav");
 	PRECACHE_SOUND("zombi/zombi_death_banshee_1.wav");
 	PRECACHE_SOUND("zombi/zombi_death_banshee_2.wav");
+	PRECACHE_SOUND("zombi/zombie_die4.wav");
+	PRECACHE_SOUND("zombi/zombie_die3.wav");
 
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
@@ -134,7 +136,9 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/resident_hurt2.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_banshee_1.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_banshee_2.wav");
-	
+	PRECACHE_SOUND("zombi/nemesis_pain1.wav");
+	PRECACHE_SOUND("zombi/nemesis_pain2.wav");
+
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_female.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_teleport.wav");
@@ -222,7 +226,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/boomer_zombi_host/boomer_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/witch_zombi_origin/witch_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/witch_zombi_host/witch_zombi_host.mdl");
-	
+	PRECACHE_MODEL("models/player/csmoe_nemesis/csmoe_nemesis.mdl");
 
 }
 
