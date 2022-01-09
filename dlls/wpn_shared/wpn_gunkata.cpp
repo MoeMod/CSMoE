@@ -52,7 +52,7 @@ public:
 	static constexpr const char *W_Model = "models/w_gunkata.mdl";
 	static constexpr const char *EventFile = "events/gunkata.sc";
 	static constexpr const char *ClassName = "weapon_gunkata";
-	static constexpr const char* AnimExtension = "dualpistols_1";
+	static constexpr const char* AnimExtension = "dualpistols_2";
 	static constexpr const char *AnimExtensionFemale = "dualpistols";
 	static constexpr int MaxClip = 36;
 	static constexpr float ArmorRatioModifier = 1.7f;

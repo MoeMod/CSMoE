@@ -140,7 +140,6 @@ void TeamChangeUpdate(CBasePlayer *player, int team_id)
 
 	if (team_id != UNASSIGNED) {
 		player->SetScoreboardAttributes();
-		player->m_bIsFemale = PlayerModel_IsFemale(player->m_iModelName, player->m_iTeam);
 	}
 }
 

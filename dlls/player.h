@@ -728,7 +728,7 @@ public:
 	void CheckZombieModeBuff(void);
 	bool ReactToDeimosTail();
 	void AddWeapon(int iWeaponID);
-	const char* GetAnimExtDualPistols() { return m_bIsFemale ? "dualpistols" : "dualpistols_1"; }
+	const char* GetAnimExtDualPistols() { return m_bIsFemale ? "dualpistols" : "dualpistols_2"; }
 
 public:
 	bool m_bSpawnProtection; // pack bools

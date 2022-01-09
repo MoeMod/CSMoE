@@ -3720,7 +3720,7 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 			}
 		}
 	}
-	else
+	else if(pevInflictor)
 		killer_weapon_name = STRING(pevInflictor->classname);
 
 	// strip the monster_* or weapon_* from the inflictor's classname
