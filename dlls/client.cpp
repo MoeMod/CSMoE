@@ -403,23 +403,35 @@ TeamName SelectDefaultTeam()
 {
 	TeamName team = UNASSIGNED;
 	CHalfLifeMultiplay *mp = g_pGameRules;
-
-	if (mp->m_iNumTerrorist < mp->m_iNumCT) {
-		team = TERRORIST;
-	} else if (mp->m_iNumTerrorist > mp->m_iNumCT) {
-		team = CT;
-	}
-		// Choose the team that's losing
-	else if (mp->m_iNumTerroristWins < mp->m_iNumCTWins) {
-		team = TERRORIST;
-	} else if (mp->m_iNumCTWins < mp->m_iNumTerroristWins) {
-		team = CT;
-	} else {
-		// Teams and scores are equal, pick a random team
+	
+	if (g_pModRunning->DamageTrack() == DT_ZB) {
 		if (RANDOM_LONG(0, 1) == 0) {
 			team = CT;
 		} else {
 			team = TERRORIST;
+		}
+	} else {
+		if (mp->m_iNumTerrorist < mp->m_iNumCT) {
+			team = TERRORIST;
+		}
+		else if (mp->m_iNumTerrorist > mp->m_iNumCT) {
+			team = CT;
+		}
+		// Choose the team that's losing
+		else if (mp->m_iNumTerroristWins < mp->m_iNumCTWins) {
+			team = TERRORIST;
+		}
+		else if (mp->m_iNumCTWins < mp->m_iNumTerroristWins) {
+			team = CT;
+		}
+		else {
+			// Teams and scores are equal, pick a random team
+			if (RANDOM_LONG(0, 1) == 0) {
+				team = CT;
+			}
+			else {
+				team = TERRORIST;
+			}
 		}
 	}
 

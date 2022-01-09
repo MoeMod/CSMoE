@@ -108,22 +108,26 @@ void EXPORT CDeimosTail::TailTouch(CBaseEntity* pOther)
 
 		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
 		CBasePlayer* pAttackePlayer = nullptr;
-		CBasePlayer* pInflictorPlayer = nullptr;
+		CBaseEntity* pInflictor = pAttacker;
 
 		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
-
-		if (pOther->IsPlayer())
 		{
-			pInflictorPlayer = dynamic_cast<CBasePlayer*>(pOther);
-
-			if (flDamage > 1e-6) {
-				MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pAttackePlayer->pev);
-				WRITE_LONG((long)flDamage);
-				WRITE_SHORT(ENTINDEX(pAttackePlayer->edict()));
-				MESSAGE_END();
-				//ClientPrint(pevAttacker, HUD_PRINTTALK, "Hit Player Msg Sent \n");
+			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+			if (pAttackePlayer->m_pActiveItem)
+			{
+				pInflictor = pAttackePlayer->m_pActiveItem;
 			}
+		}
+
+		if (pOther->IsPlayer() && pAttackePlayer)
+		{
+			Vector vecDirection = (pev->velocity).Normalize();
+			TraceResult tr;
+			UTIL_TraceLine(pev->origin, pev->origin + vecDirection * 36.0f, dont_ignore_monsters, ENT(pAttackePlayer->pev), &tr);
+
+			ClearMultiDamage();
+			pOther->TraceAttack(pAttackePlayer->pev, flDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
+			ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 		}		
 	}
 		

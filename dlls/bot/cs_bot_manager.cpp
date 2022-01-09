@@ -1243,8 +1243,8 @@ bool CCSBotManager::AddBot(const BotProfile *profile, BotProfileTeamType team)
 	{
 		int skin = profile->GetSkin();
 
-		if (!skin)
-			skin = 6;// MODEL_GIGN?
+		//if (!skin)
+		//	skin = 6;// MODEL_GIGN?
 
 		HandleMenu_ChooseAppearance(pBot, skin);
 
