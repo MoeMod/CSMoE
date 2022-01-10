@@ -85,8 +85,6 @@ protected:
 void ZombieSkill_Precache();
 void HumanSkill_Precache();
 
-std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name = nullptr);
-
 }
 
 #endif //PROJECT_ZCLASS_H

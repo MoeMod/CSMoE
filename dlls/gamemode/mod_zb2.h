@@ -86,6 +86,7 @@ protected:
 	virtual void UpdatePlayerEvolutionHUD();
 	virtual void CheckEvolution();
 	virtual void Evolution(ZombieLevel iEvolutionLevel);
+	virtual std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char *name = nullptr);
 
 protected:
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;

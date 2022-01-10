@@ -58,6 +58,9 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zbb", DefaultFactory<CMod_ZombieBaseBuilder> },
 	{ "zbz", DefaultFactory<CMod_ZombieZ> },
 	{ "z4", DefaultFactory<CMod_ZombieIV> },
+
+	// custom
+	{ "zb3f2p", DefaultFactory<CMod_ZB3F2P> },
 };
 
 void InstallBteMod(const char *name)

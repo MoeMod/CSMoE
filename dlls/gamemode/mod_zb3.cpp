@@ -24,12 +24,16 @@ GNU General Public License for more details.
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
 
+#include "zb2/zb2_zclass_speed.h"
+#include "zb2/zb2_zclass_resident.h"
+
 #include "util/u_range.hpp"
 
 #include <vector>
 #include <algorithm>
 #include <functional>
 #include <random>
+#include <memory>
 
 namespace sv {
 
@@ -369,6 +373,56 @@ BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pA
 	} while (false);*/
 
 	return iReturn;
+}
+
+void CMod_ZB3F2P::InstallPlayerModStrategy(CBasePlayer *player)
+{
+	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3F2P(player, this));
+}
+
+void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
+{
+	if (!m_pPlayer->m_bIsZombie)
+	{
+		if(!RANDOM_LONG(0, 3))
+		{
+			// 电锯套 25%
+			m_pPlayer->GiveNamedItem("weapon_chainsaw");
+			m_pPlayer->GiveNamedItem("weapon_infinityex2");
+			m_pPlayer->GiveNamedItem("weapon_dragonsword");
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		}
+		else
+		{
+			// 龙炮套 75%
+			m_pPlayer->GiveNamedItem("weapon_cannon");
+			m_pPlayer->GiveNamedItem("weapon_infinityex2");
+			m_pPlayer->GiveNamedItem("weapon_skullaxe");
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		}
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+			GiveSlotAmmo(m_pPlayer, iSlot);
+		return;
+	}
+	return CPlayerModStrategy_ZB3::GiveDefaultItems();
+}
+
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFactory(ZombieLevel lv, const char *name)
+{
+	if(!strcmp(name, "random"))
+	{
+		if(!RANDOM_LONG(0, 3))
+		{
+			// 长手 25%
+			return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
+		}
+		else
+		{
+			// 芭比 75%
+			return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
+		}
+	}
+	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
 }
 
 }

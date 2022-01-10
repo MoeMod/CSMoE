@@ -86,8 +86,9 @@ constexpr std::array<unsigned int, NUM_ZCLASSES> MakeZClassWeightList(std::index
 }
 auto ZCLASSES_WEIGHT = MakeZClassWeightList(std::make_index_sequence<NUM_ZCLASSES>{});
 
-std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(CBasePlayer *player, ZombieLevel lv, const char *name)
+std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB2::ZombieClassFactory(ZombieLevel lv, const char *name)
 {
+	auto player = m_pPlayer;
 	if(name == nullptr)
 		return std::get<2>(g_FindList[0])(player, lv);
 

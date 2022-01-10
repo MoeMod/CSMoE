@@ -81,6 +81,21 @@ private:
 	bool m_bIsHero;
 };
 
+class CMod_ZB3F2P : public CMod_ZombieHero
+{
+public:
+	void InstallPlayerModStrategy(CBasePlayer *) override;
+	void PickHero() override {} // no hero
+};
+
+class CPlayerModStrategy_ZB3F2P : public CPlayerModStrategy_ZB3
+{
+public:
+	using CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3;
+	void GiveDefaultItems() override;
+	std::shared_ptr<CBaseZombieClass_ZB2> ZombieClassFactory(ZombieLevel lv, const char *name) override;
+};
+
 }
 
 #endif //PROJECT_MOD_ZB3_H

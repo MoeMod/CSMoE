@@ -376,7 +376,7 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 
 void CPlayerModStrategy_ZB2::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	auto sp = ZombieClassFactory(m_pPlayer, iEvolutionLevel, m_pPlayer->m_ZombieClass);
+	auto sp = ZombieClassFactory(iEvolutionLevel, m_pPlayer->m_ZombieClass);
 	m_pCharacter_ZB2 = sp;
 	m_pCharacter = sp;
 

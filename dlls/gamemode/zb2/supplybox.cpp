@@ -39,59 +39,6 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 
 		}
 	},
-#ifdef XASH_DEDICATED
-	{ "【朱雀】M249 缺开火动作属正常", [](CBasePlayer* p) {
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-		{
-			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		}
-		DropPrimary(p);
-		p->GiveNamedItem("weapon_buffm249");
-		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50az", 200);
-		p->GiveAmmo(iAmount, "50az", iAmount);
-		}
-	},
-	{ "【魂狩】猎弓", [](CBasePlayer* p) {
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-		{
-			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		}
-		DropPrimary(p);
-		p->GiveNamedItem("weapon_huntbow");
-		//int iAmount = p->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-		//p->GiveAmmo(iAmount, "556Nato", iAmount);
-		}
-	},
-	{ "神鬼开天", [](CBasePlayer* p) {
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-		{
-			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		}
-		p->RemovePlayerItem(p->m_rgpPlayerItems[KNIFE_SLOT]);
-		p->GiveNamedItem("knife_dgaxe");
-		}
-	},
-	{ "破碎炙炎EX 缺开火动作属正常", [](CBasePlayer* p) {
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-		{
-			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		}
-		DropPrimary(p);
-		p->GiveNamedItem("weapon_qbarrel");
-		int iAmount = p->m_pModStrategy->ComputeMaxAmmo("buckshot", MAX_AMMO_BUCKSHOT);
-		p->GiveAmmo(iAmount, "buckshot", iAmount);
-		}
-	},
-	{ "天罚-龙枪", [](CBasePlayer* p) {
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
-		{
-			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		}
-		p->RemovePlayerItem(p->m_rgpPlayerItems[KNIFE_SLOT]);
-		p->GiveNamedItem("knife_lance");
-		}
-	},
-#else
 	{ "Dual MP7A1", [](CBasePlayer* p) {
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT})
 		{
@@ -124,8 +71,7 @@ static std::pair<const char *, void(*)(CBasePlayer *p)> g_SupplyboxItems[]=
 			int iAmount = p->m_pModStrategy->ComputeMaxAmmo("50ae", MAX_AMMO_50AE);
 			p->GiveAmmo(iAmount, "50AE", iAmount);
 		}
-	},
-#endif
+	}
 };
 
 LINK_ENTITY_TO_CLASS(supplybox, CSupplyBox);
@@ -170,53 +116,58 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 	if (p->m_bIsVIP || p->m_bIsZombie)
 		return;
-#if 1
-	for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+
+	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
+	if(!strcmp(mod_str, "zb1"))
 	{
-		p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+		{
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+		}
+
+		DropPrimary(p);
+		DropSecondary(p);
+		p->RemoveAllItems(FALSE, false);
+		p->m_bHasPrimary = false;
+
+		const char* weapon_names_view[5];
+
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+		{
+			std::vector<MoEWeaponBuyInfo_s> candidate_list;
+			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			p->GiveNamedItem(info.pszClassName);
+			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
+			weapon_names_view[iSlot] = info.pszDisplayName;
+		}
+
+		p->GiveNamedItem("weapon_hegrenade");
+		p->GiveNamedItem("weapon_smokegrenade");
+		p->GiveNamedItem("weapon_flashbang");
+		p->GiveNamedItem("weapon_flashbang");
+
+		if (!(p->m_flDisplayHistory & DHF_NIGHTVISION))
+		{
+			p->HintMessage("#Hint_use_nightvision");
+			p->m_flDisplayHistory |= DHF_NIGHTVISION;
+		}
+		EMIT_SOUND(ENT(p->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
+		p->m_bHasNightVision = true;
+		SendItemStatus(p);
+
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2, %s3, %s4).", STRING(p->pev->netname), weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
+		ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1, %s2, %s3).", weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
 	}
-
-	DropPrimary(p);
-	DropSecondary(p);
-	p->RemoveAllItems(FALSE, false);
-	p->m_bHasPrimary = false;
-
-	const char* weapon_names_view[5];
-
-	for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+	else
 	{
-		std::vector<MoEWeaponBuyInfo_s> candidate_list;
-		std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-		std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
-		const MoEWeaponBuyInfo_s& info = candidate_list.front();
-		p->GiveNamedItem(info.pszClassName);
-		p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
-		weapon_names_view[iSlot] = info.pszDisplayName;
+		auto &nf = g_SupplyboxItems[RANDOM_LONG(0, std::extent<decltype(g_SupplyboxItems)>::value - 1)];
+		nf.second(p);
+
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2).", STRING(p->pev->netname), nf.first);
+		ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1).", nf.first);
 	}
-
-	p->GiveNamedItem("weapon_hegrenade");
-	p->GiveNamedItem("weapon_smokegrenade");
-	p->GiveNamedItem("weapon_flashbang");
-	p->GiveNamedItem("weapon_flashbang");
-
-	if (!(p->m_flDisplayHistory & DHF_NIGHTVISION))
-	{
-		p->HintMessage("#Hint_use_nightvision");
-		p->m_flDisplayHistory |= DHF_NIGHTVISION;
-	}
-	EMIT_SOUND(ENT(p->pev), CHAN_ITEM, "items/equip_nvg.wav", VOL_NORM, ATTN_NORM);
-	p->m_bHasNightVision = true;
-	SendItemStatus(p);
-
-	UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2, %s3, %s4).", STRING(p->pev->netname), weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
-	ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1, %s2, %s3).", weapon_names_view[PRIMARY_WEAPON_SLOT], weapon_names_view[PISTOL_SLOT], weapon_names_view[KNIFE_SLOT]);
-#else
-	auto &nf = g_SupplyboxItems[RANDOM_LONG(0, std::extent<decltype(g_SupplyboxItems)>::value - 1)];
-	nf.second(p);
-
-	UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s1 获得补给物品 (%s2).", STRING(p->pev->netname), nf.first);
-	ClientPrint(p->pev, HUD_PRINTCENTER, "你获得了补给物品 (%s1).", nf.first);
-#endif
 	
 	EMIT_SOUND(ENT(p->pev), CHAN_BODY, "zombi/get_box.wav", VOL_NORM, ATTN_NORM);
 
