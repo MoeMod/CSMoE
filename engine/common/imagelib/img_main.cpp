@@ -252,6 +252,9 @@ rgbdata_t *FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 
 	// HACKHACK: skip any checks, load file from buffer
 	if( filename[0] == '#' && buffer && size ) goto load_internal;
+	else if (buffer && !size) {
+		if(Q_strchr(filename, '@') || Q_strchr(filename, '#')) goto load_internal_ext;
+	}
 
 search_fs:
 
@@ -353,6 +356,29 @@ load_internal:
 					return ImagePack(); // loaded
 			}
 		}
+	}
+
+load_internal_ext:
+	if (!Q_stricmp(ext, "bmp"))
+	{
+		Q_sprintf(path, "%s.bmp", loadname);
+		image.hint = IL_HINT_HL;
+		f = FS_LoadFile(path, &filesize, gamedironly);
+		if (f && filesize > 0)
+		{
+			if (Image_LoadMDL_BMP(path, f, (size_t)filesize, buffer))
+			{
+				Mem_Free(f); // release buffer
+				return ImagePack(); // loaded
+			}
+			else Mem_Free(f); // release buffer 
+		}
+	}
+
+	if (gamedironly)
+	{
+		gamedironly = false;
+		goto load_internal_ext;
 	}
 
 	if( !image.loadformats || image.loadformats->ext == NULL )

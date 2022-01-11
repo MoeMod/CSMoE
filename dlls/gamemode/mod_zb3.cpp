@@ -384,12 +384,14 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 {
 	if (!m_pPlayer->m_bIsZombie)
 	{
+		m_pPlayer->RemoveAllItems(FALSE);
+		m_pPlayer->m_bHasPrimary = false;
 		if(!RANDOM_LONG(0, 3))
 		{
 			// 电锯套 25%
 			m_pPlayer->GiveNamedItem("weapon_chainsaw");
 			m_pPlayer->GiveNamedItem("weapon_infinityex2");
-			m_pPlayer->GiveNamedItem("weapon_dragonsword");
+			m_pPlayer->GiveNamedItem("knife_dragonsword");
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 		else
@@ -397,7 +399,7 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 			// 龙炮套 75%
 			m_pPlayer->GiveNamedItem("weapon_cannon");
 			m_pPlayer->GiveNamedItem("weapon_infinityex2");
-			m_pPlayer->GiveNamedItem("weapon_skullaxe");
+			m_pPlayer->GiveNamedItem("knife_skullaxe");
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })

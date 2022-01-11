@@ -47,9 +47,9 @@ void CZombieBomb2::Spawn(void)
 
 void CZombieBomb2::Precache(void)
 {
-	PRECACHE_MODEL("models/v_zombibomb.mdl");
-	PRECACHE_MODEL("models/w_zombibomb.mdl");
-	PRECACHE_MODEL("models/p_zombibomb.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb.mdl");
+	PRECACHE_MODEL("models/@frogvari_w_zombibomb.mdl");
+	PRECACHE_MODEL("models/@frogvari_p_zombibomb.mdl");
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_hegrenade.mdl");
 #endif
@@ -92,7 +92,7 @@ BOOL CZombieBomb2::Deploy(void)
 		return DefaultDeploy("models/shield/v_shield_hegrenade.mdl", "models/shield/p_shield_hegrenade.mdl", HEGRENADE_DRAW, "shieldgren", UseDecrement() != FALSE);
 	else
 #endif
-		return DefaultDeploy("models/v_zombibomb.mdl", "models/p_zombibomb.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
+		return DefaultDeploy("models/@frogvari_v_zombibomb.mdl", "models/@frogvari_p_zombibomb.mdl", HEGRENADE_DRAW, "grenade", UseDecrement() != FALSE);
 }
 
 BOOL CZombieBomb2::CanHolster(void)
@@ -154,9 +154,9 @@ void CZombieBomb2::WeaponIdle(void)
 		UTIL_MakeVectors(angThrow);
 		Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
-		auto time = 1.5s;
+
 #ifndef CLIENT_DLL
-		//CGrenade::ShootZombiBomb2(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, NULL, 50.0);
+		CGrenade::ShootZombiBomb2(m_pPlayer->pev, vecSrc, vecThrow, 4.0s, m_pPlayer->m_iTeam, NULL, 50.0);
 #endif
 
 		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);

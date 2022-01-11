@@ -171,6 +171,15 @@ namespace sv {
 #endif
 
 class CBasePlayer;
+class CCSBot;
+
+#define	DMGFLAG_CTONLY		(1<<0)
+#define	DMGFLAG_TRONLY		(1<<1)
+#define	DMGFLAG_NOBOOST	(1<<2)
+#define	DMGFLAG_DECAY		(1<<3)
+#define	DMGFLAG_NOPUNCH	(1<<4)
+#define	DMGFLAG_NOSHAKE		(1<<5)
+#define	DMGFLAG_TRACECHECK	(1<<6)
 
 template<> struct PrivateData<class CGrenade, CBaseMonster>
 {
@@ -211,6 +220,7 @@ public:
 	int BloodColor() override { return DONT_BLEED; }
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 	virtual void BounceSound();
+	void KickRate(entvars_t *pevInflictor, entvars_t *pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost);
    
 public:
 	enum SATCHELCODE
@@ -534,6 +544,9 @@ public:
 	virtual WeaponCrosshairData GetCrosshairData(void) { return { 0, 0, 0, 0 }; }
 #endif
 
+	virtual void OnBotStrategy(CCSBot *bot) {}
+	virtual int GetPriority() { return 1; }
+	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];

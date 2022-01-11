@@ -137,9 +137,13 @@ void CZombieClass_Speed::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
-		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-s.mdl");
+			break;
+		}
+		case WEAPON_SMOKEGRENADE:
+		{
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb-s.mdl");
 			break;
 		}
 		default:

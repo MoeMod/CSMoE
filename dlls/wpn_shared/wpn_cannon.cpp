@@ -57,7 +57,8 @@ int CCannon::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 {
 	if (m_iDefaultAmmo)
 	{
-		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
+		if(m_pPlayer)
+			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
 		m_iClip = WEAPON_NOCLIP;
 		m_iDefaultAmmo = 0;
 		return TRUE;
@@ -147,4 +148,32 @@ float CCannon::GetDamage()
 	return 410;
 }
 
+#ifndef CLIENT_DLL
+void CCannon::OnBotStrategy(CCSBot* bot)
+{
+}
+
+int CCannon::GetPriority()
+{
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
+		return 0;
+
+	if (m_flNextPrimaryAttack > UTIL_WeaponTimeBase())
+		return 0;
+
+	return 1;
+}
+
+int CCannon::GetPriorityByTarget(CBaseEntity* target)
+{
+	if (!GetPriority())
+		return 0;
+
+	float flDistance = (m_pPlayer->pev->origin - target->pev->origin).Length();
+	if (flDistance > 405.0f)
+		return 0;
+
+	return 1;
+}
+#endif
 }

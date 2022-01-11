@@ -138,9 +138,13 @@ void CZombieClass_Witch::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
-		case WEAPON_SMOKEGRENADE:
 		{
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_witch.mdl");
+			break;
+		}
+		case WEAPON_SMOKEGRENADE:
+		{
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_witch.mdl");
 			break;
 		}
 		default:

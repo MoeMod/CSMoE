@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.security.MessageDigest;
 
+import in.celest.xash3d.csbtem.BuildConfig;
 import in.celest.xash3d.csbtem.R;
 import in.celest.xash3d.XashConfig;
 import in.celest.xash3d.JoystickHandler;
@@ -140,8 +141,11 @@ public class XashActivity extends Activity {
 
 		CrashReport.UserStrategy strategy = new CrashReport.UserStrategy(getApplicationContext());
 		strategy.setAppVersion(String.valueOf(nativeGetBuildVersion()));
+		strategy.setEnableNativeCrashMonitor(true);
+
 
 		CrashReport.initCrashReport(getApplicationContext(), "39df575b0b", false, strategy);
+		CrashReport.setIsDevelopmentDevice(getApplicationContext(), BuildConfig.DEBUG);
 
 		//if(checkExtractAssets())
 			launchSurfaceAndEngine();

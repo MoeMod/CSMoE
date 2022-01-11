@@ -2532,4 +2532,119 @@ void CBaseMonster::BloodSplat(const Vector &vecSrc, const Vector &vecDir, int Hi
 	MESSAGE_END();
 }
 
+void DamageWithKickRate(CBasePlayer* pPlayer, const Vector& vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost)
+{
+	if ((flags & DMGFLAG_CTONLY) && pPlayer->m_iTeam == TEAM_TERRORIST)
+		return;
+
+	if ((flags & DMGFLAG_TRONLY) && pPlayer->m_iTeam == TEAM_CT)
+		return;
+
+	Vector vecDir = pPlayer->pev->origin - vecSrc;
+
+	if (vecDir.IsLengthGreaterThan(flRadius))
+		return;
+
+	if (flags & DMGFLAG_TRACECHECK)
+	{
+		TraceResult tr;
+
+		UTIL_TraceLine(vecSrc, pPlayer->pev->origin, ignore_monsters, ENT(pevInflictor), &tr);
+
+		if (tr.flFraction != 1.0 && tr.pHit != pPlayer->edict())
+			return;
+	}
+
+	float flReversedDist = vecDir.LengthReverse();
+	float falloff = (flRadius - (1.0 / flReversedDist)) / flRadius;
+
+	if (falloff < 0.0)
+		falloff = 0.0;
+
+	if (flags & DMGFLAG_DECAY)
+		flDamage *= falloff;
+
+	if (flDamage)
+	{
+		pPlayer->TakeDamage(pevInflictor, pevAttacker, flDamage, (pevAttacker->flags & FL_CLIENT) ? DMG_EXPLOSION : DMG_BLAST);
+	}
+
+	if (!(flags & DMGFLAG_NOBOOST))
+	{
+		vecDir = vecDir * flReversedDist;
+
+		float flMaxKickRate;
+		if (!pPlayer->m_bIsZombie && pPlayer->pev->deadflag == DEAD_NO)
+		{
+			flMaxKickRate = ((rand() % 10) / 10.0 + 1.5) * flKickRate;
+
+			if (flKickRate * 1.2 > flMaxKickRate * falloff)
+			{
+				falloff = 1.0;
+				flMaxKickRate = flKickRate * 1.2;
+			}
+		}
+		else
+		{
+			flMaxKickRate = flKickRate;
+		}
+
+		Vector vecKickRate = vecDir * flMaxKickRate * falloff;
+
+		if (!FBitSet(pPlayer->pev->flags, FL_ONGROUND))
+			vecKickRate = vecKickRate * 0.9;
+		else if (FBitSet(pPlayer->pev->flags, FL_DUCKING))
+			vecKickRate = vecKickRate * 0.8;
+
+		pPlayer->pev->velocity += vecKickRate;
+
+		if (flBoost)
+		{
+			pPlayer->pev->velocity.z = (falloff * 0.8 + 0.2) * flBoost;
+		}
+	}
+
+	if (!(flags & DMGFLAG_NOSHAKE))
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pPlayer->pev);
+		WRITE_SHORT(0xA000);
+		WRITE_SHORT(0x2000);
+		WRITE_SHORT(0x6400);
+		MESSAGE_END();
+	}
+
+	/*if (!(flags & DMGFLAG_NOPUNCH))
+	{
+		pPlayer->pev->punchangle.x = (RANDOM_LONG(0, 1) ? 1 : -1) * 20.0f * falloff;
+		pPlayer->pev->punchangle.z = (RANDOM_LONG(0, 1) ? 1 : -1) * 35.0f * falloff;
+	}*/
+}
+
+void CGrenade::KickRate(entvars_t* pevInflictor, entvars_t* pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost)
+{
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	pev->origin.z -= 20.0;
+
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer* pPlayer = (CBasePlayer*)UTIL_PlayerByIndex(i);
+
+		if (!pPlayer)
+			continue;
+
+		if (!pPlayer->pev)
+			continue;
+
+		if (OFFSET(pPlayer->pev) == eoNullEntity)
+			continue;
+
+		if (pPlayer->IsDormant())
+			continue;
+
+		DamageWithKickRate(pPlayer, pev->origin, pevInflictor, pevAttacker, flKickRate, flRadius, flDamage, flags, flBoost);
+	}
+}
+
 }

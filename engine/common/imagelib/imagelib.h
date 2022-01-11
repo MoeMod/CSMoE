@@ -302,6 +302,7 @@ qboolean Image_LoadFNT( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadDDS( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize );
+qboolean Image_LoadMDL_BMP( const char *name, const byte *buffer, size_t filesize, const byte* ptexture );
 
 //
 // formats save

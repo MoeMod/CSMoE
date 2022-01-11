@@ -120,6 +120,32 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 		m_iPoint = 99;
 		return true;
 	}
+	else if (!Q_stricmp(pcmd, "zombie"))
+	{
+		const char* pszArg1 = CMD_ARGV_(1);
+		if (pszArg1)
+			m_pPlayer->m_ZombieClass = pszArg1;
+		else
+			m_pPlayer->m_ZombieClass = "random";
+
+		m_pPlayer->pev->sequence = 0;
+		m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
+		m_pPlayer->pev->armorvalue = 3000;
+		return true;
+	}
+	else if (!Q_stricmp(pcmd, "human"))
+	{
+		m_pPlayer->m_bIsZombie = false;
+		BecomeHuman();
+		m_pPlayer->GiveDefaultItems();
+		return true;
+	}
+	else if (!Q_stricmp(pcmd, "spawn"))
+	{
+		m_pPlayer->RoundRespawn();
+		return true;
+	}
 #endif
 
 	if (!m_pPlayer->m_bIsZombie)

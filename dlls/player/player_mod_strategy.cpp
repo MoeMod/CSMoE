@@ -341,16 +341,21 @@ void CPlayerModStrategy_Zombie::DeathSound()
 float CPlayerModStrategy_Zombie::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
 	// grenade damage 5x in zb mode
-	if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
+	if (bitsDamageType & DMG_EXPLOSION)
 	{
-		if (bitsDamageType & DMG_EXPLOSION)
+		CBasePlayer* pPlayerAttacker = dynamic_ent_cast<CBasePlayer*>(pevAttacker);
+		if (pPlayerAttacker && !pPlayerAttacker->m_bIsZombie)
 		{
-			if (m_pPlayer->m_bIsZombie)
-				flDamage *= 5.0f;
-			else
-				flDamage *= 2.5f;
+			if (g_pModRunning->DamageTrack() == DT_ZB && !Q_strcmp(STRING(pevInflictor->classname), "grenade"))
+			{
+				if (m_pPlayer->m_bIsZombie)
+					flDamage *= 5.0f;
+				else
+					flDamage *= 2.5f;
+			}
 		}
 	}
+
 	return CPlayerModStrategy_Default::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -381,7 +386,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 
 	m_pPlayer->GiveNamedItem("weapon_zombibomb");
 	m_pPlayer->GiveNamedItem("knife_zombi");
-	//m_pPlayer->GiveNamedItem("weapon_zombibomb2");
+	m_pPlayer->GiveNamedItem("weapon_zombibomb2");
 	
 
 	if (!(m_pPlayer->m_flDisplayHistory & DHF_NIGHTVISION))

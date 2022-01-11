@@ -465,14 +465,14 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 		return;
 	}
 
-	if (pPlayer->m_bIsZombie && m_iId != WEAPON_KNIFE && Q_strcmp(STRING(pev->classname), "weapon_zombibomb"))
+	if (pPlayer->m_bIsZombie && m_iId != WEAPON_KNIFE && Q_strcmp(STRING(pev->classname), "weapon_zombibomb") && Q_strcmp(STRING(pev->classname), "weapon_zombibomb2"))
 	{
 		return;
 	}
-	if(!pPlayer->m_bIsZombie)
+
+	if (!pPlayer->m_bIsZombie && (!Q_strcmp(STRING(pev->classname), "weapon_zombibomb") || !Q_strcmp(STRING(pev->classname), "weapon_zombibomb2")))
 	{
-		if (!Q_strcmp(STRING(pev->classname), "weapon_zombibomb"))
-			return;
+		return;
 	}
 
 	// can I have this?

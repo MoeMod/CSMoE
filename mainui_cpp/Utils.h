@@ -37,7 +37,9 @@ GNU General Public License for more details.
 // How did I ever live without ASSERT?
 //
 #ifdef _DEBUG
+namespace ui {
 void DBG_AssertFunction( bool fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage );
+}
 #define ASSERT( f )		DBG_AssertFunction( f, #f, __FILE__, __LINE__, NULL )
 #define ASSERTSZ( f, sz )	DBG_AssertFunction( f, #f, __FILE__, __LINE__, sz )
 #else
@@ -184,7 +186,9 @@ inline size_t Q_strncpy( char *dst, const char *src, size_t size )
 	return ( s - src - 1 ); // count does not include NULL
 }
 
+#ifndef ARRAYSIZE
 #define ARRAYSIZE( x ) ( sizeof( x ) / sizeof( x[0] ) )
+#endif
 
 #ifdef register
 #undef register

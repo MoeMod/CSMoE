@@ -189,6 +189,28 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibomb_resident.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_witch.mdl");
 
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-deimos2.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-deimos.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-deimos_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-s.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibombpc.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-heal.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb-h.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_teleport_zombi.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_teleport_zombi_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_booster_zombi.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_booster_zombi_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_china.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_pass_zombi.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_pass_zombi_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_flyingzombi.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_flyingzombi_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_revival.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_revival_host.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_undertaker.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_resident.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_witch.mdl");
+
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
 	PRECACHE_MODEL("models/player/speed_zombi_origin/speed_zombi_origin.mdl");

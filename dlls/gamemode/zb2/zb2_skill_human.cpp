@@ -55,9 +55,15 @@ public:
 
 	void Activate() override
 	{
+		if (g_pGameRules->IsFreezePeriod() || !g_pModRunning->IsGameStarted())
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "倒计时结束之前无法使用");
+			return;
+		}
+		
 		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
 		{
-			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Sprint' skill can only be used once per round."); // #CSO_CantSprintUsed
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "每回合只能使用一次<极速飞奔>技能"); // #CSO_CantSprintUsed
 			return;
 		}
 
@@ -135,9 +141,15 @@ public:
 
 	void Activate() override
 	{
+		if (g_pGameRules->IsFreezePeriod() || !g_pModRunning->IsGameStarted())
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "倒计时结束之前无法使用");
+			return;
+		}
+
 		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
 		{
-			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'HeadShot' skill can only be used once per round."); // #CSO_CantSprintUsed
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "一回合只能使用一次<致命一击>技能"); // #CSO_CantSprintUsed
 			return;
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
@@ -185,9 +197,14 @@ public:
 
 	void Activate() override
 	{
+		if (g_pGameRules->IsFreezePeriod() || !g_pModRunning->IsGameStarted())
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "倒计时结束之前无法使用");
+			return;
+		}
 		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
 		{
-			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Knife2x' skill can only be used once per round."); // #CSO_CantSprintUsed
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "一回合只能使用一次<屠戮之刃>技能"); // #CSO_CantKnife2XUsed
 			return;
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;

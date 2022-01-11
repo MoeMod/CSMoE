@@ -100,8 +100,8 @@ namespace sv {
 			{
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-				return TRUE;
 			}
+			return TRUE;
 		}
 
 		int GetItemInfo(ItemInfo* p) override;

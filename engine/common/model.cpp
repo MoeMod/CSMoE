@@ -2955,21 +2955,58 @@ Mod_FindName
 model_t *Mod_FindName( const char *filename, qboolean create )
 {
 	model_t	*mod;
-	char	name[64];
+	char	name[MAX_MODEL_NAME];
 	int	i;
 	
 	if( !filename || !filename[0] )
 		return NULL;
 
 	if( *filename == '!' ) filename++;
-	Q_strncpy( name, filename, sizeof( name ));
+	Q_strncpy( name, filename, MAX_MODEL_NAME);
 	COM_FixSlashes( name );
-		
+
+	char* s = name;
+	// 加载模型的时候就确定好贴图前缀(@frogvari_) -> (models/@frogvari_v_zombibomb.mdl)，找到第一个'@'为开始和第一个'_'为结尾，作为贴图前缀
+	int start = -1, end = 0, pos = 0;
+	while (*s != '\0')
+	{
+		if (*s == '@')
+		{
+			start = pos;
+		}
+		else if (start != -1 && *s == '_')
+		{
+			end = pos;
+			break;
+		}
+
+		++pos;
+		++s;
+	}
+
+	char suffix[MAX_MODEL_SUFFIX], origin_name[MAX_MODEL_NAME];
+	if (end)
+	{
+		memset(suffix, 0, MAX_MODEL_SUFFIX);
+		memset(origin_name, 0, MAX_MODEL_SUFFIX);
+		Q_strncpy(suffix, name + start, min(MAX_MODEL_SUFFIX, end - start + 1));
+		Q_strncpy(origin_name, name, start);
+		Q_strncat(origin_name, name + start + Q_strlen(suffix), MAX_MODEL_NAME);
+	}
+
 	// search the currently loaded models
 	for( i = 0, mod = cm_models; i < cm_nummodels; i++, mod++ )
 	{
 		if( !mod->name[0] ) continue;
 		if( !Q_stricmp( mod->name, name ))
+		{
+			// prolonge registration
+			mod->needload = world.load_sequence;
+			return mod;
+		}
+
+		if (!mod->suffix[0]) continue;
+		if (end != 0 && !Q_stricmp(mod->suffix, suffix) && !Q_stricmp(origin_name, mod->name))
 		{
 			// prolonge registration
 			mod->needload = world.load_sequence;
@@ -2988,13 +3025,24 @@ model_t *Mod_FindName( const char *filename, qboolean create )
 
 	if( i == cm_nummodels )
 	{
-		if( cm_nummodels == MAX_MODELS )
-			Host_Error( "Mod_ForName: MAX_MODELS limit exceeded\n" );
+		if (cm_nummodels == MAX_MODELS)
+		{
+			Cmd_ExecuteString("dumpprecache\n", src_command);
+			Host_Error("Mod_ForName: MAX_MODELS limit exceeded\n");
+		}
 		cm_nummodels++;
 	}
 
 	// copy name, so model loader can find model file
-	Q_strncpy( mod->name, name, sizeof( mod->name ));
+	if (end)
+	{
+		Q_strncpy(mod->name, origin_name, MAX_MODEL_NAME);
+		Q_strncpy(mod->suffix, suffix, MAX_MODEL_SUFFIX);
+	}
+	else
+	{
+		Q_strncpy(mod->name, name, MAX_MODEL_NAME);
+	}
 
 	return mod;
 }

@@ -425,6 +425,7 @@ void CMod_Zombi::PickZombieOrigin()
 		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
 	}
+	TeamCheck();
 
 	// sound effect
 	InfectionSound();

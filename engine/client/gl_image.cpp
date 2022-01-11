@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #include <list>
 #include <unordered_map>
 #include <variant>
-#include <numeric>
+#include <optional>
 #include <memory>
 #include "mod_decryptor.h"
 #include "mod_extend_seq.h"
@@ -1608,8 +1608,8 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 	if (tex->name[0] != '*')
 		tex->refCount = 1;
 
-	if( flags & TF_SKYSIDE )
-		tex->texnum = tr.skyboxbasenum++;
+	if (flags & TF_SKYSIDE)
+		tex->texnum = i;//tr.skyboxbasenum++;
 	else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 	GL_UploadTexture( pic, tex, false, filter );
@@ -1676,6 +1676,7 @@ int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, 
 namespace xe {
 	struct texlru_src_external_s {
 		std::string path;
+		mstudiotexture_t texture;
 	};
 	struct texlru_src_internal_s {
 		std::string texture_name;
@@ -1689,7 +1690,7 @@ namespace xe {
 		std::variant<texlru_src_external_s, texlru_src_internal_s> src;
 	};
 
-	int TexLru_LoadTextureExternal(const char *name, int flags, imgfilter_t *filter)
+	int TexLru_LoadTextureExternal(const char *name, mstudiotexture_t *ptexture, int flags, imgfilter_t *filter)
 	{
 		uint		picFlags = 0;
 
@@ -1722,13 +1723,6 @@ namespace xe {
 		if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
 			flags |= TF_NEAREST;
 
-		rgbdata_t *pic = FS_LoadImage( name, nullptr, 0 );
-		if(!pic)
-		{
-			// texture not found
-			return 0;
-		}
-
 		i = GL_AllocateTextureSlot(name);
 
 		auto tex = &r_textures[i];
@@ -1740,16 +1734,11 @@ namespace xe {
 			tex->refCount = 1;
 
 		if( flags & TF_SKYSIDE )
-			tex->texnum = tr.skyboxbasenum++;
+			tex->texnum = i;//tr.skyboxbasenum++;
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
-		tex->width = pic->width;
-		tex->height = pic->height;
-
-		// we load texture file just for its width & height, so free it now
-		FS_FreeImage(pic);
 
 		// add to lru
-		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name } });
+		tex->texlru_extdata = std::make_unique<texlru_extdata_s>(texlru_extdata_s{ i, filter, texlru_src_external_s{ name, *ptexture } });
 
 		// NOTE: always return texnum as index in array or engine will stop work !!!
 		return i;
@@ -1792,15 +1781,13 @@ namespace xe {
 		gltexture_t	*tex = &r_textures[i];
 		Q_strncpy( tex->name, name, sizeof( tex->name ));
 		tex->flags = (texFlags_t)flags;
-		tex->width = ptexture->width;
-		tex->height = ptexture->height;
 
 		// init reference exclude brush model's texture
 		if (tex->name[0] != '*')
 			tex->refCount = 1;
 
 		if( flags & TF_SKYSIDE )
-			tex->texnum = tr.skyboxbasenum++;
+			tex->texnum = i;//tr.skyboxbasenum++;
 		else tex->texnum = i; // texnum is used for fast acess into r_textures array too
 
 		// add to lru
@@ -1830,7 +1817,7 @@ namespace xe {
 		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
 		{
 			int flags = tex->flags;
-			rgbdata_t *pic = FS_LoadImage( src.path.c_str(), nullptr, 0 );
+			rgbdata_t *pic = FS_LoadImage( src.path.c_str(), (byte*)&src.texture, 0 );
 			if( !pic )
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
@@ -1844,7 +1831,6 @@ namespace xe {
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
 			// set size for external texture
-			ptexture->index = tex->texnum;
 			ptexture->width = tex->width;
 			ptexture->height = tex->height;
 
@@ -1901,10 +1887,10 @@ namespace xe {
 	public:
 		typedef Key key_type;
 		typedef Value value_type;
-		typedef std::vector<key_type> list_type;
+		typedef std::list<key_type> list_type;
 		typedef std::unordered_map<
 				key_type,
-				value_type
+				std::pair<value_type, typename list_type::iterator>
 		> map_type;
 
 		lru_cache(size_t capacity)
@@ -1931,7 +1917,7 @@ namespace xe {
 			return m_map.empty();
 		}
 
-		bool contains(const key_type &key) const
+		bool contains(const key_type &key)
 		{
 			return m_map.find(key) != m_map.end();
 		}
@@ -1947,31 +1933,49 @@ namespace xe {
 				}
 
 				// insert the new item
-				m_list.push_back(key);
-				m_map[key] = value;
+				m_list.push_front(key);
+				m_map[key] = std::make_pair(value, m_list.begin());
 			}
 		}
 
 		void remove(const key_type &key)
 		{
-			m_list.erase(std::remove(m_list.begin(), m_list.end(), key), m_list.end());
-			m_map.erase(key);
+			auto i = m_map.find(key);
+			auto i2 = i->second.second;
+			m_list.erase(i2);
+			m_map.erase(i);
 		}
 
-		bool update(const key_type &key)
+		std::optional<value_type> get(const key_type &key)
 		{
 			// lookup value in the cache
 			auto i = m_map.find(key);
 			if(i == m_map.end()){
 				// value not in cache
-				return false;
+				return std::nullopt;
 			}
 
 			// return the value, but first update its place in the most
 			// recently used list
-			auto iter = std::find(m_list.begin(), m_list.end(), key);
-			std::rotate(iter, iter + 1, m_list.end());
-			return true;
+			auto j = i->second.second;
+			if(j != m_list.begin()){
+				// move item to the front of the most recently used list
+				m_list.erase(j);
+				m_list.push_front(key);
+
+				// update iterator in map
+				j = m_list.begin();
+				const value_type &value = i->second.first;
+				m_map[key] = std::make_pair(value, j);
+
+				// return the value
+				return value;
+			}
+			else {
+				// the item is already at the front of the most recently
+				// used list so just return it
+				return i->second.first;
+			}
 		}
 
 		void clear()
@@ -1984,9 +1988,9 @@ namespace xe {
 		void evict()
 		{
 			// evict item from the end of most recently used list
-			auto mid = m_list.begin() + m_list.size() / 2;
-			std::for_each(m_list.begin(), mid, [&](const key_type &key){ m_map.erase(key); });
-			m_list.erase(m_list.begin(), mid);
+			typename list_type::iterator i = --m_list.end();
+			m_map.erase(*i);
+			m_list.erase(i);
 		}
 
 	private:
@@ -1995,35 +1999,29 @@ namespace xe {
 		const size_t m_capacity;
 	};
 
-	static lru_cache<gltexture_t *, std::shared_ptr<gltexture_t>> textureCache(256);
+	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(256);
 
 	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
 	{
 		int texnum = ptexture->index;
 		gltexture_t	*tex = &r_textures[texnum];
-
 		if(!tex->texlru_extdata)
 			return; // unknown texture
 
-		if(textureCache.update(tex))
+		if(textureCache.contains((GLuint)texnum))
 			return; // already present
 
 		auto &lrudata = *tex->texlru_extdata;
 		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
-		textureCache.insert(tex, std::move(deleter));
-	}
-
-	void TexLru_Free( gltexture_t *tex )
-	{
-		tex->texlru_extdata = nullptr;
-		if(textureCache.contains(tex))
-			textureCache.remove(tex);
+		textureCache.insert((GLuint)texnum, std::move(deleter));
 	}
 
 	void TexLru_Free( int texnum )
 	{
 		gltexture_t	*tex = &r_textures[texnum];
-		return TexLru_Free(tex);
+		tex->texlru_extdata = nullptr;
+		if(textureCache.contains(texnum))
+			textureCache.remove(texnum);
 	}
 }
 
@@ -2184,6 +2182,8 @@ void GL_FreeTexture( GLenum texnum )
 		return;
 
 	ASSERT( texnum > 0 && texnum < R_TextureNum() );
+	if (texnum >= R_TextureNum())
+		return;
 	R_FreeImage( &r_textures[texnum] );
 }
 #if 0 // Uncle Mike removed this
@@ -4166,10 +4166,17 @@ void R_FreeImage( gltexture_t *image )
 		return;
 	}
 
-	xe::TexLru_Free( image );
+	auto iter = r_texturesHashTable.find(image->name);
+	if (iter == r_texturesHashTable.end())
+	{
+		MsgDev(D_ERROR, "couldn't find %i %s\n", image->texnum, image->name);
+		return;
+	}
+
+	xe::TexLru_Free( image->texnum );
 
 	// remove from hash table
-	auto iter = r_texturesHashTable.find(image->name);
+	iter = r_texturesHashTable.find(image->name);
 	if(iter != r_texturesHashTable.end())
 	{
 		r_texturesHashTable.erase(iter);
@@ -4179,7 +4186,6 @@ void R_FreeImage( gltexture_t *image )
 	if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
 		FS_FreeImage( image->original );
 
-	MsgDev( D_INFO, "R_FreeImage %i %s\n", image->texnum, image->name );
 	pglDeleteTextures( 1, &image->texnum );
 	Q_memset( image, 0, sizeof( *image ));
 }

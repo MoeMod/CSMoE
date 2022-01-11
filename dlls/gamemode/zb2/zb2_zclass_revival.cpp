@@ -137,12 +137,19 @@ void CZombieClass_Revival::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
-		case WEAPON_SMOKEGRENADE:
 		{
 			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_revival_host.mdl");
 			else
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_revival.mdl");
+			break;
+		}
+		case WEAPON_SMOKEGRENADE:
+		{
+			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_revival_host.mdl");
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_revival.mdl");
 			break;
 		}
 		default:

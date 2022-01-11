@@ -30,6 +30,7 @@ typedef vec_t		vec2_t[2];
 #define ZISCALE		((float)0x8000)
 
 #define MAX_MODEL_NAME		64
+#define MAX_MODEL_SUFFIX		32
 
 #define	MIPLEVELS			4
 #define VERTEXSIZE		7
@@ -333,6 +334,8 @@ typedef struct model_s
 	// additional model data
 	//
 	cache_user_t	cache;		// only access through Mod_Extradata
+
+	char		suffix[MAX_MODEL_SUFFIX];
 
 } model_t;
 

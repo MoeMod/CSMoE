@@ -68,16 +68,7 @@ int main( int argc, char** argv )
 	system("chcp 65001");
 	system("cls");
 #endif
-	char gamedir_buf[32] = "";
-	const char *gamedir = getenv("XASH3D_GAMEDIR");
-
-	if(!gamedir)
-		gamedir = "cstrike";
-	else
-	{
-		strncpy( gamedir_buf, gamedir, 32 );
-		gamedir = gamedir_buf;
-	}
+	const char *gamedir = "csmoe";
 
 #ifdef __EMSCRIPTEN__
 #ifdef EMSCRIPTEN_LIB_FS

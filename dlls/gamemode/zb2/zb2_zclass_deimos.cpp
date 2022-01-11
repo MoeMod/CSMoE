@@ -143,12 +143,19 @@ void CZombieClass_Deimos::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
-		case WEAPON_SMOKEGRENADE:
 		{
 			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-deimos_host.mdl");
 			else
 				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb-deimos.mdl");
+			break;
+		}
+		case WEAPON_SMOKEGRENADE:
+		{
+			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb-deimos_host.mdl");
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb-deimos.mdl");
 			break;
 		}
 		default:

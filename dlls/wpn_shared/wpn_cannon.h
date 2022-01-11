@@ -65,6 +65,9 @@ public:
 	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
+	void OnBotStrategy(CCSBot* bot) override;
+	int GetPriority() override;
+	int GetPriorityByTarget(CBaseEntity* target) override;
 #endif
 
 public:

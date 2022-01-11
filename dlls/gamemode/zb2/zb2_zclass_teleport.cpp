@@ -120,12 +120,19 @@ void CZombieClass_Teleport::OnWeaponDeploy(CBasePlayerItem *item)
 			break;
 		}
 		case WEAPON_HEGRENADE:
+		{
+			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_teleport_zombi_host.mdl");
+			else
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_teleport_zombi.mdl");
+			break;
+		}
 		case WEAPON_SMOKEGRENADE:
 		{
 			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
-				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_teleport_zombi_host.mdl");			
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_teleport_zombi_host.mdl");			
 			else
-				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_zombibomb_teleport_zombi.mdl");				
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_teleport_zombi.mdl");				
 			break;
 		}
 		default:

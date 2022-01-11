@@ -3912,7 +3912,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		if( FS_FileExists( texname, false ))
 		{
 			//gl_texturenum = GL_LoadTexture( texname, NULL, 0, flags, filter );
-			gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+			gl_texturenum = xe::TexLru_LoadTextureExternal(texname, NULL, flags, filter);
 		}
 
 		if( gl_texturenum )
@@ -3928,13 +3928,23 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		int	gl_texturenum = 0;
 		do
 		{
-			if (Q_strstr(mod->name, "balrog11b"))
+			if (mod->suffix[0])
+			{
+				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
+				if (FS_FileExists(texname, false))
+				{
+					//gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+					break;
+				}
+			}
+			else if (Q_strstr(mod->name, "balrog11b"))
 			{
 				sprintf(texname, "models/texture/@balrog11b_%s.bmp", name);
 				if (FS_FileExists(texname, false))
 				{
 					//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
-					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
 					break;
 				}
 			}
@@ -3943,7 +3953,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			if (FS_FileExists(texname, false))
 			{
 				//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
-				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
 				break;
 			}
 
@@ -3951,7 +3961,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			if (FS_FileExists(texname, false))
 			{
 				//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
-				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, flags, filter);
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
 				break;
 			}
 			break;

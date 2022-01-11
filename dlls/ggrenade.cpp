@@ -776,6 +776,12 @@ void CGrenade::SlideTouch(CBaseEntity *pOther)
 
 void CGrenade::BounceSound()
 {
+	if (pev->dmg >= 999)
+	{
+		EMIT_SOUND(ENT(pev), CHAN_VOICE, RANDOM_LONG(0, 1) ? "zombi/zombi_bomb_bounce_2.wav" : "zombi/zombi_bomb_bounce_1.wav", 0.25, ATTN_NORM);
+		return;
+	}
+
 	if (pev->dmg > 50.0f)
 	{
 		EMIT_SOUND(ENT(pev), CHAN_VOICE, "weapons/he_bounce-1.wav", 0.25, ATTN_NORM);
@@ -1057,8 +1063,6 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->angles = pevOwner->angles;
 	pGrenade->pev->owner = ENT(pevOwner);
 
-	//pGrenade->m_usEvent = usEvent;
-
 	pGrenade->SetTouch(&CGrenade::BounceTouch);
 
 	pGrenade->pev->sequence = RANDOM_LONG(1, 3);
@@ -1068,7 +1072,7 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->m_fSequenceLoops = TRUE;
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
-	pGrenade->pev->dmg = 998;
+	pGrenade->pev->dmg = 999;
 	pGrenade->pev->health = 50;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
@@ -1085,15 +1089,36 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 
 CGrenade* CGrenade::ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, float flDamage)
 {
-	CGrenade* pGrenade = ShootTimed3(pevOwner, vecStart, vecVelocity, time, iTeam, usEvent, 0);
+	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
+	pGrenade->Spawn();
+	
+	SET_MODEL(ENT(pGrenade->pev), "models/@frogvari_w_zombibomb.mdl");
+	UTIL_SetOrigin(pGrenade->pev, vecStart);
+	pGrenade->pev->velocity = vecVelocity;
+	pGrenade->pev->angles = pevOwner->angles;
+	pGrenade->pev->owner = ENT(pevOwner);
 
-	SET_MODEL(ENT(pGrenade->pev), "models/w_zombibomb2.mdl");
+	pGrenade->SetTouch(&CGrenade::ZombiBomb2Touch);
+
+	pGrenade->pev->sequence = RANDOM_LONG(1, 3);
+	pGrenade->pev->frame = 0.0;
+	pGrenade->ResetSequenceInfo();
+	pGrenade->pev->framerate = 5.0f;
+	pGrenade->m_fSequenceLoops = TRUE;
+	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
+	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->pev->dmg = 999;
-	pGrenade->pev->dmgtime = gpGlobals->time + 4.0s;
 	pGrenade->pev->solid = SOLID_TRIGGER;
 	pGrenade->pev->health = flDamage;
 	UTIL_SetSize(pGrenade->pev, Vector(-4, -4, -4), Vector(4, 4, 4));
-	pGrenade->SetTouch(&CGrenade::ZombiBomb2Touch);
+	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
+
+	pGrenade->m_bJustBlew = true;
+
+	pGrenade->pev->gravity = 0.55f;
+	pGrenade->pev->friction = 0.7f;
+
+	pGrenade->m_iTeam = iTeam;
 
 	return pGrenade;
 }
@@ -1811,6 +1836,12 @@ void CGrenade::C4Think()
 
 void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float iType )
 {
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	KickRate(pev, pevAttacker, 350.0, 250.0, pev->health, DMGFLAG_DECAY, 0.0);
+
+#if 0
 	CBaseEntity* pEntity = NULL;
 	TraceResult tr;
 	float flAdjustedDamage, falloff, flRadius, flPower;
@@ -1890,6 +1921,7 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 		WRITE_SHORT((1 << 12) * 6);
 		MESSAGE_END();
 	}
+#endif
 }
 
 void CGrenade::C4Touch(CBaseEntity *pOther)
