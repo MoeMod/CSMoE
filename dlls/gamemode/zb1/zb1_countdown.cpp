@@ -58,7 +58,7 @@ void CModCountdownHelper::Think()
 bool CModCountdownHelper::IsExpired() const
 {
 	const int iCountDown = static_cast<int>(gpGlobals->time.time_since_epoch() /1s - g_pGameRules->m_fRoundCount.time_since_epoch() /1s);
-	return iCountDown > m_iTotalCounts;
+	return iCountDown >= m_iTotalCounts;
 }
 
 bool CModCountdownHelper::IsFreezePeriod() const

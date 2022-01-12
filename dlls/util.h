@@ -129,6 +129,7 @@ using sv::gpGlobals;
 #define LANGUAGE_FRENCH		2
 #define LANGUAGE_BRITISH	3
 
+#define SVC_STUFFTEXT 9
 #define SVC_TEMPENTITY		23
 #define SVC_INTERMISSION	30
 #define SVC_CDTRACK		32
@@ -524,7 +525,8 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd);
 //NOXREF int GetPlayerTeam(int index);
 bool UTIL_IsGame(const char *gameName);
 float UTIL_GetPlayerGaitYaw(int playerIndex);
-int UTIL_ReadFlags(const char *c);
+int UTIL_ReadFlags(const char* c);
+void UTIL_BroadcastStuffText(const char* fmt, ...);
 
 }
 #else

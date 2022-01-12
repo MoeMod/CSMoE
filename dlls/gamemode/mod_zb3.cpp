@@ -153,12 +153,9 @@ void CPlayerModStrategy_ZB3::OnThink()
 
 			m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
 			m_pPlayer->pev->armorvalue = armor;
+			m_pPlayer->SetScoreboardAttributes();
 
-			for (CBasePlayer *dest : moe::range::PlayersList())
-			{
-				CLIENT_COMMAND(dest->edict(), "spk zombi_comeback\n");
-				SetScoreAttrib(dest, m_pPlayer);
-			}
+			UTIL_BroadcastStuffText("spk \"zombi_comeback\"\n");
 		}
 	}
 

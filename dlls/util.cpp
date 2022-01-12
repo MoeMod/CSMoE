@@ -2377,4 +2377,18 @@ int UTIL_ReadFlags(const char *c)
 	return flags;
 }
 
+void UTIL_BroadcastStuffText(const char* fmt, ...)
+{
+	va_list argptr;
+	static char string[256];
+
+	va_start(argptr, fmt);
+	vsprintf(string, fmt, argptr);
+	va_end(argptr);
+
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_STUFFTEXT);
+	WRITE_STRING(string);
+	MESSAGE_END();
+}
+
 }

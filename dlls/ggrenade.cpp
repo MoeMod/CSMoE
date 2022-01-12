@@ -745,15 +745,18 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 		++m_iBounceCount;
 	}
 
-	pev->framerate = pev->velocity.Length() / 200.0f;
+	if (pev->dmg != 999)
+	{
+		pev->framerate = pev->velocity.Length() / 200.0f;
 
-	if (pev->framerate > 1)
-	{
-		pev->framerate = 1.0f;
-	}
-	else if (pev->framerate < 0.5f)
-	{
-		pev->framerate = 0.0f;
+		if (pev->framerate > 1)
+		{
+			pev->framerate = 1.0f;
+		}
+		else if (pev->framerate < 0.5f)
+		{
+			pev->framerate = 0.0f;
+		}
 	}
 }
 
@@ -776,7 +779,7 @@ void CGrenade::SlideTouch(CBaseEntity *pOther)
 
 void CGrenade::BounceSound()
 {
-	if (pev->dmg >= 999)
+	if (pev->dmg == 999)
 	{
 		EMIT_SOUND(ENT(pev), CHAN_VOICE, RANDOM_LONG(0, 1) ? "zombi/zombi_bomb_bounce_2.wav" : "zombi/zombi_bomb_bounce_1.wav", 0.25, ATTN_NORM);
 		return;
@@ -839,12 +842,25 @@ void CGrenade::ZombieBomb_TumbleThink()
 		return;
 	}
 
+	float flSpeed = pev->velocity.Length();
+
+	if (flSpeed > 100)
+		flSpeed = 100;
+
+	pev->framerate = flSpeed / 20.0;
+
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.05s;
 
 	if (pev->dmgtime <= gpGlobals->time)
 	{
 		SetThink(&CGrenade::ZombieBombExplosion);
+	}
+
+	if (pev->waterlevel != 0)
+	{
+		pev->velocity = pev->velocity * 0.5f;
+		pev->framerate = 0.2f;
 	}
 }
 
@@ -1170,13 +1186,6 @@ void CGrenade::ZombiBomb2Touch(CBaseEntity* pOther)
 			{
 				BounceSound();
 			}
-
-			pev->framerate = pev->velocity.Length() / 200;
-
-			if (pev->framerate > 1)
-				pev->framerate = 1;
-			else if (pev->framerate < 0.5)
-				pev->framerate = 0;
 		}
 	}
 }

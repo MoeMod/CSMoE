@@ -714,8 +714,7 @@ namespace sv {
 
 	void CMod_ZombieIV::InfectionSound()
 	{
-		for(CBasePlayer *player : moe::range::PlayersList())
-			CLIENT_COMMAND(player->edict(), "spk z4/z4_zombi_coming_%d.wav\n", RANDOM_LONG(1, 2));
+		UTIL_BroadcastStuffText("spk \"z4/z4_zombi_coming_%d\"\n", RANDOM_LONG(1, 2));
 	}
 
 	void CMod_ZombieIV::EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker)
@@ -725,9 +724,7 @@ namespace sv {
 
 	void CMod_ZombieIV::HumanWin()
 	{
-		//Broadcast("ctwin");
-		for(CBasePlayer *player : moe::range::PlayersList())
-			CLIENT_COMMAND(player->edict(), "spk z4/z4_win_human.wav\n");
+		UTIL_BroadcastStuffText("spk \"z4/z4_win_human.wav\"\n");
 
 		/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 		WRITE_BYTE(2);

@@ -2061,7 +2061,7 @@ static void R_StudioDrawPoints_legacy( void )
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
 			pglAlphaFunc( GL_GREATER, 0.0f );
-			alpha = 1.0f;
+			alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 		}
 		else if( g_nFaceFlags & STUDIO_NF_ADDITIVE )
 		{

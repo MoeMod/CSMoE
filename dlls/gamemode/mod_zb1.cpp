@@ -456,8 +456,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 
 void CMod_Zombi::InfectionSound()
 {
-	for(CBasePlayer *player : moe::range::PlayersList())
-		CLIENT_COMMAND(player->edict(), "spk zombi_coming_%d\n", RANDOM_LONG(1, 2));
+	UTIL_BroadcastStuffText("spk \"zombi_coming_%d\"\n", RANDOM_LONG(1, 2));
 }
 
 void CMod_Zombi::EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker)
@@ -555,8 +554,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 
 void CZB1CountdownDelegate::OnCountdownStart()
 {
-	for (CBasePlayer* player : moe::range::PlayersList())
-		CLIENT_COMMAND(player->edict(), "spk zombi_start\n");
+	UTIL_BroadcastStuffText("spk \"zombi_start\"\n");
 }
 
 inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)
@@ -569,9 +567,7 @@ inline void CZB1CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 	UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZombiSelectCount", UTIL_dtos1(iCurrentCount)); // #CSO_ZombiSelectCount
 	if (iCurrentCount <= 10)
 	{
-		for (CBasePlayer* player : moe::range::PlayersList())
-			CLIENT_COMMAND(player->edict(), "spk %s\n", s_szCountDownSound[iCurrentCount]);
-
+		UTIL_BroadcastStuffText("spk \"%s\"\n", s_szCountDownSound[iCurrentCount]);
 	}
 }
 
