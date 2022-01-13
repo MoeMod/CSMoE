@@ -167,6 +167,16 @@ void CMod_Zombi::Think()
 		}
 	}
 
+	if (!IsCareer())
+	{
+		// have we hit the max rounds?
+		if (CheckMaxRounds())
+			return;
+
+		if (CheckWinLimit())
+			return;
+	}
+
 	if (TimeRemaining() <= 0s && !m_bRoundTerminating && !m_bFreezePeriod)
 		HumanWin();
 }
