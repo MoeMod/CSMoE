@@ -2061,7 +2061,10 @@ static void R_StudioDrawPoints_legacy( void )
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
 			pglAlphaFunc( GL_GREATER, 0.0f );
-			alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
+			if (RI.currententity->curstate.rendermode == kRenderTransAlpha)
+				alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
+			else
+				alpha = 1.0f;
 		}
 		else if( g_nFaceFlags & STUDIO_NF_ADDITIVE )
 		{
@@ -2427,7 +2430,10 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
 			pglAlphaFunc( GL_GREATER, 0.0f );
-			alpha = 1.0f;
+			if (RI.currententity->curstate.rendermode == kRenderTransAlpha)
+				alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
+			else
+				alpha = 1.0f;
 		}
 		else if( g_nFaceFlags & STUDIO_NF_ADDITIVE )
 		{

@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/zb2/zb2_zclass.h"
 #include "gamemode/zb2/zb2_skill.h"
+#include "gamemode/mod_zb2.h"
 
 #include "player/player_zombie.h"
 

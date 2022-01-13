@@ -28,6 +28,9 @@ bool CCSBot::BhopJump_Start()
 	// too slow or too heavy...
 	if (pev->maxspeed < 285.0f || pev->gravity > 0.83f)
 		return false;
+	// using ladder
+	if (IsUsingLadder())
+		return false;
 	// should be fully run-up
 	if (!IsRunning() || pev->velocity.Length2D() < pev->maxspeed * 0.9f)
 		return false;
