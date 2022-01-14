@@ -1,5 +1,5 @@
 /*
-knife_runeblade.cpp
+knife_balrog9.cpp
 Copyright (C) 2021 Original Author BTE Team
 
 
@@ -35,15 +35,15 @@ namespace sv {
 #define KNIFE_BODYHIT_VOLUME 128
 #define KNIFE_WALLHIT_VOLUME 512
 
-	class CKnifeRuneBlade : public LinkWeaponTemplate<CKnifeRuneBlade,
+	class CKnifeBalrog9 : public LinkWeaponTemplate<CKnifeBalrog9,
 		TGeneralData,
 		BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type
 	>
 	{
 	public:
-		static constexpr const char* ClassName = "knife_runeblade";
-		static constexpr const char* V_Model = "models/v_runeblade.mdl";
-		static constexpr const char* P_Model = "models/p_runeblade.mdl";
+		static constexpr const char* ClassName = "knife_balrog9";
+		static constexpr const char* V_Model = "models/v_balrog9.mdl";
+		static constexpr const char* P_Model = "models/p_balrog9.mdl";
 		static constexpr const char* W_Model = "models/w_knife.mdl";
 
 		static constexpr int MaxClip = 100;
@@ -53,7 +53,7 @@ namespace sv {
 
 	public:
 
-		enum runeblade_e
+		enum balrog9_e
 		{
 			ANIM_IDLE = 0,
 			ANIM_SLASH,
@@ -69,21 +69,21 @@ namespace sv {
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("models/v_runeblade.mdl");
-			PRECACHE_MODEL("models/p_runeblade.mdl");
-			PRECACHE_MODEL("models/ef_runeblade_swing.mdl");
+			PRECACHE_MODEL("models/v_balrog9.mdl");
+			PRECACHE_MODEL("models/p_balrog9.mdl");
+			PRECACHE_MODEL("models/ef_balrog9_swing.mdl");
 
-			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef.spr");
-			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef02.spr");
-			PRECACHE_MODEL("sprites/runeblade_eye.spr");
-			PRECACHE_MODEL("sprites/ef_runeblade_swing.spr");
+			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/balrogcritical.spr");
+			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/spear_exp.spr");
+			PRECACHE_MODEL("sprites/balrogcritical.spr");
+			PRECACHE_MODEL("sprites/spear_exp.spr");
 
-			PRECACHE_SOUND("weapons/runeblade-slash1.wav");
-			PRECACHE_SOUND("weapons/runeblade-slash2.wav");
-			PRECACHE_SOUND("weapons/runeblade_v_charge_attack1.wav");
-			PRECACHE_SOUND("weapons/runeblade_v_charge_attack2.wav");
-			PRECACHE_SOUND("weapons/tomahawk_slash1_hit.wav");
-			PRECACHE_SOUND("weapons/laserminigun_exp2.wav");
+			PRECACHE_SOUND("weapons/balrog9_slash1.wav");
+			PRECACHE_SOUND("weapons/balrog9-slash2.wav");
+			PRECACHE_SOUND("weapons/balrog9_hit1.wav");
+			PRECACHE_SOUND("weapons/balrog9_hit2.wav");
+			PRECACHE_SOUND("weapons/balrog9_hitwall.wav");
+			PRECACHE_SOUND("weapons/balrog9_charge_attack2.wav");
 		}
 		
 		BOOL Deploy(void) override
@@ -100,8 +100,8 @@ namespace sv {
 			{
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
-				return TRUE;
 			}
+			return TRUE;
 		}
 
 		int GetItemInfo(ItemInfo* p) override;
@@ -163,11 +163,11 @@ namespace sv {
 		int m_iState;	//pev_iuser1
 	};
 
-	LINK_ENTITY_TO_CLASS(knife_runeblade, CKnifeRuneBlade)
+	LINK_ENTITY_TO_CLASS(knife_balrog9, CKnifeBalrog9)
 
-	void CKnifeRuneBlade::Spawn()
+	void CKnifeBalrog9::Spawn()
 	{
-		pev->classname = MAKE_STRING("knife_runeblade");
+		pev->classname = MAKE_STRING("knife_balrog9");
 		m_iId = WEAPON_KNIFE;
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
@@ -177,7 +177,7 @@ namespace sv {
 		FallInit();
 	}
 
-	int CKnifeRuneBlade::GetItemInfo(ItemInfo* p)
+	int CKnifeBalrog9::GetItemInfo(ItemInfo* p)
 	{
 		p->pszName = STRING(pev->classname);
 		p->pszAmmo1 = NULL;
@@ -195,7 +195,7 @@ namespace sv {
 	}
 
 
-	bool CKnifeRuneBlade::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType)
+	bool CKnifeBalrog9::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType)
 	{
 		bool bResult = false;
 #ifndef CLIENT_DLL
@@ -270,16 +270,16 @@ namespace sv {
 			if (pEntity->IsPlayer())
 			{
 				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
-					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
+					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
 				else
-					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
+					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
 			}
 			else
 			{
 				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
-					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
+					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
 				else
-					CKnifeRuneBlade::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
+					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
 			}
 		}
 #endif
@@ -288,7 +288,7 @@ namespace sv {
 }
 
 
-	void CKnifeRuneBlade::CreateHitFX(Vector pos, int iType)
+	void CKnifeBalrog9::CreateHitFX(Vector pos, int iType)
 	{
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
@@ -304,7 +304,7 @@ namespace sv {
 #endif
 	}
 
-	void CKnifeRuneBlade::DelayPrimaryAttack(void)
+	void CKnifeBalrog9::DelayPrimaryAttack(void)
 	{
 #ifndef CLIENT_DLL		
 		m_iSwing = 0;
@@ -366,7 +366,7 @@ namespace sv {
 			if (tr.flFraction < 1.0f)
 			{
 				//MaterialSound(&tr, vecSrc, vecEnd);
-				CKnifeRuneBlade::CreateHitFX(tr.vecEndPos, 0);
+				CKnifeBalrog9::CreateHitFX(tr.vecEndPos, 0);
 				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			}
 		}
@@ -375,23 +375,23 @@ namespace sv {
 		SetThink(nullptr);
 	}
 
-	void CKnifeRuneBlade::PrimaryAttack(void)
+	void CKnifeBalrog9::PrimaryAttack(void)
 	{
 
 		SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
 #ifndef CLIENT_DLL	
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-		SetThink(&CKnifeRuneBlade::DelayPrimaryAttack);
+		SetThink(&CKnifeBalrog9::DelayPrimaryAttack);
 		pev->nextthink = gpGlobals->time + 0.35s;
 
-		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade-slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9-slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;				
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
 	}
 
-	void CKnifeRuneBlade::SecondaryAttack(void)
+	void CKnifeBalrog9::SecondaryAttack(void)
 	{
 		if (!m_iState)
 		{
@@ -461,7 +461,7 @@ namespace sv {
 		}
 	}
 
-	void CKnifeRuneBlade::OnAttack2Released(void)
+	void CKnifeBalrog9::OnAttack2Released(void)
 	{
 		switch (m_iState)
 		{
@@ -473,9 +473,9 @@ namespace sv {
 			m_iSwing = 0;
 			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade-slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9-slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			
-			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
+			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 1.0s;
 			break;
 		}
@@ -492,9 +492,9 @@ namespace sv {
 			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade_v_charge_attack1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_v_charge_attack1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
+			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.35s;
 			break;
 		}
@@ -509,9 +509,9 @@ namespace sv {
 			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/runeblade_v_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_v_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-			SetThink(&CKnifeRuneBlade::DelaySecondaryAttack);
+			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.35s;
 
 			break;
@@ -520,7 +520,7 @@ namespace sv {
 		m_iState = 0;
 	}
 
-	void CKnifeRuneBlade::DelaySecondaryAttack(void)
+	void CKnifeBalrog9::DelaySecondaryAttack(void)
 	{
 #ifndef CLIENT_DLL
 		float flDamage, flRadius, flAngleDegrees;
@@ -531,8 +531,10 @@ namespace sv {
 		CBaseEntity* pEntity = NULL;
 		BOOL fDidHit = FALSE;
 		TraceResult tr;
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecEnd;
+		
+		Vector vecEnd, vecAngle;
+		vecAngle = m_pPlayer->pev->v_angle;
+		UTIL_MakeVectors(vecAngle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 
 		Vector vecForward = gpGlobals->v_forward;
@@ -540,8 +542,9 @@ namespace sv {
 
 		if (m_iSwing)
 		{
-			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
-			CKnifeRuneBlade::CreateHitFX(vecSrc + vecForward * 40, m_iSwing);
+			vecAngle[0] = 360.0 - vecAngle[0];
+			//难看死了还是屏蔽好了=-= PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + vecForward * 50, vecAngle, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
+			CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 40, m_iSwing);
 		}
 		float c = cos(flAngleDegrees * 0.5 * M_PI / flRadius);
 
@@ -617,7 +620,7 @@ namespace sv {
 				}
 				else
 				{
-					CKnifeRuneBlade::CreateHitFX(tr.vecEndPos, m_iSwing);
+					CKnifeBalrog9::CreateHitFX(tr.vecEndPos, m_iSwing);
 					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
@@ -625,7 +628,7 @@ namespace sv {
 			{
 				if (m_iSwing)
 				{
-					CKnifeRuneBlade::CreateHitFX(vecSrc + vecForward * 55.0, m_iSwing);
+					CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 55.0, m_iSwing);
 					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
@@ -636,12 +639,12 @@ namespace sv {
 		SetThink(nullptr);
 	}
 
-	float CKnifeRuneBlade::GetMaxSpeed(void)
+	float CKnifeBalrog9::GetMaxSpeed(void)
 	{
 			return 250;
 	}
 
-	void CKnifeRuneBlade::Holster(int skiplocal)
+	void CKnifeBalrog9::Holster(int skiplocal)
 	{
 		m_iState = 0;
 		SetThink(nullptr);
@@ -649,7 +652,7 @@ namespace sv {
 		return CBasePlayerWeapon::Holster(skiplocal);
 	}
 
-	void CKnifeRuneBlade::WeaponIdle(void)
+	void CKnifeBalrog9::WeaponIdle(void)
 	{
 		ResetEmptySound();
 		m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
@@ -666,7 +669,7 @@ namespace sv {
 		
 	}
 
-	void CKnifeRuneBlade::ItemPostFrame()
+	void CKnifeBalrog9::ItemPostFrame()
 	{
 		return CBasePlayerWeapon::ItemPostFrame();
 	}

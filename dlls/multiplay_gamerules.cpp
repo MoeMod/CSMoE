@@ -33,6 +33,8 @@ DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
 DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
 DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
 
+void SV_Start_VoteMaps();
+
 void SV_Update_Tips_f()
 {
 	char szText[128];
@@ -2632,7 +2634,14 @@ bool CHalfLifeMultiplay::CheckMaxRounds()
 	if (m_iMaxRounds != 0 && m_iTotalRoundsPlayed >= m_iMaxRounds)
 	{
 		ALERT(at_console, "Changing maps due to maximum rounds have been met\n");
-		GoToIntermission();
+		if (CheckCanStartVoteMaps())
+		{
+			SV_Start_VoteMaps();
+		}
+		else
+		{
+			GoToIntermission();
+		}
 		return true;
 	}
 
@@ -2647,7 +2656,14 @@ bool CHalfLifeMultiplay::CheckWinLimit()
 		if ((m_iNumCTWins - m_iNumTerroristWins >= m_iRoundWinDifference) || (m_iNumTerroristWins - m_iNumCTWins >= m_iRoundWinDifference))
 		{
 			ALERT(at_console, "Changing maps...one team has won the specified number of rounds\n");
-			GoToIntermission();
+			if (CheckCanStartVoteMaps())
+			{
+				SV_Start_VoteMaps();
+			}
+			else
+			{
+				GoToIntermission();
+			}
 			return true;
 		}
 	}
@@ -4529,6 +4545,14 @@ void CHalfLifeMultiplay::ProcessMapVote(CBasePlayer *player, int iVote)
 
 void CHalfLifeMultiplay::ChangeLevel()
 {
+	if (m_iVoteMapStatus == 3)
+	{
+		m_iVoteMapStatus = 0;
+		g_fGameOver = TRUE;
+		CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
+		return;
+	}
+
 	static char szPreviousMapCycleFile[256];
 	static mapcycle_t mapcycle;
 
@@ -4718,7 +4742,7 @@ bool CHalfLifeMultiplay::CheckCanStartVoteMaps()
 	}
 
 	if (m_iVoteMapStatus) {
-			ALERT(at_console, "votemap currently in process\n");
+		ALERT(at_console, "votemap currently in process\n");
 		return false;
 	}
 
@@ -4906,7 +4930,8 @@ void CHalfLifeMultiplay::VoteMapThink()
 	}
 	case 3: {
 		m_iVoteMapStatus = 0;
-		CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
+		GoToIntermission();
+		//CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
 		break;
 		default:
 			break;

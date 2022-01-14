@@ -1133,7 +1133,7 @@ bool IsHidingSpotInCover(const Vector *spot);
 void ClassifySniperSpot(HidingSpot *spot);
 void DestroyHidingSpots();
 void EditNavAreas(NavEditCmdType cmd);
-bool GetGroundHeight(const Vector *pos, float *height, Vector *normal = nullptr);
+bool GetGroundHeight(const Vector *pos, float *height, Vector *normal = nullptr, bool usehull = false);
 bool GetSimpleGroundHeight(const Vector *pos, float *height, Vector *normal = nullptr);
 CNavArea *GetMarkedArea();
 void EditNavAreasReset();

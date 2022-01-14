@@ -325,6 +325,8 @@ void CMod_ZombieHero::CheckWinConditions()
 	auto iAliveHuman = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_CT && !player->m_bIsZombie && player->IsAlive(); });
 	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie && !(!player->IsAlive() && player->m_bHeadshotKilled); });
 
+	ALERT(at_console, "CheckWinConditions: iAliveHuman:%d iAliveZombie:%d\n", iAliveHuman, iAliveZombie);
+
 	if (!iAliveHuman)
 		ZombieWin();
 	else if (!iAliveZombie)
@@ -370,6 +372,29 @@ BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pA
 	} while (false);*/
 
 	return iReturn;
+}
+
+void CMod_ZombieHero::Think()
+{
+	if (m_flCheckWinConditions <= gpGlobals->time)
+	{
+		m_flCheckWinConditions = gpGlobals->time + 5s;
+		CheckWinConditions();
+	}
+	return CMod_ZombieMod2::Think();
+}
+
+int CMod_ZombieHero::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled)
+{
+	if (!pAttacker->m_bIsZombie && pKilled->m_bIsZombie)
+	{
+		if (pKilled->m_bHeadshotKilled)
+			return 3;
+
+		return 0;
+	}
+
+	return 1;
 }
 
 void CMod_ZB3F2P::InstallPlayerModStrategy(CBasePlayer *player)

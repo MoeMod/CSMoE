@@ -1639,7 +1639,7 @@ bool CCSBot::ComputePath(CNavArea *goalArea, const Vector *goal, RouteType route
 	if (goalArea)
 		pathEndPosition.z = goalArea->GetZ(&pathEndPosition);
 	else
-		GetGroundHeight(&pathEndPosition, &pathEndPosition.z);
+		GetGroundHeight(&pathEndPosition, &pathEndPosition.z, nullptr, true);
 
 	// if we are already in the goal area, build trivial path
 	if (startArea == goalArea)

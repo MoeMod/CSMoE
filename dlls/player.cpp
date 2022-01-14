@@ -4496,6 +4496,10 @@ void CBasePlayer::CheckPowerups(entvars_t *pev)
 void CBasePlayer::SetNewPlayerModel(const char *modelName)
 {
 	SET_MODEL(edict(), modelName);
+	if (pev->flags & FL_DUCKING)
+		UTIL_SetSize(pev, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX);
+	else
+		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	m_modelIndexPlayer = pev->modelindex;
 }
 

@@ -33,6 +33,8 @@ public:
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void CheckWinConditions() override;
 	BOOL FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker) override;
+	void Think() override;
+	int IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled) override;
 
 	const CZB3HumanMorale &HumanMorale() const { return m_Morale; }
 

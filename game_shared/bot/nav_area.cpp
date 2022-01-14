@@ -4356,7 +4356,7 @@ void EditNavAreas(NavEditCmdType cmd)
 		isCreatingNavArea = false;
 }
 
-bool GetGroundHeight(const Vector *pos, float *height, Vector *normal)
+bool GetGroundHeight(const Vector *pos, float *height, Vector *normal, bool usehull)
 {
 	Vector to;
 	to.x = pos->x;
@@ -4386,7 +4386,10 @@ bool GetGroundHeight(const Vector *pos, float *height, Vector *normal)
 	{
 		from = *pos + Vector(0, 0, offset);
 
-		UTIL_TraceLine(from, to, ignore_monsters, dont_ignore_glass, ignore, &result);
+		if(usehull)
+			UTIL_TraceHull(from, to, ignore_monsters, human_hull, ignore, &result);
+		else
+			UTIL_TraceLine(from, to, ignore_monsters, dont_ignore_glass, ignore, &result);
 
 		if (result.flFraction != 1.0f && result.pHit)
 		{
@@ -4837,7 +4840,7 @@ CNavArea *CNavAreaGrid::GetNearestNavArea(const Vector *pos, bool anyZ) const
 	source.x = pos->x;
 	source.y = pos->y;
 
-	if (GetGroundHeight(pos, &source.z) == false)
+	if (GetGroundHeight(pos, &source.z, nullptr, true) == false)
 		return nullptr;
 
 	source.z += HalfHumanHeight;

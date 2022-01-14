@@ -51,7 +51,7 @@ void CCSBot::BhopJump_UpdateJump()
 		return;
 
 	// too slow to bhop...
-	if (!IsRunning() || pev->velocity.Length2D() < pev->maxspeed * 0.5f)
+	if (!IsRunning() || IsUsingLadder() || pev->velocity.Length2D() < pev->maxspeed * 0.5f)
 	{
 		m_isBhopJumping = false;
 		m_isRapidFiring = false;

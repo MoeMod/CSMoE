@@ -47,7 +47,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f }; }
-	const char* GetCSModelName() override { return "models/w_balrog11b.mdl"; }
+	const char* GetCSModelName() override { return "models/@balrog11b_w_balrog11.mdl"; }
 
 public:
 	duration_t m_flPumpTime;

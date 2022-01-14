@@ -274,7 +274,7 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_plasma");
 	UTIL_PrecacheOtherWeapon("knife_runeblade");
 	UTIL_PrecacheOtherWeapon("knife_janus9");
-	
+	UTIL_PrecacheOtherWeapon("knife_balrog9");
 	
 
 	if (g_pGameRules->IsDeathmatch())

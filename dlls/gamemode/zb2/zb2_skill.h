@@ -417,6 +417,7 @@ public:
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
+	void FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, float flDamage, entvars_t* pevAttacker);
 };
 
 

@@ -118,6 +118,13 @@ void CMod_Zombi::Think()
 	if (CheckTimeLimit())
 		return;
 
+	// have we hit the max rounds?
+	if (CheckMaxRounds())
+		return;
+
+	if (CheckWinLimit())
+		return;
+
 	if (IsFreezePeriod())
 	{
 		CheckFreezePeriodExpired();

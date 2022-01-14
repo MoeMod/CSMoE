@@ -102,7 +102,7 @@ public:
 		if (goalArea)
 			pathEndPosition.z = goalArea->GetZ(&pathEndPosition);
 		else
-			GetGroundHeight(&pathEndPosition, &pathEndPosition.z);
+			GetGroundHeight(&pathEndPosition, &pathEndPosition.z, nullptr, true);
 
 		// Compute shortest path to goal
 		CNavArea *closestArea;

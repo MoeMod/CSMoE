@@ -32,7 +32,7 @@ void CBalrog11B::Spawn(void)
 {
 	Precache();
 	m_iId = WEAPON_XM1014;
-	SET_MODEL(ENT(pev), "models/w_balrog11b.mdl");
+	SET_MODEL(ENT(pev), "models/@balrog11b_w_balrog11b.mdl");
 	m_iDefaultAmmo2 = m_iChargeShotsFired = 0;
 	m_iDefaultAmmo = XM1014_DEFAULT_GIVE;
 
@@ -41,9 +41,9 @@ void CBalrog11B::Spawn(void)
 
 void CBalrog11B::Precache(void)
 {
-	PRECACHE_MODEL("models/v_balrog11b.mdl");
-	PRECACHE_MODEL("models/w_balrog11b.mdl");
-	PRECACHE_MODEL("models/p_balrog11b.mdl");
+	PRECACHE_MODEL("models/@balrog11b_v_balrog11b.mdl");
+	PRECACHE_MODEL("models/@balrog11b_w_balrog11b.mdl");
+	PRECACHE_MODEL("models/@balrog11b_p_balrog11b.mdl");
 	PRECACHE_MODEL("sprites/muzzleflash17.spr");
 
 	m_iShellId = PRECACHE_MODEL("models/shotgunshell.mdl");
@@ -77,7 +77,7 @@ BOOL CBalrog11B::Deploy(void)
 {
 	m_iChargeShotsFired = 0;
 
-	return DefaultDeploy("models/v_balrog11b.mdl", "models/p_balrog11b.mdl", BALROG11_DRAW, "m249", UseDecrement() != FALSE);
+	return DefaultDeploy("models/@balrog11b_v_balrog11b.mdl", "models/@balrog11b_p_balrog11b.mdl", BALROG11_DRAW, "m249", UseDecrement() != FALSE);
 }
 
 int CBalrog11B::ExtractAmmo(CBasePlayerWeapon* pWeapon)

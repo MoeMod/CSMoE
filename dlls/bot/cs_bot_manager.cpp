@@ -1232,9 +1232,10 @@ bool CCSBotManager::AddBot(const BotProfile *profile, BotProfileTeamType team)
 		return false;
 	}
 
-	//int nJoinedTeam;
+	int index = pBot->entindex();
+	mp->m_iPlayersOS[index-1] = (OperationSystem)RANDOM_LONG(OS_Windows, OS_Android);
 	ClientPutInServer(pBot->edict());
-	SET_CLIENT_KEY_VALUE(pBot->entindex(), GET_INFO_BUFFER(pBot->edict()), "*bot", "1");
+	SET_CLIENT_KEY_VALUE(index, GET_INFO_BUFFER(pBot->edict()), "*bot", "1");
 
 	pBot->m_iMenu = Menu_ChooseTeam;
 	pBot->m_iJoiningState = PICKINGTEAM;

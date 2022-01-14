@@ -2090,6 +2090,12 @@ namespace sv {
 			return;
 		}
 
+		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "无法在空中安置铁处女");
+			return;
+		}
+
 		if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
 		{
 			m_iZombieSkillStatus = SKILL_STATUS_USING;
@@ -2216,11 +2222,17 @@ namespace sv {
 		m_pPlayer->m_flNextAttack = 1.7s;
 		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.7s;
 
-		TraceResult tr;
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 
+		if (!(m_pPlayer->pev->flags & FL_ONGROUND))
+			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.5, 0.5, 0.0), 150.0, 2000, m_pPlayer->pev);
+		else if (m_pPlayer->pev->velocity.Length() > 140.0f)
+			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.25, 0.25, 0.0), 160.0, 2000, m_pPlayer->pev);
+		else
+			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.075, 0.075, 0.0), 140.0, 2000, m_pPlayer->pev);
+#if 0
 		const float flDistance = 4.0f * 39.37f;
 		Vector vecStart = vecSrc;
 		Vector vecEnd = vecSrc + gpGlobals->v_forward * flDistance;
@@ -2263,6 +2275,7 @@ namespace sv {
 			vecStart = tr.vecEndPos + gpGlobals->v_forward * 32;
 		}
 
+#endif
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_PENETRATION);
@@ -2286,6 +2299,46 @@ namespace sv {
 		return 180.0s;
 	}
 
+	void CZombieSkill_ZombiePenetration::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, float flDamage, entvars_t* pevAttacker)
+	{
+		TraceResult tr;
+		Vector vecRight = gpGlobals->v_right;
+		Vector vecUp = gpGlobals->v_up;
+
+		if (!pevAttacker) {
+			// the default attacker is ourselves
+			pevAttacker = m_pPlayer->pev;
+		}
+
+		ClearMultiDamage();
+		gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
+
+		for (ULONG iShot = 1; iShot <= cShots; iShot++) {
+			// get circular gaussian spread
+			float x, y, z;
+
+			do {
+				x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+				y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
+				z = x * x + y * y;
+			} while (z > 1);
+
+			Vector vecDir, vecEnd;
+
+			vecDir = vecDirShooting + x * vecSpread.x * vecRight + y * vecSpread.y * vecUp;
+			vecEnd = vecSrc + vecDir * flDistance;
+
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+			// do damage
+			if (tr.flFraction != 1.0f) {
+				CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+				pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
+			}
+		}
+
+		ApplyMultiDamage(pevAttacker, pevAttacker);
+	}
 
 	CZombieSkill_ZombieJumpUp::CZombieSkill_ZombieJumpUp(CBasePlayer* player) : CZombieSkill_Base(player)
 	{

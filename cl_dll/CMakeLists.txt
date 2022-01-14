@@ -217,6 +217,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_runeblade.cpp
 	../dlls/wpn_shared/wpn_plasmagun.cpp
 	../dlls/wpn_shared/knife_janus9.cpp
+	../dlls/wpn_shared/knife_balrog9.cpp
 	)
 
 set (HUD_SRCS

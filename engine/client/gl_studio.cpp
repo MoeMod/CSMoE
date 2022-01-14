@@ -3944,16 +3944,6 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 					break;
 				}
 			}
-			else if (Q_strstr(mod->name, "balrog11b"))
-			{
-				sprintf(texname, "models/texture/@balrog11b_%s.bmp", name);
-				if (FS_FileExists(texname, false))
-				{
-					//gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
-					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
-					break;
-				}
-			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))

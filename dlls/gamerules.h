@@ -473,7 +473,7 @@ private:
 public:
 	CVoiceGameMgr m_VoiceGameMgr;
 	time_point_t m_fTeamCount;                // m_flRestartRoundTime, the global time when the round is supposed to end, if this is not 0
-	float m_flCheckWinConditions;
+	time_point_t m_flCheckWinConditions;
 	time_point_t m_fRoundCount;
 	std::chrono::duration<int, std::ratio<1>> m_iRoundTime;                // (From mp_roundtime) - How many seconds long this round is.
 	std::chrono::duration<int, std::ratio<1>> m_iRoundTimeSecs;
