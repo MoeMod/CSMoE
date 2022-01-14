@@ -568,6 +568,7 @@ public:
 	static char *LocaliseTextString( const char *msg, char *dst_buffer, int buffer_size );
 	static char *BufferedLocaliseTextString( const char *msg );
 	static char *LookupString( char *msg_name, int *msg_dest = NULL );
+	static bool LookupString2( char *msg, int size );
 	CHudMsgFunc(TextMsg);
 };
 

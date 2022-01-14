@@ -133,6 +133,32 @@ char *CHudTextMessage::LookupString( char *msg, int *msg_dest )
 	}
 }
 
+// Simplified version of LocaliseTextString;  assumes string is only one word
+bool CHudTextMessage::LookupString2( char *msg, int size )
+{
+	if ( !msg )
+		return false;
+
+	// '#' character indicates this is a reference to a string in titles.txt, and not the string itself
+	if ( msg[0] == '#' ) 
+	{
+		// this is a message name, so look up the real message
+		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
+
+		if ( !clmsg || !(clmsg->pMessage) )
+			return false; // lookup failed, so return the original string
+
+		if (clmsg->pMessage[0] == '#')
+			strncpy(msg, (char*)Localize(clmsg->pMessage + 1), size);
+		else
+			strncpy(msg, (char*)Localize(clmsg->pMessage), size);
+
+		return true;
+	}
+
+	return false;
+}
+
 void StripEndNewlineFromString( char *str )
 {
 	int s = strlen( str ) - 1;
@@ -205,19 +231,11 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 		}
 	}
 
-
 	switch ( msg_dest )
 	{
 	case HUD_PRINTCENTER:
 	{
 		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, sstr1, sstr2, sstr3, sstr4 );
-
-		/*ConvertCRtoNL( psz );
-
-		int len = DrawUtils::ConsoleStringLen( psz );
-
-		DrawUtils::DrawConsoleString( (ScreenWidth - len) / 2, ScreenHeight / 3, psz );*/
-
 		CenterPrint( ConvertCRtoNL( psz ) );
 		break;
 	}
@@ -239,6 +257,36 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 		break;
 
 	case HUD_PRINTRADIO:
+		static char szNewBuf[4][MAX_TEXTMSG_STRING];
+
+		if (strlen(sstr1) > 0)
+		{
+			snprintf(szNewBuf[0], MAX_TEXTMSG_STRING, "#%s", sstr1);
+			if (LookupString2(szNewBuf[0], MAX_TEXTMSG_STRING))
+				sstr1 = szNewBuf[0];
+		}
+
+		if (strlen(sstr2) > 0)
+		{
+			snprintf(szNewBuf[1], MAX_TEXTMSG_STRING, "#%s", sstr2);
+			if (LookupString2(szNewBuf[1], MAX_TEXTMSG_STRING))
+				sstr2 = szNewBuf[1];
+		}
+
+		if (strlen(sstr3) > 0)
+		{
+			snprintf(szNewBuf[2], MAX_TEXTMSG_STRING, "#%s", sstr3);
+			if (LookupString2(szNewBuf[2], MAX_TEXTMSG_STRING))
+				sstr3 = szNewBuf[2];
+		}
+
+		if (strlen(sstr4) > 0)
+		{
+			snprintf(szNewBuf[3], MAX_TEXTMSG_STRING, "#%s", sstr4);
+			if(LookupString2(szNewBuf[3], MAX_TEXTMSG_STRING))
+				sstr4 = szNewBuf[3];
+		}
+
 		// For some reason, HUD_PRINTRADIO always have "1" in msg_text
 		for( int i = 1; i < MAX_PLAYERS; i++ )
 		{

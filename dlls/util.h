@@ -61,7 +61,7 @@
 
 #define cchMapNameMost		32
 
-#define CBSENTENCENAME_MAX	16
+#define CBSENTENCENAME_MAX	20
 #define CVOXFILESENTENCEMAX	1536	// max number of sentences in game. NOTE: this must match CVOXFILESENTENCEMAX in engine\sound.h
 
 #define GROUP_OP_AND		0

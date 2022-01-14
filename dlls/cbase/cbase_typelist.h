@@ -173,6 +173,7 @@ TL_ADD(CSFSniper)
 TL_ADD(CPlasmaGun)
 TL_ADD(CKnifeRuneBlade)
 TL_ADD(CKnifeJanus9)
+TL_ADD(CKnifeBalrog9)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
