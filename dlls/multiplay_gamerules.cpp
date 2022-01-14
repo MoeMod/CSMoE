@@ -2631,6 +2631,10 @@ bool CHalfLifeMultiplay::CheckTimeLimit()
 
 bool CHalfLifeMultiplay::CheckMaxRounds()
 {
+	if (votemap_enabled.value > 0.0f && m_iVoteMapStatus) {
+		return false;
+	}
+
 	if (m_iMaxRounds != 0 && m_iTotalRoundsPlayed >= m_iMaxRounds)
 	{
 		ALERT(at_console, "Changing maps due to maximum rounds have been met\n");
@@ -2650,6 +2654,10 @@ bool CHalfLifeMultiplay::CheckMaxRounds()
 
 bool CHalfLifeMultiplay::CheckWinLimit()
 {
+	if (votemap_enabled.value > 0.0f && m_iVoteMapStatus) {
+		return false;
+	}
+
 	// has one team won the specified number of rounds?
 	if (m_iMaxRoundsWon != 0 && (m_iNumCTWins >= m_iMaxRoundsWon || m_iNumTerroristWins >= m_iMaxRoundsWon))
 	{
