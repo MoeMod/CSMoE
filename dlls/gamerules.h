@@ -545,6 +545,7 @@ public:
 
 	int m_iVoteMapStatus;
 	time_point_t m_flVoteNextThink;
+	time_point_t m_flVoteTipsThink;
 	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 
 	OperationSystem m_iPlayersOS[MAX_CLIENTS];

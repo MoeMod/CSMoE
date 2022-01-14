@@ -4553,7 +4553,7 @@ void CHalfLifeMultiplay::ProcessMapVote(CBasePlayer *player, int iVote)
 
 void CHalfLifeMultiplay::ChangeLevel()
 {
-	if (m_iVoteMapStatus == 3)
+	if (m_iVoteMapStatus == 5)
 	{
 		m_iVoteMapStatus = 0;
 		g_fGameOver = TRUE;
@@ -4773,42 +4773,7 @@ void SV_Start_VoteMaps()
 
 	ALERT(at_console, "Start voting maps\n");
 	g_pGameRules->m_iVoteMapStatus = 1;
-	g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
-	
-	int iKeys = MENU_KEY_0;
-	char szMenu[512];
-	Q_sprintf(szMenu, "\\y请选择下一张地图:\n\n");
-
-	size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
-	for (size_t i = 0; i < length; i++)
-	{
-		iKeys |= (1 << i);
-		Q_sprintf(szMenu, "%s\\w%d.%s\n", szMenu, i + 1, g_pGameRules->m_vecVoteMaps[i].first.c_str());
-	}
-	Q_sprintf(szMenu, "%s\n\w0.退出", szMenu);
-
-	CBaseEntity* pPlayer = NULL;
-	while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
-	{
-		if (FNullEnt(pPlayer->edict()))
-		{
-			break;
-		}
-
-		if (pPlayer->pev->flags == FL_DORMANT)
-		{
-			continue;
-		}
-
-		CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
-		if (player->IsBot())
-		{
-			continue;
-		}
-
-		ShowMenu(player, iKeys, -1, 0, szMenu);
-		player->m_iMenu = Menu_VoteMap;
-	}
+	g_pGameRules->m_flVoteNextThink = gpGlobals->time + 10s;
 }
 
 void CHalfLifeMultiplay::LoadRandomMaps()
@@ -4880,6 +4845,29 @@ void CHalfLifeMultiplay::LoadRandomMaps()
 void CHalfLifeMultiplay::VoteMapThink()
 {
 	if (m_flVoteNextThink > gpGlobals->time) {
+		if (m_iVoteMapStatus == 1 && m_flVoteTipsThink <= gpGlobals->time) {
+			m_flVoteTipsThink = gpGlobals->time + 1s;
+			hudtextparms_t textParms;
+			textParms.x = -1.0f;
+			textParms.y = 0.35f;
+			textParms.effect = 0;
+			textParms.r1 = 100;
+			textParms.g1 = 255;
+			textParms.b1 = 100;
+			textParms.r2 = 255;
+			textParms.g2 = 255;
+			textParms.b2 = 255;
+			textParms.fadeinTime = 0.0f;
+			textParms.fadeoutTime = 0.5f;
+			textParms.holdTime = 2.0f;
+			textParms.fxTime = 0.0f;
+			textParms.channel = 0;
+
+			char szText[128];
+			int iCountDown = static_cast<int>(m_flVoteNextThink.time_since_epoch() / 1s - gpGlobals->time.time_since_epoch() / 1s);
+			sprintf(szText, "%d 秒后开始投票换图！", iCountDown);
+			UTIL_HudMessageAll(textParms, szText);
+		}
 		return;
 	}
 
@@ -4903,14 +4891,56 @@ void CHalfLifeMultiplay::VoteMapThink()
 
 	switch (m_iVoteMapStatus)
 	{
-		// Vote end
+		// Vote start
 	case 1: {
+		ALERT(at_console, "Voting maps start\n");
+		g_pGameRules->m_iVoteMapStatus = 2;
+		g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
+
+		int iKeys = MENU_KEY_0;
+		char szMenu[512];
+		Q_sprintf(szMenu, "\\y请选择下一张地图:\n\n");
+
+		size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+		for (size_t i = 0; i < length; i++)
+		{
+			iKeys |= (1 << i);
+			Q_sprintf(szMenu, "%s\\w%d.%s\n", szMenu, i + 1, g_pGameRules->m_vecVoteMaps[i].first.c_str());
+		}
+		Q_sprintf(szMenu, "%s\n\w0.退出", szMenu);
+
+		CBaseEntity* pPlayer = NULL;
+		while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
+		{
+			if (FNullEnt(pPlayer->edict()))
+			{
+				break;
+			}
+
+			if (pPlayer->pev->flags == FL_DORMANT)
+			{
+				continue;
+			}
+
+			CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+			if (player->IsBot())
+			{
+				continue;
+			}
+
+			ShowMenu(player, iKeys, -1, 0, szMenu);
+			player->m_iMenu = Menu_VoteMap;
+		}
+		break;
+	}
+		// Vote end
+	case 2: {
 		std::sort(m_vecVoteMaps.begin(),
 				  min(m_vecVoteMaps.begin() + MAX_CUSTOM_VOTE_MAPS, m_vecVoteMaps.end()),
 				  [](std::pair<std::string, int> a, std::pair<std::string, int> b) {
 					  return b.second < a.second;
 				  });
-		m_iVoteMapStatus = 2;
+		m_iVoteMapStatus = 3;
 		auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
 		// delay timelimit
 		g_flResetTime = gpGlobals->time + delay;
@@ -4927,23 +4957,23 @@ void CHalfLifeMultiplay::VoteMapThink()
 		break;
 		// Change map
 	}
-	case 2: {
+	case 3: {
 		if (!m_bRoundTerminating) {
 			m_flVoteNextThink = gpGlobals->time + 1s;
 			break;
 		}
-		m_iVoteMapStatus = 3;
+		m_iVoteMapStatus = 4;
 		m_flVoteNextThink = gpGlobals->time + 3s;
 		break;
 	}
-	case 3: {
-		m_iVoteMapStatus = 0;
+	case 4: {
+		m_iVoteMapStatus = 5;
 		GoToIntermission();
 		//CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
 		break;
-		default:
-			break;
 	}
+	default:
+		break;
 	}
 }
 

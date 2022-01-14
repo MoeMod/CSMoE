@@ -1329,7 +1329,7 @@ void HandleMenu_VoteMap(CBasePlayer* pPlayer, int iSlot)
 
 	pPlayer->m_iMenu = Menu_OFF;
 	//ALERT(at_console, "select #%d %s %d \n", iSlot, g_pGameRules->m_vecVoteMaps[iSlot-1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot-1].second);
-	if (g_pGameRules->m_iVoteMapStatus != 1)
+	if (g_pGameRules->m_iVoteMapStatus != 2)
 		return;
 
 	char szText[128];
