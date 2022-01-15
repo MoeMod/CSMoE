@@ -64,6 +64,7 @@ public:
 	void OnThink() override;
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 
 	virtual void Event_OnBecomeHero(CBasePlayer *who);
 	virtual void Event_OnRoundStart();
@@ -81,6 +82,7 @@ private:
 	float m_flBackupMaxHealth;
 	float m_flBackupArmor;
 	bool m_bIsHero;
+	time_point_t m_flGodMode;
 };
 
 class CMod_ZB3F2P : public CMod_ZombieHero

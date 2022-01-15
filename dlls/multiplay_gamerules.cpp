@@ -45,11 +45,23 @@ void SV_Update_Tips_f()
 	MESSAGE_END();
 
 	char szHudText[128];
-	sprintf(szHudText, "服务器即将关闭更新，请在5~10 秒后重新进入!!");
-	MESSAGE_BEGIN(MSG_BROADCAST, gmsgHudText);
-	WRITE_STRING(szHudText);
-	WRITE_BYTE(0);
-	MESSAGE_END();
+	sprintf(szHudText, "服务器即将关闭更新，请在 5~10 秒后重新进入!!");
+	hudtextparms_t textParms;
+	textParms.x = -1.0f;
+	textParms.y = 0.35f;
+	textParms.effect = 2;
+	textParms.r1 = 100;
+	textParms.g1 = 255;
+	textParms.b1 = 100;
+	textParms.r2 = 255;
+	textParms.g2 = 255;
+	textParms.b2 = 255;
+	textParms.fadeinTime = 0.0f;
+	textParms.fadeoutTime = 0.5f;
+	textParms.holdTime = 10.0f;
+	textParms.fxTime = 0.5f;
+	textParms.channel = 0;
+	UTIL_HudMessageAll(textParms, szHudText);
 
 	ALERT(at_console, "Server will close for updating, please reconnect after 5 to 10 seconds\n");
 }

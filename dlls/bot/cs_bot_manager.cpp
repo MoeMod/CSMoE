@@ -77,7 +77,7 @@ CCSBotManager::CCSBotManager()
 
 	if (dataPointer == NULL)
 	{
-		TheBotProfiles->Init("BotProfile.db");
+		TheBotProfiles->Init(cv_bot_profile_db.string);
 	}
 	else
 	{

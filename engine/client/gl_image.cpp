@@ -4173,7 +4173,9 @@ void R_FreeImage( gltexture_t *image )
 		return;
 	}
 
+#if TARGET_OS_IOS
 	xe::TexLru_Free( image->texnum );
+#endif
 
 	// remove from hash table
 	iter = r_texturesHashTable.find(image->name);

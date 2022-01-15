@@ -846,13 +846,25 @@ namespace sv {
 
 	}
 
+	bool CZombieSkill_ZombiePass::HasZombieBomb()
+	{
+		CBasePlayerItem *item = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+		while (item != NULL)
+		{
+			if (!Q_strcmp(STRING(item->pev->classname), "weapon_zombibomb"))
+				return true;
+
+			item = item->m_pNext;
+		}
+		return false;
+	}
+
 	void CZombieSkill_ZombiePass::Think()
 	{	
 		if (m_pPlayer->IsBot())
 			return CZombieSkill_Base::Think();
 
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
+		if (HasZombieBomb())
 		{
 			CBasePlayerWeapon* pWpn = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
 			if (pWpn != NULL && pWpn->m_iId == WEAPON_KNIFE)
@@ -948,8 +960,7 @@ namespace sv {
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "正在生成爆弹兽颅...");
 				return;
 			}
-			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-			if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
+			if (HasZombieBomb())
 			{
 				CBasePlayerWeapon* pWpn = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
 				if (pWpn)
@@ -1583,7 +1594,7 @@ namespace sv {
 		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 
 		m_pPlayer->pev->renderfx = kRenderFxGlowShell;
-		m_pPlayer->pev->rendercolor = { 255,0,0 };
+		m_pPlayer->pev->rendercolor = { 255,255,255 };
 		m_pPlayer->pev->renderamt = 1;
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
 
@@ -2225,14 +2236,16 @@ namespace sv {
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-
+#if 0
 		if (!(m_pPlayer->pev->flags & FL_ONGROUND))
 			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.5, 0.5, 0.0), 150.0, 2000, m_pPlayer->pev);
 		else if (m_pPlayer->pev->velocity.Length() > 140.0f)
 			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.25, 0.25, 0.0), 160.0, 2000, m_pPlayer->pev);
 		else
 			FireBullets(7, vecSrc, gpGlobals->v_forward, Vector(0.075, 0.075, 0.0), 140.0, 2000, m_pPlayer->pev);
-#if 0
+#endif
+#if 1
+		TraceResult tr;
 		const float flDistance = 4.0f * 39.37f;
 		Vector vecStart = vecSrc;
 		Vector vecEnd = vecSrc + gpGlobals->v_forward * flDistance;
@@ -2298,7 +2311,7 @@ namespace sv {
 	{
 		return 180.0s;
 	}
-
+	
 	void CZombieSkill_ZombiePenetration::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, float flDamage, entvars_t* pevAttacker)
 	{
 		TraceResult tr;
@@ -2310,10 +2323,11 @@ namespace sv {
 			pevAttacker = m_pPlayer->pev;
 		}
 
-		ClearMultiDamage();
-		gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
-
+		CBasePlayer* pVictim;
 		for (ULONG iShot = 1; iShot <= cShots; iShot++) {
+			ClearMultiDamage();
+			gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
+
 			// get circular gaussian spread
 			float x, y, z;
 
@@ -2323,23 +2337,30 @@ namespace sv {
 				z = x * x + y * y;
 			} while (z > 1);
 
-			Vector vecDir, vecEnd;
-
+			Vector vecNewSrc, vecDir, vecEnd;
+			vecNewSrc = vecSrc;
 			vecDir = vecDirShooting + x * vecSpread.x * vecRight + y * vecSpread.y * vecUp;
-			vecEnd = vecSrc + vecDir * flDistance;
+			vecEnd = vecNewSrc + vecDir * flDistance;
 
-			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+			pVictim = GetClassPtr<CBasePlayer>(pevAttacker);
+			int iCount = 5;
+			while (pVictim && pVictim->IsAlive() && pVictim->m_bIsZombie && iCount)
+			{
+				UTIL_TraceLine(vecNewSrc, vecEnd, dont_ignore_monsters, ENT(pVictim->pev), &tr);
+				CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+				pVictim = (CBasePlayer*)(pEntity);
+				vecNewSrc = tr.vecEndPos;
+				--iCount;
+			}
 
 			// do damage
-			if (tr.flFraction != 1.0f) {
-				CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-				pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
+			if (tr.flFraction != 1.0f && pVictim->IsAlive()) {
+				pVictim->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
 			}
+			ApplyMultiDamage(pevAttacker, pevAttacker);
 		}
 
-		ApplyMultiDamage(pevAttacker, pevAttacker);
 	}
-
 	CZombieSkill_ZombieJumpUp::CZombieSkill_ZombieJumpUp(CBasePlayer* player) : CZombieSkill_Base(player)
 	{
 
@@ -2489,6 +2510,9 @@ namespace sv {
 
 		m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
 
+		m_pPlayer->pev->renderfx = kRenderFxGlowShell;
+		m_pPlayer->pev->rendercolor = { 255,255,255 };
+		m_pPlayer->pev->renderamt = 1;
 		m_pPlayer->ResetMaxSpeed();
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
@@ -2508,7 +2532,9 @@ namespace sv {
 
 	void CZombieSkill_ZombieHook::OnSkillEnd()
 	{
-		
+		m_pPlayer->pev->renderfx = kRenderFxNone;
+		m_pPlayer->pev->rendercolor = { 255,255,255 };
+		m_pPlayer->pev->renderamt = 16;
 		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 		m_pPlayer->ResetMaxSpeed();
@@ -2522,7 +2548,7 @@ namespace sv {
 	float CZombieSkill_ZombieHook::GetDamageRatio() const
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			return 0.5f;
+			return 0.0f;
 		return 1.0f;
 	}
 

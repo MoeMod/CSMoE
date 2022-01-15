@@ -56,7 +56,11 @@ namespace sv {
 		enum balrog9_e
 		{
 			ANIM_IDLE = 0,
-			ANIM_SLASH,
+			ANIM_SLASH1,
+			ANIM_SLASH2,
+			ANIM_SLASH3,
+			ANIM_SLASH4,
+			ANIM_SLASH5,
 			ANIM_DRAW,
 			ANIM_CHARGE_START1,
 			ANIM_CHARGE_FINISH1,
@@ -64,14 +68,12 @@ namespace sv {
 			ANIM_CHARGE_IDLE2,
 			ANIM_CHARGE_ATTACK1,
 			ANIM_CHARGE_ATTACK2,
-			ANIM_STAB,
 		};
 
 		void Precache() override
 		{
 			PRECACHE_MODEL("models/v_balrog9.mdl");
 			PRECACHE_MODEL("models/p_balrog9.mdl");
-			PRECACHE_MODEL("models/ef_balrog9_swing.mdl");
 
 			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/balrogcritical.spr");
 			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/spear_exp.spr");
@@ -346,7 +348,7 @@ namespace sv {
 
 			m_pPlayer->m_iWeaponVolume = 128;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9-slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 			ClearMultiDamage();
 
@@ -367,7 +369,7 @@ namespace sv {
 			{
 				//MaterialSound(&tr, vecSrc, vecEnd);
 				CKnifeBalrog9::CreateHitFX(tr.vecEndPos, 0);
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_hitwall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			}
 		}
 		else
@@ -378,7 +380,7 @@ namespace sv {
 	void CKnifeBalrog9::PrimaryAttack(void)
 	{
 
-		SendWeaponAnim(ANIM_SLASH, UseDecrement() != FALSE);
+		SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
 #ifndef CLIENT_DLL	
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
@@ -395,7 +397,7 @@ namespace sv {
 	{
 		if (!m_iState)
 		{
-			SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);
+			SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
 
 			m_flTimeCheckCharge = gpGlobals->time + 0.5s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.7s;
@@ -426,7 +428,7 @@ namespace sv {
 
 					m_flTimeCheckCharge = gpGlobals->time + 1.23s;
 					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.23s;
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.23s;
 					break;
 				}
 				case 3:
@@ -437,7 +439,7 @@ namespace sv {
 
 					m_flTimeCheckCharge = gpGlobals->time + 0.35s;
 					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.33s;
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.33s;
 					break;
 				}
 				case 4:
@@ -576,12 +578,12 @@ namespace sv {
 
 			if (m_iSwing)
 			{
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 			else
 			{
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
 
 			ClearMultiDamage();
@@ -615,13 +617,13 @@ namespace sv {
 			{
 				if (m_iSwing)
 				{
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_slash1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				}
 				else
 				{
 					CKnifeBalrog9::CreateHitFX(tr.vecEndPos, m_iSwing);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/tomahawk_wall.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_hitwall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
 			else
@@ -629,7 +631,7 @@ namespace sv {
 				if (m_iSwing)
 				{
 					CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 55.0, m_iSwing);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/laserminigun_exp2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
 		}

@@ -816,7 +816,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 
 #ifdef XASH_DEDICATED
-		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
+		if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && (int)flDamage > 0) {
 			MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 			WRITE_LONG((long)flDamage);
 			WRITE_SHORT(ENTINDEX(edict()));
@@ -1084,7 +1084,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	}
 
 #ifdef XASH_DEDICATED
-	if (CBaseEntity::Instance(pevAttacker)->IsPlayer() && flDamage > 1e-6) {
+	if (CBaseEntity::Instance(pevAttacker)->IsPlayer()) {
 		MESSAGE_BEGIN(MSG_ONE, gmsgHitMsg, NULL, pevAttacker);
 		WRITE_LONG((long)flDamage);
 		WRITE_SHORT(ENTINDEX(edict()));

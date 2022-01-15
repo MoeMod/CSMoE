@@ -122,6 +122,7 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 	}
 	else if (!Q_stricmp(pcmd, "zombie"))
 	{
+		m_pPlayer->m_iTeam = TERRORIST;
 		const char* pszArg1 = CMD_ARGV_(1);
 		if (pszArg1)
 			m_pPlayer->m_ZombieClass = pszArg1;
@@ -136,6 +137,7 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 	}
 	else if (!Q_stricmp(pcmd, "human"))
 	{
+		m_pPlayer->m_iTeam = CT;
 		m_pPlayer->m_bIsZombie = false;
 		BecomeHuman();
 		m_pPlayer->GiveDefaultItems();
@@ -143,8 +145,24 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 	}
 	else if (!Q_stricmp(pcmd, "spawn"))
 	{
+		m_pPlayer->pev->deadflag = DEAD_RESPAWNABLE;
 		m_pPlayer->RoundRespawn();
 		return true;
+	}
+	else if (!Q_stricmp(pcmd, "bot_place"))
+	{
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecOrigin = vecSrc + gpGlobals->v_forward * 60;
+
+		moe::range::PlayersList list;
+		std::random_device rd;
+		std::vector<CBasePlayer*> players(list.begin(), list.end());
+		players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) {
+			return !player->IsAlive() || !player->IsBot();
+		}), players.end());
+		std::shuffle(players.begin(), players.end(), rd);
+		UTIL_SetOrigin(players.front()->pev, vecOrigin);
 	}
 #endif
 

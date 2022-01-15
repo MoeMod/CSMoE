@@ -76,7 +76,6 @@ namespace sv {
 			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef.spr");
 			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef02.spr");
 			PRECACHE_MODEL("sprites/runeblade_eye.spr");
-			PRECACHE_MODEL("sprites/ef_runeblade_swing.spr");
 
 			PRECACHE_SOUND("weapons/runeblade-slash1.wav");
 			PRECACHE_SOUND("weapons/runeblade-slash2.wav");

@@ -87,6 +87,7 @@ void CPlayerModStrategy_ZB3::Evolution(ZombieLevel iEvolutionLevel)
 
 void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
+	m_flGodMode = gpGlobals->time + 1s;
 	SetHero(false);
 	return CPlayerModStrategy_ZB2::BecomeZombie(iEvolutionLevel);
 }
@@ -118,6 +119,11 @@ void CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD()
 float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvars_t * pevAttacker, float flDamage, int bitsDamageType)
 {
 	flDamage = CPlayerModStrategy_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+
+	if (m_flGodMode > gpGlobals->time)
+	{
+		flDamage = 0.0F;
+	}
 
 	// morale calc
 	CBasePlayer *pPlayerAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker);
@@ -244,6 +250,20 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 
 	m_pModZB3->HumanInfectionByZombie(m_pPlayer, pAttackerPlayer);
 	return 0;
+}
+
+int CPlayerModStrategy_ZB3::AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet)
+{
+	if (m_flGodMode > gpGlobals->time)
+	{
+		if (player)
+		{
+			state->renderfx = kRenderFxGlowShell;
+			state->rendercolor = { 255,255,255 };
+			state->renderamt = 1;
+		}
+	}
+	return CPlayerModStrategy_ZB2::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 }
 
 void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const

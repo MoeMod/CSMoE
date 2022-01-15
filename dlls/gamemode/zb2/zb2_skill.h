@@ -214,6 +214,7 @@ public:
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
+	bool HasZombieBomb();
 
 	int m_bHasCreateBomb;
 	ZombieSkillStatus m_iZombieSkillStatusStored;

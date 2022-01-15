@@ -438,6 +438,7 @@ void CMod_Zombi::PickZombieOrigin()
 	{
 		players[i]->m_ZombieClass = "random";
 		players[i]->pev->sequence = 0;
+		players[i]->m_iCustomSequence = -1;
 		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
 		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
 		players[i]->pev->armorvalue = 1100;
@@ -453,6 +454,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 {
 	player->m_ZombieClass = "random";
 	player->pev->sequence = 0;
+	player->m_iCustomSequence = -1;
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;

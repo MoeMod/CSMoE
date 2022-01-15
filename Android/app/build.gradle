@@ -1,4 +1,18 @@
+
 apply plugin: 'com.android.application'
+apply plugin: 'bugly'
+
+bugly {
+    appPackage = 'in.celest.xash3d.csbtem'
+    appVersion = '2481' // 白白：记得改这里，还有AndroidManifest.xml
+
+    appId = '39df575b0b' // 注册时分配的App ID
+    appKey = '92a523be-1f71-4228-91be-f151ef970598' // 注册时分配的App Key
+    execute = true
+    upload = true
+    uploadSymbol = true
+}
+
 
 android {
     signingConfigs {
@@ -28,7 +42,7 @@ android {
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your APK.
-            abiFilters 'arm64-v8a', 'x86_64'
+            abiFilters 'arm64-v8a'
         }
     }
 
