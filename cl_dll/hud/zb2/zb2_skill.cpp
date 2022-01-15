@@ -155,6 +155,7 @@ CHudZB2_Skill::CHudZB2_Skill(void) :  // 0-init
 
 int CHudZB2_Skill::VidInit(void)
 {
+	m_flRecoveryBeginTime = 0.0f;
 	m_HUD_zombirecovery = gHUD.GetSpriteIndex("zombirecovery");
 	m_HUD_zombieGKey = gHUD.GetSpriteIndex("zombiGkey");
 	for (int i = 0; i < 12; ++i)
@@ -200,6 +201,7 @@ int CHudZB2_Skill::VidInit(void)
 
 void CHudZB2_Skill::Reset(void)
 {
+	m_flRecoveryBeginTime = 0.0f;
 	OnSkillInit();
 }
 

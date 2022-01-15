@@ -867,7 +867,7 @@ namespace sv {
 		if (HasZombieBomb())
 		{
 			CBasePlayerWeapon* pWpn = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
-			if (pWpn != NULL && pWpn->m_iId == WEAPON_KNIFE)
+			if (pWpn != NULL && Q_strcmp(STRING(pWpn->pev->classname), "weapon_zombibomb"))
 			{
 				m_iZombieSkillStatus = SKILL_STATUS_USED;
 
@@ -978,7 +978,6 @@ namespace sv {
 						m_flTimeTriggerZombieSkill = gpGlobals->time + 1.1s;
 					}
 				}
-				return;		
 			}
 			else
 			{
@@ -1032,12 +1031,18 @@ namespace sv {
 
 	void CZombieSkill_ZombiePass::FireZombieSkill()
 	{
-		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
-		if (pWeapon != NULL && !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_zombibomb"))
+		CBasePlayerItem* item = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
+		while (item != NULL)
 		{
-			m_pPlayer->DropPlayerItem(STRING(pWeapon->pev->classname));
-			m_flTimeTriggerZombieSkill = invalid_time_point;
-		}		
+			if (!Q_strcmp(STRING(item->pev->classname), "weapon_zombibomb"))
+			{
+				m_pPlayer->DropPlayerItem(STRING(item->pev->classname));
+				m_flTimeTriggerZombieSkill = invalid_time_point;
+				break;
+			}
+
+			item = item->m_pNext;
+		}
 	}
 	//teleport Zombie
 	CZombieSkill_ZombieTeleport::CZombieSkill_ZombieTeleport(CBasePlayer* player) : CZombieSkill_Base(player)

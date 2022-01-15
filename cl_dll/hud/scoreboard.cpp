@@ -273,8 +273,6 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 	std::iota(std::begin(SortedId), std::end(SortedId), 0);
 	std::sort(std::begin(SortedId), std::end(SortedId), [](size_t a, size_t b) {
 		return std::make_pair(g_PlayerExtraInfo[a].frags, -g_PlayerExtraInfo[a].deaths) > std::make_pair(g_PlayerExtraInfo[b].frags, -g_PlayerExtraInfo[b].deaths);
-		//return (g_PlayerExtraInfo[a].frags > g_PlayerExtraInfo[b].deaths) || 
-		//	(g_PlayerExtraInfo[a].frags == g_PlayerExtraInfo[b].frags && g_PlayerExtraInfo[a].deaths < g_PlayerExtraInfo[b].deaths);
 	});
 
 	int r = 255, g = 255, b = 255, a = 255;
@@ -292,7 +290,7 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 		char szBuf[128];
 		const float flScale = 0.0f;
 
-		for (int i : SortedId)
+		for (int i = 0; i < MAX_PLAYERS + 1; i++)
 		{
 			const int id = SortedId[i];
 
@@ -356,25 +354,25 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 
 			if (g_PlayerExtraInfo[id].dead)
 			{
-				sprintf(szBuf, "Dead");
+				sprintf(szBuf, "死亡");
 				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
 			}
 			else if (g_PlayerExtraInfo[id].has_c4)
 			{
-				sprintf(szBuf, "Bomb");
+				sprintf(szBuf, "炸弹");
 				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
 			}
 			else if (g_PlayerExtraInfo[id].vip)
 			{
 				if(gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
-					sprintf(szBuf, "Hero");
+					sprintf(szBuf, "英雄");
 				else 
 					sprintf(szBuf, "VIP");
 				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
 			}
 			else if (g_PlayerExtraInfo[id].zombie)
 			{
-				sprintf(szBuf, "Zombie");
+				sprintf(szBuf, "僵尸");
 				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
 			}
 
@@ -402,11 +400,11 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 
 
 		std::tie(r, g, b, a) = std::make_tuple(255, 188, 0, 255);
-		sprintf(szBuf, "Kills");
+		sprintf(szBuf, "杀敌");
 		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 145, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
-		sprintf(szBuf, "Deaths");
+		sprintf(szBuf, "死亡");
 		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 75, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
-		sprintf(szBuf, "Ping");
+		sprintf(szBuf, "延迟");
 		DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 5, y + 80 + iCharHeightOffset, 0, szBuf, r, g, b, flScale);
 
 		gEngfuncs.pfnFillRGBA(x + 9, y + 96, (iStartW / 2) - 16, 1, 172, 104, 0, 255);
@@ -415,9 +413,9 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 		{
 			const bool bIsZombieMode = gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZB4 || gHUD.m_iModRunning == MOD_ZBB || gHUD.m_iModRunning == MOD_ZBZ;
 			if (iColumn == 2)
-				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Human" : "CT", iPlayerCount);
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "人类" : "CT", iPlayerCount);
 			else
-				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Zombie" : "TR", iPlayerCount);
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "僵尸" : "TR", iPlayerCount);
 
 			DrawUtils::DrawHudString(x + 105, y + 110 + iCharHeightOffset, 1000, szBuf, r, g, b, flScale);
 
@@ -440,9 +438,9 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 		else if (!bDivideTeam && iPlayerCount)
 		{
 			if (iColumn == 2)
-				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Human" : "CT", g_PlayerExtraInfo[SortedId[0]].frags);
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "人类" : "CT", g_PlayerExtraInfo[SortedId[0]].frags);
 			else
-				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "Zombie" : "TR", g_PlayerExtraInfo[SortedId[0]].frags);
+				sprintf(szBuf, "%s  (%d)", bIsZombieMode ? "僵尸" : "TR", g_PlayerExtraInfo[SortedId[0]].frags);
 
 			DrawUtils::DrawHudString(x + 105, y + 110 + iCharHeightOffset, 1000, szBuf, r, g, b, flScale);
 
@@ -487,7 +485,7 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 			if (iPlayerCount)
 			{
 				std::tie(r, g, b, a) = std::make_tuple(255, 188, 0, 255);
-				DrawUtils::DrawHudString(x + 35, y + iStartH - 212, (iStartW / 2) - 49 - (x + 35), "Spectators", r, g, b, flScale);
+				DrawUtils::DrawHudString(x + 35, y + iStartH - 212, (iStartW / 2) - 49 - (x + 35), "观察者", r, g, b, flScale);
 				gEngfuncs.pfnFillRGBA(x + 19, y + iStartH - 212, (iStartW / 2) - 49, 1, 188, 112, 0, 255);
 			}
 		}

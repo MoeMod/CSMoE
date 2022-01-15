@@ -340,11 +340,21 @@ void CMod_ZombieHero::CheckWinConditions()
 
 	if (!FInfectionStarted() || m_bRoundTerminating)
 		return;
-
-	moe::range::PlayersList list;
+	
+	/*moe::range::PlayersList list;
 	auto iAliveHuman = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_CT && !player->m_bIsZombie && player->IsAlive(); });
-	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie && !(!player->IsAlive() && player->m_bHeadshotKilled); });
+	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie && !(!player->IsAlive() && player->m_bHeadshotKilled); });*/
+	int iAliveHuman = 0;
+	int iAliveZombie = 0;
+	for (int i = 1; i <= gpGlobals->maxClients; ++i)
+	{
+		CBasePlayer *pPlayer = static_cast<CBasePlayer*>(UTIL_PlayerByIndex(i));
 
+		if (pPlayer && pPlayer->m_iTeam == CT && !pPlayer->m_bIsZombie && pPlayer->IsAlive())
+			++iAliveHuman;
+		if (pPlayer && pPlayer->m_iTeam == TERRORIST && pPlayer->m_bIsZombie && (pPlayer->IsAlive() || !pPlayer->m_bHeadshotKilled))
+			++iAliveZombie;
+	}
 	ALERT(at_console, "CheckWinConditions: iAliveHuman:%d iAliveZombie:%d\n", iAliveHuman, iAliveZombie);
 
 	if (!iAliveHuman)
