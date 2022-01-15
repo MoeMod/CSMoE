@@ -1575,7 +1575,12 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 
 	int i = GL_FindTexture(name);
 	if(i > 0)
+	{
+		tex = R_GetTexture(i);
+		if (tex->name[0] != '*')
+			tex->refCount++;
 		return i;
+	}
 
 	i = GL_AllocateTextureSlot(name);
 	if(!i)
