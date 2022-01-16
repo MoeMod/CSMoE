@@ -16,30 +16,26 @@ CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const
 
 	if (args) {
 		for (int i = 0; i < args->Count(); ++i)
-			m_args.AddToTail(CloneString((*args)[i]));
+			m_args.emplace_back((*args)[i]);
 	}
 }
 
 CHintMessage::~CHintMessage()
 {
-	for (int i = 0; i < m_args.Count(); ++i)
-		delete[] m_args[i];
-
-	m_args.RemoveAll();
+	m_args.clear();
 }
 
 void CHintMessage::Send(CBaseEntity *client)
 {
-	UTIL_ShowMessageArgs(m_hintString, client, &m_args, m_isHint);
+	CUtlVector<char *> args;
+	for(std::string &arg : m_args)
+		args.AddToTail(arg.data());
+	UTIL_ShowMessageArgs(m_hintString, client, &args, m_isHint);
 }
 
 void CHintMessageQueue::Reset()
 {
 	m_tmMessageEnd = invalid_time_point;
-
-	for (int i = 0; i < m_messages.size(); ++i)
-		delete m_messages[i];
-
 	m_messages.clear();
 }
 
@@ -51,17 +47,15 @@ void CHintMessageQueue::Update(CBaseEntity *client)
 	if (m_messages.empty())
 		return;
 
-	CHintMessage *msg = m_messages[0];
-	m_tmMessageEnd = gpGlobals->time + msg->GetDuration();
-	msg->Send(client);
-	delete msg;
+	CHintMessage &msg = m_messages.front();
+	m_tmMessageEnd = gpGlobals->time + msg.GetDuration();
+	msg.Send(client);
 	m_messages.erase(m_messages.begin());
 }
 
 bool CHintMessageQueue::AddMessage(const char *message, duration_t duration, bool isHint, CUtlVector<const char *> *args)
 {
-	CHintMessage *msg = new CHintMessage(message, isHint, args, duration);
-	m_messages.push_back(msg);
+	m_messages.emplace_back(message, isHint, args, duration);
 
 	return true;
 }

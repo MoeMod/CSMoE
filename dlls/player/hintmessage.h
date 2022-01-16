@@ -38,7 +38,7 @@ public:
 
 private:
 	const char *m_hintString;
-	CUtlVector<char *> m_args;
+	std::vector<std::string> m_args;
 	duration_t m_duration;
 	bool m_isHint;
 };
@@ -54,7 +54,7 @@ struct CHintMessageQueue
 	void LuaGet(lua_State* L, int N);
 
 	time_point_t m_tmMessageEnd;
-	std::vector<CHintMessage *> m_messages;
+	std::vector<CHintMessage> m_messages;
 };
 
 }
