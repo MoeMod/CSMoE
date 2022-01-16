@@ -1806,7 +1806,10 @@ namespace xe {
 	{
 		// release source
 		if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
+		{
 			FS_FreeImage( image->original );
+			image->original = nullptr;
+		}
 
 		pglDeleteTextures( 1, &image->texnum );
 

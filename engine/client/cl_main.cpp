@@ -1249,10 +1249,10 @@ void CL_InternetServers_f( void )
 	const size_t remaining = sizeof( fullquery ) - sizeof( MS_SCAN_REQUEST );
 
 	Info_SetValueForKey( info, "nat", cl_nat->string, remaining );
-	Info_SetValueForKey( info, "gamedir", GI->gamefolder, remaining );
+	Info_SetValueForKey( info, "gamedir", "cstrike", remaining );
 
 	// let master know about client version
-	Info_SetValueForKey( info, "clver", XASH_VERSION, remaining );
+	Info_SetValueForKey( info, "clver", "1200", remaining );
 
 	NET_Config( true, true ); // allow remote
 
@@ -1785,6 +1785,8 @@ void CL_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 
 		if( !CL_IsFromConnectingServer( from ))
 			return;
+
+		Cmd_ExecuteString( "menu_connectionprogress disconnect", src_command );
 
 		str = BF_ReadString( msg );
 		if( UI_IsVisible() )
