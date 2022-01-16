@@ -1,8 +1,0 @@
-symbolFile=D:\repos\CSMoE\Android\app\bugly\buglySymbol_libxash_arm64-v8a-dddcc.zip
-file=D:\repos\CSMoE\Android\app\build\intermediates\cmake\release\obj\arm64-v8a\libxash.so
-uuid=dddcc4b895425e68394b6b14acaa1e06
-
-symbolFile=D:\repos\CSMoE\Android\app\bugly\buglySymbol_libxash_x86_64-094b0.zip
-file=D:\repos\CSMoE\Android\app\build\intermediates\cmake\release\obj\x86_64\libxash.so
-uuid=094b0b706adc096bb751f25b4806d5b9
-
