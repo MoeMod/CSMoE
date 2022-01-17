@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.celest.xash3d.csbtem"
     android:installLocation="auto"
-    android:versionCode="2481"
-    android:versionName="v22-citrus-2481">
+    android:versionCode="2482"
+    android:versionName="v22-citrus-2482">
     <!-- OpenGL ES 1.1 -->
     <uses-feature android:glEsVersion="0x00010000" /> <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
