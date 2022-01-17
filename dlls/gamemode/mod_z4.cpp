@@ -625,9 +625,19 @@ namespace sv {
 						}
 
 						if(RANDOM_LONG(0, 1))
-							EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash1, VOL_NORM, ATTN_NORM);
+						{
+							if(soundlist.szSoundDash1 && soundlist.szSoundDash1[0])
+							{
+								EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash1, VOL_NORM, ATTN_NORM);
+							}
+						}
 						else
-							EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash2, VOL_NORM, ATTN_NORM);
+						{
+							if(soundlist.szSoundDash2 && soundlist.szSoundDash2[0])
+							{
+								EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundDash2, VOL_NORM, ATTN_NORM);
+							}
+						}
 
 						m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("dash");
 						m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + skill.flDashTimeCheck;

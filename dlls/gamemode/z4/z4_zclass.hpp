@@ -57,12 +57,26 @@ namespace sv {
 }
 
 #include "z4_zclass_z4normal.hpp"
+#include "z4_zclass_z4light.hpp"
+#include "z4_zclass_z4heavy.hpp"
+#include "z4_zclass_z4hide.hpp"
+#include "z4_zclass_z4humpback.hpp"
 
 namespace sv {
 	namespace z4 {
 		using zclass_variant_t = std::variant<
-	        zclass_z4normal
+	        zclass_z4normal,
+			zclass_z4light,
+			zclass_z4heavy,
+			zclass_z4hide,
+			zclass_z4humpback
 		>;
+
+		template<class ZC> auto Z4_ZClass_Precache_Single_Custom(ZC *) -> decltype(ZC::Precache())
+		{
+			return ZC::Precache();
+		}
+		template<class ZC> void Z4_ZClass_Precache_Single_Custom(...) {}
 
 		template<class ZC> void Z4_ZClass_Precache_Single()
 		{
@@ -75,6 +89,8 @@ namespace sv {
 			StructApply(ZC::Sound, [](auto...SoundList){
 				(..., (SoundList && PRECACHE_SOUND(SoundList)));
 			});
+
+			Z4_ZClass_Precache_Single_Custom<ZC>(nullptr);
 		}
 
 		template<class...ZC>

@@ -22,7 +22,6 @@ namespace sv {
 			static constexpr zclass_skill_s Skill = {
 					"攀爬", "暴走", 10.0, 25.0, 0.0, 20.0, 15.0s, 0.5s, 11, 0.5s
 			};
-			static constexpr auto Sound_Skill = "zombi/z4/normal/normal_skill.wav";
 
 			CBasePlayer *const m_pPlayer;
 
@@ -40,7 +39,7 @@ namespace sv {
 				m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 				m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 				m_pPlayer->pev->armorvalue = 200;
-				m_pPlayer->pev->gravity = 0.7f;
+				m_pPlayer->pev->gravity = Ability.flGravity;
 				m_pPlayer->ResetMaxSpeed();
 			}
 
