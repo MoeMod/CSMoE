@@ -848,6 +848,9 @@ namespace sv {
 
 	bool CZombieSkill_ZombiePass::HasZombieBomb()
 	{
+		if (!m_pPlayer->AmmoInventory(m_pPlayer->GetAmmoIndex("HEGrenade")))
+			return false;
+
 		CBasePlayerItem *item = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 		while (item != NULL)
 		{
@@ -976,6 +979,7 @@ namespace sv {
 						m_pPlayer->m_flNextAttack = 2.1s;
 						pWpn->m_flTimeWeaponIdle = 2.1s;
 						m_flTimeTriggerZombieSkill = gpGlobals->time + 1.1s;
+						m_flTimeZombieSkillNext = gpGlobals->time + 2.1s;
 					}
 				}
 			}
@@ -993,6 +997,7 @@ namespace sv {
 				if (pWpn)
 				{
 					pWpn->SendWeaponAnim(5, TRUE);
+					pWpn->m_flNextPrimaryAttack = 2.0s;
 					pWpn->m_flTimeWeaponIdle = 2.0s;
 				}
 				m_pPlayer->m_flNextAttack = 2.0s;
@@ -1031,6 +1036,9 @@ namespace sv {
 
 	void CZombieSkill_ZombiePass::FireZombieSkill()
 	{
+		if (!m_pPlayer->AmmoInventory(m_pPlayer->GetAmmoIndex("HEGrenade")))
+			return ;
+
 		CBasePlayerItem* item = m_pPlayer->m_rgpPlayerItems[GRENADE_SLOT];
 		while (item != NULL)
 		{
