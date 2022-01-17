@@ -274,6 +274,7 @@ set (HUD_SRCS
 	./hud/moe/moe_touch.cpp
 	./hud/z4/z4.cpp
 	./hud/z4/z4_energy.cpp
+	./hud/z4/z4_scoreboard.cpp
 	./hud/zbz/zbz.cpp
 	./hud/zbz/zbz_skill_info.cpp
 	./hud/hud_sifiammo.cpp

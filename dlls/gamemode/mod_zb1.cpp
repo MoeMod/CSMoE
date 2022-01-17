@@ -383,20 +383,21 @@ CPlayerModStrategy_ZB1::CPlayerModStrategy_ZB1(CBasePlayer *player, CMod_Zombi *
 
 float CPlayerModStrategy_ZB1::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
-	flDamage = m_pCharacter->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+	if(m_pCharacter)
+		flDamage = m_pCharacter->AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 	return CPlayerModStrategy_Zombie::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 void CPlayerModStrategy_ZB1::Pain(int m_LastHitGroup, bool HasArmour)
 {
-	if(m_pPlayer->m_bIsZombie)
+	if(m_pPlayer->m_bIsZombie && m_pCharacter)
 		return m_pCharacter->Pain_Zombie(m_LastHitGroup, HasArmour);
 	return CPlayerModStrategy_Zombie::Pain(m_LastHitGroup, HasArmour);
 }
 
 void CPlayerModStrategy_ZB1::DeathSound()
 {
-	if(m_pPlayer->m_bIsZombie)
+	if(m_pPlayer->m_bIsZombie && m_pCharacter)
 		return m_pCharacter->DeathSound_Zombie();
 	return CPlayerModStrategy_Zombie::DeathSound();
 }

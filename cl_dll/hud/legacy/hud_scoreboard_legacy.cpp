@@ -43,7 +43,7 @@ int CHudScoreBoardLegacy::VidInit(void)
 
 int CHudScoreBoardLegacy::Draw(float flTime)
 {
-	if (g_iUser1)
+	if (g_iUser1 || gHUD.m_iModRunning == MOD_ZB4)
 		return 1;
 
 	int idx = gEngfuncs.GetLocalPlayer()->index;

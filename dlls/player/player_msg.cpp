@@ -118,6 +118,7 @@ DLL_GLOBAL int gmsgZBZMsg = 0;
 DLL_GLOBAL int gmsgGunDeath = 0;
 DLL_GLOBAL int gmsgWeapDrop = 0;
 DLL_GLOBAL int gmsgOperationSystem = 0;
+DLL_GLOBAL int gmsgZ4Msg = 0;
 
 // main code
 
@@ -220,6 +221,7 @@ void LinkUserMessages()
 	gmsgHitMsg = REG_USER_MSG("HitMsg", -1);
 	gmsgWeapDrop = REG_USER_MSG("WeapDrop", -1);
 	gmsgOperationSystem = REG_USER_MSG("OperationSystem", -1);
+	gmsgZ4Msg = REG_USER_MSG("Z4Msg", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)

@@ -29,7 +29,7 @@ class CHintMessage
 {
 public:
 	CHintMessage(const char *hintString, bool isHint, CUtlVector<const char *> *args, duration_t duration);
-	~CHintMessage(void);
+	~CHintMessage() = default;
 
 public:
 	duration_t GetDuration(void) const { return m_duration; }
@@ -37,7 +37,7 @@ public:
 	bool IsEquivalent(const char *hintString, CUtlVector<const char *> *args) const;
 
 private:
-	const char *m_hintString;
+	std::string m_hintString;
 	std::vector<std::string> m_args;
 	duration_t m_duration;
 	bool m_isHint;

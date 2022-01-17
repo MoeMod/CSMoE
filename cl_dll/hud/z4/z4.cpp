@@ -1,5 +1,5 @@
 /*
-zb4.cpp - CSMoE Client HUD : Zombie Hero
+z4.cpp - CSMoE Client HUD : Zombie 4
 Copyright (C) 2019 Moemod Hyakuya
 
 This program is free software: you can redistribute it and/or modify
@@ -25,13 +25,14 @@ GNU General Public License for more details.
 
 #include "z4.h"
 #include "z4_energy.h"
+#include "z4_scoreboard.h"
 
-#include "gamemode/zb3/zb3_const.h"
+#include "gamemode/z4/z4_const.h"
 
 #include <vector>
 
 class CHudZ4::impl_t
-	: public THudSubDispatcher<CHudZ4Energy>
+	: public THudSubDispatcher<CHudZ4Energy, CHudZ4Scoreboard>
 {
 public:
 };
@@ -40,14 +41,38 @@ DECLARE_MESSAGE(m_ZB4, ZB4Msg)
 int CHudZ4::MsgFunc_ZB4Msg(const char *pszName, int iSize, void *pbuf)
 {
 	BufferReader buf(pszName, pbuf, iSize);
-	auto type = static_cast<ZB3MessageType>(buf.ReadByte());
+	auto type = static_cast<Z4MessageType>(buf.ReadByte());
 	switch (type)
 	{
-	case ZB3_MESSAGE_RAGE:
+	/*
+	case 4:
 	{
-		auto zombie_level = static_cast<ZombieLevel>(buf.ReadByte());
-		int percent = buf.ReadByte();
-		pimpl->get<CHudZ4Energy>().SetPercent(percent);
+		int slot = READ_BYTE();
+		int id = READ_BYTE();
+		int status = READ_BYTE();
+		g_CHudZB4UI.m_Icon.AddIcon(slot, id, status);
+		break;
+	}
+	case 5:
+	{
+		int start = READ_BYTE();
+		int end = READ_BYTE();
+		g_CHudZB4UI.m_Tip.SetNightTime(start, end);
+		break;
+	}*/
+	case Z4_MESSAGE_ENERGY:
+	{
+		int power = buf.ReadByte();
+		float flashtime = buf.ReadByte() / 10.0f;
+		//g_CHudZB4UI.m_Icon.SetPower(power);
+		pimpl->get<CHudZ4Energy>().SetPower(power, flashtime);
+		break;
+	}
+	case Z4_MESSAGE_DAMAGE:
+	{
+		int a = buf.ReadByte();
+		int b = buf.ReadByte();
+		pimpl->get<CHudZ4Scoreboard>().SetDamage(a * 255 + b);
 		break;
 	}
 	}

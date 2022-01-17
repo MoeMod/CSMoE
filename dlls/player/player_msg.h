@@ -122,6 +122,7 @@ extern int gmsgZBZMsg;
 extern int gmsgGunDeath;
 extern int gmsgWeapDrop;
 extern int gmsgOperationSystem;
+extern int gmsgZ4Msg;
 
 void LinkUserMessages();
 void WriteSigonMessages();

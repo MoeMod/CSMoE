@@ -20,17 +20,12 @@ CHintMessage::CHintMessage(const char *hintString, bool isHint, CUtlVector<const
 	}
 }
 
-CHintMessage::~CHintMessage()
-{
-	m_args.clear();
-}
-
 void CHintMessage::Send(CBaseEntity *client)
 {
 	CUtlVector<char *> args;
 	for(std::string &arg : m_args)
 		args.AddToTail(arg.data());
-	UTIL_ShowMessageArgs(m_hintString, client, &args, m_isHint);
+	UTIL_ShowMessageArgs(m_hintString.c_str(), client, &args, m_isHint);
 }
 
 void CHintMessageQueue::Reset()

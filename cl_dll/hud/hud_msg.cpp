@@ -118,6 +118,7 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	gHUD.m_ZB2.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZB3.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZBZ.m_iFlags &= ~HUD_ACTIVE;
+	gHUD.m_ZB4.m_iFlags &= ~HUD_ACTIVE;
 	gHUD.m_ZBS.m_iFlags &= ~HUD_ACTIVE;
 
 	switch (m_iModRunning)
@@ -147,6 +148,11 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 		break;
 	}
 
+	case MOD_ZB4:
+	{
+		gHUD.m_ZB4.m_iFlags |= HUD_ACTIVE;
+		break;
+	}
 	case MOD_ZBZ:
 	{
 		gHUD.m_ZBZ.m_iFlags |= HUD_ACTIVE;

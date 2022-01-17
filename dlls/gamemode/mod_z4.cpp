@@ -25,6 +25,7 @@
 #include <numeric>
 
 #include "gamemode/z4/z4_zclass.hpp"
+#include "gamemode/z4/z4_const.h"
 
 template<class...Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class...Ts> overloaded(Ts...) -> overloaded<Ts...>;
@@ -374,7 +375,7 @@ namespace sv {
 					{
 						if(dns == DNS_DARK && strategy->IsZombie())
 						{
-							Adrenaline_Set(7);
+							Adrenaline_Set(7, 1.0f);
 						}
 						else
 						{
@@ -395,12 +396,16 @@ namespace sv {
 			}
 		}
 
-		void Adrenaline_Set(int DeltaValue)
+		void Adrenaline_Set(int DeltaValue, float flFlashTime = 0.5f)
 		{
 			int oldvalue = std::exchange(m_iAdrenaline, std::clamp(m_iAdrenaline + DeltaValue, 0, 120));
 			if(m_iAdrenaline != oldvalue)
 			{
-				// TODO : fire message
+				MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, strategy->m_pPlayer->pev);
+				WRITE_BYTE(Z4_MESSAGE_ENERGY);
+				WRITE_BYTE(m_iAdrenaline);
+				WRITE_BYTE(flFlashTime * 10);
+				MESSAGE_END();
 			}
 
 		}
@@ -824,7 +829,7 @@ namespace sv {
 		m_pCharacter = p;
 		m_pCharacter_Z4 = p;
 		adrenaline = std::make_unique<adrenaline_t>(m_pModZB4, this);
-		adrenaline->Adrenaline_Set(100);
+		adrenaline->Adrenaline_Set(100, 0.2f);
 
 		DeployWeapon(m_pPlayer->m_pActiveItem);
 	}
@@ -834,7 +839,7 @@ namespace sv {
 		m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
 		m_pCharacter_Z4 = nullptr; // TODO
 		adrenaline = std::make_unique<adrenaline_t>(m_pModZB4, this);
-		adrenaline->Adrenaline_Set(0);
+		adrenaline->Adrenaline_Set(0, 0.0f);
 	}
 
 	void CPlayerModStrategy_ZB4::OnSpawn()

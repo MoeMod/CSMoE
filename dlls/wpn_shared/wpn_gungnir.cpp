@@ -938,8 +938,11 @@ void CGungnir::DestroyEffect()
 	for (CBeam *p : phs5_6_7)
 	{
 		if (p)
-			p->SUB_Remove();
+			UTIL_Remove(p);
 	}
+	phs5_6_7[0] = NULL;
+	phs5_6_7[1] = NULL;
+	phs5_6_7[2] = NULL;
 #endif
 }
 
