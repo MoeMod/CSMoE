@@ -29,6 +29,8 @@ GNU General Public License for more details.
 
 #include "util/u_range.hpp"
 
+#include "Reciter.h"
+
 #include <vector>
 #include <algorithm>
 #include <functional>
@@ -278,10 +280,9 @@ void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) 
 	MESSAGE_END();
 }
 
-CMod_ZombieHero::CMod_ZombieHero()
-{
-
-}
+// pimpl requires individual definition for dtor
+CMod_ZombieHero::CMod_ZombieHero() = default;
+CMod_ZombieHero::~CMod_ZombieHero() = default;
 
 void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 {
@@ -308,7 +309,62 @@ void CMod_ZombieHero::RestartRound()
 {
 	m_Morale.ResetLevel();
 	m_eventRoundStart.dispatch();
-	return CMod_ZombieMod2::RestartRound();
+	CMod_ZombieMod2::RestartRound();
+
+	MakeReciter();
+}
+
+void CMod_ZombieHero::MakeReciter()
+{
+	m_bHasAnswered = false;
+	m_pCurrentReciter = nullptr;
+	try {
+		m_pCurrentReciter = std::make_unique<Reciter>(GetRandomReciter());
+	}
+	catch(...) {}
+
+	if(	m_pCurrentReciter )
+	{
+		char szText[512];
+		snprintf(szText, 512, "^3[柑橘CitruS] ^7抢答活动：：^5%s^7", m_pCurrentReciter->question.c_str());
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+		WRITE_BYTE(0);
+		WRITE_STRING(szText);
+		MESSAGE_END();
+	}
+}
+
+bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *content)
+{
+	if(m_pCurrentReciter && content == m_pCurrentReciter->answer)
+	{
+		if(m_bHasAnswered)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgSayText, nullptr, pEntity);
+			WRITE_BYTE(0);
+			WRITE_STRING("^3[柑橘CitruS] ^7已有其他人回答过问题，你手速慢了嗷！^7");
+			MESSAGE_END();
+		}
+		else
+		{
+			CBaseEntity *pEntity2 = CBaseEntity::Instance(pEntity);
+			if(pEntity2->IsPlayer())
+			{
+				char szText[256];
+				snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，本局将成为英雄！^7", STRING(pEntity->v.netname));
+				MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+				WRITE_BYTE(ENTINDEX(pEntity));
+				WRITE_STRING(szText);
+				MESSAGE_END();
+
+				CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pEntity2);
+				MakeHero(pPlayer);
+
+				m_bHasAnswered = true;
+			}
+		}
+	}
+	return CMod_ZombieMod2::Host_Say(pEntity, teamonly, content);
 }
 
 void CMod_ZombieHero::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)
@@ -328,8 +384,9 @@ void CMod_ZombieHero::PickHero()
 	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
 	std::shuffle(players.begin(), players.end(), rd);
 	// make heroes
-	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
-	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieHero::MakeHero, this, std::placeholders::_1));
+	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<int>(-1, 1)(rd) - (int)m_bHasAnswered);
+	if(iNumHeroes > 0)
+		std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieHero::MakeHero, this, std::placeholders::_1));
 }
 
 void CMod_ZombieHero::CheckWinConditions()

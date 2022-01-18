@@ -644,6 +644,9 @@ void Host_Say(edict_t *pEntity, int teamonly)
 	if (Q_strlen(p) <= 0)
 		return;
 
+	if(g_pModRunning->Host_Say(pEntity, teamonly, p))
+		return;
+
 	const char *placeName = NULL;
 	const char *pszFormat = NULL;
 	const char *pszConsoleFormat = NULL;

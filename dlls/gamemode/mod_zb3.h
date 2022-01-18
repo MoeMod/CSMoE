@@ -20,12 +20,15 @@ GNU General Public License for more details.
 #include "zb3/zb3_const.h"
 #include "zb3/zb3_morale.h"
 
+struct Reciter;
+
 namespace sv {
 
 class CMod_ZombieHero : public CMod_ZombieMod2
 {
 public:
 	CMod_ZombieHero();
+	~CMod_ZombieHero();
 	void InstallPlayerModStrategy(CBasePlayer *) override;
 	void PickZombieOrigin() override;
 	void UpdateGameMode(CBasePlayer *pPlayer) override;
@@ -35,6 +38,7 @@ public:
 	BOOL FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker) override;
 	void Think() override;
 	int IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled) override;
+	bool Host_Say(edict_t *pEntity, int teamonly, const char *content) override;
 
 	const CZB3HumanMorale &HumanMorale() const { return m_Morale; }
 
@@ -45,7 +49,11 @@ protected:
 	virtual void PickHero();
 	void MakeHero(CBasePlayer *p) { m_eventBecomeHero.dispatch(p); }
 
+	void MakeReciter();
+
 	CZB3HumanMorale m_Morale;
+	std::unique_ptr<Reciter> m_pCurrentReciter;
+	bool m_bHasAnswered = false;
 };
 
 class CPlayerModStrategy_ZB3 : public CPlayerModStrategy_ZB2

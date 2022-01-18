@@ -52,6 +52,7 @@ public:
 	virtual enum CCSBotManager::GameScenarioType OverrideGameScenario(enum CCSBotManager::GameScenarioType type) { return type; }
 	virtual bool CanChangeTeam(CBasePlayer* player, int newTeam_id, int curTeam_id) { return true; }
 	virtual bool IsGameStarted()  { return true; }
+	virtual bool Host_Say(edict_t *pEntity, int teamonly, const char *content) { return false; }
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, virtual public IBaseMod
