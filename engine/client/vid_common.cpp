@@ -85,6 +85,7 @@ convar_t	*r_vbo;
 convar_t 	*r_bump;
 convar_t	*r_vbo_dlightmode;
 convar_t	*r_underwater_distortion;
+convar_t    *r_texlru;
 convar_t	*mp_decals;
 
 convar_t	*vid_displayfrequency;
@@ -913,6 +914,11 @@ void GL_InitCommands( void )
 	gl_overbright = Cvar_Get( "gl_overbright", "0", CVAR_ARCHIVE, "Overbright mode (0-2)");
 	gl_overbright_studio = Cvar_Get( "gl_overbright_studio", "0", CVAR_ARCHIVE, "Overbright for studiomodels");
 	gl_fog = Cvar_Get("gl_fog", "1", CVAR_ARCHIVE, "Fog");
+#if TARGET_OS_IOS
+	r_texlru = Cvar_Get("r_texlru", "256", CVAR_ARCHIVE, "Texture LRU size");
+#else
+	r_texlru = Cvar_Get("r_texlru", "0", CVAR_ARCHIVE, "Texture LRU size");
+#endif
 
 	// these cvar not used by engine but some mods requires this
 	Cvar_Get( "gl_polyoffset", "-0.1", 0, "polygon offset for decals" );

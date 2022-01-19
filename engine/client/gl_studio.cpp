@@ -1832,9 +1832,8 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
-#if TARGET_OS_IOS
-	xe::TexLru_StudioSetupSkin(&ptexture[pskinref[index]]);
-#endif
+	if(r_texlru->integer)
+		xe::TexLru_StudioSetupSkin(&ptexture[pskinref[index]]);
 	GL_Bind( XASH_TEXTURE0, ptexture[pskinref[index]].index );
 }
 
@@ -2105,9 +2104,8 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-#if TARGET_OS_IOS
-			xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
-#endif
+			if(r_texlru->integer)
+				xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -2475,9 +2473,8 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-#if TARGET_OS_IOS
-			xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
-#endif
+			if(r_texlru->integer)
+				xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -3923,11 +3920,10 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		if( FS_FileExists( texname, false ))
 		{
-#if TARGET_OS_IOS
-			gl_texturenum = xe::TexLru_LoadTextureExternal(texname, NULL, flags, filter);
-#else
-			gl_texturenum = GL_LoadTexture( texname, NULL, 0, flags, filter );
-#endif
+			if(r_texlru->integer)
+				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, NULL, flags, filter);
+			else
+				gl_texturenum = GL_LoadTexture( texname, NULL, 0, flags, filter );
 		}
 
 		if( gl_texturenum )
@@ -3948,11 +3944,10 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
 				if (FS_FileExists(texname, false))
 				{
-#if TARGET_OS_IOS
-					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
-#else
-					gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
-#endif
+					if(r_texlru->integer)
+						gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+					else
+						gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
 					break;
 				}
 			}
@@ -3960,22 +3955,20 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{
-#if TARGET_OS_IOS
-				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
-#else
-				gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
-#endif
+				if(r_texlru->integer)
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+				else
+					gl_texturenum = GL_LoadTexture(texname, NULL, 0, flags, filter);
 				break;
 			}
 
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.bmp", name);
 			if (FS_FileExists(texname, false))
 			{
-#if TARGET_OS_IOS
-				gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
-#else
-				gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
-#endif
+				if(r_texlru->integer)
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+				else
+					gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
 				break;
 			}
 			break;
@@ -4014,11 +4007,10 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 		// build the texname
 		Q_snprintf( texname, sizeof( texname ), "#%s/%s.mdl", mdlname, name );
-#if TARGET_OS_IOS
-		ptexture->index = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
-#else
-		ptexture->index = GL_LoadTexture( texname, (byte *)ptexture, size, flags, filter );
-#endif
+		if(r_texlru->integer)
+			ptexture->index = xe::TexLru_LoadTextureInternal(texname, mod->name, ptexture, size, flags, filter);
+		else
+			ptexture->index = GL_LoadTexture( texname, (byte *)ptexture, size, flags, filter );
 	}
 	else MsgDev( D_NOTE, "Loading HQ: %s\n", texname );
 

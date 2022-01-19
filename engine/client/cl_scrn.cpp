@@ -676,12 +676,6 @@ void SCR_VidInit( void )
 
 	// restart console size
 	Con_VidInit ();
-
-	// restart imgui
-#ifdef XASH_IMGUI
-	ImGui_ImplGL_InvalidateDeviceObjects();
-	ImGui_ImplGL_CreateDeviceObjects();
-#endif
 }
 
 /*
@@ -718,6 +712,12 @@ void SCR_Init( void )
 		// console still can't be toggled in-game without extra cmd-line switch
 		if( !host.developer ) host.developer = 1; // we need console, because menu is missing
 	}
+
+	// restart imgui
+#ifdef XASH_IMGUI
+	ImGui_ImplGL_InvalidateDeviceObjects();
+	ImGui_ImplGL_CreateDeviceObjects();
+#endif
 
 	SCR_LoadCreditsFont ();
 	SCR_InstallParticlePalette ();

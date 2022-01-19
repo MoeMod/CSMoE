@@ -20,6 +20,9 @@ GNU General Public License for more details.
 #include "imgui.h"
 #include "imgui_internal.h"
 
+extern float g_ImGUI_DPI;
+extern float g_ImGui_Font_DPI;
+
 namespace ImGuiUtils {
 	inline void CenterNextWindow(ImGuiCond cond = 0) {
 		auto& io = ImGui::GetIO();
@@ -29,13 +32,13 @@ namespace ImGuiUtils {
 	inline float GetScaledValue(float in)
 	{
 		auto& io = ImGui::GetIO();
-		float scale = std::max(1.0f, io.FontGlobalScale * 2);
+		float scale = std::max(1.0f, g_ImGUI_DPI);
 		return in * scale;
 	}
 	inline ImVec2 GetScaledSize(ImVec2 in)
 	{
 		auto& io = ImGui::GetIO();
-		float scale = std::max(1.0f, io.FontGlobalScale * 2);
+		float scale = std::max(1.0f, g_ImGUI_DPI);
 		return { in.x * scale, in.y * scale };
 	}
 
