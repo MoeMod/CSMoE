@@ -300,15 +300,23 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		m_iPoint++;
 		m_iExp = 0;
 		bLevelUp = true;
-		if (m_pPlayer->IsBot())
+
+		auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+		if (data.second != nullptr)
 		{
-			auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
-			if (data.second != nullptr)
+			m_iPoint--;
+			m_setSkillID.insert(data.first);
+			m_vecSkill.insert(data.second);
+			data.second->OnGetSkill();
+			if (!m_pPlayer->IsBot())
 			{
-				m_iPoint--;
-				m_setSkillID.insert(data.first);
-				m_vecSkill.insert(data.second);
+				ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
 				data.second->OnGetSkill();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+				WRITE_BYTE(ZB3_MESSAGE_SKILL_ADD);
+				WRITE_BYTE(data.first);
+				MESSAGE_END();
 			}
 		}
 	}
