@@ -124,7 +124,7 @@ void GL_InitExtensions( void )
 	pglGetIntegerv( GL_MAX_TEXTURE_SIZE, &glConfig.max_2d_texture_size );
 	if( glConfig.max_2d_texture_size <= 0 ) glConfig.max_2d_texture_size = 256;
 
-	Cvar_Get( "gl_max_texture_size", "0", CVAR_INIT, "opengl texture max dims" );
+	Cvar_Get( "gl_max_texture_size", "0", CVAR_ARCHIVE, "opengl texture max dims" );
 	Cvar_Set( "gl_max_texture_size", va( "%i", glConfig.max_2d_texture_size ));
 
 	pglGetIntegerv( GL_MAX_VERTEX_UNIFORM_COMPONENTS_ARB, &glConfig.max_vertex_uniforms );
@@ -323,7 +323,7 @@ rserr_t R_ChangeDisplaySettings( int width, int height, qboolean fullscreen )
 	// Automatically set HUD scale to DPI
 	if (hud_scale->value == 0.0f)
 	{
-		float dpi = Android_GetDisplayDPI();
+		float dpi = Android_GetDisplayDPI() * 0.75;
 		Cvar_SetFloat("hud_scale", dpi);
 	}
 

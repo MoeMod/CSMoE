@@ -53,6 +53,7 @@ float g_MouseWheel = 0.0f;
 GLuint g_FontTexture = 0;
 
 float g_ImGUI_DPI = 1.0f;
+float g_ImGui_Font_DPI = 1.0f;
 
 ImGuiContext* g_EngineContext = nullptr;
 
@@ -292,6 +293,9 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 {
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
+
+	ImGui_ImplGL_ReloadFonts();
+
 	unsigned char* pixels;
 	int width, height, bytes_per_pixel;
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
@@ -366,7 +370,14 @@ void ImGui_ImplGL_ReloadFonts()
 	search_t		*t;
 	int		i;
 
-	float size_pixels = 14 * 2; // 14 * 2
+	if(glConfig.max_2d_texture_size <= 2048)
+		g_ImGui_Font_DPI = 0.5f;
+	else if(glConfig.max_2d_texture_size <= 4096)
+		g_ImGui_Font_DPI = 1.0f;
+	else
+		g_ImGui_Font_DPI = 2.0f;
+
+	float size_pixels = 14 * g_ImGui_Font_DPI; // 14 * 2
 
 	if (size_pixels <= 0.0f)
 		return;
@@ -509,9 +520,6 @@ qboolean ImGui_ImplGL_Init(void)
 #ifdef XASH_SDL
 	ImGui_ImplSDL2_Init();
 #endif
-
-	//io.Fonts->AddFontFromFileTTF("msyh.ttf", 16, NULL, io.Fonts->GetGlyphRangesChinese());
-	ImGui_ImplGL_ReloadFonts();
 
 	ImGui_Console_Init();
 	ImGui_ImeWindow_Init();
@@ -671,7 +679,7 @@ void ImGui_ImplGL_NewFrame(void)
 #endif
 	nst.FramePadding = {16, 9};
 	nst.ScaleAllSizes(g_ImGUI_DPI);
-	io.FontGlobalScale = g_ImGUI_DPI / 2;
+	io.FontGlobalScale = g_ImGUI_DPI / g_ImGui_Font_DPI;
 	ImGui::GetStyle() = nst;
 
 	// Setup time step

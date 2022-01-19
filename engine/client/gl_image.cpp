@@ -1935,7 +1935,7 @@ namespace xe {
 			auto i = m_map.find(key);
 			if(i == m_map.end()){
 				// insert item into the cache, but first check if it is full
-				if(size() >= m_capacity){
+				while(size() >= m_capacity){
 					// cache is full, evict the least recently used item
 					evict();
 				}
@@ -1992,6 +1992,11 @@ namespace xe {
 			m_list.clear();
 		}
 
+		void set_capacity(size_t value)
+		{
+			m_capacity = value;
+		}
+
 	private:
 		void evict()
 		{
@@ -2004,7 +2009,7 @@ namespace xe {
 	private:
 		map_type m_map;
 		list_type m_list;
-		const size_t m_capacity;
+		size_t m_capacity;
 	};
 
 	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(256);
@@ -2018,6 +2023,8 @@ namespace xe {
 
 		if(textureCache.contains((GLuint)texnum))
 			return; // already present
+
+		textureCache.set_capacity(max(r_texlru->integer, 64));
 
 		auto &lrudata = *tex->texlru_extdata;
 		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
