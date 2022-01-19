@@ -278,6 +278,7 @@ set (HUD_SRCS
 	./hud/zbz/zbz.cpp
 	./hud/zbz/zbz_skill_info.cpp
 	./hud/hud_sifiammo.cpp
+	./hud/hud_mvp.cpp
 
 )
 

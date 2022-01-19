@@ -181,15 +181,15 @@ int CHudZ4Energy::Draw(float time)
 		float flPowerLine2Width = m_iPowerLine2->w();
 		int left = 0;
 		if (m_iPowerServer > m_iPower[1] && m_flPowerEndRefreshTime[1] > time)
-			left = m_iPower[1] / MAX_ENERGY * flPowerLine2Width;
+			left = m_iPower[1] / (float)MAX_ENERGY * flPowerLine2Width;
 		else
-			left = m_iPowerServer / MAX_ENERGY * flPowerLine2Width;
+			left = m_iPowerServer / (float)MAX_ENERGY * flPowerLine2Width;
 
-		iProgress = iPower / MAX_ENERGY * flPowerLine2Width;
+		iProgress = iPower / (float)MAX_ENERGY * flPowerLine2Width;
 
-		if (iProgress >= m_iPower[1] / MAX_ENERGY * flPowerLine2Width)
+		if (iProgress >= m_iPower[1] / (float)MAX_ENERGY * flPowerLine2Width)
 		{
-			m_iPowerLine2->Draw2DQuadScaled(iX, iY, iX + flPowerLine2Width, iY + m_iPowerLine2->h(), left / flPowerLine2Width, 0.0f, iProgress / flPowerLine2Width, 1.0f);
+			m_iPowerLine2->Draw2DQuadScaled(iX, iY, iX + iProgress, iY + m_iPowerLine2->h(), 0.0f, 0.0f, iProgress / flPowerLine2Width, 1.0f);
 		}
 	}
 
@@ -202,18 +202,18 @@ int CHudZ4Energy::Draw(float time)
 		if (iPower > MAX_ENERGY)
 			iPower = MAX_ENERGY;
 
-		iProgress = iPower / MAX_ENERGY * flPowerLineWidth;
+		iProgress = iPower / (float)MAX_ENERGY * flPowerLineWidth;
 		m_iPowerLine->Draw2DQuadScaled(iX, iY, iX + iProgress, iY + flPowerLineHeight, 0.0f, 0.0f, iProgress / flPowerLineWidth, 1.0f, 225, 225, 225);
 	}
 	else
 	{
 		m_iPower[1] = m_iPowerServer;
 
-		iProgress = m_iPowerServer / MAX_ENERGY * flPowerLineWidth;
+		iProgress = m_iPowerServer / (float)MAX_ENERGY * flPowerLineWidth;
 		m_iPowerLine->Draw2DQuadScaled(iX, iY, iX + iProgress, iY + flPowerLineHeight, 0.0f, 0.0f, iProgress / flPowerLineWidth, 1.0f, 225, 225, 225);
 	}
 
-	iProgress = m_iPowerServer / MAX_ENERGY * flPowerLineWidth;
+	iProgress = m_iPowerServer / (float)MAX_ENERGY * flPowerLineWidth;
 	m_iPowerLine->Draw2DQuadScaled(iX, iY, iX + iProgress, iY + flPowerLineHeight, 0.0f, 0.0f, iProgress / flPowerLineWidth, 1.0f, 225, 225, 225, 200);
 
 	iX = ScreenWidth / 2 - m_iPowerBackground->w() / 2;
@@ -264,8 +264,7 @@ int CHudZ4Energy::Draw(float time)
 		{
 			m_iUseTimesOld = m_iPowerServer / m_iSkillUsage;
 
-			char szFormatBuf[16], szSkillBuf[16], szSkillTimesBuf[64];
-			strncpy(szFormatBuf, "%s(%d次)", sizeof(szFormatBuf));
+			char szSkillBuf[32], szSkillTimesBuf[16];
 
 			/*switch (m_iText)
 			{
@@ -287,7 +286,7 @@ int CHudZ4Energy::Draw(float time)
 
 			szSkillTimesBuf[0] = '0' + m_iUseTimesOld;
 			szSkillTimesBuf[1] = 0;
-			snprintf(m_szDrawText, 64, szFormatBuf, szSkillBuf, szSkillTimesBuf);
+			snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf, szSkillTimesBuf);
 		}
 
 		m_iKey[1]->Draw2DQuadScaled(iX, iY + m_iKey[1]->h() / 2, iX + m_iKey[1]->w(), iY + m_iKey[1]->h());
@@ -358,7 +357,7 @@ void CHudZ4Energy::DrawNumbers(int n, int x, int y, int from_right, float size)
 
 	if (n >= 10)
 	{
-		k = (n % MAX_ENERGY) / 10;
+		k = (n % 100) / 10;
 		DrawNumber(k, x, y, size);
 		if (!from_right)
 			x += width;

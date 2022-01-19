@@ -37,8 +37,8 @@ class CHudZ4::impl_t
 public:
 };
 
-DECLARE_MESSAGE(m_ZB4, ZB4Msg)
-int CHudZ4::MsgFunc_ZB4Msg(const char *pszName, int iSize, void *pbuf)
+DECLARE_MESSAGE(m_ZB4, Z4Msg)
+int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 {
 	BufferReader buf(pszName, pbuf, iSize);
 	auto type = static_cast<Z4MessageType>(buf.ReadByte());
@@ -86,7 +86,7 @@ int CHudZ4::Init(void)
 
 	gHUD.AddHudElem(this);
 
-	HOOK_MESSAGE(ZB4Msg);
+	HOOK_MESSAGE(Z4Msg);
 
 	return 1;
 }

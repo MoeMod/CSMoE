@@ -72,6 +72,7 @@ public:
 	virtual float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) = 0;
 	virtual duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) = 0;
 	virtual float AdjustZombieKnifeRange(bool bStab, float flRange) = 0;
+	virtual int AdjustScoreAttrib(int state) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -110,6 +111,7 @@ public:
 	float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) override { return flDamage; }
 	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) { return fDelay; }
 	float AdjustZombieKnifeRange(bool bStab, float flRange) { return flRange; }
+	int AdjustScoreAttrib(int state) { return state; }
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

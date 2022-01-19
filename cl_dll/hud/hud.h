@@ -119,6 +119,7 @@ struct HUDLIST {
 #include "z4/z4.h"
 #include "retina.h"
 #include "moe/moe_touch.h"
+#include "hud_mvp.h"
 
 //
 //-----------------------------------------------------
@@ -1105,6 +1106,7 @@ public:
 	CHudZBZ m_ZBZ;
 	CHudZ4 m_ZB4;
 	CHudMoeTouch m_MoeTouch;
+	CHudMVP m_MVP;
 
 	// user messages
 	CHudMsgFunc(Damage);

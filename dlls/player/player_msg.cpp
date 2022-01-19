@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "gamerules.h"
 
 #include "player.h"
+#include "player/player_mod_strategy.h"
 
 namespace sv {
 
@@ -119,6 +120,7 @@ DLL_GLOBAL int gmsgGunDeath = 0;
 DLL_GLOBAL int gmsgWeapDrop = 0;
 DLL_GLOBAL int gmsgOperationSystem = 0;
 DLL_GLOBAL int gmsgZ4Msg = 0;
+DLL_GLOBAL int gmsgMVPInfo = 0;
 
 // main code
 
@@ -222,6 +224,7 @@ void LinkUserMessages()
 	gmsgWeapDrop = REG_USER_MSG("WeapDrop", -1);
 	gmsgOperationSystem = REG_USER_MSG("OperationSystem", -1);
 	gmsgZ4Msg = REG_USER_MSG("Z4Msg", -1);
+	gmsgMVPInfo = REG_USER_MSG("MVPInfo", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)
@@ -313,6 +316,7 @@ void SetScoreAttrib(CBasePlayer *dest, CBasePlayer *src)
 
 	if (gmsgScoreAttrib)
 	{
+		state = src->m_pModStrategy->AdjustScoreAttrib(state);
 		MESSAGE_BEGIN(MSG_ONE, gmsgScoreAttrib, NULL, dest->pev);
 		WRITE_BYTE(src->entindex());
 		WRITE_BYTE(state);

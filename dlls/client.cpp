@@ -3734,19 +3734,19 @@ void EXT_FUNC StartFrame()
 
 	CLocalNav::Think();
 
-	static cvar_t *skill = NULL;
+	/*static cvar_t *skill = NULL;
 	if (!skill)
 	{
 		skill = CVAR_GET_POINTER("skill");
-	}
+	}*/
 
 	gpGlobals->teamplay = 1.0f;
-
-	if (skill != NULL)
+	g_iSkillLevel = 1;
+	/*if (skill != NULL)
 		g_iSkillLevel = (int)skill->value;
 
 	else
-		g_iSkillLevel = 0;
+		g_iSkillLevel = 0;*/
 
 	if (TheBots != NULL)
 	{

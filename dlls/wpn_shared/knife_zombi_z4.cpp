@@ -98,6 +98,22 @@ public:
 	void SecondaryAttack() override;
 	bool HasSecondaryAttack() override { return true; }
 	BOOL CanDrop() override { return false; }
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = "weapon_knife";
+		p->pszAmmo1 = NULL;
+		p->iMaxAmmo1 = -1;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = WEAPON_NOCLIP;
+		p->iSlot = 2;
+		p->iPosition = 1;
+		p->iId = WEAPON_KNIFE;
+		p->iFlags = 0;
+		p->iWeight = KNIFE_WEIGHT;
+
+		return 1;
+	}
 
 public:
 	float GetPrimaryAttackDamage() const

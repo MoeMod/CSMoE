@@ -26,7 +26,7 @@ public:
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
 
-	CHudMsgFunc(ZB4Msg);
+	CHudMsgFunc(Z4Msg);
 
 protected:
 	class impl_t;

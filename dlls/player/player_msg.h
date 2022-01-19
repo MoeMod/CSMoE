@@ -123,6 +123,7 @@ extern int gmsgGunDeath;
 extern int gmsgWeapDrop;
 extern int gmsgOperationSystem;
 extern int gmsgZ4Msg;
+extern int gmsgMVPInfo;
 
 void LinkUserMessages();
 void WriteSigonMessages();

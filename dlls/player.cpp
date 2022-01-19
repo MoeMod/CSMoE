@@ -5356,6 +5356,9 @@ void CBasePlayer::Reset()
 	m_iAccount.UpdateHUD(this);
 
 	m_bNotKilled = false;
+	m_iRoundKill = 0;
+	m_iRoundAssist = 0;
+	m_iRoundInfect = 0;
 
 	RemoveShield();
 	CheckStartMoney();

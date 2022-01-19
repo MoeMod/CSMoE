@@ -199,6 +199,7 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 		return;
 
 	SetHero(true);
+	m_pPlayer->SetScoreboardAttributes();
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 3000.0f;
 	m_pPlayer->pev->armorvalue = 1000.0f;
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", m_pPlayer->m_bIsFemale ? "heroine" : "hero");

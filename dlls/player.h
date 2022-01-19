@@ -753,6 +753,9 @@ public:
 	int m_iZombieFlying;
 	int m_iZombieRevivalEnabled;
 	std::set<int> m_setWeaponID;
+	int m_iRoundKill;
+	int m_iRoundAssist;
+	int m_iRoundInfect;
 };
 
 }

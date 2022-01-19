@@ -73,6 +73,7 @@ public:
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
+	int AdjustScoreAttrib(int state) override { return IsHero() ? (state | PLAYER_VIP) : state; }
 
 	virtual void Event_OnBecomeHero(CBasePlayer *who);
 	virtual void Event_OnRoundStart();

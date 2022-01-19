@@ -471,6 +471,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 
 	player->m_iDeaths += 1;
 	player->AddPoints(0, FALSE);
+	attacker->m_iRoundInfect++;
 	attacker->AddPoints(1, FALSE);
 }
 
