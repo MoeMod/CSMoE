@@ -1443,7 +1443,7 @@ static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImag
 			Host_Error( "GL_UploadTexture: %s image buffer overflow\n", tex->name );
 
 		// copy or resample the texture
-		if(( tex->width == tex->srcWidth && tex->height == tex->srcHeight ) || ( tex->flags & ( TF_TEXTURE_1D|TF_TEXTURE_3D )))
+		if(( tex->width == tex->srcWidth && tex->height == tex->srcHeight ) || ( tex->flags & ( TF_TEXTURE_1D|TF_TEXTURE_3D )) || (pic->type != PF_RGBA_32 && pic->type != PF_BGRA_32))
 		{
 			data = buf;
 		}

@@ -268,6 +268,7 @@ namespace ui {
 	void Server_Open()
 	{
 		s_server_open = true;
+		ServerModel_Refresh();
 	}
 
 	void Server_OnGui()

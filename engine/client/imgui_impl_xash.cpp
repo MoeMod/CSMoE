@@ -549,7 +549,7 @@ void ImGui_ImplGL_SetColors(ImGuiStyle* style)
 {
 	ImVec4* colors = style->Colors;
 
-#if __APPLE__
+#if 1
 	colors[ImGuiCol_Text]                   = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
 	colors[ImGuiCol_TextDisabled]           = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
 	colors[ImGuiCol_WindowBg]               = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
