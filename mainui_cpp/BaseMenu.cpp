@@ -48,6 +48,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef XASH_IMGUI
 #include "imgui.h"
 #include "imgui_utils.h"
+#include "imgui_menu/imgui_menu_server.h"
 #endif
 
 #include "luash_menu/luash_menu.h"
@@ -1446,6 +1447,8 @@ void UI_Init( void )
 	CMenuPicButton::ClearButtonStack();
 
 	LuaUI_Init();
+
+	EngFuncs::Cmd_AddCommand("citrus_servers", Server_Open);
 }
 
 /*

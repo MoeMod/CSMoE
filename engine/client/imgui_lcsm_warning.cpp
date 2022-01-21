@@ -136,7 +136,7 @@ void ImGui_LCSM_OnGUI(void)
 		ImGui::SameLine(ImGuiUtils::GetScaledValue(80));
 		if (ImGui::Button(xorstr("进入柑橘联机服").crypt_get(), ImGuiUtils::GetScaledSize({ 320, 36 }))) {
 			lcsm_enabled = false;
-			Cbuf_AddText(xorstr("connect z4cs.com:5555\n").crypt_get());
+			Cbuf_AddText(xorstr("citrus_servers\n").crypt_get());
 		}
 
 		ImGui::EndGroup();
