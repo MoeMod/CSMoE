@@ -148,7 +148,6 @@ void CZombiePile::Precache(void)
 	PRECACHE_MODEL("models/zombipile.mdl");
 	m_idShard = PRECACHE_MODEL("models/woodgibs.mdl");
 	m_idShockWave = PRECACHE_MODEL("sprites/ef_shockwave.spr");
-	m_usEvent = PRECACHE_EVENT(1, "addons/luash/events/event_zombiepile.lua");
 }
 
 void EXPORT CZombiePile::OnGround()
@@ -167,10 +166,6 @@ void EXPORT CZombiePile::OnGround()
 		SetThink(&CZombiePile::OnThink);
 		Slowdown();
 		EMIT_SOUND(ENT(pev), CHAN_BODY, "zombi/zombi_stamper_iron_maiden_stamping.wav", 1.0, ATTN_NORM);
-
-		Vector origin = pev->origin;
-		origin[2] -= pev->size[2] * 0.5f;
-		PLAYBACK_EVENT_FULL(0, NULL, m_usEvent, 0.0f, origin, (float*)&g_vecZero, 0.0f, 0.0f, 0, 0, FALSE, FALSE);
 	}
 }
 

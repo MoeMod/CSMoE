@@ -349,6 +349,30 @@ void CPlayerModStrategy_ZBZ::OnThink()
 		SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "drp", "0");
 	}
 
+	if (IsOnFire() && m_flFireDmg <= gpGlobals->time && m_pPlayer->m_bIsZombie)
+	{
+		for (auto it = m_vecFireList.begin(); it != m_vecFireList.end();)
+		{
+			auto atk = it->first;
+			auto time = it->second;
+
+			if (!(atk && !atk->m_bIsZombie && time > gpGlobals->time))
+			{
+				it = m_vecFireList.erase(it);
+				continue;
+			}
+			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN);
+			++it;
+		}
+
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgHeadIcon, NULL, m_pPlayer->pev);
+		WRITE_BYTE(4);	//type
+		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
+		MESSAGE_END();
+
+		m_flFireDmg = gpGlobals->time + 0.2s;
+	}
+
 	SKILL_FUNCTION(m_vecSkill, OnThink);
 	return CPlayerModStrategy_ZB3::OnThink();
 }
@@ -411,6 +435,10 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 void CPlayerModStrategy_ZBZ::OnResetMaxSpeed() {
 	CPlayerModStrategy_ZB3::OnResetMaxSpeed();
+	if (IsOnFire())
+	{
+		m_pPlayer->pev->maxspeed *= 0.02f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
+	}
 	SKILL_FUNCTION(m_vecSkill, OnResetMaxSpeed);
 }
 

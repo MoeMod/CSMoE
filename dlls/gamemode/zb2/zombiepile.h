@@ -30,7 +30,6 @@ private:
 	time_point_t m_flRemoveTime;
 	int m_idShard;
 	int m_idShockWave;
-	unsigned short m_usEvent;
 	bool m_bStomp;
 };
 

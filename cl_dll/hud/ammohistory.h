@@ -25,7 +25,7 @@ class WeaponsResource
 {
 private:
 	// Information about weapons & ammo
-	std::map<int, WEAPON*> rgWeapons;	// Weapons Array
+	std::map<int, WEAPON> rgWeapons;	// Weapons Array
 
 	// counts of weapons * ammo
 	WEAPON*		rgSlots[MAX_WEAPON_SLOTS+1][MAX_WEAPON_POSITIONS+1];	// The slots currently in use by weapons.  The value is a pointer to the weapon;  if it's NULL, no weapon is there
@@ -53,13 +53,13 @@ public:
 		if (iter == rgWeapons.end())
 			return nullptr;
 
-		return iter->second;
+		return &iter->second;
 	}
 
 	void AddWeapon( WEAPON *wp ) 
 	{ 
-		rgWeapons[wp->iId] = wp;
-		LoadWeaponSprites(wp);
+		rgWeapons[wp->iId] = *wp;
+		LoadWeaponSprites(&rgWeapons[wp->iId]);
 	}
 
 	void PickupWeapon( WEAPON *wp )
@@ -82,7 +82,7 @@ public:
 	{
 		for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 		{
-			DropWeapon(it->second);
+			DropWeapon(&it->second);
 		}
 		rgWeapons.clear();
 	}

@@ -1812,8 +1812,8 @@ namespace xe {
 		}
 
 		pglDeleteTextures( 1, &image->texnum );
-
 		MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
+		Q_memset( image, 0, sizeof(*image) );
 
 		return 0;
 	}

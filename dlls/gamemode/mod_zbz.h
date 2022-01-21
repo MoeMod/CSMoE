@@ -72,6 +72,8 @@ public:
 
 	bool IsLadderDisabled() const { return m_bLadderDisabled; }
 	void SetLadderDisabled(bool value) { m_bLadderDisabled = value; }
+	bool IsOnFire() const { return m_vecFireList.size() > 0; }
+	void SetOnFire(CBasePlayer *atk, duration_t value) { m_vecFireList.push_back(std::make_pair(atk, gpGlobals->time + value)); }
 
 protected:
 	void UpdatePlayerEvolutionHUD() override;
@@ -92,11 +94,15 @@ private:
 	time_point_t m_flSkillDelay;
 	float m_flTakeDamage;
 	float m_flSufferDamage;
-	bool m_bLadderDisabled;
 	void AddExp(int exp);
 	
 	std::set<std::shared_ptr<CZombieZSkill_Base>> m_vecSkill;
 	std::set<byte> m_setSkillID;
+
+private:
+	bool m_bLadderDisabled;
+	std::vector<std::pair<CBasePlayer*, time_point_t>> m_vecFireList;
+	time_point_t m_flFireDmg;
 };
 
 }

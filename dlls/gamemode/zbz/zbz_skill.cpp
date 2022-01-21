@@ -710,6 +710,45 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_IncendiaryAmmo : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_IncendiaryAmmo(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "点燃"; }
+		const char* GetDesc() const override { return "使用狙击枪攻击的敌人时，有几率使其被点燃"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (attacker != m_pPlayer)
+				return;
+			if (~bitsDamageType & DMG_BULLET)
+				return;
+			if (!IsActivate())
+				return;
+			if (!victim->m_bIsZombie)
+				return;
+			CBasePlayerItem* weapon = m_pPlayer->m_pActiveItem;
+			if (weapon == NULL)
+				return;
+			if (!isSniperRifle(weapon))
+				return;
+			if (victim->m_LastHitGroup == HITGROUP_HEAD)
+			{
+				if (RANDOM_FLOAT(0, 1) > GetHeadShotChance())
+					return;
+			}
+			else if (RANDOM_FLOAT(0, 1) > GetChance())
+				return;
+
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(victim->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetOnFire(m_pPlayer, GetFireTime());
+			}
+		}
+	private:
+		float GetChance() const { return 0.2f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetHeadShotChance() const { return 1.0f; }
+		duration_t GetFireTime() const { return 1.5s + 0.25s * g_pGameRules->m_iTotalRoundsPlayed; }
+	};
 	
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
@@ -744,6 +783,8 @@ namespace sv {
 		{ Skill_Kangaroo, 25, MakeSkill<ZSkill_Kangaroo> },
 		{ Skill_BombEnhacement, 15, MakeSkill<ZSkill_BombEnhacement> },
 		{ Skill_ClawEnhacement, 25, MakeSkill<ZSkill_ClawEnhacement> },
+		{ Skill_IncendiaryAmmo, 25, MakeSkill<ZSkill_IncendiaryAmmo> },
+		
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

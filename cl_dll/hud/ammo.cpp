@@ -68,7 +68,7 @@ void WeaponsResource :: LoadAllWeaponSprites( void )
 {
 	for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 	{
-		LoadWeaponSprites(it->second);
+		LoadWeaponSprites(&it->second);
 	}
 }
 
@@ -485,15 +485,15 @@ HSPRITE* WeaponsResource :: GetAmmoPicFromWeapon( int iAmmoId, wrect_t& rect )
 {
 	for (auto it = rgWeapons.begin(); it != rgWeapons.end(); ++it)
 	{
-		if (it->second->iAmmoType == iAmmoId)
+		if (it->second.iAmmoType == iAmmoId)
 		{
-			rect = it->second->rcAmmo;
-			return &it->second->hAmmo;
+			rect = it->second.rcAmmo;
+			return &it->second.hAmmo;
 		}
-		else if (it->second->iAmmo2Type == iAmmoId)
+		else if (it->second.iAmmo2Type == iAmmoId)
 		{
-			rect = it->second->rcAmmo2;
-			return &it->second->hAmmo2;
+			rect = it->second.rcAmmo2;
+			return &it->second.hAmmo2;
 		}
 	}
 
@@ -772,27 +772,27 @@ int CHudAmmo::MsgFunc_WeaponList(const char *pszName, int iSize, void *pbuf )
 {
 	BufferReader reader( pszName, pbuf, iSize );
 	
-	WEAPON* Weapon = new WEAPON();
+	WEAPON Weapon;
 
-	strncpy( Weapon->szName, reader.ReadString(), MAX_WEAPON_NAME );
-	Weapon->iAmmoType = (int)reader.ReadChar();
+	strncpy( Weapon.szName, reader.ReadString(), MAX_WEAPON_NAME );
+	Weapon.iAmmoType = (int)reader.ReadChar();
 	
-	Weapon->iMax1 = reader.ReadByte();
-	if (Weapon->iMax1 == 255)
-		Weapon->iMax1 = -1;
+	Weapon.iMax1 = reader.ReadByte();
+	if (Weapon.iMax1 == 255)
+		Weapon.iMax1 = -1;
 
-	Weapon->iAmmo2Type = reader.ReadChar();
-	Weapon->iMax2 = reader.ReadByte();
-	if (Weapon->iMax2 == 255)
-		Weapon->iMax2 = -1;
+	Weapon.iAmmo2Type = reader.ReadChar();
+	Weapon.iMax2 = reader.ReadByte();
+	if (Weapon.iMax2 == 255)
+		Weapon.iMax2 = -1;
 
-	Weapon->iSlot = reader.ReadChar();
-	Weapon->iSlotPos = reader.ReadChar();
-	Weapon->iId = reader.ReadByte();
-	Weapon->iFlags = reader.ReadByte();
-	Weapon->iClip = 0;
+	Weapon.iSlot = reader.ReadChar();
+	Weapon.iSlotPos = reader.ReadChar();
+	Weapon.iId = reader.ReadByte();
+	Weapon.iFlags = reader.ReadByte();
+	Weapon.iClip = 0;
 
-	gWR.AddWeapon( Weapon );
+	gWR.AddWeapon( &Weapon );
 
 	return 1;
 
