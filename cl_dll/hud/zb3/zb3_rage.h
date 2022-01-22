@@ -25,9 +25,11 @@ public:
 	CHudZB3Rage();
 	int VidInit(void) override;
 	int Draw(float time) override;
+	void InitHUDData() override { m_bEnabled = false; }
 
 	void SetPercent(int iPercent) { m_iPercent = iPercent; }
 	void SetZombieLevel(ZombieLevel zl) { m_iZombieLevel = zl; }
+	void SetEnabled(bool val) { m_bEnabled = val; }
 
 protected:
 	ZombieLevel m_iZombieLevel;
@@ -44,4 +46,5 @@ private:
 	int m_iArUpSPR;
 	int m_iHpUpSPR;
 	int m_iFastRespawnSPR;
+	bool m_bEnabled;
 };

@@ -62,6 +62,9 @@ int CHudZB3Rage::Draw(float time)
 	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
 		return 0;
 
+	if (!m_bEnabled && gHUD.m_iModRunning == MOD_ZBZ)
+		return 0;
+
 	int idx = IS_FIRSTPERSON_SPEC ? g_iUser2 : gEngfuncs.GetLocalPlayer()->index;
 	if (!g_PlayerExtraInfo[idx].zombie)
 		return 0;

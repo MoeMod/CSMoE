@@ -34,6 +34,8 @@ public:
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	float GetAdjustedEntityDamage(CBaseEntity* victim, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 	HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity* victim, entvars_t* pevAttacker, float flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void HumanWin() override;
+	void ZombieWin() override;
 
 protected:
 	void PickHero() override;
@@ -56,6 +58,7 @@ public:
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void Event_AdjustHumanDamage(CBasePlayer* attacker, float& flDamage) override;
 	void OnThink() override;
+	void OnTouch(CBaseEntity* other) override;
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
 	void Event_OnRoundStart() override;
 	void CmdStart(struct usercmd_s* cmd, unsigned int random_seed) override;
@@ -64,16 +67,30 @@ public:
 	bool ApplyKnockback(CBasePlayer* attacker, const KnockbackData& data) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) override;
+	int AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip) override;
 	int ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax) override;
 	float AdjustZombieKnifeRange(bool bStab, float flRange) override;
+	Vector AdjustFireBullets3Dir(Vector vecDir) override;
+	void ClientPutInServer() override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);
 
 	bool IsLadderDisabled() const { return m_bLadderDisabled; }
 	void SetLadderDisabled(bool value) { m_bLadderDisabled = value; }
-	bool IsOnFire() const { return m_vecFireList.size() > 0; }
-	void SetOnFire(CBasePlayer *atk, duration_t value) { m_vecFireList.push_back(std::make_pair(atk, gpGlobals->time + value)); }
+	bool IsOnFire() const { return m_pPlayer->IsAlive() && m_bIsFiring; }
+	void SetOnFire(CBasePlayer *atk, duration_t value)
+	{
+		m_bIsFiring = true;
+		m_vecFireList[atk->entindex()] = gpGlobals->time + value;
+
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgZBZMsg);
+		WRITE_BYTE(ZBZ_MESSAGE_BURN);
+		WRITE_BYTE(ENTINDEX(m_pPlayer->edict()));
+		WRITE_BYTE(value.count() * 10);
+		MESSAGE_END();
+	}
+	void ClearFire() { m_bIsFiring = false;  m_vecFireList.fill(invalid_time_point); }
 
 protected:
 	void UpdatePlayerEvolutionHUD() override;
@@ -84,6 +101,7 @@ protected:
 
 public:
 	bool CheckSkill(ZombieZSkillSkillId id) const { return m_setSkillID.find(id) != m_setSkillID.end(); }
+	void SetRoundStartAddLevel(bool value) { m_bRoundStartAddLevel = value; }
 
 private:
 	CMod_ZombieZ* const m_pModZBZ;
@@ -94,15 +112,20 @@ private:
 	time_point_t m_flSkillDelay;
 	float m_flTakeDamage;
 	float m_flSufferDamage;
+	float m_flExpScale;
+	bool m_bRoundStartAddLevel;
 	void AddExp(int exp);
+	void AddLevel(int lv);
+	void SetLevel(int lv);
 	
 	std::set<std::shared_ptr<CZombieZSkill_Base>> m_vecSkill;
 	std::set<byte> m_setSkillID;
 
 private:
 	bool m_bLadderDisabled;
-	std::vector<std::pair<CBasePlayer*, time_point_t>> m_vecFireList;
+	std::array<time_point_t, MAX_CLIENTS + 1> m_vecFireList;
 	time_point_t m_flFireDmg;
+	bool m_bIsFiring;
 };
 
 }

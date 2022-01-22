@@ -46,6 +46,7 @@
 
 #include "luash_cl/lua_cl.h"
 #include <map>
+#include "gamemode/zbz/zbz_const.h"
 
 extern int g_iUser1;
 
@@ -467,6 +468,23 @@ void CBasePlayerWeapon::RetireWeapon()
 	//UTIL_GetNextBestWeapon( m_pPlayer, this );
 }
 
+bool isSniperRifle(CBasePlayerItem* item)
+{
+	switch (item->m_iId)
+	{
+	case WEAPON_SCOUT:
+	case WEAPON_SG550:
+	case WEAPON_AWP:
+	case WEAPON_G3SG1:
+	case WEAPON_SKULL5:
+	case WEAPON_SFSNIPER:
+		return true;
+
+	default:
+		return false;
+	}
+}
+
 Vector CBaseEntity::FireBullets3 ( Vector vecSrc, Vector vecDirShooting, float flSpread, float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, entvars_t *pevAttacker, bool bPistol, int shared_rand )
 {
 	float x, y, z;
@@ -487,6 +505,10 @@ Vector CBaseEntity::FireBullets3 ( Vector vecSrc, Vector vecDirShooting, float f
 		while (z > 1);
 	}
 
+	if(player.m_pActiveItem && isSniperRifle(player.m_pActiveItem) && gHUD.m_ZBZ.CheckHasSkill(Skill_Marksman))
+	{
+		return Vector();
+	}
 	return Vector(x * flSpread, y * flSpread, 0);
 }
 /*

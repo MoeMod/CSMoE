@@ -470,7 +470,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	entvars_t *pev = &pEntity->v;
 	CBasePlayer *pPlayer = GetClassPtr<CBasePlayer>(pev);
 	CHalfLifeMultiplay *mp = g_pGameRules;
-
+	
 	pPlayer->SetCustomDecalFrames(-1);
 	pPlayer->SetPrefsFromUserinfo(GET_INFO_BUFFER(pEntity));
 
@@ -570,6 +570,8 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	}
 
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
+
+	pPlayer->m_pModStrategy->ClientPutInServer();
 }
 
 int Q_strlen_(const char *str)
@@ -3358,7 +3360,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (FStrEq(pcmd, "weapon_knife"))
 			{
-				if (!player->m_pActiveItem->CanHolster())
+				if (!player->CanHolster())
 					return;
 				if (player->m_bIsZombie)
 				{
@@ -3369,7 +3371,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			}
 			else if (((pstr = Q_strstr(pcmd, "weapon_")) != NULL) && (pstr == pcmd))
 			{
-			if (!player->m_pActiveItem->CanHolster())
+			if (!player->CanHolster())
 				return;
 			GetClassPtr<CBasePlayer>(pev)->SelectItem(pcmd);
 			}

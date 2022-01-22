@@ -164,14 +164,17 @@ void EV_FireVoidpistol( event_args_t *args )
 				{
 					gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol_blackhole_start.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
-					
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.scale = 0.5;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->die = gHUD.m_flTime + 1.5;
-					pEnt->flags |= FTENT_SPRANIMATE;
+					if (pEnt)
+					{
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 30.0;
+
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.scale = 0.5;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->die = gHUD.m_flTime + 1.5;
+						pEnt->flags |= FTENT_SPRANIMATE;
+					}
 				}
 				break;
 			}
@@ -182,14 +185,17 @@ void EV_FireVoidpistol( event_args_t *args )
 				if (pModel)
 				{
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
-					
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.scale = 0.5;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->die = gHUD.m_flTime + 4.0;
-					pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
+					if (pEnt)
+					{
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 30.0;
+
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.scale = 0.5;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->die = gHUD.m_flTime + 4.0;
+						pEnt->flags |= FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
+					}
 				}
 				break;
 			}
@@ -200,14 +206,17 @@ void EV_FireVoidpistol( event_args_t *args )
 				{
 					gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_WEAPON, "weapons/voidpistol_blackhole_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
-					
-					pEnt->entity.curstate.scale = 0.5;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->die = gHUD.m_flTime + 1.53;
-					pEnt->flags |= FTENT_SPRANIMATE;
+					if (pEnt)
+					{
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 30.0;
+
+						pEnt->entity.curstate.scale = 0.5;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderamt = 255;
+						pEnt->die = gHUD.m_flTime + 1.53;
+						pEnt->flags |= FTENT_SPRANIMATE;
+					}
 
 				}
 				break;
@@ -220,50 +229,53 @@ void EV_FireVoidpistol( event_args_t *args )
 				{
 					
 					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
-					pEnt->entity.curstate.vuser1 = { args->angles[0] ,args->angles[1] ,args->angles[2] };
-					pEnt->entity.curstate.scale = 0.1;
-					pEnt->clientIndex = idx;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderamt = 255;
+					if (pEnt)
+					{
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 30.0;
+						pEnt->entity.curstate.vuser1 = { args->angles[0] ,args->angles[1] ,args->angles[2] };
+						pEnt->entity.curstate.scale = 0.1;
+						pEnt->clientIndex = idx;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderamt = 255;
 
-					pEnt->frameMax = 30;
-					pEnt->tentOffset = Vector(0, 0, 0);
-					pEnt->die = gHUD.m_flTime + 4.0;
-					pEnt->callback = [](tempent_s* ent, float frametime, float currenttime){
-					
-						float	traceFraction = 1;
-						vec3_t	traceNormal;
-						pmtrace_t pmtrace;
-						physent_t* pe;
-						Vector vecForward = ent->entity.curstate.vuser1;
-						gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-						gEngfuncs.pEventAPI->EV_PlayerTrace(ent->entity.prevstate.origin, ent->entity.origin + vecForward * 40, PM_STUDIO_BOX, -1, &pmtrace);
+						pEnt->frameMax = 30;
+						pEnt->tentOffset = Vector(0, 0, 0);
+						pEnt->die = gHUD.m_flTime + 4.0;
+						pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
 
-						if (pmtrace.fraction != 1)
-						{
-							pe = gEngfuncs.pEventAPI->EV_GetPhysent(pmtrace.ent);
+							float	traceFraction = 1;
+							vec3_t	traceNormal;
+							pmtrace_t pmtrace;
+							physent_t* pe;
+							Vector vecForward = ent->entity.curstate.vuser1;
+							gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+							gEngfuncs.pEventAPI->EV_PlayerTrace(ent->entity.prevstate.origin, ent->entity.origin + vecForward * 40, PM_STUDIO_BOX, -1, &pmtrace);
 
-							if (!pmtrace.ent || (pe->info != ent->clientIndex))
+							if (pmtrace.fraction != 1)
 							{
-								traceFraction = pmtrace.fraction;
-								VectorCopy(pmtrace.plane.normal, traceNormal);
+								pe = gEngfuncs.pEventAPI->EV_GetPhysent(pmtrace.ent);
 
-								if (ent->hitcallback)
+								if (!pmtrace.ent || (pe->info != ent->clientIndex))
 								{
-									(*ent->hitcallback)(ent, &pmtrace);
+									traceFraction = pmtrace.fraction;
+									VectorCopy(pmtrace.plane.normal, traceNormal);
+
+									if (ent->hitcallback)
+									{
+										(*ent->hitcallback)(ent, &pmtrace);
+									}
 								}
 							}
-						}
-					};
-					pEnt->hitcallback = [](tempent_s* ent, pmtrace_t* tr)
-					{
-						ent->flags &= ~FTENT_FADEOUT;
-						ent->die = gHUD.m_flTime;
-					};
+						};
+						pEnt->hitcallback = [](tempent_s* ent, pmtrace_t* tr)
+						{
+							ent->flags &= ~FTENT_FADEOUT;
+							ent->die = gHUD.m_flTime;
+						};
 
-					pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+						pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+					}
 				}
 				break;
 			}

@@ -59,10 +59,11 @@ enum ZombieZSkillSkillId : byte
 
 enum ZBZMessageType : byte
 {
-	ZB3_MESSAGE_LEVEL_INFO, // { byte msg_type, byte lv, byte exp, byte point }
-	ZB3_MESSAGE_SKILL_ADD, // { byte msg_type, byte id }
-	ZB3_MESSAGE_SKILL_REMOVE, // { byte msg_type, byte id }
-
+	ZBZ_MESSAGE_LEVEL_INFO, // { byte msg_type, byte lv, byte exp, byte point }
+	ZBZ_MESSAGE_SKILL_ADD, // { byte msg_type, byte id }
+	ZBZ_MESSAGE_SKILL_REMOVE, // { byte msg_type, byte id }
+	ZBZ_MESSAGE_BURN, // { byte msg_type, byte player, byte time(in 0.1s) }
+	ZBZ_MESSAGE_CONTACT_INFECTION_RING, // { byte msg_type, byte player }
 };
 
 #endif

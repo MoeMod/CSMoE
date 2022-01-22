@@ -35,6 +35,12 @@ public:
 		}
 		m_SkillList.erase(id);
 	}
+
+	bool CheckHasSkill(ZombieZSkillSkillId id) const
+	{
+		return m_SkillList.find(id) != m_SkillList.end();
+	}
+
 private:
 	int m_iLevel;
 	int m_iExp;

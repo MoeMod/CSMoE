@@ -3176,7 +3176,7 @@ BOOL CHalfLifeMultiplay::FShouldSwitchWeapon(CBasePlayer *pPlayer, CBasePlayerIt
 	if (!pPlayer->m_iAutoWepSwitch)
 		return FALSE;
 
-	if (!pPlayer->m_pActiveItem->CanHolster())
+	if (!pPlayer->CanHolster())
 		return FALSE;
 
 	if (pWeapon->iWeight() > pPlayer->m_pActiveItem->iWeight())

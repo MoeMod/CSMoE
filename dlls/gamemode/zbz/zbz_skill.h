@@ -34,6 +34,7 @@ public:
 
 	virtual void OnGetSkill() = 0;
 	virtual void OnThink() = 0;
+	virtual void OnTouch(CBaseEntity* other) = 0;
 	virtual void OnRoundStart() = 0;
 	virtual void OnSpawn() = 0;
 	virtual void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) = 0;
@@ -49,9 +50,11 @@ public:
 	virtual void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) = 0;
 	virtual void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 	virtual void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) = 0;
+	virtual void OnAdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int& iClip) = 0;
 	virtual void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) = 0;
 	virtual void OnAdjustZombieKnifeRange(bool bStab, float& flRange) = 0;
-
+	virtual void OnAdjustFireBullets3Dir(Vector& vecDir) = 0;
+	
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
 	virtual const char* GetDesc() const = 0;
@@ -67,6 +70,7 @@ public:
 
 	void OnGetSkill() override {}
 	void OnThink() override {}
+	void OnTouch(CBaseEntity* other) override {}
 	void OnRoundStart() override {}
 	void OnSpawn() override {}
 	void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override {}
@@ -82,8 +86,10 @@ public:
 	void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {}
 	void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override {}
 	void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override {}
+	void OnAdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int& iClip) override {}
 	void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override {}
 	void OnAdjustZombieKnifeRange(bool bStab, float& flRange) override {}
+	void OnAdjustFireBullets3Dir(Vector& vecDir) override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

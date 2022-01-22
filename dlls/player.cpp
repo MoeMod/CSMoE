@@ -2906,7 +2906,7 @@ void CWShield::Touch(CBaseEntity *pOther)
 
 		if (pPlayer->m_pActiveItem)
 		{
-			if (!pPlayer->m_pActiveItem->CanHolster())
+			if (!pPlayer->CanHolster())
 				return;
 		}
 
@@ -2968,7 +2968,7 @@ void CBasePlayer::DropShield(bool bDeploy)
 	if (!HasShield())
 		return;
 #ifdef ENABLE_SHIELD
-	if (m_pActiveItem && !m_pActiveItem->CanHolster())
+	if (!CanHolster())
 		return;
 
 	if (m_pActiveItem)
@@ -5231,6 +5231,9 @@ void CBasePlayer::Spawn()
 	sv_aim = CVAR_GET_POINTER("sv_aim");
 
 	std::fill(std::begin(m_flLastCommandTime), std::end(m_flLastCommandTime), invalid_time_point);
+	m_bHolsterDisabled = false;
+
+	SetTouch(&CBasePlayer::PlayerTouch);
 }
 
 void CBasePlayer::Precache()
@@ -5431,7 +5434,7 @@ NOXREF void CBasePlayer::SelectNextItem(int iItem)
 
 void CBasePlayer::SelectItem(const char *pstr)
 {
-	if (m_pActiveItem && !m_pActiveItem->CanHolster())
+	if (!CanHolster())
 		return;
 
 	if (!pstr)
@@ -5495,7 +5498,7 @@ void CBasePlayer::SelectItem(const char *pstr)
 
 void CBasePlayer::SelectLastItem()
 {
-	if (m_pActiveItem && !m_pActiveItem->CanHolster())
+	if (!CanHolster())
 		return;
 
 	if (!m_pLastItem || m_pLastItem == m_pActiveItem)
@@ -9090,5 +9093,10 @@ void CBasePlayer::ClearWeapon(bool removeSuit) {
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);
 	WRITE_BYTE(WEAPON_NONE);
 	MESSAGE_END();
+}
+
+void CBasePlayer::PlayerTouch(CBaseEntity* other)
+{
+	m_pModStrategy->OnTouch(other);
 }
 }

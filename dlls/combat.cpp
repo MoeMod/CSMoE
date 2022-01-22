@@ -1906,6 +1906,12 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 	Vector vecOldSrc, vecNewSrc;
 
 	vecDir = vecDirShooting + x * vecSpread * vecRight + y * vecSpread * vecUp;
+	if (IsPlayer()) {
+		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this);
+		if (pPlayer) {
+			vecDir = pPlayer->m_pModStrategy->AdjustFireBullets3Dir(vecDir);
+		}
+	}
 	vecEnd = vecSrc + vecDir * flDistance;
 
 	float flDamageModifier = 0.5;

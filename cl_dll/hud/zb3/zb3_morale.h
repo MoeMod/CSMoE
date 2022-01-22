@@ -25,8 +25,10 @@ public:
 	CHudZB3Morale();
 	int VidInit(void) override;
 	int Draw(float time) override;
+	void InitHUDData() override { m_bEnabled = false; }
 
 	void UpdateLevel(ZB3HumanMoraleType_e type, int level);
+	void SetEnabled(bool val) { m_bEnabled = val; }
 
 protected:
 	ZB3HumanMoraleType_e m_iMoraleType;
@@ -39,6 +41,5 @@ private:
 	int m_iHighMoraleSPR;
 	int m_iJumphigherSPR;
 	int m_iAmmoupSPR;
-
-
+	bool m_bEnabled;
 };

@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "gamemode/zbz/zbz_const.h"
+
 class CHudZBZ : public CHudBase
 {
 public:
@@ -14,6 +16,7 @@ public:
 
 	CHudMsgFunc(ZBZMsg);
 
+	bool CheckHasSkill(ZombieZSkillSkillId id);
 protected:
 	class impl_t;
 	impl_t* pimpl;

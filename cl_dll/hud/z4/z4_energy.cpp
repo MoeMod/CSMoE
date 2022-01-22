@@ -82,7 +82,7 @@ int CHudZ4Energy::VidInit(void)
 	if (!m_iKey[0])
 		m_iKey[0] = R_LoadTextureUnique("resource/zombi/z4_6key");
 	if (!m_iKey[1])
-		m_iKey[1] = R_LoadTextureUnique("resource/zombi/right");
+		m_iKey[1] = R_LoadTextureUnique("resource/zombi/z4_rightclick");
 
 	return 1;
 }
@@ -289,7 +289,7 @@ int CHudZ4Energy::Draw(float time)
 			snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf, szSkillTimesBuf);
 		}
 
-		m_iKey[1]->Draw2DQuadScaled(iX, iY + m_iKey[1]->h() / 2, iX + m_iKey[1]->w(), iY + m_iKey[1]->h());
+		m_iKey[1]->Draw2DQuadScaled(iX, iY, iX + m_iKey[1]->w(), iY + m_iKey[1]->h());
 		iX += m_iKey[1]->w() + 5;
 		DrawUtils::DrawHudString(iX, iY + 15, ScreenWidth, m_szDrawText, 251, 201, 96);
 	}

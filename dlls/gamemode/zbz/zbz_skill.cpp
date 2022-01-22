@@ -16,6 +16,7 @@ namespace sv {
 	{
 		g_iKnifeMasterSpr = PRECACHE_MODEL("sprites/ef_coilmg.spr");
 		g_iExplodeSpr = PRECACHE_MODEL("sprites/zerogxplode.spr");
+		PRECACHE_MODEL("models/zombiez_contactinfection_ring.mdl");
 	}
 
 	class ZSkill_BulletDamage : public CZombieZSkill_Base
@@ -347,6 +348,19 @@ namespace sv {
 		const char* GetName() const override { return "狂热"; }
 		const char* GetDesc() const override { return "通过战斗与合作变得更加强大。如果是人类，将激活士气系统。如果是僵尸，将激活怒气系统"; }
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+		void OnGetSkill() override {
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB3Msg, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(ZB3_MESSAGE_MORALE); // type, reserved.
+			WRITE_BYTE(0);
+			WRITE_BYTE(255);
+			MESSAGE_END();
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB3Msg, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(ZB3_MESSAGE_RAGE); // type, reserved.
+			WRITE_BYTE(0);
+			WRITE_BYTE(255);
+			MESSAGE_END();
+		}
 	};
 
 	class ZSkill_HeroicPresence : public CZombieZSkill_Base
@@ -749,42 +763,167 @@ namespace sv {
 		float GetHeadShotChance() const { return 1.0f; }
 		duration_t GetFireTime() const { return 1.5s + 0.25s * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
-	
+
+	class ZSkill_Marksman : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Marksman(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "神枪手"; }
+		const char* GetDesc() const override { return "大幅提升狙击步枪的命中率。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnAdjustFireBullets3Dir(Vector& vecDir) override {
+			if (!IsActivate())
+				return;
+			if (!m_pPlayer->m_pActiveItem)
+				return;
+			if (!isSniperRifle(m_pPlayer->m_pActiveItem))
+				return;
+
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+			Vector vecNewDir = gpGlobals->v_forward;
+			vecDir.x = vecNewDir.x;
+			vecDir.y = vecNewDir.y;
+			vecDir.z = vecNewDir.z;
+		}
+	};
+
+	class ZSkill_SteelHead : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SteelHead(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "钢铁头盔"; }
+		const char* GetDesc() const override { return "降低致命打击的伤害。"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (victim != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+			if (m_pPlayer->m_LastHitGroup != HITGROUP_HEAD)
+				return;
+
+			flDamage += flDamage * (-0.04f + -0.03f * g_pGameRules->m_iTotalRoundsPlayed);
+		}
+	};
+
+	class ZSkill_AmmoCreation : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_AmmoCreation(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "弹夹扩充"; }
+		const char* GetDesc() const override { return "填装时一定概率填装更多的子弹。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnAdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int& iClip) override
+		{
+			if (!IsActivate())
+				return;
+			if (RANDOM_FLOAT(0, 1) > 0.5f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed)
+				return;
+
+			iClip += iClip * 0.45f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed;
+		}
+	};
+
+	class ZSkill_ContactInfection : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_ContactInfection(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "接触感染"; }
+		const char* GetDesc() const override { return "身体接触时触发感染。"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnTouch(CBaseEntity *other) override
+		{
+			if (!IsActivate())
+				return;
+			if (!other->IsPlayer())
+				return;
+			if (!other->IsAlive())
+				return;
+			CBasePlayer* p = static_cast<CBasePlayer*>(other);
+			if (p->m_bIsZombie)
+				return;
+
+			p->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, 1000.0f, DMG_BULLET | DMG_NEVERGIB);
+		}
+
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
+
+		void OnGetSkill() override {
+			MESSAGE_BEGIN(MSG_BROADCAST, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(ZBZ_MESSAGE_CONTACT_INFECTION_RING); // type, reserved.
+			WRITE_BYTE(m_pPlayer->entindex());
+			MESSAGE_END();
+		}
+	};
+
+	class ZSkill_GeneBooster : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_GeneBooster(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "强化基因"; }
+		const char* GetDesc() const override { return "被感染时强化为母体僵尸。"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
+
+		void OnGetSkill() override {
+			if (m_pPlayer->m_iZombieLevel < ZOMBIE_LEVEL_ORIGIN)
+			{
+				m_pPlayer->m_iZombieLevel = ZOMBIE_LEVEL_ORIGIN;
+				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+				if (strategy)
+				{
+					strategy->SetRagePercent(101.0f);
+					strategy->CheckEvolution();
+				}
+			}
+
+		}
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
 		return std::make_shared<T>(player);
 	}
 	const std::tuple<byte, unsigned int, std::shared_ptr<CZombieZSkill_Base>(*)(CBasePlayer*)> g_SkillList[] = {
-		{ Skill_BulletDamage, 25, MakeSkill<ZSkill_BulletDamage> },
-		{ Skill_Critical, 25, MakeSkill<ZSkill_Critical> },
-		{ Skill_KnifeMaster, 25, MakeSkill<ZSkill_KnifeMaster> },
+		{ Skill_BulletDamage, 100, MakeSkill<ZSkill_BulletDamage> },
+		{ Skill_Critical, 100, MakeSkill<ZSkill_Critical> },
+		{ Skill_KnifeMaster, 100, MakeSkill<ZSkill_KnifeMaster> },
 		{ Skill_DoubleJump, 25, MakeSkill<ZSkill_DoubleJump> },
-		{ Skill_Health, 25, MakeSkill<ZSkill_Health> },
-		{ Skill_BombBackpack, 25, MakeSkill<ZSkill_BombBackpack> },
-		{ Skill_ExplodeBullet, 25, MakeSkill<ZSkill_ExplodeBullet> },
-		{ Skill_Speed, 25, MakeSkill<ZSkill_Speed> },
+		{ Skill_Health, 100, MakeSkill<ZSkill_Health> },
+		{ Skill_BombBackpack, 100, MakeSkill<ZSkill_BombBackpack> },
+		{ Skill_ExplodeBullet, 100, MakeSkill<ZSkill_ExplodeBullet> },
+		{ Skill_Speed, 100, MakeSkill<ZSkill_Speed> },
 		{ Skill_Icarus, 25, MakeSkill<ZSkill_Icarus> },
-		{ Skill_Fanatic, 25, MakeSkill<ZSkill_Fanatic> },
+		{ Skill_Fanatic, 100, MakeSkill<ZSkill_Fanatic> },
 
 		{ Skill_HeroicPresence, 25, MakeSkill<ZSkill_HeroicPresence> },
-		{ Skill_SteelSkin, 25, MakeSkill<ZSkill_SteelSkin> },
+		{ Skill_SteelSkin, 100, MakeSkill<ZSkill_SteelSkin> },
 		{ Skill_EnduranceHave, 25, MakeSkill<ZSkill_EnduranceHave> },
 		{ Skill_ArmonedAdvance, 25, MakeSkill<ZSkill_ArmonedAdvance> },
-		{ Skill_SpeedyCrouch, 25, MakeSkill<ZSkill_SpeedyCrouch> },
-		{ Skill_SteelBody, 25, MakeSkill<ZSkill_SteelBody> },
-		{ Skill_Specialist, 25, MakeSkill<ZSkill_Specialist> },
-		{ Skill_StealthReloader, 25, MakeSkill<ZSkill_StealthReloader> },
+		{ Skill_SpeedyCrouch, 100, MakeSkill<ZSkill_SpeedyCrouch> },
+		{ Skill_SteelBody, 100, MakeSkill<ZSkill_SteelBody> },
+		{ Skill_Specialist, 100, MakeSkill<ZSkill_Specialist> },
+		{ Skill_StealthReloader, 100, MakeSkill<ZSkill_StealthReloader> },
 		{ Skill_RapidReloader, 25, MakeSkill<ZSkill_RapidReloader> },
 		{ Skill_AmmoReserves, 25, MakeSkill<ZSkill_AmmoReserves> },
 
-		{ Skill_DropZone, 25, MakeSkill<ZSkill_DropZone> },
-		{ Skill_ExplosiveReaction, 25, MakeSkill<ZSkill_ExplosiveReaction> },
+		{ Skill_DropZone, 100, MakeSkill<ZSkill_DropZone> },
+		{ Skill_ExplosiveReaction, 50, MakeSkill<ZSkill_ExplosiveReaction> },
 		{ Skill_Kangaroo, 25, MakeSkill<ZSkill_Kangaroo> },
 		{ Skill_BombEnhacement, 15, MakeSkill<ZSkill_BombEnhacement> },
 		{ Skill_ClawEnhacement, 25, MakeSkill<ZSkill_ClawEnhacement> },
-		{ Skill_IncendiaryAmmo, 25, MakeSkill<ZSkill_IncendiaryAmmo> },
-		
+		{ Skill_IncendiaryAmmo, 100, MakeSkill<ZSkill_IncendiaryAmmo> },
+		{ Skill_Marksman, 100, MakeSkill<ZSkill_Marksman> },
+		{ Skill_SteelHead, 100, MakeSkill<ZSkill_SteelHead> },
+		{ Skill_AmmoCreation, 100, MakeSkill<ZSkill_AmmoCreation> },
+		{ Skill_ContactInfection, 5, MakeSkill<ZSkill_ContactInfection> },
+
+		{ Skill_GeneBooster, 100, MakeSkill<ZSkill_GeneBooster> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

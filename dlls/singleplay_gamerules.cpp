@@ -44,7 +44,7 @@ BOOL CHalfLifeRules::FShouldSwitchWeapon(CBasePlayer *pPlayer, CBasePlayerItem *
 		return TRUE;
 	}
 
-	if (!pPlayer->m_pActiveItem->CanHolster())
+	if (!pPlayer->CanHolster())
 	{
 		return FALSE;
 	}

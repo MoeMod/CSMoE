@@ -218,6 +218,7 @@ bool IsIntersectingBox(const Vector *start, const Vector *end, const Vector *box
 
 void CCSBot::BotTouch(CBaseEntity *other)
 {
+	m_pModStrategy->OnTouch(other);
 	// if we have touched a higher-priority player, make way
 	// TODO: Need to account for reaction time, etc.
 	if (other->IsPlayer()) {

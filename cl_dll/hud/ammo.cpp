@@ -74,7 +74,7 @@ void WeaponsResource :: LoadAllWeaponSprites( void )
 
 int WeaponsResource :: CountAmmo( int iId ) 
 { 
-	if ( iId < 0 )
+	if ( iId < 0 || iId >= MAX_AMMO_TYPES )
 		return 0;
 
 	return riAmmo[iId];

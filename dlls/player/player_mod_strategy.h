@@ -43,6 +43,7 @@ public:
 	virtual ~IBasePlayerModStrategy() = 0;
 
 	virtual void OnThink() = 0;
+	virtual void OnTouch(CBaseEntity* other) = 0;
 	virtual void OnSpawn() = 0;
 	virtual void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) = 0;
 	virtual void OnResetMaxSpeed() = 0;
@@ -71,8 +72,11 @@ public:
 	virtual int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) = 0;
 	virtual float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) = 0;
 	virtual duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) = 0;
+	virtual int AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip) = 0;
 	virtual float AdjustZombieKnifeRange(bool bStab, float flRange) = 0;
 	virtual int AdjustScoreAttrib(int state) = 0;
+	virtual Vector AdjustFireBullets3Dir(Vector vecDir) = 0;
+	virtual void ClientPutInServer() = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -83,6 +87,7 @@ public:
 	explicit CPlayerModStrategy_Default(CBasePlayer *p) : BasePlayerExtra(p) {}
 
 	void OnThink() override {}
+	void OnTouch(CBaseEntity* other) override {}
 	void OnSpawn() override {}
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override {}
 	void OnResetMaxSpeed() override {}
@@ -109,9 +114,12 @@ public:
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
 	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return 1; }
 	float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) override { return flDamage; }
-	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) { return fDelay; }
-	float AdjustZombieKnifeRange(bool bStab, float flRange) { return flRange; }
-	int AdjustScoreAttrib(int state) { return state; }
+	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) override { return fDelay; }
+	int AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip) override { return iClip; }
+	float AdjustZombieKnifeRange(bool bStab, float flRange) override { return flRange; }
+	int AdjustScoreAttrib(int state) override { return state; }
+	Vector AdjustFireBullets3Dir(Vector vecDir) override { return vecDir; }
+	void ClientPutInServer() {}
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

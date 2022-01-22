@@ -80,6 +80,7 @@ public:
 
 	bool IsHero() const { return m_bIsHero; }
 	void SetHero(bool value) { m_bIsHero = value; }
+	void SetRagePercent(float value) { m_flRagePercent = value; }
 
 private:
 	CMod_ZombieHero * const m_pModZB3;

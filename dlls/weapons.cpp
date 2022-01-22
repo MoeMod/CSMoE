@@ -780,6 +780,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 	{
 		// complete the reload.
 		int j = Q_min(iMaxClip() - m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+		j = m_pPlayer->m_pModStrategy->AdjustDefaultReloadClip(this, j);
 
 		// Add them to the clip
 		m_iClip += j;

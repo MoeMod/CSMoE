@@ -308,6 +308,8 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_SG550:
 	case WEAPON_AWP:
 	case WEAPON_G3SG1:
+	case WEAPON_SKULL5:
+	case WEAPON_SFSNIPER:
 		return true;
 
 	default:

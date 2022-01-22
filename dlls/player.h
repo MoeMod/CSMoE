@@ -715,11 +715,13 @@ public:
 		else
 			pev->weapons &= ~WEAPON_ALLWEAPONS;
 	}
+	void EXPORT PlayerTouch(CBaseEntity* other) {}
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
 	void RemoveWeapon(int iWeaponID);
 	void ClearWeapon(bool removeSuit = false);
+	void EXPORT PlayerTouch(CBaseEntity* other);
 #endif
 
 	void SpawnProtection_Check();
@@ -730,7 +732,17 @@ public:
 	bool ReactToDeimosTail();
 	void AddWeapon(int iWeaponID);
 	const char* GetAnimExtDualPistols() { return m_bIsFemale ? "dualpistols" : "dualpistols_2"; }
+	bool CanHolster(CBasePlayerItem* item = nullptr)
+	{
+		if (m_bHolsterDisabled)
+			return false;
 
+		if (!item) item = m_pActiveItem;
+		if (item)
+			return item->CanHolster();
+
+		return true;
+	}
 public:
 	bool m_bSpawnProtection; // pack bools
 	ZombieLevel m_iZombieLevel;
@@ -756,6 +768,7 @@ public:
 	int m_iRoundKill;
 	int m_iRoundAssist;
 	int m_iRoundInfect;
+	bool m_bHolsterDisabled;
 };
 
 }

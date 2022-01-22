@@ -85,6 +85,7 @@ public:
 			DropWeapon(&it->second);
 		}
 		rgWeapons.clear();
+		gHUD.m_Ammo.m_pWeapon = nullptr;
 	}
 
 	WEAPON* GetWeaponSlot( int slot, int pos ) { return rgSlots[slot][pos]; }

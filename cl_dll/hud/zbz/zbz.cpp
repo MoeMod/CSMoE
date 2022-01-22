@@ -25,6 +25,10 @@ GNU General Public License for more details.
 #include "zbz.h"
 #include "zbz_skill_info.h"
 
+namespace cl {
+	extern engine_studio_api_t IEngineStudio;
+}
+
 class CHudZBZ::impl_t
 	: public THudSubDispatcher<CHudZBZ_Skill> {};
 
@@ -36,7 +40,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	auto type = static_cast<ZBZMessageType>(buf.ReadByte());
 	switch (type)
 	{
-	case ZB3_MESSAGE_LEVEL_INFO:
+	case ZBZ_MESSAGE_LEVEL_INFO:
 	{
 		int lv = buf.ReadByte();
 		int exp = buf.ReadByte();
@@ -44,16 +48,53 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 		pimpl->get<CHudZBZ_Skill>().UpdateLevel(lv, exp, point);
 		break;
 	}
-	case ZB3_MESSAGE_SKILL_ADD:
+	case ZBZ_MESSAGE_SKILL_ADD:
 	{
 		ZombieZSkillSkillId id = static_cast<ZombieZSkillSkillId>(buf.ReadByte());
 		pimpl->get<CHudZBZ_Skill>().AddSkill(id);
 		break;
 	}
-	case ZB3_MESSAGE_SKILL_REMOVE:
+	case ZBZ_MESSAGE_SKILL_REMOVE:
 	{
 		ZombieZSkillSkillId id = static_cast<ZombieZSkillSkillId>(buf.ReadByte());
 		pimpl->get<CHudZBZ_Skill>().RemoveSkill(id);
+		break;
+	}
+	case ZBZ_MESSAGE_BURN:
+	{
+		int player = buf.ReadByte();
+		float time = buf.ReadByte() / 10.0f;
+		gHUD.m_HeadIcon.R_AttachTentToPlayer(player, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"), Vector(0.0, 0.0, 0.0), time, TRUE, FTENT_PERSIST | FTENT_FADEOUT | FTENT_SPRANIMATELOOP, 1.0, kRenderTransAdd, 10.0f);
+		break;
+	}
+	case ZBZ_MESSAGE_CONTACT_INFECTION_RING:
+	{
+		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiez_contactinfection_ring.mdl", false);
+		if (!pModel)
+			break;
+
+		int player = buf.ReadByte();
+		cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(player);
+		if (!pPlayer)
+		{
+			gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", player);
+			break;
+		}
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin, pModel);
+		if (!pEnt)
+			break;
+
+		pEnt->entity.curstate.sequence = 0;
+		pEnt->entity.curstate.frame = 0;
+		pEnt->entity.curstate.framerate = 1.0;
+		pEnt->clientIndex = player;
+		pEnt->die = gHUD.m_flTime + 9999.9f;
+		pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM | FTENT_PERSIST;
+		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
+		{
+			if (!g_PlayerExtraInfo[ent->clientIndex].zombie || g_PlayerExtraInfo[ent->clientIndex].dead)
+				ent->die = currenttime;
+		};
 		break;
 	}
 	}
@@ -105,3 +146,8 @@ void CHudZBZ::Shutdown(void)
 	pimpl = nullptr;
 }
 
+
+bool CHudZBZ::CheckHasSkill(ZombieZSkillSkillId id)
+{
+	return pimpl->get<CHudZBZ_Skill>().CheckHasSkill(id);
+}

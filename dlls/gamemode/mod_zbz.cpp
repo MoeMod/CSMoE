@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 
-// #define __DEBUG
+ //#define __DEBUG
 
 #define SKILL_FUNCTION(skillSet, func, ...) { \
 	for (auto &skill : skillSet) { \
@@ -44,6 +44,8 @@ namespace sv {
 	constexpr int HURT_AMOUNT = 400; // 满足累计承受伤害值
 	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
 	constexpr int DAMAGE_AMOUNT = 200; // 满足累计造成伤害值
+	constexpr float EXP_SCALE = 0.2f; // 每回合每升一级所减少经验获取百分比
+	constexpr duration_t ROUND_PERIOD_ADD = 60s; // 每回合时间超过多少秒后下一回合才会给予技能点
 
 	CPlayerModStrategy_ZBZ::CPlayerModStrategy_ZBZ(CBasePlayer* player, CMod_ZombieZ* mp)
 		: CPlayerModStrategy_ZB3(player, static_cast<CMod_ZombieHero*>(mp)),
@@ -54,7 +56,8 @@ namespace sv {
 		m_iExp(0),
 		m_iPoint(0),
 		m_flTakeDamage(0.0f),
-		m_flSufferDamage(0.0f)
+		m_flSufferDamage(0.0f),
+		m_flExpScale(1.0f)
 {
 	
 }
@@ -62,14 +65,14 @@ namespace sv {
 void CPlayerModStrategy_ZBZ::OnInitHUD()
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-	WRITE_BYTE(ZB3_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
 	WRITE_BYTE(m_iExp);
 	WRITE_BYTE(m_iPoint);
 	MESSAGE_END();
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-	WRITE_BYTE(ZB3_MESSAGE_SKILL_REMOVE);
+	WRITE_BYTE(ZBZ_MESSAGE_SKILL_REMOVE);
 	WRITE_BYTE(0);
 	MESSAGE_END();
 }
@@ -78,6 +81,11 @@ float CPlayerModStrategy_ZBZ::AdjustZombieKnifeRange(bool bStab, float flRange)
 {
 	SKILL_FUNCTION(m_vecSkill, OnAdjustZombieKnifeRange, bStab, flRange);
 	return flRange;
+}
+Vector CPlayerModStrategy_ZBZ::AdjustFireBullets3Dir(Vector vecDir)
+{
+	SKILL_FUNCTION(m_vecSkill, OnAdjustFireBullets3Dir, vecDir);
+	return vecDir;
 }
 
 int CPlayerModStrategy_ZBZ::ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax)
@@ -103,12 +111,15 @@ duration_t CPlayerModStrategy_ZBZ::OnDefaultReload_Pre(CBasePlayerWeapon* weapon
 	return fDelay;
 }
 
+int CPlayerModStrategy_ZBZ::AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip)
+{
+	SKILL_FUNCTION(m_vecSkill, OnAdjustDefaultReloadClip, weapon, iClip);
+	return iClip;
+}
+
 void CPlayerModStrategy_ZBZ::UpdatePlayerEvolutionHUD()
 {
 	CPlayerModStrategy_ZB3::UpdatePlayerEvolutionHUD();
-	/*if (CheckSkill(Skill_Fanatic))
-	{
-	}*/
 }
 
 bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
@@ -199,6 +210,7 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 
 void CPlayerModStrategy_ZBZ::OnSpawn()
 {
+	ClearFire();
 	SKILL_FUNCTION(m_vecSkill, OnSpawn);
 	return CPlayerModStrategy_ZB3::OnSpawn();
 }
@@ -287,36 +299,72 @@ void CPlayerModStrategy_ZBZ::Event_TakeDamage(CBasePlayer* victim, entvars_t* pe
 	SKILL_FUNCTION(m_vecSkill, OnTakeDamage, victim, pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
+void CPlayerModStrategy_ZBZ::SetLevel(int lv)
+{
+	lv = min(lv, MAX_LEVELS);
+	m_iLevel = lv;
+	m_iPoint = lv;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(m_iLevel);
+	WRITE_BYTE(m_iExp);
+	WRITE_BYTE(m_iPoint);
+	MESSAGE_END();
+}
+
+void CPlayerModStrategy_ZBZ::AddLevel(int lv)
+{
+	if (m_iLevel >= MAX_LEVELS)
+		return;
+
+	m_iLevel++;
+	m_iPoint++;
+
+	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(m_iLevel);
+	WRITE_BYTE(m_iExp);
+	WRITE_BYTE(m_iPoint);
+	MESSAGE_END();
+}
+
 void CPlayerModStrategy_ZBZ::AddExp(int exp)
 {
 	if (m_iLevel >= MAX_LEVELS)
 		return;
 
 	bool bLevelUp = false;
-	m_iExp += exp;
+	m_iExp += exp * m_flExpScale;
 	while (m_iExp >= ((m_iLevel + 1) * 2 * 50))
 	{
 		m_iLevel++;
 		m_iPoint++;
 		m_iExp = 0;
+		m_flExpScale = max(0.0f, m_flExpScale - EXP_SCALE);
 		bLevelUp = true;
 
-		auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
-		if (data.second != nullptr)
+		int index = m_pPlayer->entindex();
+		if (g_pGameRules->m_iPlayersOS[index - 1] == OS_Android || g_pGameRules->m_iPlayersOS[index - 1] == OS_Apple || m_pPlayer->IsBot())
 		{
-			m_iPoint--;
-			m_setSkillID.insert(data.first);
-			m_vecSkill.insert(data.second);
-			data.second->OnGetSkill();
-			if (!m_pPlayer->IsBot())
+			auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+			if (data.second != nullptr)
 			{
-				ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
+				m_iPoint--;
+				m_setSkillID.insert(data.first);
+				m_vecSkill.insert(data.second);
 				data.second->OnGetSkill();
+				if (!m_pPlayer->IsBot())
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
+					CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
+					data.second->OnGetSkill();
 
-				MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-				WRITE_BYTE(ZB3_MESSAGE_SKILL_ADD);
-				WRITE_BYTE(data.first);
-				MESSAGE_END();
+					MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+					WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
+					WRITE_BYTE(data.first);
+					MESSAGE_END();
+				}
 			}
 		}
 	}
@@ -326,11 +374,11 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		char buf[64];
 		Q_snprintf(buf, ARRAYSIZE(buf), "等级提升！Level %i", m_iLevel);
 		ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, buf);
-		/*PlaySound(id, g_szSound[0])*/
+		CLIENT_COMMAND(m_pPlayer->edict(), "spk metalarena/level_up.wav\n");
 	}
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-	WRITE_BYTE(ZB3_MESSAGE_LEVEL_INFO);
+	WRITE_BYTE(ZBZ_MESSAGE_LEVEL_INFO);
 	WRITE_BYTE(m_iLevel);
 	WRITE_BYTE(m_iExp);
 	WRITE_BYTE(m_iPoint);
@@ -351,30 +399,35 @@ void CPlayerModStrategy_ZBZ::OnThink()
 
 	if (IsOnFire() && m_flFireDmg <= gpGlobals->time && m_pPlayer->m_bIsZombie)
 	{
-		for (auto it = m_vecFireList.begin(); it != m_vecFireList.end();)
+		bool fireElapsed = true;
+		for (int i = 1; i <= gpGlobals->maxClients; ++i)
 		{
-			auto atk = it->first;
-			auto time = it->second;
-
-			if (!(atk && !atk->m_bIsZombie && time > gpGlobals->time))
-			{
-				it = m_vecFireList.erase(it);
+			if (m_vecFireList[i] <= gpGlobals->time)
 				continue;
-			}
+
+			CBasePlayer* atk = static_cast<CBasePlayer*>(UTIL_PlayerByIndex(i));
+			if (!(atk && !atk->m_bIsZombie))
+				continue;
+
+			fireElapsed = false;
 			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN);
-			++it;
 		}
+		float flSlow = 0.02f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
+		if(m_pPlayer->m_flVelocityModifier > flSlow)
+			m_pPlayer->m_flVelocityModifier = flSlow;
 
-		MESSAGE_BEGIN(MSG_BROADCAST, gmsgHeadIcon, NULL, m_pPlayer->pev);
-		WRITE_BYTE(4);	//type
-		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		MESSAGE_END();
-
-		m_flFireDmg = gpGlobals->time + 0.2s;
+		m_bIsFiring = !fireElapsed;
+		m_flFireDmg = gpGlobals->time + 0.5s;
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnThink);
 	return CPlayerModStrategy_ZB3::OnThink();
+}
+
+void CPlayerModStrategy_ZBZ::OnTouch(CBaseEntity* other)
+{
+	SKILL_FUNCTION(m_vecSkill, OnTouch, other);
+	return CPlayerModStrategy_ZB3::OnTouch(other);
 }
 
 void CPlayerModStrategy_ZBZ::OnKilled(entvars_t * pKiller, entvars_t * pInflictor)
@@ -385,6 +438,13 @@ void CPlayerModStrategy_ZBZ::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 
 void CPlayerModStrategy_ZBZ::Event_OnRoundStart()
 {
+	m_flExpScale = 1.0f;
+	if (m_bRoundStartAddLevel)
+	{
+		AddLevel(1);
+		m_bRoundStartAddLevel = false;
+	}
+
 	SKILL_FUNCTION(m_vecSkill, OnRoundStart);
 	return CPlayerModStrategy_ZB3::Event_OnRoundStart();
 }
@@ -399,14 +459,15 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 	auto& bitsCurButton = cmd->buttons;
 	auto& bitsOldButton = m_pPlayer->pev->oldbuttons;
 
-	/*if (m_flSkillDelay != invalid_time_point && m_flSkillDelay <= gpGlobals->time)
+	if (m_flSkillDelay != invalid_time_point && m_flSkillDelay <= gpGlobals->time)
 	{
+		m_pPlayer->m_bHolsterDisabled = false;
 		m_flSkillDelay = invalid_time_point;
 		if (m_pPlayer->IsAlive() && m_pPlayer->m_pActiveItem)
 		{
 			m_pPlayer->SwitchWeapon(m_pPlayer->m_pActiveItem);
 		}
-	}*/
+	}
 
 	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 	{
@@ -414,18 +475,36 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 		if (data.second != nullptr)
 		{
 #ifndef __DEBUG
-			m_flSkillDelay = gpGlobals->time + 1.4s;
+			m_flSkillDelay = gpGlobals->time + 1.0s;
+			m_pPlayer->ResetMaxSpeed();
+#else
+			m_flSkillDelay = gpGlobals->time + 0.01s;
 #endif
 			m_iPoint--;
 			m_setSkillID.insert(data.first);
 			m_vecSkill.insert(data.second);
 			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
+			CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
 			data.second->OnGetSkill();
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-			WRITE_BYTE(ZB3_MESSAGE_SKILL_ADD);
+			WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
 			WRITE_BYTE(data.first);
 			MESSAGE_END();
+
+			if (!m_pPlayer->m_bIsZombie)
+			{
+				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
+				m_pPlayer->pev->weaponmodel = 0;
+			}
+			m_pPlayer->m_bHolsterDisabled = true;
+			if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
+			{
+				pWeapon->SendWeaponAnim(28, TRUE);
+				pWeapon->m_flNextPrimaryAttack = 1.0s;
+				pWeapon->m_flNextSecondaryAttack = 1.0s;
+				pWeapon->m_flTimeWeaponIdle = 1.0s;
+			}
 		}
 	}
 
@@ -435,10 +514,10 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 void CPlayerModStrategy_ZBZ::OnResetMaxSpeed() {
 	CPlayerModStrategy_ZB3::OnResetMaxSpeed();
-	if (IsOnFire())
-	{
-		m_pPlayer->pev->maxspeed *= 0.02f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
-	}
+	if (m_flSkillDelay > gpGlobals->time)
+		m_pPlayer->pev->maxspeed = 1.0f;
+	if (m_pPlayer->pev->maxspeed <= 1.0f)
+		return;
 	SKILL_FUNCTION(m_vecSkill, OnResetMaxSpeed);
 }
 
@@ -455,9 +534,28 @@ bool CPlayerModStrategy_ZBZ::ApplyKnockback(CBasePlayer* attacker, const Knockba
 	return m_pCharacter->ApplyKnockback(attacker, knockback);
 }
 
+void CPlayerModStrategy_ZBZ::ClientPutInServer()
+{
+	int iMinLevel = 9999;
+	moe::range::PlayersList list;
+	for (CBasePlayer* player : list)
+	{
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
+		if (!strategy) continue;
+		if(strategy->m_iLevel < iMinLevel);
+			iMinLevel = strategy->m_iLevel;
+		break;
+	}
+	SetLevel(iMinLevel == 9999 ? 1 : iMinLevel);
+}
+
 CMod_ZombieZ::CMod_ZombieZ()
 {
 	Skill_Precache();
+
+	PRECACHE_MODEL("models/v_emotion.mdl");
+	PRECACHE_SOUND("metalarena/level_up.wav");
+	PRECACHE_SOUND("player/zombiez_mutation.wav");
 }
 
 void CMod_ZombieZ::InstallPlayerModStrategy(CBasePlayer *player)
@@ -524,6 +622,34 @@ void CMod_ZombieZ::PickHero()
 	// make heroes
 	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
 	std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieZ::MakeHero, this, std::placeholders::_1));
+}
+
+void CMod_ZombieZ::HumanWin()
+{
+	CMod_ZombieHero::HumanWin();
+	if (gpGlobals->time - m_fRoundCount >= ROUND_PERIOD_ADD)
+	{
+		for (CBasePlayer* player : moe::range::PlayersList())
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
+			if (!strategy) continue;
+			strategy->SetRoundStartAddLevel(true);
+		}
+	}
+}
+
+void CMod_ZombieZ::ZombieWin()
+{
+	CMod_ZombieHero::ZombieWin();
+	if (gpGlobals->time - m_fRoundCount >= ROUND_PERIOD_ADD)
+	{
+		for (CBasePlayer* player : moe::range::PlayersList())
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
+			if (!strategy) continue;
+			strategy->SetRoundStartAddLevel(true);
+		}
+	}
 }
 
 }
