@@ -405,7 +405,7 @@ void Image_GetPaletteLMP( const byte *pal, int rendermode )
 	else Image_GetPaletteHL(); // default half-life palette
 }
 
-void Image_ConvertPalTo24bit( rgbdata_t *pic )
+void Image_ConvertPalTo24bit( image_ref pic )
 {
 	byte	*pal32, *pal24;
 	byte	*converted;
@@ -519,7 +519,7 @@ void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end )
 	}
 }
 
-void Image_CopyParms( rgbdata_t *src )
+void Image_CopyParms( image_ref src )
 {
 	Image_Reset();
 
@@ -1344,7 +1344,7 @@ qboolean Image_Decompress( const byte *data )
 	return true;
 }
 
-rgbdata_t *Image_DecompressInternal( rgbdata_t *pic )
+image_ref Image_DecompressInternal( image_ref pic )
 {
 	// quick case to reject unneeded conversions
 	if( pic->type == PF_RGBA_32 )
@@ -1367,7 +1367,7 @@ rgbdata_t *Image_DecompressInternal( rgbdata_t *pic )
 	return pic;
 }
 
-rgbdata_t *Image_LightGamma( rgbdata_t *pic, float texGamma )
+image_ref Image_LightGamma( image_ref pic, float texGamma )
 {
 	byte	*in = (byte *)pic->buffer;
 	byte	gammatable[256];
@@ -1397,7 +1397,7 @@ rgbdata_t *Image_LightGamma( rgbdata_t *pic, float texGamma )
 	return pic;
 }
 
-qboolean Image_RemapInternal( rgbdata_t *pic, int topColor, int bottomColor )
+qboolean Image_RemapInternal( image_ref pic, int topColor, int bottomColor )
 {
 	switch( pic->type )
 	{
@@ -1436,7 +1436,7 @@ Filtering algorithm from http://www.student.kuleuven.ac.be/~m0216922/CG/filterin
 All credit due 
 ================== 
 */
-qboolean Image_ApplyFilter( rgbdata_t *pic, int filter, float factor, float bias, flFlags_t flags, GLenum blendFunc )
+qboolean Image_ApplyFilter( image_ref pic, int filter, float factor, float bias, flFlags_t flags, GLenum blendFunc )
 { 
 	int	i, x, y; 
 	uint	*fin, *fout; 
@@ -1545,9 +1545,9 @@ qboolean Image_ApplyFilter( rgbdata_t *pic, int filter, float factor, float bias
 	return true;
 }
 
-qboolean Image_Process( rgbdata_t **pix, int width, int height, float gamma, uint flags, imgfilter_t *filter )
+qboolean Image_Process( image_ref *pix, int width, int height, float gamma, uint flags, imgfilter_t *filter )
 {
-	rgbdata_t	*pic = *pix;
+	auto pic = *pix;
 	qboolean	result = true;
 	byte	*out;
 				

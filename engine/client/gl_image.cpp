@@ -39,8 +39,7 @@ std::vector<gltexture_t> r_textures(1);
 std::unordered_map<std::string, int> r_texturesHashTable;
 
 static byte	*scaledImage = NULL;			// pointer to a scaled image
-static byte	data2D[BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4];	// intermediate texbuffer
-static rgbdata_t	r_image;					// generic pixelbuffer used for internal textures
+static image_ref	r_image;					// generic pixelbuffer used for internal textures
 
 // internal tables
 static vec3_t	r_luminanceTable[256];	// RGB to luminance
@@ -1020,7 +1019,7 @@ GL_GenerateMipmaps
 sgis generate mipmap
 ===============
 */
-void GL_GenerateMipmaps( byte *buffer, rgbdata_t *pic, gltexture_t *tex, GLenum glTarget, GLenum inFormat, int side, qboolean subImage )
+static void GL_GenerateMipmaps( byte *buffer, image_ref pic, gltexture_t *tex, GLenum glTarget, GLenum inFormat, int side, qboolean subImage )
 {
 	int	mipLevel;
 	int	dataType = GL_UNSIGNED_BYTE;
@@ -1069,7 +1068,7 @@ GL_MakeLuminance
 Converts the given image to luminance
 =================
 */
-void GL_MakeLuminance( rgbdata_t *in )
+static void GL_MakeLuminance( image_ref in )
 {
 	byte	luminance;
 	float	r, g, b;
@@ -1151,7 +1150,7 @@ GL_UploadTextureDXT
 upload compressed texture into video memory
 ===============
 */
-static void GL_UploadTextureDXT( rgbdata_t *pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter )
+static void GL_UploadTextureDXT( image_ref pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter )
 {
 	byte		*buf;
 	const byte	*bufend;
@@ -1291,7 +1290,7 @@ GL_UploadTexture
 upload texture into video memory
 ===============
 */
-static void GL_UploadTexture( rgbdata_t *pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter )
+static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage, imgfilter_t *filter )
 {
 	byte		*buf, *data;
 	const byte	*bufend;
@@ -1570,7 +1569,6 @@ int GL_LoadTexture_DDS(const char *name, GLvoid* data, int type, int size, int w
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter )
 {
 	gltexture_t	*tex;
-	rgbdata_t		*pic;
 	uint		picFlags = 0;
 
 	int i = GL_FindTexture(name);
@@ -1599,7 +1597,7 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 	if( !Q_strcmp( name, "#lab1_map1.mip" ) || !Q_strcmp( name, "#lab1_map2.mip" ))
 		flags |= TF_NEAREST;
 
-	pic = FS_LoadImage( name, buf, size );
+	image_ref pic = FS_LoadImage( name, buf, size );
 	if( !pic ) return i; // couldn't loading image
 
 	// force upload texture as RGB or RGBA (detail textures requires this)
@@ -1621,7 +1619,7 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 	GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
 	if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
-		FS_FreeImage( pic ); // release source texture
+		pic = nullptr; // release source texture
 
 	return i;
 }
@@ -1631,7 +1629,7 @@ int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, i
 GL_LoadTextureInternal
 ================
 */
-int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update )
+int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, qboolean update )
 {
 	int i = 0;
 
@@ -1807,7 +1805,6 @@ namespace xe {
 		// release source
 		if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
 		{
-			FS_FreeImage( image->original );
 			image->original = nullptr;
 		}
 
@@ -1824,7 +1821,7 @@ namespace xe {
 		std::shared_ptr<gltexture_t> operator()(texlru_src_external_s &src) const
 		{
 			int flags = tex->flags;
-			rgbdata_t *pic = FS_LoadImage( src.path.c_str(), (byte*)&src.texture, 0 );
+			auto pic = FS_LoadImage( src.path.c_str(), (byte*)&src.texture, 0 );
 			if( !pic )
 			{
 				MsgDev(D_ERROR, "TexLru : fail to load load external texture %s\n", src.path.c_str());
@@ -1842,7 +1839,7 @@ namespace xe {
 			ptexture->height = tex->height;
 
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
-				FS_FreeImage( pic ); // release source texture
+				pic = nullptr; // release source texture
 
 			MsgDev(D_INFO, "TexLru : load external texture %s\n", src.path.c_str());
 			return std::shared_ptr<gltexture_t>{ tex, TexLru_ReleaseTexture };
@@ -1864,7 +1861,7 @@ namespace xe {
 
 			int flags = tex->flags;
 			// hack : expected mstudiotexture_t* as buffer
-			rgbdata_t *pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
+			auto pic = FS_LoadImage( src.texture_name.c_str(), (byte *)&src.texture, src.size );
 			if( !pic )
 			{
 				Mem_Free( buf );
@@ -1879,7 +1876,7 @@ namespace xe {
 			GL_TexFilter( tex, false ); // update texture filter, wrap etc
 
 			if(!( flags & ( TF_KEEP_8BIT|TF_KEEP_RGBDATA )))
-				FS_FreeImage( pic ); // release source texture
+				pic = nullptr; // release source texture
 
 			Mem_Free( buf );
 
@@ -2048,38 +2045,36 @@ creates an empty 32-bit texture (just reserve slot)
 */
 int GL_CreateTexture( const char *name, int width, int height, const void *buffer, texFlags_t flags )
 {
-	rgbdata_t	r_empty;
 	int	texture;
-
-	Q_memset( &r_empty, 0, sizeof( r_empty ));
-	r_empty.width = width;
-	r_empty.height = height;
-	r_empty.type = PF_RGBA_32;
-	r_empty.size = r_empty.width * r_empty.height * 4;
-	r_empty.flags = IMAGE_HAS_COLOR | (( flags & TF_HAS_ALPHA ) ? IMAGE_HAS_ALPHA : 0 );
-	r_empty.buffer = (byte *)buffer;
+	image_ref r_empty = Image_NewTemp();
+	r_empty->width = width;
+	r_empty->height = height;
+	r_empty->type = PF_RGBA_32;
+	r_empty->size = r_empty->width * r_empty->height * 4;
+	r_empty->flags = IMAGE_HAS_COLOR | (( flags & TF_HAS_ALPHA ) ? IMAGE_HAS_ALPHA : 0 ) | IMAGE_TEMP;
+	r_empty->buffer = (byte *)buffer;
 
 	if( flags & TF_TEXTURE_1D )
 	{
-		r_empty.height = 1;
-		r_empty.size = r_empty.width * 4;
+		r_empty->height = 1;
+		r_empty->size = r_empty->width * 4;
 	}
 	else if( flags & TF_TEXTURE_3D )
 	{
 		if( !GL_Support( GL_TEXTURE_3D_EXT ))
 			return 0;
 
-		r_empty.depth = r_empty.width;
-		r_empty.size = r_empty.width * r_empty.height * r_empty.depth * 4;
+		r_empty->depth = r_empty->width;
+		r_empty->size = r_empty->width * r_empty->height * r_empty->depth * 4;
 	}
 	else if( flags & TF_CUBEMAP )
 	{
 		flags &= ~TF_CUBEMAP; // will be set later
-		r_empty.flags |= IMAGE_CUBEMAP;
-		r_empty.size *= 6;
+		r_empty->flags |= IMAGE_CUBEMAP;
+		r_empty->size *= 6;
 	}
 
-	texture = GL_LoadTextureInternal( name, &r_empty, flags, false );
+	texture = GL_LoadTextureInternal( name, r_empty, flags, false );
 
 	if( flags & TF_DEPTHMAP )
 		GL_SetTextureType( texture, TEX_DEPTHMAP );
@@ -2096,7 +2091,6 @@ GL_ProcessTexture
 void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor )
 {
 	gltexture_t	*image;
-	rgbdata_t		*pic;
 	int		flags = 0;
 
 	if( texnum <= 0 ) return; // missed image
@@ -2131,13 +2125,11 @@ void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor )
 	}
 
 	// all the operations makes over the image copy not an original
-	pic = FS_CopyImage( image->original );
+	auto pic = FS_CopyImage( image->original );
 	Image_Process( &pic, topColor, bottomColor, gamma, flags, NULL );
 
 	GL_UploadTexture( pic, image, true, NULL );
 	GL_TexFilter( image, true ); // update texture filter, wrap etc
-
-	FS_FreeImage( pic );
 }
 
 /*
@@ -2200,1961 +2192,7 @@ void GL_FreeTexture( GLenum texnum )
 		return;
 	R_FreeImage( &r_textures[texnum] );
 }
-#if 0 // Uncle Mike removed this
-/*
-=======================================================================
 
- IMAGE PROGRAM FUNCTIONS
-
-=======================================================================
-*/
-/*
-=================
-R_ForceImageToRGBA
-
-Unpack any image to RGBA buffer
-=================
-*/
-_inline rgbdata_t *R_ForceImageToRGBA( rgbdata_t *pic )
-{
-	// don't need additional checks - image lib do it himself
-	Image_Process( &pic, 0, 0, 0, IMAGE_FORCE_RGBA, NULL );
-
-	return pic;
-}
-
-/*
-=================
-R_AddImages
-
-Adds the given images together
-=================
-*/
-static rgbdata_t *R_AddImages( rgbdata_t *in1, rgbdata_t *in2 )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	r, g, b, a;
-	int	x, y;
-
-	// make sure what we processing RGBA images
-	in1 = R_ForceImageToRGBA( in1 );
-	in2 = R_ForceImageToRGBA( in2 );
-	width = in1->width, height = in1->height;
-	out = in1;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = in1->buffer[4*(y*width+x)+0] + in2->buffer[4*(y*width+x)+0];
-			g = in1->buffer[4*(y*width+x)+1] + in2->buffer[4*(y*width+x)+1];
-			b = in1->buffer[4*(y*width+x)+2] + in2->buffer[4*(y*width+x)+2];
-			a = in1->buffer[4*(y*width+x)+3] + in2->buffer[4*(y*width+x)+3];
-			out->buffer[4*(y*width+x)+0] = bound( 0, r, 255 );
-			out->buffer[4*(y*width+x)+1] = bound( 0, g, 255 );
-			out->buffer[4*(y*width+x)+2] = bound( 0, b, 255 );
-			out->buffer[4*(y*width+x)+3] = bound( 0, a, 255 );
-		}
-	}
-
-	FS_FreeImage( in2 );
-
-	return out;
-}
-
-/*
-=================
-R_MultiplyImages
-
-Multiplies the given images
-=================
-*/
-static rgbdata_t *R_MultiplyImages( rgbdata_t *in1, rgbdata_t *in2 )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	r, g, b, a;
-	int	x, y;
-
-	// make sure what we processing RGBA images
-	in1 = R_ForceImageToRGBA( in1 );
-	in2 = R_ForceImageToRGBA( in2 );
-	width = in1->width, height = in1->height;
-	out = in1;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = in1->buffer[4*(y*width+x)+0] * (in2->buffer[4*(y*width+x)+0] * (1.0f/255));
-			g = in1->buffer[4*(y*width+x)+1] * (in2->buffer[4*(y*width+x)+1] * (1.0f/255));
-			b = in1->buffer[4*(y*width+x)+2] * (in2->buffer[4*(y*width+x)+2] * (1.0f/255));
-			a = in1->buffer[4*(y*width+x)+3] * (in2->buffer[4*(y*width+x)+3] * (1.0f/255));
-			out->buffer[4*(y*width+x)+0] = bound( 0, r, 255 );
-			out->buffer[4*(y*width+x)+1] = bound( 0, g, 255 );
-			out->buffer[4*(y*width+x)+2] = bound( 0, b, 255 );
-			out->buffer[4*(y*width+x)+3] = bound( 0, a, 255 );
-		}
-	}
-	FS_FreeImage( in2 );
-
-	return out;
-}
-
-/*
-=================
-R_BiasImage
-
-Biases the given image
-=================
-*/
-static rgbdata_t *R_BiasImage( rgbdata_t *in, const vec4_t bias )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	r, g, b, a;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = in->buffer[4*(y*width+x)+0] + (255 * bias[0]);
-			g = in->buffer[4*(y*width+x)+1] + (255 * bias[1]);
-			b = in->buffer[4*(y*width+x)+2] + (255 * bias[2]);
-			a = in->buffer[4*(y*width+x)+3] + (255 * bias[3]);
-			out->buffer[4*(y*width+x)+0] = bound( 0, r, 255 );
-			out->buffer[4*(y*width+x)+1] = bound( 0, g, 255 );
-			out->buffer[4*(y*width+x)+2] = bound( 0, b, 255 );
-			out->buffer[4*(y*width+x)+3] = bound( 0, a, 255 );
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_ScaleImage
-
-Scales the given image
-=================
-*/
-static rgbdata_t *R_ScaleImage( rgbdata_t *in, const vec4_t scale )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	r, g, b, a;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = in->buffer[4*(y*width+x)+0] * scale[0];
-			g = in->buffer[4*(y*width+x)+1] * scale[1];
-			b = in->buffer[4*(y*width+x)+2] * scale[2];
-			a = in->buffer[4*(y*width+x)+3] * scale[3];
-			out->buffer[4*(y*width+x)+0] = bound( 0, r, 255 );
-			out->buffer[4*(y*width+x)+1] = bound( 0, g, 255 );
-			out->buffer[4*(y*width+x)+2] = bound( 0, b, 255 );
-			out->buffer[4*(y*width+x)+3] = bound( 0, a, 255 );
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_InvertColor
-
-Inverts the color channels of the given image
-=================
-*/
-static rgbdata_t *R_InvertColor( rgbdata_t *in )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			out->buffer[4*(y*width+x)+0] = 255 - in->buffer[4*(y*width+x)+0];
-			out->buffer[4*(y*width+x)+1] = 255 - in->buffer[4*(y*width+x)+1];
-			out->buffer[4*(y*width+x)+2] = 255 - in->buffer[4*(y*width+x)+2];
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_InvertAlpha
-
-Inverts the alpha channel of the given image
-=================
-*/
-static rgbdata_t *R_InvertAlpha( rgbdata_t *in )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-			out->buffer[4*(y*width+x)+3] = 255 - in->buffer[4*(y*width+x)+3];
-	}
-
-	return out;
-}
-
-/*
-=================
-R_MakeIntensity
-
-Converts the given image to intensity
-=================
-*/
-static rgbdata_t *R_MakeIntensity( rgbdata_t *in )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	byte	intensity;
-	float	r, g, b;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = r_luminanceTable[in->buffer[4*(y*width+x)+0]][0];
-			g = r_luminanceTable[in->buffer[4*(y*width+x)+1]][1];
-			b = r_luminanceTable[in->buffer[4*(y*width+x)+2]][2];
-
-			intensity = (byte)(r + g + b);
-
-			out->buffer[4*(y*width+x)+0] = intensity;
-			out->buffer[4*(y*width+x)+1] = intensity;
-			out->buffer[4*(y*width+x)+2] = intensity;
-			out->buffer[4*(y*width+x)+3] = intensity;
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_MakeLuminance
-
-Converts the given image to luminance
-=================
-*/
-static rgbdata_t *R_MakeLuminance( rgbdata_t *in )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	byte	luminance;
-	float	r, g, b;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = r_luminanceTable[in->buffer[4*(y*width+x)+0]][0];
-			g = r_luminanceTable[in->buffer[4*(y*width+x)+1]][1];
-			b = r_luminanceTable[in->buffer[4*(y*width+x)+2]][2];
-
-			luminance = (byte)(r + g + b);
-
-			out->buffer[4*(y*width+x)+0] = luminance;
-			out->buffer[4*(y*width+x)+1] = luminance;
-			out->buffer[4*(y*width+x)+2] = luminance;
-			out->buffer[4*(y*width+x)+3] = 255;
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_MakeLuma
-
-Converts the given image to glow (LUMA)
-=================
-*/
-static rgbdata_t *R_MakeLuma( rgbdata_t *in )
-{
-	Image_Process( &in, 0, 0, 0, IMAGE_MAKE_LUMA|IMAGE_FORCE_RGBA, NULL );
-
-	return in;
-}
-
-/*
-=================
-R_MakeImageBlock
-
-Scissor the specifed rectangle from image
-=================
-*/
-static rgbdata_t *R_MakeImageBlock( rgbdata_t *in, int block[4] )
-{
-	byte	*fin, *fout, *out;
-	int	i, x, y, xl, yl, xh, yh, w, h;
-	int	linedelta;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-
-	xl = block[0];
-	yl = block[1];
-	w = block[2];
-	h = block[3];
-	xh = xl + w;
-	yh = yl + h;
-
-	out = fout = Mem_Alloc( r_temppool, w * h * 4 );
-
-	fin = in->buffer + (yl * in->width + xl) * 4;
-	linedelta = (in->width - w) * 4;
-
-	// cut block from source
-	for( y = yl; y < yh; y++ )
-	{
-		for( x = xl; x < xh; x++ )
-			for( i = 0; i < 4; i++ )
-				*out++ = *fin++;
-		fin += linedelta;
-	}
-
-	// update image size
-	in->width = w, in->height = h;
-	in->size = in->width * in->height * 4;
-
-	// copy result back
-	in->buffer = Mem_Realloc( host.imagepool, in->buffer, in->size );
-	Q_memcpy( in->buffer, fout, in->size );
-	Mem_Free( fout ); // purge temp buffer
-
-	return in;
-}
-
-/*
-=================
-R_MakeAlpha
-
-Converts the given image to alpha
-=================
-*/
-static rgbdata_t *R_MakeAlpha( rgbdata_t *in )
-{
-	rgbdata_t	*out;
-	int	width, height;
-	byte	alpha;
-	float	r, g, b;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = in;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = r_luminanceTable[in->buffer[4*(y*width+x)+0]][0];
-			g = r_luminanceTable[in->buffer[4*(y*width+x)+1]][1];
-			b = r_luminanceTable[in->buffer[4*(y*width+x)+2]][2];
-
-			alpha = (byte)(r + g + b);
-
-			out->buffer[4*(y*width+x)+0] = 255;
-			out->buffer[4*(y*width+x)+1] = 255;
-			out->buffer[4*(y*width+x)+2] = 255;
-			out->buffer[4*(y*width+x)+3] = alpha;
-		}
-	}
-
-	return out;
-}
-
-/*
-=================
-R_HeightMap
-
-Converts the given height map to a normal map
-=================
-*/
-static rgbdata_t *R_HeightMap( rgbdata_t *in, float bumpScale )
-{
-	byte	*out;
-	int	width, height;
-	vec3_t	normal;
-	float	r, g, b;
-	float	c, cx, cy;
-	int	x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = Mem_Alloc( r_temppool, width * height * 4 );
-
-	if( !bumpScale ) bumpScale = 1.0f;
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			r = r_luminanceTable[in->buffer[4*(y*width+x)+0]][0];
-			g = r_luminanceTable[in->buffer[4*(y*width+x)+1]][1];
-			b = r_luminanceTable[in->buffer[4*(y*width+x)+2]][2];
-
-			c = (r + g + b) * (1.0f/255);
-
-			r = r_luminanceTable[in->buffer[4*(y*width+((x+1)%width))+0]][0];
-			g = r_luminanceTable[in->buffer[4*(y*width+((x+1)%width))+1]][1];
-			b = r_luminanceTable[in->buffer[4*(y*width+((x+1)%width))+2]][2];
-
-			cx = (r + g + b) * (1.0f/255);
-
-			r = r_luminanceTable[in->buffer[4*(((y+1)%height)*width+x)+0]][0];
-			g = r_luminanceTable[in->buffer[4*(((y+1)%height)*width+x)+1]][1];
-			b = r_luminanceTable[in->buffer[4*(((y+1)%height)*width+x)+2]][2];
-
-			cy = (r + g + b) * (1.0f/255);
-
-			normal[0] = (c - cx) * bumpScale;
-			normal[1] = (c - cy) * bumpScale;
-			normal[2] = 1.0f;
-
-			if( !VectorNormalizeLength( normal ))
-				VectorSet( normal, 0.0f, 0.0f, 1.0f );
-
-			out[4*(y*width+x)+0] = (byte)(128 + 127 * normal[0]);
-			out[4*(y*width+x)+1] = (byte)(128 + 127 * normal[1]);
-			out[4*(y*width+x)+2] = (byte)(128 + 127 * normal[2]);
-			out[4*(y*width+x)+3] = 255;
-		}
-	}
-
-	// copy result back
-	Q_memcpy( in->buffer, out, width * height * 4 );
-	Mem_Free( out );
-
-	return in;
-}
-
-/*
-=================
-R_AddNormals
-
-Adds the given normal maps together
-=================
-*/
-static rgbdata_t *R_AddNormals( rgbdata_t *in1, rgbdata_t *in2 )
-{
-	byte	*out;
-	int	width, height;
-	vec3_t	normal;
-	int	x, y;
-
-	// make sure what we processing RGBA images
-	in1 = R_ForceImageToRGBA( in1 );
-	in2 = R_ForceImageToRGBA( in2 );
-	width = in1->width, height = in1->height;
-	out = Mem_Alloc( r_temppool, in1->size );
-
-	for( y = 0; y < height; y++ )
-	{
-		for( x = 0; x < width; x++ )
-		{
-			normal[0] = (in1->buffer[4*(y*width+x)+0] * (1.0f/127) - 1.0f) + (in2->buffer[4*(y*width+x)+0] * (1.0f/127) - 1.0f);
-			normal[1] = (in1->buffer[4*(y*width+x)+1] * (1.0f/127) - 1.0f) + (in2->buffer[4*(y*width+x)+1] * (1.0f/127) - 1.0f);
-			normal[2] = (in1->buffer[4*(y*width+x)+2] * (1.0f/127) - 1.0f) + (in2->buffer[4*(y*width+x)+2] * (1.0f/127) - 1.0f);
-
-			if( !VectorNormalizeLength( normal ))
-				VectorSet( normal, 0.0f, 0.0f, 1.0f );
-
-			out[4*(y*width+x)+0] = (byte)(128 + 127 * normal[0]);
-			out[4*(y*width+x)+1] = (byte)(128 + 127 * normal[1]);
-			out[4*(y*width+x)+2] = (byte)(128 + 127 * normal[2]);
-			out[4*(y*width+x)+3] = 255;
-		}
-	}
-
-	// copy result back
-	Q_memcpy( in1->buffer, out, width * height * 4 );
-	FS_FreeImage( in2 );
-	Mem_Free( out );
-
-	return in1;
-}
-
-/*
-=================
-R_SmoothNormals
-
-Smoothes the given normal map
-=================
-*/
-static rgbdata_t *R_SmoothNormals( rgbdata_t *in )
-{
-	byte	*out;
-	int	width, height;
-	uint	frac, fracStep;
-	uint	p1[0x1000], p2[0x1000];
-	byte	*pix1, *pix2, *pix3, *pix4;
-	uint	*inRow1, *inRow2;
-	vec3_t	normal;
-	int	i, x, y;
-
-	// make sure what we processing RGBA image
-	in = R_ForceImageToRGBA( in );
-	width = in->width, height = in->height;
-	out = Mem_Alloc( r_temppool, in->size );
-
-	fracStep = 0x10000;
-	frac = fracStep>>2;
-	for( i = 0; i < width; i++ )
-	{
-		p1[i] = 4 * (frac>>16);
-		frac += fracStep;
-	}
-
-	frac = (fracStep>>2) * 3;
-	for( i = 0; i < width; i++ )
-	{
-		p2[i] = 4 * (frac>>16);
-		frac += fracStep;
-	}
-
-	for( y = 0; y < height; y++ )
-	{
-		inRow1 = (uint *)in->buffer + width * (int)((float)y + 0.25f);
-		inRow2 = (uint *)in->buffer + width * (int)((float)y + 0.75f);
-
-		for( x = 0; x < width; x++ )
-		{
-			pix1 = (byte *)inRow1 + p1[x];
-			pix2 = (byte *)inRow1 + p2[x];
-			pix3 = (byte *)inRow2 + p1[x];
-			pix4 = (byte *)inRow2 + p2[x];
-
-			normal[0] = (pix1[0] * (1.0f/127) - 1.0f) + (pix2[0] * (1.0f/127) - 1.0f) + (pix3[0] * (1.0f/127) - 1.0f) + (pix4[0] * (1.0f/127) - 1.0f);
-			normal[1] = (pix1[1] * (1.0f/127) - 1.0f) + (pix2[1] * (1.0f/127) - 1.0f) + (pix3[1] * (1.0f/127) - 1.0f) + (pix4[1] * (1.0f/127) - 1.0f);
-			normal[2] = (pix1[2] * (1.0f/127) - 1.0f) + (pix2[2] * (1.0f/127) - 1.0f) + (pix3[2] * (1.0f/127) - 1.0f) + (pix4[2] * (1.0f/127) - 1.0f);
-
-			if( !VectorNormalizeLength( normal ))
-				VectorSet( normal, 0.0f, 0.0f, 1.0f );
-
-			out[4*(y*width+x)+0] = (byte)(128 + 127 * normal[0]);
-			out[4*(y*width+x)+1] = (byte)(128 + 127 * normal[1]);
-			out[4*(y*width+x)+2] = (byte)(128 + 127 * normal[2]);
-			out[4*(y*width+x)+3] = 255;
-		}
-	}
-
-	// copy result back
-	Q_memcpy( in->buffer, out, width * height * 4 );
-	Mem_Free( out );
-
-	return in;
-}
-
-/*
-================
-R_IncludeDepthmap
-
-Write depthmap into alpha-channel the given normal map
-================
-*/
-static rgbdata_t *R_IncludeDepthmap( rgbdata_t *in1, rgbdata_t *in2 )
-{
-	int	i;
-	byte	*pic1, *pic2;
-
-	// make sure what we processing RGBA images
-	in1 = R_ForceImageToRGBA( in1 );
-	in2 = R_ForceImageToRGBA( in2 );
-
-	pic1 = in1->buffer;
-	pic2 = in2->buffer;
-
-	for( i = (in1->width * in1->height) - 1; i > 0; i--, pic1 += 4, pic2 += 4 )
-	{
-		if( in2->flags & IMAGE_HAS_COLOR )
-			pic1[3] = ((int)pic2[0] + (int)pic2[1] + (int)pic2[2]) / 3;
-		else if( in2->flags & IMAGE_HAS_ALPHA )
-			pic1[3] = pic2[3];
-		else pic1[3] = pic2[0];
-	}
-
-	in1->flags |= (IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA);
-	FS_FreeImage( in2 );
-
-	return in1;
-}
-
-/*
-================
-R_ClearPixels
-
-clear specified area: color or alpha
-================
-*/
-static rgbdata_t *R_ClearPixels( rgbdata_t *in, qboolean clearAlpha )
-{
-	byte	*pic;
-	int	i;
-
-	// make sure what we processing RGBA images
-	in = R_ForceImageToRGBA( in );
-	pic = in->buffer;
-
-	if( clearAlpha )
-	{
-		for( i = 0; ( i < in->width * in->height ) && ( in->flags & IMAGE_HAS_ALPHA ); i++ )
-			pic[(i<<2)+3] = 0xFF;
-	}
-	else
-	{
-		// clear color or greyscale image otherwise
-		for( i = 0; i < in->width * in->height; i++ )
-			pic[(i<<2)+0] = pic[(i<<2)+1] = pic[(i<<2)+2] = 0xFF;
-	}
-
-	return in;
-}
-
-/*
-================
-R_MovePixels
-
-move alpha-channel into color or back
-================
-*/
-static rgbdata_t *R_MovePixels( rgbdata_t *in, qboolean alphaToColor )
-{
-	byte	*pic;
-	int	i;
-
-	// make sure what we processing RGBA images
-	in = R_ForceImageToRGBA( in );
-	pic = in->buffer;
-
-	if( alphaToColor )
-	{
-		for( i = 0; ( i < in->width * in->height ) && ( in->flags & IMAGE_HAS_ALPHA ); i++ )
-		{
-			pic[(i<<2)+0] = pic[(i<<2)+1] = pic[(i<<2)+2] = pic[(i<<2)+3]; // move from alpha to color
-			pic[(i<<2)+3] = 0xFF; // clear alpha channel
-		}
-	}
-	else
-	{
-		// clear color or greyscale image otherwise
-		for( i = 0; i < in->width * in->height; i++ )
-		{
-			// convert to grayscale
-			pic[(i<<2)+3] = (pic[(i<<2)+0] * 0.32f) + (pic[(i<<2)+0] * 0.59f) + (pic[(i<<2)+0] * 0.09f);
-			pic[(i<<2)+0] = pic[(i<<2)+1] = pic[(i<<2)+2] = 0x00; // clear RGB channels
-		}
-	}
-
-	return in;
-}
-
-/*
-==============================================================================
-
-EXTENDED IMAGE INTERFACE
-
-==============================================================================
-*/
-/*
-=================
-R_ParseAdd
-=================
-*/
-static rgbdata_t *R_ParseAdd( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic1, *pic2;
-	int	samples1, samples2;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'add'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'add'\n" );
-		return NULL;
-	}
-
-	pic1 = R_LoadImage( script, token, NULL, 0, &samples1, flags );
-	if( !pic1 ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "," ))
-	{
-		MsgDev( D_WARN, "expected ',', found '%s' instead for 'add'\n", token );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'add'\n" );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	pic2 = R_LoadImage( script, token, NULL, 0, &samples2, flags );
-	if( !pic2 )
-	{
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'add'\n", token );
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	if( pic1->width != pic2->width || pic1->height != pic2->height )
-	{
-		MsgDev( D_WARN, "images for 'add' have mismatched dimensions [%ix%i] != [%ix%i]\n",
-		pic1->width, pic1->height, pic2->width, pic2->height );
-
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	*samples = GL_CalcImageSamples( samples1, samples2 );
-	if( *samples != 1 )
-	{
-		*flags &= ~TF_INTENSITY;
-		*flags &= ~TF_LUMINANCE;
-	}
-
-	return R_AddImages( pic1, pic2 );
-}
-
-/*
-=================
-R_ParseMultiply
-=================
-*/
-static rgbdata_t *R_ParseMultiply( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic1, *pic2;
-	int	samples1, samples2;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'multiply'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'multiply'\n" );
-		return NULL;
-	}
-
-	pic1 = R_LoadImage( script, token, NULL, 0, &samples1, flags );
-	if( !pic1 ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "," ))
-	{
-		MsgDev( D_WARN, "expected ',', found '%s' instead for 'multiply'\n", token );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'multiply'\n" );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	pic2 = R_LoadImage( script, token, NULL, 0, &samples2, flags );
-	if( !pic2 )
-	{
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'multiply'\n", token );
-
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	if( pic1->width != pic2->width || pic1->height != pic2->height )
-	{
-		MsgDev( D_WARN, "images for 'multiply' have mismatched dimensions [%ix%i] != [%ix%i]\n",
-			pic1->width, pic1->height, pic2->width, pic2->height );
-
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	*samples = GL_CalcImageSamples( samples1, samples2 );
-
-	if( *samples != 1 )
-	{
-		*flags &= ~TF_INTENSITY;
-		*flags &= ~TF_LUMINANCE;
-	}
-
-	return R_MultiplyImages( pic1, pic2 );
-}
-
-/*
-=================
-R_ParseBias
-=================
-*/
-static rgbdata_t *R_ParseBias( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-	vec4_t	bias;
-	int	i;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'bias'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'bias'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	for( i = 0; i < 4; i++ )
-	{
-		*script = COM_ParseFile( *script, token );
-		if( Q_stricmp( token, "," ))
-		{
-			MsgDev( D_WARN, "expected ',', found '%s' instead for 'bias'\n", token );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		if(( *script = COM_ParseFile( *script, token )) == NULL )
-		{
-			MsgDev( D_WARN, "missing parameters for 'bias'\n" );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		bias[i] = Q_atof( token );
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'bias'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	if( *samples < 3 ) *samples += 2;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-
-	return R_BiasImage( pic, bias );
-}
-
-/*
-=================
-R_ParseScale
-=================
-*/
-static rgbdata_t *R_ParseScale( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-	vec4_t	scale;
-	int	i;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'scale'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'scale'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	for( i = 0; i < 4; i++ )
-	{
-		*script = COM_ParseFile( *script, token );
-		if( Q_stricmp( token, "," ))
-		{
-			MsgDev( D_WARN, "expected ',', found '%s' instead for 'scale'\n", token );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		if(( *script = COM_ParseFile( *script, token )) == NULL )
-		{
-			MsgDev( D_WARN, "missing parameters for 'scale'\n" );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		scale[i] = Q_atof( token );
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'scale'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	if( *samples < 3 ) *samples += 2;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-
-	return R_ScaleImage( pic, scale );
-}
-
-/*
-=================
-R_ParseInvertColor
-=================
-*/
-static rgbdata_t *R_ParseInvertColor( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'invertColor'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'invertColor'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'invertColor'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	return R_InvertColor( pic );
-}
-
-/*
-=================
-R_ParseInvertAlpha
-=================
-*/
-static rgbdata_t *R_ParseInvertAlpha( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'invertAlpha'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'invertAlpha'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'invertAlpha'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	return R_InvertAlpha( pic );
-}
-
-/*
-=================
-R_ParseMakeIntensity
-=================
-*/
-static rgbdata_t *R_ParseMakeIntensity( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'makeIntensity'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'makeIntensity'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'makeIntensity'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 1;
-	*flags |= TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-	*flags &= ~TF_NORMALMAP;
-
-	return R_MakeIntensity( pic );
-}
-
-/*
-=================
-R_ParseMakeLuminance
-=================
-*/
-static rgbdata_t *R_ParseMakeLuminance( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'makeLuminance'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'makeLuminance'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'makeLuminance'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 1;
-	*flags |= TF_LUMINANCE;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_NORMALMAP;
-
-	return R_MakeIntensity( pic );
-}
-
-/*
-=================
-R_ParseMakeAlpha
-=================
-*/
-static rgbdata_t *R_ParseMakeAlpha( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'makeAlpha'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'makeAlpha'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'makeAlpha'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 1;
-	*flags &= ~TF_INTENSITY;
-	*flags |= TF_HAS_ALPHA;
-	*flags &= ~TF_NORMALMAP;
-
-	return R_MakeAlpha( pic );
-}
-
-/*
-=================
-R_ParseMakeLuma
-=================
-*/
-static rgbdata_t *R_ParseMakeLuma( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'makeLuma'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'makeLuma'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	if( !( pic->flags & IMAGE_HAS_LUMA ))
-	{
-		MsgDev( D_WARN, "%s doesn't contain a luma-pixels for 'makeLuma'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'makeLuma'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 3;
-
-	return R_MakeLuma( pic );
-}
-
-/*
-=================
-R_ParseStudioSkin
-=================
-*/
-static rgbdata_t *R_ParseStudioSkin( char **script, const byte *buf, size_t size, int *samples, texFlags_t *flags )
-{
-	char		token[256];
-	string		model_path;
-	string		modelT_path;
-	string		skinname;
-	rgbdata_t 	*pic;
-	studiohdr_t	hdr;
-	file_t		*f;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'Studio'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'Studio'\n" );
-		return NULL;
-	}
-
-	// NOTE: studio skin show as 'models/props/flame1.mdl/flame2a.bmp'
-	FS_ExtractFilePath( token, model_path );
-	FS_StripExtension( model_path );
-	Q_snprintf( modelT_path, MAX_STRING, "%sT.mdl", model_path );
-	FS_DefaultExtension( model_path, ".mdl" );
-	FS_FileBase( token, skinname );
-
-	// load it in
-	if( buf && size )
-	{
-		pic = R_LoadImage( script, va( "#%s.mdl", skinname ), buf, size, samples, flags );
-		if( !pic ) return NULL;
-		goto studio_done;
-	}
-
-	FS_DefaultExtension( skinname, ".bmp" );
-	f = FS_Open( model_path, "rb", false );
-
-	if( !f )
-	{
-		MsgDev( D_WARN, "'Studio' can't find studiomodel %s\n", model_path );
-		return NULL;
-	}
-
-	if( FS_Read( f, &hdr, sizeof( hdr )) != sizeof( hdr ))
-	{
-		MsgDev( D_WARN, "'Studio' %s probably corrupted\n", model_path );
-		FS_Close( f );
-		return NULL;		
-	}
-
-	if( hdr.numtextures == 0 )
-	{
-		// textures are keep seperate
-		FS_Close( f );
-		f = FS_Open( modelT_path, "rb", false );
-
-		if( !f )
-		{
-			MsgDev( D_WARN, "'Studio' can't find studiotextures %s\n", modelT_path );
-			return NULL;
-		}
-
-		if( FS_Read( f, &hdr, sizeof( hdr )) != sizeof( hdr ))
-		{
-			MsgDev( D_WARN, "'Studio' %s probably corrupted\n", modelT_path );
-			FS_Close( f );
-			return NULL;		
-		}
-	}
-
-	if( hdr.textureindex > 0 && hdr.numtextures <= MAXSTUDIOSKINS )
-	{
-		// all ok, can load model into memory
-		mstudiotexture_t	*ptexture, *tex;
-		size_t		mdl_size, tex_size;
-		byte		*pin;
-		int		i;
-
-		FS_Seek( f, 0, SEEK_END );
-		mdl_size = FS_Tell( f );
-		FS_Seek( f, 0, SEEK_SET );
-
-		pin = Mem_Alloc( r_temppool, mdl_size );
-
-		if( FS_Read( f, pin, mdl_size ) != mdl_size )
-		{
-			MsgDev( D_WARN, "'Studio' %s probably corrupted\n", model_path );
-			Mem_Free( pin );
-			FS_Close( f );
-			return NULL;
-		}
-
-		ptexture = (mstudiotexture_t *)(pin + hdr.textureindex);
-
-		// find specified texture
-		for( i = 0; i < hdr.numtextures; i++ )
-		{
-			if( !Q_stricmp( ptexture[i].name, skinname ))
-				break; // found
-		}
-
-		if( i == hdr.numtextures )
-		{
-			MsgDev( D_WARN, "'Studio' %s doesn't have skin %s\n", model_path, skinname );
-			Mem_Free( pin );
-			FS_Close( f );
-			return NULL;
-		}
-
-		tex = ptexture + i;
-
-		// NOTE: replace index with pointer to start of imagebuffer, ImageLib expected it
-		//tex->index = (int)pin + tex->index;
-		// no more pointer-to-int-to-pointer casts
-		Image_SetMDLPointer((byte*)pin + tex->index);
-		tex_size = sizeof( mstudiotexture_t ) + tex->width * tex->height + 768;
-
-		// load studio texture and bind it
-		FS_FileBase( skinname, skinname );
-
-		// load it in
-		pic = R_LoadImage( script, va( "#%s.mdl", tex->name ), (byte *)tex, tex_size, samples, flags );
-
-		// shutdown operations
-		Mem_Free( pin );
-		FS_Close( f );
-
-		if( !pic ) return NULL;
-	}
-	else
-	{
-		MsgDev( D_WARN, "'Studio' %s has invalid skin count\n", model_path );
-		FS_Close( f );
-		return NULL;		
-	}
-
-studio_done:
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'Studio'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	return pic;
-}
-
-/*
-=================
-R_ParseSpriteFrame
-=================
-*/
-static rgbdata_t *R_ParseSpriteFrame( char **script, const byte *buf, size_t size, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'Sprite'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'Sprite'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, va( "#%s.spr", token ), buf, size, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'Sprite'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	return pic;
-}
-
-/*
-=================
-R_ParseScrapBlock
-=================
-*/
-static rgbdata_t *R_ParseScrapBlock( char **script, int *samples, texFlags_t *flags )
-{
-	int	i, block[4];
-	char	token[256];
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'scrapBlock'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'scrapBlock'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	for( i = 0; i < 4; i++ )
-	{
-		*script = COM_ParseFile( *script, token );
-		if( Q_stricmp( token, "," ))
-		{
-			MsgDev( D_WARN, "expected ',', found '%s' instead for 'rect'\n", token );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		if(( *script = COM_ParseFile( *script, token )) == NULL )
-		{
-			MsgDev( D_WARN, "missing parameters for 'block'\n" );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		block[i] = Q_atoi( token );
-#if 0
-		if( block[i] < 0 )
-		{
-			MsgDev( D_WARN, "invalid argument %i for 'block'\n", i + 1 );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		if((( i + 1 ) & 1 ) && block[i] > pic->width ) 
-		{
-			MsgDev( D_WARN, "invalid argument %i for 'block'\n", i + 1 );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-
-		if((( i + 1 ) & 2 ) && block[i] > pic->height ) 
-		{
-			MsgDev( D_WARN, "invalid argument %i for 'block'\n", i + 1 );
-			FS_FreeImage( pic );
-			return NULL;
-		}
-#endif
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'bias'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	// check bounds silently
-	if( block[0] < 0 || block[0] > pic->width ) block[0] = 0;
-	if( block[1] < 0 || block[1] > pic->height ) block[1] = 0;
-	if( block[2] < 0 || block[2] > pic->width ) block[2] = pic->width;
-	if( block[3] < 0 || block[3] > pic->height ) block[3] = pic->height;
-
-	if(( block[0] + block[2] > pic->width ) || ( block[1] + block[3] > pic->height ))
-	{
-		MsgDev( D_WARN, "'ScrapBlock' image size out of bounds\n" );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	return R_MakeImageBlock( pic, block );
-}
-
-/*
-=================
-R_ParseHeightMap
-=================
-*/
-static rgbdata_t *R_ParseHeightMap( char **script, const byte *buf, size_t size, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic;
-	float	scale;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'heightMap'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'heightMap'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, buf, size, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "," ))
-	{
-		MsgDev( D_WARN, "expected ',', found '%s' instead for 'heightMap'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'heightMap'\n" );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	scale = Q_atof( token );
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'heightMap'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 3;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-	*flags |= TF_NORMALMAP;
-
-	return R_HeightMap( pic, scale );
-}
-
-/*
-=================
-R_ParseAddNormals
-=================
-*/
-static rgbdata_t *R_ParseAddNormals( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic1, *pic2;
-	int	samples1, samples2;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'addNormals'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'addNormals'\n" );
-		return NULL;
-	}
-
-	pic1 = R_LoadImage( script, token, NULL, 0, &samples1, flags );
-	if( !pic1 ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "," ))
-	{
-		MsgDev( D_WARN, "expected ',', found '%s' instead for 'addNormals'\n", token );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'addNormals'\n" );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	pic2 = R_LoadImage( script, token, NULL, 0, &samples2, flags );
-	if( !pic2 )
-	{
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'addNormals'\n", token );
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	if( pic1->width != pic2->width || pic1->height != pic2->height )
-	{
-		MsgDev( D_WARN, "images for 'addNormals' have mismatched dimensions [%ix%i] != [%ix%i]\n",
-			pic1->width, pic1->height, pic2->width, pic2->height );
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	*samples = 3;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-	*flags |= TF_NORMALMAP;
-
-	return R_AddNormals( pic1, pic2 );
-}
-
-/*
-=================
-R_ParseSmoothNormals
-=================
-*/
-static rgbdata_t *R_ParseSmoothNormals( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'smoothNormals'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'smoothNormals'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'smoothNormals'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = 3;
-	*flags &= ~TF_INTENSITY;
-	*flags &= ~TF_LUMINANCE;
-	*flags |= TF_NORMALMAP;
-
-	return R_SmoothNormals( pic );
-}
-
-/*
-=================
-R_ParseDepthmap
-=================
-*/
-static rgbdata_t *R_ParseDepthmap( char **script, const byte *buf, size_t size, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	rgbdata_t	*pic1, *pic2;
-	int	samples1, samples2;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'mergeDepthmap'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'mergeDepthmap'\n" );
-		return NULL;
-	}
-
-	pic1 = R_LoadImage( script, token, buf, size, &samples1, flags );
-	if( !pic1 ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "," ))
-	{
-		MsgDev( D_WARN, "expected ',', found '%s' instead for 'mergeDepthmap'\n", token );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'mergeDepthmap'\n" );
-		FS_FreeImage( pic1 );
-		return NULL;
-	}
-
-	*samples = 3;
-	pic2 = R_LoadImage( script, token, buf, size, &samples2, flags );
-	if( !pic2 ) return pic1; // don't free normalmap
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'mergeDepthmap'\n", token );
-
-		FS_FreeImage( pic1 );
-		FS_FreeImage( pic2 );
-		return NULL;
-	}
-
-	if( pic1->width != pic2->width || pic1->height != pic2->height )
-	{
-		MsgDev( D_WARN, "images for 'mergeDepthmap' have mismatched dimensions [%ix%i] != [%ix%i]\n",
-			pic1->width, pic1->height, pic2->width, pic2->height );
-
-		FS_FreeImage( pic2 );
-		return pic1; // don't free normalmap
-	}
-
-	*samples = 4;
-	*flags &= ~TF_INTENSITY;
-
-	return R_IncludeDepthmap( pic1, pic2 );
-}
-
-/*
-=================
-R_ParseClearPixels
-=================
-*/
-static rgbdata_t *R_ParseClearPixels( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	qboolean	clearAlpha = false;
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'clearPixels'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'clearPixels'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( !Q_stricmp( token, "alpha" ))
-	{
-		*script = COM_ParseFile( *script, token );
-		clearAlpha = true;
-	}
-	else if( !Q_stricmp( token, "color" ))
-	{
-		*script = COM_ParseFile( *script, token );
-		clearAlpha = false;
-	}
-	else if( !Q_stricmp( token, ")" ))
-	{
-		clearAlpha = false;	// clear color as default
-	}
-	else *script = COM_ParseFile( *script, token ); // skip unknown token
-	
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'clearPixels'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = clearAlpha ? 3 : 1;
-	if( clearAlpha ) *flags &= ~TF_HAS_ALPHA;
-	*flags &= ~TF_INTENSITY;
-
-	return R_ClearPixels( pic, clearAlpha );
-}
-
-/*
-=================
-R_ParseMovePixels
-=================
-*/
-static rgbdata_t *R_ParseMovePixels( char **script, int *samples, texFlags_t *flags )
-{
-	char	token[256];
-	qboolean	alphaToColor = false;
-	rgbdata_t *pic;
-
-	*script = COM_ParseFile( *script, token );
-	if( Q_stricmp( token, "(" ))
-	{
-		MsgDev( D_WARN, "expected '(', found '%s' instead for 'movePixels'\n", token );
-		return NULL;
-	}
-
-	if(( *script = COM_ParseFile( *script, token )) == NULL )
-	{
-		MsgDev( D_WARN, "missing parameters for 'movePixels'\n" );
-		return NULL;
-	}
-
-	pic = R_LoadImage( script, token, NULL, 0, samples, flags );
-	if( !pic ) return NULL;
-
-	*script = COM_ParseFile( *script, token );
-	if( !Q_stricmp( token, "AlphaToColor" ))
-	{
-		*script = COM_ParseFile( *script, token );
-		alphaToColor = true;
-	}
-	else if( !Q_stricmp( token, "ColorToAlpha" ))
-	{
-		*script = COM_ParseFile( *script, token );
-		alphaToColor = false;
-	}
-	else if( !Q_stricmp( token, ")" ))
-	{
-		alphaToColor = true; // move alpha to color as default
-	}
-	else *script = COM_ParseFile( *script, token ); // skip unknown token
-	
-	if( Q_stricmp( token, ")" ))
-	{
-		MsgDev( D_WARN, "expected ')', found '%s' instead for 'movePixels'\n", token );
-		FS_FreeImage( pic );
-		return NULL;
-	}
-
-	*samples = alphaToColor ? 3 : 1;
-	if( alphaToColor ) *flags &= ~TF_HAS_ALPHA;
-	*flags &= ~TF_INTENSITY;
-
-	return R_MovePixels( pic, alphaToColor );
-}
-
-/*
-=================
-R_LoadImage
-=================
-*/
-static rgbdata_t *R_LoadImage( char **script, const char *name, const byte *buf, size_t size, int *samples, texFlags_t *flags )
-{
-	if( !Q_stricmp( name, "add" ))
-		return R_ParseAdd( script, samples, flags );
-	else if( !Q_stricmp( name, "multiply" ))
-		return R_ParseMultiply( script, samples, flags );
-	else if( !Q_stricmp( name, "bias" ))
-		return R_ParseBias( script, samples, flags );
-	else if( !Q_stricmp( name, "scale"))
-		return R_ParseScale( script, samples, flags );
-	else if( !Q_stricmp( name, "invertColor" ))
-		return R_ParseInvertColor( script, samples, flags );
-	else if( !Q_stricmp( name, "invertAlpha" ))
-		return R_ParseInvertAlpha( script, samples, flags );
-	else if( !Q_stricmp( name, "makeIntensity" ))
-		return R_ParseMakeIntensity( script, samples, flags );
-	else if( !Q_stricmp( name, "makeLuminance" ))
-		return R_ParseMakeLuminance( script, samples, flags);
-	else if( !Q_stricmp( name, "makeAlpha" ))
-		return R_ParseMakeAlpha( script, samples, flags );
-	else if( !Q_stricmp( name, "makeLuma" ))
-		return R_ParseMakeLuma( script, samples, flags );
-	else if( !Q_stricmp( name, "heightMap" ))
-		return R_ParseHeightMap( script, buf, size, samples, flags );
-	else if( !Q_stricmp( name, "ScrapBlock" ))
-		return R_ParseScrapBlock( script, samples, flags );
-	else if( !Q_stricmp( name, "addNormals" ))
-		return R_ParseAddNormals( script, samples, flags );
-	else if( !Q_stricmp( name, "smoothNormals" ))
-		return R_ParseSmoothNormals( script, samples, flags );
-	else if( !Q_stricmp( name, "mergeDepthmap" ))
-		return R_ParseDepthmap( script, buf, size, samples, flags );
-	else if( !Q_stricmp( name, "clearPixels" ))
-		return R_ParseClearPixels( script, samples, flags );
-	else if( !Q_stricmp( name, "movePixels" ))
-		return R_ParseMovePixels( script, samples, flags );
-	else if( !Q_stricmp( name, "Studio" ))
-		return R_ParseStudioSkin( script, buf, size, samples, flags );
-	else if( !Q_stricmp( name, "Sprite" ))
-		return R_ParseSpriteFrame( script, buf, size, samples, flags );
-	else
-	{	
-		// loading form disk
-		rgbdata_t	*image = FS_LoadImage( name, buf, size );
-
-		// we can't decompress DXT texture
-		if( image && ImageDXT( image->type ))
-		{
-			FS_FreeImage( image );
-			return NULL;
-		}
-
-		if( image ) *samples = GL_CalcTextureSamples( image->flags );
-
-		return image;
-	}
-	return NULL;
-}
-#endif
 /*
 ================
 R_FreeImage
@@ -4200,10 +2238,12 @@ void R_FreeImage( gltexture_t *image )
 
 	// release source
 	if( image->flags & (TF_KEEP_RGBDATA|TF_KEEP_8BIT) && image->original )
-		FS_FreeImage( image->original );
+	{
+		image->original.reset();
+	}
 
 	pglDeleteTextures( 1, &image->texnum );
-	Q_memset( image, 0, sizeof( *image ));
+	image = {};
 }
 
 /*
@@ -4218,16 +2258,17 @@ INTERNAL TEXTURES
 R_InitDefaultTexture
 ==================
 */
-static rgbdata_t *R_InitDefaultTexture( texFlags_t *flags )
+static image_ref R_InitDefaultTexture( texFlags_t *flags )
 {
 	int	x, y;
 
 	// also use this for bad textures, but without alpha
-	r_image.width = r_image.height = 16;
-	r_image.buffer = data2D;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = r_image->height = 16;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = (texFlags_t)0;
 
@@ -4237,11 +2278,11 @@ static rgbdata_t *R_InitDefaultTexture( texFlags_t *flags )
 		for( x = 0; x < 16; x++ )
 		{
 			if(( y < 8 ) ^ ( x < 8 ))
-				((uint *)&data2D)[y*16+x] = 0xFFFF00FF;
-			else ((uint *)&data2D)[y*16+x] = 0xFF000000;
+				data2D[y*16+x] = 0xFFFF00FF;
+			else data2D[y*16+x] = 0xFF000000;
 		}
 	}
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4249,17 +2290,18 @@ static rgbdata_t *R_InitDefaultTexture( texFlags_t *flags )
 R_InitParticleTexture
 ==================
 */
-static rgbdata_t *R_InitParticleTexture( texFlags_t *flags )
+static image_ref R_InitParticleTexture( texFlags_t *flags )
 {
 	int	x, y;
 	int	dx2, dy, d;
 
 	// particle texture
-	r_image.width = r_image.height = 16;
-	r_image.buffer = data2D;
-	r_image.flags = (IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA);
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = r_image->height = 16;
+	r_image->flags = (IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA);
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = TF_NOPICMIP|TF_NOMIPMAP;
 
@@ -4275,7 +2317,7 @@ static rgbdata_t *R_InitParticleTexture( texFlags_t *flags )
 			data2D[( y*16 + x ) * 4 + 3] = bound( 0, d, 255 );
 		}
 	}
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4283,16 +2325,17 @@ static rgbdata_t *R_InitParticleTexture( texFlags_t *flags )
 R_InitOldParticleTexture
 ==================
 */
-static rgbdata_t *R_InitOldParticleTexture(texFlags_t *flags)
+static image_ref R_InitOldParticleTexture(texFlags_t *flags)
 {
 	int	x, y;
 
 	// particle texture
-	r_image.width = r_image.height = 8;
-	r_image.buffer = data2D;
-	r_image.flags = (IMAGE_HAS_COLOR | IMAGE_HAS_ALPHA);
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = r_image->height = 8;
+	r_image->flags = (IMAGE_HAS_COLOR | IMAGE_HAS_ALPHA);
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = TF_NOPICMIP | TF_NOMIPMAP;
 
@@ -4306,7 +2349,7 @@ static rgbdata_t *R_InitOldParticleTexture(texFlags_t *flags)
 			data2D[(y * 8 + x) * 4 + 3] = r_oldParticleTexture[x][y] * 255;
 		}
 	}
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4314,16 +2357,17 @@ static rgbdata_t *R_InitOldParticleTexture(texFlags_t *flags)
 R_InitParticleTexture2
 ==================
 */
-static rgbdata_t *R_InitParticleTexture2( texFlags_t *flags )
+static image_ref R_InitParticleTexture2( texFlags_t *flags )
 {
 	int	x, y;
 
 	// particle texture
-	r_image.width = r_image.height = 8;
-	r_image.buffer = data2D;
-	r_image.flags = (IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA);
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = r_image->height = 8;
+	r_image->flags = (IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA);
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = TF_NOPICMIP|TF_NOMIPMAP;
 
@@ -4337,7 +2381,7 @@ static rgbdata_t *R_InitParticleTexture2( texFlags_t *flags )
 			data2D[(y * 8 + x) * 4 + 3] = r_particleTexture[x][y] * 255;
 		}
 	}
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4345,23 +2389,24 @@ static rgbdata_t *R_InitParticleTexture2( texFlags_t *flags )
 R_InitSkyTexture
 ==================
 */
-static rgbdata_t *R_InitSkyTexture( texFlags_t *flags )
+static image_ref R_InitSkyTexture( texFlags_t *flags )
 {
 	int	i;
 
+	r_image->width = r_image->height = 16;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
+
 	// skybox texture
 	for( i = 0; i < 256; i++ )
-		((uint *)&data2D)[i] = 0xFFFFDEB5;
+		((uint *)data2D)[i] = 0xFFFFDEB5;
 
 	*flags = TF_NOPICMIP|TF_UNCOMPRESSED;
 
-	r_image.buffer = data2D;
-	r_image.width = r_image.height = 16;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4369,17 +2414,18 @@ static rgbdata_t *R_InitSkyTexture( texFlags_t *flags )
 R_InitCinematicTexture
 ==================
 */
-static rgbdata_t *R_InitCinematicTexture( texFlags_t *flags )
+static image_ref R_InitCinematicTexture( texFlags_t *flags )
 {
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.width = r_image.height = 256;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->type = PF_RGBA_32;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->width = r_image->height = 256;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = TF_NOMIPMAP|TF_NOPICMIP|TF_UNCOMPRESSED|TF_CLAMP;
 
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4387,19 +2433,20 @@ static rgbdata_t *R_InitCinematicTexture( texFlags_t *flags )
 R_InitSolidColorTexture
 ==================
 */
-static rgbdata_t *R_InitSolidColorTexture( texFlags_t *flags, int color )
+static image_ref R_InitSolidColorTexture( texFlags_t *flags, int color )
 {
 	// solid color texture
-	r_image.width = r_image.height = 1;
-	r_image.buffer = data2D;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGB_24;
-	r_image.size = r_image.width * r_image.height * 3;
+	r_image->width = r_image->height = 1;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGB_24;
+	r_image->size = r_image->width * r_image->height * 3;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	*flags = TF_NOMIPMAP|TF_NOPICMIP|TF_UNCOMPRESSED;
 
 	data2D[0] = data2D[1] = data2D[2] = color;
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4407,7 +2454,7 @@ static rgbdata_t *R_InitSolidColorTexture( texFlags_t *flags, int color )
 R_InitWhiteTexture
 ==================
 */
-static rgbdata_t *R_InitWhiteTexture( texFlags_t *flags )
+static image_ref R_InitWhiteTexture( texFlags_t *flags )
 {
 	return R_InitSolidColorTexture( flags, 255 );
 }
@@ -4417,7 +2464,7 @@ static rgbdata_t *R_InitWhiteTexture( texFlags_t *flags )
 R_InitGrayTexture
 ==================
 */
-static rgbdata_t *R_InitGrayTexture( texFlags_t *flags )
+static image_ref R_InitGrayTexture( texFlags_t *flags )
 {
 	return R_InitSolidColorTexture( flags, 127 );
 }
@@ -4427,7 +2474,7 @@ static rgbdata_t *R_InitGrayTexture( texFlags_t *flags )
 R_InitBlackTexture
 ==================
 */
-static rgbdata_t *R_InitBlackTexture( texFlags_t *flags )
+static image_ref R_InitBlackTexture( texFlags_t *flags )
 {
 	return R_InitSolidColorTexture( flags, 0 );
 }
@@ -4437,9 +2484,15 @@ static rgbdata_t *R_InitBlackTexture( texFlags_t *flags )
 R_InitBlankBumpTexture
 ==================
 */
-static rgbdata_t *R_InitBlankBumpTexture( texFlags_t *flags )
+static image_ref R_InitBlankBumpTexture( texFlags_t *flags )
 {
 	int	i;
+	r_image->width = r_image->height = 16;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	// default normalmap texture
 	for( i = 0; i < 256; i++ )
@@ -4451,13 +2504,7 @@ static rgbdata_t *R_InitBlankBumpTexture( texFlags_t *flags )
 
 	*flags = TF_NORMALMAP|TF_UNCOMPRESSED;
 
-	r_image.buffer = data2D;
-	r_image.width = r_image.height = 16;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4465,9 +2512,16 @@ static rgbdata_t *R_InitBlankBumpTexture( texFlags_t *flags )
 R_InitBlankDeluxeTexture
 ==================
 */
-static rgbdata_t *R_InitBlankDeluxeTexture( texFlags_t *flags )
+static image_ref R_InitBlankDeluxeTexture( texFlags_t *flags )
 {
 	int	i;
+
+	r_image->width = r_image->height = 16;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	// default normalmap texture
 	for( i = 0; i < 256; i++ )
@@ -4479,13 +2533,7 @@ static rgbdata_t *R_InitBlankDeluxeTexture( texFlags_t *flags )
 
 	*flags = TF_NORMALMAP|TF_UNCOMPRESSED;
 
-	r_image.buffer = data2D;
-	r_image.width = r_image.height = 16;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4493,24 +2541,25 @@ static rgbdata_t *R_InitBlankDeluxeTexture( texFlags_t *flags )
 R_InitAttenuationTexture
 ==================
 */
-static rgbdata_t *R_InitAttenTextureGamma( texFlags_t *flags, float gamma )
+static image_ref R_InitAttenTextureGamma( texFlags_t *flags, float gamma )
 {
 	int	i;
 
 	// 1d attenuation texture
-	r_image.width = 256;
-	r_image.height = 1;
-	r_image.buffer = data2D;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = 256;
+	r_image->height = 1;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
-	for( i = 0; i < r_image.width; i++ )
+	for( i = 0; i < r_image->width; i++ )
 	{
-		float atten = 255 - bound( 0, 255 * pow((i + 0.5f) / r_image.width, gamma ) + 0.5f, 255 );
+		float atten = 255 - bound( 0, 255 * pow((i + 0.5f) / r_image->width, gamma ) + 0.5f, 255 );
 
 		// clear attenuation at ends to prevent light go outside
-		if( i == (r_image.width - 1) || i == 0 )
+		if( i == (r_image->width - 1) || i == 0 )
 			atten = 0.0f;
 
 		data2D[(i * 4) + 0] = (byte)atten;
@@ -4521,38 +2570,39 @@ static rgbdata_t *R_InitAttenTextureGamma( texFlags_t *flags, float gamma )
 
 	*flags = TF_UNCOMPRESSED|TF_NOMIPMAP|TF_CLAMP|TF_TEXTURE_1D;
 
-	return &r_image;
+	return r_image;
 }
 
-static rgbdata_t *R_InitAttenuationTexture( texFlags_t *flags )
+static image_ref R_InitAttenuationTexture( texFlags_t *flags )
 {
 	return R_InitAttenTextureGamma( flags, 1.5f );
 }
 
-static rgbdata_t *R_InitAttenuationTexture2( texFlags_t *flags )
+static image_ref R_InitAttenuationTexture2( texFlags_t *flags )
 {
 	return R_InitAttenTextureGamma( flags, 0.5f );
 }
 
-static rgbdata_t *R_InitAttenuationTexture3( texFlags_t *flags )
+static image_ref R_InitAttenuationTexture3( texFlags_t *flags )
 {
 	return R_InitAttenTextureGamma( flags, 3.5f );
 }
 
-static rgbdata_t *R_InitAttenuationTextureNoAtten( texFlags_t *flags )
+static image_ref R_InitAttenuationTextureNoAtten( texFlags_t *flags )
 {
 	// 1d attenuation texture
-	r_image.width = 256;
-	r_image.height = 1;
-	r_image.buffer = data2D;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
+	r_image->width = 256;
+	r_image->height = 1;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
-	Q_memset( data2D, 0xFF, r_image.size );
+	Q_memset( data2D, 0xFF, r_image->size );
 	*flags = TF_UNCOMPRESSED|TF_NOMIPMAP|TF_CLAMP|TF_TEXTURE_1D;
 
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4560,7 +2610,7 @@ static rgbdata_t *R_InitAttenuationTextureNoAtten( texFlags_t *flags )
 R_InitAttenuationTexture3D
 ==================
 */
-static rgbdata_t *R_InitAttenTexture3D( texFlags_t *flags )
+static image_ref R_InitAttenTexture3D( texFlags_t *flags )
 {
 	vec3_t	v = { 0, 0, 0 };
 	int	x, y, z, d, size, size2, halfsize;
@@ -4570,28 +2620,29 @@ static rgbdata_t *R_InitAttenTexture3D( texFlags_t *flags )
 		return NULL;
 
 	// 3d attenuation texture
-	r_image.width = 32;
-	r_image.height = 32;
-	r_image.depth = 32;
-	r_image.buffer = data2D;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * r_image.depth * 4;
+	r_image->width = 32;
+	r_image->height = 32;
+	r_image->depth = 32;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * r_image->depth * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
 	size = 32;
 	halfsize = size / 2;
 	intensity = halfsize * halfsize;
 	size2 = size * size;
 
-	for( x = 0; x < r_image.width; x++ )
+	for( x = 0; x < r_image->width; x++ )
 	{
-		for( y = 0; y < r_image.height; y++ )
+		for( y = 0; y < r_image->height; y++ )
 		{
-			for( z = 0; z < r_image.depth; z++ )
+			for( z = 0; z < r_image->depth; z++ )
 			{
 				v[0] = (( x + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
 				v[1] = (( y + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
-				if( r_image.depth > 1 ) v[2] = (( z + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
+				if( r_image->depth > 1 ) v[2] = (( z + 0.5f ) * ( 2.0f / (float)size ) - 1.0f );
 
 				intensity = 1.0f - sqrt( DotProduct( v, v ) );
 				if( intensity > 0 ) intensity = intensity * intensity * 215.5f;
@@ -4606,41 +2657,43 @@ static rgbdata_t *R_InitAttenTexture3D( texFlags_t *flags )
 
 	*flags = TF_UNCOMPRESSED|TF_NOMIPMAP|TF_CLAMP|TF_TEXTURE_3D;
 
-	return &r_image;
+	return r_image;
 }
 
-static rgbdata_t *R_InitDlightTexture( texFlags_t *flags )
+static image_ref R_InitDlightTexture( texFlags_t *flags )
 {
 	// solid color texture
-	r_image.width = BLOCK_SIZE_DEFAULT;
-	r_image.height = BLOCK_SIZE_DEFAULT;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.buffer = data2D;
+	r_image->width = BLOCK_SIZE_DEFAULT;
+	r_image->height = BLOCK_SIZE_DEFAULT;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
-	Q_memset( data2D, 0x00, r_image.size );
+	Q_memset( data2D, 0x00, r_image->size );
 
 	*flags = TF_NOPICMIP|TF_UNCOMPRESSED|TF_NOMIPMAP;
 
-	return &r_image;
+	return r_image;
 }
 
-static rgbdata_t *R_InitDlightTexture2( texFlags_t *flags )
+static image_ref R_InitDlightTexture2( texFlags_t *flags )
 {
 	// solid color texture
-	r_image.width = BLOCK_SIZE_MAX;
-	r_image.height = BLOCK_SIZE_MAX;
-	r_image.flags = IMAGE_HAS_COLOR;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.buffer = data2D;
+	r_image->width = BLOCK_SIZE_MAX;
+	r_image->height = BLOCK_SIZE_MAX;
+	r_image->flags = IMAGE_HAS_COLOR;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 
-	Q_memset( data2D, 0x00, r_image.size );
+	Q_memset( data2D, 0x00, r_image->size );
 
 	*flags = TF_NOPICMIP|TF_UNCOMPRESSED|TF_NOMIPMAP;
 
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4648,9 +2701,16 @@ static rgbdata_t *R_InitDlightTexture2( texFlags_t *flags )
 R_InitNormalizeCubemap
 ==================
 */
-static rgbdata_t *R_InitNormalizeCubemap( texFlags_t *flags )
+static image_ref R_InitNormalizeCubemap( texFlags_t *flags )
 {
 	int	i, x, y, size = 32;
+
+	r_image->width = r_image->height = size;
+	r_image->size = r_image->width * r_image->height * 4 * 6;
+	r_image->flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 	byte	*dataCM = data2D;
 	float	s, t;
 	vec3_t	normal;
@@ -4691,13 +2751,7 @@ static rgbdata_t *R_InitNormalizeCubemap( texFlags_t *flags )
 
 	*flags = (TF_NOPICMIP|TF_NOMIPMAP|TF_UNCOMPRESSED|TF_CUBEMAP|TF_CLAMP);
 
-	r_image.width = r_image.height = size;
-	r_image.size = r_image.width * r_image.height * 4 * 6;
-	r_image.flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4705,9 +2759,16 @@ static rgbdata_t *R_InitNormalizeCubemap( texFlags_t *flags )
 R_InitDlightCubemap
 ==================
 */
-static rgbdata_t *R_InitDlightCubemap( texFlags_t *flags )
+static image_ref R_InitDlightCubemap( texFlags_t *flags )
 {
 	int	i, x, y, size = 4;
+
+	r_image->width = r_image->height = size;
+	r_image->size = r_image->width * r_image->height * 4 * 6;
+	r_image->flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
 	byte	*dataCM = data2D;
 	int	dx2, dy, d;
 
@@ -4736,13 +2797,7 @@ static rgbdata_t *R_InitDlightCubemap( texFlags_t *flags )
 
 	*flags = (TF_NOPICMIP|TF_NOMIPMAP|TF_UNCOMPRESSED|TF_CUBEMAP|TF_CLAMP);
 
-	r_image.width = r_image.height = size;
-	r_image.size = r_image.width * r_image.height * 4 * 6;
-	r_image.flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4750,9 +2805,16 @@ static rgbdata_t *R_InitDlightCubemap( texFlags_t *flags )
 R_InitGrayCubemap
 ==================
 */
-static rgbdata_t *R_InitGrayCubemap( texFlags_t *flags )
+static image_ref R_InitGrayCubemap( texFlags_t *flags )
 {
 	int	size = 4;
+
+	r_image->width = r_image->height = size;
+	r_image->size = r_image->width * r_image->height * 4 * 6;
+	r_image->flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4);
+	r_image->buffer = data2D;
 	byte	*dataCM = data2D;
 
 	if( !GL_Support( GL_TEXTURECUBEMAP_EXT ))
@@ -4763,13 +2825,7 @@ static rgbdata_t *R_InitGrayCubemap( texFlags_t *flags )
 
 	*flags = (TF_NOPICMIP|TF_NOMIPMAP|TF_UNCOMPRESSED|TF_CUBEMAP|TF_CLAMP);
 
-	r_image.width = r_image.height = size;
-	r_image.size = r_image.width * r_image.height * 4 * 6;
-	r_image.flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4777,9 +2833,16 @@ static rgbdata_t *R_InitGrayCubemap( texFlags_t *flags )
 R_InitWhiteCubemap
 ==================
 */
-static rgbdata_t *R_InitWhiteCubemap( texFlags_t *flags )
+static image_ref R_InitWhiteCubemap( texFlags_t *flags )
 {
 	int	size = 4;
+
+	r_image->width = r_image->height = size;
+	r_image->size = r_image->width * r_image->height * 4 * 6;
+	r_image->flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4);
+	r_image->buffer = data2D;
 	byte	*dataCM = data2D;
 
 	if( !GL_Support( GL_TEXTURECUBEMAP_EXT ))
@@ -4790,13 +2853,7 @@ static rgbdata_t *R_InitWhiteCubemap( texFlags_t *flags )
 
 	*flags = (TF_NOPICMIP|TF_NOMIPMAP|TF_UNCOMPRESSED|TF_CUBEMAP|TF_CLAMP);
 
-	r_image.width = r_image.height = size;
-	r_image.size = r_image.width * r_image.height * 4 * 6;
-	r_image.flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR); // yes it's cubemap
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4804,22 +2861,22 @@ static rgbdata_t *R_InitWhiteCubemap( texFlags_t *flags )
 R_InitAlphaContrast
 ==================
 */
-static rgbdata_t *R_InitAlphaContrast( texFlags_t *flags )
+static image_ref R_InitAlphaContrast( texFlags_t *flags )
 {
 	int	size = 64;
+
+	r_image->width = r_image->height = 64;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, BLOCK_SIZE_MAX*BLOCK_SIZE_MAX*4);
+	r_image->buffer = data2D;
 	byte	*data = data2D;
 
 	*flags = (TF_NOPICMIP|TF_UNCOMPRESSED|TF_ALPHACONTRAST|TF_INTENSITY);
 
-	r_image.width = r_image.height = 64;
-	r_image.size = r_image.width * r_image.height * 4;
+	Q_memset( data, size, r_image->size );
 
-	Q_memset( data, size, r_image.size );
-
-	r_image.buffer = data2D;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 /*
@@ -4827,7 +2884,7 @@ static rgbdata_t *R_InitAlphaContrast( texFlags_t *flags )
 R_InitVSDCTCubemap
 ==================
 */
-static rgbdata_t *R_InitVSDCTCubemap( texFlags_t *flags )
+static image_ref R_InitVSDCTCubemap( texFlags_t *flags )
 {
 	// maps to a 2x3 texture rectangle with normalized coordinates
 	// +-
@@ -4835,6 +2892,14 @@ static rgbdata_t *R_InitVSDCTCubemap( texFlags_t *flags )
 	// YY
 	// ZZ
 	// stores abs(dir.xy), offset.xy/2.5
+
+	r_image->width = r_image->height = 1;
+	r_image->size = r_image->width * r_image->height * 4 * 6;
+	r_image->flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA); // yes it's cubemap
+	r_image->type = PF_RGBA_32;
+	byte *data2D = (byte *)Mem_Alloc(r_temppool, r_image->size);
+	r_image->buffer = data2D;
+
 	static byte data[4*6] =
 	{
 		0xFF, 0x00, 0x33, 0x33, // +X: <1, 0>, <0.5, 0.5>
@@ -4844,16 +2909,11 @@ static rgbdata_t *R_InitVSDCTCubemap( texFlags_t *flags )
 		0x00, 0x00, 0x33, 0xFF, // +Z: <0, 0>, <0.5, 2.5>
 		0x00, 0x00, 0x99, 0xFF, // -Z: <0, 0>, <1.5, 2.5>
 	};
+	Q_memcpy(data2D, data, sizeof(data));
 
 	*flags = (TF_NOPICMIP|TF_UNCOMPRESSED|TF_NEAREST|TF_CUBEMAP|TF_CLAMP|TF_NOMIPMAP);
 
-	r_image.width = r_image.height = 1;
-	r_image.size = r_image.width * r_image.height * 4 * 6;
-	r_image.flags |= (IMAGE_CUBEMAP|IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA); // yes it's cubemap
-	r_image.buffer = data;
-	r_image.type = PF_RGBA_32;
-
-	return &r_image;
+	return r_image;
 }
 
 
@@ -4864,14 +2924,13 @@ R_InitBuiltinTextures
 */
 static void R_InitBuiltinTextures( void )
 {
-	rgbdata_t		*pic;
 	texFlags_t	flags;
 
 	const struct
 	{
 		const char	*name;
 		int	*texnum;
-		rgbdata_t	*(*init)( texFlags_t *flags );
+		image_ref (*init)( texFlags_t *flags );
 		int	texType;
 	}
 	textures[] =
@@ -4906,14 +2965,13 @@ static void R_InitBuiltinTextures( void )
 
 	for( i = 0; i < num_builtin_textures; i++ )
 	{
-		Q_memset( &r_image, 0, sizeof( rgbdata_t ));
-		Q_memset( data2D, 0xFF, sizeof( data2D ));
-
-		pic = textures[i].init( &flags );
+		r_image = Image_NewTemp();
+		auto pic = textures[i].init( &flags );
 		if( pic == NULL ) continue;
 		*textures[i].texnum = GL_LoadTextureInternal( textures[i].name, pic, flags, false );
 
 		GL_SetTextureType( *textures[i].texnum, textures[i].texType );
+		r_image = nullptr;
 	}
 }
 

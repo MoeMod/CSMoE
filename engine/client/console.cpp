@@ -906,7 +906,7 @@ If no console is visible, the text will appear at the top of the game window
 */
 void Con_Print( const char *txt )
 {
-#if XASH_IMGUI
+#if 0 // XASH_IMGUI
 	ImGui_Console_Print(txt);
 #endif
 	int	y, c, l, color;

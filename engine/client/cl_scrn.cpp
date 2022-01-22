@@ -575,11 +575,10 @@ void SCR_LoadCreditsFont( void )
 
 void SCR_InstallParticlePalette( void )
 {
-	rgbdata_t	*pic;
 	int	i;
 
 	// first check 'palette.lmp' then 'palette.pal'
-	pic = FS_LoadImage( "gfx/palette.lmp", NULL, 0 );
+	auto pic = FS_LoadImage( "gfx/palette.lmp", NULL, 0 );
 	if( !pic ) pic = FS_LoadImage( "gfx/palette.pal", NULL, 0 );
 
 	// NOTE: imagelib required this fakebuffer for loading internal palette
@@ -593,7 +592,7 @@ void SCR_InstallParticlePalette( void )
 			clgame.palette[i][1] = pic->palette[i*4+1];
 			clgame.palette[i][2] = pic->palette[i*4+2];
 		}
-		FS_FreeImage( pic );
+		pic = nullptr;
 	}
 	else
 	{

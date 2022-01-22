@@ -662,7 +662,7 @@ static void LM_UploadBlock( qboolean dynamic )
 	}
 	else
 	{
-		rgbdata_t	r_lightmap = {0};
+		image_ref r_lightmap = Image_NewTemp();
 		char	lmName[16];
 
 		i = gl_lms.current_lightmap_texture;
@@ -670,26 +670,26 @@ static void LM_UploadBlock( qboolean dynamic )
 		// upload static lightmaps only during loading
 		Q_snprintf( lmName, sizeof( lmName ), "*lightmap%i", i );
 
-		r_lightmap.width = BLOCK_SIZE;
-		r_lightmap.height = BLOCK_SIZE;
-		r_lightmap.type = PF_RGBA_32;
-		r_lightmap.size = r_lightmap.width * r_lightmap.height * 4;
-		r_lightmap.flags = ( world.version == Q1BSP_VERSION ) ? 0 : IMAGE_HAS_COLOR;
-		r_lightmap.buffer = gl_lms.lightmap_buffer;
-		tr.lightmapTextures[i] = GL_LoadTextureInternal( lmName, &r_lightmap, (texFlags_t)TF_FONT, false );
+		r_lightmap->width = BLOCK_SIZE;
+		r_lightmap->height = BLOCK_SIZE;
+		r_lightmap->type = PF_RGBA_32;
+		r_lightmap->size = r_lightmap->width * r_lightmap->height * 4;
+		r_lightmap->flags = (( world.version == Q1BSP_VERSION ) ? 0 : IMAGE_HAS_COLOR) | IMAGE_TEMP;
+		r_lightmap->buffer = gl_lms.lightmap_buffer;
+		tr.lightmapTextures[i] = GL_LoadTextureInternal( lmName, r_lightmap, (texFlags_t)TF_FONT, false );
 		GL_SetTextureType( tr.lightmapTextures[i], TEX_LIGHTMAP );
 
 		if( tr.deluxemap )
 		{
-			rgbdata_t	r_deluxemap = {0};
-			r_deluxemap.width = BLOCK_SIZE;
-			r_deluxemap.height = BLOCK_SIZE;
-			r_deluxemap.type = PF_RGBA_32;
-			r_deluxemap.size = r_deluxemap.width * r_deluxemap.height * 4;
-			r_deluxemap.flags = IMAGE_HAS_COLOR;
-			r_deluxemap.buffer = gl_lms.deluxemap_buffer;
+			image_ref r_deluxemap = Image_NewTemp();
+			r_deluxemap->width = BLOCK_SIZE;
+			r_deluxemap->height = BLOCK_SIZE;
+			r_deluxemap->type = PF_RGBA_32;
+			r_deluxemap->size = r_deluxemap->width * r_deluxemap->height * 4;
+			r_deluxemap->flags = IMAGE_HAS_COLOR|IMAGE_TEMP;
+			r_deluxemap->buffer = gl_lms.deluxemap_buffer;
 			Q_snprintf( lmName, sizeof( lmName ), "*deluxemap%i", i );
-			tr.deluxemapTextures[i] = GL_LoadTextureInternal( lmName, &r_deluxemap, (texFlags_t)TF_FONT, false );
+			tr.deluxemapTextures[i] = GL_LoadTextureInternal( lmName, r_deluxemap, (texFlags_t)TF_FONT, false );
 		}
 
 		if( ++gl_lms.current_lightmap_texture == MAX_LIGHTMAPS )

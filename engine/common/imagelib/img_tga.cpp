@@ -226,7 +226,7 @@ qboolean Image_LoadTGA( const char *name, const byte *buffer, size_t filesize )
 Image_SaveTGA
 =============
 */
-qboolean Image_SaveTGA( const char *name, rgbdata_t *pix )
+qboolean Image_SaveTGA( const char *name, image_ref pix )
 {
 	int		y, outsize, pixel_size;
 	const byte	*bufend, *in;

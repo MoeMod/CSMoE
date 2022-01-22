@@ -586,7 +586,7 @@ Upload texture into video memory
 */
 void GAME_EXPORT VGUI_UploadTexture( int id, const char *buffer, int width, int height )
 {
-	rgbdata_t	r_image;
+	auto	r_image = Image_NewTemp();
 	char	texName[32];
 
 	if( id <= 0 || id >= VGUI_MAX_TEXTURES )
@@ -596,16 +596,15 @@ void GAME_EXPORT VGUI_UploadTexture( int id, const char *buffer, int width, int 
 	}
 
 	Q_snprintf( texName, sizeof( texName ), "*vgui%i", id );
-	Q_memset( &r_image, 0, sizeof( r_image ));
 
-	r_image.width = width;
-	r_image.height = height;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
-	r_image.buffer = (byte *)buffer;
+	r_image->width = width;
+	r_image->height = height;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA|IMAGE_TEMP;
+	r_image->buffer = (byte *)buffer;
 
-	g_textures[id] = GL_LoadTextureInternal( texName, &r_image, (texFlags_t)TF_IMAGE, false );
+	g_textures[id] = GL_LoadTextureInternal( texName, r_image, (texFlags_t)TF_IMAGE, false );
 	GL_SetTextureType( g_textures[id], TEX_VGUI );
 	g_iBoundTexture = id;
 }
@@ -619,7 +618,7 @@ Create empty rgba texture and upload them into video memory
 */
 void GAME_EXPORT VGUI_CreateTexture( int id, int width, int height )
 {
-	rgbdata_t	r_image;
+	auto	r_image = Image_NewTemp();
 	char	texName[32];
 
 	if( id <= 0 || id >= VGUI_MAX_TEXTURES )
@@ -629,16 +628,15 @@ void GAME_EXPORT VGUI_CreateTexture( int id, int width, int height )
 	}
 
 	Q_snprintf( texName, sizeof( texName ), "*vgui%i", id );
-	Q_memset( &r_image, 0, sizeof( r_image ));
 
-	r_image.width = width;
-	r_image.height = height;
-	r_image.type = PF_RGBA_32;
-	r_image.size = r_image.width * r_image.height * 4;
-	r_image.flags = IMAGE_HAS_ALPHA;
-	r_image.buffer = NULL;
+	r_image->width = width;
+	r_image->height = height;
+	r_image->type = PF_RGBA_32;
+	r_image->size = r_image->width * r_image->height * 4;
+	r_image->flags = IMAGE_HAS_ALPHA;
+	r_image->buffer = nullptr;
 
-	g_textures[id] = GL_LoadTextureInternal(texName, &r_image, (texFlags_t)(TF_IMAGE | TF_NEAREST), false);
+	g_textures[id] = GL_LoadTextureInternal(texName, r_image, (texFlags_t)(TF_IMAGE | TF_NEAREST), false);
 	GL_SetTextureType( g_textures[id], TEX_VGUI );
 	g_iBoundTexture = id;
 }

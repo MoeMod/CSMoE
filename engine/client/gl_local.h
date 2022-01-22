@@ -84,7 +84,7 @@ typedef struct gltexture_s
 
 	rgba_t		fogParams;	// some water textures
 					// contain info about underwater fog
-	rgbdata_t		*original;	// keep original image
+	image_ref		original;	// keep original image
 
 	// debug info
 	byte		texType;		// used for gl_showtextures
@@ -325,7 +325,7 @@ gltexture_t *R_GetTexture( GLenum texnum );
 void GL_SetTextureType( GLenum texnum, GLenum type );
 int GL_LoadTexture_DDS(const char* name, GLvoid* data, int type, int size, int w, int h);
 int GL_LoadTexture( const char *name, const byte *buf, size_t size, int flags, imgfilter_t *filter );
-int GL_LoadTextureInternal( const char *name, rgbdata_t *pic, texFlags_t flags, qboolean update );
+int GL_LoadTextureInternal( const char *name, image_ref pic, texFlags_t flags, qboolean update );
 byte *GL_ResampleTexture( const byte *source, int in_w, int in_h, int out_w, int out_h, qboolean isNormalMap );
 int GL_CreateTexture( const char *name, int width, int height, const void *buffer, texFlags_t flags );
 void GL_ProcessTexture( int texnum, float gamma, int topColor, int bottomColor );

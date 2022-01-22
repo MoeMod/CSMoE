@@ -1640,7 +1640,7 @@ static const char *GL_TextureName( unsigned int texnum )
 
 const byte *GL_TextureData( unsigned int texnum )
 {
-	rgbdata_t *pic = R_GetTexture( texnum )->original;
+	auto pic = R_GetTexture( texnum )->original;
 
 	if( pic != NULL )
 		return pic->buffer;

@@ -597,7 +597,7 @@ qboolean Image_LoadBMP( const char *name, const byte *buffer, size_t filesize )
 	return true;
 }
 
-qboolean Image_SaveBMP( const char *name, rgbdata_t *pix )
+qboolean Image_SaveBMP( const char *name, image_ref pix )
 {
 	file_t		*pfile = NULL;
 	bmp_t		bhdr;

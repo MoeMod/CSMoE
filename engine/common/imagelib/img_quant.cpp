@@ -433,7 +433,7 @@ void learn( void )
 }
 
 // returns the actual number of palette entries.
-rgbdata_t *Image_Quantize( rgbdata_t *pic )
+image_ref Image_Quantize( image_ref pic )
 {
 	int	i;
 

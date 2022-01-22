@@ -222,7 +222,6 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 {
 	static string	wndname;
 	Uint32 wndFlags = SDL_WINDOW_OPENGL;
-	rgbdata_t *icon = NULL;
 	char iconpath[MAX_STRING];
 
 	if( vid_highdpi->integer ) wndFlags |= SDL_WINDOW_ALLOW_HIGHDPI;
@@ -297,9 +296,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 		FS_StripExtension( iconpath );
 		FS_DefaultExtension( iconpath, ".tga") ;
 
-		icon = FS_LoadImage( iconpath, NULL, 0 );
-
-		if( icon )
+		if( auto icon = FS_LoadImage( iconpath, NULL, 0 ); )
 		{
 			SDL_Surface *surface = SDL_CreateRGBSurfaceFrom( icon->buffer,
 				icon->width, icon->height, 32, 4 * icon->width,
@@ -310,8 +307,6 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 				SDL_SetWindowIcon( host.hWnd, surface );
 				SDL_FreeSurface( surface );
 			}
-
-			FS_FreeImage( icon );
 		}
 #endif
 

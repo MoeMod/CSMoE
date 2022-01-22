@@ -135,7 +135,6 @@ Allocate the screen texture and make copy
 */
 int R_AllocateMirrorTexture( void )
 {
-	rgbdata_t	r_screen;
 	int	i, texture;
 	char	txName[16];
 
@@ -152,16 +151,16 @@ int R_AllocateMirrorTexture( void )
 	if( !texture )
 	{
 		// not initialized ?
-		Q_memset( &r_screen, 0, sizeof( r_screen ));
+		image_ref r_screen = Image_NewTemp();
 		Q_snprintf( txName, sizeof( txName ), "*screen%i", i );
 
-		r_screen.width = RI.viewport[2];
-		r_screen.height = RI.viewport[3];
-		r_screen.type = PF_RGBA_32;
-		r_screen.size = r_screen.width * r_screen.height * 4;
-		r_screen.flags = IMAGE_HAS_COLOR;
-		r_screen.buffer = NULL; // create empty texture for now
-		tr.mirrorTextures[i] = GL_LoadTextureInternal( txName, &r_screen, TF_IMAGE, false );
+		r_screen->width = RI.viewport[2];
+		r_screen->height = RI.viewport[3];
+		r_screen->type = PF_RGBA_32;
+		r_screen->size = r_screen->width * r_screen->height * 4;
+		r_screen->flags = IMAGE_HAS_COLOR;
+		r_screen->buffer = NULL; // create empty texture for now
+		tr.mirrorTextures[i] = GL_LoadTextureInternal( txName, r_screen, TF_IMAGE, false );
 		GL_SetTextureType( tr.mirrorTextures[i], TEX_SCREENCOPY );
 		texture = tr.mirrorTextures[i];
 	}

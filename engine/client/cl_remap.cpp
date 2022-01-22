@@ -148,7 +148,6 @@ Update texture top and bottom colors
 void CL_UpdateTexture( mstudiotexture_t *ptexture, int topcolor, int bottomcolor )
 {
 	gltexture_t	*glt;
-	rgbdata_t		*pic;
 	texture_t		*tx = NULL;
 	char		texname[128], name[128], mdlname[128];
 	int		i, index;
@@ -183,7 +182,7 @@ void CL_UpdateTexture( mstudiotexture_t *ptexture, int topcolor, int bottomcolor
 	Q_memcpy( paletteBackup, pal, 768 );
 
 	raw = CL_CreateRawTextureFromPixels( tx, &size, topcolor, bottomcolor );
-	pic = FS_LoadImage( glt->name, raw, size );
+	auto pic = FS_LoadImage( glt->name, raw, size );
 	if( !pic )
 	{
 		MsgDev( D_ERROR, "Couldn't update texture %s\n", glt->name );
@@ -191,7 +190,7 @@ void CL_UpdateTexture( mstudiotexture_t *ptexture, int topcolor, int bottomcolor
 	}
 
 	index = GL_LoadTextureInternal( glt->name, pic, (texFlags_t)0, true );
-	FS_FreeImage( pic );
+	pic = nullptr;
 
 	// restore original palette
 	Q_memcpy( pal, paletteBackup, 768 );

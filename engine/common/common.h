@@ -621,6 +621,8 @@ typedef enum
 	IMAGE_QUANTIZE	= BIT(25),	// make indexed image from 24 or 32- bit image
 	IMAGE_LIGHTGAMMA	= BIT(26),	// apply gamma for image
 	IMAGE_REMAP	= BIT(27),	// interpret width and height as top and bottom color
+
+	IMAGE_TEMP = BIT(28)
 } imgFlags_t;
 
 // ordering is important!
@@ -642,8 +644,8 @@ typedef struct rgbdata_s
 	uint	flags;		// misc image flags
 	word	encode;
 	byte	numMips;	// mipmap count
-	byte	*palette;		// palette if present
-	byte	*buffer;		// image buffer
+	byte	*palette = nullptr;		// palette if present
+	byte	*buffer = nullptr;		// image buffer
 	rgba_t	fogParams;	// some water textures in hl1 has info about fog color and alpha
 	size_t	size;		// for bounds checking
 } rgbdata_t;
@@ -669,12 +671,13 @@ typedef struct imgfilter_s
 void Image_Init( void );
 void Image_Shutdown( void );
 void Image_AddCmdFlags( uint flags );
-rgbdata_t *FS_LoadImage( const char *filename, const byte *buffer, size_t size );
-qboolean FS_SaveImage( const char *filename, rgbdata_t *pix );
-rgbdata_t *FS_CopyImage( rgbdata_t *in );
-void FS_FreeImage( rgbdata_t *pack );
+using image_ref = std::shared_ptr<rgbdata_t>;
+image_ref Image_NewTemp();
+image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size );
+qboolean FS_SaveImage( const char *filename, image_ref pix );
+image_ref FS_CopyImage( image_ref in );
 extern const bpc_desc_t PFDesc[];	// image get pixelformat
-qboolean Image_Process( rgbdata_t **pix, int width, int height, float gamma, uint flags, imgfilter_t *filter );
+qboolean Image_Process( image_ref *pix, int width, int height, float gamma, uint flags, imgfilter_t *filter );
 void Image_PaletteHueReplace( byte *palSrc, int newHue, int start, int end );
 void Image_SetForceFlags( uint flags );	// set image force flags on loading
 size_t Image_DXTGetLinearSize( int type, int width, int height, int depth );

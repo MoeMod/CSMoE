@@ -176,7 +176,6 @@ void R_CreateDetailTexturesList( const char *filename )
 	float		xScale, yScale;
 	const char	*detail_name;
 	texture_t		*tex;
-	rgbdata_t		*pic;
 	int		i;
 
 	for( i = 0; i < cl.worldmodel->numtextures; i++ )
@@ -195,13 +194,10 @@ void R_CreateDetailTexturesList( const char *filename )
 				break;
 			}
 
-			pic = FS_LoadImage( va( "gfx/detail/%s", detail_name ), NULL, 0 );
-
-			if( pic )
+			if( auto pic = FS_LoadImage( va( "gfx/detail/%s", detail_name ), NULL, 0 ) )
 			{
 				xScale = (pic->width / (float)tex->width) * gl_detailscale->value;
 				yScale = (pic->height / (float)tex->height) * gl_detailscale->value;
-				FS_FreeImage( pic );
 			}
 			else xScale = yScale = 10.0f;
 

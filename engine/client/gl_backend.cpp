@@ -505,12 +505,11 @@ void VID_ImageAdjustGamma( byte *in, uint width, uint height )
 
 qboolean VID_ScreenShot( const char *filename, int shot_type )
 {
-	rgbdata_t *r_shot;
 	uint	flags = IMAGE_FLIP_Y;
 	int	width = 0, height = 0;
 	qboolean	result;
 
-	r_shot = (rgbdata_t *)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
+	image_ref r_shot = Image_NewTemp();
 	r_shot->width = (glState.width + 3) & ~3;
 	r_shot->height = (glState.height + 3) & ~3;
 	r_shot->flags = IMAGE_HAS_COLOR | IMAGE_HAS_ALPHA;
@@ -565,7 +564,6 @@ qboolean VID_ScreenShot( const char *filename, int shot_type )
 	result = FS_SaveImage( filename, r_shot );
 	host.write_to_clipboard = false;		// disable write to clipboard
 	FS_AllowDirectPaths( false );			// always reset after store screenshot
-	FS_FreeImage( r_shot );
 
 	return result;
 }
@@ -577,7 +575,6 @@ VID_CubemapShot
 */
 qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qboolean skyshot )
 {
-	rgbdata_t		*r_shot, *r_side;
 	byte		*temp = NULL;
 	byte		*buffer = NULL;
 	string		basename;
@@ -599,8 +596,8 @@ qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qbo
 	// alloc space
 	temp = (byte*)Mem_Alloc( r_temppool, size * size * 3 );
 	buffer = (byte*)Mem_Alloc( r_temppool, size * size * 3 * 6 );
-	r_shot = (rgbdata_t*)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
-	r_side = (rgbdata_t*)Mem_Alloc( r_temppool, sizeof( rgbdata_t ));
+	image_ref r_shot = Image_NewTemp();
+	image_ref r_side = Image_NewTemp();
 
 	// use client vieworg
 	if( !vieworg ) vieworg = cl.refdef.vieworg;
@@ -650,8 +647,6 @@ qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qbo
 
 	// write image as 6 sides
 	result = FS_SaveImage( basename, r_shot );
-	FS_FreeImage( r_shot );
-	FS_FreeImage( r_side );
 
 	return result;
 }

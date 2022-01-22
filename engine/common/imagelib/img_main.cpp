@@ -119,9 +119,17 @@ void Image_Reset( void )
 	image.size = 0;
 }
 
-rgbdata_t *ImagePack( void )
+void FS_FreeImageInternal( rgbdata_t *pack );
+
+image_ref Image_NewTemp()
 {
-	rgbdata_t	*pack = (rgbdata_t *)Mem_Alloc( host.imagepool, sizeof( rgbdata_t ));
+	image_ref pack((rgbdata_t *)Mem_Alloc( host.imagepool, sizeof( rgbdata_t )), FS_FreeImageInternal);
+	return pack;
+}
+
+image_ref ImagePack( void )
+{
+	image_ref pack = Image_NewTemp();
 
 	// clear any force flags
 	image.force_flags = 0;
@@ -130,8 +138,8 @@ rgbdata_t *ImagePack( void )
 	{
 		// this never be happens, just in case
 		MsgDev( D_NOTE, "ImagePack: inconsistent cubemap pack %d\n", image.num_sides );
-		FS_FreeImage( pack );
-		return NULL;
+		pack.reset();
+		return nullptr;
 	}
 
 	if( image.cubemap ) 
@@ -220,7 +228,7 @@ FS_LoadImage
 loading and unpack to rgba any known image
 ================
 */
-rgbdata_t *FS_LoadImage( const char *filename, const byte *buffer, size_t size )
+image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 {
 	const char	*ext = FS_FileExtension( filename );
 	string		path, loadname, sidename;
@@ -389,7 +397,7 @@ load_internal_ext:
 	// clear any force flags
 	image.force_flags = 0;
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -399,7 +407,7 @@ Image_Save
 writes image as any known format
 ================
 */
-qboolean FS_SaveImage( const char *filename, rgbdata_t *pix )
+qboolean FS_SaveImage( const char *filename, image_ref pix )
 {
 	const char	*ext = FS_FileExtension( filename );
 	qboolean		anyformat = !Q_stricmp( ext, "" ) ? true : false;
@@ -490,15 +498,19 @@ Image_FreeImage
 free RGBA buffer
 ================
 */
-void FS_FreeImage( rgbdata_t *pack )
+void FS_FreeImageInternal( rgbdata_t *pack )
 {
 	if( pack )
 	{
-		if( pack->buffer ) Mem_Free( pack->buffer );
-		if( pack->palette ) Mem_Free( pack->palette );
+		if(!(pack->flags & IMAGE_TEMP))
+		{
+			if( pack->buffer ) Mem_Free( pack->buffer );
+			if( pack->palette ) Mem_Free( pack->palette );
+		}
+		pack->~rgbdata_t();
 		Mem_Free( pack );
 	}
-	else MsgDev( D_WARN, "FS_FreeImage: trying to free NULL image\n" );
+	// else MsgDev( D_WARN, "FS_FreeImage: trying to free NULL image\n" );
 }
 
 /*
@@ -508,14 +520,13 @@ FS_CopyImage
 make an image copy
 ================
 */
-rgbdata_t *FS_CopyImage( rgbdata_t *in )
+image_ref FS_CopyImage( image_ref in )
 {
-	rgbdata_t	*out;
 	int	palSize = 0;
 
-	if( !in ) return NULL;
+	if( !in ) return nullptr;
 
-	out = (rgbdata_t *)Mem_Alloc( host.imagepool, sizeof( rgbdata_t ));
+	image_ref out = Image_NewTemp();
 	*out = *in;
 
 	switch( in->type )

@@ -306,22 +306,21 @@ qboolean ImGui_ImplGL_CreateDeviceObjects(void)
 	//pglGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
 	//pglGenTextures(1, &g_FontTexture);
 	//g_FontTexture = 888888;	// UNDONE: create texture by surface()->CreateNewTextureId()
-	rgbdata_t	r_image;
+	auto	r_image = Image_NewTemp();
 	char	texName[32];
 
 	Q_strncpy( texName, "*imgui_font", sizeof( texName ) );
-	Q_memset( &r_image, 0, sizeof( r_image ));
 
-	r_image.width = width;
-	r_image.height = height;
-	r_image.depth = bytes_per_pixel;
-	r_image.type = PF_A_8;
-	r_image.size = r_image.width * r_image.height * r_image.depth;
-	r_image.flags = IMAGE_HAS_ALPHA;
-	r_image.buffer = (byte *)pixels;
+	r_image->width = width;
+	r_image->height = height;
+	r_image->depth = bytes_per_pixel;
+	r_image->type = PF_A_8;
+	r_image->size = r_image->width * r_image->height * r_image->depth;
+	r_image->flags = IMAGE_HAS_ALPHA | IMAGE_TEMP;
+	r_image->buffer = (byte *)pixels;
 
 	//pglPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	auto i = GL_LoadTextureInternal( "*imgui_font", &r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
+	auto i = GL_LoadTextureInternal( "*imgui_font", r_image, (texFlags_t)(TF_FONT | TF_FONT_ALPHA), false );
 	g_FontTexture = i;
 	//GL_Bind(XASH_TEXTURE0, i);
 	//pglTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -150,11 +150,10 @@ void ImGui_LCSM_OnGUI(void)
 			s_qrCodeBytes.resize(qrcode::getBufferSize(9));
 			qrcode::initText(&s_qrcode, s_qrCodeBytes.data(), 9, qrcode::ECC_LOW, xorstr("https://qm.qq.com/cgi-bin/qm/qr?k=m-wI8acAT7XurfGiy_2JZy9DBupc1tXe&authKey=ZgiTHa6sHJjpkKqMLE8XQH31pHL1gFGF4mOi3xH5zW6D169YuTGbKJqcRI0B7cVX").crypt_get());
 
-			rgbdata_t	r_image;
+			auto	r_image = Image_NewTemp();
 			char	texName[32];
 
 			Q_strncpy( texName, xorstr("*citrus_qrcode").crypt_get(), sizeof( texName ) );
-			Q_memset( &r_image, 0, sizeof( r_image ));
 
 			static std::vector<ImU32> pixels(s_qrcode.size * s_qrcode.size, ImColor(255, 255, 255, 255));
 
@@ -165,15 +164,15 @@ void ImGui_LCSM_OnGUI(void)
 				}
 			}
 
-			r_image.width = s_qrcode.size;
-			r_image.height = s_qrcode.size;
-			r_image.depth = 4;
-			r_image.type = PF_RGBA_32;
-			r_image.size = r_image.width * r_image.height * r_image.depth;
-			r_image.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
-			r_image.buffer = (byte *)pixels.data();
+			r_image->width = s_qrcode.size;
+			r_image->height = s_qrcode.size;
+			r_image->depth = 4;
+			r_image->type = PF_RGBA_32;
+			r_image->size = r_image->width * r_image->height * r_image->depth;
+			r_image->flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA|IMAGE_TEMP;
+			r_image->buffer = (byte *)pixels.data();
 
-			qrTexture = (void *)(ptrdiff_t)GL_LoadTextureInternal( xorstr("*citrus_qrcode").crypt_get(), &r_image, (texFlags_t)(TF_IMAGE | TF_NEAREST), false );
+			qrTexture = (void *)(ptrdiff_t)GL_LoadTextureInternal( xorstr("*citrus_qrcode").crypt_get(), r_image, (texFlags_t)(TF_IMAGE | TF_NEAREST), false );
 		}
 
 		ImGui::Image(qrTexture, ImGuiUtils::GetScaledSize({ 160, 160 }));

@@ -482,7 +482,7 @@ A sky texture is 256*128, with the right side being a masked overlay
 */
 void R_InitSky( mip_t *mt, byte *buf, texture_t *tx )
 {
-	rgbdata_t	r_temp, *r_sky;
+	image_ref	r_sky;
 	uint	*trans, *rgba;
 	uint	transpix;
 	int	r, g, b;
@@ -510,7 +510,6 @@ void R_InitSky( mip_t *mt, byte *buf, texture_t *tx )
 	if( !r_sky || !r_sky->palette || r_sky->type != PF_INDEXED_32 || r_sky->height == 0 )
 	{
 		MsgDev( D_ERROR, "R_InitSky: unable to load sky texture %s\n", tx->name );
-		FS_FreeImage( r_sky );
 		return;
 	}
 
@@ -538,17 +537,18 @@ void R_InitSky( mip_t *mt, byte *buf, texture_t *tx )
 	((byte *)&transpix)[3] = 0;
 
 	// build a temporary image
-	r_temp = *r_sky;
-	r_temp.width = r_sky->width >> 1;
-	r_temp.height = r_sky->height;
-	r_temp.type = PF_RGBA_32;
-	r_temp.flags = IMAGE_HAS_COLOR;
-	r_temp.palette = NULL;
-	r_temp.buffer = (byte *)trans;
-	r_temp.size = r_temp.width * r_temp.height * 4;
+	image_ref r_temp = Image_NewTemp();
+	*r_temp = *r_sky;
+	r_temp->width = r_sky->width >> 1;
+	r_temp->height = r_sky->height;
+	r_temp->type = PF_RGBA_32;
+	r_temp->flags = IMAGE_HAS_COLOR;
+	r_temp->palette = NULL;
+	r_temp->buffer = (byte *)trans;
+	r_temp->size = r_temp->width * r_temp->height * 4;
 
 	// load it in
-	tr.solidskyTexture = GL_LoadTextureInternal( "solid_sky", &r_temp, (texFlags_t)(TF_UNCOMPRESSED|TF_NOMIPMAP), false );
+	tr.solidskyTexture = GL_LoadTextureInternal( "solid_sky", r_temp, (texFlags_t)(TF_UNCOMPRESSED|TF_NOMIPMAP), false );
 
 	for( i = 0; i < r_sky->width >> 1; i++ )
 	{
@@ -567,17 +567,13 @@ void R_InitSky( mip_t *mt, byte *buf, texture_t *tx )
 		}
 	}
 
-	r_temp.flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
+	r_temp->flags = IMAGE_HAS_COLOR|IMAGE_HAS_ALPHA;
 
 	// load it in
-	tr.alphaskyTexture = GL_LoadTextureInternal( "alpha_sky", &r_temp, (texFlags_t)(TF_UNCOMPRESSED|TF_NOMIPMAP), false );
+	tr.alphaskyTexture = GL_LoadTextureInternal( "alpha_sky", r_temp, (texFlags_t)(TF_UNCOMPRESSED|TF_NOMIPMAP), false );
 
 	GL_SetTextureType( tr.solidskyTexture, TEX_BRUSH );
 	GL_SetTextureType( tr.alphaskyTexture, TEX_BRUSH );
-
-	// clean up
-	FS_FreeImage( r_sky );
-	Mem_Free( trans );
 }
 
 /*

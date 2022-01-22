@@ -394,7 +394,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 	else {
 		if (numi == 256)
 		{
-			rgbdata_t* pal;
+			image_ref pal;
 
 			buffer += sizeof(short);
 
@@ -417,7 +417,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 			}
 
 			buffer += 768; //读下一个数据块
-			FS_FreeImage(pal); // palette installed, no reason to keep this data
+			pal = nullptr; // palette installed, no reason to keep this data
 		}
 		else
 		{
@@ -475,7 +475,6 @@ as pieces of input image
 void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean *loaded )
 {
 	byte		*src, *dst;
-	rgbdata_t		*pix, temp;
 	char		texname[128];
 	int		i, j, x, y, w, h;
 	int		xl, yl, xh, yh;
@@ -490,7 +489,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	if( loaded ) *loaded = false;
 	Q_snprintf( texname, sizeof( texname ), "#%s", mod->name );
 	host.overview_loading = true;
-	pix = FS_LoadImage( texname, (byte*)buffer, size );
+	auto pix = FS_LoadImage( texname, (byte*)buffer, size );
 	host.overview_loading = false;
 	if( !pix ) return;	// bad image or something else
 
@@ -534,14 +533,14 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	mod->maxs[2] = h / 2;
 
 	// create a temporary pic
-	Q_memset( &temp, 0, sizeof( temp ));
-	temp.width = w;
-	temp.height = h;
-	temp.type = pix->type;
-	temp.flags = pix->flags;	
-	temp.size = w * h * PFDesc[temp.type].bpp;
-	temp.buffer = (byte*)Mem_Alloc( r_temppool, temp.size );
-	temp.palette = NULL;
+	image_ref temp = Image_NewTemp();
+	temp->width = w;
+	temp->height = h;
+	temp->type = pix->type;
+	temp->flags = pix->flags;	
+	temp->size = w * h * PFDesc[temp->type].bpp;
+	temp->buffer = (byte*)Mem_Alloc( r_temppool, temp->size );
+	temp->palette = NULL;
 
 	// chop the image and upload into video memory
 	for( i = xl = yl = 0; i < numframes; i++ )
@@ -551,7 +550,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 
 		src = pix->buffer + ( yl * pix->width + xl ) * 4;
 		linedelta = ( pix->width - w ) * 4;
-		dst = temp.buffer;
+		dst = temp->buffer;
 
 		// cut block from source
 		for( y = yl; y < yh; y++ )
@@ -573,7 +572,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 		pspriteframe->left = -( w >> 1 );
 		pspriteframe->down = ( h >> 1 ) - h;
 		pspriteframe->right = w + -( w >> 1 );
-		pspriteframe->gl_texturenum = GL_LoadTextureInternal( texname, &temp, (texFlags_t)texFlags, false );
+		pspriteframe->gl_texturenum = GL_LoadTextureInternal( texname, temp, (texFlags_t)texFlags, false );
 		GL_SetTextureType( pspriteframe->gl_texturenum, TEX_NOMIP );
 			
 		xl += w;
@@ -583,9 +582,6 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 			yl += h;
 		}
 	}
-
-	FS_FreeImage( pix );
-	Mem_Free( temp.buffer );
 
 	if( loaded ) *loaded = true;
 }
