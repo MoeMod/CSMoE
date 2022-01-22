@@ -301,6 +301,7 @@ include_directories(
 	server/
 	../common
 	../pm_shared
+	../public
 )
 
 if(XASH_NANOGL)
@@ -475,7 +476,7 @@ if(XASH_CPUINFO)
 	target_link_libraries(${XASH_ENGINE} PRIVATE cpuinfo_3p)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p luajit_3p)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

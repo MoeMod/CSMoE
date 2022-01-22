@@ -616,7 +616,7 @@ static pmtrace_t *GAME_EXPORT pfnTraceLine( const vec3_t start, const vec3_t end
 
 static void *GAME_EXPORT pfnHullForBsp( physent_t *pe, vec3_t_ref offset )
 {
-	PM_HullForBsp( pe, clgame.pmove, offset );
+	return PM_HullForBsp( pe, clgame.pmove, offset );
 }
 
 static float GAME_EXPORT pfnTraceModel( physent_t *pe, const vec3_t start, const vec3_t end, trace_t *trace )

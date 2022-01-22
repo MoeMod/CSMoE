@@ -80,8 +80,6 @@ using namespace sv::moe;
 using namespace cl::moe;
 #endif
 
-#define vec3_t Vector
-#define vec3_t_ref Vector &
 #define time_point_t EngineClock::time_point
 #define duration_t EngineClock::duration
 

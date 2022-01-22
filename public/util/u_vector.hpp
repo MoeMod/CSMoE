@@ -41,7 +41,8 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 	constexpr VectorBase_Gen() : m_data{}
 	{
 	}
-	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase_Gen((I, NAN)...)
+	template<class U = std::nullptr_t>
+	constexpr VectorBase_Gen(typename std::type_identity<U>::type ) : VectorBase_Gen((I, NAN)...)
 	{
 	}
 	constexpr explicit VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
@@ -99,7 +100,8 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>, Align> : VectorBase2_Data
 	constexpr VectorBase_Gen(T x1, T y1) : VectorBase2_Data<T, Align>{x1, y1}
 	{
 	}
-	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase2_Data<T, Align>{ NAN, NAN }
+	template<class U = std::nullptr_t>
+	constexpr VectorBase_Gen(typename std::type_identity<U>::type &&) : VectorBase2_Data<T, Align>{ NAN, NAN }
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
@@ -154,7 +156,8 @@ struct alignas(Align) VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>, Align> 
 	constexpr VectorBase_Gen(T x1, T y1, T z1) : VectorBase3_Data<T, Align>{ x1, y1, z1 }
 	{
 	}
-	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase3_Data<T, Align>{ NAN, NAN, NAN }
+	template<class U = std::nullptr_t>
+	constexpr VectorBase_Gen(typename std::type_identity<U>::type &&) : VectorBase3_Data<T, Align>{ NAN, NAN, NAN }
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
