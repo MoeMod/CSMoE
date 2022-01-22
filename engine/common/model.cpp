@@ -1528,7 +1528,7 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 	{
 		vec3_t vv;
 		VectorSet(vv, v[0], v[1], v[2]);
-		AddPointToBounds( v, mins, maxs );
+		AddPointToBounds( vv, mins, maxs );
 	}
 
 	for( i = 0; i < 3; i++ )
@@ -1576,8 +1576,8 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 			}
 		}
 
-		Mod_SubdividePolygon( info, surf, f, front[0], tessSize );
-		Mod_SubdividePolygon( info, surf, b, back[0], tessSize );
+		Mod_SubdividePolygon( info, surf, f, (float *)front[0], tessSize );
+		Mod_SubdividePolygon( info, surf, b, (float *)back[0], tessSize );
 		return;
 	}
 
@@ -2528,7 +2528,7 @@ Mod_FindModelOrigin
 routine to detect bmodels with origin-brush
 =================
 */
-static void Mod_FindModelOrigin( const char *entities, const char *modelname, vec3_t origin )
+static void Mod_FindModelOrigin( const char *entities, const char *modelname, vec3_t_ref origin )
 {
 	char	*pfile;
 	string	keyname;
@@ -2910,11 +2910,11 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 		{
 			// HACKHACK: c2a1 issues
 			if( !bm->origin[0] && !bm->origin[1] ) mod->flags |= MODEL_HAS_ORIGIN;
-
-			Mod_FindModelOrigin( ents, va( "*%i", i ), bm->origin );
+			vec3_t origin(bm->origin[0], bm->origin[1], bm->origin[2]);
+			Mod_FindModelOrigin( ents, va( "*%i", i ), origin );
 
 			// flag 2 is indicated model with origin brush!
-			if( !VectorIsNull( bm->origin )) mod->flags |= MODEL_HAS_ORIGIN;
+			if( !VectorIsNull( origin )) mod->flags |= MODEL_HAS_ORIGIN;
 		}
 
 		for( j = 0; i != 0 && j < mod->nummodelsurfaces; j++ )
@@ -2981,7 +2981,7 @@ model_t *Mod_FindName( const char *filename, qboolean create )
 	COM_FixSlashes( name );
 
 	char* s = name;
-	// ¼ÓÔØÄ£ÐÍµÄÊ±ºò¾ÍÈ·¶¨ºÃÌùÍ¼Ç°×º(@frogvari_) -> (models/@frogvari_v_zombibomb.mdl)£¬ÕÒµ½µÚÒ»¸ö'@'Îª¿ªÊ¼ºÍµÚÒ»¸ö'_'Îª½áÎ²£¬×÷ÎªÌùÍ¼Ç°×º
+	// ï¿½ï¿½ï¿½ï¿½Ä£ï¿½Íµï¿½Ê±ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ç°×º(@frogvari_) -> (models/@frogvari_v_zombibomb.mdl)ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ò»ï¿½ï¿½'@'Îªï¿½ï¿½Ê¼ï¿½Íµï¿½Ò»ï¿½ï¿½'_'Îªï¿½ï¿½Î²ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Í¼Ç°×º
 	int start = -1, end = 0, pos = 0;
 	while (*s != '\0')
 	{

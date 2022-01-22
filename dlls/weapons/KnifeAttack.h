@@ -20,7 +20,7 @@ GNU General Public License for more details.
 
 namespace sv {
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity);
+void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const vec3_t pflMins, const vec3_t pfkMaxs, edict_t *pEntity);
 
 enum hit_result_t
 {
@@ -233,13 +233,13 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 				{
 					if (IsPrimaryAttack)
 					{
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
 					}
 					else
 					{
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
 					}
 					break;
 				}
@@ -304,13 +304,13 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 								}
 							}
 
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
 						}
 						else
 						{
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
 						}
 						break;
 					}

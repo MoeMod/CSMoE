@@ -1055,10 +1055,9 @@ void Mod_StudioGetAttachment( const edict_t *e, int iAttachment, vec3_t_ref orig
 		e->v.controller, e->v.blending, pAtt[iAttachment].bone, e );
 
 	// compute pos and angles
-	if( origin != NULL )
-		Matrix3x4_VectorTransform( studio_bones[pAtt[iAttachment].bone], pAtt[iAttachment].org, origin );
+	Matrix3x4_VectorTransform( studio_bones[pAtt[iAttachment].bone], pAtt[iAttachment].org, origin );
 
-	if( sv_allow_studio_attachment_angles->integer && origin != NULL && angles != NULL )
+	if( sv_allow_studio_attachment_angles->integer )
 	{
 		vec3_t	forward, bonepos;
 		

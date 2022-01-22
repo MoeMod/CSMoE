@@ -41,8 +41,8 @@ void CL_GetPackedColor( short *packed, short color );
 void CL_SparkleTracer( const vec3_t pos, const vec3_t dir, float vel );
 void CL_StreakTracer( const vec3_t pos, const vec3_t velocity, int colorIndex );
 void CL_TracerEffect( const vec3_t start, const vec3_t end );
-void CL_UserTracerParticle( const float *org, const float *vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)( struct particle_s* ));
-struct particle_s* CL_TracerParticles(const float* org, const float* vel, float life);
+void CL_UserTracerParticle( const vec3_t org, const vec3_t vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)( struct particle_s* ));
+struct particle_s* CL_TracerParticles(const vec3_t org, const vec3_t vel, float life);
 void CL_ParticleLine( const vec3_t start, const vec3_t end, byte r, byte g, byte b, float life );
 void CL_ParticleBox( const vec3_t mins, const vec3_t maxs, byte r, byte g, byte b, float life );
 void CL_ShowLine( const vec3_t start, const vec3_t end );
@@ -78,7 +78,7 @@ void CL_SparkStreaks( const vec3_t pos, int count, int velocityMin, int velocity
 void CL_Projectile( const vec3_t origin, const vec3_t velocity, int modelIndex, int life, int owner, void (*hitcallback)( struct tempent_s*, struct pmtrace_s* ));
 void CL_TempSphereModel( const vec3_t pos, float speed, float life, int count, int modelIndex );
 void CL_MultiGunshot( const vec3_t org, const vec3_t dir, const vec3_t noise, int count, int decalCount, int *decalIndices );
-void CL_FireField( const float *org, int radius, int modelIndex, int count, int flags, float life );
+void CL_FireField( const vec3_t org, int radius, int modelIndex, int count, int flags, float life );
 void CL_PlayerSprites( int client, int modelIndex, int count, int size );
 void CL_Sprite_WallPuff( struct tempent_s *pTemp, float scale );
 void CL_DebugParticle( const vec3_t pos, byte r, byte g, byte b );
@@ -86,7 +86,7 @@ void CL_RicochetSound( const vec3_t pos );
 struct dlight_s *CL_AllocDlight( int key );
 struct dlight_s *CL_AllocElight( int key );
 void CL_UpdateFlashlight( cl_entity_t *pEnt );
-void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags );
+void CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags );
 void CL_DecalRemoveAll( int textureIndex );
 int CL_DecalIndexFromName( const char *name );
 int CL_DecalIndex( int id );
@@ -107,6 +107,6 @@ void TriVertex3fv( const float *v );
 void TriNormal3fv( const float *v );
 void TriColor4f( float r, float g, float b, float a );
 int TriSpriteTexture( model_t *pSpriteModel, int frame );
-int TriWorldToScreen( float *world, float *screen );
+int TriWorldToScreen( const vec3_t world, vec3_t_ref screen );
 
 #endif//CL_TENT_H

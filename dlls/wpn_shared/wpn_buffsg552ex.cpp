@@ -290,7 +290,7 @@ void CBuffsg552ex::Buffsg552exFireB(float flSpread, duration_t flCycleTime, BOOL
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc, vecDir);
 		RadiusDamage(vecShootPosition, SlashDamage());
 	}
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
 #endif
 	
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
@@ -366,7 +366,7 @@ void CBuffsg552ex::Buffsg552exFire(float flSpread, duration_t flCycleTime, BOOL 
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBuffsg552ex, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

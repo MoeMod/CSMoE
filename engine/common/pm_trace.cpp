@@ -531,7 +531,7 @@ pmtrace_t PM_PlayerTraceExt( playermove_t *pmove, vec3_t start, vec3_t end, int 
 	return trace_total;
 }
 
-int PM_TestPlayerPosition( playermove_t *pmove, vec3_t pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
+int PM_TestPlayerPosition( playermove_t *pmove, const vec3_t pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
 {
 	int	i, j, hullcount;
 	vec3_t	pos_l, offset;

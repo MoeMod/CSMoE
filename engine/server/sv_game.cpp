@@ -91,8 +91,6 @@ void SV_SetMinMaxSize( edict_t *e, const vec3_t min, const vec3_t max )
 {
 	int	i;
 
-	ASSERT( min != NULL && max != NULL );
-
 	if( !SV_IsValidEdict( e ))
 		return;
 
@@ -305,7 +303,6 @@ qboolean SV_Send( int dest, const vec3_t origin, const edict_t *ent, qboolean ex
 		reliable = true;
 		// intentional fallthrough
 	case MSG_PAS:
-		if( origin == NULL ) return false;
 		leaf = Mod_PointInLeaf( origin, sv.worldmodel->nodes );
 		mask = Mod_LeafPHS( leaf, sv.worldmodel );
 		break;
@@ -313,7 +310,6 @@ qboolean SV_Send( int dest, const vec3_t origin, const edict_t *ent, qboolean ex
 		reliable = true;
 		// intentional fallthrough
 	case MSG_PVS:
-		if( origin == NULL ) return false;
 		leaf = Mod_PointInLeaf( origin, sv.worldmodel->nodes );
 		mask = Mod_LeafPVS( leaf, sv.worldmodel );
 		break;
@@ -1289,7 +1285,6 @@ pfnVecToYaw
 */
 float GAME_EXPORT pfnVecToYaw( const vec3_t rgflVector )
 {
-	if( !rgflVector ) return 0.0f;
 	return SV_VecToYaw( rgflVector );
 }
 
@@ -1304,12 +1299,6 @@ void GAME_EXPORT pfnMoveToOrigin( edict_t *ent, const vec3_t pflGoal, float dist
 	if( !SV_IsValidEdict( ent ))
 	{
 		MsgDev( D_WARN, "SV_MoveToOrigin: invalid entity %s\n", SV_ClassName( ent ));
-		return;
-	}
-
-	if( !pflGoal )
-	{
-		MsgDev( D_WARN, "SV_MoveToOrigin: invalid goal pos\n" );
 		return;
 	}
 	
@@ -1431,7 +1420,7 @@ pfnFindEntityInSphere
 return NULL instead of world!
 =================
 */
-edict_t *GAME_EXPORT pfnFindEntityInSphere( edict_t *pStartEdict, const float *org, float flRadius )
+edict_t *GAME_EXPORT pfnFindEntityInSphere( edict_t *pStartEdict, const vec3_t org, float flRadius )
 {
 	edict_t	*ent;
 	float	distSquared;
@@ -2069,7 +2058,7 @@ pfnEmitAmbientSound
 
 =================
 */
-void GAME_EXPORT pfnEmitAmbientSound( edict_t *ent, vec3_t_ref pos, const char *sample, float vol, float attn, int flags, int pitch )
+void GAME_EXPORT pfnEmitAmbientSound( edict_t *ent, const vec3_t pos, const char *sample, float vol, float attn, int flags, int pitch )
 {
 	int 	number = 0, sound_idx;
 	int	msg_dest = MSG_PAS_R;
@@ -2153,7 +2142,7 @@ void SV_StartMusic( const char *curtrack, const char *looptrack, fs_offset_t pos
 {
 	BF_WriteByte( &sv.multicast, svc_stufftext );
 	BF_WriteString( &sv.multicast, va( "music \"%s\" \"%s\" %i\n", curtrack, looptrack, (int)position ));
-	SV_Send( MSG_ALL, NULL, NULL, false );
+	SV_Send( MSG_ALL, {}, nullptr, false );
 }
 
 /*
@@ -2318,7 +2307,7 @@ pfnTraceSphere
 trace sphere instead of bbox
 =============
 */
-void GAME_EXPORT pfnTraceSphere( const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr )
+void GAME_EXPORT pfnTraceSphere( const vec3_t v1, const vec3_t v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr )
 {
 	Host_Error( "TraceSphere not yet implemented!\n" );
 }
@@ -2440,16 +2429,9 @@ pfnParticleEffect
 Make sure the event gets sent to all clients
 =================
 */
-void GAME_EXPORT pfnParticleEffect( const vec3_t org, const float *dir, float color, float count )
+void GAME_EXPORT pfnParticleEffect( const vec3_t org, const vec3_t dir, float color, float count )
 {
 	int	i, v;
-
-	if( !org || !dir )
-	{
-		if( !org ) MsgDev( D_ERROR, "SV_StartParticle: NULL origin. Ignored\n" );
-		if( !dir ) MsgDev( D_ERROR, "SV_StartParticle: NULL dir. Ignored\n" );
-		return;
-	}
 
 	BF_WriteByte( &sv.datagram, svc_particle );
 	BF_WriteVec3Coord( &sv.datagram, org );
@@ -2514,7 +2496,6 @@ pfnPointContents
 */
 static int GAME_EXPORT pfnPointContents( const vec3_t rgflVector )
 {
-	if( !rgflVector ) return CONTENTS_NONE;
 	return SV_PointContents( rgflVector );
 }
 
@@ -2569,8 +2550,7 @@ void GAME_EXPORT pfnMessageBegin( int msg_dest, int msg_num, const vec3_t pOrigi
 	BF_WriteByte( &sv.multicast, msg_num );
 
 	// save message destination
-	if( pOrigin ) VectorCopy( pOrigin, svgame.msg_org );
-	else VectorClear( svgame.msg_org );
+	VectorCopy( pOrigin, svgame.msg_org );
 
 	if( iSize == -1 )
 	{
@@ -2600,7 +2580,6 @@ pfnMessageEnd
 void GAME_EXPORT pfnMessageEnd( void )
 {
 	const char	*name = "Unknown";
-	vec3_t_ref org = NULL;
 
 	if( svgame.msg_name ) name = svgame.msg_name;
 	if( !svgame.msg_started ) Host_Error( "MessageEnd: called with no active message\n" );
@@ -2683,7 +2662,7 @@ void GAME_EXPORT pfnMessageEnd( void )
 		BF_WriteByte( &sv.multicast, 0 );
 	}
 
-	if( !VectorIsNull( svgame.msg_org )) org = svgame.msg_org;
+	vec3_t_ref org = svgame.msg_org;
 	svgame.msg_dest = bound( MSG_BROADCAST, svgame.msg_dest, MSG_SPEC );
 
 	SV_Send( svgame.msg_dest, org, svgame.msg_ent, false );
@@ -3446,7 +3425,7 @@ int GAME_EXPORT pfnRegUserMsg( const char *pszName, int iSize )
 		BF_WriteByte( &sv.multicast, svgame.msg[i].number );
 		BF_WriteByte( &sv.multicast, (byte)iSize );
 		BF_WriteString( &sv.multicast, svgame.msg[i].name );
-		SV_Send( MSG_ALL, NULL, NULL, false );
+		SV_Send( MSG_ALL, {}, nullptr, false );
 	}
 
 	if( sv_trace_messages->integer )
@@ -3475,7 +3454,7 @@ pfnGetBonePosition
 
 =============
 */
-static void GAME_EXPORT pfnGetBonePosition( const edict_t* pEdict, int iBone, float *rgflOrigin, float *rgflAngles )
+static void GAME_EXPORT pfnGetBonePosition( const edict_t* pEdict, int iBone, vec3_t_ref rgflOrigin, vec3_t_ref rgflAngles )
 {
 	if( !SV_IsValidEdict( pEdict ))
 	{
@@ -3572,7 +3551,7 @@ pfnGetAttachment
 
 =============
 */
-static void GAME_EXPORT pfnGetAttachment( const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles )
+static void GAME_EXPORT pfnGetAttachment( const edict_t *pEdict, int iAttachment, vec3_t_ref rgflOrigin, vec3_t_ref rgflAngles )
 {
 	if( !SV_IsValidEdict( pEdict ))
 	{
@@ -4013,7 +3992,7 @@ pfnPlaybackEvent
 
 =============
 */
-void GAME_EXPORT SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
+void GAME_EXPORT SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin, const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	sv_client_t	*cl;
 	event_state_t	*es;
@@ -4505,7 +4484,7 @@ pfnForceUnmodified
 
 =============
 */
-void GAME_EXPORT pfnForceUnmodified( FORCE_TYPE type, vec3_t_ref mins, vec3_t_ref maxs, const char *filename )
+void GAME_EXPORT pfnForceUnmodified( FORCE_TYPE type, const vec3_t mins, const vec3_t maxs, const char *filename )
 {
 	sv_consistency_t	*pData;
 	int		i;

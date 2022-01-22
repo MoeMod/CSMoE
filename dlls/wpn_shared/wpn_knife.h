@@ -79,6 +79,6 @@ public:
 	time_point_t m_NextInspect;
 };
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *mins, const float *maxs, edict_t *pEntity);
+void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const vec3_t mins, const vec3_t maxs, edict_t *pEntity);
 
 }

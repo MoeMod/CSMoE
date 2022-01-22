@@ -121,7 +121,7 @@ namespace sv {
 			{
 				RadiusDamage(pev->origin, DetonationDamage(), TRUE);
 
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireGatlingex, 0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, 0, TRUE, TRUE);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireGatlingex, 0, pev->origin, g_vecZero, 0.0, 0.0, 0, 0, TRUE, TRUE);
 
 				Remove();
 			}
@@ -332,7 +332,7 @@ void CGatlingex::SecondaryAttack(void)
 	m_pPlayer->m_iWeaponVolume = LOUD_GUN_VOLUME;
 	m_pPlayer->m_iWeaponFlash = BRIGHT_GUN_FLASH;
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireGatlingex, 0, (float*)&g_vecZero, (float*)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, FALSE, TRUE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireGatlingex, 0, g_vecZero, g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, FALSE, TRUE);
 	
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
 #ifndef CLIENT_DLL
@@ -393,7 +393,7 @@ void CGatlingex::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireGatlingex, 0, (float *)&g_vecZero, (float *)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireGatlingex, 0, g_vecZero, g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
 
 
 #ifndef CLIENT_DLL

@@ -294,13 +294,13 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, 
 	if (isGlock18)
 	{
 		vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, 0.05, 8192, 1, BULLET_PLAYER_9MM, 18, 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
-		PLAYBACK_EVENT_FULL(FEV_NOTHOST, ENT(m_pPlayer->pev), m_usFireGlock18, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip != 0, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_NOTHOST, ENT(m_pPlayer->pev), m_usFireGlock18, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip != 0, FALSE);
 		m_pPlayer->ammo_9mm--;
 	}
 	else
 	{
 		vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, m_fBurstSpread, 8192, 2, BULLET_PLAYER_556MM, 30, 0.96, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
-		PLAYBACK_EVENT_FULL(FEV_NOTHOST, ENT(m_pPlayer->pev), m_usFireFamas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 10000000), (int)(m_pPlayer->pev->punchangle.y * 10000000), m_iClip != 0, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_NOTHOST, ENT(m_pPlayer->pev), m_usFireFamas, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 10000000), (int)(m_pPlayer->pev->punchangle.y * 10000000), m_iClip != 0, FALSE);
 		m_pPlayer->ammo_556nato--;
 	}
 
@@ -914,7 +914,7 @@ void UTIL_TraceLine( const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTE
 char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 {
 	char chTextureType;
-	float rgfl1[3], rgfl2[3];
+	Vector rgfl1, rgfl2;
 	const char *pTextureName;
 	char szbuffer[64];
 	CBaseEntity *pEntity;
@@ -927,8 +927,8 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
 		return CHAR_TEX_FLESH;
 
-	vecSrc.CopyToArray(rgfl1);
-	vecEnd.CopyToArray(rgfl2);
+	rgfl1 = vecSrc;
+	rgfl2 = vecEnd;
 
 	if (pEntity)
 		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), rgfl1, rgfl2);

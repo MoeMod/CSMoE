@@ -246,13 +246,13 @@ void CKnifeDualsword::WeaponIdle()
 	if (m_iLastAnim <= 5 || m_iLastAnim >= 14 || m_iLastAnim == 6)
 	{
 		SendWeaponAnim(0);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 11, 0, TRUE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, TRUE, FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;
 	}
 	else if (m_iLastAnim >= 7 || m_iLastAnim <= 11)
 	{
 		SendWeaponAnim(7);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 11, 0, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 11, 0, FALSE, FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 4.0s;
 	}
 
@@ -560,7 +560,7 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 	int v8 = m_iSecondaryAttackCount % 4;
 	SendWeaponAnim(v8 + 1);
-	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 5, v8, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 5, v8, FALSE, FALSE);
 	m_iLastAnim = v8 + 1;
 
 	if (m_iSkillRecord)
@@ -746,7 +746,7 @@ public:
 			{
 				// TEMPENTITY HERE (90 15 10)
 				// "weapons/dualsword_skill_start.wav"
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 0);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 0);
 				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_start.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				m_iEffectType = 1; // this+93(iEffectType)
 				m_flNextEffect = gpGlobals->time + 1.49s;
@@ -773,7 +773,7 @@ public:
 			{
 				// TEMPENTITY HERE (90 -20 15 10)
 				// "weapons/dualsword_skill_end.wav"
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 1);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pPlayer->pev->origin, g_vecZero, 0.0, 0.0, 10, pPlayer->entindex(), FALSE, 1);
 				EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_skill_loop_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 				m_iEffectType = 4; // this+93(iEffectType)
 				m_flNextEffect = gpGlobals->time + 1.4s; // this+97

@@ -145,7 +145,7 @@ void CSgdrill::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSgdrill, 0, (float *)&g_vecZero, (float *)&g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSgdrill, 0, g_vecZero, g_vecZero, m_vVecAiming.x, m_vVecAiming.y, 7, m_vVecAiming.x * 100, m_iClip != 0, FALSE);
 
 
 #ifndef CLIENT_DLL
@@ -346,11 +346,11 @@ BOOL CSgdrill::KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float f
 #endif
 
 
-void CSgdrill::FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity)
+void CSgdrill::FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const vec3_t pflMins, const vec3_t pfkMaxs, edict_t *pEntity)
 {
 	TraceResult trTemp;
 	float flDistance = 1000000;
-	const float *pflMinMaxs[2] = { pflMins, pfkMaxs };
+	const vec3_t pflMinMaxs[] = { pflMins, pfkMaxs };
 	Vector vecHullEnd = tr.vecEndPos;
 
 	vecHullEnd = vecSrc + ((vecHullEnd - vecSrc) * 2);

@@ -158,7 +158,7 @@ void CSCOUT::SCOUTFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 	flags = 0;
 #endif
 	m_NextInspect = gpGlobals->time;
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireScout, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x * 1000, vecDir.y * 1000, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireScout, 0, g_vecZero, g_vecZero, vecDir.x * 1000, vecDir.y * 1000, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

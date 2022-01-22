@@ -346,7 +346,7 @@ typedef struct alight_s
 	int			ambientlight;	// clip at 128
 	int			shadelight;		// clip at 192 - ambientlight
 	vec3_t		color;
-	float* plightvec;
+	vec3_t *plightvec;
 } alight_t;
 
 typedef struct auxvert_s

@@ -119,7 +119,7 @@ void CTbarrel::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0527, 0.0, m_iInstantShots, 7, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, g_vecZero, g_vecZero, 0.0527, 0.0, m_iInstantShots, 7, FALSE, FALSE);
 
 
 
@@ -189,7 +189,7 @@ void CTbarrel::SecondaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, (float *)&g_vecZero, (float *)&g_vecZero, GetSpread(), 0.0, m_iInstantShots, 6 * m_iInstantShots, m_iClip != 0, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireTbarrel, 0, g_vecZero, g_vecZero, GetSpread(), 0.0, m_iInstantShots, 6 * m_iInstantShots, m_iClip != 0, FALSE);
 	m_iClip = 0;
 
 

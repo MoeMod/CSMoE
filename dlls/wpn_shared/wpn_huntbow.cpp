@@ -617,7 +617,7 @@ void CHuntbow::ChargedFire(void)
 
 	//int iEffect = 3;
 	//Vector vecDir = m_pPlayer->FireBullets4(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, 0, 8192, 7, 16, GetSecondaryAttackDamage(), 0.99, m_pPlayer->pev, true, m_pPlayer->random_seed, &iEffect, m_pPlayer);
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, int(m_pPlayer->pev->punchangle.x * 100), 1, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, TRUE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, int(m_pPlayer->pev->punchangle.x * 100), 1, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, TRUE);
 #endif
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.28s;
 	m_pPlayer->pev->punchangle.x -= 2.0;
@@ -707,7 +707,7 @@ void CHuntbow::HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeI
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireHuntbow, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, fChargeInterrupted);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireHuntbow, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0, fChargeInterrupted);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + flCycleTime;
 
@@ -1067,11 +1067,11 @@ void CHuntbow::ItemPostFrame(void)
 	//ScannerFunc(vecSrc, gpGlobals->v_forward, 1500, 180, m_pPlayer->pev, m_iChargeState);
 	if (m_iChargeState == 3 || m_iChargeState == 4)
 	{
-		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 6, 0, TRUE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 6, 0, TRUE, FALSE);
 	}
 	else
 	{
-		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 6, 0, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_CLIENT, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 6, 0, FALSE, FALSE);
 	}
 #ifndef CLIENT_DLL
 		if (m_CrossHairState != m_CrossHairStateStored)

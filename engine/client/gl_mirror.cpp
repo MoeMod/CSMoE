@@ -376,7 +376,10 @@ void R_RecursiveMirrorNode( mnode_t *node, uint clipflags )
 			if(!( clipflags & ( 1<<i )))
 				continue;
 
-			clipped = BoxOnPlaneSide( node->minmaxs, node->minmaxs + 3, clipplane );
+			vec3_t a{ node->minmaxs[0], node->minmaxs[1], node->minmaxs[2]};
+			vec3_t b{ node->minmaxs[3], node->minmaxs[4], node->minmaxs[5]};
+
+			clipped = BoxOnPlaneSide( a, b, clipplane );
 			if( clipped == 2 ) return;
 			if( clipped == 1 ) clipflags &= ~(1<<i);
 		}
@@ -609,7 +612,7 @@ void R_FindMirrors( const ref_params_t *fd )
 	// build the transformation matrix for the given view angles
 	if( cl.thirdperson )
 	{
-		vec3_t	cam_ofs, vpn;
+		vec3_t	cam_ofs, vpn, r, u;
 
 		clgame.dllFuncs.CL_CameraOffset( cam_ofs );
 
@@ -617,7 +620,7 @@ void R_FindMirrors( const ref_params_t *fd )
 		viewAng[YAW] = cam_ofs[YAW];
 		viewAng[ROLL] = 0;
 
-		AngleVectors( viewAng, vpn, NULL, NULL );
+		AngleVectors( viewAng, vpn, r, u );
 		VectorMA( RI.refdef.vieworg, -cam_ofs[ROLL], vpn, viewOrg );
 	}
 	else

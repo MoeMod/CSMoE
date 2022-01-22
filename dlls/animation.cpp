@@ -32,7 +32,7 @@ studiohdr_t *g_pstudiohdr;
 float (*g_pRotationMatrix)[3][4];
 float (*g_pBoneTransform)[128][3][4];
 
-int ExtractBbox(void *pmodel, int sequence, float *mins, float *maxs)
+int ExtractBbox(void *pmodel, int sequence, vec3_t_ref mins, vec3_t_ref maxs)
 {
 	studiohdr_t *pstudiohdr = (studiohdr_t *)pmodel;
 
@@ -151,7 +151,7 @@ int LookupActivityHeaviest(void *pmodel, entvars_t *pev, int activity)
 	return seq;
 }
 
-NOXREF void GetEyePosition(void *pmodel, float *vecEyePosition)
+NOXREF void GetEyePosition(void *pmodel, vec3_t_ref vecEyePosition)
 {
 	studiohdr_t *pstudiohdr;
 
@@ -557,7 +557,7 @@ C_DLLEXPORT int Server_GetBlendingInterface(int version, struct sv_blending_inte
 	return 1;
 }
 
-void AngleQuaternion(vec_t *angles, vec_t *quaternion)
+void AngleQuaternion(const vec3_t angles, vec4_t quaternion)
 {
 	float sy, cy, sp_, cp;
 	float angle;
@@ -590,7 +590,7 @@ void AngleQuaternion(vec_t *angles, vec_t *quaternion)
 	quaternion[3] = sp_ * sr * sy + ftmp2 * cy;
 }
 
-void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
+void QuaternionSlerp(vec4_t p, vec4_t q, float t, vec4_t qt)
 {
 	int i;
 	float a = 0;
@@ -647,7 +647,7 @@ void QuaternionSlerp(vec_t *p, vec_t *q, float t, vec_t *qt)
 	}
 }
 
-void QuaternionMatrix(vec_t *quaternion, float (*matrix)[4])
+void QuaternionMatrix(const vec4_t quaternion, float (*matrix)[4])
 {
 	matrix[0][0] = 1.0 - 2.0 * quaternion[1] * quaternion[1] - 2.0 * quaternion[2] * quaternion[2];
 	matrix[1][0] = 2.0 * quaternion[0] * quaternion[1] + 2.0 * quaternion[3] * quaternion[2];
@@ -846,7 +846,7 @@ void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioan
 		AngleQuaternion(angle1, q);
 }
 
-void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos)
+void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos)
 {
 	int j, k;
 	mstudioanimvalue_t *panimvalue;
@@ -899,7 +899,7 @@ void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioani
 	}
 }
 
-void StudioSlerpBones(vec4_t *q1, float pos1[][3], vec4_t *q2, float pos2[][3], float s)
+void StudioSlerpBones(vec4_t *q1, vec3_t pos1[], vec4_t *q2, vec3_t pos2[], float s)
 {
 	int i;
 	vec4_t q3;
@@ -928,7 +928,7 @@ void StudioSlerpBones(vec4_t *q1, float pos1[][3], vec4_t *q2, float pos2[][3], 
 	}
 }
 
-void StudioCalcRotations(mstudiobone_t *pbones, int *chain, int chainlength, float *adj, float pos[128][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f, float s)
+void StudioCalcRotations(mstudiobone_t *pbones, int *chain, int chainlength, float *adj, vec3_t pos[128], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f, float s)
 {
 	int i;
 	int j;
@@ -982,7 +982,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, vec3_t angl
 	int chainlength;
 	vec3_t temp_angles;
 
-	/*static */float pos[MAXSTUDIOBONES][3], pos2[MAXSTUDIOBONES][3];
+	/*static */vec3_t pos[MAXSTUDIOBONES], pos2[MAXSTUDIOBONES];
 	/*static */float q[MAXSTUDIOBONES][4], q2[MAXSTUDIOBONES][4];
 
 	g_pstudiohdr = (studiohdr_t *)IEngineStudio.Mod_Extradata(pModel);
@@ -1039,7 +1039,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, vec3_t angl
 	// This game knows how to do nine way blending
 	else
 	{
-		/*static */float pos3[MAXSTUDIOBONES][3], pos4[MAXSTUDIOBONES][3];
+		/*static */vec3_t pos3[MAXSTUDIOBONES], pos4[MAXSTUDIOBONES];
 		/*static */float q3[MAXSTUDIOBONES][4], q4[MAXSTUDIOBONES][4];
 
 		float s, t;
@@ -1172,7 +1172,7 @@ void SV_StudioSetupBones(model_t *pModel, float frame, int sequence, vec3_t angl
 
 			if (copy)
 			{
-				Q_memcpy(pos[i], pos2[i], sizeof(pos[i]));
+				pos[i] = pos2[i];
 				Q_memcpy(q[i], q2[i], sizeof(q[i]));
 			}
 		}

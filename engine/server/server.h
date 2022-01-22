@@ -614,7 +614,7 @@ void SV_SetModel( edict_t *ent, const char *name );
 void SV_CopyTraceToGlobal( trace_t *trace );
 void SV_SetMinMaxSize( edict_t *e, const vec3_t min, const vec3_t max );
 edict_t* SV_FindEntityByString( edict_t *pStartEdict, const char *pszField, const char *pszValue );
-void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
+void SV_PlaybackEventFull( int flags, const edict_t *pInvoker, word eventindex, float delay, const vec3_t origin, const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 void SV_PlaybackReliableEvent( sizebuf_t *msg, word eventindex, float delay, event_args_t *args );
 void SV_BaselineForEntity( edict_t *pEdict );
 void SV_WriteEntityPatch( const char *filename );
@@ -669,8 +669,8 @@ void SV_InitSaveRestore( void );
 //
 // sv_pmove.c
 //
-void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t origin );
-void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t mins, vec3_t maxs );
+void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t_ref origin );
+void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t_ref mins, vec3_t_ref maxs );
 
 //
 // sv_world.c
@@ -678,9 +678,9 @@ void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t mins, vec3_t maxs )
 void SV_ClearWorld( void );
 void SV_UnlinkEdict( edict_t *ent );
 qboolean SV_HeadnodeVisible( mnode_t *node, byte *visbits, int *lastleaf );
-void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace );
-void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace );
-trace_t SV_TraceHull( edict_t *ent, int hullNum, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end );
+void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace );
+void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace );
+trace_t SV_TraceHull( edict_t *ent, int hullNum, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end );
 trace_t SV_Move( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e );
 trace_t SV_MoveNoEnts( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e );
 const char *SV_TraceTexture( edict_t *ent, const vec3_t start, const vec3_t end );

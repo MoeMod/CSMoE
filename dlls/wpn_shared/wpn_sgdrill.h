@@ -44,7 +44,7 @@ public:
 	BOOL KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
 		entvars_t *pevInflictor, entvars_t *pevAttacker);
 #endif
-	void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity);
+	void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const vec3_t pflMins, const vec3_t pfkMaxs, edict_t *pEntity);
 	float GetSecondaryAttackDamage() const;
 	void Holster(int skiplocal) override;
 #ifndef CLIENT_DLL

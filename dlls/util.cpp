@@ -308,16 +308,14 @@ NOXREF float UTIL_AngleDiff(float destAngle, float srcAngle)
 
 Vector UTIL_VecToAngles(const Vector &vec)
 {
-	float rgflVecOut[3];
+	Vector rgflVecOut;
 	VEC_TO_ANGLES(vec, rgflVecOut);
-	return Vector(rgflVecOut);
+	return rgflVecOut;
 }
 
 NOXREF void UTIL_MoveToOrigin(edict_t *pent, const Vector &vecGoal, float flDist, int iMoveType)
 {
-	float rgfl[3];
-	vecGoal.CopyToArray(rgfl);
-	MOVE_TO_ORIGIN(pent, rgfl, flDist, iMoveType);
+	MOVE_TO_ORIGIN(pent, vecGoal, flDist, iMoveType);
 }
 
 int UTIL_EntitiesInBox(CBaseEntity **pList, int listMax, const Vector &mins, const Vector &maxs, int flagMask)
@@ -583,8 +581,7 @@ void UTIL_MakeVectors(const Vector &vecAngles)
 
 void UTIL_MakeAimVectors(const Vector &vecAngles)
 {
-	float rgflVec[3];
-	vecAngles.CopyToArray(rgflVec);
+	auto rgflVec = vecAngles;
 	rgflVec[0] = -rgflVec[0];
 	MAKE_VECTORS(rgflVec);
 }
@@ -602,17 +599,14 @@ void UTIL_MakeInvVectors(const Vector &vec, globalvars_t *pgv)
 
 void UTIL_EmitAmbientSound(edict_t *entity, const Vector &vecOrigin, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
-	float rgfl[3];
-	vecOrigin.CopyToArray(rgfl);
-
 	if (samp && *samp == '!')
 	{
 		char name[32];
 		if (SENTENCEG_Lookup(samp, name) >= 0)
-			EMIT_AMBIENT_SOUND(entity, rgfl, name, vol, attenuation, fFlags, pitch);
+			EMIT_AMBIENT_SOUND(entity, vecOrigin, name, vol, attenuation, fFlags, pitch);
 	}
 	else
-		EMIT_AMBIENT_SOUND(entity, rgfl, samp, vol, attenuation, fFlags, pitch);
+		EMIT_AMBIENT_SOUND(entity, vecOrigin, samp, vol, attenuation, fFlags, pitch);
 }
 
 unsigned short FixedUnsigned16(float value, float scale)
@@ -2289,8 +2283,6 @@ NOXREF int CRestore::BufferCheckZString(const char *string)
 char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 {
 	char chTextureType;
-	float rgfl1[3];
-	float rgfl2[3];
 	const char *pTextureName;
 	char szbuffer[64];
 	CBaseEntity *pEntity = CBaseEntity::Instance(ptr->pHit);
@@ -2298,13 +2290,10 @@ char UTIL_TextureHit(TraceResult *ptr, Vector vecSrc, Vector vecEnd)
 	if (pEntity && pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
 		return CHAR_TEX_FLESH;
 
-	vecSrc.CopyToArray(rgfl1);
-	vecEnd.CopyToArray(rgfl2);
-
 	if (pEntity)
-		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), rgfl1, rgfl2);
+		pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), vecSrc, vecEnd);
 	else
-		pTextureName = TRACE_TEXTURE(ENT(0), rgfl1, rgfl2);
+		pTextureName = TRACE_TEXTURE(ENT(0), vecSrc, vecEnd);
 
 	if (pTextureName)
 	{

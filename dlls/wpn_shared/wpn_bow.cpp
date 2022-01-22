@@ -313,7 +313,7 @@ void CBow::PrimaryAttack(void)
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.425s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.925s;
 
-	PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireBow, 0, m_pPlayer->pev->origin, (float *)&g_vecZero, 0.0, 0.0, (1 << 1), 0, FALSE, TRUE);
+	PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireBow, 0, m_pPlayer->pev->origin, g_vecZero, 0.0, 0.0, (1 << 1), 0, FALSE, TRUE);
 
 #ifndef CLIENT_DLL
 	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -460,7 +460,7 @@ void CBow::ItemPostFrame(void)
 			flags = 0;
 #endif
 
-			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBow, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBow, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType], 0, FALSE, FALSE);
 
 			SendWeaponAnim(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] ? ANIM_CHARGE_SHOOT2 : ANIM_CHARGE_SHOOT2_EMPTY, UseDecrement() != FALSE);
 

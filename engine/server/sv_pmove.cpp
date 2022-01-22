@@ -38,7 +38,7 @@ void SV_ConvertPMTrace( trace_t *out, pmtrace_t *in, edict_t *ent )
 	out->ent = ent;
 }
 
-void SV_ClipPMoveToEntity( physent_t *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, pmtrace_t *tr )
+void SV_ClipPMoveToEntity( physent_t *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, pmtrace_t *tr )
 {
 	ASSERT( tr != NULL );
 
@@ -286,15 +286,9 @@ void SV_AddLaddersToPmove( areanode_t *node, const vec3_t pmove_mins, const vec3
 		SV_AddLaddersToPmove( node->children[1], pmove_mins, pmove_maxs );
 }
 
-static void pfnParticle( float *origin, int color, float life, int zpos, int zvel )
+static void pfnParticle( const vec3_t origin, int color, float life, int zpos, int zvel )
 {
 	int	v;
-
-	if( !origin )
-	{
-		MsgDev( D_ERROR, "SV_StartParticle: NULL origin. Ignored\n" );
-		return;
-	}
 
 	BF_WriteByte( &sv.reliable_datagram, svc_particle );
 	BF_WriteVec3Coord( &sv.reliable_datagram, origin );
@@ -307,7 +301,7 @@ static void pfnParticle( float *origin, int color, float life, int zpos, int zve
 	BF_WriteByte( &sv.reliable_datagram, bound( 0, life * 8, 255 ));
 }
 
-static int GAME_EXPORT pfnTestPlayerPosition( float *pos, pmtrace_t *ptrace )
+static int GAME_EXPORT pfnTestPlayerPosition( const vec3_t pos, pmtrace_t *ptrace )
 {
 	return PM_TestPlayerPosition( svgame.pmove, pos, ptrace, NULL );
 }
@@ -334,7 +328,7 @@ static void GAME_EXPORT pfnStuckTouch( int hitent, pmtrace_t *tr )
 	svgame.pmove->touchindex[svgame.pmove->numtouch++] = *tr;
 }
 
-static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
+static int GAME_EXPORT pfnPointContents( const vec3_t p, int *truecontents )
 {
 	int	cont, truecont;
 
@@ -346,12 +340,12 @@ static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
 	return cont;
 }
 
-static int GAME_EXPORT pfnTruePointContents( float *p )
+static int GAME_EXPORT pfnTruePointContents( const vec3_t p )
 {
 	return SV_TruePointContents( p );
 }
 
-static int GAME_EXPORT pfnHullPointContents( struct hull_s *hull, int num, float *p )
+static int GAME_EXPORT pfnHullPointContents( struct hull_s *hull, int num, const vec3_t p )
 {
 	return PM_HullPointContents( hull, num, p );
 }
@@ -369,12 +363,12 @@ static pmtrace_t *GAME_EXPORT pfnPlayerTrace_w32(pmtrace_t * retvalue, float *st
 	return retvalue;
 }
 #endif
-static pmtrace_t GAME_EXPORT pfnPlayerTrace(float *start, float *end, int traceFlags, int ignore_pe)
+static pmtrace_t GAME_EXPORT pfnPlayerTrace(const vec3_t start, const vec3_t end, int traceFlags, int ignore_pe)
 {
 	return PM_PlayerTraceExt( svgame.pmove, start, end, traceFlags, svgame.pmove->numphysent, svgame.pmove->physents, ignore_pe, NULL );
 }
 
-static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags, int usehull, int ignore_pe )
+static pmtrace_t *GAME_EXPORT pfnTraceLine( const vec3_t start, const vec3_t end, int flags, int usehull, int ignore_pe )
 {
 	static pmtrace_t	tr;
 	int		old_usehull;
@@ -397,12 +391,12 @@ static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags,
 	return &tr;
 }
 
-static hull_t *GAME_EXPORT pfnHullForBsp( physent_t *pe, float *offset )
+static void *GAME_EXPORT pfnHullForBsp( physent_t *pe, vec3_t_ref offset )
 {
 	return PM_HullForBsp( pe, svgame.pmove, offset );
 }
 
-static float GAME_EXPORT pfnTraceModel( physent_t *pe, float *start, float *end, trace_t *trace )
+static float GAME_EXPORT pfnTraceModel( physent_t *pe, const vec3_t start, const vec3_t end, trace_t *trace )
 {
 	int	old_usehull;
 	vec3_t	start_l, end_l;
@@ -448,7 +442,7 @@ static float GAME_EXPORT pfnTraceModel( physent_t *pe, float *start, float *end,
 	return trace->fraction;
 }
 
-static const char *GAME_EXPORT pfnTraceTexture( int ground, float *vstart, float *vend )
+static const char *GAME_EXPORT pfnTraceTexture( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -474,8 +468,8 @@ static void GAME_EXPORT pfnPlaySound( int channel, const char *sample, float vol
 	SV_StartSoundEx( ent, channel, sample, volume, attenuation, fFlags, pitch, exclude );
 }
 
-static void GAME_EXPORT pfnPlaybackEventFull( int flags, int clientindex, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
+static void GAME_EXPORT pfnPlaybackEventFull( int flags, int clientindex, word eventindex, float delay, const vec3_t origin,
+                                              const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	edict_t	*ent;
 
@@ -501,17 +495,17 @@ static pmtrace_t *GAME_EXPORT pfnPlayerTraceEx_w32( pmtrace_t * retvalue, float 
 }
 #endif
 
-static pmtrace_t GAME_EXPORT pfnPlayerTraceEx( float *start, float *end, int traceFlags, pfnIgnore pmFilter )
+static pmtrace_t GAME_EXPORT pfnPlayerTraceEx( const vec3_t start, const vec3_t end, int traceFlags, pfnIgnore pmFilter )
 {
 	return PM_PlayerTraceExt( svgame.pmove, start, end, traceFlags, svgame.pmove->numphysent, svgame.pmove->physents, -1, pmFilter );
 }
 
-static int GAME_EXPORT pfnTestPlayerPositionEx( float *pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
+static int GAME_EXPORT pfnTestPlayerPositionEx( const vec3_t pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
 {
 	return PM_TestPlayerPosition( svgame.pmove, pos, ptrace, pmFilter );
 }
 
-static pmtrace_t *GAME_EXPORT pfnTraceLineEx( float *start, float *end, int flags, int usehull, pfnIgnore pmFilter )
+static pmtrace_t *GAME_EXPORT pfnTraceLineEx( const vec3_t start, const vec3_t end, int flags, int usehull, pfnIgnore pmFilter )
 {
 	static pmtrace_t	tr;
 	int		old_usehull;
@@ -534,7 +528,7 @@ static pmtrace_t *GAME_EXPORT pfnTraceLineEx( float *start, float *end, int flag
 	return &tr;
 }
 
-static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, float *vstart, float *vend )
+static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -593,7 +587,7 @@ void SV_InitClientMove( void )
 	svgame.pmove->RandomFloat = Com_RandomFloat;
 	svgame.pmove->PM_GetModelType = pfnGetModelType;
 	svgame.pmove->PM_GetModelBounds = pfnGetModelBounds;
-	svgame.pmove->PM_HullForBsp = (void* (*)(physent_t* pe, float* offset))pfnHullForBsp;
+	svgame.pmove->PM_HullForBsp = pfnHullForBsp;
 	svgame.pmove->PM_TraceModel = pfnTraceModel;
 	svgame.pmove->COM_FileSize = COM_FileSize;
 	svgame.pmove->COM_LoadFile = COM_LoadFile;
@@ -833,7 +827,7 @@ SV_GetTrueOrigin
 Returns noncompensated origin value
 =================
 */
-void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t origin )
+void SV_GetTrueOrigin( sv_client_t *cl, int edictnum, vec3_t_ref origin )
 {
 	if( !SV_ShouldUnlagForPlayer( cl ) )
 		return;
@@ -849,7 +843,7 @@ SV_GetTrueMinMax
 Returns noncompensated bbox value
 =================
 */
-void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t mins, vec3_t maxs )
+void SV_GetTrueMinMax( sv_client_t *cl, int edictnum, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	if( !SV_ShouldUnlagForPlayer( cl ) )
 		return;
@@ -888,7 +882,7 @@ SV_UnlagCheckTeleport
 
 ================
 */
-qboolean SV_UnlagCheckTeleport( vec3_t old_pos, vec3_t new_pos )
+qboolean SV_UnlagCheckTeleport( const vec3_t old_pos, const vec3_t new_pos )
 {
 	int	i;
 

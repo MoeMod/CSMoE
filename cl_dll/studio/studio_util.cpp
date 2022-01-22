@@ -56,7 +56,7 @@ AngleQuaternion
 
 ====================
 */
-void AngleQuaternion(float *angles, vec4_t quaternion)
+void AngleQuaternion(const vec3_t angles, vec4_t quaternion)
 {
 	float angle;
 	float sr, sp, sy, cr, cp, cy;

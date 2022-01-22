@@ -926,7 +926,7 @@ void CHostage::PointAt(const Vector &vecLoc)
 void CHostage::MoveToward(const Vector &vecLoc)
 {
 	int nFwdMove;
-	Vector vecFwd;
+	Vector vecFwd, vecRight, vecUp;
 	Vector vecbigDest;
 	Vector vecMove;
 	CBaseEntity *pFollowing;
@@ -937,7 +937,7 @@ void CHostage::MoveToward(const Vector &vecLoc)
 	vecMove = vecLoc - pev->origin;
 	vecAng = UTIL_VecToAngles(vecMove);
 	vecAng = Vector(0, vecAng.y, 0);
-	UTIL_MakeVectorsPrivate(vecAng, vecFwd, NULL, NULL);
+	UTIL_MakeVectorsPrivate(vecAng, vecFwd, vecRight, vecUp);
 
 	if ((vecFwd * s_flStepSize_LocalNav).Length2D() <= (vecLoc - pev->origin).Length2D())
 		flDist = (vecFwd * s_flStepSize_LocalNav).Length2D();

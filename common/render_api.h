@@ -222,7 +222,7 @@ typedef struct render_api_s
 	void		(*GL_Scissor)(int enable, int x, int y, int width, int height);
 		
 	// Misc renderer functions
-	void		(*GL_DrawParticles)( const float *vieworg, const float *fwd, const float *rt, const float *up, unsigned int clipFlags );
+	void		(*GL_DrawParticles)( const vec3_t vieworg, const vec3_t fwd, const vec3_t rt, const vec3_t up, unsigned int clipFlags );
 	void		(*EnvShot)( const float *vieworg, const char *name, qboolean skyshot, int shotsize ); // creates a cubemap or skybox into gfx\env folder
 	int		(*COM_CompareFileTime)( const char *filename1, const char *filename2, int *iCompare );
 	void		(*Host_Error)( const char *error, ... ); // cause Host Error

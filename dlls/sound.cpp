@@ -1645,8 +1645,6 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 	float fvolbar;
 	char szbuffer[64];
 	const char *pTextureName;
-	float rgfl1[3];
-	float rgfl2[3];
 	const char *rgsz[4];
 	int cnt;
 	float fattn = ATTN_NORM;
@@ -1669,15 +1667,12 @@ float TEXTURETYPE_PlaySound(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int 
 		// find texture under strike, get material type
 		// copy trace vector into array for trace_texture
 
-		vecSrc.CopyToArray(rgfl1);
-		vecEnd.CopyToArray(rgfl2);
-
 		// get texture from entity or world (world is ent(0))
 
 		if (pEntity)
-			pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), rgfl1, rgfl2);
+			pTextureName = TRACE_TEXTURE(ENT(pEntity->pev), vecSrc, vecEnd);
 		else
-			pTextureName = TRACE_TEXTURE(ENT(0), rgfl1, rgfl2);
+			pTextureName = TRACE_TEXTURE(ENT(0), vecSrc, vecEnd);
 
 		if (pTextureName)
 		{

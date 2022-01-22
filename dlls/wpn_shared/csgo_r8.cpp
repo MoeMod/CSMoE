@@ -197,7 +197,7 @@ void CR8::R8Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim, BOOL 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 2, BULLET_PLAYER_50AE, GetDamage(fIsModeA), 0.81, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(0, ENT(m_pPlayer->pev), m_usFireR8, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, fIsModeA);
+	PLAYBACK_EVENT_FULL(0, ENT(m_pPlayer->pev), m_usFireR8, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, fIsModeA);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)

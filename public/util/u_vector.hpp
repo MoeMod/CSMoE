@@ -30,11 +30,6 @@ GNU General Public License for more details.
 
 #include "angledef.h"
 
-#ifndef CLIENT_DLL
-namespace sv {
-#else
-namespace cl {
-#endif
 namespace moe {
 
 template<class T, std::size_t N, class Seq, std::size_t Align>
@@ -44,6 +39,9 @@ template<class T, std::size_t N, std::size_t...I, std::size_t Align>
 struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 {
 	constexpr VectorBase_Gen() : m_data{}
+	{
+	}
+	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase_Gen((I, NAN)...)
 	{
 	}
 	constexpr explicit VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
@@ -101,6 +99,9 @@ struct VectorBase_Gen<T, 2, std::index_sequence<0, 1>, Align> : VectorBase2_Data
 	constexpr VectorBase_Gen(T x1, T y1) : VectorBase2_Data<T, Align>{x1, y1}
 	{
 	}
+	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase2_Data<T, Align>{ NAN, NAN }
+	{
+	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
 	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
@@ -151,6 +152,9 @@ struct alignas(Align) VectorBase_Gen<T, 3, std::index_sequence<0, 1, 2>, Align> 
 	{
 	}
 	constexpr VectorBase_Gen(T x1, T y1, T z1) : VectorBase3_Data<T, Align>{ x1, y1, z1 }
+	{
+	}
+	constexpr VectorBase_Gen(std::nullptr_t) : VectorBase3_Data<T, Align>{ NAN, NAN, NAN }
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
@@ -281,6 +285,11 @@ template<class VecType, std::size_t...I>
 inline VecType fma_impl(typename VecType::value_type x, VecType y, VecType z, std::index_sequence<I...>)
 {
 	return { moe_math_util::fma(x, y.template get<I>(), z.template get<I>())... };
+}
+template<class VecType, std::size_t...I>
+inline bool IsNaN_impl(VecType x, std::index_sequence<I...>)
+{
+	return (... || std::isnan(x.template get<I>()));
 }
 
 template<class VecType, std::size_t...I>
@@ -457,13 +466,13 @@ inline void LuaGet_impl(lua_State* L, int idx, VecType &vec, std::index_sequence
 		return DotProduct(v1.Make2D(), v2.Make2D());
 	}
 
-	constexpr bool IsNull() const
+	bool IsNaN() const
 	{
-		return LengthSquared() == T{};
+		return IsNaN_impl(*this, std::make_index_sequence<N>());
 	}
-	explicit constexpr operator bool()
+	explicit operator bool() const
 	{
-		return !IsNull();
+		return !IsNaN();
 	}
 	void LuaPush(lua_State* L) const
 	{
@@ -475,9 +484,54 @@ inline void LuaGet_impl(lua_State* L, int idx, VecType &vec, std::index_sequence
 	}
 };
 
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorAdd(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
+{
+	return out = a + b;
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorSubtract(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
+{
+	return out = a - b;
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorScale(VectorBase<T, N, Align> a, typename std::type_identity<T>::type b, VectorBase<T, N, Align> &out)
+{
+	return out = a * b;
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorClear(VectorBase<T, N, Align> &in)
+{
+	return in = {};
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorInverse(VectorBase<T, N, Align> &in)
+{
+	return in = -in;
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr T VectorLength(VectorBase<T, N, Align> in)
+{
+	return in.Length();
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr T Length(VectorBase<T, N, Align> in)
+{
+	return in.Length();
+}
+
+template<class T, std::size_t N, std::size_t Align> constexpr T Distance(VectorBase<T, N, Align> a,  VectorBase<T, N, Align> b)
+{
+	return (a - b).Length();
+}
+
 template<class T, std::size_t Align> constexpr VectorBase<T, 3, Align> CrossProduct(VectorBase<T, 3, Align> a, VectorBase<T, 3, Align> b)
 {
 	return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+}
+
+template<class T, std::size_t Align> constexpr void CrossProduct(VectorBase<T, 3, Align> a, VectorBase<T, 3, Align> b, VectorBase<T, 3, Align> &out)
+{
+	out = CrossProduct(a, b);
 }
 
 template<class T, std::size_t N, std::size_t Align> T AngleBetweenVectors(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b)
@@ -500,14 +554,14 @@ template<class T, std::size_t N, std::size_t Align> constexpr VectorBase<T, N, A
 	return out = in;
 }
 
-template<class T, std::size_t N, std::size_t Align> inline VectorBase<T, N, Align> &VectorMA(VectorBase<T, N, Align> a, T scale, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
+template<class T, std::size_t N, std::size_t Align> inline void VectorMA(VectorBase<T, N, Align> a, typename std::type_identity<T>::type scale, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
-	return out = fma(b, scale, a);
+	out = fma(b, scale, a);
 }
 
-template<class T, std::size_t N, std::size_t Align> inline VectorBase<T, N, Align> &VectorMA(T scale, VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
+template<class T, std::size_t N, std::size_t Align> inline void VectorMA(T scale, VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
-	return out = fma(scale, a, b);
+	out = fma(scale, a, b);
 }
 	
 template<class T, std::size_t Align> void AngleVectors(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
@@ -521,6 +575,19 @@ template<class T, std::size_t Align> void AngleVectors(VectorBase<T, 3, Align> a
 	forward = { cp * cy, cp * sy, -sp };
 	right = { (-sr * sp * cy + -cr * -sy), (-sr * sp * sy + -cr * cy), (-sr * cp) };
 	up = { (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp) };
+}
+
+template<class T, std::size_t Align> void AngleVectorsTranspose(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
+{
+	auto sp = sin(DEG2RAD(angles[PITCH]));
+	auto sy = sin(DEG2RAD(angles[YAW]));
+	auto sr = sin(DEG2RAD(angles[ROLL]));
+	auto cp = cos(DEG2RAD(angles[PITCH]));
+	auto cy = cos(DEG2RAD(angles[YAW]));
+	auto cr = cos(DEG2RAD(angles[ROLL]));
+	forward = { cp * cy, sr * sp * cy + cr * -sy, cr * sp * cy + -sr * -sy };
+	right = { cp * sy, ( sr * sp * sy + cr * cy ), ( cr * sp * sy + -sr * cy ) };
+	up = { -sp, sr * cp, cr * cp };
 }
 
 template<class T, std::size_t Align> void VectorAngles(VectorBase<T, 3, Align> forward, VectorBase<T, 3, Align>& angles)
@@ -538,7 +605,7 @@ template<class T, std::size_t Align> void VectorAngles(VectorBase<T, 3, Align> f
 		angles[YAW] = RAD2DEG(atan2(forward.y, forward.x));
 		if (angles[YAW] < 0) angles[YAW] += 360;
 
-		float tmp = hypot(forward.x, forward.y);
+		auto tmp = hypot(forward.x, forward.y);
 		angles[PITCH] = RAD2DEG(atan2(forward.z, tmp));
 		if (angles[PITCH] < 0) angles[PITCH] += 360;
 	}
@@ -547,16 +614,10 @@ template<class T, std::size_t Align> void VectorAngles(VectorBase<T, 3, Align> f
 }
 
 }
-}
 
 namespace std {
-#ifndef CLIENT_DLL
-template<class T, std::size_t N, std::size_t Align> class tuple_size<::sv::moe::VectorBase<T, N, Align>> : public std::integral_constant<std::size_t, N> {};
-template<class T, std::size_t N, std::size_t I, std::size_t Align> class tuple_element<I, ::sv::moe::VectorBase<T, N, Align>> { public: using type = T; };
-#else
-template<class T, std::size_t N, std::size_t Align> class tuple_size<::cl::moe::VectorBase<T, N, Align>> : public std::integral_constant<std::size_t, N> {};
-template<class T, std::size_t N, std::size_t I, std::size_t Align> class tuple_element<I, ::cl::moe::VectorBase<T, N, Align>> { public: using type = T; };
-#endif
+template<class T, std::size_t N, std::size_t Align> class tuple_size<moe::VectorBase<T, N, Align>> : public std::integral_constant<std::size_t, N> {};
+template<class T, std::size_t N, std::size_t I, std::size_t Align> class tuple_element<I, moe::VectorBase<T, N, Align>> { public: using type = T; };
 }
 
 #endif //PROJECT_U_VECTOR_HPP

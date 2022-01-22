@@ -961,11 +961,11 @@ void CL_DrawCrosshair( void )
 	if( !VectorIsNull( cl.refdef.crosshairangle ))
 	{
 		vec3_t	angles;
-		vec3_t	forward;
+		vec3_t	forward, right, up;
 		vec3_t	point, screen;
 
 		VectorAdd( cl.refdef.viewangles, cl.refdef.crosshairangle, angles );
-		AngleVectors( angles, forward, NULL, NULL );
+		AngleVectors( angles, forward, right, up );
 		VectorAdd( cl.refdef.vieworg, forward, point );
 		R_WorldToScreen( point, screen );
 
@@ -1985,7 +1985,7 @@ pfnGetViewAngles
 return interpolated angles from previous frame
 =============
 */
-static void GAME_EXPORT pfnGetViewAngles( float *angles )
+static void GAME_EXPORT pfnGetViewAngles( vec3_t_ref angles )
 {
 	if( angles ) VectorCopy( cl.refdef.cl_viewangles, angles );
 }
@@ -1997,7 +1997,7 @@ pfnSetViewAngles
 return interpolated angles from previous frame
 =============
 */
-static void GAME_EXPORT pfnSetViewAngles( float *angles )
+static void GAME_EXPORT pfnSetViewAngles( const vec3_t angles )
 {
 	if( angles ) VectorCopy( angles, cl.refdef.cl_viewangles );
 }
@@ -2175,7 +2175,7 @@ pfnApplyShake
 
 =============
 */
-static void GAME_EXPORT pfnApplyShake( float *origin, float *angles, float factor )
+static void GAME_EXPORT pfnApplyShake( vec3_t_ref origin, vec3_t_ref angles, float factor )
 {
 	if( origin ) VectorMA( origin, factor, clgame.shake.applied_offset, origin );
 	if( angles ) angles[ROLL] += clgame.shake.applied_angle * factor;
@@ -2199,7 +2199,7 @@ pfnPointContents
 
 =============
 */
-static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
+static int GAME_EXPORT pfnPointContents( const vec3_t p, int *truecontents )
 {
 	int	cont, truecont;
 
@@ -2217,7 +2217,7 @@ pfnTraceLine
 
 =============
 */
-static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags, int usehull, int ignore_pe )
+static pmtrace_t *GAME_EXPORT pfnTraceLine( const vec3_t start, const vec3_t end, int flags, int usehull, int ignore_pe )
 {
 	static pmtrace_t	tr;
 	int		old_usehull;
@@ -2240,7 +2240,7 @@ static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags,
 	return &tr;
 }
 
-static void GAME_EXPORT pfnPlaySoundByNameAtLocation( const char *szSound, float volume, float *origin )
+static void GAME_EXPORT pfnPlaySoundByNameAtLocation( const char *szSound, float volume, const vec3_t origin )
 {
 	int hSound = S_RegisterSound( szSound );
 	S_StartSound( origin, 0, CHAN_ITEM, hSound, volume, 1.0, PITCH_NORM, 0 );
@@ -2337,7 +2337,7 @@ pfnPlaySound
 
 =============
 */
-static void GAME_EXPORT pfnPlaySound( int ent, float *org, int chan, const char *samp, float vol, float attn, int flags, int pitch )
+static void GAME_EXPORT pfnPlaySound( int ent, const vec3_t org, int chan, const char *samp, float vol, float attn, int flags, int pitch )
 {
 	S_StartSound( org, ent, chan, S_RegisterSound( samp ), vol, attn, pitch, flags );
 }
@@ -2399,7 +2399,7 @@ pfnLocalPlayerViewheight
 
 =============
 */
-static void GAME_EXPORT pfnLocalPlayerViewheight( float *view_ofs )
+static void GAME_EXPORT pfnLocalPlayerViewheight( vec3_t_ref view_ofs )
 {
 	// predicted or smoothed
 	if( !view_ofs ) return;
@@ -2415,7 +2415,7 @@ pfnLocalPlayerBounds
 
 =============
 */
-static void GAME_EXPORT pfnLocalPlayerBounds( int hull, float *mins, float *maxs )
+static void GAME_EXPORT pfnLocalPlayerBounds( int hull, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	if( hull >= 0 && hull < 4 )
 	{
@@ -2476,7 +2476,7 @@ pfnPlayerTrace
 
 =============
 */
-void GAME_EXPORT CL_PlayerTrace( float *start, float *end, int traceFlags, int ignore_pe, pmtrace_t *tr )
+void GAME_EXPORT CL_PlayerTrace( const vec3_t start, const vec3_t end, int traceFlags, int ignore_pe, pmtrace_t *tr )
 {
 	if( !tr ) return;
 	*tr = PM_PlayerTraceExt( clgame.pmove, start, end, traceFlags, clgame.pmove->numphysent, clgame.pmove->physents, ignore_pe, NULL );
@@ -2489,7 +2489,7 @@ pfnPlayerTraceExt
 
 =============
 */
-void GAME_EXPORT CL_PlayerTraceExt( float *start, float *end, int traceFlags, int (*pfnIgnore)( physent_t *pe ), pmtrace_t *tr )
+void GAME_EXPORT CL_PlayerTraceExt( const vec3_t start, const vec3_t end, int traceFlags, int (*pfnIgnore)( physent_t *pe ), pmtrace_t *tr )
 {
 	if( !tr ) return;
 	*tr = PM_PlayerTraceExt( clgame.pmove, start, end, traceFlags, clgame.pmove->numphysent, clgame.pmove->physents, -1, pfnIgnore );
@@ -2502,7 +2502,7 @@ pfnTraceTexture
 
 =============
 */
-static const char *GAME_EXPORT pfnTraceTexture( int ground, float *vstart, float *vend )
+static const char *GAME_EXPORT pfnTraceTexture( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -2519,7 +2519,7 @@ pfnTraceSurface
 
 =============
 */
-static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, float *vstart, float *vend )
+static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -3258,9 +3258,9 @@ TriVertex3fv
 
 =============
 */
-void GAME_EXPORT TriVertex3fv( const float *v )
+void GAME_EXPORT TriVertex3fv( const vec3_t v )
 {
-	pglVertex3fv( v );
+	pglVertex3fv( (const float *)v );
 }
 
 /*
@@ -3353,7 +3353,7 @@ TriWorldToScreen
 convert world coordinates (x,y,z) into screen (x, y)
 =============
 */
-int TriWorldToScreen( float *world, float *screen )
+int TriWorldToScreen( const vec3_t world, vec3_t_ref screen )
 {
 	int	retval;
 
@@ -3374,7 +3374,7 @@ TriFog
 enables global fog on the level
 =============
 */
-void GAME_EXPORT TriFog( float flFogColor[3], float flStart, float flEnd, int bOn )
+void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, int bOn )
 {
 	if( RI.fogEnabled || !gl_fog->integer ) return;
 	RI.fogCustom = true;
@@ -3402,7 +3402,7 @@ void GAME_EXPORT TriFog( float flFogColor[3], float flStart, float flEnd, int bO
 	pglFogi(GL_FOG_MODE, GL_EXP);
 	pglFogf(GL_FOG_DENSITY, RI.fogDensity);
 #endif
-	pglFogfv(GL_FOG_COLOR, RI.fogColor);
+	pglFogfv(GL_FOG_COLOR, (float *)RI.fogColor);
 	pglHint(GL_FOG_HINT, GL_NICEST);
 }
 
@@ -3425,7 +3425,7 @@ TriBoxInPVS
 check box in pvs (absmin, absmax)
 =============
 */
-int GAME_EXPORT TriBoxInPVS( float *mins, float *maxs )
+int GAME_EXPORT TriBoxInPVS( const vec3_t mins, const vec3_t maxs )
 {
 	return Mod_BoxVisible( mins, maxs, Mod_GetCurrentVis( ));
 }
@@ -3437,7 +3437,7 @@ TriLightAtPoint
 NOTE: dlights are ignored
 =============
 */
-void GAME_EXPORT TriLightAtPoint( float *pos, float *value )
+void GAME_EXPORT TriLightAtPoint( const vec3_t pos, float *value )
 {
 	color24	ambient;
 

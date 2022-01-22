@@ -573,7 +573,7 @@ qboolean VID_ScreenShot( const char *filename, int shot_type )
 VID_CubemapShot
 =================
 */
-qboolean VID_CubemapShot( const char *base, uint size, const float *vieworg, qboolean skyshot )
+qboolean VID_CubemapShot( const char *base, uint size, vec3_t_ref vieworg, qboolean skyshot )
 {
 	byte		*temp = NULL;
 	byte		*buffer = NULL;

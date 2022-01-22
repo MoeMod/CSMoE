@@ -42,12 +42,12 @@ public:
 	virtual float StudioEstimateInterpolant(void);
 	virtual float StudioEstimateFrame(mstudioseqdesc_t *pseqdesc);
 	virtual void StudioFxTransform(cl_entity_t *ent, float transform[3][4]);
-	virtual void StudioSlerpBones(vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s);
+	virtual void StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s);
 	virtual void StudioCalcBoneAdj(float dadt, float *adj, const byte *pcontroller1, const byte *pcontroller2, byte mouthopen);
 	virtual void StudioCalcBoneQuaterion(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *q);
-	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos);
-	virtual void StudioCalcRotations(float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
-	virtual void StudioRenderModel(float *lightdir);
+	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos);
+	virtual void StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
+	virtual void StudioRenderModel(const vec3_t lightdir);
 	virtual void StudioRenderFinal(void);
 	virtual void StudioRenderFinal_Software(void);
 	virtual void StudioRenderFinal_Hardware(void);

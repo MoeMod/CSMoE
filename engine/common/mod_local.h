@@ -105,7 +105,7 @@ void Mod_Shutdown( void );
 void Mod_ClearUserData( void );
 void Mod_PrintBSPFileSizes( void );
 void Mod_SetupHulls( vec3_t mins[MAX_MAP_HULLS], vec3_t maxs[MAX_MAP_HULLS] );
-void Mod_GetBounds( int handle, vec3_t mins, vec3_t maxs );
+void Mod_GetBounds( int handle, vec3_t_ref mins, vec3_t_ref maxs );
 void Mod_GetFrames( int handle, int *numFrames );
 void Mod_LoadWorld( const char *name, uint *checksum, qboolean multiplayer );
 void Mod_FreeUnused( void );

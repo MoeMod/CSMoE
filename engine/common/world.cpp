@@ -82,7 +82,7 @@ void InsertLinkBefore( link_t *l, link_t *before )
 World_MoveBounds
 ==================
 */
-void World_MoveBounds( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, vec3_t boxmins, vec3_t boxmaxs )
+void World_MoveBounds( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, vec3_t_ref boxmins, vec3_t_ref boxmaxs )
 {
 	int	i;
 	
@@ -123,7 +123,7 @@ trace_t World_CombineTraces( trace_t *cliptrace, trace_t *trace, edict_t *touch 
 World_TransformAABB
 ==================
 */
-void World_TransformAABB( matrix4x4 transform, const vec3_t mins, const vec3_t maxs, vec3_t outmins, vec3_t outmaxs )
+void World_TransformAABB( matrix4x4 transform, const vec3_t mins, const vec3_t maxs, vec3_t_ref outmins, vec3_t_ref outmaxs )
 {
 	vec3_t	p1, p2;
 	matrix4x4	itransform;

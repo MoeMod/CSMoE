@@ -112,7 +112,7 @@ void CKnifeDragon::WeaponAnimation(int iAnimation)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usKnife, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, iAnimation, 2, 3, 4);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usKnife, 0, g_vecZero, g_vecZero, 0, 0, iAnimation, 2, 3, 4);
 }
 
 

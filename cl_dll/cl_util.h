@@ -135,7 +135,6 @@ template<class VectorTypeA> auto VectorLength(const VectorTypeA &a) -> decltype(
 template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorTypeC> void VectorMA(const VectorTypeA &a, ScaleType scale, const VectorTypeB &b, VectorTypeC &c) { ((c)[0] = (a)[0] + (scale) * (b)[0], (c)[1] = (a)[1] + (scale) * (b)[1], (c)[2] = (a)[2] + (scale) * (b)[2]); }
 template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
 template<class VectorTypeA> void VectorInverse(VectorTypeA &x) { ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2]); }
-template<class VectorTypeA> void AngleVectors( const VectorTypeA &vecAngles, float *forward, float *right, float *up ) { return gEngfuncs.pfnAngleVectors(vecAngles, forward, right, up); }
 
 namespace cl{
 	// const vec3_t ==untypedef=> float (const [3]) ==decay=> float *		NOT const float * !!!
@@ -159,7 +158,7 @@ inline HSPRITE LoadSprite(const char *pszName)
 	return SPR_Load(sz);
 }
 
-extern vec3_t g_ColorRed, g_ColorBlue, g_ColorYellow, g_ColorGrey;
+extern float g_ColorRed[3], g_ColorBlue[3], g_ColorYellow[3], g_ColorGrey[3];
 
 inline void GetTeamColor( int &r, int &g, int &b, int teamIndex )
 {

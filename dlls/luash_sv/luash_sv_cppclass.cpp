@@ -26,7 +26,6 @@ namespace cl {
 
 #define CLASS_BEGIN(ClassName, BaseClassName) { \
 		using ThisClass = ClassName; \
-		using BaseClass = BaseClassName; \
 		constexpr const char* CurrentClassName = #ClassName; \
 		lua_getglobal(L, "class"); \
 		lua_pushstring(L, #ClassName); \

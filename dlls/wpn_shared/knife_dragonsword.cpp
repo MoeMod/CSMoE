@@ -205,7 +205,7 @@ namespace sv {
 		}
 		}
 #endif
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 2, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 2, FALSE, FALSE);
 
 		SetThink(nullptr);
 
@@ -253,7 +253,7 @@ namespace sv {
 		}
 #endif
 		if(iAnim != 2)
-			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 12, 0, FALSE, FALSE);
 
 
 		SetThink(nullptr);

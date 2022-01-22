@@ -264,8 +264,8 @@ void CFuncVehicle::StopSound()
 		unsigned short us_sound = ((unsigned short) m_sounds & 0x0007) << 12;
 		unsigned short us_encode = us_sound;
 
-		PLAYBACK_EVENT_FULL(FEV_RELIABLE | FEV_UPDATE, edict(), m_usAdjustPitch, 0, (float *) &g_vecZero,
-		                    (float *) &g_vecZero, 0, 0, us_encode, 0, 1, 0);
+		PLAYBACK_EVENT_FULL(FEV_RELIABLE | FEV_UPDATE, edict(), m_usAdjustPitch, 0, g_vecZero,
+		                    g_vecZero, 0, 0, us_encode, 0, 1, 0);
 	}
 
 	m_soundPlaying = 0;
@@ -296,7 +296,7 @@ void CFuncVehicle::UpdateSound()
 		unsigned short us_volume = ((unsigned short) (m_flVolume * 40) & 0x003F);
 		unsigned short us_encode = us_sound | us_pitch | us_volume;
 
-		PLAYBACK_EVENT_FULL(FEV_UPDATE, edict(), m_usAdjustPitch, 0.0, (float *) &g_vecZero, (float *) &g_vecZero, 0.0,
+		PLAYBACK_EVENT_FULL(FEV_UPDATE, edict(), m_usAdjustPitch, 0.0, g_vecZero, g_vecZero, 0.0,
 		                    0.0, us_encode, 0, 0, 0);
 	}
 }

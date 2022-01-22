@@ -254,8 +254,8 @@ namespace cl {
 namespace sv {
 #endif
 
-inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
-inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT( int flags, const edict_t *who, unsigned short index ) { return PLAYBACK_EVENT_FULL(flags, who, index, 0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
+inline void	PLAYBACK_EVENT_DELAY( int flags, const edict_t *who, unsigned short index, float delay ) { return PLAYBACK_EVENT_FULL(flags, who, index, delay, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 0); }
 
 inline void MAKE_STRING_CLASS(const char *str, entvars_t *pev)
 {
@@ -324,7 +324,7 @@ inline edict_t *INDEXENT(int iEdictNum)
 	return (*g_engfuncs.pfnPEntityOfEntIndex)(iEdictNum);
 }
 
-inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const float *pOrigin, entvars_t *ent)
+inline void MESSAGE_BEGIN(int msg_dest, int msg_type, const vec3_t pOrigin, entvars_t *ent)
 {
 	MESSAGE_BEGIN(msg_dest, msg_type, pOrigin, ENT(ent));
 }
@@ -363,7 +363,7 @@ inline BOOL FClassnameIs(edict_t *pent, const char *szClassname)
 	return FStrEq(STRING(VARS(pent)->classname), szClassname);
 }
 
-inline void UTIL_MakeVectorsPrivate(Vector vecAngles, float *p_vForward, float *p_vRight, float *p_vUp)
+inline void UTIL_MakeVectorsPrivate(Vector vecAngles, vec3_t_ref p_vForward, vec3_t_ref p_vRight, vec3_t_ref p_vUp)
 {
 	g_engfuncs.pfnAngleVectors(vecAngles, p_vForward, p_vRight, p_vUp);
 }

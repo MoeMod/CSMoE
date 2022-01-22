@@ -102,7 +102,7 @@ void CChainsaw::SecondaryAttack(void)
 	int iAnim = RANDOM_LONG(0, 1);
 	hit_result_t iCallBack = KnifeAttack1(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), CHAINSAW_DISTANCE_B, CHAINSAW_SLASH_ANGLE, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, iAnim == 1);
 	m_pPlayer->SetAnimation(PLAYER_ATTACK2);
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, CHAINSAW_DISTANCE_B, float(iAnim), iAnim, 2, iCallBack == HIT_PLAYER, m_iClip > 0);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, g_vecZero, g_vecZero, CHAINSAW_DISTANCE_B, float(iAnim), iAnim, 2, iCallBack == HIT_PLAYER, m_iClip > 0);
 	pev->iuser3 = iAnim;
 #endif
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.15s;
@@ -145,7 +145,7 @@ void CChainsaw::ItemPostFrame(void)
 					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.53s;
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.53s;
 					pev->iuser1 = 1;
-					PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0, (float *)&g_vecZero, (float *)&g_vecZero, CHAINSAW_DISTANCE_A, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, FALSE);
+					PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0, g_vecZero, g_vecZero, CHAINSAW_DISTANCE_A, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_iClip != 0, FALSE);
 					return CBasePlayerWeapon::ItemPostFrame();
 				}
 				case 1:
@@ -184,7 +184,7 @@ void CChainsaw::ItemPostFrame(void)
 
 
 				#ifndef CLIENT_DLL
-					PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, CHAINSAW_DISTANCE_A, 0.0, 0, 0, iCallBack != HIT_NONE, TRUE);
+					PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireChainsaw, 0.0, g_vecZero, g_vecZero, CHAINSAW_DISTANCE_A, 0.0, 0, 0, iCallBack != HIT_NONE, TRUE);
 					/*MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, m_pPlayer->pev);
 					WRITE_SHORT((1 << 12) * 5);
 					WRITE_SHORT(1);
@@ -382,7 +382,7 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 
 
 				
-				PLAYBACK_EVENT_FULL(0, ENT(pEntity->pev), m_usFireChainsaw, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 1, iAnim, m_iClip > 0);
+				PLAYBACK_EVENT_FULL(0, ENT(pEntity->pev), m_usFireChainsaw, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 1, iAnim, m_iClip > 0);
 
 				if (!pEntity->IsPlayer())
 					continue;

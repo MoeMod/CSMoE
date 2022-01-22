@@ -128,7 +128,7 @@ void CSawedoff::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSawedoff, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, 0, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSawedoff, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, FALSE, FALSE);
 
 	if (m_iClip)
 		m_flPumpTime = UTIL_WeaponTimeBase() + 0.5s;

@@ -22,9 +22,9 @@ GNU General Public License for more details.
 typedef struct moveclip_s
 {
 	vec3_t		boxmins, boxmaxs;	// enclose the test object along entire move
-	float		*mins, *maxs;	// size of the moving object
+	vec3_t		mins, maxs;	// size of the moving object
 	vec3_t		mins2, maxs2;	// size when clipping against mosnters
-	const float	*start, *end;
+	vec3_t      start, end;
 	edict_t		*passedict;
 	trace_t		trace;
 	int		type;		// move type
@@ -134,7 +134,7 @@ SV_HullAutoSelect
 select the apropriate hull automatically
 ==================
 */
-hull_t *SV_HullAutoSelect( model_t *model, const vec3_t mins, const vec3_t maxs, const vec3_t size, vec3_t offset )
+hull_t *SV_HullAutoSelect( model_t *model, const vec3_t mins, const vec3_t maxs, const vec3_t size, vec3_t_ref offset )
 {
 	float	curdiff;
 	float	lastdiff = 999;
@@ -172,7 +172,7 @@ SV_HullForBsp
 forcing to select BSP hull
 ==================
 */
-hull_t *SV_HullForBsp( edict_t *ent, const vec3_t mins, const vec3_t maxs, float *offset )
+hull_t *SV_HullForBsp( edict_t *ent, const vec3_t mins, const vec3_t maxs, vec3_t_ref offset )
 {
 	hull_t		*hull;
 	model_t		*model;
@@ -245,7 +245,7 @@ Offset is filled in to contain the adjustment that must be added to the
 testing object's origin to get a point to use with the returned hull.
 ================
 */
-hull_t *SV_HullForEntity( edict_t *ent, vec3_t mins, vec3_t maxs, vec3_t offset )
+hull_t *SV_HullForEntity( edict_t *ent, const vec3_t mins, const vec3_t maxs, vec3_t_ref offset )
 {
 	hull_t	*hull;
 	vec3_t	hullmins, hullmaxs;
@@ -277,7 +277,7 @@ SV_HullForStudioModel
 
 ====================
 */
-hull_t *SV_HullForStudioModel( edict_t *ent, vec3_t mins, vec3_t maxs, vec3_t offset, int *numhitboxes )
+hull_t *SV_HullForStudioModel( edict_t *ent, const vec3_t mins, const vec3_t maxs, vec3_t_ref offset, int *numhitboxes )
 {
 	int		isPointTrace;
 	float		scale = 0.5f;
@@ -371,7 +371,7 @@ SV_CreateAreaNode
 builds a uniformly subdivided tree for the given world size
 ===============
 */
-areanode_t *SV_CreateAreaNode( int depth, vec3_t mins, vec3_t maxs )
+areanode_t *SV_CreateAreaNode( int depth, const vec3_t mins, const vec3_t maxs )
 {
 	areanode_t	*anode;
 	vec3_t		size;
@@ -700,8 +700,6 @@ void SV_WaterLinks( const vec3_t origin, int *pCont, areanode_t *node )
 	vec3_t	test, offset;
 	model_t	*mod;
 
-	Q_memset( offset, 0, 3 * sizeof( float ) );
-
 	// get water edicts
 	for( l = node->water_edicts.next; l != &node->water_edicts; l = next )
 	{
@@ -861,7 +859,7 @@ SV_RecursiveHullCheck
 
 ==================
 */
-qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace )
+qboolean SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, const vec3_t p1, const vec3_t p2, trace_t *trace )
 {
 	dclipnode_t	*node;
 	mplane_t		*plane;
@@ -991,7 +989,7 @@ Handles selection or creation of a clipping hull, and offseting (and
 eventually rotation) of the end points
 ==================
 */
-void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace )
+void SV_ClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace )
 {
 	hull_t	*hull = NULL;
 	model_t	*model;
@@ -1133,7 +1131,7 @@ A part of physics engine implementation
 or custom physics implementation
 ==================
 */
-void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, trace_t *trace )
+void SV_CustomClipMoveToEntity( edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, trace_t *trace )
 {
 	Q_memset( trace, 0, sizeof( trace_t ));
 	VectorCopy( end, trace->endpos );
@@ -1312,7 +1310,7 @@ void SV_ClipToWorldBrush( areanode_t *node, moveclip_t *clip )
 SV_Move
 ==================
 */
-trace_t SV_Move( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e )
+trace_t SV_Move( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int type, edict_t *e )
 {
 	moveclip_t	clip;
 	vec3_t		trace_endpos;
@@ -1362,7 +1360,7 @@ trace_t SV_Move( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end,
 SV_MoveNoEnts
 ==================
 */
-trace_t SV_MoveNoEnts( const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int type, edict_t *e )
+trace_t SV_MoveNoEnts( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int type, edict_t *e )
 {
 	moveclip_t	clip;
 	vec3_t		trace_endpos;

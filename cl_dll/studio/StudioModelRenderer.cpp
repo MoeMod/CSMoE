@@ -243,7 +243,7 @@ void CStudioModelRenderer::StudioCalcBoneQuaterion(int frame, float s, mstudiobo
 	}
 }
 
-void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, float *pos)
+void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos)
 {
 	int j, k;
 	mstudioanimvalue_t *panimvalue;
@@ -290,7 +290,7 @@ void CStudioModelRenderer::StudioCalcBonePosition(int frame, float s, mstudiobon
 	}
 }
 
-void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s)
+void CStudioModelRenderer::StudioSlerpBones(vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s)
 {
 	int i;
 	vec4_t q3;
@@ -468,7 +468,7 @@ float CStudioModelRenderer::StudioEstimateInterpolant(void)
 	return dadt;
 }
 
-void CStudioModelRenderer::StudioCalcRotations(float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f)
+void CStudioModelRenderer::StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f)
 {
 	int i;
 	int frame;
@@ -616,15 +616,15 @@ void CStudioModelRenderer::StudioSetupBones(void)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
+	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
 	float bonematrix[3][4];
 
-	static float pos2[MAXSTUDIOBONES][3];
+	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
-	static float pos3[MAXSTUDIOBONES][3];
+	static vec3_t pos3[MAXSTUDIOBONES];
 	static vec4_t q3[MAXSTUDIOBONES];
-	static float pos4[MAXSTUDIOBONES][3];
+	static vec3_t pos4[MAXSTUDIOBONES];
 	static vec4_t q4[MAXSTUDIOBONES];
 
 	if (m_pCurrentEntity->curstate.sequence >= m_pStudioHeader->numseq)
@@ -668,7 +668,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 
 	if (m_fDoInterp && m_pCurrentEntity->latched.sequencetime && (m_pCurrentEntity->latched.sequencetime + 0.2 > m_clTime) && (m_pCurrentEntity->latched.prevsequence < m_pStudioHeader->numseq))
 	{
-		static float pos1b[MAXSTUDIOBONES][3];
+		static vec3_t pos1b[MAXSTUDIOBONES];
 		static vec4_t q1b[MAXSTUDIOBONES];
 		float s;
 
@@ -723,7 +723,7 @@ void CStudioModelRenderer::StudioSetupBones(void)
 			if (strcmp(pbones[i].name, "Bip01 Spine") == 0)
 				break;
 
-			memcpy(pos[i], pos2[i], sizeof( pos[i]));
+			pos[i] = pos2[i];
 			memcpy(q[i], q2[i], sizeof( q[i]));
 		}
 	}
@@ -801,7 +801,7 @@ void CStudioModelRenderer::StudioMergeBones(model_t *m_pSubModel)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
+	static vec3_t pos[MAXSTUDIOBONES];
 	float bonematrix[3][4];
 	static vec4_t q[MAXSTUDIOBONES];
 
@@ -970,7 +970,7 @@ int CStudioModelRenderer::StudioDrawModel(int flags)
 	{
 		alight_t lighting;
 		vec3_t dir;
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 
@@ -1229,7 +1229,7 @@ int CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t *pplayer)
 
 		alight_t lighting;
 		vec3_t dir;
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 		IEngineStudio.StudioEntityLight(&lighting);
@@ -1295,7 +1295,7 @@ void CStudioModelRenderer::StudioCalcAttachments(void)
 		VectorTransform(pattachment[i].org, (*m_plighttransform)[pattachment[i].bone], m_pCurrentEntity->attachment[i]);
 }
 
-void CStudioModelRenderer::StudioRenderModel(float *lightdir)
+void CStudioModelRenderer::StudioRenderModel(const vec3_t lightdir)
 {
 	IEngineStudio.SetChromeOrigin();
 
@@ -1469,7 +1469,7 @@ void CStudioModelRenderer::StudioDrawShadow( Vector origin, float scale )
 	p4.y = pmtrace.endpos.y - pmtrace.plane.normal.z;
 	p4.z = pmtrace.endpos.z + 2.0f + pmtrace.plane.normal.x + pmtrace.plane.normal.y;
 
-	IEngineStudio.StudioRenderShadow( m_iShadowSprite, p1, p2, p3, p4 );
+	IEngineStudio.StudioRenderShadow( m_iShadowSprite, (float *)p1, (float *)p2, (float *)p3, (float *)p4 );
 }
 
 }

@@ -384,7 +384,7 @@ void CY21s1Jetgunmd::ItemPostFrame()
 				flags = 0;
 #endif
 
-				PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireY21s1Jetgunmd, 0, (float*)&g_vecZero, (float*)&g_vecZero, 2, 0, 2, 0, FALSE, FALSE);
+				PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireY21s1Jetgunmd, 0, g_vecZero, g_vecZero, 2, 0, 2, 0, FALSE, FALSE);
 
 				return CBasePlayerWeapon::ItemPostFrame();
 			}

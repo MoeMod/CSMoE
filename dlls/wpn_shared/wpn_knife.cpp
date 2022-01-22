@@ -125,14 +125,14 @@ void CKnife::WeaponAnimation(int iAnimation)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usKnife, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0, 0, iAnimation, 2, 3, 4);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usKnife, 0, g_vecZero, g_vecZero, 0, 0, iAnimation, 2, 3, 4);
 }
 
-void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const float *pflMins, const float *pfkMaxs, edict_t *pEntity)
+void FindHullIntersection(const Vector &vecSrc, TraceResult &tr, const vec3_t pflMins, const vec3_t pfkMaxs, edict_t *pEntity)
 {
 	TraceResult trTemp;
 	float flDistance = 1000000;
-	const float *pflMinMaxs[2] = { pflMins, pfkMaxs };
+	const vec3_t pflMinMaxs[2] = { pflMins, pfkMaxs };
 	Vector vecHullEnd = tr.vecEndPos;
 
 	vecHullEnd = vecSrc + ((vecHullEnd - vecSrc) * 2);
