@@ -18,6 +18,9 @@ GNU General Public License for more details.
 #ifndef _WIN32
 #include <dirent.h>
 #endif
+
+#include <openssl/md5.h>
+
 static char id_md5[33];
 static char id_customid[MAX_STRING];
 
@@ -611,7 +614,7 @@ void GAME_EXPORT ID_SetCustomClientID( const char *id )
 
 void ID_Init( void )
 {
-	MD5Context_t hash = {0};
+	MD5_CTX hash = {0};
 	byte md5[16];
 	int i;
 
@@ -678,9 +681,9 @@ void ID_Init( void )
 	if( !id )
 		id = ID_GenerateRawId();
 
-	MD5Init( &hash );
-	MD5Update( &hash, (byte *)&id, sizeof( id ) );
-	MD5Final( (byte*)md5, &hash );
+	MD5_Init( &hash );
+	MD5_Update( &hash, (byte *)&id, sizeof( id ) );
+	MD5_Final( (byte*)md5, &hash );
 
 	for( i = 0; i < 16; i++ )
 		Q_sprintf( &id_md5[i*2], "%02hhx", md5[i] );

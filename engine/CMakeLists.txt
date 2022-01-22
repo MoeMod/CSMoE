@@ -469,7 +469,7 @@ if(XASH_CPUINFO)
 	target_link_libraries(${XASH_ENGINE} PRIVATE cpuinfo_3p)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

@@ -16,6 +16,8 @@ GNU General Public License for more details.
 #include "common.h"
 #include "filesystem.h"
 
+#include <openssl/md5.h>
+
 convar_t		*hpk_maxsize;
 hpak_t		*hpak_queue = NULL;
 hpak_header_t	hash_pack_header;
@@ -78,7 +80,7 @@ void HPAK_CreatePak( const char *filename, resource_t *DirEnt, byte *data, file_
 	string		pakname;
 	char		md5[16];
 	char		*temp;
-	MD5Context_t	MD5_Hash;
+	MD5_CTX	MD5_Hash;
 	file_t		*fout;
 
 	if( !filename || !filename[0] )
@@ -106,8 +108,7 @@ void HPAK_CreatePak( const char *filename, resource_t *DirEnt, byte *data, file_
 	}
 
 	// let's hash it.
-	Q_memset( &MD5_Hash, 0, sizeof( MD5Context_t ));
-	MD5Init( &MD5_Hash );
+	MD5_Init( &MD5_Hash );
 
 	if( data == NULL )
 	{
@@ -117,15 +118,15 @@ void HPAK_CreatePak( const char *filename, resource_t *DirEnt, byte *data, file_
 		FS_Read( f, temp, DirEnt->nDownloadSize );
 		FS_Seek( f, filelocation, SEEK_SET );
 
-		MD5Update( &MD5_Hash, (byte *)temp, DirEnt->nDownloadSize );
+		MD5_Update( &MD5_Hash, (byte *)temp, DirEnt->nDownloadSize );
 		Mem_Free( temp );
 	}
 	else
 	{
-		MD5Update( &MD5_Hash, data, DirEnt->nDownloadSize );
+		MD5_Update( &MD5_Hash, data, DirEnt->nDownloadSize );
 	}
 
-	MD5Final( (byte *)md5, &MD5_Hash );
+	MD5_Final( (byte *)md5, &MD5_Hash );
 
 	if( Q_memcmp( md5, DirEnt->rgucMD5_hash, 16 ))
 	{
@@ -188,7 +189,7 @@ void HPAK_AddLump( qboolean add_to_queue, const char *name, resource_t *DirEnt, 
 	int		i, position, length;
 	string		pakname1, pakname2;
 	char		md5[16];
-	MD5Context_t	MD5_Hash;
+	MD5_CTX	MD5_Hash;
 	hpak_container_t	hpak1, hpak2;
 	file_t		*f1, *f2;
 	hpak_dir_t	*dirs;
@@ -219,8 +220,7 @@ void HPAK_AddLump( qboolean add_to_queue, const char *name, resource_t *DirEnt, 
 	}
 
 	// hash it
-	Q_memset( &MD5_Hash, 0, sizeof( MD5Context_t ));
-	MD5Init( &MD5_Hash );
+	MD5_Init( &MD5_Hash );
 
 	if( data == NULL )
 	{
@@ -230,15 +230,15 @@ void HPAK_AddLump( qboolean add_to_queue, const char *name, resource_t *DirEnt, 
 		FS_Read( f, temp, DirEnt->nDownloadSize );
 		FS_Seek( f, position, SEEK_SET );
 
-		MD5Update( &MD5_Hash, temp, DirEnt->nDownloadSize );
+		MD5_Update( &MD5_Hash, temp, DirEnt->nDownloadSize );
 		Mem_Free( temp );
 	}
 	else
 	{
-		MD5Update( &MD5_Hash, data, DirEnt->nDownloadSize );
+		MD5_Update( &MD5_Hash, data, DirEnt->nDownloadSize );
 	}
 
-	MD5Final( (byte *)md5, &MD5_Hash );
+	MD5_Final( (byte *)md5, &MD5_Hash );
 
 	if( Q_memcmp( md5, DirEnt->rgucMD5_hash, 0x10 ))
 	{
@@ -385,7 +385,7 @@ static qboolean HPAK_Validate( const char *filename, qboolean quiet )
 	hpak_header_t	hdr;
 	byte		*dataPak;
 	int		i, num_lumps;
-	MD5Context_t	MD5_Hash;
+	MD5_CTX	MD5_Hash;
 	string		pakname;
 	resource_t	*pRes;
 	char		md5[16];
@@ -449,10 +449,9 @@ static qboolean HPAK_Validate( const char *filename, qboolean quiet )
 		FS_Seek( f, dataDir[i].seek, SEEK_SET );
 		FS_Read( f, dataPak, dataDir[i].size );
 
-		Q_memset( &MD5_Hash, 0, sizeof( MD5Context_t ));
-		MD5Init( &MD5_Hash );
-		MD5Update( &MD5_Hash, dataPak, dataDir[i].size );
-		MD5Final( (byte *)md5, &MD5_Hash );
+		MD5_Init( &MD5_Hash );
+		MD5_Update( &MD5_Hash, dataPak, dataDir[i].size );
+		MD5_Final( (byte *)md5, &MD5_Hash );
 
 		pRes = &dataDir[i].DirectoryResource;
 

@@ -318,14 +318,6 @@ typedef enum
 	key_message
 } keydest_t;
 
-// MD5 Hash
-typedef struct
-{
-	uint	buf[4];
-	uint	bits[2];
-	byte	in[64];
-} MD5Context_t;
-
 typedef enum
 {
 	RD_NONE = 0,
@@ -871,9 +863,6 @@ void CRC32_ProcessByte( dword *pulCRC, byte ch );
 void CRC32_Final( dword *pulCRC );
 qboolean CRC32_File( dword *crcvalue, const char *filename );
 qboolean CRC32_MapFile( dword *crcvalue, const char *filename, qboolean multiplayer );
-void MD5Init( MD5Context_t *ctx );
-void MD5Update( MD5Context_t *ctx, const byte *buf, uint len );
-void MD5Final( byte digest[16], MD5Context_t *ctx );
 qboolean MD5_HashFile( byte digest[16], const char *pszFileName, uint seed[4] );
 uint Com_HashKey( const char *string, uint hashSize );
 
