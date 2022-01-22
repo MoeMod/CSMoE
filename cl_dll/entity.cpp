@@ -287,11 +287,11 @@ void DLLEXPORT HUD_StudioEvent( const struct mstudioevent_s *event, const struct
 		iAttachment = 15;
 		break;
 	case 5002:
-		gEngfuncs.pEfxAPI->R_SparkEffect( (float *)&entity->attachment[0], atoi( event->options), -100, 100 );
+		gEngfuncs.pEfxAPI->R_SparkEffect( entity->attachment[0], atoi( event->options), -100, 100 );
 		break;
 	// Client side sound
 	case 5004:		
-		gEngfuncs.pfnPlaySoundByNameAtLocation( (char *)event->options, 1.0, (float *)&entity->attachment[0] );
+		gEngfuncs.pfnPlaySoundByNameAtLocation( (char *)event->options, 1.0, entity->attachment[0] );
 		break;
 	default:
 		break;

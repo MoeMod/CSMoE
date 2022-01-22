@@ -120,7 +120,7 @@ void CQbarrel::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireQbarrel, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0527, 0.0, m_iInstantShots, 7, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireQbarrel, 0, g_vecZero, g_vecZero, 0.0527, 0.0, m_iInstantShots, 7, FALSE, FALSE);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -194,7 +194,7 @@ void CQbarrel::SecondaryAttack(void)
 #else
 		flags = 0;
 #endif
-		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireQbarrel, 0.0, (float*)&g_vecZero, (float*)&g_vecZero, GetSpread(), 0.0, m_iInstantShots, 7 * m_iInstantShots, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireQbarrel, 0.0, g_vecZero, g_vecZero, GetSpread(), 0.0, m_iInstantShots, 7 * m_iInstantShots, FALSE, FALSE);
 	}
 
 #ifndef CLIENT_DLL

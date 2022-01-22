@@ -466,7 +466,7 @@ qboolean SV_CheckWater( edict_t *ent )
 		if( truecont <= CONTENTS_CURRENT_0 && truecont >= CONTENTS_CURRENT_DOWN )
 		{
 			float speed = 50.0f * ent->v.waterlevel;
-			const float *dir = current_table[CONTENTS_CURRENT_0 - truecont];
+			auto dir = current_table[CONTENTS_CURRENT_0 - truecont];
 
 			VectorMA( ent->v.basevelocity, speed, dir, ent->v.basevelocity );
 		}
@@ -1575,7 +1575,7 @@ void SV_Physics_Step( edict_t *ent )
 
 		if(( wasonground || wasonmover ) && ( ent->v.health > 0 || SV_CheckBottom( ent, MOVE_NORMAL )))
 		{
-			float	*vel = ent->v.velocity;
+			auto    vel = ent->v.velocity;
 			float	control, speed, newspeed;
 			float	friction;
 

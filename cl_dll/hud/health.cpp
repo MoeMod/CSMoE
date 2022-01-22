@@ -367,7 +367,7 @@ void CHudHealth::CalcDamageDirection( Vector vecFrom )
 	Vector	forward, right, up;
 	float	side, front, flDistToTarget;
 
-	if( vecFrom.IsNull() )
+	if( vecFrom.IsZero() )
 	{
 		for( int i = 0; i < 4; i++ )
 			m_fAttack[i] = 0;

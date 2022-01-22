@@ -469,7 +469,7 @@ public:
 	void GetAttachment(int iAttachment, Vector &origin, Vector &angles);
 	void SetBodygroup(int iGroup, int iValue);
 	int GetBodygroup(int iGroup);
-	int ExtractBbox(int sequence, float *mins, float *maxs);
+	int ExtractBbox(int sequence, vec3_t_ref mins, vec3_t_ref maxs);
 	void SetSequenceBox(void);
 
 public:

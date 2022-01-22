@@ -240,7 +240,7 @@ R_StudioExtractBbox
 Extract bbox from current sequence
 ================
 */
-qboolean R_StudioExtractBbox( studiohdr_t *phdr, int sequence, float *mins, float *maxs )
+qboolean R_StudioExtractBbox( studiohdr_t *phdr, int sequence, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	mstudioseqdesc_t	*pseqdesc;
 
@@ -924,7 +924,7 @@ StudioCalcBonePosition
 
 ====================
 */
-void R_StudioCalcBonePosition( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, vec3_t adj, vec3_t pos )
+void R_StudioCalcBonePosition( int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos )
 {
 	mstudioanimvalue_t	*panimvalue;
 	int		j, k;
@@ -981,7 +981,7 @@ StudioSlerpBones
 
 ====================
 */
-void R_StudioSlerpBones( vec4_t q1[], float pos1[][3], vec4_t q2[], float pos2[][3], float s )
+void R_StudioSlerpBones( vec4_t q1[], vec3_t pos1[], vec4_t q2[], vec3_t pos2[], float s )
 {
 	int	i;
 	vec4_t	q3;
@@ -1009,7 +1009,7 @@ StudioCalcRotations
 
 ====================
 */
-void R_StudioCalcRotations( cl_entity_t *e, float pos[][3], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f )
+void R_StudioCalcRotations( cl_entity_t *e, vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f )
 {
 	int		i, frame;
 	mstudiobone_t	*pbone;
@@ -1070,7 +1070,7 @@ void R_StudioMergeBones( cl_entity_t *e, model_t *m_pSubModel )
 	mstudioanim_t	*panim;
 	matrix3x4		bonematrix;
 	static vec4_t	q[MAXSTUDIOBONES];
-	static float	pos[MAXSTUDIOBONES][3];
+	static vec3_t	pos[MAXSTUDIOBONES];
 	double		f;
 
 	if( e->curstate.sequence >=  m_pStudioHeader->numseq )
@@ -1302,7 +1302,7 @@ StudioSetupChrome
 
 ====================
 */
-void R_StudioSetupChrome( float *pchrome, int bone, vec3_t normal )
+void R_StudioSetupChrome( float *pchrome, int bone, const vec3_t normal )
 {
 	float	n;
 
@@ -1458,7 +1458,8 @@ void R_StudioGetShadowImpactAndDir( void )
 	if( !cl.refdef.movevars ) return; // e.g. in menu
 
 	// convert skyvec into angles then back into vector to avoid 0 0 0 direction
-	VectorAngles( (float *)&cl.refdef.movevars->skyvec_x, skyAngles );
+	vec3_t skyvec = { cl.refdef.movevars->skyvec_x, cl.refdef.movevars->skyvec_y, cl.refdef.movevars->skyvec_z };
+	VectorAngles( skyvec, skyAngles );
 	angle = skyAngles[YAW] / 180 * M_PI;
 
 	Matrix3x4_OriginFromMatrix( g_bonestransform[0], origin );
@@ -1519,7 +1520,7 @@ void GAME_EXPORT R_StudioDynamicLight( cl_entity_t *ent, alight_t *lightinfo )
 	if( VectorIsNull( plight->lightvec ))
 		VectorSet( plight->lightvec, 0.0f, 0.0f, -1.0f );
 
-	VectorCopy( plight->lightvec, lightinfo->plightvec );
+	VectorCopy( plight->lightvec, *lightinfo->plightvec );
 
 	// setup ambient lighting
 	invLight = (ent && ent->curstate.effects & EF_INVLIGHT) ? true : false;
@@ -1693,7 +1694,7 @@ void GAME_EXPORT R_StudioSetupLighting( alight_t *lightinfo )
 	plight = &g_studiolight; 
 
 	for( i = 0; i < m_pStudioHeader->numbones; i++ )
-		Matrix3x4_VectorIRotate( g_lighttransform[i], lightinfo->plightvec, plight->blightvec[i] );
+		Matrix3x4_VectorIRotate( g_lighttransform[i], *lightinfo->plightvec, plight->blightvec[i] );
 
 	// copy custom alight color in case of mod-maker changed it
 	plight->lightcolor[0] = lightinfo->color[0];
@@ -1709,7 +1710,7 @@ R_StudioLighting
 
 ===============
 */
-void R_StudioLighting( float *lv, int bone, int flags, vec3_t normal )
+void R_StudioLighting( float *lv, int bone, int flags, const vec3_t normal )
 {
 	float		_max, ambient;
 	vec3_t		illum;
@@ -2018,10 +2019,10 @@ static void R_StudioDrawPoints_legacy( void )
 
 		for( i = 0; i < pmesh[j].numnorms; i++, lv += 3, pstudionorms++, pnormbone++ )
 		{
-			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, (float *)pstudionorms );
+			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, *pstudionorms );
 
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
-				R_StudioSetupChrome( g_chrome[(float (*)[3])lv - g_lightvalues], *pnormbone, (float *)pstudionorms );
+				R_StudioSetupChrome( g_chrome[(vec3_t *)lv - g_lightvalues], *pnormbone, *pstudionorms );
 		}
 	}
 
@@ -2579,11 +2580,11 @@ static void GAME_EXPORT R_StudioDrawPoints( void )
 
 		for( i = 0; i < pmesh[j].numnorms; i++, lv += 3, pstudionorms++, pnormbone++ )
 		{
-			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, (float *)pstudionorms );
+			R_StudioLighting( lv, *pnormbone, g_nFaceFlags, *pstudionorms );
 
 			if(( g_nFaceFlags & STUDIO_NF_CHROME ) || ( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 			{
-				R_StudioSetupChrome( g_chrome[(float (*)[3])lv - g_lightvalues], *pnormbone, (float *)pstudionorms );
+				R_StudioSetupChrome( g_chrome[(vec3_t *)lv - g_lightvalues], *pnormbone, *pstudionorms );
 			}
 		}
 	}
@@ -3395,7 +3396,7 @@ static int GAME_EXPORT R_StudioDrawPlayer( int flags, entity_state_t *pplayer )
 {
 	int	m_nPlayerIndex;
 	float	gaitframe = 0.0f, gaityaw = 0.0f;
-	vec3_t	dir, prevgaitorigin = { 0.0f };
+	vec3_t	dir, prevgaitorigin = { };
 	alight_t	lighting;
 
 	m_nPlayerIndex = pplayer->number - 1;
@@ -3506,7 +3507,7 @@ static int GAME_EXPORT R_StudioDrawPlayer( int flags, entity_state_t *pplayer )
 			RI.currententity->curstate.body = 1; // force helmet
 		}
 
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 		R_StudioDynamicLight( RI.currententity, &lighting );
 
 		R_StudioEntityLight( &lighting );
@@ -3638,7 +3639,7 @@ static int GAME_EXPORT R_StudioDrawModel( int flags )
 
 	if( flags & STUDIO_RENDER )
 	{
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 		R_StudioDynamicLight( RI.currententity, &lighting );
 
 		R_StudioEntityLight( &lighting );

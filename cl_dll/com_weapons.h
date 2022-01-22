@@ -41,7 +41,7 @@ int				HUD_GetWeaponAnim( void );
 void			HUD_SendWeaponAnim(int iAnim, int iWeaponId, int iBody, int iForce = 0 );
 int				HUD_GetWeapon( void );
 void			HUD_PlaySound( char *sound, float volume );
-void			HUD_PlaybackEvent( int flags, const struct edict_s *pInvoker, unsigned short eventindex, float delay, float *origin, float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
+void			HUD_PlaybackEvent( int flags, const struct edict_s *pInvoker, unsigned short eventindex, float delay, const vec3_t origin, const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 );
 //void			HUD_SetMaxSpeed( const struct edict_s *ed, float speed );
 WeaponCrosshairData				GetWeaponCrosshairData( void );
 

@@ -1,6 +1,6 @@
 /*
 knife_lance.cpp
-Copyright (C) 2021 Original Author ÎôÈÕ¤Î¾ÉÇé Modify by JustANoobQAQ , Entity Think by Rentro
+Copyright (C) 2021 Original Author ï¿½ï¿½ï¿½Õ¤Î¾ï¿½ï¿½ï¿½ Modify by JustANoobQAQ , Entity Think by Rentro
 
 
 This program is free software: you can redistribute it and/or modify
@@ -236,13 +236,13 @@ namespace sv {
 				}
 				if (pev->iuser1)
 				{
-					//µÚÒ»²½£¬´Óµ±Ç°Î»ÖÃË®Æ½ÍùÇ°ÑÓÉì80£¬¼Ç×¡Õâ¸öÎ»ÖÃÎªtemp(vecOrigin)	By Rentro
-					//µÚ¶þ²½£¬´ÓtempÍùÕýÉÏ·½·¢traceline£¬³¤¶ÈÊÇ50£¬endpos¼ÇÎªtemp2 (VecEnd1)
-					//µÚÈý²½£¬´Ótemp2ÍùÏÂ·¢traceline£¬³¤¶ÈÊÇ£¨temp2.z - temp.z) + 50
-					//endpos¼ÇÎªtemp3
-					//µÚËÄ²½£¬Èç¹ûÉÏÒ»¸ötracelineµÄstartsolidÊÇtrue£¬
-					//ÄÇÃ´Ñ¡Ôñtemp
-					//·ñÔòÑ¡Ôñtemp3
+					//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½Ç°Î»ï¿½ï¿½Ë®Æ½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½80ï¿½ï¿½ï¿½ï¿½×¡ï¿½ï¿½ï¿½Î»ï¿½ï¿½Îªtemp(vecOrigin)	By Rentro
+					//ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tempï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½tracelineï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½50ï¿½ï¿½endposï¿½ï¿½Îªtemp2 (VecEnd1)
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½temp2ï¿½ï¿½ï¿½Â·ï¿½tracelineï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç£ï¿½temp2.z - temp.z) + 50
+					//endposï¿½ï¿½Îªtemp3
+					//ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½tracelineï¿½ï¿½startsolidï¿½ï¿½trueï¿½ï¿½
+					//ï¿½ï¿½Ã´Ñ¡ï¿½ï¿½temp
+					//ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½temp3
 
 					Vector vecOrigin = pev->origin;
 					vecOrigin += m_vecDir * 80;
@@ -794,7 +794,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 			RadiusDamage3(vecOrigin, pev, m_pPlayer->pev, Slash3ExpDamage(), 140, CLASS_MACHINE, DMG_NEVERGIB | DMG_BULLET, 0, 0, 0, 1, 0, 2);
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, (float*)&g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
 #endif			
 			FakeKnockBack();
 			m_iActSlash3 = 0;

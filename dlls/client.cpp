@@ -3956,21 +3956,21 @@ void ClientPrecache()
 			if (!fname)
 				break;
 
-			ENGINE_FORCE_UNMODIFIED(force_model_specifybounds_if_avail, (float *)&vMin, (float *)&vMax, fname);
+			ENGINE_FORCE_UNMODIFIED(force_model_specifybounds_if_avail, vMin, vMax, fname);
 		}
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/black_smoke1.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/black_smoke2.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/black_smoke3.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/black_smoke4.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/fast_wallpuff1.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/smokepuff.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/gas_puff_01.spr");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_nw.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_ne.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_sw.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/black_smoke1.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/black_smoke2.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/black_smoke3.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/black_smoke4.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/fast_wallpuff1.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/smokepuff.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/gas_puff_01.spr");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_nw.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_ne.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_sw.tga");
 
 	if (g_bIsCzeroGame)
 	{
@@ -3983,12 +3983,12 @@ void ClientPrecache()
 		vMax = Vector(12, 6, 22);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_deagle.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_p228.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_elite.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_usp.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_fiveseven.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_glock18.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_deagle.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_p228.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_elite.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_usp.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_fiveseven.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_glock18.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4001,8 +4001,8 @@ void ClientPrecache()
 		vMax = Vector(25, 23, 21);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_xm1014.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_m3.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_xm1014.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_m3.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4015,11 +4015,11 @@ void ClientPrecache()
 		vMax = Vector(23, 8, 20);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_mac10.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_mp5.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_ump45.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_tmp.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_p90.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_mac10.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_mp5.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_ump45.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_tmp.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_p90.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4032,16 +4032,16 @@ void ClientPrecache()
 		vMax = Vector(31, 12, 31);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_ak47.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_aug.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_awp.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_g3sg1.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_sg550.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_m4a1.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_scout.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_sg552.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_famas.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_galil.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_ak47.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_aug.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_awp.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_g3sg1.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_sg550.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_m4a1.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_scout.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_sg552.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_famas.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_galil.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4054,12 +4054,12 @@ void ClientPrecache()
 		vMax = Vector(25, 10, 20);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_m249.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_m249.mdl");
 
 	vMin = Vector(-7, -7, -15);
 	vMax = Vector(7, 7, 15);
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_c4.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_c4.mdl");
 
 	vMin = Vector(-4, -8, -3);
 	vMax = Vector(3, 7, 3);
@@ -4075,7 +4075,7 @@ void ClientPrecache()
 		vMax = Vector(3, 7, 3);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/w_c4.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/w_c4.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4088,9 +4088,9 @@ void ClientPrecache()
 		vMax = Vector(7, 2, 18);
 	}
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_flashbang.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_hegrenade.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_smokegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_flashbang.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_hegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_smokegrenade.mdl");
 
 	if (g_bIsCzeroGame)
 		vMin = Vector(-5, -5, -7);
@@ -4099,14 +4099,14 @@ void ClientPrecache()
 
 	vMax = Vector(5, 5, 14);
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/w_flashbang.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/w_hegrenade.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/w_smokegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/w_flashbang.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/w_hegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/w_smokegrenade.mdl");
 
 	vMin = Vector(-7, -11, -18);
 	vMax = Vector(7, 6, 18);
 
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/p_knife.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/p_knife.mdl");
 
 	if (g_bIsCzeroGame)
 	{
@@ -4120,15 +4120,15 @@ void ClientPrecache()
 	}
 
 #ifdef ENABLE_SHIELD
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_deagle.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_fiveseven.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_flashbang.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_glock18.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_hegrenade.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_knife.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_p228.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_smokegrenade.mdl");
-	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, "models/shield/p_shield_usp.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_deagle.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_fiveseven.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_flashbang.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_glock18.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_hegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_knife.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_p228.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_smokegrenade.mdl");
+	ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, "models/shield/p_shield_usp.mdl");
 #endif
 
 	PRECACHE_SOUND("common/wpn_hudoff.wav");
@@ -4171,10 +4171,10 @@ void ClientPrecache()
 	m_usResetDecals = g_engfuncs.pfnPrecacheEvent(1, "events/decal_reset.sc");
 
 	/*Vector temp = g_vecZero;
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_nw.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_ne.tga");
-	ENGINE_FORCE_UNMODIFIED(force_exactfile, (float *)&temp, (float *)&temp, "sprites/scope_arc_sw.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_nw.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_ne.tga");
+	ENGINE_FORCE_UNMODIFIED(force_exactfile, temp, temp, "sprites/scope_arc_sw.tga");
 
 
 	PRECACHE_GENERIC("sprites/scope_arc.tga");
@@ -4294,8 +4294,8 @@ void EXT_FUNC SetupVisibility(edict_t *pViewEntity, edict_t *pClient, unsigned c
 		org = org + (VEC_HULL_MIN - VEC_DUCK_HULL_MIN);
 	}
 
-	*pvs = ENGINE_SET_PVS((float *)&org);
-	*pas = ENGINE_SET_PAS((float *)&org);
+	*pvs = ENGINE_SET_PVS(org);
+	*pas = ENGINE_SET_PAS(org);
 }
 
 void ResetPlayerPVS(edict_t *client, int clientnum)
@@ -4417,12 +4417,12 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
    state->animtime = (int)(1000.0 * ent->v.animtime.time_since_epoch().count()) / 1000.0;
 
-   Q_memcpy (state->origin, ent->v.origin, sizeof (float) * 3);
-   Q_memcpy (state->angles, ent->v.angles, sizeof (float) * 3);
-   Q_memcpy (state->mins, ent->v.mins, sizeof (float) * 3);
-   Q_memcpy (state->maxs, ent->v.maxs, sizeof (float) * 3);
-   Q_memcpy (state->startpos, ent->v.startpos, sizeof (float) * 3);
-   Q_memcpy (state->endpos, ent->v.endpos, sizeof (float) * 3);
+   state->origin = ent->v.origin;
+   state->angles = ent->v.angles;
+   state->mins = ent->v.mins;
+   state->maxs = ent->v.maxs;
+   state->startpos = ent->v.startpos;
+   state->endpos = ent->v.endpos;
 
    state->impacttime = ent->v.impacttime.time_since_epoch() / 1s;
    state->starttime = ent->v.starttime.time_since_epoch() / 1s;
@@ -4471,7 +4471,7 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
    if (player)
    {
-      Q_memcpy (state->basevelocity, ent->v.basevelocity, sizeof (float) * 3);
+      state->basevelocity = ent->v.basevelocity;
 
       state->weaponmodel = MODEL_INDEX (STRING (ent->v.weaponmodel));
       state->gaitsequence = ent->v.gaitsequence;
@@ -4871,21 +4871,21 @@ int EXT_FUNC ConnectionlessPacket(const struct netadr_s *net_from, const char *a
 	return 0;
 }
 
-int EXT_FUNC GetHullBounds(int hullnumber, float *mins, float *maxs)
+int EXT_FUNC GetHullBounds(int hullnumber, vec3_t_ref mins, vec3_t_ref maxs)
 {
 	switch (hullnumber)
 	{
 		case 0: // Normal player
-			VEC_HULL_MIN.CopyToArray(mins);
-			VEC_HULL_MAX.CopyToArray(maxs);
+			mins = VEC_HULL_MIN;
+			maxs = VEC_HULL_MAX;
 			return TRUE;
 		case 1: // Crouched player
-			VEC_DUCK_HULL_MIN.CopyToArray(mins);
-			VEC_DUCK_HULL_MAX.CopyToArray(maxs);
+			mins = VEC_DUCK_HULL_MIN;
+			maxs = VEC_DUCK_HULL_MAX;
 			return TRUE;
 		case 2: // Point based hull
-			Vector(0, 0, 0).CopyToArray(mins);
-			Vector(0, 0, 0).CopyToArray(maxs);
+			mins = Vector(0, 0, 0);
+			maxs = Vector(0, 0, 0);
 			return TRUE;
 		default:
 			return FALSE;

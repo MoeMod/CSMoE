@@ -449,7 +449,7 @@ qboolean Mod_BoxVisible( const vec3_t mins, const vec3_t maxs, const byte *visbi
 	short	leafList[MAX_BOX_LEAFS];
 	int	i, count;
 
-	if( !visbits || !mins || !maxs )
+	if( !visbits )
 		return true;
 
 	count = Mod_BoxLeafnums( mins, maxs, leafList, MAX_BOX_LEAFS, NULL );
@@ -475,7 +475,7 @@ void Mod_AmbientLevels( const vec3_t p, byte *pvolumes )
 {
 	mleaf_t	*leaf;
 
-	if( !worldmodel || !p || !pvolumes )
+	if( !worldmodel || !pvolumes )
 		return;	
 
 	leaf = Mod_PointInLeaf( p, worldmodel->nodes );
@@ -649,10 +649,12 @@ static void Mod_LoadSubmodels( const dlump_t *l )
 		if( i == 0 || !world.loading )
 			continue; // skip the world
 
-		if( VectorIsNull( out->origin ))
+		if( !out->origin[0] && !out->origin[1] && !out->origin[2] )
 		{
 			// NOTE: zero origin after recalculating is indicated included origin brush
-			VectorAverage( out->mins, out->maxs, out->origin );
+			out->origin[0] = (out->mins[0] + out->maxs[0]) / 2;
+			out->origin[1] = (out->mins[1] + out->maxs[1]) / 2;
+			out->origin[2] = (out->mins[2] + out->maxs[2]) / 2;
 		}
 
 		world.max_surfaces = max( world.max_surfaces, out->numfaces ); 
@@ -1170,9 +1172,11 @@ static void Mod_LoadTexInfo( const dlump_t *l )
 			out->vecs[0][j] = LittleFloat(in->vecs[0][j]);
 			out->vecs[1][j] = LittleFloat(in->vecs[1][j]);
 		}
-
-		len1 = VectorLength( out->vecs[0] );
-		len2 = VectorLength( out->vecs[1] );
+		vec3_t vecs[2];
+		VectorSet(vecs[0], out->vecs[0][0], out->vecs[0][1], out->vecs[0][2]);
+		VectorSet(vecs[1], out->vecs[1][0], out->vecs[1][1], out->vecs[1][2]);
+		len1 = VectorLength(vecs[0] );
+		len2 = VectorLength(vecs[1] );
 		len1 = ( len1 + len2 ) / 2;
 
 		// g-cont: can use this info for GL_TEXTURE_LOAD_BIAS_EXT ?
@@ -1344,7 +1348,9 @@ static void Mod_CalcSurfaceExtents( msurface_t *surf )
 
 		for( j = 0; j < 2; j++ )
 		{
-			val = DotProduct( v->position, surf->texinfo->vecs[j] ) + surf->texinfo->vecs[j][3];
+			vec3_t vecsj;
+			VectorSet(vecsj, surf->texinfo->vecs[j][0], surf->texinfo->vecs[j][1], surf->texinfo->vecs[j][2]);
+			val = DotProduct( v->position, vecsj ) + surf->texinfo->vecs[j][3];
 			if( val < mins[j] ) mins[j] = val;
 			if( val > maxs[j] ) maxs[j] = val;
 		}
@@ -1374,7 +1380,7 @@ static void Mod_CalcSurfaceBounds( msurface_t *surf, mextrasurf_t *info )
 {
 	int	i, e;
 	mvertex_t	*v;
-
+	
 	ClearBounds( info->mins, info->maxs );
 
 	for( i = 0; i < surf->numedges; i++ )
@@ -1425,8 +1431,13 @@ static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts
 	if( surf->flags & SURF_PLANEBACK )
 		VectorNegate( surf->plane->normal, normal );
 	else VectorCopy( surf->plane->normal, normal );
-	VectorCopy( surf->texinfo->vecs[0], tangent );
-	VectorNegate( surf->texinfo->vecs[1], binormal );
+
+	vec3_t tex_vecs[2];
+	
+	VectorSet(tex_vecs[0], surf->texinfo->vecs[0][0], surf->texinfo->vecs[0][1], surf->texinfo->vecs[0][2]);
+	VectorCopy(tex_vecs[0], tangent);
+	VectorSet(tex_vecs[1], surf->texinfo->vecs[1][0], surf->texinfo->vecs[1][1], surf->texinfo->vecs[1][2]);
+	VectorNegate(tex_vecs[1], binormal);
 
 	VectorNormalize( normal ); // g-cont. is this even needed?
 	VectorNormalize( tangent );
@@ -1455,28 +1466,28 @@ static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts
 		glvert_t	*out = &mesh->verts[i];
 
 		// vertex
-		VectorCopy( verts, out->vertex );
+		VectorSet( out->vertex, verts[0], verts[1], verts[2] );
 		VectorCopy( tangent, out->tangent );
 		VectorCopy( binormal, out->binormal );
 		VectorCopy( normal, out->normal );
 
 		// texture coordinates
-		s = DotProduct( verts, texinfo->vecs[0] ) + texinfo->vecs[0][3];
+		s = DotProduct( out->vertex, tex_vecs[0] ) + texinfo->vecs[0][3];
 		s /= texinfo->texture->width;
 
-		t = DotProduct( verts, texinfo->vecs[1] ) + texinfo->vecs[1][3];
+		t = DotProduct( out->vertex, tex_vecs[1] ) + texinfo->vecs[1][3];
 		t /= texinfo->texture->height;
 
 		out->stcoord[0] = s;
 		out->stcoord[1] = t;
 
 		// lightmap texture coordinates
-		s = DotProduct( verts, texinfo->vecs[0] ) + texinfo->vecs[0][3] - surf->texturemins[0];
+		s = DotProduct( out->vertex, tex_vecs[0] ) + texinfo->vecs[0][3] - surf->texturemins[0];
 		s += surf->light_s * LM_SAMPLE_SIZE;
 		s += LM_SAMPLE_SIZE >> 1;
 		s /= BLOCK_SIZE * LM_SAMPLE_SIZE;
 
-		t = DotProduct( verts, texinfo->vecs[1] ) + texinfo->vecs[1][3] - surf->texturemins[1];
+		t = DotProduct( out->vertex, tex_vecs[1] ) + texinfo->vecs[1][3] - surf->texturemins[1];
 		t += surf->light_t * LM_SAMPLE_SIZE;
 		t += LM_SAMPLE_SIZE >> 1;
 		t /= BLOCK_SIZE * LM_SAMPLE_SIZE;
@@ -1510,11 +1521,15 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 	msurfmesh_t	*mesh;
 
 	Q_memset( dists, 0, MAX_SIDE_VERTS * sizeof( float ) );
-
+	
 	ClearBounds( mins, maxs );
 
 	for( i = 0, v = verts; i < numVerts; i++, v += 3 )
-		AddPointToBounds( v, mins, maxs );
+	{
+		vec3_t vv;
+		VectorSet(vv, v[0], v[1], v[2]);
+		AddPointToBounds( vv, mins, maxs );
+	}
 
 	for( i = 0; i < 3; i++ )
 	{
@@ -1561,8 +1576,8 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 			}
 		}
 
-		Mod_SubdividePolygon( info, surf, f, front[0], tessSize );
-		Mod_SubdividePolygon( info, surf, b, back[0], tessSize );
+		Mod_SubdividePolygon( info, surf, f, (float *)front[0], tessSize );
+		Mod_SubdividePolygon( info, surf, b, (float *)back[0], tessSize );
 		return;
 	}
 
@@ -2513,7 +2528,7 @@ Mod_FindModelOrigin
 routine to detect bmodels with origin-brush
 =================
 */
-static void Mod_FindModelOrigin( const char *entities, const char *modelname, vec3_t origin )
+static void Mod_FindModelOrigin( const char *entities, const char *modelname, vec3_t_ref origin )
 {
 	char	*pfile;
 	string	keyname;
@@ -2895,11 +2910,11 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 		{
 			// HACKHACK: c2a1 issues
 			if( !bm->origin[0] && !bm->origin[1] ) mod->flags |= MODEL_HAS_ORIGIN;
-
-			Mod_FindModelOrigin( ents, va( "*%i", i ), bm->origin );
+			vec3_t origin(bm->origin[0], bm->origin[1], bm->origin[2]);
+			Mod_FindModelOrigin( ents, va( "*%i", i ), origin );
 
 			// flag 2 is indicated model with origin brush!
-			if( !VectorIsNull( bm->origin )) mod->flags |= MODEL_HAS_ORIGIN;
+			if( !VectorIsNull( origin )) mod->flags |= MODEL_HAS_ORIGIN;
 		}
 
 		for( j = 0; i != 0 && j < mod->nummodelsurfaces; j++ )
@@ -2966,7 +2981,7 @@ model_t *Mod_FindName( const char *filename, qboolean create )
 	COM_FixSlashes( name );
 
 	char* s = name;
-	// ¼ÓÔØÄ£ÐÍµÄÊ±ºò¾ÍÈ·¶¨ºÃÌùÍ¼Ç°×º(@frogvari_) -> (models/@frogvari_v_zombibomb.mdl)£¬ÕÒµ½µÚÒ»¸ö'@'Îª¿ªÊ¼ºÍµÚÒ»¸ö'_'Îª½áÎ²£¬×÷ÎªÌùÍ¼Ç°×º
+	// ï¿½ï¿½ï¿½ï¿½Ä£ï¿½Íµï¿½Ê±ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Ç°×º(@frogvari_) -> (models/@frogvari_v_zombibomb.mdl)ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ò»ï¿½ï¿½'@'Îªï¿½ï¿½Ê¼ï¿½Íµï¿½Ò»ï¿½ï¿½'_'Îªï¿½ï¿½Î²ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Í¼Ç°×º
 	int start = -1, end = 0, pos = 0;
 	while (*s != '\0')
 	{
@@ -3271,7 +3286,7 @@ void Mod_GetFrames( int handle, int *numFrames )
 Mod_GetBounds
 ===================
 */
-void Mod_GetBounds( int handle, vec3_t mins, vec3_t maxs )
+void Mod_GetBounds( int handle, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	model_t	*cmod;
 

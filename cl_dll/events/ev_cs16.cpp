@@ -93,7 +93,7 @@ void EV_HLDM_NewExplode( float x, float y, float z, float ScaleExplode1 )
 
 }
 
-char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, float *vecSrc, float *vecEnd, int iBulletType )
+char EV_HLDM_PlayTextureSound( int idx, pmtrace_t *ptr, const vec3_t vecSrc, const vec3_t vecEnd, int iBulletType )
 {
 	// hit the world, try to play sound based on texture material type
 	char chTextureType = CHAR_TEX_CONCRETE;
@@ -485,7 +485,7 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 		te->entity.curstate.scale = scale;
 		te->entity.baseline.origin = speed * dir;
 
-		if( !velocity.IsNull() )
+		if( !velocity.IsZero() )
 		{
 			velocity.x *= 0.5;
 			velocity.y *= 0.5;
@@ -495,7 +495,7 @@ void EV_CS16Client_CreateSmoke(int type, Vector origin, Vector dir, int speed, f
 	}
 }
 
-void EV_HLDM_CreateSmoke(float *origin, float *dir, int speed, float scale, int r, int g, int b, int iSmokeType, float *base_velocity, bool bWind, int framerate)
+void EV_HLDM_CreateSmoke(const vec3_t origin, const vec3_t dir, int speed, float scale, int r, int g, int b, int iSmokeType, float *base_velocity, bool bWind, int framerate)
 {
 	char model[256];
 	int model_index;
@@ -754,7 +754,7 @@ void EV_DescribeBulletTypeParameters(int iBulletType, int &iPenetrationPower, fl
 	}
 }
 
-int EV_HLDM_CheckTracer(int idx, float *vecSrc, float *end, float *forward, float *right, int iBulletType, int iTracerFreq, int *tracerCount)
+int EV_HLDM_CheckTracer(int idx, const vec3_t vecSrc, const vec3_t end, const vec3_t forward, const vec3_t right, int iBulletType, int iTracerFreq, int *tracerCount)
 {
 	int tracer = 0;
 	int i;
@@ -789,7 +789,7 @@ int EV_HLDM_CheckTracer(int idx, float *vecSrc, float *end, float *forward, floa
 }
 
 
-void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, int iPenetration, int iAttachment, bool lefthand, float srcofs)
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iTracerFreq, int *tracerCount, int iPenetration, int iAttachment, bool lefthand, float srcofs)
 {
 	int i;
 	pmtrace_t tr;
@@ -1066,7 +1066,7 @@ void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int c
 	}
 }
 
-void EV_HLDM_FireBullets(int idx, float *forward, float *right, float *up, int cShots, float *vecSrc, float *vecDirShooting, float *vecSpread, float flDistance, int iBulletType, int iPenetration)
+void EV_HLDM_FireBullets(int idx, const vec3_t forward, const vec3_t right, const vec3_t up, int cShots, vec3_t vecSrc, const vec3_t vecDirShooting, const vec3_t vecSpread, float flDistance, int iBulletType, int iPenetration)
 {
     return EV_HLDM_FireBullets(idx, forward, right, up, cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, 0, 0, iPenetration, 0, false, 0.0f);
 }
@@ -1101,9 +1101,9 @@ void CreateCorpse(Vector *p_vOrigin, Vector *p_vAngles, const char *pModel, floa
 {
 	int modelIdx = gEngfuncs.pEventAPI->EV_FindModelIndex(pModel);
 	vec3_t null(0, 0, 0);
-	TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( (float*)p_vOrigin,
+	TEMPENTITY *model = gEngfuncs.pEfxAPI->R_TempModel( *p_vOrigin,
 														null,
-														(float*)p_vAngles,
+														*p_vAngles,
 														gEngfuncs.pfnGetCvarFloat("cl_corpsestay"),
 														modelIdx,
 														0 );

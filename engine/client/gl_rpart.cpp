@@ -588,7 +588,7 @@ void CL_DrawParticles( void )
 	}
 }
 
-void CL_DrawParticlesExternal( const float *vieworg, const float *forward, const float *right, const float *up, uint clipFlags )
+void CL_DrawParticlesExternal( const vec3_t vieworg, const vec3_t forward, const vec3_t right, const vec3_t up, uint clipFlags )
 {
 	if( vieworg ) VectorCopy( vieworg, RI.vieworg );
 	if( forward ) VectorCopy( forward, RI.vforward );
@@ -1423,8 +1423,8 @@ qboolean CL_TracerComputeVerts( const vec3_t start, const vec3_t delta, float wi
 		return false;
 
 	// transform point into the screen space
-	TriWorldToScreen( (float *)start, screenStart );
-	TriWorldToScreen( (float *)end, screenEnd );
+	TriWorldToScreen( start, screenStart );
+	TriWorldToScreen( end, screenEnd );
 
 	VectorSubtract( screenStart, screenEnd, tmp );	
 	tmp[2] = 0; // we don't need Z, we're in screen space
@@ -1583,7 +1583,7 @@ CL_UserTracerParticle
 
 ===============
 */
-void GAME_EXPORT CL_UserTracerParticle(const float* org, const float* vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)(particle_t* p))
+void GAME_EXPORT CL_UserTracerParticle(const vec3_t org, const vec3_t vel, float life, int colorIndex, float length, byte deathcontext, void (*deathfunc)(particle_t* p))
 {
 	particle_t* p;
 	byte* color;
@@ -1617,7 +1617,7 @@ CL_TracerParticles
 allow more customization
 ===============
 */
-particle_t *GAME_EXPORT CL_TracerParticles( const float *org, const float *vel, float life )
+particle_t *GAME_EXPORT CL_TracerParticles( const vec3_t org, const vec3_t vel, float life )
 {
 	particle_t	*p;
 	byte		*color;

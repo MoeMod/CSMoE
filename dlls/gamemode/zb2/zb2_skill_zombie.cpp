@@ -762,13 +762,13 @@ namespace sv {
 	{
 		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
 		{
-			PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), (float*)&g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
 			m_flTimeTriggerZombieSkill = invalid_time_point;
 			m_flTimeNextSmoke = gpGlobals->time + 1.5s;
 		}
 		if (m_flTimeNextSmoke != invalid_time_point && m_flTimeNextSmoke < gpGlobals->time)
 		{
-			PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), (float*)&g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
+			PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
 			m_flTimeNextSmoke = invalid_time_point;
 		}
 
@@ -800,7 +800,7 @@ namespace sv {
 
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/zombi_smoke.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
 
-		PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), (float*)&g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
+		PLAYBACK_EVENT_FULL(0, NULL, PRECACHE_EVENT(1, "events/createsmoke.sc"), 0, m_pPlayer->pev->origin - Vector(0, 0, 30), g_vecZero, 0, 0, 1, 1, TRUE, FALSE);
 		
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_pPlayer->ResetMaxSpeed();

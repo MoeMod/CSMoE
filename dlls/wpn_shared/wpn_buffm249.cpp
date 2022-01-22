@@ -57,7 +57,7 @@ void CBUFFM249::ItemPostFrame()
 #if 0
 	if (gpGlobals->time > m_tNextPlayEvent && m_tNextPlayEvent != invalid_time_point)
 	{
-		PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 9, 0, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 9, 0, FALSE, FALSE);
 		m_tNextPlayEvent = gpGlobals->time + 0.1s;
 	}
 #endif
@@ -184,7 +184,7 @@ void CBUFFM249::BUFFM249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBUFFM249, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->pev->fov != 90 ? TRUE : FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireBUFFM249, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), m_pPlayer->pev->fov != 90 ? TRUE : FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL

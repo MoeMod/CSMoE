@@ -51,7 +51,7 @@ namespace sv {
 		m_flNumFrames = (float)(MODEL_FRAMES(pev->modelindex) - 1);
 		pev->framerate = RANDOM_FLOAT(1.0, 30.0);
 
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, m_vecOrigin, (float*)&g_vecZero, 0.0, 0.0, 7, iType, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, m_vecOrigin, g_vecZero, 0.0, 0.0, 7, iType, FALSE, FALSE);
 	}
 
 	void CBalrog11Cannon::Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList)

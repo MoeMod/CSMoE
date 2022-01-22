@@ -331,6 +331,7 @@ CMakeSettings.json
 /3rdparty/cpuinfo
 /3rdparty/xorstr
 /3rdparty/boost_*
+/3rdparty/zlib
 /SDL2
 msvc/BundleArtifacts/
 /enc_temp_folder

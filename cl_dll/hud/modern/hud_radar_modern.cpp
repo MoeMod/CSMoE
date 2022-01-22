@@ -644,7 +644,7 @@ bool CHudRadarModern::IsValidEntity(cl_entity_s *pEntity)
 #pragma optimize("", off)
 #endif
 
-bool CHudRadarModern::CalcPoint(float *origin, int &screenX, int &screenY, int &scale)
+bool CHudRadarModern::CalcPoint(const vec3_t origin, int &screenX, int &screenY, int &scale)
 {
 	int wide, tall;
 	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
@@ -735,11 +735,11 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	struct model_s *model = (struct model_s *)gEngfuncs.GetSpritePointer(hspr);
 	gEngfuncs.pTriAPI->SpriteTexture(model, 0);
 
-	vec3_t forward, right, sub;
+	vec3_t forward, right, up, sub;
 	sub[0] = sub[2] = 0;
 	sub[1] = yaw - 90.0;
 
-	gEngfuncs.pfnAngleVectors(sub, forward, right, NULL);
+	gEngfuncs.pfnAngleVectors(sub, forward, right, up);
 
 	gEngfuncs.pTriAPI->Begin(TRI_QUADS);
 	gEngfuncs.pTriAPI->TexCoord2f(1, 0);

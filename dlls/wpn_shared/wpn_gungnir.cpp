@@ -734,7 +734,7 @@ void CGungnir::PrimaryAttack()
 #else
 	flags = 0;
 #endif
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, v6 /*0*/, 0, v6, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, v6 /*0*/, 0, v6, 0, FALSE, FALSE);
 
 	if (v6)
 		phs12 = gpGlobals->time;
@@ -775,7 +775,7 @@ void CGungnir::ShootProjectile()
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.58s;
 
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 3/*0*/, 0, 3, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 3/*0*/, 0, 3, 0, FALSE, FALSE);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -804,7 +804,7 @@ void CGungnir::ShootSpear()
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.13s;
 	m_iClip = std::max(m_iClip - 5, 0);
 
-	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 4 /*0*/, 0, 4, 0, FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 4 /*0*/, 0, 4, 0, FALSE, FALSE);
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -851,7 +851,7 @@ void CGungnir::ItemPostFrame()
 				phs3 = invalid_time_point;
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.4s;
 				ClearEffect();
-				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 2 /*0*/, 0, 2, 0, FALSE, FALSE);
+				PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, 2 /*0*/, 0, 2, 0, FALSE, FALSE);
 				phs12 = invalid_time_point;
 			}
 		}

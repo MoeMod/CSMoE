@@ -646,7 +646,7 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, 
 		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, 0.05, 8192, 1, BULLET_PLAYER_9MM, 18, 0.9, m_pPlayer->pev, true, m_pPlayer->random_seed);
 		--m_pPlayer->ammo_9mm;
 
-		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireGlock18, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y,
+		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireGlock18, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
 			(int)(m_pPlayer->pev->punchangle.x * 10000), (int)(m_pPlayer->pev->punchangle.y * 10000), m_iClip == 0, FALSE);
 	}
 	else
@@ -655,7 +655,7 @@ void CBasePlayerWeapon::FireRemaining(int &shotsFired, time_point_t &shootTime, 
 		vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, m_fBurstSpread, 8192, 2, BULLET_PLAYER_556MM, 30, 0.96, m_pPlayer->pev, false, m_pPlayer->random_seed);
 		--m_pPlayer->ammo_556nato;
 
-		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireFamas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y,
+		PLAYBACK_EVENT_FULL(flag, m_pPlayer->edict(), m_usFireFamas, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y,
 			(int)(m_pPlayer->pev->punchangle.x * 10000000), (int)(m_pPlayer->pev->punchangle.y * 10000000), FALSE, FALSE);
 	}
 
@@ -1250,7 +1250,7 @@ void CBasePlayerWeapon::ReloadSound()
 	CBaseEntity *pPlayer = NULL;
 	float distance;
 
-	m_pPlayer->pev->origin.CopyToArray(origin);
+	origin = m_pPlayer->pev->origin;
 
 	while ((pPlayer = (CBasePlayer *)UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
 	{

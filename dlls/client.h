@@ -198,7 +198,7 @@ void CmdStart(const edict_t *player, struct usercmd_s *cmd, unsigned int random_
 void CmdEnd(const edict_t *player);
 int ConnectionlessPacket(const struct netadr_s *net_from, const char *args, char *response_buffer,
                          int *response_buffer_size);
-int GetHullBounds(int hullnumber, float *mins, float *maxs);
+int GetHullBounds(int hullnumber, vec3_t_ref mins, vec3_t_ref maxs);
 void CreateInstancedBaselines();
 int InconsistentFile(const edict_t *player, const char *filename, char *disconnect_message);
 int AllowLagCompensation();

@@ -25,15 +25,18 @@ GNU General Public License for more details.
 
 #include "util/u_vector.hpp"
 
-#ifndef CLIENT_DLL
-using Vector2D = sv::moe::VectorBase<float, 2>;
-using Vector = sv::moe::VectorBase<float, 3>;
+using Vector2D = moe::VectorBase<float, 2>;
+#ifdef XASH_SIMD
+using Vector = moe::VectorBase<float, 3, 16>;
 #else
-using Vector2D = cl::moe::VectorBase<float, 2>;
-using Vector = cl::moe::VectorBase<float, 3>;
+using Vector = moe::VectorBase<float, 3>;
 #endif
 
 static_assert(sizeof(Vector2D) == sizeof(float[2]), "Vector2D should be compatible with engine");
+#ifdef XASH_SIMD
+static_assert(sizeof(Vector) == sizeof(float[4]) && alignof(Vector) == 16, "Vector should be compatible with engine");
+#else
 static_assert(sizeof(Vector) == sizeof(float[3]), "Vector should be compatible with engine");
+#endif
 
 #endif // VECTOR_H

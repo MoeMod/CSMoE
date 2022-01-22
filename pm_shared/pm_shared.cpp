@@ -13,11 +13,6 @@
 *
 ****/
 
-#ifdef vec3_t
-#undef vec3_t
-#endif
-
-#include "basetypes.h"
 #include "pm_math.h"
 #include "const.h"
 #include "usercmd.h"
@@ -45,8 +40,8 @@ int g_bhopcap = 1;
 #ifdef CLIENT_DLL
 	// Spectator Mode
 int iJumpSpectator;
-extern float vJumpOrigin[3];
-extern float vJumpAngles[3];
+extern vec3_t vJumpOrigin;
+extern vec3_t vJumpAngles;
 #endif
 
 static int pm_shared_initialized = 0;
@@ -855,7 +850,7 @@ PM_AddToTouched
 Add's the trace result to touch list, if contact is not already in list.
 ================
 */
-qboolean PM_AddToTouched(pmtrace_t tr, vec3_t impactvelocity)
+qboolean PM_AddToTouched(pmtrace_t tr, const vec3_t impactvelocity)
 {
 	int i;
 
@@ -928,7 +923,7 @@ returns the blocked flags:
 0x02 == step / wall
 ==================
 */
-int PM_ClipVelocity(vec3_t in, vec3_t normal, vec3_t out, float overbounce)
+int PM_ClipVelocity(const vec3_t in, const vec3_t normal, vec3_t_ref out, float overbounce)
 {
 	float backoff;
 	float change;
@@ -1191,7 +1186,7 @@ int PM_FlyMove(void)
 PM_Accelerate
 ==============
 */
-void PM_Accelerate(vec3_t wishdir, float wishspeed, float accel)
+void PM_Accelerate(const vec3_t wishdir, float wishspeed, float accel)
 {
 	int i;
 	float addspeed, accelspeed, currentspeed;
@@ -1417,7 +1412,6 @@ Handles both ground friction and water friction
 */
 void PM_Friction(void)
 {
-	float *vel;
 	float speed, newspeed, control;
 	float friction;
 	float drop;
@@ -1428,7 +1422,7 @@ void PM_Friction(void)
 		return;
 
 	// Get velocity
-	vel = pmove->velocity;
+	auto vel = pmove->velocity;
 
 	// Calculate speed
 	speed = sqrt(vel[0] * vel[0] + vel[1] * vel[1] + vel[2] * vel[2]);
@@ -1491,7 +1485,7 @@ void PM_Friction(void)
 	VectorCopy(newvel, pmove->velocity);
 }
 
-void PM_AirAccelerate(vec3_t wishdir, float wishspeed, float accel)
+void PM_AirAccelerate(const vec3_t wishdir, float wishspeed, float accel)
 {
 	int i;
 	float addspeed, accelspeed, currentspeed, wishspd = wishspeed;
@@ -1821,7 +1815,7 @@ When a player is stuck, it's costly to try and unstick them
 Grab a test offset for the player based on a passed in index
 =================
 */
-int PM_GetRandomStuckOffsets(int nIndex, int server, vec3_t offset)
+int PM_GetRandomStuckOffsets(int nIndex, int server, vec3_t_ref offset)
 {
 	// Last time we did a full
 	int idx;
@@ -2570,7 +2564,7 @@ PM_PushEntity
 Does not change the entities velocity at all
 ============
 */
-pmtrace_t PM_PushEntity(vec3_t push)
+pmtrace_t PM_PushEntity(const vec3_t push)
 {
 	pmtrace_t trace;
 	vec3_t end;
@@ -3065,7 +3059,7 @@ PM_CalcRoll
 
 ===============
 */
-float PM_CalcRoll(vec3_t angles, vec3_t velocity, float rollangle, float rollspeed)
+float PM_CalcRoll(const vec3_t angles, const vec3_t velocity, float rollangle, float rollspeed)
 {
 	float sign;
 	float side;
@@ -3100,7 +3094,7 @@ PM_DropPunchAngle
 
 =============
 */
-void PM_DropPunchAngle(vec3_t punchangle)
+void PM_DropPunchAngle(vec3_t_ref punchangle)
 {
 	float len;
 

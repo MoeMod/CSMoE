@@ -28,7 +28,7 @@ public:
 
 	void BuildHostageList(void);
 	bool IsValidEntity(cl_entity_s *pEntity);
-	bool CalcPoint(float *origin, int &screenX, int &screenY, int &scale);
+	bool CalcPoint(const vec3_t origin, int &screenX, int &screenY, int &scale);
 	void DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scale, int r, int g, int b, int a);
 
 	bool Available() const { return m_MapSprite != nullptr; }

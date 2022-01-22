@@ -3834,8 +3834,8 @@ void EditNavAreas(NavEditCmdType cmd)
 		}
 	}
 
-	Vector dir;
-	UTIL_MakeVectorsPrivate(pLocalPlayer->pev->v_angle, dir, nullptr, nullptr);
+	Vector dir, _2, _3;
+	UTIL_MakeVectorsPrivate(pLocalPlayer->pev->v_angle, dir, _2, _3);
 
 	// eye position
 	Vector from = pLocalPlayer->pev->origin + pLocalPlayer->pev->view_ofs;

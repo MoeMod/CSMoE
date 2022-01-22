@@ -2411,19 +2411,19 @@ static void SV_SendBuildInfo_f( sv_client_t *cl )
 	SV_ClientPrintf( cl, PRINT_HIGH, "Server running Xash3D FWGS %s (build %i-%s, %s-%s)\n", XASH_VERSION, Q_buildnum(), Q_buildcommit(), Q_buildos(), Q_buildarch() );
 }
 
-edict_t *pfnFindEntityInSphere( edict_t *pStartEdict, const float *org, float flRadius );
+edict_t *pfnFindEntityInSphere( edict_t *pStartEdict, const vec3_t org, float flRadius );
 
 static edict_t *SV_GetCrossEnt( edict_t *player )
 {
 	edict_t *ent = EDICT_NUM(1);
 	edict_t *closest = NULL;
 	float flMaxDot = 0.94;
-	vec3_t forward;
+	vec3_t forward, right, up;
 	vec3_t viewPos;
 	int i;
 	float maxLen = 1000;
 
-	AngleVectors( player->v.v_angle, forward, NULL, NULL );
+	AngleVectors( player->v.v_angle, forward, right, up );
 	VectorAdd( player->v.origin, player->v.view_ofs, viewPos );
 
 	// find bmodels by trace

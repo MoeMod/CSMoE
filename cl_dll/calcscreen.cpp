@@ -78,7 +78,7 @@ extern vec3_t v_angles;		// last view angle
 extern vec3_t v_cl_angles;	// last client/mouse angle
 extern vec3_t v_sim_org;	// last sim origin
 
-int CalcScreen(const float in[3], float out[2])
+int CalcScreen(const vec3_t in, float out[2])
 {
 	vec3_t aim;
 	vec3_t newaim;

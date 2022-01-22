@@ -138,7 +138,7 @@ void GAME_EXPORT CL_SetUpPlayerPrediction( int dopred, int includeLocal )
 }
 
 
-void CL_ClipPMoveToEntity( physent_t *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, pmtrace_t *tr )
+void CL_ClipPMoveToEntity( physent_t *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, pmtrace_t *tr )
 {
 	ASSERT( tr != NULL );
 
@@ -429,7 +429,7 @@ CL_WaterEntity
 
 =============
 */
-int GAME_EXPORT CL_WaterEntity( const float *rgflPos )
+int GAME_EXPORT CL_WaterEntity( const vec3_t rgflPos )
 {
 	physent_t		*pe;
 	hull_t		*hull;
@@ -484,7 +484,7 @@ CL_TraceLine
 a simple engine traceline
 =============
 */
-pmtrace_t CL_TraceLine( vec3_t start, vec3_t end, int flags )
+pmtrace_t CL_TraceLine( const vec3_t start, const vec3_t end, int flags )
 {
 	int	old_usehull;
 	pmtrace_t	tr;
@@ -504,7 +504,7 @@ CL_GetWaterEntity
 returns water brush where inside pos
 =============
 */
-cl_entity_t *CL_GetWaterEntity( const float *rgflPos )
+cl_entity_t *CL_GetWaterEntity( const vec3_t rgflPos )
 {
 	int	entnum;
 
@@ -514,15 +514,9 @@ cl_entity_t *CL_GetWaterEntity( const float *rgflPos )
 	return CL_GetEntityByIndex( entnum );
 }
 
-static void GAME_EXPORT pfnParticle( float *origin, int color, float life, int zpos, int zvel )
+static void GAME_EXPORT pfnParticle( const vec3_t origin, int color, float life, int zpos, int zvel )
 {
 	particle_t	*p;
-
-	if( !origin )
-	{
-		MsgDev( D_ERROR, "CL_StartParticle: NULL origin. Ignored\n" );
-		return;
-	}
 
 	p = CL_AllocParticle( NULL );
 	if( !p ) return;
@@ -535,7 +529,7 @@ static void GAME_EXPORT pfnParticle( float *origin, int color, float life, int z
 	VectorSet( p->vel, 0.0f, 0.0f, ( zpos * zvel ));
 }
 
-static int GAME_EXPORT pfnTestPlayerPosition( float *pos, pmtrace_t *ptrace )
+static int GAME_EXPORT pfnTestPlayerPosition( const vec3_t pos, pmtrace_t *ptrace )
 {
 	return PM_TestPlayerPosition( clgame.pmove, pos, ptrace, NULL );
 }
@@ -562,7 +556,7 @@ static void GAME_EXPORT pfnStuckTouch( int hitent, pmtrace_t *tr )
 	clgame.pmove->touchindex[clgame.pmove->numtouch++] = *tr;
 }
 
-static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
+static int GAME_EXPORT pfnPointContents( const vec3_t p, int *truecontents )
 {
 	int	cont, truecont;
 
@@ -574,12 +568,12 @@ static int GAME_EXPORT pfnPointContents( const float *p, int *truecontents )
 	return cont;
 }
 
-static int GAME_EXPORT pfnTruePointContents( float *p )
+static int GAME_EXPORT pfnTruePointContents( const vec3_t p )
 {
 	return CL_TruePointContents( p );
 }
 
-static int GAME_EXPORT pfnHullPointContents( struct hull_s *hull, int num, float *p )
+static int GAME_EXPORT pfnHullPointContents( struct hull_s *hull, int num, const vec3_t p )
 {
 	return PM_HullPointContents( hull, num, p );
 }
@@ -592,12 +586,12 @@ static pmtrace_t *GAME_EXPORT pfnPlayerTrace_w32(pmtrace_t * retvalue, float *st
 	return retvalue;
 }
 #endif
-static pmtrace_t GAME_EXPORT pfnPlayerTrace( float *start, float *end, int traceFlags, int ignore_pe )
+static pmtrace_t GAME_EXPORT pfnPlayerTrace( const vec3_t start, const vec3_t end, int traceFlags, int ignore_pe )
 {
 	return PM_PlayerTraceExt( clgame.pmove, start, end, traceFlags, clgame.pmove->numphysent, clgame.pmove->physents, ignore_pe, NULL );
 }
 
-static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags, int usehull, int ignore_pe )
+static pmtrace_t *GAME_EXPORT pfnTraceLine( const vec3_t start, const vec3_t end, int flags, int usehull, int ignore_pe )
 {
 	static pmtrace_t	tr;
 	int		old_usehull;
@@ -620,12 +614,12 @@ static pmtrace_t *GAME_EXPORT pfnTraceLine( float *start, float *end, int flags,
 	return &tr;
 }
 
-static hull_t *GAME_EXPORT pfnHullForBsp( physent_t *pe, float *offset )
+static void *GAME_EXPORT pfnHullForBsp( physent_t *pe, vec3_t_ref offset )
 {
-	return PM_HullForBsp( pe, clgame.pmove, offset );
+	PM_HullForBsp( pe, clgame.pmove, offset );
 }
 
-static float GAME_EXPORT pfnTraceModel( physent_t *pe, float *start, float *end, trace_t *trace )
+static float GAME_EXPORT pfnTraceModel( physent_t *pe, const vec3_t start, const vec3_t end, trace_t *trace )
 {
 	int	old_usehull;
 	vec3_t	start_l, end_l;
@@ -671,7 +665,7 @@ static float GAME_EXPORT pfnTraceModel( physent_t *pe, float *start, float *end,
 	return trace->fraction;
 }
 
-static const char *GAME_EXPORT pfnTraceTexture( int ground, float *vstart, float *vend )
+static const char *GAME_EXPORT pfnTraceTexture( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -694,8 +688,8 @@ static void GAME_EXPORT pfnPlaySound( int channel, const char *sample, float vol
 	S_StartSound( NULL, clgame.pmove->player_index + 1, channel, snd, volume, attenuation, pitch, fFlags );
 }
 
-static void GAME_EXPORT pfnPlaybackEventFull( int flags, int clientindex, word eventindex, float delay, float *origin,
-	float *angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
+static void GAME_EXPORT pfnPlaybackEventFull( int flags, int clientindex, word eventindex, float delay, const vec3_t origin,
+                                              const vec3_t angles, float fparam1, float fparam2, int iparam1, int iparam2, int bparam1, int bparam2 )
 {
 	cl_entity_t	*ent;
 
@@ -717,17 +711,17 @@ static pmtrace_t *GAME_EXPORT pfnPlayerTraceEx_w32( pmtrace_t * retvalue, float 
 	return retvalue;
 }
 #endif
-static pmtrace_t GAME_EXPORT pfnPlayerTraceEx( float *start, float *end, int traceFlags, pfnIgnore pmFilter )
+static pmtrace_t GAME_EXPORT pfnPlayerTraceEx( const vec3_t start, const vec3_t end, int traceFlags, pfnIgnore pmFilter )
 {
 	return PM_PlayerTraceExt( clgame.pmove, start, end, traceFlags, clgame.pmove->numphysent, clgame.pmove->physents, -1, pmFilter );
 }
 
-static int GAME_EXPORT pfnTestPlayerPositionEx( float *pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
+static int GAME_EXPORT pfnTestPlayerPositionEx( const vec3_t pos, pmtrace_t *ptrace, pfnIgnore pmFilter )
 {
 	return PM_TestPlayerPosition( clgame.pmove, pos, ptrace, pmFilter );
 }
 
-static pmtrace_t *GAME_EXPORT pfnTraceLineEx( float *start, float *end, int flags, int usehull, pfnIgnore pmFilter )
+static pmtrace_t *GAME_EXPORT pfnTraceLineEx( const vec3_t start, const vec3_t end, int flags, int usehull, pfnIgnore pmFilter )
 {
 	static pmtrace_t	tr;
 	int		old_usehull;
@@ -750,7 +744,7 @@ static pmtrace_t *GAME_EXPORT pfnTraceLineEx( float *start, float *end, int flag
 	return &tr;
 }
 
-static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, float *vstart, float *vend )
+static struct msurface_s *GAME_EXPORT pfnTraceSurface( int ground, const vec3_t vstart, const vec3_t vend )
 {
 	physent_t *pe;
 
@@ -809,7 +803,7 @@ void CL_InitClientMove( void )
 	clgame.pmove->RandomFloat = Com_RandomFloat;
 	clgame.pmove->PM_GetModelType = pfnGetModelType;
 	clgame.pmove->PM_GetModelBounds = pfnGetModelBounds;
-	clgame.pmove->PM_HullForBsp = (void* (__cdecl*)(physent_t*, float*))pfnHullForBsp;
+	clgame.pmove->PM_HullForBsp = pfnHullForBsp;
 	clgame.pmove->PM_TraceModel = pfnTraceModel;
 	clgame.pmove->COM_FileSize = COM_FileSize;
 	clgame.pmove->COM_LoadFile = COM_LoadFile;

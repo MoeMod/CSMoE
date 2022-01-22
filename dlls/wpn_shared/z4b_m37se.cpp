@@ -137,7 +137,7 @@ void CM37se::PrimaryAttack(void)
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_338MAG, 115, 0.96, m_pPlayer->pev, FALSE, 0);
 		pev->iuser1 = 0;
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireM37se, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireM37se, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
 #endif
 	}
 	else
@@ -145,7 +145,7 @@ void CM37se::PrimaryAttack(void)
 		m_iClip--;
 #ifndef CLIENT_DLL
 		m_pPlayer->FireBullets(8, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0);
-		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireM37se, 0, (float*)&g_vecZero, (float*)&g_vecZero, 0, 0, 0, 0, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(m_pPlayer->pev), m_usFireM37se, 0, g_vecZero, g_vecZero, 0, 0, 0, 0, FALSE, FALSE);
 #endif
 	}
 #ifndef CLIENT_DLL

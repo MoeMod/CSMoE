@@ -181,7 +181,7 @@ NOXREF int CBaseAnimating::GetBodygroup(int iGroup)
 	return sv::GetBodygroup(GET_MODEL_PTR(ENT(pev)), pev, iGroup);
 }
 
-int CBaseAnimating::ExtractBbox(int sequence, float *mins, float *maxs)
+int CBaseAnimating::ExtractBbox(int sequence, vec3_t_ref mins, vec3_t_ref maxs)
 {
 	return sv::ExtractBbox(GET_MODEL_PTR(ENT(pev)), sequence, mins, maxs);
 }

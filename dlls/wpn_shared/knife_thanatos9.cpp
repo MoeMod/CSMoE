@@ -119,7 +119,7 @@ public:
 
 	void CreateSmoke(int iType)
 	{
-		//PLAYBACK_EVENT_FULL(0, p->m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, iType != -1 ? iType : p->m_flThanatos9SmokeTime, 0.0, iType, 11, m_iWeaponState == 0, m_iState);
+		//PLAYBACK_EVENT_FULL(0, p->m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, iType != -1 ? iType : p->m_flThanatos9SmokeTime, 0.0, iType, 11, m_iWeaponState == 0, m_iState);
 	}
 
 	BOOL Deploy() override

@@ -193,7 +193,7 @@ void R_DecalComputeBasis( msurface_t *surf, vec3_t pSAxis, vec3_t textureSpaceBa
 
 void R_SetupDecalTextureSpaceBasis( decal_t *pDecal, msurface_t *surf, int texture, vec3_t textureSpaceBasis[3], float decalWorldScale[2] )
 {
-	float	*sAxis = NULL;
+	vec3_t sAxis = {};
 	int	width, height;
 
 	if( pDecal->flags & FDECAL_USESAXIS )
@@ -679,7 +679,7 @@ void R_DecalSurface( msurface_t *surf, decalinfo_t *decalinfo )
 	// get the texture associated with this surface
 	mtexinfo_t	*tex = surf->texinfo;
 	vec4_t		textureU, textureV;
-	float		*sAxis = NULL;
+	vec3_t      sAxis = nullptr;
 	float		s, t, w, h;
 	decal_t		*decal = surf->pdecals;
 

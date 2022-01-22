@@ -280,13 +280,13 @@ int SV_TransferConsistencyInfo( void )
 					Host_Error( "Mod_GetStudioBounds: couldn't get bounds for %s\n", filepath );
 
 				res->rguc_reserved[0x00] = check->force_state;
-				Q_memcpy( &res->rguc_reserved[0x01], mins, sizeof( mins ));
-				Q_memcpy( &res->rguc_reserved[0x0D], maxs, sizeof( maxs ));
+				Q_memcpy( &res->rguc_reserved[0x01], (float *)mins, sizeof( mins ));
+				Q_memcpy( &res->rguc_reserved[0x0D], (float *)maxs, sizeof( maxs ));
 				break;
 			case force_model_specifybounds:
 				res->rguc_reserved[0x00] = check->force_state;
-				Q_memcpy( &res->rguc_reserved[0x01], check->mins, sizeof( check->mins ));
-				Q_memcpy( &res->rguc_reserved[0x0D], check->maxs, sizeof( check->maxs ));
+				Q_memcpy( &res->rguc_reserved[0x01], (float *)check->mins, sizeof( check->mins ));
+				Q_memcpy( &res->rguc_reserved[0x0D], (float *)check->maxs, sizeof( check->maxs ));
 				break;
 			}
 		}

@@ -100,7 +100,7 @@ void PlayerModel_Precache()
 void PlayerModel_ForceUnmodified(const Vector &vMin, const Vector &vMax)
 {
 	for (auto psz : sPlayerModelFiles)
-		ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, (float *)&vMin, (float *)&vMax, psz);
+		ENGINE_FORCE_UNMODIFIED(force_model_specifybounds, vMin, vMax, psz);
 }
 
 }

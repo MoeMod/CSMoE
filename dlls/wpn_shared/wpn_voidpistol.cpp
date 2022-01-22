@@ -64,7 +64,7 @@ namespace sv {
 			pev->animtime = gpGlobals->time;
 			pev->framerate = 1.0;
 			m_iState = BLACKHOLE_START;
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 
 			SetThink(&CVoidpistolBlackhole::OnLoop);
 			pev->nextthink = gpGlobals->time + 1.5s;
@@ -82,7 +82,7 @@ namespace sv {
 				m_flLoopTime = gpGlobals->time + 4s;
 				m_SoundRepeat = 0;
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/voidpistol_blackhole_idle.wav", VOL_NORM, ATTN_NORM);
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 			}
 				RadiusDamage(pev->origin, m_BlackholeDamage, TRUE, m_freq);
 				
@@ -117,7 +117,7 @@ namespace sv {
 				m_iState = BLACKHOLE_END;
 				m_flLoopTime = gpGlobals->time + 1.6s;
 				m_freq = 0;
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, (float*)&g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
+				PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pev), m_usFireVoidpistol, 0.0, pev->origin, g_vecZero, 0.0, 0.0, 0, m_iState, FALSE, TRUE);
 			}
 
 				RadiusDamage(pev->origin, DetonationDamage(), FALSE, m_freq);
@@ -800,7 +800,7 @@ void CVoidpistol::VoidpistolFireB(float flSpread, duration_t flCycleTime, BOOL f
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 #endif
 		m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
-		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, (float*)&g_vecZero, (float*)&g_vecZero, 2.0, 0.0, 0, 0, IsModeCEnabled(m_iCharging), FALSE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, g_vecZero, g_vecZero, 2.0, 0.0, 0, 0, IsModeCEnabled(m_iCharging), FALSE);
 
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
@@ -878,11 +878,11 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 			
 			if (pHit->IsPlayer())
 			{
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pHit->pev->origin, (float*)&g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
+				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pHit->pev->origin, g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
 				if (g_pGameRules->PlayerRelationship(m_pPlayer, pHit) != GR_TEAMMATE)
 					m_iCharging++;
 			}
-				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, (float*)&g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
+				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 2, 0, TRUE, FALSE);
 		}
 	}
 	if (IsModeCEnabled(m_iCharging))
@@ -890,7 +890,7 @@ void CVoidpistol::VoidpistolFireA(float flSpread, duration_t flCycleTime, BOOL f
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 1;
 	}
 
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), 1, IsModeCEnabled(m_iCharging), FALSE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireVoidpistol, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), 1, IsModeCEnabled(m_iCharging), FALSE);
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.5s;
 #endif
 

@@ -545,7 +545,7 @@ namespace sv {
 		if (m_iSwing)
 		{
 			vecAngle[0] = 360.0 - vecAngle[0];
-			//ÄÑ¿´ËÀÁË»¹ÊÇÆÁ±ÎºÃÁË=-= PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + vecForward * 50, vecAngle, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
+			//ï¿½Ñ¿ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½=-= PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + vecForward * 50, vecAngle, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
 			CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 40, m_iSwing);
 		}
 		float c = cos(flAngleDegrees * 0.5 * M_PI / flRadius);
@@ -667,7 +667,7 @@ namespace sv {
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, (float*)&g_vecZero, (float*)&g_vecZero, 0.0, 0.0, 14, 0, TRUE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 14, 0, TRUE, FALSE);
 		
 	}
 

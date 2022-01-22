@@ -101,7 +101,7 @@ static qboolean CheckSkybox( const char *name )
 	return false;
 }
 
-void DrawSkyPolygon( int nump, vec3_t vecs )
+void DrawSkyPolygon( int nump, float *vecs )
 {
 	int	i, j, axis;
 	float	s, t, dv, *vp;
@@ -124,18 +124,18 @@ void DrawSkyPolygon( int nump, vec3_t vecs )
 	else axis = (v[2] < 0) ? 5 : 4;
 
 	// project new texture coords
-	for( i = 0; i < nump; i++, vecs += 3 )
+	for( i = 0, vp = vecs; i < nump; i++, vp += 3 )
 	{
 		j = vec_to_st[axis][2];
-		dv = (j > 0) ? vecs[j-1] : -vecs[-j-1];
+		dv = (j > 0) ? vp[j-1] : -vp[-j-1];
 
 		if( dv == 0 ) continue;
 
 		j = vec_to_st[axis][0];
-		s = (j < 0) ? -vecs[-j-1] / dv : vecs[j-1] / dv;
+		s = (j < 0) ? -vp[-j-1] / dv : vp[j-1] / dv;
 
 		j = vec_to_st[axis][1];
-		t = (j < 0) ? -vecs[-j-1] / dv : vecs[j-1] / dv;
+		t = (j < 0) ? -vp[-j-1] / dv : vp[j-1] / dv;
 
 		if( s < RI.skyMins[0][axis] ) RI.skyMins[0][axis] = s;
 		if( t < RI.skyMins[1][axis] ) RI.skyMins[1][axis] = t;
@@ -149,7 +149,7 @@ void DrawSkyPolygon( int nump, vec3_t vecs )
 ClipSkyPolygon
 ==============
 */
-void ClipSkyPolygon( int nump, vec3_t vecs, int stage )
+void ClipSkyPolygon( int nump, float *vecs, int stage )
 {
 	const float	*norm;
 	float		*v, d, e;

@@ -604,7 +604,7 @@ void CGrenade::SG_Detonate()
 	}
 
 	m_bDetonated = true;
-	PLAYBACK_EVENT_FULL(0, NULL, m_usEvent, 0, pev->origin, (float *)&g_vecZero, 0, 0, 0, 1, m_bLightSmoke, FALSE);
+	PLAYBACK_EVENT_FULL(0, NULL, m_usEvent, 0, pev->origin, g_vecZero, 0, 0, 0, 1, m_bLightSmoke, FALSE);
 	m_vSmokeDetonate = pev->origin;
 
 	pev->velocity.x = RANDOM_FLOAT(-175, 175);

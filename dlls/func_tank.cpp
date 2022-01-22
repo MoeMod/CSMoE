@@ -259,8 +259,8 @@ void CFuncTank::ControllerPostFrame()
 		return;
 
 	if (m_pController->pev->button & IN_ATTACK) {
-		Vector vecForward;
-		UTIL_MakeVectorsPrivate(pev->angles, vecForward, NULL, NULL);
+		Vector vecForward, vecUp, vecRight;
+		UTIL_MakeVectorsPrivate(pev->angles, vecForward, vecUp, vecRight);
 
 		m_fireLast = gpGlobals->time - duration_t(1.0f / m_fireRate) - 0.01s;
 		Fire(BarrelPosition(), vecForward, m_pController->pev);
@@ -449,8 +449,8 @@ void CFuncTank::TrackTarget()
 	if (CanFire() &&
 	    ((fabs(distX) < m_pitchTolerance && fabs(distY) < m_yawTolerance) || (pev->spawnflags & SF_TANK_LINEOFSIGHT))) {
 		BOOL fire = FALSE;
-		Vector forward;
-		UTIL_MakeVectorsPrivate(pev->angles, forward, NULL, NULL);
+		Vector forward, right, up;
+		UTIL_MakeVectorsPrivate(pev->angles, forward, right, up);
 
 		if (pev->spawnflags & SF_TANK_LINEOFSIGHT) {
 			float length = direction.Length();

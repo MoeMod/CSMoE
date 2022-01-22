@@ -55,6 +55,7 @@ jobs:
     - sudo apt-get install libfontconfig1-dev
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     script:
     - mkdir -p linux-build-amd64 && cd linux-build-amd64
     - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
@@ -83,6 +84,7 @@ jobs:
     - sudo apt-get install libfontconfig1-dev
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     script:
     - mkdir -p linux-build-arm64 && cd linux-build-arm64
     - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../
@@ -99,6 +101,7 @@ jobs:
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -131,6 +134,7 @@ jobs:
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     - brew install p7zip
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -168,6 +172,7 @@ jobs:
     - echo y | /usr/local/android-sdk/tools/bin/sdkmanager "cmake;3.18.1" --channel=3
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     - sudo apt-get install p7zip-full
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
@@ -201,6 +206,7 @@ jobs:
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:
@@ -234,6 +240,7 @@ jobs:
     - mv SDL2-2.0.14 3rdparty/SDL2
     - git clone https://github.com/LuaJIT/LuaJIT 3rdparty/LuaJIT
     - git clone https://github.com/Neargye/nameof 3rdparty/nameof
+    - git clone https://github.com/JustasMasiulis/xorstr 3rdparty/xorstr
     - curl -fLO https://github.com/MoeMod/CSMoE-GameDir/releases/download/continuous/CSMoE-CD-GameDir-Full.7z
     - 7z x CSMoE-CD-GameDir-Full.7z
     script:

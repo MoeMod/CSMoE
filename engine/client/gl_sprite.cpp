@@ -1094,7 +1094,7 @@ void R_DrawSpriteModel( cl_entity_t *e )
 	float		angle, dot, sr, cr, flAlpha;
 	float		lerp = 1.0f, ilerp, scale;
 	vec3_t		v_forward, v_right, v_up;
-	vec3_t		origin, color, color2 = {0.0f};
+	vec3_t		origin, color, color2 = {};
 
 	if( RI.params & RP_ENVVIEW )
 		return;

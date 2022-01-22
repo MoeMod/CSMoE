@@ -335,7 +335,7 @@ void CM134HeroI::SpecialAttack(  )
 
             m_flAmmoUseTime = gpGlobals->time;// start using ammo ASAP.
 
-            PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 1, 0 );
+            PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 1, 0 );
 
             m_shakeTime = invalid_time_point;
 
@@ -354,12 +354,12 @@ void CM134HeroI::SpecialAttack(  )
 
             if( pev->fuser1 <= UTIL_WeaponTimeBase() / 1s )
             {
-                PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 0, 0 );
+                PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 0, 0 );
                 pev->fuser1 = 1000;
             }
             else
             {
-                PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 0, 1 );
+                PLAYBACK_EVENT_FULL( flags, m_pPlayer->edict(), m_usEgonFire, 0, g_vecZero, g_vecZero, 0.0, 0.0, m_fireState, m_fireMode, 0, 1 );
             }
 
             if( !HasAmmo() )

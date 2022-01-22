@@ -211,7 +211,7 @@ void CFrequency1::Frequency1FireSP(float flSpread, duration_t flCycleTime, BOOL 
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 4096, 10, BULLET_PLAYER_50AE, GetDamage2(), 0.89, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireFrequency1, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireFrequency1, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
@@ -288,7 +288,7 @@ void CFrequency1::Frequency1Fire(float flSpread, duration_t flCycleTime, BOOL fU
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireFrequency1, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE , TRUE);
+	PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFireFrequency1, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE , TRUE);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
@@ -628,7 +628,7 @@ void CFrequency1::Frequency1HighNoonFire(int iIndex)
 
 	int flags;
 
-	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireFrequency1, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
+	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireFrequency1, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), TRUE, FALSE);
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 

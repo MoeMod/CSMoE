@@ -38,14 +38,14 @@ extern "C++"
 namespace cl
 {
 	extern int		iJumpSpectator;
-	extern float	vJumpOrigin[3];
-	extern float	vJumpAngles[3];
+	extern vec3_t	vJumpOrigin;
+	extern vec3_t	vJumpAngles;
 }
 using namespace cl;
 
-extern void V_GetInEyePos(int entity, float * origin, float * angles );
+extern void V_GetInEyePos(int entity, vec3_t_ref origin, vec3_t_ref angles );
 extern void V_ResetChaseCam();
-extern void V_GetChasePos(int target, float * cl_angles, float * origin, float * angles);
+extern void V_GetChasePos(int target, const vec3_t, vec3_t_ref origin, vec3_t_ref angles);
 extern float * GetClientColor( int clientIndex );
 
 extern vec3_t v_origin;		// last view origin
@@ -70,12 +70,12 @@ void SpectatorMode(void)
 
 void SpectatorSpray(void)
 {
-	vec3_t forward;
+	vec3_t forward, up, right;
 
 	if ( !gEngfuncs.IsSpectateOnly() )
 		return;
 
-	AngleVectors(v_angles,forward,NULL,NULL);
+	AngleVectors(v_angles,forward,up, right);
 	VectorScale(forward, 128, forward);
 	VectorAdd(forward, v_origin, forward);
 	pmtrace_t * trace = gEngfuncs.PM_TraceLine( v_origin, forward, PM_TRACELINE_PHYSENTSONLY, 2, -1 );
@@ -218,7 +218,7 @@ int CHudSpectator::Init()
 // UTIL_StringToVector originally from ..\dlls\util.cpp, slightly changed
 //-----------------------------------------------------------------------------
 
-void UTIL_StringToVector( float * pVector, const char *pString )
+void UTIL_StringToVector( vec3_t_ref pVector, const char *pString )
 {
 	char *pstr, *pfront, tempString[128];
 	int	j;
@@ -245,7 +245,7 @@ void UTIL_StringToVector( float * pVector, const char *pString )
 	}
 }
 
-int UTIL_FindEntityInMap( const char * name, float * origin, float * angle)
+int UTIL_FindEntityInMap( const char * name, vec3_t_ref origin, vec3_t_ref angle)
 {
 	int				n,found = 0;
 	char			keyname[256];
@@ -476,8 +476,8 @@ int CHudSpectator::Draw(float flTime)
 	// if user moves in map mode, change map origin
 	if ( (m_moveDelta != 0.0f) && (g_iUser1 != OBS_ROAMING) )
 	{
-		vec3_t	right;
-		AngleVectors(v_angles, NULL, right, NULL);
+		vec3_t	forward, right, up;
+		AngleVectors(v_angles, forward, right, up);
 		VectorNormalize(right);
 		VectorScale(right, m_moveDelta, right );
 
@@ -1308,7 +1308,8 @@ void CHudSpectator::DrawOverviewEntities()
 		// see R_DrawSpriteModel
 		// draws players sprite
 
-		AngleVectors(ent->angles, right, up, NULL );
+		vec3_t temp;
+		AngleVectors(ent->angles, right, up, temp );
 		VectorCopy(ent->origin,origin);
 
 		float fScale = 16.0f * sizeScale;
@@ -1447,7 +1448,7 @@ void CHudSpectator::DrawOverviewEntities()
 	
 	gEngfuncs.pTriAPI->Color4f( r, g, b, 1.0 );
 
-	AngleVectors(angles, forward, NULL, NULL );
+	AngleVectors(angles, forward, right, up );
 	VectorScale (forward, 512.0f, forward);
 	
 	offset[0] =  0.0f;

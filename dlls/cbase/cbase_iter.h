@@ -136,7 +136,7 @@ CLASS_BEGIN(CBaseAnimating, CBaseDelay)
 	ADD_MEMBER_FUNCTION(GetAttachment, int, Vector&, Vector&)
 	ADD_MEMBER_FUNCTION(SetBodygroup, int, int)
 	ADD_MEMBER_FUNCTION(GetBodygroup, int)
-	ADD_MEMBER_FUNCTION(ExtractBbox, int, float*, float*)
+	ADD_MEMBER_FUNCTION(ExtractBbox, int, vec3_t_ref, vec3_t_ref)
 	ADD_MEMBER_FUNCTION(SetSequenceBox)
 #endif
 

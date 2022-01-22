@@ -107,15 +107,15 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 	mstudioseqdesc_t *pseqdesc;
 	mstudioanim_t *panim;
 
-	static float pos[MAXSTUDIOBONES][3];
+	static vec3_t pos[MAXSTUDIOBONES];
 	static vec4_t q[MAXSTUDIOBONES];
 	float bonematrix[3][4];
 
-	static float pos2[MAXSTUDIOBONES][3];
+	static vec3_t pos2[MAXSTUDIOBONES];
 	static vec4_t q2[MAXSTUDIOBONES];
-	static float pos3[MAXSTUDIOBONES][3];
+	static vec3_t pos3[MAXSTUDIOBONES];
 	static vec4_t q3[MAXSTUDIOBONES];
-	static float pos4[MAXSTUDIOBONES][3];
+	static vec3_t pos4[MAXSTUDIOBONES];
 	static vec4_t q4[MAXSTUDIOBONES];
 
 	if (!m_pCurrentEntity->player)
@@ -227,7 +227,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 	if (m_fDoInterp && m_pCurrentEntity->latched.sequencetime && (m_pCurrentEntity->latched.sequencetime + 0.2 > m_clTime) && (m_pCurrentEntity->latched.prevsequence < m_pStudioHeader->numseq))
 	{
-		static float pos1b[MAXSTUDIOBONES][3];
+		static vec3_t pos1b[MAXSTUDIOBONES];
 		static vec4_t q1b[MAXSTUDIOBONES];
 		float s = m_pCurrentEntity->latched.prevseqblending[0];
 		float t = m_pCurrentEntity->latched.prevseqblending[1];
@@ -342,7 +342,7 @@ void CGameStudioModelRenderer::StudioSetupBones(void)
 
 			if (copy)
 			{
-				memcpy(pos[i], pos2[i], sizeof(pos[i]));
+				pos[i] = pos2[i];
 				memcpy(q[i], q2[i], sizeof(q[i]));
 			}
 		}
@@ -955,7 +955,7 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 		alight_t lighting;
 		vec3_t dir;
 
-		lighting.plightvec = dir;
+		lighting.plightvec = &dir;
 
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
 		IEngineStudio.StudioEntityLight(&lighting);

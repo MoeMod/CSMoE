@@ -273,8 +273,8 @@ typedef struct gameinfo_s
 	char		sp_entity[32];	// e.g. info_player_start
 	char		mp_entity[32];	// e.g. info_player_deathmatch
 
-	float		client_mins[MAX_MAP_HULLS][3];	// 4 hulls allowed
-	float		client_maxs[MAX_MAP_HULLS][3];	// 4 hulls allowed
+	vec3_t		client_mins[MAX_MAP_HULLS];	// 4 hulls allowed
+	vec3_t		client_maxs[MAX_MAP_HULLS];	// 4 hulls allowed
 
 	char		ambientsound[NUM_AMBIENTS][64];	// quake ambient sounds
 	int		soundclip_dist;			// custom distance to clip sound
@@ -823,7 +823,7 @@ void pfnDrawConsoleStringLen( const char *pText, int *length, int *height );
 int pfnAddClientCommand( const char *cmd_name, xcommand_t func );
 void *Cache_Check( byte *mempool, struct cache_user_s *c );
 edict_t* pfnPEntityOfEntIndex( int iEntIndex );
-void pfnGetModelBounds( model_t *mod, float *mins, float *maxs );
+void pfnGetModelBounds( model_t *mod, vec3_t_ref mins, vec3_t_ref maxs );
 void pfnGetGameDir( char *szGetGameDir );
 int pfnDecalIndex( const char *m );
 int pfnGetModelType( model_t *mod );
@@ -969,8 +969,8 @@ int COM_ExpandFilename( const char *fileName, char *nameOutBuffer, int nameOutBu
 struct pmtrace_s *PM_TraceLine( float *start, float *end, int flags, int usehull, int ignore_pe );
 void SV_StartSound( edict_t *ent, int chan, const char *sample, float vol, float attn, int flags, int pitch );
 void SV_StartMusic( const char *curtrack, const char *looptrack, fs_offset_t position );
-void SV_CreateDecal( struct sizebuf_s *msg, const float *origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
-void SV_CreateStudioDecal( struct sizebuf_s *msg, const float *origin, const float *start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
+void SV_CreateDecal( struct sizebuf_s *msg, const vec3_t origin, int decalIndex, int entityIndex, int modelIndex, int flags, float scale );
+void SV_CreateStudioDecal( struct sizebuf_s *msg, const vec3_t origin, const vec3_t start, int decalIndex, int entityIndex, int modelIndex, int flags, struct modelstate_s *state );
 struct sizebuf_s *SV_GetReliableDatagram( void );
 qboolean SV_RestoreCustomDecal( struct decallist_s *entry, edict_t *pEdict, qboolean adjacent );
 int R_CreateDecalList( struct decallist_s *pList, qboolean changelevel );
@@ -991,8 +991,8 @@ qboolean CL_IsBackgroundMap( void );
 qboolean CL_LoadProgs( const char *name );
 qboolean SV_GetComment( const char *savename, char *comment );
 qboolean SV_NewGame( const char *mapName, qboolean loadGame );
-void SV_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
-void CL_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
+void SV_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
+void CL_ClipPMoveToEntity( struct physent_s *pe, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, struct pmtrace_s *tr );
 void SV_SysError( const char *error_string );
 void SV_InitGameProgs( void );
 void SV_FreeGameProgs( void );

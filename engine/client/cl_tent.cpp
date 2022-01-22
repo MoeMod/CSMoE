@@ -1889,7 +1889,7 @@ CL_FireField
 Makes a field of fire
 ==============
 */
-void GAME_EXPORT CL_FireField( const float *org, int radius, int modelIndex, int count, int flags, float life )
+void GAME_EXPORT CL_FireField( const vec3_t org, int radius, int modelIndex, int count, int flags, float life )
 {
 	TEMPENTITY	*pTemp;
 	float		radius2;
@@ -2721,7 +2721,7 @@ update client flashlight
 void CL_UpdateFlashlight( cl_entity_t *pEnt )
 {
 	vec3_t	vecSrc, vecEnd;
-	vec3_t	forward, view_ofs;
+	vec3_t	forward, right, up, view_ofs;
 	float	falloff;
 	pmtrace_t	trace;
 	dlight_t	*dl;
@@ -2730,7 +2730,7 @@ void CL_UpdateFlashlight( cl_entity_t *pEnt )
 	if(( pEnt->index - 1 ) == cl.playernum )
 	{
 		// get the predicted angles
-		AngleVectors( cl.refdef.cl_viewangles, forward, NULL, NULL );
+		AngleVectors( cl.refdef.cl_viewangles, forward, right, up );
 	}
 	else
 	{
@@ -2741,7 +2741,7 @@ void CL_UpdateFlashlight( cl_entity_t *pEnt )
 		v_angle[YAW] = pEnt->angles[YAW];
 		v_angle[ROLL] = 0; 	// no roll
 
-		AngleVectors( v_angle, forward, NULL, NULL );
+		AngleVectors( v_angle, forward, right, up );
 	}
 
 	VectorClear( view_ofs );
@@ -2821,7 +2821,7 @@ CL_DecalShoot
 normal temporary decal
 ===============
 */
-void GAME_EXPORT CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags )
+void GAME_EXPORT CL_DecalShoot( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags )
 {
 	R_DecalShoot( textureIndex, entityIndex, modelIndex, pos, flags, NULL, 1.0f );
 }
@@ -2833,7 +2833,7 @@ CL_FireCustomDecal
 custom temporary decal
 ===============
 */
-void GAME_EXPORT CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, const float *pos, int flags, float scale )
+void GAME_EXPORT CL_FireCustomDecal( int textureIndex, int entityIndex, int modelIndex, const vec3_t pos, int flags, float scale )
 {
 	R_DecalShoot( textureIndex, entityIndex, modelIndex, pos, flags, NULL, scale );
 }
@@ -2845,7 +2845,7 @@ CL_PlayerDecal
 spray custom colored decal (clan logo etc)
 ===============
 */
-void CL_PlayerDecal( int textureIndex, int entityIndex, float *pos )
+void CL_PlayerDecal( int textureIndex, int entityIndex, const vec3_t pos )
 {
 	R_DecalShoot( textureIndex, entityIndex, 0, pos, 0, NULL, 1.0f );
 }

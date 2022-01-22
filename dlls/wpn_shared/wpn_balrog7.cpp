@@ -378,7 +378,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		m_iChargeShotsFired = 0;
 		auto vecShootPosition = Get_ShootPosition(vecSrc, gpGlobals->v_forward, 0.0, 8192, m_pPlayer->random_seed);
 		RadiusDamage(vecShootPosition, BalrogDamage());
-		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
 		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 		if (pEnt)
 		{
@@ -388,7 +388,7 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		//RadiusDamage(vecAiming , flDamage);
 	}
 	else
-		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, (float*)&g_vecZero, (float*)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, FALSE);
 #endif
 
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;

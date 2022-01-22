@@ -318,7 +318,7 @@ void DLLEXPORT CAM_Think( void )
 	// Move towards ideal
 	VectorCopy( cam_ofs, camAngles );
 
-	gEngfuncs.GetViewAngles( (float *)viewangles );
+	gEngfuncs.GetViewAngles( viewangles );
 
 	if( cam_snapto->value )
 	{
@@ -372,7 +372,7 @@ void CAM_ToThirdPerson(void)
 	}
 #endif
 
-	gEngfuncs.GetViewAngles( (float *)viewangles );
+	gEngfuncs.GetViewAngles( viewangles );
 
 	if( !cam_thirdperson )
 	{
@@ -439,7 +439,7 @@ void CAM_ClearStates( void )
 {
 	vec3_t viewangles;
 
-	gEngfuncs.GetViewAngles( (float *)viewangles );
+	gEngfuncs.GetViewAngles( viewangles );
 
 	cam_pitchup.state = 0;
 	cam_pitchdown.state = 0;
@@ -556,7 +556,7 @@ int DLLEXPORT CL_IsThirdPerson( void )
 	return (cam_thirdperson ? 1 : 0) || (g_iUser1 && gEngfuncs.GetLocalPlayer() && (g_iUser2 == gEngfuncs.GetLocalPlayer()->index) );
 }
 
-void DLLEXPORT CL_CameraOffset( float *ofs )
+void DLLEXPORT CL_CameraOffset( vec3_t_ref ofs )
 {
 	VectorCopy( cam_ofs, ofs );
 }

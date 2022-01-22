@@ -58,7 +58,7 @@ void CZombieClass_Revival::Evolution(ZombieLevel iEvolutionLevel)
 
 void CZombieClass_Revival::InitHUD() const
 {
-	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, {}, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_REVIVAL);
 	WRITE_BYTE(ZOMBIE_SKILL_REVIVAL);

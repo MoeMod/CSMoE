@@ -856,7 +856,7 @@ it will never be restarted.  Use StartStaticSound (pass CHAN_STATIC to EMIT_SOUN
 SV_StartSound.
 ====================
 */
-void S_StartSound( const vec3_t pos, int ent, int chan, sound_t handle, float fvol, float attn, int pitch, int flags )
+void S_StartSound( vec3_t pos, int ent, int chan, sound_t handle, float fvol, float attn, int pitch, int flags )
 {
 	wavdata_t	*pSource;
 	sfx_t	*sfx = NULL;

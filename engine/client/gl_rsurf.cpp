@@ -3387,7 +3387,9 @@ void R_RecursiveWorldNode( mnode_t *node, uint clipflags )
 			if(!( clipflags & ( 1U << i )))
 				continue;
 
-			clipped = BoxOnPlaneSide( node->minmaxs, node->minmaxs + 3, clipplane );
+			vec3_t mins = { node->minmaxs[0], node->minmaxs[1], node->minmaxs[2] };
+			vec3_t maxs = { node->minmaxs[3], node->minmaxs[4], node->minmaxs[5] };
+			clipped = BoxOnPlaneSide( mins, maxs, clipplane );
 			if( clipped == 2 ) return;
 			if( clipped == 1 ) clipflags &= ~(1U << i);
 		}
@@ -3536,7 +3538,9 @@ void R_DrawWorldTopView( mnode_t *node, uint clipflags )
 				if(!( clipflags & ( 1U << c )))
 					continue;
 
-				clipped = BoxOnPlaneSide( node->minmaxs, node->minmaxs + 3, clipplane );
+				vec3_t mins = { node->minmaxs[0], node->minmaxs[1], node->minmaxs[2] };
+				vec3_t maxs = { node->minmaxs[3], node->minmaxs[4], node->minmaxs[5] };
+				clipped = BoxOnPlaneSide( mins, maxs, clipplane );
 				if( clipped == 2 ) return;
 				if( clipped == 1 ) clipflags &= ~(1U << c);
 			}

@@ -210,7 +210,7 @@ namespace sv {
 #endif
 */
 #ifndef CLIENT_DLL
-		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireJanus7xmas, 0, (float *)&g_vecZero, (float *)&g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireJanus7xmas, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
 #endif		
 		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
