@@ -372,18 +372,18 @@ pfnGetModelBounds
 
 =============
 */
-void GAME_EXPORT pfnGetModelBounds( model_t *mod, float *mins, float *maxs )
+void GAME_EXPORT pfnGetModelBounds( model_t *mod, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	if( mod )
 	{
-		if( mins ) VectorCopy( mod->mins, mins );
-		if( maxs ) VectorCopy( mod->maxs, maxs );
+		if (mins) VectorCopy(mod->mins, mins);
+		if (maxs) VectorCopy(mod->maxs, maxs);
 	}
 	else
 	{
 		MsgDev( D_ERROR, "Mod_GetBounds: NULL model\n" );
-		if( mins ) VectorClear( mins );
-		if( maxs ) VectorClear( maxs );
+		if (mins) VectorClear(mins);
+		if (maxs) VectorClear(maxs);
 	}
 }
 	

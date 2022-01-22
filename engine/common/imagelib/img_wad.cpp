@@ -490,7 +490,7 @@ qboolean Image_LoadMIP( const char *name, const byte *buffer, size_t filesize )
 		image.fogParams[2] = pal[255*3+2];
 
 		// calc the decal reflectivity
-		image.fogParams[3] = VectorAvg( image.fogParams );         
+		image.fogParams[3] = (image.fogParams[0] + image.fogParams[1] + image.fogParams[2]) / 3;
 	}
  
 	image.type = PF_INDEXED_32;	// 32-bit palete

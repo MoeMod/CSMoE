@@ -112,7 +112,7 @@ PM_HullForBsp
 assume physent is valid
 ==================
 */
-hull_t *PM_HullForBsp( physent_t *pe, playermove_t *pmove, float *offset )
+hull_t *PM_HullForBsp( physent_t *pe, playermove_t *pmove, vec3_t_ref offset )
 {
 	hull_t	*hull;
 
@@ -141,8 +141,8 @@ hull_t *PM_HullForBsp( physent_t *pe, playermove_t *pmove, float *offset )
 		hull = &pe->model->hulls[0];
 
 	// calculate an offset value to center the origin
-	VectorSubtract( hull->clip_mins, pmove->player_mins[pmove->usehull], offset );
-	VectorAdd( offset, pe->origin, offset );
+	VectorSubtract(hull->clip_mins, pmove->player_mins[pmove->usehull], offset);
+	VectorAdd(offset, pe->origin, offset);
 
 	return hull;
 }
@@ -413,7 +413,7 @@ pmtrace_t PM_PlayerTraceExt( playermove_t *pmove, vec3_t start, vec3_t end, int 
 			if( transform_bbox )
 				Matrix4x4_CreateFromEntity( matrix, pe->angles, pe->origin, 1.0f );
 			else Matrix4x4_CreateFromEntity( matrix, pe->angles, offset, 1.0f );
-
+			
 			Matrix4x4_VectorITransform( matrix, start, start_l );
 			Matrix4x4_VectorITransform( matrix, end, end_l );
 
@@ -424,12 +424,21 @@ pmtrace_t PM_PlayerTraceExt( playermove_t *pmove, vec3_t start, vec3_t end, int 
 
 				for( j = 0; j < 3; j++ )
 				{
+#ifdef XASH_SIMD
+					vec3_t temp;
+					VectorCopySign(start_l, offset, temp);
+					VectorSubtract(start_l, temp, start_l);
+					
+					VectorCopySign(end_l, offset, temp);
+					VectorSubtract(end_l, temp, end_l);
+#else
 					if( start_l[j] >= 0.0f )
 						start_l[j] -= offset[j];
 					else start_l[j] += offset[j];
 					if( end_l[j] >= 0.0f )
 						end_l[j] -= offset[j];
 					else end_l[j] += offset[j];
+#endif
 				}
 			}
 		}
@@ -590,7 +599,7 @@ int PM_TestPlayerPosition( playermove_t *pmove, vec3_t pos, pmtrace_t *ptrace, p
 				Matrix4x4_CreateFromEntity( matrix, pe->angles, pe->origin, 1.0f );
 			else Matrix4x4_CreateFromEntity( matrix, pe->angles, offset, 1.0f );
 
-			Matrix4x4_VectorITransform( matrix, pos, pos_l );
+			Matrix4x4_VectorITransform(matrix, pos, pos_l);
 
 			if( transform_bbox )
 			{
@@ -599,9 +608,15 @@ int PM_TestPlayerPosition( playermove_t *pmove, vec3_t pos, pmtrace_t *ptrace, p
 
 				for( j = 0; j < 3; j++ )
 				{
+#ifdef XASH_SIMD
+					vec3_t temp;
+					VectorCopySign(pos_l, offset, temp);
+					VectorSubtract(pos_l, offset, pos_l);
+#else
 					if( pos_l[j] >= 0.0f )
 						pos_l[j] -= offset[j];
 					else pos_l[j] += offset[j];
+#endif
 				}
 			}
 		}
