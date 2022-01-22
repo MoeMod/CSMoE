@@ -18,6 +18,8 @@ GNU General Public License for more details.
 
 #include "port.h"
 
+#include <memory>
+
 #include "backends.h"
 #include "defaults.h"
 #include "wrect.h"
