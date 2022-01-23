@@ -15,13 +15,47 @@ GNU General Public License for more details.
 
 #include "common.h"
 
-#define XASH_GENERATE_BUILDNUM
+//#define XASH_GENERATE_BUILDNUM
 
 #if defined(XASH_GENERATE_BUILDNUM)
 static const char *date = __DATE__;
 static const char *mon[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 static char mond[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 #endif
+
+#define YEAR (\
+(__DATE__ [7] - '0') * 1000 + \
+(__DATE__ [8] - '0') * 100 + \
+(__DATE__ [9] - '0') * 10 + \
+(__DATE__ [10] - '0') * 1 \
+)
+
+#define MONTH (\
+  __DATE__ [2] == 'n' ? (__DATE__ [1] == 'a' ? 1 : 6) \
+: __DATE__ [2] == 'b' ? 2 \
+: __DATE__ [2] == 'r' ? (__DATE__ [0] == 'M' ? 3 : 4) \
+: __DATE__ [2] == 'y' ? 5 \
+: __DATE__ [2] == 'l' ? 7 \
+: __DATE__ [2] == 'g' ? 8 \
+: __DATE__ [2] == 'p' ? 9 \
+: __DATE__ [2] == 't' ? 10 \
+: __DATE__ [2] == 'v' ? 11 \
+: 12)
+
+#define DAY ( \
+(__DATE__ [4] - '0') * 10 + \
+(__DATE__ [5] - '0') * 1 \
+)
+
+#define BUILD (((int[]){ 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 })[MONTH] + (DAY - 1) + (YEAR - 1900 - 1) * 365.25 + (YEAR % 4 == 0 && MONTH >= 2) - 41728)
+
+constexpr int g_iBuildNum = BUILD;
+
+extern "C" const char SO_FILE_VERSION[5]
+#if __ANDROID__
+	__attribute__ ((section (".bugly_version")))
+#endif
+= { ((g_iBuildNum / 1000) % 10) + '0', ((g_iBuildNum / 100) % 10) + '0', ((g_iBuildNum / 10) % 10) + '0', ((g_iBuildNum / 1) % 10) + '0', '\0' };
 
 // returns days since Feb 13 2007
 int Q_buildnum( void )
@@ -54,7 +88,7 @@ int Q_buildnum( void )
 
 	return b;
 #else
-	return 1276; // Aug 13 2016
+	return g_iBuildNum; // Aug 13 2016
 #endif
 }
 
