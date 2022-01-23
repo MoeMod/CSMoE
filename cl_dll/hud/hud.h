@@ -982,9 +982,7 @@ public:
 	inline float GetSensitivity() { return m_flMouseSensitivity; }
 	inline HSPRITE GetSprite( int index )
 	{
-		assert( index >= -1 && index <= m_iSpriteCount );
-
-		return (index >= 0) ? m_rghSprites[index] : 0;
+		return (index >= 0 && index < m_iSpriteCount) ? m_rghSprites[index] : 0;
 	}
 
 	inline wrect_t& GetSpriteRect( int index )

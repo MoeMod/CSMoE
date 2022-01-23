@@ -9099,4 +9099,10 @@ void CBasePlayer::PlayerTouch(CBaseEntity* other)
 {
 	m_pModStrategy->OnTouch(other);
 }
+
+bool CBasePlayer::IsPC()
+{
+	int index = entindex();
+	return (g_pGameRules->m_iPlayersOS[index - 1] == OS_Windows);
+}
 }

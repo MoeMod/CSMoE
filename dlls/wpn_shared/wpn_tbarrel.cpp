@@ -240,15 +240,16 @@ void CTbarrel::WeaponIdle(void)
 
 int CTbarrel::GetDamage()
 {
-	float flDamage[4] = { 0.0, 32.0, 32.0, 36.0 };
-	return flDamage[m_iInstantShots];
+	float iDamage[4] = { 0, 32, 32, 36 };
+	if (m_iInstantShots > 4)
+		return iDamage[3] + (m_iInstantShots - 3) * 4;
+	return iDamage[min(m_iInstantShots, 3)];
 }
 
 float CTbarrel::GetSpread()
 {
 	float flSpread[4] = { 0.0, 0.0527, 0.0625, 0.085 };
-
-	return flSpread[m_iInstantShots];
+	return flSpread[min(m_iInstantShots, 3)];
 }
 
 }

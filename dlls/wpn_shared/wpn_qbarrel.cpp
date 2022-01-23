@@ -180,8 +180,8 @@ void CQbarrel::SecondaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
-	if (m_iInstantShots > 0 && m_iInstantShots < 5)
-	{
+	/*if (m_iInstantShots > 0 && m_iInstantShots < 5)
+	{*/
 		float flSpread = GetSpread();
 
 #ifndef CLIENT_DLL
@@ -195,7 +195,7 @@ void CQbarrel::SecondaryAttack(void)
 		flags = 0;
 #endif
 		PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireQbarrel, 0.0, g_vecZero, g_vecZero, GetSpread(), 0.0, m_iInstantShots, 7 * m_iInstantShots, FALSE, FALSE);
-	}
+	//}
 
 #ifndef CLIENT_DLL
 	if (!m_iClip && m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
@@ -243,15 +243,16 @@ void CQbarrel::WeaponIdle(void)
 
 int CQbarrel::GetDamage()
 {
-	float flDamage[5] = { 0.0, 66.0, 66.0, 86.0, 100.0 };
-	return flDamage[m_iInstantShots];
+	int iDamage[5] = { 0, 66, 66, 86, 100 };
+	if (m_iInstantShots > 4)
+		return iDamage[4] + (m_iInstantShots - 4) * 14;
+	return iDamage[m_iInstantShots];
 }
 
 float CQbarrel::GetSpread()
 {
 	float flSpread[5] = { 0.0, 0.0527, 0.0625, 0.085, 0.125 };
-
-	return flSpread[m_iInstantShots];
+	return flSpread[min(m_iInstantShots, 4)];
 }
 
 }

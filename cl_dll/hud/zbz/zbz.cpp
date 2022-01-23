@@ -97,6 +97,74 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 		};
 		break;
 	}
+	case ZBZ_MESSAGE_CLAW:
+	{
+		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiezclaw.mdl", false);
+		if (!pModel)
+			break;
+
+		int player = buf.ReadByte();
+		cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(player);
+		if (!pPlayer)
+		{
+			gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", player);
+			break;
+		}
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin, pModel);
+		if (!pEnt)
+			break;
+
+		pEnt->entity.curstate.sequence = 0;
+		pEnt->entity.curstate.frame = 0;
+		pEnt->entity.curstate.framerate = 1.0;
+		pEnt->entity.curstate.angles = pPlayer->angles;
+		pEnt->die = gHUD.m_flTime + 0.6667f;
+		pEnt->flags |= FTENT_FADEOUT;
+		break;
+	}
+	case ZBZ_MESSAGE_WING:
+	{
+		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiezwingfx.mdl", false);
+		if (!pModel)
+			break;
+
+		int player = buf.ReadByte();
+		cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(player);
+		if (!pPlayer)
+		{
+			gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", player);
+			break;
+		}
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(pPlayer->origin, pModel);
+		if (!pEnt)
+			break;
+
+		pEnt->entity.curstate.sequence = 0;
+		pEnt->entity.curstate.frame = 0;
+		pEnt->entity.curstate.framerate = 1.0;
+		pEnt->clientIndex = player;
+		pEnt->die = gHUD.m_flTime + 9999.9f;
+		pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM | FTENT_PERSIST;
+		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
+		{
+			if (g_PlayerExtraInfo[ent->clientIndex].dead)
+			{
+				ent->die = currenttime;
+				return;
+			}
+
+			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(ent->clientIndex);
+			if (!pPlayer)
+			{
+				ent->die = currenttime;
+				return;
+			}
+
+			if (pPlayer->curstate.onground)
+				ent->die = currenttime;
+		};
+		break;
+	}
 	}
 
 	return 1;

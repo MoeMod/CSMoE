@@ -46,6 +46,7 @@ namespace sv {
 	constexpr int DAMAGE_AMOUNT = 200; // 满足累计造成伤害值
 	constexpr float EXP_SCALE = 0.2f; // 每回合每升一级所减少经验获取百分比
 	constexpr duration_t ROUND_PERIOD_ADD = 60s; // 每回合时间超过多少秒后下一回合才会给予技能点
+	constexpr duration_t UPGRADE_SKILL_DELAY = 1s;
 
 	CPlayerModStrategy_ZBZ::CPlayerModStrategy_ZBZ(CBasePlayer* player, CMod_ZombieZ* mp)
 		: CPlayerModStrategy_ZB3(player, static_cast<CMod_ZombieHero*>(mp)),
@@ -211,6 +212,12 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 void CPlayerModStrategy_ZBZ::OnSpawn()
 {
 	ClearFire();
+	if (!m_pPlayer->IsPC())
+	{
+		while(m_iPoint > 0)
+			UpgradeSkill();
+	}
+
 	SKILL_FUNCTION(m_vecSkill, OnSpawn);
 	return CPlayerModStrategy_ZB3::OnSpawn();
 }
@@ -344,28 +351,9 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		m_flExpScale = max(0.0f, m_flExpScale - EXP_SCALE);
 		bLevelUp = true;
 
-		int index = m_pPlayer->entindex();
-		if (g_pGameRules->m_iPlayersOS[index - 1] == OS_Android || g_pGameRules->m_iPlayersOS[index - 1] == OS_Apple || m_pPlayer->IsBot())
+		if (!m_pPlayer->IsPC() || m_pPlayer->IsBot())
 		{
-			auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
-			if (data.second != nullptr)
-			{
-				m_iPoint--;
-				m_setSkillID.insert(data.first);
-				m_vecSkill.insert(data.second);
-				data.second->OnGetSkill();
-				if (!m_pPlayer->IsBot())
-				{
-					ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
-					CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
-					data.second->OnGetSkill();
-
-					MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-					WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
-					WRITE_BYTE(data.first);
-					MESSAGE_END();
-				}
-			}
+			UpgradeSkill();
 		}
 	}
 
@@ -454,6 +442,52 @@ void CPlayerModStrategy_ZBZ::Event_OnRoundStart()
 //	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 //}
 
+void CPlayerModStrategy_ZBZ::UpgradeSkill()
+{
+	auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+	if (!data.second)
+		return;
+
+	m_iPoint--;
+	m_setSkillID.insert(data.first);
+	m_vecSkill.insert(data.second);
+	data.second->OnGetSkill();
+
+	if (!m_pPlayer->IsBot())
+	{
+		ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
+		CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+		WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
+		WRITE_BYTE(data.first);
+		MESSAGE_END();
+	}
+
+	if (m_pPlayer->IsPC())
+	{
+#ifndef __DEBUG
+		m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
+		m_pPlayer->ResetMaxSpeed();
+#else
+		m_flSkillDelay = gpGlobals->time + 0.01s;
+#endif
+		if (!m_pPlayer->m_bIsZombie)
+		{
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
+			m_pPlayer->pev->weaponmodel = 0;
+		}
+		m_pPlayer->m_bHolsterDisabled = true;
+		if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
+		{
+			pWeapon->SendWeaponAnim(28, TRUE);
+			pWeapon->m_flNextPrimaryAttack = UPGRADE_SKILL_DELAY;
+			pWeapon->m_flNextSecondaryAttack = UPGRADE_SKILL_DELAY;
+			pWeapon->m_flTimeWeaponIdle = UPGRADE_SKILL_DELAY;
+		}
+	}
+}
+
 void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
 {
 	auto& bitsCurButton = cmd->buttons;
@@ -471,41 +505,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 	{
-		auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
-		if (data.second != nullptr)
-		{
-#ifndef __DEBUG
-			m_flSkillDelay = gpGlobals->time + 1.0s;
-			m_pPlayer->ResetMaxSpeed();
-#else
-			m_flSkillDelay = gpGlobals->time + 0.01s;
-#endif
-			m_iPoint--;
-			m_setSkillID.insert(data.first);
-			m_vecSkill.insert(data.second);
-			ClientPrint(m_pPlayer->pev, HUD_PRINTTALK, "获得技能：%s-%s", data.second->GetName(), data.second->GetDesc());
-			CLIENT_COMMAND(m_pPlayer->edict(), "spk player/zombiez_mutation.wav\n");
-			data.second->OnGetSkill();
-
-			MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
-			WRITE_BYTE(ZBZ_MESSAGE_SKILL_ADD);
-			WRITE_BYTE(data.first);
-			MESSAGE_END();
-
-			if (!m_pPlayer->m_bIsZombie)
-			{
-				m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_emotion.mdl");
-				m_pPlayer->pev->weaponmodel = 0;
-			}
-			m_pPlayer->m_bHolsterDisabled = true;
-			if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
-			{
-				pWeapon->SendWeaponAnim(28, TRUE);
-				pWeapon->m_flNextPrimaryAttack = 1.0s;
-				pWeapon->m_flNextSecondaryAttack = 1.0s;
-				pWeapon->m_flTimeWeaponIdle = 1.0s;
-			}
-		}
+		UpgradeSkill();
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnButtonEvent, bitsCurButton, bitsOldButton);

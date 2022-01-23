@@ -209,6 +209,12 @@ namespace sv {
 		void OnRoundStart() override {
 			OnGetSkill();
 		}
+		void OnBecomeHuman() override {
+			OnGetSkill();
+		}
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
 	private:
 		int GetBonus() const { return 30 + 5 * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
@@ -327,6 +333,11 @@ namespace sv {
 				m_pPlayer->pev->velocity = vecVelocity;
 				m_sSkillStatus = 2;
 				m_flCooldown = gpGlobals->time + 2s;
+
+				MESSAGE_BEGIN(MSG_PVS, gmsgZBZMsg, m_pPlayer->pev->origin);
+				WRITE_BYTE(ZBZ_MESSAGE_WING); // type, reserved.
+				WRITE_BYTE(m_pPlayer->entindex());
+				MESSAGE_END();
 			}
 		}
 
@@ -721,6 +732,11 @@ namespace sv {
 				return;
 
 			flRange += 15.0f;
+
+			MESSAGE_BEGIN(MSG_PVS, gmsgZBZMsg, m_pPlayer->pev->origin);
+			WRITE_BYTE(ZBZ_MESSAGE_CLAW); // type, reserved.
+			WRITE_BYTE(m_pPlayer->entindex());
+			MESSAGE_END();
 		}
 	};
 
@@ -851,7 +867,7 @@ namespace sv {
 		}
 
 		void OnGetSkill() override {
-			MESSAGE_BEGIN(MSG_BROADCAST, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+			MESSAGE_BEGIN(MSG_ALL, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 			WRITE_BYTE(ZBZ_MESSAGE_CONTACT_INFECTION_RING); // type, reserved.
 			WRITE_BYTE(m_pPlayer->entindex());
 			MESSAGE_END();
