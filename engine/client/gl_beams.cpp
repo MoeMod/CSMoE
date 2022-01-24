@@ -111,7 +111,7 @@ void BeamNormalizeColor( BEAM *pBeam, float r, float g, float b, float brightnes
 	pBeam->brightness = ( brightness > 1.0f ) ? brightness : brightness * 255.0f;
 }
 
-static qboolean ComputeBeamEntPosition( int beamEnt, vec3_t pt )
+static qboolean ComputeBeamEntPosition( int beamEnt, vec3_t_ref pt )
 {
 	cl_entity_t	*pEnt;
 	int		nAttachment;
@@ -146,7 +146,7 @@ static qboolean ComputeBeamEntPosition( int beamEnt, vec3_t pt )
 	return true;
 }
 
-static void ComputeBeamPerpendicular( const vec3_t vecBeamDelta, vec3_t pPerp )
+static void ComputeBeamPerpendicular( const vec3_t vecBeamDelta, vec3_t_ref pPerp )
 {
 	// Direction in worldspace of the center of the beam
 	vec3_t	vecBeamCenter;
@@ -156,7 +156,7 @@ static void ComputeBeamPerpendicular( const vec3_t vecBeamDelta, vec3_t pPerp )
 	VectorNormalize( pPerp );
 }
 
-static void ComputeNormal( const vec3_t vStartPos, const vec3_t vNextPos, vec3_t pNormal )
+static void ComputeNormal( const vec3_t vStartPos, const vec3_t vNextPos, vec3_t_ref pNormal )
 {
 	// vTangentY = line vector for beam
 	vec3_t	vTangentY, vDirToBeam;
@@ -811,8 +811,8 @@ CL_DrawBeamFollow
 Draw beam trail
 ================
 */
-static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int rendermode, vec3_t delta,
-							vec3_t screen, vec3_t screenLast, float die, const vec3_t source, int flags, float width,
+static void DrawBeamFollow( int modelIndex, particle_t *pHead, int frame, int rendermode, const vec3_t delta,
+							vec3_t_ref screen, vec3_t_ref screenLast, float die, const vec3_t source, int flags, float width,
 							float amplitude, float freq, float *color )
 {
 	float	fraction;
