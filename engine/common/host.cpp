@@ -1295,7 +1295,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 		MsgDev(D_INFO, "%s is working directory now\n", host.rootdir);
 	else
 		Sys_Error("Changing working directory to %s failed.\n", host.rootdir);
-#elseif _WIN32
+#elif _WIN32
 	wchar_t wrootdir[256];
 	MultiByteToWideChar(CP_UTF8, 0, host.rootdir, -1, wrootdir, 256);
 	if ( !host.rootdir[0] || SetCurrentDirectoryW( wrootdir ) != 0)
