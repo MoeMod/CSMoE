@@ -263,6 +263,9 @@ namespace sv {
 		void GiveDefaultItems() override;
 		bool ClientCommand(const char *pcmd) override;
 		float AdjustDamageGivenToPlayer(entvars_t *pevInflictor, CBasePlayer *victim, float flDamage, int bitsDamageType) override;
+		void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;
+
+		boost::asio::awaitable<void> DelayRespawnCheck();
 
 	public:
 		bool IsZombie() const { return m_pPlayer->m_bIsZombie; }
@@ -810,12 +813,12 @@ namespace sv {
 	{
 		if (!m_pPlayer->m_bIsZombie)
 		{
-			if (!Q_stricmp(pcmd, "z4_skill5"))
+			if (!Q_stricmp(pcmd, "z4_skill5") || !Q_stricmp(pcmd, "MoE_HumanSkill1"))
 			{
 				// TODO : activate kick
 				return true;
 			}
-			else if (!Q_stricmp(pcmd, "z4_skill6"))
+			else if (!Q_stricmp(pcmd, "z4_skill6") || !Q_stricmp(pcmd, "MoE_HumanSkill2"))
 			{
 				adrenaline->Skill_AdrShoot_Activate();
 				return true;
@@ -870,6 +873,100 @@ namespace sv {
 		return flDamage;
 	}
 
+	HitBoxGroup CMod_ZombieIV::GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType)
+	{
+		HitBoxGroup hbg = CMod_Zombi::GetAdjustedTraceAttackHitgroup(victim, pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+
+		if (CBasePlayer *pAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker))
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZB4 *>(pAttacker->m_pModStrategy.get());
+			if(strategy && strategy->adrenaline->m_bIsUsingAdrShoot)
+				return HITGROUP_CHEST; // dont allow *4 *3 damage when headshot with 6
+		}
+
+		return hbg;
+	}
+
+	void CPlayerModStrategy_ZB4::OnKilled(entvars_t * pKiller, entvars_t * pInflictor)
+	{
+		// Human should respawn as a zombie
+		if (!m_pPlayer->m_bIsZombie)
+		{
+			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->m_bHeadshotKilled = false;
+			m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
+			m_pPlayer->m_bIsZombie = true;
+			m_pPlayer->pev->max_health = 2000.0f;
+			m_pPlayer->pev->armorvalue = 200.0f;
+			m_pModZB4->TeamCheck();
+		}
+
+		m_pPlayer->m_bHeadshotKilled = false;
+		if(m_pPlayer->m_LastHitGroup == HITGROUP_HEAD)
+		{
+			m_pPlayer->m_LastHitGroup = HITGROUP_CHEST;
+		}
+
+		bool bCanRespawn = true;
+
+		if (CBasePlayer *pAttacker = dynamic_ent_cast<CBasePlayer *>(pKiller))
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZB4 *>(pAttacker->m_pModStrategy.get());
+			if(strategy && strategy->adrenaline->m_bIsUsingAdrShoot && m_pModZB4->round->GetDayNightStatus() != DNS_DARK)
+			{
+				ClientPrint(this->m_pPlayer->pev, HUD_PRINTCENTER, "被精准打击技能击毙，无法复活");
+				m_pPlayer->m_bHeadshotKilled = true; // set headshot with 6
+				bCanRespawn = false;
+			}
+		}
+
+		if(bCanRespawn)
+			boost::asio::co_spawn(ioc, DelayRespawnCheck(), boost::asio::detached);
+
+		// TODO : Respawn effect
+
+		return CPlayerModStrategy_ZB1::OnKilled(pKiller, pInflictor);
+	}
+
+	boost::asio::awaitable<void> CPlayerModStrategy_ZB4::DelayRespawnCheck()
+	{
+		try{
+
+			const float flBackupMaxHealth = m_pPlayer->pev->max_health;
+			const float flBackupArmor = m_pPlayer->pev->armorvalue;
+
+			timer_type timer(ioc);
+			for(int i = 0; i < 5; ++i)
+			{
+				// countdown
+				co_await timer.async_wait(boost::asio::use_awaitable);
+				ClientPrint(this->m_pPlayer->pev, HUD_PRINTCENTER, "距离复活剩余%s1秒", UTIL_dtos1(5 - i)); // #CSO_ZombiSelectCount
+				timer.expires_after(1s);
+				// show countdown msg
+			}
+
+			if (!m_pPlayer->IsAlive() && m_pPlayer->m_bIsZombie && m_pPlayer->m_iTeam != TEAM_UNASSIGNED && m_pPlayer->m_iTeam != TEAM_SPECTATOR)
+			{
+				// respawn after 5 secs
+				const float health = max(flBackupMaxHealth, 3000);
+				const float armor = flBackupArmor;
+
+				m_pPlayer->RoundRespawn();
+				BecomeZombie(m_pPlayer->m_iZombieLevel);
+
+				m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
+				m_pPlayer->pev->armorvalue = armor;
+				m_pPlayer->SetScoreboardAttributes();
+
+				UTIL_BroadcastStuffText("spk \"z4/z4_zombi_comeback\"\n");
+			}
+		}
+		catch(const std::exception & e)
+		{
+			// swallow it
+		}
+	}
+
 	void CPlayerModStrategy_ZB4::CmdStart(usercmd_t *cmd, unsigned int random_seed)
 	{
 		CPlayerModStrategy_Default::CmdStart(cmd, random_seed);
@@ -919,5 +1016,18 @@ namespace sv {
 				CLIENT_COMMAND(player->edict(), "spk %s\n", s_szCountDownSound[iCurrentCount]);
 
 		}
+	}
+
+	int CMod_ZombieIV::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled)
+	{
+		if (!pAttacker->m_bIsZombie && pKilled->m_bIsZombie)
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZB4 *>(pAttacker->m_pModStrategy.get());
+			if(strategy && strategy->adrenaline->m_bIsUsingAdrShoot && this->round->GetDayNightStatus() != DNS_DARK)
+				return 3;
+			return 0;
+		}
+
+		return 1;
 	}
 }

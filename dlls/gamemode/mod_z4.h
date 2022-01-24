@@ -32,6 +32,8 @@ namespace sv {
 		void Think() override;
 		void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker) override;
 		void InstallPlayerModStrategy(CBasePlayer *player) override;
+		HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType) override;
+		int IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled);
 
 		void InfectionSound() override;
 		void EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker) override;
