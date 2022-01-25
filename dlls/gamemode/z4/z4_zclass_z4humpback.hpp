@@ -178,6 +178,14 @@ namespace sv {
 				MESSAGE_END();
 			}
 
+			void CmdStart(usercmd_t *cmd, unsigned int random_seed)
+			{
+				if(m_bIsUsingDash)
+				{
+					cmd->buttons |= IN_DUCK;
+				}
+			}
+
 		};
 	}
 }

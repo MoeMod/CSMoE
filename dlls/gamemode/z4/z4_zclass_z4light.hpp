@@ -143,6 +143,8 @@ namespace sv {
 				}
 			}
 
+			void CmdStart(usercmd_t *cmd, unsigned int random_seed) {}
+
 		};
 	}
 }

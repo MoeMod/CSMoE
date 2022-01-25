@@ -183,17 +183,17 @@ bool CHudZB2::ActivateSkill(int iSlot)
 {
 	if (iSlot == 5)
 	{
-		gEngfuncs.pfnClientCmd("MoE_HumanSkill1;BTE_ZombieSkill2;z4_skill5");
+		gEngfuncs.pfnClientCmd("MoE_HumanSkill1;BTE_ZombieSkill2");
 		return true;
 	}
 	else if (iSlot == 6)
 	{
-		gEngfuncs.pfnClientCmd("MoE_HumanSkill2;z4_skill6");
+		gEngfuncs.pfnClientCmd("MoE_HumanSkill2;BTE_ZombieSkill3");
 		return true;
 	}
 	else if (iSlot == 7)
 	{
-		gEngfuncs.pfnClientCmd("MoE_HumanSkill3");
+		gEngfuncs.pfnClientCmd("MoE_HumanSkill3;BTE_ZombieSkill4");
 		return true;
 	}
 	else if (iSlot == 8)

@@ -107,6 +107,8 @@ namespace sv {
 					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
 				}
 			}
+
+			void CmdStart(usercmd_t *cmd, unsigned int random_seed) {}
 		};
 	}
 }

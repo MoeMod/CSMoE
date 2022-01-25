@@ -319,21 +319,9 @@ void GAME_EXPORT AngleVectors( const vec3_t angles, vec3_t_ref forward, vec3_t_r
 	SinCos( DEG2RAD( angles[PITCH] ), &sp, &cp );
 	SinCos( DEG2RAD( angles[ROLL] ), &sr, &cr );
 #endif
-
-	if( forward )
-	{
-		VectorSet(forward, cp * cy, cp * sy, -sp);
-	}
-
-	if( right )
-	{
-		VectorSet(right, (-1.0f * sr * sp * cy + -1.0f * cr * -sy), (-1.0f * sr * sp * sy + -1.0f * cr * cy), (-1.0f * sr * cp));
-	}
-
-	if( up )
-	{
-		VectorSet(up, (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp));
-	}
+	VectorSet(forward, cp * cy, cp * sy, -sp);
+	VectorSet(right, (-1.0f * sr * sp * cy + -1.0f * cr * -sy), (-1.0f * sr * sp * sy + -1.0f * cr * cy), (-1.0f * sr * cp));
+	VectorSet(up, (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp));
 }
 
 /*
@@ -345,12 +333,6 @@ VectorAngles
 void VectorAngles( const vec3_t forward, vec3_t_ref angles )
 {
 	float	tmp, yaw, pitch;
-
-	if( !angles )
-	{
-		if( angles ) VectorClear( angles );
-		return;
-	}
 	
 	if( forward[1] == 0 && forward[0] == 0 )
 	{

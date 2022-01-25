@@ -124,3 +124,19 @@ void CHudZ4::Shutdown(void)
 	delete pimpl;
 	pimpl = nullptr;
 }
+
+bool CHudZ4::ActivateSkill(int iSlot)
+{
+	if (iSlot == 5)
+	{
+		gEngfuncs.pfnClientCmd("z4_skill5");
+		return true;
+	}
+	else if (iSlot == 6)
+	{
+		gEngfuncs.pfnClientCmd("z4_skill6");
+		return true;
+	}
+
+	return false;
+}

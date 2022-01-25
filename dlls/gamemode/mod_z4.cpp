@@ -231,6 +231,7 @@ namespace sv {
 		virtual void Skill_Dash_Start() = 0;
 		virtual void Skill_Dash_End() = 0;
 		virtual void Skill_Activate() = 0;
+		virtual void CmdStart(usercmd_t *cmd, unsigned int random_seed) = 0;
 	};
 
 	class CPlayerModStrategy_ZB4 : public CPlayerModStrategy_ZB1
@@ -438,7 +439,6 @@ namespace sv {
 		{
 			try {
 				timer_type timer(ioc);
-				auto dns = mod->round->GetDayNightStatus();
 
 				while(m_iAdrenaline > 0)
 				{
@@ -448,6 +448,8 @@ namespace sv {
 
 						timer.expires_after(SKILL_ADRSHOOT_LASTING / 20);
 						co_await timer.async_wait(boost::asio::use_awaitable);
+
+						CLIENT_COMMAND(strategy->m_pPlayer->edict(), "spk zombi/speedup_heartbeat\n");
 						continue;
 					}
 				}
@@ -515,6 +517,13 @@ namespace sv {
 						break;
 					}
 				}
+			}, zclass);
+		}
+
+		void CmdStart(usercmd_t *cmd, unsigned int random_seed) override
+		{
+			std::visit([cmd, random_seed](auto &zc) {
+				zc.CmdStart(cmd, random_seed);
 			}, zclass);
 		}
 
@@ -717,11 +726,120 @@ namespace sv {
 		CHuman_Z4(CPlayerModStrategy_ZB4 *strategy) : CHuman_ZB1(strategy->m_pPlayer),
 		strategy(strategy)
 		{
+			boost::asio::co_spawn(ioc, Task_Dash_SkillConsume(), boost::asio::detached);
+			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
+		}
+
+		void ResetMaxSpeed() const override
+		{
+			if(strategy->adrenaline->m_bIsUsingDash)
+			{
+				m_pPlayer->pev->maxspeed = 350.0f;
+				return;
+			}
+			return CHuman_ZB1::ResetMaxSpeed();
+		}
+
+		void Think() override
+		{
+			ioc.poll();
+		}
+
+		boost::asio::awaitable<void> Task_Dash_SkillConsume()
+		{
+			try {
+				timer_type timer(ioc);
+
+				while(true)
+				{
+					timer.expires_after(SKILL_HUMANDASH_LASTING / 20);
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
+
+					if(strategy->adrenaline->m_bIsUsingDash)
+					{
+						strategy->adrenaline->Adrenaline_Set(-5);
+
+						if(strategy->adrenaline->m_iAdrenaline <= 0)
+							Skill_Dash_End();
+					}
+				}
+			}
+			catch(const boost::system::system_error & e)
+			{
+				if(e.code() == boost::system::errc::operation_canceled)
+				{
+					// ignored
+				}
+			}
+		}
+
+		boost::asio::awaitable<void> Task_Dash_SkillCheck()
+		{
+			try {
+				timer_type timer(ioc);
+
+				while(true)
+				{
+					timer.expires_after(0.5s);
+					co_await timer.async_wait(boost::asio::use_awaitable); // throws
+
+					if(strategy->adrenaline->m_bIsUsingDash)
+					{
+						m_pPlayer->ResetMaxSpeed();
+						CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/human_breath_male\n");
+					}
+				}
+			}
+			catch(const boost::system::system_error & e)
+			{
+				if(e.code() == boost::system::errc::operation_canceled)
+				{
+					// ignored
+				}
+			}
+		}
+
+		void Skill_Dash_Start() override
+		{
+			if(strategy->adrenaline->m_bIsUsingAdrShoot || strategy->adrenaline->m_bIsUsingDash)
+				return;
+			if(strategy->adrenaline->m_iAdrenaline <= 0)
+				return;
+			if(strategy->adrenaline->m_bIsSlowDown)
+				return;
+
+			strategy->adrenaline->m_bIsUsingDash = true;
+			m_pPlayer->ResetMaxSpeed();
+			// TODO : send msg
+		}
+
+		void Skill_Dash_End() override
+		{
+			if(!strategy->adrenaline->m_bIsUsingDash)
+				return;
+			strategy->adrenaline->m_bIsUsingDash = false;
+			m_pPlayer->ResetMaxSpeed();
+			// TODO : send msg
+		}
+
+		void OnWeaponDeploy(CBasePlayerItem *item) override
+		{
+
+		}
+
+		void Skill_Activate() override
+		{
+
+		}
+
+		void CmdStart(usercmd_t *cmd, unsigned int random_seed)
+		{
 
 		}
 
 	public:
 		CPlayerModStrategy_ZB4 *strategy;
+		boost::asio::io_context ioc;
 	};
 
 	void CMod_ZombieIV::InstallPlayerModStrategy(CBasePlayer *player)
@@ -849,8 +967,9 @@ namespace sv {
 
 	void CPlayerModStrategy_ZB4::BecomeHuman()
 	{
-		m_pCharacter = std::make_shared<CHuman_ZB1>(m_pPlayer);
-		m_pCharacter_Z4 = nullptr; // TODO
+		auto p = std::make_shared<CHuman_Z4>(this);
+		m_pCharacter = p;
+		m_pCharacter_Z4 = p;
 		adrenaline = std::make_unique<adrenaline_t>(m_pModZB4, this);
 		adrenaline->Adrenaline_Set(0, 0.0f);
 	}
@@ -983,6 +1102,8 @@ namespace sv {
 			if(m_pCharacter_Z4)
 				m_pCharacter_Z4->Skill_Dash_End();
 		}
+		if(m_pCharacter_Z4)
+			m_pCharacter_Z4->CmdStart(cmd, random_seed);
 	}
 
 	CZ4CountdownDelegate::CZ4CountdownDelegate(CMod_ZombieIV *mod) : CZB1CountdownDelegate(mod) {}

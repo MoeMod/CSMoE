@@ -531,6 +531,12 @@ void WeaponsResource :: SelectSlot( int iSlot, int fAdvance, int iDirection )
 			return;
 	}
 
+	if ((gHUD.m_ZB4.m_iFlags & HUD_ACTIVE) && (fAdvance == FALSE) && (iDirection == 1))
+	{
+		if(gHUD.m_ZB4.ActivateSkill(iSlot + 1))
+			return;
+	}
+
 	if ( iSlot > MAX_WEAPON_SLOTS )
 		return;
 

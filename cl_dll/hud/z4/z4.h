@@ -26,6 +26,7 @@ public:
 	void InitHUDData(void) override;		// called every time a server is connected to
 	void Shutdown(void) override;
 
+	bool ActivateSkill(int iSlot);
 	CHudMsgFunc(Z4Msg);
 
 protected:
