@@ -24,6 +24,7 @@ namespace sv {
 			};
 
 			CBasePlayer *const m_pPlayer;
+			bool m_bIsUsingSkill = false;
 
 			explicit zclass_z4normal(CBasePlayer *player) : m_pPlayer(player)
 			{
@@ -88,6 +89,7 @@ namespace sv {
 				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, Sound.szSkill1, VOL_NORM, ATTN_NORM);
 
 				m_flTimeSkillEnd = gpGlobals->time + 0.4s;
+				m_bIsUsingSkill = true;
 			}
 
 			void OnThink()
@@ -105,6 +107,8 @@ namespace sv {
 
 					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("idle1");
 					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
+					
+					m_bIsUsingSkill = false;
 				}
 			}
 

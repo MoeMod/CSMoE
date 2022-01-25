@@ -71,7 +71,7 @@ namespace sv {
 				if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
 				{
 					pWeapon->SendWeaponAnim(ANIM_DASH_LOOP, TRUE);
-					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck;
+					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck + 0.1s;
 				}
 				m_pPlayer->m_flVelocityModifier = 1.0;
 				m_pPlayer->m_flNextAttack = 0.5s;
@@ -83,7 +83,7 @@ namespace sv {
 				if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
 				{
 					pWeapon->SendWeaponAnim(ANIM_DASH_END, TRUE);
-					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck;
+					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck + 0.1s;
 				}
 
 				m_pPlayer->pev->bInDuck = 0;
@@ -102,11 +102,10 @@ namespace sv {
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
 				Vector new_velocity = origin2 - origin1;
-				float num = speed * speed / new_velocity.LengthSquared();
-				new_velocity[0] *= num * 2;
-				new_velocity[1] *= num * 2;
-				new_velocity[2] *= num / 2;
-				return new_velocity;
+				new_velocity[0] *= 2;
+				new_velocity[1] *= 2;
+				new_velocity[2] /= 2;
+				return new_velocity.Normalize() * speed;
 			}
 
 			void OnSkillActivate()

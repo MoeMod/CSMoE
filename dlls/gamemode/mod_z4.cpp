@@ -365,7 +365,6 @@ namespace sv {
 		{
 			try {
 				timer_type timer(ioc);
-				auto dns = mod->round->GetDayNightStatus();
 
 				while(true)
 				{
@@ -377,7 +376,7 @@ namespace sv {
 
 					if(strategy->IsAlive())
 					{
-						if(dns == DNS_DARK && strategy->IsZombie())
+						if(mod->round->GetDayNightStatus() == DNS_DARK && strategy->IsZombie())
 						{
 							Adrenaline_Set(7, 1.0f);
 						}
@@ -477,7 +476,48 @@ namespace sv {
 			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
 		}
 
-		float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override { return flDamage; }
+		float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override
+		{
+			float ratio = 1.0f;
+			std::visit([this, &ratio](auto &zc) mutable {
+				if(this->strategy->adrenaline->m_bIsUsingDash)
+				{
+					ratio = zc.Ability.flDashDefense;
+				}
+				else if(zc.m_bIsUsingSkill)
+				{
+					ratio = 0.0f;
+				}
+				else
+				{
+					ratio = zc.Ability.flDefense;
+				}
+			}, zclass);
+			return flDamage * ratio; 
+		}
+
+		bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override
+		{
+			float ratio = 1.0f;
+			float velocitymodifier = data.flVelocityModifier;
+			std::visit([this, &ratio](auto &zc) mutable {
+				if(this->strategy->adrenaline->m_bIsUsingDash)
+				{
+					ratio = zc.Ability.flDashKnockback;
+				}
+				else if(zc.m_bIsUsingSkill)
+				{
+					ratio = 0.0f;
+				}
+				else
+				{
+					ratio = zc.Ability.flKnockback;
+				}
+			}, zclass);
+			auto data2 = { data.flOnGround * ratio, data.flNotOnGround * ratio, data.flFlying * ratio, data.flDucking * ratio, velocitymodifier };
+			ApplyKnockbackData(m_pPlayer, m_pPlayer->pev->origin - attacker->pev->origin, data);
+			return true;
+		}
 		void ResetMaxSpeed() const override
 		{
 			auto ability = AbilityForZClass();
@@ -718,6 +758,7 @@ namespace sv {
 		CPlayerModStrategy_ZB4 *strategy;
 		z4::zclass_variant_t zclass;
 		boost::asio::io_context ioc;
+		bool m_bIsUsingSkill = false;
 	};
 
 	class CHuman_Z4 : public CHuman_ZB1, virtual public IZombieModeCharacter_Z4
@@ -987,7 +1028,7 @@ namespace sv {
 			if(adrenaline->m_bIsUsingAdrShoot)
 				flDamage *= 3.0f;
 			else
-				flDamage *= 1.0f + (adrenaline->m_iAdrenaline / 100.0f);
+				flDamage *= 1.0f + (adrenaline->m_iAdrenaline / 200.0f);
 		}
 		return flDamage;
 	}
