@@ -304,6 +304,10 @@ qboolean Image_LoadLMP( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadPAL( const char *name, const byte *buffer, size_t filesize );
 qboolean Image_LoadMDL_BMP( const char *name, const byte *buffer, size_t filesize, const byte* ptexture );
 
+#ifdef XASH_ASTC
+qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize );
+#endif
+
 //
 // formats save
 //

@@ -91,11 +91,10 @@ namespace sv {
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
 				Vector new_velocity = origin2 - origin1;
-				float num = speed * speed / new_velocity.LengthSquared();
-				new_velocity[0] *= num * 2;
-				new_velocity[1] *= num * 2;
-				new_velocity[2] *= num / 2;
-				return new_velocity;
+				new_velocity[0] *= 2;
+				new_velocity[1] *= 2;
+				new_velocity[2] /= 2;
+				return new_velocity.Normalize() * speed;
 			}
 
 			void OnSkillActivate()

@@ -22,3 +22,6 @@
 [submodule "3rdparty/boost-cmake"]
 	path = 3rdparty/boost-cmake
 	url = https://github.com/ITesserakt/boost-cmake
+[submodule "3rdparty/astc-encoder"]
+	path = 3rdparty/astc-encoder
+	url = https://github.com/ARM-software/astc-encoder/

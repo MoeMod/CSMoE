@@ -139,6 +139,10 @@ static const loadpixformat_t load_game[] =
 { "%s%s.%s", "lmp", Image_LoadLMP, IL_HINT_HL },	// hl menu images (cached.wad etc)
 { "%s%s.%s", "fnt", Image_LoadFNT, IL_HINT_HL },	// hl console font (fonts.wad etc)
 { "%s%s.%s", "pal", Image_LoadPAL, IL_HINT_NO },	// install studio\sprite palette
+#ifdef XASH_ASTC
+{ "%s%s.%s", "astc", Image_LoadASTC, IL_HINT_NO },	// install studio\sprite palette
+
+#endif
 { NULL, NULL, NULL, IL_HINT_NO }
 };
 
