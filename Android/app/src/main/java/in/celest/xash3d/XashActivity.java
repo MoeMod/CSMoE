@@ -59,6 +59,7 @@ public class XashActivity extends Activity {
 	protected static ViewGroup mLayout;
 	
 	public static EngineSurface mSurface;
+	public static EngineSurface mSurface;
 	public static String mArgv[];
 	public static final int sdk = Integer.valueOf( Build.VERSION.SDK );
 	public static final String TAG = "XASH3D:XashActivity";
@@ -104,7 +105,7 @@ public class XashActivity extends Activity {
 	// Load the .so
 	static 
 	{
-		System.loadLibrary( "xash" );
+		System.loadLibrary( "UE4" );
 	}
 
 	// Setup

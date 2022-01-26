@@ -556,6 +556,11 @@ if(XASH_DEDICATED)
 	endif()
 endif()
 
+if(ANDROID)
+	set_target_properties(${XASH_ENGINE} PROPERTIES
+			OUTPUT_NAME "UE4")
+endif()
+
 # engine doesnt support unity build now
 set_target_properties(${XASH_ENGINE} PROPERTIES UNITY_BUILD OFF)
 
