@@ -3953,6 +3953,18 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				}
 			}
 
+#ifdef XASH_ASTC
+			Q_snprintf(texname, sizeof(texname), "models/texture/%s.astc", name);
+			if (FS_FileExists(texname, false))
+			{
+				if(r_texlru->integer)
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+				else
+					gl_texturenum = GL_LoadTexture(texname, (byte*)ptexture, 0, flags, filter);
+				break;
+			}
+#endif
+
 			Q_snprintf(texname, sizeof(texname), "models/texture/%s.tga", name);
 			if (FS_FileExists(texname, false))
 			{

@@ -260,9 +260,9 @@ image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size )
 
 	// HACKHACK: skip any checks, load file from buffer
 	if( filename[0] == '#' && buffer && size ) goto load_internal;
-	else if (buffer && !size) {
-		if(Q_strchr(filename, '@') || Q_strchr(filename, '#')) goto load_internal_ext;
-	}
+	//else if (buffer && !size) {
+	//	if(Q_strchr(filename, '@') || Q_strchr(filename, '#')) goto load_internal_ext;
+	//}
 
 search_fs:
 

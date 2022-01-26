@@ -103,3 +103,11 @@ set(JSON_MultipleHeaders ON)
 add_subdirectory(json EXCLUDE_FROM_ALL)
 add_library(json_3p INTERFACE)
 target_link_libraries(json_3p INTERFACE nlohmann_json::nlohmann_json)
+
+set(UNITTEST OFF)
+set(CLI OFF)
+set(UNIVERSAL_BUILD OFF)
+set(ISA_AVX2 OFF) # dont build avx2
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/astc-encoder EXCLUDE_FROM_ALL)
+add_library(astcenc_3p INTERFACE)
+target_link_libraries(astcenc_3p INTERFACE astcenc-native-static)

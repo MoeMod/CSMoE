@@ -66,6 +66,7 @@ option(XASH_CPUINFO "Build with cpuinfo support" ON)
 if(IOS)
 	set(XASH_CPUINFO OFF)
 endif()
+option(XASH_ASTC "Build with ASTC support" ON)
 
 option(XASH_SKIPCRTLIB "Use system crtlib" ON)
 
@@ -155,6 +156,10 @@ if(XASH_STATIC_GAMELIB)
 	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.cpp)
 else()
 	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.cpp)
+endif()
+
+if(XASH_ASTC)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/imagelib/img_astc.cpp)
 endif()
 
 if(NOT XASH_DEDICATED)
@@ -474,6 +479,12 @@ if(XASH_CPUINFO)
 	add_definitions(-DXASH_CPUINFO=1)
 
 	target_link_libraries(${XASH_ENGINE} PRIVATE cpuinfo_3p)
+endif()
+
+if(XASH_ASTC)
+	add_definitions(-DXASH_ASTC=1)
+
+	target_link_libraries(${XASH_ENGINE} PRIVATE astcenc_3p)
 endif()
 
 target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p luajit_3p)

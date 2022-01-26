@@ -2243,7 +2243,7 @@ void R_FreeImage( gltexture_t *image )
 	}
 
 	pglDeleteTextures( 1, &image->texnum );
-	image = {};
+	*image = {};
 }
 
 /*
