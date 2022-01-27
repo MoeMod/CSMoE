@@ -66,9 +66,9 @@ void R_AnimateLight( void )
 		if( !RI.refdef.paused && RI.refdef.frametime <= 0.1f )
 			ls->time += RI.refdef.frametime; // evaluate local time
 
-		flight = (int)floor( ls->time * 10 );
-		clight = (int)ceil( ls->time * 10 );
-		lerpfrac = ( ls->time * 10 ) - flight;
+		flight = (int)floor( ls->time * 10 / ls->interp );
+		clight = (int)ceil( ls->time * 10 / ls->interp );
+		lerpfrac = ( ls->time * 10 / ls->interp ) - flight;
 		backlerp = 1.0f - lerpfrac;
 
 		if( !ls->length )

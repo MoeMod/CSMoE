@@ -2535,15 +2535,25 @@ void CL_SetLightstyle( int style, const char *s, float f )
 
 	ls = &cl.lightstyles[style];
 
-	Q_strncpy( ls->pattern, s, sizeof( ls->pattern ));
+    const char *pattern = s;
+    while(pattern && (isdigit(*pattern) || *pattern == '.'))
+        ++pattern;
 
-	ls->length = Q_strlen( s );
+	Q_strncpy( ls->pattern, pattern, sizeof( ls->pattern ));
+
+	ls->length = Q_strlen( pattern );
 	ls->time = f; // set local time
 
 	for( i = 0; i < ls->length; i++ )
-		ls->map[i] = (float)(s[i] - 'a');
+		ls->map[i] = (float)(pattern[i] - 'a');
 
-	ls->interp = (ls->length <= 1) ? false : true;
+	ls->interp = (ls->length <= 1) ? 0 : 10;
+
+    if(ls->interp && pattern != s)
+    {
+        char *end = nullptr;
+        ls->interp = 10 * strtof(s, &end);
+    }
 
 	// check for allow interpolate
 	// NOTE: fast flickering styles looks ugly when interpolation is running
@@ -2554,11 +2564,11 @@ void CL_SetLightstyle( int style, const char *s, float f )
 
 		if( fabs( val1 - val2 ) > STYLE_LERPING_THRESHOLD )
 		{
-			ls->interp = false;
+			ls->interp = 0;
 			break;
 		}
 	}
-	MsgDev( D_AICONSOLE, "Lightstyle %i (%s), interp %s\n", style, ls->pattern, ls->interp ? "Yes" : "No" );
+	MsgDev( D_AICONSOLE, "Lightstyle %i (%s), interp %d\n", style, ls->pattern, ls->interp );
 }
 
 /*

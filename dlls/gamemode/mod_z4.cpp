@@ -38,7 +38,7 @@ static const char* s_szCountDownSound[11] = {
 namespace sv {
 	namespace z4 {
 	// DayNight Effect : Dusk & Dark & Dawn
-	constexpr const char *LIGHTSTYLE[7] = { "g", "f", "e", "d", "c", "b", "b" };
+	constexpr char LIGHTSTYLE[7] = { 'h', 'g', 'f', 'e', 'd', 'c', 'b' };
 	constexpr float SKY_COLOR[7] = { 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.4 };
 	constexpr const char *FOG_DENSITY[7] = { "0.001", "0.0015", "0.002", "0.0025", "0.0025", "0.003", "0.003" };
 	constexpr const char *FOG_COLOR[7] = { "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0" };
@@ -89,6 +89,9 @@ namespace sv {
 				m_iDayNightStatus = DNS_DUSK;
 
 				timer_type timer(ioc);
+                Set_Light(0, 0, 0.0f);
+                for (CBasePlayer* player : moe::range::PlayersList())
+                    CLIENT_COMMAND(player->edict(), "mp3 stop\n");
 
 				// countdown
 				timer.expires_after(20s);
@@ -102,8 +105,10 @@ namespace sv {
 				for (CBasePlayer* player : moe::range::PlayersList())
 					CLIENT_COMMAND(player->edict(), "spk z4/z4_bgm_night.wav\n");
 
+                Set_Light(0, 5, 3.0f);
 				for(int iLight = 0; iLight < 5; ++iLight)
 				{
+                    //Set_Light(iLight, 5, (5 - iLight) * 3);
 					Update_Environment(iLight);
 					timer.expires_after(3s);
 					co_await timer.async_wait(boost::asio::use_awaitable);
@@ -112,16 +117,21 @@ namespace sv {
 				Check_NightStart();
 
 				// night running for 45secs
+                Set_Light(5, 6, 45.0f);
+                Update_Environment(6);
 				timer.expires_after(45s);
 				co_await timer.async_wait(boost::asio::use_awaitable);
 
+                Set_Light(6, 0, 3.0f);
 				for(int iLight = 6; iLight > 0; --iLight)
 				{
+                    //Set_Light(iLight, 1, (iLight - 1) * 3);
 					Update_Environment(iLight);
 
 					timer.expires_after(3s);
 					co_await timer.async_wait(boost::asio::use_awaitable);
 				}
+                Set_Light(0, 0, 0.0f);
 
 				// night ends
 				for (CBasePlayer* player : moe::range::PlayersList())
@@ -146,7 +156,6 @@ namespace sv {
 			m_iGameLight = iLight;
 			Set_SkyColor(SKY_COLOR[iLight]);
 			Set_EnvironmentFog(FOG_DENSITY[iLight], FOG_COLOR[iLight]);
-			Set_Light(LIGHTSTYLE[iLight]);
 		}
 
 		void Set_SkyColor(float x = 1.0)
@@ -162,10 +171,28 @@ namespace sv {
 			mod->m_pFogEntity->pev->rendercolor = {0, 0, 0};
 		}
 
-		void Set_Light(const char *LightStyle)
+		void Set_Light(int from, int to, float time)
 		{
-			// light
-			LIGHT_STYLE(0, LightStyle); // previous one is "f"
+            std::string ls;
+            if(time > 0)
+                ls = std::to_string((int)time);
+            if(from < to)
+            {
+                for(int i = from; i <= to; ++i)
+                {
+                    //for(int j = 0; j < time / (from - to); ++j)
+                        ls.push_back(LIGHTSTYLE[i]);
+                }
+            }
+            else
+            {
+                for(int i = from; i >= to; --i)
+                {
+                    //for(int j = 0; j < time / (to - from); ++j)
+                        ls.push_back(LIGHTSTYLE[i]);
+                }
+            }
+            LIGHT_STYLE(0, ls.c_str());
 		}
 
 		void Check_NightStart()
