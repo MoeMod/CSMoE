@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.10.2)
 
+#add_library(hidapi_3p INTERFACE)
+#set(BUILD_SHARED_LIBS OFF)
+#set(HIDAPI_BUILD_HIDTEST OFF)
+#add_subdirectory(hidapi EXCLUDE_FROM_ALL)
+#target_link_libraries(hidapi_3p INTERFACE hidapi::hidapi)
+
 set(SDL2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
 
 if(XASH_SDL)

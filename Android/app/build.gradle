@@ -32,8 +32,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments "-DXASH_SDL=0",
-                        "-DXASH_NANOGL=1",
+                arguments "-DXASH_NANOGL=1",
                         "-DXASH_STATIC_GAMELIB=1",
                         "-DMAINUI_USE_CUSTOM_FONT_RENDER=0"
                 version "3.18.1"

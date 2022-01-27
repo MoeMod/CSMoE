@@ -34,6 +34,18 @@ typedef enum
 	rserr_unknown
 } rserr_t;
 
+static dllfunc_t texturecompressionfuncs[] =
+{
+		{ GL_CALL( glCompressedTexImage3DARB ) },
+		{ GL_CALL( glCompressedTexImage2DARB ) },
+		{ GL_CALL( glCompressedTexImage1DARB ) },
+		{ GL_CALL( glCompressedTexSubImage3DARB ) },
+		{ GL_CALL( glCompressedTexSubImage2DARB ) },
+		{ GL_CALL( glCompressedTexSubImage1DARB ) },
+		{ GL_CALL_EX( glGetCompressedTexImageARB, glGetCompressedTexImage ) },
+		{ NULL, NULL }
+};
+
 /*
 =================
 GL_GetProcAddress
@@ -100,7 +112,7 @@ void GL_InitExtensions( void )
 		pglGetFloatv( GL_MAX_TEXTURE_LOD_BIAS_EXT, &glConfig.max_texture_lodbias );
 	}
 
-	GL_SetExtension( GL_TEXTURE_COMPRESSION_EXT, false );
+	GL_CheckExtension( "GL_ARB_texture_compression", texturecompressionfuncs, "gl_dds_hardware_support", GL_TEXTURE_COMPRESSION_EXT );
 	GL_SetExtension( GL_CUSTOM_VERTEX_ARRAY_EXT, false );
 	GL_SetExtension( GL_CLAMPTOEDGE_EXT, true ); // by gles1 specs
 	GL_SetExtension( GL_CLAMP_TEXBORDER_EXT, false );
