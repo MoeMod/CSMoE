@@ -104,7 +104,7 @@ namespace sv {
 			float flDamage = 90;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 9.5f;
+				flDamage *= 14.5f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage *= 5.5f;
 #endif
@@ -115,7 +115,7 @@ namespace sv {
 			float flDamage = 85;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 9.5f;
+				flDamage *= 17.5f; //*= 9.5
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage *= 5.5f;
 #endif

@@ -1,6 +1,6 @@
 /*
-img_tga.c - tga format load & save
-Copyright (C) 2007 Uncle Mike
+img_astc.cpp - astc format load
+Copyright (C) 2022 Moemod Hymei
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,10 +14,7 @@ GNU General Public License for more details.
 */
 
 #include "imagelib.h"
-
 #include "astcenc.h"
-
-#include <algorithm>
 
 static const unsigned int thread_count = 1;
 static const astcenc_profile profile = ASTCENC_PRF_LDR;
@@ -87,9 +84,8 @@ static astcenc_image *alloc_image(
 			data[z] = new uint16_t[dim_x * dim_y * 4];
 		}
 	}
-	else // if (bitness == 32)
+	else if (bitness == 32)
 	{
-		assert(bitness == 32);
 		void** data = new void*[dim_z];
 		img->data_type = ASTCENC_TYPE_F32;
 		img->data = data;
@@ -143,9 +139,9 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	// Ensure these are not zero to avoid div by zero
-	unsigned int block_x = std::max((unsigned int)hdr.block_x, 1u);
-	unsigned int block_y = std::max((unsigned int)hdr.block_y, 1u);
-	unsigned int block_z = std::max((unsigned int)hdr.block_z, 1u);
+	unsigned int block_x = max((unsigned int)hdr.block_x, 1u);
+	unsigned int block_y = max((unsigned int)hdr.block_y, 1u);
+	unsigned int block_z = max((unsigned int)hdr.block_z, 1u);
 
 	unsigned int dim_x = unpack_bytes(hdr.dim_x[0], hdr.dim_x[1], hdr.dim_x[2], 0);
 	unsigned int dim_y = unpack_bytes(hdr.dim_y[0], hdr.dim_y[1], hdr.dim_y[2], 0);

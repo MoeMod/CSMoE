@@ -473,7 +473,7 @@ namespace sv {
 			float flDamage = 4;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 240.0f;
+				flDamage = 210.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 240.0f;
 #endif
@@ -794,7 +794,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 			RadiusDamage3(vecOrigin, pev, m_pPlayer->pev, Slash3ExpDamage(), 140, CLASS_MACHINE, DMG_NEVERGIB | DMG_BULLET, 0, 0, 0, 1, 0, 2);
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
 #endif			
 			FakeKnockBack();
 			m_iActSlash3 = 0;

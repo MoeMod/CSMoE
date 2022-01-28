@@ -31,7 +31,7 @@ CHudZ4Energy::CHudZ4Energy(void)
 void CHudZ4Energy::InitHUDData()
 {
 	m_iSkillUsage = 5;
-	m_iText = 0;
+	m_iZClass = Z4_CLASS_NORMAL;
 	m_iPower[0] = 0;
 	m_iPower[1] = 0;
 	m_iPower2[0] = 0;
@@ -255,7 +255,7 @@ int CHudZ4Energy::Draw(float time)
 
 		DrawUtils::DrawHudString(iX, iY + 15, ScreenWidth, "可使用[精准打击]", 251, 201, 96);
 	}
-	else if (g_PlayerExtraInfo[idx].zombie)
+	else if (g_PlayerExtraInfo[idx].zombie && m_iPowerServer >= m_iSkillUsage)
 	{
 		m_iTextFlash = 0;
 		m_flTextFlashStart = 0.0f;
@@ -280,8 +280,8 @@ int CHudZ4Energy::Draw(float time)
 					"可使用[制空]",
 					"可使用[飞跃]"
 			};
-			if(m_iText >= 0 && m_iText < std::extent_v<decltype(szSkillBuf)>)
-				snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf[m_iText], m_iUseTimesOld);
+			if(m_iZClass >= 0 && m_iZClass < std::extent_v<decltype(szSkillBuf)>)
+				snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf[m_iZClass], m_iUseTimesOld);
 			else
 				m_szDrawText[0] = '\0';
 		}

@@ -44,7 +44,7 @@ namespace sv {
 	constexpr int HURT_AMOUNT = 400; // 满足累计承受伤害值
 	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
 	constexpr int DAMAGE_AMOUNT = 200; // 满足累计造成伤害值
-	constexpr float EXP_SCALE = 0.2f; // 每回合每升一级所减少经验获取百分比
+	constexpr float EXP_SCALE = 0.1f; // 每回合每升一级所减少经验获取百分比
 	constexpr duration_t ROUND_PERIOD_ADD = 60s; // 每回合时间超过多少秒后下一回合才会给予技能点
 	constexpr duration_t UPGRADE_SKILL_DELAY = 1s;
 
@@ -214,8 +214,7 @@ void CPlayerModStrategy_ZBZ::OnSpawn()
 	ClearFire();
 	if (!m_pPlayer->IsPC())
 	{
-		while(m_iPoint > 0)
-			UpgradeSkill();
+		while (m_iPoint > 0 && UpgradeSkill()) {}
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnSpawn);
@@ -442,11 +441,11 @@ void CPlayerModStrategy_ZBZ::Event_OnRoundStart()
 //	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 //}
 
-void CPlayerModStrategy_ZBZ::UpgradeSkill()
+bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 {
 	auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
 	if (!data.second)
-		return;
+		return false;
 
 	m_iPoint--;
 	m_setSkillID.insert(data.first);
@@ -486,6 +485,7 @@ void CPlayerModStrategy_ZBZ::UpgradeSkill()
 			pWeapon->m_flTimeWeaponIdle = UPGRADE_SKILL_DELAY;
 		}
 	}
+	return true;
 }
 
 void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)

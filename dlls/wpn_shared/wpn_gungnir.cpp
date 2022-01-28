@@ -710,16 +710,19 @@ void CGungnir::PrimaryAttack()
 		}
 		return; // sth ignored
 	}
-	--m_iClip;
+	
 	if (phs2 > invalid_time_point)
 		phs2 = invalid_time_point; // 0xBF800000
 	if (phs3 == invalid_time_point)
 	{
 		SendWeaponAnim(ANIM_SHOOT_START, UseDecrement() != FALSE); // 3
 		phs3 = gpGlobals->time + 0.23s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.12s;
 		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 99999.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 99999.0s;
+		return;
 	}
+	--m_iClip;
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1); // 5
 #endif
@@ -993,9 +996,43 @@ bool CGungnir::PrimaryAttack_CheckTargetAvailable(CBaseEntity * a2, Vector vecAn
 
 void CGungnir::PrimaryAttack_InstantDamage()
 {
-	if (phs9_10_11.empty())
+	if (phs9_10_11.empty())	//m_pEnemyList
 	{
-		ClearEffect();
+#ifndef CLIENT_DLL
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		TraceResult tr;
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * 320;
+		UTIL_TraceLine(vecSrc, vecEnd, missile, ENT(m_pPlayer->pev), &tr);
+
+		if (tr.flFraction != 1.0)
+			vecEnd = tr.vecEndPos;
+
+		CBeam* pBeam = phs5_6_7[0];	//m_pBeamList
+		if (pBeam)
+		{
+			pBeam->SetType(BEAM_ENTPOINT);
+			pBeam->SetStartPos(vecEnd);
+			pBeam->SetEndEntity(ENTINDEX(m_pPlayer->edict()));
+			pBeam->SetStartAttachment(0);
+			pBeam->SetEndAttachment(1);
+			pBeam->SetBrightness(230);
+			pBeam->RelinkBeam();
+			pBeam->pev->effects &= ~EF_NODRAW;
+		}
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(vecEnd.x);
+		WRITE_COORD(vecEnd.y);
+		WRITE_COORD(vecEnd.z);
+		WRITE_SHORT(MODEL_INDEX("sprites/ef_gungnir_aexplo.spr"));
+		WRITE_BYTE(5);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+#endif
+		//ClearEffect();
 		if (!phs5_6_7.empty())
 		{
 			// ???

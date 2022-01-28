@@ -4,6 +4,7 @@
 #include "monsters.h"
 #include "weapons.h"
 #include "player.h"
+#include "player/player_mod_strategy.h"
 #include "gamerules.h"
 #include "training_gamerules.h"
 #include "hltv.h"

@@ -125,7 +125,7 @@ namespace sv {
 			float flDamage = 55;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2618.0f;	//original 1836
+				flDamage = 1836.0f;	//original 1836
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1240.0f;
 #endif
@@ -136,7 +136,7 @@ namespace sv {
 			float flDamage = 70;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 3298.0f;	//1785
+				flDamage = 2165.0f;	//3298
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 3600.0f;
 #endif
@@ -148,7 +148,7 @@ namespace sv {
 			float flDamage = 130;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 4573.0f;	//2465
+				flDamage = 3298.0f;	//4573
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4573.0f;
 #endif

@@ -59,7 +59,6 @@ public class XashActivity extends Activity {
 	protected static ViewGroup mLayout;
 	
 	public static EngineSurface mSurface;
-	public static EngineSurface mSurface;
 	public static String mArgv[];
 	public static final int sdk = Integer.valueOf( Build.VERSION.SDK );
 	public static final String TAG = "XASH3D:XashActivity";

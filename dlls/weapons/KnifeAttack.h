@@ -61,8 +61,11 @@ KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bi
 			const float flAdjustedDamage = flDamage;
 
 			UTIL_MakeVectors(pHit->pev->angles);
-			if (DotProduct((tr.vecEndPos - vecSrc).Normalize().Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+			if (DotProduct((pHit->pev->origin - pevAttacker->origin).Normalize().Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+			{
 				flDamage *= 3.0;
+				bitsDamageType |= DMG_BACKATK;
+			}
 
 			ClearMultiDamage();
 			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
@@ -162,11 +165,14 @@ KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 				}
 
-				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
+				Vector vecRealDir = (pEntity->pev->origin - pevAttacker->origin).Normalize();
 
 				UTIL_MakeVectors(pEntity->pev->angles);
 				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flDamage *= 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
@@ -274,11 +280,14 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 				}
 
-				Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
+				Vector vecRealDir = (pEntity->pev->origin - pevAttacker->origin).Normalize();
 
 				UTIL_MakeVectors(pEntity->pev->angles);
 				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flDamage *= 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 
 				ClearMultiDamage();
 				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
@@ -324,7 +333,7 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 								if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
 								{
 									target->m_flVelocityModifier = 0.9;
-									AddKickRate(target, pevAttacker->origin, 3000, 290);
+									AddKickRate(target, pevAttacker->origin, 2100, 290);
 								}
 							}
 						}
@@ -559,7 +568,7 @@ inline hit_result_t
 		pAttackPlayer->m_iWeaponVolume = 128;
 
 		ClearMultiDamage();
-
+		if (flRatio == 3.0) bitsDamageType |= DMG_BACKATK;
 		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);

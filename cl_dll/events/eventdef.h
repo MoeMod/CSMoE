@@ -123,3 +123,5 @@ HOOK_EVENT(y21s1jetgunmd, FireY21s1Jetgunmd);
 HOOK_EVENT(barrettd, FireBarrettD);
 HOOK_EVENT(sfsniper, FireSFSniper);
 HOOK_EVENT(plasmagun, FirePlasmaGun);
+HOOK_EVENT(summonknife, FireSummonKnife);
+HOOK_EVENT(revivegun, FireReviveGun);

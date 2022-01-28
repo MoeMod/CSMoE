@@ -26,13 +26,13 @@ GNU General Public License for more details.
 #include "z4.h"
 #include "z4_energy.h"
 #include "z4_scoreboard.h"
-
-#include "gamemode/z4/z4_const.h"
+#include "z4_status.h"
+#include "z4_tips.h"
 
 #include <vector>
 
 class CHudZ4::impl_t
-	: public THudSubDispatcher<CHudZ4Energy, CHudZ4Scoreboard>
+	: public THudSubDispatcher<CHudZ4Energy, CHudZ4Scoreboard, CHudZ4Status, CHudZ4Tips>
 {
 public:
 };
@@ -44,28 +44,21 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 	auto type = static_cast<Z4MessageType>(buf.ReadByte());
 	switch (type)
 	{
-	/*
-	case 4:
+	
+	case Z4_MESSAGE_NIGHTTIME:
 	{
-		int slot = READ_BYTE();
-		int id = READ_BYTE();
-		int status = READ_BYTE();
-		g_CHudZB4UI.m_Icon.AddIcon(slot, id, status);
+		int start = buf.ReadByte();
+		int end = buf.ReadByte();
+		pimpl->get<CHudZ4Tips>().SetNightTime(start, end);
+		pimpl->get<CHudZ4Status>().HideAll();
 		break;
 	}
-	case 5:
-	{
-		int start = READ_BYTE();
-		int end = READ_BYTE();
-		g_CHudZB4UI.m_Tip.SetNightTime(start, end);
-		break;
-	}*/
 	case Z4_MESSAGE_ENERGY:
 	{
 		int power = buf.ReadByte();
 		float flashtime = buf.ReadByte() / 10.0f;
-		//g_CHudZB4UI.m_Icon.SetPower(power);
 		pimpl->get<CHudZ4Energy>().SetPower(power, flashtime);
+		pimpl->get<CHudZ4Status>().SetPower(power);
 		break;
 	}
 	case Z4_MESSAGE_DAMAGE:
@@ -75,11 +68,63 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 		pimpl->get<CHudZ4Scoreboard>().SetDamage(a * 255 + b);
 		break;
 	}
+	case Z4_MESSAGE_STATUS:
+	{
+		int slot = buf.ReadByte();
+		Z4Status id = static_cast<Z4Status>(buf.ReadByte());
+		Z4StatusIconDraw status = static_cast<Z4StatusIconDraw>(buf.ReadByte());
+		pimpl->get<CHudZ4Status>().AddIcon(slot, id, status);
+		break;
+	}
 	case Z4_MESSAGE_ZCLASS:
 	{
-		int zclassid = buf.ReadByte();
-		int iSkillConsume = buf.ReadByte();
-		pimpl->get<CHudZ4Energy>().SetZbSkill(zclassid, iSkillConsume);
+		Z4ZClassType zclass = static_cast<Z4ZClassType>(buf.ReadByte());
+		pimpl->get<CHudZ4Energy>().SetZClass(zclass);
+		break;
+	}
+	case Z4_MESSAGE_SKILL:
+	{
+		Z4ZSkillType skill = static_cast<Z4ZSkillType>(buf.ReadByte());
+		int activate = buf.ReadByte();
+		if (skill == Z4_SKILL_DASH)
+		{
+			if (g_PlayerExtraInfo[gEngfuncs.GetLocalPlayer()->index].zombie)
+			{
+				switch (pimpl->get<CHudZ4Energy>().GetZClass())
+				{
+				case Z4_CLASS_NORMAL:
+					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					break;
+				case Z4_CLASS_LIGHT:
+					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEDOWN, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					break;
+				case Z4_CLASS_HEAVY:
+					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDDOWN, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					break;
+				case Z4_CLASS_HIDE:
+					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					break;
+				case Z4_CLASS_HUMPBACK:
+					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
+				pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+
+			}
+		}
+		else if (skill == Z4_SKILL_ACCSHOOT)
+		{
+			pimpl->get<CHudZ4Status>().AddIcon(1, Z4_CRITICALSHOT, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+		}
+		break;
 	}
 	}
 	
@@ -145,4 +190,9 @@ bool CHudZ4::ActivateSkill(int iSlot)
 	}
 
 	return false;
+}
+
+void CHudZ4::SetStatus(int slot, Z4Status id, Z4StatusIconDraw status)
+{
+	pimpl->get<CHudZ4Status>().AddIcon(slot, id, status);
 }

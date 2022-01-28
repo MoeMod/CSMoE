@@ -117,7 +117,7 @@ private:
 	void AddExp(int exp);
 	void AddLevel(int lv);
 	void SetLevel(int lv);
-	void UpgradeSkill();
+	bool UpgradeSkill();
 
 	std::set<std::shared_ptr<CZombieZSkill_Base>> m_vecSkill;
 	std::set<byte> m_setSkillID;

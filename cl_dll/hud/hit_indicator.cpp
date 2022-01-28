@@ -36,7 +36,7 @@ struct HitIndicatorItem
 
 	int iId;	// the index number of the associated sprite
 	float flDisplayTime;
-	int iHeadShot;
+	byte byFlag;
 	float fRange;
 };
 
@@ -45,8 +45,12 @@ struct HitIndicatorItem
 
 #define DAMAGENUM_DISPLAY_TIME 0.75f
 
+#define HIT_FLAGS_HEAD (1<<0)
+#define HIT_FLAGS_CRITICAL (1<<1)
+#define HIT_FLAGS_BACKATK (1<<2)
+#define HIT_FLAGS_BURN (1<<3)
 
-HitIndicatorItem rgHitIndicatorList[MAX_INDICATORS + 1 ];
+HitIndicatorItem pList[MAX_INDICATORS + 1 ];
 
 int CHudHitIndicator:: Init( void )
 {
@@ -67,7 +71,7 @@ void CHudHitIndicator::Reset(void)
 
 void CHudHitIndicator:: InitHUDData( void )
 {
-	memset(rgHitIndicatorList, 0, sizeof(rgHitIndicatorList) );
+	memset(pList, 0, sizeof(pList) );
 }
 
 
@@ -105,9 +109,9 @@ void CHudHitIndicator::Shutdown(void)
 
 int CHudHitIndicator:: Draw( float flTime )
 {
-	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL)  )
+	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL))
 		return 1;
-	HitIndicatorItem *pList = rgHitIndicatorList;
+
 
 	if ((int)hud_hitindicator_style->value != current_style) {
 		int new_style = (int)hud_hitindicator_style->value;
@@ -116,15 +120,15 @@ int CHudHitIndicator:: Draw( float flTime )
 			Reset();
 		}
 	}
-	int r, g, b, scale;
-	if ( (int)hud_hitindicator_style ->value == 1) {
+	gEngfuncs.pTriAPI->RenderMode(kRenderTransAlpha);
+	gEngfuncs.pTriAPI->Brightness(1.0);
+	gEngfuncs.pTriAPI->CullFace(TRI_NONE);
+
+	if ((int)hud_hitindicator_style->value == 1) {
 		for (int i = 0; i < MAX_INDICATORS; i++)
 		{
 			if (pList[i].iId == 0)
 				break;  // we've gone through them all
-
-			//if (g_PlayerExtraInfo[i].dead)
-				//continue;
 
 			if (pList[i].flDisplayTime < flTime)
 			{ // display time has expired
@@ -134,19 +138,23 @@ int CHudHitIndicator:: Draw( float flTime )
 				continue;
 			}
 
-			pList[i].flDisplayTime = min(pList[i].flDisplayTime, flTime + DAMAGENUM_DISPLAY_TIME);
+			float fProgress;
+			float fScale;
+			float fOffset;
+			byte byFlag = pList[i].byFlag;
 
-			cl_entity_t *ent = gEngfuncs.GetEntityByIndex(pList[i].iVictim);
+			int r, g, b;
+
+			fProgress = (flTime + DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime) / DAMAGENUM_DISPLAY_TIME;
+
+			cl_entity_t* ent = gEngfuncs.GetEntityByIndex(pList[i].iVictim);
 			vec3_t origin = ent->origin;
-			if (ent->curstate.solid == SOLID_BSP && !ent->player) {
-				origin = ((ent->curstate.origin + ent->curstate.maxs) + (ent->curstate.origin + ent->curstate.mins)) / 2.0f;
-			}
-			float fixed_offset = (DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime + flTime) / DAMAGENUM_DISPLAY_TIME;
-			if (fixed_offset >= 0.5) fixed_offset = 0.5;
-			fixed_offset *= pList[i].fRange / 10.0f;
-			origin.z += fixed_offset;
+			fOffset = fProgress;
+			if (fOffset >= 1.0f) fOffset = 1.0f;
+			fOffset *= pList[i].fRange / 10.0f;
+			origin.z += fOffset;
 
-			model_t *model = ent->model;
+			model_t* model = ent->model;
 			if (model)
 				origin.z += max(model->maxs.z, 35.0);
 
@@ -155,13 +163,13 @@ int CHudHitIndicator:: Draw( float flTime )
 				continue;
 
 			int textlen = DrawUtils::HudStringLen(pList[i].damage_num);
-			if (pList[i].iHeadShot == 1) {
-				r = 150; g = 0; b = 0; scale = 3.0;
+			if (byFlag & HIT_FLAGS_HEAD) {
+				r = 150; g = 0; b = 0; fScale = 3.0f;
 			}
 			else {
-				r = 150; g = 150; b = 150; scale = 2.0;
+				r = 150; g = 150; b = 150; fScale = 2.0f; //scale not working
 			}
-			DrawUtils::DrawHudString(screen[0] - textlen * 0.5f, screen[1], gHUD.m_scrinfo.iWidth, pList[i].damage_num, r, g, b, scale);
+			DrawUtils::DrawHudString(screen[0] - textlen * 0.5f, screen[1], ScreenWidth, pList[i].damage_num, r, g, b, fScale);
 		}
 	}
 	else if ((int)hud_hitindicator_style->value >= 2 && (int)hud_hitindicator_style->value <= 8) {
@@ -171,9 +179,6 @@ int CHudHitIndicator:: Draw( float flTime )
 			if (pList[i].iId == 0)
 				break;  // we've gone through them all
 
-			//if (g_PlayerExtraInfo[i].dead)
-				//continue;
-
 			if (pList[i].flDisplayTime < flTime)
 			{ // display time has expired
 				// remove the current item from the list
@@ -182,32 +187,40 @@ int CHudHitIndicator:: Draw( float flTime )
 				continue;
 			}
 
-			pList[i].flDisplayTime = min(pList[i].flDisplayTime, flTime + DAMAGENUM_DISPLAY_TIME);
+			BOOL bIsNewest = false;
+			float fProgress;
+			float fScale;
+			float fOffset;
+			float iAlpha;
+			byte byFlag = pList[i].byFlag;
 
-			float fixed_offset = 0.1f * gHUD.m_flScale*ScreenHeight * (DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime + flTime) / DAMAGENUM_DISPLAY_TIME;
-			float fScale = 1.0f - 1.0f * (DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime + flTime) / DAMAGENUM_DISPLAY_TIME;
-			
-			int alpha = 3 * (255 - 255 * (DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime + flTime) / DAMAGENUM_DISPLAY_TIME);
-			if (alpha > 255) alpha = 255;
+			if (i == MAX_INDICATORS || pList[i + 1].iId == 0) bIsNewest = true; //Newest one larger  
 
-			if (i == MAX_INDICATORS) fScale += 0.2f;
-			else if (pList[i+1].iId == 0) fScale += 0.2f;    //Newest one larger
+			fProgress = (flTime + DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime) / DAMAGENUM_DISPLAY_TIME;
+			if (!bIsNewest) fProgress += 0.2f;
+			if (fProgress < 0.0f || fProgress >= 1.0f) continue;
 
-			fScale -= pList[i].fRange / 2000.0f;  //Differs by distance
+			fOffset = 0.1f * gHUD.m_flScale * ScreenHeight * fProgress;
+			fScale = 1.25f - fProgress;
 
-			if (fScale < 0.5) fScale = 0.5f;
-			if (alpha < 0) alpha = 0;
+			iAlpha = 3 * (255 - 255 * fProgress);
+			if (iAlpha > 255) iAlpha = 255;
 
-			if (pList[i].iHeadShot) fScale += 0.2f;
+			fScale -= pList[i].fRange / 1000.0f;  //Differs by distance
+
+			if (fScale < 0.5f || !bIsNewest) fScale = 0.5f;
+			if (iAlpha < 0) iAlpha = 0;
+
+			if (byFlag & HIT_FLAGS_HEAD) fScale += 0.25f;    // 1==head 2==critical 3==backattack 4==burn
 
 			float screen[2]{ -1,-1 };
 			if (!CalcScreen(pList[i].fOrigin, screen))
 				continue;
-			screen[1] -= fixed_offset; 
+			screen[1] -= fOffset;
 			screen[0] += pList[i].random_offset;
 
 			int iDamage = pList[i].iDamage;
-			
+
 			int count = 1;
 			while (iDamage >= 10) {
 				iDamage /= 10;
@@ -215,14 +228,31 @@ int CHudHitIndicator:: Draw( float flTime )
 			}
 
 			int gap = 0;
-			if(m_iTex[pList[i].iHeadShot]->valid()) gap = fScale * m_iTex[pList[i].iHeadShot]->w() / 10.0f;
+			int isheadshot;
+			if (byFlag & HIT_FLAGS_HEAD) isheadshot = 1;
+			else isheadshot = 0;
+			if (m_iTex[isheadshot]->valid()) gap = fScale * m_iTex[isheadshot]->w() / 10.0f;
 
 			iDamage = pList[i].iDamage;
 
 			char str[128];
 			for (int j = 1; j <= count; j++) {
-				Draw2DQuad_Custom(screen[0] + gap * ((count+1) / 2.0f - j), screen[1], fScale, iDamage % 10, pList[i].iHeadShot, alpha);
+				Draw2DQuad_Custom(screen[0] + gap * ((count + 1) / 2.0f - j), screen[1], fScale, iDamage % 10, isheadshot, iAlpha);
 				iDamage /= 10;
+			}
+			
+			float x, y;
+			if (byFlag & HIT_FLAGS_CRITICAL) {   //Critical
+				
+				x = screen[0] - (gap * (count / 2.0f));
+				y = screen[1] - fScale * m_iTex[0]->h() / 2.0f;
+				Draw2DQuad_Custom(x, y, fScale, 0, 3, iAlpha);
+			}
+			
+			if (byFlag & HIT_FLAGS_BACKATK) {   //BackAttack
+				x = screen[0] + fScale * m_iTex[3]->w() / 2.0f;
+				y = screen[1] - fScale * (m_iTex[4]->h() / 2.0f + m_iTex[0]->h() / 2.0f);
+				Draw2DQuad_Custom(x, y, fScale, 0, 4, iAlpha);
 			}
 		}
 	}
@@ -238,43 +268,41 @@ int CHudHitIndicator::MsgFunc_HitMsg( const char *pszName, int iSize, void *pbuf
 	int i;
 	for (i = 0; i < MAX_INDICATORS; i++)
 	{
-		if (rgHitIndicatorList[i].iId == 0)
+		if (pList[i].iId == 0)
 			break;
 	}
 	if (i == MAX_INDICATORS)
 	{ // move the rest of the list forward to make room for this item
-		memmove(rgHitIndicatorList, rgHitIndicatorList + 1, sizeof(HitIndicatorItem) * MAX_INDICATORS);
+		memmove(pList, pList + 1, sizeof(HitIndicatorItem) * MAX_INDICATORS);
 		i = MAX_INDICATORS - 1;
 	}
 
 	BufferReader reader(pszName, pbuf, iSize);
 
-	rgHitIndicatorList[i].iDamage = reader.ReadLong();
+	pList[i].iDamage = reader.ReadLong();
 
 	int iVictim = reader.ReadShort();
-	int iHead = reader.ReadByte();
+	byte byFlag = reader.ReadByte();
 
-	rgHitIndicatorList[i].iId = 1;
-	sprintf(rgHitIndicatorList[i].damage_num, "%d", rgHitIndicatorList[i].iDamage);
-	rgHitIndicatorList[i].iVictim = iVictim;  
-	if(iHead == 1) rgHitIndicatorList[i].iHeadShot = 1;
-	else rgHitIndicatorList[i].iHeadShot = 0;
-	rgHitIndicatorList[i].flDisplayTime = gHUD.m_flTime + DAMAGENUM_DISPLAY_TIME;
-	rgHitIndicatorList[i].random_offset = gHUD.m_flScale * 0.1f * (rand() % (ScreenWidth / 2) - (ScreenWidth / 4));
+	pList[i].iId = 1;
+	sprintf(pList[i].damage_num, "%d", pList[i].iDamage);
+	pList[i].iVictim = iVictim;
+	pList[i].byFlag = byFlag;
+	pList[i].flDisplayTime = gHUD.m_flTime + DAMAGENUM_DISPLAY_TIME;
+	pList[i].random_offset = gHUD.m_flScale * 0.1f * (rand() % (ScreenWidth / 2) - (ScreenWidth / 4));
 
-	cl_entity_t *ent = gEngfuncs.GetEntityByIndex(iVictim);
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iVictim);
+	pList[i].fRange = (gEngfuncs.GetLocalPlayer()->origin - ent->origin).Length();
 
-	vec3_t center = ent->origin;
-	if (ent->curstate.solid == SOLID_BSP && !ent->player) {
-		center = ((ent->curstate.origin + ent->curstate.maxs) + (ent->curstate.origin + ent->curstate.mins)) / 2.0f;
-	}
 
-	rgHitIndicatorList[i].fRange = (gEngfuncs.GetLocalPlayer()->origin - center).Length();
-	rgHitIndicatorList[i].fOrigin = center;
+	//if (!CheckForPlayer(ent))
+		//continue;
 
-	model_t *model = ent->model;
+	pList[i].fOrigin = ent->origin;
+
+	model_t* model = ent->model;
 	if (model)
-		rgHitIndicatorList[i].fOrigin.z += max(model->maxs.z, 35.0);
+		pList[i].fOrigin.z += max(model->maxs.z, 35.0);
 
 	return 1;
 }
@@ -286,11 +314,18 @@ void CHudHitIndicator::Draw2DQuad_Custom(float x, float y, float scale, int num,
 	x *= gHUD.m_flScale;    //Xash3D feature
 	y *= gHUD.m_flScale;
 
-	float w = m_iTex[iTexID]->w() / 10.0f / 2.0f, h = m_iTex[iTexID]->h() / 2.0f;
+	float w, h;
+
+	if (iTexID < 2) { w = m_iTex[iTexID]->w() / 10.0f / 2.0f; h = m_iTex[iTexID]->h() / 2.0f; }
+	else { w = m_iTex[iTexID]->w() / 2.0f; h = m_iTex[iTexID]->h() / 2.0f; }
 	w *= scale;
 	h *= scale;
 	w *= gHUD.m_flScale;     //Xash3D feature
 	h *= gHUD.m_flScale;
 
-	m_iTex[iTexID]->Draw2DQuad(x - w, y - h, x + w, y + h, 0.1*num , 0, 0.1*(num + 1), 1, 255, 255, 255, alpha);
+	float a1, a2, a3, a4;
+	if (iTexID < 2) { a1 = 0.1 * num; a2 = 0; a3 = 0.1 * (num + 1); a4 = 1; }
+	else { a1 = 0; a2 = 0; a3 = 1; a4 = 1; }
+
+	m_iTex[iTexID]->Draw2DQuad(x - w, y - h, x + w, y + h, a1 , 0, a3, 1, 255, 255, 255, alpha);
 }

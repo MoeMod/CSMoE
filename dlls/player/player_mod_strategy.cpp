@@ -199,8 +199,8 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 
 		break;
 	case TERRORIST:
-		m_pPlayer->GiveNamedItem("knife_balrog9");
-		m_pPlayer->GiveNamedItem("weapon_skull5");
+		m_pPlayer->GiveNamedItem("knife_summonknife");
+		m_pPlayer->GiveNamedItem("weapon_revivegun");
 		m_pPlayer->GiveAmmo(40, "9mm", MAX_AMMO_9MM);
 
 		break;

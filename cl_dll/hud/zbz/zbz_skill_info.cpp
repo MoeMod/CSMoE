@@ -72,7 +72,7 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_SteelBody, {TYPE_ZOMBIE, "钢铁铠甲"}},
 	{Skill_SpeedyCrouch, {TYPE_ZOMBIE, "脚掌"}},
 	{Skill_SteelHead, {TYPE_ZOMBIE, "钢铁头盔"}},
-	{Skill_AdaptabilityYou, {TYPE_ZOMBIE, "适应力"}},
+	{Skill_Adaptability, {TYPE_ZOMBIE, "适应力"}},
 	{Skill_ExplosiveReaction, {TYPE_ZOMBIE, "爆弹兽颅"}},
 	{Skill_ArmonedAdvance, {TYPE_ZOMBIE, "猛犸"}},
 	{Skill_BombEnhacement, {TYPE_ZOMBIE, "兽颅强化"}},

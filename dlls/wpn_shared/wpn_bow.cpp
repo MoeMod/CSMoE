@@ -520,7 +520,7 @@ float CBow::GetPrimaryAttackDamage() const
 	float flDamage = 38;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 72;
+		flDamage = 309;	// 95
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 72;
 #endif
@@ -532,7 +532,7 @@ float CBow::GetSecondaryAttackDamage() const
 	float flDamage = 152.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 755.0f;
+		flDamage = 1944.0f;	//+3 original 600
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 755.0f;
 #endif

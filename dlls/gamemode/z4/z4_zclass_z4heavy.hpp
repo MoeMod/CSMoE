@@ -52,6 +52,14 @@ namespace sv {
 				m_pPlayer->ResetMaxSpeed();
 			}
 
+			bool CheckCanDash()
+			{
+				if (m_pPlayer->pev->flags & FL_DUCKING)
+					return false;
+
+				return true;
+			}
+
 			void OnDashStart()
 			{
 				if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
@@ -81,7 +89,7 @@ namespace sv {
 
 			Vector get_position(float f, float r, float u) const // copied from amxx
 			{
-				UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 				Vector vecSrc = m_pPlayer->GetGunPosition();
 				return vecSrc + gpGlobals->v_forward * f + gpGlobals->v_right * r + gpGlobals->v_up * u;
 			}
@@ -89,10 +97,11 @@ namespace sv {
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
 				Vector new_velocity = origin2 - origin1;
-				new_velocity[0] *= 2;
-				new_velocity[1] *= 2;
-				new_velocity[2] /= 2;
-				return new_velocity.Normalize() * speed;
+				float val = speed / new_velocity.LengthReverse();
+				new_velocity[0] *= (val * 2);
+				new_velocity[1] *= (val * 2);
+				new_velocity[2] *= (val / 2);
+				return new_velocity;
 			}
 
 			bool OnSkillActivate()

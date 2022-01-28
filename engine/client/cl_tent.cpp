@@ -785,7 +785,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 	unsigned char idx = 0;
 	unsigned char cType = 0;
 	float fTemp;
-	while (*pOptions != '\0')
+	do
 	{
 		if (isalpha(*pOptions)) {
 			idx = 0;
@@ -793,7 +793,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 			value[1] = '\0';
 			cType = *pOptions;
 		}
-		else if (*pOptions == ' ') {
+		else if (*pOptions == ' ' || *pOptions == '\0') {
 			switch (cType) {
 			case 'I':
 				index = bound(0, atoi(value), MAX_MUZZLEFLASH - 1);
@@ -840,8 +840,7 @@ void CL_MuzzleFlashExtend(cl_entity_t* parent, int clientindex, int iAttachment,
 		else {
 			value[idx++] = *pOptions;
 		}
-		++pOptions;
-	}
+	} while (*pOptions++ != '\0');
 
 	int modelIndex = cl_muzzleflash[index];
 	if (!modelIndex) return;

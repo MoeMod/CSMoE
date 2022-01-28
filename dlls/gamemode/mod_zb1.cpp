@@ -191,8 +191,10 @@ void CMod_Zombi::Think()
 void CMod_Zombi::HumanWin()
 {
 	//Broadcast("ctwin");
-	for(CBasePlayer *player : moe::range::PlayersList())
-		CLIENT_COMMAND(player->edict(), "spk win_human\n");
+	//for(CBasePlayer *player : moe::range::PlayersList())
+		//CLIENT_COMMAND(player->edict(), "spk win_human\n");
+
+	UTIL_BroadcastStuffText("mp3 stop;spk \"win_human\"\n");
 
 	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 	WRITE_BYTE(2);
@@ -210,8 +212,10 @@ void CMod_Zombi::HumanWin()
 void CMod_Zombi::ZombieWin()
 {
 	//Broadcast("terwin");
-	for(CBasePlayer *player : moe::range::PlayersList())
-		CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
+	//for(CBasePlayer *player : moe::range::PlayersList())
+		//CLIENT_COMMAND(player->edict(), "spk win_zombi\n");
+
+	UTIL_BroadcastStuffText("mp3 stop;spk \"win_zombi\"\n");
 
 	/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 	WRITE_BYTE(3);

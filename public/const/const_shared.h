@@ -32,6 +32,8 @@ constexpr DamageType_t DMG_ENERGYBEAM = (1 << 10);		// laser or other high energ
 constexpr DamageType_t DMG_NEVERGIB = (1 << 12);		// with this bit OR'd in, no damage type will be able to gib victims upon death
 constexpr DamageType_t DMG_ALWAYSGIB = (1 << 13);		// with this bit OR'd in, any damage type can be made to gib victims upon death
 constexpr DamageType_t DMG_DROWN = (1 << 14);			// Drowning
+constexpr DamageType_t DMG_BACKATK = (1 << 15);			// Knife back atk
+constexpr DamageType_t DMG_CRITICAL = (1 << 16);			// Critical
 
 // time-based damage
 //mask off TF-specific stuff too

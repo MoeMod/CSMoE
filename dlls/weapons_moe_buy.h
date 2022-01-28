@@ -90,6 +90,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_buffak",      "圣帝",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_sfsniper",         "雷神",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_plasmagun",      "破晓黎明",    0, PRIMARY_WEAPON_SLOT, UNASSIGNED, 50},
+	//{"weapon_revivegun",	 "逆界星轮",			  1500,  PRIMARY_WEAPON_SLOT,         UNASSIGNED },
 	{"z4b_cannonplasma",      "黎明离子炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"z4b_cannontiger",      "裂地虎炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"z4b_m134heroi",      "漩涡i7",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
@@ -125,6 +126,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_oppovivo",      "绝地光剑",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_stormgiantx",      "骇影巨锤",    0, KNIFE_SLOT, UNASSIGNED, 80},
 	//{"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, 35},
+	//{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED },
 
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, 1},
 

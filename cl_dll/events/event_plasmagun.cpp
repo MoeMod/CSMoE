@@ -26,73 +26,34 @@ enum
 	ANIM_SHOOT3
 };
 
-static const char *SOUNDS_NAME[] =
-{
-	"weapons/plasmagun-1.wav"
-};
-
 void EV_FirePlasmaGun( event_args_t *args )
 {
-	vec3_t ShellVelocity;
-	vec3_t ShellOrigin;
-	vec3_t vecSrc, vecAiming;
 	int    idx = args->entindex;
 	Vector origin( args->origin );
-	Vector angles(
-		args->iparam1 / 100.0f + args->angles[0],
-		args->iparam2 / 100.0f + args->angles[1],
-		args->angles[2]
-		);
-	Vector velocity( args->velocity );
-	Vector forward, right, up;
-
-	AngleVectors( angles, forward, right, up );
 
 	if ( EV_IsLocal( idx ) )
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		if (args->bparam1)
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
-		else
-			gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
-		if( !gHUD.cl_righthand->value )
+		
+		/*
+		dlight_t *dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
+		if(dl)
 		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, -10.0, 0);
+			dl->origin = args->origin;
+			dl->radius = 50;
+			dl->decay = 200;
+			dl->color.r = 100;
+			dl->color.g = 220;
+			dl->color.b = 150;
+			dl->die = gEngfuncs.GetClientTime() + 0.1;
 		}
-		else
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, 10.0, 0);
-		}
-	}
-	else
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
+		*/
+
+		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
 	}
 
-	if (args->bparam1)
-	{
-		PLAY_EVENT_SOUND(SOUNDS_NAME[1]);
-	}
-	else
-	{
-		EV_EjectBrass(ShellOrigin, ShellVelocity, angles[YAW], g_iRShell, TE_BOUNCE_SHELL);
-
-		PLAY_EVENT_SOUND(SOUNDS_NAME[0]);
-
-		EV_GetGunPosition(args, vecSrc, origin);
-		VectorCopy(forward, vecAiming);
-		Vector vSpread;
-
-		vSpread.x = args->fparam1;
-		vSpread.y = args->fparam2;
-		EV_HLDM_FireBullets(idx,
-			forward, right, up,
-			1, vecSrc, vecAiming,
-			vSpread, 8192.0, BULLET_PLAYER_762MM,
-			2);
-	}
-	
+	PLAY_EVENT_SOUND("weapons/plasmagun-1.wav");
 }
 
 }

@@ -703,6 +703,7 @@ class CHudTimer: public CHudBase
 {
 	friend class CHudSpectatorGui;
 	friend class CHudScenarioStatus;
+	friend class CHudZ4Tips;
 public:
 	int Init( void );
 	int VidInit( void );
@@ -830,7 +831,7 @@ public:
 private:
 	cvar_t* hud_hitindicator_style;
 	int current_style;
-	SharedTexture m_iTex[4];
+	SharedTexture m_iTex[5];
 
 
 };

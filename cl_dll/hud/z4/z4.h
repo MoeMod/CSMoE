@@ -15,6 +15,8 @@ GNU General Public License for more details.
 
 #pragma once
 
+#include "gamemode/z4/z4_const.h"
+
 class CHudZ4 : public CHudBase
 {
 public:
@@ -27,6 +29,8 @@ public:
 	void Shutdown(void) override;
 
 	bool ActivateSkill(int iSlot);
+	void SetStatus(int slot, Z4Status id, Z4StatusIconDraw status);
+
 	CHudMsgFunc(Z4Msg);
 
 protected:

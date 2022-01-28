@@ -173,7 +173,9 @@ TL_ADD(CSFSniper)
 TL_ADD(CPlasmaGun)
 TL_ADD(CKnifeRuneBlade)
 TL_ADD(CKnifeJanus9)
-TL_ADD(CKnifeBalrog9)
+TL_ADD(CKnifeSummonKnife)
+TL_ADD(CReviveGun)
+
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -402,6 +404,8 @@ TL_ADD(CZombieHook)
 TL_ADD(CSkullT9Ammo)
 TL_ADD(CSkullT9Storm)
 TL_ADD(CPlasmaGrenade)
+TL_ADD(CSummoner)
+TL_ADD(CSummonKnifeCannon)
 #endif
 
 TL_END(AllEntityTypeList)

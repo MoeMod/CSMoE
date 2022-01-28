@@ -944,7 +944,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 380;
+			flDamage = 200;	//380 original
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 380;
 #endif

@@ -76,12 +76,9 @@ namespace sv {
 			PRECACHE_MODEL("models/p_balrog9.mdl");
 
 			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/balrogcritical.spr");
-			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/spear_exp.spr");
-			PRECACHE_MODEL("sprites/balrogcritical.spr");
-			PRECACHE_MODEL("sprites/spear_exp.spr");
 
 			PRECACHE_SOUND("weapons/balrog9_slash1.wav");
-			PRECACHE_SOUND("weapons/balrog9-slash2.wav");
+			PRECACHE_SOUND("weapons/balrog9_slash2.wav");
 			PRECACHE_SOUND("weapons/balrog9_hit1.wav");
 			PRECACHE_SOUND("weapons/balrog9_hit2.wav");
 			PRECACHE_SOUND("weapons/balrog9_hitwall.wav");
@@ -116,16 +113,14 @@ namespace sv {
 		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
 		void OnAttack2Released();
-		void CreateHitFX(Vector pos, int iType);
-		bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType);
+		void CreateHitFX(Vector pos);
 
 		BOOL CanDrop() override { return false; }
-		void ItemPostFrame() override;
 
 	public:
 		float GetPrimaryAttackDamage() const
 		{
-			float flDamage = 55;
+			float flDamage = 35;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				flDamage = 2618.0f;	//original 1836
@@ -136,31 +131,30 @@ namespace sv {
 		}
 		float GetSecondaryAttackDamage() const
 		{
-			float flDamage = 70;
+			float flDamage = 58;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 3298.0f;	//1785
+				flDamage = 350.0f;	//1785
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 3600.0f;
+				flDamage = 245.0f;
 #endif
 			return flDamage;
 		}
 
 		float  GetChargeAttackDamage() const
 		{
-			float flDamage = 130;
+			float flDamage = 118;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 4573.0f;	//2465
+				flDamage = 1180.0f;	//580+500
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flDamage = 4573.0f;
+				flDamage = 906.0f;
 #endif
 			return flDamage;
 		}
 
 		time_point_t m_flTimeCheckCharge;
 
-		int m_iPrimarySprEffect;
 		int m_iSecondarySprEffect;
 		int m_iState;	//pev_iuser1
 	};
@@ -196,101 +190,7 @@ namespace sv {
 		return 1;
 	}
 
-
-	bool CKnifeBalrog9::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, int iType)
-	{
-		bool bResult = false;
-#ifndef CLIENT_DLL
-		if (pEntity->IsBSPModel())
-		{
-			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
-
-			if (ptr->flFraction < 1.0)
-			{
-				if (ptr->pHit)
-				{
-					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
-
-					if (pHit && pHit == pEntity)
-						bResult = true;
-				}
-			}
-		}
-		else
-		{
-			UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
-
-			if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
-			{
-				UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
-
-				bResult = true;
-			}
-			else
-			{
-				Vector vecEnd = pEntity->BodyTarget(vecSrc);
-
-				if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
-				{
-					edict_t* peAttacker = pAttacker->edict();
-
-					for (int i = 5; i > 0; i--)
-					{
-						UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
-
-						if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
-						{
-							break;
-						}
-
-						CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
-
-						if (ptr->flFraction < 1.0 || pHit == pEntity)
-						{
-							bResult = true;
-
-							break;
-						}
-
-						if (pHit->IsBSPModel())
-						{
-							break;
-						}
-
-						vecSrc = ptr->vecEndPos + vecDir * 5.0;
-					}
-			}
-		}
-	}
-
-		//if ((!friendlyfire.value && pEntity->m_iTeam == pAttacker->m_iTeam) || !bResult)
-		if (!bResult)
-			return bResult;
-
-		if (!m_iSwing)
-		{
-			if (pEntity->IsPlayer())
-			{
-				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
-					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
-				else
-					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
-			}
-			else
-			{
-				if (FBitSet(pEntity->pev->flags, FL_DUCKING))
-					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, 10), iType);
-				else
-					CKnifeBalrog9::CreateHitFX(pEntity->pev->origin + Vector(0, 0, -10), iType);
-			}
-		}
-#endif
-
-		return bResult;
-}
-
-
-	void CKnifeBalrog9::CreateHitFX(Vector pos, int iType)
+	void CKnifeBalrog9::CreateHitFX(Vector pos)
 	{
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
@@ -298,109 +198,74 @@ namespace sv {
 		WRITE_COORD(pos.x);
 		WRITE_COORD(pos.y);
 		WRITE_COORD(pos.z);
-		WRITE_SHORT(iType ? m_iSecondarySprEffect : m_iPrimarySprEffect);
-		WRITE_BYTE(iType ? 10 : 3);
+		WRITE_SHORT(m_iSecondarySprEffect);
+		WRITE_BYTE(5);
 		WRITE_BYTE(30);
-		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
 		MESSAGE_END();
 #endif
 	}
 
-	void CKnifeBalrog9::DelayPrimaryAttack(void)
-	{
-#ifndef CLIENT_DLL		
-		m_iSwing = 0;
-		CBaseEntity* pEntity = NULL;
-		BOOL fDidHit = FALSE;
-		TraceResult tr;
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecEnd;
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-
-		Vector vecForward = gpGlobals->v_forward;
-		Vector2D vecForward2D = vecForward.Make2D().Normalize();
-
-		float c = cos(200.0 * 0.5 * M_PI / 180.0);
-
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 110.0)) != NULL)
-		{
-			if (pEntity == m_pPlayer)
-				continue;
-
-			if (pEntity->IsDormant())
-				continue;
-
-			if (pEntity->pev->takedamage == DAMAGE_NO)
-				continue;
-
-			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr, 0))
-				continue;
-
-			float flRatio = 1.0;
-
-			if (pEntity && pEntity->IsPlayer())
-			{
-				UTIL_MakeVectors(pEntity->pev->angles);
-
-				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
-					flRatio = 3.0;
-			}
-
-			m_pPlayer->m_iWeaponVolume = 128;
-
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9-slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-
-			ClearMultiDamage();
-
-			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
-
-			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-			fDidHit = TRUE;
-		}
-
-		if (!fDidHit)
-		{
-			vecEnd = vecSrc + vecForward * 110.0;
-
-			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
-
-			if (tr.flFraction < 1.0f)
-			{
-				//MaterialSound(&tr, vecSrc, vecEnd);
-				CKnifeBalrog9::CreateHitFX(tr.vecEndPos, 0);
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_hitwall.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			}
-		}
-		else
-#endif
-		SetThink(nullptr);
-	}
-
 	void CKnifeBalrog9::PrimaryAttack(void)
 	{
-
-		SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
-#ifndef CLIENT_DLL	
-		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-		SetThink(&CKnifeBalrog9::DelayPrimaryAttack);
-		pev->nextthink = gpGlobals->time + 0.35s;
+		if (m_iState)
+		{
+			OnAttack2Released();
+			return;
+		}
 
 		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9-slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;				
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+#ifndef CLIENT_DLL
+		SendWeaponAnim(RANDOM_LONG(ANIM_SLASH1, ANIM_SLASH5), UseDecrement() != FALSE);
+
+		bool fDidHit = FALSE;
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+		switch (KnifeAttack(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 50, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+		{
+		case HIT_NONE:
+		{
+			break;
+		}
+		case HIT_PLAYER:
+		{
+			if (RANDOM_LONG(0, 1))
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			else
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+			fDidHit = TRUE;
+			
+			break;
+		}
+		case HIT_WALL:
+		{
+
+			m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+			fDidHit = TRUE;
+			break;
+		}
+		}
+
+		if(fDidHit)
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.33s;
+		else
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.8s;
+#endif
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.25s;				
+		
 	}
 
 	void CKnifeBalrog9::SecondaryAttack(void)
 	{
 		if (!m_iState)
 		{
-			SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
+			SendWeaponAnim(ANIM_CHARGE_START1, UseDecrement() != FALSE);
 
-			m_flTimeCheckCharge = gpGlobals->time + 0.5s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.7s;
+			m_flTimeCheckCharge = gpGlobals->time + 0.73s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 			m_iState = 1;
 		}
 		else
@@ -411,52 +276,33 @@ namespace sv {
 				{
 				case 1:
 				{
-					SendWeaponAnim(ANIM_CHARGE_START1, UseDecrement() != FALSE);
+					SendWeaponAnim(ANIM_CHARGE_IDLE1, UseDecrement() != FALSE);
 
 					m_iState = 2;
 
-					m_flTimeCheckCharge = gpGlobals->time + 0.37s;
-					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.37s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.85s;
+					m_flTimeCheckCharge = gpGlobals->time + 1.5s;
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 					break;
 				}
 				case 2:
 				{
-					SendWeaponAnim(ANIM_CHARGE_IDLE1, UseDecrement() != FALSE);
+					SendWeaponAnim(ANIM_CHARGE_FINISH1, UseDecrement() != FALSE);
 
 					m_iState = 3;
 
-					m_flTimeCheckCharge = gpGlobals->time + 1.23s;
-					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.23s;
+					m_flTimeCheckCharge = gpGlobals->time + 0.33s;
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.33s;
 					break;
 				}
 				case 3:
 				{
-					SendWeaponAnim(ANIM_CHARGE_FINISH1, UseDecrement() != FALSE);
+					SendWeaponAnim(ANIM_CHARGE_IDLE2, UseDecrement() != FALSE);
 
 					m_iState = 4;
 
-					m_flTimeCheckCharge = gpGlobals->time + 0.35s;
-					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
-					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.33s;
-					break;
-				}
-				case 4:
-				{
-					SendWeaponAnim(ANIM_CHARGE_IDLE2, UseDecrement() != FALSE);
-
-					m_iState = 5;
-
-					m_flTimeCheckCharge = gpGlobals->time + 0.1s;
-					m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 999999s;
+					m_flTimeCheckCharge = gpGlobals->time + 99999s;
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
 					break;	
-				}
-				case 5:
-				{
-					m_flTimeCheckCharge = gpGlobals->time + 999999s;
-					break;
 				}
 				}
 			}
@@ -468,39 +314,26 @@ namespace sv {
 		switch (m_iState)
 		{
 		case 1:
-		{
-#ifndef CLIENT_DLL	
-			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-#endif
-			m_iSwing = 0;
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
-
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9-slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-			
-			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
-			pev->nextthink = gpGlobals->time + 1.0s;
-			break;
-		}
 		case 2:
-		case 3:
-		case 4:
 		{
 #ifndef CLIENT_DLL	
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 			m_iSwing = 0;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
+
 			SendWeaponAnim(ANIM_CHARGE_ATTACK1, UseDecrement() != FALSE);
 
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9-slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_v_charge_attack1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			DelaySecondaryAttack();
 
-			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
-			pev->nextthink = gpGlobals->time + 0.35s;
 			break;
 		}
-		case 5:
+		case 3:
+		case 4:
 		{
 #ifndef CLIENT_DLL	
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
@@ -508,13 +341,13 @@ namespace sv {
 			m_iSwing = 1;
 			SendWeaponAnim(ANIM_CHARGE_ATTACK2, UseDecrement() != FALSE);
 
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.3s;
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.7s;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
+			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.7s;
 
-			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_v_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_v_charge_attack1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-			SetThink(&CKnifeBalrog9::DelaySecondaryAttack);
-			pev->nextthink = gpGlobals->time + 0.35s;
+			DelaySecondaryAttack();
 
 			break;
 		}
@@ -526,12 +359,11 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		float flDamage, flRadius, flAngleDegrees;
-		flAngleDegrees = m_iSwing ? 120 : 60;
+		flAngleDegrees = m_iSwing ? 360 : 60;
 		flDamage = m_iSwing ? GetChargeAttackDamage() : GetSecondaryAttackDamage();
-		flRadius = m_iSwing ? 210 : 120;
+		flRadius = m_iSwing ? 90 : 85;
 		
 		CBaseEntity* pEntity = NULL;
-		BOOL fDidHit = FALSE;
 		TraceResult tr;
 		
 		Vector vecEnd, vecAngle;
@@ -543,11 +375,8 @@ namespace sv {
 		Vector2D vecForward2D = vecForward.Make2D().Normalize();
 
 		if (m_iSwing)
-		{
-			vecAngle[0] = 360.0 - vecAngle[0];
-			//�ѿ����˻������κ���=-= PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + vecForward * 50, vecAngle, 0.0, (m_pPlayer->pev->animtime - gpGlobals->time) / 1s, 13, 0, FALSE, FALSE);
-			CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 40, m_iSwing);
-		}
+			CreateHitFX(vecSrc + vecForward * 35);
+
 		float c = cos(flAngleDegrees * 0.5 * M_PI / flRadius);
 
 		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
@@ -561,84 +390,43 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, m_iSwing))
+			if (!AngleCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
 				continue;
 
 			float flRatio = 1.0;
+			int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 
 			if (pEntity && pEntity->IsPlayer())
 			{
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
-			}
-
-			m_pPlayer->m_iWeaponVolume = 128;
-
-			if (m_iSwing)
-			{
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-			}
-			else
-			{
-				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			ClearMultiDamage();
-
-			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
-			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+			if (m_iSwing)
 			{
-				Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
-
-				pPlayer->pev->velocity.x = vecDir2D.x * 300;
-				pPlayer->pev->velocity.y = vecDir2D.y * 300;
-				pPlayer->pev->velocity.z = 400;
-
-				pPlayer->m_flVelocityModifier = 0.9;
-			}
-
-			fDidHit = TRUE;
-		}
-
-		if (!fDidHit)
-		{
-			vecEnd = vecSrc + vecForward * 110.0;
-
-			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
-
-			if (tr.flFraction < 1.0f)
-			{
-				if (m_iSwing)
+				CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+				if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
 				{
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				}
-				else
-				{
-					CKnifeBalrog9::CreateHitFX(tr.vecEndPos, m_iSwing);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/balrog9_hitwall.wav", VOL_NORM, ATTN_NORM, 0, 94);
-				}
-			}
-			else
-			{
-				if (m_iSwing)
-				{
-					CKnifeBalrog9::CreateHitFX(vecSrc + vecForward * 55.0, m_iSwing);
-					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_attack2.wav", VOL_NORM, ATTN_NORM, 0, 94);
+					Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+					pPlayer->pev->velocity.z = 150;
+					pPlayer->m_flVelocityModifier = 0.5;
 				}
 			}
 		}
 #endif
 		m_iState = 0;
 		m_iSwing = 0;
-		SetThink(nullptr);
 	}
 
 	float CKnifeBalrog9::GetMaxSpeed(void)
@@ -667,13 +455,5 @@ namespace sv {
 
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20s;
 		SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
-		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 14, 0, TRUE, FALSE);
-		
 	}
-
-	void CKnifeBalrog9::ItemPostFrame()
-	{
-		return CBasePlayerWeapon::ItemPostFrame();
-	}
-
 }

@@ -2674,9 +2674,9 @@ namespace sv {
 		float fRecoverArmorValue;
 		switch (m_pPlayer->m_iZombieLevel)
 		{
-		case ZOMBIE_LEVEL_HOST: fRecoverArmorValue = 500.0f; break;
-		case ZOMBIE_LEVEL_ORIGIN: fRecoverArmorValue = 1000.0f; break;
-		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverArmorValue = 2000.0f; break;
+		case ZOMBIE_LEVEL_HOST: fRecoverArmorValue = 2000.0f; break;
+		case ZOMBIE_LEVEL_ORIGIN: fRecoverArmorValue = 3000.0f; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverArmorValue = 4000.0f; break;
 		}
 
 		m_pPlayer->pev->armorvalue += fRecoverArmorValue;
@@ -2741,9 +2741,9 @@ namespace sv {
 		float fRecoverHealthValue;
 		switch (m_pPlayer->m_iZombieLevel)
 		{
-		case ZOMBIE_LEVEL_HOST: fRecoverHealthValue = 1000.0f; break;
-		case ZOMBIE_LEVEL_ORIGIN: fRecoverHealthValue = 2000.0f; break;
-		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverHealthValue = 3000.0f; break;
+		case ZOMBIE_LEVEL_HOST: fRecoverHealthValue = 3000.0f; break;
+		case ZOMBIE_LEVEL_ORIGIN: fRecoverHealthValue = 4000.0f; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverHealthValue = 5000.0f; break;
 		}
 
 		m_pPlayer->pev->health += fRecoverHealthValue;

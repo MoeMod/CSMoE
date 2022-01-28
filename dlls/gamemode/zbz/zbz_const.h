@@ -27,34 +27,34 @@ enum ZombieZSkillSkillId : byte
 	Skill_HeroicPresence,
 	Skill_AmmoReserves, //	Increases the amount of ammo of the weapon. When reached a certain level, it will be able to shoot the weapon's endlessly.
 	Skill_RapidReloader, //	The reloading speed of the weapon decreases. If the loading speed is faster than a certain value, automatic loading is activated, which means that the shot is not fired but fires instantly from the reserved ammo.
-	Skill_StealthReloader, //	The body becomes transparent when it is in the state of stealth when you are reloading. If you attack, the stealth state will be canceled immediately. Cooldown time applies as soon as the stun effect is triggered.
+	Skill_StealthReloader,
 	Skill_FocusedBreakthrough, //	Moving an assault rifle forward with your hands. It will improve your combat ability every second. Improvement width is as follows.
 	Skill_Booster, //	Movement speed increases when equipped with submachine guns, and is subject to additional acceleration periodically. The additional acceleration effect is maintained only for a short time.
-	Skill_AmmoCreation, //	When reloading, there is a certain probability that more bullets will be loaded. The additional amount increases in proportion to the current loading amount, and this shot can be loaded beyond the maximum limit of the magazine.
-	Skill_IncendiaryAmmo, //	When you hit an enemy with a sniper rifle, there is a certain probability to set the enemy on fire. The enemy will suffer damage every second and the movement speed will decrease.
-	Skill_Marksman, //	When using a sniper rifle, the shot will hit the center of the sight line unconditionally.
+	Skill_AmmoCreation,
+	Skill_IncendiaryAmmo,
+	Skill_Marksman,
 	Skill_SixthSense, //	You can detect the appearance of a zombie host. You can detect when zombie hosts appear within a certain range. You can also tell if you yourself are a zombie host.
-	Skill_Specialist, //	Human special skills are activated.
-	Skill_DropZone, //	强制坠落 When attacking an enemy hanging on a ladder, forcefully drop them from the ladder.
+	Skill_Specialist,
+	Skill_DropZone,
 	Skill_VaccinationBlaster, //	The smoke bomb will be changed to a zombie-compatible vaccine. Also, the round starts with the vaccine shot.
 	Skill_SupportBombardment, //	When a grenade explodes, there is a low probability of bombing at that location.
 	Skill_RapidFireAmmo, //	When throwing a grenade, the same kind of grenade is automatically thrown.
 	Skill_Fireball, //	The use of sniper rifles causes a strong explosion in close range. This explosion causes great damage to the enemy.
 	Skill_FrostBlaster, //	Replace flashbang with Nitrogen Grenade that can freeze and knock zombies away in a short period of time when exploded. A new grenade will be issued at the beginning of each round.
-	Skill_GeneBooster, // 基因进化 感染后立即成为宿主僵尸。即使没有[狂热]，进化也是可能的。
-	Skill_EnduranceHave, // 坚持不懈 受到伤害时低概率忽略定身和击退。但伤害不会减轻
-	Skill_ContactInfection, // 接触感染 即使不攻击只要身体接触就可以感染。
+	Skill_GeneBooster,
+	Skill_EnduranceHave,
+	Skill_ContactInfection,
 	Skill_Resucitation, // 复活 获得复活能力。病毒被驱散后，致命击杀死亡时依旧不能复活。
-	Skill_SteelBody, //	钢铁铠甲
-	Skill_SpeedyCrouch, //	脚掌 蹲下移动时增加速度
-	Skill_SteelHead, //	钢铁头盔.
-	Skill_AdaptabilityYou, // 适应力 can change the zombie class at any time by using the class change key (default [M] key). However, when you change a zombie class, your health decreases.
-	Skill_ExplosiveReaction, //	爆弹兽颅 受到伤害后生成爆弹兽颅。
-	Skill_ArmonedAdvance, // When you move slowly, your armor increases.
+	Skill_SteelBody,
+	Skill_SpeedyCrouch,
+	Skill_SteelHead,
+	Skill_Adaptability, // 适应力 You can change the zombie class at any time by using the class change key (default [M] key). However, when you change a zombie class, your health decreases.
+	Skill_ExplosiveReaction,
+	Skill_ArmonedAdvance,
 	Skill_BombEnhacement, // 兽颅强化 增加爆弹兽颅的攻击力和击退效果。
-	Skill_ClawEnhacement, // 合金利爪
+	Skill_ClawEnhacement,
 	Skill_SteelSkin,
-	Skill_Kangaroo, // 袋鼠
+	Skill_Kangaroo,
 };
 
 enum ZBZMessageType : byte

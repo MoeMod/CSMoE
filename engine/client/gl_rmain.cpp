@@ -150,14 +150,13 @@ Sorting translucent entities by rendermode then by distance
 */
 static bool R_TransEntityCompare( cl_entity_t *ent1, cl_entity_t *ent2 )
 {
+	// now sort by rendermode
+	int render1 = R_RankForRenderMode(ent1), render2 = R_RankForRenderMode(ent2);
+	if(render1 != render2)
+		return render1 < render2;
+
 	vec3_t		vecLen, org;
 	float		len1, len2;
-
-	// now sort by rendermode
-	if( R_RankForRenderMode( ent1 ) > R_RankForRenderMode( ent2 ))
-		return 1;
-	if( R_RankForRenderMode( ent1 ) < R_RankForRenderMode( ent2 ))
-		return -1;
 
 	// then by distance
 	if( ent1->model->type == mod_brush )

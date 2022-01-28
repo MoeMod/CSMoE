@@ -30,10 +30,29 @@ public:
 	void SetPower(int power, float flashtime);
 	void DrawNumber(int n, int x, int y, float size);
 	void DrawNumbers(int n, int x, int y, int from_right, float size);
-	void SetZbSkill(int text, int usage)
-	{
-		m_iText = text;
-		m_iSkillUsage = usage;
+	Z4ZClassType GetZClass() const { return m_iZClass; }
+	void SetZClass(Z4ZClassType zclass) { 
+		m_iZClass = zclass;
+		switch (m_iZClass)
+		{
+		case Z4_CLASS_NORMAL:
+			m_iSkillUsage = 11;
+			break;
+		case Z4_CLASS_LIGHT:
+			m_iSkillUsage = 60;
+			break;
+		case Z4_CLASS_HEAVY:
+			m_iSkillUsage = 25;
+			break;
+		case Z4_CLASS_HIDE:
+			m_iSkillUsage = 25;
+			break;
+		case Z4_CLASS_HUMPBACK:
+			m_iSkillUsage = 45;
+			break;
+		default:
+			break;
+		}
 	}
 
 private:
@@ -54,7 +73,7 @@ private:
 
 	int m_iUseTimesOld;
 	int m_iSkillUsage;
-	int m_iText;
+	Z4ZClassType m_iZClass;
 
 	float m_flPowerStartRefreshTime[2];
 	float m_flPowerEndRefreshTime[2];

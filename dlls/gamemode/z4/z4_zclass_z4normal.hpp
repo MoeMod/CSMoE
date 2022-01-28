@@ -44,6 +44,14 @@ namespace sv {
 				m_pPlayer->ResetMaxSpeed();
 			}
 
+			bool CheckCanDash()
+			{
+				if (m_pPlayer->pev->flags & FL_DUCKING)
+					return false;
+
+				return true;
+			}
+
 			void OnDashStart()
 			{
 				// nothing

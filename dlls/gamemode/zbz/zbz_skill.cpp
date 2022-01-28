@@ -206,9 +206,9 @@ namespace sv {
 			SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "kgr", szValue);
 		}
 
-		void OnRoundStart() override {
+		/*void OnRoundStart() override {
 			OnGetSkill();
-		}
+		}*/
 		void OnBecomeHuman() override {
 			OnGetSkill();
 		}
@@ -286,6 +286,14 @@ namespace sv {
 		const char* GetName() const override { return "伊卡洛斯"; }
 		const char* GetDesc() const override { return "持续按下跳跃键，短时间内可以滑翔。跳跃过程中碰撞到其他物体时无法启动。"; }
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnTouch(CBaseEntity* other) override
+		{
+			if (m_pPlayer->pev->groundentity == other->edict())
+				return;
+
+			m_sSkillStatus = 2;
+		}
 
 		void OnButtonEvent(unsigned short& bitsCurButton, int bitsOldButton) override {
 
@@ -699,7 +707,7 @@ namespace sv {
 	{
 	public:
 		explicit ZSkill_BombEnhacement(CBasePlayer* player) : CZombieZSkill_Base(player) {}
-		const char* GetName() const override { return "兽颅增强"; }
+		const char* GetName() const override { return "兽颅强化"; }
 		const char* GetDesc() const override { return "增加爆弹兽颅的攻击力和击退效果。"; }
 		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
 
@@ -867,6 +875,9 @@ namespace sv {
 		}
 
 		void OnGetSkill() override {
+			if (!IsActivate())
+				return;
+
 			MESSAGE_BEGIN(MSG_ALL, gmsgZBZMsg, nullptr, m_pPlayer->edict());
 			WRITE_BYTE(ZBZ_MESSAGE_CONTACT_INFECTION_RING); // type, reserved.
 			WRITE_BYTE(m_pPlayer->entindex());

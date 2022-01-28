@@ -117,7 +117,8 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 		pEnt->entity.curstate.sequence = 0;
 		pEnt->entity.curstate.frame = 0;
 		pEnt->entity.curstate.framerate = 1.0;
-		pEnt->entity.curstate.angles = pPlayer->angles;
+		pEnt->entity.curstate.animtime = gHUD.m_flTime;
+		pEnt->entity.angles = pPlayer->angles;
 		pEnt->die = gHUD.m_flTime + 0.6667f;
 		pEnt->flags |= FTENT_FADEOUT;
 		break;
@@ -142,8 +143,10 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 		pEnt->entity.curstate.sequence = 0;
 		pEnt->entity.curstate.frame = 0;
 		pEnt->entity.curstate.framerate = 1.0;
+		pEnt->entity.curstate.animtime = gHUD.m_flTime;
+		pEnt->entity.angles = pPlayer->angles;
 		pEnt->clientIndex = player;
-		pEnt->die = gHUD.m_flTime + 9999.9f;
+		pEnt->die = gHUD.m_flTime + 2.0f;
 		pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_CLIENTCUSTOM | FTENT_PERSIST;
 		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
 		{
@@ -154,14 +157,11 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 			}
 
 			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(ent->clientIndex);
-			if (!pPlayer)
+			if (pPlayer)
 			{
-				ent->die = currenttime;
-				return;
+				ent->entity.origin = pPlayer->origin;
+				ent->entity.angles = pPlayer->angles;
 			}
-
-			if (pPlayer->curstate.onground)
-				ent->die = currenttime;
 		};
 		break;
 	}

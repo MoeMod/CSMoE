@@ -218,6 +218,8 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_plasmagun.cpp
 	../dlls/wpn_shared/knife_janus9.cpp
 	../dlls/wpn_shared/knife_balrog9.cpp
+	../dlls/wpn_shared/knife_summonknife.cpp
+	../dlls/wpn_shared/wpn_revivegun.cpp
 	)
 
 set (HUD_SRCS
@@ -275,6 +277,8 @@ set (HUD_SRCS
 	./hud/z4/z4.cpp
 	./hud/z4/z4_energy.cpp
 	./hud/z4/z4_scoreboard.cpp
+	./hud/z4/z4_tips.cpp
+	./hud/z4/z4_status.cpp
 	./hud/zbz/zbz.cpp
 	./hud/zbz/zbz_skill_info.cpp
 	./hud/hud_sifiammo.cpp
