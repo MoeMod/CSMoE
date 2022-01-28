@@ -98,11 +98,8 @@ namespace sv {
 
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
-				Vector new_velocity = origin2 - origin1;
-				float val = speed / new_velocity.LengthReverse();
-				new_velocity[0] *= (val * 2);
-				new_velocity[1] *= (val * 2);
-				new_velocity[2] *= (val / 2);
+				Vector new_velocity = (origin2 - origin1).Normalize() * speed;
+				new_velocity[2] *= 0.5f;
 				return new_velocity;
 			}
 

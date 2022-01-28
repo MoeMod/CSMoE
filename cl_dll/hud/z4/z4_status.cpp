@@ -180,7 +180,7 @@ int CHudZ4Status::Draw(float time)
 		g_Font.SetColor(125, 160, 200, m_iAlpha[0]);
 		g_Font.DrawString(ppower, X_Start + m_rcIcon[0].right - g_Font.GetLen(ppower) - 3, g_sScreenInfo.iHeight * 0.54 + m_rcIcon[0].bottom - 6, 100, 12);*/
 		//DrawUtils::DrawHudString(X_Start + m_pIcon[0]->w() - DrawUtils::HudStringLen(power), ScreenHeight * 0.54f + m_pIcon[0]->h() - 20, 100, power, 125, 160, 200);
-		DrawUtils::DrawHudStringReverse(X_Start + m_pIcon[0]->w() - 5, ScreenHeight * 0.54f + m_pIcon[0]->h() - 20, 100, szPower, 125, 160, 200);
+		DrawUtils::DrawHudStringReverse(X_Start + m_pIcon[0]->w() - 10, ScreenHeight * 0.54f + m_pIcon[0]->h() - 20, 100, szPower, 125, 160, 200);
 	}
 
 	return 1;

@@ -2295,6 +2295,37 @@ void CClientFog::Spawn()
 	pev->solid = SOLID_NOT;				// Remove model & collisions
 	pev->renderamt = 0;				// The engine won't draw this model if this is set to 0 and blending is on
 	pev->rendermode = kRenderTransTexture;
+	m_fBlendTime = 0.0f;
+}
+
+void CClientFog::UpdateClientMsg(entvars_t *target)
+{
+	int r = pev->rendercolor[0];
+	int g = pev->rendercolor[1];
+	int b = pev->rendercolor[2];
+
+	union
+	{
+		float f;
+		char b[4];
+
+	} density;
+
+	density.f = m_fDensity;
+
+	if(target)
+		MESSAGE_BEGIN(MSG_ONE, gmsgFog, NULL, target);
+	else
+		MESSAGE_BEGIN(MSG_ALL, gmsgFog);
+	WRITE_BYTE(r);
+	WRITE_BYTE(g);
+	WRITE_BYTE(b);
+	WRITE_BYTE(density.b[0]);
+	WRITE_BYTE(density.b[1]);
+	WRITE_BYTE(density.b[2]);
+	WRITE_BYTE(density.b[3]);
+	WRITE_BYTE(m_fBlendTime * 10);
+	MESSAGE_END();
 }
 
 LINK_ENTITY_TO_CLASS(env_fog, CClientFog);

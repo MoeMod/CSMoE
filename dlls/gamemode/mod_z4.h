@@ -40,6 +40,8 @@ namespace sv {
 		void HumanWin() override;
 		void ZombieWin() override;
 		BOOL FAllowFlashlight() override { return true; }
+		void CheckWinConditions() override;
+		BOOL ClientConnected(edict_t* pEntity, const char* pszName, const char* pszAddress, char* szRejectReason) override;
 
 	public:
 		struct round_t;

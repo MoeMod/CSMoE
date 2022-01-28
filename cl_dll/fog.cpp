@@ -134,16 +134,21 @@ void CFog::BlendFog(void)
 
 		m_fogChangeTime = 0;
 		m_fogBlendTime = 0;
+		if (CVAR_GET_FLOAT("developer"))
+		{
+			gEngfuncs.Con_Printf("FOG Blend Over --- density:%.f \n", m_fogParams.density);
+		}
 		return;
 	}
 
 	// Perform linear blending
 	float interp = (gEngfuncs.GetClientTime() - m_fogChangeTime) / m_fogBlendTime;
-	VectorScale(m_fogBlend1.color, (1.0 - interp), m_fogParams.color);
+	float fraction = 1.0 - interp;
+	VectorScale(m_fogBlend1.color, fraction, m_fogParams.color);
 	VectorMA(m_fogParams.color, interp, m_fogBlend2.color, m_fogParams.color);
-	m_fogParams.enddist = (m_fogBlend1.enddist * (1.0 - interp)) + (m_fogBlend2.enddist * interp);
-	m_fogParams.startdist = (m_fogBlend1.startdist * (1.0 - interp)) + (m_fogBlend2.startdist * interp);
-	m_fogParams.density = (m_fogBlend1.density * (1.0 - interp)) + (m_fogBlend2.density * interp);
+	m_fogParams.enddist = (m_fogBlend1.enddist * fraction) + (m_fogBlend2.enddist * interp);
+	m_fogParams.startdist = (m_fogBlend1.startdist * fraction) + (m_fogBlend2.startdist * interp);
+	m_fogParams.density = (m_fogBlend1.density * fraction) + (m_fogBlend2.density * interp);
 }
 
 /*
@@ -205,15 +210,15 @@ int CFog::MsgFunc_Fog(const char* pszName, int iSize, void* pBuf)
 	for (int i = 0; i < 4; i++)
 		density.b[i] = reader.ReadByte();
 #endif
-	m_fogParams.density = density.f;
+
 	if (CVAR_GET_FLOAT("developer"))
 	{
-		gEngfuncs.Con_Printf("FOG --- r:%d g:%d b:%d desity:%.f \n", fogcolor[0], fogcolor[1], fogcolor[2], density.f);
+		gEngfuncs.Con_Printf("FOG --- r:%d g:%d b:%d density:%.f \n", fogcolor[0], fogcolor[1], fogcolor[2], density.f);
 	}
 
-	int startdist = !m_fogParams.density ? 0 : 1;
-	int enddist = !m_fogParams.density ? 0 : min(1, 0.25f / m_fogParams.density);
-	float blendtime = 0.0f;//reader.ReadByte() * 0.1f;
+	int startdist = !density.f ? 0 : 1;
+	int enddist = !density.f ? 0 : min(1, 0.25f / density.f);
+	float blendtime = reader.ReadByte() * 0.1f;
 
 	// If blending, copy current fog params to the blend state if we had any active
 	if (blendtime > 0 && m_fogParams.enddist > 0 && m_fogParams.startdist > 0)
@@ -223,6 +228,7 @@ int CFog::MsgFunc_Fog(const char* pszName, int iSize, void* pBuf)
 		VectorCopy(fogcolor, m_fogBlend2.color);
 		m_fogBlend2.startdist = startdist;
 		m_fogBlend2.enddist = enddist;
+		m_fogBlend2.density = density.f;
 
 		// Set times
 		m_fogChangeTime = gEngfuncs.GetClientTime();
@@ -237,6 +243,7 @@ int CFog::MsgFunc_Fog(const char* pszName, int iSize, void* pBuf)
 		VectorCopy(fogcolor, m_fogParams.color);
 		m_fogParams.startdist = startdist;
 		m_fogParams.enddist = enddist;
+		m_fogParams.density = density.f;
 
 		m_fogChangeTime = 0;
 		m_fogBlendTime = 0;

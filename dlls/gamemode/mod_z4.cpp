@@ -27,6 +27,8 @@
 #include "gamemode/z4/z4_const.h"
 #include "gamemode/z4/z4_zclass.hpp"
 
+#include "weapons_moe_buy.h"
+
 template<class...Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class...Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
@@ -40,7 +42,7 @@ namespace sv {
 	// DayNight Effect : Dusk & Dark & Dawn
 	constexpr char LIGHTSTYLE[7] = { 's', 'p', 'm', 'j', 'g', 'd', 'b' };
 	constexpr float SKY_COLOR[7] = { 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.4 };
-	constexpr const char *FOG_DENSITY[7] = { "0.001", "0.0015", "0.002", "0.0025", "0.0025", "0.003", "0.003" };
+	constexpr const char *FOG_DENSITY[7] = { "0.0001", "0.00015", "0.0002", "0.00025", "0.00025", "0.0003", "0.0003" };
 	constexpr const char *FOG_COLOR[7] = { "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0" };
 
 	constexpr duration_t SKILL_ADRSHOOT_LASTING = 4.0s;
@@ -87,28 +89,28 @@ namespace sv {
 			try
 			{
 				m_iDayNightStatus = DNS_DUSK;
-				auto night_start_time = RandomDuration(mod->m_iRoundTimeSecs / 5, mod->m_iRoundTimeSecs / 2);
+				auto night_start_time = RandomDuration(mod->m_iRoundTime / 5, mod->m_iRoundTime / 2);
 				MESSAGE_BEGIN(MSG_ALL, gmsgZ4Msg);
 				WRITE_BYTE(Z4_MESSAGE_NIGHTTIME);
 				WRITE_BYTE((night_start_time + 20s + 15s).count());
-				WRITE_BYTE((night_start_time + 20s + 15s + 48s + 15s).count());
+				WRITE_BYTE((night_start_time + 20s + 15s + 45s + 15s).count());
 				MESSAGE_END();
 
 				timer_type timer(ioc);
                 Set_Light(0, 0, 0.0f);
-                for (CBasePlayer* player : moe::range::PlayersList())
-                    CLIENT_COMMAND(player->edict(), "mp3 stop\n");
+				Update_Environment(0);
+				UTIL_BroadcastStuffText("mp3 stop;stopsound\n");
 
 				// countdown
 				timer.expires_after(20s);
 				co_await timer.async_wait(boost::asio::use_awaitable);
+				UTIL_BroadcastStuffText("mp3 loop sound/Zombi_Ambience.mp3\n");
 
 				timer.expires_after(night_start_time);
 				co_await timer.async_wait(boost::asio::use_awaitable);
 
 				// night starts, pre 15secs
-				for (CBasePlayer* player : moe::range::PlayersList())
-					CLIENT_COMMAND(player->edict(), "spk z4/z4_bgm_night.wav\n");
+				UTIL_BroadcastStuffText("spk z4/z4_bgm_night.wav\n");
 
                 Set_Light(0, 5, 3.0f);
 				for(int iLight = 0; iLight < 5; ++iLight)
@@ -138,9 +140,16 @@ namespace sv {
 				}
                 Set_Light(0, 0, 0.0f);
 
+				UTIL_BroadcastStuffText("spk dm_darksnow/planes_bomb.wav\n");
 				// night ends
 				for (CBasePlayer* player : moe::range::PlayersList())
-					CLIENT_COMMAND(player->edict(), "spk dm_darksnow/planes_bomb.wav\n");
+				{
+					for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
+					{
+						player->m_pModStrategy->GiveSlotAmmo(player, iSlot);
+					}
+					player->GiveNamedItem("weapon_hegrenade");
+				}
 
 				m_iDayNightStatus = DNS_DAWN;
 				Check_NightEnd();
@@ -174,6 +183,8 @@ namespace sv {
 		{
 			mod->m_pFogEntity->m_fDensity = atof(szDensity);
 			mod->m_pFogEntity->pev->rendercolor = {0, 0, 0};
+			mod->m_pFogEntity->m_fBlendTime = 3.0f;
+			mod->m_pFogEntity->UpdateClientMsg();
 		}
 
 		void Set_Light(int from, int to, float time)
@@ -798,6 +809,12 @@ namespace sv {
 				return;
 			if(strategy->adrenaline->m_bIsSlowDown)
 				return;
+			if (!std::visit([](auto& zc) {
+				return zc.CheckCanDash();
+				}, zclass))
+			{
+				return;
+			}
 
 			strategy->adrenaline->m_bIsUsingDash = true;
 
@@ -1027,7 +1044,7 @@ namespace sv {
 
 	void CMod_ZombieIV::HumanWin()
 	{
-		UTIL_BroadcastStuffText("spk \"z4/z4_win_human.wav\"\n");
+		UTIL_BroadcastStuffText("spk \"stopsound;z4/z4_win_human.wav\"\n");
 
 		/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 		WRITE_BYTE(2);
@@ -1045,8 +1062,7 @@ namespace sv {
 	void CMod_ZombieIV::ZombieWin()
 	{
 		//Broadcast("terwin");
-		for(CBasePlayer *player : moe::range::PlayersList())
-			CLIENT_COMMAND(player->edict(), "spk z4/z4_win_zombie.wav\n");
+		UTIL_BroadcastStuffText("spk \"stopsound;z4/z4_win_zombie.wav\"\n");
 
 		/*MESSAGE_BEGIN(MSG_ALL, gmsgShowWin);
 		WRITE_BYTE(3);
@@ -1067,7 +1083,7 @@ namespace sv {
 		if(adrenaline)
 			adrenaline->Think();
 		if (m_bIsStun)
-			m_pPlayer->pev->view_ofs = Vector(0, 0, 7);
+			m_pPlayer->pev->velocity = Vector(0, 0, -200);
 
 		ioc.poll();
 	}
@@ -1093,7 +1109,20 @@ namespace sv {
 		}
 		else
 		{
-			return CPlayerModStrategy_ZB1::GiveDefaultItems();
+
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
+
+			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+			{
+				std::vector<MoEWeaponBuyInfo_s> candidate_list;
+				std::copy_if(std::begin(g_MoEWeaponBuyInfo_Z4), std::end(g_MoEWeaponBuyInfo_Z4), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
+				const MoEWeaponBuyInfo_s& info = candidate_list.front();
+				m_pPlayer->GiveNamedItem(info.pszClassName);
+				GiveSlotAmmo(m_pPlayer, iSlot);
+			}
+			m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 	}
 
@@ -1259,6 +1288,8 @@ namespace sv {
 				else
 				{
 					m_bIsStun = false;
+					m_pPlayer->pev->bInDuck = 0;
+					CLIENT_COMMAND(m_pPlayer->edict(), "-duck\n");
 					const float health = max(flBackupMaxHealth, 3000);
 					const float armor = flBackupArmor;
 					m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
@@ -1287,6 +1318,12 @@ namespace sv {
 	void CPlayerModStrategy_ZB4::CmdStart(usercmd_t *cmd, unsigned int random_seed)
 	{
 		CPlayerModStrategy_Default::CmdStart(cmd, random_seed);
+
+		if (m_bIsStun)
+		{
+			cmd->buttons |= IN_DUCK;
+		}
+
 		if(cmd->buttons & IN_FORWARD)
 		{
 			OnPressW();
@@ -1308,6 +1345,9 @@ namespace sv {
 	{
 		if (!m_pPlayer->m_bIsZombie)
 			return 1;
+
+		if (m_bIsStun)
+			return 0;
 
 		if (m_pModZB4->round->GetDayNightStatus() != DNS_DARK)
 			return 1;
@@ -1331,6 +1371,9 @@ namespace sv {
 			}
 		}
 		m_bIsStun = true;
+		m_pPlayer->ResetMaxSpeed();
+		m_pPlayer->pev->bInDuck = 1;
+		CLIENT_COMMAND(m_pPlayer->edict(), "+duck\n");
 		boost::asio::co_spawn(ioc, DelayRespawnCheck(), boost::asio::detached);
 
 		return 0;
@@ -1380,5 +1423,29 @@ namespace sv {
 		}
 
 		return 1;
+	}
+
+	void CMod_ZombieIV::CheckWinConditions()
+	{
+		// If a winner has already been determined and game of started.. then get the heck out of here
+		if (m_bFirstConnected && m_iRoundWinStatus != WINNER_NONE)
+			return;
+
+		if (!FInfectionStarted() || m_bRoundTerminating)
+			return;
+
+		moe::range::PlayersList list;
+		auto iAliveHuman = std::count_if(list.begin(), list.end(), [](CBasePlayer* player) { return player->m_iTeam == TEAM_CT && !player->m_bIsZombie && player->IsAlive() && !player->IsDormant(); });
+		auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer* player) { return player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie && !(!player->IsAlive() && player->m_bHeadshotKilled) && !player->IsDormant(); });
+
+		if (!iAliveHuman)
+			ZombieWin();
+		else if (!iAliveZombie)
+			HumanWin();
+	}
+
+	BOOL CMod_ZombieIV::ClientConnected(edict_t* pEntity, const char* pszName, const char* pszAddress, char* szRejectReason)
+	{
+		return CMod_Zombi::ClientConnected(pEntity, pszName, pszAddress, szRejectReason);
 	}
 }

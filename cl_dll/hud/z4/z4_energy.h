@@ -32,6 +32,7 @@ public:
 	void DrawNumbers(int n, int x, int y, int from_right, float size);
 	Z4ZClassType GetZClass() const { return m_iZClass; }
 	void SetZClass(Z4ZClassType zclass) { 
+		m_iUseTimesOld = -1;
 		m_iZClass = zclass;
 		switch (m_iZClass)
 		{

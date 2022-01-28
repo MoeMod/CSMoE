@@ -490,7 +490,7 @@ void CM134HeroI::SpecialFire( const Vector &vecOrigSrc, const Vector &vecDir )
                     if( gpGlobals->time >= m_flAmmoUseTime )
                     {
                         UseAmmo( 1 );
-                        m_flAmmoUseTime = gpGlobals->time + 0.2s;
+                        m_flAmmoUseTime = gpGlobals->time + 0.05s;
                     }
                 }
                 else

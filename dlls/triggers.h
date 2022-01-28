@@ -74,10 +74,12 @@ class CClientFog : public CBaseEntity
 public:
 	void Spawn(void);
 	void KeyValue(KeyValueData *pkvd);
+	void UpdateClientMsg(entvars_t* target = nullptr);
 
 public:
 	int m_iStartDist, m_iEndDist;
 	float m_fDensity;
+	float m_fBlendTime;
 };
 
 class CFrictionModifier : public CBaseEntity

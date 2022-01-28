@@ -406,6 +406,7 @@ TL_ADD(CSkullT9Storm)
 TL_ADD(CPlasmaGrenade)
 TL_ADD(CSummoner)
 TL_ADD(CSummonKnifeCannon)
+TL_ADD(CKnifeBalrog9)
 #endif
 
 TL_END(AllEntityTypeList)

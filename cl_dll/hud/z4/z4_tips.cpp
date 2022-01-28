@@ -124,6 +124,9 @@ int CHudZ4Tips::Draw(float flTime)
 			m_flDisplayEnd = 0.0f;
 		}
 
+		if (isZombie)
+			gHUD.m_ZB4.SetStatus(0, Z4_POWERUP, Z4_ICON_HIDE);
+
 		if (time == m_iNightStart)
 		{
 			if (!isZombie)
@@ -158,7 +161,7 @@ int CHudZ4Tips::Draw(float flTime)
 			}
 		}
 
-		if (time == m_iNightEnd)
+		if (time == m_iNightEnd - 1)
 		{
 			if (!isZombie)
 			{
@@ -207,15 +210,6 @@ int CHudZ4Tips::Draw(float flTime)
 			{
 				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(12, 14)], sizeof(m_szText));
 				gEngfuncs.pfnClientCmd("spk sound/events/zombie_message.wav");
-			}
-		}
-
-		if (time > 20)
-		{
-			if (time > m_iNightStart)
-			{
-				if (isZombie)
-					gHUD.m_ZB4.SetStatus(0, Z4_POWERUP, Z4_ICON_HIDE);
 			}
 		}
 

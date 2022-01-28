@@ -31,8 +31,8 @@ namespace sv {
 
 			static void Precache()
 			{
-				s_iSprDust[0] = PRECACHE_MODEL("sprites/z4/dust.spr");
-				s_iSprDust[1] = PRECACHE_MODEL("sprites/z4/dust2.spr");
+				s_iSprDust[0] = PRECACHE_MODEL("sprites/dust.spr");
+				s_iSprDust[1] = PRECACHE_MODEL("sprites/dust2.spr");
 			}
 
 			explicit zclass_z4humpback(CBasePlayer *player) : m_pPlayer(player)
@@ -66,8 +66,8 @@ namespace sv {
 					pWeapon->m_flTimeWeaponIdle = Skill.flDashTimeCheck;
 				}
 				m_pPlayer->pev->bInDuck = 1;
-				CLIENT_COMMAND(m_pPlayer->edict(), "+duck");
-				CLIENT_COMMAND(m_pPlayer->edict(), "cl_forwardspeed 1000");
+				CLIENT_COMMAND(m_pPlayer->edict(), "+duck\n");
+				CLIENT_COMMAND(m_pPlayer->edict(), "cl_forwardspeed 1000\n");
 				m_bIsUsingDash = true;
 			}
 
@@ -92,8 +92,8 @@ namespace sv {
 				}
 
 				m_pPlayer->pev->bInDuck = 0;
-				CLIENT_COMMAND(m_pPlayer->edict(), "-duck");
-				CLIENT_COMMAND(m_pPlayer->edict(), "cl_forwardspeed 400");
+				CLIENT_COMMAND(m_pPlayer->edict(), "-duck\n");
+				CLIENT_COMMAND(m_pPlayer->edict(), "cl_forwardspeed 400\n");
 				m_bIsUsingDash = false;
 			}
 
@@ -106,11 +106,8 @@ namespace sv {
 
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
-				Vector new_velocity = origin2 - origin1;
-				float val = speed / new_velocity.LengthReverse();
-				new_velocity[0] *= (val * 2);
-				new_velocity[1] *= (val * 2);
-				new_velocity[2] *= (val / 2);
+				Vector new_velocity = (origin2 - origin1).Normalize() * speed;
+				new_velocity[2] *= 0.5f;
 				return new_velocity;
 			}
 
@@ -163,7 +160,7 @@ namespace sv {
 				if(m_bIsUsingDash)
 				{
 					m_pPlayer->pev->bInDuck = 1;
-					CLIENT_COMMAND(m_pPlayer->edict(), "+duck");
+					CLIENT_COMMAND(m_pPlayer->edict(), "+duck\n");
 					SET_CLIENT_MAXSPEED(m_pPlayer->edict(), Ability.flDashSpeed);
 					m_pPlayer->pev->maxspeed = Ability.flDashSpeed;
 				}
