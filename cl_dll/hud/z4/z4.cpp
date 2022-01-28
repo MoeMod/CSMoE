@@ -75,6 +75,12 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 		pimpl->get<CHudZ4Scoreboard>().SetDamage(a * 255 + b);
 		break;
 	}
+	case Z4_MESSAGE_ZCLASS:
+	{
+		int zclassid = buf.ReadByte();
+		int iSkillConsume = buf.ReadByte();
+		pimpl->get<CHudZ4Energy>().SetZbSkill(zclassid, iSkillConsume);
+	}
 	}
 	
 	return 1;

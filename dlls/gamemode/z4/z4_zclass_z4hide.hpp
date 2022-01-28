@@ -87,10 +87,10 @@ namespace sv {
 				return new_velocity.Normalize() * speed;
 			}
 
-			void OnSkillActivate()
+			bool OnSkillActivate()
 			{
 				if(m_pPlayer->pev->flags & FL_DUCKING)
-					return;
+					return false;
 
 				if((m_pPlayer->pev->flags & FL_ONGROUND))
 				{
@@ -126,6 +126,7 @@ namespace sv {
 				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill_start");
 				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.4s;
 				m_bIsUsingSkill = true;
+				return true;
 			}
 
 			void OnThink()

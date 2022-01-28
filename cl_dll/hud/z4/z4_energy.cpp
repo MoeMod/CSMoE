@@ -264,8 +264,6 @@ int CHudZ4Energy::Draw(float time)
 		{
 			m_iUseTimesOld = m_iPowerServer / m_iSkillUsage;
 
-			char szSkillBuf[32], szSkillTimesBuf[16];
-
 			/*switch (m_iText)
 			{
 			case 0: sprintf(szBuf[1], "残暴镰魔"); break;
@@ -275,18 +273,17 @@ int CHudZ4Energy::Draw(float time)
 			case 4: sprintf(szBuf[1], "厄运之轮"); break;
 			}*/
 
-			switch (m_iText)
-			{
-			case 0: sprintf(szSkillBuf, "可使用[攀爬]"); break;
-			case 1: sprintf(szSkillBuf, "可使用[飞跃]"); break;
-			case 2: sprintf(szSkillBuf, "可使用[撼地]"); break;
-			case 3: sprintf(szSkillBuf, "可使用[制空]"); break;
-			case 4: sprintf(szSkillBuf, "可使用[飞跃]"); break;
-			}
-
-			szSkillTimesBuf[0] = '0' + m_iUseTimesOld;
-			szSkillTimesBuf[1] = 0;
-			snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf, szSkillTimesBuf);
+			const char *szSkillBuf[] = {
+					"可使用[攀爬]",
+					"可使用[飞跃]",
+					"可使用[撼地]",
+					"可使用[制空]",
+					"可使用[飞跃]"
+			};
+			if(m_iText >= 0 && m_iText < std::extent_v<decltype(szSkillBuf)>)
+				snprintf(m_szDrawText, 64, "%s(%d次)", szSkillBuf[m_iText], m_iUseTimesOld);
+			else
+				m_szDrawText[0] = '\0';
 		}
 
 		m_iKey[1]->Draw2DQuadScaled(iX, iY, iX + m_iKey[1]->w(), iY + m_iKey[1]->h());

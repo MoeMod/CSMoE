@@ -25,7 +25,7 @@ enum Z4MessageType : byte
 	Z4_MESSAGE_DAMAGE, // { byte msg_type, byte a, byte b }
 	Z4_MESSAGE_ICON, // { byte msg_type, byte slot, byte id, byte status }
 	Z4_MESSAGE_NIGHTTIME, // { byte msg_type, byte start, byte end }
-
+	Z4_MESSAGE_ZCLASS,
 };
 
 #endif

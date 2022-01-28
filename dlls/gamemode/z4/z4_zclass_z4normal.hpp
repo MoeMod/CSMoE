@@ -61,10 +61,10 @@ namespace sv {
 
 			time_point_t m_flTimeSkillEnd = invalid_time_point;
 
-			void OnSkillActivate()
+			bool OnSkillActivate()
 			{
 				if(m_pPlayer->pev->flags & FL_DUCKING)
-					return;
+					return false;
 
 				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 				Vector vecSrc = m_pPlayer->GetGunPosition();
@@ -73,7 +73,7 @@ namespace sv {
 				TraceResult tr;
 				UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 				if(tr.flFraction >= 1.0f)
-					return;
+					return false;
 
 				m_pPlayer->pev->velocity[2] = 300.0f;
 
@@ -90,6 +90,7 @@ namespace sv {
 
 				m_flTimeSkillEnd = gpGlobals->time + 0.4s;
 				m_bIsUsingSkill = true;
+				return true;
 			}
 
 			void OnThink()

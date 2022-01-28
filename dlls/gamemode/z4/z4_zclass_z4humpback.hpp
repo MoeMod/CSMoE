@@ -108,14 +108,14 @@ namespace sv {
 				return new_velocity.Normalize() * speed;
 			}
 
-			void OnSkillActivate()
+			bool OnSkillActivate()
 			{
 				if(m_pPlayer->pev->flags & FL_DUCKING)
-					return;
+					return false;
 				if(!(m_pPlayer->pev->flags & FL_ONGROUND))
-					return;
+					return false;
 				if(m_bIsUsingSkill)
-					return;
+					return false;
 
 				auto vecStart = m_pPlayer->GetGunPosition();
 				auto vecEnd = get_position(512, 0, 320);
@@ -135,6 +135,7 @@ namespace sv {
 				m_bIsUsingSkill = true;
 
 				Make_Smoke(0);
+				return true;
 			}
 
 			void OnThink()

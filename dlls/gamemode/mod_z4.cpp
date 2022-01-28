@@ -501,6 +501,12 @@ namespace sv {
 		{
 			boost::asio::co_spawn(ioc, Task_Dash_SkillConsume(), boost::asio::detached);
 			boost::asio::co_spawn(ioc, Task_Dash_SkillCheck(), boost::asio::detached);
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, strategy->m_pPlayer->pev);
+			WRITE_BYTE(Z4_MESSAGE_ZCLASS);
+			WRITE_BYTE(zclass.index());
+			WRITE_BYTE(SkillForZClass().iSkillConsume);
+			MESSAGE_END();
 		}
 
 		float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override
@@ -520,7 +526,7 @@ namespace sv {
 					ratio = zc.Ability.flDefense;
 				}
 			}, zclass);
-			return flDamage * ratio; 
+			return flDamage * ratio;
 		}
 
 		bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override
@@ -667,9 +673,11 @@ namespace sv {
 			if(strategy->adrenaline->m_iAdrenaline < Skill.iSkillConsume)
 				return;
 
-			std::visit([](auto &zc) {
+			bool succ = std::visit([](auto &zc) {
 				return zc.OnSkillActivate();
 			}, zclass);
+			if(not succ)
+				return;
 
 			m_flNextSkillActivate = gpGlobals->time + Skill.flSkillTimeReset;
 			strategy->adrenaline->Adrenaline_Set(-Skill.iSkillConsume);
@@ -935,7 +943,7 @@ namespace sv {
 		WRITE_BYTE(5);
 		MESSAGE_END();*/
 
-		EndRoundMessage("--------『人类胜利』--------", ROUND_CTS_WIN);
+		EndRoundMessage("人类胜利", ROUND_CTS_WIN);
 		TerminateRound(5s, WINSTATUS_CTS);
 		RoundEndScore(WINSTATUS_CTS);
 
@@ -954,7 +962,7 @@ namespace sv {
 		WRITE_BYTE(5);
 		MESSAGE_END();*/
 
-		EndRoundMessage("--------『僵尸胜利』--------", ROUND_TERRORISTS_WIN);
+		EndRoundMessage("僵尸胜利", ROUND_TERRORISTS_WIN);
 		TerminateRound(5s, WINSTATUS_TERRORISTS);
 		RoundEndScore(WINSTATUS_TERRORISTS);
 
@@ -1054,7 +1062,7 @@ namespace sv {
 		{
 			if(adrenaline->m_bIsUsingAdrShoot)
 				flDamage *= 3.0f;
-			else
+			else if(m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
 				flDamage *= 1.0f + (adrenaline->m_iAdrenaline / 200.0f);
 		}
 		return flDamage;
