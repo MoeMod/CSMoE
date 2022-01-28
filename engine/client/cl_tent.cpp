@@ -2781,7 +2781,7 @@ void CL_UpdateFlashlight( cl_entity_t *pEnt )
 	dl->color.r = bound( 0, 255 * falloff, 255 );
 	dl->color.g = bound( 0, 255 * falloff, 255 );
 	dl->color.b = bound( 0, 255 * falloff, 255 );
-	dl->radius = 72;
+	dl->radius = 256;
 }
 
 /*

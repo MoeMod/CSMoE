@@ -39,6 +39,7 @@ namespace sv {
 		void EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker) override;
 		void HumanWin() override;
 		void ZombieWin() override;
+		BOOL FAllowFlashlight() override { return true; }
 
 	public:
 		struct round_t;

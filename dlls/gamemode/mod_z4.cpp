@@ -38,7 +38,7 @@ static const char* s_szCountDownSound[11] = {
 namespace sv {
 	namespace z4 {
 	// DayNight Effect : Dusk & Dark & Dawn
-	constexpr char LIGHTSTYLE[7] = { 'h', 'g', 'f', 'e', 'd', 'c', 'b' };
+	constexpr char LIGHTSTYLE[7] = { 's', 'p', 'm', 'j', 'g', 'd', 'b' };
 	constexpr float SKY_COLOR[7] = { 0.7, 0.6, 0.6, 0.5, 0.5, 0.4, 0.4 };
 	constexpr const char *FOG_DENSITY[7] = { "0.001", "0.0015", "0.002", "0.0025", "0.0025", "0.003", "0.003" };
 	constexpr const char *FOG_COLOR[7] = { "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0", "0 0 0" };
@@ -197,10 +197,29 @@ namespace sv {
 
 		void Check_NightStart()
 		{
+			// turn on flashlight
+			for (CBasePlayer* player : moe::range::PlayersList())
+			{
+				if(player->IsAlive() && !player->m_bIsZombie)
+				{
+					if (!player->FlashlightIsOn())
+						player->FlashlightTurnOn();
+				}
+			}
+
 		}
 
 		void Check_NightEnd()
 		{
+			// turn on flashlight
+			for (CBasePlayer* player : moe::range::PlayersList())
+			{
+				if(player->IsAlive() && !player->m_bIsZombie)
+				{
+					if (player->FlashlightIsOn())
+						player->FlashlightTurnOff();
+				}
+			}
 		}
 
 		DayNightStatus_e GetDayNightStatus() const { return m_iDayNightStatus; }
@@ -507,6 +526,10 @@ namespace sv {
 			WRITE_BYTE(zclass.index());
 			WRITE_BYTE(SkillForZClass().iSkillConsume);
 			MESSAGE_END();
+
+			// turn off flashlight
+			if (strategy->m_pPlayer->FlashlightIsOn())
+				strategy->m_pPlayer->FlashlightTurnOff();
 		}
 
 		float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override
