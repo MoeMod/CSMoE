@@ -206,7 +206,7 @@ void LinkUserMessages()
 	gmsgLocation = REG_USER_MSG("Location", -1);
 	gmsgBotProgress = REG_USER_MSG("BotProgress", -1);
 	gmsgBrass = REG_USER_MSG("Brass", -1);
-	gmsgFog = REG_USER_MSG("Fog", 7);
+	gmsgFog = REG_USER_MSG("Fog", -1);
 	gmsgShowTimer = REG_USER_MSG("ShowTimer", 0);
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 	gmsgShowWin = REG_USER_MSG("ShowWin", -1);
