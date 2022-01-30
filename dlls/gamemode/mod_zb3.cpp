@@ -555,7 +555,7 @@ void CMod_ZombieHero::CheckWinConditions()
 	auto iAliveHuman = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_CT && !player->m_bIsZombie && player->IsAlive() && !player->IsDormant(); });
 	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) {
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
-		return player->m_iTeam == TEAM_TERRORIST && (player->m_bIsZombie || (strategy && strategy->IsPickAsZombie())) && !(!player->IsAlive() && player->m_bHeadshotKilled) && !player->IsDormant();
+		return ((player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie) || (strategy && strategy->IsPickAsZombie())) && !(!player->IsAlive() && player->m_bHeadshotKilled) && !player->IsDormant();
 	});
 
 	//ALERT(at_console, "CheckWinConditions: iAliveHuman:%d iAliveZombie:%d\n", iAliveHuman, iAliveZombie);
