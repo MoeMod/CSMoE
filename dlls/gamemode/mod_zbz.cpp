@@ -542,9 +542,8 @@ void CPlayerModStrategy_ZBZ::ClientPutInServer()
 	{
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
 		if (!strategy) continue;
-		if(strategy->m_iLevel < iMinLevel);
+		if(strategy->m_iLevel < iMinLevel)
 			iMinLevel = strategy->m_iLevel;
-		break;
 	}
 	SetLevel(iMinLevel == 9999 ? 1 : iMinLevel);
 }

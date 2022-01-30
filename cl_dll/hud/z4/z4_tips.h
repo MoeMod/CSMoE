@@ -32,6 +32,17 @@ public:
 		m_iNightEnd = end;
 	}
 
+	bool IsNightTime()
+	{
+		int time = gHUD.m_flTime - gHUD.m_Timer.m_fStartTime + 1;
+		return (time >= m_iNightStart && time <= m_iNightEnd);
+	}
+
+	float GetNightTime()
+	{
+		return m_iNightEnd - m_iNightStart;
+	}
+
 	/*void ZombieIconsCheck(float flTime)
 	{
 		int time = m_flTimeEnd - flTime + 1;

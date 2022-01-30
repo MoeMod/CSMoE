@@ -80,12 +80,12 @@ public:
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void RoundEndScore(int iWinStatus);
 
-	BOOL FInfectionStarted();
+	virtual BOOL FInfectionStarted();
 	void TeamCheck();
 	void MakeZombie(CBasePlayer* player, ZombieLevel iEvolutionLevel) { m_eventBecomeZombie.dispatch(player, iEvolutionLevel); }
+	virtual void InfectionSound();
 
 protected:
-	virtual void InfectionSound();
 	virtual void EmitHomoSound(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void HumanWin();
 	virtual void ZombieWin();

@@ -27,7 +27,7 @@ enum Z4MessageType : byte
 	Z4_MESSAGE_NIGHTTIME, // { byte msg_type, byte start, byte end }
 	Z4_MESSAGE_ZCLASS, // { byte msg_type, byte zclass }
 	Z4_MESSAGE_SKILL, // { byte msg_type, byte skill, byte state }
-
+	Z4_MESSAGE_STUN, // { byte msg_type, byte client }
 };
 
 enum Z4Status : byte {

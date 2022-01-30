@@ -66,4 +66,9 @@ bool CModCountdownHelper::IsFreezePeriod() const
 	return g_pGameRules->IsFreezePeriod();
 }
 
+int CModCountdownHelper::GetCountdown() const
+{
+	return m_iTotalCounts - static_cast<int>(gpGlobals->time.time_since_epoch() / 1s - g_pGameRules->m_fRoundCount.time_since_epoch() / 1s);
+}
+
 }

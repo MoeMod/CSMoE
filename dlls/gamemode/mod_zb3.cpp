@@ -46,6 +46,7 @@ CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieH
 		m_pModZB3(mp),
 		m_eventBecomeHeroListener(mp->m_eventBecomeHero.subscribe(&CPlayerModStrategy_ZB3::Event_OnBecomeHero, this)),
 		m_eventRoundStartListener(mp->m_eventRoundStart.subscribe(&CPlayerModStrategy_ZB3::Event_OnRoundStart, this)),
+		m_eventPickAsZombieListener(mp->m_eventPickAsZombie.subscribe(&CPlayerModStrategy_ZB3::Event_OnPickAsZombie, this)),
 		m_flRagePercent(0.0f)
 {
 	
@@ -54,6 +55,7 @@ CPlayerModStrategy_ZB3::CPlayerModStrategy_ZB3(CBasePlayer *player, CMod_ZombieH
 void CPlayerModStrategy_ZB3::OnSpawn()
 {
 	SetHero(false);
+	SetPickAsZombie(false);
 	m_pModZB3->HumanMorale().UpdateHUD(m_pPlayer, MORALE_TYPE_GLOBAL);
 	return CPlayerModStrategy_ZB2::OnSpawn();
 }
@@ -171,6 +173,12 @@ void CPlayerModStrategy_ZB3::OnThink()
 
 void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflictor)
 {
+	if (m_pModZB3->isForceRespawn())
+	{
+		m_pPlayer->m_bHeadshotKilled = false;
+		m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC;
+	}
+
 	// Human should respawn as a zombie
 	if (!m_pPlayer->m_bIsZombie)
 	{
@@ -268,6 +276,60 @@ int CPlayerModStrategy_ZB3::AddToFullPack_Post(struct entity_state_s* state, int
 	return CPlayerModStrategy_ZB2::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 }
 
+void CPlayerModStrategy_ZB3::Event_OnPickAsZombie(CBasePlayer *who)
+{
+	if (m_pPlayer != who)
+		return;
+
+	SetPickAsZombie(true);
+
+	char szHudText[64];
+	Q_sprintf(szHudText, "您已被感染，可在[变异阶段]使用[E]键变成僵尸");
+
+	hudtextparms_t textParms;
+	textParms.x = -1.0f;
+	textParms.y = 0.3f;
+	textParms.effect = 2;
+	textParms.r1 = 200;
+	textParms.g1 = 200;
+	textParms.b1 = 50;
+	textParms.r2 = 255;
+	textParms.g2 = 255;
+	textParms.b2 = 255;
+	textParms.fadeinTime = 0.1f;
+	textParms.fadeoutTime = 1.5f;
+	textParms.holdTime = 3.0f;
+	textParms.fxTime = 0.1f;
+	textParms.channel = 1;
+	UTIL_HudMessage(m_pPlayer, textParms, szHudText);
+}
+
+void CPlayerModStrategy_ZB3::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
+{
+	auto& bitsCurButton = cmd->buttons;
+	auto& bitsOldButton = m_pPlayer->pev->oldbuttons;
+
+	if (bitsCurButton & ~bitsOldButton & IN_USE && m_pPlayer->IsAlive() && !m_pPlayer->m_bIsZombie && IsPickAsZombie())
+	{
+		auto iNumZombies = m_pModZB3->ZombieOriginNum();
+		auto iNumPlayers = m_pModZB3->m_iNumTerrorist + m_pModZB3->m_iNumCT;
+
+		m_pPlayer->m_ZombieClass = "random";
+		m_pPlayer->pev->sequence = 0;
+		m_pPlayer->m_iCustomSequence = -1;
+		m_pModZB3->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+		m_pPlayer->pev->armorvalue = 1100;
+		m_pModZB3->TeamCheck();
+
+		// sound effect
+		m_pModZB3->InfectionSound();
+		m_pModZB3->CheckWinConditions();
+	}
+
+	return CPlayerModStrategy_ZB2::CmdStart(cmd, random_seed);
+}
+
 void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) const
 {
 	if(player)
@@ -281,7 +343,11 @@ void CZB3HumanMorale::UpdateHUD(CBasePlayer *player, ZB3HumanMoraleType_e type) 
 }
 
 // pimpl requires individual definition for dtor
-CMod_ZombieHero::CMod_ZombieHero() = default;
+CMod_ZombieHero::CMod_ZombieHero() : m_CountDownDelegate(this)
+{
+	m_flForceRespawnEnd = invalid_time_point;
+	m_Countdown.SetDelegate(&m_CountDownDelegate);
+}
 CMod_ZombieHero::~CMod_ZombieHero() = default;
 
 void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
@@ -291,7 +357,92 @@ void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 
 void CMod_ZombieHero::PickZombieOrigin()
 {
-	CMod_Zombi::PickZombieOrigin();
+	UTIL_BroadcastStuffText("mp3 loop sound/Zombi_Ambience.mp3\n");
+	m_flForceRespawnEnd = gpGlobals->time + m_iRoundTime * 0.25;
+	char szHudText[64];
+	Q_sprintf(szHudText, "病毒散布中，僵尸被致命击杀后依旧能够复活");
+
+	hudtextparms_t textParms;
+	textParms.x = -1.0f;
+	textParms.y = 0.3f;
+	textParms.effect = 0;
+	textParms.r1 = 255;
+	textParms.g1 = 155;
+	textParms.b1 = 0;
+	textParms.r2 = 255;
+	textParms.g2 = 255;
+	textParms.b2 = 255;
+	textParms.fadeinTime = 0.1f;
+	textParms.fadeoutTime = 1.0f;
+	textParms.holdTime = 5.0f;
+	textParms.fxTime = 0.1f;
+	textParms.channel = 1;
+	UTIL_HudMessageAll(textParms, szHudText);
+
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer *> players {list.begin(), list.end()};
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
+
+	if (players.empty())
+		return;
+
+	// randomize player list
+	std::shuffle(players.begin(), players.end(), std::random_device());
+
+	// pick them
+	for (size_t i = 0; i < iNumZombies; ++i)
+	{
+		MakePickAsZombie(players[i]);
+	}
+	CheckWinConditions();
+}
+
+void CMod_ZombieHero::MakeZombieOrigin()
+{
+	auto iNumZombies = ZombieOriginNum();
+	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
+
+	// build alive player list
+	moe::range::PlayersList list;
+	std::vector<CBasePlayer*> players{ list.begin(), list.end() };
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) {
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
+		if (strategy && strategy->IsPickAsZombie() && player->IsAlive() || player->m_iTeam != TEAM_CT)
+		{
+			return false;
+		}
+		return true;
+	}), players.end());
+
+	if (players.empty())
+	{
+		if (iNumPlayers)
+		{
+			PickZombieOrigin();
+			MakeZombieOrigin();
+		}
+		return;
+	}
+
+	// pick them
+	for (size_t i = 0; i < players.size(); ++i)
+	{
+		players[i]->m_ZombieClass = "random";
+		players[i]->pev->sequence = 0;
+		players[i]->m_iCustomSequence = -1;
+		MakeZombie(players[i], ZOMBIE_LEVEL_ORIGIN);
+		players[i]->pev->health = players[i]->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+		players[i]->pev->armorvalue = 1100;
+	}
+	TeamCheck();
+
+	// sound effect
+	InfectionSound();
+	CheckWinConditions();
 	PickHero();
 }
 
@@ -307,6 +458,7 @@ void CMod_ZombieHero::UpdateGameMode(CBasePlayer * pPlayer)
 
 void CMod_ZombieHero::RestartRound()
 {
+	UTIL_BroadcastStuffText("mp3 stop;stopsound\n");
 	m_Morale.ResetLevel();
 	m_eventRoundStart.dispatch();
 	CMod_ZombieMod2::RestartRound();
@@ -358,7 +510,8 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 				MESSAGE_END();
 
 				CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pEntity2);
-				MakeHero(pPlayer);
+				if(!pPlayer->m_bIsZombie)
+					MakeHero(pPlayer);
 
 				m_bHasAnswered = true;
 			}
@@ -400,7 +553,10 @@ void CMod_ZombieHero::CheckWinConditions()
 	
 	moe::range::PlayersList list;
 	auto iAliveHuman = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_CT && !player->m_bIsZombie && player->IsAlive() && !player->IsDormant(); });
-	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) { return player->m_iTeam == TEAM_TERRORIST && player->m_bIsZombie && !(!player->IsAlive() && player->m_bHeadshotKilled) && !player->IsDormant(); });
+	auto iAliveZombie = std::count_if(list.begin(), list.end(), [](CBasePlayer *player) {
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
+		return player->m_iTeam == TEAM_TERRORIST && (player->m_bIsZombie || (strategy && strategy->IsPickAsZombie())) && !(!player->IsAlive() && player->m_bHeadshotKilled) && !player->IsDormant();
+	});
 
 	//ALERT(at_console, "CheckWinConditions: iAliveHuman:%d iAliveZombie:%d\n", iAliveHuman, iAliveZombie);
 
@@ -427,36 +583,38 @@ BOOL CMod_ZombieHero::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pA
 		iReturn = TRUE;
 	}
 
-	/*CBasePlayer* pAttackerPlayer = dynamic_ent_cast<CBasePlayer*>(pAttacker);
-	do
-	{
-		if (!pAttackerPlayer) break;
-		if (!pAttackerPlayer->m_bIsZombie || pPlayer->m_bIsZombie) break;
-		if (pPlayer->iuser1 == 1 && pPlayer->m_pActiveItem && !Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
-		{
-			iReturn = FALSE;
-			break;
-		}
-
-		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(pPlayer->m_pModStrategy.get());
-		if (strategy && strategy->IsHero())
-		{
-			iReturn = TRUE;
-			break;
-		}
-		iReturn = FALSE;
-		HumanInfectionByZombie(pPlayer, pAttackerPlayer);
-	} while (false);*/
-
 	return iReturn;
 }
 
 void CMod_ZombieHero::Think()
 {
-	if (m_flCheckWinConditions <= gpGlobals->time)
+	/*if (m_flCheckWinConditions <= gpGlobals->time)
 	{
 		m_flCheckWinConditions = gpGlobals->time + 5s;
 		CheckWinConditions();
+	}*/
+	if (m_flForceRespawnEnd != invalid_time_point && m_flForceRespawnEnd <= gpGlobals->time)
+	{
+		m_flForceRespawnEnd = invalid_time_point;
+		char szHudText[64];
+		Q_sprintf(szHudText, "病毒已驱散，僵尸被致命击败后无法再次复活");
+
+		hudtextparms_t textParms;
+		textParms.x = -1.0f;
+		textParms.y = 0.3f;
+		textParms.effect = 0;
+		textParms.r1 = 255;
+		textParms.g1 = 155;
+		textParms.b1 = 0;
+		textParms.r2 = 255;
+		textParms.g2 = 255;
+		textParms.b2 = 255;
+		textParms.fadeinTime = 0.1f;
+		textParms.fadeoutTime = 1.0f;
+		textParms.holdTime = 5.0f;
+		textParms.fxTime = 0.1f;
+		textParms.channel = 1;
+		UTIL_HudMessageAll(textParms, szHudText);
 	}
 	return CMod_ZombieMod2::Think();
 }
@@ -472,6 +630,49 @@ int CMod_ZombieHero::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled
 	}
 
 	return 1;
+}
+
+BOOL CMod_ZombieHero::FInfectionStarted()
+{
+	return !m_Countdown.IsFreezePeriod() && (m_Countdown.GetCountdown() <= 7 || m_Countdown.IsExpired());
+}
+
+CZB3CountdownDelegate::CZB3CountdownDelegate(CMod_ZombieHero *mod) : CZB1CountdownDelegate(mod) {}
+
+void CZB3CountdownDelegate::OnCountdownStart()
+{
+	UTIL_BroadcastStuffText("spk \"zombi_start\"\n");
+}
+
+void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
+{
+	static const char* s_szCountDownSound[11] = {
+		"", "one", "two", "three", "four", "five", "six",
+		"seven", "eight", "nine", "ten"
+	};
+
+	if (iCurrentCount > 7)
+	{
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[感染阶段]生化病毒正在寻找宿主，%s秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
+
+		if (iCurrentCount - 7 <= 10)
+		{
+			UTIL_BroadcastStuffText("spk \"%s\"\n", s_szCountDownSound[iCurrentCount - 7]);
+		}
+	}
+	else if (iCurrentCount <= 7)
+	{
+		if (iCurrentCount == 7)
+			m_pMod->PickZombieOrigin();
+
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[变异阶段]生化病毒已找到宿主，母体僵尸将在%s秒内出现", UTIL_dtos1(iCurrentCount));
+	}
+}
+
+void CZB3CountdownDelegate::OnCountdownEnd()
+{
+	// select zombie
+	((CMod_ZombieHero*)m_pMod)->MakeZombieOrigin();
 }
 
 void CMod_ZB3F2P::InstallPlayerModStrategy(CBasePlayer *player)

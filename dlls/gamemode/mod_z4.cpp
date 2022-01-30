@@ -11,6 +11,7 @@
 #include "triggers.h"
 #include "entity_state.h"
 #include "usercmd.h"
+#include "shake.h"
 
 #include "mod_z4.h"
 
@@ -111,7 +112,7 @@ namespace sv {
 
 				// night starts, pre 15secs
 				UTIL_BroadcastStuffText("spk z4/z4_bgm_night.wav\n");
-
+				UTIL_BroadcastStuffText("mp3 stop;stopsound\n");
                 Set_Light(0, 5, 3.0f);
 				for(int iLight = 0; iLight < 5; ++iLight)
 				{
@@ -244,7 +245,7 @@ namespace sv {
 	CMod_ZombieIV::CMod_ZombieIV() : m_CountDownDelegate(this) // precache
 	{
 		PRECACHE_SOUND("zombi/z4/all/z4human_death_male.wav");
-
+		PRECACHE_MODEL("sprites/z4_stun.spr");
 		z4::Z4_ZClass_Precache_All();
 
 		round = std::make_unique<round_t>(this);
@@ -867,25 +868,6 @@ namespace sv {
 			MESSAGE_END();
 		}
 
-		void Stun_Start()
-		{
-			MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, m_pPlayer->pev);
-			WRITE_BYTE(Z4_MESSAGE_STATUS);
-			WRITE_BYTE(8);
-			WRITE_BYTE(Z4_CANNOTCONTROL);
-			WRITE_BYTE(Z4_ICON_SHOW);
-			MESSAGE_END();
-		}
-		void Stun_End()
-		{
-			MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, m_pPlayer->pev);
-			WRITE_BYTE(Z4_MESSAGE_STATUS);
-			WRITE_BYTE(8);
-			WRITE_BYTE(Z4_CANNOTCONTROL);
-			WRITE_BYTE(Z4_ICON_FLASH2);
-			MESSAGE_END();
-		}
-
 	public:
 		CPlayerModStrategy_ZB4 *strategy;
 		z4::zclass_variant_t zclass;
@@ -1265,6 +1247,22 @@ namespace sv {
 				// countdown
 				co_await timer.async_wait(boost::asio::use_awaitable);
 				ClientPrint(this->m_pPlayer->pev, HUD_PRINTCENTER, "距离复活剩余%s1秒", UTIL_dtos1(5 - i)); // #CSO_ZombiSelectCount
+
+				// stun over pre anim
+				if (i == 4 && m_pPlayer->IsAlive() && m_bIsStun)
+				{
+					UTIL_ScreenFade(m_pPlayer, Vector(255, 0, 0), 1s, 1s, 100, FFADE_IN);
+					if (m_pPlayer->m_pActiveItem)
+					{
+						if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
+						{
+							pWeapon->SendWeaponAnim(ANIM_STUN_END, TRUE);
+							pWeapon->m_flTimeWeaponIdle = 1s;
+							pWeapon->m_flNextPrimaryAttack = 1s;
+							pWeapon->m_flNextSecondaryAttack = 1s;
+						}
+					}
+				}
 				timer.expires_after(1s);
 				// show countdown msg
 			}
@@ -1287,6 +1285,7 @@ namespace sv {
 				}
 				else
 				{
+					
 					m_bIsStun = false;
 					m_pPlayer->pev->bInDuck = 0;
 					CLIENT_COMMAND(m_pPlayer->edict(), "-duck\n");
@@ -1295,17 +1294,15 @@ namespace sv {
 					m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
 					m_pPlayer->pev->armorvalue = armor;
 					m_pPlayer->ResetMaxSpeed();
+					m_pPlayer->m_bNightVisionOn = false;
+					m_pPlayer->ClientCommand("nightvision");
 
-					if (m_pPlayer->m_pActiveItem)
-					{
-						if (CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem)
-						{
-							pWeapon->SendWeaponAnim(ANIM_STUN_END, TRUE);
-							pWeapon->m_flTimeWeaponIdle = 1.0s;
-							pWeapon->m_flNextPrimaryAttack = 0.5s;
-							pWeapon->m_flNextSecondaryAttack = 0.5s;
-						}
-					}
+					MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, m_pPlayer->pev);
+					WRITE_BYTE(Z4_MESSAGE_STATUS);
+					WRITE_BYTE(8);
+					WRITE_BYTE(Z4_CANNOTCONTROL);
+					WRITE_BYTE(Z4_ICON_FLASH2);
+					MESSAGE_END();
 				}
 			}
 		}
@@ -1358,7 +1355,7 @@ namespace sv {
 		if (m_pPlayer->pev->flags & FL_DUCKING)
 			return 1;
 
-		// TODO:Stun
+		m_pPlayer->pev->health = 1;
 		m_pPlayer->m_flNextAttack = 5.0s;
 		if (m_pPlayer->m_pActiveItem)
 		{
@@ -1374,6 +1371,32 @@ namespace sv {
 		m_pPlayer->ResetMaxSpeed();
 		m_pPlayer->pev->bInDuck = 1;
 		CLIENT_COMMAND(m_pPlayer->edict(), "+duck\n");
+		m_pPlayer->m_bNightVisionOn = true;
+		m_pPlayer->ClientCommand("nightvision");
+		m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("stun");
+		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 5.0s;
+		if (m_pCharacter_Z4)
+		{
+			if (auto zombie = std::dynamic_pointer_cast<CZombie_Z4>(m_pCharacter_Z4))
+			{
+				z4::zclass_sound_s soundlist = zombie->SoundForZClass();
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, soundlist.szSoundStun, VOL_NORM, ATTN_NORM);
+			}
+		}
+		UTIL_ScreenFade(m_pPlayer, Vector(255, 0, 0), 0s, 0s, 100, FFADE_STAYOUT);
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZ4Msg, nullptr, m_pPlayer->pev);
+		WRITE_BYTE(Z4_MESSAGE_STATUS);
+		WRITE_BYTE(8);
+		WRITE_BYTE(Z4_CANNOTCONTROL);
+		WRITE_BYTE(Z4_ICON_SHOW);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_ALL, gmsgZ4Msg);
+		WRITE_BYTE(Z4_MESSAGE_STUN);
+		WRITE_BYTE(m_pPlayer->entindex());
+		MESSAGE_END();
+
 		boost::asio::co_spawn(ioc, DelayRespawnCheck(), boost::asio::detached);
 
 		return 0;

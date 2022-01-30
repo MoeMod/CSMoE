@@ -1104,6 +1104,16 @@ namespace sv {
 
 	void CKnifeLance::ItemPostFrame()
 	{
+		if (!(m_pPlayer->pev->button & IN_ATTACK) && m_iState == 2)
+		{
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.67s;
+		}
+
+		if (!(m_pPlayer->pev->button & IN_ATTACK) && m_iState == 3)
+		{
+			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.67s;
+		}
+
 		if (m_tTimeRestMaxSpeed != invalid_time_point && m_tTimeRestMaxSpeed < gpGlobals->time)
 		{
 			m_tTimeRestMaxSpeed = invalid_time_point;

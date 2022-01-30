@@ -43,6 +43,7 @@ public:
 
 	bool IsExpired() const;
 	bool IsFreezePeriod() const;
+	int GetCountdown() const;
 
 private:
 	ICountdownDelegate *m_pDelegate;

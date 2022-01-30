@@ -86,15 +86,15 @@ V_CalcRefDef
 void CFog::V_CalcRefdef(const ref_params_t* pparams)
 {
 	// Calculate distance to edge
-	Vector boxTotal = Vector(m_fogParams.enddist, m_fogParams.enddist, m_fogParams.enddist);
-	float edgeLength = boxTotal.Length();
+	//Vector boxTotal = Vector(m_fogParams.enddist, m_fogParams.enddist, m_fogParams.enddist);
+	//float edgeLength = boxTotal.Length();
 
-	// Set mins/maxs box
-	for (int i = 0; i < 3; i++)
-	{
-		m_vFogBBoxMin[i] = pparams->vieworg[i] - edgeLength;
-		m_vFogBBoxMax[i] = pparams->vieworg[i] + edgeLength;
-	}
+	//// Set mins/maxs box
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	m_vFogBBoxMin[i] = pparams->vieworg[i] - edgeLength;
+	//	m_vFogBBoxMax[i] = pparams->vieworg[i] + edgeLength;
+	//}
 
 	// Remember this
 	m_clientWaterLevel = pparams->waterlevel;
@@ -136,7 +136,7 @@ void CFog::BlendFog(void)
 		m_fogBlendTime = 0;
 		if (CVAR_GET_FLOAT("developer"))
 		{
-			gEngfuncs.Con_Printf("FOG Blend Over --- density:%.f \n", m_fogParams.density);
+			gEngfuncs.Con_Printf("FOG Blend Over --- density:%f \n", m_fogParams.density);
 		}
 		return;
 	}
@@ -213,7 +213,7 @@ int CFog::MsgFunc_Fog(const char* pszName, int iSize, void* pBuf)
 
 	if (CVAR_GET_FLOAT("developer"))
 	{
-		gEngfuncs.Con_Printf("FOG --- r:%d g:%d b:%d density:%.f \n", fogcolor[0], fogcolor[1], fogcolor[2], density.f);
+		gEngfuncs.Con_Printf("FOG --- r:%d g:%d b:%d density:%f \n", fogcolor[0], fogcolor[1], fogcolor[2], density.f);
 	}
 
 	int startdist = !density.f ? 0 : 1;

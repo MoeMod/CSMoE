@@ -35,6 +35,15 @@ class CHudZ4::impl_t
 	: public THudSubDispatcher<CHudZ4Energy, CHudZ4Scoreboard, CHudZ4Status, CHudZ4Tips>
 {
 public:
+	SharedTexture m_pTexture_Rage;
+	SharedTexture m_pTexture_Hide;
+	SharedTexture m_pTexture_Sprint;
+	SharedTexture m_pTexture_Trap;
+	SharedTexture m_pTexture_Night;
+	SharedTexture m_pTexture_Dash;
+	CHudRetina::MagicNumber m_iLastIdx = -1;
+	CHudRetina::MagicNumber m_iNightIdx = -1;
+	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 };
 
 DECLARE_MESSAGE(m_ZB4, Z4Msg)
@@ -80,6 +89,13 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 	{
 		Z4ZClassType zclass = static_cast<Z4ZClassType>(buf.ReadByte());
 		pimpl->get<CHudZ4Energy>().SetZClass(zclass);
+		// remove retinas...
+		for (auto x : pimpl->m_RetinaIndexes)
+		{
+			gHUD.m_Retina.RemoveItem(x);
+		}
+		pimpl->m_RetinaIndexes.clear();
+		pimpl->m_iNightIdx = pimpl->m_iLastIdx = -1;
 		break;
 	}
 	case Z4_MESSAGE_SKILL:
@@ -94,21 +110,71 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 				{
 				case Z4_CLASS_NORMAL:
 					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					if (activate)
+					{
+						pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Dash, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+						pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+					}
+					else
+					{
+						gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+						pimpl->m_iLastIdx = -1;
+					}
 					break;
 				case Z4_CLASS_LIGHT:
 					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
 					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEDOWN, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					if (activate)
+					{
+						pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Hide, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+						pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+					}
+					else
+					{
+						gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+						pimpl->m_iLastIdx = -1;
+					}
 					break;
 				case Z4_CLASS_HEAVY:
 					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDDOWN, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
 					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					if (activate)
+					{
+						pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Trap, CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+						pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+					}
+					else
+					{
+						gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+						pimpl->m_iLastIdx = -1;
+					}
 					break;
 				case Z4_CLASS_HIDE:
 					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					if (activate)
+					{
+						pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Dash, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+						pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+					}
+					else
+					{
+						gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+						pimpl->m_iLastIdx = -1;
+					}
 					break;
 				case Z4_CLASS_HUMPBACK:
 					pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
 					pimpl->get<CHudZ4Status>().AddIcon(9, Z4_DEFENSEUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+					if (activate)
+					{
+						pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Dash, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+						pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+					}
+					else
+					{
+						gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+						pimpl->m_iLastIdx = -1;
+					}
 					break;
 				default:
 					break;
@@ -117,15 +183,38 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 			else
 			{
 				pimpl->get<CHudZ4Status>().AddIcon(7, Z4_SPEEDUP, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
-
+				if (activate)
+				{
+					pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Sprint, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, 9999.9f);
+					pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+				}
+				else
+				{
+					gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+					pimpl->m_iLastIdx = -1;
+				}
 			}
 		}
 		else if (skill == Z4_SKILL_ACCSHOOT)
 		{
 			pimpl->get<CHudZ4Status>().AddIcon(1, Z4_CRITICALSHOT, activate ? Z4_ICON_SHOW : Z4_ICON_FLASH2);
+			if (activate)
+			{
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Rage, CHudRetina::RETINA_DRAW_TYPE_BLINK, 9999.9f);
+				pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
+			}
+			else
+			{
+				gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+				pimpl->m_iLastIdx = -1;
+			}
 		}
 		break;
 	}
+	case Z4_MESSAGE_STUN:
+		int player = buf.ReadByte();
+		gHUD.m_HeadIcon.R_AttachTentToPlayer(player, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/z4_stun.spr"), Vector(0.0, 0.0, 16.0), 5.5f, TRUE, FTENT_PERSIST | FTENT_FADEOUT | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 10.0f);
+		break;
 	}
 	
 	return 1;
@@ -146,12 +235,36 @@ int CHudZ4::VidInit(void)
 {
 	pimpl->for_each(&IBaseHudSub::VidInit);
 
+	R_InitTexture(pimpl->m_pTexture_Rage, "resource/zombi/zombicrazy");
+	R_InitTexture(pimpl->m_pTexture_Hide, "resource/zombi/zombihiding2");
+	R_InitTexture(pimpl->m_pTexture_Sprint, "resource/zombi/zombispeedup");
+	R_InitTexture(pimpl->m_pTexture_Trap, "resource/zombi/zombitrap");
+	R_InitTexture(pimpl->m_pTexture_Night, "resource/zombi/zombinight");
+	R_InitTexture(pimpl->m_pTexture_Dash, "resource/zombi/zombidash");
+
 	return 1;
 }
 
 int CHudZ4::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
+
+	if (g_PlayerExtraInfo[gEngfuncs.GetLocalPlayer()->index].zombie)
+	{
+		if (pimpl->get<CHudZ4Tips>().IsNightTime())
+		{
+			if (pimpl->m_iNightIdx == -1)
+			{
+				pimpl->m_iNightIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_Night, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, pimpl->get<CHudZ4Tips>().GetNightTime());
+				pimpl->m_RetinaIndexes.push_back(pimpl->m_iNightIdx);
+			}
+		}
+		else
+		{
+			//gHUD.m_Retina.RemoveItem(pimpl->m_iNightIdx);
+			pimpl->m_iNightIdx = -1;
+		}
+	}
 	return 1;
 }
 

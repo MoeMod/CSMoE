@@ -132,8 +132,6 @@ void CZombieClass_China::OnWeaponDeploy(CBasePlayerItem *item)
 			m_pPlayer->pev->viewmodel = MAKE_STRING("models/@frogvari_v_zombibomb_china.mdl");
 			break;
 		}
-		china:
-			break;
 	}
 }
 

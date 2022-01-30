@@ -96,9 +96,15 @@ namespace sv {
 
 			Vector Get_SpeedVector(Vector origin1, Vector origin2, float speed)
 			{
-				Vector new_velocity = (origin2 - origin1).Normalize() * speed;
-				new_velocity[2] *= 0.5f;
+				Vector new_velocity = origin2 - origin1;
+				float num = sqrtf(speed * speed / (new_velocity[0] * new_velocity[0] + new_velocity[1] * new_velocity[1] + new_velocity[2] * new_velocity[2]));
+				new_velocity[0] *= (num * 2.0);
+				new_velocity[1] *= (num * 2.0);
+				new_velocity[2] *= (num / 2.0);
 				return new_velocity;
+				/*Vector new_velocity = (origin2 - origin1).Normalize() * speed;
+				new_velocity[2] *= 0.5f;
+				return new_velocity;*/
 			}
 
 			bool OnSkillActivate()
