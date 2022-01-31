@@ -31,7 +31,7 @@ GNU General Public License for more details.
 world_static_t	world;
 
 byte		*mod_base;
-byte		*com_studiocache;		// cache for submodels
+mempool_t		*com_studiocache;		// cache for submodels
 static model_t	*com_models[MAX_MODELS];	// shared replacement modeltable
 static model_t	cm_models[MAX_MODELS];
 static int	cm_nummodels = 0;

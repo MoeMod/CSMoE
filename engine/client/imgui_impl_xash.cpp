@@ -61,7 +61,7 @@ bool g_bShowDemoWindow = false;
 
 int g_imguiRenderMode = 0;
 
-extern "C" byte *imgui_pool = nullptr;
+extern "C" mempool_t *imgui_pool = nullptr;
 
 void* ImGui_ImplGL_OperatorNew(size_t sz, void* user_data)
 {

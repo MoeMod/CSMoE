@@ -258,7 +258,7 @@ Cache_Check
 consistency check
 ====================
 */
-void *Cache_Check( byte *mempool, cache_user_t *c )
+void *Cache_Check( mempool_t *mempool, cache_user_t *c )
 {
 	if( !c->data )
 		return NULL;

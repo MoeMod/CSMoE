@@ -123,7 +123,7 @@ void FS_FreeImageInternal( rgbdata_t *pack );
 
 image_ref Image_NewTemp()
 {
-	image_ref pack((rgbdata_t *)Mem_Alloc( host.imagepool, sizeof( rgbdata_t )), FS_FreeImageInternal);
+	image_ref pack(new rgbdata_t(), FS_FreeImageInternal);
 	return pack;
 }
 
@@ -507,8 +507,7 @@ void FS_FreeImageInternal( rgbdata_t *pack )
 			if( pack->buffer ) Mem_Free( pack->buffer );
 			if( pack->palette ) Mem_Free( pack->palette );
 		}
-		pack->~rgbdata_t();
-		Mem_Free( pack );
+		delete pack;
 	}
 	// else MsgDev( D_WARN, "FS_FreeImage: trying to free NULL image\n" );
 }

@@ -104,7 +104,7 @@ struct touch_s
 {
 	qboolean initialized;
 	touchbuttonlist_t list_user, list_edit;
-	byte *mempool;
+	mempool_t *mempool;
 	touchState state;
 	int look_finger;
 	int move_finger;

@@ -66,21 +66,20 @@ typedef struct mempool_s
 
 mempool_t *poolchain; // critical stuff
 
-void *_Mem_Alloc( byte *poolptr, size_t size, const char *filename, int fileline )
+void *_Mem_Alloc( mempool_t *pool, size_t size, const char *filename, int fileline )
 {
 	int		i, j, k, needed, endbit, largest;
 	memclump_t	*clump, **clumpchainpointer;
 	memheader_t	*mem;
-	mempool_t		*pool = (mempool_t *)((byte *)poolptr);
 
 	if( size <= 0 ) return NULL;
-	if( poolptr == NULL ) Sys_Error( "Mem_Alloc: pool == NULL (alloc at %s:%i)\n", filename, fileline );
+	if( pool == NULL ) Sys_Error( "Mem_Alloc: pool == NULL (alloc at %s:%i)\n", filename, fileline );
 	pool->totalsize += size;
 
 	if( size < 4096 )
 	{
 		// clumping
-		needed = ( sizeof( memheader_t ) + size + sizeof( int ) + (MEMUNIT - 1)) / MEMUNIT;
+		needed = ( sizeof( memheader_t ) + size + alignof(std::max_align_t) + (MEMUNIT - 1)) / MEMUNIT;
 		endbit = MEMBITS - needed;
 		for( clumpchainpointer = &pool->clumpchain; *clumpchainpointer; clumpchainpointer = &(*clumpchainpointer)->chain )
 		{
@@ -134,8 +133,8 @@ choseclump:
 	else
 	{
 		// big allocations are not clumped
-		pool->realsize += sizeof( memheader_t ) + size + sizeof( int );
-		mem = (memheader_t *)malloc( sizeof( memheader_t ) + size + sizeof( int ));
+		pool->realsize += sizeof( memheader_t ) + size + alignof(std::max_align_t);
+		mem = (memheader_t *)malloc( sizeof( memheader_t ) + size + alignof(std::max_align_t));
 		if( mem == NULL ) Sys_Error( "Mem_Alloc: out of memory (alloc at %s:%i)\n", filename, fileline );
 		mem->clump = NULL;
 	}
@@ -213,7 +212,7 @@ static void Mem_FreeBlock( memheader_t *mem, const char *filename, int fileline 
 		if( firstblock & ( MEMUNIT - 1 ))
 			Sys_Error( "Mem_Free: address not valid in clump (free at %s:%i)\n", filename, fileline );
 		firstblock /= MEMUNIT;
-		endblock = firstblock + ((sizeof( memheader_t ) + mem->size + sizeof( int ) + (MEMUNIT - 1)) / MEMUNIT );
+		endblock = firstblock + ((sizeof( memheader_t ) + mem->size + alignof(std::max_align_t) + (MEMUNIT - 1)) / MEMUNIT );
 		clump->blocksinuse -= endblock - firstblock;
 
 		// could use &, but we know the bit is set
@@ -244,7 +243,7 @@ static void Mem_FreeBlock( memheader_t *mem, const char *filename, int fileline 
 	}
 	else
 	{
-		pool->realsize -= sizeof( memheader_t ) + mem->size + sizeof( int );
+		pool->realsize -= sizeof( memheader_t ) + mem->size + alignof(std::max_align_t);
 		free( mem );
 	}
 }
@@ -255,7 +254,7 @@ void _Mem_Free( void *data, const char *filename, int fileline )
 	Mem_FreeBlock((memheader_t *)((byte *)data - sizeof( memheader_t )), filename, fileline );
 }
 
-void *_Mem_Realloc( byte *poolptr, void *memptr, size_t size, const char *filename, int fileline )
+void *_Mem_Realloc( mempool_t *poolptr, void *memptr, size_t size, const char *filename, int fileline )
 {
 	char		*nb;
 	memheader_t	*memhdr = NULL;
@@ -283,11 +282,9 @@ void *_Mem_Realloc( byte *poolptr, void *memptr, size_t size, const char *filena
 	return (void *)nb;
 }
 
-byte *_Mem_AllocPool( const char *name, const char *filename, int fileline )
+mempool_t *_Mem_AllocPool( const char *name, const char *filename, int fileline )
 {
-	mempool_t *pool;
-
-	pool = (mempool_t *)malloc( sizeof( mempool_t ));
+	mempool_t *pool = (mempool_t *)malloc( sizeof( mempool_t ));
 	if( pool == NULL ) Sys_Error( "Mem_AllocPool: out of memory (allocpool at %s:%i)\n", filename, fileline );
 	_Q_memset( pool, 0, sizeof( mempool_t ), filename, fileline );
 
@@ -303,12 +300,12 @@ byte *_Mem_AllocPool( const char *name, const char *filename, int fileline )
 	pool->next = poolchain;
 	poolchain = pool;
 
-	return (byte *)((mempool_t *)pool);
+	return pool;
 }
 
-void _Mem_FreePool( byte **poolptr, const char *filename, int fileline )
+void _Mem_FreePool( mempool_t **poolptr, const char *filename, int fileline )
 {
-	mempool_t	*pool = (mempool_t *)((byte *)*poolptr );
+	mempool_t	*pool = (*poolptr );
 	mempool_t	**chainaddress;
 
 	if( pool )
@@ -329,10 +326,9 @@ void _Mem_FreePool( byte **poolptr, const char *filename, int fileline )
 	}
 }
 
-void _Mem_EmptyPool( byte *poolptr, const char *filename, int fileline )
+void _Mem_EmptyPool( mempool_t *pool, const char *filename, int fileline )
 {
-	mempool_t *pool = (mempool_t *)((byte *)poolptr);
-	if( poolptr == NULL ) Sys_Error( "Mem_EmptyPool: pool == NULL (emptypool at %s:%i)\n", filename, fileline );
+	if( pool == NULL ) Sys_Error( "Mem_EmptyPool: pool == NULL (emptypool at %s:%i)\n", filename, fileline );
 
 	if( pool->sentinel1 != MEMHEADER_SENTINEL1 ) Sys_Error( "Mem_EmptyPool: trashed pool sentinel 1 (allocpool at %s:%i, emptypool at %s:%i)\n", pool->filename, pool->fileline, filename, fileline );
 	if( pool->sentinel2 != MEMHEADER_SENTINEL1 ) Sys_Error( "Mem_EmptyPool: trashed pool sentinel 2 (allocpool at %s:%i, emptypool at %s:%i)\n", pool->filename, pool->fileline, filename, fileline );
@@ -367,11 +363,8 @@ qboolean Mem_CheckAlloc( mempool_t *pool, void *data )
 Check pointer for memory
 ========================
 */
-qboolean Mem_IsAllocatedExt( byte *poolptr, void *data )
+qboolean Mem_IsAllocatedExt( mempool_t *pool, void *data )
 {
-	mempool_t	*pool = NULL;
-	if( poolptr ) pool = (mempool_t *)((byte *)poolptr);
-
 	return Mem_CheckAlloc( pool, data );
 }
 

@@ -270,7 +270,7 @@ typedef struct model_s
 	modtype_t	type;
 	int			numframes;
 	//synctype_t	synctype;
-	byte* mempool;		// private mempool (was synctype)
+	mempool_t* mempool;		// private mempool (was synctype)
 
 	int			flags;
 

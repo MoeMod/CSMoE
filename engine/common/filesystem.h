@@ -95,7 +95,7 @@ struct wfile_s
 {
 	char		filename[MAX_SYSPATH];
 	int		infotableofs;
-	byte		*mempool;	// W_ReadLump temp buffers
+	mempool_t		*mempool;	// W_ReadLump temp buffers
 	int		numlumps;
 	int		mode;
 	file_t		*wadfile;

@@ -49,4 +49,6 @@ typedef Uint64 integer64;
 typedef unsigned long long integer64;
 #endif
 typedef integer64 longtime_t;
+
+typedef struct mempool_s mempool_t;
 #endif // XASH_TYPES_H

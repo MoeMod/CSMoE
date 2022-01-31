@@ -79,7 +79,7 @@ char Q_tolower( const char in )
 }
 #endif
 
-char *_copystring( byte *mempool, const char *s, const char *filename, int fileline )
+char *_copystring( mempool_t *mempool, const char *s, const char *filename, int fileline )
 {
 	char	*b;
 

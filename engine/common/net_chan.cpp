@@ -96,7 +96,7 @@ int	net_drop;
 netadr_t	net_from;
 netadr_t	net_local;
 sizebuf_t	net_message;
-byte	*net_mempool;
+mempool_t	*net_mempool;
 byte	net_message_buffer[NET_MAX_PAYLOAD];
 
 /*

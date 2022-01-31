@@ -1489,7 +1489,7 @@ static client_sprite_t *GAME_EXPORT pfnSPR_GetList( const char *psz, int *piCoun
 	int		index, numSprites = 0;
 	char		*afile, *pfile;
 	string		token;
-	byte		*pool;
+	mempool_t		*pool;
 
 	if( piCount ) *piCount = 0;
 

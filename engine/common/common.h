@@ -162,8 +162,8 @@ typedef enum
 #include "system.h"
 #include "ref_params.h"
 #include "com_model.h"
-#include "filesystem.h"
 #include "crtlib.h"
+#include "filesystem.h"
 #include "base_cmd.h"
 
 #define XASH_VERSION	"0.19.3"		// engine current version
@@ -378,7 +378,7 @@ typedef struct host_parm_s
 	instance_t	type;		// running at
 	jmp_buf		abortframe;	// abort current frame
 	dword		errorframe;	// to prevent multiple host error
-	byte		*mempool;		// static mempool for misc allocations
+	mempool_t		*mempool;		// static mempool for misc allocations
 	string		finalmsg;		// server shutdown final message
 	host_redirect_t	rd;		// remote console
 
@@ -422,8 +422,8 @@ typedef struct host_parm_s
 	char		gamefolder[64];	// it's a default gamefolder	
 
 
-	byte		*imagepool;	// imagelib mempool
-	byte		*soundpool;	// soundlib mempool
+	mempool_t		*imagepool;	// imagelib mempool
+	mempool_t		*soundpool;	// soundlib mempool
 
 	uint		features;		// custom features that enables by mod-maker request
 
@@ -821,7 +821,7 @@ int pfnDrawConsoleString( int x, int y, const char *string );
 void pfnDrawSetTextColor( float r, float g, float b );
 void pfnDrawConsoleStringLen( const char *pText, int *length, int *height );
 int pfnAddClientCommand( const char *cmd_name, xcommand_t func );
-void *Cache_Check( byte *mempool, struct cache_user_s *c );
+void *Cache_Check( mempool_t *mempool, struct cache_user_s *c );
 edict_t* pfnPEntityOfEntIndex( int iEntIndex );
 void pfnGetModelBounds( model_t *mod, vec3_t_ref mins, vec3_t_ref maxs );
 void pfnGetGameDir( char *szGetGameDir );

@@ -95,7 +95,7 @@ convar_t	*vid_texgamma;
 convar_t	*vid_mode;
 convar_t	*vid_highdpi;
 
-byte		*r_temppool;
+mempool_t		*r_temppool;
 
 ref_globals_t	tr;
 glconfig_t	glConfig;
