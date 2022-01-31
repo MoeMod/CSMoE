@@ -30,7 +30,7 @@ GNU General Public License for more details.
 #include <memory>
 #include <string>
 
-extern byte	*r_temppool;
+extern mempool_t	*r_temppool;
 
 #define BLOCK_SIZE		world.block_size	// lightmap blocksize
 #define BLOCK_SIZE_DEFAULT	128		// for keep backward compatibility
@@ -567,6 +567,8 @@ enum
 	GL_DEPTH_TEXTURE,
 	GL_DEBUG_OUTPUT,
 	GL_SHADOW_EXT,
+	GL_S3TC_EXT,
+
 	GL_EXTCOUNT,		// must be last
 };
 

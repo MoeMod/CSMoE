@@ -84,7 +84,7 @@ struct file_s
 #endif
 };
 
-byte		*fs_mempool;
+mempool_t		*fs_mempool;
 searchpath_t	*fs_searchpaths = NULL;
 searchpath_t	fs_directpath;		// static direct path
 // char		fs_rootdir[MAX_SYSPATH];	// engine root directory

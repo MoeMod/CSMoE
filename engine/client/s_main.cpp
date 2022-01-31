@@ -25,7 +25,7 @@ GNU General Public License for more details.
 #define SND_CLIP_DISTANCE		(float)(GI->soundclip_dist)
 
 dma_t		dma;
-byte		*sndpool;
+mempool_t		*sndpool;
 static soundfade_t	soundfade;
 channel_t   	channels[MAX_CHANNELS];
 sound_t		ambient_sfx[NUM_AMBIENTS];

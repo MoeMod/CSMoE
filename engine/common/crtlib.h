@@ -153,7 +153,6 @@ void Cmd_ForwardToServer( void );
 //
 // crtlib.c
 //
-
 #define Q_strupr( in, out ) Q_strnupr( in, out, 99999 )
 void Q_strnupr( const char *in, char *out, size_t size_out );
 #define Q_strlwr( in, out ) Q_strnlwr( in, out, 99999 )
@@ -209,7 +208,7 @@ static inline int Q_strlen(const char* str)
 }
 #endif
 #define copystring( s ) _copystring( host.mempool, s, __FILE__, __LINE__ )
-char *_copystring( byte *mempool, const char *s, const char *filename, int fileline );
+char *_copystring( mempool_t *mempool, const char *s, const char *filename, int fileline );
 qboolean Q_isdigit( const char *str );
 #ifndef XASH_SKIPCRTLIB
 int Q_atoi( const char *str );
@@ -355,14 +354,14 @@ void _Q_memmove( void *dest, const void *src, size_t count, const char *filename
 //
 // zone.c
 //
-void *_Mem_Realloc( byte *poolptr, void *memptr, size_t size, const char *filename, int fileline );
-void *_Mem_Alloc( byte *poolptr, size_t size, const char *filename, int fileline );
-byte *_Mem_AllocPool( const char *name, const char *filename, int fileline );
-void _Mem_FreePool( byte **poolptr, const char *filename, int fileline );
-void _Mem_EmptyPool( byte *poolptr, const char *filename, int fileline );
+void *_Mem_Realloc( mempool_t *poolptr, void *memptr, size_t size, const char *filename, int fileline );
+void *_Mem_Alloc( mempool_t *poolptr, size_t size, const char *filename, int fileline );
+mempool_t *_Mem_AllocPool( const char *name, const char *filename, int fileline );
+void _Mem_FreePool( mempool_t **poolptr, const char *filename, int fileline );
+void _Mem_EmptyPool( mempool_t *poolptr, const char *filename, int fileline );
 void _Mem_Free( void *data, const char *filename, int fileline );
 void _Mem_Check( const char *filename, int fileline );
-qboolean Mem_IsAllocatedExt( byte *poolptr, void *data );
+qboolean Mem_IsAllocatedExt( mempool_t *poolptr, void *data );
 void Mem_PrintList( size_t minallocationsize );
 void Mem_PrintStats( void );
 
