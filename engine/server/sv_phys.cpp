@@ -505,7 +505,7 @@ SV_ClipVelocity
 Slide off of the impacting object
 ==================
 */
-int SV_ClipVelocity( vec3_t in, vec3_t normal, vec3_t out, float overbounce )
+int SV_ClipVelocity( vec3_t in, vec3_t normal, vec3_t_ref out, float overbounce )
 {
 	float	backoff;
 	float	change;

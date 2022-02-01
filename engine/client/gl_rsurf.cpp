@@ -65,7 +65,7 @@ void Mod_SetOrthoBounds( float *mins, float *maxs )
 	Vector2Subtract( maxs, world_orthocenter, world_orthohalf );
 }
 
-static void BoundPoly( int numverts, float *verts, vec3_t mins, vec3_t maxs )
+static void BoundPoly( int numverts, float *verts, vec3_t_ref mins, vec3_t_ref maxs )
 {
 	int	i, j;
 	float	*v;
