@@ -14,6 +14,7 @@
 #include "globals.h"
 
 #include "bot_include.h"
+#include "player/player_mod_strategy.h"
 
 namespace sv {
 
@@ -114,6 +115,23 @@ void CCSBot::FireWeaponAtEnemy()
 								else
 									PrimaryAttack();
 							}
+						}
+					}
+					else if (IsUsingCannon())
+					{
+						const float cannonRange = 150.0f; // 50.0f
+						if (rangeToEnemy < cannonRange)
+						{
+							// since we've given ourselves away - run!
+							ForceRun(5.0s);
+
+							// if multiple enemy found, press 6
+							if (GetNearbyEnemyCount() > 2)
+							{
+								m_pModStrategy->ClientCommand("MoE_HumanSkill2");
+							}
+
+							PrimaryAttack();
 						}
 					}
 					else
@@ -411,6 +429,24 @@ bool CCSBot::IsUsingMachinegun() const
 	return false;
 }
 
+// Returns true if using cannon
+
+bool CCSBot::IsUsingCannon() const
+{
+	CBasePlayerWeapon *weapon = GetActiveWeapon();
+
+	if (weapon == NULL)
+		return false;
+
+	if (weapon->m_iId == WEAPON_CANNON || weapon->m_iId == WEAPON_Z4B_CANNONPLASMA || weapon->m_iId == WEAPON_Z4B_CANNONTIGER)
+		return true;
+
+	if(weapon->GetBotStrategy() == BOT_STRATEGY_CANNON)
+		return true;
+
+	return false;
+}
+
 // Return true if primary weapon doesn't exist or is totally out of ammo
 
 bool CCSBot::IsPrimaryWeaponEmpty() const
@@ -419,6 +455,10 @@ bool CCSBot::IsPrimaryWeaponEmpty() const
 
 	if (weapon == NULL)
 		return true;
+
+	// If cannon is reloading
+	if(weapon->m_flNextPrimaryAttack > 0.75s)
+		return false;
 
 	// check if gun has any ammo left
 	if (HasAnyAmmo(weapon))
@@ -454,6 +494,10 @@ bool CCSBot::DoEquip(CBasePlayerWeapon *gun)
 
 	// check if weapon has any ammo left
 	if (!HasAnyAmmo(gun))
+		return false;
+
+	// If cannon is reloading
+	if(gun->m_flNextPrimaryAttack > 0.75s)
 		return false;
 
 	// equip it
@@ -777,6 +821,65 @@ void CCSBot::ReloadCheck()
 		return;
 
 	Reload();
+
+	// move to cover to reload if there are enemies nearby
+	if (GetNearbyEnemyCount())
+	{
+		// avoid enemies while reloading (above 0.75 skill always hide to reload)
+		const float hideChance = 25.0f + 100.0f * GetProfile()->GetSkill();
+
+		if (!IsHiding() && RANDOM_FLOAT(0.0f, 100.0f) < hideChance)
+		{
+			constexpr auto safeTime = 5.0s;
+			if (GetTimeSinceLastSawEnemy() < safeTime)
+			{
+				PrintIfWatched("Retreating to a safe spot to reload!\n");
+				const Vector *spot = FindNearbyRetreatSpot(this, 1000.0f);
+				if (spot != NULL)
+				{
+					// ignore enemies for a second to give us time to hide
+					// reaching our hiding spot clears our disposition
+					IgnoreEnemies(10.0s);
+
+					Run();
+					StandUp();
+					Hide(spot, 0.0s);
+				}
+			}
+		}
+	}
+}
+
+void CCSBot::BackgroundReloadCheck()
+{
+	if(CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_rgpPlayerItems[ PRIMARY_WEAPON_SLOT ]))
+	{
+		if(weapon->GetBotStrategy() == BOT_STRATEGY_CANNON)
+		{
+			if(m_pActiveItem == weapon)
+			{
+				if(weapon && weapon->m_flNextPrimaryAttack > 0.75s)
+				{
+					EquipBestWeapon(true);
+				}
+				else
+				{
+					return;
+				}
+			}
+			else
+			{
+				if(weapon->m_flNextPrimaryAttack < 0.75s && GetNearbyEnemyCount())
+				{
+					EquipBestWeapon(true);
+				}
+				else
+				{
+					return;
+				}
+			}
+		}
+	}
 
 	// move to cover to reload if there are enemies nearby
 	if (GetNearbyEnemyCount())

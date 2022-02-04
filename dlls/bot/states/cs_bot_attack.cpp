@@ -212,7 +212,7 @@ void AttackState::OnUpdate(CCSBot *me)
 
 	// Knife fighting
 	// We need to pathfind right to the enemy to cut him
-	if (me->IsUsingKnife())
+	if (me->IsUsingKnife() || me->IsUsingCannon())
 	{
 		// can't crouch and hold with a knife
 		m_crouchAndHold = false;
@@ -313,6 +313,13 @@ void AttackState::OnUpdate(CCSBot *me)
 	{
 		// if we have a shotgun equipped and enemy is too far away, switch to pistol
 		const float shotgunMaxRange = 1000.0f;
+		if ((enemy->pev->origin - me->pev->origin).IsLengthGreaterThan(shotgunMaxRange))
+			me->EquipPistol();
+	}
+	else if (me->IsUsingCannon())
+	{
+		// if we have a shotgun equipped and enemy is too far away, switch to pistol
+		const float shotgunMaxRange = 400.0f;
 		if ((enemy->pev->origin - me->pev->origin).IsLengthGreaterThan(shotgunMaxRange))
 			me->EquipPistol();
 	}

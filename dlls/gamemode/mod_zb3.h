@@ -62,6 +62,7 @@ public:
 	EventDispatcher<void(CBasePlayer* who)> m_eventPickAsZombie;
 
 protected:
+	virtual void StartForceRespawn();
 	virtual void PickHero();
 	void MakeHero(CBasePlayer* p) { m_eventBecomeHero.dispatch(p); }
 	void MakePickAsZombie(CBasePlayer *p) { m_eventPickAsZombie.dispatch(p); }
@@ -124,6 +125,7 @@ class CMod_ZB3F2P : public CMod_ZombieHero
 {
 public:
 	void InstallPlayerModStrategy(CBasePlayer *) override;
+	void StartForceRespawn() override {} // no force respawn
 	void PickHero() override {} // no hero
 };
 

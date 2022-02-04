@@ -417,4 +417,14 @@ struct WeaponCrosshairData
 #define ACCURACY_MULTIPLY_BY_14 (1 << 3) // accuracy multiply to 1.4
 #define ACCURACY_MULTIPLY_BY_14_2 (1 << 4) // accuracy multiply to 1.4
 
+enum WeaponBotStrategy
+{
+	BOT_STRATEGY_NONE,
+	BOT_STRATEGY_AWP,
+	BOT_STRATEGY_SNIPER,
+	BOT_STRATEGY_KNIFE,
+	BOT_STRATEGY_MG,
+	BOT_STRATEGY_CANNON
+};
+
 #endif

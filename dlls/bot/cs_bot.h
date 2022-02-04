@@ -420,6 +420,7 @@ public:
 	bool IsSniping() const;							// return true if we are actively sniping (moving to sniper spot or settled in)
 	bool IsUsingShotgun() const;						// returns true if using a shotgun
 	bool IsUsingMachinegun() const;						// returns true if using the big 'ol machinegun
+	bool IsUsingCannon() const;						// returns true if using a shotgun
 	void ThrowGrenade(const Vector *target);				// begin the process of throwing the grenade
 	bool IsThrowingGrenade() const;						// return true if we are in the process of throwing a grenade
 	bool HasGrenade() const;						// return true if we have a grenade in our inventory
@@ -717,6 +718,7 @@ private:
 
 	void ReloadCheck();					// reload our weapon if we must
 	void SilencerCheck();					// use silencer
+	void BackgroundReloadCheck();           // cannon, etc
 
 	time_point_t m_fireWeaponTimestamp;
 

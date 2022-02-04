@@ -373,7 +373,7 @@ void CCSBot::Update()
 		{
 			if (GetEnemy() == NULL || !IsAttacking() || threat != GetEnemy())
 			{
-				if (IsUsingKnife() && IsHiding())
+				if ((IsUsingKnife() || IsUsingCannon()) && IsHiding())
 				{
 					// if hiding with a knife, wait until threat is close
 					const float knifeAttackRange = 250.0f;
@@ -556,6 +556,8 @@ void CCSBot::Update()
 	// equip silencer
 	SilencerCheck();
 
+	BackgroundReloadCheck();
+
 	// listen to the radio
 	RespondToRadioCommands();
 
@@ -663,7 +665,7 @@ void CCSBot::Update()
 	// Follow nearby humans if our co-op is high and we have nothing else to do
 	// If we were just following someone, don't auto-follow again for a short while to
 	// give us a chance to do something else.
-	EngineClock::duration earliestAutoFollowTime = 5.0s;
+	duration_t earliestAutoFollowTime = 5.0s;
 	const float minAutoFollowTeamwork = 0.4f;
 	if (ctrl->GetElapsedRoundTime() > earliestAutoFollowTime
 		&& GetProfile()->GetTeamwork() > minAutoFollowTeamwork

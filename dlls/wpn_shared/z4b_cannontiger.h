@@ -66,6 +66,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannon" , 200 }; }
 #endif
+	WeaponBotStrategy GetBotStrategy() const;
 
 public:
 	void CannonTigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

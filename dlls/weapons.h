@@ -544,7 +544,7 @@ public:
 	virtual WeaponCrosshairData GetCrosshairData(void) { return { 0, 0, 0, 0 }; }
 #endif
 
-	virtual void OnBotStrategy(CCSBot *bot) {}
+	virtual WeaponBotStrategy GetBotStrategy() const { return BOT_STRATEGY_NONE; }
 	virtual int GetPriority() { return 1; }
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
 

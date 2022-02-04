@@ -148,10 +148,12 @@ float CCannon::GetDamage()
 	return 410;
 }
 
-#ifndef CLIENT_DLL
-void CCannon::OnBotStrategy(CCSBot* bot)
+WeaponBotStrategy CCannon::GetBotStrategy() const
 {
+	return BOT_STRATEGY_CANNON;
 }
+
+#ifndef CLIENT_DLL
 
 int CCannon::GetPriority()
 {

@@ -51,6 +51,11 @@ void CCannonTiger::Precache(void)
 	m_usFire = PRECACHE_EVENT(1, "events/cannontiger.sc");
 }
 
+WeaponBotStrategy CCannonTiger::GetBotStrategy() const
+{
+	return BOT_STRATEGY_CANNON;
+}
+
 int CCannonTiger::ExtractAmmo(CBasePlayerWeapon *pWeapon)
 {
 	if (m_iDefaultAmmo)

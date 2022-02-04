@@ -355,9 +355,8 @@ void CMod_ZombieHero::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3(player, this));
 }
 
-void CMod_ZombieHero::PickZombieOrigin()
+void CMod_ZombieHero::StartForceRespawn()
 {
-	UTIL_BroadcastStuffText("mp3 loop sound/Zombi_Ambience.mp3\n");
 	m_flForceRespawnEnd = gpGlobals->time + m_iRoundTime * 0.25;
 	char szHudText[64];
 	Q_sprintf(szHudText, "病毒散布中，僵尸被致命击杀后依旧能够复活");
@@ -378,6 +377,12 @@ void CMod_ZombieHero::PickZombieOrigin()
 	textParms.fxTime = 0.1f;
 	textParms.channel = 1;
 	UTIL_HudMessageAll(textParms, szHudText);
+}
+
+void CMod_ZombieHero::PickZombieOrigin()
+{
+	UTIL_BroadcastStuffText("mp3 loop sound/Zombi_Ambience.mp3\n");
+	StartForceRespawn();
 
 	auto iNumZombies = ZombieOriginNum();
 	auto iNumPlayers = this->m_iNumTerrorist + this->m_iNumCT;
@@ -686,9 +691,9 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 	{
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
-		if(!RANDOM_LONG(0, 3))
+		if(!RANDOM_LONG(0, 10))
 		{
-			// 电锯套 25%
+			// 电锯套 10%
 			m_pPlayer->GiveNamedItem("weapon_chainsaw");
 			m_pPlayer->GiveNamedItem("weapon_infinityex2");
 			m_pPlayer->GiveNamedItem("knife_dragonsword");
@@ -696,10 +701,22 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 		}
 		else
 		{
-			// 龙炮套 75%
-			m_pPlayer->GiveNamedItem("weapon_cannon");
-			m_pPlayer->GiveNamedItem("weapon_infinityex2");
-			m_pPlayer->GiveNamedItem("knife_skullaxe");
+			// 龙炮套 90%
+			if(!RANDOM_LONG(0, 5))
+				m_pPlayer->GiveNamedItem("z4b_cannontiger");
+			else
+				m_pPlayer->GiveNamedItem("weapon_cannon");
+
+			if(!RANDOM_LONG(0, 5))
+				m_pPlayer->GiveNamedItem("z4b_infinityx");
+			else
+				m_pPlayer->GiveNamedItem("weapon_infinityex2");
+
+			if(!RANDOM_LONG(0, 5))
+				m_pPlayer->GiveNamedItem("knife_skullt9");
+			else
+				m_pPlayer->GiveNamedItem("knife_skullaxe");
+
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
