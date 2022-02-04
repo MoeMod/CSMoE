@@ -307,14 +307,8 @@ void CY21s1Jetgunmd::PrimaryAttack_FieldDamage()
 	{
 		if (!pEntity)
 			continue;
-		Vector vecDirection = (pEntity->pev->origin - m_pPlayer->pev->origin).Normalize();
 
-		TraceResult tr;
-		UTIL_TraceLine(m_pPlayer->pev->origin, pEntity->pev->origin, missile, ENT(m_pPlayer->pev), &tr);
-
-		ClearMultiDamage();
-		pEntity->TraceAttack(m_pPlayer->pev, GetDamage_PrimaryAttack_Field(), vecDirection, &tr, DMG_BULLET);
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+		pEntity->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, GetDamage_PrimaryAttack_Field(), DMG_BULLET);
 
 #ifndef CLIENT_DLL
 			MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pEntity->pev->origin);
@@ -462,11 +456,11 @@ double CY21s1Jetgunmd::GetDamage_PrimaryAttack_Instant()
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
 		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 2)
-			return 64.0;
-		else if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 1)
-			return 54.0;
-		else
 			return 44.0;
+		else if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 1)
+			return 34.0;
+		else
+			return 24.0;
 	}
 #endif
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 2)
@@ -493,11 +487,11 @@ double CY21s1Jetgunmd::GetDamage_PrimaryAttack_Field()
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
 		if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 2)
-			return 55.0;
-		else if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 1)
 			return 45.0;
-		else
+		else if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 1)
 			return 35.0;
+		else
+			return 25.0;
 	}
 #endif
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 2)

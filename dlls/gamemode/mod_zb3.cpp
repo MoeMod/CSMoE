@@ -93,6 +93,7 @@ void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	m_flGodMode = gpGlobals->time + 1s;
 	SetHero(false);
+	SetPickAsZombie(false);
 	return CPlayerModStrategy_ZB2::BecomeZombie(iEvolutionLevel);
 }
 
@@ -507,16 +508,35 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 			CBaseEntity *pEntity2 = CBaseEntity::Instance(pEntity);
 			if(pEntity2->IsPlayer())
 			{
-				char szText[256];
-				snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，本局将成为英雄！^7", STRING(pEntity->v.netname));
-				MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
-				WRITE_BYTE(ENTINDEX(pEntity));
-				WRITE_STRING(szText);
-				MESSAGE_END();
+				if (RANDOM_LONG(0, 1))
+				{
+					char szText[256];
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，本局将成为英雄！^7", STRING(pEntity->v.netname));
+					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+					WRITE_BYTE(ENTINDEX(pEntity));
+					WRITE_STRING(szText);
+					MESSAGE_END();
 
-				CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pEntity2);
-				if(!pPlayer->m_bIsZombie)
-					MakeHero(pPlayer);
+					CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity2);
+					if (!pPlayer->m_bIsZombie)
+						MakeHero(pPlayer);
+				}
+				else
+				{
+					char szText[256];
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题专属武器逆界星轮beta（去除传送版本）^7", STRING(pEntity->v.netname));
+					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+					WRITE_BYTE(ENTINDEX(pEntity));
+					WRITE_STRING(szText);
+					MESSAGE_END();
+					CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity2);
+					if (!pPlayer->m_bIsZombie)
+					{
+						DropPrimary(pPlayer);
+						pPlayer->GiveNamedItem("weapon_revivegun");
+						int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("556NatoStar", 150);
+					}
+				}
 
 				m_bHasAnswered = true;
 			}
@@ -539,10 +559,17 @@ void CMod_ZombieHero::PickHero()
 	moe::range::PlayersList list;
 	std::random_device rd;
 	std::vector<CBasePlayer *> players (list.begin(), list.end());
-	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) { return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie; }), players.end());
+	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer *player) {
+		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
+		return !player->IsAlive() || player->m_iTeam != TEAM_CT || player->m_bIsZombie || (strategy && strategy->IsHero());
+	}), players.end());
+
+	if (players.empty())
+		return;
+
 	std::shuffle(players.begin(), players.end(), rd);
 	// make heroes
-	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<int>(-1, 1)(rd) - (int)m_bHasAnswered);
+	const auto iNumHeroes = std::min(players.size(), players.size() / 10 + std::uniform_int_distribution<size_t>(0, 1)(rd));
 	if(iNumHeroes > 0)
 		std::for_each(players.begin(), players.begin() + iNumHeroes, std::bind(&CMod_ZombieHero::MakeHero, this, std::placeholders::_1));
 }

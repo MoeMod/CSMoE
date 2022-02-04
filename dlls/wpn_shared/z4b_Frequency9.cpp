@@ -81,7 +81,6 @@ public:
 		PRECACHE_SOUND("weapons/frequency9_slash1.wav");
 		PRECACHE_SOUND("weapons/frequency9_slash2.wav");
 		PRECACHE_SOUND("weapons/frequency9_wall.wav");
-		PRECACHE_SOUND("weapons/skullaxe_stab.wav");
 		PRECACHE_SOUND("weapons/thanatos5_explode3.wav");
 		PRECACHE_SOUND("weapons/frequency9_knife_wall.wav");
 		PRECACHE_SOUND("weapons/frequency9_knife_create.wav");

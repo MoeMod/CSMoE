@@ -42,6 +42,7 @@ namespace sv {
 	class CHuntbowArrow : public CBaseEntity
 	{
 	public:
+		KnockbackData GetKnockBackData() override { return { 1500.0f, 900.0f, 1000.0f, 900.0f, 0.25f }; }
 		void Spawn() override
 		{
 			Precache();

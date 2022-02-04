@@ -59,11 +59,10 @@ namespace sv {
 		PRECACHE_MODEL("models/p_janus7xmas.mdl");
 		PRECACHE_SOUND("weapons/janus7-1.wav");
 		PRECACHE_SOUND("weapons/janus7-2.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipout.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipin.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_cliplock.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_open.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_close.wav");
+		PRECACHE_SOUND("weapons/janus7xmas_clipout1.wav");
+		PRECACHE_SOUND("weapons/janus7xmas_clipout2.wav");
+		PRECACHE_SOUND("weapons/janus7xmas_clipin1.wav");
+		PRECACHE_SOUND("weapons/janus7xmas_clipin3.wav");
 
 		m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 		m_usFireJanus7xmas = PRECACHE_EVENT(1, "events/janus7xmas.sc");
@@ -441,7 +440,7 @@ namespace sv {
 		float flDamage = 33.0f;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 304.0f;
+			flDamage = 208.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 35.0f;
 #endif

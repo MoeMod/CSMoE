@@ -168,7 +168,7 @@ struct Z4B_AK47X_WeaponData
 
 			pev->scale += 0.01;
 
-			constexpr auto Frames = 33;
+			constexpr auto Frames = 8;
 			pev->frame = (static_cast<int>(pev->frame) + 1) % Frames;
 			pev->nextthink = gpGlobals->time + 45ms;
 

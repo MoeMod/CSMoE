@@ -77,6 +77,8 @@ namespace sv {
 
 			m_flTimeAppearAttack = UTIL_WeaponTimeBase() + 0.01s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.86s;
+			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.4s;
+			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.6s;
 
 			pev->classname = MAKE_STRING("d_summonknife");
 		}
@@ -84,7 +86,7 @@ namespace sv {
 		void Precache() override
 		{
 			PRECACHE_MODEL("models/ef_summoner_summoning.mdl");
-			PRECACHE_MODEL("models/ef_summoner_wing.mdl");
+			//PRECACHE_MODEL("models/ef_summoner_swing.mdl");
 
 			PRECACHE_MODEL("models/summoner.mdl");
 
@@ -133,16 +135,18 @@ namespace sv {
 
 			EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/summon_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-			pev->sequence = ANIM_SLASH1;
+			
+			pev->sequence = RANDOM_LONG(1, 4);
 
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 16, pev->sequence - 1, TRUE, FALSE);
+			//PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 16, pev->sequence - 1, TRUE, FALSE);
 
 			pev->animtime = gpGlobals->time;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.37s;
 			m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.1s;
 			m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.9s;
 
-			float flSlashDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 840;
+			//float flSlashDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 840;
+			float flSlashDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 420;
 
 			CBaseEntity* pEntity = NULL;
 			TraceResult tr;
@@ -203,7 +207,8 @@ namespace sv {
 
 		void AppearAttack()
 		{
-			float flAppearDamage = g_pModRunning->DamageTrack() == DT_NONE ? 200 : 4000;
+			//float flAppearDamage = g_pModRunning->DamageTrack() == DT_NONE ? 200 : 4000;
+			float flAppearDamage = g_pModRunning->DamageTrack() == DT_NONE ? 200 : 2000;
 
 			CBaseEntity* pEntity = NULL;
 			TraceResult tr;
@@ -262,7 +267,8 @@ namespace sv {
 
 		void HideAttack()
 		{
-			float flAHideDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 3000;
+			//float flAHideDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 3000;
+			float flAHideDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 1500;
 
 			CBaseEntity* pEntity = NULL;
 			TraceResult tr;
@@ -324,14 +330,18 @@ namespace sv {
 		{
 			pev->nextthink = gpGlobals->time + 0.01s;
 
-
-			if (m_pOwner)
+			if (!m_pOwner)
 			{
-				UTIL_SetOrigin(pev, m_pOwner->pev->origin + Vector(0, 0, m_flSummonerHeight));
-
-				pev->angles = m_pOwner->pev->angles;
-				pev->angles.x = 0;
+				m_pWeapon = NULL;
+				SetThink(nullptr);
+				UTIL_Remove(this);
 			}
+
+			UTIL_SetOrigin(pev, m_pOwner->pev->origin + Vector(0, 0, m_flSummonerHeight));
+
+			pev->angles = m_pOwner->pev->angles;
+			pev->angles.x = 0;
+
 
 			if (m_iEffectState != EFFECT_FADEOUT && m_pOwner && (!m_pOwner->IsAlive() || m_pOwner->m_bIsZombie))
 			{
@@ -387,8 +397,10 @@ namespace sv {
 
 			EMIT_SOUND_DYN(ENT(pev), CHAN_BODY, "weapons/summon_stab_fire.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-			float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 80 : 3200;
-			float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 30 : 1200;
+			//float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 80 : 3200;
+			//float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 30 : 1200;
+			float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 80 : 1600;
+			float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 30 : 600;
 			float flDistance = 4096.0;
 
 			Vector vecSrc = m_pOwner->GetGunPosition();
@@ -396,7 +408,8 @@ namespace sv {
 			vecDir = gpGlobals->v_forward;
 			vecEnd = vecSrc + vecDir * flDistance;
 	
-			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pOwner->pev), &tr);
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pOwner->pev), &tr);
+			//UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pOwner->pev), &tr);	CSO maybe use Hull
 
 			if (TheBots != NULL && tr.flFraction != 1.0f) {
 				TheBots->OnEvent(EVENT_BULLET_IMPACT, this, (CBaseEntity*)&tr.vecEndPos);
@@ -503,7 +516,7 @@ namespace sv {
 				pev->renderfx = kRenderFxNone;
 				pev->renderamt = 0;
 
-				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 17, 3, TRUE, FALSE);
+				//PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 17, 3, TRUE, FALSE);
 			}
 			else
 			{
@@ -525,6 +538,8 @@ namespace sv {
 				PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pOwner->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, m_pOwner->pev->origin + Vector(0, 0, m_flSummonerHeight), pev->origin, 0.0, 0.0, 17, 2, TRUE, FALSE);
 
 				pev->nextthink = invalid_time_point;
+				m_pOwner = NULL;
+				m_pWeapon = NULL;
 				SetThink(nullptr);
 				UTIL_Remove(this);
 				
@@ -840,15 +855,6 @@ namespace sv {
 			PRECACHE_MODEL("sprites/ef_summonr.spr");
 			PRECACHE_MODEL("sprites/ef_summonr_left.spr");
 			
-			PRECACHE_SOUND("weapons/summonknife_slash1.wav");
-			PRECACHE_SOUND("weapons/summonknife_slash2.wav");
-			PRECACHE_SOUND("weapons/summonknife_slash3.wav");
-			PRECACHE_SOUND("weapons/summonknife_slash3_exp.wav");
-
-			PRECACHE_SOUND("weapons/summonknife_slash_hit1.wav");
-			PRECACHE_SOUND("weapons/summonknife_slash_hit2.wav");
-			PRECACHE_SOUND("weapons/summonknife_slash_hit3.wav");	
-			
 			PRECACHE_SOUND("weapons/summonknife1.wav");
 			PRECACHE_SOUND("weapons/summonknife2.wav");
 			PRECACHE_SOUND("weapons/summonknife3.wav");
@@ -927,7 +933,8 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 644.0f;
+				//flDamage = 644.0f;
+				flDamage = 270.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -947,7 +954,8 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 1380.0f;
+				//flDamage = 1380.0f;
+				flDamage = 400.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -967,7 +975,8 @@ namespace sv {
 			float flDamage = 100;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2000.0f;
+				//flDamage = 2000.0f;
+				flDamage = 1000.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 3700.0f;
 #endif
@@ -979,7 +988,8 @@ namespace sv {
 			float flDamage = 115;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2300.0f;
+				//flDamage = 2300.0f;
+				flDamage = 1300.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4255.0f;
 #endif
@@ -1563,7 +1573,7 @@ namespace sv {
 		{
 		case 1:
 		{
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.9s;
 			break;
 		}
 		case 2:

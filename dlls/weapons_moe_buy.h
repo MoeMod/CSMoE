@@ -126,7 +126,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_oppovivo",      "绝地光剑",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_stormgiantx",      "骇影巨锤",    0, KNIFE_SLOT, UNASSIGNED, 80},
 	//{"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, 35},
-	//{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED },
+	{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED },
 
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, 1},
 
@@ -269,6 +269,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo_Z4[] = {
 	{"z4b_oppovivo",      "绝地光剑",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_stormgiantx",      "骇影巨锤",    0, KNIFE_SLOT, UNASSIGNED, 80},
 #endif
+
+	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, 1 },
 
 	{"weapon_m95",         "巴雷特",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 	{"weapon_wa2000",      "狂怒骑士",                4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },

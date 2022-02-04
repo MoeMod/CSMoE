@@ -272,7 +272,7 @@ float CBUFFM249::GetDamageA() const
 	float flDamage = 37.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 170.0f;
+		flDamage = 80.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 550.0f;
 #endif
@@ -284,7 +284,7 @@ float CBUFFM249::GetDamageB() const
 	float flDamage = 38.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 500.0f;
+		flDamage = 350.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 1070.0f;
 #endif

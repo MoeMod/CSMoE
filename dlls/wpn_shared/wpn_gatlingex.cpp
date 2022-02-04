@@ -34,6 +34,7 @@ namespace sv {
 		class CGatlingexProjectile : public CBaseEntity
 		{
 		public:
+			KnockbackData GetKnockBackData() override { return { 1000.0f, 1000.0f, 1000.0f, 1000.0f, 0.9f }; }
 			void Spawn() override
 			{
 				Precache();
@@ -184,29 +185,10 @@ namespace sv {
 							}
 							float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
 							flAdjustedDamage = Q_max(0, flAdjustedDamage);
+							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 
-							if (tr.flFraction == 1.0f)
-							{
-								pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-							}
-							else
-							{
-								tr.iHitgroup = HITGROUP_CHEST;
-								ClearMultiDamage();
-								pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-								ApplyMultiDamage(pevInflictor, pevAttacker);
-								CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
-								if (player && player->m_bIsZombie)
-								{
-									ApplyKnockbackData(player, player->Center() - vecSrc, { 7000.0, 7000.0, 7000.0, 7000.0, 0.01f });
-								}
-							}
+							
 
-							/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-							if (pVictim->m_bIsZombie) // Zombie Knockback...
-							{
-								ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-							}*/
 						}
 					}
 				}

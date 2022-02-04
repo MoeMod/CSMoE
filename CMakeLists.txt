@@ -80,7 +80,6 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 	add_compile_options(-Wpedantic)
-	add_compile_options(-fPIC)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

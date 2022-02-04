@@ -588,6 +588,103 @@ public:
 		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
+#ifndef CLIENT_DLL
+	hit_result_t RadiusAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
+		entvars_t* pevInflictor, entvars_t* pevAttacker)
+	{
+		TraceResult tr;
+		hit_result_t result = HIT_NONE;
+
+		vecSrc.z += 1;
+
+		if (!pevAttacker)
+			pevAttacker = pevInflictor;
+
+		Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+
+		if (tr.flFraction >= 1) {
+			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+
+			if (tr.flFraction < 1) {
+				CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+				if (!pHit || pHit->IsBSPModel()) {
+					FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
+				}
+
+				vecEnd = tr.vecEndPos;
+			}
+		}
+
+		if (tr.flFraction < 1) {
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO) {
+				const float flAdjustedDamage = flDamage;
+				tr.iHitgroup = HITGROUP_CHEST;
+				ClearMultiDamage();
+				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+				ApplyMultiDamage(pevInflictor, pevAttacker);
+			}
+
+			float flVol = 1;
+			BOOL fHitWorld = TRUE;
+			if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE) {
+				flVol = 0.1f;
+				fHitWorld = FALSE;
+			}
+
+			if (fHitWorld) {
+				TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
+				result = HIT_WALL;
+			}
+	}
+
+		CBaseEntity* pEntity = nullptr;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr) {
+			if (pEntity->pev->takedamage != DAMAGE_NO) {
+				if (pEntity->IsBSPModel())
+					continue;
+
+				if (pEntity->pev == pevAttacker)
+					continue;
+
+				Vector vecSpot = pEntity->BodyTarget(vecSrc);
+				vecSpot.z = vecEnd.z;
+				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+
+				if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
+					continue;
+
+				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict()) {
+					if (tr.fStartSolid) {
+						tr.vecEndPos = vecSrc;
+						tr.flFraction = 0;
+					}
+
+					if (tr.flFraction == 1.0f) {
+						pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+					}
+
+					Vector vecRealDir = (pEntity->pev->origin - pevAttacker->origin).Normalize();
+
+					tr.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+
+					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
+					if (player && player->m_bIsZombie)
+						ApplyKnockbackData(player, player->Center() - vecSrc, { 0, 0, 0, 0, 0.6f });
+
+					result = HIT_PLAYER;
+				}
+			}
+		}
+
+		return result;
+	}
+#endif
 	void RadiusAttack1()
 	{
 #ifndef CLIENT_DLL
@@ -595,7 +692,7 @@ public:
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetDamage(GUNKATA_MODE_B), 220, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+		switch (RadiusAttack3(vecSrc, gpGlobals->v_forward, GetDamage(GUNKATA_MODE_B), 220, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 			case HIT_PLAYER:
 			{
@@ -636,12 +733,14 @@ public:
 			CBasePlayer *player = dynamic_ent_cast<CBasePlayer *>(ent);
 			if(player && player->m_bIsZombie)
 			{
-				ApplyKnockbackData(player, player->Center() - vecSrc, { 5000, 5000, 5000, 5000, 1.0f });
+				ApplyKnockbackData(player, player->Center() - vecSrc, { 3000, 3000, 3000, 3000, 1.0f });
 				player->pev->velocity.z = +200.0f;
 			}
 		}
 #endif
 	}
+
+	
 
 	bool HasSecondaryAttack() override { return true; }
 

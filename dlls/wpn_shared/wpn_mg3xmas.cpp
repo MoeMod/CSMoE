@@ -55,7 +55,6 @@ void CMG3xmas::Precache(void)
 	PRECACHE_MODEL("models/w_mg3xmas.mdl");
 	PRECACHE_MODEL("models/p_mg3xmas.mdl");
 	PRECACHE_SOUND("weapons/mg3-1.wav");
-	PRECACHE_SOUND("weapons/mg3-2.wav");
 	PRECACHE_SOUND("weapons/mg3_clipout.wav");
 	PRECACHE_SOUND("weapons/mg3_clipin.wav");
 	PRECACHE_SOUND("weapons/mg3_cliplock.wav");

@@ -1018,13 +1018,16 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				SetAnimation(PLAYER_LARGE_FLINCH);
 			}
 
-			if (pevInflictor != pAttack->m_pActiveItem->pev)
+			if (!pevInflictor || pInflictor->IsPlayer())
+			{
+				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
+				
+			}
+			else
 			{
 				CBaseEntity* pInflictor = GetClassPtr<CBaseEntity>(pevInflictor);
 				Knockback(pAttack, pInflictor->GetKnockBackData()); // Zombie Knockback...
 			}
-			else
-				Knockback(pAttack, pAttack->m_pActiveItem->GetKnockBackData()); // Zombie Knockback...
 		}
 	}
 

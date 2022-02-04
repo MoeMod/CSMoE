@@ -263,7 +263,6 @@ public:
 		PRECACHE_SOUND("weapons/skullaxe_slash1.wav");
 		PRECACHE_SOUND("weapons/skullaxe_slash2.wav");
 		PRECACHE_SOUND("weapons/skullaxe_wall.wav");
-		PRECACHE_SOUND("weapons/skullaxe_stab.wav");
 		PRECACHE_SOUND("weapons/skullt9_skill_wind.wav");
 		PRECACHE_SOUND("weapons/skullt9_fx.wav");
 	}

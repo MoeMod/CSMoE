@@ -53,10 +53,7 @@ public:
 	int m_iMode;
 	KnockbackData GetKnockBackData() override 
 	{ 
-		if (m_iMode)
-			return { 2500, 500, 700, 600, 0.4f };
-		else
-			return { 1500, 900, 1000, 900, 0.25f };
+		return { 2500, 500, 700, 600, 0.4f };
 	}
 	const char *GetCSModelName() override { return "models/w_bow.mdl"; }
 #ifndef CLIENT_DLL

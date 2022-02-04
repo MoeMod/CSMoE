@@ -234,17 +234,7 @@ namespace sv {
 
 							if (freq == 30 || freq == 72)
 							{
-								if (tr.flFraction == 1.0f)
-								{
-									pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-								}
-								else
-								{
-									tr.iHitgroup = HITGROUP_CHEST;
-									ClearMultiDamage();
-									pEntity->TraceAttack(pevAttacker, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-									ApplyMultiDamage(pevInflictor, pevAttacker);
-								}
+								pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 							}
 							/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
 							if (pVictim->m_bIsZombie) // Zombie Knockback...
@@ -263,7 +253,7 @@ namespace sv {
 			float flDamage = 40.0f;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1500.0f;
+				flDamage = 1000.0f;
 			//flDamage = 750.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1500.0f;
@@ -980,7 +970,7 @@ float CVoidpistol::GetDamage() const
 	float flDamage = 24.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 48.0f;
+		flDamage = 78.0f;
 		//flDamage = 225.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 390.0f;
@@ -993,7 +983,7 @@ float CVoidpistol::BlackholeDamage() const
 	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 140.0f;
+		flDamage = 220.0f;
 	//flDamage = 375.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 750.0f;

@@ -55,6 +55,36 @@ enum ZombieZSkillSkillId : byte
 	Skill_ClawEnhacement,
 	Skill_SteelSkin,
 	Skill_Kangaroo,
+	Skill_HuntierInstinct, // Target targets within range periodically. Your combat ability against your target opponent is greatly increased.
+	Skill_MoneyGrubber, // Earn extra dollars at the start of the round. It is provided separately from the dollar rewards resulting from the combat.
+	Skill_SkillEvolution, // Zombie skill reuse time is reduced.
+	Skill_LifePlunder, // When you infected a human, you and your allies will recover HP.
+	Skill_Craftsmanship, // When you use the same firearm continuously, the damage of the firearm increases. (Based on weapons when zombies appeared)	
+	Skill_PurchasingPower, // The more dollars you have, the more damage you do.
+	Skill_Elite, // As the number of humans decreases, the damageand movement rate increases.
+	Skill_PenetratingRounds, // The penetration rate of the shot is increased. The effect can not be applied to firearms that can not penetrate.
+	Skill_Revenge, // Automatically throw a zombie bomb in the direction you look before dying as a zombie.
+	Skill_ZombieBombGiveaway, // Receive a zombie bomb in every round.
+	Skill_Intellectual, // Gain experience when killing zombies or infecting humans.
+	Skill_BombDefense, // Damage and knockback received from zombie bombs is reduced. The reduced damage and knockback is applied to all zombie bombs.
+	Skill_SupplyContamination, // Allows you to place Zombie Grenade on human Supply Boxes by pressing E. When a human approaches a bombed supply box, the Zombie Grenade will explode.
+	Skill_PainfulMemories, // For one round, marks the last player who killed you. You'll take less damage from the marked player.
+	Skill_Mutant,	// Zombie gains another common zombie skill. Skills have a random chance.	No
+	Skill_FuriouslyFast,	// When a zombie's health is below a certain level, movement speed is increased, stiffness and knockback are reduced.	No
+	Skill_Liberator,	// Creates a stack each time it infects a human. Each stack increases resistance to stiffness, knockback attacks, movement speed, and restores health.	No
+	Skill_AggressiveInvestment,	// Gets a bonus dollar from the infected target. This will be paid in addition to the existing reward.	No
+	Skill_PoisonousCloud,	// When a zombie dies, a deadly gas is created. Humans who come into contact with the gas take damage. Zombies can regenerate health when they come into contact with the gas.	No
+	Skill_HookBomb,	// Pull targets damaged by hitting or detonating a zombie bomb a certain distance.	No
+	Skill_Fetch,	// If you deal damage with a zombie bomb, 1 zombie dog is created.	Yes
+	Skill_Darkness,	// You can be reborn as a Darkness Zombie. Darkness Zombies have limited performance.	No
+	Skill_QuickChange,	// Increases weapon swap speed.	Yes
+	Skill_NetRound,	// Your attack has a low chance to fire a net round. Enemies hit by the grenade are limited to movement for a short time.	Yes
+	Skill_EmergencyEscape,	// Escape from the brink of deathand escape into the air.Upon escaping, you become temporarily invincible.No
+	Skill_GlassCannon,	// Instead of just increasing your damage, you also take increased damage.	No
+	Skill_DoubleImpact,	// Low chance to apply damage once more.	Yes
+	Skill_BusyLife,	// Attack power is increased when skills cannot be used. Accelerated mutation and skills during cooldown do not apply.	No
+	Skill_EarlyAdopter,	// All unlock levels are reduced by 1.	No
+	Skill_DiscountCoupon,	// All purchases using dollars are discounted.
 };
 
 enum ZBZMessageType : byte

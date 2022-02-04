@@ -4373,11 +4373,11 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    {
       if (!CheckEntityRecentlyInPVS (hostnum, e, gpGlobals->time))
       {
-         if (!ENGINE_CHECK_VISIBILITY (ent, pSet))
+         if (!ENGINE_CHECK_VISIBILITY(ent, pSet))   //这里禁用掉检测是否在“可能可见的区域内”
          {
             MarkEntityInPVS (hostnum, e, invalid_time_point, false);
             return 0;
-         }
+         } 
 
          MarkEntityInPVS (hostnum, e, gpGlobals->time, true);
       }

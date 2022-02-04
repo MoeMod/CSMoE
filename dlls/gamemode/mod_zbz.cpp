@@ -488,6 +488,37 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 	return true;
 }
 
+void CPlayerModStrategy_ZBZ::Event_OnPickAsZombie(CBasePlayer* who)
+{
+	if (m_pPlayer != who)
+		return;
+
+	SetPickAsZombie(true);
+
+	if (!CheckSkill(Skill_SixthSense))
+		return;
+
+	char szHudText[64];
+	Q_sprintf(szHudText, "您已被感染，可在[变异阶段]使用[E]键变成僵尸");
+
+	hudtextparms_t textParms;
+	textParms.x = -1.0f;
+	textParms.y = 0.3f;
+	textParms.effect = 2;
+	textParms.r1 = 200;
+	textParms.g1 = 200;
+	textParms.b1 = 50;
+	textParms.r2 = 255;
+	textParms.g2 = 255;
+	textParms.b2 = 255;
+	textParms.fadeinTime = 0.1f;
+	textParms.fadeoutTime = 1.5f;
+	textParms.holdTime = 3.0f;
+	textParms.fxTime = 0.1f;
+	textParms.channel = 1;
+	UTIL_HudMessage(m_pPlayer, textParms, szHudText);
+}
+
 void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random_seed)
 {
 	auto& bitsCurButton = cmd->buttons;
@@ -503,13 +534,31 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 		}
 	}
 
-	if (bitsCurButton & ~bitsOldButton & IN_USE && m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
+	if (bitsCurButton & ~bitsOldButton & IN_USE)
 	{
-		UpgradeSkill();
+		if (m_pPlayer->IsAlive() && !m_pPlayer->m_bIsZombie && IsPickAsZombie() && CheckSkill(Skill_SixthSense))
+		{
+			auto iNumZombies = m_pModZBZ->ZombieOriginNum();
+			auto iNumPlayers = m_pModZBZ->m_iNumTerrorist + m_pModZBZ->m_iNumCT;
+
+			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->pev->sequence = 0;
+			m_pPlayer->m_iCustomSequence = -1;
+			m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+			m_pPlayer->pev->armorvalue = 1100;
+			m_pModZBZ->TeamCheck();
+
+			// sound effect
+			m_pModZBZ->InfectionSound();
+			m_pModZBZ->CheckWinConditions();
+		}
+		else if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
+			UpgradeSkill();
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnButtonEvent, bitsCurButton, bitsOldButton);
-	return CPlayerModStrategy_ZB1::CmdStart(cmd, random_seed);
+	return CPlayerModStrategy_ZB2::CmdStart(cmd, random_seed);
 }
 
 void CPlayerModStrategy_ZBZ::OnResetMaxSpeed() {
@@ -540,6 +589,8 @@ void CPlayerModStrategy_ZBZ::ClientPutInServer()
 	moe::range::PlayersList list;
 	for (CBasePlayer* player : list)
 	{
+		if (m_pPlayer == player)
+			continue;
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
 		if (!strategy) continue;
 		if(strategy->m_iLevel < iMinLevel)

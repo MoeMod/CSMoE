@@ -999,7 +999,7 @@ void EV_WpnEffects(event_args_s* args)
 				1.0
 			);
 		}
-
+		
 		break;
 	}
 	case EVENT_SUMMONER_SLASH:
@@ -1045,7 +1045,7 @@ void EV_WpnEffects(event_args_s* args)
 				}
 			};
 		}
-		break;
+	break;
 	}
 	case EVENT_SUMMONER:
 	{
@@ -1054,12 +1054,12 @@ void EV_WpnEffects(event_args_s* args)
 		case 0:
 		{
 			//appear
-			idx = gEngfuncs.GetLocalPlayer()->index;
+			idx = args->entindex;
 			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(idx);
 			if (!pPlayer)
 				return;
 
-			 model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_summon01.spr", false);
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_summoner_summon01.spr", false);
 
 			if (pModel)
 			{
@@ -1151,7 +1151,7 @@ void EV_WpnEffects(event_args_s* args)
 		}
 		case 1:
 		{
-			//appear
+			//appear Trash
 			idx = gEngfuncs.GetLocalPlayer()->index;
 			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(idx);
 			if (!pPlayer)
@@ -1214,7 +1214,7 @@ void EV_WpnEffects(event_args_s* args)
 		case 2:
 		{
 			//hide
-			idx = gEngfuncs.GetLocalPlayer()->index;
+			idx = args->entindex;
 			cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(idx);
 			if (!pPlayer)
 				return;
@@ -1317,128 +1317,131 @@ void EV_WpnEffects(event_args_s* args)
 		default:
 			break;
 		}
-		break;
+	break;
 	}
 	case EVENT_REVIVEGUN:
 	{
-		if (args->bparam2)
+		if (EV_IsLocal(args->entindex))
 		{
-			model_s* pModel;
-
-			char pModelName[128];
-
-			if (args->iparam2)
+			if (args->bparam2)
 			{
-				//draw
-				if (args->bparam1)
-				{
-					if (!gHUD.cl_righthand->value)
-						sprintf(pModelName, "sprites/ef_revivegun_draw2_left.spr");
-					else
-						sprintf(pModelName, "sprites/ef_revivegun_draw2.spr");
-				}
-				else
-				{
-					if (!gHUD.cl_righthand->value)
-						sprintf(pModelName, "sprites/ef_revivegun_draw1_left.spr");
-					else
-						sprintf(pModelName, "sprites/ef_revivegun_draw1.spr");
-				}
+				model_s* pModel;
 
-			}
-			else
-			{
-				if (args->bparam1)
-				{
-					if (!gHUD.cl_righthand->value)
-						sprintf(pModelName, "sprites/ef_revivegun_idle2_left.spr");
-					else
-						sprintf(pModelName, "sprites/ef_revivegun_idle2.spr");
-				}
-				else
-				{
-					if (!gHUD.cl_righthand->value)
-						sprintf(pModelName, "sprites/ef_revivegun_idle1_left.spr");
-					else
-						sprintf(pModelName, "sprites/ef_revivegun_idle1.spr");
-				}
-			}
-
-			pModel = IEngineStudio.Mod_ForName(pModelName, false);
-			if (pModel)
-			{
-				cl_entity_t* viewent = gEngfuncs.GetViewModel();
-				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], pModel);
-
-				if (!pEnt)
-					return;
-
-				if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
-					viewent->curstate.skin = 0;
+				char pModelName[128];
 
 				if (args->iparam2)
 				{
-					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-					pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-					pEnt->entity.curstate.framerate = 30.0f;
-					pEnt->entity.curstate.aiment = viewent->index;
-					pEnt->entity.curstate.body = 6;
-					pEnt->frameMax = 31;
+					//draw
+					if (args->bparam1)
+					{
+						if (!gHUD.cl_righthand->value)
+							sprintf(pModelName, "sprites/ef_revivegun_draw2_left.spr");
+						else
+							sprintf(pModelName, "sprites/ef_revivegun_draw2.spr");
+					}
+					else
+					{
+						if (!gHUD.cl_righthand->value)
+							sprintf(pModelName, "sprites/ef_revivegun_draw1_left.spr");
+						else
+							sprintf(pModelName, "sprites/ef_revivegun_draw1.spr");
+					}
 
-					pEnt->entity.curstate.solid = SOLID_NOT;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderfx = kRenderFxNone;
-					pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-					pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
-
-					pEnt->die = gHUD.m_flTime + 1.0;
-					pEnt->entity.curstate.iuser1 = viewent->index;
-					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
 				}
 				else
 				{
-					pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
-					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-					pEnt->entity.curstate.framerate = 30.0f;
-					pEnt->entity.curstate.aiment = viewent->index;
-					pEnt->entity.curstate.body = 6;
-					pEnt->frameMax = args->bparam1 ? 47 : 45;
-
-					pEnt->entity.curstate.solid = SOLID_NOT;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderfx = kRenderFxNone;
-					pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
-					pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
-					pEnt->entity.curstate.iuser2 = args->bparam1;
-
-					pEnt->die = gHUD.m_flTime + (args->bparam1 ? 1.77f : 1.7f);
-					pEnt->entity.curstate.iuser1 = viewent->index;
-					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
-
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-						cl_entity_t* viewent = gEngfuncs.GetViewModel();
-
-						if (viewent)
-						{
-							if (pEnt->entity.curstate.iuser2)
-							{
-								if (viewent->curstate.sequence == 7 || viewent->curstate.sequence < 5)
-									pEnt->die = gHUD.m_flTime;
-							}
-							else
-							{
-								if (viewent->curstate.sequence == 1 || viewent->curstate.sequence > 6)
-									pEnt->die = gHUD.m_flTime;
-							}
-						}
-					};
+					if (args->bparam1)
+					{
+						if (!gHUD.cl_righthand->value)
+							sprintf(pModelName, "sprites/ef_revivegun_idle2_left.spr");
+						else
+							sprintf(pModelName, "sprites/ef_revivegun_idle2.spr");
+					}
+					else
+					{
+						if (!gHUD.cl_righthand->value)
+							sprintf(pModelName, "sprites/ef_revivegun_idle1_left.spr");
+						else
+							sprintf(pModelName, "sprites/ef_revivegun_idle1.spr");
+					}
 				}
-			}
 
+				pModel = IEngineStudio.Mod_ForName(pModelName, false);
+				if (pModel)
+				{
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[5], pModel);
+
+					if (!pEnt)
+						return;
+
+					if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
+						viewent->curstate.skin = 0;
+
+					if (args->iparam2)
+					{
+						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+						pEnt->flags |= FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP;
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						pEnt->entity.curstate.framerate = 30.0f;
+						pEnt->entity.curstate.aiment = viewent->index;
+						pEnt->entity.curstate.body = 6;
+						pEnt->frameMax = 31;
+
+						pEnt->entity.curstate.solid = SOLID_NOT;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderfx = kRenderFxNone;
+						pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+						pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
+
+						pEnt->die = gHUD.m_flTime + 1.0;
+						pEnt->entity.curstate.iuser1 = viewent->index;
+						pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+					}
+					else
+					{
+						pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+						pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+						pEnt->entity.curstate.framerate = 30.0f;
+						pEnt->entity.curstate.aiment = viewent->index;
+						pEnt->entity.curstate.body = 6;
+						pEnt->frameMax = args->bparam1 ? 47 : 45;
+
+						pEnt->entity.curstate.solid = SOLID_NOT;
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderfx = kRenderFxNone;
+						pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+						pEnt->entity.curstate.scale = args->bparam1 ? 0.04f : 0.03f;
+						pEnt->entity.curstate.iuser2 = args->bparam1;
+
+						pEnt->die = gHUD.m_flTime + (args->bparam1 ? 1.77f : 1.7f);
+						pEnt->entity.curstate.iuser1 = viewent->index;
+						pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+
+						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+							cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+							if (viewent)
+							{
+								if (pEnt->entity.curstate.iuser2)
+								{
+									if (viewent->curstate.sequence == 7 || viewent->curstate.sequence < 5)
+										pEnt->die = gHUD.m_flTime;
+								}
+								else
+								{
+									if (viewent->curstate.sequence == 1 || viewent->curstate.sequence > 6)
+										pEnt->die = gHUD.m_flTime;
+								}
+							}
+						};
+					}
+				}
+
+			}
 		}
 		break;
 	}

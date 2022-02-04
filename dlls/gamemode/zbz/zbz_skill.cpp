@@ -911,6 +911,64 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_SixthSense : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SixthSense(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "第六感"; }
+		const char* GetDesc() const override { return "可以感知母体僵尸的出现。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnThink() override {
+			if (!IsActivate())
+				return;
+
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy && strategy->IsPickAsZombie())
+				return;
+
+			if (m_flNextThink > gpGlobals->time)
+				return;
+
+			m_flNextThink = gpGlobals->time + 0.5s;
+			
+			moe::range::PlayersList list;
+			std::vector<CBasePlayer*> players{ list.begin(), list.end() };
+			players.erase(std::remove_if(players.begin(), players.end(), [=](CBasePlayer* player) {
+				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(player->m_pModStrategy.get());
+				if (strategy && strategy->IsPickAsZombie() && player->IsAlive() && (player->pev->origin - m_pPlayer->pev->origin).IsLengthLessThan(250))
+				{
+					return false;
+				}
+				return true;
+			}), players.end());
+
+			if (players.empty())
+				return;
+
+			char szHudText[64];
+			Q_sprintf(szHudText, "感知到周围存在生化病毒感染体！");
+
+			hudtextparms_t textParms;
+			textParms.x = -1.0f;
+			textParms.y = 0.3f;
+			textParms.effect = 2;
+			textParms.r1 = 200;
+			textParms.g1 = 200;
+			textParms.b1 = 50;
+			textParms.r2 = 255;
+			textParms.g2 = 255;
+			textParms.b2 = 255;
+			textParms.fadeinTime = 0.1f;
+			textParms.fadeoutTime = 0.1f;
+			textParms.holdTime = 0.5f;
+			textParms.fxTime = 0.1f;
+			textParms.channel = 1;
+			UTIL_HudMessage(m_pPlayer, textParms, szHudText);
+		}
+	private:
+		time_point_t m_flNextThink;
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -951,6 +1009,7 @@ namespace sv {
 		{ Skill_ContactInfection, 5, MakeSkill<ZSkill_ContactInfection> },
 
 		{ Skill_GeneBooster, 100, MakeSkill<ZSkill_GeneBooster> },
+		{ Skill_SixthSense, 100, MakeSkill<ZSkill_SixthSense> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;
