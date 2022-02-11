@@ -41,7 +41,7 @@ CZombieClass_Flying::CZombieClass_Flying(CBasePlayer *player, ZombieLevel iEvolu
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->pev->gravity = 0.65f;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -69,21 +69,85 @@ void CZombieClass_Flying::InitHUD() const
 
 void CZombieClass_Flying::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 334;
+		m_pPlayer->pev->gravity = 0.55f;
+	}
+
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
+	
 }
 
 float CZombieClass_Flying::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
+	flDamage *= 1.3;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 bool CZombieClass_Flying::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
-	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+	if (m_pZombieSkill2->GetStatus() == SKILL_STATUS_USING)
+	{
+		if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		{
+			return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 3.f * 0.7f,
+				kbd.flNotOnGround * 2.f * 0.7f,
+				kbd.flFlying * 2.f * 0.7f,
+				kbd.flDucking * 3.f * 0.7f,
+				Q_max(kbd.flVelocityModifier, 0.2f),
+				});
+		}
+
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 2.4f * 0.7f,
+				kbd.flNotOnGround * 1.7f * 0.7f,
+				kbd.flFlying * 1.7f * 0.7f,
+				kbd.flDucking * 2.4f * 0.7f,
+				Q_max(kbd.flVelocityModifier, 0.2f),
+			});
+	}
+
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 3.f,
+			kbd.flNotOnGround * 2.f,
+			kbd.flFlying * 2.f,
+			kbd.flDucking * 3.f,
+			kbd.flVelocityModifier * 0.9f,
+			});
+	}
+
+	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 2.4f,
+			kbd.flNotOnGround * 1.7f,
+			kbd.flFlying * 1.7f,
+			kbd.flDucking * 2.4f,
+			kbd.flVelocityModifier * 0.9f,
+		});
 }
 
 void CZombieClass_Flying::Pain_Zombie(int m_LastHitGroup, bool HasArmour)

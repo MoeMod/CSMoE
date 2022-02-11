@@ -48,8 +48,9 @@ public:
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
+	static constexpr float ArmorRatioModifier = 1.7f;
 	static constexpr const char *AnimExtension = "katana";
-	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 0.6f };
+	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f };
 
 private:
 	int m_iAttackRecord; // iAttackRecord
@@ -190,7 +191,7 @@ public:
 		float flDamage = iType ? 50 : 770;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 2.0f;
+			flDamage *= 1.3f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -209,7 +210,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 3.0f;	//4.5
+			flDamage *= 2.0f;	//4.5
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -813,7 +814,12 @@ public:
 
 					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
 					if (player && player->m_bIsZombie)
-						ApplyKnockbackData(player, player->Center() - vecSrc, { 0, 0, 0, 0, 0.8f });
+					{
+						Vector vecDir = (player->pev->origin - pevAttacker->origin);
+						vecDir.z = 0;
+
+						ApplyKnockbackData(player, vecDir, { 0.0, 1.0, 1.0, 0.0, 0.0f });
+					}
 
 					result = HIT_PLAYER;
 				}
@@ -1043,7 +1049,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 150;	//380 original
+			flDamage = 90;	//380 original
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 380;
 #endif

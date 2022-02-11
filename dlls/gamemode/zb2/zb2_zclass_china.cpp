@@ -69,7 +69,34 @@ void CZombieClass_China::InitHUD() const
 
 void CZombieClass_China::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 285;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 285;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 328;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+
+	if (m_pZombieSkill)
+		m_pZombieSkill->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_China::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const

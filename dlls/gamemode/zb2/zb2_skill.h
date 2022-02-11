@@ -347,7 +347,7 @@ protected:
 		m_flPlayerAnimTime = invalid_time_point;
 	}
 
-	int m_bIsflying = 0;;
+	int m_bIsflying = 0;
 	ZombieFlyingSkillStatus m_iFlyingState;
 	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
 	EngineClock::time_point m_flTimeStartFlying = invalid_time_point;
@@ -431,6 +431,7 @@ public:
 	void Think() override;
 	void Activate() override;
 	void OnSkillEnd() override;
+	void ResetMaxSpeed() override;
 	void FireZombieSkill();
 
 protected:
@@ -470,6 +471,7 @@ public:
 public:
 	void Activate() override;
 	void OnSkillEnd() override;
+	void ResetMaxSpeed() override;
 
 protected:
 	duration_t GetDurationTime() const;
@@ -503,6 +505,40 @@ public:
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
+};
+
+enum ZombieDashSkillStatus
+{
+	DASH_START,
+	DASH_LOOP,
+	DASH_END,
+};
+
+class CZombieSkill_ZombieDash : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieDash(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void ResetMaxSpeed() override;
+	void FireZombieSkill();
+	void DashAttack();
+	bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr);
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	void Reset() override
+	{
+		m_SkillStatus = DASH_END;
+	}
+
+	ZombieDashSkillStatus m_SkillStatus = DASH_END;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
 };
 
 

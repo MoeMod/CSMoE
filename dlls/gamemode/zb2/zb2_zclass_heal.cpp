@@ -40,8 +40,8 @@ CZombieClass_Heal::CZombieClass_Heal(CBasePlayer *player, ZombieLevel iEvolution
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -70,9 +70,30 @@ void CZombieClass_Heal::InitHUD() const
 void CZombieClass_Heal::ResetMaxSpeed() const
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
 		m_pPlayer->pev->maxspeed = 280;
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
 	else
-		m_pPlayer->pev->maxspeed = 290;
+	{
+		m_pPlayer->pev->maxspeed = 333;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Heal::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
@@ -98,7 +119,7 @@ bool CZombieClass_Heal::ApplyKnockback(CBasePlayer* attacker, const KnockbackDat
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
 
 	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 1.0f,
+			kbd.flOnGround * 0.9f,
 			kbd.flNotOnGround * 0.9f,
 			kbd.flFlying * 0.9f,
 			kbd.flDucking * 0.9f,

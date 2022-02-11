@@ -41,8 +41,8 @@ CZombieClass_Resident::CZombieClass_Resident(CBasePlayer *player, ZombieLevel iE
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -70,7 +70,34 @@ void CZombieClass_Resident::InitHUD() const
 
 void CZombieClass_Resident::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 300;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 300;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 330;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 345;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+
+	if (m_pZombieSkill)
+		m_pZombieSkill->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Resident::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const

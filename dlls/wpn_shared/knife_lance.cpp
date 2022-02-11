@@ -31,6 +31,8 @@ namespace sv {
 	class CLanceFountainFieldAttack : public CBaseEntity
 	{
 	public:
+		KnockbackData GetKnockBackData() override { return { 0.0f, 1.0f, 1.0f, 0.0f, 0.1f }; }
+
 		void Spawn() override
 		{
 			Precache();
@@ -451,7 +453,7 @@ namespace sv {
 			float flDamage = 30;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 552.0f;
+				flDamage = 332.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1240.0f;
 #endif
@@ -462,7 +464,7 @@ namespace sv {
 			float flDamage = 70;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1700.0f;
+				flDamage = 900.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage *= 3600.0f;
 #endif
@@ -473,7 +475,7 @@ namespace sv {
 			float flDamage = 4;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 210.0f;
+				flDamage = 110.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 240.0f;
 #endif
@@ -484,7 +486,7 @@ namespace sv {
 			float flDamage = 35;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1150.0f;
+				flDamage = 850.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1280.0f;
 #endif
@@ -495,7 +497,7 @@ namespace sv {
 			float flDamage = 95;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1600.0f;
+				flDamage = 1100.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4900.0f;
 #endif
@@ -794,7 +796,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 			RadiusDamage3(vecOrigin, pev, m_pPlayer->pev, Slash3ExpDamage(), 140, CLASS_MACHINE, DMG_NEVERGIB | DMG_BULLET, 0, 0, 0, 1, 0, 2);
-			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
 #endif			
 			FakeKnockBack();
 			m_iActSlash3 = 0;

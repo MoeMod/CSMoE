@@ -134,6 +134,7 @@ namespace sv {
 		m_pPlayer->pev->renderfx = kRenderFxGlowShell;
 		m_pPlayer->pev->rendercolor = { 255,0,0 };
 		m_pPlayer->pev->renderamt = 1;
+	
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 105;
 		m_pPlayer->ResetMaxSpeed();
 
@@ -156,7 +157,27 @@ namespace sv {
 	void CZombieSkill_ZombieCrazy::ResetMaxSpeed()
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			m_pPlayer->pev->maxspeed = 390;
+		{
+			m_pPlayer->pev->maxspeed = 415;
+			if (m_pPlayer->m_ZombieClass != NULL)
+			{
+				if (!stricmp(m_pPlayer->m_ZombieClass, "flying"))
+				{
+					m_pPlayer->pev->maxspeed = 395;
+					m_pPlayer->pev->gravity = 0.55;
+				}
+				if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
+				{
+					m_pPlayer->pev->maxspeed = 350;
+					m_pPlayer->pev->gravity = 0.6;
+				}
+				if (!stricmp(m_pPlayer->m_ZombieClass, "tank"))
+				{
+					m_pPlayer->pev->maxspeed = 415;
+					m_pPlayer->pev->gravity = 0.7;
+				}
+			}
+		}
 	}
 
 	void CZombieSkill_ZombieCrazy::OnSkillEnd()
@@ -165,6 +186,7 @@ namespace sv {
 
 		m_pPlayer->pev->renderfx = kRenderFxNone;
 		m_pPlayer->pev->rendercolor = { 255,255,255 };
+
 		m_pPlayer->pev->renderamt = 16;
 		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
 		m_pPlayer->ResetMaxSpeed();
@@ -198,6 +220,16 @@ namespace sv {
 
 	float CZombieSkill_ZombieCrazy::GetDamageRatio() const
 	{
+		if (m_pPlayer->m_ZombieClass != NULL)
+		{
+			if (!stricmp(m_pPlayer->m_ZombieClass, "flying"))
+				return 2.0;
+			if (!stricmp(m_pPlayer->m_ZombieClass, "pass"))
+				return 0.9;
+			if (!stricmp(m_pPlayer->m_ZombieClass, "tank"))
+				return 1.5;
+		}
+
 		return 1.0f;
 	}
 
@@ -281,8 +313,6 @@ namespace sv {
 		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
 		m_flInvisiable = gpGlobals->time + 0.5s;
 
-		
-		m_pPlayer->pev->gravity = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 0.8 : 0.64;
 		/*m_pPlayer->pev->rendermode = kRenderTransAlpha;
 		m_pPlayer->pev->renderfx = kRenderFxNone;
 		m_pPlayer->pev->renderamt = 35;
@@ -303,14 +333,13 @@ namespace sv {
 	void CZombieSkill_ZombieHide::ResetMaxSpeed()
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			m_pPlayer->pev->maxspeed = m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 180 : 250;
+			m_pPlayer->pev->maxspeed = 180.0f;
 	}
 
 	void CZombieSkill_ZombieHide::OnSkillEnd()
 	{
 		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
 
-		m_pPlayer->pev->gravity = 0.64;
 		m_pPlayer->pev->renderamt = 255.0;
 		m_pPlayer->pev->skin = 0;
 		m_pPlayer->ResetMaxSpeed();
@@ -337,7 +366,7 @@ namespace sv {
 	float CZombieSkill_ZombieHide::GetDamageRatio() const
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 1.1 : 1.0;
+			return 2.0;
 		return 1.0f;
 	}
 
@@ -387,12 +416,6 @@ namespace sv {
 		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 		m_flTimeZombieSkillEffect = gpGlobals->time + 3.0s;
-		switch (m_pPlayer->m_iZombieLevel)
-		{
-		case ZOMBIE_LEVEL_HOST: m_pPlayer->pev->gravity = 0.71; break;
-		case ZOMBIE_LEVEL_ORIGIN: m_pPlayer->pev->gravity = 0.7; break;
-		case ZOMBIE_LEVEL_ORIGIN_LV2: m_pPlayer->pev->gravity = 0.69; break;
-		}
 
 		m_pPlayer->pev->renderfx = kRenderFxGlowShell;
 		m_pPlayer->pev->rendercolor = { 255,0,0 };
@@ -413,7 +436,22 @@ namespace sv {
 	void CZombieSkill_ZombieCrazy2::ResetMaxSpeed()
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			m_pPlayer->pev->maxspeed = 300;
+		{
+			m_pPlayer->pev->gravity = 0.7;
+			if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+			{
+				m_pPlayer->pev->maxspeed = 192;
+
+			}
+			else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+			{
+				m_pPlayer->pev->maxspeed = 215;
+			}
+			else
+			{
+				m_pPlayer->pev->maxspeed = 225;
+			}
+		}
 	}
 
 	void CZombieSkill_ZombieCrazy2::OnSkillEnd()
@@ -462,8 +500,6 @@ namespace sv {
 
 	float CZombieSkill_ZombieCrazy2::GetDamageRatio() const
 	{
-		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			return 0.85f;
 		return 1.0f;
 	}
 
@@ -1718,7 +1754,7 @@ namespace sv {
 					m_iFlyingState = SKILL_END;
 					break;
 				}
-				m_pPlayer->pev->gravity = 0.6;
+				m_pPlayer->pev->gravity = 0.55;
 				if (m_flPlayerAnimTime < gpGlobals->time)
 				{
 					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_idle");
@@ -1774,7 +1810,7 @@ namespace sv {
 			}
 			case DOWNHILL_END:
 			{
-				m_pPlayer->pev->gravity = 0.7;
+				m_pPlayer->ResetMaxSpeed();
 				m_bIsflying = 0;
 				break;
 			}
@@ -1796,7 +1832,7 @@ namespace sv {
 				WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 				MESSAGE_END();
 
-				m_pPlayer->pev->gravity = 0.7;
+				m_pPlayer->ResetMaxSpeed();
 				m_bIsflying = 0;
 				break;
 			}
@@ -1805,7 +1841,7 @@ namespace sv {
 
 		if (m_iFlyingState < DOWNHILL_START && m_iFlyingState > FLY_START && m_pPlayer->pev->flags & FL_ONGROUND)
 		{
-			m_pPlayer->pev->gravity = 0.7;
+			m_pPlayer->ResetMaxSpeed();
 			m_iFlyingState = SKILL_END;
 		}
 
@@ -1910,8 +1946,6 @@ namespace sv {
 
 	float CZombieSkill_ZombieFlying::GetDamageRatio() const
 	{
-		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			return 0.0f;
 		return 1.0f;
 	}
 
@@ -2003,7 +2037,10 @@ namespace sv {
 	void CZombieSkill_ZombieRevival::ResetMaxSpeed()
 	{
 		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
-			m_pPlayer->pev->maxspeed = 210;
+		{
+			m_pPlayer->pev->maxspeed = 200;
+			m_pPlayer->pev->gravity = 0.7f;
+		}
 	}
 
 	duration_t CZombieSkill_ZombieRevival::GetDurationTime() const
@@ -2405,7 +2442,6 @@ namespace sv {
 			return;
 		}
 
-	
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
@@ -2445,7 +2481,13 @@ namespace sv {
 	{
 		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
 
-		m_pPlayer->pev->gravity = 0.7;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void CZombieSkill_ZombieJumpUp::ResetMaxSpeed()
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			m_pPlayer->pev->gravity = 0.4f;
 	}
 
 	duration_t CZombieSkill_ZombieJumpUp::GetDurationTime() const
@@ -2455,7 +2497,7 @@ namespace sv {
 
 	void CZombieSkill_ZombieJumpUp::FireZombieSkill()
 	{
-		m_pPlayer->pev->gravity = 0.4f;
+		m_pPlayer->ResetMaxSpeed();
 		m_flTimeTriggerZombieSkill = invalid_time_point;
 	}
 
@@ -2615,7 +2657,7 @@ namespace sv {
 		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 
-		m_pPlayer->pev->gravity = 0.54f;
+		m_pPlayer->ResetMaxSpeed();
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
@@ -2626,11 +2668,36 @@ namespace sv {
 
 	}
 
+	void CZombieSkill_ZombieJumpUpM::ResetMaxSpeed()
+	{
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+		{
+			if (m_pPlayer->m_ZombieClass != NULL)
+			{
+				if (!stricmp(m_pPlayer->m_ZombieClass, "speed"))
+				{
+					if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+						m_pPlayer->pev->gravity = 0.5;
+					else
+						m_pPlayer->pev->gravity = 0.55;
+				}
+				if (!stricmp(m_pPlayer->m_ZombieClass, "booster"))
+				{
+					m_pPlayer->pev->gravity = 0.55;
+				}
+				if (!stricmp(m_pPlayer->m_ZombieClass, "witch"))
+				{
+					m_pPlayer->pev->gravity = 0.6;
+				}
+			}
+		}
+	}
+
 	void CZombieSkill_ZombieJumpUpM::OnSkillEnd()
 	{
 		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
 
-		m_pPlayer->pev->gravity = 0.7;
+		m_pPlayer->ResetMaxSpeed();
 	}
 
 	duration_t CZombieSkill_ZombieJumpUpM::GetDurationTime() const
@@ -2773,5 +2840,259 @@ namespace sv {
 	duration_t CZombieSkill_ZombieStrengthRecovery::GetCooldownTime() const
 	{
 		return 30.0s;
+	}
+
+	//ZS_Deimos2 Zombie
+	CZombieSkill_ZombieDash::CZombieSkill_ZombieDash(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieDash::Think()
+	{
+		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
+		{
+			if(m_SkillStatus == DASH_START)
+				FireZombieSkill();
+			
+			if (m_SkillStatus == DASH_LOOP)
+			{
+				DashAttack();
+				m_flTimeTriggerZombieSkill = gpGlobals->time + 0.2s;
+			}
+		}
+
+		//if (m_SkillStatus == DASH_LOOP)
+		//{
+		//	m_pPlayer->pev->velocity.z = -200.0;	//avoid jump
+		//}
+
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombieDash::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "You can no longer use [Bloody Blade]. It can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+	
+		if (FBitSet(m_pPlayer->pev->flags, FL_ONGROUND) && !FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+		{
+			if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
+			{
+				m_iZombieSkillStatus = SKILL_STATUS_USING;
+				m_SkillStatus = DASH_START;
+				m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+				m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
+				if (pWeapon)
+				{
+					pWeapon->SendWeaponAnim(2, TRUE);
+					pWeapon->m_flTimeWeaponIdle = 1.0s;
+				}
+
+				m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 94;
+				m_pPlayer->m_flNextAttack = 2.0s;
+
+				EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_VOICE, "zombi/boss_dash.wav", 1.0, ATTN_NORM, 0, PITCH_NORM);
+
+				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("zbs_skill_dash");
+				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.9s;
+
+				m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+				m_flTimeTriggerZombieSkill = gpGlobals->time + 0.65s;
+
+				m_pPlayer->ResetMaxSpeed();
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+				WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+				WRITE_BYTE(ZOMBIE_SKILL_CRAZY2);
+				WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+				WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+				MESSAGE_END();
+			}
+		}
+		else
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "无法在空中或者下蹲状态冲刺"); // 
+			return;
+		}
+		
+		
+	}
+
+	void CZombieSkill_ZombieDash::DashAttack()
+	{
+		Vector vecSrc, vecEnd;
+		TraceResult tr;
+		CBaseEntity* pEntity = NULL;
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+
+		vecSrc = m_pPlayer->GetGunPosition();
+
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		float c = cos(180.0 * 0.5 * M_PI / 180.0);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_pPlayer->pev->origin, 95.0)) != NULL)
+		{
+			if (pEntity == m_pPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (!AngleCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 95, c, &tr))
+				continue;
+
+			ClearMultiDamage();
+
+			pEntity->TraceAttack(m_pPlayer->pev, 440, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_EXPLOSION | DMG_NEVERGIB);
+
+			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			Vector2D vecKickRateDir = (pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+			pEntity->pev->velocity.x = vecKickRateDir.x * 800;
+			pEntity->pev->velocity.y = vecKickRateDir.y * 800;
+			pEntity->pev->velocity.z = 300.0;
+
+			ClientPrint(pEntity->pev, HUD_PRINTCENTER, "fuck you");
+		}
+	}
+
+	bool CZombieSkill_ZombieDash::AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
+	{
+		if (pEntity->IsBSPModel())
+		{
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
+
+			if (ptr->flFraction < 1.0)
+			{
+				if (ptr->pHit)
+				{
+					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+					if (pHit && pHit == pEntity)
+						return true;
+				}
+			}
+		}
+		else
+		{
+			UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+			if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+			{
+				UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
+
+				return true;
+			}
+			else
+			{
+				Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+				if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
+				{
+					edict_t* peAttacker = pAttacker->edict();
+
+					for (int i = 5; i > 0; i--)
+					{
+						UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+						if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+							return false;
+
+						CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+						if (ptr->flFraction < 1.0 || pHit == pEntity)
+							return true;
+
+						if (pHit->IsBSPModel())
+							return false;
+
+						vecSrc = ptr->vecEndPos + vecDir * 5.0;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	void CZombieSkill_ZombieDash::OnSkillEnd()
+	{
+		m_pPlayer->pev->fov = m_pPlayer->m_iFOV = 90;
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+		m_SkillStatus = DASH_END;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void CZombieSkill_ZombieDash::ResetMaxSpeed()
+	{
+		if (m_SkillStatus == DASH_START)
+		{
+			m_pPlayer->pev->gravity = 10.0;
+			m_pPlayer->pev->maxspeed = 1;
+		}
+
+		if (m_SkillStatus == DASH_LOOP)
+		{
+			m_pPlayer->pev->maxspeed = 415;
+		}
+	}
+
+	duration_t CZombieSkill_ZombieDash::GetDurationTime() const
+	{
+		return 1.5s;
+	}
+
+	void CZombieSkill_ZombieDash::FireZombieSkill()
+	{
+		m_SkillStatus = DASH_LOOP;
+		m_pPlayer->ResetMaxSpeed();
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+		Vector vecDir = gpGlobals->v_forward;
+
+		m_pPlayer->pev->velocity = vecDir * 2500;
+
+		m_pPlayer->m_flVelocityModifier = 1.0;
+
+		m_flTimeTriggerZombieSkill = gpGlobals->time + 0.35s;
+	}
+
+	duration_t CZombieSkill_ZombieDash::GetCooldownTime() const
+	{
+		switch (m_pPlayer->m_iZombieLevel)
+		{
+		case ZOMBIE_LEVEL_HOST: return 15.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN: return 10.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: return 10.0s; break;
+		}
 	}
 }

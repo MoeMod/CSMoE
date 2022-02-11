@@ -40,8 +40,7 @@ CZombieClass_Deimos2::CZombieClass_Deimos2(CBasePlayer *player, ZombieLevel iEvo
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.85f;
+	m_pPlayer->pev->armorvalue = 1000;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -70,19 +69,42 @@ void CZombieClass_Deimos2::InitHUD() const
 void CZombieClass_Deimos2::ResetMaxSpeed() const
 {
 	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
 		m_pPlayer->pev->maxspeed = 275;
+		m_pPlayer->pev->gravity = 0.85f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 308;
+		m_pPlayer->pev->gravity = 0.75f;
+	}
 	else
-		m_pPlayer->pev->maxspeed = 280;
+	{
+		m_pPlayer->pev->maxspeed = 322;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
+
+
 }
 
 float CZombieClass_Deimos2::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	if (m_pZombieSkill->GetStatus() != SKILL_STATUS_USING)
 		flDamage *= 0.7;
-	else
-		flDamage *= 0.65;
+
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -91,13 +113,38 @@ bool CZombieClass_Deimos2::ApplyKnockback(CBasePlayer *attacker, const Knockback
 	// knife knockback
 	m_iCrazySkillStatus = m_pZombieSkill->GetStatus();
 	if (m_iCrazySkillStatus == SKILL_STATUS_USING)
-			return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 0.05f,
-			kbd.flNotOnGround * 0.05f,
-			kbd.flFlying * 0.05f,
-			kbd.flDucking * 0.05f,
-			Q_max(kbd.flVelocityModifier, 0.8f),
+	{
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+		0.0f,
+		0.0f,
+		0.0f,
+		0.0f,
+		1.0f,
 			});
+		/*if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+			return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 0.12f * 0.6f,
+				kbd.flNotOnGround * 0.35f * 0.6f,
+				kbd.flFlying * 0.35f * 0.6f,
+				kbd.flDucking * 0.12f * 0.6f,
+				Q_max(kbd.flVelocityModifier, 0.8f),
+				});
+
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 0.08f * 0.55f,
+				kbd.flNotOnGround * 0.3f * 0.55f,
+				kbd.flFlying * 0.3f * 0.55f,
+				kbd.flDucking * 0.08f * 0.55f,
+				Q_max(kbd.flVelocityModifier, 0.8f),
+			});*/
+	}
+			//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			//kbd.flOnGround * 0.05f,
+			//kbd.flNotOnGround * 0.05f,
+			//kbd.flFlying * 0.05f,
+			//kbd.flDucking * 0.05f,
+			//Q_max(kbd.flVelocityModifier, 0.8f),
+			//});
 
 	/*if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 	{

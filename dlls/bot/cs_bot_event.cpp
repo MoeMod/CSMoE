@@ -282,6 +282,12 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
 							ClientCommand("BTE_ZombieSkill2");
 					}
+					else if (!stricmp(this->m_ZombieClass, "zbs_deimos2"))
+					{
+						skillUseRange = 3000;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+							ClientCommand("BTE_ZombieSkill1");
+					}
 					else
 						ClientCommand("BTE_ZombieSkill1");
 						

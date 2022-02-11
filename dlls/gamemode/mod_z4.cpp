@@ -601,7 +601,11 @@ namespace sv {
 				}
 			}, zclass);
 			auto data2 = { data.flOnGround * ratio, data.flNotOnGround * ratio, data.flFlying * ratio, data.flDucking * ratio, velocitymodifier };
-			ApplyKnockbackData(m_pPlayer, m_pPlayer->pev->origin - attacker->pev->origin, data);
+
+			Vector vecDir = m_pPlayer->pev->origin - attacker->pev->origin;
+			vecDir.z = 0;
+
+			ApplyKnockbackData(m_pPlayer, vecDir, data);
 			return true;
 		}
 		void ResetMaxSpeed() const override

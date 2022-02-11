@@ -132,6 +132,31 @@ public:
 		human->m_tSlowdown = gpGlobals->time + value;
 		m_pPlayer->ResetMaxSpeed();
 	}
+
+	void SetStunSpeedTime(duration_t value) {
+		if (!m_pCharacter_ZB2)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CBaseZombieClass_ZB2>(m_pCharacter_ZB2);
+		if (!zombie)
+			return;
+
+		zombie->m_tStunSpeedTime = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void SetStunGravityTime(duration_t value) {
+		if (!m_pCharacter_ZB2)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CBaseZombieClass_ZB2>(m_pCharacter_ZB2);
+		if (!zombie)
+			return;
+
+		zombie->m_tStunGravityTime = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
 };
 
 }

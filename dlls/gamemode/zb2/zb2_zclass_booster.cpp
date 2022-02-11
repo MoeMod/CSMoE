@@ -40,8 +40,8 @@ CZombieClass_Booster::CZombieClass_Booster(CBasePlayer *player, ZombieLevel iEvo
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -69,19 +69,60 @@ void CZombieClass_Booster::InitHUD() const
 
 void CZombieClass_Booster::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 300;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 330;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 345;
+		m_pPlayer->pev->gravity = 0.55f;
+	}
+
+	if (m_pZombieSkill2)
+		m_pZombieSkill2->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Booster::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
+	flDamage *= 1.5;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 bool CZombieClass_Booster::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
-	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 3.0f,
+			kbd.flNotOnGround * 2.0f,
+			kbd.flFlying * 2.0f,
+			kbd.flDucking * 3.0f,
+			kbd.flVelocityModifier * 0.9f,
+			});
+
+	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 2.4f,
+			kbd.flNotOnGround * 1.7f,
+			kbd.flFlying * 1.7f,
+			kbd.flDucking * 2.4f,
+			kbd.flVelocityModifier * 0.9f,
+		});
 }
 
 void CZombieClass_Booster::Pain_Zombie(int m_LastHitGroup, bool HasArmour)

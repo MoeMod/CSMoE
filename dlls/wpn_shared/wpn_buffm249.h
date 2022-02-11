@@ -37,6 +37,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override;
+	float GetArmorRatioModifier() override { return 1.5; }
 	const char *GetCSModelName() override { return "models/w_buffm249.mdl"; }
 #ifndef CLIENT_DLL
 		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50az" , 600 }; }

@@ -51,6 +51,7 @@ public:
 	const char *GetCSModelName() override { return "models/w_chainsaw.mdl"; }
 	float GetPrimaryAttackDamage() const;
 	float GetSecondaryAttackDamage() const;
+	float GetArmorRatioModifier() override { return 1.8; }
 	void AddKickRate(CBasePlayer *pPlayer ,Vector vecSrc, float amount, float boost);
 #ifndef CLIENT_DLL
 #include "weapons/KnifeAttack.h"

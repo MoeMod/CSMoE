@@ -70,6 +70,17 @@ CZombie_ZB1::CZombie_ZB1(CBasePlayer *player, ZombieLevel iEvolutionLevel) : Bas
 void CZombie_ZB1::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 290;
+	m_pPlayer->pev->gravity = 0.8f;
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 void CZombie_ZB1::DeathSound_Zombie()

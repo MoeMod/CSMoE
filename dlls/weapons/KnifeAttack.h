@@ -17,6 +17,7 @@ GNU General Public License for more details.
 
 #ifndef CLIENT_DLL
 #include "monsters.h"
+#include <dlls/gamemode/mod_zb2.h>
 
 namespace sv {
 
@@ -304,11 +305,17 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 								CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 								if (target->m_bIsZombie && target->m_ZombieClass)
 								{
-									if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+									/*if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
 									{
 										target->pev->velocity.x = 0;
 										target->pev->velocity.y = 0;
 										target->m_flVelocityModifier = 0.3;
+									}*/
+									auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(target->m_pModStrategy.get());
+									if (strategy)
+									{
+										strategy->SetStunSpeedTime(1.0s);
+										strategy->SetStunGravityTime(1.0s);
 									}
 								}
 							}
@@ -346,12 +353,19 @@ KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 							if (target->m_bIsZombie && target->m_ZombieClass)
 							{
-								if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(target->m_pModStrategy.get());
+								if (strategy)
+								{
+									strategy->SetStunSpeedTime(2.0s);
+									strategy->SetStunGravityTime(2.0s);
+								}
+
+								/*if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
 								{
 									target->pev->velocity.x = 0;
 									target->pev->velocity.y = 0;
 									target->m_flVelocityModifier = 0.3;
-								}
+								}*/
 							}
 						}
 						break;

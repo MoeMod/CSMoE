@@ -40,8 +40,7 @@ CZombieClass_Default::CZombieClass_Default(CBasePlayer *player, ZombieLevel iEvo
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->pev->armorvalue = 1000;
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -69,15 +68,38 @@ void CZombieClass_Default::InitHUD() const
 
 void CZombieClass_Default::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.72f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 334;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Default::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
-		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -91,6 +113,26 @@ bool CZombieClass_Default::ApplyKnockback(CBasePlayer* attacker, const Knockback
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
 		
 	}*/
+
+	if (m_pZombieSkill->GetStatus() == SKILL_STATUS_USING)
+	{
+		if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+			return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 0.7f,
+				kbd.flNotOnGround * 0.7f,
+				kbd.flFlying * 0.7f,
+				kbd.flDucking * 0.7f,
+				Q_max(kbd.flVelocityModifier, 0.55f),
+				});
+
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+				kbd.flOnGround * 0.7f * 0.7f,
+				kbd.flNotOnGround * 0.75f * 0.7f,
+				kbd.flFlying * 0.75f * 0.7f,
+				kbd.flDucking * 0.7f * 0.7f,
+				Q_max(kbd.flVelocityModifier, 0.55f),
+			});
+	}
 
 	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);

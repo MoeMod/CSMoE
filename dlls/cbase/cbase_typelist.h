@@ -407,6 +407,7 @@ TL_ADD(CPlasmaGrenade)
 TL_ADD(CSummoner)
 TL_ADD(CSummonKnifeCannon)
 TL_ADD(CKnifeBalrog9)
+TL_ADD(CZBZFireBall)
 #endif
 
 TL_END(AllEntityTypeList)

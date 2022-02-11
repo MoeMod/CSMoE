@@ -236,11 +236,6 @@ namespace sv {
 							{
 								pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 							}
-							/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-							if (pVictim->m_bIsZombie) // Zombie Knockback...
-							{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-							}*/
 						}
 					}
 				}

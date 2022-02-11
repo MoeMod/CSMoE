@@ -107,7 +107,7 @@ BOOL CFrequency1::Deploy(void)
 
 	if (m_flTimeHostler != invalid_time_point)
 	{
-		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.3s;
+		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] += (gpGlobals->time - m_flTimeHostler) / 0.25s;
 	}
 	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] >= 100)
 		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = 100;
@@ -750,7 +750,7 @@ void CFrequency1::ItemPostFrame()
 		if (m_flTimeNextCharge <= gpGlobals->time)
 		{
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
-			m_flTimeNextCharge = gpGlobals->time + 0.3s;
+			m_flTimeNextCharge = gpGlobals->time + 0.25s;
 
 			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] == 100)
 				EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "weapons/skullt9_fx.wav", VOL_NORM, ATTN_NORM, 0, 94);
@@ -782,7 +782,7 @@ float CFrequency1::GetDamage1() const
 	float flDamage = 56.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 280.0f;
+		flDamage = 400.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 350.0f;
 #endif
@@ -794,7 +794,7 @@ float CFrequency1::GetDamage2() const
 	float flDamage = 40.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 190.0f;
+		flDamage = 260.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 280.0f;
 #endif
@@ -806,7 +806,7 @@ float CFrequency1::GetDamage3() const
 	float flDamage = 70.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 480.0f;
+		flDamage = 600.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 280.0f;
 #endif
@@ -816,7 +816,7 @@ float CFrequency1::GetDamage3() const
 float CFrequency1::GetMaxSpeed(void)
 {
 	if (m_iUsingSkill)
-		return 200.0;
+		return 180.0;
 
 	return 250.0;
 }

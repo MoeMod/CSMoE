@@ -62,7 +62,7 @@ namespace sv {
 			m_iSprEffect = PRECACHE_MODEL("sprites/laserbeam.spr");
 		}
 
-		KnockbackData GetKnockBackData()
+		KnockbackData GetKnockBackData() override
 		{
 			return { 2000.0f, 1250.0f, 1000.0f, 1750.0f, 1.0f };
 		}
@@ -184,12 +184,6 @@ namespace sv {
 
 						if (!pEntity->IsPlayer())
 							continue;
-
-						CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-						if (pVictim->m_bIsZombie) // Zombie Knockback...
-						{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, { 800.0f, 800.0, 800.0f, 800.0f, 0.5f });
-						}
 					}
 				}
 			}

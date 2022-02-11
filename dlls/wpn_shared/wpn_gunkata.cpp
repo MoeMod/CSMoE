@@ -675,7 +675,12 @@ public:
 
 					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
 					if (player && player->m_bIsZombie)
-						ApplyKnockbackData(player, player->Center() - vecSrc, { 0, 0, 0, 0, 0.6f });
+					{
+						Vector vecDir = (player->pev->origin - pevAttacker->origin);
+						vecDir.z = 0;
+
+						ApplyKnockbackData(player, vecDir, { 0, 0, 0, 0, 0.8f });
+					}
 
 					result = HIT_PLAYER;
 				}
@@ -733,6 +738,9 @@ public:
 			CBasePlayer *player = dynamic_ent_cast<CBasePlayer *>(ent);
 			if(player && player->m_bIsZombie)
 			{
+				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+				vecDir.z = 0;
+
 				ApplyKnockbackData(player, player->Center() - vecSrc, { 3000, 3000, 3000, 3000, 1.0f });
 				player->pev->velocity.z = +200.0f;
 			}

@@ -569,6 +569,9 @@ void EV_WpnEffects(event_args_s* args)
 	}
 	case EVENT_LANCE:
 	{
+		if (!EV_IsLocal(idx))
+			return;
+
 		model_s* pModel;
 		pModel = IEngineStudio.Mod_ForName("sprites/ef_lance_cockpung.spr", false);
 		if (pModel)
@@ -1375,8 +1378,8 @@ void EV_WpnEffects(event_args_s* args)
 					if (!pEnt)
 						return;
 
-					if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
-						viewent->curstate.skin = 0;
+					/*if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
+						viewent->curstate.skin = 0;*/
 
 					if (args->iparam2)
 					{

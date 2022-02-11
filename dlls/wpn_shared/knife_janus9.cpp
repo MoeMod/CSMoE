@@ -50,7 +50,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "sfsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f };
+		KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.6f };
 
 	public:
 

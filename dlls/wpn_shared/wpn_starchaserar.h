@@ -50,6 +50,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556natostar" , 200 }; }
 #endif
+	float GetArmorRatioModifier() override { return 1.4; }
 	Vector Get_ShootPosition(CBaseEntity *pevAttacker, Vector vecSrc);
 	float GetDamage() const;
 	int m_iShell;

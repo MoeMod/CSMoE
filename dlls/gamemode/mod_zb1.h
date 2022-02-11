@@ -131,6 +131,30 @@ public:
 	virtual void BecomeHuman();
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
+
+	void SetStunSpeedTime(duration_t value) {
+		if (!m_pCharacter)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CZombie_ZB1>(m_pCharacter);
+		if (!zombie)
+			return;
+
+		zombie->m_tStunSpeedTime = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	void SetStunGravityTime(duration_t value) {
+		if (!m_pCharacter)
+			return;
+
+		auto zombie = std::dynamic_pointer_cast<CZombie_ZB1>(m_pCharacter);
+		if (!zombie)
+			return;
+
+		zombie->m_tStunGravityTime = gpGlobals->time + value;
+		m_pPlayer->ResetMaxSpeed();
+	}
 };
 
 }

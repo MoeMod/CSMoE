@@ -288,7 +288,7 @@ public:
 	void MakeDormant(void);
 	int IsDormant(void);
 	BOOL IsLockedByMaster(void) { return FALSE; }
-	virtual KnockbackData GetKnockBackData() { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
+	virtual KnockbackData GetKnockBackData() { return { 0.0f, 1.0f, 1.0f, 0.0f, 0.0f }; }
 
 public:
 	static CBaseEntity *Instance(edict_t *pent) { return GET_PRIVATE<CBaseEntity>(pent ? pent : ENT(0)); }

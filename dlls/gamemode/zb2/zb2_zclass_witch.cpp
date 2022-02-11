@@ -41,8 +41,8 @@ CZombieClass_Witch::CZombieClass_Witch(CBasePlayer *player, ZombieLevel iEvoluti
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -70,12 +70,40 @@ void CZombieClass_Witch::InitHUD() const
 
 void CZombieClass_Witch::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 333;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+
+	if (m_pZombieSkill2)
+		m_pZombieSkill2->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Witch::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	flDamage *= 0.65f;
+	flDamage *= 1.2;
+
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -95,7 +123,7 @@ bool CZombieClass_Witch::ApplyKnockback(CBasePlayer *attacker, const KnockbackDa
 			kbd.flNotOnGround * 1.1f,
 			kbd.flFlying * 1.1f,
 			kbd.flDucking * 1.1f,
-			kbd.flVelocityModifier * 1.0f,
+			kbd.flVelocityModifier * 0.85f,
 			});
 
 	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
@@ -103,7 +131,7 @@ bool CZombieClass_Witch::ApplyKnockback(CBasePlayer *attacker, const KnockbackDa
 			kbd.flNotOnGround * 0.9f,
 			kbd.flFlying * 0.75f,
 			kbd.flDucking * 0.9f,
-			kbd.flVelocityModifier * 1.0f,
+			kbd.flVelocityModifier * 0.85f,
 	});
 }
 

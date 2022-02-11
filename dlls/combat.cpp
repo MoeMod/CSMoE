@@ -1293,9 +1293,10 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 								WRITE_BYTE(1);
 								MESSAGE_END();
 
-								target->m_flVelocityModifier = 0.05;
+								//need stun
+								/*target->m_flVelocityModifier = 0.05;
 								if(target->m_bIsZombie && target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
-									target->m_flVelocityModifier = 1.0;
+									target->m_flVelocityModifier = 1.0;*/
 								break;
 							}
 						}

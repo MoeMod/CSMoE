@@ -103,6 +103,7 @@ protected:
 public:
 	bool CheckSkill(ZombieZSkillSkillId id) const { return m_setSkillID.find(id) != m_setSkillID.end(); }
 	void SetRoundStartAddLevel(bool value) { m_bRoundStartAddLevel = value; }
+	void AddExp(int exp);
 
 private:
 	CMod_ZombieZ* const m_pModZBZ;
@@ -115,7 +116,6 @@ private:
 	float m_flSufferDamage;
 	float m_flExpScale;
 	bool m_bRoundStartAddLevel;
-	void AddExp(int exp);
 	void AddLevel(int lv);
 	void SetLevel(int lv);
 	bool UpgradeSkill();

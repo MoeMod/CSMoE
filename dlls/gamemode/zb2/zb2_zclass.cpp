@@ -42,6 +42,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_stamper.h"
 #include "zb2_zclass_resident.h"
 #include "zb2_zclass_witch.h"
+#include "zb2_zclass_zbs_deimos2.h"
 #include <random>
 
 namespace sv {
@@ -68,7 +69,8 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"revival", 20, MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
 		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
-		{"witch", 100, MakeZombieClass<CZombieClass_Witch> }
+		{"witch", 100, MakeZombieClass<CZombieClass_Witch> },
+		{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> }
 		//{"nemesis", 100, MakeZombieClass<CZombieClass_Nemesis>}
 };
 
@@ -148,6 +150,20 @@ void CBaseZombieClass_ZB2::Think()
 		m_pZombieSkill->Think();
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->Think();
+
+	if (m_tStunGravityTime != invalid_time_point && m_tStunGravityTime <= gpGlobals->time)
+	{
+		m_tStunGravityTime = invalid_time_point;
+		m_pPlayer->ResetMaxSpeed();
+	}
+
+	if (m_tStunSpeedTime != invalid_time_point && m_tStunGravityTime <= gpGlobals->time)
+	{
+		m_tStunSpeedTime = invalid_time_point;
+		m_pPlayer->ResetMaxSpeed();
+		m_pPlayer->m_flVelocityModifier = m_pPlayer->pev->maxspeed / 100.0;
+	}
+
 	return CZombie_ZB1::Think();
 }
 

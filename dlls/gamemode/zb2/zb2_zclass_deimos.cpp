@@ -41,8 +41,8 @@ CZombieClass_Deimos::CZombieClass_Deimos(CBasePlayer *player, ZombieLevel iEvolu
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.85f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -70,13 +70,35 @@ void CZombieClass_Deimos::InitHUD() const
 
 void CZombieClass_Deimos::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.85f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.75f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 333;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Deimos::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
-		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 

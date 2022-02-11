@@ -44,11 +44,11 @@ public:
 	KnockbackData GetKnockBackData() override
 	{
 		if (pev->iuser1)
-			return { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			return { 250.0f, 150.0f, 200.0f, 100.0f, 0.8f };
 		else
 			return { 450.0f, 350.0f, 400.0f, 300.0f, 0.3f };		
 	}
-	float GetArmorRatioModifier() override { return 1.2; }
+	float GetArmorRatioModifier() override { return 1.6; }
 
 public:
 	duration_t m_flNextRunIdle;

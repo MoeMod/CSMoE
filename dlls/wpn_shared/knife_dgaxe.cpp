@@ -254,11 +254,6 @@ namespace sv {
 									}
 								}
 							}
-							/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-							if (pVictim->m_bIsZombie) // Zombie Knockback...
-							{
-							ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-							}*/
 						}				
 					}
 				}
@@ -489,7 +484,7 @@ namespace sv {
 			float flDamage = 45;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage *= 4.0f;
+				flDamage *= 3.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage *= 3.5f;
 #endif
@@ -588,14 +583,14 @@ namespace sv {
 		switch (m_iDamageType)
 		{
 		case DGAXE_PRIMARYATTACK:  return { 1.0f, 1.0f, 1.0f, 1.0f, 0.4f };
-		case DGAXE_SECONDARYATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
+		case DGAXE_SECONDARYATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.9f }; }
 		case DGAXE_COMBOATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
 		case DGAXE_SKILL1ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.1f }; }
 		case DGAXE_SKILL2ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
 		default:
 			break;
 		}
-		{ return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
+		{ return { 1.0f, 1.0f, 1.0f, 1.0f, 0.9f }; }
 	}
 
 	void CKnifeDgaxe::PrimaryAttack(void)
@@ -629,15 +624,11 @@ namespace sv {
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
-
-		TraceResult tr;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		m_iDamageType = DGAXE_PRIMARYATTACK;
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 130, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 180, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 		case HIT_NONE:
 		{
@@ -700,15 +691,11 @@ namespace sv {
 		BOOL fDidHit = FALSE;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
-
-		TraceResult tr;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 		m_iDamageType = DGAXE_SECONDARYATTACK;
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 130, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 180, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 		case HIT_NONE:
 		{
@@ -757,7 +744,7 @@ namespace sv {
 		m_iDamageType = DGAXE_COMBOATTACK;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
-		Vector vecEnd = vecSrc + gpGlobals->v_forward * 115;
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * 220;
 
 		SetThink(&CKnifeDgaxe::Guard);
 		pev->nextthink = gpGlobals->time + 1.17s;

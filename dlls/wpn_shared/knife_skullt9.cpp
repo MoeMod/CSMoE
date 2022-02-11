@@ -133,26 +133,7 @@ namespace sv {
 								ClearMultiDamage();
 								pEntity->TraceAttack(pAttackePlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 								ApplyMultiDamage(pevInflictor, pAttackePlayer->pev);
-							}
-
-							if (pEntity->IsPlayer())
-							{
-								CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-								if (target->m_bIsZombie && target->m_ZombieClass)
-								{
-									if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
-									{
-										Vector2D vecDir2D = (target->pev->origin.Make2D() - pAttackePlayer->pev->origin.Make2D()).Normalize();
-
-										target->pev->velocity.x = vecDir2D.x * 600;
-										target->pev->velocity.y = vecDir2D.y * 600;
-										target->pev->velocity.z = 310;
-
-										target->m_flVelocityModifier = 1.0;
-
-									}
-								}
-							}			
+							}	
 						}
 					}
 				}
@@ -227,7 +208,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
-	KnockbackData KnockBack = { .0f, .0f, .0f, .0f, 1.0f };
+	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.0f };
 
 public:
 
@@ -275,13 +256,13 @@ public:
 		m_iSwing = 0;
 		m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 		m_pPlayer->m_bShieldDrawn = false;
-		/*
+		
 #ifndef CLIENT_DLL
 		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
 		WRITE_BYTE(2);
 		WRITE_BYTE(m_CrossHairState);
 		MESSAGE_END();
-#endif*/
+#endif
 
 		if (m_flTimeholster != invalid_time_point)
 		{
@@ -301,6 +282,9 @@ public:
 	BOOL CanDrop() override { return false; }
 
 public:
+#ifndef CLIENT_DLL
+	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack);
+#endif
 	void DelayPrimaryAttack();
 	void DelaySecondaryAttack();
 	float GetPrimaryAttackDamage() const
@@ -308,7 +292,7 @@ public:
 		float flDamage = 100;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 17.5f;
+			flDamage *= 20.5f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 9760.0f;
 #endif
@@ -436,16 +420,10 @@ void CKnifeSkullT9::SecondaryAttack(void)
 void CKnifeSkullT9::DelayPrimaryAttack()
 {
 	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
-
-	TraceResult tr;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
 	m_iSwing++;
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 95, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack(GetPrimaryAttackDamage(), 95, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, true))
 	{
 	case HIT_NONE:
 	{
@@ -483,15 +461,8 @@ void CKnifeSkullT9::DelayPrimaryAttack()
 void CKnifeSkullT9::DelaySecondaryAttack()
 {
 	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 48;
-
-	TraceResult tr;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 75, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 75, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, false))
 	{
 	case HIT_NONE:
 	{
@@ -516,7 +487,11 @@ void CKnifeSkullT9::DelaySecondaryAttack()
 
 	if (m_iUseSkill)
 	{
-		vecEnd = vecSrc + gpGlobals->v_forward * 8192;
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecSrc = m_pPlayer->GetGunPosition();
+		TraceResult tr;
+
+		Vector vecEnd = vecSrc + gpGlobals->v_forward * 8192;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 		CSkullT9Storm* pEnt = static_cast<CSkullT9Storm*>(CBaseEntity::Create("skullt9_storm", tr.vecEndPos, { 0,0,0 }, ENT(m_pPlayer->pev)));
 		if (pEnt)
@@ -551,6 +526,103 @@ BOOL CKnifeSkullT9::IsSignal()
 #endif
 	return TRUE;
 }
+
+#ifndef CLIENT_DLL
+hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack)
+{
+	CBaseEntity* pEntity = NULL;
+	hit_result_t result = HIT_NONE;
+	TraceResult tr;
+	UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+	Vector vecEnd;
+	Vector vecSrc = pAttackPlayer->GetGunPosition();
+
+	Vector vecForward = gpGlobals->v_forward;
+	Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+	float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity == pAttackPlayer)
+			continue;
+
+		if (pEntity->IsDormant())
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+			continue;
+
+		float flRatio = 1.0;
+
+		if (pEntity && pEntity->IsPlayer())
+		{
+			UTIL_MakeVectors(pEntity->pev->angles);
+
+			if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				flRatio = 3.0;
+		}
+
+		pAttackPlayer->m_iWeaponVolume = 128;
+
+		ClearMultiDamage();
+
+		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+		result = HIT_PLAYER;
+
+		if (pEntity->IsPlayer())
+		{
+			CBasePlayer* player = (CBasePlayer*)pEntity;
+
+			if (player->m_bIsZombie)
+			{
+				Vector vecDir = (player->pev->origin - pev->origin);
+				vecDir.z = 0;
+				if (!IsPrimaryAttack)
+				{
+					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					{
+						Vector2D vecDir2D = (player->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+						player->pev->velocity.x = vecDir2D.x * 600;
+						player->pev->velocity.y = vecDir2D.y * 600;
+						player->pev->velocity.z = 310;
+
+						player->m_flVelocityModifier = 1.0;
+					}
+				}
+			}
+		}
+	}
+
+	if (!result)
+	{
+		static int calced = 0;
+		static float calcRes = 0.0f;
+
+		if (!(calced & 1))
+		{
+			calced |= 1;
+			calcRes = sqrt(512.0);
+		}
+
+		vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0f)
+			result = HIT_WALL;
+	}
+
+	return result;
+}
+#endif
 
 void CKnifeSkullT9::Holster(int skiplocal)
 {
@@ -593,13 +665,13 @@ void CKnifeSkullT9::ItemPostFrame()
 	{
 		if (m_CrossHairState != m_CrossHairStateStored)
 		{
-			/*
+			
 #ifndef CLIENT_DLL
 			MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
 			WRITE_BYTE(2);
 			WRITE_BYTE(m_CrossHairState);
 			MESSAGE_END();
-#endif*/
+#endif
 		}
 
 #ifndef CLIENT_DLL

@@ -29,18 +29,21 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	// TBD : zombie class konckback ratio 
 	//flKnockbackRatio *= 0.5f;
 
-	if (flKnockbackRatio > 0.0f)
-	{
-		Vector dir2 = dir.Normalize();
-		dir2.z = 0.0f;
-		//player->pev->velocity = fma(dir2, flKnockbackRatio, player->pev->velocity);
-		player->pev->velocity.x = flKnockbackRatio * dir2.x;
-		player->pev->velocity.y = flKnockbackRatio * dir2.y;
-	}
-
 	if (flVelocityModifier > 0.0)
 	{
 		player->m_flVelocityModifier = flVelocityModifier;
+	}
+
+	if (flKnockbackRatio > 0.0f)
+	{
+		Vector2D dir2 = dir.Make2D().Normalize();
+		Vector2D vecVelocityDir = player->pev->velocity.Make2D().Normalize();
+		if (vecVelocityDir.Length() && DotProduct(dir2, vecVelocityDir) > 0)
+			return;
+
+		//player->pev->velocity = fma(dir2, flKnockbackRatio, player->pev->velocity);
+		player->pev->velocity.x = flKnockbackRatio * dir2.x;
+		player->pev->velocity.y = flKnockbackRatio * dir2.y;
 	}
 }
 

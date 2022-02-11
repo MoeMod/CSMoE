@@ -46,6 +46,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <dlls/gamemode/zb1/zb1_const.h>
 
 namespace sv {
 
@@ -498,6 +499,15 @@ void CBasePlayer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 				break;
 			}
 			flDamage *= 4;
+
+			if (m_bIsZombie)
+			{
+				if (m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+					flDamage *= 0.8;
+				else if (m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+					flDamage *= 0.6;
+			}
+
 			if (bShouldPunch && bShouldBleed)
 			{
 				pev->punchangle.x = flDamage * -0.5;

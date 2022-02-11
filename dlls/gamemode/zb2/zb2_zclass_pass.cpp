@@ -40,8 +40,8 @@ CZombieClass_Pass::CZombieClass_Pass(CBasePlayer *player, ZombieLevel iEvolution
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -69,11 +69,34 @@ void CZombieClass_Pass::InitHUD() const
 
 void CZombieClass_Pass::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.75f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 333;
+		m_pPlayer->pev->gravity = 0.6f;
+	}
+
 	if (m_pZombieSkill2)
-		m_pZombieSkill->ResetMaxSpeed();
+		m_pZombieSkill2->ResetMaxSpeed();
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 1.0f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Pass::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
@@ -83,7 +106,16 @@ float CZombieClass_Pass::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *p
 
 bool CZombieClass_Pass::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
-	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
+
+	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
+			kbd.flOnGround * 0.7f,
+			kbd.flNotOnGround * 0.75f,
+			kbd.flFlying * 0.75f,
+			kbd.flDucking * 0.7f,
+			kbd.flVelocityModifier,
+		});
 }
 
 void CZombieClass_Pass::Pain_Zombie(int m_LastHitGroup, bool HasArmour)

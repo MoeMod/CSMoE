@@ -2,6 +2,7 @@
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
+#include "cbase/cbase_hash.h"
 #include "player.h"
 #include "entity_state.h"
 
@@ -289,7 +290,10 @@ namespace sv {
 
 		void OnTouch(CBaseEntity* other) override
 		{
-			if (m_pPlayer->pev->groundentity == other->edict())
+			if (m_pPlayer->pev->flags & FL_ONGROUND)
+				return;
+
+			if (m_pPlayer->pev->groundentity && m_pPlayer->pev->groundentity == other->edict())
 				return;
 
 			m_sSkillStatus = 2;
@@ -527,7 +531,7 @@ namespace sv {
 				m_pPlayer->pev->maxspeed += GetBonus();
 		}
 	private:
-		float GetBonus() const { return 4.0f + 2.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetBonus() const { return 50.0f + 5.0f * g_pGameRules->m_iTotalRoundsPlayed; }
 		bool m_bActivate;
 	};
 
@@ -911,6 +915,124 @@ namespace sv {
 		}
 	};
 
+	class CZBZFireBall : public CBaseAnimating
+	{
+	public:
+		void Precache()
+		{
+			PRECACHE_MODEL("models/ef_fireball.mdl");
+			m_sModelIndex = PRECACHE_MODEL("sprites/bexplo.spr");
+			m_sFireIndex[0] = PRECACHE_MODEL("sprites/buffm249_fire01.spr");
+			m_sFireIndex[1] = PRECACHE_MODEL("sprites/buffm249_fire02.spr");
+			m_sFireIndex[2] = PRECACHE_MODEL("sprites/buffm249_fire03.spr");
+			m_sFireIndex[3] = PRECACHE_MODEL("sprites/buffm249_fire04.spr");
+			m_sFireIndex[4] = PRECACHE_MODEL("sprites/buffm249_fire05.spr");
+		}
+		void Spawn()
+		{
+			Precache();
+			pev->movetype = MOVETYPE_TOSS;
+
+			if (pev->classname)
+			{
+				RemoveEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+			}
+
+			MAKE_STRING_CLASS("zbz_fireball", pev);
+			AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+			pev->solid = SOLID_BBOX;
+
+			SetThink(&CZBZFireBall::AnimationThink);
+			SetTouch(&CZBZFireBall::Touch);
+			SET_MODEL(ENT(pev), "models/ef_fireball.mdl");
+			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+
+			pev->sequence = 0;
+			pev->frame = 0;
+			pev->framerate = 1.5f;
+			ResetSequenceInfo();
+			m_fSequenceLoops = true;
+		}
+		static void ShootFireBall(entvars_t* owner, Vector origin, Vector velocity)
+		{
+			CZBZFireBall* pGrenade = CreateClassPtr<CZBZFireBall>();
+			pGrenade->Spawn();
+			UTIL_SetOrigin(pGrenade->pev, origin);
+			pGrenade->pev->velocity = velocity;
+			pGrenade->pev->angles = UTIL_VecToAngles(pGrenade->pev->velocity);
+			pGrenade->pev->owner = ENT(owner);
+			pGrenade->pev->renderfx = kRenderFxNone;
+			pGrenade->pev->renderamt = 255.0f;
+			pGrenade->pev->rendermode = kRenderTransAdd;
+			pGrenade->pev->nextthink = gpGlobals->time;
+		}
+
+		void EXPORT AnimationThink(void)
+		{
+			StudioFrameAdvance();
+			pev->nextthink = gpGlobals->time + 0.2s;
+
+			if (m_flFireThink > gpGlobals->time)
+				return;
+
+			m_flFireThink = gpGlobals->time + 0.5s;
+			// TODO:Follow Fire Sprite
+		}
+
+		void EXPORT Touch(CBaseEntity* other)
+		{
+			RadiusDamage3(pev->origin, pev, VARS(pev->owner), 800.0f + 100.0f * g_pGameRules->m_iTotalRoundsPlayed, 100.0f, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_EXPLOSION);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z);
+			WRITE_SHORT(m_sModelIndex);
+			WRITE_BYTE(RANDOM_LONG(25, 30));
+			WRITE_BYTE(30);
+			WRITE_BYTE(TE_EXPLFLAG_NONE);
+			MESSAGE_END();
+
+			UTIL_Remove(this);
+			SetTouch(NULL);
+		}
+	private:
+		short m_sModelIndex;
+		short m_sFireIndex[5];
+		time_point_t m_flFireThink;
+	};
+	LINK_ENTITY_TO_CLASS(zbz_fireball, CZBZFireBall);
+
+	class ZSkill_Fireball : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Fireball(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "火焰球"; }
+		const char* GetDesc() const override { return "使用狙击枪射击时发射火焰球。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnAdjustFireBullets3Dir(Vector& vecDir) override {
+			if (!IsActivate())
+				return;
+			if (!m_pPlayer->m_pActiveItem)
+				return;
+			if (!isSniperRifle(m_pPlayer->m_pActiveItem))
+				return;
+			if (m_flCooldown > gpGlobals->time)
+				return;
+
+			m_flCooldown = gpGlobals->time + GetCooldown();
+			CZBZFireBall::ShootFireBall(m_pPlayer->pev, m_pPlayer->GetGunPosition(), vecDir * GetSpeed());
+		}
+	private:
+		float GetDamage() const { return 800.0f + 100.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+		duration_t GetCooldown() const { return 5.0s - 0.2s * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetKnockBack() const { return 320.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetSpeed() const { return 1200.0f; }
+		float GetRange() const { return 100.0f; }
+		time_point_t m_flCooldown;
+	};
+
 	class ZSkill_SixthSense : public CZombieZSkill_Base
 	{
 	public:
@@ -951,7 +1073,7 @@ namespace sv {
 			hudtextparms_t textParms;
 			textParms.x = -1.0f;
 			textParms.y = 0.3f;
-			textParms.effect = 2;
+			textParms.effect = 0;
 			textParms.r1 = 200;
 			textParms.g1 = 200;
 			textParms.b1 = 50;
@@ -967,6 +1089,89 @@ namespace sv {
 		}
 	private:
 		time_point_t m_flNextThink;
+	};
+
+	class ZSkill_Intellectual : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Intellectual(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "进化学者"; }
+		const char* GetDesc() const override { return "通过击败僵尸及感染人类也可以提升进化等级。"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (!strategy)
+				return;
+			if (m_pPlayer->m_bIsZombie)
+				return;
+			if (m_pPlayer->pev != pKiller)
+				return;
+
+			strategy->AddExp(max(1, 150 - g_pGameRules->m_iTotalRoundsPlayed * 5));
+		}
+
+		void OnInfection(CBasePlayer* victim, CBasePlayer* attacker) override
+		{
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (!strategy)
+				return;
+			if (m_pPlayer != attacker)
+				return;
+
+			strategy->AddExp(max(1, 250 - g_pGameRules->m_iTotalRoundsPlayed * 8));
+		}
+	};
+
+	class ZSkill_LifePlunder : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_LifePlunder(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "感染恢复"; }
+		const char* GetDesc() const override { return "感染时恢复周围僵尸的生命值。"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnInfection(CBasePlayer* victim, CBasePlayer* attacker) override
+		{
+			if (m_pPlayer != attacker)
+				return;
+			
+			for (int i = 1; i <= gpGlobals->maxClients; i++)
+			{
+				CBasePlayer* player = (CBasePlayer*)UTIL_PlayerByIndex(i);
+
+				if (player == NULL)
+					continue;
+
+				if (FNullEnt(player->pev))
+					continue;
+
+				if (player->IsDormant())
+					continue;
+
+				if (player->m_iTeam != m_pPlayer->m_iTeam)
+					continue;
+
+				if (player->pev->health >= player->pev->max_health)
+					continue;
+
+				if ((player->pev->origin - m_pPlayer->pev->origin).IsLengthGreaterThan(100.0f))
+					continue;
+
+				player->pev->health = min(player->pev->health + player->pev->max_health * (0.03f * g_pGameRules->m_iTotalRoundsPlayed), player->pev->max_health);
+				
+				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
+				WRITE_BYTE(2);	//type
+				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+				MESSAGE_END();
+
+				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
+				WRITE_BYTE(3);	//type
+				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+				MESSAGE_END();
+			}
+		}
 	};
 
 	template<class T>
@@ -1009,7 +1214,11 @@ namespace sv {
 		{ Skill_ContactInfection, 5, MakeSkill<ZSkill_ContactInfection> },
 
 		{ Skill_GeneBooster, 100, MakeSkill<ZSkill_GeneBooster> },
-		{ Skill_SixthSense, 100, MakeSkill<ZSkill_SixthSense> },
+		{ Skill_Fireball, 100, MakeSkill<ZSkill_Fireball> },
+		{ Skill_SixthSense, 200, MakeSkill<ZSkill_SixthSense> },
+		{ Skill_Intellectual, 100, MakeSkill<ZSkill_Intellectual> },
+		{ Skill_LifePlunder, 100, MakeSkill<ZSkill_LifePlunder> },
+		
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

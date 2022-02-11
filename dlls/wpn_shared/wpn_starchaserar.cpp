@@ -172,12 +172,6 @@ void CStarchaserar::RadiusDamage(Vector vecAiming, float flDamage)
 					pEntity->TraceAttack(pevInflictor, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
 				}
-
-				/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-				if (pVictim->m_bIsZombie) // Zombie Knockback...
-				{
-				ApplyKnockbackData(pVictim, vecSpot - vecSrc, GetKnockBackData());
-				}*/
 			}
 		}
 	}

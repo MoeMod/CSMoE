@@ -207,9 +207,9 @@ void CDesperado::SecondaryAttack(void)
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDirShooting = gpGlobals->v_forward;
 
-	AddKickRateToLineTargets(vecSrc, vecDirShooting);
-
 	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 6, BULLET_PLAYER_50AE, GetDamage(), 0.9, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
+
+	AddKickRateToLineTargets(vecSrc, vecDirShooting);
 
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -473,13 +473,16 @@ void CDesperado::AddKickRateToLineTargets(Vector vecSrc, Vector vecDir)
 		if (pEntity && pEntity->IsPlayer())
 		{
 			CBasePlayer* player = static_cast<CBasePlayer*>(pEntity);
-			Vector2D dir = (pEntity->pev->origin - m_pPlayer->pev->origin).Make2D().Normalize();
+			if (player->m_bIsZombie)
+			{
+				Vector2D dir = (pEntity->pev->origin - m_pPlayer->pev->origin).Make2D().Normalize();
 
-			player->pev->velocity.x = dir.x * 300.0;
-			player->pev->velocity.y = dir.y * 300.0;
-			player->pev->velocity.z = 100.0;
+				player->pev->velocity.x = dir.x * 300.0;
+				player->pev->velocity.y = dir.y * 300.0;
+				player->pev->velocity.z = 100.0;
 
-			player->m_flVelocityModifier = 0.85;
+				player->m_flVelocityModifier = 0.85;
+			}
 		}
 	}
 }

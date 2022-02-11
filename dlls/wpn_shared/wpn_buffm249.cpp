@@ -54,13 +54,13 @@ void CBUFFM249::ItemPostFrame()
 	CBasePlayerWeapon::ItemPostFrame();
 	//if (m_fInReload)
 		//m_tNextPlayEvent = invalid_time_point;
-#if 0
+#
 	if (gpGlobals->time > m_tNextPlayEvent && m_tNextPlayEvent != invalid_time_point)
 	{
-		PLAYBACK_EVENT_FULL(1, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 9, 0, FALSE, FALSE);
+		PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 9, 0, FALSE, FALSE);
 		m_tNextPlayEvent = gpGlobals->time + 0.1s;
 	}
-#endif
+
 }
 
 void CBUFFM249::Precache(void)

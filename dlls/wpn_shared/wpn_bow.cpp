@@ -127,12 +127,6 @@ namespace sv {
 				pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
 				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
 
-				/*CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pOther);
-				if (pVictim->m_bIsZombie) // Zombie Knockback...
-				{
-					ApplyKnockbackData(pVictim, vecDirection, { 1500, 500, 700, 600, 0.4f });
-					
-				}*/
 				pev->renderamt = 0.0;
 				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 			}
@@ -529,7 +523,7 @@ float CBow::GetSecondaryAttackDamage() const
 	float flDamage = 152.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 1944.0f;	//+3 original 600
+		flDamage = 1344.0f;	//+3 original 600
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 755.0f;
 #endif

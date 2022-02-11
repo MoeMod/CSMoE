@@ -21,10 +21,12 @@ GNU General Public License for more details.
 #include "weapons.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
+#include <dlls/gamemode/mod_zb2.h>
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
+
 
 
 
@@ -256,7 +258,8 @@ namespace sv {
 
 					if (player->m_bIsZombie)
 					{
-						Vector vecDir = (player->pev->origin - m_pOwner->pev->origin).Normalize();
+						Vector vecDir = (player->pev->origin - m_pOwner->pev->origin);
+						vecDir.z = 0;
 
 						ApplyKnockbackData(player, vecDir, { 3000, 3000, 3000, 3000, 1.0f });
 						player->pev->velocity.z = +200.0f;
@@ -433,7 +436,8 @@ namespace sv {
 
 						if (player->m_bIsZombie)
 						{
-							Vector vecDir = (player->pev->origin - m_pOwner->pev->origin).Normalize();
+							Vector vecDir = (player->pev->origin - m_pOwner->pev->origin);
+							vecDir.z = 0;
 
 							ApplyKnockbackData(player, vecDir, { 1000, 1000, 1000, 1000, 1.0f });
 							player->pev->velocity.z = +200.0f;
@@ -494,7 +498,8 @@ namespace sv {
 
 					if (player->m_bIsZombie)
 					{
-						Vector vecDir = (player->pev->origin - m_pOwner->pev->origin).Normalize();
+						Vector vecDir = (player->pev->origin - m_pOwner->pev->origin);
+						vecDir.z = 0;
 
 						ApplyKnockbackData(player, vecDir, { 1000, 1000, 1000, 1000, 1.0f });
 						player->pev->velocity.z = +200.0f;
@@ -723,7 +728,8 @@ public:
 
 					if (player->m_bIsZombie)
 					{
-						Vector vecDir = (player->pev->origin - pAttackePlayer->pev->origin).Normalize();
+						Vector vecDir = (player->pev->origin - pAttackePlayer->pev->origin);
+						vecDir.z = 0;
 
 						ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
 						player->pev->velocity.z = +200.0f;
@@ -731,6 +737,7 @@ public:
 				}
 			}
 		}
+
 
 		SetTouch(NULL);
 		SetThink(NULL);
@@ -802,7 +809,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
 
 	public:
 
@@ -934,7 +941,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 644.0f;
-				flDamage = 270.0f;
+				flDamage = 190.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -955,7 +962,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 1380.0f;
-				flDamage = 400.0f;
+				flDamage = 360.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -976,7 +983,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2000.0f;
-				flDamage = 1000.0f;
+				flDamage = 800.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 3700.0f;
 #endif
@@ -989,7 +996,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2300.0f;
-				flDamage = 1300.0f;
+				flDamage = 1000.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4255.0f;
 #endif
@@ -1133,18 +1140,37 @@ namespace sv {
 
 				if (player->m_bIsZombie)
 				{
-					Vector vecDir = (player->pev->origin - pev->origin).Normalize();
+					Vector vecDir = (player->pev->origin - pev->origin);
+					vecDir.z = 0;
 					if (IsPrimaryAttack)
 					{
-						if (player->m_bIsZombie && player->m_ZombieClass)
+						/*auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
 						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-							{
-								player->pev->velocity.x = 0;
-								player->pev->velocity.y = 0;
-								player->m_flVelocityModifier = 0.1;
-							}
-						}			
+							strategy->SetStunSpeedTime(2.0s);
+							strategy->SetStunGravityTime(2.0s);
+						}*/
+						//if (player->m_bIsZombie && player->m_ZombieClass)
+						//{
+						//	if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+						//	{
+						//		//need stun
+						//		
+
+
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(player->m_pModStrategy.get());
+								if (strategy)
+								{
+									strategy->SetStunSpeedTime(2.0s);
+									strategy->SetStunGravityTime(2.0s);
+								}
+
+
+						//		player->pev->velocity.x = 0;
+						//		player->pev->velocity.y = 0;
+						//		player->m_flVelocityModifier = 0.1;
+						//	}
+						//}			
 					}
 					else
 					{
@@ -1153,6 +1179,13 @@ namespace sv {
 							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
 							{
 								ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
+
+								/*auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+								if (strategy)
+								{
+									strategy->SetStunSpeedTime(2.0s);
+									strategy->SetStunGravityTime(2.0s);
+								}*/
 							}
 						}
 						

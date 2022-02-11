@@ -30,7 +30,13 @@ public:
 	// IZombieModeCharacter
 	void Think() override;
 	void PostThink() override;
-	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override { ApplyKnockbackData(m_pPlayer, m_pPlayer->pev->origin - attacker->pev->origin, data); return true; }
+	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override 
+	{ 
+		Vector vecDir = m_pPlayer->pev->origin - attacker->pev->origin;
+		vecDir.z = 0;
+		ApplyKnockbackData(m_pPlayer, vecDir, data);
+		return true;
+	}
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const override { return 0.0f; }
 	void ResetMaxSpeed() const override;
 	void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override;

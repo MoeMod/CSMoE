@@ -207,6 +207,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_resident.cpp
 	./gamemode/zb2/zb2_zclass_witch.cpp
 	./gamemode/zb2/zombiehook.cpp
+	./gamemode/zb2/zb2_zclass_zbs_deimos2.cpp
 	)
 
 set (HLWPN_SRCS

@@ -494,7 +494,7 @@ R_GetLightSpot
 NOTE: must call R_LightForPoint first
 =================
 */
-void R_GetLightSpot( vec3_t lightspot )
+void R_GetLightSpot( vec3_t_ref lightspot )
 {
 	if( lightspot ) VectorCopy( r_lightSpot, lightspot );
 }
@@ -504,7 +504,7 @@ void R_GetLightSpot( vec3_t lightspot )
 R_LightDir
 =================
 */
-void R_LightDir( const vec3_t origin, vec3_t lightDir, float radius )
+void R_LightDir( const vec3_t origin, vec3_t_ref lightDir, float radius )
 {
 	dlight_t	*dl;
 	vec3_t	dir, local;

@@ -75,7 +75,7 @@ namespace sv {
     static constexpr auto BulletType = BULLET_PLAYER_338MAG;
     static constexpr int Penetration = 4;
 	std::array<float, 3> RecoilPunchAngleDelta = { -3, 0, 0 };
-    KnockbackData KnockBack = { 5000.0f, 700.0f, 1200.0f, 800.0f, 0.8f };
+    KnockbackData KnockBack = { 5000.0f, 700.0f, 1200.0f, 800.0f, 0.3f };
 
 	void Precache() override
 	{

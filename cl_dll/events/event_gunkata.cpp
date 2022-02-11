@@ -193,36 +193,39 @@ void EV_FireGunkata(struct event_args_s *args)
 		}
 		else if (args->fparam1 == 10.0f && args->fparam2 == 2.0f) // playermodel
 		{
-			struct model_s *pModel = IEngineStudio.Mod_ForName("models/ef_gunkata_man.mdl", false);
-
-			if (pModel)
+			if (!EV_IsLocal(idx))
 			{
-				TEMPENTITY *pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
-				if (pEnt)
+				struct model_s* pModel = IEngineStudio.Mod_ForName("models/ef_gunkata_man.mdl", false);
+
+				if (pModel)
 				{
-					pEnt->entity.curstate.sequence = args->iparam1;
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 1.0;
-					angles[0] = 0.0f;
-					pEnt->entity.angles = angles;
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+					if (pEnt)
+					{
+						pEnt->entity.curstate.sequence = args->iparam1;
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 1.0;
+						angles[0] = 0.0f;
+						pEnt->entity.angles = angles;
 
-					pEnt->die = gHUD.m_flTime + args->fparam2;
-					pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-					pEnt->clientIndex = idx;
-					pEnt->flags |= FTENT_FADEOUT | FTENT_CLIENTCUSTOM;
+						pEnt->die = gHUD.m_flTime + args->fparam2;
+						pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
+						pEnt->clientIndex = idx;
+						pEnt->flags |= FTENT_FADEOUT | FTENT_CLIENTCUSTOM;
 
-					pEnt->entity.curstate.rendermode = kRenderTransTexture;
-					pEnt->entity.curstate.renderamt = 100;
+						pEnt->entity.curstate.rendermode = kRenderTransTexture;
+						pEnt->entity.curstate.renderamt = 100;
 
-					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
-						float delta = currenttime - pEnt->entity.curstate.fuser1;
-						if (delta > 1.0)
-							pEnt->entity.curstate.renderamt = 100 - (delta - 1.0) * 100.0f;
-					};
+						pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+							float delta = currenttime - pEnt->entity.curstate.fuser1;
+							if (delta > 1.0)
+								pEnt->entity.curstate.renderamt = 100 - (delta - 1.0) * 100.0f;
+						};
+					}
+					int i = args->iparam1 % 6;
+					if (i)
+						gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_AUTO, ("weapons/gunkata_skill_0" + std::to_string(i) + ".wav").c_str(), 1.0, 0.6, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 				}
-				int i = args->iparam1 % 6;
-				if(i)
-					gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_AUTO, ("weapons/gunkata_skill_0" + std::to_string(i) + ".wav").c_str(), 1.0, 0.6, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 			}
 		}
 	}

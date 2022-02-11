@@ -40,8 +40,8 @@ CZombieClass_Stamper::CZombieClass_Stamper(CBasePlayer *player, ZombieLevel iEvo
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 800;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->pev->armorvalue = 1000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -69,15 +69,36 @@ void CZombieClass_Stamper::InitHUD() const
 
 void CZombieClass_Stamper::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 270;
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 270;
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 297;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 310;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = 100.0f;
+	}
 }
 
 float CZombieClass_Stamper::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
-		flDamage *= 1.2;
-	else
-		flDamage *= 1.1;
+	flDamage *= 0.65;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 

@@ -206,7 +206,7 @@ int CHudHitIndicator:: Draw( float flTime )
 			iAlpha = 3 * (255 - 255 * fProgress);
 			if (iAlpha > 255) iAlpha = 255;
 
-			fScale -= pList[i].fRange / 1000.0f;  //Differs by distance
+			fScale -= pList[i].fRange / 2000.0f;  //Differs by distance
 
 			if (fScale < 0.5f || !bIsNewest) fScale = 0.5f;
 			if (iAlpha < 0) iAlpha = 0;
