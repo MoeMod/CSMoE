@@ -49,6 +49,7 @@
 		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3D99F5A3277215DC006EDB62 /* launchdialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A2277215DC006EDB62 /* launchdialog.mm */; };
 		3D99F5A527721613006EDB62 /* TutorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A427721613006EDB62 /* TutorViewController.mm */; };
+		3D9E467327A42F2D00367C2D /* libastcenc-native-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */; };
 		3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB534302761091B0052BD7F /* libcqmiao.a */; };
 		3DB5343C276109580052BD7F /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB5343B276109580052BD7F /* libluash.a */; };
 		3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53441276109B10052BD7F /* libcrypto.a */; };
@@ -127,6 +128,7 @@
 		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimgui_ext.a; sourceTree = "<group>"; };
 		3D99F5A2277215DC006EDB62 /* launchdialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = launchdialog.mm; sourceTree = "<group>"; };
 		3D99F5A427721613006EDB62 /* TutorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TutorViewController.mm; sourceTree = "<group>"; };
+		3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libastcenc-native-static.a"; sourceTree = "<group>"; };
 		3DB534302761091B0052BD7F /* libcqmiao.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcqmiao.a; sourceTree = "<group>"; };
 		3DB5343B276109580052BD7F /* libluash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluash.a; sourceTree = "<group>"; };
 		3DB53441276109B10052BD7F /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
 				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
 				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
+				3D9E467327A42F2D00367C2D /* libastcenc-native-static.a in Frameworks */,
 				B6D007C4262A1B71007A949F /* libluajit.a in Frameworks */,
 				3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */,
 				3DB53444276109BA0052BD7F /* libssl.a in Frameworks */,
@@ -340,6 +343,22 @@
 			path = engine;
 			sourceTree = "<group>";
 		};
+		3D9E467027A42F0800367C2D /* astc-encoder */ = {
+			isa = PBXGroup;
+			children = (
+				3D9E467127A42F1F00367C2D /* Source */,
+			);
+			path = "astc-encoder";
+			sourceTree = "<group>";
+		};
+		3D9E467127A42F1F00367C2D /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
 		3DB53420276108F70052BD7F /* cqmiao */ = {
 			isa = PBXGroup;
 			children = (
@@ -359,6 +378,7 @@
 		3DB5343D276109740052BD7F /* 3rdparty */ = {
 			isa = PBXGroup;
 			children = (
+				3D9E467027A42F0800367C2D /* astc-encoder */,
 				3DDCB14627625A3700BBEC27 /* SDL2 */,
 				3DB5343E276109820052BD7F /* openssl-cmake */,
 				B6D007C3262A1B71007A949F /* libluajit.a */,
@@ -634,6 +654,7 @@
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/astc-encoder/Source",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -753,6 +774,7 @@
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
 					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
+					"$(PROJECT_DIR)/cmake-build/3rdparty/astc-encoder/Source",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;

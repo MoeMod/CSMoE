@@ -130,16 +130,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, 1},
 
-#endif
 	{"csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, 1},
 	{"csgo_tec9",         "Tec-9",                  500, PISTOL_SLOT, UNASSIGNED, 1},
 	{"csgo_r8",        "左轮R8",                  850, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_fiveseven",      "FiveSeven",    750, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, 1},
-	{"weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, 1 },
 
 	{"weapon_m95",         "巴雷特",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 	{"weapon_wa2000",      "狂怒骑士",                4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
@@ -154,6 +147,19 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"csgo_mag7",         "警喷MAG-7",                  1800, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"csgo_sawedoff",         "匪喷Sawed-Off",                  1100, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"csgo_bizon",         "野牛PP-Bizon",                  1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+
+	{"knife_dragonsword",     "青龙偃月刀",               0,    KNIFE_SLOT,          UNASSIGNED, 1 },
+	{"knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, 1 },
+	{"knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
+	{"knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
+
+#endif
+	{"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_fiveseven",      "FiveSeven",    750, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, 1 },
 	{"weapon_scout",      "Scout",    2750, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_xm1014",      "XM1014",    3000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_mac10",      "MAC10",    1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
@@ -173,10 +179,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_ak47",      "CV-47",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 	{"weapon_p90",      "P90",    2350, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 
-	{"knife_dragonsword",     "青龙偃月刀",               0,    KNIFE_SLOT,          UNASSIGNED, 1 },
-	{"knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, 1 },
-	{"knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
-	{"knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"weapon_knife", "海豹短刀",            0,    KNIFE_SLOT,          UNASSIGNED, 1},
 };
 
@@ -268,8 +270,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo_Z4[] = {
 	{"z4b_nataknifedx",      "双持新月刃",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_oppovivo",      "绝地光剑",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_stormgiantx",      "骇影巨锤",    0, KNIFE_SLOT, UNASSIGNED, 80},
-#endif
-
 	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},
 	{"weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, 1 },
 
@@ -296,6 +296,33 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo_Z4[] = {
 	{"knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
+#else
+    {"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_fiveseven",      "FiveSeven",    750, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_usp",      "USP45",    500, PISTOL_SLOT, UNASSIGNED, 1},
+	{"weapon_deagle",      "Deagle",    650, PISTOL_SLOT, UNASSIGNED, 1 },
+	{"weapon_scout",      "Scout",    2750, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_xm1014",      "XM1014",    3000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_mac10",      "MAC10",    1400, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_aug",      "AUG",    3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_ump45",      "UMP-45",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_sg550",      "SG550",    4200, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_galil",      "Galil",    2000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_famas",      "Famas",    2250, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{"weapon_awp",      "AWP",    4750, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_mp5navy",      "MP5",    1500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_m249",      "M249",    5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_m3",      "M3",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_m4a1",      "M4A1",    3100, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_tmp",      "TMP",    1250, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_g3sg1",      "G3SG1",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_sg552",      "SG552",    3500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_ak47",      "CV-47",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{"weapon_p90",      "P90",    2350, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+
 	{"weapon_knife", "海豹短刀",            0,    KNIFE_SLOT,          UNASSIGNED, 1},
+#endif
 };
 #endif
