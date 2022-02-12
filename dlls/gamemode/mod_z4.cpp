@@ -611,8 +611,8 @@ namespace sv {
 		void ResetMaxSpeed() const override
 		{
 			auto ability = AbilityForZClass();
-			m_pPlayer->pev->maxspeed = strategy->m_bIsStun ? 1.0 : strategy->adrenaline->m_bIsUsingDash ? ability.flDashSpeed : ability.flSpeed;
-			m_pPlayer->pev->gravity = strategy->adrenaline->m_bIsUsingDash ? ability.flDashGravity : ability.flGravity;
+			m_pPlayer->pev->maxspeed = strategy->m_bIsStun ? 1.0f : strategy->adrenaline->m_bIsSlowDown ? ability.flSpeed / 3.0f : strategy->adrenaline->m_bIsUsingDash ? ability.flDashSpeed : ability.flSpeed;
+			m_pPlayer->pev->gravity = strategy->adrenaline->m_bIsSlowDown ? ability.flGravity * 3.0f : strategy->adrenaline->m_bIsUsingDash ? ability.flDashGravity : ability.flGravity;
 		}
 
 		void Pain_Zombie(int m_LastHitGroup, bool HasArmour) override
@@ -966,6 +966,10 @@ namespace sv {
 				return;
 			if(strategy->adrenaline->m_bIsSlowDown)
 				return;
+			if(m_pPlayer->pev->flags & FL_DUCKING)
+				return;
+			if(m_pPlayer->pev->maxspeed <= 1.0f)
+				return;
 
 			strategy->adrenaline->m_bIsUsingDash = true;
 			m_pPlayer->ResetMaxSpeed();
@@ -1289,7 +1293,6 @@ namespace sv {
 				}
 				else
 				{
-					
 					m_bIsStun = false;
 					m_pPlayer->pev->bInDuck = 0;
 					CLIENT_COMMAND(m_pPlayer->edict(), "-duck\n");

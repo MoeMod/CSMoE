@@ -160,7 +160,6 @@ namespace sv {
 					if (pEntity->pev == pevAttacker)
 						continue;
 
-
 					if (bInWater && !pEntity->pev->waterlevel)
 						continue;
 
@@ -172,53 +171,6 @@ namespace sv {
 
 					if (!m_pPlayer->m_bIsZombie)
 					{
-						if (bIsLoop)
-						{
-							if (pEntity->IsPlayer())
-							{
-								if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
-								{
-									CBasePlayer* pPlayer;
-									Vector vecPullVelocity, vecOrigin;
-									const float power = 400;
-									pPlayer = (CBasePlayer*)pEntity;
-									vecOrigin = pev->origin;
-
-									float fDis = (vecOrigin - pPlayer->pev->origin).Length();
-									if (fDis > 200.0)
-									{
-										vecOrigin[0] += RANDOM_LONG(-20, 20);
-										vecOrigin[1] += RANDOM_LONG(-15, 15);
-										vecOrigin[2] += RANDOM_LONG(-10, 10);
-									}
-									else
-									{
-										vecOrigin[0] += RANDOM_LONG(-1, 1);
-										vecOrigin[1] += RANDOM_LONG(-1, 1);
-										vecOrigin[2] += RANDOM_LONG(-1, 1);
-									}
-
-									vecPullVelocity = (vecOrigin - pPlayer->pev->origin).Normalize() * power;
-									pPlayer->pev->velocity = vecPullVelocity;
-								}
-							}
-						}
-						else
-						{
-							if (pEntity->IsPlayer())
-							{
-								if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
-								{
-									CBasePlayer* pPlayer;
-									Vector vecPullVelocity;
-									const float power = 1.3;
-									pPlayer = (CBasePlayer*)pEntity;
-									vecPullVelocity = -(vecSrc - pPlayer->pev->origin).Normalize() * power;
-									pPlayer->pev->velocity = vecPullVelocity;
-								}
-							}
-						}
-
 						Vector vecSpot = pEntity->BodyTarget(vecSrc);
 						UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
 
@@ -236,6 +188,53 @@ namespace sv {
 							{
 								pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 							}
+
+							if (bIsLoop)
+							{
+								if (pEntity->IsPlayer())
+								{
+									if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+									{
+										CBasePlayer* pPlayer;
+										Vector vecPullVelocity, vecOrigin;
+										const float power = 400;
+										pPlayer = (CBasePlayer*)pEntity;
+										vecOrigin = pev->origin;
+
+										float fDis = (vecOrigin - pPlayer->pev->origin).Length();
+										if (fDis > 200.0)
+										{
+											vecOrigin[0] += RANDOM_LONG(-20, 20);
+											vecOrigin[1] += RANDOM_LONG(-15, 15);
+											vecOrigin[2] += RANDOM_LONG(-10, 10);
+										}
+										else
+										{
+											vecOrigin[0] += RANDOM_LONG(-1, 1);
+											vecOrigin[1] += RANDOM_LONG(-1, 1);
+											vecOrigin[2] += RANDOM_LONG(-1, 1);
+										}
+
+										vecPullVelocity = (vecOrigin - pPlayer->pev->origin).Normalize() * power;
+										pPlayer->pev->velocity = vecPullVelocity;
+									}
+								}
+							}
+							else
+							{
+								if (pEntity->IsPlayer())
+								{
+									if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
+									{
+										CBasePlayer* pPlayer;
+										Vector vecPullVelocity;
+										const float power = 1.3;
+										pPlayer = (CBasePlayer*)pEntity;
+										vecPullVelocity = -(vecSrc - pPlayer->pev->origin).Normalize() * power;
+										pPlayer->pev->velocity = vecPullVelocity;
+									}
+								}
+							}
 						}
 					}
 				}
@@ -248,8 +247,7 @@ namespace sv {
 			float flDamage = 40.0f;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 1000.0f;
-			//flDamage = 750.0f;
+				flDamage = 750.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1500.0f;
 			//flDamage = 1500.0f;
@@ -965,7 +963,7 @@ float CVoidpistol::GetDamage() const
 	float flDamage = 24.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 78.0f;
+		flDamage = 56.0f;
 		//flDamage = 225.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 390.0f;
@@ -978,7 +976,7 @@ float CVoidpistol::BlackholeDamage() const
 	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 220.0f;
+		flDamage = 110.0f;
 	//flDamage = 375.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 750.0f;

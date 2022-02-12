@@ -31,7 +31,7 @@ namespace cl {
 namespace sv {
 #endif
 
-class CKnifeNataKnifeDX: public LinkWeaponTemplate<CKnifeNataKnifeDX,
+class CKnifeNataKnifeD: public LinkWeaponTemplate<CKnifeNataKnifeD,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_KNIFE>::template type,
 	TWeaponIdleDefault,
@@ -39,15 +39,15 @@ class CKnifeNataKnifeDX: public LinkWeaponTemplate<CKnifeNataKnifeDX,
 >
 {
 public:
-	static constexpr const char *ClassName = "z4b_nataknifedx";
-	static constexpr const char *V_Model = "models/z4b/v_nataknifedx.mdl";
-	static constexpr const char *P_Model = "models/z4b/p_nataknifedx.mdl";
+	static constexpr const char *ClassName = "knife_nataknifed";
+	static constexpr const char *V_Model = "models/v_nataknifed.mdl";
+	static constexpr const char *P_Model = "models/p_nataknifed.mdl";
 	static constexpr const char *W_Model = "models/w_knife.mdl";
 
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "nataknife";
-	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.65f };
+	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
 
 public:
 
@@ -66,17 +66,21 @@ public:
 	{
 		Base::Precache();
 
-		PRECACHE_SOUND("weapons/nata_draw.wav");
+		PRECACHE_SOUND("weapons/nataknife_draw.wav");
 		PRECACHE_SOUND("weapons/nata_wall.wav");
-		PRECACHE_SOUND("weapons/nata_slash.wav");
-		PRECACHE_SOUND("weapons/nata_stab.wav");
 		PRECACHE_SOUND("weapons/nata_hit_1.wav");
 		PRECACHE_SOUND("weapons/nata_hit_2.wav");
+		PRECACHE_SOUND("weapons/nata_stab.wav");
+		PRECACHE_SOUND("weapons/nataknife_slash1.wav");
+		PRECACHE_SOUND("weapons/nataknife_slash2.wav");
+		PRECACHE_SOUND("weapons/nataknife_stap_miss.wav");
+		PRECACHE_SOUND("weapons/nataknife_stap.wav");
+				
 	}
 
 	BOOL Deploy() override
 	{
-		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/nata_draw.wav", 0.3, 2.4);
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/nataknife_draw.wav", 0.3, 2.4);
 
 		m_fMaxSpeed = 250;
 		m_iSwing = 0;
@@ -99,7 +103,7 @@ public:
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			flDamage *= 9.5f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage *= 5.5f;
+			flDamage = 150.0f;
 #endif
 		return flDamage;
 	}
@@ -108,19 +112,19 @@ public:
 		float flDamage = 110;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 25.0f;
+			flDamage = 8000.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			flDamage *= 5.5f;
+			flDamage = 950.0f;
 #endif
 		return flDamage;
 	}
 };
 
-LINK_ENTITY_TO_CLASS(z4b_nataknifedx, CKnifeNataKnifeDX)
+LINK_ENTITY_TO_CLASS(knife_nataknifed, CKnifeNataKnifeD)
 
-void CKnifeNataKnifeDX::Spawn()
+void CKnifeNataKnifeD::Spawn()
 {
-	pev->classname = MAKE_STRING("z4b_nataknifedx");
+	pev->classname = MAKE_STRING("knife_nataknifed");
 	m_iId = WEAPON_KNIFE;
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
@@ -128,7 +132,7 @@ void CKnifeNataKnifeDX::Spawn()
 	FallInit();
 }
 
-void CKnifeNataKnifeDX::PrimaryAttack(void)
+void CKnifeNataKnifeD::PrimaryAttack(void)
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -147,7 +151,10 @@ void CKnifeNataKnifeDX::PrimaryAttack(void)
 	{
 		case HIT_NONE:
 		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nata_slash.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			if (m_iSwing & 1)
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nataknife_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			else
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nataknife_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			break;
 		}
 		case HIT_PLAYER:
@@ -174,7 +181,7 @@ void CKnifeNataKnifeDX::PrimaryAttack(void)
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
-void CKnifeNataKnifeDX::SecondaryAttack(void)
+void CKnifeNataKnifeD::SecondaryAttack(void)
 {
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -193,12 +200,12 @@ void CKnifeNataKnifeDX::SecondaryAttack(void)
 	{
 		case HIT_NONE:
 		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nata_slash.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nataknife_stap_miss.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			break;
 		}
 		case HIT_PLAYER:
 		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nata_stab.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/nataknife_stap.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 			if(m_iSwing & 1)
 				SendWeaponAnim(ANIM_STAB, UseDecrement() != FALSE);

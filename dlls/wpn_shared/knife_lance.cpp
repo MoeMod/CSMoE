@@ -31,7 +31,7 @@ namespace sv {
 	class CLanceFountainFieldAttack : public CBaseEntity
 	{
 	public:
-		KnockbackData GetKnockBackData() override { return { 0.0f, 1.0f, 1.0f, 0.0f, 0.1f }; }
+		KnockbackData GetKnockBackData() override { return { 0.0f, 1.0f, 1.0f, 0.0f, 1.0f }; }
 
 		void Spawn() override
 		{
@@ -352,7 +352,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
+		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.3f };
 
 	public:
 

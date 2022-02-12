@@ -12,6 +12,9 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	float flKnockbackRatio = 0.0f;
 	float flVelocityModifier = data.flVelocityModifier;
 
+	Vector2D dir2 = dir.Make2D().Normalize();
+	Vector2D vecVelocityDir = player->pev->velocity.Make2D().Normalize();
+
 	if (player->pev->flags & FL_ONGROUND)
 	{
 		if (player->pev->flags & FL_DUCKING)
@@ -22,9 +25,18 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	else
 	{
 		if (player->pev->velocity.Length2D() > 0.0f)
+		{
 			flKnockbackRatio = data.flFlying;
+			if(DotProduct(dir2, vecVelocityDir) > 0)
+				flKnockbackRatio = 0.0;
+		}
 		else
-			flKnockbackRatio = data.flNotOnGround;
+		{
+			if (player->m_flFallVelocity)
+				flKnockbackRatio = data.flNotOnGround;
+			else
+				flKnockbackRatio = 0.0;		
+		}		
 	}
 	// TBD : zombie class konckback ratio 
 	//flKnockbackRatio *= 0.5f;
@@ -36,11 +48,6 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 
 	if (flKnockbackRatio > 0.0f)
 	{
-		Vector2D dir2 = dir.Make2D().Normalize();
-		Vector2D vecVelocityDir = player->pev->velocity.Make2D().Normalize();
-		if (vecVelocityDir.Length() && DotProduct(dir2, vecVelocityDir) > 0)
-			return;
-
 		//player->pev->velocity = fma(dir2, flKnockbackRatio, player->pev->velocity);
 		player->pev->velocity.x = flKnockbackRatio * dir2.x;
 		player->pev->velocity.y = flKnockbackRatio * dir2.y;

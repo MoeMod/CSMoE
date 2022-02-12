@@ -16,6 +16,7 @@
 #include "cbase/cbase_hash.h"
 
 #include "bot_include.h"
+#include <dlls/gamemode/mod_zb1.h>
 
 namespace sv {
 
@@ -1267,6 +1268,7 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 							{
 								if (target->m_bIsZombie && target->m_ZombieClass)
 								{
+									target->m_flVelocityModifier = 1.0;
 									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
 										break;
 									else
@@ -1278,6 +1280,7 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 							{
 								if (target->m_bIsZombie && target->m_ZombieClass)
 								{
+									target->m_flVelocityModifier = 1.0;
 									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
 										break;
 									else
@@ -1294,9 +1297,22 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 								MESSAGE_END();
 
 								//need stun
-								/*target->m_flVelocityModifier = 0.05;
-								if(target->m_bIsZombie && target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
-									target->m_flVelocityModifier = 1.0;*/
+
+								if (target->m_bIsZombie)
+								{
+									if (target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+										target->m_flVelocityModifier = 1.0;
+									else
+									{
+										auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(target->m_pModStrategy.get());
+										if (strategy)
+										{
+											strategy->SetStunSpeedTime(0.3s);
+											strategy->SetStunGravityTime(0.3s);
+										}
+									}
+
+								}				
 								break;
 							}
 						}

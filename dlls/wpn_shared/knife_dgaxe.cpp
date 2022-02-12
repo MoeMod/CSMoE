@@ -583,10 +583,10 @@ namespace sv {
 		switch (m_iDamageType)
 		{
 		case DGAXE_PRIMARYATTACK:  return { 1.0f, 1.0f, 1.0f, 1.0f, 0.4f };
-		case DGAXE_SECONDARYATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.9f }; }
+		case DGAXE_SECONDARYATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
 		case DGAXE_COMBOATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
-		case DGAXE_SKILL1ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.1f }; }
-		case DGAXE_SKILL2ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
+		case DGAXE_SKILL1ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
+		case DGAXE_SKILL2ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
 		default:
 			break;
 		}

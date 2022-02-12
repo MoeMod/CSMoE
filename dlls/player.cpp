@@ -1765,7 +1765,10 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 			CHEGrenade *pHEGrenade = (CHEGrenade *)m_pActiveItem;
 			if ((pev->button & IN_ATTACK) && m_rgAmmo[ pHEGrenade->m_iPrimaryAmmoType ])
 			{
-				CGrenade::ShootTimed2(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, m_iTeam, pHEGrenade->m_usCreateExplosion);
+				if(m_bIsZombie)
+					CGrenade::ShootZombieBomb(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, m_iTeam, NULL);
+				else
+					CGrenade::ShootTimed2(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, m_iTeam, pHEGrenade->m_usCreateExplosion);
 			}
 			break;
 		}
@@ -1782,7 +1785,10 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 			CSmokeGrenade *pSmoke = (CSmokeGrenade *)m_pActiveItem;
 			if ((pev->button & IN_ATTACK) && m_rgAmmo[ pSmoke->m_iPrimaryAmmoType ])
 			{
-				CGrenade::ShootSmokeGrenade(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, pSmoke->m_usCreateSmoke);
+				if (m_bIsZombie)
+					CGrenade::ShootZombiBomb2(pev, (pev->origin + pev->view_ofs), pev->angles, 4.0s, m_iTeam, NULL, 50.0);
+				else
+					CGrenade::ShootSmokeGrenade(pev, (pev->origin + pev->view_ofs), pev->angles, 1.5s, pSmoke->m_usCreateSmoke);
 			}
 			break;
 		}

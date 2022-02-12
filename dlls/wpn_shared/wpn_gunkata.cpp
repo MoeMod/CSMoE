@@ -679,7 +679,7 @@ public:
 						Vector vecDir = (player->pev->origin - pevAttacker->origin);
 						vecDir.z = 0;
 
-						ApplyKnockbackData(player, vecDir, { 0, 0, 0, 0, 0.8f });
+						ApplyKnockbackData(player, vecDir, { 0, 0, 0, 0, 0.4f });
 					}
 
 					result = HIT_PLAYER;

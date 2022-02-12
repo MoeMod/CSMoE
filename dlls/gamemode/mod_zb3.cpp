@@ -417,11 +417,7 @@ void CMod_ZombieHero::MakeZombieOrigin()
 	std::vector<CBasePlayer*> players{ list.begin(), list.end() };
 	players.erase(std::remove_if(players.begin(), players.end(), [](CBasePlayer* player) {
 		auto strategy = dynamic_cast<CPlayerModStrategy_ZB3*>(player->m_pModStrategy.get());
-		if (strategy && strategy->IsPickAsZombie() && player->IsAlive() || player->m_iTeam != TEAM_CT)
-		{
-			return false;
-		}
-		return true;
+		return !(strategy && strategy->IsPickAsZombie() && player->IsAlive() && !player->m_bIsZombie);
 	}), players.end());
 
 	if (players.empty())
@@ -508,6 +504,8 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 			CBaseEntity *pEntity2 = CBaseEntity::Instance(pEntity);
 			if(pEntity2->IsPlayer())
 			{
+				if (RANDOM_LONG(0, 1))
+				{
 					char szText[256];
 					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，本局将成为英雄！^7", STRING(pEntity->v.netname));
 					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
@@ -518,8 +516,8 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 					CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity2);
 					if (!pPlayer->m_bIsZombie)
 						MakeHero(pPlayer);
-
-				/*else
+				}
+				else
 				{
 					char szText[256];
 					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题专属武器逆界星轮beta（去除传送版本）^7", STRING(pEntity->v.netname));
@@ -534,7 +532,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 						pPlayer->GiveNamedItem("weapon_revivegun");
 						int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("556NatoStar", 150);
 					}
-				}*/
+				}
 
 				m_bHasAnswered = true;
 			}

@@ -745,7 +745,10 @@ enum
 	kRenderFxExplode,			// Scale up really big!
 	kRenderFxGlowShell,			// Glowing Shell
 	kRenderFxClampMinScale,		// Keep this sprite from getting very small (SPRITES only!)
-	kRenderFxWallHack			//Huntbow only
+	kRenderFxWallHack,			//Huntbow only
+	kRenderFxGreenOutLine,		// WallHeck
+	kRenderFxRedOutLine,		// WallHeck
+	kRenderFxBlackOutLine		// No WallHeck
 };
 
 typedef int		func_t;

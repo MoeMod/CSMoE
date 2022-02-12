@@ -68,7 +68,7 @@ struct BuffAK47_WeaponData
 	static constexpr float RangeModifier = 0.98;
 	static constexpr auto BulletType = BULLET_PLAYER_762MM;
 	static constexpr int Penetration = 2;
-	KnockbackData KnockBack = { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f };
+	KnockbackData KnockBack = { 800.0f, 1100.0f, 650.0f, 500.0f, 0.9f };
 
 	KickBackData KickBackWalking = { 0.9f, 0.35f, 0.225f, 0.05f, 5.5f, 2.5f, 8 };
 	KickBackData KickBackNotOnGround = { 1.5f, 0.9f, 0.4f, 0.3f, 7.0f, 4.5f, 8 };
@@ -238,7 +238,7 @@ struct BuffAK47_WeaponData
 			m_iType = type;
 		}
 
-		KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
+		KnockbackData GetKnockBackData() override { return { 800.0f, 110.0f, 650.0f, 500.0f, 0.9f }; }
 
 		int m_fSequenceLoops;
 		time_point_t m_flRemoveTime;

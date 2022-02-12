@@ -809,7 +809,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.1f };
 
 	public:
 
@@ -941,7 +941,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 644.0f;
-				flDamage = 190.0f;
+				flDamage = 344.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -962,7 +962,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 1380.0f;
-				flDamage = 360.0f;
+				flDamage = 450.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -983,7 +983,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2000.0f;
-				flDamage = 800.0f;
+				flDamage = 900.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 3700.0f;
 #endif
@@ -996,7 +996,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2300.0f;
-				flDamage = 1000.0f;
+				flDamage = 1100.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4255.0f;
 #endif
@@ -1161,14 +1161,9 @@ namespace sv {
 								auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(player->m_pModStrategy.get());
 								if (strategy)
 								{
-									strategy->SetStunSpeedTime(2.0s);
-									strategy->SetStunGravityTime(2.0s);
+									strategy->SetStunSpeedTime(1.5s);
+									strategy->SetStunGravityTime(1.5s);
 								}
-
-
-						//		player->pev->velocity.x = 0;
-						//		player->pev->velocity.y = 0;
-						//		player->m_flVelocityModifier = 0.1;
 						//	}
 						//}			
 					}
@@ -1178,14 +1173,14 @@ namespace sv {
 						{
 							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
 							{
-								ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
+								ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 1.0f });
 
-								/*auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 								if (strategy)
 								{
-									strategy->SetStunSpeedTime(2.0s);
-									strategy->SetStunGravityTime(2.0s);
-								}*/
+									strategy->SetStunSpeedTime(3.0s);
+									strategy->SetStunGravityTime(3.0s);
+								}
 							}
 						}
 						

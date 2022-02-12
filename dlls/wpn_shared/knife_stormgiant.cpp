@@ -152,7 +152,8 @@ public:
 		float flDamage = 35;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 420.0f;
+			//flDamage = 420.0f;
+			flDamage = 252.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -185,7 +186,8 @@ public:
 		float flDamage = 75;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 862.0f;
+			//flDamage = 862.0f;
+			flDamage = 518.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
