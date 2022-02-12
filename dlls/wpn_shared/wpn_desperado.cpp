@@ -487,4 +487,9 @@ void CDesperado::AddKickRateToLineTargets(Vector vecSrc, Vector vecDir)
 	}
 }
 
+WeaponBotStrategy CDesperado::GetBotStrategy() const
+{
+    return BOT_STRATEGY_DESPERADO;
+}
+
 }

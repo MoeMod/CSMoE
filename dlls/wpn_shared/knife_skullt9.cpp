@@ -280,6 +280,7 @@ public:
 	void SecondaryAttack() override;
 	int GetItemInfo(ItemInfo* p) override;
 	BOOL CanDrop() override { return false; }
+    WeaponBotStrategy GetBotStrategy() const override;
 
 public:
 #ifndef CLIENT_DLL
@@ -686,6 +687,11 @@ void CKnifeSkullT9::ItemPostFrame()
 	}
 #endif
 	return CBasePlayerWeapon::ItemPostFrame();
+}
+
+WeaponBotStrategy CKnifeSkullT9::GetBotStrategy() const
+{
+    return BOT_STRATEGY_SKULLAXE;
 }
 
 

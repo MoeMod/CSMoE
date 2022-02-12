@@ -93,9 +93,20 @@ void CCSBot::FireWeaponAtEnemy()
 				if (doAttack)
 				{
 					// if we are using a knife, only swing it if we're close
-					if (IsUsingKnife())
+                    if(IsUsingSkullAxe())
+                    {
+                        if(GetRangeToNearestRecognizedEnemy() < 350)
+                        {
+                            // range is enough
+                            if (GetNearbyEnemyCount() > 3)
+                                SecondaryAttack();
+                            else
+                                PrimaryAttack();
+                        }
+                    }
+					else if (IsUsingKnife())
 					{
-						const float knifeRange = 75.0f; // 50.0f
+                        float knifeRange = 75.0f; // 50.0f
 						if (rangeToEnemy < knifeRange)
 						{
 							// since we've given ourselves away - run!
@@ -123,7 +134,7 @@ void CCSBot::FireWeaponAtEnemy()
 						if (rangeToEnemy < cannonRange)
 						{
 							// since we've given ourselves away - run!
-							ForceRun(5.0s);
+							//ForceRun(5.0s);
 
 							// if multiple enemy found, press 6
 							if (GetNearbyEnemyCount() > 2)
@@ -160,11 +171,19 @@ void CCSBot::FireWeaponAtEnemy()
 					}
 					CBasePlayerWeapon* weapon = GetActiveWeapon();
 
-					if (weapon != NULL && (!Q_strcmp(STRING(weapon->pev->classname), "weapon_desperado")))
+					if (weapon != NULL && weapon->GetBotStrategy() == BOT_STRATEGY_DESPERADO)
 					{
 						if(IsPistolEmpty())
 							SecondaryAttack();
 					}
+
+                    if (weapon != NULL && weapon->GetBotStrategy() == BOT_STRATEGY_INFINITY)
+                    {
+                        if(weapon->m_iClip & 1)
+                            PrimaryAttack();
+                        else
+                            SecondaryAttack();
+                    }
 				}
 				// not using a pistol
 				else
@@ -447,6 +466,21 @@ bool CCSBot::IsUsingCannon() const
 	return false;
 }
 
+// Returns true if using skullaxe
+
+bool CCSBot::IsUsingSkullAxe() const
+{
+    CBasePlayerWeapon *weapon = GetActiveWeapon();
+
+    if (weapon == NULL)
+        return false;
+
+    if(weapon->GetBotStrategy() == BOT_STRATEGY_SKULLAXE)
+        return true;
+
+    return false;
+}
+
 // Return true if primary weapon doesn't exist or is totally out of ammo
 
 bool CCSBot::IsPrimaryWeaponEmpty() const
@@ -496,8 +530,8 @@ bool CCSBot::DoEquip(CBasePlayerWeapon *gun)
 	if (!HasAnyAmmo(gun))
 		return false;
 
-	// If cannon is reloading
-	if(gun->m_flNextPrimaryAttack > 0.75s)
+	// If cannon is reloading and not using skullaxe
+	if(gun->m_flNextPrimaryAttack > 0.75s && (m_pActiveItem && GetActiveWeapon()->GetBotStrategy() != BOT_STRATEGY_SKULLAXE))
 		return false;
 
 	// equip it
@@ -536,6 +570,24 @@ void CCSBot::EquipBestWeapon(bool mustEquip)
 				return;
 		}
 	}
+
+    // if there is enemy nearby, equip knife pls
+    CBasePlayerWeapon *knife = static_cast<CBasePlayerWeapon *>(m_rgpPlayerItems[ KNIFE_SLOT ]);
+
+    if (knife != NULL && knife->m_flNextPrimaryAttack <= 0.0s)
+    {
+        if (GetRangeToNearestRecognizedEnemy() < 500) {
+            if (DoEquip(knife))
+            {
+                // if multiple enemy found, press 5
+                if (GetNearbyEnemyCount() > 4)
+                {
+                    m_pModStrategy->ClientCommand("MoE_HumanSkill1");
+                }
+                return;
+            }
+        }
+    }
 
 	if (ctrl->AllowPistols())
 	{
@@ -618,7 +670,7 @@ bool CCSBot::IsUsingKnife() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && weapon->m_iId == WEAPON_KNIFE)
+	if (weapon != NULL && weapon->iItemSlot() == KNIFE_SLOT)
 		return true;
 
 	return false;
@@ -852,61 +904,97 @@ void CCSBot::ReloadCheck()
 
 void CCSBot::BackgroundReloadCheck()
 {
+    auto goto_safe_spot = [this](){
+        // move to cover to reload if there are enemies nearby
+        if (GetNearbyEnemyCount())
+        {
+            // avoid enemies while reloading (above 0.75 skill always hide to reload)
+            const float hideChance = 25.0f + 100.0f * GetProfile()->GetSkill();
+
+            if (!IsHiding() && RANDOM_FLOAT(0.0f, 100.0f) < hideChance)
+            {
+                constexpr auto safeTime = 5.0s;
+                if (GetTimeSinceLastSawEnemy() < safeTime)
+                {
+                    PrintIfWatched("Retreating to a safe spot to reload!\n");
+                    const Vector *spot = FindNearbyRetreatSpot(this, 1000.0f);
+                    if (spot != NULL)
+                    {
+                        // ignore enemies for a second to give us time to hide
+                        // reaching our hiding spot clears our disposition
+                        IgnoreEnemies(10.0s);
+
+                        Run();
+                        StandUp();
+                        Hide(spot, 0.0s);
+                    }
+                }
+            }
+        }
+    };
+
+    if(CBasePlayerWeapon *weapon = GetActiveWeapon())
+    {
+        if(weapon->GetBotStrategy() == BOT_STRATEGY_CANNON)
+        {
+            if(weapon->m_flNextPrimaryAttack > 0.75s)
+            {
+                EquipBestWeapon(true);
+                goto_safe_spot();
+                m_fireWeaponTimestamp = gpGlobals->time;
+                return;
+            }
+        }
+
+        if(weapon->GetBotStrategy() == BOT_STRATEGY_SKULLAXE)
+        {
+            if((weapon->m_flNextPrimaryAttack > 0.1s && weapon->m_flNextPrimaryAttack <= 1.25s) || (weapon->m_flNextPrimaryAttack > 0.1s && weapon->m_flNextSecondaryAttack <= 1.25s))
+            {
+                EquipBestWeapon(true);
+                //goto_safe_spot();
+                m_fireWeaponTimestamp = gpGlobals->time;
+                return;
+            }
+        }
+    }
+
 	if(CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_rgpPlayerItems[ PRIMARY_WEAPON_SLOT ]))
 	{
 		if(weapon->GetBotStrategy() == BOT_STRATEGY_CANNON)
 		{
-			if(m_pActiveItem == weapon)
-			{
-				if(weapon && weapon->m_flNextPrimaryAttack > 0.75s)
-				{
-					EquipBestWeapon(true);
-				}
-				else
-				{
-					return;
-				}
-			}
-			else
+            if(m_pActiveItem != weapon)
 			{
 				if(weapon->m_flNextPrimaryAttack < 0.75s && GetNearbyEnemyCount())
 				{
-					EquipBestWeapon(true);
-				}
-				else
-				{
-					return;
+					EquipBestWeapon(false);
+                    goto_safe_spot();
+                    return;
 				}
 			}
 		}
 	}
 
-	// move to cover to reload if there are enemies nearby
-	if (GetNearbyEnemyCount())
-	{
-		// avoid enemies while reloading (above 0.75 skill always hide to reload)
-		const float hideChance = 25.0f + 100.0f * GetProfile()->GetSkill();
-
-		if (!IsHiding() && RANDOM_FLOAT(0.0f, 100.0f) < hideChance)
-		{
-			constexpr auto safeTime = 5.0s;
-			if (GetTimeSinceLastSawEnemy() < safeTime)
-			{
-				PrintIfWatched("Retreating to a safe spot to reload!\n");
-				const Vector *spot = FindNearbyRetreatSpot(this, 1000.0f);
-				if (spot != NULL)
-				{
-					// ignore enemies for a second to give us time to hide
-					// reaching our hiding spot clears our disposition
-					IgnoreEnemies(10.0s);
-
-					Run();
-					StandUp();
-					Hide(spot, 0.0s);
-				}
-			}
-		}
-	}
+    if(CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(m_rgpPlayerItems[ KNIFE_SLOT ]))
+    {
+        if(weapon->GetBotStrategy() == BOT_STRATEGY_SKULLAXE)
+        {
+            if(m_pActiveItem != weapon)
+            {
+                if(weapon->m_flNextPrimaryAttack <= 0.0s || weapon->m_flNextSecondaryAttack <= 0.0s)
+                {
+                    if(GetNearbyEnemyCount() && GetRangeToNearestRecognizedEnemy() >= 55.0 && GetRangeToNearestRecognizedEnemy() <= 500.0)
+                    {
+                        EquipKnife();
+                        return;
+                    }
+                }
+                else
+                {
+                    PrimaryAttack();
+                }
+            }
+        }
+    }
 }
 
 // Silence/unsilence our weapon if we must

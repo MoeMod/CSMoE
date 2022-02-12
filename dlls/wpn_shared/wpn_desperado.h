@@ -49,6 +49,7 @@ public:
 			return { 450.0f, 350.0f, 400.0f, 300.0f, 0.3f };		
 	}
 	float GetArmorRatioModifier() override { return 1.6; }
+    WeaponBotStrategy GetBotStrategy() const override;
 
 public:
 	duration_t m_flNextRunIdle;

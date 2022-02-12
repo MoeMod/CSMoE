@@ -376,7 +376,9 @@ void CCSBot::Update()
 				if ((IsUsingKnife() || IsUsingCannon()) && IsHiding())
 				{
 					// if hiding with a knife, wait until threat is close
-					const float knifeAttackRange = 250.0f;
+                    float knifeAttackRange = 250.0f;
+                    if(IsUsingSkullAxe())
+                        knifeAttackRange = 450.0f;
 					if ((pev->origin - threat->pev->origin).IsLengthLessThan(knifeAttackRange))
 					{
 						Attack(threat);

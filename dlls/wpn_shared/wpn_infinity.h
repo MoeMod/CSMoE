@@ -68,6 +68,7 @@ protected:
 	int m_iMaxClip;
 	int m_iSpecialAttack;
 	virtual float GetDamage() const;
+    WeaponBotStrategy GetBotStrategy() const override;
 
 public:
 	int m_iShell;

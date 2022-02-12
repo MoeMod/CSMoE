@@ -91,6 +91,7 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	BOOL CanDrop() override { return false; }
+    WeaponBotStrategy GetBotStrategy() const override;
 
 public:
 	void DelayPrimaryAttack();
@@ -245,6 +246,11 @@ void CKnifeSkullAxe::DelaySecondaryAttack()
 	SetThink(nullptr);
 
 	//return fDidHit;
+}
+
+WeaponBotStrategy CKnifeSkullAxe::GetBotStrategy() const
+{
+    return BOT_STRATEGY_SKULLAXE;
 }
 
 }

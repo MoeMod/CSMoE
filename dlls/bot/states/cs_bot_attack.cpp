@@ -212,7 +212,7 @@ void AttackState::OnUpdate(CCSBot *me)
 
 	// Knife fighting
 	// We need to pathfind right to the enemy to cut him
-	if (me->IsUsingKnife() || me->IsUsingCannon())
+	if ((me->IsUsingKnife() || me->IsUsingCannon()) && me->m_flNextAttack < 0.2s && !me->IsUsingSkullAxe())
 	{
 		// can't crouch and hold with a knife
 		m_crouchAndHold = false;
@@ -496,10 +496,36 @@ void AttackState::OnUpdate(CCSBot *me)
 		Vector toEnemy = enemy->pev->origin - me->pev->origin;
 		float range = toEnemy.Length2D();
 
-		const float hysterisRange = 125.0f;		// (+/-) m_combatRange
+        float combatRange = me->GetCombatRange();
+        float hysterisRange = 125.0f;		// (+/-) m_combatRange
 
-		float minRange = me->GetCombatRange() - hysterisRange;
-		float maxRange = me->GetCombatRange() + hysterisRange;
+        // special weapon should always keep distance
+        if(me->IsUsingSkullAxe())
+        {
+            auto weapon = me->GetActiveWeapon();
+            if(weapon->pev->nextthink > gpGlobals->time)
+            {
+                combatRange = 75.0f + me->pev->maxspeed * (weapon->pev->nextthink - gpGlobals->time) / 1s;
+                hysterisRange = 10.0f;
+            }
+        }
+        else if(me->IsUsingCannon())
+        {
+            combatRange = 75.0f + me->pev->maxspeed * me->m_flNextAttack / 1s;
+            hysterisRange = 10.0f * (1 - me->GetProfile()->GetSkill());
+        }
+        else if(CBasePlayerWeapon *weapon = static_cast<CBasePlayerWeapon *>(me->m_rgpPlayerItems[ KNIFE_SLOT ]); weapon->GetBotStrategy() == BOT_STRATEGY_SKULLAXE)
+        {
+            auto delta_time = weapon->pev->nextthink - gpGlobals->time;
+            if(delta_time > 0.1s)
+            {
+                combatRange = 75.0f + me->pev->maxspeed * delta_time / 1s;
+                hysterisRange = 10.0f * (1 - me->GetProfile()->GetSkill());
+            }
+        }
+
+		float minRange = combatRange - hysterisRange;
+		float maxRange = combatRange + hysterisRange;
 
 		// move towards (or away from) enemy if we are using a knife, behind a corner, or we aren't very skilled
 		if (me->GetProfile()->GetSkill() < 0.66f || !me->IsEnemyVisible() || bEnemyIsZombie)

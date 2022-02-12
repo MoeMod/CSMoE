@@ -324,4 +324,9 @@ void CInfinityX::WeaponIdle(void)
 	}
 }
 
+WeaponBotStrategy CInfinityX::GetBotStrategy() const
+{
+    return BOT_STRATEGY_INFINITY;
+}
+
 }
