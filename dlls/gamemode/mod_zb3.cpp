@@ -708,6 +708,22 @@ void CMod_ZB3F2P::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy.reset(new CPlayerModStrategy_ZB3F2P(player, this));
 }
 
+void CMod_ZB3F2P::W_Precache()
+{
+    UTIL_PrecacheOtherWeapon("weapon_cannon");
+    UTIL_PrecacheOther("ammo_cannon");
+    UTIL_PrecacheOtherWeapon("z4b_cannontiger");
+    UTIL_PrecacheOtherWeapon("z4b_cannonplasma");
+    UTIL_PrecacheOtherWeapon("weapon_infinityex2");
+    UTIL_PrecacheOtherWeapon("z4b_infinityx");
+    UTIL_PrecacheOtherWeapon("knife_skullaxe");
+    UTIL_PrecacheOtherWeapon("knife_skullt9");
+    UTIL_PrecacheOther("ammo_skullt9");
+    UTIL_PrecacheOtherWeapon("weapon_chainsaw");
+    UTIL_PrecacheOther("ammo_chainsaw");
+    UTIL_PrecacheOtherWeapon("knife_dragonsword");
+}
+
 void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 {
 	if (!m_pPlayer->m_bIsZombie)

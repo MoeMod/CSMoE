@@ -457,7 +457,6 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 					ClearMultiDamage();
 					pEntity->TraceAttack(pevAttacker, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 					ApplyMultiDamage(pevInflictor, pevAttacker);
-#ifdef XASH_DEDICATED						
 					if (pEntity->IsPlayer())
 					{
 						CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
@@ -469,7 +468,6 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 							MESSAGE_END();
 						}
 					}
-#endif
 
 					
 				}

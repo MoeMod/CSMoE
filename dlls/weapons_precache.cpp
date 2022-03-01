@@ -325,6 +325,8 @@ void W_Precache()
 
 	PRECACHE_SOUND("items/weapondrop1.wav");	// weapon falls to the ground
 	PRECACHE_SOUND("weapons/generic_reload.wav");
+
+    g_pModRunning->W_Precache();
 }
 
 }

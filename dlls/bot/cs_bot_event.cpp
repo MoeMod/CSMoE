@@ -290,8 +290,7 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 					}
 						
 				}
-
-				if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)
+                else if (m_bIsZombie && event == EVENT_WEAPON_RELOADED)
 				{
 					const float skillUseRange = 8192.0f;
 					if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))

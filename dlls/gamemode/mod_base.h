@@ -53,6 +53,7 @@ public:
 	virtual bool CanChangeTeam(CBasePlayer* player, int newTeam_id, int curTeam_id) { return true; }
 	virtual bool IsGameStarted()  { return true; }
 	virtual bool Host_Say(edict_t *pEntity, int teamonly, const char *content) { return false; }
+    virtual void W_Precache() {}
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, virtual public IBaseMod

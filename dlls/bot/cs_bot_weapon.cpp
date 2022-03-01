@@ -98,7 +98,7 @@ void CCSBot::FireWeaponAtEnemy()
                         if(GetRangeToNearestRecognizedEnemy() < 350)
                         {
                             // range is enough
-                            if (GetNearbyEnemyCount() > 3)
+                            if (GetNearbyEnemyCount() >= 3 && GetRangeToNearestRecognizedEnemy() < 100)
                                 SecondaryAttack();
                             else
                                 PrimaryAttack();
@@ -137,7 +137,7 @@ void CCSBot::FireWeaponAtEnemy()
 							//ForceRun(5.0s);
 
 							// if multiple enemy found, press 6
-							if (GetNearbyEnemyCount() > 2)
+							if (GetNearbyEnemyCount() > 2 && m_flNextAttack < 0.2s)
 							{
 								m_pModStrategy->ClientCommand("MoE_HumanSkill2");
 							}
@@ -982,10 +982,13 @@ void CCSBot::BackgroundReloadCheck()
             {
                 if(weapon->m_flNextPrimaryAttack <= 0.0s || weapon->m_flNextSecondaryAttack <= 0.0s)
                 {
-                    if(GetNearbyEnemyCount() && GetRangeToNearestRecognizedEnemy() >= 55.0 && GetRangeToNearestRecognizedEnemy() <= 500.0)
+                    if(GetNearbyEnemyCount())
                     {
-                        EquipKnife();
-                        return;
+                        if((GetRangeToNearestRecognizedEnemy() >= 32.0 && GetRangeToNearestRecognizedEnemy() <= 500.0))
+                        {
+                            EquipKnife();
+                            return;
+                        }
                     }
                 }
                 else

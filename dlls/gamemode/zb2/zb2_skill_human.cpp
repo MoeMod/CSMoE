@@ -171,14 +171,12 @@ public:
 		WRITE_SHORT(5);
 		WRITE_SHORT(-1);
 		MESSAGE_END();
-#ifdef XASH_DEDICATED
 
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(1);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
 		WRITE_BYTE(m_flTimeZombieSkillEnd == gpGlobals->time + 5.5s ? 1 : 0);
 		MESSAGE_END();
-#endif
 	}
 
 	void OnSkillEnd() override
@@ -219,12 +217,11 @@ public:
 		WRITE_SHORT(10);
 		WRITE_SHORT(-1);
 		MESSAGE_END();
-#ifdef XASH_DEDICATED
+
 		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
 		WRITE_BYTE(0);	//type
 		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
 		MESSAGE_END();
-#endif
 	}
 
 	void OnSkillEnd() override

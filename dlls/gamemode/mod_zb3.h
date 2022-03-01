@@ -127,6 +127,7 @@ public:
 	void InstallPlayerModStrategy(CBasePlayer *) override;
 	void StartForceRespawn() override {} // no force respawn
 	void PickHero() override {} // no hero
+    void W_Precache() override;
 };
 
 class CPlayerModStrategy_ZB3F2P : public CPlayerModStrategy_ZB3
