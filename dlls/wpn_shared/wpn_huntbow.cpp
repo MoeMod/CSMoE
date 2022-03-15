@@ -42,6 +42,14 @@ namespace sv {
 	class CHuntbowArrow : public CBaseEntity
 	{
 	public:
+        Vector Get_Velocity_Angle(CBaseEntity *pEntity, Vector Output)
+        {
+            pEntity->pev->velocity;
+            Output = UTIL_VecToAngles(pEntity->pev->velocity);
+            if (Output[0] > 90.0)
+                Output[0] = -(360.0 - Output[0]);
+            return Output;
+        }
 		KnockbackData GetKnockBackData() override { return { 1500.0f, 900.0f, 1000.0f, 900.0f, 0.25f }; }
 		void Spawn() override
 		{

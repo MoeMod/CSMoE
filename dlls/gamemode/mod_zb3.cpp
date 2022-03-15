@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "player.h"
 #include "game.h"
 #include "client.h"
+#include "entity_state.h"
 
 #include "mod_zb3.h"
 #include "player/player_zombie.h"
