@@ -132,7 +132,7 @@ public:
 
 	std::shared_ptr<IZombieModeCharacter> m_pCharacter;
 
-	void SetStunSpeedTime(duration_t value) {
+	void SetStunSpeedTime(duration_t time, float value = 100.0) {
 		if (!m_pCharacter)
 			return;
 
@@ -140,11 +140,12 @@ public:
 		if (!zombie)
 			return;
 
-		zombie->m_tStunSpeedTime = gpGlobals->time + value;
+		zombie->m_tStunSpeedTime = gpGlobals->time + time;
+		zombie->m_flStunSpeed = value;
 		m_pPlayer->ResetMaxSpeed();
 	}
 
-	void SetStunGravityTime(duration_t value) {
+	void SetStunGravityTime(duration_t time, float value = 1.0) {
 		if (!m_pCharacter)
 			return;
 
@@ -152,7 +153,8 @@ public:
 		if (!zombie)
 			return;
 
-		zombie->m_tStunGravityTime = gpGlobals->time + value;
+		zombie->m_tStunGravityTime = gpGlobals->time + time;
+		zombie->m_flStunGravity = value;
 		m_pPlayer->ResetMaxSpeed();
 	}
 };

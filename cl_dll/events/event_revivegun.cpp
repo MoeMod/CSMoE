@@ -78,13 +78,13 @@ void EV_FireReviveGun( event_args_t *args )
 		{
 			if (args->bparam2)
 			{
-				//viewent->curstate.skin = 2;
+				viewent->curstate.skin = 2;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_REVIVE_SHOOTB, 2);
 				return;
 			}
 			else
 			{
-				//viewent->curstate.skin = 0;
+				viewent->curstate.skin = 0;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_REVIVE_SHOOTA, 2);
 			}
 		}
@@ -92,34 +92,19 @@ void EV_FireReviveGun( event_args_t *args )
 		{
 			if (args->bparam2)
 			{
-				//viewent->curstate.skin = 2;
+				viewent->curstate.skin = 2;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_SHOOTB, 2);
 				return;
 			}
 			else
 			{
-				//viewent->curstate.skin = 0;
+				viewent->curstate.skin = 0;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_SHOOTA, 2);
 			}
 		}
 			
 		EV_MuzzleFlash();
-		if( !gHUD.cl_righthand->value )
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, -10.0, 0);
-		}
-		else
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, 10.0, 0);
-		}
 	}
-	else
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
-	}
-
-
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iRShell, TE_BOUNCE_SHELL);
 
 	EV_GetGunPosition( args, vecSrc, origin );
 	VectorCopy( forward, vecAiming );

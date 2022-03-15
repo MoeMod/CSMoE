@@ -502,11 +502,9 @@ void CPlayerModStrategy_ZB2::CheckEvolution()
 
 void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 {
-	if (!m_pCharacter_ZB2)
-		return;
-
 	m_iZombieInfections = 0;
-	m_pCharacter_ZB2->Evolution(iEvolutionLevel);
+	if (m_pCharacter_ZB2)
+		m_pCharacter_ZB2->Evolution(iEvolutionLevel);
 
 	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
 	{
@@ -545,6 +543,28 @@ int CPlayerModStrategy_ZB2::AddToFullPack_Post(struct entity_state_s* state, int
 		return CPlayerModStrategy_ZB1::AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
 
 	return m_pCharacter_ZB2->AddToFullPack_Post(state, e, ent, host, hostflags, player, pSet);
+}
+
+void CPlayerModStrategy_ZB2::OnTouch(CBaseEntity* other)
+{
+	
+	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "boomer") && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+	{
+		if (!other->IsPlayer())
+			return;
+		if (!other->IsAlive())
+			return;
+		CBasePlayer* p = static_cast<CBasePlayer*>(other);
+		if (p->m_bIsZombie)
+			return;
+
+		if (m_pPlayer->IsAlive())
+		{
+			m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC;
+			m_pPlayer->Killed(m_pPlayer->pev, 1);
+		}
+	}
+	return CPlayerModStrategy_Default::OnTouch(other);
 }
 
 }

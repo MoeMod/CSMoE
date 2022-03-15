@@ -283,7 +283,7 @@ void CStarchaserar::StarchaserarFire(float flSpread, duration_t flCycleTime, BOO
 		CBaseEntity *pevAttacker = this->m_pPlayer;
 		auto vecShootPosition = Get_ShootPosition(pevAttacker, vecSrc);
 #ifndef CLIENT_DLL
-		RadiusDamage(vecShootPosition, g_pModRunning->DamageTrack() == DT_NONE ? 10 : 1000);
+		RadiusDamage(vecShootPosition, g_pModRunning->DamageTrack() == DT_NONE ? 10 : 500);
 #endif
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/starchaserar-2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 	}
@@ -352,7 +352,7 @@ float CStarchaserar::GetDamage() const
 	float flDamage = 25.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 144.0f;
+		flDamage = 72.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 146.0f;
 #endif

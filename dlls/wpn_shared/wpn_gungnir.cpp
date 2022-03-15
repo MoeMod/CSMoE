@@ -979,6 +979,18 @@ bool CGungnir::PrimaryAttack_CheckTargetAvailable(CBaseEntity * a2, Vector vecAn
 	if (DotProduct(gpGlobals->v_forward, vecDelta) < 0.5)
 		return false;
 
+	TraceResult tr;
+	UTIL_TraceLine(m_pPlayer->pev->origin, a2->pev->origin, missile, m_pPlayer->edict(), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		if (!tr.pHit)
+			return false;
+
+		if (tr.pHit != a2->edict())
+			return false;
+	}
+
 	return true;
 }
 
@@ -1000,6 +1012,8 @@ void CGungnir::PrimaryAttack_InstantDamage()
 		if (pBeam)
 		{
 			pBeam->SetType(BEAM_ENTPOINT);
+			pBeam->pev->sequence = 0;
+			pBeam->pev->owner = 0;
 			pBeam->SetStartPos(vecEnd);
 			pBeam->SetEndEntity(ENTINDEX(m_pPlayer->edict()));
 			pBeam->SetStartAttachment(0);

@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
 
+
 enum summon_anim
 {
 	ATTACK1_START,
@@ -55,6 +56,8 @@ namespace sv {
 			SetThink(&CDgaxeSummon::Skill);
 			pev->nextthink = gpGlobals->time + 0.01s;
 			pev->classname = MAKE_STRING("dgaxe");
+			m_flDamageTime = invalid_time_point;
+			m_flLoopTime = invalid_time_point;
 		}
 
 		void Skill()
@@ -90,6 +93,7 @@ namespace sv {
 				m_iState = ATTACK2_END;
 				m_freq = 40;
 				m_flLoopTime = gpGlobals->time + 1.7s;
+				m_flDamageTime = gpGlobals->time + 0.2s;
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill1_exp.wav", VOL_NORM, ATTN_NORM);
 
 				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
@@ -98,15 +102,19 @@ namespace sv {
 				WRITE_COORD(pev->origin[1]);
 				WRITE_COORD(pev->origin[2]);
 				WRITE_SHORT(MODEL_INDEX("sprites/ef_dgaxe_explo.spr"));
-				WRITE_BYTE(8);
+				WRITE_BYTE(15);
 				WRITE_BYTE(30);
 				WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
 				MESSAGE_END();
 
 			}
-			RadiusDamage(pev->origin, m_SkillDamage, TRUE, m_freq);
-			if (m_freq == 40)
-				m_freq = 0;
+
+			if (m_flDamageTime != invalid_time_point && gpGlobals->time > m_flDamageTime)
+			{
+				RadiusDamage(m_SkillDamage, TRUE);
+				m_flDamageTime = invalid_time_point;
+			}
+
 			pev->renderamt -= 1;
 			pev->nextthink = gpGlobals->time + 0.01s;
 			if (gpGlobals->time > m_flLoopTime)		//after 1.7s
@@ -126,6 +134,7 @@ namespace sv {
 
 			SetThink(&CDgaxeSummon::Skill2OnLoop);
 			pev->nextthink = gpGlobals->time + 0.36s;
+			m_flDamageTime = gpGlobals->time + 0.25s;
 		}
 
 		void Skill2OnLoop()
@@ -136,23 +145,23 @@ namespace sv {
 				pev->sequence = ATTACK2_LOOP;
 				pev->animtime = gpGlobals->time;
 				pev->framerate = 1.0;
-				m_freq = 40;
-				m_flLoopTime = gpGlobals->time + 6.8s;
+				m_flLoopTime = gpGlobals->time + 5.0s;
+				
 				EMIT_SOUND(ENT(pev), CHAN_WEAPON, "weapons/dgaxe_skill2_exp.wav", VOL_NORM, ATTN_NORM);
 			}
-			RadiusDamage(pev->origin, m_SkillDamage, FALSE, m_freq);
-
-			if (m_freq == 40)
+			if (m_flDamageTime != invalid_time_point && gpGlobals->time > m_flDamageTime)
 			{
-				m_freq = 0;
+				RadiusDamage(m_SkillDamage, FALSE);
+				m_flDamageTime = gpGlobals->time + 0.25s;
 			}
-			m_freq++;
+			
 			pev->nextthink = gpGlobals->time + 0.01s;
 			//RadiusDamage();
 			if (gpGlobals->time > m_flLoopTime)		//after 4s
 			{
 				SetThink(&CDgaxeSummon::Skill2OnEnd);
 				pev->nextthink = gpGlobals->time + 0.01s;
+				m_flDamageTime = invalid_time_point;
 			}
 
 		}
@@ -177,85 +186,87 @@ namespace sv {
 
 		}
 
-		void RadiusDamage(Vector vecAiming, float flDamage, bool bIsSkill1, int freq)
+		void RadiusDamage(float flDamage, bool bIsSkill1)
 		{
-			float flRadius = 175.0f;
-			if (g_pModRunning->DamageTrack() == DT_ZBS)
-				flRadius = 175.0f;
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flRadius = 175.0f;
-			const Vector vecSrc = vecAiming;
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackPlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
 
-			entvars_t* const pevAttacker = VARS(pev->owner);
-			entvars_t* const pevInflictor = this->pev;
-			int bitsDamageType = DMG_BULLET;
-
-			TraceResult tr;
-			const int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
-
-			CBaseEntity* pEntity = NULL;
-			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+			if (pAttackPlayer && !pAttackPlayer->m_bIsZombie)
 			{
-				if (pEntity->pev->takedamage != DAMAGE_NO)
+				TraceResult tr;
+				CBaseEntity* pEntity = NULL;
+
+				Vector vecEnd;
+				int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+
+				while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 175.0)) != NULL)
 				{
-					if (pEntity->pev == pevAttacker)
+					if (pEntity->edict() == pev->owner)
 						continue;
 
-					if (bInWater && !pEntity->pev->waterlevel)
+					if (pEntity->IsDormant())
 						continue;
 
-					if (!bInWater && pEntity->pev->waterlevel == 3)
+					if (pEntity->pev->takedamage == DAMAGE_NO)
 						continue;
 
-					if (pEntity->IsBSPModel())
+					if (pEntity->Classify() == CLASS_NONE)
 						continue;
 
-					if (!m_pPlayer->m_bIsZombie)
+					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+						continue;
+
+					if (pEntity->IsPlayer())
 					{
-						Vector vecSpot = pEntity->BodyTarget(vecSrc);
-						UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+						CBasePlayer* player = (CBasePlayer*)pEntity;
 
-						if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict())
+						if (!player)
+							continue;
+
+						if (pAttackPlayer->m_iTeam == player->m_iTeam)
+							continue;
+
+						vecEnd = player->BodyTarget(pev->origin);
+
+						UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+						if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+							continue;
+
+						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
+
+						if (player->m_bIsZombie)
 						{
-							if (tr.fStartSolid)
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
 							{
-								tr.vecEndPos = vecSrc;
-								tr.flFraction = 0;
-							}
-
-							if (freq == 40)
-							{
-								if (tr.flFraction == 1.0f)
+								if (bIsSkill1)
 								{
-									pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+									strategy->SetStunSpeedTime(1.0s, 150.0f);	//150
+									strategy->SetStunGravityTime(1.0s);
 								}
 								else
 								{
-									tr.iHitgroup = HITGROUP_CHEST;
-									ClearMultiDamage();
-									pEntity->TraceAttack(pevAttacker, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-									ApplyMultiDamage(pevInflictor, pevAttacker);
+									strategy->SetStunSpeedTime(2.0s, 60.0f);	//60
+									strategy->SetStunGravityTime(2.0s);
 								}
 
-								if (bIsSkill1)
-								{
-									if (pEntity->IsPlayer())
-									{
-										CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-										if (target->m_bIsZombie && target->m_ZombieClass)
-										{
-											if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
-											{
-												target->pev->velocity.x = 0;
-												target->pev->velocity.y = 0;
-												target->m_flVelocityModifier = 0.3;
-											}
-										}
-									}
-								}
 							}
-						}				
+						}					
 					}
+					else
+					{
+						vecEnd = pEntity->BodyTarget(pev->origin);
+
+						UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+
+						if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+							continue;
+
+						pEntity->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
+					}			
 				}
 			}
 		}
@@ -266,16 +277,6 @@ namespace sv {
 			m_usDgaxe = eventindex;
 			m_pPlayer = pPlayer;
 			m_iSkill = iSkill;
-		}
-
-		KnockbackData GetKnockBackData()
-		{
-			if (m_iSkill)
-			{
-				return { 30.0f, 85.0f, 100.0f, 100.0f, 0.1f };
-			}
-			else
-				return { 350.0f, 250.0f, 350.0f, 100.0f, 0.6f };
 		}
 
 		void Precache() override
@@ -292,6 +293,7 @@ namespace sv {
 		CBasePlayer* m_pPlayer;
 		int m_iState;
 		time_point_t m_flLoopTime;
+		time_point_t m_flDamageTime;
 
 		protected:
 			void Remove()
@@ -421,7 +423,7 @@ namespace sv {
 		
 		BOOL Deploy(void) override
 		{
-			m_fMaxSpeed = 250;
+			m_fMaxSpeed = 260;
 			m_iComboState = DGAXE_COMBO_IDLE;
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_pPlayer->m_bShieldDrawn = false;
@@ -444,11 +446,11 @@ namespace sv {
 				PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, g_vecZero, 0.0, 0.0, 4, 2, TRUE, FALSE);
 			}
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_draw.wav", 0.3, 2.4);
-			return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 ? V_Model_1 : V_Model, P_Model, DGAXE_DRAW, "tomahawk", UseDecrement() != FALSE);
+			return DefaultDeploy(m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] >= 50 ? V_Model_1 : V_Model, P_Model, DGAXE_DRAW, "tomahawk", UseDecrement() != FALSE, 0.1s);
 		}
 
 		int GetItemInfo(ItemInfo* p) override;
-		float GetMaxSpeed() override { return 250; }
+		float GetMaxSpeed() override { return 260; }
 		void PrimaryAttack() override;
 		void SecondaryAttack() override;
 		void Spawn() override;
@@ -462,7 +464,8 @@ namespace sv {
 		BOOL CanDrop() override { return false; }
 		BOOL IsSignal();
 		BOOL CanHolster() override;
-#ifndef CLIENT_DLL	
+#ifndef CLIENT_DLL
+		hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack);
 		Vector Get_ShootPosition(CBaseEntity* pevAttacker, Vector Start, int* bHit);
 		void ItemPostFrame() override;
 #endif
@@ -530,7 +533,6 @@ namespace sv {
 		time_point_t m_flTimeNextSkill2;
 		time_point_t m_flTimeHostler;
 		time_point_t m_flTimeNextMessage;
-		int m_iDamageType;
 		int m_iComboState;
 		int m_iHolsterAmmo;
 		int m_usDgaxe;
@@ -578,20 +580,115 @@ namespace sv {
 		return 1;
 	}
 
-	KnockbackData CKnifeDgaxe::GetKnockBackData()
+	KnockbackData CKnifeDgaxe::GetKnockBackData() { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
+
+#ifndef CLIENT_DLL
+	hit_result_t CKnifeDgaxe::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack)
 	{
-		switch (m_iDamageType)
+		CBaseEntity* pEntity = NULL;
+		hit_result_t result = HIT_NONE;
+		TraceResult tr;
+		UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+		Vector vecEnd;
+		Vector vecSrc = pAttackPlayer->GetGunPosition();
+
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
 		{
-		case DGAXE_PRIMARYATTACK:  return { 1.0f, 1.0f, 1.0f, 1.0f, 0.4f };
-		case DGAXE_SECONDARYATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f }; }
-		case DGAXE_COMBOATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
-		case DGAXE_SKILL1ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
-		case DGAXE_SKILL2ATTACK: { return { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }; }
-		default:
-			break;
+			if (pEntity == pAttackPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+				continue;
+
+			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+				continue;
+
+			float flRatio = 1.0;
+
+			if (pEntity && pEntity->IsPlayer())
+			{
+				UTIL_MakeVectors(pEntity->pev->angles);
+
+				if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
+					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
+
+			}
+
+			pAttackPlayer->m_iWeaponVolume = 128;
+
+			ClearMultiDamage();
+
+			pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+			ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+			result = HIT_PLAYER;
+
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+
+				if (player->m_bIsZombie && player->m_ZombieClass)
+				{
+					if (IsPrimaryAttack)
+					{
+						
+
+						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+						{
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
+							{
+								strategy->SetStunSpeedTime(2.0s);
+								strategy->SetStunGravityTime(2.0s);
+							}
+						}
+					}
+					else
+					{
+						Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.6f });
+					}
+				}
+			}
 		}
-		{ return { 1.0f, 1.0f, 1.0f, 1.0f, 0.9f }; }
+
+		if (!result)
+		{
+			static int calced = 0;
+			static float calcRes = 0.0f;
+
+			if (!(calced & 1))
+			{
+				calced |= 1;
+				calcRes = sqrt(512.0);
+			}
+
+			vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+			if (tr.flFraction < 1.0f)
+				result = HIT_WALL;
+		}
+
+		return result;
 	}
+#endif
 
 	void CKnifeDgaxe::PrimaryAttack(void)
 	{
@@ -607,9 +704,9 @@ namespace sv {
 			SendWeaponAnim(DGAXE_COMBO, UseDecrement() != FALSE);
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_STATIC, "weapons/dgaxe_combo.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			SetThink(&CKnifeDgaxe::ComboAttack);
-			pev->nextthink = gpGlobals->time + 0.83s;
+			pev->nextthink = gpGlobals->time + 0.73s;
 
-			m_pPlayer->iuser1 = 1;
+			m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.51s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.03s;
 			m_iComboState = DGAXE_COMBO_IDLE;
@@ -627,8 +724,8 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-		m_iDamageType = DGAXE_PRIMARYATTACK;
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 180, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+
+		switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 360, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, true))
 		{
 		case HIT_NONE:
 		{
@@ -665,7 +762,8 @@ namespace sv {
 		}
 #endif
 		DualSlashAnim++;
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.9s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.97s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		SlashAnim++;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}
@@ -694,8 +792,7 @@ namespace sv {
 
 #ifndef CLIENT_DLL
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-		m_iDamageType = DGAXE_SECONDARYATTACK;
-		switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 180, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+		switch (KnifeAttack(GetSecondaryAttackDamage(), 180, 180, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, true))
 		{
 		case HIT_NONE:
 		{
@@ -734,20 +831,19 @@ namespace sv {
 		}
 		}
 #endif
-		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.16s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.15s;
 		SlashAnim++;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}
 
 	void CKnifeDgaxe::ComboAttack()
 	{
-		m_iDamageType = DGAXE_COMBOATTACK;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecEnd = vecSrc + gpGlobals->v_forward * 220;
 
 		SetThink(&CKnifeDgaxe::Guard);
-		pev->nextthink = gpGlobals->time + 1.17s;
+		pev->nextthink = gpGlobals->time + 1.27s;
 		m_pPlayer->pev->weaponmodel = MAKE_STRING(P_Model);
 		Q_strcpy(m_pPlayer->m_szAnimExtention, "tomahawk");
 #ifndef CLIENT_DLL
@@ -823,6 +919,7 @@ namespace sv {
 					CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
 					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie && pPlayer->m_ZombieClass)
 					{
+						pPlayer->m_flVelocityModifier = 1.0;
 						if (stricmp(pPlayer->m_ZombieClass, "revival") || !pPlayer->m_iZombieRevivalEnabled)
 						{
 							Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
@@ -845,8 +942,8 @@ namespace sv {
 
 	void CKnifeDgaxe::Guard()
 	{
-		if (m_pPlayer->iuser1 == 1)
-			m_pPlayer->iuser1 = 0;
+		if (m_pPlayer->m_iBuff & BUFF_AVOID_INFECT)
+			m_pPlayer->m_iBuff &= ~BUFF_AVOID_INFECT;
 		SetThink(nullptr);
 	}
 
@@ -902,6 +999,7 @@ namespace sv {
 		MESSAGE_END();
 #endif
 		SetThink(nullptr);
+		m_pPlayer->m_iBuff &= ~BUFF_AVOID_INFECT;
 		m_iHolsterAmmo = m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType];
 		m_flTimeHostler = gpGlobals->time;
 		return CBasePlayerWeapon::Holster(skiplocal);
@@ -979,8 +1077,7 @@ namespace sv {
 					{
 						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 						SendWeaponAnim(DGAXE_SKILL1, UseDecrement() != FALSE);
-						m_iDamageType = DGAXE_SKILL2ATTACK;
-						m_pPlayer->iuser1 = 1;
+						m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
 						SetThink(&CKnifeDgaxe::Guard);
 						pev->nextthink = gpGlobals->time + 2.0s;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));
@@ -1004,8 +1101,7 @@ namespace sv {
 					{
 						m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 						SendWeaponAnim(DGAXE_SKILL2, UseDecrement() != FALSE);
-						m_iDamageType = DGAXE_SKILL1ATTACK;
-						m_pPlayer->iuser1 = 1;
+						m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
 						SetThink(&CKnifeDgaxe::Guard);
 						pev->nextthink = gpGlobals->time + 2.0s;
 						CDgaxeSummon* pEnt = static_cast<CDgaxeSummon*>(CBaseEntity::Create("dgaxe_summon", vecShootPosition, { 0,0,0 }, ENT(m_pPlayer->pev)));

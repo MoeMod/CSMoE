@@ -270,17 +270,23 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
 							ClientCommand("BTE_ZombieSkill2");
 					}
+					else if (!stricmp(this->m_ZombieClass, "boomer"))
+					{
+						skillUseRange = 500;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange) && this->pev->health <= 2000)
+							ClientCommand("BTE_ZombieSkill1");
+					}
 					else if (!stricmp(this->m_ZombieClass, "stamper"))
 					{
 						skillUseRange = 140;
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
 							ClientCommand("BTE_ZombieSkill1");
 					}
-					else if (!stricmp(this->m_ZombieClass, "witch"))
+					else if (!stricmp(this->m_ZombieClass, "witch") || !stricmp(this->m_ZombieClass, "aksha"))
 					{
 						skillUseRange = 1500;
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
-							ClientCommand("BTE_ZombieSkill2");
+							ClientCommand("BTE_ZombieSkill1");
 					}
 					else if (!stricmp(this->m_ZombieClass, "zbs_deimos2"))
 					{

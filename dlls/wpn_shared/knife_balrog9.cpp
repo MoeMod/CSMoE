@@ -46,10 +46,10 @@ namespace sv {
 		static constexpr const char* P_Model = "models/p_balrog9.mdl";
 		static constexpr const char* W_Model = "models/w_knife.mdl";
 
-		static constexpr int MaxClip = 100;
+		static constexpr int MaxClip = -1;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "sfsword";
-		KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.5f };
+		KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 	public:
 
@@ -77,6 +77,7 @@ namespace sv {
 
 			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/balrogcritical.spr");
 
+			PRECACHE_MODEL("sprites/muzzleflash20.spr");
 			PRECACHE_SOUND("weapons/balrog9_slash1.wav");
 			PRECACHE_SOUND("weapons/balrog9_slash2.wav");
 			PRECACHE_SOUND("weapons/balrog9_hit1.wav");
@@ -95,7 +96,7 @@ namespace sv {
 			m_flTimeCheckCharge = invalid_time_point;
 			m_pPlayer->m_bShieldDrawn = false;
 
-			if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "sfsword", UseDecrement() != FALSE))
+			if (DefaultDeploy(V_Model, P_Model, ANIM_DRAW, "dragontail", UseDecrement() != FALSE))
 			{
 				m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
 				m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
@@ -113,7 +114,7 @@ namespace sv {
 		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
 		void OnAttack2Released();
-		void CreateHitFX(Vector pos);
+		void PunchAxis(float x, float y, float x_min, float y_min);
 
 		BOOL CanDrop() override { return false; }
 
@@ -123,7 +124,7 @@ namespace sv {
 			float flDamage = 35;
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
-				flDamage = 2618.0f;	//original 1836
+				flDamage = 150.0f;	//original 1836
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 1240.0f;
 #endif
@@ -190,19 +191,17 @@ namespace sv {
 		return 1;
 	}
 
-	void CKnifeBalrog9::CreateHitFX(Vector pos)
+	void CKnifeBalrog9::PunchAxis(float x, float y, float x_min = -100.0, float y_min = -100.0)
 	{
 #ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_EXPLOSION);
-		WRITE_COORD(pos.x);
-		WRITE_COORD(pos.y);
-		WRITE_COORD(pos.z);
-		WRITE_SHORT(m_iSecondarySprEffect);
-		WRITE_BYTE(5);
-		WRITE_BYTE(30);
-		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
-		MESSAGE_END();
+		Vector vecPunchangle = m_pPlayer->pev->punchangle;
+		vecPunchangle[0] += x;
+		vecPunchangle[1] += y;
+
+		vecPunchangle[0] = min(max(vecPunchangle[0], x_min), -x_min);
+		vecPunchangle[1] = min(max(vecPunchangle[1], y_min), -y_min);
+
+		m_pPlayer->pev->punchangle = vecPunchangle;	
 #endif
 	}
 
@@ -218,10 +217,14 @@ namespace sv {
 
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 #ifndef CLIENT_DLL
-		SendWeaponAnim(RANDOM_LONG(ANIM_SLASH1, ANIM_SLASH5), UseDecrement() != FALSE);
+		int iAnim = RANDOM_LONG(ANIM_SLASH1, ANIM_SLASH5);
+		SendWeaponAnim(iAnim, UseDecrement() != FALSE);
 
 		bool fDidHit = FALSE;
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/balrog9_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+
 		switch (KnifeAttack(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 50, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
 		{
 		case HIT_NONE:
@@ -241,15 +244,22 @@ namespace sv {
 		}
 		case HIT_WALL:
 		{
-
+			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/balrog9_hitwall.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
 			fDidHit = TRUE;
 			break;
 		}
 		}
 
-		if(fDidHit)
+		if (fDidHit)
+		{
+			if (iAnim % 2)
+				PunchAxis(0.8, 0.8);
+			else
+				PunchAxis(-0.8, -0.8);
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.33s;
+		}
+			
 		else
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.8s;
 #endif
@@ -287,6 +297,8 @@ namespace sv {
 				case 2:
 				{
 					SendWeaponAnim(ANIM_CHARGE_FINISH1, UseDecrement() != FALSE);
+
+					EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_WEAPON, "weapons/balrog9_charge_finish1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 					m_iState = 3;
 
@@ -375,7 +387,7 @@ namespace sv {
 		Vector2D vecForward2D = vecForward.Make2D().Normalize();
 
 		if (m_iSwing)
-			CreateHitFX(vecSrc + vecForward * 35);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecSrc + gpGlobals->v_forward * 35, g_vecZero, 0.0, 0.0, 21, 0, TRUE, FALSE);
 
 		float c = cos(flAngleDegrees * 0.5 * M_PI / flRadius);
 
@@ -411,17 +423,21 @@ namespace sv {
 			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-			if (m_iSwing)
+		
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
 			{
-				CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-				if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
+				Vector vecDir = (pPlayer->pev->origin - m_pPlayer->pev->origin);
+				if (m_iSwing)
 				{
-					Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
-
-					pPlayer->pev->velocity.z = 150;
-					pPlayer->m_flVelocityModifier = 0.5;
+					ApplyKnockbackData(pPlayer, vecDir, { 500, 400, 400, 500, 1.0f });
+					pPlayer->pev->velocity.z = 200;
 				}
+				else
+				{
+					ApplyKnockbackData(pPlayer, vecDir, { 400, 300, 300, 400, 1.0f });
+					pPlayer->pev->velocity.z = 150;
+				}		
 			}
 		}
 #endif

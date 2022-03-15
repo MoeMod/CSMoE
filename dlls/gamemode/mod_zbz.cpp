@@ -78,11 +78,22 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	MESSAGE_END();
 }
 
+void CPlayerModStrategy_ZBZ::GrenadeExploded(Vector vecOrigin)
+{
+	SKILL_FUNCTION(m_vecSkill, OnGrenadeExploded, vecOrigin);
+}
+
+void CPlayerModStrategy_ZBZ::ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
+{
+	SKILL_FUNCTION(m_vecSkill, OnShootGrenade, vecStart, vecVelocity, time, iTeam, usEvent);
+}
+
 float CPlayerModStrategy_ZBZ::AdjustZombieKnifeRange(bool bStab, float flRange)
 {
 	SKILL_FUNCTION(m_vecSkill, OnAdjustZombieKnifeRange, bStab, flRange);
 	return flRange;
 }
+
 Vector CPlayerModStrategy_ZBZ::AdjustFireBullets3Dir(Vector vecDir)
 {
 	SKILL_FUNCTION(m_vecSkill, OnAdjustFireBullets3Dir, vecDir);
@@ -545,7 +556,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
 			m_pModZBZ->MakeZombie(m_pPlayer, ZOMBIE_LEVEL_ORIGIN);
-			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 1000.0f;
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 1000.0f * iNumPlayers / iNumZombies + 3000.0f;
 			m_pPlayer->pev->armorvalue = 1100;
 			m_pModZBZ->TeamCheck();
 

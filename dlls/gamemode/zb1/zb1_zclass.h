@@ -50,11 +50,23 @@ class CZombie_ZB1 : public BasePlayerExtra, virtual public IZombieModeCharacter
 {
 public:
 	explicit CZombie_ZB1(CBasePlayer *player, ZombieLevel lv); // player_zombie.cpp
-	void Think() override {}
+	void Think() override 
+	{
+		if (m_tStunGravityTime != invalid_time_point && m_tStunGravityTime <= gpGlobals->time)
+		{
+			m_tStunGravityTime = invalid_time_point;
+			m_pPlayer->ResetMaxSpeed();
+		}
+
+		if (m_tStunSpeedTime != invalid_time_point && m_tStunSpeedTime <= gpGlobals->time)
+		{
+			m_tStunSpeedTime = invalid_time_point;
+			m_pPlayer->ResetMaxSpeed();
+		}
+	}
 	bool ApplyKnockback(CBasePlayer *attacker, const KnockbackData & data) override 
 	{ 
 		Vector vecDir = m_pPlayer->pev->origin - attacker->pev->origin;
-		vecDir.z = 0;
 		ApplyKnockbackData(m_pPlayer, vecDir, data);
 		return true;
 	}
@@ -64,7 +76,9 @@ public:
 	void DeathSound_Zombie() override;
 
 	time_point_t m_tStunGravityTime;
+	float m_flStunGravity;
 	time_point_t m_tStunSpeedTime;
+	float m_flStunSpeed;
 };
 
 }

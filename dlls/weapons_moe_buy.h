@@ -41,6 +41,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_infinityx", "英菲尼迪双枪",     1500, PISTOL_SLOT,         UNASSIGNED, 1},
 	{"weapon_voidpistol",         "黑曜审判",                  1700, PISTOL_SLOT, UNASSIGNED, 50},
 	{"weapon_gunkata",	 "深渊",			  1500,  PISTOL_SLOT,         UNASSIGNED, 50},
+	{"weapon_desperado",         "永恒",                  1500, PISTOL_SLOT, UNASSIGNED, 50},
 	{"weapon_y21s1jetgunmd",  "冰雪魔咒",	2000, PISTOL_SLOT, UNASSIGNED, 50},
 	{"z4b_frequency1",        "劫曦F1",                  1500, PISTOL_SLOT, UNASSIGNED, 1},
 	{"z4b_deagleb",      "修罗",    700, PISTOL_SLOT, UNASSIGNED, 1},
@@ -90,7 +91,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_buffak",      "圣帝",    5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_sfsniper",         "雷神",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_plasmagun",      "破晓黎明",    0, PRIMARY_WEAPON_SLOT, UNASSIGNED, 50},
-	//{"weapon_revivegun",	 "逆界星轮",			  1500,  PRIMARY_WEAPON_SLOT,         UNASSIGNED },
+	{"weapon_revivegun",	 "逆界星轮",			  1500,  PRIMARY_WEAPON_SLOT,         UNASSIGNED },
 	{"z4b_cannonplasma",      "黎明离子炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"z4b_cannontiger",      "裂地虎炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"z4b_m134heroi",      "漩涡i7",    7700, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
@@ -125,9 +126,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_nataknifedx",      "双持新月刃",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_oppovivo",      "绝地光剑",    0, KNIFE_SLOT, UNASSIGNED, 1},
 	{"z4b_stormgiantx",      "骇影巨锤",    0, KNIFE_SLOT, UNASSIGNED, 80},
-	//{"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, 35},
-	{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED },
-
+	{"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, 35},
+	{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED, 150 },
+	{"knife_holysword",     "【辉煌】圣剑",               0,    KNIFE_SLOT,          UNASSIGNED, 150 },
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, 1},
 
 	{"csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, 1},
@@ -153,7 +154,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
 
-#endif
+#endif	
 	{"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, 1},
 	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, 1},
 	{"weapon_elite",      "Elite",    800, PISTOL_SLOT, UNASSIGNED, 1},

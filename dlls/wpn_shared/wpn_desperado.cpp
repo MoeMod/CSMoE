@@ -480,8 +480,6 @@ void CDesperado::AddKickRateToLineTargets(Vector vecSrc, Vector vecDir)
 				player->pev->velocity.x = dir.x * 300.0;
 				player->pev->velocity.y = dir.y * 300.0;
 				player->pev->velocity.z = 100.0;
-
-				player->m_flVelocityModifier = 0.85;
 			}
 		}
 	}

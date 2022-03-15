@@ -54,6 +54,8 @@ public:
 	virtual void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) = 0;
 	virtual void OnAdjustZombieKnifeRange(bool bStab, float& flRange) = 0;
 	virtual void OnAdjustFireBullets3Dir(Vector& vecDir) = 0;
+	virtual void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) = 0;
+	virtual void OnGrenadeExploded(Vector vecOrigin) = 0;
 	
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
@@ -90,6 +92,8 @@ public:
 	void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override {}
 	void OnAdjustZombieKnifeRange(bool bStab, float& flRange) override {}
 	void OnAdjustFireBullets3Dir(Vector& vecDir) override {}
+	void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override {}
+	void OnGrenadeExploded(Vector vecOrigin) override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

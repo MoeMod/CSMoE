@@ -125,3 +125,4 @@ HOOK_EVENT(sfsniper, FireSFSniper);
 HOOK_EVENT(plasmagun, FirePlasmaGun);
 HOOK_EVENT(summonknife, FireSummonKnife);
 HOOK_EVENT(revivegun, FireReviveGun);
+HOOK_EVENT(holysword, FireHolySword);

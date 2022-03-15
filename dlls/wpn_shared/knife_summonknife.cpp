@@ -21,11 +21,12 @@ GNU General Public License for more details.
 #include "weapons.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
-#include <dlls/gamemode/mod_zb2.h>
+#include <dlls/gamemode/mod_zb1.h>
 #endif
 
 #include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
+
 
 
 
@@ -607,8 +608,8 @@ public:
 		pev->renderamt = 180;
 		pev->framerate = 1.0;
 		pev->scale = 1.0;
-		pev->solid = SOLID_BBOX;
-		pev->movetype = MOVETYPE_FLYMISSILE;
+		pev->solid = SOLID_TRIGGER;
+		pev->movetype = MOVETYPE_FLY;
 		pev->nextthink = gpGlobals->time + 0.1s;
 
 		UTIL_SetOrigin(pev, pev->origin);
@@ -809,7 +810,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.1f };
+		KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 	public:
 
@@ -887,6 +888,7 @@ namespace sv {
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_tNextThink = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
 			m_pPlayer->m_bShieldDrawn = false;
+			m_flTimeBuff = invalid_time_point;
 
 			RemoveSummoner();
 
@@ -1011,6 +1013,7 @@ namespace sv {
 		int m_usFireSummonKnife;
 		time_point_t m_tTimeSoundEmit;
 		time_point_t m_flTimeCheckCharge;
+		time_point_t m_flTimeBuff;
 		int m_iDamageType;
 		int m_iState;	//pev_iuser1
 		int m_iState2;	//pev_iuser4
@@ -1028,7 +1031,7 @@ namespace sv {
 		m_iId = WEAPON_KNIFE;
 		Precache();
 		SET_MODEL(ENT(pev), "models/w_knife.mdl");
-		m_tNextThink = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
+		m_flTimeBuff = m_tNextThink = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
 #ifndef CLIENT_DLL
 		m_flTimeholster = gpGlobals->time;
 #endif
@@ -1111,6 +1114,9 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+				continue;
+
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
 				continue;
 
@@ -1121,7 +1127,10 @@ namespace sv {
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			pAttackPlayer->m_iWeaponVolume = 128;
@@ -1140,7 +1149,7 @@ namespace sv {
 
 				if (player->m_bIsZombie)
 				{
-					Vector vecDir = (player->pev->origin - pev->origin);
+					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
 					vecDir.z = 0;
 					if (IsPrimaryAttack)
 					{
@@ -1158,7 +1167,7 @@ namespace sv {
 						//		
 
 
-								auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(player->m_pModStrategy.get());
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 								if (strategy)
 								{
 									strategy->SetStunSpeedTime(1.5s);
@@ -1263,7 +1272,9 @@ namespace sv {
 			m_iState = 0;
 			SendWeaponAnim(ANIM_SUMMONING_A, UseDecrement() != FALSE);
 			m_iLastAnim = ANIM_SUMMONING_A;
-
+			m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+			m_flTimeBuff = gpGlobals->time + 3.0s;
+			
 			PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireSummonKnife, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, ANIM_SUMMONING_A, 0, FALSE, FALSE);
 			
 			m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
@@ -1272,7 +1283,6 @@ namespace sv {
 			m_tNextThink = gpGlobals->time + 0.1s;
 
 #ifndef CLIENT_DLL
-
 			if (m_pSummoner != NULL)
 				return;
 
@@ -1370,6 +1380,8 @@ namespace sv {
 				}
 
 #ifndef CLIENT_DLL	
+				m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+
 				if (m_pSummoner)
 					m_pSummoner->PrimaryAttack();
 #endif
@@ -1426,7 +1438,11 @@ namespace sv {
 			}
 		}
 #endif
-
+		if (m_flTimeBuff != invalid_time_point && m_flTimeBuff < gpGlobals->time)
+		{
+			m_pPlayer->m_iBuff &= ~BUFF_AVOID_INFECT;
+			m_flTimeBuff = invalid_time_point;
+		}
 
 		if (m_tNextThink != invalid_time_point && m_tNextThink < gpGlobals->time)
 		{
@@ -1699,7 +1715,8 @@ namespace sv {
 		m_iCheck = 0;
 		m_iThinkType = 0;
 		m_tNextThink = m_tTimeSoundEmit = m_flTimeCheckCharge = invalid_time_point;
-		
+		m_pPlayer->m_iBuff &= ~BUFF_AVOID_INFECT;
+
 #ifndef CLIENT_DLL
 		m_flTimeholster = gpGlobals->time;
 		if(m_pSummoner)

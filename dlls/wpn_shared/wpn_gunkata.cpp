@@ -342,11 +342,12 @@ public:
 				m_flNextSpecialAttack11 = get_gametime();
 
 				m_flNextSpecialAttack4 = get_gametime() + 0.2s;
-				m_flNextSpecialAttack2 = get_gametime() + 0.2s;
+				m_flNextSpecialAttack2 = get_gametime() + 1.0s;
 
 				m_iMode = GUNKATA_MODE_B2;
-				m_iAnim1 = 13;
-				m_iAnim2 = 11;
+				m_iAnim1 = RANDOM_LONG(12, 14);
+				m_iAnim2 = m_iAnim1 - 2 ;
+
 				break;
 			}
 			case GUNKATA_MODE_B2:
@@ -368,7 +369,7 @@ public:
 							}
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	v14,0,iAnim1,0,1,1
-							PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, v14, 0.0, m_iAnim2, 0, 1, 1); // show additional vmodel
+							PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFire, 0.2, g_vecZero, g_vecZero, v14, 0.0, m_iAnim2, 0, m_pPlayer->m_bIsFemale, 1); // show additional vmodel
 							SendWeaponAnim(m_iAnim1, UseDecrement() != FALSE);
 							/*
 							// CGunkata_sub_101710E0(&iAnim1, (int)&v45, iAnim1);
@@ -403,7 +404,7 @@ public:
 							}
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	v22,0,iAnim1,0,0,1);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, v22, 0.0, m_iAnim2, 0, 1, 1); // show additional vmodel
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.2, g_vecZero, g_vecZero, v22, 0.0, m_iAnim2, 0, m_pPlayer->m_bIsFemale, 1); // show additional vmodel
 							SendWeaponAnim(m_iAnim1, UseDecrement() != FALSE);
 							/*
 							// CGunkata_sub_101710E0(&iAnim1, (int)&v45, iAnim1);
@@ -439,7 +440,7 @@ public:
 						{
 							// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 							//	0.87, 0,0,0,0,2);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.87, 0.0, 0, 0, 0, 2);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.87, 0.0, 0, 0, 0, 2);	 
 							m_flNextSpecialAttack5 = get_gametime() + 0.87s;
 						}
 
@@ -449,18 +450,28 @@ public:
 							if(m_pPlayer->pev->flags & FL_DUCKING)
 								v26 = 6;
                             m_iStatus2 = m_iAnim2 - 10;
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 10.0, 2.0, v26+m_iStatus2, 4, 0, 4);
+							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 10.0, 2.0, v26+m_iStatus2, 4, m_pPlayer->m_bIsFemale, 4);	 //playermodel
 							m_flNextSpecialAttack4 = get_gametime() + 0.2s;
 						}
 
 						if(get_gametime() > m_flNextSpecialAttack6)
 						{
 #ifndef CLIENT_DLL
-							m_pPlayer->SetAnimation(PLAYER_IDLE);
 							if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-								m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata");							
+							{
+								//m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata");
+								if(m_pPlayer->m_bIsFemale)
+									strcpy(m_pPlayer->m_szCustomSequence, "crouchgunkata");
+								else
+									strcpy(m_pPlayer->m_szCustomSequence, "crouch_gunkata");
+							}
 							else
-								m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata");
+							{
+								//m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata");
+								strcpy(m_pPlayer->m_szCustomSequence, "gunkata");
+							}
+							
+
 							m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.1s;
 #endif
 							RadiusAttack1();
@@ -479,7 +490,7 @@ public:
 					{
 						// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC
 						//	0 ,0, 0, 0, 0, 5);
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 5);
+						PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 5); //useless?
 						m_iMode = GUNKATA_MODE_B4;
 						return CBasePlayerWeapon::ItemPostFrame();
 					}
@@ -487,13 +498,21 @@ public:
 				else // m_iClip <= 0
 				{
 #ifndef CLIENT_DLL
-				m_pPlayer->SetAnimation(PLAYER_IDLE);
-				if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
-					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata_end");
-				else
-					m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata_end");
-			
-				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.5s;
+					if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+					{
+						//m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("crouch_gunkata_end");
+						if (m_pPlayer->m_bIsFemale)
+							strcpy(m_pPlayer->m_szCustomSequence, "crouchgunkata_end");
+						else
+							strcpy(m_pPlayer->m_szCustomSequence, "crouch_gunkata_end");
+					}
+					else
+					{
+						//m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("gunkata_end");
+						strcpy(m_pPlayer->m_szCustomSequence, "gunkata_end");
+					}
+						
+					m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.5s;
 #endif
 				
 					SendWeaponAnim(15, UseDecrement() != FALSE); //(*(void (__cdecl **)(signed int, _DWORD))(*(_DWORD *)a1 + 540))(15, 0);
@@ -503,6 +522,7 @@ public:
 					//*(_WORD *)(pPlayer + 2308) = v6;
 					//*(float *)(pPlayer + 2304) = *(float *)gametime + 1.1;
 
+					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 					m_pPlayer->pev->weaponmodel = MAKE_STRING("models/p_gunkata.mdl");
 					m_flNextSpecialAttack8 =  get_gametime() + 0.63s;
 					m_flNextSpecialAttack9 =  get_gametime() + 0.63s;
@@ -512,7 +532,7 @@ public:
 
 					// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 					//	0 ,0, 0, 0, 0, 5);
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 5);
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 0.0, 0.0, 0, 0, 0, 5); //useless
 					m_iMode = GUNKATA_MODE_B3;
 
 					return CBasePlayerWeapon::ItemPostFrame();
@@ -525,7 +545,7 @@ public:
 				{
 					// dword_108F7A0C(32,*(_DWORD *)(pPlayer + 540),*(_WORD *)(this + 286),0,pPlayer + 8,&qword_108F77EC,
 					//	1.0 ,0.22, 0, 0, 0, 3);
-					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 1.0 ,0.22, 0, 0, 0, 3);
+					PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 1.0 ,0.22, 0, 0, 0, 3);	   //hole
 					m_flNextSpecialAttack8 = time_point_t::max(); // 0x7F7FFFFF
 
 				}
@@ -584,8 +604,10 @@ public:
 				break;
 			}
 		}
-#endif
+
 		return CBasePlayerWeapon::ItemPostFrame();
+#endif
+	
 	}
 
 #ifndef CLIENT_DLL

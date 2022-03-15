@@ -111,7 +111,12 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_jumpupm",//ZOMBIE_SKILL_JUMPUPM
 		"resource/zombi/zombieskill_armorrecovery",//ZOMBIE_SKILL_ARMORRECOVERY
 		"resource/zombi/zombieskill_hpbuff",//ZOMBIE_SKILL_HPBUFF
-		"resource/zombi/zombieskill_strengthrecovery"//ZOMBIE_SKILL_STRENGTHRECOVERY
+		"resource/zombi/zombieskill_strengthrecovery",//ZOMBIE_SKILL_STRENGTHRECOVERY
+		"resource/zombi/zombieskill_chargeslash",//ZOMBIE_SKILL_DASH
+		"resource/zombi/zombieskill_zombipileexp",//ZOMBIE_SKILL_PILEEXP
+		"resource/zombi/zombieskill_charge",//ZOMBIE_SKILL_CHARGE
+		"resource/zombi/zombieskill_discharge",//ZOMBIE_SKILL_DISCHARGE
+		"resource/zombi/zombieskill_zombiselfdestruct"//ZOMBIE_SKILL_SELFDESTRUCT
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -133,6 +138,8 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_undertakerzb",//ZOMBIE_CLASS_STAMPER
 		"resource/zombi/zombietype_residentzb",//ZOMBIE_CLASS_RESIDENT
 		"resource/zombi/zombietype_witchzb",//ZOMBIE_CLASS_WITCH
+		"resource/zombi/zombietype_akshazb",//ZOMBIE_CLASS_AKSHA
+		"resource/zombi/zombietype_boomerzb",//ZOMBIE_CLASS_BOOMER
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

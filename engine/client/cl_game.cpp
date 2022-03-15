@@ -3394,7 +3394,7 @@ enables global fog on the level
 void GAME_EXPORT TriFog( const vec3_t flFogColor, float flStart, float flEnd, int bOn )
 {
 	if( RI.fogEnabled || !gl_fog->integer ) return;
-	RI.fogCustom = true;
+	//RI.fogCustom = true;
 
 	if( !bOn )
 	{

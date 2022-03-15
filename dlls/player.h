@@ -151,6 +151,13 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define SOUND_FLASHLIGHT_OFF		"items/flashlight1.wav"
 
+#define BUFF_REVIVE					(1<<1)
+#define BUFF_AVOID_INFECT			(1<<2)
+#define BUFF_HOLYSWORD_AVOID_INFECT			(1<<3)
+
+#define BUFF_REVIVEGUN				(1<<1)
+#define BUFF_DGAXE			(1<<2)
+
 #ifndef CLIENT_DLL
 namespace sv {
 
@@ -584,6 +591,7 @@ public:
 	void UpdatePlayerSound();
 	void DeathSound();
 	void SetAnimation(PLAYER_ANIM playerAnim);
+	void SetCustomAnimation(char* szAnimation, PLAYER_ANIM playerAnim);
 	void SetWeaponAnimType(const char* szExtention)/* { Q_strcpy(m_szAnimExtention, szExtention); }*/;
 	void CheatImpulseCommands(int iImpulse);
 	void StartDeathCam();
@@ -764,6 +772,7 @@ public:
 	const char* m_ZombieClass;
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;
+	char m_szCustomSequence[32];
 	int m_iZombieFlying;
 	int m_iZombieRevivalEnabled;
 	std::set<int> m_setWeaponID;
@@ -771,6 +780,11 @@ public:
 	int m_iRoundAssist;
 	int m_iRoundInfect;
 	bool m_bHolsterDisabled;
+	bool m_bJumpDisabled;
+	bool m_bDuckDisabled;
+	float m_flDamageUnderTake;	//aksha zombie
+	int m_iBuff;
+	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 };
 
 }

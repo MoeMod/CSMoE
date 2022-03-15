@@ -352,6 +352,18 @@ namespace sv {
 		if (DotProduct(gpGlobals->v_forward, vecDelta) < 0.5)
 			return false;
 
+		TraceResult tr;
+		UTIL_TraceLine(m_pPlayer->pev->origin, pEntity->pev->origin, missile, m_pPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0)
+		{
+			if (!tr.pHit)
+				return false;
+
+			if (tr.pHit != pEntity->edict())
+				return false;
+		}
+
 		return true;
 	}
 

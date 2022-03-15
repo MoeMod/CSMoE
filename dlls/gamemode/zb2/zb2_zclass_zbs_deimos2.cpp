@@ -38,7 +38,7 @@ namespace sv {
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 1000;
 	m_pPlayer->ResetMaxSpeed();
@@ -61,7 +61,7 @@ void CZombieClass_ZBS_Deimos2::InitHUD() const
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_DEIMOS2);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY2);
+	WRITE_BYTE(ZOMBIE_SKILL_DASH);
 	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
@@ -84,12 +84,12 @@ void CZombieClass_ZBS_Deimos2::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 0.8f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 0.8);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 }
 

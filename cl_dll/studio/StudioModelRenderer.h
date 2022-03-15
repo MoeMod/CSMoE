@@ -48,6 +48,11 @@ public:
 	virtual void StudioCalcBonePosition(int frame, float s, mstudiobone_t *pbone, mstudioanim_t *panim, float *adj, vec3_t_ref pos);
 	virtual void StudioCalcRotations(vec3_t pos[], vec4_t *q, mstudioseqdesc_t *pseqdesc, mstudioanim_t *panim, float f);
 	virtual void StudioRenderModel(const vec3_t lightdir);
+	virtual void DrawOutLineBegin(int flag);
+	virtual void DrawOutLine(int flag);
+	virtual void DrawOutLinePause(int flag);
+	virtual void DrawOutLineEnd(int flag);
+	virtual BOOL DrawOutLineCheck(int flag);
 	virtual void StudioRenderFinal(void);
 	virtual void StudioRenderFinal_Software(void);
 	virtual void StudioRenderFinal_Hardware(void);

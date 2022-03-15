@@ -2350,7 +2350,15 @@ static void R_StudioDrawMesh( short *ptricmds, float s, float t, float a, float 
 				cl[2] = 0;
 				cl[3] = 255;
 			}
-
+			if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
+			{
+				color24* clr;
+				clr = &RI.currententity->curstate.rendercolor;
+				cl[0] = clr->r;
+				cl[1] = clr->g;
+				cl[2] = clr->b;
+				cl[3] = alpha;
+			}
 			Q_memcpy( g_xarraycolor[g_nNumArrayVerts], cl, sizeof(cl) );
 
 			av = g_xformverts[ptricmds[0]];
@@ -2429,6 +2437,49 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			pglColor4ub( clr->r, clr->g, clr->b, 255 );
 			alpha = 1.0f;
 		}
+		else if (g_nForceFaceFlags & STUDIO_NF_OUTLINE)
+		{
+			GL_Bind(XASH_TEXTURE0, tr.whiteTexture);
+			pglPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			pglLineWidth(5.0);
+			//pglEnable(GL_LINE_SMOOTH);
+			if (RI.currententity->curstate.renderfx == kRenderFxGreenOutLine) {
+				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				RI.currententity->curstate.rendercolor.r = 100;
+				RI.currententity->curstate.rendercolor.g = 200;
+				RI.currententity->curstate.rendercolor.b = 150;
+
+				alpha = 0.5f;
+
+				pglEnable(GL_STENCIL_TEST);
+				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+				pglDisable(GL_DEPTH_TEST);
+			}
+			else if (RI.currententity->curstate.renderfx == kRenderFxRedOutLine) {
+				pglBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				RI.currententity->curstate.rendercolor.r = 200;
+				RI.currententity->curstate.rendercolor.g = 0;
+				RI.currententity->curstate.rendercolor.b = 0;
+
+				alpha = 0.5f;
+
+				pglEnable(GL_STENCIL_TEST);
+				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+				pglDisable(GL_DEPTH_TEST);
+			}
+			else {
+				pglBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				RI.currententity->curstate.rendercolor.r = 1;
+				RI.currententity->curstate.rendercolor.g = 1;
+				RI.currententity->curstate.rendercolor.b = 1;
+
+				alpha = 1.0f;
+
+				pglEnable(GL_STENCIL_TEST);
+				pglStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+			}
+
+		}
 		else if( g_nFaceFlags & STUDIO_NF_TRANSPARENT && R_StudioOpaque( RI.currententity ))
 		{
 			GL_SetRenderMode( kRenderTransAlpha );
@@ -2472,7 +2523,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			else alpha = RI.currententity->curstate.renderamt * (1.0f / 255.0f);
 		}
 
-		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
+		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
 			if(r_texlru->integer)
 				xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
@@ -2494,6 +2545,15 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 				pglDepthFunc(GL_GEQUAL);
 				pglDepthMask(GL_FALSE);
 			}
+		}
+
+		if (RI.currententity->syncbase == 1.0f)   //set stencil
+		{
+			pglEnable(GL_STENCIL_TEST);
+			pglStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+
+			pglStencilMask(0xFF);  // ÔÊÐíÐÞ¸ÄÄ£°å»º³å			
+			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //ËùÓÐÆ¬¶Î¶¼ÒªÐ´ÈëÄ£°å»º³å
 		}
 
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
@@ -2973,6 +3033,29 @@ R_StudioSetForceFaceFlags
 void GAME_EXPORT R_StudioSetForceFaceFlags( int flags )
 {
 	g_nForceFaceFlags = flags;
+	int flag = RI.currententity->curstate.renderfx;
+	if (!(flag == kRenderFxBlackOutLine || flag == kRenderFxRedOutLine || flag == kRenderFxGreenOutLine)) return;
+	if (RI.currententity->syncbase == 1.0f && flags == 0)   //DrawOutLinePause
+	{
+		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		pglLineWidth(1.0);
+
+		pglStencilMask(0x00); // ½ûÖ¹ÐÞ¸ÄÄ£°å»º³å
+		pglDisable(GL_STENCIL_TEST);
+		pglEnable(GL_DEPTH_TEST);
+	}
+	else if (RI.currententity->syncbase == 2.0f && flags == 0)   //DrawOutLineEnd
+	{
+		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		pglLineWidth(1.0);
+
+		pglClear(GL_STENCIL_BUFFER_BIT);
+		pglStencilMask(0x00); // ½ûÖ¹ÐÞ¸ÄÄ£°å»º³å
+		pglDisable(GL_STENCIL_TEST);
+		pglEnable(GL_DEPTH_TEST);
+
+		RI.currententity->syncbase = 0.0f;
+	}
 }
 
 /*

@@ -13,6 +13,7 @@
 #else
 #include <unistd.h>
 #endif // _WIN32
+#include <dlls/map_manager.h>
 
 namespace sv {
 
@@ -4921,6 +4922,9 @@ CNavArea* CNavAreaGrid::GetRandomSpawnableArea(void)
 	if (!m_grid[listIndex].empty())
 	{
 		CNavArea* area = *iter;
+
+		//if (area->GetID() is in mapsafearea)
+			//return NULL;
 
 		if (area->m_extent.hi.x - area->m_extent.lo.x < 40.0f)
 			return NULL;

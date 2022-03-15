@@ -77,6 +77,8 @@ public:
 	virtual int AdjustScoreAttrib(int state) = 0;
 	virtual Vector AdjustFireBullets3Dir(Vector vecDir) = 0;
 	virtual void ClientPutInServer() = 0;
+	virtual void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) = 0;
+	virtual void GrenadeExploded(Vector vecStart) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -120,6 +122,8 @@ public:
 	int AdjustScoreAttrib(int state) override { return state; }
 	Vector AdjustFireBullets3Dir(Vector vecDir) override { return vecDir; }
 	void ClientPutInServer() {}
+	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) {}
+	void GrenadeExploded(Vector vecStart) {}
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

@@ -38,9 +38,10 @@ CZombieClass_Deimos2::CZombieClass_Deimos2(CBasePlayer *player, ZombieLevel iEvo
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 1000;
+	
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -89,12 +90,12 @@ void CZombieClass_Deimos2::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 0.8f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 0.8);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 
 
@@ -115,10 +116,10 @@ bool CZombieClass_Deimos2::ApplyKnockback(CBasePlayer *attacker, const Knockback
 	if (m_iCrazySkillStatus == SKILL_STATUS_USING)
 	{
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-		0.0f,
-		0.0f,
-		0.0f,
-		0.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
 		1.0f,
 			});
 		/*if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)

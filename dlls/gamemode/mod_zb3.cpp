@@ -36,6 +36,8 @@ GNU General Public License for more details.
 #include <functional>
 #include <random>
 #include <memory>
+#include "player/csdm_randomspawn.h"
+
 
 namespace sv {
 
@@ -187,8 +189,8 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 		m_pPlayer->m_bHeadshotKilled = false;
 		m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
 		m_pPlayer->m_bIsZombie = true;
-		m_pPlayer->pev->max_health = 2000.0f;
-		m_pPlayer->pev->armorvalue = 200.0f;
+		m_pPlayer->pev->max_health = 6000.0f;
+		m_pPlayer->pev->armorvalue = 1000.0f;
 		m_pModZB3->TeamCheck();
 	}
 
@@ -253,11 +255,56 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 	if (!pAttackerPlayer->m_bIsZombie)
 		return 1;
 
-	if (m_pPlayer->iuser1 == 1 && m_pPlayer->m_pActiveItem && !Q_strcmp(STRING(m_pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe") && m_pPlayer->pev->health - flDamage > 0.0f)
-		return 1;
+	if (m_pPlayer->m_iBuff & BUFF_HOLYSWORD_AVOID_INFECT)
+	{
+		UTIL_MakeVectors(m_pPlayer->pev->angles);
+		if (DotProduct((m_pPlayer->pev->origin.Make2D() - pevAttacker->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) < 0.8 && !(bitsDamageType & DMG_INFECTION))
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+			if (pWeapon)
+			{
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword"))
+					pWeapon->WeaponCallBack(0);
+			}
+
+			if (bitsDamageType & DMG_BULLET)
+			{
+				flDamage = 75.0f;
+
+				if (m_pPlayer->pev->health - flDamage >= 300)
+				{
+					m_pPlayer->pev->health -= flDamage;
+				}
+				return 0;
+			}
+			return 1;
+		}	
+	}
+
+	if (m_pPlayer->m_iBuff & BUFF_AVOID_INFECT)
+	{
+		return 0;
+	}
+
+	if (m_pPlayer->m_bHasBuffWpn & BUFF_REVIVEGUN && m_pPlayer->m_iBuff & BUFF_REVIVE && (bitsDamageType & DMG_BULLET))
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+		CSDM_DoRandomSpawn(m_pPlayer);
+		if (pWeapon)
+		{
+			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+				pWeapon->WeaponCallBack(1);
+		}
+		return 0;
+	}
 
 	if (IsHero() && m_pPlayer->pev->health - flDamage > 0.0f)
 		return 1;
+
+	/*if (~bitsDamageType & DMG_INFECTION)
+		return 1;*/
 
 	m_pModZB3->HumanInfectionByZombie(m_pPlayer, pAttackerPlayer);
 	return 0;
@@ -520,7 +567,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 				else
 				{
 					char szText[256];
-					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题专属武器逆界星轮beta（去除传送版本）^7", STRING(pEntity->v.netname));
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题专属武器【辉煌】圣剑beta^7", STRING(pEntity->v.netname));
 					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 					WRITE_BYTE(ENTINDEX(pEntity));
 					WRITE_STRING(szText);
@@ -528,9 +575,8 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 					CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity2);
 					if (!pPlayer->m_bIsZombie)
 					{
-						DropPrimary(pPlayer);
-						pPlayer->GiveNamedItem("weapon_revivegun");
-						int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("556NatoStar", 150);
+						pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+						pPlayer->GiveNamedItem("knife_holysword");
 					}
 				}
 
@@ -681,7 +727,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 
 	if (iCurrentCount > 7)
 	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[感染阶段]生化病毒正在寻找宿主，%s秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[感染阶段]生化病毒正在寻找宿主， %s 秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
 
 		if (iCurrentCount - 7 <= 10)
 		{
@@ -693,7 +739,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 		if (iCurrentCount == 7)
 			m_pMod->PickZombieOrigin();
 
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[变异阶段]生化病毒已找到宿主，母体僵尸将在%s秒内出现", UTIL_dtos1(iCurrentCount));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[变异阶段]生化病毒已找到宿主，母体僵尸将在 %s 秒内出现", UTIL_dtos1(iCurrentCount));
 	}
 }
 
