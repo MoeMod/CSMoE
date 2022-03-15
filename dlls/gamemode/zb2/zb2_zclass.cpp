@@ -43,6 +43,8 @@ GNU General Public License for more details.
 #include "zb2_zclass_resident.h"
 #include "zb2_zclass_witch.h"
 #include "zb2_zclass_zbs_deimos2.h"
+#include "zb2_zclass_aksha.h"
+#include "zb2_zclass_boomer.h"
 #include <random>
 
 namespace sv {
@@ -70,7 +72,9 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
 		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
 		{"witch", 100, MakeZombieClass<CZombieClass_Witch> },
-		{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> }
+		{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> },
+		{"aksha", 100, MakeZombieClass<CZombieClass_Aksha> },
+		{"boomer", 100, MakeZombieClass<CZombieClass_Boomer> },
 		//{"nemesis", 100, MakeZombieClass<CZombieClass_Nemesis>}
 };
 
@@ -151,19 +155,6 @@ void CBaseZombieClass_ZB2::Think()
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->Think();
 
-	if (m_tStunGravityTime != invalid_time_point && m_tStunGravityTime <= gpGlobals->time)
-	{
-		m_tStunGravityTime = invalid_time_point;
-		m_pPlayer->ResetMaxSpeed();
-	}
-
-	if (m_tStunSpeedTime != invalid_time_point && m_tStunGravityTime <= gpGlobals->time)
-	{
-		m_tStunSpeedTime = invalid_time_point;
-		m_pPlayer->ResetMaxSpeed();
-		m_pPlayer->m_flVelocityModifier = m_pPlayer->pev->maxspeed / 100.0;
-	}
-
 	return CZombie_ZB1::Think();
 }
 
@@ -216,7 +207,7 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 			return 1000;
 	}
 		
-	return m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST ? 200 : 500;
+	return 500;
 }
 
 CBaseZombieClass_ZB2::~CBaseZombieClass_ZB2() = default;

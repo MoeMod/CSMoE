@@ -16,6 +16,10 @@
 
 #include "bot_include.h"
 
+#ifndef CLIENT_DLL
+#include "player/player_mod_strategy.h"
+#endif
+
 namespace sv {
 
 
@@ -321,6 +325,12 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 
 	for (int i = 0; i < sparkCount; ++i)
 		Create("spark_shower", pev->origin, pTrace->vecPlaneNormal, NULL);
+
+	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+	if (player)
+	{
+		player->m_pModStrategy->GrenadeExploded(pev->origin);
+	}
 }
 
 NOXREF void CGrenade::SG_Explode(TraceResult *pTrace, int bitsDamageType)
@@ -1024,6 +1034,11 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
 	pGrenade->pev->dmg = 100.0f;
 
+	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+	if (player)
+	{
+		player->m_pModStrategy->ShootGrenade(vecStart, vecVelocity, time, iTeam, usEvent);
+	}
 	return pGrenade;
 }
 

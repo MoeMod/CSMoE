@@ -21,7 +21,7 @@ GNU General Public License for more details.
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
-
+#include "weapons/KnifeAttack.h"
 #include "weapons/WeaponTemplate.hpp"
 #ifdef CLIENT_DLL
 namespace cl {
@@ -43,7 +43,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
-	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.5f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 public:
 
@@ -368,10 +368,11 @@ void CKnifeStormgiant::SecondaryAttack(void)
 void CKnifeStormgiant::DelayPrimaryAttack()
 {
 #ifndef CLIENT_DLL
+	int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 	if (m_iSwing != 1 && m_iSwing != 2)
 	{
 		m_iSwing = 5;
-
+		
 		CBaseEntity* pEntity = NULL;
 		BOOL fDidHit = FALSE;
 		TraceResult tr;
@@ -395,6 +396,9 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+				continue;
+
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr))
 				continue;
 
@@ -405,7 +409,10 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
@@ -414,7 +421,7 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -477,6 +484,9 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+				continue;
+
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 105.0, c, &tr))
 				continue;
 
@@ -487,7 +497,10 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
@@ -496,7 +509,7 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, GetDeployAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, GetDeployAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -566,6 +579,7 @@ void CKnifeStormgiant::ExtraAttack()
 		m_iSwing = 6;
 
 	float flDamage;
+	int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 
 	if (m_iSwing == 3)
 		flDamage = GetDeployExtraAttackDamage();
@@ -592,6 +606,9 @@ void CKnifeStormgiant::ExtraAttack()
 		if (pEntity->pev->takedamage == DAMAGE_NO)
 			continue;
 
+		if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+			continue;
+
 		if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr))
 			continue;
 
@@ -602,7 +619,10 @@ void CKnifeStormgiant::ExtraAttack()
 			UTIL_MakeVectors(pEntity->pev->angles);
 
 			if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+			{
 				flRatio = 3.0;
+				bitsDamageType |= DMG_BACKATK;
+			}
 		}
 
 		m_pPlayer->m_iWeaponVolume = 128;
@@ -611,7 +631,7 @@ void CKnifeStormgiant::ExtraAttack()
 
 		ClearMultiDamage();
 
-		pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+		pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

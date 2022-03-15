@@ -56,6 +56,7 @@ void CK1ases::Precache(void)
 	PRECACHE_MODEL("models/w_k1ases.mdl");
 
 	PRECACHE_SOUND("weapons/k1ases-1.wav");
+	PRECACHE_SOUND("weapons/deimos_skill_start.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireK1ases = PRECACHE_EVENT(1, "events/k1ases.sc");

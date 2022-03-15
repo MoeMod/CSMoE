@@ -48,7 +48,7 @@ public:
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
 	static constexpr const auto &DefaultDeployTime = 0s;
-	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.5f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.8f };
 
 public:
 
@@ -233,7 +233,7 @@ void CKnifeStormgiantX::DelayPrimaryAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 110, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack5(GetPrimaryAttackDamage(), 110, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer))
 	{
 	case HIT_NONE:
 	{
@@ -283,7 +283,7 @@ void CKnifeStormgiantX::DelaySecondaryAttack()
 	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack5(GetSecondaryAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer))
 	{
 	case HIT_NONE:
 	{
@@ -328,7 +328,7 @@ void CKnifeStormgiantX::DeployAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetDeployAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack5(GetDeployAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer))
 	{
 		case HIT_NONE:
 		{
@@ -390,7 +390,7 @@ void CKnifeStormgiantX::DeployComboAttackCheck()
 	Q_strcpy(m_pPlayer->m_szAnimExtention, "skullaxe");
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack3(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 110, 110, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev))
+	switch (KnifeAttack5(GetSecondaryAttackDamage(), 105, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer))
 	{
 		case HIT_NONE:
 		{

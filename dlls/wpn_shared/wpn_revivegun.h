@@ -55,6 +55,7 @@ public:
 	void ClearEffect();
 	void CreateEffect();
 	void DestroyEffect();
+	void ExpToLineTargets(Vector vecSrc, Vector vecDir);
 
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -63,18 +64,20 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 550.0f,250.0f,300.0f,300.0f,0.5f }; }
+	float GetArmorRatioModifier() override { return 1.5; }
+	KnockbackData GetKnockBackData() override { return { 550.0f,250.0f,300.0f,300.0f,0.4f }; }
 
 public:
 	void ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	const char *GetCSModelName() override { return "models/w_revivegun.mdl"; }
 #ifndef CLIENT_DLL
-	Vector FireBullets(Vector vecSrc, Vector vecDirShooting, float vecSpread, float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol, int shared_rand);
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556natostar" , 200 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_revivegun" , 200 }; }
 #endif
 
 	float GetDamage() const;
 	float GetSecondaryAttackDamage() const;
+	float GetExpDamage() const;
+	void WeaponCallBack(int iType) override;
 
 	std::vector<EHANDLE> m_pEnemyList;
 	std::array<CBeam*, MAXTARGET> m_pBeamList;
@@ -84,6 +87,8 @@ private:
 	time_point_t m_tNextPlayEvent;	//phs[4]
 	int m_iChargeShotsFired;
 	time_point_t m_flTimeHostler;
+	time_point_t m_flTimeHold;
+	time_point_t m_flTimeNextRevive;
 	time_point_t m_flTimeNextCharge;
 	int m_iThinkType;
 	int m_iDefaultAmmo2;

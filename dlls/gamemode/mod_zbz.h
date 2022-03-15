@@ -73,6 +73,8 @@ public:
 	Vector AdjustFireBullets3Dir(Vector vecDir) override;
 	void ClientPutInServer() override;
 	void Event_OnPickAsZombie(CBasePlayer* who) override;
+	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override;
+	void GrenadeExploded(Vector vecOrigin) override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);

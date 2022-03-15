@@ -32,6 +32,7 @@ GNU General Public License for more details.
 
 #include "bot_include.h"
 #include "player/player_zombie.h"
+#include "player/csdm_randomspawn.h"
 
 #include "util/u_range.hpp"
 
@@ -56,11 +57,17 @@ void CMod_Zombi::CheckMapConditions()
 {
 	Base::CheckMapConditions();
 	
-	CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
+	const char* skybox = MapMgr_GetMapSkybox(STRING(gpGlobals->mapname));
+	if (skybox == NULL)
+		CVAR_SET_STRING("sv_skyname", "hk"); // it should work, but...
+	else
+		CVAR_SET_STRING("sv_skyname", skybox);
+	
 //	CVAR_SET_FLOAT("sv_skycolor_r", 150);
 //	CVAR_SET_FLOAT("sv_skycolor_g", 150);
 //	CVAR_SET_FLOAT("sv_skycolor_b", 150);
 
+	/*
 	CBaseEntity *fog = nullptr;
 	while ((fog = UTIL_FindEntityByClassname(fog, "env_fog")) != nullptr)
 	{
@@ -72,13 +79,21 @@ void CMod_Zombi::CheckMapConditions()
 	{
 		CClientFog* pEntity = static_cast<CClientFog*>(CBaseEntity::Instance(pent));
 		DispatchSpawn(pEntity->edict());
-		pEntity->m_fDensity = 0.00006f;
-		pEntity->pev->rendercolor = { 0,0,0 };
+		float fDenity = MapMgr_GetMapDensity(STRING(gpGlobals->mapname));
+		pEntity->m_fDensity = fDenity;
+		float iDensity_r = MapMgr_GetMapDensity_r(STRING(gpGlobals->mapname));
+		float iDensity_g = MapMgr_GetMapDensity_g(STRING(gpGlobals->mapname));
+		float iDensity_b = MapMgr_GetMapDensity_b(STRING(gpGlobals->mapname));
+		pEntity->pev->rendercolor = { iDensity_r, iDensity_g, iDensity_b };
 		m_pFogEntity = pEntity;
 	}
-
+	*/
 	// light
-	LIGHT_STYLE(0, "l"); // previous one is "f"
+	const char* light = MapMgr_GetMapBright(STRING(gpGlobals->mapname));
+	if (light == NULL)
+		LIGHT_STYLE(0, "l"); // previous one is "f"
+	else
+		LIGHT_STYLE(0, light);
 }
 
 void CMod_Zombi::UpdateGameMode(CBasePlayer *pPlayer)
@@ -332,10 +347,10 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 	int ret;
 	// do not *2 for machine-guns.
 
+	ret = iOriginalMax * 1.5;
+
 	if (iOriginalMax < 200)
 		ret = iOriginalMax *= 2;
-
-	ret = int(iOriginalMax * 1.5f);
 
 	if (!strcmp(szAmmoClassName, "bowarrow"))
 		ret = 60;
@@ -556,18 +571,40 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 	{
 		if (pAttackerPlayer->m_bIsZombie && !pPlayer->m_bIsZombie)
 		{
-			
-			if (pPlayer->iuser1 == 1)
+			if (pPlayer->m_iBuff & BUFF_HOLYSWORD_AVOID_INFECT)
 			{
-				if (pPlayer->m_pActiveItem != NULL)
+				UTIL_MakeVectors(pPlayer->pev->angles);
+				if (DotProduct((pPlayer->pev->origin.Make2D() - pAttackerPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+					return 0;
+
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[KNIFE_SLOT];
+
+				if (pWeapon)
 				{
-					if (!Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "knife_dgaxe"))
-					{
-						iReturn = false;
-						return iReturn;
-					}
+					if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword"))
+						pWeapon->WeaponCallBack(0);
+				}
+				return 1;
+			}
+
+			if (pPlayer->m_iBuff & BUFF_AVOID_INFECT)
+			{
+				iReturn = false;
+				return iReturn;
+			}
+
+			if (pPlayer->m_bHasBuffWpn & BUFF_REVIVEGUN && pPlayer->m_iBuff & BUFF_REVIVE)
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+				CSDM_DoRandomSpawn(pPlayer);
+				if (pWeapon)
+				{
+					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+						pWeapon->WeaponCallBack(1);
 				}
 			}
+
 			HumanInfectionByZombie(pPlayer, pAttackerPlayer);
 			iReturn = false;
 		}

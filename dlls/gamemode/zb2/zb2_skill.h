@@ -378,6 +378,7 @@ public:
 	explicit CZombieSkill_ZombieTrap(CBasePlayer* player);
 
 public:
+	void Think() override;
 	void Activate() override;
 	void OnSkillEnd() override;
 
@@ -386,6 +387,7 @@ protected:
 	duration_t GetCooldownTime() const;
 };
 
+class CZombiePile;
 class CZombieSkill_ZombiePile : public CZombieSkill_Base
 {
 public:
@@ -397,12 +399,15 @@ public:
 	void OnSkillEnd() override;
 	float GetDamageRatio() const override;
 	void FireZombieSkill();
+	EntityHandle <CZombiePile> m_pPile;
 
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
 
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
+	EngineClock::time_point m_flTimeChangeFov;
+	EngineClock::time_point m_flTimeBotUseSkill;
 };
 
 class CZombieSkill_ZombiePenetration : public CZombieSkill_Base
@@ -539,6 +544,60 @@ protected:
 
 	ZombieDashSkillStatus m_SkillStatus = DASH_END;
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+enum ZombieDefenseSkillStatus
+{
+	SKILL_IDLE,
+	DEFENSE_START,
+	DEFENSE_LOOP,
+	DEFENSE_ENDTOSHOT,
+	DEFENSE_ENDTOIDLE,
+};
+
+class CZombieSkill_ZombieDefense : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieDefense(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	float GetDamageRatio() const override;
+	void ResetMaxSpeed() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+	float GetChargeDamage() const;
+
+	void Reset() override
+	{
+		m_flPlayerAnimTime = invalid_time_point;
+	}
+
+	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
+	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
+	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
+	ZombieDefenseSkillStatus m_SkillStatus = SKILL_IDLE;
+};
+
+
+class CZombieSkill_ZombieSelfDestruct : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieSelfDestruct(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void ResetMaxSpeed()  override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	duration_t GetDurationTime() const;
 };
 
 

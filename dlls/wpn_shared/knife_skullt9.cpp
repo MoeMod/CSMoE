@@ -208,7 +208,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
-	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 public:
 
@@ -554,6 +554,9 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 		if (pEntity->pev->takedamage == DAMAGE_NO)
 			continue;
 
+		if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			continue;
+
 		if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
 			continue;
 
@@ -564,7 +567,10 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 			UTIL_MakeVectors(pEntity->pev->angles);
 
 			if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+			{
 				flRatio = 3.0;
+				bitsDamageType |= DMG_BACKATK;
+			}
 		}
 
 		pAttackPlayer->m_iWeaponVolume = 128;

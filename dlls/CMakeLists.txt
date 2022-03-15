@@ -208,6 +208,9 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_witch.cpp
 	./gamemode/zb2/zombiehook.cpp
 	./gamemode/zb2/zb2_zclass_zbs_deimos2.cpp
+	./gamemode/zb2/zb2_zclass_aksha.cpp
+	./gamemode/zb2/fireball.cpp
+	./gamemode/zb2/zb2_zclass_boomer.cpp
 	)
 
 set (HLWPN_SRCS
@@ -363,6 +366,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_balrog9.cpp
 	../dlls/wpn_shared/knife_summonknife.cpp
 	../dlls/wpn_shared/wpn_revivegun.cpp
+	../dlls/wpn_shared/knife_holysword.cpp
 	)
 
 set(PM_SRCS

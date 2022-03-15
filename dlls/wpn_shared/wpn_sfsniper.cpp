@@ -76,7 +76,7 @@ void CSFSniper::Precache(void)
 int CSFSniper::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "railbeam";
+	p->pszAmmo1 = "RailBeam";
 	p->iMaxAmmo1 = 35;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;

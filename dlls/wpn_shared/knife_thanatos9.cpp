@@ -45,7 +45,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "skullaxe";
-	KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 0.5f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.8f };
 
 public:
 
@@ -313,6 +313,7 @@ void CKnifeThanatos9::DelayPrimaryAttack()
 		CBaseEntity* pEntity = NULL;
 		BOOL fDidHit = FALSE;
 		TraceResult tr;
+		int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecEnd;
 		Vector vecSrc = m_pPlayer->GetGunPosition();
@@ -343,7 +344,10 @@ void CKnifeThanatos9::DelayPrimaryAttack()
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
@@ -352,7 +356,7 @@ void CKnifeThanatos9::DelayPrimaryAttack()
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -392,6 +396,7 @@ void CKnifeThanatos9::DelayPrimaryAttack()
 		TraceResult tr;
 		CBaseEntity* pEntity = NULL;
 		BOOL fDidHit = FALSE;
+		int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 
 		if (m_iWeaponState == 1)
 		{
@@ -433,14 +438,17 @@ void CKnifeThanatos9::DelayPrimaryAttack()
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, GetChargeAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, GetChargeAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

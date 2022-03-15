@@ -588,6 +588,29 @@
 // byte,byte,byte (color)
 // byte (brightness)
 
+#define	TE_ARROWMODEL		129	// a client-side arrow model for weapon_bow, allows to fade out or follow a player
+// coord, coord, coord (position or offset)
+// angle, angle, angle (angles)
+// short (model index)
+// byte (life * 10)
+// byte (framerate * 10)
+// byte (mode)
+// byte (renderamt)
+// byte (rendermode)
+// short (player index)					// -1 to be a static model in certain position
+// byte (fade speed * 10)
+
+#define TE_ROTATEDMODEL			130
+// coord, coord, coord (origin)
+// angle (yaw)
+// short (model index)
+// byte (life * 10)
+// byte (framerate)
+// byte (fade out or not)
+// byte (brightness)
+// byte (rendermode)
+// short (entity index)
+
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)
 #define MSG_ALL			2	// reliable to all

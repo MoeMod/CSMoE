@@ -6,6 +6,7 @@
 #include "player.h"
 #include "entity_state.h"
 
+#include "gamemode/zb1/zb1_const.h"
 #include "gamemode/zbz/zbz_const.h"
 #include "gamemode/zbz/zbz_skill.h"
 #include "weapons/KnifeAttack.h"
@@ -32,6 +33,8 @@ namespace sv {
 				return;
 			if (!IsActivate())
 				return;
+			if (!m_pPlayer->m_pActiveItem)
+				return;
 			if (m_pPlayer->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 				return;
 			if (~bitsDamageType & DMG_BULLET)
@@ -52,6 +55,8 @@ namespace sv {
 			if (attacker != m_pPlayer)
 				return;
 			if (!IsActivate())
+				return;
+			if (!m_pPlayer->m_pActiveItem)
 				return;
 			if (m_pPlayer->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
 				return;
@@ -117,6 +122,12 @@ namespace sv {
 		void OnGetSkill() override {
 			SET_PHYSICS_KEY_VALUE(m_pPlayer->edict(), "dbj", "1");
 		}
+		void OnBecomeHuman() override {
+			OnGetSkill();
+		}
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
 	};
 
 	class ZSkill_Health : public CZombieZSkill_Base
@@ -124,7 +135,7 @@ namespace sv {
 	public:
 		explicit ZSkill_Health(CBasePlayer* player) : CZombieZSkill_Base(player) {}
 		const char* GetName() const override { return "生命补液"; }
-		const char* GetDesc() const override { return "增加生命值。"; } // （400+200*回合数）
+		const char* GetDesc() const override { return "增加生命值。"; }
 		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
 		void OnBecomeHuman() override {
 			OnGetSkill();
@@ -133,10 +144,11 @@ namespace sv {
 			OnGetSkill();
 		}
 		void OnGetSkill() override {
-			m_pPlayer->pev->health += GetBonus();
+			m_pPlayer->pev->health += m_pPlayer->m_bIsZombie ? GetZombieBonus() : GetBonus();
 		}
 	private:
 		float GetBonus() const { return 400.0f + 200.0f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetZombieBonus() const { return 1000.0f + 500.0f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_BombBackpack : public CZombieZSkill_Base
@@ -225,7 +237,7 @@ namespace sv {
 	public:
 		explicit ZSkill_ExplodeBullet(CBasePlayer* player) : CZombieZSkill_Base(player), m_flNextThink(0s), m_uFiredTimes(0){}
 		const char* GetName() const override { return "爆炸弹头"; }
-		const char* GetDesc() const override { return "每（30-4*回合数/3）次射击时产生爆炸，爆炸范围64，爆炸的伤害为武器本身的（35%+5%*回合数）"; }
+		const char* GetDesc() const override { return "射击时一定概率触发爆炸。"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 		void OnTraceAttack(CBasePlayer* victim, CBasePlayer* attacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType) override {
 			if (attacker != m_pPlayer)
@@ -243,7 +255,7 @@ namespace sv {
 				return;
 
 			m_uFiredTimes = 0;
-			RadiusDamage3(ptr->vecEndPos, m_pPlayer->pev, m_pPlayer->pev, flDamage * 0.35f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed, 64.0f, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
+			RadiusDamage3(ptr->vecEndPos, m_pPlayer->pev, m_pPlayer->pev, flDamage * (0.35f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed), 64.0f, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
 
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 			WRITE_BYTE(TE_EXPLOSION);
@@ -513,6 +525,9 @@ namespace sv {
 		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
 
 		void OnThink() override {
+			if (!IsActivate())
+				return;
+
 			if (m_pPlayer->pev->flags & FL_ONGROUND && m_pPlayer->pev->flags & FL_DUCKING)
 			{
 				if (!m_bActivate) {
@@ -728,7 +743,7 @@ namespace sv {
 			flDamage *= GetBonus();
 		}
 	private:
-		float GetBonus() const { return 1.0f + 0.0056f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_ClawEnhacement : public CZombieZSkill_Base
@@ -871,7 +886,7 @@ namespace sv {
 			if (p->m_bIsZombie)
 				return;
 
-			p->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, 1000.0f, DMG_BULLET | DMG_NEVERGIB);
+			p->TakeDamage(m_pPlayer->pev, m_pPlayer->pev, 1000.0f, DMG_BULLET | DMG_NEVERGIB | DMG_INFECTION);
 		}
 
 		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
@@ -1173,6 +1188,343 @@ namespace sv {
 			}
 		}
 	};
+	
+	class ZSkill_RapidFireAmmo : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_RapidFireAmmo(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "连发手雷"; }
+		const char* GetDesc() const override { return "使用投掷装备时，自动追加使用次数。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		struct ShootGrenadeRecord
+		{
+			time_point_t flTime;
+			int iCount;
+			Vector vecStart;
+			Vector vecVelocity;
+			duration_t time;
+			int iTeam;
+			unsigned short usEvent;
+		};
+
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			m_vecGrenadeRecord.clear();
+		}
+
+		void OnSpawn() override {
+			m_vecGrenadeRecord.clear();
+		}
+
+		void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override {
+			if (!IsActivate())
+				return;
+
+			m_flNextThink = time_point_t();
+			ShootGrenadeRecord record;
+			record.flTime = gpGlobals->time + 1s;
+			record.iCount = 1 + g_pGameRules->m_iTotalRoundsPlayed / 2;
+			record.vecStart = vecStart;
+			record.vecVelocity = vecVelocity;
+			record.time = time;
+			record.iTeam = iTeam;
+			record.usEvent = usEvent;
+			m_vecGrenadeRecord.push_back(record);
+			//m_vecGrenadeRecord.push_back({ gpGlobals->time, 1 + g_pGameRules->m_iTotalRoundsPlayed / 2, vecStart, vecVelocity, time, iTeam, usEvent });
+		}
+
+		void OnThink() override {
+			if (!IsActivate())
+				return;
+
+			if (m_flNextThink > gpGlobals->time)
+				return;
+
+			m_flNextThink = gpGlobals->time + 1s;
+
+			if (m_vecGrenadeRecord.empty())
+				return;
+
+			auto iter = m_vecGrenadeRecord.begin();
+			while (iter != m_vecGrenadeRecord.end())
+			{
+				if (iter->flTime > gpGlobals->time)
+				{
+					++iter;
+					continue;
+				}
+
+				if (iter->iCount > 0)
+				{
+					CGrenade* pGrenade = CreateClassPtr<CGrenade>();
+					pGrenade->Spawn();
+
+					UTIL_SetOrigin(pGrenade->pev, iter->vecStart);
+					pGrenade->pev->velocity = iter->vecVelocity;
+					pGrenade->pev->angles = m_pPlayer->pev->angles;
+					pGrenade->pev->owner = ENT(m_pPlayer->pev);
+
+					pGrenade->m_usEvent = iter->usEvent;
+
+					pGrenade->SetTouch(&CGrenade::BounceTouch);
+
+					pGrenade->pev->dmgtime = gpGlobals->time + iter->time;
+					pGrenade->SetThink(&CGrenade::TumbleThink);
+					pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
+
+					pGrenade->pev->sequence = RANDOM_LONG(3, 6);
+					pGrenade->pev->framerate = 1.0f;
+
+					pGrenade->m_bJustBlew = true;
+
+					pGrenade->pev->gravity = 0.55f;
+					pGrenade->pev->friction = 0.7f;
+
+					pGrenade->m_iTeam = iter->iTeam;
+
+					SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
+					pGrenade->pev->dmg = 100.0f;
+
+					(*iter).flTime = gpGlobals->time + 1s;
+					(*iter).iCount--;
+				}
+
+				if (!iter->iCount) iter = m_vecGrenadeRecord.erase(iter);
+				else ++iter;
+			}
+
+		}
+	private:
+		time_point_t m_flNextThink;
+		std::vector<ShootGrenadeRecord> m_vecGrenadeRecord;
+	};
+	
+	class ZSkill_Revenge : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Revenge(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "复仇投掷"; }
+		const char* GetDesc() const override { return "作为僵尸死亡时，向前方投掷爆弹兽颅。"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override {
+			if (!IsActivate())
+				return;
+
+			Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
+
+			if (angThrow.x < 0)
+				angThrow.x = -10 + angThrow.x * ((90 - 10) / 90.0);
+			else
+				angThrow.x = -10 + angThrow.x * ((90 + 10) / 90.0);
+
+			float flVel = (90 - angThrow.x) * 6;
+
+			if (flVel > 750)
+				flVel = 750;
+
+			UTIL_MakeVectors(angThrow);
+			Vector vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
+			Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
+			CGrenade::ShootZombieBomb(m_pPlayer->pev, vecSrc, vecThrow, 1.5s, m_pPlayer->m_iTeam, NULL);
+		}
+	};
+	
+	class CZBZSupportBombardment : public CBaseAnimating
+	{
+	public:
+		void Precache()
+		{
+			m_sModelIndex_Missle = PRECACHE_MODEL("models/bunkerbuster_missile.mdl");
+			PRECACHE_MODEL("models/bunkerbuster_target.mdl");
+			PRECACHE_SOUND("weapons/bunkerbuster_fire.wav");
+			PRECACHE_SOUND("weapons/bunkerbuster_explosion_1st.wav");
+			PRECACHE_SOUND("weapons/bunkerbuster_whistling1.wav");
+			PRECACHE_SOUND("weapons/bunkerbuster_whistling2.wav");
+			PRECACHE_SOUND("weapons/bunkerbuster_whistling3.wav");
+
+			m_sSpriteIndex_Fire = PRECACHE_MODEL("sprites/bunkerbuster_fire.spr");
+			m_sSpriteIndex_Smoke = PRECACHE_MODEL("sprites/bunkerbuster_smoke.spr");
+			m_sSpriteIndex_Exp = PRECACHE_MODEL("sprites/bunkerbuster_explosion.spr");
+		}
+
+		void Spawn()
+		{
+			Precache();
+			pev->movetype = MOVETYPE_TOSS;
+
+			if (pev->classname)
+			{
+				RemoveEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+			}
+
+			MAKE_STRING_CLASS("zbz_supportbombardment", pev);
+			AddEntityHashValue(pev, STRING(pev->classname), CLASSNAME);
+			pev->solid = SOLID_NOT;
+
+			SetThink(&CZBZSupportBombardment::AnimationThink);
+			SET_MODEL(ENT(pev), "models/bunkerbuster_target.mdl");
+			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+
+			pev->sequence = 0;
+			pev->frame = 0;
+			pev->framerate = 1.0f;
+			ResetSequenceInfo();
+			m_fSequenceLoops = true;
+		}
+
+		static void CreateSupportBombardment(entvars_t* owner, Vector origin)
+		{
+			CZBZSupportBombardment* pEntity = CreateClassPtr<CZBZSupportBombardment>();
+			pEntity->Spawn();
+			UTIL_SetOrigin(pEntity->pev, origin);
+			pEntity->pev->gravity = 2.0f;
+			pEntity->pev->owner = ENT(owner);
+			pEntity->pev->renderfx = kRenderFxNone;
+			pEntity->pev->renderamt = 255.0f;
+			pEntity->pev->rendermode = kRenderTransAdd;
+			pEntity->pev->nextthink = gpGlobals->time;
+			pEntity->m_flFireThink = gpGlobals->time + 4.7s;
+			pEntity->m_iState = 0;
+		}
+
+		void EXPORT AnimationThink(void)
+		{
+			if(!m_iState)
+				StudioFrameAdvance();
+
+			CBaseEntity* pOwner = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pEntityOwner = nullptr;
+			if (pOwner && pOwner->IsPlayer())
+			{
+				pEntityOwner = static_cast<CBasePlayer*>(pOwner);
+				if (pEntityOwner && pEntityOwner->m_bIsZombie)
+					UTIL_Remove(this);
+			}
+
+			pev->nextthink = gpGlobals->time + 0.2s;
+
+			if (m_iState == 2)
+			{
+				if (m_flHurtThink <= gpGlobals->time)
+				{
+					m_flHurtThink = gpGlobals->time + 0.5s;
+					
+					CBaseEntity* pEntity = NULL;
+					while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 150)) != NULL)
+					{
+						if (pEntity->pev->takedamage == DAMAGE_NO)
+							continue;
+
+						pEntity->TakeDamage(pev, VARS(pev->owner), 30.0f, DMG_NEVERGIB | DMG_SLOWBURN);
+					}
+				}
+
+				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+				WRITE_BYTE(TE_FIREFIELD);
+				WRITE_COORD(pev->origin[0]);
+				WRITE_COORD(pev->origin[1]);
+				WRITE_COORD(pev->origin[2] + RANDOM_FLOAT(25.0f, 45.0f));
+				WRITE_SHORT(150); // Radius
+				WRITE_SHORT(m_sSpriteIndex_Fire);
+				WRITE_BYTE(10); // count
+				WRITE_BYTE(TEFIRE_FLAG_PLANAR|TEFIRE_FLAG_ADDITIVE);
+				WRITE_BYTE(2); // duration
+				MESSAGE_END();
+			}
+
+			if (m_flFireThink > gpGlobals->time)
+				return;
+
+			if (!m_iState)
+			{
+				TraceResult result;
+				Vector ceiling = pev->origin;
+				ceiling.z += 8192.0;
+				UTIL_TraceLine(pev->origin, ceiling, ignore_monsters, dont_ignore_glass, ENT(pev), &result);
+
+				Vector vecTravel = result.vecEndPos - pev->origin;
+				float flSpeed = 2000.0f;
+				pev->effects |= EF_NODRAW;
+				m_iState = 1;
+				duration_t travelTime = vecTravel.Length() / flSpeed * 1s;
+				m_flFireThink = gpGlobals->time + travelTime;
+
+				MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+				WRITE_BYTE(TE_PROJECTILE);
+				WRITE_COORD(result.vecEndPos[0]);
+				WRITE_COORD(result.vecEndPos[1]);
+				WRITE_COORD(result.vecEndPos[2]);
+				WRITE_COORD(0);
+				WRITE_COORD(0);
+				WRITE_COORD(-flSpeed);
+				WRITE_SHORT(m_sModelIndex_Missle);
+				WRITE_BYTE(12); // (life in 1's)
+				WRITE_BYTE(ENTINDEX(pev->owner)); // (owner)
+				MESSAGE_END();
+			}
+			else if (m_iState == 1)
+			{
+				m_iState = 2;
+				m_flFireThink = gpGlobals->time + 12s;
+
+				EMIT_SOUND(ENT(pev), CHAN_STATIC, "weapons/bunkerbuster_explosion_1st.wav", VOL_NORM, ATTN_NORM);
+
+				RadiusDamage3(pev->origin, pev, VARS(pev->owner), 500.0f * (50.0f * g_pGameRules->m_iTotalRoundsPlayed), 250.0f, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, 0);
+
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_EXPLOSION);
+				WRITE_COORD(pev->origin.x);
+				WRITE_COORD(pev->origin.y);
+				WRITE_COORD(pev->origin.z + 230.0f);
+				WRITE_SHORT(m_sSpriteIndex_Exp);
+				WRITE_BYTE(22);
+				WRITE_BYTE(20);
+				WRITE_BYTE(TE_EXPLFLAG_NONE);
+				MESSAGE_END();
+
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_SPRITE);
+				WRITE_COORD(pev->origin.x);
+				WRITE_COORD(pev->origin.y);
+				WRITE_COORD(pev->origin.z + 80.0f);
+				WRITE_SHORT(m_sSpriteIndex_Smoke);
+				WRITE_BYTE(RANDOM_LONG(4, 9));
+				WRITE_BYTE(255);
+				MESSAGE_END();
+			}
+			else
+			{
+				UTIL_Remove(this);
+			}
+		}
+
+	private:
+		short m_sModelIndex_Missle;
+		short m_sSpriteIndex_Fire;
+		short m_sSpriteIndex_Smoke;
+		short m_sSpriteIndex_Exp;
+		int m_iState;
+		time_point_t m_flHurtThink;
+		time_point_t m_flFireThink;
+	};
+	LINK_ENTITY_TO_CLASS(zbz_supportbombardment, CZBZSupportBombardment);
+
+	class ZSkill_SupportBombardment : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SupportBombardment(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "支援轰炸"; }
+		const char* GetDesc() const override { return "手雷爆炸时低概率进行轰炸。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnGrenadeExploded(Vector vecOrigin) override {
+			if (!IsActivate())
+				return;
+			if (RANDOM_FLOAT(0.0f, 1.0f) > 0.01f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed)
+				return;
+
+			CZBZSupportBombardment::CreateSupportBombardment(m_pPlayer->pev, vecOrigin);
+		}
+	};
 
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
@@ -1218,6 +1570,9 @@ namespace sv {
 		{ Skill_SixthSense, 200, MakeSkill<ZSkill_SixthSense> },
 		{ Skill_Intellectual, 100, MakeSkill<ZSkill_Intellectual> },
 		{ Skill_LifePlunder, 100, MakeSkill<ZSkill_LifePlunder> },
+		{ Skill_RapidFireAmmo, 100, MakeSkill<ZSkill_RapidFireAmmo> },
+		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
+		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
 		
 	};
 

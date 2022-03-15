@@ -37,7 +37,7 @@ CZombieClass_Revival::CZombieClass_Revival(CBasePlayer *player, ZombieLevel iEvo
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 10000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 5000;
 
@@ -85,12 +85,12 @@ void CZombieClass_Revival::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 1.0f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 
 	if (m_pZombieSkill)
@@ -117,10 +117,10 @@ bool CZombieClass_Revival::ApplyKnockback(CBasePlayer* attacker, const Knockback
 	m_iRevivalSkillStatus = m_pZombieSkill->GetStatus();
 	if (m_iRevivalSkillStatus == SKILL_STATUS_USING)
 		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-		0.0f,
-		0.0f,
-		0.0f,
-		0.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
+		-1.0f,
 		1.0f,
 			});
 

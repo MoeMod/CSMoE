@@ -220,6 +220,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_balrog9.cpp
 	../dlls/wpn_shared/knife_summonknife.cpp
 	../dlls/wpn_shared/wpn_revivegun.cpp
+	../dlls/wpn_shared/knife_holysword.cpp
 	)
 
 set (HUD_SRCS

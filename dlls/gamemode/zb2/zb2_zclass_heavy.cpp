@@ -38,7 +38,7 @@ CZombieClass_Heavy::CZombieClass_Heavy(CBasePlayer *player, ZombieLevel iEvoluti
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 1000;
 
@@ -87,13 +87,16 @@ void CZombieClass_Heavy::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 1.0f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
+
+	if (m_pPlayer->pev->velocity.Length2D() < 200.0f)
+		m_pPlayer->pev->maxspeed = 399.0;
 }
 
 float CZombieClass_Heavy::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const

@@ -49,7 +49,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "sfsword";
-		KnockbackData KnockBack = { 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+		KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 	public:
 
@@ -307,6 +307,7 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL		
 		m_iSwing = 0;
+		int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 		CBaseEntity* pEntity = NULL;
 		BOOL fDidHit = FALSE;
 		TraceResult tr;
@@ -330,6 +331,9 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+				continue;
+
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr, 0))
 				continue;
 
@@ -340,7 +344,10 @@ namespace sv {
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
@@ -349,7 +356,7 @@ namespace sv {
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, GetPrimaryAttackDamage() * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -523,6 +530,7 @@ namespace sv {
 	{
 #ifndef CLIENT_DLL
 		float flDamage, flRadius, flAngleDegrees;
+		int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 		flAngleDegrees = m_iSwing ? 120 : 60;
 		flDamage = m_iSwing ? GetChargeAttackDamage() : GetSecondaryAttackDamage();
 		flRadius = m_iSwing ? 210 : 120;
@@ -558,6 +566,9 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
+			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+				continue;
+
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, m_iSwing))
 				continue;
 
@@ -568,7 +579,10 @@ namespace sv {
 				UTIL_MakeVectors(pEntity->pev->angles);
 
 				if (DotProduct((pEntity->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
 					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
 
 			m_pPlayer->m_iWeaponVolume = 128;
@@ -585,7 +599,7 @@ namespace sv {
 
 			ClearMultiDamage();
 
-			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
+			pEntity->TraceAttack(m_pPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

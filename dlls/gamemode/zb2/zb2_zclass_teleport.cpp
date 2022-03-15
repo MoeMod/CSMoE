@@ -37,7 +37,7 @@ CZombieClass_Teleport::CZombieClass_Teleport(CBasePlayer *player, ZombieLevel iE
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 10000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 5000;
 
@@ -88,12 +88,12 @@ void CZombieClass_Teleport::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 1.0f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 }
 

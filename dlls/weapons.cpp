@@ -70,6 +70,11 @@ short int g_sModelIndexCTGhost;
 short int g_sModelIndexTGhost;
 short int g_sModelIndexC4Glow;
 
+short g_sModelIndexBoomerEffect;
+short g_sModelIndexBoomerSprite;
+short g_sModelIndexBoomerEffectEx;
+short g_sModelIndexPosionEffect;
+
 int giAmmoIndex;
 
 MULTIDAMAGE gMultiDamage;
@@ -1651,6 +1656,12 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 				|| (pPlayer->IsBot() && (ctrl != NULL && !ctrl->IsWeaponUseable(pItem))))
 			{
 				return;
+			}
+
+			if (FClassnameIs(pItem->pev, "weapon_revivegun"))
+			{
+				pPlayer->m_bHasBuffWpn |= BUFF_REVIVEGUN;
+				//how check if has charged ? call back IsSignal fuction in CReviveGun
 			}
 
 			if (FClassnameIs(pItem->pev, "weapon_c4"))

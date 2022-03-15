@@ -17,7 +17,7 @@ GNU General Public License for more details.
 
 #ifndef CLIENT_DLL
 #include "monsters.h"
-#include <dlls/gamemode/mod_zb2.h>
+#include <dlls/gamemode/mod_zb1.h>
 
 namespace sv {
 
@@ -187,198 +187,6 @@ KnifeAttack3(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float
 	return result;
 }
 
-inline hit_result_t
-KnifeAttack4(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
-	entvars_t* pevInflictor, entvars_t* pevAttacker,bool IsPrimaryAttack, int iType)
-{
-	TraceResult tr;
-	hit_result_t result = HIT_NONE;
-
-	vecSrc.z += 1;
-
-	if (!pevAttacker)
-		pevAttacker = pevInflictor;
-
-	Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
-
-	if (tr.flFraction >= 1) {
-		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
-
-		if (tr.flFraction < 1) {
-			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
-
-			if (!pHit || pHit->IsBSPModel()) {
-				FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
-			}
-
-			vecEnd = tr.vecEndPos;
-		}
-	}
-
-	if (tr.flFraction < 1) {
-		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
-		if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO) {
-			const float flAdjustedDamage = flDamage;
-			ClearMultiDamage();
-			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-			ApplyMultiDamage(pevInflictor, pevAttacker);
-		}
-
-		float flVol = 1;
-		BOOL fHitWorld = TRUE;
-		if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE) {
-			flVol = 0.1f;
-			fHitWorld = FALSE;
-		}
-
-		if (fHitWorld) {
-			TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-			switch (iType)
-			{
-				case 1:	//dualsword
-				{
-					if (IsPrimaryAttack)
-					{
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
-					}
-					else
-					{
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-						PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
-					}
-					break;
-				}
-			}	
-			result = HIT_WALL;
-		}
-	}
-
-	CBaseEntity* pEntity = nullptr;
-	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr) {
-		if (pEntity->pev->takedamage != DAMAGE_NO) {
-			if (pEntity->IsBSPModel())
-				continue;
-
-			if (pEntity->pev == pevAttacker)
-				continue;
-
-			Vector vecSpot = pEntity->BodyTarget(vecSrc);
-			vecSpot.z = vecEnd.z;
-			UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
-
-			if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
-				continue;
-
-			if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict()) {
-				if (tr.fStartSolid) {
-					tr.vecEndPos = vecSrc;
-					tr.flFraction = 0;
-				}
-
-				if (tr.flFraction == 1.0f) {
-					pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-				}
-
-				Vector vecRealDir = (pEntity->pev->origin - pevAttacker->origin).Normalize();
-
-				UTIL_MakeVectors(pEntity->pev->angles);
-				if (DotProduct(vecRealDir.Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
-				{
-					flDamage *= 3.0;
-					bitsDamageType |= DMG_BACKATK;
-				}
-
-				ClearMultiDamage();
-				pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
-				ApplyMultiDamage(pevInflictor, pevAttacker);
-
-				switch (iType)
-				{
-					case 1:	//dualsword
-					{
-						if (IsPrimaryAttack)
-						{
-							if (pEntity->IsPlayer())
-							{
-								CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-								if (target->m_bIsZombie && target->m_ZombieClass)
-								{
-									/*if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
-									{
-										target->pev->velocity.x = 0;
-										target->pev->velocity.y = 0;
-										target->m_flVelocityModifier = 0.3;
-									}*/
-									auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(target->m_pModStrategy.get());
-									if (strategy)
-									{
-										strategy->SetStunSpeedTime(1.0s);
-										strategy->SetStunGravityTime(1.0s);
-									}
-								}
-							}
-
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
-						}
-						else
-						{
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
-						}
-						break;
-					}
-					case 2:		//knife_lance sndatk
-					{
-						if (pEntity->IsPlayer())
-						{
-							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-							if (target->m_bIsZombie && target->m_ZombieClass)
-							{
-								if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
-								{
-									target->m_flVelocityModifier = 0.9;
-									AddKickRate(target, pevAttacker->origin, 2100, 290);
-								}
-							}
-						}
-						break;
-					}
-					case 3:
-					{
-						if (pEntity->IsPlayer())
-						{
-							CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-							if (target->m_bIsZombie && target->m_ZombieClass)
-							{
-								auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(target->m_pModStrategy.get());
-								if (strategy)
-								{
-									strategy->SetStunSpeedTime(2.0s);
-									strategy->SetStunGravityTime(2.0s);
-								}
-
-								/*if (stricmp(target->m_ZombieClass, "revival") || !target->m_iZombieRevivalEnabled)
-								{
-									target->pev->velocity.x = 0;
-									target->pev->velocity.y = 0;
-									target->m_flVelocityModifier = 0.3;
-								}*/
-							}
-						}
-						break;
-					}
-				}
-				result = HIT_PLAYER;
-			}
-		}
-	}
-
-	return result;
-}
-
 inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, entvars_t* pevAttacker)
 {
 	TraceResult tr;
@@ -479,6 +287,29 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 	return vecDir;
 }
 
+inline bool bIsWallBetweenEntity(CBaseEntity* pEntity, CBasePlayer* pAttackPlayer)
+{
+	TraceResult tr;
+	Vector vecSrc = pAttackPlayer->pev->origin;
+	Vector vecEnd = pEntity->pev->origin;
+	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, pAttackPlayer->edict(), &tr);
+	
+	if (tr.flFraction < 1.0)
+	{
+		if (tr.pHit)
+		{
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			if (pHit && pHit == pEntity)
+				return false;
+		}
+		return true;
+	}
+
+	return false;
+
+}
+
 inline
 bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
 {
@@ -497,6 +328,7 @@ bool AngleCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vec
 					return true;
 			}
 		}
+
 	}
 	else
 	{
@@ -564,6 +396,9 @@ inline hit_result_t
 			continue;
 
 		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if(bIsWallBetweenEntity(pEntity, pAttackPlayer))
 			continue;
 
 		if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))

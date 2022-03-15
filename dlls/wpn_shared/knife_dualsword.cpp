@@ -24,9 +24,9 @@ GNU General Public License for more details.
 #endif
 
 #include <random>
-
-#include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
+#include "weapons/WeaponTemplate.hpp"
+
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -50,7 +50,7 @@ public:
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr float ArmorRatioModifier = 1.7f;
 	static constexpr const char *AnimExtension = "katana";
-	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.6f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 private:
 	int m_iAttackRecord; // iAttackRecord
@@ -64,7 +64,6 @@ private:
 
 
 public:
-
 	BOOL CanHolster() override
 	{
 		return gpGlobals->time > m_flNextTimeCanHolster;
@@ -169,8 +168,9 @@ public:
 	void SecondaryAttack() override;
 	BOOL CanDrop() override { return false; }
 
-	
 #ifndef CLIENT_DLL
+	hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack, int iType);
+	bool AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, bool IsPrimaryAttack);
 	void ItemPostFrame() override;
 	void ActPrimaryAttack(int iType);
 	void DelaySecondaryAttack();
@@ -461,6 +461,198 @@ void CKnifeDualsword::SecondaryAttack(void)
 #endif
 }
 
+#ifndef CLIENT_DLL
+bool CKnifeDualsword::AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr, bool IsPrimaryAttack)
+{
+	bool bResult = false;
+	if (pEntity->IsBSPModel())
+	{
+		UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, pAttacker->edict(), ptr);
+
+		if (ptr->flFraction < 1.0)
+		{
+			if (ptr->pHit)
+			{
+				CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+				if (pHit && pHit == pEntity)
+					bResult = true;
+			}
+		}
+	}
+	else
+	{
+		UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+		if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+		{
+			UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), ptr);
+
+			bResult = true;
+		}
+		else
+		{
+			Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+			if (DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()) > flMinimumCosine)
+			{
+				edict_t* peAttacker = pAttacker->edict();
+
+				for (int i = 5; i > 0; i--)
+				{
+					UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+					if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+					{
+						break;
+					}
+
+					CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+					if (ptr->flFraction < 1.0 || pHit == pEntity)
+					{
+						bResult = true;
+
+						break;
+					}
+
+					if (pHit->IsBSPModel())
+					{
+						break;
+					}
+
+					vecSrc = ptr->vecEndPos + vecDir * 5.0;
+				}
+			}
+		}
+	}
+
+	if (!bResult)
+		return bResult;
+
+	if (pEntity->IsPlayer())
+	{
+		if(IsPrimaryAttack)
+		{
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+		}
+		else
+		{
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pEntity->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+		}
+	}
+	
+	return bResult;
+}
+
+hit_result_t CKnifeDualsword::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, bool IsPrimaryAttack, int iType)
+{
+	CBaseEntity* pEntity = NULL;
+	hit_result_t result = HIT_NONE;
+	TraceResult tr;
+	UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+	Vector vecEnd;
+	Vector vecSrc = pAttackPlayer->GetGunPosition();
+
+	Vector vecForward = gpGlobals->v_forward;
+	Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+	float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity == pAttackPlayer)
+			continue;
+
+		if (pEntity->IsDormant())
+			continue;
+
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			continue;
+
+		if (!AngularCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, IsPrimaryAttack))
+			continue;
+
+		float flRatio = 1.0;
+
+		if (pEntity && pEntity->IsPlayer())
+		{
+			UTIL_MakeVectors(pEntity->pev->angles);
+
+			if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+			{
+				flRatio = 3.0;
+				bitsDamageType |= DMG_BACKATK;
+			}
+		}
+
+		pAttackPlayer->m_iWeaponVolume = 128;
+
+		ClearMultiDamage();
+
+		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+		result = HIT_PLAYER;
+
+		if (pEntity->IsPlayer())
+		{
+			CBasePlayer* player = (CBasePlayer*)pEntity;
+
+			if (player->m_bIsZombie && player->m_ZombieClass)
+			{	
+				if (IsPrimaryAttack)
+				{	
+					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+
+					if(iType)
+						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.8f });
+					else
+						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.5f });
+
+					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					{
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.0s);
+							strategy->SetStunGravityTime(1.0s);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (!result)
+	{
+		static int calced = 0;
+		static float calcRes = 0.0f;
+
+		if (!(calced & 1))
+		{
+			calced |= 1;
+			calcRes = sqrt(512.0);
+		}
+
+		vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+		UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0f)
+			result = HIT_WALL;
+	}
+
+	return result;
+}
+#endif
+
 void CKnifeDualsword::DelayPrimaryAttack()
 {
 	if (m_iPrimaryAttackRecord == 0)
@@ -489,12 +681,8 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 	const float flRadius = iType ? 130 : 140;
 	const float flAngle = iType ? 90 : 180;
 
-	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	const Vector vecSrc = m_pPlayer->GetGunPosition();
-	const Vector vecDir = gpGlobals->v_forward;
+	
 	/*{
-		TraceResult tr;
 		Vector vecEnd = vecSrc + vecDir.Normalize() * flAngle;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 
@@ -519,7 +707,7 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 		}
 	}*/
 
-	switch (KnifeAttack4(vecSrc, vecDir, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev,TRUE,1))
+	switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, true, iType))
 	{
 	case HIT_NONE:
 	{
@@ -533,14 +721,30 @@ void CKnifeDualsword::ActPrimaryAttack(int iType)
 		else
 			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-		fDidHit = TRUE;
 		break;
 	}
 	case HIT_WALL:
 	{
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		TraceResult tr;
+
+		const Vector vecSrc = m_pPlayer->GetGunPosition();
+		const Vector vecDir = gpGlobals->v_forward;
+
+		Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0f)
+		{
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, TRUE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, TRUE, FALSE);
+
+		}
+
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-		fDidHit = TRUE;
 		break;
 	}
 	}
@@ -580,12 +784,9 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	const float flRadius = 120;
 	const float flAngle = 330;
 
-	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	const Vector vecSrc = m_pPlayer->GetGunPosition();
-	const Vector vecDir = gpGlobals->v_forward;
+	
 	/*{
-		TraceResult tr;
+		
 		Vector vecEnd = vecSrc + vecDir.Normalize() * flAngle;
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 
@@ -614,7 +815,7 @@ void CKnifeDualsword::DelaySecondaryAttack()
 	sprintf(buffer, "weapons/dualsword_slash_%d.wav", v8 + 1);
 	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
-	switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, FALSE, 1))
+	switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false, 0))
 	{
 	case HIT_NONE:
 	{
@@ -635,16 +836,29 @@ void CKnifeDualsword::DelaySecondaryAttack()
 		sprintf(buffer, "weapons/dualsword_hit%d.wav", random_sound);
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, buffer, VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-		fDidHit = TRUE;
 		break;
 	}
 	case HIT_WALL:
 	{
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		TraceResult tr;
+
+		const Vector vecSrc = m_pPlayer->GetGunPosition();
+		const Vector vecDir = gpGlobals->v_forward;
+
+		Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, m_pPlayer->edict(), &tr);
+
+		if (tr.flFraction < 1.0f)
+		{
+			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, TRUE);
+			PLAYBACK_EVENT_FULL(FEV_GLOBAL, ENT(pHit->pev), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, tr.vecEndPos, g_vecZero, 0.0, 0.0, 1, 0, FALSE, FALSE);
+
+		}
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.1;
-		fDidHit = TRUE;
-		break;
-		fDidHit = TRUE;
 		break;
 	}
 	}
@@ -709,7 +923,8 @@ private:
 	int m_iModelSkillFx2;
 
 public:
-	KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.65f };
+
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.9f };
 	void Precache() override
 	{
 		m_iModelSkillFx1 = PRECACHE_MODEL("models/dualsword_skillfx1.mdl");
@@ -728,105 +943,82 @@ public:
 	}
 
 #ifndef CLIENT_DLL
-	hit_result_t RadiusAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType,
-		entvars_t* pevInflictor, entvars_t* pevAttacker)
+	void RadiusAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
 	{
+		CBaseEntity* pEntity = NULL;
+		BOOL fHit = FALSE;
+
 		TraceResult tr;
-		hit_result_t result = HIT_NONE;
+		UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+		Vector vecEnd;
+		Vector vecSrc = pAttackPlayer->GetGunPosition();
 
-		vecSrc.z += 1;
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
 
-		if (!pevAttacker)
-			pevAttacker = pevInflictor;
+		float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
 
-		Vector vecEnd = vecSrc + vecDir.Normalize() * flRadius;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pevAttacker), &tr);
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+		{
+			if (pEntity == pAttackPlayer)
+				continue;
 
-		if (tr.flFraction >= 1) {
-			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pevAttacker), &tr);
+			if (pEntity->IsDormant())
+				continue;
 
-			if (tr.flFraction < 1) {
-				CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
 
-				if (!pHit || pHit->IsBSPModel()) {
-					FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(pevAttacker));
-				}
+			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+				continue;
 
-				vecEnd = tr.vecEndPos;
-			}
-		}
+			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+				continue;
 
-		if (tr.flFraction < 1) {
-			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
-			if (pHit && pHit->IsBSPModel() && pHit->pev->takedamage != DAMAGE_NO) {
-				const float flAdjustedDamage = flDamage;
-				tr.iHitgroup = HITGROUP_CHEST;
-				ClearMultiDamage();
-				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
-				ApplyMultiDamage(pevInflictor, pevAttacker);
-			}
+			pAttackPlayer->m_iWeaponVolume = 128;
 
-			float flVol = 1;
-			BOOL fHitWorld = TRUE;
-			if (pHit && pHit->Classify() != CLASS_NONE && pHit->Classify() != CLASS_MACHINE) {
-				flVol = 0.1f;
-				fHitWorld = FALSE;
-			}
+			ClearMultiDamage();
 
-			if (fHitWorld) {
-				TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-				result = HIT_WALL;
-			}
-		}
+			tr.iHitgroup = HITGROUP_CHEST;
+			pEntity->TraceAttack(pAttackPlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
-		CBaseEntity* pEntity = nullptr;
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != nullptr) {
-			if (pEntity->pev->takedamage != DAMAGE_NO) {
-				if (pEntity->IsBSPModel())
-					continue;
+			ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
 
-				if (pEntity->pev == pevAttacker)
-					continue;
+			fHit = TRUE;
 
-				Vector vecSpot = pEntity->BodyTarget(vecSrc);
-				vecSpot.z = vecEnd.z;
-				UTIL_TraceLine(vecSrc, vecSpot, missile, ENT(pevInflictor), &tr);
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
 
-				if (AngleBetweenVectors(tr.vecEndPos - vecSrc, vecDir) > flAngleDegrees)
-					continue;
-
-				if (tr.flFraction == 1.0f || tr.pHit == pEntity->edict()) {
-					if (tr.fStartSolid) {
-						tr.vecEndPos = vecSrc;
-						tr.flFraction = 0;
-					}
-
-					if (tr.flFraction == 1.0f) {
-						pEntity->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-					}
-
-					Vector vecRealDir = (pEntity->pev->origin - pevAttacker->origin).Normalize();
-
-					tr.iHitgroup = HITGROUP_CHEST;
-					ClearMultiDamage();
-					pEntity->TraceAttack(pevInflictor, flDamage, vecRealDir, &tr, bitsDamageType);
-					ApplyMultiDamage(pevInflictor, pevAttacker);
-
+				if (player->m_bIsZombie && player->m_ZombieClass)
+				{
 					CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
 					if (player && player->m_bIsZombie)
 					{
-						Vector vecDir = (player->pev->origin - pevAttacker->origin);
+						Vector vecDir = (player->pev->origin - pAttackPlayer->pev->origin);
 						vecDir.z = 0;
 
-						ApplyKnockbackData(player, vecDir, { 0.0, 1.0, 1.0, 0.0, 0.9f });
+						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.9f });
 					}
-
-					result = HIT_PLAYER;
 				}
 			}
 		}
 
-		return result;
+		if (!fHit)
+		{
+			static int calced = 0;
+			static float calcRes = 0.0f;
+
+			if (!(calced & 1))
+			{
+				calced |= 1;
+				calcRes = sqrt(512.0);
+			}
+
+			vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+		}
 	}
 #endif
 
@@ -1060,7 +1252,7 @@ public:
 		UTIL_MakeVectors(pPlayer->pev->v_angle);
 		Vector vecSrc = pPlayer->GetGunPosition();
 
-		RadiusAttack(vecSrc, gpGlobals->v_forward, flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, pPlayer->pev, pPlayer->pev);
+		RadiusAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, pPlayer->pev, pPlayer);
 	}
 
 };

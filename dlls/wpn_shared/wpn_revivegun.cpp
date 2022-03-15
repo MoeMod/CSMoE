@@ -22,10 +22,11 @@
 #include <array>
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
+#include <dlls/gamemode/mod_zb1.h>
 #include "effects.h"
+#include <dlls/player/csdm_randomspawn.h>
 #endif
 #include "wpn_revivegun.h"
-
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -98,8 +99,8 @@ void CReviveGun::Precache(void)
 int CReviveGun::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556NatoStar";
-	p->iMaxAmmo1 = 150;
+	p->pszAmmo1 = "ReviveGunAmmo";
+	p->iMaxAmmo1 = 120;
 	p->pszAmmo2 = "ReviveAmmo";
 	p->iMaxAmmo2 = 6;
 	p->iMaxClip = REVIVEGUN_MAXCLIP;
@@ -121,8 +122,6 @@ BOOL CReviveGun::Deploy(void)
 	m_tBeamThink = m_tNextThink = invalid_time_point;
 	m_tNextPlayEvent = gpGlobals->time + 1.0s;
 	CreateEffect();
-
-
 
 	if (m_flTimeHostler != invalid_time_point)
 	{
@@ -266,11 +265,13 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			if (pBeam)
 			{
 				pBeam->SetType(BEAM_ENTPOINT);
+				pBeam->pev->sequence = 0;
+				pBeam->pev->owner = 0;
 				pBeam->SetStartPos(vecEnd);
-				pBeam->SetEndEntity(ENTINDEX(m_pPlayer->edict()));
+				pBeam->SetEndEntity(m_pPlayer->entindex());
 				pBeam->SetStartAttachment(0);
 				pBeam->SetEndAttachment(iAttachment);
-				pBeam->SetBrightness(230);
+				pBeam->SetBrightness(255);
 				pBeam->RelinkBeam();
 				pBeam->pev->effects &= ~EF_NODRAW;
 			}
@@ -281,6 +282,20 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 
 		}
 #endif
+
+#ifndef CLIENT_DLL
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(vecEnd.x);
+		WRITE_COORD(vecEnd.y);
+		WRITE_COORD(vecEnd.z);
+		WRITE_SHORT(MODEL_INDEX("sprites/ef_revivegun_expB.spr"));
+		WRITE_BYTE(5);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+#endif
+
 		if (tr.flFraction != 1.0f)
 		{
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
@@ -292,8 +307,29 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			ClearMultiDamage();
 			pEntity->TraceAttack(m_pPlayer->pev, 7 * GetSecondaryAttackDamage(), vecDirection, &tr, DMG_BULLET);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+				if (player->m_bIsZombie && player->m_ZombieClass)
+				{
+					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					{
+						ApplyKnockbackData(player, vecDir, { 1100, 600, 600, 700, 1.0f });
+
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.0s);
+							strategy->SetStunGravityTime(1.0s);
+						}
+					}
+				}
+			}
 #endif
 		}
+
 		return;
 	}
 
@@ -327,6 +363,26 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			ClearMultiDamage();
 			pEntity->TraceAttack(m_pPlayer->pev, 7 * GetSecondaryAttackDamage(), vecDirection, &tr, DMG_BULLET);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+				if (player->m_bIsZombie && player->m_ZombieClass)
+				{
+					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					{
+						ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
+
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.0s);
+							strategy->SetStunGravityTime(1.0s);
+						}
+					}
+				}
+			}
 #endif
 			int iTime;
 			for (iTime = 0; iTime < 7; iTime++)
@@ -341,7 +397,7 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 					pBeam->SetEndEntity(ENTINDEX(pEntity->edict()));
 					pBeam->SetStartAttachment(iAttachment);
 					pBeam->SetEndAttachment(0);
-					pBeam->SetBrightness(230);
+					pBeam->SetBrightness(255);
 					pBeam->RelinkBeam();
 					pBeam->pev->effects &= ~EF_NODRAW;
 
@@ -370,6 +426,26 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			ClearMultiDamage();
 			pEntity->TraceAttack(m_pPlayer->pev, iAveShoot * GetSecondaryAttackDamage() + iAddShoot * GetSecondaryAttackDamage(), vecDirection, &tr, DMG_BULLET);
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
+
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+				if (player->m_bIsZombie && player->m_ZombieClass)
+				{
+					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					{
+						ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
+
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(1.0s);
+							strategy->SetStunGravityTime(1.0s);
+						}
+					}
+				}
+			}
 #endif
 			int iTime;
 			for (iTime = 0; iTime < iAveShoot + iAddShoot; iTime++)
@@ -384,7 +460,7 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 					pBeam->SetEndEntity(ENTINDEX(pEntity->edict()));
 					pBeam->SetStartAttachment(iAttachment);
 					pBeam->SetEndAttachment(0);
-					pBeam->SetBrightness(230);
+					pBeam->SetBrightness(255);
 					pBeam->RelinkBeam();
 					pBeam->pev->effects &= ~EF_NODRAW;
 
@@ -419,11 +495,9 @@ void CReviveGun::CreateEffect()
 #ifndef CLIENT_DLL
 	for (size_t i = 0; i < MAXTARGET; ++i)
 	{
-		CBeam* pBeam = CBeam::BeamCreate("sprites/ef_revivegun_laser.spr", 125);
+		CBeam* pBeam = CBeam::BeamCreate("sprites/ef_revivegun_laser.spr", 250);
 		pBeam->SetColor(255, 255, 255);
-		pBeam->SetScrollRate(30);
-		pBeam->SetNoise(12);
-		pBeam->SetWidth(125);
+		pBeam->SetScrollRate(10);
 		pBeam->pev->effects |= EF_NODRAW;
 
 		m_pBeamList[i] = pBeam;
@@ -470,7 +544,10 @@ void CReviveGun::PrimaryAttack(void)
 
 bool CReviveGun::IsSignal(void)
 {
-	return m_iChargeShotsFired > 20 ? true : false;
+	if (m_iChargeShotsFired > 80)
+		m_pPlayer->m_iBuff |= BUFF_REVIVE;
+
+	return m_pPlayer->m_iBuff & BUFF_REVIVE ? true : false;
 }
 
 void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
@@ -505,15 +582,12 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
+	Vector vecDirShooting = gpGlobals->v_forward;
 	Vector vecDir;
 
-#ifndef CLIENT_DLL
-	vecDir = FireBullets(vecSrc, gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, GetDamage(), 0.96, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-#else
-	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, GetDamage(), 0.96, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
-#endif
+	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 3, BULLET_PLAYER_762MM, GetDamage(), 0.97, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 
-	int flags;
+	ExpToLineTargets(vecSrc, vecDirShooting);
 
 #ifndef CLIENT_DLL
 	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireReviveGun, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), FALSE);
@@ -535,6 +609,7 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 		KickBack(0.575, 0.325, 0.2, 0.011, 3.25, 2.0, 8);
 	else
 		KickBack(0.625, 0.375, 0.25, 0.0125, 3.5, 2.25, 8);
+
 }
 
 void CReviveGun::ItemPostFrame()
@@ -625,267 +700,123 @@ void CReviveGun::Reload(void)
 	}
 }
 
-#ifndef CLIENT_DLL
-Vector CReviveGun::FireBullets(Vector vecSrc, Vector vecDirShooting, float vecSpread, float flDistance, int iPenetration, int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol, int shared_rand)
+
+void CReviveGun::ExpToLineTargets(Vector vecSrc, Vector vecDir)
 {
-	int iOriginalPenetration = iPenetration;
-	int iPenetrationPower;
-	float flPenetrationDistance;
-	int iCurrentDamage = iDamage;
-	float flCurrentDistance;
+#ifndef CLIENT_DLL
+	TraceResult tr;
+	g_engfuncs.pfnSetGroupMask(0, GROUP_OP_AND);
+	m_pPlayer->pev->groupinfo = (1 << 1);
 
-	TraceResult tr, tr2;
-	Vector vecRight, vecUp;
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
 
-	bool bHitMetal = false;
-	int iSparksAmount = 1;
+		if (entity->edict() == m_pPlayer->edict())
+			continue;
 
-	vecRight = gpGlobals->v_right;
-	vecUp = gpGlobals->v_up;
+		CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(entity);
 
-	iPenetrationPower = 39;
-	flPenetrationDistance = 5000;
-
-	if (!pevAttacker) {
-		// the default attacker is ourselves
-		pevAttacker = pev;
+		if (g_pGameRules->PlayerRelationship(m_pPlayer, TargetPlayer) == GR_TEAMMATE)
+			TargetPlayer->pev->groupinfo = (1 << 2);
 	}
 
-	gMultiDamage.type = (DMG_BULLET | DMG_NEVERGIB);
+	UTIL_TraceLine(vecSrc, vecSrc + vecDir * 8192.0, dont_ignore_monsters, m_pPlayer->edict(), &tr);
 
-	float x, y, z;
+	m_pPlayer->pev->groupinfo = 0;
 
-	if (IsPlayer()) {
-		// Use player's random seed.
-		// get circular gaussian spread
-		x = UTIL_SharedRandomFloat(shared_rand, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 1, -0.5, 0.5);
-		y = UTIL_SharedRandomFloat(shared_rand + 2, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + 3, -0.5, 0.5);
-	}
-	else {
-		do {
-			x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-			y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-			z = x * x + y * y;
-		} while (z > 1);
+	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+	{
+		CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+		if (!entity)
+			continue;
+
+		CBasePlayer* TargetPlayer = static_cast<CBasePlayer*>(entity);
+		TargetPlayer->pev->groupinfo = 0;
 	}
 
-	Vector vecDir, vecEnd;
-	Vector vecOldSrc, vecNewSrc;
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_EXPLOSION);
+	WRITE_COORD(tr.vecEndPos[0]);
+	WRITE_COORD(tr.vecEndPos[1]);
+	WRITE_COORD(tr.vecEndPos[2]);
+	WRITE_SHORT(MODEL_INDEX("sprites/ef_revivegun_expA.spr"));
+	WRITE_BYTE(6);
+	WRITE_BYTE(25);
+	WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
+	MESSAGE_END();
 
-	vecDir = vecDirShooting + x * vecSpread * vecRight + y * vecSpread * vecUp;
-	vecEnd = vecSrc + vecDir * flDistance;
+	EMIT_SOUND_DYN(this->edict(), CHAN_STATIC, "weapons/revivegun-1_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-	float flDamageModifier = 0.5;
+	if (tr.flFraction < 1.0)
+	{
+		TraceResult CheckHeadShotTR;
+		CBaseEntity* pEntity = NULL;
 
-	while (iPenetration != 0) {
-		ClearMultiDamage();
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev), &tr);
+		Vector vecEnd;
 
-		if (TheBots != NULL && tr.flFraction != 1.0f) {
-			TheBots->OnEvent(EVENT_BULLET_IMPACT, this, (CBaseEntity*)&tr.vecEndPos);
-		}
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, tr.vecEndPos, 80.0)) != NULL)
+		{
+			if (pEntity->edict() == m_pPlayer->edict())
+				continue;
 
-		char cTextureType = UTIL_TextureHit(&tr, vecSrc, vecEnd);
-		bool bSparks = false;
+			if (pEntity->IsDormant())
+				continue;
 
-		switch (cTextureType) {
-		case CHAR_TEX_METAL:
-			bHitMetal = true;
-			bSparks = true;
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
 
-			iPenetrationPower *= 0.15;
-			flDamageModifier = 0.2;
-			break;
-		case CHAR_TEX_CONCRETE:
-			iPenetrationPower *= 0.25;
-			break;
-		case CHAR_TEX_GRATE:
-			bHitMetal = true;
-			bSparks = true;
+			if (pEntity->Classify() == CLASS_NONE)
+				continue;
 
-			iPenetrationPower *= 0.5;
-			flDamageModifier = 0.4;
-			break;
-		case CHAR_TEX_VENT:
-			bHitMetal = true;
-			bSparks = true;
-
-			iPenetrationPower *= 0.5;
-			flDamageModifier = 0.45;
-			break;
-		case CHAR_TEX_TILE:
-			iPenetrationPower *= 0.65;
-			flDamageModifier = 0.3;
-			break;
-		case CHAR_TEX_COMPUTER:
-			bHitMetal = true;
-			bSparks = true;
-
-			iPenetrationPower *= 0.4;
-			flDamageModifier = 0.45;
-			break;
-		case CHAR_TEX_WOOD:
-			flDamageModifier = 0.6;
-			break;
-		default:
-			break;
-		}
-		if (tr.flFraction != 1.0f) {
-			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-			if (iPenetration == iOriginalPenetration)
+			if (pEntity->IsPlayer())
 			{
-				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-				WRITE_BYTE(TE_EXPLOSION);
-				WRITE_COORD(tr.vecEndPos[0]);
-				WRITE_COORD(tr.vecEndPos[1]);
-				WRITE_COORD(tr.vecEndPos[2]);
-				WRITE_SHORT(MODEL_INDEX("sprites/ef_revivegun_expA.spr"));
-				WRITE_BYTE(6);
-				WRITE_BYTE(25);
-				WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
-				MESSAGE_END();
+				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 
-				EMIT_SOUND_DYN(this->edict(), CHAN_STATIC, "weapons/revivegun-1_exp.wav", VOL_NORM, ATTN_NORM, 0, 94);
-
-				float RadiusDamageAmount = 150;
-				CBaseEntity* pEntity = NULL;
-
-				Vector vecEnd;
-				int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
-
-				while ((pEntity = UTIL_FindEntityInSphere(pEntity, tr.vecEndPos, 90.0)) != NULL)
-				{
-					if (pEntity->edict() == pev->owner)
-						continue;
-
-					if (pEntity->IsDormant())
-						continue;
-
-					if (pEntity->pev->takedamage == DAMAGE_NO)
-						continue;
-
-					if (pEntity->Classify() == CLASS_NONE)
-						continue;
-
-
-					if (pEntity->IsPlayer())
-					{
-						CBasePlayer* Player = GetClassPtr<CBasePlayer>(pevAttacker);
-						CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-
-						if (Player->m_iTeam == target->m_iTeam)
-							continue;
-					}
-
-					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
-						continue;
-
-
-					vecEnd = pEntity->BodyTarget(tr.vecEndPos);
-
-					UTIL_TraceLine(tr.vecEndPos, vecEnd, ignore_monsters, pev->owner, &tr2);
-
-					if (tr2.flFraction < 1.0 && tr2.pHit != pEntity->edict())
-						continue;
-
-					UTIL_TraceLine(vecSrc, pEntity->pev->origin, dont_ignore_monsters, pev->owner, &tr2);
-
-					int falloff = RadiusDamageAmount / 90.0;
-
-					float flCurrentDamage = max(0, RadiusDamageAmount - (tr.vecEndPos - pEntity->pev->origin).Length() * falloff);
-
-					ClearMultiDamage();
-					pEntity->TraceAttack(pevAttacker, flCurrentDamage, pEntity->pev->origin - pevAttacker->origin, &tr2, DMG_BULLET);
-					ApplyMultiDamage(pev, pevAttacker);
-				}
-			}
-			iPenetration--;
-
-			flCurrentDistance = tr.flFraction * flDistance;
-			iCurrentDamage *= pow(flRangeModifier, flCurrentDistance / 500);
-
-			if (flCurrentDistance > flPenetrationDistance) {
-				iPenetration = 0;
+				if (g_pGameRules->PlayerRelationship(m_pPlayer, target) == GR_TEAMMATE)
+					continue;
 			}
 
-			if (tr.iHitgroup == HITGROUP_SHIELD) {
-				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
-					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
-					ATTN_NORM);
-				UTIL_Sparks(tr.vecEndPos);
+			vecEnd = pEntity->BodyTarget(pev->origin);
 
-				pEntity->pev->punchangle.x = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
-				pEntity->pev->punchangle.z = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
+			UTIL_TraceLine(tr.vecEndPos, vecEnd, dont_ignore_monsters, pev->owner, &CheckHeadShotTR);
 
-				if (pEntity->pev->punchangle.x < 4) {
-					pEntity->pev->punchangle.x = -4;
-				}
+			if (CheckHeadShotTR.flFraction < 1.0 && CheckHeadShotTR.pHit != pEntity->edict())
+				continue;
 
-				if (pEntity->pev->punchangle.z < -5) {
-					pEntity->pev->punchangle.z = -5;
-				}
-				else if (pEntity->pev->punchangle.z > 5) {
-					pEntity->pev->punchangle.z = 5;
-				}
+			ClearMultiDamage();
+			CheckHeadShotTR.iHitgroup = HITGROUP_CHEST;
+			pEntity->TraceAttack(m_pPlayer->pev, GetExpDamage(), (tr.vecEndPos - vecSrc).Normalize(), &tr, DMG_BULLET | DMG_NEVERGIB);
 
-				break;
-			}
-
-			float flDistanceModifier;
-			if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration) {
-				iPenetrationPower = 42;
-				flDamageModifier = 0.75;
-				flDistanceModifier = 0.75;
-			}
-			else
-				flDistanceModifier = 0.5;
-
-			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
-				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
-					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
-					ATTN_NORM);
-				UTIL_Sparks(tr.vecEndPos);
-				iPenetration = 0;
-				flDistanceModifier = 0.0;
-			}
-
-			DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pev, bHitMetal);
-
-#ifdef TRACE_BULLETS
-			Vector vecEndPos2 = tr.vecEndPos - (vecDir * 3);
-			MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
-			WRITE_BYTE(TE_LINE);
-			WRITE_COORD(vecEndPos2.x);
-			WRITE_COORD(vecEndPos2.y);
-			WRITE_COORD(vecEndPos2.z);
-
-			WRITE_COORD(tr.vecEndPos.x);
-			WRITE_COORD(tr.vecEndPos.y);
-			WRITE_COORD(tr.vecEndPos.z);
-			WRITE_SHORT(300);
-			WRITE_BYTE(0);
-			WRITE_BYTE(0);
-			WRITE_BYTE(255);
-			MESSAGE_END();
-#endif
-
-
-			vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
-			flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
-			vecEnd = vecSrc + (vecDir * flDistance);
-
-			pEntity->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
-			iCurrentDamage *= flDamageModifier;
+			ApplyMultiDamage(pev, m_pPlayer->pev);
 		}
-		else
-			iPenetration = 0;
-
-		ApplyMultiDamage(pev, pevAttacker);
+		
 	}
-
-	return Vector(x * vecSpread, y * vecSpread, 0);
-}
 #endif
+}
+
+void CReviveGun::WeaponCallBack(int iType)
+{
+	if (iType == 1)
+	{
+#ifndef CLIENT_DLL
+		m_iChargeShotsFired = 0;
+		SendWeaponAnim(REVIVEGUN_REVIVE, UseDecrement() != FALSE);
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
+		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 0, IsSignal(), FALSE);
+#endif
+		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
+		return;
+	}
+	IsSignal();
+
+	/*if (m_flTimeHold == invalid_time_point)
+		m_flTimeHold = gpGlobals->time;
+	else
+		m_flTimeHold = time_point_t(gpGlobals->time + (gpGlobals->time - m_flTimeHold));*/
+}
 
 void CReviveGun::WeaponIdle(void)
 {
@@ -912,22 +843,34 @@ void CReviveGun::Holster(int skiplocal)
 
 float CReviveGun::GetDamage() const
 {
-	float flDamage = 25.0f;
+	float flDamage = 34.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 180.0f;
+		flDamage = 90.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 146.0f;
 #endif
 	return flDamage;
 }
 
-float CReviveGun::GetSecondaryAttackDamage() const
+float CReviveGun::GetExpDamage() const
 {
-	float flDamage = 25.0f;
+	float flDamage = 10.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 615.0f;
+		flDamage = 150.0f;
+	else if (g_pModRunning->DamageTrack() == DT_ZBS)
+		flDamage = 1500.0f;
+#endif
+	return flDamage;
+}
+
+float CReviveGun::GetSecondaryAttackDamage() const
+{
+	float flDamage = 5.0f;
+#ifndef CLIENT_DLL
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+		flDamage = 265.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 		flDamage = 146.0f;
 #endif

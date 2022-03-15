@@ -43,6 +43,7 @@
 #include "player/player_knockback.h"
 #include "player/player_mod_strategy.h"
 #include "player/player_model.h"
+#include "player/csdm_randomspawn.h"
 
 #include <chrono>
 #include <algorithm>
@@ -810,6 +811,19 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
+			if (m_iBuff & BUFF_REVIVE && m_bHasBuffWpn & BUFF_REVIVEGUN)
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+				CSDM_DoRandomSpawn(this);
+				if (pWeapon)
+				{
+					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+						pWeapon->WeaponCallBack(1);
+				}
+				return flDamage;
+			}
+
 			if (m_bIsZombie && m_ZombieClass)
 			{
 				if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
@@ -984,7 +998,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1x") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm4") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffak"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1x") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm4") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffak") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
@@ -1110,6 +1124,19 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 	}
 #endif
+	if (m_iBuff & BUFF_REVIVE && m_bHasBuffWpn & BUFF_REVIVEGUN && flDamage > pev->health)
+	{
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+		CSDM_DoRandomSpawn(this);
+		if (pWeapon)
+		{
+			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+				pWeapon->WeaponCallBack(1);
+		}
+		return flDamage;
+	}
+
 	if (m_bIsZombie && m_ZombieClass && flDamage > pev->health)
 	{
 		if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
@@ -1712,6 +1739,119 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		}
 	}
 
+	if (m_bIsZombie && m_ZombieClass && (!stricmp(m_ZombieClass, "boomer")))
+	{
+		EMIT_SOUND_DYN(ENT(pev), CHAN_ITEM, "zombi/boomer_death.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_ARROWMODEL);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z);
+		WRITE_ANGLE(0);
+		WRITE_ANGLE(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
+		WRITE_ANGLE(0);
+		WRITE_SHORT(g_sModelIndexBoomerEffect);
+		WRITE_BYTE(0);
+		WRITE_BYTE(10);
+		WRITE_BYTE(1);
+		WRITE_BYTE(200);
+		WRITE_BYTE(4);
+		WRITE_SHORT(-1);
+		WRITE_BYTE(17);
+		MESSAGE_END();
+
+		float z = (FBitSet(pev->flags, FL_DUCKING)) ? (pev->origin.z - 18.0 + 1.0) : (pev->origin.z - 32.0 + 1.0);
+
+		for (int i = 0; i < 5; i++)
+		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_SPRITE);
+			WRITE_COORD(pev->origin.x - 100 + rand() % (100 - (-100) + 1));
+			WRITE_COORD(pev->origin.y - 100 + rand() % (100 - (-100) + 1));
+			WRITE_COORD(z + 60);
+			WRITE_SHORT(g_sModelIndexBoomerSprite);
+			WRITE_BYTE(15);
+			WRITE_BYTE(255);
+			MESSAGE_END();
+		}
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_SPRITE);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 60);
+		WRITE_SHORT(g_sModelIndexBoomerEffectEx);
+		WRITE_BYTE(15);
+		WRITE_BYTE(255);
+		MESSAGE_END();
+
+		if (m_iZombieLevel)
+		{
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_ROTATEDMODEL);
+			WRITE_COORD(pev->origin.x - 55.0f + rand() * (1.0f / 32767.0f) * (55.0f - (-55.0f)));
+			WRITE_COORD(pev->origin.y - 55.0f + rand() * (1.0f / 32767.0f) * (55.0f - (-55.0f)));
+			WRITE_COORD(z);
+			WRITE_ANGLE(0.0f + rand() * (1.0f / 32767.0f) * (180.0f - 0.0f));
+			WRITE_SHORT(g_sModelIndexPosionEffect);
+			WRITE_BYTE(10);
+			WRITE_BYTE(1);
+			WRITE_BYTE(1);
+			WRITE_BYTE(100);
+			WRITE_BYTE(kRenderTransAdd);
+			WRITE_SHORT(-1);
+			MESSAGE_END();
+		}
+
+		pev->effects |= EF_NODRAW;
+
+		float flDamage = 700.0f;
+		float flRadius = 200.0f;
+
+		for (int i = 1; i <= gpGlobals->maxClients; i++)
+		{
+			CBasePlayer* pPlayer = (CBasePlayer*)UTIL_PlayerByIndex(i);
+
+			if (pPlayer == this)
+				continue;
+
+			if (!pPlayer)
+				continue;
+
+			if (FNullEnt(pPlayer->pev))
+				continue;
+
+			if (pPlayer->pev->deadflag != DEAD_NO)
+				continue;
+
+			if (200.0f * 0.25f > -(pPlayer->pev->origin.z - pev->origin.z))
+			{
+				Vector vecDelta = pPlayer->pev->origin - pev->origin;
+
+				if (flRadius * flRadius > vecDelta.LengthSquared())
+				{
+					MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pPlayer->pev);
+					WRITE_SHORT(40960);
+					WRITE_SHORT(0x2000);
+					WRITE_SHORT(25600);
+					MESSAGE_END();
+
+					
+					int falloff = flDamage / flRadius;
+
+					float flCurrentDamage = max(0, flDamage - vecDelta.Length() * falloff);				
+					if (pPlayer->m_iTeam != m_iTeam && !pPlayer->m_bIsZombie)
+						pPlayer->TakeDamage(pev, pev, flCurrentDamage, DMG_EXPLOSION);
+
+					float flDist = vecDelta.NormalizeInPlace();
+
+					pPlayer->pev->velocity += vecDelta * (1.0f - (flDist / 200.0f)) * 20 * 150;
+				}
+			}
+		}
+	}
+
 	if (!m_bKilledByBomb)
 	{
 		g_pGameRules->PlayerKilled(this, pevAttacker, g_pevLastInflictor);
@@ -2010,9 +2150,18 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 				}
 			}
 
+			if (m_szCustomSequence[0] != ' ')
+			{
+				SetCustomAnimation(m_szCustomSequence, playerAnim);
+			}
 			return;
 		}
 	}
+
+	if (m_szCustomSequence[0] != ' ')
+	{
+		strcpy(m_szCustomSequence, " ");
+	}	
 
 	if (m_iCustomSequence != -1)
 		m_iCustomSequence = -1;
@@ -2732,6 +2881,458 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 						m_Activity = ACT_RUN;
 					}
+				}
+				pev->gaitsequence = LookupActivity(ACT_RUN);
+			}
+			else
+			{
+				if (speed > 0.0f)
+					pev->gaitsequence = LookupActivity(ACT_WALK);
+				else
+					pev->gaitsequence = LookupActivity(ACT_IDLE);
+			}
+		}
+	}
+	if (pev->sequence != animDesired)
+	{
+		pev->sequence = animDesired;
+		pev->frame = 0;
+
+		ResetSequenceInfo();
+	}
+}
+
+void CBasePlayer::SetCustomAnimation(char* szAnimation, PLAYER_ANIM playerAnim)
+{
+	int animDesired;
+	float speed;
+	float speedLimit = 135.0f;
+
+	char szAnim[64];
+	int hopSeq;
+	int leapSeq;
+
+	if (!pev->modelindex)
+		return;
+
+	if (m_bIsZombie)
+		speedLimit = 160.0;
+
+	if ((playerAnim == PLAYER_FLINCH || playerAnim == PLAYER_LARGE_FLINCH) && HasShield())
+		return;
+
+	if (playerAnim != PLAYER_FLINCH && playerAnim != PLAYER_LARGE_FLINCH && m_flFlinchTime > gpGlobals->time && pev->health > 0.0f)
+		return;
+
+	speed = pev->velocity.Length2D();
+	if (pev->flags & FL_FROZEN)
+	{
+		speed = 0;
+		playerAnim = PLAYER_IDLE;
+	}
+
+	hopSeq = LookupActivity(ACT_HOP);
+	leapSeq = LookupActivity(ACT_LEAP);
+
+	switch (playerAnim)
+	{
+	case PLAYER_JUMP:
+	{
+		if (m_Activity == ACT_SWIM || m_Activity == ACT_DIESIMPLE || m_Activity == ACT_HOVER)
+			m_IdealActivity = m_Activity;
+		else
+		{
+			m_IdealActivity = ACT_HOP;
+			if (TheBots != NULL)
+			{
+				TheBots->OnEvent(EVENT_PLAYER_JUMPED, this);
+			}
+		}
+		break;
+	}
+	case PLAYER_SUPERJUMP:
+	{
+		if (m_Activity == ACT_SWIM || m_Activity == ACT_DIESIMPLE || m_Activity == ACT_HOVER)
+			m_IdealActivity = m_Activity;
+		else
+			m_IdealActivity = ACT_LEAP;
+		break;
+	}
+	case PLAYER_ATTACK1:
+	{
+		if (m_Activity == ACT_SWIM || m_Activity == ACT_DIESIMPLE || m_Activity == ACT_HOVER)
+			m_IdealActivity = m_Activity;
+		else
+		{
+			m_IdealActivity = ACT_RANGE_ATTACK1;
+			if (TheBots != NULL)
+			{
+				TheBots->OnEvent(EVENT_WEAPON_FIRED, this);
+			}
+		}
+		break;
+	}
+	case PLAYER_ATTACK2:
+	{
+		if (m_Activity == ACT_SWIM || m_Activity == ACT_DIESIMPLE || m_Activity == ACT_HOVER)
+			m_IdealActivity = m_Activity;
+		else
+		{
+			m_IdealActivity = ACT_RANGE_ATTACK2;
+			if (TheBots != NULL)
+			{
+				TheBots->OnEvent(EVENT_WEAPON_FIRED, this);
+			}
+		}
+		break;
+	}
+	case PLAYER_DIE:
+	{
+		m_IdealActivity = ACT_DIESIMPLE;
+		DeathSound();
+		break;
+	}
+	case PLAYER_IDLE:
+	case PLAYER_WALK:
+	{
+		if (pev->flags & FL_ONGROUND || (m_Activity != ACT_HOP && m_Activity != ACT_LEAP))
+		{
+			if (pev->waterlevel <= 1)
+				m_IdealActivity = ACT_WALK;
+
+			else if (speed == 0.0f)
+				m_IdealActivity = ACT_HOVER;
+
+			else
+				m_IdealActivity = ACT_SWIM;
+		}
+		else
+			m_IdealActivity = m_Activity;
+		break;
+	}
+	default:
+		break;
+	}
+	switch (m_IdealActivity)
+	{
+	case ACT_HOP:
+	case ACT_LEAP:
+	{
+		if (m_Activity == m_IdealActivity)
+			return;
+
+		Q_strcpy(szAnim, szAnimation);
+		animDesired = LookupSequence(szAnim);
+
+		if (animDesired == -1)
+			animDesired = 0;
+
+		if (pev->sequence != animDesired || !m_fSequenceLoops)
+			pev->frame = 0;
+
+		if (!m_fSequenceLoops)
+			pev->effects |= EF_NOINTERP;
+
+		if (m_IdealActivity == ACT_LEAP)
+			pev->gaitsequence = LookupActivity(ACT_LEAP);
+		else
+			pev->gaitsequence = LookupActivity(ACT_HOP);
+
+		m_Activity = m_IdealActivity;
+		break;
+	}
+	case ACT_DIESIMPLE:
+	{
+		if (m_Activity == m_IdealActivity)
+			return;
+
+		m_Activity = m_IdealActivity;
+		m_flDeathThrowTime = invalid_time_point;
+		m_iThrowDirection = THROW_NONE;
+
+		switch (m_LastHitGroup)
+		{
+		case HITGROUP_GENERIC:
+		{
+			switch (RANDOM_LONG(0, 8))
+			{
+			case 0:
+				animDesired = LookupActivity(ACT_DIE_HEADSHOT);
+				m_iThrowDirection = THROW_BACKWARD;
+				break;
+			case 1:
+				animDesired = LookupActivity(ACT_DIE_GUTSHOT);
+				break;
+			case 2:
+				animDesired = LookupActivity(ACT_DIE_BACKSHOT);
+				m_iThrowDirection = THROW_HITVEL;
+				break;
+			case 3:
+				animDesired = LookupActivity(ACT_DIESIMPLE);
+				break;
+			case 4:
+				animDesired = LookupActivity(ACT_DIEBACKWARD);
+				m_iThrowDirection = THROW_HITVEL;
+				break;
+			case 5:
+				animDesired = LookupActivity(ACT_DIEFORWARD);
+				m_iThrowDirection = THROW_FORWARD;
+				break;
+			case 6:
+				animDesired = LookupActivity(ACT_DIE_CHESTSHOT);
+				break;
+			case 7:
+				animDesired = LookupActivity(ACT_DIE_GUTSHOT);
+				break;
+			case 8:
+				animDesired = LookupActivity(ACT_DIE_HEADSHOT);
+				break;
+			default:
+				break;
+			}
+			break;
+		}
+		case HITGROUP_HEAD:
+		{
+			int random = RANDOM_LONG(0, 8);
+			m_bHeadshotKilled = true;
+
+			if (m_bHighDamage)
+				++random;
+
+			switch (random)
+			{
+			case 1:
+			case 2:
+				m_iThrowDirection = THROW_BACKWARD;
+				break;
+			case 3:
+			case 4:
+				m_iThrowDirection = THROW_FORWARD;
+				break;
+			case 5:
+			case 6:
+				m_iThrowDirection = THROW_HITVEL;
+				break;
+			default:
+				m_iThrowDirection = THROW_NONE;
+				break;
+			}
+
+			animDesired = LookupActivity(ACT_DIE_HEADSHOT);
+			break;
+		}
+		case HITGROUP_CHEST:
+			animDesired = LookupActivity(ACT_DIE_CHESTSHOT);
+			break;
+		case HITGROUP_STOMACH:
+			animDesired = LookupActivity(ACT_DIE_GUTSHOT);
+			break;
+		case HITGROUP_LEFTARM:
+			animDesired = LookupSequence("left");
+			break;
+		case HITGROUP_RIGHTARM:
+		{
+			m_iThrowDirection = RANDOM_LONG(0, 1) ? THROW_HITVEL : THROW_HITVEL_MINUS_AIRVEL;
+			animDesired = LookupSequence("right");
+			break;
+		}
+		default:
+		{
+			animDesired = LookupActivity(ACT_DIESIMPLE);
+			break;
+		}
+		}
+		if (pev->flags & FL_DUCKING)
+		{
+			animDesired = LookupSequence("crouch_die");
+			m_iThrowDirection = THROW_BACKWARD;
+		}
+		else if (m_bKilledByBomb || m_bKilledByGrenade)
+		{
+			UTIL_MakeVectors(pev->angles);
+
+			if (DotProduct(gpGlobals->v_forward, m_vBlastVector) > 0.0f)
+				animDesired = LookupSequence("left");
+
+			else
+			{
+				if (RANDOM_LONG(0, 1))
+					animDesired = LookupSequence("crouch_die");
+				else
+					animDesired = LookupActivity(ACT_DIE_HEADSHOT);
+			}
+
+			if (m_bKilledByBomb)
+				m_iThrowDirection = THROW_BOMB;
+
+			else if (m_bKilledByGrenade)
+				m_iThrowDirection = THROW_GRENADE;
+		}
+
+		if (animDesired == -1)
+			animDesired = 0;
+
+		if (pev->sequence != animDesired)
+		{
+			pev->gaitsequence = 0;
+			pev->sequence = animDesired;
+			pev->frame = 0.0f;
+			ResetSequenceInfo();
+		}
+		return;
+	}
+	case ACT_RANGE_ATTACK1:
+	case ACT_RANGE_ATTACK2:
+	case ACT_HOLDBOMB:
+	{
+		//if (pev->flags & FL_DUCKING)
+		//{
+		//	if (m_bIsFemale)
+		//		Q_strcpy(szAnim, "crouch");	//gunkata
+		//	else
+		//		Q_strcpy(szAnim, "crouch_");
+		//	Q_strcat(szAnim, szAnimation);
+		//}
+		//else
+		//	Q_strcpy(szAnim, szAnimation);
+		Q_strcpy(szAnim, szAnimation);
+
+		animDesired = LookupSequence(szAnim);
+		if (animDesired == -1)
+			animDesired = 0;
+
+		pev->sequence = animDesired;
+		pev->frame = 0;
+
+		ResetSequenceInfo();
+		m_Activity = m_IdealActivity;
+		break;
+	}
+	case ACT_WALK:
+	{
+		if ((m_Activity != ACT_RANGE_ATTACK1 || m_fSequenceFinished)
+			&& (m_Activity != ACT_RANGE_ATTACK2 || m_fSequenceFinished)
+			&& (m_Activity != ACT_FLINCH || m_fSequenceFinished)
+			&& (m_Activity != ACT_LARGE_FLINCH || m_fSequenceFinished)
+			&& (m_Activity != ACT_RELOAD || m_fSequenceFinished))
+		{
+			if (speed <= speedLimit)
+			{
+				/*if (pev->flags & FL_DUCKING)
+				{
+					if(m_bIsFemale)
+						Q_strcpy(szAnim, "crouch");
+					else
+						Q_strcpy(szAnim, "crouch_");
+					Q_strcat(szAnim, szAnimation);
+				}
+				else
+					Q_strcpy(szAnim, szAnimation);*/
+				Q_strcpy(szAnim, szAnimation);
+				
+				animDesired = LookupSequence(szAnim);
+
+				if (animDesired == -1)
+					animDesired = 0;
+				m_Activity = ACT_WALK;
+			}
+			else
+			{
+				/*if (pev->flags & FL_DUCKING)
+				{
+					if (m_bIsFemale)
+						Q_strcpy(szAnim, "crouch");
+					else
+						Q_strcpy(szAnim, "crouch_");
+					Q_strcat(szAnim, szAnimation);
+				}
+				else
+					Q_strcpy(szAnim, szAnimation);*/
+				Q_strcpy(szAnim, szAnimation);
+
+				animDesired = LookupSequence(szAnim);
+				if (animDesired == -1)
+					animDesired = 0;
+
+				m_Activity = ACT_RUN;
+				pev->gaitsequence = LookupActivity(ACT_RUN);
+
+				if (m_Activity == ACT_RUN)
+				{
+					//TODO: maybe away used variable 'speed'?
+					//if (speed > 150.0f)
+					if (pev->velocity.Length2D() > 150.0f)
+					{
+						if (TheBots != NULL)
+						{
+							TheBots->OnEvent(EVENT_PLAYER_FOOTSTEP, this);
+						}
+					}
+				}
+			}
+		}
+		else
+			animDesired = pev->sequence;
+
+		if (speed > speedLimit)
+			pev->gaitsequence = LookupActivity(ACT_RUN);
+		else
+			pev->gaitsequence = LookupActivity(ACT_WALK);
+		break;
+	}
+	default:
+	{
+		if (m_Activity == m_IdealActivity)
+			return;
+
+		m_Activity = m_IdealActivity;
+		animDesired = LookupActivity(m_IdealActivity);
+
+		if (pev->gaitsequence != animDesired)
+		{
+			pev->gaitsequence = 0;
+			pev->sequence = animDesired;
+			pev->frame = 0;
+
+			ResetSequenceInfo();
+		}
+		return;
+	}
+	}
+
+	if (pev->gaitsequence != hopSeq && pev->gaitsequence != leapSeq)
+	{
+		if (pev->flags & FL_DUCKING)
+		{
+			if (speed != 0.0f)
+				pev->gaitsequence = LookupActivity(ACT_CROUCH);
+			else
+				pev->gaitsequence = LookupActivity(ACT_CROUCHIDLE);
+		}
+		else
+		{
+			if (speed > speedLimit)
+			{
+				if (m_Activity != ACT_FLINCH && m_Activity != ACT_LARGE_FLINCH)
+				{
+					/*if (pev->flags & FL_DUCKING)
+					{
+						if (m_bIsFemale)
+							Q_strcpy(szAnim, "crouch");
+						else
+							Q_strcpy(szAnim, "crouch_");
+						Q_strcat(szAnim, szAnimation);
+					}
+					else
+						Q_strcpy(szAnim, szAnimation);*/
+					Q_strcpy(szAnim, szAnimation);
+					animDesired = LookupSequence(szAnim);
+
+					if (animDesired == -1)
+						animDesired = 0;
+
+					m_Activity = ACT_RUN;
 				}
 				pev->gaitsequence = LookupActivity(ACT_RUN);
 			}
@@ -3528,7 +4129,8 @@ void CBasePlayer::PlayerDeathThink()
 		if (gpGlobals->time > m_fDeadTime + 3.0s && !(m_afPhysicsFlags & PFLAG_OBSERVER))
 		{
 			// Send message to everybody to spawn a corpse.
-			SpawnClientSideCorpse();
+			if (!(m_bIsZombie && m_ZombieClass && (!stricmp(m_ZombieClass, "boomer"))))
+				SpawnClientSideCorpse();
 
 			// go to dead camera.
 			StartDeathCam();
@@ -3905,6 +4507,9 @@ void CBasePlayer::HostageUsed()
 
 void CBasePlayer::Jump()
 {
+	if (m_bJumpDisabled)
+		return;
+
 	if (pev->flags & FL_WATERJUMP)
 		return;
 
@@ -3979,6 +4584,9 @@ NOXREF void FixPlayerCrouchStuck(edict_t *pPlayer)
 
 void CBasePlayer::Duck()
 {
+	if (m_bDuckDisabled)
+		pev->button &= ~IN_DUCK;
+
 	if (pev->button & IN_DUCK)
 		SetAnimation(PLAYER_WALK);
 }
@@ -4937,6 +5545,7 @@ void CBasePlayer::Spawn()
 	SET_PHYSICS_KEY_VALUE(edict(), "hl", "1");
 	SET_PHYSICS_KEY_VALUE(edict(), "drp", "0");
 	SET_PHYSICS_KEY_VALUE(edict(), "kgr", "0");
+	SET_PHYSICS_KEY_VALUE(edict(), "dbj", "0");
 	m_hintMessageQueue.Reset();
 
 	m_flVelocityModifier = 1;
@@ -4997,6 +5606,10 @@ void CBasePlayer::Spawn()
 
 	m_iZombieFlying = 0;
 	m_iZombieRevivalEnabled = 0;
+	m_flDamageUnderTake = 0.0;
+
+	m_iBuff = 0;
+	m_bHasBuffWpn = 0;
 
 	SpawnProtection_End();
 
@@ -6795,7 +7408,7 @@ void CBasePlayer::ResetMaxSpeed()
 		speed = 1;
 	}
 	// VIP is slow due to the armour he's wearing
-	else if (m_bIsVIP)
+	else if (m_bIsVIP && g_pModRunning->DamageTrack() == DT_NONE)
 	{
 		speed = 227;
 	}
@@ -7173,6 +7786,12 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 
 			if (pWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
 				m_bHasPrimary = false;
+
+			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+			{
+				m_bHasBuffWpn &= ~BUFF_REVIVEGUN;
+				m_iBuff &= ~BUFF_REVIVE;
+			}
 
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_c4"))
 			{

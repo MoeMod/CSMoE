@@ -547,6 +547,7 @@ public:
 	virtual WeaponBotStrategy GetBotStrategy() const { return BOT_STRATEGY_NONE; }
 	virtual int GetPriority() { return 1; }
 	virtual int GetPriorityByTarget(CBaseEntity* target) { return 1; }
+	virtual void WeaponCallBack(int iType = 0) {};
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
@@ -680,6 +681,11 @@ extern short g_sModelIndexC4Glow;
 
 extern short g_sModelIndexRadio;
 extern MULTIDAMAGE gMultiDamage;
+
+extern short g_sModelIndexBoomerEffect;
+extern short g_sModelIndexBoomerSprite;
+extern short g_sModelIndexBoomerEffectEx;
+extern short g_sModelIndexPosionEffect;
 
 void AnnounceFlashInterval(float interval, float offset = 0);
 

@@ -78,7 +78,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flHoldTime = buf.ReadShort();
 		float flFreezeTime = buf.ReadShort();
 		pimpl->get<CHudZB2_Skill>().OnSkillActivate(skilltype, flHoldTime, flFreezeTime);
-		if (skilltype == ZOMBIE_SKILL_CRAZY || skilltype == ZOMBIE_SKILL_CRAZY2 || skilltype == ZOMBIE_SKILL_STIFFEN || skilltype == ZOMBIE_SKILL_GLIDE || skilltype == ZOMBIE_SKILL_REVIVAL)
+		if (skilltype == ZOMBIE_SKILL_CRAZY || skilltype == ZOMBIE_SKILL_CRAZY2 || skilltype == ZOMBIE_SKILL_STIFFEN || skilltype == ZOMBIE_SKILL_GLIDE || skilltype == ZOMBIE_SKILL_REVIVAL || skilltype == ZOMBIE_SKILL_SELFDESTRUCT)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_SPRINT)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
@@ -92,7 +92,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HealRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_SHOCK || skilltype == ZOMBIE_SKILL_HOOK || skilltype == ZOMBIE_SKILL_PENETRATION)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_ShockRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
-		else if (skilltype == ZOMBIE_SKILL_TRAP || skilltype == ZOMBIE_SKILL_STAMPER)
+		else if (skilltype == ZOMBIE_SKILL_TRAP)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_BOOSTER)
 		{
@@ -117,6 +117,20 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		auto skillstatus = static_cast<ZombieSkillStatus>(buf.ReadByte());
 		pimpl->get<CHudZB2_Skill>().OnSkillIconPass(skilltype, skillstatus);
 		break;
+	}
+	case ZB2_MESSAGE_DRAW_RETINA:
+	{
+		int iType = buf.ReadByte();
+		float flHoldTime = buf.ReadShort();
+		switch (iType)
+		{
+		case 0:
+		{
+			pimpl->get<CHudZB2_Skill>();
+			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
+			break;
+		}
+		}
 	}
 		
 		

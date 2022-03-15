@@ -1330,6 +1330,38 @@ void CStudioModelRenderer::StudioRenderModel(const vec3_t lightdir)
 	m_pCurrentEntity->curstate.renderamt = iSaveRenderAmt;
 }
 
+void CStudioModelRenderer::DrawOutLineBegin(int flag)
+{
+	m_pCurrentEntity->syncbase = 1.0f;
+}
+
+void CStudioModelRenderer::DrawOutLine(int flag)
+{
+	m_pCurrentEntity->syncbase = 2.0f;
+	IEngineStudio.SetForceFaceFlags(STUDIO_NF_OUTLINE);
+	StudioRenderFinal();
+}
+
+void CStudioModelRenderer::DrawOutLinePause(int flag)
+{
+	m_pCurrentEntity->syncbase = 1.0f;
+	IEngineStudio.SetForceFaceFlags(0);
+}
+
+void CStudioModelRenderer::DrawOutLineEnd(int flag)
+{
+	IEngineStudio.SetForceFaceFlags(0);//
+}
+
+BOOL CStudioModelRenderer::DrawOutLineCheck(int flag)
+{
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxGreenOutLine) return true;
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxRedOutLine) return true;
+	if (m_pCurrentEntity->curstate.renderfx == kRenderFxBlackOutLine) return true;
+
+	return false;
+}
+
 void CStudioModelRenderer::StudioRenderFinal_Software(void)
 {
 	int i;

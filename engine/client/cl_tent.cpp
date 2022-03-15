@@ -2007,6 +2007,115 @@ void GAME_EXPORT CL_Sprite_WallPuff( TEMPENTITY *pTemp, float scale )
 	pTemp->die = cl.time + 0.01f;
 }
 
+void R_ArrowModel(sizebuf_t* msg)
+{
+	vec3_t pos, angles;
+	int model, mode, renderamt, rendermode, player;
+	float life, framerate, fadespeed;
+
+	pos.x = BF_ReadCoord(msg);
+	pos.y = BF_ReadCoord(msg);
+	pos.z = BF_ReadCoord(msg);
+
+	angles.x = BF_ReadAngle(msg);
+	angles.y = BF_ReadAngle(msg);
+	angles.z = BF_ReadAngle(msg);
+
+	model = BF_ReadShort(msg);
+	life = BF_ReadByte(msg) * 0.1f;
+	framerate = BF_ReadByte(msg) * 0.1f;
+	mode = BF_ReadByte(msg);
+	renderamt = BF_ReadByte(msg);
+	rendermode = BF_ReadByte(msg);
+	player = BF_ReadShort(msg);
+	fadespeed = BF_ReadByte(msg) * 0.1f;
+
+	TEMPENTITY* ent = CL_TempEntAlloc(pos, Mod_Handle(model));
+	if (ent)
+	{
+		ent->entity.angles = angles;
+		ent->entity.curstate.framerate = framerate;
+		ent->frameMax = 256;
+		ent->entity.curstate.renderamt = renderamt;
+		ent->entity.curstate.rendermode = rendermode;
+		ent->entity.curstate.frame = 0;
+		ent->flags |= FTENT_SPRANIMATE;
+		ent->entity.curstate.animtime = cl.time;
+		ent->die = cl.time + life;
+
+		if (mode)
+		{
+			ent->flags |= FTENT_FADEOUT;
+			ent->entity.baseline.renderamt = renderamt;
+			ent->fadeSpeed = fadespeed;
+		}
+
+		if (player > 0)
+		{
+			ent->flags |= (FTENT_PERSIST | FTENT_PLYRATTACHMENT);
+			ent->clientIndex = player;
+			ent->tentOffset = pos;
+		}
+	}
+}
+
+
+void R_RotatedModel(sizebuf_t* msg)
+{
+	vec3_t pos;
+	vec3_t angles;
+	int modelIndex;
+	float life;
+	int framerate;
+	bool bFadeout;
+	int alpha;
+	int rendermode;
+	int clientIndex;
+	model_t* pModel;
+
+	pos.x = BF_ReadCoord(msg);
+	pos.y = BF_ReadCoord(msg);
+	pos.z = BF_ReadCoord(msg);
+
+	angles.x = 0;
+	angles.y = BF_ReadAngle(msg);
+	angles.z = 0;
+
+	modelIndex = BF_ReadShort(msg);
+	life = BF_ReadByte(msg) * 0.1;
+	framerate = BF_ReadByte(msg);
+	bFadeout = BF_ReadByte(msg) != 0;
+	alpha = BF_ReadByte(msg);
+	rendermode = BF_ReadByte(msg);
+	clientIndex = BF_ReadShort(msg);
+
+	TEMPENTITY* pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
+	if (pTemp)
+	{
+		pTemp->flags |= FTENT_SPRANIMATE;
+		pTemp->entity.angles = angles;
+		pTemp->frameMax = 256;
+		pTemp->entity.curstate.renderamt = alpha;
+		pTemp->entity.curstate.rendermode = rendermode;
+		pTemp->entity.curstate.framerate = framerate;
+		pTemp->die = cl.time + life;
+
+		if (bFadeout)
+		{
+			pTemp->flags |= FTENT_FADEOUT;
+			pTemp->entity.baseline.renderamt = alpha;
+			pTemp->fadeSpeed = 1;
+		}
+
+		if (clientIndex > 0)
+		{
+			pTemp->flags |= FTENT_PLYRATTACHMENT;
+			pTemp->clientIndex = clientIndex;
+			pTemp->tentOffset = pos;
+		}
+	}
+}
+
 /*
 ==============
 CL_ParseTempEntity
@@ -2493,6 +2602,12 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		color = BF_ReadByte( &buf );
 		scale = (float)(BF_ReadByte( &buf ) * 0.1f);
 		CL_UserTracerParticle( pos, pos2, life, color, scale, 0, NULL );
+		break;
+	case TE_ARROWMODEL:
+		R_ArrowModel( &buf );
+		break;
+	case TE_ROTATEDMODEL:
+		R_RotatedModel(&buf);
 		break;
 	default:
 		MsgDev( D_ERROR, "ParseTempEntity: illegible TE message %i\n", type );

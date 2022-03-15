@@ -18,6 +18,7 @@ public:
 	static CZombiePile* Create(CBasePlayer* player);
 	void Explosion();
 	void Slowdown();
+	void Break();
 
 private:
 	duration_t GetAliveTime() const { return 10s; }

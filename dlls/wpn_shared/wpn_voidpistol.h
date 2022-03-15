@@ -51,7 +51,6 @@ public:
 	float GetMaxSpeed() override { return m_fMaxSpeed; }
 	int iItemSlot() override { return PISTOL_SLOT; }
 	void PrimaryAttack() override;
-	bool IsTargetAvailable;
 	bool HasSecondaryAttack() override { return true; }
 	void SecondaryAttack() override;
 	void Reload() override;
@@ -72,13 +71,13 @@ public:
 	void VoidpistolFireB(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	void VoidpistolFireC(void);
 	bool IsModeCEnabled(int);
+	float GetArmorRatioModifier() override { return 1.5; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_voidpistol" , 200 }; }
 #endif
 	const char* GetCSModelName() override { return "models/w_voidpistol.mdl"; }
 	float GetDamage() const;
 	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;
-	float BlackholeDamage() const;
 	int m_iShell;
 	int m_iMode;
 	int m_iCharging;

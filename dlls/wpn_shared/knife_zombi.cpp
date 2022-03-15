@@ -141,7 +141,7 @@ int CKnife_Zombi::Swing(int fFirst)
 	BOOL fDidHit = FALSE;
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
-	float flRange = 25.0f;
+	float flRange = 32.0f;
 #ifndef CLIENT_DLL
 	flRange = m_pPlayer->m_pModStrategy->AdjustZombieKnifeRange(false, flRange);
 #endif

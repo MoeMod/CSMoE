@@ -278,6 +278,8 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("knife_balrog9");
 	UTIL_PrecacheOtherWeapon("knife_summonknife");
 	UTIL_PrecacheOtherWeapon("weapon_revivegun");
+	UTIL_PrecacheOther("ammo_revivegun");
+	UTIL_PrecacheOtherWeapon("knife_holysword");
 #endif
 
 	if (g_pGameRules->IsDeathmatch())
@@ -299,6 +301,10 @@ void W_Precache()
 	g_sModelIndexFireball4 = PRECACHE_MODEL("sprites/fexplo1.spr");
 	g_sModelIndexRadio = PRECACHE_MODEL("sprites/radio.spr");
 	g_sModelIndexZombiebomb_exp = PRECACHE_MODEL("sprites/zombiebomb_exp.spr");
+	g_sModelIndexBoomerEffect = PRECACHE_MODEL("models/ef_boomer.mdl");
+	g_sModelIndexBoomerEffectEx = PRECACHE_MODEL("sprites/ef_boomer_ex.spr");
+	g_sModelIndexBoomerSprite = PRECACHE_MODEL("sprites/spr_boomer.spr");
+	g_sModelIndexPosionEffect = PRECACHE_MODEL("models/ef_poison03.mdl");
 
 	g_sModelIndexCTGhost = PRECACHE_MODEL("sprites/b-tele1.spr");
 	g_sModelIndexTGhost = PRECACHE_MODEL("sprites/c-tele1.spr");

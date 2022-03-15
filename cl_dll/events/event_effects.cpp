@@ -58,6 +58,9 @@ enum event_effect
 	EVENT_SUMMONER_SLASH,
 	EVENT_SUMMONER,
 	EVENT_REVIVEGUN,
+	EVENT_VOIDPISTOL_BLACKHOLE,
+	EVENT_FOLLOW_ENT,
+	EVENT_BALROGCRITICAL,
 };
 
 enum buffsg552ex_slash_e
@@ -375,9 +378,10 @@ void EV_WpnEffects(event_args_s* args)
 
 				pEnt->entity.curstate.sequence = 1;
 				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
 				pEnt->entity.curstate.framerate = 1.0;
 				pEnt->tentOffset = Vector(0, 0, -32);
-				pEnt->die = gHUD.m_flTime + 0.69;
+				pEnt->die = gHUD.m_flTime + 0.2;
 				pEnt->clientIndex = idx;
 				pEnt->flags |= FTENT_PLYRATTACHMENT;
 			}
@@ -1378,8 +1382,8 @@ void EV_WpnEffects(event_args_s* args)
 					if (!pEnt)
 						return;
 
-					/*if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
-						viewent->curstate.skin = 0;*/
+					if (viewent->curstate.sequence != 5 || viewent->curstate.sequence != 11)
+						viewent->curstate.skin = 0;
 
 					if (args->iparam2)
 					{
@@ -1445,6 +1449,293 @@ void EV_WpnEffects(event_args_s* args)
 				}
 
 			}
+		}
+
+		if (!args->bparam2)
+		{
+			model_s* pModel = IEngineStudio.Mod_ForName("models/ef_revivegun_field.mdl", false);
+
+			if (pModel)
+			{
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin + Vector(0, 0, -36), pModel);
+
+				if (!pEnt)
+					return;
+
+				pEnt->entity.curstate.scale = 1.0;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.sequence = 0;
+				pEnt->entity.curstate.framerate = 1.0f;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 1.7;
+				pEnt->flags |= FTENT_NONE;
+			}
+		}
+		break;
+	}
+	case EVENT_VOIDPISTOL_BLACKHOLE:
+	{
+		if (EV_IsLocal(args->entindex))
+		{
+
+			char pModelName[128];
+
+			switch (args->iparam2)
+			{
+			case 1:
+			{
+				sprintf(pModelName, "sprites/ef_blackhole01.spr"); break;
+			}
+			case 2:
+			{
+				sprintf(pModelName, "sprites/ef_blackhole02.spr"); break;
+			}
+			case 3: 
+			{
+				sprintf(pModelName, "sprites/ef_blackhole03.spr"); break;
+			}
+			case 4:
+			{
+				sprintf(pModelName, "sprites/ef_blackhole04.spr"); break;
+			}
+			default:
+				return;
+			}			
+
+			model_s* pModel = IEngineStudio.Mod_ForName(pModelName, false);
+			if (pModel)
+			{
+				cl_entity_t* viewent = gEngfuncs.GetViewModel();
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(viewent->attachment[1], pModel);
+
+				if (!pEnt)
+					return;
+			
+				pEnt->flags &= ~(FTENT_COLLIDEWORLD | FTENT_GRAVITY);
+				pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+				pEnt->entity.curstate.frame = 0;
+				pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
+				pEnt->entity.curstate.framerate = 30.0f;
+				pEnt->entity.curstate.aiment = viewent->index;
+				pEnt->entity.curstate.body = 2;
+				pEnt->frameMax = 35;
+
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->entity.curstate.weaponmodel = viewent->curstate.weaponmodel;
+				if (args->iparam2 == 4)
+				{
+					pEnt->entity.curstate.scale = 0.05;
+					pEnt->die = gHUD.m_flTime + 3.0f;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED;
+				}
+				else
+				{
+					pEnt->die = gHUD.m_flTime + 1.4f;
+					pEnt->entity.curstate.scale = 0.01;
+					if(args->iparam2 == 3)
+						pEnt->entity.curstate.scale = 0.005;
+					pEnt->entity.curstate.eflags |= EFLAG_DEPTH_CHANGED | EFLAG_AFTER_VIEWMODEL;
+				}
+				
+				pEnt->entity.curstate.iuser2 = args->iparam2;
+
+				
+				pEnt->entity.curstate.iuser1 = viewent->index;
+				
+
+				pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+					cl_entity_t* viewent = gEngfuncs.GetViewModel();
+
+					if (viewent)
+					{
+						if (pEnt->entity.curstate.iuser2 == 4)
+						{
+							if (viewent->curstate.sequence != 2 || viewent->curstate.sequence != 5)
+								pEnt->die = gHUD.m_flTime;
+						}
+						else
+						{
+							if (viewent->curstate.sequence == 2 || (viewent->curstate.sequence >= 5 && viewent->curstate.sequence <= 10) || viewent->curstate.sequence >= 13)
+								pEnt->die = gHUD.m_flTime;
+						}
+					}
+				};
+					
+			}		
+		}
+		break;
+	}
+	case EVENT_FOLLOW_ENT:
+	{
+		cl_entity_t* pFollow = gEngfuncs.GetEntityByIndex(idx);
+		if (!pFollow)
+			return;
+
+		model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_aksha_fireball.spr", false);
+		TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin, pModel);
+
+		if (pEnt)
+		{
+			pEnt->die = gHUD.m_flTime + 1.0;
+			pEnt->entity.curstate.iuser1 = idx;
+			pEnt->entity.curstate.iuser2 = args->iparam2;
+			pEnt->entity.curstate.fuser1 = args->fparam1;
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderfx = kRenderFxNone;
+			pEnt->entity.curstate.frame = 0;
+			pEnt->entity.curstate.framerate = 30.0f;
+			pEnt->entity.curstate.fuser2 = gHUD.m_flTime + args->fparam2;
+			pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM | FTENT_SPRANIMATELOOP;
+			pEnt->entity.curstate.vuser1 = pFollow->origin;
+			pEnt->callback = [](tempent_s* ent, float frametime, float currenttime)
+			{
+				cl_entity_t* pFollow = gEngfuncs.GetEntityByIndex(ent->entity.curstate.iuser1);
+				if (!pFollow)
+				{
+					ent->die = currenttime;
+					return;
+				}
+				else
+				{
+					//if (pFollow->origin == ent->entity.curstate.vuser1) // Entity Stoppted = Death
+					//{
+					//	ent->die = gHUD.m_flTime;
+					//	return;
+					//}
+
+					ent->entity.curstate.vuser1 = pFollow->origin;
+
+					if (ent->entity.curstate.fuser2 > currenttime)
+						return;
+
+					if (ent->entity.curstate.fuser1)
+						ent->entity.curstate.fuser2 = currenttime + ent->entity.curstate.fuser1;
+
+					model_t* pModel = NULL;
+					float fScale;
+					int frameCount;
+					float displaytime;
+					switch (ent->entity.curstate.iuser2)
+					{
+						case 0:
+						{
+							pModel = IEngineStudio.Mod_ForName("sprites/ef_aksha_fireball.spr", 0);
+							frameCount = 30;
+							displaytime = (float)frameCount / 30.0f;
+							fScale = 0.3;
+							break;
+						}
+					}
+
+					if (!pModel)
+					{
+						ent->die = gHUD.m_flTime;
+						return;
+					}
+
+					Vector vecOrigin = pFollow->origin;
+
+					vecOrigin.x += gEngfuncs.pfnRandomFloat(-2.0, 2.0);
+					vecOrigin.y += gEngfuncs.pfnRandomFloat(-2.0, 2.0);
+					vecOrigin.z += gEngfuncs.pfnRandomFloat(-2.0, 2.0);
+
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(vecOrigin, pModel);
+					if (pEnt)
+					{
+						pEnt->flags |= FTENT_CLIENTCUSTOM;
+						pEnt->die = gHUD.m_flTime + displaytime;
+						pEnt->entity.angles[2] = gEngfuncs.pfnRandomFloat(0.0, 360.0);
+						pEnt->entity.curstate.rendermode = kRenderTransAdd;
+						pEnt->entity.curstate.renderamt = pEnt->entity.curstate.fuser2 = 250;
+						pEnt->entity.curstate.scale = fScale;
+						pEnt->entity.curstate.frame = 0;
+						pEnt->entity.curstate.framerate = 1.0f;
+						pEnt->entity.curstate.fuser1 = displaytime;
+						pEnt->frameMax = frameCount;
+
+						pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+							if (ent->die >= gHUD.m_flTime)
+							{
+								float percentage = (ent->die - gHUD.m_flTime) / ent->entity.curstate.fuser1;
+								ent->entity.curstate.frame = ent->frameMax * (1.0f - percentage);
+								ent->entity.curstate.renderamt = ent->entity.curstate.fuser2 * percentage;
+							}
+						};
+
+						
+					}
+				}
+
+
+
+			};
+			
+		}
+	}
+	case EVENT_BALROGCRITICAL:
+	{
+		int type = args->iparam2;
+
+		if (!type)
+		{
+			struct model_s* pModel;
+			TEMPENTITY* pEnt;
+
+			pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
+
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.scale = 0.3;
+			pEnt->die = gHUD.m_flTime + 0.6f;
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+				ent->entity.curstate.scale += 0.0013;
+				if (ent->die <= gHUD.m_flTime + 0.4)
+					ent->entity.curstate.renderamt -= 15;
+
+				if (ent->entity.curstate.renderamt < 0)
+					ent->entity.curstate.renderamt = 0;
+
+			};
+
+			int id;
+			gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);
+			origin[2] -= 15.0;
+			gEngfuncs.pEfxAPI->R_Explosion(origin, id, 0.45, 60, TE_EXPLFLAG_NONE);
+		}
+		else
+		{
+			struct model_s* pModel;
+			TEMPENTITY* pEnt;
+
+			pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
+
+			pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+			pEnt->entity.curstate.rendermode = kRenderTransAdd;
+			pEnt->entity.curstate.renderamt = 255;
+			pEnt->entity.curstate.scale = 0.5;
+			pEnt->die = gHUD.m_flTime + 0.6f;
+			pEnt->flags |= FTENT_CLIENTCUSTOM;
+			pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+				ent->entity.curstate.scale += 0.007;
+				if (ent->die <= gHUD.m_flTime + 0.3)
+					ent->entity.curstate.renderamt -= 35;
+			};
+
+			int id;
+			gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);
+			origin[2] -= 15.0;
+			gEngfuncs.pEfxAPI->R_Explosion(origin, id, 0.45, 30, TE_EXPLFLAG_NONE);
+
+			gEngfuncs.pEfxAPI->R_TracerEffect(gEngfuncs.GetEntityByIndex(idx)->origin, origin);
 		}
 		break;
 	}

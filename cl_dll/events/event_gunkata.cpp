@@ -127,7 +127,7 @@ void EV_FireGunkata(struct event_args_s *args)
 					if (!ent)
 						return;
 
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempModel(ent->origin, Vector(0, 0, 0), Vector(0, 0, 0), args->fparam1 + 0.2, gEngfuncs.pEventAPI->EV_FindModelIndex("models/v_gunkata.mdl"), 0);
+					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_TempModel(ent->origin, Vector(0, 0, 0), Vector(0, 0, 0), time + args->fparam1, gEngfuncs.pEventAPI->EV_FindModelIndex("models/v_gunkata.mdl"), 0);
 
 					if (!pEnt)
 						return;
@@ -136,7 +136,8 @@ void EV_FireGunkata(struct event_args_s *args)
 					pEnt->flags |= FTENT_CLIENTCUSTOM;
 
 					pEnt->clientIndex = ent->index;
-					pEnt->entity.curstate.animtime = gHUD.m_flTime + 0.4;
+					pEnt->entity.curstate.body = args->bparam1 ? 1 : 0;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
 					pEnt->entity.curstate.sequence = args->iparam1;
 					pEnt->entity.curstate.rendermode = kRenderNormal;
 					pEnt->entity.curstate.renderamt = 255;
@@ -149,6 +150,8 @@ void EV_FireGunkata(struct event_args_s *args)
 						cl_entity_t* viewent = gEngfuncs.GetViewModel();
 						pEnt->entity.origin = viewent->origin;
 						pEnt->entity.angles = viewent->angles;
+						if (viewent->curstate.sequence <= 9 || viewent->curstate.sequence == 15)
+							pEnt->die = gHUD.m_flTime;
 					};
 				}
 				//R_AddExtraViewModel({ gHUD.m_flTime + 0.2f, gHUD.m_flTime + args->fparam1 + 0.2f, args->iparam1, kRenderNormal, 255 });
@@ -181,10 +184,11 @@ void EV_FireGunkata(struct event_args_s *args)
 				if (pEnt)
 				{
 					pEnt->entity.curstate.sequence = 1;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
 					pEnt->entity.curstate.frame = 0;
 					pEnt->entity.curstate.framerate = 1.0;
 					pEnt->tentOffset = Vector(0, 0, -32);
-					pEnt->die = gHUD.m_flTime + 0.9;
+					pEnt->die = gHUD.m_flTime + 0.2;
 					pEnt->clientIndex = idx;
 					pEnt->flags |= FTENT_PLYRATTACHMENT;
 				}
@@ -196,6 +200,8 @@ void EV_FireGunkata(struct event_args_s *args)
 			if (!EV_IsLocal(idx))
 			{
 				struct model_s* pModel = IEngineStudio.Mod_ForName("models/ef_gunkata_man.mdl", false);
+				if(args->bparam1)
+					pModel = IEngineStudio.Mod_ForName("models/ef_gunkata_woman.mdl", false);
 
 				if (pModel)
 				{

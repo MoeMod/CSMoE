@@ -41,9 +41,9 @@ struct MapData
 	char bright[32];
 	char skybox[32];
 	float density;
-	int density_r;
-	int density_g;
-	int density_b;
+	float density_r;
+	float density_g;
+	float density_b;
 	/*int server_limit;
 	int max_player;
 	char d3d_bright;
@@ -139,6 +139,54 @@ int MapMgr_GetMapID(const char *szMapName)
 		return -1;
 
 	return g_MapData[std::string(szMapName)].map_id;
+}
+
+char *MapMgr_GetMapBright(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return NULL;
+
+	return g_MapData[std::string(szMapName)].bright;
+}
+
+char* MapMgr_GetMapSkybox(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return NULL;
+
+	return g_MapData[std::string(szMapName)].skybox;
+}
+
+float MapMgr_GetMapDensity(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return 0.00006;
+
+	return g_MapData[std::string(szMapName)].density;
+}
+
+float MapMgr_GetMapDensity_r(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return 0;
+
+	return g_MapData[std::string(szMapName)].density_r;
+}
+
+float MapMgr_GetMapDensity_g(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return 0;
+
+	return g_MapData[std::string(szMapName)].density_g;
+}
+
+float MapMgr_GetMapDensity_b(const char* szMapName)
+{
+	if (g_MapData.find(std::string(szMapName)) == g_MapData.end())
+		return 0;
+
+	return g_MapData[std::string(szMapName)].density_b;
 }
 
 void MapMgr_LoadMapSafeArea()
@@ -262,7 +310,7 @@ void MapMgr_LoadMapList()
 		std::getline(ss, data, ',');
 		Q_strncpy(map.map_filename, data.c_str(), sizeof(map.map_filename));
 
-		/*std::getline(ss, data, ',');
+		std::getline(ss, data, ',');
 		Q_strncpy(map.bright, data.c_str(), sizeof(map.bright));
 
 		std::getline(ss, data, ',');
@@ -272,14 +320,15 @@ void MapMgr_LoadMapList()
 		map.density = atof(data.c_str());
 
 		std::getline(ss, data, ',');
-		map.density_r = atoi(data.c_str());
+		map.density_r = atof(data.c_str());
 
 		std::getline(ss, data, ',');
-		map.density_g = atoi(data.c_str());
+		map.density_g = atof(data.c_str());
 
 		std::getline(ss, data, ',');
-		map.density_b = atoi(data.c_str());*/
+		map.density_b = atof(data.c_str());
 
+		data = map.map_filename;
 		if (g_MapData.find(data) != g_MapData.end())
 			continue;
 

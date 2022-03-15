@@ -980,7 +980,14 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
+		//m_pCurrentEntity->curstate.renderfx = kRenderFxBlackOutLine;  //debug player outline
+
+
+		if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 		StudioRenderModel(dir);
+		if (DrawOutLineCheck(0)) DrawOutLine(0);
+		if (DrawOutLineCheck(0)) DrawOutLinePause(0);
+
 		m_pPlayerInfo = NULL;
 
 		if (pplayer->weaponmodel)
@@ -1000,7 +1007,10 @@ int CGameStudioModelRenderer::_StudioDrawPlayer(int flags, entity_state_t *pplay
 
 			IEngineStudio.StudioSetupLighting(&lighting);
 
+			if (DrawOutLineCheck(0)) DrawOutLineBegin(0);
 			StudioRenderModel(dir);
+			if (DrawOutLineCheck(0))DrawOutLine(0);
+			if (DrawOutLineCheck(0))DrawOutLineEnd(0);
 
 			StudioCalcAttachments();
 

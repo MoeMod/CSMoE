@@ -31,7 +31,7 @@ namespace sv {
 	class CLanceFountainFieldAttack : public CBaseEntity
 	{
 	public:
-		KnockbackData GetKnockBackData() override { return { 0.0f, 1.0f, 1.0f, 0.0f, 1.0f }; }
+		KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
 
 		void Spawn() override
 		{
@@ -86,13 +86,84 @@ namespace sv {
 				return;
 			}
 
-			RadiusDamage3(pev->origin, this->pev, pAttackePlayer->pev, m_SkillDamage, 360, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, -1, 0, 3);
+			RadiusDamage();
 
 			if (m_tTimeRemove < gpGlobals->time)
 			{
 				pev->effects |= EF_NODRAW; // 0x80u
 				SetThink(NULL);
 				UTIL_Remove(this);
+			}
+		}
+
+		void RadiusDamage()
+		{
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackPlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+			if (pAttackPlayer && !pAttackPlayer->m_bIsZombie)
+			{
+				TraceResult tr;
+				CBaseEntity* pEntity = NULL;
+
+				Vector vecEnd;
+				int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+
+				while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 250.0)) != NULL)
+				{
+					if (pEntity->edict() == pev->owner)
+						continue;
+
+					if (pEntity->IsDormant())
+						continue;
+
+					if (pEntity->pev->takedamage == DAMAGE_NO)
+						continue;
+
+					if (pEntity->Classify() == CLASS_NONE)
+						continue;
+
+					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+						continue;
+
+					if (pev->origin.z - pEntity->pev->origin.z > 40)
+						continue;
+
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* player = (CBasePlayer*)pEntity;
+
+						if (!player)
+							continue;
+
+						if (pAttackPlayer->m_iTeam == player->m_iTeam)
+							continue;
+
+						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, m_SkillDamage, DMG_BULLET | DMG_NEVERGIB);
+
+						if (player->m_bIsZombie)
+						{
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
+							{
+								strategy->SetStunSpeedTime(0.2s);
+								strategy->SetStunGravityTime(0.2s);
+							}
+						}
+
+						MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
+						WRITE_BYTE(9);	//type
+						WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+						WRITE_BYTE(1);
+						MESSAGE_END();
+					}
+					else
+					{
+						pEntity->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, m_SkillDamage, DMG_BULLET | DMG_NEVERGIB);
+					}
+				}
 			}
 		}
 
@@ -204,7 +275,7 @@ namespace sv {
 
 				Vector vecOrigin = pev->origin;
 				vecOrigin[2] += 250;
-				RadiusDamage3(vecOrigin, this->pev, pAttackePlayer->pev, m_SkillDamage, 250, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, -1, 0, 1);
+				RadiusDamage();
 				m_iDoDamage = 1;
 			}
 
@@ -271,6 +342,79 @@ namespace sv {
 				SetThink(&CLanceFountainSpecialAttack::StartFadeOut);
 				pev->nextthink = gpGlobals->time + 0.1s;
 				return;
+			}
+		}
+
+		void RadiusDamage()
+		{
+			CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+			CBasePlayer* pAttackPlayer = nullptr;
+			if (pAttacker && pAttacker->IsPlayer())
+				pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+			if (pAttackPlayer && !pAttackPlayer->m_bIsZombie)
+			{
+				TraceResult tr;
+				CBaseEntity* pEntity = NULL;
+
+				Vector vecEnd;
+				int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+
+				while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 200.0)) != NULL)
+				{
+					if (pEntity->edict() == pev->owner)
+						continue;
+
+					if (pEntity->IsDormant())
+						continue;
+
+					if (pEntity->pev->takedamage == DAMAGE_NO)
+						continue;
+
+					if (pEntity->Classify() == CLASS_NONE)
+						continue;
+
+					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+						continue;
+
+					if (pev->origin.z - pEntity->pev->origin.z > 40)
+						continue;
+
+					if (pEntity->IsPlayer())
+					{
+						CBasePlayer* player = (CBasePlayer*)pEntity;
+
+						if (!player)
+							continue;
+
+						if (pAttackPlayer->m_iTeam == player->m_iTeam)
+							continue;
+
+						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, m_SkillDamage, DMG_BULLET | DMG_NEVERGIB);
+
+						if (player->m_bIsZombie && player->m_ZombieClass)
+						{
+							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+							{
+								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+
+								player->pev->velocity.x = vecDir.x * 600.0;
+								player->pev->velocity.y = vecDir.y * 600.0;
+								player->pev->velocity.z = 310.0;
+							}					
+						}
+
+						MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
+						WRITE_BYTE(9);	//type
+						WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+						WRITE_BYTE(1);
+						MESSAGE_END();
+					}
+					else
+					{
+						pEntity->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, m_SkillDamage, DMG_BULLET | DMG_NEVERGIB);
+					}
+				}
 			}
 		}
 
@@ -352,7 +496,7 @@ namespace sv {
 		static constexpr int MaxClip = 100;
 		static constexpr auto ItemSlot = KNIFE_SLOT;
 		static constexpr const char* AnimExtension = "dragonsword";
-		KnockbackData KnockBack = { 1.0f, 1.0f, 1.0f, 1.0f, 0.3f };
+		KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 	public:
 
@@ -442,6 +586,7 @@ namespace sv {
 		void ComboAttack();
 		void FakeKnockBack();
 #ifndef CLIENT_DLL
+		hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, int iType);
 		void MaterialSound();
 # endif
 		BOOL CanDrop() override { return false; }
@@ -614,6 +759,135 @@ namespace sv {
 			}
 		}
 	}
+
+	hit_result_t CKnifeLance::KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer, int iType)
+	{
+		CBaseEntity* pEntity = NULL;
+		hit_result_t result = HIT_NONE;
+		TraceResult tr;
+		UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+		Vector vecEnd;
+		Vector vecSrc = pAttackPlayer->GetGunPosition();
+
+		Vector vecForward = gpGlobals->v_forward;
+		Vector2D vecForward2D = vecForward.Make2D().Normalize();
+
+		float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+		{
+			if (pEntity == pAttackPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (pEntity->pev->takedamage == DAMAGE_NO)
+				continue;
+
+			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+				continue;
+
+			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+				continue;
+
+			float flRatio = 1.0;
+
+			if (pEntity && pEntity->IsPlayer())
+			{
+				UTIL_MakeVectors(pEntity->pev->angles);
+
+				if (DotProduct((pEntity->pev->origin.Make2D() - pAttackPlayer->pev->origin.Make2D()).Normalize(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
+					flRatio = 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
+			}
+
+			pAttackPlayer->m_iWeaponVolume = 128;
+
+			ClearMultiDamage();
+
+			pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+			ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+			result = HIT_PLAYER;
+
+			if (pEntity->IsPlayer())
+			{
+				CBasePlayer* player = (CBasePlayer*)pEntity;
+
+				if (player->m_bIsZombie)
+				{
+					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
+					vecDir.z = 0;
+					if (!iType)
+					{
+						//left
+						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.3f });
+
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(3.0s);
+							strategy->SetStunGravityTime(3.0s);
+						}	
+					}
+					else if(iType == 1)
+					{
+						//left3
+						if (player->m_bIsZombie && player->m_ZombieClass)
+						{
+							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+							{
+								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+
+								player->pev->velocity.x = vecDir.x * 2400.0;
+								player->pev->velocity.y = vecDir.y * 2400.0;
+							}
+						}
+					}
+					else
+					{
+						//right
+						if (player->m_bIsZombie && player->m_ZombieClass)
+						{
+							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+							{
+								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+
+								player->pev->velocity.x = vecDir.x * 2100.0;
+								player->pev->velocity.y = vecDir.y * 2100.0;
+								player->pev->velocity.z = 290.0;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!result)
+		{
+			static int calced = 0;
+			static float calcRes = 0.0f;
+
+			if (!(calced & 1))
+			{
+				calced |= 1;
+				calcRes = sqrt(512.0);
+			}
+
+			vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+			UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+			if (tr.flFraction < 1.0f)
+				result = HIT_WALL;
+		}
+
+		return result;
+	}
 #endif
 
 	void CKnifeLance::DelayPrimaryAttack(void)
@@ -623,11 +897,16 @@ namespace sv {
 		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-		switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 150, 90, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, 0, 3))
+		switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
 		{
 		case HIT_PLAYER:
 		{
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+			switch (RANDOM_LONG(0, 2))
+			{
+			case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			}
 			break;
 		}
 		case HIT_WALL:
@@ -769,11 +1048,16 @@ namespace sv {
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-			switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 150, 90, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, 0, 3))
+			switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
 			{
 			case HIT_PLAYER:
 			{
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				switch (RANDOM_LONG(0, 2))
+				{
+				case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				}			
 				break;
 			}
 			case HIT_WALL:
@@ -795,7 +1079,7 @@ namespace sv {
 			Vector vecOrigin = vecSrc + gpGlobals->v_forward * 55;
 
 #ifndef CLIENT_DLL
-			RadiusDamage3(vecOrigin, pev, m_pPlayer->pev, Slash3ExpDamage(), 140, CLASS_MACHINE, DMG_NEVERGIB | DMG_BULLET, 0, 0, 0, 1, 0, 2);
+			KnifeAttack(Slash3ExpDamage(), 260, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 1);
 			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, vecOrigin, g_vecZero, 0.0, 0.0, 8, 0, FALSE, FALSE);
 #endif			
 			FakeKnockBack();
@@ -872,11 +1156,16 @@ namespace sv {
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
-			switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, GetPrimaryAttackDamage(), 150, 90, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev, 0, 3))
+			switch (KnifeAttack(GetPrimaryAttackDamage(), 180, 85, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 0))
 			{
 			case HIT_PLAYER:
 			{
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94);
+				switch (RANDOM_LONG(0, 2))
+				{
+				case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+				}
 
 				break;
 			}
@@ -986,7 +1275,7 @@ namespace sv {
 
 			//do buff
 #ifndef CLIENT_DLL
-			Vector vecOrigin = pev->origin;
+			Vector vecOrigin = m_pPlayer->pev->origin;
 			vecOrigin[2] -= 20.0;
 
 			CLanceFountainFieldAttack* pEnt = static_cast<CLanceFountainFieldAttack*>(CBaseEntity::Create("lance_fountainfield", vecOrigin, { 0,0,0 }, ENT(m_pPlayer->pev)));
@@ -1020,13 +1309,18 @@ namespace sv {
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_snd_attack.wav", VOL_NORM, ATTN_NORM, 0, 94);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/lance_snd_attack.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
-		switch (KnifeAttack4(vecSrc, gpGlobals->v_forward, GetSecondaryAttackDamage(), 150, 90, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev , 0, 2))
+		switch (KnifeAttack(GetSecondaryAttackDamage(), 185, 360, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, 2))
 		{
 		case HIT_PLAYER:
 		{
-			
+			switch (RANDOM_LONG(0, 2))
+			{
+			case 0: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			case 1: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit2.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			case 2: { EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_AUTO, "weapons/lance_slash_hit3.wav", VOL_NORM, ATTN_NORM, 0, 94); break; }
+			}
 			break;
 		}
 		case HIT_WALL:

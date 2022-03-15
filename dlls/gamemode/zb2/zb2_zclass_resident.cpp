@@ -39,7 +39,7 @@ CZombieClass_Resident::CZombieClass_Resident(CBasePlayer *player, ZombieLevel iE
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 1000;
 
@@ -91,12 +91,12 @@ void CZombieClass_Resident::ResetMaxSpeed() const
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->gravity = 1.0f;
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);
 	}
 
 	if (m_tStunSpeedTime > gpGlobals->time)
 	{
-		m_pPlayer->pev->maxspeed = 100.0f;
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 }
 
