@@ -109,7 +109,7 @@ elseif(APPLE)
 	set(APP_ICNS "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/DragNDrop/Icon.png")
 	set_source_files_properties(${APP_ICNS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
-	find_library(SDL2_LIBRARY_FILE SDL2)
+	#find_library(SDL2_LIBRARY_FILE SDL2)
 	#set_source_files_properties(${SDL2_LIBRARY_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
 
 	add_executable(${XASH_LAUNCHER} MACOSX_BUNDLE xash_static.cpp ${APP_ICNS})
@@ -139,10 +139,10 @@ elseif(APPLE)
 	set(CMAKE_INSTALL_PREFIX "/Applications")
 	set(APPS "\${CMAKE_INSTALL_PREFIX}/CSMoE.app")
 	install(TARGETS ${XASH_LAUNCHER} BUNDLE DESTINATION ".")
-	install(CODE "
-		include(BundleUtilities)
-		fixup_bundle(\"${APPS}\"   \"\"   \"${SDL2_LIBRARY_FILE}\")
-		")
+	#install(CODE "
+	#	include(BundleUtilities)
+	#	fixup_bundle(\"${APPS}\"   \"\"   \"${SDL2_LIBRARY_FILE}\")
+	#	")
 
 	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/csmoe DESTINATION "./CSMoE.app/Contents/Resources" OPTIONAL)
 	install(DIRECTORY ${CMAKE_SOURCE_DIR}/CSMoE-Full/cstrike DESTINATION "./CSMoE.app/Contents/Resources" OPTIONAL)
@@ -160,8 +160,4 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set_target_properties(${XASH_LAUNCHER} PROPERTIES
 		OUTPUT_NAME csmoe_linux) # Change name to your gamedir, if you building a standalone game
 	install( TARGETS ${XASH_LAUNCHER} DESTINATION ${CMAKE_INSTALL_PREFIX} )
-endif()
-
-if(XASH_SDL)
-	target_link_libraries(${XASH_LAUNCHER} sdl2)
 endif()
