@@ -435,6 +435,23 @@ void SPR_AdjustSize( float *x, float *y, float *w, float *h )
 	if( h ) *h *= yscale;
 }
 
+void SPR_AdjustSizeReverse( float *x, float *y, float *w, float *h )
+{
+    float	xscale, yscale;
+
+    ASSERT( x || y || w || h );
+
+    // scale for screen sizes
+    xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
+    yscale = scr_height->value / (float)clgame.scrInfo.iHeight;
+
+    if( x ) *x /= xscale;
+    if( y ) *y /= yscale;
+
+    if( w ) *w /= xscale;
+    if( h ) *h /= yscale;
+}
+
 /*
 ====================
 TextAdjustSize
@@ -4126,6 +4143,10 @@ void CL_UnloadProgs( void )
 	Cvar_FullSet( "host_clientloaded", "0", CVAR_INIT );
 
 	Com_FreeLibrary( clgame.hInstance );
+#ifdef XASH_VGUI2
+    extern void VGui2_Shutdown();
+    VGui2_Shutdown();
+#endif
 	VGui_Shutdown();
 	Mem_FreePool( &cls.mempool );
 	Mem_FreePool( &clgame.mempool );
@@ -4233,6 +4254,10 @@ qboolean CL_LoadProgs( const char *name )
 		clgame.hInstance = NULL;
 		return false;
 	}
+#ifdef XASH_VGUI2
+    extern void VGui2_Initialize(cl_enginefunc_t *pEnginefuncs);
+    VGui2_Initialize(&gEngfuncs);
+#endif
 
 	Cvar_Get( "cl_nopred", "0", CVAR_ARCHIVE|CVAR_USERINFO, "disable client movement predicting" );
 	cl_lw = Cvar_Get( "cl_lw", "1", CVAR_ARCHIVE|CVAR_USERINFO, "enable client weapon predicting" );

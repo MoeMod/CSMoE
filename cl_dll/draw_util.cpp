@@ -60,7 +60,7 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 		return 1;
 
 	wchar_t wstr[1024];
-	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
+	Q_UTF8ToUnicode(str, wstr, 1024, STRINGCONVERT_SKIP);
 	
 	wchar_t* szIt = wstr;
 	
@@ -111,7 +111,7 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char * str, int r, int g, int b, float scale, bool drawing )
 {
 	wchar_t wstr[1024];
-	cl::Q_UTF8ToUTF16(str, wstr, 1024, STRINGCONVERT_SKIP);
+    Q_UTF8ToUnicode(str, wstr, 1024, STRINGCONVERT_SKIP);
 
 	if (!wstr[0])
 		return 0;

@@ -427,17 +427,17 @@ void Button::ApplySchemeSettings(IScheme *pScheme)
 	_depressedBorder = pScheme->GetBorder("ButtonDepressedBorder");
 	_keyFocusBorder = pScheme->GetBorder("ButtonKeyFocusBorder");
 
-	_defaultFgColor = GetSchemeColor("Button.TextColor", GetSchemeColor("BaseText", Color(255, 255, 255, 255), pScheme), pScheme);
-	_defaultBgColor = GetSchemeColor("Button.BgColor", GetSchemeColor("BgColor", Color(0, 0, 0, 255), pScheme), pScheme);
+	_defaultFgColor = GetSchemeColor("Button.TextColor", GetSchemeColor("ButtonFgColor", GetSchemeColor("BaseText", Color(255, 255, 255, 255), pScheme), pScheme), pScheme);
+	_defaultBgColor = GetSchemeColor("Button.BgColor", GetSchemeColor("ButtonBgColor", GetSchemeColor("BgColor", Color(0, 0, 0, 255), pScheme), pScheme), pScheme);
 
 	_armedFgColor = GetSchemeColor("Button.ArmedTextColor", GetSchemeColor("ButtonArmedFgColor", _defaultFgColor, pScheme), pScheme);
 	_armedBgColor = GetSchemeColor("Button.ArmedBgColor", GetSchemeColor("ButtonArmedBgColor", _defaultBgColor, pScheme), pScheme);
 
 	_depressedFgColor = GetSchemeColor("Button.DepressedTextColor", GetSchemeColor("ButtonDepressedFgColor", _defaultFgColor, pScheme), pScheme);
 	_depressedBgColor = GetSchemeColor("Button.DepressedBgColor", GetSchemeColor("ButtonDepressedBgColor", _defaultBgColor, pScheme), pScheme);
-	_keyboardFocusColor = GetSchemeColor("Button.FocusBorderColor", Color(0, 0, 0, 255), pScheme);
+	_keyboardFocusColor = GetSchemeColor("Button.FocusBorderColor", GetSchemeColor("ButtonFocusBorder", Color(0, 0, 0, 255), pScheme), pScheme);
 
-	int xInset = 0, yInset = 0;
+	int xInset = 6, yInset = 0;
 
 	const char *resourceString = pScheme->GetResourceString("Button.TextInsetX");
 
@@ -858,6 +858,30 @@ const char *Button::GetDescription( void )
 	static char buf[1024];
 	Q_snprintf(buf, sizeof(buf), "%s, string command, int default", BaseClass::GetDescription());
 	return buf;
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+void Button::SetCustomBorderScheme(IScheme* pScheme, char* szBorder)
+{
+	char buffer[64];
+	auto va = [&buffer](const char* format, auto...args) { sprintf(buffer, format, args...); return buffer; };
+	const char* enableImage = pScheme->GetResourceString(va("%sLeftC", szBorder));
+
+	if (enableImage[0])
+	{
+		_imageBackground = true;
+		_depressedImage[0] = scheme()->GetImage(enableImage, true);
+		_depressedImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterC", szBorder)), true);
+		_depressedImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightC", szBorder)), true);
+		_defaultImage[0] = scheme()->GetImage(pScheme->GetResourceString(va("%sLeftN", szBorder)), true);
+		_defaultImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterN", szBorder)), true);
+		_defaultImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightN", szBorder)), true);
+		_armedImage[0] = scheme()->GetImage(pScheme->GetResourceString(va("%sLeftO", szBorder)), true);
+		_armedImage[1] = scheme()->GetImage(pScheme->GetResourceString(va("%sCenterO", szBorder)), true);
+		_armedImage[2] = scheme()->GetImage(pScheme->GetResourceString(va("%sRightO", szBorder)), true);
+	}
 }
 
 //-----------------------------------------------------------------------------

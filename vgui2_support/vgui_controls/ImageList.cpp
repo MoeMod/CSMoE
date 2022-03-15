@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <Color.h>
 
 #include "ImageList.h"

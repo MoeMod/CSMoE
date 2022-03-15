@@ -506,6 +506,66 @@ namespace vgui2
 		{
 			if (ShouldPaint())
 			{
+#ifdef OSX
+                int wide, tall;
+                GetSize(wide, tall);
+
+                auto draw_circle = [](Color color, float flWide, float flTall, float flRadius){
+                    surface()->DrawSetColor( color );
+                    float flHalfWide = (float)flWide / 2;
+                    float flHalfTall = (float)flTall / 2;
+                    for ( int i=0;i<=36;i++ )
+                    {
+                        Vertex_t v[3];
+
+                        float angle = 2 * M_PI / 36 * i;
+                        float angle2 = 2 * M_PI / 36 * (i + 1);
+
+                        // vert 0 is ( 0.5, 0.5 )
+                        v[0].m_Position.Init( flHalfWide, flHalfTall );
+                        v[0].m_TexCoord.Init( 0.5f, 0.5f );
+
+                        // full segment, easy calculation
+                        v[2].m_Position.Init( flHalfWide + flRadius * cos(angle), flHalfTall + flRadius * sin(angle) );
+                        v[2].m_TexCoord.Init( 0.5f + cos(angle), 0.5f + sin(angle) );
+
+                        // vert 2 is ( Segments[i].vert1x, Segments[i].vert1y )
+                        v[1].m_Position.Init( flHalfWide + flRadius * cos(angle2), flHalfTall + flRadius * sin(angle2) );
+                        v[1].m_TexCoord.Init( 0.5f + cos(angle2), 0.5f + sin(angle2) );
+
+                        surface()->DrawTexturedPolygon( 3, v );
+                    }
+                };
+
+                float radius = wide / 2 * 0.66;
+                if(!IsEnabled())
+                {
+                    draw_circle(Color(0.625f * 255, 0.625f * 255, 0.625f * 255, 255), wide, tall, radius);
+                    draw_circle(Color(0.85f * 255, 0.85f * 255, 0.85f * 255, 255), wide, tall, radius * 0.93);
+                }
+                else if(IsDepressed())
+                {
+                    draw_circle(Color(0.8f * 255, 0.3f * 255, 0.25f * 255, 255), wide, tall, radius);
+                    draw_circle(Color(0.7f * 255, 0.3f * 255, 0.3f * 255, 255), wide, tall, radius * 0.93);
+                }
+                else if(!IsArmed() && !GetParent()->HasFocus() && false)
+                {
+                    draw_circle(Color(0.4f * 255, 0.4f * 255, 0.4f * 255, 255), wide, tall, radius);
+                    draw_circle(Color(0.85f * 255, 0.85f * 255, 0.85f * 255, 255), wide, tall, radius * 0.93);
+                }
+                else
+                {
+                    draw_circle(Color(0.64f * 255, 0.24f * 255, 0.24f * 255, 255), wide, tall, radius);
+                    draw_circle(Color(0.9f * 255, 0.3f * 255, 0.3f * 255, 255), wide, tall, radius * 0.93);
+                }
+
+                if(IsArmed() || IsDepressed())
+                {
+                    // TODO
+                    //Label::Paint();
+                }
+
+#else
 				Label::Paint();
 
 				if (HasFocus() && IsEnabled() && IsDrawingFocusBox())
@@ -516,6 +576,7 @@ namespace vgui2
 					x0 = 3, y0 = 3, x1 = wide - 4, y1 = tall - 2;
 					DrawFocusBorder(x0, y0, x1, y1);
 				}
+#endif
 			}
 		}
 	
@@ -555,6 +616,8 @@ namespace vgui2
 			_brightBorder = pScheme->GetBorder("TitleButtonBorder");
 			_depressedBorder = pScheme->GetBorder("TitleButtonDepressedBorder");
 			_disabledBorder = pScheme->GetBorder("TitleButtonDisabledBorder");
+
+            _imageBackground = false;
 			
 			SetDisabledLook(_disabledLook);
 		}
@@ -1743,7 +1806,11 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	
 	m_flTransitionEffectTime = atof(pScheme->GetResourceString("Frame.TransitionEffectTime"));
 	m_flFocusTransitionEffectTime = atof(pScheme->GetResourceString("Frame.FocusTransitionEffectTime"));
+#ifdef OSX
+    m_bFrameTitleButtonLeft = !!Q_stricmp(pScheme->GetResourceString("Frame.FrameTitleButtonPosition"), "right");
+#else
 	m_bFrameTitleButtonLeft = !Q_stricmp(pScheme->GetResourceString("Frame.FrameTitleButtonPosition"), "left");
+#endif
 
 	m_InFocusBgColor = GetSchemeColor("Frame.BgColor", GetSchemeColor("BgColor", GetBgColor(), pScheme), pScheme);
 	m_OutOfFocusBgColor = GetSchemeColor("Frame.OutOfFocusBgColor", GetSchemeColor("OutOfFocusBgColor", m_InFocusBgColor, pScheme), pScheme);
@@ -1765,6 +1832,9 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	}
 
 	resourceString = pScheme->GetResourceString("Frame.FrameTitlePosition");
+#ifdef OSX
+    resourceString = "center";
+#endif
 	if (!Q_stricmp(resourceString, "center"))
 	{
 		m_iFrameTitleAlign = Label::a_center;

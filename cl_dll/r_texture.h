@@ -13,7 +13,11 @@
 
 #include <memory>
 
+#ifdef XASH_IMGUI
 extern float g_ImGUI_DPI;
+#else
+extern cvar_t *hud_scale;
+#endif
 
 class CTextureRef; // forward decl
 using SharedTexture = std::shared_ptr<CTextureRef>;
@@ -40,7 +44,11 @@ public:
 public:
 	void Draw2DQuadScaled( float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255 ) const noexcept
 	{
+#ifdef XASH_IMGUI
 		Draw2DQuad(x1 * g_ImGUI_DPI, y1 * g_ImGUI_DPI, x2 * g_ImGUI_DPI, y2 * g_ImGUI_DPI, s1, t1, s2, t2, r, g, b, a);
+#else
+        Draw2DQuad(x1 * hud_scale->value, y1 * hud_scale->value, x2 * hud_scale->value, y2 * hud_scale->value, s1, t1, s2, t2, r, g, b, a);
+#endif
 	}
 
 	void Draw2DQuad(float x1, float y1, float x2, float y2, float s1 = 0, float t1 = 0, float s2 = 1, float t2 = 1, byte r = 255, byte g = 255, byte b = 255, byte a = 255) const noexcept

@@ -262,6 +262,10 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_surface.cpp
 )
 
+set(XASH_ENGINE_VGUI2_SOURCES
+
+)
+
 set(XASH_ENGINE_DEDICATED_SOURCES
 	common/dedicated.cpp
 )
@@ -291,6 +295,10 @@ if(XASH_IMGUI)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_IMGUI_SOURCES})
 add_definitions(-DXASH_IMGUI=1)
 endif()
+if(XASH_VGUI2)
+	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_VGUI2_SOURCES})
+	add_definitions(-DXASH_VGUI2=1)
+endif()
 if(XASH_SINGLE_BINARY)
 set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} ${XASH_ENGINE_LAUNCHER_SOURCES})
 endif()
@@ -307,6 +315,7 @@ include_directories(
 	../common
 	../pm_shared
 	../public
+	../SourceSDK/public
 )
 
 if(XASH_NANOGL)
@@ -411,7 +420,13 @@ if(XASH_STATIC_GAMELIB)
 	#target_link_libraries(${XASH_ENGINE} xashmenu)
 	target_link_libraries(${XASH_ENGINE} PRIVATE server)
 	if(NOT XASH_DEDICATED)
-		target_link_libraries(${XASH_ENGINE} PRIVATE xashmenu client)
+		target_link_libraries(${XASH_ENGINE} PRIVATE client)
+		if(XASH_VGUI2)
+			target_link_libraries(${XASH_ENGINE} PUBLIC vgui2_support)
+			target_link_libraries(${XASH_ENGINE} PUBLIC vgui2 GameUI)
+		else()
+			target_link_libraries(${XASH_ENGINE} PRIVATE xashmenu)
+		endif()
 	endif()
 endif()
 
@@ -463,7 +478,7 @@ if(XASH_SDL)
 	set(SDL2_BUILDING_EXECUTABLE ${XASH_SINGLE_BINARY}) # link sdl2main, if needed
 	add_definitions(-DXASH_SDL)
 
-	target_link_libraries(${XASH_ENGINE} PUBLIC sdl2)
+	target_link_libraries(${XASH_ENGINE} PUBLIC 3rdparty-sdl2)
 endif()
 
 if(XASH_GLES)

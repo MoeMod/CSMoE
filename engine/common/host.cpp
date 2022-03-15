@@ -1395,12 +1395,16 @@ Host_Main
 extern "C" int switch_installdll_mainui( void );
 extern "C" int switch_installdll_client( void );
 extern "C" int switch_installdll_server( void );
+extern "C" int switch_installdll_vgui( void );
 int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bChangeGame, pfnChangeGame func )
 {
 #ifdef XASH_STATIC_GAMELIB
 #ifndef XASH_DEDICATED
  	switch_installdll_mainui(); // mainui_cpp/udll_int.cpp
  	switch_installdll_client(); // cl_dll/cdll_int.cpp
+#ifdef XASH_VGUI2
+    switch_installdll_vgui();
+#endif
 #endif
  	switch_installdll_server();
 #endif

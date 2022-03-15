@@ -212,7 +212,7 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 void CPlayerModStrategy_ZBZ::OnSpawn()
 {
 	ClearFire();
-	if (!m_pPlayer->IsPC())
+	if (!m_pPlayer->IsUsingPC())
 	{
 		while (m_iPoint > 0 && UpgradeSkill()) {}
 	}
@@ -350,7 +350,7 @@ void CPlayerModStrategy_ZBZ::AddExp(int exp)
 		m_flExpScale = max(0.0f, m_flExpScale - EXP_SCALE);
 		bLevelUp = true;
 
-		if (!m_pPlayer->IsPC() || m_pPlayer->IsBot())
+		if (!m_pPlayer->IsUsingPC() || m_pPlayer->IsBot())
 		{
 			UpgradeSkill();
 		}
@@ -463,7 +463,7 @@ bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 		MESSAGE_END();
 	}
 
-	if (m_pPlayer->IsPC())
+	if (m_pPlayer->IsUsingPC())
 	{
 #ifndef __DEBUG
 		m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;

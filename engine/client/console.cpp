@@ -136,6 +136,10 @@ void Con_Clear( void )
 	for( i = 0; i < CON_TEXTSIZE; i++ )
 		con.text[i] = ( ColorIndex( COLOR_DEFAULT ) << 8 ) | ' ';
 	con.display = con.current; // go to end
+#ifdef XASH_VGUI2
+    void VGuiWrap2_ClearConsole();
+    VGuiWrap2_ClearConsole();
+#endif
 }
 
 /*
@@ -908,6 +912,10 @@ void Con_Print( const char *txt )
 {
 #if 0 // XASH_IMGUI
 	ImGui_Console_Print(txt);
+#endif
+#ifdef XASH_VGUI2
+    void VGuiWrap2_ConPrintf(const char* msg);
+    VGuiWrap2_ConPrintf(txt);
 #endif
 	int	y, c, l, color;
 

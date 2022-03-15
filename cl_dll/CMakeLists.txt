@@ -352,7 +352,6 @@ set (CLDLL_SOURCES
 	./util.cpp
 	./view.cpp
     ./vgui_parser.cpp
-    ../public/unicode_strtools.cpp
 	./draw_util.cpp
 	./calcscreen.cpp
 	./input_touch.cpp
@@ -379,7 +378,7 @@ include_directories (
 	../dlls/
 	../game_shared/
 	../public/
-	../public/tier1/
+	../SourceSDK/public/
 	)
 
 if(XASH_STATIC_GAMELIB)
@@ -429,6 +428,8 @@ endif()
 if(XASH_LUASH)
 	target_link_libraries( ${CLIENT_LIBRARY} luash)
 endif()
+
+target_link_libraries( ${CLIENT_LIBRARY} platform_config )
 
 if(ANDROID OR IOS)
 	set_target_properties(${CLIENT_LIBRARY} PROPERTIES

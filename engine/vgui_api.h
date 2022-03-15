@@ -27,7 +27,7 @@ typedef struct
 
 // C-Style VGUI enums
 
-enum VGUI_MouseCode
+enum class VGUI_MouseCode
 {
 	MOUSE_LEFT=0,
 	MOUSE_RIGHT,
@@ -35,7 +35,7 @@ enum VGUI_MouseCode
 	MOUSE_LAST
 };
 
-enum VGUI_KeyCode
+enum class VGUI_KeyCode
 {
 	KEY_0=0,
 	KEY_1,
@@ -143,13 +143,13 @@ enum VGUI_KeyCode
 	KEY_LAST
 };
 
-enum VGUI_KeyAction
+enum class VGUI_KeyAction
 {
 	KA_TYPED=0,
 	KA_PRESSED,
 	KA_RELEASED
 };
-enum VGUI_MouseAction
+enum class VGUI_MouseAction
 {
 	MA_PRESSED=0,
 	MA_RELEASED,
@@ -157,7 +157,7 @@ enum VGUI_MouseAction
 	MA_WHEEL
 };
 
-enum VGUI_DefaultCursor
+enum class VGUI_DefaultCursor
 {
 	dc_user,
 	dc_none,

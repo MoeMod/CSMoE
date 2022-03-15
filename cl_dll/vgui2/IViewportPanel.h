@@ -13,7 +13,7 @@
 #ifndef GAME_CLIENT_UI_VGUI2_IVIEWPORTPANEL_H
 #define GAME_CLIENT_UI_VGUI2_IVIEWPORTPANEL_H
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 class KeyValues;
 

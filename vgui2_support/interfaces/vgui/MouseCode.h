@@ -1,7 +1,7 @@
 #ifndef MOUSECODE_H
 #define MOUSECODE_H
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 namespace vgui2
 {

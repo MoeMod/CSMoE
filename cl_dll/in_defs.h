@@ -20,7 +20,7 @@
 #include <WinUser.h>
 #else
 #ifndef PORT_H
-typedef struct point_s{
+typedef struct tagPOINT{
 	int x;
 	int y;
 } POINT;

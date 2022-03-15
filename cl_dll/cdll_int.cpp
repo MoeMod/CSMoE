@@ -537,7 +537,11 @@ extern "C" void DLLEXPORT F(void *pv) {
 			IN_ClientTouchEvent,	// SDL Xash pfnTouchEvent
 			nullptr,	// SDL Xash pfnMoveEvent
 			nullptr,	// SDL Xash pfnLookEvent
+#ifdef XASH_IMGUI
 			HUD_OnGUI,	// SDL Xash pfnOnGUI
+#else
+            nullptr,
+#endif
 			CL_OnPrecache, // CSMoE ext
 	};
 
@@ -594,7 +598,9 @@ static dllexport_t switch_client_exports[] = {
 	{ "HUD_VoiceStatus", (void*)HUD_VoiceStatus },
 	{ "IN_ClientMoveEvent", (void*)IN_ClientMoveEvent}, // Xash3D ext
 	{ "IN_ClientLookEvent", (void*)IN_ClientLookEvent}, // Xash3D ext
+#ifdef XASH_IMGUI
 	{ "HUD_OnGUI", (void*)HUD_OnGUI },
+#endif
 	{ "CL_OnPrecache", (void*)CL_OnPrecache },
 	{ NULL, NULL },
 };

@@ -1,1 +1,1 @@
-#include "SourceSDK/public/tier1/interface.h"
+#include "tier1/interface.h"

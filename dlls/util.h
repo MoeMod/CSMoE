@@ -105,7 +105,7 @@ typedef int BOOL;
 #define HUMAN_GIB_COUNT		6
 #define ALIEN_GIB_COUNT		4
 
-template<class T> class CUtlVector;
+#include <tier1/utlvector.h>
 
 #ifdef CLIENT_DLL
 namespace cl {

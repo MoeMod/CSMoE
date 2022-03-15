@@ -1,7 +1,7 @@
 #ifndef IGAMEUIPANEL_H
 #define IGAMEUIPANEL_H
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 /**
 *	A panel that is part of the client's GameUI (pause menu).

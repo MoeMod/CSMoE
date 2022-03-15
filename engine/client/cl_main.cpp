@@ -1588,6 +1588,10 @@ boost::asio::awaitable<void> CL_PrepVideo( void )
 
 	// must be called after lightmap loading!
 	clgame.dllFuncs.pfnVidInit();
+#ifdef XASH_VGUI2
+    extern int VGui2_VidInit();
+    VGui2_VidInit();
+#endif
 
 	// release unused SpriteTextures
 	for( i = 1; i < MAX_IMAGES; i++ )

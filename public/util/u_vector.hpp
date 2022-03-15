@@ -22,13 +22,11 @@ GNU General Public License for more details.
 #include <array>
 #include <type_traits>
 
-#include "lua.hpp"
+typedef struct lua_State lua_State;
 
 #ifdef __SSE__
 #include <xmmintrin.h>
 #endif
-
-#include "angledef.h"
 
 namespace moe {
 
@@ -295,26 +293,8 @@ inline bool IsNaN_impl(VecType x, std::index_sequence<I...>)
 	return (... || std::isnan(x.template get<I>()));
 }
 
-template<class VecType, std::size_t...I>
-inline void LuaPush_impl(lua_State* L, VecType vec, std::index_sequence<I...>)
-{
-	return (lua_newtable(L), ..., ( // #1 = res
-		lua_pushnumber(L, vec.template get<I>()), // #2 = res[1]
-		lua_rawseti(L, -2, I + 1) // #1
-	));
-}
-template<class VecType, std::size_t...I>
-inline void LuaGet_impl(lua_State* L, int idx, VecType &vec, std::index_sequence<I...>)
-{
-	lua_pushvalue(L, idx);
-	vec = {
-		(lua_rawgeti(L, -1 - (int)I, I + 1), static_cast<typename VecType::value_type>(lua_tonumber(L, -1)))...
-	};
-	lua_pop(L, 1 + (int)sizeof...(I));
-}
-
-	template<class T, std::size_t N, std::size_t Align = alignof(float)>
-	struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>, Align>
+template<class T, std::size_t N, std::size_t Align = alignof(float)>
+struct VectorBase : VectorBase_Gen<T, N, std::make_index_sequence<N>, Align>
 {
 	using Base = VectorBase_Gen<T, N, std::make_index_sequence<N>, Align>;
 	using Base::Base;
@@ -477,14 +457,8 @@ inline void LuaGet_impl(lua_State* L, int idx, VecType &vec, std::index_sequence
 	{
 		return !IsNaN();
 	}
-	void LuaPush(lua_State* L) const
-	{
-		return LuaPush_impl(L, *this, std::make_index_sequence<N>());
-	}
-	void LuaGet(lua_State* L, int idx)
-	{
-		return LuaGet_impl(L, idx, *this, std::make_index_sequence<N>());
-	}
+	void LuaPush(lua_State* L) const;
+	void LuaGet(lua_State* L, int idx);
 };
 
 template<class T, std::size_t N, std::size_t Align> constexpr decltype(auto) VectorAdd(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
@@ -565,55 +539,6 @@ template<class T, std::size_t N, std::size_t Align> inline void VectorMA(VectorB
 template<class T, std::size_t N, std::size_t Align> inline void VectorMA(T scale, VectorBase<T, N, Align> a, VectorBase<T, N, Align> b, VectorBase<T, N, Align> &out)
 {
 	out = fma(scale, a, b);
-}
-	
-template<class T, std::size_t Align> void AngleVectors(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
-{
-	auto sp = sin(DEG2RAD(angles[PITCH]));
-	auto sy = sin(DEG2RAD(angles[YAW]));
-	auto sr = sin(DEG2RAD(angles[ROLL]));
-	auto cp = cos(DEG2RAD(angles[PITCH]));
-	auto cy = cos(DEG2RAD(angles[YAW]));
-	auto cr = cos(DEG2RAD(angles[ROLL]));
-	forward = { cp * cy, cp * sy, -sp };
-	right = { (-sr * sp * cy + -cr * -sy), (-sr * sp * sy + -cr * cy), (-sr * cp) };
-	up = { (cr * sp * cy + -sr * -sy), (cr * sp * sy + -sr * cy), (cr * cp) };
-}
-
-template<class T, std::size_t Align> void AngleVectorsTranspose(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
-{
-	auto sp = sin(DEG2RAD(angles[PITCH]));
-	auto sy = sin(DEG2RAD(angles[YAW]));
-	auto sr = sin(DEG2RAD(angles[ROLL]));
-	auto cp = cos(DEG2RAD(angles[PITCH]));
-	auto cy = cos(DEG2RAD(angles[YAW]));
-	auto cr = cos(DEG2RAD(angles[ROLL]));
-	forward = { cp * cy, sr * sp * cy + cr * -sy, cr * sp * cy + -sr * -sy };
-	right = { cp * sy, ( sr * sp * sy + cr * cy ), ( cr * sp * sy + -sr * cy ) };
-	up = { -sp, sr * cp, cr * cp };
-}
-
-template<class T, std::size_t Align> void VectorAngles(VectorBase<T, 3, Align> forward, VectorBase<T, 3, Align>& angles)
-{
-	if (forward.x == 0 && forward.y == 0)
-	{
-		// fast case
-		angles[YAW] = 0;
-		if (forward.z > 0)
-			angles[PITCH] = 90;
-		else angles[PITCH] = 270;
-	}
-	else
-	{
-		angles[YAW] = RAD2DEG(atan2(forward.y, forward.x));
-		if (angles[YAW] < 0) angles[YAW] += 360;
-
-		auto tmp = hypot(forward.x, forward.y);
-		angles[PITCH] = RAD2DEG(atan2(forward.z, tmp));
-		if (angles[PITCH] < 0) angles[PITCH] += 360;
-	}
-
-	angles[ROLL] = 0;
 }
 
 }

@@ -25,3 +25,15 @@
 [submodule "3rdparty/astc-encoder"]
 	path = 3rdparty/astc-encoder
 	url = https://github.com/ARM-software/astc-encoder/
+[submodule "3rdparty/freetype"]
+	path = 3rdparty/freetype
+	url = https://github.com/freetype/freetype
+[submodule "3rdparty/stb"]
+	path = 3rdparty/stb
+	url = https://github.com/nothings/stb
+[submodule "3rdparty/fontconfig"]
+	path = 3rdparty/fontconfig
+	url = https://gitlab.freedesktop.org/fontconfig/fontconfig
+[submodule "3rdparty/libexpat"]
+	path = 3rdparty/libexpat
+	url = https://github.com/libexpat/libexpat

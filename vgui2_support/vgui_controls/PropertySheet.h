@@ -16,7 +16,7 @@
 #undef PropertySheet
 #endif
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 #include "EditablePanel.h"
 #include "PHandle.h"

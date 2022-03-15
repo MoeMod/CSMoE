@@ -24,9 +24,16 @@ GNU General Public License for more details.
 #endif
 
 #include "util/u_vector.hpp"
+#include "util/u_vector_angle.hpp"
 
-using Vector2D = moe::VectorBase<float, 2>;
-using Vector = vec3_t;
+#ifndef CLIENT_DLL
+namespace sv::moe {
+#else
+namespace cl::moe {
+#endif
+
+using Vector2D = ::moe::VectorBase<float, 2>;
+using Vector = ::moe::VectorBase<float, 3>;
 
 static_assert(sizeof(Vector2D) == sizeof(float[2]), "Vector2D should be compatible with engine");
 #ifdef XASH_SIMD
@@ -34,5 +41,6 @@ static_assert(sizeof(Vector) == sizeof(float[4]) && alignof(Vector) == 16, "Vect
 #else
 static_assert(sizeof(Vector) == sizeof(float[3]), "Vector should be compatible with engine");
 #endif
+}
 
 #endif // VECTOR_H

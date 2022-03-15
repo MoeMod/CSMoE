@@ -2,9 +2,10 @@
 #define ISURFACE_H
 
 #include <interface.h>
-#include "vgui/VGUI2.h"
+#include "vgui/VGUI.h"
 #include "vgui/IHTML.h"
 #include "Color.h"
+#include "mathlib/vector2d.h"  // must be before the namespace line
 
 class IHTMLChromeController;
 class IHTMLResponses;
@@ -20,53 +21,25 @@ namespace vgui2 {
 	typedef unsigned long HTexture;
 	typedef unsigned long HFont;
 
-	struct VGuiVertex
-	{
-		VGuiVertex() {}
-		VGuiVertex(int x, int y, float u = 0, float v = 0)
-			: x(x)
-			, y(y)
-			, u(u)
-			, v(v)
-		{
-		}
-		void Init(int xIn, int yIn, float uIn = 0, float vIn = 0)
-		{
-			this->x = xIn;
-			this->y = yIn;
-			this->u = uIn;
-			this->v = vIn;
-		}
-
-		int x, y;
-		float u, v;
-	};
-
-
 	//SRC only defines
-	//These types aren't used in GoldSource. - Solokiller
-	struct Vertex_t;
-	/*
-	struct Vertex_t
-	{
-		Vertex_t() {}
-		Vertex_t( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
-		void Init( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
+    struct Vertex_t
+    {
+        Vertex_t() {}
+        Vertex_t( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
+        {
+            m_Position = pos;
+            m_TexCoord = coord;
+        }
+        void Init( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
+        {
+            m_Position = pos;
+            m_TexCoord = coord;
+        }
 
-		Vector2D	m_Position;
-		Vector2D	m_TexCoord;
-	};
-	*/
+        Vector2D	m_Position;
+        Vector2D	m_TexCoord;
+    };
 
-	/*
 	enum FontDrawType_t
 	{
 		// Use the "additive" value from the scheme file
@@ -78,7 +51,6 @@ namespace vgui2 {
 
 		FONT_DRAW_TYPE_COUNT = 2,
 	};
-	*/
 
 
 	// Refactor these two
@@ -312,7 +284,7 @@ namespace vgui2 {
 		//virtual void DrawOutlinedCircle(int x, int y, int radius, int segments) = 0;
 		//virtual void DrawTexturedPolyLine( const Vertex_t *p,int n ) = 0; // (Note: this connects the first and last points).
 		//virtual void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 ) = 0;
-		virtual void DrawTexturedPolygon(VGuiVertex *pVertices, int n) = 0;
+		virtual void DrawTexturedPolygon(Vertex_t *pVertices, int n) = 0;
 		virtual int GetFontAscent(HFont font, wchar_t wch) = 0;
 		//virtual const wchar_t *GetTitle(VPANEL panel) = 0;
 		//virtual bool IsCursorLocked( void ) const = 0;

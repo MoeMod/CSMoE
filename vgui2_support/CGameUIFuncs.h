@@ -9,7 +9,7 @@ public:
 	virtual const char  * Key_NameForKey(int);
 	virtual const char  * Key_BindingForKey(int);
 	virtual KeyCode GetVGUI2KeyCodeForBind(const char  *);
-	virtual void GetVideoModes(class vmode_s * *, int *);
+	virtual void GetVideoModes(vmode_t * *, int *);
 	virtual void GetCurrentVideoMode(int *, int *, int *);
 	virtual void GetCurrentRenderer(char *, int, int *, int *, int *, int *);
 	virtual bool IsConnectedToVACSecureServer();

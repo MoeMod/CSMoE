@@ -44,7 +44,7 @@ typedef int qboolean;
 #if _MSC_VER == 1200
 typedef __int64 integer64; //msvc6
 #elif defined (XASH_SDL)
-typedef Uint64 integer64;
+typedef uint64_t integer64;
 #else
 typedef unsigned long long integer64;
 #endif

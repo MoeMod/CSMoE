@@ -2172,9 +2172,8 @@ int Menu::GetCurrentlyHighlightedItem()
 //-----------------------------------------------------------------------------
 // Purpose: Respond to cursor entering a menuItem.
 //-----------------------------------------------------------------------------
-void Menu::OnCursorEnteredMenuItem(int VPanel)
+void Menu::OnCursorEnteredMenuItem(VPANEL menuItem)
 {
-	VPANEL menuItem = (VPANEL)VPanel;
 	// if we are in mouse mode
 	if (m_iInputMode == MOUSE)
 	{
@@ -2190,9 +2189,8 @@ void Menu::OnCursorEnteredMenuItem(int VPanel)
 //-----------------------------------------------------------------------------
 // Purpose: Respond to cursor exiting a menuItem
 //-----------------------------------------------------------------------------
-void Menu::OnCursorExitedMenuItem(int VPanel)
+void Menu::OnCursorExitedMenuItem(VPANEL menuItem)
 {
-	VPANEL menuItem = (VPANEL)VPanel;
 	// only care if we are in mouse mode
 	if (m_iInputMode == MOUSE)
 	{

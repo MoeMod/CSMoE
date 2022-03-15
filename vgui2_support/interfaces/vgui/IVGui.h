@@ -2,7 +2,7 @@
 #define IVGUI_H
 
 #include <interface.h>
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 class KeyValues;
 

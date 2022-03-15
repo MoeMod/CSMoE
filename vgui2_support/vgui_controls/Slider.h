@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include "Panel.h"
 
 namespace vgui2

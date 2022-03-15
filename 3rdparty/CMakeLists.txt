@@ -1,38 +1,16 @@
 cmake_minimum_required(VERSION 3.10.2)
 
-set(SDL2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SDL2 CACHE PATH "SDL2 path")
-
-if(XASH_SDL)
-	add_library(sdl2 INTERFACE)
-	if(XASH_VCPKG)
-		find_package(SDL2 CONFIG REQUIRED)
-		target_link_libraries(sdl2 INTERFACE SDL2::SDL2)
-	else()
-		if(NOT CMAKE_CROSSCOMPILING)
-			find_package(SDL2 QUIET)
-		endif()
-
-		if(SDL2_FOUND)
-			target_link_libraries(sdl2 INTERFACE ${SDL2_LIBRARY})
-			target_include_directories(sdl2 INTERFACE ${SDL2_INCLUDE_DIR})
-			if(MSVC)
-				string(REGEX REPLACE "lib$" "dll" SDL2_DLL "${SDL2_LIBRARY}")
-				install(FILES ${SDL2_LIBRARY} DESTINATION "." OPTIONAL)
-			endif()
-		else()
-			if(MSVC)
-				add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
-			endif()
-			set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
-			set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
-			add_subdirectory(SDL2 EXCLUDE_FROM_ALL)
-			target_link_libraries(sdl2 INTERFACE SDL2-static)
-			if(IOS)
-				target_link_libraries(sdl2 INTERFACE SDL2main)
-			endif()
-		endif()
-	endif()
-
+add_library(3rdparty-sdl2 INTERFACE)
+if(MSVC)
+	add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
+endif()
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
+set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
+add_subdirectory(sdl2 EXCLUDE_FROM_ALL)
+target_link_libraries(3rdparty-sdl2 INTERFACE SDL2-static)
+if(IOS)
+	target_link_libraries(3rdparty-sdl2 INTERFACE SDL2main)
 endif()
 
 find_package(LuaJit QUIET)
@@ -106,8 +84,32 @@ target_link_libraries(json_3p INTERFACE nlohmann_json::nlohmann_json)
 
 set(UNITTEST OFF)
 set(CLI OFF)
+set(DIAGNOSTICS OFF)
 set(UNIVERSAL_BUILD OFF)
 set(ISA_AVX2 OFF) # dont build avx2
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/astc-encoder EXCLUDE_FROM_ALL)
 add_library(astcenc_3p INTERFACE)
 target_link_libraries(astcenc_3p INTERFACE astcenc-native-static)
+
+set(BUILD_SHARED_LIBS OFF)
+set(BUILD_FRAMEWORK OFF)
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/freetype EXCLUDE_FROM_ALL)
+add_library(3rdparty-freetype INTERFACE)
+target_link_libraries(3rdparty-freetype INTERFACE freetype)
+target_include_directories(3rdparty-freetype INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/freetype/include)
+
+add_library(3rdparty-stb INTERFACE)
+target_include_directories(3rdparty-stb INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/stb)
+
+add_library(3rdparty-expat INTERFACE)
+set(EXPAT_SHARED_LIBS OFF)
+set(EXPAT_BUILD_DOCS OFF)
+set(EXPAT_BUILD_PKGCONFIG OFF)
+set(EXPAT_BUILD_EXAMPLES OFF)
+set(EXPAT_BUILD_TESTS OFF)
+set(EXPAT_BUILD_TOOLS OFF)
+set(EXPAT_ENABLE_INSTALL OFF)
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/libexpat/expat EXCLUDE_FROM_ALL)
+target_link_libraries(3rdparty-expat INTERFACE expat)
+
+add_subdirectory(fontconfig-cmake)

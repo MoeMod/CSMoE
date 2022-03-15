@@ -88,21 +88,21 @@ void VGUI_InitCursors( void )
 {
 	// load up all default cursors
 #ifdef XASH_SDL
-	s_pDefaultCursor[dc_none] = NULL;
-	s_pDefaultCursor[dc_arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	s_pDefaultCursor[dc_ibeam] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-	s_pDefaultCursor[dc_hourglass]= SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
-	s_pDefaultCursor[dc_crosshair]= SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
-	s_pDefaultCursor[dc_up] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-	s_pDefaultCursor[dc_sizenwse] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
-	s_pDefaultCursor[dc_sizenesw] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
-	s_pDefaultCursor[dc_sizewe] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
-	s_pDefaultCursor[dc_sizens] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-	s_pDefaultCursor[dc_sizeall] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-	s_pDefaultCursor[dc_no] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
-	s_pDefaultCursor[dc_hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_none] = NULL;
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_ibeam] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_hourglass]= SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_crosshair]= SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_CROSSHAIR);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_up] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_sizenwse] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_sizenesw] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_sizewe] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_sizens] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_sizeall] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_no] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+	s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
 	//host.mouse_visible = true;
-	SDL_SetCursor( s_pDefaultCursor[dc_arrow] );
+	SDL_SetCursor( s_pDefaultCursor[(int)VGUI_DefaultCursor::dc_arrow] );
 #endif
 }
 
@@ -114,8 +114,8 @@ void GAME_EXPORT VGUI_CursorSelect(enum VGUI_DefaultCursor cursor )
 	
 	switch( cursor )
 	{
-		case dc_user:
-		case dc_none:
+		case VGUI_DefaultCursor::dc_user:
+		case VGUI_DefaultCursor::dc_none:
 			visible = false;
 			break;
 		default:
@@ -127,7 +127,7 @@ void GAME_EXPORT VGUI_CursorSelect(enum VGUI_DefaultCursor cursor )
 	if( host.mouse_visible )
 	{
 		SDL_SetRelativeMouseMode( SDL_FALSE );
-		SDL_SetCursor( s_pDefaultCursor[cursor] );
+		SDL_SetCursor( s_pDefaultCursor[(int)cursor] );
 		SDL_ShowCursor( true );
 	}
 	else
@@ -270,7 +270,11 @@ void VGui_Startup( int width, int height )
 		if( !vguiloader[0] && !Sys_GetParmFromCmdLine( "-vguiloader", vguiloader ) )
 			Q_strncpy( vguiloader, VGUI_SUPPORT_DLL, 256 );
 
+#ifdef XASH_STATIC_GAMELIB
+        s_pVGuiSupport = Com_LoadLibrary( "vgui2_support", false );
+#else
 		s_pVGuiSupport = Com_LoadLibrary( VGUI2_SUPPORT_DLL, false );
+#endif
 		
 		if( !s_pVGuiSupport )
 		{
@@ -366,110 +370,110 @@ void VGUI_InitKeyTranslationTable( void )
 	// set virtual key translation table
 	Q_memset( s_pVirtualKeyTrans, -1, sizeof( s_pVirtualKeyTrans ) );
 
-	s_pVirtualKeyTrans['0'] = KEY_0;
-	s_pVirtualKeyTrans['1'] = KEY_1;
-	s_pVirtualKeyTrans['2'] = KEY_2;
-	s_pVirtualKeyTrans['3'] = KEY_3;
-	s_pVirtualKeyTrans['4'] = KEY_4;
-	s_pVirtualKeyTrans['5'] = KEY_5;
-	s_pVirtualKeyTrans['6'] = KEY_6;
-	s_pVirtualKeyTrans['7'] = KEY_7;
-	s_pVirtualKeyTrans['8'] = KEY_8;
-	s_pVirtualKeyTrans['9'] = KEY_9;
-	s_pVirtualKeyTrans['A'] = s_pVirtualKeyTrans['a'] = KEY_A;
-	s_pVirtualKeyTrans['B'] = s_pVirtualKeyTrans['b'] = KEY_B;
-	s_pVirtualKeyTrans['C'] = s_pVirtualKeyTrans['c'] = KEY_C;
-	s_pVirtualKeyTrans['D'] = s_pVirtualKeyTrans['d'] = KEY_D;
-	s_pVirtualKeyTrans['E'] = s_pVirtualKeyTrans['e'] = KEY_E;
-	s_pVirtualKeyTrans['F'] = s_pVirtualKeyTrans['f'] = KEY_F;
-	s_pVirtualKeyTrans['G'] = s_pVirtualKeyTrans['g'] = KEY_G;
-	s_pVirtualKeyTrans['H'] = s_pVirtualKeyTrans['h'] = KEY_H;
-	s_pVirtualKeyTrans['I'] = s_pVirtualKeyTrans['i'] = KEY_I;
-	s_pVirtualKeyTrans['J'] = s_pVirtualKeyTrans['j'] = KEY_J;
-	s_pVirtualKeyTrans['K'] = s_pVirtualKeyTrans['k'] = KEY_K;
-	s_pVirtualKeyTrans['L'] = s_pVirtualKeyTrans['l'] = KEY_L;
-	s_pVirtualKeyTrans['M'] = s_pVirtualKeyTrans['m'] = KEY_M;
-	s_pVirtualKeyTrans['N'] = s_pVirtualKeyTrans['n'] = KEY_N;
-	s_pVirtualKeyTrans['O'] = s_pVirtualKeyTrans['o'] = KEY_O;
-	s_pVirtualKeyTrans['P'] = s_pVirtualKeyTrans['p'] = KEY_P;
-	s_pVirtualKeyTrans['Q'] = s_pVirtualKeyTrans['q'] = KEY_Q;
-	s_pVirtualKeyTrans['R'] = s_pVirtualKeyTrans['r'] = KEY_R;
-	s_pVirtualKeyTrans['S'] = s_pVirtualKeyTrans['s'] = KEY_S;
-	s_pVirtualKeyTrans['T'] = s_pVirtualKeyTrans['t'] = KEY_T;
-	s_pVirtualKeyTrans['U'] = s_pVirtualKeyTrans['u'] = KEY_U;
-	s_pVirtualKeyTrans['V'] = s_pVirtualKeyTrans['v'] = KEY_V;
-	s_pVirtualKeyTrans['W'] = s_pVirtualKeyTrans['w'] = KEY_W;
-	s_pVirtualKeyTrans['X'] = s_pVirtualKeyTrans['x'] = KEY_X;
-	s_pVirtualKeyTrans['Y'] = s_pVirtualKeyTrans['y'] = KEY_Y;
-	s_pVirtualKeyTrans['Z'] = s_pVirtualKeyTrans['z'] = KEY_Z;
+	s_pVirtualKeyTrans['0'] = VGUI_KeyCode::KEY_0;
+	s_pVirtualKeyTrans['1'] = VGUI_KeyCode::KEY_1;
+	s_pVirtualKeyTrans['2'] = VGUI_KeyCode::KEY_2;
+	s_pVirtualKeyTrans['3'] = VGUI_KeyCode::KEY_3;
+	s_pVirtualKeyTrans['4'] = VGUI_KeyCode::KEY_4;
+	s_pVirtualKeyTrans['5'] = VGUI_KeyCode::KEY_5;
+	s_pVirtualKeyTrans['6'] = VGUI_KeyCode::KEY_6;
+	s_pVirtualKeyTrans['7'] = VGUI_KeyCode::KEY_7;
+	s_pVirtualKeyTrans['8'] = VGUI_KeyCode::KEY_8;
+	s_pVirtualKeyTrans['9'] = VGUI_KeyCode::KEY_9;
+	s_pVirtualKeyTrans['A'] = s_pVirtualKeyTrans['a'] = VGUI_KeyCode::KEY_A;
+	s_pVirtualKeyTrans['B'] = s_pVirtualKeyTrans['b'] = VGUI_KeyCode::KEY_B;
+	s_pVirtualKeyTrans['C'] = s_pVirtualKeyTrans['c'] = VGUI_KeyCode::KEY_C;
+	s_pVirtualKeyTrans['D'] = s_pVirtualKeyTrans['d'] = VGUI_KeyCode::KEY_D;
+	s_pVirtualKeyTrans['E'] = s_pVirtualKeyTrans['e'] = VGUI_KeyCode::KEY_E;
+	s_pVirtualKeyTrans['F'] = s_pVirtualKeyTrans['f'] = VGUI_KeyCode::KEY_F;
+	s_pVirtualKeyTrans['G'] = s_pVirtualKeyTrans['g'] = VGUI_KeyCode::KEY_G;
+	s_pVirtualKeyTrans['H'] = s_pVirtualKeyTrans['h'] = VGUI_KeyCode::KEY_H;
+	s_pVirtualKeyTrans['I'] = s_pVirtualKeyTrans['i'] = VGUI_KeyCode::KEY_I;
+	s_pVirtualKeyTrans['J'] = s_pVirtualKeyTrans['j'] = VGUI_KeyCode::KEY_J;
+	s_pVirtualKeyTrans['K'] = s_pVirtualKeyTrans['k'] = VGUI_KeyCode::KEY_K;
+	s_pVirtualKeyTrans['L'] = s_pVirtualKeyTrans['l'] = VGUI_KeyCode::KEY_L;
+	s_pVirtualKeyTrans['M'] = s_pVirtualKeyTrans['m'] = VGUI_KeyCode::KEY_M;
+	s_pVirtualKeyTrans['N'] = s_pVirtualKeyTrans['n'] = VGUI_KeyCode::KEY_N;
+	s_pVirtualKeyTrans['O'] = s_pVirtualKeyTrans['o'] = VGUI_KeyCode::KEY_O;
+	s_pVirtualKeyTrans['P'] = s_pVirtualKeyTrans['p'] = VGUI_KeyCode::KEY_P;
+	s_pVirtualKeyTrans['Q'] = s_pVirtualKeyTrans['q'] = VGUI_KeyCode::KEY_Q;
+	s_pVirtualKeyTrans['R'] = s_pVirtualKeyTrans['r'] = VGUI_KeyCode::KEY_R;
+	s_pVirtualKeyTrans['S'] = s_pVirtualKeyTrans['s'] = VGUI_KeyCode::KEY_S;
+	s_pVirtualKeyTrans['T'] = s_pVirtualKeyTrans['t'] = VGUI_KeyCode::KEY_T;
+	s_pVirtualKeyTrans['U'] = s_pVirtualKeyTrans['u'] = VGUI_KeyCode::KEY_U;
+	s_pVirtualKeyTrans['V'] = s_pVirtualKeyTrans['v'] = VGUI_KeyCode::KEY_V;
+	s_pVirtualKeyTrans['W'] = s_pVirtualKeyTrans['w'] = VGUI_KeyCode::KEY_W;
+	s_pVirtualKeyTrans['X'] = s_pVirtualKeyTrans['x'] = VGUI_KeyCode::KEY_X;
+	s_pVirtualKeyTrans['Y'] = s_pVirtualKeyTrans['y'] = VGUI_KeyCode::KEY_Y;
+	s_pVirtualKeyTrans['Z'] = s_pVirtualKeyTrans['z'] = VGUI_KeyCode::KEY_Z;
 
-	s_pVirtualKeyTrans[K_KP_5 - 5] = KEY_PAD_0;
-	s_pVirtualKeyTrans[K_KP_5 - 4] = KEY_PAD_1;
-	s_pVirtualKeyTrans[K_KP_5 - 3] = KEY_PAD_2;
-	s_pVirtualKeyTrans[K_KP_5 - 2] = KEY_PAD_3;
-	s_pVirtualKeyTrans[K_KP_5 - 1] = KEY_PAD_4;
-	s_pVirtualKeyTrans[K_KP_5 - 0] = KEY_PAD_5;
-	s_pVirtualKeyTrans[K_KP_5 + 1] = KEY_PAD_6;
-	s_pVirtualKeyTrans[K_KP_5 + 2] = KEY_PAD_7;
-	s_pVirtualKeyTrans[K_KP_5 + 3] = KEY_PAD_8;
-	s_pVirtualKeyTrans[K_KP_5 + 4] = KEY_PAD_9;
-	s_pVirtualKeyTrans[K_KP_SLASH]	= KEY_PAD_DIVIDE;
-	s_pVirtualKeyTrans['*'] = KEY_PAD_MULTIPLY;
-	s_pVirtualKeyTrans[K_KP_MINUS] = KEY_PAD_MINUS;
-	s_pVirtualKeyTrans[K_KP_PLUS] = KEY_PAD_PLUS;
-	s_pVirtualKeyTrans[K_KP_ENTER]	= KEY_PAD_ENTER;
-	//s_pVirtualKeyTrans[K_KP_DECIMAL] = KEY_PAD_DECIMAL;
-	s_pVirtualKeyTrans['['] = KEY_LBRACKET;
-	s_pVirtualKeyTrans[']'] = KEY_RBRACKET;
-	s_pVirtualKeyTrans[';'] = KEY_SEMICOLON;
-	s_pVirtualKeyTrans['\''] = KEY_APOSTROPHE;
-	s_pVirtualKeyTrans['`'] = KEY_BACKQUOTE;
-	s_pVirtualKeyTrans[','] = KEY_COMMA;
-	s_pVirtualKeyTrans['.'] = KEY_PERIOD;
-	s_pVirtualKeyTrans[K_KP_SLASH] = KEY_SLASH;
-	s_pVirtualKeyTrans['\\'] = KEY_BACKSLASH;
-	s_pVirtualKeyTrans['-'] = KEY_MINUS;
-	s_pVirtualKeyTrans['='] = KEY_EQUAL;
-	s_pVirtualKeyTrans[K_ENTER]	= KEY_ENTER;
-	s_pVirtualKeyTrans[K_SPACE] = KEY_SPACE;
-	s_pVirtualKeyTrans[K_BACKSPACE] = KEY_BACKSPACE;
-	s_pVirtualKeyTrans[K_TAB] = KEY_TAB;
-	s_pVirtualKeyTrans[K_CAPSLOCK] = KEY_CAPSLOCK;
-	s_pVirtualKeyTrans[K_KP_NUMLOCK] = KEY_NUMLOCK;
-	s_pVirtualKeyTrans[K_ESCAPE]	= KEY_ESCAPE;
-	//s_pVirtualKeyTrans[K_KP_SCROLLLOCK]	= KEY_SCROLLLOCK;
-	s_pVirtualKeyTrans[K_INS]	= KEY_INSERT;
-	s_pVirtualKeyTrans[K_DEL]	= KEY_DELETE;
-	s_pVirtualKeyTrans[K_HOME] = KEY_HOME;
-	s_pVirtualKeyTrans[K_END] = KEY_END;
-	s_pVirtualKeyTrans[K_PGUP] = KEY_PAGEUP;
-	s_pVirtualKeyTrans[K_PGDN] = KEY_PAGEDOWN;
-	s_pVirtualKeyTrans[K_PAUSE] = KEY_BREAK;
-	//s_pVirtualKeyTrans[K_SHIFT] = KEY_RSHIFT;
-	s_pVirtualKeyTrans[K_SHIFT] = KEY_LSHIFT;	// SHIFT -> left SHIFT
-	//s_pVirtualKeyTrans[SDLK_RALT] = KEY_RALT;
-	s_pVirtualKeyTrans[K_ALT] = KEY_LALT;		// ALT -> left ALT
-	//s_pVirtualKeyTrans[SDLK_RCTRL] = KEY_RCONTROL;
-	s_pVirtualKeyTrans[K_CTRL] = KEY_LCONTROL;	// CTRL -> left CTRL
-	s_pVirtualKeyTrans[K_WIN] = KEY_LWIN;
-	//s_pVirtualKeyTrans[SDLK_APPLICATION] = KEY_RWIN;
-	//s_pVirtualKeyTrans[K_WIN] = KEY_APP;
-	s_pVirtualKeyTrans[K_UPARROW] = KEY_UP;
-	s_pVirtualKeyTrans[K_LEFTARROW] = KEY_LEFT;
-	s_pVirtualKeyTrans[K_DOWNARROW] = KEY_DOWN;
-	s_pVirtualKeyTrans[K_RIGHTARROW] = KEY_RIGHT;
-	s_pVirtualKeyTrans[K_F1] = KEY_F1;
-	s_pVirtualKeyTrans[K_F2] = KEY_F2;
-	s_pVirtualKeyTrans[K_F3] = KEY_F3;
-	s_pVirtualKeyTrans[K_F4] = KEY_F4;
-	s_pVirtualKeyTrans[K_F5] = KEY_F5;
-	s_pVirtualKeyTrans[K_F6] = KEY_F6;
-	s_pVirtualKeyTrans[K_F7] = KEY_F7;
-	s_pVirtualKeyTrans[K_F8] = KEY_F8;
-	s_pVirtualKeyTrans[K_F9] = KEY_F9;
-	s_pVirtualKeyTrans[K_F10] = KEY_F10;
-	s_pVirtualKeyTrans[K_F11] = KEY_F11;
-	s_pVirtualKeyTrans[K_F12] = KEY_F12;
+	s_pVirtualKeyTrans[K_KP_5 - 5] = VGUI_KeyCode::KEY_PAD_0;
+	s_pVirtualKeyTrans[K_KP_5 - 4] = VGUI_KeyCode::KEY_PAD_1;
+	s_pVirtualKeyTrans[K_KP_5 - 3] = VGUI_KeyCode::KEY_PAD_2;
+	s_pVirtualKeyTrans[K_KP_5 - 2] = VGUI_KeyCode::KEY_PAD_3;
+	s_pVirtualKeyTrans[K_KP_5 - 1] = VGUI_KeyCode::KEY_PAD_4;
+	s_pVirtualKeyTrans[K_KP_5 - 0] = VGUI_KeyCode::KEY_PAD_5;
+	s_pVirtualKeyTrans[K_KP_5 + 1] = VGUI_KeyCode::KEY_PAD_6;
+	s_pVirtualKeyTrans[K_KP_5 + 2] = VGUI_KeyCode::KEY_PAD_7;
+	s_pVirtualKeyTrans[K_KP_5 + 3] = VGUI_KeyCode::KEY_PAD_8;
+	s_pVirtualKeyTrans[K_KP_5 + 4] = VGUI_KeyCode::KEY_PAD_9;
+	s_pVirtualKeyTrans[K_KP_SLASH]	= VGUI_KeyCode::KEY_PAD_DIVIDE;
+	s_pVirtualKeyTrans['*'] = VGUI_KeyCode::KEY_PAD_MULTIPLY;
+	s_pVirtualKeyTrans[K_KP_MINUS] = VGUI_KeyCode::KEY_PAD_MINUS;
+	s_pVirtualKeyTrans[K_KP_PLUS] = VGUI_KeyCode::KEY_PAD_PLUS;
+	s_pVirtualKeyTrans[K_KP_ENTER]	= VGUI_KeyCode::KEY_PAD_ENTER;
+	//s_pVirtualKeyTrans[K_KP_DECIMAL] = VGUI_KeyCode::KEY_PAD_DECIMAL;
+	s_pVirtualKeyTrans['['] = VGUI_KeyCode::KEY_LBRACKET;
+	s_pVirtualKeyTrans[']'] = VGUI_KeyCode::KEY_RBRACKET;
+	s_pVirtualKeyTrans[';'] = VGUI_KeyCode::KEY_SEMICOLON;
+	s_pVirtualKeyTrans['\''] = VGUI_KeyCode::KEY_APOSTROPHE;
+	s_pVirtualKeyTrans['`'] = VGUI_KeyCode::KEY_BACKQUOTE;
+	s_pVirtualKeyTrans[','] = VGUI_KeyCode::KEY_COMMA;
+	s_pVirtualKeyTrans['.'] = VGUI_KeyCode::KEY_PERIOD;
+	s_pVirtualKeyTrans[K_KP_SLASH] = VGUI_KeyCode::KEY_SLASH;
+	s_pVirtualKeyTrans['\\'] = VGUI_KeyCode::KEY_BACKSLASH;
+	s_pVirtualKeyTrans['-'] = VGUI_KeyCode::KEY_MINUS;
+	s_pVirtualKeyTrans['='] = VGUI_KeyCode::KEY_EQUAL;
+	s_pVirtualKeyTrans[K_ENTER]	= VGUI_KeyCode::KEY_ENTER;
+	s_pVirtualKeyTrans[K_SPACE] = VGUI_KeyCode::KEY_SPACE;
+	s_pVirtualKeyTrans[K_BACKSPACE] = VGUI_KeyCode::KEY_BACKSPACE;
+	s_pVirtualKeyTrans[K_TAB] = VGUI_KeyCode::KEY_TAB;
+	s_pVirtualKeyTrans[K_CAPSLOCK] = VGUI_KeyCode::KEY_CAPSLOCK;
+	s_pVirtualKeyTrans[K_KP_NUMLOCK] = VGUI_KeyCode::KEY_NUMLOCK;
+	s_pVirtualKeyTrans[K_ESCAPE]	= VGUI_KeyCode::KEY_ESCAPE;
+	//s_pVirtualKeyTrans[K_KP_SCROLLLOCK]	= VGUI_KeyCode::KEY_SCROLLLOCK;
+	s_pVirtualKeyTrans[K_INS]	= VGUI_KeyCode::KEY_INSERT;
+	s_pVirtualKeyTrans[K_DEL]	= VGUI_KeyCode::KEY_DELETE;
+	s_pVirtualKeyTrans[K_HOME] = VGUI_KeyCode::KEY_HOME;
+	s_pVirtualKeyTrans[K_END] = VGUI_KeyCode::KEY_END;
+	s_pVirtualKeyTrans[K_PGUP] = VGUI_KeyCode::KEY_PAGEUP;
+	s_pVirtualKeyTrans[K_PGDN] = VGUI_KeyCode::KEY_PAGEDOWN;
+	s_pVirtualKeyTrans[K_PAUSE] = VGUI_KeyCode::KEY_BREAK;
+	//s_pVirtualKeyTrans[K_SHIFT] = VGUI_KeyCode::KEY_RSHIFT;
+	s_pVirtualKeyTrans[K_SHIFT] = VGUI_KeyCode::KEY_LSHIFT;	// SHIFT -> left SHIFT
+	//s_pVirtualKeyTrans[SDLK_RALT] = VGUI_KeyCode::KEY_RALT;
+	s_pVirtualKeyTrans[K_ALT] = VGUI_KeyCode::KEY_LALT;		// ALT -> left ALT
+	//s_pVirtualKeyTrans[SDLK_RCTRL] = VGUI_KeyCode::KEY_RCONTROL;
+	s_pVirtualKeyTrans[K_CTRL] = VGUI_KeyCode::KEY_LCONTROL;	// CTRL -> left CTRL
+	s_pVirtualKeyTrans[K_WIN] = VGUI_KeyCode::KEY_LWIN;
+	//s_pVirtualKeyTrans[SDLK_APPLICATION] = VGUI_KeyCode::KEY_RWIN;
+	//s_pVirtualKeyTrans[K_WIN] = VGUI_KeyCode::KEY_APP;
+	s_pVirtualKeyTrans[K_UPARROW] = VGUI_KeyCode::KEY_UP;
+	s_pVirtualKeyTrans[K_LEFTARROW] = VGUI_KeyCode::KEY_LEFT;
+	s_pVirtualKeyTrans[K_DOWNARROW] = VGUI_KeyCode::KEY_DOWN;
+	s_pVirtualKeyTrans[K_RIGHTARROW] = VGUI_KeyCode::KEY_RIGHT;
+	s_pVirtualKeyTrans[K_F1] = VGUI_KeyCode::KEY_F1;
+	s_pVirtualKeyTrans[K_F2] = VGUI_KeyCode::KEY_F2;
+	s_pVirtualKeyTrans[K_F3] = VGUI_KeyCode::KEY_F3;
+	s_pVirtualKeyTrans[K_F4] = VGUI_KeyCode::KEY_F4;
+	s_pVirtualKeyTrans[K_F5] = VGUI_KeyCode::KEY_F5;
+	s_pVirtualKeyTrans[K_F6] = VGUI_KeyCode::KEY_F6;
+	s_pVirtualKeyTrans[K_F7] = VGUI_KeyCode::KEY_F7;
+	s_pVirtualKeyTrans[K_F8] = VGUI_KeyCode::KEY_F8;
+	s_pVirtualKeyTrans[K_F9] = VGUI_KeyCode::KEY_F9;
+	s_pVirtualKeyTrans[K_F10] = VGUI_KeyCode::KEY_F10;
+	s_pVirtualKeyTrans[K_F11] = VGUI_KeyCode::KEY_F11;
+	s_pVirtualKeyTrans[K_F12] = VGUI_KeyCode::KEY_F12;
 }
 
 enum VGUI_KeyCode VGUI_MapKey( int keyCode )
@@ -500,28 +504,28 @@ void VGui_KeyEvent( int key, int down )
 	switch( key )
 	{
 	case K_MOUSE1:
-		vgui.Mouse( down?MA_PRESSED:MA_RELEASED, MOUSE_LEFT );
+		vgui.Mouse( down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_LEFT );
 		return;
 	case K_MOUSE2:
-		vgui.Mouse( down?MA_PRESSED:MA_RELEASED, MOUSE_RIGHT );
+		vgui.Mouse( down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_RIGHT );
 		return;
 	case K_MOUSE3:
-		vgui.Mouse( down?MA_PRESSED:MA_RELEASED, MOUSE_MIDDLE );
+		vgui.Mouse( down?VGUI_MouseAction::MA_PRESSED:VGUI_MouseAction::MA_RELEASED, (int)VGUI_MouseCode::MOUSE_MIDDLE );
 		return;
 	case K_MWHEELDOWN:
-		vgui.Mouse( MA_WHEEL, 1 );
+		vgui.Mouse( VGUI_MouseAction::MA_WHEEL, 1 );
 		return;
 	case K_MWHEELUP:
-		vgui.Mouse( MA_WHEEL, -1 );
+		vgui.Mouse( VGUI_MouseAction::MA_WHEEL, -1 );
 		return;
 	default:
 		break;
 	}
 
 	if( down == 2 )
-		vgui.Key( KA_TYPED, VGUI_MapKey( key ) );
+		vgui.Key( VGUI_KeyAction::KA_TYPED, VGUI_MapKey( key ) );
 	else
-		vgui.Key( down?KA_PRESSED:KA_RELEASED, VGUI_MapKey( key ) );
+		vgui.Key( down?VGUI_KeyAction::KA_PRESSED:VGUI_KeyAction::KA_RELEASED, VGUI_MapKey( key ) );
 	//Msg("VGui_KeyEvent %d %d %d\n", key, VGUI_MapKey( key ), down );
 }
 

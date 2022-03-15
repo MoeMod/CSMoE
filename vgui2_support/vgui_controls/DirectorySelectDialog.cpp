@@ -1,4 +1,4 @@
-//========= Copyright ?1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -6,24 +6,25 @@
 
 #define PROTECTED_THINGS_DISABLE
 
-#include "DirectorySelectDialog.h"
-#include "Button.h"
-#include "ComboBox.h"
-#include "TreeView.h"
-#include "ImageList.h"
-#include "MessageBox.h"
-
-#include <tier1/KeyValues.h>
-
+#include <vgui_controls/Button.h>
+#include <vgui_controls/ComboBox.h>
+#include <vgui_controls/DirectorySelectDialog.h>
+#include <vgui_controls/TreeView.h>
+#include <vgui_controls/ImageList.h>
+#include <vgui_controls/MessageBox.h>
 #include <vgui/Cursor.h>
+#include <KeyValues.h>
 #include <vgui/IInput.h>
 #include <vgui/IInputInternal.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
+#include <filesystem.h>
 
+#ifdef WIN32
 #include <direct.h>
 #include <stdio.h>
 #include <io.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -32,26 +33,15 @@
 
 using namespace vgui2;
 
-//-----------------------------------------------------------------------------
-// Purpose: Used to handle dynamically populating the tree view
-//-----------------------------------------------------------------------------
-class DirectoryTreeView : public TreeView
+DirectoryTreeView::DirectoryTreeView(DirectorySelectDialog *parent, const char *name) : TreeView(parent, name)
 {
-public:
-	DirectoryTreeView(DirectorySelectDialog *parent, const char *name) : TreeView(parent, name)
-	{
-		m_pParent = parent;
-	}
+	m_pParent = parent;
+}
 
-	virtual void GenerateChildrenOfNode(int itemIndex)
-	{
-		m_pParent->GenerateChildrenOfDirectoryNode(itemIndex);
-	}
-
-private:
-	DirectorySelectDialog *m_pParent;
-};
-
+void DirectoryTreeView::GenerateChildrenOfNode(int itemIndex)
+{
+	m_pParent->GenerateChildrenOfDirectoryNode(itemIndex);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Used to prompt the user to create a directory
@@ -396,26 +386,22 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex
 	char searchString[512];
 	sprintf(searchString, "%s*.*", path);
 
-	_finddata_t wfd;
-	memset(&wfd, 0, sizeof(_finddata_t));
-	long hResult = _findfirst(searchString, &wfd);
-	if (hResult != -1)
+	FileFindHandle_t h;
+	const char *pFileName = g_pFullFileSystem->FindFirst( searchString, &h );
+	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
-		do
-		{
-			if ((wfd.attrib & _A_SUBDIR) && wfd.name[0] != '.')
-			{
-				KeyValues *kv = new KeyValues("item");
-				kv->SetString("Text", wfd.name);
-				// set the folder image
-				kv->SetInt("Image", 1);
-				kv->SetInt("SelectedImage", 1);
-				kv->SetInt("Expand", DoesDirectoryHaveSubdirectories(path, wfd.name));	
-				m_pDirTree->AddItem(kv, parentNodeIndex);
-			}
-		} while (_findnext(hResult, &wfd) == 0);
-		_findclose(hResult);
+		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
+			continue;
+
+		KeyValues *kv = new KeyValues("item");
+		kv->SetString("Text", pFileName);
+		// set the folder image
+		kv->SetInt("Image", 1);
+		kv->SetInt("SelectedImage", 1);
+		kv->SetInt("Expand", DoesDirectoryHaveSubdirectories(path, pFileName));	
+		m_pDirTree->AddItem(kv, parentNodeIndex);
 	}
+	g_pFullFileSystem->FindClose( h );
 }
 
 //-----------------------------------------------------------------------------
@@ -426,21 +412,20 @@ bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, co
 	char searchString[512];
 	sprintf(searchString, "%s%s\\*.*", path, dir);
 
-	_finddata_t wfd;
-	memset(&wfd, 0, sizeof(_finddata_t));
-	long hResult = _findfirst(searchString, &wfd);
-	if (hResult != -1)
+	FileFindHandle_t h;
+	const char *pFileName = g_pFullFileSystem->FindFirst( searchString, &h );
+	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
-		do
+		char szFullPath[ MAX_PATH ];
+		Q_snprintf( szFullPath, sizeof(szFullPath), "%s\\%s", path, pFileName );
+		Q_FixSlashes( szFullPath ); 
+		if ( g_pFullFileSystem->IsDirectory( szFullPath ) )
 		{
-			if ((wfd.attrib & _A_SUBDIR) && wfd.name[0] != '.')
-			{
-				_findclose(hResult);
-				return true;
-			}
-		} while (_findnext(hResult, &wfd) == 0);
-		_findclose(hResult);
+			g_pFullFileSystem->FindClose( h );
+			return true;
+		}
 	}
+	g_pFullFileSystem->FindClose( h );
 	return false;
 }
 

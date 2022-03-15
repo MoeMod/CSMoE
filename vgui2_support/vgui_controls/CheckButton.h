@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include "ToggleButton.h"
 
 class CheckImage;
@@ -62,7 +62,7 @@ private:
 	Color _selectedFgColor;
 	Color _disabledFgColor;
 	Color _disabledBgColor;
-	friend class CheckImage;
+	friend CheckImage;
 };
 
 } // namespace vgui

@@ -672,6 +672,10 @@ void SCR_VidInit( void )
 	// vid_state has changed
 	if( menu.hInstance ) menu.dllFuncs.pfnVidInit();
 	if( clgame.hInstance ) clgame.dllFuncs.pfnVidInit();
+#ifdef XASH_VGUI2
+    extern int VGui2_VidInit();
+    if( clgame.hInstance ) VGui2_VidInit();
+#endif
 
 	// restart console size
 	Con_VidInit ();

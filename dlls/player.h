@@ -716,14 +716,14 @@ public:
 			pev->weapons &= ~WEAPON_ALLWEAPONS;
 	}
 	void EXPORT PlayerTouch(CBaseEntity* other) {}
-	bool IsPC() { return true; }
+	bool IsUsingPC() { return true; }
 #else
 	virtual void OnBecomeZombie(ZombieLevel iEvolutionLevel) {} // moved to mod_zb1.cpp -> CZombie_ZB1::CZombie_ZB1()
 	virtual bool Knockback(CBasePlayer *attacker, const KnockbackData &data);
 	void RemoveWeapon(int iWeaponID);
 	void ClearWeapon(bool removeSuit = false);
 	void EXPORT PlayerTouch(CBaseEntity* other);
-	bool IsPC();
+	bool IsUsingPC();
 #endif
 
 	void SpawnProtection_Check();

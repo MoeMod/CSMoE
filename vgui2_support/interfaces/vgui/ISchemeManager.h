@@ -2,18 +2,22 @@
 #define ISCHEMEMANAGER_H
 
 namespace vgui2 {
-	class ISchemeManager : public IBaseInterface {
+	class IScheme;
+	class IBorder;
+	class IImage;
+	class ISchemeManager : public IBaseInterface
+	{
 	public:
-		virtual HScheme LoadSchemeFromFile(const char  *, const char  *) = 0;
-		virtual void ReloadSchemes() = 0;
-		virtual HScheme GetDefaultScheme() = 0;
-		virtual HScheme GetScheme(const char  *) = 0;
-		virtual class IImage * GetImage(const char  *, bool) = 0;
-		virtual HTexture GetImageID(const char  *, bool) = 0;
-		virtual class IScheme * GetIScheme(HScheme) = 0;
-		virtual void Shutdown(bool) = 0;
-		virtual int GetProportionalScaledValue(int) = 0;
-		virtual int GetProportionalNormalizedValue(int) = 0;
+		virtual HScheme LoadSchemeFromFile(const char* fileName, const char* tag) = 0;
+		virtual void ReloadSchemes(void) = 0;
+		virtual HScheme GetDefaultScheme(void) = 0;
+		virtual HScheme GetScheme(const char* tag) = 0;
+		virtual IImage* GetImage(const char* imageName, bool hardwareFiltered) = 0;
+		virtual HTexture GetImageID(const char* imageName, bool hardwareFiltered) = 0;
+		virtual IScheme* GetIScheme(HScheme scheme) = 0;
+		virtual void Shutdown(bool full = true) = 0;
+		virtual int GetProportionalScaledValue(int normalizedValue) = 0;
+		virtual int GetProportionalNormalizedValue(int scaledValue) = 0;
 
 	public:
 		// deadscheme.cpp

@@ -1,7 +1,7 @@
 #ifndef CGAMEUITESTPANEL_H
 #define CGAMEUITESTPANEL_H
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <vgui_controls/Frame.h>
 #include "IGameUIPanel.h"
 

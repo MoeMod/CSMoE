@@ -25,9 +25,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <mathlib/math_base.h>
-
-#include <random>
+#include <mathlib/mathlib.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/dbg.h>
@@ -801,9 +799,7 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 		break;
 	case INTERPOLATOR_FLICKER:
 	{
-		// if ( gEngfuncs.pfnRandomFloat( 0.0f, 1.0f ) < interpolatorParam )
-		static std::random_device rd;
-		if (std::uniform_real<float>(0.0f, 1.0f)(rd) < interpolatorParam)
+		if (RandomFloat(0.0f, 1.0f) < interpolatorParam)
 		{
 			pos = 1.0f;
 		}

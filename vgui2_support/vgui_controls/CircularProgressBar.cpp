@@ -16,34 +16,13 @@
 #include <vgui/ISurface.h>
 
 #include <tier1/KeyValues.h>
-#include <Vector2D.h>
+#include <mathlib/Vector2D.h>
 
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
 using namespace vgui2;
-
-namespace vgui2
-{
-	struct Vertex_t
-	{
-		Vertex_t() {}
-		Vertex_t(const Vector2D &pos, const Vector2D &coord = Vector2D(0, 0))
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
-		void Init(const Vector2D &pos, const Vector2D &coord = Vector2D(0, 0))
-		{
-			m_Position = pos;
-			m_TexCoord = coord;
-		}
-
-		Vector2D	m_Position;
-		Vector2D	m_TexCoord;
-	};
-}
 
 DECLARE_BUILD_FACTORY( CircularProgressBar );
 

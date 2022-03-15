@@ -131,7 +131,11 @@ void Wcon_Clear( void );
 char *Wcon_Input( void );
 
 // text messages
+namespace xe {
 void Msg( const char *pMsg, ... ) _format(1);
 void MsgDev( int level, const char *pMsg, ... ) _format(2);
+}
+using xe::Msg;
+using xe::MsgDev;
 
 #endif//SYSTEM_H

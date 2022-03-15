@@ -14,7 +14,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include "tier1/UtlVector.h"
 
 #include "tier0/memdbgon.h"
@@ -57,10 +57,10 @@ namespace vgui2
 				return;
 
 			// quick check to see if it's already at the end
-			if (Element(this->Count() - 1) == elem)
+			if (this->Element(this->Count() - 1) == elem)
 				return;
 
-			int idx = Find(elem);
+			int idx = this->Find(elem);
 			if (idx == this->InvalidIndex())
 				return;
 
@@ -92,7 +92,7 @@ namespace vgui2
 		// insert element at index and move all the others down 1
 		void InsertElementAt(ELEMTYPE elem, int index)
 		{
-			InsertBefore(index, elem);
+			this->InsertBefore(index, elem);
 		}
 		void SetElementAt(ELEMTYPE elem, int index)
 		{

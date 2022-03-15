@@ -62,7 +62,7 @@ static char *CopyString( const char *in )
 //-----------------------------------------------------------------------------
 struct vgui2::DragDrop_t
 {
-	vgui2::DragDrop_t() :
+	DragDrop_t() :
 		m_bDragEnabled( false ),
 		m_bDropEnabled( false ),
 		m_bDragStarted( false ),
@@ -425,7 +425,7 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 
 	while ( --level >= 0 )
 	{
-		buf.Printf( "    " );
+		buf.Printf( "	" );
 	}
 	buf.Printf( "%s", string );
 }
@@ -527,7 +527,7 @@ void Panel::LoadKeyBindingsForOnePanel( KeyBindingContextHandle_t handle, Panel 
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
 	kv->deleteThis();
@@ -565,7 +565,7 @@ void Panel::ReloadKeyBindings( KeyBindingContextHandle_t handle )
 				continue;
 			}
 			
-            kbPanel->ParseKeyBindings( subKey );
+			kbPanel->ParseKeyBindings( subKey );
 		}
 	}
 	kv->deleteThis();
@@ -1186,9 +1186,9 @@ void Panel::PaintBuildOverlay()
 	GetSize(wide,tall);
 	surface()->DrawSetColor(0, 0, 0, 255);
 
-	surface()->DrawFilledRect(0,0,wide,2);           //top
+	surface()->DrawFilledRect(0,0,wide,2);		   //top
 	surface()->DrawFilledRect(0,tall-2,wide,tall);   //bottom
-	surface()->DrawFilledRect(0,2,2,tall-2);         //left
+	surface()->DrawFilledRect(0,2,2,tall-2);		 //left
 	surface()->DrawFilledRect(wide-2,2,wide,tall-2); //right
 }
 
@@ -2638,7 +2638,7 @@ void Panel::OnThink()
 			return;
 		}
 
-		if ( m_pDragDrop->m_hCurrentDrop != NULL )
+		if ( m_pDragDrop->m_hCurrentDrop != nullptr )
 		{
 			if ( !input()->IsMouseDown( MOUSE_LEFT ) )
 			{
@@ -3071,7 +3071,7 @@ void Panel::RequestFocus(int direction)
 //-----------------------------------------------------------------------------
 void Panel::OnRequestFocus(VPANEL subFocus, VPANEL defaultPanel)
 {
-	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", subFocus, "defaultPanel", defaultPanel));
+	CallParentFunction(new KeyValues("OnRequestFocus", "subFocus", ivgui()->PanelToHandle( subFocus ), "defaultPanel", ivgui()->PanelToHandle( defaultPanel )));
 }
 
 //-----------------------------------------------------------------------------
@@ -3534,7 +3534,7 @@ void Panel::ApplySchemeSettings(IScheme *pScheme)
 	SetBgColor(GetSchemeColor("Panel.BgColor", GetSchemeColor("BgColor", pScheme), pScheme));
 
 #if defined( VGUI_USEDRAGDROP )
-    m_clrDragFrame = pScheme->GetColor("DragDrop.DragFrame", Color(255, 255, 255, 192));
+	m_clrDragFrame = pScheme->GetColor("DragDrop.DragFrame", Color(255, 255, 255, 192));
 	m_clrDropFrame = pScheme->GetColor("DragDrop.DropFrame", Color(150, 255, 150, 255));
 
 	m_infoFont = pScheme->GetFont( "DefaultVerySmall" );
@@ -3606,7 +3606,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 		}
 #endif
 	}
-				    
+					
 	int nPinnedCornerOffsetX = 0, nPinnedCornerOffsetY = 0;
 	int nUnpinnedCornerOffsetX = 0, nUnpinnedCornerOffsetY = 0;
 	switch( pinCorner )
@@ -3645,19 +3645,19 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	{
 		if ( inResourceData->FindKey( "PinnedCornerOffsetX" ) )
 		{
-            nPinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetX" ) );
+			nPinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetX" ) );
 		}
 		if ( inResourceData->FindKey( "PinnedCornerOffsetY" ) )
 		{
-            nPinnedCornerOffsetY =	scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetY" ) );
+			nPinnedCornerOffsetY =	scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "PinnedCornerOffsetY" ) );
 		}
 		if ( inResourceData->FindKey( "UnpinnedCornerOffsetX" ) )
 		{
-            nUnpinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetX" ) );
+			nUnpinnedCornerOffsetX = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetX" ) );
 		}
 		if ( inResourceData->FindKey( "UnpinnedCornerOffsetY" ) )
 		{
-            nUnpinnedCornerOffsetY = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetY" ) );
+			nUnpinnedCornerOffsetY = scheme()->GetProportionalScaledValueEx( GetScheme(), inResourceData->GetInt( "UnpinnedCornerOffsetY" ) );
 		}
 	}
 	else
@@ -4129,7 +4129,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 {
 	PanelMessageMap *panelMap = GetMessageMap();
 	bool bFound = false;
-	int iMessageName = params->GetNameSymbol();
+	intp iMessageName = params->GetNameSymbol();
 
 	if (!panelMap->processed)
 	{
@@ -4188,6 +4188,14 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					case DATATYPE_PTR:
 						typedef void (Panel::*MessageFunc_Ptr_t)(void *);
 						(this->*((MessageFunc_Ptr_t)pMap->func))(param1->GetPtr());
+						break;
+
+					case DATATYPE_HANDLE:
+					{
+						typedef void (Panel::*MessageFunc_VPANEL_t)( VPANEL );
+						VPANEL vpanel = ivgui()->HandleToPanel( param1->GetInt() );
+						(this->*((MessageFunc_VPANEL_t)pMap->func))( vpanel );
+					}
 						break;
 
 					case DATATYPE_FLOAT:
@@ -4273,6 +4281,13 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
 						(this->*((MessageFunc_PtrConstCharPtr_t)pMap->func))(param1->GetPtr(), param2->GetWString());
 					}
+					else if ((DATATYPE_HANDLE == pMap->firstParamType) && (DATATYPE_HANDLE == pMap->secondParamType))
+					{
+						typedef void (Panel::*MessageFunc_HandleConstCharPtr_t)(VPANEL, VPANEL);
+						VPANEL vp1 = ivgui()->HandleToPanel( param1->GetInt() );
+						VPANEL vp2 = ivgui()->HandleToPanel( param1->GetInt() );
+						(this->*((MessageFunc_HandleConstCharPtr_t)pMap->func))( vp1, vp2 );
+					}
 					else
 					{
 						// the message isn't handled
@@ -4303,7 +4318,7 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 {
 	bool bFound = false;
 	// message map dispatch
-	int iMessageName = params->GetNameSymbol();
+	intp iMessageName = params->GetNameSymbol();
 
 	PanelMap_t *panelMap = GetPanelMap();
 	if (!panelMap->processed)
@@ -4358,6 +4373,13 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 					{
 						typedef void (Panel::*MessageFunc_PtrConstCharPtr_t)(void *, const wchar_t *);
 						(this->*((MessageFunc_PtrConstCharPtr_t)pMessageMap[i].func))(params->GetPtr(pMessageMap[i].firstParamName), params->GetWString(pMessageMap[i].secondParamName));
+					}
+					else if ((DATATYPE_HANDLE == pMessageMap[i].firstParamType) && (DATATYPE_HANDLE == pMessageMap[i].secondParamType))
+					{
+						typedef void (Panel::*MessageFunc_HandleConstCharPtr_t)(VPANEL, VPANEL);
+						VPANEL vp1 = ivgui()->HandleToPanel( params->GetInt(pMessageMap[i].firstParamName) );
+						VPANEL vp2 = ivgui()->HandleToPanel( params->GetInt(pMessageMap[i].firstParamName) );
+						(this->*((MessageFunc_HandleConstCharPtr_t)pMessageMap[i].func))( vp1, vp2 );
 					}
 					else
 					{
@@ -4578,18 +4600,20 @@ void Panel::PreparePanelMap( PanelMap_t *panelMap )
 //-----------------------------------------------------------------------------
 void Panel::OnDelete()
 {
-	Assert(IsXbox() || ( IsPC() && _heapchk() == _HEAPOK ) );
-
+#ifdef WIN32
+	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+#endif
 	delete this;
-
-	Assert(IsXbox() || ( IsPC() && _heapchk() == _HEAPOK ) );
+#ifdef WIN32
+	Assert( IsX360() || ( IsPC() && _heapchk() == _HEAPOK ) );
+#endif
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Panel handle implementation
 //			Returns a pointer to a valid panel, NULL if the panel has been deleted
 //-----------------------------------------------------------------------------
-Panel *PHandle::Get() 
+Panel *PHandle::Get() const
 {
 	if (m_iPanelID != INVALID_PANEL)
 	{
@@ -4920,7 +4944,7 @@ public:
 		strcpy( ( char * )data, entry->defaultvalue() );
 	}
 };
-
+/*
 class CHFontProperty : public vgui2::IPanelAnimationPropertyConverter
 {
 public:
@@ -5021,7 +5045,7 @@ public:
 		*(int *)data = currentId;
 	}
 };
-
+*/
 static CFloatProperty floatconverter;
 static CProportionalFloatProperty p_floatconverter;
 static CIntProperty intconverter;
@@ -5029,8 +5053,8 @@ static CProportionalIntProperty p_intconverter;
 static CColorProperty colorconverter;
 static CBoolProperty boolconverter;
 static CStringProperty stringconverter;
-static CHFontProperty fontconverter;
-static CTextureIdProperty textureidconverter;
+//static CHFontProperty fontconverter;
+//static CTextureIdProperty textureidconverter;
 
 static CUtlDict< IPanelAnimationPropertyConverter *, int > g_AnimationPropertyConverters;
 
@@ -5073,14 +5097,14 @@ void Panel::InitPropertyConverters( void )
 	AddPropertyConverter( "bool", &boolconverter );
 	AddPropertyConverter( "char", &stringconverter );
 	AddPropertyConverter( "string", &stringconverter );
-	AddPropertyConverter( "HFont", &fontconverter );
-	AddPropertyConverter( "vgui2::HFont", &fontconverter );
+	//AddPropertyConverter( "HFont", &fontconverter );
+	//AddPropertyConverter( "vgui2::HFont", &fontconverter );
 
 	// This is an aliased type for proportional float
 	AddPropertyConverter( "proportional_float", &p_floatconverter );
 	AddPropertyConverter( "proportional_int", &p_intconverter );
 
-	AddPropertyConverter( "textureid", &textureidconverter );
+	//AddPropertyConverter( "textureid", &textureidconverter );
 }
 
 bool Panel::InternalRequestInfo( PanelAnimationMap *map, KeyValues *outputData )
@@ -5603,7 +5627,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 	int x, y;
 	input()->GetCursorPos( x, y );
 
-    m_pDragDrop->m_nLastPos[ 0 ] = x;
+	m_pDragDrop->m_nLastPos[ 0 ] = x;
 	m_pDragDrop->m_nLastPos[ 1 ] = y;
 
 	if ( s_DragDropHelper.Get() )
@@ -5625,7 +5649,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 		Q_strncpy( cmd, "default", sizeof( cmd ) );
 
 		if ( mousereleased &&
-			m_pDragDrop->m_hCurrentDrop != NULL &&
+			m_pDragDrop->m_hCurrentDrop != nullptr &&
 			m_pDragDrop->m_hDropContextMenu.Get() )
 		{
 			Menu *menu = m_pDragDrop->m_hDropContextMenu;
@@ -5715,7 +5739,7 @@ void Panel::OnFinishDragging( bool mousereleased, MouseCode code, bool abort /*=
 	}
 	for ( int i = 0 ; i < c ; ++i )
 	{
-        temp[ i ]->deleteThis();
+		temp[ i ]->deleteThis();
 	}
 #endif
 }
@@ -6497,7 +6521,7 @@ void Panel::SetSkipChildDuringPainting( Panel *child )
 class CPanelMessageMapDictionary
 {
 public:
-	CPanelMessageMapDictionary() : m_PanelMessageMapPool( sizeof(PanelMessageMap), 32, CMemoryPool::GROW_FAST, "CPanelMessageMapDictionary::m_PanelMessageMapPool" )
+	CPanelMessageMapDictionary() : m_PanelMessageMapPool( sizeof(CUtlMemoryPool), 32, CUtlMemoryPool::GROW_FAST, "CPanelMessageMapDictionary::m_PanelMessageMapPool" )
 	{
 		m_MessageMaps.RemoveAll();
 	}
@@ -6514,16 +6538,21 @@ private:
 	char const *StripNamespace( char const *className );
 	
 	CUtlDict< PanelMessageMapDictionaryEntry, int > m_MessageMaps;
-	CMemoryPool m_PanelMessageMapPool;
+	CUtlMemoryPool m_PanelMessageMapPool;
 };
 
 
 char const *CPanelMessageMapDictionary::StripNamespace( char const *className )
 {
-	constexpr const char szNamespace[] = "vgui2::";
+	constexpr const char szNamespace[] = "vgui::";
 	if ( !strnicmp( className, szNamespace, strlen(szNamespace) ) )
 	{
 		return className + strlen(szNamespace);
+	}
+	constexpr const char szNamespace2[] = "vgui2::";
+	if ( !strncmp( className, szNamespace2, strlen(szNamespace2) ) )
+	{
+		return className + strlen(szNamespace2);
 	}
 	return className;
 }
@@ -6567,7 +6596,7 @@ PanelMessageMap *CPanelMessageMapDictionary::FindOrAddPanelMessageMap( char cons
 class CPanelKeyBindingMapDictionary
 {
 public:
-	CPanelKeyBindingMapDictionary() : m_PanelKeyBindingMapPool( sizeof(PanelKeyBindingMap), 32, CMemoryPool::GROW_FAST, "CPanelKeyBindingMapDictionary::m_PanelKeyBindingMapPool" )
+	CPanelKeyBindingMapDictionary() : m_PanelKeyBindingMapPool( sizeof(PanelKeyBindingMap), 32, CUtlMemoryPool::GROW_FAST, "CPanelKeyBindingMapDictionary::m_PanelKeyBindingMapPool" )
 	{
 		m_MessageMaps.RemoveAll();
 	}
@@ -6584,7 +6613,7 @@ private:
 	char const *StripNamespace( char const *className );
 	
 	CUtlDict< PanelKeyBindingMapDictionaryEntry, int > m_MessageMaps;
-	CMemoryPool m_PanelKeyBindingMapPool;
+	CUtlMemoryPool m_PanelKeyBindingMapPool;
 };
 
 

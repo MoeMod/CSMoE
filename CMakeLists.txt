@@ -6,6 +6,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 option(XASH_DEDICATED "Enable dedicated build. Servers must choose this." OFF) # Servers must choose this
 
+set(HLSDK_PATH ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Path to hlsdk")
+set(HL2SDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/SourceSDK CACHE PATH "Path to hl2sdk")
+include(cmake/platform_config.cmake)
+include(cmake/video_config.cmake)
+
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
 	option(XASH_SDL "Enable SDL." OFF) # Dedicated servers still can use SDL
@@ -22,7 +27,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16.0")
 	option(XASH_PCH "Enable PCH support." ON)
-	option(XASH_UNITY_BUILD "Enable Unity Build support." ON)
+	option(XASH_UNITY_BUILD "Enable Unity Build support." OFF)
 endif()
 
 option(XASH_VCPKG "Enable VCPKG support." OFF)
@@ -54,8 +59,10 @@ endif()
 
 if(NOT XASH_DEDICATED)
 	option(XASH_IMGUI "Imgui support for CSMoE" ON)
+	option(XASH_VGUI2 "VGUI2 support for CSMoE" ON)
 else()
 	set(XASH_IMGUI OFF)
+	set(XASH_VGUI2 OFF)
 endif()
 
 option(XASH_LUASH "LUA support for CSMoE. Expected lua 5.3" ON)
@@ -122,12 +129,7 @@ if(APPLE)
 	add_definitions(-DHAVE_STDINT_H)
 endif()
 
-if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-	message(STATUS "Building for 64 Bit")
-	set(XASH_64BIT ON)
-else()
-	message(STATUS "Building for 32 Bit")
-endif()
+set(XASH_64BIT PLATFORM_64BIT)
 
 # Desktop or dedicated version options
 if(XASH_DEDICATED)
@@ -140,8 +142,6 @@ endif()
 
 set(XASH_BUILD_COMMIT "${CMAKE_BUILD_POSTFIX}")
 set(XASH_LIBDL true)
-
-set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(3rdparty EXCLUDE_FROM_ALL)
 
@@ -181,8 +181,13 @@ endif()
 
 if(NOT XASH_DEDICATED)
 	ADD_SUBDIRECTORY(cl_dll)
-	ADD_SUBDIRECTORY(mainui_cpp)
-#	ADD_SUBDIRECTORY(hymenu)
+	ADD_SUBDIRECTORY(SourceSDK)
+	if(XASH_VGUI2)
+		ADD_SUBDIRECTORY(vgui2_support)
+	else()
+		ADD_SUBDIRECTORY(mainui_cpp)
+	endif()
+	#	ADD_SUBDIRECTORY(hymenu)
 endif()
 ADD_SUBDIRECTORY(dlls)
 ADD_SUBDIRECTORY(engine)

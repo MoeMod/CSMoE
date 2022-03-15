@@ -1,23 +1,77 @@
 #include <vector>
 #include <string.h>
-#include <vgui_api.h>
-#include "wrect.h"
-#include "cl_dll.h"
+
+#include "vgui_api.h"
+#include "cdll_int.h"
+
 #include "BaseUISurface.h"
 #include "vgui/IPanel.h"
 #include "vgui/IInput.h"
-#include "vgui_controls_simple/controls.h"
+#include "vgui/IInputInternal.h"
+#include "vgui/Cursor.h"
+#include "vgui_controls/controls.h"
 
-extern vguiapi_t *g_api;
+#include "vgui_surfacelib/FontManager.h"
+
+#include "filesystem.h"
+#include "render_api.h"
+#include "triangleapi.h"
+
+#include <tier1/utlbuffer.h>
+
+//#define USE_IMGUI_SURFACE
+#ifdef USE_IMGUI_SURFACE
+#include "client/imgui_surface.h"
+#endif
+
+// from engine/common/common.h
+typedef struct rgbdata_s
+{
+    word	width;		// image width
+    word	height;		// image height
+    word	depth;		// image depth
+    uint	type;		// compression type
+    uint	flags;		// misc image flags
+    word	encode;
+    byte	numMips;	// mipmap count
+    byte	*palette = nullptr;		// palette if present
+    byte	*buffer = nullptr;		// image buffer
+    rgba_t	fogParams;	// some water textures in hl1 has info about fog color and alpha
+    size_t	size;		// for bounds checking
+} rgbdata_t;
+using image_ref = std::shared_ptr<rgbdata_t>;
+image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size );
+
+void SPR_AdjustSize( float *x, float *y, float *w, float *h );
+void SPR_AdjustSizeReverse( float *x, float *y, float *w, float *h );
 
 bool BaseUISurface::m_bTranslateExtendedKeys;
+#if defined(LINUX) || defined(OSX)
+CUtlDict< BaseUISurface::font_entry, unsigned short > BaseUISurface::m_FontData;
+#endif
+
+namespace vgui2 {
+
+extern vguiapi_t *g_api;
+extern cl_enginefunc_t gEngfuncs;
 
 static wrect_t g_ScissorRect;
 qboolean g_bScissor;
-static int g_iCurrentTexture;
+
+}
+
+#define VGUI_MAX_TEXTURES	2048	// a half of total textures count
+extern int	g_textures[VGUI_MAX_TEXTURES];
+extern int	g_textureId;
+extern int	g_iBoundTexture;
+
+using namespace vgui2;
 
 // TODO: implement vgui2::Dar
 std::vector<vgui2::VPANEL> staticPopupList;
+
+#define VPANEL_NORMAL	((vgui2::SurfacePlat *) NULL)
+#define VPANEL_MINIMIZED ((vgui2::SurfacePlat *) 0x00000001)
 
 BaseUISurface::BaseUISurface() {
 	_restrictedPanel = 0;
@@ -37,6 +91,11 @@ BaseUISurface::BaseUISurface() {
 	m_iSurfaceBounds[0] = m_iSurfaceBounds[1] = m_iSurfaceBounds[2] = m_iSurfaceBounds[3] = 0;
 	_drawTextPos[0] = _drawTextPos[1] = 0;
 	_translateX = _translateY = 0;
+
+    FontManager().SetLanguage("schinese");
+#if defined(LINUX) || defined(OSX)
+    FontManager().SetFontDataHelper( &BaseUISurface::FontDataHelper );
+#endif
 }
 
 BaseUISurface::~BaseUISurface() {
@@ -51,8 +110,21 @@ void BaseUISurface::Init(vgui2::VPANEL embeddedPanel, IHTMLChromeController *pCh
 	SetScreenBounds(0, 0, screeninfo.iWidth, screeninfo.iHeight);
 
 	SetEmbeddedPanel(embeddedPanel);
+
+    AddCustomFontFile( "resource/marlett.ttf" );
+
+    // Added : CSO font loading
+    FileFindHandle_t findHandle = NULL;
+    const char *pszFilename = vgui2::filesystem()->FindFirst("resource/font/*.ttf", &findHandle);
+    while (pszFilename)
+    {
+        AddCustomFontFile(pszFilename);
+        pszFilename = vgui2::filesystem()->FindNext(findHandle);
+    }
+    vgui2::filesystem()->FindClose(findHandle);
+
 	m_pChromeController = pChromeController;
-	
+
 	if (pChromeController) {
 		m_pChromeController->Init("htmlcache", "htmlcookies");
 		m_pChromeController->SetCefThreadTargetFrameRate(60);
@@ -63,6 +135,7 @@ void BaseUISurface::Shutdown() {
 	if (m_pChromeController) {
 		m_pChromeController->Shutdown();
 	}
+    FontManager().ClearAllFonts();
 }
 
 void BaseUISurface::RunFrame() {
@@ -86,7 +159,7 @@ void SetScissorRect(int left, int top, int right, int bottom) {
 	g_ScissorRect.bottom = bottom;
 }
 
-void BaseUISurface::SetupPaintState(const paintState_t &paintState) {
+void BaseUISurface::SetupPaintState(const PaintState_t &paintState) {
 	_translateX = paintState.iTranslateX;
 	_translateY = paintState.iTranslateY;
 	SetScissorRect(paintState.iScissorLeft, paintState.iScissorTop, paintState.iScissorRight, paintState.iScissorBottom);
@@ -109,7 +182,7 @@ void BaseUISurface::PushMakeCurrent(vgui2::VPANEL panel, bool useInsets) {
 	vgui2::ipanel()->GetClipRect(panel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
 	_paintStack.emplace_back();
-	paintState_t &paintState = _paintStack.back();
+	PaintState_t &paintState = _paintStack.back();
 	paintState.vPanel = panel;
 
 	paintState.iTranslateX = inSets[0] + absExtents[0] - m_iSurfaceBounds[0];
@@ -124,6 +197,8 @@ void BaseUISurface::PushMakeCurrent(vgui2::VPANEL panel, bool useInsets) {
 }
 
 void BaseUISurface::PopMakeCurrent(vgui2::VPANEL panel) {
+    DrawFlushText();
+
 	if (!_paintStack.size()) {
 		return;
 	}
@@ -222,11 +297,16 @@ void BaseUISurface::DrawFilledRect(int x0, int y0, int x1, int y1) {
 	if (!ClipRect(rect[0], rect[1], &clippedRect[0], &clippedRect[1])) {
 		return;
 	}
-
-	g_api->SetupDrawingRect(_drawColor);
-	g_api->EnableTexture(false);
-	g_api->DrawQuad(&clippedRect[0], &clippedRect[1]);
-	g_api->EnableTexture(true);
+#ifdef USE_IMGUI_SURFACE
+    ImGui_Surface_SetRenderMode(kRenderTransAlpha);
+    SPR_AdjustSize(&rect[0].point[0], &rect[0].point[1], &rect[1].point[0], &rect[1].point[1]);
+    ImGui_Surface_DrawRectangle(rect[0].point[0], rect[0].point[1], rect[1].point[0] - rect[0].point[0], rect[1].point[1] - rect[0].point[1], _drawColor[0], _drawColor[1], _drawColor[2],  255 - _drawColor[3]);
+#else
+    g_api->SetupDrawingRect(_drawColor);
+    g_api->EnableTexture(false);
+    g_api->DrawQuad(&clippedRect[0], &clippedRect[1]);
+    g_api->EnableTexture(true);
+#endif
 }
 
 void BaseUISurface::DrawOutlinedRect(int x0, int y0, int x1, int y1) {
@@ -249,10 +329,12 @@ void BaseUISurface::DrawPolyLine(int *, int *, int) {
 }
 
 void BaseUISurface::DrawSetTextFont(vgui2::HFont font) {
+    DrawFlushText();
 	m_hCurrentFont = font;
 }
 
 void BaseUISurface::DrawSetTextColor(int r, int g, int b, int a) {
+    DrawFlushText();
 	_drawTextColor[0] = r;
 	_drawTextColor[1] = g;
 	_drawTextColor[2] = b;
@@ -260,6 +342,7 @@ void BaseUISurface::DrawSetTextColor(int r, int g, int b, int a) {
 }
 
 void BaseUISurface::DrawSetTextColor(Color col) {
+    DrawFlushText();
 	col.GetColor(_drawTextColor[0], _drawTextColor[1], _drawTextColor[2], _drawTextColor[3]);
 }
 
@@ -274,27 +357,132 @@ void BaseUISurface::DrawGetTextPos(int &x, int &y) {
 }
 
 void BaseUISurface::DrawPrintText(const wchar_t *text, int textlen) {
-	if (!text || textlen <= 0) {
-		return;
-	}
+    if (!text)
+        return;
 
-	for (int i = 0; i < textlen; ++i) {
-		DrawUnicodeChar(text[i]);
-	}
+    if (!m_hCurrentFont)
+        return;
+
+    int x, y;
+    DrawGetTextPos(x, y);
+
+    x += _translateX;
+    y += _translateY;
+
+    int iTall = GetFontTall(m_hCurrentFont);
+    int iLastTexId = -1;
+
+    int iCount = 0;
+    vpoint_t *pQuads = (vpoint_t *)stackalloc((2 * textlen) * sizeof(vpoint_t));
+
+    int iTotalWidth = 0;
+
+    for (int i = 0; i < textlen; ++i)
+    {
+        wchar_t ch = text[i];
+
+        bool bUnderlined = FontManager().GetFontUnderlined(m_hCurrentFont);
+        int abcA, abcB, abcC;
+        GetCharABCwide(m_hCurrentFont, ch, abcA, abcB, abcC);
+        iTotalWidth += abcA;
+
+        int iWide = abcB;
+
+        if (bUnderlined)
+        {
+            iWide += (abcA + abcC);
+            x-= abcA;
+        }
+
+        if (!iswspace(ch) || bUnderlined)
+        {
+            int iTexId = 0;
+            float texCoords[4];
+
+            if (!m_FontTextureCache.GetTextureForChar(m_hCurrentFont, ch, &iTexId, texCoords))
+                continue;
+
+            Assert(texCoords);
+
+            if (iTexId != iLastTexId)
+            {
+                if (iCount)
+                {
+                    DrawSetTexture(iLastTexId);
+                    DrawQuadArray(iCount, pQuads, _drawTextColor);
+                    iCount = 0;
+                }
+
+                iLastTexId = iTexId;
+            }
+
+            vpoint_t &ul = pQuads[2 * iCount];
+            vpoint_t &lr = pQuads[2 * iCount + 1];
+            iCount++;
+
+            ul.point[0] = x + iTotalWidth;
+            ul.point[1] = y;
+            lr.point[0] = ul.point[0] + iWide;
+            lr.point[1] = ul.point[1] + iTall;
+
+            ul.coord[0] = texCoords[0];
+            ul.coord[1] = texCoords[1];
+            lr.coord[0] = texCoords[2];
+            lr.coord[1] = texCoords[3];
+        }
+
+        iTotalWidth += iWide + abcC;
+
+        if (bUnderlined)
+        {
+            iTotalWidth -= abcC;
+        }
+    }
+
+    if (iCount)
+    {
+        DrawSetTexture(iLastTexId);
+        DrawQuadArray(iCount, pQuads, _drawTextColor);
+    }
+
+    DrawSetTextPos(x + iTotalWidth, y);
+    stackfree(pQuads);
 }
 
 void BaseUISurface::DrawUnicodeChar(wchar_t ch) {
-	// TODO: support custom fonts
+    CharRenderInfo info;
+    info.additive = false;
+
+    if (DrawGetUnicodeCharRenderInfo(ch, info))
+        DrawRenderCharFromInfo(info);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    int x = _drawTextPos[0] + _translateX, y = _drawTextPos[1] + _translateY;
+    ImGui_SetTextAdjustSize(true);
+	ImGui_Surface_DrawChar(x, y, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], 255);
+    ImGui_SetTextAdjustSize(false);
+#else
 	gEngfuncs.pfnVGUI2DrawCharacterAdditive(_drawTextPos[0] + _translateX, _drawTextPos[1] + _translateY, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], m_hCurrentFont);
+#endif
+     */
 }
 
 void BaseUISurface::DrawUnicodeCharAdd(wchar_t ch) {
-	// TODO: support custom fonts
-	gEngfuncs.pfnVGUI2DrawCharacterAdditive(_drawTextPos[0] + _translateX, _drawTextPos[1] + _translateY, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], m_hCurrentFont);
-}
+    CharRenderInfo info;
+    info.additive = true;
 
-void BaseUISurface::DrawFlushText() {
-	// TODO: support custom fonts
+    if (DrawGetUnicodeCharRenderInfo(ch, info))
+        DrawRenderCharFromInfo(info);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    int x = _drawTextPos[0] + _translateX, y = _drawTextPos[1] + _translateY;
+    ImGui_SetTextAdjustSize(true);
+    ImGui_Surface_DrawChar(x, y, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], _drawTextColor[3]);
+    ImGui_SetTextAdjustSize(false);
+#else
+    gEngfuncs.pfnVGUI2DrawCharacterAdditive(_drawTextPos[0] + _translateX, _drawTextPos[1] + _translateY, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], m_hCurrentFont);
+#endif
+     */
 }
 
 class vgui2::IHTML *BaseUISurface::CreateHTMLWindow(class vgui2::IHTMLEvents *, vgui2::VPANEL) {
@@ -302,31 +490,57 @@ class vgui2::IHTML *BaseUISurface::CreateHTMLWindow(class vgui2::IHTMLEvents *, 
 }
 
 void BaseUISurface::PaintHTMLWindow(class vgui2::IHTML *) {
-	//
+	// TODO
 }
 
 void BaseUISurface::DeleteHTMLWindow(class vgui2::IHTML *) {
-	//
+	// TODO
 }
 
-void BaseUISurface::DrawSetTextureFile(int, const char  *, int, bool) {
-	// gEngfuncs.Con_DPrintf((char *)"DrawSetTextureFile ");
+void BaseUISurface::DrawSetTextureFile(int id, const char  * filename, int hardwareFilter, bool forceReload) {
+	char name[512];
+	snprintf(name, sizeof(name), "%s.tga", filename);
+    image_ref pic;
+
+    pic = FS_LoadImage( name, nullptr, 0 );
+	if (!pic)
+	{
+		snprintf(name, sizeof(name), "%s.bmp", filename);
+
+        pic = FS_LoadImage( name, nullptr, 0 );
+		if (!pic)
+		{
+			DrawSetTexture(id);
+			return;
+		}
+	}
+
+	DrawSetTextureRGBA(id, pic->buffer, pic->width, pic->height, hardwareFilter, forceReload);
 }
 
 void BaseUISurface::DrawSetTextureRGBA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload) {
 	g_api->UploadTexture(id, (const char *)rgba, wide, tall);
+	DrawSetTexture(id);
 }
 
 void BaseUISurface::DrawSetTexture(int id) {
-	g_iCurrentTexture = id;
+    if(m_iCurrentTexture != id)
+    {
+        m_iCurrentTexture = id;
+        DrawFlushText();
+    }
+#ifdef USE_IMGUI_SURFACE
+    // nothing
+#else
 	g_api->BindTexture(id);
+#endif
 }
 
 void BaseUISurface::DrawGetTextureSize(int id, int &wide, int &tall) {
 	int width, height;
 	g_api->BindTexture(id);
 	g_api->GetTextureSizes(&width, &height);
-	g_api->BindTexture(g_iCurrentTexture);
+	g_api->BindTexture(m_iCurrentTexture);
 	wide = width;
 	tall = height;
 }
@@ -341,9 +555,18 @@ void BaseUISurface::DrawTexturedRect(int x0, int y0, int x1, int y1) {
 	if (!ClipRect(rect[0], rect[1], &clippedRect[0], &clippedRect[1])) {
 		return;
 	}
-
+#ifdef USE_IMGUI_SURFACE
+    int id = m_iCurrentTexture;
+    if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
+    {
+        ImGui_Surface_SetRenderMode(kRenderTransTexture);
+        SPR_AdjustSize(&clippedRect[0].point[0], &clippedRect[0].point[1], &clippedRect[1].point[0], &clippedRect[1].point[1]);
+        ImGui_Surface_DrawImage(g_textures[id], clippedRect[0].point[0], clippedRect[0].point[1], clippedRect[1].point[0], clippedRect[1].point[1], clippedRect[0].coord[0], clippedRect[0].coord[1], clippedRect[1].coord[0], clippedRect[1].coord[1], _drawColor[0], _drawColor[1], _drawColor[2],  255 - _drawColor[3]);
+    }
+#else
 	g_api->SetupDrawingImage(_drawColor);
 	g_api->DrawQuad(&clippedRect[0], &clippedRect[1]);
+#endif
 }
 
 bool BaseUISurface::IsTextureIDValid(int) {
@@ -360,12 +583,12 @@ void BaseUISurface::GetScreenSize(int &wide, int &tall) {
 }
 
 void BaseUISurface::SetAsTopMost(vgui2::VPANEL, bool) {
-	// 
+	//
 }
 
 void BaseUISurface::BringToFront(vgui2::VPANEL panel) {
 	vgui2::ipanel()->MoveToFront(panel);
-	
+
 	if (vgui2::ipanel()->IsPopup(panel)) {
 		MovePopupToFront(panel);
 	}
@@ -431,7 +654,7 @@ void BaseUISurface::SetCursor(vgui2::HCursor cursor) {
 }
 
 bool BaseUISurface::IsCursorVisible() {
-	return _currentCursor != dc_none;
+	return _currentCursor != vgui2::dc_none;
 }
 
 void BaseUISurface::ApplyChanges() {
@@ -495,44 +718,90 @@ void BaseUISurface::SetTopLevelFocus(vgui2::VPANEL subFocus) {
 }
 
 vgui2::HFont BaseUISurface::CreateFont() {
-	gEngfuncs.Con_DPrintf((char *)"CreateFont ");
-	return 1;
+    return FontManager().CreateFont();
 }
 
-bool BaseUISurface::AddGlyphSetToFont(vgui2::HFont, const char  *, int, int, int, int, int, int, int) {
-	gEngfuncs.Con_DPrintf((char *)"AddGlyphSetToFont ");
-	return true;
+bool BaseUISurface::AddGlyphSetToFont(vgui2::HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int lowRange, int highRange) {
+    return FontManager().SetFontGlyphSet(font, windowsFontName, tall, weight, blur, scanlines, flags, lowRange, highRange);
 }
 
-bool BaseUISurface::AddCustomFontFile(const char  *) {
-	gEngfuncs.Con_DPrintf((char *)"AddCustomFontFile ");
-	return true;
+bool BaseUISurface::AddCustomFontFile(const char *fontFileName) {
+    char fullPath[ 4096 ];
+
+    vgui2::filesystem()->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
+
+    CUtlSymbol symbol( fontFileName );
+
+    m_CustomFontFileNames[ m_CustomFontFileNames.AddToTail() ] = symbol;
+
+#ifdef WIN32
+    return AddFontResourceExA( fullPath, FR_PRIVATE, nullptr ) > 0 ||
+		AddFontResourceA( fullPath) > 0;
+#else
+    int size;
+    if ( BaseUISurface::FontDataHelper( nullptr, size, fontFileName ) )
+        return true;
+    return false;
+#endif
 }
 
 int BaseUISurface::GetFontTall(vgui2::HFont font) {
-	// TODO: support custom fonts
+    return FontManager().GetFontTall(font);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    ImGui_SetTextAdjustSize(true);
+    return ImGui_Surface_GetCharHeight();
+    ImGui_SetTextAdjustSize(false);
+#else
 	return _screeninfo.iCharHeight;
+#endif
+     */
 }
 
 void BaseUISurface::GetCharABCwide(vgui2::HFont font, int ch, int &a, int &b, int &c) {
-	// TODO: support custom fonts
+    return FontManager().GetCharABCwide(font, ch, a, b, c);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    ImGui_SetTextAdjustSize(true);
+    a = ImGui_Surface_GetCharWidth(ch);
+    ImGui_SetTextAdjustSize(false);
+#else
 	a = _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(ch))];
+#endif
 	b = c = 0;
+     */
 }
 
 int BaseUISurface::GetCharacterWidth(vgui2::HFont font, int ch) {
-	// TODO: support custom fonts
+    return FontManager().GetCharacterWidth(font, ch);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    ImGui_SetTextAdjustSize(true);
+    int w = ImGui_Surface_GetCharWidth(ch);
+    ImGui_SetTextAdjustSize(false);
+    return w;
+#else
 	return _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(ch))];
+#endif
+     */
 }
 
-void BaseUISurface::GetTextSize(vgui2::HFont, const wchar_t *text, int &wide, int &tall) {
-	// TODO: support custom fonts
+void BaseUISurface::GetTextSize(vgui2::HFont font, const wchar_t *text, int &wide, int &tall) {
+    return FontManager().GetTextSize(font, text, wide, tall);
+    /*
+#ifdef USE_IMGUI_SURFACE
+    ImGui_SetTextAdjustSize(true);
+    ImGui_Surface_DrawStringLenUnicode(text, &wide, &tall);
+    ImGui_SetTextAdjustSize(false);
+#else
 	wide = 0;
 	tall = _screeninfo.iCharHeight;
 
 	for (; *text != 0; ++text) {
 		wide += _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(*text))];
 	}
+#endif
+     */
 }
 
 vgui2::VPANEL BaseUISurface::GetNotifyPanel() {
@@ -718,11 +987,13 @@ void BaseUISurface::CalculateMouseVisible() {
 	UnlockCursor();
 
 	if (_needMouse) {
-		SetCursor(dc_arrow);
+		SetCursor(vgui2::dc_arrow);
 	} else {
-		SetCursor(dc_none);
+		SetCursor(vgui2::dc_none);
 		LockCursor();
 	}
+
+	g_api->SetVisible(_needMouse);
 }
 
 bool BaseUISurface::NeedKBInput() {
@@ -752,13 +1023,33 @@ void BaseUISurface::SetVGUI2MouseControl(bool state) {
 	m_bVGUI2MouseControl = state;
 }
 
-void BaseUISurface::DrawTexturedPolygon(class vgui2::VGuiVertex *, int) {
-	gEngfuncs.Con_DPrintf((char *)"DrawTexturedPolygon ");
+void BaseUISurface::DrawTexturedPolygon(vgui2::Vertex_t *pVertices, int n) {
+    if( _drawColor[ 3 ] == 255 )
+        return;
+
+    g_api->EnableTexture(false);
+    g_api->SetupDrawingImage(_drawColor);
+
+    auto pNext = pVertices;
+
+    gEngfuncs.pTriAPI->Begin( TRI_POLYGON );
+
+    for( int i = 0; i < n; ++i, ++pNext )
+    {
+        vpoint_t point;
+        InitVertex(point, pNext->m_Position[0], pNext->m_Position[1], pNext->m_TexCoord[0], pNext->m_TexCoord[1]);
+        SPR_AdjustSize(&point.point[0], &point.point[1], nullptr, nullptr);
+
+        gEngfuncs.pTriAPI->TexCoord2f( point.coord[0], point.coord[1] );
+        gEngfuncs.pTriAPI->Vertex3f( point.point[0], point.point[1], 0 );
+    }
+
+    gEngfuncs.pTriAPI->End();
+    g_api->EnableTexture(true);
 }
 
-int BaseUISurface::GetFontAscent(vgui2::HFont, wchar_t) {
-	gEngfuncs.Con_DPrintf((char *)"GetFontAscent ");
-	return 0;
+int BaseUISurface::GetFontAscent(vgui2::HFont font, wchar_t ch) {
+	return FontManager().GetFontAscent(font, ch);
 }
 
 void BaseUISurface::SetAllowHTMLJavaScript(bool state) {
@@ -767,9 +1058,9 @@ void BaseUISurface::SetAllowHTMLJavaScript(bool state) {
 
 void BaseUISurface::SetLanguage(const char *pchLang) {
 	if (pchLang) {
-		strncpy_s(m_szLanguage, pchLang, sizeof(m_szLanguage));
+		strncpy(m_szLanguage, pchLang, sizeof(m_szLanguage));
 	} else {
-		strcpy_s(m_szLanguage, "english");
+		strcpy(m_szLanguage, "english");
 	}
 }
 
@@ -867,5 +1158,364 @@ void BaseUISurface::InternalSolveTraverse(vgui2::VPANEL panel) {
 		}
 	}
 }
+
+void BaseUISurface::DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter)
+{
+	DrawSetTextureRGBA(id, rgba, wide, tall, hardwareFilter, true);
+}
+
+void BaseUISurface::DrawSetSubTextureRGBA(int textureID, int drawX, int drawY, const byte* rgba, int subTextureWide, int subTextureTall)
+{
+	//DrawSetSubTextureRGBA(textureID, drawX, drawY, rgba, subTextureWide, subTextureTall);
+
+	/*
+	qglTexSubImage2D(
+		GL_TEXTURE_2D,
+		0,
+		drawX, drawY,
+		subTextureWide, subTextureTall,
+		GL_RGBA, GL_UNSIGNED_BYTE,
+		rgba
+	);
+	*/
+	return g_api->UploadTextureBlock(textureID, drawX, drawY, rgba, subTextureWide, subTextureTall);
+}
+
+bool BaseUISurface::DrawGetUnicodeCharRenderInfo(wchar_t ch, CharRenderInfo &info)
+{
+    info.valid = false;
+
+    if (!m_hCurrentFont)
+    {
+        return info.valid;
+    }
+
+    info.valid = true;
+    info.ch = ch;
+
+    info.currentFont = m_hCurrentFont;
+    info.fontTall = GetFontTall(m_hCurrentFont);
+
+    DrawGetTextPos(info.x, info.y);
+    GetCharABCwide(m_hCurrentFont, ch, info.abcA, info.abcB, info.abcC);
+
+    bool bUnderlined = FontManager().GetFontUnderlined(m_hCurrentFont);
+
+    if (!bUnderlined)
+    {
+        info.x += info.abcA;
+    }
+
+    info.textureId = 0;
+    float texCoords[4];
+
+    if (!m_FontTextureCache.GetTextureForChar(m_hCurrentFont, ch, &info.textureId, texCoords))
+    {
+        info.valid = false;
+        return info.valid;
+    }
+
+    int fontWide = info.abcB;
+
+    if (bUnderlined)
+    {
+        fontWide += (info.abcA + info.abcC);
+        info.x-= info.abcA;
+    }
+
+    // Because CharRenderInfo has a pointer to the verts, we need to keep m_BatchedCharVerts in sync, so if we
+    //  will be flushing the text when we get to this char, flush it now instead.
+    if ( info.textureId != m_iCurrentTexture )
+    {
+        DrawFlushText();
+    }
+
+    InitVertex(info.verts[0], info.x, info.y, texCoords[0], texCoords[1]);
+    InitVertex(info.verts[1], info.x + fontWide, info.y + info.fontTall, texCoords[2], texCoords[3]);
+
+    info.shouldclip = true;
+    return info.valid;
+}
+
+void BaseUISurface::DrawRenderCharInternal(const CharRenderInfo &info)
+{
+    if (_drawTextColor[3] == 0)
+        return;
+
+    vpoint_t clippedRect[2];
+
+    if (info.shouldclip)
+    {
+        if (!ClipRect(info.verts[0], info.verts[1], &clippedRect[0], &clippedRect[1]))
+            return;
+    }
+    else
+    {
+        clippedRect[0] = info.verts[0];
+        clippedRect[1] = info.verts[1];
+    }
+
+    if (m_BatchedCharInfos.size() > MAX_BATCHED_CHAR_VERTS)
+        DrawFlushText();
+
+    if (info.additive)
+    {
+        DrawSetTexture(info.textureId);
+        DrawQuadBlend(clippedRect[0], clippedRect[1], _drawTextColor);
+    }
+    else
+    {
+        CBatchedCharInfo batchedCharInfo;
+        batchedCharInfo.verts[0] = clippedRect[0];
+        batchedCharInfo.verts[1] = clippedRect[1];
+        batchedCharInfo.textureId = info.textureId;
+        m_BatchedCharInfos.emplace_back(batchedCharInfo);
+    }
+}
+
+void BaseUISurface::DrawRenderCharFromInfo(const CharRenderInfo &info)
+{
+    if (!info.valid)
+        return;
+
+    DrawRenderCharInternal(info);
+    DrawSetTextPos(info.x + (info.abcB + info.abcC), info.y);
+}
+
+void BaseUISurface::DrawFlushText(void)
+{
+    if (m_BatchedCharInfos.empty())
+        return;
+
+    for (int i = 0; i < m_BatchedCharInfos.size(); i++)
+    {
+        //DrawSetTexture(m_BatchedCharInfos[i].textureId);
+        m_iCurrentTexture = m_BatchedCharInfos[i].textureId;
+#ifdef USE_IMGUI_SURFACE
+        // nothing
+#else
+        g_api->BindTexture(m_BatchedCharInfos[i].textureId);
+#endif
+        DrawQuad(m_BatchedCharInfos[i].verts[0], m_BatchedCharInfos[i].verts[1], _drawTextColor);
+    }
+
+    m_BatchedCharInfos.clear();
+}
+
+void BaseUISurface::DrawQuad(vpoint_t ul, vpoint_t lr, int *pColor)
+{
+#ifdef USE_IMGUI_SURFACE
+    int id = m_iCurrentTexture;
+    if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
+    {
+        ImGui_Surface_SetRenderMode(kRenderTransTexture);
+        SPR_AdjustSize(&ul.point[0], &ul.point[1], &lr.point[0], &lr.point[1]);
+        ImGui_Surface_DrawImage(g_textures[id], ul.point[0], ul.point[1], lr.point[0], lr.point[1], ul.coord[0], ul.coord[1], lr.coord[0], lr.coord[1], pColor[0], pColor[1], pColor[2], pColor[3]);
+    }
+    else
+    {
+        gEngfuncs.Con_DPrintf("BaseUISurface::DrawQuad invalid texture %d", id);
+    }
+#else
+    int pColor2[4] = { pColor[0], pColor[1], pColor[2], 255 - pColor[3] };
+    g_api->SetupDrawingImage(pColor2);
+    g_api->DrawQuad(&ul, &lr);
+#endif
+}
+
+void BaseUISurface::DrawQuadBlend(vpoint_t ul, vpoint_t lr, int *pColor)
+{
+#ifdef USE_IMGUI_SURFACE
+    int id = m_iCurrentTexture;
+    if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
+    {
+        ImGui_Surface_SetRenderMode(kRenderTransAlpha);
+        SPR_AdjustSize(&ul.point[0], &ul.point[1], &lr.point[0], &lr.point[1]);
+        ImGui_Surface_DrawImage(g_textures[id], ul.point[0], ul.point[1], lr.point[0], lr.point[1], ul.coord[0], ul.coord[1], lr.coord[0], lr.coord[1], pColor[0], pColor[1], pColor[2], pColor[3]);
+    }
+    else
+    {
+        gEngfuncs.Con_DPrintf("BaseUISurface::DrawQuadBlend invalid texture %d", id);
+    }
+#else
+    int pColor2[4] = { pColor[0], pColor[1], pColor[2], 255 - pColor[3] };
+    g_api->SetupDrawingImage(pColor2);
+    g_api->DrawQuad(&ul, &lr);
+#endif
+}
+
+void BaseUISurface::DrawQuadArray(int quadCount, vpoint_t *pVerts, int *pColor)
+{
+#ifdef USE_IMGUI_SURFACE
+    int id = m_iCurrentTexture;
+    if( id > 0 && id < VGUI_MAX_TEXTURES && g_textures[id] )
+    {
+        ImGui_Surface_SetRenderMode(kRenderTransTexture);
+
+        for (int i = 0; i < quadCount; ++i)
+        {
+            vpoint_t ulc, lrc;
+            vpoint_t &ul = pVerts[2 * i];
+            vpoint_t &lr = pVerts[2 * i + 1];
+
+            if (!ClipRect(ul, lr, &ulc, &lrc))
+                continue;
+
+            SPR_AdjustSize(&ulc.point[0], &ulc.point[1], &lrc.point[0], &lrc.point[1]);
+            ImGui_Surface_DrawImage(g_textures[id], ulc.point[0], ulc.point[1], lrc.point[0], lrc.point[1], ulc.coord[0], ulc.coord[1], lrc.coord[0], lrc.coord[1], pColor[0], pColor[1], pColor[2], pColor[3]);
+        }
+        ImGui_Surface_Flush();
+    }
+    else
+    {
+        gEngfuncs.Con_DPrintf("BaseUISurface::DrawQuadArray invalid texture %d", id);
+    }
+#else
+    int pColor2[4] = { pColor[0], pColor[1], pColor[2], 255 - pColor[3] };
+    g_api->SetupDrawingImage(pColor2);
+    for (int i = 0; i < quadCount; ++i)
+    {
+        vpoint_t ulc, lrc;
+        vpoint_t &ul = pVerts[2 * i];
+        vpoint_t &lr = pVerts[2 * i + 1];
+
+        if (!ClipRect(ul, lr, &ulc, &lrc))
+            continue;
+
+        g_api->DrawQuad(&ul, &lr);
+    }
+#endif
+}
+
+
+#if defined(LINUX) || defined(OSX)
+
+static void RemoveSpaces( CUtlString &str )
+{
+    char *dst = str.GetForModify();
+
+    for( int i = 0; i < str.Length(); i++ )
+    {
+        if( ( str[ i ] != ' ' ) && ( str[ i ] != '-' ) )
+        {
+            *dst++ = str[ i ];
+        }
+    }
+
+    *dst = 0;
+}
+
+void *BaseUISurface::FontDataHelper( const char *pchFontName, int &size, const char *fontFileName )
+{
+    size = 0;
+
+    // redirect CSO font name
+    if(pchFontName && (!Q_strcmp(pchFontName, "Verdana") || !Q_strcmp(pchFontName, "Trebuchet MS")))
+    {
+        pchFontName = "DFYuanW9-GB";
+    }
+
+    if( fontFileName )
+    {
+        // If we were given a fontFileName, then load that bugger and shove it in the cache.
+
+        // Just load the font data, decrypt in memory and register for this process]
+
+        char *buffer = nullptr;
+        int fileSize = 0;
+
+        // find with filesystem
+        if(!buffer)
+        {
+            FileHandle_t f = vgui2::filesystem()->Open(fontFileName, "rb");
+            if(f)
+            {
+                fileSize = vgui2::filesystem()->Size(f);
+                buffer = (char *)MemAllocScratch(fileSize + 1);
+                Assert(buffer);
+
+                vgui2::filesystem()->Read(buffer, fileSize, f);
+                vgui2::filesystem()->Close(f);
+            }
+        }
+
+        // xash added : find with stdio
+        if( !buffer )
+        {
+            FILE *f = fopen(fontFileName, "rb");
+            if(f)
+            {
+                fseek(f, SEEK_SET, SEEK_END);
+                fileSize = ftell(f);
+                buffer = (char *)MemAllocScratch(fileSize + 1);
+                fseek(f, SEEK_SET, 0);
+                fread(buffer, 1, fileSize, f);
+                fclose(f);
+            }
+        }
+
+        if ( !buffer )
+        {
+            Msg( "Failed to load custom font file '%s'\n", fontFileName );
+            return NULL;
+        }
+
+        FT_Face face;
+        const FT_Error error = FT_New_Memory_Face( FontManager().GetFontLibraryHandle(), (FT_Byte *)buffer, fileSize, 0, &face );
+
+        if ( error  )
+        {
+            // FT_Err_Unknown_File_Format, etc.
+            Msg( "ERROR %d: UNABLE TO LOAD FONT FILE %s\n", error, fontFileName );
+
+            MemFreeScratch();
+            return NULL;
+        }
+
+        if( !pchFontName )
+        {
+            // If we weren't passed a font name for this thing, then use the one from the face.
+            pchFontName = face->family_name;
+            if ( !pchFontName || !pchFontName[ 0 ] )
+            {
+                pchFontName = FT_Get_Postscript_Name( face );
+            }
+        }
+
+        // Replace spaces and dashes with underscores.
+        CUtlString strFontName( pchFontName );
+        RemoveSpaces( strFontName );
+
+        font_entry entry;
+        entry.size = fileSize;
+        entry.data = malloc( entry.size );
+        memcpy( entry.data, buffer, entry.size );
+        m_FontData.Insert( strFontName.Get(), entry );
+
+        FT_Done_Face( face );
+
+        size = entry.size;
+
+        MemFreeScratch();
+        return entry.data;
+    }
+    else
+    {
+        // Replace spaces and dashes with underscores.
+        CUtlString strFontName( pchFontName );
+        RemoveSpaces( strFontName );
+
+        int iIndex = m_FontData.Find( strFontName.Get() );
+        if ( iIndex != m_FontData.InvalidIndex() )
+        {
+            size = m_FontData[ iIndex ].size;
+            return m_FontData[ iIndex ].data;
+        }
+    }
+
+    return NULL;
+}
+
+#endif // LINUX
 
 EXPOSE_SINGLE_INTERFACE(BaseUISurface, ISurface, VGUI_SURFACE_INTERFACE_VERSION);

@@ -2,7 +2,7 @@
 #include <clocale>
 
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
 #include <vgui_controls/Panel.h>

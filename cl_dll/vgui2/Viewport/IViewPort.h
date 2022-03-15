@@ -15,7 +15,7 @@ GNU General Public License for more details.
 
 #pragma once
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 typedef struct VGuiLibraryInterface_s VGuiLibraryInterface_t;
 typedef struct VGuiLibraryTeamInfo_s VGuiLibraryTeamInfo_t;

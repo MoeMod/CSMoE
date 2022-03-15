@@ -29,7 +29,7 @@
 #include <tier1/utlflags.h>
 #include <tier1/utlsymbol.h>
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <vgui/Dar.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
@@ -550,7 +550,7 @@ protected:
 	virtual void CreateDragData();
 
 protected:
-	MESSAGE_FUNC_ENUM_ENUM( OnRequestFocus, "OnRequestFocus", VPANEL, subFocus, VPANEL, defaultPanel);
+    MESSAGE_FUNC_HANDLE_HANDLE( OnRequestFocus, "OnRequestFocus", subFocus, defaultPanel);
 	MESSAGE_FUNC_INT_INT( OnScreenSizeChanged, "OnScreenSizeChanged", oldwide, oldtall );
 	virtual void *QueryInterface(EInterfaceID id);
 

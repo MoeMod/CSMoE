@@ -33,6 +33,11 @@ ImColor RGBAtoImColor(rgba_t setColor)
 	return ImColor(setColor[0], setColor[1], setColor[2], setColor[3]);
 }
 
+void ImGui_SetTextAdjustSize(bool x)
+{
+    clgame.ds.adjust_size = x;
+}
+
 int ImGui_Surface_DrawConsoleString(int x0, int y0, const char* string, byte r, byte g, byte b, byte a)
 {
 	if (!ImGui::GetDrawListSharedData()->Font)
@@ -139,7 +144,27 @@ void ImGui_Surface_DrawStringLen(const char* pText, int* length, int* height)
 	TextAdjustSizeReverse(NULL, NULL, length, height);
 }
 
-int ImGui_Surface_DrawChar(int x, int y, int ch, byte r, byte g, byte b, byte a)
+void ImGui_Surface_DrawStringLenUnicode(const wchar_t* pText, int* length, int* height)
+{
+    ImFont* font = ImGui::GetDrawListSharedData()->Font;
+    if (!font)
+        return;
+    ImGuiIO& io = ImGui::GetIO();
+
+    int w = 0;
+    for (auto text = pText; *text != 0; ++text) {
+        int ch = *text;
+        w += font->GetCharAdvance(ch) * io.FontGlobalScale; // / io.FontGlobalScale;
+    }
+
+    int h = font->FontSize * io.FontGlobalScale; // / io.FontGlobalScale;
+    if (length) *length = w;
+    if (height) *height = h;
+
+	TextAdjustSizeReverse(NULL, NULL, length, height);
+}
+
+int ImGui_Surface_DrawChar(int x, int y, wchar_t ch, byte r, byte g, byte b, byte a)
 {
 	ImFont* font = ImGui::GetDrawListSharedData()->Font;
 	if (!font)
@@ -160,6 +185,30 @@ int ImGui_Surface_DrawChar(int x, int y, int ch, byte r, byte g, byte b, byte a)
 	TextAdjustSizeReverse(NULL, NULL, &w, NULL);
 
 	return w;
+}
+
+int ImGui_Surface_GetCharWidth(wchar_t ch)
+{
+    ImFont* font = ImGui::GetDrawListSharedData()->Font;
+    if (!font)
+        return 0;
+    ImGuiIO& io = ImGui::GetIO();
+    int w = font->GetCharAdvance(ch) * io.FontGlobalScale; // / io.FontGlobalScale;
+    TextAdjustSizeReverse(NULL, NULL, &w, NULL);
+
+    return w;
+}
+
+int ImGui_Surface_GetCharHeight()
+{
+    ImFont* font = ImGui::GetDrawListSharedData()->Font;
+    if (!font)
+        return 0;
+    ImGuiIO& io = ImGui::GetIO();
+    int h = font->FontSize * io.FontGlobalScale; // / io.FontGlobalScale;
+    TextAdjustSizeReverse(NULL, NULL, NULL, &h);
+
+    return h;
 }
 
 template<int mode> void ImGui_Surface_SetRenderModeDrawCall(const ImDrawList* parent_list, const ImDrawCmd* cmd)
@@ -226,4 +275,10 @@ void ImGui_Surface_DisableScissor()
 {
 	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
 	drawlist->PopClipRect();
+}
+
+void ImGui_Surface_Flush()
+{
+    ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+    drawlist->AddDrawCmd();
 }

@@ -905,6 +905,8 @@ void Sys_Print( const char *pMsg )
 	Rcon_Print( pMsg );
 }
 
+namespace xe {
+
 /*
 ================
 Msg
@@ -956,4 +958,6 @@ void MsgDev( int level, const char *pMsg, ... )
 		Sys_Print( text );
 		break;
 	}
+}
+
 }

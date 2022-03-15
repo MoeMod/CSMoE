@@ -34,8 +34,7 @@ typedef int (*pfnUserMsgHook)(const char *pszName, int iSize, void *pbuf);
 #include "math.h"
 
 #include "../dlls/vector.h" // dlls/vector.h
-#define vec3_t Vector
-#define vec3_t_ref Vector &
+using namespace cl::moe;
 
 #include "../engine/cdll_int.h"
 #include "../dlls/cdll_dll.h"

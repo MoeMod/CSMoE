@@ -30,8 +30,10 @@ GNU General Public License for more details.
 #include "gamemode/mods_const.h"
 
 #include "legacy/hud_scoreboard_legacy.h"
+#ifdef XASH_IMGUI
 #include "imgui.h"
 #include "imgui_utils.h"
+#endif
 
 hud_player_info_t   g_PlayerInfoList[MAX_PLAYERS + 1]; // player info from the engine
 extra_player_info_t	g_PlayerExtraInfo[MAX_PLAYERS + 1]; // additional player info sent directly to the client dll

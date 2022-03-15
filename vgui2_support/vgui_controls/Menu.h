@@ -279,8 +279,8 @@ namespace vgui2
 
 		void SetCurrentlySelectedItem(MenuItem *item);
 		void SetCurrentlySelectedItem(int itemID);
-		MESSAGE_FUNC_INT(OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
-		MESSAGE_FUNC_INT(OnCursorExitedMenuItem, "CursorExitedMenuItem", VPanel);
+        MESSAGE_FUNC_HANDLE(OnCursorEnteredMenuItem, "CursorEnteredMenuItem", menuItem);
+        MESSAGE_FUNC_HANDLE(OnCursorExitedMenuItem, "CursorExitedMenuItem", menuItem);
 
 		void MoveAlongMenuItemList(int direction, int loopCount);
 

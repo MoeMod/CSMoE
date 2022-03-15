@@ -16,7 +16,7 @@
 #include <tier1/utlsymbol.h>
 #include <tier1/utlhandletable.h>
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 #include <vgui/Dar.h>
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>

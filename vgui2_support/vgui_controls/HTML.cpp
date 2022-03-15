@@ -34,7 +34,7 @@
 #include "html/ichromehtmlwrapper.h"
 
 #include "FileSystem.h"
-#include "../vgui2/src/vgui_key_translation.h"
+#include "vgui2/vgui_key_translation.h"
 
 #undef PostMessage
 #undef MessageBox
@@ -1506,13 +1506,13 @@ void HTML::CHTMLFindBar::OnCommand( const char *pchCmd )
 void HTML::BrowserReady()
 {
 	/*
-	const char *pchTitle = g_pVGuiLocalize->FindAsUTF8( "#cef_error_title" );
-	const char *pchHeader = g_pVGuiLocalize->FindAsUTF8( "#cef_error_header" );
-	const char *pchDetailCacheMiss = g_pVGuiLocalize->FindAsUTF8( "#cef_cachemiss" );
-	const char *pchDetailBadUURL = g_pVGuiLocalize->FindAsUTF8( "#cef_badurl" );
-	const char *pchDetailConnectionProblem = g_pVGuiLocalize->FindAsUTF8( "#cef_connectionproblem" );
-	const char *pchDetailProxyProblem = g_pVGuiLocalize->FindAsUTF8( "#cef_proxyconnectionproblem" );
-	const char *pchDetailUnknown = g_pVGuiLocalize->FindAsUTF8( "#cef_unknown" );
+	const char *pchTitle = vgui2::localize()->FindAsUTF8( "#cef_error_title" );
+	const char *pchHeader = vgui2::localize()->FindAsUTF8( "#cef_error_header" );
+	const char *pchDetailCacheMiss = vgui2::localize()->FindAsUTF8( "#cef_cachemiss" );
+	const char *pchDetailBadUURL = vgui2::localize()->FindAsUTF8( "#cef_badurl" );
+	const char *pchDetailConnectionProblem = vgui2::localize()->FindAsUTF8( "#cef_connectionproblem" );
+	const char *pchDetailProxyProblem = vgui2::localize()->FindAsUTF8( "#cef_proxyconnectionproblem" );
+	const char *pchDetailUnknown = vgui2::localize()->FindAsUTF8( "#cef_unknown" );
 
 	// tell it utf8 loc strings to use
 	CHTMLProtoBufMsg<CMsgBrowserErrorStrings> cmd( eHTMLCommands_BrowserErrorStrings );

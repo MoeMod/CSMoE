@@ -1,4 +1,4 @@
-//===== Copyright ?1996-2005, Valve Corporation, All rights reserved. ======//
+//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: Declaration of FileOpenDialog class, a generic open/save as file dialog
 //
@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include "Frame.h"
+#include "vgui_controls/Frame.h"
 
 namespace vgui2
 {

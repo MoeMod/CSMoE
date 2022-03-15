@@ -23,7 +23,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 project (server)
-set(CMAKE_CXX_STANDARD 20)
 
 set (SERVER_LIBRARY server)
 
@@ -153,7 +152,6 @@ set(HLDLL_SRCS
 	./gamemode/mod_zbs.cpp
 	./gamemode/zbs/zs_subs.cpp
 	./gamemode/zbs/monster_entity.cpp
-	./../public/unicode_strtools.cpp
 	./gamemode/mod_zb2.cpp
 	./gamemode/zb2/supplybox.cpp
 	./bot/cs_bot_bhopjump.cpp
@@ -420,7 +418,7 @@ include_directories (
 	../engine/
 	../pm_shared/
 	../public/
-	../public/tier1/
+	../SourceSDK/public/
 	../dlls/
 	../game_shared/)
 
@@ -469,8 +467,14 @@ add_definitions(
 	-DQUIVER -DQUAKE2 -DVALVE_DLL -DSERVER_DLL
 	)
 
+# fix tier1/strtools
+add_definitions(
+	-DVSTDLIB_BACKWARD_COMPAT
+)
+
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
 target_link_libraries( ${SERVER_LIBRARY} luash cqmiao )
+target_link_libraries( ${SERVER_LIBRARY} platform_config )
 
 if(ANDROID OR IOS)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES

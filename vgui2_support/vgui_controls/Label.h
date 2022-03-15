@@ -14,7 +14,7 @@
 
 #include <tier1/utlvector.h>
 
-#include <vgui/VGUI2.h>
+#include <vgui/VGUI.h>
 
 #include "Panel.h"
 #include "PHandle.h"

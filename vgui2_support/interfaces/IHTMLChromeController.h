@@ -4,6 +4,8 @@
 #include <interface.h>
 
 class IHTMLResponses;
+class IHTMLResponses_HL1;
+enum EHTMLCommands : int;
 
 class IHTMLChromeController : public IBaseInterface {
 public:
@@ -17,7 +19,7 @@ public:
 	virtual void CreateBrowser(class IHTMLResponses *, bool, const char  *) = 0;
 	virtual void RemoveBrowser(class IHTMLResponses *) = 0;
 	virtual void WakeThread() = 0;
-	virtual class HTMLCommandBuffer_t * GetFreeCommandBuffer(enum EHTMLCommands, int) = 0;
+	virtual class HTMLCommandBuffer_t * GetFreeCommandBuffer(EHTMLCommands, int) = 0;
 	virtual void PushCommand(class HTMLCommandBuffer_t *) = 0;
 	virtual void SetCefThreadTargetFrameRate(uint32_t) = 0;
 	virtual class IHTMLSerializer * CreateSerializer(class IHTMLResponses_HL1 *) = 0;

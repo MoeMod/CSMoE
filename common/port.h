@@ -113,7 +113,7 @@ GNU General Public License for more details.
 	#define tell( a )					lseek(a, 0, SEEK_CUR)
 
 	typedef unsigned char	BYTE;
-	typedef short int	    WORD;
+	typedef unsigned short  WORD;
 	typedef unsigned int    DWORD;
 	typedef int	    LONG;
 	typedef unsigned int   ULONG;

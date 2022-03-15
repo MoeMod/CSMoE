@@ -65,7 +65,7 @@ private:
 	public:
 		CompletionItem( void );
 		CompletionItem( const CompletionItem& src );
-		CompletionItem& CompletionItem::operator =( const CompletionItem& src );
+		CompletionItem& operator =( const CompletionItem& src );
 		~CompletionItem( void );
 		const char *GetItemText( void );
 		const char *GetCommand( void ) const;
