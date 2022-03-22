@@ -64,9 +64,6 @@ public:
 
 	void ConstructString( wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const char *tokenName, KeyValues *localizationVariables ) override;
 	void ConstructString( wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, vgui2::StringIndex_t unlocalizedTextSymbol, KeyValues *localizationVariables ) override;
-
-	void ConstructString( wchar_t *unicodeOuput, int unicodeBufferSizeInBytes, wchar_t *formatString, int numFormatParameters, va_list argList );
-
 private:
 	static bool FastValueLessFunc( const fastvalue_t& lhs, const fastvalue_t& rhs );
 	static bool SymLess( const localizedstring_t& lhs, const localizedstring_t& rhs );

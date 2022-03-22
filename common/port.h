@@ -116,7 +116,7 @@ GNU General Public License for more details.
 	typedef unsigned short  WORD;
 	typedef unsigned int    DWORD;
 	typedef int	    LONG;
-	typedef unsigned int   ULONG;
+	typedef unsigned long   ULONG;
 	typedef int			WPARAM;
 	typedef unsigned int    LPARAM;
 

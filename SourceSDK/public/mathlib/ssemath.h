@@ -8,7 +8,7 @@
 
 #if defined( _X360 )
 #include <xboxmath.h>
-#elif defined(__arm__) || defined(__arm64__)
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__)
 #include "sse2neon.h"
 #else
 #include <xmmintrin.h>

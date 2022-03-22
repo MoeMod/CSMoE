@@ -84,3 +84,5 @@ target_include_directories(vgui_controls PUBLIC
 		${HLSDK_PATH}/pm_shared
 )
 target_link_libraries(vgui_controls PUBLIC platform_config)
+target_link_libraries(vgui_controls PUBLIC dead_wrapper)
+target_link_libraries(vgui_controls PUBLIC vstdlib)

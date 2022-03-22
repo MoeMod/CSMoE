@@ -87,8 +87,7 @@ if(OSX)
 			#vgui2/vgui_surfacelib/osxfont.cpp
 			vgui2/vgui_surfacelib/linuxfont.cpp
 			)
-	find_package(Freetype REQUIRED)
-	target_link_libraries(vgui_surfacelib PUBLIC Freetype::Freetype)
+	target_link_libraries(vgui_surfacelib PUBLIC 3rdparty-freetype)
 endif()
 if(LINUX)
 	target_sources(vgui_surfacelib PRIVATE
@@ -100,8 +99,7 @@ if(NOT ANDROID)
 	find_package(Fontconfig REQUIRED)
 	target_link_libraries(vgui_surfacelib PUBLIC Fontconfig::Fontconfig)
 endif()
-	find_package(Freetype REQUIRED)
-	target_link_libraries(vgui_surfacelib PUBLIC Freetype::Freetype)
+	target_link_libraries(vgui_surfacelib PUBLIC 3rdparty-freetype)
 endif()
 target_include_directories(vgui_surfacelib PUBLIC
 		vgui2
@@ -119,6 +117,7 @@ add_library(dead_wrapper STATIC
     dead_wrapper/deadipanel.cpp
     dead_wrapper/deadscheme.cpp
     dead_wrapper/deadsurface.cpp
+	${HL2SDK_PATH}/public/filesystem_helpers.cpp
 )
 target_link_libraries(dead_wrapper PUBLIC vgui2_interfaces)
 target_link_libraries(dead_wrapper PRIVATE vguimatsurface)
@@ -133,8 +132,6 @@ add_library(vgui2_support STATIC
     udll_int.cpp
     interface_static.cpp
     filesystem_xash.cpp
-
-	${HL2SDK_PATH}/public/filesystem_helpers.cpp
 )
 
 target_link_libraries(vgui2_support PUBLIC vgui2_interfaces)

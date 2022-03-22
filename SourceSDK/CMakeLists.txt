@@ -85,11 +85,19 @@ add_library(tier1 STATIC
         ${HL2SDK_PATH}/tier1/utlsymbol.cpp
         ${HL2SDK_PATH}/tier1/ilocalize.cpp
         )
+if(LINUX)
+    target_sources(tier1 PRIVATE
+            ${HL2SDK_PATH}/tier1/qsort_s.cpp
+            )
+endif()
 target_include_directories(tier1 PUBLIC
         ${HL2SDK_PATH}/public
         ${HL2SDK_PATH}/public/tier1
         )
 target_link_libraries(tier1 PUBLIC platform_config)
+if(ANDROID)
+    target_link_libraries(tier1 PRIVATE android) # iconv
+endif()
 
 add_library(mathlib STATIC
         ${HL2SDK_PATH}/mathlib/color_conversion.cpp

@@ -32,7 +32,7 @@
 
 #define SETBITS(iBitVector, bits)		((iBitVector) |= (bits))
 #define CLEARBITS(iBitVector, bits)		((iBitVector) &= ~(bits))
-#define FBitSet(iBitVector, bits)		((iBitVector) & (bits))
+#define FBITSET(iBitVector, bits)		((iBitVector) & (bits))
 
 template <typename T>
 inline bool IsPowerOfTwo( T value )

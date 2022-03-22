@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
-        minSdkVersion 24
+        minSdkVersion 28
         targetSdkVersion 29
 
         externalNativeBuild {
@@ -68,6 +68,7 @@ android {
             assets.srcDirs = ['src/main/assets', '../../CSMoE-Full']
         }
     }
+    ndkVersion '21.1.6352462'
 }
 
 dependencies {

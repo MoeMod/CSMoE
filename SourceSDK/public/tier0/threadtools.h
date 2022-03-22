@@ -12,7 +12,7 @@
 #include "tier0/type_traits.h"
 
 #include <limits.h>
-#if defined( __arm__ ) || defined( __arm64__ )
+#if defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )
 #include <atomic>
 #endif
 
@@ -152,7 +152,7 @@ inline void ThreadPause()
 #elif POSIX && ( defined( __i386__ ) || defined( __x86_64__ ) )
 	__asm __volatile( "pause" );
 #elif defined( _X360 )
-#elif defined(__arm__) || defined(__arm64__)
+#elif defined(__arm__) || defined(__arm64__) || defined(__aarch64__)
 	sched_yield();
 #else
 #error "implement me"
@@ -528,7 +528,7 @@ public:
 	bool operator!=( T rhs ) const	{ return ( m_value != rhs ); }
 
 
-#if defined( __arm__ ) || defined( __arm64__ )
+#if defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )
     CInterlockedIntT( const CInterlockedIntT &rhs ) : m_value( rhs ) 	{}
     CInterlockedIntT &operator=( const CInterlockedIntT &rhs ) { m_value.store(rhs.m_value.load()); return *this; }
 	T operator++()					{ return m_value.fetch_add(1) + 1; }
@@ -577,7 +577,7 @@ public:
 	T operator-( T rhs ) const		{ return m_value - rhs; }
 
 private:
-#if defined( __arm__ ) || defined( __arm64__ )
+#if defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )
     std::atomic<T> m_value;
 #else
 	volatile T m_value;
@@ -601,7 +601,7 @@ public:
 	bool operator!() const			{ return ( m_value == 0 ); }
 	bool operator==( T *rhs ) const	{ return ( m_value == rhs ); }
 	bool operator!=( T *rhs ) const	{ return ( m_value != rhs ); }
-#if defined( __arm__ ) || defined( __arm64__ )
+#if defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )
     CInterlockedPtr( const CInterlockedPtr &rhs ) : m_value( rhs ) 	{}
     CInterlockedPtr &operator=( const CInterlockedPtr &rhs ) { m_value.store(rhs.m_value.load()); return *this; }
     T *operator++()					{ return m_value.fetch_add(1) + 1; }
@@ -653,7 +653,7 @@ public:
 	size_t operator-( const CInterlockedPtr<T> &p ) const	{ return m_value - p.m_value; }
 
 private:
-#if defined( __arm__ ) || defined( __arm64__ )
+#if defined( __arm__ ) || defined( __arm64__ ) || defined( __aarch64__ )
     std::atomic<T *> m_value;
 #else
 	T * volatile m_value;

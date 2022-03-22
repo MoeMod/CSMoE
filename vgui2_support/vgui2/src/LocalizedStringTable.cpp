@@ -143,10 +143,14 @@ bool CLocalizedStringTable::AddFile( IFileSystem *fileSystem, const char *fileNa
 	bool bSuccess = false;
 
 	//Little endian UTF16 byte order mark.
+#ifdef _WIN32
 	if( *data == 0xFEFF )
 	{
 		auto pszData = data + 1;
-
+#else
+    {
+        auto pszData = data;
+#endif
 		//TODO: part of debug only code? - Solokiller
 		vgui2::system()->CommandLineParamExists( "-ccsyntax" );
 
@@ -646,66 +650,6 @@ void CLocalizedStringTable::ConstructString( wchar_t *unicodeOutput, int unicode
 
 		wcsncpy( unicodeOutput, L"[", bufSize );
 	}
-}
-
-void CLocalizedStringTable::ConstructString( wchar_t *unicodeOuput, int unicodeBufferSizeInBytes, wchar_t *formatString, int numFormatParameters, va_list argList )
-{
-	//This only works if callers only pass wchar_t* as varargs parameters.
-	auto ppszStrings = reinterpret_cast<const wchar_t**>( argList );
-
-	auto bufSize = unicodeBufferSizeInBytes / sizeof( wchar_t );
-
-	auto pszFormatArg = formatString;
-
-	auto uiFmtLen = wcslen( formatString );
-
-	auto pszDest = unicodeOuput;
-
-	while( *pszFormatArg && bufSize > 1 )
-	{
-		if( uiFmtLen <= 2 ||
-			*pszFormatArg != L'%' ||
-			pszFormatArg[ 1 ] != L's' )
-		{
-			*pszDest = *pszFormatArg;
-			--bufSize;
-			++pszDest;
-			++pszFormatArg;
-			--uiFmtLen;
-			continue;
-		}
-
-		const auto index = pszFormatArg[ 2 ] - L'1';
-
-		if( index >= numFormatParameters )
-		{
-			*pszDest = L'%';
-			--bufSize;
-			++pszDest;
-			++pszFormatArg;
-			--uiFmtLen;
-			continue;
-		}
-
-		auto src = ppszStrings[ index ];
-
-		if( !src )
-			*pszDest = L'\0';
-
-		auto uiArgLen = wcslen( src );
-
-		if( bufSize < uiArgLen )
-			uiArgLen = bufSize - 1;
-
-		pszFormatArg += 3;
-		uiFmtLen -= 3;
-		wcsncpy( pszDest, src, uiArgLen );
-
-		bufSize -= uiArgLen;
-		pszDest += uiArgLen;
-	}
-
-	*pszDest = L'\0';
 }
 
 bool CLocalizedStringTable::FastValueLessFunc( const fastvalue_t& lhs, const fastvalue_t& rhs )
