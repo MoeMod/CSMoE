@@ -142,7 +142,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_galil");
 	UTIL_PrecacheOtherWeapon("weapon_famas");
 
-#ifdef XASH_DEDICATED
+
 	UTIL_PrecacheOtherWeapon("weapon_mp7a1d");
 	UTIL_PrecacheOther("ammo_46mm");
 	UTIL_PrecacheOtherWeapon("weapon_ak47l");
@@ -280,7 +280,11 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_revivegun");
 	UTIL_PrecacheOther("ammo_revivegun");
 	UTIL_PrecacheOtherWeapon("knife_holysword");
-#endif
+	UTIL_PrecacheOtherWeapon("weapon_y20s2scard");
+	UTIL_PrecacheOtherWeapon("weapon_zombielaw");
+	UTIL_PrecacheOtherWeapon("weapon_m32venom");
+	UTIL_PrecacheOther("ammo_m32venomgrenade");
+	UTIL_PrecacheOtherWeapon("weapon_m95tiger");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

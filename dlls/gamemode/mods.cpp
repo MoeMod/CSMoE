@@ -66,7 +66,7 @@ void InstallBteMod(const char *name)
 {
 	for (auto p : g_FindList)
 	{
-		if (!strcasecmp(name, p.first))
+		if (!stricmp(name, p.first))
 		{
 			g_pModRunning = p.second();
 			return;

@@ -88,19 +88,19 @@ namespace sv {
 
 		void Precache() override
 		{
-			PRECACHE_MODEL("models/ef_summoner_summoning.mdl");
+			//PRECACHE_MODEL("models/ef_summoner_summoning.mdl");
 			//PRECACHE_MODEL("models/ef_summoner_swing.mdl");
 
 			PRECACHE_MODEL("models/summoner.mdl");
 
-			PRECACHE_MODEL("sprites/ef_summoner_summon01.spr");
-			PRECACHE_MODEL("sprites/ef_summoner_summon02.spr");
-			PRECACHE_MODEL("sprites/ef_summoner_unsummon01.spr");
-			PRECACHE_MODEL("sprites/ef_summoner_unsummon02.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_summon01.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_summon02.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_unsummon01.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_unsummon02.spr");
 
-			PRECACHE_MODEL("sprites/ef_summoner_smoke.spr");
-			PRECACHE_MODEL("sprites/ef_summoner_stab1.spr");
-			PRECACHE_MODEL("sprites/ef_summoner_stab2.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_smoke.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_stab1.spr");
+			//PRECACHE_MODEL("sprites/ef_summoner_stab2.spr");
 
 			PRECACHE_SOUND("weapons/summon_summon.wav");
 			PRECACHE_SOUND("weapons/summon_unsummon.wav");

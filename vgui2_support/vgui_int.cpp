@@ -1,7 +1,7 @@
-#include <string.h>
-#include <stdlib.h>
 #include "vgui_api.h"
 #include "cdll_int.h"
+
+#include "BaseUISurface.h"
 
 #include <FileSystem.h>
 #include "IBaseUI.h"
@@ -9,7 +9,6 @@
 #include "vgui/IInputInternal.h"
 #include "vgui/KeyCode.h"
 #include "vgui/MouseCode.h"
-#include "BaseUISurface.h"
 
 extern BaseUISurface *staticSurface;
 

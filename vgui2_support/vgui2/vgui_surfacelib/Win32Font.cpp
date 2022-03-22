@@ -120,7 +120,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	m_bRotary = (flags & vgui2::ISurface::FONTFLAG_ROTARY) ? 1 : 0;
 	m_bAdditive = (flags & vgui2::ISurface::FONTFLAG_ADDITIVE) ? 1 : 0;
 
-	int charset = (flags & vgui2::ISurface::FONTFLAG_SYMBOL) ? SYMBOL_CHARSET : ANSI_CHARSET;
+	int charset = (flags & vgui2::ISurface::FONTFLAG_SYMBOL) ? SYMBOL_CHARSET : DEFAULT_CHARSET;
 
 	// hack for japanese win98 support
 	if ( !stricmp( windowsFontName, "win98japanese" ) )
@@ -130,13 +130,22 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 		m_szName = "Tahoma";
 	}
 
+	// MoeMod : support CSO Fontloading
+	if (!stricmp(windowsFontName, "DFYuanW9-GB"))
+	{
+		if (!(m_iFlags & vgui2::ISurface::FONTFLAG_CUSTOM))
+			m_iFlags |= vgui2::ISurface::FONTFLAG_CUSTOM;
+
+		m_bAntiAliased = true;
+	}
+
 	// create our windows device context
 	m_hDC = ::CreateCompatibleDC(NULL);
 	Assert( m_hDC );
 
 	// see if the font exists on the system
 	LOGFONT logfont;
-	logfont.lfCharSet = DEFAULT_CHARSET;
+	logfont.lfCharSet = charset;
 	logfont.lfPitchAndFamily = 0;
 	strcpy(logfont.lfFaceName, m_szName.String());
 	g_bFontFound = false;
@@ -297,14 +306,14 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 	{
 		// try and get the glyph directly
 		::SelectObject(m_hDC, m_hFont);
-		bytesNeeded = ::GetGlyphOutline(m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, 0, NULL, &mat2);
+		bytesNeeded = ::GetGlyphOutlineW(m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, 0, NULL, &mat2);
 	}
 
 	if (bytesNeeded > 0)
 	{
 		// take it
 		unsigned char *lpbuf = (unsigned char *)_alloca(bytesNeeded);
-		::GetGlyphOutline(m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, bytesNeeded, lpbuf, &mat2);
+		::GetGlyphOutlineW(m_hDC, ch, GGO_GRAY8_BITMAP, &glyphMetrics, bytesNeeded, lpbuf, &mat2);
 
 		// rows are on DWORD boundaries
 		wide = glyphMetrics.gmBlackBoxX;
@@ -394,7 +403,7 @@ void CWin32Font::GetCharRGBA(wchar_t ch, int rgbaWide, int rgbaTall, unsigned ch
 		{
 			// clear the background first (it may not get done automatically in win98/ME
 			RECT rect = { 0, 0, wide, tall};
-			::ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
+			::ExtTextOutA(m_hDC, 0, 0, ETO_OPAQUE, &rect, NULL, 0, NULL);
 
 			// convert the character using the current codepage
 			char mbcs[6] = { 0 };

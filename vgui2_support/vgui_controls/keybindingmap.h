@@ -13,7 +13,9 @@
 #include <tier1/utlvector.h>
 
 // more flexible than default pointers to members code required for casting member function pointers
+#ifdef _MSC_VER
 #pragma pointers_to_members( full_generality, virtual_inheritance )
+#endif
 
 namespace vgui2
 {

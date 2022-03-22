@@ -1,12 +1,8 @@
-#include <vector>
-#include <string.h>
-
+#include "BaseUISurface.h"
 #include "FontTextureCache.h"
 #include "vgui_surfacelib/FontManager.h"
 
-#include "vgui_api.h"
-#include "cdll_int.h"
-#include "BaseUISurface.h"
+#include <vgui/ISurface.h>
 
 extern BaseUISurface* staticSurface;
 

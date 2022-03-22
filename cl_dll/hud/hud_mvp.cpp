@@ -5,6 +5,7 @@
 #include "parsemsg.h"
 #include "draw_util.h"
 #include "hud_mvp.h"
+#include "gamemode/mods_const.h"
 
 DECLARE_MESSAGE(m_MVP, MVPInfo)
 

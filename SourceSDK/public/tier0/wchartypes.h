@@ -78,12 +78,12 @@ typedef wchar_t wchar;
 
 #if defined(_UNICODE)
 typedef wchar tchar;
-#define tstring wstring
+#define tstring std::wstring
 #define __TFILE__ __WFILE__
 #define TCHAR_IS_WCHAR
 #else
 typedef char tchar;
-#define tstring string
+#define tstring std::string
 #define __TFILE__ __FILE__
 #define TCHAR_IS_CHAR
 #endif

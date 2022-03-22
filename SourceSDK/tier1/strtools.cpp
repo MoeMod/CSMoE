@@ -79,7 +79,9 @@
 #include "xbox/xbox_win32stubs.h"
 #endif
 #include "tier0/memdbgon.h"
+#ifdef POSIX
 #include "iconv.h"
+#endif
 
 static int FastToLower( char c )
 {

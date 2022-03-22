@@ -21,6 +21,11 @@ namespace vgui2
 class ListPanel;
 }
 
+#define MAX_GAMEMODES 8
+static const char* g_szGameModeCode[MAX_GAMEMODES] = {
+	"none", "dm", "tdm", "zb1", "zb3", "zbs", "gd", "zbb"
+};
+
 //-----------------------------------------------------------------------------
 // Purpose: server options page of the create game server dialog
 //-----------------------------------------------------------------------------
@@ -49,9 +54,11 @@ protected:
 
 private:
 	void LoadMapList();
+	void LoadModeList();
 	void LoadMaps( const char *pszPathID );
 
 	vgui2::ComboBox *m_pMapList;
+	vgui2::ComboBox* m_pModeList;
 	vgui2::TextEntry *m_pBotQuotaCombo;
 	vgui2::CheckButton *m_pEnableBotsCheck;
 	CCvarToggleCheckButton *m_pEnableTutorCheck;
@@ -60,6 +67,7 @@ private:
 	char m_szHostName[DATA_STR_LENGTH];
 	char m_szPassword[DATA_STR_LENGTH];
 	char m_szMapName[DATA_STR_LENGTH];
+	char m_szModeName[DATA_STR_LENGTH];
 	int m_iMaxPlayers;
 	CUtlRBTree<CUtlSymbol> m_MapNames;
 };

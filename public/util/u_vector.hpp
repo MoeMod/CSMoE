@@ -511,11 +511,6 @@ template<class T, std::size_t Align> constexpr void CrossProduct(VectorBase<T, 3
 	out = CrossProduct(a, b);
 }
 
-template<class T, std::size_t N, std::size_t Align> T AngleBetweenVectors(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b)
-{
-	return moe_math_util::acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
-}
-
 template<class T, std::size_t N, std::size_t Align> constexpr T VectorNormalize(VectorBase<T, N, Align> &in)
 {
 	return in.NormalizeInPlace();

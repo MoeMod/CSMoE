@@ -937,11 +937,11 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/ef_fireball.mdl");
 			m_sModelIndex = PRECACHE_MODEL("sprites/bexplo.spr");
-			m_sFireIndex[0] = PRECACHE_MODEL("sprites/buffm249_fire01.spr");
+		/*	m_sFireIndex[0] = PRECACHE_MODEL("sprites/buffm249_fire01.spr");
 			m_sFireIndex[1] = PRECACHE_MODEL("sprites/buffm249_fire02.spr");
 			m_sFireIndex[2] = PRECACHE_MODEL("sprites/buffm249_fire03.spr");
 			m_sFireIndex[3] = PRECACHE_MODEL("sprites/buffm249_fire04.spr");
-			m_sFireIndex[4] = PRECACHE_MODEL("sprites/buffm249_fire05.spr");
+			m_sFireIndex[4] = PRECACHE_MODEL("sprites/buffm249_fire05.spr");*/
 		}
 		void Spawn()
 		{
@@ -1014,7 +1014,6 @@ namespace sv {
 		}
 	private:
 		short m_sModelIndex;
-		short m_sFireIndex[5];
 		time_point_t m_flFireThink;
 	};
 	LINK_ENTITY_TO_CLASS(zbz_fireball, CZBZFireBall);
@@ -1469,7 +1468,7 @@ namespace sv {
 
 				EMIT_SOUND(ENT(pev), CHAN_STATIC, "weapons/bunkerbuster_explosion_1st.wav", VOL_NORM, ATTN_NORM);
 
-				RadiusDamage3(pev->origin, pev, VARS(pev->owner), 500.0f * (50.0f * g_pGameRules->m_iTotalRoundsPlayed), 250.0f, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, 0);
+				RadiusDamage3(pev->origin, pev, VARS(pev->owner), 500.0f * (5.0f * g_pGameRules->m_iTotalRoundsPlayed), 250.0f, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, 0);
 
 				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 				WRITE_BYTE(TE_EXPLOSION);
@@ -1526,6 +1525,36 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_RapidReloaderII : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_RapidReloaderII(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "高速装填II"; }
+		const char* GetDesc() const override { return "武器直接消耗备弹"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		
+		void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int &iClip, int &iBackAmmo)
+		{
+			if (iClip <= 0)
+				return;
+
+			if (iBackAmmo <= 0)
+				return;
+
+			int iClipDecrease = iClipBeforeAttack - iClip;
+			if (iBackAmmo - iClipDecrease)
+			{
+				iBackAmmo -= iClipDecrease;
+				iClip += iClipDecrease;
+			}
+			else
+			{
+				iClip -= (iClipDecrease - iBackAmmo);
+				iBackAmmo = 0;
+			}
+		}
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -1573,6 +1602,8 @@ namespace sv {
 		{ Skill_RapidFireAmmo, 100, MakeSkill<ZSkill_RapidFireAmmo> },
 		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
+		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
+		
 		
 	};
 

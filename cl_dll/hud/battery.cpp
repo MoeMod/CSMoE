@@ -108,8 +108,8 @@ int CHudBattery::Draw( float flTime )
 	// battery can go from 0 to 100 so * 0.01 goes from 0 to 1
 	rc.top += m_iHeight * ((float)( 100 - ( min( 100, m_iBat ))) * 0.01f );
 
-	DrawUtils::UnpackRGB( r, g, b, gHUD.m_csgohud->value? RGB_WHITE : RGB_YELLOWISH );
-	if (gHUD.m_csgohud->value)
+	DrawUtils::UnpackRGB( r, g, b, gHUD.m_hudstyle->value? RGB_WHITE : RGB_YELLOWISH );
+	if (gHUD.m_hudstyle->value)
 		a = 255;
 	// Has health changed? Flash the health #
 	if( m_fFade )
@@ -126,13 +126,13 @@ int CHudBattery::Draw( float flTime )
 		}
 
 		// Fade the health number back to dim
-		if (!gHUD.m_csgohud->value)
+		if (!gHUD.m_hudstyle->value)
 			a = MIN_ALPHA +  (m_fFade / FADE_TIME) * 128;
 
 	}
 	else
 	{
-		if (!gHUD.m_csgohud->value)
+		if (!gHUD.m_hudstyle->value)
 			a = MIN_ALPHA;
 	}
 
@@ -143,7 +143,7 @@ int CHudBattery::Draw( float flTime )
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight / 2;
 	x = ScreenWidth / 5;
 
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		m_pTexture_Black->Draw2DQuadScaled(x - ArmorWidth, y - gHUD.m_iFontHeight / 2, x - ArmorWidth + ScreenWidth / 5 - ArmorWidth, ScreenHeight, 0, 0, 1, 1, 0, 0, 0, 100);
 	}
@@ -164,7 +164,7 @@ int CHudBattery::Draw( float flTime )
 
 	x += (m_hEmpty[m_enArmorType].rect.right - m_hEmpty[m_enArmorType].rect.left);
 	x = DrawUtils::DrawHudNumber( x, y, DHN_3DIGITS|DHN_DRAWZERO, m_iBat, r, g, b );
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		
 		float f = (float)m_iBat / (float)100;

@@ -30,7 +30,7 @@ CTSList<int> g_TestList;
 volatile bool g_bStart;
 std::list<ThreadHandle_t> g_ThreadHandles;
 
-int *g_pTestBuckets;
+int32 *g_pTestBuckets;
 
 CTSListBase g_Test;
 TSLNodeBase_t **g_nodes;

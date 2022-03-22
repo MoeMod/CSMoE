@@ -3515,4 +3515,87 @@ namespace sv {
 	{
 		return 1.2f;
 	}
+
+
+	CZombieSkill_ZombieCreateRocket::CZombieSkill_ZombieCreateRocket(CBasePlayer* player) : CZombieSkill_Base(player)
+	{
+
+	}
+
+	void CZombieSkill_ZombieCreateRocket::Think()
+	{
+
+		CZombieSkill_Base::Think();
+	}
+
+	void CZombieSkill_ZombieCreateRocket::Activate()
+	{
+		if (m_iZombieSkillStatus != SKILL_STATUS_READY)
+		{
+			switch (m_iZombieSkillStatus)
+			{
+			case SKILL_STATUS_USING:
+			case SKILL_STATUS_FREEZING:
+				char buf[16];
+				sprintf(buf, "%d", static_cast<int>((m_flTimeZombieSkillNext - gpGlobals->time) / 1s));
+
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_WaitSkillCoolTime", buf);
+				break;
+			case SKILL_STATUS_USED:
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "The 'Trap' skill can only be used once per round."); // #CSO_CantSprintUsed
+				break;
+			default:
+				break;
+			}
+
+			return;
+		}
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+
+		if (!pWeapon)
+		{
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+			m_pPlayer->GiveNamedItem("weapon_zombielaw");
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+			WRITE_BYTE(ZOMBIE_SKILL_CREATEROCKET);
+			WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+			MESSAGE_END();
+
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+		}
+		else
+		{
+			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "You has a weapon"); // #CSO_CantSprintUsed
+		}
+
+		
+	}
+
+	void CZombieSkill_ZombieCreateRocket::OnSkillEnd()
+	{
+		m_iZombieSkillStatus = SKILL_STATUS_FREEZING;
+	}
+
+	duration_t CZombieSkill_ZombieCreateRocket::GetDurationTime() const
+	{
+		return 1.0s;
+	}
+
+	duration_t CZombieSkill_ZombieCreateRocket::GetCooldownTime() const
+	{
+		switch (m_pPlayer->m_iZombieLevel)
+		{
+		case ZOMBIE_LEVEL_HOST: return 30.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN: return 20.0s; break;
+		case ZOMBIE_LEVEL_ORIGIN_LV2: return 20.0s; break;
+		}
+	}
 }

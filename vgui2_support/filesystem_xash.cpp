@@ -12,9 +12,13 @@ GNU General Public License for more details.
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <string.h>
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <dlfcn.h>
 #include <unistd.h>
+#endif
 #include <stdarg.h>
 #include <time.h>
 #include <sys/stat.h>
@@ -25,6 +29,10 @@ GNU General Public License for more details.
 typedef int qboolean;
 
 #include "fs_int.h"
+
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+#endif
 
 class CXashFileSystem : public IFileSystem
 {
@@ -148,12 +156,12 @@ using namespace vgui2;
 
 #define Mem_Free( ptr ) gFileSystemAPI._Mem_Free( (ptr), __FILE__, __LINE__ );
 
-#define STUBCALL( format, ... ) printf( "FS_Stdio_Xash: called a stub: %s  ->(" format ")\n" , __PRETTY_FUNCTION__, __VA_ARGS__ );
-#define STUBCALL_VOID			printf( "FS_Stdio_Xash: called a stub: %s  ->(void)\n", __PRETTY_FUNCTION__ );
+#define STUBCALL( format, ... ) printf( "FS_Stdio_Xash: called a stub: %s  ->(" format ")\n" , __FUNCTION__, __VA_ARGS__ );
+#define STUBCALL_VOID			printf( "FS_Stdio_Xash: called a stub: %s  ->(void)\n", __FUNCTION__ );
 
 #ifndef NDEBUG
-#define LOGCALL( format, ... )	printf( "FS_Stdio_Xash: called %s     ->(" format ")\n" , __PRETTY_FUNCTION__, __VA_ARGS__ )
-#define LOGCALL_VOID			printf( "FS_Stdio_Xash: called %s     ->(void)\n", __PRETTY_FUNCTION__ );
+#define LOGCALL( format, ... )	printf( "FS_Stdio_Xash: called %s     ->(" format ")\n" , __FUNCTION__, __VA_ARGS__ )
+#define LOGCALL_VOID			printf( "FS_Stdio_Xash: called %s     ->(void)\n", __FUNCTION__ );
 
 #define LOGRETVAL( format, ret ) printf( "FS_Stdio_Xash:             \-> " format "\n", ret );
 #else
@@ -480,7 +488,11 @@ bool CXashFileSystem::FullPathToRelativePath(const char *pFullpath, char *pRelat
         return success;
     }
 
-    char *fullpath = realpath( pFullpath, NULL );
+#ifdef _WIN32
+    const char* fullpath = pFullpath;
+#else
+    char* fullpath = realpath(pFullpath, NULL);
+#endif
     searchpath_t *sp = gFileSystemAPI.FS_GetSearchPaths();
     char *real = NULL;
 
@@ -489,7 +501,11 @@ bool CXashFileSystem::FullPathToRelativePath(const char *pFullpath, char *pRelat
         if( sp->wad || sp->pack )
             continue;
 
+#ifdef _WIN32
+        real = sp->filename;
+#else
         real = realpath( sp->filename, 0 );
+#endif
 
         if( !real )
             continue; // is this possible?
@@ -521,7 +537,10 @@ bool CXashFileSystem::FullPathToRelativePath(const char *pFullpath, char *pRelat
         free( real );
     }
 
+#ifdef _WIN32
+#else
     free( fullpath );
+#endif
 
     return true;
 }

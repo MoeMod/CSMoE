@@ -347,6 +347,7 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_G3SG1:
 	case WEAPON_SKULL5:
 	case WEAPON_SFSNIPER:
+	case WEAPON_M95TIGER:
 		return true;
 
 	default:
@@ -358,7 +359,7 @@ bool CCSBot::IsUsingAWP() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && weapon->m_iId == WEAPON_AWP)
+	if (weapon != NULL && (weapon->m_iId == WEAPON_AWP || weapon->m_iId == WEAPON_M95TIGER))
 		return true;
 
 	return false;

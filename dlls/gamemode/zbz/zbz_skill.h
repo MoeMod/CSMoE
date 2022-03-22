@@ -50,6 +50,7 @@ public:
 	virtual void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) = 0;
 	virtual void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
 	virtual void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) = 0;
+	virtual void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int& iClip, int& iBackAmmo) = 0;
 	virtual void OnAdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int& iClip) = 0;
 	virtual void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) = 0;
 	virtual void OnAdjustZombieKnifeRange(bool bStab, float& flRange) = 0;
@@ -88,6 +89,7 @@ public:
 	void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {}
 	void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override {}
 	void OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t& fDelay) override {}
+	void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int& iClip, int& iBackAmmo) override {}
 	void OnAdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int& iClip) override {}
 	void OnComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax, int& iMax) override {}
 	void OnAdjustZombieKnifeRange(bool bStab, float& flRange) override {}

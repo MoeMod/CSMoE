@@ -388,13 +388,15 @@ namespace sv {
 			PRECACHE_MODEL("models/v_dgaxe_1.mdl");
 			PRECACHE_MODEL("models/p_dgaxe_a.mdl");
 			PRECACHE_MODEL("models/p_dgaxe_b.mdl");
-
+#ifndef CLIENT_DLL
 			PRECACHE_MODEL("sprites/muzzleflash200.spr");
 			PRECACHE_MODEL("sprites/muzzleflash201.spr");
 			PRECACHE_MODEL("sprites/muzzleflash202.spr");
 			PRECACHE_MODEL("sprites/muzzleflash203.spr");
 			PRECACHE_MODEL("sprites/muzzleflash204.spr");
 			PRECACHE_MODEL("sprites/ef_dgaxe_change.spr");
+#endif
+			
 				
 			PRECACHE_SOUND("weapons/dgaxe_combo.wav");
 			PRECACHE_SOUND("weapons/dgaxe_ready.wav");

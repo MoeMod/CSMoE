@@ -4144,7 +4144,7 @@ void CL_UnloadProgs( void )
 
 	Com_FreeLibrary( clgame.hInstance );
 #ifdef XASH_VGUI2
-    extern void VGui2_Shutdown();
+    extern int VGui2_Shutdown();
     VGui2_Shutdown();
 #endif
 	VGui_Shutdown();
@@ -4255,7 +4255,7 @@ qboolean CL_LoadProgs( const char *name )
 		return false;
 	}
 #ifdef XASH_VGUI2
-    extern void VGui2_Initialize(cl_enginefunc_t *pEnginefuncs);
+    extern int VGui2_Initialize(cl_enginefunc_t *pEnginefuncs);
     VGui2_Initialize(&gEngfuncs);
 #endif
 

@@ -76,7 +76,7 @@ add_library(vgui_surfacelib STATIC
 		vgui2/vgui_surfacelib/FontManager.cpp
 		vgui2/vgui_surfacelib/FontEffects.cpp
 		)
-if(HL2_WIN32)
+if(WIN32)
 	target_sources(vgui_surfacelib PRIVATE
 			vgui2/vgui_surfacelib/Win32Font.cpp
 			)
@@ -96,8 +96,10 @@ if(LINUX)
 			#vgui2/vgui_surfacelib/osxfont.cpp
 			vgui2/vgui_surfacelib/linuxfont.cpp
 			)
+if(NOT ANDROID)
 	find_package(Fontconfig REQUIRED)
 	target_link_libraries(vgui_surfacelib PUBLIC Fontconfig::Fontconfig)
+endif()
 	find_package(Freetype REQUIRED)
 	target_link_libraries(vgui_surfacelib PUBLIC Freetype::Freetype)
 endif()

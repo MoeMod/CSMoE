@@ -21,6 +21,9 @@
 #include "hltv.h"
 #include "gamerules.h"
 #include "wpn_c4.h"
+#ifndef CLIENT_DLL
+#include "bot_include.h"
+#endif
 
 #ifdef CLIENT_DLL
 namespace cl {

@@ -21,6 +21,7 @@
 #include "draw_util.h"
 #include "calcscreen.h"
 #include "com_model.h"
+#include "triangleapi.h"
 
 
 DECLARE_MESSAGE(m_HitIndicator, HitMsg )

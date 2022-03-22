@@ -1,10 +1,10 @@
-#include <vector>
-#include <string.h>
-
-#include "vgui_api.h"
-#include "cdll_int.h"
 
 #include "BaseUISurface.h"
+
+#include "filesystem.h"
+#include "render_api.h"
+#include "triangleapi.h"
+
 #include "vgui/IPanel.h"
 #include "vgui/IInput.h"
 #include "vgui/IInputInternal.h"
@@ -13,11 +13,10 @@
 
 #include "vgui_surfacelib/FontManager.h"
 
-#include "filesystem.h"
-#include "render_api.h"
-#include "triangleapi.h"
-
 #include <tier1/utlbuffer.h>
+
+#include <vector>
+#include <memory>
 
 //#define USE_IMGUI_SURFACE
 #ifdef USE_IMGUI_SURFACE

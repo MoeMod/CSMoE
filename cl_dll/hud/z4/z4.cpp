@@ -18,6 +18,8 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "draw_util.h"
 #include "triangleapi.h"
+#include "r_efx.h"
+#include "event_api.h"
 
 #include "parsemsg.h"
 

@@ -260,6 +260,9 @@ set(XASH_ENGINE_IMGUI_SOURCES
 	client/imgui_sprview.cpp
 	client/imgui_connectprogress.cpp
 	client/imgui_surface.cpp
+	client/imgui_menu_server.cpp
+	client/imgui_menu_update.cpp
+	client/imgui_menu_msgbox.cpp
 )
 
 set(XASH_ENGINE_VGUI2_SOURCES

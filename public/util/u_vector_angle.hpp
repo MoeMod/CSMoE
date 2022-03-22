@@ -4,6 +4,12 @@
 #include "u_vector.hpp"
 
 namespace moe {
+
+    template<class T, std::size_t N, std::size_t Align> T AngleBetweenVectors(VectorBase<T, N, Align> a, VectorBase<T, N, Align> b)
+    {
+        return moe_math_util::acos(DotProduct(a.Normalize(), b.Normalize())) * (180 / M_PI);
+    }
+
     template<class T, std::size_t Align> void AngleVectors(VectorBase<T, 3, Align> angles, VectorBase<T, 3, Align> &forward, VectorBase<T, 3, Align>& right, VectorBase<T, 3, Align>& up)
     {
         auto sp = sin(DEG2RAD(angles[PITCH]));

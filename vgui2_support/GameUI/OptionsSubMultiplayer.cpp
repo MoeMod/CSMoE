@@ -34,7 +34,7 @@
 
 struct ColorItem_t
 {
-	char *name;
+	const char *name;
 	int r, g, b;
 };
 

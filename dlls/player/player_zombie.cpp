@@ -187,6 +187,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombiaksha_host.mdl");
 	PRECACHE_MODEL("models/v_knife_zombiaksha.mdl");
 	PRECACHE_MODEL("models/v_knife_zombiboomer.mdl");
+	PRECACHE_MODEL("models/v_knife_zombinemesis.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");

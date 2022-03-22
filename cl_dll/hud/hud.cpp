@@ -72,6 +72,7 @@ GHUD_DECLARE_MESSAGE(ViewMode)
 GHUD_DECLARE_MESSAGE(GameMode)
 GHUD_DECLARE_MESSAGE(ShadowIdx)
 GHUD_DECLARE_MESSAGE(OperationSystem)
+GHUD_DECLARE_MESSAGE(MPToCL)
 
 void __CmdFunc_InputCommandSpecial()
 {
@@ -125,7 +126,8 @@ void CHud :: Init( void )
 	HOOK_COMMAND( "evdev_mouseopen", MouseSucksOpen );
 	HOOK_COMMAND( "evdev_mouseclose", MouseSucksClose );
 #endif
-	
+
+	HOOK_MESSAGE( MPToCL );
 	HOOK_MESSAGE( Logo );
 	HOOK_MESSAGE( ResetHUD );
 	HOOK_MESSAGE( GameMode );
@@ -164,7 +166,7 @@ void CHud :: Init( void )
 	cl_shadows   = CVAR_CREATE( "cl_shadows", "1", FCVAR_ARCHIVE );
 	default_fov  = CVAR_CREATE( "default_fov", "90", 0 );
 	m_pCvarDraw  = CVAR_CREATE( "hud_draw", "1", FCVAR_ARCHIVE );
-	m_csgohud  = CVAR_CREATE( "hud_csgo", "0", FCVAR_ARCHIVE );
+	m_hudstyle  = CVAR_CREATE( "hud_style", "0", FCVAR_ARCHIVE );
 	m_bMordenRadar = FALSE;
 	fastsprites  = CVAR_CREATE( "fastsprites", "0", FCVAR_ARCHIVE );
 	cl_gunsmoke  = CVAR_CREATE( "cl_gunsmoke", "0", FCVAR_ARCHIVE );

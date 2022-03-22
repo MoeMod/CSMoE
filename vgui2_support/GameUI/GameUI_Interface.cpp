@@ -461,8 +461,10 @@ bool CGameUI::IsServerBrowserValid(void)
 
 void CGameUI::ActivateServerBrowser(void)
 {
-	if (serverbrowser)
-		serverbrowser->Activate();
+	/*if (serverbrowser)
+		serverbrowser->Activate();*/
+
+	engine->pfnClientCmd("citrus_servers");
 }
 
 bool CGameUI::IsInLevel(void)

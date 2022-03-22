@@ -294,18 +294,17 @@ inline bool bIsWallBetweenEntity(CBaseEntity* pEntity, CBasePlayer* pAttackPlaye
 	
 	if (tr.flFraction < 1.0)
 	{
-		if (tr.pHit)
-		{
-			CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+		if (!tr.pHit)
+			return false;
 
-			if (pHit && pHit == pEntity)
-				return false;
-		}
+		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
+
+		if (pHit && pHit == pEntity)
+			return false;
+
 		return true;
 	}
-
 	return false;
-
 }
 
 inline

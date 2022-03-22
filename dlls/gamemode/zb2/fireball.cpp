@@ -40,7 +40,7 @@ void CAkshaFireBall::Precache(void)
 {
 	PRECACHE_SOUND("zombi/akshazombi_skill_exp.wav");
 	PRECACHE_MODEL("models/ef_fireball2.mdl");
-	PRECACHE_MODEL("sprites/ef_aksha_fireball.spr");
+	//PRECACHE_MODEL("sprites/ef_aksha_fireball.spr");
 	m_iFireBallDestroy = PRECACHE_MODEL("sprites/ef_aksha_fireballdestroy.spr");
 	m_iFireBallExplosion = PRECACHE_MODEL("sprites/ef_aksha_fireballexplosion.spr");
 }

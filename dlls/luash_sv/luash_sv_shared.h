@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <map>
 
 #ifndef CLIENT_DLL

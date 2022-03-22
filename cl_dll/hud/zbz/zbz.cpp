@@ -17,6 +17,9 @@ GNU General Public License for more details.
 #include "cl_util.h"
 #include "draw_util.h"
 #include "triangleapi.h"
+#include "r_efx.h"
+#include "r_studioint.h"
+#include "event_api.h"
 
 #include "parsemsg.h"
 
@@ -24,6 +27,7 @@ GNU General Public License for more details.
 
 #include "zbz.h"
 #include "zbz_skill_info.h"
+#include "gamemode/mods_const.h"
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;

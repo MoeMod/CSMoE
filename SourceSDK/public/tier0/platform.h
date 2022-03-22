@@ -21,6 +21,13 @@
 #define COMPILER_CLANG 1
 #endif
 
+#ifdef _MSC_VER
+#define COMPILER_MSVC 1
+#ifdef PLATFORM_64BITS
+#define COMPILER_MSVC64 1
+#endif
+#endif
+
 #if defined( _X360 )
 	#define NO_STEAM
 	#define NO_VOICE
@@ -80,7 +87,8 @@
 // need this for memset
 #include <string.h>
 
-#include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
+#include "minmax.h"	// GCC 4.2.2 headers screw up our min/max defs.
+#include "arraysize.h"
 
 #ifdef _RETAIL
 #define IsRetail() true
@@ -170,8 +178,8 @@ typedef signed char int8;
 
 	typedef __int16					int16;
 	typedef unsigned __int16		uint16;
-	typedef __int32					int32;
-	typedef unsigned __int32		uint32;
+	typedef int						int32;
+	typedef unsigned int			uint32;
 	typedef __int64					int64;
 	typedef unsigned __int64		uint64;
 
@@ -179,11 +187,11 @@ typedef signed char int8;
     typedef uint64 ulint64;
 
 	#ifdef PLATFORM_64BITS
-		typedef __int64 intp;				// intp is an integer that can accomodate a pointer
-		typedef unsigned __int64 uintp;		// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
+		typedef long long intp;				// intp is an integer that can accomodate a pointer
+		typedef unsigned long long uintp;		// (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
 	#else
-		typedef __int32 intp;
-		typedef unsigned __int32 uintp;
+		typedef int intp;
+		typedef unsigned int uintp;
 	#endif
 
 	#if defined( _X360 )

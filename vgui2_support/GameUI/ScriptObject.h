@@ -85,7 +85,7 @@ public:
 
 public:
 	bool ReadFromBuffer(char **pBuffer);
-	bool InitFromFile(char *pszFileName);
+	bool InitFromFile(const char *pszFileName);
 	void TransferCurrentValues(const char *pszConfigFile);
 	void AddObject(CScriptObject *pItem);
 	void WriteToConfig(void);

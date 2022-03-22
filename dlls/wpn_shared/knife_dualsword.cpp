@@ -99,12 +99,12 @@ public:
 		PRECACHE_MODEL("models/p_dualsword_a.mdl");
 		PRECACHE_MODEL("models/p_dualsword_b.mdl");
 		
-		m_iModelLeaf1 = PRECACHE_MODEL("sprites/leaf01_dualsword.spr");
-		m_iModelLeaf2 = PRECACHE_MODEL("sprites/leaf02_dualsword.spr");
-		m_iModelPetal1 = PRECACHE_MODEL("sprites/petal01_dualsword.spr");
-		m_iModelPetal2 = PRECACHE_MODEL("sprites/petal02_dualsword.spr");
-		m_iModelSkill = PRECACHE_MODEL("models/dualsword_skill.mdl");
-		PRECACHE_MODEL("models/dualswordfx.mdl");
+		//m_iModelLeaf1 = PRECACHE_MODEL("sprites/leaf01_dualsword.spr");
+		//m_iModelLeaf2 = PRECACHE_MODEL("sprites/leaf02_dualsword.spr");
+		//m_iModelPetal1 = PRECACHE_MODEL("sprites/petal01_dualsword.spr");
+		//m_iModelPetal2 = PRECACHE_MODEL("sprites/petal02_dualsword.spr");
+		//m_iModelSkill = PRECACHE_MODEL("models/dualsword_skill.mdl");
+		//PRECACHE_MODEL("models/dualswordfx.mdl");
 	}
 
 	int m_iModelLeaf1;
@@ -919,16 +919,16 @@ private:
 
 	int m_iAnim;
 	
-	int m_iModelSkillFx1;
-	int m_iModelSkillFx2;
+	//int m_iModelSkillFx1;
+	//int m_iModelSkillFx2;
 
 public:
 
 	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.9f };
 	void Precache() override
 	{
-		m_iModelSkillFx1 = PRECACHE_MODEL("models/dualsword_skillfx1.mdl");
-		m_iModelSkillFx2 = PRECACHE_MODEL("models/dualsword_skillfx2.mdl");
+		//m_iModelSkillFx1 = PRECACHE_MODEL("models/dualsword_skillfx1.mdl");
+		//m_iModelSkillFx2 = PRECACHE_MODEL("models/dualsword_skillfx2.mdl");
 	}
 
 	void Spawn() override

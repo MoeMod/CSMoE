@@ -36,75 +36,6 @@ namespace sv {
 #include "gamemode/mods.h"
 #endif
 
-#ifndef CLIENT_DLL
-class CBalrog7Explosion : public CBaseEntity
-{
-public:
-	void Spawn() override
-	{
-		Precache();
-
-		SET_MODEL(this->edict(), "sprites/balrogcritical.spr");
-		pev->origin[2] += 24.0f;
-		pev->rendermode = kRenderTransAdd; // 5;
-		pev->renderfx = kRenderFxNone;
-		pev->renderamt = 230.0;
-		SetThink(&CBalrog7Explosion::Callback);
-		pev->scale = 0.3;
-		flife = gpGlobals->time;
-		pev->nextthink = gpGlobals->time + 0.15s;
-
-		//ph32 = ?
-		pev->framerate = 1;
-		
-		pev->solid = SOLID_BBOX; // 2
-		pev->movetype = MOVETYPE_NOCLIP; // 9
-		/*
-		v9 = 0x40800000;
-		v10 = 0x40800000;
-		v11 = 0x40800000;
-		v6 = 80000000800000008000000080000000h ^ 0x40800000;
-		v7 = 80000000800000008000000080000000h ^ 0x40800000;
-		v8 = 80000000800000008000000080000000h ^ 0x40800000;
-		return UTIL_SetSize((int)v4, (int)&v6, (int)&v9);
-		*/
-		UTIL_SetSize(pev, { -4, -4, -4 }, { 4, 4, 4 });
-
-		
-	}
-
-
-	void Precache() override
-	{
-		PRECACHE_MODEL("sprites/balrogcritical.spr");
-	}
-
-	
-	time_point_t flife;
-
-
-protected:
-	void Remove()
-	{
-		SetThink(nullptr);
-		pev->effects |= EF_NODRAW; // 0x80u
-		return UTIL_Remove(this);
-	}
-
-	void Callback()
-	{
-		pev->nextthink = gpGlobals->time + 0.01s;
-		this->pev->origin[2] += float(30.0f / (2s / 0.01s));
-		pev->scale  += (0.75 - 0.1)/(2s / 0.01s);
-		pev->renderamt -= int(200 / (2s / 0.01s));
-		if (flife + 0.75s < gpGlobals->time)
-			Remove();
-	}
-};
-
-LINK_ENTITY_TO_CLASS(balrog7_explosion, CBalrog7Explosion);
-#endif
-
 LINK_ENTITY_TO_CLASS(weapon_balrog7, CBalrog7)
 
 void CBalrog7::Spawn(void)
@@ -127,7 +58,7 @@ void CBalrog7::Precache(void)
 	PRECACHE_MODEL("models/v_balrog7.mdl");
 	PRECACHE_MODEL("models/w_balrog7.mdl");
 	PRECACHE_MODEL("models/p_balrog7.mdl");
-	PRECACHE_MODEL("sprites/eexplo.spr");
+
 	PRECACHE_MODEL("sprites/muzzleflash20.spr");
 
 	PRECACHE_SOUND("weapons/balrog7-1.wav");
@@ -309,18 +240,6 @@ void CBalrog7::RadiusDamage(Vector vecAiming, float flDamage)
 			}
 		}
 	}
-
-	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-	WRITE_BYTE(TE_EXPLOSION);
-	WRITE_COORD(vecAiming[0]);
-	WRITE_COORD(vecAiming[1]);
-	WRITE_COORD(vecAiming[2]);
-	WRITE_SHORT(MODEL_INDEX("sprites/eexplo.spr"));
-	WRITE_BYTE(12);
-	WRITE_BYTE(30);
-	WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS);
-	MESSAGE_END();
-
 }
 #endif
 
@@ -373,11 +292,6 @@ void CBalrog7::Balrog7Fire(float flSpread, duration_t flCycleTime, BOOL fUseAuto
 		auto vecShootPosition = Get_ShootPosition(vecSrc, gpGlobals->v_forward, 0.0, 8192, m_pPlayer->random_seed);
 		RadiusDamage(vecShootPosition, BalrogDamage());
 		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog7, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), FALSE, TRUE);
-		CBalrog7Explosion *pEnt = static_cast<CBalrog7Explosion *>(CBaseEntity::Create("balrog7_explosion", vecShootPosition, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
-		if (pEnt)
-		{
-			pEnt->Spawn();
-		}
 		m_iTargetShotsFired = RANDOM_LONG(7, 11);
 		//RadiusDamage(vecAiming , flDamage);
 	}

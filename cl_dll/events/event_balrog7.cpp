@@ -26,13 +26,16 @@
 *
 */
 #include "events.h"
-/*#include "studio.h"
+#include "studio.h"
 #include "r_studioint.h"
-#include <string>*/
+#include <string>
+
+
+namespace cl {
+	extern engine_studio_api_t IEngineStudio;
+}
 
 namespace cl::event::balrog7 {
-
-//extern engine_studio_api_t IEngineStudio;
 
 enum balrog7_e
 {
@@ -68,30 +71,6 @@ void EV_FireBalrog7(event_args_s *args)
 
 	if ( EV_IsLocal( args->entindex ) )
 	{
-		/*if (args->bparam2)
-		{
-			cl_entity_t* ent = gEngfuncs.GetViewModel();
-			struct model_s* pModel = IEngineStudio.Mod_ForName("sprites/muzzleflash20.spr", false);
-			if (pModel)
-			{
-				for (int i = 0; i < 3; i = i + 2)
-				{
-					TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->attachment[i], pModel);
-
-					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 30.0;
-
-					pEnt->entity.curstate.scale = 0.08;
-					pEnt->entity.curstate.rendermode = kRenderTransAdd;
-					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.curstate.movetype = MOVETYPE_FOLLOW;
-					pEnt->entity.curstate.solid = SOLID_NOT;
-
-					pEnt->die = gHUD.m_flTime + 0.02;
-					pEnt->flags |= FTENT_SPRANIMATE;
-				}
-			}
-		}*/
 		++g_iShotsFired;
 		if (args->bparam2)
 		{
@@ -131,6 +110,38 @@ void EV_FireBalrog7(event_args_s *args)
 		1, vecSrc, vecAiming,
 		vSpread, 8192.0, BULLET_PLAYER_556MM,
 		2 );
+
+	if (args->bparam2)
+	{
+		pmtrace_t tr;
+		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecSrc + vecAiming * 8192, PM_NORMAL, -1, &tr);
+
+		Vector VecOrigin = tr.endpos;
+
+		struct model_s* pModel;
+		TEMPENTITY* pEnt;
+
+		pModel = IEngineStudio.Mod_ForName("sprites/balrogcritical.spr", 0);
+
+		pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(VecOrigin, pModel);
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 255;
+		pEnt->entity.curstate.scale = 0.5;
+		pEnt->die = gHUD.m_flTime + 0.6f;
+		pEnt->flags |= FTENT_CLIENTCUSTOM;
+		pEnt->callback = pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+			ent->entity.curstate.scale += 0.007;
+			if (ent->die <= gHUD.m_flTime + 0.3)
+				ent->entity.curstate.renderamt -= 35;
+		};
+
+		int id;
+		gEngfuncs.CL_LoadModel("sprites/fexplo.spr", &id);
+		VecOrigin[2] -= 15.0;
+		gEngfuncs.pEfxAPI->R_Explosion(VecOrigin, id, 0.45, 30, TE_EXPLFLAG_NONE);
+
+		//gEngfuncs.pEfxAPI->R_TracerEffect(gEngfuncs.GetEntityByIndex(idx)->origin, origin);
+	}
 }
 
 }

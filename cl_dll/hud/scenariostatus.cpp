@@ -47,7 +47,7 @@ int CHudScenarioStatus::Draw(float fTime)
 	if (m_iFlags & HUD_ACTIVE)
 	{
 		int r, g, b;
-		if (gHUD.m_csgohud->value && m_hSprite == gHUD.GetSprite(gHUD.GetSpriteIndex("bombticking")))
+		if (gHUD.m_hudstyle->value && m_hSprite == gHUD.GetSprite(gHUD.GetSpriteIndex("bombticking")))
 		{
 			int x = ScreenWidth / 2;	
 			int w = m_rect.right - m_rect.left;

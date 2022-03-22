@@ -1,9 +1,11 @@
 #ifndef ENGINE_VGUI2_FONTTEXTURECACHE_H
 #define ENGINE_VGUI2_FONTTEXTURECACHE_H
 
+#include "winsani_in.h"
 #include <map>
 #include <utility>
 #include <vector>
+#include "winsani_out.h"
 
 #include <vgui/VGUI.h>
 

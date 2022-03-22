@@ -123,6 +123,11 @@ duration_t CPlayerModStrategy_ZBZ::OnDefaultReload_Pre(CBasePlayerWeapon* weapon
 	return fDelay;
 }
 
+void CPlayerModStrategy_ZBZ::OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int &iClip, int &iBackAmmo)
+{
+	SKILL_FUNCTION(m_vecSkill, OnAttack_Post, weapon, iClipBeforeAttack, iClip, iBackAmmo);
+}
+
 int CPlayerModStrategy_ZBZ::AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip)
 {
 	SKILL_FUNCTION(m_vecSkill, OnAdjustDefaultReloadClip, weapon, iClip);

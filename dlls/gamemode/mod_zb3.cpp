@@ -27,6 +27,7 @@ GNU General Public License for more details.
 
 #include "zb2/zb2_zclass_speed.h"
 #include "zb2/zb2_zclass_resident.h"
+#include "zb2/zb2_zclass_nemesis.h"
 
 #include "util/u_range.hpp"
 
@@ -568,7 +569,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 				else
 				{
 					char szText[256];
-					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题专属武器【辉煌】圣剑beta^7", STRING(pEntity->v.netname));
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题武器【虎王】M95^7", STRING(pEntity->v.netname));
 					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 					WRITE_BYTE(ENTINDEX(pEntity));
 					WRITE_STRING(szText);
@@ -576,8 +577,10 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 					CBasePlayer* pPlayer = static_cast<CBasePlayer*>(pEntity2);
 					if (!pPlayer->m_bIsZombie)
 					{
-						pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
-						pPlayer->GiveNamedItem("knife_holysword");
+
+						DropPrimary(pPlayer);
+						//pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+						pPlayer->GiveNamedItem("weapon_m95tiger");
 					}
 				}
 
@@ -791,7 +794,8 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("z4b_cannontiger");
 			else
-				m_pPlayer->GiveNamedItem("weapon_cannon");
+				m_pPlayer->GiveNamedItem("weapon_balrog11");
+				//m_pPlayer->GiveNamedItem("weapon_cannon");
 
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("z4b_infinityx");
@@ -803,6 +807,7 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 			else
 				m_pPlayer->GiveNamedItem("knife_skullaxe");
 
+			
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");
 		}
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
@@ -816,16 +821,17 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFact
 {
 	if(!strcmp(name, "random"))
 	{
-		if(!RANDOM_LONG(0, 3))
-		{
-			// 长手 25%
-			return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
-		}
-		else
-		{
-			// 芭比 75%
-			return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
-		}
+		//if(!RANDOM_LONG(0, 3))
+		//{
+		//	// 长手 25%
+		//	return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
+		//}
+		//else
+		//{
+		//	// 芭比 75%
+		//	return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
+		//}
+		return std::make_shared<CZombieClass_Nemesis>(m_pPlayer, lv);
 	}
 	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
 }

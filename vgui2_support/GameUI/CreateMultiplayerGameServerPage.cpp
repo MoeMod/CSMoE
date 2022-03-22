@@ -45,6 +45,7 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(vgui2::Panel 
 
 	// we can use this if we decide we want to put "listen server" at the end of the game name
 	m_pMapList = new vgui2::ComboBox(this, "MapList", 12, false);
+	m_pModeList = new vgui2::ComboBox(this, "ModeList", 12, false);
 
 	m_pBotQuotaCombo = new vgui2::TextEntry( this, "BotQuotaCombo" );
 	m_pEnableTutorCheck = new CCvarToggleCheckButton( this, "CheckButtonTutor", "#CStrike_Tutor_Enabled", "tutor_enable" );
@@ -53,10 +54,11 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(vgui2::Panel 
 	LoadControlSettings("Resource/CreateMultiplayerGameServerPage.res");
 
 	LoadMapList();
-
+	LoadModeList();
 	if ( stricmp( ModInfo().GetGameDescription(), "Condition Zero" ) )
 		m_pEnableTutorCheck->SetVisible( false );
 
+	m_szModeName[0] = 0;
 	m_szMapName[0]  = 0;
 	m_szHostName[0] = 0;
 	m_szPassword[0] = 0;
@@ -104,6 +106,9 @@ void CCreateMultiplayerGameServerPage::OnApplyChanges()
 
 	KeyValues *kv = m_pMapList->GetActiveItemUserData();
 	strncpy(m_szMapName, kv->GetString("mapname", ""), DATA_STR_LENGTH);
+	kv = m_pModeList->GetActiveItemUserData();
+	strncpy(m_szModeName, kv->GetString("mp_gamemode", ""), DATA_STR_LENGTH);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +253,21 @@ void CCreateMultiplayerGameServerPage::LoadMapList()
 	m_pMapList->ActivateItem( 0 );
 }
 
+void CCreateMultiplayerGameServerPage::LoadModeList()
+{
+	m_pModeList->DeleteAllItems();
+
+	char szPlugin[128];
+	char szName[128];
+
+	for (int i = 0; i < MAX_GAMEMODES; i++)
+	{
+		m_pModeList->AddItem(g_szGameModeCode[i], NULL);
+	}
+
+	m_pModeList->ActivateItem( 0 );
+}
+
 bool CCreateMultiplayerGameServerPage::IsRandomMapSelected()
 {
 	const char *mapname = m_pMapList->GetActiveItemUserData()->GetString("mapname");
@@ -290,6 +310,7 @@ void CCreateMultiplayerGameServerPage::SetMap(const char *mapName)
 		}
 	}
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

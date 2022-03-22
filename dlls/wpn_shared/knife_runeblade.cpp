@@ -71,11 +71,11 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/v_runeblade.mdl");
 			PRECACHE_MODEL("models/p_runeblade.mdl");
-			PRECACHE_MODEL("models/ef_runeblade_swing.mdl");
+			//PRECACHE_MODEL("models/ef_runeblade_swing.mdl");
 
 			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef.spr");
 			m_iPrimarySprEffect = PRECACHE_MODEL("sprites/runeblade_ef02.spr");
-			PRECACHE_MODEL("sprites/runeblade_eye.spr");
+			//PRECACHE_MODEL("sprites/runeblade_eye.spr");
 
 			PRECACHE_SOUND("weapons/runeblade-slash1.wav");
 			PRECACHE_SOUND("weapons/runeblade-slash2.wav");

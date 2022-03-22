@@ -762,10 +762,11 @@ public:
 	int VidInit( void );
 	int Draw( float flTime );
 	void Shutdown( void );
-
+	void DrawSpecialScope(int iId, int iType);
 private:
 	float left, right, centerx, centery;
 	UniqueTexture m_iScopeArc[4];
+	UniqueTexture m_iM95TigerScope[2];
 };
 
 //
@@ -1038,7 +1039,7 @@ public:
 	int		m_iRes;
 	cvar_t *m_pCvarDraw;
 	cvar_t *cl_shadows;
-	cvar_t *m_csgohud;
+	cvar_t *m_hudstyle;
 	cvar_t *fastsprites;
 	cvar_t *cl_predict;
 	cvar_t *cl_weapon_wallpuff;
@@ -1118,6 +1119,7 @@ public:
 	CHudMsgFunc(Concuss);
 	CHudMsgFunc(ShadowIdx);
 	CHudMsgFunc(OperationSystem);
+	CHudMsgFunc(MPToCL);
 
 	// Screen information
 	SCREENINFO	m_scrinfo;

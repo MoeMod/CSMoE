@@ -111,5 +111,3 @@ set(EXPAT_BUILD_TOOLS OFF)
 set(EXPAT_ENABLE_INSTALL OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/libexpat/expat EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-expat INTERFACE expat)
-
-add_subdirectory(fontconfig-cmake)

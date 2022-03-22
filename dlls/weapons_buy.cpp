@@ -321,6 +321,8 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SFSNIPER:
 	case WEAPON_PLASMAGUN:
 	case WEAPON_SKULL5:
+	case WEAPON_ZOMBIELAW:
+	case WEAPON_M95TIGER:
 		return true;
 	default:
 		break;

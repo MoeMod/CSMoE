@@ -13,6 +13,9 @@
 *
 ****/
 
+#include "hud.h"
+#include "cl_util.h"
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
@@ -389,6 +392,9 @@ BOOL CBasePlayerWeapon :: DefaultDeploy( const char *szViewModel, const char *sz
 	SendWeaponAnim( iAnim, skiplocal );
 
 	m_pPlayer->m_flNextAttack = fDelay;
+	m_pPlayer->m_bResumeZoom = false;
+	m_pPlayer->m_iLastZoom = 90;
+	m_pPlayer->m_iFOV = m_pPlayer->pev->fov = 90;
 	m_flTimeWeaponIdle = flTimeWeaponIdle;
 	return TRUE;
 }
@@ -811,6 +817,9 @@ WeaponCrosshairData CBasePlayerWeapon::GetCrosshairData(void)
 	case WEAPON_P90:
 		result = ACCURACY_AIR | ACCURACY_SPEED;
 		iAccuraySpeed = 170;
+		break;
+	case WEAPON_CHAINSAW:
+	case WEAPON_M95TIGER:
 		break;
 	}
 
@@ -1398,7 +1407,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	if (cmd->weaponselect && (player.pev->deadflag != (DEAD_DISCARDBODY + 1)))
 	{
 		// Switched to a different weapon?
-		if (from->weapondata[0].m_iId == cmd->weaponselect)
+		if (from->weapondata[0].m_iId != cmd->weaponselect)
 		{
 			CBasePlayerWeapon* pNew = g_pWpns[cmd->weaponselect];
 			if (pNew && (pNew != pWeapon))

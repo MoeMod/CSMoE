@@ -70,7 +70,7 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 	int scoreMax = gHUD.m_Scoreboard.m_iTeamScore_Max;
 	int roundNumber = scoreMax ? scoreMax : scoreT + scoreCT + 1;
 
-	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
+	if (gHUD.m_hudstyle->value && gHUD.m_iModRunning == MOD_NONE)
 	{
 		int x = ScreenWidth / 2;
 		bgY = 5;

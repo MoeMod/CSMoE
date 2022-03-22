@@ -56,6 +56,9 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iScopeArc[2], "sprites/scope_arc.tga");
 	R_InitTexture(m_iScopeArc[3], "sprites/scope_arc_sw.tga");
 
+	R_InitTexture(m_iM95TigerScope[0], "sprites/m95tiger_scope_red.tga");
+	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
+	
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -65,8 +68,6 @@ int CHudSniperScope::VidInit()
 
 int CHudSniperScope::Draw(float flTime)
 {
-	
-
 	cl::CBasePlayerWeapon* pActiveBTEWeapon = cl::BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
@@ -78,6 +79,14 @@ int CHudSniperScope::Draw(float flTime)
 		else if (pActiveBTEWeapon->m_iId == WEAPON_SFSNIPER)
 		{
 			return 1;
+		}
+		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
+		{
+			if (gHUD.m_iFOV > 40)
+				return 1;
+
+			DrawSpecialScope(pActiveBTEWeapon->m_iId, pActiveBTEWeapon->pev->iuser1);
+			return 0;
 		}
 		else
 		{
@@ -109,6 +118,15 @@ int CHudSniperScope::Draw(float flTime)
 	FillRGBABlend(ScreenWidth/2, ScreenHeight/2 + 20, 1, ScreenHeight       , 0, 0, 0, 255);
 
 	return 0;
+}
+
+void CHudSniperScope::DrawSpecialScope(int iId, int iType)
+{
+	if (iId == WEAPON_M95TIGER)
+	{
+		m_iM95TigerScope[iType]->Draw2DQuad(0, 0, centerx, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255);
+		m_iM95TigerScope[iType]->Draw2DQuad(TrueWidth, 0, centerx, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255);
+	}
 }
 
 void CHudSniperScope::Shutdown()

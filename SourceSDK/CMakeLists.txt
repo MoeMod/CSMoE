@@ -37,7 +37,12 @@ add_library(tier0 STATIC
         ${HL2SDK_PATH}/tier0/tslist.cpp
         ${HL2SDK_PATH}/tier0/vprof.cpp
 )
-if( POSIX )
+if( WIN32 )
+    target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/platform.cpp)
+    target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/vcrmode.cpp)
+    target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/pme.cpp)
+    #target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/etwprof.cpp)
+elseif( POSIX )
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/cpu_posix.cpp)
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/platform_posix.cpp)
     target_sources(tier0 PUBLIC ${HL2SDK_PATH}/tier0/pme_posix.cpp)
@@ -131,7 +136,7 @@ add_library(vstdlib STATIC
         ${HL2SDK_PATH}/vstdlib/osversion.cpp
         ${HL2SDK_PATH}/vstdlib/random.cpp
         ${HL2SDK_PATH}/vstdlib/vcover.cpp
-        ${HL2SDK_PATH}/public/tier0/memoverride.cpp
+#        ${HL2SDK_PATH}/public/tier0/memoverride.cpp
         )
 if(WIN32)
     target_sources(vstdlib PRIVATE

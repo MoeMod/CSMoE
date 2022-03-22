@@ -126,3 +126,7 @@ HOOK_EVENT(plasmagun, FirePlasmaGun);
 HOOK_EVENT(summonknife, FireSummonKnife);
 HOOK_EVENT(revivegun, FireReviveGun);
 HOOK_EVENT(holysword, FireHolySword);
+HOOK_EVENT(y20s2scard, FireY20S2SCARD);
+HOOK_EVENT(m95tiger, FireM95Tiger);
+HOOK_EVENT(m32, FireM32);
+

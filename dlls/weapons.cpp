@@ -470,7 +470,7 @@ void CBasePlayerItem::DefaultTouch(CBaseEntity *pOther)
 		return;
 	}
 
-	if (pPlayer->m_bIsZombie && m_iId != WEAPON_KNIFE && Q_strcmp(STRING(pev->classname), "weapon_zombibomb") && Q_strcmp(STRING(pev->classname), "weapon_zombibomb2"))
+	if (pPlayer->m_bIsZombie && m_iId != WEAPON_KNIFE && Q_strcmp(STRING(pev->classname), "weapon_zombibomb") && Q_strcmp(STRING(pev->classname), "weapon_zombibomb2") && m_iId != WEAPON_ZOMBIELAW)
 	{
 		return;
 	}
@@ -801,7 +801,9 @@ void CBasePlayerWeapon::ItemPostFrame()
 			m_fFireOnEmpty = TRUE;
 		}
 
+		int iClipBeforeAttack = m_iClip;
 		SecondaryAttack();
+		m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 		m_pPlayer->pev->button &= ~IN_ATTACK2;
 	}
 	else if ((m_pPlayer->pev->button & IN_ATTACK) && CanAttack(m_flNextPrimaryAttack, UTIL_WeaponTimeBase(), UseDecrement()))
@@ -817,7 +819,10 @@ void CBasePlayerWeapon::ItemPostFrame()
 		// Always allow firing in single player
 		if ((m_pPlayer->m_bCanShoot && g_pGameRules->IsMultiplayer() && !g_pGameRules->IsFreezePeriod() && !m_pPlayer->m_bIsDefusing) || !g_pGameRules->IsMultiplayer())
 		{
+			int iClipBeforeAttack = m_iClip;
 			PrimaryAttack();
+			m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
+			
 		}
 	}
 	else if ((m_pPlayer->pev->button & IN_RELOAD) && iMaxClip() != WEAPON_NOCLIP && !m_fInReload && m_flNextPrimaryAttack < UTIL_WeaponTimeBase())

@@ -225,7 +225,7 @@ void CBow::Spawn(void)
 	m_iShotsFired = 0;
 
 	m_iClip = -1;
-	m_iDefaultAmmo = 60;
+	m_iDefaultAmmo = 10;
 
 	FallInit();
 }

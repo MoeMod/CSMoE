@@ -154,9 +154,12 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_REVIVE					(1<<1)
 #define BUFF_AVOID_INFECT			(1<<2)
 #define BUFF_HOLYSWORD_AVOID_INFECT			(1<<3)
+#define BUFF_M32VENOM			(1<<4)
 
 #define BUFF_REVIVEGUN				(1<<1)
 #define BUFF_DGAXE			(1<<2)
+
+#define COUNT_M32VENOM	0
 
 #ifndef CLIENT_DLL
 namespace sv {
@@ -785,6 +788,7 @@ public:
 	float m_flDamageUnderTake;	//aksha zombie
 	int m_iBuff;
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
+	float m_flAccumulateDamage[33];	//like m32venom
 };
 
 }

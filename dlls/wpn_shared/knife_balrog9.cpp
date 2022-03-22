@@ -74,10 +74,9 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/v_balrog9.mdl");
 			PRECACHE_MODEL("models/p_balrog9.mdl");
-
-			m_iSecondarySprEffect = PRECACHE_MODEL("sprites/balrogcritical.spr");
-
+#ifndef CLIENT_DLL
 			PRECACHE_MODEL("sprites/muzzleflash20.spr");
+#endif
 			PRECACHE_SOUND("weapons/balrog9_slash1.wav");
 			PRECACHE_SOUND("weapons/balrog9_slash2.wav");
 			PRECACHE_SOUND("weapons/balrog9_hit1.wav");
@@ -111,7 +110,6 @@ namespace sv {
 		void WeaponIdle() override;
 		float GetMaxSpeed() override;
 		void Holster(int skiplocal) override;
-		void DelayPrimaryAttack();
 		void DelaySecondaryAttack();
 		void OnAttack2Released();
 		void PunchAxis(float x, float y, float x_min, float y_min);
@@ -156,7 +154,6 @@ namespace sv {
 
 		time_point_t m_flTimeCheckCharge;
 
-		int m_iSecondarySprEffect;
 		int m_iState;	//pev_iuser1
 	};
 

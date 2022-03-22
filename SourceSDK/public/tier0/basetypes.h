@@ -140,7 +140,7 @@ typedef int BOOL;
 #endif
 
 typedef int qboolean;
-typedef unsigned int ULONG;
+typedef unsigned long ULONG;
 typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;

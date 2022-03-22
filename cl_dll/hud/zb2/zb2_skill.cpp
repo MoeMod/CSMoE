@@ -116,7 +116,8 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_zombipileexp",//ZOMBIE_SKILL_PILEEXP
 		"resource/zombi/zombieskill_charge",//ZOMBIE_SKILL_CHARGE
 		"resource/zombi/zombieskill_discharge",//ZOMBIE_SKILL_DISCHARGE
-		"resource/zombi/zombieskill_zombiselfdestruct"//ZOMBIE_SKILL_SELFDESTRUCT
+		"resource/zombi/zombieskill_zombiselfdestruct",//ZOMBIE_SKILL_SELFDESTRUCT
+		"resource/zombi/zombieskill_zombicreaterocket"//ZOMBIE_SKILL_CREATEROCKET
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -140,6 +141,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_witchzb",//ZOMBIE_CLASS_WITCH
 		"resource/zombi/zombietype_akshazb",//ZOMBIE_CLASS_AKSHA
 		"resource/zombi/zombietype_boomerzb",//ZOMBIE_CLASS_BOOMER
+		"resource/zombi/zombietype_nemesiszb",//ZOMBIE_CLASS_NEMESIS
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

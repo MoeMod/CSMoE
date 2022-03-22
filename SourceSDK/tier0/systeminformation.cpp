@@ -92,9 +92,9 @@ public:
 	bool IsInitialized() const;
 	SYSTEM_CALL_RESULT_t CallResult() const;
 
-	SYSTEM_CALL_RESULT_t InitializeLoadModule( _TCHAR *pszModule, char *pszFunction );
-	SYSTEM_CALL_RESULT_t InitializeFindModule( _TCHAR *pszModule, char *pszFunction );
-	SYSTEM_CALL_RESULT_t InitializeFindProc( HMODULE hModule, char *pszFunction );
+	SYSTEM_CALL_RESULT_t InitializeLoadModule( _TCHAR *pszModule, const char *pszFunction );
+	SYSTEM_CALL_RESULT_t InitializeFindModule(const _TCHAR *pszModule, const char *pszFunction );
+	SYSTEM_CALL_RESULT_t InitializeFindProc( HMODULE hModule, const char *pszFunction );
 
 	void SetFailed( SYSTEM_CALL_RESULT_t eResult );
 	void Reset();
@@ -116,7 +116,7 @@ struct CSysCallCacheEntry_LoadModule : public CSysCallCacheEntry
 };
 struct CSysCallCacheEntry_FindModule : public CSysCallCacheEntry
 {
-	CSysCallCacheEntry_FindModule( _TCHAR *pszModule, char *pszFunction ) { InitializeFindModule( pszModule, pszFunction ); }
+	CSysCallCacheEntry_FindModule( const _TCHAR *pszModule, const char *pszFunction ) { InitializeFindModule( pszModule, pszFunction ); }
 };
 struct CSysCallCacheEntry_FindProc : public CSysCallCacheEntry
 {
@@ -149,7 +149,7 @@ SYSTEM_CALL_RESULT_t CSysCallCacheEntry::CallResult() const
 	return m_eResult;
 }
 
-SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeLoadModule( _TCHAR *pszModule, char *pszFunction )
+SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeLoadModule( _TCHAR *pszModule, const char *pszFunction )
 {
 	m_bInitialized = true;
 
@@ -161,7 +161,7 @@ SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeLoadModule( _TCHAR *pszModule
 	return InitializeFindProc( m_hModule, pszFunction );
 }
 
-SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeFindModule( _TCHAR *pszModule, char *pszFunction )
+SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeFindModule( const _TCHAR *pszModule, const char *pszFunction )
 {
 	m_bInitialized = true;
 
@@ -173,7 +173,7 @@ SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeFindModule( _TCHAR *pszModule
 	return InitializeFindProc( m_hModule, pszFunction );
 }
 
-SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeFindProc( HMODULE hModule, char *pszFunction )
+SYSTEM_CALL_RESULT_t CSysCallCacheEntry::InitializeFindProc( HMODULE hModule, const char *pszFunction )
 {
 	m_bInitialized = true;
 

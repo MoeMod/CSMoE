@@ -277,14 +277,8 @@ public:
 		Vector vecSrc = m_pPlayer->GetGunPosition();
 		Vector vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, df::Distance::Get(*this), df::Penetration::Get(*this), df::BulletType::Get(*this), GetDamage(), df::RangeModifier::Get(*this), m_pPlayer->pev, df::ItemSlot::Get(*this) == PISTOL_SLOT, m_pPlayer->random_seed);
 
-		int flags = 0;
-#ifdef CLIENT_WEAPONS
-		flags = FEV_NOTHOST;
-#else
-		flags = 0;
-#endif
-		PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
-		SendWeaponAnim(iShootAnim, UseDecrement() != FALSE);
+		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFire, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, static_cast<int>(m_pPlayer->pev->punchangle.x * 100), static_cast<int>(m_pPlayer->pev->punchangle.y * 100), iShootAnim, FALSE);
+		//SendWeaponAnim(iShootAnim, UseDecrement() != FALSE);
 
 		Recoil();
 
@@ -450,7 +444,7 @@ public:
 							if(m_pPlayer->pev->flags & FL_DUCKING)
 								v26 = 6;
                             m_iStatus2 = m_iAnim2 - 10;
-							PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 10.0, 2.0, v26+m_iStatus2, 4, m_pPlayer->m_bIsFemale, 4);	 //playermodel
+							PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFire, 0.0, g_vecZero, g_vecZero, 10.0, 2.0, v26+m_iStatus2, 4, m_pPlayer->m_bIsFemale, 4);	 //playermodel
 							m_flNextSpecialAttack4 = get_gametime() + 0.2s;
 						}
 

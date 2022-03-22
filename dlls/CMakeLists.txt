@@ -365,6 +365,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_summonknife.cpp
 	../dlls/wpn_shared/wpn_revivegun.cpp
 	../dlls/wpn_shared/knife_holysword.cpp
+	../dlls/wpn_shared/wpn_y20s2scard.cpp
+	../dlls/wpn_shared/wpn_zombielaw.cpp
+	../dlls/wpn_shared/wpn_m32venom.cpp
+	../dlls/wpn_shared/wpn_m95tiger.cpp
 	)
 
 set(PM_SRCS
@@ -478,7 +482,7 @@ add_definitions(
 
 target_link_libraries( ${SERVER_LIBRARY} ${CMAKE_DL_LIBS} )
 target_link_libraries( ${SERVER_LIBRARY} luash cqmiao )
-target_link_libraries( ${SERVER_LIBRARY} platform_config )
+target_link_libraries( ${SERVER_LIBRARY} platform_config tier1)
 
 if(ANDROID OR IOS)
 	set_target_properties(${SERVER_LIBRARY} PROPERTIES

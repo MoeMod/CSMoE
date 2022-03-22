@@ -1,6 +1,3 @@
-#include <string.h>
-#include <stdlib.h>
-
 #include "vgui_api.h"
 #include "cdll_int.h"
 
@@ -10,8 +7,9 @@
 #include "cl_entity.h"
 #include "cdll_exp.h"
 
+#include "winsani_in.h"
+
 #include <FileSystem.h>
-#include "APIProxy.h"
 #include "tier1/interface.h"
 #include "vgui/ISurface.h"
 #include "vgui_controls/controls.h"
@@ -20,10 +18,12 @@
 #include "GameUI/IGameConsole.h"
 #include "IBaseUI.h"
 
+#include "winsani_out.h"
+
 #ifdef _WIN32
 #include "winsani_in.h"
 #include <Windows.h>
-#include "winsani_in.h"
+#include "winsani_out.h"
 #else
 #include <dlfcn.h>
 #endif

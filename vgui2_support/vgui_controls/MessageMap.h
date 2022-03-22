@@ -14,8 +14,10 @@
 
 #include "tier1/utlvector.h"
 
-// more flexible than default pointers to members code required for casting member function pointers
-//#pragma pointers_to_members( full_generality, virtual_inheritance )
+// more flexible than default pointers to members code required for casting member function pointer
+#ifdef _MSC_VER
+#pragma pointers_to_members( full_generality, virtual_inheritance )
+#endif
 
 namespace vgui2
 {
@@ -41,11 +43,7 @@ enum DataType_t
 	DATATYPE_HANDLE,  // It's an int, really
 };
 
-#ifdef WIN32
-class __virtual_inheritance Panel;
-#else
 class Panel;
-#endif
 typedef uintp VPANEL;
 
 typedef void (Panel::*MessageFunc_t)(void);

@@ -33,15 +33,15 @@ namespace sv {
 CZombieClass_Nemesis::CZombieClass_Nemesis(CBasePlayer *player, ZombieLevel iEvolutionLevel) : CBaseZombieClass_ZB2(player, iEvolutionLevel)
 {
 	m_pPlayer->m_ZombieClass = "nemesis";
-	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieDeimos>(m_pPlayer);
+	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieCreateRocket>(m_pPlayer);
 	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieStrengthRecovery>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 10000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
-	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->pev->armorvalue = 5000;
+
 	m_pPlayer->ResetMaxSpeed();
 }
 
@@ -61,47 +61,56 @@ void CZombieClass_Nemesis::InitHUD() const
 {
 	MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, nullptr, m_pPlayer->pev);
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
-	WRITE_BYTE(ZOMBIE_CLASS_TANK);
-	WRITE_BYTE(ZOMBIE_SKILL_CRAZY);
+	WRITE_BYTE(ZOMBIE_CLASS_NEMESIS);
+	WRITE_BYTE(ZOMBIE_SKILL_CREATEROCKET);
 	WRITE_BYTE(ZOMBIE_SKILL_STRENGTHRECOVERY);
 	MESSAGE_END();
 }
 
 void CZombieClass_Nemesis::ResetMaxSpeed() const
 {
-	m_pPlayer->pev->maxspeed = 290;
-	if (m_pZombieSkill)
-		m_pZombieSkill->ResetMaxSpeed();
+	if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
+	{
+		m_pPlayer->pev->maxspeed = 290;
+		m_pPlayer->pev->gravity = 0.8f;
+	}
+	else if (m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->maxspeed = 319;
+		m_pPlayer->pev->gravity = 0.7f;
+	}
+	else
+	{
+		m_pPlayer->pev->maxspeed = 333;
+		m_pPlayer->pev->gravity = 0.65f;
+	}
+
+	if (m_tStunGravityTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);
+	}
+
+	if (m_tStunSpeedTime > gpGlobals->time)
+	{
+		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
+	}
 }
 
 float CZombieClass_Nemesis::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	if (m_pPlayer->m_iZombieLevel != ZOMBIE_LEVEL_HOST)
-		flDamage *= 0.9;
+	flDamage *= 0.5;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 bool CZombieClass_Nemesis::ApplyKnockback(CBasePlayer* attacker, const KnockbackData& kbd)
 {
-	// knife knockback
-
-	/*if (attacker->m_pActiveItem && attacker->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
-	{
-		//return CBaseZombieClass_ZB2::ApplyKnockback(attacker, { 700, 1600, 1300, 400, 1.0f });
-		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, attacker->m_pActiveItem->GetKnockBackData());
-		
-	}*/
-
-	if(m_pPlayer->m_iZombieLevel == ZOMBIE_LEVEL_HOST)
-		return CBaseZombieClass_ZB2::ApplyKnockback(attacker, kbd);
-
 	return CBaseZombieClass_ZB2::ApplyKnockback(attacker, {
-			kbd.flOnGround * 0.7f,
-			kbd.flNotOnGround * 0.75f,
-			kbd.flFlying * 0.75f,
-			kbd.flDucking * 0.7f,
-			kbd.flVelocityModifier,
-	});
+			kbd.flOnGround * 0.07f,
+			kbd.flNotOnGround * 0.28f,
+			kbd.flFlying * 0.25f,
+			kbd.flDucking * 0.07f,
+			kbd.flVelocityModifier * 0.97f,
+		});
 }
 
 void CZombieClass_Nemesis::Pain_Zombie(int m_LastHitGroup, bool HasArmour)
@@ -131,7 +140,7 @@ void CZombieClass_Nemesis::OnWeaponDeploy(CBasePlayerItem *item)
 	{
 		case WEAPON_KNIFE:
 		{
-			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_nem_koshak.mdl");
+			m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_knife_zombinemesis.mdl");
 			break;
 		}
 		case WEAPON_HEGRENADE:

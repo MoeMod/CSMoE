@@ -221,6 +221,10 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/knife_summonknife.cpp
 	../dlls/wpn_shared/wpn_revivegun.cpp
 	../dlls/wpn_shared/knife_holysword.cpp
+	../dlls/wpn_shared/wpn_y20s2scard.cpp
+	../dlls/wpn_shared/wpn_zombielaw.cpp
+	../dlls/wpn_shared/wpn_m32venom.cpp
+	../dlls/wpn_shared/wpn_m95tiger.cpp
 	)
 
 set (HUD_SRCS
@@ -284,6 +288,7 @@ set (HUD_SRCS
 	./hud/zbz/zbz_skill_info.cpp
 	./hud/hud_sifiammo.cpp
 	./hud/hud_mvp.cpp
+	./hud/server.cpp
 
 )
 

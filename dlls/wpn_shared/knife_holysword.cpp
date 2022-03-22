@@ -63,6 +63,7 @@ public:
 		m_ExpIndex = PRECACHE_MODEL("sprites/muzzleflash78.spr");
 		m_Exp2Index = PRECACHE_MODEL("sprites/muzzleflash65.spr");
 
+
 		PRECACHE_SOUND("weapons/holysword_cannon_exp.wav");
 	}
 
@@ -1179,6 +1180,12 @@ namespace sv {
 				{
 				case 1:
 				{
+					if (m_iStackLevel == 5)
+					{
+						m_iStackLevel = 6;
+
+						SetToBMode();
+					}
 #ifndef CLIENT_DLL
 					SendWeaponAnim(m_iStackLevel >= 5 ? ANIM_FULLSTACK_CHARGE_START : ANIM_CHARGE_START, UseDecrement() != FALSE);
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, m_pPlayer->edict(), m_usFireHolySword, 0.5, g_vecZero, g_vecZero, 0.0, 0.0, 0, m_iStackLevel, FALSE, TRUE);
@@ -1237,9 +1244,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 			SendWeaponAnim(ANIM_SLASH_CHANGE, UseDecrement() != FALSE);
 			m_iStackLevel = 6;
-#endif
+#endif		
 			SetToBMode();
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.3s;
+			m_tNextThink = invalid_time_point;
 			
 		}
 
@@ -1253,6 +1261,9 @@ namespace sv {
 
 	void CKnifeHolySword::SecondaryAttack()
 	{
+		pev->iuser1 = 1;	//enable paring
+		m_flTimeBuff = gpGlobals->time + 3.0s;
+		m_pPlayer->m_iBuff |= BUFF_HOLYSWORD_AVOID_INFECT;
 #ifndef CLIENT_DLL
 		if (m_pParray)
 			m_pParray->Remove();
@@ -1300,9 +1311,6 @@ namespace sv {
 		m_iState = 0;
 		m_iState2 = 0;
 		m_flTimeCheckCharge = invalid_time_point;
-		pev->iuser1 = 1;	//enable paring
-		m_flTimeBuff = gpGlobals->time + 3.0s;
-		m_pPlayer->m_iBuff |= BUFF_HOLYSWORD_AVOID_INFECT;
 		m_flNextTimeCanHolster = gpGlobals->time + 3.0s;
 		m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 3.0s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 3.0s;

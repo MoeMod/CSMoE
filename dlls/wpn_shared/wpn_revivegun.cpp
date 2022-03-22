@@ -22,9 +22,10 @@
 #include <array>
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
-#include <dlls/gamemode/mod_zb1.h>
+#include "gamemode/mod_zb1.h"
 #include "effects.h"
-#include <dlls/player/csdm_randomspawn.h>
+#include "customentity.h"
+#include "player/csdm_randomspawn.h"
 #endif
 #include "wpn_revivegun.h"
 
@@ -61,19 +62,19 @@ void CReviveGun::Precache(void)
 	PRECACHE_MODEL("models/v_revivegun.mdl");
 	PRECACHE_MODEL("models/w_revivegun.mdl");
 	PRECACHE_MODEL("models/p_revivegun.mdl");
-	PRECACHE_MODEL("models/ef_revivegun_field.mdl");
+	/*PRECACHE_MODEL("models/ef_revivegun_field.mdl");
 
 	PRECACHE_MODEL("sprites/ef_revivegun_idle1.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_idle1_left.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_idle2.spr");
-	PRECACHE_MODEL("sprites/ef_revivegun_idle2_left.spr");
+	PRECACHE_MODEL("sprites/ef_revivegun_idle2_left.spr");*/
 
 	PRECACHE_MODEL("sprites/ef_revivegun_laser.spr");
 
-	PRECACHE_MODEL("sprites/ef_revivegun_draw1_left.spr");
+	/*PRECACHE_MODEL("sprites/ef_revivegun_draw1_left.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_draw1.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_draw2_left.spr");
-	PRECACHE_MODEL("sprites/ef_revivegun_draw2.spr");
+	PRECACHE_MODEL("sprites/ef_revivegun_draw2.spr");*/
 
 	PRECACHE_MODEL("sprites/ef_revivegun_expA.spr");
 	PRECACHE_MODEL("sprites/ef_revivegun_expB.spr");
@@ -82,9 +83,6 @@ void CReviveGun::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash224.spr");
 	PRECACHE_MODEL("sprites/muzzleflash225.spr");
 	PRECACHE_MODEL("sprites/muzzleflash226.spr");
-
-	PRECACHE_SOUND("weapons/revivegun-1.wav");
-	PRECACHE_SOUND("weapons/revivegun-2.wav");
 	PRECACHE_SOUND("weapons/revivegun-1_exp.wav");
 
 	PRECACHE_SOUND("weapons/revivegun_revive_in1.wav");

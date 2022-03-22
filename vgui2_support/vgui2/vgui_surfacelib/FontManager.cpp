@@ -149,6 +149,14 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 	}
 	font_t *winFont = CreateOrFindWin32Font( windowsFontName, tall, weight, blur, scanlines, flags );
 
+	// MoeMod : support CSO Fontloading
+	if (!Q_stricmp(windowsFontName, "DFYuanW9-GB"))
+	{
+		if (winFont)
+			m_FontAmalgams[font].AddFont(winFont, 0x0, 0xFFFF);
+
+		return true;
+	}
 
 	// cycle until valid english/extended font support has been created
 	do
@@ -471,7 +479,7 @@ struct FallbackFont_t
 };
 
 #ifdef WIN32
-const char *g_szValidAsianFonts[] = { "Marlett", NULL };
+const char *g_szValidAsianFonts[] = { "Marlett", NULL};
 // list of how fonts fallback
 FallbackFont_t g_FallbackFonts[] =
 {

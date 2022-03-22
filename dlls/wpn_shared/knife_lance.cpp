@@ -524,11 +524,12 @@ namespace sv {
 			PRECACHE_MODEL("models/v_lance.mdl");
 			PRECACHE_MODEL("models/p_lance.mdl");
 
-			PRECACHE_MODEL("sprites/ef_lance_cockpung.spr");
+			
 			PRECACHE_MODEL("sprites/ef_lance_hit.spr");
-		
+#ifndef CLIENT_DLL
+			PRECACHE_MODEL("sprites/ef_lance_cockpung.spr");
 			PRECACHE_MODEL("sprites/muzzleflash159.spr");
-
+#endif
 			PRECACHE_SOUND("weapons/lance_slash1.wav");
 			PRECACHE_SOUND("weapons/lance_slash2.wav");
 			PRECACHE_SOUND("weapons/lance_slash3.wav");

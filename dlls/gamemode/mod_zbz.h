@@ -67,6 +67,7 @@ public:
 	bool ApplyKnockback(CBasePlayer* attacker, const KnockbackData& data) override;
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override;
 	duration_t OnDefaultReload_Pre(CBasePlayerWeapon* weapon, duration_t fDelay) override;
+	void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int &iClip, int &iBackAmmo) override;
 	int AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip) override;
 	int ComputeMaxAmmo(const char* szAmmoClassName, int iOriginalMax) override;
 	float AdjustZombieKnifeRange(bool bStab, float flRange) override;

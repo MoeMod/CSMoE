@@ -109,6 +109,7 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_BusyLife, {TYPE_HUMAN, "忙碌"}},
 	{Skill_EarlyAdopter, {TYPE_GENERAL, "先行者"}},
 	{Skill_DiscountCoupon, {TYPE_GENERAL, "优惠券"}},
+	{Skill_RapidReloaderII, {TYPE_HUMAN, "高速填装II"}},
 };
 
 vec3_t g_ColorActive = { 0.74, 0.87, 0.5 };

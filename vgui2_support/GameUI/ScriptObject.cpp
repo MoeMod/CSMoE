@@ -837,7 +837,7 @@ bool CDescription::ReadFromBuffer(char **pBuffer)
 	return true;
 }
 
-bool CDescription::InitFromFile(char *pszFileName)
+bool CDescription::InitFromFile(const char *pszFileName)
 {
 	FileHandle_t file = vgui2::filesystem()->Open(pszFileName, "rb");
 

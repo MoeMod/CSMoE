@@ -21,6 +21,7 @@
 #include "cdll_int.h"
 #include "pm_defs.h"
 #include "event_api.h"
+#include "triangleapi.h"
 
 #include "parsemsg.h"
 #include "fog.h"

@@ -129,7 +129,7 @@ void CHudZ4Scoreboard::DrawScore(float time)
 		g_Font.SetWidth(18);
 		g_Font.DrawString(g_szCurWeapon2, ScreenWidth - g_Font.GetLen(g_szCurWeapon2) - 18, ScreenHeight - 50, 1000, 100);
 	}*/
-	int iOffsetY = gHUD.m_csgohud->value ? g_iSelectionHeight * 7 : g_iSelectionHeight;
+	int iOffsetY = gHUD.m_hudstyle->value ? g_iSelectionHeight * 7 : g_iSelectionHeight;
 	int iW, iH, iX, iY;
 	iW = m_iDamageBorad->w();
 	iH = m_iDamageBorad->h();

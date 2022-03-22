@@ -101,7 +101,7 @@ int CHudDeathNotice :: VidInit( void )
 	m_KM_Icon_Head = gHUD.GetSpriteIndex("KM_Icon_Head");
 	m_KM_Icon_Knife = gHUD.GetSpriteIndex("KM_Icon_knife");
 	m_KM_Icon_Frag = gHUD.GetSpriteIndex("KM_Icon_Frag");
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		R_InitTexture(m_killBg[0], "resource/hud/csgo/DeathNotice/KillBg_left");
 		R_InitTexture(m_killBg[1], "resource/hud/csgo/DeathNotice/KillBg_center");
@@ -179,7 +179,7 @@ int CHudDeathNotice :: Draw( float flTime )
 				DrawBg = &m_deathBg; break;
 			default:
 			{
-				if (gHUD.m_csgohud->value)
+				if (gHUD.m_hudstyle->value)
 				{
 					DrawBg = &m_defaultBg; break;
 				}

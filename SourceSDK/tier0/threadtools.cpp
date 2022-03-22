@@ -999,10 +999,8 @@ extern "C" unsigned char _InterlockedCompareExchange128( int64 volatile * Destin
 bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
 {
 	Assert( ( (size_t)pDest % 16 ) == 0 );
-
-	volatile int64 *pDest64 = ( volatile int64 * )pDest;
-	int64 *pValue64 = ( int64 * )&value;
-	int64 *pComperand64 = ( int64 * )&comperand;
+	// Must copy comperand to stack because the intrinsic uses it as an in/out param
+	int64 comperandInOut[2] = { comperand.m128i_i64[0], comperand.m128i_i64[1] };
 
 	// Description:
 	//  The CMPXCHG16B instruction compares the 128-bit value in the RDX:RAX and RCX:RBX registers
@@ -1011,7 +1009,7 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 	//  Otherwise, the ZF flag is cleared, and the memory value is copied to RDX:RAX.
 
 	// _InterlockedCompareExchange128: http://msdn.microsoft.com/en-us/library/bb514094.aspx
-	return _InterlockedCompareExchange128( pDest64, pValue64[1], pValue64[0], pComperand64 ) == 1;
+	return _InterlockedCompareExchange128((volatile int64*)pDest, value.m128i_i64[1], value.m128i_i64[0], comperandInOut);
 }
 
 #endif // PLATFORM_64BITS

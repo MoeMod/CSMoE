@@ -21,6 +21,7 @@ GNU General Public License for more details.
 #include "zb3.h"
 #include "zb3_morale.h"
 
+#include "gamemode/mods_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
 

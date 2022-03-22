@@ -107,6 +107,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"z4b_m1887se",        "降魔圣焰M1887",                  5500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 	{"weapon_ak47l",      "AK47-旋风",    2500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
 	{"weapon_mp7a1d",      "双持MP7",    1700, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1},
+	{ "weapon_m32venom", "腐化重炮", 6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{ "weapon_m95tiger",         "【虎王】M95",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
+	{ "weapon_y20s2scard",         "绿野仙踪SCARD",           1500, PRIMARY_WEAPON_SLOT, UNASSIGNED, 1 },
 
 	//{"csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, 1},
 	{"knife_skullaxe",     "旋风",               0,    KNIFE_SLOT,          UNASSIGNED, 60},
@@ -153,7 +156,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_knifedragon",         "龙吻",                  0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
 	{"knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, 1 },
-
+	
 #endif	
 	{"weapon_p228",      "P228",    600, PISTOL_SLOT, UNASSIGNED, 1},
 	{"weapon_glock18",      "Glock-18",    400, PISTOL_SLOT, UNASSIGNED, 1},

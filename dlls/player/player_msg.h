@@ -124,6 +124,7 @@ extern int gmsgWeapDrop;
 extern int gmsgOperationSystem;
 extern int gmsgZ4Msg;
 extern int gmsgMVPInfo;
+extern int gmsgMPToCL;
 
 void LinkUserMessages();
 void WriteSigonMessages();

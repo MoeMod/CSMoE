@@ -85,6 +85,7 @@ enum ZombieZSkillSkillId : byte
 	Skill_BusyLife,	// Attack power is increased when skills cannot be used. Accelerated mutation and skills during cooldown do not apply.	No
 	Skill_EarlyAdopter,	// All unlock levels are reduced by 1.	No
 	Skill_DiscountCoupon,	// All purchases using dollars are discounted.
+	Skill_RapidReloaderII, //the shot is not fired but fires instantly from the reserved ammo.
 };
 
 enum ZBZMessageType : byte

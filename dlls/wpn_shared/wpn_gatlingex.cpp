@@ -260,7 +260,7 @@ void CGatlingex::Precache(void)
 	PRECACHE_MODEL("models/w_gatlingex.mdl");
 	PRECACHE_MODEL("models/p_gatlingex.mdl");
 
-	PRECACHE_MODEL("sprites/ef_gatlingex_star.spr");
+	//PRECACHE_MODEL("sprites/ef_gatlingex_star.spr");
 
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/shotgunshell.mdl");
 

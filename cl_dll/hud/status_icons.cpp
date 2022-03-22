@@ -87,7 +87,7 @@ int CHudStatusIcons::Draw( float flTime )
 				else
 					m_tgaC4[0]->Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}
-			else if (gHUD.m_csgohud->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
+			else if (gHUD.m_hudstyle->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
 			{
 					SPR_Set(m_IconList[i].spr, 255, 255, 255);
 					if(gHUD.m_bMordenRadar)

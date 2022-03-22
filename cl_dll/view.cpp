@@ -7,12 +7,7 @@
 
 // view/refresh setup functions
 
-#include <string.h>
-
 #include "hud.h"
-
-#include "pm_math.h"
-
 #include "cl_util.h"
 #include "cvardef.h"
 #include "usercmd.h"
@@ -23,6 +18,7 @@
 #include "ref_params.h"
 #include "in_defs.h" // PITCH YAW ROLL
 
+#include "pm_math.h"
 #include "pm_movevars.h"
 #include "pm_shared.h"
 #include "pm_defs.h"

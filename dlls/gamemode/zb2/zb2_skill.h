@@ -600,6 +600,21 @@ protected:
 	duration_t GetDurationTime() const;
 };
 
+class CZombieSkill_ZombieCreateRocket : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieCreateRocket(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
 
 }
 

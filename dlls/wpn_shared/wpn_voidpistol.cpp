@@ -421,13 +421,13 @@ void CVoidpistol::Precache(void)
 	PRECACHE_MODEL("models/w_voidpistol.mdl");
 	PRECACHE_MODEL("models/p_voidpistol.mdl");
 
-	PRECACHE_MODEL("sprites/ef_blackhole01.spr"); //charing spr attached to model
-	PRECACHE_MODEL("sprites/ef_blackhole02.spr");
-	PRECACHE_MODEL("sprites/ef_blackhole03.spr");
-	PRECACHE_MODEL("sprites/ef_blackhole04.spr");//infront of the gun charing finished
+	//PRECACHE_MODEL("sprites/ef_blackhole01.spr"); //charing spr attached to model
+	//PRECACHE_MODEL("sprites/ef_blackhole02.spr");
+	//PRECACHE_MODEL("sprites/ef_blackhole03.spr");
+	//PRECACHE_MODEL("sprites/ef_blackhole04.spr");//infront of the gun charing finished
 	PRECACHE_MODEL("models/ef_blackhole_projectile.mdl");
 
-	PRECACHE_MODEL("sprites/ef_blackhole_star.spr"); //muzzleflash
+	//PRECACHE_MODEL("sprites/ef_blackhole_star.spr"); //muzzleflash
 
 	PRECACHE_MODEL("models/ef_blackhole.mdl");
 	

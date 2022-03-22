@@ -77,13 +77,13 @@ int CHudTimer::Draw( float fTime )
 
 	if( minutes * 60 + seconds > 20 )
 	{
-		DrawUtils::UnpackRGB(r,g,b, gHUD.m_csgohud->value? RGB_WHITE : RGB_YELLOWISH );
+		DrawUtils::UnpackRGB(r,g,b, gHUD.m_hudstyle->value? RGB_WHITE : RGB_YELLOWISH );
 	}
 	else
 	{
 		m_flPanicTime += gHUD.m_flTimeDelta;
 		// add 0.1 sec, so it's not flicker fast
-		if (gHUD.m_csgohud->value)
+		if (gHUD.m_hudstyle->value)
 			DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
 		else
 		{
@@ -106,7 +106,7 @@ int CHudTimer::Draw( float fTime )
 
 	int y = ScreenHeight - 1.5 * gHUD.m_iFontHeight ;
     
-	if (gHUD.m_csgohud->value && gHUD.m_iModRunning == MOD_NONE)
+	if (gHUD.m_hudstyle->value && gHUD.m_iModRunning == MOD_NONE)
 	{
 		int x = ScreenWidth / 2;
 

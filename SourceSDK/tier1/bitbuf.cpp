@@ -40,16 +40,16 @@ inline unsigned int CountTrailingZeros( unsigned int elem )
 #pragma intrinsic(_BitScanReverse)
 #pragma intrinsic(_BitScanForward)
 
-inline unsigned int CountLeadingZeros(unsigned int x)
+inline unsigned long CountLeadingZeros(unsigned long x)
 {
-	uint32 firstBit;
+	unsigned long firstBit;
 	if ( _BitScanReverse(&firstBit,x) )
 		return 31 - firstBit;
 	return 32;
 }
-inline unsigned int CountTrailingZeros(unsigned int elem)
+inline unsigned long CountTrailingZeros(unsigned long elem)
 {
-	uint32 out;
+	unsigned long out;
 	if ( _BitScanForward(&out, elem) )
 		return out;
 	return 32;

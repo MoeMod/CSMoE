@@ -3,6 +3,10 @@
 
 #include "VGUI.h"
 
+#ifdef GetClassName
+#undef GetClassName
+#endif
+
 class KeyValues;
 
 namespace vgui2 {

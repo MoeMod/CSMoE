@@ -73,16 +73,12 @@ void EV_FireGunkata(struct event_args_s *args)
 	gEngfuncs.pfnAngleVectors(angles, forward, right, up);
 	if (!args->bparam2)
 	{
-
 		if (EV_IsLocal(idx))
 		{
 			g_iShotsFired++;
 			EV_MuzzleFlash();
-			//gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1, 2);
-		}
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(args->bparam1, 2);
 
-		if (EV_IsLocal(idx))
-		{
 			float vecScale[3] = { 35.0, -11.0, -16.0 };
 
 			EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, vecScale[0], vecScale[1], vecScale[2], true);
@@ -228,11 +224,11 @@ void EV_FireGunkata(struct event_args_s *args)
 								pEnt->entity.curstate.renderamt = 100 - (delta - 1.0) * 100.0f;
 						};
 					}
-					int i = args->iparam1 % 6;
-					if (i)
-						gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_AUTO, ("weapons/gunkata_skill_0" + std::to_string(i) + ".wav").c_str(), 1.0, 0.6, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 				}
 			}
+			int i = args->iparam1 % 6;
+			if (i)
+				gEngfuncs.pEventAPI->EV_PlaySound(idx, origin, CHAN_AUTO, ("weapons/gunkata_skill_0" + std::to_string(i) + ".wav").c_str(), 1.0, 0.6, 0, 94 + gEngfuncs.pfnRandomLong(0, 0xf));
 		}
 	}
 

@@ -1201,7 +1201,7 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 
 	if ( pMem )
 	{
-		RegisterAllocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
+		RegisterAllocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), g_ClockSpeed > 0 ? m_Timer.GetDuration().GetMicroseconds() : 0 );
 	}
 	else
 	{
@@ -1462,7 +1462,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	static int s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		char *pPath = "";
+		const char *pPath = "";
 		if ( IsX360() )
 		{
 			pPath = "D:\\";

@@ -63,10 +63,10 @@ void CBuffsg552ex::Precache(void)
 	PRECACHE_MODEL("models/v_buffsg552ex2.mdl");
 	PRECACHE_MODEL("models/w_buffsg552ex.mdl");
 	PRECACHE_MODEL("models/p_buffsg552ex.mdl");
-	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash1.spr");
+	/*PRECACHE_MODEL("sprites/ef_buffsg552ex_slash1.spr");
 	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash2.spr");
 	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash3.spr");
-	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash_big.spr");
+	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash_big.spr");*/
 	PRECACHE_MODEL("sprites/muzzleflash205.spr");
 	PRECACHE_MODEL("sprites/muzzleflash206.spr");
 

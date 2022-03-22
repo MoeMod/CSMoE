@@ -23,6 +23,7 @@ GNU General Public License for more details.
 #undef DotProduct
 #endif
 
+#include "xash3d_types.h"
 #include "util/u_vector.hpp"
 #include "util/u_vector_angle.hpp"
 

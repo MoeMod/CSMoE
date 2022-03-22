@@ -83,7 +83,7 @@ int CHudMoney::Draw(float flTime)
 
 	int x = ScreenWidth - iDollarWidth * 7;
 	int y = ScreenHeight - 3 * gHUD.m_iFontHeight;
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		x = 5;
 		if (gHUD.m_bMordenRadar)
@@ -94,7 +94,7 @@ int CHudMoney::Draw(float flTime)
 		m_pTexture_Black->Draw2DQuadScaled(0, y- 0.5 * gHUD.m_iFontHeight, x + (gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left) * 10, y + 1.5 * gHUD.m_iFontHeight, 0, 0, 1, 1, 255, 255, 255, 100);
 	}
 	// Does weapon have seconday ammo?
-	if (!gHUD.m_csgohud->value)
+	if (!gHUD.m_hudstyle->value)
 	{
 		if (gHUD.m_Ammo.FHasSecondaryAmmo())
 		{
@@ -141,12 +141,12 @@ int CHudMoney::Draw(float flTime)
 				b = (RGB_REDISH & 0xFF) - interpolate * (RGB_REDISH & 0xFF);
 
 				SPR_Set(m_hMinus.spr, iDeltaR, iDeltaG, iDeltaB );
-				if (gHUD.m_csgohud->value)
+				if (gHUD.m_hudstyle->value)
 					SPR_DrawAdditive(0, x, y + iDollarHeight * 1.5, &m_hMinus.rect );
 				else
 					SPR_DrawAdditive(0, x, y - iDollarHeight * 1.5, &m_hMinus.rect);
 			}
-			if (gHUD.m_csgohud->value)
+			if (gHUD.m_hudstyle->value)
 			{
 				if (m_iDelta < 0)
 				DrawUtils::DrawHudNumber2(x + iDollarWidth, y + iDollarHeight * 1.5, false, 5,
@@ -161,24 +161,24 @@ int CHudMoney::Draw(float flTime)
 				DrawUtils::DrawHudNumber2(x + iDollarWidth, y - iDollarHeight * 1.5, false, 5,
 					m_iDelta < 0 ? -m_iDelta : m_iDelta,
 					iDeltaR, iDeltaG, iDeltaB);
-			if (!gHUD.m_csgohud->value)
+			if (!gHUD.m_hudstyle->value)
 				FillRGBA(x + iDollarWidth / 4, y - iDollarHeight * 1.5 + gHUD.m_iFontHeight / 4, 2, 2, iDeltaR, iDeltaG, iDeltaB, iDeltaAlpha );
 		}
-		else DrawUtils::UnpackRGB(r, g, b, gHUD.m_csgohud->value? RGB_WHITE : RGB_YELLOWISH );
+		else DrawUtils::UnpackRGB(r, g, b, gHUD.m_hudstyle->value? RGB_WHITE : RGB_YELLOWISH );
 	}
 
 	alphaBalance = 255 - interpolate * (255 - MIN_ALPHA);
 
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 		alphaBalance = 255;
 	DrawUtils::ScaleColors( r, g, b, alphaBalance );
 
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 		SPR_Set(m_hDollar.spr, 255, 255, 255);
 	else
 		SPR_Set(m_hDollar.spr, r, g, b);
 	SPR_DrawAdditive(0, x, y, &m_hDollar.rect);
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		DrawUtils::DrawHudNumber2(x + iDollarWidth, y, false, 5, m_iMoneyCount, 255, 255, 255);
 		FillRGBA(x + iDollarWidth / 4, y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);

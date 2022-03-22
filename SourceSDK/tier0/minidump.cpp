@@ -101,12 +101,12 @@ bool WriteMiniDumpUsingExceptionInfo(
 			{
 				// move past the last slash
 				pch++;
+				strcpy(g_rgchMinidumpFilenamePrefix, pch);
 			}
 			else
 			{
-				pch = _T("unknown");
+				strcpy(g_rgchMinidumpFilenamePrefix, "unknown");
 			}
-			strcpy( g_rgchMinidumpFilenamePrefix, pch );
 		}
 
 		

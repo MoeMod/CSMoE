@@ -28,7 +28,7 @@ GNU General Public License for more details.
 #include "imgui_imewindow.h"
 #include "imgui_sprview.h"
 #include "imgui_connectprogress.h"
-
+#include "imgui_menu_server.h"
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
@@ -524,6 +524,7 @@ qboolean ImGui_ImplGL_Init(void)
 	ImGui_ImeWindow_Init();
 	ImGui_SprView_Init();
 	ImGui_ConnectProgress_Init();
+	ui::ImGui_Server_Init();
 
 	Cmd_AddCommand("imgui", Cmd_ImGui_f, "imgui demo");
 
@@ -761,6 +762,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_ConnectProgress_OnGUI();
 	ImGui_ImeWindow_OnGUI();
 	ImGui_SprView_OnGUI();
+	ui::ImGui_Server_OnGui();
 	if(g_bShowDemoWindow)
 		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }

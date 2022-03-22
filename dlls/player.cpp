@@ -34,6 +34,7 @@
 #include "wpn_shared/wpn_hegrenade.h"
 #include "wpn_shared/wpn_flashbang.h"
 #include "wpn_shared/wpn_smokegrenade.h"
+#include "wpn_shared/wpn_m32venom.h"
 
 // gamemode
 #include "gamemode/mods.h"
@@ -743,9 +744,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		if (bitsDamageType & DMG_EXPLOSION)
 		{
-			CBaseEntity *temp = GetClassPtr<CBaseEntity>(pevInflictor);
-
-			if (!Q_strcmp(STRING(temp->pev->classname), "grenade"))
+			/*CBaseEntity *temp = GetClassPtr<CBaseEntity>(pevInflictor);
+			
+			if (temp)
 			{
 				CGrenade *pGrenade = GetClassPtr<CGrenade>(pevInflictor);
 
@@ -757,6 +758,23 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					pAttack = dynamic_cast<CBasePlayer *>(CBasePlayer::Instance(pevAttacker));
 				}
 				else if (g_pGameRules->IsTeamplay() && pGrenade->m_iTeam == m_iTeam && (&edict()->v != pevAttacker))
+				{
+					return 0;
+				}
+			}*/
+
+			CGrenade* temp = dynamic_cast<CGrenade*>(CBaseEntity::Instance(pevInflictor));
+
+			if (temp)
+			{
+				if (CVAR_GET_FLOAT("mp_friendlyfire"))
+				{
+					if (g_pGameRules->IsTeamplay() && temp->m_iTeam == m_iTeam)
+						teamAttack = TRUE;
+
+					pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+				}
+				else if (g_pGameRules->IsTeamplay() && temp->m_iTeam == m_iTeam && (&edict()->v != pevAttacker))
 				{
 					return 0;
 				}
@@ -803,6 +821,30 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			Pain(m_LastHitGroup, false);
 
 		m_lastDamageAmount = flDamage;
+		
+		CBaseEntity* temp = GetClassPtr<CBaseEntity>(pevInflictor);
+
+		if (!Q_strcmp(STRING(temp->pev->classname), "d_m32venom"))
+		{
+			if(~m_iBuff & BUFF_M32VENOM)
+				m_flAccumulateDamage[COUNT_M32VENOM] += flDamage;
+
+			if (m_flAccumulateDamage[COUNT_M32VENOM] >= 2000 && ~m_iBuff & BUFF_M32VENOM)
+			{
+				m_iBuff |= BUFF_M32VENOM;
+				m_flAccumulateDamage[COUNT_M32VENOM] = 0.0f;
+
+				pAttack = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pevAttacker));
+				CM32VenomMark* pEnt = (CM32VenomMark*)CBaseEntity::Create("m32venom_mark", pev->origin + Vector( 0, 0, 40 ), { 0, 0, 0 }, pAttack->edict());
+				if (pEnt)
+				{
+					pEnt->m_iTeam = pAttack->m_iTeam;
+					pEnt->m_pEnemy = this;
+					pEnt->m_pAttacker = pAttack;
+					pEnt->pev->aiment = this->edict();
+				}
+			}
+		}
 
 		if (pev->health > flDamage)
 		{
@@ -1124,6 +1166,11 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		MESSAGE_END();
 	}
 #endif
+	if (!Q_strcmp(STRING(pevInflictor->classname), "weapon_m95tiger"))
+	{
+		pevInflictor->iuser1 += 1;
+	}
+
 	if (m_iBuff & BUFF_REVIVE && m_bHasBuffWpn & BUFF_REVIVEGUN && flDamage > pev->health)
 	{
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
@@ -1263,6 +1310,9 @@ void CBasePlayer::PackDeadPlayerItems()
 {
 	bool bPackGun = (g_pGameRules->DeadPlayerWeapons(this) != GR_PLR_DROP_GUN_NO);
 	bool bPackAmmo = (g_pGameRules->DeadPlayerAmmo(this) != GR_PLR_DROP_AMMO_NO);
+
+	if (m_bIsZombie)
+		bPackGun = false;
 
 	if (bPackGun)
 	{
@@ -5664,6 +5714,10 @@ void CBasePlayer::Spawn()
 		case WEAPON_SG550:
 			pev->viewmodel = MAKE_STRING("models/v_sg550.mdl");
 			break;
+		case WEAPON_M95TIGER:
+			pev->viewmodel = MAKE_STRING("models/v_m95tiger.mdl");
+		case WEAPON_SFSNIPER:
+			pev->viewmodel = MAKE_STRING("models/v_sfsniper.mdl");
 		default:
 			break;
 		}
@@ -8594,6 +8648,8 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_DEAGLE:
 		case WEAPON_SG552:
 		case WEAPON_AK47:
+		case WEAPON_M95TIGER:
+		case WEAPON_SFSNIPER:
 			return TRUE;
 		}
 	}

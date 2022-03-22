@@ -26,6 +26,8 @@
 #include "events.h"
 #include "r_efx.h"
 
+#include "gamemode/mods_const.h"
+
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
 }

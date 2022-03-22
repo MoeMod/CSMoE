@@ -1,6 +1,7 @@
 #ifndef BASEUISURFACE_H
 #define BASEUISURFACE_H
 
+#include "tier0/platform.h"
 #include "IHTMLChromeController.h"
 #include "vgui/ISurface.h"
 #include "IMouseControl.h"
@@ -10,6 +11,12 @@
 
 #include <vector>
 #include <tier1/utldict.h>
+
+#include "winsani_in.h"
+#include "xash3d_types.h"
+#include "cdll_int.h"
+#include "vgui_api.h"
+#include "winsani_out.h"
 
 class BaseUISurface : public vgui2::ISurface, public IMouseControl {
 	enum {

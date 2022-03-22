@@ -1239,14 +1239,14 @@ int CHudAmmo::Draw(float flTime)
 	}
 
 	// Draw ammo pickup history
-	if (!gHUD.m_csgohud->value)
+	if (!gHUD.m_hudstyle->value)
 		gHR.DrawAmmoHistory( flTime );
 
 	if (!m_pWeapon)
 		return 0;
 	 
 	WEAPON *pw = m_pWeapon; // shorthand
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 		DrawWpnList(flTime);
 	// SPR_Draw Ammo
 	if ((pw->iAmmoType < 0) && (pw->iAmmo2Type < 0))
@@ -1264,7 +1264,7 @@ int CHudAmmo::Draw(float flTime)
 	// Does this weapon have a clip?
 	y = ScreenHeight - gHUD.m_iFontHeight - gHUD.m_iFontHeight/2;
 
-	if (gHUD.m_csgohud->value)
+	if (gHUD.m_hudstyle->value)
 	{
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 		x = ScreenWidth - (8 * AmmoWidth) - iIconWidth;
@@ -1273,7 +1273,7 @@ int CHudAmmo::Draw(float flTime)
 	// Does weapon have any ammo at all?
 	if (m_pWeapon->iAmmoType > 0)
 	{
-		DrawUtils::UnpackRGB(r, g, b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
+		DrawUtils::UnpackRGB(r, g, b, gHUD.m_hudstyle->value ? RGB_WHITE : RGB_YELLOWISH);
 		DrawUtils::ScaleColors(r, g, b, a);
 
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
@@ -1290,7 +1290,7 @@ int CHudAmmo::Draw(float flTime)
 
 			x += AmmoWidth/2;
 
-			DrawUtils::UnpackRGB(r,g,b, gHUD.m_csgohud->value ? RGB_WHITE : RGB_YELLOWISH);
+			DrawUtils::UnpackRGB(r,g,b, gHUD.m_hudstyle->value ? RGB_WHITE : RGB_YELLOWISH);
 
 			// draw the | bar
 			FillRGBA(x, y, iBarWidth, gHUD.m_iFontHeight, r, g, b, a);
