@@ -44,6 +44,8 @@ extern vgui2::IInputInternal* g_pInputInternal;
 }
 extern BaseUISurface* staticSurface;
 extern void RegisterInterface();
+void TextAdjustSize( int *x, int *y, int *w, int *h );
+void TextAdjustSizeReverse(int* x, int* y, int* w, int* h);
 
 namespace ui
 {
@@ -78,13 +80,15 @@ void UI_KeyEvent(int key, int down)
 	{
 		return;
 	}
-	
+	// MoeMod : WTF here?
 	bool want_text_input = staticUIFuncs->Key_Event(down, key, "");
-	ui::textfuncs.pfnEnableTextInput(want_text_input);
+	//ui::textfuncs.pfnEnableTextInput(want_text_input);
 }
+
 void UI_MouseMove(int x, int y)
 {
-
+	//TextAdjustSizeReverse(&x, &y, nullptr, nullptr);
+	//g_pInputInternal->InternalCursorMoved(x, y);
 }
 void UI_SetActiveMenu(int fActive)
 {
@@ -108,7 +112,7 @@ void UI_UpdateMenu(float flTime)
 	{
 		// real VidInit goes here
 		UI_SetActiveMenu(true);
-		staticUIFuncs->ShowConsole();
+		//staticUIFuncs->SahowConsole();
 	}
 	
 	if (!staticUIFuncs) {

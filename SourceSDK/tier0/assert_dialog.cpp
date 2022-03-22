@@ -612,9 +612,13 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		g_bBreak = true;
 	}
 
+#elif defined(_DEBUG)
+    // xash impl
+    extern void DBG_AssertFunction( qboolean fExpr, const char* szExpr, const char* szFile, int szLine, const char* szMessage );
+    DBG_AssertFunction(false, pExpression, pFilename, line, "Assertion Failed");
 #else
 	// No dialog mode on this platform
-	g_bBreak = true;
+	//g_bBreak = true;
 #endif
 
 	return g_bBreak;

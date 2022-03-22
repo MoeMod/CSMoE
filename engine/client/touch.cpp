@@ -1826,6 +1826,20 @@ int IN_TouchEvent( touchEventType type, int fingerID, float x, float y, float dx
 	}
 #endif
 
+#ifdef XASH_VGUI2
+	if( VGui_IsActive() )
+	{
+		VGui_MouseMove( TO_SCRN_X(x), TO_SCRN_Y(y) );
+
+		if( type != event_motion )
+			VGui_KeyEvent( K_MOUSE1, type == event_down ? 1 : 0 );
+
+		// allow scoreboard scroll
+		if( host.mouse_visible && type == event_motion )
+			return 0;
+	}
+#endif
+
 	// simulate menu mouse click
 	if( cls.key_dest != key_game && !touch_in_menu->integer )
 	{

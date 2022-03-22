@@ -349,6 +349,10 @@ void CSystem::SetClipboardText(const char *text, int textLen)
 			free( ClipText );
 		}
 	}
+#else
+    // xash impl
+    void Sys_SetClipboardData( const byte *buffer, size_t size );
+    Sys_SetClipboardData((const byte *)text, textLen);
 #endif
 }
 
@@ -375,7 +379,7 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 	CFDataRef theData = CFDataCreate( kCFAllocatorDefault, (const UInt8*)charStr, Q_strlen(charStr) );
 	PasteboardPutItemFlavor( m_PasteBoardRef, (PasteboardItemID)1, CFSTR("public.utf8-plain-text"), theData, 0 );
 	CFRelease( theData );
-#elif defined( USE_SDL )
+#else
 	SetClipboardText( charStr, Q_strlen( charStr ) );
 #endif
 
@@ -424,7 +428,10 @@ int CSystem::GetClipboardTextCount()
 
 	return Count;
 #else
-	return 0;
+	// xash impl
+    char *Sys_GetClipboardData( void );
+    auto text = Sys_GetClipboardData();
+    return Q_strlen( text ) + 1;
 #endif
 }
 
@@ -471,7 +478,11 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 
 	return 0;
 #else
-	return 0;
+	// xash impl
+    char *Sys_GetClipboardData( void );
+    auto text = Sys_GetClipboardData();
+    Q_strncpy( buf, text, bufLen );
+    return Q_strlen( buf );
 #endif
 }
 

@@ -465,8 +465,6 @@ void TextAdjustSize( int *x, int *y, int *w, int *h )
 
 	ASSERT( x || y || w || h );
 
-	if( !clgame.ds.adjust_size ) return;
-
 	// scale for screen sizes
 	xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
 	yscale = scr_height->value / (float)clgame.scrInfo.iHeight;
@@ -481,8 +479,6 @@ void TextAdjustSizeReverse(int* x, int* y, int* w, int* h)
 	float	xscale, yscale;
 
 	ASSERT(x || y || w || h);
-
-	if (!clgame.ds.adjust_size) return;
 
 	// scale for screen sizes
 	xscale = scr_width->value / (float)clgame.scrInfo.iWidth;
@@ -505,7 +501,6 @@ void PicAdjustSize( float *x, float *y, float *w, float *h )
 {
 	float	xscale, yscale;
 
-	if( !clgame.ds.adjust_size ) return;
 	if( !x && !y && !w && !h ) return;
 
 	// scale for screen sizes
@@ -1829,12 +1824,10 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 		return 0;
 
 #ifdef XASH_IMGUI
-	clgame.ds.adjust_size = true;
 	int a = max(r, max(g, b));
 	rgba_t rgb = { (byte)r,(byte)g,(byte)b,(byte)a };
 	ImGui_Surface_SetRenderMode( kRenderTransAdd );
 	int w = ImGui_Surface_DrawChar(x, y, number, r, g, b, a);
-	clgame.ds.adjust_size = false;
 	return w;
 #else
 	number &= 255;
@@ -1846,10 +1839,8 @@ int GAME_EXPORT pfnDrawCharacter( int x, int y, int number, int r, int g, int b 
 	if( y < -clgame.scrInfo.iCharHeight )
 		return 0;
 
-	clgame.ds.adjust_size = true;
 	pfnPIC_Set( cls.creditsFont.hFontTexture, r, g, b, 255 );
 	pfnPIC_DrawAdditive( x, y, -1, -1, &cls.creditsFont.fontRc[number] );
-	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
 #endif
@@ -1867,7 +1858,6 @@ int GAME_EXPORT pfnDrawConsoleString( int x, int y, const char *string )
 	int	drawLen;
 
 	if( !string || !*string ) return 0; // silent ignore
-	clgame.ds.adjust_size = true;
 	Con_SetFont( con_fontsize->integer );
 #ifdef XASH_IMGUI
 	drawLen = ImGui_Console_AddGenericString(x, y, string, clgame.ds.textColor);
@@ -1875,7 +1865,6 @@ int GAME_EXPORT pfnDrawConsoleString( int x, int y, const char *string )
 	drawLen = Con_DrawString(x, y, string, clgame.ds.textColor);
 #endif
 	Vector4Copy( g_color_table[7], clgame.ds.textColor );
-	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
 
 	return (x + drawLen); // exclude color prexfixes
@@ -1907,13 +1896,11 @@ compute string length in screen pixels
 void GAME_EXPORT pfnDrawConsoleStringLen( const char *pText, int *length, int *height )
 {
 	Con_SetFont( con_fontsize->integer );
-	clgame.ds.adjust_size = true;
 #ifdef XASH_IMGUI
 	ImGui_Console_DrawStringLen( pText, length, height );
 #else
 	Con_DrawStringLen( pText, length, height );
 #endif
-	clgame.ds.adjust_size = false;
 	Con_RestoreFont();
 }
 
@@ -2945,9 +2932,7 @@ pfnVGUI2DrawCharacter
 static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned int font )
 {
 #ifdef XASH_IMGUI
-	clgame.ds.adjust_size = true;
 	int w = ImGui_Surface_DrawChar(x, y, number, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2], g_color_table[7][3]);
-	clgame.ds.adjust_size = false;
 	return w;
 #else
 	if( !cls.creditsFont.valid )
@@ -2961,10 +2946,8 @@ static int GAME_EXPORT pfnVGUI2DrawCharacter( int x, int y, int number, unsigned
 	if( y < -clgame.scrInfo.iCharHeight )
 		return 0;
 
-	clgame.ds.adjust_size = true;
 	menu.ds.gl_texturenum = cls.creditsFont.hFontTexture;
 	pfnPIC_DrawAdditive( x, y, -1, -1, &cls.creditsFont.fontRc[number] );
-	clgame.ds.adjust_size = false;
 
 	return clgame.scrInfo.charWidths[number];
 #endif
@@ -2981,9 +2964,7 @@ static int GAME_EXPORT pfnVGUI2DrawCharacterAdditive( int x, int y, int ch, int 
 	if( !hud_utf8->integer )
 		ch = Con_UtfProcessChar( ch );
 
-	clgame.ds.adjust_size = true;
 	int w = pfnDrawCharacter( x, y, ch, r, g, b );
-	clgame.ds.adjust_size = false;
 	return w;
 }
 

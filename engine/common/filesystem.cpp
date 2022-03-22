@@ -2153,7 +2153,15 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	if(!strncmp(filepath, "/android_asset/", 15))
 	{
 		AAssetManager *mgr = Android_GetAssetManager();
-		AAsset *asset = AAssetManager_open(mgr, filepath + 15, AASSET_MODE_BUFFER);
+		AAsset *asset = AAssetManager_open(mgr, filepath + 15, AASSET_MODE_RANDOM);
+
+		if( asset == NULL )
+		{
+			const char *ffilepath = FS_FixFileCase( filepath );
+			if( ffilepath != filepath )
+				asset = AAssetManager_open(mgr, ffilepath + 15, AASSET_MODE_RANDOM);
+		}
+
 		if(asset == NULL)
 			return NULL;
 
