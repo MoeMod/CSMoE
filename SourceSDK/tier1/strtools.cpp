@@ -1417,7 +1417,9 @@ int _V_UCS2ToUnicode( const ucs2 *pUCS2, wchar_t *pUnicode, int cubDestSizeInByt
 #ifdef _WIN32
 	int cchResult = V_wcslen( pUCS2 );
 	V_memcpy( pUnicode, pUCS2, cubDestSizeInBytes );
-#else
+#elif defined (__ANDROID__)
+    int cchResult = Q_UTF16ToUTF32(pUCS2, pUnicode, cubDestSizeInBytes);
+#else defined (POSIX)
 	iconv_t conv_t = iconv_open( "UCS-4LE", "UCS-2LE" );
 	int cchResult = -1;
 	size_t nLenUnicde = cubDestSizeInBytes;
@@ -1447,7 +1449,7 @@ int _V_UCS2ToUnicode( const ucs2 *pUCS2, wchar_t *pUnicode, int cubDestSizeInByt
 //-----------------------------------------------------------------------------
 // Purpose: Converts a wchar_t string into a UCS2 string -noop on windows
 //-----------------------------------------------------------------------------
-int _V_UnicodeToUCS2( const wchar_t *pUnicode, int cubSrcInBytes, char *pUCS2, int cubDestSizeInBytes )
+int _V_UnicodeToUCS2( const wchar_t *pUnicode, int cubSrcInBytes, ucs2 *pUCS2, int cubDestSizeInBytes )
 {
 #ifdef _WIN32
 	// Figure out which buffer is smaller and convert from bytes to character
@@ -1457,13 +1459,15 @@ int _V_UnicodeToUCS2( const wchar_t *pUnicode, int cubSrcInBytes, char *pUCS2, i
 	wcsncpy( pDest, pUnicode, cchResult );
 	// Make sure we NULL-terminate.
 	pDest[ cchResult - 1 ] = 0;
+#elif defined (__ANDROID__)
+    int cchResult = Q_UTF32ToUTF16(pUnicode, pUCS2, cubDestSizeInBytes);
 #elif defined (POSIX)
 	iconv_t conv_t = iconv_open( "UCS-2LE", "UTF-32LE" );
 	size_t cchResult = -1;
 	size_t nLenUnicde = cubSrcInBytes;
 	size_t nMaxUCS2 = cubDestSizeInBytes;
 	char *pIn = (char*)pUnicode;
-	char *pOut = pUCS2;
+	char *pOut = (char *)pUCS2;
 	if ( conv_t > (void*)0 )
 	{
 		cchResult = iconv( conv_t, &pIn, &nLenUnicde, &pOut, &nMaxUCS2 );
@@ -1492,6 +1496,8 @@ int _V_UCS2ToUTF8( const ucs2 *pUCS2, char *pUTF8, int cubDestSizeInBytes )
 #ifdef _WIN32
 	// under win32 wchar_t == ucs2, sigh
 	int cchResult = WideCharToMultiByte( CP_UTF8, 0, pUCS2, -1, pUTF8, cubDestSizeInBytes, NULL, NULL );
+#elif defined (__ANDROID__)
+    int cchResult = Q_UTF16ToUTF8(pUCS2, pUTF8, cubDestSizeInBytes);
 #elif defined(POSIX)
 	iconv_t conv_t = iconv_open( "UTF-8", "UCS-2LE" );
 	size_t cchResult = -1;
@@ -1547,9 +1553,8 @@ int _V_UTF8ToUCS2( const char *pUTF8, int cubSrcInBytes, ucs2 *pUCS2, int cubDes
 #ifdef _WIN32
 	// under win32 wchar_t == ucs2, sigh
 	int cchResult = MultiByteToWideChar( CP_UTF8, 0, pUTF8, -1, pUCS2, cubDestSizeInBytes / sizeof(wchar_t) );
-#elif defined( _PS3 ) // bugbug JLB
-	int cchResult = 0;
-	Assert( 0 );
+#elif defined (__ANDROID__)
+    int cchResult = Q_UTF8ToUTF16(pUTF8, pUCS2, cubDestSizeInBytes);
 #elif defined(POSIX)
 	iconv_t conv_t = iconv_open( "UCS-2LE", "UTF-8" );
 	size_t cchResult = -1;

@@ -12,6 +12,8 @@
 using vgui2::ILocalize;
 using vgui2::CLocalizedStringtable_VGUI_Localize002;
 
+#define MAX_LOCALIZED_CHARS	4096
+
 struct LessCtx_t
 {
 	const char* m_pUserString;
@@ -138,23 +140,14 @@ bool CLocalizedStringTable::AddFile( IFileSystem *fileSystem, const char *fileNa
 
 	fileSystem->Read( data, size, hFile );
 
-	data[ size / sizeof(wchar_t) ] = '\0';
+	data[ size / sizeof(ucs2) ] = '\0';
 
 	bool bSuccess = false;
 
 	//Little endian UTF16 byte order mark.
-#ifdef _WIN32
 	if( *data == 0xFEFF )
 	{
 		auto pszData = data + 1;
-#else
-    {
-        auto pszData = data;
-#endif
-		//TODO: part of debug only code? - Solokiller
-		vgui2::system()->CommandLineParamExists( "-ccsyntax" );
-
-		BuildFastValueLookup();
 
 		enum states_e
 		{
@@ -162,71 +155,142 @@ bool CLocalizedStringTable::AddFile( IFileSystem *fileSystem, const char *fileNa
 			STATE_TOKENS
 		};
 
-		states_e state = STATE_BASE;
-
-		char key[ 128 ];
-		ucs2 keytoken[ 128 ];
-        ucs2 valuetoken[ 2048 ];
-		wchar_t fullString[ 2049 ];
-
 		bool bQuoted;
-
-		decltype( pszData ) pszNext;
-
-		while( true )
+		bool bEnglishFile = false;
+		if ( Q_strstr(szFileName, "_english.txt") )
 		{
-			pszNext = ReadUnicodeToken( pszData, keytoken, ARRAYSIZE( keytoken ), bQuoted );
+			bEnglishFile = true;
+		}
 
-			if( !keytoken[ 0 ] )
-				break;
+		bool spew = false;
+		if ( vgui2::system()->CommandLineParamExists( "-ccsyntax" ) )
+		{
+			spew = true;
+		}
 
-			key[ 0 ] = '\0';
-			V_UCS2ToUTF8(keytoken, key, ARRAYSIZE(key));
+		BuildFastValueLookup();
 
-			if( !strnicmp( key, "//", 2 ) )
+		states_e state = STATE_BASE;
+		while (1)
+		{
+			// read the key and the value
+			ucs2 keytoken[128];
+			ucs2 *pchNewdata = ReadUnicodeToken(pszData, keytoken, ARRAYSIZE(keytoken), bQuoted);
+			if (!keytoken[0])
+				break;	// we've hit the null terminator
+
+			// convert the token to a string
+			char key[128];
+			V_UCS2ToUTF8(keytoken, key, static_cast<int>( sizeof(key) ));
+            pszData = pchNewdata;
+
+			// if we have a C++ style comment, read to end of line and continue
+			if (!strnicmp(key, "//", 2))
 			{
-				pszData = ReadToEndOfLine( pszNext );
+                pszData = ReadToEndOfLine(pszData);
+				continue;
 			}
-			else
+
+			if ( spew )
 			{
-				pszData = ReadUnicodeToken( pszNext, valuetoken, ARRAYSIZE( valuetoken ), bQuoted );
+				Msg( "%s\n", key );
+			}
 
-				if( !valuetoken[ 0 ] && !bQuoted )
-					break;
+			ucs2 valuetoken[ MAX_LOCALIZED_CHARS ];
+            pszData = ReadUnicodeToken(pszData, valuetoken, MAX_LOCALIZED_CHARS, bQuoted);
+			if (!valuetoken[0] && !bQuoted)
+				break;	// we've hit the null terminator
 
-				if( state != STATE_BASE )
+			if (state == STATE_BASE)
+			{
+				if (!stricmp(key, "Language"))
 				{
-					if( state == STATE_TOKENS )
-					{
-						int i;
-						for( i = 0; ( i < ARRAYSIZE( fullString ) - 1 ) && valuetoken[ i ]; ++i )
-						{
-							fullString[ i ] = valuetoken[ i ];
-						}
-
-						fullString[ i ] = '\0';
-
-						AddString( key, fullString, nullptr );
-					}
-					else
-					{
-						state = STATE_BASE;
-					}
+					// copy out our language setting
+					char value[MAX_LOCALIZED_CHARS];
+					V_UCS2ToUTF8(valuetoken, value, sizeof(value));
+					strncpy(m_szLanguage, value, sizeof(m_szLanguage) - 1);
 				}
-				else if( !stricmp( key, "Language" ) )
-				{
-					char szLanguage[ 512 ];
-                    V_UCS2ToUTF8(valuetoken, szLanguage, sizeof(szLanguage));
-					//Q_UCS2ToUTF8( valuetoken, ARRAYSIZE( valuetoken ), szLanguage, sizeof( szLanguage ) );
-					strncpy( m_szLanguage, szLanguage, ARRAYSIZE( m_szLanguage ) - 1 );
-				}
-				else if( !stricmp( key, "Tokens" ) )
+				else if (!stricmp(key, "Tokens"))
 				{
 					state = STATE_TOKENS;
 				}
-				else if( !stricmp( key, "}" ) )
+				else if (!stricmp(key, "}"))
 				{
+					// we've hit the end
 					break;
+				}
+			}
+			else if (state == STATE_TOKENS)
+			{
+				if (!stricmp(key, "}"))
+				{
+					// end of tokens
+					state = STATE_BASE;
+				}
+				else
+				{
+					// skip our [english] beginnings (in non-english files)
+					if ( (bEnglishFile) || (!bEnglishFile && strnicmp(key, "[english]", 9)))
+					{
+						// Check for a conditional tag
+						bool bAccepted = true;
+						ucs2 conditional[ MAX_LOCALIZED_CHARS ];
+						ucs2 *tempData = ReadUnicodeToken(pszData, conditional, MAX_LOCALIZED_CHARS, bQuoted);
+						if ( !bQuoted && conditional[0] == L'[' && conditional[1] == L'$' ) // wcsstr( conditional, L"[$" ) )
+						{
+							// Evaluate the conditional tag
+							char cond[MAX_LOCALIZED_CHARS];
+							V_UCS2ToUTF8(conditional, cond, sizeof(cond));
+							bAccepted = EvaluateConditional( cond );
+
+							// Robin: HACK: Cheesy support for language-based filtering. Main has much better
+							// support for this, in all KV files, so this will be obsoleted in post-TF2 products.
+							char *pszKey = &cond[2];
+							bool bNot = false;
+							if ( pszKey[0] == '!' )
+							{
+								bNot = true;
+								pszKey++;
+							}
+							// Trim off the ]
+							if ( pszKey && pszKey[0] )
+							{
+								pszKey[ V_strlen(pszKey)-1 ] = '\0';
+								if ( !V_stricmp( pszKey, "ENGLISH" ) ||
+									 !V_stricmp( pszKey, "JAPANESE" ) ||
+									 !V_stricmp( pszKey, "GERMAN" ) ||
+									 !V_stricmp( pszKey, "FRENCH" ) ||
+									 !V_stricmp( pszKey, "SPANISH" ) ||
+									 !V_stricmp( pszKey, "ITALIAN" ) ||
+									 !V_stricmp( pszKey, "KOREAN" ) ||
+									 !V_stricmp( pszKey, "TCHINESE" ) ||
+									 !V_stricmp( pszKey, "PORTUGUESE" ) ||
+									 !V_stricmp( pszKey, "SCHINESE" ) ||
+									 !V_stricmp( pszKey, "POLISH" ) ||
+									 !V_stricmp( pszKey, "RUSSIAN" ) )
+								{
+									// the language symbols are true if we are in that language
+									// english is assumed when no language is present
+									const char *pLanguageString = "schinese";
+									bool bMatched = ( !V_stricmp( pszKey, pLanguageString ) );
+									bAccepted = (bMatched && !bNot) || (!bMatched && bNot);
+								}
+							}
+
+                            pszData = tempData;
+						}
+						if ( bAccepted )
+						{
+							wchar_t fullString[MAX_LOCALIZED_CHARS+1];
+							int i = 0;
+							for ( i = 0; i < MAX_LOCALIZED_CHARS && valuetoken[i] != 0; i++ )
+								fullString[i] = valuetoken[i]; // explode the ucs2 into a wchar_t wide buffer
+							fullString[i] = 0;
+
+							// add the string to the table
+							AddString(key, fullString, NULL);
+						}
+					}
 				}
 			}
 		}
@@ -681,17 +745,17 @@ bool CLocalizedStringTable::SymLess( const localizedstring_t& lhs, const localiz
 int CLocalizedStringTable::FindExistingValueIndex( const wchar_t* value )
 {
 	if( !s_pTable )
-		return vgui2::INVALID_STRING_INDEX;
+		return m_Values.InvalidIndex();
 
 	fastvalue_t val;
 
 	val.search = value;
-	val.valueindex = vgui2::INVALID_STRING_INDEX;
+	val.valueindex = m_Values.InvalidIndex();
 
 	auto index = m_FastValueLookup.Find( val );
 
 	if( index == m_FastValueLookup.InvalidIndex() )
-		return vgui2::INVALID_STRING_INDEX;
+		return m_Values.InvalidIndex();
 
 	return m_FastValueLookup[ index ].valueindex;
 }
