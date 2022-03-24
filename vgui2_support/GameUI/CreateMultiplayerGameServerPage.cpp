@@ -315,7 +315,7 @@ void CCreateMultiplayerGameServerPage::SetMap(const char *mapName)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CCreateMultiplayerGameServerPage::OnCheckButtonChecked()
+void CCreateMultiplayerGameServerPage::OnCheckButtonChecked(int state)
 {
 	SetControlEnabled("SkillLevelExpert", m_pEnableBotsCheck->IsSelected());
 	SetControlEnabled("SkillLevelHard", m_pEnableBotsCheck->IsSelected());

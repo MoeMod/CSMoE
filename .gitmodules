@@ -31,9 +31,6 @@
 [submodule "3rdparty/stb"]
 	path = 3rdparty/stb
 	url = https://github.com/nothings/stb
-[submodule "3rdparty/fontconfig"]
-	path = 3rdparty/fontconfig
-	url = https://gitlab.freedesktop.org/fontconfig/fontconfig
 [submodule "3rdparty/libexpat"]
 	path = 3rdparty/libexpat
 	url = https://github.com/libexpat/libexpat

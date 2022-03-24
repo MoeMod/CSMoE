@@ -50,7 +50,7 @@ public:
 
 protected:
 	virtual void OnApplyChanges();
-	MESSAGE_FUNC( OnCheckButtonChecked, "CheckButtonChecked" );
+    MESSAGE_FUNC_INT(OnCheckButtonChecked, "CheckButtonChecked", state);
 
 private:
 	void LoadMapList();

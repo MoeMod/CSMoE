@@ -349,6 +349,28 @@ private:
 // It creates a function which instances an object of the specified type
 // It them hooks that function up to the helper list so that the CHud objects can create
 //  the elements by name, with no header file dependency, etc.
+#ifdef XASH_STATIC_GAMELIB
+#define DECLARE_BUILD_FACTORY( className ) \
+    vgui2::Panel *Create_##className( void ) \
+    { \
+        return new className( NULL, NULL ); \
+    } \
+	className *g_##className##LinkerHack = NULL;
+
+#define DECLARE_BUILD_FACTORY_DEFAULT_TEXT( className, defaultText ) \
+    vgui2::Panel *Create_##className( void ) \
+    { \
+        return new className( NULL, NULL, #defaultText ); \
+    } \
+	className *g_##className##LinkerHack = NULL;
+
+#define DECLARE_BUILD_FACTORY_CUSTOM( className, createFunc ) \
+	className *g_##className##LinkerHack = NULL;
+
+#define DECLARE_BUILD_FACTORY_CUSTOM_ALIAS( className, factoryName, createFunc ) \
+	className *g_##factoryName##LinkerHack = NULL;
+
+#else
 #define DECLARE_BUILD_FACTORY( className )										\
 	static vgui2::Panel *Create_##className( void )							\
 		{																		\
@@ -373,7 +395,7 @@ private:
 #define DECLARE_BUILD_FACTORY_CUSTOM_ALIAS( className, factoryName, createFunc )					\
 	static vgui2::CBuildFactoryHelper g_##factoryName##_Helper( #factoryName, createFunc );\
 	className *g_##factoryName##LinkerHack = NULL;
-
+#endif
 } // namespace vgui
 
 

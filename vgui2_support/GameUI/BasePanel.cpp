@@ -9,6 +9,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
 #include "vgui/IVGui.h"
+#include "IBaseUI.h"
 #include "FileSystem.h"
 #include "GameConsole.h"
 #include "GameUI_Interface.h"
@@ -39,6 +40,9 @@
 #include <algorithm>
 
 extern vgui2::DHANDLE<CLoadingDialog> g_hLoadingDialog;
+namespace vgui2 {
+    extern IBaseUI *staticUIFuncs;
+}
 
 static CBasePanel *g_pBasePanel = NULL;
 static float g_flAnimationPadding = 0.01f;
@@ -771,6 +775,8 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
 	CGameMenu *menu = new CGameMenu(this, datafile->GetName());
 
+    menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
+
 	for (KeyValues *dat = datafile->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
 	{
 		const char *label = dat->GetString("label", "<unknown>");
@@ -779,7 +785,6 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 
 		menu->AddMenuItem(name, label, cmd, this, dat);
 	}
-	menu->AddMenuItem("[ Thanatos Zone ]", "[ Thanatos Zone ]", "OnConnectThanatosZone", this, nullptr);
 	return menu;
 }
 
@@ -1008,9 +1013,9 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
 		vgui2::surface()->RestrictPaintToSinglePanel(NULL);
 	}
-	else if (!Q_stricmp(command, "OnConnectThanatosZone"))
+	else if (!Q_stricmp(command, "OpenConsole"))
 	{
-		engine->pfnClientCmd("connect x.imomoe.cn:27015");
+        vgui2::staticUIFuncs->ShowConsole();
 	}
 
 	else

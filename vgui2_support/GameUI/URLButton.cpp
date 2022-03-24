@@ -15,8 +15,7 @@
 #include "URLButton.h"
 #include <vgui_controls/FocusNavGroup.h>
 
-namespace vgui2
-{
+using namespace vgui2;
 
 DECLARE_BUILD_FACTORY_DEFAULT_TEXT(URLButton, URLButton);
 	
@@ -421,5 +420,4 @@ void URLButton::SizeToContents(void)
 	int wide, tall;
 	GetContentSize(wide, tall);
 	SetSize(wide + Label::Content, tall + Label::Content);
-}
 }

@@ -44,6 +44,7 @@ extern vgui2::IInputInternal* g_pInputInternal;
 }
 extern BaseUISurface* staticSurface;
 extern void RegisterInterface();
+extern void RegisterControls();
 void TextAdjustSize( int *x, int *y, int *w, int *h );
 void TextAdjustSizeReverse(int* x, int* y, int* w, int* h);
 
@@ -63,6 +64,7 @@ static bool pending_activate = false;
 void UI_Init(void)
 {
     RegisterInterface();
+    RegisterControls();
 	CreateInterfaceFn pEngineFactory = Sys_GetFactoryThis();
 	staticUIFuncs = (IBaseUI*)pEngineFactory(BASEUI_INTERFACE_VERSION, NULL);
 }
