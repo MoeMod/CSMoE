@@ -102,6 +102,8 @@ EOSType GetOSType()
 			}
 		}
 	}
+#elif defined(IOS)
+    return k_eMacOSUnknown;
 #elif defined(OSX)
 	if ( eOSVersion == k_eOSUnknown )
 	{

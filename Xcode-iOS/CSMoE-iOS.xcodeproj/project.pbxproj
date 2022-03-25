@@ -7,28 +7,16 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */ = {
+		3DA767EE27EE518600824693 /* cmake-xcode-proj */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 3D2DCBF7233209E300ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-gen-csmoe" */;
+			buildConfigurationList = 3DA767F027EE518600824693 /* Build configuration list for PBXAggregateTarget "cmake-xcode-proj" */;
 			buildPhases = (
-				3D2DCBFA233209ED00ADBA6B /* Run Script */,
+				3DA767EF27EE518600824693 /* Run Script */,
 			);
 			dependencies = (
 			);
-			name = "cmake-gen-csmoe";
+			name = "cmake-xcode-proj";
 			productName = "cmake-mkdir-csmoe";
-		};
-		3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3D2DCBFE23320D5D00ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-build-csmoe" */;
-			buildPhases = (
-				3D2DCC0123320D9600ADBA6B /* ShellScript */,
-			);
-			dependencies = (
-				3D2DCC0323320DCF00ADBA6B /* PBXTargetDependency */,
-			);
-			name = "cmake-build-csmoe";
-			productName = "cmake-build-csmoe";
 		};
 /* End PBXAggregateTarget section */
 
@@ -41,19 +29,41 @@
 		3D0090EB2788B84500E68FC3 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0090EA2788B84500E68FC3 /* libz.tbd */; };
 		3D4416DA231D1711001A0696 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96ED30DEFC9C700FAF19F /* OpenGLES.framework */; };
 		3D4416E4231D1893001A0696 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D525D7722252AAB00DD9932 /* Metal.framework */; };
-		3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DAA0223BCEC7C00F575C1 /* libxash.a */; };
 		3D5099E323CB0F7900F75CEA /* CSMoE-Full in Resources */ = {isa = PBXBuildFile; fileRef = 3D5099DA23CB0F7900F75CEA /* CSMoE-Full */; };
 		3D5E35DC227768B10073D791 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35D6227768B10073D791 /* Icon.png */; };
 		3D5E35EC22776A8D0073D791 /* LaunchScreenStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */; };
 		3D670D69227A30620030B7D1 /* Launch.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D670D68227A30620030B7D1 /* Launch.png */; };
-		3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D8777BD24A26819006806BF /* libimgui_ext.a */; };
 		3D99F5A3277215DC006EDB62 /* launchdialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A2277215DC006EDB62 /* launchdialog.mm */; };
 		3D99F5A527721613006EDB62 /* TutorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A427721613006EDB62 /* TutorViewController.mm */; };
-		3D9E467327A42F2D00367C2D /* libastcenc-native-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */; };
-		3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB534302761091B0052BD7F /* libcqmiao.a */; };
-		3DB5343C276109580052BD7F /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB5343B276109580052BD7F /* libluash.a */; };
-		3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53441276109B10052BD7F /* libcrypto.a */; };
-		3DB53444276109BA0052BD7F /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DB53443276109BA0052BD7F /* libssl.a */; };
+		3DA767ED27EDE1AD00824693 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA767EC27EDE1AD00824693 /* libbz2.tbd */; };
+		3DA768AC27EE578F00824693 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768AB27EE575700824693 /* libxash.a */; };
+		3DA768B227EE6C6400824693 /* libastcenc-native-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687527EE575700824693 /* libastcenc-native-static.a */; };
+		3DA768B327EE6C7A00824693 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687727EE575700824693 /* libclient.a */; };
+		3DA768B427EE6C9C00824693 /* libcpuinfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687B27EE575700824693 /* libcpuinfo.a */; };
+		3DA768B527EE6C9C00824693 /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687F27EE575700824693 /* libcqmiao.a */; };
+		3DA768B627EE6C9C00824693 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688127EE575700824693 /* libcrypto.a */; };
+		3DA768B727EE6C9C00824693 /* libdead_wrapper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688327EE575700824693 /* libdead_wrapper.a */; };
+		3DA768B827EE6C9C00824693 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688527EE575700824693 /* libexpat.a */; };
+		3DA768B927EE6C9C00824693 /* libfreetyped.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688727EE575700824693 /* libfreetyped.a */; };
+		3DA768BA27EE6C9C00824693 /* libGameUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7686F27EE575700824693 /* libGameUI.a */; };
+		3DA768BB27EE6C9C00824693 /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688B27EE575700824693 /* libimgui_ext.a */; };
+		3DA768BC27EE6C9C00824693 /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688927EE575700824693 /* libimgui.a */; };
+		3DA768BE27EE6C9C00824693 /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689127EE575700824693 /* libluash.a */; };
+		3DA768BF27EE6C9C00824693 /* libmathlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689327EE575700824693 /* libmathlib.a */; };
+		3DA768C027EE6C9C00824693 /* libSDL2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687127EE575700824693 /* libSDL2d.a */; };
+		3DA768C127EE6C9C00824693 /* libSDL2maind.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687327EE575700824693 /* libSDL2maind.a */; };
+		3DA768C227EE6C9C00824693 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689527EE575700824693 /* libserver.a */; };
+		3DA768C327EE6C9C00824693 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689727EE575700824693 /* libssl.a */; };
+		3DA768C427EE6C9C00824693 /* libtier0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689927EE575700824693 /* libtier0.a */; };
+		3DA768C527EE6C9C00824693 /* libtier1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689B27EE575700824693 /* libtier1.a */; };
+		3DA768C627EE6C9C00824693 /* libvgui_controls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A127EE575700824693 /* libvgui_controls.a */; };
+		3DA768C727EE6C9C00824693 /* libvgui_surfacelib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A327EE575700824693 /* libvgui_surfacelib.a */; };
+		3DA768C827EE6C9C00824693 /* libvgui2_support.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689F27EE575700824693 /* libvgui2_support.a */; };
+		3DA768C927EE6C9C00824693 /* libvgui2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689D27EE575700824693 /* libvgui2.a */; };
+		3DA768CA27EE6C9C00824693 /* libvguimatsurface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A527EE575700824693 /* libvguimatsurface.a */; };
+		3DA768CB27EE6C9C00824693 /* libvinterface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A727EE575700824693 /* libvinterface.a */; };
+		3DA768CC27EE6C9C00824693 /* libvstdlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A927EE575700824693 /* libvstdlib.a */; };
+		3DA768CD27EE6E8000824693 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688D27EE575700824693 /* libluajit.a */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
 		3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A42289683100114D80 /* MacBookiTunes.png */; };
@@ -66,21 +76,14 @@
 		3DC1E4BF2289F18500114D80 /* Steam.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4BE2289F18500114D80 /* Steam.png */; };
 		3DC1E4C9228AE05000114D80 /* TutorStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */; };
 		3DC8946F260FAC5600F7A4A5 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */; };
-		3DDCB14827625A4600BBEC27 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDCB14727625A4600BBEC27 /* libSDL2.a */; };
-		3DDCB14D27625BE200BBEC27 /* libSDL2main.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDCB14C27625BE200BBEC27 /* libSDL2main.a */; };
 		3DDCB15827625D0C00BBEC27 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDCB15727625D0C00BBEC27 /* libiconv.tbd */; };
 		3DDCB15C27625D1700BBEC27 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0FC1DB2278310100D9A961 /* libc++.tbd */; };
 		3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE829A7260F8F00009DABD0 /* Assets.xcassets */; };
-		3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAED19260F846D0045F79B /* libmenu.a */; };
-		3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DEAEE6D260F8B340045F79B /* libserver.a */; };
-		3DF2719E23D45158005D151E /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF2719523D4511C005D151E /* libimgui.a */; };
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		B62AADA826274FB800F77FE7 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D4DA95623BCE9C800F575C1 /* libclient.a */; };
 		B6467524253FE21E00F557B8 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B646751B253FE21E00F557B8 /* CoreBluetooth.framework */; };
 		B663773925DD89D000564BD5 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B663773825DD89D000564BD5 /* CoreHaptics.framework */; };
-		B6D007C4262A1B71007A949F /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6D007C3262A1B71007A949F /* libluajit.a */; };
 		FA8B4BA31967070A00F8EB7C /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */; };
 		FABA34D41D8B5E5600915323 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FABA34D31D8B5E5600915323 /* AVFoundation.framework */; };
 		FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FDB96EDF0DEFC9DC00FAF19F /* QuartzCore.framework */; };
@@ -89,19 +92,397 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3D2DCC0223320DCF00ADBA6B /* PBXContainerItemProxy */ = {
+		3DA7683C27EE575700824693 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3D2DCBF6233209E300ADBA6B;
-			remoteInfo = "cmake-gen-csmoe";
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D787F122E3A4C61ABE0C37C;
+			remoteInfo = Boost_atomic;
 		};
-		3D4DAA1123BCEF0900F575C1 /* PBXContainerItemProxy */ = {
+		3DA7683E27EE575700824693 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3D2DCBFD23320D5D00ADBA6B;
-			remoteInfo = "cmake-build-csmoe";
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3D6217535CA1406686082B69;
+			remoteInfo = Boost_chrono;
+		};
+		3DA7684027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 78F6527EDAAA431D9BACDAA3;
+			remoteInfo = Boost_container;
+		};
+		3DA7684227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 9BEF706F59774173B557564D;
+			remoteInfo = Boost_context;
+		};
+		3DA7684427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 85513D03795C46D4909E1005;
+			remoteInfo = Boost_coroutine;
+		};
+		3DA7684627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 45B0522868C24E19B89FA7BC;
+			remoteInfo = Boost_date_time;
+		};
+		3DA7684827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 77D1B715DB174A78AC97BCEB;
+			remoteInfo = Boost_exception;
+		};
+		3DA7684A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0AFB23FB12774D2783FA66C1;
+			remoteInfo = Boost_fiber;
+		};
+		3DA7684C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5544A93D9F004F38856089F7;
+			remoteInfo = Boost_filesystem;
+		};
+		3DA7684E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3AB23EF6F89946FBB411261B;
+			remoteInfo = Boost_graph;
+		};
+		3DA7685027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4B3AD0EB8E9E4BA7B0C61F4F;
+			remoteInfo = Boost_iostreams;
+		};
+		3DA7685227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 551016815CCC4650B82C3A2E;
+			remoteInfo = Boost_locale;
+		};
+		3DA7685427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D003C414C6F445A8B96B831C;
+			remoteInfo = Boost_log;
+		};
+		3DA7685627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7ECA4BE019B342098F179902;
+			remoteInfo = Boost_log_setup;
+		};
+		3DA7685827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A9F124C4A5A241FBB07C83DE;
+			remoteInfo = Boost_math;
+		};
+		3DA7685A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E3FDA9A3CDC84B629ABFAA12;
+			remoteInfo = Boost_program_options;
+		};
+		3DA7685C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7C2C577F892143579F25B2F9;
+			remoteInfo = Boost_random;
+		};
+		3DA7685E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3C77336F8D9E4104829DC926;
+			remoteInfo = Boost_regex;
+		};
+		3DA7686027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A380ECB3669A4D44AB35FEA2;
+			remoteInfo = Boost_serialization;
+		};
+		3DA7686227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 42BCC8725F9E4229AB7ED301;
+			remoteInfo = Boost_system;
+		};
+		3DA7686427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0027AC2EC0A24EF8AE3EA846;
+			remoteInfo = Boost_thread;
+		};
+		3DA7686627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EA688E770BBD4B84B3884C7B;
+			remoteInfo = Boost_timer;
+		};
+		3DA7686827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3F22615E18EE4640B7252DC0;
+			remoteInfo = Boost_type_erasure;
+		};
+		3DA7686A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5E0A1053B964463190D4E5EB;
+			remoteInfo = Boost_unit_test_framework;
+		};
+		3DA7686C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4A766B99DF7842EF9781C849;
+			remoteInfo = Boost_wave;
+		};
+		3DA7686E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AB23F06542BB4BD39C20CF4A;
+			remoteInfo = GameUI;
+		};
+		3DA7687027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 471FAB9BB4EB4073B02A74A4;
+			remoteInfo = "SDL2-static";
+		};
+		3DA7687227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 37B25F7B11DD48B8933D77BE;
+			remoteInfo = SDL2main;
+		};
+		3DA7687427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E30E2EE012794DDABA4D52CE;
+			remoteInfo = "astcenc-native-static";
+		};
+		3DA7687627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7B7A60CCC99547D7AAEAF806;
+			remoteInfo = client;
+		};
+		3DA7687827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D45539C0D21A41FDBC5AC242;
+			remoteInfo = clog;
+		};
+		3DA7687A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CA265F249917436A9D94AB3F;
+			remoteInfo = cpuinfo;
+		};
+		3DA7687C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7A75432158E84B70920870DC;
+			remoteInfo = cpuinfo_internals;
+		};
+		3DA7687E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 433AFC8660524EBF98451685;
+			remoteInfo = cqmiao;
+		};
+		3DA7688027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E40A9DFB972D437F8AD8153A;
+			remoteInfo = crypto;
+		};
+		3DA7688227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D8625776899047149C773F3F;
+			remoteInfo = dead_wrapper;
+		};
+		3DA7688427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 29D113755A5546AF8E8E6CA3;
+			remoteInfo = expat;
+		};
+		3DA7688627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7291B947E3CA46779972BB66;
+			remoteInfo = freetype;
+		};
+		3DA7688827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BD24D0740A3A48C0B3BC4A45;
+			remoteInfo = imgui;
+		};
+		3DA7688A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 56304C3DF7FB440A871B24C0;
+			remoteInfo = imgui_ext;
+		};
+		3DA7688C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7DF6FB7FDC3640D5AF48250A;
+			remoteInfo = libluajit;
+		};
+		3DA7688E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5805A319539240699A013A69;
+			remoteInfo = luajit;
+		};
+		3DA7689027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EFDF9451E8CE4886A71B9473;
+			remoteInfo = luash;
+		};
+		3DA7689227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 034801E268334B0587BE162E;
+			remoteInfo = mathlib;
+		};
+		3DA7689427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4D81A829B41741C79A467571;
+			remoteInfo = server;
+		};
+		3DA7689627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5BEA11DA18094FDAB0E7EF99;
+			remoteInfo = ssl;
+		};
+		3DA7689827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EC8756869AB8491193E921B3;
+			remoteInfo = tier0;
+		};
+		3DA7689A27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 141DEE0EA3D54D78AE46ABED;
+			remoteInfo = tier1;
+		};
+		3DA7689C27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FD3D04CA24C14B6483C74767;
+			remoteInfo = vgui2;
+		};
+		3DA7689E27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E59887C646C847F2959CFED8;
+			remoteInfo = vgui2_support;
+		};
+		3DA768A027EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EC3F37EF17A14E228659D83E;
+			remoteInfo = vgui_controls;
+		};
+		3DA768A227EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6F836CB218A44821AECD5348;
+			remoteInfo = vgui_surfacelib;
+		};
+		3DA768A427EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A8745D7AA92F4FDF92C9CCF9;
+			remoteInfo = vguimatsurface;
+		};
+		3DA768A627EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DCAA97AADD2C47BB8FCAA7DD;
+			remoteInfo = vinterface;
+		};
+		3DA768A827EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = EBAF9DDA61FB4DC390357ECA;
+			remoteInfo = vstdlib;
+		};
+		3DA768AA27EE575700824693 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 7329781906EB477AB84A35ED;
+			remoteInfo = xash;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -116,8 +497,6 @@
 		3D094FAF228F1D3B00F168C2 /* TutorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TutorViewController.h; sourceTree = "<group>"; };
 		3D0FC1DB2278310100D9A961 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		3D37322E229488AA00713C9C /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		3D4DA95623BCE9C800F575C1 /* libclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclient.a; sourceTree = "<group>"; };
-		3D4DAA0223BCEC7C00F575C1 /* libxash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxash.a; sourceTree = "<group>"; };
 		3D5099DA23CB0F7900F75CEA /* CSMoE-Full */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "CSMoE-Full"; path = "../CSMoE-Full"; sourceTree = "<group>"; };
 		3D525D7722252AAB00DD9932 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		3D5E35D6227768B10073D791 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Icon.png; sourceTree = "<group>"; };
@@ -125,14 +504,10 @@
 		3D5E35EB22776A8D0073D791 /* LaunchScreenStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreenStoryboard.storyboard; sourceTree = "<group>"; };
 		3D670D68227A30620030B7D1 /* Launch.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Launch.png; path = Resources/Launch.png; sourceTree = "<group>"; };
 		3D670D78227D901F0030B7D1 /* launcherdialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = launcherdialog.h; sourceTree = "<group>"; };
-		3D8777BD24A26819006806BF /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimgui_ext.a; sourceTree = "<group>"; };
 		3D99F5A2277215DC006EDB62 /* launchdialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = launchdialog.mm; sourceTree = "<group>"; };
 		3D99F5A427721613006EDB62 /* TutorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TutorViewController.mm; sourceTree = "<group>"; };
-		3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libastcenc-native-static.a"; sourceTree = "<group>"; };
-		3DB534302761091B0052BD7F /* libcqmiao.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcqmiao.a; sourceTree = "<group>"; };
-		3DB5343B276109580052BD7F /* libluash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluash.a; sourceTree = "<group>"; };
-		3DB53441276109B10052BD7F /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
-		3DB53443276109BA0052BD7F /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
+		3DA767EC27EDE1AD00824693 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		3DA767F327EE575600824693 /* csmoe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = csmoe.xcodeproj; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
 		3DC1E4A32289683100114D80 /* page1_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = page1_en.png; path = Resources/page1_en.png; sourceTree = "<group>"; };
 		3DC1E4A42289683100114D80 /* MacBookiTunes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MacBookiTunes.png; path = Resources/MacBookiTunes.png; sourceTree = "<group>"; };
@@ -145,18 +520,12 @@
 		3DC1E4BE2289F18500114D80 /* Steam.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Steam.png; path = Resources/Steam.png; sourceTree = "<group>"; };
 		3DC1E4C8228AE05000114D80 /* TutorStoryboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = TutorStoryboard.storyboard; sourceTree = "<group>"; };
 		3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
-		3DDCB14727625A4600BBEC27 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2.a; sourceTree = "<group>"; };
-		3DDCB14C27625BE200BBEC27 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2main.a; sourceTree = "<group>"; };
 		3DDCB15727625D0C00BBEC27 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		3DE829A7260F8F00009DABD0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
-		3DEAED19260F846D0045F79B /* libmenu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmenu.a; sourceTree = "<group>"; };
-		3DEAEE6D260F8B340045F79B /* libserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libserver.a; sourceTree = "<group>"; };
-		3DF2719523D4511C005D151E /* libimgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libimgui.a; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		B663773825DD89D000564BD5 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
-		B6D007C3262A1B71007A949F /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		FA8B4BA21967070A00F8EB7C /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		FABA34D31D8B5E5600915323 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		FAE0E9691BAF96A00098DFA4 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
@@ -171,6 +540,35 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DA768CD27EE6E8000824693 /* libluajit.a in Frameworks */,
+				3DA768B427EE6C9C00824693 /* libcpuinfo.a in Frameworks */,
+				3DA768B527EE6C9C00824693 /* libcqmiao.a in Frameworks */,
+				3DA768B627EE6C9C00824693 /* libcrypto.a in Frameworks */,
+				3DA768B727EE6C9C00824693 /* libdead_wrapper.a in Frameworks */,
+				3DA768B827EE6C9C00824693 /* libexpat.a in Frameworks */,
+				3DA768B927EE6C9C00824693 /* libfreetyped.a in Frameworks */,
+				3DA768BA27EE6C9C00824693 /* libGameUI.a in Frameworks */,
+				3DA768BB27EE6C9C00824693 /* libimgui_ext.a in Frameworks */,
+				3DA768BC27EE6C9C00824693 /* libimgui.a in Frameworks */,
+				3DA768BE27EE6C9C00824693 /* libluash.a in Frameworks */,
+				3DA768BF27EE6C9C00824693 /* libmathlib.a in Frameworks */,
+				3DA768C027EE6C9C00824693 /* libSDL2d.a in Frameworks */,
+				3DA768C127EE6C9C00824693 /* libSDL2maind.a in Frameworks */,
+				3DA768C227EE6C9C00824693 /* libserver.a in Frameworks */,
+				3DA768C327EE6C9C00824693 /* libssl.a in Frameworks */,
+				3DA768C427EE6C9C00824693 /* libtier0.a in Frameworks */,
+				3DA768C527EE6C9C00824693 /* libtier1.a in Frameworks */,
+				3DA768C627EE6C9C00824693 /* libvgui_controls.a in Frameworks */,
+				3DA768C727EE6C9C00824693 /* libvgui_surfacelib.a in Frameworks */,
+				3DA768C827EE6C9C00824693 /* libvgui2_support.a in Frameworks */,
+				3DA768C927EE6C9C00824693 /* libvgui2.a in Frameworks */,
+				3DA768CA27EE6C9C00824693 /* libvguimatsurface.a in Frameworks */,
+				3DA768CB27EE6C9C00824693 /* libvinterface.a in Frameworks */,
+				3DA768CC27EE6C9C00824693 /* libvstdlib.a in Frameworks */,
+				3DA768AC27EE578F00824693 /* libxash.a in Frameworks */,
+				3DA768B327EE6C7A00824693 /* libclient.a in Frameworks */,
+				3DA768B227EE6C6400824693 /* libastcenc-native-static.a in Frameworks */,
+				3DA767ED27EDE1AD00824693 /* libbz2.tbd in Frameworks */,
 				3D0090EB2788B84500E68FC3 /* libz.tbd in Frameworks */,
 				3DDCB15C27625D1700BBEC27 /* libc++.tbd in Frameworks */,
 				3DDCB15827625D0C00BBEC27 /* libiconv.tbd in Frameworks */,
@@ -191,20 +589,6 @@
 				1D3623EC0D0F72F000981E51 /* CoreGraphics.framework in Frameworks */,
 				FDB96EE00DEFC9DC00FAF19F /* QuartzCore.framework in Frameworks */,
 				49C4D60720781DAB00855677 /* GameController.framework in Frameworks */,
-				3DDCB14D27625BE200BBEC27 /* libSDL2main.a in Frameworks */,
-				3DDCB14827625A4600BBEC27 /* libSDL2.a in Frameworks */,
-				3D4DAA0A23BCED7000F575C1 /* libxash.a in Frameworks */,
-				B62AADA826274FB800F77FE7 /* libclient.a in Frameworks */,
-				3DEAEE6E260F8B750045F79B /* libserver.a in Frameworks */,
-				3DEAED1A260F84920045F79B /* libmenu.a in Frameworks */,
-				3D8777C624A26838006806BF /* libimgui_ext.a in Frameworks */,
-				3DF2719E23D45158005D151E /* libimgui.a in Frameworks */,
-				3D9E467327A42F2D00367C2D /* libastcenc-native-static.a in Frameworks */,
-				B6D007C4262A1B71007A949F /* libluajit.a in Frameworks */,
-				3DB53442276109B10052BD7F /* libcrypto.a in Frameworks */,
-				3DB53444276109BA0052BD7F /* libssl.a in Frameworks */,
-				3DB534312761091B0052BD7F /* libcqmiao.a in Frameworks */,
-				3DB5343C276109580052BD7F /* libluash.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +642,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3DA767EC27EDE1AD00824693 /* libbz2.tbd */,
 				3D0090EA2788B84500E68FC3 /* libz.tbd */,
 				3D0090BF2788B2D200E68FC3 /* Security.framework */,
 				3D0090E52788B7F900E68FC3 /* Bugly.framework */,
@@ -314,126 +699,72 @@
 		3D4DA95923BCEA2F00F575C1 /* cmake-build */ = {
 			isa = PBXGroup;
 			children = (
-				3DB5343D276109740052BD7F /* 3rdparty */,
-				3DB5343A2761094A0052BD7F /* luash */,
-				3DB53420276108F70052BD7F /* cqmiao */,
-				3DF2719523D4511C005D151E /* libimgui.a */,
-				3D8777BD24A26819006806BF /* libimgui_ext.a */,
-				3D4DA95A23BCEA4700F575C1 /* cl_dll */,
-				3DEAED46260F8B340045F79B /* dlls */,
-				3D4DA95E23BCEAFB00F575C1 /* engine */,
-				3DEAECC0260F846D0045F79B /* mainui_cpp */,
+				3DA767F327EE575600824693 /* csmoe.xcodeproj */,
 			);
 			path = "cmake-build";
 			sourceTree = SOURCE_ROOT;
 		};
-		3D4DA95A23BCEA4700F575C1 /* cl_dll */ = {
+		3DA767F427EE575600824693 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3D4DA95623BCE9C800F575C1 /* libclient.a */,
+				3DA7683D27EE575700824693 /* libboost_atomic.a */,
+				3DA7683F27EE575700824693 /* libboost_chrono.a */,
+				3DA7684127EE575700824693 /* libboost_container.a */,
+				3DA7684327EE575700824693 /* libboost_context.a */,
+				3DA7684527EE575700824693 /* libboost_coroutine.a */,
+				3DA7684727EE575700824693 /* libboost_date_time.a */,
+				3DA7684927EE575700824693 /* libboost_exception.a */,
+				3DA7684B27EE575700824693 /* libboost_fiber.a */,
+				3DA7684D27EE575700824693 /* libboost_filesystem.a */,
+				3DA7684F27EE575700824693 /* libboost_graph.a */,
+				3DA7685127EE575700824693 /* libboost_iostreams.a */,
+				3DA7685327EE575700824693 /* libboost_locale.a */,
+				3DA7685527EE575700824693 /* libboost_log.a */,
+				3DA7685727EE575700824693 /* libboost_log_setup.a */,
+				3DA7685927EE575700824693 /* libboost_math.a */,
+				3DA7685B27EE575700824693 /* libboost_program_options.a */,
+				3DA7685D27EE575700824693 /* libboost_random.a */,
+				3DA7685F27EE575700824693 /* libboost_regex.a */,
+				3DA7686127EE575700824693 /* libboost_serialization.a */,
+				3DA7686327EE575700824693 /* libboost_system.a */,
+				3DA7686527EE575700824693 /* libboost_thread.a */,
+				3DA7686727EE575700824693 /* libboost_timer.a */,
+				3DA7686927EE575700824693 /* libboost_type_erasure.a */,
+				3DA7686B27EE575700824693 /* libboost_unit_test_framework.a */,
+				3DA7686D27EE575700824693 /* libboost_wave.a */,
+				3DA7686F27EE575700824693 /* libGameUI.a */,
+				3DA7687127EE575700824693 /* libSDL2d.a */,
+				3DA7687327EE575700824693 /* libSDL2maind.a */,
+				3DA7687527EE575700824693 /* libastcenc-native-static.a */,
+				3DA7687727EE575700824693 /* libclient.a */,
+				3DA7687927EE575700824693 /* libclog.a */,
+				3DA7687B27EE575700824693 /* libcpuinfo.a */,
+				3DA7687D27EE575700824693 /* libcpuinfo_internals.a */,
+				3DA7687F27EE575700824693 /* libcqmiao.a */,
+				3DA7688127EE575700824693 /* libcrypto.a */,
+				3DA7688327EE575700824693 /* libdead_wrapper.a */,
+				3DA7688527EE575700824693 /* libexpat.a */,
+				3DA7688727EE575700824693 /* libfreetyped.a */,
+				3DA7688927EE575700824693 /* libimgui.a */,
+				3DA7688B27EE575700824693 /* libimgui_ext.a */,
+				3DA7688D27EE575700824693 /* libluajit.a */,
+				3DA7688F27EE575700824693 /* luajit */,
+				3DA7689127EE575700824693 /* libluash.a */,
+				3DA7689327EE575700824693 /* libmathlib.a */,
+				3DA7689527EE575700824693 /* libserver.a */,
+				3DA7689727EE575700824693 /* libssl.a */,
+				3DA7689927EE575700824693 /* libtier0.a */,
+				3DA7689B27EE575700824693 /* libtier1.a */,
+				3DA7689D27EE575700824693 /* libvgui2.a */,
+				3DA7689F27EE575700824693 /* libvgui2_support.a */,
+				3DA768A127EE575700824693 /* libvgui_controls.a */,
+				3DA768A327EE575700824693 /* libvgui_surfacelib.a */,
+				3DA768A527EE575700824693 /* libvguimatsurface.a */,
+				3DA768A727EE575700824693 /* libvinterface.a */,
+				3DA768A927EE575700824693 /* libvstdlib.a */,
+				3DA768AB27EE575700824693 /* libxash.a */,
 			);
-			path = cl_dll;
-			sourceTree = "<group>";
-		};
-		3D4DA95E23BCEAFB00F575C1 /* engine */ = {
-			isa = PBXGroup;
-			children = (
-				3D4DAA0223BCEC7C00F575C1 /* libxash.a */,
-			);
-			path = engine;
-			sourceTree = "<group>";
-		};
-		3D9E467027A42F0800367C2D /* astc-encoder */ = {
-			isa = PBXGroup;
-			children = (
-				3D9E467127A42F1F00367C2D /* Source */,
-			);
-			path = "astc-encoder";
-			sourceTree = "<group>";
-		};
-		3D9E467127A42F1F00367C2D /* Source */ = {
-			isa = PBXGroup;
-			children = (
-				3D9E467227A42F2D00367C2D /* libastcenc-native-static.a */,
-			);
-			path = Source;
-			sourceTree = "<group>";
-		};
-		3DB53420276108F70052BD7F /* cqmiao */ = {
-			isa = PBXGroup;
-			children = (
-				3DB534302761091B0052BD7F /* libcqmiao.a */,
-			);
-			path = cqmiao;
-			sourceTree = "<group>";
-		};
-		3DB5343A2761094A0052BD7F /* luash */ = {
-			isa = PBXGroup;
-			children = (
-				3DB5343B276109580052BD7F /* libluash.a */,
-			);
-			path = luash;
-			sourceTree = "<group>";
-		};
-		3DB5343D276109740052BD7F /* 3rdparty */ = {
-			isa = PBXGroup;
-			children = (
-				3D9E467027A42F0800367C2D /* astc-encoder */,
-				3DDCB14627625A3700BBEC27 /* SDL2 */,
-				3DB5343E276109820052BD7F /* openssl-cmake */,
-				B6D007C3262A1B71007A949F /* libluajit.a */,
-			);
-			path = 3rdparty;
-			sourceTree = "<group>";
-		};
-		3DB5343E276109820052BD7F /* openssl-cmake */ = {
-			isa = PBXGroup;
-			children = (
-				3DB53440276109990052BD7F /* crypto */,
-				3DB5343F276109930052BD7F /* ssl */,
-			);
-			path = "openssl-cmake";
-			sourceTree = "<group>";
-		};
-		3DB5343F276109930052BD7F /* ssl */ = {
-			isa = PBXGroup;
-			children = (
-				3DB53443276109BA0052BD7F /* libssl.a */,
-			);
-			path = ssl;
-			sourceTree = "<group>";
-		};
-		3DB53440276109990052BD7F /* crypto */ = {
-			isa = PBXGroup;
-			children = (
-				3DB53441276109B10052BD7F /* libcrypto.a */,
-			);
-			path = crypto;
-			sourceTree = "<group>";
-		};
-		3DDCB14627625A3700BBEC27 /* SDL2 */ = {
-			isa = PBXGroup;
-			children = (
-				3DDCB14727625A4600BBEC27 /* libSDL2.a */,
-				3DDCB14C27625BE200BBEC27 /* libSDL2main.a */,
-			);
-			path = SDL2;
-			sourceTree = "<group>";
-		};
-		3DEAECC0260F846D0045F79B /* mainui_cpp */ = {
-			isa = PBXGroup;
-			children = (
-				3DEAED19260F846D0045F79B /* libmenu.a */,
-			);
-			path = mainui_cpp;
-			sourceTree = "<group>";
-		};
-		3DEAED46260F8B340045F79B /* dlls */ = {
-			isa = PBXGroup;
-			children = (
-				3DEAEE6D260F8B340045F79B /* libserver.a */,
-			);
-			path = dlls;
+			name = Products;
 			sourceTree = "<group>";
 		};
 		FD77A0040E26BC0500F39101 /* CSMoE-iOS */ = {
@@ -460,7 +791,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				3D4DAA1223BCEF0900F575C1 /* PBXTargetDependency */,
 			);
 			name = "CSMoE-iOS";
 			productName = SDLiPodTest;
@@ -479,14 +809,6 @@
 						DevelopmentTeam = 24RZN93GW3;
 						ProvisioningStyle = Manual;
 					};
-					3D2DCBF6233209E300ADBA6B = {
-						CreatedOnToolsVersion = 10.3;
-						ProvisioningStyle = Automatic;
-					};
-					3D2DCBFD23320D5D00ADBA6B = {
-						CreatedOnToolsVersion = 10.3;
-						ProvisioningStyle = Automatic;
-					};
 				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CSMoE-iOS" */;
@@ -502,14 +824,415 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 3DA767F427EE575600824693 /* Products */;
+					ProjectRef = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* CSMoE-iOS */,
-				3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */,
-				3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */,
+				3DA767EE27EE518600824693 /* cmake-xcode-proj */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		3DA7683D27EE575700824693 /* libboost_atomic.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_atomic.a;
+			remoteRef = 3DA7683C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7683F27EE575700824693 /* libboost_chrono.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_chrono.a;
+			remoteRef = 3DA7683E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684127EE575700824693 /* libboost_container.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_container.a;
+			remoteRef = 3DA7684027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684327EE575700824693 /* libboost_context.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_context.a;
+			remoteRef = 3DA7684227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684527EE575700824693 /* libboost_coroutine.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_coroutine.a;
+			remoteRef = 3DA7684427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684727EE575700824693 /* libboost_date_time.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_date_time.a;
+			remoteRef = 3DA7684627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684927EE575700824693 /* libboost_exception.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_exception.a;
+			remoteRef = 3DA7684827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684B27EE575700824693 /* libboost_fiber.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_fiber.a;
+			remoteRef = 3DA7684A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684D27EE575700824693 /* libboost_filesystem.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_filesystem.a;
+			remoteRef = 3DA7684C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7684F27EE575700824693 /* libboost_graph.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_graph.a;
+			remoteRef = 3DA7684E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685127EE575700824693 /* libboost_iostreams.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_iostreams.a;
+			remoteRef = 3DA7685027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685327EE575700824693 /* libboost_locale.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_locale.a;
+			remoteRef = 3DA7685227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685527EE575700824693 /* libboost_log.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_log.a;
+			remoteRef = 3DA7685427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685727EE575700824693 /* libboost_log_setup.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_log_setup.a;
+			remoteRef = 3DA7685627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685927EE575700824693 /* libboost_math.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_math.a;
+			remoteRef = 3DA7685827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685B27EE575700824693 /* libboost_program_options.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_program_options.a;
+			remoteRef = 3DA7685A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685D27EE575700824693 /* libboost_random.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_random.a;
+			remoteRef = 3DA7685C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7685F27EE575700824693 /* libboost_regex.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_regex.a;
+			remoteRef = 3DA7685E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686127EE575700824693 /* libboost_serialization.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_serialization.a;
+			remoteRef = 3DA7686027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686327EE575700824693 /* libboost_system.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_system.a;
+			remoteRef = 3DA7686227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686527EE575700824693 /* libboost_thread.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_thread.a;
+			remoteRef = 3DA7686427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686727EE575700824693 /* libboost_timer.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_timer.a;
+			remoteRef = 3DA7686627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686927EE575700824693 /* libboost_type_erasure.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_type_erasure.a;
+			remoteRef = 3DA7686827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686B27EE575700824693 /* libboost_unit_test_framework.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_unit_test_framework.a;
+			remoteRef = 3DA7686A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686D27EE575700824693 /* libboost_wave.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libboost_wave.a;
+			remoteRef = 3DA7686C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7686F27EE575700824693 /* libGameUI.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGameUI.a;
+			remoteRef = 3DA7686E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687127EE575700824693 /* libSDL2d.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDL2d.a;
+			remoteRef = 3DA7687027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687327EE575700824693 /* libSDL2maind.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDL2maind.a;
+			remoteRef = 3DA7687227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687527EE575700824693 /* libastcenc-native-static.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libastcenc-native-static.a";
+			remoteRef = 3DA7687427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687727EE575700824693 /* libclient.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libclient.a;
+			remoteRef = 3DA7687627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687927EE575700824693 /* libclog.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libclog.a;
+			remoteRef = 3DA7687827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687B27EE575700824693 /* libcpuinfo.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcpuinfo.a;
+			remoteRef = 3DA7687A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687D27EE575700824693 /* libcpuinfo_internals.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcpuinfo_internals.a;
+			remoteRef = 3DA7687C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7687F27EE575700824693 /* libcqmiao.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcqmiao.a;
+			remoteRef = 3DA7687E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688127EE575700824693 /* libcrypto.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcrypto.a;
+			remoteRef = 3DA7688027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688327EE575700824693 /* libdead_wrapper.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libdead_wrapper.a;
+			remoteRef = 3DA7688227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688527EE575700824693 /* libexpat.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libexpat.a;
+			remoteRef = 3DA7688427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688727EE575700824693 /* libfreetyped.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfreetyped.a;
+			remoteRef = 3DA7688627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688927EE575700824693 /* libimgui.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libimgui.a;
+			remoteRef = 3DA7688827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688B27EE575700824693 /* libimgui_ext.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libimgui_ext.a;
+			remoteRef = 3DA7688A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688D27EE575700824693 /* libluajit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libluajit.a;
+			remoteRef = 3DA7688C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7688F27EE575700824693 /* luajit */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			name = luajit;
+			path = luajit.app;
+			remoteRef = 3DA7688E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689127EE575700824693 /* libluash.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libluash.a;
+			remoteRef = 3DA7689027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689327EE575700824693 /* libmathlib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libmathlib.a;
+			remoteRef = 3DA7689227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689527EE575700824693 /* libserver.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libserver.a;
+			remoteRef = 3DA7689427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689727EE575700824693 /* libssl.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libssl.a;
+			remoteRef = 3DA7689627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689927EE575700824693 /* libtier0.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libtier0.a;
+			remoteRef = 3DA7689827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689B27EE575700824693 /* libtier1.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libtier1.a;
+			remoteRef = 3DA7689A27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689D27EE575700824693 /* libvgui2.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvgui2.a;
+			remoteRef = 3DA7689C27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA7689F27EE575700824693 /* libvgui2_support.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvgui2_support.a;
+			remoteRef = 3DA7689E27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768A127EE575700824693 /* libvgui_controls.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvgui_controls.a;
+			remoteRef = 3DA768A027EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768A327EE575700824693 /* libvgui_surfacelib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvgui_surfacelib.a;
+			remoteRef = 3DA768A227EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768A527EE575700824693 /* libvguimatsurface.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvguimatsurface.a;
+			remoteRef = 3DA768A427EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768A727EE575700824693 /* libvinterface.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvinterface.a;
+			remoteRef = 3DA768A627EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768A927EE575700824693 /* libvstdlib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libvstdlib.a;
+			remoteRef = 3DA768A827EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DA768AB27EE575700824693 /* libxash.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libxash.a;
+			remoteRef = 3DA768AA27EE575700824693 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1D60588D0D05DD3D006BFB54 /* Resources */ = {
@@ -539,7 +1262,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3D2DCBFA233209ED00ADBA6B /* Run Script */ = {
+		3DA767EF27EE518600824693 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -553,43 +1276,11 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/cmake-build/CMakeCache.txt",
+				"$(SRCROOT)/cmake-build/csmoe.xcodeproj",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cmake -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DPLATFORM=OS64 -DSDL2_INCLUDE_DIR=\" ${SRCROOT}/../SDL2/include\" -DSDL2_LIBRARY=\"${BUILT_PRODUCTS_DIR}/libSDL2.a\"  -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_NANOGL_SRC=\"${SRCROOT}/../nanogl\" -DXASH_GLES=1 -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
-		};
-		3D2DCC0123320D9600ADBA6B /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/cmake-build/CMakeCache.txt",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/cmake-build/cl_dll/libclient.a",
-				"$(SRCROOT)/cmake-build/dlls/libserver.a",
-				"$(SRCROOT)/cmake-build/mainui_cpp/libmenu.a",
-				"$(SRCROOT)/cmake-build/engine/libxash.a",
-				"$(SRCROOT)/cmake-build/libimgui_ext.a",
-				"$(SRCROOT)/cmake-build/libimgui.a",
-				"$(SRCROOT)/cmake-build/3rdparty/libluajit.a",
-				"$(SRCROOT)/cmake-build/3rdparty/SDL2/libSDL2.a",
-				"$(SRCROOT)/cmake-build/3rdparty/SDL2/libSDL2main.a",
-				"$(SRCROOT)/cmake-build/3rdparty/openssl-cmake/ssl/libssl.a",
-				"$(SRCROOT)/cmake-build/3rdparty/openssl-cmake/crypto/libcrypto.a",
-				"$(SRCROOT)/cmake-build/3rdparty/luash/luash.a",
-				"$(SRCROOT)/cmake-build/3rdparty/cqmiao/cqmiao.a",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${SRCROOT}/cmake-build\" && cmake --build . -j 12 || cmake --build . -j 12\n";
+			shellScript = "cmake -G \"Xcode\" -DCMAKE_BUILD_TYPE=$(CONFIGURATION) -DCMAKE_TOOLCHAIN_FILE=\"${SRCROOT}/../cmake/ios.toolchain.cmake\" -DPLATFORM=OS64  -DXASH_STATIC_GAMELIB=1 -DXASH_NANOGL=1 -DXASH_GLES=1 -DDEPLOYMENT_TARGET=13.0 -S \"${SRCROOT}/../\" -B \"${SRCROOT}/cmake-build\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -605,23 +1296,11 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		3D2DCC0323320DCF00ADBA6B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3D2DCBF6233209E300ADBA6B /* cmake-gen-csmoe */;
-			targetProxy = 3D2DCC0223320DCF00ADBA6B /* PBXContainerItemProxy */;
-		};
-		3D4DAA1223BCEF0900F575C1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3D2DCBFD23320D5D00ADBA6B /* cmake-build-csmoe */;
-			targetProxy = 3D4DAA1123BCEF0900F575C1 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -643,18 +1322,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
-					"$(PROJECT_DIR)/cmake-build/cl_dll",
-					"$(PROJECT_DIR)/cmake-build/dlls",
-					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
-					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
-					"$(PROJECT_DIR)/cmake-build/3rdparty",
-					"$(PROJECT_DIR)/cmake-build/cqmiao",
-					"$(PROJECT_DIR)/cmake-build/luash",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/astc-encoder/Source",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -663,50 +1331,9 @@
 			};
 			name = Debug;
 		};
-		3D2DCBF8233209E300ADBA6B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		3D2DCBF9233209E300ADBA6B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
-		3D2DCBFF23320D5D00ADBA6B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		3D2DCC0023320D5D00ADBA6B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 		3D6C2EFE229841B200DACF3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -726,7 +1353,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -742,6 +1368,7 @@
 		3D6C2EFF229841B200DACF3E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -763,18 +1390,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/Resources",
-					"$(PROJECT_DIR)/cmake-build/cl_dll",
-					"$(PROJECT_DIR)/cmake-build/dlls",
-					"$(PROJECT_DIR)/cmake-build/mainui_cpp",
-					"$(PROJECT_DIR)/cmake-build/engine",
 					"$(PROJECT_DIR)/cmake-build",
-					"$(PROJECT_DIR)/cmake-build/3rdparty",
-					"$(PROJECT_DIR)/cmake-build/cqmiao",
-					"$(PROJECT_DIR)/cmake-build/luash",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/crypto",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/openssl-cmake/ssl",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/SDL2",
-					"$(PROJECT_DIR)/cmake-build/3rdparty/astc-encoder/Source",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.moemod.citrus;
 				PRODUCT_NAME = CSMoE;
@@ -782,10 +1398,29 @@
 			};
 			name = Release;
 		};
+		3DA767F127EE518600824693 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3DA767F227EE518600824693 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -805,8 +1440,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -832,20 +1465,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3D2DCBF7233209E300ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-gen-csmoe" */ = {
+		3DA767F027EE518600824693 /* Build configuration list for PBXAggregateTarget "cmake-xcode-proj" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3D2DCBF8233209E300ADBA6B /* Debug */,
-				3D2DCBF9233209E300ADBA6B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		3D2DCBFE23320D5D00ADBA6B /* Build configuration list for PBXAggregateTarget "cmake-build-csmoe" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3D2DCBFF23320D5D00ADBA6B /* Debug */,
-				3D2DCC0023320D5D00ADBA6B /* Release */,
+				3DA767F127EE518600824693 /* Debug */,
+				3DA767F227EE518600824693 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -861,6 +861,9 @@ void FileOpenDialog::OnOpenInExplorer()
 	GetCurrentDirectory( pCurrentDirectory, sizeof(pCurrentDirectory) );
 #if !defined( _X360 ) && defined( WIN32 )
 	ShellExecute( NULL, NULL, pCurrentDirectory, NULL, NULL, SW_SHOWNORMAL );
+#elif defined( IOS )
+    extern void IOS_OpenURL(const char *url);
+    IOS_OpenURL(pCurrentDirectory);
 #elif defined( OSX )
 	char szCmd[ MAX_PATH * 2];
 	Q_snprintf( szCmd, sizeof(szCmd), "/usr/bin/open \"%s\"", pCurrentDirectory );

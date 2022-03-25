@@ -101,7 +101,7 @@ void CGameUI::Initialize(CreateInterfaceFn *factories, int count)
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/cstrike_%language%.txt");
 
 	staticPanel = new CBasePanel();
-	staticPanel->SetBounds(0, 0, 400, 300);
+	staticPanel->SetBounds(0, 0, 640, 480);
 	staticPanel->SetPaintBorderEnabled(false);
 	staticPanel->SetPaintBackgroundEnabled(true);
 	staticPanel->SetPaintEnabled(false);
@@ -222,7 +222,7 @@ void CGameUI::RunFrame(void)
 	staticPanel->SetSize(wide, tall);
 
 	if (staticPanel->IsVisible())
-		BasePanel()->RunFrame();
+        staticPanel->RunFrame();
 }
 
 void CGameUI::ConnectToServer(const char *game, int IP, int port)

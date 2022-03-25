@@ -357,7 +357,7 @@ emulate WIN32 FS behaviour when opening local file
 */
 const char *FS_FixFileCase( const char *path )
 {
-#if !defined _WIN32 && !TARGET_OS_IPHONE // assume case insensitive
+#if !defined _WIN32 // assume case insensitive
 	DIR *dir; struct dirent *entry;
 	char path2[PATH_MAX], *fname;
 
@@ -406,6 +406,14 @@ const char *FS_FixFileCase( const char *path )
     {
         Q_strlwr( path, path2 );
         return va( "%s", path2 );
+    }
+#endif
+
+#if defined(TARGET_OS_IPHONE)
+    if(!strncmp(path, host.rodir, Q_strlen(host.rodir)))
+    {
+        Q_strlwr( path + Q_strlen(host.rodir), path2 );
+        return va( "%s%s", host.rodir, path2 );
     }
 #endif
 
@@ -692,7 +700,10 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 	{
 		const char *fpackfile = FS_FixFileCase( packfile );
 		if( fpackfile!= packfile )
-			packhandle = open( fpackfile, O_RDONLY|O_BINARY );
+        {
+            packhandle = open( fpackfile, O_RDONLY|O_BINARY );
+            packfile = fpackfile;
+        }
 	}
 #endif
 
@@ -2220,7 +2231,10 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	{
 		const char *ffilepath = FS_FixFileCase( filepath );
 		if( ffilepath != filepath )
-			file->handle = open( ffilepath, mod|opt, 0666 );
+        {
+            file->handle = open( ffilepath, mod|opt, 0666 );
+            filepath = ffilepath;
+        }
 	}
 #endif
 
@@ -2577,6 +2591,18 @@ file_t *FS_OpenReadFile( const char *filename, const char *mode, qboolean gamedi
 
 	search = FS_FindFile( filename, &pack_ind, gamedironly );
 
+#ifndef _WIN32
+    if( search == NULL )
+    {
+        const char *ffilepath = FS_FixFileCase( filename );
+        if( ffilepath != filename )
+        {
+            search = FS_FindFile( ffilepath, &pack_ind, gamedironly );
+            filename = ffilepath;
+        }
+    }
+#endif
+
 	// not found?
 	if( search == NULL )
 		return NULL;
@@ -2620,8 +2646,15 @@ file_t *FS_Open( const char *filepath, const char *mode, qboolean gamedironly )
 		if( filepath[0] == '/' || filepath[0] == '\\' ) filepath++;
 	}
 
+#ifndef _WIN32
 	if( FS_CheckNastyPath( filepath, false ))
-		return NULL;
+    {
+        const char *ffilepath = FS_FixFileCase( filepath );
+        if( FS_CheckNastyPath( ffilepath, false ))
+            return NULL;
+        filepath = ffilepath;
+    }
+#endif
 
 	// if the file is opened in "write", "append", or "read/write" mode
 	if( mode[0] == 'w' || mode[0] == 'a' || Q_strchr( mode, '+' ))
@@ -4026,7 +4059,8 @@ wfile_t *W_Open( const char *filename, const char *mode )
 		const char *ffilename = FS_FixFileCase( filename );
 		if( ffilename != filename )
 		{
-			wad->wadfile = FS_SysOpen( filename, mode );
+			wad->wadfile = FS_SysOpen( ffilename, mode );
+            filename = ffilename;
 		}
 	}
 #endif

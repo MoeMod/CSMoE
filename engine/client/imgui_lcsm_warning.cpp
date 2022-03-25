@@ -29,11 +29,7 @@ GNU General Public License for more details.
 #define JM_XORSTR_DISABLE_AVX_INTRINSICS
 #include <xorstr.hpp>
 
-#if TARGET_OS_IPHONE
-static bool lcsm_enabled = false;
-#else
 static bool lcsm_enabled = true;
-#endif
 
 static bool CheckIsNameValid(const char* name)
 {

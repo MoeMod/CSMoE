@@ -152,3 +152,14 @@ void IOS_OpenURL(const char *url)
 {
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:[[NSString alloc] initWithUTF8String:url]]];
 }
+
+void IOS_GetSystemVersion(int *major, int *minor, int *patch)
+{
+	auto ver = [[NSProcessInfo processInfo] operatingSystemVersion];
+	if(major)
+		*major = ver.majorVersion;
+	if(minor)
+		*major = ver.minorVersion;
+	if(patch)
+		*major = ver.patchVersion;
+}

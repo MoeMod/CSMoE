@@ -102,12 +102,6 @@ BaseUISurface::~BaseUISurface() {
 }
 
 void BaseUISurface::Init(vgui2::VPANEL embeddedPanel, IHTMLChromeController *pChromeController) {
-	SCREENINFO screeninfo;
-	screeninfo.iSize = sizeof(screeninfo);
-	gEngfuncs.pfnGetScreenInfo(&screeninfo);
-	SetScreenInfo(&screeninfo);
-	SetScreenBounds(0, 0, screeninfo.iWidth, screeninfo.iHeight);
-
 	SetEmbeddedPanel(embeddedPanel);
 
     AddCustomFontFile( "resource/marlett.ttf" );
@@ -577,8 +571,11 @@ int BaseUISurface::CreateNewTextureID(bool procedural) {
 }
 
 void BaseUISurface::GetScreenSize(int &wide, int &tall) {
-	wide = _screeninfo.iWidth;
-	tall = _screeninfo.iHeight;
+    SCREENINFO screenInfo;
+    screenInfo.iSize = sizeof( SCREENINFO );
+    gEngfuncs.pfnGetScreenInfo( &screenInfo );
+    wide = screenInfo.iWidth;
+    tall = screenInfo.iHeight;
 }
 
 void BaseUISurface::SetAsTopMost(vgui2::VPANEL, bool) {
@@ -1128,10 +1125,6 @@ void BaseUISurface::InternalSchemeSettingsTraverse(vgui2::VPANEL panel, bool for
 	}
 
 	vgui2::ipanel()->PerformApplySchemeSettings(panel);
-}
-
-void BaseUISurface::SetScreenInfo(SCREENINFO *scrinfo) {
-	memcpy(&_screeninfo, scrinfo, scrinfo->iSize);
 }
 
 void BaseUISurface::InternalThinkTraverse(vgui2::VPANEL panel) {

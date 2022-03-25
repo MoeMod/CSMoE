@@ -437,8 +437,11 @@ void V_PostRender( void )
 		ImGui_ImplGL_Client_OnGUI();
 #endif
 		CL_DrawHUD( CL_CHANGELEVEL );
-
 		Con_DrawConsole();
+#ifdef XASH_VGUI2
+        extern void VGui2_Paint();
+        VGui2_Paint();
+#endif
 #ifdef XASH_IMGUI
 		ImGui_ImplGL_Menu_OnGUI();
 #endif

@@ -32,7 +32,7 @@ void VGui_Startup(int width, int height) {
 }
 
 void VGui_Shutdown() {
-    VGuiWrap2_Shutdown();
+    g_api->DrawShutdown();
 }
 
 void *VGui_GetPanel() {
@@ -40,7 +40,7 @@ void *VGui_GetPanel() {
 }
 
 void VGui_Paint() {
-    VGuiWrap2_Paint();
+
 }
 
 void VGUI_Mouse(enum VGUI_MouseAction action, int code) {

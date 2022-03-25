@@ -706,7 +706,7 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 	s_LastFileLoadingFrom = (char*)resourceName;
 
     int fileSize = filesystem->Size(f);
-    char *buffer = (char *)MemAllocScratch(fileSize + 1);
+    char *buffer = (char *)MemAllocScratch(fileSize + 2);
     Assert(buffer);
 
     bool bRetOK = (filesystem->Read(buffer, fileSize, f) != 0);
@@ -2362,11 +2362,11 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, const char *pBuffer, I
 	CUtlBuffer buf( pBuffer, nLen, CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER );
 
 	// Translate Unicode files into UTF-8 before proceeding
-	if ( nLen > 2 && (uint8)pBuffer[0] == 0xFF && (uint8)pBuffer[1] == 0xFE )
+	if ( nLen > 2 && *(ucs2 *)pBuffer == 0xFEFF )
 	{
-		int nUTF8Len = V_UnicodeToUTF8( (wchar_t*)(pBuffer+2), NULL, 0 );
+		int nUTF8Len = V_UCS2ToUTF8( (ucs2*)(pBuffer+2), NULL, 0 );
 		char *pUTF8Buf = new char[nUTF8Len];
-		V_UnicodeToUTF8( (wchar_t*)(pBuffer+2), pUTF8Buf, nUTF8Len );
+		V_UCS2ToUTF8( (ucs2*)(pBuffer+2), pUTF8Buf, nUTF8Len );
 		buf.AssumeMemory( pUTF8Buf, nUTF8Len, nUTF8Len, CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER );
 	}
 

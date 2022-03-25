@@ -43,19 +43,9 @@ extern vgui2::DHANDLE<CLoadingDialog> g_hLoadingDialog;
 namespace vgui2 {
     extern IBaseUI *staticUIFuncs;
 }
+extern IBaseUI *baseuifuncs;
 
-static CBasePanel *g_pBasePanel = NULL;
 static float g_flAnimationPadding = 0.01f;
-
-CBasePanel *BasePanel(void)
-{
-	return g_pBasePanel;
-}
-
-vgui2::VPANEL GetGameUIBasePanel(void)
-{
-	return BasePanel()->GetVPanel();
-}
 
 CGameMenuItem::CGameMenuItem(vgui2::Menu *parent, const char *name) : BaseClass(parent, name, "GameMenuItem")
 {
@@ -294,6 +284,8 @@ public:
 					shouldBeVisible = false;
 				else if (kv->GetInt("ConsoleOnly"))
 					shouldBeVisible = false;
+                else if (kv->GetInt("OnlyInCareerGame"))
+                    shouldBeVisible = false;
 
 				menuItem->SetVisible(shouldBeVisible);
 				
@@ -370,7 +362,6 @@ static CBackgroundMenuButton *CreateMenuButton(CBasePanel *parent, const char *p
 
 CBasePanel::CBasePanel(void) : vgui2::Panel(NULL, "BaseGameUIPanel")
 {
-	g_pBasePanel = this;
 	m_bLevelLoading = false;
 	m_eBackgroundState = BACKGROUND_INITIAL;
 	m_flTransitionStartTime = 0.0f;
@@ -422,7 +413,7 @@ KeyValues *CBasePanel::GetConsoleControlSettings(void)
 
 CBasePanel::~CBasePanel(void)
 {
-	g_pBasePanel = NULL;
+
 }
 
 void CBasePanel::PaintBackground(void)
@@ -475,8 +466,7 @@ void CBasePanel::UpdateBackgroundState(void)
 	}
 	else if (!m_bLevelLoading)
 	{
-		if (IsPC())
-			SetBackgroundRenderState(BACKGROUND_MAINMENU);
+        SetBackgroundRenderState(BACKGROUND_MAINMENU);
 	}
 	else if (m_bLevelLoading && g_hLoadingDialog.Get())
 	{
@@ -683,7 +673,7 @@ void CBasePanel::DrawBackgroundImage(void)
 	}
 	
 
-	if (IsPC() && (m_bRenderingBackgroundTransition || m_eBackgroundState == BACKGROUND_LOADING))
+	if ((m_bRenderingBackgroundTransition || m_eBackgroundState == BACKGROUND_LOADING))
 	{
 		if (m_pGameMenu->GetAlpha() < 255)
 		{
@@ -773,7 +763,7 @@ void CBasePanel::UpdateGameMenus(void)
 
 CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
-	CGameMenu *menu = new CGameMenu(this, datafile->GetName());
+	CGameMenu *menu = new CGameMenu(this, "GameMenu");
 
     menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
 
@@ -993,7 +983,8 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if (!Q_stricmp(command, "ResumeGame"))
 	{
-		engine->pfnClientCmd("cancelselect");
+		if( baseuifuncs )
+			baseuifuncs->HideGameUI();
 	}
 	else if (!Q_stricmp(command, "Disconnect"))
 	{
@@ -1078,21 +1069,15 @@ public:
 
 void CBasePanel::OnOpenQuitConfirmationDialog(void)
 {
-	if (GameUI().IsInLevel() && engine->GetMaxClients() == 1)
-	{
-	}
-	else
-	{
-		if (!m_hQuitQueryBox.Get())
-		{
-			m_hQuitQueryBox = new CQuitQueryBox("#GameUI_QuitConfirmationTitle", "#GameUI_QuitConfirmationText", this);
-			m_hQuitQueryBox->SetOKButtonText("#GameUI_Quit");
-			m_hQuitQueryBox->SetOKCommand(new KeyValues("Command", "command", "QuitNoConfirm"));
-			m_hQuitQueryBox->SetCancelCommand(new KeyValues("Command", "command", "ReleaseModalWindow"));
-			m_hQuitQueryBox->AddActionSignalTarget(this);
-			m_hQuitQueryBox->DoModal();
-		}
-	}
+    if (!m_hQuitQueryBox.Get())
+    {
+        m_hQuitQueryBox = new CQuitQueryBox("#GameUI_QuitConfirmationTitle", "#GameUI_QuitConfirmationText", this);
+        m_hQuitQueryBox->SetOKButtonText("#GameUI_Quit");
+        m_hQuitQueryBox->SetOKCommand(new KeyValues("Command", "command", "QuitNoConfirm"));
+        m_hQuitQueryBox->SetCancelCommand(new KeyValues("Command", "command", "ReleaseModalWindow"));
+        m_hQuitQueryBox->AddActionSignalTarget(this);
+        m_hQuitQueryBox->DoModal();
+    }
 }
 
 void CBasePanel::OnOpenServerBrowser(void)

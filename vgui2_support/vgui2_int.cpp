@@ -37,9 +37,11 @@ extern vguiapi_t *g_api;
 }
 extern BaseUISurface* staticSurface;
 extern void RegisterInterface();
+extern void RegisterControls();
 
 void VGuiWrap2_Startup();
 void VGuiWrap2_Shutdown();
+void VGuiWrap2_Paint();
 
 qboolean g_bScissor;
 
@@ -57,28 +59,27 @@ void VGui2_pfnDrawSetTextColor(float r, float g, float b) {
 int VGui2_Initialize(cl_enginefunc_t *pEnginefuncs) {
     gEngfuncs = *pEnginefuncs;
 
-    SCREENINFO screeninfo;
-    screeninfo.iSize = sizeof(SCREENINFO);
-    gEngfuncs.pfnGetScreenInfo(&screeninfo);
-    g_api->DrawInit();
-    g_api->Startup(screeninfo.iWidth, screeninfo.iHeight);
-
 	return 0;
+}
+
+void VGui2_Startup()
+{
+    VGuiWrap2_Startup();
 }
 
 int VGui2_VidInit()
 {
-	SCREENINFO screeninfo;
-	screeninfo.iSize = sizeof(SCREENINFO);
-	gEngfuncs.pfnGetScreenInfo(&screeninfo);
-	staticSurface->SetScreenInfo(&screeninfo);
-
 	return 0;
+}
+
+int VGui2_Paint()
+{
+    VGuiWrap2_Paint();
 }
 
 int VGui2_Shutdown()
 {
-    g_api->DrawShutdown();
+    VGuiWrap2_Shutdown();
     return 0;
 }
 
@@ -86,6 +87,8 @@ void VGuiWrap2_Startup()
 {
     if( staticUIFuncs )
         return;
+    RegisterInterface();
+    RegisterControls();
 
     CreateInterfaceFn pEngineFactory = Sys_GetFactoryThis();
     staticUIFuncs = (IBaseUI *)pEngineFactory(BASEUI_INTERFACE_VERSION, NULL);

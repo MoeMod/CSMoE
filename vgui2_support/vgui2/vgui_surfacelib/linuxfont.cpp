@@ -447,11 +447,19 @@ const char *FindFontApple(bool bBold, int italic)
 {
     const char *dataFile = nullptr;
 
+#ifdef IOS
+    dataFile = "/System/Library/Fonts/LanguageSupport/PingFang.ttc";
+#else
     dataFile = "/System/Library/Fonts/PingFang.ttc";
+#endif
 
 	if( access( dataFile, R_OK ) != 0 )
 	{
+#ifdef IOS
+        dataFile = "/System/Library/Fonts/Core/Helvetica.ttc";
+#else
         dataFile = "/System/Library/Fonts/Helvetica.ttc";
+#endif
 
 		if( access( dataFile, R_OK ) != 0 )
 			return NULL;

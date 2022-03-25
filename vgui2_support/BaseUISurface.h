@@ -186,7 +186,6 @@ public:
 	void InternalSolveTraverse(vgui2::VPANEL);
 	void InternalThinkTraverse(vgui2::VPANEL);
 	void InternalSchemeSettingsTraverse(vgui2::VPANEL, bool);
-	void SetScreenInfo(SCREENINFO *scrinfo);
 	void DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter);
 
 protected:
@@ -242,7 +241,6 @@ private:
 	int _drawTextPos[2];
 	int	_translateX;
 	int	_translateY;
-	SCREENINFO _screeninfo;
 	std::vector<PaintState_t> _paintStack;
 
     CFontTextureCache m_FontTextureCache;

@@ -130,9 +130,7 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 	g_pFullFileSystem->AddSearchPath("platform", "PLATFORM");
 	g_pFullFileSystem->AddSearchPath("csmoe", "GAME");
 	g_pFullFileSystem->AddSearchPath("cstrike", "GAME");
-	g_pFullFileSystem->AddSearchPath(gEngfuncs.pfnGetGameDirectory(), "GAME");
 	g_pFullFileSystem->AddSearchPath("csmoe", "GAMECONFIG");
-	g_pFullFileSystem->AddSearchPath(gEngfuncs.pfnGetGameDirectory(), "GAMECONFIG");
 	g_pFullFileSystem->AddSearchPath("valve", "GAME_FALLBACK");
 
 #ifdef XASH_STATIC_GAMELIB

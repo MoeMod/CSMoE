@@ -19,6 +19,7 @@ GNU General Public License for more details.
 #include "menu_int.h"
 #include "gameinfo.h"
 #include "keydefs.h"
+#include "keydest.h"
 #include "netadr.h"
 
 #include <FileSystem.h>
@@ -35,7 +36,7 @@ GNU General Public License for more details.
 
 namespace vgui2 {
 
-static IBaseUI* staticUIFuncs;
+extern IBaseUI* staticUIFuncs;
 extern IGameUI* staticGameUIFuncs;
 extern cl_enginefunc_t gEngfuncs;
 extern qboolean g_bScissor;
@@ -43,8 +44,6 @@ extern vgui2::IInputInternal* g_pInputInternal;
 
 }
 extern BaseUISurface* staticSurface;
-extern void RegisterInterface();
-extern void RegisterControls();
 void TextAdjustSize( int *x, int *y, int *w, int *h );
 void TextAdjustSizeReverse(int* x, int* y, int* w, int* h);
 
@@ -63,10 +62,7 @@ static bool pending_activate = false;
 
 void UI_Init(void)
 {
-    RegisterInterface();
-    RegisterControls();
-	CreateInterfaceFn pEngineFactory = Sys_GetFactoryThis();
-	staticUIFuncs = (IBaseUI*)pEngineFactory(BASEUI_INTERFACE_VERSION, NULL);
+
 }
 int UI_VidInit(void)
 {
@@ -94,38 +90,28 @@ void UI_MouseMove(int x, int y)
 }
 void UI_SetActiveMenu(int fActive)
 {
-	if (!staticUIFuncs || !staticGameUIFuncs)
-	{
-		pending_activate = fActive;
-		return;
-	}
-	pending_activate = false;
-
 	ui::engfuncs.pfnKeyClearStates();
 
-	if (fActive)
-		staticUIFuncs->ActivateGameUI();
-	else
-		staticUIFuncs->HideGameUI();
+    if(!staticUIFuncs)
+    {
+        if(fActive)
+            ui::engfuncs.pfnSetKeyDest( key_menu );
+        else
+            ui::engfuncs.pfnSetKeyDest( key_game );
+        return;
+    }
+    else
+    {
+        if (fActive)
+            staticUIFuncs->ActivateGameUI();
+        else
+            staticUIFuncs->HideGameUI();
+    }
+
 }
 void UI_UpdateMenu(float flTime)
 {
-	if (pending_activate)
-	{
-		// real VidInit goes here
-		UI_SetActiveMenu(true);
-		//staticUIFuncs->SahowConsole();
-	}
-	
-	if (!staticUIFuncs) {
-		return;
-	}
-	
-	int wide, tall;
-	staticSurface->GetScreenSize(wide, tall);
-	g_bScissor = true;
-	staticUIFuncs->Paint(0, 0, wide, tall);
-	g_bScissor = false;
+
 }
 void UI_AddServerToList(netadr_t adr, const char* info)
 {
@@ -187,7 +173,7 @@ int UI_MouseInRect(void)
 }
 int UI_IsVisible(void)
 {
-	return staticUIFuncs->IsGameUIVisible();
+	return staticUIFuncs && staticUIFuncs->IsGameUIVisible();
 }
 int UI_CreditsActive(void)
 {

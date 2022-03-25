@@ -159,8 +159,11 @@ void GAME_EXPORT VGUI_SetVisible( qboolean state )
 	SDL_ShowCursor( state );
 	if( !state )
 		SDL_GetRelativeMouseState( NULL, NULL );
-
+#ifdef XASH_VGUI2
+    // TODO
+#else
 	SDLash_EnableTextInput( state, true );
+#endif
 #endif
 }
 
@@ -497,8 +500,12 @@ void VGui_KeyEvent( int key, int down )
 		return;
 
 #ifdef XASH_SDL
+#ifdef XASH_VGUI2
+    // TODO
+#else
 	if( host.mouse_visible )
 		SDLash_EnableTextInput( 1, false );
+#endif
 #endif
 
 	switch( key )

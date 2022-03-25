@@ -517,7 +517,7 @@ static void SDLash_EventFilter( SDL_Event *event )
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
 		{
-#if !defined(TARGET_OS_MAC) && !defined(XASH_WINRT) && !defined(XASH_QINDIEGL)
+#if !defined(TARGET_OS_OSX) && !defined(XASH_WINRT) && !defined(XASH_QINDIEGL)
 			int w, h;
 			if( vid_fullscreen->integer != 0 ) break;
 			Cvar_SetFloat( "vid_mode", VID_NOMODE ); // no mode

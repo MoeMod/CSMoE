@@ -28,7 +28,7 @@
 #include "vgui_key_translation.h"
 #include "filesystem.h"
 
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 #include <Carbon/Carbon.h>
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -138,7 +138,7 @@ private:
 	bool m_bRegistryDirty;
 	
 	char m_szRegistryPath[ MAX_PATH ];
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	PasteboardRef m_PasteBoardRef;
 #endif
 	
@@ -166,7 +166,7 @@ CSystem::CSystem()
 	m_flRegistrySaveTime = 0.0;
 	m_bRegistryDirty = false;
 	m_pUserConfigData = NULL;
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	PasteboardCreate( kPasteboardClipboard, &m_PasteBoardRef );
 #endif
 	
@@ -181,7 +181,7 @@ CSystem::CSystem()
 CSystem::~CSystem()
 {
 	SaveRegistryToFile( true );
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	CFRelease( m_PasteBoardRef );
 #endif
 }
@@ -280,7 +280,7 @@ void CSystem::ShellExecute(const char *command, const char *file)
 		return;
 	}
 
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	const char *szCommand = "open";
 #else
 	const char *szCommand = "xdg-open";
@@ -322,7 +322,7 @@ void CSystem::ShellExecuteEx( const char *command, const char *file, const char 
 
 void CSystem::SetClipboardText(const char *text, int textLen)
 {
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	PasteboardSynchronize( m_PasteBoardRef );
 	PasteboardClear( m_PasteBoardRef );
 	CFDataRef theData = CFDataCreate( kCFAllocatorDefault, (const UInt8*)text, textLen );
@@ -372,7 +372,7 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 
 	Q_UnicodeToUTF8( text, charStr, textLen*4 );
 
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	PasteboardSynchronize( m_PasteBoardRef );
 	PasteboardClear( m_PasteBoardRef );
 
@@ -388,7 +388,7 @@ void CSystem::SetClipboardText(const wchar_t *text, int textLen)
 
 int CSystem::GetClipboardTextCount()
 {
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	ItemCount count;
 	PasteboardSynchronize( m_PasteBoardRef );
 	
@@ -439,7 +439,7 @@ int CSystem::GetClipboardText(int offset, char *buf, int bufLen)
 {
 	Assert( !offset );
 
-#ifdef OSX
+#if defined(OSX) && !defined(IOS)
 	ItemCount count;
 	PasteboardSynchronize( m_PasteBoardRef );
 	
