@@ -1298,6 +1298,10 @@ void TextEntry::SetEditable(bool state)
 		SetDropEnabled( false );
 	}
 	_editable = state;
+
+#ifndef DISABLE_MOE_VGUI2_EXT
+    SetVirtualKeyBoardInputEnabled( state );
+#endif
 }
 
 const wchar_t *UnlocalizeUnicode( wchar_t *unicode )

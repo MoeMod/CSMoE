@@ -34,6 +34,8 @@ GNU General Public License for more details.
 
 #include <string>
 
+#define XASH_DISABLE_FWGS_EXTENSIONS
+
 namespace vgui2 {
 
 extern IBaseUI* staticUIFuncs;
@@ -252,8 +254,10 @@ void *func;
 
 static dllexport_t switch_mainui_exports[] = {
 	{ "GetMenuAPI", (void*)ui::GetMenuAPI },
+#ifndef XASH_DISABLE_FWGS_EXTENSIONS
 	{ "GiveTextAPI", (void*)ui::GiveTextAPI },
 	{ "AddTouchButtonToList", (void*)ui::AddTouchButtonToList },
+#endif
 	{ NULL, NULL }
 };
 

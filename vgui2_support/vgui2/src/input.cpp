@@ -367,6 +367,15 @@ void CInputWin32::RunFrame()
 		pCtx->_keyFocus = pNewFocus;
 
 		pNewFocus->MoveToFront();
+
+#ifndef DISABLE_MOE_VGUI2_EXT
+        // CSMoE Added : toggle virtual keyboard
+        if(pNewFocus)
+        {
+            extern void Key_EnableTextInput(qboolean enable, qboolean force);
+            Key_EnableTextInput(pNewFocus->IsVirtualKeyBoardInputEnabled(), true);
+        }
+#endif
 	}
 }
 

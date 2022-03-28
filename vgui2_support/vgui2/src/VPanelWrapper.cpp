@@ -186,6 +186,28 @@ bool VPanelWrapper::IsMouseInputEnabled(vgui2::VPANEL vguiPanel)
 	return reinterpret_cast<vgui2::VPanel*>(vguiPanel)->IsMouseInputEnabled();
 }
 
+#ifndef DISABLE_MOE_VGUI2_EXT
+void VPanelWrapper::SetVirtualKeyBoardInputEnabled(vgui2::VPANEL vguiPanel, bool state)
+{
+    reinterpret_cast<vgui2::VPanel*>(vguiPanel)->SetVirtualKeyBoardInputEnabled(state);
+}
+
+void VPanelWrapper::SetTouchInputEnabled(vgui2::VPANEL vguiPanel, bool state)
+{
+    reinterpret_cast<vgui2::VPanel*>(vguiPanel)->SetTouchInputEnabled(state);
+}
+
+bool VPanelWrapper::IsVirtualKeyBoardInputEnabled(vgui2::VPANEL vguiPanel)
+{
+    return reinterpret_cast<vgui2::VPanel*>(vguiPanel)->IsVirtualKeyBoardInputEnabled();
+}
+
+bool VPanelWrapper::IsTouchInputEnabled(vgui2::VPANEL vguiPanel)
+{
+    return reinterpret_cast<vgui2::VPanel*>(vguiPanel)->IsTouchInputEnabled();
+}
+#endif
+
 void VPanelWrapper::Solve(vgui2::VPANEL vguiPanel)
 {
 	reinterpret_cast<vgui2::VPanel*>(vguiPanel)->Solve();

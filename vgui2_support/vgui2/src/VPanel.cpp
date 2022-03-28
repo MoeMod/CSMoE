@@ -452,4 +452,26 @@ namespace vgui2
 	{
 		return _mouseInput;
 	}
+
+#ifndef DISABLE_MOE_VGUI2_EXT
+    void VPanel::SetVirtualKeyBoardInputEnabled(bool state)
+    {
+        _vkbInput = state;
+    }
+
+    void VPanel::SetTouchInputEnabled(bool state)
+    {
+        _touchInput = state;
+    }
+
+    bool VPanel::IsVirtualKeyBoardInputEnabled()
+    {
+        return _vkbInput;
+    }
+
+    bool VPanel::IsTouchInputEnabled()
+    {
+        return _touchInput;
+    }
+#endif
 }

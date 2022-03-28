@@ -450,6 +450,12 @@ public:
 	virtual void SetKeyBoardInputEnabled( bool state );
 	virtual bool IsMouseInputEnabled();
 	virtual bool IsKeyBoardInputEnabled();
+#ifndef DISABLE_MOE_VGUI2_EXT
+    virtual void SetTouchInputEnabled( bool state );
+    virtual void SetVirtualKeyBoardInputEnabled( bool state );
+    virtual bool IsTouchInputEnabled();
+    virtual bool IsVirtualKeyBoardInputEnabled();
+#endif
 
 	virtual void DrawTexturedBox( int x, int y, int wide, int tall, Color color, float normalizedAlpha );
 	virtual void DrawBox(int x, int y, int wide, int tall, Color color, float normalizedAlpha, bool hollow = false );

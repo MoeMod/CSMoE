@@ -71,6 +71,12 @@ public:
 	virtual void SetMouseInputEnabled(bool state);
 	virtual bool IsKeyBoardInputEnabled(void);
 	virtual bool IsMouseInputEnabled(void);
+#ifndef DISABLE_MOE_VGUI2_EXT
+	virtual void SetVirtualKeyBoardInputEnabled(bool state);
+	virtual void SetTouchInputEnabled(bool state);
+	virtual bool IsVirtualKeyBoardInputEnabled(void);
+    virtual bool IsTouchInputEnabled(void);
+#endif
 
 private:
 	Dar<VPanel*> _childDar;
@@ -97,6 +103,9 @@ private:
 	bool _mouseInput = true;
 	bool _kbInput = true;
 	//bool _isTopmostPopup : 1;
+
+    bool _touchInput = false;
+    bool _vkbInput = false;
 
 
 private:

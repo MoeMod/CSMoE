@@ -45,6 +45,12 @@ namespace vgui2 {
 		virtual void SetMouseInputEnabled(VPANEL, bool) = 0;
 		virtual bool IsKeyBoardInputEnabled(VPANEL) = 0;
 		virtual bool IsMouseInputEnabled(VPANEL) = 0;
+#ifndef DISABLE_MOE_VGUI2_EXT
+        virtual void SetVirtualKeyBoardInputEnabled(VPANEL, bool) = 0;
+        virtual void SetTouchInputEnabled(VPANEL, bool) = 0;
+        virtual bool IsVirtualKeyBoardInputEnabled(VPANEL) = 0;
+        virtual bool IsTouchInputEnabled(VPANEL) = 0;
+#endif
 		virtual void Solve(VPANEL) = 0;
 		virtual const char  * GetName(VPANEL) = 0;
 		virtual const char  * GetClassName(VPANEL) = 0;

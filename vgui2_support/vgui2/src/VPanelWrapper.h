@@ -53,6 +53,13 @@ public:
 	bool IsKeyBoardInputEnabled( vgui2::VPANEL vguiPanel ) override;
 	bool IsMouseInputEnabled( vgui2::VPANEL vguiPanel ) override;
 
+#ifndef DISABLE_MOE_VGUI2_EXT
+    void SetVirtualKeyBoardInputEnabled( vgui2::VPANEL vguiPanel, bool state ) override;
+    void SetTouchInputEnabled( vgui2::VPANEL vguiPanel, bool state ) override;
+    bool IsVirtualKeyBoardInputEnabled( vgui2::VPANEL vguiPanel ) override;
+    bool IsTouchInputEnabled( vgui2::VPANEL vguiPanel ) override;
+#endif
+
 	void Solve( vgui2::VPANEL vguiPanel ) override;
 
 	const char *GetName( vgui2::VPANEL vguiPanel ) override;

@@ -4754,6 +4754,28 @@ bool Panel::IsMouseInputEnabled()
 	return ipanel()->IsMouseInputEnabled( GetVPanel() );
 }
 
+#ifndef DISABLE_MOE_VGUI2_EXT
+void Panel::SetTouchInputEnabled( bool state )
+{
+    ipanel()->SetTouchInputEnabled( GetVPanel(), state );
+}
+
+void Panel::SetVirtualKeyBoardInputEnabled( bool state )
+{
+    ipanel()->SetVirtualKeyBoardInputEnabled( GetVPanel(), state );
+}
+
+bool Panel::IsTouchInputEnabled()
+{
+    return ipanel()->IsTouchInputEnabled( GetVPanel() );
+}
+
+bool Panel::IsVirtualKeyBoardInputEnabled()
+{
+    return ipanel()->IsVirtualKeyBoardInputEnabled( GetVPanel() );
+}
+#endif
+
 class CFloatProperty : public IPanelAnimationPropertyConverter
 {
 public:
