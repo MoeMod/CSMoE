@@ -22,248 +22,8 @@ GNU General Public License for more details.
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #endif
-
 #include "weapons/WeaponTemplate.hpp"
 #include "weapons/KnifeAttack.h"
-
-#ifndef CLIENT_DLL
-namespace sv {
-
-class CHolySwordCannon : public CBaseEntity
-{
-public:
-	void Spawn() override
-	{
-		Precache();
-
-		SetThink(&CHolySwordCannon::FlyThink);
-		SetTouch(&CHolySwordCannon::OnTouch);
-		SET_MODEL(this->edict(), "models/ef_holysword_chargecannon.mdl");
-
-		pev->rendermode = kRenderTransAdd;
-		pev->renderfx = kRenderFxNone;
-		pev->renderamt = 180;
-		pev->framerate = 1.0;
-		pev->solid = SOLID_TRIGGER;
-		pev->movetype = MOVETYPE_FLY;
-
-		m_flRemoveTime = gpGlobals->time + 1.0s;
-		UTIL_SetOrigin(pev, pev->origin);
-		UTIL_SetSize(pev, Vector(-4, -4, -4), Vector(4, 4, 4));
-
-		pev->classname = MAKE_STRING("d_holysword");
-
-		pev->nextthink = gpGlobals->time + 0.01s;
-	}
-
-	void Precache() override
-	{
-		PRECACHE_MODEL("models/ef_holysword_chargecannon.mdl");
-
-		m_ExpIndex = PRECACHE_MODEL("sprites/muzzleflash78.spr");
-		m_Exp2Index = PRECACHE_MODEL("sprites/muzzleflash65.spr");
-
-
-		PRECACHE_SOUND("weapons/holysword_cannon_exp.wav");
-	}
-
-	void EXPORT OnTouch(CBaseEntity* pOther)
-	{
-		if (pev->owner == pOther->edict())
-			return;
-
-		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
-		if (!pOther->IsPlayer() || !pAttacker->IsPlayer()) {
-			TouchWall();
-			Remove();
-			return;
-		}
-
-		CBasePlayer* pAttackePlayer = nullptr;
-		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
-
-		if (pAttackePlayer)
-		{
-			if (pOther->pev->takedamage != DAMAGE_NO && pOther->IsAlive())
-			{
-				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
-
-				TraceResult tr;
-				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-
-				ClearMultiDamage();
-				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
-			}
-			RadiusDamage();
-		}
-
-		PenetrateStart();
-	}
-
-	void CreateEffect()
-	{
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_EXPLOSION);
-		WRITE_COORD(pev->origin[0]);
-		WRITE_COORD(pev->origin[1]);
-		WRITE_COORD(pev->origin[2]);
-		WRITE_SHORT(m_ExpIndex);
-		WRITE_BYTE(9);
-		WRITE_BYTE(15);
-		WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
-		MESSAGE_END();
-
-		EMIT_SOUND_DYN(ENT(this->pev), CHAN_ITEM, "weapons/holysword_cannon_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-	}
-
-	void RadiusDamage()
-	{
-		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
-		CBasePlayer* pAttackePlayer = nullptr;
-		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
-
-		CreateEffect();
-		TraceResult tr;
-		CBaseEntity* pEntity = NULL;
-
-		Vector vecEnd;
-		int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
-
-		while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 90.0)) != NULL)
-		{
-			if (pEntity->edict() == pev->owner)
-				continue;
-
-			if (pEntity->IsDormant())
-				continue;
-
-			if (pEntity->pev->takedamage == DAMAGE_NO)
-				continue;
-
-			if (pEntity->Classify() == CLASS_NONE)
-				continue;
-
-			if (pEntity->IsPlayer())
-			{
-				CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-
-				if (pAttackePlayer->m_iTeam == target->m_iTeam)
-					continue;
-			}
-
-			if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
-				continue;
-
-			vecEnd = pEntity->BodyTarget(pev->origin);
-
-			UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
-
-			if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
-				continue;
-
-			int falloff = RadiusDamageAmount / 90.0;
-
-			float flCurrentDamage = max(0, RadiusDamageAmount - (pev->origin - pEntity->pev->origin).Length() * falloff);
-
-			pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
-
-			if (pEntity->IsPlayer())
-			{
-				CBasePlayer* player = (CBasePlayer*)pEntity;
-
-				if (player->m_bIsZombie)
-				{
-					Vector vecDir = (player->pev->origin - pAttackePlayer->pev->origin);
-					vecDir.z = 0;
-
-					ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
-					player->pev->velocity.z = +200.0f;
-				}
-			}
-		}
-	}
-
-	void TouchWall()
-	{
-		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_EXPLOSION);
-		WRITE_COORD(pev->origin[0]);
-		WRITE_COORD(pev->origin[1]);
-		WRITE_COORD(pev->origin[2]);
-		WRITE_SHORT(m_Exp2Index);
-		WRITE_BYTE(6);
-		WRITE_BYTE(15);
-		WRITE_BYTE(TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOSOUND);
-		MESSAGE_END();
-
-		pev->movetype = MOVETYPE_NONE;
-		RadiusDamage();
-	}
-
-	void PenetrateStart()
-	{
-		pev->origin = pev->origin + m_vecStartVelocity.Normalize() * 42;
-		pev->velocity = {};
-		pev->solid = SOLID_NOT;
-		pev->nextthink = gpGlobals->time + 0.05s;
-	}
-
-	void PenetrateEnd()
-	{
-		pev->velocity = m_vecStartVelocity;
-		pev->solid = SOLID_CUSTOM;
-		pev->nextthink = gpGlobals->time + 0.001s;
-	}
-
-	void EXPORT FlyThink()
-	{
-		if (m_flRemoveTime <= gpGlobals->time)
-		{
-			TouchWall();
-			Remove();
-			return;
-		}
-
-		pev->nextthink = gpGlobals->time + 0.01s;
-		if (pev->solid == SOLID_NOT)
-		{
-			PenetrateEnd();
-		}
-	}
-
-	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, TeamName iTeam)
-	{
-		std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
-		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
-	}
-
-	KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
-
-	time_point_t m_flRemoveTime;
-	float m_flTouchDamage;
-	float RadiusDamageAmount;
-	int m_ExpIndex;
-	int m_Exp2Index;
-	TeamName m_iTeam;
-	Vector m_vecStartVelocity;
-
-protected:
-	void Remove()
-	{
-		SetThink(nullptr);
-		SetTouch(nullptr);
-		pev->effects |= EF_NODRAW; // 0x80u
-		return UTIL_Remove(this);
-	}
-};
-
-LINK_ENTITY_TO_CLASS(holysword_cannon, CHolySwordCannon)
-}
-#endif
-
 
 #ifdef CLIENT_DLL
 namespace cl {
@@ -1085,7 +845,7 @@ namespace sv {
 		{
 			float flTouchDamage = GetCannonTouchDamage();
 			float flExplodeDamage = GetCannonExpDamage();
-			pEnt->Init(gpGlobals->v_forward * 500, flTouchDamage, flExplodeDamage, m_pPlayer->m_iTeam);
+			pEnt->Init(gpGlobals->v_forward * 500, flTouchDamage, flExplodeDamage);
 		}
 #endif
 
@@ -1350,7 +1110,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), m_usFireHolySword, 0.0, m_pPlayer->pev->origin, g_vecZero, 0.0, 0.0, 0, m_iStackLevel, true, 0);
 
-			SendWeaponAnim(m_iStackLevel >= 5 ? ANIM_PARING_SLASH : ANIM_FULLSTACK_PARING_SLASH2, UseDecrement() != FALSE);
+			SendWeaponAnim(m_iStackLevel >= 5 ? ANIM_FULLSTACK_PARING_SLASH2 : ANIM_PARING_SLASH, UseDecrement() != FALSE);
 
 			if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
 			{
@@ -1374,8 +1134,8 @@ namespace sv {
 			pev->iuser1 = 0;
 			SetThink(&CKnifeHolySword::DelaySecondaryAttack);
 			pev->nextthink = gpGlobals->time + 0.5s;
-			m_flNextTimeCanHolster = gpGlobals->time + 2.0s;
-			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.0s;
+			m_flNextTimeCanHolster = gpGlobals->time + 2.3s;
+			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 2.3s;
 			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 		}
 
@@ -1814,9 +1574,11 @@ namespace sv {
 				m_pOwner->pev->health -= flDamage;	
 		}
 
-		if (g_pGameRules->PlayerRelationship(m_pOwner, pAttack) != GR_TEAMMATE)
+		if (m_pWeapon && g_pGameRules->PlayerRelationship(m_pOwner, pAttack) != GR_TEAMMATE)
+		{
 			m_pWeapon->WeaponCallBack(0);
-
+		}
+			
 		flDamage = 0.0f;
 
 		return CBaseEntity::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);

@@ -125,6 +125,7 @@ extern int gmsgOperationSystem;
 extern int gmsgZ4Msg;
 extern int gmsgMVPInfo;
 extern int gmsgMPToCL;
+extern int gmsgNewHudMsg;
 
 void LinkUserMessages();
 void WriteSigonMessages();

@@ -15,14 +15,6 @@ bugly {
 
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('/Users/moemod/repos/CSMoE-Sign/key')
-            storePassword '111503'
-            keyAlias 'xiaobaibai'
-            keyPassword '111503'
-        }
-    }
     compileSdkVersion 29
 
     defaultConfig {
@@ -54,7 +46,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.release
         }
     }
     externalNativeBuild {

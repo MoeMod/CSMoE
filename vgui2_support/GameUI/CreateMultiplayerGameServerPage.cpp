@@ -107,7 +107,7 @@ void CCreateMultiplayerGameServerPage::OnApplyChanges()
 	KeyValues *kv = m_pMapList->GetActiveItemUserData();
 	strncpy(m_szMapName, kv->GetString("mapname", ""), DATA_STR_LENGTH);
 	kv = m_pModeList->GetActiveItemUserData();
-	strncpy(m_szModeName, kv->GetString("mp_gamemode", ""), DATA_STR_LENGTH);
+	strncpy(m_szModeName, kv->GetString("gamemode", "none"), DATA_STR_LENGTH);
 
 }
 
@@ -262,7 +262,7 @@ void CCreateMultiplayerGameServerPage::LoadModeList()
 
 	for (int i = 0; i < MAX_GAMEMODES; i++)
 	{
-		m_pModeList->AddItem(g_szGameModeCode[i], NULL);
+		m_pModeList->AddItem(g_szGameModeNames[i], NULL);
 	}
 
 	m_pModeList->ActivateItem( 0 );
@@ -309,6 +309,26 @@ void CCreateMultiplayerGameServerPage::SetMap(const char *mapName)
 			break;
 		}
 	}
+}
+
+void CCreateMultiplayerGameServerPage::SetGameMode(const char* name)
+{
+	for (int i = 0; i < MAX_GAMEMODES; i++)
+	{
+		if (!m_pModeList->IsItemIDValid(i))
+			continue;
+
+		if (!stricmp(g_szGameModeCode[i], name))
+		{
+			m_pModeList->ActivateItem(i);
+			break;
+		}
+	}
+}
+
+const char* CCreateMultiplayerGameServerPage::GetGameMode()
+{
+	return g_szGameModeCode[m_pModeList->GetActiveItem()];
 }
 
 

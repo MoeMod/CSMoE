@@ -631,19 +631,11 @@ inline float MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vect
 
 int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane);
 
-inline float anglemod(float a)
-{
-	a = (360.f/65536) * ((int)(a*(65536.f/360.0f)) & 65535);
-	return a;
-}
+float anglemod(float a);
+float anglemod(float a);
 
 // Remap a value in the range [A,B] to [C,D].
-inline float RemapVal( float val, float A, float B, float C, float D)
-{
-	if ( A == B )
-		return val >= B ? D : C;
-	return C + (D - C) * (val - A) / (B - A);
-}
+float RemapVal(float val, float A, float B, float C, float D);
 
 inline float RemapValClamped( float val, float A, float B, float C, float D)
 {

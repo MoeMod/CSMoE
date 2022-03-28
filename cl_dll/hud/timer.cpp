@@ -37,9 +37,15 @@ version.
 #include <string.h>
 #include "draw_util.h"
 #include "gamemode/mods_const.h"
+#include "legacy/hud_scoreboard_legacy.h"
 
 DECLARE_MESSAGE( m_Timer, RoundTime )
 DECLARE_MESSAGE( m_Timer, ShowTimer )
+
+CHudTimer::CHudTimer()
+{
+	CHudScoreBoardLegacy::BuildNumberRC(m_iNum_BottomC, 8, 12);
+}
 
 int CHudTimer::Init()
 {
@@ -60,6 +66,54 @@ int CHudTimer::VidInit()
 {
 	m_HUD_timer = gHUD.GetSpriteIndex( "stopwatch" );
 	R_InitTexture(m_pTexture_Black, "resource/hud/csgo/black");
+
+	if (!m_iNum_Bottom)
+		m_iNum_Bottom = R_LoadTextureShared("resource/hud/hud_sb_num_bottom");
+
+	if (!m_iColon_Bottom)
+		m_iColon_Bottom = R_LoadTextureUnique("resource/hud/hud_sb_num_bottom_colon");
+
+	return 1;
+}
+
+int CHudTimer::DrawNEWHudTimer(float fTime)
+{
+	int r, g, b;
+	// time must be positive
+	int minutes = max(0, (int)(m_iTime + m_fStartTime - gHUD.m_flTime) / 60);
+	int seconds = max(0, (int)(m_iTime + m_fStartTime - gHUD.m_flTime) - (minutes * 60));
+
+	if (minutes * 60 + seconds > 20)
+	{
+		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
+	}
+	else
+	{
+		m_flPanicTime += gHUD.m_flTimeDelta;
+		// add 0.1 sec, so it's not flicker fast
+		if (m_flPanicTime > ((float)seconds / 40.0f) + 0.1f)
+		{
+			m_flPanicTime = 0;
+			m_bPanicColorChange = !m_bPanicColorChange;
+		}
+		DrawUtils::UnpackRGB(r, g, b, m_bPanicColorChange ? RGB_WHITE : RGB_REDISH);
+	}
+
+	int iX, iY;
+	iX = ScreenWidth / 2 - 20;
+	iY = 60;
+	DrawUtils::ScaleColors(r, g, b, 255);
+
+	CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Bottom, m_iNum_BottomC, minutes, iX, iY, DHN_2DIGITS, 1, 1.0, r, g, b);
+
+	int iH = m_iColon_Bottom->h();	//10
+	int iW = m_iColon_Bottom->w();	//3
+
+	iX = ScreenWidth / 2 - 1;
+	m_iColon_Bottom->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH, 0.0f, 0.0f, 1.0f, 1.0f, r, g, b);
+
+	CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Bottom, m_iNum_BottomC, seconds, iX + iW + 1, iY, DHN_2DIGITS, 1, 1.0, r, g, b);
+
 	return 1;
 }
 
@@ -70,6 +124,12 @@ int CHudTimer::Draw( float fTime )
 
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
 		return 1;
+	if (gHUD.m_hudstyle->value == 2 && (gHUD.m_iModRunning == MOD_NONE || gHUD.m_iModRunning == MOD_DM || gHUD.m_iModRunning == MOD_TDM || gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ))
+	{
+		DrawNEWHudTimer(fTime);
+		return 1;
+	}
+	
 	int r, g, b;
 	// time must be positive
 	int minutes = max( 0, (int)( m_iTime + m_fStartTime - gHUD.m_flTime ) / 60);
@@ -77,13 +137,13 @@ int CHudTimer::Draw( float fTime )
 
 	if( minutes * 60 + seconds > 20 )
 	{
-		DrawUtils::UnpackRGB(r,g,b, gHUD.m_hudstyle->value? RGB_WHITE : RGB_YELLOWISH );
+		DrawUtils::UnpackRGB(r,g,b, gHUD.m_hudstyle->value == 1 ? RGB_WHITE : RGB_YELLOWISH );
 	}
 	else
 	{
 		m_flPanicTime += gHUD.m_flTimeDelta;
 		// add 0.1 sec, so it's not flicker fast
-		if (gHUD.m_hudstyle->value)
+		if (gHUD.m_hudstyle->value == 1)
 			DrawUtils::UnpackRGB(r, g, b, RGB_REDISH);
 		else
 		{
@@ -106,7 +166,7 @@ int CHudTimer::Draw( float fTime )
 
 	int y = ScreenHeight - 1.5 * gHUD.m_iFontHeight ;
     
-	if (gHUD.m_hudstyle->value && gHUD.m_iModRunning == MOD_NONE)
+	if (gHUD.m_hudstyle->value == 1 && gHUD.m_iModRunning == MOD_NONE)
 	{
 		int x = ScreenWidth / 2;
 

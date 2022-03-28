@@ -86,6 +86,8 @@ private:
 	overview_t m_OverviewData;
 	model_t *m_MapSprite;
 	void LoadMapSprites(void);
+
+	UniqueTexture m_iMapTitleBG;
 };
 
 #endif

@@ -27,7 +27,6 @@ GNU General Public License for more details.
 
 #include "zb2/zb2_zclass_speed.h"
 #include "zb2/zb2_zclass_resident.h"
-#include "zb2/zb2_zclass_nemesis.h"
 
 #include "util/u_range.hpp"
 
@@ -266,7 +265,7 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 
 			if (pWeapon)
 			{
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword"))
+				if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword") || !Q_strcmp(STRING(pWeapon->pev->classname), "knife_y22s1holyswordmb"))
 					pWeapon->WeaponCallBack(0);
 			}
 
@@ -821,17 +820,16 @@ std::shared_ptr<CBaseZombieClass_ZB2> CPlayerModStrategy_ZB3F2P::ZombieClassFact
 {
 	if(!strcmp(name, "random"))
 	{
-		//if(!RANDOM_LONG(0, 3))
-		//{
-		//	// 长手 25%
-		//	return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
-		//}
-		//else
-		//{
-		//	// 芭比 75%
-		//	return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
-		//}
-		return std::make_shared<CZombieClass_Nemesis>(m_pPlayer, lv);
+		if(!RANDOM_LONG(0, 3))
+		{
+			// 长手 25%
+			return std::make_shared<CZombieClass_Resident>(m_pPlayer, lv);
+		}
+		else
+		{
+			// 芭比 75%
+			return std::make_shared<CZombieClass_Speed>(m_pPlayer, lv);
+		}
 	}
 	return CPlayerModStrategy_ZB3::ZombieClassFactory(lv, name);
 }

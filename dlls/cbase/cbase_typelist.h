@@ -181,7 +181,7 @@ TL_ADD(CY20S2SCARD)
 TL_ADD(CZombieLaw)
 TL_ADD(CM32Venom)
 TL_ADD(CM95Tiger)
-
+TL_ADD(CKnifeY22S1HolySwordMB)
 
 
 
@@ -419,6 +419,7 @@ TL_ADD(CZBZFireBall)
 TL_ADD(CZBZSupportBombardment)
 TL_ADD(CAkshaFireBall)
 TL_ADD(CHolySwordParray)
+TL_ADD(CY22S1HolySwordMBParray)
 TL_ADD(CHolySwordCannon)
 TL_ADD(CY20S2SCARDGrenade)
 TL_ADD(CZombieLawRocket)

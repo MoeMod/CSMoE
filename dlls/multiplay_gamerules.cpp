@@ -1520,7 +1520,7 @@ bool CHalfLifeMultiplay::TeamExterminationCheck(int NumAliveTerrorist, int NumAl
 				MESSAGE_END();
 #endif
 				EndRoundMessage("", ROUND_TERRORISTS_WIN);
-				//EndRoundMessage("#CTs_Win", ROUND_CTS_WIN);
+				EndRoundMessage("#CTs_Win", ROUND_CTS_WIN);
 				TerminateRound(5s, WINSTATUS_CTS);
 
 				if (IsCareer())
@@ -1551,7 +1551,7 @@ bool CHalfLifeMultiplay::TeamExterminationCheck(int NumAliveTerrorist, int NumAl
 			MESSAGE_END();
 #endif
 			EndRoundMessage("", ROUND_TERRORISTS_WIN);
-			//EndRoundMessage("#Terrorists_Win", ROUND_TERRORISTS_WIN);
+			EndRoundMessage("#Terrorists_Win", ROUND_TERRORISTS_WIN);
 			TerminateRound(5s, WINSTATUS_TERRORISTS);
 
 			if (IsCareer())

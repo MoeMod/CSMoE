@@ -122,6 +122,7 @@ DLL_GLOBAL int gmsgOperationSystem = 0;
 DLL_GLOBAL int gmsgZ4Msg = 0;
 DLL_GLOBAL int gmsgMVPInfo = 0;
 DLL_GLOBAL int gmsgMPToCL = 0;
+DLL_GLOBAL int gmsgNewHudMsg = 0;
 
 // main code
 
@@ -227,6 +228,7 @@ void LinkUserMessages()
 	gmsgZ4Msg = REG_USER_MSG("Z4Msg", -1);
 	gmsgMVPInfo = REG_USER_MSG("MVPInfo", -1);
 	gmsgMPToCL = REG_USER_MSG("MPToCL", -1);
+	gmsgHeadIcon = REG_USER_MSG("NewHudMsg", -1);
 }
 
 /*void WriteWeaponInfo(const ItemInfo &II)

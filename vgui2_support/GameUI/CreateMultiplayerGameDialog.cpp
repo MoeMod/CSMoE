@@ -125,6 +125,12 @@ CCreateMultiplayerGameDialog::CCreateMultiplayerGameDialog(vgui2::Panel *parent)
 		m_pServerPage->SetMap(startMap);
 	}
 
+	const char* startGameMode = m_pBotSavedData->GetString("mp_gamemode", "none");
+	if (startGameMode[0])
+	{
+		m_pServerPage->SetGameMode(startGameMode);
+	}
+
 	// set bot difficulty radio buttons
 	static const char *buttonName[] = 
 	{
@@ -187,7 +193,7 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 	BaseClass::OnOK(applyOnly);
 
 	// get these values from m_pServerPage and store them temporarily
-	char szMapName[64], szHostName[64], szPassword[64];
+	char szMapName[64], szHostName[64], szPassword[64], szGameModeName[64];
 	const char *pszMapName = m_pServerPage->GetMapName();
 
 	if (!pszMapName)
@@ -195,6 +201,7 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 	strncpy(szMapName, pszMapName, sizeof(szMapName));
 	strncpy(szHostName, m_pGameplayPage->GetHostName(), sizeof( szHostName ));
 	strncpy(szPassword, m_pGameplayPage->GetPassword(), sizeof( szPassword ));
+	strncpy(szGameModeName, m_pServerPage->GetGameMode(), sizeof(szGameModeName));
 
 	char szMapCommand[1024];
 
@@ -245,14 +252,17 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 			m_pBotSavedData->SetString("map", szMapName);
 		}
 
+		m_pBotSavedData->SetString("mp_gamemode", m_pServerPage->GetGameMode());
+
 		// save bot config to a file
-		m_pBotSavedData->SaveToFile( vgui2::filesystem(), "CSBotConfig.vdf"/*, "CONFIG"*/ );
+		m_pBotSavedData->SaveToFile( vgui2::filesystem(), "CSBotConfig.vdf", "CONFIG" );
 
 		// create command to load map, set password, etc
-		sprintf( szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nmap %s\n",
+		sprintf( szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nmp_gamemode %s\nmap %s\n",
 			m_pGameplayPage->GetMaxPlayers(),
 			szPassword,
 			szHostName,
+			szGameModeName,
 			szMapName
 		);
 
@@ -266,6 +276,8 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 		for( KeyValues *key = m_pBotSavedData->GetFirstSubKey(); key; key = key->GetNextKey() )
 		{
 			if (!stricmp(key->GetName(), "map"))
+				continue;
+			if (!stricmp(key->GetName(), "mp_gamemode"))
 				continue;
 
 			static char buffer[128];

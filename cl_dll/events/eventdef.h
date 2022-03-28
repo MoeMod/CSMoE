@@ -129,4 +129,5 @@ HOOK_EVENT(holysword, FireHolySword);
 HOOK_EVENT(y20s2scard, FireY20S2SCARD);
 HOOK_EVENT(m95tiger, FireM95Tiger);
 HOOK_EVENT(m32, FireM32);
+HOOK_EVENT(y22s1holyswordmb, FireY22S1HolySwordMB);
 

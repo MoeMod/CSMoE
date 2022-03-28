@@ -24,6 +24,9 @@ class ListPanel;
 #define MAX_GAMEMODES 8
 static const char* g_szGameModeCode[MAX_GAMEMODES] = {
 	"none", "dm", "tdm", "zb1", "zb3", "zbs", "gd", "zbb"
+}; 
+static const wchar_t* g_szGameModeNames[MAX_GAMEMODES] = {
+	L"竞技模式", L"个人竞技模式", L"团队竞技模式", L"生化模式(感染)", L"生化模式(英雄)", L"大灾变", L"枪王决战模式", L"基地建设模式"
 };
 
 //-----------------------------------------------------------------------------
@@ -41,6 +44,9 @@ public:
 	void SetMap(const char *name);
 	bool IsRandomMapSelected();
 	const char *GetMapName();
+
+	void SetGameMode(const char* name);
+	const char* GetGameMode();
 
 	// CS Bots
 	void SetBotQuota( int quota );

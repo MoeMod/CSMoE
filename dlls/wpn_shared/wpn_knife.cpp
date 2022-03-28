@@ -46,10 +46,8 @@ void CKnife::Spawn(void)
 
 void CKnife::Precache(void)
 {
-	PRECACHE_MODEL("models/texturewpn/v_knife2.mdl");
-	PRECACHE_MODEL("models/texturewpn/v_knife3.mdl");
-	PRECACHE_MODEL("models/texturewpn/v_knife4.mdl");
 	PRECACHE_MODEL("models/v_knife.mdl");
+	PRECACHE_MODEL("models/v_knife_w.mdl");
 #ifdef ENABLE_SHIELD
 	PRECACHE_MODEL("models/shield/v_shield_knife.mdl");
 #endif
@@ -84,17 +82,12 @@ int CKnife::GetItemInfo(ItemInfo *p)
 
 	return 1;
 }
-static const char* WEAPON_NAME[] =
-{
-	"models/v_knife.mdl",
-	"models/texturewpn/v_knife2.mdl",
-	"models/texturewpn/v_knife3.mdl",
-	"models/texturewpn/v_knife4.mdl"
-};
+
 BOOL CKnife::Deploy(void)
 {
 	
-	EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_deploy1.wav", 0.3, 2.4);
+	if(!m_pPlayer->m_bIsFemale)
+		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/knife_deploy1.wav", 0.3, 2.4);
 
 	m_fMaxSpeed = 250;
 	m_iSwing = 0;
@@ -107,7 +100,7 @@ BOOL CKnife::Deploy(void)
 	else
 #endif
 	{
-		return DefaultDeploy(WEAPON_NAME[m_SeqModel], "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
+		return DefaultDeploy(m_pPlayer->m_bIsFemale ? "models/v_knife_w.mdl" : "models/v_knife.mdl", "models/p_knife.mdl", KNIFE_DRAW, "knife", UseDecrement() != FALSE);
 	}
 }
 
@@ -543,13 +536,6 @@ int CKnife::Stab(int fFirst)
 	}
 
 	return fDidHit;
-}
-void CKnife::ChangeModel()
-{
-	if (m_SeqModel >= 3)
-		m_SeqModel = -1;
-	m_SeqModel += 1;
-	Deploy();
 }
 
 void CKnife::Inspect()

@@ -222,7 +222,7 @@ int CZombieLaw::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "ZombieLawGrenade";
-	p->iMaxAmmo1 = 10;
+	p->iMaxAmmo1 = 3;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = 3;
@@ -237,7 +237,7 @@ int CZombieLaw::GetItemInfo(ItemInfo *p)
 
 BOOL CZombieLaw::Deploy(void)
 {
-	return DefaultDeploy("models/v_zombielaw.mdl", "models/p_zombielaw.mdl", ZOMBIELAW_DRAW, "grenade", UseDecrement() != FALSE, 3.1s, 3.5s);
+	return DefaultDeploy("models/v_zombielaw.mdl", "models/p_zombielaw.mdl", ZOMBIELAW_DRAW, "at4", UseDecrement() != FALSE, 3.1s, 3.5s);
 }
 
 int CZombieLaw::ExtractAmmo(CBasePlayerWeapon* pWeapon)

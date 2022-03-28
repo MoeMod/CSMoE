@@ -2439,7 +2439,7 @@ void CL_Init( void )
 	}
 
 #ifdef XASH_VGUI2
-    extern int VGui2_Startup();
+    extern void VGui2_Startup();
     VGui2_Startup();
 #endif
 

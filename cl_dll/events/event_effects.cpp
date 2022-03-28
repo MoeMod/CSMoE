@@ -1675,12 +1675,10 @@ void EV_WpnEffects(event_args_s* args)
 						
 					}
 				}
-
-
-
 			};
 			
 		}
+		break;
 	}
 	case EVENT_BALROGCRITICAL:
 	{
@@ -1869,18 +1867,17 @@ void EV_WpnEffects(event_args_s* args)
 					pEnt->entity.curstate.animtime = gHUD.m_flTime;
 					pEnt->entity.curstate.frame = 0;
 					pEnt->entity.curstate.framerate = 1.0;
-					pEnt->die = gHUD.m_flTime + 1.5;
+					pEnt->die = gHUD.m_flTime + 3.0;
 					pEnt->clientIndex = args->iparam2;
 					pEnt->entity.curstate.fuser1 = gHUD.m_flTime;
-					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
-
 					pEnt->entity.curstate.rendermode = kRenderTransAdd;
 					pEnt->entity.curstate.renderamt = 255;
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_PLYRATTACHMENT | FTENT_SPRANIMATELOOP | FTENT_SPRANIMATE;
 
 					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
 						float delta = currenttime - pEnt->entity.curstate.fuser1;
-						if (delta > 1.0)
-							pEnt->entity.curstate.renderamt = 255 - (delta - 1.0) * 255;
+						if (delta > 2.0)
+							pEnt->entity.curstate.renderamt = 255 - (delta - 2.0) * 255;
 					};
 				}
 			}

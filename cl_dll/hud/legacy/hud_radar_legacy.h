@@ -12,6 +12,10 @@ public:
 	~CHudRadarLegacy() override;
 	int VidInit(void) override;
 	int Draw(float time) override;
+	int GetRadarSize()
+	{
+		return m_hRadarOpaque.rect.right - m_hRadarOpaque.rect.left;
+	}
 
 private:
 	CClientSprite m_hRadar;
@@ -39,4 +43,6 @@ private:
 	bool bUseRenderAPI, bTexturesInitialized;
 	int hDot, hCross, hT, hFlippedT;
 	int iMaxRadius;
+
+	UniqueTexture m_iMapTitleBG;
 };

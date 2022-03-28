@@ -47,6 +47,11 @@ int CHudStatusIcons::VidInit( void )
 {
 	R_InitTexture(m_tgaC4[0], "resource/helperhud/c4_left_default");
 	R_InitTexture(m_tgaC4[1], "resource/helperhud/c4_left_install");
+
+	m_NEWHUD_hC4_Off = gHUD.GetSpriteIndex("c4_off_new");
+	m_NEWHUD_hC4_On = gHUD.GetSpriteIndex("c4_on_new");
+	m_NEWHUD_hDefuser = gHUD.GetSpriteIndex("defuser_new");
+
 	return 1;
 }
 
@@ -61,11 +66,64 @@ void CHudStatusIcons::Shutdown(void)
 	std::fill(std::begin(m_tgaC4), std::end(m_tgaC4), nullptr);
 }
 
+int CHudStatusIcons::DrawNewHudStatusIcons(float flTime)
+{
+	for (int i = 0; i < MAX_ICONSPRITES; i++)
+	{
+		if (m_IconList[i].spr)
+		{
+			if (!strcmp(m_IconList[i].szSpriteName, "buyzone"))
+			{
+				// 28 dollarbg
+				int iY = gHUD.m_iMapHeight + 28 + 7 * gHUD.m_flScale;
+				int iX = 4;
+				SPR_Set(m_IconList[i].spr, 255, 255, 255);
+				SPR_DrawAdditive(0, iX, iY, &m_IconList[i].rc);
+			}
+			if (!strcmp(m_IconList[i].szSpriteName, "c4"))
+			{
+				int iY = ScreenHeight - 82;
+				int iX = ScreenWidth - 25;
+
+				iX -= 125;
+
+				if (g_bInBombZone && ((int)(flTime * 10) % 2))
+				{
+					SPR_Set(gHUD.GetSprite(m_NEWHUD_hC4_On), 255, 255, 255);
+					SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_NEWHUD_hC4_On));
+				}
+				else
+				{
+					SPR_Set(gHUD.GetSprite(m_NEWHUD_hC4_Off), 255, 255, 255);
+					SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_NEWHUD_hC4_Off));
+				}
+			}
+			if (!strcmp(m_IconList[i].szSpriteName, "defuser"))
+			{
+				int iY = ScreenHeight - 82;
+				int iX = ScreenWidth - 25;
+
+				iX -= 160;
+
+				SPR_Set(gHUD.GetSprite(m_NEWHUD_hDefuser), 255, 255, 255);
+				SPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_NEWHUD_hDefuser));
+			}
+		}
+	}
+	return 1;
+}
+
 // Draw status icons along the left-hand side of the screen
 int CHudStatusIcons::Draw( float flTime )
 {
 	if (gEngfuncs.IsSpectateOnly())
 		return 1;
+
+	if (gHUD.m_hudstyle->value == 2)
+	{
+		DrawNewHudStatusIcons(flTime);
+		return 1;
+	}
 	// find starting position to draw from, along right-hand side of screen
 	int x = 5;
 	int y = ScreenHeight / 2;
@@ -87,7 +145,7 @@ int CHudStatusIcons::Draw( float flTime )
 				else
 					m_tgaC4[0]->Draw2DQuadScaled(x, y, x + 58, y + 55);
 			}
-			else if (gHUD.m_hudstyle->value && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
+			else if (gHUD.m_hudstyle->value == 1 && !strcmp(m_IconList[i].szSpriteName, "buyzone"))
 			{
 					SPR_Set(m_IconList[i].spr, 255, 255, 255);
 					if(gHUD.m_bMordenRadar)

@@ -89,13 +89,13 @@ int CHudZB3Rage::Draw(float time)
 
 	//Zombie Item
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iArUpSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iArUpSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 : ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iArUpSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHpUpSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iHpUpSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 46 : ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iHpUpSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iFastRespawnSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 + 75, &gHUD.GetSpriteRect(m_iFastRespawnSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 90 : ScreenHeight / 2 + 75, &gHUD.GetSpriteRect(m_iFastRespawnSPR));
 
 
 	// background bar

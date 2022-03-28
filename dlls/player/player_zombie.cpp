@@ -56,7 +56,7 @@ CZombie_ZB1::CZombie_ZB1(CBasePlayer *player, ZombieLevel iEvolutionLevel) : Bas
 	// remove guns & give nvg
 	m_pPlayer->GiveDefaultItems();
 	m_pPlayer->m_bNightVisionOn = false;
-	m_pPlayer->ClientCommand("nightvision");
+	//m_pPlayer->ClientCommand("nightvision");
 
 	// set default property
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
@@ -281,7 +281,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/akshazombi_origin/akshazombi_origin.mdl");
 	PRECACHE_MODEL("models/player/boomer_zombi_host/boomer_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/boomer_zombi_origin/boomer_zombi_origin.mdl");
-
+	PRECACHE_MODEL("models/player/zbs_deimos2_zombi/zbs_deimos2_zombi.mdl");
 }
 
 }

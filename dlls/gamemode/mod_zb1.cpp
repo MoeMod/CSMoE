@@ -581,7 +581,7 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 
 				if (pWeapon)
 				{
-					if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword"))
+					if (!Q_strcmp(STRING(pWeapon->pev->classname), "knife_holysword") || !Q_strcmp(STRING(pWeapon->pev->classname), "knife_y22s1holyswordmb"))
 						pWeapon->WeaponCallBack(0);
 				}
 				return 1;

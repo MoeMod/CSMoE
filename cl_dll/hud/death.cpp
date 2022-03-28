@@ -101,24 +101,30 @@ int CHudDeathNotice :: VidInit( void )
 	m_KM_Icon_Head = gHUD.GetSpriteIndex("KM_Icon_Head");
 	m_KM_Icon_Knife = gHUD.GetSpriteIndex("KM_Icon_knife");
 	m_KM_Icon_Frag = gHUD.GetSpriteIndex("KM_Icon_Frag");
-	if (gHUD.m_hudstyle->value)
-	{
-		R_InitTexture(m_killBg[0], "resource/hud/csgo/DeathNotice/KillBg_left");
-		R_InitTexture(m_killBg[1], "resource/hud/csgo/DeathNotice/KillBg_center");
-		R_InitTexture(m_killBg[2], "resource/hud/csgo/DeathNotice/KillBg_right");
-	}
-	else
-	{
-		R_InitTexture(m_killBg[0], "resource/Hud/DeathNotice/KillBg_left");
-		R_InitTexture(m_killBg[1], "resource/Hud/DeathNotice/KillBg_center");
-		R_InitTexture(m_killBg[2], "resource/Hud/DeathNotice/KillBg_right");
-	}
+
+	R_InitTexture(m_csgo_killBg[0], "resource/hud/csgo/DeathNotice/KillBg_left");
+	R_InitTexture(m_csgo_killBg[1], "resource/hud/csgo/DeathNotice/KillBg_center");
+	R_InitTexture(m_csgo_killBg[2], "resource/hud/csgo/DeathNotice/KillBg_right");
+
+	R_InitTexture(m_NewHud_killBg[0], "resource/Hud/DeathNotice/killbg_left_new");
+	R_InitTexture(m_NewHud_killBg[1], "resource/Hud/DeathNotice/killbg_center_new");
+	R_InitTexture(m_NewHud_killBg[2], "resource/Hud/DeathNotice/killbg_right_new");
+
+	R_InitTexture(m_killBg[0], "resource/Hud/DeathNotice/KillBg_left");
+	R_InitTexture(m_killBg[1], "resource/Hud/DeathNotice/KillBg_center");
+	R_InitTexture(m_killBg[2], "resource/Hud/DeathNotice/KillBg_right");
+
+	R_InitTexture(m_NewHud_deathBg[0], "resource/Hud/DeathNotice/deathbg_left_new");
+	R_InitTexture(m_NewHud_deathBg[1], "resource/Hud/DeathNotice/deathbg_center_new");
+	R_InitTexture(m_NewHud_deathBg[2], "resource/Hud/DeathNotice/deathbg_right_new");
+
 	R_InitTexture(m_deathBg[0], "resource/Hud/DeathNotice/DeathBg_left");
 	R_InitTexture(m_deathBg[1], "resource/Hud/DeathNotice/DeathBg_center");
 	R_InitTexture(m_deathBg[2], "resource/Hud/DeathNotice/DeathBg_right");
-	R_InitTexture(m_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
-	R_InitTexture(m_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
-	R_InitTexture(m_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
+	
+	R_InitTexture(m_csgo_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
+	R_InitTexture(m_csgo_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
+	R_InitTexture(m_csgo_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
 	return 1;
 }
 
@@ -174,14 +180,20 @@ int CHudDeathNotice :: Draw( float flTime )
 			switch (rgDeathNoticeList[i].DrawBg)
 			{
 			case DB_KILL:
-				DrawBg = &m_killBg; break;
+				if (gHUD.m_hudstyle->value == 2)
+					DrawBg = &m_NewHud_killBg;
+				else
+					DrawBg = &m_killBg; break;
 			case DB_DEATH:
-				DrawBg = &m_deathBg; break;
+				if (gHUD.m_hudstyle->value == 2)
+					DrawBg = &m_NewHud_deathBg;
+				else
+					DrawBg = &m_deathBg; break;
 			default:
 			{
-				if (gHUD.m_hudstyle->value)
+				if (gHUD.m_hudstyle->value == 1)
 				{
-					DrawBg = &m_defaultBg; break;
+					DrawBg = &m_csgo_defaultBg; break;
 				}
 				else
 				{
@@ -228,6 +240,12 @@ int CHudDeathNotice :: Draw( float flTime )
 			}
 
 			// Draw death weapon
+			if (gHUD.m_hudstyle->value == 2)
+			{
+				r = 255;
+				g = 255;
+				b = 255;
+			}
 			SPR_Set( gHUD.GetSprite(id), r, g, b );
 			SPR_DrawAdditive( 0, x, y, &gHUD.GetSpriteRect(id) );
 

@@ -404,6 +404,9 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 	int x = ScreenWidth / 2;
 	int y = 58;
 
+	if(gHUD.m_hudstyle->value == 2)
+		y = 90;
+
 	x -= m_pTexture_skillslotbg->w() / 2;
 	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 	{		

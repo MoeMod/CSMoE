@@ -209,6 +209,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_aksha.cpp
 	./gamemode/zb2/fireball.cpp
 	./gamemode/zb2/zb2_zclass_boomer.cpp
+	./holyswordcannon.cpp
 	)
 
 set (HLWPN_SRCS
@@ -369,6 +370,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_zombielaw.cpp
 	../dlls/wpn_shared/wpn_m32venom.cpp
 	../dlls/wpn_shared/wpn_m95tiger.cpp
+	../dlls/wpn_shared/knife_y22s1holyswordmb.cpp
 	)
 
 set(PM_SRCS

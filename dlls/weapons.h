@@ -638,6 +638,30 @@ private:
 	CUtlVector<CBaseEntity*>* m_pGroupList;
 };
 
+class CHolySwordCannon : public CBaseEntity
+{
+public:
+	void Spawn() override;
+	void Precache() override;
+	void EXPORT OnTouch(CBaseEntity* pOther);
+	void CreateEffect();
+	void RadiusDamage();
+	void TouchWall();
+	void PenetrateStart();
+	void PenetrateEnd();
+	void EXPORT FlyThink();
+	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage);
+	void Remove();
+
+private:
+	time_point_t m_flRemoveTime;
+	float m_flTouchDamage;
+	float RadiusDamageAmount;
+	int m_ExpIndex;
+	int m_Exp2Index;
+	Vector m_vecStartVelocity;
+};
+
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {

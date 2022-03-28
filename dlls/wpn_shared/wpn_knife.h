@@ -48,7 +48,6 @@ public:
 	void PrimaryAttack() override;
 	void Inspect() override;
 	duration_t GetInspectTime() override { return KNIFE_INSPECT_TIME; }
-	void ChangeModel() override;
 	void SecondaryAttack() override;
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS
@@ -75,7 +74,6 @@ public:
 public:
 	TraceResult m_trHit;
 	unsigned short m_usKnife;
-	int m_SeqModel;
 	time_point_t m_NextInspect;
 };
 

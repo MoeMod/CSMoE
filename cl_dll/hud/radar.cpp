@@ -103,14 +103,18 @@ int CHudRadar::Draw(float time)
 	if (modern.Available() && gHUD.m_iModRunning != MOD_NONE)
 	{	
 		modern.Draw(time);
-		gHUD.m_bMordenRadar = TRUE;
+		gHUD.m_bMordenRadar = TRUE;		
 	}
 	else
-	{
-		
+	{	
 		legacy.Draw(time);
 		gHUD.m_bMordenRadar = FALSE;
 	}
+
+	if (gHUD.m_bMordenRadar)
+		gHUD.m_iMapHeight = modern.cl_newradar_size->value * ScreenWidth;
+	else
+		gHUD.m_iMapHeight = legacy.GetRadarSize();
 
 	return 1;
 }

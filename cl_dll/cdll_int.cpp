@@ -53,6 +53,7 @@ mobile_engfuncs_t gMobileAPI = { };
 fs_api_t gFileSystemAPI = { };
 CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
+vec3_t g_velocity;
 int g_iMobileAPIVersion = 0;
 
 void InitInput (void);
@@ -171,6 +172,8 @@ char DLLEXPORT HUD_PlayerMoveTexture( char *name )
 
 void DLLEXPORT HUD_PlayerMove( struct playermove_s *ppmove, int server )
 {
+	VectorCopy(ppmove->velocity, g_velocity);
+
 	PM_Move( ppmove, server );
 }
 

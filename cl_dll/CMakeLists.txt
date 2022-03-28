@@ -225,6 +225,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_zombielaw.cpp
 	../dlls/wpn_shared/wpn_m32venom.cpp
 	../dlls/wpn_shared/wpn_m95tiger.cpp
+	../dlls/wpn_shared/knife_y22s1holyswordmb.cpp
 	)
 
 set (HUD_SRCS
@@ -289,6 +290,7 @@ set (HUD_SRCS
 	./hud/hud_sifiammo.cpp
 	./hud/hud_mvp.cpp
 	./hud/server.cpp
+	./hud/newhud/newhud.cpp
 
 )
 

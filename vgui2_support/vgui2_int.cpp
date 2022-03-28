@@ -72,7 +72,7 @@ int VGui2_VidInit()
 	return 0;
 }
 
-int VGui2_Paint()
+void VGui2_Paint()
 {
     VGuiWrap2_Paint();
 }

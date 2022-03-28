@@ -112,6 +112,7 @@ extern WeaponsResource gWR;
 
 
 #define MAX_HISTORY 12
+#define NEWHUD_MAX_HISTORY 4
 enum {
 	HISTSLOT_EMPTY,
 	HISTSLOT_AMMO,
@@ -130,6 +131,8 @@ private:
 	};
 
 	HIST_ITEM rgAmmoHistory[MAX_HISTORY];
+	HIST_ITEM rgAmmoNewHudHistory[NEWHUD_MAX_HISTORY];
+	HIST_ITEM WeaponNewHudHistory[NEWHUD_MAX_HISTORY];
 
 public:
 
@@ -145,12 +148,15 @@ public:
 
 	int iHistoryGap;
 	int iCurrentHistorySlot;
+	int iNewHudWepaonCurrentHistorySlot;
 
 	void AddToHistory( int iType, int iId, int iCount = 0 );
 	void AddToHistory( int iType, const char *szName, int iCount = 0 );
 
 	void CheckClearHistory( void );
+	void CheckClearWeaponHistory(void);
 	int DrawAmmoHistory( float flTime );
+	int DrawNEWHudAmmoHistory(float flTime);
 };
 
 extern HistoryResource gHR;

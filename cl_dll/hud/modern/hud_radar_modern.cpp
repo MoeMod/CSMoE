@@ -68,6 +68,10 @@ int CHudRadarModern::VidInit(void)
 
 	m_hRadar = gHUD.GetSprite(m_HUD_radar);
 	m_hRadaropaque = gHUD.GetSprite(m_HUD_radaropaque);
+
+	if (!m_iMapTitleBG)
+		m_iMapTitleBG = R_LoadTextureUnique("resource/hud/hud_maptitle_bg");
+
 	return 1;
 }
 
@@ -223,10 +227,27 @@ int CHudRadarModern::Draw(float time)
 		m_flNextBuild = gHUD.m_flTime + 1.0;
 	}
 #endif
-
 	int sx, sy, wide, tall;
 	sx = sy = 0;
 	tall = wide = cl_newradar_size->value * ScreenWidth * gHUD.m_flScale;
+
+	if (gHUD.m_hudstyle->value == 2)
+	{
+		if (strlen(g_szLocation))
+		{
+			int iLength, iHeight;
+			int iX, iW, iH, iY;
+			iW = m_iMapTitleBG->w();
+			iH = m_iMapTitleBG->h();
+			iX = iY = 0;
+			m_iMapTitleBG->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
+
+			gEngfuncs.pfnDrawSetTextColor(0.8f, 0.8f, 0.8f);
+			gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+			gEngfuncs.pfnDrawConsoleString(5, abs(iH - iHeight) / 2, g_szLocation);
+		}
+		sy = m_iMapTitleBG->h() + 1;
+	}
 	
 	{
 		float angles, xTemp, yTemp, viewzoom;
@@ -326,6 +347,16 @@ int CHudRadarModern::Draw(float time)
 	DrawUtils::DrawOutlinedRect(sx / gHUD.m_flScale, sy / gHUD.m_flScale, wide / gHUD.m_flScale, tall / gHUD.m_flScale, 0, 0, 0, 255);
 
 	// TODO : localization
+	if (strlen(g_szLocation))
+	{
+		if (gHUD.m_hudstyle->value != 2)
+		{
+			int iLength, iHeight;
+			gEngfuncs.pfnDrawSetTextColor(0.0f, 0.8f, 0.0f);
+			gEngfuncs.pfnDrawConsoleStringLen(g_szLocation, &iLength, &iHeight);
+			gEngfuncs.pfnDrawConsoleString((wide - iLength) / 2 / gHUD.m_flScale, (tall + iHeight) / gHUD.m_flScale, g_szLocation);
+		}
+	}
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderTransAdd);
 	gEngfuncs.pTriAPI->Color4f(1, 0.62745f, 0, 1.0f);

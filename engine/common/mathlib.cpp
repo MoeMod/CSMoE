@@ -166,7 +166,8 @@ float rsqrt( float number )
 
 	return y;
 }
-
+// MoeMod : defined in SourceSDK
+#if 0 
 /*
 =================
 SinCos
@@ -196,6 +197,7 @@ void SinCos( float radians, float *sine, float *cosine )
 #endif
 #endif
 }
+#endif
 
 #ifdef XASH_VECTORIZE_SINCOS
 void SinCosFastVector4(float r1, float r2, float r3, float r4,

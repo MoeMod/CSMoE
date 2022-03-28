@@ -48,7 +48,7 @@ void CZombieClass_ZBS_Deimos2::Evolution(ZombieLevel iEvolutionLevel)
 {
 	CBaseZombieClass_ZB2::Evolution(iEvolutionLevel);
 
-	const char *szModel = "deimos2_zombi_origin";
+	const char *szModel = "zbs_deimos2_zombi";
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", szModel);
 
 	static char szModelPath[64];

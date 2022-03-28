@@ -36,6 +36,8 @@ constexpr int DHN_3DIGITS = 4;
 constexpr int DHN_FILLZERO = 8;
 constexpr int DHN_4DIGITS = 16;
 constexpr int DHN_5DIGITS = 32;
+constexpr int DHN_FROMRIGHT = 64;
+constexpr int DHN_CENTERALIGNED = 128;
 constexpr int MIN_ALPHA = 100;
 
 constexpr unsigned long RGB_YELLOWISH = 0x00FFA000; //255,160,0
@@ -55,6 +57,10 @@ public:
 
 	static int DrawHudNumber2( int x, int y, int iNumber,
 						   int r, int g, int b);
+
+	static int DrawNEWHudNumber(int index, int iX, int iY, int number, int r, int g, int b, int a, int iDrawZero, int maxsize, int widthplus = 0);
+
+	static int GetNEWHudNumberWidth(int type, int number, int iDrawZero, int maxsize, int widthplus = 0);
 
 	static int DrawHudString(int x, int y, int iMaxX, const char *szString,
 						 int r, int g, int b, float scale = 0.0f, bool drawing = false );

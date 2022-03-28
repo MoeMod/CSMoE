@@ -42,6 +42,21 @@ version.
 #include "draw_util.h"
 #include "cs_wpn/bte_weapons.h"
 
+enum drawscope_type
+{
+	TYPE_QUADRD_SQUARE = 0,
+	TYPE_DOUBLE_SQUARE,
+	TYPE_DOUBLE_SQUARE_NOTCENTER
+};
+
+enum drawcorner_type
+{
+	TYPE_CORNER_SW = 0,
+	TYPE_CORNER_SE,
+	TYPE_CORNER_NW,
+	TYPE_CORNER_NE
+};
+
 int CHudSniperScope::Init()
 {
 	gHUD.AddHudElem(this);
@@ -58,12 +73,91 @@ int CHudSniperScope::VidInit()
 
 	R_InitTexture(m_iM95TigerScope[0], "sprites/m95tiger_scope_red.tga");
 	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
+	R_InitTexture(m_iM95TigerScopeCorner, "sprites/m95tiger_scope_corner.tga");
 	
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
 	centery = TrueHeight/2;
 	return 1;
+}
+
+void CHudSniperScope::FuncDraw2DQuadScaled(const CTextureRef& tex, int x, int y, int width, int height, float s1, float t1, float s2, float t2, byte r, byte g, byte b, byte a)
+{
+	tex.Draw2DQuadScaled(x, y, x + width, y + height, s1, t1, s2, t2, r, g, b, a);
+}
+
+void CHudSniperScope::FuncDrawCorner(const CTextureRef& tex, int type, int width, int height, int width2, int height2)
+{
+	switch (type)
+	{
+	case 0:
+	{
+		FuncDraw2DQuadScaled(tex, width2, ScreenHeight - height2 - height, width, height);
+		FuncDraw2DQuadScaled(tex, width2, height + height2, width, -height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, height + height2, -width, -height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, ScreenHeight - height - height2, -width, height);
+		break;
+	}
+	case 1:
+	{
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2 - width, ScreenHeight - height2 - height, width, height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2 - width, height2, width, -height);
+		FuncDraw2DQuadScaled(tex, width + width2, ScreenHeight - height2 - height, -width, height);
+		FuncDraw2DQuadScaled(tex, width + width2, height2, -width, -height);
+		break;
+	}
+	case 2:
+	{
+		FuncDraw2DQuadScaled(tex, width2, height2, width, height, height);
+		FuncDraw2DQuadScaled(tex, width2, ScreenHeight - height2, width, -height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, height2, -width, height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width2, ScreenHeight - height2, -width, -height);
+		break;
+	}
+	case 3:
+	{
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width - width2, height2, width, height);
+		FuncDraw2DQuadScaled(tex, ScreenWidth - width - width2, ScreenHeight - height2, width, -height);
+		FuncDraw2DQuadScaled(tex, width + width2, height2, -width, height);
+		FuncDraw2DQuadScaled(tex, width + width2, ScreenHeight - height2, -width, -height);
+		break;
+	}
+	}
+}
+
+void CHudSniperScope::FuncDrawScope(const CTextureRef& tex, int type, int x, int y, int width, int height)
+{
+	switch (type)
+	{
+	case 0:
+	{
+		int iX, iY;
+		iX = x - width;
+		iY = y - height;
+		tex.Draw2DQuadScaled(iX, iY, iX + iX + width, iY + iY + height);
+		iY = ScreenHeight / 2 + height;
+		tex.Draw2DQuadScaled(iX, iY, iX + iX + width, iY + iY - height);
+		iX = ScreenWidth / 2 + width;
+		iY = ScreenHeight / 2 - height;
+		tex.Draw2DQuadScaled(iX, iY, iX + iX - width, iY + iY + height);
+		iY = ScreenHeight / 2 + height;
+		tex.Draw2DQuadScaled(iX, iY, iX + iX - width, iY + iY - height);
+		break;
+	}
+	case 1:
+	{
+		tex.Draw2DQuadScaled(x - width, y - height / 2, x - width + width, y - height / 2 + y + height / 2);
+		tex.Draw2DQuadScaled(x + width, y - height / 2, x + width - width, y - height / 2 + y + height / 2);
+		break;
+	}
+	case 2:
+	{
+		tex.Draw2DQuadScaled(x - width, y, x - width + width,  y + height);
+		tex.Draw2DQuadScaled(x + width, y, x + width - width, y + height);
+		break;
+	}
+	}
 }
 
 int CHudSniperScope::Draw(float flTime)
@@ -124,8 +218,20 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 {
 	if (iId == WEAPON_M95TIGER)
 	{
-		m_iM95TigerScope[iType]->Draw2DQuad(0, 0, centerx, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255);
-		m_iM95TigerScope[iType]->Draw2DQuad(TrueWidth, 0, centerx, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255);
+		float Height = min(ScreenWidth, ScreenHeight);
+		float Width = (Height * m_iM95TigerScope[iType]->w() / m_iM95TigerScope[iType]->h());
+		int iX = ScreenWidth / 2;
+		int iY = ScreenHeight / 2;
+
+		FuncDrawScope(*m_iM95TigerScope[iType], TYPE_DOUBLE_SQUARE, iX, iY, Width, Height);
+
+		FillRGBABlend(0, 0, iX - Width, ScreenHeight, 0, 0, 0, 93);
+		FillRGBABlend(iX + Width, 0, ScreenWidth, ScreenHeight, 0, 0, 0, 93);
+
+		FillRGBABlend(0, iY + Height / 2, ScreenWidth, ScreenHeight, 0, 0, 0, 93);
+		FillRGBABlend(0, 0, ScreenWidth, iY - Height / 2, 0, 0, 0, 93);
+
+		FuncDrawCorner(*m_iM95TigerScopeCorner, TYPE_CORNER_SW, Width, Height / 2);
 	}
 }
 

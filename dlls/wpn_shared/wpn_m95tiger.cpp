@@ -504,14 +504,7 @@ void CM95Tiger::M95TigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAu
 	
 	Vector vecDir = m_pPlayer->FireBullets3(m_pPlayer->GetGunPosition(), gpGlobals->v_forward, flSpread, 8192, 9, BULLET_PLAYER_338MAG, GetDamage(), M95TIGER_ARMOR_RATIO_MODIFIER, m_pPlayer->pev, TRUE, m_pPlayer->random_seed);
 
-	int flags;
-#ifdef CLIENT_WEAPONS
-	flags = FEV_NOTHOST;
-#else
-	flags = 0;
-#endif
-
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
+	PLAYBACK_EVENT_FULL(0, ENT(m_pPlayer->pev), m_usFireM95Tiger, 0, g_vecZero, g_vecZero, vecDir.x, vecDir.y, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.x * 100), FALSE, FALSE);
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + flCycleTime;
 
 #ifndef CLIENT_DLL

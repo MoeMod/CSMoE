@@ -191,7 +191,7 @@ public:
 		float flDamage = iType ? 50 : 770;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 1.3f;
+			flDamage *= 3.3f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -210,7 +210,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage *= 2.0f;	//4.5
+			flDamage *= 2.5f;	//4.5
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -1241,7 +1241,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 90;	//380 original
+			flDamage = 150;	//380 original
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 380;
 #endif

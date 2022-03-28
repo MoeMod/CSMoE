@@ -90,13 +90,13 @@ int CHudZB3Morale::Draw(float time)
 
 	//Human item
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iAmmoupSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iAmmoupSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73: ScreenHeight / 2 - 164, &gHUD.GetSpriteRect(m_iAmmoupSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iJumphigherSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iJumphigherSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 46: ScreenHeight / 2 - 120, &gHUD.GetSpriteRect(m_iJumphigherSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iHighMoraleSPR), 255, 193, 147);
-	gEngfuncs.pfnSPR_DrawAdditive(0, 4, ScreenHeight / 2  + 75, &gHUD.GetSpriteRect(m_iHighMoraleSPR));
+	gEngfuncs.pfnSPR_DrawAdditive(0, 4, gHUD.m_hudstyle->value == 2 ? gHUD.m_iMapHeight + 73 + 90 : ScreenHeight / 2  + 75, &gHUD.GetSpriteRect(m_iHighMoraleSPR));
 
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iMoraleIconSPR), r, g, b);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iMoraleIconSPR));
