@@ -27,6 +27,7 @@
 
 #include "draw_util.h"
 
+namespace cl {
 
 DECLARE_MESSAGE(m_Flash, FlashBat)
 DECLARE_MESSAGE(m_Flash, Flashlight)
@@ -150,7 +151,7 @@ int CHudFlashlight::Draw(float flTime)
 		DrawNewHudFlashLight(flTime);
 		return 1;
 	}
-		
+
 
 	if (m_fOn)
 		a = 225;
@@ -193,4 +194,6 @@ int CHudFlashlight::Draw(float flTime)
 
 
 	return 1;
+}
+
 }

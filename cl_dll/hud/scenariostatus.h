@@ -1,6 +1,6 @@
 
 #pragma once
-
+namespace cl {
 class CHudScenarioStatus : public CHudBase
 {
 public:
@@ -23,3 +23,4 @@ public:
 	int m_flashAlpha;
 	int m_iRepeatTimes;
 };
+}

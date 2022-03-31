@@ -2,7 +2,7 @@
 #pragma once
 
 #include "hud_sub.h"
-
+namespace cl {
 class CClientSprite;
 
 class CHudRadarLegacy : public IBaseHudSub
@@ -46,3 +46,4 @@ private:
 
 	UniqueTexture m_iMapTitleBG;
 };
+}

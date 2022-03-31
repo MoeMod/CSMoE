@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #pragma once
 
 #include "hud_sub.h"
-
+namespace cl {
 class CHudZ4Energy : public IBaseHudSub
 {
 public:
@@ -31,7 +31,7 @@ public:
 	void DrawNumber(int n, int x, int y, float size);
 	void DrawNumbers(int n, int x, int y, int from_right, float size);
 	Z4ZClassType GetZClass() const { return m_iZClass; }
-	void SetZClass(Z4ZClassType zclass) { 
+	void SetZClass(Z4ZClassType zclass) {
 		m_iUseTimesOld = -1;
 		m_iZClass = zclass;
 		switch (m_iZClass)
@@ -86,3 +86,4 @@ private:
 	float m_flTextFlashStart;
 	int m_iTextFlash;
 };
+}

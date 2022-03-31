@@ -17,6 +17,8 @@
 #include "rain.h"
 #include "fog.h"
 
+using namespace cl;
+
 /*
 =================
 HUD_DrawNormalTriangles

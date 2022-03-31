@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_StatusBar, StatusText )
 DECLARE_MESSAGE( m_StatusBar, StatusValue )
 
@@ -133,7 +135,7 @@ void CHudStatusBar :: ParseStatusString( int line_num )
 					}
 
 					// move over descriptor, then get and move over the index
-					index = atoi( ++src ); 
+					index = atoi( ++src );
 					while ( *src >= '0' && *src <= '9' )
 						src++;
 
@@ -292,6 +294,7 @@ int CHudStatusBar :: MsgFunc_StatusValue( const char *pszName, int iSize, void *
 	m_iStatusValues[index] = reader.ReadShort();
 
 	m_bReparseString = TRUE;
-	
+
 	return 1;
+}
 }

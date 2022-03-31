@@ -38,7 +38,7 @@ version.
 #include <string.h>
 #include <stdio.h>
 
-
+namespace cl {
 
 DECLARE_MESSAGE(m_ShowWin, ShowWin)
 
@@ -145,7 +145,7 @@ int CHudShowWin::Draw(float flTime)
 	default:
 		break;
 	}
-	
+
 
 	return 1;
 }
@@ -161,3 +161,4 @@ void CHudShowWin::Shutdown()
 	m_pCurTexture[3] = nullptr;
 }
 
+}

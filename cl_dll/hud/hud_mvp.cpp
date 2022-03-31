@@ -7,6 +7,7 @@
 #include "hud_mvp.h"
 #include "gamemode/mods_const.h"
 
+namespace cl {
 DECLARE_MESSAGE(m_MVP, MVPInfo)
 
 int CHudMVP::Init()
@@ -261,4 +262,5 @@ void CHudMVP::Shutdown()
 	m_pPopupboard = nullptr;
 	m_pTopBlue = nullptr;
 	m_pTopRed = nullptr;
+}
 }

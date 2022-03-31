@@ -26,6 +26,8 @@
 #include "cl_util.h"
 #include <string.h>
 
+namespace cl {
+
 int HUD_GetSpriteIndexByName( const char *sz )
 {
 	return gHUD.GetSpriteIndex(sz);
@@ -62,4 +64,4 @@ float *GetClientColor( int clientIndex )
 	}
 }
 
-
+}

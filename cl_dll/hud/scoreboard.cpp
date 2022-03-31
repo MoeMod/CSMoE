@@ -35,6 +35,8 @@ GNU General Public License for more details.
 #include "imgui_utils.h"
 #endif
 
+namespace cl {
+
 hud_player_info_t   g_PlayerInfoList[MAX_PLAYERS + 1]; // player info from the engine
 extra_player_info_t	g_PlayerExtraInfo[MAX_PLAYERS + 1]; // additional player info sent directly to the client dll
 team_info_t         g_TeamInfo[MAX_TEAMS + 1];
@@ -328,7 +330,7 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 			iDraw++;
 
 			int offsetY = 120 + 21 * iDraw + iCharHeightOffset - 6;
-			
+
 			//if (m_bHostOwnBuff)
 			//	GL_DrawTGA2(g_Texture[m_iBuffIcon].iTexture, x + 80, y + offsetY - 14, g_Texture[m_iBuffIcon].iWidth, g_Texture[m_iBuffIcon].iHeight, 255);
 			switch (g_PlayerExtraInfo[id].os)
@@ -349,7 +351,7 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 
 			sprintf(szBuf, "%d", g_PlayerExtraInfo[id].frags);
 			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 145, y + offsetY, 0, szBuf, r, g, b, flScale);
-			
+
 			sprintf(szBuf, "%d", g_PlayerExtraInfo[id].deaths);
 			DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 75, y + offsetY, 0, szBuf, r, g, b, flScale);
 
@@ -368,7 +370,7 @@ void CHudScoreboard::DrawScoreNew(bool bDivideTeam)
 			{
 				if(gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 					sprintf(szBuf, "英雄");
-				else 
+				else
 					sprintf(szBuf, "VIP");
 				DrawUtils::DrawHudStringReverse(x + (iStartW / 2) - 5 - 220, y + offsetY, 0, szBuf, r, g, b, flScale);
 			}
@@ -732,4 +734,6 @@ void CHudScoreboard::CacheTeamAliveNumber(void)
 {
 	m_iTeamAlive_T = GetTeamAliveCounts(TEAM_TERRORIST);
 	m_iTeamAlive_CT = GetTeamAliveCounts(TEAM_CT);
+}
+
 }

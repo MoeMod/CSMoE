@@ -17,8 +17,6 @@
 #include "IGameUIFuncs.h"
 #include "IBaseUI.h"
 
-#include "KeyValuesCompat.h"
-
 #include "CClientVGUI.h"
 
 namespace
@@ -83,12 +81,6 @@ void CClientVGUI::Initialize( CreateInterfaceFn* pFactories, int iNumFactories )
 	if( !vgui2::VGuiControls_Init( "CLIENT", m_FactoryList, NUM_FACTORIES ) )
 	{
 		Msg( "Failed to initialize VGUI2\n" );
-		return;
-	}
-
-	if( !KV_InitKeyValuesSystem( m_FactoryList, NUM_FACTORIES ) )
-	{
-		Msg( "Failed to initialize IKeyValues\n" );
 		return;
 	}
 

@@ -22,6 +22,7 @@
 
 #include "weapons_const.h"
 
+namespace cl {
 extern "C"
 {
 	void _DLLEXPORT HUD_PostRunCmd( struct local_state_s *from, struct local_state_s *to, struct usercmd_s *cmd, int runfuncs, double time, unsigned int random_seed );
@@ -32,7 +33,6 @@ extern "C"
 void			COM_Log( char *pszFile, char *fmt, ...);
 bool			CL_IsDead();
 
-namespace cl {
 float			UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
 int				UTIL_SharedRandomLong( unsigned int seed, int low, int high );
 
@@ -61,9 +61,9 @@ extern struct local_state_s *g_curstate;
 extern struct local_state_s *g_finalstate;
 extern int g_iShotsFired;
 
-}
-
 extern float g_lastFOV;
 extern vec3_t v_angles;
+
+}
 
 #endif

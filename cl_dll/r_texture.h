@@ -19,6 +19,8 @@ extern float g_ImGUI_DPI;
 extern cvar_t *hud_scale;
 #endif
 
+namespace cl {
+
 class CTextureRef; // forward decl
 using SharedTexture = std::shared_ptr<CTextureRef>;
 using UniqueTexture = std::unique_ptr<CTextureRef>;
@@ -35,10 +37,10 @@ public:
 	CTextureRef &operator=(CTextureRef &&rhs) { std::swap(m_iInternalId, rhs.m_iInternalId); return *this; }
 
 public:
-	~CTextureRef() 
-	{ 
-		if(g_iXash) 
-			gRenderAPI.GL_FreeTexture(m_iInternalId); 
+	~CTextureRef()
+	{
+		if(g_iXash)
+			gRenderAPI.GL_FreeTexture(m_iInternalId);
 	}
 
 public:
@@ -75,10 +77,10 @@ public:
 #endif
 	}
 
-	int GetParm(int parm = PARM_TEX_TYPE) const noexcept 
-	{ 
+	int GetParm(int parm = PARM_TEX_TYPE) const noexcept
+	{
 		if(g_iXash)
-			return gRenderAPI.RenderGetParm(parm, m_iInternalId); 
+			return gRenderAPI.RenderGetParm(parm, m_iInternalId);
 		return 0;
 	}
 	int w() const noexcept { return GetParm(PARM_TEX_WIDTH); }
@@ -114,4 +116,6 @@ inline bool R_InitTexture(P &p, Args&&...args)
 			return static_cast<bool>(p = P(new CTextureRef(std::move(tex))));
 	}
 	return false;
+}
+
 }

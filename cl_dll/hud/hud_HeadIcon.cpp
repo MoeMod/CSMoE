@@ -30,7 +30,6 @@
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
-}
 
 DECLARE_MESSAGE(m_HeadIcon, HeadIcon)
 #define MAXPLAYER 32
@@ -89,7 +88,7 @@ int CHudHeadIcon:: Draw( float flTime )
 {
 	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_ALL)  )
 		return 1;
-	
+
 	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		for (int i = 0; i < MAXPLAYER; i++)
@@ -241,7 +240,7 @@ int CHudHeadIcon::MsgFunc_HeadIcon( const char *pszName, int iSize, void *pbuf )
 
 	return 1;
 }
-	
+
 
 void CHudHeadIcon::R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
 {
@@ -321,5 +320,7 @@ void CHudHeadIcon::R_AttachTentToPlayer(int client, int modelIndex, vec3_t offse
 	if (additive)
 		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->die = gHUD.m_flTime + life;
+
+}
 
 }

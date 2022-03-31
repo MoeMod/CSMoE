@@ -3,7 +3,7 @@
 #define RADAR_H
 
 #include <memory>
-
+namespace cl {
 class CHudRadar: public CHudBase
 {
 public:
@@ -21,7 +21,7 @@ public:
 
 	void UserCmd_ShowRadar();
 	void UserCmd_HideRadar();
-	
+
 	int MsgFunc_Radar(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_BombDrop(const char *pszName, int iSize, void *pbuf);
 	int MsgFunc_BombPickup(const char *pszName, int iSize, void *pbuf);
@@ -35,5 +35,5 @@ private:
 };
 
 extern char g_szLocation[2048];
-
+}
 #endif // RADAR_H

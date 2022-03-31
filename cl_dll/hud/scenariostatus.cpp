@@ -6,6 +6,8 @@
 #include "draw_util.h"
 DECLARE_MESSAGE(m_scenarioStatus, Scenario)
 
+namespace cl {
+
 int CHudScenarioStatus::Init(void)
 {
 	HOOK_MESSAGE(Scenario);
@@ -149,4 +151,6 @@ int CHudScenarioStatus::MsgFunc_Scenario(const char *pszName, int iSize, void *p
 
 	m_nextFlash += reader.ReadShort() * 0.01;
 	return 1;
+}
+
 }

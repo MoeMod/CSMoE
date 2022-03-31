@@ -26,6 +26,8 @@
 #include "parsemsg.h"
 #include "fog.h"
 
+namespace cl {
+
 // Class declaration
 CFog gFog;
 
@@ -251,4 +253,5 @@ int CFog::MsgFunc_Fog(const char* pszName, int iSize, void* pBuf)
 	}
 
 	return 1;
+}
 }

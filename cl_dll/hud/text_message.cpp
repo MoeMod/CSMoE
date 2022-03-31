@@ -29,6 +29,8 @@
 #include "ctype.h"
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_TextMessage, TextMsg )
 
 int CHudTextMessage::Init(void)
@@ -106,19 +108,19 @@ char *CHudTextMessage::LookupString( char *msg, int *msg_dest )
 		return (char*)"";
 
 	// '#' character indicates this is a reference to a string in titles.txt, and not the string itself
-	if ( msg[0] == '#' ) 
+	if ( msg[0] == '#' )
 	{
 		// this is a message name, so look up the real message
 		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
 
 		if ( !clmsg || !(clmsg->pMessage) )
 			return (char*)msg; // lookup failed, so return the original string
-				
+
 		if ( msg_dest )
 		{
 			// check to see if titles.txt info overrides msg destination
 			// if clmsg->effect is less than 0, then clmsg->effect holds -1 * message_destination
-			if ( clmsg->effect < 0 )  // 
+			if ( clmsg->effect < 0 )  //
 				*msg_dest = -clmsg->effect;
 		}
 
@@ -140,7 +142,7 @@ bool CHudTextMessage::LookupString2( char *msg, int size )
 		return false;
 
 	// '#' character indicates this is a reference to a string in titles.txt, and not the string itself
-	if ( msg[0] == '#' ) 
+	if ( msg[0] == '#' )
 	{
 		// this is a message name, so look up the real message
 		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
@@ -302,4 +304,5 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	}
 
 	return 1;
+}
 }

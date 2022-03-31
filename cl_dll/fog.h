@@ -13,6 +13,7 @@
 
 #include "ref_params.h"
 
+namespace cl {
 class CFog
 {
 public:
@@ -54,5 +55,5 @@ private:
 };
 
 extern CFog gFog;
-
+}
 #endif // FOG_H

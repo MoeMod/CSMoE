@@ -11,6 +11,7 @@
 #include "cl_entity.h"
 #include "hud.h"
 
+namespace cl {
 
 #define INSET_OFF				0
 #define	INSET_CHASE_FREE		1
@@ -136,5 +137,7 @@ private:
 	int			m_lastPrimaryObject;
 	int			m_lastSecondaryObject;
 };
+
+}
 
 #endif // SPECTATOR_H

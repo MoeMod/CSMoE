@@ -2,7 +2,7 @@
 #pragma once
 
 #include "hud_sub.h"
-
+namespace cl {
 class CHudScoreBoardLegacy : public IBaseHudSub
 {
 public:
@@ -131,7 +131,7 @@ private:
 
 	UniqueTexture m_iIcon_Round;
 	int m_iIcon_Score;
-	
+
 	UniqueTexture m_iIcon_TeamKill;
 	int m_iIcon_TimeAttack;
 	int m_iIcon_TotalKillL;
@@ -146,3 +146,4 @@ private:
 
 
 };
+}

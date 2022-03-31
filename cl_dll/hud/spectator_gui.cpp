@@ -40,6 +40,8 @@ version.
  * We will draw all elements inside a box. It's size 16x10.
  */
 
+namespace cl {
+
 #define XPOS( x ) ( (x) / 16.0f )
 #define YPOS( y ) ( (y) / 10.0f  )
 
@@ -474,4 +476,6 @@ void CHudSpectatorGui::UserCmd_ToggleSpectatorMenuSpectateOptions()
 		m_menuFlags &= ~MENU_SPEC_OPTIONS;
 		gMobileAPI.pfnTouchRemoveButton( "_spec_spec_*" );
 	}
+}
+
 }

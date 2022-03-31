@@ -29,7 +29,7 @@
 #ifndef DRAW_UTIL_H
 #define DRAW_UTIL_H
 // Drawing primitives
-
+namespace cl {
 constexpr int DHN_DRAWZERO = 1;
 constexpr int DHN_2DIGITS = 2;
 constexpr int DHN_3DIGITS = 4;
@@ -174,5 +174,5 @@ public:
 	static void Draw2DQuad( float x1, float y1, float x2, float y2 );
 	static void Draw2DQuadScaled(float x1, float y1, float x2, float y2) { return Draw2DQuad(x1 * gHUD.m_flScale, y1 * gHUD.m_flScale, x2 * gHUD.m_flScale, y2 * gHUD.m_flScale); }
 };
-
+}
 #endif // DRAW_UTIL_H

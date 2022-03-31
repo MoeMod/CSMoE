@@ -42,6 +42,8 @@ version.
 #include "draw_util.h"
 #include "cs_wpn/bte_weapons.h"
 
+namespace cl {
+
 enum drawscope_type
 {
 	TYPE_QUADRD_SQUARE = 0,
@@ -74,7 +76,7 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iM95TigerScope[0], "sprites/m95tiger_scope_red.tga");
 	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
 	R_InitTexture(m_iM95TigerScopeCorner, "sprites/m95tiger_scope_corner.tga");
-	
+
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -238,4 +240,6 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 void CHudSniperScope::Shutdown()
 {
 	std::fill(std::begin(m_iScopeArc), std::end(m_iScopeArc), nullptr);
+}
+
 }

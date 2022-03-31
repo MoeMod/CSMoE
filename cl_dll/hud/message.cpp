@@ -27,6 +27,8 @@
 #include "unicode_strtools.h"
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_Message, HudText )
 DECLARE_MESSAGE( m_Message, GameTitle )
 DECLARE_MESSAGE( m_Message, HudTextPro )
@@ -61,7 +63,7 @@ void CHudMessage::Reset( void )
 {
 	std::fill(std::begin(m_pMessages), std::end(m_pMessages), nullptr);
 	memset( m_startTime, 0, sizeof( m_startTime[0] ) * maxHUDMessages );
-	
+
 	m_gameTitleTime = 0;
 	m_pGameTitle = NULL;
 }
@@ -212,7 +214,7 @@ void CHudMessage::MessageScanStart( void )
 	case 1:
 	case 0:
 		m_parms.fadeTime = m_parms.pMessage->fadein + m_parms.pMessage->holdtime;
-		
+
 
 		if ( m_parms.time < m_parms.pMessage->fadein )
 		{
@@ -235,7 +237,7 @@ void CHudMessage::MessageScanStart( void )
 
 	case 2:
 		m_parms.fadeTime = (m_parms.pMessage->fadein * m_parms.length) + m_parms.pMessage->holdtime;
-		
+
 		if ( m_parms.time > m_parms.fadeTime && m_parms.pMessage->fadeout > 0 )
 			m_parms.fadeBlend = (((m_parms.time - m_parms.fadeTime) / m_parms.pMessage->fadeout) * 255);
 		else
@@ -292,7 +294,7 @@ void CHudMessage::MessageDrawScan(std::shared_ptr<client_textmessage_t> pMessage
 		{
 			m_parms.text = wline[j];
 			MessageScanNextChar();
-			
+
 			if ( m_parms.x >= 0 && m_parms.y >= 0 )
 			{
 				auto width = DrawUtils::TextMessageDrawChar(m_parms.x, m_parms.y, m_parms.text, m_parms.r, m_parms.g, m_parms.b);
@@ -370,7 +372,7 @@ int CHudMessage::Draw( float fTime )
 			case 1:
 				endTime = m_startTime[i] + pMessage->fadein + pMessage->fadeout + pMessage->holdtime;
 				break;
-			
+
 			// Fade in is per character in scanning messages
 			case 2:
 				endTime = m_startTime[i] + (pMessage->fadein * strlen( pMessage->pMessage )) + pMessage->fadeout + pMessage->holdtime;
@@ -422,7 +424,7 @@ void CHudMessage::MessageAdd( const char *pName, float time )
 		if ( !m_pMessages[i] )
 		{
 			// Trim off a leading # if it's there
-			if ( pName[0] == '#' ) 
+			if ( pName[0] == '#' )
 				tempMessage = TextMessageGet( pName+1 );
 			else
 				tempMessage = TextMessageGet( pName );
@@ -535,7 +537,7 @@ void CHudMessage::MessageAdd(const client_textmessage_t &newMessage )
 
 	// Turn on drawing
 	m_iFlags |= HUD_DRAW;
-	
+
 	for ( int i = 0; i < maxHUDMessages; i++ )
 	{
 		if ( !m_pMessages[i] )
@@ -584,4 +586,6 @@ int CHudMessage::MsgFunc_HudTextArgs( const char *pszName, int iSize, void *pbuf
 		m_iFlags |= HUD_ACTIVE;*/
 
 	return 1;
+}
+
 }

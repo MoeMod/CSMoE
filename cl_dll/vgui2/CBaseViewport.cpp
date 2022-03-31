@@ -1,6 +1,3 @@
-//TODO: Need to merge the vector classes - Solokiller
-#define VECTOR2D_H
-
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 #include <vgui_controls/AnimationController.h>
@@ -17,6 +14,9 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "demo_api.h"
+
+using cl::gHUD;
+using cl::gEngfuncs;
 
 CBaseViewport* g_pViewport = nullptr;
 

@@ -40,6 +40,8 @@ version.
 #include "draw_util.h"
 #include "modern/hud_radar_modern.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_Money, Money )
 DECLARE_MESSAGE( m_Money, BlinkAcct )
 
@@ -143,8 +145,8 @@ int CHudMoney::DrawNewHudMoney(float flTime)
 
 			iY -= max(m_iDollarBG->h(), gHUD.m_NEWHUD_iFontHeight_Dollar);
 		}
-		else 
-			DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);	
+		else
+			DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
 	}
 
 	alphaBalance = 255 - interpolate * (255 - MIN_ALPHA);
@@ -316,4 +318,6 @@ int CHudMoney::MsgFunc_BlinkAcct(const char *pszName, int iSize, void *pbuf)
 	m_iBlinkAmt = buf.ReadByte();
 	m_fBlinkTime = 0;
 	return 1;
+}
+
 }

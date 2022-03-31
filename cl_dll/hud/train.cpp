@@ -25,6 +25,8 @@
 #include "parsemsg.h"
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE(m_Train, Train )
 
 
@@ -83,4 +85,5 @@ int CHudTrain::MsgFunc_Train(const char *pszName,  int iSize, void *pbuf)
 		m_iFlags &= ~HUD_DRAW;
 
 	return 1;
+}
 }

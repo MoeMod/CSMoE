@@ -31,6 +31,7 @@ target_include_directories(vguimatsurface PRIVATE
 target_link_libraries(vguimatsurface PRIVATE vgui_surfacelib)
 
 add_subdirectory(vgui_controls)
+add_subdirectory(cso_controls)
 add_subdirectory(GameUI)
 
 add_library(vgui2 STATIC
@@ -138,6 +139,7 @@ target_link_libraries(vgui2_support PUBLIC vgui2_interfaces)
 target_link_libraries(vgui2_support PRIVATE platform_config)
 target_link_libraries(vgui2_support PRIVATE video_config)
 target_link_libraries(vgui2_support PRIVATE vgui_controls)
+target_link_libraries(vgui2_support PRIVATE cso_controls)
 target_link_libraries(vgui2_support PRIVATE vgui_surfacelib)
 target_link_libraries(vgui2_support PRIVATE vguimatsurface)
 target_link_libraries(vgui2_support PRIVATE dead_wrapper)

@@ -29,6 +29,7 @@
 #include "UtlBuffer.h"
 #include "ModInfo.h"
 #include "LogoFile.h"
+#include "BMPUtils.h"
 
 #include <setjmp.h>
 
@@ -546,74 +547,20 @@ void COptionsSubMultiplayer::RemapLogoPalette(char *filename, int r, int g, int 
 	char infile[256];
 	char outfile[256];
 
-	CUtlBuffer outbuffer(16384, 16384, false);
 	sprintf(infile, "logos/%s.bmp", filename);
 	sprintf(outfile, "logos/remapped.bmp");
 
-	FileHandle_t file = vgui2::filesystem()->Open(infile, "rb");
+    auto bmpFile = std::unique_ptr<ui::CBMP>(ui::CBMP::LoadFile( filename ));
+    bmpFile->RemapLogo( r, g, b );
 
-	if (file == FILESYSTEM_INVALID_HANDLE)
-		return;
-/*
-	BITMAPFILEHEADER bmfHeader;
-	DWORD dwBitsSize, dwFileSize;
-	LPBITMAPINFO lpbmi;
-	LPBITMAPCOREINFO lpbmc;
-
-	dwFileSize = vgui2::filesystem()->Size(file);
-	vgui2::filesystem()->Read(&bmfHeader, sizeof(bmfHeader), file);
-	outbuffer.Put(&bmfHeader, sizeof(bmfHeader));
-
-	if (bmfHeader.bfType == DIB_HEADER_MARKER)
-	{
-		dwBitsSize = dwFileSize - sizeof(bmfHeader);
-
-		HGLOBAL hDIB = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize);
-		char *pDIB = (LPSTR)GlobalLock((HGLOBAL)hDIB);
-		{
-			vgui2::filesystem()->Read(pDIB, dwBitsSize, file);
-			lpbmi = (LPBITMAPINFO)pDIB;
-			lpbmc = (LPBITMAPCOREINFO)pDIB;
-
-			bool bWinStyleDIB = true;
-			float f = 0;
-
-			for (int i = 0; i < 256; i++)
-			{
-				float t = f / 256.0;
-
-				if (bWinStyleDIB)
-				{
-					lpbmi->bmiColors[i].rgbRed = (unsigned char)(r * t);
-					lpbmi->bmiColors[i].rgbGreen = (unsigned char)(g * t);
-					lpbmi->bmiColors[i].rgbBlue = (unsigned char)(b * t);
-				}
-				else
-				{
-					lpbmc->bmciColors[i].rgbtRed = (unsigned char)(r * t);
-					lpbmc->bmciColors[i].rgbtGreen = (unsigned char)(g * t);
-					lpbmc->bmciColors[i].rgbtBlue = (unsigned char)(b * t);
-				}
-
-				f++;
-			}
-
-			outbuffer.Put(pDIB, dwBitsSize);
-		}
-
-		GlobalUnlock(hDIB);
-		GlobalFree((HGLOBAL) hDIB);
-	}
-*/
-	vgui2::filesystem()->Close(file);
 	vgui2::filesystem()->RemoveFile(outfile, NULL);
 
 	vgui2::filesystem()->CreateDirHierarchy("logos", NULL);
-	file = vgui2::filesystem()->Open(outfile, "wb");
+	auto file = vgui2::filesystem()->Open(outfile, "wb");
 
 	if (file != FILESYSTEM_INVALID_HANDLE)
 	{
-		vgui2::filesystem()->Write(outbuffer.Base(), outbuffer.TellPut(), file);
+		vgui2::filesystem()->Write(bmpFile->GetBitmap(), bmpFile->GetBitmapHdr()->fileSize, file);
 		vgui2::filesystem()->Close(file);
 	}
 }

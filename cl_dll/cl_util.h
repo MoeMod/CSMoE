@@ -22,6 +22,8 @@
 #define FALSE 0
 #endif
 
+namespace cl {
+
 extern cvar_t *hud_textmode;
 
 #ifdef _MSC_VER
@@ -91,10 +93,8 @@ inline int GetScreenInfo( SCREENINFO *pscrinfo ) { return gEngfuncs.pfnGetScreen
 inline int ServerCmd( const char *szCmdString ) { return gEngfuncs.pfnServerCmd(szCmdString); }
 inline int ClientCmd( const char *szCmdString ) { return gEngfuncs.pfnClientCmd(szCmdString); }
 inline void SetCrosshair( HSPRITE hspr, wrect_t rc, int r, int g, int b ) { return gEngfuncs.pfnSetCrosshair(hspr, rc, r, g, b); }
-namespace cl {
-	inline int Com_RandomLong(int lLow, int lHigh) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
-	inline float Com_RandomFloat(float flLow, float flHigh) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
-}
+inline int Com_RandomLong(int lLow, int lHigh) { return gEngfuncs.pfnRandomLong(lLow, lHigh); }
+inline float Com_RandomFloat(float flLow, float flHigh) { return gEngfuncs.pfnRandomFloat(flLow, flHigh); }
 extern float color[3]; // hud.cpp
 
 // Gets the height & width of a sprite,  at the specified frame
@@ -136,11 +136,9 @@ template<class VectorTypeA, class ScaleType, class VectorTypeB, class VectorType
 template<class VectorTypeA, class ScaleType, class VectorTypeB> void VectorScale(const VectorTypeA &in, ScaleType scale, VectorTypeB &out) { ((out)[0] = (in)[0] * (scale), (out)[1] = (in)[1] * (scale), (out)[2] = (in)[2] * (scale)); }
 template<class VectorTypeA> void VectorInverse(VectorTypeA &x) { ((x)[0] = -(x)[0], (x)[1] = -(x)[1], (x)[2] = -(x)[2]); }
 
-namespace cl{
 	// const vec3_t ==untypedef=> float (const [3]) ==decay=> float *		NOT const float * !!!
 	float VectorNormalize(vec_t v[3]); // pm_math.h
 	//extern vec3_t vec3_origin;
-}
 
 #ifdef MSC_VER
 // disable 'possible loss of data converting float to int' warning message
@@ -197,3 +195,4 @@ constexpr auto bound(MinType min, NumType num, MaxType max) -> typename std::com
 	return ((num) >= (min) ? ((num) < (max) ? (num) : (max)) : (min));
 }
 
+}

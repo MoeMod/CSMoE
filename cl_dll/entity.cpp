@@ -20,6 +20,8 @@
 #include "r_efx.h"
 #include "event_api.h"
 
+using namespace cl;
+
 extern vec3_t v_origin;
 
 int iOnTrain[MAX_PLAYERS];

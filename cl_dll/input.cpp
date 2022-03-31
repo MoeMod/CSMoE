@@ -33,7 +33,7 @@
 #include "vgui_parser.h"
 #include "com_weapons.h"
 
-using namespace cl;
+namespace cl {
 
 extern int g_weaponselect;
 extern cl_enginefunc_t gEngfuncs;
@@ -56,7 +56,6 @@ extern cvar_t *in_joystick;
 int	in_impulse	= 0;
 int	in_cancel	= 0;
 
-namespace cl {
 cvar_t	*m_pitch;
 cvar_t	*m_yaw;
 cvar_t	*m_forward;
@@ -75,7 +74,7 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 cvar_t	*cl_anglespeedkey;
 cvar_t	*cl_vsmoothing;
-}
+
 /*
 ===============================================================================
 
@@ -1010,4 +1009,5 @@ void Input_Shutdown (void)
 	IN_Shutdown();
 #endif
 	KB_Shutdown();
+}
 }

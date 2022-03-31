@@ -28,6 +28,8 @@
 #include "draw_util.h"
 #include "legacy/hud_scoreboard_legacy.h"
 
+namespace cl {
+
 HistoryResource gHR;
 
 #define AMMO_PICKUP_GAP (gHR.iHistoryGap+5)
@@ -111,9 +113,9 @@ void HistoryResource :: AddToHistory( int iType, int iId, int iCount )
 		freeslot->DisplayTime = gHUD.m_flTime + HISTORY_DRAW_TIME;
 
 	}
-	
-	
-	
+
+
+
 }
 
 void HistoryResource :: AddToHistory( int iType, const char *szName, int iCount )
@@ -202,7 +204,7 @@ void HistoryResource :: CheckClearHistory( void )
 
 		iCurrentHistorySlot = 0;
 	}
-	
+
 }
 
 int HistoryResource::DrawNEWHudAmmoHistory(float flTime)
@@ -417,4 +419,4 @@ int HistoryResource :: DrawAmmoHistory( float flTime )
 	return 1;
 }
 
-
+}

@@ -37,7 +37,7 @@ version.
 
 #include <string.h>
 #include <stdio.h>
-
+namespace cl {
 DECLARE_MESSAGE(m_Dgaxe, Dgaxe)
 
 enum
@@ -233,7 +233,7 @@ int CHudDgaxe::Draw(float flTime)
 	}
 	}
 
-	
+
 
 	return 1;
 }
@@ -344,3 +344,4 @@ void CHudDgaxe::Shutdown()
 	std::fill(std::begin(m_pCurTexture), std::end(m_pCurTexture), nullptr);
 }
 
+}

@@ -27,7 +27,7 @@
 #include "com_weapons.h"
 #include "gamemode/mods_const.h"
 
-using namespace cl;
+namespace cl {
 
 DECLARE_MESSAGE( m_StatusIcons, StatusIcon )
 
@@ -134,7 +134,7 @@ int CHudStatusIcons::Draw( float flTime )
 		if ( m_IconList[i].spr )
 		{
 			y -= ( m_IconList[i].rc.bottom - m_IconList[i].rc.top ) + 5;
-			
+
 			/*if( g_bInBombZone && !strcmp(m_IconList[i].szSpriteName, "c4") && ((int)(flTime * 10) % 2))
 				SPR_Set( m_IconList[i].spr, 255, 16, 16 );
 			else SPR_Set( m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b );*/
@@ -158,10 +158,10 @@ int CHudStatusIcons::Draw( float flTime )
 				SPR_Set(m_IconList[i].spr, m_IconList[i].r, m_IconList[i].g, m_IconList[i].b);
 				SPR_DrawAdditive(0, x, y, &m_IconList[i].rc);
 			}
-			
+
 		}
 	}
-	
+
 	return 1;
 }
 
@@ -252,4 +252,6 @@ void CHudStatusIcons::DisableIcon( const char *pszIconName )
 			return;
 		}
 	}
+}
+
 }

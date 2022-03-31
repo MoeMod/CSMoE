@@ -9,6 +9,8 @@
 
 using namespace cl;
 
+namespace cl {
+
 cvar_t	*cl_laddermode;
 cvar_t	*sensitivity;
 cvar_t	*in_joystick;
@@ -210,16 +212,18 @@ void IN_Move( float frametime, usercmd_t *cmd )
 	}
 
 	dead_viewangles = viewangles;
-	
+
 	if( ac_movecount )
 	{
 		IN_ToggleButtons( ac_forwardmove / ac_movecount, ac_sidemove / ac_movecount );
 		if( ac_forwardmove ) cmd->forwardmove  = ac_forwardmove * cl_forwardspeed->value / ac_movecount;
 		if( ac_sidemove ) cmd->sidemove  = ac_sidemove * cl_sidespeed->value / ac_movecount;
 	}
-	
+
 	ac_sidemove = ac_forwardmove = rel_pitch = rel_yaw = 0;
 	ac_movecount = 0;
+}
+
 }
 
 #ifdef XASH_STATIC_GAMELIB
@@ -241,8 +245,8 @@ void DLLEXPORT IN_MouseEvent( int mstate )
 		{
 			gEngfuncs.Key_Event( K_MOUSE1 + i, 0 );
 		}
-	}	
-	
+	}
+
 	mouse_oldbuttonstate = mstate;
 	bMouseInUse = true;
 }
@@ -277,6 +281,8 @@ void DLLEXPORT IN_Accumulate ( void )
 	//gEngfuncs.Con_Printf("IN_Accumulate\n");
 }
 
+namespace cl {
+
 void IN_Commands ( void )
 {
 	//gEngfuncs.Con_Printf("IN_Commands\n");
@@ -300,8 +306,8 @@ void IN_Init (void)
 	in_joystick = gEngfuncs.pfnRegisterVariable ( "joystick", "0", FCVAR_ARCHIVE );
 	cl_laddermode = gEngfuncs.pfnRegisterVariable ( "cl_laddermode", "2", FCVAR_ARCHIVE );
 	evdev_grab = gEngfuncs.pfnGetCvarPointer("evdev_grab");
-	
-	
+
+
 #ifdef __ANDROID__
 	gEngfuncs.Cvar_SetValue("m_yaw", -1);
 	gEngfuncs.Cvar_SetValue("m_pitch", -1);
@@ -309,4 +315,6 @@ void IN_Init (void)
 #endif
 
 	ac_forwardmove = ac_sidemove = rel_yaw = rel_pitch = 0;
+}
+
 }

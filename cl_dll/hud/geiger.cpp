@@ -26,6 +26,8 @@
 
 #include "parsemsg.h"
 
+namespace cl {
+
 DECLARE_MESSAGE(m_Geiger, Geiger )
 
 int CHudGeiger::Init(void)
@@ -68,7 +70,7 @@ int CHudGeiger::Draw (float flTime)
 	int pct = 0;
 	float flvol = 0.0f;
 	int i = 0;
-	
+
 	if (m_iGeigerRange < 1000 && m_iGeigerRange > 0)
 	{
 		// peicewise linear is better than continuous formula for this
@@ -142,18 +144,20 @@ int CHudGeiger::Draw (float flTime)
 
 		if( pct && (rand() & 127) < pct )
 		{
-			//S_StartDynamicSound (-1, 0, rgsfx[rand() % i], r_origin, flvol, 1.0, 0, 100);	
+			//S_StartDynamicSound (-1, 0, rgsfx[rand() % i], r_origin, flvol, 1.0, 0, 100);
 			char sz[256];
-			
+
 			int j = rand() & 1;
 			if( i > 2 )
 				j += rand() & 1;
 
 			sprintf( sz, "player/geiger%d.wav", j + 1 );
 			PlaySound( sz, flvol );
-			
+
 		}
 	}
 
 	return 1;
+}
+
 }

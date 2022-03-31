@@ -35,6 +35,8 @@ version.
 
 #include "unicode_strtools.h"
 
+namespace cl {
+
 #define IsColorString( p )	( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 #define IsColorStringW( p )	( p && *( p ) == L'^' && *(( p ) + 1) && *(( p ) + 1) >= L'0' && *(( p ) + 1 ) <= L'9' )
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
@@ -61,9 +63,9 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 
 	wchar_t wstr[1024];
 	Q_UTF8ToUnicode(str, wstr, 1024, STRINGCONVERT_SKIP);
-	
+
 	wchar_t* szIt = wstr;
-	
+
 	// draw the string until we hit the null character or a newline character
 	for ( ; *szIt != 0 && *szIt != L'\n'; szIt++ )
 	{
@@ -115,7 +117,7 @@ int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *
 
 	if (!wstr[0])
 		return 0;
-	
+
 	// iterate throug the string in reverse
 	for ( signed int i = wcslen(wstr); i > 0; i-- )
 	{
@@ -430,4 +432,6 @@ int DrawUtils::HudStringLen( const char *szIt, float scale )
 		l += gHUD.m_scrinfo.charWidths[(unsigned char)*szIt] * scale;
 	}
 	return l;
+}
+
 }

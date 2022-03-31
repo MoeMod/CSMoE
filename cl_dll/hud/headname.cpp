@@ -5,6 +5,8 @@
 #include "com_model.h"
 #include "calcscreen.h"
 
+namespace cl {
+
 int CHudHeadName::Init(void)
 {
 	gHUD.AddHudElem(this);
@@ -64,4 +66,5 @@ int CHudHeadName::Draw(float flTime)
 	}
 
 	return 1;
+}
 }

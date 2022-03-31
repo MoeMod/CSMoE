@@ -4,7 +4,7 @@
 #include "interface.h"
 
 // handle to a KeyValues key name symbol
-typedef int HKeySymbol;
+typedef intp HKeySymbol;
 #define INVALID_KEY_SYMBOL (-1)
 
 class IKeyValues : public IBaseInterface

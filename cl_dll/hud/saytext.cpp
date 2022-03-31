@@ -30,7 +30,7 @@
 #include "com_weapons.h"
 //#include "vgui_TeamFortressViewport.h"
 
-using namespace cl;
+namespace cl {
 
 extern float *GetClientColor( int clientIndex );
 
@@ -252,7 +252,7 @@ int CHudSayText :: MsgFunc_SayText( const char *pszName, int iSize, void *pbuf )
 	else
 		snprintf(dst, sizeof(dst), fmt, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
 	SayTextPrint( dst, strlen(dst),  client_index );
-	
+
 	return 1;
 }
 
@@ -369,7 +369,7 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 
 				// find an empty string slot
 				int j;
-				do 
+				do
 				{
 					for ( j = 0; j < MAX_LINES; j++ )
 					{
@@ -411,4 +411,6 @@ void CHudSayText :: EnsureTextFitsInOneLineAndWrapIfHaveTo( int line )
 			}
 		}
 	}
+}
+
 }

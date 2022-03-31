@@ -1,6 +1,6 @@
-#include <vgui/ISurface.h>
 
 #include "CBackGroundPanel.h"
+#include <vgui/ISurface.h>
 
 CBackGroundPanel::CBackGroundPanel( vgui2::Panel* pParent )
 	: BaseClass( pParent, "ViewPortBackGround" )

@@ -5,6 +5,8 @@
 #include "keydefs.h"
 #include "input.h"
 
+using namespace cl;
+
 extern "C" {
 
 int DLLEXPORT IN_ClientTouchEvent(int type_id, int fingerID, float x, float y, float dx, float dy)

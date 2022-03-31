@@ -20,9 +20,11 @@ GNU General Public License for more details.
 
 #include <algorithm> // std::remove_if
 
+namespace cl {
+
 int CHudRetina::Init(void)
 {
-	
+
 
 	gHUD.AddHudElem(this);
 	m_iFlags = 0;
@@ -119,4 +121,6 @@ SharedTexture CHudRetina::PrecacheTexture(const char *path)
 		iter = m_TextureMap.emplace(path, R_LoadTextureShared(path)).first;
 	}
 	return iter->second;
+}
+
 }

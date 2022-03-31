@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_MOTD, MOTD )
 
 int CHudMOTD :: Init( void )
@@ -117,7 +119,7 @@ int CHudMOTD :: Draw( float fTime )
 
 		ypos += LINE_HEIGHT;
 
-		if ( top )  // restore 
+		if ( top )  // restore
 			*top = '\n';
 		ch = next_line;
 		if ( *ch == '\n' )
@@ -126,7 +128,7 @@ int CHudMOTD :: Draw( float fTime )
 		if ( ypos > (ScreenHeight - 20) )
 			break;  // don't let it draw too low
 	}
-	
+
 	return 1;
 }
 
@@ -159,7 +161,7 @@ int CHudMOTD :: MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 	if ( is_finished )
 	{
 		int length = 0;
-		
+
 		m_iMaxLength = 0;
 		m_iFlags |= HUD_DRAW;
 
@@ -177,7 +179,7 @@ int CHudMOTD :: MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 			}
 			length++;
 		}
-		
+
 		m_iLines++;
 		if( length > m_iMaxLength )
 		{
@@ -188,4 +190,6 @@ int CHudMOTD :: MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 	}
 
 	return 1;
+}
+
 }

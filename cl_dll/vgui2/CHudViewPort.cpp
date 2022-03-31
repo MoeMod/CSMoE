@@ -10,6 +10,9 @@
 #include "hud.h"
 #include "parsemsg.h"
 
+using cl::gHUD;
+using cl::gEngfuncs;
+
 void CHudViewport::ApplySchemeSettings(vgui2::IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);

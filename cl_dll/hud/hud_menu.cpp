@@ -33,6 +33,8 @@
 
 //#include "vgui_TeamFortressViewport.h"
 
+namespace cl {
+
 #define MAX_MENU_STRING	512
 
 char g_szMenuString[MAX_MENU_STRING];
@@ -106,7 +108,7 @@ int CHudMenu :: Draw( float flTime )
 	cl::ImGuiCL_Menu_OnGUI();
 	return 1;
 #endif
-	
+
 	// don't draw the menu if the scoreboard is being shown
 	//if ( gViewPort && gViewPort->IsScoreBoardVisible() )
 		//return 1;
@@ -137,7 +139,7 @@ int CHudMenu :: Draw( float flTime )
 		if ( g_szMenuString[i] == '\n' )
 			i++;
 	}
-	
+
 	return 1;
 }
 
@@ -322,7 +324,7 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 			szCmd = "exec touch/buy.cfg";
 			break;
 		}
-		
+
 		break;
 	case MENU_BUY_PISTOL:
 		if( g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_TERRORIST )
@@ -399,4 +401,6 @@ void CHudMenu::UserCmd_ShowVGUIMenu()
 
 	int menuType = atoi(gEngfuncs.Cmd_Argv(1));
 	ShowVGUIMenu(menuType);
+}
+
 }

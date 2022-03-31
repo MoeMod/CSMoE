@@ -55,7 +55,7 @@ int DLLEXPORT CL_IsThirdPerson_CL( void );
 int DLLEXPORT CL_IsThirdPerson( void );
 #endif
 
-using namespace cl;
+namespace cl {
 
 /*
 The view is allowed to move slightly from it's true position for bobbing,
@@ -67,10 +67,8 @@ when crossing a water boudnary.
 extern cvar_t	*chase_active;
 extern cvar_t	*scr_ofsx, *scr_ofsy, *scr_ofsz;
 
-namespace cl {
 extern cvar_t    *cl_forwardspeed;
 extern cvar_t    *cl_vsmoothing;
-}
 
 #define	CAM_MODE_RELAX		1
 #define CAM_MODE_FOCUS		2
@@ -1982,4 +1980,6 @@ void V_Init (void)
 	cl_csgoviewmode		= gEngfuncs.pfnRegisterVariable("cl_csgoviewmode", "0", 0);
 	cl_waterdist		= gEngfuncs.pfnRegisterVariable( "cl_waterdist","4", 0 );
 	cl_chasedist		= gEngfuncs.pfnRegisterVariable( "cl_chasedist","112", 0 );
+}
+
 }

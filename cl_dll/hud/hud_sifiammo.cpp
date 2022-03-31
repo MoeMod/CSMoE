@@ -25,6 +25,9 @@
 #include "com_model.h"
 
 #include "triangleapi.h"
+
+namespace cl {
+
 #define BOUND_VALUE(var, min, max) if ((var) > (max)) { (var) = (max); }; if ((var) < (min)) { (var) = (min); }
 
 struct SiFiammoItem
@@ -104,7 +107,7 @@ int CHudSiFiammo:: Draw( float flTime )
 
 	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
 		return 0;
-	
+
 	if ((int)hud_sifiammo_style->value != current_style) {
 		int new_style = (int)hud_sifiammo_style->value;
 		if (new_style >= 2 && new_style <= 9) {
@@ -273,7 +276,7 @@ int CHudSiFiammo:: Draw( float flTime )
 void CHudSiFiammo::Draw2DQuad_Custom(float x, float y, float scale, int num, int r, int g, int b, int alpha) //m_flScale;
 {
 	if (!m_iTex->valid()) return;
-	
+
 	gEngfuncs.pTriAPI->Color4ub(r, g, b, alpha);
 	float w = m_iTex->w() / 10.0f / 2.0f, h = m_iTex->h() / 2.0f;
 	w *= scale;
@@ -281,3 +284,4 @@ void CHudSiFiammo::Draw2DQuad_Custom(float x, float y, float scale, int num, int
 	m_iTex->Draw2DQuadScaled(x - w, y - h, x + w, y + h, 0.1 * num, 0, 0.1 * (num + 1), 1);
 }
 
+}

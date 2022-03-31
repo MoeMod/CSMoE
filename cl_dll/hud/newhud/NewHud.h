@@ -14,6 +14,7 @@
 ****/
 #pragma once
 #include "hud_sub.h"
+namespace cl {
 extern vec3_t g_velocity;
 
 class CHudNewHud : public CHudBase
@@ -44,3 +45,4 @@ private:
 	UniqueTexture m_iWeaponBG;
 
 };
+}

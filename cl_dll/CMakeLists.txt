@@ -339,6 +339,18 @@ else()
 	set(LUASH_SRCS )
 endif()
 
+if(XASH_VGUI2)
+	set(VGUI2_SRCS
+		vgui2/CBackGroundPanel.cpp
+		vgui2/CBaseViewport.cpp
+		vgui2/CClientMOTD.cpp
+		vgui2/CClientVGUI.cpp
+		vgui2/CHudViewPort.cpp
+	)
+else()
+	set(VGUI2_SRCS )
+endif()
+
 set_source_files_properties(
     ${LUASH_SRCS} PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
 )
@@ -374,6 +386,7 @@ set (CLDLL_SOURCES
 	${HLWPN_SRCS}
 	${STUDIORENDER_SRCS}
 	${IMGUI_SRCS}
+	${VGUI2_SRCS}
 )
 
 include_directories (
@@ -435,6 +448,10 @@ endif()
 
 if(XASH_LUASH)
 	target_link_libraries( ${CLIENT_LIBRARY} luash)
+endif()
+
+if(XASH_VGUI2)
+	target_link_libraries( ${CLIENT_LIBRARY} vgui_controls)
 endif()
 
 target_link_libraries( ${CLIENT_LIBRARY} platform_config )

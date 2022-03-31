@@ -49,8 +49,8 @@ namespace luash {
 	EXTERN_TEMPLATE_DEF(const char)
 	EXTERN_TEMPLATE_DEF(float)
 	EXTERN_TEMPLATE_DEF(const float)
-	EXTERN_TEMPLATE_DEF(Vector)
-	EXTERN_TEMPLATE_DEF(const Vector)
+	EXTERN_TEMPLATE_DEF(cl::Vector)
+	EXTERN_TEMPLATE_DEF(const cl::Vector)
 
 }
 

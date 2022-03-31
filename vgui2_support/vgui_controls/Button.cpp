@@ -81,8 +81,11 @@ void Button::Init()
 	// labels have this off by default, but we need it on
 	SetPaintBackgroundEnabled( true );
 
+#ifndef DISABLE_MOE_VGUI2_EXT
 	// Modified to fit in CSO Style
 	SetContentAlignment(a_center);
+    SetTouchInputEnabled(true);
+#endif
 
 	_paint = true;
 	_imageBackground = false;

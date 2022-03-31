@@ -30,7 +30,6 @@
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
-}
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -139,4 +138,5 @@ void R_AttachTentToPlayer(int client, int modelIndex, vec3_t offset, float life,
 		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->die = gHUD.m_flTime + life;
 
+}
 }

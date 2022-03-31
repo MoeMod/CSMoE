@@ -20,7 +20,7 @@
 #define MAX_WEAPON_POSITIONS		19
 
 #include <set>
-
+namespace cl {
 class WeaponsResource
 {
 private:
@@ -48,7 +48,7 @@ public:
 ///// WEAPON /////
 	int			iOldWeaponBits;
 
-	WEAPON *GetWeapon( int iId ) { 
+	WEAPON *GetWeapon( int iId ) {
 		auto iter = rgWeapons.find(iId);
 		if (iter == rgWeapons.end())
 			return nullptr;
@@ -56,8 +56,8 @@ public:
 		return &iter->second;
 	}
 
-	void AddWeapon( WEAPON *wp ) 
-	{ 
+	void AddWeapon( WEAPON *wp )
+	{
 		rgWeapons[wp->iId] = *wp;
 		LoadWeaponSprites(&rgWeapons[wp->iId]);
 	}
@@ -161,5 +161,5 @@ public:
 
 extern HistoryResource gHR;
 
-
+}
 

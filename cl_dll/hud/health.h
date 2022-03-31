@@ -30,13 +30,15 @@ constexpr int DMG_IMAGE_HALLUC = 11;
 constexpr size_t NUM_DMG_TYPES = 12;
 // instant damage
 
+namespace cl {
+
 struct DAMAGE_IMAGE
 {
 	float fExpire;
 	float fBaseline;
 	int	x, y;
 };
-	
+
 //
 //-----------------------------------------------------
 //
@@ -79,3 +81,4 @@ private:
 	cvar_t *cl_radartype;
 	UniqueTexture m_pTexture_Black;
 };
+}

@@ -9,7 +9,7 @@ enum mvp_type
 	MVP_ASSIST,
 	MVP_INFECTION
 };
-
+namespace cl {
 class CHudMVP : public CHudBase
 {
 public:
@@ -20,7 +20,7 @@ public:
 	void Shutdown(void) override;
 
 	CHudMsgFunc(MVPInfo);
-	
+
 public:
 	void SetContent(int player, int data, int rank, int type) { m_MVPData[type][rank].iIndex = player; m_MVPData[type][rank].iData = data;}
 	void UpdateData(int type, int bombhandler);
@@ -48,3 +48,4 @@ private:
 	char m_wszTitle[64], m_wszLabel[3][32];
 	char m_szScoreType[3][32];
 };
+}

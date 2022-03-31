@@ -14,6 +14,8 @@
 #include "event_api.h"
 #include "r_efx.h"
 
+namespace cl {
+
 // defaults for clientinfo messages
 #define IS_FIRSTPERSON_SPEC ( g_iUser1 == OBS_IN_EYE || (g_iUser1 && (gHUD.m_Spectator.m_pip->value == INSET_IN_EYE)) )
 
@@ -93,5 +95,5 @@ inline void EV_EjectBrass( const vec3_t origin, const vec3_t velocity, float rot
 	gEngfuncs.pEfxAPI->R_TempModel( origin, velocity, angles, life, model, soundtype );
 }
 
-
+}
 #endif // EVENTSCRIPTS_H

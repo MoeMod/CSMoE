@@ -23,6 +23,8 @@
 #include "cl_util.h"
 #include "draw_util.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_Battery, Battery )
 DECLARE_MESSAGE( m_Battery, ArmorType )
 
@@ -106,11 +108,11 @@ int CHudBattery::Draw( float flTime )
 		return 1;
 
 	if (gHUD.m_hudstyle->value == 2)
-	{ 
+	{
 		DrawNewHudArmor(flTime);
 		return 1;
 	}
-		
+
 
 	int r, g, b, x, y, a, x1;
 	int ArmorWidth, ArmorHeight;
@@ -162,8 +164,8 @@ int CHudBattery::Draw( float flTime )
 	}
 
 	// make sure we have the right sprite handles
-	
-	
+
+
 	SPR_Set( m_hFull[m_enArmorType].spr, r, g, b );
 	SPR_DrawAdditive( 0, x, y, &m_hFull[m_enArmorType].rect );
 
@@ -179,7 +181,7 @@ int CHudBattery::Draw( float flTime )
 	x = DrawUtils::DrawHudNumber( x, y, DHN_3DIGITS|DHN_DRAWZERO, m_iBat, r, g, b );
 	if (gHUD.m_hudstyle->value == 1)
 	{
-		
+
 		float f = (float)m_iBat / (float)100;
 		x = DrawBar(x + ArmorWidth / 2, y + 2.5, ArmorWidth * 5, ArmorHeight * 0.8, f, r, g, b, a);
 	}
@@ -228,4 +230,6 @@ int CHudBattery::MsgFunc_ArmorType(const char *pszName,  int iSize, void *pbuf )
 	m_enArmorType = (armortype_t)reader.ReadByte();
 
 	return 1;
+}
+
 }

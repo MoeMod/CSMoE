@@ -39,6 +39,8 @@ version.
 #include "gamemode/mods_const.h"
 #include "legacy/hud_scoreboard_legacy.h"
 
+namespace cl {
+
 DECLARE_MESSAGE( m_Timer, RoundTime )
 DECLARE_MESSAGE( m_Timer, ShowTimer )
 
@@ -53,7 +55,7 @@ int CHudTimer::Init()
 	HOOK_MESSAGE( ShowTimer );
 	m_iFlags = 0;
 	m_bPanicColorChange = false;
-	gHUD.AddHudElem(this);	
+	gHUD.AddHudElem(this);
 	return 1;
 }
 
@@ -129,7 +131,7 @@ int CHudTimer::Draw( float fTime )
 		DrawNEWHudTimer(fTime);
 		return 1;
 	}
-	
+
 	int r, g, b;
 	// time must be positive
 	int minutes = max( 0, (int)( m_iTime + m_fStartTime - gHUD.m_flTime ) / 60);
@@ -160,12 +162,12 @@ int CHudTimer::Draw( float fTime )
 
 	DrawUtils::ScaleColors( r, g, b,  MIN_ALPHA );
 
-    
+
     int iWatchWidth = gHUD.GetSpriteRect(m_HUD_timer).right - gHUD.GetSpriteRect(m_HUD_timer).left;
 	int iNumberWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
 
 	int y = ScreenHeight - 1.5 * gHUD.m_iFontHeight ;
-    
+
 	if (gHUD.m_hudstyle->value == 1 && gHUD.m_iModRunning == MOD_NONE)
 	{
 		int x = ScreenWidth / 2;
@@ -178,7 +180,7 @@ int CHudTimer::Draw( float fTime )
 		// draw :
 		FillRGBA(x + iWatchWidth / 4 , y + gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);
 		FillRGBA(x + iWatchWidth / 4, y + gHUD.m_iFontHeight - gHUD.m_iFontHeight / 4, 2, 2, r, g, b, 255);
-		
+
 
 		x = DrawUtils::DrawHudNumber2(x + iWatchWidth / 2, y, true, 2, seconds, r * 255, g * 255, b * 255);
 
@@ -350,4 +352,6 @@ int CHudProgressBar::MsgFunc_BotProgress(const char *pszName, int iSize, void *p
 	}
 
 	return 1;
+}
+
 }

@@ -23,11 +23,12 @@
 #include "com_model.h"
 #include "triangleapi.h"
 
+namespace cl {
 
 DECLARE_MESSAGE(m_HitIndicator, HitMsg )
 
 
-struct HitIndicatorItem 
+struct HitIndicatorItem
 {
 	int iVictim;
 	char damage_num[32];
@@ -195,7 +196,7 @@ int CHudHitIndicator:: Draw( float flTime )
 			float iAlpha;
 			byte byFlag = pList[i].byFlag;
 
-			if (i == MAX_INDICATORS || pList[i + 1].iId == 0) bIsNewest = true; //Newest one larger  
+			if (i == MAX_INDICATORS || pList[i + 1].iId == 0) bIsNewest = true; //Newest one larger
 
 			fProgress = (flTime + DAMAGENUM_DISPLAY_TIME - pList[i].flDisplayTime) / DAMAGENUM_DISPLAY_TIME;
 			if (!bIsNewest) fProgress += 0.2f;
@@ -241,15 +242,15 @@ int CHudHitIndicator:: Draw( float flTime )
 				Draw2DQuad_Custom(screen[0] + gap * ((count + 1) / 2.0f - j), screen[1], fScale, iDamage % 10, isheadshot, iAlpha);
 				iDamage /= 10;
 			}
-			
+
 			float x, y;
 			if (byFlag & HIT_FLAGS_CRITICAL) {   //Critical
-				
+
 				x = screen[0] - (gap * (count / 2.0f));
 				y = screen[1] - fScale * m_iTex[0]->h() / 2.0f;
 				Draw2DQuad_Custom(x, y, fScale, 0, 3, iAlpha);
 			}
-			
+
 			if (byFlag & HIT_FLAGS_BACKATK) {   //BackAttack
 				x = screen[0] + fScale * m_iTex[3]->w() / 2.0f;
 				y = screen[1] - fScale * (m_iTex[4]->h() / 2.0f + m_iTex[0]->h() / 2.0f);
@@ -329,4 +330,5 @@ void CHudHitIndicator::Draw2DQuad_Custom(float x, float y, float scale, int num,
 	else { a1 = 0; a2 = 0; a3 = 1; a4 = 1; }
 
 	m_iTex[iTexID]->Draw2DQuad(x - w, y - h, x + w, y + h, a1 , 0, a3, 1, 255, 255, 255, alpha);
+}
 }

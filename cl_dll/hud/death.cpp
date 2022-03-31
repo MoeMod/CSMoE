@@ -23,18 +23,20 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+namespace cl {
+
 float color[3];
 
 DECLARE_MESSAGE( m_DeathNotice, DeathMsg )
 
 enum DrawBgType
 {
-	DB_NONE, 
+	DB_NONE,
 	DB_KILL,
 	DB_DEATH
 };
 
-struct DeathNoticeItem 
+struct DeathNoticeItem
 {
 	char szKiller[MAX_PLAYER_NAME_LENGTH*2];
 	char szVictim[MAX_PLAYER_NAME_LENGTH*2];
@@ -121,7 +123,7 @@ int CHudDeathNotice :: VidInit( void )
 	R_InitTexture(m_deathBg[0], "resource/Hud/DeathNotice/DeathBg_left");
 	R_InitTexture(m_deathBg[1], "resource/Hud/DeathNotice/DeathBg_center");
 	R_InitTexture(m_deathBg[2], "resource/Hud/DeathNotice/DeathBg_right");
-	
+
 	R_InitTexture(m_csgo_defaultBg[0], "resource/hud/csgo/DeathNotice/DefaultBg_left");
 	R_InitTexture(m_csgo_defaultBg[1], "resource/hud/csgo/DeathNotice/DefaultBg_center");
 	R_InitTexture(m_csgo_defaultBg[2], "resource/hud/csgo/DeathNotice/DefaultBg_right");
@@ -231,7 +233,7 @@ int CHudDeathNotice :: Draw( float flTime )
 
 				x = 5 + DrawUtils::DrawConsoleString( x, y, rgDeathNoticeList[i].szKiller );
 			}
-			
+
 
 			r = 255;  g = 80;	b = 0;
 			if ( rgDeathNoticeList[i].bTeamKill )
@@ -691,6 +693,6 @@ int CHudDeathNotice :: MsgFunc_DeathMsg( const char *pszName, int iSize, void *p
 	return 1;
 }
 
-
+}
 
 

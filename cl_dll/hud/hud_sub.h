@@ -14,7 +14,7 @@ GNU General Public License for more details.
 */
 
 #pragma once
-
+namespace cl {
 // limited RAII support for convenience...
 class IBaseHudSub
 {
@@ -27,3 +27,4 @@ public:
 	virtual void Reset(void) { return; }
 	virtual void InitHUDData(void) {}		// called every time a server is connected to
 };
+}

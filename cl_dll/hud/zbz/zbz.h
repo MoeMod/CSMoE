@@ -2,7 +2,7 @@
 #pragma once
 
 #include "gamemode/zbz/zbz_const.h"
-
+namespace cl {
 class CHudZBZ : public CHudBase
 {
 public:
@@ -21,3 +21,4 @@ protected:
 	class impl_t;
 	impl_t* pimpl;
 };
+}

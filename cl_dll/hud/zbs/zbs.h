@@ -1,6 +1,6 @@
 
 #pragma once
-
+namespace cl {
 class CHudZBS : public CHudBase
 {
 public:
@@ -19,3 +19,4 @@ protected:
 	class impl_t;
 	impl_t *pimpl;
 };
+}

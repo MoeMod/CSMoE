@@ -13,11 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#ifndef VECTOR_H
-#define VECTOR_H
-#ifdef _WIN32
 #pragma once
-#endif
 
 #ifdef DotProduct
 #undef DotProduct
@@ -43,5 +39,3 @@ static_assert(sizeof(Vector) == sizeof(float[4]) && alignof(Vector) == 16, "Vect
 static_assert(sizeof(Vector) == sizeof(float[3]), "Vector should be compatible with engine");
 #endif
 }
-
-#endif // VECTOR_H

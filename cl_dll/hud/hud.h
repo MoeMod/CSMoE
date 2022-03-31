@@ -33,6 +33,8 @@
 
 enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
+namespace cl {
+
 #define CHudMsgFunc(x) int MsgFunc_##x(const char *pszName, int iSize, void *buf)
 #define CHudUserCmd(x) void UserCmd_##x()
 
@@ -42,8 +44,8 @@ public:
 	unsigned char r, g, b, a;
 };
 
-enum 
-{ 
+enum
+{
 	MAX_PLAYERS = 33, // including the bomb
 	MAX_TEAMS = 3,
 	MAX_TEAM_NAME = 16,
@@ -100,7 +102,7 @@ struct HUDLIST {
 	HUDLIST		*pNext;
 };
 
-
+}
 
 //
 //-----------------------------------------------------
@@ -122,6 +124,7 @@ struct HUDLIST {
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
 
+namespace cl {
 //
 //-----------------------------------------------------
 //
@@ -199,7 +202,7 @@ public:
 	bool m_bDrawCrosshair;
 	int m_iAmmoLastCheck;
 	float m_flLastHitTime, m_flLastBuffHit;
-	
+
 	cvar_t *m_pClCrosshairColor;
 	cvar_t *m_pClCrosshairTranslucent;
 	cvar_t *m_pClCrosshairSize;
@@ -257,7 +260,7 @@ public:
 	int VidInit( void );
 	int Draw(float flTime);
 	CHudMsgFunc(Geiger);
-	
+
 private:
 	int m_iGeigerRange;
 
@@ -304,7 +307,7 @@ public:
 protected:
 	static int MOTD_DISPLAY_TIME;
 	char m_szMOTD[ MAX_MOTD_LENGTH ];
-	
+
 	int m_iLines;
 	int m_iMaxLength;
 	bool ignoreThisMotd;
@@ -344,7 +347,7 @@ protected:
 	cvar_t *hud_centerid;
 };
 
-struct extra_player_info_t 
+struct extra_player_info_t
 {
 	short frags;
 	short deaths;
@@ -367,7 +370,7 @@ struct extra_player_info_t
 	byte os;
 };
 
-struct team_info_t 
+struct team_info_t
 {
 	char name[MAX_TEAM_NAME];
 	short frags;
@@ -509,7 +512,7 @@ public:
 	void InitHUDData( void );
 	CHudMsgFunc(Battery);
 	CHudMsgFunc(ArmorType);
-	
+
 private:
 	enum armortype_t {
 		Vest = 0,
@@ -542,7 +545,7 @@ public:
 	void Reset( void );
 	CHudMsgFunc(Flashlight);
 	CHudMsgFunc(FlashBat);
-	
+
 private:
 	CClientSprite m_hSprite1;
 	CClientSprite m_hSprite2;
@@ -649,7 +652,7 @@ public:
 		MAX_ICONSPRITES = 4,
 	};
 
-	
+
 	//had to make these public so CHud could access them (to enable concussion icon)
 	//could use a friend declaration instead...
 	void EnableIcon( const char *pszIconName, unsigned char red, unsigned char green, unsigned char blue );
@@ -946,7 +949,7 @@ public:
 	int m_iPlayerLastPointedAt;
 	static float m_fTextScale;
 
-private:	
+private:
 	// szMapName is 64 bytes only. Removing "maps/" and ".bsp" gived me this result
 	class Labels
 	{
@@ -1142,7 +1145,7 @@ public:
 	CHudSpectatorGui m_SpectatorGui;
 	CHudFollowIcon	m_FollowIcon;
 	CHudScenarioStatus m_scenarioStatus;
-	
+
 	CHudHeadName	m_HeadName;
 	CHudRetina		m_Retina;
 	CHudZBS	m_ZBS;
@@ -1219,3 +1222,5 @@ extern int g_iTeamNumber;
 extern int g_iUser1;
 extern int g_iUser2;
 extern int g_iUser3;
+
+}

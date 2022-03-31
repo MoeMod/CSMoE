@@ -7,6 +7,8 @@
 
 #define BOUND_VALUE(var, min, max) if ((var) > (max)) { (var) = (max); }; if ((var) < (min)) { (var) = (min); }
 
+namespace cl {
+
 inline float VectorAngle(const vec3_t a, const vec3_t b)
 {
 	float length_a = a.Length();
@@ -108,4 +110,6 @@ int CalcScreen(const vec3_t in, float out[2])
 	BOUND_VALUE(out[0], 0, (ScreenWidth / 2) * 2);
 	BOUND_VALUE(out[1], 0, (ScreenHeight / 2) * 2);
 	return true;
+}
+
 }

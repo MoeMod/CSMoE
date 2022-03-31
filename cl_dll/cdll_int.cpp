@@ -44,9 +44,7 @@ extern "C"
 #include "pmtrace.h"
 #include "pm_shared.h"
 }
-
-using namespace cl;
-
+namespace cl {
 cl_enginefunc_t gEngfuncs = { };
 render_api_t gRenderAPI = { };
 mobile_engfuncs_t gMobileAPI = { };
@@ -55,10 +53,12 @@ CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
 vec3_t g_velocity;
 int g_iMobileAPIVersion = 0;
-
+}
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
+
+using namespace cl;
 
 #ifdef XASH_STATIC_GAMELIB
 int FS_GetAPI(fs_api_t * g_api);

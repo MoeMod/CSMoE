@@ -41,6 +41,8 @@
 
 #include "cs_wpn/bte_weapons.h"
 
+namespace cl {
+
 extern client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes, int iCount);
 
 wrect_t nullrc = { 0, 0, 0, 0 };
@@ -293,7 +295,7 @@ void CHud :: VidInit( void )
 	// Load Sprites
 	// ---------
 	//	m_hsprFont = LoadSprite("sprites/%d_font.spr");
-	
+
 	m_hsprLogo = 0;
 
 	m_flScale = CVAR_GET_FLOAT( "hud_scale" );
@@ -465,12 +467,12 @@ void COM_FileBase ( const char *in, char *out)
 	int len, start, end;
 
 	len = strlen( in );
-	
+
 	// scan backward for '.'
 	end = len - 1;
 	while ( end && in[end] != '.' && in[end] != '/' && in[end] != '\\' )
 		end--;
-	
+
 	if ( in[end] != '.' )		// no '.', copy to end
 		end = len-1;
 	else
@@ -600,3 +602,4 @@ void CHud::AddHudElem(CHudBase *phudelem)
 	ptemp->pNext = pdl;
 }
 
+}

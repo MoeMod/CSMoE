@@ -31,6 +31,7 @@
 #include "draw_util.h"
 #include "const/const_client.h"
 
+namespace cl {
 
 DECLARE_MESSAGE(m_Health, Health )
 DECLARE_MESSAGE(m_Health, Damage )
@@ -45,7 +46,7 @@ int giDmgHeight, giDmgWidth;
 
 float g_LocationColor[3];
 
-int giDmgFlags[NUM_DMG_TYPES] = 
+int giDmgFlags[NUM_DMG_TYPES] =
 {
 	DMG_POISON,
 	DMG_ACID,
@@ -141,7 +142,7 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	BufferReader reader( pszName, pbuf, iSize );
 	//int x = reader.ReadByte();
 	int x = m_iHealth;
-	
+
 	if (iSize == 4)
 	{
 		x = reader.ReadShort();
@@ -153,7 +154,7 @@ int CHudHealth:: MsgFunc_Health(const char *pszName,  int iSize, void *pbuf )
 	}
 
 	m_iFlags |= HUD_DRAW;
-	
+
 	// Only update the fade if we've changed health
 	if (x != m_iHealth)
 	{
@@ -275,8 +276,8 @@ void CHudHealth::GetPainColor(int& r, int& g, int& b, int& a)
 		}
 	}
 
-	
-#endif 
+
+#endif
 }
 
 
@@ -287,7 +288,7 @@ int CHudHealth::Draw(float flTime)
 		if (gHUD.m_hudstyle->value == 2)
 			DrawNewHudHealth(flTime);
 		else
-			DrawHealthBar(flTime);			
+			DrawHealthBar(flTime);
 		DrawDamage(flTime);
 		DrawPain(flTime);
 	}
@@ -354,7 +355,7 @@ void CHudHealth::DrawHealthBar( float flTime )
 		x = DrawUtils::DrawHudNumber(x, y, DHN_3DIGITS | DHN_DRAWZERO, m_iHealth, r, g, b);
 		//x = DrawUtils::DrawHudNumber2(x, y, m_iHealth, r, g, b);
 
-		
+
 
 		if (gHUD.m_hudstyle->value == 1)
 		{
@@ -464,7 +465,7 @@ void CHudHealth::DrawDamage(float flTime)
 		return;
 
 	DrawUtils::UnpackRGB(r,g,b, RGB_YELLOWISH);
-	
+
 	a = (int)( fabs(sin(flTime*2)) * 256.0);
 
 	DrawUtils::ScaleColors(r, g, b, a);
@@ -515,12 +516,12 @@ void CHudHealth::DrawDamage(float flTime)
 
 
 void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
-{	
+{
 	DAMAGE_IMAGE *pdmg;
 
 	// Which types are new?
 	long bitsOn = ~m_bitsDamage & bitsDamage;
-	
+
 	for (size_t i = 0; i < NUM_DMG_TYPES; i++)
 	{
 		pdmg = &m_dmg[i];
@@ -540,7 +541,7 @@ void CHudHealth::UpdateTiles(float flTime, long bitsDamage)
 			pdmg->x = giDmgWidth/8;
 			pdmg->y = ScreenHeight - giDmgHeight * 2;
 			pdmg->fExpire=flTime + DMG_IMAGE_LIFE;
-			
+
 			// move everyone else up
 			for (size_t j = 0; j < NUM_DMG_TYPES; j++)
 			{
@@ -626,4 +627,6 @@ bool CL_IsDead()
 	if( gHUD.m_Health.m_iHealth <= 0 )
 		return true;
 	return false;
+}
+
 }

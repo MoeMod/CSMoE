@@ -17,6 +17,8 @@ GNU General Public License for more details.
 
 #include "hud_sub.h"
 
+namespace cl {
+
 class CHudZ4Scoreboard : public IBaseHudSub
 {
 public:
@@ -31,7 +33,7 @@ public:
 	void DrawScore(float time);
 	void DrawNumber(int n, int x, int y, float scale, int r, int g, int b);
 	void DrawNumbers(int n, int x, int y, int from_right, float scale = 1.0f, int r = 255, int g = 255, int b = 255);
-	
+
 	void SetTeam(int team) { m_iTeam = team; }
 	void SetDamage(int damage) { m_iDamage = damage; }
 	void SetLastScore() { m_iLastScore = g_PlayerExtraInfo[gEngfuncs.GetLocalPlayer()->index].frags; }
@@ -50,3 +52,5 @@ private:
 	int m_iLastScore;
 	int g_iSelectionHeight;
 };
+
+}

@@ -33,7 +33,7 @@
 
 #include "gamemode/mods_const.h"
 
-using namespace cl;
+namespace cl {
 
 extern float g_flRoundTime;
 
@@ -140,7 +140,7 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	}
 	case MOD_TDM:
 	{
-		
+
 		break;
 	}
 	case MOD_DM:
@@ -230,4 +230,5 @@ int CHud::MsgFunc_OperationSystem(const char* pszName, int iSize, void* pbuf)
 			g_PlayerExtraInfo[index].os = OS_Android;
 	}
 	return 1;
+}
 }

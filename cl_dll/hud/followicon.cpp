@@ -8,6 +8,8 @@
 
 #include "gamemode/mods_const.h"
 
+namespace cl {
+
 int CHudFollowIcon::Init(void)
 {
 	m_iBombTargetsNum = 0;
@@ -18,11 +20,11 @@ int CHudFollowIcon::Init(void)
 
 int CHudFollowIcon::VidInit(void)
 {
-	if (!m_pTexture_BombAB[0]) 
+	if (!m_pTexture_BombAB[0])
 		m_pTexture_BombAB[0] = R_LoadTextureUnique("resource/helperhud/c4_a");
-	if (!m_pTexture_BombAB[1]) 
+	if (!m_pTexture_BombAB[1])
 		m_pTexture_BombAB[1] = R_LoadTextureUnique("resource/helperhud/c4_b");
-	if (!m_pTexture_Supplybox) 
+	if (!m_pTexture_Supplybox)
 		m_pTexture_Supplybox = R_LoadTextureUnique("resource/helperhud/supplybox");
 	m_iFlags |= HUD_DRAW;
 	return 1;
@@ -37,7 +39,7 @@ void CHudFollowIcon::Shutdown(void)
 
 void CHudFollowIcon::Reset(void)
 {
-	
+
 }
 
 int CHudFollowIcon::Draw(float time)
@@ -77,8 +79,10 @@ int CHudFollowIcon::Draw(float time)
 
 			}
 		}
-		
+
 	}
 
 	return 1;
+}
+
 }

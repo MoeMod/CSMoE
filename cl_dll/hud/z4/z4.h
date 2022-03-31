@@ -16,7 +16,7 @@ GNU General Public License for more details.
 #pragma once
 
 #include "gamemode/z4/z4_const.h"
-
+namespace cl {
 class CHudZ4 : public CHudBase
 {
 public:
@@ -37,3 +37,4 @@ protected:
 	class impl_t;
 	impl_t *pimpl;
 };
+}

@@ -19,7 +19,7 @@
 #include <map>
 
 #include "r_texture.h"
-
+namespace cl {
 class CHudRetina : public CHudBase
 {
 public:
@@ -46,7 +46,7 @@ public:
 		float flTimeEnd;
 		MagicNumber num;
 	};
-	
+
 	MagicNumber AddItem(SharedTexture tex, int type = RETINA_DRAW_TYPE_NONE, float time = -1.0f);
 	MagicNumber AddItem(SharedTexture tex, int type, float time, MagicNumber num);
 	bool RemoveItem(MagicNumber idx);
@@ -58,3 +58,4 @@ private:
 	std::vector<RetinaDrawItem_s> m_ItemList;
 	std::map<std::string, SharedTexture> m_TextureMap;
 };
+}

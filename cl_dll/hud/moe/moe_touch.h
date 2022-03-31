@@ -22,7 +22,7 @@ enum touchEventType : int
 	event_up,
 	event_motion
 };
-
+namespace cl {
 class CHudMoeTouch : public CHudBase
 {
 public:
@@ -42,3 +42,4 @@ protected:
 	class impl_t;
 	impl_t *pimpl;
 };
+}

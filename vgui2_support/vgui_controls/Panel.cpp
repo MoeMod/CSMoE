@@ -2798,6 +2798,16 @@ bool Panel::IsWithin(int x,int y)
 	// check against our clip rect
 	int clipRect[4];
 	ipanel()->GetClipRect(GetVPanel(), clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
+#ifndef DISABLE_MOE_VGUI2_EXT
+    if(IsTouchInputEnabled())
+    {
+        const int padding = 6;
+        clipRect[0] -= padding;
+        clipRect[1] -= padding;
+        clipRect[2] += padding;
+        clipRect[3] += padding;
+    }
+#endif
 
 	if (x < clipRect[0])
 	{
