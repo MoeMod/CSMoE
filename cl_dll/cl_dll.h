@@ -64,6 +64,8 @@ typedef struct weapon_data_s weapon_data_t;
 
 struct ImGuiContext;
 
+namespace cl {
+
 extern "C"
 {
 int        DLLEXPORT Initialize( cl_enginefunc_t *pEnginefuncs, int iVersion );
@@ -114,7 +116,6 @@ void       DLLEXPORT IN_ClientLookEvent( float relyaw, float relpitch );
 void       DLLEXPORT HUD_OnGUI( ImGuiContext *context );
 }
 
-namespace cl {
 extern cl_enginefunc_t gEngfuncs;
 extern render_api_t gRenderAPI;
 extern mobile_engfuncs_t gMobileAPI;

@@ -20,7 +20,6 @@ GNU General Public License for more details.
 
 #include "render_api.h"
 #include "mobility_int.h"
-#include "vgui_parser.h"
 
 #include "const.h"
 #include "entity_state.h"

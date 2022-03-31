@@ -6,6 +6,8 @@
 #include "hud_sub.h"
 #include <set>
 
+namespace cl {
+
 class CHudZBZ_Skill : public IBaseHudSub
 {
 public:
@@ -47,3 +49,5 @@ private:
 	int m_iSkillPoints;
 	std::set<ZombieZSkillSkillId> m_SkillList;
 };
+
+}

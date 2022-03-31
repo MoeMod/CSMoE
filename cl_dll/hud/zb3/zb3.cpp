@@ -28,6 +28,7 @@ GNU General Public License for more details.
 #include "gamemode/zb3/zb3_const.h"
 
 #include <vector>
+namespace cl {
 
 class CHudZB3::impl_t
 	: public THudSubDispatcher<CHudZB3Morale, CHudZB3Rage>
@@ -69,7 +70,7 @@ int CHudZB3::MsgFunc_ZB3Msg(const char *pszName, int iSize, void *pbuf)
 		break;
 	}
 	}
-	
+
 	return 1;
 }
 
@@ -116,4 +117,5 @@ void CHudZB3::Shutdown(void)
 {
 	delete pimpl;
 	pimpl = nullptr;
+}
 }

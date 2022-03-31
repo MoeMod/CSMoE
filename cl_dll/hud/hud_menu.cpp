@@ -105,7 +105,7 @@ int CHudMenu :: Draw( float flTime )
 
 #ifdef XASH_IMGUI
 	// we have imgui one
-	cl::ImGuiCL_Menu_OnGUI();
+	ImGuiCL_Menu_OnGUI();
 	return 1;
 #endif
 
@@ -383,7 +383,7 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 
 	if (menuType == MENU_TEAM)
 	{
-		cl::LuaCL_Exec("imgui_jointeam_open = true");
+		LuaCL_Exec("imgui_jointeam_open = true");
 		return;
 	}
 #endif

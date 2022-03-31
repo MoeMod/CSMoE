@@ -25,7 +25,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "vgui_parser.h"
 #include "draw_util.h"
 #include "com_weapons.h"
 //#include "vgui_TeamFortressViewport.h"

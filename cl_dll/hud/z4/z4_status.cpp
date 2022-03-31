@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "z4.h"
 #include "z4_status.h"
 
+namespace cl {
+
 #define X_Start 10
 
 const char* g_szStatusIcon[Z4_MAX_STATUS] = {
@@ -184,4 +186,6 @@ int CHudZ4Status::Draw(float time)
 	}
 
 	return 1;
+}
+
 }

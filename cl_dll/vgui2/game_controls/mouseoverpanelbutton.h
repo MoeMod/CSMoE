@@ -5,10 +5,10 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
-#include <vgui_controls/Button.h>
-#include <vgui/KeyCode.h>
-#include <FileSystem.h>
+#include "vgui/IScheme.h"
+#include "vgui_controls/Button.h"
+#include "vgui/KeyCode.h"
+#include "FileSystem.h"
 
 extern vgui2::Panel *g_lastPanel;
 extern vgui2::Button *g_lastButton;

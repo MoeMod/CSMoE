@@ -23,7 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
-#include "vgui_parser.h"
 #include "unicode_strtools.h"
 #include "draw_util.h"
 

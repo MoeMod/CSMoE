@@ -6,6 +6,8 @@
 
 #include "gamemode/mods_const.h"
 
+namespace cl {
+
 
 CHudScoreBoardLegacy::CHudScoreBoardLegacy()
 {
@@ -19,7 +21,7 @@ CHudScoreBoardLegacy::CHudScoreBoardLegacy()
 
 CHudScoreBoardLegacy::~CHudScoreBoardLegacy()
 {
-	
+
 }
 
 int CHudScoreBoardLegacy::VidInit(void)
@@ -138,7 +140,7 @@ int CHudScoreBoardLegacy::VidInit(void)
 
 	if (!m_iIcon_TeamKill)
 		m_iIcon_TeamKill = R_LoadTextureUnique("resource/hud/hud_text_icon_team-kill");
-	
+
 	return 1;
 }
 
@@ -330,7 +332,7 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 			else
 				DrawHudNumber(m_iNum_csgo, m_rcNumber_csgo, (ScreenWidth) / 2 - 100, bgY + 20, DHN_DRAWZERO, aliveCT, 128 * 255, 128 * 255, 128 * 255);
 		}
-	
+
 		if (textWidth_CTAlive > 0)
 		{
 			if (aliveT >= 10)
@@ -381,7 +383,7 @@ int CHudScoreBoardLegacy::Draw(float flTime)
 	}
 
 //Caculate HudNumber
-	
+
 	if (gHUD.m_iModRunning == MOD_DM)
 	{
 		int best_player = gHUD.m_Scoreboard.FindBestPlayer();
@@ -553,7 +555,7 @@ int CHudScoreBoardLegacy::DrawNewHud(float flTime)
 		m_iIcon_Round->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
 
 		iY += iH + 2;
-	
+
 		iW = m_iSlash_Center->w();
 		iH = m_iSlash_Center->h();
 		iX = (ScreenWidth - iW) / 2;
@@ -678,7 +680,7 @@ int CHudScoreBoardLegacy::DrawNewHud(float flTime)
 		else
 			DrawTexturedNumbers(*m_iNum_BigRed, m_iNum_BigRedC, iSBTopLeft, iX, iY, DHN_2DIGITS, 3); // ok
 
-		
+
 		int iSBTopRight = gHUD.m_Scoreboard.m_iTeamScore_CT;
 		int iLength = iSBTopRight > 100 ? 93 : 42;
 		iX = ScreenWidth / 2 + (iSBTopRight > 100 ? 106 : 93) - iLength + 3;	//- length + gap
@@ -904,3 +906,4 @@ int CHudScoreBoardLegacy::GetHudNumberWidth(int moe, wrect_t *prc, int iFlags, i
 	return x;
 }
 
+}

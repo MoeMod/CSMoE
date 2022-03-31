@@ -31,9 +31,9 @@ GNU General Public License for more details.
 
 #include <assert.h>
 
-extern float g_flRoundTime;
-
 namespace cl {
+
+extern float g_flRoundTime;
 
 // play a strike sound based on the texture that was hit by the attack traceline.  VecSrc/VecEnd are the
 // original traceline endpoints used by the attacker, iBulletType is the type of bullet that hit the texture.

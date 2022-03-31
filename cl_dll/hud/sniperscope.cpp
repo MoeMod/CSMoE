@@ -164,7 +164,7 @@ void CHudSniperScope::FuncDrawScope(const CTextureRef& tex, int type, int x, int
 
 int CHudSniperScope::Draw(float flTime)
 {
-	cl::CBasePlayerWeapon* pActiveBTEWeapon = cl::BTEClientWeapons().GetActiveWeaponEntity();
+	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
 		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5)

@@ -24,6 +24,9 @@ GNU General Public License for more details.
 #include "legacy/hud_radar_legacy.h"
 #include "modern/hud_radar_modern.h"
 
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
+
 namespace cl {
 
     DECLARE_COMMAND(m_Radar, ShowRadar)
@@ -211,7 +214,14 @@ namespace cl {
         BufferReader reader(pszName, pbuf, iSize);
         int iPlayerID = reader.ReadByte();
         if (iPlayerID == gEngfuncs.GetLocalPlayer()->index)
+        {
             strcpy(g_szLocation, reader.ReadString());
+
+            if (g_szLocation[0] == '#')
+            {
+                vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(g_szLocation), g_szLocation, sizeof(g_szLocation));
+            }
+        }
 
         return 1;
     }

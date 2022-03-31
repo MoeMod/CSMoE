@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "z4.h"
 #include "z4_tips.h"
 
+namespace cl {
+
 const char* g_szTipsText[] = {
 	// RoundStart5 0 - 2
 	"感染体出现，注意四周警戒！",
@@ -243,4 +245,6 @@ int CHudZ4Tips::Draw(float flTime)
 		DrawUtils::DrawHudString(iX, iY, ScreenWidth, m_szText, 146, 158, 185);
 	}
 	return 1;
+}
+
 }

@@ -1,7 +1,7 @@
 #include "hud.h"
-#include "Viewport.h"
-#include "BuyMenu.h"
-#include "BuySubMenu.h"
+#include "CBaseViewport.h"
+#include "buymenu.h"
+#include "buysubmenu.h"
 #include "mouseoverpanelbutton.h"
 
 using namespace vgui2;

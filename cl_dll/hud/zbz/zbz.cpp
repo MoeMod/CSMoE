@@ -31,7 +31,6 @@ GNU General Public License for more details.
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
-}
 
 class CHudZBZ::impl_t
 	: public THudSubDispatcher<CHudZBZ_Skill> {};
@@ -73,7 +72,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	}
 	case ZBZ_MESSAGE_CONTACT_INFECTION_RING:
 	{
-		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiez_contactinfection_ring.mdl", false);
+		struct model_s* pModel = IEngineStudio.Mod_ForName("models/zombiez_contactinfection_ring.mdl", false);
 		if (!pModel)
 			break;
 
@@ -103,7 +102,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	}
 	case ZBZ_MESSAGE_CLAW:
 	{
-		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiezclaw.mdl", false);
+		struct model_s* pModel = IEngineStudio.Mod_ForName("models/zombiezclaw.mdl", false);
 		if (!pModel)
 			break;
 
@@ -129,7 +128,7 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 	}
 	case ZBZ_MESSAGE_WING:
 	{
-		struct model_s* pModel = cl::IEngineStudio.Mod_ForName("models/zombiezwingfx.mdl", false);
+		struct model_s* pModel = IEngineStudio.Mod_ForName("models/zombiezwingfx.mdl", false);
 		if (!pModel)
 			break;
 
@@ -222,4 +221,6 @@ void CHudZBZ::Shutdown(void)
 bool CHudZBZ::CheckHasSkill(ZombieZSkillSkillId id)
 {
 	return pimpl->get<CHudZBZ_Skill>().CheckHasSkill(id);
+}
+
 }

@@ -551,6 +551,8 @@ void COptionsSubMultiplayer::RemapLogoPalette(char *filename, int r, int g, int 
 	sprintf(outfile, "logos/remapped.bmp");
 
     auto bmpFile = std::unique_ptr<ui::CBMP>(ui::CBMP::LoadFile( filename ));
+    if(!bmpFile)
+        return;
     bmpFile->RemapLogo( r, g, b );
 
 	vgui2::filesystem()->RemoveFile(outfile, NULL);

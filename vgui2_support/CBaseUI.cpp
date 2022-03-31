@@ -30,7 +30,6 @@
 #include "GameUI/IGameConsole.h"
 #include "GameUI/ICareerUI.h"
 
-extern cl_enginefunc_t gEngfuncs;
 namespace ui
 {
 	extern ui_enginefuncs_t engfuncs;
@@ -43,6 +42,7 @@ class CStaticPanel;
 class CEnginePanel;
 
 namespace vgui2 {
+extern cl_enginefunc_t gEngfuncs;
 IClientVGUI *staticClient;
 IGameUI* staticGameUIFuncs;
 IGameConsole* staticGameConsole;

@@ -44,8 +44,10 @@ static IEngineVGui* enginevguifuncs = nullptr;
 IGameUIFuncs* gameuifuncs = nullptr;
 IBaseUI* baseuifuncs = nullptr;
 
-
+namespace vgui2 {
 extern cl_enginefunc_t gEngfuncs;
+}
+using namespace vgui2;
 cl_enginefunc_t* engine = &gEngfuncs;
 
 vgui2::DHANDLE<CLoadingDialog> g_hLoadingDialog;

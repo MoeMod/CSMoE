@@ -1,10 +1,10 @@
 #include "hud.h"
 #include "Viewport.h"
-#include "BuySubMenu.h"
+#include "buysubmenu.h"
 
-#include <KeyValues.h>
-#include <vgui_controls/WizardPanel.h>
-#include <FileSystem.h>
+#include "tier1/KeyValues.h"
+#include "vgui_controls/WizardPanel.h"
+#include "FileSystem.h"
 #include "cdll_dll.h"
 
 #include <string>

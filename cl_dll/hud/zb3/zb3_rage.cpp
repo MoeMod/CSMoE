@@ -24,9 +24,11 @@ GNU General Public License for more details.
 #include "gamemode/zb1/zb1_const.h"
 #include "gamemode/zb3/zb3_const.h"
 
+namespace cl {
+
 CHudZB3Rage::CHudZB3Rage(void)
 {
-	
+
 }
 
 int CHudZB3Rage::VidInit(void)
@@ -44,7 +46,7 @@ int CHudZB3Rage::VidInit(void)
 			sprintf(szBuffer, "ZB3_RageEffect%d0%d", i, j);
 			m_iRageIndex[i][j] = gHUD.GetSpriteIndex(szBuffer);
 		}
-			
+
 	m_flRageTimer = 0;
 	return 1;
 }
@@ -72,7 +74,7 @@ int CHudZB3Rage::Draw(float time)
 
 	int iX = ScreenWidth / 2 - gEngfuncs.pfnSPR_Width(gHUD.GetSprite(m_iRageBG), 0) / 2;
 	int iY = ScreenHeight * 0.97 - gEngfuncs.pfnSPR_Height(gHUD.GetSprite(m_iRageBG), 0) / 2;
-	
+
 	gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iRageBG), 255, 255, 255);
 	gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &gHUD.GetSpriteRect(m_iRageBG));
 
@@ -117,4 +119,6 @@ int CHudZB3Rage::Draw(float time)
 	}
 
 	return 1;
+}
+
 }

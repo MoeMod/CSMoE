@@ -105,7 +105,7 @@ int CHudNVG::Draw(float flTime)
 
 		dlight_t *dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
 		dl->origin = gHUD.m_vecOrigin;
-		dl->radius = cl::Com_RandomLong(750, 800);
+		dl->radius = Com_RandomLong(750, 800);
 		dl->die = flTime + 0.1f;
 		dl->color.r = r;
 		dl->color.g = g;
@@ -129,7 +129,7 @@ int CHudNVG::Draw(float flTime)
 		if (m_pLight)
 		{
 			m_pLight->origin = gHUD.m_vecOrigin;
-			m_pLight->radius = cl::Com_RandomLong(750, 800);
+			m_pLight->radius = Com_RandomLong(750, 800);
 		}
 	}
 

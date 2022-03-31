@@ -17,6 +17,8 @@ GNU General Public License for more details.
 
 #include "hud_sub.h"
 
+namespace cl {
+
 class CHudZ4Tips : public IBaseHudSub
 {
 public:
@@ -65,3 +67,5 @@ private:
 
 	char m_szText[128];
 };
+
+}

@@ -1,8 +1,7 @@
-#include "metahook.h"
+
 #include "vgui_int.h"
-#include <VGUI/ISurface.h>
+#include <vgui/ISurface.h>
 #include "CSBackGroundPanel.h"
-#include <r_studioint.h>
 
 using namespace vgui2;
 

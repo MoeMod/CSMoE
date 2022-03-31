@@ -5,10 +5,10 @@
 #pragma once
 #endif
 
-#include <vgui_controls/WizardSubPanel.h>
-#include <vgui_controls/Button.h>
-#include <UtlVector.h>
-#include "game_controls/MouseOverPanelButton.h"
+#include "vgui_controls/WizardSubPanel.h"
+#include "vgui_controls/Button.h"
+#include "UtlVector.h"
+#include "mouseoverpanelbutton.h"
 
 class CBuyMenu;
 

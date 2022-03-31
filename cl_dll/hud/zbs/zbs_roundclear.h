@@ -4,6 +4,8 @@
 #include "hud_sub.h"
 #include "r_texture.h"
 
+namespace cl {
+
 class CHudZBSRoundClear : public IBaseHudSub
 {
 public:
@@ -19,3 +21,5 @@ protected:
 	SharedTexture m_pCurTexture;
 	float m_flDisplayTime;
 };
+
+}

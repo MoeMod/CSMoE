@@ -26,7 +26,6 @@
 //#include "interface.h" // not used here
 #include "render_api.h"
 #include "mobility_int.h"
-#include "vgui_parser.h"
 
 #include "entity_state.h"
 #include "usercmd.h"
@@ -44,6 +43,11 @@ extern "C"
 #include "pmtrace.h"
 #include "pm_shared.h"
 }
+
+#ifdef XASH_STATIC_GAMELIB
+int FS_GetAPI(fs_api_t * g_api);
+#endif
+
 namespace cl {
 cl_enginefunc_t gEngfuncs = { };
 render_api_t gRenderAPI = { };
@@ -53,16 +57,9 @@ CHud gHUD;
 int g_iXash = 0; // indicates a buildnum
 vec3_t g_velocity;
 int g_iMobileAPIVersion = 0;
-}
 void InitInput (void);
 void IN_Commands( void );
 void Input_Shutdown (void);
-
-using namespace cl;
-
-#ifdef XASH_STATIC_GAMELIB
-int FS_GetAPI(fs_api_t * g_api);
-#endif
 
 /*
 ==========================
@@ -98,7 +95,6 @@ void DLLEXPORT HUD_Shutdown( void )
 {
 	gHUD.Shutdown();
 	Input_Shutdown();
-	Localize_Free();
 #ifdef XASH_LUASH
 	LuaCL_Shutdown();
 #endif
@@ -550,6 +546,10 @@ extern "C" void DLLEXPORT F(void *pv) {
 
 	*pcldll_func = cldll_func;
 }
+
+}
+
+using namespace cl;
 
 typedef struct dllexport_s
 {

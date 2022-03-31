@@ -33,7 +33,6 @@ version.
 #include "cl_util.h"
 #include "parsemsg.h"
 
-#include "vgui_parser.h"
 #include "draw_util.h"
 
 /*

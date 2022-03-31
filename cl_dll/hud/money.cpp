@@ -36,7 +36,6 @@ version.
 #include "parsemsg.h"
 #include "gamemode/mods_const.h"
 #include <string.h>
-#include "vgui_parser.h"
 #include "draw_util.h"
 #include "modern/hud_radar_modern.h"
 

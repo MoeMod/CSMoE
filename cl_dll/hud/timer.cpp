@@ -33,11 +33,13 @@ version.
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
-#include "vgui_parser.h"
 #include <string.h>
 #include "draw_util.h"
 #include "gamemode/mods_const.h"
 #include "legacy/hud_scoreboard_legacy.h"
+
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
 
 namespace cl {
 
@@ -338,9 +340,10 @@ int CHudProgressBar::MsgFunc_BotProgress(const char *pszName, int iSize, void *p
 		}
 		strncpy(m_szHeader, reader.ReadString(), sizeof(m_szHeader));
 		if( m_szHeader[0] == '#' )
-			m_szLocalizedHeader = Localize(m_szHeader + 1);
-		else
-			m_szLocalizedHeader = m_szHeader;
+        {
+            vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(m_szHeader), m_szHeader, sizeof(m_szHeader));
+        }
+            m_szLocalizedHeader = m_szHeader;
 		break;
 	case REMOVE_BOTPROGRESS:
 	default:

@@ -6,6 +6,8 @@
 #include "hud_sub.h"
 #include "r_texture.h"
 
+namespace cl {
+
 class CHudZB2_Skill : public IBaseHudSub
 {
 public:
@@ -55,7 +57,9 @@ protected:
 		float m_flTimeSkillBlink;
 	} m_ZombieSkillHudIcons[4];
 	int DrawSkillIcon(float time, int x, int y, const ZombieSkillHudIcon &icon) const;
-	
+
 private:
 	struct Config;
 };
+
+}

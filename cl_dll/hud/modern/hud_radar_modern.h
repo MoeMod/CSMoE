@@ -10,6 +10,8 @@
 
 #include "r_texture.h"
 
+namespace cl {
+
 #ifndef MAX_HOSTAGES
 #define MAX_HOSTAGES 24
 #endif
@@ -89,5 +91,7 @@ private:
 
 	UniqueTexture m_iMapTitleBG;
 };
+
+}
 
 #endif

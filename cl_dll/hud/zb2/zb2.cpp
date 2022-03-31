@@ -27,6 +27,8 @@ GNU General Public License for more details.
 
 #include <vector>
 
+namespace cl {
+
 class CHudZB2_impl_t : public THudSubDispatcher<CHudZB2_Skill>
 {
 public:
@@ -96,7 +98,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_BOOSTER)
 		{
-			if (cl::Com_RandomLong(0, 1))
+			if (Com_RandomLong(0, 1))
 				pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_BoosterRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
 			else
 				pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_BoosterRetina2, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
@@ -132,10 +134,10 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		}
 		}
 	}
-		
-		
+
+
 	}
-	
+
 	return 1;
 }
 
@@ -217,4 +219,6 @@ bool CHudZB2::ActivateSkill(int iSlot)
 	}
 
 	return false;
+}
+
 }

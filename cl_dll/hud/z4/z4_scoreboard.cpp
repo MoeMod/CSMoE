@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "z4.h"
 #include "z4_scoreboard.h"
 
+namespace cl {
+
 CHudZ4Scoreboard::CHudZ4Scoreboard(void)
 {
 	BuildNumberRC(m_rcNumber, 14, 32);
@@ -237,4 +239,6 @@ void CHudZ4Scoreboard::DrawNumbers(int n, int x, int y, int from_right, float sc
 
 	k = n % 10;
 	DrawNumber(k, x, y, scale, r, g, b);
+}
+
 }

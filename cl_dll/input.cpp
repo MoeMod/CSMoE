@@ -30,7 +30,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "vgui_parser.h"
 #include "com_weapons.h"
 
 namespace cl {

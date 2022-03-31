@@ -17,7 +17,7 @@
 #include "rain.h"
 #include "fog.h"
 
-using namespace cl;
+namespace cl {
 
 /*
 =================
@@ -45,4 +45,6 @@ void DLLEXPORT HUD_DrawTransparentTriangles( void )
 	ProcessRain();
 	DrawRain();
 	DrawFXObjects();
+}
+
 }

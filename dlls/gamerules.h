@@ -626,8 +626,9 @@ int GetMapCount();
 
 }
 #else // CLIENT_DLL
-
+namespace cl {
 extern void Broadcast(const char *sentence, int pitch = 100);
+}
 #endif
 
 #endif // GAMERULES_H

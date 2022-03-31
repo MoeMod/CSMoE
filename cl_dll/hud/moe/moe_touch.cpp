@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include <vector>
 #include <algorithm>
 
+namespace cl {
+
 constexpr float POSITION_SWITCH_ANIM = 0.25f;
 
 class CHudMoeTouch::impl_t
@@ -96,7 +98,7 @@ int CHudMoeTouch::Draw(float time)
 {
 	if (!pimpl->m_bActive || !m_TouchSwitch->value)
 		return 0;
-	
+
 	const int x = ScreenWidth * pimpl->m_flX;
 	const int y = ScreenHeight * pimpl->m_flStartY;
 	const float scale = 1;
@@ -120,7 +122,7 @@ int CHudMoeTouch::Draw(float time)
 			iWidth = (p->rcActive.right - p->rcActive.left) * scale;
 			iHeight = (p->rcActive.bottom - p->rcActive.top) * scale;
 		}
-		
+
 		int x2 = x;
 
 		bool bFirstPosition = true;
@@ -233,7 +235,7 @@ void CHudMoeTouch::Think(void)
 				pimpl->m_iActiveSlot = NewActiveSlot;
 			}
 		}
-		
+
 		if (pimpl->m_flX < (ScreenWidth - flWidth * 2) / ScreenWidth)
 		{
 			const int iSlot = pimpl->m_iActiveSlot;
@@ -306,7 +308,7 @@ void CHudMoeTouch::Think(void)
 				p = gWR.GetFirstPos(iSlot);
 				pimpl->m_iWeaponSlotSelectedPosition[iSlot] = 0;
 			}
-				
+
 			if (p)
 			{
 				ServerCmd(p->szName);
@@ -319,12 +321,12 @@ void CHudMoeTouch::Think(void)
 
 void CHudMoeTouch::Reset(void)
 {
-	
+
 }
 
 void CHudMoeTouch::InitHUDData(void)
 {
-	
+
 }
 
 void CHudMoeTouch::Shutdown(void)
@@ -375,4 +377,6 @@ int CHudMoeTouch::TouchEvent(touchEventType type, int fingerID, float x, float y
 	}
 
 	return 0;
+}
+
 }

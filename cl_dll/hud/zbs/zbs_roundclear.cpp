@@ -9,6 +9,8 @@
 #include <numeric>
 #include <tuple>
 
+namespace cl {
+
 const float ZBS_ROUNDCLEAR_DISPLAY_TIME = 1.0f;
 
 int CHudZBSRoundClear::VidInit(void)
@@ -51,4 +53,6 @@ void CHudZBSRoundClear::OnRoundFail()
 	m_pCurTexture = m_pTexture_RoundFail;
 	m_flDisplayTime = gHUD.m_flTime;
 	gEngfuncs.pfnClientCmd("speak \"roundfail\"\n");
+}
+
 }

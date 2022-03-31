@@ -2,11 +2,10 @@
 #include "cl_util.h"
 #include "parsemsg.h"
 #include "cl_util.h"
-#include "vgui_parser.h"
 #include "draw_util.h"
-DECLARE_MESSAGE(m_scenarioStatus, Scenario)
 
 namespace cl {
+DECLARE_MESSAGE(m_scenarioStatus, Scenario)
 
 int CHudScenarioStatus::Init(void)
 {

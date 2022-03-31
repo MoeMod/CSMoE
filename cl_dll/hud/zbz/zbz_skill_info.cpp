@@ -23,6 +23,8 @@ GNU General Public License for more details.
 
 #include <set>
 
+namespace cl {
+
 CHudZBZ_Skill::CHudZBZ_Skill(void)
 {
 	m_iLevel = m_iExp = 0;
@@ -150,7 +152,7 @@ int CHudZBZ_Skill::Draw(float time)
 		auto skill = g_SkillList.find(*it);
 		if (skill == g_SkillList.end())
 			continue;
-		
+
 		auto color = (skill->second.first == TYPE_GENERAL) || (skill->second.first == TYPE_ZOMBIE && g_PlayerExtraInfo[idx].zombie) || (skill->second.first == TYPE_HUMAN && !g_PlayerExtraInfo[idx].zombie) ? g_ColorActive : g_ColorInactive;
 		DrawUtils::SetConsoleTextColor(color[0], color[1], color[2]);
 		len = DrawUtils::ConsoleStringLen(skill->second.second);
@@ -158,4 +160,6 @@ int CHudZBZ_Skill::Draw(float time)
 		y -= 20;
 	}
 	return 1;
+}
+
 }

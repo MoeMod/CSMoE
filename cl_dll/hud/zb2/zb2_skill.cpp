@@ -24,6 +24,8 @@ GNU General Public License for more details.
 #include <algorithm>
 #include <functional>
 
+namespace cl {
+
 struct CHudZB2_Skill::Config
 {
 	static const char * const ZOMBIE_SKILL_HUD_ICON[MAX_ZOMBIE_SKILL];
@@ -182,7 +184,7 @@ int CHudZB2_Skill::VidInit(void)
 	for (int i = 0; i < 11; ++i)
 	{
 		if (Config::ZOMBIE_SKILL_HUD_TIP[i][0] != '\0')
-			if (!m_pTexture_SkillTips[i]) 
+			if (!m_pTexture_SkillTips[i])
 				m_pTexture_SkillTips[i] = R_LoadTextureUnique(Config::ZOMBIE_SKILL_HUD_TIP[i]);
 	}
 
@@ -234,7 +236,7 @@ int CHudZB2_Skill::Draw(float time)
 
 	x = DrawHealthRecoveryIcon(time, x, y);
 	if (false)
-	{	
+	{
 		if (m_iCurrentClass >= ZOMBIE_CLASS_TELEPORT && m_iCurrentClass < MAX_ZOMBIE_CLASS)
 			DrawSkillBoardNew(time);
 		else
@@ -267,7 +269,7 @@ void CHudZB2_Skill::Think()
 				sprintf(buf, "touch_show \"_moe_skill%d_button\"\n", i);
 				gEngfuncs.pfnClientCmd(buf);
 			}
-			
+
 		}
 	}
 }
@@ -293,7 +295,7 @@ int CHudZB2_Skill::DrawHealthRecoveryIcon(float time, int x, int y) const
 	SPR_Set(gHUD.GetSprite(m_HUD_zombirecovery), r, g, b);
 	SPR_DrawAdditive(0, x, y, &gHUD.GetSpriteRect(m_HUD_zombirecovery));
 
-	
+
 	return x + iWidth;
 }
 
@@ -326,7 +328,7 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 		}
 		x += w;
 	}
-	
+
 	int iHudIcon = m_HUD_SkillIcons[icon.m_iCurrentSkill];
 	int w = gHUD.GetSpriteRect(iHudIcon).right - gHUD.GetSpriteRect(iHudIcon).left;
 
@@ -339,7 +341,7 @@ int CHudZB2_Skill::DrawSkillIcon(float time, int x, int y, const ZombieSkillHudI
 		int iHeight = Rect.bottom - Rect.top;
 
 		float flPercent = (time - icon.m_flTimeSkillStart) / (icon.m_flTimeSkillReady - icon.m_flTimeSkillStart);
-		
+
 
 		DrawUtils::UnpackRGB(r, g, b, RGB_WHITE);
 
@@ -409,7 +411,7 @@ void CHudZB2_Skill::DrawSkillBoardNew(float time) const
 
 	x -= m_pTexture_skillslotbg->w() / 2;
 	if (m_iCurrentClass >= 0 && m_iCurrentClass < MAX_ZOMBIE_CLASS)
-	{		
+	{
 		const auto &classicon = m_pTexture_NewClassIcons[m_iCurrentClass];
 		if (classicon != nullptr)
 		{
@@ -497,7 +499,7 @@ void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, 
 		m_ZombieSkillHudIcons[2] = { skill3, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
 		m_ZombieSkillHudIcons[3] = { skill4, SKILL_STATUS_READY, 0.0f, 0.0f, flSkillBlinkTime };
 	}
-	// some blink ? 
+	// some blink ?
 	if (!m_pTexture_skillslotbg || !m_pTexture_skillslotbg->valid())
 		return;
 
@@ -544,7 +546,7 @@ void CHudZB2_Skill::OnSkillInit(ZombieClassType zclass, ZombieSkillType skill1, 
 			//gMobileAPI.pfnTouchAddClientButton("_moe_skill1_button", "*white", "+_moe_skill1_press", 0.100000, 0.408511, 0.340000, 0.459574, color, 0, 0.0f, 0);
 
 		}
-		
+
 		x += w;
 	}
 
@@ -582,4 +584,6 @@ void CHudZB2_Skill::OnSkillIconPass(ZombieSkillType skill, ZombieSkillStatus sta
 {
 	auto& icon = m_ZombieSkillHudIcons[0];
 	icon = { skill, status, 0.0f, 0.0f, 0.0f };
+}
+
 }

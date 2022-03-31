@@ -25,9 +25,11 @@
 #include <string.h>
 #include <stdio.h>
 #include "parsemsg.h"
-#include "vgui_parser.h"
 #include "ctype.h"
 #include "draw_util.h"
+
+#include "vgui_controls/controls.h"
+#include "vgui/ILocalize.h"
 
 namespace cl {
 
@@ -72,7 +74,10 @@ char *CHudTextMessage::LocaliseTextString( const char *msg, char *dst_buffer, in
 				continue;
 			}
 
-			if(clmsg->pMessage[0] == '#') strncpy(dst, Localize(clmsg->pMessage+1), buffer_size);
+			if(clmsg->pMessage[0] == '#')
+            {
+                vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(clmsg->pMessage), dst, buffer_size);
+            }
 
 			// copy string into message over the msg name
 			for ( char *wsrc = (char*)clmsg->pMessage; *wsrc != 0; wsrc++, dst++ )
@@ -124,9 +129,6 @@ char *CHudTextMessage::LookupString( char *msg, int *msg_dest )
 				*msg_dest = -clmsg->effect;
 		}
 
-		if( clmsg->pMessage[0] == '#')
-			return (char *)Localize( clmsg->pMessage + 1);
-
 		return (char*)clmsg->pMessage;
 	}
 	else
@@ -150,10 +152,11 @@ bool CHudTextMessage::LookupString2( char *msg, int size )
 		if ( !clmsg || !(clmsg->pMessage) )
 			return false; // lookup failed, so return the original string
 
+        strncpy(msg, clmsg->pMessage, size);
 		if (clmsg->pMessage[0] == '#')
-			strncpy(msg, (char*)Localize(clmsg->pMessage + 1), size);
-		else
-			strncpy(msg, (char*)Localize(clmsg->pMessage), size);
+        {
+            vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(clmsg->pMessage), msg, size);
+        }
 
 		return true;
 	}
@@ -202,18 +205,11 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	msg_text = strncpy( szBuf[0], msg_text, MAX_TEXTMSG_STRING );
 
 	// keep reading strings and using C format strings for substituting the strings into the localised text string
-	char *sstr1 = LookupString( reader.ReadString() );
-	sstr1 = strncpy( szBuf[1], sstr1, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr1 );  // these strings are meant for subsitution into the main strings, so cull the automatic end newlines
-	char *sstr2 = LookupString( reader.ReadString() );
-	sstr2 = strncpy( szBuf[2], sstr2, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr2 );
-	char *sstr3 = LookupString( reader.ReadString() );
-	sstr3 = strncpy( szBuf[3], sstr3, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr3 );
-	char *sstr4 = LookupString( reader.ReadString() );
-	sstr4 = strncpy( szBuf[4], sstr4, MAX_TEXTMSG_STRING );
-	StripEndNewlineFromString( sstr4 );
+	for(int i = 1; i <=4 ; ++i)
+	{
+		strncpy( szBuf[i], reader.ReadString(), MAX_TEXTMSG_STRING );
+		LookupString2( szBuf[i], MAX_TEXTMSG_STRING );
+	}
 	char *psz = szBuf[5];
 
 	// Remove numbers after %s.
@@ -237,65 +233,35 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	{
 	case HUD_PRINTCENTER:
 	{
-		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		CenterPrint( ConvertCRtoNL( psz ) );
 		break;
 	}
 	case HUD_PRINTNOTIFY:
 		psz[0] = 1;  // mark this message to go into the notify buffer
-		snprintf( psz+1, MAX_TEXTMSG_STRING - 1, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz+1, MAX_TEXTMSG_STRING - 1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		ConsolePrint( ConvertCRtoNL( psz ) );
 		break;
 
 	case HUD_PRINTTALK:
 		psz[0] = 2; // mark, so SayTextPrint will color it
-		snprintf( psz+1, MAX_TEXTMSG_STRING-1, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz+1, MAX_TEXTMSG_STRING-1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		gHUD.m_SayText.SayTextPrint( ConvertCRtoNL( psz ), 128 );
 		break;
 
 	case HUD_PRINTCONSOLE:
-		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, sstr1, sstr2, sstr3, sstr4 );
+		snprintf( psz, MAX_TEXTMSG_STRING, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 		ConsolePrint( ConvertCRtoNL( psz ) );
 		break;
 
 	case HUD_PRINTRADIO:
-		static char szNewBuf[4][MAX_TEXTMSG_STRING];
-
-		if (strlen(sstr1) > 0)
-		{
-			snprintf(szNewBuf[0], MAX_TEXTMSG_STRING, "#%s", sstr1);
-			if (LookupString2(szNewBuf[0], MAX_TEXTMSG_STRING))
-				sstr1 = szNewBuf[0];
-		}
-
-		if (strlen(sstr2) > 0)
-		{
-			snprintf(szNewBuf[1], MAX_TEXTMSG_STRING, "#%s", sstr2);
-			if (LookupString2(szNewBuf[1], MAX_TEXTMSG_STRING))
-				sstr2 = szNewBuf[1];
-		}
-
-		if (strlen(sstr3) > 0)
-		{
-			snprintf(szNewBuf[2], MAX_TEXTMSG_STRING, "#%s", sstr3);
-			if (LookupString2(szNewBuf[2], MAX_TEXTMSG_STRING))
-				sstr3 = szNewBuf[2];
-		}
-
-		if (strlen(sstr4) > 0)
-		{
-			snprintf(szNewBuf[3], MAX_TEXTMSG_STRING, "#%s", sstr4);
-			if(LookupString2(szNewBuf[3], MAX_TEXTMSG_STRING))
-				sstr4 = szNewBuf[3];
-		}
-
 		// For some reason, HUD_PRINTRADIO always have "1" in msg_text
 		for( int i = 1; i < MAX_PLAYERS; i++ )
 		{
-			if( g_PlayerInfoList[i].name && !strncmp(g_PlayerInfoList[i].name, sstr2, strlen(sstr2)) )
+			if( g_PlayerInfoList[i].name && !strncmp(g_PlayerInfoList[i].name, szBuf[2], strlen(szBuf[2])) )
 			{
 				psz[0] = 2;
-				snprintf( psz + 1, MAX_TEXTMSG_STRING-1, sstr1, sstr2, sstr3, sstr4 );
+				snprintf( psz + 1, MAX_TEXTMSG_STRING-1, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
 				gHUD.m_SayText.SayTextPrint( ConvertCRtoNL( psz ), 128, i );
 				break;
 			}

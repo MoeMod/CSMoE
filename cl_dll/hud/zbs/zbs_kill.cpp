@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <functional>
 
+namespace cl {
+
 const float ZBS_KILL_DISPLAY_TIME = 1.0f;
 
 void CHudZBSKill::OnKillMessage()
@@ -16,9 +18,9 @@ void CHudZBSKill::OnKillMessage()
 
 int CHudZBSKill::VidInit(void)
 {
-	if(!m_iKillTexture) 
+	if(!m_iKillTexture)
 		m_iKillTexture = R_LoadTextureUnique("resource/hud/zbs/zbskill");
-	
+
 	return 1;
 }
 
@@ -29,7 +31,7 @@ void CHudZBSKill::Reset(void)
 
 int CHudZBSKill::Draw(float time)
 {
-	
+
 	for (auto &flStartTime : m_killTimes)
 	{
 		float shownTime = time - flStartTime;
@@ -51,4 +53,6 @@ void CHudZBSKill::Think()
 {
 	// remove expired item
 	m_killTimes.erase(std::remove_if(m_killTimes.begin(), m_killTimes.end(), std::bind(std::less<float>(), std::placeholders::_1, gHUD.m_flTime - ZBS_KILL_DISPLAY_TIME)), m_killTimes.end());
+}
+
 }

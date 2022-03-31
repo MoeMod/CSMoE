@@ -17,14 +17,14 @@
 #include <vgui_controls/ImagePanel.h>
 #include <vgui_controls/EditablePanel.h>
 
-#include "ViewPort.h"
+#include "CBaseViewPort.h"
 
 #include "cstrikebuymouseoverpanelbutton.h"
 #include "cstrikebuymouseoverpanel.h"
 
 #include <string>
 
-using namespace vgui;
+using namespace vgui2;
 
 CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const char *panelName, vgui2::EditablePanel *panel)
 	: BaseClass(parent, panelName, panel)
@@ -53,14 +53,14 @@ void CSBuyMouseOverPanelButton::UpdateWeapon(const char *weapon)
 
 void CSBuyMouseOverPanelButton::Paint()
 {
-	Color col = COL_NONE;
-	if (m_iTeam == WeaponBuyTeam::TR)
+	Color col(200, 200, 200, 255);
+	if (m_iTeam == TERRORIST)
 	{
-		col = COL_TR;
+		col = Color(255, 65, 65, 255);
 	}
-	else if (m_iTeam == WeaponBuyTeam::CT)
+	else if (m_iTeam == CT)
 	{
-		col = COL_CT;
+		col = Color(65, 65, 255, 255);
 	}
 	SetFgColor(col);
 	BaseClass::Paint();

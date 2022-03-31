@@ -11,6 +11,8 @@
 #ifndef _CAMERA_H_
 #define _CAMEA_H_
 
+namespace cl {
+
 // pitch, yaw, dist
 extern vec3_t cam_ofs;
 // Using third person camera
@@ -20,5 +22,7 @@ void CAM_Init( void );
 void CAM_ClearStates( void );
 void CAM_StartMouseMove(void);
 void CAM_EndMouseMove(void);
+
+}
 
 #endif		// _CAMERA_H_

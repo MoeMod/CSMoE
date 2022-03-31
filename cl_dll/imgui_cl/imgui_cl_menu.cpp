@@ -6,12 +6,12 @@
 #include "hud.h"
 #include "cl_util.h"
 
+namespace cl {
+
 #define MAX_MENU_STRING	512
 
-extern char g_szMenuString[MAX_MENU_STRING];
-extern char g_szPrelocalisedMenuString[MAX_MENU_STRING];
-
-namespace cl {
+    extern char g_szMenuString[MAX_MENU_STRING];
+    extern char g_szPrelocalisedMenuString[MAX_MENU_STRING];
 	
 	void ImGuiCL_Menu_OnGUI()
 	{

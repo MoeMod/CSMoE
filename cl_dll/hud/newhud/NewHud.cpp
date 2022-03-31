@@ -24,6 +24,8 @@
 #include "draw_util.h"
 #include "legacy/hud_scoreboard_legacy.h"
 
+namespace cl {
+
 DECLARE_MESSAGE(m_NewHud, NewHudMsg)
 
 CHudNewHud::CHudNewHud()
@@ -68,7 +70,7 @@ int CHudNewHud::VidInit(void)
 
 void CHudNewHud::InitHUDData(void)
 {
-	
+
 }
 
 int CHudNewHud::Draw(float flTime)
@@ -91,7 +93,7 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 {
 	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH))
 		return 1;
-		
+
 	if(gEngfuncs.IsSpectateOnly())
 		return 1;
 
@@ -104,7 +106,7 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 	if (gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		int iSpeed;
-	
+
 		iW = m_iCharacterBG->w();
 		iH = m_iCharacterBG->h();
 		m_iCharacterBG->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY - iH + iH);
@@ -120,7 +122,7 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 		iX = 180;
 
 		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, iSpeed, iX, iY + 5, 0, 1, 1.0, 72, 156, 255);
-	
+
 		iX = 120;
 		iY = iY + 5 + iH;
 		iW = m_iIcon_Damage->w();
@@ -130,7 +132,7 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 		iX = 180;
 
 		CHudScoreBoardLegacy::DrawTexturedNumbers(*m_iNum_Character, m_iNum_CharacterC, 0, iX, iY + 5, 0, 1, 1.0, 255, 80, 80);
-		
+
 	}
 	else
 	{
@@ -155,4 +157,7 @@ int CHudNewHud::MsgFunc_NewHudMsg(const char* pszName, int iSize, void* pbuf)
 
 
 	return 1;
+}
+
+
 }

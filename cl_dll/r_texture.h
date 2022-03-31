@@ -15,6 +15,7 @@
 
 #ifdef XASH_IMGUI
 extern float g_ImGUI_DPI;
+extern void ImGui_Surface_SetRenderMode( int mode );
 #else
 extern cvar_t *hud_scale;
 #endif
@@ -57,7 +58,6 @@ public:
 	{
 #ifdef XASH_IMGUI
 		ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
-		extern void ImGui_Surface_SetRenderMode( int mode );
 		ImGui_Surface_SetRenderMode(kRenderTransTexture);
 		drawlist->AddImage((ImTextureID)m_iInternalId, ImVec2(x1, y1), ImVec2(x2, y2), ImVec2(s1, t1), ImVec2(s2, t2), ImColor(r, g, b, a));
 #else

@@ -18,7 +18,7 @@
 #include "demo_api.h"
 #include <memory.h>
 
-using namespace cl;
+namespace cl {
 
 int g_demosniper = 0;
 int g_demosniperdamage = 0;
@@ -67,7 +67,7 @@ void DLLEXPORT Demo_ReadBuffer( int size, unsigned char *buffer )
 	case TYPE_SNIPERDOT:
 		g_demosniper = *(int * )&buffer[ i ];
 		i += sizeof( int );
-		
+
 		if ( g_demosniper )
 		{
 			g_demosniperdamage = *( int * )&buffer[ i ];
@@ -95,4 +95,6 @@ void DLLEXPORT Demo_ReadBuffer( int size, unsigned char *buffer )
 		gEngfuncs.Con_DPrintf( "Unknown demo buffer type, skipping.\n" );
 		break;
 	}
+}
+
 }

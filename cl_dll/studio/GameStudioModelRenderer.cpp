@@ -1108,8 +1108,6 @@ r_studio_interface_t studio =
 	R_StudioDrawPlayer,
 };
 
-}
-
 /*
 ====================
 HUD_GetStudioModelInterface
@@ -1122,15 +1120,17 @@ int DLLEXPORT HUD_GetStudioModelInterface( int version, struct r_studio_interfac
 		return 0;
 
 	// Point the engine to our callbacks
-	*ppinterface = &cl::studio;
+	*ppinterface = &studio;
 
 	// Copy in engine helper functions
-	cl::IEngineStudio = *pstudio;
+	IEngineStudio = *pstudio;
 
 	// Initialize local variables, etc.
-	cl::R_StudioInit();
+	R_StudioInit();
 
 	// Success
 	return 1;
 }
 
+
+}

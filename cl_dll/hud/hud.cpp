@@ -33,7 +33,6 @@
 
 #include "demo.h"
 #include "demo_api.h"
-#include "vgui_parser.h"
 #include "rain.h"
 #include "fog.h"
 
@@ -252,7 +251,7 @@ void CHud :: Init( void )
 	InitRain();
 	gFog.Init();
 
-	cl::BTEClientWeapons().Init();
+	BTEClientWeapons().Init();
 
 	//ServersInit();
 
@@ -460,8 +459,6 @@ COM_FileBase
 ============
 */
 // Extracts the base name of a file (no path, no extension, assumes '/' as path separator)
-namespace cl
-{
 void COM_FileBase ( const char *in, char *out)
 {
 	int len, start, end;
@@ -497,8 +494,6 @@ void COM_FileBase ( const char *in, char *out)
 	// Terminate it
 	out[len] = 0;
 }
-}
-using cl::COM_FileBase;
 
 /*
 =================

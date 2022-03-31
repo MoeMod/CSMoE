@@ -37,6 +37,8 @@ version.
 
 #include "gamemode/mods_const.h"
 
+namespace cl {
+
 static byte	r_RadarCross[8][8] =
 {
 {1,1,0,0,0,0,1,1},
@@ -491,4 +493,6 @@ int CHudRadarLegacy::Draw(float flTime)
 	}
 
 	return 0;
+}
+
 }

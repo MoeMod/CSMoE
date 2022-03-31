@@ -59,9 +59,7 @@ client_sprite_t *GetSpriteList(client_sprite_t *pList, const char *psz, int iRes
 WeaponsResource gWR;
 
 int g_weaponselect = 0;
-namespace cl {
 int g_iShotsFired;
-}
 
 
 void WeaponsResource :: LoadAllWeaponSprites( void )

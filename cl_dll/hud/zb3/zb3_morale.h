@@ -18,7 +18,7 @@ GNU General Public License for more details.
 #include "hud_sub.h"
 
 enum ZB3HumanMoraleType_e : byte;
-
+namespace cl {
 class CHudZB3Morale : public IBaseHudSub
 {
 public:
@@ -43,3 +43,4 @@ private:
 	int m_iAmmoupSPR;
 	bool m_bEnabled;
 };
+}

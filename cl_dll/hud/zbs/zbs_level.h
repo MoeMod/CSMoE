@@ -4,13 +4,15 @@
 #include "hud_sub.h"
 #include "r_texture.h"
 
+namespace cl {
+
 class CHudZBSLevel : public IBaseHudSub
 {
 public:
 	CHudZBSLevel();
 	int VidInit(void) override;
 	int Draw(float time) override;
-	void UpdateLevel(int hp, int att, int wall) 
+	void UpdateLevel(int hp, int att, int wall)
 	{
 		m_iLevel_HP = hp;
 		m_iLevel_ATK = att;
@@ -25,3 +27,4 @@ protected:
 	int m_iLevel_ATK;
 	int m_iLevel_Wall;
 };
+}

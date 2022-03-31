@@ -18,6 +18,8 @@ GNU General Public License for more details.
 #include "hud_sub.h"
 #include "gamemode/z4/z4_const.h"
 
+namespace cl {
+
 class CHudZ4Status : public IBaseHudSub
 {
 public:
@@ -49,3 +51,5 @@ private:
 	int m_iPower;
 	//int m_iTeam;
 };
+
+}

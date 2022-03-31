@@ -5,7 +5,7 @@
 #pragma once
 #endif
 
-#include "game_controls\teammenu.h"
+#include "game_controls/teammenu.h"
 
 class CCSTeamMenu : public CTeamMenu
 {

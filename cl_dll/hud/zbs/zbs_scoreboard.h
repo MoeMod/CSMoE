@@ -4,6 +4,8 @@
 #include "hud_sub.h"
 #include "r_texture.h"
 
+namespace cl {
+
 class CHudZBSScoreBoard : public IBaseHudSub
 {
 public:
@@ -22,3 +24,5 @@ protected:
 	float m_iSelfnumberScale;
 	float m_flSelfnumberScaleTime;
 };
+
+}

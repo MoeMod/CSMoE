@@ -13,6 +13,8 @@
 
 #include <string>
 
+namespace cl {
+
 #if 1
 #define USE_HOSTAGEENTITY
 #endif
@@ -248,7 +250,7 @@ int CHudRadarModern::Draw(float time)
 		}
 		sy = m_iMapTitleBG->h() + 1;
 	}
-	
+
 	{
 		float angles, xTemp, yTemp, viewzoom;
 		float screenaspect, xs, ys, xStep, yStep, x, y, z;
@@ -363,7 +365,7 @@ int CHudRadarModern::Draw(float time)
 
 	struct model_s* model = (struct model_s*)gEngfuncs.GetSpritePointer(m_hsprCamera);
 	gEngfuncs.pTriAPI->SpriteTexture(model, 0);
-	
+
 	float cameraScale = 2;
 	int cameraWide = gEngfuncs.pfnSPR_Width(m_hsprCamera, 0) * cameraScale;
 	int cameraHeight = gEngfuncs.pfnSPR_Height(m_hsprCamera, 0) * cameraScale;
@@ -522,7 +524,7 @@ int CHudRadarModern::Draw(float time)
 		}
 	}
 
-	
+
 	if (gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
 		if (g_PlayerExtraInfo[gHUD.m_Scoreboard.m_iPlayerNum].teamnumber == TEAM_CT)
@@ -622,7 +624,7 @@ int CHudRadarModern::Draw(float time)
 			}
 		}
 	}
-	
+
 
 	gEngfuncs.pTriAPI->RenderMode(kRenderNormal);
 	return 1;
@@ -782,4 +784,6 @@ void CHudRadarModern::DrawSprite(int x, int y, HSPRITE hspr, float yaw, int scal
 	gEngfuncs.pTriAPI->TexCoord2f(1, 1);
 	gEngfuncs.pTriAPI->Vertex3f(x + right.x * -scale + forward.x * scale, y + right.y * -scale + forward.y * scale, 0);
 	gEngfuncs.pTriAPI->End();
+}
+
 }

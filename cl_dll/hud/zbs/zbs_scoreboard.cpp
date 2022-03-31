@@ -7,6 +7,8 @@
 #include "string.h"
 #include "assert.h"
 
+namespace cl {
+
 const float ZBS_SELFNUMBER_SCALE_TIME = 0.3f;
 
 inline int CalcTeamFrags()
@@ -94,7 +96,7 @@ int CHudZBSScoreBoard::Draw(float time)
 	const float flScale = 0.0f;
 
 	m_pBackground->Draw2DQuadScaled(x - 373 / 2, y, x + 373 / 2, y + 51);
-	
+
 	int idx = gEngfuncs.GetLocalPlayer()->index;
 	int roundNumber = gHUD.m_Scoreboard.m_iTeamScore_CT + 1;
 	int selfKill = max(0, g_PlayerExtraInfo[idx].frags);
@@ -107,7 +109,7 @@ int CHudZBSScoreBoard::Draw(float time)
 		m_iSelfnumberScale = 2.0f;
 		m_flSelfnumberScaleTime = time;
 	}
-	
+
 	if (time > m_flSelfnumberScaleTime + ZBS_SELFNUMBER_SCALE_TIME)
 	{
 		DrawTexturedNumbersTopCenterAligned(*m_pSelfnumber, m_rcSelfnumber, selfKill, x + 105, y + 10, 1, 160, 210, 250, 255);
@@ -120,6 +122,8 @@ int CHudZBSScoreBoard::Draw(float time)
 
 
 	m_iSelfKills = selfKill;
-	
+
 	return 1;
+}
+
 }

@@ -5,7 +5,7 @@
 #include "keydefs.h"
 #include "input.h"
 
-using namespace cl;
+namespace cl {
 
 extern "C" {
 
@@ -30,4 +30,6 @@ void DLLEXPORT IN_ClientLookEvent(float relyaw, float relpitch)
 }
 #endif
 #endif
+}
+
 }

@@ -19,6 +19,8 @@ GNU General Public License for more details.
 
 enum ZombieLevel : int;
 
+namespace cl {
+
 class CHudZB3Rage : public IBaseHudSub
 {
 public:
@@ -48,3 +50,5 @@ private:
 	int m_iFastRespawnSPR;
 	bool m_bEnabled;
 };
+
+}

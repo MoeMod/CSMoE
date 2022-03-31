@@ -25,9 +25,10 @@ GNU General Public License for more details.
 #include "gamemode/zb3/zb3_const.h"
 
 
+namespace cl {
 CHudZB3Morale::CHudZB3Morale(void)
 {
-	
+
 }
 
 int CHudZB3Morale::VidInit(void)
@@ -64,7 +65,7 @@ int CHudZB3Morale::Draw(float time)
 
 	int iX = ScreenWidth / 2 - 130;
 	int iY = ScreenHeight - 100;
-	
+
 	int iMorale = m_iMoraleLevel;
 	int iMaxMorale = 10;
 	if (m_iMoraleType == ZB3_MORALE_STRENGTHEN)
@@ -72,7 +73,7 @@ int CHudZB3Morale::Draw(float time)
 		iMorale += 3;
 		iMaxMorale += 3;
 	}
-	
+
 	int r = 0, g = 0, b = 0, a = 0;
 
 	if (iMorale < 4)
@@ -121,7 +122,7 @@ int CHudZB3Morale::Draw(float time)
 		iLen = iLen * flMorale;
 		ModifyRect.right = iLen + ModifyRect.left;
 		gEngfuncs.pfnSPR_Set(gHUD.GetSprite(m_iMoraleLevelSPR), 50, 50, 50);
-		gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &ModifyRect); 
+		gEngfuncs.pfnSPR_DrawAdditive(0, iX, iY, &ModifyRect);
 	}
 
 	// foreground
@@ -151,4 +152,5 @@ void CHudZB3Morale::UpdateLevel(ZB3HumanMoraleType_e type, int level)
 	}
 
 	std::tie(m_iMoraleType, m_iMoraleLevel) = std::make_pair(type, level);
+}
 }

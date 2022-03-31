@@ -7,7 +7,7 @@
 
 #define PANEL_BUY "BuyMenu"
 
-#include <vgui_controls/WizardPanel.h>
+#include "vgui_controls/WizardPanel.h"
 
 class CBuySubMenu;
 
@@ -16,7 +16,7 @@ namespace vgui2
 	class Panel;
 }
 
-class CBuyMenu : public vgui2::WizardPanel, public CViewPortPanel
+class CBuyMenu : public vgui2::WizardPanel, public IViewportPanel
 {
 private:
 	DECLARE_CLASS_SIMPLE(CBuyMenu, vgui2::WizardPanel);

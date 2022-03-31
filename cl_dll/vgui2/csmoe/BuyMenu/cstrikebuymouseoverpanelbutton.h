@@ -10,8 +10,7 @@
 #include <vgui/KeyCode.h>
 #include <filesystem.h>
 #include "shared_util.h"
-
-#include "WeaponManager.h"
+#include "player/player_const.h"
 
 #include "game_controls/mouseoverpanelbutton.h"
 #include "buymouseoverpanelbutton.h"
@@ -31,7 +30,7 @@ public:
 	{
 		m_iTeam = team;
 	}
-	WeaponBuyTeam m_iTeam;
+    TeamName m_iTeam;
 	void UpdateWeapon(const char *weapon = "");
 
 	vgui2::ImagePanel *m_pWeaponImage;

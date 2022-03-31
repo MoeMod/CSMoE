@@ -1,4 +1,4 @@
-#include "BackGroundPanel.h"
+#include "CBackGroundPanel.h"
 
 #include <vgui_controls/Panel.h>
 #include <vgui_controls/Label.h>

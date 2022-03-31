@@ -1,7 +1,7 @@
 #ifndef GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H
 #define GAME_CLIENT_UI_HUD_CHUDVIEWPORT_H
 
-#include "vgui2/CBaseViewport.h"
+#include "CBaseViewport.h"
 
 #include <string>
 

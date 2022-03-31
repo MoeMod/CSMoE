@@ -11,7 +11,7 @@
 #include "IGameUIFuncs.h"
 
 #include "CClientVGUI.h"
-#include "vgui2/CBaseViewport.h"
+#include "CBaseViewport.h"
 
 #include "CClientMOTD.h"
 

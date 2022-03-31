@@ -25,6 +25,8 @@
 #include "event_api.h"
 #include "pm_shared.h"
 
+namespace cl {
+
 // defaults for clientinfo messages
 constexpr int DEFAULT_VIEWHEIGHT = 28;
 constexpr int VEC_DUCK_VIEW = 12;
@@ -104,4 +106,7 @@ void EV_GetDefaultShellInfo( event_args_t *args, const vec3_t origin, const vec3
 		ShellOrigin[i]   = velocity[i] * 0.1f + origin[i] + view_ofs[i] +
 				upScale * up[i] + forwardScale * forward[i] + rightScale * right[i];
 	}
+}
+
+
 }

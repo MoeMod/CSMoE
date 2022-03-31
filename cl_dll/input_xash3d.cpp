@@ -224,8 +224,6 @@ void IN_Move( float frametime, usercmd_t *cmd )
 	ac_movecount = 0;
 }
 
-}
-
 #ifdef XASH_STATIC_GAMELIB
 void DLLEXPORT IN_MouseEvent_CL( int mstate )
 #else
@@ -280,8 +278,6 @@ void DLLEXPORT IN_Accumulate ( void )
 {
 	//gEngfuncs.Con_Printf("IN_Accumulate\n");
 }
-
-namespace cl {
 
 void IN_Commands ( void )
 {

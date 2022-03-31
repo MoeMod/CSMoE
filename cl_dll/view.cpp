@@ -47,15 +47,12 @@ vec3_t	vJumpAngles;
 
 
 extern engine_studio_api_t IEngineStudio;
-}
 
 #ifdef XASH_STATIC_GAMELIB
 int DLLEXPORT CL_IsThirdPerson_CL( void );
 #else
 int DLLEXPORT CL_IsThirdPerson( void );
 #endif
-
-namespace cl {
 
 /*
 The view is allowed to move slightly from it's true position for bobbing,

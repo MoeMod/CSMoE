@@ -33,6 +33,8 @@ GNU General Public License for more details.
 
 #include <vector>
 
+namespace cl {
+
 class CHudZ4::impl_t
 	: public THudSubDispatcher<CHudZ4Energy, CHudZ4Scoreboard, CHudZ4Status, CHudZ4Tips>
 {
@@ -55,7 +57,7 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 	auto type = static_cast<Z4MessageType>(buf.ReadByte());
 	switch (type)
 	{
-	
+
 	case Z4_MESSAGE_NIGHTTIME:
 	{
 		int start = buf.ReadByte();
@@ -218,7 +220,7 @@ int CHudZ4::MsgFunc_Z4Msg(const char *pszName, int iSize, void *pbuf)
 		gHUD.m_HeadIcon.R_AttachTentToPlayer(player, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/z4_stun.spr"), Vector(0.0, 0.0, 16.0), 5.5f, TRUE, FTENT_PERSIST | FTENT_FADEOUT | FTENT_SPRANIMATELOOP, 0.5, kRenderTransAdd, 10.0f);
 		break;
 	}
-	
+
 	return 1;
 }
 
@@ -310,4 +312,6 @@ bool CHudZ4::ActivateSkill(int iSlot)
 void CHudZ4::SetStatus(int slot, Z4Status id, Z4StatusIconDraw status)
 {
 	pimpl->get<CHudZ4Status>().AddIcon(slot, id, status);
+}
+
 }

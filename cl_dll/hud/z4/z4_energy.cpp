@@ -20,6 +20,8 @@ GNU General Public License for more details.
 #include "z4.h"
 #include "z4_energy.h"
 
+namespace cl {
+
 constexpr int MAX_ENERGY = 120;
 
 CHudZ4Energy::CHudZ4Energy(void)
@@ -364,4 +366,6 @@ void CHudZ4Energy::DrawNumbers(int n, int x, int y, int from_right, float size)
 
 	k = n % 10;
 	DrawNumber(k, x, y, size);
+}
+
 }
