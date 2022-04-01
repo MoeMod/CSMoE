@@ -31,7 +31,7 @@
 #include "LogoFile.h"
 #include "BMPUtils.h"
 
-#include <setjmp.h>
+#include <memory>
 
 struct ColorItem_t
 {
@@ -464,11 +464,11 @@ void COptionsSubMultiplayer::InitCrosshairTypeList(CLabeledCommandComboBox *cb)
 
 	cb->Reset();
 
-	cb->AddItem("十字型", "cl_crosshair_type 0");
-	cb->AddItem("点射型", "cl_crosshair_type 1");
-	cb->AddItem("枪靶型", "cl_crosshair_type 2");
-	cb->AddItem("复合型", "cl_crosshair_type 3");
-	cb->AddItem("圆点型", "cl_crosshair_type 4");
+	cb->AddItem("#CSO_CrossHairType_0", "cl_crosshair_type 0");
+	cb->AddItem("#CSO_CrossHairType_1", "cl_crosshair_type 1");
+	cb->AddItem("#CSO_CrossHairType_2", "cl_crosshair_type 2");
+	cb->AddItem("#CSO_CrossHairType_3", "cl_crosshair_type 3");
+	cb->AddItem("#CSO_CrossHairType_4", "cl_crosshair_type 4");
 
 	auto value = engine->pfnGetCvarString("cl_crosshair_type");
 

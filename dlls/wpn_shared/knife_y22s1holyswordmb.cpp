@@ -398,8 +398,6 @@ namespace sv {
 		void Precache(void)
 		{
 			m_iModelLight = PRECACHE_MODEL("sprites/laserbeam.spr");
-			PRECACHE_MODEL("models/ef_y22s1holyswordmb_parryattack2.mdl");
-			PRECACHE_MODEL("models/ef_y22s1holyswordmb_parryattack.mdl");
 		}
 #if DEBUG_DRAWBOX
 		void DrawBeam();

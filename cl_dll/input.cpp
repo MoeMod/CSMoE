@@ -216,7 +216,7 @@ KB_Find
 Allows the engine to get a kbutton_t directly ( so it can check +mlook state, etc ) for saving out to .cfg files
 ============
 */
-struct kbutton_s DLLEXPORT *KB_Find( const char *name )
+kbutton_t DLLEXPORT *KB_Find( const char *name )
 {
 	kblist_t *p;
 	p = g_kbkeys;

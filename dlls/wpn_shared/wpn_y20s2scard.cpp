@@ -103,7 +103,7 @@ struct Y20s2SCARD_WeaponData
 			m_flRemoveTime = gpGlobals->time + 4.0s;
 			UTIL_SetSize(pev, g_vecZero, g_vecZero);
 
-			pev->classname = MAKE_STRING("weapon_y21s1jetgunmd");
+			pev->classname = MAKE_STRING("weapon_y20s2scard");
 
 			pev->nextthink = gpGlobals->time + 0.01s;
 		}
@@ -119,6 +119,10 @@ struct Y20s2SCARD_WeaponData
 
 		bool CanAttack(CBaseEntity* pOther)
 		{
+		
+			if (pev->iuser1 & (1 << pOther->entindex()))
+				return false;
+
 			if (pOther->IsBSPModel())
 				return false;
 
@@ -139,6 +143,9 @@ struct Y20s2SCARD_WeaponData
 
 		void EXPORT OnTouch(CBaseEntity* pOther)
 		{
+			if (m_iPenetrationTime < 0)
+				return;
+
 			if (pev->owner == pOther->edict())
 				return;
 
@@ -193,6 +200,9 @@ struct Y20s2SCARD_WeaponData
 				{
 					m_iPenetrationTime++;
 				}
+
+
+				pev->iuser1 |= (1 << pOther->entindex());
 			}
 			else
 			{

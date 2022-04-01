@@ -804,7 +804,7 @@ void CPlayerModStrategy_ZB3F2P::GiveDefaultItems()
 			if(!RANDOM_LONG(0, 5))
 				m_pPlayer->GiveNamedItem("knife_skullt9");
 			else
-				m_pPlayer->GiveNamedItem("knife_skullaxe");
+				m_pPlayer->GiveNamedItem("knife_magicknife");
 
 			
 			m_pPlayer->GiveNamedItem("weapon_hegrenade");

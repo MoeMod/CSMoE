@@ -1,6 +1,10 @@
 #include <vgui/IInput.h>
 
 
+#ifndef DISABLE_MOE_VGUI2_EXT
+void IME_SetInputScreenPos(int x, int y);
+#endif
+
 // CS vgui2.dll doesn't have the following functions, so just return a default value
 namespace vgui2
 {
@@ -58,6 +62,9 @@ namespace vgui2
 
 	void IInput::SetCandidateWindowPos(int x, int y)
 	{
+#ifndef DISABLE_MOE_VGUI2_EXT
+		IME_SetInputScreenPos(x, y);
+#endif
 		return;
 	}
 

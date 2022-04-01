@@ -34,8 +34,6 @@ GNU General Public License for more details.
 
 #include <string>
 
-#define XASH_DISABLE_FWGS_EXTENSIONS
-
 namespace vgui2 {
 
 extern IBaseUI* staticUIFuncs;

@@ -64,6 +64,7 @@ enum event_effect
 	EVENT_M32VENOM,
 	EVENT_M95TIGERNET,
 	EVENT_M95TIGER,
+	EVENT_MAGICKNIFE,
 };
 
 enum buffsg552ex_slash_e
@@ -1849,7 +1850,7 @@ void EV_WpnEffects(event_args_s* args)
 					pEnt->entity.curstate.renderamt = 255;
 					pEnt->entity.curstate.animtime = gHUD.m_flTime;
 					pEnt->entity.curstate.frame = 0;
-					pEnt->entity.curstate.framerate = 1.0;
+					pEnt->entity.curstate.framerate = 30.0;
 					pEnt->die = gHUD.m_flTime + 0.1;
 					pEnt->clientIndex = args->iparam2;
 					pEnt->flags |= FTENT_NONE;
@@ -1883,6 +1884,85 @@ void EV_WpnEffects(event_args_s* args)
 			}
 		}
 
+		break;
+	}
+	case EVENT_MAGICKNIFE:
+	{
+		model_s* pModel;
+		TEMPENTITY* pEnt;
+		
+		if (args->bparam1)
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_end.spr", false);
+			if (pModel)
+			{
+				pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				if (pEnt)
+				{
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.scale = 0.5f;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->frameMax = 45;
+					pEnt->entity.curstate.framerate = 30.0;
+					pEnt->die = gHUD.m_flTime + 1.5;
+					pEnt->clientIndex = args->iparam2;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_SPRANIMATE;
+				}
+			}
+		}
+		else
+		{
+			pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp01.spr", false);
+			if (pModel)
+			{
+				pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				if (pEnt)
+				{
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.scale = 0.5f;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->frameMax = 35;
+					pEnt->entity.curstate.framerate = 30.0;
+					pEnt->die = gHUD.m_flTime + 1.6;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.renderamt = 255;
+					pEnt->entity.curstate.fuser1 = 1.5;
+					pEnt->entity.curstate.vuser1 = origin;
+					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE;
+				}
+				pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+
+					if (currenttime > ent->entity.curstate.fuser1)
+					{
+						ent->entity.curstate.fuser1 = currenttime + 9999.0;
+
+						model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp02.spr", false);
+
+						if (pModel)
+						{
+							TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->entity.curstate.vuser1, pModel);
+
+							if (!pEnt)
+								return;
+
+							pEnt->flags |= FTENT_SPRANIMATE;
+							pEnt->entity.curstate.animtime = gHUD.m_flTime;
+							pEnt->entity.curstate.frame = 0.0f;
+							pEnt->entity.curstate.framerate = 30.0f;
+							pEnt->entity.curstate.rendermode = kRenderTransAdd;
+							pEnt->frameMax = 35.0;
+							pEnt->entity.curstate.scale = 0.5f;
+							pEnt->entity.curstate.renderamt = 255;
+							pEnt->die = gHUD.m_flTime + 1.5;
+						}
+					}
+				};
+			}
+		}
+		
+		
 		break;
 	}
 

@@ -182,6 +182,7 @@ TL_ADD(CZombieLaw)
 TL_ADD(CM32Venom)
 TL_ADD(CM95Tiger)
 TL_ADD(CKnifeY22S1HolySwordMB)
+TL_ADD(CKnifeMagicKnife)
 
 
 
@@ -427,6 +428,7 @@ TL_ADD(CM32VenomMark)
 TL_ADD(CM32VenomRocket)
 TL_ADD(CM95TigerNet)
 TL_ADD(CM95TigerEFTiger)
+TL_ADD(CMagicCircle)
 #endif
 
 TL_END(AllEntityTypeList)

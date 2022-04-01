@@ -613,6 +613,14 @@ namespace sv {
 				pPlayer->pev->velocity.z = 400;
 
 				pPlayer->m_flVelocityModifier = 0.9;
+
+				auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(pPlayer->m_pModStrategy.get());
+				if (strategy)
+				{
+					strategy->SetStunSpeedTime(1.5s);
+					strategy->SetStunGravityTime(1.5s);
+				}
+
 			}
 
 			fDidHit = TRUE;

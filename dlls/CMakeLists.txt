@@ -371,6 +371,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m32venom.cpp
 	../dlls/wpn_shared/wpn_m95tiger.cpp
 	../dlls/wpn_shared/knife_y22s1holyswordmb.cpp
+	../dlls/wpn_shared/knife_magicknife.cpp
 	)
 
 set(PM_SRCS

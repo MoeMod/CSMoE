@@ -18,7 +18,6 @@
 #include "OptionsSubVoice.h"
 #include "OptionsSubVideo.h"
 #include "OptionsSubAdvanced.h"
-
 #include "ModInfo.h"
 
 #include "KeyValues.h"
@@ -44,7 +43,6 @@ COptionsDialog::COptionsDialog(vgui2::Panel *parent) : PropertyDialog(parent, "O
 	m_pOptionsSubMouse = new COptionsSubMouse(this);
 	m_pOptionsSubAudio = new COptionsSubAudio(this);
 	m_pOptionsSubVideo = new COptionsSubVideo(this);
-
 	if (!ModInfo().IsSinglePlayerOnly())
 	{
 		m_pOptionsSubVoice = new COptionsSubVoice(this);
@@ -56,8 +54,8 @@ COptionsDialog::COptionsDialog(vgui2::Panel *parent) : PropertyDialog(parent, "O
 	AddPage(m_pOptionsSubKeyboard, "#GameUI_Keyboard");
 	AddPage(m_pOptionsSubMouse, "#GameUI_Mouse");
 	AddPage(m_pOptionsSubAudio, "#GameUI_Audio");
-	AddPage(m_pOptionsSubVideo, "#GameUI_Video");
-	AddPage(m_pOptionsSubVoice, "#GameUI_Voice");
+	//AddPage(m_pOptionsSubVideo, "#GameUI_Video");
+	//AddPage(m_pOptionsSubVoice, "#GameUI_Voice");
 	//AddPage(m_pOptionsSubAdvanced, "#GameUI_Advanced");
 
 	SetApplyButtonVisible(true);

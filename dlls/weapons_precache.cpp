@@ -286,6 +286,7 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_m32venomgrenade");
 	UTIL_PrecacheOtherWeapon("weapon_m95tiger");
 	UTIL_PrecacheOtherWeapon("knife_y22s1holyswordmb");
+	UTIL_PrecacheOtherWeapon("knife_magicknife");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

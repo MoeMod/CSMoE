@@ -80,9 +80,8 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
-	{"nemesis", 20, MakeZombieClass<CZombieClass_Nemesis>}
-	//{"tank", 100, MakeZombieClass<CZombieClass_Default>},
-	//{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
+	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
+	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
 };
 #endif
 

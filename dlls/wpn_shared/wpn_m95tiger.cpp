@@ -64,7 +64,6 @@ public:
 		pev->rendermode = kRenderTransAdd;
 		pev->renderfx = kRenderFxNone;
 		pev->renderamt = 255;
-		pev->framerate = 1.0;
 		pev->solid = SOLID_TRIGGER;
 		pev->movetype = MOVETYPE_NOCLIP;
 		pev->sequence = 0;

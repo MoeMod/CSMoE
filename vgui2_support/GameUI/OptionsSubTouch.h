@@ -5,8 +5,8 @@
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef OPTIONS_SUB_AUDIO_H
-#define OPTIONS_SUB_AUDIO_H
+#ifndef OPTIONS_SUB_TOUCH_H
+#define OPTIONS_SUB_TOUCH_H
 #ifdef _WIN32
 #pragma once
 #endif
@@ -16,7 +16,7 @@ class CLabeledCommandComboBox;
 class CCvarSlider;
 class CCvarToggleCheckButton;
 //-----------------------------------------------------------------------------
-// Purpose: Audio Details, Part of OptionsDialog
+// Purpose: Touch Details, Part of OptionsDialog
 //-----------------------------------------------------------------------------
 class COptionsSubTouch : public vgui2::PropertyPage
 {
@@ -50,11 +50,11 @@ private:
 	CCvarSlider* m_pExponentSlider;
 
 	CCvarToggleCheckButton* m_pGridButton;
-	CCvarToggleCheckButton* m_pEnableButton;
+	CCvarToggleCheckButton* m_pEnableTouchButton;
 	CCvarToggleCheckButton* m_pNomouseButton;
 	CCvarToggleCheckButton* m_pAccelerationButton;
 
-	CCvarTextEntry* m_pProfileName;
+	//CCvarTextEntry* m_pProfileName;
 
 	vgui2::ComboBox* m_pProfiles;
 	vgui2::Button* reset;

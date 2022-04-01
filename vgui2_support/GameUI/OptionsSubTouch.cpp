@@ -4,7 +4,7 @@
 //
 //=============================================================================
 #include "EngineInterface.h"
-#include "OptionsSubAudio.h"
+#include "OptionsSubTouch.h"
 
 #include "CvarToggleCheckButton.h"
 #include "CvarSlider.h"
@@ -44,10 +44,10 @@ COptionsSubTouch::COptionsSubTouch(vgui2::Panel *parent) : PropertyPage(parent, 
 		"#GameUI_EnableGrid",
 		"touch_grid_enable");
 
-	m_pEnableButton = new  CCvarToggleCheckButton(
+	m_pEnableTouchButton = new  CCvarToggleCheckButton(
 		this,
-		"EnableButton",
-		"#GameUI_EnableButton",
+		"EnableTouchButton",
+		"#GameUI_EnableTouchButton",
 		"touch_enable");
 
 	m_pNomouseButton = new  CCvarToggleCheckButton(
@@ -62,66 +62,9 @@ COptionsSubTouch::COptionsSubTouch(vgui2::Panel *parent) : PropertyPage(parent, 
 		"#GameUI_EnableAcceleration",
 		"touch_nonlinear_look");
 
-	m_pProfileName = new CCvarTextEntry(this, "NameEntry", "name");
+	//m_pProfileName = new CCvarTextEntry(this, "NameEntry", "name");
 
-
-
-	m_pEAXCheckButton = new CCvarToggleCheckButton( 
-		this, 
-		"EAX",
-		"#GameUI_EnableEAX",
-		"s_eax" );
-
-	m_pA3DCheckButton = new CCvarToggleCheckButton( 
-		this, 
-		"A3D",
-		"#GameUI_EnableA3D",
-		"s_a3d" );
-
-	m_pSFXSlider = new CCvarSlider( this, "SFX Slider", "#GameUI_SoundEffectVolume",
-		0.0f, 2.0f, "volume");
-
-	m_pHEVSlider = new CCvarSlider( this, "Suit Slider", "#GameUI_HEVSuitVolume",
-		0.0f, 2.0f, "suitvolume");
-
-	m_pMP3Slider = new CCvarSlider( this, "MP3 Volume", "#GameUI_MP3Volume",
-		0.0f, 1.0f, "mp3volume" );
-
-	m_pSoundQualityCombo = new CLabeledCommandComboBox( this, "Sound Quality" );
-
-	//!! bug no command given
-	m_pSoundQualityCombo->AddItem( "#GameUI_High", "hisound 1" );
-	m_pSoundQualityCombo->AddItem( "#GameUI_Low", "hisound 0" );
-	m_pSoundQualityCombo->SetInitialItem(engine->pfnGetCvarFloat("hisound") != 0.0f ? 0 : 1);
-		
-
-
-	LoadControlSettings("Resource/OptionsSubAudio.res");
-
-	// override, hide the HEV suit volume when not in half-life
-	if (ModInfo().IsMultiplayerOnly())
-	{
-		Panel *child = FindChildByName("suit label");
-		if (child)
-		{
-			child->SetVisible(false);
-		}
-		child = FindChildByName("Suit Slider");
-		if (child)
-		{
-			child->SetVisible(false);
-		}
-	}
-
-	// hide expired cvar
-	if (!engine->pfnGetCvarPointer("s_eax"))
-	{
-		m_pEAXCheckButton->SetVisible( false );
-	}
-	if (!engine->pfnGetCvarPointer("s_a3d"))
-	{
-		m_pA3DCheckButton->SetVisible( false );
-	}
+	LoadControlSettings("Resource/optionssubtouch.res");
 }
 
 COptionsSubTouch::~COptionsSubTouch()
@@ -130,25 +73,32 @@ COptionsSubTouch::~COptionsSubTouch()
 
 void COptionsSubTouch::OnResetData()
 {
-	m_pEAXCheckButton->Reset();
-	m_pA3DCheckButton->Reset();
-	m_pSFXSlider->Reset();
-	m_pHEVSlider->Reset();
-	m_pMP3Slider->Reset();
-	m_pSoundQualityCombo->Reset();
+	m_pLookXSlider->Reset();
+	m_pLookYSlider->Reset();
+	m_pMoveXSlider->Reset();
+	m_pMoveYSlider->Reset();
+	m_pPowerSlider->Reset();
+	m_pMultiplierSlider->Reset();
+	m_pExponentSlider->Reset();
+	m_pGridButton->Reset();
+	m_pEnableTouchButton->Reset();
+	m_pNomouseButton->Reset();
+	m_pAccelerationButton->Reset();
 }
 
 void COptionsSubTouch::OnApplyChanges()
 {
-	if (engine->pfnGetCvarPointer("s_eax"))
-		m_pEAXCheckButton->ApplyChanges();
-	if ( engine->pfnGetCvarPointer( "s_a3d" ) )
-		m_pA3DCheckButton->ApplyChanges();
-
-	m_pSFXSlider->ApplyChanges();
-	m_pHEVSlider->ApplyChanges();
-	m_pMP3Slider->ApplyChanges();
-	m_pSoundQualityCombo->ApplyChanges();
+	m_pLookXSlider->ApplyChanges();
+	m_pLookYSlider->ApplyChanges();
+	m_pMoveXSlider->ApplyChanges();
+	m_pMoveYSlider->ApplyChanges();
+	m_pPowerSlider->ApplyChanges();
+	m_pMultiplierSlider->ApplyChanges();
+	m_pExponentSlider->ApplyChanges();
+	m_pGridButton->ApplyChanges();
+	m_pEnableTouchButton->ApplyChanges();
+	m_pNomouseButton->ApplyChanges();
+	m_pAccelerationButton->ApplyChanges();
 }
 
 void COptionsSubTouch::OnControlModified()

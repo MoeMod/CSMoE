@@ -32,6 +32,7 @@
 #include "BackgroundMenuButton.h"
 #include "OptionsDialog.h"
 #include "CreateMultiplayerGameDialog.h"
+#include "MoeSettings.h"
 
 #include "ToolBar.h"
 #include <keydefs.h>
@@ -765,8 +766,9 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 {
 	CGameMenu *menu = new CGameMenu(this, "GameMenu");
 
+	menu->AddMenuItem("#GameUI_CSMoESettings", "#GameUI_CSMoESettings", "OpenMoeSettings", this, nullptr);
     menu->AddMenuItem("#GameUI_Console", "#GameUI_Console", "OpenConsole", this, nullptr);
-
+	
 	for (KeyValues *dat = datafile->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
 	{
 		const char *label = dat->GetString("label", "<unknown>");
@@ -1008,6 +1010,10 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
         vgui2::staticUIFuncs->ShowConsole();
 	}
+	else if (!Q_stricmp(command, "OpenMoeSettings"))
+	{
+		OnOpenMoeSettings();
+	}
 
 	else
 		BaseClass::OnCommand(command);
@@ -1105,6 +1111,17 @@ void CBasePanel::OnOpenCreateMultiplayerGameDialog(void)
 	}
 
 	m_hCreateMultiplayerGameDialog->Activate();
+}
+
+void CBasePanel::OnOpenMoeSettings(void)
+{
+	if (!m_hMoeSettings.Get())
+	{
+		m_hMoeSettings = new CMoeSettings(this);
+		PositionDialog(m_hMoeSettings);
+	}
+
+	m_hMoeSettings->Activate();
 }
 
 void CBasePanel::PositionDialog(vgui2::PHandle dlg)

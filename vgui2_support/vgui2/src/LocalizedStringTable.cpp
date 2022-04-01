@@ -330,24 +330,14 @@ wchar_t *CLocalizedStringTable::Find( char const *tokenName )
 
 int CLocalizedStringTable::ConvertANSIToUnicode( const char *ansi, wchar_t *unicode, int unicodeBufferSizeInBytes )
 {
-	if( !unicode || !ansi )
-		return -1;
-
-	auto result = mbstowcs( unicode, ansi, unicodeBufferSizeInBytes / sizeof( wchar_t ) );
-	unicode[ ( unicodeBufferSizeInBytes / sizeof( wchar_t ) ) - 1 ] = '\0';
-
-	return result;
+	// MoeMod : No more GB2312
+	return Q_UTF8ToUnicode(ansi, unicode, unicodeBufferSizeInBytes) / sizeof(wchar_t);
 }
 
 int CLocalizedStringTable::ConvertUnicodeToANSI( const wchar_t *unicode, char *ansi, int ansiBufferSize )
 {
-	if( !ansi || !unicode )
-		return -1;
-
-	auto result = wcstombs( ansi, unicode, ansiBufferSize );
-	ansi[ ansiBufferSize - 1 ] = '\0';
-
-	return result;
+	// MoeMod : No more GB2312
+	return Q_UnicodeToUTF8(unicode, ansi, ansiBufferSize);
 }
 
 vgui2::StringIndex_t CLocalizedStringTable::FindIndex( const char *tokenName )
