@@ -32,19 +32,7 @@ namespace ui
 	void LuaUI_Init()
 	{
 		L = luaL_newstate();
-
-		// we should ban some dangerous libs
-		luaopen_base(L);
-		luaopen_math(L);
-		luaopen_string(L);
-		luaopen_table(L);
-		//luaopen_io(L);
-		//luaopen_os(L);
-		//luaopen_package(L);
-		luaopen_debug(L);
-		luaopen_bit(L);
-		luaopen_jit(L);
-		//luaopen_ffi(L);
+        luaL_openlibs(L);
 
 		lua_register(L, "require", LuaUI_GlobalRequire);
 		lua_register(L, "reload", LuaUI_GlobalReload);
@@ -104,7 +92,7 @@ namespace ui
 		{
 			// reload all
 			lua_newtable(L);
-			lua_setfield(L, LUA_REGISTRYINDEX, "_LOADED");
+			lua_setfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 			return 0;
 		}
 
@@ -115,7 +103,7 @@ namespace ui
 			return 0;
 		}
 
-		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
+		lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 		lua_pushnil(L);
 		lua_setfield(L, 2, ModuleName);
 		return 0;
@@ -167,7 +155,7 @@ namespace ui
 		}
 #endif
 
-		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED"); // LUA_LOADED_TABLE
+        luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE
 
 		lua_getfield(L, 2, ModuleName);

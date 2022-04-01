@@ -168,18 +168,25 @@ namespace cl {
 		lua_getglobal(L, "_LUACLASS"); // #1 = _R._LUACLASS
 		assert(!lua_isnil(L, -1));
 		lua_pushnil(L);
+        // Note : dont modify table while iteration
+        std::vector<std::string> ClassNames;
 		while (lua_next(L, -2))
 		{
 			// -1 = value, -2 = key
 			const char* classname = lua_tostring(L, -2);
-			auto pEntity = LuaGetPredictionWeaponEntity(classname);
-			if (pEntity)
-			{
-				((CBasePlayerWeapon*)pEntity)->m_pPlayer = pWeaponOwner;
-			}
+            ClassNames.emplace_back(classname);
 			lua_pop(L, 1);
 		}
 		lua_pop(L, 1);
+
+        for(const auto &ClassName : ClassNames)
+        {
+            auto pEntity = LuaGetPredictionWeaponEntity(ClassName.c_str());
+            if (pEntity)
+            {
+                ((CBasePlayerWeapon*)pEntity)->m_pPlayer = pWeaponOwner;
+            }
+        }
 	}
 #endif
 

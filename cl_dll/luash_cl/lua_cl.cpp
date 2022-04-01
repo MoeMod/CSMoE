@@ -33,19 +33,7 @@ namespace cl
 	void LuaCL_Init()
 	{
 		L = luaL_newstate();
-
-		// we should ban some dangerous libs
-		luaopen_base(L);
-		luaopen_math(L);
-		luaopen_string(L);
-		luaopen_table(L);
-		//luaopen_io(L);
-		//luaopen_os(L);
-		//luaopen_package(L);
-		luaopen_debug(L);
-		luaopen_bit(L);
-		luaopen_jit(L);
-		//luaopen_ffi(L);
+        luaL_openlibs(L);
 
 		lua_register(L, "reload", LuaUI_GlobalReload);
 		lua_register(L, "require", LuaCL_GlobalRequire);
@@ -142,7 +130,7 @@ namespace cl
 		{
 			// reload all
 			lua_newtable(L);
-			lua_setfield(L, LUA_REGISTRYINDEX, "_LOADED");
+			lua_setfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 			return 0;
 		}
 
@@ -153,7 +141,7 @@ namespace cl
 			return 0;
 		}
 
-		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED");
+		lua_getfield(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE);
 		lua_pushnil(L);
 		lua_setfield(L, 2, ModuleName);
 		return 0;
@@ -205,7 +193,7 @@ namespace cl
 		}
 #endif
 
-		lua_getfield(L, LUA_REGISTRYINDEX, "_LOADED"); // LUA_LOADED_TABLE
+        luaL_getsubtable(L, LUA_REGISTRYINDEX, LUA_LOADED_TABLE); // LUA_LOADED_TABLE
 		// #2 = _G.LUA_LOADED_TABLE
 
 		lua_getfield(L, 2, ModuleName);
@@ -292,27 +280,32 @@ namespace cl
 	{
 		lua_State* L = LuaCL_Get();
 
+        lua_getglobal(L, "debug"); // #1 = debug
+        lua_getfield(L, -1, "traceback"); // #2 = debug.traceback
+
 		lua_getglobal(L, "require");
-		// #1 = require
+		// #3 = require
 
 		lua_pushstring(L, "imgui/client");
-		// #2 = path
+		// #4 = path
 
 		lua_call(L, 1, 1);
-		// #1 = function LuaCL_OnGUI
+		// #3 = function LuaCL_OnGUI
 
 		if (!lua_isnil(L, -1))
 		{
-			int errc = lua_pcall(L, 0, 0, 0);
+
+			int errc = lua_pcall(L, 0, 0, -2);
 			// #0 on succ
 			// #1 = errmsg on failed
 			if (errc)
 			{
 				const char* msg = lua_tostring(L, -1);
-				gEngfuncs.Con_Printf("%s Error: lua imgui failed: %s", __FUNCTION__, msg);
+				gEngfuncs.Con_Printf("%s Error: lua imgui failed: %s\n", __FUNCTION__, msg);
 				lua_pop(L, 1);
 				// #0
 			}
+            lua_pop(L, 2); // #0
 		}
 		else
 		{

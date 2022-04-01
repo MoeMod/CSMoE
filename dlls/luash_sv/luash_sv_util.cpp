@@ -85,8 +85,6 @@ namespace cl {
 
 	int LuaSV_InitEntityFactory(lua_State* L)
 	{
-		lua_newtable(L);
-		lua_setfield(L, LUA_REGISTRYINDEX, "_LUACLASS");
 		return 0;
 	}
 }

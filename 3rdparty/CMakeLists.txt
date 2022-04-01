@@ -13,19 +13,9 @@ if(IOS)
 	target_link_libraries(3rdparty-sdl2 INTERFACE SDL2main)
 endif()
 
-find_package(LuaJit QUIET)
-if(LuaJit_FOUND AND FALSE) # we are using our own luajit and build from source.
-	add_library(luajit_3p INTERFACE)
-	target_link_libraries(luajit_3p INTERFACE ${LUAJIT_LIBRARIES})
-	target_include_directories(luajit_3p INTERFACE ${LUAJIT_INCLUDE_DIR})
-else()
-	set(LUAJIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/LuaJIT")
-	include(luajit-cmake/LuaJIT.cmake)
-
-	add_library(luajit_3p INTERFACE)
-	target_link_libraries(luajit_3p INTERFACE libluajit)
-	target_include_directories(luajit_3p INTERFACE "${LUAJIT_DIR}/src")
-endif()
+add_subdirectory(lua-cmake EXCLUDE_FROM_ALL)
+add_library(lua54_3p INTERFACE)
+target_link_libraries(lua54_3p INTERFACE lua_static)
 
 if(XASH_VCPKG)
 	find_package(nameof CONFIG QUIET)

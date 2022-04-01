@@ -92,7 +92,7 @@ namespace luash
 	template<class T> auto GetArray(lua_State* L, int N, T& v) -> decltype(v.begin(), v.end(), v.resize(0), void())
 	{
 		lua_pushvalue(L, N); // #1 = arr
-		const auto Size = lua_objlen(L, -1);
+		const auto Size = lua_rawlen(L, -1);
 		v.resize(Size);
 		int i = 0;
 		for (auto& x : v)

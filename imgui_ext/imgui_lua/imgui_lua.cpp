@@ -62,7 +62,7 @@ static int w_SetReturnValueLast(lua_State *L)
 
 static int w_GetStyleColorName(lua_State *L)
 {
-	int idx = luaL_checkint(L, 1);
+	int idx = luaL_checkinteger(L, 1);
 	lua_pushstring(L, ImGui::GetStyleColorName(idx - 1));
 	return 1;
 }
@@ -143,7 +143,7 @@ static int impl_##name(lua_State *L) { \
 
 #define LABEL_ARRAY_ARG(name) \
   luaL_checktype(L, arg, LUA_TTABLE); \
-  int len = lua_objlen(L, arg++); \
+  int len = luaL_len(L, arg++); \
   std::vector<const char *> list; \
   for (int i = 0; i < len; i++) \
     { \
@@ -209,7 +209,7 @@ static int impl_##name(lua_State *L) { \
 
 #define FLOAT_ARRAY_ARG(name) \
   luaL_checktype(L, arg, LUA_TTABLE); \
-  int len = lua_objlen(L, arg++); \
+  int len = luaL_len(L, arg++); \
   std::vector<float> list; \
   for (int i = 0; i < len; i++) \
       { \
@@ -304,7 +304,7 @@ static int impl_##name(lua_State *L) { \
   int name = otherwise; \
   if (arg <= max_args) { \
 	if (lua_istable(L, arg++)) { \
-		int len = lua_objlen(L, -1); \
+		int len = lua_rawlen(L, -1); \
 		for (int i = 0; i < len; i++) { \
 			lua_pushinteger(L, i + 1); \
 			lua_gettable(L, arg - 1); \
@@ -324,7 +324,7 @@ static int impl_##name(lua_State *L) { \
 #define ENUM_ARG(name) \
 	int name = 0; \
 	if (lua_istable(L, arg++)) { \
-		int len = lua_objlen(L, -1); \
+		int len = luaL_len(L, -1); \
 		for (int i = 0; i < len; i++) { \
 			lua_pushinteger(L, i + 1); \
 			lua_gettable(L, arg - 1); \
@@ -797,6 +797,8 @@ static const struct luaL_Reg imguilib[] = {
 
 int luaopen_imgui(lua_State *L)
 {
+    lua_newtable(L);
+
 	// Enums not handled by iterator yet
 	lua_newtable(L);
 
@@ -1148,6 +1150,8 @@ int luaopen_imgui(lua_State *L)
 	WRAP_ENUM(L, ImGuiCond_FirstUseEver, ImGuiCond_FirstUseEver);
 	WRAP_ENUM(L, ImGuiCond_Appearing, ImGuiCond_Appearing);
 
-	luaL_openlib(L, "imgui", imguilib, 1);
-	return 1;
+    luaL_setfuncs(L, imguilib, 1);
+    lua_setglobal(L, "imgui");
+
+	return 0;
 }

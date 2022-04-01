@@ -505,7 +505,7 @@ if(XASH_ASTC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE astcenc_3p)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p luajit_3p)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

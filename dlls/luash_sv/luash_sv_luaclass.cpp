@@ -102,7 +102,7 @@ namespace cl {
 			PushArgs(L BOOST_PP_COMMA_IF(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))) BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
 			if(!PostCall(L, BOOST_PP_STRINGIZE(BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__)), BOOST_PP_VARIADIC_SIZE(__VA_ARGS__))) \
 				return ThisClass::BOOST_PP_VARIADIC_ELEM(0, __VA_ARGS__) (BOOST_PP_ENUM_PARAMS(BOOST_PP_DEC(BOOST_PP_VARIADIC_SIZE(__VA_ARGS__)), x)); \
-			return ReturnFromLuaIfNotVoid<ResultType>(L, 2); \
+			return ReturnFromLuaIfNotVoid<ResultType>(L, 1); \
 		}
 	#define ADD_OVERRIDE_VIRTUAL_FUNCTION(...) ADD_VIRTUAL_FUNCTION(__VA_ARGS__)
 	#define ADD_MEMBER_FUNCTION(FunctionName, ...) 
