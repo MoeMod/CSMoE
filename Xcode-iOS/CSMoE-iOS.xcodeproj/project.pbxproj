@@ -36,34 +36,6 @@
 		3D99F5A3277215DC006EDB62 /* launchdialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A2277215DC006EDB62 /* launchdialog.mm */; };
 		3D99F5A527721613006EDB62 /* TutorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D99F5A427721613006EDB62 /* TutorViewController.mm */; };
 		3DA767ED27EDE1AD00824693 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA767EC27EDE1AD00824693 /* libbz2.tbd */; };
-		3DA768AC27EE578F00824693 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768AB27EE575700824693 /* libxash.a */; };
-		3DA768B227EE6C6400824693 /* libastcenc-native-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687527EE575700824693 /* libastcenc-native-static.a */; };
-		3DA768B327EE6C7A00824693 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687727EE575700824693 /* libclient.a */; };
-		3DA768B427EE6C9C00824693 /* libcpuinfo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687B27EE575700824693 /* libcpuinfo.a */; };
-		3DA768B527EE6C9C00824693 /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687F27EE575700824693 /* libcqmiao.a */; };
-		3DA768B627EE6C9C00824693 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688127EE575700824693 /* libcrypto.a */; };
-		3DA768B727EE6C9C00824693 /* libdead_wrapper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688327EE575700824693 /* libdead_wrapper.a */; };
-		3DA768B827EE6C9C00824693 /* libexpat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688527EE575700824693 /* libexpat.a */; };
-		3DA768B927EE6C9C00824693 /* libfreetyped.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688727EE575700824693 /* libfreetyped.a */; };
-		3DA768BA27EE6C9C00824693 /* libGameUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7686F27EE575700824693 /* libGameUI.a */; };
-		3DA768BB27EE6C9C00824693 /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688B27EE575700824693 /* libimgui_ext.a */; };
-		3DA768BC27EE6C9C00824693 /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688927EE575700824693 /* libimgui.a */; };
-		3DA768BE27EE6C9C00824693 /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689127EE575700824693 /* libluash.a */; };
-		3DA768BF27EE6C9C00824693 /* libmathlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689327EE575700824693 /* libmathlib.a */; };
-		3DA768C027EE6C9C00824693 /* libSDL2d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687127EE575700824693 /* libSDL2d.a */; };
-		3DA768C127EE6C9C00824693 /* libSDL2maind.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7687327EE575700824693 /* libSDL2maind.a */; };
-		3DA768C227EE6C9C00824693 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689527EE575700824693 /* libserver.a */; };
-		3DA768C327EE6C9C00824693 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689727EE575700824693 /* libssl.a */; };
-		3DA768C427EE6C9C00824693 /* libtier0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689927EE575700824693 /* libtier0.a */; };
-		3DA768C527EE6C9C00824693 /* libtier1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689B27EE575700824693 /* libtier1.a */; };
-		3DA768C627EE6C9C00824693 /* libvgui_controls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A127EE575700824693 /* libvgui_controls.a */; };
-		3DA768C727EE6C9C00824693 /* libvgui_surfacelib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A327EE575700824693 /* libvgui_surfacelib.a */; };
-		3DA768C827EE6C9C00824693 /* libvgui2_support.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689F27EE575700824693 /* libvgui2_support.a */; };
-		3DA768C927EE6C9C00824693 /* libvgui2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7689D27EE575700824693 /* libvgui2.a */; };
-		3DA768CA27EE6C9C00824693 /* libvguimatsurface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A527EE575700824693 /* libvguimatsurface.a */; };
-		3DA768CB27EE6C9C00824693 /* libvinterface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A727EE575700824693 /* libvinterface.a */; };
-		3DA768CC27EE6C9C00824693 /* libvstdlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA768A927EE575700824693 /* libvstdlib.a */; };
-		3DA768CD27EE6E8000824693 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DA7688D27EE575700824693 /* libluajit.a */; };
 		3DC1E4A82289683200114D80 /* PowerCable.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A12289683000114D80 /* PowerCable.png */; };
 		3DC1E4AA2289683200114D80 /* page1_en.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A32289683100114D80 /* page1_en.png */; };
 		3DC1E4AB2289683200114D80 /* MacBookiTunes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DC1E4A42289683100114D80 /* MacBookiTunes.png */; };
@@ -79,6 +51,33 @@
 		3DDCB15827625D0C00BBEC27 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DDCB15727625D0C00BBEC27 /* libiconv.tbd */; };
 		3DDCB15C27625D1700BBEC27 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D0FC1DB2278310100D9A961 /* libc++.tbd */; };
 		3DE829B5260F8F00009DABD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3DE829A7260F8F00009DABD0 /* Assets.xcassets */; };
+		3DF981BE27F9AE400030D0B5 /* libimgui_ext.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A327F9AE3F0030D0B5 /* libimgui_ext.a */; };
+		3DF981BF27F9AE400030D0B5 /* libxash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A427F9AE3F0030D0B5 /* libxash.a */; };
+		3DF981C027F9AE400030D0B5 /* libserver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A527F9AE3F0030D0B5 /* libserver.a */; };
+		3DF981C127F9AE400030D0B5 /* libdead_wrapper.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A627F9AE3F0030D0B5 /* libdead_wrapper.a */; };
+		3DF981C227F9AE400030D0B5 /* libvgui2_support.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A727F9AE400030D0B5 /* libvgui2_support.a */; };
+		3DF981C327F9AE400030D0B5 /* libmathlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A827F9AE400030D0B5 /* libmathlib.a */; };
+		3DF981C427F9AE400030D0B5 /* libastcenc-native-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981A927F9AE400030D0B5 /* libastcenc-native-static.a */; };
+		3DF981C527F9AE400030D0B5 /* libclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981AA27F9AE400030D0B5 /* libclient.a */; };
+		3DF981C627F9AE400030D0B5 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981AB27F9AE400030D0B5 /* libssl.a */; };
+		3DF981C727F9AE400030D0B5 /* libvguimatsurface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981AC27F9AE400030D0B5 /* libvguimatsurface.a */; };
+		3DF981C827F9AE400030D0B5 /* libtier0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981AD27F9AE400030D0B5 /* libtier0.a */; };
+		3DF981CA27F9AE400030D0B5 /* libvgui_controls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981AF27F9AE400030D0B5 /* libvgui_controls.a */; };
+		3DF981CB27F9AE400030D0B5 /* libimgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B027F9AE400030D0B5 /* libimgui.a */; };
+		3DF981CC27F9AE400030D0B5 /* libtier1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B127F9AE400030D0B5 /* libtier1.a */; };
+		3DF981CD27F9AE400030D0B5 /* libvgui2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B227F9AE400030D0B5 /* libvgui2.a */; };
+		3DF981CE27F9AE400030D0B5 /* libcqmiao.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B327F9AE400030D0B5 /* libcqmiao.a */; };
+		3DF981CF27F9AE400030D0B5 /* libvgui_surfacelib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B427F9AE400030D0B5 /* libvgui_surfacelib.a */; };
+		3DF981D027F9AE400030D0B5 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B527F9AE400030D0B5 /* libcrypto.a */; };
+		3DF981D127F9AE400030D0B5 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B627F9AE400030D0B5 /* liblua.a */; };
+		3DF981D327F9AE400030D0B5 /* libcso_controls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B827F9AE400030D0B5 /* libcso_controls.a */; };
+		3DF981D427F9AE400030D0B5 /* libluash.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981B927F9AE400030D0B5 /* libluash.a */; };
+		3DF981D527F9AE400030D0B5 /* libvstdlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981BA27F9AE400030D0B5 /* libvstdlib.a */; };
+		3DF981D627F9AE400030D0B5 /* libGameUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981BB27F9AE400030D0B5 /* libGameUI.a */; };
+		3DF981D727F9AE400030D0B5 /* libvinterface.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF981BC27F9AE400030D0B5 /* libvinterface.a */; };
+		3DF9829227F9AF820030D0B5 /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9828F27F9AF820030D0B5 /* libSDL2.a */; settings = {ATTRIBUTES = (Weak, ); }; };
+		3DF9829327F9AF820030D0B5 /* libSDL2main.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9829027F9AF820030D0B5 /* libSDL2main.a */; settings = {ATTRIBUTES = (Weak, ); }; };
+		3DF9829427F9AF820030D0B5 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DF9829127F9AF820030D0B5 /* libfreetype.a */; settings = {ATTRIBUTES = (Weak, ); }; };
 		498CCAC41E15618F00299D38 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC31E15618F00299D38 /* SystemConfiguration.framework */; };
 		498CCAC61E1561AD00299D38 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 498CCAC51E1561AD00299D38 /* CFNetwork.framework */; };
 		49C4D60720781DAB00855677 /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE0E9691BAF96A00098DFA4 /* GameController.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -92,396 +91,403 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3DA7683C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9821D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1D787F122E3A4C61ABE0C37C;
+			remoteGlobalIDString = D2A67CCC225E49C7BFE4210C;
 			remoteInfo = Boost_atomic;
 		};
-		3DA7683E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9821F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3D6217535CA1406686082B69;
+			remoteGlobalIDString = AA76FFC8DD4A407BB208955F;
 			remoteInfo = Boost_chrono;
 		};
-		3DA7684027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 78F6527EDAAA431D9BACDAA3;
+			remoteGlobalIDString = 1394D8E1C8F446339AE45DF4;
 			remoteInfo = Boost_container;
 		};
-		3DA7684227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 9BEF706F59774173B557564D;
+			remoteGlobalIDString = EFCEF23548204A22AADA4485;
 			remoteInfo = Boost_context;
 		};
-		3DA7684427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 85513D03795C46D4909E1005;
+			remoteGlobalIDString = A559794251544D5FAB30DC04;
 			remoteInfo = Boost_coroutine;
 		};
-		3DA7684627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 45B0522868C24E19B89FA7BC;
+			remoteGlobalIDString = 67D78EBA65D24E86B6BC400C;
 			remoteInfo = Boost_date_time;
 		};
-		3DA7684827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 77D1B715DB174A78AC97BCEB;
+			remoteGlobalIDString = A8D51365E6B34FFEBCEC8ACD;
 			remoteInfo = Boost_exception;
 		};
-		3DA7684A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0AFB23FB12774D2783FA66C1;
+			remoteGlobalIDString = 0DB429A1F6EF4074A414BDEA;
 			remoteInfo = Boost_fiber;
 		};
-		3DA7684C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 5544A93D9F004F38856089F7;
+			remoteGlobalIDString = CF3E0F8D7C544E5B999BA6CF;
 			remoteInfo = Boost_filesystem;
 		};
-		3DA7684E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9822F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3AB23EF6F89946FBB411261B;
+			remoteGlobalIDString = D43584587E334886B2ACA98A;
 			remoteInfo = Boost_graph;
 		};
-		3DA7685027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 4B3AD0EB8E9E4BA7B0C61F4F;
+			remoteGlobalIDString = AC53433C70A9413A9A7FDCCB;
 			remoteInfo = Boost_iostreams;
 		};
-		3DA7685227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 551016815CCC4650B82C3A2E;
+			remoteGlobalIDString = 1857AE7233474C96860B9A63;
 			remoteInfo = Boost_locale;
 		};
-		3DA7685427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D003C414C6F445A8B96B831C;
+			remoteGlobalIDString = 79AF387B2B7F420BB916B824;
 			remoteInfo = Boost_log;
 		};
-		3DA7685627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7ECA4BE019B342098F179902;
+			remoteGlobalIDString = A076DFAA07AE4C94AB2F8D1A;
 			remoteInfo = Boost_log_setup;
 		};
-		3DA7685827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = A9F124C4A5A241FBB07C83DE;
+			remoteGlobalIDString = 8E349385CD36455D8F23E734;
 			remoteInfo = Boost_math;
 		};
-		3DA7685A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E3FDA9A3CDC84B629ABFAA12;
+			remoteGlobalIDString = 64E1FBA030174A20BEB62DE6;
 			remoteInfo = Boost_program_options;
 		};
-		3DA7685C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7C2C577F892143579F25B2F9;
+			remoteGlobalIDString = DE82A047B02945D2B5F03114;
 			remoteInfo = Boost_random;
 		};
-		3DA7685E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9823F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3C77336F8D9E4104829DC926;
+			remoteGlobalIDString = E0C3806C89934DEB8EE0AAF3;
 			remoteInfo = Boost_regex;
 		};
-		3DA7686027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = A380ECB3669A4D44AB35FEA2;
+			remoteGlobalIDString = F91DF27CEF784AD58862AF6D;
 			remoteInfo = Boost_serialization;
 		};
-		3DA7686227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 42BCC8725F9E4229AB7ED301;
+			remoteGlobalIDString = 74A16F5FDFC247C1A253228E;
 			remoteInfo = Boost_system;
 		};
-		3DA7686427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 0027AC2EC0A24EF8AE3EA846;
+			remoteGlobalIDString = 1F73A7AE2A344D1C907391FC;
 			remoteInfo = Boost_thread;
 		};
-		3DA7686627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = EA688E770BBD4B84B3884C7B;
+			remoteGlobalIDString = CD051F0BEFE24B70B9CEBC0C;
 			remoteInfo = Boost_timer;
 		};
-		3DA7686827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 3F22615E18EE4640B7252DC0;
+			remoteGlobalIDString = 9D7C098D05D04B2E99D5800C;
 			remoteInfo = Boost_type_erasure;
 		};
-		3DA7686A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 5E0A1053B964463190D4E5EB;
+			remoteGlobalIDString = B1DFCA1EC78843629FAE9D61;
 			remoteInfo = Boost_unit_test_framework;
 		};
-		3DA7686C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 4A766B99DF7842EF9781C849;
+			remoteGlobalIDString = 084004C822A04F168EE34B27;
 			remoteInfo = Boost_wave;
 		};
-		3DA7686E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9824F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = AB23F06542BB4BD39C20CF4A;
+			remoteGlobalIDString = 1901B0788BCE482984E8236C;
 			remoteInfo = GameUI;
 		};
-		3DA7687027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 471FAB9BB4EB4073B02A74A4;
+			remoteGlobalIDString = 0A7EE137EA0E49C392DD2DE7;
 			remoteInfo = "SDL2-static";
 		};
-		3DA7687227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 37B25F7B11DD48B8933D77BE;
+			remoteGlobalIDString = 449819FE53344784911595C7;
 			remoteInfo = SDL2main;
 		};
-		3DA7687427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E30E2EE012794DDABA4D52CE;
+			remoteGlobalIDString = 5FA52E1376D54925A3F92ABA;
 			remoteInfo = "astcenc-native-static";
 		};
-		3DA7687627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7B7A60CCC99547D7AAEAF806;
+			remoteGlobalIDString = F35546D76D014F5E850DCF30;
 			remoteInfo = client;
 		};
-		3DA7687827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D45539C0D21A41FDBC5AC242;
+			remoteGlobalIDString = 0BA7D62988B546A0AD4F1C48;
 			remoteInfo = clog;
 		};
-		3DA7687A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = CA265F249917436A9D94AB3F;
+			remoteGlobalIDString = 2CB64431BA2A42EFA1FAAC5F;
 			remoteInfo = cpuinfo;
 		};
-		3DA7687C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7A75432158E84B70920870DC;
+			remoteGlobalIDString = 466EDAF219EF4049855ABFE0;
 			remoteInfo = cpuinfo_internals;
 		};
-		3DA7687E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9825F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 433AFC8660524EBF98451685;
+			remoteGlobalIDString = 494BB0757E27490B9BD135B3;
 			remoteInfo = cqmiao;
 		};
-		3DA7688027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E40A9DFB972D437F8AD8153A;
+			remoteGlobalIDString = 9432162618834DF4B2A58A16;
 			remoteInfo = crypto;
 		};
-		3DA7688227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D8625776899047149C773F3F;
+			remoteGlobalIDString = CEEF6FE2691E450895633C5D;
+			remoteInfo = cso_controls;
+		};
+		3DF9826527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6E031AACC9D0455A808575CC;
 			remoteInfo = dead_wrapper;
 		};
-		3DA7688427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 29D113755A5546AF8E8E6CA3;
+			remoteGlobalIDString = 56045403A7D54314BE1EF693;
 			remoteInfo = expat;
 		};
-		3DA7688627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7291B947E3CA46779972BB66;
+			remoteGlobalIDString = 2D86911F12974F47B25417D3;
 			remoteInfo = freetype;
 		};
-		3DA7688827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = BD24D0740A3A48C0B3BC4A45;
+			remoteGlobalIDString = 9142239942384DEBBA01FAA0;
 			remoteInfo = imgui;
 		};
-		3DA7688A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 56304C3DF7FB440A871B24C0;
+			remoteGlobalIDString = 3B30D05E51D645179F9877C0;
 			remoteInfo = imgui_ext;
 		};
-		3DA7688C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9826F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7DF6FB7FDC3640D5AF48250A;
-			remoteInfo = libluajit;
+			remoteGlobalIDString = 176CD873E8F948A7A38F27B6;
+			remoteInfo = lua_static;
 		};
-		3DA7688E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 5805A319539240699A013A69;
-			remoteInfo = luajit;
+			remoteGlobalIDString = D3E23FF77FC749658E1B835E;
+			remoteInfo = luac;
 		};
-		3DA7689027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = EFDF9451E8CE4886A71B9473;
+			remoteGlobalIDString = F18F835A1F7A4556ACD2BCFD;
 			remoteInfo = luash;
 		};
-		3DA7689227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 034801E268334B0587BE162E;
+			remoteGlobalIDString = A06ABDD17B1F41E7862291B3;
 			remoteInfo = mathlib;
 		};
-		3DA7689427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 4D81A829B41741C79A467571;
+			remoteGlobalIDString = B2291C453896431886A5FD87;
 			remoteInfo = server;
 		};
-		3DA7689627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 5BEA11DA18094FDAB0E7EF99;
+			remoteGlobalIDString = AD7317E68B25442C9AB9F2AA;
 			remoteInfo = ssl;
 		};
-		3DA7689827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = EC8756869AB8491193E921B3;
+			remoteGlobalIDString = C27504C61B794BB5B02C825C;
 			remoteInfo = tier0;
 		};
-		3DA7689A27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 141DEE0EA3D54D78AE46ABED;
+			remoteGlobalIDString = 3E7B57F58619448D88DFC8E9;
 			remoteInfo = tier1;
 		};
-		3DA7689C27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9827F27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = FD3D04CA24C14B6483C74767;
+			remoteGlobalIDString = 249C7158F22D46928B591572;
 			remoteInfo = vgui2;
 		};
-		3DA7689E27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828127F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = E59887C646C847F2959CFED8;
+			remoteGlobalIDString = 2403D36709C744C3A06C3CC9;
 			remoteInfo = vgui2_support;
 		};
-		3DA768A027EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828327F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = EC3F37EF17A14E228659D83E;
+			remoteGlobalIDString = D7D23AD6C5734E7CA898821F;
 			remoteInfo = vgui_controls;
 		};
-		3DA768A227EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828527F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 6F836CB218A44821AECD5348;
+			remoteGlobalIDString = F5F9950B6E32444B9D700834;
 			remoteInfo = vgui_surfacelib;
 		};
-		3DA768A427EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828727F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = A8745D7AA92F4FDF92C9CCF9;
+			remoteGlobalIDString = 58B72FB2439F453EA03CAF34;
 			remoteInfo = vguimatsurface;
 		};
-		3DA768A627EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828927F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = DCAA97AADD2C47BB8FCAA7DD;
+			remoteGlobalIDString = BBBDA12D9F034F6AAF5D8109;
 			remoteInfo = vinterface;
 		};
-		3DA768A827EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828B27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = EBAF9DDA61FB4DC390357ECA;
+			remoteGlobalIDString = 44379BFEC9864F7E98933B5A;
 			remoteInfo = vstdlib;
 		};
-		3DA768AA27EE575700824693 /* PBXContainerItemProxy */ = {
+		3DF9828D27F9AE940030D0B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+			containerPortal = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 7329781906EB477AB84A35ED;
+			remoteGlobalIDString = AB980332CB1C4FDD9D81D36C;
 			remoteInfo = xash;
 		};
 /* End PBXContainerItemProxy section */
@@ -507,7 +513,6 @@
 		3D99F5A2277215DC006EDB62 /* launchdialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = launchdialog.mm; sourceTree = "<group>"; };
 		3D99F5A427721613006EDB62 /* TutorViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TutorViewController.mm; sourceTree = "<group>"; };
 		3DA767EC27EDE1AD00824693 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
-		3DA767F327EE575600824693 /* csmoe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = csmoe.xcodeproj; sourceTree = "<group>"; };
 		3DC1E4A12289683000114D80 /* PowerCable.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = PowerCable.png; path = Resources/PowerCable.png; sourceTree = "<group>"; };
 		3DC1E4A32289683100114D80 /* page1_en.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = page1_en.png; path = Resources/page1_en.png; sourceTree = "<group>"; };
 		3DC1E4A42289683100114D80 /* MacBookiTunes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = MacBookiTunes.png; path = Resources/MacBookiTunes.png; sourceTree = "<group>"; };
@@ -522,6 +527,37 @@
 		3DC8946E260FAC5600F7A4A5 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
 		3DDCB15727625D0C00BBEC27 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		3DE829A7260F8F00009DABD0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		3DF981A227F9AE3F0030D0B5 /* libfreetyped.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetyped.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libfreetyped.a"; sourceTree = "<group>"; };
+		3DF981A327F9AE3F0030D0B5 /* libimgui_ext.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui_ext.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libimgui_ext.a"; sourceTree = "<group>"; };
+		3DF981A427F9AE3F0030D0B5 /* libxash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libxash.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libxash.a"; sourceTree = "<group>"; };
+		3DF981A527F9AE3F0030D0B5 /* libserver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libserver.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libserver.a"; sourceTree = "<group>"; };
+		3DF981A627F9AE3F0030D0B5 /* libdead_wrapper.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdead_wrapper.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libdead_wrapper.a"; sourceTree = "<group>"; };
+		3DF981A727F9AE400030D0B5 /* libvgui2_support.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvgui2_support.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvgui2_support.a"; sourceTree = "<group>"; };
+		3DF981A827F9AE400030D0B5 /* libmathlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmathlib.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libmathlib.a"; sourceTree = "<group>"; };
+		3DF981A927F9AE400030D0B5 /* libastcenc-native-static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libastcenc-native-static.a"; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libastcenc-native-static.a"; sourceTree = "<group>"; };
+		3DF981AA27F9AE400030D0B5 /* libclient.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libclient.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libclient.a"; sourceTree = "<group>"; };
+		3DF981AB27F9AE400030D0B5 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libssl.a"; sourceTree = "<group>"; };
+		3DF981AC27F9AE400030D0B5 /* libvguimatsurface.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvguimatsurface.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvguimatsurface.a"; sourceTree = "<group>"; };
+		3DF981AD27F9AE400030D0B5 /* libtier0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtier0.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libtier0.a"; sourceTree = "<group>"; };
+		3DF981AE27F9AE400030D0B5 /* libSDL2d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2d.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2d.a"; sourceTree = "<group>"; };
+		3DF981AF27F9AE400030D0B5 /* libvgui_controls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvgui_controls.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvgui_controls.a"; sourceTree = "<group>"; };
+		3DF981B027F9AE400030D0B5 /* libimgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimgui.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libimgui.a"; sourceTree = "<group>"; };
+		3DF981B127F9AE400030D0B5 /* libtier1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtier1.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libtier1.a"; sourceTree = "<group>"; };
+		3DF981B227F9AE400030D0B5 /* libvgui2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvgui2.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvgui2.a"; sourceTree = "<group>"; };
+		3DF981B327F9AE400030D0B5 /* libcqmiao.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcqmiao.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libcqmiao.a"; sourceTree = "<group>"; };
+		3DF981B427F9AE400030D0B5 /* libvgui_surfacelib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvgui_surfacelib.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvgui_surfacelib.a"; sourceTree = "<group>"; };
+		3DF981B527F9AE400030D0B5 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libcrypto.a"; sourceTree = "<group>"; };
+		3DF981B627F9AE400030D0B5 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/liblua.a"; sourceTree = "<group>"; };
+		3DF981B727F9AE400030D0B5 /* libSDL2maind.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2maind.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2maind.a"; sourceTree = "<group>"; };
+		3DF981B827F9AE400030D0B5 /* libcso_controls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcso_controls.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libcso_controls.a"; sourceTree = "<group>"; };
+		3DF981B927F9AE400030D0B5 /* libluash.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libluash.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libluash.a"; sourceTree = "<group>"; };
+		3DF981BA27F9AE400030D0B5 /* libvstdlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvstdlib.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvstdlib.a"; sourceTree = "<group>"; };
+		3DF981BB27F9AE400030D0B5 /* libGameUI.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGameUI.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libGameUI.a"; sourceTree = "<group>"; };
+		3DF981BC27F9AE400030D0B5 /* libvinterface.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvinterface.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libvinterface.a"; sourceTree = "<group>"; };
+		3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = csmoe.xcodeproj; sourceTree = "<group>"; };
+		3DF9828F27F9AF820030D0B5 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2.a"; sourceTree = "<group>"; };
+		3DF9829027F9AF820030D0B5 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libSDL2main.a"; sourceTree = "<group>"; };
+		3DF9829127F9AF820030D0B5 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = "../../../Library/Developer/Xcode/DerivedData/CSMoE-iOS-dvppqskxifhvkmglxeaundyzmyhs/Build/Products/Debug-iphoneos/libfreetype.a"; sourceTree = "<group>"; };
 		498CCAC31E15618F00299D38 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		498CCAC51E1561AD00299D38 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B646751B253FE21E00F557B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
@@ -540,34 +576,33 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DA768CD27EE6E8000824693 /* libluajit.a in Frameworks */,
-				3DA768B427EE6C9C00824693 /* libcpuinfo.a in Frameworks */,
-				3DA768B527EE6C9C00824693 /* libcqmiao.a in Frameworks */,
-				3DA768B627EE6C9C00824693 /* libcrypto.a in Frameworks */,
-				3DA768B727EE6C9C00824693 /* libdead_wrapper.a in Frameworks */,
-				3DA768B827EE6C9C00824693 /* libexpat.a in Frameworks */,
-				3DA768B927EE6C9C00824693 /* libfreetyped.a in Frameworks */,
-				3DA768BA27EE6C9C00824693 /* libGameUI.a in Frameworks */,
-				3DA768BB27EE6C9C00824693 /* libimgui_ext.a in Frameworks */,
-				3DA768BC27EE6C9C00824693 /* libimgui.a in Frameworks */,
-				3DA768BE27EE6C9C00824693 /* libluash.a in Frameworks */,
-				3DA768BF27EE6C9C00824693 /* libmathlib.a in Frameworks */,
-				3DA768C027EE6C9C00824693 /* libSDL2d.a in Frameworks */,
-				3DA768C127EE6C9C00824693 /* libSDL2maind.a in Frameworks */,
-				3DA768C227EE6C9C00824693 /* libserver.a in Frameworks */,
-				3DA768C327EE6C9C00824693 /* libssl.a in Frameworks */,
-				3DA768C427EE6C9C00824693 /* libtier0.a in Frameworks */,
-				3DA768C527EE6C9C00824693 /* libtier1.a in Frameworks */,
-				3DA768C627EE6C9C00824693 /* libvgui_controls.a in Frameworks */,
-				3DA768C727EE6C9C00824693 /* libvgui_surfacelib.a in Frameworks */,
-				3DA768C827EE6C9C00824693 /* libvgui2_support.a in Frameworks */,
-				3DA768C927EE6C9C00824693 /* libvgui2.a in Frameworks */,
-				3DA768CA27EE6C9C00824693 /* libvguimatsurface.a in Frameworks */,
-				3DA768CB27EE6C9C00824693 /* libvinterface.a in Frameworks */,
-				3DA768CC27EE6C9C00824693 /* libvstdlib.a in Frameworks */,
-				3DA768AC27EE578F00824693 /* libxash.a in Frameworks */,
-				3DA768B327EE6C7A00824693 /* libclient.a in Frameworks */,
-				3DA768B227EE6C6400824693 /* libastcenc-native-static.a in Frameworks */,
+				3DF9829227F9AF820030D0B5 /* libSDL2.a in Frameworks */,
+				3DF9829327F9AF820030D0B5 /* libSDL2main.a in Frameworks */,
+				3DF9829427F9AF820030D0B5 /* libfreetype.a in Frameworks */,
+				3DF981BE27F9AE400030D0B5 /* libimgui_ext.a in Frameworks */,
+				3DF981BF27F9AE400030D0B5 /* libxash.a in Frameworks */,
+				3DF981C027F9AE400030D0B5 /* libserver.a in Frameworks */,
+				3DF981C127F9AE400030D0B5 /* libdead_wrapper.a in Frameworks */,
+				3DF981C227F9AE400030D0B5 /* libvgui2_support.a in Frameworks */,
+				3DF981C327F9AE400030D0B5 /* libmathlib.a in Frameworks */,
+				3DF981C427F9AE400030D0B5 /* libastcenc-native-static.a in Frameworks */,
+				3DF981C527F9AE400030D0B5 /* libclient.a in Frameworks */,
+				3DF981C627F9AE400030D0B5 /* libssl.a in Frameworks */,
+				3DF981C727F9AE400030D0B5 /* libvguimatsurface.a in Frameworks */,
+				3DF981C827F9AE400030D0B5 /* libtier0.a in Frameworks */,
+				3DF981CA27F9AE400030D0B5 /* libvgui_controls.a in Frameworks */,
+				3DF981CB27F9AE400030D0B5 /* libimgui.a in Frameworks */,
+				3DF981CC27F9AE400030D0B5 /* libtier1.a in Frameworks */,
+				3DF981CD27F9AE400030D0B5 /* libvgui2.a in Frameworks */,
+				3DF981CE27F9AE400030D0B5 /* libcqmiao.a in Frameworks */,
+				3DF981CF27F9AE400030D0B5 /* libvgui_surfacelib.a in Frameworks */,
+				3DF981D027F9AE400030D0B5 /* libcrypto.a in Frameworks */,
+				3DF981D127F9AE400030D0B5 /* liblua.a in Frameworks */,
+				3DF981D327F9AE400030D0B5 /* libcso_controls.a in Frameworks */,
+				3DF981D427F9AE400030D0B5 /* libluash.a in Frameworks */,
+				3DF981D527F9AE400030D0B5 /* libvstdlib.a in Frameworks */,
+				3DF981D627F9AE400030D0B5 /* libGameUI.a in Frameworks */,
+				3DF981D727F9AE400030D0B5 /* libvinterface.a in Frameworks */,
 				3DA767ED27EDE1AD00824693 /* libbz2.tbd in Frameworks */,
 				3D0090EB2788B84500E68FC3 /* libz.tbd in Frameworks */,
 				3DDCB15C27625D1700BBEC27 /* libc++.tbd in Frameworks */,
@@ -642,6 +677,36 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3DF9829127F9AF820030D0B5 /* libfreetype.a */,
+				3DF9828F27F9AF820030D0B5 /* libSDL2.a */,
+				3DF9829027F9AF820030D0B5 /* libSDL2main.a */,
+				3DF981A927F9AE400030D0B5 /* libastcenc-native-static.a */,
+				3DF981AA27F9AE400030D0B5 /* libclient.a */,
+				3DF981B327F9AE400030D0B5 /* libcqmiao.a */,
+				3DF981B527F9AE400030D0B5 /* libcrypto.a */,
+				3DF981B827F9AE400030D0B5 /* libcso_controls.a */,
+				3DF981A627F9AE3F0030D0B5 /* libdead_wrapper.a */,
+				3DF981A227F9AE3F0030D0B5 /* libfreetyped.a */,
+				3DF981BB27F9AE400030D0B5 /* libGameUI.a */,
+				3DF981A327F9AE3F0030D0B5 /* libimgui_ext.a */,
+				3DF981B027F9AE400030D0B5 /* libimgui.a */,
+				3DF981B627F9AE400030D0B5 /* liblua.a */,
+				3DF981B927F9AE400030D0B5 /* libluash.a */,
+				3DF981A827F9AE400030D0B5 /* libmathlib.a */,
+				3DF981AE27F9AE400030D0B5 /* libSDL2d.a */,
+				3DF981B727F9AE400030D0B5 /* libSDL2maind.a */,
+				3DF981A527F9AE3F0030D0B5 /* libserver.a */,
+				3DF981AB27F9AE400030D0B5 /* libssl.a */,
+				3DF981AD27F9AE400030D0B5 /* libtier0.a */,
+				3DF981B127F9AE400030D0B5 /* libtier1.a */,
+				3DF981AF27F9AE400030D0B5 /* libvgui_controls.a */,
+				3DF981B427F9AE400030D0B5 /* libvgui_surfacelib.a */,
+				3DF981A727F9AE400030D0B5 /* libvgui2_support.a */,
+				3DF981B227F9AE400030D0B5 /* libvgui2.a */,
+				3DF981AC27F9AE400030D0B5 /* libvguimatsurface.a */,
+				3DF981BC27F9AE400030D0B5 /* libvinterface.a */,
+				3DF981BA27F9AE400030D0B5 /* libvstdlib.a */,
+				3DF981A427F9AE3F0030D0B5 /* libxash.a */,
 				3DA767EC27EDE1AD00824693 /* libbz2.tbd */,
 				3D0090EA2788B84500E68FC3 /* libz.tbd */,
 				3D0090BF2788B2D200E68FC3 /* Security.framework */,
@@ -699,70 +764,71 @@
 		3D4DA95923BCEA2F00F575C1 /* cmake-build */ = {
 			isa = PBXGroup;
 			children = (
-				3DA767F327EE575600824693 /* csmoe.xcodeproj */,
+				3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */,
 			);
 			path = "cmake-build";
 			sourceTree = SOURCE_ROOT;
 		};
-		3DA767F427EE575600824693 /* Products */ = {
+		3DF981D927F9AE940030D0B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3DA7683D27EE575700824693 /* libboost_atomic.a */,
-				3DA7683F27EE575700824693 /* libboost_chrono.a */,
-				3DA7684127EE575700824693 /* libboost_container.a */,
-				3DA7684327EE575700824693 /* libboost_context.a */,
-				3DA7684527EE575700824693 /* libboost_coroutine.a */,
-				3DA7684727EE575700824693 /* libboost_date_time.a */,
-				3DA7684927EE575700824693 /* libboost_exception.a */,
-				3DA7684B27EE575700824693 /* libboost_fiber.a */,
-				3DA7684D27EE575700824693 /* libboost_filesystem.a */,
-				3DA7684F27EE575700824693 /* libboost_graph.a */,
-				3DA7685127EE575700824693 /* libboost_iostreams.a */,
-				3DA7685327EE575700824693 /* libboost_locale.a */,
-				3DA7685527EE575700824693 /* libboost_log.a */,
-				3DA7685727EE575700824693 /* libboost_log_setup.a */,
-				3DA7685927EE575700824693 /* libboost_math.a */,
-				3DA7685B27EE575700824693 /* libboost_program_options.a */,
-				3DA7685D27EE575700824693 /* libboost_random.a */,
-				3DA7685F27EE575700824693 /* libboost_regex.a */,
-				3DA7686127EE575700824693 /* libboost_serialization.a */,
-				3DA7686327EE575700824693 /* libboost_system.a */,
-				3DA7686527EE575700824693 /* libboost_thread.a */,
-				3DA7686727EE575700824693 /* libboost_timer.a */,
-				3DA7686927EE575700824693 /* libboost_type_erasure.a */,
-				3DA7686B27EE575700824693 /* libboost_unit_test_framework.a */,
-				3DA7686D27EE575700824693 /* libboost_wave.a */,
-				3DA7686F27EE575700824693 /* libGameUI.a */,
-				3DA7687127EE575700824693 /* libSDL2d.a */,
-				3DA7687327EE575700824693 /* libSDL2maind.a */,
-				3DA7687527EE575700824693 /* libastcenc-native-static.a */,
-				3DA7687727EE575700824693 /* libclient.a */,
-				3DA7687927EE575700824693 /* libclog.a */,
-				3DA7687B27EE575700824693 /* libcpuinfo.a */,
-				3DA7687D27EE575700824693 /* libcpuinfo_internals.a */,
-				3DA7687F27EE575700824693 /* libcqmiao.a */,
-				3DA7688127EE575700824693 /* libcrypto.a */,
-				3DA7688327EE575700824693 /* libdead_wrapper.a */,
-				3DA7688527EE575700824693 /* libexpat.a */,
-				3DA7688727EE575700824693 /* libfreetyped.a */,
-				3DA7688927EE575700824693 /* libimgui.a */,
-				3DA7688B27EE575700824693 /* libimgui_ext.a */,
-				3DA7688D27EE575700824693 /* libluajit.a */,
-				3DA7688F27EE575700824693 /* luajit */,
-				3DA7689127EE575700824693 /* libluash.a */,
-				3DA7689327EE575700824693 /* libmathlib.a */,
-				3DA7689527EE575700824693 /* libserver.a */,
-				3DA7689727EE575700824693 /* libssl.a */,
-				3DA7689927EE575700824693 /* libtier0.a */,
-				3DA7689B27EE575700824693 /* libtier1.a */,
-				3DA7689D27EE575700824693 /* libvgui2.a */,
-				3DA7689F27EE575700824693 /* libvgui2_support.a */,
-				3DA768A127EE575700824693 /* libvgui_controls.a */,
-				3DA768A327EE575700824693 /* libvgui_surfacelib.a */,
-				3DA768A527EE575700824693 /* libvguimatsurface.a */,
-				3DA768A727EE575700824693 /* libvinterface.a */,
-				3DA768A927EE575700824693 /* libvstdlib.a */,
-				3DA768AB27EE575700824693 /* libxash.a */,
+				3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */,
+				3DF9822027F9AE940030D0B5 /* libboost_chrono.a */,
+				3DF9822227F9AE940030D0B5 /* libboost_container.a */,
+				3DF9822427F9AE940030D0B5 /* libboost_context.a */,
+				3DF9822627F9AE940030D0B5 /* libboost_coroutine.a */,
+				3DF9822827F9AE940030D0B5 /* libboost_date_time.a */,
+				3DF9822A27F9AE940030D0B5 /* libboost_exception.a */,
+				3DF9822C27F9AE940030D0B5 /* libboost_fiber.a */,
+				3DF9822E27F9AE940030D0B5 /* libboost_filesystem.a */,
+				3DF9823027F9AE940030D0B5 /* libboost_graph.a */,
+				3DF9823227F9AE940030D0B5 /* libboost_iostreams.a */,
+				3DF9823427F9AE940030D0B5 /* libboost_locale.a */,
+				3DF9823627F9AE940030D0B5 /* libboost_log.a */,
+				3DF9823827F9AE940030D0B5 /* libboost_log_setup.a */,
+				3DF9823A27F9AE940030D0B5 /* libboost_math.a */,
+				3DF9823C27F9AE940030D0B5 /* libboost_program_options.a */,
+				3DF9823E27F9AE940030D0B5 /* libboost_random.a */,
+				3DF9824027F9AE940030D0B5 /* libboost_regex.a */,
+				3DF9824227F9AE940030D0B5 /* libboost_serialization.a */,
+				3DF9824427F9AE940030D0B5 /* libboost_system.a */,
+				3DF9824627F9AE940030D0B5 /* libboost_thread.a */,
+				3DF9824827F9AE940030D0B5 /* libboost_timer.a */,
+				3DF9824A27F9AE940030D0B5 /* libboost_type_erasure.a */,
+				3DF9824C27F9AE940030D0B5 /* libboost_unit_test_framework.a */,
+				3DF9824E27F9AE940030D0B5 /* libboost_wave.a */,
+				3DF9825027F9AE940030D0B5 /* libGameUI.a */,
+				3DF9825227F9AE940030D0B5 /* libSDL2d.a */,
+				3DF9825427F9AE940030D0B5 /* libSDL2maind.a */,
+				3DF9825627F9AE940030D0B5 /* libastcenc-native-static.a */,
+				3DF9825827F9AE940030D0B5 /* libclient.a */,
+				3DF9825A27F9AE940030D0B5 /* libclog.a */,
+				3DF9825C27F9AE940030D0B5 /* libcpuinfo.a */,
+				3DF9825E27F9AE940030D0B5 /* libcpuinfo_internals.a */,
+				3DF9826027F9AE940030D0B5 /* libcqmiao.a */,
+				3DF9826227F9AE940030D0B5 /* libcrypto.a */,
+				3DF9826427F9AE940030D0B5 /* libcso_controls.a */,
+				3DF9826627F9AE940030D0B5 /* libdead_wrapper.a */,
+				3DF9826827F9AE940030D0B5 /* libexpat.a */,
+				3DF9826A27F9AE940030D0B5 /* libfreetyped.a */,
+				3DF9826C27F9AE940030D0B5 /* libimgui.a */,
+				3DF9826E27F9AE940030D0B5 /* libimgui_ext.a */,
+				3DF9827027F9AE940030D0B5 /* liblua.a */,
+				3DF9827227F9AE940030D0B5 /* luac */,
+				3DF9827427F9AE940030D0B5 /* libluash.a */,
+				3DF9827627F9AE940030D0B5 /* libmathlib.a */,
+				3DF9827827F9AE940030D0B5 /* libserver.a */,
+				3DF9827A27F9AE940030D0B5 /* libssl.a */,
+				3DF9827C27F9AE940030D0B5 /* libtier0.a */,
+				3DF9827E27F9AE940030D0B5 /* libtier1.a */,
+				3DF9828027F9AE940030D0B5 /* libvgui2.a */,
+				3DF9828227F9AE940030D0B5 /* libvgui2_support.a */,
+				3DF9828427F9AE940030D0B5 /* libvgui_controls.a */,
+				3DF9828627F9AE940030D0B5 /* libvgui_surfacelib.a */,
+				3DF9828827F9AE940030D0B5 /* libvguimatsurface.a */,
+				3DF9828A27F9AE940030D0B5 /* libvinterface.a */,
+				3DF9828C27F9AE940030D0B5 /* libvstdlib.a */,
+				3DF9828E27F9AE940030D0B5 /* libxash.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -826,8 +892,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 3DA767F427EE575600824693 /* Products */;
-					ProjectRef = 3DA767F327EE575600824693 /* csmoe.xcodeproj */;
+					ProductGroup = 3DF981D927F9AE940030D0B5 /* Products */;
+					ProjectRef = 3DF981D827F9AE940030D0B5 /* csmoe.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -839,397 +905,404 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		3DA7683D27EE575700824693 /* libboost_atomic.a */ = {
+		3DF9821E27F9AE940030D0B5 /* libboost_atomic.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_atomic.a;
-			remoteRef = 3DA7683C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9821D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7683F27EE575700824693 /* libboost_chrono.a */ = {
+		3DF9822027F9AE940030D0B5 /* libboost_chrono.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_chrono.a;
-			remoteRef = 3DA7683E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9821F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684127EE575700824693 /* libboost_container.a */ = {
+		3DF9822227F9AE940030D0B5 /* libboost_container.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_container.a;
-			remoteRef = 3DA7684027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684327EE575700824693 /* libboost_context.a */ = {
+		3DF9822427F9AE940030D0B5 /* libboost_context.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_context.a;
-			remoteRef = 3DA7684227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684527EE575700824693 /* libboost_coroutine.a */ = {
+		3DF9822627F9AE940030D0B5 /* libboost_coroutine.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_coroutine.a;
-			remoteRef = 3DA7684427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684727EE575700824693 /* libboost_date_time.a */ = {
+		3DF9822827F9AE940030D0B5 /* libboost_date_time.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_date_time.a;
-			remoteRef = 3DA7684627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684927EE575700824693 /* libboost_exception.a */ = {
+		3DF9822A27F9AE940030D0B5 /* libboost_exception.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_exception.a;
-			remoteRef = 3DA7684827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684B27EE575700824693 /* libboost_fiber.a */ = {
+		3DF9822C27F9AE940030D0B5 /* libboost_fiber.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_fiber.a;
-			remoteRef = 3DA7684A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684D27EE575700824693 /* libboost_filesystem.a */ = {
+		3DF9822E27F9AE940030D0B5 /* libboost_filesystem.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_filesystem.a;
-			remoteRef = 3DA7684C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7684F27EE575700824693 /* libboost_graph.a */ = {
+		3DF9823027F9AE940030D0B5 /* libboost_graph.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_graph.a;
-			remoteRef = 3DA7684E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9822F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685127EE575700824693 /* libboost_iostreams.a */ = {
+		3DF9823227F9AE940030D0B5 /* libboost_iostreams.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_iostreams.a;
-			remoteRef = 3DA7685027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685327EE575700824693 /* libboost_locale.a */ = {
+		3DF9823427F9AE940030D0B5 /* libboost_locale.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_locale.a;
-			remoteRef = 3DA7685227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685527EE575700824693 /* libboost_log.a */ = {
+		3DF9823627F9AE940030D0B5 /* libboost_log.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_log.a;
-			remoteRef = 3DA7685427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685727EE575700824693 /* libboost_log_setup.a */ = {
+		3DF9823827F9AE940030D0B5 /* libboost_log_setup.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_log_setup.a;
-			remoteRef = 3DA7685627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685927EE575700824693 /* libboost_math.a */ = {
+		3DF9823A27F9AE940030D0B5 /* libboost_math.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_math.a;
-			remoteRef = 3DA7685827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685B27EE575700824693 /* libboost_program_options.a */ = {
+		3DF9823C27F9AE940030D0B5 /* libboost_program_options.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_program_options.a;
-			remoteRef = 3DA7685A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685D27EE575700824693 /* libboost_random.a */ = {
+		3DF9823E27F9AE940030D0B5 /* libboost_random.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_random.a;
-			remoteRef = 3DA7685C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7685F27EE575700824693 /* libboost_regex.a */ = {
+		3DF9824027F9AE940030D0B5 /* libboost_regex.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_regex.a;
-			remoteRef = 3DA7685E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9823F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686127EE575700824693 /* libboost_serialization.a */ = {
+		3DF9824227F9AE940030D0B5 /* libboost_serialization.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_serialization.a;
-			remoteRef = 3DA7686027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686327EE575700824693 /* libboost_system.a */ = {
+		3DF9824427F9AE940030D0B5 /* libboost_system.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_system.a;
-			remoteRef = 3DA7686227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686527EE575700824693 /* libboost_thread.a */ = {
+		3DF9824627F9AE940030D0B5 /* libboost_thread.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_thread.a;
-			remoteRef = 3DA7686427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686727EE575700824693 /* libboost_timer.a */ = {
+		3DF9824827F9AE940030D0B5 /* libboost_timer.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_timer.a;
-			remoteRef = 3DA7686627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686927EE575700824693 /* libboost_type_erasure.a */ = {
+		3DF9824A27F9AE940030D0B5 /* libboost_type_erasure.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_type_erasure.a;
-			remoteRef = 3DA7686827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686B27EE575700824693 /* libboost_unit_test_framework.a */ = {
+		3DF9824C27F9AE940030D0B5 /* libboost_unit_test_framework.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_unit_test_framework.a;
-			remoteRef = 3DA7686A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686D27EE575700824693 /* libboost_wave.a */ = {
+		3DF9824E27F9AE940030D0B5 /* libboost_wave.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libboost_wave.a;
-			remoteRef = 3DA7686C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7686F27EE575700824693 /* libGameUI.a */ = {
+		3DF9825027F9AE940030D0B5 /* libGameUI.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libGameUI.a;
-			remoteRef = 3DA7686E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9824F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687127EE575700824693 /* libSDL2d.a */ = {
+		3DF9825227F9AE940030D0B5 /* libSDL2d.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libSDL2d.a;
-			remoteRef = 3DA7687027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687327EE575700824693 /* libSDL2maind.a */ = {
+		3DF9825427F9AE940030D0B5 /* libSDL2maind.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libSDL2maind.a;
-			remoteRef = 3DA7687227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687527EE575700824693 /* libastcenc-native-static.a */ = {
+		3DF9825627F9AE940030D0B5 /* libastcenc-native-static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libastcenc-native-static.a";
-			remoteRef = 3DA7687427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687727EE575700824693 /* libclient.a */ = {
+		3DF9825827F9AE940030D0B5 /* libclient.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libclient.a;
-			remoteRef = 3DA7687627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687927EE575700824693 /* libclog.a */ = {
+		3DF9825A27F9AE940030D0B5 /* libclog.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libclog.a;
-			remoteRef = 3DA7687827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687B27EE575700824693 /* libcpuinfo.a */ = {
+		3DF9825C27F9AE940030D0B5 /* libcpuinfo.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libcpuinfo.a;
-			remoteRef = 3DA7687A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687D27EE575700824693 /* libcpuinfo_internals.a */ = {
+		3DF9825E27F9AE940030D0B5 /* libcpuinfo_internals.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libcpuinfo_internals.a;
-			remoteRef = 3DA7687C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7687F27EE575700824693 /* libcqmiao.a */ = {
+		3DF9826027F9AE940030D0B5 /* libcqmiao.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libcqmiao.a;
-			remoteRef = 3DA7687E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9825F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688127EE575700824693 /* libcrypto.a */ = {
+		3DF9826227F9AE940030D0B5 /* libcrypto.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libcrypto.a;
-			remoteRef = 3DA7688027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688327EE575700824693 /* libdead_wrapper.a */ = {
+		3DF9826427F9AE940030D0B5 /* libcso_controls.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcso_controls.a;
+			remoteRef = 3DF9826327F9AE940030D0B5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3DF9826627F9AE940030D0B5 /* libdead_wrapper.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libdead_wrapper.a;
-			remoteRef = 3DA7688227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688527EE575700824693 /* libexpat.a */ = {
+		3DF9826827F9AE940030D0B5 /* libexpat.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libexpat.a;
-			remoteRef = 3DA7688427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688727EE575700824693 /* libfreetyped.a */ = {
+		3DF9826A27F9AE940030D0B5 /* libfreetyped.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libfreetyped.a;
-			remoteRef = 3DA7688627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688927EE575700824693 /* libimgui.a */ = {
+		3DF9826C27F9AE940030D0B5 /* libimgui.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libimgui.a;
-			remoteRef = 3DA7688827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688B27EE575700824693 /* libimgui_ext.a */ = {
+		3DF9826E27F9AE940030D0B5 /* libimgui_ext.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libimgui_ext.a;
-			remoteRef = 3DA7688A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9826D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688D27EE575700824693 /* libluajit.a */ = {
+		3DF9827027F9AE940030D0B5 /* liblua.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libluajit.a;
-			remoteRef = 3DA7688C27EE575700824693 /* PBXContainerItemProxy */;
+			path = liblua.a;
+			remoteRef = 3DF9826F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7688F27EE575700824693 /* luajit */ = {
+		3DF9827227F9AE940030D0B5 /* luac */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			name = luajit;
-			path = luajit.app;
-			remoteRef = 3DA7688E27EE575700824693 /* PBXContainerItemProxy */;
+			name = luac;
+			path = luac.app;
+			remoteRef = 3DF9827127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689127EE575700824693 /* libluash.a */ = {
+		3DF9827427F9AE940030D0B5 /* libluash.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libluash.a;
-			remoteRef = 3DA7689027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689327EE575700824693 /* libmathlib.a */ = {
+		3DF9827627F9AE940030D0B5 /* libmathlib.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libmathlib.a;
-			remoteRef = 3DA7689227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689527EE575700824693 /* libserver.a */ = {
+		3DF9827827F9AE940030D0B5 /* libserver.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libserver.a;
-			remoteRef = 3DA7689427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689727EE575700824693 /* libssl.a */ = {
+		3DF9827A27F9AE940030D0B5 /* libssl.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libssl.a;
-			remoteRef = 3DA7689627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689927EE575700824693 /* libtier0.a */ = {
+		3DF9827C27F9AE940030D0B5 /* libtier0.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libtier0.a;
-			remoteRef = 3DA7689827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689B27EE575700824693 /* libtier1.a */ = {
+		3DF9827E27F9AE940030D0B5 /* libtier1.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libtier1.a;
-			remoteRef = 3DA7689A27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689D27EE575700824693 /* libvgui2.a */ = {
+		3DF9828027F9AE940030D0B5 /* libvgui2.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvgui2.a;
-			remoteRef = 3DA7689C27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9827F27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA7689F27EE575700824693 /* libvgui2_support.a */ = {
+		3DF9828227F9AE940030D0B5 /* libvgui2_support.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvgui2_support.a;
-			remoteRef = 3DA7689E27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828127F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768A127EE575700824693 /* libvgui_controls.a */ = {
+		3DF9828427F9AE940030D0B5 /* libvgui_controls.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvgui_controls.a;
-			remoteRef = 3DA768A027EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828327F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768A327EE575700824693 /* libvgui_surfacelib.a */ = {
+		3DF9828627F9AE940030D0B5 /* libvgui_surfacelib.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvgui_surfacelib.a;
-			remoteRef = 3DA768A227EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828527F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768A527EE575700824693 /* libvguimatsurface.a */ = {
+		3DF9828827F9AE940030D0B5 /* libvguimatsurface.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvguimatsurface.a;
-			remoteRef = 3DA768A427EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828727F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768A727EE575700824693 /* libvinterface.a */ = {
+		3DF9828A27F9AE940030D0B5 /* libvinterface.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvinterface.a;
-			remoteRef = 3DA768A627EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828927F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768A927EE575700824693 /* libvstdlib.a */ = {
+		3DF9828C27F9AE940030D0B5 /* libvstdlib.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libvstdlib.a;
-			remoteRef = 3DA768A827EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828B27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		3DA768AB27EE575700824693 /* libxash.a */ = {
+		3DF9828E27F9AE940030D0B5 /* libxash.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libxash.a;
-			remoteRef = 3DA768AA27EE575700824693 /* PBXContainerItemProxy */;
+			remoteRef = 3DF9828D27F9AE940030D0B5 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

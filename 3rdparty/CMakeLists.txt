@@ -7,6 +7,7 @@ endif()
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
 set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
+set(SDL_CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 add_subdirectory(sdl2 EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-sdl2 INTERFACE SDL2-static)
 if(IOS)
@@ -83,6 +84,7 @@ target_link_libraries(astcenc_3p INTERFACE astcenc-native-static)
 
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_FRAMEWORK OFF)
+set(DISABLE_FORCE_DEBUG_POSTFIX ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/freetype EXCLUDE_FROM_ALL)
 add_library(3rdparty-freetype INTERFACE)
 target_link_libraries(3rdparty-freetype INTERFACE freetype)
