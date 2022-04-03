@@ -829,7 +829,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			if(~m_iBuff & BUFF_M32VENOM)
 				m_flAccumulateDamage[COUNT_M32VENOM] += flDamage;
 
-			if (m_flAccumulateDamage[COUNT_M32VENOM] >= 2000 && ~m_iBuff & BUFF_M32VENOM)
+			if (m_flAccumulateDamage[COUNT_M32VENOM] >= 4000 && ~m_iBuff & BUFF_M32VENOM)
 			{
 				m_iBuff |= BUFF_M32VENOM;
 				m_flAccumulateDamage[COUNT_M32VENOM] = 0.0f;

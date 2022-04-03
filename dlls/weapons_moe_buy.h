@@ -131,6 +131,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, 35},
 	{"knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED, 150 },
 	{"knife_holysword",     "【辉煌】圣剑",               0,    KNIFE_SLOT,          UNASSIGNED, 150 },
+	{"knife_magicknife",     "幻镜！光棱剑",               0,    KNIFE_SLOT,          UNASSIGNED, 150 },
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, 1},
 
 #endif

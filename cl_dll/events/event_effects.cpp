@@ -1905,10 +1905,21 @@ void EV_WpnEffects(event_args_s* args)
 					pEnt->frameMax = 45;
 					pEnt->entity.curstate.framerate = 30.0;
 					pEnt->die = gHUD.m_flTime + 1.5;
-					pEnt->clientIndex = args->iparam2;
+					pEnt->entity.curstate.iuser1 = args->iparam2;
+					pEnt->entity.curstate.vuser1 = origin;
 					pEnt->entity.curstate.rendermode = kRenderTransAdd;
 					pEnt->entity.curstate.renderamt = 255;
-					pEnt->flags |= FTENT_PLYRATTACHMENT | FTENT_SPRANIMATE;
+					pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+
+					pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+						cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+						if (pPlayer)
+						{
+							Vector vecDir = (pEnt->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
+							VectorAngles(vecDir, pEnt->entity.angles);
+							pEnt->entity.angles.x *= -1.0;
+						}
+					};
 				}
 			}
 		}
@@ -1925,38 +1936,65 @@ void EV_WpnEffects(event_args_s* args)
 					pEnt->entity.curstate.frame = 0;
 					pEnt->frameMax = 35;
 					pEnt->entity.curstate.framerate = 30.0;
-					pEnt->die = gHUD.m_flTime + 1.6;
+					pEnt->die = gHUD.m_flTime + 1.5;
 					pEnt->entity.curstate.rendermode = kRenderTransAdd;
 					pEnt->entity.curstate.renderamt = 255;
-					pEnt->entity.curstate.fuser1 = 1.5;
 					pEnt->entity.curstate.vuser1 = origin;
+					pEnt->entity.curstate.iuser1 = args->iparam2;
 					pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_SPRANIMATE;
+
+					gEngfuncs.pEventAPI->EV_PlaySound(pEnt->entity.index, origin, CHAN_AUTO, "weapons/magicknife_magic_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
 				}
 				pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
 
-					if (currenttime > ent->entity.curstate.fuser1)
+					cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(ent->entity.curstate.iuser1);
+					if (pPlayer)
 					{
-						ent->entity.curstate.fuser1 = currenttime + 9999.0;
+						Vector vecDir = (ent->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
+						VectorAngles(vecDir, ent->entity.angles);
+						ent->entity.angles.x *= -1.0;
+					}
 
-						model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp02.spr", false);
-
-						if (pModel)
+					if (ent->entity.curstate.frame + 1 >= ent->frameMax)
+					{
+						if (!ent->entity.curstate.iuser2)
 						{
-							TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->entity.curstate.vuser1, pModel);
+							ent->entity.curstate.iuser2 = 1;
 
-							if (!pEnt)
-								return;
+							model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_mgknife_exp02.spr", false);
 
-							pEnt->flags |= FTENT_SPRANIMATE;
-							pEnt->entity.curstate.animtime = gHUD.m_flTime;
-							pEnt->entity.curstate.frame = 0.0f;
-							pEnt->entity.curstate.framerate = 30.0f;
-							pEnt->entity.curstate.rendermode = kRenderTransAdd;
-							pEnt->frameMax = 35.0;
-							pEnt->entity.curstate.scale = 0.5f;
-							pEnt->entity.curstate.renderamt = 255;
-							pEnt->die = gHUD.m_flTime + 1.5;
+							if (pModel)
+							{
+								TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(ent->entity.curstate.vuser1, pModel);
+
+								if (!pEnt)
+									return;
+
+								pEnt->flags |= FTENT_SPRANIMATE | FTENT_CLIENTCUSTOM;
+								pEnt->entity.curstate.animtime = gHUD.m_flTime;
+								pEnt->entity.curstate.frame = 0.0f;
+								pEnt->entity.curstate.framerate = 30.0f;
+								pEnt->entity.curstate.rendermode = kRenderTransAdd;
+								pEnt->frameMax = 35.0;
+								pEnt->entity.curstate.scale = 0.5f;
+								pEnt->entity.curstate.renderamt = 255;
+								pEnt->die = gHUD.m_flTime + 1.5;
+								pEnt->entity.curstate.vuser1 = ent->entity.curstate.vuser1;
+								pEnt->entity.curstate.iuser1 = ent->entity.curstate.iuser1;
+
+								pEnt->callback = [](tempent_s* pEnt, float frametime, float currenttime) {
+									cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.iuser1);
+									if (pPlayer)
+									{
+										Vector vecDir = (pEnt->entity.curstate.vuser1 - pPlayer->curstate.origin).Normalize();
+										VectorAngles(vecDir, pEnt->entity.angles);
+										pEnt->entity.angles.x *= -1.0;
+									}
+								};
+							}
 						}
+						
 					}
 				};
 			}

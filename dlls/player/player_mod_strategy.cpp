@@ -193,7 +193,7 @@ void CPlayerModStrategy_Default::GiveDefaultItems()
 	{
 	case CT:
 		m_pPlayer->GiveNamedItem("weapon_knife");
-		m_pPlayer->GiveNamedItem("weapon_m95tiger");
+		m_pPlayer->GiveNamedItem("weapon_usp");
 		m_pPlayer->GiveAmmo(m_pPlayer->m_bIsVIP ? 12 : 24, "45acp", MAX_AMMO_45ACP);
 
 		break;
@@ -367,7 +367,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 		m_pPlayer->RemoveAllItems(FALSE);
 		m_pPlayer->m_bHasPrimary = false;
 
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
@@ -377,6 +377,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
+		m_pPlayer->GiveNamedItem("knife_magicknife");
 		return;
 	}
 	

@@ -194,6 +194,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "skull5",	WEAPONCLASS_SNIPERRIFLE },
 	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
 	{ "plasmagun",	WEAPONCLASS_RIFLE },
+	{ "zombielaw",	WEAPONCLASS_RIFLE },
 	{ NULL,		WEAPONCLASS_NONE }
 };
 

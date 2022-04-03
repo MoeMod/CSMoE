@@ -51,7 +51,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
-				flDamage = 500;
+				flDamage = 400;
 			}
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			{

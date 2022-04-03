@@ -44,7 +44,7 @@ void CM32VenomMark::Spawn(void)
 	UTIL_SetSize(pev, g_vecZero, g_vecZero);
 	UTIL_SetOrigin(pev, pev->origin);
 
-	pev->classname = MAKE_STRING("weapon_m32venom");
+	pev->classname = MAKE_STRING("m32venom");
 	SetThink(&CM32VenomMark::VenomThink);
 
 	m_flVenomDamageTime = gpGlobals->time + 0.1s;
@@ -64,7 +64,7 @@ float CM32VenomMark::GetVenomDamage() const
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 	{
-		flDamage = 600;
+		flDamage = 300;	//600
 	}
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
 	{
