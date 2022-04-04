@@ -1,22 +1,36 @@
 
 #include "CGameUIFuncs.h"
+#include "menu_int.h"
+#include "kbutton.h"
+#include "keydefs.h"
+#include "vgui_key_translation.h"
 
-using namespace vgui2;
-
-bool CGameUIFuncs::IsKeyDown(const char  *, bool &) {
-	return false;
+namespace ui {
+    extern ui_enginefuncs_t engfuncs;
 }
 
-const char  * CGameUIFuncs::Key_NameForKey(int) {
-	return "";
+bool CGameUIFuncs::IsKeyDown(const char *keyname, bool &isdown) {
+	return (((kbutton_t *)ui::engfuncs.pfnKeyGetState(keyname))->state & 1) != 0;
 }
 
-const char  * CGameUIFuncs::Key_BindingForKey(int) {
-	return "";
+const char *CGameUIFuncs::Key_NameForKey(int keynum) {
+	return ui::engfuncs.pfnKeynumToString(keynum);
+}
+
+const char *CGameUIFuncs::Key_BindingForKey(int keynum) {
+	return ui::engfuncs.pfnKeyGetBinding(keynum);
 }
 
 KeyCode CGameUIFuncs::GetVGUI2KeyCodeForBind(const char *bind) {
-	return KEY_TAB;
+    for(int keynum = 0; keynum < 256; ++keynum)
+    {
+        auto bind2 = Key_BindingForKey(keynum);
+        if(bind2 && !strcmp(bind, bind2))
+        {
+            return KeyCode_VirtualKeyToVGUI(keynum);
+        }
+    }
+	return vgui2::KEY_NONE;
 }
 
 void CGameUIFuncs::GetVideoModes(vmode_t * *, int *) {
@@ -35,7 +49,15 @@ bool CGameUIFuncs::IsConnectedToVACSecureServer() {
 	return false;
 }
 
-int CGameUIFuncs::Key_KeyStringToKeyNum(const char  *) {
+int CGameUIFuncs::Key_KeyStringToKeyNum(const char *name) {
+    for(int keynum = 0; keynum < 256; ++keynum)
+    {
+        auto name2 = Key_NameForKey(keynum);
+        if(name2 && !strcmp(name2, name))
+        {
+            return KeyCode_VirtualKeyToVGUI(keynum);
+        }
+    }
 	return 0;
 }
 
