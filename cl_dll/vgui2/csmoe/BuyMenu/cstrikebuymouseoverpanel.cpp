@@ -21,7 +21,7 @@
 
 #include <string>
 
-using namespace vgui;
+using namespace vgui2;
 
 CSBuyMouseOverPanel::CSBuyMouseOverPanel(vgui2::Panel *parent, const char *panelName) : BaseClass(parent, panelName)
 {
@@ -87,8 +87,6 @@ void CSBuyMouseOverPanel::PerformLayout(void)
 	}
 }
 
-extern wchar_t *GetWeaponInfoFormat(int iSlot, const char *pItem); // BTEPanel.cpp
-
 void CSBuyMouseOverPanel::UpdateWeapon(const char *weapon)
 {
 	bool bEnabled = weapon && weapon[0];
@@ -108,13 +106,13 @@ void CSBuyMouseOverPanel::UpdateWeapon(const char *weapon)
 		return;
 	
 	char szBuffer[64];
-	sprintf(szBuffer, "gfx\\vgui\\%s", weapon);
+	sprintf(szBuffer, "gfx/vgui/%s", weapon);
 	classimage->SetImage(szBuffer);
 
 	std::string str1("#CStrike_");
 
 	for (int i = 0; i < 5; ++i)
 	{
-		info[i]->SetText(GetWeaponInfoFormat(i, weapon));
+		info[i]->SetText("TODO");
 	}
 }

@@ -10,9 +10,6 @@
 #include <vgui_controls/ImagePanel.h>
 #include <vgui/KeyCode.h>
 #include <filesystem.h>
-#include "shared_util.h"
-
-#include "WeaponManager.h"
 
 class WeaponImagePanel : public vgui2::ImagePanel
 {

@@ -17,9 +17,6 @@
 
 using namespace vgui2;
 
-extern int g_iVisibleMouse;
-void IN_ResetMouse(void);
-
 class CClientMOTDHTML : public vgui2::HTML
 {
 public:
@@ -127,13 +124,10 @@ void CClientMOTD::Close()
 {
 	BaseClass::Close();
 	m_pViewport->ShowBackGround( false );
-	g_iVisibleMouse = 0;
-	IN_ResetMouse();
 }
 
 void CClientMOTD::Activate( const char* title, const char* msg )
 {
-	g_iVisibleMouse = 1;
 	m_pMessage->SetVisible(true);
 	m_pMessageHtml->SetVisible(false);
 	BaseClass::Activate();
@@ -148,7 +142,6 @@ void CClientMOTD::ActivateHtml( const char* title, const char* msg )
 {
 	char localURL[ MAX_HTML_FILENAME_LENGTH + 7 ];
 
-	g_iVisibleMouse = 1;
 	m_pMessage->SetVisible(false);
 	m_pMessageHtml->SetVisible(true);
 	BaseClass::Activate();

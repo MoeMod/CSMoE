@@ -489,8 +489,6 @@ bool HasPlayerItem(CBasePlayer *pPlayer, const char *pszCheckItem)
 
 bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 {
-#ifdef XASH_DEDICATED
-	// moe_buy is only useable in dedicated server to avoid pupils
 	if (!pPlayer->CanPlayerBuy(true))
 		return false;
 
@@ -541,7 +539,6 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 
 		return true;
 	}
-#endif
 	return false;
 }
 

@@ -597,4 +597,9 @@ void CHud::AddHudElem(CHudBase *phudelem)
 	ptemp->pNext = pdl;
 }
 
+bool CHud::IsZombieMod() const
+{
+    return m_iModRunning == MOD_ZB1 || m_iModRunning == MOD_ZB2 || m_iModRunning == MOD_ZB3 || m_iModRunning == MOD_ZB4 || m_iModRunning == MOD_ZBZ;
+}
+
 }

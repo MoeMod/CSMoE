@@ -7,6 +7,7 @@
 
 #include <vgui_controls/TextImage.h>
 #include <vgui_controls/ImagePanel.h>
+#include <vgui/ISurface.h>
 
 extern vgui2::Panel *g_lastPanel;
 extern vgui2::Button *g_lastButton;
@@ -153,17 +154,17 @@ public:
 		BaseClass::ApplySchemeSettings(pScheme);
 
 		if (!m_pKeyboard)
-			m_pKeyboard = vgui2::scheme()->GetImage(pScheme->GetResourceString("MouseOverPanelButton.Keyboard"), true);
+			m_pKeyboard = vgui2::scheme()->GetImage("resource/Control/button_ingame/keyboard", true);
 
 		if (!m_pBlankSlot)
-			m_pBlankSlot = vgui2::scheme()->GetImage(pScheme->GetResourceString("MouseOverPanelButton.BlankSlot"), true);
+			m_pBlankSlot = vgui2::scheme()->GetImage("resource/Control/buybutton/blank_slot", true);
 
 		if (!m_pSelect)
-			m_pSelect = vgui2::scheme()->GetImage(pScheme->GetResourceString("MouseOverPanelButton.Select"), true);
+			m_pSelect = vgui2::scheme()->GetImage("resource/Control/buybutton/select", true);
 
 		if (m_iKeyOffset == -1)
 		{
-			m_iKeyOffset = atoi(pScheme->GetResourceString("MouseOverPanelButton.KeyboardOffset"));
+			m_iKeyOffset = 3;
 
 			if (IsProportional())
 				m_iKeyOffset = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeyOffset);
@@ -171,7 +172,7 @@ public:
 
 		if (m_iKeySize == -1)
 		{
-			m_iKeySize = atoi(pScheme->GetResourceString("MouseOverPanelButton.KeyboardSize"));
+			m_iKeySize = 18;
 
 			if (IsProportional())
 				m_iKeySize = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeySize);
@@ -287,7 +288,7 @@ public:
 
 	void GetText(char *textOut, int bufferLen)
 	{
-		g_pVGuiLocalize->ConvertUnicodeToANSI(m_pFullText, textOut, bufferLen);
+		vgui2::localize()->ConvertUnicodeToANSI(m_pFullText, textOut, bufferLen);
 	}
 
 	void GetText(wchar_t *textOut, int bufLenInBytes)
@@ -312,12 +313,12 @@ public:
 
 		if (text[0] == '#')
 		{
-			wtext = g_pVGuiLocalize->Find(text);
+			wtext = vgui2::localize()->Find(text);
 		}
 		else
 		{
 			wchar_t unicodeVar[256];
-			g_pVGuiLocalize->ConvertANSIToUnicode(text, unicodeVar, sizeof(unicodeVar));
+            vgui2::localize()->ConvertANSIToUnicode(text, unicodeVar, sizeof(unicodeVar));
 			wtext = unicodeVar;
 		}
 

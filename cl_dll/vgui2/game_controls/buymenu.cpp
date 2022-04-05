@@ -6,7 +6,7 @@
 
 using namespace vgui2;
 
-CBuyMenu::CBuyMenu(void) : WizardPanel(NULL, PANEL_BUY)
+CBuyMenu::CBuyMenu(IViewport *pViewPort) : WizardPanel(NULL, PANEL_BUY), m_pViewPort(pViewPort)
 {
 	SetScheme("ClientScheme");
 	SetTitle("#Cstrike_Buy_Menu", true);
@@ -60,7 +60,7 @@ void CBuyMenu::ShowPanel(bool bShow)
 		SetMouseInputEnabled(false);
 	}
 
-	g_pViewPort->ShowBackGround(bShow);
+    m_pViewPort->ShowBackGround(bShow);
 }
 
 void CBuyMenu::Update(void)
@@ -74,5 +74,5 @@ void CBuyMenu::OnClose(void)
 
 	ResetHistory();
 
-	g_pViewPort->ShowBackGround(false);
+    m_pViewPort->ShowBackGround(false);
 }

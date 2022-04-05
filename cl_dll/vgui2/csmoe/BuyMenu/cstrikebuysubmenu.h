@@ -4,23 +4,14 @@
 #pragma once
 #endif
 
-#include "game_controls\buysubmenu.h"
+#include "game_controls/buysubmenu.h"
 #include "BuyPresetButton.h"
 #include "cstrikebuymouseoverpanelbutton.h"
 #include "cso_controls/NewTabButton.h"
-#include "WeaponManager.h"
 #include "WeaponImagePanel.h"
-
-#include "STLHelper.h"
-#include "util/iniParser.h"
-
-using namespace vgui;
 
 class CCSBuySubMenu : public CBuySubMenu
 {
-public:
-	using WeaponBuyTeam = CWeaponManager::WeaponBuyTeam;
-	using WeaponBuyMenuType = CWeaponManager::WeaponBuyMenuType;
 private:
 	DECLARE_CLASS_SIMPLE(CCSBuySubMenu, CBuySubMenu);
 
@@ -37,9 +28,9 @@ public:
 	virtual void PerformLayout() override;
 	virtual void OnThink() override;
 
-	virtual void SetupItems(CWeaponManager::WeaponBuyMenuType type);
+	virtual void SetupItems(cl::MoEWeaponBuyType type);
 	virtual void SetupPage(size_t page);
-	virtual void SetTeam(WeaponBuyTeam team);
+	virtual void SetTeam(TeamName team);
 	
 	virtual void OnSelectWeapon(const char *weapon);
 
@@ -74,14 +65,14 @@ protected:
 	struct ItemInfo
 	{
 		std::string name;
+		std::string showname;
 		std::string command;
 	};
 	std::vector<ItemInfo> m_BuyItemList;
 	FavoriteSet m_FavoriteItems[5];
 	FavoriteSet m_SelectedItems;
-	CIniParser m_iniFavorite;
 	size_t m_iCurrentPage;
-	WeaponBuyTeam m_iTeam;
+    TeamName m_iTeam;
 
 protected:
 	vgui2::Label *m_pTitleLabel;
@@ -174,7 +165,7 @@ public:
 	CCSBuySubMenu_ZombieMod(vgui2::Panel *parent, const char *name = "BuySubMenu") : CCSBuySubMenu(parent, name) {}
 	virtual void LoadControlSettings(const char *dialogResourceName, const char *pathID = NULL, KeyValues *pPreloadedKeyValues = NULL) override;
 	virtual void OnSelectWeapon(const char *weapon) override;
-	virtual void SetupItems(CWeaponManager::WeaponBuyMenuType type) override;
+	virtual void SetupItems(cl::MoEWeaponBuyType type) override;
 	virtual void OnCommand(const char *command) override;
 };
 

@@ -161,9 +161,9 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 	//char szClientDLLPath[_MAX_PATH];
 	//g_pFullFileSystem->GetLocalPath("cl_dlls/client.dll", szClientDLLPath, sizeof(szClientDLLPath));
 	//m_hClientModule = Sys_LoadModule(szClientDLLPath);
-	//m_FactoryList[4] = Sys_GetFactory(m_hClientModule);
-	//m_iNumFactories = 5;
-	//staticClient = (IClientVGUI *)m_FactoryList[4](CLIENTVGUI_INTERFACE_VERSION, NULL);
+	m_FactoryList[4] = Sys_GetFactoryThis(); // Sys_GetFactory(m_hClientModule);
+	m_iNumFactories = 5;
+	staticClient = (IClientVGUI *)m_FactoryList[4](CLIENTVGUI_INTERFACE_VERSION, NULL);
 	//gClDllFuncs.pfnInitialize(&gEngfuncs, CLDLL_INTERFACE_VERSION);
 }
 

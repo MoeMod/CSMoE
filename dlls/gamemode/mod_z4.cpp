@@ -1106,11 +1106,7 @@ namespace sv {
 			for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
 			{
 				std::vector<MoEWeaponBuyInfo_s> candidate_list;
-#ifdef XASH_DEDICATED
-				std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#else
-				std::copy_if(std::begin(g_MoEWeaponBuyInfo_Z4), std::end(g_MoEWeaponBuyInfo_Z4), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
-#endif
+                std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 				const MoEWeaponBuyInfo_s& info = candidate_list.front();
 				m_pPlayer->GiveNamedItem(info.pszClassName);

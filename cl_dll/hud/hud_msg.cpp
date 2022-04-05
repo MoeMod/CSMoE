@@ -32,6 +32,7 @@
 #include "events.h"
 
 #include "gamemode/mods_const.h"
+#include "CBaseViewport.h"
 
 namespace cl {
 
@@ -184,6 +185,8 @@ int CHud :: MsgFunc_GameMode(const char *pszName, int iSize, void *pbuf )
 	default:
 		break;
 	}
+
+    g_pViewport->UpdateGameMode();
 
 	return 1;
 }

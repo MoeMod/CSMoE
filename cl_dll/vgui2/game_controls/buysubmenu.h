@@ -10,6 +10,8 @@
 #include "UtlVector.h"
 #include "mouseoverpanelbutton.h"
 
+#include "weapons_moe_buy.h"
+
 class CBuyMenu;
 
 class CBuySubMenu : public vgui2::WizardSubPanel

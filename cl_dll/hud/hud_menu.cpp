@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include "draw_util.h"
 
+#include "CBaseViewport.h"
+
 #include "gamemode/mods_const.h"
 #ifdef XASH_IMGUI
 #include "imgui_cl/imgui_cl_menu.h"
@@ -291,7 +293,7 @@ void CHudMenu::UserCmd_OldStyleMenuClose()
 
 void CHudMenu::ShowVGUIMenu( int menuType )
 {
-	const char *szCmd;
+	const char *szCmd = nullptr;
 
 	switch(menuType)
 	{
@@ -304,6 +306,19 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 	case MENU_CLASS_CT:
 		szCmd = "exec touch/chooseteam_ct.cfg";
 		break;
+#ifdef XASH_VGUI2
+    case MENU_BUY:
+	case MENU_BUY_PISTOL:
+	case MENU_BUY_SHOTGUN:
+	case MENU_BUY_RIFLE:
+	case MENU_BUY_SUBMACHINEGUN:
+	case MENU_BUY_MACHINEGUN:
+	case MENU_BUY_ITEM:
+        if(g_pViewport->ShowVGUIMenu(menuType))
+        {
+            return;
+        }
+#else
 	case MENU_BUY:
 		switch (gHUD.m_iModRunning)
 		{
@@ -356,6 +371,7 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 			szCmd = "exec touch/buy_item_t.cfg";
 		else szCmd = "exec touch/buy_item_ct.cfg";
 		break;
+#endif
 	case MENU_RADIOA:
 		szCmd = "exec touch/radioa.cfg";
 		break;
@@ -388,7 +404,8 @@ void CHudMenu::ShowVGUIMenu( int menuType )
 	}
 #endif
 	m_fMenuDisplayed = 1;
-	ClientCmd(szCmd);
+    if(szCmd)
+	    ClientCmd(szCmd);
 }
 
 void CHudMenu::UserCmd_ShowVGUIMenu()

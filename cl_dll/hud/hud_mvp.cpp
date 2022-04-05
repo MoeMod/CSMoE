@@ -21,7 +21,7 @@ int CHudMVP::Init()
 
 bool CHudMVP::IsZombieMod()
 {
-	return gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZB4 || gHUD.m_iModRunning == MOD_ZBZ;
+	return gHUD.IsZombieMod();
 }
 
 void CHudMVP::InitHUDData()

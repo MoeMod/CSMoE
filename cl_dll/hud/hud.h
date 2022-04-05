@@ -694,8 +694,10 @@ public:
 	CHudMsgFunc(Money);
 	CHudMsgFunc(BlinkAcct);
 
+public:
+    int m_iMoneyCount;
+
 private:
-	int m_iMoneyCount;
 	int m_iDelta;
 	int m_iBlinkAmt;
 	float m_fBlinkTime;
@@ -1023,6 +1025,8 @@ public:
 	int Redraw( float flTime, int intermission );
 	int UpdateClientData( client_data_t *cdata, float time );
 	void AddHudElem(CHudBase *p);
+
+    bool IsZombieMod() const;
 
 	inline float GetSensitivity() { return m_flMouseSensitivity; }
 	inline HSPRITE GetSprite( int index )

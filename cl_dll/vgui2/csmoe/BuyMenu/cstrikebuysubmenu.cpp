@@ -1,6 +1,5 @@
 #include "hud.h"
-#include "message.h"
-#include "ViewPort.h"
+#include "CBaseViewport.h"
 #include "cdll_dll.h"
 #include "cl_util.h"
 #include "cstrikebuymenu.h"
@@ -16,13 +15,17 @@
 #include "cso_controls/ButtonGlow.h"
 #include "cso_controls/DarkTextEntry.h"
 
-#include "WeaponManager.h"
-
 #include <string>
 
-using namespace vgui;
+using namespace vgui2;
+using namespace cl;
+
+const Color COL_NONE = { 255, 255, 255, 255 };
+const Color COL_CT = { 192, 205, 224, 255 };
+const Color COL_TR = { 216, 182, 183, 255 };
 
 static const char *EQUIPMENT_BUYLIST[] = { "vest","vesthelm","flash","hegrenade","sgren","defuser","nvgs" };
+static const char *EQUIPMENT_BUYLIST_TEXT[] = { "#Cstrike_Kevlar","#Cstrike_Kevlar_Helmet","#Cstrike_Flashbang","#Cstrike_HE_Grenade","#Cstrike_Smoke_Grenade","#Cstrike_Defuser","#Cstrike_NightVision_Button_CT" };
 static const char *EQUIPMENT_BUYLIST_CMD[] = { "vest","vesthelm","flash","VGUI_BuyMenu_BuyWeapon hegrenade","sgren","defuser","nvgs" };
 
 CCSBuySubMenu::CCSBuySubMenu(vgui2::Panel *parent, const char *name) : CBuySubMenu(parent, name)
@@ -101,19 +104,19 @@ CCSBuySubMenu::CCSBuySubMenu(vgui2::Panel *parent, const char *name) : CBuySubMe
 	m_pEditDescBg = new vgui2::ImagePanel(this, "EditDescBg");
 	m_pEquipSample = new vgui2::ImagePanel(this, "EquipSample");
 
-	m_iniFavorite.OpenFile("quickbuy.ini");
+	//m_iniFavorite.OpenFile("quickbuy.ini");
 	ReadFavoriteSets();
 
-	SetupItems(WeaponBuyMenuType::NONE);
+	SetupItems(BUY_NONE);
 }
 
 void CCSBuySubMenu::OnCommand(const char *command)
 {
 	if (!strncmp(command, "VGUI_BuyMenu_Show", 17))
 	{
-		WeaponBuyMenuType iType;
+        MoEWeaponBuyType iType;
 		if (command[17] == '\0')
-			iType = WeaponBuyMenuType::NONE;
+			iType = BUY_NONE;
 		else
 			sscanf(command + 17, "%d", &iType); //"Pistol 1"
 
@@ -124,9 +127,9 @@ void CCSBuySubMenu::OnCommand(const char *command)
 	}
 	else if (!strncmp(command, "VGUI_BuyMenu_SetTeam", 20))
 	{
-		WeaponBuyTeam team;
+		TeamName team;
 		if (command[20] == '\0')
-			team = WeaponBuyTeam::ALL;
+			team = UNASSIGNED;
 		else
 			sscanf(command + 20, "%d", &team); //"Pistol 1"
 
@@ -154,14 +157,14 @@ void CCSBuySubMenu::OnCommand(const char *command)
 	}
 	else if (!Q_strcmp(command, "showctwpn"))
 	{
-		SetTeam(WeaponBuyTeam::CT);
-		SetupItems(WeaponBuyMenuType::NONE);
+		SetTeam(CT);
+		SetupItems(BUY_NONE);
 		return;
 	}
 	else if (!Q_strcmp(command, "showterwpn"))
 	{
-		SetTeam(WeaponBuyTeam::TR);
-		SetupItems(WeaponBuyMenuType::NONE);
+		SetTeam(TERRORIST);
+		SetupItems(BUY_NONE);
 		return;
 	}
 	else if (!Q_strcmp(command, "buy_unavailable"))
@@ -171,16 +174,16 @@ void CCSBuySubMenu::OnCommand(const char *command)
 	}
 	else if (!Q_strcmp(command, "autobuy_in"))
 	{
-		if (m_iTeam == WeaponBuyTeam::CT)
-			gEngfuncs.pfnClientCmd("sv_create_psb 10397 m4a1;sv_create_psb 10397 usp;sv_create_psb 10397 hegrenade;sv_create_psb 10397 knife;secammo;primammo;vesthelm;defuser");
+		if (m_iTeam == CT)
+			gEngfuncs.pfnClientCmd("moe_buy weapon_m4a1;moe_buy weapon_usp;moe_buy weapon_hegrenade;moe_buy weapon_knife;secammo;primammo;vesthelm;defuser");
 		else
-			gEngfuncs.pfnClientCmd("sv_create_psb 10397 ak47;sv_create_psb 10397 glock18;sv_create_psb 10397 hegrenade;sv_create_psb 10397 knife;secammo;primammo;vesthelm");
+            gEngfuncs.pfnClientCmd("moe_buy weapon_ak47;moe_buy weapon_glock18;moe_buy weapon_hegrenade;moe_buy weapon_knife;secammo;primammo;vesthelm");
 		BaseClass::OnCommand("vguicancel");
 		return;
 	}
 	else if (!Q_strcmp(command, "rebuy_in"))
 	{
-		gEngfuncs.pfnClientCmd("bte_wpn_rebuy;rebuy;secammo;primammo");
+        gEngfuncs.pfnClientCmd("bte_wpn_rebuy;rebuy;secammo;primammo");
 		BaseClass::OnCommand("vguicancel");
 		return;
 	}
@@ -254,21 +257,18 @@ void CCSBuySubMenu::OnThink()
 {
 	BaseClass::OnThink();
 
-	int time = g_iBuyTime - (int)Hud().m_flTime;
-	if (time < 0)
-		time = 0;
-	account_num->SetText(std::to_wstring(g_iMoney).c_str());
-	buytime_num->SetText(std::to_wstring(time).c_str());
+	account_num->SetText(std::to_wstring(gHUD.m_Money.m_iMoneyCount).c_str());
+	buytime_num->SetText(std::to_wstring(0).c_str());
 }
 
-void CCSBuySubMenu::SetupItems(WeaponBuyMenuType type)
+void CCSBuySubMenu::SetupItems(MoEWeaponBuyType type)
 {
 	m_BuyItemList.clear();
-	if (type == WeaponBuyMenuType::NONE)
+	if (type == BUY_NONE)
 	{
-		static const char szTitles[10][32] = { "#CSO_Pistols", "#CSO_Shotguns", "#CSO_SubMachineGuns", "#CSO_Rifles",
-			"#CSO_MachineGuns", "#CSO_Prim_Ammo", "#CSO_Sec_Ammo", "#CSO_Equipment",
-			"#CSO_ProximityWpn", "#CSO_EndWpnBuy" };
+		static const char szTitles[10][32] = { "#Cstrike_Pistols", "#Cstrike_Shotguns", "#Cstrike_SubMachineGuns", "#Cstrike_Rifles",
+			"#Cstrike_MachineGuns", "#Cstrike_Prim_Ammo", "#Cstrike_Sec_Ammo", "#Cstrike_Equipment",
+			"&9 近身武器", "#Cstrike_Cancel" };
 		static const char szCommands[10][32] = { "VGUI_BuyMenu_Show 0", "VGUI_BuyMenu_Show 1", "VGUI_BuyMenu_Show 2", "VGUI_BuyMenu_Show 3",
 			"VGUI_BuyMenu_Show 4", "primammo", "secammo", "VGUI_BuyMenu_Show 5",
 			"VGUI_BuyMenu_Show 6", "vguicancel" };
@@ -288,29 +288,29 @@ void CCSBuySubMenu::SetupItems(WeaponBuyMenuType type)
 	}
 	else
 	{
-		if (type == WeaponBuyMenuType::EQUIP)
+		if (type == BUY_EQUIP)
 		{
 			for (int i = 0; i < 7; ++i)
 			{
-				m_BuyItemList.push_back({ EQUIPMENT_BUYLIST[i], EQUIPMENT_BUYLIST_CMD[i] });
+				m_BuyItemList.push_back({ EQUIPMENT_BUYLIST[i], EQUIPMENT_BUYLIST_TEXT[i], EQUIPMENT_BUYLIST_CMD[i] });
 			}
 		}
 
-		for (auto &x : WeaponManager())
+		for (auto &x : g_MoEWeaponBuyInfo)
 		{
 			if (type != x.iMenu)
 				continue;
-			if (x.iTeam != WeaponBuyTeam::ALL && m_iTeam != x.iTeam)
+			if (x.iTeam != UNASSIGNED && m_iTeam != x.iTeam)
 				continue;
-			const char *name = x.szName;
+			const char *name = x.pszClassName;
 
-			if (type == WeaponBuyMenuType::EQUIP)
+			if (type == BUY_EQUIP)
 			{
 				if (!strcmp(name, "flashbang") || !strcmp(name, "hegrenade") || !strcmp(name, "smokegrenade"))
 					continue;
 			}
 
-			m_BuyItemList.push_back(ItemInfo{ name, MakeString("VGUI_BuyMenu_BuyWeapon ", name) });
+			m_BuyItemList.push_back(ItemInfo{ name, x.pszDisplayName, std::string("VGUI_BuyMenu_BuyWeapon ") + name });
 		}
 
 		m_pPrevBtn->SetHotkey(L'-');
@@ -345,8 +345,9 @@ void CCSBuySubMenu::SetupPage(size_t iPage)
 		else
 		{
 			const char *weapon = m_BuyItemList[iElement].name.c_str();
+			const char *showname = m_BuyItemList[iElement].showname.c_str();
 			const char *cmd = m_BuyItemList[iElement].command.c_str();
-			m_pSlotButtons[i]->SetText(GetWeaponNameFormat(weapon));
+			m_pSlotButtons[i]->SetText(showname);
 			m_pSlotButtons[i]->SetCommand(cmd);
 			m_pSlotButtons[i]->SetVisible(true);
 			m_pSlotButtons[i]->SetHotkey('0' + i + 1);
@@ -361,7 +362,7 @@ void CCSBuySubMenu::SetupPage(size_t iPage)
 
 }
 
-void CCSBuySubMenu::SetTeam(WeaponBuyTeam team)
+void CCSBuySubMenu::SetTeam(TeamName team)
 {
 	m_iTeam = team;
 
@@ -372,18 +373,18 @@ void CCSBuySubMenu::SetTeam(WeaponBuyTeam team)
 	
 	m_pShowCTWeapon->SetActive(false);
 	m_pShowTERWeapon->SetActive(false);
-	if (team== WeaponBuyTeam::CT)
+	if (team== CT)
 		m_pShowCTWeapon->SetActive(true);
-	if (team == WeaponBuyTeam::TR)
+	if (team == TERRORIST)
 		m_pShowTERWeapon->SetActive(true);
 
 	Color col = { 255,255,255,255 };
 	Color bg = { 255,255,255,255 };
-	if (m_iTeam == WeaponBuyTeam::TR)
+	if (m_iTeam == TERRORIST)
 	{
 		col = COL_TR;
 	}
-	else if (m_iTeam == WeaponBuyTeam::CT)
+	else if (m_iTeam == CT)
 	{
 		col = COL_CT;
 	}
@@ -392,20 +393,25 @@ void CCSBuySubMenu::SetTeam(WeaponBuyTeam team)
 
 void CCSBuySubMenu::OnSelectWeapon(const char *weapon)
 {
-	switch (WeaponManager()[weapon].iSlot)
+    auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), [weapon](const MoEWeaponBuyInfo_s &info){ return !stricmp(info.pszClassName, weapon); });
+	if(iter == std::end(g_MoEWeaponBuyInfo))
+        return;
+    
+    switch (iter->iSlot)
 	{
 	case 1: m_SelectedItems.Primary = weapon; break;
 	case 2: m_SelectedItems.Secondary = weapon; break;
 	case 3: m_SelectedItems.Melee = weapon; break;
 	case 4: m_SelectedItems.HEGrenade = weapon; break;
 	}
-	SetupItems(WeaponBuyMenuType::NONE);
+	SetupItems(BUY_NONE);
 	UpdateFavoriteSetsControls();
 	SaveFavoriteSets();
 }
 
 void CCSBuySubMenu::ReadFavoriteSets()
 {
+    /*
 	auto &keyvalue = m_iniFavorite[std::string("QuickBuy0")];
 	m_SelectedItems = {
 		keyvalue["Primary"] ,
@@ -415,7 +421,7 @@ void CCSBuySubMenu::ReadFavoriteSets()
 		0,0,0,0, ArmorType::ARMOR_HELMET
 	};
 
-	for(int i:xrange(1, 6))
+	for(int i = 1; i <= 5; ++i)
 	{
 		std::string app = "QuickBuy";
 		app += std::to_string(i);
@@ -432,13 +438,14 @@ void CCSBuySubMenu::ReadFavoriteSets()
 			0,0,0,0, ArmorType::ARMOR_HELMET 
 		};
 	}
-
+     */
 	UpdateFavoriteSetsControls(); // update images
 }
 
 void CCSBuySubMenu::SaveFavoriteSets()
 {
-	for (int i : xrange(1, 6))
+    /*
+	for (int i = 1; i <= 5; ++i)
 	{
 		std::string app = "QuickBuy";
 		app += std::to_string(i);
@@ -459,6 +466,7 @@ void CCSBuySubMenu::SaveFavoriteSets()
 	keyvalue["Grenade"] = m_SelectedItems.HEGrenade;
 
 	m_iniFavorite.SaveFile();
+    */
 	UpdateFavoriteSetsControls(); // update images
 }
 
@@ -478,16 +486,16 @@ void CCSBuySubMenu::UpdateFavoriteSetsControls()
 
 	
 
-	fgrenBG->SetImage(m_SelectedItems.nFlashBang ? "gfx\\vgui\\flash" : "");
-	sgrenBG->SetImage(m_SelectedItems.nSmokeGrenade ? "gfx\\vgui\\sgren" : "");
-	dfBG->SetImage(m_SelectedItems.bDefuser ? "gfx\\vgui\\defuser" : "");
-	nvBG->SetImage(m_SelectedItems.bDefuser ? "gfx\\vgui\\nvgs" : "");
+	fgrenBG->SetImage(m_SelectedItems.nFlashBang ? "gfx/vgui/flash" : "");
+	sgrenBG->SetImage(m_SelectedItems.nSmokeGrenade ? "gfx/vgui/sgren" : "");
+	dfBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/defuser" : "");
+	nvBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/nvgs" : "");
 
 	switch (m_SelectedItems.iKelmet)
 	{
 	case ArmorType::NONE: kevBG->SetImage(""); break;
-	case ArmorType::ARMOR: kevBG->SetImage("gfx\\vgui\\vest"); break;
-	case ArmorType::ARMOR_HELMET: kevBG->SetImage("gfx\\vgui\\vesthelm"); break;
+	case ArmorType::ARMOR: kevBG->SetImage("gfx/vgui/vest"); break;
+	case ArmorType::ARMOR_HELMET: kevBG->SetImage("gfx/vgui/vesthelm"); break;
 	}
 }
 
@@ -525,7 +533,7 @@ void CCSBuySubMenu::OnBuySelectedItems()
 	for(const std::string &wpn : { m_SelectedItems.Primary,m_SelectedItems.Secondary,m_SelectedItems.Melee,m_SelectedItems.HEGrenade })
 		if (wpn.size())
 		{
-			szCommand += "sv_create_psb 10397 ";
+			szCommand += "moe_buy ";
 			szCommand += wpn;
 			szCommand += ';';
 		}
@@ -723,7 +731,7 @@ void CCSBuySubMenu_DefaultMode::OnSelectWeapon(const char *weapon)
 {
 	char szBuffer[64];
 
-	sprintf(szBuffer, "sv_create_psb 10397 %s", weapon);
+	sprintf(szBuffer, "moe_buy %s", weapon);
 	gEngfuncs.pfnClientCmd(szBuffer);
 	OnCommand("vguicancel");
 }
@@ -739,14 +747,14 @@ void CCSBuySubMenu_ZombieMod::OnCommand(const char *command)
 	{
 		m_SelectedItems.iKelmet = ArmorType::ARMOR;
 		UpdateFavoriteSetsControls();
-		BaseClass::SetupItems(WeaponBuyMenuType::NONE);
+		BaseClass::SetupItems(BUY_NONE);
 		return;
 	}
 	else if (!Q_strcmp(command, "vesthelm"))
 	{
 		m_SelectedItems.iKelmet = ArmorType::ARMOR_HELMET;
 		UpdateFavoriteSetsControls();
-		BaseClass::SetupItems(WeaponBuyMenuType::NONE);
+		BaseClass::SetupItems(BUY_NONE);
 		return;
 	}
 	else if (!Q_strcmp(command, "flash") || !Q_strcmp(command, "sgren") || !Q_strcmp(command, "defuser") || !Q_strcmp(command, "nvgs"))
@@ -757,7 +765,7 @@ void CCSBuySubMenu_ZombieMod::OnCommand(const char *command)
 		msgbox->SetBounds(GetWide() / 2 - 150, GetTall() / 2 - 100, 300, 200);
 		msgbox->DoModal();
 		msgbox->Activate();
-		BaseClass::SetupItems(WeaponBuyMenuType::NONE);
+		BaseClass::SetupItems(BUY_NONE);
 		return;
 	}
 	BaseClass::OnCommand(command);
@@ -768,11 +776,11 @@ void CCSBuySubMenu_ZombieMod::OnSelectWeapon(const char *weapon)
 	BaseClass::OnSelectWeapon(weapon);
 }
 
-void CCSBuySubMenu_ZombieMod::SetupItems(WeaponBuyMenuType type)
+void CCSBuySubMenu_ZombieMod::SetupItems(MoEWeaponBuyType type)
 {
 	BaseClass::SetupItems(type);
 
-	if (type == WeaponBuyMenuType::NONE)
+	if (type == BUY_NONE)
 	{
 		for (int i : {5,6})
 		{

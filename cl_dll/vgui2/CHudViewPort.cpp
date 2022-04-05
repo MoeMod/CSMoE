@@ -9,6 +9,7 @@
 
 #include "hud.h"
 #include "parsemsg.h"
+#include "csmoe/BuyMenu/cstrikebuymenu.h"
 
 using cl::gHUD;
 using cl::gEngfuncs;
@@ -78,6 +79,7 @@ void CHudViewport::HideClientUI()
 void CHudViewport::CreateDefaultPanels()
 {
 	AddNewPanel(CreatePanelByName("ClientMOTD"));
+    AddNewPanel(CreatePanelByName(PANEL_BUY));
 	//AddNewPanel(CreatePanelByName(VIEWPORT_PANEL_SCORE));
 
 	AddNewGameUIPanel(CreateGameUIPanelByName("GameUITestPanel"));
@@ -93,6 +95,16 @@ IViewportPanel* CHudViewport::CreatePanelByName(const char* pszName)
 			m_pMOTD = new CClientMOTD(this);
 		pPanel = m_pMOTD;
 	}
+	if (Q_strcmp(PANEL_BUY, pszName) == 0)
+	{
+		if(!m_pBuyMenu)
+        {
+            m_pBuyMenu = new CCSBaseBuyMenu(this);
+            m_pBuyMenu->UpdateGameMode();
+        }
+		pPanel = m_pBuyMenu;
+	}
+
 	/*else if (Q_strcmp(VIEWPORT_PANEL_SCORE, pszName) == 0)
 	{
 		pPanel = new CScorePanel(this);
@@ -107,9 +119,90 @@ IGameUIPanel *CHudViewport::CreateGameUIPanelByName(const char *pszName)
 	
 	if (Q_strcmp("GameUITestPanel", pszName) == 0)
 	{
-		//pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
-		pPanel = new CGameUITestPanel(this->GetVPanel());
+		pPanel = new CGameUITestPanel(engineVgui()->GetPanel(PANEL_GAMEUIDLL));
 	}
 	
 	return pPanel;
+}
+
+
+bool CHudViewport::ShowVGUIMenu(int iMenu)
+{
+    IViewportPanel *panel = NULL;
+
+    switch (iMenu)
+    {
+        case MENU_TEAM:
+        case MENU_CLASS_T:
+        case MENU_CLASS_CT:
+        {
+            break;
+        }
+        case MENU_BUY:
+        case MENU_BUY_PISTOL:
+        case MENU_BUY_SHOTGUN:
+        case MENU_BUY_RIFLE:
+        case MENU_BUY_SUBMACHINEGUN:
+        case MENU_BUY_MACHINEGUN:
+        case MENU_BUY_ITEM:
+        {
+            if (cl::g_iTeamNumber == TEAM_CT)
+                m_pBuyMenu->SetTeam(TEAM_CT);
+            else if (cl::g_iTeamNumber == TEAM_TERRORIST)
+                m_pBuyMenu->SetTeam(TEAM_TERRORIST);
+            else
+                m_pBuyMenu->SetTeam(TEAM_UNASSIGNED);
+
+            m_pBuyMenu->ActivateMenu(iMenu);
+            return true;
+        }
+    }
+
+    if (panel)
+    {
+        ShowPanel(panel, true);
+        return true;
+    }
+
+    return false;
+}
+
+bool CHudViewport::HideVGUIMenu(int iMenu)
+{
+    IViewportPanel *panel = NULL;
+
+    switch (iMenu)
+    {
+        case MENU_CLASS_T:
+        case MENU_TEAM:
+        case MENU_CLASS_CT:
+        {
+            break;
+        }
+
+        case MENU_BUY:
+        case MENU_BUY_PISTOL:
+        case MENU_BUY_SHOTGUN:
+        case MENU_BUY_RIFLE:
+        case MENU_BUY_SUBMACHINEGUN:
+        case MENU_BUY_MACHINEGUN:
+        case MENU_BUY_ITEM:
+        {
+            panel = m_pBuyMenu;
+        }
+    }
+
+    if (panel)
+    {
+        ShowPanel(panel, false);
+        return true;
+    }
+
+    return false;
+}
+
+void CHudViewport::UpdateGameMode()
+{
+    if(m_pBuyMenu)
+        m_pBuyMenu->UpdateGameMode();
 }

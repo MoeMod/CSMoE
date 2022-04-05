@@ -342,22 +342,24 @@ endif()
 
 if(XASH_VGUI2)
 	set(VGUI2_SRCS
-#		vgui2/CBackGroundPanel.cpp
-#		vgui2/CBaseViewport.cpp
-#		vgui2/CClientMOTD.cpp
-#		vgui2/CClientVGUI.cpp
-#		vgui2/CHudViewPort.cpp
-#		vgui2/game_controls/buymenu.cpp
-#		vgui2/game_controls/buysubmenu.cpp
-#		vgui2/csmoe/CSBackGroundPanel.cpp
-#		vgui2/csmoe/vgui_int.cpp
-#		vgui2/csmoe/BuyMenu/buypresetbutton.cpp
-#		vgui2/csmoe/BuyMenu/cstrikebuymenu.cpp
-#		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanel.cpp
-#		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanelbutton.cpp
-#		vgui2/csmoe/BuyMenu/cstrikebuysubmenu.cpp
-#		vgui2/csmoe/BuyMenu/WeaponImagePanel.cpp
+		vgui2/CBackGroundPanel.cpp
+		vgui2/CBaseViewport.cpp
+		vgui2/CClientMOTD.cpp
+		vgui2/CClientVGUI.cpp
+		vgui2/CHudViewPort.cpp
+		vgui2/CGameUITestPanel.cpp
+		vgui2/game_controls/buymenu.cpp
+		vgui2/game_controls/buysubmenu.cpp
+		vgui2/csmoe/CSBackGroundPanel.cpp
+		vgui2/csmoe/vgui_int.cpp
+		vgui2/csmoe/BuyMenu/buypresetbutton.cpp
+		vgui2/csmoe/BuyMenu/cstrikebuymenu.cpp
+		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanel.cpp
+		vgui2/csmoe/BuyMenu/cstrikebuymouseoverpanelbutton.cpp
+		vgui2/csmoe/BuyMenu/cstrikebuysubmenu.cpp
+		vgui2/csmoe/BuyMenu/WeaponImagePanel.cpp
 	)
+	add_definitions(-DXASH_VGUI2=1)
 else()
 	set(VGUI2_SRCS )
 endif()

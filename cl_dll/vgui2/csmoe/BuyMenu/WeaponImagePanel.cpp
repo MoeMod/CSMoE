@@ -15,16 +15,12 @@
 
 #include "WeaponImagePanel.h"
 
-#include "WeaponManager.h"
-
-#include "util/STLHelper.h"
-
-using namespace vgui;
+using namespace vgui2;
 
 WeaponImagePanel::WeaponImagePanel(Panel *parent, const char *name) : BaseClass(parent, name)
 {
 	m_bBanned = false;
-	m_pBannedImage = vgui2::scheme()->GetImage("gfx\\vgui\\cannotuse", true);
+	m_pBannedImage = vgui2::scheme()->GetImage("gfx/vgui/cannotuse", true);
 }
 
 void WeaponImagePanel::SetWeapon(const char *name)
@@ -34,10 +30,12 @@ void WeaponImagePanel::SetWeapon(const char *name)
 		return SetWeapon(nullptr);
 	}
 
-	vgui2::IImage *image = vgui2::scheme()->GetImage(MakeString("gfx\\vgui\\", name).c_str(), true);
+    char path[MAX_PATH];
+    sprintf(path, "gfx/vgui/%s", name);
+	vgui2::IImage *image = vgui2::scheme()->GetImage(path, true);
 	SetImage(image);
 
-	m_bBanned = !WeaponManager().FCanBuyWeapon(name);
+	m_bBanned = false;
 }
 
 void WeaponImagePanel::SetWeapon(nullptr_t)

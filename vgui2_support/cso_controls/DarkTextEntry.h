@@ -6,8 +6,8 @@
 #pragma once
 #endif
 
-#include <VGUI/IBorder.h>
-#include <VGUI/IScheme.h>
+#include <vgui/IBorder.h>
+#include <vgui/IScheme.h>
 #include <KeyValues.h>
 
 #include <vgui_controls/TextEntry.h>

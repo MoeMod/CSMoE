@@ -26,6 +26,10 @@
 
 using namespace vgui2;
 
+const Color COL_NONE = { 255, 255, 255, 255 };
+const Color COL_CT = { 192, 205, 224, 255 };
+const Color COL_TR = { 216, 182, 183, 255 };
+
 CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const char *panelName, vgui2::EditablePanel *panel)
 	: BaseClass(parent, panelName, panel)
 {
@@ -42,13 +46,21 @@ CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const
 
 void CSBuyMouseOverPanelButton::UpdateWeapon(const char *weapon)
 {
-	CSBuyMouseOverPanel *panel = dynamic_cast<CSBuyMouseOverPanel *>(m_pPanel);
-	if (panel)
-		panel->UpdateWeapon(weapon);
+    if(weapon && weapon[0])
+    {
+        m_pWeaponImage->SetVisible(true);
+        CSBuyMouseOverPanel *panel = dynamic_cast<CSBuyMouseOverPanel *>(m_pPanel);
+        if (panel)
+            panel->UpdateWeapon(weapon);
 
-	char szBuffer[64];
-	sprintf(szBuffer, "gfx\\vgui\\%s", weapon);
-	m_pWeaponImage->SetImage(szBuffer);
+        char szBuffer[64];
+        sprintf(szBuffer, "gfx/vgui/%s", weapon);
+        m_pWeaponImage->SetImage(szBuffer);
+    }
+    else
+    {
+        m_pWeaponImage->SetVisible(false);
+    }
 }
 
 void CSBuyMouseOverPanelButton::Paint()
@@ -56,11 +68,11 @@ void CSBuyMouseOverPanelButton::Paint()
 	Color col(200, 200, 200, 255);
 	if (m_iTeam == TERRORIST)
 	{
-		col = Color(255, 65, 65, 255);
+		col = COL_TR;
 	}
 	else if (m_iTeam == CT)
 	{
-		col = Color(65, 65, 255, 255);
+		col = COL_CT;
 	}
 	SetFgColor(col);
 	BaseClass::Paint();

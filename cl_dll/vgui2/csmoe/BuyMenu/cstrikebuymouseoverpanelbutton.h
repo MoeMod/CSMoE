@@ -25,8 +25,7 @@ public:
 	virtual void Paint() override;
 	virtual void PerformLayout() override;
 
-	using WeaponBuyTeam = CWeaponManager::WeaponBuyTeam;
-	void SetTeam(WeaponBuyTeam team)
+	void SetTeam(TeamName team)
 	{
 		m_iTeam = team;
 	}

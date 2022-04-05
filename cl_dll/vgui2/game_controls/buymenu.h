@@ -8,6 +8,8 @@
 #define PANEL_BUY "BuyMenu"
 
 #include "vgui_controls/WizardPanel.h"
+#include "IViewportPanel.h"
+#include "IViewPort.h"
 
 class CBuySubMenu;
 
@@ -22,7 +24,7 @@ private:
 	DECLARE_CLASS_SIMPLE(CBuyMenu, vgui2::WizardPanel);
 
 public:
-	CBuyMenu(void);
+	CBuyMenu(IViewport *pViewPort);
 	~CBuyMenu(void);
 
 public:
@@ -44,6 +46,7 @@ public:
 
 protected:
 	CBuySubMenu *m_pMainMenu;
+	IViewport	*m_pViewPort;
 
 	int m_iTeam;
 	int m_iClass;

@@ -14,7 +14,7 @@
 
 using namespace vgui2;
 
-CCSBaseBuyMenu::CCSBaseBuyMenu() : CBuyMenu()
+CCSBaseBuyMenu::CCSBaseBuyMenu(IViewport *pViewPort) : CBuyMenu(pViewPort)
 {
 	SetTitle("#Cstrike_Buy_Menu", true);
 	SetProportional(true);
@@ -63,7 +63,7 @@ void CCSBaseBuyMenu::ShowPanel(bool bShow)
 {
 	if (bShow)
 	{
-		if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		if (cl::gHUD.m_iIntermission || cl::gEngfuncs.IsSpectateOnly())
 			return;
 	}
 
@@ -154,7 +154,7 @@ void CCSBaseBuyMenu::ActivateMenu(int iMenu)
 {
 	GotoMenu(iMenu);
 
-	g_pViewPort->ShowPanel(this, true);
+	g_pViewport->ShowPanel(this, true);
 }
 
 void CCSBaseBuyMenu::SetTeam(int iTeam)
@@ -175,9 +175,9 @@ void CCSBaseBuyMenu::UpdateGameMode()
 	if (m_pMainMenu)
 		m_pMainMenu->DeletePanel();
 
-	if (IS_ZOMBIE_MODE && (g_iMod != MOD_ZB4))
+	if (cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning != MOD_ZB4))
 		m_pMainMenu = new CCSBuySubMenu_ZombieMod(this);
-	else if ((g_iMod == MOD_ZB4) || (g_iMod == MOD_TDM) || (g_iMod == MOD_DM))
+	else if ((cl::gHUD.m_iModRunning == MOD_ZB4) || (cl::gHUD.m_iModRunning == MOD_TDM) || (cl::gHUD.m_iModRunning == MOD_DM))
 		m_pMainMenu = new CCSBuySubMenu_DeathMatch(this);
 	else
 		m_pMainMenu = new CCSBuySubMenu_DefaultMode(this);

@@ -1,5 +1,5 @@
 #include "hud.h"
-#include "Viewport.h"
+#include "CBaseViewport.h"
 #include "buysubmenu.h"
 
 #include "tier1/KeyValues.h"
@@ -9,7 +9,7 @@
 
 #include <string>
 
-using namespace vgui;
+using namespace vgui2;
 
 CBuySubMenu::CBuySubMenu(vgui2::Panel *parent, const char *name) : WizardSubPanel(parent, name)
 {
@@ -66,7 +66,7 @@ void CBuySubMenu::Close(void)
 	if (GetWizardPanel())
 		GetWizardPanel()->Close();
 
-	g_pViewPort->ShowBackGround(false);
+    g_pViewport->ShowBackGround(false);
 }
 
 CBuySubMenu *CBuySubMenu::CreateNewSubMenu(const char *name)
@@ -91,7 +91,7 @@ void CBuySubMenu::OnCommand(const char *command)
 		Close();
 
 		if (Q_stricmp(command, "vguicancel") != 0)
-			engine->pfnClientCmd((char *)command);
+			cl::gEngfuncs.pfnClientCmd((char *)command);
 
 		BaseClass::OnCommand(command);
 	}

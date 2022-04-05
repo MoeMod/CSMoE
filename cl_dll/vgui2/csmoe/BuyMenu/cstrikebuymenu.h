@@ -7,6 +7,7 @@
 
 #include <vgui_controls/WizardPanel.h>
 #include "game_controls/buymenu.h"
+#include "IViewPort.h"
 
 namespace vgui
 {
@@ -27,7 +28,7 @@ class CCSBaseBuyMenu : public CBuyMenu
 	typedef CBuyMenu BaseClass;
 
 public:
-	CCSBaseBuyMenu();
+	CCSBaseBuyMenu(IViewport *pViewPort);
 
 protected:
 	void SetupControlSettings();

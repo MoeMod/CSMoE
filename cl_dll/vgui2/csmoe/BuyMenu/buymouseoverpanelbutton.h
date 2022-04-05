@@ -71,17 +71,17 @@ public:
 		BaseClass::ApplySchemeSettings(pScheme);
 
 		if (!m_pKeyboard)
-			m_pKeyboard = vgui2::scheme()->GetImage(pScheme->GetResourceString("BuyMouseOverPanelButton.Keyboard"), true);
+			m_pKeyboard = vgui2::scheme()->GetImage("resource/Control/button_ingame/keyboard", true);
 
 		if (!m_pBlankSlot)
-			m_pBlankSlot = vgui2::scheme()->GetImage(pScheme->GetResourceString("BuyMouseOverPanelButton.BlankSlot"), true);
+			m_pBlankSlot = vgui2::scheme()->GetImage(pScheme->GetResourceString("BuyButton.Up"), true);
 
 		if (!m_pSelect)
-			m_pSelect = vgui2::scheme()->GetImage(pScheme->GetResourceString("BuyMouseOverPanelButton.Select"), true);
+			m_pSelect = vgui2::scheme()->GetImage(pScheme->GetResourceString("BuyButton.On"), true);
 
 		if (m_iKeyOffset == -1)
 		{
-			m_iKeyOffset = atoi(pScheme->GetResourceString("BuyMouseOverPanelButton.KeyboardOffset"));
+			m_iKeyOffset = 3;
 
 			if (IsProportional())
 				m_iKeyOffset = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeyOffset);
@@ -89,7 +89,7 @@ public:
 
 		if (m_iKeySize == -1)
 		{
-			m_iKeySize = atoi(pScheme->GetResourceString("BuyMouseOverPanelButton.KeyboardSize"));
+			m_iKeySize = 18;
 
 			if (IsProportional())
 				m_iKeySize = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeySize);

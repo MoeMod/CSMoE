@@ -115,6 +115,11 @@ public:
 	bool AddNewGameUIPanel(IGameUIPanel* pPanel);
 	IGameUIPanel* FindGameUIPanelByName(const char* pszName);
 
+	// CSMoE client
+    virtual bool ShowVGUIMenu(int iMenu) { return false; }
+    virtual bool HideVGUIMenu(int iMenu) { return false; }
+    virtual void UpdateGameMode() {}
+
 private:
 	int m_OldSize[ 2 ] = { -1, -1 };
 	int m_nRootSize[ 2 ] = { -1, -1 };

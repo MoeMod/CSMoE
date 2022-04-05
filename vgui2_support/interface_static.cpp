@@ -14,6 +14,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IBorder.h>
+#include <vgui/IClientVGUI.h>
 #include <IBaseUI.h>
 #include <IEngineVGui.h>
 #include <IGameUIFuncs.h>
@@ -63,5 +64,7 @@ REGISTER_SINGLE_INTERFACE(CBaseUI, IBaseUI, BASEUI_INTERFACE_VERSION);
 REGISTER_SINGLE_INTERFACE(CEngineVGui, IEngineVGui, VENGINE_VGUI_VERSION);
 REGISTER_SINGLE_INTERFACE(CGameUIFuncs, IGameUIFuncs, ENGINE_GAMEUIFUNCS_INTERFACE_VERSION);
 REGISTER_SINGLE_INTERFACE_GLOBALVAR( CXashFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION, fs );
-    
+
+// client
+REGISTER_SINGLE_INTERFACE_GLOBALVAR( CClientVGUI, IClientVGUI, CLIENTVGUI_INTERFACE_VERSION, g_ClientVGUI );
 }

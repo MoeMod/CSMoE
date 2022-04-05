@@ -10,7 +10,7 @@ static void __CmdFunc_OpenGameUITestPanel()
 	CGameUITestPanel *panel = dynamic_cast<CGameUITestPanel *>(g_pViewport->FindGameUIPanelByName("GameUITestPanel"));
 	if (!panel)
 	{
-		gEngfuncs.Con_Printf("__CmdFunc_OpenGameUITestPanel: panel is NULL\n");
+		cl::gEngfuncs.Con_Printf("__CmdFunc_OpenGameUITestPanel: panel is NULL\n");
 		return;
 	}
 
@@ -39,7 +39,7 @@ CGameUITestPanel::CGameUITestPanel(vgui2::VPANEL parent) : BaseClass(nullptr, "G
 
 	SetScheme("ClientScheme");
 	Reset();
-	HOOK_COMMAND("gameui_open_test_panel", OpenGameUITestPanel);
+    cl::HOOK_COMMAND("gameui_open_test_panel", OpenGameUITestPanel);
 }
 
 CGameUITestPanel::~CGameUITestPanel() {}

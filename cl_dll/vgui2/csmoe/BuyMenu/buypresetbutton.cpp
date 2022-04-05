@@ -20,6 +20,8 @@
 
 #include "WeaponImagePanel.h"
 
+#include "shared_util.h"
+
 #include <string>
 
 using namespace vgui2;
@@ -133,20 +135,20 @@ void BuyPresetButton::ApplySchemeSettings(IScheme *pScheme)
 	BaseClass::ApplySchemeSettings(pScheme);
 
 	if (!m_pKeyboard)
-		m_pKeyboard = scheme()->GetImage(pScheme->GetResourceString("BuyPresetButton.Keyboard"), true);
+		m_pKeyboard = scheme()->GetImage("resource/Control/button_ingame/keyboard", true);
 
 	if (!m_pBlankSlot)
-		m_pBlankSlot = scheme()->GetImage(pScheme->GetResourceString("BuyPresetButton.BlankSlot"), true);
+		m_pBlankSlot = scheme()->GetImage("resource/Control/button_ingame/favoritebg", true);
 
 	if(!m_pArmed)
-		m_pArmed = scheme()->GetImage(pScheme->GetResourceString("BuyPresetButton.Select"), true);
+		m_pArmed = scheme()->GetImage("resource/Control/buybutton/select", true);
 
 	if (!m_pSelect)
-		m_pSelect = scheme()->GetImage(pScheme->GetResourceString("BuyPresetButton.Select"), true);
+		m_pSelect = scheme()->GetImage("resource/Control/buybutton/select", true);
 
 	if (m_iKeyOffset == -1)
 	{
-		m_iKeyOffset = atoi(pScheme->GetResourceString("BuyPresetButton.KeyboardOffset"));
+		m_iKeyOffset = 6;
 
 		if (IsProportional())
 			m_iKeyOffset = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeyOffset);
@@ -154,7 +156,7 @@ void BuyPresetButton::ApplySchemeSettings(IScheme *pScheme)
 
 	if (m_iKeySize == -1)
 	{
-		m_iKeySize = atoi(pScheme->GetResourceString("BuyPresetButton.KeyboardSize"));
+		m_iKeySize = 18;
 
 		if (IsProportional())
 			m_iKeySize = vgui2::scheme()->GetProportionalScaledValueEx(GetScheme(), m_iKeySize);
@@ -301,7 +303,7 @@ void BuyPresetButton::OnMouseReleased(MouseCode code)
 
 void BuyPresetButton::GetText(char *textOut, int bufferLen)
 {
-	g_pVGuiLocalize->ConvertUnicodeToANSI(m_pFullText, textOut, bufferLen);
+	vgui2::localize()->ConvertUnicodeToANSI(m_pFullText, textOut, bufferLen);
 }
 
 void BuyPresetButton::GetText(wchar_t *textOut, int bufLenInBytes)
@@ -326,12 +328,12 @@ void BuyPresetButton::SetText(const char *text)
 
 	if (text[0] == '#')
 	{
-		wtext = g_pVGuiLocalize->Find(text);
+		wtext = vgui2::localize()->Find(text);
 	}
 	else
 	{
 		wchar_t unicodeVar[256];
-		g_pVGuiLocalize->ConvertANSIToUnicode(text, unicodeVar, sizeof(unicodeVar));
+        vgui2::localize()->ConvertANSIToUnicode(text, unicodeVar, sizeof(unicodeVar));
 		wtext = unicodeVar;
 	}
 
