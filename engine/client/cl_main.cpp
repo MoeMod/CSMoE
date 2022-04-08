@@ -28,6 +28,7 @@ GNU General Public License for more details.
 
 #ifdef XASH_IMGUI
 #include "imgui_impl_xash.h"
+#include "imgui_menu_msgbox.h"
 #endif
 
 #include <optional>
@@ -1793,8 +1794,12 @@ void CL_ConnectionlessPacket( netadr_t from, sizebuf_t *msg )
 		Cmd_ExecuteString( "menu_connectionprogress disconnect", src_command );
 
 		str = BF_ReadString( msg );
+#ifdef XASH_IMGUI
+        ui::MsgBox_Open(str);
+#else
 		if( UI_IsVisible() )
 			Cmd_ExecuteString( va("menu_showmessagebox \"^3Server message^7\n%s\"", str ), src_command );
+#endif
 		Msg( "%s", str );
 	}
 	else if( !Q_strcmp( c, "updatemsg" ))

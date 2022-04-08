@@ -30,6 +30,7 @@ GNU General Public License for more details.
 #include "imgui_connectprogress.h"
 #include "imgui_menu_server.h"
 #include "imgui_menu_update.h"
+#include "imgui_menu_msgbox.h"
 #include <keydefs.h>
 #include <utility>
 #include <algorithm>
@@ -766,6 +767,7 @@ void Engine_OnGUI(struct ImGuiContext *context)
 	ImGui_SprView_OnGUI();
 	ui::ImGui_Server_OnGui();
     ui::Update_OnGui();
+    ui::MsgBox_OnGui();
 	if(g_bShowDemoWindow)
 		ImGui::ShowDemoWindow(&g_bShowDemoWindow);
 }
