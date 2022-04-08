@@ -261,13 +261,57 @@ gotnewcl:
 		Q_strncpy( cl->auth_id, id, sizeof( cl->auth_id ) );
 
 		int cl_build = Q_atoi(Info_ValueForKey(newcl->useragent, "b"));
+        if(!cl_build)
+        {
+            Netchan_OutOfBandPrint( NS_SERVER, from, "print\nInvalid useragent.\n" );
+            Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
+            return;
+        }
 		if(sv_minclver->integer > 0 && cl_build < sv_minclver->integer)
 		{
 			Netchan_OutOfBandPrint( NS_SERVER, from, "print\nServer requires build version >= %i.\n", sv_minclver->integer );
-			Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\nServer requires build version %i.\n", sv_minclver->integer );
+			Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\n本服务器要求 build %i 以上版本，请加入QQ群 706711420 下载最新客户端。\n", sv_minclver->integer );
 			Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
 			return;
 		}
+
+        const char *cl_os = Info_ValueForKey(newcl->useragent, "o");
+        if(!cl_os || !cl_os[0])
+        {
+            Netchan_OutOfBandPrint( NS_SERVER, from, "print\nInvalid useragent.\n" );
+            Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
+            return;
+        }
+        if(sv_allow_clos->string && sv_allow_clos->string[0])
+        {
+           do {
+               if(!strcmp(cl_os, "iOS") && strchr(sv_allow_clos->string, 'i'))
+               {
+                    break;
+               }
+               if(!strcmp(cl_os, "macOS") && strchr(sv_allow_clos->string, 'm'))
+               {
+                   break;
+               }
+               if(!strcmp(cl_os, "Android") && strchr(sv_allow_clos->string, 'a'))
+               {
+                   break;
+               }
+               if(!strcmp(cl_os, "Win32") && strchr(sv_allow_clos->string, 'w'))
+               {
+                   break;
+               }
+               if(!strcmp(cl_os, "Linux") && strchr(sv_allow_clos->string, 'l'))
+               {
+                   break;
+               }
+
+               Netchan_OutOfBandPrint( NS_SERVER, from, "print\nPlatform %s is not allowed.\n", cl_os );
+               Netchan_OutOfBandPrint( NS_SERVER, from, "errormsg\n本服务器禁止 %s 设备进入，请更换设备。\n", cl_os );
+               Netchan_OutOfBandPrint( NS_SERVER, from, "disconnect\n" );
+               return;
+           } while(0);
+        }
 	}
 
 	svs.currentPlayer = newcl;

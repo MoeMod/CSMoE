@@ -55,7 +55,22 @@ qboolean	error_on_exit = false;	// arg for exit();
 Sys_DoubleTime
 ================
 */
-#if XASH_TIMER == TIMER_WIN32
+#if 1
+#include <chrono>
+double GAME_EXPORT Sys_DoubleTime( void )
+{
+    using clock = std::chrono::high_resolution_clock;
+    static clock::time_point g_ClockStart;
+
+    if( !g_ClockStart.time_since_epoch().count() )
+    {
+        g_ClockStart = clock::now();
+    }
+
+    auto time = clock::now() - g_ClockStart;
+    return std::chrono::duration_cast<std::chrono::duration<double>>(time).count();
+}
+#elif XASH_TIMER == TIMER_WIN32
 #include <winbase.h>
 
 double GAME_EXPORT Sys_DoubleTime( void )

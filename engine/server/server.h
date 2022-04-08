@@ -479,6 +479,7 @@ extern  convar_t		*sv_userinfo_penalty_time;
 extern  convar_t		*sv_userinfo_penalty_multiplier;
 extern  convar_t		*sv_userinfo_penalty_attempts;
 extern  convar_t		*sv_minclver;
+extern  convar_t		*sv_allow_clos;
 
 //===========================================================
 //
