@@ -163,9 +163,9 @@ void CCSBaseBuyMenu::SetTeam(int iTeam)
 		return;
 	m_iTeam = iTeam;
 	if(iTeam == TEAM_TERRORIST)
-		m_pMainMenu->OnCommand("VGUI_BuyMenu_SetTeam 2");
-	else if (iTeam == TEAM_CT)
 		m_pMainMenu->OnCommand("VGUI_BuyMenu_SetTeam 1");
+	else if (iTeam == TEAM_CT)
+		m_pMainMenu->OnCommand("VGUI_BuyMenu_SetTeam 2");
 	else
 		m_pMainMenu->OnCommand("VGUI_BuyMenu_SetTeam 0");
 }
@@ -178,7 +178,7 @@ void CCSBaseBuyMenu::UpdateGameMode()
 	if (cl::gHUD.IsZombieMod() && (cl::gHUD.m_iModRunning != MOD_ZB4))
 		m_pMainMenu = new CCSBuySubMenu_ZombieMod(this);
 	else if ((cl::gHUD.m_iModRunning == MOD_ZB4) || (cl::gHUD.m_iModRunning == MOD_TDM) || (cl::gHUD.m_iModRunning == MOD_DM))
-		m_pMainMenu = new CCSBuySubMenu_DeathMatch(this);
+		m_pMainMenu = new CCSBuySubMenu_ZombieMod(this); // new CCSBuySubMenu_DeathMatch(this);
 	else
 		m_pMainMenu = new CCSBuySubMenu_DefaultMode(this);
 

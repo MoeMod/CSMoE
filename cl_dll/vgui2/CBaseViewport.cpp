@@ -18,9 +18,6 @@
 using cl::gHUD;
 using cl::gEngfuncs;
 
-vgui2::Panel *g_lastPanel = NULL;
-vgui2::Button *g_lastButton = NULL;
-
 CBaseViewport* g_pViewport = nullptr;
 
 CBaseViewport::CBaseViewport()

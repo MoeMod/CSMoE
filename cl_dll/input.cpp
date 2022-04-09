@@ -32,6 +32,13 @@
 
 #include "com_weapons.h"
 
+#ifdef XASH_VGUI2
+#include "IBaseUI.h"
+namespace vgui2 {
+    extern IBaseUI *staticUIFuncs;
+}
+#endif
+
 namespace cl {
 
 extern int g_weaponselect;
@@ -375,6 +382,13 @@ Return 1 to allow engine to process the key, otherwise, act on it as needed
 */
 int DLLEXPORT HUD_Key_Event( int down, int keynum, const char *pszCurrentBinding )
 {
+#ifdef XASH_VGUI2
+    bool want_text_input = vgui2::staticUIFuncs->Key_Event(down, keynum, pszCurrentBinding);
+    if(want_text_input)
+    {
+        return 0;
+    }
+#endif
 	return 1;
 }
 

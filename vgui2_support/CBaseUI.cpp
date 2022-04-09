@@ -126,13 +126,6 @@ void CBaseUI::Initialize(CreateInterfaceFn* factories, int count) {
 	
 	vgui2::VGuiControls_Init("BaseUI", m_FactoryList, m_iNumFactories);
 
-	g_pFullFileSystem->AddSearchPath(".", "BASE");
-	g_pFullFileSystem->AddSearchPath("platform", "PLATFORM");
-	g_pFullFileSystem->AddSearchPath("csmoe", "GAME");
-	g_pFullFileSystem->AddSearchPath("cstrike", "GAME");
-	g_pFullFileSystem->AddSearchPath("csmoe", "GAMECONFIG");
-	g_pFullFileSystem->AddSearchPath("valve", "GAME_FALLBACK");
-
 #ifdef XASH_STATIC_GAMELIB
     auto gameUIFactory = Sys_GetFactoryThis();
     m_FactoryList[m_iNumFactories] = gameUIFactory;

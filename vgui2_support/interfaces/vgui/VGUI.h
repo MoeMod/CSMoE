@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#define null 0L
+//#define null 0L
 
 #ifndef NULL
 #ifdef __cplusplus

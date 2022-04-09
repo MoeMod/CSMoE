@@ -10,19 +10,14 @@
 #include "vgui/KeyCode.h"
 #include "FileSystem.h"
 
-extern vgui2::Panel *g_lastPanel;
-extern vgui2::Button *g_lastButton;
-
-template <class T>
-
-class MouseOverButton : public vgui2::Button
+class MouseOverPanelButton : public vgui2::Button
 {
-	DECLARE_CLASS_SIMPLE(MouseOverButton, vgui2::Button);
+	DECLARE_CLASS_SIMPLE(MouseOverPanelButton, vgui2::Button);
 
 public:
-	MouseOverButton(vgui2::Panel *parent, const char *panelName, T *templatePanel) : Button(parent, panelName, "MouseOverButton")
+    MouseOverPanelButton(vgui2::Panel *parent, const char *panelName, vgui2::EditablePanel *templatePanel) : Button(parent, panelName, "MouseOverButton")
 	{
-		m_pPanel = new T(parent, NULL);
+		m_pPanel = new vgui2::EditablePanel(parent, NULL);
 		m_pPanel ->SetVisible(false);
 
 		int x, y, wide, tall;
@@ -46,11 +41,11 @@ public:
 
 	virtual void ShowPage(void)
 	{
-		if (g_lastPanel)
+		if (s_lastPanel)
 		{
-			for (int i = 0; i < g_lastPanel->GetParent()->GetChildCount(); i++)
+			for (int i = 0; i < s_lastPanel->GetParent()->GetChildCount(); i++)
 			{
-				MouseOverButton *pButton = dynamic_cast<MouseOverButton *>(g_lastPanel->GetParent()->GetChild(i));
+                MouseOverPanelButton *pButton = dynamic_cast<MouseOverPanelButton *>(s_lastPanel->GetParent()->GetChild(i));
 
 				if (pButton)
 					pButton->HidePage();
@@ -61,7 +56,7 @@ public:
 		{
 			m_pPanel->SetVisible(true);
 			m_pPanel->MoveToFront();
-			g_lastPanel = m_pPanel;
+			s_lastPanel = m_pPanel;
 		}
 	}
 
@@ -96,7 +91,7 @@ public:
 		LoadClassPage();
 	}
 
-	T *GetClassPanel(void) { return m_pPanel; }
+	auto *GetClassPanel(void) { return m_pPanel; }
 
 	virtual void OnCursorExited(void)
 	{
@@ -116,18 +111,21 @@ public:
 
 		if (m_bPreserveArmedButtons)
 		{
-			if (g_lastButton && g_lastButton != this)
-				g_lastButton->SetArmed(false);
+			if (s_lastButton && s_lastButton != this)
+                s_lastButton->SetArmed(false);
 
-			g_lastButton = this;
+            s_lastButton = this;
 		}
 
-		if (m_pPanel && (!m_pPanel->IsVisible()))
+		if (m_pPanel)
 		{
-			if (g_lastPanel && g_lastPanel->IsVisible())
-				g_lastPanel->SetVisible(false);
+            if(!m_pPanel->IsVisible())
+            {
+                if (s_lastPanel && s_lastPanel->IsVisible())
+                    s_lastPanel->SetVisible(false);
 
-			ShowPage();
+                ShowPage();
+            }
 		}
 	}
 
@@ -137,17 +135,19 @@ public:
 
 		if (m_bPreserveArmedButtons)
 		{
-			if (g_lastButton)
-				g_lastButton->SetArmed(true);
+			if (s_lastButton)
+                s_lastButton->SetArmed(true);
 		}
 	}
 
 protected:
-	T *m_pPanel;
+	vgui2::EditablePanel *m_pPanel;
 	bool m_bPreserveArmedButtons;
 	bool m_bUpdateDefaultButtons;
-};
 
-using MouseOverPanelButton = MouseOverButton<vgui2::EditablePanel>;
+public:
+    static inline vgui2::Panel *s_lastPanel;
+    static inline vgui2::Button *s_lastButton;
+};
 
 #endif

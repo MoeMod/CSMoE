@@ -468,6 +468,7 @@ if(XASH_VGUI2)
 endif()
 
 target_link_libraries( ${CLIENT_LIBRARY} platform_config )
+target_link_libraries( ${CLIENT_LIBRARY} json_3p )
 
 if(ANDROID OR IOS)
 	set_target_properties(${CLIENT_LIBRARY} PROPERTIES

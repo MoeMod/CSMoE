@@ -203,7 +203,7 @@ void CXashFileSystem::RemoveAllSearchPaths( void )
 
 void CXashFileSystem::AddSearchPath(const char *pPath, const char *pathID)
 {
-    gFileSystemAPI.FS_AddGameDirectory( pPath, FS_CUSTOM_PATH );
+    gFileSystemAPI.FS_AddGameDirectory( pPath, (IsGameDir( pathID) ? FS_GAMEDIR_PATH : FS_CUSTOM_PATH) );
     LOGCALL("%s,%s", pPath, pathID );;
 }
 
@@ -662,7 +662,7 @@ FileHandle_t CXashFileSystem::OpenFromCacheForRead(const char *pFileName, const 
 
 void CXashFileSystem::AddSearchPathNoWrite(const char *pPath, const char *pathID)
 {
-    gFileSystemAPI.FS_AddGameDirectory( pPath, FS_CUSTOM_PATH | FS_NOWRITE_PATH );
+    gFileSystemAPI.FS_AddGameDirectory( pPath, (IsGameDir( pathID) ? FS_GAMEDIR_PATH : FS_CUSTOM_PATH) | FS_NOWRITE_PATH );
 
     LOGCALL("%s, %s", pPath, pathID);
 }
@@ -681,7 +681,7 @@ bool CXashFileSystem::IsGameDir(const char *pathID)
 {
     bool gamedironly = false;
 
-    if( pathID && (strstr( pathID, "GAME" ) || strstr( pathID, "BASE" )))
+    if( pathID && (strstr( pathID, "GAME" ) || strstr( pathID, "CONFIG" ) || strstr( pathID, "GAMECONFIG" )))
         gamedironly = true;
 
     return gamedironly;

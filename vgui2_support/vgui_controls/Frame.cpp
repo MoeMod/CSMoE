@@ -849,7 +849,7 @@ Frame::Frame(Panel *parent, const char *panelName, bool showTaskbarIcon) : Edita
 
 	m_hPreviousModal = 0;
 
-	_title=null;
+	_title=nullptr;
 	_moveable=true;
 	_sizeable=true;
 	m_bHasFocus=false;

@@ -60,7 +60,7 @@ CCreateMultiplayerGameDialog::CCreateMultiplayerGameDialog(vgui2::Panel *parent)
 	// load the bot config data
 	if (m_pBotSavedData)
 	{
-		if ( !m_pBotSavedData->LoadFromFile( vgui2::filesystem(), "CSBotConfig.vdf"/*, "CONFIG"*/ ) )
+		if ( !m_pBotSavedData->LoadFromFile( vgui2::filesystem(), "CSBotConfig.vdf", "CONFIG" ) )
 		{
 			m_pBotSavedData->SetString( "bot_difficulty", "0" );
 			m_pBotSavedData->SetString( "bot_join_after_player", "1" );
@@ -257,12 +257,17 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 		// save bot config to a file
 		m_pBotSavedData->SaveToFile( vgui2::filesystem(), "CSBotConfig.vdf", "CONFIG" );
 
+        // Xash Ext
+        engine->Cvar_Set("deathmatch", "1");
+        engine->Cvar_Set("defaultmap", szMapName);
+        engine->Cvar_Set("sv_nat", "1");
+        engine->Cvar_Set("mp_gamemode", szGameModeName);
+
 		// create command to load map, set password, etc
-		sprintf( szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nmp_gamemode %s\nmap %s\n",
+		sprintf( szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nwait\nmap %s\n",
 			m_pGameplayPage->GetMaxPlayers(),
 			szPassword,
 			szHostName,
-			szGameModeName,
 			szMapName
 		);
 
@@ -295,8 +300,14 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 	}
 	else
 	{
+        // Xash Ext
+        engine->Cvar_Set("deathmatch", "1");
+        engine->Cvar_Set("defaultmap", szMapName);
+        engine->Cvar_Set("sv_nat", "1");
+        engine->Cvar_Set("mp_gamemode", szGameModeName);
+
 		// create the command to execute
-		sprintf(szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nmap %s\n",
+		sprintf(szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nwait\nmap %s\n",
 			m_pGameplayPage->GetMaxPlayers(),
 			szPassword,
 			szHostName,

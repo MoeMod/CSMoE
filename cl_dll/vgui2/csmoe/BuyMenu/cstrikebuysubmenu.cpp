@@ -15,6 +15,8 @@
 #include "cso_controls/ButtonGlow.h"
 #include "cso_controls/DarkTextEntry.h"
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 
 using namespace vgui2;
@@ -49,11 +51,11 @@ CCSBuySubMenu::CCSBuySubMenu(vgui2::Panel *parent, const char *name) : CBuySubMe
 	m_pNextBtn = new vgui2::Button(this, "nextBtn", "#CSO_NextBuy");
 
 	m_pRebuyButton = new ButtonGlow(this, "RebuyButton", "#Cstrike_BuyMenuRebuy");
-	m_pAutobuyButton = new ButtonGlow(this, "AutobuyButton", "#CSO_AutoBuy2");
+	m_pAutobuyButton = new ButtonGlow(this, "AutobuyButton", "#Cstrike_BuyMenuAutobuy");
 
 	m_pBasketClear = new vgui2::Button(this, "BasketClear", "#CSO_BasketClear");
 	m_pBasketBuy = new ButtonGlow(this, "BasketBuy", "#CSO_BasketBuy");
-	m_pQuitButton = new vgui2::Button(this, "QuitButton", "#CSO_BuyQuit");
+	m_pQuitButton = new vgui2::Button(this, "QuitButton", "#Cstrike_Cancel");
 
 	primaryBG = new vgui2::ImagePanel(this, "primaryBG");
 	secondaryBG = new vgui2::ImagePanel(this, "secondaryBG");
@@ -411,62 +413,90 @@ void CCSBuySubMenu::OnSelectWeapon(const char *weapon)
 
 void CCSBuySubMenu::ReadFavoriteSets()
 {
-    /*
-	auto &keyvalue = m_iniFavorite[std::string("QuickBuy0")];
-	m_SelectedItems = {
-		keyvalue["Primary"] ,
-		keyvalue["Secondary"] ,
-		keyvalue["Knife"],
-		keyvalue["Grenade"],
-		0,0,0,0, ArmorType::ARMOR_HELMET
-	};
+    nlohmann::json j;
+    FileHandle_t fh = vgui2::filesystem()->Open("moe_buy.json", "rb", "CONFIG");
+    if (fh != FILESYSTEM_INVALID_HANDLE)
+    {
+        int len = vgui2::filesystem()->Size(fh);
+        if (len > 0)
+        {
+            char *buf = (char *)_alloca(len + 1);
+            vgui2::filesystem()->Read(buf, len, fh);
+            buf[len] = 0;
+            j.parse(buf, buf + len);
+        }
 
-	for(int i = 1; i <= 5; ++i)
-	{
-		std::string app = "QuickBuy";
-		app += std::to_string(i);
-			// = MakeString("QuickBuy", i);
-		
+        vgui2::filesystem()->Close(fh);
+    }
 
-		auto &keyvalue = m_iniFavorite[app];
-		
-		m_FavoriteItems[i - 1] = { 
-			keyvalue["Primary"] ,
-			keyvalue["Secondary"] ,
-			keyvalue["Knife"],
-			keyvalue["Grenade"],
-			0,0,0,0, ArmorType::ARMOR_HELMET 
-		};
-	}
-     */
+    try {
+        m_SelectedItems = {
+                j["Primary"] ,
+                j["Secondary"] ,
+                j["Knife"],
+                j["Grenade"],
+                0,0,0,0, ArmorType::ARMOR_HELMET
+        };
+
+        for(int i = 1; i <= 5; ++i)
+        {
+            std::string app = "QuickBuy";
+            app += std::to_string(i);
+
+            auto &keyvalue = j[app];
+
+            m_FavoriteItems[i - 1] = {
+                    keyvalue["Primary"] ,
+                    keyvalue["Secondary"] ,
+                    keyvalue["Knife"],
+                    keyvalue["Grenade"],
+                    0,0,0,0, ArmorType::ARMOR_HELMET
+            };
+        }
+    } catch(const std::exception &e)
+    {
+        // ignore json error
+        gEngfuncs.Con_DPrintf("moe_buy error: %s", e.what());
+    }
 	UpdateFavoriteSetsControls(); // update images
 }
 
 void CCSBuySubMenu::SaveFavoriteSets()
 {
-    /*
-	for (int i = 1; i <= 5; ++i)
-	{
-		std::string app = "QuickBuy";
-		app += std::to_string(i);
-		//	= MakeString("QuickBuy", i);
-		--i;
+    std::string content;
+    try {
+        nlohmann::json j;
+        for (int i = 1; i <= 5; ++i)
+        {
+            std::string app = "QuickBuy";
+            app += std::to_string(i);
 
-		auto &keyvalue = m_iniFavorite[app];
-		keyvalue["Primary"] = m_FavoriteItems[i].Primary;
-		keyvalue["Secondary"] = m_FavoriteItems[i].Secondary;
-		keyvalue["Knife"] = m_FavoriteItems[i].Melee;
-		keyvalue["Grenade"] = m_FavoriteItems[i].HEGrenade;
-	}
+            auto &keyvalue = j[app];
+            keyvalue["Primary"] = m_FavoriteItems[i].Primary;
+            keyvalue["Secondary"] = m_FavoriteItems[i].Secondary;
+            keyvalue["Knife"] = m_FavoriteItems[i].Melee;
+            keyvalue["Grenade"] = m_FavoriteItems[i].HEGrenade;
+        }
 
-	auto &keyvalue = m_iniFavorite[std::string("QuickBuy0")];
-	keyvalue["Primary"] = m_SelectedItems.Primary;
-	keyvalue["Secondary"] = m_SelectedItems.Secondary;
-	keyvalue["Knife"] = m_SelectedItems.Melee;
-	keyvalue["Grenade"] = m_SelectedItems.HEGrenade;
+        auto &keyvalue = j[std::string("QuickBuy0")];
+        keyvalue["Primary"] = m_SelectedItems.Primary;
+        keyvalue["Secondary"] = m_SelectedItems.Secondary;
+        keyvalue["Knife"] = m_SelectedItems.Melee;
+        keyvalue["Grenade"] = m_SelectedItems.HEGrenade;
 
-	m_iniFavorite.SaveFile();
-    */
+        content = j.dump();
+    } catch(const std::exception &e)
+    {
+        // ignore json error
+        gEngfuncs.Con_DPrintf("moe_buy error: %s", e.what());
+    }
+
+    FileHandle_t fh = vgui2::filesystem()->Open("moe_buy.json", "wb", "CONFIG");
+    if (fh != FILESYSTEM_INVALID_HANDLE)
+    {
+        vgui2::filesystem()->Write(content.c_str(), content.length(), fh);
+        vgui2::filesystem()->Close(fh);
+    }
 	UpdateFavoriteSetsControls(); // update images
 }
 
