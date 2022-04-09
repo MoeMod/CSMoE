@@ -82,8 +82,7 @@ public:
 	operator PanelType *()						{ return (PanelType *)PHandle::Get(); }
 	PanelType * operator ->()					{ return (PanelType *)PHandle::Get(); }
 	PanelType * operator = (PanelType *pPanel)	{ return (PanelType *)PHandle::Set(pPanel); }
-	bool operator == (Panel *pPanel)			{ return (PHandle::Get() == pPanel); }
-	operator bool ()							{ return PHandle::Get() != NULL; }
+	operator bool () const						{ return PHandle::Get() != NULL; }
 };
 
 };

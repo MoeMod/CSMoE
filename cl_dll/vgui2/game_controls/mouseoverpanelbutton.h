@@ -7,6 +7,7 @@
 
 #include "vgui/IScheme.h"
 #include "vgui_controls/Button.h"
+#include "vgui_controls/PHandle.h"
 #include "vgui/KeyCode.h"
 #include "FileSystem.h"
 
@@ -146,8 +147,8 @@ protected:
 	bool m_bUpdateDefaultButtons;
 
 public:
-    static inline vgui2::Panel *s_lastPanel;
-    static inline vgui2::Button *s_lastButton;
+    static inline vgui2::DHANDLE<vgui2::Panel> s_lastPanel;
+    static inline vgui2::DHANDLE<vgui2::Button> s_lastButton;
 };
 
 #endif
