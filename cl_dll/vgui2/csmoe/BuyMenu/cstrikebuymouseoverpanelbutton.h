@@ -14,6 +14,7 @@
 
 #include "game_controls/mouseoverpanelbutton.h"
 #include "buymouseoverpanelbutton.h"
+#include "WeaponImagePanel.h"
 
 class CSBuyMouseOverPanelButton : public BuyMouseOverPanelButton
 {
@@ -32,7 +33,7 @@ public:
     TeamName m_iTeam;
 	void UpdateWeapon(const char *weapon = "");
 
-	vgui2::ImagePanel *m_pWeaponImage;
+	WeaponImagePanel *m_pWeaponImage;
 };
 
 #endif

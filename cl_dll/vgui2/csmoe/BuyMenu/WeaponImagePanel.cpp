@@ -20,7 +20,7 @@ using namespace vgui2;
 WeaponImagePanel::WeaponImagePanel(Panel *parent, const char *name) : BaseClass(parent, name)
 {
 	m_bBanned = false;
-	m_pBannedImage = vgui2::scheme()->GetImage("gfx/vgui/cannotuse", true);
+	m_pBannedImage = vgui2::scheme()->GetImage("gfx/vgui/basket/cannotuse", true);
 }
 
 void WeaponImagePanel::SetWeapon(const char *name)
@@ -30,10 +30,35 @@ void WeaponImagePanel::SetWeapon(const char *name)
 		return SetWeapon(nullptr);
 	}
 
+    // strip prefix
+    if(!strncmp(name, "weapon_", 7))
+    {
+        name += 7;
+    }
+    if(!strncmp(name, "knife_", 6))
+    {
+        name += 6;
+    }
+    if(!stricmp(name, "mp5navy"))
+    {
+        name = "mp5";
+    }
+    if(!stricmp(name, "scarl") || !stricmp(name, "scarh"))
+    {
+        name = "scar";
+    }
+    if(!stricmp(name, "xm8c") || !stricmp(name, "xm8s"))
+    {
+        name = "xm8";
+    }
+    if(!stricmp(name, "mg3"))
+    {
+        name = "mg3_xmas";
+    }
+
     char path[MAX_PATH];
-    sprintf(path, "gfx/vgui/%s", name);
-	vgui2::IImage *image = vgui2::scheme()->GetImage(path, true);
-	SetImage(image);
+    sprintf(path, "gfx/vgui/basket/%s", name);
+	SetImage(path);
 
 	m_bBanned = false;
 }

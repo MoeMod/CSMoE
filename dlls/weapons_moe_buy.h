@@ -90,9 +90,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_deagled",      "双持沙鹰",    700, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1},
 	//{"z4b_m37se",         "恶棍",                  2700, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1},
 	{"weapon_huntbow",      "魂狩猎弓",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 100 },
-	{"weapon_gatling",      "加特林",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1 },
-	{"weapon_chainsaw",         "生命收割者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1},
-	{"weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 60},
 	{"weapon_gungnir",     "断狱雷魂",               6000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 150},
     {"weapon_sgdrill",         "怒海狂鲨",                 6250, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1},
 	{"weapon_gatlingex",        "日冕加特林",                  4600, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1},
@@ -120,6 +117,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ "weapon_m32venom", "腐化重炮", 6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
 	{ "weapon_m95tiger",         "【虎王】M95",           5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE, 1 },
 	{ "weapon_y20s2scard",         "绿野仙踪SCARD",           1500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE, 1 },
+    {"weapon_janus7xmas",         "圣诞雷狱",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1},
 
 	{"knife_lance",     "天罚龙枪",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150 },
 	{"knife_dualsword",    "弑神双剑",0, KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150},
@@ -139,6 +137,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_magicknife",     "幻镜！光棱剑",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150 },
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1},
 	{ "knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1 },
+	{ "knife_y22s1holyswordmb",         "【奇幻乐园】双手剑",           0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 150 },
 
 	//{"csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1},
 	{ "csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1 },
@@ -176,7 +175,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     {"weapon_mg3",         "毁灭者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1},
     {"weapon_mg3xmas",         "圣诞毁灭者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1},
     {"weapon_m95xmas",         "圣诞巴雷特",                  5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1},
-    {"weapon_janus7xmas",         "圣诞雷狱",                  9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1},
     {"weapon_bow",      "鹰眼",               6200, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
     {"weapon_balrog7",      "炎魔",               9000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_MG, 1 },
     {"weapon_starchaserar",      "灭却星光",               5000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_RIFLE, 90 },
@@ -202,9 +200,11 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{ "knife_nataknife",      "背刺银刃",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1 },
     {"knife_katana",     "狂花乱舞",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 1},
     {"knife_balrog9",      "爆裂拳套",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 35},
-    {"knife_janus9",     "灾厄Janus-9",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 1 },
+    {"knife_janus9",     "灾厄",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 1 },
     {"knife_thanatos9",      "陨裂",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 100},
-	{ "knife_y22s1holyswordmb",         "【奇幻乐园】双手剑",           0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 150 },
+    {"weapon_gatling",      "加特林",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1 },
+    {"weapon_chainsaw",         "生命收割者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1},
+    {"weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 60},
 };
 
 }

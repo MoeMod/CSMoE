@@ -37,7 +37,7 @@ CSBuyMouseOverPanelButton::CSBuyMouseOverPanelButton(vgui2::Panel *parent, const
 		delete m_pPanel;
 	m_pPanel = new CSBuyMouseOverPanel(parent, "ItemInfo");
 
-	m_pWeaponImage = new vgui2::ImagePanel(this, "WeaponImage");
+	m_pWeaponImage = new WeaponImagePanel(this, "WeaponImage");
 	m_pWeaponImage->SetShouldScaleImage(true);
 	m_pWeaponImage->SetShouldCenterImage(true);
 	m_pWeaponImage->SetMouseInputEnabled(false);
@@ -53,9 +53,7 @@ void CSBuyMouseOverPanelButton::UpdateWeapon(const char *weapon)
         if (panel)
             panel->UpdateWeapon(weapon);
 
-        char szBuffer[64];
-        sprintf(szBuffer, "gfx/vgui/%s", weapon);
-        m_pWeaponImage->SetImage(szBuffer);
+        m_pWeaponImage->SetWeapon(weapon);
     }
     else
     {
