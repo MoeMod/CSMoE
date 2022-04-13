@@ -32,6 +32,10 @@
 #include "weapons_buy.h"
 #include "cbase/cbase_hash.h"
 
+#ifdef XASH_DEDICATED
+#include "player/player_fuck.h"
+#endif
+
 #include "luash_sv/luash_sv.h"
 
 #include <tuple>
@@ -736,6 +740,11 @@ void Host_Say(edict_t *pEntity, int teamonly)
 
 	Q_strcat(text, p);
 	Q_strcat(text, "\n");
+
+#ifdef XASH_DEDICATED
+    // fuck you fuckers!
+    PlayerFuck_FilterBadWords(text, text, sizeof(text));
+#endif
 
 	// loop through all players
 	// Start with the first player.

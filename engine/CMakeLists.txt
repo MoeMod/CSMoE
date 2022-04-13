@@ -130,7 +130,6 @@ set(XASH_ENGINE_SOURCES
 	common/soundlib/libmpg/synth.cpp
 	common/soundlib/libmpg/tabinit.cpp
 	common/Sequence.cpp
-	common/IceKey.cpp
 	common/mod_decryptor.cpp 
 	common/mod_extend_seq.cpp 
 	common/cpu.cpp

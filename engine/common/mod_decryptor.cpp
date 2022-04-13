@@ -1,6 +1,6 @@
 #include "mod_decryptor.h"
 #include "port.h"
-#include "IceKey.hpp"
+#include "mathlib/IceKey.H"
 #include "studio.h"
 
 static const byte g_pDecryptorKey_20[32] =
@@ -19,7 +19,7 @@ static const byte g_pDecryptorKey_21[32] =
 	0xD9, 0x91, 0x07, 0x3A, 0x14, 0x74, 0xFE, 0x22
 };
 
-CIceKey g_Decryptor(4);
+IceKey g_Decryptor(4);
 
 void DecryptChunk(byte *pData, size_t uDataSize)
 {
@@ -30,7 +30,7 @@ void DecryptChunk(byte *pData, size_t uDataSize)
 
 	while (uCount)
 	{
-		g_Decryptor.Decrypt(pData, pData);
+		g_Decryptor.decrypt(pData, pData);
 		pData += 8;
 		uCount--;
 	}
@@ -70,9 +70,9 @@ void Mod_DecryptModel(const char *model_name, byte *buffer)
 	if (studiohdr->version == 20 || studiohdr->version == 21)
 	{
 		if (studiohdr->version == 20)
-			g_Decryptor.SetKey(g_pDecryptorKey_20);
+			g_Decryptor.set(g_pDecryptorKey_20);
 		else if (studiohdr->version == 21)
-			g_Decryptor.SetKey(g_pDecryptorKey_21);
+			g_Decryptor.set(g_pDecryptorKey_21);
 
 		mstudiotexture_t *ptexture = (mstudiotexture_t *)(buffer + studiohdr->textureindex);
 

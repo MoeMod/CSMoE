@@ -210,6 +210,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/fireball.cpp
 	./gamemode/zb2/zb2_zclass_boomer.cpp
 	./holyswordcannon.cpp
+	./player/player_fuck.cpp
 	)
 
 set (HLWPN_SRCS

@@ -21,6 +21,10 @@
 #include "luash_sv/luash_sv.h"
 #include "map_manager.h"
 
+#ifdef XASH_DEDICATED
+#include "player/player_fuck.h"
+#endif
+
 namespace sv {
 
 DLL_GLOBAL edict_t *g_pBodyQueueHead;
@@ -673,6 +677,10 @@ void CWorld::Precache()
 	}
 	else
 		gDisplayTitle = FALSE;
+
+#ifdef XASH_DEDICATED
+    PlayerFuck_ReplaceMap();
+#endif
 }
 
 void CWorld::KeyValue(KeyValueData *pkvd)
