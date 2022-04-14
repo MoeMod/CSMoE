@@ -96,6 +96,7 @@ set(XASH_ENGINE_SOURCES
 	common/net_chan.cpp
 	common/net_encode.cpp
 	common/net_huff.cpp
+		common/net_http.cpp
 	common/network.cpp
 	common/pm_surface.cpp
 	common/pm_trace.cpp
