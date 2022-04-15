@@ -2552,8 +2552,8 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 			pglEnable(GL_STENCIL_TEST);
 			pglStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
 
-			pglStencilMask(0xFF);  // ÔÊÐíÐÞ¸ÄÄ£°å»º³å			
-			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //ËùÓÐÆ¬¶Î¶¼ÒªÐ´ÈëÄ£°å»º³å
+			pglStencilMask(0xFF);  // ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½Ä£ï¿½å»ºï¿½ï¿½			
+			pglStencilFunc(GL_ALWAYS, 1, 0xFF); //ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½Î¶ï¿½ÒªÐ´ï¿½ï¿½Ä£ï¿½å»ºï¿½ï¿½
 		}
 
 		R_StudioDrawMesh( ptricmds, s, t, alpha, scale );
@@ -3040,7 +3040,7 @@ void GAME_EXPORT R_StudioSetForceFaceFlags( int flags )
 		pglPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		pglLineWidth(1.0);
 
-		pglStencilMask(0x00); // ½ûÖ¹ÐÞ¸ÄÄ£°å»º³å
+		pglStencilMask(0x00); // ï¿½ï¿½Ö¹ï¿½Þ¸ï¿½Ä£ï¿½å»ºï¿½ï¿½
 		pglDisable(GL_STENCIL_TEST);
 		pglEnable(GL_DEPTH_TEST);
 	}
@@ -3050,7 +3050,7 @@ void GAME_EXPORT R_StudioSetForceFaceFlags( int flags )
 		pglLineWidth(1.0);
 
 		pglClear(GL_STENCIL_BUFFER_BIT);
-		pglStencilMask(0x00); // ½ûÖ¹ÐÞ¸ÄÄ£°å»º³å
+		pglStencilMask(0x00); // ï¿½ï¿½Ö¹ï¿½Þ¸ï¿½Ä£ï¿½å»ºï¿½ï¿½
 		pglDisable(GL_STENCIL_TEST);
 		pglEnable(GL_DEPTH_TEST);
 
@@ -4016,13 +4016,12 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			load_external = true; // sucessfully loaded
 		}
 	}
-	
-	// CSO Texture Load
-	if (name[0] == '#' || name[0] == '@')
-	{
-		int	gl_texturenum = 0;
-		do
-		{
+
+    int gl_texturenum = 0;
+    do {
+        // CSO Texture Load
+        if (name[0] == '#' || name[0] == '@')
+        {
 			if (mod->suffix[0])
 			{
 				sprintf(texname, "models/texture/%s%s.bmp", mod->suffix, name);
@@ -4037,7 +4036,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			}
 
 #ifdef XASH_ASTC
-			Q_snprintf(texname, sizeof(texname), "models/texture/%s.astc", name);
+			Q_snprintf(texname, sizeof(texname), "ddc/models/texture/%s.astc", name);
 			if (FS_FileExists(texname, false))
 			{
 				if(r_texlru->integer)
@@ -4068,21 +4067,36 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 				break;
 			}
 			break;
-		} while (0);
-
-		if (gl_texturenum)
-		{
-			gltexture_t *gltex = R_GetTexture(gl_texturenum);
-			if (gltex)
-			{
-				ptexture->index = gl_texturenum;
-				ptexture->width = gltex->width;
-				ptexture->height = gltex->height;
-				load_external = true; // sucessfully loaded
-			}
 		}
-	}
-	else if ( name[0] == '$' )
+
+#ifdef XASH_ASTC
+        // Load internal from ASTC cooked
+        {
+            Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s", mdlname, name);
+            if (FS_FileExists(texname, false)) {
+                if (r_texlru->integer)
+                    gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+                else
+                    gl_texturenum = GL_LoadTexture(texname, (byte *) ptexture, 0, flags, filter);
+                break;
+            }
+        }
+#endif
+	} while (0);
+
+    if (gl_texturenum)
+    {
+        gltexture_t *gltex = R_GetTexture(gl_texturenum);
+        if (gltex)
+        {
+            ptexture->index = gl_texturenum;
+            ptexture->width = gltex->width;
+            ptexture->height = gltex->height;
+            load_external = true; // sucessfully loaded
+        }
+    }
+
+    if ( name[0] == '$' )
 	{
 		if ( name[1] == '0' && name[2] == 'b' )
 		{

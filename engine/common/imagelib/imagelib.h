@@ -313,6 +313,9 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 //
 qboolean Image_SaveTGA( const char *name, image_ref pix );
 qboolean Image_SaveBMP( const char *name, image_ref pix );
+#ifdef XASH_ASTC
+qboolean Image_SaveASTC( const char *name, image_ref pix );
+#endif
 
 //
 // img_quant.c

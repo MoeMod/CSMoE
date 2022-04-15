@@ -164,6 +164,7 @@ static const savepixformat_t save_game[] =
 {
 { "%s%s.%s", "tga", Image_SaveTGA },		// tga screenshots
 { "%s%s.%s", "bmp", Image_SaveBMP },		// bmp levelshots or screenshots
+{ "%s%s.%s", "astc", Image_SaveASTC },		// bmp levelshots or screenshots
 { NULL, NULL, NULL }
 };
 

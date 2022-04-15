@@ -203,7 +203,7 @@ void HTTP_Run( void )
     float frametime;
     boost::asio::ip::tcp::endpoint addr;
 
-    ioc_http.run();
+    ioc_http.poll();
 
     if( !curfile )
         return;

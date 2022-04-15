@@ -205,3 +205,113 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 	return true;
 }
 
+qboolean Image_SaveASTC( const char *name, image_ref pix )
+{
+    if( FS_FileExists( name, false ) && !Image_CheckFlag( IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
+        return false; // already existed
+
+    // bogus parameter check
+    if( !pix->buffer )
+        return false;
+
+    // get image description
+    switch( pix->type )
+    {
+        case PF_RGBA_32:
+            break;
+        default:
+            MsgDev( D_ERROR, "Image_SaveASTC: unsupported image type %s\n", PFDesc[pix->type].name );
+            return false;
+    }
+
+    file_t *pfile = FS_Open( name, "wb", false );
+    if( !pfile ) return false;
+
+    static const unsigned int block_x = 6;
+    static const unsigned int block_y = 6;
+    static const unsigned int block_z = 1;
+
+    // Compute the number of ASTC blocks in each dimension
+    unsigned int block_count_x = (pix->width + block_x - 1) / block_x;
+    unsigned int block_count_y = (pix->height + block_y - 1) / block_y;
+
+    astcenc_error status;
+    // Initialize the default configuration for the block size and quality
+    astcenc_config config;
+    config.block_x = block_x;
+    config.block_y = block_y;
+    config.profile = profile;
+
+    status = astcenc_config_init(profile, block_x, block_y, block_z, quality, 0, &config);
+    if (status != ASTCENC_SUCCESS)
+    {
+        MsgDev( D_WARN, "Image_SaveASTC: Codec config init failed: %s\n", astcenc_get_error_string(status));
+        FS_Close(pfile);
+        return false;
+    }
+
+    astcenc_context* context;
+    status = astcenc_context_alloc(&config, thread_count, &context);
+    if (status != ASTCENC_SUCCESS)
+    {
+        MsgDev( D_WARN, "Image_SaveASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
+        FS_Close(pfile);
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+    // Compress the image
+    astcenc_image image;
+    image.dim_x = pix->width;
+    image.dim_y = pix->height;
+    image.dim_z = 1;
+    image.data_type = ASTCENC_TYPE_U8;
+    uint8_t* slices = pix->buffer;
+    image.data = reinterpret_cast<void**>(&slices);
+
+    // Space needed for 16 bytes of output per compressed block
+    size_t comp_len = block_count_x * block_count_y * 16;
+    uint8_t* comp_data = new uint8_t[comp_len];
+
+    status = astcenc_compress_image(context, &image, &swizzle, comp_data, comp_len, 0);
+    if (status != ASTCENC_SUCCESS)
+    {
+        MsgDev( D_WARN, "Image_SaveASTC: Codec compress failed: %s\n", astcenc_get_error_string(status));
+        delete[] comp_data;
+        astcenc_context_free(context);
+        FS_Close(pfile);
+        return false;
+    }
+
+    // Stage : write file
+
+    astc_header hdr;
+    hdr.magic[0] =  ASTC_MAGIC_ID        & 0xFF;
+    hdr.magic[1] = (ASTC_MAGIC_ID >>  8) & 0xFF;
+    hdr.magic[2] = (ASTC_MAGIC_ID >> 16) & 0xFF;
+    hdr.magic[3] = (ASTC_MAGIC_ID >> 24) & 0xFF;
+
+    hdr.block_x = static_cast<uint8_t>(block_x);
+    hdr.block_y = static_cast<uint8_t>(block_y);
+    hdr.block_z = static_cast<uint8_t>(block_z);
+
+    hdr.dim_x[0] =  image.dim_x        & 0xFF;
+    hdr.dim_x[1] = (image.dim_x >>  8) & 0xFF;
+    hdr.dim_x[2] = (image.dim_x >> 16) & 0xFF;
+
+    hdr.dim_y[0] =  image.dim_y       & 0xFF;
+    hdr.dim_y[1] = (image.dim_y >>  8) & 0xFF;
+    hdr.dim_y[2] = (image.dim_y >> 16) & 0xFF;
+
+    hdr.dim_z[0] =  image.dim_z        & 0xFF;
+    hdr.dim_z[1] = (image.dim_z >>  8) & 0xFF;
+    hdr.dim_z[2] = (image.dim_z >> 16) & 0xFF;
+
+    FS_Write(pfile, &hdr, sizeof(astc_header));
+    FS_Write(pfile, comp_data, comp_len);
+
+    delete[] comp_data;
+    astcenc_context_free(context);
+    FS_Close(pfile);
+    return true;
+}

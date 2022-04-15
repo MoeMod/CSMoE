@@ -213,9 +213,6 @@ void Sys_PrintUsage( void )
 		O("-nowcon          ","disable win32 console")
 	#endif
 
-	#ifdef XASH_IPX
-		O("-noipx           ","disable IPX")
-	#endif
 	O("-noip            ","disable TCP/IP")
 	O("-noch            ","disable crashhandler")
 	O("-disablehelp     ","disable this message")
@@ -913,6 +910,7 @@ void Host_Frame( float time )
 	if ( !Host_IsDedicated() )
 		Host_ClientFrame (); // client frame
 
+    NET_Run();
 	HTTP_Run();
 
 	host.framecount++;

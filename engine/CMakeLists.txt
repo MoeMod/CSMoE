@@ -458,10 +458,6 @@ if(NOT XASH_64BIT AND NOT MSVC)
 	add_definitions(-DXASH_FASTSTR)
 endif()
 
-if(XASH_IPX)
-	add_definitions(-DXASH_IPX)
-endif()
-
 if(XASH_NONSTANDARD_LOAD)
 	add_definitions(-DXASH_NONSTANDARD_LOAD)
 endif()
