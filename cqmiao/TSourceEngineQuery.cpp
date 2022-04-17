@@ -259,7 +259,7 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
     ddl.async_wait([&socket](boost::system::error_code e) mutable {
         if(e)
             return;
-        socket.close();
+        socket.close(e);
     });
 
 	TSourceEngineQuery::ServerInfoQueryResult result;

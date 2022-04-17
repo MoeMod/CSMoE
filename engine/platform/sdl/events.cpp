@@ -447,6 +447,10 @@ static void SDLash_EventFilter( SDL_Event *event )
 		Sys_Quit();
 		break;
 
+    case SDL_APP_LOWMEMORY:
+        Sys_LowMemory();
+        break;
+
 	case SDL_WINDOWEVENT:
 		if( event->window.windowID != SDL_GetWindowID( host.hWnd ) )
 			return;

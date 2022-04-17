@@ -1808,7 +1808,15 @@ namespace xe {
 			image->original = nullptr;
 		}
 
-		pglDeleteTextures( 1, &image->texnum );
+		//pglDeleteTextures( 1, &image->texnum );
+
+		byte data2D[4] = {  };
+		data2D[0] = data2D[1] = data2D[2] = 80;
+		data2D[3] = 255;
+
+        pglBindTexture( image->target, image->texnum );
+		pglTexImage2D( image->target, 0, image->format, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2D);
+        pglBindTexture( image->target, 0 );
 		MsgDev(D_INFO, "TexLru : swap out texture %s\n", image->name);
 
 		return 0;
@@ -1931,7 +1939,7 @@ namespace xe {
 			auto i = m_map.find(key);
 			if(i == m_map.end()){
 				// insert item into the cache, but first check if it is full
-				while(size() >= m_capacity){
+				while(m_capacity && size() >= m_capacity){
 					// cache is full, evict the least recently used item
 					evict();
 				}
@@ -1993,7 +2001,6 @@ namespace xe {
 			m_capacity = value;
 		}
 
-	private:
 		void evict()
 		{
 			// evict item from the end of most recently used list
@@ -2008,7 +2015,7 @@ namespace xe {
 		size_t m_capacity;
 	};
 
-	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(256);
+	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(0);
 
 	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
 	{
@@ -2020,7 +2027,7 @@ namespace xe {
 		if(textureCache.contains((GLuint)texnum))
 			return; // already present
 
-		textureCache.set_capacity(max(r_texlru->integer, 64));
+		textureCache.set_capacity(r_texlru->integer);
 
 		auto &lrudata = *tex->texlru_extdata;
 		auto deleter = std::visit(TexLru_Uploader{ tex, lrudata.filter, ptexture }, lrudata.src);
@@ -2033,6 +2040,14 @@ namespace xe {
 		tex->texlru_extdata = nullptr;
 		if(textureCache.contains(texnum))
 			textureCache.remove(texnum);
+	}
+
+	void TexLru_Shrink()
+	{
+		while( textureCache.size() >= 64 ){
+			// cache is full, evict the least recently used item
+			textureCache.evict();
+		}
 	}
 }
 

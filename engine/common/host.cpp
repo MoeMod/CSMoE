@@ -582,6 +582,11 @@ void Host_MemStats_f( void )
 	}
 }
 
+void Host_LowMem_f( void )
+{
+    Sys_LowMemory();
+}
+
 void Host_Minimize_f( void )
 {
 #ifdef XASH_SDL
@@ -1348,6 +1353,7 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 	Cvar_Get( "developer", dev_level, CVAR_INIT, "current developer level" );
 	Cmd_AddCommand( "exec", Host_Exec_f, "execute a script file" );
 	Cmd_AddCommand( "memlist", Host_MemStats_f, "prints memory pool information" );
+	Cmd_AddCommand( "lowmem", Host_LowMem_f, "release some memory" );
 	Cmd_AddCommand( "userconfigd", Host_Userconfigd_f, "execute all scripts from userconfig.d" );
 	cmd_scripting = Cvar_Get( "cmd_scripting", "0", CVAR_ARCHIVE, "enable simple condition checking and variable operations" );
 	

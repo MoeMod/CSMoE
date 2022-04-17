@@ -17,6 +17,10 @@ GNU General Public License for more details.
 #include "common.h"
 #include "mathlib.h"
 
+#ifndef XASH_DEDICATED
+#include "gl_texlru.h"
+#endif
+
 #ifdef XASH_SDL
 #include <SDL_timer.h>
 #include <SDL_clipboard.h>
@@ -918,6 +922,20 @@ void Sys_Print( const char *pMsg )
 	Sys_PrintLog( pMsg );
 #endif
 	Rcon_Print( pMsg );
+}
+
+void Sys_LowMemory()
+{
+#ifndef XASH_DEDICATED
+    qboolean CL_FreeLowPriorityTempEnt( void );
+    void CL_ClearViewBeams( void );
+    void CL_ClearParticles( void );
+
+    xe::TexLru_Shrink();
+    CL_FreeLowPriorityTempEnt();
+    CL_ClearViewBeams ();
+    CL_ClearParticles();
+#endif
 }
 
 namespace xe {

@@ -107,6 +107,7 @@ void Sys_InitLog( void );
 void Sys_CloseLog( void );
 void Sys_Quit( void );
 int Sys_LogFileNo( void );
+void Sys_LowMemory();
 
 //
 // sys_con.c
