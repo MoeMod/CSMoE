@@ -4,6 +4,7 @@
 #include "strmatch.h"
 
 #include <algorithm>
+#include <iterator>
 
 namespace strsearch {
 
