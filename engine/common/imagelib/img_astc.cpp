@@ -16,7 +16,10 @@ GNU General Public License for more details.
 #include "imagelib.h"
 #include "astcenc.h"
 
-static const unsigned int thread_count = 1;
+#include <vector>
+
+static const unsigned int thread_count_r = 1;
+static const unsigned int thread_count_w = 1;
 static const astcenc_profile profile = ASTCENC_PRF_LDR;
 static const float quality = ASTCENC_PRE_MEDIUM;
 static const astcenc_swizzle swizzle {
@@ -121,7 +124,7 @@ static void free_image(astcenc_image * img)
 Image_LoadTGA
 =============
 */
-qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
+qboolean Image_LoadASTC_SW( const char *name, const byte *buffer, size_t filesize )
 {
 	if(filesize <= sizeof(astc_header))
 	{
@@ -175,7 +178,7 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 	}
 
 	astcenc_context* context;
-	status = astcenc_context_alloc(&config, thread_count, &context);
+	status = astcenc_context_alloc(&config, thread_count_r, &context);
 	if (status != ASTCENC_SUCCESS)
 	{
 		MsgDev( D_WARN, "Image_LoadASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
@@ -205,35 +208,96 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 	return true;
 }
 
-qboolean Image_SaveASTC( const char *name, image_ref pix )
+qboolean Image_LoadASTC_HW( const char *name, const byte *buffer, size_t filesize )
 {
-    if( FS_FileExists( name, false ) && !Image_CheckFlag( IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
-        return false; // already existed
-
-    // bogus parameter check
-    if( !pix->buffer )
-        return false;
-
-    // get image description
-    switch( pix->type )
+    if(filesize <= sizeof(astc_header))
     {
-        case PF_RGBA_32:
-            break;
-        default:
-            MsgDev( D_ERROR, "Image_SaveASTC: unsupported image type %s\n", PFDesc[pix->type].name );
-            return false;
+        MsgDev( D_WARN, "Image_LoadASTC: EmptyFile: %s\n", name);
+        return false;
+    }
+    const astc_header &hdr = *reinterpret_cast<const astc_header *>(buffer);
+
+    unsigned int magicval = unpack_bytes(hdr.magic[0], hdr.magic[1], hdr.magic[2], hdr.magic[3]);
+    if (magicval != ASTC_MAGIC_ID)
+    {
+        MsgDev( D_WARN, "Image_LoadASTC_HW: File not recognized '%s'\n", name);
+        return false;
     }
 
-    file_t *pfile = FS_Open( name, "wb", false );
-    if( !pfile ) return false;
+    // Ensure these are not zero to avoid div by zero
+    unsigned int block_x = max((unsigned int)hdr.block_x, 1u);
+    unsigned int block_y = max((unsigned int)hdr.block_y, 1u);
+    unsigned int block_z = max((unsigned int)hdr.block_z, 1u);
 
-    static const unsigned int block_x = 6;
-    static const unsigned int block_y = 6;
+    unsigned int dim_x = unpack_bytes(hdr.dim_x[0], hdr.dim_x[1], hdr.dim_x[2], 0);
+    unsigned int dim_y = unpack_bytes(hdr.dim_y[0], hdr.dim_y[1], hdr.dim_y[2], 0);
+    unsigned int dim_z = unpack_bytes(hdr.dim_z[0], hdr.dim_z[1], hdr.dim_z[2], 0);
+
+    if (dim_x == 0 || dim_y == 0 || dim_z == 0)
+    {
+        MsgDev( D_WARN, "Image_LoadASTC_HW: File corrupt '%s'\n", name);
+        return false;
+    }
+
+    unsigned int xblocks = (dim_x + block_x - 1) / block_x;
+    unsigned int yblocks = (dim_y + block_y - 1) / block_y;
+    unsigned int zblocks = (dim_z + block_z - 1) / block_z;
+
+    size_t data_size = xblocks * yblocks * zblocks * 16;
+
+    if(filesize < sizeof(astc_header) + data_size)
+    {
+        MsgDev( D_WARN, "Image_LoadASTC_HW: Incomplete file '%s'\n", name);
+        return false;
+    }
+
+    pixformat_t format = PF_UNKNOWN;
+    if(block_x == 4 && block_y == 4)
+        format = PF_ASTC_4x4;
+    if(block_x == 6 && block_y == 6)
+        format = PF_ASTC_6x6;
+    if(block_x == 8 && block_y == 8)
+        format = PF_ASTC_8x8;
+    if(block_x == 10 && block_y == 10)
+        format = PF_ASTC_10x10;
+    if(block_x == 12 && block_y == 12)
+        format = PF_ASTC_12x12;
+
+    if (format == PF_UNKNOWN)
+    {
+        MsgDev( D_WARN, "Image_LoadASTC_HW: Invalid format '%s'\n", name);
+        return false;
+    }
+
+    image.width = dim_x;
+    image.height = dim_y;
+    image.type = format;
+    image.size = data_size;
+    image.rgba = (byte *)Mem_Alloc( host.imagepool, image.size );
+    Q_memcpy(image.rgba, buffer + sizeof(astc_header), image.size);
+    image.flags |= IMAGE_HAS_ALPHA;
+    image.flags |= IMAGE_HAS_COLOR;
+
+    return true;
+}
+
+qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
+{
+    if(Cvar_VariableInteger("gl_astc_format") > 0)
+        return Image_LoadASTC_HW(name, buffer, filesize);
+    else
+        return Image_LoadASTC_SW(name, buffer, filesize);
+}
+
+std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width, int height, int size)
+{
+    static const unsigned int block_x = 8;
+    static const unsigned int block_y = 8;
     static const unsigned int block_z = 1;
 
     // Compute the number of ASTC blocks in each dimension
-    unsigned int block_count_x = (pix->width + block_x - 1) / block_x;
-    unsigned int block_count_y = (pix->height + block_y - 1) / block_y;
+    unsigned int block_count_x = (width + block_x - 1) / block_x;
+    unsigned int block_count_y = (height + block_y - 1) / block_y;
 
     astcenc_error status;
     // Initialize the default configuration for the block size and quality
@@ -246,46 +310,43 @@ qboolean Image_SaveASTC( const char *name, image_ref pix )
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec config init failed: %s\n", astcenc_get_error_string(status));
-        FS_Close(pfile);
-        return false;
+        return {};
     }
 
     astcenc_context* context;
-    status = astcenc_context_alloc(&config, thread_count, &context);
+    status = astcenc_context_alloc(&config, thread_count_w, &context);
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
-        FS_Close(pfile);
-        return false;
+        return {};
     }
 
     // ------------------------------------------------------------------------
     // Compress the image
     astcenc_image image;
-    image.dim_x = pix->width;
-    image.dim_y = pix->height;
+    image.dim_x = width;
+    image.dim_y = height;
     image.dim_z = 1;
     image.data_type = ASTCENC_TYPE_U8;
-    uint8_t* slices = pix->buffer;
+    uint8_t* slices = rgba.get();
     image.data = reinterpret_cast<void**>(&slices);
 
     // Space needed for 16 bytes of output per compressed block
     size_t comp_len = block_count_x * block_count_y * 16;
-    uint8_t* comp_data = new uint8_t[comp_len];
+    std::vector<byte> result(sizeof(astc_header) + comp_len);
+    uint8_t* comp_data = result.data() + sizeof(astc_header);
 
     status = astcenc_compress_image(context, &image, &swizzle, comp_data, comp_len, 0);
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec compress failed: %s\n", astcenc_get_error_string(status));
-        delete[] comp_data;
         astcenc_context_free(context);
-        FS_Close(pfile);
-        return false;
+        return {};
     }
 
     // Stage : write file
 
-    astc_header hdr;
+    astc_header &hdr = *reinterpret_cast<astc_header *>(result.data());
     hdr.magic[0] =  ASTC_MAGIC_ID        & 0xFF;
     hdr.magic[1] = (ASTC_MAGIC_ID >>  8) & 0xFF;
     hdr.magic[2] = (ASTC_MAGIC_ID >> 16) & 0xFF;
@@ -307,11 +368,37 @@ qboolean Image_SaveASTC( const char *name, image_ref pix )
     hdr.dim_z[1] = (image.dim_z >>  8) & 0xFF;
     hdr.dim_z[2] = (image.dim_z >> 16) & 0xFF;
 
-    FS_Write(pfile, &hdr, sizeof(astc_header));
-    FS_Write(pfile, comp_data, comp_len);
-
-    delete[] comp_data;
     astcenc_context_free(context);
+
+    return result;
+}
+
+qboolean Image_SaveASTC( const char *name, image_ref pix )
+{
+    if( FS_FileExists( name, false ) && !Image_CheckFlag( IL_ALLOW_OVERWRITE ) && !host.write_to_clipboard )
+        return false; // already existed
+
+    // bogus parameter check
+    if( !pix->buffer )
+        return false;
+
+    // get image description
+    switch( pix->type )
+    {
+        case PF_RGBA_32:
+            break;
+        default:
+            MsgDev( D_ERROR, "Image_SaveASTC: unsupported image type %s\n", PFDesc[pix->type].name );
+            return false;
+    }
+
+    auto astc_tex = Image_SaveASTC_Worker(std::shared_ptr<byte[]>(pix, pix->buffer), pix->width, pix->height, pix->size);
+    if(astc_tex.empty())
+        return false;
+
+    file_t *pfile = FS_Open( name, "wb", false );
+    if( !pfile ) return false;
+    FS_Write(pfile, astc_tex.data(), astc_tex.size());
     FS_Close(pfile);
     return true;
 }

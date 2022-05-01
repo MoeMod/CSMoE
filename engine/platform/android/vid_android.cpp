@@ -117,6 +117,7 @@ void GL_InitExtensions( void )
 	GL_SetExtension( GL_ARB_DEPTH_FLOAT_EXT, false );
 	GL_SetExtension( GL_OCCLUSION_QUERIES_EXT,false );
 	GL_CheckExtension( "GL_OES_depth_texture", NULL, "gl_depthtexture", GL_DEPTH_TEXTURE );
+    GL_CheckExtension( "GL_KHR_texture_compression_astc_ldr", NULL, "gl_astc_format", GL_ASTC_EXT );
 
 	glConfig.texRectangle = glConfig.max_2d_rectangle_size = 0; // no rectangle
 

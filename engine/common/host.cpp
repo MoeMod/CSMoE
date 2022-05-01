@@ -48,6 +48,7 @@ GNU General Public License for more details.
 #include "platform/sdl/events.h"
 #endif
 #include "cpu.h"
+#include "cook.h"
 
 #if defined _WIN32 && defined XASH_DEDICATED
 #include "textconsole.h"
@@ -917,6 +918,7 @@ void Host_Frame( float time )
 
     NET_Run();
 	HTTP_Run();
+    xe::Cook_Run();
 
 	host.framecount++;
 }
@@ -1479,6 +1481,8 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 #if defined(__ANDROID__) && !defined( XASH_SDL ) && !defined( XASH_DEDICATED )
 	Android_Init();
 #endif
+
+    xe::Cook_Init();
 
 	HTTP_Init();
 

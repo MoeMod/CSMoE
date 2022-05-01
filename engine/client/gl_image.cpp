@@ -1461,26 +1461,50 @@ static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage
 		}
 		else if( glTarget == GL_TEXTURE_CUBE_MAP_ARB )
 		{
-			if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & TF_NORMALMAP ))
-				GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
-			if( subImage ) pglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
-			else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
-			if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & TF_NORMALMAP ))
-				GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+            if(PFDesc[pic->type].compressed)
+            {
+                if( subImage ) pglCompressedTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
+                else pglCompressedTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
+            }
+            else
+            {
+                if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & TF_NORMALMAP ))
+                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+                if( subImage ) pglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
+                else pglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
+                if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & TF_NORMALMAP ))
+                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+            }
 		}
 		else if( glTarget == GL_TEXTURE_3D )
 		{
-			if( subImage ) pglTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, dataType, data );
-			else pglTexImage3D( tex->target, 0, outFormat, tex->width, tex->height, pic->depth, 0, inFormat, dataType, data );
+            if(PFDesc[pic->type].compressed)
+            {
+                if( subImage ) pglCompressedTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, pic->size, data );
+                else pglCompressedTexImage3D( tex->target, 0, outFormat, tex->width, tex->height, pic->depth, 0, pic->size, data );
+            }
+            else
+            {
+                if( subImage ) pglTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, dataType, data );
+                else pglTexImage3D( tex->target, 0, inFormat, tex->width, tex->height, pic->depth, 0, inFormat, dataType, data );
+            }
 		}
 		else
 		{
-			if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
-				GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
-			if( subImage ) pglTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
-			else pglTexImage2D( tex->target, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
-			if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
-				GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+            if(PFDesc[pic->type].compressed)
+            {
+                if( subImage ) pglCompressedTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, pic->size, data );
+                else pglCompressedTexImage2D( tex->target, 0, inFormat, tex->width, tex->height, 0, pic->size, data );
+            }
+            else
+            {
+                if( GL_Support( GL_SGIS_MIPMAPS_EXT ) && !( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
+                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+                if( subImage ) pglTexSubImage2D( tex->target, 0, 0, 0, tex->width, tex->height, inFormat, dataType, data );
+                else pglTexImage2D( tex->target, 0, outFormat, tex->width, tex->height, 0, inFormat, dataType, data );
+                if( !GL_Support( GL_SGIS_MIPMAPS_EXT ) || ( tex->flags & ( TF_NORMALMAP|TF_ALPHACONTRAST )))
+                    GL_GenerateMipmaps( data, pic, tex, glTarget, inFormat, i, subImage );
+            }
 		}
 
 		if( numSides > 1 && buf != NULL )

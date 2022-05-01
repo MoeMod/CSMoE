@@ -554,6 +554,11 @@ typedef enum
 	PF_DXT3, // nvidia DXT3 format
 	PF_DXT5, // nvidia DXT5 format
 	PF_A_8,
+    PF_ASTC_4x4,
+    PF_ASTC_6x6,
+    PF_ASTC_8x8,
+    PF_ASTC_10x10,
+    PF_ASTC_12x12,
 	PF_TOTALCOUNT,	// must be last
 } pixformat_t;
 
@@ -563,6 +568,7 @@ typedef struct bpc_desc_s
 	char	name[16];	// used for debug
 	uint	glFormat;	// RGBA format
 	int	bpp;	// channels (e.g. rgb = 3, rgba = 4)
+    bool compressed;
 } bpc_desc_t;
 
 // imagelib global settings

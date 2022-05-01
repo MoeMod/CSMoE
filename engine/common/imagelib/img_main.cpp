@@ -83,17 +83,22 @@ static const cubepack_t load_cubemap[] =
 // soul of ImageLib - table of image format constants 
 const bpc_desc_t PFDesc[] =
 {
-{PF_UNKNOWN,	"raw",	0x1908, 0 },
-{PF_INDEXED_24,	"pal 24",	0x1908, 1 },
-{PF_INDEXED_32,	"pal 32",	0x1908, 1 },
-{PF_RGBA_32,	"RGBA 32",0x1908, 4 },
-{PF_BGRA_32,	"BGRA 32",0x80E1, 4 },
-{PF_RGB_24,	"RGB 24",	0x1908, 3 },
-{PF_BGR_24,	"BGR 24",	0x80E0, 3 },
-{PF_DXT1, "DXT 1", 0x83F1, 4 },
-{PF_DXT3, "DXT 3", 0x83F2, 4 },
-{PF_DXT5, "DXT 5", 0x83F3, 4 },
-{PF_A_8,	"A 8",0x1906, 1 },
+{PF_UNKNOWN,	"raw",	0x1908, 0, false },
+{PF_INDEXED_24,	"pal 24",	0x1908, 1, false },
+{PF_INDEXED_32,	"pal 32",	0x1908, 1, false },
+{PF_RGBA_32,	"RGBA 32",0x1908, 4, false },
+{PF_BGRA_32,	"BGRA 32",0x80E1, 4, false },
+{PF_RGB_24,	"RGB 24",	0x1908, 3, false },
+{PF_BGR_24,	"BGR 24",	0x80E0, 3, false },
+{PF_DXT1, "DXT 1", 0x83F1, 4, true },
+{PF_DXT3, "DXT 3", 0x83F2, 4, true },
+{PF_DXT5, "DXT 5", 0x83F3, 4, true },
+{PF_A_8,	"A 8",0x1906, 1, false },
+{PF_ASTC_4x4,	"ASTC 4x4",0x93B0, 4, true },
+{PF_ASTC_6x6,	"ASTC 6x6",0x93B4, 4, true },
+{PF_ASTC_8x8,	"ASTC 8x8",0x93B7, 4, true },
+{PF_ASTC_10x10,	"ASTC 10x10",0x93BB, 4, true },
+{PF_ASTC_12x12,	"ASTC 12x12",0x93BD, 4, true },
 };
 
 void Image_Reset( void )

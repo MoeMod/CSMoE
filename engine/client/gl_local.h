@@ -568,6 +568,7 @@ enum
 	GL_DEBUG_OUTPUT,
 	GL_SHADOW_EXT,
 	GL_S3TC_EXT,
+	GL_ASTC_EXT,
 
 	GL_EXTCOUNT,		// must be last
 };

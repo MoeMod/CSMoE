@@ -66,7 +66,7 @@ option(XASH_CPUINFO "Build with cpuinfo support" ON)
 if(IOS)
 	set(XASH_CPUINFO OFF)
 endif()
-option(XASH_ASTC "Build with ASTC support" ON)
+set(XASH_ASTC ON)
 
 option(XASH_SKIPCRTLIB "Use system crtlib" ON)
 
@@ -114,6 +114,7 @@ set(XASH_ENGINE_SOURCES
 	common/imagelib/img_utils.cpp
 	common/imagelib/img_wad.cpp
 	common/imagelib/img_dds.cpp
+	common/imagelib/img_astc.cpp
 	common/soundlib/snd_main.cpp
 	common/soundlib/snd_mp3.cpp
 	common/soundlib/snd_utils.cpp
@@ -135,6 +136,7 @@ set(XASH_ENGINE_SOURCES
 	common/mod_extend_seq.cpp 
 	common/cpu.cpp
 	common/textconsole.cpp
+	common/cook.cpp
 	server/sv_client.cpp
 	server/sv_cmds.cpp
 	server/sv_custom.cpp
@@ -156,10 +158,6 @@ if(XASH_STATIC_GAMELIB)
 	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library_static.cpp)
 else()
 	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/library.cpp)
-endif()
-
-if(XASH_ASTC)
-	set(XASH_ENGINE_SOURCES ${XASH_ENGINE_SOURCES} common/imagelib/img_astc.cpp)
 endif()
 
 if(NOT XASH_DEDICATED)
