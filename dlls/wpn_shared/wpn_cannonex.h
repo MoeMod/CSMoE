@@ -26,9 +26,7 @@ namespace sv {
 class CCannonEX : public LinkWeaponTemplate<CCannonEX,
 	TGeneralData,
 	BuildTGetItemInfoFromCSW<WEAPON_AK47>::template type,
-	TGetItemInfoDefault,
-	TWeaponIdleDefault,
-	TDeployDefault
+	TGetItemInfoDefault
 >
 {
 public:
@@ -54,7 +52,7 @@ public:
 	{
 		static constexpr int iFlags = ITEM_FLAG_EXHAUSTIBLE;
 		static constexpr const char *szAmmo1 = "CannonEXAmmo";
-		static constexpr int iMaxAmmo1 = 20;
+		static constexpr int iMaxAmmo1 = 30;
 	};
 
 	static constexpr int MaxClip = -1;
@@ -68,16 +66,72 @@ public:
 	void Spawn() override;
 	void Precache() override;
 	void PrimaryAttack() override;
+	void SecondaryAttack(void) override;
+	void ItemPostFrame(void) override;
 	int ExtractAmmo(CBasePlayerWeapon *pWeapon) override; // sync Clip -> BpAmmo
+	void Holster(int skiplocal = 0) override;
+	void Reload(void) override { };
+	void WeaponIdle(void) override;
+	BOOL Deploy(void) override;
+	void StopIdleSound(void);
+	void UpdateOnRemove(void);
+	
+	bool HasSecondaryAttack() override { return true; }
+	const char* GetCSModelName() override 
+	{
+		if (m_iWeaponState != 0)
+			return "models/w_cannonexb.mdl";
+
+		return "models/w_cannonex.mdl";
+	}
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannonEX" , 200 }; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannonex" , 200 }; }
 #endif
 
 public:
 	void CannonEXFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-	float GetDamage();
+	void Explode(void);
+	void RemoveDragon(void);
+	void ResetState(void);
+
+	void InitializeData(void);
+	
+	void CreateDragon(void);
+	void CheckWeaponState(void);
+
+public:
+	unsigned short m_usFireCannonEx;
+
+#ifndef CLIENT_DLL
+	CCannonEXDragon* m_pDragon;
+#endif
+
+	bool m_bDragonReloading;
+	bool m_bDragonTransforming;
+	time_point_t m_flTimeCheckState;
+	int m_iWeaponState2;
+	int m_iDragonFXModelIndex;
+	int m_iExplodeModelIndex;
+	int m_iExplodeEffectModelIndex;
+
+	float m_flExplodeRadius;
+	duration_t m_flIdleTime;
+	duration_t m_flCycleTime;
+	float m_flRange;
+	float m_flAngleCheck1;
+	float m_flAngleCheck2;
+	float m_flRangeModifier;
+	duration_t m_flTransformTime;
+	duration_t m_flDragonFireTime;
+	duration_t m_flReloadDelay;
+	duration_t m_flReloadTime;
+
+	std::string m_strWeaponModel;
+	std::string m_strWeaponModelB;
 
 private:
-	unsigned short m_usFire;
+	float GetExplodeDamage(void);
+	float GetDamageAmount(void);
+	duration_t GetDragonRemovalTime(void);
 };
 }

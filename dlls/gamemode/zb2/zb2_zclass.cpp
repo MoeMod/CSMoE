@@ -45,6 +45,9 @@ GNU General Public License for more details.
 #include "zb2_zclass_zbs_deimos2.h"
 #include "zb2_zclass_aksha.h"
 #include "zb2_zclass_boomer.h"
+#include "zb2_zclass_spider.h"
+#include "zb2_zclass_deathknight.h"
+#include "zb2_zclass_meatwall.h"
 #include <random>
 
 namespace sv {
@@ -68,18 +71,22 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"china", 100, MakeZombieClass<CZombieClass_China> },
 		{"pass", 100, MakeZombieClass<CZombieClass_Pass> },
 		{"flying", 100, MakeZombieClass<CZombieClass_Flying> },
-		{"revival", 40, MakeZombieClass<CZombieClass_Revival> },
+		{"revival", 50, MakeZombieClass<CZombieClass_Revival> },
 		{"stamper", 100, MakeZombieClass<CZombieClass_Stamper> },
 		{"resident", 100, MakeZombieClass<CZombieClass_Resident> },
 		{"witch", 100, MakeZombieClass<CZombieClass_Witch> },
 		{"zbs_deimos2", 100, MakeZombieClass<CZombieClass_ZBS_Deimos2> },
 		{"aksha", 100, MakeZombieClass<CZombieClass_Aksha> },
 		{"boomer", 100, MakeZombieClass<CZombieClass_Boomer> },
-		{"nemesis", 20, MakeZombieClass<CZombieClass_Nemesis>}
+		{"nemesis", 25, MakeZombieClass<CZombieClass_Nemesis>},
+		{"spider", 25, MakeZombieClass<CZombieClass_Spider>},
+		{"deathknight", 25, MakeZombieClass<CZombieClass_DeathKnight>},
+		//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
 };
 
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
+	//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
 	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
 	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
 };
@@ -203,7 +210,7 @@ float CBaseZombieClass_ZB2::HealthRecoveryAmount() const
 
 	if (m_pPlayer->m_ZombieClass)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || !stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+		if (!stricmp(m_pPlayer->m_ZombieClass, "revival") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "spider") || !stricmp(m_pPlayer->m_ZombieClass, "deathknight") || !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
 			return 1000;
 	}
 		

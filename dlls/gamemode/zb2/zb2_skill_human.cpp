@@ -172,10 +172,10 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 
-		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
-		WRITE_BYTE(1);	//type
-		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
-		WRITE_BYTE(m_flTimeZombieSkillEnd == gpGlobals->time + 5.5s ? 1 : 0);
+		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
+		WRITE_BYTE(4);
+		WRITE_SHORT(m_pPlayer->entindex());
+		WRITE_BYTE(1);
 		MESSAGE_END();
 	}
 
@@ -218,9 +218,10 @@ public:
 		WRITE_SHORT(-1);
 		MESSAGE_END();
 
-		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, m_pPlayer->pev);
-		WRITE_BYTE(0);	//type
-		WRITE_SHORT(ENTINDEX(m_pPlayer->edict()));	//entity
+		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
+		WRITE_BYTE(4);
+		WRITE_SHORT(m_pPlayer->entindex());
+		WRITE_BYTE(0);
 		MESSAGE_END();
 	}
 
@@ -283,6 +284,7 @@ void CHuman_ZB2::Think()
 	{
 		m_tSlowdown = invalid_time_point;
 		m_pPlayer->ResetMaxSpeed();
+		m_pPlayer->pev->gravity = 0.8f;
 	}
 }
 

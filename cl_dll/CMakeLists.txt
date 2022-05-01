@@ -227,6 +227,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m95tiger.cpp
 	../dlls/wpn_shared/knife_y22s1holyswordmb.cpp
 	../dlls/wpn_shared/knife_magicknife.cpp
+	../dlls/wpn_shared/knife_whipsword.cpp
+	../dlls/wpn_shared/knife_zombi_z5.cpp
+	../dlls/wpn_shared/z4b_dualkukri.cpp
+	../dlls/wpn_shared/wpn_cannonex.cpp
+	../dlls/wpn_shared/wpn_speargun.cpp
 	)
 
 set (HUD_SRCS
@@ -259,7 +264,7 @@ set (HUD_SRCS
 	./hud/death.cpp
 	./hud/showwin.cpp
 	./hud/hud_headicon.cpp
-	./hud/hit_dgaxe.cpp
+	./hud/specialcrosshair.cpp
 	./hud/hit_indicator.cpp
 	./hud/saytext.cpp
 	./hud/spectator_gui.cpp

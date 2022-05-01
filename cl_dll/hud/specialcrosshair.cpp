@@ -38,13 +38,14 @@ version.
 #include <string.h>
 #include <stdio.h>
 namespace cl {
-DECLARE_MESSAGE(m_Dgaxe, Dgaxe)
+DECLARE_MESSAGE(m_SpecialCrossHair, SpecialCrossHair)
 
 enum
 {
 	WPN_DGAXE,
 	WPN_HUNTBOW,
-	WPN_SKULLT9
+	WPN_SKULLT9,
+	WPN_WHIPSWORD,
 };
 
 enum
@@ -62,18 +63,20 @@ enum
 	HUNTBOW_AIM_HIT_RIGHT,
 	SKULLT9_AIM_OFF,
 	SKULLT9_AIM_ON,
+	WHIPSWORD_AIM_OFF,
+	WHIPSWORD_AIM_ON,
 };
 
-int CHudDgaxe::Init()
+int CHudSpecialCrossHair::Init()
 {
 	gHUD.AddHudElem(this);
 	m_iFlags |= HUD_DRAW;
-	HOOK_MESSAGE(Dgaxe);
+	HOOK_MESSAGE(SpecialCrossHair);
 	iType = 3;
 	return 1;
 }
 
-int CHudDgaxe::MsgFunc_Dgaxe(const char* pszName, int iSize, void* pbuf)
+int CHudSpecialCrossHair::MsgFunc_SpecialCrossHair(const char* pszName, int iSize, void* pbuf)
 {
 	m_iFlags |= HUD_DRAW;
 
@@ -112,7 +115,7 @@ int CHudDgaxe::MsgFunc_Dgaxe(const char* pszName, int iSize, void* pbuf)
 	return 1;
 }
 
-int CHudDgaxe::VidInit()
+int CHudSpecialCrossHair::VidInit()
 {
 	m_iFlags |= HUD_DRAW;
 	R_InitTexture(m_pCurTexture[0], "sprites/dgaxe_aim_off.tga");
@@ -124,17 +127,19 @@ int CHudDgaxe::VidInit()
 	R_InitTexture(m_pCurTexture[6], "sprites/huntbow_aim_charging.tga");
 	R_InitTexture(m_pCurTexture[7], "sprites/skullt9_aim_off.tga");
 	R_InitTexture(m_pCurTexture[8], "sprites/skullt9_aim_on.tga");
+	R_InitTexture(m_pCurTexture[9], "sprites/whipsword_aim_off.tga");
+	R_InitTexture(m_pCurTexture[10], "sprites/whipsword_aim_on.tga");
 	return 1;
 }
 
-void CHudDgaxe::Reset(void)
+void CHudSpecialCrossHair::Reset(void)
 {
 	DisplayTime = 0;
 	std::fill(std::begin(m_pCurTexture), std::end(m_pCurTexture), nullptr);
 	VidInit();
 }
 
-int CHudDgaxe::Draw(float flTime)
+int CHudSpecialCrossHair::Draw(float flTime)
 {
 	if (!m_pCurTexture)
 		return 1;
@@ -231,6 +236,39 @@ int CHudDgaxe::Draw(float flTime)
 
 		break;
 	}
+	case WPN_WHIPSWORD:
+	{
+		switch (iType)
+		{
+		case WHIPSWORD_AIM_OFF:
+		case WHIPSWORD_AIM_ON:
+		{
+			wide = 110;
+			height = 110;
+			break;
+		}
+		case AIM_NO:return 1;
+		}
+
+		float x = ScreenWidth / 2;
+		float y = ScreenHeight / 2;
+		const float flScale = 0.0f;
+
+		float iX, iY;
+
+		iX = x - wide / 2;
+		iY = y - height / 2;
+
+		switch (iType)
+		{
+		case WHIPSWORD_AIM_OFF:m_pCurTexture[iType - 4]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		case WHIPSWORD_AIM_ON:m_pCurTexture[iType - 4]->Draw2DQuadScaled(iX, iY, iX + wide, iY + height); break;
+		default:
+			break;
+		}
+
+		break;
+	}
 	}
 
 
@@ -238,7 +276,7 @@ int CHudDgaxe::Draw(float flTime)
 	return 1;
 }
 
-void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height, int iType)
+void CHudSpecialCrossHair::DrawHuntbowCrossHair(float x, float y, float wide, float height, int iType)
 {
 	switch (iType)
 	{
@@ -339,7 +377,7 @@ void CHudDgaxe::DrawHuntbowCrossHair(float x, float y, float wide, float height,
 
 
 
-void CHudDgaxe::Shutdown()
+void CHudSpecialCrossHair::Shutdown()
 {
 	std::fill(std::begin(m_pCurTexture), std::end(m_pCurTexture), nullptr);
 }

@@ -270,9 +270,10 @@ inline Vector KnifeAttack2(Vector vecSrc, Vector vecDir, float flDamage, float f
 						CBasePlayer* pVictim = dynamic_cast<CBasePlayer*>(pEntity);
 						if (pVictim->m_bIsZombie) // fire burn
 						{
-							MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pVictim->pev);
-							WRITE_BYTE(4);	//type
-							WRITE_SHORT(ENTINDEX(pVictim->edict()));	//entity
+							MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pVictim->pev);
+							WRITE_BYTE(4);
+							WRITE_SHORT(pVictim->entindex());
+							WRITE_BYTE(4);
 							MESSAGE_END();
 						}
 					}

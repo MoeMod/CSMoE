@@ -65,6 +65,7 @@ enum event_effect
 	EVENT_M95TIGERNET,
 	EVENT_M95TIGER,
 	EVENT_MAGICKNIFE,
+	EVENT_DEATHKNIGHT,
 };
 
 enum buffsg552ex_slash_e
@@ -2001,6 +2002,66 @@ void EV_WpnEffects(event_args_s* args)
 		}
 		
 		
+		break;
+	}
+	case EVENT_DEATHKNIGHT:
+	{
+		switch (args->iparam2)
+		{
+		case 2:
+		{
+			model_s* pModel = IEngineStudio.Mod_ForName("sprites/ef_deathknight_floor.spr", false);
+
+			if (pModel)
+			{
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(args->origin + Vector(0, 0, -36), pModel);
+
+				if (!pEnt)
+					return;
+
+				pEnt->entity.curstate.scale = 1.0;
+				pEnt->entity.curstate.animtime = gHUD.m_flTime;
+				pEnt->entity.curstate.frame = 0.0f;
+				pEnt->entity.curstate.framerate = 30.0f;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->frameMax = 8.0;
+				pEnt->entity.curstate.movetype = MOVETYPE_NONE;
+				pEnt->entity.curstate.solid = SOLID_NOT;
+				pEnt->entity.curstate.rendermode = kRenderTransAdd;
+				pEnt->entity.curstate.renderfx = kRenderFxNone;
+				pEnt->entity.curstate.renderamt = 255;
+				pEnt->die = gHUD.m_flTime + 0.4;
+				pEnt->flags |= FTENT_NONE | FTENT_SPRANIMATE;
+			}
+			break;
+		}
+
+		default:
+		{
+			struct model_s* pModel = IEngineStudio.Mod_ForName("models/ef_deathknight_shield.mdl", false);
+			if (pModel)
+			{
+				int id = gEngfuncs.GetLocalPlayer()->index;
+				cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(id);
+
+				TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->CL_TempEntAllocHigh(origin, pModel);
+				if (pEnt)
+				{
+					pEnt->entity.angles = pPlayer->angles;
+					pEnt->entity.angles.z = 0;
+					pEnt->entity.curstate.sequence = 0;
+					pEnt->entity.curstate.rendermode = kRenderTransAdd;
+					pEnt->entity.curstate.animtime = gHUD.m_flTime;
+					pEnt->entity.curstate.frame = 0;
+					pEnt->entity.curstate.framerate = 1.0;
+					pEnt->die = gHUD.m_flTime + 5.0;
+					pEnt->clientIndex = idx;
+					pEnt->flags |= FTENT_PLYRATTACHMENT;
+				}
+			}
+		}
+
+		}
 		break;
 	}
 

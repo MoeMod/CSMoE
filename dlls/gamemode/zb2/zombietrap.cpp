@@ -109,6 +109,7 @@ void EXPORT CZombieTrap::OnTouch(CBaseEntity* pOther)
 	m_hTarget = p;
 	pev->origin.x = p->pev->origin.x;
 	pev->origin.y = p->pev->origin.y;
+	pev->velocity = g_vecZero;
 	pev->sequence = 1;
 	pev->frame = 0.0;
 	m_flRemoveTime = gpGlobals->time + GetTrappedTime();

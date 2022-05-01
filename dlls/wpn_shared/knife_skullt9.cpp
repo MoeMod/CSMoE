@@ -228,8 +228,8 @@ public:
 
 	enum skullt9_crosshairstate_e
 	{
-		SKULLT9_AIM_NO = 3,
-		SKULLT9_AIM_ON = 12
+		SKULLT9_AIM_NO = 11,
+		SKULLT9_AIM_ON,
 	};
 
 	void Precache() override
@@ -258,7 +258,7 @@ public:
 		m_pPlayer->m_bShieldDrawn = false;
 		
 #ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+		MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 		WRITE_BYTE(2);
 		WRITE_BYTE(m_CrossHairState);
 		MESSAGE_END();
@@ -554,7 +554,7 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 		if (pEntity->pev->takedamage == DAMAGE_NO)
 			continue;
 
-		if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+		if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 			continue;
 
 		if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -593,7 +593,7 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 				vecDir.z = 0;
 				if (!IsPrimaryAttack)
 				{
-					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 					{
 						Vector2D vecDir2D = (player->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
 
@@ -634,7 +634,7 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 void CKnifeSkullT9::Holster(int skiplocal)
 {
 #ifndef CLIENT_DLL
-	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 	WRITE_BYTE(2);
 	WRITE_BYTE(3);
 	MESSAGE_END();
@@ -674,7 +674,7 @@ void CKnifeSkullT9::ItemPostFrame()
 		{
 			
 #ifndef CLIENT_DLL
-			MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+			MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 			WRITE_BYTE(2);
 			WRITE_BYTE(m_CrossHairState);
 			MESSAGE_END();

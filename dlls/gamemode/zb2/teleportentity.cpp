@@ -29,12 +29,13 @@ void CTeleportEntity::Spawn(void)
 	SetTouch(&CTeleportEntity::OnTouch);
 	SetThink(&CTeleportEntity::OnThink);
 
-	UTIL_SetSize(pev, Vector(-5, -5, -2), Vector(5, 5, 2));
+	UTIL_SetSize(pev, g_vecZero, g_vecZero);
 }
 
 void CTeleportEntity::Precache(void)
 {
 	PRECACHE_MODEL("models/teleport_zombie_mark.mdl");
+	m_iTeleportZombieOut = PRECACHE_MODEL("sprites/ef_teleportzombieout.spr");
 }
 
 void CTeleportEntity::Kill(void)
@@ -48,7 +49,7 @@ void CTeleportEntity::Kill(void)
 void EXPORT CTeleportEntity::OnThink()
 {
 	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
-	if (!owner->IsAlive())
+	if (!owner->IsAlive() || (owner->m_ZombieClass && stricmp(owner->m_ZombieClass, "teleport")))
 		Kill();
 }
 
@@ -62,10 +63,15 @@ void EXPORT CTeleportEntity::OnTouch(CBaseEntity* pOther)
 
 void CTeleportEntity::Play_EfTeleport()
 {
-	MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, this->pev);
-	WRITE_BYTE(7);	//type
-	WRITE_SHORT(ENTINDEX(this->edict()));	//entity
-	WRITE_BYTE(1);
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_TEMPSPRITE);
+	WRITE_COORD(pev->origin.x);
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z);
+	WRITE_SHORT(m_iTeleportZombieOut);
+	WRITE_BYTE(8);
+	WRITE_BYTE(255);
+	WRITE_BYTE(8);
 	MESSAGE_END();
 }
 }

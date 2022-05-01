@@ -211,6 +211,13 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zb2_zclass_boomer.cpp
 	./holyswordcannon.cpp
 	./player/player_fuck.cpp
+	./gamemode/zb2/zb2_zclass_spider.cpp
+	./gamemode/zb2/zb2_zclass_deathknight.cpp
+	./gamemode/zb2/webbomb.cpp
+	./gamemode/zb2/zb2_zclass_meatwall.cpp
+	./gamemode/zb2/zombidogegg.cpp
+	./cannonexdragon.cpp
+	./spearammo.cpp
 	)
 
 set (HLWPN_SRCS
@@ -373,6 +380,11 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_m95tiger.cpp
 	../dlls/wpn_shared/knife_y22s1holyswordmb.cpp
 	../dlls/wpn_shared/knife_magicknife.cpp
+	../dlls/wpn_shared/knife_whipsword.cpp
+	../dlls/wpn_shared/knife_zombi_z5.cpp
+	../dlls/wpn_shared/z4b_dualkukri.cpp
+	../dlls/wpn_shared/wpn_cannonex.cpp
+	../dlls/wpn_shared/wpn_speargun.cpp
 	)
 
 set(PM_SRCS

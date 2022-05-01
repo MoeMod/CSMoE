@@ -331,7 +331,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 				continue;
 
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr, 0))
@@ -566,7 +566,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 				continue;
 
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, m_iSwing))

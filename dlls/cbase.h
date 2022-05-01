@@ -264,7 +264,7 @@ public:
 	virtual BOOL FVisible(CBaseEntity *pEntity);
 	virtual BOOL FVisible(const Vector &vecOrigin);
 #endif
-
+	virtual void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind) {}
 public:
 #ifdef CLIENT_DLL
 	void EXPORT SUB_Remove(void) {}
@@ -278,7 +278,11 @@ public:
 	void SUB_UseTargets(CBaseEntity *pActivator, USE_TYPE useType, float value);
 
 public:
-	void UpdateOnRemove(void);
+#ifndef CLIENT_DLL
+	virtual void UpdateOnRemove(void);
+#else
+	virtual void UpdateOnRemove(void) { ; }
+#endif
 	int ShouldToggle(USE_TYPE useType, BOOL currentState);
 	void FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq = 4, int iDamage = 0, entvars_t *pevAttacker = NULL);
 	void FireBullets2(ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq = 4, int iDamage = 0, entvars_t* pevAttacker = NULL, int iWeaponType = 0);

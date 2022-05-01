@@ -74,6 +74,12 @@ void EXPORT CZombieHook::Kill(void)
 		}
 
 		pPlayer->m_iCustomSequence = -1;
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_DRAW_RETINA);
+		WRITE_BYTE(ZOMBIE_SKILL_HOOK);
+		WRITE_SHORT(-1);
+		MESSAGE_END();
 	}
 
 	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);

@@ -1478,16 +1478,8 @@ static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage
 		}
 		else if( glTarget == GL_TEXTURE_3D )
 		{
-            if(PFDesc[pic->type].compressed)
-            {
-                if( subImage ) pglCompressedTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, pic->size, data );
-                else pglCompressedTexImage3D( tex->target, 0, outFormat, tex->width, tex->height, pic->depth, 0, pic->size, data );
-            }
-            else
-            {
-                if( subImage ) pglTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, dataType, data );
-                else pglTexImage3D( tex->target, 0, inFormat, tex->width, tex->height, pic->depth, 0, inFormat, dataType, data );
-            }
+			if( subImage ) pglTexSubImage3D( tex->target, 0, 0, 0, 0, tex->width, tex->height, pic->depth, inFormat, dataType, data );
+			else pglTexImage3D( tex->target, 0, inFormat, tex->width, tex->height, pic->depth, 0, inFormat, dataType, data );
 		}
 		else
 		{

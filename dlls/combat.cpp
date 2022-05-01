@@ -1266,10 +1266,10 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 						{
 							case 1:	//knife_lance_specialattack
 							{
-								if (target->m_bIsZombie && target->m_ZombieClass)
+								if (target->m_bIsZombie)
 								{
 									target->m_flVelocityModifier = 1.0;
-									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+									if (target->m_iBuff & BUFF_IGNORE_KNOCKBACK)
 										break;
 									else
 										AddKickRate(target, pAttacker->pev->origin, 1000, 400);
@@ -1278,10 +1278,10 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 							}
 							case 2:	//knife_lance_slash3
 							{
-								if (target->m_bIsZombie && target->m_ZombieClass)
+								if (target->m_bIsZombie)
 								{
 									target->m_flVelocityModifier = 1.0;
-									if (!stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+									if (target->m_iBuff & BUFF_IGNORE_KNOCKBACK)
 										break;
 									else
 										AddKickRate(target, vecSrc, 2400, 220);
@@ -1290,17 +1290,17 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 							}
 							case 3:
 							{
-								MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, target->pev);
-								WRITE_BYTE(9);	//type
-								WRITE_SHORT(ENTINDEX(target->edict()));	//entity
-								WRITE_BYTE(1);
+								MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, target->pev);
+								WRITE_BYTE(4);
+								WRITE_SHORT(target->entindex());
+								WRITE_BYTE(9);
 								MESSAGE_END();
 
 								//need stun
 
 								if (target->m_bIsZombie)
 								{
-									if (target->m_ZombieClass && !stricmp(target->m_ZombieClass, "revival") && target->m_iZombieRevivalEnabled)
+									if (target->m_iBuff & BUFF_IGNORE_KNOCKBACK)
 										target->m_flVelocityModifier = 1.0;
 									else
 									{
@@ -1835,6 +1835,9 @@ NOXREF char *vstr(float *v)
 	return string[idx];
 }
 
+void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float flPenetrationDistance, int iPenetration,
+	int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol, CBaseEntity* pEntity);
+
 // Go to the trouble of combining multiple pellets into a single damage call.
 // This version is used by Players, uses the random seed generator to sync client and server side shots.
 
@@ -1927,6 +1930,11 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this);
 		if (pPlayer) {
 			vecDir = pPlayer->m_pModStrategy->AdjustFireBullets3Dir(vecDir);
+		}
+		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot())
+		{
+			FireBulletsForMobile(vecSrc, vecDir, flDistance, flPenetrationDistance, iPenetration, iBulletType, iDamage, flRangeModifier, pevAttacker, bPistol, this);
+			return Vector(x * vecSpread, y * vecSpread, 0);
 		}
 	}
 	vecEnd = vecSrc + vecDir * flDistance;
@@ -2341,10 +2349,10 @@ CBaseEntity::FireBullets4(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 
 						if (pInflictorPlayer->m_bIsZombie && !pInflictorPlayer->m_iHealthDecreaseCount) // fire burn
 						{
-							MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pInflictorPlayer->pev);
-							WRITE_BYTE(8);	//type
-							WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict()));	//entity
-							WRITE_BYTE(5);
+							MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pInflictorPlayer->pev);
+							WRITE_BYTE(4);
+							WRITE_SHORT(pInflictorPlayer->entindex());
+							WRITE_BYTE(8);
 							MESSAGE_END();
 						}
 
@@ -2667,6 +2675,197 @@ void CGrenade::KickRate(entvars_t* pevInflictor, entvars_t* pevAttacker, float f
 			continue;
 
 		DamageWithKickRate(pPlayer, pev->origin, pevInflictor, pevAttacker, flKickRate, flRadius, flDamage, flags, flBoost);
+	}
+}
+
+void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float flPenetrationDistance, int iPenetration,
+	int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol, CBaseEntity* pEntity)
+{
+	int iOriginalPenetration = iPenetration;
+	int iPenetrationPower;
+	int iCurrentDamage = iDamage;
+	float flCurrentDistance;
+
+	bool bHitMetal = false;
+	int iSparksAmount = 1;
+
+	TraceResult tr, tr2;
+	Vector vecEnd = vecSrc + vecDir * flDistance;
+
+	float flDamageModifier = 0.5;
+
+	while (iPenetration != 0) {
+		ClearMultiDamage();
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pEntity->pev), &tr);
+
+		if (TheBots != NULL && tr.flFraction != 1.0f) {
+			TheBots->OnEvent(EVENT_BULLET_IMPACT, pEntity, (CBaseEntity*)&tr.vecEndPos);
+		}
+
+		if (tr.flFraction != 1.0f && iPenetration == iOriginalPenetration)
+		{
+			CBaseEntity* pEnt = CBaseEntity::Instance(tr.pHit);
+			if (!pEnt->IsPlayer())
+			{
+				UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(pEntity->pev), &tr2);
+				if (tr2.flFraction != 1.0f)
+				{
+					pEnt = CBaseEntity::Instance(tr2.pHit);
+
+					iPenetration--;
+
+					flCurrentDistance = tr.flFraction * flDistance;
+					iCurrentDamage *= pow(flRangeModifier, flCurrentDistance / 500);
+
+					if (flCurrentDistance > flPenetrationDistance) {
+						iPenetration = 0;
+					}
+
+					float flDistanceModifier = 0.75;
+					iPenetrationPower = 42;
+					flDamageModifier = 0.75;
+
+					flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
+
+					tr2.iHitgroup = HITGROUP_CHEST;
+					ClearMultiDamage();
+					pEnt->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr2, (DMG_BULLET | DMG_NEVERGIB));
+					iCurrentDamage *= flDamageModifier;
+					ApplyMultiDamage(pEntity->pev, pevAttacker);
+					continue;
+				}
+			}
+		}
+
+		char cTextureType = UTIL_TextureHit(&tr, vecSrc, vecEnd);
+		bool bSparks = false;
+
+		switch (cTextureType) {
+		case CHAR_TEX_METAL:
+			bHitMetal = true;
+			bSparks = true;
+
+			iPenetrationPower *= 0.15;
+			flDamageModifier = 0.2;
+			break;
+		case CHAR_TEX_CONCRETE:
+			iPenetrationPower *= 0.25;
+			break;
+		case CHAR_TEX_GRATE:
+			bHitMetal = true;
+			bSparks = true;
+
+			iPenetrationPower *= 0.5;
+			flDamageModifier = 0.4;
+			break;
+		case CHAR_TEX_VENT:
+			bHitMetal = true;
+			bSparks = true;
+
+			iPenetrationPower *= 0.5;
+			flDamageModifier = 0.45;
+			break;
+		case CHAR_TEX_TILE:
+			iPenetrationPower *= 0.65;
+			flDamageModifier = 0.3;
+			break;
+		case CHAR_TEX_COMPUTER:
+			bHitMetal = true;
+			bSparks = true;
+
+			iPenetrationPower *= 0.4;
+			flDamageModifier = 0.45;
+			break;
+		case CHAR_TEX_WOOD:
+			flDamageModifier = 0.6;
+			break;
+		default:
+			break;
+		}
+		if (tr.flFraction != 1.0f) {
+			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+			iPenetration--;
+
+			flCurrentDistance = tr.flFraction * flDistance;
+			iCurrentDamage *= pow(flRangeModifier, flCurrentDistance / 500);
+
+			if (flCurrentDistance > flPenetrationDistance) {
+				iPenetration = 0;
+			}
+
+			if (tr.iHitgroup == HITGROUP_SHIELD) {
+				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
+					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
+					ATTN_NORM);
+				UTIL_Sparks(tr.vecEndPos);
+
+				pEntity->pev->punchangle.x = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
+				pEntity->pev->punchangle.z = iCurrentDamage * RANDOM_FLOAT(-0.15, 0.15);
+
+				if (pEntity->pev->punchangle.x < 4) {
+					pEntity->pev->punchangle.x = -4;
+				}
+
+				if (pEntity->pev->punchangle.z < -5) {
+					pEntity->pev->punchangle.z = -5;
+				}
+				else if (pEntity->pev->punchangle.z > 5) {
+					pEntity->pev->punchangle.z = 5;
+				}
+
+				break;
+			}
+
+			float flDistanceModifier;
+			if (VARS(tr.pHit)->solid != SOLID_BSP || !iPenetration) {
+				iPenetrationPower = 42;
+				flDamageModifier = 0.75;
+				flDistanceModifier = 0.75;
+			}
+			else
+				flDistanceModifier = 0.5;
+
+			if (!Q_strcmp(STRING(pEntity->pev->classname), "zombiepile")) {
+				EMIT_SOUND(pEntity->edict(), CHAN_VOICE,
+					(RANDOM_LONG(0, 1) == 1) ? "weapons/ric_metal-1.wav" : "weapons/ric_metal-2.wav", VOL_NORM,
+					ATTN_NORM);
+				UTIL_Sparks(tr.vecEndPos);
+				iPenetration = 0;
+				flDistanceModifier = 0.0;
+			}
+
+			DecalGunshot(&tr, iBulletType, (!bPistol && RANDOM_LONG(0, 3)), pEntity->pev, bHitMetal);
+
+#ifdef TRACE_BULLETS
+			Vector vecEndPos2 = tr.vecEndPos - (vecDir * 3);
+			MESSAGE_BEGIN(MSG_ALL, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_LINE);
+			WRITE_COORD(vecEndPos2.x);
+			WRITE_COORD(vecEndPos2.y);
+			WRITE_COORD(vecEndPos2.z);
+
+			WRITE_COORD(tr.vecEndPos.x);
+			WRITE_COORD(tr.vecEndPos.y);
+			WRITE_COORD(tr.vecEndPos.z);
+			WRITE_SHORT(300);
+			WRITE_BYTE(0);
+			WRITE_BYTE(0);
+			WRITE_BYTE(255);
+			MESSAGE_END();
+#endif
+
+
+			vecSrc = tr.vecEndPos + (vecDir * iPenetrationPower);
+			flDistance = (flDistance - flCurrentDistance) * flDistanceModifier;
+			vecEnd = vecSrc + (vecDir * flDistance);
+
+			pEntity->TraceAttack(pevAttacker, iCurrentDamage, vecDir, &tr, (DMG_BULLET | DMG_NEVERGIB));
+			iCurrentDamage *= flDamageModifier;
+		}
+		else
+			iPenetration = 0;
+
+		ApplyMultiDamage(pEntity->pev, pevAttacker);
 	}
 }
 

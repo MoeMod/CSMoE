@@ -37,10 +37,20 @@ void EV_Smoke_FadeOut( struct tempent_s *te, float frametime, float currenttime 
 {
 	if( te->entity.curstate.renderamt > 0 && currenttime >= te->entity.curstate.fuser3 )
 	{
-		te->entity.curstate.renderamt = 255.0f - (currenttime - te->entity.curstate.fuser3) * te->entity.baseline.renderamt ;
+		te->entity.curstate.renderamt = 255.0f - (currenttime - te->entity.curstate.fuser3) * te->entity.baseline.renderamt;
 		if( te->entity.curstate.renderamt < 0 ) te->entity.curstate.renderamt = 0;
 	}
 	EV_CS16Client_KillEveryRound( te, frametime, currenttime );
+}
+
+void EV_BlackSmoke_FadeOut(struct tempent_s* te, float frametime, float currenttime)
+{
+	if (te->entity.curstate.renderamt > 0 && currenttime >= te->entity.curstate.fuser3)
+	{
+		te->entity.curstate.renderamt = te->entity.curstate.iuser1 - (currenttime - te->entity.curstate.fuser3) * te->entity.baseline.renderamt;	
+		if (te->entity.curstate.renderamt < 0) te->entity.curstate.renderamt = 0;
+	}
+	EV_CS16Client_KillEveryRound(te, frametime, currenttime);
 }
 
 void SG_CreateSmoke(event_args_s* args)
@@ -64,18 +74,44 @@ void SG_CreateSmoke(event_args_s* args)
 			{
 				// don't die when animation is ended
 				pTemp->flags |= (FTENT_SPRANIMATELOOP | FTENT_COLLIDEWORLD | FTENT_CLIENTCUSTOM);
-				pTemp->die = gEngfuncs.GetClientTime() + 30.0f;
-				pTemp->callback = EV_Smoke_FadeOut;
-				pTemp->entity.curstate.fuser3 = gEngfuncs.GetClientTime() + 15.0f; // start fading after 15 sec
+				
+				if (args->iparam1)
+				{
+					pTemp->die = gEngfuncs.GetClientTime() + 20.0f;
+					pTemp->entity.curstate.fuser3 = gEngfuncs.GetClientTime() + 10.0f; // start fading after 15 sec
+					pTemp->callback = EV_BlackSmoke_FadeOut;
+				}				
+				else
+				{
+					pTemp->die = gEngfuncs.GetClientTime() + 30.0f;
+					pTemp->callback = EV_Smoke_FadeOut;
+					pTemp->entity.curstate.fuser3 = gEngfuncs.GetClientTime() + 15.0f; // start fading after 15 sec
+				}
+							
 				pTemp->entity.curstate.fuser4 = gEngfuncs.GetClientTime(); // entity creation time
 
 				pTemp->entity.curstate.rendermode = kRenderTransTexture;
 				if (args->iparam1)
 				{
-					pTemp->entity.curstate.rendercolor.r = 5;
-					pTemp->entity.curstate.rendercolor.g = 5;
-					pTemp->entity.curstate.rendercolor.b = 5;
-					pTemp->entity.curstate.renderamt = Com_RandomLong(240, 255);
+					int iLocalIdx = gEngfuncs.GetLocalPlayer()->index;
+					cl_entity_t* pLocalPlayer = gEngfuncs.GetEntityByIndex(iLocalIdx);
+
+					if (g_PlayerExtraInfo[iLocalIdx].zombie)
+					{
+						pTemp->entity.curstate.rendercolor.r = Com_RandomLong(210, 230);
+						pTemp->entity.curstate.rendercolor.g = Com_RandomLong(210, 230);
+						pTemp->entity.curstate.rendercolor.b = Com_RandomLong(210, 230);
+						pTemp->entity.curstate.iuser1 = pTemp->entity.curstate.renderamt = 10;
+						pTemp->entity.baseline.renderamt = 1;
+					}
+					else
+					{
+						pTemp->entity.curstate.rendercolor.r = 5;
+						pTemp->entity.curstate.rendercolor.g = 5;
+						pTemp->entity.curstate.rendercolor.b = 5;
+						pTemp->entity.curstate.iuser1 = pTemp->entity.curstate.renderamt = Com_RandomLong(240, 255);
+						pTemp->entity.baseline.renderamt = 18;
+					}			
 				}
 				else
 				{
@@ -83,13 +119,14 @@ void SG_CreateSmoke(event_args_s* args)
 					pTemp->entity.curstate.rendercolor.g = Com_RandomLong(210, 230);
 					pTemp->entity.curstate.rendercolor.b = Com_RandomLong(210, 230);
 					pTemp->entity.curstate.renderamt = 255;
+					pTemp->entity.baseline.renderamt = 18;
 				}
 				pTemp->entity.curstate.scale = 5.0f;
 
 				// make it move slowly
 				pTemp->entity.baseline.origin.x = Com_RandomLong(-5, 5);
 				pTemp->entity.baseline.origin.y = Com_RandomLong(-5, 5);
-				pTemp->entity.baseline.renderamt = 18;
+				
 			}
 		}
 	}

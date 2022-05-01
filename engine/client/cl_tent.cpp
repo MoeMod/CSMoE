@@ -1757,7 +1757,7 @@ CL_TempSphereModel
 Spherical shower of models, picks from set
 ==============
 */
-void GAME_EXPORT CL_TempSphereModel( const vec3_t pos, float speed, float life, int count, int modelIndex )
+void GAME_EXPORT CL_TempSphereModel( const vec3_t pos, float speed, float life, int count, int modelIndex)
 {
 	vec3_t		forward, dir;
 	TEMPENTITY	*pTemp;
@@ -1783,6 +1783,64 @@ void GAME_EXPORT CL_TempSphereModel( const vec3_t pos, float speed, float life, 
 		pTemp->entity.baseline.angles[2] = Com_RandomFloat( -255, 255 );
 		pTemp->entity.curstate.rendermode = kRenderNormal;
 		pTemp->entity.baseline.renderamt = 255;
+		pTemp->die = cl.time + life;
+	}
+}
+
+
+void R_TempSphereModel(vec3_t pos, float speed, float life, int count, int modelIndex, bool bAnglesCalc)
+{
+	if (!modelIndex)
+		return;
+
+	int frameCount;
+	Mod_GetFrames(modelIndex, &frameCount);
+
+	TEMPENTITY* pTemp;
+
+	for (int i = 0; i < count; i++)
+	{
+		pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
+
+		if (!pTemp)
+			return;
+
+		pTemp->entity.curstate.body = Com_RandomLong(0, frameCount - 1);
+
+		if (Com_RandomLong(0, 255) < 10)
+			pTemp->flags |= FTENT_SLOWGRAVITY;
+		else
+			pTemp->flags |= FTENT_GRAVITY;
+
+		if (!bAnglesCalc && Com_RandomLong(0, 255) < 220)
+		{
+			pTemp->flags |= FTENT_ROTATE;
+
+			pTemp->entity.baseline.angles.x = Com_RandomFloat(-256.0, -255.0);
+			pTemp->entity.baseline.angles.y = Com_RandomFloat(-256.0, -255.0);
+			pTemp->entity.baseline.angles.z = Com_RandomFloat(-256.0, -255.0);
+		}
+
+		if (Com_RandomLong(0, 255) < 100)
+		{
+			pTemp->flags |= FTENT_SMOKETRAIL;
+		}
+
+		pTemp->flags |= FTENT_FLICKER | FTENT_COLLIDEWORLD;
+		pTemp->entity.curstate.rendermode = kRenderNormal;
+		//pTemp->entity.curstate.effects = i & 31;
+
+		pTemp->entity.baseline.origin.x = Com_RandomFloat(-1.0, 1.0);
+		pTemp->entity.baseline.origin.y = Com_RandomFloat(-1.0, 1.0);
+		pTemp->entity.baseline.origin.z = Com_RandomFloat(-1.0, 1.0);
+
+		VectorNormalize(pTemp->entity.baseline.origin);
+
+		if (bAnglesCalc)
+			pTemp->flags |= FTENT_VELOCITYANGLES;
+
+		VectorScale(pTemp->entity.baseline.origin, speed, pTemp->entity.baseline.origin);
+
 		pTemp->die = cl.time + life;
 	}
 }
@@ -2059,6 +2117,191 @@ void R_ArrowModel(sizebuf_t* msg)
 	}
 }
 
+
+void ArrowFollow(TEMPENTITY* ent, float frametime, float currenttime)
+{
+	
+	cl_entity_t* pPlayer = CL_GetEntityByIndex(ent->entity.curstate.iuser1);
+
+	if (pPlayer)
+	{
+		ent->entity.angles = pPlayer->angles + ent->entity.curstate.vuser1;
+	}
+}
+
+void R_FollowingArrow(sizebuf_t* msg)
+{
+	int player, modelIndex;
+	vec3_t orgOffset, angOffset;
+
+	player = BF_ReadShort(msg);
+	modelIndex = BF_ReadShort(msg);
+
+	orgOffset.x = BF_ReadCoord(msg);
+	orgOffset.y = BF_ReadCoord(msg);
+	orgOffset.z = BF_ReadCoord(msg);
+
+	angOffset.x = BF_ReadCoord(msg);
+	angOffset.y = BF_ReadCoord(msg);
+	angOffset.z = BF_ReadCoord(msg);
+
+	float life = (float)BF_ReadByte(msg);
+
+	TEMPENTITY* ent = CL_TempEntAlloc(vec3_t( 0, 0, 0 ), Mod_Handle(modelIndex));
+
+	if (ent)
+	{
+		ent->flags |= FTENT_CLIENTCUSTOM | FTENT_PLYRATTACHMENT;
+		ent->tentOffset = orgOffset;
+		ent->clientIndex = player;
+		ent->entity.angles = vec3_t(0, 0, 0);
+		ent->entity.curstate.iuser1 = player;
+		ent->entity.curstate.vuser1 = angOffset;
+		ent->die = cl.time + life;
+		ent->callback = ArrowFollow;
+	}
+	
+}
+
+void R_TempModel(sizebuf_t* msg)
+{
+	vec3_t pos, angles, velocity;
+	int modelIndex;
+	float life;
+	int sequence;
+	float framerate;
+	bool fadeOut;
+	int brightness;
+	int rendermode;
+	int entity;
+	float fadeSpeed;
+	bool fadeIn;
+	float fadeInSpeed;
+	float scale;
+	int frameMax;
+	int flags;
+
+	pos.x = BF_ReadCoord(msg);
+	pos.y = BF_ReadCoord(msg);
+	pos.z = BF_ReadCoord(msg);
+
+	angles.x = BF_ReadAngle(msg);
+	angles.y = BF_ReadAngle(msg);
+	angles.z = BF_ReadAngle(msg);
+
+	velocity.x = BF_ReadCoord(msg);
+	velocity.y = BF_ReadCoord(msg);
+	velocity.z = BF_ReadCoord(msg);
+
+	modelIndex = BF_ReadShort(msg);
+	life = BF_ReadByte(msg) * 0.1;
+	sequence = BF_ReadShort(msg);
+	framerate = BF_ReadByte(msg) * 0.1;
+	fadeOut = BF_ReadByte(msg) != 0;
+	brightness = BF_ReadByte(msg);
+	rendermode = BF_ReadByte(msg);
+	entity = BF_ReadShort(msg);
+	fadeSpeed = BF_ReadByte(msg) * 0.1;
+	fadeIn = BF_ReadByte(msg) != 0;
+	fadeInSpeed = BF_ReadByte(msg) * 0.1;
+	scale = BF_ReadByte(msg) * 0.1;
+	frameMax = BF_ReadShort(msg);
+	flags = BF_ReadLong(msg);
+
+	for (int i = 0; i < 2; i++)
+	{
+		TEMPENTITY* pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
+
+		if (!pTemp)
+		{
+			MsgDev(D_INFO, "No temp ent.\n");
+			return;
+		}
+
+		int frameCount;
+		Mod_GetFrames(modelIndex, &frameCount);
+
+		pTemp->entity.angles = angles;
+		pTemp->entity.baseline.origin = velocity;
+
+		if (frameMax > 0)
+			pTemp->frameMax = frameMax;
+		else
+			pTemp->frameMax = frameCount;
+
+		pTemp->entity.curstate.rendermode = rendermode;
+		pTemp->entity.curstate.renderamt = brightness * 2;
+		pTemp->entity.curstate.sequence = sequence;
+		pTemp->entity.curstate.modelindex = 0;
+		pTemp->entity.curstate.framerate = framerate;
+		pTemp->flags |= FTENT_SPRANIMATE;
+		pTemp->entity.curstate.animtime = cl.time;
+
+		if (flags > 0)
+			pTemp->flags |= flags;
+
+		pTemp->die = cl.time + life;
+
+		if (fadeOut)
+		{
+			pTemp->flags |= FTENT_FADEOUT;
+			pTemp->entity.baseline.renderamt = brightness;
+			pTemp->fadeSpeed = fadeSpeed;
+		}
+
+		if (fadeIn)
+		{
+			pTemp->flags |= FTENT_FADEIN;
+			pTemp->entity.baseline.fuser1 = fadeInSpeed;
+		}
+
+		if (entity > 0)
+		{
+			pTemp->flags |= FTENT_PLYRATTACHMENT;
+			pTemp->clientIndex = entity;
+			pTemp->tentOffset = pos;
+		}
+
+		if (scale > 0)
+			pTemp->entity.curstate.scale = scale;
+	}
+}
+
+TEMPENTITY* R_TempSprite2(vec3_t pos, vec3_t dir, float scale, int modelIndex, int rendermode, int renderfx, float brightness, float life, int flags, float framerate)
+{
+	TEMPENTITY* pTemp = CL_TempEntAlloc(pos, Mod_Handle(modelIndex));
+
+	if (!pTemp)
+	{
+		MsgDev(D_INFO, "No temp ent.\n");
+		return NULL;
+	}
+
+	int frameCount;
+	Mod_GetFrames(modelIndex, &frameCount);
+
+	if (pTemp)
+	{
+		pTemp->entity.curstate.rendermode = rendermode;
+		pTemp->entity.curstate.renderfx = renderfx;
+		pTemp->entity.curstate.rendercolor.r = pTemp->entity.curstate.rendercolor.g = pTemp->entity.curstate.rendercolor.b = 255;
+		pTemp->frameMax = frameCount;
+		pTemp->entity.curstate.framerate = framerate;
+		pTemp->entity.curstate.renderamt = pTemp->entity.baseline.renderamt = brightness * 255.0;
+		pTemp->flags |= flags;
+		pTemp->entity.curstate.scale = scale;
+		pTemp->entity.baseline.origin = dir;
+		pTemp->entity.origin = pos;
+		pTemp->entity.curstate.frame = 0;
+
+		if (life)
+			pTemp->die = cl.time + life * 0.1;
+		else
+			pTemp->die = cl.time + 1.0 + frameCount / 10.0f;
+	}
+
+	return pTemp;
+}
 
 void R_RotatedModel(sizebuf_t* msg)
 {
@@ -2435,7 +2678,7 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		modelIndex = BF_ReadShort( &buf );
 		count = BF_ReadShort( &buf );
 		life = (float)(BF_ReadByte( &buf ) * 0.1f);
-		CL_TempSphereModel( pos, vel, life, count, modelIndex );
+		CL_TempSphereModel( pos, vel, life, count, modelIndex);
 		break;
 	case TE_BREAKMODEL:
 		pos[0] = BF_ReadCoord( &buf );
@@ -2608,6 +2851,34 @@ void CL_ParseTempEntity( sizebuf_t *msg )
 		break;
 	case TE_ROTATEDMODEL:
 		R_RotatedModel(&buf);
+		break;
+	case TE_TEMPMODEL:
+		R_TempModel(&buf);
+		break;
+	case TE_TEMPSPRITE:
+		pos.x = BF_ReadCoord(&buf);
+		pos.y = BF_ReadCoord(&buf);
+		pos.z = BF_ReadCoord(&buf);
+
+		modelIndex = BF_ReadShort(&buf);
+		scale = BF_ReadByte(&buf) / 10.0;
+		brightness = BF_ReadByte(&buf) / 255.0;
+		frameRate = BF_ReadByte(&buf);
+
+		R_TempSprite2(pos, vec3_origin, scale, modelIndex, kRenderTransAdd, kRenderFxNone, brightness, 0.0, FTENT_SPRANIMATE, frameRate);
+		break;
+	case TE_FOLLOWINGARROW:
+		R_FollowingArrow(&buf);
+		break;
+	case TE_TEMPEXPLODEMODEL:
+		pos[0] = BF_ReadCoord(&buf);
+		pos[1] = BF_ReadCoord(&buf);
+		pos[2] = BF_ReadCoord(&buf);
+		vel = BF_ReadCoord(&buf);
+		modelIndex = BF_ReadShort(&buf);
+		count = BF_ReadShort(&buf);
+		life = (float)(BF_ReadByte(&buf) * 0.1f);
+		R_TempSphereModel(pos, vel, life, count, modelIndex, BF_ReadByte(&buf) != 0);
 		break;
 	default:
 		MsgDev( D_ERROR, "ParseTempEntity: illegible TE message %i\n", type );

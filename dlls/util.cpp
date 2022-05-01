@@ -17,6 +17,7 @@ unsigned int glSeed;
 #include <string>
 #include <functional>
 #include <utility>
+#include <engine/common/mathlib.h>
 
 namespace sv {
 
@@ -921,7 +922,8 @@ void UTIL_TraceModel(const Vector &vecStart, const Vector &vecEnd, int hullNumbe
 	TRACE_MODEL(vecStart, vecEnd, hullNumber, pentModel, ptr);
 }
 
-NOXREF TraceResult UTIL_GetGlobalTrace()
+TraceResult UTIL_GetGlobalTrace()
+//NOXREF TraceResult UTIL_GetGlobalTrace()
 {
 	TraceResult tr;
 
@@ -2379,5 +2381,188 @@ void UTIL_BroadcastStuffText(const char* fmt, ...)
 	WRITE_STRING(string);
 	MESSAGE_END();
 }
+
+
+void UTIL_TempModel(const Vector& vecOrigin, const Vector& vecAngles, const Vector& vecVelocity, int iModelIndex, int life, int sequence, int framerate, bool fadeOut, int fadeSpeed, int brightness, int rendermode, CBaseEntity* pEntity, bool fadeIn, int fadeInSpeed, int scale, int frameMax, int flags)
+{
+	MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	WRITE_BYTE(TE_TEMPMODEL);
+	WRITE_COORD(vecOrigin.x);
+	WRITE_COORD(vecOrigin.y);
+	WRITE_COORD(vecOrigin.z);
+	WRITE_ANGLE(vecAngles.x);
+	WRITE_ANGLE(vecAngles.y);
+	WRITE_ANGLE(vecAngles.z);
+	WRITE_COORD(vecVelocity.x);
+	WRITE_COORD(vecVelocity.y);
+	WRITE_COORD(vecVelocity.z);
+	WRITE_SHORT(iModelIndex);
+	WRITE_BYTE(life);
+	WRITE_SHORT(sequence);
+	WRITE_BYTE(framerate);
+	WRITE_BYTE(fadeOut != false);
+	WRITE_BYTE(brightness);
+	WRITE_BYTE(rendermode);
+	if (pEntity)
+	{
+		WRITE_SHORT(pEntity->entindex());
+	}
+	else
+	{
+		WRITE_SHORT(-1);
+	}
+	WRITE_BYTE(fadeSpeed);
+	WRITE_BYTE(fadeIn != false);
+	WRITE_BYTE(fadeInSpeed);
+	WRITE_BYTE(scale);
+	WRITE_SHORT(frameMax);
+	WRITE_LONG(flags);
+	MESSAGE_END();
+}
+
+bool UTIL_AngularCheck(CBaseEntity* pEntity, CBaseEntity* pAttacker, Vector vecSrc, Vector vecDir, Vector2D vecAngleCheckDir, float flRange, float flMinimumCosine, TraceResult* ptr)
+{
+	if (pEntity->IsBSPModel())
+	{
+		UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+		if (ptr->flFraction < 1.0)
+		{
+			if (ptr->pHit)
+			{
+				CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+				if (pHit == pEntity)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	UTIL_TraceHull(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, head_hull, pAttacker->edict(), ptr);
+
+	if (ptr->flFraction < 1.0 && ptr->pHit != NULL && CBaseEntity::Instance(ptr->pHit) == pEntity)
+	{
+		TraceResult tr;
+
+		UTIL_TraceLine(vecSrc, vecSrc + vecDir * flRange, dont_ignore_monsters, pAttacker->edict(), &tr);
+
+		if (tr.flFraction >= 1.0)
+		{
+			return true;
+		}
+
+		if (!tr.pHit)
+		{
+			return true;
+		}
+
+		CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+		if (!pHit || pHit != pEntity)
+		{
+			return true;
+		}
+
+		*ptr = tr;
+
+		return true;
+	}
+	else
+	{
+		Vector vecEnd = pEntity->BodyTarget(vecSrc);
+
+		if (flMinimumCosine > DotProduct(vecAngleCheckDir, (vecEnd.Make2D() - vecSrc.Make2D()).Normalize()))
+		{
+			return false;
+		}
+
+		edict_t* peAttacker = pAttacker->edict();
+
+		for (int i = 5; i > 0; i--)
+		{
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, peAttacker, ptr);
+
+			if (!ptr->pHit || !GET_PRIVATE(ptr->pHit))
+			{
+				return false;
+			}
+
+			CBaseEntity* pHit = CBaseEntity::Instance(ptr->pHit);
+
+			if (ptr->flFraction < 1.0 || pHit == pEntity)
+			{
+				return true;
+			}
+
+			if (pHit->IsBSPModel())
+			{
+				return false;
+			}
+
+			vecSrc = ptr->vecEndPos + vecDir * 5.0;
+		}
+	}
+
+	return false;
+}
+
+void UTIL_AddKickRateBoost(CBaseEntity* pEntity, const Vector2D& vecDir, float flVelocityModifier, float flForce, float flBoost)
+{
+	pEntity->pev->velocity.x = vecDir.x * flVelocityModifier * flForce;
+	pEntity->pev->velocity.y = vecDir.y * flVelocityModifier * flForce;
+	pEntity->pev->velocity.z = flVelocityModifier * flBoost;
+}
+
+float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flBaseDamage, float flMaxRange)
+{
+	float disSqr = (vecTarget - vecSrc).LengthSquared();
+
+	if (disSqr > flMaxRange * flMaxRange)
+		return 0.0f;
+
+	float falloff = (flMaxRange - (1.0 / sqrt(disSqr))) / flMaxRange;
+
+	if (falloff < 0.0)
+		falloff = 0.0;
+
+	return (flDamage - flBaseDamage) * falloff + flBaseDamage;
+}
+
+
+float UTIL_CalcDamage(const Vector& vecSrc, const Vector& vecTarget, float flDamage, float flRange, Vector& vecDir)
+{
+	Vector vecDelta = vecTarget - vecSrc;
+	float flLenSqr = vecDelta.LengthSquared();
+
+	if (flRange * flRange > flLenSqr)
+	{
+		float flReversedDistance = rsqrt(flLenSqr);
+		float flFalloff = (flRange - 1.0 / flReversedDistance) / flRange;
+
+		if (flFalloff < 0.0)
+			flFalloff = 0.0;
+
+		if (vecDir)
+		{
+			vecDir[0] = vecDelta.x * flReversedDistance;
+			vecDir[1] = vecDelta.y * flReversedDistance;
+			vecDir[2] = vecDelta.z * flReversedDistance;
+		}
+
+		return flFalloff * flDamage;
+	}
+	else
+	{
+		if (vecDir)
+		{
+			vecDir[0] = vecDir[1] = vecDir[2] = 0;
+		}
+
+		return 0;
+	}
+}
+
 
 }

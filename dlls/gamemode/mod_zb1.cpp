@@ -356,6 +356,10 @@ int CPlayerModStrategy_ZB1::ComputeMaxAmmo(const char *szAmmoClassName, int iOri
 		ret = 60;
 	else if (!strcmp(szAmmoClassName, "CannonAmmo"))
 		ret = 20;
+	else if (!strcmp(szAmmoClassName, "CannonEXAmmo"))
+		ret = 30;
+	else if (!strcmp(szAmmoClassName, "SpearAmmo"))
+		ret = 30;
 	else if (!strcmp(szAmmoClassName, "RailBeam"))
 		ret = 35;
 	else if (!strcmp(szAmmoClassName, "HEGrenade"))
@@ -476,7 +480,7 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 	player->pev->sequence = 0;
 	player->m_iCustomSequence = -1;
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
-	player->pev->health = player->pev->max_health = std::max(1000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
 
 	InfectionSound();
@@ -529,6 +533,7 @@ void CMod_Zombi::TeamCheck()
 
 		if ((player->m_bIsZombie && player->m_iTeam != TERRORIST) || (!player->m_bIsZombie && player->m_iTeam != CT))
 		{
+			player->pev->team = player->m_bIsZombie ? TERRORIST : CT;
 			player->m_iTeam = player->m_bIsZombie ? TERRORIST :CT;
 			TeamChangeUpdate(player, player->m_iTeam);
 
@@ -593,11 +598,13 @@ BOOL CMod_Zombi::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttack
 				return iReturn;
 			}
 
-			if (pPlayer->m_bHasBuffWpn & BUFF_REVIVEGUN && pPlayer->m_iBuff & BUFF_REVIVE)
+			if (pPlayer->m_iBuff & BUFF_REVIVE)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
 				CSDM_DoRandomSpawn(pPlayer);
+				pPlayer->m_iBuff &= ~BUFF_REVIVE;
+				pPlayer->m_iReviveGunShotsFired = 0;
 				if (pWeapon)
 				{
 					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))

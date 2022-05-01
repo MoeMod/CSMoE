@@ -1104,7 +1104,9 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->nextthink = gpGlobals->time + 0.05s;
 	pGrenade->pev->dmgtime = gpGlobals->time + time;
 	pGrenade->pev->dmg = 999;
-	pGrenade->pev->health = 50;
+	pGrenade->pev->health = 100;	//damage
+	pGrenade->pev->fuser1 = 350.0; //kickrate;
+	pGrenade->pev->fuser2 = 250.0; //radius;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
 	pGrenade->m_bJustBlew = true;
@@ -1141,6 +1143,8 @@ CGrenade* CGrenade::ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->dmg = 999;
 	pGrenade->pev->solid = SOLID_TRIGGER;
 	pGrenade->pev->health = flDamage;
+	pGrenade->pev->fuser1 = 450.0; //kickrate;
+	pGrenade->pev->fuser2 = 250.0; //radius;
 	UTIL_SetSize(pGrenade->pev, Vector(-4, -4, -4), Vector(4, 4, 4));
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
@@ -1863,7 +1867,13 @@ void CGrenade::ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entva
 	if (!pevAttacker)
 		pevAttacker = pevInflictor;
 
-	KickRate(pev, pevAttacker, 350.0, 250.0, pev->health, DMGFLAG_DECAY, 0.0);
+	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevAttacker);
+	if (player)
+	{
+		player->m_pModStrategy->ZombiBombExploded(pev->fuser1, pev->fuser2, pev->health);
+	}
+
+	KickRate(pev, pevAttacker, pev->fuser1, pev->fuser2, pev->health, DMGFLAG_DECAY, 0.0);
 
 #if 0
 	CBaseEntity* pEntity = NULL;

@@ -138,6 +138,9 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"weapon_molotov",         "燃烧瓶",                  600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1},
 	{ "knife_nataknifed",      "双持银刃",    0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1 },
 	{ "knife_y22s1holyswordmb",         "【奇幻乐园】双手剑",           0, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 150 },
+	{"knife_whipsword",     "【极影】蛇心剑",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150 },
+	{ "weapon_cannonex",         "赤焰魔龙",           6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
+	{ "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
 
 	//{"csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1},
 	{ "csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1 },
@@ -205,6 +208,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     {"weapon_gatling",      "加特林",               4000, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1 },
     {"weapon_chainsaw",         "生命收割者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1},
     {"weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 60},
+	//{ "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
+	//{ "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
 };
 
 }

@@ -331,6 +331,23 @@ public:
 	virtual BOOL AddAmmo(CBaseEntity* pOther);
 };
 
+
+class CCannonEXAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CSpearAmmo : public CBasePlayerAmmo
+{
+public:
+	virtual void Spawn();
+	virtual void Precache();
+	virtual BOOL AddAmmo(CBaseEntity* pOther);
+};
+
 }
 
 #endif // AMMO_H

@@ -1114,7 +1114,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -1147,52 +1147,29 @@ namespace sv {
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 
-				if (player->m_bIsZombie)
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
 					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
 					vecDir.z = 0;
 					if (IsPrimaryAttack)
 					{
-						/*auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 						if (strategy)
 						{
-							strategy->SetStunSpeedTime(2.0s);
-							strategy->SetStunGravityTime(2.0s);
-						}*/
-						//if (player->m_bIsZombie && player->m_ZombieClass)
-						//{
-						//	if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-						//	{
-						//		//need stun
-						//		
-
-
-								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-								if (strategy)
-								{
-									strategy->SetStunSpeedTime(1.5s);
-									strategy->SetStunGravityTime(1.5s);
-								}
-						//	}
-						//}			
+							strategy->SetStunSpeedTime(1.5s);
+							strategy->SetStunGravityTime(1.5s);
+						}	
 					}
 					else
-					{
-						if (player->m_bIsZombie && player->m_ZombieClass)
-						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-							{
-								ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 1.0f });
+					{				
+						ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 1.0f });
 
-								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-								if (strategy)
-								{
-									strategy->SetStunSpeedTime(3.0s);
-									strategy->SetStunGravityTime(3.0s);
-								}
-							}
-						}
-						
+						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+						if (strategy)
+						{
+							strategy->SetStunSpeedTime(3.0s);
+							strategy->SetStunGravityTime(3.0s);
+						}										
 					}
 				}
 			}

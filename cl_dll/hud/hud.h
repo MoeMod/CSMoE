@@ -903,7 +903,7 @@ private:
 //-----------------------------------------------------
 //
 
-class CHudDgaxe : public CHudBase
+class CHudSpecialCrossHair : public CHudBase
 {
 public:
 	int Init(void);
@@ -912,7 +912,7 @@ public:
 	void Reset(void);
 	void Shutdown();
 	void DrawHuntbowCrossHair(float x, float y, float wide, float height, int iType);
-	CHudMsgFunc(Dgaxe);
+	CHudMsgFunc(SpecialCrossHair);
 
 private:
 	float wide, height;
@@ -920,7 +920,7 @@ private:
 	int iStoredType;
 	int iWeapon;
 	int DisplayTime;
-	SharedTexture m_pCurTexture[9];
+	SharedTexture m_pCurTexture[11];
 };
 
 //
@@ -1129,7 +1129,7 @@ public:
 	CHudDeathNotice m_DeathNotice;
 	CHudShowWin		m_ShowWin;
 	CHudHeadIcon	m_HeadIcon;
-	CHudDgaxe		m_Dgaxe;
+	CHudSpecialCrossHair	m_SpecialCrossHair;
 	CHudHitIndicator m_HitIndicator;
 	CHudSiFiammo m_HudSiFiammo;
 	CHudSayText     m_SayText;

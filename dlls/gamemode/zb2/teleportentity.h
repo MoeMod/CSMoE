@@ -15,9 +15,8 @@ public:
 	void Kill();
 	void Play_EfTeleport();
 
-public:
-	time_point_t m_flNextRadarTime;
-	int m_iSupplyboxIndex;
+private:
+	int m_iTeleportZombieOut;
 };
 
 }

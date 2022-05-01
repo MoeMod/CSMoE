@@ -153,10 +153,10 @@ namespace sv {
 							}
 						}
 
-						MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
-						WRITE_BYTE(9);	//type
-						WRITE_SHORT(ENTINDEX(player->edict()));	//entity
-						WRITE_BYTE(1);
+						MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, player->pev);
+						WRITE_BYTE(4);
+						WRITE_SHORT(player->entindex());
+						WRITE_BYTE(9);
 						MESSAGE_END();
 					}
 					else
@@ -392,22 +392,19 @@ namespace sv {
 
 						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, m_SkillDamage, DMG_BULLET | DMG_NEVERGIB);
 
-						if (player->m_bIsZombie && player->m_ZombieClass)
-						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-							{
-								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+						{					
+							Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
 
-								player->pev->velocity.x = vecDir.x * 600.0;
-								player->pev->velocity.y = vecDir.y * 600.0;
-								player->pev->velocity.z = 310.0;
-							}					
+							player->pev->velocity.x = vecDir.x * 600.0;
+							player->pev->velocity.y = vecDir.y * 600.0;
+							player->pev->velocity.z = 310.0;				
 						}
 
-						MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
-						WRITE_BYTE(9);	//type
-						WRITE_SHORT(ENTINDEX(player->edict()));	//entity
-						WRITE_BYTE(1);
+						MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, player->pev);
+						WRITE_BYTE(4);
+						WRITE_SHORT(player->entindex());
+						WRITE_BYTE(9);
 						MESSAGE_END();
 					}
 					else
@@ -786,7 +783,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -838,30 +835,24 @@ namespace sv {
 					else if(iType == 1)
 					{
 						//left3
-						if (player->m_bIsZombie && player->m_ZombieClass)
+						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-							{
-								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+							Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
 
-								player->pev->velocity.x = vecDir.x * 2400.0;
-								player->pev->velocity.y = vecDir.y * 2400.0;
-							}
+							player->pev->velocity.x = vecDir.x * 2400.0;
+							player->pev->velocity.y = vecDir.y * 2400.0;
 						}
 					}
 					else
 					{
 						//right
-						if (player->m_bIsZombie && player->m_ZombieClass)
+						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-							{
-								Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
+							Vector2D vecDir = (player->pev->origin - pAttackPlayer->pev->origin).Make2D().Normalize();
 
-								player->pev->velocity.x = vecDir.x * 2100.0;
-								player->pev->velocity.y = vecDir.y * 2100.0;
-								player->pev->velocity.z = 290.0;
-							}
+							player->pev->velocity.x = vecDir.x * 2100.0;
+							player->pev->velocity.y = vecDir.y * 2100.0;
+							player->pev->velocity.z = 290.0;
 						}
 					}
 				}

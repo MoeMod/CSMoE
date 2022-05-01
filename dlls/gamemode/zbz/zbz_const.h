@@ -86,6 +86,9 @@ enum ZombieZSkillSkillId : byte
 	Skill_EarlyAdopter,	// All unlock levels are reduced by 1.	No
 	Skill_DiscountCoupon,	// All purchases using dollars are discounted.
 	Skill_RapidReloaderII, //the shot is not fired but fires instantly from the reserved ammo.
+	Skill_ZombieS, // become z5 zombie
+	Skill_GhostHunter, // get dualkukri
+	Skill_ZombiBombGiveaway, //Zombie Bombs given every cycle
 };
 
 enum ZBZMessageType : byte

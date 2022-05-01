@@ -259,8 +259,8 @@ void CHEGrenade::WeaponIdle(void)
 		}
 		else
 		{
-			if (flVel > 1100)
-				flVel = 1100;
+			if (flVel > 750)
+				flVel = 750;
 
 			vecSrc = m_pPlayer->pev->origin + m_pPlayer->pev->view_ofs + gpGlobals->v_forward * 16;
 			vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;

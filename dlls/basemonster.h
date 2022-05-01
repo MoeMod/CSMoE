@@ -143,6 +143,10 @@ public:
 		return FALSE;
 	}
 	inline void StopAnimation(void) { pev->framerate = 0; }
+#ifndef CLIENT_DLL
+	EHANDLE m_hSpearAttached;
+#endif
+	time_point_t m_flNextSpearPush;
 };
 
 }

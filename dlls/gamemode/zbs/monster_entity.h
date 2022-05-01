@@ -63,7 +63,10 @@ public:
 	void OnKilled(entvars_t *pKiller, int iGib) override;
 
 	void DeathSound() const override;
-	bool IsTeamMate(CBaseEntity *that) const override { return false; }
+	bool IsTeamMate(CBaseEntity *that) const override
+	{
+		return that->pev->team == TEAM_TERRORIST;
+	}
 };
 
 class CMonster : public CHostage

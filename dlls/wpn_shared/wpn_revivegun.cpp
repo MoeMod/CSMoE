@@ -310,18 +310,15 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-				if (player->m_bIsZombie && player->m_ZombieClass)
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
-					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-					{
-						ApplyKnockbackData(player, vecDir, { 1100, 600, 600, 700, 1.0f });
+					ApplyKnockbackData(player, vecDir, { 1100, 600, 600, 700, 1.0f });
 
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(1.0s);
-							strategy->SetStunGravityTime(1.0s);
-						}
+					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+					if (strategy)
+					{
+						strategy->SetStunSpeedTime(1.0s);
+						strategy->SetStunGravityTime(1.0s);
 					}
 				}
 			}
@@ -366,18 +363,15 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-				if (player->m_bIsZombie && player->m_ZombieClass)
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
-					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-					{
-						ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
+					ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
 
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(1.0s);
-							strategy->SetStunGravityTime(1.0s);
-						}
+					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+					if (strategy)
+					{
+						strategy->SetStunSpeedTime(1.0s);
+						strategy->SetStunGravityTime(1.0s);
 					}
 				}
 			}
@@ -429,19 +423,17 @@ void CReviveGun::SecondaryAttack_InstantDamage()
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 				Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
-				if (player->m_bIsZombie && player->m_ZombieClass)
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
-					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-					{
-						ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
+					ApplyKnockbackData(player, vecDir, { 980, 980, 980, 980, 1.0f });
 
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(1.0s);
-							strategy->SetStunGravityTime(1.0s);
-						}
+					auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+					if (strategy)
+					{
+						strategy->SetStunSpeedTime(1.0s);
+						strategy->SetStunGravityTime(1.0s);
 					}
+					
 				}
 			}
 #endif
@@ -542,7 +534,7 @@ void CReviveGun::PrimaryAttack(void)
 
 bool CReviveGun::IsSignal(void)
 {
-	if (m_iChargeShotsFired > 80)
+	if (m_pPlayer->m_iReviveGunShotsFired > 80)
 		m_pPlayer->m_iBuff |= BUFF_REVIVE;
 
 	return m_pPlayer->m_iBuff & BUFF_REVIVE ? true : false;
@@ -569,7 +561,7 @@ void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUse
 	}
 
 	m_iThinkType = 0;
-	m_iChargeShotsFired++;
+	m_pPlayer->m_iReviveGunShotsFired++;
 	m_iClip--;
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 #ifndef CLIENT_DLL
@@ -800,7 +792,7 @@ void CReviveGun::WeaponCallBack(int iType)
 	if (iType == 1)
 	{
 #ifndef CLIENT_DLL
-		m_iChargeShotsFired = 0;
+		m_pPlayer->m_iReviveGunShotsFired = 0;
 		SendWeaponAnim(REVIVEGUN_REVIVE, UseDecrement() != FALSE);
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2.0s;
 		PLAYBACK_EVENT_FULL(FEV_GLOBAL, m_pPlayer->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0, g_vecZero, g_vecZero, 0.0, 0.0, 18, 0, IsSignal(), FALSE);

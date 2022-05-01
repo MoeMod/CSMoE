@@ -19,6 +19,7 @@ namespace sv {
 		g_iKnifeMasterSpr = PRECACHE_MODEL("sprites/ef_coilmg.spr");
 		g_iExplodeSpr = PRECACHE_MODEL("sprites/zerogxplode.spr");
 		PRECACHE_MODEL("models/zombiez_contactinfection_ring.mdl");
+		PRECACHE_SOUND("zombi/ghosthunterready.wav");		
 	}
 
 	class ZSkill_BulletDamage : public CZombieZSkill_Base
@@ -143,8 +144,14 @@ namespace sv {
 		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
 			OnGetSkill();
 		}
+
+		void OnEvolution(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
+
 		void OnGetSkill() override {
-			m_pPlayer->pev->health += m_pPlayer->m_bIsZombie ? GetZombieBonus() : GetBonus();
+			
+			m_pPlayer->pev->max_health = m_pPlayer->pev->health += m_pPlayer->m_bIsZombie ? GetZombieBonus() : GetBonus();
 		}
 	private:
 		float GetBonus() const { return 400.0f + 200.0f * g_pGameRules->m_iTotalRoundsPlayed; }
@@ -162,6 +169,10 @@ namespace sv {
 			m_flNextThink = gpGlobals->time + GetBonus();
 		}
 		void OnThink() override {
+
+			if (m_pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
+				return;
+
 			if (m_flNextThink > gpGlobals->time)
 				return;
 
@@ -730,20 +741,15 @@ namespace sv {
 		const char* GetDesc() const override { return "增加爆弹兽颅的攻击力和击退效果。"; }
 		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
 
-		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
-			if (attacker != m_pPlayer)
-				return;
-			if (!IsActivate())
-				return;
-
-			CGrenade* grenade = GetClassPtr<CGrenade>(pevInflictor);
-			if (!grenade)
-				return;
-
-			flDamage *= GetBonus();
+		void OnZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override {
+			flKickRate *= GetKickRateBonus();
+			flRadius *= GetRadiusBonus();
+			flDamage *= GetDamageBonus();
 		}
 	private:
-		float GetBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetKickRateBonus() const { return 1.0f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetRadiusBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetDamageBonus() const { return 1.0f + 0.2f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_ClawEnhacement : public CZombieZSkill_Base
@@ -917,14 +923,14 @@ namespace sv {
 
 		void OnGetSkill() override {
 			if (m_pPlayer->m_iZombieLevel < ZOMBIE_LEVEL_ORIGIN)
-			{
-				m_pPlayer->m_iZombieLevel = ZOMBIE_LEVEL_ORIGIN;
+			{			
 				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
 				if (strategy)
 				{
 					strategy->SetRagePercent(101.0f);
 					strategy->CheckEvolution();
 				}
+				m_pPlayer->m_iZombieLevel = ZOMBIE_LEVEL_ORIGIN;
 			}
 
 		}
@@ -937,11 +943,6 @@ namespace sv {
 		{
 			PRECACHE_MODEL("models/ef_fireball.mdl");
 			m_sModelIndex = PRECACHE_MODEL("sprites/bexplo.spr");
-		/*	m_sFireIndex[0] = PRECACHE_MODEL("sprites/buffm249_fire01.spr");
-			m_sFireIndex[1] = PRECACHE_MODEL("sprites/buffm249_fire02.spr");
-			m_sFireIndex[2] = PRECACHE_MODEL("sprites/buffm249_fire03.spr");
-			m_sFireIndex[3] = PRECACHE_MODEL("sprites/buffm249_fire04.spr");
-			m_sFireIndex[4] = PRECACHE_MODEL("sprites/buffm249_fire05.spr");*/
 		}
 		void Spawn()
 		{
@@ -996,7 +997,7 @@ namespace sv {
 
 		void EXPORT Touch(CBaseEntity* other)
 		{
-			RadiusDamage3(pev->origin, pev, VARS(pev->owner), 800.0f + 100.0f * g_pGameRules->m_iTotalRoundsPlayed, 100.0f, CLASS_MACHINE, DMG_EXPLOSION, 0, 0, 0, 0);
+			RadiusDamage3(pev->origin, pev, VARS(pev->owner), 800.0f + 100.0f * g_pGameRules->m_iTotalRoundsPlayed, 100.0f, CLASS_MACHINE, DMG_EXPLOSION | DMG_NOMORALE, 0, 0, 0, 0);
 
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 			WRITE_BYTE(TE_EXPLOSION);
@@ -1175,14 +1176,16 @@ namespace sv {
 
 				player->pev->health = min(player->pev->health + player->pev->max_health * (0.03f * g_pGameRules->m_iTotalRoundsPlayed), player->pev->max_health);
 				
-				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
-				WRITE_BYTE(2);	//type
-				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, player->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(player->entindex());
+				WRITE_BYTE(2);
 				MESSAGE_END();
 
-				MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, player->pev);
-				WRITE_BYTE(3);	//type
-				WRITE_SHORT(ENTINDEX(player->edict()));	//entity
+				MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, player->pev);
+				WRITE_BYTE(4);
+				WRITE_SHORT(player->entindex());
+				WRITE_BYTE(3);
 				MESSAGE_END();
 			}
 		}
@@ -1414,7 +1417,7 @@ namespace sv {
 						if (pEntity->pev->takedamage == DAMAGE_NO)
 							continue;
 
-						pEntity->TakeDamage(pev, VARS(pev->owner), 30.0f, DMG_NEVERGIB | DMG_SLOWBURN);
+						pEntity->TakeDamage(pev, VARS(pev->owner), 30.0f, DMG_NEVERGIB | DMG_BURN | DMG_NOMORALE | DMG_EXPLOSION);
 					}
 				}
 
@@ -1468,7 +1471,7 @@ namespace sv {
 
 				EMIT_SOUND(ENT(pev), CHAN_STATIC, "weapons/bunkerbuster_explosion_1st.wav", VOL_NORM, ATTN_NORM);
 
-				RadiusDamage3(pev->origin, pev, VARS(pev->owner), 500.0f * (5.0f * g_pGameRules->m_iTotalRoundsPlayed), 250.0f, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION, 0, 0, 0, 0);
+				RadiusDamage3(pev->origin, pev, VARS(pev->owner), 500.0f * (5.0f * g_pGameRules->m_iTotalRoundsPlayed), 250.0f, CLASS_MACHINE, DMG_NEVERGIB | DMG_EXPLOSION | DMG_NOMORALE, 0, 0, 0, 0);
 
 				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 				WRITE_BYTE(TE_EXPLOSION);
@@ -1555,6 +1558,235 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_ZombieS : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_ZombieS(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "生化超越"; }
+		const char* GetDesc() const override { return "受到一定伤害可随机进化成特殊僵尸"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnSpawn() override {
+			m_flTakeDamage = 0.0f;
+
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(0, 0);
+			}
+		}
+		void OnGetSkill() override {
+			m_flTakeDamage = 0.0f;
+
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(0, 0);
+			}
+		}
+		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+			if (victim != m_pPlayer)
+				return;
+			if (!IsActivate())
+				return;
+
+			m_flTakeDamage += flDamage;
+			if (m_flTakeDamage >= GetBonus())
+			{
+				m_flTakeDamage = 0.0f;
+
+				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(victim->m_pModStrategy.get());
+				if (strategy) {
+
+					int ChangeTime = strategy->GetClassChangeTime(0);
+					if (ChangeTime == -1)
+						return;
+
+					strategy->SetClassChangeTime(0, 1);
+
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "按E成为特殊僵尸");
+				}
+			}
+		}
+	private:
+		float m_flTakeDamage;
+		float GetBonus() const { return max(0.0f, 10000.0f - (100.0f * g_pGameRules->m_iTotalRoundsPlayed)); }
+	};
+
+	class ZSkill_GhostHunter : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_GhostHunter(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "幽灵猎手"; }
+		const char* GetDesc() const override { return "在人类人数小于6时可以变身为幽灵猎手"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnSpawn() override {
+			m_flNextThink = invalid_time_point;
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(1, 0);
+			}
+		}
+		void OnGetSkill() override {
+			m_flNextThink = invalid_time_point;
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(1, 0);
+			}
+		}
+		void OnThink() override {
+			if (m_flNextThink > gpGlobals->time)
+				return;
+
+			if (g_pGameRules->m_iNumCT <= 6)
+			{
+				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+				if (strategy) {
+
+					int ChangeTime = strategy->GetClassChangeTime(1);
+					if (ChangeTime == -1)
+						return;
+
+					EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterready.wav", VOL_NORM, ATTN_NORM);
+
+					strategy->SetClassChangeTime(1, 1);
+
+					m_flNextThink = gpGlobals->time + 9999s;
+				}
+			}
+			
+		}
+		
+	private:
+		float m_flTakeDamage;
+		time_point_t m_flNextThink;
+	};
+
+	class ZSkill_Adaptability : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Adaptability(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "适应力"; }
+		const char* GetDesc() const override { return "随时改变僵尸种类"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+
+		void OnSpawn() override {
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(2, 0);
+			}
+		}
+		void OnGetSkill() override {
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy) {
+				strategy->SetClassChangeTime(2, 1);
+			}
+		}
+
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			OnGetSkill();
+		}
+
+	};
+
+	class ZSkill_ZombiBombGiveaway : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_ZombiBombGiveaway(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "兽颅增殖"; }
+		const char* GetDesc() const override { return "每隔一段时间自动生成爆弹兽颅，红色兽颅生成周期:（30秒-0.5秒*回合数),绿色兽颅生成周期:（25秒-0.5秒*回合数）"; }
+		ZombieZSkillType GetType() const override { return TYPE_ZOMBIE; }
+		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
+			m_flNextRedBombGive = gpGlobals->time + GetRedBombBonus();
+			m_flNextGreenBombGive = gpGlobals->time + GetGreenBombBonus();
+		}
+		void OnThink() override {
+
+			if (m_flNextRedBombGive < gpGlobals->time)
+			{
+				m_flNextRedBombGive = gpGlobals->time + GetRedBombBonus();
+				if (!IsActivate())
+					return;
+
+				int i = m_pPlayer->GetAmmoIndex("HEGrenade");
+				if (i < 0)
+					return;
+
+				if (m_pPlayer->AmmoInventory(i)) {
+					m_pPlayer->m_rgAmmo[i]++;
+					// make sure the ammo messages have been linked first
+					if (gmsgAmmoPickup)
+					{
+						// Send the message that ammo has been picked up
+						MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+						WRITE_BYTE(i); // ammo ID
+						WRITE_BYTE(1); // amount
+						MESSAGE_END();
+					}
+					return;
+				}
+
+				m_pPlayer->GiveNamedItem("weapon_zombibomb");
+			}
+
+			if (m_flNextGreenBombGive < gpGlobals->time)
+			{
+				m_flNextGreenBombGive = gpGlobals->time + GetGreenBombBonus();
+				if (!IsActivate())
+					return;
+
+				int i = m_pPlayer->GetAmmoIndex("SmokeGrenade");
+				if (i < 0)
+					return;
+
+				if (m_pPlayer->AmmoInventory(i)) {
+					m_pPlayer->m_rgAmmo[i]++;
+					// make sure the ammo messages have been linked first
+					if (gmsgAmmoPickup)
+					{
+						// Send the message that ammo has been picked up
+						MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+						WRITE_BYTE(i); // ammo ID
+						WRITE_BYTE(1); // amount
+						MESSAGE_END();
+					}
+					return;
+				}
+
+				m_pPlayer->GiveNamedItem("weapon_zombibomb2");
+			}	
+		}
+		void OnGetSkill() override {
+			m_flNextRedBombGive = time_point_t();
+			m_flNextGreenBombGive = time_point_t();
+		}
+	private:
+		time_point_t m_flNextRedBombGive;
+		time_point_t m_flNextGreenBombGive;
+		duration_t GetRedBombBonus() const { return 25.0s - 0.5s * g_pGameRules->m_iTotalRoundsPlayed; }
+		duration_t GetGreenBombBonus() const { return 30.0s - 0.5s * g_pGameRules->m_iTotalRoundsPlayed; }
+	};
+
+	class ZSkill_BombDefense : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_BombDefense(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "兽颅护盾"; }
+		const char* GetDesc() const override { return "降低兽颅造成的伤害及击退效果。能够对兽颅起到防御作用，降低兽颅造成的伤害及击退效果。该防御可对所有类型兽颅产生效果。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		void OnZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override {
+
+			if (!m_pPlayer->m_bIsZombie)
+			{
+				flKickRate *= GetKickRateBonus();
+				flDamage *= GetDamageBonus();
+			}		
+		}
+	private:
+		float GetKickRateBonus() const { return 1.0f - 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetDamageBonus() const { return 1.0f - 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -1603,8 +1835,11 @@ namespace sv {
 		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
 		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
-		
-		
+		{ Skill_ZombieS, 15, MakeSkill<ZSkill_ZombieS> },
+		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
+		{ Skill_Adaptability, 100, MakeSkill<ZSkill_Adaptability> },
+		{ Skill_ZombiBombGiveaway, 50, MakeSkill<ZSkill_ZombiBombGiveaway> },
+		{ Skill_BombDefense, 100, MakeSkill<ZSkill_BombDefense> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

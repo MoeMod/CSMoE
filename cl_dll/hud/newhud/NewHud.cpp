@@ -87,6 +87,7 @@ int CHudNewHud::Draw(float flTime)
 		return 1;
 	}
 
+	return 1;
 }
 
 int CHudNewHud::DrawNewHudCharacterBG(float flTime)

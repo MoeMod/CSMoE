@@ -155,9 +155,9 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_AVOID_INFECT			(1<<2)
 #define BUFF_HOLYSWORD_AVOID_INFECT			(1<<3)
 #define BUFF_M32VENOM			(1<<4)
-
-#define BUFF_REVIVEGUN				(1<<1)
-#define BUFF_DGAXE			(1<<2)
+#define BUFF_IGNORE_KNOCKBACK			(1<<5)
+#define BUFF_RUSHENTITY			(1<<6)
+#define BUFF_GHOSTHUNTER			(1<<7)
 
 #define COUNT_M32VENOM	0
 
@@ -777,7 +777,6 @@ public:
 	int m_iCustomSequence;
 	char m_szCustomSequence[32];
 	int m_iZombieFlying;
-	int m_iZombieRevivalEnabled;
 	std::set<int> m_setWeaponID;
 	int m_iRoundKill;
 	int m_iRoundAssist;
@@ -789,6 +788,7 @@ public:
 	int m_iBuff;
 	int m_bHasBuffWpn;	//revivegun buffak buffm4 and more
 	float m_flAccumulateDamage[33];	//like m32venom
+	int m_iReviveGunShotsFired;
 };
 
 }

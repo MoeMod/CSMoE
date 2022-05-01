@@ -37,6 +37,7 @@ public:
 		RETINA_DRAW_TYPE_NONE,
 		RETINA_DRAW_TYPE_QUARTER = (1 << 0),
 		RETINA_DRAW_TYPE_BLINK = (1 << 1),
+		RETINA_DRAW_TYPE_BLACK = (1 << 2),
 	};
 
 	struct RetinaDrawItem_s

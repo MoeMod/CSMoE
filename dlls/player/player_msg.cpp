@@ -46,7 +46,7 @@ DLL_GLOBAL int gmsgWeaponList = 0;
 DLL_GLOBAL int gmsgAmmoX = 0;
 DLL_GLOBAL int gmsgDeathMsg = 0;
 DLL_GLOBAL int gmsgShowWin = 0;
-DLL_GLOBAL int gmsgDgaxe = 0;
+DLL_GLOBAL int gmsgSpecialCrossHair = 0;
 DLL_GLOBAL int gmsgHitMsg = 0;
 DLL_GLOBAL int gmsgHeadIcon = 0;
 DLL_GLOBAL int gmsgScoreAttrib = 0;
@@ -212,7 +212,7 @@ void LinkUserMessages()
 	gmsgShowTimer = REG_USER_MSG("ShowTimer", 0);
 	gmsgHudTextArgs = REG_USER_MSG("HudTextArgs", -1);
 	gmsgShowWin = REG_USER_MSG("ShowWin", -1);
-	gmsgDgaxe = REG_USER_MSG("Dgaxe", -1);
+	gmsgSpecialCrossHair = REG_USER_MSG("SpecialCrossHair", -1);
 	gmsgHeadIcon = REG_USER_MSG("HeadIcon", -1);
 
 	gmsgZBSTip = REG_USER_MSG("ZBSTip", -1);

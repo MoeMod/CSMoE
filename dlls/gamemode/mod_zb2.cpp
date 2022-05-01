@@ -357,11 +357,11 @@ void CPlayerModStrategy_ZB2::Zombie_HealthRecoveryThink()
 			// effects
 			if (m_pPlayer->m_ZombieClass)
 			{
-				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "resident") || !stricmp(m_pPlayer->m_ZombieClass, "witch"))
+				if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "resident") || !stricmp(m_pPlayer->m_ZombieClass, "witch") || !stricmp(m_pPlayer->m_ZombieClass, "spider"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_female.wav\n");
 				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_teleport.wav\n");
-				else if (!stricmp(m_pPlayer->m_ZombieClass, "teleport"))
+				else if (!stricmp(m_pPlayer->m_ZombieClass, "revival"))
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal_revival.wav\n");
 				else
 					CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/zombi_heal.wav\n");
@@ -451,7 +451,9 @@ void CPlayerModStrategy_ZB2::Pain(int m_LastHitGroup, bool HasArmour)
 {
 	if (m_pPlayer->m_ZombieClass)
 	{
-		if(stricmp(m_pPlayer->m_ZombieClass, "revival") || !m_pPlayer->m_iZombieRevivalEnabled)
+		if(!stricmp(m_pPlayer->m_ZombieClass, "revival") && (m_pPlayer->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
+			return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
+		else
 			m_flTimeNextZombieHealthRecovery = gpGlobals->time + 3.0s;
 	}
 	return CPlayerModStrategy_ZB1::Pain(m_LastHitGroup, HasArmour);
@@ -519,7 +521,7 @@ void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 
 	if (m_pPlayer->m_ZombieClass)
 	{
-		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "flying"))
+		if (!stricmp(m_pPlayer->m_ZombieClass, "speed") || !stricmp(m_pPlayer->m_ZombieClass, "booster") || !stricmp(m_pPlayer->m_ZombieClass, "teleport") || !stricmp(m_pPlayer->m_ZombieClass, "flying") || !stricmp(m_pPlayer->m_ZombieClass, "spider"))
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution_female.wav", VOL_NORM, ATTN_NORM);
 		else
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_BODY, "zombi/zombi_evolution.wav", VOL_NORM, ATTN_NORM);
@@ -547,7 +549,11 @@ int CPlayerModStrategy_ZB2::AddToFullPack_Post(struct entity_state_s* state, int
 
 void CPlayerModStrategy_ZB2::OnTouch(CBaseEntity* other)
 {
-	
+	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "meatwall") && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+	{
+		m_pPlayer->m_iBuff |= BUFF_RUSHENTITY;
+	}
+
 	if (m_pPlayer->m_bIsZombie && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "boomer") && m_pCharacter_ZB2->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
 	{
 		if (!other->IsPlayer())

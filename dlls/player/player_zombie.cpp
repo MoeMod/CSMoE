@@ -131,6 +131,12 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/akshazombie_death1.wav");
 	PRECACHE_SOUND("zombi/akshazombie_death2.wav");
 	PRECACHE_SOUND("zombi/boomer_death.wav");
+	PRECACHE_SOUND("zombi/spider_death1.wav");
+	PRECACHE_SOUND("zombi/spider_death2.wav");
+	PRECACHE_SOUND("zombi/deathknight_death1.wav");
+	PRECACHE_SOUND("zombi/deathknight_death2.wav");
+	PRECACHE_SOUND("zombi/meatwallzombie_death1.wav");
+	PRECACHE_SOUND("zombi/meatwallzombie_death2.wav");
 
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
@@ -156,6 +162,12 @@ void PlayerZombie_Precache()
 	PRECACHE_SOUND("zombi/akshazombie_hurt2.wav");
 	PRECACHE_SOUND("zombi/boomer_hurt1.wav");
 	PRECACHE_SOUND("zombi/boomer_hurt2.wav");
+	PRECACHE_SOUND("zombi/spider_hurt1.wav");
+	PRECACHE_SOUND("zombi/spider_hurt2.wav");
+	PRECACHE_SOUND("zombi/deathknight_hurt1.wav");
+	PRECACHE_SOUND("zombi/deathknight_hurt2.wav");
+	PRECACHE_SOUND("zombi/meatwallzombie_hurt1.wav");
+	PRECACHE_SOUND("zombi/meatwallzombie_hurt2.wav");
 
 	PRECACHE_SOUND("zombi/zombi_heal.wav");
 	PRECACHE_SOUND("zombi/zombi_heal_female.wav");
@@ -188,6 +200,9 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombiaksha.mdl");
 	PRECACHE_MODEL("models/v_knife_zombiboomer.mdl");
 	PRECACHE_MODEL("models/v_knife_zombinemesis.mdl");
+	PRECACHE_MODEL("models/v_knife_zombispider.mdl");
+	PRECACHE_MODEL("models/v_knife_zombideathknight.mdl");
+	PRECACHE_MODEL("models/v_knife_zombimeatwall.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -213,6 +228,9 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_zombibomb_aksha_host.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_aksha.mdl");
 	PRECACHE_MODEL("models/v_zombibomb_boomer.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_spider.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_deathknight.mdl");
+	PRECACHE_MODEL("models/v_zombibomb_meatwall.mdl");
 
 	PRECACHE_MODEL("models/@frogvari_v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/@frogvari_v_zombibomb-deimos.mdl");
@@ -238,6 +256,9 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/@frogvari_v_zombibomb_aksha_host.mdl");
 	PRECACHE_MODEL("models/@frogvari_v_zombibomb_aksha.mdl");
 	PRECACHE_MODEL("models/@frogvari_v_zombibomb_boomer.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_spider.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_deathknight.mdl");
+	PRECACHE_MODEL("models/@frogvari_v_zombibomb_meatwall.mdl");
 
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
@@ -282,6 +303,9 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/boomer_zombi_host/boomer_zombi_host.mdl");
 	PRECACHE_MODEL("models/player/boomer_zombi_origin/boomer_zombi_origin.mdl");
 	PRECACHE_MODEL("models/player/zbs_deimos2_zombi/zbs_deimos2_zombi.mdl");
+	PRECACHE_MODEL("models/player/zombi_spider/zombi_spider.mdl");
+	PRECACHE_MODEL("models/player/zombi_deathknight/zombi_deathknight.mdl");
+	PRECACHE_MODEL("models/player/zombi_meatwall/zombi_meatwall.mdl");
 }
 
 }

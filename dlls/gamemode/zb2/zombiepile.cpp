@@ -57,9 +57,10 @@ void CZombiePile::Slowdown()
 		if (pPlayer->m_bIsZombie)
 			continue;
 
-		MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pPlayer->pev);
-		WRITE_BYTE(10);	//type
-		WRITE_SHORT(ENTINDEX(pPlayer->edict()));	//entity
+		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pPlayer->pev);
+		WRITE_BYTE(4);
+		WRITE_SHORT(pPlayer->entindex());
+		WRITE_BYTE(10);
 		MESSAGE_END();
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgShake, NULL, pPlayer->pev);
@@ -310,9 +311,10 @@ void CZombiePile::Explosion()
 			if (flAdjustedDamage > 0.0f)
 				pEntity->TakeDamage(pev, pevAttacker, flAdjustedDamage, DMG_EXPLOSION);
 
-			MESSAGE_BEGIN(MSG_ALL, gmsgHeadIcon, NULL, pPlayer->pev);
-			WRITE_BYTE(10);	//type
-			WRITE_SHORT(ENTINDEX(pPlayer->edict()));	//entity
+			MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, pPlayer->pev);
+			WRITE_BYTE(10);
+			WRITE_SHORT(pPlayer->entindex());
+			WRITE_BYTE(0);
 			MESSAGE_END();
 
 			auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(pPlayer->m_pModStrategy.get());

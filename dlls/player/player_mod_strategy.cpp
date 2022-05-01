@@ -377,7 +377,7 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}
 		m_pPlayer->GiveNamedItem("weapon_hegrenade");
-		m_pPlayer->GiveNamedItem("knife_magicknife");
+		m_pPlayer->GiveNamedItem("knife_whipsword");
 		return;
 	}
 	
@@ -385,7 +385,12 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 	m_pPlayer->m_bHasPrimary = false;
 
 	m_pPlayer->GiveNamedItem("weapon_zombibomb");
-	m_pPlayer->GiveNamedItem("knife_zombi");
+	if (m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "deathknight"))
+	{
+		m_pPlayer->GiveNamedItem("knife_zombi_z5");
+	}
+	else
+		m_pPlayer->GiveNamedItem("knife_zombi");
 	m_pPlayer->GiveNamedItem("weapon_zombibomb2");
 	
 

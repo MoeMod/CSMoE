@@ -233,7 +233,7 @@ void CHud :: Init( void )
 	m_Flash.Init();
 	m_Message.Init();
 	m_StatusBar.Init();
-	m_Dgaxe.Init();
+	m_SpecialCrossHair.Init();
 	m_ShowWin.Init();
 	m_HeadIcon.Init();
 	m_DeathNotice.Init();

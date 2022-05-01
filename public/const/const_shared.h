@@ -50,5 +50,6 @@ constexpr DamageType_t DMG_EXPLOSION = (1 << 24);
 constexpr DamageType_t DMG_BACKATK = (1 << 25);			// Knife back atk
 constexpr DamageType_t DMG_CRITICAL = (1 << 26);			// Critical
 constexpr DamageType_t DMG_INFECTION = (1 << 27);			// Infection
+constexpr DamageType_t DMG_NOMORALE = (1 << 28);			// Infection
 
 constexpr int WEAPON_IS_ONTARGET = 0x40;

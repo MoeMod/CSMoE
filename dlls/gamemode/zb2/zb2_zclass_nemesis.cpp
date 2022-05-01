@@ -38,7 +38,7 @@ CZombieClass_Nemesis::CZombieClass_Nemesis(CBasePlayer *player, ZombieLevel iEvo
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 10000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 20000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 5000;
 

@@ -134,7 +134,7 @@ float CPlayerModStrategy_ZB3::AdjustDamageTaken(entvars_t * pevInflictor, entvar
 
 	// morale calc
 	CBasePlayer *pPlayerAttacker = dynamic_ent_cast<CBasePlayer *>(pevAttacker);
-	if (pPlayerAttacker && pPlayerAttacker->m_pActiveItem)
+	if (pPlayerAttacker && pPlayerAttacker->m_pActiveItem && !(bitsDamageType & DMG_NOMORALE))
 	{
 		// knife doesn't have extra damage
 		if(pPlayerAttacker->m_pActiveItem->m_iId != WEAPON_KNIFE)
@@ -158,14 +158,16 @@ void CPlayerModStrategy_ZB3::OnThink()
 		// respawn after 5 secs
 		if (!m_pPlayer->m_bHeadshotKilled && gpGlobals->time > m_flDeadTime + 1.0s)
 		{
-			const float health = max(m_flBackupMaxHealth, 1000);
+			const float health = max(m_flBackupMaxHealth, 3000);
 			const float armor = m_flBackupArmor;
 
-			m_pPlayer->RoundRespawn();
-			BecomeZombie(m_pPlayer->m_iZombieLevel);
-
-			m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
+			m_pPlayer->RoundRespawn();		
 			m_pPlayer->pev->armorvalue = armor;
+			BecomeZombie(m_pPlayer->m_iZombieLevel);	//set health
+
+			if(m_pPlayer->pev->health < health)
+				m_pPlayer->pev->max_health = m_pPlayer->pev->health = health;
+
 			m_pPlayer->SetScoreboardAttributes();
 
 			UTIL_BroadcastStuffText("spk \"zombi_comeback\"\n");
@@ -190,8 +192,10 @@ void CPlayerModStrategy_ZB3::OnKilled(entvars_t * pKiller, entvars_t * pInflicto
 		m_pPlayer->m_bHeadshotKilled = false;
 		m_pPlayer->m_LastHitGroup = HITGROUP_GENERIC; // fix headshot cannot respawn (Bad Solution)
 		m_pPlayer->m_bIsZombie = true;
-		m_pPlayer->pev->max_health = 6000.0f;
+		m_pPlayer->m_iZombieLevel = ZOMBIE_LEVEL_HOST;
+		m_pPlayer->pev->max_health = 3000.0f;
 		m_pPlayer->pev->armorvalue = 1000.0f;
+		m_flRagePercent = 0;
 		m_pModZB3->TeamCheck();
 	}
 
@@ -211,7 +215,8 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 
 	SetHero(true);
 	m_pPlayer->SetScoreboardAttributes();
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 3000.0f;
+	m_pPlayer->pev->max_health = 10000.0f;
+	m_pPlayer->pev->health += 2000.0f;
 	m_pPlayer->pev->armorvalue = 1000.0f;
 	SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", m_pPlayer->m_bIsFemale ? "heroine" : "hero");
 
@@ -288,11 +293,13 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 		return 0;
 	}
 
-	if (m_pPlayer->m_bHasBuffWpn & BUFF_REVIVEGUN && m_pPlayer->m_iBuff & BUFF_REVIVE && (bitsDamageType & DMG_BULLET))
+	if (m_pPlayer->m_iBuff & BUFF_REVIVE && (bitsDamageType & DMG_BULLET))
 	{
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
 		CSDM_DoRandomSpawn(m_pPlayer);
+		m_pPlayer->m_iBuff &= ~BUFF_REVIVE;
+		m_pPlayer->m_iReviveGunShotsFired = 0;
 		if (pWeapon)
 		{
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))

@@ -119,7 +119,12 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_charge",//ZOMBIE_SKILL_CHARGE
 		"resource/zombi/zombieskill_discharge",//ZOMBIE_SKILL_DISCHARGE
 		"resource/zombi/zombieskill_zombiselfdestruct",//ZOMBIE_SKILL_SELFDESTRUCT
-		"resource/zombi/zombieskill_zombicreaterocket"//ZOMBIE_SKILL_CREATEROCKET
+		"resource/zombi/zombieskill_zombicreaterocket",//ZOMBIE_SKILL_CREATEROCKET
+		"resource/zombi/zombieskill_webshooter",//ZOMBIE_SKILL_WEBSHOOTER
+		"resource/zombi/zombieskill_webbomb",//ZOMBIE_SKILL_WEBBOMB
+		"resource/zombi/zombieskill_protect",//ZOMBIE_SKILL_PROTECT
+		"resource/zombi/zombieskill_dogshoot",//ZOMBIE_SKILL_DOGSHOOT
+		"resource/zombi/zombieskill_rush",//ZOMBIE_SKILL_RUSH
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -144,6 +149,14 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_akshazb",//ZOMBIE_CLASS_AKSHA
 		"resource/zombi/zombietype_boomerzb",//ZOMBIE_CLASS_BOOMER
 		"resource/zombi/zombietype_nemesiszb",//ZOMBIE_CLASS_NEMESIS
+		"resource/zombi/zombietype_spiderzb",//ZOMBIE_CLASS_SPIDER
+		"resource/zombi/zombietype_deathknightzb",//ZOMBIE_CLASS_DEATHKNIGHT
+		"resource/zombi/zombietype_meatwallzb",//ZOMBIE_CLASS_MEATWALL
+		"resource/zombi/zombietype_zbzdarknormalzb",//ZOMBIE_CLASS_Z4NORMAL
+		"resource/zombi/zombietype_zbzdarkspeedzb",//ZOMBIE_CLASS_Z4SPEED
+		"resource/zombi/zombietype_zbzdarkheavyzb",//ZOMBIE_CLASS_Z4HEAVY
+		"resource/zombi/zombietype_zbzdarkhiddenzb",//ZOMBIE_CLASS_Z4HIDDEN
+		"resource/zombi/zombietype_zbzdarkhumpbackzb",//ZOMBIE_CLASS_Z4HUMPBACKS
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

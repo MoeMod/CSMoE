@@ -237,7 +237,7 @@ namespace sv {
 
 						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
 
-						if (player->m_bIsZombie)
+						if (player->m_bIsZombie && ~(player->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
 						{
 							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 							if (strategy)
@@ -430,7 +430,7 @@ namespace sv {
 			m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 			m_pPlayer->m_bShieldDrawn = false;
 #ifndef CLIENT_DLL
-			MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+			MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 			WRITE_BYTE(0);
 			WRITE_BYTE(m_CrossHairState);
 			MESSAGE_END();
@@ -610,7 +610,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -644,13 +644,11 @@ namespace sv {
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 
-				if (player->m_bIsZombie && player->m_ZombieClass)
+				if (player->m_bIsZombie)
 				{
 					if (IsPrimaryAttack)
 					{
-						
-
-						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+						if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
 							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 							if (strategy)
@@ -919,10 +917,10 @@ namespace sv {
 					ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
 					CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
-					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie && pPlayer->m_ZombieClass)
+					if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie)
 					{
 						pPlayer->m_flVelocityModifier = 1.0;
-						if (stricmp(pPlayer->m_ZombieClass, "revival") || !pPlayer->m_iZombieRevivalEnabled)
+						if (!(pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
 							Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
 
@@ -995,7 +993,7 @@ namespace sv {
 	void CKnifeDgaxe::Holster(int skiplocal)
 	{
 #ifndef CLIENT_DLL
-		MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+		MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 		WRITE_BYTE(0);
 		WRITE_BYTE(3);
 		MESSAGE_END();
@@ -1124,7 +1122,7 @@ namespace sv {
 		{
 			if (m_CrossHairState != m_CrossHairStateStored)
 			{
-				MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+				MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 				WRITE_BYTE(0);
 				WRITE_BYTE(m_CrossHairState);
 				MESSAGE_END();

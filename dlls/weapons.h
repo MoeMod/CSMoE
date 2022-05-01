@@ -662,6 +662,147 @@ private:
 	Vector m_vecStartVelocity;
 };
 
+class CCannonEX;
+#ifndef CLIENT_DLL
+class CCannonEXDragon : public CBaseAnimating
+{
+public:
+	CCannonEXDragon()
+	{
+		m_pOwner = NULL;
+		m_pWeapon = NULL;
+		m_flAttackTime = invalid_time_point;
+		m_flSoundTime = invalid_time_point;
+		m_flEffectTime = invalid_time_point;
+
+		InitializeData();
+	}
+
+public:
+	void Spawn(void);
+	void Precache(void);
+	void UpdateOnRemove(void);
+
+public:
+	float GetDamageAmount(void);
+	float GetKickRateMagnitude(void);
+	duration_t DragonAppearance(void);
+	void InitializeData(void);
+
+public:
+	void RemoveDragon(void);
+
+public:
+	void EXPORT CCannonEXDragonThink(void);
+
+public:
+	void DragonInit(CBasePlayer* pOwner, CCannonEX* pWeapon);
+	void Attack(void);
+	void DragonFire(Vector vecSrc, Vector vecOffset, Vector vecDir, std::set<CBaseEntity*>* pSet);
+	void ApplyDamageForce(CBaseEntity* pOther);
+	void EF_Appear(void);
+	void EF_Hide(void);
+
+public:
+	CBasePlayer* m_pOwner;
+	CCannonEX* m_pWeapon;
+
+	time_point_t m_flAttackTime;
+	time_point_t m_flSoundTime;
+	time_point_t m_flEffectTime;
+
+	int m_iEffectState;
+
+	int m_usFireCannonEx;
+	float m_flDragonHeight;
+	duration_t m_flFadeInTime;
+	duration_t m_flFadeOutTime;
+	float m_flDamage;
+	float m_flForceMagnitude;
+	duration_t m_flAttackInterval;
+	float m_flAttackRange;
+	float m_flFireOffsetStrength;
+	float m_flFlameDirectionOffset;
+	duration_t m_flFlameInterval;
+	float m_flFlameVelocity;
+	duration_t m_flSoundInterval;
+};
+
+
+#define SPEAR_MAX_CROWD_PLAYERS	20
+#define SPEAR_MAX_CROWD_MONSTERS	12
+#define SPEAR_PLAYER_PUSH_INTERVAL		0.08s
+
+class CSpear : public CBaseEntity
+{
+public:
+	static CSpear* Create(void);
+
+public:
+	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
+	void Spawn(void);
+	void Precache(void);
+
+	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier)
+	{
+		flGround = flAir = flAirStrafing = flDucking = 0.0;
+
+		flVelocityModifier = 1.0;
+
+		return TRUE;
+	}
+
+public:
+	void EXPORT IgniteThink(void);
+	void EXPORT FollowThink(void);
+	void EXPORT SpearTouch(CBaseEntity* pOther);
+
+public:
+	void Update(void);
+	void MaterialSound(void);
+
+	void HitDamage(CBaseEntity* pOther);
+	void AddPlayerToCrowd(CBasePlayer* pPlayer);
+
+public:
+	void Explode(duration_t flTimeRemove, bool bDetonate);
+
+public:
+	CBasePlayer* m_pOwner;
+	EHANDLE m_hLockingEntity;
+	EHANDLE m_rgCrowdPlayers[SPEAR_MAX_CROWD_PLAYERS];
+	int m_iNumCrowdPlayers;
+	float m_flPushVelocityModifier;
+	EHANDLE m_hEntityHit;
+	int m_LastHitGroup;
+	EHANDLE m_rgCrowdMonsters[SPEAR_MAX_CROWD_MONSTERS];
+	Vector m_rgvecCrowdPushVelocity[SPEAR_MAX_CROWD_MONSTERS];
+	time_point_t m_rgflTimeCrowdMovement[SPEAR_MAX_CROWD_MONSTERS];
+	int m_iNumCrowdMonsters;
+	time_point_t m_flTimeNextBleed;
+	BOOL m_bLockingTarget;
+	Vector m_vecLockingPos;
+	Vector m_vecVelocity;
+	Vector m_vecDirection;
+	float m_flPushForce;
+	float m_flPushBoostVel;
+	float m_flCrowdForce;
+	float m_flCrowdBoostVel;
+	int m_iArrowModel;
+	int m_iExplodeModel;
+	int m_iBeamModelIndex;
+	time_point_t m_flTimeExplode;
+	duration_t m_flPushDuration;
+	time_point_t m_flTimeStopPushing;
+	float m_flHitDamage;
+	float m_flExplodeDamage;
+	float m_flOwnerDamageModifier;
+	float m_flCrowdDamage;
+	float m_flExplodeForce;
+	int m_iExplosionCount;
+};
+#endif
+
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {

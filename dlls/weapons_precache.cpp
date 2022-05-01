@@ -287,6 +287,12 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_m95tiger");
 	UTIL_PrecacheOtherWeapon("knife_y22s1holyswordmb");
 	UTIL_PrecacheOtherWeapon("knife_magicknife");
+	UTIL_PrecacheOtherWeapon("knife_whipsword");
+	UTIL_PrecacheOtherWeapon("knife_zombi_z5");
+	UTIL_PrecacheOtherWeapon("z4b_dualkukri");
+	UTIL_PrecacheOtherWeapon("weapon_cannonex");
+	UTIL_PrecacheOther("cannonex_dragon");
+	UTIL_PrecacheOtherWeapon("weapon_speargun");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -572,7 +572,7 @@ hit_result_t CKnifeDualsword::KnifeAttack(float flDamage, float flRadius, float 
 		if (pEntity->pev->takedamage == DAMAGE_NO)
 			continue;
 
-		if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+		if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 			continue;
 
 		if (!AngularCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr, IsPrimaryAttack))
@@ -605,7 +605,7 @@ hit_result_t CKnifeDualsword::KnifeAttack(float flDamage, float flRadius, float 
 		{
 			CBasePlayer* player = (CBasePlayer*)pEntity;
 
-			if (player->m_bIsZombie && player->m_ZombieClass)
+			if (player->m_bIsZombie)
 			{	
 				if (IsPrimaryAttack)
 				{	
@@ -616,7 +616,7 @@ hit_result_t CKnifeDualsword::KnifeAttack(float flDamage, float flRadius, float 
 					else
 						ApplyKnockbackData(player, vecDir, { 0.0, 0.0, 0.0, 0.0, 0.5f });
 
-					if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+					if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 					{
 						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
 						if (strategy)
@@ -969,7 +969,7 @@ public:
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -1241,7 +1241,7 @@ public:
 
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 150;	//380 original
+			flDamage = 240;	//380 original
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 380;
 #endif

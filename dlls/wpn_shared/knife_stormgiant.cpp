@@ -152,8 +152,7 @@ public:
 		float flDamage = 35;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			//flDamage = 420.0f;
-			flDamage = 252.0f;
+			flDamage = 420.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -186,8 +185,7 @@ public:
 		float flDamage = 75;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			//flDamage = 862.0f;
-			flDamage = 518.0f;
+			flDamage = 862.0f;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -396,7 +394,7 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 				continue;
 
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr))
@@ -484,7 +482,7 @@ void CKnifeStormgiant::DelayPrimaryAttack()
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 				continue;
 
 			if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 105.0, c, &tr))
@@ -606,7 +604,7 @@ void CKnifeStormgiant::ExtraAttack()
 		if (pEntity->pev->takedamage == DAMAGE_NO)
 			continue;
 
-		if (bIsWallBetweenEntity(pEntity, m_pPlayer))
+		if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, m_pPlayer))
 			continue;
 
 		if (!AngularCheck(pEntity, m_pPlayer, vecSrc, vecForward, vecForward2D, 110.0, c, &tr))

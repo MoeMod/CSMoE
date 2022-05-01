@@ -549,7 +549,7 @@ BOOL CHuntbow::Deploy(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->UpdateShieldCrosshair(FALSE);
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe, NULL, m_pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 	WRITE_BYTE(1);
 	WRITE_BYTE(HUNTBOW_AIM_IDLE);
 	MESSAGE_END();
@@ -693,7 +693,7 @@ void CHuntbow::HuntbowFire(float flSpread, duration_t flCycleTime, BOOL fChargeI
 		}	
 	}
 
-	MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgDgaxe, NULL, m_pPlayer->pev);
+	MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 	WRITE_BYTE(1);
 	WRITE_BYTE(m_CrossHairState);
 	MESSAGE_END();
@@ -745,7 +745,7 @@ void CHuntbow::OnAttack2Released(void)
 void CHuntbow::Holster(int skiplocal)
 {
 #ifndef CLIENT_DLL
-	MESSAGE_BEGIN(MSG_ONE, gmsgDgaxe);
+	MESSAGE_BEGIN(MSG_ONE, gmsgSpecialCrossHair);
 	WRITE_BYTE(0);
 	WRITE_BYTE(3);
 	MESSAGE_END();
@@ -1085,7 +1085,7 @@ void CHuntbow::ItemPostFrame(void)
 #ifndef CLIENT_DLL
 		if (m_CrossHairState != m_CrossHairStateStored)
 		{
-			MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgDgaxe, NULL, m_pPlayer->pev);
+			MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgSpecialCrossHair, NULL, m_pPlayer->pev);
 			WRITE_BYTE(1);
 			WRITE_BYTE(m_CrossHairState);
 			MESSAGE_END();

@@ -629,7 +629,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -724,7 +724,7 @@ namespace sv {
 						//charge
 						ApplyKnockbackData(player, vecDir, { 1500, 1000, 1000, 1500, 1.0f });
 
-						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+						if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
 							player->pev->velocity.z = 260.0;
 						}
@@ -735,7 +735,7 @@ namespace sv {
 						//parying
 						ApplyKnockbackData(player, vecDir, { 1500, 1000, 1000, 1500, 1.0f });
 
-						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+						if (!(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
 							player->pev->velocity.z = 260.0;
 						}

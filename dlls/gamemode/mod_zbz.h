@@ -52,6 +52,7 @@ public:
 
 	bool ClientCommand(const char* pcmd) override;
 	void OnSpawn() override;
+	void Evolution(ZombieLevel iEvolutionLevel) override;
 	void BecomeHuman() override;
 	void BecomeZombie(ZombieLevel iEvolutionLevel) override;
 	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
@@ -76,6 +77,8 @@ public:
 	void Event_OnPickAsZombie(CBasePlayer* who) override;
 	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override;
 	void GrenadeExploded(Vector vecOrigin) override;
+	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override;
+	
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);
@@ -95,6 +98,8 @@ public:
 		MESSAGE_END();
 	}
 	void ClearFire() { m_bIsFiring = false;  m_vecFireList.fill(invalid_time_point); }
+	void SetClassChangeTime(int type, int value) { m_iChangeClassTime[type] = value; }
+	int GetClassChangeTime(int type) { return m_iChangeClassTime[type]; }
 
 protected:
 	void UpdatePlayerEvolutionHUD() override;
@@ -122,11 +127,14 @@ private:
 	void AddLevel(int lv);
 	void SetLevel(int lv);
 	bool UpgradeSkill();
+	time_point_t m_flNextTimeChangeZombie;
+	int m_iZB5EvolutionEffect;
 
 	std::set<std::shared_ptr<CZombieZSkill_Base>> m_vecSkill;
 	std::set<byte> m_setSkillID;
 
 private:
+	int m_iChangeClassTime[3];
 	bool m_bLadderDisabled;
 	std::array<time_point_t, MAX_CLIENTS + 1> m_vecFireList;
 	time_point_t m_flFireDmg;

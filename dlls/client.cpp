@@ -31,7 +31,7 @@
 #include "player/player_zombie.h"
 #include "weapons_buy.h"
 #include "cbase/cbase_hash.h"
-
+#include "wpn_shared/wpn_cannonex.h"
 #ifdef XASH_DEDICATED
 #include "player/player_fuck.h"
 #endif
@@ -3374,6 +3374,7 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				if (player->m_bIsZombie)
 				{
 					player->SelectItem("knife_zombi");
+					player->SelectItem("knife_zombi_z5");
 					player->SelectItem("knife_zombi_z4");
 				}
 				player->SelectItem(pcmd);
@@ -4378,6 +4379,25 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
    if (CheckPlayerPVSLeafChanged (host, hostnum))
       ResetPlayerPVS (host, hostnum);
 
+   CBasePlayer* pPlayer = (CBasePlayer*)GET_PRIVATE(host);
+
+   if (pPlayer && pPlayer->IsPlayer())
+   {
+	   if (pPlayer->m_pActiveItem)
+	   {
+		   if (!Q_strcmp(STRING(pPlayer->m_pActiveItem->pev->classname), "weapon_cannonex"))
+		   {
+			   CCannonEX* pWeapon = (CCannonEX*)pPlayer->m_pActiveItem;
+
+			   if (pWeapon && pWeapon->m_pDragon)
+			   {
+				   if (GET_PRIVATE(ent) == pWeapon->m_pDragon)
+					   goto SEND_ENTITY;
+			   }
+		   }
+	   }
+   }
+
    if (ent != host)
    {
       if (!CheckEntityRecentlyInPVS (hostnum, e, gpGlobals->time))
@@ -4415,6 +4435,8 @@ int EXT_FUNC AddToFullPack (struct entity_state_s *state, int e, edict_t *ent, e
 
       UTIL_UnsetGroupTrace ();
    }
+
+	SEND_ENTITY:
 
    Q_memset (state, 0, sizeof (entity_state_t));
 

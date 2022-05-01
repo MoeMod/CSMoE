@@ -183,8 +183,11 @@ TL_ADD(CM32Venom)
 TL_ADD(CM95Tiger)
 TL_ADD(CKnifeY22S1HolySwordMB)
 TL_ADD(CKnifeMagicKnife)
-
-
+TL_ADD(CKnifeWhipSword)
+TL_ADD(CKnifeZombiZ5)
+TL_ADD(CKnifeDualKukri)
+TL_ADD(CCannonEX)
+TL_ADD(CSpearGun)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -225,6 +228,8 @@ TL_ADD(CRailBeamAmmo)
 TL_ADD(CSVDEXGrenadeAmmo)
 TL_ADD(CPlasmaAmmo)
 TL_ADD(CReviveGunAmmo)
+TL_ADD(CCannonEXAmmo)
+TL_ADD(CSpearAmmo)
 TL_ADD(CM32VenomGrenade)
 TL_ADD(CWeaponBox)
 TL_ADD(CArmoury)
@@ -429,6 +434,10 @@ TL_ADD(CM32VenomRocket)
 TL_ADD(CM95TigerNet)
 TL_ADD(CM95TigerEFTiger)
 TL_ADD(CMagicCircle)
+TL_ADD(CWebBomb)
+TL_ADD(CZombiDogEgg)
+TL_ADD(CCannonEXDragon)
+TL_ADD(CSpear)
 #endif
 
 TL_END(AllEntityTypeList)

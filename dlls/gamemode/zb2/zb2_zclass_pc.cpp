@@ -38,7 +38,7 @@ CZombieClass_Pc::CZombieClass_Pc(CBasePlayer *player, ZombieLevel iEvolutionLeve
 	Evolution(iEvolutionLevel);
 
 	// set default property
-	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 6000;
+	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 4000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 1000;
 
@@ -101,7 +101,10 @@ void CZombieClass_Pc::ResetMaxSpeed() const
 
 float CZombieClass_Pc::AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) const
 {
-	flDamage *= 0.9;
+	if (m_pZombieSkill->GetStatus() == SKILL_STATUS_USING)
+		flDamage *= 0.1;
+	else
+		flDamage *= 0.9;
 	return CBaseZombieClass_ZB2::AdjustDamageTaken(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 

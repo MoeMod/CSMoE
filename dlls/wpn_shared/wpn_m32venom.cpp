@@ -139,7 +139,7 @@ void EXPORT CM32VenomMark::VenomThink(void)
 
 			float flDamage = GetVenomDamage();
 
-			pEntity->TakeDamage(pev, m_pAttacker->pev, flDamage, DMG_NEVERGIB | DMG_EXPLOSION);
+			pEntity->TakeDamage(pev, m_pAttacker->pev, flDamage, DMG_NEVERGIB | DMG_EXPLOSION | DMG_NOMORALE);
 		}
 
 	}
@@ -269,7 +269,7 @@ void CM32VenomRocket::VenomThink(void)
 			if (pEntity->pev == pAttackPlayer->pev)
 				continue;
 
-			pEntity->TakeDamage(pev, pAttackPlayer->pev, GetVenomDamage(), DMG_NEVERGIB | DMG_EXPLOSION);
+			pEntity->TakeDamage(pev, pAttackPlayer->pev, GetVenomDamage(), DMG_NEVERGIB | DMG_EXPLOSION | DMG_NOMORALE);
 		}
 
 	}

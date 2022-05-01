@@ -596,7 +596,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -637,7 +637,7 @@ namespace sv {
 			{
 				CBasePlayer* player = (CBasePlayer*)pEntity;
 
-				if (player->m_bIsZombie)
+				if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 				{
 					Vector vecDir = (player->pev->origin - m_pPlayer->pev->origin);
 					vecDir.z = 0;
@@ -690,22 +690,14 @@ namespace sv {
 					{
 						//charge
 						ApplyKnockbackData(player, vecDir, { 1500, 1000, 1000, 1500, 1.0f });
-
-						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-						{
-							player->pev->velocity.z = 260.0;
-						}
+						player->pev->velocity.z = 260.0;
 						break;
 					}
 					case 4:
 					{
 						//parying
 						ApplyKnockbackData(player, vecDir, { 1500, 1000, 1000, 1500, 1.0f });
-
-						if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
-						{
-							player->pev->velocity.z = 260.0;
-						}
+						player->pev->velocity.z = 260.0;
 						break;
 					}
 					}

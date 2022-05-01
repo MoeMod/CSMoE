@@ -481,6 +481,7 @@ void CMonster::Precache()
 	PRECACHE_SOUND("zombi/zombi_attack_2.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_3.wav");
 	PRECACHE_MODEL("models/player/zombi_origin/zombi_origin.mdl");
+	PRECACHE_MODEL("models/monster/zombiedog.mdl");
 }
 
 void CMonster::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
@@ -945,8 +946,15 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
-
+		{
+			Q_strcpy(szAnim, "zbs_attack_walk");	//zombiedog dont have ref_shoot_knife
+			animDesired = LookupSequence(szAnim);
+			if (animDesired == -1)
+			{
+				animDesired = 0;
+			}
+		}
+			
 		pev->sequence = animDesired;
 		pev->frame = 0;
 
@@ -965,7 +973,14 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 
 		animDesired = LookupSequence(szAnim);
 		if (animDesired == -1)
-			animDesired = 0;
+		{
+			Q_strcpy(szAnim, "zbs_attack_walk");	//zombiedog dont have ref_shoot_knife
+			animDesired = LookupSequence(szAnim);
+			if (animDesired == -1)
+			{
+				animDesired = 0;
+			}
+		}
 
 		pev->sequence = animDesired;
 		pev->frame = 0;

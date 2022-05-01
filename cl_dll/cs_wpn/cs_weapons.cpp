@@ -819,6 +819,7 @@ WeaponCrosshairData CBasePlayerWeapon::GetCrosshairData(void)
 		iAccuraySpeed = 170;
 		break;
 	case WEAPON_CHAINSAW:
+		break;
 	case WEAPON_M95TIGER:
 		break;
 	}

@@ -1632,7 +1632,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(pOther);
 
-	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie)
+	if (pPlayer->m_bIsVIP || pPlayer->m_bShieldDrawn || pPlayer->m_bIsZombie || pPlayer->m_iBuff & BUFF_GHOSTHUNTER)
 		return;
 
 	pPlayer->OnTouchingWeapon(this);
@@ -1661,12 +1661,6 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 				|| (pPlayer->IsBot() && (ctrl != NULL && !ctrl->IsWeaponUseable(pItem))))
 			{
 				return;
-			}
-
-			if (FClassnameIs(pItem->pev, "weapon_revivegun"))
-			{
-				pPlayer->m_bHasBuffWpn |= BUFF_REVIVEGUN;
-				//how check if has charged ? call back IsSignal fuction in CReviveGun
 			}
 
 			if (FClassnameIs(pItem->pev, "weapon_c4"))

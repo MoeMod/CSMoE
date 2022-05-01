@@ -57,7 +57,9 @@ public:
 	virtual void OnAdjustFireBullets3Dir(Vector& vecDir) = 0;
 	virtual void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) = 0;
 	virtual void OnGrenadeExploded(Vector vecOrigin) = 0;
-	
+	virtual void OnZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) = 0;
+	virtual void OnEvolution(ZombieLevel iEvolutionLevel) = 0;
+
 	virtual bool IsActivate() = 0;
 	virtual const char* GetName() const = 0;
 	virtual const char* GetDesc() const = 0;
@@ -96,6 +98,8 @@ public:
 	void OnAdjustFireBullets3Dir(Vector& vecDir) override {}
 	void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override {}
 	void OnGrenadeExploded(Vector vecOrigin) override {}
+	void OnZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override {};
+	void OnEvolution(ZombieLevel iEvolutionLevel) override {}
 
 	bool IsActivate() override { 
 		return (GetType() == TYPE_HUMAN && !m_pPlayer->m_bIsZombie)

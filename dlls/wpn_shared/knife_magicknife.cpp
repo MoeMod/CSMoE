@@ -309,7 +309,7 @@ namespace sv {
 			if (pEntity->pev->takedamage == DAMAGE_NO)
 				continue;
 
-			if (bIsWallBetweenEntity(pEntity, pAttackPlayer))
+			if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
 				continue;
 
 			if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
@@ -349,22 +349,17 @@ namespace sv {
 
 					if (!IsPrimaryAttack)
 					{
-						if (player->m_bIsZombie && player->m_ZombieClass)
+						if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 						{
-							if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+							player->pev->velocity.x = vecDir.x * 600;
+							player->pev->velocity.y = vecDir.y * 600;
+							player->pev->velocity.z = 400;
+
+							auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+							if (strategy)
 							{
-								
-
-								player->pev->velocity.x = vecDir.x * 600;
-								player->pev->velocity.y = vecDir.y * 600;
-								player->pev->velocity.z = 400;
-
-								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-								if (strategy)
-								{
-									strategy->SetStunSpeedTime(1.0s);
-									strategy->SetStunGravityTime(1.0s);
-								}
+								strategy->SetStunSpeedTime(1.0s);
+								strategy->SetStunGravityTime(1.0s);
 							}
 						}
 					}
@@ -478,16 +473,13 @@ namespace sv {
 						if (pNearest->IsPlayer())
 						{
 							CBasePlayer* player = (CBasePlayer*)pNearest;
-							if (player->m_bIsZombie && player->m_ZombieClass)
+							if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
 							{
-								if (stricmp(player->m_ZombieClass, "revival") || !player->m_iZombieRevivalEnabled)
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+								if (strategy)
 								{
-									auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-									if (strategy)
-									{
-										strategy->SetStunSpeedTime(3.0s);
-										strategy->SetStunGravityTime(3.0s);
-									}
+									strategy->SetStunSpeedTime(3.0s);
+									strategy->SetStunGravityTime(3.0s);
 								}
 							}
 						}
@@ -664,7 +656,7 @@ namespace sv {
 			m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.56s;
 			
 			SetThink(&CKnifeMagicKnife::DelaySecondaryAttack);
-			pev->nextthink = gpGlobals->time + 1.1s;
+			pev->nextthink = gpGlobals->time + 1.0s;
 			break;
 		}
 		case 2:

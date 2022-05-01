@@ -136,9 +136,6 @@ void CZombieBomb2::WeaponIdle(void)
 
 	if (m_flStartThrow != invalid_time_point)
 	{
-#ifndef CLIENT_DLL
-		m_pPlayer->Radio("%!MRAD_FIREINHOLE_ZB", "#Fire_in_the_hole");
-#endif
 		Vector angThrow = m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle;
 
 		if (angThrow.x < 0)
@@ -156,8 +153,19 @@ void CZombieBomb2::WeaponIdle(void)
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
 
 #ifndef CLIENT_DLL
-		CGrenade::ShootZombiBomb2(m_pPlayer->pev, vecSrc, vecThrow, 4.0s, m_pPlayer->m_iTeam, NULL, 50.0);
+		CGrenade::ShootZombiBomb2(m_pPlayer->pev, vecSrc, vecThrow, 4.0s, m_pPlayer->m_iTeam, NULL, 1.0);
 #endif
+
+#ifndef CLIENT_DLL
+		if (m_pPlayer->m_iZombieFlying)		//flying zombie attack anim
+		{
+			m_pPlayer->m_iZombieFlying = 0;
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("fly_bomb_shoot");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.86s;
+		}
+#endif
+
+		EMIT_SOUND_DYN(pev->owner, CHAN_WEAPON, "zombi/zombi_bomb_throw.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
 		SetPlayerShieldAnim();

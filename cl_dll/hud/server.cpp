@@ -31,6 +31,24 @@
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
 
+enum
+{
+	HUMAN_SKILL_KNIFE2X,
+	HUMAN_SKILL_HEADSHOT,
+	ZOMBIE_SKILL_HEAL,
+	ZOMBIE_SKILL_HEAL_HEAD,
+	CANNON_FLAME_BURN,
+	HUNTBOW_DMGREITERATION,
+	HUNTBOW_MARKZOMBIE,
+	TELEPORT_MARKEF,
+	HOLYBOMB_BURN,
+	LANCE_HIT,
+	ZOMBIE_SKILL_PILE,
+};
+
+void CreateAttachedEntitiesToPlayer(int entity, int type);
+void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
+
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
 	int iType;
@@ -41,12 +59,22 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	switch (iType)
 	{
 	case 1:
-		{
-			CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
-			if (pActiveBTEWeapon && pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
-				pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
-			break;
-		}
+	{
+		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
+		if (pActiveBTEWeapon && pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
+			pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
+		break;
+	}
+	case 4:
+	{
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+
+		CreateAttachedEntitiesToPlayer(arg1, arg2);
+
+		break;
+
+	}
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
@@ -58,6 +86,64 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	return 1;
 }
 
+void CreateAttachedEntitiesToPlayer(int entity, int type)
+{
+	int flags = FTENT_PERSIST | FTENT_FADEOUT | FTENT_SPRANIMATELOOP;
+	switch (type)
+	{
+	case HUMAN_SKILL_KNIFE2X:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_meleeup.spr"),
+			Vector(0.0, 0.0, 30.0), 10.0, TRUE, flags, 1.0, kRenderTransAdd, 1.0);
+		break;
+	}
+	case HUMAN_SKILL_HEADSHOT:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_skill_headshot.spr"),
+			Vector(0.0, 0.0, 30.0), 4.5, TRUE, flags, 1.0, kRenderTransAdd, 1.0);
+		break;
+	}
+	case ZOMBIE_SKILL_HEAL:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombihealer.spr"),
+			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case ZOMBIE_SKILL_HEAL_HEAD:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zombiheal_head.spr"),
+			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case CANNON_FLAME_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_burn01.spr"),
+			Vector(Com_RandomFloat(-5.0, 5.0), Com_RandomFloat(-5.0, 5.0), 0.0), 3, TRUE, flags, 0.3, kRenderTransAdd, 10.0);
+		break;
+	}
+	case HOLYBOMB_BURN:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/holybomb_burn.spr"),
+			Vector(0.0, 0.0, 30.0), 5.0, TRUE, flags, 0.9, kRenderTransAdd, 10.0);
+		break;
+	}
+	case LANCE_HIT:
+	{
+		flags = FTENT_PERSIST;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
+			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case ZOMBIE_SKILL_PILE:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zbt_slow.spr"),
+			Vector(0.0, 0.0, 40.0), 3.0, TRUE, flags, 1.0, kRenderTransAdd, 1.0);
+		break;
+	}
+	default:
+		break;
+	}
+}
 
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
 {
@@ -73,6 +159,9 @@ void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life,
 		gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", entity);
 		return;
 	}
+
+	if (!pEnity->index)	//avoid sent to world origin
+		return;
 
 	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_DefaultSprite(pEnity->origin + offset, modelIndex, 1.0);
 	if (!pTemp)
@@ -96,47 +185,4 @@ void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life,
 
 }
 
-
-void R_AttachTentToPlayer(int client, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
-{
-	if (!modelIndex)
-	{
-		gEngfuncs.Con_Printf("No model %d!\n", modelIndex);
-		return;
-	}
-
-	if (client <= 0 || client > gEngfuncs.GetMaxClients())
-	{
-		gEngfuncs.Con_Printf("Bad client %i in R_AttachTentToEntity()!\n", client);
-		return;
-	}
-
-	cl_entity_t* pClient = gEngfuncs.GetEntityByIndex(client);
-	if (!pClient)
-	{
-		gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", client);
-		return;
-	}
-
-	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_DefaultSprite(pClient->origin + offset, modelIndex, 1.0);
-	if (!pTemp)
-	{
-		gEngfuncs.Con_Printf("No temp ent.\n");
-
-		return;
-	}
-
-	pTemp->entity.curstate.framerate = framerate;
-	pTemp->entity.baseline.renderamt = pTemp->entity.curstate.renderamt = 255;
-	pTemp->tentOffset = offset;
-	pTemp->flags = FTENT_PLYRATTACHMENT | FTENT_SPRANIMATE | flags;
-	pTemp->clientIndex = client;
-	pTemp->entity.curstate.renderfx = kRenderFxNoDissipation;
-	pTemp->entity.curstate.scale = scale;
-	pTemp->entity.curstate.rendermode = rendermode;
-	if (additive)
-		pTemp->entity.curstate.rendermode = kRenderTransAdd;
-	pTemp->die = gHUD.m_flTime + life;
-
-}
 }

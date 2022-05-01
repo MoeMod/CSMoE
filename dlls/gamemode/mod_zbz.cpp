@@ -22,6 +22,7 @@ GNU General Public License for more details.
 #include "mod_zbz.h"
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
+#include "zb2/zb2_zclass.cpp"
 
 #include "util/u_range.hpp"
 
@@ -29,6 +30,7 @@ GNU General Public License for more details.
 #include <algorithm>
 #include <functional>
 #include <random>
+
 
  //#define __DEBUG
 
@@ -59,8 +61,13 @@ namespace sv {
 		m_flTakeDamage(0.0f),
 		m_flSufferDamage(0.0f),
 		m_flExpScale(1.0f)
-{
-	
+
+	{
+		m_iChangeClassTime[0] = 0;
+		m_iChangeClassTime[1] = 0;
+		m_iChangeClassTime[2] = 0;
+		m_flNextTimeChangeZombie = invalid_time_point;
+		m_iZB5EvolutionEffect = PRECACHE_MODEL("models/zb5_za_evolution_effect.mdl");
 }
 
 void CPlayerModStrategy_ZBZ::OnInitHUD()
@@ -78,9 +85,32 @@ void CPlayerModStrategy_ZBZ::OnInitHUD()
 	MESSAGE_END();
 }
 
+void CPlayerModStrategy_ZBZ::Evolution(ZombieLevel iEvolutionLevel)
+{
+	CPlayerModStrategy_ZB3::Evolution(iEvolutionLevel);
+
+	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
+	{
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		m_pPlayer->pev->armorvalue = 500.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
+	}
+	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
+	{
+		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f + g_pGameRules->m_iTotalRoundsPlayed * 500;
+		m_pPlayer->pev->armorvalue = 1000.0f + g_pGameRules->m_iTotalRoundsPlayed * 100;
+	}
+
+	SKILL_FUNCTION(m_vecSkill, OnEvolution, iEvolutionLevel);
+}
+
 void CPlayerModStrategy_ZBZ::GrenadeExploded(Vector vecOrigin)
 {
 	SKILL_FUNCTION(m_vecSkill, OnGrenadeExploded, vecOrigin);
+}
+
+void CPlayerModStrategy_ZBZ::ZombiBombExploded(float &flKickRate, float &flRadius, float &flDamage)
+{
+	SKILL_FUNCTION(m_vecSkill, OnZombiBombExploded, flKickRate, flRadius, flDamage);
 }
 
 void CPlayerModStrategy_ZBZ::ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
@@ -247,11 +277,11 @@ void CPlayerModStrategy_ZBZ::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
 	CPlayerModStrategy_ZB3::BecomeZombie(iEvolutionLevel);
 	// this is a bad solution....
-	if (!CheckSkill(Skill_HeroicPresence) && m_pPlayer->m_ZombieClass == "revival")
+	/*if (!CheckSkill(Skill_HeroicPresence) && m_pPlayer->m_ZombieClass == "revival")
 	{
 		m_pPlayer->m_ZombieClass = "random";
 		m_pModZBZ->MakeZombie(m_pPlayer, m_pPlayer->m_iZombieLevel);
-	}
+	}*/
 	SKILL_FUNCTION(m_vecSkill, OnBecomeZombie, iEvolutionLevel);
 }
 
@@ -413,10 +443,10 @@ void CPlayerModStrategy_ZBZ::OnThink()
 				continue;
 
 			fireElapsed = false;
-			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN);
+			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN | DMG_NOMORALE);
 		}
-		float flSlow = 0.02f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
-		if(m_pPlayer->m_flVelocityModifier > flSlow)
+		float flSlow = 0.5f - 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
+		if(m_pPlayer->m_flVelocityModifier > flSlow && m_pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK)
 			m_pPlayer->m_flVelocityModifier = flSlow;
 
 		m_bIsFiring = !fireElapsed;
@@ -569,6 +599,97 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pModZBZ->InfectionSound();
 			m_pModZBZ->CheckWinConditions();
 		}
+		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		{
+			m_iChangeClassTime[0] = -1;
+
+			switch (RANDOM_LONG(0, 3))
+			{
+			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
+			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
+			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
+			}
+			
+			m_pPlayer->pev->sequence = 0;
+			m_pPlayer->m_iCustomSequence = -1;
+			CPlayerModStrategy_ZB3::BecomeZombie(ZOMBIE_LEVEL_ORIGIN_LV2);
+			m_pPlayer->pev->health = m_pPlayer->pev->max_health = 30000;
+			m_pPlayer->pev->armorvalue = 9000;
+
+			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+			WRITE_BYTE(TE_TEMPMODEL);
+			WRITE_COORD(m_pPlayer->pev->origin.x);
+			WRITE_COORD(m_pPlayer->pev->origin.y);
+			WRITE_COORD(m_pPlayer->pev->origin.z);
+			WRITE_ANGLE(g_vecZero.x);
+			WRITE_ANGLE(g_vecZero.y);
+			WRITE_ANGLE(g_vecZero.z);
+			WRITE_COORD(g_vecZero.x);
+			WRITE_COORD(g_vecZero.y);
+			WRITE_COORD(g_vecZero.z);
+			WRITE_SHORT(m_iZB5EvolutionEffect);
+			WRITE_BYTE(10);	//life
+			WRITE_SHORT(0);
+			WRITE_BYTE(1);
+			WRITE_BYTE(false);
+			WRITE_BYTE(255);
+			WRITE_BYTE(kRenderNormal);
+			WRITE_SHORT(-1);
+			WRITE_BYTE(0);
+			WRITE_BYTE(false);
+			WRITE_BYTE(0);
+			WRITE_BYTE(0);
+			WRITE_SHORT(31);
+			WRITE_LONG(0);
+			MESSAGE_END();
+
+			auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(m_pPlayer->m_pModStrategy.get());
+			if (strategy)
+			{
+				strategy->SetStunSpeedTime(1.0s, 1.0);
+			}
+		}
+		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && m_flNextTimeChangeZombie < gpGlobals->time && !m_pPlayer->IsBot())
+		{
+			float flHealth = m_pPlayer->pev->health;
+			float flMaxHealth = m_pPlayer->pev->max_health;
+
+			if (flHealth <= 3000)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "血量不足或切换冷却时间未到，无法改变僵尸种类");
+				return;
+			}
+			m_flNextTimeChangeZombie = gpGlobals->time + 20.0s;
+			m_pPlayer->m_ZombieClass = "random";
+			m_pPlayer->pev->sequence = 0;
+			m_pPlayer->m_iCustomSequence = -1;
+			CPlayerModStrategy_ZB3::BecomeZombie(m_pPlayer->m_iZombieLevel);
+			m_pPlayer->pev->max_health = flMaxHealth;
+			m_pPlayer->pev->health = flHealth - 3000;	
+		}
+		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		{
+			m_iChangeClassTime[1] = -1;
+
+			SetHero(true);
+			m_pPlayer->SetScoreboardAttributes();
+			m_pPlayer->pev->max_health = 10000.0f;
+			m_pPlayer->pev->health += 6000.0f;
+			if (m_pPlayer->pev->health >= m_pPlayer->pev->max_health)
+				m_pPlayer->pev->health = m_pPlayer->pev->max_health;
+
+			m_pPlayer->pev->armorvalue = 1000.0f;
+			SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
+			m_pPlayer->GiveNamedItem("z4b_dualkukri");
+			m_pPlayer->m_bHolsterDisabled = true;
+			m_pPlayer->m_iBuff |= BUFF_GHOSTHUNTER;
+
+			UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s 成为幽灵猎手", STRING(m_pPlayer->pev->netname));
+
+			EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterappear.wav", VOL_NORM, ATTN_NORM);
+		}
 		else if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 			UpgradeSkill();
 	}
@@ -622,6 +743,7 @@ CMod_ZombieZ::CMod_ZombieZ()
 	PRECACHE_MODEL("models/v_emotion.mdl");
 	PRECACHE_SOUND("metalarena/level_up.wav");
 	PRECACHE_SOUND("player/zombiez_mutation.wav");
+	PRECACHE_SOUND("zombi/ghosthunterappear.wav");
 }
 
 void CMod_ZombieZ::InstallPlayerModStrategy(CBasePlayer *player)

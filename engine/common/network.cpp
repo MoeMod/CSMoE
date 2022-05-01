@@ -618,7 +618,12 @@ qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *lengt
 			if( ec.value() == boost::system::errc::operation_would_block || ec.value() == boost::system::errc::connection_reset )
 				return false;
 
-			MsgDev( D_ERROR, "NET_GetPacket: %s from %s\n", ec.message().c_str(), NET_AdrToString( *from ));
+#ifdef _WIN32
+			if (ec.value() == WSAEWOULDBLOCK || ec.value() == WSAECONNRESET)
+				return false;
+#endif
+
+			MsgDev( D_ERROR, "NET_GetPacket: %d error %s from %s\n", ec.value(), ec.message().c_str(), NET_AdrToString( *from ));
 			continue;
 		}
 
@@ -683,7 +688,10 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 		// WSAEWOULDBLOCK is silent
 		if( ec.value() == boost::system::errc::operation_would_block )
 			return;
-
+#ifdef _WIN32
+		if (ec.value() == WSAEWOULDBLOCK)
+			return;
+#endif
 		// some PPP links don't allow broadcasts
 		if(( ec.value() == boost::system::errc::address_not_available ) && (( to.type == NA_BROADCAST ) || ( to.type == NA_BROADCAST_IPX )))
 			return;

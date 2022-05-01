@@ -42,6 +42,7 @@ public:
 	SharedTexture m_pTexture_TrapRetina;
 	SharedTexture m_pTexture_DamageDoubleRetina;
 	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
+	CHudRetina::MagicNumber m_iLastIdx = -1;
 };
 
 DECLARE_MESSAGE(m_ZB2, ZB2Msg)
@@ -122,17 +123,26 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 	}
 	case ZB2_MESSAGE_DRAW_RETINA:
 	{
-		int iType = buf.ReadByte();
+		int skilltype = buf.ReadByte();
 		float flHoldTime = buf.ReadShort();
-		switch (iType)
+
+		if (flHoldTime == -1 && pimpl->m_iLastIdx)
 		{
-		case 0:
+			gHUD.m_Retina.RemoveItem(pimpl->m_iLastIdx);
+			pimpl->m_iLastIdx = -1;
+		}
+		else
 		{
 			pimpl->get<CHudZB2_Skill>();
-			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
-			break;
+			if(skilltype == ZOMBIE_SKILL_TRAP)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime);
+			else if(skilltype == ZOMBIE_SKILL_GLIDE)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime);
+			else if (skilltype == ZOMBIE_SKILL_HOOK)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
+			pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
 		}
-		}
+
 	}
 
 

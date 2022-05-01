@@ -114,7 +114,7 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 	CBasePlayer *p = static_cast<CBasePlayer *>(pOther);
 
-	if (p->m_bIsVIP || p->m_bIsZombie)
+	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_GHOSTHUNTER)
 		return;
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");

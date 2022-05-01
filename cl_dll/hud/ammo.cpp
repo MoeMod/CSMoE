@@ -1395,7 +1395,8 @@ void CHudAmmo::DrawCrosshair( float flTime )
 		|| weaponid == WEAPON_G3SG1
 		|| weaponid == WEAPON_HUNTBOW
 		|| weaponid == WEAPON_SFSNIPER
-		|| weaponid == WEAPON_SKULL5)
+		|| weaponid == WEAPON_SKULL5
+		|| weaponid == WEAPON_CHAINSAW)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )
@@ -1987,6 +1988,8 @@ int CHudAmmo::DrawNEWHudAmmo(float flTime)
 			SPR_DrawAdditive(0, iX, iY, &m_pWeapon->rcAmmo2);
 		}
 	}
+
+	return 1;
 }
 
 int CHudAmmo::DrawNEWHudCurrentWpn(float flTime)

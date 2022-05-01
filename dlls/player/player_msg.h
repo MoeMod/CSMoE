@@ -109,7 +109,7 @@ extern int gmsgBrass;
 extern int gmsgFog;
 extern int gmsgShowTimer;
 extern int gmsgShowWin;
-extern int gmsgDgaxe;
+extern int gmsgSpecialCrossHair;
 extern int gmsgHitMsg;
 
 extern int gmsgHeadIcon;

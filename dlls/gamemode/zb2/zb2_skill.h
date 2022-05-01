@@ -23,6 +23,8 @@ GNU General Public License for more details.
 #include "gamemode/zb2/zb2_const.h"
 #include "gamemode/mod_zb1.h"
 #include "wpn_shared/wpn_zombiebomb.h"
+#include "effects.h"
+#include "customentity.h"
 
 namespace sv {
 
@@ -196,6 +198,7 @@ protected:
 
 	EngineClock::time_point m_flTimeNextSmoke;
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
+	int m_iSmokeEvent;
 };
 
 
@@ -252,6 +255,8 @@ protected:
 	int m_bHasFireTeleportEntity = 0;
 	EngineClock::time_point m_flTimeBotUseSkill;
 	EngineClock::time_point m_flTimeTriggerZombieSkill;
+	int m_iTeleportZombie;
+	int m_iTeleportZombieOut;
 	
 };
 
@@ -613,6 +618,166 @@ public:
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
+};
+
+class CZombieSkill_ZombieWebShooter : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieWebShooter(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	Vector GetShootPosition(int* bHit = 0);
+	void FireZombieSkill();
+	void Reset() override
+	{
+		bHit = 0;
+		m_flPlayerAnimTime = invalid_time_point;
+		m_flFlyingTime = invalid_time_point;
+	}
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
+	EngineClock::time_point m_flFlyingTime = invalid_time_point;
+	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
+	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
+	EntityHandle <CBeam> m_pBeam;
+	Vector m_vecHookOrigin, m_vecPlayerOrigin;
+	int bHit = 0;
+};
+
+
+class CZombieSkill_ZombieWebBomb : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieWebBomb(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+class CZombieSkill_ZombieProtect : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieProtect(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	void OnCrazyEffect();
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeZombieSkillEffect;
+
+	int m_iDeathKnightEffectShield;
+};
+
+
+class CZombieSkill_ZombieChargeSlash : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieChargeSlash(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void ResetMaxSpeed() override;
+	void FireZombieSkill();
+	Vector GetShootPosition();
+	void DashAttack();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	void Reset() override
+	{
+		m_SkillStatus = DASH_END;
+	}
+
+	Vector m_vecPosition;
+	ZombieDashSkillStatus m_SkillStatus = DASH_END;
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+
+	int m_iDeathKnightEffectFloor;
+	int m_iDeathKnightEffectFlash;
+	int m_iDeathKnightEffectFlashArea;
+};
+
+class CZombieSkill_ZombieDogShoot : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieDogShoot(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+	EngineClock::time_point m_flTimeTriggerZombieSkill;
+};
+
+enum ZombieRushSkillStatus
+{
+	RUSH_IDLE,
+	RUSH_START,
+	RUSH_LOOP,
+	RUSH_HOLD,
+	RUSH_FINISH,
+};
+
+class CZombieSkill_ZombieRush : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieRush(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	float GetDamageRatio() const override;
+	void ResetMaxSpeed() override;
+	void FireZombieSkill();
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+	float GetChargeDamage() const;
+
+	void Reset() override
+	{
+		m_flPlayerAnimTime = invalid_time_point;
+	}
+
+	Vector m_vecLockAngle;
+	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
+	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
+	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
+	ZombieRushSkillStatus m_SkillStatus = RUSH_IDLE;
 };
 
 

@@ -255,7 +255,13 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 				ForceRun(5.0s);
 				if (m_bIsZombie && this->m_ZombieClass)
 				{
-					if(!stricmp(this->m_ZombieClass, "flying") || !stricmp(this->m_ZombieClass, "china") || !stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy"))
+					if (!stricmp(this->m_ZombieClass, "china") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy") || !stricmp(this->m_ZombieClass, "stamper") || !stricmp(this->m_ZombieClass, "zbs_deimos2") || !stricmp(this->m_ZombieClass, "nemesis"))
+					{
+						if(pev->health <= 3000)
+							ClientCommand("BTE_ZombieSkill2");
+					}
+
+					if(!stricmp(this->m_ZombieClass, "flying") || !stricmp(this->m_ZombieClass, "china") || !stricmp(this->m_ZombieClass, "teleport") || !stricmp(this->m_ZombieClass, "deimos") || !stricmp(this->m_ZombieClass, "heal") || !stricmp(this->m_ZombieClass, "deimos2") || !stricmp(this->m_ZombieClass, "pc") || !stricmp(this->m_ZombieClass, "heavy") || !stricmp(this->m_ZombieClass, "deathknight") || !stricmp(this->m_ZombieClass, "nemesis"))
 						ClientCommand("BTE_ZombieSkill1");
 
 					float skillUseRange = 1400.0f;
@@ -293,6 +299,20 @@ void CCSBot::OnEvent(GameEventType event, CBaseEntity *entity, CBaseEntity *othe
 						skillUseRange = 3000;
 						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
 							ClientCommand("BTE_ZombieSkill1");
+					}
+					else if (!stricmp(this->m_ZombieClass, "spider"))
+					{
+						skillUseRange = 2000;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+							ClientCommand("BTE_ZombieSkill2");
+						else
+							ClientCommand("BTE_ZombieSkill1");
+					}
+					else if (!stricmp(this->m_ZombieClass, "deathknight"))
+					{
+						skillUseRange = 3000;
+						if ((pev->origin - entity->pev->origin).IsLengthLessThan(skillUseRange))
+							ClientCommand("BTE_ZombieSkill2");
 					}
 						
 				}

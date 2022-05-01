@@ -67,6 +67,9 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 		return;
 
 	float a = 1.0f;
+	byte r = 255;
+	byte g = 255;
+	byte b = 255;
 	if (item.type & RETINA_DRAW_TYPE_BLINK)
 	{
 		float timeDelta = item.flTimeEnd - time;
@@ -74,16 +77,23 @@ void CHudRetina::DrawItem(float time, const RetinaDrawItem_s &item) const
 		a = 0.5f + (modDelta < 0.5f ? modDelta * 2.0f : 2.0f - modDelta * 2.0f) * 0.5f;
 	}
 
+	if (item.type & RETINA_DRAW_TYPE_BLACK)
+	{
+		r = 0;
+		g = 0;
+		b = 0;
+	}
+
 	if (item.type & RETINA_DRAW_TYPE_QUARTER)
 	{
-		item.pTexture->Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �I
-		item.pTexture->Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �J
-		item.pTexture->Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �L
-		item.pTexture->Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, 255, 255, 255, 255 * a); // �K
+		item.pTexture->Draw2DQuad(0,			0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, r, g, b, 255 * a); // �I
+		item.pTexture->Draw2DQuad(TrueWidth,	0,				TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, r, g, b, 255 * a); // �J
+		item.pTexture->Draw2DQuad(0,			TrueHeight, 	TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, r, g, b, 255 * a); // �L
+		item.pTexture->Draw2DQuad(TrueWidth,	TrueHeight,		TrueWidth / 2,	TrueHeight / 2, 0, 0, 1, 1, r, g, b, 255 * a); // �K
 	}
 	else
 	{
-		item.pTexture->Draw2DQuad(0, 0, TrueWidth, TrueHeight, 0, 0, 1, 1, 255, 255, 255, 255 * a);
+		item.pTexture->Draw2DQuad(0, 0, TrueWidth, TrueHeight, 0, 0, 1, 1, r, g, b, 255 * a);
 	}
 }
 

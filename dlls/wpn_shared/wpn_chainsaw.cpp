@@ -38,7 +38,7 @@ void CChainsaw::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_chainsaw");
 
 	Precache();
-	m_iId = WEAPON_SCOUT;
+	m_iId = WEAPON_CHAINSAW;
 	SET_MODEL(ENT(pev), "models/w_chainsaw.mdl");
 	m_bSlash = 0;
 	m_iDefaultAmmo = CHAINSAW_MAX_CLIP;
@@ -69,7 +69,7 @@ int CChainsaw::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = CHAINSAW_MAX_CLIP	;
 	p->iSlot = 0;
 	p->iPosition = 9;
-	p->iId = m_iId = WEAPON_SCOUT;
+	p->iId = m_iId = WEAPON_CHAINSAW;
 	p->iFlags = 0;
 	p->iWeight = SCOUT_WEIGHT;
 
@@ -388,13 +388,9 @@ hit_result_t CChainsaw::KnifeAttack1(Vector vecSrc, Vector vecDir, float flDamag
 					continue;
 
 				CBasePlayer *pVictim = dynamic_cast<CBasePlayer *>(pEntity);
-				if (pVictim->m_bIsZombie) // Zombie Knockback...
+				if (pVictim->m_bIsZombie && !(pVictim->m_iBuff & BUFF_IGNORE_KNOCKBACK)) // Zombie Knockback...
 				{
-					if (pVictim->m_ZombieClass)
-					{
-						if (stricmp(pVictim->m_ZombieClass, "revival") || !pVictim->m_iZombieRevivalEnabled)
-							AddKickRate(pVictim, m_pPlayer->pev->origin, 3200, 120);
-					}
+					AddKickRate(pVictim, m_pPlayer->pev->origin, 3200, 120);
 				}
 				result = HIT_PLAYER;
 

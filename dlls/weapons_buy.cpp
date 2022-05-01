@@ -94,6 +94,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "skull5",	WEAPON_SKULL5 },
 	{ "sfsniper",	WEAPON_SFSNIPER },
 	{ "plasmagun",	WEAPON_PLASMAGUN },
+	{ "chainsaw",	WEAPON_CHAINSAW },
 	{ NULL,		WEAPON_NONE }
 };
 
@@ -195,6 +196,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
 	{ "plasmagun",	WEAPONCLASS_RIFLE },
 	{ "zombielaw",	WEAPONCLASS_RIFLE },
+	{ "chainsaw",	WEAPONCLASS_RIFLE },
 	{ NULL,		WEAPONCLASS_NONE }
 };
 
@@ -324,6 +326,7 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SKULL5:
 	case WEAPON_ZOMBIELAW:
 	case WEAPON_M95TIGER:
+	case WEAPON_CHAINSAW:
 		return true;
 	default:
 		break;

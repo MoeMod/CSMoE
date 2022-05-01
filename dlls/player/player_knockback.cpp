@@ -25,9 +25,9 @@ void ApplyKnockbackData(CBasePlayer *player, const Vector &dir, const KnockbackD
 	else
 	{
 		if (player->pev->velocity.Length2D() > 0.0f)
-			flKnockbackRatio = data.flFlying;
+			flKnockbackRatio = data.flFlying * flVelocityModifier;
 		else
-			flKnockbackRatio = data.flNotOnGround;		
+			flKnockbackRatio = data.flNotOnGround * flVelocityModifier;
 	}
 
 	if (DotProduct(dir.Normalize(), vecVelocityDir) > 0)

@@ -611,6 +611,49 @@
 // byte (rendermode)
 // short (entity index)
 
+#define TE_TEMPMODEL				131	// a customized model
+// coord, coord, coord (position)
+// angle, angle, angle (angles)
+// coord, coord, coord (velocity)
+// short (model index)
+// byte (life * 10)
+// short (sequence)
+// byte (framerate)
+// byte (fade out)
+// byte (brightness)
+// byte (rendermode)
+// short (player index)
+// byte (fade out speed)
+// byte (fade in)
+// byte (fade in speed)
+// byte (scale * 10)
+// short (frame max)
+// long (tempentity flags)
+
+#define TE_TEMPSPRITE				132
+// coord (origin)
+// coord (origin)
+// coord (origin)
+// short (sprite index)
+// byte (scale * 10)
+// byte (brightness)
+// byte (framerate)
+
+#define TE_FOLLOWINGARROW			133	// an arrow following a player
+// short (player index)
+// short (model index)
+// coord, coord, coord (position offset)
+// coord, coord, coord (angle offset)
+// byte (life)
+
+#define TE_TEMPEXPLODEMODEL		134	// spherical shower of models, picks from set
+// coord, coord, coord (origin)
+// coord (velocity)
+// short (model index)
+// short (count)
+// byte (life in 0.1's)
+// byte (anglecalc)
+
 #define MSG_BROADCAST		0	// unreliable to all
 #define MSG_ONE			1	// reliable to one (msg_entity)
 #define MSG_ALL			2	// reliable to all

@@ -399,6 +399,17 @@ void DLLEXPORT HUD_TempEntUpdate (
 		{
 			pprev = pTemp;
 
+			if (pTemp->entity.baseline.fuser1 && life > 0 && (pTemp->flags & FTENT_FADEIN))
+			{
+				if (pTemp->entity.curstate.rendermode == kRenderNormal)
+					pTemp->entity.curstate.rendermode = kRenderTransTexture;
+
+				pTemp->entity.curstate.renderamt = ((pTemp->entity.baseline.fuser1 - life) / pTemp->entity.baseline.fuser1) * pTemp->entity.baseline.renderamt;
+
+				if (pTemp->entity.curstate.renderamt >= 255)
+					pTemp->entity.curstate.renderamt = 255;
+			}
+
 			VectorCopy( pTemp->entity.origin, pTemp->entity.prevstate.origin );
 
 			if ( pTemp->flags & FTENT_SPARKSHOWER )
@@ -510,6 +521,13 @@ void DLLEXPORT HUD_TempEntUpdate (
 				pTemp->entity.angles[2] += pTemp->entity.baseline.angles[2] * frametime;
 
 				VectorCopy( pTemp->entity.angles, pTemp->entity.latched.prevangles );
+			}
+
+			if (pTemp->flags & FTENT_VELOCITYANGLES)
+			{
+				VectorAngles(pTemp->entity.baseline.origin, pTemp->entity.angles);
+
+				pTemp->entity.latched.prevangles = pTemp->entity.angles;
 			}
 
 			if ( pTemp->flags & (FTENT_COLLIDEALL | FTENT_COLLIDEWORLD) && !(pTemp->flags & FTENT_IGNOREGRAVITY))

@@ -853,11 +853,13 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 		else
 		{
-			if (m_iBuff & BUFF_REVIVE && m_bHasBuffWpn & BUFF_REVIVEGUN)
+			if (m_iBuff & BUFF_REVIVE)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
-
+				
 				CSDM_DoRandomSpawn(this);
+				m_iBuff &= ~BUFF_REVIVE;
+				m_iReviveGunShotsFired = 0;
 				if (pWeapon)
 				{
 					if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
@@ -868,9 +870,9 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 			if (m_bIsZombie && m_ZombieClass)
 			{
-				if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
+				if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
 				{
-					m_iZombieRevivalEnabled = 1;
+					m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 					return flDamage;
 				}
 			}
@@ -1171,11 +1173,13 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		pevInflictor->iuser1 += 1;
 	}
 
-	if (m_iBuff & BUFF_REVIVE && m_bHasBuffWpn & BUFF_REVIVEGUN && flDamage > pev->health)
+	if (m_iBuff & BUFF_REVIVE && flDamage > pev->health)
 	{
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
 		CSDM_DoRandomSpawn(this);
+		m_iBuff &= ~BUFF_REVIVE;
+		m_iReviveGunShotsFired = 0;
 		if (pWeapon)
 		{
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
@@ -1186,12 +1190,15 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 	if (m_bIsZombie && m_ZombieClass && flDamage > pev->health)
 	{
-		if (!stricmp(m_ZombieClass, "revival") && !m_iZombieRevivalEnabled)
+		if (!stricmp(m_ZombieClass, "revival") && ~m_iBuff & BUFF_IGNORE_KNOCKBACK)
 		{
-			m_iZombieRevivalEnabled = 1;
+			m_iBuff |= BUFF_IGNORE_KNOCKBACK;
 			return flDamage;
 		}
 	}
+
+	if (!m_bIsZombie && m_iBuff & BUFF_GHOSTHUNTER)
+		m_flVelocityModifier = 1.0f;
 
 	LogAttack(pAttack, this, teamAttack, flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 
@@ -5655,11 +5662,15 @@ void CBasePlayer::Spawn()
 	m_iHealthDecreaseCount = 0;
 
 	m_iZombieFlying = 0;
-	m_iZombieRevivalEnabled = 0;
 	m_flDamageUnderTake = 0.0;
 
 	m_iBuff = 0;
 	m_bHasBuffWpn = 0;
+
+	if(IsBot())
+		m_iReviveGunShotsFired = 79;
+	else
+		m_iReviveGunShotsFired = 0;
 
 	SpawnProtection_End();
 
@@ -7841,12 +7852,6 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			if (pWeapon->iItemSlot() == PRIMARY_WEAPON_SLOT)
 				m_bHasPrimary = false;
 
-			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
-			{
-				m_bHasBuffWpn &= ~BUFF_REVIVEGUN;
-				m_iBuff &= ~BUFF_REVIVE;
-			}
-
 			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_c4"))
 			{
 				m_bHasC4 = false;
@@ -9775,6 +9780,9 @@ void CBasePlayer::ClearWeapon(bool removeSuit) {
 void CBasePlayer::PlayerTouch(CBaseEntity* other)
 {
 	m_pModStrategy->OnTouch(other);
+
+	if (m_hSpearAttached.Get() != nullptr)
+		m_hSpearAttached->CrowdCallback(this, other);
 }
 
 bool CBasePlayer::IsUsingPC()
