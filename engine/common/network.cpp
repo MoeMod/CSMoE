@@ -81,6 +81,18 @@ static void NET_NetadrToSockadr( netadr_t *a, boost::asio::ip::udp::endpoint *s 
         s->address(boost::asio::ip::address_v4(host));
         s->port(a->port);
 	}
+    else if( a->type == NA_IP6 )
+    {
+        std::array<unsigned char, 16> host;
+        memcpy(host.data(), a->ip6, 16);
+        s->address(boost::asio::ip::address_v6(host));
+        s->port(a->port);
+    }
+    else if( a->type6 == NA_MULTICAST_IP6 )
+    {
+        s->address(boost::asio::ip::address_v6::from_string("ff02::1"));
+        s->port(a->port);
+    }
 }
 
 
@@ -93,6 +105,13 @@ static void NET_SockadrToNetadr( boost::asio::ip::udp::endpoint *s, netadr_t *a 
         memcpy(a->ip, host.data(), 4);
 		a->port = s->port();
 	}
+    else if( s->protocol() == boost::asio::ip::udp::v6() )
+    {
+        a->type = NA_IP6;
+        auto host = s->address().to_v6().to_bytes();
+        memcpy(a->ip6, host.data(), 16);
+        a->port = s->port();
+    }
 }
 
 /*
@@ -113,6 +132,7 @@ static int NET_StringToSockaddr( const char *s, boost::asio::ip::udp::endpoint *
     boost::system::error_code ec;
     boost::asio::ip::udp::resolver resolver(ioc_udp);
     boost::asio::ip::udp::resolver::results_type results = resolver.resolve(host,port,ec);
+
     if(ec)
         return 0;
 
@@ -126,7 +146,32 @@ char *NET_AdrToString( const netadr_t a )
 		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
+    else if( a.type == NA_IP6 )
+    {
+        std::array<unsigned char, 16> host;
+        memcpy(host.data(), a.ip6, 16);
+        return va("[%s]:%d", boost::asio::ip::address_v6(host).to_string().c_str(), a.port);
+    }
 	return NULL; // compiler warning
+}
+
+const char *NET_AdrProtocolName( const netadr_t a )
+{
+    if( a.type == NA_LOOPBACK )
+        return "Loopback";
+    if( a.type == NA_IP || a.type == NA_BROADCAST )
+        return "IPv4";
+    if( a.type == NA_IP6 || a.type == NA_MULTICAST_IP6 )
+        return "IPv6";
+    return "IP";
+}
+const char *NET_SockadrProtocolName( const boost::asio::ip::udp::endpoint &s )
+{
+    if( s.protocol() == boost::asio::ip::udp::v4() )
+        return "IPv4";
+    if( s.protocol() == boost::asio::ip::udp::v6() )
+        return "IPv4";
+    return "IP";
 }
 
 char *NET_BaseAdrToString( const netadr_t a )
@@ -135,6 +180,12 @@ char *NET_BaseAdrToString( const netadr_t a )
 		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3] );
+    else if( a.type == NA_IP6 )
+    {
+        std::array<unsigned char, 16> host;
+        memcpy(host.data(), a.ip6, 16);
+        return va("%s", boost::asio::ip::address_v6(host).to_string().c_str());
+    }
 	return NULL;
 }
 
@@ -160,6 +211,13 @@ qboolean NET_CompareBaseAdr( const netadr_t a, const netadr_t b )
 		return false;
 	}
 
+    if( a.type == NA_IP6 )
+    {
+        if( !Q_memcmp( a.ip6, b.ip6, 16 ))
+            return true;
+        return false;
+    }
+
 	MsgDev( D_ERROR, "NET_CompareBaseAdr: bad address type\n" );
 	return false;
 }
@@ -178,6 +236,13 @@ qboolean NET_CompareAdr( const netadr_t a, const netadr_t b )
 			return true;
 		return false;
 	}
+
+    if( a.type == NA_IP6 )
+    {
+        if( !Q_memcmp( a.ip6, b.ip6, 16 ) && a.port == b.port)
+            return true;
+        return false;
+    }
 
 	MsgDev( D_ERROR, "NET_CompareAdr: bad address type\n" );
 	return false;
@@ -596,12 +661,7 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 		NET_SendLoopPacket( sock, length, data, to );
 		return;
 	}
-	else if( to.type == NA_BROADCAST )
-	{
-		net_socket = ip_sockets[sock];
-		if( !net_socket ) return;
-	}
-	else if( to.type == NA_IP )
+	else if( to.type == NA_BROADCAST || to.type == NA_IP || to.type == NA_IP6 || to.type == NA_MULTICAST_IP6 )
 	{
 		net_socket = ip_sockets[sock];
 		if( !net_socket ) return;
@@ -782,7 +842,7 @@ void NET_GetLocalAddress( void )
 		else
 		{
 			net_local.port = address.port();
-			Msg( "Server IP address: %s\n", NET_AdrToString( net_local ));
+			Msg( "Server %s address: %s\n", NET_AdrProtocolName(net_local), NET_AdrToString( net_local ));
 		}
 	}
 }
@@ -871,7 +931,7 @@ void NET_ShowIP_f( void )
     }
 
     for(auto in : results)
-        Msg( "IP: %s\n", in.endpoint().address().to_string().c_str());
+        Msg( "%s: %s\n", NET_SockadrProtocolName(in.endpoint()), in.endpoint().address().to_string().c_str());
 }
 
 /*
