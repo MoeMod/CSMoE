@@ -16,44 +16,60 @@ std::vector<byte> Image_SaveASTC_Worker(astcenc_context *context, std::shared_pt
 namespace xe {
     struct CookContext{
         boost::asio::io_context ioc_cook;
-        boost::asio::thread_pool ioc_cook_worker{16};
+        boost::asio::thread_pool ioc_cook_worker;
         std::optional<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> ioc_cook_work_guard;
         std::optional<boost::asio::executor_work_guard<boost::asio::thread_pool::executor_type>> ioc_cook_worker_work_guard;
         int cur_num = 0;
         int total_num = 0;
-        std::shared_ptr<astcenc_context> context;
+        std::chrono::high_resolution_clock::time_point start_time;
     };
     std::shared_ptr<CookContext> g_cook_ctx;
+
+    void Cook_End()
+    {
+        auto used_time = std::chrono::high_resolution_clock::now() - g_cook_ctx->start_time;
+
+        using namespace std::chrono_literals;
+        Msg(  "Cook: finish cooking %d files for %d min %02d sec\n", g_cook_ctx->total_num, (int)(used_time / 1min), (int)(used_time / 1s) - (int)(used_time / 1min) * 60 );
+
+        g_cook_ctx = nullptr;
+    }
 
     void Cook_Run()
     {
         if(g_cook_ctx)
-            while(g_cook_ctx->ioc_cook.poll());
+        {
+            g_cook_ctx->ioc_cook.poll();
+            if(g_cook_ctx->cur_num >= g_cook_ctx->total_num)
+            {
+                Cook_End();
+            }
+        }
     }
 
-    boost::asio::awaitable<void> Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::shared_ptr<byte[]> rgba, int width, int height, int size, std::string destpath)
+    void Cook_WriteResult(std::shared_ptr<CookContext> cook_ctx, std::string destpath, std::vector<byte> astc_tex)
     {
-
-        // switch to cook thread pool
-        co_await boost::asio::dispatch(cook_ctx->ioc_cook_worker, boost::asio::use_awaitable);
-        auto astc_tex = Image_SaveASTC_Worker(cook_ctx->context.get(), rgba, width, height, size, 0);
-
-        // switch to main thread
-        co_await boost::asio::dispatch(cook_ctx->ioc_cook, boost::asio::use_awaitable);
         file_t *pfile = FS_Open( destpath.c_str(), "wb", false );
         if( pfile )
         {
             FS_Write(pfile, astc_tex.data(), astc_tex.size());
             FS_Close(pfile);
         }
-        Msg(  "Cook:        %s\n", destpath.c_str() );
+        ++cook_ctx->cur_num;
+        Msg("Cook: [%d/%d] %s\n", cook_ctx->cur_num, cook_ctx->total_num, destpath.c_str());
     }
 
-    boost::asio::awaitable<void> Cook_RunMDL(std::shared_ptr<CookContext> cook_ctx, std::string mdl)
+    void Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::shared_ptr<byte[]> rgba, int width, int height, int size, std::string destpath)
     {
+        std::shared_ptr<astcenc_context> context ( Image_SaveASTC_CreateContext(16), Image_SaveASTC_DestroyContext );
+        auto astc_tex = Image_SaveASTC_Worker(context.get(), rgba, width, height, size, 0);
 
-        std::vector<boost::asio::awaitable<void>> task_list;
+        // switch to main thread
+        boost::asio::dispatch(cook_ctx->ioc_cook, std::bind(Cook_WriteResult, cook_ctx, destpath, std::move(astc_tex)));
+    }
 
+    void Cook_SubmitMDL(std::shared_ptr<CookContext> cook_ctx, std::string mdl)
+    {
         auto buf = FS_LoadFile(mdl.c_str(), nullptr, true);
         if(buf)
         {
@@ -107,23 +123,16 @@ namespace xe {
 
                         pic = nullptr;
 
-                        task_list.emplace_back(boost::asio::co_spawn(cook_ctx->ioc_cook_worker, Cook_ProcessTexture(cook_ctx, mt_buffer, width, height, size,  std::string(destpath)), boost::asio::use_awaitable));
-                        //auto astc_tex = Image_SaveASTC_Worker(mt_buffer, width, height, size);
+                        boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, size, std::string(destpath)));
+                        ++cook_ctx->total_num;
                     }
                 }
             }
-            for(auto &&awaitable : task_list)
-            {
-                co_await std::move(awaitable);
-            }
         }
 
-        ++cook_ctx->cur_num;
-        Msg(  "Cook: [%d/%d] %s\n", cook_ctx->cur_num, cook_ctx->total_num, mdl.c_str() );
-        //co_await boost::asio::post(cook_ctx->ioc_cook, boost::asio::use_awaitable);
     }
 
-    boost::asio::awaitable<void> Cook_RunTex(std::shared_ptr<CookContext> cook_ctx, std::string file)
+    void Cook_SubmitTex(std::shared_ptr<CookContext> cook_ctx, std::string file)
     {
         auto pic = FS_LoadImage( file.c_str(), nullptr, 0 );
         if(pic)
@@ -143,19 +152,17 @@ namespace xe {
 
                 pic = nullptr;
 
-                co_await boost::asio::co_spawn(cook_ctx->ioc_cook_worker, Cook_ProcessTexture(cook_ctx, mt_buffer, width, height, size,  std::string(destpath)), boost::asio::use_awaitable);
+                boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, size, std::string(destpath)));
+                ++cook_ctx->total_num;
             }
         }
 
-        ++cook_ctx->cur_num;
-        Msg("Cook: [%d/%d] %s\n", cook_ctx->cur_num, cook_ctx->total_num, file.c_str());
     }
 
-    boost::asio::awaitable<void> Cook_CoMain()
+    void Cook_Initiate()
     {
         try {
             Msg(  "Cook: start\n" );
-            auto start_time = std::chrono::high_resolution_clock::now();
 
             std::vector<std::string> mdl_files;
             std::vector<std::string> tex_files;
@@ -178,36 +185,19 @@ namespace xe {
             Msg(  "Cook: found %d texture files\n", (int)tex_files.size() );
 
             auto local_cook_ctx = g_cook_ctx;
-
-            local_cook_ctx->cur_num = 0;
-            local_cook_ctx->total_num = (int)mdl_files.size() + (int)tex_files.size();
-            local_cook_ctx->context = { Image_SaveASTC_CreateContext(16), Image_SaveASTC_DestroyContext };
-
-            co_await boost::asio::post(local_cook_ctx->ioc_cook, boost::asio::use_awaitable);
+            local_cook_ctx->start_time = std::chrono::high_resolution_clock::now();
 
             std::vector<boost::asio::awaitable<void>> task_list;
 
             for(auto mdl : mdl_files)
             {
-                task_list.emplace_back(Cook_RunMDL(local_cook_ctx, mdl)) ;
+                Cook_SubmitMDL(local_cook_ctx, mdl) ;
             }
 
             for(auto file : tex_files)
             {
-                task_list.emplace_back(Cook_RunTex(local_cook_ctx, file));
+                Cook_SubmitTex(local_cook_ctx, file);
             }
-
-            for(auto &awaitable : task_list)
-            {
-                co_await std::move(awaitable);
-            }
-
-            auto used_time = std::chrono::high_resolution_clock::now() - start_time;
-
-            using namespace std::chrono_literals;
-            Msg(  "Cook: finish cooking %d files for %d min %02d sec\n", (int)mdl_files.size() + (int)tex_files.size(), (int)(used_time / 1min), (int)(used_time / 1s) - (int)(used_time / 1min) * 60 );
-
-            local_cook_ctx = nullptr;
         }
         catch(const std::exception &e)
         {
@@ -233,8 +223,7 @@ namespace xe {
         g_cook_ctx = std::make_shared<CookContext>();
         g_cook_ctx->ioc_cook_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook));
         g_cook_ctx->ioc_cook_worker_work_guard.emplace(boost::asio::make_work_guard(g_cook_ctx->ioc_cook_worker));
-
-        boost::asio::co_spawn(g_cook_ctx->ioc_cook, Cook_CoMain(), boost::asio::detached);
+        Cook_Initiate();
     }
 
     void Con_Cook_f()
