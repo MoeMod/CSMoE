@@ -16,6 +16,10 @@ GNU General Public License for more details.
 #include "imagelib.h"
 #include "astcenc.h"
 
+#ifndef XASH_DEDICATED
+#include "gl_local.h"
+#endif
+
 #include <vector>
 
 static const unsigned int thread_count_r = 1;
@@ -283,9 +287,11 @@ qboolean Image_LoadASTC_HW( const char *name, const byte *buffer, size_t filesiz
 
 qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
 {
-    if(Cvar_VariableInteger("gl_astc_format") > 0)
+#ifndef XASH_DEDICATED
+    if(GL_Support(GL_ASTC_EXT) > 0)
         return Image_LoadASTC_HW(name, buffer, filesize);
     else
+#endif
         return Image_LoadASTC_SW(name, buffer, filesize);
 }
 
@@ -324,7 +330,7 @@ void Image_SaveASTC_DestroyContext(astcenc_context *context)
     astcenc_context_free(context);
 }
 
-std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, std::shared_ptr<byte[]> rgba, int width, int height, int size, int thread_id)
+std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, byte *rgba, int width, int height, int size, int thread_id)
 {
     // Compute the number of ASTC blocks in each dimension
     unsigned int block_count_x = (width + save_block_x - 1) / save_block_x;
@@ -338,7 +344,7 @@ std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, std::shared_pt
     image.dim_y = height;
     image.dim_z = 1;
     image.data_type = ASTCENC_TYPE_U8;
-    uint8_t* slices = rgba.get();
+    uint8_t* slices = rgba;
     image.data = reinterpret_cast<void**>(&slices);
 
     // Space needed for 16 bytes of output per compressed block
@@ -400,7 +406,7 @@ qboolean Image_SaveASTC( const char *name, image_ref pix )
     }
 
     auto context = Image_SaveASTC_CreateContext(1);
-    auto astc_tex = Image_SaveASTC_Worker(context, std::shared_ptr<byte[]>(pix, pix->buffer), pix->width, pix->height, pix->size, 0);
+    auto astc_tex = Image_SaveASTC_Worker(context, pix->buffer, pix->width, pix->height, pix->size, 0);
     Image_SaveASTC_DestroyContext(context);
     if(astc_tex.empty())
         return false;

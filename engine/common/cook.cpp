@@ -11,7 +11,8 @@
 struct astcenc_context;
 astcenc_context *Image_SaveASTC_CreateContext(int thread_num);
 void Image_SaveASTC_DestroyContext(astcenc_context *context);
-std::vector<byte> Image_SaveASTC_Worker(astcenc_context *context, std::shared_ptr<byte[]> rgba, int width, int height, int size, int thread_id);
+std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, byte *rgba, int width, int height, int size, int thread_id);
+int matchpattern( const char *in, const char *pattern, qboolean caseinsensitive );
 
 namespace xe {
     struct CookContext{
@@ -59,13 +60,28 @@ namespace xe {
         Msg("Cook: [%d/%d] %s\n", cook_ctx->cur_num, cook_ctx->total_num, destpath.c_str());
     }
 
-    void Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::shared_ptr<byte[]> rgba, int width, int height, int size, std::string destpath)
+    void Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::vector<byte> rgba, int width, int height, std::string destpath)
     {
         std::shared_ptr<astcenc_context> context ( Image_SaveASTC_CreateContext(16), Image_SaveASTC_DestroyContext );
-        auto astc_tex = Image_SaveASTC_Worker(context.get(), rgba, width, height, size, 0);
+        auto astc_tex = Image_SaveASTC_Worker(context.get(), rgba.data(), width, height, rgba.size(), 0);
 
         // switch to main thread
         boost::asio::dispatch(cook_ctx->ioc_cook, std::bind(Cook_WriteResult, cook_ctx, destpath, std::move(astc_tex)));
+    }
+
+    void Cook_SubmitPic(std::shared_ptr<CookContext> cook_ctx, image_ref pic, std::string destpath)
+    {
+        std::vector<byte> mt_buffer(pic->size);
+        memcpy(mt_buffer.data(), pic->buffer, pic->size);
+
+        auto width = pic->width;
+        auto height = pic->height;
+        auto size = pic->size;
+
+        pic = nullptr;
+
+        boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, std::string(destpath)));
+        ++cook_ctx->total_num;
     }
 
     void Cook_SubmitMDL(std::shared_ptr<CookContext> cook_ctx, std::string mdl)
@@ -113,19 +129,7 @@ namespace xe {
                     FS_StripExtension( destpath );
                     FS_DefaultExtension( destpath, ".astc" );
 
-                    {
-                        std::shared_ptr<byte[]> mt_buffer(new byte[pic->size]);
-                        memcpy(mt_buffer.get(), pic->buffer, pic->size);
-
-                        auto width = pic->width;
-                        auto height = pic->height;
-                        auto size = pic->size;
-
-                        pic = nullptr;
-
-                        boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, size, std::string(destpath)));
-                        ++cook_ctx->total_num;
-                    }
+                    Cook_SubmitPic(cook_ctx, pic, destpath);
                 }
             }
         }
@@ -142,21 +146,36 @@ namespace xe {
             FS_StripExtension( destpath );
             FS_DefaultExtension( destpath, ".astc" );
 
-            {
-                std::shared_ptr<byte[]> mt_buffer(new byte[pic->size]);
-                memcpy(mt_buffer.get(), pic->buffer, pic->size);
-
-                auto width = pic->width;
-                auto height = pic->height;
-                auto size = pic->size;
-
-                pic = nullptr;
-
-                boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, size, std::string(destpath)));
-                ++cook_ctx->total_num;
-            }
+            Cook_SubmitPic(cook_ctx, pic, destpath);
         }
 
+    }
+
+    void Cook_SearchResursive(std::vector<std::string> &out, const char *start_dir, const char *pattern)
+    {
+        auto t = FS_Search( va("%s/*", start_dir), true, true );
+        for( int i = 0; t && i < t->numfilenames; i++ )
+        {
+            auto filename = t->filenames[i];
+
+            if(matchpattern(FS_FileWithoutPath(filename), pattern, true))
+            {
+                out.push_back(filename);
+            }
+            else if(!Q_stricmp(t->filenames[i], va("%s/.", start_dir)))
+            {
+                // ignored
+            }
+            else if(!Q_stricmp(t->filenames[i], va("%s/..", start_dir)))
+            {
+                // ignored
+            }
+            else
+            {
+                Cook_SearchResursive(out, t->filenames[i], pattern);
+            }
+        }
+        if( t ) Mem_Free( t );
     }
 
     void Cook_Initiate()
@@ -168,20 +187,12 @@ namespace xe {
             std::vector<std::string> tex_files;
 
             // search for files
-            auto t = FS_Search( "models/*.mdl", true, true );
-            for( int i = 0; t && i < t->numfilenames; i++ )
-            {
-                mdl_files.push_back(t->filenames[i]);
-            }
-            if( t ) Mem_Free( t );
+            Cook_SearchResursive(mdl_files, "models", "*.mdl");
+
             Msg(  "Cook: found %d mdl files\n", (int)mdl_files.size() );
 
-            t = FS_Search( "models/texture/*.bmp", true, true );
-            for( int i = 0; t && i < t->numfilenames; i++ )
-            {
-                tex_files.push_back(t->filenames[i]);
-            }
-            if( t ) Mem_Free( t );
+            Cook_SearchResursive(tex_files, "models/texture", "*.bmp");
+            Cook_SearchResursive(tex_files, "models/texture", "*.tga");
             Msg(  "Cook: found %d texture files\n", (int)tex_files.size() );
 
             auto local_cook_ctx = g_cook_ctx;

@@ -1992,16 +1992,18 @@ void Con_DrawVersion( void )
 	int ram = Cpu_GetInstalledRamMegaBytes();
 	if (ram > 0)
 	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%d MB RAM)\nGPU: %s",
+		Q_snprintf(curbuild, MAX_STRING, "CPU: %s (%d MB RAM)\nGPU: %s%s",
 			Cpu_GetName(),
 			ram,
-			glConfig.renderer_string);
+			glConfig.renderer_string,
+			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
 	}
 	else
 	{
-		Q_snprintf(curbuild, MAX_STRING, "CPU: %s \nGPU: %s",
+		Q_snprintf(curbuild, MAX_STRING, "CPU: %s \nGPU: %s%s",
 			Cpu_GetName(),
-			glConfig.renderer_string);
+			glConfig.renderer_string,
+			GL_Support(GL_ASTC_EXT) ? "(ASTC)" : "");
 	}
 	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
 	start = scr_width->integer - stringLen;
