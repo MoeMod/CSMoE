@@ -289,28 +289,24 @@ qboolean Image_LoadASTC( const char *name, const byte *buffer, size_t filesize )
         return Image_LoadASTC_SW(name, buffer, filesize);
 }
 
-std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width, int height, int size)
+static const unsigned int save_block_x = 8;
+static const unsigned int save_block_y = 8;
+static const unsigned int save_block_z = 1;
+
+astcenc_context *Image_SaveASTC_CreateContext(int thread_num)
 {
-    static const unsigned int block_x = 8;
-    static const unsigned int block_y = 8;
-    static const unsigned int block_z = 1;
-
-    // Compute the number of ASTC blocks in each dimension
-    unsigned int block_count_x = (width + block_x - 1) / block_x;
-    unsigned int block_count_y = (height + block_y - 1) / block_y;
-
     astcenc_error status;
     // Initialize the default configuration for the block size and quality
     astcenc_config config;
-    config.block_x = block_x;
-    config.block_y = block_y;
+    config.block_x = save_block_x;
+    config.block_y = save_block_y;
     config.profile = profile;
 
-    status = astcenc_config_init(profile, block_x, block_y, block_z, quality, 0, &config);
+    status = astcenc_config_init(profile, save_block_x, save_block_y, save_block_z, quality, 0, &config);
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec config init failed: %s\n", astcenc_get_error_string(status));
-        return {};
+        return nullptr;
     }
 
     astcenc_context* context;
@@ -318,9 +314,23 @@ std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width,
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec context alloc failed: %s\n", astcenc_get_error_string(status));
-        return {};
+        return nullptr;
     }
+    return context;
+}
 
+void Image_SaveASTC_DestroyContext(astcenc_context *context)
+{
+    astcenc_context_free(context);
+}
+
+std::vector<byte> Image_SaveASTC_Worker(astcenc_context* context, std::shared_ptr<byte[]> rgba, int width, int height, int size, int thread_id)
+{
+    // Compute the number of ASTC blocks in each dimension
+    unsigned int block_count_x = (width + save_block_x - 1) / save_block_x;
+    unsigned int block_count_y = (height + save_block_y - 1) / save_block_y;
+
+    astcenc_error status;
     // ------------------------------------------------------------------------
     // Compress the image
     astcenc_image image;
@@ -336,11 +346,10 @@ std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width,
     std::vector<byte> result(sizeof(astc_header) + comp_len);
     uint8_t* comp_data = result.data() + sizeof(astc_header);
 
-    status = astcenc_compress_image(context, &image, &swizzle, comp_data, comp_len, 0);
+    status = astcenc_compress_image(context, &image, &swizzle, comp_data, comp_len, thread_id);
     if (status != ASTCENC_SUCCESS)
     {
         MsgDev( D_WARN, "Image_SaveASTC: Codec compress failed: %s\n", astcenc_get_error_string(status));
-        astcenc_context_free(context);
         return {};
     }
 
@@ -352,9 +361,9 @@ std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width,
     hdr.magic[2] = (ASTC_MAGIC_ID >> 16) & 0xFF;
     hdr.magic[3] = (ASTC_MAGIC_ID >> 24) & 0xFF;
 
-    hdr.block_x = static_cast<uint8_t>(block_x);
-    hdr.block_y = static_cast<uint8_t>(block_y);
-    hdr.block_z = static_cast<uint8_t>(block_z);
+    hdr.block_x = static_cast<uint8_t>(save_block_x);
+    hdr.block_y = static_cast<uint8_t>(save_block_y);
+    hdr.block_z = static_cast<uint8_t>(save_block_z);
 
     hdr.dim_x[0] =  image.dim_x        & 0xFF;
     hdr.dim_x[1] = (image.dim_x >>  8) & 0xFF;
@@ -367,8 +376,6 @@ std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width,
     hdr.dim_z[0] =  image.dim_z        & 0xFF;
     hdr.dim_z[1] = (image.dim_z >>  8) & 0xFF;
     hdr.dim_z[2] = (image.dim_z >> 16) & 0xFF;
-
-    astcenc_context_free(context);
 
     return result;
 }
@@ -392,7 +399,9 @@ qboolean Image_SaveASTC( const char *name, image_ref pix )
             return false;
     }
 
-    auto astc_tex = Image_SaveASTC_Worker(std::shared_ptr<byte[]>(pix, pix->buffer), pix->width, pix->height, pix->size);
+    auto context = Image_SaveASTC_CreateContext(1);
+    auto astc_tex = Image_SaveASTC_Worker(context, std::shared_ptr<byte[]>(pix, pix->buffer), pix->width, pix->height, pix->size, 0);
+    Image_SaveASTC_DestroyContext(context);
     if(astc_tex.empty())
         return false;
 

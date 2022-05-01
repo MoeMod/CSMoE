@@ -8,23 +8,27 @@
 #include <boost/asio.hpp>
 #include <optional>
 
-std::vector<byte> Image_SaveASTC_Worker(std::shared_ptr<byte[]> rgba, int width, int height, int size);
+struct astcenc_context;
+astcenc_context *Image_SaveASTC_CreateContext(int thread_num);
+void Image_SaveASTC_DestroyContext(astcenc_context *context);
+std::vector<byte> Image_SaveASTC_Worker(astcenc_context *context, std::shared_ptr<byte[]> rgba, int width, int height, int size, int thread_id);
 
 namespace xe {
     struct CookContext{
         boost::asio::io_context ioc_cook;
-        boost::asio::thread_pool ioc_cook_worker;
+        boost::asio::thread_pool ioc_cook_worker{16};
         std::optional<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> ioc_cook_work_guard;
         std::optional<boost::asio::executor_work_guard<boost::asio::thread_pool::executor_type>> ioc_cook_worker_work_guard;
-        int cur_num;
-        int total_num;
+        int cur_num = 0;
+        int total_num = 0;
+        std::shared_ptr<astcenc_context> context;
     };
     std::shared_ptr<CookContext> g_cook_ctx;
 
     void Cook_Run()
     {
         if(g_cook_ctx)
-            g_cook_ctx->ioc_cook.poll();
+            while(g_cook_ctx->ioc_cook.poll());
     }
 
     boost::asio::awaitable<void> Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::shared_ptr<byte[]> rgba, int width, int height, int size, std::string destpath)
@@ -32,7 +36,7 @@ namespace xe {
 
         // switch to cook thread pool
         co_await boost::asio::dispatch(cook_ctx->ioc_cook_worker, boost::asio::use_awaitable);
-        auto astc_tex = Image_SaveASTC_Worker(rgba, width, height, size);
+        auto astc_tex = Image_SaveASTC_Worker(cook_ctx->context.get(), rgba, width, height, size, 0);
 
         // switch to main thread
         co_await boost::asio::dispatch(cook_ctx->ioc_cook, boost::asio::use_awaitable);
@@ -177,6 +181,7 @@ namespace xe {
 
             local_cook_ctx->cur_num = 0;
             local_cook_ctx->total_num = (int)mdl_files.size() + (int)tex_files.size();
+            local_cook_ctx->context = { Image_SaveASTC_CreateContext(16), Image_SaveASTC_DestroyContext };
 
             co_await boost::asio::post(local_cook_ctx->ioc_cook, boost::asio::use_awaitable);
 

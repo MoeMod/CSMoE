@@ -178,6 +178,7 @@ void Image_Init( void )
 	switch( host.type )
 	{
 	case HOST_NORMAL:
+    case HOST_DEDICATED:
 		image.cmd_flags = IL_USE_LERPING|IL_ALLOW_OVERWRITE;		
 		image.loadformats = load_game;
 		image.saveformats = save_game;

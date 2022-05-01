@@ -4054,7 +4054,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 #ifdef XASH_ASTC
         // Load internal from ASTC cooked
         {
-            Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s", mdlname, name);
+            Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s.astc", mdlname, name);
             if (FS_FileExists(texname, false)) {
                 gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
                 break;
