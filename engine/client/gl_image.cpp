@@ -1452,7 +1452,10 @@ static void GL_UploadTexture( image_ref pic, gltexture_t *tex, qboolean subImage
 		}
 
 		if(!( tex->flags & TF_NOMIPMAP ) && !( tex->flags & TF_SKYSIDE ) && !( tex->flags & TF_TEXTURE_3D ))
-			data = GL_ApplyGamma( data, tex->width * tex->height, ( tex->flags & TF_NORMALMAP ));
+		{
+			if(!PFDesc[pic->type].compressed)
+				data = GL_ApplyGamma( data, tex->width * tex->height, ( tex->flags & TF_NORMALMAP ));
+		}
 
 		if( glTarget == GL_TEXTURE_1D )
 		{
@@ -2033,7 +2036,7 @@ namespace xe {
 
 	static lru_cache<int, std::shared_ptr<gltexture_t>> textureCache(0);
 
-	void TexLru_StudioSetupSkin( mstudiotexture_t *ptexture )
+	void TexLru_Upload( mstudiotexture_t *ptexture )
 	{
 		int texnum = ptexture->index;
 		gltexture_t	*tex = &r_textures[texnum];

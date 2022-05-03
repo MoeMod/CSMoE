@@ -391,7 +391,8 @@ public class XashActivity extends Activity {
 	public static native int  nativeTestWritePermission( String path );
 	public static native void nativeMouseMove( float x, float y );
 	public static native int  nativeGetBuildVersion();
-	
+	public static native void nativeOnLowMemory();
+
 	// for future expansion
 	public static native void nativeBall( int id, byte ball, short xrel, short yrel );
 	public static native void nativeJoyAdd( int id );
@@ -850,6 +851,11 @@ public class XashActivity extends Activity {
 	{
 		BuglyLog.w("Xash", str);
 	}
+
+	@Override
+	public void onLowMemory() {
+		XashActivity.nativeOnLowMemory();
+	}
 }
 
 /**
@@ -1065,7 +1071,7 @@ class EngineSurface extends SurfaceView implements SurfaceHolder.Callback, View.
 	{
 		try
 		{
-			EGL10 egl = ( EGL10 )EGLContext.getEGL();
+			EGL10 egl = (EGL10)EGLContext.getEGL();
 			
 			if( egl == null )
 			{

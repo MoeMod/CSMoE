@@ -1833,7 +1833,7 @@ static void GAME_EXPORT R_StudioSetupSkin( mstudiotexture_t *ptexture, int index
 	if( m_skinnum != 0 && m_skinnum < m_pTextureHeader->numskinfamilies )
 		pskinref += (m_skinnum * m_pTextureHeader->numskinref);
 
-    xe::TexLru_StudioSetupSkin(&ptexture[pskinref[index]]);
+    xe::TexLru_Upload(&ptexture[pskinref[index]]);
 	GL_Bind( XASH_TEXTURE0, ptexture[pskinref[index]].index );
 }
 
@@ -2104,7 +2104,7 @@ static void R_StudioDrawPoints_legacy( void )
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ))
 		{
-            xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
+            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -2523,7 +2523,7 @@ static void R_StudioDrawMeshes( mstudiotexture_t *ptexture, short *pskinref, flo
 
 		if( !( g_nForceFaceFlags & STUDIO_NF_CHROME ) && !(g_nForceFaceFlags & STUDIO_NF_OUTLINE))
 		{
-            xe::TexLru_StudioSetupSkin(&ptexture[pskinref[pmesh->skinref]]);
+            xe::TexLru_Upload(&ptexture[pskinref[pmesh->skinref]]);
 			GL_Bind( XASH_TEXTURE0, ptexture[pskinref[pmesh->skinref]].index );
 		}
 
@@ -4027,11 +4027,14 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 			}
 
 #ifdef XASH_ASTC
-			Q_snprintf(texname, sizeof(texname), "ddc/models/texture/%s.astc", name);
-			if (FS_FileExists(texname, false))
+			if(GL_Support(GL_ASTC_EXT) > 0)
 			{
-                gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
-				break;
+				Q_snprintf(texname, sizeof(texname), "ddc/models/texture/%s.astc", name);
+				if (FS_FileExists(texname, false))
+				{
+					gl_texturenum = xe::TexLru_LoadTextureExternal(texname, ptexture, flags, filter);
+					break;
+				}
 			}
 #endif
 
@@ -4053,6 +4056,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 
 #ifdef XASH_ASTC
         // Load internal from ASTC cooked
+		if(GL_Support(GL_ASTC_EXT) > 0)
         {
             Q_snprintf(texname, sizeof(texname), "ddc/%s.mdl/%s.astc", mdlname, name);
             if (FS_FileExists(texname, false)) {
@@ -4110,6 +4114,8 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		// duplicate texnum for easy acess 
 		if( tx ) tx->gl_texturenum = ptexture->index;
 		GL_SetTextureType( ptexture->index, TEX_STUDIO );
+        // upload immediately
+        xe::TexLru_Upload(ptexture);
 	}
 }
 

@@ -2688,7 +2688,7 @@ int FS_Close( file_t *file )
 		file->asset = NULL;
 	}
 #endif
-	if( close( file->handle ))
+	if( file->handle && close( file->handle ))
 		return EOF;
 
 	Mem_Free( file );

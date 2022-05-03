@@ -124,7 +124,7 @@ _inline float LittleFloat( float f )
 #define LittleLongSW(x)
 #define LittleShort(x) (x)
 #define LittleShortSW(x)
-#define LittleFloat(x) (x)
+_inline float LittleFloat( float f ) { return f; }
 #endif
 
 typedef unsigned int	dword;

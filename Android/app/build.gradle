@@ -4,7 +4,7 @@ apply plugin: 'bugly'
 
 bugly {
     appPackage = 'in.celest.xash3d.csbtem'
-    appVersion = '2481' // 白白：记得改这里，还有AndroidManifest.xml
+    appVersion = '2587' // 白白：记得改这里，还有AndroidManifest.xml
 
     appId = '39df575b0b' // 注册时分配的App ID
     appKey = '92a523be-1f71-4228-91be-f151ef970598' // 注册时分配的App Key
@@ -15,12 +15,12 @@ bugly {
 
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
         minSdkVersion 28
-        targetSdkVersion 29
+        targetSdkVersion 30
 
         externalNativeBuild {
             cmake {

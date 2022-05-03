@@ -62,7 +62,7 @@ namespace xe {
 
     void Cook_ProcessTexture(std::shared_ptr<CookContext> cook_ctx, std::vector<byte> rgba, int width, int height, std::string destpath)
     {
-        std::shared_ptr<astcenc_context> context ( Image_SaveASTC_CreateContext(16), Image_SaveASTC_DestroyContext );
+        std::shared_ptr<astcenc_context> context ( Image_SaveASTC_CreateContext(1), Image_SaveASTC_DestroyContext );
         auto astc_tex = Image_SaveASTC_Worker(context.get(), rgba.data(), width, height, rgba.size(), 0);
 
         // switch to main thread
@@ -78,9 +78,7 @@ namespace xe {
         auto height = pic->height;
         auto size = pic->size;
 
-        pic = nullptr;
-
-        boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, mt_buffer, width, height, std::string(destpath)));
+        boost::asio::dispatch(cook_ctx->ioc_cook_worker, std::bind(Cook_ProcessTexture, cook_ctx, std::move(mt_buffer), width, height, std::move(destpath)));
         ++cook_ctx->total_num;
     }
 

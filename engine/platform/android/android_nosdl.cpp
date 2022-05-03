@@ -32,6 +32,8 @@ convar_t *android_sleep;
 #include "imgui_impl_xash.h"
 #endif
 
+#include "tier1/strtools.h"
+
 #ifndef JAVA_EXPORT
 #define JAVA_EXPORT // a1ba: workaround for my IDE, where Java files are not included
 #endif
@@ -805,6 +807,11 @@ DECLARE_JNI_INTERFACE_VOID( int, nativeGetBuildVersion )
 	return Q_buildnum();
 }
 
+DECLARE_JNI_INTERFACE_VOID( void, nativeOnLowMemory )
+{
+	return Sys_LowMemory();
+}
+
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad( JavaVM *vm, void *reserved )
 {
 	return JNI_VERSION_1_6;
@@ -1195,8 +1202,12 @@ void Android_Log(const char *str)
 {
 	__android_log_print( ANDROID_LOG_DEBUG, "Xash", "%s", str );
 
-	jstring jstr = jni.env->NewStringUTF( str );
+	jchar jbuffer[256];
+	int size = Q_UTF8ToUTF16(str, jbuffer, sizeof(jbuffer));
+
+	jstring jstr = jni.env->NewString( jbuffer, size );
 	jni.env->CallStaticVoidMethod(jni.actcls, jni.logToBugly, jstr);
+	jni.env->DeleteLocalRef(jstr);
 }
 
 #endif
