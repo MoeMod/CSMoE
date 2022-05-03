@@ -735,11 +735,15 @@ void CBasePlayerWeapon::ItemPostFrame()
 
 	if (m_flGlock18Shoot != invalid_time_point)
 	{
+		int iClipBeforeAttack = m_iClip;
 		FireRemaining(m_iGlock18ShotsFired, m_flGlock18Shoot, TRUE);
+		m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 	}
 	else if (gpGlobals->time > m_flFamasShoot && m_flFamasShoot != invalid_time_point)
 	{
+		int iClipBeforeAttack = m_iClip;
 		FireRemaining(m_iFamasShotsFired, m_flFamasShoot, FALSE);
+		m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 	}
 
 	// Return zoom level back to previous zoom level before we fired a shot.

@@ -762,8 +762,7 @@ namespace sv {
 		}
 #endif
 		DualSlashAnim++;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.97s;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.15s;
+		m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.97s;
 		SlashAnim++;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.03s;
 	}

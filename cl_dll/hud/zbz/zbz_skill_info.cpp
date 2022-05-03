@@ -115,6 +115,7 @@ const std::map<ZombieZSkillSkillId, std::pair<ZombieZSkillType, const char*>> g_
 	{Skill_ZombieS, {TYPE_ZOMBIE, "生化超越"}},
 	{Skill_GhostHunter, {TYPE_HUMAN, "幽灵猎手"}},
 	{Skill_ZombiBombGiveaway, {TYPE_ZOMBIE, "兽颅增殖"}},
+	{Skill_SwordMaster, {TYPE_HUMAN, "刀剑将领"}},
 };
 
 vec3_t g_ColorActive = { 0.74, 0.87, 0.5 };

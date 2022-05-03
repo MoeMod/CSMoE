@@ -58,6 +58,7 @@ public:
 	void Event_OnInfection(CBasePlayer *victim, CBasePlayer *attacker) override;
 	float AdjustDamageTaken(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
 	void Event_AdjustHumanDamage(CBasePlayer* attacker, float& flDamage) override;
+	void Event_AdjustHumanHitgroup(CBasePlayer* attacker, HitBoxGroup& iHitgroup) override;
 	void OnThink() override;
 	void OnTouch(CBaseEntity* other) override;
 	void OnKilled(entvars_t *pKiller, entvars_t *pInflictor) override;

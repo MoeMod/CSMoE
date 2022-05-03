@@ -98,6 +98,7 @@ cvar_t sk_healthkit3 = {"sk_healthkit3", "0", 0, 0.0f, NULL};
 cvar_t sk_scientist_heal1 = {"sk_scientist_heal1", "0", 0, 0.0f, NULL};
 cvar_t sk_scientist_heal2 = {"sk_scientist_heal2", "0", 0, 0.0f, NULL};
 cvar_t sk_scientist_heal3 = {"sk_scientist_heal3", "0", 0, 0.0f, NULL};
+cvar_t assistaim = { "mp_assistaim", "0", FCVAR_SERVER, 0.0f, NULL };
 
 cvar_t gamemode = {"mp_gamemode", "none", FCVAR_SERVER, 0.0f, NULL};
 cvar_t maxkills = {"mp_maxkills", "150", FCVAR_SERVER, 0.0f, NULL};

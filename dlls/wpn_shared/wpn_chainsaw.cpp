@@ -150,6 +150,7 @@ void CChainsaw::ItemPostFrame(void)
 				}
 				case 1:
 				{
+					int iClipBeforeAttack = m_iClip;
 					if (!m_iClip)
 					{
 						SendWeaponAnim(ANIM_ATTACK_END, UseDecrement() != FALSE);
@@ -175,6 +176,7 @@ void CChainsaw::ItemPostFrame(void)
 					UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 					Vector vecSrc = m_pPlayer->GetGunPosition();
 				#ifndef CLIENT_DLL
+					m_pPlayer->m_pModStrategy->OnAttack_Post(this, iClipBeforeAttack, m_iClip, m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]);
 					m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 				#endif
 					m_bSlash = 0;

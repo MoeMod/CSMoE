@@ -107,7 +107,7 @@ public:
 		float flDamage = 47;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 380 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 480 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -118,7 +118,7 @@ public:
 		float flDamage = 120;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 785 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1105 + (g_pGameRules->m_iTotalRoundsPlayed * 150);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -181,7 +181,7 @@ void CKnifeDualKukri::DelayPrimaryAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetPrimaryAttackDamage(), 55, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetPrimaryAttackDamage(), 85, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{
@@ -220,7 +220,7 @@ void CKnifeDualKukri::DelaySecondaryAttack()
 	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
 
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 95, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 135, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{
@@ -283,12 +283,11 @@ hit_result_t CKnifeDualKukri::KnifeAttack(float flDamage, float flRadius, float 
 			}
 		}
 
-		tr.iHitgroup = HITGROUP_HEAD;
-
 		pAttackPlayer->m_iWeaponVolume = 128;
 
 		ClearMultiDamage();
 
+		tr.iHitgroup = HITGROUP_HEAD;
 		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);

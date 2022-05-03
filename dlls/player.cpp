@@ -1300,7 +1300,7 @@ void packPlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem, bool packAmmo)
 		pWeaponBox->pev->velocity = pPlayer->pev->velocity * 0.75;
 
 		pWeaponBox->SetThink(&CWeaponBox::Kill);
-		pWeaponBox->pev->nextthink = gpGlobals->time + 300s;
+		pWeaponBox->pev->nextthink = gpGlobals->time + g_pModRunning->GetWeaponBoxLifeTime();
 		pWeaponBox->PackWeapon(pItem);
 
 		if (packAmmo)
@@ -7902,7 +7902,7 @@ void CBasePlayer::DropPlayerItem(const char *pszItemName)
 			pWeaponBox->pev->angles.x = 0;
 			pWeaponBox->pev->angles.z = 0;
 			pWeaponBox->SetThink(&CWeaponBox::Kill);
-			pWeaponBox->pev->nextthink = gpGlobals->time + 300s;
+			pWeaponBox->pev->nextthink = gpGlobals->time + g_pModRunning->GetWeaponBoxLifeTime();
 			
 			pWeaponBox->PackWeapon(pWeapon);
 

@@ -456,12 +456,17 @@ namespace sv {
 				return;
 
 			if (m_flTime > gpGlobals->time)
-				data.flFlying = data.flDucking = data.flNotOnGround = data.flVelocityModifier = 0.0f;
+			{
+				data.flOnGround = data.flFlying = data.flDucking = data.flNotOnGround = -1.0f;
+				data.flVelocityModifier = 0.0f;
+			}
+				
 
 			if (RANDOM_FLOAT(0, 1) > 0.01f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
 				return;
 
-			data.flFlying = data.flDucking = data.flNotOnGround = data.flVelocityModifier = 0.0f;
+			data.flOnGround = data.flFlying = data.flDucking = data.flNotOnGround = -1.0f;
+			data.flVelocityModifier = 0.0f;
 			m_flTime = gpGlobals->time + 0.01s;
 		}
 	private:
@@ -585,6 +590,9 @@ namespace sv {
 		const char* GetName() const override { return "持之以恒"; }
 		const char* GetDesc() const override { return "解锁人类特殊技能"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnGetSkill() override {
+			//show hud
+		}
 	};
 
 	class ZSkill_StealthReloader : public CZombieZSkill_Base
@@ -747,7 +755,7 @@ namespace sv {
 			flDamage *= GetDamageBonus();
 		}
 	private:
-		float GetKickRateBonus() const { return 1.0f + 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetKickRateBonus() const { return 1.0f + 0.02f * g_pGameRules->m_iTotalRoundsPlayed; }
 		float GetRadiusBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
 		float GetDamageBonus() const { return 1.0f + 0.2f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
@@ -1417,6 +1425,14 @@ namespace sv {
 						if (pEntity->pev->takedamage == DAMAGE_NO)
 							continue;
 
+						CBaseEntity* pOwner = CBaseEntity::Instance(pev->owner);
+						if (pOwner && pOwner->IsPlayer())
+						{
+							pEntityOwner = static_cast<CBasePlayer*>(pOwner);
+							if (g_pGameRules->PlayerRelationship(pEntityOwner, pEntity) == GR_TEAMMATE)
+								continue;
+						}
+
 						pEntity->TakeDamage(pev, VARS(pev->owner), 30.0f, DMG_NEVERGIB | DMG_BURN | DMG_NOMORALE | DMG_EXPLOSION);
 					}
 				}
@@ -1538,21 +1554,24 @@ namespace sv {
 		
 		void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int &iClip, int &iBackAmmo)
 		{
-			if (iClip <= 0)
+			if (iClip < 0)
 				return;
 
 			if (iBackAmmo <= 0)
 				return;
 
 			int iClipDecrease = iClipBeforeAttack - iClip;
-			if (iBackAmmo - iClipDecrease)
+			if (iBackAmmo - iClipDecrease >= 0)
 			{
 				iBackAmmo -= iClipDecrease;
 				iClip += iClipDecrease;
 			}
 			else
 			{
+				iClip += iClipDecrease;
 				iClip -= (iClipDecrease - iBackAmmo);
+				if (iClip < 0)
+					iClip = 0;
 				iBackAmmo = 0;
 			}
 		}
@@ -1637,7 +1656,8 @@ namespace sv {
 			if (m_flNextThink > gpGlobals->time)
 				return;
 
-			if (g_pGameRules->m_iNumCT <= 6)
+			int iTeamCT = CountTeamPlayers(CT);
+			if (iTeamCT <= 6)
 			{
 				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
 				if (strategy) {
@@ -1647,6 +1667,8 @@ namespace sv {
 						return;
 
 					EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterready.wav", VOL_NORM, ATTN_NORM);
+
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "按E成为幽灵猎手");
 
 					strategy->SetClassChangeTime(1, 1);
 
@@ -1787,6 +1809,15 @@ namespace sv {
 		float GetDamageBonus() const { return 1.0f - 0.05f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
+	class ZSkill_SwordMaster : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_SwordMaster(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "刀剑将领"; }
+		const char* GetDesc() const override { return "激活致命打击对近身武器的效果。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -1835,11 +1866,13 @@ namespace sv {
 		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
 		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
-		{ Skill_ZombieS, 15, MakeSkill<ZSkill_ZombieS> },
+		{ Skill_ZombieS, 15, MakeSkill<ZSkill_ZombieS>},
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
 		{ Skill_Adaptability, 100, MakeSkill<ZSkill_Adaptability> },
 		{ Skill_ZombiBombGiveaway, 50, MakeSkill<ZSkill_ZombiBombGiveaway> },
 		{ Skill_BombDefense, 100, MakeSkill<ZSkill_BombDefense> },
+		{ Skill_SwordMaster, 100, MakeSkill<ZSkill_SwordMaster> },
+		{ Skill_Specialist, 100, MakeSkill<ZSkill_Specialist> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

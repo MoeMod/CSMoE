@@ -2084,7 +2084,7 @@ namespace sv {
 
 	duration_t CZombieSkill_ZombieRevival::GetDurationTime() const
 	{
-		return 5.0s;
+		return 13.0s;
 	}
 
 	float CZombieSkill_ZombieRevival::GetDamageRatio() const

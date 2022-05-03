@@ -1931,7 +1931,7 @@ CBaseEntity::FireBullets3(Vector vecSrc, Vector vecDirShooting, float vecSpread,
 		if (pPlayer) {
 			vecDir = pPlayer->m_pModStrategy->AdjustFireBullets3Dir(vecDir);
 		}
-		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot())
+		if (!pPlayer->IsUsingPC() && !pPlayer->IsBot() && (int)CVAR_GET_FLOAT("mp_assistaim"))
 		{
 			FireBulletsForMobile(vecSrc, vecDir, flDistance, flPenetrationDistance, iPenetration, iBulletType, iDamage, flRangeModifier, pevAttacker, bPistol, this);
 			return Vector(x * vecSpread, y * vecSpread, 0);

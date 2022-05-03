@@ -22,7 +22,6 @@ GNU General Public License for more details.
 #include "mod_zbz.h"
 #include "player/player_zombie.h"
 #include "player/player_mod_strategy.h"
-#include "zb2/zb2_zclass.cpp"
 
 #include "util/u_range.hpp"
 
@@ -41,7 +40,7 @@ GNU General Public License for more details.
 }
 
 namespace sv {
-	constexpr int MAX_LEVELS = 30;
+	constexpr int MAX_LEVELS = 35;
 	constexpr int HURT_PER_XP = 10; // 满足累计承受伤害后获得经验值
 	constexpr int HURT_AMOUNT = 400; // 满足累计承受伤害值
 	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
@@ -322,10 +321,22 @@ float CPlayerModStrategy_ZBZ::AdjustDamageTaken(entvars_t * pevInflictor, entvar
 
 void CPlayerModStrategy_ZBZ::Event_AdjustHumanDamage(CBasePlayer* attacker, float& flDamage)
 {
-	if (attacker != m_pPlayer)
-		return;
+	CPlayerModStrategy_ZB2::Event_AdjustHumanDamage(attacker, flDamage);
 
 	SKILL_FUNCTION(m_vecSkill, OnAdjustDamage, attacker, flDamage);
+}
+
+void CPlayerModStrategy_ZBZ::Event_AdjustHumanHitgroup(CBasePlayer* attacker, HitBoxGroup& iHitgroup)
+{
+	CPlayerModStrategy_ZB2::Event_AdjustHumanHitgroup(attacker, iHitgroup);
+
+	if (CheckSkill(Skill_SwordMaster))
+	{
+		if (!m_pPlayer->m_bIsZombie && GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING)
+		{
+			iHitgroup = HITGROUP_HEAD;
+		}
+	}
 }
 
 void CPlayerModStrategy_ZBZ::Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType)
@@ -445,7 +456,7 @@ void CPlayerModStrategy_ZBZ::OnThink()
 			fireElapsed = false;
 			m_pPlayer->TakeDamage(atk->pev, atk->pev, 20.0f + 20.0f * g_pGameRules->m_iTotalRoundsPlayed, DMG_BURN | DMG_NOMORALE);
 		}
-		float flSlow = 0.5f - 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
+		float flSlow = 0.8f - 0.01f * g_pGameRules->m_iTotalRoundsPlayed;
 		if(m_pPlayer->m_flVelocityModifier > flSlow && m_pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK)
 			m_pPlayer->m_flVelocityModifier = flSlow;
 
@@ -599,16 +610,18 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pModZBZ->InfectionSound();
 			m_pModZBZ->CheckWinConditions();
 		}
-		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			m_iChangeClassTime[0] = -1;
-
+			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			switch (RANDOM_LONG(0, 3))
 			{
 			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
 			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
 			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
 			}
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
 			
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
@@ -649,16 +662,19 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				strategy->SetStunSpeedTime(1.0s, 1.0);
 			}
 		}
-		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && m_flNextTimeChangeZombie < gpGlobals->time && !m_pPlayer->IsBot())
+		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			float flHealth = m_pPlayer->pev->health;
 			float flMaxHealth = m_pPlayer->pev->max_health;
-
-			if (flHealth <= 3000)
+			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
+			if (flHealth <= 3000 || m_flNextTimeChangeZombie > gpGlobals->time)
 			{
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "血量不足或切换冷却时间未到，无法改变僵尸种类");
 				return;
 			}
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
+
 			m_flNextTimeChangeZombie = gpGlobals->time + 20.0s;
 			m_pPlayer->m_ZombieClass = "random";
 			m_pPlayer->pev->sequence = 0;
@@ -667,10 +683,10 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pPlayer->pev->max_health = flMaxHealth;
 			m_pPlayer->pev->health = flHealth - 3000;	
 		}
-		else if (m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			m_iChangeClassTime[1] = -1;
-
+			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			SetHero(true);
 			m_pPlayer->SetScoreboardAttributes();
 			m_pPlayer->pev->max_health = 10000.0f;

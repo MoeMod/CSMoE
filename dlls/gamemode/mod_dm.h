@@ -30,6 +30,7 @@ public: // CHalfLifeMultiplay
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
 
 public:
+	duration_t GetWeaponBoxLifeTime() { return 5.0s; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 public:

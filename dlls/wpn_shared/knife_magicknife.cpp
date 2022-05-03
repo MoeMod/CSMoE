@@ -900,7 +900,17 @@ namespace sv {
 			if (m_pOwner->pev->takedamage != DAMAGE_NO && m_pAttachedEnt->IsAlive())
 			{
 				Vector vecDirection = (m_pAttachedEnt->pev->origin - m_pOwner->pev->origin).Normalize();
-				m_pAttachedEnt->TakeDamage(this->pev, m_pOwner->pev, GetDamage(), DMG_NEVERGIB | DMG_BULLET);
+
+				TraceResult tr;
+
+				UTIL_TraceLine(m_pOwner->pev->origin, m_pAttachedEnt->pev->origin, dont_ignore_monsters, m_pOwner->edict(), &tr);
+
+				ClearMultiDamage();
+				tr.iHitgroup = HITGROUP_CHEST;
+				m_pAttachedEnt->TraceAttack(m_pOwner->pev, GetDamage(), vecDirection, &tr, DMG_NEVERGIB | DMG_BULLET);
+				ApplyMultiDamage(this->pev, m_pOwner->pev);
+
+				//m_pAttachedEnt->TakeDamage(this->pev, m_pOwner->pev, GetDamage(), DMG_NEVERGIB | DMG_BULLET);
 			}
 		}
 

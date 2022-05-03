@@ -3555,13 +3555,16 @@ void CHalfLifeMultiplay::PlayerThink(CBasePlayer *pPlayer)
 		pPlayer->m_bCanShoot = true;
 	}
 
-	if (pPlayer->m_pActiveItem && pPlayer->m_pActiveItem->IsWeapon())
+	if (pPlayer->m_pActiveItem)
 	{
-		CBasePlayerWeapon *pWeapon = static_cast<CBasePlayerWeapon *>(pPlayer->m_pActiveItem->GetWeaponPtr());
-
-		if (pWeapon->m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
+		if (pPlayer->m_pActiveItem->IsWeapon())
 		{
-			pPlayer->m_bCanShoot = false;
+			CBasePlayerWeapon* pWeapon = static_cast<CBasePlayerWeapon*>(pPlayer->m_pActiveItem->GetWeaponPtr());
+
+			if (pWeapon->m_iWeaponState & WPNSTATE_SHIELD_DRAWN)
+			{
+				pPlayer->m_bCanShoot = false;
+			}
 		}
 	}
 

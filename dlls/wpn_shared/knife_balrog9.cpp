@@ -287,7 +287,7 @@ namespace sv {
 
 					m_iState = 2;
 
-					m_flTimeCheckCharge = gpGlobals->time + 1.5s;
+					m_flTimeCheckCharge = gpGlobals->time + 1.0s;
 					m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.5s;
 					break;
 				}

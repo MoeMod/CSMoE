@@ -395,7 +395,7 @@ void CKnifeSkullT9::PrimaryAttack(void)
 	SetThink(&CKnifeSkullT9::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9s;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.4s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 
@@ -424,7 +424,7 @@ void CKnifeSkullT9::DelayPrimaryAttack()
 
 #ifndef CLIENT_DLL
 	m_iSwing++;
-	switch (KnifeAttack(GetPrimaryAttackDamage(), 95, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, true))
+	switch (KnifeAttack(GetPrimaryAttackDamage(), 117, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, true))
 	{
 	case HIT_NONE:
 	{
@@ -463,7 +463,7 @@ void CKnifeSkullT9::DelaySecondaryAttack()
 {
 	BOOL fDidHit = FALSE;
 #ifndef CLIENT_DLL
-	switch (KnifeAttack(GetSecondaryAttackDamage(), 75, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, false))
+	switch (KnifeAttack(GetSecondaryAttackDamage(), 130, 180, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer, false))
 	{
 	case HIT_NONE:
 	{
@@ -603,6 +603,15 @@ hit_result_t CKnifeSkullT9::KnifeAttack(float flDamage, float flRadius, float fl
 
 						player->m_flVelocityModifier = 1.0;
 					}
+				}
+				else
+				{
+					Vector2D vecDir2D = (player->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+					player->pev->velocity.x = vecDir2D.x * 600;
+					player->pev->velocity.y = vecDir2D.y * 600;
+
+					player->m_flVelocityModifier = 1.0;
 				}
 			}
 		}

@@ -54,6 +54,7 @@ public:
 	virtual bool IsGameStarted()  { return true; }
 	virtual bool Host_Say(edict_t *pEntity, int teamonly, const char *content) { return false; }
     virtual void W_Precache() {}
+	virtual duration_t GetWeaponBoxLifeTime() { return 300.0s; }
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, virtual public IBaseMod

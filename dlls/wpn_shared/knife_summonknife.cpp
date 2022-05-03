@@ -943,7 +943,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 644.0f;
-				flDamage = 344.0f;
+				flDamage = 544.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -964,7 +964,7 @@ namespace sv {
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 			{
 				//flDamage = 1380.0f;
-				flDamage = 450.0f;
+				flDamage = 870.0f;
 				if (m_pSummoner)
 					flDamage *= 0.85;
 			}
@@ -985,7 +985,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2000.0f;
-				flDamage = 900.0f;
+				flDamage = 1300.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 3700.0f;
 #endif
@@ -998,7 +998,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 			if (g_pModRunning->DamageTrack() == DT_ZB)
 				//flDamage = 2300.0f;
-				flDamage = 1100.0f;
+				flDamage = 1600.0f;
 			else if (g_pModRunning->DamageTrack() == DT_ZBS)
 				flDamage = 4255.0f;
 #endif
