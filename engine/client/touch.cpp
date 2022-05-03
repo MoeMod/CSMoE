@@ -1004,7 +1004,7 @@ void Touch_Init( void )
 	// input devices cvar
 	touch_enable = Cvar_Get( "touch_enable", DEFAULT_TOUCH_ENABLE, CVAR_ARCHIVE, "enable touch controls" );
 #if defined(XASH_SDL) && defined(__ANDROID__)
-	SDL_SetHint( SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1" );
+	//SDL_SetHint( SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH, "1" );
 #endif
 #if defined(XASH_SDL) && defined(__APPLE__) && ( TARGET_OS_IOS || TARGET_OS_IPHONE )
 	// iOS Settings...

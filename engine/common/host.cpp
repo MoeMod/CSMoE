@@ -1293,6 +1293,9 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 #if defined XASH_GLES && !defined __EMSCRIPTEN__ && !TARGET_OS_IOS && defined SDL_HINT_OPENGL_ES_DRIVER
 	SDL_SetHint( SDL_HINT_OPENGL_ES_DRIVER, "1" );
 #endif
+#if defined __ANDROID__
+	SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif
 #endif
 
 #ifdef XASH_WINRT
@@ -1413,6 +1416,11 @@ int EXPORT Host_Main( int argc, const char **argv, const char *progname, int bCh
 #endif
 #endif
  	switch_installdll_server();
+#endif
+
+#ifdef __ANDROID__
+ 	void Android_SetupJNI();
+	Android_SetupJNI();
 #endif
 
 	pChangeGame = func;	// may be NULL

@@ -37,11 +37,6 @@ else()
 	set(XASH_ENGINE xash) # Lib name
 endif()
 
-if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-	option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" ON)
-else()
-	option(XASH_64BIT "Enable experimental 64-bit build. Note that you must also provide 64-bit game binaries" OFF)
-endif()
 option(XASH_GLES   "Enable if Xash3D is running over GL to GLES translator." OFF)
 option(XASH_NANOGL "Use NanoGL(GLES1). Implicitly enables XASH_GLES." OFF)
 if(XASH_NANOGL)
@@ -174,10 +169,10 @@ if(NOT XASH_DEDICATED)
 	)
 
 	set(XASH_ENGINE_ANDROID_SOURCES
-	   platform/android/vid_android.cpp
-	   platform/android/android_nosdl.cpp
-	   platform/android/snd_opensles.cpp
-	   platform/ime_stub.cpp
+		common/launcher.cpp
+		platform/android/android_nosdl.cpp
+		platform/android/snd_opensles.cpp
+		platform/ime_stub.cpp
 	)
 
 	if(IOS)
@@ -399,6 +394,10 @@ if(XASH_SKIPCRTLIB)
 endif()
 
 if(ANDROID)
+	add_definitions(-DSINGLE_BINARY)
+	if(XASH_SDL)
+		add_definitions(-DXASH_SDLMAIN)
+	endif()
 	add_library(${XASH_ENGINE} SHARED ${XASH_ENGINE_SOURCES})
 elseif(XASH_STATIC_GAMELIB)
 	add_definitions(-DSINGLE_BINARY)

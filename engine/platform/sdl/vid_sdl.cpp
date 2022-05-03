@@ -524,6 +524,9 @@ qboolean VID_SetMode( void )
 
 	gl_swapInterval->modified = true;
 	fullscreen = Cvar_VariableInteger("fullscreen") != 0;
+#if defined(__ANDROID__)
+	fullscreen = true;
+#endif
 
 	if(( err = R_ChangeDisplaySettings( iScreenWidth, iScreenHeight, fullscreen )) == rserr_ok )
 	{
@@ -584,6 +587,9 @@ qboolean VID_GetDPI(float* out)
 #elif TARGET_OS_IPHONE
 	success = true;
 	dpi = 2.0f;
+#elif defined(__ANDROID__)
+	success = true;
+	dpi = Android_GetDisplayDPI() * 0.75;
 #elif defined(SDL_VIDEO_DRIVER_COCOA)
 	success = true;
 	dpi = MacOS_GetDPI();

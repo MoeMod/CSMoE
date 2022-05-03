@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.10.2)
 
+#add_library(hidapi_3p INTERFACE)
+#set(BUILD_SHARED_LIBS OFF)
+#set(HIDAPI_BUILD_HIDTEST OFF)
+#add_subdirectory(hidapi EXCLUDE_FROM_ALL)
+#target_link_libraries(hidapi_3p INTERFACE hidapi::hidapi)
+
 add_library(3rdparty-sdl2 INTERFACE)
 if(MSVC)
 	add_definitions(-D_ftol2_sse=SDL_ftol2_sse) # fix x86 compile
@@ -7,10 +13,11 @@ endif()
 set(SDL_SHARED OFF CACHE BOOL "" FORCE)
 set(DIRECTX OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
 set(LIBC ON CACHE BOOL "" FORCE) # win10 arm dont have dx8
+set(HIDAPI OFF CACHE BOOL "" FORCE) # win10 arm dont have dx8
 set(SDL_CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 add_subdirectory(sdl2 EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-sdl2 INTERFACE SDL2-static)
-if(IOS)
+if(IOS OR ANDROID)
 	target_link_libraries(3rdparty-sdl2 INTERFACE SDL2main)
 endif()
 
