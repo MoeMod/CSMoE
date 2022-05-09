@@ -57,15 +57,10 @@ public:
 	}*/
 
 private:
-	UniqueTexture m_pBG[2];
-
-	float m_flDisplayEnd;
 	int m_iCount;
 
 	int m_iNightStart;
 	int m_iNightEnd;
-
-	char m_szText[128];
 };
 
 }

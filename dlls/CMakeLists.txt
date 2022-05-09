@@ -218,6 +218,7 @@ set(HLDLL_SRCS
 	./gamemode/zb2/zombidogegg.cpp
 	./cannonexdragon.cpp
 	./spearammo.cpp
+	./gamemode/mod_z4e.cpp
 	)
 
 set (HLWPN_SRCS

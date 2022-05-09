@@ -231,4 +231,11 @@ void CMod_TeamDeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->SpawnProtection_Start(3.0s);
 }
 
+ModConfigData_t CMod_TeamDeathMatch::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker)
+{
+    if(!strcmp(key, "WeaponBoxLifeTime"))
+        return 3.0s;
+    return IBaseMod::QueryModConfig(key, defaultValue, invoker);
+}
+
 }

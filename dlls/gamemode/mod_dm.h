@@ -28,9 +28,9 @@ public: // CHalfLifeMultiplay
 	void CheckWinConditions() override {}
 	void PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor) override;
 	void PlayerSpawn(CBasePlayer *pPlayer) override;
+    ModConfigData_t QueryModConfig(const char *key, ModConfigData_t defaultValue = {}, CBaseEntity *invoker = nullptr) override;
 
 public:
-	duration_t GetWeaponBoxLifeTime() { return 5.0s; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 
 public:

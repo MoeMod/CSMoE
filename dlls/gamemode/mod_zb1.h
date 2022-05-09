@@ -79,6 +79,7 @@ public:
 	virtual void PickZombieOrigin();
 	virtual void HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attacker);
 	virtual void RoundEndScore(int iWinStatus);
+	virtual void CheckTimeoutWin();
 
 	virtual BOOL FInfectionStarted();
 	void TeamCheck();

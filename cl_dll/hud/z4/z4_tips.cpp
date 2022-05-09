@@ -66,20 +66,11 @@ CHudZ4Tips::CHudZ4Tips(void)
 
 void CHudZ4Tips::InitHUDData()
 {
-	memset(m_szText, 0, sizeof(m_szText));
-
-	m_flDisplayEnd = 0.0f;
 	m_iCount = -1;
 }
 
 int CHudZ4Tips::VidInit(void)
 {
-	if (!m_pBG[0])
-		m_pBG[0] = R_LoadTextureUnique("resource/zombi/z4_hmmsgbg");
-
-	if (!m_pBG[1])
-		m_pBG[1] = R_LoadTextureUnique("resource/zombi/z4_zbmsgbg");
-
 	return 1;
 }
 
@@ -93,10 +84,6 @@ int CHudZ4Tips::Draw(float flTime)
 		return 0;
 
 	int time = flTime - gHUD.m_Timer.m_fStartTime + 1;
-
-	int iX, iY;
-	iX = ScreenWidth / 2 - m_pBG[0]->w() / 2;
-	iY = ScreenHeight * 0.18;
 
 	bool isZombie = g_PlayerExtraInfo[index].zombie;
 	if (isZombie)
@@ -123,7 +110,6 @@ int CHudZ4Tips::Draw(float flTime)
 		if (time == 1)
 		{
 			gHUD.m_ZB4.SetStatus(0, Z4_POWERUP, Z4_ICON_FLASH);
-			m_flDisplayEnd = 0.0f;
 		}
 
 		if (isZombie)
@@ -135,18 +121,14 @@ int CHudZ4Tips::Draw(float flTime)
 			{
 				gHUD.m_ZB4.SetStatus(5, Z4_MIDNIGHTDOWN, Z4_ICON_FLASH);
 
-				m_flDisplayEnd = flTime + 3.0f;
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(6, 8)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/human_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(6, 8)], 3, 0);
 			}
 			else
 			{
 				gHUD.m_ZB4.SetStatus(5, Z4_MIDNIGHTUP, Z4_ICON_FLASH);
 				gHUD.m_ZB4.SetStatus(4, Z4_HPUP, Z4_ICON_FLASH);
 
-				m_flDisplayEnd = flTime + 3.0f;
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(15, 17)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/zombie_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(15, 17)], 3, 1);
 			}
 		}
 
@@ -169,9 +151,7 @@ int CHudZ4Tips::Draw(float flTime)
 			{
 				gHUD.m_ZB4.SetStatus(5, Z4_MIDNIGHTDOWN, Z4_ICON_FLASH2);
 
-				m_flDisplayEnd = flTime + 3.0f;
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(9, 11)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/human_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(9, 11)], 3, 0);
 			}
 			else
 			{
@@ -179,9 +159,7 @@ int CHudZ4Tips::Draw(float flTime)
 				gHUD.m_ZB4.SetStatus(4, Z4_HPUP, Z4_ICON_FLASH2);
 				gHUD.m_ZB4.SetStatus(7, Z4_SPEEDDOWN, Z4_ICON_SHOW);
 
-				m_flDisplayEnd = flTime + 3.0f;
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(18, 20)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/zombie_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(18, 20)], 3, 1);
 			}
 		}
 
@@ -194,55 +172,23 @@ int CHudZ4Tips::Draw(float flTime)
 		// RoundStart Tips
 		if (time == 5)
 		{
-			m_flDisplayEnd = flTime + 3.0f;
-			strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(0, 2)], sizeof(m_szText));
-			gEngfuncs.pfnClientCmd("spk sound/events/human_message.wav");
+            gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(0, 2)], 3, 0);
 		}
 
 		// FirstZombie Tips
 		if (time == 21)
 		{
-			m_flDisplayEnd = flTime + 3.0f;
 			if (!isZombie)
 			{
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(3, 5)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/human_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(3, 5)], 3, 0);
 			}
 			else
 			{
-				strncpy(m_szText, g_szTipsText[gEngfuncs.pfnRandomLong(12, 14)], sizeof(m_szText));
-				gEngfuncs.pfnClientCmd("spk sound/events/zombie_message.wav");
+                gHUD.m_CenterTips.Show(g_szTipsText[gEngfuncs.pfnRandomLong(12, 14)], 3, 0);
 			}
 		}
 
 		m_iCount = time;
-	}
-
-	if (m_flDisplayEnd < flTime)
-		return 0;
-
-	int a = 255;
-	if (m_flDisplayEnd - flTime > 2.6)
-		a = abs((int)((m_flDisplayEnd - flTime - 3.0f) * 255 / 0.4));
-
-	if (a > 255) a = 255;
-
-	if (m_flDisplayEnd - flTime < 0.5)
-		a = (m_flDisplayEnd - flTime) * 255 * 2;
-
-	if (isZombie) m_pBG[1]->Draw2DQuadScaled(iX, iY, iX + m_pBG[1]->w(), iY + m_pBG[1]->h(), 0.0f, 0.0f, 1.0f, 1.0f, 255, 255, 255, a);
-	else m_pBG[0]->Draw2DQuadScaled(iX, iY, iX + m_pBG[0]->w(), iY + m_pBG[0]->h(), 0.0f, 0.0f, 1.0f, 1.0f, 255, 255, 255, a);
-
-	iX += 127;
-	iY += 60;
-
-	if (isZombie)
-	{
-		DrawUtils::DrawHudString(iX, iY, ScreenWidth, m_szText, 180, 80, 75);
-	}
-	else
-	{
-		DrawUtils::DrawHudString(iX, iY, ScreenWidth, m_szText, 146, 158, 185);
 	}
 	return 1;
 }

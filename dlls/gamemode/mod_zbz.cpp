@@ -498,9 +498,14 @@ void CPlayerModStrategy_ZBZ::Event_OnRoundStart()
 //	return CPlayerModStrategy_ZB3::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 //}
 
+bool CPlayerModStrategy_ZBZ::IsSkillAvailable(ZombieZSkillSkillId skill)
+{
+    return m_setSkillID.find(skill) == m_setSkillID.end();
+}
+
 bool CPlayerModStrategy_ZBZ::UpgradeSkill()
 {
-	auto data = ZSkillFactory(m_pPlayer, m_setSkillID);
+    auto data = ZSkillFactory(m_pPlayer, std::bind(&CPlayerModStrategy_ZBZ::IsSkillAvailable, this, std::placeholders::_1));
 	if (!data.second)
 		return false;
 

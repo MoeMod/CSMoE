@@ -33,7 +33,7 @@ public:
 	DamageTrack_e DamageTrack() override { return DT_ZBS; }
 	void InstallPlayerModStrategy(CBasePlayer *player) override;
 	float GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
-	int MaxMoney() override { return 32000; }
+    ModConfigData_t QueryModConfig(const char *key, ModConfigData_t defaultValue = {}, CBaseEntity *invoker = nullptr) override;
 
 public:
 	void TeamCheck();

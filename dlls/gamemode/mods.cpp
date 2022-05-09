@@ -33,6 +33,7 @@ GNU General Public License for more details.
 #include "mod_zbb.h"
 #include "mod_zbz.h"
 #include "mod_z4.h"
+#include "mod_z4e.h"
 
 namespace sv {
 
@@ -58,6 +59,7 @@ std::pair<const char *, IBaseMod *(*)()> g_FindList[] = {
 	{ "zbb", DefaultFactory<CMod_ZombieBaseBuilder> },
 	{ "zbz", DefaultFactory<CMod_ZombieZ> },
 	{ "z4", DefaultFactory<CMod_ZombieIV> },
+	{ "z4e", DefaultFactory<CMod_Z4E> },
 	// custom
 	{ "zb3f2p", DefaultFactory<CMod_ZB3F2P> },
 };

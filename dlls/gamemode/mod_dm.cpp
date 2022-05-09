@@ -337,4 +337,11 @@ int CMod_DeathMatch::CalcLeaderFrags()
 	return iMaxFrags;
 }
 
+ModConfigData_t CMod_DeathMatch::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker)
+{
+    if(!strcmp(key, "WeaponBoxLifeTime"))
+        return 5.0s;
+    return IBaseMod::QueryModConfig(key, defaultValue, invoker);
+}
+
 }

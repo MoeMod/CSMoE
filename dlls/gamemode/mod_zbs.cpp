@@ -421,4 +421,10 @@ void CMod_ZombieScenario::ClearZombieNPC()
 	}
 }
 
+ModConfigData_t CMod_ZombieScenario::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker) {
+    if(!strcmp(key, "MaxMoney"))
+        return 16000;
+    return IBaseMod::QueryModConfig(key, defaultValue, invoker);
+}
+
 }
