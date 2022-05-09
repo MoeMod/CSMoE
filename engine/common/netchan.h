@@ -237,7 +237,8 @@ typedef struct netchan_s
 } netchan_t;
 
 extern netadr_t		net_from;
-extern netadr_t		net_local;
+extern netadr_t		net_ipv4_local;
+extern netadr_t		net_ipv6_local;
 extern sizebuf_t		net_message;
 extern byte		net_message_buffer[NET_MAX_PAYLOAD];
 extern convar_t		*net_speeds;

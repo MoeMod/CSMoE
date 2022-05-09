@@ -51,8 +51,10 @@ typedef struct packetlag_s
 static loopback_t	loopbacks[NS_COUNT];
 static packetlag_t lagdata[NS_COUNT];
 static float fakelag = 0.0f; // actual lag value
-static qboolean noip = false;
-static boost::asio::ip::udp::socket *ip_sockets[NS_COUNT];
+static qboolean noipv4 = false;
+static qboolean noipv6 = false;
+static boost::asio::ip::udp::socket *ipv4_sockets[NS_COUNT];
+static boost::asio::ip::udp::socket *ipv6_sockets[NS_COUNT];
 static qboolean winsockInitialized = false;
 //static const char *net_src[2] = { "client", "server" };
 static convar_t *net_ip;
@@ -155,22 +157,26 @@ char *NET_AdrToString( const netadr_t a )
 	return NULL; // compiler warning
 }
 
-const char *NET_AdrProtocolName( const netadr_t a )
+const char *NET_AdrProtocolName( const netadrtype_t type )
 {
-    if( a.type == NA_LOOPBACK )
+    if( type == NA_LOOPBACK )
         return "Loopback";
-    if( a.type == NA_IP || a.type == NA_BROADCAST )
+    if( type == NA_IP || type == NA_BROADCAST )
         return "IPv4";
-    if( a.type == NA_IP6 || a.type == NA_MULTICAST_IP6 )
+    if( type == NA_IP6 || type == NA_MULTICAST_IP6 )
         return "IPv6";
     return "IP";
+}
+const char *NET_AdrProtocolName( const netadr_t &a )
+{
+    return NET_AdrProtocolName((netadrtype_t)a.type);
 }
 const char *NET_SockadrProtocolName( const boost::asio::ip::udp::endpoint &s )
 {
     if( s.protocol() == boost::asio::ip::udp::v4() )
         return "IPv4";
     if( s.protocol() == boost::asio::ip::udp::v6() )
-        return "IPv4";
+        return "IPv6";
     return "IP";
 }
 
@@ -583,7 +589,7 @@ NET_GetPacket
 Never called by the game logic, just the system event queing
 ==================
 */
-qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length )
+qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock, netadr_t *from, byte *data, size_t *length )
 {
     size_t ret = 0;
 	boost::system::error_code ec;
@@ -645,6 +651,11 @@ qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *lengt
 	return false;
 }
 
+qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length )
+{
+    return NET_GetPacket(ipv4_sockets, sock, from, data, length) || NET_GetPacket(ipv6_sockets, sock, from, data, length);
+}
+
 /*
 ==================
 NET_SendPacket
@@ -666,16 +677,21 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 		NET_SendLoopPacket( sock, length, data, to );
 		return;
 	}
-	else if( to.type == NA_BROADCAST || to.type == NA_IP || to.type == NA_IP6 || to.type == NA_MULTICAST_IP6 )
+	else if( to.type == NA_BROADCAST || to.type == NA_IP )
 	{
-		net_socket = ip_sockets[sock];
+		net_socket = ipv4_sockets[sock];
 		if( !net_socket ) return;
 	}
+    else if( to.type == NA_IP6 || to.type == NA_MULTICAST_IP6 )
+    {
+        net_socket = ipv6_sockets[sock];
+        if( !net_socket ) return;
+    }
 	else 
 	{
 		char buf[256];
 		Q_strncpy( buf, (char*)data,  min( 256, length ));
-		MsgDev( D_ERROR, "NET_SendPacket ( %d, %d, \"%s\", %i ): bad address type %i\n", sock, length, buf, to.type, to.type );
+		MsgDev( D_ERROR, "NET_SendPacket ( %d, %d, \"%s\", %i ): bad address type %s\n", sock, length, buf, to.type, NET_AdrProtocolName(to) );
 		return;
 	}
 
@@ -705,21 +721,34 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 NET_IPSocket
 ====================
 */
-static boost::asio::ip::udp::socket *NET_IPSocket( const char *netInterface, int port )
+static boost::asio::ip::udp::socket *NET_IPSocket( const char *netInterface, int port, netadrtype_t protocol )
 {
     boost::asio::ip::udp::socket *net_socket = nullptr;
     boost::asio::ip::udp::endpoint	addr;
 
-	MsgDev( D_NOTE, "NET_UDPSocket( %s, %i )\n", netInterface, port );
+	MsgDev( D_NOTE, "NET_UDPSocket( %s, %i, %s )\n", netInterface, port, NET_AdrProtocolName(protocol) );
     try {
         if( !netInterface[0] || !Q_stricmp( netInterface, "localhost" ))
         {
-            addr = boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port);
+            if(protocol == NA_IP || protocol == NA_BROADCAST)
+                addr = boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port);
+            else if(protocol == NA_IP6 || protocol == NA_MULTICAST_IP6)
+                addr = boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v6(), port);
         }
         else
         {
-            NET_StringToSockaddr( netInterface, &addr, false );
-            addr.port(port);
+            boost::system::error_code ec;
+            boost::asio::ip::udp::resolver resolver(ioc_udp);
+            if(protocol == NA_IP || protocol == NA_BROADCAST)
+            {
+                auto results = resolver.resolve(boost::asio::ip::udp::v4(), netInterface, std::to_string(port), ec);
+                addr = results->endpoint();
+            }
+            else if(protocol == NA_IP6 || protocol == NA_MULTICAST_IP6)
+            {
+                auto results = resolver.resolve(boost::asio::ip::udp::v6(), netInterface, std::to_string(port), ec);
+                addr = results->endpoint();
+            }
         }
         net_socket = new boost::asio::ip::udp::socket(ioc_udp, addr);
         net_socket->set_option(boost::asio::socket_base::broadcast(true));
@@ -736,7 +765,7 @@ static boost::asio::ip::udp::socket *NET_IPSocket( const char *netInterface, int
 NET_OpenIP
 ====================
 */
-static void NET_OpenIP( qboolean changeport )
+static void NET_OpenIP( boost::asio::ip::udp::socket **ip_sockets, netadrtype_t protocol, qboolean changeport )
 {
 	int	port;
 	qboolean sv_nat = Cvar_VariableInteger( "sv_nat" );
@@ -768,9 +797,9 @@ static void NET_OpenIP( qboolean changeport )
 				port = Cvar_VariableInteger("port");
 		}
 
-		ip_sockets[NS_SERVER] = NET_IPSocket( net_ip->string, port );
+        ip_sockets[NS_SERVER] = NET_IPSocket( net_ip->string, port, protocol );
 		if( !ip_sockets[NS_SERVER] && Host_IsDedicated() )
-			Host_Error( "Couldn't allocate dedicated server IP port.\nMaybe you're trying to run dedicated server twice?\n" );
+			Host_Error( "Couldn't allocate dedicated server %s port.\nMaybe you're trying to run dedicated server twice?\n", NET_AdrProtocolName(protocol) );
 	}
 
 	// dedicated servers don't need client ports
@@ -798,8 +827,8 @@ static void NET_OpenIP( qboolean changeport )
 				port = net_clientport->integer;
 		}
 
-		ip_sockets[NS_CLIENT] = NET_IPSocket( net_ip->string, port );
-		if( !ip_sockets[NS_CLIENT] ) ip_sockets[NS_CLIENT] = NET_IPSocket( net_ip->string, PORT_ANY );
+        ip_sockets[NS_CLIENT] = NET_IPSocket( net_ip->string, port, protocol );
+		if( !ip_sockets[NS_CLIENT] ) ip_sockets[NS_CLIENT] = NET_IPSocket( net_ip->string, PORT_ANY, protocol );
 	}
 }
 
@@ -810,16 +839,16 @@ NET_GetLocalAddress
 Returns the servers' ip address as a string.
 ================
 */
-void NET_GetLocalAddress( void )
+void NET_GetLocalAddress( boost::asio::ip::udp::socket **ip_sockets, netadr_t &net_local, netadrtype_t protocol, qboolean &noip )
 {
-	char		buff[512];
+	std::string		buff;
     boost::asio::ip::udp::endpoint	address;
 
 	Q_memset( &net_local, 0, sizeof( netadr_t ));
 
 	if( noip )
 	{
-		MsgDev( D_INFO, "TCP/IP Disabled.\n" );
+		MsgDev( D_INFO, "%s Disabled.\n", NET_AdrProtocolName(protocol) );
 	}
 	else
 	{
@@ -827,24 +856,24 @@ void NET_GetLocalAddress( void )
         boost::system::error_code ec;
 		if( Q_strcmp( net_ip->string, "localhost" ))
 		{
-            Q_strcpy( buff, net_ip->string );
+            buff = net_ip->string;
 		}
 		else
 		{
-            Q_strcpy( buff, boost::asio::ip::host_name(ec).c_str() );
+            buff = boost::asio::ip::host_name(ec);
 		}
 
-		// ensure that it doesn't overrun the buffer
-		buff[511] = 0;
-
-		NET_StringToAdr( buff, &net_local );
+		NET_StringToAdr( buff.c_str(), &net_local );
 
         if(ip_sockets[NS_SERVER])
-            address = ip_sockets[NS_SERVER]->remote_endpoint(ec);
+        {
+            address = ip_sockets[NS_SERVER]->local_endpoint(ec);
+            NET_SockadrToNetadr(&address, &net_local);
+        }
 
 		if( ec )
 		{
-			MsgDev( D_ERROR, "Could not get TCP/IP address, TCP/IP disabled\nReason: %s\n", ec.message().c_str());
+			MsgDev( D_ERROR, "Could not get %s address, TCP/IP disabled\nReason: %s\n", NET_AdrProtocolName(protocol), ec.message().c_str());
 			noip = true;
 		}
 		else
@@ -879,25 +908,36 @@ void NET_Config( qboolean multiplayer, qboolean changeport )
 		// shut down any existing sockets
 		for( i = 0; i < 2; i++ )
 		{
-			if( ip_sockets[i] )
+			if( ipv4_sockets[i] )
 			{
-                if( ip_sockets[i] )
-                    ip_sockets[i]->close();
-                delete ip_sockets[i];
-                ip_sockets[i] = nullptr;
+                if( ipv4_sockets[i] )
+                    ipv4_sockets[i]->close();
+                delete ipv4_sockets[i];
+                ipv4_sockets[i] = nullptr;
 			}
+            if( ipv6_sockets[i] )
+            {
+                if( ipv6_sockets[i] )
+                    ipv6_sockets[i]->close();
+                delete ipv6_sockets[i];
+                ipv6_sockets[i] = nullptr;
+            }
 		}
 	}
 	else
 	{	
 		// open sockets
-		if( !noip ) NET_OpenIP( changeport );
+		if( !noipv4 )
+            NET_OpenIP( ipv4_sockets, NA_IP, changeport );
+		if( !noipv6 )
+            NET_OpenIP( ipv6_sockets, NA_IP6, changeport );
 
 		// Get our local address, if possible
 		if( bFirst )
 		{
 			bFirst = false;
-			NET_GetLocalAddress();
+			NET_GetLocalAddress(ipv4_sockets,net_ipv4_local, NA_IP, noipv4);
+			NET_GetLocalAddress(ipv6_sockets,net_ipv6_local, NA_IP6, noipv6);
 		}
 	}
 
@@ -970,7 +1010,8 @@ void NET_Init( void )
 	}
 
 
-	if( Sys_CheckParm( "-noip" )) noip = true;
+	if( Sys_CheckParm( "-noip" )) noipv4 = true;
+	if( Sys_CheckParm( "-noip6" )) noipv6 = true;
 
     ioc_udp.restart();
     ioc_udp_work_guard.emplace(boost::asio::make_work_guard(ioc_udp));
