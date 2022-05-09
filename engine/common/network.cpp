@@ -83,7 +83,7 @@ static void NET_NetadrToSockadr( netadr_t *a, boost::asio::ip::udp::endpoint *s 
         s->address(boost::asio::ip::address_v4(host));
         s->port(a->port);
 	}
-    else if( a->type == NA_IP6 )
+    else if( a->type6 == NA_IP6 )
     {
         std::array<unsigned char, 16> host;
         memcpy(host.data(), a->ip6, 16);
@@ -109,7 +109,7 @@ static void NET_SockadrToNetadr( boost::asio::ip::udp::endpoint *s, netadr_t *a 
 	}
     else if( s->protocol() == boost::asio::ip::udp::v6() )
     {
-        a->type = NA_IP6;
+        a->type6 = NA_IP6;
         auto host = s->address().to_v6().to_bytes();
         memcpy(a->ip6, host.data(), 16);
         a->port = s->port();
@@ -148,7 +148,7 @@ char *NET_AdrToString( const netadr_t a )
 		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i:%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3], a.port );
-    else if( a.type == NA_IP6 )
+    else if( a.type6 == NA_IP6 )
     {
         std::array<unsigned char, 16> host;
         memcpy(host.data(), a.ip6, 16);
@@ -167,10 +167,18 @@ const char *NET_AdrProtocolName( const netadrtype_t type )
         return "IPv6";
     return "IP";
 }
+
 const char *NET_AdrProtocolName( const netadr_t &a )
 {
-    return NET_AdrProtocolName((netadrtype_t)a.type);
+    if( a.type == NA_LOOPBACK )
+        return "Loopback";
+    if( a.type == NA_IP || a.type == NA_BROADCAST )
+        return "IPv4";
+    if( a.type6 == NA_IP6 || a.type6 == NA_MULTICAST_IP6 )
+        return "IPv6";
+    return "IP";
 }
+
 const char *NET_SockadrProtocolName( const boost::asio::ip::udp::endpoint &s )
 {
     if( s.protocol() == boost::asio::ip::udp::v4() )
@@ -186,7 +194,7 @@ char *NET_BaseAdrToString( const netadr_t a )
 		return (char*)("loopback");
 	else if( a.type == NA_IP )
 		return va( "%i.%i.%i.%i", a.ip[0], a.ip[1], a.ip[2], a.ip[3] );
-    else if( a.type == NA_IP6 )
+    else if( a.type6 == NA_IP6 )
     {
         std::array<unsigned char, 16> host;
         memcpy(host.data(), a.ip6, 16);
@@ -217,7 +225,7 @@ qboolean NET_CompareBaseAdr( const netadr_t a, const netadr_t b )
 		return false;
 	}
 
-    if( a.type == NA_IP6 )
+    if( a.type6 == NA_IP6 )
     {
         if( !Q_memcmp( a.ip6, b.ip6, 16 ))
             return true;
@@ -243,7 +251,7 @@ qboolean NET_CompareAdr( const netadr_t a, const netadr_t b )
 		return false;
 	}
 
-    if( a.type == NA_IP6 )
+    if( a.type6 == NA_IP6 )
     {
         if( !Q_memcmp( a.ip6, b.ip6, 16 ) && a.port == b.port)
             return true;
@@ -682,7 +690,7 @@ void NET_SendPacket( netsrc_t sock, size_t length, const void *data, netadr_t to
 		net_socket = ipv4_sockets[sock];
 		if( !net_socket ) return;
 	}
-    else if( to.type == NA_IP6 || to.type == NA_MULTICAST_IP6 )
+    else if( to.type6 == NA_IP6 || to.type6 == NA_MULTICAST_IP6 )
     {
         net_socket = ipv6_sockets[sock];
         if( !net_socket ) return;
