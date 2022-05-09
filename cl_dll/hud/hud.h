@@ -123,6 +123,7 @@ struct HUDLIST {
 #include "moe/moe_touch.h"
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
+#include "hud_centertips.h"
 
 namespace cl {
 //
@@ -1160,6 +1161,7 @@ public:
 	CHudMoeTouch m_MoeTouch;
 	CHudMVP m_MVP;
 	CHudNewHud m_NewHud;
+    CHudCenterTips m_CenterTips;
 
 	// user messages
 	CHudMsgFunc(Damage);

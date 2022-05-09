@@ -53,7 +53,7 @@ public:
 	bool Host_Say(edict_t *pEntity, int teamonly, const char *content) override;
 
 	const CZB3HumanMorale& HumanMorale() const { return m_Morale; }
-	bool isForceRespawn() const { return m_flForceRespawnEnd > gpGlobals->time; }
+	virtual bool isForceRespawn() const { return m_flForceRespawnEnd > gpGlobals->time; }
 	virtual void MakeZombieOrigin();
 	BOOL FInfectionStarted() override;
 

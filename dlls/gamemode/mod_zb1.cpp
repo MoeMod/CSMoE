@@ -200,8 +200,13 @@ void CMod_Zombi::Think()
 			return;
 	}
 
-	if (TimeRemaining() <= 0s && !m_bRoundTerminating && !m_bFreezePeriod)
-		HumanWin();
+    CheckTimeoutWin();
+}
+
+void CMod_Zombi::CheckTimeoutWin()
+{
+    if (TimeRemaining() <= 0s && !m_bRoundTerminating && !m_bFreezePeriod)
+        HumanWin();
 }
 
 void CMod_Zombi::HumanWin()

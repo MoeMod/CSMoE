@@ -245,7 +245,7 @@ std::size_t TSourceEngineQuery::WritePlayerListQueryResultToBuffer(const PlayerL
 // Reference: https://developer.valvesoftware.com/wiki/Server_queries#A2S_INFO
 auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout) -> boost::asio::awaitable<ServerInfoQueryResult>
 {
-	udp::socket socket(ioc, udp::endpoint(udp::v4(), 0));
+	udp::socket socket(ioc, udp::endpoint(endpoint.protocol(), 0));
 
 	constexpr auto A2S_INFO = 'T';
 	static constexpr char request1[] = "\xFF\xFF\xFF\xFF" "TSource Engine Query"; // Source / GoldSrc Steam
@@ -266,7 +266,7 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 	while (1)
 	{
 		try {
-			udp::endpoint sender_endpoint(udp::v4(), 0);
+			udp::endpoint sender_endpoint;
 			char buffer[4096];
 			std::size_t reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
 			if (sender_endpoint == endpoint && reply_length > 5)
@@ -287,7 +287,7 @@ auto TSourceEngineQuery::Co_GetServerInfoDataAsync(boost::asio::io_context &ioc,
 
 auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc, boost::asio::ip::udp::endpoint endpoint, std::chrono::system_clock::duration timeout) -> boost::asio::awaitable<PlayerListQueryResult>
 {
-	udp::socket socket(ioc, udp::endpoint(udp::v4(), 0));
+	udp::socket socket(ioc, udp::endpoint(endpoint.protocol(), 0));
 
 	boost::asio::system_timer ddl(ioc, timeout);
     ddl.async_wait([&socket](boost::system::error_code e) mutable {
@@ -302,7 +302,7 @@ auto TSourceEngineQuery::Co_GetPlayerListDataAsync(boost::asio::io_context &ioc,
 	constexpr char request_challenge[] = "\xFF\xFF\xFF\xFF" "U" "\xFF\xFF\xFF\xFF";
 	std::size_t bytes_transferred = co_await socket.async_send_to(boost::asio::buffer(request_challenge, sizeof(request_challenge)), endpoint, boost::asio::use_awaitable);
 
-	udp::endpoint sender_endpoint(udp::v4(), 0);
+	udp::endpoint sender_endpoint;
 	std::size_t reply_length = co_await socket.async_receive_from(boost::asio::buffer(buffer, 4096), sender_endpoint, boost::asio::use_awaitable);
 
 	TSourceEngineQuery::PlayerListQueryResult first_result = TSourceEngineQuery::MakePlayerListQueryResultFromBuffer(buffer, reply_length);

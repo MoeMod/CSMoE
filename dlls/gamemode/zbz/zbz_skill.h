@@ -111,7 +111,7 @@ public:
 };
 
 void Skill_Precache();
-std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> ZSkillFactory(CBasePlayer* player, const std::set<byte>& skillIDSet);
+std::pair<byte, std::shared_ptr<CZombieZSkill_Base>> ZSkillFactory(CBasePlayer* player, std::function<bool(ZombieZSkillSkillId)> is_available);
 }
 
 #endif

@@ -219,6 +219,7 @@ set(HLDLL_SRCS
 	./cannonexdragon.cpp
 	./spearammo.cpp
 	./summonknifecannon.cpp
+	./gamemode/mod_z4e.cpp
 	)
 
 set (HLWPN_SRCS

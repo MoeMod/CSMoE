@@ -20,6 +20,7 @@ GNU General Public License for more details.
 #endif
 
 #include "mods.h"
+#include "modconfig.h"
 
 #include "monsters.h"
 
@@ -45,7 +46,6 @@ public:
 	virtual float
 	GetAdjustedEntityDamage(CBaseEntity *victim, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,
 	                        int bitsDamageType) { return flDamage; }
-	virtual int MaxMoney() { return 16000; }
 	virtual HitBoxGroup GetAdjustedTraceAttackHitgroup(CBaseEntity *victim, entvars_t * pevAttacker, float flDamage, const Vector & vecDir, TraceResult * ptr, int bitsDamageType) { return static_cast<HitBoxGroup>(ptr->iHitgroup); }
 	virtual int AddToFullPack_Post(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet) { return 0; }
 	virtual int ShouldCollide(CBaseEntity *pTouched, CBaseEntity *pOther) { return 1; }
@@ -54,7 +54,8 @@ public:
 	virtual bool IsGameStarted()  { return true; }
 	virtual bool Host_Say(edict_t *pEntity, int teamonly, const char *content) { return false; }
     virtual void W_Precache() {}
-	virtual duration_t GetWeaponBoxLifeTime() { return 300.0s; }
+    virtual bool CustomRandomSpawn(CBasePlayer *pPlayer);
+    virtual ModConfigData_t QueryModConfig(const char *key, ModConfigData_t defaultValue = {}, CBaseEntity *invoker = nullptr) { return defaultValue; }
 };
 
 class CBaseModDefault : public CHalfLifeMultiplay, virtual public IBaseMod
@@ -85,12 +86,12 @@ protected:
 template<class CBase = CBaseModDefault>
 class TBaseMod_RandomSpawn : public CBase
 {
-	friend edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, CBasePlayer *pPlayer);
+	friend edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, IBaseMod *mod2, CBasePlayer *pPlayer);
 
 public: // CHalfLifeMultiplay
 	edict_t *GetPlayerSpawnSpot(CBasePlayer *pPlayer) override
 	{
-		return _IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(this, pPlayer);
+		return _IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(this, this, pPlayer);
 	}
 
 protected:

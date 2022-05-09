@@ -69,7 +69,10 @@ public:
 
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0s;
-		m_flTimeZombieSkillNext = invalid_time_point;
+
+        auto cooldown_time = to_duration(g_pModRunning->QueryModConfig("SprintSkillCooldownTime", zero_duration, m_pPlayer));
+        m_flTimeZombieSkillNext = cooldown_time != zero_duration ? gpGlobals->time + cooldown_time : invalid_time_point;
+
 		m_flTimeZombieSkillEffect = gpGlobals->time + 1.0s;
 		m_bDebuffStatus = false;
 
@@ -81,7 +84,7 @@ public:
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_SPRINT);
 		WRITE_SHORT(10);
-		WRITE_SHORT(-1);
+        WRITE_SHORT(cooldown_time != zero_duration ? cooldown_time / 1s : -1);
 		MESSAGE_END();
 	}
 
@@ -160,8 +163,9 @@ public:
 		{
 			m_flTimeZombieSkillEnd = gpGlobals->time + 5.5s;
 		}
-		
-		m_flTimeZombieSkillNext = invalid_time_point;
+
+        auto cooldown_time = to_duration(g_pModRunning->QueryModConfig("HeadShotSkillCooldownTime", zero_duration, m_pPlayer));
+        m_flTimeZombieSkillNext = cooldown_time != zero_duration ? gpGlobals->time + cooldown_time : invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
 
@@ -169,7 +173,7 @@ public:
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_HEADSHOT);
 		WRITE_SHORT(5);
-		WRITE_SHORT(-1);
+        WRITE_SHORT(cooldown_time != zero_duration ? cooldown_time / 1s : -1);
 		MESSAGE_END();
 
 		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);
@@ -207,7 +211,9 @@ public:
 		}
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
 		m_flTimeZombieSkillEnd = gpGlobals->time + 10.0s;
-		m_flTimeZombieSkillNext = invalid_time_point;
+
+        auto cooldown_time = to_duration(g_pModRunning->QueryModConfig("Knife2xSkillCooldownTime", zero_duration, m_pPlayer));
+        m_flTimeZombieSkillNext = cooldown_time != zero_duration ? gpGlobals->time + cooldown_time : invalid_time_point;
 
 		EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/speedup.wav", VOL_NORM, ATTN_NORM);
 
@@ -215,7 +221,7 @@ public:
 		WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
 		WRITE_BYTE(ZOMBIE_SKILL_KNIFE2X);
 		WRITE_SHORT(10);
-		WRITE_SHORT(-1);
+		WRITE_SHORT(cooldown_time != zero_duration ? cooldown_time / 1s : -1);
 		MESSAGE_END();
 
 		MESSAGE_BEGIN(MSG_ALL, gmsgMPToCL, NULL, m_pPlayer->pev);

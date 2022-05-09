@@ -104,6 +104,7 @@ public:
 
 protected:
 	void UpdatePlayerEvolutionHUD() override;
+    virtual bool IsSkillAvailable(ZombieZSkillSkillId);
 
 protected:
 	EventListener m_eventTakeDamageListener;

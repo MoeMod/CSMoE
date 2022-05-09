@@ -20,6 +20,11 @@ void IBaseMod::InstallPlayerModStrategy(CBasePlayer *player)
 	player->m_pModStrategy = std::move(up);
 }
 
+bool IBaseMod::CustomRandomSpawn(CBasePlayer *pPlayer)
+{
+    return CSDM_DoRandomSpawn(pPlayer);
+}
+
 void _IBaseMod_RemoveObjects_CheckMapConditions_impl(CHalfLifeMultiplay *mod)
 {
 	//CHalfLifeMultiplay::CheckMapConditions();
@@ -70,7 +75,7 @@ BOOL _IBaseMod_RemoveObjects_IsAllowedToSpawn_impl(CHalfLifeMultiplay *mod, CBas
 	return TRUE;
 }
 
-edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, CBasePlayer *pPlayer)
+edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, IBaseMod *mod2, CBasePlayer *pPlayer)
 {
 	// completely rewrites it
 
@@ -85,7 +90,7 @@ edict_t *_IBaseMod_RandomSpawn_GetPlayerSpawnSpot_impl(CHalfLifeMultiplay *mod, 
 
 	// Move the player to the place it said.
 	// Note that here has been modified
-	if (!CSDM_DoRandomSpawn(pPlayer))
+	if (!mod2->CustomRandomSpawn(pPlayer))
 	{
 		pPlayer->pev->origin = VARS(pentSpawnSpot)->origin + Vector(0, 0, 1);
 		pPlayer->pev->v_angle = g_vecZero;

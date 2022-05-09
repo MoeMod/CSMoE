@@ -316,6 +316,7 @@ set (HUD_SRCS
 	./hud/hud_mvp.cpp
 	./hud/server.cpp
 	./hud/newhud/newhud.cpp
+	./hud/hud_centertips.cpp
 
 )
 
