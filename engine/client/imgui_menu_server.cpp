@@ -78,7 +78,7 @@ namespace ui {
 	{
 		try {
 			boost::asio::ip::udp::resolver resolver(s_server_ioc);
-			auto desc_endpoints = co_await resolver.async_resolve(boost::asio::ip::udp::v4(), host.c_str(), port.c_str(), boost::asio::use_awaitable);
+			auto desc_endpoints = co_await resolver.async_resolve(host.c_str(), port.c_str(), boost::asio::use_awaitable);
 			for (const auto &ep: desc_endpoints) {
 				co_await ServerModel_AsyncRefreshSingleServer(ep);
 			}
@@ -117,8 +117,11 @@ namespace ui {
 
 	void ServerModel_Connect(boost::asio::ip::udp::endpoint ep)
 	{
-		char cmd[128];
-		snprintf(cmd, 128, "connect %s:%d", ep.address().to_string().c_str(), (int)ep.port());
+		char cmd[256];
+        if(ep.protocol() == boost::asio::ip::udp::v6())
+		    snprintf(cmd, 256, "connect [%s]:%d", ep.address().to_string().c_str(), (int)ep.port());
+		else
+            snprintf(cmd, 256, "connect %s:%d", ep.address().to_string().c_str(), (int)ep.port());
 		Cbuf_AddText(cmd);
 	}
 

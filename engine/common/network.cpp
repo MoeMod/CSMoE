@@ -616,11 +616,11 @@ qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock
 		return true;
 	}
 
-	for( protocol = 0; protocol < 2; protocol++ )
+	do
 	{
-		if( !protocol) net_socket = ip_sockets[sock];
+		net_socket = ip_sockets[sock];
 
-		if( !net_socket ) continue;
+		if( !net_socket ) break;
 
         ret = net_socket->receive_from(boost::asio::buffer(data, NET_MAX_PAYLOAD), addr, 0, ec);
 
@@ -638,18 +638,18 @@ qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock
 #endif
 
 			MsgDev( D_ERROR, "NET_GetPacket: %d error %s from %s\n", ec.value(), ec.message().c_str(), NET_AdrToString( *from ));
-			continue;
+            break;
 		}
 
 		if( ret == NET_MAX_PAYLOAD )
 		{
 			MsgDev( D_ERROR, "NET_GetPacket: oversize packet from %s\n", NET_AdrToString( *from ));
-			continue;
+			break;
 		}
 
 		*length = ret;
 		return true;
-	}
+	} while(0);
 
 	if( ec )
 	{
@@ -661,7 +661,9 @@ qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock
 
 qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length )
 {
-    return NET_GetPacket(ipv4_sockets, sock, from, data, length) || NET_GetPacket(ipv6_sockets, sock, from, data, length);
+    auto v4 = NET_GetPacket(ipv4_sockets, sock, from, data, length);
+    auto v6 = NET_GetPacket(ipv6_sockets, sock, from, data, length);
+    return v4 || v6;
 }
 
 /*

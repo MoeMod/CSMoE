@@ -13,20 +13,20 @@ inline std::pair<std::string, std::string> ParseHostPort(const std::string& msg)
 	std::pair<std::string, std::string> ret{ {}, "27015" };
 	auto& [host, port] = ret;
 
+    if (std::smatch sm; std::regex_match(msg, sm, v6p) && sm.size() > 2) {
+        // host:port, host, port
+        host = sm[1].str();
+        port = sm[3].str();
+    }
+    if (std::smatch sm; std::regex_match(msg, sm, v6) && sm.size() > 1) {
+        // host:port, host, port
+        host = sm[1].str();
+    }
 	if (std::smatch sm; std::regex_match(msg, sm, v4) && sm.size() > 2) {
 		// host:port, host, port
 		host = sm[1].str();
 		if (sm[2].str().size()) port = sm[2].str();
 	}
-    if (std::smatch sm; std::regex_match(msg, sm, v6) && sm.size() > 1) {
-        // host:port, host, port
-        host = sm[1].str();
-    }
-    if (std::smatch sm; std::regex_match(msg, sm, v6p) && sm.size() > 2) {
-        // host:port, host, port
-        host = sm[1].str();
-        port = sm[2].str();
-    }
 	else if (std::smatch sm; std::regex_match(msg, sm, r3) && sm.size() > 2) {
 		// ip:port, ...
 		const auto adr = sm[0].str();
