@@ -89,6 +89,7 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 	//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
 	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
 	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
+
 };
 #endif
 

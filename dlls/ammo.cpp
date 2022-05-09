@@ -674,7 +674,7 @@ void C762NatoBoxAmmo::Precache(void)
 
 BOOL C762NatoBoxAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(30, "762NatoBox", 200) == -1)
+	if (pOther->GiveAmmo(30, "762NatoBox", 240) == -1)
 		return FALSE;
 
 	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
@@ -978,5 +978,29 @@ BOOL CSpearAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_spear, CSpearAmmo);
+
+void C556LVBAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C556LVBAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C556LVBAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(30, "556LVB", 90) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_556lvb, C556LVBAmmo);
 
 }

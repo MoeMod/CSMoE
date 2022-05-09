@@ -90,6 +90,7 @@ enum ZombieZSkillSkillId : byte
 	Skill_GhostHunter, // get dualkukri
 	Skill_ZombiBombGiveaway, //Zombie Bombs given every cycle
 	Skill_SwordMaster,	//enable accshoot to knife
+	Skill_Knife2X, //Knife2X
 };
 
 enum ZBZMessageType : byte

@@ -79,7 +79,6 @@ public:
 		PRECACHE_SOUND("weapons/dualsword_stab2.wav");
 		PRECACHE_SOUND("weapons/dualsword_stab1_hit.wav");
 		PRECACHE_SOUND("weapons/dualsword_stab2_hit.wav");
-		PRECACHE_SOUND("weapons/mastercombat_wall.wav");
 		PRECACHE_SOUND("weapons/dualsword_slash_1.wav");
 		PRECACHE_SOUND("weapons/dualsword_slash_2.wav");
 		PRECACHE_SOUND("weapons/dualsword_slash_3.wav");
@@ -87,7 +86,6 @@ public:
 		PRECACHE_SOUND("weapons/dualsword_hit1.wav");
 		PRECACHE_SOUND("weapons/dualsword_hit2.wav");
 		PRECACHE_SOUND("weapons/dualsword_hit3.wav");
-		PRECACHE_SOUND("weapons/mastercombat_wall.wav");
 		PRECACHE_SOUND("weapons/dualsword_skill_start.wav");
 		PRECACHE_SOUND("weapons/dualsword_skill_end.wav");
 		PRECACHE_SOUND("weapons/dualsword_fly1.wav");

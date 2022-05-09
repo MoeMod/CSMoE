@@ -48,6 +48,9 @@ enum
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
+void CreateBalrog11CannonFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
+void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
+void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -55,6 +58,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	BufferReader reader(pszName, pbuf, iSize);
 	int arg1;
 	int arg2;
+	Vector pos;
 	iType = reader.ReadByte();
 	switch (iType)
 	{
@@ -64,6 +68,25 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		if (pActiveBTEWeapon && pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
 			pActiveBTEWeapon->pev->iuser1 = reader.ReadByte();
 		break;
+	}
+	case 2:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+		CreateBalrog11CannonSingleProjectile(NULL, pos, arg1, arg2);
+		//CreateBalrog11CannonFollowEnt(NULL, pos, arg1, arg2);
+	}
+	case 3:
+	{
+		pos.x = reader.ReadCoord();
+		pos.y = reader.ReadCoord();
+		pos.z = reader.ReadCoord();
+		arg1 = reader.ReadShort();
+		arg2 = reader.ReadByte();
+		CreateFollowEnt(NULL, pos, arg1, arg2);
 	}
 	case 4:
 	{
@@ -84,6 +107,194 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		break;
 	}
 	return 1;
+}
+
+
+void FollowThink(tempent_s* ent, float frametime, float currenttime)
+{
+	if (ent->entity.baseline.fuser1 > ent->entity.curstate.scale)
+		ent->entity.curstate.scale += 0.03;
+
+	static cl_entity_t* pEntity;
+	pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
+
+	if (!pEntity)
+	{
+		ent->die = currenttime;
+		return;
+	}
+
+	if (ent->die - currenttime <= frametime * 100 && !ent->entity.curstate.iuser1)
+	{
+		CreateBalrog11CannonSingleProjectile(ent, pEntity->origin, pEntity->index, ent->entity.curstate.iuser2);
+		ent->entity.curstate.iuser1 = 1;
+	}
+}
+
+void DefaultFramerateTouch(tempent_s* ent, pmtrace_t* tr)
+{
+	ent->entity.baseline.origin *= 0.01f;
+	ent->entity.curstate.framerate = 60;
+}
+
+void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
+{
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
+	if (!ent)
+		return;
+	if (prev && (prev->entity.origin - origin).Length() < 5)	// Why not other numbers??
+		return;
+	static int iModelIndex;
+	if (iType)
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
+	else
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+	TEMPENTITY* te = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
+	if (te)
+	{
+		te->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEKILL;
+		te->entity.angles.y = gEngfuncs.pfnRandomFloat(-512, 511);
+		te->entity.angles.x = gEngfuncs.pfnRandomFloat(-256, 255);
+		te->entity.angles.z = gEngfuncs.pfnRandomFloat(-256, 255);
+		te->flags |= FTENT_ROTATE;
+		te->entity.curstate.scale = 0.01;
+		te->entity.baseline.fuser1 = 0.3;
+		te->entity.curstate.iuser2 = iType;
+		te->callback = FollowThink;
+		te->hitcallback = DefaultFramerateTouch;
+
+		te->entity.curstate.rendermode = kRenderTransAdd;
+		te->entity.curstate.renderamt = 40.0f;
+		te->entity.curstate.renderfx = kRenderFxNone;
+
+		te->entity.baseline.origin = Vector(0, 0, 0);
+		te->entity.baseline.iuser1 = ent->index;
+		te->entity.curstate.iuser1 = 0;
+		te->clientIndex = ent->curstate.owner;
+	}
+}
+
+void CreateBalrog11CannonFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
+{
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
+	if (!ent)
+		return;
+	static int iModelIndex;
+	if (iType)
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
+	else
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+
+	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
+	if (pEnt)
+	{
+		pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEKILL;
+		pEnt->entity.angles.y = gEngfuncs.pfnRandomFloat(-512, 511);
+		pEnt->entity.angles.x = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->entity.angles.z = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->flags |= FTENT_ROTATE;
+		pEnt->entity.curstate.scale = 0.01;
+		pEnt->entity.baseline.fuser1 = 0.3;
+		pEnt->entity.curstate.iuser2 = iType;
+
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 40.0f;
+		pEnt->entity.curstate.renderfx = kRenderFxNone;
+
+		pEnt->entity.baseline.origin = Vector(0, 0, 0);
+		pEnt->entity.baseline.iuser1 = ent->index;
+		pEnt->entity.curstate.iuser1 = 0;
+		pEnt->clientIndex = ent->curstate.owner;
+
+		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+			if (ent->entity.baseline.fuser1 > ent->entity.curstate.scale)
+				ent->entity.curstate.scale += 0.03;
+
+			cl_entity_t* pEntity;
+			pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
+
+			if (!pEntity)
+			{
+				ent->die = currenttime;
+				return;
+			}
+
+			if (ent->die - currenttime <= frametime * 100 && !ent->entity.curstate.iuser1)
+			{
+				if ((ent->entity.origin - pEntity->origin).Length() < 5)
+					return;
+				CreateBalrog11CannonFollowEnt(ent, pEntity->origin, pEntity->index, ent->entity.curstate.iuser2);
+				ent->entity.curstate.iuser1 = 1;
+			}
+		};
+		pEnt->hitcallback = [](tempent_s* ent, pmtrace_s* ptr) {
+			ent->entity.baseline.origin *= 0.01f;
+			ent->entity.curstate.framerate = 60;
+
+		};
+	}
+}
+
+
+void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
+{
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
+	if (!ent)
+		return;
+	static int iModelIndex;
+	if (iType)
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
+	else
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+
+	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
+	if (pEnt)
+	{
+		pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEKILL;
+		pEnt->entity.angles.y = gEngfuncs.pfnRandomFloat(-512, 511);
+		pEnt->entity.angles.x = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->entity.angles.z = gEngfuncs.pfnRandomFloat(-256, 255);
+		pEnt->flags |= FTENT_ROTATE;
+		pEnt->entity.curstate.scale = 0.01;
+		pEnt->entity.baseline.fuser1 = 0.3;
+		pEnt->entity.curstate.iuser2 = iType;
+
+		pEnt->entity.curstate.rendermode = kRenderTransAdd;
+		pEnt->entity.curstate.renderamt = 40.0f;
+		pEnt->entity.curstate.renderfx = kRenderFxNone;
+
+		pEnt->entity.baseline.origin = Vector(0, 0, 0);
+		pEnt->entity.baseline.iuser1 = ent->index;
+		pEnt->entity.curstate.iuser1 = 0;
+		pEnt->clientIndex = ent->curstate.owner;
+
+		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
+			if (ent->entity.baseline.fuser1 > ent->entity.curstate.scale)
+				ent->entity.curstate.scale += 0.03;
+
+			cl_entity_t* pEntity;
+			pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
+
+			if (!pEntity)
+			{
+				ent->die = currenttime;
+				return;
+			}
+
+			if (ent->die - currenttime <= frametime * 100 && !ent->entity.curstate.iuser1)
+			{
+				if ((ent->entity.origin - pEntity->origin).Length() < 5)
+					return;
+				CreateFollowEnt(ent, pEntity->origin, pEntity->index, ent->entity.curstate.iuser2);
+				ent->entity.curstate.iuser1 = 1;
+			}
+		};
+		pEnt->hitcallback = [](tempent_s* ent, pmtrace_s* ptr) {
+			ent->entity.baseline.origin *= 0.01f;
+			ent->entity.curstate.framerate = 60;
+
+		};
+	}
 }
 
 void CreateAttachedEntitiesToPlayer(int entity, int type)

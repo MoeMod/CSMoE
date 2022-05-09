@@ -1627,7 +1627,7 @@ namespace sv {
 		}
 	private:
 		float m_flTakeDamage;
-		float GetBonus() const { return max(0.0f, 10000.0f - (100.0f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetBonus() const { return max(0.0f, 10000.0f - (200.0f * g_pGameRules->m_iTotalRoundsPlayed)); }
 	};
 
 	class ZSkill_GhostHunter : public CZombieZSkill_Base
@@ -1818,6 +1818,18 @@ namespace sv {
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 	};
 
+	class ZSkill_Knife2X : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Knife2X(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "屠戮之刃"; }
+		const char* GetDesc() const override { return "开启后近战武器伤害*2"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnGetSkill() override {
+			//show hud
+		}
+	};
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -1873,6 +1885,7 @@ namespace sv {
 		{ Skill_BombDefense, 100, MakeSkill<ZSkill_BombDefense> },
 		{ Skill_SwordMaster, 100, MakeSkill<ZSkill_SwordMaster> },
 		{ Skill_Specialist, 100, MakeSkill<ZSkill_Specialist> },
+		{ Skill_Knife2X, 100, MakeSkill<ZSkill_Knife2X> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

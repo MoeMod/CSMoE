@@ -133,4 +133,12 @@ HOOK_EVENT(y22s1holyswordmb, FireY22S1HolySwordMB);
 HOOK_EVENT(whipsword, FireWhipSword);
 HOOK_EVENT(cannonex, FireCannonEX);
 HOOK_EVENT(speargun, FireSpearGun);
-
+HOOK_EVENT(hk23, FireHK23);
+HOOK_EVENT(m60, FireM60);
+HOOK_EVENT(mk48, FireMK48);
+HOOK_EVENT(lightzg, FireLightZG);
+HOOK_EVENT(heavyzg, FireHeavyZG);
+HOOK_EVENT(bpgm, FireBPGM);
+HOOK_EVENT(m950, FireM950);
+HOOK_EVENT(zgun, FireZGun);
+HOOK_EVENT(k3, FireK3);

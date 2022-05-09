@@ -46,7 +46,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "knife";
-	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.3f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.5f };
 
 public:
 
@@ -68,6 +68,10 @@ public:
 
 		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/Hero_SWING.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/Hero_Hit.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/Hero_ATTACK_1.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/Hero_ATTACK_2.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/Hero_ATTACK_3.wav");
+		PRECACHE_SOUND("CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav");
 	}
 
 	BOOL Deploy() override
@@ -107,7 +111,7 @@ public:
 		float flDamage = 47;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 480 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 480 + (g_pGameRules->m_iTotalRoundsPlayed * 50);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -118,7 +122,7 @@ public:
 		float flDamage = 120;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1105 + (g_pGameRules->m_iTotalRoundsPlayed * 150);
+			flDamage = 1105 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -142,10 +146,22 @@ void CKnifeDualKukri::Spawn()
 void CKnifeDualKukri::PrimaryAttack(void)
 {
 #ifndef CLIENT_DLL
-	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+	if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+	{
+		strcpy(m_pPlayer->m_szCustomSequence, "crouch_shoot_Lknife");
+	}
+	else
+		strcpy(m_pPlayer->m_szCustomSequence, "ref_shoot_Lknife");
+	m_pPlayer->pev->frame = 0;
+	m_pPlayer->ResetSequenceInfo();
+	m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.6s;
 #endif
 	m_iSwing = 0;
 	SendWeaponAnim(pev->iuser1++ ? ANIM_SLASH1 : ANIM_SLASH2, UseDecrement() != FALSE);
+	if (pev->iuser1)
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualKukri/Hero_ATTACK_1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	else
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualKukri/Hero_ATTACK_2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	pev->iuser1 %= 2;
 	SetThink(&CKnifeDualKukri::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.25s;
@@ -160,7 +176,7 @@ void CKnifeDualKukri::SecondaryAttack(void)
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
 	SendWeaponAnim(RANDOM_LONG(0, 1)? ANIM_STAB1:ANIM_STAB2, UseDecrement() != FALSE);
-
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/DualKukri/Hero_ATTACK_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	SetThink(&CKnifeDualKukri::DelaySecondaryAttack);
 	pev->nextthink = gpGlobals->time + 1.1s;
 
@@ -172,20 +188,13 @@ void CKnifeDualKukri::SecondaryAttack(void)
 
 void CKnifeDualKukri::DelayPrimaryAttack()
 {
-	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 90;
-
-	TraceResult tr;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
 #ifndef CLIENT_DLL
 	switch (KnifeAttack(GetPrimaryAttackDamage(), 85, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
@@ -206,25 +215,17 @@ void CKnifeDualKukri::DelayPrimaryAttack()
 		SetThink(nullptr);
 	}
 
-	//return fDidHit;
 }
 
 void CKnifeDualKukri::DelaySecondaryAttack()
 {
-	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 103;
-
-	TraceResult tr;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
 #ifndef CLIENT_DLL
 	switch (KnifeAttack(GetSecondaryAttackDamage(), 135, 120, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{
 	case HIT_PLAYER:
 	{
 		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
@@ -323,7 +324,7 @@ void CKnifeDualKukri::WeaponIdle(void)
 	ResetEmptySound();
 	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
-		if (m_pPlayer->pev->button & IN_FORWARD)
+		if (m_pPlayer->pev->button & (IN_FORWARD | IN_MOVELEFT | IN_MOVERIGHT | IN_BACK))
 		{
 			if (m_flNextRunIdle <= UTIL_WeaponTimeBase())
 			{

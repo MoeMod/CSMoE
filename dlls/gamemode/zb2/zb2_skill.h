@@ -613,11 +613,13 @@ public:
 public:
 	void Think() override;
 	void Activate() override;
+	void FireZombieSkill();
 	void OnSkillEnd() override;
 
 protected:
 	duration_t GetDurationTime() const;
 	duration_t GetCooldownTime() const;
+	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
 };
 
 class CZombieSkill_ZombieWebShooter : public CZombieSkill_Base

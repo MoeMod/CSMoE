@@ -232,6 +232,25 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/z4b_dualkukri.cpp
 	../dlls/wpn_shared/wpn_cannonex.cpp
 	../dlls/wpn_shared/wpn_speargun.cpp
+	../dlls/wpn_shared/z4b_dualslayer.cpp
+	../dlls/wpn_shared/wpn_hk23.cpp
+	../dlls/wpn_shared/wpn_m60.cpp
+	../dlls/wpn_shared/knife_jknife.cpp
+	../dlls/wpn_shared/knife_combat.cpp
+	../dlls/wpn_shared/knife_mastercombat.cpp
+	../dlls/wpn_shared/knife_hdagger.cpp
+	../dlls/wpn_shared/knife_axe.cpp
+	../dlls/wpn_shared/knife_hammer.cpp
+	../dlls/wpn_shared/wpn_mk48.cpp
+	../dlls/wpn_shared/wpn_lightzg.cpp
+	../dlls/wpn_shared/wpn_heavyzg.cpp
+	../dlls/wpn_shared/wpn_bpgm.cpp
+	../dlls/wpn_shared/wpn_m950.cpp
+	../dlls/wpn_shared/wpn_tmpdragon.cpp
+	../dlls/wpn_shared/wpn_zgun.cpp
+	../dlls/wpn_shared/wpn_k3.cpp
+	../dlls/wpn_shared/wpn_as50g.cpp
+	../dlls/wpn_shared/wpn_ak47g.cpp
 	)
 
 set (HUD_SRCS

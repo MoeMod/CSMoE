@@ -832,7 +832,7 @@ void CGrenade::TumbleThink()
 			SetThink(&CGrenade::Detonate);
 		}
 		else if(pev->dmg == 999.0f)
-			SetThink(&CGrenade::Detonate);
+			SetThink(&CGrenade::Detonate);	//useless
 		else
 			SetThink(&CGrenade::Detonate3);
 	}

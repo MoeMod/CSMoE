@@ -90,7 +90,6 @@ namespace sv {
 			PRECACHE_SOUND("weapons/magicknife_slash4.wav");
 
 			PRECACHE_SOUND("weapons/tomahawk_slash1_hit.wav");
-			PRECACHE_SOUND("weapons/combatknife_wall.wav");
 		}
 		
 		BOOL Deploy(void) override
@@ -547,6 +546,10 @@ namespace sv {
 				break;
 			}
 		}
+
+#ifndef CLIENT_DLL	
+		m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+#endif
 
 		SetThink(&CKnifeMagicKnife::DelayPrimaryAttack);
 		pev->nextthink = gpGlobals->time + 0.1s;

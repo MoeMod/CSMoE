@@ -185,7 +185,7 @@ public:
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			//flDamage = iType ? 1067 : 1333;
-			flDamage = iType ? 768 : 970;
+			flDamage = iType ? 768 : 850;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = iType ? 3267 : 4900;
 #endif
@@ -197,7 +197,7 @@ public:
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			//flDamage = iType ? 640 : 1666;
-			flDamage = iType ? 540 : 1100;
+			flDamage = iType ? 540 : 970;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = iType ? 1960 : 5554;
 #endif

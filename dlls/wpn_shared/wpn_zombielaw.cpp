@@ -27,60 +27,6 @@ namespace sv {
 #endif
 
 #ifndef CLIENT_DLL
-	class CZombieLawRocket : public CBaseEntity
-	{
-	public:
-		KnockbackData GetKnockBackData() override { return { 500.0f, 600.0f, 600.f, 300.0f, 1.0f }; }
-
-		void Spawn(void);
-		void Precache(void);
-
-		float GetExplodeDamage() const
-		{
-			float flDamage = 138;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-			{
-				flDamage = 300;
-			}
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			{
-				flDamage = 1300;
-			}
-#endif
-			return flDamage;
-		}
-
-		float GetRadius() const
-		{
-			float flRadius = 1.2 * 39.37;
-#ifndef CLIENT_DLL
-			if (g_pModRunning->DamageTrack() == DT_ZB)
-			{
-				flRadius = 4 * 39.37;
-			}
-			else if (g_pModRunning->DamageTrack() == DT_ZBS)
-			{
-				flRadius = 4 * 39.37;
-			}
-#endif
-			return flRadius;
-		}
-
-
-	public:
-		void EXPORT FollowThink(void);
-		void EXPORT IgniteThink(void);
-		void EXPORT RocketTouch(CBaseEntity* pOther);
-
-	private:
-		int m_iTrail;
-		time_point_t m_flIgniteTime;
-		time_point_t m_flRemoveTime;
-		time_point_t m_flVenomDamageTime;
-		time_point_t m_flSprEffectTime;
-	};
-
 	void CZombieLawRocket::Spawn(void)
 	{
 		Precache();

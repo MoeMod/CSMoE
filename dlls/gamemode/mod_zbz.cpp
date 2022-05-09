@@ -112,6 +112,11 @@ void CPlayerModStrategy_ZBZ::ZombiBombExploded(float &flKickRate, float &flRadiu
 	SKILL_FUNCTION(m_vecSkill, OnZombiBombExploded, flKickRate, flRadius, flDamage);
 }
 
+void CPlayerModStrategy_ZBZ::FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime)
+{
+	//SKILL_FUNCTION(m_vecSkill, OnFlashbangExploded, flKickRate, flRadius, flFreezeTime);
+}
+
 void CPlayerModStrategy_ZBZ::ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
 {
 	SKILL_FUNCTION(m_vecSkill, OnShootGrenade, vecStart, vecVelocity, time, iTeam, usEvent);
@@ -227,23 +232,38 @@ bool CPlayerModStrategy_ZBZ::ClientCommand(const char *pcmd)
 	{
 		if (!Q_strnicmp(pcmd, "MoE_HumanSkill", 14)) // MoE_HumanSkill[1-4]
 		{
-			if (!CheckSkill(Skill_Specialist))
-			{
-				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
-				return true;
-			}
 			switch (pcmd[14])
 			{
 			case '1':
+				if (!CheckSkill(Skill_Specialist))
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
+					return true;
+				}
 				GetCharacter()->ActivateSkill(SKILL_SLOT_1);
 				break;
 			case '2':
+				if (!CheckSkill(Skill_Specialist))
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
+					return true;
+				}
 				GetCharacter()->ActivateSkill(SKILL_SLOT_2);
 				break;
 			case '3':
+				if (!CheckSkill(Skill_Knife2X))
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[屠戮之刃]无法使用特殊技能");
+					return true;
+				}
 				GetCharacter()->ActivateSkill(SKILL_SLOT_3);
 				break;
 			case '4':
+				if (!CheckSkill(Skill_Specialist))
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "你没有[持之以恒]无法使用特殊技能");
+					return true;
+				}
 				GetCharacter()->ActivateSkill(SKILL_SLOT_4);
 				break;
 			}
@@ -612,6 +632,22 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 		}
 		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
+			if (GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING || GetCharacter()->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "当前技能使用完之后再使用生化超越技能");
+				return;
+			}
+
+			if (m_pPlayer && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+				if (pWeapon)
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "检测到主武器，请移除主武器再使用生化超越技能");
+					return;
+				}
+			}
+
 			m_iChangeClassTime[0] = -1;
 			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			switch (RANDOM_LONG(0, 3))
@@ -619,9 +655,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
 			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
 			case 2: m_pPlayer->m_ZombieClass = "deathknight"; break;
-			}
-			m_pPlayer->RemoveAllItems(FALSE);
-			m_pPlayer->m_bHasPrimary = false;
+			}		
 			
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
@@ -664,6 +698,22 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 		}
 		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
+			if (GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING || GetCharacter()->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
+			{
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "当前技能使用完之后再使用适应力技能");
+				return;
+			}
+
+			if (m_pPlayer && m_pPlayer->m_ZombieClass && !stricmp(m_pPlayer->m_ZombieClass, "nemesis"))
+			{
+				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+				if (pWeapon)
+				{
+					ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "检测到主武器，请移除主武器再使用适应力技能");
+					return;
+				}
+			}
+
 			float flHealth = m_pPlayer->pev->health;
 			float flMaxHealth = m_pPlayer->pev->max_health;
 			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
@@ -672,10 +722,8 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "血量不足或切换冷却时间未到，无法改变僵尸种类");
 				return;
 			}
-			m_pPlayer->RemoveAllItems(FALSE);
-			m_pPlayer->m_bHasPrimary = false;
 
-			m_flNextTimeChangeZombie = gpGlobals->time + 20.0s;
+			m_flNextTimeChangeZombie = gpGlobals->time + 10.0s;
 			m_pPlayer->m_ZombieClass = "random";
 			m_pPlayer->pev->sequence = 0;
 			m_pPlayer->m_iCustomSequence = -1;
@@ -696,6 +744,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 			m_pPlayer->pev->armorvalue = 1000.0f;
 			SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
+			m_pPlayer->SetNewPlayerModel("models/player/ghosthunter/ghosthunter.mdl");
 			m_pPlayer->RemoveAllItems(FALSE);
 			m_pPlayer->m_bHasPrimary = false;
 			m_pPlayer->GiveNamedItem("z4b_dualkukri");
@@ -760,6 +809,7 @@ CMod_ZombieZ::CMod_ZombieZ()
 	PRECACHE_SOUND("metalarena/level_up.wav");
 	PRECACHE_SOUND("player/zombiez_mutation.wav");
 	PRECACHE_SOUND("zombi/ghosthunterappear.wav");
+	PRECACHE_SOUND("zombi/KILLNANOCOUNTSND.WAV");
 }
 
 void CMod_ZombieZ::InstallPlayerModStrategy(CBasePlayer *player)
@@ -784,6 +834,8 @@ void CMod_ZombieZ::RestartRound()
 
 void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)
 {
+	if(pInflictor && (FClassnameIs(pInflictor, "z4b_dualkukri") || FClassnameIs(pInflictor, "z4b_dualslayer")))
+		UTIL_BroadcastStuffText("spk \"zombi/KILLNANOCOUNTSND\"\n");
 	return CMod_ZombieHero::PlayerKilled(pVictim, pKiller, pInflictor);
 }
 

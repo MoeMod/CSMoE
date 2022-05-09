@@ -114,8 +114,24 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 	CBasePlayer *p = static_cast<CBasePlayer *>(pOther);
 
-	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_GHOSTHUNTER)
+	if (p->m_bIsVIP || p->m_bIsZombie || p->m_iBuff & BUFF_MASTERHUNTER)
 		return;
+
+	if (p->m_iBuff & BUFF_GHOSTHUNTER)
+	{
+		SET_CLIENT_KEY_VALUE(p->entindex(), GET_INFO_BUFFER(p->edict()), "model", "masterhunter");
+
+		p->SetNewPlayerModel("models/player/masterhunter/masterhunter.mdl");
+
+		p->RemoveAllItems(FALSE);
+		p->m_bHasPrimary = false;
+		p->GiveNamedItem("z4b_dualslayer");
+		p->m_iBuff |= BUFF_MASTERHUNTER;
+		pev->effects |= EF_NODRAW;
+		SendPositionMsg();
+		SUB_Remove();
+		return;
+	}
 
 	const char *mod_str = CVAR_GET_STRING("mp_gamemode");
 	if(strcmp(mod_str, "zb3f2p"))

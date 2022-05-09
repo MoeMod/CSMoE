@@ -29,7 +29,7 @@ enum hit_result_t
 };
 inline hit_result_t
 KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bitsDamageType,
-             entvars_t *pevInflictor, entvars_t *pevAttacker)
+             entvars_t *pevInflictor, entvars_t *pevAttacker, bool IsPrimaryAttack = false)
 {
 	TraceResult tr;
 	hit_result_t result = HIT_NONE;
@@ -61,13 +61,16 @@ KnifeAttack(Vector vecSrc, Vector vecDir, float flDamage, float flRadius, int bi
 		if (pHit && pHit->pev->takedamage != DAMAGE_NO) {
 			const float flAdjustedDamage = flDamage;
 
-			UTIL_MakeVectors(pHit->pev->angles);
-			if (DotProduct((pHit->pev->origin - pevAttacker->origin).Normalize().Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+			if (!IsPrimaryAttack)
 			{
-				flDamage *= 3.0;
-				bitsDamageType |= DMG_BACKATK;
+				UTIL_MakeVectors(pHit->pev->angles);
+				if (DotProduct((pHit->pev->origin - pevAttacker->origin).Normalize().Make2D(), gpGlobals->v_forward.Make2D()) > 0.8)
+				{
+					flDamage *= 3.0;
+					bitsDamageType |= DMG_BACKATK;
+				}
 			}
-
+			
 			ClearMultiDamage();
 			pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 			ApplyMultiDamage(pevInflictor, pevAttacker);

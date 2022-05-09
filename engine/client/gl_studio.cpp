@@ -4115,7 +4115,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		if( tx ) tx->gl_texturenum = ptexture->index;
 		GL_SetTextureType( ptexture->index, TEX_STUDIO );
         // upload immediately
-        xe::TexLru_Upload(ptexture);
+       // xe::TexLru_Upload(ptexture);
 	}
 }
 

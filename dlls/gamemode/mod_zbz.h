@@ -79,7 +79,7 @@ public:
 	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override;
 	void GrenadeExploded(Vector vecOrigin) override;
 	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override;
-	
+	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);

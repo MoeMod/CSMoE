@@ -96,8 +96,7 @@ public:
 	void Precache() override
 	{
 		PRECACHE_SOUND("weapons/mastercombat_slash.wav");
-		PRECACHE_SOUND("weapons/combatknife_hit_1.wav");
-		PRECACHE_SOUND("weapons/combatknife_wall.wav");
+	
 		return Base::Precache();
 	}
 	

@@ -23,6 +23,7 @@ static const char *sPlayerModelFiles[] =
 	"models/player/hero/hero.mdl",
 	"models/player/heroine/heroine.mdl",
 	"models/player/ghosthunter/ghosthunter.mdl",
+	"models/player/masterhunter/masterhunter.mdl",
 };
 
 struct AppearanceInfo

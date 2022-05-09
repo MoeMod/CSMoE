@@ -293,6 +293,25 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_cannonex");
 	UTIL_PrecacheOther("cannonex_dragon");
 	UTIL_PrecacheOtherWeapon("weapon_speargun");
+	UTIL_PrecacheOtherWeapon("z4b_dualslayer");
+	UTIL_PrecacheOtherWeapon("weapon_hk23");
+	UTIL_PrecacheOtherWeapon("weapon_m60");
+	UTIL_PrecacheOtherWeapon("knife_jknife");
+	UTIL_PrecacheOtherWeapon("knife_combat");
+	UTIL_PrecacheOtherWeapon("knife_mastercombat");	
+	UTIL_PrecacheOtherWeapon("knife_hdagger");
+	UTIL_PrecacheOtherWeapon("knife_axe");
+	UTIL_PrecacheOtherWeapon("knife_hammer");
+	UTIL_PrecacheOtherWeapon("weapon_mk48");
+	UTIL_PrecacheOtherWeapon("weapon_lightzg");
+	UTIL_PrecacheOtherWeapon("weapon_heavyzg");
+	UTIL_PrecacheOtherWeapon("weapon_bpgm");
+	UTIL_PrecacheOtherWeapon("weapon_m950");
+	UTIL_PrecacheOtherWeapon("weapon_tmpdragon");
+	UTIL_PrecacheOtherWeapon("weapon_zgun");
+	UTIL_PrecacheOtherWeapon("weapon_k3");
+	UTIL_PrecacheOtherWeapon("weapon_as50g");
+	UTIL_PrecacheOtherWeapon("weapon_ak47g");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

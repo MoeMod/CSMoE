@@ -99,8 +99,8 @@ namespace sv {
 			//PRECACHE_MODEL("sprites/ef_summoner_unsummon02.spr");
 
 			//PRECACHE_MODEL("sprites/ef_summoner_smoke.spr");
-			//PRECACHE_MODEL("sprites/ef_summoner_stab1.spr");
-			//PRECACHE_MODEL("sprites/ef_summoner_stab2.spr");
+			PRECACHE_MODEL("sprites/ef_summoner_stab1.spr");
+			PRECACHE_MODEL("sprites/ef_summoner_stab2.spr");
 
 			PRECACHE_SOUND("weapons/summon_summon.wav");
 			PRECACHE_SOUND("weapons/summon_unsummon.wav");
@@ -873,8 +873,6 @@ namespace sv {
 			PRECACHE_SOUND("weapons/summonknife_stab.wav");
 			PRECACHE_SOUND("weapons/summoning_ready.wav");
 					
-			PRECACHE_SOUND("weapons/mastercombat_wall.wav");
-			PRECACHE_SOUND("weapons/mastercombat_hit1.wav");
 			PRECACHE_SOUND("weapons/plasmagun_exp.wav");
 		}
 		

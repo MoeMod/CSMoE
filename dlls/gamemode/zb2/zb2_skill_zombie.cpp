@@ -34,6 +34,7 @@ GNU General Public License for more details.
 #include "zb2_zclass.h"
 #include "player/player_zombie.h"
 #include "entity_state.h"
+#include "wpn_shared/wpn_zombielaw.h"
 
 
 namespace sv {
@@ -2472,6 +2473,12 @@ namespace sv {
 		WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
 		WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
 		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+		WRITE_BYTE(ZB2_MESSAGE_DRAW_RETINA);
+		WRITE_BYTE(ZOMBIE_SKILL_HOOK);
+		WRITE_SHORT(1);
+		MESSAGE_END();
 	}
 
 	void CZombieSkill_ZombiePenetration::OnSkillEnd()
@@ -2481,7 +2488,7 @@ namespace sv {
 
 	duration_t CZombieSkill_ZombiePenetration::GetDurationTime() const
 	{
-		return 0.5s;
+		return 1.0s;
 	}
 
 	duration_t CZombieSkill_ZombiePenetration::GetCooldownTime() const
@@ -3261,7 +3268,7 @@ namespace sv {
 			case DEFENSE_START:
 			{
 				m_SkillStatus = DEFENSE_LOOP;
-				m_iZombieSkillStatus = SKILL_STATUS_USING;
+				
 				m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill_loop");
 				m_pPlayer->pev->gaitsequence = m_pPlayer->LookupSequence("skill_loop");
 				m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 2.5s;
@@ -3411,7 +3418,7 @@ namespace sv {
 				if (m_pPlayer->m_pActiveItem && m_pPlayer->m_pActiveItem->m_iId == WEAPON_KNIFE)
 				{
 					m_SkillStatus = DEFENSE_START;
-					
+					m_iZombieSkillStatus = SKILL_STATUS_USING;
 					CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_pActiveItem;
 					if (pWeapon)
 					{
@@ -3544,7 +3551,7 @@ namespace sv {
 
 			m_pPlayer->ResetMaxSpeed();
 
-			m_pPlayer->m_flNextAttack = 5.0s;
+			m_pPlayer->m_flNextAttack = 10.0s;
 			m_pPlayer->m_bHolsterDisabled = true;
 
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_VOICE, "zombi/zombi_pressure.wav", VOL_NORM, ATTN_NORM);
@@ -3578,7 +3585,7 @@ namespace sv {
 
 	duration_t CZombieSkill_ZombieSelfDestruct::GetDurationTime() const
 	{
-		return 5.0s;
+		return 10.0s;
 	}
 
 	float CZombieSkill_ZombieSelfDestruct::GetDamageRatio() const
@@ -3594,7 +3601,8 @@ namespace sv {
 
 	void CZombieSkill_ZombieCreateRocket::Think()
 	{
-
+		if (m_flTimeTriggerZombieSkill != invalid_time_point && m_flTimeTriggerZombieSkill < gpGlobals->time)
+			FireZombieSkill();
 		CZombieSkill_Base::Think();
 	}
 
@@ -3620,6 +3628,33 @@ namespace sv {
 
 			return;
 		}
+		if (m_pPlayer->IsBot())
+		{
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+	
+			m_pPlayer->m_flNextAttack = 1.5s;
+			m_pPlayer->m_iCustomSequence = m_pPlayer->LookupSequence("skill");
+			m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 1.5s;
+
+			m_pPlayer->SetAnimation(PLAYER_IDLE);
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, m_pPlayer->pev);
+			WRITE_BYTE(ZB2_MESSAGE_SKILL_ACTIVATE);
+			WRITE_BYTE(ZOMBIE_SKILL_CREATEROCKET);
+			WRITE_SHORT(static_cast<int>(GetDurationTime() / 1s));
+			WRITE_SHORT(static_cast<int>(GetCooldownTime() / 1s));
+			MESSAGE_END();
+
+			m_iZombieSkillStatus = SKILL_STATUS_USING;
+			m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
+			m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
+
+			m_flTimeTriggerZombieSkill = gpGlobals->time + 0.5s;
+			return;
+		}
+
 		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
 
 		if (!pWeapon)
@@ -3645,8 +3680,25 @@ namespace sv {
 		{
 			ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "You has a weapon"); // #CSO_CantSprintUsed
 		}
+	}
 
-		
+	void CZombieSkill_ZombieCreateRocket::FireZombieSkill()
+	{
+		m_flTimeTriggerZombieSkill = invalid_time_point;
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+		Vector vecDir;
+
+		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+		Vector vecVelocity = gpGlobals->v_forward;
+		Vector VecAngle = m_pPlayer->pev->v_angle;
+		VecAngle[0] = 360.0 - VecAngle[0];
+
+		Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
+		CZombieLawRocket* pEnt = static_cast<CZombieLawRocket*>(CBaseEntity::Create("zombielaw_rocket", vecSrc, VecAngle, m_pPlayer->edict()));
+		if (pEnt)
+		{
+			pEnt->pev->velocity = vecVelocity * 1000.0;
+		}
 	}
 
 	void CZombieSkill_ZombieCreateRocket::OnSkillEnd()
@@ -3661,11 +3713,23 @@ namespace sv {
 
 	duration_t CZombieSkill_ZombieCreateRocket::GetCooldownTime() const
 	{
-		switch (m_pPlayer->m_iZombieLevel)
+		if (m_pPlayer->IsBot())
 		{
-		case ZOMBIE_LEVEL_HOST: return 30.0s; break;
-		case ZOMBIE_LEVEL_ORIGIN: return 20.0s; break;
-		case ZOMBIE_LEVEL_ORIGIN_LV2: return 20.0s; break;
+			switch (m_pPlayer->m_iZombieLevel)
+			{
+			case ZOMBIE_LEVEL_HOST: return 12.0s; break;
+			case ZOMBIE_LEVEL_ORIGIN: return 8.0s; break;
+			case ZOMBIE_LEVEL_ORIGIN_LV2: return 8.0s; break;
+			}
+		}
+		else
+		{
+			switch (m_pPlayer->m_iZombieLevel)
+			{
+			case ZOMBIE_LEVEL_HOST: return 30.0s; break;
+			case ZOMBIE_LEVEL_ORIGIN: return 20.0s; break;
+			case ZOMBIE_LEVEL_ORIGIN_LV2: return 20.0s; break;
+			}
 		}
 	}
 

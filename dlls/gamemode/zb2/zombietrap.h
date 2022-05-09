@@ -14,8 +14,8 @@ public:
 
 private:
 	float GetMoveSpeed() const { return 50.0f; }
-	duration_t GetAliveTime() const { return 20s; }
-	duration_t GetTrappedTime() const { return 10s; }
+	duration_t GetAliveTime() const { return 15s; }
+	duration_t GetTrappedTime() const { return 5.0s; }
 	CBasePlayer* GetClosestPlayer() const;
 
 	EntityHandle <CBasePlayer> m_hTarget;

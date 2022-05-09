@@ -801,6 +801,41 @@ public:
 	float m_flExplodeForce;
 	int m_iExplosionCount;
 };
+
+
+class CSummonKnifeCannon : public CSpear
+{
+public:
+	static CSummonKnifeCannon* Create(void);
+
+public:
+	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
+	void Spawn(void);
+	void Precache(void);
+
+	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier)
+	{
+		flGround = flAir = flAirStrafing = flDucking = 0.0;
+
+		flVelocityModifier = 1.0;
+
+		return TRUE;
+	}
+
+public:
+	void EXPORT IgniteThink(void);
+	void EXPORT FollowThink(void);
+	void EXPORT CannonTouch(CBaseEntity* pOther);
+
+public:
+	void Update(void);
+
+	void HitDamage(CBaseEntity* pOther);
+	void AddPlayerToCrowd(CBasePlayer* pPlayer);
+
+public:
+	void Explode(duration_t flTimeRemove, bool bDetonate);
+};
 #endif
 
 #ifdef ENABLE_SHIELD

@@ -1197,8 +1197,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		}
 	}
 
-	if (!m_bIsZombie && m_iBuff & BUFF_GHOSTHUNTER)
-		m_flVelocityModifier = 1.0f;
+	/*if (!m_bIsZombie && m_iBuff & BUFF_GHOSTHUNTER)
+		m_flVelocityModifier = 1.0f;*/
 
 	LogAttack(pAttack, this, teamAttack, flDamage, armorHit, pev->health - flDamage, pev->armorvalue, GetWeaponName(pevInflictor, pevAttacker));
 

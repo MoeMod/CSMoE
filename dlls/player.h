@@ -158,6 +158,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_IGNORE_KNOCKBACK			(1<<5)
 #define BUFF_RUSHENTITY			(1<<6)
 #define BUFF_GHOSTHUNTER			(1<<7)
+#define BUFF_MASTERHUNTER			(1<<8)
 
 #define COUNT_M32VENOM	0
 
