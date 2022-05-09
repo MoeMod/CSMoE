@@ -94,7 +94,8 @@ convar_t	*net_qport;
 
 int	net_drop;
 netadr_t	net_from;
-netadr_t	net_local;
+netadr_t	net_ipv4_local;
+netadr_t	net_ipv6_local;
 sizebuf_t	net_message;
 mempool_t	*net_mempool;
 byte	net_message_buffer[NET_MAX_PAYLOAD];

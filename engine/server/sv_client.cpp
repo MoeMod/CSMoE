@@ -3374,7 +3374,7 @@ void SV_TSourceEngineQuery( netadr_t from )
 	*/
 	BF_WriteLong(&buf, -1);// Fixed this
 	BF_WriteByte( &buf, 'm' );
-	BF_WriteString( &buf, NET_AdrToString( net_local ) );
+	BF_WriteString( &buf, NET_AdrToString( net_ipv4_local ) );
 	BF_WriteString( &buf, hostname->string );
 	BF_WriteString( &buf, sv.name );
 	BF_WriteString( &buf, GI->gamefolder );

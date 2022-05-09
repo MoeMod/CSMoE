@@ -3576,7 +3576,7 @@ static void GAME_EXPORT NetAPI_Status( net_status_t *status )
 	status->remote_address = cls.netchan.remote_address;
 	status->packet_loss = cls.packet_loss / 100; // percent
 	status->latency = cl.frame.latency;
-	status->local_address = net_local;
+	status->local_address = net_ipv4_local;
 	status->rate = cls.netchan.rate;
 }
 
@@ -3597,6 +3597,9 @@ static void GAME_EXPORT NetAPI_SendRequest( int context, int request, int flags,
 		MsgDev( D_ERROR, "Net_SendRequest: no callbcak specified for request with context %i!\n", context );
 		return;
 	}
+
+    if( remote_address->type == NA_IPX || remote_address->type == NA_BROADCAST_IPX )
+        return; // IPX no longer support
 
 	// find a free request
 	for( i = 0; i < MAX_REQUESTS; i++ )
