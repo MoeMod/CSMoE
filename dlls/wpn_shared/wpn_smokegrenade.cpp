@@ -55,6 +55,13 @@ void CSmokeGrenade::Precache(void)
 	PRECACHE_SOUND("weapons/pinpull.wav");
 	PRECACHE_SOUND("weapons/sg_explode.wav");
 
+	PRECACHE_SOUND("warcraft3/impalehit.wav");
+#ifndef CLIENT_DLL
+	g_sModelIndexShockWave = PRECACHE_MODEL("sprites/shockwave.spr");
+	g_sModelIndexFrostGibs = PRECACHE_MODEL("sprites/xman2030/frost_gib.spr");
+	g_sModelIndexFrostExp = PRECACHE_MODEL("sprites/xman2030/frost_kurukafa.spr");
+#endif
+
 	m_usCreateSmoke = PRECACHE_EVENT(1, "events/createsmoke.sc");
 }
 

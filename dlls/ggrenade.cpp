@@ -58,6 +58,103 @@ void CGrenade::Explode(Vector vecSrc, Vector vecAim)
 
 void CGrenade::Explode(TraceResult *pTrace, int bitsDamageType)
 {
+	if (to_int(g_pModRunning->QueryModConfig("EnableKnockBackBomb")))
+	{
+#define NADE_FLASHBANG_RADIUS 420
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "metalarena/acc_up.wav", VOL_NORM, ATTN_NORM);	//preache
+
+		Vector vecOrigin = pev->origin;
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_TEMPSPRITE);
+		WRITE_COORD(vecOrigin.x);
+		WRITE_COORD(vecOrigin.y);
+		WRITE_COORD(vecOrigin.z + 50.0);
+		WRITE_SHORT(g_sModelIndexWind);
+		WRITE_BYTE(15);
+		WRITE_BYTE(255);
+		WRITE_BYTE(100);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_BEAMCYLINDER);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2]);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + NADE_FLASHBANG_RADIUS);
+		WRITE_SHORT(g_sModelIndexShockWave);
+		WRITE_BYTE(0); // Start Frame
+		WRITE_BYTE(20); // Framerate
+		WRITE_BYTE(4); // Live Time
+		WRITE_BYTE(10); // Width
+		WRITE_BYTE(10); // Noise
+		WRITE_BYTE(0); // R
+		WRITE_BYTE(255); // G
+		WRITE_BYTE(255); // B
+		WRITE_BYTE(255); // Bright
+		WRITE_BYTE(9); // Speed
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_BEAMCYLINDER);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2]);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + NADE_FLASHBANG_RADIUS);
+		WRITE_SHORT(g_sModelIndexShockWave);
+		WRITE_BYTE(0); // Start Frame
+		WRITE_BYTE(10); // Framerate
+		WRITE_BYTE(4); // Live Time
+		WRITE_BYTE(10); // Width
+		WRITE_BYTE(20); // Noise
+		WRITE_BYTE(0); // R
+		WRITE_BYTE(255); // G
+		WRITE_BYTE(0); // B
+		WRITE_BYTE(150); // Bright
+		WRITE_BYTE(9); // Speed
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_TEMPSPRITE);
+		WRITE_COORD(vecOrigin.x);
+		WRITE_COORD(vecOrigin.y);
+		WRITE_COORD(vecOrigin.z + 50.0);
+		WRITE_SHORT(g_sModelIndexWindExp);
+		WRITE_BYTE(15);
+		WRITE_BYTE(255);
+		WRITE_BYTE(100);
+		MESSAGE_END();
+
+		CBaseEntity* pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecOrigin, NADE_FLASHBANG_RADIUS)) != NULL)
+		{
+			if (!pEntity->IsPlayer())
+				continue;
+
+			if (!pEntity->IsAlive())
+				continue;
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->m_bIsZombie)
+				continue;
+
+			Vector vecDir = (pPlayer->pev->origin - vecOrigin);
+
+			ApplyKnockbackData(pPlayer, vecDir, { 2000, 2000, 2000, 2000, 1.0f });
+		}
+		pev->effects |= EF_NODRAW;
+
+		if (TheBots != NULL)
+		{
+			TheBots->RemoveGrenade(this);
+		}
+		UTIL_Remove(this);
+		return;
+	}
 	float flRndSound; // sound randomizer
 
 	pev->model = iStringNull; // invisible
@@ -575,6 +672,108 @@ void CGrenade::Detonate()
 
 void CGrenade::SG_Detonate()
 {
+	if (to_int(g_pModRunning->QueryModConfig("EnableForstBomb")))
+	{
+#define NADE_HEGRENADE_RADIUS 420
+#define NADE_SMOKEGRENADE_RADIUS 420
+		EMIT_SOUND(ENT(pev), CHAN_WEAPON, "warcraft3/impalehit.wav", VOL_NORM, ATTN_NORM);	//preache
+
+		Vector vecOrigin = pev->origin;
+
+		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_TEMPSPRITE);
+		WRITE_COORD(vecOrigin.x);
+		WRITE_COORD(vecOrigin.y);
+		WRITE_COORD(vecOrigin.z + 50.0);
+		WRITE_SHORT(g_sModelIndexFrostExp);
+		WRITE_BYTE(15);
+		WRITE_BYTE(255);
+		WRITE_BYTE(100);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_BEAMCYLINDER);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2]);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + NADE_HEGRENADE_RADIUS);
+		WRITE_SHORT(g_sModelIndexShockWave);
+		WRITE_BYTE(0); // Start Frame
+		WRITE_BYTE(20); // Framerate
+		WRITE_BYTE(4); // Live Time
+		WRITE_BYTE(10); // Width
+		WRITE_BYTE(10); // Noise
+		WRITE_BYTE(0); // R
+		WRITE_BYTE(255); // G
+		WRITE_BYTE(255); // B
+		WRITE_BYTE(255); // Bright
+		WRITE_BYTE(9); // Speed
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_BEAMCYLINDER);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2]);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + NADE_HEGRENADE_RADIUS);
+		WRITE_SHORT(g_sModelIndexShockWave);
+		WRITE_BYTE(0); // Start Frame
+		WRITE_BYTE(10); // Framerate
+		WRITE_BYTE(4); // Live Time
+		WRITE_BYTE(10); // Width
+		WRITE_BYTE(20); // Noise
+		WRITE_BYTE(0); // R
+		WRITE_BYTE(0); // G
+		WRITE_BYTE(255); // B
+		WRITE_BYTE(150); // Bright
+		WRITE_BYTE(9); // Speed
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, vecOrigin);
+		WRITE_BYTE(TE_SPRITETRAIL);
+		WRITE_COORD(vecOrigin[0]);
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + 200.0);
+		WRITE_COORD(vecOrigin[0]);// velocity
+		WRITE_COORD(vecOrigin[1]);
+		WRITE_COORD(vecOrigin[2] + 30.0);
+		WRITE_SHORT(g_sModelIndexFrostGibs);
+		WRITE_BYTE(60); // count
+		WRITE_BYTE(RANDOM_LONG(27,30)); // life
+		WRITE_BYTE(2); // scale
+		WRITE_BYTE(50); // velocity along vector in 10's
+		WRITE_BYTE(10); // randomness of velocity in 10's
+		MESSAGE_END();
+
+		CBaseEntity * pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecOrigin, NADE_SMOKEGRENADE_RADIUS)) != NULL)
+		{
+			if (!pEntity->IsPlayer())
+				continue;
+
+			if (!pEntity->IsAlive())
+				continue;
+
+			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+			if (pPlayer->m_bIsZombie)
+				continue;
+
+			//freeze
+
+		}
+		pev->effects |= EF_NODRAW;
+
+		if (TheBots != NULL)
+		{
+			TheBots->RemoveGrenade(this);
+		}
+		UTIL_Remove(this);
+		return;
+	}
 	TraceResult tr;
 	Vector vecSpot;
 	edict_t *pentFind = NULL;

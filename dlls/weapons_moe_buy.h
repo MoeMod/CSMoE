@@ -228,7 +228,6 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     {"weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 60},
 	//{ "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
 	//{ "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
-	{ "knife_summonknife",     "星际仲裁",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150 },
 };
 
 }

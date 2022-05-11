@@ -588,201 +588,201 @@ namespace sv {
 
 LINK_ENTITY_TO_CLASS(summoner, CSummoner)
 
-
-class CSummonKnifeCannon : public CBaseEntity
-{
-public:
-	void Spawn() override
-	{
-		Precache();
-
-		m_fSequenceLoops = 0;
-		//ph26 = 0;
-		SetThink(&CSummonKnifeCannon::FollowThink);
-		SetTouch(&CSummonKnifeCannon::OnTouch);
-		SET_MODEL(this->edict(), "models/ef_summonknife_cannon.mdl");
-
-		//ph32 = ?
-		pev->rendermode = kRenderTransAdd;
-		pev->renderfx = kRenderFxNone;
-		pev->renderamt = 180;
-		pev->framerate = 1.0;
-		pev->scale = 1.0;
-		pev->solid = SOLID_TRIGGER;
-		pev->movetype = MOVETYPE_FLY;
-		pev->nextthink = gpGlobals->time + 0.1s;
-
-		UTIL_SetOrigin(pev, pev->origin);
-		UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
-
-		pev->classname = MAKE_STRING("d_summonknife");
-	}
-
-	void Precache() override
-	{
-		PRECACHE_MODEL("models/ef_summonknife_cannon.mdl");
-
-		PRECACHE_MODEL("sprites/ef_summon_charging_exp.spr");
-	}
-
-	void EXPORT OnTouch(CBaseEntity* pOther)
-	{
-		if (pev->owner == pOther->edict())
-		{
-			SetTouch(NULL);
-			SetThink(NULL);
-			Remove();
-			return;
-		}
-
-		if (pOther->IsBSPModel() || !pOther->IsPlayer())
-		{
-			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, g_vecZero, 0.0, 0.0, 15, 1, TRUE, FALSE);
-			//MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-			//WRITE_BYTE(TE_SPRITE);
-			//WRITE_COORD(pev->origin.x);
-			//WRITE_COORD(pev->origin.y);
-			//WRITE_COORD(pev->origin.z);
-			//WRITE_SHORT(m_iSprExplo);	// sprite index
-			//WRITE_BYTE(6);			// scale in 0.1's
-			//WRITE_BYTE(255);			// brightness
-			//MESSAGE_END();
-		}
-
-		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
-		CBasePlayer* pAttackePlayer = nullptr;
-		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
-
-		if (pAttackePlayer)
-		{
-			if (pOther->pev->takedamage != DAMAGE_NO && pOther->IsAlive())
-			{
-				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
-
-				TraceResult tr;
-				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
-				tr.iHitgroup = HITGROUP_CHEST; // ...
-
-				ClearMultiDamage();
-				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
-
-				if (pOther->IsPlayer())
-				{
-					CBasePlayer* player = (CBasePlayer*)pOther;
-
-					if (player->m_bIsZombie)
-					{
-						player->pev->velocity = m_vecStartVelocity;
-					}
-				}
-			}
-
-			TraceResult tr;
-			CBaseEntity* pEntity = NULL;
-
-			Vector vecEnd;
-			int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
-
-			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 90.0)) != NULL)
-			{
-				if (pEntity->edict() == pev->owner)
-					continue;
-
-				if (pEntity->IsDormant())
-					continue;
-
-				if (pEntity->pev->takedamage == DAMAGE_NO)
-					continue;
-
-				if (pEntity->Classify() == CLASS_NONE)
-					continue;
-
-				if (pEntity->IsPlayer())
-				{
-					CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
-
-					if (pAttackePlayer->m_iTeam == target->m_iTeam)
-						continue;
-				}
-
-				if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
-					continue;
-
-				vecEnd = pEntity->BodyTarget(pev->origin);
-
-				UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
-
-				if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
-					continue;
-
-				int falloff = RadiusDamageAmount / 90.0;
-
-				float flCurrentDamage = max(0, RadiusDamageAmount - (pev->origin - pEntity->pev->origin).Length() * falloff);
-
-				pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
-
-				if (pEntity->IsPlayer())
-				{
-					CBasePlayer* player = (CBasePlayer*)pEntity;
-
-					if (player->m_bIsZombie)
-					{
-						Vector vecDir = (player->pev->origin - pAttackePlayer->pev->origin);
-						vecDir.z = 0;
-
-						ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
-						player->pev->velocity.z = +200.0f;
-					}
-				}
-			}
-		}
-
-
-		SetTouch(NULL);
-		SetThink(NULL);
-		Remove();
-	}
-
-	void EXPORT FollowThink()
-	{
-		pev->frame += pev->framerate * gpGlobals->frametime / 1s;
-
-		if (pev->frame > m_flMaxFrames)
-			pev->frame = fmod(pev->frame, m_flMaxFrames);
-
-		pev->nextthink = gpGlobals->time + 0.01s;
-	}
-
-	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, TeamName iTeam)
-	{
-		std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
-		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
-	}
-
-	KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 1.0f }; }
-
-	int m_fSequenceLoops;
-	time_point_t m_flRemoveTime;
-	float m_flMaxFrames;
-	float m_flTouchDamage;
-	float RadiusDamageAmount;
-	TeamName m_iTeam;
-	int m_iSprEffect;
-	Vector m_vecStartVelocity;
-
-protected:
-	void Remove()
-	{
-		SetThink(nullptr);
-		SetTouch(nullptr);
-		pev->effects |= EF_NODRAW; // 0x80u
-		return UTIL_Remove(this);
-	}
-};
-
-LINK_ENTITY_TO_CLASS(summonknife_cannon, CSummonKnifeCannon)
+//
+//class CSummonKnifeCannon : public CBaseEntity
+//{
+//public:
+//	void Spawn() override
+//	{
+//		Precache();
+//
+//		m_fSequenceLoops = 0;
+//		//ph26 = 0;
+//		SetThink(&CSummonKnifeCannon::FollowThink);
+//		SetTouch(&CSummonKnifeCannon::OnTouch);
+//		SET_MODEL(this->edict(), "models/ef_summonknife_cannon.mdl");
+//
+//		//ph32 = ?
+//		pev->rendermode = kRenderTransAdd;
+//		pev->renderfx = kRenderFxNone;
+//		pev->renderamt = 180;
+//		pev->framerate = 1.0;
+//		pev->scale = 1.0;
+//		pev->solid = SOLID_TRIGGER;
+//		pev->movetype = MOVETYPE_FLY;
+//		pev->nextthink = gpGlobals->time + 0.1s;
+//
+//		UTIL_SetOrigin(pev, pev->origin);
+//		UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
+//
+//		pev->classname = MAKE_STRING("d_summonknife");
+//	}
+//
+//	void Precache() override
+//	{
+//		PRECACHE_MODEL("models/ef_summonknife_cannon.mdl");
+//
+//		PRECACHE_MODEL("sprites/ef_summon_charging_exp.spr");
+//	}
+//
+//	void EXPORT OnTouch(CBaseEntity* pOther)
+//	{
+//		if (pev->owner == pOther->edict())
+//		{
+//			SetTouch(NULL);
+//			SetThink(NULL);
+//			Remove();
+//			return;
+//		}
+//
+//		if (pOther->IsBSPModel() || !pOther->IsPlayer())
+//		{
+//			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pev->origin, g_vecZero, 0.0, 0.0, 15, 1, TRUE, FALSE);
+//			//MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
+//			//WRITE_BYTE(TE_SPRITE);
+//			//WRITE_COORD(pev->origin.x);
+//			//WRITE_COORD(pev->origin.y);
+//			//WRITE_COORD(pev->origin.z);
+//			//WRITE_SHORT(m_iSprExplo);	// sprite index
+//			//WRITE_BYTE(6);			// scale in 0.1's
+//			//WRITE_BYTE(255);			// brightness
+//			//MESSAGE_END();
+//		}
+//
+//		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+//		CBasePlayer* pAttackePlayer = nullptr;
+//		if (pAttacker && pAttacker->IsPlayer())
+//			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+//
+//		if (pAttackePlayer)
+//		{
+//			if (pOther->pev->takedamage != DAMAGE_NO && pOther->IsAlive())
+//			{
+//				Vector vecDirection = (pOther->pev->origin - pev->origin).Normalize();
+//
+//				TraceResult tr;
+//				UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackePlayer->pev), &tr);
+//				tr.iHitgroup = HITGROUP_CHEST; // ...
+//
+//				ClearMultiDamage();
+//				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
+//				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+//
+//				if (pOther->IsPlayer())
+//				{
+//					CBasePlayer* player = (CBasePlayer*)pOther;
+//
+//					if (player->m_bIsZombie)
+//					{
+//						player->pev->velocity = m_vecStartVelocity;
+//					}
+//				}
+//			}
+//
+//			TraceResult tr;
+//			CBaseEntity* pEntity = NULL;
+//
+//			Vector vecEnd;
+//			int bInWater = (UTIL_PointContents(pev->origin) == CONTENTS_WATER);
+//
+//			while ((pEntity = UTIL_FindEntityInSphere(pEntity, pev->origin, 90.0)) != NULL)
+//			{
+//				if (pEntity->edict() == pev->owner)
+//					continue;
+//
+//				if (pEntity->IsDormant())
+//					continue;
+//
+//				if (pEntity->pev->takedamage == DAMAGE_NO)
+//					continue;
+//
+//				if (pEntity->Classify() == CLASS_NONE)
+//					continue;
+//
+//				if (pEntity->IsPlayer())
+//				{
+//					CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
+//
+//					if (pAttackePlayer->m_iTeam == target->m_iTeam)
+//						continue;
+//				}
+//
+//				if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
+//					continue;
+//
+//				vecEnd = pEntity->BodyTarget(pev->origin);
+//
+//				UTIL_TraceLine(pev->origin, vecEnd, ignore_monsters, pev->owner, &tr);
+//
+//				if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
+//					continue;
+//
+//				int falloff = RadiusDamageAmount / 90.0;
+//
+//				float flCurrentDamage = max(0, RadiusDamageAmount - (pev->origin - pEntity->pev->origin).Length() * falloff);
+//
+//				pEntity->TakeDamage(pev, pAttackePlayer->pev, flCurrentDamage, DMG_EXPLOSION);
+//
+//				if (pEntity->IsPlayer())
+//				{
+//					CBasePlayer* player = (CBasePlayer*)pEntity;
+//
+//					if (player->m_bIsZombie)
+//					{
+//						Vector vecDir = (player->pev->origin - pAttackePlayer->pev->origin);
+//						vecDir.z = 0;
+//
+//						ApplyKnockbackData(player, vecDir, { 1200, 1200, 1200, 1200, 0.85f });
+//						player->pev->velocity.z = +200.0f;
+//					}
+//				}
+//			}
+//		}
+//
+//
+//		SetTouch(NULL);
+//		SetThink(NULL);
+//		Remove();
+//	}
+//
+//	void EXPORT FollowThink()
+//	{
+//		pev->frame += pev->framerate * gpGlobals->frametime / 1s;
+//
+//		if (pev->frame > m_flMaxFrames)
+//			pev->frame = fmod(pev->frame, m_flMaxFrames);
+//
+//		pev->nextthink = gpGlobals->time + 0.01s;
+//	}
+//
+//	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage, TeamName iTeam)
+//	{
+//		std::tie(m_flTouchDamage, RadiusDamageAmount, m_iTeam) = std::make_tuple(flTouchDamage, flExplodeDamage, iTeam);
+//		m_vecStartVelocity = pev->velocity = std::move(vecVelocity);
+//	}
+//
+//	KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 1.0f }; }
+//
+//	int m_fSequenceLoops;
+//	time_point_t m_flRemoveTime;
+//	float m_flMaxFrames;
+//	float m_flTouchDamage;
+//	float RadiusDamageAmount;
+//	TeamName m_iTeam;
+//	int m_iSprEffect;
+//	Vector m_vecStartVelocity;
+//
+//protected:
+//	void Remove()
+//	{
+//		SetThink(nullptr);
+//		SetTouch(nullptr);
+//		pev->effects |= EF_NODRAW; // 0x80u
+//		return UTIL_Remove(this);
+//	}
+//};
+//
+//LINK_ENTITY_TO_CLASS(summonknife_cannon, CSummonKnifeCannon)
 }
 #endif
 
@@ -1633,9 +1633,6 @@ namespace sv {
 
 	void CKnifeSummonKnife::DelaySecondaryAttack(void)
 	{
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		Vector vecSrc = m_pPlayer->GetGunPosition();
-
 #ifndef CLIENT_DLL	
 		float flDamage = GetSecondaryAttackDamage();
 		if (m_iLastAnim == ANIM_CHARGING_RELEASE);
@@ -1664,13 +1661,58 @@ namespace sv {
 		{
 			//…‰ µÃÂ
 #ifndef CLIENT_DLL
-			CSummonKnifeCannon* pEnt = static_cast<CSummonKnifeCannon*>(CBaseEntity::Create("summonknife_cannon", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+			Vector vecSrc = m_pPlayer->GetGunPosition() - gpGlobals->v_up * 2;
+			Vector vecDir = gpGlobals->v_forward;
+
+			Vector vecAngles = UTIL_VecToAngles(vecDir);
+
+			CSummonKnifeCannon* pEnt = CSummonKnifeCannon::Create();
+			
+			if (pEnt)
+			{
+				pEnt->pev->origin = vecSrc;
+				pEnt->pev->angles = vecAngles;
+				pEnt->pev->owner = m_pPlayer->edict();
+				pEnt->m_vecVelocity = pEnt->pev->velocity = vecDir * 800;
+				pEnt->pev->avelocity.z = 5;
+				pEnt->m_flTimeExplode = gpGlobals->time + 1s;
+				pEnt->m_vecDirection = pEnt->pev->velocity.Normalize();
+
+				pEnt->m_flHitDamage = 20;
+				pEnt->m_flExplodeDamage = 10;
+				pEnt->m_flOwnerDamageModifier = 0.1;
+				pEnt->m_flCrowdDamage = 15;
+				pEnt->m_flPushDuration = 0s;
+				pEnt->m_flExplodeForce = 100;
+				pEnt->m_flPushForce = 0;
+				pEnt->m_flPushBoostVel = 0;
+				pEnt->m_flCrowdForce = 0;
+				pEnt->m_flCrowdBoostVel = 0;
+				pEnt->m_pOwner = m_pPlayer;
+
+				if (g_pModRunning->DamageTrack() == DT_ZB)
+				{
+					pEnt->m_flPushDuration = 0.4s;
+					pEnt->m_flHitDamage = 1350;
+					pEnt->m_flExplodeDamage = 900;
+					pEnt->m_flOwnerDamageModifier = 0.1;
+					pEnt->m_flCrowdDamage = 125;
+					pEnt->m_flExplodeForce = 350;
+					pEnt->m_flPushForce = 650;
+					pEnt->m_flPushBoostVel = 50;
+					pEnt->m_flCrowdForce = 500;
+					pEnt->m_flCrowdBoostVel = 125;
+				}
+			}
+
+			/*CSummonKnifeCannon* pEnt = static_cast<CSummonKnifeCannon*>(CBaseEntity::Create("summonknife_cannon", vecSrc, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
 			if (pEnt)
 			{
 				float flTouchDamage = g_pModRunning->DamageTrack() == DT_NONE ? 20 : 3960;
 				float flExplodeDamage = g_pModRunning->DamageTrack() == DT_NONE ? 10 : 3300;
 				pEnt->Init(gpGlobals->v_forward * 2000, flTouchDamage, flExplodeDamage, m_pPlayer->m_iTeam);
-			}
+			}*/
 #endif
 		}
 

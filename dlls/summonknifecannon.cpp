@@ -15,7 +15,7 @@ namespace sv {
 
 	float UTIL_QuickRandomFloat(float low, float high);
 
-	Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
+	static Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
 	{
 		Vector vecPushingDir = pPushing->pev->velocity.Normalize();
 		Vector vecDir = (pBehind->pev->origin - pPushing->pev->origin).Normalize();
@@ -33,7 +33,7 @@ namespace sv {
 
 	CSummonKnifeCannon* CSummonKnifeCannon::Create(void)
 	{
-		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("spear"));
+		edict_t* pent = CREATE_NAMED_ENTITY(MAKE_STRING("summonknife_cannon"));
 
 		if (FNullEnt(pent))
 		{
@@ -44,7 +44,7 @@ namespace sv {
 		CSummonKnifeCannon* pCannon = (CSummonKnifeCannon*)Instance(pent);
 		if (pCannon)
 		{
-			pCannon->pev->classname = MAKE_STRING("d_summonknife");
+			pCannon->pev->classname = MAKE_STRING("summonknife");
 
 			pCannon->Spawn();
 		}
@@ -52,24 +52,13 @@ namespace sv {
 		return pCannon;
 	}
 
-	void CSummonKnifeCannon::AddPlayerToCrowd(CBasePlayer* pPlayer)
-	{
-		if (pPlayer->m_hSpearAttached != this)
-		{
-			if (m_iNumCrowdPlayers >= SPEAR_MAX_CROWD_PLAYERS)
-				return;
-
-			m_rgCrowdPlayers[m_iNumCrowdPlayers] = pPlayer;
-			pPlayer->m_hSpearAttached = this;
-
-			m_iNumCrowdPlayers++;
-		}
-
-		pPlayer->m_flNextSpearPush = gpGlobals->time + 0.08s;
-	}
-
 	void CSummonKnifeCannon::Update(void)
 	{
+		pev->frame += pev->framerate * gpGlobals->frametime / 1s;
+
+		if (pev->frame > m_flNumFrames)
+			pev->frame = fmod(pev->frame, m_flNumFrames);
+
 		if (gpGlobals->time > m_flTimeExplode)
 		{
 			Explode(0.0s, false);
@@ -162,6 +151,9 @@ namespace sv {
 			if (pEntity->IsBSPModel())
 				continue;
 
+			if (pEntity == m_pOwner)
+				continue;
+
 			if (pEntity->IsPlayer() && ENT(pEntity->pev) != pev->owner && g_pGameRules->PlayerRelationship(m_pOwner, pEntity) == GR_TEAMMATE)
 				continue;
 
@@ -171,10 +163,6 @@ namespace sv {
 
 			if (flDamage == 0.0)
 				continue;
-
-			if (ENT(pEntity->pev) == pev->owner)
-				flDamage *= m_flOwnerDamageModifier;
-
 
 			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION);
 
@@ -188,6 +176,7 @@ namespace sv {
 					pEntity->pev->velocity.z = 199;
 			}
 		}
+
 		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
 		WRITE_BYTE(TE_TEMPSPRITE);
 		WRITE_COORD(vecSrc.x);
@@ -197,29 +186,6 @@ namespace sv {
 		WRITE_BYTE(6);
 		WRITE_BYTE(255);
 		WRITE_BYTE(30);
-		MESSAGE_END();
-
-		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_EXPLOSION);
-		WRITE_COORD(vecSrc.x);
-		WRITE_COORD(vecSrc.y);
-		WRITE_COORD(vecSrc.z);
-		WRITE_SHORT(g_sModelIndexFireball2);
-		WRITE_BYTE(2 - int(flRadius * -0.3));
-		WRITE_BYTE(150);
-		WRITE_BYTE(TE_EXPLFLAG_NONE);
-		MESSAGE_END();
-
-		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
-		WRITE_BYTE(TE_TEMPEXPLODEMODEL);
-		WRITE_COORD(vecSrc.x);
-		WRITE_COORD(vecSrc.y);
-		WRITE_COORD(vecSrc.z);
-		WRITE_COORD(400);
-		WRITE_SHORT(m_iExplodeModel);
-		WRITE_SHORT(30);
-		WRITE_BYTE(int(0.3 * 10));
-		WRITE_BYTE(1);
 		MESSAGE_END();
 
 		if (flTimeRemove <= 0.3s)
@@ -240,110 +206,7 @@ namespace sv {
 	void CSummonKnifeCannon::IgniteThink(void)
 	{
 		Update();
-
 		pev->nextthink = gpGlobals->time + 0.032s;
-	}
-
-	void CSummonKnifeCannon::CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind)
-	{
-		if (m_flPushDuration == UTIL_WeaponTimeBase())
-			return;
-
-		if (m_hLockingEntity == entityPushing)
-		{
-			if (entityBehind->IsPlayer() && g_pGameRules->PlayerRelationship(m_pOwner, entityBehind) != GR_TEAMMATE)
-			{
-				CBasePlayer* pPlayer = static_cast<CBasePlayer*>(entityBehind);
-				Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
-
-				if (vecDir.x || vecDir.y || vecDir.z)
-				{
-					entityBehind->pev->velocity = vecDir * m_flCrowdForce;
-					entityBehind->pev->velocity.z = m_flCrowdBoostVel;
-
-					bool bFound = false;
-
-					for (int i = 0; i < m_iNumCrowdMonsters; i++)
-					{
-						if (m_rgCrowdMonsters[i].Get() == ENT(entityBehind->pev))
-						{
-							bFound = true;
-
-							break;
-						}
-					}
-
-					if (!bFound && m_iNumCrowdMonsters < SPEAR_MAX_CROWD_MONSTERS)
-					{
-						if (entityBehind->pev->takedamage && entityBehind->pev->health > 0)
-						{
-							entvars_t* pevOwner = VARS(pev->owner);
-
-							pPlayer->m_LastHitGroup = HITGROUP_CHEST;
-
-							entityBehind->TakeDamage(pev, pevOwner, m_flCrowdDamage, DMG_BULLET);
-
-							if (gpGlobals->time >= m_flTimeNextBleed)
-							{
-								TraceResult tr = UTIL_GetGlobalTrace();
-
-								if (g_pModRunning->DamageTrack() == DT_ZB)
-									UTIL_BloodDrips(tr.vecEndPos, Vector(0, 0, 1), BLOOD_COLOR_RED, 30);
-
-								m_flTimeNextBleed = gpGlobals->time + 0.05s;
-							}
-						}
-
-						m_rgCrowdMonsters[m_iNumCrowdMonsters] = entityBehind;
-						m_rgvecCrowdPushVelocity[m_iNumCrowdMonsters] = entityBehind->pev->velocity;
-						m_rgflTimeCrowdMovement[m_iNumCrowdMonsters] = gpGlobals->time + 0.1s;
-
-						m_iNumCrowdMonsters++;
-					}
-
-					if (entityBehind->IsPlayer())
-						AddPlayerToCrowd((CBasePlayer*)entityBehind);
-				}
-			}
-			else if (entityBehind->IsBSPModel() && UTIL_PointContents(entityBehind->pev->origin) != CONTENTS_WATER)
-			{
-				TraceResult tr = UTIL_GetGlobalTrace();
-
-				float dot = DotProduct((entityPushing->pev->velocity * -1).Normalize(), tr.vecPlaneNormal);
-
-				if (dot > cos(45.0f * 3.141592f / 180.0f))
-				{
-					float modifier = (1.0 - 0.5) * (1.0 - dot) + 0.5;
-
-					if (m_flPushVelocityModifier > 0.01 && modifier != 0)
-						m_flPushVelocityModifier *= modifier;
-				}
-
-				if (dot > cos(15.0f * 3.141592f / 180.0f))
-					Explode(0.0s, false);
-			}
-		}
-		else if (entityPushing->IsPlayer() && entityBehind->IsPlayer() && SPEAR_PLAYER_PUSH_INTERVAL != 0s)
-		{
-			CBasePlayer* pPlayer = static_cast<CBasePlayer*>(entityBehind);	
-			if (g_pGameRules->PlayerRelationship(pPlayer, entityPushing) == GR_TEAMMATE && (pPlayer->m_hSpearAttached != nullptr || pPlayer->m_hSpearAttached == this))
-			{
-				AddPlayerToCrowd(pPlayer);
-
-				if (pPlayer->m_flNextSpearPush > gpGlobals->time && gpGlobals->time > pPlayer->m_flNextSpearPush)
-				{
-					Vector vecDir = CalcCrowdForceDir(entityPushing, entityBehind);
-					vecDir.z = 0;
-
-					if (vecDir.x || vecDir.y || vecDir.z)
-					{
-						entityBehind->pev->velocity = vecDir * entityPushing->pev->velocity.Length() * 1.01;
-
-						((CBasePlayer*)entityBehind)->m_flNextSpearPush = gpGlobals->time + SPEAR_PLAYER_PUSH_INTERVAL;
-					}
-				}
-			}	
-		}
 	}
 
 	void CSummonKnifeCannon::Precache(void)
@@ -389,6 +252,8 @@ namespace sv {
 
 		pev->nextthink = gpGlobals->time;
 
+		m_flNumFrames = (float)(MODEL_FRAMES(pev->modelindex) - 1);
+		pev->framerate = 1.0;
 		m_flTimeStopPushing = invalid_time_point;
 		m_flPushVelocityModifier = 1.0;
 
@@ -423,77 +288,29 @@ namespace sv {
 		m_LastHitGroup = tr.iHitgroup;
 
 		if (pOther->IsBSPModel())
-		{
-			if (gpGlobals->time + 0.8s <= m_flTimeExplode)
-				m_flTimeExplode = gpGlobals->time + 0.8s;
+		{	
+			SetTouch(NULL);
 
-			if (UTIL_PointContents(pev->origin) != CONTENTS_WATER)
-			{
-				UTIL_DecalTrace(&tr, DamageDecal(DMG_BULLET | DMG_NEVERGIB));
-				UTIL_GunshotDecalTrace(&tr, DamageDecal(DMG_BULLET | DMG_NEVERGIB), false, NULL);
+			pev->effects |= EF_NODRAW;
+			pev->velocity = g_vecZero;
+			pev->origin -= m_vecDirection * 5;
 
-				if (m_flTimeExplode <= gpGlobals->time)
-				{
-					SetTouch(NULL);
+			HitDamage(pOther);
 
-					pev->effects |= EF_NODRAW;
-					pev->velocity = g_vecZero;
-					pev->origin -= m_vecDirection * 5;
-				}
-				else
-				{
-					Vector vecEffectPos = pev->origin + m_vecDirection * UTIL_QuickRandomFloat(-7.0, -2.0);
-
-					MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-					WRITE_BYTE(TE_TEMPSPRITE);
-					WRITE_COORD(vecEffectPos.x);
-					WRITE_COORD(vecEffectPos.y);
-					WRITE_COORD(vecEffectPos.z);
-					WRITE_SHORT(m_iExplodeModel);
-					WRITE_BYTE(10);
-					WRITE_BYTE(255);
-					WRITE_BYTE(10);
-					MESSAGE_END();
-
-					MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
-					WRITE_BYTE(TE_ARROWMODEL);
-					WRITE_COORD(vecEffectPos.x);
-					WRITE_COORD(vecEffectPos.y);
-					WRITE_COORD(vecEffectPos.z);
-					WRITE_ANGLE(pev->angles[0]);
-					WRITE_ANGLE(pev->angles[1]);
-					WRITE_ANGLE(pev->angles[2]);
-					WRITE_SHORT(m_iArrowModel);
-					WRITE_BYTE(int((m_flTimeExplode - gpGlobals->time) / 1s * 10.0));
-					WRITE_BYTE(10);
-					WRITE_BYTE(1);
-					WRITE_BYTE(200);
-					WRITE_BYTE(4);
-					WRITE_SHORT(-1);
-					WRITE_BYTE(17);
-					MESSAGE_END();
-
-					SetTouch(NULL);
-
-					pev->effects |= EF_NODRAW;
-					pev->velocity = g_vecZero;
-					pev->origin -= m_vecDirection * 5;
-				}
-			}
-			else
-			{
-				SetTouch(NULL);
-
-				pev->effects |= EF_NODRAW;
-				pev->velocity = g_vecZero;
-				pev->origin -= m_vecDirection * 5;
-			}
+			pev->origin -= m_vecDirection * 5.0;
+			Explode(0.0s, true);
 
 			return;
 		}
 
 		if (!pOther->IsPlayer())	// !CanAddKickRate(pOther)
 		{
+			SetTouch(NULL);
+
+			pev->effects |= EF_NODRAW;
+			pev->velocity = g_vecZero;
+			pev->origin -= m_vecDirection * 5;
+
 			HitDamage(pOther);
 
 			pev->origin -= m_vecDirection * 5.0;

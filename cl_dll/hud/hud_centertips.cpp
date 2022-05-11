@@ -12,6 +12,8 @@ namespace cl {
         m_iFlags |= HUD_DRAW;
         InitHUDData();
         HOOK_MESSAGE(CenterTips);
+
+        return 1;
     }
 
     void CHudCenterTips::InitHUDData()

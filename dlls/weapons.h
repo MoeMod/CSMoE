@@ -809,32 +809,23 @@ public:
 	static CSummonKnifeCannon* Create(void);
 
 public:
-	void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind);
 	void Spawn(void);
 	void Precache(void);
 
-	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier)
-	{
-		flGround = flAir = flAirStrafing = flDucking = 0.0;
-
-		flVelocityModifier = 1.0;
-
-		return TRUE;
-	}
 
 public:
 	void EXPORT IgniteThink(void);
-	void EXPORT FollowThink(void);
 	void EXPORT CannonTouch(CBaseEntity* pOther);
 
 public:
 	void Update(void);
 
 	void HitDamage(CBaseEntity* pOther);
-	void AddPlayerToCrowd(CBasePlayer* pPlayer);
 
 public:
 	void Explode(duration_t flTimeRemove, bool bDetonate);
+
+	float m_flNumFrames;
 };
 #endif
 
@@ -886,6 +877,12 @@ extern short g_sModelIndexBoomerEffect;
 extern short g_sModelIndexBoomerSprite;
 extern short g_sModelIndexBoomerEffectEx;
 extern short g_sModelIndexPosionEffect;
+
+extern short g_sModelIndexFrostExp;
+extern short g_sModelIndexFrostGibs;
+extern short g_sModelIndexShockWave;
+extern short g_sModelIndexWind;
+extern short g_sModelIndexWindExp;
 
 void AnnounceFlashInterval(float interval, float offset = 0);
 

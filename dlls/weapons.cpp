@@ -74,6 +74,11 @@ short g_sModelIndexBoomerEffect;
 short g_sModelIndexBoomerSprite;
 short g_sModelIndexBoomerEffectEx;
 short g_sModelIndexPosionEffect;
+short g_sModelIndexFrostExp;
+short g_sModelIndexFrostGibs;
+short g_sModelIndexShockWave;
+short g_sModelIndexWind;
+short g_sModelIndexWindExp;
 
 int giAmmoIndex;
 

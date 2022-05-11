@@ -129,7 +129,7 @@ namespace sv {
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 		{
-			flDamage = RANDOM_LONG(0,20) ? 37.0f : 114514;
+			flDamage = RANDOM_LONG(0,100) ? 37.0f : 114514;
 		}
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 37.0f;

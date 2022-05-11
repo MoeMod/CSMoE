@@ -122,6 +122,10 @@ namespace sv {
             return 60s;
         if(!strcmp(key, "Knife2xSkillCooldownTime"))
             return 120s;
+        if (!strcmp(key, "EnableForstBomb"))
+            return 1;
+        if (!strcmp(key, "EnableKnockBackBomb"))
+            return 1;
         return IBaseMod::QueryModConfig(key, defaultValue, invoker);
     }
 

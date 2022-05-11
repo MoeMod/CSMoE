@@ -15,7 +15,7 @@ namespace sv {
 
 	float UTIL_QuickRandomFloat(float low, float high);
 
-	Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
+	static Vector CalcCrowdForceDir(CBaseEntity* pPushing, CBaseEntity* pBehind)
 	{
 		Vector vecPushingDir = pPushing->pev->velocity.Normalize();
 		Vector vecDir = (pBehind->pev->origin - pPushing->pev->origin).Normalize();

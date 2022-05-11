@@ -164,10 +164,10 @@ void CSpearGun::PrimaryAttack(void)
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 		{
 			pSpear->m_flPushDuration = 0.4s;
-			pSpear->m_flHitDamage = 560;
-			pSpear->m_flExplodeDamage = 250;
+			pSpear->m_flHitDamage = 560 + 1440;
+			pSpear->m_flExplodeDamage = 250 + 60;
 			pSpear->m_flOwnerDamageModifier = 0.1;
-			pSpear->m_flCrowdDamage = 125;
+			pSpear->m_flCrowdDamage = 125 + 3;
 			pSpear->m_flExplodeForce = 350;
 			pSpear->m_flPushForce = 650;
 			pSpear->m_flPushBoostVel = 50;
