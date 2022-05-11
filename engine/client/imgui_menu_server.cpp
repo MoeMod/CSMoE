@@ -168,7 +168,7 @@ namespace ui {
 			ImGui::NextColumn();
 			ImGui::TextUnformatted("IP地址：");
 			ImGui::NextColumn();
-			ImGui::TextUnformatted(ep.address().to_string().c_str());
+			ImGui::TextUnformatted(boost::asio::ip::detail::endpoint(ep.address(), ep.port()).to_string().c_str());
 
 			ImGui::NextColumn();
 			ImGui::TextUnformatted("游戏：");

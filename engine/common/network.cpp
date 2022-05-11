@@ -603,18 +603,6 @@ qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock
 	boost::system::error_code ec;
 	boost::asio::ip::udp::endpoint	addr;
     boost::asio::ip::udp::socket *net_socket = nullptr;
-	int		protocol;
-
-	if( !data || !length )
-		return false;
-
-	NET_AdjustLag();
-
-	if( NET_GetLoopPacket( sock, from, data, length ))
-	{
-		NET_LagPacket( true, sock, from, length, data );
-		return true;
-	}
 
 	do
 	{
@@ -651,19 +639,30 @@ qboolean NET_GetPacket( boost::asio::ip::udp::socket **ip_sockets, netsrc_t sock
 		return true;
 	} while(0);
 
-	if( ec )
-	{
-		return NET_LagPacket( false, sock, from, length, data );
-	}
-
 	return false;
 }
 
 qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *length )
 {
-    auto v4 = NET_GetPacket(ipv4_sockets, sock, from, data, length);
-    auto v6 = NET_GetPacket(ipv6_sockets, sock, from, data, length);
-    return v4 || v6;
+    if( !data || !length )
+        return false;
+
+    NET_AdjustLag();
+
+    if( NET_GetLoopPacket( sock, from, data, length ))
+    {
+        NET_LagPacket( true, sock, from, length, data );
+        return true;
+    }
+
+    // use + instead of || to prevent from short circuit
+    auto result = NET_GetPacket(ipv4_sockets, sock, from, data, length) + NET_GetPacket(ipv6_sockets, sock, from, data, length);
+
+    if( !result )
+    {
+        return NET_LagPacket( false, sock, from, length, data );
+    }
+    return true;
 }
 
 /*

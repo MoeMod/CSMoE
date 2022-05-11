@@ -38,8 +38,8 @@ typedef enum
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
-	NA_IPX,
-	NA_BROADCAST_IPX,
+	NA_IPX [[deprecated]],
+	NA_BROADCAST_IPX [[deprecated]],
     NA_IP6,
     NA_MULTICAST_IP6, // all nodes multicast
 } netadrtype_t;
@@ -64,7 +64,7 @@ typedef struct netadr_s
         {
             uint32_t type;
             uint8_t  ip[4];   // or last 4 IPv6 octets
-            uint8_t  ipx[10]; // or first 10 IPv6 octets
+            [[deprecated]] uint8_t  ipx[10]; // or first 10 IPv6 octets
         };
         struct
         {

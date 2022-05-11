@@ -263,6 +263,9 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
         engine->Cvar_Set("sv_nat", "1");
         engine->Cvar_Set("mp_gamemode", szGameModeName);
 
+        // show xash loading dialog
+        engine->pfnClientCmd( "endgame\nmenu_connectionprogress localserver\nwait\nwait\nwait\n" );
+
 		// create command to load map, set password, etc
 		sprintf( szMapCommand, "disconnect\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\ncd fadeout\nwait\nmap %s\n",
 			m_pGameplayPage->GetMaxPlayers(),
