@@ -18,11 +18,11 @@ inline std::pair<std::string, std::string> ParseHostPort(const std::string& msg)
         host = sm[1].str();
         port = sm[3].str();
     }
-    if (std::smatch sm; std::regex_match(msg, sm, v6) && sm.size() > 1) {
+    else if (std::smatch sm; std::regex_match(msg, sm, v6) && sm.size() > 1) {
         // host:port, host, port
         host = sm[1].str();
     }
-	if (std::smatch sm; std::regex_match(msg, sm, v4) && sm.size() > 2) {
+    else if (std::smatch sm; std::regex_match(msg, sm, v4) && sm.size() > 2) {
 		// host:port, host, port
 		host = sm[1].str();
 		if (sm[2].str().size()) port = sm[2].str();
