@@ -142,3 +142,4 @@ HOOK_EVENT(bpgm, FireBPGM);
 HOOK_EVENT(m950, FireM950);
 HOOK_EVENT(zgun, FireZGun);
 HOOK_EVENT(k3, FireK3);
+HOOK_EVENT(sgmissile, FireSGMissile);

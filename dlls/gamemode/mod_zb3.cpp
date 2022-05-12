@@ -575,7 +575,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 				else
 				{
 					char szText[256];
-					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题武器【虎王】M95^7", STRING(pEntity->v.netname));
+					snprintf(szText, 256, "^3[柑橘CitruS] ^7恭喜^2%s^7成功抢答，获得答题武器撼宇碎星^7", STRING(pEntity->v.netname));
 					MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 					WRITE_BYTE(ENTINDEX(pEntity));
 					WRITE_STRING(szText);
@@ -586,7 +586,7 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 
 						DropPrimary(pPlayer);
 						//pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
-						pPlayer->GiveNamedItem("weapon_m95tiger");
+						pPlayer->GiveNamedItem("weapon_sgmissile");
 					}
 				}
 

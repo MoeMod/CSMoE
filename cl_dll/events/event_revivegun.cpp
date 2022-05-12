@@ -78,13 +78,11 @@ void EV_FireReviveGun( event_args_t *args )
 		{
 			if (args->bparam2)
 			{
-				viewent->curstate.skin = 2;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_REVIVE_SHOOTB, 2);
 				return;
 			}
 			else
 			{
-				viewent->curstate.skin = 0;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_REVIVE_SHOOTA, 2);
 			}
 		}
@@ -92,13 +90,11 @@ void EV_FireReviveGun( event_args_t *args )
 		{
 			if (args->bparam2)
 			{
-				viewent->curstate.skin = 2;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_SHOOTB, 2);
 				return;
 			}
 			else
 			{
-				viewent->curstate.skin = 0;
 				gEngfuncs.pEventAPI->EV_WeaponAnimation(REVIVEGUN_SHOOTA, 2);
 			}
 		}

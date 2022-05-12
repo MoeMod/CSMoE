@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "player.h"
 #include "weapons.h"
 #include "wpn_knife.h"
-
+#include "weapons/knifeattack.h"
 #ifndef CLIENT_DLL
 #include "gamemode/mods.h"
 #include "player/player_mod_strategy.h"
@@ -256,86 +256,38 @@ namespace sv {
 			BOOL fDidHit = FALSE;
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();
-			float flRange = 45.0f;
+			
 #ifndef CLIENT_DLL
 			m_pPlayer->SetAnimation(PLAYER_ATTACK1);
+			float flRange = 45.0f;
 			flRange = m_pPlayer->m_pModStrategy->AdjustZombieKnifeRange(true, flRange);
-#endif
+
 			flRange += (m_iState - 2) * 10.0;
 			Vector vecEnd = vecSrc + gpGlobals->v_forward * flRange;
 
-			TraceResult tr;
-			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+			float flDamage = 1000 + (m_iState - 2) * 300.0;
+			m_iState = 0;
 
-			if (tr.flFraction >= 1)
+			switch (KnifeAttack5(flDamage, flRange, 90, DMG_NEVERGIB | DMG_EXPLOSION, this->pev, m_pPlayer))
 			{
-				UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, head_hull, ENT(m_pPlayer->pev), &tr);
-
-				if (tr.flFraction < 1)
-				{
-					CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
-
-					if (!pHit || pHit->IsBSPModel())
-						FindHullIntersection(vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, ENT(m_pPlayer->pev));
-
-					vecEnd = tr.vecEndPos;
-				}
-			}
-			else
+			case HIT_NONE:
 			{
-				m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-				m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.0s;
-
-				CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-
-				float flDamage = 1000 + (m_iState - 2) * 200.0;
-				m_iState = 0;
-				m_pPlayer->ResetMaxSpeed();
-
-				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-#ifndef CLIENT_DLL
-				ClearMultiDamage();
-				if (pEntity && g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) != GR_TEAMMATE)
-					pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_EXPLOSION);
-				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-#endif
-
-				float flVol = 1;
-#ifndef CLIENT_DLL
-				int fHitWorld = TRUE;
-#endif
-				if (pEntity)
-				{
-					if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
-					{
-						EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM);
-						m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-
-						if (!pEntity->IsAlive())
-							return;
-
-						flVol = 0.1;
-#ifndef CLIENT_DLL
-						fHitWorld = FALSE;
-#endif
-					}
-				}
-
-#ifndef CLIENT_DLL
-				if (fHitWorld)
-				{
-					TEXTURETYPE_PlaySound(&tr, vecSrc, vecSrc + (vecEnd - vecSrc) * 2, BULLET_PLAYER_CROWBAR);
-
-					EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/deathknight_slash_wall.wav", VOL_NORM, ATTN_NORM);
-				}
-#endif
-
-				m_trHit = tr;
-				m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
-
-				SetThink(&CKnifeZombiZ5::Smack);
-				pev->nextthink = invalid_time_point + UTIL_WeaponTimeBase() + 0.2s;
+				break;
 			}
+			case HIT_PLAYER:
+			{
+				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/zombi_attack_3.wav", VOL_NORM, ATTN_NORM);	
+				break;
+			}
+			case HIT_WALL:
+			{
+				m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "zombi/deathknight_slash_wall.wav", VOL_NORM, ATTN_NORM);
+				break;
+			}
+			}
+#endif
 			break;
 		}
 		}

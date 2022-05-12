@@ -765,14 +765,12 @@ public:
 	std::unique_ptr<IBasePlayerModStrategy> m_pModStrategy;
 #endif
 	int iuser1;
-	int iRecorder[33];
 	time_point_t m_tHealthDecreaseStartTime;
 	float m_flHealthDecreaseAmount;
 	time_point_t m_tHealthDecreaseInterval;
 	time_point_t m_tNextSkillSoundTime;
 	int m_iHealthDecreaseCount;
 	int m_iHealthDamageType;
-	time_point_t tLastMarkTime[33];
 	const char* m_ZombieClass;
 	time_point_t m_flCustomSequenceUntilTime;
 	int m_iCustomSequence;

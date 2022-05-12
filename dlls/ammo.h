@@ -356,6 +356,22 @@ public:
 	BOOL AddAmmo(CBaseEntity* pOther);
 };
 
+class CSGMissileBcsAmmo : public CBasePlayerAmmo
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CReviveAmmo : public CBasePlayerAmmo
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL AddAmmo(CBaseEntity* pOther);
+};
+
 }
 
 #endif // AMMO_H

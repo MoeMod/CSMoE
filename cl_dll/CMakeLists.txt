@@ -251,6 +251,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_k3.cpp
 	../dlls/wpn_shared/wpn_as50g.cpp
 	../dlls/wpn_shared/wpn_ak47g.cpp
+	../dlls/wpn_shared/wpn_sgmissile.cpp
 	)
 
 set (HUD_SRCS

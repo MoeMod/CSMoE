@@ -98,6 +98,19 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		break;
 
 	}
+	case 15:
+		switch (reader.ReadByte())
+		{
+		case 1:
+			gEngfuncs.pfnPlaySoundByNameAtPitch("zombi/TD_Buff.wav", 1.0, 100);
+			break;
+
+		case 44:
+			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/sgmissile_reload.wav", VOL_NORM, gHUD.m_vecOrigin);
+			break;
+		}
+
+		break;
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
@@ -145,10 +158,17 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 	if (prev && (prev->entity.origin - origin).Length() < 5)	// Why not other numbers??
 		return;
 	static int iModelIndex;
-	if (iType)
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
-	else
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+
+	switch (iType)
+	{
+	case 0:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr"); break;
+	case 1:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr"); break;
+	case 2:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissile_line.spr"); break;	
+	}
+
 	TEMPENTITY* te = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
 	if (te)
 	{
@@ -180,10 +200,15 @@ void CreateBalrog11CannonFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingE
 	if (!ent)
 		return;
 	static int iModelIndex;
-	if (iType)
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr");
-	else
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr");
+	switch (iType)
+	{
+	case 0:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr"); break;
+	case 1:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr"); break;
+	case 2:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissile_line.spr"); break;
+	}
 
 	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
 	if (pEnt)

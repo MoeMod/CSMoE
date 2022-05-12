@@ -75,25 +75,27 @@ namespace sv {
 		const char* GetName() const override { return "格斗大师"; };
 		const char* GetDesc() const override { return "近战武器加强。"; }; // 近身武器攻击时获得一个（80units60°）的攻击，伤害为（120+40*回合数），击退为（600+30*回合数），定身为（20%+3%*回合数），最大定身50%加成
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
-		void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
-			if (attacker != m_pPlayer)
-				return;
+
+		void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int& iClip, int& iBackAmmo)
+		{
 			if (!IsActivate())
 				return;
-			if (m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
+			if (weapon->m_iId != WEAPON_KNIFE)
 				return;
 			if (m_flNextThink > gpGlobals->time)
 				return;
-			m_flNextThink = gpGlobals->time + 0.01s;
+			m_flNextThink = gpGlobals->time + 0.5s;
 
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();
 			auto result = KnifeAttack3(vecSrc, gpGlobals->v_forward, 120.0f + 40.0f * g_pGameRules->m_iTotalRoundsPlayed, 80, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
-			if (result == HIT_NONE)
-				return;
+
 			/*if (result == HIT_PLAYER) {
 				ApplyKnockbackData(victim, victim->pev->origin - m_pPlayer->pev->origin, { 700, 1600, 1300, 400, 0.5f });
 			}*/
+			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, RANDOM_LONG(0, 1) ? "weapons/stormgiant_hit1.wav" : "weapons/stormgiant_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecEnd = vecSrc + gpGlobals->v_forward * 80;
 			TraceResult tr;
 			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
@@ -109,6 +111,41 @@ namespace sv {
 			WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
 			MESSAGE_END();
 		}
+
+	//	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+	//		if (attacker != m_pPlayer)
+	//			return;
+	//		if (!IsActivate())
+	//			return;
+	//		if (m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
+	//			return;
+	//		if (m_flNextThink > gpGlobals->time)
+	//			return;
+	//		m_flNextThink = gpGlobals->time + 0.01s;
+
+	//		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+	//		Vector vecSrc = m_pPlayer->GetGunPosition();
+	//		auto result = KnifeAttack3(vecSrc, gpGlobals->v_forward, 120.0f + 40.0f * g_pGameRules->m_iTotalRoundsPlayed, 80, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
+	//		if (result == HIT_NONE)
+	//			return;
+	//		/*if (result == HIT_PLAYER) {
+	//			ApplyKnockbackData(victim, victim->pev->origin - m_pPlayer->pev->origin, { 700, 1600, 1300, 400, 0.5f });
+	//		}*/
+	//		Vector vecEnd = vecSrc + gpGlobals->v_forward * 80;
+	//		TraceResult tr;
+	//		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+
+	//		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+	//		WRITE_BYTE(TE_EXPLOSION);
+	//		WRITE_COORD(tr.vecEndPos.x);
+	//		WRITE_COORD(tr.vecEndPos.y);
+	//		WRITE_COORD(tr.vecEndPos.z);
+	//		WRITE_SHORT(g_iKnifeMasterSpr);
+	//		WRITE_BYTE(3);
+	//		WRITE_BYTE(15);
+	//		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
+	//		MESSAGE_END();
+	//	}
 	private:
 		time_point_t m_flNextThink;
 	};
@@ -1656,7 +1693,10 @@ namespace sv {
 			if (m_flNextThink > gpGlobals->time)
 				return;
 
-			int iTeamCT = CountTeamPlayers(CT);
+			if (m_pPlayer->m_bIsZombie)
+				return;
+
+			int iTeamCT = CountLiveCTPlayers();
 			if (iTeamCT <= 6)
 			{
 				auto strategy = dynamic_cast<CPlayerModStrategy_ZBZ*>(m_pPlayer->m_pModStrategy.get());
@@ -1677,6 +1717,28 @@ namespace sv {
 			}
 			
 		}
+		int CountLiveCTPlayers()
+		{
+			CBaseEntity* pPlayer = NULL;
+			int i = 0;
+
+			while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL) {
+				if (FNullEnt(pPlayer->edict()))
+					break;
+
+				if (pPlayer->pev->flags & FL_DORMANT)
+					continue;
+
+				if (!pPlayer->IsAlive())
+					continue;
+
+				if (GetClassPtr<CBasePlayer>(pPlayer->pev)->m_iTeam == CT)
+					++i;
+			}
+
+			return i;
+		}
+
 		
 	private:
 		float m_flTakeDamage;
@@ -1878,7 +1940,7 @@ namespace sv {
 		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
 		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
-		{ Skill_ZombieS, 15, MakeSkill<ZSkill_ZombieS>},
+		{ Skill_ZombieS, 50, MakeSkill<ZSkill_ZombieS>},
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
 		{ Skill_Adaptability, 100, MakeSkill<ZSkill_Adaptability> },
 		{ Skill_ZombiBombGiveaway, 50, MakeSkill<ZSkill_ZombiBombGiveaway> },

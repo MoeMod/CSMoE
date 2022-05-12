@@ -188,7 +188,7 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_44magnum");
 	UTIL_PrecacheOtherWeapon("weapon_tbarrel");
 	UTIL_PrecacheOtherWeapon("weapon_sgdrill");
-	UTIL_PrecacheOther("ammo_sgdrill");
+	UTIL_PrecacheOther("ammo_sgdrill_buckshot");
 	UTIL_PrecacheOtherWeapon("weapon_mg3");
 	UTIL_PrecacheOtherWeapon("weapon_mg36");
 	UTIL_PrecacheOtherWeapon("csgo_mag7");
@@ -312,6 +312,9 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_k3");
 	UTIL_PrecacheOtherWeapon("weapon_as50g");
 	UTIL_PrecacheOtherWeapon("weapon_ak47g");
+	UTIL_PrecacheOtherWeapon("weapon_sgmissile");
+	UTIL_PrecacheOther("ammo_sgmissilebcs");
+	UTIL_PrecacheOther("ammo_revive");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

@@ -1290,6 +1290,10 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	pWeapon->pev->body = pfrom->iuser2;
 	pWeapon->pev->skin = pfrom->iuser3;
 
+	cl_entity_t* viewent = gEngfuncs.GetViewModel();
+	viewent->curstate.body = pfrom->iuser2;
+	viewent->curstate.skin = pfrom->iuser3;
+
 	/*for ( i = 0; i < MAX_WEAPONS; i++)
 	{
 		CBasePlayerWeapon* pCurrent = g_pWpns[i];
@@ -1460,7 +1464,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	//  over the wire ( fixes some animation glitches )
 	if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim || HUD_GetWeapon() != pWeapon->m_iId))
 		// Force a fixed anim down to viewmodel
-		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, pWeapon->pev->body, 1);
+		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->m_iId, pfrom->iuser2, 1);
 
 	if (pWeapon->m_iPrimaryAmmoType < MAX_AMMO_TYPES)
 	{

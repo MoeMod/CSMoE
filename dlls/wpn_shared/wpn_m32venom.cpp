@@ -456,7 +456,7 @@ void CM32Venom::PrimaryAttack(void)
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 
 #ifndef CLIENT_DLL
-	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 13 + gpGlobals->v_right * -1.5 + gpGlobals->v_up * -1.5;
+	Vector vecSrc = m_pPlayer->GetGunPosition() + gpGlobals->v_forward * 16 + gpGlobals->v_right * 8 + gpGlobals->v_up * -8;
 	CM32VenomRocket* pEnt = static_cast<CM32VenomRocket*>(CBaseEntity::Create("m32venom_rocket", vecSrc, m_pPlayer->pev->v_angle, m_pPlayer->edict()));
 	if (pEnt)
 	{

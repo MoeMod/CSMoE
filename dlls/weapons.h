@@ -619,8 +619,6 @@ public:
 	void Precache() override;
 	void Touch(CBaseEntity* pOther) override;
 
-	BOOL GetKickRate(float& flGround, float& flAir, float& flAirStrafing, float& flDucking, float& flVelocityModifier);
-
 	void EXPORT AnimationThink(void);
 	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList);
 	void Remove();
@@ -636,6 +634,8 @@ private:
 
 	CUtlVector<CBaseEntity*>* m_pEnemyList;
 	CUtlVector<CBaseEntity*>* m_pGroupList;
+
+	friend class CSGMissileCannon;
 };
 
 class CHolySwordCannon : public CBaseEntity
@@ -829,6 +829,26 @@ public:
 };
 #endif
 
+class CSGMissileCannon : public CBalrog11Cannon
+{
+	//From CS:AE
+public:
+	void Spawn();
+	void Precache();
+	void EXPORT SGMissileBcsTouch(CBaseEntity* pOther);
+
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce);
+	void Remove();
+	void Explode(void);
+
+private:
+	float m_flExplodeDamage;
+	float m_flExplodeRadius;
+	float m_flDirectForce;
+
+	int m_iEffectSprite;
+	int m_iExplosionSprite;
+};
 #ifdef ENABLE_SHIELD
 class CWShield : public CBaseEntity
 {

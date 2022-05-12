@@ -91,6 +91,7 @@ namespace sv {
 		pev->scale = 0.8;
 
 		pev->frame += 1.5;
+
 		if (pev->frame > m_flNumFrames)
 			pev->frame = fmod(pev->frame, m_flNumFrames);
 
@@ -101,7 +102,7 @@ namespace sv {
 
 		UTIL_SetOrigin(pev, m_vecOrigin);
 
-		if (m_tTimeRemove < gpGlobals->time)
+		if (gpGlobals->time >= m_tTimeRemove)
 		{
 			m_pGroupList->FindAndRemove(this);
 
@@ -148,15 +149,7 @@ namespace sv {
 				{
 					if (pOther->pev->takedamage != DAMAGE_NO)
 					{
-						//pOther->TakeDamage(pev, pOwner->pev, m_flDamage, DMG_GENERIC);
-						TraceResult tr;
-						UTIL_TraceLine(pev->origin, pOther->pev->origin, dont_ignore_monsters, ENT(pev), &tr);
-
-						ClearMultiDamage();
-						pOther->TraceAttack(pOwner->pev, m_flDamage, (pOther->pev->origin - pev->origin).Normalize(), &tr,
-							DMG_GENERIC);
-						ApplyMultiDamage(pev, pOwner->pev);
-
+						pOther->TakeDamage(pev, pOwner->pev, m_flDamage, DMG_GENERIC);
 						m_pEnemyList->AddToTail(pOther);
 					}
 				}

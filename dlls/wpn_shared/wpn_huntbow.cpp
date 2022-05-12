@@ -128,35 +128,6 @@ namespace sv {
 					)
 				{
 					Vector vecDirection = (pev->velocity).Normalize();
-					if (g_pModRunning->DamageTrack() == DT_ZB)
-					{
-						if (pOther->IsPlayer() && g_pGameRules->PlayerRelationship(pAttackePlayer, pOther) != GR_TEAMMATE)
-						{
-							pInflictorPlayer = static_cast<CBasePlayer*>(pOther);
-							if (pInflictorPlayer->tLastMarkTime[ENTINDEX(pAttacker->edict())] + 5s < gpGlobals->time)
-								pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
-							pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] += 1;
-							pInflictorPlayer->tLastMarkTime[ENTINDEX(pAttacker->edict())] = gpGlobals->time;
-
-							
-							MESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgHeadIcon, NULL, pAttacker->pev);
-							WRITE_BYTE(5);	//type
-							WRITE_SHORT(ENTINDEX(pInflictorPlayer->edict())); //entity
-							WRITE_BYTE(pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())]);
-							MESSAGE_END();
-
-							m_ArrowDamage = m_ArrowDamage + (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] * 70);	//original 300
-							if (pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] == 5)
-							{
-								pInflictorPlayer->iRecorder[ENTINDEX(pAttacker->edict())] = 0;
-
-								//pInflictorPlayer->m_pModStrategy->AdjustDamageTaken(this, this->pev->owner, 170, 1);
-
-								pInflictorPlayer->m_iHealthDecreaseCount = 4;
-								pInflictorPlayer->m_flHealthDecreaseAmount = 170;
-							}
-						}
-					}
 
 					ClearMultiDamage();
 					pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
@@ -492,11 +463,11 @@ void CHuntbow::Precache(void)
 	PRECACHE_MODEL("sprites/muzzleflash211.spr");
 	PRECACHE_MODEL("sprites/muzzleflash212.spr");
 	PRECACHE_MODEL("sprites/muzzleflash213.spr");
-	PRECACHE_MODEL("sprites/dmgreiteration01.spr");
-	PRECACHE_MODEL("sprites/dmgreiteration02.spr");
-	PRECACHE_MODEL("sprites/dmgreiteration03.spr");
-	PRECACHE_MODEL("sprites/dmgreiteration04.spr");
-	PRECACHE_MODEL("sprites/dmgreiteration05.spr");
+	//PRECACHE_MODEL("sprites/dmgreiteration01.spr");
+	//PRECACHE_MODEL("sprites/dmgreiteration02.spr");
+	//PRECACHE_MODEL("sprites/dmgreiteration03.spr");
+	//PRECACHE_MODEL("sprites/dmgreiteration04.spr");
+	//PRECACHE_MODEL("sprites/dmgreiteration05.spr");
 	PRECACHE_MODEL("sprites/ef_huntbow_explo.spr");
 	PRECACHE_MODEL("sprites/ef_huntbow_trail.spr");
 

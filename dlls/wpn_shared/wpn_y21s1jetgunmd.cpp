@@ -164,7 +164,7 @@ void CY21s1Jetgunmd::PrimaryAttack(void)
 		if (m_iChargeShotsFired >= 60)
 		{
 			m_iChargeShotsFired = 0;
-
+			pev->skin = 1;
 			if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] < DashCount())
 			{
 				m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
@@ -333,6 +333,9 @@ void CY21s1Jetgunmd::SecondaryAttack(void)
 		return;
 
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]--;
+
+	if (m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] <= 0)
+		pev->skin = 0;
 
 	if (m_tDashStart == invalid_time_point)
 	{

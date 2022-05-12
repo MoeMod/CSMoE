@@ -62,7 +62,7 @@ void CSgdrill::Precache(void)
 int CSgdrill::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "SgdrillAmmo";
+	p->pszAmmo1 = "sgdrill_buckshot";
 	p->iMaxAmmo1 = 105;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;

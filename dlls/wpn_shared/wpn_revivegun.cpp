@@ -115,7 +115,7 @@ BOOL CReviveGun::Deploy(void)
 {
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
-
+	pev->skin = 0;
 	m_iThinkType = 0;
 	m_tBeamThink = m_tNextThink = invalid_time_point;
 	m_tNextPlayEvent = gpGlobals->time + 1.0s;
@@ -169,7 +169,7 @@ void CReviveGun::SecondaryAttack(void)
 #ifndef CLIENT_DLL
 		PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireReviveGun, 0, g_vecZero, g_vecZero, 0.0, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), TRUE);
 #endif
-
+		pev->skin = 1;
 		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/revivegun-2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 		SecondaryAttack_FindTargets();
@@ -542,6 +542,7 @@ bool CReviveGun::IsSignal(void)
 
 void CReviveGun::ReviveGunFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
 {
+	pev->skin = 0;
 	m_bDelayFire = true;
 	m_iShotsFired++;
 	m_flAccuracy = ((float)(m_iShotsFired * m_iShotsFired * m_iShotsFired) / 215.0) + 0.3;
@@ -622,7 +623,7 @@ void CReviveGun::ItemPostFrame()
 #ifndef CLIENT_DLL
 				PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireReviveGun, 0, g_vecZero, g_vecZero, 0.0, 0.0, (int)(m_pPlayer->pev->punchangle.x * 100), (int)(m_pPlayer->pev->punchangle.y * 100), IsSignal(), TRUE);
 #endif
-
+				pev->skin = 1;
 				EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/revivegun-2.wav", VOL_NORM, ATTN_NORM, 0, 94);
 
 				SecondaryAttack_FindTargets();
@@ -636,6 +637,7 @@ void CReviveGun::ItemPostFrame()
 			case 2:
 			{
 				m_iThinkType = 0;
+				pev->skin = 0;
 				m_tNextThink = invalid_time_point;
 			}
 		}
@@ -668,6 +670,12 @@ void CReviveGun::ItemPostFrame()
 		{
 			m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType]++;
 			m_flTimeNextCharge = gpGlobals->time + 3.5s;
+#ifndef CLIENT_DLL
+			MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
+			WRITE_SHORT(CBasePlayer::GetAmmoIndex("ReviveAmmo"));
+			WRITE_SHORT(1);
+			MESSAGE_END();
+#endif
 		}
 	}
 	return CBasePlayerWeapon::ItemPostFrame();

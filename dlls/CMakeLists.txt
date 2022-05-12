@@ -220,6 +220,7 @@ set(HLDLL_SRCS
 	./spearammo.cpp
 	./summonknifecannon.cpp
 	./gamemode/mod_z4e.cpp
+	./sgmissilecannon.cpp
 	)
 
 set (HLWPN_SRCS
@@ -406,6 +407,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_k3.cpp
 	../dlls/wpn_shared/wpn_as50g.cpp
 	../dlls/wpn_shared/wpn_ak47g.cpp
+	../dlls/wpn_shared/wpn_sgmissile.cpp
 	)
 
 set(PM_SRCS

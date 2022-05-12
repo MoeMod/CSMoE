@@ -141,7 +141,7 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
 	{"knife_whipsword",     "【极影】蛇心剑",               0,    KNIFE_SLOT,          UNASSIGNED, BUY_KNIFE, 150 },
 	{ "weapon_cannonex",         "赤焰魔龙",           6500, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
 	{ "weapon_speargun",         "海皇之怒",           5800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP, 1 },
-
+	//{"weapon_sgmissile",        "撼宇碎星",                  6400, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_SHOTGUN, 1},
 	//{"csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_KNIFE, 1},
 	{ "csgo_cz75",         "CZ75",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1 },
 	{ "csgo_tec9",         "Tec-9",                  500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1 },

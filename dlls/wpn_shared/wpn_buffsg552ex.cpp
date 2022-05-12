@@ -60,7 +60,6 @@ void CBuffsg552ex::Spawn(void)
 void CBuffsg552ex::Precache(void)
 {
 	PRECACHE_MODEL("models/v_buffsg552ex.mdl");
-	PRECACHE_MODEL("models/v_buffsg552ex2.mdl");
 	PRECACHE_MODEL("models/w_buffsg552ex.mdl");
 	PRECACHE_MODEL("models/p_buffsg552ex.mdl");
 	PRECACHE_MODEL("sprites/ef_buffsg552ex_slash1.spr");
@@ -99,7 +98,7 @@ BOOL CBuffsg552ex::Deploy(void)
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
 	iShellOn = 1;
-	return DefaultDeploy(m_iShotsCount >= SIGNAL_SHOTS_COUNT ? "models/v_buffsg552ex2.mdl" : "models/v_buffsg552ex.mdl", "models/p_buffsg552ex.mdl", BUFFSG552EX_DRAW, "mp5", UseDecrement() != FALSE);
+	return DefaultDeploy("models/v_buffsg552ex.mdl", "models/p_buffsg552ex.mdl", BUFFSG552EX_DRAW, "mp5", UseDecrement() != FALSE);
 }
 
 void CBuffsg552ex::SecondaryAttack(void)
@@ -239,12 +238,12 @@ BOOL CBuffsg552ex::IsSignal()
 #ifndef CLIENT_DLL
 	if (m_iShotsCount >= SIGNAL_SHOTS_COUNT)
 	{
-		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_buffsg552ex2.mdl");
+		pev->skin = 1;
 		return TRUE;
 	}
 	else
 	{
-		m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_buffsg552ex.mdl");
+		pev->skin = 0;
 		return FALSE;
 	}
 #endif
