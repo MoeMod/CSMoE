@@ -73,7 +73,7 @@ namespace ui {
 	{
 		// https://api.moemod.com/csmoe/version
 		try {
-			std::string result = co_await HTTPS_RequestAsync(s_update_ioc, "GET", "api.moemod.com", "443", "/csmoe/version", boost::asio::use_awaitable);
+			std::string result = co_await HTTPS_RequestAsync(s_update_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/version", boost::asio::use_awaitable);
 			auto j = nlohmann::json::parse(result);
 
 			std::vector<VersionInfo_s> all_infos;

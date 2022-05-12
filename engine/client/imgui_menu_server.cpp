@@ -92,7 +92,7 @@ namespace ui {
 	{
 		// https://api.moemod.com/csmoe/masterserver
 		try {
-			std::string result = co_await HTTPS_RequestAsync(s_server_ioc, "GET", "api.moemod.com", "443", "/csmoe/masterserver", boost::asio::use_awaitable);
+			std::string result = co_await HTTPS_RequestAsync(s_server_ioc, "GET", "apiv2.moemod.com", "443", "/csmoe/masterserver", boost::asio::use_awaitable);
             auto j = nlohmann::json::parse(result);
             auto j2 = j["servers"];
 
