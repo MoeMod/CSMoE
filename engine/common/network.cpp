@@ -656,13 +656,13 @@ qboolean NET_GetPacket( netsrc_t sock, netadr_t *from, byte *data, size_t *lengt
     }
 
     // use + instead of || to prevent from short circuit
-    auto result = NET_GetPacket(ipv4_sockets, sock, from, data, length) + NET_GetPacket(ipv6_sockets, sock, from, data, length);
+    if(NET_GetPacket(ipv6_sockets, sock, from, data, length))
+        return true;
 
-    if( !result )
-    {
-        return NET_LagPacket( false, sock, from, length, data );
-    }
-    return true;
+    if(NET_GetPacket(ipv4_sockets, sock, from, data, length))
+        return true;
+
+    return NET_LagPacket( false, sock, from, length, data );
 }
 
 /*

@@ -1804,7 +1804,7 @@ void Con_DrawSolidConsole( float frac, qboolean fill )
 		byte	*color = g_color_table[7];
 		int	stringLen, width = 0, charH;
 
-		Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 build %i %s-%s", Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
+		Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D %s build %i %s-%s", XASH_VERSION, Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
 #ifdef XASH_IMGUI
 		ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
 		start = scr_width->integer - stringLen;
@@ -1982,7 +1982,7 @@ void Con_DrawVersion( void )
 			host.force_draw_version = false;
 	}
 
-	Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 build %i %s-%s", Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
+	Q_snprintf( curbuild, MAX_STRING, "CSMoE 柑橘 Xash3D %s build %i %s-%s", XASH_VERSION, Q_buildnum( ), Q_buildos( ), Q_buildarch( ));
 #ifdef XASH_IMGUI
 	ImGui_Console_DrawStringLen(curbuild, &stringLen, &charH);
 	start = scr_width->integer - stringLen;
