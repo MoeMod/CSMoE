@@ -737,7 +737,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 
 	if (iCurrentCount > 7)
 	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[感染阶段]生化病毒正在寻找宿主， %s 秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[😷]生化病毒正在寻找宿主， %s 秒后选定感染目标", UTIL_dtos1(iCurrentCount - 7));
 
 		if (iCurrentCount - 7 <= 10)
 		{
@@ -749,7 +749,7 @@ void CZB3CountdownDelegate::OnCountdownChanged(int iCurrentCount)
 		if (iCurrentCount == 7)
 			m_pMod->PickZombieOrigin();
 
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[变异阶段]生化病毒已找到宿主，母体僵尸将在 %s 秒内出现", UTIL_dtos1(iCurrentCount));
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "[💉]生化病毒已找到宿主，母体僵尸将在 %s 秒内出现", UTIL_dtos1(iCurrentCount));
 	}
 }
 

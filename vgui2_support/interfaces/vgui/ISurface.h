@@ -225,6 +225,9 @@ namespace vgui2 {
 			FONTFLAG_OUTLINE = 0x200,
 			FONTFLAG_CUSTOM = 0x400,		// custom generated font - never fall back to asian compatibility mode
 			FONTFLAG_BITMAP = 0x800,		// compiled bitmap font - no fallbacks
+#ifndef DISABLE_MOE_VGUI2_EXT
+			FONTFLAG_EMOJI = 0x1000,		// compiled bitmap font - no fallbacks
+#endif
 		};
 
 		virtual bool AddGlyphSetToFont(HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int lowRange, int highRange) = 0;
@@ -366,6 +369,11 @@ namespace vgui2 {
 	//virtual void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) = 0;
 	
 		//GoldSource doesn't use these, but provide the functions anyway so code is still there. - Solokiller
+
+#ifndef DISABLE_MOE_VGUI2_EXT
+    virtual bool IsEmojiChar(wchar_t ch) = 0;
+#endif
+
 	public:
 	// deadsurface.cpp
 	void DrawSetAlphaMultiplier(float alpha);

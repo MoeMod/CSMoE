@@ -69,6 +69,8 @@ void VGui2_Startup()
 
 int VGui2_VidInit()
 {
+    extern void VGUI2_Draw_Init();
+    VGUI2_Draw_Init();
 	return 0;
 }
 

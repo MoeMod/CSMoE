@@ -187,6 +187,9 @@ public:
 	void InternalThinkTraverse(vgui2::VPANEL);
 	void InternalSchemeSettingsTraverse(vgui2::VPANEL, bool);
 	void DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter);
+#ifndef DISABLE_MOE_VGUI2_EXT
+    bool IsEmojiChar(wchar_t ch);
+#endif
 
 protected:
     bool DrawGetUnicodeCharRenderInfo(wchar_t ch, CharRenderInfo &info);

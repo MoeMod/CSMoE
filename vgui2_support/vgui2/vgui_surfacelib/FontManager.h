@@ -74,6 +74,9 @@ public:
 	// used as a hint that intensive TTF operations are finished
 	void ClearTemporaryFontCache();
 	void GetKernedCharWidth( vgui2::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC );
+#ifndef DISABLE_MOE_VGUI2_EXT
+    void AddEmojiFont(HFont font, int tall, int weight, int blur, int scanlines, int flags);
+#endif
 
 private:
 	bool IsFontForeignLanguageCapable(const char *windowsFontName);

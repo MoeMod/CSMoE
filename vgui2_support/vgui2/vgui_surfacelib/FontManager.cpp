@@ -110,6 +110,15 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 	return SetFontGlyphSet( font, windowsFontName, tall, weight, blur, scanlines, flags, 0, 0);
 }
 
+#ifndef DISABLE_MOE_VGUI2_EXT
+// MoeMod : create emoji
+void CFontManager::AddEmojiFont(HFont font, int tall, int weight, int blur, int scanlines, int flags)
+{
+    font_t *emojiFont = CreateOrFindWin32Font( "AppleColorEmoji", 20, weight, blur, scanlines, flags | vgui2::ISurface::FONTFLAG_EMOJI );
+    m_FontAmalgams[font].AddFont(emojiFont, 0x1F300, 0x1F6FF);
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Sets the valid glyph ranges for a font created by CreateFont()
 //-----------------------------------------------------------------------------
@@ -149,25 +158,17 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 	}
 	font_t *winFont = CreateOrFindWin32Font( windowsFontName, tall, weight, blur, scanlines, flags );
 
-	// MoeMod : support CSO Fontloading
-	if (!Q_stricmp(windowsFontName, "DFYuanW9-GB"))
-	{
-		if (winFont)
-			m_FontAmalgams[font].AddFont(winFont, 0x0, 0xFFFF);
-
-		return true;
-	}
-
 	// cycle until valid english/extended font support has been created
 	do
 	{
 		// add to the amalgam
-		if ( bForceSingleFontForXbox || IsFontForeignLanguageCapable( windowsFontName ) )
+		if ( bForceSingleFontForXbox || IsFontForeignLanguageCapable( windowsFontName ) || !Q_stricmp(windowsFontName, "DFYuanW9-GB") )
 		{
 			if ( winFont )
 			{
 				// font supports the full range of characters
 				m_FontAmalgams[font].AddFont( winFont, 0x0000, 0xFFFF );
+                AddEmojiFont(font, tall, weight, blur, scanlines, flags);
 				return true;
 			}
 		}
@@ -180,6 +181,7 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 			{
 				// it's the same font and can support the full range
 				m_FontAmalgams[font].AddFont( winFont, 0x0000, 0xFFFF );
+                AddEmojiFont(font, tall, weight, blur, scanlines, flags);
 				return true;
 			}
 
@@ -217,6 +219,7 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 					m_FontAmalgams[font].AddFont( pExtendedFont, nMax + 1, 0xFFFF );
 				}
 
+                AddEmojiFont(font, tall, weight, blur, scanlines, flags);
 				return true;
 			}
 			else if ( pExtendedFont )
@@ -224,6 +227,7 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 				// the normal font failed to create
 				// just use the extended font for the full range
 				m_FontAmalgams[font].AddFont( pExtendedFont, 0x0000, 0xFFFF );
+                AddEmojiFont(font, tall, weight, blur, scanlines, flags);
 				return true;
 			}
 		}

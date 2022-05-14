@@ -148,7 +148,7 @@ void CMod_ZombieMod2::MakeSupplyboxThink()
 		}
 	}
 
-	UTIL_ClientPrintAll(HUD_PRINTCENTER, "强化武器补给箱已到达！！"); // #CSO_SupportItemSpawned
+	UTIL_ClientPrintAll(HUD_PRINTCENTER, "[💰]强化武器补给箱已到达！！"); // #CSO_SupportItemSpawned
 
 	for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
 	{

@@ -43,6 +43,8 @@ image_ref FS_LoadImage( const char *filename, const byte *buffer, size_t size );
 
 void SPR_AdjustSize( float *x, float *y, float *w, float *h );
 void SPR_AdjustSizeReverse( float *x, float *y, float *w, float *h );
+void TextAdjustSize( int *x, int *y, int *w, int *h );
+void TextAdjustSizeReverse( int *x, int *y, int *w, int *h );
 
 bool BaseUISurface::m_bTranslateExtendedKeys;
 #if defined(LINUX) || defined(OSX)
@@ -58,6 +60,8 @@ static wrect_t g_ScissorRect;
 qboolean g_bScissor;
 
 }
+
+static int white_color[4] = { 255, 255, 255, 255 };
 
 #define VGUI_MAX_TEXTURES	2048	// a half of total textures count
 extern int	g_textures[VGUI_MAX_TEXTURES];
@@ -105,6 +109,9 @@ void BaseUISurface::Init(vgui2::VPANEL embeddedPanel, IHTMLChromeController *pCh
 	SetEmbeddedPanel(embeddedPanel);
 
     AddCustomFontFile( "resource/marlett.ttf" );
+#ifndef DISABLE_MOE_VGUI2_EXT
+    AddCustomFontFile( "resource/font/Apple Color Emoji.ttc" );
+#endif
 
     // Added : CSO font loading
     FileFindHandle_t findHandle = NULL;
@@ -187,6 +194,9 @@ void BaseUISurface::PushMakeCurrent(vgui2::VPANEL panel, bool useInsets) {
 	paintState.iScissorBottom = clipRect[3] - m_iSurfaceBounds[1];
 
 	SetupPaintState(paintState);
+#ifdef USE_IMGUI_SURFACE
+    ImGui_Surface_EnableFullScreenScissor();
+#endif
 }
 
 void BaseUISurface::PopMakeCurrent(vgui2::VPANEL panel) {
@@ -201,6 +211,9 @@ void BaseUISurface::PopMakeCurrent(vgui2::VPANEL panel) {
 	if (_paintStack.size()) {
 		SetupPaintState(_paintStack.back());
 	}
+#ifdef USE_IMGUI_SURFACE
+    ImGui_Surface_DisableScissor();
+#endif
 }
 
 void BaseUISurface::DrawSetColor(int r, int g, int b, int a) {
@@ -386,7 +399,34 @@ void BaseUISurface::DrawPrintText(const wchar_t *text, int textlen) {
             iWide += (abcA + abcC);
             x-= abcA;
         }
+#ifndef DISABLE_MOE_VGUI2_EXT
+        if(IsEmojiChar(ch))
+        {
+            int iTexId = 0;
+            float texCoords[4];
 
+            if (!m_FontTextureCache.GetTextureForChar(m_hCurrentFont, ch, &iTexId, texCoords))
+                continue;
+
+            DrawSetTexture(iTexId);
+
+            vpoint_t ul;
+            vpoint_t lr;
+
+            ul.point[0] = x + iTotalWidth;
+            ul.point[1] = y + iTall / 2 - iWide / 2;
+            lr.point[0] = ul.point[0] + iWide;
+            lr.point[1] = ul.point[1] + iWide;
+
+            ul.coord[0] = texCoords[0];
+            ul.coord[1] = texCoords[1];
+            lr.coord[0] = texCoords[2];
+            lr.coord[1] = texCoords[3];
+
+            DrawQuadBlend(ul, lr, white_color);
+        }
+        else
+#endif
         if (!iswspace(ch) || bUnderlined)
         {
             int iTexId = 0;
@@ -448,16 +488,6 @@ void BaseUISurface::DrawUnicodeChar(wchar_t ch) {
 
     if (DrawGetUnicodeCharRenderInfo(ch, info))
         DrawRenderCharFromInfo(info);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    int x = _drawTextPos[0] + _translateX, y = _drawTextPos[1] + _translateY;
-    ImGui_SetTextAdjustSize(true);
-	ImGui_Surface_DrawChar(x, y, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], 255);
-    ImGui_SetTextAdjustSize(false);
-#else
-	gEngfuncs.pfnVGUI2DrawCharacterAdditive(_drawTextPos[0] + _translateX, _drawTextPos[1] + _translateY, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], m_hCurrentFont);
-#endif
-     */
 }
 
 void BaseUISurface::DrawUnicodeCharAdd(wchar_t ch) {
@@ -466,16 +496,6 @@ void BaseUISurface::DrawUnicodeCharAdd(wchar_t ch) {
 
     if (DrawGetUnicodeCharRenderInfo(ch, info))
         DrawRenderCharFromInfo(info);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    int x = _drawTextPos[0] + _translateX, y = _drawTextPos[1] + _translateY;
-    ImGui_SetTextAdjustSize(true);
-    ImGui_Surface_DrawChar(x, y, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], _drawTextColor[3]);
-    ImGui_SetTextAdjustSize(false);
-#else
-    gEngfuncs.pfnVGUI2DrawCharacterAdditive(_drawTextPos[0] + _translateX, _drawTextPos[1] + _translateY, ch, _drawTextColor[0], _drawTextColor[1], _drawTextColor[2], m_hCurrentFont);
-#endif
-     */
 }
 
 class vgui2::IHTML *BaseUISurface::CreateHTMLWindow(class vgui2::IHTMLEvents *, vgui2::VPANEL) {
@@ -521,6 +541,9 @@ void BaseUISurface::DrawSetTexture(int id) {
     {
         m_iCurrentTexture = id;
         DrawFlushText();
+#ifdef USE_IMGUI_SURFACE
+        ImGui_Surface_Flush();
+#endif
     }
 #ifdef USE_IMGUI_SURFACE
     // nothing
@@ -743,61 +766,18 @@ bool BaseUISurface::AddCustomFontFile(const char *fontFileName) {
 
 int BaseUISurface::GetFontTall(vgui2::HFont font) {
     return FontManager().GetFontTall(font);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    ImGui_SetTextAdjustSize(true);
-    return ImGui_Surface_GetCharHeight();
-    ImGui_SetTextAdjustSize(false);
-#else
-	return _screeninfo.iCharHeight;
-#endif
-     */
 }
 
 void BaseUISurface::GetCharABCwide(vgui2::HFont font, int ch, int &a, int &b, int &c) {
     return FontManager().GetCharABCwide(font, ch, a, b, c);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    ImGui_SetTextAdjustSize(true);
-    a = ImGui_Surface_GetCharWidth(ch);
-    ImGui_SetTextAdjustSize(false);
-#else
-	a = _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(ch))];
-#endif
-	b = c = 0;
-     */
 }
 
 int BaseUISurface::GetCharacterWidth(vgui2::HFont font, int ch) {
     return FontManager().GetCharacterWidth(font, ch);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    ImGui_SetTextAdjustSize(true);
-    int w = ImGui_Surface_GetCharWidth(ch);
-    ImGui_SetTextAdjustSize(false);
-    return w;
-#else
-	return _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(ch))];
-#endif
-     */
 }
 
 void BaseUISurface::GetTextSize(vgui2::HFont font, const wchar_t *text, int &wide, int &tall) {
     return FontManager().GetTextSize(font, text, wide, tall);
-    /*
-#ifdef USE_IMGUI_SURFACE
-    ImGui_SetTextAdjustSize(true);
-    ImGui_Surface_DrawStringLenUnicode(text, &wide, &tall);
-    ImGui_SetTextAdjustSize(false);
-#else
-	wide = 0;
-	tall = _screeninfo.iCharHeight;
-
-	for (; *text != 0; ++text) {
-		wide += _screeninfo.charWidths[static_cast<char>(g_api->ProcessUtfChar(*text))];
-	}
-#endif
-     */
 }
 
 vgui2::VPANEL BaseUISurface::GetNotifyPanel() {
@@ -1221,9 +1201,18 @@ bool BaseUISurface::DrawGetUnicodeCharRenderInfo(wchar_t ch, CharRenderInfo &inf
     {
         DrawFlushText();
     }
-
-    InitVertex(info.verts[0], info.x, info.y, texCoords[0], texCoords[1]);
-    InitVertex(info.verts[1], info.x + fontWide, info.y + info.fontTall, texCoords[2], texCoords[3]);
+#ifndef DISABLE_MOE_VGUI2_EXT
+    if(IsEmojiChar(ch))
+    {
+        InitVertex(info.verts[0], info.x, info.y + info.fontTall / 2 - fontWide / 2, texCoords[0], texCoords[1]);
+        InitVertex(info.verts[1], info.x + fontWide, info.y + info.fontTall / 2 + fontWide / 2, texCoords[2], texCoords[3]);
+    }
+    else
+#endif
+    {
+        InitVertex(info.verts[0], info.x, info.y, texCoords[0], texCoords[1]);
+        InitVertex(info.verts[1], info.x + fontWide, info.y + info.fontTall, texCoords[2], texCoords[3]);
+    }
 
     info.shouldclip = true;
     return info.valid;
@@ -1249,8 +1238,19 @@ void BaseUISurface::DrawRenderCharInternal(const CharRenderInfo &info)
 
     if (m_BatchedCharInfos.size() > MAX_BATCHED_CHAR_VERTS)
         DrawFlushText();
-
+#ifndef DISABLE_MOE_VGUI2_EXT
+    if(IsEmojiChar(info.ch))
+    {
+        DrawSetTexture(info.textureId);
+        DrawQuadBlend(clippedRect[0], clippedRect[1], white_color);
+    }
+    else
+#endif
+#ifdef USE_IMGUI_SURFACE
+    if(true)
+#else
     if (info.additive)
+#endif
     {
         DrawSetTexture(info.textureId);
         DrawQuadBlend(clippedRect[0], clippedRect[1], _drawTextColor);
@@ -1378,7 +1378,12 @@ void BaseUISurface::DrawQuadArray(int quadCount, vpoint_t *pVerts, int *pColor)
     }
 #endif
 }
-
+#ifndef DISABLE_MOE_VGUI2_EXT
+bool BaseUISurface::IsEmojiChar(wchar_t ch)
+{
+    return ch >= 0x1F300 && ch <= 0x1F6FF;
+}
+#endif
 
 #if defined(LINUX) || defined(OSX)
 

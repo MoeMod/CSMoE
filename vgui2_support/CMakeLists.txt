@@ -133,6 +133,7 @@ add_library(vgui2_support STATIC
     udll_int.cpp
     interface_static.cpp
     filesystem_xash.cpp
+    vgui2_surface.cpp
 )
 
 target_link_libraries(vgui2_support PUBLIC vgui2_interfaces)

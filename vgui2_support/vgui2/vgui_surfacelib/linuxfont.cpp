@@ -335,11 +335,11 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 			// check for the tallest character we know about (O') and bump up the ascender
 			// value if it is greater than what we've currently got.
 			wchar_t ch = 0xd3;
-			error = FT_Load_Char( m_face, ch, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL); 
+			error = FT_Load_Char( m_face, ch, FT_LOAD_RENDER | FT_LOAD_COLOR | FT_LOAD_TARGET_NORMAL);
 			if ( !error )
 			{
 				int glyph_index = FT_Get_Char_Index( m_face, ch );
-				error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER );
+				error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER | FT_LOAD_COLOR );
 				if ( !error )
 				{
 					FT_GlyphSlot slot = m_face->glyph;
@@ -364,6 +364,17 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 
 		const int fxpHeight = ascender + -descender + INT_2FIXED6( m_iDropShadowOffset + 2 * m_iOutlineSize );
 		m_iHeight = FIXED6_2INT( fxpHeight );
+#ifndef DISABLE_MOE_VGUI2_EXT
+        if(m_iFlags & vgui2::ISurface::FONTFLAG_EMOJI)
+        {
+            int glyph_index = FT_Get_Char_Index( m_face, L'😅' );
+            error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER | FT_LOAD_COLOR );
+            if ( !error )
+            {
+                m_iHeight = m_face->glyph->bitmap.rows;
+            }
+        }
+#endif
 
 		// If we're exact or we got too small, bail.
 		if ( SetPixelSizesFailed || ( m_iHeight == m_iTall ) || ( m_iHeight < 7 ) || ( m_iHeightRequested <= 1 ) )
@@ -539,16 +550,9 @@ void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned c
 	{
 		bShouldAntialias = false;
 	}
-	
-	FT_Error error = FT_Load_Char( m_face, ch, FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL ); 
-	if ( error )
-	{
-		Msg( "Error in FT_Load_Char: ch:%x error:%x\n", (int)ch, error );
-		return;
-	}
 
 	int glyph_index = FT_Get_Char_Index( m_face, ch );
-	error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER | FT_LOAD_FLAGS );
+    FT_Error error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER | FT_LOAD_COLOR | FT_LOAD_FLAGS );
 	if ( error )
 	{
 		Msg( "Error in FL_Load_Glyph: glyph_index:%d error:%x\n", glyph_index, error );
@@ -557,7 +561,7 @@ void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned c
 
 	int yBitmapStart = 0;
 	FT_GlyphSlot slot = m_face->glyph;
-	int nSkipRows = ( m_iAscent - slot->bitmap_top );
+	int nSkipRows = m_iAscent > 0 ? ( m_iAscent - slot->bitmap_top ) : 0;
 
 	if( nSkipRows < 0 )
 	{
@@ -575,7 +579,35 @@ void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned c
 		Msg( "m_face->glyph->bitmap.width is 0 for ch:%d %s\n", (int)ch, m_face->family_name ? m_face->family_name : "??" );
 		return;
 	}
-
+#ifndef DISABLE_MOE_VGUI2_EXT
+	if(m_iFlags & vgui2::ISurface::FONTFLAG_EMOJI)
+	{
+		int pixel_mode = m_face->glyph->bitmap.pixel_mode;
+		assert(pixel_mode == FT_PIXEL_MODE_BGRA);
+		auto src = m_face->glyph->bitmap.buffer;
+		unsigned char *rgba = prgba + ( nSkipRows * rgbaWide * 4 );
+		for (uint32_t y = 0; y < m_face->glyph->bitmap.rows; ++y)
+		{
+			for (uint32_t x = 0; x < m_face->glyph->bitmap.width; ++x)
+			{
+				int rgbaOffset = 4 * ( x + m_iBlur ); // +(rgbaTall-y-1)*rgbaWide*4
+				uint8_t b = *src++, g = *src++, r = *src++, a = *src++;
+				rgba[ rgbaOffset + 0 ] =  r;
+				rgba[ rgbaOffset + 1 ] =  g;
+				rgba[ rgbaOffset + 2 ] =  b;
+				rgba[ rgbaOffset + 3 ] =  a;
+			}
+			rgba += ( rgbaWide * 4 );
+		}
+		// apply requested effects in specified order
+		//ApplyDropShadowToTexture( rgbaWide, rgbaTall, prgba, m_iDropShadowOffset );
+		//ApplyOutlineToTexture( rgbaWide, rgbaTall, prgba, m_iOutlineSize );
+		ApplyGaussianBlurToTexture( rgbaWide, rgbaTall, prgba, m_iBlur );
+		ApplyScanlineEffectToTexture( rgbaWide, rgbaTall, prgba, m_iScanLines );
+		ApplyRotaryEffectToTexture( rgbaWide, rgbaTall, prgba, m_bRotary );
+		return;
+	}
+#endif
 	FT_Bitmap bitmap;
 	FT_Library ftLibrary = FontManager().GetFontLibraryHandle();
 
@@ -598,6 +630,9 @@ void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned c
 			break;
 		case FT_PIXEL_MODE_GRAY4: // 4-bit per pixel bitmap
 			alpha_scale *= 16;
+			break;
+		case FT_PIXEL_MODE_BGRA: // 32-bit per pixel bitmap
+			alpha_scale *= 1;
 			break;
 		}
 
@@ -697,6 +732,14 @@ void CLinuxFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAft
 void CLinuxFont::GetCharABCWidths(int ch, int &a, int &b, int &c)
 {
 	Assert(IsValid());
+
+    if(m_iFlags & vgui2::ISurface::FONTFLAG_EMOJI)
+    {
+        a = 0;
+        b = m_face->glyph->bitmap.width + ( ( m_iBlur + m_iOutlineSize ) * 2 ) + m_iDropShadowOffset;
+        c = 0;
+        return;
+    }
 
 	auto i = m_ExtendedABCWidthsCache.find(ch);
 	if (i != m_ExtendedABCWidthsCache.end())
