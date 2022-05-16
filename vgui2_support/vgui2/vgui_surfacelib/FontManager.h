@@ -16,7 +16,10 @@
 #include "filesystem.h"
 #include "vguifont.h"
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(WIN32)
+#ifdef _WIN32
+#undef DLL_IMPORT
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 typedef void *(*FontDataHelper)( const char *pchFontName, int &size, const char *fontFileName );
@@ -60,7 +63,7 @@ public:
 	bool IsFontAdditive(HFont font);
 	bool IsBitmapFont(HFont font );
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 	FT_Library GetFontLibraryHandle() { return library; }
 	void SetFontDataHelper( FontDataHelper helper ) { m_pFontDataHelper = helper; }
 #endif
@@ -87,7 +90,7 @@ private:
 	CUtlVector<CFontAmalgam> m_FontAmalgams;
 	CUtlVector<font_t *> m_Win32Fonts;
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 	FT_Library library; 
 	FontDataHelper m_pFontDataHelper;
 #endif

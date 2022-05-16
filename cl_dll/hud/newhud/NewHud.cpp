@@ -152,6 +152,12 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 	return 1;
 }
 
+void CHudNewHud::DrawPortrait()
+{
+
+	
+}
+
 int CHudNewHud::MsgFunc_NewHudMsg(const char* pszName, int iSize, void* pbuf)
 {
 	BufferReader reader(pszName, pbuf, iSize);

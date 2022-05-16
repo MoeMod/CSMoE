@@ -137,6 +137,7 @@ private:
 
 private:
 	int m_iChangeClassTime[3];
+	time_point_t m_tNextChangeClass;
 	bool m_bLadderDisabled;
 	std::array<time_point_t, MAX_CLIENTS + 1> m_vecFireList;
 	time_point_t m_flFireDmg;

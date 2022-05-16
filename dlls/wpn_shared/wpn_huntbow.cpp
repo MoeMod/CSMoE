@@ -275,7 +275,6 @@ namespace sv {
 		void Precache() override
 		{
 			m_iBeamModelIndex = PRECACHE_MODEL("sprites/ef_huntbow_trail.spr");
-			PRECACHE_MODEL("models/huntbow_arrow.mdl");
 		}
 
 		void OnThink()
@@ -470,7 +469,7 @@ void CHuntbow::Precache(void)
 	//PRECACHE_MODEL("sprites/dmgreiteration05.spr");
 	PRECACHE_MODEL("sprites/ef_huntbow_explo.spr");
 	PRECACHE_MODEL("sprites/ef_huntbow_trail.spr");
-
+	PRECACHE_MODEL("models/huntbow_arrow.mdl");
 	PRECACHE_SOUND("weapons/xhuntbow_hit1.wav");
 	PRECACHE_SOUND("weapons/xhuntbow_hitbod1.wav");
 	PRECACHE_SOUND("weapons/failnaught_charge_loop_fx.wav");
@@ -487,7 +486,7 @@ void CHuntbow::Precache(void)
 	PRECACHE_SOUND("weapons/failnaught-1.wav");
 	PRECACHE_SOUND("weapons/failnaught-2.wav");
 	PRECACHE_SOUND("weapons/failnaught-2_exp.wav");
-
+				PRECACHE_MODEL("models/huntbow_arrow.mdl");
 	m_usFireHuntbow = PRECACHE_EVENT(1, "events/huntbow.sc");
 }
 

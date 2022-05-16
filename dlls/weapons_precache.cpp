@@ -315,6 +315,19 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sgmissile");
 	UTIL_PrecacheOther("ammo_sgmissilebcs");
 	UTIL_PrecacheOther("ammo_revive");
+	UTIL_PrecacheOtherWeapon("weapon_sgmissilem");
+	UTIL_PrecacheOtherWeapon("weapon_sgmissileex");
+	UTIL_PrecacheOtherWeapon("weapon_cheytaclrrs");
+	UTIL_PrecacheOtherWeapon("weapon_m400");
+	UTIL_PrecacheOtherWeapon("weapon_m82");
+	UTIL_PrecacheOtherWeapon("weapon_m24");
+	UTIL_PrecacheOtherWeapon("weapon_trg42");
+	UTIL_PrecacheOtherWeapon("weapon_trg42g");
+	UTIL_PrecacheOtherWeapon("weapon_aw50");
+	UTIL_PrecacheOtherWeapon("weapon_sl8");
+	UTIL_PrecacheOtherWeapon("weapon_sl8g");
+	UTIL_PrecacheOtherWeapon("weapon_sl8ex");
+	UTIL_PrecacheOtherWeapon("weapon_sprifle");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

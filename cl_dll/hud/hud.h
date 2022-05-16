@@ -124,6 +124,8 @@ struct HUDLIST {
 #include "hud_mvp.h"
 #include "newhud/NewHud.h"
 #include "hud_centertips.h"
+#include "weapons_const.h"
+#include "weapons_moe_buy.h"
 
 namespace cl {
 //
@@ -813,6 +815,7 @@ private:
 	UniqueTexture m_iScopeArc[4];
 	UniqueTexture m_iM95TigerScope[2];
 	UniqueTexture m_iM95TigerScopeCorner;
+	UniqueTexture m_iCheytaclrrsScope;
 };
 
 //
@@ -1199,6 +1202,8 @@ public:
 	char m_szServerName[64];
 
 	GameMode_e m_iModRunning;
+
+	std::vector<MoEWeaponBuyInfo_s> m_WeaponBuyInfo;
 
 private:
 	HUDLIST	*m_pHudList;

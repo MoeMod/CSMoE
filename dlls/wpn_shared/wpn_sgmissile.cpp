@@ -50,7 +50,7 @@ void CSGMissile::Precache(void)
 {
 	PRECACHE_MODEL("models/p_sgmissile_a.mdl");
 	PRECACHE_MODEL("models/p_sgmissile_b.mdl");
-
+	PRECACHE_MODEL("sprites/ef_sgmissile_line.spr");
 	m_iModelIndex = PRECACHE_MODEL("models/v_sgmissile.mdl");
 	PRECACHE_MODEL("models/w_sgmissile.mdl");
 	PRECACHE_MODEL("sprites/muzzleflash60.spr");
@@ -215,8 +215,8 @@ void CSGMissile::ItemPreFrame(void)
 		m_flTimeNextCharge = gpGlobals->time + 2.0s;
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
-		WRITE_SHORT(CBasePlayer::GetAmmoIndex("sgmissilebcs"));
-		WRITE_SHORT(1);
+		WRITE_BYTE(CBasePlayer::GetAmmoIndex("sgmissilebcs"));
+		WRITE_BYTE(1);
 		MESSAGE_END();
 
 		if (m_iWeaponState == 10)
@@ -286,7 +286,7 @@ void CSGMissile::PrimaryAttack(void)
 	flags = 0;
 #endif
 
-	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSGMissile, 0, g_vecZero, g_vecZero, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType], 0.04, 7, m_vVecAiming.x * 100, FALSE, 8);
+	PLAYBACK_EVENT_FULL(flags, ENT(m_pPlayer->pev), m_usFireSGMissile, 0, g_vecZero, g_vecZero, m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType], 0.04, 8, m_vVecAiming.x * 100, FALSE, 8);
 
 	if (m_iWeaponState > 0)
 		SendWeaponAnim(SGMISSILE_SHOOT_B + RANDOM_LONG(0, 1), UseDecrement() != FALSE);
@@ -454,7 +454,7 @@ void CSGMissile::SGMissileBcsFire(float fYaw, CUtlVector<CBaseEntity*>* pList, C
 	CSGMissileCannon* pEnt = static_cast<CSGMissileCannon*>(CSGMissileCannon::Create("sgmissile_cannon", vecSrc, vecAngle, ENT(m_pPlayer->pev)));
 	if (pEnt)
 	{
-		pEnt->Init(vecDir, 1000, 0.75s, GetDamageBcs(), pList, pGroupList, GetExplodeDamage(), GetExplodeRadius(), GetDirectDamageForce());
+		pEnt->Init(vecDir, 1000, 0.75s, GetDamageBcs(), pList, pGroupList, GetExplodeDamage(), GetExplodeRadius(), GetDirectDamageForce(), 2);
 	}
 }
 #endif

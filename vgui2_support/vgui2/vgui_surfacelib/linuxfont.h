@@ -15,6 +15,9 @@
 #include "tier1/strtools.h"
 #include "tier1/utlstring.h"
 
+#ifdef _WIN32
+#undef DLL_IMPORT
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
 

@@ -93,6 +93,7 @@ void EXPORT CZombiDogEgg::OnTouch(CBaseEntity* pOther)
 	vecOrigin.z += 36;
 	monster->pev->origin = vecOrigin;
 	monster->pev->angles = pev->angles;
+	monster->m_iClass = MONSTER_CLASS_ZOMBIEDOG;
 
 	DispatchSpawn(pent);
 
@@ -101,8 +102,6 @@ void EXPORT CZombiDogEgg::OnTouch(CBaseEntity* pOther)
 	monster->pev->maxspeed = 160.0f;
 	monster->m_flAttackDamage = 100.0f;
 
-	SET_MODEL(monster->edict(), "models/monster/zombiedog.mdl");
-	UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
 }
 
 }

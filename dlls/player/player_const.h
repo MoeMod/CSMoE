@@ -132,4 +132,10 @@ typedef enum
 
 } MusicState;
 
+
+enum PlayerClass
+{
+	
+};
+
 #endif

@@ -95,6 +95,13 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "sfsniper",	WEAPON_SFSNIPER },
 	{ "plasmagun",	WEAPON_PLASMAGUN },
 	{ "chainsaw",	WEAPON_CHAINSAW },
+	{ "cheytaclrrs",	WEAPON_CHEYTACLRRS },
+	{ "m400",	WEAPON_M400 },
+	{ "m82",	WEAPON_M82 },
+	{ "m24",	WEAPON_M24 },
+	{ "trg42",	WEAPON_TRG42 },
+	{ "aw50",	WEAPON_AW50 },
+	{ "trg42g",	WEAPON_TRG42G },
 	{ NULL,		WEAPON_NONE }
 };
 
@@ -327,6 +334,15 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_ZOMBIELAW:
 	case WEAPON_M95TIGER:
 	case WEAPON_CHAINSAW:
+	case WEAPON_CHEYTACLRRS:
+	case WEAPON_M400:
+	case WEAPON_M82:
+	case WEAPON_M24:
+	case WEAPON_TRG42:
+	case WEAPON_TRG42G:
+	case WEAPON_AW50:
+	//case WEAPON_SL8:
+	//case WEAPON_SL8EX:
 		return true;
 	default:
 		break;

@@ -165,7 +165,6 @@ namespace sv {
 		void Precache() override
 		{
 			m_iModelLight1 = PRECACHE_MODEL("sprites/smoke.spr");
-			PRECACHE_MODEL("models/arrow.mdl");
 		}
 
 		void OnThink()
@@ -244,7 +243,7 @@ void CBow::Precache(void)
 	PRECACHE_SOUND("weapons/bow_charge_start2.wav");
 	PRECACHE_SOUND("weapons/bow_draw.wav");
 	PRECACHE_SOUND("weapons/bow-shoot1.wav");
-
+	PRECACHE_MODEL("models/arrow.mdl");
 	m_usFireBow = PRECACHE_EVENT(1, "events/bow.sc");
 }
 

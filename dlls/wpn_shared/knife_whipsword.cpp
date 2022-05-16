@@ -125,6 +125,7 @@ public:
 		//PRECACHE_SOUND("weapons/whipsword_stab_loop3.wav");
 		PRECACHE_SOUND("weapons/whipsword_stab_skill_flying.wav");
 		PRECACHE_SOUND("weapons/whipsword_stab_skill_start.wav");
+		PRECACHE_SOUND("weapons/whipsword_stab_skill_end.wav");
 		PRECACHE_SOUND("weapons/whipsword_stab1.wav");
 		PRECACHE_SOUND("weapons/whipsword_stab2.wav");
 		PRECACHE_SOUND("weapons/whipsword_stab3.wav");
@@ -160,7 +161,6 @@ public:
 		WRITE_BYTE(3);
 		WRITE_BYTE(m_CrossHairState);
 		MESSAGE_END();
-		m_pPlayer->UpdateShieldCrosshair(false);
 #endif
 
 		return DefaultDeploy(V_Model, P_Model, ANIM_DRAW, AnimExtension, UseDecrement() != FALSE, 0.53s, 1.0s);
@@ -374,6 +374,7 @@ void CKnifeWhipSword::ItemPostFrame()
 #ifndef CLIENT_DLL
 		SendWeaponAnim(ANIM_STAB_SKILL_END, UseDecrement() != FALSE);
 #endif
+		EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, "weapons/whipsword_stab_skill_end.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		m_iThinkType = 6;
 		m_tNextThink = gpGlobals->time + 0.7s;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.7s;
@@ -671,7 +672,6 @@ void CKnifeWhipSword::SecondaryAttack(void)
 				ClearMultiDamage();
 				pEntity->TraceAttack(m_pPlayer->pev, GetSlashComboAttackDamage(), gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
 				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			}
 			//WALL
 		}
@@ -725,11 +725,6 @@ void CKnifeWhipSword::SecondaryAttack(void)
 							strategy->SetStunGravityTime(1.3s);
 						}
 					}
-
-					if (pEntity->Classify() == CLASS_PLAYER)
-						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_slash_hit1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-					else
-						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dgaxe_wall_stone1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 				}
 			}
 		}

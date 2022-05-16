@@ -79,8 +79,11 @@ add_library(vgui_surfacelib STATIC
 		)
 if(WIN32)
 	target_sources(vgui_surfacelib PRIVATE
-			vgui2/vgui_surfacelib/Win32Font.cpp
+			# MoeMod : use freetype to support emoji...
+			#vgui2/vgui_surfacelib/Win32Font.cpp
+			vgui2/vgui_surfacelib/linuxfont.cpp
 			)
+	target_link_libraries(vgui_surfacelib PUBLIC freetype)
 endif()
 if(OSX)
 	target_sources(vgui_surfacelib PRIVATE

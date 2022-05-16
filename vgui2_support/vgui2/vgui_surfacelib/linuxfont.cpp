@@ -17,6 +17,14 @@
 #else
 #include <malloc.h>
 #endif
+#if !defined( _X360 )
+#define WIN32_LEAN_AND_MEAN
+#define OEMRESOURCE
+#include <windows.h>
+#endif
+#ifdef GetCharABCWidths
+#undef GetCharABCWidths
+#endif
 #include <tier0/dbg.h>
 #include <vgui/ISurface.h>
 #include <utlbuffer.h>
@@ -87,7 +95,7 @@ void CLinuxFont::CreateFontList()
 	if ( m_FriendlyNameCache.size() > 0 )
 		return;
 
-#if !defined(ANDROID) && !defined(OSX)
+#if !defined(ANDROID) && !defined(OSX) && !defined(WIN32)
 	if(!FcInit())
 		return;
     FcConfig *config;
@@ -160,7 +168,7 @@ void CLinuxFont::CreateFontList()
 #endif
 }
 
-#if !defined(ANDROID) && !defined(OSX)
+#if !defined(ANDROID) && !defined(OSX) && !defined(WIN32)
 static FcPattern* FontMatch(const char* type, ...)
 {
     FcValue fcvalue;
@@ -453,6 +461,17 @@ char *FindFontAndroid(bool bBold, int italic)
 }
 #endif
 
+#ifdef WIN32
+const char *FindFontWin32(bool bBold, int italic)
+{
+	static char buffer[MAX_PATH];
+	GetSystemDirectoryA(buffer, sizeof(buffer));
+	strcat(buffer, "\\..\\Fonts\\simhei.ttf");
+
+	return buffer;
+}
+#endif
+
 #ifdef OSX
 const char *FindFontApple(bool bBold, int italic)
 {
@@ -504,6 +523,11 @@ char *CLinuxFont::GetFontFileName( const char *windowsFontName, int flags )
     Msg("Apple font: %s\n", filename);
     if( !filename ) return NULL;
     return strdup( filename );
+#elif defined(WIN32)
+	const char* filename = FindFontWin32(bBold, flags & vgui2::ISurface::FONTFLAG_ITALIC);
+	Msg("Apple font: %s\n", filename);
+	if (!filename) return NULL;
+	return strdup(filename);
 #else
     const int italic = ( flags & vgui2::ISurface::FONTFLAG_ITALIC ) ? FC_SLANT_ITALIC : FC_SLANT_ROMAN;
 	const int nFcWeight = bBold ? FC_WEIGHT_BOLD : FC_WEIGHT_NORMAL;

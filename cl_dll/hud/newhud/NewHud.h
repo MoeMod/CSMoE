@@ -28,6 +28,7 @@ public:
 
 	void BuildNumberRC(wrect_t(&rgrc)[10], int w, int h);
 	void InitHUDData(void);
+	void DrawPortrait(void);
 	CHudMsgFunc(NewHudMsg);
 
 private:

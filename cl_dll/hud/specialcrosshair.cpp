@@ -243,8 +243,8 @@ int CHudSpecialCrossHair::Draw(float flTime)
 		case WHIPSWORD_AIM_OFF:
 		case WHIPSWORD_AIM_ON:
 		{
-			wide = 110;
-			height = 110;
+			wide = 220;
+			height = 220;
 			break;
 		}
 		case AIM_NO:return 1;

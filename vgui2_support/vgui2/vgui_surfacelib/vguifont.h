@@ -20,12 +20,12 @@ struct newChar_t
 	int     offset;		// Offset into the buffer given to GetCharsRGBA
 };
 
-#ifdef WIN32
-#include "Win32Font.h"
-typedef CWin32Font font_t;
-#elif defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 #include "linuxfont.h"
 typedef CLinuxFont font_t;
+#elif defined(WIN32)
+#include "Win32Font.h"
+typedef CWin32Font font_t;
 #else
 #error
 #endif

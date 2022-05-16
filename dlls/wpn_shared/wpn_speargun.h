@@ -60,6 +60,7 @@ public:
 	static constexpr float ArmorRatioModifier = 1.5f;
 
 public:
+	int GetItemInfo(ItemInfo* p) override;
 	void Spawn() override;
 	void Precache() override;
 	void PrimaryAttack() override;
@@ -73,10 +74,6 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_spear" , 180 }; }
 #endif
-
-public:
-
-	float GetDamage();
 
 private:
 	float GetSpread(void);

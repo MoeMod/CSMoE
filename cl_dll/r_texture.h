@@ -17,7 +17,7 @@
 extern float g_ImGUI_DPI;
 extern void ImGui_Surface_SetRenderMode( int mode );
 #else
-extern cvar_t *hud_scale;
+// extern cvar_t *hud_scale;
 #endif
 
 namespace cl {
@@ -50,7 +50,8 @@ public:
 #if defined(XASH_IMGUI) && !defined(XASH_VGUI2)
 		Draw2DQuad(x1 * g_ImGUI_DPI, y1 * g_ImGUI_DPI, x2 * g_ImGUI_DPI, y2 * g_ImGUI_DPI, s1, t1, s2, t2, r, g, b, a);
 #else
-        Draw2DQuad(x1 * hud_scale->value, y1 * hud_scale->value, x2 * hud_scale->value, y2 * hud_scale->value, s1, t1, s2, t2, r, g, b, a);
+		float flScale = gEngfuncs.pfnGetCvarFloat("hud_scale");
+        Draw2DQuad(x1 * flScale, y1 * flScale, x2 * flScale, y2 * flScale, s1, t1, s2, t2, r, g, b, a);
 #endif
 	}
 

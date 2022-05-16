@@ -122,6 +122,10 @@ float GetArmorRatioModifier(WeaponIdType iGunType)
 			flRatio *= 1.4;
 			break;
 		case WEAPON_AWP:
+		case WEAPON_M400:
+		case WEAPON_TRG42:
+		case WEAPON_TRG42G:
+		case WEAPON_CHEYTACLRRS:
 			flRatio *= 1.95;
 			break;
 		case WEAPON_G3SG1:
@@ -164,6 +168,19 @@ float GetArmorRatioModifier(WeaponIdType iGunType)
 		case WEAPON_AK47:
 			flRatio *= 1.55;
 			break;
+		case WEAPON_M82:
+			flRatio *= 1.92;
+			break;
+		case WEAPON_AW50:
+			flRatio *= 1.94;
+			break;
+		case WEAPON_M24:
+			flRatio *= 1.94;
+			break;
+		case WEAPON_SFSNIPER:
+		case WEAPON_M95TIGER:
+			flRatio *= 1.99;
+			break;
 		default:
 			break;
 	}
@@ -177,12 +194,17 @@ WeaponBuyAmmoConfig GetBuyAmmoConfig(WeaponIdType id)
 
 	switch (id) {
 		case WEAPON_AWP:
+		case WEAPON_M400:
+		case WEAPON_TRG42:
+		case WEAPON_TRG42G:
 			cost = AMMO_338MAG_PRICE;
 			classname = "ammo_338magnum";
 			break;
 		case WEAPON_SCOUT:
 		case WEAPON_G3SG1:
 		case WEAPON_AK47:
+		case WEAPON_M82:
+		case WEAPON_M24:
 			cost = AMMO_762MM_PRICE;
 			classname = "ammo_762nato";
 			break;

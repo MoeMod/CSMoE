@@ -672,8 +672,8 @@ void CReviveGun::ItemPostFrame()
 			m_flTimeNextCharge = gpGlobals->time + 3.5s;
 #ifndef CLIENT_DLL
 			MESSAGE_BEGIN(MSG_ONE, gmsgAmmoPickup, NULL, m_pPlayer->pev);
-			WRITE_SHORT(CBasePlayer::GetAmmoIndex("ReviveAmmo"));
-			WRITE_SHORT(1);
+			WRITE_BYTE(CBasePlayer::GetAmmoIndex("ReviveAmmo"));
+			WRITE_BYTE(1);
 			MESSAGE_END();
 #endif
 		}

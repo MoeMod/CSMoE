@@ -76,7 +76,9 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iM95TigerScope[0], "sprites/m95tiger_scope_red.tga");
 	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
 	R_InitTexture(m_iM95TigerScopeCorner, "sprites/m95tiger_scope_corner.tga");
-
+	R_InitTexture(m_iCheytaclrrsScope, "sprites/scope_m200.tga");
+	//R_InitTexture(m_iSprifleScope, "sprites/scope_circle.tga");
+	
 	left = (TrueWidth - TrueHeight)/2;
 	right = left + TrueHeight;
 	centerx = TrueWidth/2;
@@ -176,7 +178,7 @@ int CHudSniperScope::Draw(float flTime)
 		{
 			return 1;
 		}
-		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER)
+		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -235,6 +237,46 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 
 		FuncDrawCorner(*m_iM95TigerScopeCorner, TYPE_CORNER_SW, Width, Height / 2);
 	}
+	if (iId == WEAPON_CHEYTACLRRS)
+	{
+		float x, y, w, h;
+
+		float scale = ScreenHeight / 0.85 / m_iCheytaclrrsScope->h();
+
+		w = m_iCheytaclrrsScope->w() * scale;
+		h = m_iCheytaclrrsScope->h() * scale;
+
+		x = ScreenWidth / 2 - w / 2;
+		y = ScreenHeight / 2 - h / 2;
+
+		m_iCheytaclrrsScope->Draw2DQuadScaled(x, y, x + w,  y + h, 0, 0, 1, 1, 255, 255, 255, 255);
+
+		int LENGTH_SCOPE = w / 2;
+
+		FillRGBABlend(0, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 0, 0, 0, 255);
+		FillRGBABlend(ScreenWidth / 2 + LENGTH_SCOPE, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 0, 0, 0, 255);
+
+		FillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 0, 0, 0, 255);
+		FillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 0, 0, 0, 255);
+	}
+	if (iId == WEAPON_M400)
+	{
+		m_iScopeArc[0]->Draw2DQuad(left, 0, centerx, centery, 0, 0, 1, 1, 0, 0, 0, 255);
+
+		m_iScopeArc[1]->Draw2DQuad(centerx, 0, right, centery, 0, 0, 1, 1, 0, 0, 0, 255);
+
+		m_iScopeArc[2]->Draw2DQuad(centerx, centery, right, TrueHeight, 0, 0, 1, 1, 0, 0, 0, 255);
+
+		m_iScopeArc[3]->Draw2DQuad(left, centery, centerx, TrueHeight, 0, 0, 1, 1, 0, 0, 0, 255);
+
+		FillRGBABlend(0, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255);
+		FillRGBABlend((ScreenWidth - ScreenHeight) / 2 - 2 + ScreenHeight, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255);
+	}
+	if (iId == WEAPON_SPRIFILE)
+	{
+
+	}
+
 }
 
 void CHudSniperScope::Shutdown()

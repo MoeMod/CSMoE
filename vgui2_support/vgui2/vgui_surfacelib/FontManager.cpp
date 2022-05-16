@@ -41,7 +41,7 @@ CFontManager::CFontManager()
 	m_FontAmalgams.AddToTail();
 	m_Win32Fonts.EnsureCapacity( MAX_INITIAL_FONTS );
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 	FT_Error error = FT_Init_FreeType( &library ); 
 	if ( error )
 		Error( "Unable to initalize freetype library, is it installed?" );
@@ -70,7 +70,7 @@ CFontManager::~CFontManager()
 {
 	ClearAllFonts();
 	m_FontAmalgams.RemoveAll();
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 	FT_Done_FreeType( library );
 #endif
 }
@@ -115,7 +115,8 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 void CFontManager::AddEmojiFont(HFont font, int tall, int weight, int blur, int scanlines, int flags)
 {
     font_t *emojiFont = CreateOrFindWin32Font( "AppleColorEmoji", 20, weight, blur, scanlines, flags | vgui2::ISurface::FONTFLAG_EMOJI );
-    m_FontAmalgams[font].AddFont(emojiFont, 0x1F300, 0x1F6FF);
+	if(emojiFont)
+		m_FontAmalgams[font].AddFont(emojiFont, 0x1F300, 0x1F6FF);
 }
 #endif
 
@@ -264,7 +265,7 @@ font_t *CFontManager::CreateOrFindWin32Font(const char *windowsFontName, int tal
 		i = m_Win32Fonts.AddToTail();
 		m_Win32Fonts[i] = NULL;
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 		int memSize = 0;
 		void *pchFontData = m_pFontDataHelper( windowsFontName, memSize, NULL );
 
@@ -673,7 +674,7 @@ void CFontManager::GetKernedCharWidth( vgui2::HFont font, wchar_t ch, wchar_t ch
 	if ( m_FontAmalgams[font].GetFontForChar( chAfter ) != pFont )
 		chAfter = 0;
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 	pFont->GetKernedCharWidth( ch, chBefore, chAfter, wide, flabcA, flabcC );
 #else
 	pFont->GetKernedCharWidth( ch, chBefore, chAfter, wide, flabcA );

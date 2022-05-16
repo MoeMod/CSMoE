@@ -51,10 +51,6 @@ void WeaponImagePanel::SetWeapon(const char *name)
     {
         name = "xm8";
     }
-    if(!stricmp(name, "mg3"))
-    {
-        name = "mg3_xmas";
-    }
 
     char path[MAX_PATH];
     sprintf(path, "gfx/vgui/basket/%s", name);

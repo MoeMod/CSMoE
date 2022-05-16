@@ -13,6 +13,12 @@
 
 namespace sv {
 
+enum MonsterClass
+{
+	MONSTER_CLASS_ZOMBIE,
+	MONSTER_CLASS_ZOMBIEDOG,
+};
+
 enum MonsterAnim
 {
 	MONSTERANIM_IDLE,
@@ -117,6 +123,7 @@ public:
 	float m_flAttackDamage;
 	int m_iKillBonusMoney;
 	int m_iKillBonusFrags;
+	int m_iClass;
 	EngineClock::time_point m_flTimeLastActive;
 	EngineClock::time_point m_flTargetChange;
 

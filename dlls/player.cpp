@@ -2188,10 +2188,10 @@ void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim)
 
 	if (!pev->modelindex)
 		return;
-
+	
 	if (m_bIsZombie)
 		speedLimit = 160.0;
-
+	
 	if (pev->health > 0)
 	{
 		if (m_flCustomSequenceUntilTime > gpGlobals->time && playerAnim != PLAYER_DIE)
@@ -5729,6 +5729,20 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/v_m95tiger.mdl");
 		case WEAPON_SFSNIPER:
 			pev->viewmodel = MAKE_STRING("models/v_sfsniper.mdl");
+		case WEAPON_CHEYTACLRRS:
+			pev->viewmodel = MAKE_STRING("models/v_cheytaclrrs.mdl");
+		case WEAPON_M400:
+			pev->viewmodel = MAKE_STRING("models/v_m400.mdl");
+		case WEAPON_M82:
+			pev->viewmodel = MAKE_STRING("models/v_m82.mdl");
+		case WEAPON_M24:
+			pev->viewmodel = MAKE_STRING("models/v_m24.mdl");
+		case WEAPON_TRG42:
+			pev->viewmodel = MAKE_STRING("models/v_trg42.mdl");
+		case WEAPON_TRG42G:
+			pev->viewmodel = MAKE_STRING("models/v_trg42g.mdl");
+		case WEAPON_AW50:
+			pev->viewmodel = MAKE_STRING("models/v_aw50.mdl");
 		default:
 			break;
 		}
@@ -8655,6 +8669,13 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_AK47:
 		case WEAPON_M95TIGER:
 		case WEAPON_SFSNIPER:
+		case WEAPON_CHEYTACLRRS:
+		case WEAPON_M400:
+		case WEAPON_M82:
+		case WEAPON_M24:
+		case WEAPON_TRG42:
+		case WEAPON_TRG42G:
+		case WEAPON_AW50:
 			return TRUE;
 		}
 	}
@@ -8960,7 +8981,7 @@ void CBasePlayer::AutoBuy()
 
 bool IsPrimaryWeaponClass(int classId)
 {
-	return (classId >= WEAPONCLASS_SUBMACHINEGUN && classId <= WEAPONCLASS_SNIPERRIFLE);
+	return (classId >= WEAPONCLASS_SUBMACHINEGUN && classId <= WEAPONCLASS_EQUIPMENT);
 }
 
 bool IsPrimaryWeaponId(int id)
@@ -9752,12 +9773,17 @@ bool CBasePlayer::Knockback(CBasePlayer *attacker, const KnockbackData &data)
 
 void CBasePlayer::AddWeapon(int iWeaponID)
 {
-	pev->weapons |= (1 << iWeaponID);
+	if(iWeaponID <= WEAPON_SUIT)
+		pev->weapons |= (1 << iWeaponID);
+
 	m_setWeaponID.insert(iWeaponID);
 }
 
 void CBasePlayer::RemoveWeapon(int iWeaponID) {
-	pev->weapons &= ~(1 << iWeaponID);
+
+	if (iWeaponID <= WEAPON_SUIT)
+		pev->weapons &= ~(1 << iWeaponID);
+
 	m_setWeaponID.erase(iWeaponID);
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgWeapDrop, NULL, pev);

@@ -76,7 +76,8 @@ void EV_FireSgdrill(event_args_s *args)
 		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
 	}
 
-	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iShotgunShell, TE_BOUNCE_SHELL);
+	int shell = gEngfuncs.pEventAPI->EV_FindModelIndex("models/shell_sgdrill.mdl");
+	EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], shell, TE_BOUNCE_SHELL);
 
 	PLAY_EVENT_SOUND( SOUNDS_NAME );
 

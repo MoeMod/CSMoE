@@ -175,7 +175,7 @@ int CZombieLaw::GetItemInfo(ItemInfo *p)
 	p->iSlot = 0;
 	p->iPosition = 12;
 	p->iId = m_iId = WEAPON_ZOMBIELAW;
-	p->iFlags = 0;
+	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
 	p->iWeight = M249_WEIGHT;
 
 	return 1;

@@ -20,7 +20,26 @@ namespace sv {
 		if (pOwner && pOwner->IsPlayer())
 			pEntityOwner = static_cast<CBasePlayer*>(pOwner);
 		
-		SET_MODEL(ENT(pev), "sprites/ef_sgmissile_line.spr");
+		int iType = 2;
+		pev->classname = MAKE_STRING("sgmissile");
+		SET_MODEL(this->edict(), "sprites/ef_sgmissile_line.spr");
+		CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pEntityOwner->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT];
+		if (pWeapon != NULL)
+		{
+			if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_sgmissilem"))
+			{
+				SET_MODEL(this->edict(), "sprites/ef_sgmissilem_line.spr");
+				pev->classname = MAKE_STRING("sgmissilem");
+				iType = 3;
+			}
+			else if(!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_sgmissileex"))
+			{
+				SET_MODEL(this->edict(), "sprites/ef_sgmissileex_line.spr");
+				pev->classname = MAKE_STRING("sgmissileex");
+				iType = 4;
+			}
+		}
+			
 
 		pev->frame = 0.0;
 		pev->effects = 0;
@@ -39,7 +58,7 @@ namespace sv {
 		UTIL_SetOrigin(pev, pev->origin);
 		UTIL_SetSize(pev, g_vecZero, g_vecZero);
 		pev->nextthink = gpGlobals->time + 0.1s;
-		pev->classname = MAKE_STRING("sgmissile");
+		
 
 		m_flNumFrames = (float)(MODEL_FRAMES(pev->modelindex) - 1);
 		pev->framerate = RANDOM_FLOAT(1.0, 30.0);
@@ -50,12 +69,19 @@ namespace sv {
 		WRITE_COORD(m_vecOrigin.y);
 		WRITE_COORD(m_vecOrigin.z);
 		WRITE_SHORT(this->entindex());
-		WRITE_BYTE(2);
+		WRITE_BYTE(iType);
 		MESSAGE_END();
 	}
 
-	void CSGMissileCannon::Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce)
+	void CSGMissileCannon::Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce, int iType)
 	{
+		switch (iType)
+		{
+		case 3:
+			m_iEffectSprite = PRECACHE_MODEL("sprites/muzzleflash115.spr"); break;
+		case 4:
+			m_iEffectSprite = PRECACHE_MODEL("sprites/ef_sgmissileex.spr"); break;
+		}
 		m_vecDir = vecDir;
 		m_flSpeed = flSpeed;
 		m_tTimeRemove = tTimeRemove + gpGlobals->time;
@@ -75,8 +101,10 @@ namespace sv {
 
 	void CSGMissileCannon::Precache()
 	{
-		PRECACHE_MODEL("sprites/ef_sgmissile_line.spr");
-
+		//PRECACHE_MODEL("sprites/ef_sgmissile_line.spr");
+		//PRECACHE_MODEL("sprites/ef_sgmissilem_line.spr");
+		//PRECACHE_MODEL("sprites/ef_sgmissileex_line.spr");
+		PRECACHE_MODEL("sprites/ef_sgmissileex.spr");
 		m_iEffectSprite = PRECACHE_MODEL("sprites/ef_sgmissile.spr");
 		m_iExplosionSprite = PRECACHE_MODEL("sprites/dart_explosion.spr");
 
@@ -113,15 +141,41 @@ namespace sv {
 				{
 					if (pOther->pev->takedamage != DAMAGE_NO)
 					{
+						
 						TraceResult tr = UTIL_GetGlobalTrace();
+						//TraceResult tr;
+						/*Vector vecStart = pev->origin;
+						Vector vecEnd = pev->origin + pev->velocity.Normalize() * 42;
+						UTIL_TraceLine(vecStart, vecEnd, dont_ignore_monsters, this->edict(), &tr);*/
 
-						if (tr.pHit && (CBaseEntity*)GET_PRIVATE(tr.pHit) == pOther)
+						//MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+						//WRITE_BYTE(TE_BEAMPOINTS);
+						//WRITE_COORD(vecStart.x);
+						//WRITE_COORD(vecStart.y);
+						//WRITE_COORD(vecStart.z);
+						//WRITE_COORD(tr.vecEndPos.x);
+						//WRITE_COORD(tr.vecEndPos.y);
+						//WRITE_COORD(tr.vecEndPos.z); // coord coord coord (end position) 
+						//WRITE_SHORT(PRECACHE_MODEL("sprites/laserbeam.spr")); // short (sprite index) 
+						//WRITE_BYTE(0); // byte (starting frame) 
+						//WRITE_BYTE(1); // byte (frame rate in 0.1's) 
+						//WRITE_BYTE(100); // byte (life in 0.1's) 
+						//WRITE_BYTE(10); // byte (line width in 0.1's) 
+						//WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
+						//WRITE_BYTE(0); // byte,byte,byte (color)
+						//WRITE_BYTE(0);
+						//WRITE_BYTE(255);
+						//WRITE_BYTE(255); // byte (brightness)
+						//WRITE_BYTE(0); // byte (scroll speed in 0.1's)
+						//MESSAGE_END();
+
+						//if (tr.pHit && (CBaseEntity*)GET_PRIVATE(tr.pHit) == pOther)
 						{
 							entvars_t* pevOwner = VARS(pev->owner);
 
 							ClearMultiDamage();
 
-							pOther->TraceAttack(pevOwner, m_flExplodeDamage, pev->velocity, &tr, DMG_BULLET | DMG_NEVERGIB);
+							pOther->TraceAttack(pevOwner, m_flDamage, pev->velocity, &tr, DMG_BULLET | DMG_NEVERGIB);
 
 							ApplyMultiDamage(pev, pOwner->pev);
 

@@ -37,6 +37,23 @@ float UTIL_QuickRandomFloat(float low, float high)
 	return rand() * (1.0 / 32767) * (high - low) + low;
 }
 
+int CSpearGun::GetItemInfo(ItemInfo* p)
+{
+	p->pszName = STRING(pev->classname);
+	p->pszAmmo1 = "SpearAmmo";
+	p->iMaxAmmo1 = 30;
+	p->pszAmmo2 = NULL;
+	p->iMaxAmmo2 = -1;
+	p->iMaxClip = 30;
+	p->iSlot = 0;
+	p->iPosition = 1;
+	p->iId = m_iId = WEAPON_AK47;
+	p->iFlags = 0;
+	p->iWeight = AK47_WEIGHT;
+
+	return 1;
+}
+
 void CSpearGun::Spawn(void)
 {
 	Base::Spawn();
@@ -225,19 +242,6 @@ void CSpearGun::ItemPostFrame(void)
 	{
 		CBasePlayerWeapon::ItemPostFrame();
 	}
-}
-
-float CSpearGun::GetDamage()
-{
-#ifndef CLIENT_DLL
-	if (g_pModRunning->DamageTrack() == DT_ZB)
-		return 1150;
-	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		return 2950;
-	else if (g_pModRunning->DamageTrack() == DT_ZSE)
-		return 650;
-#endif
-	return 410;
 }
 
 void CSpearGun::WeaponIdle(void)

@@ -1050,4 +1050,29 @@ BOOL CReviveAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_revive, CReviveAmmo);
+
+void C408CheyTacAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C408CheyTacAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C408CheyTacAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(AMMO_50BMG_BUY, "408CheyTac", 30) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_408cheytac, C408CheyTacAmmo);
 }

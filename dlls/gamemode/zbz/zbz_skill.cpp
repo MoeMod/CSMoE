@@ -84,7 +84,7 @@ namespace sv {
 				return;
 			if (m_flNextThink > gpGlobals->time)
 				return;
-			m_flNextThink = gpGlobals->time + 0.5s;
+			m_flNextThink = gpGlobals->time + 0.3s;
 
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();

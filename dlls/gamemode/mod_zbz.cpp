@@ -65,6 +65,7 @@ namespace sv {
 		m_iChangeClassTime[0] = 0;
 		m_iChangeClassTime[1] = 0;
 		m_iChangeClassTime[2] = 0;
+		m_tNextChangeClass = invalid_time_point;
 		m_flNextTimeChangeZombie = invalid_time_point;
 		m_iZB5EvolutionEffect = PRECACHE_MODEL("models/zb5_za_evolution_effect.mdl");
 }
@@ -634,8 +635,16 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			// sound effect
 			m_pModZBZ->InfectionSound();
 			m_pModZBZ->CheckWinConditions();
+			return;
 		}
-		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+
+		if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
+		{
+			UpgradeSkill();
+			return;
+		}
+			
+		if (m_tNextChangeClass <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[0] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			if (GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING || GetCharacter()->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
 			{
@@ -654,8 +663,8 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			}
 
 			m_iChangeClassTime[0] = -1;
-			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
-			switch (RANDOM_LONG(0, 3))
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
+			switch (RANDOM_LONG(0, 2))
 			{
 			case 0: m_pPlayer->m_ZombieClass = "nemesis"; break;
 			case 1: m_pPlayer->m_ZombieClass = "spider"; break;
@@ -700,8 +709,10 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			{
 				strategy->SetStunSpeedTime(1.0s, 1.0);
 			}
+			return;
 		}
-		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+
+		if (m_tNextChangeClass <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[2] > 0 && m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			if (GetCharacter()->GetSkillStatus(SKILL_SLOT_2) == SKILL_STATUS_USING || GetCharacter()->GetSkillStatus(SKILL_SLOT_1) == SKILL_STATUS_USING)
 			{
@@ -721,7 +732,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 			float flHealth = m_pPlayer->pev->health;
 			float flMaxHealth = m_pPlayer->pev->max_health;
-			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			if (flHealth <= 3000 || m_flNextTimeChangeZombie > gpGlobals->time)
 			{
 				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "血量不足或切换冷却时间未到，无法改变僵尸种类");
@@ -734,12 +745,14 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pPlayer->m_iCustomSequence = -1;
 			CPlayerModStrategy_ZB3::BecomeZombie(m_pPlayer->m_iZombieLevel);
 			m_pPlayer->pev->max_health = flMaxHealth;
-			m_pPlayer->pev->health = flHealth - 3000;	
+			m_pPlayer->pev->health = flHealth - 3000;
+			return;
 		}
-		else if (m_flSkillDelay <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+
+		if (m_tNextChangeClass <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
 		{
 			m_iChangeClassTime[1] = -1;
-			m_flSkillDelay = gpGlobals->time + UPGRADE_SKILL_DELAY;
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			SetHero(true);
 			m_pPlayer->SetScoreboardAttributes();
 			m_pPlayer->pev->max_health = 10000.0f;
@@ -759,9 +772,8 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s 成为幽灵猎手", STRING(m_pPlayer->pev->netname));
 
 			EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterappear.wav", VOL_NORM, ATTN_NORM);
+			return;
 		}
-		else if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
-			UpgradeSkill();
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnButtonEvent, bitsCurButton, bitsOldButton);

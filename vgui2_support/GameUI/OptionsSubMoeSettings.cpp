@@ -28,11 +28,14 @@ COptionsSubMoeSettings::COptionsSubMoeSettings(vgui2::Panel *parent) : PropertyP
 	m_pHudStyle = new CLabeledCommandComboBox(this, "HudStyleComboBox");
 	InitHudStyleList(m_pHudStyle);
 
-	m_pTexlru = new CLabeledCommandComboBox(this, "TexlruComboBox");
-	InitTexlruList(m_pTexlru);
+	//m_pTexlru = new CLabeledCommandComboBox(this, "TexlruComboBox");
+	//InitTexlruList(m_pTexlru);
 
 	m_pHudScale = new CLabeledCommandComboBox(this, "HudScaleComboBox");
 	InitHudScaleList(m_pHudScale);
+
+	m_pGammaSlider = new CCvarSlider(this, "Gamma", "#GameUI_Brightness",
+		1.0f, 30.0f, "gamma");
 
 	LoadControlSettings("Resource/optionssubmoesettings.res");
 }
@@ -221,8 +224,9 @@ void COptionsSubMoeSettings::OnResetData()
 	m_pFloatingDamageType->Reset();
 	m_pSiFiAmmoType->Reset();
 	m_pHudStyle->Reset();
-	m_pTexlru->Reset();
+	//m_pTexlru->Reset();
 	m_pHudScale->Reset();
+	m_pGammaSlider->Reset();
 }
 
 void COptionsSubMoeSettings::OnApplyChanges()
@@ -236,11 +240,14 @@ void COptionsSubMoeSettings::OnApplyChanges()
 	if (m_pHudStyle)
 		m_pHudStyle->ApplyChanges();
 
-	if (m_pTexlru)
-		m_pTexlru->ApplyChanges();
+	//if (m_pTexlru)
+		//m_pTexlru->ApplyChanges();
 
 	if (m_pHudScale)
 		m_pHudScale->ApplyChanges();
+
+	if(m_pGammaSlider)
+		m_pGammaSlider->ApplyChanges();
 	
 }
 

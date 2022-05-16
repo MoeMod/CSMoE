@@ -408,6 +408,19 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_as50g.cpp
 	../dlls/wpn_shared/wpn_ak47g.cpp
 	../dlls/wpn_shared/wpn_sgmissile.cpp
+	../dlls/wpn_shared/wpn_sgmissilem.cpp
+	../dlls/wpn_shared/wpn_sgmissileex.cpp
+	../dlls/wpn_shared/wpn_cheytaclrrs.cpp
+	../dlls/wpn_shared/wpn_m400.cpp
+	../dlls/wpn_shared/wpn_m82.cpp
+	../dlls/wpn_shared/wpn_m24.cpp
+	../dlls/wpn_shared/wpn_trg42.cpp
+	../dlls/wpn_shared/wpn_aw50.cpp
+	../dlls/wpn_shared/wpn_sl8.cpp
+	../dlls/wpn_shared/wpn_sl8g.cpp
+	../dlls/wpn_shared/wpn_sl8ex.cpp
+	../dlls/wpn_shared/wpn_trg42g.cpp
+	../dlls/wpn_shared/wpn_sprifle.cpp
 	)
 
 set(PM_SRCS

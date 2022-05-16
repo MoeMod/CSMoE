@@ -615,9 +615,9 @@ class CBalrog11Cannon : public CBaseEntity
 {
 //From CS:AE
 public:
-	void Spawn() override;
-	void Precache() override;
-	void Touch(CBaseEntity* pOther) override;
+	void Spawn();
+	void Precache();
+	void EXPORT BuckBcsTouch(CBaseEntity* pOther);
 
 	void EXPORT AnimationThink(void);
 	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList);
@@ -837,7 +837,7 @@ public:
 	void Precache();
 	void EXPORT SGMissileBcsTouch(CBaseEntity* pOther);
 
-	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce);
+	void Init(Vector vecDir, float flSpeed, duration_t tTimeRemove, float flDamage, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList, float flExplodeDamage, float flExplodeRadius, float flDirectForce, int iType);
 	void Remove();
 	void Explode(void);
 

@@ -42,6 +42,7 @@ namespace sv {
 		pev->angles.z = (float)RANDOM_LONG(0, 180);
 
 		SetThink(&CBalrog11Cannon::AnimationThink);
+		SetTouch(&CBalrog11Cannon::BuckBcsTouch);
 		m_vecOrigin = pev->origin;
 		UTIL_SetOrigin(pev, pev->origin);
 		UTIL_SetSize(pev, g_vecZero, g_vecZero);
@@ -128,7 +129,7 @@ namespace sv {
 		return UTIL_Remove(this);
 	}
 
-	void CBalrog11Cannon::Touch(CBaseEntity* pOther)
+	void CBalrog11Cannon::BuckBcsTouch(CBaseEntity* pOther)
 	{
 		if (pOther->edict() == pev->owner)
 			return;

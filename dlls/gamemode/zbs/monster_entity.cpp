@@ -414,6 +414,13 @@ void CMonster::Spawn()
 
 	UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 
+	if (m_iClass == MONSTER_CLASS_ZOMBIEDOG)
+	{
+		SET_MODEL(edict(), "models/monster/zombiedog.mdl");
+		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_DUCK_HULL_MAX);
+	}
+		
+
 	TraceResult tr;
 	TRACE_MONSTER_HULL(edict(), pev->origin, pev->origin, dont_ignore_monsters, edict(), &tr);
 
@@ -475,8 +482,12 @@ void CMonster::Precache()
 {
 	PRECACHE_SOUND("zombi/zombi_death_1.wav");
 	PRECACHE_SOUND("zombi/zombi_death_2.wav");
+	PRECACHE_SOUND("zombi/zombiedog_death1.wav");
+	PRECACHE_SOUND("zombi/zombiedog_death2.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_02.wav");
+	PRECACHE_SOUND("zombi/zombiedog_hurt1.wav");
+	PRECACHE_SOUND("zombi/zombiedog_hurt2.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_1.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_2.wav");
 	PRECACHE_SOUND("zombi/zombi_attack_3.wav");
@@ -647,6 +658,7 @@ CMonster::CMonster() : CHostage(),
 	m_iKillBonusMoney(500), 
 	m_iKillBonusFrags(1), 
 	m_flTimeLastActive(0.0s), 
+	m_iClass(MONSTER_CLASS_ZOMBIE),
 	m_pMonsterStrategy(new CMonsterModStrategy_Default(this))
 {
 	m_pLifeCycleHolder = std::make_shared<CMonster *>(this);
@@ -861,7 +873,28 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 	case MONSTERANIM_DIE:
 	{
 		m_IdealActivity = ACT_DIESIMPLE;
-		m_pMonsterStrategy->DeathSound();
+		{
+			if (m_iClass == MONSTER_CLASS_ZOMBIEDOG)
+			{
+				switch (RANDOM_LONG(1, 2))
+				{
+				case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombiedog_death1.wav", VOL_NORM, ATTN_NORM); break;
+				case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombiedog_death2.wav", VOL_NORM, ATTN_NORM); break;
+				
+				}
+			}
+			else
+			{
+				switch (RANDOM_LONG(1, 2))
+				{
+				case 1: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
+				case 2: EMIT_SOUND(ENT(pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
+				}
+			}
+			
+
+		}
+		//m_pMonsterStrategy->DeathSound();
 		break;
 	}
 	case MONSTERANIM_ATTACK:
@@ -1224,6 +1257,9 @@ CBasePlayer *CMonster::GetClosestPlayer(bool bVisible) const
 			continue;
 
 		if (bVisible && !m_improv->IsVisible(m_improv->GetEyes(), true))
+			continue;
+
+		if (player->pev->team == pev->team)
 			continue;
 
 		float rangeSq = (m_improv->GetCentroid() - player->pev->origin).LengthSquared();

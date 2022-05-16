@@ -62,6 +62,24 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	iType = reader.ReadByte();
 	switch (iType)
 	{
+	case 0:
+	{
+		int length = reader.ReadShort();
+		for (int i = 0; i < length; i++)
+		{
+			// {"weapon_usp", "USP45", 500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1},
+			MoEWeaponBuyInfo_s info;
+			info.pszClassName = reader.ReadString();
+			info.pszDisplayName = reader.ReadString();
+			info.iCost = reader.ReadShort();
+			info.iSlot = (InventorySlotType)reader.ReadByte();
+			info.iTeam = (TeamName)reader.ReadByte();
+			info.iMenu = (MoEWeaponBuyType)reader.ReadByte();
+			info.iScore = 1;
+			gHUD.m_WeaponBuyInfo.push_back(info);
+		}
+		break;
+	}
 	case 1:
 	{
 		CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
@@ -78,6 +96,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		arg2 = reader.ReadByte();
 		CreateBalrog11CannonSingleProjectile(NULL, pos, arg1, arg2);
 		//CreateBalrog11CannonFollowEnt(NULL, pos, arg1, arg2);
+		break;
 	}
 	case 3:
 	{
@@ -87,6 +106,7 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadByte();
 		CreateFollowEnt(NULL, pos, arg1, arg2);
+		break;
 	}
 	case 4:
 	{
@@ -131,7 +151,7 @@ void FollowThink(tempent_s* ent, float frametime, float currenttime)
 	static cl_entity_t* pEntity;
 	pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
 
-	if (!pEntity)
+	if (!pEntity)	//preent
 	{
 		ent->die = currenttime;
 		return;
@@ -152,10 +172,10 @@ void DefaultFramerateTouch(tempent_s* ent, pmtrace_t* tr)
 
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
 {
-	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
+	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);	//the msgent
 	if (!ent)
 		return;
-	if (prev && (prev->entity.origin - origin).Length() < 5)	// Why not other numbers??
+	if (prev && (prev->entity.origin - origin).Length() < 5)	// Why not other numbers??	//2nd
 		return;
 	static int iModelIndex;
 
@@ -167,6 +187,10 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr"); break;
 	case 2:
 		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissile_line.spr"); break;	
+	case 3:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissilem_line.spr"); break;
+	case 4:
+		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissileex_line.spr"); break;
 	}
 
 	TEMPENTITY* te = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
@@ -180,9 +204,9 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 		te->entity.curstate.scale = 0.01;
 		te->entity.baseline.fuser1 = 0.3;
 		te->entity.curstate.iuser2 = iType;
+		te->die = gHUD.m_flTime + 1.0;	//0.75 default
 		te->callback = FollowThink;
-		te->hitcallback = DefaultFramerateTouch;
-
+		te->hitcallback = DefaultFramerateTouch;	
 		te->entity.curstate.rendermode = kRenderTransAdd;
 		te->entity.curstate.renderamt = 40.0f;
 		te->entity.curstate.renderfx = kRenderFxNone;

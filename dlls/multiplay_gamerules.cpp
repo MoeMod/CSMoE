@@ -20,6 +20,7 @@
 
 #include "bot_include.h"
 #include "player/player_model.h"
+#include "weapons_moe_buy.h"
 
 namespace sv {
 
@@ -3417,6 +3418,20 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer *pl)
 		WRITE_BYTE(m_iPlayersOS[i]);
 	}
 	MESSAGE_END();
+
+	/*MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->edict());
+	WRITE_BYTE(0);
+	WRITE_SHORT(ARRAYSIZE(g_MoEWeaponBuyInfo));
+	for (auto& x : g_MoEWeaponBuyInfo)
+	{
+		WRITE_STRING(x.pszClassName);
+		WRITE_STRING(x.pszDisplayName);
+		WRITE_SHORT(x.iCost);
+		WRITE_BYTE(x.iSlot);
+		WRITE_BYTE(x.iTeam);
+		WRITE_BYTE(x.iMenu);
+	}
+	MESSAGE_END();*/
 }
 
 void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)

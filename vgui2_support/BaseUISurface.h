@@ -200,7 +200,7 @@ protected:
     void DrawQuad(vpoint_t ul, vpoint_t lr, int *pColor);
     void DrawQuadBlend(vpoint_t ul, vpoint_t lr, int *pColor);
     void DrawQuadArray(int quadCount, vpoint_t *pVerts, int *pColor);
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
     struct font_entry
     {
         void *data;

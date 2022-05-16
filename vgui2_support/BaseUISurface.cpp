@@ -47,7 +47,7 @@ void TextAdjustSize( int *x, int *y, int *w, int *h );
 void TextAdjustSizeReverse( int *x, int *y, int *w, int *h );
 
 bool BaseUISurface::m_bTranslateExtendedKeys;
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(_WIN32)
 CUtlDict< BaseUISurface::font_entry, unsigned short > BaseUISurface::m_FontData;
 #endif
 
@@ -96,7 +96,7 @@ BaseUISurface::BaseUISurface() {
 	_translateX = _translateY = 0;
 
     FontManager().SetLanguage("schinese");
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(WIN32)
     FontManager().SetFontDataHelper( &BaseUISurface::FontDataHelper );
 #endif
 }
@@ -753,14 +753,14 @@ bool BaseUISurface::AddCustomFontFile(const char *fontFileName) {
 
     m_CustomFontFileNames[ m_CustomFontFileNames.AddToTail() ] = symbol;
 
-#ifdef WIN32
-    return AddFontResourceExA( fullPath, FR_PRIVATE, nullptr ) > 0 ||
-		AddFontResourceA( fullPath) > 0;
-#else
+#if defined(LINUX) || defined(OSX) || defined(WIN32)
     int size;
     if ( BaseUISurface::FontDataHelper( nullptr, size, fontFileName ) )
         return true;
     return false;
+#elif defined WIN32
+    return AddFontResourceExA(fullPath, FR_PRIVATE, nullptr) > 0 ||
+        AddFontResourceA(fullPath) > 0;
 #endif
 }
 
@@ -1385,7 +1385,7 @@ bool BaseUISurface::IsEmojiChar(wchar_t ch)
 }
 #endif
 
-#if defined(LINUX) || defined(OSX)
+#if defined(LINUX) || defined(OSX) || defined(WIN32)
 
 static void RemoveSpaces( CUtlString &str )
 {
