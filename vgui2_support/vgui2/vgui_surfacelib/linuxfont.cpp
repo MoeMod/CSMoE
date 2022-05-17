@@ -17,7 +17,7 @@
 #else
 #include <malloc.h>
 #endif
-#if !defined( _X360 )
+#if defined(_WIN32) && !defined( _X360 )
 #define WIN32_LEAN_AND_MEAN
 #define OEMRESOURCE
 #include <windows.h>
