@@ -1658,12 +1658,20 @@ static const ref_overview_t *GL_GetOverviewParms( void )
 
 static void *R_Mem_Alloc( size_t cb, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	return _Mem_Alloc( cls.mempool, cb, filename, fileline );
+#else
+	return Mem_Alloc( cls.mempool, cb );
+#endif
 }
 
 static void R_Mem_Free( void *mem, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	_Mem_Free( mem, filename, fileline );
+#else
+	Mem_Free( mem );
+#endif
 }
 
 /*

@@ -99,7 +99,7 @@ void SV_CheckAllEnts( void )
 			continue;
 		}
 
-		if( !e->pvPrivateData || !Mem_IsAllocatedExt( svgame.mempool, e->pvPrivateData ))
+		if( !e->pvPrivateData )
 		{
 			MsgDev( D_ERROR, "Entity %s (%i) trashed private data.\n", SV_ClassName( e ), i );
 			e->pvPrivateData = NULL;
@@ -1920,12 +1920,20 @@ static char **pfnGetFilesList( const char *pattern, int *numFiles, int gamediron
 
 static void *pfnMem_Alloc( size_t cb, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	return _Mem_Alloc( svgame.mempool, cb, filename, fileline );
+#else
+	return Mem_Alloc( svgame.mempool, cb );
+#endif
 }
 
 static void pfnMem_Free( void *mem, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	_Mem_Free( mem, filename, fileline );
+#else
+	Mem_Free( mem );
+#endif
 }
 
 

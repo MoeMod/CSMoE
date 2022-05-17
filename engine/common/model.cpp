@@ -32,6 +32,7 @@ world_static_t	world;
 
 byte		*mod_base;
 mempool_t		*com_studiocache;		// cache for submodels
+mempool_t		*mempool_mdl;		// cache for submodels
 static model_t	*com_models[MAX_MODELS];	// shared replacement modeltable
 static model_t	cm_models[MAX_MODELS];
 static int	cm_nummodels = 0;
@@ -542,6 +543,7 @@ static void Mod_FreeModel( model_t *mod )
 void Mod_Init( void )
 {
 	com_studiocache = Mem_AllocPool( "Studio Cache" );
+    mempool_mdl = Mem_AllocPool( "BSP" );
 	mod_studiocache = Cvar_Get( "r_studiocache", "1", CVAR_ARCHIVE, "enables studio cache for speedup tracing hitboxes" );
 	r_wadtextures = Cvar_Get( "r_wadtextures", "1", CVAR_ARCHIVE, "completely ignore textures in the wad-files if disabled" );
 
@@ -587,6 +589,7 @@ void Mod_Shutdown( void )
 {
 	Mod_ClearAll( false );
 	Mem_FreePool( &com_studiocache );
+	Mem_FreePool( &mempool_mdl );
 }
 
 /*
@@ -2842,7 +2845,7 @@ static void Mod_LoadBrushModel( model_t *mod, const void *buffer, qboolean *load
 		LittleLongSW(((int *)header)[i]);
 #endif
 
-	loadmodel->mempool = Mem_AllocPool( va( "^2%s^7", loadmodel->name ));
+	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
 
 	// load into heap
 	if( header->lumps[LUMP_ENTITIES].fileofs <= 1024 && (header->lumps[LUMP_ENTITIES].filelen % sizeof( dplane_t )) == 0 )

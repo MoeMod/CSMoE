@@ -821,7 +821,11 @@ pfnMemAlloc
 */
 static void *pfnMemAlloc( size_t cb, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	return _Mem_Alloc( menu.mempool, cb, filename, fileline );
+#else
+	return Mem_Alloc( menu.mempool, cb );
+#endif
 }
 
 /*
@@ -832,7 +836,11 @@ pfnMemFree
 */
 static void pfnMemFree( void *mem, const char *filename, const int fileline )
 {
+#ifdef XASH_MEMDBG
 	_Mem_Free( mem, filename, fileline );
+#else
+	Mem_Free( mem );
+#endif
 }
 
 /*

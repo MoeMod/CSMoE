@@ -46,6 +46,10 @@ option(XASH_WES    "Use gl-wes-v2(GLES2). Implicitly enables XASH_GLES." OFF)
 if(XASH_WES)
 	set(XASH_WES_SRC "${CMAKE_SOURCE_DIR}/gl-wes-v2" CACHE PATH "GL WES path")
 endif()
+option(XASH_GL4ES    "Use gl4es(GLES2). Implicitly enables XASH_GLES." OFF)
+if(XASH_GL4ES)
+	set(XASH_GL4ES_SRC "${CMAKE_SOURCE_DIR}/3rdparty/gl4es" CACHE PATH "GL4ES path")
+endif()
 if(WIN32)
 	option(XASH_QINDIEGL    "Use QindieGL(D3D9). Only avaible on Win32" OFF)
 endif()
@@ -63,7 +67,11 @@ if(IOS)
 endif()
 set(XASH_ASTC ON)
 
-option(XASH_SKIPCRTLIB "Use system crtlib" ON)
+option(XASH_TBBMALLOC "Use tbbmalloc" ON)
+if(IOS)
+	# CRT malloc is the best in iOS
+	set(XASH_TBBMALLOC OFF)
+endif()
 
 set(XASH_ENGINE_SOURCES 
 	common/avikit.cpp
@@ -100,7 +108,7 @@ set(XASH_ENGINE_SOURCES
 	common/system.cpp
 	common/titles.cpp
 	common/world.cpp
-	common/zone.cpp
+	common/llm.cpp
 	common/crashhandler.cpp
 	common/imagelib/img_bmp.cpp
 	common/imagelib/img_main.cpp
@@ -332,6 +340,15 @@ elseif(XASH_WES)
 
 	include_directories(${XASH_NANOGL_SRC}/ ${XASH_NANOGL_SRC}/GL/ ${XASH_WES_SRC}/src/)
 	add_definitions(-DXASH_WES)
+elseif(XASH_GL4ES)
+	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES ${XASH_GL4ES_SRC}/src/gl/*.c ${XASH_GL4ES_SRC}/src/gl/*/*.c ${XASH_GL4ES_SRC}/src/glx/hardext.c)
+	if(NOT XASH_ENGINE_GLESWRAP_SOURCES)
+		message(FATAL_ERROR "Clone gl4es sources to engine folder!")
+	endif()
+	list(APPEND XASH_ENGINE_SOURCES ${XASH_ENGINE_GLESWRAP_SOURCES})
+
+	include_directories(${XASH_GL4ES_SRC}/src ${XASH_GL4ES_SRC}/src/gl ${XASH_GL4ES_SRC}/src/glx ${XASH_GL4ES_SRC}/include)
+	add_definitions(-DXASH_GL4ES -DNOX11 -DNO_GBM -DNO_INIT_CONSTRUCTOR -DDEFAULT_ES=2 -DNOEGL -DEXTERNAL_GETPROCADDRESS=GL4ES_GetProcAddress -DNO_LOADER -DSTATICLIB)
 elseif(XASH_QINDIEGL)
 	file(GLOB XASH_ENGINE_GLESWRAP_SOURCES 
 		${XASH_QINDIEGL_SRC}/code/d3d_array.cpp
@@ -385,10 +402,6 @@ add_definitions(-DXASH_FORCEINLINE)
 if(XASH_VECTORIZE_SINCOS) # I know what I am doing and I want to build version that requires SSE
 	add_definitions(-DVECTORIZE_SINCOS)
 endif()
-if(XASH_SKIPCRTLIB)
-	add_definitions(-DXASH_SKIPCRTLIB)
-endif()
-
 if(XASH_SKIPCRTLIB)
 	add_definitions(-DXASH_SKIPCRTLIB)
 endif()
@@ -498,7 +511,13 @@ if(XASH_ASTC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE astcenc_3p)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p)
+if(XASH_TBBMALLOC)
+	add_definitions(-DXASH_TBBMALLOC)
+
+	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-tbbmalloc)
+endif()
+
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

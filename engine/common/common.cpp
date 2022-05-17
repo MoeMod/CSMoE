@@ -263,9 +263,6 @@ void *Cache_Check( mempool_t *mempool, cache_user_t *c )
 	if( !c->data )
 		return NULL;
 
-	if( !Mem_IsAllocatedExt( mempool, c->data ))
-		return NULL;
-
 	return c->data;
 }
 

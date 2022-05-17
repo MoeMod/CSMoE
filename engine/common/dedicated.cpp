@@ -576,7 +576,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
-	loadmodel->mempool = Mem_AllocPool( va( "^2%s^7", loadmodel->name ));
+	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
 	loadmodel->type = mod_studio;
 
 	phdr = R_StudioLoadHeader( mod, buffer );
@@ -667,7 +667,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		return;
 	}
 
-	mod->mempool = Mem_AllocPool( va( "^2%s^7", mod->name ));
+	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
 	psprite = (msprite_t *)Mem_Alloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata

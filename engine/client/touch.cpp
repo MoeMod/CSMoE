@@ -19,7 +19,7 @@ GNU General Public License for more details.
 #include "input.h"
 #include "client.h"
 #include "touch.h"
-#include "math.h"
+#include <vector>
 #include "vgui_draw.h"
 #ifdef XASH_SDL
 #include <SDL_hints.h>
@@ -76,9 +76,8 @@ typedef struct touch_button_s
 	float fadeend;
 	float aspect;
 
-	// Double-linked list
-	struct touch_button_s *next;
-	struct touch_button_s *prev;
+    void *operator new(size_t size);
+    void operator delete(void *ptr);
 
 } touch_button_t;
 
@@ -94,11 +93,7 @@ typedef struct touchdefaultbutton_s
 	int flags;
 } touchdefaultbutton_t;
 
-typedef struct touchbuttonlist_s
-{
-	touch_button_t *first;
-	touch_button_t *last;
-} touchbuttonlist_t;
+typedef std::vector<std::shared_ptr<touch_button_t>> touchbuttonlist_t;
 
 struct touch_s
 {
@@ -108,7 +103,7 @@ struct touch_s
 	touchState state;
 	int look_finger;
 	int move_finger;
-	touch_button_t *move;
+    std::weak_ptr<touch_button_t> move;
 	float move_start_x;
 	float move_start_y;
 	float forward;
@@ -117,9 +112,9 @@ struct touch_s
 	float pitch;
 
 	// editing
-	touch_button_t *edit;
-	touch_button_t *selection;
-	touch_button_t *hidebutton;
+    std::weak_ptr<touch_button_t> edit;
+    std::weak_ptr<touch_button_t> selection;
+    std::weak_ptr<touch_button_t> hidebutton;
 	int resize_finger;
 	qboolean showeditbuttons;
 
@@ -134,8 +129,7 @@ struct touch_s
 	qboolean configchanged;
 } touch;
 
-touchdefaultbutton_t g_DefaultButtons[256];
-int g_LastDefaultButton;
+std::vector<touchdefaultbutton_t> g_DefaultButtons;
 
 convar_t *touch_pitch;
 convar_t *touch_yaw;
@@ -172,13 +166,23 @@ convar_t *touch_3dtouch_attack_pressure;
 int pfnDrawCharacter( int x, int y, int number, int r, int g, int b );
 static void IN_TouchCheckCoords( float *x1, float *y1, float *x2, float *y2  );
 
+void *touch_button_t::operator new(size_t size)
+{
+    return Mem_Alloc(touch.mempool, size);
+}
+
+void touch_button_t::operator delete(void *ptr)
+{
+    Mem_Free(ptr);
+}
+
 void Touch_WriteConfig( void )
 {
 	file_t	*f;
 	char newconfigfile[64];
 	char oldconfigfile[64];
 
-	if( !touch.list_user.first ) return;
+	if( touch.list_user.empty() ) return;
 
 	if( Sys_CheckParm( "-nowriteconfig" ) || !touch.configchanged )
 		return;
@@ -191,7 +195,6 @@ void Touch_WriteConfig( void )
 	f = FS_Open( newconfigfile, "w", true );
 	if( f )
 	{
-		touch_button_t *button;
 		FS_Printf( f, "//=======================================================================\n");
 		FS_Printf( f, "//\tCopyright SDLash3D team & XashXT group %s ©\n", Q_timestamp( TIME_YEAR_ONLY ));
 		FS_Printf( f, "//\t\t\ttouchscreen config\n" );
@@ -229,7 +232,7 @@ void Touch_WriteConfig( void )
 		FS_Printf( f, "\n// touch buttons\n" );
 		FS_Printf( f, "touch_removeall\n" );
 
-		for( button = touch.list_user.first; button; button = button->next )
+		for( const auto &button : touch.list_user )
 		{
 			string newCommand;
 			int flags = button->flags;
@@ -269,7 +272,7 @@ void Touch_ExportConfig_f( void )
 		return;
 	}
 
-	if( !touch.list_user.first ) return;
+	if( touch.list_user.empty() ) return;
 
 	auto name = Cmd_Argv( 1 );
 
@@ -279,7 +282,6 @@ void Touch_ExportConfig_f( void )
 	{
 		char profilename[256];
 		char profilebase[256];
-		touch_button_t *button;
 		if( Q_strstr( name, "touch_presets/" ) )
 		{
 			FS_FileBase( name, profilebase );
@@ -323,7 +325,7 @@ void Touch_ExportConfig_f( void )
 		FS_Printf( f, "touch_setclientonly 0\n" );
 		FS_Printf( f, "\n// touch buttons\n" );
 		FS_Printf( f, "touch_removeall\n" );
-		for( button = touch.list_user.first; button; button = button->next )
+		for( auto button : touch.list_user )
 		{
 			string newCommand;
 			float aspect;
@@ -353,7 +355,6 @@ void Touch_ExportConfig_f( void )
 
 void Touch_GenetateCode_f( void )
 {
-	touch_button_t *button;
 	rgba_t c = {0,0,0,0};
 
 	if( Cmd_Argc() != 1 )
@@ -362,9 +363,9 @@ void Touch_GenetateCode_f( void )
 		return;
 	}
 
-	if( !touch.list_user.first ) return;
+	if( touch.list_user.empty() ) return;
 
-	for( button = touch.list_user.first; button; button = button->next )
+	for( const auto &button : touch.list_user )
 	{
 		float aspect;
 		int flags = button->flags;
@@ -389,17 +390,15 @@ void Touch_GenetateCode_f( void )
 
 void Touch_RoundAll_f( void )
 {
-	touch_button_t *button;
 	if( !touch_grid_enable->value )
 		return;
-	for( button = touch.list_user.first; button; button = button->next )
+	for( auto button : touch.list_user )
 		IN_TouchCheckCoords( &B(x1), &B(y1), &B(x2), &B(y2) );
 }
 
 void Touch_ListButtons_f( void )
 {
-	touch_button_t *button;
-	for( button = touch.list_user.first; button; button = button->next )
+	for( auto button : touch.list_user )
 	{
 		Msg( "%s %s %s %f %f %f %f %d %d %d %d %d\n", 
 			B(name), B(texturefile), B(command),
@@ -418,24 +417,20 @@ void Touch_Stroke_f( void )
 	MakeRGBA( touch.scolor, Q_atoi( Cmd_Argv( 2 ) ), Q_atoi( Cmd_Argv( 3 ) ), Q_atoi( Cmd_Argv( 4 ) ), Q_atoi( Cmd_Argv( 5 ) ) );
 }
 
-touch_button_t *Touch_FindButton( touchbuttonlist_t *list, const char *name )
+std::shared_ptr<touch_button_t> Touch_FindButton( touchbuttonlist_t *list, const char *name )
 {
-	touch_button_t *button;
-
-	for ( button = list->first; button; button = button->next )
+	for ( const auto &button : *list )
 		if( !Q_strncmp( button->name, name, 32 ) )
 			return button;
-	return NULL;
+	return nullptr;
 }
 
-touch_button_t *Touch_FindFirst( touchbuttonlist_t *list, const char *name )
+std::shared_ptr<touch_button_t> Touch_FindFirst( touchbuttonlist_t *list, const char *name )
 {
-	touch_button_t *button;
-
-	for ( button = list->first; button; button = button->next )
+	for ( const auto &button : *list )
 		if( ( Q_strstr( name, "*" ) && Q_stricmpext( name, button->name ) ) || !Q_strncmp( name, button->name, 32 ) )
 			return button;
-	return NULL;
+	return nullptr;
 }
 
 void Touch_SetClientOnly( bool state )
@@ -469,21 +464,11 @@ void Touch_SetClientOnly_f( void )
 
 void Touch_RemoveButtonFromList( touchbuttonlist_t *list, const char *name )
 {
-	touch_button_t *button;
-
 	IN_TouchEditClear();
 
-	while( ( button = Touch_FindFirst( &touch.list_user, name ) ) )
+	while( const auto &button = Touch_FindFirst( &touch.list_user, name ) )
 	{
-		if( button->prev )
-			button->prev->next = button->next;
-		else
-			list->first = button->next;
-		if( button->next )
-			button->next->prev = button->prev;
-		else
-			list->last = button->prev;
-		Mem_Free( button );
+        touch.list_user.erase(std::remove(touch.list_user.begin(), touch.list_user.end(), button), touch.list_user.end());
 	}
 
 }
@@ -500,25 +485,20 @@ void IN_TouchRemoveButton_f( void )
 
 void Touch_ClearList( touchbuttonlist_t *list )
 {
-	while( list->first )
-	{
-		touch_button_t *remove = list->first;
-		list->first = list->first->next;
-		Mem_Free ( remove );
-	}
-	list->first = list->last = NULL;
+    list->clear();
 }
 
 void Touch_RemoveAll_f( void )
 {
 	IN_TouchEditClear();
 	Touch_ClearList( &touch.list_user );
+    Touch_ClearList( &touch.list_edit );
+    g_DefaultButtons.clear();
 }
 
 void Touch_SetColor( touchbuttonlist_t *list, const char *name, byte *color )
 {
-	touch_button_t *button;
-	for( button = list->first; button; button = button->next )
+	for( const auto& button : *list )
 	{
 		if( ( Q_strstr( name, "*" ) && Q_stricmpext( name, button->name ) ) || !Q_strncmp( name, button->name, 32 ) )
 			MakeRGBA( button->color, color[0], color[1], color[2], color[3] );
@@ -527,7 +507,7 @@ void Touch_SetColor( touchbuttonlist_t *list, const char *name, byte *color )
 
 void Touch_SetTexture( touchbuttonlist_t *list, const char *name, const char *texture )
 {
-	touch_button_t *button = Touch_FindButton( list, name );
+	auto button = Touch_FindButton( list, name );
 	if( !button )
 		return;
 	button->texture = -1; // mark for texture load
@@ -536,7 +516,7 @@ void Touch_SetTexture( touchbuttonlist_t *list, const char *name, const char *te
 
 void Touch_SetCommand( touchbuttonlist_t *list, const char *name, const char *command )
 {
-	touch_button_t *button = Touch_FindButton( list, name );
+	auto button = Touch_FindButton( list, name );
 	
 	if( !button )
 		return;
@@ -555,9 +535,7 @@ void Touch_SetCommand( touchbuttonlist_t *list, const char *name, const char *co
 
 void Touch_HideButtons( const char *name, bool hide )
 {
-	touch_button_t *button;
-
-	for( button = touch.list_user.first; button; button = button->next)
+	for( const auto &button : touch.list_user )
 	{
 		if( ( Q_strstr( name, "*" ) && Q_stricmpext( name, button->name ) ) || !Q_strncmp( name, button->name, 32 ) )
 		{
@@ -572,8 +550,8 @@ void Touch_HideButtons( const char *name, bool hide )
 
 void Touch_ToggleSelection_f( void )
 {
-	if( touch.selection )
-		touch.selection->flags ^= TOUCH_FL_HIDE;
+	if( auto button = touch.selection.lock() )
+        button->flags ^= TOUCH_FL_HIDE;
 }
 
 void Touch_Hide_f( void )
@@ -588,8 +566,7 @@ void Touch_Show_f( void )
 
 void Touch_FadeButtons( touchbuttonlist_t *list, const char *name, float speed, float end, float start  )
 {
-	touch_button_t *button;
-	for( button = list->first; button; button = button->next)
+	for( const auto &button : *list )
 	{
 		if( ( Q_strstr( name, "*" ) && Q_stricmpext( name, button->name ) ) || !Q_strncmp( name, button->name, 32 ) )
 		{
@@ -636,7 +613,7 @@ void Touch_SetFlags_f( void )
 {
 	if( Cmd_Argc() == 3 )
 	{
-		touch_button_t *button = Touch_FindButton( &touch.list_user, Cmd_Argv( 1 ) );
+		auto button = Touch_FindButton( &touch.list_user, Cmd_Argv( 1 ) );
 		if( button )
 			button->flags = Q_atoi( Cmd_Argv( 2 ) );
 		return;
@@ -656,19 +633,21 @@ void Touch_SetCommand_f( void )
 void Touch_ReloadConfig_f( void )
 {
 	touch.state = state_none;
-	if( touch.edit )
-		touch.edit->finger = -1;
-	if( touch.selection )
-		touch.selection->finger = -1;
-	touch.edit = touch.selection = NULL;
+	if( auto button = touch.edit.lock() )
+        button->finger = -1;
+	if( auto button = touch.selection.lock() )
+        button->finger = -1;
+	touch.edit.reset();
+    touch.selection.reset();
 	touch.resize_finger = touch.move_finger = touch.look_finger = -1;
 
 	Cbuf_AddText( va("exec %s\n", touch_config_file->string ) );
 }
 
-touch_button_t *Touch_AddButton( touchbuttonlist_t *list, const char *name,  const char *texture, const char *command, float x1, float y1, float x2, float y2, byte *color )
+std::shared_ptr<touch_button_t> Touch_AddButton( touchbuttonlist_t *list, const char *name,  const char *texture, const char *command, float x1, float y1, float x2, float y2, byte *color )
 {
-	touch_button_t* button = (touch_button_t*)Mem_Alloc(touch.mempool, sizeof(touch_button_t));
+    // dont use make_shared to make use of our operator new
+    std::shared_ptr<touch_button_t> button(new touch_button_t());
 	button->texture = -1;
 	Q_strncpy( button->texturefile, texture, sizeof( button->texturefile ) );
 	Q_strncpy( button->name, name, 32 );
@@ -694,22 +673,14 @@ touch_button_t *Touch_AddButton( touchbuttonlist_t *list, const char *name,  con
 
 	Q_strncpy( button->command, command, sizeof( button->command ) );
 	button->finger = -1;
-	button->next = NULL;
-	button->prev = list->last;
-	if( list->last )
-		list->last->next = button;
-	list->last = button;
 
-	if( !list->first )
-		list->first = button;
+    list->insert(list->begin(), button);
 
 	return button;
 }
 
 void Touch_AddClientButton( const char *name, const char *texture, const char *command, float x1, float y1, float x2, float y2, byte *color, int round, float aspect, int flags )
 {
-	touch_button_t *button;
-
 	if( !touch.initialized )
 		return;
 	if( round )
@@ -718,7 +689,7 @@ void Touch_AddClientButton( const char *name, const char *texture, const char *c
 	{
 		y2 = y1 + ( x2 - x1 ) * (SCR_W/SCR_H) * aspect;
 	}
-	button = Touch_AddButton( &touch.list_user, name, texture, command, x1, y1, x2, y2, color );
+	auto button = Touch_AddButton( &touch.list_user, name, texture, command, x1, y1, x2, y2, color );
 	button->flags |= flags | TOUCH_FL_CLIENT | TOUCH_FL_NOEDIT;
 	button->aspect = aspect;
 }
@@ -726,9 +697,8 @@ void Touch_AddClientButton( const char *name, const char *texture, const char *c
 void Touch_LoadDefaults_f( void )
 {
 	int i;
-	for( i = 0; i < g_LastDefaultButton; i++ )
+	for( i = 0; i < g_DefaultButtons.size(); i++ )
 	{
-		touch_button_t *button;
 		float x1 = g_DefaultButtons[i].x1, 
 			  y1 = g_DefaultButtons[i].y1,
 			  x2 = g_DefaultButtons[i].x2,
@@ -745,7 +715,7 @@ void Touch_LoadDefaults_f( void )
 		}
 		
 		IN_TouchCheckCoords( &x1, &y1, &x2, &y2 );
-		button = Touch_AddButton( &touch.list_user, g_DefaultButtons[i].name, g_DefaultButtons[i].texturefile, g_DefaultButtons[i].command, x1, y1, x2, y2, g_DefaultButtons[i].color );
+		auto button = Touch_AddButton( &touch.list_user, g_DefaultButtons[i].name, g_DefaultButtons[i].texturefile, g_DefaultButtons[i].command, x1, y1, x2, y2, g_DefaultButtons[i].color );
 		button->flags |= g_DefaultButtons[i].flags;
 		button->aspect = g_DefaultButtons[i].aspect;
 	}
@@ -755,26 +725,25 @@ void Touch_LoadDefaults_f( void )
 // Add default button from client
 void Touch_AddDefaultButton( const char *name, const char *texturefile, const char *command, float x1, float y1, float x2, float y2, byte *color, int round, float aspect, int flags )
 {
-	if( g_LastDefaultButton >= 255 )
-		return;
-	Q_strncpy( g_DefaultButtons[g_LastDefaultButton].name, name, 32 );
-	Q_strncpy( g_DefaultButtons[g_LastDefaultButton].texturefile, texturefile, 256 );
-	Q_strncpy( g_DefaultButtons[g_LastDefaultButton].command, command, 256 );
-	g_DefaultButtons[g_LastDefaultButton].x1 = x1;
-	g_DefaultButtons[g_LastDefaultButton].y1 = y1;
-	g_DefaultButtons[g_LastDefaultButton].x2 = x2;
-	g_DefaultButtons[g_LastDefaultButton].y2 = y2;
-	MakeRGBA( g_DefaultButtons[g_LastDefaultButton].color, color[0], color[1], color[2], color[3] );
-	g_DefaultButtons[g_LastDefaultButton].round = (touchRound)round;
-	g_DefaultButtons[g_LastDefaultButton].aspect = aspect;
-	g_DefaultButtons[g_LastDefaultButton].flags = flags;
-	g_LastDefaultButton++;
+    touchdefaultbutton_t default_button;
+	Q_strncpy( default_button.name, name, 32 );
+	Q_strncpy( default_button.texturefile, texturefile, 256 );
+	Q_strncpy( default_button.command, command, 256 );
+    default_button.x1 = x1;
+    default_button.y1 = y1;
+    default_button.x2 = x2;
+    default_button.y2 = y2;
+	MakeRGBA( default_button.color, color[0], color[1], color[2], color[3] );
+    default_button.round = (touchRound)round;
+    default_button.aspect = aspect;
+    default_button.flags = flags;
+	g_DefaultButtons.push_back(default_button);
 }
 
 // Client may remove all default buttons from engine
 void Touch_ResetDefaultButtons( void )
 {
-	g_LastDefaultButton = 0;
+    g_DefaultButtons.clear();
 }
 void Touch_AddButton_f( void )
 {
@@ -783,10 +752,9 @@ void Touch_AddButton_f( void )
 
 	if( argc >= 12 )
 	{
-		touch_button_t *button;
 		MakeRGBA( color, Q_atoi( Cmd_Argv(8) ), Q_atoi( Cmd_Argv(9) ), 
 			Q_atoi( Cmd_Argv(10) ), Q_atoi( Cmd_Argv(11) ) );
-		button = Touch_AddButton( &touch.list_user, Cmd_Argv(1), Cmd_Argv(2), Cmd_Argv(3),
+		auto button = Touch_AddButton( &touch.list_user, Cmd_Argv(1), Cmd_Argv(2), Cmd_Argv(3),
 			Q_atof( Cmd_Argv(4) ), Q_atof( Cmd_Argv(5) ), 
 			Q_atof( Cmd_Argv(6) ), Q_atof( Cmd_Argv(7) ) ,
 			color );
@@ -830,18 +798,19 @@ void Touch_EnableEdit_f( void )
 	if( touch.state == state_none )
 		touch.state = state_edit;
 	touch.resize_finger = touch.move_finger = touch.look_finger = -1;
-	touch.move = NULL;
+	touch.move.reset();
 	touch.configchanged = true;
 }
 
 void Touch_DisableEdit_f( void )
 {
 	touch.state = state_none;
-	if( touch.edit )
-		touch.edit->finger = -1;
-	if( touch.selection )
-		touch.selection->finger = -1;
-	touch.edit = touch.selection = NULL;
+	if( auto button = touch.edit.lock() )
+		button->finger = -1;
+	if( auto button = touch.selection.lock() )
+        button->finger = -1;
+	touch.edit.reset();
+    touch.selection.reset();
 	touch.resize_finger = touch.move_finger = touch.look_finger = -1;
 
 	if( touch_in_menu->integer )
@@ -877,8 +846,9 @@ void Touch_InitEditor( void )
 	Touch_AddButton( &touch.list_edit, "cancel", "touch_default/edit_reset.tga", "touch_reloadconfig", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
 	Touch_AddButton( &touch.list_edit, "close", "#Cancel and reset", "", x, y, x + 0.2, y + 0.1, (byte*)"\xff\xff\xff\xff" )->flags |= TOUCH_FL_NOEDIT;
 	y += 0.2;
-	touch.hidebutton = Touch_AddButton( &touch.list_edit, "showhide", "touch_default/edit_hide.tga", "touch_toggleselection", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" );
-	touch.hidebutton->flags |= TOUCH_FL_HIDE | TOUCH_FL_NOEDIT;
+	auto button = Touch_AddButton( &touch.list_edit, "showhide", "touch_default/edit_hide.tga", "touch_toggleselection", 0, y, x, y + 0.1, (byte*)"\xff\xff\xff\xff" );
+    touch.hidebutton = button;
+    button->flags |= TOUCH_FL_HIDE | TOUCH_FL_NOEDIT;
 }
 
 void Touch_Init( void )
@@ -896,10 +866,10 @@ void Touch_Init( void )
 	touch.precision = false;
 	MakeRGBA( touch.scolor, 255, 255, 255, 255 );
 	touch.swidth = 1;
-	g_LastDefaultButton = 0;
+    g_DefaultButtons.clear();
 
-	touch.list_edit.first = touch.list_edit.last = NULL;
-	touch.list_user.first = touch.list_user.last = NULL;
+	touch.list_edit.clear();
+	touch.list_user.clear();
 
 	// fill default buttons list
 	MakeRGBA( color, 255, 255, 255, 150 );
@@ -1028,7 +998,7 @@ void Touch_InitConfig( void )
 	touch.joytexture = GL_LoadTexture( touch_joy_texture->string, NULL, 0, TF_NOPICMIP, NULL );
 	touch.configchanged = false;
 }
-qboolean Touch_IsVisible( touch_button_t *button )
+qboolean Touch_IsVisible( const std::shared_ptr<touch_button_t> &button )
 {
 	if( !(button->flags & TOUCH_FL_CLIENT) && touch.clientonly )
 		return false; // skip nonclient buttons in clientonly mode
@@ -1170,9 +1140,7 @@ float Touch_DrawText( float x1, float y1, float x2, float y2, const char *s, byt
 
 void Touch_DrawButtons( touchbuttonlist_t *list )
 {
-	touch_button_t *button;
-	
-	for( button = list->first; button; button = button->next )
+	for( const auto &button : *list )
 	{
 		if( Touch_IsVisible( button ) )
 		{
@@ -1257,8 +1225,6 @@ void Touch_DrawButtons( touchbuttonlist_t *list )
 
 void Touch_Draw( void )
 {
-	touch_button_t *button;
-
 	if( !touch.initialized || (!touch_enable->integer && !touch.clientonly) )
 		return;
 
@@ -1297,12 +1263,12 @@ void Touch_Draw( void )
 
 		MakeRGBA( color, 255, 255, 255, 255 );
 
-		if( touch.edit )
+		if( auto edit_button = touch.edit.lock() )
 		{
-			float	x1 = touch.edit->x1,
-					y1 = touch.edit->y1,
-					x2 = touch.edit->x2,
-					y2 = touch.edit->y2;
+			float	x1 = edit_button->x1,
+					y1 = edit_button->y1,
+					x2 = edit_button->x2,
+					y2 = edit_button->y2;
 			IN_TouchCheckCoords( &x1, &y1, &x2, &y2 );
 			Touch_DrawTexture( x1, y1, x2, y2, cls.fillImage, 0, 255, 0, 32 );
 		}
@@ -1314,9 +1280,8 @@ void Touch_Draw( void )
 			Touch_DrawButtons( &touch.list_edit );
 
 		/// TODO: move to mainui
-		if( touch.selection )
+		if( auto button = touch.selection.lock() )
 		{
-			button = touch.selection;
 			Touch_DrawTexture( B(x1), B(y1), B(x2), B(y2), cls.fillImage, 255, 0, 0, 64 );
 
 			Con_DrawString( 0, TO_SCRN_Y(GRID_Y * 11), "Selection:", color );
@@ -1331,7 +1296,8 @@ void Touch_Draw( void )
 
 	pglColor4ub( 255, 255, 255, 255 );
 
-	if( ( touch.move_finger != -1 ) && touch.move && touch_move_indicator->value )
+    auto move_button = touch.move.lock();
+	if( ( touch.move_finger != -1 ) && move_button && touch_move_indicator->value )
 	{
 		float width;
 		float height;
@@ -1340,15 +1306,15 @@ void Touch_Draw( void )
 			touch_joy_texture->modified = false;
 			touch.joytexture = GL_LoadTexture( touch_joy_texture->string, NULL, 0, TF_NOPICMIP, NULL );
 		}
-		if( touch.move->type == touch_move )
+		if( move_button->type == touch_move )
 		{
 			width =  touch_sidezone->value;
 			height = touch_forwardzone->value;
 		}
 		else
 		{
-			width = (touch.move->x2 - touch.move->x1)/2;
-			height = (touch.move->y2 - touch.move->y1)/2;
+			width = (move_button->x2 - move_button->x1)/2;
+			height = (move_button->y2 - move_button->y1)/2;
 		}
 		pglColor4ub( 255, 255, 255, 128 );
 		R_DrawStretchPic( TO_SCRN_X( touch.move_start_x - GRID_X * touch_move_indicator->value ),
@@ -1374,21 +1340,21 @@ void IN_TouchEditClear( void )
 
 	touch.state = state_edit;
 
-	if( touch.edit )
-		touch.edit->finger = -1;
+	if( auto button = touch.edit.lock() )
+        button->finger = -1;
 
 	touch.resize_finger = -1;
-	touch.edit = NULL;
-	touch.selection = NULL;
+	touch.edit.reset();
+	touch.selection.reset();
 }
 
 static void Touch_EditMove( touchEventType type, int fingerID, float x, float y, float dx, float dy )
 {
-	if( touch.edit->finger == fingerID )
+    auto button = touch.edit.lock();
+	if( button->finger == fingerID )
 	{
 		if( type == event_up ) // shutdown button move
 		{
-			touch_button_t *button = touch.edit;
 			IN_TouchCheckCoords( &B(x1), &B(y1), &B(x2), &B(y2) );
 			IN_TouchEditClear();
 			if( button->type == touch_command )
@@ -1396,21 +1362,22 @@ static void Touch_EditMove( touchEventType type, int fingerID, float x, float y,
 				touch.selection = button;
 
 				// update "hide" editor button
-				touch.hidebutton->texture = -1;
-				touch.hidebutton->flags &= ~TOUCH_FL_HIDE;
+                auto hidebutton = touch.hidebutton.lock();
+                hidebutton->texture = -1;
+                hidebutton->flags &= ~TOUCH_FL_HIDE;
 
 				if( button->flags & TOUCH_FL_HIDE )
-					Q_strcpy( touch.hidebutton->texturefile, "touch_default/edit_show.tga" );
+					Q_strcpy( hidebutton->texturefile, "touch_default/edit_show.tga" );
 				else
-					Q_strcpy( touch.hidebutton->texturefile, "touch_default/edit_hide.tga" );
+					Q_strcpy( hidebutton->texturefile, "touch_default/edit_hide.tga" );
 			}
 		}
 		if( type == event_motion ) // shutdown button move
 		{
-			touch.edit->y1 += dy;
-			touch.edit->y2 += dy;
-			touch.edit->x1 += dx;
-			touch.edit->x2 += dx;
+            button->y1 += dy;
+            button->y2 += dy;
+            button->x1 += dx;
+            button->x2 += dx;
 		}
 	}
 	else 
@@ -1433,8 +1400,8 @@ static void Touch_EditMove( touchEventType type, int fingerID, float x, float y,
 		{
 			if( touch.resize_finger == fingerID )
 			{
-				touch.edit->y2 += dy;
-				touch.edit->x2 += dx;
+                button->y2 += dy;
+                button->x2 += dx;
 			}
 		}
 	}
@@ -1451,23 +1418,24 @@ static void Touch_Motion( touchEventType type, int fingerID, float x, float y, f
 		if( touch_sidezone->value <= 0 )
 			Cvar_SetFloat( "touch_sidezone", 0.3 );
 
-		if( !touch.move || touch.move->type == touch_move )
+        auto move_button = touch.move.lock();
+		if( !move_button || move_button->type == touch_move )
 		{
 			// move relative to touch start
 			touch.forward = ( touch.move_start_y - y ) / touch_forwardzone->value;
 			touch.side = ( x - touch.move_start_x ) / touch_sidezone->value;
 		}
-		else if( touch.move->type == touch_joy )
+		else if( move_button->type == touch_joy )
 		{
 			// move relative to joy center
-			touch.forward = ( ( touch.move->y2 + touch.move->y1 ) - y * 2 ) / ( touch.move->y2 - touch.move->y1 ) * touch_joy_radius->value;
-			touch.side = ( x * 2 - ( touch.move->x2 + touch.move->x1 ) ) / ( touch.move->x2 - touch.move->x1 ) * touch_joy_radius->value;
+			touch.forward = ( ( move_button->y2 + move_button->y1 ) - y * 2 ) / ( move_button->y2 - move_button->y1 ) * touch_joy_radius->value;
+			touch.side = ( x * 2 - ( move_button->x2 + move_button->x1 ) ) / ( move_button->x2 - move_button->x1 ) * touch_joy_radius->value;
 		}
-		else if( touch.move->type == touch_dpad )
+		else if( move_button->type == touch_dpad )
 		{
 			// like joy, but without acceleration. useful for bhop
-			touch.forward = round( ( (touch.move->y2 + touch.move->y1) - y * 2 ) / ( touch.move->y2 - touch.move->y1 ) * touch_dpad_radius->value );
-			touch.side = round( ( x * 2 - (touch.move->x2 + touch.move->x1) ) / ( touch.move->x2 - touch.move->x1 ) * touch_dpad_radius->value );
+			touch.forward = round( ( (move_button->y2 + move_button->y1) - y * 2 ) / ( move_button->y2 - move_button->y1 ) * touch_dpad_radius->value );
+			touch.side = round( ( x * 2 - (move_button->x2 + move_button->x1) ) / ( move_button->x2 - move_button->x1 ) * touch_dpad_radius->value );
 		}
 
 		touch.forward = bound( -1, touch.forward, 1 );
@@ -1531,13 +1499,11 @@ static void Touch_Motion( touchEventType type, int fingerID, float x, float y, f
 
 static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type, int fingerID, float x, float y, float dx, float dy )
 {
-	touch_button_t *button;
 	qboolean result = false;
 
 	// run from end(front) to start(back)
-	for( button = list->last; button; button = button->prev )
+	for( const auto &button : *list )
 	{
-
 		// skip invisible buttons
 		if( !Touch_IsVisible( button ) )
 			continue;
@@ -1582,14 +1548,12 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 
 					if( touch.look_finger == fingerID )
 					{
-						touch_button_t *newbutton;
-
 						// this is an error, try recover
 						touch.move_finger = touch.look_finger = -1;
 
 						// player touched touch_move with enabled look mode
 						// and same finger id. release all move triggers
-						for( newbutton = list->first; newbutton; newbutton = newbutton->next )
+						for( const auto &newbutton : *list )
 							if( ( newbutton->type == touch_move ) || ( newbutton->type == touch_look ) ) newbutton->finger = -1;
 
 						MsgDev( D_NOTE, "Touch: touch_move on look finger %d!\n", fingerID );
@@ -1600,31 +1564,31 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 					touch.move_finger = fingerID;
 					touch.move = button;
 
-					if( touch.move->type == touch_move )
+					if( button->type == touch_move )
 					{
 						// initial position is first touch
 						touch.move_start_x = x;
 						touch.move_start_y = y;
 					}
-					else if( touch.move->type == touch_joy )
+					else if( button->type == touch_joy )
 					{
 						// initial position is button center
-						touch.move_start_y = (touch.move->y2 + touch.move->y1) / 2;
-						touch.move_start_x = (touch.move->x2 + touch.move->x1) / 2;
+						touch.move_start_y = (button->y2 + button->y1) / 2;
+						touch.move_start_x = (button->x2 + button->x1) / 2;
 
 						// start move instanly
-						touch.forward = ((touch.move->y2 + touch.move->y1) - y * 2) / (touch.move->y2 - touch.move->y1);
-						touch.side = (x * 2 - (touch.move->x2 + touch.move->x1)) / (touch.move->x2 - touch.move->x1);
+						touch.forward = ((button->y2 + button->y1) - y * 2) / (button->y2 - button->y1);
+						touch.side = (x * 2 - (button->x2 + button->x1)) / (button->x2 - button->x1);
 					}
-					else if( touch.move->type == touch_dpad )
+					else if( button->type == touch_dpad )
 					{
 						// dame as joy, but round
-						touch.move_start_y = (touch.move->y2 + touch.move->y1) / 2;
-						touch.move_start_x = (touch.move->x2 + touch.move->x1) / 2;
+						touch.move_start_y = (button->y2 + button->y1) / 2;
+						touch.move_start_x = (button->x2 + button->x1) / 2;
 
 						// start move instanly
-						touch.forward = round(((touch.move->y2 + touch.move->y1) - y * 2) / (touch.move->y2 - touch.move->y1));
-						touch.side = round((x * 2 - (touch.move->x2 + touch.move->x1)) / (touch.move->x2 - touch.move->x1));
+						touch.forward = round(((button->y2 + button->y1) - y * 2) / (button->y2 - button->y1));
+						touch.side = round((x * 2 - (button->x2 + button->x1)) / (button->x2 - button->x1));
 					}
 				}
 
@@ -1643,14 +1607,12 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 
 					if( touch.move_finger == fingerID )
 					{
-						touch_button_t *newbutton;
-
 						// this is an error, try recover
 						touch.move_finger = touch.look_finger = -1;
 
 						// player touched touch_move with enabled look mode
 						// and same finger id. release all move triggers
-						for( newbutton = list->first; newbutton; newbutton = newbutton->next )
+						for( const auto &newbutton : *list )
 							if( ( newbutton->type == touch_move ) || ( newbutton->type == touch_look ) ) newbutton->finger = -1;
 
 						MsgDev( D_NOTE, "touch: touch_look on move finger %d!\n", fingerID );
@@ -1694,7 +1656,7 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 				{
 					touch.move_finger = -1;
 					touch.forward = touch.side = 0;
-					touch.move = NULL;
+					touch.move.reset();
 				}
 
 				// release look buttons
@@ -1704,11 +1666,9 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 
 					if( touch_follow_attack_enable->value > 0.0f )
 					{
-						touch_button_t *newbutton;
-
 						// player touched touch_move with enabled look mode
 						// and same finger id. release all move triggers
-						for( newbutton = list->first; newbutton; newbutton = newbutton->next )
+						for( const auto newbutton : *list )
 							if( !Q_strcmp( newbutton->command, "+attack" )   )
 							{
 								float w = ( newbutton->x2 - newbutton->x1 ), h = ( newbutton->y2 - newbutton->y1 );
@@ -1734,8 +1694,6 @@ static qboolean Touch_ButtonPress( touchbuttonlist_t *list, touchEventType type,
 
 static qboolean Touch_ButtonEdit( touchEventType type, int fingerID, float x, float y, float dx, float dy )
 {
-	touch_button_t *button;
-
 	// edit buttons are on y1
 	if( type == event_down )
 	{
@@ -1750,8 +1708,10 @@ static qboolean Touch_ButtonEdit( touchEventType type, int fingerID, float x, fl
 	}
 
 	// run from end(front) to start(back)
-	for( button = touch.list_user.last; button; button = button->prev )
+	for( auto iter = touch.list_user.begin(); iter != touch.list_user.end(); ++iter )
 	{
+        // just copy to ensure it not effected by iter
+        auto button = *iter;
 		if( type == event_down )
 		{
 			if( ( x > button->x1 &&
@@ -1766,22 +1726,15 @@ static qboolean Touch_ButtonEdit( touchEventType type, int fingerID, float x, fl
 						continue;
 
 				touch.edit = button;
-				touch.selection = NULL;
+				touch.selection.reset();
 
 				// make button last to bring it up
-				if( ( button->next ) && ( button->type == touch_command ) )
-				{
-					if( button->prev )
-						button->prev->next = button->next;
-					else 
-						touch.list_user.first = button->next;
-
-					button->next->prev = button->prev;
-					touch.list_user.last->next = button;
-					button->prev = touch.list_user.last;
-					button->next = NULL;
-					touch.list_user.last = button;
-				}
+                // warning: iter is changed
+                if( ( button->type == touch_command ) )
+                {
+                    iter = std::rotate(iter, iter + 1, touch.list_user.end());
+                }
+                // then we return, nothing happened after iter changed
 				touch.state = state_edit_move;
 				return true;
 			}
@@ -1793,8 +1746,9 @@ static qboolean Touch_ButtonEdit( touchEventType type, int fingerID, float x, fl
 
 	if( type == event_down )
 	{
-		touch.selection = NULL;
-		touch.hidebutton->flags |= TOUCH_FL_HIDE;
+		touch.selection.reset();
+        if(auto button = touch.hidebutton.lock())
+            button->flags |= TOUCH_FL_HIDE;
 	}
 
 	return false;

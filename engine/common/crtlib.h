@@ -351,27 +351,6 @@ void _Q_memcpy( void *dest, const void *src, size_t count, const char *filename,
 int _Q_memcmp( const void *src0, const void *src1, size_t count, const char *filename, int fileline );
 void _Q_memmove( void *dest, const void *src, size_t count, const char *filename, int fileline );
 
-//
-// zone.c
-//
-void *_Mem_Realloc( mempool_t *poolptr, void *memptr, size_t size, const char *filename, int fileline );
-void *_Mem_Alloc( mempool_t *poolptr, size_t size, const char *filename, int fileline );
-mempool_t *_Mem_AllocPool( const char *name, const char *filename, int fileline );
-void _Mem_FreePool( mempool_t **poolptr, const char *filename, int fileline );
-void _Mem_EmptyPool( mempool_t *poolptr, const char *filename, int fileline );
-void _Mem_Free( void *data, const char *filename, int fileline );
-void _Mem_Check( const char *filename, int fileline );
-qboolean Mem_IsAllocatedExt( mempool_t *poolptr, void *data );
-void Mem_PrintList( size_t minallocationsize );
-void Mem_PrintStats( void );
-
-#define Mem_Alloc( pool, size ) _Mem_Alloc( pool, size, __FILE__, __LINE__ )
-#define Mem_Realloc( pool, ptr, size ) _Mem_Realloc( pool, ptr, size, __FILE__, __LINE__ )
-#define Mem_Free( mem ) _Mem_Free( mem, __FILE__, __LINE__ )
-#define Mem_AllocPool( name ) _Mem_AllocPool( name, __FILE__, __LINE__ )
-#define Mem_FreePool( pool ) _Mem_FreePool( pool, __FILE__, __LINE__ )
-#define Mem_EmptyPool( pool ) _Mem_EmptyPool( pool, __FILE__, __LINE__ )
-#define Mem_IsAllocated( mem ) Mem_IsAllocatedExt( NULL, mem )
-#define Mem_Check() _Mem_Check( __FILE__, __LINE__ )
+#include "llm.h"
 	
 #endif//STDLIB_H

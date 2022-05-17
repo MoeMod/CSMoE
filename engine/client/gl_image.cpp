@@ -2068,6 +2068,11 @@ namespace xe {
 			textureCache.evict();
 		}
 	}
+
+	void TexLru_Clear()
+	{
+        textureCache.clear();
+	}
 }
 
 /*
@@ -3066,6 +3071,8 @@ void R_ShutdownImages( void )
 		if( GL_Support( GL_TEXTURECUBEMAP_EXT ))
 			pglBindTexture( GL_TEXTURE_CUBE_MAP_ARB, 0 );
 	}
+
+    xe::TexLru_Clear();
 
 	for( auto &image : r_textures )
 	{

@@ -560,29 +560,6 @@ void Host_Clear_f( void )
 #endif
 }
 
-/*
-===============
-Host_MemStats_f
-===============
-*/
-void Host_MemStats_f( void )
-{
-	switch( Cmd_Argc( ))
-	{
-	case 1:
-		Mem_PrintList( 1<<30 );
-		Mem_PrintStats();
-		break;
-	case 2:
-		Mem_PrintList( Q_atoi( Cmd_Argv( 1 )) * 1024 );
-		Mem_PrintStats();
-		break;
-	default:
-		Msg( "Usage: memlist <all>\n" );
-		break;
-	}
-}
-
 void Host_LowMem_f( void )
 {
     Sys_LowMemory();
@@ -1357,7 +1334,6 @@ void Host_InitCommon( int argc, const char** argv, const char *progname, qboolea
 	Q_snprintf( dev_level, sizeof( dev_level ), "%i", host.developer );
 	Cvar_Get( "developer", dev_level, CVAR_INIT, "current developer level" );
 	Cmd_AddCommand( "exec", Host_Exec_f, "execute a script file" );
-	Cmd_AddCommand( "memlist", Host_MemStats_f, "prints memory pool information" );
 	Cmd_AddCommand( "lowmem", Host_LowMem_f, "release some memory" );
 	Cmd_AddCommand( "userconfigd", Host_Userconfigd_f, "execute all scripts from userconfig.d" );
 	cmd_scripting = Cvar_Get( "cmd_scripting", "0", CVAR_ARCHIVE, "enable simple condition checking and variable operations" );

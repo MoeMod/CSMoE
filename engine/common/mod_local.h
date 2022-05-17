@@ -92,6 +92,7 @@ typedef struct
 
 extern world_static_t	world;
 extern mempool_t		*com_studiocache;
+extern mempool_t		*mempool_mdl;
 extern model_t		*loadmodel;
 extern convar_t		*mod_studiocache;
 extern int		bmodel_version;	// only actual during loading

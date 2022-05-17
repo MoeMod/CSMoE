@@ -359,7 +359,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 		return;
 	}
 
-	mod->mempool = Mem_AllocPool( va( "^2%s^7", mod->name ));
+	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
 	psprite = (msprite_t *)Mem_Alloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata
@@ -518,7 +518,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 
 	// determine how many frames we needs
 	numframes = (pix->width * pix->height) / (w * h);
-	mod->mempool = Mem_AllocPool( va( "^2%s^7", mod->name ));
+	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
 	psprite = (msprite_t *)Mem_Alloc( mod->mempool, sizeof( msprite_t ) + ( numframes - 1 ) * sizeof( psprite->frames ));
 	mod->cache.data = psprite;	// make link to extradata
 

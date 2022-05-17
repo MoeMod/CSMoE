@@ -4074,7 +4074,7 @@ wfile_t *W_Open( const char *filename, const char *mode )
 
 	// copy wad name
 	Q_strncpy( wad->filename, filename, sizeof( wad->filename ));
-	wad->mempool = Mem_AllocPool( filename );
+	wad->mempool = Mem_AllocSubPool( fs_mempool, filename );
 	wad->filetime = FS_SysFileTime( filename );
 
 	// if the file is opened in "write", "append", or "read/write" mode
@@ -4227,6 +4227,7 @@ FILESYSTEM PUBLIC API
 =============================================================================
 */
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline );
+void FSAPI_MemFree( void *data, const char *filename, int fileline );
 
 fs_api_t g_fsapi =
 {
@@ -4251,12 +4252,25 @@ fs_api_t g_fsapi =
 	FS_AddPack_Fullpath,
 	Msg,
 	FSAPI_MemAlloc,
-	_Mem_Free
+    FSAPI_MemFree
 };
 
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline )
 {
+#ifdef XASH_MEMDBG
 	return _Mem_Alloc( fs_mempool, size, filename, fileline );
+#else
+	return Mem_Alloc( fs_mempool, size );
+#endif
+}
+
+void FSAPI_MemFree( void *data, const char *filename, int fileline )
+{
+#ifdef XASH_MEMDBG
+    return _Mem_Free(data, filename, fileline);
+#else
+    return Mem_Free(data);
+#endif
 }
 
 int GAME_EXPORT FS_GetAPI( fs_api_t *g_api )

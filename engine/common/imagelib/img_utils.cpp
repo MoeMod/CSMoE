@@ -194,7 +194,6 @@ void Image_Init( void )
 
 void Image_Shutdown( void )
 {
-	Mem_Check(); // check for leaks
 	Mem_FreePool( &host.imagepool );
 }
 

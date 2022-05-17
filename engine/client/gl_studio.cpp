@@ -4170,7 +4170,7 @@ void Mod_LoadStudioModel( model_t *mod, const void *buffer, qboolean *loaded )
 	studiohdr_t	*phdr;
 
 	if( loaded ) *loaded = false;
-	loadmodel->mempool = Mem_AllocPool( va( "^2%s^7", loadmodel->name ));
+	loadmodel->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", loadmodel->name ));
 	loadmodel->type = mod_studio;
 
 	phdr = R_StudioLoadHeader( mod, buffer );

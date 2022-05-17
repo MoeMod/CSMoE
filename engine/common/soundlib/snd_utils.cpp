@@ -79,7 +79,6 @@ void Sound_Init( void )
 
 void Sound_Shutdown( void )
 {
-	Mem_Check(); // check for leaks
 	Mem_FreePool( &host.soundpool );
 }
 

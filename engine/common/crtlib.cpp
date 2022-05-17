@@ -86,7 +86,11 @@ char *_copystring( mempool_t *mempool, const char *s, const char *filename, int 
 	if( !s ) return NULL;
 	if( !mempool ) mempool = host.mempool;
 
+#ifdef XASH_MEMDBG
 	b = (char*)_Mem_Alloc( mempool, Q_strlen( s ) + 1, filename, fileline );
+#else
+	b = (char*)Mem_Alloc( mempool, Q_strlen( s ) + 1 );
+#endif
 	Q_strcpy( b, s );
 
 	return b;

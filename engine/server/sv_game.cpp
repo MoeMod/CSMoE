@@ -841,8 +841,7 @@ void SV_FreePrivateData( edict_t *pEdict )
 	if( svgame.dllFuncs2.pfnOnFreeEntPrivateData != NULL )
 		svgame.dllFuncs2.pfnOnFreeEntPrivateData( pEdict );
 
-	if( Mem_IsAllocatedExt( svgame.mempool, pEdict->pvPrivateData ))
-		Mem_Free( pEdict->pvPrivateData );
+    Mem_Free( pEdict->pvPrivateData );
 
 	pEdict->pvPrivateData = NULL;
 }
@@ -5119,8 +5118,7 @@ void SV_SpawnEntities( const char *mapname, char *entities )
 	SV_LoadFromFile( mapname, entities );
 
 	// free memory that allocated by entpatch only
-	if( !Mem_IsAllocatedExt( sv.worldmodel->mempool, entities ))
-		Mem_Free( entities );
+    Mem_Free( entities );
 
 	MsgDev( D_NOTE, "Total %i entities spawned\n", svgame.numEntities );
 }

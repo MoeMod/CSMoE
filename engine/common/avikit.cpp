@@ -736,11 +736,8 @@ void AVI_FreeVideo( movie_state_t *state )
 #ifdef USE_VFW
 	if( !state ) return;
 
-	if( Mem_IsAllocatedExt( cls.mempool, state ))
-	{
-		AVI_CloseVideo( state );
-		Mem_Free( state );
-	}
+	AVI_CloseVideo( state );
+    Mem_Free( state );
 #endif
 }
 
