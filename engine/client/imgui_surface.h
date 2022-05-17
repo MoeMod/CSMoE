@@ -27,5 +27,6 @@ void ImGui_Surface_SetCustomBlend( int blendsrc, int blenddst );
 void ImGui_Surface_DrawRectangle(float x, float y, float w, float h, byte r, byte g, byte b, byte a);
 void ImGui_Surface_DrawImage(int texnum, float x1, float y1, float x2, float y2, float s1, float t1, float s2, float t2, byte r, byte g, byte b, byte a);
 void ImGui_Surface_EnableScissor(float x, float y, float w, float h);
+void ImGui_Surface_EnableFullScreenScissor();
 void ImGui_Surface_DisableScissor();
 void ImGui_Surface_Flush();

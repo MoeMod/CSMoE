@@ -271,6 +271,12 @@ void ImGui_Surface_EnableScissor(float x, float y, float w, float h)
 	drawlist->PushClipRect(ImVec2(x, y), ImVec2(x + w, y + h));
 }
 
+void ImGui_Surface_EnableFullScreenScissor()
+{
+    ImDrawList* drawlist = ImGui::GetBackgroundDrawList();
+    drawlist->PushClipRectFullScreen();
+}
+
 void ImGui_Surface_DisableScissor()
 {
 	ImDrawList* drawlist = ImGui::GetBackgroundDrawList();

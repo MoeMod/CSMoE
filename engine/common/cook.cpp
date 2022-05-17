@@ -151,7 +151,7 @@ namespace xe {
 
     void Cook_SearchResursive(std::vector<std::string> &out, const char *start_dir, const char *pattern)
     {
-        auto t = FS_Search( va("%s/*", start_dir), true, true );
+        auto t = FS_Search( va("%s/*", start_dir), true, false );
         for( int i = 0; t && i < t->numfilenames; i++ )
         {
             auto filename = t->filenames[i];
@@ -191,12 +191,15 @@ namespace xe {
 
             Cook_SearchResursive(tex_files, "models/texture", "*.bmp");
             Cook_SearchResursive(tex_files, "models/texture", "*.tga");
+            Cook_SearchResursive(tex_files, "gfx/env", "*.bmp");
+            Cook_SearchResursive(tex_files, "gfx/env", "*.tga");
+            Cook_SearchResursive(tex_files, "overviews", "*.bmp");
+            Cook_SearchResursive(tex_files, "overviews", "*.tga");
+
             Msg(  "Cook: found %d texture files\n", (int)tex_files.size() );
 
             auto local_cook_ctx = g_cook_ctx;
             local_cook_ctx->start_time = std::chrono::high_resolution_clock::now();
-
-            std::vector<boost::asio::awaitable<void>> task_list;
 
             for(auto mdl : mdl_files)
             {

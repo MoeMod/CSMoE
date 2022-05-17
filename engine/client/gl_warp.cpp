@@ -67,7 +67,7 @@ float r_turbsin[] =
 
 static qboolean CheckSkybox( const char *name )
 {
-	const char	*skybox_ext[] = { "dds", "tga", "bmp" };
+	const char	*skybox_ext[] = { "astc", "dds", "tga", "bmp" };
 	int		i, j, num_checked_sides;
 	const char	*sidename;
 
@@ -429,11 +429,25 @@ void R_SetupSky( const char *skyboxname )
 		return; // clear old skybox
 	}
 
-	Q_snprintf( loadname, sizeof( loadname ), "gfx/env/%s", skyboxname );
-	FS_StripExtension( loadname );
+    loadname[0] = '\0';
+    // try load ddc
+    if( !loadname[0] || !CheckSkybox( loadname ) )
+    {
+        Q_snprintf( loadname, sizeof( loadname ), "ddc/gfx/env/%s", skyboxname );
+        FS_StripExtension( loadname );
 
-	if( loadname[Q_strlen( loadname ) - 1] == '_' )
-		loadname[Q_strlen( loadname ) - 1] = '\0';
+        if( loadname[Q_strlen( loadname ) - 1] == '_' )
+            loadname[Q_strlen( loadname ) - 1] = '\0';
+    }
+    // fallback to default
+    if( !loadname[0] || !CheckSkybox( loadname ) )
+    {
+        Q_snprintf(loadname, sizeof(loadname), "gfx/env/%s", skyboxname);
+        FS_StripExtension(loadname);
+
+        if (loadname[Q_strlen(loadname) - 1] == '_')
+            loadname[Q_strlen(loadname) - 1] = '\0';
+    }
 
 	// to prevent infinite recursion if default skybox was missed
 	if( !CheckSkybox( loadname ) && Q_stricmp( loadname, "gfx/env/desert" ))

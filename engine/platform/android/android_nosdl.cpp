@@ -15,8 +15,6 @@ GNU General Public License for more details.
 #include "common.h"
 #include "client.h"
 
-#include "nanogl.h" //use NanoGL
-
 #include <pthread.h>
 #include <jni.h>
 #include <sys/prctl.h>
