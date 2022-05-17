@@ -23,6 +23,10 @@ GNU General Public License for more details.
 #ifdef XASH_NANOGL
 #include <GL/nanogl.h>
 #endif
+#ifdef XASH_GL4ES
+#include "gl4esinit.h"
+#include "gl4eshint.h"
+#endif
 
 #ifdef WIN32
 // Enable NVIDIA High Performance Graphics while using Integrated Graphics.
@@ -410,6 +414,8 @@ void EXPORT *GL_GetProcAddress( const char *name )
 #elif defined( XASH_QINDIEGL )
 	PROC wrap_wglGetProcAddress(LPCSTR s);
 	void* func = wrap_wglGetProcAddress(name);
+#elif defined( XASH_GL4ES )
+	void* func = gl4es_GetProcAddress( name );
 #else
 	void *func = SDL_GL_GetProcAddress(name);
 #endif
@@ -534,7 +540,7 @@ void GL_SetupAttributes()
 #ifdef XASH_NANOGL
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 1 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
-#elif defined( XASH_WES ) || defined( XASH_REGAL )
+#elif defined( XASH_WES ) || defined( XASH_REGAL ) || defined( XASH_GL4ES )
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 2 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
 #endif
@@ -892,6 +898,23 @@ void GL_InitExtensions( void )
 	tr.framecount = tr.visframecount = 1;
 }
 
+#ifdef XASH_WES
+extern "C" void wes_init();
+#endif
+#ifdef XASH_GL4ES
+void GL4ES_GetMainFBSize( int *width, int *height )
+{
+	*width = glState.width;
+	*height = glState.height;
+}
+void *GL4ES_GetProcAddress( const char *name )
+{
+	if( !Q_strcmp(name, "glShadeModel") )
+		// combined gles/gles2/gl implementation exports this, but it is invalid
+		return NULL;
+	return GL_GetProcAddress( name );
+}
+#endif
 
 /*
 =================
@@ -951,8 +974,17 @@ qboolean GL_CreateContext( void )
 	
 #endif
 #ifdef XASH_WES
-	void wes_init();
 	wes_init();
+#endif
+#ifdef XASH_GL4ES
+	set_getprocaddress( GL4ES_GetProcAddress );
+	set_getmainfbsize( GL4ES_GetMainFBSize );
+	initialize_gl4es();
+
+	// merge glBegin/glEnd in beams and console
+	pglHint( GL_BEGINEND_HINT_GL4ES, 1 );
+	// dxt unpacked to 16-bit looks ugly
+	pglHint( GL_AVOID16BITS_HINT_GL4ES, 1 );
 #endif
 
 	return true;
@@ -1004,6 +1036,8 @@ qboolean GL_DeleteContext( void )
 	wrap_wglDeleteContext(wrap_wglGetCurrentContext());
 	void QindieGL_Destroy(void);
 	QindieGL_Destroy();
+#elif defined XASH_GL4ES
+	close_gl4es();
 #else
 	if (glw_state.context)
 	{

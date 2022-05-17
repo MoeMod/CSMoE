@@ -19,15 +19,14 @@ android {
 
     defaultConfig {
         applicationId "in.celest.xash3d.csbtem"
-        minSdkVersion 28
+        minSdkVersion 24
         targetSdkVersion 30
 
         externalNativeBuild {
             cmake {
                 arguments "-DXASH_SDL=1",
                         "-DXASH_NANOGL=1",
-                        "-DXASH_STATIC_GAMELIB=1",
-                        "-DMAINUI_USE_CUSTOM_FONT_RENDER=0"
+                        "-DXASH_STATIC_GAMELIB=1"
                 version "3.18.1"
             }
         }
