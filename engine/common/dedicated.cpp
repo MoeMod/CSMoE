@@ -393,7 +393,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 	}
 
 	// add a point in the center to help keep warp valid
-	poly = (glpoly_t *)Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
+	poly = (glpoly_t *)Mem_ZeroAlloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
 	poly->next = warpface->polys;
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
@@ -669,7 +669,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 
 	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
-	psprite = (msprite_t *)Mem_Alloc( mod->mempool, size );
+	psprite = (msprite_t *)Mem_ZeroAlloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata
 
 	psprite->type = LittleLong(pin.type);

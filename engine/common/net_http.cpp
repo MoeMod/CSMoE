@@ -464,7 +464,7 @@ Add new download to end of queue
 */
 void HTTP_AddDownload(const char* path, int size, bool process)
 {
-    httpfile_t* httpfile = (httpfile_t*)Mem_Alloc(net_mempool, sizeof(httpfile_t));
+    httpfile_t* httpfile = (httpfile_t*)Mem_ZeroAlloc(net_mempool, sizeof(httpfile_t));
 
     MsgDev(D_INFO, "File %s queued to download\n", path);
 

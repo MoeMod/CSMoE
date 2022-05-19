@@ -627,7 +627,7 @@ static void Mod_LoadSubmodels( const dlump_t *l )
 	}
 
 	// allocate extradata
-	out = (dmodel_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (dmodel_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 	loadmodel->submodels = out;
 	loadmodel->numsubmodels = count;
 	if( world.loading ) world.max_surfaces = 0;
@@ -664,7 +664,7 @@ static void Mod_LoadSubmodels( const dlump_t *l )
 	}
 
 	if( world.loading )
-		world.draw_surfaces = (msurface_t * *)Mem_Alloc( loadmodel->mempool, world.max_surfaces * sizeof( msurface_t* ));
+		world.draw_surfaces = (msurface_t * *)Mem_ZeroAlloc( loadmodel->mempool, world.max_surfaces * sizeof( msurface_t* ));
 }
 
 /*
@@ -710,7 +710,7 @@ static void Mod_LoadTextures( const dlump_t *l )
 	LittleLongSW(*offset);
 
 	loadmodel->numtextures = *offset;
-	loadmodel->textures = (texture_t **)Mem_Alloc( loadmodel->mempool, loadmodel->numtextures * sizeof( texture_t* ));
+	loadmodel->textures = (texture_t **)Mem_ZeroAlloc( loadmodel->mempool, loadmodel->numtextures * sizeof( texture_t* ));
 
 	for( i = 0; i < loadmodel->numtextures; i++ )
 	{
@@ -723,7 +723,7 @@ static void Mod_LoadTextures( const dlump_t *l )
 		if( *(offset + i + 1) == -1 )
 		{
 			// create default texture (some mods requires this)
-			tx = (texture_t *)Mem_Alloc( loadmodel->mempool, sizeof( *tx ));
+			tx = (texture_t *)Mem_ZeroAlloc( loadmodel->mempool, sizeof( *tx ));
 			loadmodel->textures[i] = tx;
 		
 			Q_strncpy( tx->name, "*default", sizeof( tx->name ));
@@ -750,7 +750,7 @@ static void Mod_LoadTextures( const dlump_t *l )
 			Q_snprintf( mt.name, sizeof( mt.name ), "miptex_%i", i );
 		}
 
-		tx = (texture_t*)Mem_Alloc( loadmodel->mempool, sizeof( *tx ));
+		tx = (texture_t*)Mem_ZeroAlloc( loadmodel->mempool, sizeof( *tx ));
 		loadmodel->textures[i] = tx;
 
 		// convert to lowercase
@@ -1163,7 +1163,7 @@ static void Mod_LoadTexInfo( const dlump_t *l )
 		Host_Error( "Mod_LoadTexInfo: funny lump size in %s\n", loadmodel->name );
 
 	count = l->filelen / sizeof( *in );
-	out = (mtexinfo_t *)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (mtexinfo_t *)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 	
 	loadmodel->texinfo = out;
 	loadmodel->numtexinfo = count;
@@ -1423,7 +1423,7 @@ static void Mod_BuildPolygon( mextrasurf_t *info, msurface_t *surf, int numVerts
 	numElems = (numVerts - 2) * 3;
 
 	bufSize = sizeof( msurfmesh_t ) + numVerts * sizeof( glvert_t ) + numElems * sizeof( word );
-	buffer = (byte *)Mem_Alloc( loadmodel->mempool, bufSize );
+	buffer = (byte *)Mem_ZeroAlloc( loadmodel->mempool, bufSize );
 
 	mesh = (msurfmesh_t *)buffer;
 	buffer += sizeof( msurfmesh_t );
@@ -1585,7 +1585,7 @@ static void Mod_SubdividePolygon( mextrasurf_t *info, msurface_t *surf, int numV
 	}
 
 	bufSize = sizeof( msurfmesh_t ) + ( numVerts + 2 ) * sizeof( glvert_t ); // temp buffer has no indices
-	buffer = (byte*)Mem_Alloc( loadmodel->mempool, bufSize );
+	buffer = (byte*)Mem_ZeroAlloc( loadmodel->mempool, bufSize );
 
 	mesh = (msurfmesh_t *)buffer;
 	buffer += sizeof( msurfmesh_t );
@@ -1743,7 +1743,7 @@ static void Mod_ConvertSurface( mextrasurf_t *info, msurface_t *surf )
 	if( numElems >= 65536 ) Host_Error( "Mod_ConvertSurface: index count %i exceeds 65535\n", numElems );
 
 	bufSize = sizeof( msurfmesh_t ) + numVerts * sizeof( glvert_t ) + numElems * sizeof( word );
-	buffer = (byte*)Mem_Alloc( loadmodel->mempool, bufSize );
+	buffer = (byte*)Mem_ZeroAlloc( loadmodel->mempool, bufSize );
 
 	mesh = (msurfmesh_t *)buffer;
 	buffer += sizeof( msurfmesh_t );
@@ -1926,8 +1926,8 @@ static void Mod_LoadSurfaces( const dlump_t *l )
 	count = l->filelen / sizeof( *in );
 
 	loadmodel->numsurfaces = count;
-	loadmodel->surfaces = (msurface_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( msurface_t ));
-	loadmodel->cache.data = (mextrasurf_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( mextrasurf_t ));
+	loadmodel->surfaces = (msurface_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( msurface_t ));
+	loadmodel->cache.data = (mextrasurf_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( mextrasurf_t ));
 	out = loadmodel->surfaces;
 	info = (mextrasurf_t *)loadmodel->cache.data;
 
@@ -2037,7 +2037,7 @@ static void Mod_LoadVertexes( const dlump_t *l )
 	count = l->filelen / sizeof( *in );
 
 	loadmodel->numvertexes = count;
-	out = loadmodel->vertexes = (mvertex_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( mvertex_t ));
+	out = loadmodel->vertexes = (mvertex_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( mvertex_t ));
 
 	if( world.loading ) ClearBounds( world.mins, world.maxs );
 
@@ -2077,7 +2077,7 @@ static void Mod_LoadEdges( const dlump_t *l )
 		Host_Error( "Mod_LoadEdges: funny lump size in %s\n", loadmodel->name );
 
 	count = l->filelen / sizeof( *in );
-	loadmodel->edges = out = (medge_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( medge_t ));
+	loadmodel->edges = out = (medge_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( medge_t ));
 	loadmodel->numedges = count;
 
 	for( i = 0; i < count; i++, in++, out++ )
@@ -2102,7 +2102,7 @@ static void Mod_LoadSurfEdges( const dlump_t *l )
 		Host_Error( "Mod_LoadSurfEdges: funny lump size in %s\n", loadmodel->name );
 
 	count = l->filelen / sizeof( dsurfedge_t );
-	loadmodel->surfedges = out = (dsurfedge_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( dsurfedge_t ));
+	loadmodel->surfedges = out = (dsurfedge_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( dsurfedge_t ));
 	loadmodel->numsurfedges = count;
 
 	//Q_memcpy( loadmodel->surfedges, in, count * sizeof( dsurfedge_t ));
@@ -2127,7 +2127,7 @@ static void Mod_LoadMarkSurfaces( const dlump_t *l )
 		Host_Error( "Mod_LoadMarkFaces: funny lump size in %s\n", loadmodel->name );
 
 	count = l->filelen / sizeof( *in );
-	loadmodel->marksurfaces = out = (msurface_t **)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	loadmodel->marksurfaces = out = (msurface_t **)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 	loadmodel->nummarksurfaces = count;
 
 	for( i = 0; i < count; i++ )
@@ -2170,7 +2170,7 @@ static void Mod_LoadNodes( const dlump_t *l )
 	loadmodel->numnodes = l->filelen / sizeof( *in );
 
 	if( loadmodel->numnodes < 1 ) Host_Error( "Map %s has no nodes\n", loadmodel->name );
-	out = loadmodel->nodes = (mnode_t *)Mem_Alloc( loadmodel->mempool, loadmodel->numnodes * sizeof( *out ));
+	out = loadmodel->nodes = (mnode_t *)Mem_ZeroAlloc( loadmodel->mempool, loadmodel->numnodes * sizeof( *out ));
 
 	for( i = 0; i < loadmodel->numnodes; i++, out++, in++ )
 	{
@@ -2213,7 +2213,7 @@ static void Mod_LoadLeafs( const dlump_t *l )
 
 	count = l->filelen / sizeof( *in );
 	if( count < 1 ) Host_Error( "Map %s has no leafs\n", loadmodel->name );
-	out = (mleaf_t *)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (mleaf_t *)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
@@ -2271,7 +2271,7 @@ static void Mod_LoadPlanes( const dlump_t *l )
 	count = l->filelen / sizeof( *in );
 
 	if( count < 1 ) Host_Error( "Map %s has no planes\n", loadmodel->name );
-	out = (mplane_t *)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (mplane_t *)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
 	loadmodel->planes = out;
 	loadmodel->numplanes = count;
@@ -2402,7 +2402,7 @@ static void Mod_LoadClipnodes( const dlump_t *l )
 	in = (dclipnode_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadClipnodes: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
-	out = (dclipnode_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
 	loadmodel->clipnodes = out;
 	loadmodel->numclipnodes = count;
@@ -2458,17 +2458,17 @@ static void Mod_LoadClipnodes31( const dlump_t *l, const dlump_t *l2, const dlum
 	in = (dclipnode_t*)(mod_base + l->fileofs);
 	if( l->filelen % sizeof( *in )) Host_Error( "Mod_LoadClipnodes: funny lump size\n" );
 	count = l->filelen / sizeof( *in );
-	out = (dclipnode_t*)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
 	in2 = (dclipnode_t*)(mod_base + l2->fileofs);
 	if( l2->filelen % sizeof( *in2 )) Host_Error( "Mod_LoadClipnodes2: funny lump size\n" );
 	count2 = l2->filelen / sizeof( *in2 );
-	out2 = (dclipnode_t*)Mem_Alloc( loadmodel->mempool, count2 * sizeof( *out2 ));
+	out2 = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count2 * sizeof( *out2 ));
 
 	in3 = (dclipnode_t*)(mod_base + l3->fileofs);
 	if( l3->filelen % sizeof( *in3 )) Host_Error( "Mod_LoadClipnodes3: funny lump size\n" );
 	count3 = l3->filelen / sizeof( *in3 );
-	out3 = (dclipnode_t*)Mem_Alloc( loadmodel->mempool, count3 * sizeof( *out3 ));
+	out3 = (dclipnode_t*)Mem_ZeroAlloc( loadmodel->mempool, count3 * sizeof( *out3 ));
 
 	loadmodel->clipnodes = out;
 	loadmodel->numclipnodes = count + count2 + count3;
@@ -2600,7 +2600,7 @@ static void Mod_MakeHull0( void )
 	
 	in = loadmodel->nodes;
 	count = loadmodel->numnodes;
-	out = (dclipnode_t *)Mem_Alloc( loadmodel->mempool, count * sizeof( *out ));
+	out = (dclipnode_t *)Mem_ZeroAlloc( loadmodel->mempool, count * sizeof( *out ));
 
 	hull->clipnodes = out;
 	hull->firstclipnode = 0;
@@ -3320,7 +3320,7 @@ void *GAME_EXPORT Mod_Calloc( int number, size_t size )
 	cache_user_t	*cu;
 
 	if( number <= 0 || size <= 0 ) return NULL;
-	cu = (cache_user_t *)Mem_Alloc( com_studiocache, sizeof( cache_user_t ) + number * size );
+	cu = (cache_user_t *)Mem_ZeroAlloc( com_studiocache, sizeof( cache_user_t ) + number * size );
 	cu->data = (void *)cu; // make sure what cu->data is not NULL
 
 	return cu;

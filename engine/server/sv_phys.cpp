@@ -1921,9 +1921,9 @@ static char **pfnGetFilesList( const char *pattern, int *numFiles, int gamediron
 static void *pfnMem_Alloc( size_t cb, const char *filename, const int fileline )
 {
 #ifdef XASH_MEMDBG
-	return _Mem_Alloc( svgame.mempool, cb, filename, fileline );
+	return _Mem_ZeroAlloc( svgame.mempool, cb, filename, fileline );
 #else
-	return Mem_Alloc( svgame.mempool, cb );
+	return Mem_ZeroAlloc( svgame.mempool, cb );
 #endif
 }
 

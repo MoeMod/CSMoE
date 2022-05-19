@@ -822,9 +822,9 @@ pfnMemAlloc
 static void *pfnMemAlloc( size_t cb, const char *filename, const int fileline )
 {
 #ifdef XASH_MEMDBG
-	return _Mem_Alloc( menu.mempool, cb, filename, fileline );
+	return _Mem_ZeroAlloc( menu.mempool, cb, filename, fileline );
 #else
-	return Mem_Alloc( menu.mempool, cb );
+	return Mem_ZeroAlloc( menu.mempool, cb );
 #endif
 }
 

@@ -106,7 +106,7 @@ static wavdata_t *S_CreateDefaultSound( void )
 {
 	wavdata_t	*sc;
 
-	sc = (wavdata_t *)Mem_Alloc( sndpool, sizeof( wavdata_t ));
+	sc = (wavdata_t *)Mem_ZeroAlloc( sndpool, sizeof( wavdata_t ));
 
 	sc->width = 2;
 	sc->channels = 1;

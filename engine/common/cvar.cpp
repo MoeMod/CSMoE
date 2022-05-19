@@ -254,7 +254,7 @@ convar_t *Cvar_Get( const char *var_name, const char *var_value, int flags, cons
 	}
 
 	// allocate a new cvar
-	cvar = (convar_t*)Z_Malloc( sizeof( convar_t ));
+	cvar = (convar_t*)Z_ZeroMalloc( sizeof( convar_t ));
 	cvar->name = copystring( var_name );
 	cvar->string = copystring( var_value );
 	cvar->reset_string = copystring( var_value );

@@ -342,7 +342,7 @@ void CL_TextMessageParse( byte *pMemFile, int fileSize )
 	}
 
 	// must malloc because we need to be able to clear it after initialization
-	clgame.titles = (client_textmessage_t *)Mem_Alloc( cls.mempool, textHeapSize + nameHeapSize + messageSize );
+	clgame.titles = (client_textmessage_t *)Mem_ZeroAlloc( cls.mempool, textHeapSize + nameHeapSize + messageSize );
 	
 	// copy table over
 	Q_memcpy( clgame.titles, textMessages, messageSize );

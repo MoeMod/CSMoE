@@ -68,7 +68,7 @@ endif()
 set(XASH_ASTC ON)
 
 option(XASH_TBBMALLOC "Use tbbmalloc" ON)
-if(IOS)
+if(APPLE)
 	# CRT malloc is the best in iOS
 	set(XASH_TBBMALLOC OFF)
 endif()

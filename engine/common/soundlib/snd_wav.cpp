@@ -387,7 +387,7 @@ stream_t *Stream_OpenWAV( const char *filename )
 	sound.samples = ( sound.samples / sound.width ) / sound.channels;
 
 	// at this point we have valid stream
-	stream = (stream_t *)Mem_Alloc( host.soundpool, sizeof( stream_t ));
+	stream = (stream_t *)Mem_ZeroAlloc( host.soundpool, sizeof( stream_t ));
 	stream->file = file;
 	stream->size = sound.samples * sound.width * sound.channels;
 	stream->buffsize = FS_Tell( file ); // header length

@@ -32,7 +32,7 @@ static void Sound_Reset( void )
 
 static wavdata_t *SoundPack( void )
 {
-	wavdata_t	*pack = (wavdata_t *)Mem_Alloc( host.soundpool, sizeof( wavdata_t ));
+	wavdata_t	*pack = (wavdata_t *)Mem_ZeroAlloc( host.soundpool, sizeof( wavdata_t ));
 
 	pack->buffer = sound.wav;
 	pack->width = sound.width;

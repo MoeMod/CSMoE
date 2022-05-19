@@ -530,7 +530,7 @@ fragbuf_t *Netchan_AllocFragbuf( void )
 {
 	fragbuf_t	*buf;
 
-	buf = (fragbuf_t *)Mem_Alloc( net_mempool, sizeof( fragbuf_t ));
+	buf = (fragbuf_t *)Mem_ZeroAlloc( net_mempool, sizeof( fragbuf_t ));
 	BF_Init( &buf->frag_message, "Frag Message", buf->frag_message_buf, sizeof( buf->frag_message_buf ));
 
 	return buf;
@@ -725,7 +725,7 @@ void Netchan_CreateFragments_( qboolean server, netchan_t *chan, sizebuf_t *msg 
 
 	chunksize = bound( 16, net_blocksize->integer, 1400 );
 
-	wait = (fragbufwaiting_t *)Mem_Alloc( net_mempool, sizeof( fragbufwaiting_t ));
+	wait = (fragbufwaiting_t *)Mem_ZeroAlloc( net_mempool, sizeof( fragbufwaiting_t ));
 
 	remaining = BF_GetNumBytesWritten( msg );
 	pos = 0;
@@ -874,7 +874,7 @@ void Netchan_CreateFileFragmentsFromBuffer( qboolean server, netchan_t *chan, ch
 	if( !size ) return;
 
 	chunksize = bound( 16, net_blocksize->integer, 512 );
-	wait = ( fragbufwaiting_t * )Mem_Alloc( net_mempool, sizeof( fragbufwaiting_t ));
+	wait = ( fragbufwaiting_t * )Mem_ZeroAlloc( net_mempool, sizeof( fragbufwaiting_t ));
 	remaining = size;
 	pos = 0;
 
@@ -955,7 +955,7 @@ int Netchan_CreateFileFragments( qboolean server, netchan_t *chan, const char *f
 		return 0;
 	}
 
-	wait = (fragbufwaiting_t *)Mem_Alloc( net_mempool, sizeof( fragbufwaiting_t ));
+	wait = (fragbufwaiting_t *)Mem_ZeroAlloc( net_mempool, sizeof( fragbufwaiting_t ));
 	remaining = filesize;
 	pos = 0;
 

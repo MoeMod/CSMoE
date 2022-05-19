@@ -1230,15 +1230,15 @@ void CL_InitEdicts( void )
 	CL_UPDATE_BACKUP = ( cl.maxclients == 1 ) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
 	cls.num_client_entities = CL_UPDATE_BACKUP * 64;
 	cls.packet_entities = (entity_state_t*)Z_Realloc( cls.packet_entities, sizeof( entity_state_t ) * cls.num_client_entities );
-	clgame.entities = (cl_entity_t*)Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities );
-	clgame.static_entities = (cl_entity_t*)Mem_Alloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES );
+	clgame.entities = (cl_entity_t*)Mem_ZeroAlloc( clgame.mempool, sizeof( cl_entity_t ) * clgame.maxEntities );
+	clgame.static_entities = (cl_entity_t*)Mem_ZeroAlloc( clgame.mempool, sizeof( cl_entity_t ) * MAX_STATIC_ENTITIES );
 	clgame.numStatics = 0;
 
 	if(( clgame.maxRemapInfos - 1 ) != clgame.maxEntities )
 	{
 		CL_ClearAllRemaps (); // purge old remap info
 		clgame.maxRemapInfos = clgame.maxEntities + 1; 
-		clgame.remap_info = (remap_info_t **)Mem_Alloc( clgame.mempool, sizeof( remap_info_t* ) * clgame.maxRemapInfos );
+		clgame.remap_info = (remap_info_t **)Mem_ZeroAlloc( clgame.mempool, sizeof( remap_info_t* ) * clgame.maxRemapInfos );
 	}
 }
 
@@ -1534,7 +1534,7 @@ static client_sprite_t *GAME_EXPORT pfnSPR_GetList( const char *psz, int *piCoun
 
 	// name, res, pic, x, y, w, h
 	// NOTE: we must use com_studiocache because it will be purge on next restart or change map
-	pList = (client_sprite_t*)Mem_Alloc( pool, sizeof( client_sprite_t ) * numSprites );
+	pList = (client_sprite_t*)Mem_ZeroAlloc( pool, sizeof( client_sprite_t ) * numSprites );
 
 	for( index = 0; index < numSprites; index++ )
 	{

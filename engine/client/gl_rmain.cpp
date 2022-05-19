@@ -1659,9 +1659,9 @@ static const ref_overview_t *GL_GetOverviewParms( void )
 static void *R_Mem_Alloc( size_t cb, const char *filename, const int fileline )
 {
 #ifdef XASH_MEMDBG
-	return _Mem_Alloc( cls.mempool, cb, filename, fileline );
+	return _Mem_ZeroAlloc( cls.mempool, cb, filename, fileline );
 #else
-	return Mem_Alloc( cls.mempool, cb );
+	return Mem_ZeroAlloc( cls.mempool, cb );
 #endif
 }
 

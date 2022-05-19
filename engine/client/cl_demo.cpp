@@ -344,7 +344,7 @@ void CL_WriteDemoHeader( const char *name )
 	FS_Write( cls.demofile, &demo.header, sizeof( demo.header ));
 
 	demo.directory.numentries = 2;
-	demo.directory.entries = (demoentry_t*)Mem_Alloc( cls.mempool, sizeof( demoentry_t ) * demo.directory.numentries );
+	demo.directory.entries = (demoentry_t*)Mem_ZeroAlloc( cls.mempool, sizeof( demoentry_t ) * demo.directory.numentries );
 
 	// DIRECTORY ENTRY # 0
 	demo.entry = &demo.directory.entries[0];	// only one here.
@@ -1130,7 +1130,7 @@ void CL_PlayDemo_f( void )
 	}
 
 	// allocate demo entries
-	demo.directory.entries = (demoentry_t*)Mem_Alloc( cls.mempool, sizeof( demoentry_t ) * demo.directory.numentries );
+	demo.directory.entries = (demoentry_t*)Mem_ZeroAlloc( cls.mempool, sizeof( demoentry_t ) * demo.directory.numentries );
 
 	for( i = 0; i < demo.directory.numentries; i++ )
 	{

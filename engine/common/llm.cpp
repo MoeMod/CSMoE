@@ -25,18 +25,29 @@ GNU General Public License for more details.
 #include <tbb/scalable_allocator.h>
 #endif
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#endif
+
 // MoeMod : there is no std::pmr on ios, so we are using the boost one
 namespace pmr = boost::container::pmr;
 
 #define MEMHEADER_SENTINEL1	0xDEADF00D
 #define MEMHEADER_SENTINEL2	0xDF
 
-class IMemPool
+class IMalloc
 {
 public:
-    virtual ~IMemPool() = default;
-    virtual void *Alloc(size_t size, size_t align =  alignof(std::max_align_t)) = 0;
+    virtual ~IMalloc() = default;
+    virtual void *Alloc(size_t size) = 0;
+    virtual void *CAlloc(size_t n, size_t size) = 0;
+    virtual void *AlignedAlloc(size_t size, size_t align =  alignof(std::max_align_t)) = 0;
     virtual void Free(void *ptr) = 0;
+};
+
+class IMemPool : public IMalloc
+{
+public:
     virtual void Empty() = 0;
 };
 
@@ -67,6 +78,11 @@ public:
     ~TBBMemPool() override
     {
         pool_destroy(tbbpool);
+    }
+
+    void *Alloc(size_t size) override
+    {
+        return rml::pool_malloc(tbbpool, size);
     }
 
     void *Alloc(size_t size, size_t align) override
@@ -102,14 +118,14 @@ private:
 };
 #endif
 
-class MemPoolRes : public pmr::memory_resource
+class MallocRes : public pmr::memory_resource
 {
 public:
-    MemPoolRes(mempool_t *bk) : backendpool(bk) {}
+    MallocRes(IMalloc *bk) : backendpool(bk) {}
 
     void* do_allocate(std::size_t size, std::size_t align) override
     {
-        return backendpool->Alloc(size, align);
+        return backendpool->AlignedAlloc(size, align);
     }
     void do_deallocate(void* ptr, std::size_t bytes, std::size_t alignment) override
     {
@@ -120,14 +136,14 @@ public:
         return this == &other;
     }
 
-    mempool_t *backendpool;
+    IMalloc *backendpool;
 };
 
 template<class T = pmr::unsynchronized_pool_resource>
 class PmrMemPool : public mempool_t, public MemPoolConfig
 {
 public:
-    PmrMemPool(mempool_t *bk, const char *name LLM_EXTRA_ARG_DEF) :
+    PmrMemPool(IMalloc *bk, const char *name LLM_EXTRA_ARG_DEF) :
         MemPoolConfig{ name LLM_EXTRA_ARG_FWD },
         memres(bk),
         pmrpool(pmr::pool_options{}, &memres)
@@ -140,7 +156,19 @@ public:
 
     }
 
-    void *Alloc(size_t size, size_t align) override
+    void *Alloc(size_t size) override
+    {
+        return pmrpool.allocate(size);
+    }
+
+    void *CAlloc(size_t n, size_t size) override
+    {
+        auto res = pmrpool.allocate(n * size);
+        memset(res, 0, n * size);
+        return res;
+    }
+
+    void *AlignedAlloc(size_t size, size_t align) override
     {
         return pmrpool.allocate(size, align);
     }
@@ -156,19 +184,75 @@ public:
     }
 
 private:
-    MemPoolRes memres;
+    MallocRes memres;
     T pmrpool;
 };
 
-class CrtMemPool : public mempool_t
+#ifdef __APPLE__
+class AppleMemPool : public mempool_t, public MemPoolConfig
 {
 public:
-    CrtMemPool()
+    AppleMemPool(const char *name LLM_EXTRA_ARG_DEF) :
+            MemPoolConfig{ name LLM_EXTRA_ARG_FWD },
+            zone(nullptr)
     {
-
+        zone = malloc_create_zone(0, 0);
+        malloc_set_zone_name(zone, name);
     }
 
-    void *Alloc(size_t size, size_t align) override
+    ~AppleMemPool() override
+    {
+        malloc_destroy_zone(zone);
+    }
+
+    void *Alloc(size_t size) override
+    {
+        return malloc_zone_malloc(zone, size);
+    }
+
+    void *CAlloc(size_t n, size_t size) override
+    {
+        return malloc_zone_calloc(zone, n, size);
+    }
+
+    void *AlignedAlloc(size_t size, size_t align) override
+    {
+        return malloc_zone_memalign(zone, align, size);
+    }
+
+    void Free(void *ptr) override
+    {
+        malloc_zone_free(zone, ptr);
+    }
+
+    void Empty() override
+    {
+        malloc_destroy_zone(zone);
+        zone = malloc_create_zone(0, 0);
+    }
+
+private:
+    malloc_zone_t *zone;
+};
+#endif
+
+class CrtMalloc : public IMalloc
+{
+public:
+
+    void *Alloc(size_t size) override
+    {
+        return ::operator new(size);
+    }
+
+    void *CAlloc(size_t n, size_t size) override
+    {
+        auto res = ::operator new(n * size);
+        memset(res, 0, n * size);
+        return res;
+    }
+
+    void *AlignedAlloc(size_t size, size_t align) override
     {
         return ::operator new(size, (std::align_val_t)align);
     }
@@ -178,11 +262,7 @@ public:
         ::operator delete(ptr);
     }
 
-    void Empty() override
-    {
-
-    }
-} g_CrtMemPool;
+} g_CrtMalloc;
 
 typedef struct alignas(std::max_align_t) memheader_s {
     mempool_t *pool;
@@ -211,8 +291,10 @@ MEMDBG_ALLOC_FUNC_BEGIN
 {
 #ifdef XASH_TBBMALLOC
     return new TBBMemPool( name LLM_EXTRA_ARG_FWD );
+#elif defined(__APPLE__)
+    return new AppleMemPool( name LLM_EXTRA_ARG_FWD );
 #else
-    return new PmrMemPool<pmr::synchronized_pool_resource>(&g_CrtMemPool, name LLM_EXTRA_ARG_FWD);
+    return new PmrMemPool<pmr::synchronized_pool_resource>(&g_CrtMalloc, name LLM_EXTRA_ARG_FWD);
 #endif
 }
 MEMDBG_ALLOC_FUNC_END
@@ -238,12 +320,12 @@ void *LLM_FUNCTION_MANGLE(Mem_Realloc)( mempool_t *poolptr, void *data, size_t s
 MEMDBG_ALLOC_FUNC_BEGIN
 {
     if(!data)
-        return LLM_FUNCTION_MANGLE(Mem_Alloc)(poolptr, size LLM_EXTRA_ARG_FWD);
+        return LLM_FUNCTION_MANGLE(Mem_ZeroAlloc)(poolptr, size LLM_EXTRA_ARG_FWD);
     auto mem = (memheader_t *)data - 1;
     auto old_size = mem->size;
     if(size <= old_size)
         return data;
-    auto new_data = LLM_FUNCTION_MANGLE(Mem_Alloc)( poolptr, size LLM_EXTRA_ARG_FWD );
+    auto new_data = LLM_FUNCTION_MANGLE(Mem_ZeroAlloc)( poolptr, size LLM_EXTRA_ARG_FWD );
     memcpy(new_data, data, old_size);
     LLM_FUNCTION_MANGLE(Mem_Free)(data LLM_EXTRA_ARG_FWD);
     return new_data;
@@ -258,7 +340,31 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #else
     auto alloc_size = sizeof(memheader_t) + size;
 #endif
-    memheader_t *mem = (memheader_t *)poolptr->Alloc(alloc_size, alignof(std::max_align_t));
+    memheader_t *mem = (memheader_t *)poolptr->AlignedAlloc(alloc_size, alignof(std::max_align_t));
+    mem->pool = poolptr;
+    mem->size = size;
+#ifdef XASH_MEMDBG
+    mem->filename = filename;
+    mem->fileline = fileline;
+    mem->sentinel1 = MEMHEADER_SENTINEL1;
+
+    *((byte *)mem + sizeof(memheader_t) + mem->size) = MEMHEADER_SENTINEL2;
+    memset(mem + 1, 0xCD, size);
+#endif
+
+    return mem + 1;
+}
+MEMDBG_ALLOC_FUNC_END
+
+void *LLM_FUNCTION_MANGLE(Mem_ZeroAlloc)( mempool_t *poolptr, size_t size LLM_EXTRA_ARG_DEF )
+MEMDBG_ALLOC_FUNC_BEGIN
+{
+#ifdef XASH_MEMDBG
+    auto alloc_size = sizeof(memheader_t) + size + sizeof(std::max_align_t);
+#else
+    auto alloc_size = sizeof(memheader_t) + size;
+#endif
+    memheader_t *mem = (memheader_t *)poolptr->CAlloc(1, alloc_size);
     mem->pool = poolptr;
     mem->size = size;
 #ifdef XASH_MEMDBG
@@ -268,8 +374,6 @@ MEMDBG_ALLOC_FUNC_BEGIN
 
     *((byte *)mem + sizeof(memheader_t) + mem->size) = MEMHEADER_SENTINEL2;
 #endif
-    // TODO : why should we need this ?
-    memset(mem + 1, 0, size);
 
     return mem + 1;
 }

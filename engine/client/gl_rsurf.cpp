@@ -152,7 +152,7 @@ static void SubdividePolygon_r( msurface_t *warpface, int numverts, float *verts
 	}
 
 	// add a point in the center to help keep warp valid
-	poly = (glpoly_t*)Mem_Alloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
+	poly = (glpoly_t*)Mem_ZeroAlloc( loadmodel->mempool, sizeof( glpoly_t ) + ( ( numverts - 4 ) + 2) * VERTEXSIZE * sizeof( float ));
 	poly->next = warpface->polys;
 	poly->flags = warpface->flags;
 	warpface->polys = poly;
@@ -328,7 +328,7 @@ void GL_BuildPolygonFromSurface( model_t *mod, msurface_t *fa )
 	vertpage = 0;
 
 	// draw texture
-	poly = (glpoly_t*)Mem_Alloc( mod->mempool, sizeof( glpoly_t ) + ( lnumverts - 4 ) * VERTEXSIZE * sizeof( float ) );
+	poly = (glpoly_t*)Mem_ZeroAlloc( mod->mempool, sizeof( glpoly_t ) + ( lnumverts - 4 ) * VERTEXSIZE * sizeof( float ) );
 	poly->next = fa->polys;
 	poly->flags = fa->flags;
 	fa->polys = poly;
@@ -1918,11 +1918,11 @@ void R_GenerateVBO()
 	vbos.mintexture = INT_MAX;
 	vbos.maxtexture = 0;
 
-	vbos.textures = (vbotexture_t*)Mem_Alloc( vbos.mempool, numtextures * numlightmaps * sizeof( vbotexture_t ) );
-	vbos.surfdata = (vbosurfdata_t*)Mem_Alloc( vbos.mempool, cl.worldmodel->numsurfaces * sizeof( vbosurfdata_t ) );
-	vbos.arraylist = vbo = (vboarray_t*)Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
-	vbos.decaldata = (vbodecaldata_t*)Mem_Alloc( vbos.mempool, sizeof( vbodecaldata_t ) );
-	vbos.decaldata->lm = (msurface_t**)Mem_Alloc( vbos.mempool, sizeof( msurface_t* ) * numlightmaps );
+	vbos.textures = (vbotexture_t*)Mem_ZeroAlloc( vbos.mempool, numtextures * numlightmaps * sizeof( vbotexture_t ) );
+	vbos.surfdata = (vbosurfdata_t*)Mem_ZeroAlloc( vbos.mempool, cl.worldmodel->numsurfaces * sizeof( vbosurfdata_t ) );
+	vbos.arraylist = vbo = (vboarray_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vboarray_t ) );
+	vbos.decaldata = (vbodecaldata_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbodecaldata_t ) );
+	vbos.decaldata->lm = (msurface_t**)Mem_ZeroAlloc( vbos.mempool, sizeof( msurface_t* ) * numlightmaps );
 
 	// count array lengths
 	for( k = 0; k < numlightmaps; k++ )
@@ -1950,11 +1950,11 @@ void R_GenerateVBO()
 				if( vbo->array_len + surf->polys->numverts > USHRT_MAX )
 				{
 					// generate new array and new vbotexture node
-					vbo->array = (vbovertex_t*)Mem_Alloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
+					vbo->array = (vbovertex_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbovertex_t ) * vbo->array_len );
 					MsgDev( D_NOTE, "R_GenerateVBOs: allocated array of %d verts, texture %d\n", vbo->array_len, j );
-					vbo->next = (vboarray_t*)Mem_Alloc( vbos.mempool, sizeof( vboarray_t ) );
+					vbo->next = (vboarray_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vboarray_t ) );
 					vbo = vbo->next;
-					vbotex->next = (vbotexture_t*)Mem_Alloc( vbos.mempool, sizeof( vbotexture_t ) );
+					vbotex->next = (vbotexture_t*)Mem_ZeroAlloc( vbos.mempool, sizeof( vbotexture_t ) );
 					vbotex = vbotex->next;
 
 					// never skip this textures and lightmaps

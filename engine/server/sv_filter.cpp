@@ -212,7 +212,7 @@ void SV_BanID_f( void )
 
 	SV_RemoveID( id );
 
-	filter = (cidfilter_t *)Mem_Alloc( host.mempool, sizeof( cidfilter_t ) );
+	filter = (cidfilter_t *)Mem_ZeroAlloc( host.mempool, sizeof( cidfilter_t ) );
 	filter->endTime = time;
 	filter->next = cidfilter;
 	Q_strncpy( filter->id, id, sizeof( filter->id ) );
@@ -355,7 +355,7 @@ void SV_AddIP_f( void )
 
 	SV_RemoveIP( ip, mask );
 
-	filter = (ipfilter_t*)Mem_Alloc( host.mempool, sizeof( ipfilter_t ) );
+	filter = (ipfilter_t*)Mem_ZeroAlloc( host.mempool, sizeof( ipfilter_t ) );
 	filter->endTime = time;
 	filter->ip = ip;
 	filter->mask = mask;

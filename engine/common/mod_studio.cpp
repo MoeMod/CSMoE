@@ -688,7 +688,7 @@ void Mod_StudioBigEndian( model_t *model, byte *buffer )
 			paSequences = (cache_user_t *)model->submodels;
 			if( paSequences == NULL )
 			{
-				paSequences = (cache_user_t *)Mem_Alloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
+				paSequences = (cache_user_t *)Mem_ZeroAlloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
 				model->submodels = (void *)paSequences;
 			}
 
@@ -889,7 +889,7 @@ static mstudioanim_t *Mod_StudioGetAnim( model_t *m_pSubModel, mstudioseqdesc_t 
 
 	if( paSequences == NULL )
 	{
-		paSequences = (cache_user_t *)Mem_Alloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
+		paSequences = (cache_user_t *)Mem_ZeroAlloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
 		m_pSubModel->submodels = (dmodel_t*)paSequences;
 	}
 

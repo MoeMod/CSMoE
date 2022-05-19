@@ -708,10 +708,10 @@ void SV_InitGame( void )
 	svgame.globals->maxClients = sv_maxclients->integer;
 	SV_UPDATE_BACKUP = ( svgame.globals->maxClients == 1 && !Host_IsDedicated() ) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
 
-	svs.clients = (sv_client_t*)Z_Malloc( sizeof( sv_client_t ) * sv_maxclients->integer );
+	svs.clients = (sv_client_t*)Z_ZeroMalloc( sizeof( sv_client_t ) * sv_maxclients->integer );
 	svs.num_client_entities = sv_maxclients->integer * SV_UPDATE_BACKUP * 64;
-	svs.packet_entities = (entity_state_t*)Z_Malloc( sizeof( entity_state_t ) * svs.num_client_entities );
-	svs.baselines = (entity_state_t*)Z_Malloc( sizeof( entity_state_t ) * GI->max_edicts );
+	svs.packet_entities = (entity_state_t*)Z_ZeroMalloc( sizeof( entity_state_t ) * svs.num_client_entities );
+	svs.baselines = (entity_state_t*)Z_ZeroMalloc( sizeof( entity_state_t ) * GI->max_edicts );
 
 	// client frames will be allocated in SV_DirectConnect
 

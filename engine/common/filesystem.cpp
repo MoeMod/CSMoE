@@ -754,7 +754,7 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 		return NULL;
 	}
 
-	info = (dpackfile_t *)Mem_Alloc( fs_mempool, sizeof( *info ) * numpackfiles );
+	info = (dpackfile_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *info ) * numpackfiles );
 	lseek( packhandle, header.dirofs, SEEK_SET );
 
 	if( header.dirlen != read( packhandle, (void *)info, header.dirlen ))
@@ -766,11 +766,11 @@ pack_t *FS_LoadPackPAK( const char *packfile, int *error )
 		return NULL;
 	}
 
-	pack = (pack_t *)Mem_Alloc( fs_mempool, sizeof( pack_t ));
+	pack = (pack_t *)Mem_ZeroAlloc( fs_mempool, sizeof( pack_t ));
 	Q_strncpy( pack->filename, packfile, sizeof( pack->filename ));
 	pack->handle = packhandle;
 	pack->numfiles = 0;
-	pack->files = (packfile_t *)Mem_Alloc( fs_mempool, numpackfiles * sizeof( packfile_t ));
+	pack->files = (packfile_t *)Mem_ZeroAlloc( fs_mempool, numpackfiles * sizeof( packfile_t ));
 	pack->filetime = FS_SysFileTime( packfile );
 
 	// parse the directory
@@ -843,7 +843,7 @@ static qboolean FS_AddPack_Fullpath( const char *pakfile, qboolean *already_load
 			// that case, we want to insert at the beginning...
 			if( !insertion_point )
 			{
-				search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+				search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 				search->pack = pak;
 				search->next = fs_searchpaths;
 				search->flags |= flags;
@@ -851,7 +851,7 @@ static qboolean FS_AddPack_Fullpath( const char *pakfile, qboolean *already_load
 			}
 			else // otherwise we want to append directly after insertion_point.
 			{
-				search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+				search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 				search->pack = pak;
 				search->next = insertion_point->next;
 				search->flags |= flags;
@@ -860,7 +860,7 @@ static qboolean FS_AddPack_Fullpath( const char *pakfile, qboolean *already_load
 		}
 		else
 		{
-			search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+			search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 			search->pack = pak;
 			search->next = fs_searchpaths;
 			search->flags |= flags;
@@ -921,14 +921,14 @@ static qboolean FS_AddWad_Fullpath( const char *wadfile, qboolean *already_loade
 			// that case, we want to insert at the beginning...
 			if( !insertion_point )
 			{
-				search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+				search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 				search->wad = wad;
 				search->next = fs_searchpaths;
 				fs_searchpaths = search;
 			}
 			else // otherwise we want to append directly after insertion_point.
 			{
-				search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+				search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 				search->wad = wad;
 				search->next = insertion_point->next;
 				insertion_point->next = search;
@@ -936,7 +936,7 @@ static qboolean FS_AddWad_Fullpath( const char *wadfile, qboolean *already_loade
 		}
 		else
 		{
-			search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+			search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 			search->wad = wad;
 			search->next = fs_searchpaths;
 			fs_searchpaths = search;
@@ -1001,7 +1001,7 @@ void FS_AddGameDirectory( const char *dir, int flags )
 
 	// add the directory to the search path
 	// (unpacked files have the priority over packed files)
-	search = (searchpath_t *)Mem_Alloc( fs_mempool, sizeof( searchpath_t ));
+	search = (searchpath_t *)Mem_ZeroAlloc( fs_mempool, sizeof( searchpath_t ));
 	Q_strncpy( search->filename, dir, sizeof ( search->filename ));
 	search->flags = flags;
 	search->next = fs_searchpaths;
@@ -2021,7 +2021,7 @@ void FS_Init( void )
 				continue;
 
 			if( !SI.games[SI.numgames] )
-				SI.games[SI.numgames] = (gameinfo_t *)Mem_Alloc( fs_mempool, sizeof( gameinfo_t ));
+				SI.games[SI.numgames] = (gameinfo_t *)Mem_ZeroAlloc( fs_mempool, sizeof( gameinfo_t ));
 
 			if( FS_ParseGameInfo( dirs.strings[i], SI.games[SI.numgames] ))
 				SI.numgames++; // added
@@ -2176,7 +2176,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 		if(asset == NULL)
 			return NULL;
 
-		file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
+		file = (file_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *file ));
 		Q_memset( file, 0, sizeof( *file ));\
 		/*
 #ifdef XASH_64BIT
@@ -2217,7 +2217,7 @@ static file_t* FS_SysOpen( const char* filepath, const char* mode )
 	}
 #endif
 
-	file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
+	file = (file_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *file ));
 	file->filetime = FS_SysFileTime( filepath );
 	file->ungetc = EOF;
 #if defined __ANDROID__
@@ -2283,7 +2283,7 @@ file_t *FS_OpenPackedFile( pack_t *pack, int pack_ind )
 	if( dup_handle < 0 )
 		return NULL;
 
-	file = (file_t *)Mem_Alloc( fs_mempool, sizeof( *file ));
+	file = (file_t *)Mem_ZeroAlloc( fs_mempool, sizeof( *file ));
 	Q_memset( file, 0, sizeof( *file ));
 	file->handle = dup_handle;
 	file->real_length = pfile->realsize;
@@ -3346,7 +3346,7 @@ dll_user_t *FS_FindLibrary( const char *dllname, qboolean directpath )
 	}
 
 	// all done, create dll_user_t struct
-	hInst = (dll_user_t*)Mem_Alloc( host.mempool, sizeof( dll_user_t ));
+	hInst = (dll_user_t*)Mem_ZeroAlloc( host.mempool, sizeof( dll_user_t ));
 
 	// save dllname for debug purposes
 	Q_strncpy( hInst->dllName, dllname, sizeof( hInst->dllName ));
@@ -4048,7 +4048,7 @@ WADSYSTEM PUBLIC BASE FUNCTIONS
 wfile_t *W_Open( const char *filename, const char *mode )
 {
 	dwadinfo_t	header;
-	wfile_t		*wad = (wfile_t *)Mem_Alloc( fs_mempool, sizeof( wfile_t ));
+	wfile_t		*wad = (wfile_t *)Mem_ZeroAlloc( fs_mempool, sizeof( wfile_t ));
 	const char	*comment = "Generated by Xash WadLib. ";
 
 	wad->wadfile = FS_SysOpen( filename, mode );
@@ -4258,9 +4258,9 @@ fs_api_t g_fsapi =
 void *FSAPI_MemAlloc( size_t size, const char *filename, int fileline )
 {
 #ifdef XASH_MEMDBG
-	return _Mem_Alloc( fs_mempool, size, filename, fileline );
+	return _Mem_ZeroAlloc( fs_mempool, size, filename, fileline );
 #else
-	return Mem_Alloc( fs_mempool, size );
+	return Mem_ZeroAlloc( fs_mempool, size );
 #endif
 }
 

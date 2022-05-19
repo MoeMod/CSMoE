@@ -685,7 +685,7 @@ mstudioanim_t *R_StudioGetAnim( model_t *m_pSubModel, mstudioseqdesc_t *pseqdesc
 
 	if( paSequences == NULL )
 	{
-		paSequences = (cache_user_t *)Mem_Alloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
+		paSequences = (cache_user_t *)Mem_ZeroAlloc( com_studiocache, MAXSTUDIOGROUPS * sizeof( cache_user_t ));
 		m_pSubModel->submodels = (dmodel_t*)paSequences;
 	}
 
@@ -3946,7 +3946,7 @@ static void R_StudioLoadTexture( model_t *mod, studiohdr_t *phdr, mstudiotexture
 		i = mod->numtextures;
 		mod->textures = (texture_t **)Mem_Realloc( mod->mempool, mod->textures, ( i + 1 ) * sizeof( texture_t* ));
 		size = ptexture->width * ptexture->height + 768;
-		tx = (texture_t *)Mem_Alloc( mod->mempool, sizeof( *tx ) + size );
+		tx = (texture_t *)Mem_ZeroAlloc( mod->mempool, sizeof( *tx ) + size );
 		mod->textures[i] = tx;
 
 		// parse ranges and store it

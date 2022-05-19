@@ -197,7 +197,7 @@ static byte *R_SpriteLoadFrame_DDS( model_t *mod, byte *pin, mspriteframe_t **pp
 	}
 
 	// setup frame description
-	pspriteframe = (mspriteframe_t *)Mem_Alloc( mod->mempool, sizeof( mspriteframe_t ));
+	pspriteframe = (mspriteframe_t *)Mem_ZeroAlloc( mod->mempool, sizeof( mspriteframe_t ));
 	pspriteframe->width = header->Header.dwWidth;
 	pspriteframe->height = header->Header.dwHeight;
 	pspriteframe->up = 0.5 * header->Header.dwHeight;
@@ -259,7 +259,7 @@ static byte* R_SpriteLoadFrame(model_t* mod, byte* pin, mspriteframe_t** ppframe
 	}
 
 	// setup frame description
-	pspriteframe = (mspriteframe_t*)Mem_Alloc(mod->mempool, sizeof(mspriteframe_t));
+	pspriteframe = (mspriteframe_t*)Mem_ZeroAlloc(mod->mempool, sizeof(mspriteframe_t));
 	pspriteframe->width = pinframe.width;
 	pspriteframe->height = pinframe.height;
 	pspriteframe->up = pinframe.origin[1];
@@ -294,7 +294,7 @@ static byte *R_SpriteLoadGroup( model_t *mod, byte *pin, mspriteframe_t **ppfram
 	numframes = LittleLong(pingroup.numframes);
 
 	groupsize = sizeof( mspritegroup_t ) + (numframes - 1) * sizeof( pspritegroup->frames[0] );
-	pspritegroup = (mspritegroup_t * )Mem_Alloc( mod->mempool, groupsize );
+	pspritegroup = (mspritegroup_t * )Mem_ZeroAlloc( mod->mempool, groupsize );
 	pspritegroup->numframes = numframes;
 
 	Q_memcpy( ppframe, pspritegroup, sizeof(mspriteframe_t));
@@ -361,7 +361,7 @@ void Mod_LoadSpriteModel( model_t *mod, byte *buffer, qboolean *loaded, uint tex
 
 	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
 	size = sizeof( msprite_t ) + ( LittleLong(pin.numframes) - 1 ) * sizeof( psprite->frames );
-	psprite = (msprite_t *)Mem_Alloc( mod->mempool, size );
+	psprite = (msprite_t *)Mem_ZeroAlloc( mod->mempool, size );
 	mod->cache.data = psprite;	// make link to extradata
 
 	psprite->type = LittleLong(pin.type);
@@ -519,7 +519,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 	// determine how many frames we needs
 	numframes = (pix->width * pix->height) / (w * h);
 	mod->mempool = Mem_AllocSubPool( mempool_mdl, va( "^2%s^7", mod->name ));
-	psprite = (msprite_t *)Mem_Alloc( mod->mempool, sizeof( msprite_t ) + ( numframes - 1 ) * sizeof( psprite->frames ));
+	psprite = (msprite_t *)Mem_ZeroAlloc( mod->mempool, sizeof( msprite_t ) + ( numframes - 1 ) * sizeof( psprite->frames ));
 	mod->cache.data = psprite;	// make link to extradata
 
 	psprite->type = SPR_FWD_PARALLEL_ORIENTED;
@@ -564,7 +564,7 @@ void Mod_LoadMapSprite( model_t *mod, const void *buffer, size_t size, qboolean 
 		// build uinque frame name
 		Q_snprintf( texname, sizeof( texname ), "#MAP/%s_%i%i.spr", mod->name, i / 10, i % 10 );
 
-		psprite->frames[i].frameptr = (mspriteframe_t*)Mem_Alloc( mod->mempool, sizeof( mspriteframe_t ));
+		psprite->frames[i].frameptr = (mspriteframe_t*)Mem_ZeroAlloc( mod->mempool, sizeof( mspriteframe_t ));
 		pspriteframe = psprite->frames[i].frameptr;
 		pspriteframe->width = w;
 		pspriteframe->height = h;

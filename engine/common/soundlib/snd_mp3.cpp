@@ -128,7 +128,7 @@ stream_t *Stream_OpenMPG( const char *filename )
 	if( !file ) return NULL;
 
 	// at this point we have valid stream
-	stream = (stream_t *)Mem_Alloc( host.soundpool, sizeof( stream_t ));
+	stream = (stream_t *)Mem_ZeroAlloc( host.soundpool, sizeof( stream_t ));
 	stream->file = file;
 	stream->pos = 0;
 
