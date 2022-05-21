@@ -22,6 +22,9 @@ GNU General Public License for more details.
 #include "server.h" // Log_Printf( , ... )
 #include "cpu.h"
 
+#if XASH_VGUI2
+#include "vgui2_surface.h"
+#endif
 #if XASH_IMGUI
 #include "imgui_console.h"
 #endif
@@ -1296,7 +1299,9 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 		hideChar = edit->cursor - prestep; // skip this char
 	
 	// draw it
-#ifdef XASH_IMGUI
+#ifdef XASH_VGUI2
+    VGUI2_Surface_DrawConsoleString(x, y, str, colorDefault[0], colorDefault[1], colorDefault[2], colorDefault[3]);
+#elif defined XASH_IMGUI
 	ImGui_Console_AddGenericString(x, y, str, colorDefault);
 #else
 	Con_DrawGenericString( x, y, str, colorDefault, false, hideChar );
@@ -1307,7 +1312,9 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 
 	// calc cursor position
 	str[edit->cursor - prestep] = 0;
-#ifdef XASH_IMGUI
+#ifdef XASH_VGUI2
+    VGUI2_Surface_DrawStringLen(str, &curPos, NULL);
+#elif defined XASH_IMGUI
 	ImGui_Console_DrawStringLen(str, &curPos, NULL);
 #else
 	Con_DrawStringLen(str, &curPos, NULL);
@@ -1322,7 +1329,10 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 		pglDisable( GL_ALPHA_TEST );
 		pglBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA );
 		pglTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-#ifdef XASH_IMGUI
+#ifdef XASH_VGUI2
+        char str[2] = { (char)cursorChar, '\0' };
+        VGUI2_Surface_DrawConsoleString(x + curPos, y, str, colorDefault[0], colorDefault[1], colorDefault[2], colorDefault[3]);
+#elif defined XASH_IMGUI
 		char str[2] = { (char)cursorChar, '\0' };
 		ImGui_Console_AddGenericString(x + curPos, y, str, colorDefault);
 #else
@@ -1332,7 +1342,9 @@ void Field_DrawInputLine( int x, int y, field_t *edit )
 	else
 	{
 		Con_UtfProcessChar( 0 );
-#ifdef XASH_IMGUI
+#ifdef XASH_VGUI2
+        VGUI2_Surface_DrawConsoleString(x + curPos, y, "_", colorDefault[0], colorDefault[1], colorDefault[2], colorDefault[3]);
+#elif defined XASH_IMGUI
 		ImGui_Console_AddGenericString(x + curPos, y, "_", colorDefault);
 #else
 		Con_DrawCharacter( x + curPos, y, '_', colorDefault );
@@ -1616,6 +1628,8 @@ int Con_DrawDebugLines( void )
 			count++;
 			y = 20 + fontTall * i;
 #ifdef XASH_IMGUI
+            VGUI2_Surface_DrawConsoleString(x, y, con.notify[i].szNotify, con.notify[i].color[0], con.notify[i].color[1], con.notify[i].color[2], con.notify[i].color[3]);
+#elif defined XASH_IMGUI
 			ImGui_Console_AddGenericString(x, y, con.notify[i].szNotify, con.notify[i].color);
 #else
 			Con_DrawString( x, y, con.notify[i].szNotify, con.notify[i].color );
@@ -1716,7 +1730,10 @@ void Con_DrawNotify( void )
 
 		Q_snprintf( buf, sizeof( buf ), "%s: ", con.chat_cmd );
 		
-#ifdef XASH_IMGUI
+#ifdef XASH_VGUI2
+		VGUI2_Surface_DrawStringLen(buf, &len, NULL);
+        VGUI2_Surface_DrawConsoleString(start, v, buf, g_color_table[7][0], g_color_table[7][1], g_color_table[7][2], g_color_table[7][3]);
+#elif defined XASH_IMGUI
 		ImGui_Console_DrawStringLen(buf, &len, NULL);
 		ImGui_Console_AddGenericString(start, v, buf, g_color_table[7]);
 #else

@@ -6,8 +6,12 @@
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
 #include "vgui_controls/controls.h"
+#include "xash3d_types.h"
+
+#include <string_view>
 
 static vgui2::HFont _consoleFont = NULL_HANDLE;
+extern rgba_t g_color_table[8];
 
 void VGUI2_Draw_Init()
 {
@@ -44,13 +48,13 @@ const wchar_t* VGUI2_Find_String( const char* str )
     return tmpString;
 }
 
-int VGUI2_Draw_StringLenW( const wchar_t* wsz, unsigned int font )
+int VGUI2_Draw_StringLenW( std::wstring_view wsv, unsigned int font )
 {
     int len = 0;
 
-    for( size_t i = 0; i < wcslen( wsz ); ++i )
+    for( size_t i = 0; i < wsv.length(); ++i )
     {
-        len += VGUI2_GetFontWide( wsz[ i ], font );
+        len += VGUI2_GetFontWide( wsv[ i ], font );
     }
 
     return len;
@@ -100,14 +104,12 @@ void VGUI2_Surface_DrawStringLen( const char* pText, int* length, int* height )
         *height = VGUI2_GetFontTall(_consoleFont);
 }
 
-int VGUI2_Surface_DrawConsoleString(int x, int y, const char* string, byte r, byte g, byte b, byte a)
+int VGUI2_Surface_DrawConsoleString(int x0, int y0, const char* string, byte r, byte g, byte b, byte a)
 {
     //g_BaseUISurface._engineSurface->resetViewPort();
     auto font = _consoleFont;
 
     vgui2::surface()->DrawSetTextFont( font );
-    vgui2::surface()->DrawSetTextPos( x, y );
-    vgui2::surface()->DrawSetTextColor( r, g, b, a );
 
     auto pszString = VGUI2_Find_String( string );
 
@@ -120,9 +122,96 @@ int VGUI2_Surface_DrawConsoleString(int x, int y, const char* string, byte r, by
         }
     }
 
-    vgui2::surface()->DrawPrintText( pszString, wcslen( pszString ) );
-    vgui2::surface()->DrawFlushText();
+    static auto print_segment = [](int x, int y, std::wstring_view sv, byte r, byte g, byte b, byte a)
+    {
+        vgui2::surface()->DrawSetTextColor( r * 0.55, g * 0.34, b * 0.11, a );
+        vgui2::surface()->DrawSetTextPos( x - 1, y - 1 );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
+        vgui2::surface()->DrawSetTextPos( x - 1, y + 1 );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
+        vgui2::surface()->DrawSetTextPos( x + 1, y - 1 );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
+        vgui2::surface()->DrawSetTextPos( x + 1, y + 1 );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
 
-    auto w = VGUI2_Draw_StringLenW( pszString, font );
-    return w;
+
+        vgui2::surface()->DrawSetTextColor( 0, 0, 0, a );
+        vgui2::surface()->DrawSetTextPos( x + 2, y + 2 );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
+
+        vgui2::surface()->DrawSetTextColor( r, g, b, a );
+        vgui2::surface()->DrawSetTextPos( x, y );
+        vgui2::surface()->DrawPrintText( sv.data(), sv.length() );
+    };
+
+    static auto print_char_no_shadow = [](int x, int y, wchar_t ch, byte r, byte g, byte b, byte a)
+    {
+        vgui2::surface()->DrawSetTextColor( r, g, b, a );
+        vgui2::surface()->DrawSetTextPos( x, y );
+        vgui2::surface()->DrawUnicodeChar( ch );
+    };
+
+    std::wstring_view sv = pszString;
+    rgba_t col = {r, g, b, a};
+    std::decay<rgba_t>::type last_color = col;
+    int x = x0, y = y0;
+    auto find_unary = [](wchar_t ch) { return (ch >= 0x01 && ch <= 0x07) || (ch == '\n') || vgui2::surface()->IsEmojiChar(ch); };
+    for (auto iter = std::find_if(sv.begin(), sv.end(), find_unary); iter != sv.end(); iter = std::find_if(sv.begin(), sv.end(), find_unary))
+    {
+        auto seg = iter - sv.begin();
+        if (sv[seg] == '^' && seg != sv.size() - 1 && sv[seg + 1] >= '1' && sv[seg + 1] <= '7')
+        {
+            print_segment(x, y, sv.substr(0, seg), last_color[0], last_color[1], last_color[2], last_color[3]);
+            auto size = VGUI2_Draw_StringLenW(sv.substr(0, seg), font);
+            x += size;
+
+            if (sv[seg + 1] == '7')
+                last_color = col;
+            else
+                last_color = g_color_table[sv[seg + 1] - '0'];
+
+            sv = sv.substr(seg + 2);
+            continue;
+        }
+        else if (sv[seg] >= '\x01' && sv[seg] <= '\x07' && seg != sv.size() - 1)
+        {
+            print_segment(x, y, sv.substr(0, seg), last_color[0], last_color[1], last_color[2], last_color[3]);
+            auto size = VGUI2_Draw_StringLenW(sv.substr(0, seg), font);
+            x += size;
+            sv = sv.substr(seg + 1);
+            continue;
+        }
+        else if (vgui2::surface()->IsEmojiChar(sv[seg]))
+        {
+            print_segment(x, y, sv.substr(0, seg), last_color[0], last_color[1], last_color[2], last_color[3]);
+            auto size = VGUI2_Draw_StringLenW(sv.substr(0, seg), font);
+            x += size;
+
+            print_char_no_shadow(x, y, sv[seg], last_color[0], last_color[1], last_color[2], last_color[3]);
+            size = VGUI2_GetFontWide( sv[seg], font );
+            x += size;
+
+            sv = sv.substr(seg + 1);
+            continue;
+        }
+        else if (sv[seg] == '\n' && seg != sv.size() - 1)
+        {
+            print_segment(x, y, sv.substr(0, seg), last_color[0], last_color[1], last_color[2], last_color[3]);
+            auto size = VGUI2_Draw_StringLenW(sv.substr(0, seg), font);
+            y += VGUI2_GetFontTall(font);
+            x = x0;
+            sv = sv.substr(seg + 1);
+            continue;
+        }
+        break;
+    }
+    if (!sv.empty())
+    {
+        print_segment(x, y, sv, last_color[0], last_color[1], last_color[2], last_color[3]);
+        auto size = VGUI2_Draw_StringLenW(sv, font);
+        x += size;
+    }
+
+    vgui2::surface()->DrawFlushText();
+    return x - x0;
 }
