@@ -238,7 +238,7 @@ char *GAME_EXPORT COM_MemFgets( byte *pMemFile, int fileSize, int *filePos, char
 		int	size = i - *filePos;
 
 		// copy it out
-		Q_memcpy( pBuffer, pMemFile + *filePos, size );
+        Mem_VirtualCopy( pBuffer, pMemFile + *filePos, size );
 		
 		// If the buffer isn't full, terminate (this is always true)
 		if( size < bufferSize ) pBuffer[size] = 0;
@@ -293,7 +293,7 @@ char* GAME_EXPORT COM_LoadFileForMe( const char *filename, int *pLength )
 	if( pfile )
 	{
 		file = (byte*)malloc( iLength + 1 );
-		Q_memcpy( file, pfile, iLength );
+        Mem_VirtualCopy( file, pfile, iLength );
 		file[iLength] = '\0';
 		Mem_Free( pfile );
 		pfile = file;
@@ -331,7 +331,7 @@ char *GAME_EXPORT COM_LoadFile( const char *filename, int usehunk, int *pLength 
 	if( pfile )
 	{
 		file = (byte*)malloc( iLength + 1 );
-		Q_memcpy( file, pfile, iLength );
+        Mem_VirtualCopy( file, pfile, iLength );
 		file[iLength] = '\0';
 		Mem_Free( pfile );
 		pfile = file;

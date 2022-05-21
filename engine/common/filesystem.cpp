@@ -2763,7 +2763,7 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 		count = file->buff_len - file->buff_ind;
 
 		done += ((fs_offset_t)buffersize > count ) ? count : (fs_offset_t)buffersize;
-		Q_memcpy( buffer, &file->buff[file->buff_ind], done );
+        Mem_VirtualCopy( buffer, &file->buff[file->buff_ind], done );
 		file->buff_ind += done;
 
 		buffersize -= done;
@@ -2822,7 +2822,7 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 			//nb = AAsset_read (file->asset, file->buff, count );
 			const char *internal_buffer = (const char *)AAsset_getBuffer(file->asset);
             nb = count;
-			Q_memcpy( file->buff, internal_buffer + file->offset + file->position, count );
+			Mem_VirtualCopy( file->buff, internal_buffer + file->offset + file->position, count );
 		}
 		else
 #endif
@@ -2838,7 +2838,7 @@ fs_offset_t FS_Read( file_t *file, void *buffer, size_t buffersize )
 
 			// copy the requested data in "buffer" (as much as we can)
 			count = (fs_offset_t)buffersize > file->buff_len ? file->buff_len : (fs_offset_t)buffersize;
-			Q_memcpy( &((byte *)buffer)[done], file->buff, count );
+            Mem_VirtualCopy( &((byte *)buffer)[done], file->buff, count );
 			file->buff_ind = count;
 			done += count;
 		}

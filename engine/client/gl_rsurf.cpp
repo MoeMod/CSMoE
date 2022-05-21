@@ -3870,7 +3870,7 @@ void R_LoadDeluxeMap( void )
 	}
 
 	tr.deluxemap = (color24 *)Mem_Alloc( cl.worldmodel->mempool, filesize - 8 );
-	Q_memcpy( tr.deluxemap, deluxemap + 8, filesize - 8 );
+    Mem_VirtualCopy( tr.deluxemap, deluxemap + 8, filesize - 8 );
 	Mem_Free( deluxemap );
 
 	MsgDev( D_NOTE, "R_LoadDeluxeMap(): %s loaded succesfully.\n", file );

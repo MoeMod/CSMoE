@@ -1,5 +1,9 @@
 #pragma once
 
+#include <new>
+
+typedef struct mempool_s mempool_t;
+
 //
 // zone.c
 //
@@ -22,6 +26,7 @@
 #define LLM_FUNCTION_MANGLE(f) f
 #define LLM_EXTRA_ARG_DEF
 #define LLM_EXTRA_ARG_FWD
+#define LLM_EXTRA_ARG_GEN
 #endif
 
 void *LLM_FUNCTION_MANGLE(Mem_Realloc)( mempool_t *poolptr, void *memptr, size_t size LLM_EXTRA_ARG_DEF );
@@ -32,3 +37,15 @@ mempool_t *LLM_FUNCTION_MANGLE(Mem_AllocSubPool)( mempool_t *backend, const char
 void LLM_FUNCTION_MANGLE(Mem_FreePool)( mempool_t **poolptr LLM_EXTRA_ARG_DEF );
 void LLM_FUNCTION_MANGLE(Mem_EmptyPool)( mempool_t *poolptr LLM_EXTRA_ARG_DEF );
 void LLM_FUNCTION_MANGLE(Mem_Free)( void *data LLM_EXTRA_ARG_DEF );
+
+// better memcpy for size >= 16K
+void *Mem_VirtualCopy(void *dest, const void *src, size_t size);
+#ifdef XASH_OPERATOR_NEW_DELETE
+void *operator new(std::size_t size, mempool_t *poolptr);
+void *operator new[](std::size_t size, mempool_t *poolptr);
+void operator delete(void *ptr, mempool_t *poolptr);
+void operator delete[](void *ptr, mempool_t *poolptr);
+
+void* operator new(std::size_t count);
+void operator delete(void* ptr) noexcept;
+#endif

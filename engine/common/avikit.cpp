@@ -474,7 +474,7 @@ fs_offset_t AVI_GetAudioChunk( movie_state_t *Avi, char *audiodata, long offset,
 				blockread = length;
 
 			// copy the data
-			Q_memcpy( audiodata + result, (void *)( Avi->cpa_dstbuffer + Avi->cpa_blockpos ), blockread );
+			Mem_VirtualCopy( audiodata + result, (void *)( Avi->cpa_dstbuffer + Avi->cpa_blockpos ), blockread );
 
 			Avi->cpa_blockpos += blockread;
 			result += blockread;

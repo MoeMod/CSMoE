@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#include "common.h"
+#include "llm.h"
 
 #include <boost/pool/pool.hpp>
 #include <boost/container/pmr/global_resource.hpp>
@@ -27,6 +27,8 @@ GNU General Public License for more details.
 
 #ifdef __APPLE__
 #include <malloc/malloc.h>
+#include <mach/mach.h>
+
 #endif
 
 // MoeMod : there is no std::pmr on ios, so we are using the boost one
@@ -227,12 +229,12 @@ public:
 
     void Empty() override
     {
-        malloc_destroy_zone(zone);
-        zone = malloc_create_zone(0, 0);
+        // should be MT safe
+        malloc_destroy_zone(zone.exchange(malloc_create_zone(0, 0)));
     }
 
 private:
-    malloc_zone_t *zone;
+    std::atomic<malloc_zone_t *> zone;
 };
 #endif
 
@@ -242,24 +244,22 @@ public:
 
     void *Alloc(size_t size) override
     {
-        return ::operator new(size);
+        return malloc(size);
     }
 
     void *CAlloc(size_t n, size_t size) override
     {
-        auto res = ::operator new(n * size);
-        memset(res, 0, n * size);
-        return res;
+        return calloc(n, size);
     }
 
     void *AlignedAlloc(size_t size, size_t align) override
     {
-        return ::operator new(size, (std::align_val_t)align);
+        return aligned_alloc(align, size);
     }
 
     void Free(void *ptr) override
     {
-        ::operator delete(ptr);
+        free(ptr);
     }
 
 } g_CrtMalloc;
@@ -340,7 +340,11 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #else
     auto alloc_size = sizeof(memheader_t) + size;
 #endif
-    memheader_t *mem = (memheader_t *)poolptr->AlignedAlloc(alloc_size, alignof(std::max_align_t));
+    memheader_t *mem;
+    if(poolptr)
+        mem = (memheader_t *)poolptr->Alloc(alloc_size);
+    else
+        mem = (memheader_t *)malloc(alloc_size);
     mem->pool = poolptr;
     mem->size = size;
 #ifdef XASH_MEMDBG
@@ -364,7 +368,11 @@ MEMDBG_ALLOC_FUNC_BEGIN
 #else
     auto alloc_size = sizeof(memheader_t) + size;
 #endif
-    memheader_t *mem = (memheader_t *)poolptr->CAlloc(1, alloc_size);
+    memheader_t *mem;
+    if(poolptr)
+        mem = (memheader_t *)poolptr->CAlloc(1, alloc_size);
+    else
+        mem = (memheader_t *)calloc(1, alloc_size);
     mem->pool = poolptr;
     mem->size = size;
 #ifdef XASH_MEMDBG
@@ -412,5 +420,52 @@ void LLM_FUNCTION_MANGLE(Mem_Free)( void *data LLM_EXTRA_ARG_DEF )
         Sys_Error( "Mem_Free: trashed header sentinel 2 (alloc at %s:%i, free at %s:%i)\n", mem->filename, mem->fileline, filename, fileline );
     }
 #endif
-    mem->pool->Free(mem);
+    if(mem->pool)
+        mem->pool->Free(mem);
+    else
+        free(mem);
 }
+
+void *Mem_VirtualCopy(void *dest, const void *src, size_t size)
+{
+#ifdef __APPLE__
+    if(size >= 16384)
+    {
+        // Apple has COW memcpy
+        vm_copy(mach_task_self(), (vm_address_t)src, (vm_size_t)size, (vm_address_t)dest);
+        return dest;
+    }
+#endif
+    return memcpy(dest, src, size);
+}
+#ifdef XASH_OPERATOR_NEW_DELETE
+void *operator new(std::size_t size, mempool_t *poolptr)
+{
+    return Mem_Alloc(poolptr, size);
+}
+
+void *operator new[](std::size_t size, mempool_t *poolptr)
+{
+    return operator new(size, poolptr);
+}
+
+void operator delete(void *ptr, mempool_t *poolptr)
+{
+    return operator delete(ptr);
+}
+
+void operator delete[](void *ptr, mempool_t *poolptr)
+{
+    return operator delete(ptr);
+}
+
+void* operator new(std::size_t count)
+{
+    return Mem_Alloc(nullptr, count);
+}
+
+void operator delete(void* ptr) noexcept
+{
+    return Mem_Free(ptr);
+}
+#endif
