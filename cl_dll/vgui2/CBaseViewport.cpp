@@ -108,6 +108,14 @@ void CBaseViewport::HideScoreBoard()
 
 void CBaseViewport::HideAllVGUIMenu()
 {
+    for (int i = 0; i < m_Panels.Count(); i++)
+    {
+        if (m_Panels[i]->IsVisible())
+            ShowPanel(m_Panels[i], false);
+    }
+
+    m_pActivePanel = NULL;
+    m_pLastActivePanel = NULL;
 }
 
 void CBaseViewport::ActivateClientUI()
