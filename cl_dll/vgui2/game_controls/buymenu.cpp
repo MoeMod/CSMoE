@@ -59,8 +59,6 @@ void CBuyMenu::ShowPanel(bool bShow)
 		SetVisible(false);
 		SetMouseInputEnabled(false);
 	}
-
-    m_pViewPort->ShowBackGround(bShow);
 }
 
 void CBuyMenu::Update(void)
@@ -73,6 +71,4 @@ void CBuyMenu::OnClose(void)
 	BaseClass::OnClose();
 
 	ResetHistory();
-
-    m_pViewPort->ShowBackGround(false);
 }

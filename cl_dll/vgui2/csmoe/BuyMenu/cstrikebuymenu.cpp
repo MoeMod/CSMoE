@@ -18,7 +18,6 @@ CCSBaseBuyMenu::CCSBaseBuyMenu(IViewport *pViewPort) : CBuyMenu(pViewPort)
 {
 	SetTitle("#Cstrike_Buy_Menu", true);
 	SetProportional(true);
-	SetPaintBackgroundEnabled(false);
 }
 
 void CCSBaseBuyMenu::SetupControlSettings()
@@ -173,7 +172,7 @@ void CCSBaseBuyMenu::SetTeam(int iTeam)
 
 void CCSBaseBuyMenu::UpdateGameMode()
 {
-    ResetHistory();
+	ResetHistory();
 	if (m_pMainMenu)
 		m_pMainMenu->DeletePanel();
 
