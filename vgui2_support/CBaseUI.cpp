@@ -324,7 +324,10 @@ void CBaseUI::Shutdown() {
 int CBaseUI::Key_Event(int down, int keynum, const char* pszCurrentBinding) {
 	if (keynum == '`' || keynum == '~')
 	{
-		ShowConsole();
+		if (!m_bConsoleShowing)
+			ShowConsole();
+		else
+			HideConsole();
 	}
 	else
 	{

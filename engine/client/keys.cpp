@@ -626,6 +626,11 @@ void GAME_EXPORT Key_Event( int key, qboolean down )
 			return;
 
 		Con_ToggleConsole_f();
+
+		// vgui console
+		if (down) {
+			UI_KeyEvent(key, true);
+		}
 		return;
 	}
 

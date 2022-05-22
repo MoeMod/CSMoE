@@ -185,7 +185,7 @@ void CCSBuySubMenu::OnCommand(const char *command)
 	}
 	else if (!Q_strcmp(command, "rebuy_in"))
 	{
-        gEngfuncs.pfnClientCmd("rebuy;secammo;primammo");
+		gHUD.m_Ammo.UserCmd_Rebuy();
 		BaseClass::OnCommand("vguicancel");
 		return;
 	}

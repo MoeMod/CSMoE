@@ -995,6 +995,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if (!Q_stricmp(command, "Quit"))
 	{
 		OnOpenQuitConfirmationDialog();
+		engine->pfnClientCmd("citrus_servers_hide\n");
 	}
 	else if (!Q_stricmp(command, "QuitNoConfirm"))
 	{
@@ -1005,6 +1006,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if (!Q_stricmp(command, "ReleaseModalWindow"))
 	{
 		vgui2::surface()->RestrictPaintToSinglePanel(NULL);
+		engine->pfnClientCmd("citrus_servers_show\n");
 	}
 	else if (!Q_stricmp(command, "OpenConsole"))
 	{
