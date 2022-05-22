@@ -37,7 +37,7 @@ namespace sv {
 		pev->classname = MAKE_STRING("weapon_m2");
 
 		Precache();
-		m_iId = WEAPON_M4A1;
+		m_iId = WEAPON_M2;
 		SET_MODEL(ENT(pev), "models/w_m2.mdl");
 
 		m_iDefaultAmmo = M2_DEFAULT_GIVE;
@@ -82,7 +82,7 @@ namespace sv {
 		p->iMaxClip = M2_DEFAULT_GIVE;
 		p->iSlot = 0;
 		p->iPosition = 6;
-		p->iId = m_iId = WEAPON_M4A1;
+		p->iId = m_iId = WEAPON_M2;
 		p->iFlags = 0;
 		p->iWeight = M249_WEIGHT;
 
@@ -247,6 +247,14 @@ namespace sv {
 			else
 				KickBack(2.3, 2.2, 2.0, 1.0, 4.0, 3.5, 6.0);
 		}
+	}
+
+	void CM2::ItemPostFrame()
+	{
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED && !m_pPlayer->IsBot())
+			m_pPlayer->pev->velocity = g_vecZero;
+
+		return CBasePlayerWeapon::ItemPostFrame();
 	}
 
 	void CM2::Reload(void)

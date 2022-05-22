@@ -29,8 +29,11 @@ public:
 public:
 	bool ActivateSkill(int iSlot);
 	CHudMsgFunc(ZB2Msg);
+	int DrawBuffHP();
 
 public:
 	class CHudZB2_impl_t *pimpl = nullptr;
+	float m_flBuffHealth;
+	int m_BuffHealthCross;
 };
 }

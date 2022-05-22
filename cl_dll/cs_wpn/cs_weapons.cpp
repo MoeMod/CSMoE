@@ -482,15 +482,33 @@ bool isSniperRifle(CBasePlayerItem* item)
 	case WEAPON_SG550:
 	case WEAPON_AWP:
 	case WEAPON_G3SG1:
+	case WEAPON_XM8SHARPSHOOTER:
+	case WEAPON_AS50:
+	case WEAPON_AS50G:
+	case WEAPON_BENDITA:
 	case WEAPON_SKULL5:
+	case WEAPON_Z4B_AWPNVIDIA:
+	case WEAPON_M95:
+	case WEAPON_M95XMAS:
+	case WEAPON_WA2000:
+	case WEAPON_Z4B_XM2010PC:
+	case WEAPON_Z4B_M1887SE:
 	case WEAPON_SFSNIPER:
+	case WEAPON_M95TIGER:
 	case WEAPON_CHEYTACLRRS:
 	case WEAPON_M400:
 	case WEAPON_M82:
-	case WEAPON_M24:
+	case WEAPON_SL8:
+	case WEAPON_SL8G:
+	case WEAPON_SL8EX:
 	case WEAPON_TRG42:
 	case WEAPON_TRG42G:
+	case WEAPON_M24:
 	case WEAPON_AW50:
+	case WEAPON_SPRIFLE:
+	case WEAPON_BPGM:
+	case WEAPON_ZGUN:
+	case WEAPON_Z4B_BARRETTD:
 		return true;
 
 	default:
@@ -632,7 +650,24 @@ void CBasePlayerWeapon::ItemPostFrame( void )
 
 		m_fFireOnEmpty = FALSE;
 
-		if (m_iId != WEAPON_USP && m_iId != WEAPON_GLOCK18 && m_iId != WEAPON_P228 && m_iId != WEAPON_DEAGLE && m_iId != WEAPON_ELITE && m_iId != WEAPON_FIVESEVEN)
+		if (m_iId != WEAPON_USP
+			&& m_iId != WEAPON_GLOCK18
+			&& m_iId != WEAPON_P228
+			&& m_iId != WEAPON_DEAGLE
+			&& m_iId != WEAPON_ELITE
+			&& m_iId != WEAPON_FIVESEVEN
+			&& m_iId != WEAPON_DEAGLED
+			&& m_iId != WEAPON_Z4B_DEAGLESHURA
+			&& m_iId != WEAPON_Z4B_FREQUENCY1
+			&& m_iId != WEAPON_INFINITY
+			&& m_iId != WEAPON_INFINITYEX1
+			&& m_iId != WEAPON_INFINITYEX2
+			&& m_iId != WEAPON_INFINITYSB
+			&& m_iId != WEAPON_INFINITYSR
+			&& m_iId != WEAPON_INFINITYSS
+			&& m_iId != WEAPON_Z4B_INFINITYX
+			&& m_iId != WEAPON_CSGO_R8
+			&& m_iId != WEAPON_ANACONDA)
 		{
 			if (m_iShotsFired > 0)
 			{
@@ -737,6 +772,7 @@ WeaponCrosshairData CBasePlayerWeapon::GetCrosshairData(void)
 	case WEAPON_ELITE:
 		break;
 	case WEAPON_FIVESEVEN:
+	case WEAPON_CSGO_CZ75:
 		result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
 		break;
 	case WEAPON_UMP45:
@@ -809,6 +845,7 @@ WeaponCrosshairData CBasePlayerWeapon::GetCrosshairData(void)
 	case WEAPON_FLASHBANG:
 		break;
 	case WEAPON_DEAGLE:
+	case WEAPON_ANACONDA:
 		result = ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK;
 		break;
 	case WEAPON_SG552:
@@ -1362,6 +1399,9 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	player.pev->weaponanim = from->client.weaponanim;
 	player.pev->viewmodel = from->client.viewmodel;
 	player.m_flNextAttack = duration_t(from->client.m_flNextAttack);
+	player.m_iKnifeID = (from->client.weapons >> 20) & 0xFFF;
+	player.m_iGrenadeID = (from->client.weapons >> 8) & 0xFFF;
+	player.m_iZombieClass = (from->client.weapons >> 1) & 0x7F;
 
 	g_iPlayerFlags = player.pev->flags = from->client.flags;
 	g_vPlayerVelocity = player.pev->velocity;
@@ -1389,6 +1429,49 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 
 	flags = from->client.iuser3;
 	g_bHoldingKnife = pWeapon->m_iId == WEAPON_KNIFE;
+#if 0
+	g_bHoldingKnife = false;
+	switch (pWeapon->m_iId)
+	{
+	case WEAPON_KNIFE:
+	case WEAPON_KNIFE_DGAXE:
+	case WEAPON_KNIFE_DRAGON:
+	case WEAPON_KNIFE_DRAGONSWORD:
+	case WEAPON_KNIFE_DUALSWORD:
+	case WEAPON_KNIFE_Z4B_FACELESSVOID:
+	case WEAPON_KNIFE_Z4B_FREQUENCY9:
+	case WEAPON_KNIFE_KATANA:
+	case WEAPON_KNIFE_LANCE:
+	case WEAPON_KNIFE_Z4B_LCSWORD:
+	case WEAPON_KNIFE_Z4B_NATAKNIFEDX:
+	case WEAPON_KNIFE_Z4B_OPPOVIVO:
+	case WEAPON_KNIFE_SKULLAXE:
+	case WEAPON_KNIFE_Z4B_STORMGIANTX:
+	case WEAPON_KNIFE_Z4B_STRONGKNIFEX:
+	case WEAPON_KNIFE_STORMGIANT:
+	case WEAPON_KNIFE_STRONGKNIFE:
+	case WEAPON_KNIFE_NATAKNIFED:
+	case WEAPON_KNIFE_THANATOS9:
+	case WEAPON_KNIFE_SKULLT9:
+	case WEAPON_KNIFE_RUNEBLADE:
+	case WEAPON_KNIFE_JANUS9:
+	case WEAPON_KNIFE_SUMMONKNIFE:
+	case WEAPON_KNIFE_BALROG9:
+	case WEAPON_KNIFE_HOLYSWORD:
+	case WEAPON_KNIFE_Y22S1HOLYSWORDMB:
+	case WEAPON_KNIFE_MAGICKNIFE:
+	case WEAPON_KNIFE_WHIPSWORD:
+	case WEAPON_KNIFE_DUALKUKRI:
+	case WEAPON_KNIFE_DUALSLAYER:
+	case WEAPON_KNIFE_JKNIFE:
+	case WEAPON_KNIFE_COMBAT:
+	case WEAPON_KNIFE_MASTERCOMBAT:
+	case WEAPON_KNIFE_HDAGGER:
+	case WEAPON_KNIFE_AXE:
+	case WEAPON_KNIFE_HAMMER:
+		g_bHoldingKnife = true;
+	}
+#endif
 	player.m_bCanShoot = (flags & PLAYER_CAN_SHOOT) != 0;
 	g_iFreezeTimeOver = !(flags & PLAYER_FREEZE_TIME_OVER);
 	g_bInBombZone = (flags & PLAYER_IN_BOMB_ZONE) != 0;

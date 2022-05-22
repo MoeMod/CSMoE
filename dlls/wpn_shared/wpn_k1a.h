@@ -43,6 +43,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 250.0f, 200.0f, 250.0f, 90.0f, 0.6f }; }
 	const char *GetCSModelName() override { return "models/w_k1a.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_GALIL); }
+#endif
+	float GetArmorRatioModifier() override { return 1.3; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 
 public:
 	void K1aFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

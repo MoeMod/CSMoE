@@ -60,6 +60,8 @@ public:
 	void SGMissileEXBcsFire(float fYaw, CUtlVector<CBaseEntity*>* pList, CUtlVector<CBaseEntity*>* pGroupList);
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_sgdrill_buckshot" , 150 }; }
 #endif
+	float GetArmorRatioModifier() override { return 1.3; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 9, 4, 0 }; }
 
 	BOOL UseDecrement() override {
 #ifdef CLIENT_WEAPONS

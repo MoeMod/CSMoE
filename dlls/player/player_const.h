@@ -39,7 +39,7 @@ typedef enum
 	Menu_Radio3,
 	Menu_ClientBuy,
 	Menu_ZbsUpgrade,
-	Menu_VoteMap
+	Menu_CustomMenu
 
 } _Menu;
 
@@ -101,6 +101,8 @@ typedef struct
 	int m_defuser;
 	int m_nightVision;
 	int m_armor;
+	int m_knifeID;
+	int m_grenadeID;
 
 } RebuyStruct;
 

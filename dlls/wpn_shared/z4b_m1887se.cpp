@@ -33,7 +33,7 @@ void CM1887se::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_m1887se");
 
 	Precache();
-	m_iId = WEAPON_SCOUT;
+	m_iId = WEAPON_Z4B_M1887SE;
 	SET_MODEL(ENT(pev), "models/pw_m1887se.mdl");
 
 	m_iDefaultAmmo = M1887SE_MAX_CLIP;
@@ -60,7 +60,7 @@ int CM1887se::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M1887SE_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 9;
-	p->iId = m_iId = WEAPON_SCOUT;
+	p->iId = m_iId = WEAPON_Z4B_M1887SE;
 	p->iFlags = 0;
 	p->iWeight = SCOUT_WEIGHT;
 

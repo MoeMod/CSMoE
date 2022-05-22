@@ -37,7 +37,7 @@ void CSkull5::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_skull5");
 
 	Precache();
-	m_iId = WEAPON_G3SG1;
+	m_iId = WEAPON_SKULL5;
 	SET_MODEL(ENT(pev), "models/w_skull5.mdl");
 	m_iDefaultAmmo = SKULL5_MAX_CLIP;
 

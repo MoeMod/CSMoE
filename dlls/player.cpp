@@ -720,7 +720,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	int armorHit = 0;
 	CBasePlayer *pAttack = NULL;
 	CBaseEntity *pAttacker = NULL;
-
+	m_flSaveArmorAmount = pev->armorvalue;
 	if (bitsDamageType & (DMG_EXPLOSION | DMG_BLAST | DMG_FALL))
 		m_LastHitGroup = HITGROUP_GENERIC;
 
@@ -812,13 +812,57 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 			flDamage = flNew;
 
+			if (m_flBuffHealthAmount)
+			{
+				m_flBuffHealthAmount -= flDamage;
+				if (m_flBuffHealthAmount < 0)
+				{
+					flDamage = -m_flBuffHealthAmount;
+					m_flBuffHealthAmount = 0;
+				}
+				else
+				{
+					flDamage = 0;
+					if (m_flSaveArmorAmount > pev->armorvalue)
+						pev->armorvalue = m_flSaveArmorAmount;
+				}
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pev);
+				WRITE_BYTE(6); // TYPE
+				WRITE_SHORT(int(m_flBuffHealthAmount));
+				MESSAGE_END();
+			}
+
 			if (pev->armorvalue <= 0.0)
 				m_iKevlar = ARMOR_TYPE_EMPTY;
 
 			Pain(m_LastHitGroup, true);
 		}
 		else
+		{
+			if (m_flBuffHealthAmount)
+			{
+				m_flBuffHealthAmount -= flDamage;
+				if (m_flBuffHealthAmount < 0)
+				{
+					flDamage = -m_flBuffHealthAmount;
+					m_flBuffHealthAmount = 0;
+				}
+				else
+				{
+					flDamage = 0;
+					if (m_flSaveArmorAmount > pev->armorvalue)
+						pev->armorvalue = m_flSaveArmorAmount;
+				}
+
+				MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pev);
+				WRITE_BYTE(6); // TYPE
+				WRITE_SHORT(int(m_flBuffHealthAmount));
+				MESSAGE_END();
+			}
+
 			Pain(m_LastHitGroup, false);
+		}
 
 		m_lastDamageAmount = flDamage;
 		
@@ -845,6 +889,8 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 				}
 			}
 		}
+
+		
 
 		if (pev->health > flDamage)
 		{
@@ -1134,6 +1180,27 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		flDamage = flNew;
 
+		if (m_flBuffHealthAmount)
+		{
+			m_flBuffHealthAmount -= flDamage;
+			if (m_flBuffHealthAmount < 0)
+			{
+				flDamage = -m_flBuffHealthAmount;
+				m_flBuffHealthAmount = 0;
+			}
+			else
+			{
+				flDamage = 0;
+				if (m_flSaveArmorAmount > pev->armorvalue)
+					pev->armorvalue = m_flSaveArmorAmount;
+			}
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pev);
+			WRITE_BYTE(6); // TYPE
+			WRITE_SHORT(int(m_flBuffHealthAmount));
+			MESSAGE_END();
+		}
+
 		if (pev->armorvalue <= 0.0f)
 			m_iKevlar = ARMOR_TYPE_EMPTY;
 
@@ -1146,6 +1213,27 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	}
 	else
 	{
+		if (m_flBuffHealthAmount)
+		{
+			m_flBuffHealthAmount -= flDamage;
+			if (m_flBuffHealthAmount < 0)
+			{
+				flDamage = -m_flBuffHealthAmount;
+				m_flBuffHealthAmount = 0;
+			}
+			else
+			{
+				flDamage = 0;
+				if (m_flSaveArmorAmount > pev->armorvalue)
+					pev->armorvalue = m_flSaveArmorAmount;
+			}
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pev);
+			WRITE_BYTE(6); // TYPE
+			WRITE_SHORT(int(m_flBuffHealthAmount));
+			MESSAGE_END();
+		}
+
 		if (!m_pModStrategy->TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType))
 		{
 			return 0;
@@ -5306,8 +5394,35 @@ void CBasePlayer::UpdatePlayerSound()
 void CBasePlayer::CheckZombieModeBuff(void)
 {
 	//From CSAE
+	if (!m_bIsZombie)
+	{
+		if (m_tShootingDownBuffTime != invalid_time_point && m_tShootingDownBuffTime < gpGlobals->time)
+		{
+			m_iBuff &= ~BUFF_SHOOTINGDOWN;
+			m_tShootingDownBuffTime = invalid_time_point;
+		}
+	}
+
 	if (m_bIsZombie)
 	{
+		if (m_iBuff & BUFF_SHOOTINGDOWN)
+		{
+			m_iBuff &= ~BUFF_SHOOTINGDOWN;
+			m_tShootingDownBuffTime = invalid_time_point;
+		}
+			
+		if (m_tHealthBuffTime != invalid_time_point && m_tHealthBuffTime < gpGlobals->time)
+		{
+			m_iBuff &= ~BUFF_HPBUFF;
+			m_tHealthBuffTime = invalid_time_point;
+			m_flBuffHealthAmount = 0;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZB2Msg, NULL, pev);
+			WRITE_BYTE(6); // TYPE
+			WRITE_SHORT(int(m_flBuffHealthAmount));
+			MESSAGE_END();
+		}
+
 		if (m_iHealthDecreaseCount && gpGlobals->time > m_tHealthDecreaseStartTime)
 		{
 			pev->health -= m_flHealthDecreaseAmount;
@@ -5329,10 +5444,13 @@ void CBasePlayer::CheckZombieModeBuff(void)
 	}
 	else
 	{
+		m_tShootingDownBuffTime = invalid_time_point;
+		m_tHealthBuffTime = invalid_time_point;
 		m_tHealthDecreaseStartTime = invalid_time_point;
 		m_flHealthDecreaseAmount = 0;
 		m_tHealthDecreaseInterval = invalid_time_point;
 		m_iHealthDecreaseCount = 0;
+		m_flBuffHealthAmount = 0;
 	}
 }
 
@@ -5656,6 +5774,9 @@ void CBasePlayer::Spawn()
 	m_iCustomSequence = -1;
 	m_flCustomSequenceUntilTime = invalid_time_point;
 
+	m_tShootingDownBuffTime == invalid_time_point;
+	m_tHealthBuffTime = invalid_time_point;
+	m_flBuffHealthAmount = 0.0f;
 	m_tHealthDecreaseStartTime = invalid_time_point;
 	m_flHealthDecreaseAmount = 0.0f;
 	m_tHealthDecreaseInterval = invalid_time_point;
@@ -5724,25 +5845,59 @@ void CBasePlayer::Spawn()
 			break;
 		case WEAPON_SG550:
 			pev->viewmodel = MAKE_STRING("models/v_sg550.mdl");
-			break;
-		case WEAPON_M95TIGER:
-			pev->viewmodel = MAKE_STRING("models/v_m95tiger.mdl");
+			break;			
+		case WEAPON_XM8SHARPSHOOTER:
+			pev->viewmodel = MAKE_STRING("models/v_xm8.mdl");
+		case WEAPON_AS50:
+			pev->viewmodel = MAKE_STRING("models/v_as50.mdl");
+		case WEAPON_AS50G:
+			pev->viewmodel = MAKE_STRING("models/v_as50g.mdl");
+		case WEAPON_BENDITA:
+			pev->viewmodel = MAKE_STRING("models/v_bendita.mdl");
+		case WEAPON_SKULL5:
+			pev->viewmodel = MAKE_STRING("models/v_skull5.mdl");
+		case WEAPON_Z4B_AWPNVIDIA:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_awpnvidia.mdl");
+		case WEAPON_M95:
+			pev->viewmodel = MAKE_STRING("models/v_m95.mdl");
+		case WEAPON_M95XMAS:
+			pev->viewmodel = MAKE_STRING("models/v_m95xmas.mdl");
+		case WEAPON_WA2000:
+			pev->viewmodel = MAKE_STRING("models/v_wa2000.mdl");
+		case WEAPON_Z4B_XM2010PC:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_xm2010pc.mdl");
+		case WEAPON_Z4B_M1887SE:
+			pev->viewmodel = MAKE_STRING("models/v_m1887se.mdl");
 		case WEAPON_SFSNIPER:
 			pev->viewmodel = MAKE_STRING("models/v_sfsniper.mdl");
+		case WEAPON_M95TIGER:
+			pev->viewmodel = MAKE_STRING("models/v_m95tiger.mdl");
 		case WEAPON_CHEYTACLRRS:
 			pev->viewmodel = MAKE_STRING("models/v_cheytaclrrs.mdl");
 		case WEAPON_M400:
 			pev->viewmodel = MAKE_STRING("models/v_m400.mdl");
 		case WEAPON_M82:
 			pev->viewmodel = MAKE_STRING("models/v_m82.mdl");
-		case WEAPON_M24:
-			pev->viewmodel = MAKE_STRING("models/v_m24.mdl");
+		case WEAPON_SL8:
+			pev->viewmodel = MAKE_STRING("models/v_sl8.mdl");
+		case WEAPON_SL8G:
+			pev->viewmodel = MAKE_STRING("models/v_sl8g.mdl");
+		case WEAPON_SL8EX:
+			pev->viewmodel = MAKE_STRING("models/v_sl8ex.mdl");
 		case WEAPON_TRG42:
 			pev->viewmodel = MAKE_STRING("models/v_trg42.mdl");
 		case WEAPON_TRG42G:
 			pev->viewmodel = MAKE_STRING("models/v_trg42g.mdl");
+		case WEAPON_M24:
+			pev->viewmodel = MAKE_STRING("models/v_m24.mdl");
 		case WEAPON_AW50:
 			pev->viewmodel = MAKE_STRING("models/v_aw50.mdl");
+		case WEAPON_SPRIFLE:
+			pev->viewmodel = MAKE_STRING("models/v_sprifle.mdl");
+		case WEAPON_BPGM:
+			pev->viewmodel = MAKE_STRING("models/@bpgmiultima_v_pgm.mdl");
+		case WEAPON_ZGUN:
+			pev->viewmodel = MAKE_STRING("models/v_zgun.mdl");
 		default:
 			break;
 		}
@@ -5950,6 +6105,11 @@ void CBasePlayer::Spawn()
 	m_bHolsterDisabled = false;
 
 	SetTouch(&CBasePlayer::PlayerTouch);
+
+	m_iNewMenuID = -1;
+	m_iNewMenuKeys = 0;
+	m_iNewMenuExpire = invalid_time_point;
+	m_iNewMenuPage = 0;
 }
 
 void CBasePlayer::Precache()
@@ -8667,15 +8827,95 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_DEAGLE:
 		case WEAPON_SG552:
 		case WEAPON_AK47:
-		case WEAPON_M95TIGER:
+		case WEAPON_ANACONDA:
+		case WEAPON_DEAGLED:
+		case WEAPON_Z4B_DEAGLESHURA:
+		case WEAPON_DESPERADO:
+		case WEAPON_Z4B_FREQUENCY1:
+		case WEAPON_GUNKATA:
+		case WEAPON_CSGO_R8:
+		case WEAPON_VOIDPISTOL:
+		case WEAPON_GATLING:
+		case WEAPON_GATLINGEX:
+		case WEAPON_M1887:
+		case WEAPON_Z4B_M1887SE:
+		case WEAPON_CSGO_MAG7:
+		case WEAPON_QBARREL:
+		case WEAPON_CSGO_SAWEDOFF:
+		case WEAPON_TBARREL:
+		case WEAPON_AK47DRAGON:
+		case WEAPON_AK47_LONG:
+		case WEAPON_BUFFSG552EX:
+		case WEAPON_M14EBR:
+		case WEAPON_Z4B_M37SE:
+		case WEAPON_M4A1DRAGON:
+		case WEAPON_Z4B_M4A1RAZER:
+		case WEAPON_SCARHEAVY:
+		case WEAPON_SCARLIGHT:
+		case WEAPON_SFGUN:
+		case WEAPON_SKULL5:
+		case WEAPON_STARCHASERAR:
+		case WEAPON_STG44:
+		case WEAPON_SVDEX:
+		case WEAPON_TAR21:
+		case WEAPON_XM8CARBINE:
+		case WEAPON_XM8SHARPSHOOTER:
+		case WEAPON_Z4B_AK47X:
+		case WEAPON_Z4B_M4A1MW:
+		case WEAPON_Z4B_M4A1X:
+		case WEAPON_BUFFM4:
+		case WEAPON_BUFFAK:
+		case WEAPON_Y20S2SCARD:
+		case WEAPON_LIGHTZG:
+		case WEAPON_HEAVYZG:
+		case WEAPON_AK47G:
+		case WEAPON_CARTBLUE:
+		case WEAPON_AS50:
+		case WEAPON_Z4B_AWPNVIDIA:
+		case WEAPON_BENDITA:
+		case WEAPON_M95:
+		case WEAPON_M95XMAS:
+		case WEAPON_Z4B_XM2010PC:
 		case WEAPON_SFSNIPER:
+		case WEAPON_M95TIGER:
 		case WEAPON_CHEYTACLRRS:
 		case WEAPON_M400:
 		case WEAPON_M82:
-		case WEAPON_M24:
+		case WEAPON_SL8:
+		case WEAPON_SL8EX:
 		case WEAPON_TRG42:
 		case WEAPON_TRG42G:
+		case WEAPON_M24:
 		case WEAPON_AW50:
+		case WEAPON_BPGM:
+		case WEAPON_AS50G:
+		case WEAPON_ZGUN:
+		case WEAPON_BALROG7:
+		case WEAPON_BUFFM249:
+		case WEAPON_JANUS7XMAS:
+		case WEAPON_M2:
+		case WEAPON_M249EX:
+		case WEAPON_CSGO_NEGEV:
+		case WEAPON_SFMG:
+		case WEAPON_HK23:
+		case WEAPON_M60:
+		case WEAPON_MK48:
+		case WEAPON_K3:
+		case WEAPON_CROSSBOW:
+		case WEAPON_CHAINSAW:
+		case WEAPON_BOW:
+		case WEAPON_CANNON:
+		case WEAPON_Z4B_CANNONPLASMA:
+		case WEAPON_Z4B_CANNONTIGER:
+		case WEAPON_GUNGNIR:
+		case WEAPON_HUNTBOW:
+		case WEAPON_SGDRILL:
+		case WEAPON_REVIVEGUN:
+		case WEAPON_CSGO_ZEUS:
+		case WEAPON_ZOMBIELAW:
+		case WEAPON_M32VENOM:
+		case WEAPON_CANNONEX:
+		case WEAPON_SPEARGUN:
 			return TRUE;
 		}
 	}
@@ -9532,6 +9772,16 @@ void CBasePlayer::BuildRebuyStruct()
 	m_rebuyStruct.m_defuser = m_bHasDefuser;		// defuser
 	m_rebuyStruct.m_nightVision = m_bHasNightVision;	// night vision
 	m_rebuyStruct.m_armor = m_iKevlar;			// check for armor.
+
+	if (m_iKnifeID && m_iKnifeID != KNIFE_ZOMBI)
+		m_rebuyStruct.m_knifeID = m_iKnifeID;
+	else
+		m_rebuyStruct.m_knifeID = KNIFE_NORMAL;
+
+	if (m_iGrenadeID > GRENADE_HEGRENADE && m_iGrenadeID < NUM_GRENADES)
+		m_rebuyStruct.m_grenadeID = m_iGrenadeID;
+	else
+		m_rebuyStruct.m_grenadeID = GRENADE_HEGRENADE;
 }
 
 void CBasePlayer::Rebuy()
@@ -9569,6 +9819,17 @@ void CBasePlayer::Rebuy()
 			RebuyNightVision();
 		else if (!Q_stricmp(token, "armor"))
 			RebuyArmor();
+	}
+
+	if (m_rebuyStruct.m_knifeID != 0 && m_rebuyStruct.m_knifeID != KNIFE_ZOMBI && m_iKnifeID != m_rebuyStruct.m_knifeID)
+	{
+		m_iKnifeID = m_rebuyStruct.m_knifeID;
+
+		if (!m_rgpPlayerItems[KNIFE_SLOT])
+			GiveNamedItem("weapon_knife");
+
+		if (m_pActiveItem && m_pActiveItem == m_rgpPlayerItems[KNIFE_SLOT])
+			m_pActiveItem->Deploy();
 	}
 
 	m_bIsInRebuy = false;

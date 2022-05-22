@@ -39,7 +39,7 @@ void CM249EX::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_m249ex");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_M249EX;
 	SET_MODEL(ENT(pev), "models/w_m249ex.mdl");
 
 	m_iDefaultAmmo = M249EX_AMMO_GIVE;
@@ -71,7 +71,7 @@ int CM249EX::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M249EX_AMMO_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_M249EX;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

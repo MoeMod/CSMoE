@@ -74,17 +74,38 @@ public:
 };
 
 class CAnaconda : public LinkWeaponTemplate< CAnaconda,
-		TGeneralData,
-		BuildTGetItemInfoFromCSW<WEAPON_DEAGLE>::template type,
-		TPrecacheEvent,
-		TDeployDefault,
-		TReloadDefault,
-		TPrimaryAttackRifle,
-		TFirePistol,
-		TRecoilPunch,
-		TWeaponIdleDefault,
-		TGetDamageDefault
-	>, public CAnaconda_WeaponData {};
+	TGeneralData,
+	BuildTGetItemInfoFromCSW<WEAPON_DEAGLE>::template type,
+	TPrecacheEvent,
+	TDeployDefault,
+	TReloadDefault,
+	TPrimaryAttackRifle,
+	TFirePistol,
+	TRecoilPunch,
+	TWeaponIdleDefault,
+	TGetDamageDefault
+>, public CAnaconda_WeaponData {
+	
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "50AE";
+		p->iMaxAmmo1 = MAX_AMMO_50AE;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = DEAGLE_MAX_CLIP;
+		p->iSlot = 1;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_ANACONDA;
+		p->iFlags = 0;
+		p->iWeight = DEAGLE_WEIGHT;
+
+		return 1;
+	};
+
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+};
+
 LINK_ENTITY_TO_CLASS(weapon_anaconda, CAnaconda)
 
 }

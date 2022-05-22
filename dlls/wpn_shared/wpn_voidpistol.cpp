@@ -400,7 +400,7 @@ void CVoidpistol::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_voidpistol");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_VOIDPISTOL;
 	SET_MODEL(ENT(pev), "models/w_voidpistol.mdl");
 	m_iCharging = 0;
 	m_iDefaultAmmo = 150;
@@ -457,7 +457,7 @@ int CVoidpistol::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = VOIDPISTOL_MAX_CLIP;
 	p->iSlot = 1;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_DEAGLE;
+	p->iId = m_iId = WEAPON_VOIDPISTOL;
 	p->iFlags = 0;
 	p->iWeight = DEAGLE_WEIGHT;
 

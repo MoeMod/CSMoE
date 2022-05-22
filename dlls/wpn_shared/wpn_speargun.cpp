@@ -47,7 +47,7 @@ int CSpearGun::GetItemInfo(ItemInfo* p)
 	p->iMaxClip = 30;
 	p->iSlot = 0;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
+	p->iId = m_iId = WEAPON_SPEARGUN;
 	p->iFlags = 0;
 	p->iWeight = AK47_WEIGHT;
 
@@ -58,6 +58,7 @@ void CSpearGun::Spawn(void)
 {
 	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
+	m_iId = WEAPON_SPEARGUN;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
 

@@ -549,6 +549,9 @@ public:
 	std::vector<std::pair<std::string, int>> m_vecVoteMaps;
 
 	OperationSystem m_iPlayersOS[MAX_CLIENTS];
+	std::set<int> m_setBanWeapon;
+	std::set<int> m_setBanKnife;
+	std::set<int> m_setBanGrenade;
 
 protected:
 	time_point_t m_flIntermissionEndTime;

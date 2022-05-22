@@ -39,7 +39,7 @@ void CSCARHeavy::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_scarh");
 
 	Precache();
-	m_iId = WEAPON_AK47;
+	m_iId = WEAPON_SCARHEAVY;
 	SET_MODEL(ENT(pev), "models/w_scar.mdl");
 
 	m_iDefaultAmmo = SCARH_AMMO;
@@ -124,7 +124,7 @@ int CSCARHeavy::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = SCARH_AMMO;
 	p->iSlot = 0;
 	p->iPosition = 18;
-	p->iId = m_iId = WEAPON_AK47;
+	p->iId = m_iId = WEAPON_SCARHEAVY;
 	p->iFlags = 0;
 	p->iWeight = 25;
 

@@ -39,7 +39,7 @@ void CAS50::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_as50");
 
 	Precache();
-	m_iId = WEAPON_AWP;
+	m_iId = WEAPON_AS50;
 	SET_MODEL(ENT(pev), "models/w_as50.mdl");
 
 	m_iDefaultAmmo = AS50_MAXCLIP;
@@ -69,7 +69,7 @@ int CAS50::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = AS50_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 2;
-	p->iId = m_iId = WEAPON_AWP;
+	p->iId = m_iId = WEAPON_AS50;
 	p->iFlags = 0;
 	p->iWeight = AWP_WEIGHT;
 

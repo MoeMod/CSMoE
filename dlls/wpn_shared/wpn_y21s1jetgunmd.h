@@ -50,6 +50,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_energycells" , 100 }; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 0 }; }
 	double GetDamage_PrimaryAttack_Instant();
 	double GetDamage_PrimaryAttack_Field();
 	void PrimaryAttack_FindTargets();

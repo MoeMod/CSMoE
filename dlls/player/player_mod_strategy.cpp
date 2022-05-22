@@ -230,6 +230,9 @@ void CPlayerModStrategy_Default::UpdateClientData(int sendweapons, clientdata_s 
 	cd->waterlevel = pev->waterlevel;
 	cd->watertype = pev->watertype;
 	cd->weapons = pev->weapons;
+	cd->weapons |= (pl->m_iKnifeID & 0xFFF) << 20;
+	cd->weapons |= (pl->m_iGrenadeID & 0xFFF) << 8;
+	cd->weapons |= (pl->m_iZombieClass & 0x7F) << 1;
 	cd->origin = pev->origin;
 	cd->velocity = pev->velocity;
 	cd->view_ofs = pev->view_ofs;
@@ -373,6 +376,9 @@ void CPlayerModStrategy_Zombie::GiveDefaultItems()
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			if (iSlot == KNIFE_SLOT) {
+				m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+			}
 			m_pPlayer->GiveNamedItem(info.pszClassName);
 			GiveSlotAmmo(m_pPlayer, iSlot);
 		}

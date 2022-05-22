@@ -39,7 +39,7 @@ void CNegev::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_negev");
 
 	Precache();
-	m_iId = WEAPON_P90;
+	m_iId = WEAPON_CSGO_NEGEV;
 	SET_MODEL(ENT(pev), "models/w_negev.mdl");
 
 	m_iDefaultAmmo = NEGEV_AMMO_GIVE;
@@ -79,7 +79,7 @@ int CNegev::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 150;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_CSGO_NEGEV;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

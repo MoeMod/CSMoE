@@ -154,6 +154,9 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
+			if (iSlot == KNIFE_SLOT) {
+				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 			weapon_names_view[iSlot] = info.pszDisplayName;

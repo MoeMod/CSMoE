@@ -37,6 +37,7 @@
 #endif
 
 #include "luash_sv/luash_sv.h"
+#include "newmenus.h"
 
 #include <tuple>
 
@@ -520,6 +521,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->ClearAutoBuyData();
 	pPlayer->m_rebuyString.clear();
 	pPlayer->m_iModelTeam = UNASSIGNED;
+	pPlayer->pev->playerclass = 0; // reset semiclip
 
 	SET_CLIENT_MAXSPEED(ENT(pPlayer->pev), 1);
 	SET_MODEL(ENT(pPlayer->pev), "models/player.mdl");
@@ -1335,26 +1337,26 @@ void ZbsUpgrade(CBasePlayer *pPlayer, int iSlot)
 	}
 }
 
-void HandleMenu_VoteMap(CBasePlayer* pPlayer, int iSlot)
-{
-	int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
-	if (iSlot < 1 || iSlot > length)
-		return;
-
-	pPlayer->m_iMenu = Menu_OFF;
-	//ALERT(at_console, "select #%d %s %d \n", iSlot, g_pGameRules->m_vecVoteMaps[iSlot-1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot-1].second);
-	if (g_pGameRules->m_iVoteMapStatus != 2)
-		return;
-
-	char szText[128];
-	Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iSlot - 1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot - 1].second);
-	int iClientIndex = pPlayer->entindex();
-	MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
-	WRITE_BYTE(iClientIndex);
-	WRITE_STRING(szText);
-	MESSAGE_END();
-
-}
+//void HandleMenu_VoteMap(CBasePlayer* pPlayer, int iSlot)
+//{
+//	int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+//	if (iSlot < 1 || iSlot > length)
+//		return;
+//
+//	pPlayer->m_iMenu = Menu_OFF;
+//	//ALERT(at_console, "select #%d %s %d \n", iSlot, g_pGameRules->m_vecVoteMaps[iSlot-1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot-1].second);
+//	if (g_pGameRules->m_iVoteMapStatus != 2)
+//		return;
+//
+//	char szText[128];
+//	Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iSlot - 1].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iSlot - 1].second);
+//	int iClientIndex = pPlayer->entindex();
+//	MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+//	WRITE_BYTE(iClientIndex);
+//	WRITE_STRING(szText);
+//	MESSAGE_END();
+//
+//}
 
 void BuyItem(CBasePlayer *pPlayer, int iSlot)
 {
@@ -1944,6 +1946,7 @@ BOOL HandleMenu_ChooseTeam(CBasePlayer *player, int slot)
 	// Switch their actual team...
 	player->m_bTeamChanged = true;
 	oldTeam = player->m_iTeam;
+	player->pev->team = team;
 	player->m_iTeam = team;
 	player->m_iModelTeam = team;
 
@@ -3060,9 +3063,52 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				}
 				break;
 			}
-			case Menu_VoteMap:
+			case Menu_CustomMenu:
 			{
-				HandleMenu_VoteMap(player, slot);
+				int	pressed_key = slot - 1;
+				int	bit_key = (1 << pressed_key);
+
+				if (player->m_iNewMenuKeys & bit_key)
+				{
+					if (player->m_iNewMenuExpire != invalid_time_point && gpGlobals->time > player->m_iNewMenuExpire)
+					{
+						if (PlayerMenu* pMenu = g_MenuMgr.get_menu_by_id(player->m_iNewMenuID))
+						{
+							pMenu->Close(player);
+
+							break;
+						}
+						else if (player->m_iNewMenuID > 0)
+						{
+							player->m_iMenu = Menu_OFF;
+							player->m_iNewMenuKeys = 0;
+							player->m_iNewMenuID = -1;
+
+							break;
+						}
+					}
+
+					if (player->m_iNewMenuID != -1)
+					{
+						int menu = player->m_iNewMenuID;
+						player->m_iNewMenuID = -1;
+						if (PlayerMenu* pMenu = g_MenuMgr.get_menu_by_id(menu))
+						{
+							int item = pMenu->PagekeyToItem(player->m_iNewMenuPage, pressed_key + 1);
+							if (item == MENU_BACK)
+							{
+								pMenu->Display(player, player->m_iNewMenuPage - 1);
+							}
+							else if (item == MENU_MORE) {
+								pMenu->Display(player, player->m_iNewMenuPage + 1);
+							}
+							else {
+								pMenu->func(player, pMenu, item);
+								pMenu->Destroy();
+							}
+						}
+					}
+				}
 				break;
 			}
 

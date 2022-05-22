@@ -265,6 +265,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sl8ex.cpp
 	../dlls/wpn_shared/wpn_trg42g.cpp
 	../dlls/wpn_shared/wpn_sprifle.cpp
+	../dlls/wpn_shared/wpn_spsmg.cpp
 	)
 
 set (HUD_SRCS

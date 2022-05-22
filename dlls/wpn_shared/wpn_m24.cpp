@@ -60,7 +60,6 @@ namespace sv {
 		ANIM_DRAW,
 	};
     static constexpr float PlayerMaxSpeed = 193;
-    static constexpr float ArmorRatioModifier = 1.9f;
     static constexpr int DamageDefault = 110;
     static constexpr int DamageZB = 135;
     static constexpr int DamageZBS = 135;
@@ -91,6 +90,12 @@ namespace sv {
 
 		return 1;
 	}
+
+	float GetArmorRatioModifier() override { return 1.9; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_SCOUT); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 5, 3, 170 }; }
 
 	void PrimaryAttack(void)
 	{

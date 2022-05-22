@@ -94,7 +94,7 @@ namespace sv {
         p->iMaxClip = 120;
         p->iSlot = 0;
         p->iPosition = 4;
-        p->iId = m_iId = WEAPON_M249;
+        p->iId = m_iId = WEAPON_MK48;
         p->iFlags = 0;
         p->iWeight = M249_WEIGHT;
 
@@ -104,6 +104,8 @@ namespace sv {
 #ifndef CLIENT_DLL
     WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
 #endif
+    float GetArmorRatioModifier() override { return 1.5; }
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
     		 	
 };
 LINK_ENTITY_TO_CLASS(weapon_mk48, CMK48)

@@ -328,6 +328,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sl8g");
 	UTIL_PrecacheOtherWeapon("weapon_sl8ex");
 	UTIL_PrecacheOtherWeapon("weapon_sprifle");
+	UTIL_PrecacheOtherWeapon("weapon_spsmg");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

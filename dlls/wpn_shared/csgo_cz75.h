@@ -57,13 +57,16 @@ public:
 public:
 	void Cz75Fire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	float GetDamage();
-	NOXREF void MakeBeam();
-	NOXREF void BeamUpdate();
 
 public:
 	int m_iShell;
 	time_point_t m_NextInspect;
 	bool m_bHasReload;
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_FIVESEVEN); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 
 private:
 	unsigned short m_usFireCz75;

@@ -279,6 +279,29 @@ struct BuffAK47_WeaponData
     {
     public:
 
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "buffbullet";
+		p->iMaxAmmo1 = MAX_AMMO_762NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 50;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_BUFFAK;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.6; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_buffbullet" , 200 }; }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
+
 	void Precache(void) override
 	{
 		Base::Precache();

@@ -93,6 +93,12 @@ namespace sv {
 		return 1;
 	}
 
+	float GetArmorRatioModifier() override { return 1.95; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AWP); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
+
 	void PrimaryAttack(void)
 	{
 		if (!FBitSet(m_pPlayer->pev->flags, FL_ONGROUND))

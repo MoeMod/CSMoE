@@ -37,7 +37,7 @@ void CStg44::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_stg44");
 
 	Precache();
-	m_iId = WEAPON_AK47;
+	m_iId = WEAPON_STG44;
 	SET_MODEL(ENT(pev), "models/w_stg44.mdl");
 
 	m_iDefaultAmmo = AK47_DEFAULT_GIVE;
@@ -53,9 +53,6 @@ void CStg44::Precache(void)
 	PRECACHE_MODEL("models/w_stg44.mdl");
 	PRECACHE_MODEL("models/p_stg44.mdl");
 	PRECACHE_SOUND("weapons/stg44_1.wav");
-	PRECACHE_SOUND("weapons/stg44_clipout.wav");
-	PRECACHE_SOUND("weapons/stg44_clipin.wav");
-	PRECACHE_SOUND("weapons/stg44_boltpull.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireStg44 = PRECACHE_EVENT(1, "events/stg44.sc");
@@ -64,14 +61,14 @@ void CStg44::Precache(void)
 int CStg44::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "762Nato";
+	p->pszAmmo1 = "792Nato";
 	p->iMaxAmmo1 = MAX_AMMO_762NATO;
 	p->pszAmmo2 = NULL;
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = AK47_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
+	p->iId = m_iId = WEAPON_STG44;
 	p->iFlags = 0;
 	p->iWeight = AK47_WEIGHT;
 

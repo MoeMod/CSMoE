@@ -125,6 +125,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_SKILL_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombieskill_protect",//ZOMBIE_SKILL_PROTECT
 		"resource/zombi/zombieskill_dogshoot",//ZOMBIE_SKILL_DOGSHOOT
 		"resource/zombi/zombieskill_rush",//ZOMBIE_SKILL_RUSH
+		"resource/zombi/zombieskill_scream",//ZOMBIE_SKILL_RUSH
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_CLASS] =
@@ -157,6 +158,7 @@ const char *  const CHudZB2_Skill::Config::ZOMBIE_CLASS_HUD_ICON_NEW[MAX_ZOMBIE_
 		"resource/zombi/zombietype_zbzdarkheavyzb",//ZOMBIE_CLASS_Z4HEAVY
 		"resource/zombi/zombietype_zbzdarkhiddenzb",//ZOMBIE_CLASS_Z4HIDDEN
 		"resource/zombi/zombietype_zbzdarkhumpbackzb",//ZOMBIE_CLASS_Z4HUMPBACKS
+		"resource/zombi/zombietype_sirenzb",//ZOMBIE_CLASS_SIREN
 };
 
 const char *  const CHudZB2_Skill::Config::ZOMBIE_ITEM_HUD_ICON[2][3] =

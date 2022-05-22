@@ -377,6 +377,7 @@ private:
 
 		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = g_pDelegateGhostShared;
 		m_pPlayer->m_iTeam = TERRORIST;
+		m_pPlayer->pev->team = TERRORIST;
 		TeamChangeUpdate(m_pPlayer, m_pPlayer->m_iTeam);
 	}
 
@@ -388,6 +389,7 @@ private:
 
 		m_pModZBB->m_BuildingInterfaces[m_pPlayer->entindex()] = &sp->m_Build;
 		m_pPlayer->m_iTeam = CT;
+		m_pPlayer->pev->team = CT;
 		TeamChangeUpdate(m_pPlayer, m_pPlayer->m_iTeam);
 	}
 

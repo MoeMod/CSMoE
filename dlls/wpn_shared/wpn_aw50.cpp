@@ -61,7 +61,6 @@ namespace sv {
 		ANIM_DRAW,
 	};
     static constexpr float PlayerMaxSpeed = 215;
-    static constexpr float ArmorRatioModifier = 1.94f;
     static constexpr int DamageDefault = 115;
     static constexpr int DamageZB = 140;
     static constexpr int DamageZBS = 140;
@@ -92,6 +91,9 @@ namespace sv {
 
 		return 1;
 	}
+
+	float GetArmorRatioModifier() override { return 1.94; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
 
 	void PrimaryAttack(void)
 	{

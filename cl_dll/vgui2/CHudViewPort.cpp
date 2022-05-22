@@ -45,8 +45,7 @@ int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
 	m_bGotAllMOTD = buf.ReadByte();
 
 	m_szMOTD += buf.ReadString();
-
-	//CClientMOTD *panel = dynamic_cast<CClientMOTD *>(g_pViewport->FindPanelByName("ClientMOTD"));
+#if 0
 	CClientMOTD *panel = m_pMOTD;
 	if (panel)
 	{
@@ -54,7 +53,7 @@ int CHudViewport::MsgFunc_MOTD(const char *pszName, int iSize, void *pbuf)
 	}
 	else
 		gEngfuncs.Con_Printf("MsgFunc_MOTD() : Error! CClientMOTD is nullptr\n");
-
+#endif
 	return 1;
 }
 

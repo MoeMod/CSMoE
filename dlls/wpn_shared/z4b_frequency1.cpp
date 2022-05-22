@@ -37,7 +37,7 @@ void CFrequency1::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_frequency1");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_Z4B_FREQUENCY1;
 	SET_MODEL(ENT(pev), "models/z4b/pw_mccree.mdl");
 
 	m_iDefaultAmmo = FREQUENCY1_MAX_CLIP;
@@ -75,12 +75,12 @@ int CFrequency1::GetItemInfo(ItemInfo *p)
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "50AE";
 	p->iMaxAmmo1 = MAX_AMMO_50AE;
-	p->pszAmmo2 = "SVDEXGrenade";
+	p->pszAmmo2 = "DeathEye";
 	p->iMaxAmmo2 = -1;
 	p->iMaxClip = FREQUENCY1_MAX_CLIP;
 	p->iSlot = 1;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_DEAGLE;
+	p->iId = m_iId = WEAPON_Z4B_FREQUENCY1;
 	p->iFlags = 0;
 	p->iWeight = DEAGLE_WEIGHT;
 

@@ -101,6 +101,7 @@ void CGameUI::Initialize(CreateInterfaceFn *factories, int count)
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/valve_%language%.txt");
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/vgui_%language%.txt");
 	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/cstrike_%language%.txt");
+	vgui2::localize()->AddFile(vgui2::filesystem(), "Resource/csmoe_%language%.txt");
 
 	staticPanel = new CBasePanel();
 	staticPanel->SetBounds(0, 0, 640, 480);
@@ -203,6 +204,7 @@ int CGameUI::ActivateGameUI(void)
 	staticPanel->SetVisible(true);
 
 	engine->pfnClientCmd("setpause");
+	engine->pfnClientCmd("citrus_servers_show");
 
 	return 1;
 }
@@ -269,6 +271,7 @@ void CGameUI::HideGameUI(void)
 
 	engine->pfnClientCmd("unpause");
 	engine->pfnClientCmd("hideconsole");
+	engine->pfnClientCmd("citrus_servers_hide");
 
 	if (GameConsole().IsConsoleVisible())
 		GameConsole().Hide();

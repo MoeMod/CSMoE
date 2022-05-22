@@ -35,7 +35,7 @@ void CY21s1Jetgunmd::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_y21s1jetgunmd");
 
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_Y21S1JETGUNMD;
 	SET_MODEL(ENT(pev), "models/w_y21s1jetgunmd.mdl");
 
 	m_iDefaultAmmo = 100;
@@ -78,7 +78,7 @@ int CY21s1Jetgunmd::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 100;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_Y21S1JETGUNMD;
 	p->iFlags = 0;
 	p->iWeight = ELITE_WEIGHT;
 

@@ -41,7 +41,7 @@ namespace sv {
 		pev->classname = MAKE_STRING("weapon_janus7xmas");
 
 		Precache();
-		m_iId = WEAPON_M249;
+		m_iId = WEAPON_JANUS7XMAS;
 		SET_MODEL(ENT(pev), "models/w_janus7xmas.mdl");
 
 		m_iDefaultAmmo = JANUS7_AMMO_GIVE;
@@ -59,10 +59,6 @@ namespace sv {
 		PRECACHE_MODEL("models/p_janus7xmas.mdl");
 		PRECACHE_SOUND("weapons/janus7-1.wav");
 		PRECACHE_SOUND("weapons/janus7-2.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipout1.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipout2.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipin1.wav");
-		PRECACHE_SOUND("weapons/janus7xmas_clipin3.wav");
 
 		m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 		m_usFireJanus7xmas = PRECACHE_EVENT(1, "events/janus7xmas.sc");
@@ -80,7 +76,7 @@ namespace sv {
 		p->iMaxClip = JANUS7_AMMO_GIVE;
 		p->iSlot = 0;
 		p->iPosition = 4;
-		p->iId = m_iId = WEAPON_M249;
+		p->iId = m_iId = WEAPON_JANUS7XMAS;
 		p->iFlags = 0;
 		p->iWeight = M249_WEIGHT;
 

@@ -221,7 +221,7 @@ public:
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 	virtual void BounceSound();
 	void KickRate(entvars_t *pevInflictor, entvars_t *pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost);
-   
+	void ModStrategy_GrenadeExploded(Vector vecStart);
 public:
 	enum SATCHELCODE
 	{
@@ -286,6 +286,9 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[15];
+
+public:
+	int m_iGrenadeID;
 };
 
 template<> struct PrivateData<class CBasePlayerItem, CBaseAnimating>
@@ -447,6 +450,10 @@ template<> struct PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
 class CBasePlayerWeapon : public CBasePlayerItem, public PrivateData<class CBasePlayerWeapon, CBasePlayerItem>
 {
 public:
+	CBasePlayerWeapon()
+	{
+		m_flHolsterTime = invalid_time_point;
+	}
 #ifdef CLIENT_DLL
 	int Save(CSave &save) override { return 1; }
 	int Restore(CRestore &restore) override { return 1; }
@@ -532,8 +539,34 @@ public:
 	virtual bool HasSecondaryAttack(); // virtualized...
 	virtual BOOL IsPistol()
 	{
-		return (m_iId == WEAPON_USP || m_iId == WEAPON_GLOCK18 || m_iId == WEAPON_P228 || m_iId == WEAPON_DEAGLE ||
-		        m_iId == WEAPON_ELITE || m_iId == WEAPON_FIVESEVEN);
+		return (
+			m_iId == WEAPON_USP
+			|| m_iId == WEAPON_GLOCK18
+			|| m_iId == WEAPON_P228
+			|| m_iId == WEAPON_DEAGLE
+			|| m_iId == WEAPON_ELITE
+			|| m_iId == WEAPON_FIVESEVEN
+			|| m_iId == WEAPON_ANACONDA
+			|| m_iId == WEAPON_CSGO_CZ75
+			|| m_iId == WEAPON_DEAGLED
+			|| m_iId == WEAPON_Z4B_DEAGLESHURA
+			|| m_iId == WEAPON_DESPERADO
+			|| m_iId == WEAPON_Z4B_FREQUENCY1
+			|| m_iId == WEAPON_GUNKATA
+			|| m_iId == WEAPON_INFINITY
+			|| m_iId == WEAPON_INFINITYEX1
+			|| m_iId == WEAPON_INFINITYEX2
+			|| m_iId == WEAPON_INFINITYSB
+			|| m_iId == WEAPON_INFINITYSR
+			|| m_iId == WEAPON_INFINITYSS
+			|| m_iId == WEAPON_Z4B_INFINITYX
+			|| m_iId == WEAPON_Z4B_FREQUENCY1
+			|| m_iId == WEAPON_CSGO_R8
+			|| m_iId == WEAPON_CSGO_TEC9
+			|| m_iId == WEAPON_VOIDPISTOL
+			|| m_iId == WEAPON_Y21S1JETGUNMD
+			|| m_iId == WEAPON_M950
+			);
 	}
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
@@ -551,6 +584,7 @@ public:
 
 public:
 	static TYPEDESCRIPTION m_SaveData[7];
+	time_point_t m_flHolsterTime;
 };
 
 }

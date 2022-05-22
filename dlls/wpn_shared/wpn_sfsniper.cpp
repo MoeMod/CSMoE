@@ -45,7 +45,7 @@ void CSFSniper::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_sfsniper");
 
 	Precache();
-	m_iId = WEAPON_AWP;
+	m_iId = WEAPON_SFSNIPER;
 	SET_MODEL(ENT(pev), "models/w_sfsniper.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;

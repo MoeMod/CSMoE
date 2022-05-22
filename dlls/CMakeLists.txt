@@ -221,6 +221,8 @@ set(HLDLL_SRCS
 	./summonknifecannon.cpp
 	./gamemode/mod_z4e.cpp
 	./sgmissilecannon.cpp
+	./newmenus.cpp
+	./gamemode/zb2/zb2_zclass_siren.cpp
 	)
 
 set (HLWPN_SRCS
@@ -421,6 +423,7 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_sl8ex.cpp
 	../dlls/wpn_shared/wpn_trg42g.cpp
 	../dlls/wpn_shared/wpn_sprifle.cpp
+	../dlls/wpn_shared/wpn_spsmg.cpp
 	)
 
 set(PM_SRCS

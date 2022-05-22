@@ -63,6 +63,11 @@ public:
 	void R8Fire(float flSpread, duration_t flCycleTime, BOOL fUseSemi, BOOL fIsModeA);
 	float GetDamage(BOOL fIsModeA);
 	time_point_t m_NextInspect;
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_DEAGLE); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 public:
 	int m_iShell;
 	unsigned short m_usFireR8;

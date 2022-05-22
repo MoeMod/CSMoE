@@ -43,6 +43,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 450.0f, 300.0f, 350.0f, 250.0f, 0.7f }; }
 	const char* GetCSModelName() override { return "models/w_sfsmg.mdl"; }
 	float GetArmorRatioModifier() override { return 1.55; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_MAC10); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 2, 170 }; }
 public:
 	void SFSMGFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 

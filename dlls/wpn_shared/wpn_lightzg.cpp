@@ -106,7 +106,7 @@ namespace sv {
         p->iMaxClip = 30;
         p->iSlot = 0;
         p->iPosition = 17;
-        p->iId = m_iId = WEAPON_GALIL;
+        p->iId = m_iId = WEAPON_LIGHTZG;
         p->iFlags = 0;
         p->iWeight = GALIL_WEIGHT;
 
@@ -279,9 +279,11 @@ namespace sv {
         }
     }
 
+    float GetArmorRatioModifier() override { return 1.55; }
 #ifndef CLIENT_DLL
     WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556lvb" , 30 }; }
 #endif
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
     		 	
 };
 LINK_ENTITY_TO_CLASS(weapon_lightzg, CLightZG)

@@ -73,6 +73,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_revivegun" , 200 }; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 3, 3, 140 }; }
 
 	float GetDamage() const;
 	float GetSecondaryAttackDamage() const;

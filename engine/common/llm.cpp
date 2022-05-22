@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 */
 
-#include "llm.h"
+#include "common.h"
 
 #include <boost/pool/pool.hpp>
 #include <boost/container/pmr/global_resource.hpp>
@@ -37,17 +37,17 @@ namespace pmr = boost::container::pmr;
 #define MEMHEADER_SENTINEL1	0xDEADF00D
 #define MEMHEADER_SENTINEL2	0xDF
 
-class IMalloc
+class ILowLevelMalloc
 {
 public:
-    virtual ~IMalloc() = default;
+    virtual ~ILowLevelMalloc() = default;
     virtual void *Alloc(size_t size) = 0;
     virtual void *CAlloc(size_t n, size_t size) = 0;
     virtual void *AlignedAlloc(size_t size, size_t align =  alignof(std::max_align_t)) = 0;
     virtual void Free(void *ptr) = 0;
 };
 
-class IMemPool : public IMalloc
+class IMemPool : public ILowLevelMalloc
 {
 public:
     virtual void Empty() = 0;
@@ -87,7 +87,14 @@ public:
         return rml::pool_malloc(tbbpool, size);
     }
 
-    void *Alloc(size_t size, size_t align) override
+    void* CAlloc(size_t n, size_t size) override
+    {
+        void *res = rml::pool_malloc(tbbpool, n * size);
+        memset(res, 0, n * size);
+        return res;
+    }
+
+    void *AlignedAlloc(size_t size, size_t align) override
     {
         return pool_aligned_malloc(tbbpool, size, align);
     }
@@ -123,7 +130,7 @@ private:
 class MallocRes : public pmr::memory_resource
 {
 public:
-    MallocRes(IMalloc *bk) : backendpool(bk) {}
+    MallocRes(ILowLevelMalloc *bk) : backendpool(bk) {}
 
     void* do_allocate(std::size_t size, std::size_t align) override
     {
@@ -138,14 +145,14 @@ public:
         return this == &other;
     }
 
-    IMalloc *backendpool;
+    ILowLevelMalloc *backendpool;
 };
 
 template<class T = pmr::unsynchronized_pool_resource>
 class PmrMemPool : public mempool_t, public MemPoolConfig
 {
 public:
-    PmrMemPool(IMalloc *bk, const char *name LLM_EXTRA_ARG_DEF) :
+    PmrMemPool(ILowLevelMalloc *bk, const char *name LLM_EXTRA_ARG_DEF) :
         MemPoolConfig{ name LLM_EXTRA_ARG_FWD },
         memres(bk),
         pmrpool(pmr::pool_options{}, &memres)
@@ -238,28 +245,44 @@ private:
 };
 #endif
 
-class CrtMalloc : public IMalloc
+class CrtMalloc : public ILowLevelMalloc
 {
 public:
 
     void *Alloc(size_t size) override
     {
+#ifndef __APPLE__
+        return ::operator new(size);
+#else
         return malloc(size);
+#endif
     }
 
     void *CAlloc(size_t n, size_t size) override
     {
+#ifndef __APPLE__
+        return ::operator new(n * size);
+#else
         return calloc(n, size);
+#endif
     }
 
     void *AlignedAlloc(size_t size, size_t align) override
     {
+#ifndef __APPLE__
+        return ::operator new(size, (std::align_val_t)align);
+#else
         return aligned_alloc(align, size);
+#endif
     }
 
     void Free(void *ptr) override
     {
+#ifndef __APPLE__
+        ::operator delete(ptr);
+#else
         free(ptr);
+#endif
     }
 
 } g_CrtMalloc;
@@ -411,14 +434,18 @@ void LLM_FUNCTION_MANGLE(Mem_Free)( void *data LLM_EXTRA_ARG_DEF )
     if( mem->sentinel1 != MEMHEADER_SENTINEL1 )
     {
         mem->filename = Mem_CheckFilename( mem->filename ); // make sure what we don't crash var_args
+        DebugBreak();
         Sys_Error( "Mem_Free: trashed header sentinel 1 (alloc at %s:%i, free at %s:%i)\n", mem->filename, mem->fileline, filename, fileline );
     }
 
     if( *((byte *)mem + sizeof( memheader_t ) + mem->size ) != MEMHEADER_SENTINEL2 )
     {
         mem->filename = Mem_CheckFilename( mem->filename ); // make sure what we don't crash var_args
+        DebugBreak();
         Sys_Error( "Mem_Free: trashed header sentinel 2 (alloc at %s:%i, free at %s:%i)\n", mem->filename, mem->fileline, filename, fileline );
     }
+    mem->sentinel1 = 0xCDCDCDCD;
+    *((byte*)mem + sizeof(memheader_t) + mem->size) = 0xCD;
 #endif
     if(mem->pool)
         mem->pool->Free(mem);

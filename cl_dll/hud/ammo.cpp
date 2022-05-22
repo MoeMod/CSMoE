@@ -552,8 +552,6 @@ void WeaponsResource :: SelectSlot( int iSlot, int fAdvance, int iDirection )
 	if (!(gHUD.m_iWeaponBits & (1<<(WEAPON_SUIT)) ))
 		return;
 
-	if ( ! ( gHUD.m_iWeaponBits & ~(1<<(WEAPON_SUIT)) ))
-		return;
 
 	WEAPON *p = NULL;
 	bool fastSwitch = gHUD.m_Ammo.m_pHud_FastSwitch->value != 0.0f;
@@ -1392,18 +1390,35 @@ void CHudAmmo::DrawCrosshair( float flTime )
 	if(    weaponid == WEAPON_AWP
 		|| weaponid == WEAPON_SCOUT
 		|| weaponid == WEAPON_SG550
-		|| weaponid == WEAPON_G3SG1
-		|| weaponid == WEAPON_HUNTBOW
-		|| weaponid == WEAPON_SFSNIPER
+		|| weaponid == WEAPON_G3SG1	
+		|| weaponid == WEAPON_XM8SHARPSHOOTER
+		|| weaponid == WEAPON_AS50
+		|| weaponid == WEAPON_AS50G
+		|| weaponid == WEAPON_BENDITA
 		|| weaponid == WEAPON_SKULL5
+		|| weaponid == WEAPON_Z4B_AWPNVIDIA
+		|| weaponid == WEAPON_M95
+		|| weaponid == WEAPON_M95XMAS
+		|| weaponid == WEAPON_WA2000
+		|| weaponid == WEAPON_Z4B_XM2010PC
+		|| weaponid == WEAPON_Z4B_M1887SE
+		|| weaponid == WEAPON_SFSNIPER
 		|| weaponid == WEAPON_CHEYTACLRRS
 		|| weaponid == WEAPON_M400
 		|| weaponid == WEAPON_M82
-		|| weaponid == WEAPON_M24
+		|| weaponid == WEAPON_SL8
+		|| weaponid == WEAPON_SL8G
+		|| weaponid == WEAPON_SL8EX
 		|| weaponid == WEAPON_TRG42
 		|| weaponid == WEAPON_TRG42G
+		|| weaponid == WEAPON_M24
 		|| weaponid == WEAPON_AW50
-		|| weaponid == WEAPON_CHAINSAW)
+		|| weaponid == WEAPON_SPRIFLE
+		|| weaponid == WEAPON_BPGM
+		|| weaponid == WEAPON_ZGUN
+		|| weaponid == WEAPON_HUNTBOW
+		|| weaponid == WEAPON_CHAINSAW
+		|| weaponid == WEAPON_Z4B_BARRETTD)
 		return;
 
 	if ( g_iWeaponFlags & WPNSTATE_SHIELD_DRAWN )

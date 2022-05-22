@@ -168,7 +168,7 @@ void EV_FireCannonCommon(struct event_args_s* args, const char* szSound, int mod
 		EV_MuzzleFlash();
 
 		if (!Com_RandomLong(0, 5))
-			EV_CS16Client_CreateSmoke(SMOKE_BLACK, ent->attachment[0], forward, 50, 0.26, 15, 15, 15, false, velocity);
+			EV_HLDM_CreateSmoke(ent->attachment[0], forward, 50, 0.26, 15, 15, 15, 3, velocity, true, 35);
 	}
 
 	EV_GetGunPosition(args, vecSrc, origin);

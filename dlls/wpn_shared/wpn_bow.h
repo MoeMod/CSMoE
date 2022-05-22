@@ -64,6 +64,9 @@ public:
 	time_point_t fFinishTime;
 	int iShellOn;
 
+	float GetArmorRatioModifier() override { return 1.95; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 4, 3, 0 }; }
+
 private:
 	unsigned short m_usFireBow;
 };

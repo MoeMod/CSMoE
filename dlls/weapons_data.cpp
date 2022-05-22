@@ -141,6 +141,7 @@ float GetArmorRatioModifier(WeaponIdType iGunType)
 			flRatio *= 1.05;
 			break;
 		case WEAPON_DEAGLE:
+		case WEAPON_ANACONDA:
 			flRatio *= 1.5;
 			break;
 		case WEAPON_GLOCK18:
@@ -236,6 +237,7 @@ WeaponBuyAmmoConfig GetBuyAmmoConfig(WeaponIdType id)
 			classname = "ammo_9mm";
 			break;
 		case WEAPON_DEAGLE:
+		case WEAPON_ANACONDA:
 			cost = AMMO_50AE_PRICE;
 			classname = "ammo_50ae";
 			break;

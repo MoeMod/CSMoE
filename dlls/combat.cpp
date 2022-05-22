@@ -2678,6 +2678,21 @@ void CGrenade::KickRate(entvars_t* pevInflictor, entvars_t* pevAttacker, float f
 	}
 }
 
+void CGrenade::ModStrategy_GrenadeExploded(Vector vecStart)
+{
+	entvars_t* pevOwner;
+	if (pev->owner)
+		pevOwner = VARS(pev->owner);
+	else
+		pevOwner = NULL;
+
+	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+	if (player)
+	{
+		player->m_pModStrategy->GrenadeExploded(pev->origin);
+	}
+}
+
 void FireBulletsForMobile(Vector vecSrc, Vector vecDir, float flDistance, float flPenetrationDistance, int iPenetration,
 	int iBulletType, int iDamage, float flRangeModifier, entvars_t* pevAttacker, bool bPistol, CBaseEntity* pEntity)
 {

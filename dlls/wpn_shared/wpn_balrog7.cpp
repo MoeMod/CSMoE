@@ -43,7 +43,7 @@ void CBalrog7::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_balrog7");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_BALROG7;
 	SET_MODEL(ENT(pev), "models/w_balrog7.mdl");
 
 	m_iDefaultAmmo = BALROG7_DEFAULT_GIVE;
@@ -79,7 +79,7 @@ int CBalrog7::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = BALROG7_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_BALROG7;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

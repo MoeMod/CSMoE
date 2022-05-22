@@ -99,6 +99,31 @@ public:
 		GUNKATA_MODE_B3 = 3,
 		GUNKATA_MODE_B4 = 4,
 	};
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_44magnum" , 100 }; }
+#endif
+	float GetArmorRatioModifier() override { return 1.7; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+
+
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "44magnum";
+		p->iMaxAmmo1 = 180;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 36;
+		p->iSlot = 1;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_GUNKATA;
+		p->iFlags = 0;
+		p->iWeight = DEAGLE_WEIGHT;
+
+		return 1;
+	};
+
 	static float GetDamage(GunkataMode iMode = GUNKATA_MODE_A)
 	{
 		if(iMode)

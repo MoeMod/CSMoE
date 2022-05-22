@@ -214,7 +214,9 @@ char *SV_EntityScript( void )
 		else if(( ents = (char *)FS_LoadFile( entfilename, NULL, true )) != NULL )
 		{
 			MsgDev( D_INFO, "^2Read entity patch:^7 %s\n", entfilename );
-			return ents;
+			//return ents;
+			Mem_Free(sv.worldmodel->entities);
+			sv.worldmodel->entities = ents;
 		}
 	}
 

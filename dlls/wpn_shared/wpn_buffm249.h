@@ -42,7 +42,7 @@ public:
 #ifndef CLIENT_DLL
 		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50az" , 600 }; }
 #endif
-
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 195 }; }
 public:
 	void BUFFM249Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamageA() const;

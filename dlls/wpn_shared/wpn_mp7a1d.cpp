@@ -35,7 +35,7 @@ void CMP7A1D::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_mp7a1d");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_MP7A1D;
 	SET_MODEL(ENT(pev), "models/w_dmp7a1.mdl");
 
 	m_iDefaultAmmo = WEAPON_MAXCLIP;
@@ -67,7 +67,7 @@ int CMP7A1D::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = WEAPON_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 8;
-	p->iId = m_iId = WEAPON_P90;
+	p->iId = m_iId = WEAPON_MP7A1D;
 	p->iFlags = 0;
 	p->iWeight = P90_WEIGHT;
 

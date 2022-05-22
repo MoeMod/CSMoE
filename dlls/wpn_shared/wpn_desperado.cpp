@@ -57,7 +57,7 @@ void CDesperado::Spawn(void)
 {
 	pev->classname = MAKE_STRING("weapon_desperado");
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_DESPERADO;
 	SET_MODEL(ENT(pev), "models/w_desperado.mdl");
 
 	m_iDefaultAmmo = DESPERADO_MAX_CLIP;
@@ -69,8 +69,6 @@ void CDesperado::Spawn(void)
 
 	ResetRunIdle();
 	m_iClip2 = m_iBackupClip = m_iDefaultAmmo;
-
-	
 }
 
 void CDesperado::Precache(void)
@@ -99,9 +97,9 @@ int CDesperado::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = DESPERADO_MAX_CLIP;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_DESPERADO;
 	p->iFlags = 0;
-	p->iWeight = ELITE_WEIGHT;
+	p->iWeight = 6;
 
 	return 1;
 }

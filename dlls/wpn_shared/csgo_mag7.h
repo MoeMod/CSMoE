@@ -46,6 +46,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 750.0f, 550.0f, 650.0f, 500.0f, 0.4f }; }
 	const char *GetCSModelName() override { return "models/w_mag7.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_XM1014); }
+#endif
+	float GetArmorRatioModifier() override { return 1.3; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 9, 4, 0 }; }
 
 public:
 	int m_iShell;

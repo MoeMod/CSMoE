@@ -76,6 +76,22 @@ void CBaseViewport::Start()
 	vgui2::ipanel()->MoveToBack( m_pBackGround->GetVPanel() ); // really send it to the back 
 }
 
+void CBaseViewport::Init()
+{
+	for (int i = 0; i < m_Panels.Count(); i++)
+		m_Panels[i]->Init();
+
+	HideAllVGUIMenu();
+}
+
+void CBaseViewport::VidInit()
+{
+	for (int i = 0; i < m_Panels.Count(); i++)
+		m_Panels[i]->VidInit();
+
+	HideAllVGUIMenu();
+}
+
 void CBaseViewport::SetParent( vgui2::VPANEL parent )
 {
 	const bool bIsProportional = IsProportional();

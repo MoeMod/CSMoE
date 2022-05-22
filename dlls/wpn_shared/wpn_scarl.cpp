@@ -39,7 +39,7 @@ void CScarLight::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_scarl");
 
 	Precache();
-	m_iId = WEAPON_GALIL;
+	m_iId = WEAPON_SCARLIGHT;
 	SET_MODEL(ENT(pev), "models/w_scar.mdl");
 
 	m_iDefaultAmmo = SCARL_AMMO;
@@ -122,7 +122,7 @@ int CScarLight::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = SCARL_AMMO;
 	p->iSlot = 0;
 	p->iPosition = 17;
-	p->iId = m_iId = WEAPON_GALIL;
+	p->iId = m_iId = WEAPON_SCARLIGHT;
 	p->iFlags = 0;
 	p->iWeight = 25;
 

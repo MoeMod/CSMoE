@@ -48,6 +48,7 @@ GNU General Public License for more details.
 #include "zb2_zclass_spider.h"
 #include "zb2_zclass_deathknight.h"
 #include "zb2_zclass_meatwall.h"
+#include "zb2_zclass_siren.h"
 #include <random>
 
 namespace sv {
@@ -81,12 +82,14 @@ const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2
 		{"nemesis", 25, MakeZombieClass<CZombieClass_Nemesis>},
 		{"spider", 25, MakeZombieClass<CZombieClass_Spider>},
 		{"deathknight", 25, MakeZombieClass<CZombieClass_DeathKnight>},
+		{"siren", 50, MakeZombieClass<CZombieClass_Siren>},
 		//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
 };
 
 #else
 const std::tuple<const char*, unsigned int, std::shared_ptr<CBaseZombieClass_ZB2>(*)(CBasePlayer*, ZombieLevel)> g_FindList[] = {
 	//{"meatwall", 100, MakeZombieClass<CZombieClass_MeatWall>},
+	//{"siren", 50, MakeZombieClass<CZombieClass_Siren>},
 	{"tank", 100, MakeZombieClass<CZombieClass_Default>},
 	{"speed", 100, MakeZombieClass<CZombieClass_Speed> },
 

@@ -46,6 +46,7 @@ using namespace std::chrono_literals;
 
 namespace ui {
 	static bool s_server_open = false;
+	static bool s_server_show = false;
 	static boost::asio::io_context s_server_ioc;
 
 	static std::vector<std::tuple<std::chrono::high_resolution_clock::duration, boost::asio::ip::udp::endpoint, TSourceEngineQuery::ServerInfoQueryResult> > s_servers_list;
@@ -276,12 +277,25 @@ namespace ui {
 	void Server_Open()
 	{
 		s_server_open = true;
+		s_server_show = true;
 		ServerModel_Refresh();
+	}
+
+	void Server_Show()
+	{
+		s_server_show = true;
+	}
+
+	void Server_Hide()
+	{
+		s_server_show = false;
 	}
 
 	void ImGui_Server_Init()
 	{
 		Cmd_AddCommand("citrus_servers", Server_Open, "open server");
+		Cmd_AddCommand("citrus_servers_show", Server_Show, "show server");
+		Cmd_AddCommand("citrus_servers_hide", Server_Hide, "hide server");
 	}
 
 	void ImGui_Server_OnGui()
@@ -291,7 +305,7 @@ namespace ui {
 		for(auto ep : serverinfo_open2)
 			ServerDetailInfo_OnGui(ep);
 
-		if(!s_server_open)
+		if(!s_server_open || !s_server_show)
 			return;
 		ImGui::SetNextWindowSizeConstraints(ImGuiUtils::GetScaledSize({480, 320}), ImGui::GetIO().DisplaySize);
 		ImGuiUtils::CenterNextWindow(ImGuiCond_Appearing);
@@ -387,7 +401,7 @@ namespace ui {
 			ImGui::Columns();
 			ImGui::End();
 		}
-		if(!s_server_open)
+		if(!s_server_open || !s_server_show)
 		{
 			// window is closed
 			s_server_ioc.stop();

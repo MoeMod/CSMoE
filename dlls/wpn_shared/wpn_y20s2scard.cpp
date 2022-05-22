@@ -54,7 +54,6 @@ struct Y20s2SCARD_WeaponData
 		ANIM_SHOOTB,
 	};
 	static constexpr float PlayerMaxSpeed = 240;
-	static constexpr float ArmorRatioModifier = 1.45f;
 	static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.035;
 	static constexpr const auto& SpreadCalcWalking = 0.025 * A + 0.07;
 	static constexpr const auto& SpreadCalcDucking = 0.0 * A;
@@ -385,6 +384,29 @@ struct Y20s2SCARD_WeaponData
 	int m_iSprEffect;
 	int m_iShootCount;
 
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "762Nato";
+		p->iMaxAmmo1 = MAX_AMMO_762NATO;
+		p->pszAmmo2 = "SCARDGrenade";
+		p->iMaxAmmo2 = 10;
+		p->iMaxClip = 45;
+		p->iSlot = 0;
+		p->iPosition = 14;
+		p->iId = m_iId = WEAPON_Y20S2SCARD;
+		p->iFlags = 0;
+		p->iWeight = AUG_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.45; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AUG); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 3, 3, 140 }; }
+
 	float GetGrenadeTouchDamage() const
 	{
 		float flDamage = 10;
@@ -407,23 +429,6 @@ struct Y20s2SCARD_WeaponData
 			flDamage = 1500;
 #endif
 		return flDamage;
-	}
-
-	int GetItemInfo(ItemInfo* p) override
-	{
-		p->pszName = STRING(pev->classname);
-		p->pszAmmo1 = "762Nato";
-		p->iMaxAmmo1 = MAX_AMMO_762NATO;
-		p->pszAmmo2 = "SCARDGrenade";
-		p->iMaxAmmo2 = 10;
-		p->iMaxClip = 45;
-		p->iSlot = 0;
-		p->iPosition = 14;
-		p->iId = m_iId = WEAPON_AUG;
-		p->iFlags = 0;
-		p->iWeight = AUG_WEIGHT;
-
-		return 1;
 	}
 
 	void Spawn(void)

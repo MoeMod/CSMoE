@@ -37,7 +37,7 @@ void CSFSMG::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_sfsmg");
 
 	Precache();
-	m_iId = WEAPON_MAC10;
+	m_iId = WEAPON_SFSMG;
 	SET_MODEL(ENT(pev), "models/w_sfsmg.mdl");
 
 	m_iDefaultAmmo = SFSMG_MAX_CLIP;
@@ -69,7 +69,7 @@ int CSFSMG::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = MAC10_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 13;
-	p->iId = m_iId = WEAPON_MAC10;
+	p->iId = m_iId = WEAPON_SFSMG;
 	p->iFlags = 0;
 	p->iWeight = MAC10_WEIGHT;
 

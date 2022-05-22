@@ -60,7 +60,6 @@ namespace sv {
 		ANIM_SHOOT3
 	};
     static constexpr float PlayerMaxSpeed = 235;
-    static constexpr float ArmorRatioModifier = 1.4f;
     static constexpr const auto &SpreadCalcNotOnGround = 0.4*A + 0.035;
     static constexpr const auto &SpreadCalcWalking = 0.025*A + 0.07;
     static constexpr const auto &SpreadCalcDucking = 0.0*A;
@@ -78,6 +77,29 @@ namespace sv {
     static constexpr auto BulletType = BULLET_PLAYER_556MM;
     /*static constexpr*/ int Penetration = 1;
     KnockbackData KnockBack = { 550.0f, 800.0f, 450.0f, 350.0f, 0.3f };
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "556Nato";
+		p->iMaxAmmo1 = MAX_AMMO_556NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 35;
+		p->iSlot = 0;
+		p->iPosition = 6;
+		p->iId = m_iId = WEAPON_Z4B_M4A1X;
+		p->iFlags = 0;
+		p->iWeight = M4A1_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.4; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M4A1); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 
 	BOOL Deploy() override
 	{

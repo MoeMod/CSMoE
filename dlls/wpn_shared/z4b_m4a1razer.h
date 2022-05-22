@@ -59,7 +59,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f }; }
 	const char *GetCSModelName() override { return "models/z4b/w_m4a1razer.mdl"; }
-
+	float GetArmorRatioModifier() override { return 1.5; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M4A1); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 public:
 	void SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void SVDEXFire2(duration_t flCycleTime, BOOL fUseAutoAim);

@@ -54,7 +54,7 @@ hit_result_t CZeus::ZeusAttack(Vector vecSrc, Vector vecDir, float flDamage, flo
 				result = HIT_WALL;
 			else
 			{
-				const float flAdjustedDamage = flDamage * tr.flFraction;
+				const float flAdjustedDamage = flDamage * (1 - tr.flFraction);
 				tr.iHitgroup = HITGROUP_CHEST;
 				ClearMultiDamage();
 				pHit->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
@@ -85,7 +85,7 @@ hit_result_t CZeus::ZeusAttack(Vector vecSrc, Vector vecDir, float flDamage, flo
 		WRITE_SHORT(m_iSprBeam);
 		WRITE_BYTE(0); // framerate
 		WRITE_BYTE(0); // framerate
-		WRITE_BYTE(10); // life
+		WRITE_BYTE(20); // life
 		WRITE_BYTE(20);  // width
 		WRITE_BYTE(7);   // noise
 		WRITE_BYTE(50);
@@ -104,7 +104,7 @@ hit_result_t CZeus::ZeusAttack(Vector vecSrc, Vector vecDir, float flDamage, flo
 		WRITE_SHORT(m_iSprBeam);
 		WRITE_BYTE(0); // framerate
 		WRITE_BYTE(0); // framerate
-		WRITE_BYTE(10); // life
+		WRITE_BYTE(20); // life
 		WRITE_BYTE(13); // width
 		WRITE_BYTE(30);   // noise
 		WRITE_BYTE(50);
@@ -125,7 +125,7 @@ void CZeus::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_zeus");
 
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_CSGO_ZEUS;
 	SET_MODEL(ENT(pev), "models/w_zeus.mdl");
 	m_iClip = -1;
 	m_iDefaultAmmo = 1;
@@ -153,9 +153,9 @@ int CZeus::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = -1;
 	p->iSlot = 2;
 	p->iPosition = 2;
-	p->iId = m_iId = WEAPON_ELITE;
-	p->iFlags = ITEM_FLAG_EXHAUSTIBLE;
-	p->iWeight = FLASHBANG_WEIGHT;
+	p->iId = m_iId = WEAPON_CSGO_ZEUS;
+	p->iFlags = 0 ;
+	p->iWeight = SG552_WEIGHT;
 
 	return 1;
 }
@@ -208,60 +208,11 @@ void CZeus::PrimaryAttack(void)
 	}
 #endif
 	m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-#ifndef CLIENT_DLL
-	m_pPlayer->DropPlayerItem(STRING(this->pev->classname));
-#endif
+
+	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+		m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
 
 }
-
-#ifndef CLIENT_DLL
-void CZeus::AttachToPlayer(CBasePlayer* pPlayer)
-{
-	CBasePlayerWeapon::AttachToPlayer(pPlayer);
-
-	/*// find the linked weapon
-	while (!m_pLink)
-	{
-		for (int i = 0; i < MAX_ITEM_TYPES; ++i)
-		{
-			CBasePlayerItem* pItem = m_pPlayer->m_rgpPlayerItems[i];
-			while (pItem != NULL)
-			{
-				if (!Q_stricmp(pItem->pszName(), "weapon_scarh"))
-				{
-					m_pLink = pItem;
-
-					m_pLink->m_iSwing = 1;
-					m_iSwing = 0;
-				}
-
-				pItem = pItem->m_pNext;
-			}
-		}
-		if (!m_pLink)
-			pPlayer->GiveNamedItem("weapon_scarh");
-
-	}*/
-}
-
-void CZeus::ItemPostFrame()
-{
-	/*m_iSwing = 0;
-	if (m_pLink)
-		m_pLink->m_iSwing = 1;*/
-	return CBasePlayerWeapon::ItemPostFrame();
-}
-
-CZeus::~CZeus()
-{
-	/*CBaseEntity* pOther = m_pLink;
-	if (pOther && pOther->m_pLink == this)
-	{
-		pOther->m_pLink = m_pLink = nullptr;
-		pOther->SUB_Remove();
-	}*/
-}
-#endif
 
 void CZeus::WeaponIdle(void)
 {
@@ -278,10 +229,21 @@ void CZeus::WeaponIdle(void)
 	SendWeaponAnim(ANIM_IDLE, UseDecrement() != FALSE);
 }
 
+void CZeus::Holster(int skiplocal)
+{
+	m_pPlayer->m_flNextAttack = UTIL_WeaponTimeBase() + 0.5s;
+
+	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	{
+		m_pPlayer->RemoveWeapon(m_iId);
+		DestroyItem();
+	}
+}
+
 
 float CZeus::GetPrimaryAttackDamage() const
 {
-	int flDamage = 125;
+	int flDamage = 145;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
 		flDamage = 1000;
@@ -301,11 +263,6 @@ int CZeus::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 		return TRUE;
 	}
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
-}
-
-BOOL CZeus::CanDeploy(void)
-{
-	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
 }
 
 }

@@ -60,7 +60,6 @@ namespace sv {
 		ANIM_RELOAD,
 		ANIM_DRAW,
 	};
-    static constexpr float ArmorRatioModifier = 1.93f;
     static constexpr int DamageDefault = 115;
     static constexpr int DamageZB = 200;
     static constexpr int DamageZBS = 250;
@@ -69,6 +68,29 @@ namespace sv {
     static constexpr int Penetration = 2;
 	std::array<float, 3> RecoilPunchAngleDelta = { -2, 0, 0 };
     KnockbackData KnockBack = { 5000.0f, 500.0f, 1200.0f, 800.0f, 0.3f };
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "338Magnum";
+		p->iMaxAmmo1 = MAX_AMMO_338MAGNUM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = AWP_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 2;
+		p->iId = m_iId = WEAPON_ZGUN;
+		p->iFlags = 0;
+		p->iWeight = AWP_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.93; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AWP); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
 
 	void Precache() override
 	{

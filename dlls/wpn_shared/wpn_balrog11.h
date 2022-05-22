@@ -49,6 +49,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f }; }
 	const char* GetCSModelName() override { return "models/w_balrog11.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_XM1014); }
+#endif
+	float GetArmorRatioModifier() override { return 1.3; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 9, 4, 0 }; }
 
 public:
 	duration_t m_flPumpTime;

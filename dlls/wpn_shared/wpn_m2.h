@@ -39,6 +39,7 @@ public:
 	void PrimaryAttack() override;
 	void SecondaryAttack() override;
 	void Reload() override;
+	void ItemPostFrame() override;
 	void WeaponIdle() override;
 	BOOL CanHolster() override;
 	BOOL CanDrop() override;
@@ -51,8 +52,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.85f }; }
 	const char *GetCSModelName() override { return "models/w_m2.mdl"; }
+#ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556natobox" , AMMO_556MM_PRICE }; }
-
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
 public:
 	void M2Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void SwitchThink(void);

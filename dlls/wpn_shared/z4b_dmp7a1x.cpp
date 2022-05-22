@@ -39,7 +39,7 @@ void CZ4B_MP7A1DX::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_dmp7a1x");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_Z4B_MP7A1DX;
 	SET_MODEL(ENT(pev), "models/z4b/w_dmp7a1x.mdl");
 
 	m_iDefaultAmmo = WEAPON_MAXCLIP;
@@ -71,7 +71,7 @@ int CZ4B_MP7A1DX::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = WEAPON_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 7;
-	p->iId = m_iId = WEAPON_MP5N;
+	p->iId = m_iId = WEAPON_Z4B_MP7A1DX;
 	p->iFlags = 0;
 	p->iWeight = MP5NAVY_WEIGHT;
 

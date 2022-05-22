@@ -185,7 +185,7 @@ void CCSBuySubMenu::OnCommand(const char *command)
 	}
 	else if (!Q_strcmp(command, "rebuy_in"))
 	{
-        gEngfuncs.pfnClientCmd("bte_wpn_rebuy;rebuy;secammo;primammo");
+        gEngfuncs.pfnClientCmd("rebuy;secammo;primammo");
 		BaseClass::OnCommand("vguicancel");
 		return;
 	}
@@ -304,6 +304,19 @@ void CCSBuySubMenu::SetupItems(MoEWeaponBuyType type)
 				continue;
 			if (x.iTeam != UNASSIGNED && m_iTeam != x.iTeam)
 				continue;
+			if (type == BUY_EQUIP && x.iSlot == GRENADE_SLOT) {
+				if (gHUD.m_setBanGrenade.find(x.iID) != gHUD.m_setBanGrenade.end())
+					continue;
+			}
+			else if (type == BUY_KNIFE) {
+				if(gHUD.m_setBanKnife.find(x.iID) != gHUD.m_setBanKnife.end())
+					continue;
+			}
+			else {
+				if (gHUD.m_setBanWeapon.find(x.iID) != gHUD.m_setBanWeapon.end())
+					continue;
+			}
+
 			const char *name = x.pszClassName;
 
 			if (type == BUY_EQUIP)

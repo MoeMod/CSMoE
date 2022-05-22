@@ -363,7 +363,7 @@ LINK_ENTITY_TO_CLASS(weapon_m32venom, CM32Venom)
 void CM32Venom::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_M32VENOM;
 	pev->classname = MAKE_STRING("weapon_m32venom");
 	SET_MODEL(ENT(pev), "models/@m32venom_w_m32.mdl");
 	m_iDefaultAmmo = 18;
@@ -396,7 +396,7 @@ int CM32Venom::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 6;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_M32VENOM;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

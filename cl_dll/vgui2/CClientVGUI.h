@@ -21,6 +21,10 @@ public:
 
 	void Start() override final;
 
+	void Init() override final;
+
+	void VidInit() override final;
+
 	void SetParent( vgui2::VPANEL parent ) override final;
 
 	bool UseVGUI1() override final;

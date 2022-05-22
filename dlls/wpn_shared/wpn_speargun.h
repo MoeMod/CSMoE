@@ -57,7 +57,9 @@ public:
 	static constexpr InventorySlotType ItemSlot = PRIMARY_WEAPON_SLOT;
 
 	KnockbackData KnockBack = { 1100.f, 500.f, 700.f, 400.f, 0.9f };
-	static constexpr float ArmorRatioModifier = 1.5f;
+
+	float GetArmorRatioModifier() override { return 1.9; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 
 public:
 	int GetItemInfo(ItemInfo* p) override;

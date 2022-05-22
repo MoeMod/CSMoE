@@ -43,6 +43,11 @@ public:
 
 	KnockbackData GetKnockBackData() override { return { 450.0f, 400.0f, 400.0f, 200.0f, 0.5f }; }
 	const char *GetCSModelName() override { return "models/w_m14ebr.mdl"; }
+	float GetArmorRatioModifier() override { return 1.6; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AK47); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
 
 public:
 	void M14EBRFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

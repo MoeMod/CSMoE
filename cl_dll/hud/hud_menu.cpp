@@ -263,6 +263,9 @@ int CHudMenu::MsgFunc_BuyClose(const char *pszName, int iSize, void *pbuf)
 {
 	UserCmd_OldStyleMenuClose();
 	gMobileAPI.pfnTouchRemoveButton("_menu_*");
+#ifdef XASH_VGUI2
+	g_pViewport->HideVGUIMenu(MENU_BUY);
+#endif
 	return 1;
 }
 

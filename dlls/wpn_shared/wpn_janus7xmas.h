@@ -63,6 +63,11 @@ public:
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 		const char *GetCSModelName() override { return "models/w_janus7xmas.mdl"; }
 
+	float GetArmorRatioModifier() override { return 1.5; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M249); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
 public:
 	void Janus7xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void Janus7Lighting();

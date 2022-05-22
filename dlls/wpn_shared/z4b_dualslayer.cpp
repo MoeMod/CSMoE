@@ -46,7 +46,7 @@ public:
 	static constexpr int MaxClip = -1;
 	static constexpr auto ItemSlot = KNIFE_SLOT;
 	static constexpr const char *AnimExtension = "knife";
-	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.6f };
+	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.7f };
 
 public:
 

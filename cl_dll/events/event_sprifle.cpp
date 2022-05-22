@@ -78,22 +78,22 @@ void EV_FireSprifle( event_args_t *args )
 		{
 			if (ent)
 			{
-				EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[0], forward, 35, 0.35, 30, 30, 30, false, velocity);
-				EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[0], forward, 70, 0.3, 25, 25, 25, false, velocity);
-				EV_CS16Client_CreateSmoke(SMOKE_RIFLE, ent->attachment[0], forward, 3, 0.3, 35, 35, 35, false, velocity);
+				EV_HLDM_CreateSmoke(ent->attachment[0], forward, 3, 0.3, 35, 35, 35, 4, velocity, false, 35);
+				EV_HLDM_CreateSmoke(ent->attachment[0], forward, 35, 0.35, 30, 30, 30, 2, velocity, false, 35);
+				EV_HLDM_CreateSmoke(ent->attachment[0], forward, 70, 0.3, 25, 25, 25, 2, velocity, false, 35);
 			}
 		}
 
-		EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[1], up, 0, 0.15, 55, 50, 50, false, velocity + up * 50, 30);
-		EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[1], up, 0, 0.2, 25, 20, 20, false, velocity + up * 50, 25);
-		EV_CS16Client_CreateSmoke(SMOKE_PISTOL, ent->attachment[1], up, 0, 0.4, 30, 25, 25, false, velocity + up * 50, 25);
-		EV_CS16Client_CreateSmoke(SMOKE_PISTOL, ent->attachment[1], up, 0, 0.15, 30, 25, 25, false, velocity + up * 80, 35);
-		EV_CS16Client_CreateSmoke(SMOKE_PISTOL, ent->attachment[1], up, 0, 0.3, 65, 65, 65, false, velocity + up * 80, 35);
-		EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[1], up, 0, 0.45, 20, 15, 15, false, velocity + up * 80, 25);
-		EV_CS16Client_CreateSmoke(SMOKE_PISTOL, ent->attachment[1], up, 0, 0.1, 50, 50, 50, false, velocity, 30);
-		EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[1], up, 0, 0.12, 35, 30, 35, false, velocity, 30);
-		EV_CS16Client_CreateSmoke(SMOKE_PISTOL, ent->attachment[1], up, 0, 0.15, 30, 30, 25, false, velocity, 30);
-		EV_CS16Client_CreateSmoke(SMOKE_WALLPUFF, ent->attachment[1], up, 0, 0.18, 35, 40, 40, false, velocity, 30);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.15, 55, 50, 50, 2, velocity + up * 50, false, 30);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.2, 25, 20, 20, 2, velocity + up * 50, false, 25);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.4, 30, 25, 25, 3, velocity + up * 50, false, 25);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.15, 30, 25, 25, 3, velocity + up * 80, false, 35);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.3, 65, 65, 65, 3, velocity + up * 80, false, 35);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.45, 20, 15, 15, 2, velocity + up * 80, false, 25);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.1, 50, 50, 50, 3, velocity, false, 30);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.12, 35, 30, 35, 2, velocity, false, 30);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.15, 30, 30, 25, 3, velocity, false, 30);
+		EV_HLDM_CreateSmoke(ent->attachment[1], up, 0, 0.18, 35, 40, 40, 2, velocity, false, 30);
 	}
 
 	if (EV_IsLocal(idx))

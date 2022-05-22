@@ -37,7 +37,7 @@ void CR8::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_r8");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_CSGO_R8;
 	SET_MODEL(ENT(pev), "models/w_r8.mdl");
 
 	m_iDefaultAmmo = R8_MAX_CLIP;
@@ -74,7 +74,7 @@ int CR8::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = R8_MAX_CLIP;
 	p->iSlot = 1;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_DEAGLE;
+	p->iId = m_iId = WEAPON_CSGO_R8;
 	p->iFlags = 0;
 	p->iWeight = DEAGLE_WEIGHT;
 

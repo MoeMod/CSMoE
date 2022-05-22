@@ -91,6 +91,8 @@ enum ZombieZSkillSkillId : byte
 	Skill_ZombiBombGiveaway, //Zombie Bombs given every cycle
 	Skill_SwordMaster,	//enable accshoot to knife
 	Skill_Knife2X, //Knife2X
+	Skill_GoldClip, //GoldClip
+	Skill_Penetration, //go through teamates
 };
 
 enum ZBZMessageType : byte

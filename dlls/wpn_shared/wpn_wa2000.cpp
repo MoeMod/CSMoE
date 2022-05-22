@@ -44,7 +44,7 @@ void CWA2000::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_wa2000");
 
 	Precache();
-	m_iId = WEAPON_G3SG1;
+	m_iId = WEAPON_WA2000;
 	SET_MODEL(ENT(pev), GetCSModelName());
 	m_iDefaultAmmo = WA2000_MAX_CLIP;
 
@@ -78,7 +78,7 @@ int CWA2000::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = WA2000_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 3;
-	p->iId = m_iId = WEAPON_G3SG1;
+	p->iId = m_iId = WEAPON_WA2000;
 	p->iFlags = 0;
 	p->iWeight = G3SG1_WEIGHT;
 

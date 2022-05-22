@@ -39,7 +39,7 @@ void CMG3::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_mg3");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_MG3;
 	SET_MODEL(ENT(pev), "models/w_mg3.mdl");
 
 	m_iDefaultAmmo = MG3_AMMO_GIVE;
@@ -76,7 +76,7 @@ int CMG3::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = MG3_AMMO_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_MG3;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

@@ -35,7 +35,7 @@ LINK_ENTITY_TO_CLASS(weapon_qbarrel, CQbarrel)
 void CQbarrel::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_QBARREL;
 	SET_MODEL(ENT(pev), "models/w_qbarrel.mdl");
 
 	m_iDefaultAmmo = DEFAULT_GIVE;
@@ -66,7 +66,7 @@ int CQbarrel::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_QBARREL;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

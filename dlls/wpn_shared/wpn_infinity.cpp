@@ -33,7 +33,7 @@ void CInfinity::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_infinity");
 
 	Precache();
-	m_iId = WEAPON_DEAGLE;
+	m_iId = WEAPON_INFINITY;
 	SET_MODEL(ENT(pev), GetCSModelName());
 
 	m_iMaxClip = 30;
@@ -66,7 +66,7 @@ int CInfinity::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = m_iMaxClip;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_INFINITY;
 	p->iFlags = 0;
 	p->iWeight = ELITE_WEIGHT;
 

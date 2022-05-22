@@ -94,7 +94,7 @@ void CPlayerModStrategy_ZB3::Evolution(ZombieLevel iEvolutionLevel)
 
 void CPlayerModStrategy_ZB3::BecomeZombie(ZombieLevel iEvolutionLevel)
 {
-	m_flGodMode = gpGlobals->time + 1s;
+	m_flGodMode = gpGlobals->time + 1.5s;
 	SetHero(false);
 	SetPickAsZombie(false);
 	return CPlayerModStrategy_ZB2::BecomeZombie(iEvolutionLevel);

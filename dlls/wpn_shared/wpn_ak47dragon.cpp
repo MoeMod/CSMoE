@@ -37,7 +37,7 @@ void CAK47Dragon::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_ak47dragon");
 
 	Precache();
-	m_iId = WEAPON_AK47;
+	m_iId = WEAPON_AK47DRAGON;
 	SET_MODEL(ENT(pev), "models/w_ak47dragon.mdl");
 
 	m_iDefaultAmmo = AK47_DEFAULT_GIVE;
@@ -70,7 +70,7 @@ int CAK47Dragon::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = AK47_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
+	p->iId = m_iId = WEAPON_AK47DRAGON;
 	p->iFlags = 0;
 	p->iWeight = AK47_WEIGHT;
 

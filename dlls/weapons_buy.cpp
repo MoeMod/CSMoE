@@ -91,18 +91,193 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "elite",	WEAPON_ELITE },
 	{ "fiveseven",	WEAPON_FIVESEVEN },
 	{ "mp5navy",	WEAPON_MP5N },
+	{ "chainsaw",	WEAPON_CHAINSAW },
+	
+	{ "anaconda",	WEAPON_ANACONDA },
+	{ "deagled",	WEAPON_DEAGLED },
+	{ "desperado",	WEAPON_DESPERADO },
+	{ "csgo_cz75",	WEAPON_CSGO_CZ75 },
+	{ "z4b_deagleb",	WEAPON_Z4B_DEAGLESHURA },
+	{ "z4b_frequency1",	WEAPON_Z4B_FREQUENCY1 },
+	{ "gunkata",	WEAPON_GUNKATA },
+	{ "infinity",	WEAPON_INFINITY },
+	{ "infinityex1",	WEAPON_INFINITYEX1 },
+	{ "infinityex2",	WEAPON_INFINITYEX2 },
+	{ "infinitysb",	WEAPON_INFINITYSB },
+	{ "infinitysr",	WEAPON_INFINITYSR },
+	{ "infinityss",	WEAPON_INFINITYSS },
+	{ "z4b_infinityx",	WEAPON_Z4B_INFINITYX },
+	{ "csgo_r8",	WEAPON_CSGO_R8 },
+	{ "csgo_tec9",	WEAPON_CSGO_TEC9 },
+	{ "voidpistol",	WEAPON_VOIDPISTOL },
+	{ "y21s1jetgunmd",	WEAPON_Y21S1JETGUNMD },
+	{ "m950",	WEAPON_M950 },
+
+	{ "balrog11",	WEAPON_BALROG11 },
+	{ "balrog11b",	WEAPON_BALROG11B },
+	{ "balrog11wc",	WEAPON_BALROG11WC },
+	{ "gatling",	WEAPON_GATLING },
+	{ "gatlingex",	WEAPON_GATLINGEX },
+	{ "m1887",	WEAPON_M1887 },
+	{ "csgo_mag7",	WEAPON_CSGO_MAG7 },
+	{ "csgo_sawedoff",	WEAPON_CSGO_SAWEDOFF },
+	{ "qbarrel",	WEAPON_QBARREL },
+	{ "tbarrel",	WEAPON_TBARREL },
+
+	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
+	{ "k1a",	WEAPON_K1A },
+	{ "z4b_k1ases",	WEAPON_Z4B_K1ASES },
+	{ "kriss",	WEAPON_KRISS },
+	{ "mp7a1d",	WEAPON_MP7A1D },
+	{ "mp7a1c",	WEAPON_MP7A1_CARBINE },
+	{ "mp7a1p",	WEAPON_MP7A1_PISTOL },
+	{ "sfsmg",	WEAPON_SFSMG },
+	{ "thompson",	WEAPON_THOMPSON },
+	{ "z4b_dmp7a1x",	WEAPON_Z4B_MP7A1DX },
+	{ "bison",	WEAPON_BISON },
+	{ "tmpdragon",	WEAPON_TMPDRAGON },
+	{ "spsmg",	WEAPON_SPSMG },
+
+	{ "ak47dragon",	WEAPON_AK47DRAGON },
+	{ "ak47l",	WEAPON_AK47_LONG },
+	{ "buffsg552ex",	WEAPON_BUFFSG552EX },
+	{ "m14ebr",	WEAPON_M14EBR },
+	{ "m4a1dragon",	WEAPON_M4A1DRAGON },
+	{ "z4b_m4a1razer",	WEAPON_Z4B_M4A1RAZER },
+	{ "scarh",	WEAPON_SCARHEAVY },
+	{ "scarl",	WEAPON_SCARLIGHT },
+	{ "sfgun",	WEAPON_SFGUN },
+	{ "starchaserar",	WEAPON_STARCHASERAR },
+	{ "stg44",	WEAPON_STG44 },
+	{ "svdex",	WEAPON_SVDEX },
+	{ "tar21",	WEAPON_TAR21 },
+	{ "xm8c",	WEAPON_XM8CARBINE },
+	{ "xm8s",	WEAPON_XM8SHARPSHOOTER },
+	{ "z4b_ak47x",	WEAPON_Z4B_AK47X },
+	{ "z4b_m4a1mw",	WEAPON_Z4B_M4A1MW },
+	{ "z4b_m4a1x",	WEAPON_Z4B_M4A1X },
+	{ "buffm4",	WEAPON_BUFFM4 },
+	{ "buffak",	WEAPON_BUFFAK },
+	{ "plasmagun",	WEAPON_PLASMAGUN },
+	{ "y20s2scard",	WEAPON_Y20S2SCARD },
+	{ "lightzg",	WEAPON_LIGHTZG },
+	{ "heavyzg",	WEAPON_HEAVYZG },
+	{ "ak47g",	WEAPON_AK47G },
+
+	{ "as50",	WEAPON_AS50 },
+	{ "as50g",	WEAPON_AS50G },
+	{ "bendita",	WEAPON_BENDITA },
 	{ "skull5",	WEAPON_SKULL5 },
 	{ "sfsniper",	WEAPON_SFSNIPER },
-	{ "plasmagun",	WEAPON_PLASMAGUN },
-	{ "chainsaw",	WEAPON_CHAINSAW },
+	{ "z4b_awpnividia",	WEAPON_Z4B_AWPNVIDIA },
+	{ "m95",	WEAPON_M95 },
+	{ "m95xmas",	WEAPON_M95XMAS },
+	{ "wa2000",	WEAPON_WA2000 },
+	{ "z4b_xm2010pc",	WEAPON_Z4B_XM2010PC },
+	{ "z4b_m1887se",	WEAPON_Z4B_M1887SE },
+	{ "m95tiger",	WEAPON_M95TIGER },
 	{ "cheytaclrrs",	WEAPON_CHEYTACLRRS },
 	{ "m400",	WEAPON_M400 },
 	{ "m82",	WEAPON_M82 },
-	{ "m24",	WEAPON_M24 },
+	{ "sl8",	WEAPON_SL8 },
+	{ "sl8g",	WEAPON_SL8G },
+	{ "sl8ex",	WEAPON_SL8EX },
 	{ "trg42",	WEAPON_TRG42 },
-	{ "aw50",	WEAPON_AW50 },
 	{ "trg42g",	WEAPON_TRG42G },
+	{ "m24",	WEAPON_M24 },
+	{ "aw50",	WEAPON_AW50 },
+	{ "sprifile",	WEAPON_SPRIFLE },
+	{ "bpgm",	WEAPON_BPGM },
+	{ "zgun",	WEAPON_ZGUN },
+	{ "barrettd",	WEAPON_Z4B_BARRETTD },
+
+	{ "balrog7",	WEAPON_BALROG7 },
+	{ "buffm249",	WEAPON_BUFFM249 },
+	{ "janus7xmas",	WEAPON_JANUS7XMAS },
+	{ "m134",	WEAPON_M134 },
+	{ "m134ex",	WEAPON_M134EX },
+	{ "z4b_m134heroi",	WEAPON_Z4B_M134HEROI },
+	{ "m134xmas",	WEAPON_M134XMAS },
+	{ "m2",	WEAPON_M2 },
+	{ "m249ex",	WEAPON_M249EX },
+	{ "mg3",	WEAPON_MG3 },
+	{ "mg36",	WEAPON_MG36 },
+	{ "mg3xmas",	WEAPON_MG3XMAS },
+	{ "csgo_negev",	WEAPON_CSGO_NEGEV },
+	{ "sfmg",	WEAPON_SFMG },
+	{ "hk23",	WEAPON_HK23 },
+	{ "m60",	WEAPON_M60 },
+	{ "mk48",	WEAPON_MK48 },
+
+	{ "crossbow",	WEAPON_CROSSBOW },
+	{ "chainsaw",	WEAPON_CHAINSAW },
+	{ "bow",	WEAPON_BOW },
+	{ "cannon",	WEAPON_CANNON },
+	{ "z4b_cannonplasma",	WEAPON_Z4B_CANNONPLASMA },
+	{ "z4b_cannontiger",	WEAPON_Z4B_CANNONTIGER },
+	{ "gungnir",	WEAPON_GUNGNIR },
+	{ "huntbow",	WEAPON_HUNTBOW },
+	{ "sgdrill",	WEAPON_SGDRILL },
+	{ "revivegun",	WEAPON_REVIVEGUN },
+	{ "csgo_zeus",	WEAPON_CSGO_ZEUS },
+	{ "zombielaw",	WEAPON_ZOMBIELAW },
+	{ "m32venom",	WEAPON_M32VENOM },
+	{ "cannonex",	WEAPON_CANNONEX },
+	{ "speargun",	WEAPON_SPEARGUN },
+	{ "sgmissile",	WEAPON_SGMISSILE },
+	{ "sgmissilem",	WEAPON_SGMISSILEM },
+	{ "sgmissileex",	WEAPON_SGMISSILEEX },
+	
 	{ NULL,		WEAPON_NONE }
+};
+
+// must same as classname
+DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
+{
+	{ "weapon_knife", KNIFE_NORMAL },
+	{ "knife_dgaxe",	KNIFE_DGAXE },
+	{ "knife_knifedragon",	KNIFE_DRAGON },
+	{ "knife_dragonsword",	KNIFE_DRAGONSWORD },
+	{ "knife_dualsword",	KNIFE_DUALSWORD },
+	{ "z4b_facelessvoid",	KNIFE_Z4B_FACELESSVOID },
+	{ "z4b_frequency9",	KNIFE_Z4B_FREQUENCY9 },
+	{ "knife_katana",	KNIFE_KATANA },
+	{ "knife_lance",	KNIFE_LANCE },
+	{ "z4b_lc_sword",	KNIFE_Z4B_LCSWORD },
+	{ "z4b_nataknifedx",	KNIFE_Z4B_NATAKNIFEDX },
+	{ "z4b_oppovivo",	KNIFE_Z4B_OPPOVIVO },
+	{ "knife_skullaxe",	KNIFE_SKULLAXE },
+	{ "z4b_stormgiantx",	KNIFE_Z4B_STORMGIANTX },
+	{ "z4b_strongknifex",	KNIFE_Z4B_STRONGKNIFEX },
+	{ "knife_stormgiant",	KNIFE_STORMGIANT },
+	{ "knife_nataknife",	KNIFE_STRONGKNIFE },
+	{ "knife_nataknifed",	KNIFE_NATAKNIFED },
+	{ "knife_thanatos9",	KNIFE_THANATOS9 },
+	{ "knife_skullt9",	KNIFE_SKULLT9 },
+	{ "knife_runeblade",	KNIFE_RUNEBLADE },
+	{ "knife_janus9",	KNIFE_JANUS9 },
+	{ "knife_summonknife",	KNIFE_SUMMONKNIFE },
+	{ "knife_balrog9",	KNIFE_BALROG9 },
+	{ "knife_holysword",	KNIFE_HOLYSWORD },
+	{ "knife_y22s1holyswordmb",	KNIFE_Y22S1HOLYSWORDMB },
+	{ "knife_magicknife",	KNIFE_MAGICKNIFE },
+	{ "knife_whipsword",	KNIFE_WHIPSWORD },
+	{ "knife_dualkukri",	KNIFE_DUALKUKRI },
+	{ "knife_dualslayer",	KNIFE_DUALSLAYER },
+	{ "knife_jknife",	KNIFE_JKNIFE },
+	{ "knife_combat",	KNIFE_COMBAT },
+	{ "knife_mastercombat",	KNIFE_MASTERCOMBAT },
+	{ "knife_hdagger",	KNIFE_HDAGGER },
+	{ "knife_axe",	KNIFE_AXE },
+	{ "knife_hammer",	KNIFE_HAMMER }
+};
+
+// must same as classname
+DLL_GLOBAL GrenadeAliasInfo grenadeInfo[] =
+{
+	{ "weapon_hegrenade", GRENADE_HEGRENADE },
+	{ "weapon_pumpkin", GRENADE_PUMPKIN },
+	{ "weapon_holybomb", GRENADE_HOLYBOMB }
 };
 
 DLL_GLOBAL WeaponBuyAliasInfo weaponBuyAliasInfo[] =
@@ -203,7 +378,131 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
 	{ "plasmagun",	WEAPONCLASS_RIFLE },
 	{ "zombielaw",	WEAPONCLASS_RIFLE },
-	{ "chainsaw",	WEAPONCLASS_RIFLE },
+	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
+	{ "cheytaclrrs",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m400",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m82",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m24",	WEAPONCLASS_SNIPERRIFLE },
+	{ "trg42",	WEAPONCLASS_SNIPERRIFLE },
+	{ "aw50",	WEAPONCLASS_SNIPERRIFLE },
+	{ "trg42g",	WEAPONCLASS_SNIPERRIFLE },
+	{ "anaconda",	WEAPONCLASS_PISTOL },
+	{ "deagled",	WEAPONCLASS_PISTOL },
+	{ "desperado",	WEAPONCLASS_PISTOL },
+	{ "csgo_cz75",	WEAPONCLASS_PISTOL },
+	{ "z4b_deagleb",	WEAPONCLASS_PISTOL },
+	{ "z4b_frequency1",	WEAPONCLASS_PISTOL },
+	{ "infinity",	WEAPONCLASS_PISTOL },
+	{ "infinityex1",	WEAPONCLASS_PISTOL },
+	{ "infinityex2",	WEAPONCLASS_PISTOL },
+	{ "infinitysb",	WEAPONCLASS_PISTOL },
+	{ "infinitysr",	WEAPONCLASS_PISTOL },
+	{ "infinityss",	WEAPONCLASS_PISTOL },
+	{ "z4b_infinityx",	WEAPONCLASS_PISTOL },
+	{ "csgo_r8",	WEAPONCLASS_PISTOL },
+	{ "csgo_tec9",	WEAPONCLASS_PISTOL },
+	{ "voidpistol",	WEAPONCLASS_PISTOL },
+	{ "y21s1jetgunmd",	WEAPONCLASS_PISTOL },
+	{ "m950",	WEAPONCLASS_PISTOL },
+	{ "csgo_r8",	WEAPONCLASS_PISTOL },
+
+	{ "balrog11",	WEAPONCLASS_SHOTGUN },
+	{ "balrog11b",	WEAPONCLASS_SHOTGUN },
+	{ "balrog11wc",	WEAPONCLASS_SHOTGUN },
+	{ "gatling",	WEAPONCLASS_SHOTGUN },
+	{ "gatlingex",	WEAPONCLASS_SHOTGUN },
+	{ "m1887",	WEAPONCLASS_SHOTGUN },
+	{ "csgo_mag7",	WEAPONCLASS_SHOTGUN },
+	{ "csgo_sawedoff",	WEAPONCLASS_SHOTGUN },
+	{ "qbarrel",	WEAPONCLASS_SHOTGUN },
+	{ "tbarrel",	WEAPONCLASS_SHOTGUN },
+
+	{ "csgo_bizon",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "k1a",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "z4b_k1ases",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "kriss",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "mp7a1d",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "mp7a1c",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "mp7a1p",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "sfsmg",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "thompson",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "z4b_dmp7a1x",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
+
+	{ "ak47dragon",	WEAPONCLASS_RIFLE },
+	{ "ak47l",	WEAPONCLASS_RIFLE },
+	{ "buffsg552ex",	WEAPONCLASS_RIFLE },
+	{ "m14ebr",	WEAPONCLASS_RIFLE },
+	{ "m4a1dragon",	WEAPONCLASS_RIFLE },
+	{ "z4b_m4a1razer",	WEAPONCLASS_RIFLE },
+	{ "scarh",	WEAPONCLASS_RIFLE },
+	{ "scarl",	WEAPONCLASS_RIFLE },
+	{ "sfgun",	WEAPONCLASS_RIFLE },
+	{ "starchaserar",	WEAPONCLASS_RIFLE },
+	{ "stg44",	WEAPONCLASS_RIFLE },
+	{ "svdex",	WEAPONCLASS_RIFLE },
+	{ "tar21",	WEAPONCLASS_RIFLE },
+	{ "xm8c",	WEAPONCLASS_RIFLE },
+	{ "xm8s",	WEAPONCLASS_SNIPERRIFLE },
+	{ "z4b_ak47x",	WEAPONCLASS_RIFLE },
+	{ "z4b_m4a1mw",	WEAPONCLASS_RIFLE },
+	{ "z4b_m4a1x",	WEAPONCLASS_RIFLE },
+	{ "buffm4",	WEAPONCLASS_RIFLE },
+	{ "buffak",	WEAPONCLASS_RIFLE },
+	{ "plasmagun",	WEAPONCLASS_RIFLE },
+	{ "y20s2scard",	WEAPONCLASS_RIFLE },
+	{ "lightzg",	WEAPONCLASS_RIFLE },
+	{ "heavyzg",	WEAPONCLASS_RIFLE },
+	{ "ak47g",	WEAPONCLASS_RIFLE },
+
+	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
+	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
+	{ "bendita",	WEAPONCLASS_SNIPERRIFLE },
+	{ "skull5",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
+	{ "z4b_awpnividia",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m95",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m95xmas",	WEAPONCLASS_SNIPERRIFLE },
+	{ "wa2000",	WEAPONCLASS_SNIPERRIFLE },
+	{ "z4b_xm2010pc",	WEAPONCLASS_SNIPERRIFLE },
+	{ "z4b_m1887se",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m95tiger",	WEAPONCLASS_SNIPERRIFLE },
+	{ "cheytaclrrs",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m400",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m82",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sl8",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sl8g",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sl8ex",	WEAPONCLASS_SNIPERRIFLE },
+	{ "trg42",	WEAPONCLASS_SNIPERRIFLE },
+	{ "trg42g",	WEAPONCLASS_SNIPERRIFLE },
+	{ "m24",	WEAPONCLASS_SNIPERRIFLE },
+	{ "aw50",	WEAPONCLASS_SNIPERRIFLE },
+	{ "sprifile",	WEAPONCLASS_SNIPERRIFLE },
+	{ "bpgm",	WEAPONCLASS_SNIPERRIFLE },
+	{ "zgun",	WEAPONCLASS_SNIPERRIFLE },
+	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
+
+	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
+	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
+	{ "janus7xmas",	WEAPONCLASS_MACHINEGUN },
+	{ "m134",	WEAPONCLASS_MACHINEGUN },
+	{ "m134ex",	WEAPONCLASS_MACHINEGUN },
+	{ "z4b_m134heroi",	WEAPONCLASS_MACHINEGUN },
+	{ "m134xmas",	WEAPONCLASS_MACHINEGUN },
+	{ "m2",	WEAPONCLASS_MACHINEGUN },
+	{ "m249ex",	WEAPONCLASS_MACHINEGUN },
+	{ "mg3",	WEAPONCLASS_MACHINEGUN },
+	{ "mg36",	WEAPONCLASS_MACHINEGUN },
+	{ "mg3xmas",	WEAPONCLASS_MACHINEGUN },
+	{ "csgo_negev",	WEAPONCLASS_MACHINEGUN },
+	{ "sfmg",	WEAPONCLASS_MACHINEGUN },
+	{ "hk23",	WEAPONCLASS_MACHINEGUN },
+	{ "m60",	WEAPONCLASS_MACHINEGUN },
+	{ "mk48",	WEAPONCLASS_MACHINEGUN },
+
+	{ "knife",	WEAPONCLASS_KNIFE },
 	{ NULL,		WEAPONCLASS_NONE }
 };
 
@@ -328,21 +627,118 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_AK47:
 	case WEAPON_P90:
 	case WEAPON_SHIELDGUN:
-	case WEAPON_SFSNIPER:
-	case WEAPON_PLASMAGUN:
+	case WEAPON_BALROG11:
+	case WEAPON_BALROG11B:
+	case WEAPON_BALROG11WC:
+	case WEAPON_GATLING:
+	case WEAPON_GATLINGEX:
+	case WEAPON_M1887:
+	case WEAPON_Z4B_M1887SE:
+	case WEAPON_CSGO_MAG7:
+	case WEAPON_QBARREL:
+	case WEAPON_CSGO_SAWEDOFF:
+	case WEAPON_TBARREL:
+	case WEAPON_CSGO_BIZON:
+	case WEAPON_K1A:
+	case WEAPON_Z4B_K1ASES:
+	case WEAPON_KRISS:
+	case WEAPON_MP7A1D:
+	case WEAPON_MP7A1_CARBINE:
+	case WEAPON_MP7A1_PISTOL:
+	case WEAPON_SFSMG:
+	case WEAPON_THOMPSON:
+	case WEAPON_Z4B_MP7A1DX:
+	case WEAPON_BISON:
+	case WEAPON_TMPDRAGON:
+	case WEAPON_SPSMG:
+	case WEAPON_AK47DRAGON:
+	case WEAPON_AK47_LONG:
+	case WEAPON_BUFFSG552EX:
+	case WEAPON_M14EBR:
+	case WEAPON_Z4B_M37SE:
+	case WEAPON_M4A1DRAGON:
+	case WEAPON_Z4B_M4A1RAZER:
+	case WEAPON_SCARHEAVY:
+	case WEAPON_SCARLIGHT:
+	case WEAPON_SFGUN:
 	case WEAPON_SKULL5:
-	case WEAPON_ZOMBIELAW:
+	case WEAPON_STARCHASERAR:
+	case WEAPON_STG44:
+	case WEAPON_SVDEX:
+	case WEAPON_TAR21:
+	case WEAPON_XM8CARBINE:
+	case WEAPON_XM8SHARPSHOOTER:
+	case WEAPON_Z4B_AK47X:
+	case WEAPON_Z4B_M4A1MW:
+	case WEAPON_Z4B_M4A1X:
+	case WEAPON_BUFFM4:
+	case WEAPON_BUFFAK:
+	case WEAPON_PLASMAGUN:
+	case WEAPON_Y20S2SCARD:
+	case WEAPON_LIGHTZG:
+	case WEAPON_HEAVYZG:
+	case WEAPON_AK47G:
+	case WEAPON_CARTBLUE:
+	case WEAPON_AS50:
+	case WEAPON_Z4B_AWPNVIDIA:
+	case WEAPON_BENDITA:
+	case WEAPON_M95:
+	case WEAPON_M95XMAS:
+	case WEAPON_WA2000:
+	case WEAPON_Z4B_XM2010PC:
+	case WEAPON_SFSNIPER:
 	case WEAPON_M95TIGER:
-	case WEAPON_CHAINSAW:
 	case WEAPON_CHEYTACLRRS:
 	case WEAPON_M400:
 	case WEAPON_M82:
-	case WEAPON_M24:
+	case WEAPON_SL8:
+	case WEAPON_SL8EX:
 	case WEAPON_TRG42:
 	case WEAPON_TRG42G:
+	case WEAPON_M24:
 	case WEAPON_AW50:
-	//case WEAPON_SL8:
-	//case WEAPON_SL8EX:
+	case WEAPON_SPRIFLE:
+	case WEAPON_BPGM:
+	case WEAPON_AS50G:
+	case WEAPON_ZGUN:
+	case WEAPON_Z4B_BARRETTD:
+	case WEAPON_BALROG7:
+	case WEAPON_BUFFM249:
+	case WEAPON_JANUS7XMAS:
+	case WEAPON_M134:
+	case WEAPON_M134EX:
+	case WEAPON_Z4B_M134HEROI:
+	case WEAPON_M134XMAS:
+	case WEAPON_M2:
+	case WEAPON_M249EX:
+	case WEAPON_MG3:
+	case WEAPON_MG36:
+	case WEAPON_MG3XMAS:
+	case WEAPON_CSGO_NEGEV:
+	case WEAPON_SFMG:
+	case WEAPON_HK23:
+	case WEAPON_M60:
+	case WEAPON_MK48:
+	case WEAPON_K3:
+	case WEAPON_CROSSBOW:
+	case WEAPON_CHAINSAW:
+	case WEAPON_BOW:
+	case WEAPON_CANNON:
+	case WEAPON_Z4B_CANNONPLASMA:
+	case WEAPON_Z4B_CANNONTIGER:
+	case WEAPON_GUNGNIR:
+	case WEAPON_HUNTBOW:
+	case WEAPON_SGDRILL:
+	case WEAPON_REVIVEGUN:
+	case WEAPON_CSGO_ZEUS:
+	case WEAPON_ZOMBIELAW:
+	case WEAPON_M32VENOM:
+	case WEAPON_CANNONEX:
+	case WEAPON_SPEARGUN:
+	case WEAPON_SGMISSILE:
+	case WEAPON_SGMISSILEM:
+	case WEAPON_SGMISSILEEX:
+
 		return true;
 	default:
 		break;
@@ -363,6 +759,25 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_USP:
 	case WEAPON_GLOCK18:
 	case WEAPON_DEAGLE:
+	case WEAPON_ANACONDA:
+	case WEAPON_CSGO_CZ75:
+	case WEAPON_DEAGLED:
+	case WEAPON_Z4B_DEAGLESHURA:
+	case WEAPON_DESPERADO:
+	case WEAPON_Z4B_FREQUENCY1:
+	case WEAPON_GUNKATA:
+	case WEAPON_INFINITY:
+	case WEAPON_INFINITYEX1:
+	case WEAPON_INFINITYEX2:
+	case WEAPON_INFINITYSB:
+	case WEAPON_INFINITYSR:
+	case WEAPON_INFINITYSS:
+	case WEAPON_Z4B_INFINITYX:
+	case WEAPON_CSGO_R8:
+	case WEAPON_CSGO_TEC9:
+	case WEAPON_VOIDPISTOL:
+	case WEAPON_Y21S1JETGUNMD:
+	case WEAPON_M950:
 		return true;
 	default:
 		break;
@@ -529,15 +944,24 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 			return false;
 		}
 
+		if (iter->iSlot == GRENADE_SLOT) {
+			if (g_pGameRules->m_setBanGrenade.find(iter->iID) != g_pGameRules->m_setBanGrenade.end())
+				return false;
+		}
+		else if (iter->iSlot == KNIFE_SLOT) {
+			if (g_pGameRules->m_setBanKnife.find(iter->iID) != g_pGameRules->m_setBanKnife.end())
+				return false;
+		}
+		else {
+			if (g_pGameRules->m_setBanWeapon.find(iter->iID) != g_pGameRules->m_setBanWeapon.end())
+				return false;
+		}
+
 		switch (iter->iSlot) {
 			case PRIMARY_WEAPON_SLOT:
 				DropPrimary(pPlayer);
 				break;
 			case PISTOL_SLOT :
-				if (!strcmp(iter->pszClassName, "csgo_zeus"))
-				{
-				}
-				else
 					DropSecondary(pPlayer);
 				break;
 			case KNIFE_SLOT:
@@ -546,8 +970,14 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 					{
 					}
 					else
-					pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+					{
+						pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+						pPlayer->m_iKnifeID = AliasToKnifeType(iter->pszClassName);
+					}
 				}
+				break;
+			case GRENADE_SLOT:
+				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
 				break;
 			default:
 				break;
@@ -555,10 +985,83 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 
 		pPlayer->GiveNamedItem(iter->pszClassName);
 		pPlayer->AddAccount(-iter->iCost);
+		pPlayer->BuildRebuyStruct();
 
 		return true;
 	}
 	return false;
+}
+
+int AliasToKnifeType(const char* alias)
+{
+	if (!alias)
+		return 0;
+
+	int i = 0;
+
+	while (knifeInfo[i].alias)
+	{
+		if (!stricmp(alias, knifeInfo[i].alias))
+			return knifeInfo[i].id;
+
+		i++;
+	}
+
+	return 0;
+}
+
+const char* KnifeTypeToAlias(int id)
+{
+	int i = 0;
+
+	while (1)
+	{
+		if (id == knifeInfo[i].id)
+			return knifeInfo[i].alias;
+
+		i++;
+	}
+
+	return NULL;
+}
+
+int AliasToGrenadeType(const char* alias)
+{
+	if (!alias)
+		return 0;
+
+	int i = 0;
+
+	while (grenadeInfo[i].alias)
+	{
+		if (!stricmp(alias, grenadeInfo[i].alias))
+			return grenadeInfo[i].id;
+
+		i++;
+
+		if (i > ARRAYSIZE(grenadeInfo) - 1)
+			return 0;
+	}
+
+	return 0;
+}
+
+const char* GrenadeTypeToAlias(int id)
+{
+	int i = 0;
+
+	while (1)
+	{
+		if (id == grenadeInfo[i].id)
+			return grenadeInfo[i].alias;
+
+		i++;
+
+		if (i > ARRAYSIZE(grenadeInfo) - 1)
+			return NULL;
+	}
+
+	return NULL;
 }
 
 }

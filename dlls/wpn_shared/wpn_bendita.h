@@ -45,7 +45,7 @@ public:
 #endif
 	}
 	KnockbackData GetKnockBackData() override { return { 3000.f, 300.0f, 800.0f, 800.0f, 0.4f }; }
-	float GetArmorRatioModifier() override { return BENDITA_ARMOR_RATIO_MODIFIER; }
+	float GetArmorRatioModifier() override { return 1.8; }
 	const char *GetCSModelName() override { return "models/w_bendita.mdl"; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50bmgholy" , AMMO_50BMG_PRICE }; }

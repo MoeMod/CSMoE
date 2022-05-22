@@ -54,7 +54,10 @@ public:
 	~CScarLight();
 	virtual void AttachToPlayer(CBasePlayer *pPlayer) override;
 #endif
-
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_GALIL); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 public:
 	void GalilFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();

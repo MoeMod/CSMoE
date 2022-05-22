@@ -65,6 +65,9 @@ public:
 			return { 600.0f, 500.0f, 650.0f, 500.0f, 0.35f };
 	}
 
+	float GetArmorRatioModifier() override { return 1.25; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 0 }; }
+
 	const char *GetCSModelName() override { return "models/w_sgdrill.mdl"; }
 public:
 	int m_iShell;

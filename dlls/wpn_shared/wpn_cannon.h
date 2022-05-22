@@ -68,6 +68,25 @@ public:
 	int GetPriority() override;
 	int GetPriorityByTarget(CBaseEntity* target) override;
 #endif
+
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "CannonAmmo";
+		p->iMaxAmmo1 = 20;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 20;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_CANNON;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
+
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
 	WeaponBotStrategy GetBotStrategy() const;
 
 public:

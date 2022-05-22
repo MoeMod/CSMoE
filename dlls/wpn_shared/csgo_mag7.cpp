@@ -35,7 +35,7 @@ LINK_ENTITY_TO_CLASS(csgo_mag7, CMag7)
 void CMag7::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_CSGO_MAG7;
 	SET_MODEL(ENT(pev), "models/w_mag7.mdl");
 
 	m_iDefaultAmmo = MAG7_DEFAULT_GIVE;
@@ -72,7 +72,7 @@ int CMag7::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = MAG7_DEFAULT_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_CSGO_MAG7;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

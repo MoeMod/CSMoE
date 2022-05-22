@@ -44,7 +44,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 1000.0f, 480.0f, 900.0f, 900.0f, 0.3f }; }
 	const char *GetCSModelName() override;
 	float GetArmorRatioModifier() override { return 1.7; }
-
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_G3SG1); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 6, 4, 0 }; }
 public:
 	void WA2000Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;

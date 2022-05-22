@@ -152,3 +152,4 @@ HOOK_EVENT(trg42, FireTRG42);
 HOOK_EVENT(aw50, FireAW50);
 HOOK_EVENT(sl8, FireSL8);
 HOOK_EVENT(sprifle, FireSprifle);
+HOOK_EVENT(spsmg, FireSPSMG);

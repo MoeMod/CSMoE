@@ -119,6 +119,16 @@ void CClientVGUI::Start()
 
 }
 
+void CClientVGUI::Init()
+{
+	g_pViewport->Init();
+}
+
+void CClientVGUI::VidInit()
+{
+	g_pViewport->VidInit();
+}
+
 void CClientVGUI::SetParent( vgui2::VPANEL parent )
 {
 	m_vRootPanel = parent;

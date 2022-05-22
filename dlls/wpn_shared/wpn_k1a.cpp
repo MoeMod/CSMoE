@@ -39,7 +39,7 @@ void CK1a::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_k1a");
 
 	Precache();
-	m_iId = WEAPON_GALIL;
+	m_iId = WEAPON_K1A;
 	SET_MODEL(ENT(pev), "models/w_k1a.mdl");
 
 	m_iDefaultAmmo = K1A_MAXCLIP;
@@ -75,7 +75,7 @@ int CK1a::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = K1A_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 17;
-	p->iId = m_iId = WEAPON_GALIL;
+	p->iId = m_iId = WEAPON_K1A;
 	p->iFlags = 0;
 	p->iWeight = GALIL_WEIGHT;
 

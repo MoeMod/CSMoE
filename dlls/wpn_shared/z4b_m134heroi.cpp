@@ -143,6 +143,31 @@ public:
     BOOL HasAmmo();
     void UseAmmo(int);
 
+
+    int GetItemInfo(ItemInfo* p)
+    {
+        p->pszName = STRING(pev->classname);
+        p->pszAmmo1 = "762NatoBox";
+        p->iMaxAmmo1 = 200;
+        p->pszAmmo2 = NULL;
+        p->iMaxAmmo2 = -1;
+        p->iMaxClip = 200;
+        p->iSlot = 0;
+        p->iPosition = 4;
+        p->iId = m_iId = WEAPON_Z4B_M134HEROI;
+        p->iFlags = 0;
+        p->iWeight = M249_WEIGHT;
+
+        return 1;
+    }
+
+#ifndef CLIENT_DLL
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
+#endif
+    float GetArmorRatioModifier() override { return 1.5; }
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
+
+
     duration_t GetPulseInterval(  )
     {
         return 0.1s;

@@ -47,6 +47,11 @@ public:
 	float GetArmorRatioModifier() override { return 1.0; }
 	const char *GetCSModelName() override { return "models/w_m1887.mdl"; }
 
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M3); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 9, 4, 0 }; }
+
 public:
 	int m_iShell;
 	duration_t m_flPumpTime;

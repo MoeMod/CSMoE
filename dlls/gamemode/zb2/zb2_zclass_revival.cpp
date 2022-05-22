@@ -34,6 +34,7 @@ CZombieClass_Revival::CZombieClass_Revival(CBasePlayer *player, ZombieLevel iEvo
 {
 	m_pPlayer->m_ZombieClass = "revival";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieRevival>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieHpBuff>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Revival::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_REVIVAL);
 	WRITE_BYTE(ZOMBIE_SKILL_REVIVAL);
+	WRITE_BYTE(ZOMBIE_SKILL_HPBUFF);
 	MESSAGE_END();
 }
 

@@ -70,7 +70,7 @@ int CHudNewHud::VidInit(void)
 
 void CHudNewHud::InitHUDData(void)
 {
-
+	m_szLastModel = "";
 }
 
 int CHudNewHud::Draw(float flTime)
@@ -149,13 +149,29 @@ int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 
 	m_iWeaponBG->Draw2DQuadScaled(iX - iW, iY - iH, iX, iY);
 
+	int idx = gEngfuncs.GetLocalPlayer()->index;
+	if (!g_PlayerInfoList[idx].model) {
+		return 1;
+	}
+
+	if (m_szLastModel != g_PlayerInfoList[idx].model) {
+		m_szLastModel = g_PlayerInfoList[idx].model;
+		if (m_iCharacter)
+			m_iCharacter = nullptr;
+
+		std::string tmp = "resource/hud/portrait/hud_" + m_szLastModel;
+		m_iCharacter = R_LoadTextureUnique(tmp.c_str());
+	}
+
+	if (m_iCharacter) {
+		iW = m_iCharacter->w();
+		iH = m_iCharacter->h();
+		iX = 0;
+		iY = ScreenHeight - 44;
+
+		m_iCharacter->Draw2DQuadScaled(iX, iY - iH, iX + iW, iY - iH + iH);
+	}
 	return 1;
-}
-
-void CHudNewHud::DrawPortrait()
-{
-
-	
 }
 
 int CHudNewHud::MsgFunc_NewHudMsg(const char* pszName, int iSize, void* pbuf)

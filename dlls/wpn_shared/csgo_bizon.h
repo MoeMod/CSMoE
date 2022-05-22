@@ -48,6 +48,12 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f }; }
 	const char* GetCSModelName() override { return "models/w_bizon.mdl"; }
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_P90); }
+#endif
+	float GetArmorRatioModifier() override { return 0.85; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 6, 2, 0 }; }
 public:
 	void BizonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 

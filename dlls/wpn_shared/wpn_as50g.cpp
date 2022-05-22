@@ -58,10 +58,12 @@ namespace sv {
 		ANIM_RELOAD,
 		ANIM_DRAW,
 	};
-    static constexpr float ArmorRatioModifier = 1.7f;
+
     static constexpr float RangeModifier = 0.973;
     static constexpr auto BulletType = BULLET_PLAYER_338MAG;
     KnockbackData KnockBack = { 5000.0f, 500.0f, 1200.0f, 800.0f, 0.3f };
+
+	float GetArmorRatioModifier() override { return 1.7; }
 
 	void Precache() override
 	{
@@ -78,7 +80,7 @@ namespace sv {
 		p->iMaxClip = 5;
 		p->iSlot = 0;
 		p->iPosition = 2;
-		p->iId = m_iId = WEAPON_AWP;
+		p->iId = m_iId = WEAPON_AS50G;
 		p->iFlags = 0;
 		p->iWeight = AWP_WEIGHT;
 

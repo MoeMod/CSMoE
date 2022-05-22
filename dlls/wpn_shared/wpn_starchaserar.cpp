@@ -37,7 +37,7 @@ void CStarchaserar::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_starchaserar");
 
 	Precache();
-	m_iId = WEAPON_AUG;
+	m_iId = WEAPON_STARCHASERAR;
 	SET_MODEL(ENT(pev), "models/w_starchaserar.mdl");
 
 	m_iDefaultAmmo = GALIL_DEFAULT_GIVE;
@@ -74,7 +74,7 @@ int CStarchaserar::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = GALIL_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 14;
-	p->iId = m_iId = WEAPON_AUG;
+	p->iId = m_iId = WEAPON_STARCHASERAR;
 	p->iFlags = 0;
 	p->iWeight = AUG_WEIGHT;
 

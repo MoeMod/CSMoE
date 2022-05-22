@@ -1286,7 +1286,15 @@ void CBasePlayerWeapon::ReloadSound()
 		{
 			MESSAGE_BEGIN(MSG_ONE, gmsgReloadSound, NULL, pPlayer->pev);
 				WRITE_BYTE((int)((1.0f - (distance / 512.0f)) * 255.0f));
-			if (!Q_strcmp(STRING(pev->classname), "weapon_m3") || !Q_strcmp(STRING(pev->classname), "weapon_xm1014"))
+			//if (!Q_strcmp(STRING(pev->classname), "weapon_m3") || !Q_strcmp(STRING(pev->classname), "weapon_xm1014"))
+			if(m_iId == WEAPON_M3
+				|| m_iId == WEAPON_XM1014
+				|| m_iId == WEAPON_M1887 
+				|| m_iId == WEAPON_CSGO_SAWEDOFF
+				|| m_iId == WEAPON_Z4B_M1887SE
+				|| m_iId == WEAPON_BALROG11
+				|| m_iId == WEAPON_BALROG11B
+				|| m_iId == WEAPON_BALROG11WC)
 				WRITE_BYTE(0);
 			else
 				WRITE_BYTE(1);
@@ -1331,6 +1339,25 @@ BOOL CBasePlayerWeapon::PlayEmptySound()
 		case WEAPON_DEAGLE:
 		case WEAPON_ELITE:
 		case WEAPON_FIVESEVEN:
+		case WEAPON_ANACONDA:
+		case WEAPON_CSGO_CZ75:
+		case WEAPON_DEAGLED:
+		case WEAPON_Z4B_DEAGLESHURA:
+		case WEAPON_DESPERADO:
+		case WEAPON_Z4B_FREQUENCY1:
+		case WEAPON_GUNKATA:
+		case WEAPON_INFINITY:
+		case WEAPON_INFINITYEX1:
+		case WEAPON_INFINITYEX2:
+		case WEAPON_INFINITYSB:
+		case WEAPON_INFINITYSR:
+		case WEAPON_INFINITYSS:
+		case WEAPON_Z4B_INFINITYX:
+		case WEAPON_CSGO_R8:
+		case WEAPON_CSGO_TEC9:
+		case WEAPON_VOIDPISTOL:
+		case WEAPON_Y21S1JETGUNMD:
+		case WEAPON_M950:
 			EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/dryfire_pistol.wav", 0.8, ATTN_NORM);
 			break;
 		default:
@@ -1369,6 +1396,8 @@ void CBasePlayerWeapon::Holster(int skiplocal)
 		if (m_pPlayer->IsAlive())
 			CheckWeapon(m_pPlayer, NULL);
 	}
+
+	m_pPlayer->m_pModStrategy->Holster_Post(this);
 }
 
 void CBasePlayerAmmo::Spawn()

@@ -34,6 +34,156 @@ namespace cl {
 namespace sv {
 #endif
 
+
+#ifndef CLIENT_DLL
+#define DEBUG_DRAWBOX 0
+		class CWhipSwordStabBox : public CBaseEntity
+		{
+		public:
+			KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
+
+			void Spawn() override
+			{	
+#if DEBUG_DRAWBOX
+				m_iModelLight = PRECACHE_MODEL("sprites/laserbeam.spr");
+#endif
+				pev->frame = 0.0;
+				
+				pev->solid = SOLID_TRIGGER; // 2	
+				pev->rendermode = kRenderTransAdd; // 5;
+				pev->renderamt = 0.0;
+				pev->movetype = MOVETYPE_NONE; // 9
+				
+				UTIL_SetSize(pev, pev->mins, pev->maxs);				
+
+				pev->nextthink = gpGlobals->time + 0.1s;
+				pev->classname = MAKE_STRING("whipsword");
+			}
+
+			void SetSize(Vector &vecSize, Vector &vecDir)
+			{
+				Vector vecOrigin = pev->origin;
+				Vector vecAbsZ = { 0, 0, 1 };
+				Vector vecTemp = CrossProduct(vecDir, vecAbsZ) /vecDir.Length();
+				Vector vecTemp2 = CrossProduct(vecDir, vecTemp) / (vecDir.Length() * vecTemp.Length());
+				Vector vecMax = -vecSize.x / 2 * vecDir + vecSize.y * vecTemp + vecSize.z * vecTemp2;
+				vecMax.x = abs(vecMax.x);
+				vecMax.y = abs(vecMax.y);
+				vecMax.z = abs(vecMax.z);
+				pev->maxs = vecMax;
+				pev->mins = -vecMax;
+
+				UTIL_SetSize(pev, pev->mins, pev->maxs);
+				SetThink(&CWhipSwordStabBox::Think);
+				SetTouch(&CWhipSwordStabBox::Touch);
+#if DEBUG_DRAWBOX
+				DrawBeam();
+#endif
+				pev->nextthink = gpGlobals->time + 0.1s;
+			}
+
+#if DEBUG_DRAWBOX
+			void DrawBeam()
+			{
+				Vector Point[2];
+				Point[0] = { pev->maxs.x, pev->maxs.y, pev->maxs.z };
+				Point[1] = { pev->mins.x, pev->mins.y, pev->mins.z };
+
+				Point[0] += pev->origin;
+				Point[1] += pev->origin;
+				MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
+				WRITE_BYTE(TE_BEAMPOINTS);
+				WRITE_COORD(Point[0].x);
+				WRITE_COORD(Point[0].y);
+				WRITE_COORD(Point[0].z);
+				WRITE_COORD(Point[1].x);
+				WRITE_COORD(Point[1].y);
+				WRITE_COORD(Point[1].z); // coord coord coord (end position) 
+				WRITE_SHORT(m_iModelLight); // short (sprite index) 
+				WRITE_BYTE(0); // byte (starting frame) 
+				WRITE_BYTE(0); // byte (frame rate in 0.1's) 
+				WRITE_BYTE(130); // byte (life in 0.1's) 
+				WRITE_BYTE(10); // byte (line width in 0.1's) 
+				WRITE_BYTE(0); // byte (noise amplitude in 0.01's) 
+				WRITE_BYTE(0); // byte,byte,byte (color)
+				WRITE_BYTE(0);
+				WRITE_BYTE(255);
+				WRITE_BYTE(255); // byte (brightness)
+				WRITE_BYTE(15); // byte (scroll speed in 0.1's)
+				MESSAGE_END();
+			}
+#endif
+			void EXPORT Think()
+			{
+				SetThink(nullptr);
+				SetTouch(nullptr);
+				pev->effects |= EF_NODRAW; // 0x80u
+				return UTIL_Remove(this);
+			}
+
+			void EXPORT Touch(CBaseEntity* pOther)
+			{
+				if (pev->owner == pOther->edict())
+					return;
+
+				if (pev->iuser1 & (1 << pOther->entindex()))
+					return;
+
+				CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
+				CBasePlayer* pAttackPlayer = nullptr;
+				if (pAttacker && pAttacker->IsPlayer())
+					pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
+
+				if (pAttackPlayer)
+				{
+					if (pOther->IsPlayer() && bIsWallBetweenEntity(pOther, pAttackPlayer))
+						return;
+
+					
+					if (pOther->pev->takedamage != DAMAGE_NO)
+					{
+						Vector vecDirection = (pOther->pev->origin - pAttackPlayer->pev->origin).Normalize();
+
+						TraceResult tr;
+						UTIL_TraceLine(pev->origin, pOther->pev->origin, missile, ENT(pAttackPlayer->pev), &tr);
+						tr.iHitgroup = HITGROUP_CHEST;
+
+						ClearMultiDamage();
+						pOther->TraceAttack(pAttackPlayer->pev, m_flDamage, vecDirection, &tr, DMG_BULLET);
+						ApplyMultiDamage(pAttackPlayer->pev, pAttackPlayer->pev);
+
+						pev->iuser1 |= (1 << pOther->entindex());
+
+						if (pOther->IsPlayer())
+						{
+							CBasePlayer* player = (CBasePlayer*)pOther;
+
+							if (player->m_bIsZombie && !(player->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+							{
+								auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
+								if (strategy)
+								{
+									strategy->SetStunSpeedTime(1.3s);
+									strategy->SetStunGravityTime(1.3s);
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+#if DEBUG_DRAWBOX	
+			int m_iModelLight;
+#endif
+			float m_flDamage;
+
+			time_point_t m_tTimeRemove;
+		};
+
+		LINK_ENTITY_TO_CLASS(whipsword_stabbox, CWhipSwordStabBox);
+#endif
+
 class CKnifeWhipSword: public LinkWeaponTemplate<CKnifeWhipSword,
 	TGeneralData,
 	TPrecacheEvent,
@@ -210,7 +360,7 @@ public:
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
 			//flDamage = 3530;
-			flDamage = 1333;
+			flDamage = 1666;
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage = 12978;
 #endif
@@ -433,32 +583,54 @@ void CKnifeWhipSword::ItemPostFrame()
 			m_tNextAttack = gpGlobals->time + (m_iThinkType == 3 ? 0.5s : 0.25s);
 
 #ifndef CLIENT_DLL
-			const float flDamage = m_iThinkType == 3 ? GetPrimaryAttackDamage(m_iThinkType) : GetSecondaryAttackDamage(m_iThinkType);
-			const float flRadius = m_iThinkType == 3 ? 200 : 140;
-			const float flAngle = 360;
+			
+	
+			//old
+			if (m_iThinkType == 3)
+			{
+				const float flDamage = m_iThinkType == 3 ? GetPrimaryAttackDamage(m_iThinkType) : GetSecondaryAttackDamage(m_iThinkType);
+				const float flRadius = m_iThinkType == 3 ? 200 : 140;
+				const float flAngle = 360;
 
-			switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false))
-			{
-			case HIT_NONE:
-			{
-				break;
+				switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, false))
+				{
+				case HIT_NONE:
+				{
+					break;
+				}
+				case HIT_PLAYER:
+				{
+					if (RANDOM_LONG(0, 1))
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					else
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+					break;
+				}
+				case HIT_WALL:
+				{
+					//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+					break;
+				}
+				}
 			}
-			case HIT_PLAYER:
+			else
 			{
-				if (RANDOM_LONG(0, 1))
-					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				else
-					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-				break;
+				Vector vecSrc = m_pPlayer->GetGunPosition();
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+				Vector vecEnd;
+				Vector vecForward = gpGlobals->v_forward;
+				vecEnd = vecSrc + vecForward * 140;
+
+				CWhipSwordStabBox* pEnt = static_cast<CWhipSwordStabBox*>(CBaseEntity::Create("whipsword_stabbox", vecEnd, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+				if (pEnt)
+				{
+					pEnt->m_flDamage = m_iThinkType == 3 ? GetPrimaryAttackDamage(0) : GetSecondaryAttackDamage(0);
+					Vector vecSize = { 280, 118, 118 };
+					pEnt->SetSize(vecSize, vecForward);
+				}
 			}
-			case HIT_WALL:
-			{
-				//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-				break;
-			}
-			}	
 #endif
 		}
 	}
@@ -469,31 +641,55 @@ void CKnifeWhipSword::ItemPostFrame()
 		{
 			m_tNextAttack = invalid_time_point;
 #ifndef CLIENT_DLL
-			const float flDamage = m_iThinkType == 1 ? GetPrimaryAttackDamage(0) : GetSecondaryAttackDamage(0);
-			const float flRadius = m_iThinkType == 1 ? 180 : 131;
-			const float flAngle = 360;
+			if (m_iThinkType == 1)
+			{
+				const float flDamage = m_iThinkType == 1 ? GetPrimaryAttackDamage(0) : GetSecondaryAttackDamage(0);
+				const float flRadius = m_iThinkType == 1 ? 180 : 131;
+				const float flAngle = 360;
 
-			switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, m_iThinkType == 1 ? true : false))
-			{
-			case HIT_NONE:
-			{
-				break;
+				switch (KnifeAttack(flDamage, flRadius, flAngle, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer, m_iThinkType == 1 ? true : false))
+				{
+				case HIT_NONE:
+				{
+					break;
+				}
+				case HIT_PLAYER:
+				{
+					if (RANDOM_LONG(0, 1))
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					else
+						EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
+					break;
+				}
+				case HIT_WALL:
+				{
+					//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
+					break;
+				}
+				}
 			}
-			case HIT_PLAYER:
+			else
 			{
-				if (RANDOM_LONG(0, 1))
-					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				else
-					EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-				break;
-			}
-			case HIT_WALL:
-			{
-				//EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/mastercombat_wall.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-				m_pPlayer->m_iWeaponVolume = KNIFE_WALLHIT_VOLUME * 0.5;
-				break;
-			}
+
+				//TraceResult tr;
+				Vector vecSrc = m_pPlayer->GetGunPosition();
+				UTIL_MakeVectors(m_pPlayer->pev->v_angle);
+				Vector vecEnd;
+				Vector vecForward = gpGlobals->v_forward;
+				vecEnd = vecSrc + vecForward * 131;
+
+				/*UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+				vecEnd = tr.vecEndPos;*/
+
+				CWhipSwordStabBox* pEnt = static_cast<CWhipSwordStabBox*>(CBaseEntity::Create("whipsword_stabbox", vecEnd, m_pPlayer->pev->v_angle, ENT(m_pPlayer->pev)));
+				if (pEnt)
+				{
+					pEnt->m_flDamage = m_iThinkType == 1 ? GetPrimaryAttackDamage(0) : GetSecondaryAttackDamage(0);
+					Vector vecSize = { 262, 118, 118 };
+					pEnt->SetSize(vecSize, vecForward);
+				}
 			}
 #endif
 		}
@@ -594,7 +790,7 @@ void CKnifeWhipSword::PrimaryAttack(void)
 #endif
 	m_iThinkType = 1;
 	m_tNextThink = gpGlobals->time + 0.6s;
-	m_tNextAttack = gpGlobals->time + 0.1s;
+	m_tNextAttack = gpGlobals->time + 0.17s;
 	m_iSecondaryAttackRecord = 1;
 
 	m_pPlayer->pev->viewmodel = MAKE_STRING("models/v_whipsword.mdl");
@@ -670,6 +866,7 @@ void CKnifeWhipSword::SecondaryAttack(void)
 			if (!pEntity || pEntity->IsBSPModel())
 			{
 				ClearMultiDamage();
+				tr.iHitgroup = HITGROUP_CHEST;
 				pEntity->TraceAttack(m_pPlayer->pev, GetSlashComboAttackDamage(), gpGlobals->v_forward, &tr, DMG_BULLET | DMG_NEVERGIB);
 				ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 			}
@@ -705,6 +902,7 @@ void CKnifeWhipSword::SecondaryAttack(void)
 					Vector vecRealDir = (tr.vecEndPos - vecSrc).Normalize();
 
 					ClearMultiDamage();
+					tr.iHitgroup = HITGROUP_CHEST;
 					pEntity->TraceAttack(m_pPlayer->pev, GetSlashComboAttackDamage(), vecRealDir, &tr, DMG_BULLET | DMG_NEVERGIB);
 					ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 
@@ -795,7 +993,7 @@ void CKnifeWhipSword::SecondaryAttack(void)
 	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 0.67s;
 	m_iThinkType = 2;
 	m_tNextThink = gpGlobals->time + 0.6s;
-	m_tNextAttack = gpGlobals->time + 0.1s;
+	m_tNextAttack = gpGlobals->time + 0.17s;
 
 }
 
@@ -915,7 +1113,8 @@ hit_result_t CKnifeWhipSword::KnifeAttack(float flDamage, float flRadius, float 
 		pAttackPlayer->m_iWeaponVolume = 128;
 
 		ClearMultiDamage();
-
+		if (!IsPrimaryAttack)
+			tr.iHitgroup = HITGROUP_CHEST;
 		pEntity->TraceAttack(pAttackPlayer->pev, flDamage * flRatio, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
 
 		ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);

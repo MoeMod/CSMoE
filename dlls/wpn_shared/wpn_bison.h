@@ -45,7 +45,11 @@ public:
 	const char* GetCSModelName() override { return "models/w_bison.mdl"; }
 public:
 	void BisonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
-
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_P90); }
+#endif
+	float GetArmorRatioModifier() override { return 0.85; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 6, 2, 0 }; }
 	int m_iShell;
 	int iShellOn;
 

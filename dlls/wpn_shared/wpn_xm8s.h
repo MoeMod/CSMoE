@@ -78,6 +78,28 @@ public:
 	~CXM8SharpShooter();
 #endif
 
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "556Nato";
+		p->iMaxAmmo1 = MAX_AMMO_556NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = SG550_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 16;
+		p->iId = m_iId = WEAPON_XM8SHARPSHOOTER;
+		p->iFlags = 0;
+		p->iWeight = SG550_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.45; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_SG550); }
+#endif
+
 public:
 	void XM8SharpShooterFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();

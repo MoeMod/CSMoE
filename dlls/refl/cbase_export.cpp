@@ -398,6 +398,13 @@ template<> constexpr auto ExportMember<CBasePlayer> = std::tuple {
 	&CBasePlayer::m_flTimeSpawnProctionExpires,
 	&CBasePlayer::m_bIsFemale,
 	&CBasePlayer::m_iModelTeam,
+	&CBasePlayer::m_iKnifeID,
+	&CBasePlayer::m_iGrenadeID,
+	&CBasePlayer::m_iZombieClass,
+	&CBasePlayer::m_iNewMenuKeys,
+	&CBasePlayer::m_iNewMenuID,
+	&CBasePlayer::m_iNewMenuPage,
+	&CBasePlayer::m_iNewMenuExpire,
 };
 
 template<> constexpr auto ExportMember<CBasePlayerItem> = std::tuple {

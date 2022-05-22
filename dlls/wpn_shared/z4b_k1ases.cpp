@@ -41,7 +41,7 @@ void CK1ases::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_k1ases");
 
 	Precache();
-	m_iId = WEAPON_GALIL;
+	m_iId = WEAPON_Z4B_K1ASES;
 	SET_MODEL(ENT(pev), "models/w_k1ases.mdl");
 
 	m_iDefaultAmmo = K1ASE_MAXCLIP;
@@ -66,13 +66,13 @@ int CK1ases::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "556Nato";
-	p->iMaxAmmo1 = 180;
+	p->iMaxAmmo1 = 90;
 	p->pszAmmo2 = "DeimosTail";
 	p->iMaxAmmo2 = 20;
 	p->iMaxClip = K1ASE_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 17;
-	p->iId = m_iId = WEAPON_GALIL;
+	p->iId = m_iId = WEAPON_Z4B_K1ASES;
 	p->iFlags = 0;
 	p->iWeight = GALIL_WEIGHT;
 

@@ -894,7 +894,7 @@ void Touch_Init( void )
 	Touch_AddDefaultButton("duck_sw", "touch/gfx/duck.tga", "crouchtoggle", 0.800000, 0.740000, 0.900000, 0.945556, color, 2, 1, TOUCH_FL_HIDE);
 	Touch_AddDefaultButton("use", "touch/gfx/use.tga", "+use", 0.920000, 0.311562, 1.000000, 0.467343, color, 2, 1, 0);
 	Touch_AddDefaultButton("reload", "touch/gfx/reload.tga", "+reload", 0.660000, 0.778905, 0.740000, 0.934686, color, 2, 1, 0);
-	Touch_AddDefaultButton("buy", "touch/gfx/buy.tga", "buy", 0.100000, 0.817850, 0.180000, 0.973631, color, 2, 1, TOUCH_FL_HIDE);
+	Touch_AddDefaultButton("buy", "touch/gfx/buy.tga", "buy", 0.100000, 0.817850, 0.180000, 0.973631, color, 2, 1, 0);
 	Touch_AddDefaultButton("change_team", "touch/gfx/change_team.tga", "chooseteam", 0.000000, 0.822222, 0.060000, 0.945556, color, 2, 1, TOUCH_FL_HIDE);
 	Touch_AddDefaultButton("spraypaint", "touch/gfx/spraypaint.tga", "impulse 201", 0.680000, 0.000000, 0.740000, 0.116836, color, 2, 1, 0);
 	Touch_AddDefaultButton("invnext", "touch/gfx/right.tga", "invnext", 0.060000, 0.711111, 0.120000, 0.834444, color, 2, 1, TOUCH_FL_HIDE);

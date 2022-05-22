@@ -118,9 +118,9 @@ void CPlayerModStrategy_ZBZ::FlashbangExploded(float& flKickRate, float& flRadiu
 	//SKILL_FUNCTION(m_vecSkill, OnFlashbangExploded, flKickRate, flRadius, flFreezeTime);
 }
 
-void CPlayerModStrategy_ZBZ::ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
+void CPlayerModStrategy_ZBZ::ShootGrenade(const std::function<void(void)>& f)
 {
-	SKILL_FUNCTION(m_vecSkill, OnShootGrenade, vecStart, vecVelocity, time, iTeam, usEvent);
+	SKILL_FUNCTION(m_vecSkill, OnShootGrenade, f);
 }
 
 float CPlayerModStrategy_ZBZ::AdjustZombieKnifeRange(bool bStab, float flRange)
@@ -161,6 +161,18 @@ duration_t CPlayerModStrategy_ZBZ::OnDefaultReload_Pre(CBasePlayerWeapon* weapon
 void CPlayerModStrategy_ZBZ::OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int &iClip, int &iBackAmmo)
 {
 	SKILL_FUNCTION(m_vecSkill, OnAttack_Post, weapon, iClipBeforeAttack, iClip, iBackAmmo);
+}
+
+void CPlayerModStrategy_ZBZ::Holster_Post(CBasePlayerWeapon* weapon)
+{
+	SKILL_FUNCTION(m_vecSkill, OnHolster_Post, weapon);
+}
+
+BOOL CPlayerModStrategy_ZBZ::DeployWeapon(CBasePlayerItem *item)
+{
+	CPlayerModStrategy_ZB2::DeployWeapon(item);
+	SKILL_FUNCTION(m_vecSkill, OnDeployWeapon, item);
+	return TRUE;
 }
 
 int CPlayerModStrategy_ZBZ::AdjustDefaultReloadClip(CBasePlayerWeapon* weapon, int iClip)
@@ -621,6 +633,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 	{
 		if (m_pPlayer->IsAlive() && !m_pPlayer->m_bIsZombie && IsPickAsZombie() && CheckSkill(Skill_SixthSense))
 		{
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			auto iNumZombies = m_pModZBZ->ZombieOriginNum();
 			auto iNumPlayers = m_pModZBZ->m_iNumTerrorist + m_pModZBZ->m_iNumCT;
 
@@ -640,6 +653,7 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 
 		if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 		{
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
 			UpgradeSkill();
 			return;
 		}

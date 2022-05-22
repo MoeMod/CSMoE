@@ -39,6 +39,7 @@ LINK_ENTITY_TO_CLASS(weapon_cannon, CCannon)
 void CCannon::Spawn(void)
 {
 	Base::Spawn();
+	m_iId = WEAPON_CANNON;
 	m_iClip = WEAPON_NOCLIP;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }

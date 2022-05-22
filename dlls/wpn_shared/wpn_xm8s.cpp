@@ -37,7 +37,7 @@ void CXM8SharpShooter::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_xm8s");
 
 	Precache();
-	m_iId = WEAPON_SG550;
+	m_iId = WEAPON_XM8SHARPSHOOTER;
 	SET_MODEL(ENT(pev), "models/w_xm8.mdl");
 	current_ammo = m_iDefaultAmmo = SG550_DEFAULT_GIVE;
 

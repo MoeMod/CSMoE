@@ -48,6 +48,7 @@ public:
 		else
 			return { 450.0f, 350.0f, 400.0f, 300.0f, 0.3f };		
 	}
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 	float GetArmorRatioModifier() override { return 1.6; }
     WeaponBotStrategy GetBotStrategy() const override;
 

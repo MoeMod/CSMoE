@@ -31,7 +31,7 @@ LINK_ENTITY_TO_CLASS(weapon_balrog11, CBalrog11)
 void CBalrog11::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_BALROG11;
 	SET_MODEL(ENT(pev), "models/w_balrog11.mdl");
 	m_iDefaultAmmo2 = m_iChargeShotsFired = 0;
 	m_iDefaultAmmo = XM1014_DEFAULT_GIVE;
@@ -66,7 +66,7 @@ int CBalrog11::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = XM1014_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_BALROG11;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

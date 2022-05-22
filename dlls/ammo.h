@@ -379,6 +379,22 @@ public:
 	void Precache(void);
 	BOOL AddAmmo(CBaseEntity* pOther);
 };
+
+class C792NatoAmmo : public CBasePlayerAmmo
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL AddAmmo(CBaseEntity* pOther);
+};
+
+class CBuffBulletAmmo : public CBasePlayerAmmo
+{
+public:
+	void Spawn(void);
+	void Precache(void);
+	BOOL AddAmmo(CBaseEntity* pOther);
+};
 }
 
 #endif // AMMO_H

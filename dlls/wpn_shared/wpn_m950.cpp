@@ -73,6 +73,29 @@ namespace sv {
     /*static constexpr*/ int Penetration = 1;
     KnockbackData KnockBack = { 450.0f, 350.0f, 400.0f, 300.0f, 0.3f };
 
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_GLOCK18); }
+#endif
+	float GetArmorRatioModifier() override { return 1.0; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "9mm";
+		p->iMaxAmmo1 = MAX_AMMO_9MM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 50;
+		p->iSlot = 1;
+		p->iPosition = 2;
+		p->iId = m_iId = WEAPON_M950;
+		p->iFlags = 0;
+		p->iWeight = GLOCK18_WEIGHT;
+
+		return 1;
+	}
+
     void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
 		if (m_flLastFire != invalid_time_point)

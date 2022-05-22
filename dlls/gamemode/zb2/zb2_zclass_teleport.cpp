@@ -34,6 +34,7 @@ CZombieClass_Teleport::CZombieClass_Teleport(CBasePlayer *player, ZombieLevel iE
 {
 	m_pPlayer->m_ZombieClass = "teleport";
 	m_pZombieSkill = std::make_unique<CZombieSkill_ZombieTeleport>(m_pPlayer);
+	m_pZombieSkill2 = std::make_unique<CZombieSkill_ZombieHpBuff>(m_pPlayer);
 	Evolution(iEvolutionLevel);
 
 	// set default property
@@ -62,6 +63,7 @@ void CZombieClass_Teleport::InitHUD() const
 	WRITE_BYTE(ZB2_MESSAGE_SKILL_INIT);
 	WRITE_BYTE(ZOMBIE_CLASS_TELEPORT);
 	WRITE_BYTE(ZOMBIE_SKILL_TELEPORT);
+	WRITE_BYTE(ZOMBIE_SKILL_HPBUFF);
 	MESSAGE_END();
 }
 

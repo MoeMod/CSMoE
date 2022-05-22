@@ -110,32 +110,15 @@ void EV_FireCannon( event_args_t *args )
 		++g_iShotsFired;
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(ANIM_SHOOT, 2);
 		EV_MuzzleFlash();
-		if( !gHUD.cl_righthand->value )
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, -10.0, 0);
-		}
-		else
-		{
-			EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -8.0, 10.0, 0);
-		}
-
+	
 		if( gHUD.cl_gunsmoke->value )
 		{
 			cl_entity_t *ent = gEngfuncs.GetViewModel();
 
 			if( ent )
-			{
-				EV_CS16Client_CreateSmoke( SMOKE_RIFLE, ent->attachment[0], forward, 3, 0.3, 20, 20, 20, false, velocity );
-			}
+				EV_HLDM_CreateSmoke(ent->attachment[0], forward, 50, 0.26, 15, 15, 15, 3, velocity, true, 35);
 		}
 	}
-	else
-	{
-		EV_GetDefaultShellInfo( args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20.0, -12.0, 4.0, 0);
-	}
-
-
-	//EV_EjectBrass(ShellOrigin, ShellVelocity, angles[ YAW ], g_iRShell, TE_BOUNCE_SHELL);
 
 	PLAY_EVENT_SOUND( "weapons/cannon-1.wav" );
 

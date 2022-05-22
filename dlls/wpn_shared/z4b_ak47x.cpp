@@ -53,7 +53,6 @@ struct Z4B_AK47X_WeaponData
 		ANIM_SHOOT3
 	};
 	static constexpr float PlayerMaxSpeed = 235;
-	static constexpr float ArmorRatioModifier = 1.4f;
 	static constexpr const auto& SpreadCalcNotOnGround = 0.4 * A + 0.04;
 	static constexpr const auto& SpreadCalcWalking = 0.07 * A + 0.04;
 	static constexpr const auto& SpreadCalcDucking = 0.0 * A;
@@ -228,6 +227,28 @@ struct Z4B_AK47X_WeaponData
     {
     public:
 
+		float GetArmorRatioModifier() override { return 1.55; }
+#ifndef CLIENT_DLL
+		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AK47); }
+#endif
+		WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
+
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "762Nato";
+		p->iMaxAmmo1 = MAX_AMMO_762NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 35;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_Z4B_AK47X;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
 
 	void PrimaryAttack(void) override
 	{

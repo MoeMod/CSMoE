@@ -203,6 +203,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/v_knife_zombispider.mdl");
 	PRECACHE_MODEL("models/v_knife_zombideathknight.mdl");
 	PRECACHE_MODEL("models/v_knife_zombimeatwall.mdl");
+	PRECACHE_MODEL("models/v_knife_zombisiren.mdl");
 
 	PRECACHE_MODEL("models/v_zombibomb-deimos2.mdl");
 	PRECACHE_MODEL("models/v_zombibomb-deimos.mdl");
@@ -306,6 +307,7 @@ void PlayerZombie_Precache()
 	PRECACHE_MODEL("models/player/zombi_spider/zombi_spider.mdl");
 	PRECACHE_MODEL("models/player/zombi_deathknight/zombi_deathknight.mdl");
 	PRECACHE_MODEL("models/player/zombi_meatwall/zombi_meatwall.mdl");
+	PRECACHE_MODEL("models/player/zombi_siren/zombi_siren.mdl");
 }
 
 }

@@ -84,15 +84,13 @@ namespace sv {
 				return;
 			if (m_flNextThink > gpGlobals->time)
 				return;
-			m_flNextThink = gpGlobals->time + 0.3s;
+
+			m_flNextThink = gpGlobals->time + 0.5s;
 
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 			Vector vecSrc = m_pPlayer->GetGunPosition();
-			auto result = KnifeAttack3(vecSrc, gpGlobals->v_forward, 120.0f + 40.0f * g_pGameRules->m_iTotalRoundsPlayed, 80, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
+			KnifeAttack(120.0f + 40.0f * g_pGameRules->m_iTotalRoundsPlayed, 80, 120, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer);
 
-			/*if (result == HIT_PLAYER) {
-				ApplyKnockbackData(victim, victim->pev->origin - m_pPlayer->pev->origin, { 700, 1600, 1300, 400, 0.5f });
-			}*/
 			EMIT_SOUND_DYN(m_pPlayer->edict(), CHAN_ITEM, RANDOM_LONG(0, 1) ? "weapons/stormgiant_hit1.wav" : "weapons/stormgiant_hit2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 
 			UTIL_MakeVectors(m_pPlayer->pev->v_angle);
@@ -112,40 +110,84 @@ namespace sv {
 			MESSAGE_END();
 		}
 
-	//	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
-	//		if (attacker != m_pPlayer)
-	//			return;
-	//		if (!IsActivate())
-	//			return;
-	//		if (m_pPlayer->m_pActiveItem->iItemSlot() != KNIFE_SLOT)
-	//			return;
-	//		if (m_flNextThink > gpGlobals->time)
-	//			return;
-	//		m_flNextThink = gpGlobals->time + 0.01s;
+		hit_result_t KnifeAttack(float flDamage, float flRadius, float flAngleDegrees, int bitsDamageType, entvars_t* pevInflictor, CBasePlayer* pAttackPlayer)
+		{
+			CBaseEntity* pEntity = NULL;
+			hit_result_t result = HIT_NONE;
+			TraceResult tr;
+			UTIL_MakeVectors(pAttackPlayer->pev->v_angle);
+			Vector vecEnd;
+			Vector vecSrc = pAttackPlayer->GetGunPosition();
 
-	//		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	//		Vector vecSrc = m_pPlayer->GetGunPosition();
-	//		auto result = KnifeAttack3(vecSrc, gpGlobals->v_forward, 120.0f + 40.0f * g_pGameRules->m_iTotalRoundsPlayed, 80, 60, DMG_NEVERGIB | DMG_BULLET, m_pPlayer->pev, m_pPlayer->pev);
-	//		if (result == HIT_NONE)
-	//			return;
-	//		/*if (result == HIT_PLAYER) {
-	//			ApplyKnockbackData(victim, victim->pev->origin - m_pPlayer->pev->origin, { 700, 1600, 1300, 400, 0.5f });
-	//		}*/
-	//		Vector vecEnd = vecSrc + gpGlobals->v_forward * 80;
-	//		TraceResult tr;
-	//		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+			Vector vecForward = gpGlobals->v_forward;
+			Vector2D vecForward2D = vecForward.Make2D().Normalize();
 
-	//		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-	//		WRITE_BYTE(TE_EXPLOSION);
-	//		WRITE_COORD(tr.vecEndPos.x);
-	//		WRITE_COORD(tr.vecEndPos.y);
-	//		WRITE_COORD(tr.vecEndPos.z);
-	//		WRITE_SHORT(g_iKnifeMasterSpr);
-	//		WRITE_BYTE(3);
-	//		WRITE_BYTE(15);
-	//		WRITE_BYTE(TE_EXPLFLAG_NODLIGHTS | TE_EXPLFLAG_NOPARTICLES | TE_EXPLFLAG_NOSOUND);
-	//		MESSAGE_END();
-	//	}
+			float c = cos(flAngleDegrees * 0.5 * M_PI / 180.0);
+
+			while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+			{
+				if (pEntity == pAttackPlayer)
+					continue;
+
+				if (pEntity->IsDormant())
+					continue;
+
+				if (pEntity->pev->takedamage == DAMAGE_NO)
+					continue;
+
+				if (pEntity->IsPlayer() && bIsWallBetweenEntity(pEntity, pAttackPlayer))
+					continue;
+
+				if (!AngleCheck(pEntity, pAttackPlayer, vecSrc, vecForward, vecForward2D, flRadius, c, &tr))
+					continue;
+
+				pAttackPlayer->m_iWeaponVolume = 128;
+
+				ClearMultiDamage();
+				tr.iHitgroup = HITGROUP_CHEST;
+				pEntity->TraceAttack(pAttackPlayer->pev, flDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+
+				ApplyMultiDamage(pevInflictor, pAttackPlayer->pev);
+
+				CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+				if (pPlayer->IsPlayer() && pPlayer->m_bIsZombie && !(pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+				{
+					Vector2D vecDir2D = (pPlayer->pev->origin.Make2D() - m_pPlayer->pev->origin.Make2D()).Normalize();
+
+					pPlayer->pev->velocity.x = vecDir2D.x * (600 + 30 * g_pGameRules->m_iTotalRoundsPlayed);
+					pPlayer->pev->velocity.y = vecDir2D.y * (600 + 30 * g_pGameRules->m_iTotalRoundsPlayed);
+
+					float flVelocityModifier = 0.8 - g_pGameRules->m_iTotalRoundsPlayed * 0.03;				
+					if (flVelocityModifier <= 0.5)
+						flVelocityModifier = 0.5;
+					pPlayer->m_flVelocityModifier = flVelocityModifier;
+
+				}
+
+				result = HIT_PLAYER;
+			}
+
+			if (!result)
+			{
+				static int calced = 0;
+				static float calcRes = 0.0f;
+
+				if (!(calced & 1))
+				{
+					calced |= 1;
+					calcRes = sqrt(512.0);
+				}
+
+				vecEnd = vecSrc + vecForward * (flRadius - calcRes);
+
+				UTIL_TraceHull(vecSrc, vecEnd, dont_ignore_monsters, human_hull, pAttackPlayer->edict(), &tr);
+
+				if (tr.flFraction < 1.0f)
+					result = HIT_WALL;
+			}
+
+			return result;
+		}
 	private:
 		time_point_t m_flNextThink;
 	};
@@ -1248,11 +1290,12 @@ namespace sv {
 		{
 			time_point_t flTime;
 			int iCount;
-			Vector vecStart;
+			/*Vector vecStart;
 			Vector vecVelocity;
 			duration_t time;
 			int iTeam;
-			unsigned short usEvent;
+			unsigned short usEvent;*/
+			std::function<void(void)> f;
 		};
 
 		void OnBecomeZombie(ZombieLevel iEvolutionLevel) override {
@@ -1263,7 +1306,7 @@ namespace sv {
 			m_vecGrenadeRecord.clear();
 		}
 
-		void OnShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override {
+		void OnShootGrenade(const std::function<void(void)>& f) override {
 			if (!IsActivate())
 				return;
 
@@ -1271,12 +1314,13 @@ namespace sv {
 			ShootGrenadeRecord record;
 			record.flTime = gpGlobals->time + 1s;
 			record.iCount = 1 + g_pGameRules->m_iTotalRoundsPlayed / 2;
-			record.vecStart = vecStart;
-			record.vecVelocity = vecVelocity;
+			record.f = f;
+			m_vecGrenadeRecord.push_back(record);
+
+			/*record.vecVelocity = vecVelocity;
 			record.time = time;
 			record.iTeam = iTeam;
-			record.usEvent = usEvent;
-			m_vecGrenadeRecord.push_back(record);
+			record.usEvent = usEvent;*/
 			//m_vecGrenadeRecord.push_back({ gpGlobals->time, 1 + g_pGameRules->m_iTotalRoundsPlayed / 2, vecStart, vecVelocity, time, iTeam, usEvent });
 		}
 
@@ -1303,7 +1347,8 @@ namespace sv {
 
 				if (iter->iCount > 0)
 				{
-					CGrenade* pGrenade = CreateClassPtr<CGrenade>();
+					iter->f();
+					/*CGrenade* pGrenade = CreateClassPtr<CGrenade>();
 					pGrenade->Spawn();
 
 					UTIL_SetOrigin(pGrenade->pev, iter->vecStart);
@@ -1330,7 +1375,7 @@ namespace sv {
 					pGrenade->m_iTeam = iter->iTeam;
 
 					SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
-					pGrenade->pev->dmg = 100.0f;
+					pGrenade->pev->dmg = 100.0f;*/
 
 					(*iter).flTime = gpGlobals->time + 1s;
 					(*iter).iCount--;
@@ -1892,6 +1937,98 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_GoldClip : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_GoldClip(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "金色弹夹"; }
+		const char* GetDesc() const override { return "切出当前武器 10s - 回合数 * 0.5s (最短5s) 以后自动装填子弹，该技能只对主武器副武器生效"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		void OnHolster_Post(CBasePlayerWeapon* weapon)
+		{
+			weapon->m_flHolsterTime = gpGlobals->time + max(5.0s, (10.0s - g_pGameRules->m_iTotalRoundsPlayed * 0.5s));
+		}
+
+		void OnDeployWeapon(CBasePlayerItem* item)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)item;
+			if (!pWeapon)
+				return;
+
+			if (pWeapon->m_flHolsterTime != invalid_time_point && pWeapon->m_flHolsterTime < gpGlobals->time)
+			{
+				pWeapon->m_flHolsterTime = invalid_time_point;
+				switch (pWeapon->iItemSlot())
+				{
+				case PRIMARY_WEAPON_SLOT:
+				case PISTOL_SLOT:
+				{
+					int delta = Q_min(pWeapon->iMaxClip() - pWeapon->m_iClip, m_pPlayer->m_rgAmmo[pWeapon->m_iPrimaryAmmoType]);
+
+					// Add them to the clip
+					pWeapon->m_iClip += delta;
+					m_pPlayer->m_rgAmmo[pWeapon->m_iPrimaryAmmoType] -= delta;
+					m_pPlayer->TabulateAmmo();
+					break;
+				}
+				}
+			}
+			
+		}
+	};
+
+	class ZSkill_QuickChange : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_QuickChange(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "快速切换"; }
+		const char* GetDesc() const override { return "增加切枪速度，基础加快25%，最多加快50%"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		void OnDeployWeapon(CBasePlayerItem* item)
+		{
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)item;
+			if (!pWeapon)
+				return;
+			m_pPlayer->m_flNextAttack *= max(0.5, (0.75 - (g_pGameRules->m_iTotalRoundsPlayed * 0.05)));
+			pWeapon->m_flNextPrimaryAttack *= max(0.5, (0.75 - (g_pGameRules->m_iTotalRoundsPlayed * 0.05)));
+			pWeapon->m_flNextSecondaryAttack *= max(0.5, (0.75 - (g_pGameRules->m_iTotalRoundsPlayed * 0.05)));
+		}
+	};
+
+	class ZSkill_Penetration : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_Penetration(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "逃杀本能"; }
+		const char* GetDesc() const override { return "移动时可以穿透队友"; }
+		ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+		void OnGetSkill() override {
+			m_pPlayer->pev->playerclass = 2; // set to team semiclip;
+		}
+		void OnAddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override
+		{
+			if (!player || host == ent)
+				return;
+
+			if (host->v.team != ent->v.team)
+				return;
+
+			state->solid = SOLID_NOT;		
+			Vector vecDelta = host->v.origin - ent->v.origin;
+
+			if (vecDelta.IsLengthLessThan(70.0f))
+			{
+				state->rendermode = kRenderTransAlpha;
+				state->renderamt = int(vecDelta.Length() * 3);
+			}
+		}
+	};
+
+
+
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
 	{
@@ -1948,6 +2085,9 @@ namespace sv {
 		{ Skill_SwordMaster, 100, MakeSkill<ZSkill_SwordMaster> },
 		{ Skill_Specialist, 100, MakeSkill<ZSkill_Specialist> },
 		{ Skill_Knife2X, 100, MakeSkill<ZSkill_Knife2X> },
+		{ Skill_GoldClip, 100, MakeSkill<ZSkill_GoldClip> },
+		{ Skill_QuickChange, 100, MakeSkill<ZSkill_QuickChange> },
+		{ Skill_Penetration, 100, MakeSkill<ZSkill_Penetration> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

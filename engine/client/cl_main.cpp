@@ -438,7 +438,7 @@ void CL_CreateCmd( void )
 	// write cdata
 	VectorCopy( cl.frame.client.origin, cl.data.origin );
 	VectorCopy( cl.refdef.cl_viewangles, cl.data.viewangles );
-	cl.data.iWeaponBits = cl.frame.client.weapons;
+	cl.data.iWeaponBits = cl.frame.client.weapons & 1;
 	cl.data.fov = cl.scr_fov;
 
 	if( clgame.dllFuncs.pfnUpdateClientData( &cl.data, cl.time ) )
@@ -2446,8 +2446,8 @@ void CL_Init( void )
 	}
 
 #ifdef XASH_VGUI2
-    extern void VGui2_Startup();
-    VGui2_Startup();
+	extern void VGui2_Startup();
+	VGui2_Startup();
 #endif
 
 	if( loaded )

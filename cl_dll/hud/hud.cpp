@@ -39,6 +39,7 @@
 #include "camera.h"
 
 #include "cs_wpn/bte_weapons.h"
+#include "vgui2/CBaseViewport.h"
 
 namespace cl {
 
@@ -254,6 +255,8 @@ void CHud :: Init( void )
 
 	BTEClientWeapons().Init();
 
+	//g_pViewport->Init(); // vgui viewport create after hud, so forget about this...
+
 	//ServersInit();
 
 	gEngfuncs.Cvar_SetValue( "hand", 1 );
@@ -423,6 +426,7 @@ void CHud :: VidInit( void )
 	for( HUDLIST *pList = m_pHudList; pList; pList = pList->pNext )
 		pList->p->VidInit();
 
+	g_pViewport->VidInit();
 	gFog.VidInit();
 
 	if( firstinit && gEngfuncs.CheckParm( "-firsttime", NULL ) )

@@ -86,9 +86,13 @@ public:
 	void Frequency1HighNoonFire(int iIndex);
 	void CalcIsTarget();
 	bool is_target_avaliable(int iIndex);
-	Vector CalcPositon();
 	void Effect_Beam(Vector vecStart, Vector vecEnd, int iLife, int iBrightness, int r, int g, int b, int iWidth, int iScollSpeed);
 #endif
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_DEAGLE); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 private:
 	unsigned short m_usFireFrequency1;
 };

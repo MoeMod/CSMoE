@@ -36,7 +36,7 @@ void CCz75::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_cz75");
 
 	Precache();
-	m_iId = WEAPON_FIVESEVEN;
+	m_iId = WEAPON_CSGO_CZ75;
 	SET_MODEL(ENT(pev), "models/w_cz75.mdl");
 	m_bHasReload = FALSE;
 	m_iDefaultAmmo = CZ75_DEFAULT_GIVE;
@@ -79,7 +79,7 @@ int CCz75::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = CZ75_DEFAULT_GIVE;
 	p->iSlot = 1;
 	p->iPosition = 6;
-	p->iId = m_iId = WEAPON_FIVESEVEN;
+	p->iId = m_iId = WEAPON_CSGO_CZ75;
 	p->iFlags = 0;
 	p->iWeight = FIVESEVEN_WEIGHT;
 

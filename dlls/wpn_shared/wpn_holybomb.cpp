@@ -10,6 +10,10 @@
 #include "gamerules.h"
 #include "cbase/cbase_hash.h"
 
+#ifndef CLIENT_DLL
+#include "player/player_mod_strategy.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -169,6 +173,9 @@ void CHolyBomb::WeaponIdle(void)
 		Vector vecThrow = gpGlobals->v_forward * flVel + m_pPlayer->pev->velocity;
 		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
 
+#ifndef CLIENT_DLL
+		m_pPlayer->m_pModStrategy->ShootGrenade(std::bind(CHolyBombGrenade::ShootGrenade, m_pPlayer->pev, vecSrc, vecThrow, m_pPlayer->m_iTeam, GetDamage()));
+#endif
 		CHolyBombGrenade::ShootGrenade(m_pPlayer->pev, vecSrc, vecThrow, m_pPlayer->m_iTeam, GetDamage());
 
 		SendWeaponAnim(HEGRENADE_THROW, UseDecrement() != FALSE);
@@ -286,6 +293,7 @@ CHolyBombGrenade* CHolyBombGrenade::ShootGrenade(entvars_t* pevOwner, Vector vec
 	pGrenade->pev->dmgtime = gpGlobals->time + pGrenade->GetExplosionTime();
 	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
 	pGrenade->m_iTeam = iTeam;
+	pGrenade->m_iGrenadeID = GRENADE_HOLYBOMB;
 	pGrenade->SetTouch(&CHolyBombGrenade::BounceTouch);
 	pGrenade->SetThink(&CHolyBombGrenade::TumbleThink);
 

@@ -626,7 +626,7 @@ bool BotPhraseManager::Initialize(const char *filename, int bankIndex)
 
 				if (speak->m_duration <= zero_duration)
 				{
-					CONSOLE_ECHO("Warning: Couldn't get duration of phrase '%s'\n", compositeFilename);
+					//CONSOLE_ECHO("Warning: Couldn't get duration of phrase '%s'\n", compositeFilename);
 					speak->m_duration = 1.0s;
 				}
 

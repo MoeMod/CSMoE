@@ -93,6 +93,30 @@ class CDeagleShura : public LinkWeaponTemplate< CDeagleShura,
 	>, public CDeagleShura_WeaponData
 {
 public:
+	float GetArmorRatioModifier() override { return 1.5; }
+
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_DEAGLE); }
+#endif
+
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "50AE";
+		p->iMaxAmmo1 = MAX_AMMO_50AE;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = DEAGLE_MAX_CLIP;
+		p->iSlot = 1;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_Z4B_DEAGLESHURA;
+		p->iFlags = 0;
+		p->iWeight = DEAGLE_WEIGHT;
+
+		return 1;
+	};
+
 	void Precache() override
 	{
 		PRECACHE_SOUND("weapons/mastercombat_slash.wav");

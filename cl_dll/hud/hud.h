@@ -30,6 +30,7 @@
 
 #include "csprite.h"
 #include "cvardef.h" // cvar_t
+#include <set>
 
 enum GameMode_e : byte; // #include "gamemode/mods_const.h"
 
@@ -1203,7 +1204,9 @@ public:
 
 	GameMode_e m_iModRunning;
 
-	std::vector<MoEWeaponBuyInfo_s> m_WeaponBuyInfo;
+	std::set<int> m_setBanWeapon;
+	std::set<int> m_setBanKnife;
+	std::set<int> m_setBanGrenade;
 
 private:
 	HUDLIST	*m_pHudList;

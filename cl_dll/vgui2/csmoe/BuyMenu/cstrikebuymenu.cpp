@@ -18,6 +18,7 @@ CCSBaseBuyMenu::CCSBaseBuyMenu(IViewport *pViewPort) : CBuyMenu(pViewPort)
 {
 	SetTitle("#Cstrike_Buy_Menu", true);
 	SetProportional(true);
+	SetPaintBackgroundEnabled(false);
 }
 
 void CCSBaseBuyMenu::SetupControlSettings()

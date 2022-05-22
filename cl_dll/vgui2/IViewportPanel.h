@@ -73,6 +73,10 @@ public:
 	virtual bool IsVisible() = 0;
 
 	virtual void SetParent( vgui2::VPANEL parent ) = 0;
+
+	virtual void Init() = 0;
+
+	virtual void VidInit() = 0;
 };
 
 

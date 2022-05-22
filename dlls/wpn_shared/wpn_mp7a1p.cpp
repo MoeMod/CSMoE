@@ -90,9 +90,28 @@ public:
 		static constexpr const char *szAmmo1 = "46MM";
 		static constexpr int iMaxAmmo1 = MAX_AMMO_46MM;
 	};
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "46MM";
+		p->iMaxAmmo1 = MAX_AMMO_46MM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 20;
+		p->iSlot = 0;
+		p->iPosition = 7;
+		p->iId = m_iId = WEAPON_MP7A1_PISTOL;
+		p->iFlags = 0;
+		p->iWeight = MP5NAVY_WEIGHT;
+
+		return 1;
+	};
+
 #ifndef CLIENT_DLL
-	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return {"ammo_46mm", AMMO_46MM_PRICE}; }
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_46mm" , AMMO_46MM_PRICE }; }
 #endif
+	float GetArmorRatioModifier() override { return 1.0; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 6, 2, 0 }; }
 
 	static constexpr const auto &SpreadCalcNotOnGround = 0.375 * A;
 	static constexpr const auto &SpreadCalcDefault = 0.035 * A;

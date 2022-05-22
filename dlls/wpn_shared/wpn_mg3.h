@@ -44,6 +44,8 @@ public:
 #ifndef CLIENT_DLL
 		WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_762natobox" , 60 }; }
 #endif
+		float GetArmorRatioModifier() override { return 1.5; }
+		WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
 
 public:
 	void MG3Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

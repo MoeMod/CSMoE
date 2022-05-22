@@ -77,6 +77,29 @@ namespace sv {
 	std::array<float, 3> RecoilPunchAngleDelta = { -3, 0, 0 };
     KnockbackData KnockBack = { 5000.0f, 700.0f, 1200.0f, 800.0f, 0.3f };
 
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "338Magnum";
+		p->iMaxAmmo1 = MAX_AMMO_338MAGNUM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = AWP_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 2;
+		p->iId = m_iId = WEAPON_Z4B_BARRETTD;
+		p->iFlags = 0;
+		p->iWeight = AWP_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.95; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AWP); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
+
 	void Precache() override
 	{
 		return Base::Precache();

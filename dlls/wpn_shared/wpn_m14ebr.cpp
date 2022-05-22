@@ -35,7 +35,7 @@ void CM14EBR::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_m14ebr");
 
 	Precache();
-	m_iId = WEAPON_AK47;
+	m_iId = WEAPON_M14EBR;
 	SET_MODEL(ENT(pev), "models/w_m14ebr.mdl");
 
 	m_iDefaultAmmo = M14EBR_MAXCLIP;
@@ -52,9 +52,6 @@ void CM14EBR::Precache(void)
 	PRECACHE_MODEL("models/p_m14ebr.mdl");
 
 	PRECACHE_SOUND("weapons/m14ebr-1.wav");
-	PRECACHE_SOUND("weapons/m14_clipout.wav");
-	PRECACHE_SOUND("weapons/m14_clipin.wav");
-	PRECACHE_SOUND("weapons/m14_draw.wav");
 
 	m_iShell = PRECACHE_MODEL("models/rshell.mdl");
 	m_usFireM14EBR = PRECACHE_EVENT(1, "events/m14ebr.sc");
@@ -70,7 +67,7 @@ int CM14EBR::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M14EBR_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 1;
-	p->iId = m_iId = WEAPON_AK47;
+	p->iId = m_iId = WEAPON_M14EBR;
 	p->iFlags = 0;
 	p->iWeight = AK47_WEIGHT;
 

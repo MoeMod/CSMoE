@@ -50,6 +50,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 1200.0f,950.0f,1100.0f,950.0f,0.5f }; }
 	float GetArmorRatioModifier() override { return 1.2; }
 	const char *GetCSModelName() override { return "models/w_tar21.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AUG); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 3, 3, 140 }; }
 
 public:
 	void TAR21Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

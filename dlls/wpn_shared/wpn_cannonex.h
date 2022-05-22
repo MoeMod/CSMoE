@@ -87,6 +87,24 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_cannonex" , 200 }; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 0 }; }
+
+	int GetItemInfo(ItemInfo* p) override
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "CannonEXAmmo";
+		p->iMaxAmmo1 = 30;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 30;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_CANNONEX;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
 
 public:
 	void CannonEXFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

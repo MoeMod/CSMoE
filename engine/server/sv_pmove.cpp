@@ -214,11 +214,21 @@ void SV_AddLinksToPmove( areanode_t *node, const vec3_t pmove_mins, const vec3_t
 
 		if( check->v.flags & FL_CLIENT )
 		{
+			// MOE NEW FEATURE: semiclip
+			if (check->v.playerclass == 1)
+				continue;
+
 			// trying to get interpolated values
 			int e = NUM_FOR_EDICT( check ) - 1;
 
-			if( svs.currentPlayer )
-				SV_GetTrueMinMax( svs.currentPlayer, e, mins, maxs );
+			if (svs.currentPlayer)
+			{
+				// MOE NEW FEATURE: semiclip
+				if (svs.currentPlayer->edict->v.playerclass == 1 || ((svs.currentPlayer->edict->v.playerclass == 2 || check->v.playerclass == 2) && svs.currentPlayer->edict->v.team == check->v.team))
+					continue;
+
+				SV_GetTrueMinMax(svs.currentPlayer, e, mins, maxs);
+			}
 		}
 
 		if( !BoundsIntersect( pmove_mins, pmove_maxs, mins, maxs ))

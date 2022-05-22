@@ -36,7 +36,7 @@ void CInfinityX::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_infinityx");
 
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_Z4B_INFINITYX;
 	SET_MODEL(ENT(pev), GetCSModelName());
 
 	m_iMaxClip = 40;
@@ -69,7 +69,7 @@ int CInfinityX::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = m_iMaxClip;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_Z4B_INFINITYX;
 	p->iFlags = 0;
 	p->iWeight = ELITE_WEIGHT;
 

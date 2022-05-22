@@ -74,7 +74,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
 #endif
-
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 0 }; }
 public:
 	void InfinityXFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	void InfinityXFire2(float flSpread, duration_t flCycleTime, BOOL fUseSemi);

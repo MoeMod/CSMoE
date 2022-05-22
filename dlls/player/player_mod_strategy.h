@@ -78,10 +78,11 @@ public:
 	virtual int AdjustScoreAttrib(int state) = 0;
 	virtual Vector AdjustFireBullets3Dir(Vector vecDir) = 0;
 	virtual void ClientPutInServer() = 0;
-	virtual void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) = 0;
+	virtual void ShootGrenade(const std::function<void(void)>& f) = 0;
 	virtual void GrenadeExploded(Vector vecStart) = 0;
 	virtual void ZombiBombExploded(float &flKickRate, float &flRadius, float &flDamage) = 0;
 	virtual void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) = 0;
+	virtual void Holster_Post(CBasePlayerWeapon* weapon) = 0;
 };
 
 inline IBasePlayerModStrategy::~IBasePlayerModStrategy() = default;
@@ -126,10 +127,11 @@ public:
 	int AdjustScoreAttrib(int state) override { return state; }
 	Vector AdjustFireBullets3Dir(Vector vecDir) override { return vecDir; }
 	void ClientPutInServer() {}
-	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) {}
+	void ShootGrenade(const std::function<void(void)>& f) {}
 	void GrenadeExploded(Vector vecStart) {}
 	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) {};
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) {};
+	void Holster_Post(CBasePlayerWeapon* weapon) {};
 };
 
 class CPlayerModStrategy_Zombie : public CPlayerModStrategy_Default

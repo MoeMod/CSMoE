@@ -38,7 +38,7 @@ void CBizon::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_bizon");
 
 	Precache();
-	m_iId = WEAPON_P90;
+	m_iId = WEAPON_CSGO_BIZON;
 	SET_MODEL(ENT(pev), "models/w_bizon.mdl");
 
 	m_iDefaultAmmo = BIZON_MAX_CLIP;
@@ -72,7 +72,7 @@ int CBizon::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = BIZON_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 8;
-	p->iId = m_iId = WEAPON_P90;
+	p->iId = m_iId = WEAPON_CSGO_BIZON;
 	p->iFlags = 0;
 	p->iWeight = P90_WEIGHT;
 

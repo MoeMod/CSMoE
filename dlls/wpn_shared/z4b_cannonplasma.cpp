@@ -38,6 +38,7 @@ void CCannonPlasma::Spawn(void)
 {
 	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
+	m_iId = WEAPON_Z4B_CANNONPLASMA;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
 }
 

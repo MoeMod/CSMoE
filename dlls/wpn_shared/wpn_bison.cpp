@@ -38,7 +38,7 @@ void CBison::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_bison");
 
 	Precache();
-	m_iId = WEAPON_P90;
+	m_iId = WEAPON_BISON;
 	SET_MODEL(ENT(pev), "models/w_bison.mdl");
 
 	m_iDefaultAmmo = BISON_MAX_CLIP;
@@ -71,7 +71,7 @@ int CBison::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = BISON_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 8;
-	p->iId = m_iId = WEAPON_P90;
+	p->iId = m_iId = WEAPON_BISON;
 	p->iFlags = 0;
 	p->iWeight = P90_WEIGHT;
 

@@ -4294,8 +4294,10 @@ qboolean CL_LoadProgs( const char *name )
 		return false;
 	}
 #ifdef XASH_VGUI2
-    extern int VGui2_Initialize(cl_enginefunc_t *pEnginefuncs);
+	extern int VGui2_Initialize(cl_enginefunc_t * pEnginefuncs);
+	//extern void VGui2_Startup();
     VGui2_Initialize(&gEngfuncs);
+	//VGui2_Startup();
 #endif
 
 	Cvar_Get( "cl_nopred", "0", CVAR_ARCHIVE|CVAR_USERINFO, "disable client movement predicting" );

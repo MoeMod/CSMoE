@@ -39,7 +39,7 @@ void CM95xmas::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_m95xmas");
 
 	Precache();
-	m_iId = WEAPON_AWP;
+	m_iId = WEAPON_M95XMAS;
 	SET_MODEL(ENT(pev), "models/w_m95xmas.mdl");
 
 	m_iDefaultAmmo = M95_MAXCLIP;
@@ -72,7 +72,7 @@ int CM95xmas::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M95_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 2;
-	p->iId = m_iId = WEAPON_AWP;
+	p->iId = m_iId = WEAPON_M95XMAS;
 	p->iFlags = 0;
 	p->iWeight = AWP_WEIGHT;
 

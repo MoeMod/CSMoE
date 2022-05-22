@@ -47,7 +47,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50bmg" , AMMO_50BMG_PRICE }; }
 #endif
-
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 120 }; }
 public:
 	void M95xmasFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage() const;

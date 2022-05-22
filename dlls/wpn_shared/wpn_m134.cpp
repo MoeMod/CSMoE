@@ -37,7 +37,7 @@ void CM134::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_m134");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_M134;
 	SET_MODEL(ENT(pev), "models/w_m134.mdl");
 
 	m_iDefaultAmmo = M134_DEFAULT_GIVE;
@@ -78,7 +78,7 @@ int CM134::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M134_DEFAULT_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_M134;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

@@ -44,11 +44,13 @@ enum
 	HOLYBOMB_BURN,
 	LANCE_HIT,
 	ZOMBIE_SKILL_PILE,
+	ZOMBIE_SKILL_HPBUFF_HEAD,
+	ZOMBIE_SKILL_ARMORRECOVERY_HEAD,
+	HUMAN_DEBUFF_SHOOTINGDOWN_HEAD,
 };
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
-void CreateBalrog11CannonFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 
@@ -64,19 +66,46 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	{
 	case 0:
 	{
-		int length = reader.ReadShort();
-		for (int i = 0; i < length; i++)
-		{
-			// {"weapon_usp", "USP45", 500, PISTOL_SLOT, UNASSIGNED, BUY_PISTOL, 1},
-			MoEWeaponBuyInfo_s info;
-			info.pszClassName = reader.ReadString();
-			info.pszDisplayName = reader.ReadString();
-			info.iCost = reader.ReadShort();
-			info.iSlot = (InventorySlotType)reader.ReadByte();
-			info.iTeam = (TeamName)reader.ReadByte();
-			info.iMenu = (MoEWeaponBuyType)reader.ReadByte();
-			info.iScore = 1;
-			gHUD.m_WeaponBuyInfo.push_back(info);
+		int iBanType = reader.ReadByte();
+		int iSlot = iBanType / 10; // 1-wpn,2-knife,3-grenad
+		int iDataType = iBanType % 10; // 0-all, 1-add, 2-remove
+		int length = reader.ReadByte();
+		if (iSlot == 1) {
+			if (iDataType == 0) {
+				gHUD.m_setBanWeapon.clear();
+			}
+			for (int i = 0; i < length; i++)
+			{
+				int id = reader.ReadByte();
+				if(iDataType <= 1)
+					gHUD.m_setBanWeapon.insert(id);
+				else if(iDataType == 2)
+					gHUD.m_setBanWeapon.erase(id);
+			}
+		}else if (iSlot == 2) {
+			if (iDataType == 0) {
+				gHUD.m_setBanKnife.clear();
+			}
+			for (int i = 0; i < length; i++)
+			{
+				int id = reader.ReadByte();
+				if (iDataType <= 1)
+					gHUD.m_setBanKnife.insert(id);
+				else if (iDataType == 2)
+					gHUD.m_setBanKnife.erase(id);
+			}
+		}else if (iSlot == 3) {
+			if (iDataType == 0) {
+				gHUD.m_setBanGrenade.clear();
+			}
+			for (int i = 0; i < length; i++)
+			{
+				int id = reader.ReadByte();
+				if (iDataType <= 1)
+					gHUD.m_setBanGrenade.insert(id);
+				else if (iDataType == 2)
+					gHUD.m_setBanGrenade.erase(id);
+			}
 		}
 		break;
 	}
@@ -95,7 +124,6 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadByte();
 		CreateBalrog11CannonSingleProjectile(NULL, pos, arg1, arg2);
-		//CreateBalrog11CannonFollowEnt(NULL, pos, arg1, arg2);
 		break;
 	}
 	case 3:
@@ -124,7 +152,9 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		case 1:
 			gEngfuncs.pfnPlaySoundByNameAtPitch("zombi/TD_Buff.wav", 1.0, 100);
 			break;
-
+		case 2:
+			gEngfuncs.pfnPlaySoundByNameAtPitch("zombi/siren_scream.wav", 1.0, 100);
+			break;
 		case 44:
 			gEngfuncs.pfnPlaySoundByNameAtLocation("weapons/sgmissile_reload.wav", VOL_NORM, gHUD.m_vecOrigin);
 			break;
@@ -217,73 +247,6 @@ void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int i
 		te->clientIndex = ent->curstate.owner;
 	}
 }
-
-void CreateBalrog11CannonFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
-{
-	cl_entity_t* ent = gEngfuncs.GetEntityByIndex(iAimingEntity);
-	if (!ent)
-		return;
-	static int iModelIndex;
-	switch (iType)
-	{
-	case 0:
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/flame_puff01.spr"); break;
-	case 1:
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_hwater.spr"); break;
-	case 2:
-		iModelIndex = gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_sgmissile_line.spr"); break;
-	}
-
-	TEMPENTITY* pEnt = gEngfuncs.pEfxAPI->R_DefaultSprite(origin, iModelIndex, 48);
-	if (pEnt)
-	{
-		pEnt->flags |= FTENT_CLIENTCUSTOM | FTENT_COLLIDEKILL;
-		pEnt->entity.angles.y = gEngfuncs.pfnRandomFloat(-512, 511);
-		pEnt->entity.angles.x = gEngfuncs.pfnRandomFloat(-256, 255);
-		pEnt->entity.angles.z = gEngfuncs.pfnRandomFloat(-256, 255);
-		pEnt->flags |= FTENT_ROTATE;
-		pEnt->entity.curstate.scale = 0.01;
-		pEnt->entity.baseline.fuser1 = 0.3;
-		pEnt->entity.curstate.iuser2 = iType;
-
-		pEnt->entity.curstate.rendermode = kRenderTransAdd;
-		pEnt->entity.curstate.renderamt = 40.0f;
-		pEnt->entity.curstate.renderfx = kRenderFxNone;
-
-		pEnt->entity.baseline.origin = Vector(0, 0, 0);
-		pEnt->entity.baseline.iuser1 = ent->index;
-		pEnt->entity.curstate.iuser1 = 0;
-		pEnt->clientIndex = ent->curstate.owner;
-
-		pEnt->callback = [](tempent_s* ent, float frametime, float currenttime) {
-			if (ent->entity.baseline.fuser1 > ent->entity.curstate.scale)
-				ent->entity.curstate.scale += 0.03;
-
-			cl_entity_t* pEntity;
-			pEntity = gEngfuncs.GetEntityByIndex(ent->entity.baseline.iuser1);
-
-			if (!pEntity)
-			{
-				ent->die = currenttime;
-				return;
-			}
-
-			if (ent->die - currenttime <= frametime * 100 && !ent->entity.curstate.iuser1)
-			{
-				if ((ent->entity.origin - pEntity->origin).Length() < 5)
-					return;
-				CreateBalrog11CannonFollowEnt(ent, pEntity->origin, pEntity->index, ent->entity.curstate.iuser2);
-				ent->entity.curstate.iuser1 = 1;
-			}
-		};
-		pEnt->hitcallback = [](tempent_s* ent, pmtrace_s* ptr) {
-			ent->entity.baseline.origin *= 0.01f;
-			ent->entity.curstate.framerate = 60;
-
-		};
-	}
-}
-
 
 void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType)
 {
@@ -398,6 +361,24 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 	{
 		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zbt_slow.spr"),
 			Vector(0.0, 0.0, 40.0), 3.0, TRUE, flags, 1.0, kRenderTransAdd, 1.0);
+		break;
+	}
+	case ZOMBIE_SKILL_HPBUFF_HEAD:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zb_skill_hpbuff.spr"),
+			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case ZOMBIE_SKILL_ARMORRECOVERY_HEAD:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/armorrecovery_head.spr"),
+			Vector(0.0, 0.0, 25.0), 1.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case HUMAN_DEBUFF_SHOOTINGDOWN_HEAD:
+	{
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/zbt_shootingdown.spr"),
+			Vector(0.0, 0.0, 25.0), 5.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
 	default:

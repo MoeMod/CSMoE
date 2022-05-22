@@ -272,7 +272,7 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 		FillRGBABlend(0, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255);
 		FillRGBABlend((ScreenWidth - ScreenHeight) / 2 - 2 + ScreenHeight, 0, (ScreenWidth - ScreenHeight) / 2 + 2, ScreenHeight, 0, 0, 0, 255);
 	}
-	if (iId == WEAPON_SPRIFILE)
+	if (iId == WEAPON_SPRIFLE)
 	{
 
 	}

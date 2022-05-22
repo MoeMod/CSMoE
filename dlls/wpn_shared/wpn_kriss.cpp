@@ -35,7 +35,7 @@ void CKRISS::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_kriss");
 
 	Precache();
-	m_iId = WEAPON_UMP45;
+	m_iId = WEAPON_KRISS;
 	SET_MODEL(ENT(pev), "models/w_kriss.mdl");
 
 	m_iDefaultAmmo = KRISS_MAXCLIP;
@@ -69,7 +69,7 @@ int CKRISS::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = KRISS_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 15;
-	p->iId = m_iId = WEAPON_UMP45;
+	p->iId = m_iId = WEAPON_KRISS;
 	p->iFlags = 0;
 	p->iWeight = UMP45_WEIGHT;
 

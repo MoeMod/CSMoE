@@ -5117,9 +5117,6 @@ void SV_SpawnEntities( const char *mapname, char *entities )
 	// spawn the rest of the entities on the map
 	SV_LoadFromFile( mapname, entities );
 
-	// free memory that allocated by entpatch only
-    Mem_Free( entities );
-
 	MsgDev( D_NOTE, "Total %i entities spawned\n", svgame.numEntities );
 }
 

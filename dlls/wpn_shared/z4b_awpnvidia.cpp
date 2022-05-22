@@ -62,7 +62,6 @@ namespace sv {
 		ANIM_DRAW,
 	};
     static constexpr float PlayerMaxSpeed = 225;
-    static constexpr float ArmorRatioModifier = 1.6f;
     static constexpr const auto &SpreadCalcNotOnGround = 0 * A + 1.0;
     static constexpr const auto &SpreadCalcWalking = 0 * A + 0.3;
     static constexpr const auto &SpreadCalcDefault = 0 * A + 0.002;
@@ -79,6 +78,29 @@ namespace sv {
 
     static constexpr auto RadiusDamageRadius = 88;
     KnockbackData RadiusDamageKnockback = { 3000.0f, 700.0f, 1200.0f, 700.0f, 0.4f };
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "338Magnum";
+		p->iMaxAmmo1 = MAX_AMMO_338MAGNUM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = AWP_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 2;
+		p->iId = m_iId = WEAPON_Z4B_AWPNVIDIA;
+		p->iFlags = 0;
+		p->iWeight = AWP_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.95; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AWP); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
 
 	void Precache() override
 	{

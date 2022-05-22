@@ -35,7 +35,7 @@ LINK_ENTITY_TO_CLASS(weapon_gatling, CGatling)
 void CGatling::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_GATLING;
 	SET_MODEL(ENT(pev), "models/w_gatling.mdl");
 
 	m_iDefaultAmmo = GATLING_DEFAULT_GIVE;
@@ -66,7 +66,7 @@ int CGatling::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = GATLING_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_GATLING;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

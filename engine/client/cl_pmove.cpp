@@ -252,6 +252,7 @@ void CL_AddLinksToPmove( void )
 	physent_t		*pe;
 	int		i, solid, idx;
 
+	cl_entity_t* pPlayer = CL_GetLocalPlayer();
 	for( i = 0; i < cl.frame.num_entities; i++ )
 	{
 		idx = cls.packet_entities[(cl.frame.first_entity + i) % cls.num_client_entities].number;
@@ -288,6 +289,10 @@ void CL_AddLinksToPmove( void )
 
 		if( solid == SOLID_BSP || solid == SOLID_BBOX || solid == SOLID_SLIDEBOX || solid == SOLID_CUSTOM )
 		{
+			// MOE NEW FEATURE: semiclip
+			if (check->player && (check->curstate.playerclass == 1 || pPlayer->curstate.playerclass == 1 || ((pPlayer->curstate.playerclass == 2 || check->curstate.playerclass == 2) && pPlayer->curstate.team == check->curstate.team)))
+				continue;
+
 			// reserve slots for all the clients
 			if( clgame.pmove->numphysent < ( MAX_PHYSENTS - cl.maxclients ))
 			{
@@ -328,6 +333,11 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 	if( !cl_solid_players->integer )
 		return;
 
+	cl_entity_t* pPlayer = CL_GetLocalPlayer();
+	// MOE NEW FEATURE: semiclip
+	if (pPlayer && pPlayer->curstate.playerclass == 1)
+		return;
+
 	for( j = 0; j < cl.maxclients; j++ )
 	{
 		// the player object never gets added
@@ -356,6 +366,9 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 			continue; // not solid
 
 #endif
+		if (pPlayer->curstate.playerclass == 2 && pPlayer->curstate.team == ent->curstate.team)
+			continue;
+
 		pe = &clgame.pmove->physents[clgame.pmove->numphysent];
 		if( CL_CopyEntityToPhysEnt( pe, ent ))
 			clgame.pmove->numphysent++;

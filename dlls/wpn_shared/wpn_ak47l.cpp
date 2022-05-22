@@ -80,6 +80,29 @@ public:
 	KickBackData KickBackDucking = { 0.3f, 0.15f, 0.05f, 0.005f, 2.5f, 0.5f, 4 };
 	KickBackData KickBackDefault = { 0.4f, 0.15f, 0.0625f, 0.015f, 2.5f, 0.5f, 3 };
 	KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "762Nato";
+		p->iMaxAmmo1 = MAX_AMMO_762NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 60;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_AK47_LONG;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.55; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AK47); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
 };
 LINK_ENTITY_TO_CLASS(weapon_ak47l, CAK47_Long)
 

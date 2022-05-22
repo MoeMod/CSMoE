@@ -55,6 +55,12 @@ public:
 	float GetDamageB();
 	float SlashDamage();
 
+	float GetArmorRatioModifier() override { return 1.6; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_SG552); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 5, 3, 140 }; }
+
 	int m_iShell;
 	int iShellOn;
 	int m_iShotsCount;

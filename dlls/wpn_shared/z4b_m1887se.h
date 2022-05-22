@@ -42,7 +42,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 1000.0f, 250.0f, 600.0f, 700.0f, 0.9f };}
 	const char* GetCSModelName() override { return "models/pw_m1887se.mdl"; }
-
+	float GetArmorRatioModifier() override { return 1.7; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_SCOUT); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 5, 3, 170 }; }
 public:
 	void M1887seFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	float GetDamage();

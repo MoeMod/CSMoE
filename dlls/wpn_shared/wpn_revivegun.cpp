@@ -42,7 +42,7 @@ void CReviveGun::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_revivegun");
 
 	Precache();
-	m_iId = WEAPON_AUG;
+	m_iId = WEAPON_REVIVEGUN;
 	SET_MODEL(ENT(pev), "models/w_revivegun.mdl");
 
 	m_iDefaultAmmo = 60;
@@ -104,7 +104,7 @@ int CReviveGun::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = REVIVEGUN_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 14;
-	p->iId = m_iId = WEAPON_AUG;
+	p->iId = m_iId = WEAPON_REVIVEGUN;
 	p->iFlags = 0;
 	p->iWeight = AUG_WEIGHT;
 

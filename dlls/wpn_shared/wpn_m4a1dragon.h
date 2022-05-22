@@ -59,6 +59,18 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 350.0f, 250.0f, 300.0f, 100.0f, 0.6f }; }
 
+	float GetArmorRatioModifier() override { return 1.4; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M4A1); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { 
+		if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
+			return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 };
+		else
+			return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_MULTIPLY_BY_14, 4, 3, 140 };
+	
+	}
+
 public:
 	void M4A1DragonFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 

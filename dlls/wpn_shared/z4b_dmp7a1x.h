@@ -68,6 +68,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 450.0f, 400.0f, 400.0f, 200.0f, 0.5f }; }
 	float GetArmorRatioModifier() override { return 1.0; }
 	const char *GetCSModelName() override { return "models/z4b/w_dmp7a1x.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_46mm" , AMMO_46MM_PRICE }; }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 0 }; }
 
 public:
 	void ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);

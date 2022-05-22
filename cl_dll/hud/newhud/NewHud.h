@@ -26,9 +26,7 @@ public:
 	int Draw(float flTime);
 	int DrawNewHudCharacterBG(float flTime);
 
-	void BuildNumberRC(wrect_t(&rgrc)[10], int w, int h);
 	void InitHUDData(void);
-	void DrawPortrait(void);
 	CHudMsgFunc(NewHudMsg);
 
 private:
@@ -45,5 +43,8 @@ private:
 
 	UniqueTexture m_iWeaponBG;
 
+
+	UniqueTexture m_iCharacter;
+	std::string m_szLastModel;
 };
 }

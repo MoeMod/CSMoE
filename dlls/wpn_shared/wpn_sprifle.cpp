@@ -78,12 +78,14 @@ namespace sv {
 		p->iMaxClip = 7;
 		p->iSlot = 0;
 		p->iPosition = 16;
-		p->iId = m_iId = WEAPON_SG550;
+		p->iId = m_iId = WEAPON_SPRIFLE;
 		p->iFlags = 0;
 		p->iWeight = SG550_WEIGHT;
 
 		return 1;
 	}
+
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 6, 4, 0 }; }
 
 	void StopIdleSound(void)
 	{

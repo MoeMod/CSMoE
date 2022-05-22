@@ -66,6 +66,30 @@ namespace sv {
     /*static constexpr*/ int Penetration = 1;
     KnockbackData KnockBack = { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f };
 
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_TMP); }
+#endif
+	float GetArmorRatioModifier() override { return 1.0; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 7, 3, 0 }; }
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "9mm";
+		p->iMaxAmmo1 = MAX_AMMO_9MM;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = TMP_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 11;
+		p->iId = m_iId = WEAPON_TMPDRAGON;
+		p->iFlags = 0;
+		p->iWeight = TMP_WEIGHT;
+
+		return 1;
+	}
+
+
     void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
 		m_bDelayFire = true;

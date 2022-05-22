@@ -52,6 +52,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_46mm" , AMMO_46MM_PRICE}; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 0 }; }
 
 public:
 	void ELITEFire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);

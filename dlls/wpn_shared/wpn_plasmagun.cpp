@@ -325,7 +325,7 @@ struct PlasmaGun_WeaponData
 		return 1;
 	}
 
-	WeaponCrosshairData GetCrosshairData() override { return { 0, 0, 0, 0 }; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
 
 	void Reload(void) override
 	{

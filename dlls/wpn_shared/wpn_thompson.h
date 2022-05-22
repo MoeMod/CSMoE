@@ -46,6 +46,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 250.0f, 200.0f, 250.0f, 90.0f, 0.7f }; }
 	float GetArmorRatioModifier() override { return THOMPSON_ARMOR_RATIO_MODIFIER; }
 	const char *GetCSModelName() override { return "models/w_thompson.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_UMP45); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR, 6, 3, 0 }; }
 
 public:
 	void THOMPSONFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

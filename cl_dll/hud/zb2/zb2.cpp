@@ -43,6 +43,7 @@ public:
 	SharedTexture m_pTexture_DamageDoubleRetina;
 	SharedTexture m_pTexture_RevivalRetina;
 	SharedTexture m_pTexture_JumpUPRetina;
+	SharedTexture m_pTexture_NightRetina;
 	std::vector<CHudRetina::MagicNumber> m_RetinaIndexes;
 	CHudRetina::MagicNumber m_iLastIdx = -1;
 };
@@ -83,7 +84,7 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 		float flHoldTime = buf.ReadShort();
 		float flFreezeTime = buf.ReadShort();
 		pimpl->get<CHudZB2_Skill>().OnSkillActivate(skilltype, flHoldTime, flFreezeTime);
-		if (skilltype == ZOMBIE_SKILL_CRAZY || skilltype == ZOMBIE_SKILL_CRAZY2 || skilltype == ZOMBIE_SKILL_STIFFEN || skilltype == ZOMBIE_SKILL_GLIDE || skilltype == ZOMBIE_SKILL_SELFDESTRUCT || skilltype == ZOMBIE_SKILL_PENETRATION)
+		if (skilltype == ZOMBIE_SKILL_CRAZY || skilltype == ZOMBIE_SKILL_CRAZY2 || skilltype == ZOMBIE_SKILL_STIFFEN || skilltype == ZOMBIE_SKILL_GLIDE || skilltype == ZOMBIE_SKILL_SELFDESTRUCT || skilltype == ZOMBIE_SKILL_PENETRATION || skilltype == ZOMBIE_SKILL_SCREAM)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_SPRINT)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
@@ -93,11 +94,11 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_JumpUPRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_HIDE)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HideRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
-		else if (skilltype == ZOMBIE_SKILL_HEAL || skilltype == ZOMBIE_SKILL_STRENGTHRECOVERY)
+		else if (skilltype == ZOMBIE_SKILL_HEAL || skilltype == ZOMBIE_SKILL_STRENGTHRECOVERY || ZOMBIE_SKILL_HPBUFF)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_HealRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_SHOCK || skilltype == ZOMBIE_SKILL_HOOK)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_ShockRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
-		else if (skilltype == ZOMBIE_SKILL_TRAP || skilltype == ZOMBIE_SKILL_CREATEROCKET)
+		else if (skilltype == ZOMBIE_SKILL_TRAP || skilltype == ZOMBIE_SKILL_CREATEROCKET || ZOMBIE_SKILL_ARMORRECOVERY)
 			pimpl->m_RetinaIndexes.push_back(gHUD.m_Retina.AddItem(pimpl->m_pTexture_TrapRetina, CHudRetina::RETINA_DRAW_TYPE_QUARTER, flHoldTime));
 		else if (skilltype == ZOMBIE_SKILL_BOOSTER)
 		{
@@ -144,8 +145,16 @@ int CHudZB2::MsgFunc_ZB2Msg(const char *pszName, int iSize, void *pbuf)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_RageRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK, flHoldTime);
 			else if (skilltype == ZOMBIE_SKILL_HOOK)
 				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
+			else if (skilltype == ZOMBIE_SKILL_SCREAM)
+				pimpl->m_iLastIdx = gHUD.m_Retina.AddItem(pimpl->m_pTexture_SprintRetina, CHudRetina::RETINA_DRAW_TYPE_BLINK | CHudRetina::RETINA_DRAW_TYPE_QUARTER | CHudRetina::RETINA_DRAW_TYPE_BLACK, flHoldTime);
 			pimpl->m_RetinaIndexes.push_back(pimpl->m_iLastIdx);
 		}
+		break;
+	}
+	case ZB2_MESSAGE_HPBUFF:
+	{
+		m_flBuffHealth = buf.ReadShort();		
+		break;
 	}
 	}
 
@@ -158,6 +167,7 @@ int CHudZB2::Init()
 
 	gHUD.AddHudElem(this);
 
+	m_flBuffHealth = 0;
 	HOOK_MESSAGE(ZB2Msg);
 
 	return 1;
@@ -178,12 +188,59 @@ int CHudZB2::VidInit()
 	R_InitTexture(pimpl->m_pTexture_DamageDoubleRetina, "resource/zombi/damagedouble");
 	R_InitTexture(pimpl->m_pTexture_RevivalRetina, "resource/zombi/herozb");
 	R_InitTexture(pimpl->m_pTexture_JumpUPRetina, "resource/zombi/zombijumpup");
+	R_InitTexture(pimpl->m_pTexture_NightRetina, "resource/zombi/zombinight");
+
+	m_BuffHealthCross = gHUD.GetSpriteIndex("crosstime");
 	return 1;
 }
 
 int CHudZB2::Draw(float time)
 {
 	pimpl->for_each(&IBaseHudSub::Draw, time);
+	DrawBuffHP();
+
+	return 1;
+}
+
+int CHudZB2::DrawBuffHP()
+{
+	if (m_flBuffHealth <= 0)
+		return 0;
+
+
+	int iX = 2;
+	int iY = ScreenHeight - 20 - gHUD.m_NEWHUD_iFontHeight * 2;
+
+	//24 old 24 new 16
+	int CrossWidth = gHUD.GetSpriteRect(m_BuffHealthCross).right - gHUD.GetSpriteRect(m_BuffHealthCross).left;
+	int CrossHeight = gHUD.GetSpriteRect(m_BuffHealthCross).bottom - gHUD.GetSpriteRect(m_BuffHealthCross).top;
+
+	int r = 255, g = 255, b = 255, a = 255;
+
+	if (gHUD.m_hudstyle->value != 2)
+	{
+		iX = CrossWidth / 2;
+		iY = ScreenHeight - gHUD.m_iFontHeight * 2 - gHUD.m_iFontHeight / 2 - 5;
+	}
+
+	DrawUtils::UnpackRGB(r, g, b, RGB_LIGHTBLUE);
+	DrawUtils::ScaleColors(r, g, b, a);
+
+	SPR_Set(gHUD.GetSprite(m_BuffHealthCross), r, g, b);
+	SPR_DrawAdditive(0, iX, iY + abs(gHUD.m_NEWHUD_iFontHeight - CrossHeight) / 2, &gHUD.GetSpriteRect(m_BuffHealthCross));
+
+	iX += CrossWidth + 3;
+
+	if(gHUD.m_hudstyle->value == 2)
+		DrawUtils::DrawNEWHudNumber(0, iX, iY, m_flBuffHealth, r, g, b, 255, FALSE, 5);
+	else
+	{
+		int HealthWidth = gHUD.GetSpriteRect(gHUD.m_HUD_number_0).right - gHUD.GetSpriteRect(gHUD.m_HUD_number_0).left;
+		iX = CrossWidth + HealthWidth / 2;
+		DrawUtils::DrawHudNumber(iX, iY, DHN_3DIGITS | DHN_DRAWZERO, m_flBuffHealth, r, g, b);
+	}
+		
+
 	return 1;
 }
 

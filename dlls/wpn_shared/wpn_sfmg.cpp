@@ -39,7 +39,7 @@ void CSFMG::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_sfmg");
 
 	Precache();
-	m_iId = WEAPON_M4A1;
+	m_iId = WEAPON_SFMG;
 	SET_MODEL(ENT(pev), "models/w_sfmg.mdl");
 
 	m_iDefaultAmmo = SFMG_AMMO_GIVE;
@@ -73,7 +73,7 @@ int CSFMG::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = SFMG_AMMO_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M4A1;
+	p->iId = m_iId = WEAPON_SFMG;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

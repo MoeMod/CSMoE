@@ -33,7 +33,7 @@ void CM4A1Dragon::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_m4a1dragon");
 
 	Precache();
-	m_iId = WEAPON_M4A1;
+	m_iId = WEAPON_M4A1DRAGON;
 	SET_MODEL(ENT(pev), "models/w_m4a1dragon.mdl");
 
 	m_iDefaultAmmo = M4A1_DEFAULT_GIVE;
@@ -68,7 +68,7 @@ int CM4A1Dragon::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = M4A1_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 6;
-	p->iId = m_iId = WEAPON_M4A1;
+	p->iId = m_iId = WEAPON_M4A1DRAGON;
 	p->iFlags = 0;
 	p->iWeight = M4A1_WEIGHT;
 

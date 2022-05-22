@@ -434,7 +434,7 @@ void CHuntbow::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_huntbow");
 
 	Precache();
-	m_iId = WEAPON_M4A1;
+	m_iId = WEAPON_HUNTBOW;
 	SET_MODEL(ENT(pev), "models/w_huntbow.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
@@ -500,7 +500,7 @@ int CHuntbow::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = -1;
 	p->iSlot = 0;
 	p->iPosition = 6;
-	p->iId = m_iId = WEAPON_M4A1;
+	p->iId = m_iId = WEAPON_HUNTBOW;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

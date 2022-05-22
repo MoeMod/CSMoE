@@ -235,7 +235,7 @@ void CM4A1Razer::Spawn(void)
 	pev->classname = MAKE_STRING("z4b_m4a1razer");
 
 	Precache();
-	m_iId = WEAPON_M4A1;
+	m_iId = WEAPON_Z4B_M4A1RAZER;
 	SET_MODEL(ENT(pev), "models/z4b/w_m4a1razer.mdl");
 
 	m_iDefaultAmmo = 30;
@@ -273,7 +273,7 @@ int CM4A1Razer::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 30;
 	p->iSlot = 0;
 	p->iPosition = 6;
-	p->iId = m_iId = WEAPON_M4A1;
+	p->iId = m_iId = WEAPON_Z4B_M4A1RAZER;
 	p->iFlags = 0;
 	p->iWeight = M4A1_WEIGHT;
 

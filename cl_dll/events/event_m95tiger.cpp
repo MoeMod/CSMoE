@@ -130,6 +130,10 @@ void EV_FireM95Tiger( event_args_t *args )
 				g_M95TigerEye->callback = [](tempent_s* pEnt, float frametime, float currenttime)
 				{
 					cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
+					if (parent->curstate.fov != 90)
+						pEnt->entity.curstate.effects |= EF_NODRAW;
+					else
+						pEnt->entity.curstate.effects &= ~EF_NODRAW;
 					if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
 					{
 						pEnt->entity.curstate.renderamt = 0;

@@ -15,6 +15,8 @@ public:
 	virtual void ActivateClientUI() = 0;
 	virtual void HideClientUI() = 0;
 	virtual void Shutdown() = 0;
+	virtual void Init() = 0;
+	virtual void VidInit() = 0;
 };
 
 #define CLIENTVGUI_INTERFACE_VERSION "VClientVGUI001"

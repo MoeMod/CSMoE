@@ -517,6 +517,20 @@ protected:
 	duration_t GetCooldownTime() const;
 };
 
+class CZombieSkill_ZombieHpBuff : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieHpBuff(CBasePlayer* player);
+
+public:
+	void Activate() override;
+	void OnSkillEnd() override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+};
+
 enum ZombieDashSkillStatus
 {
 	DASH_START,
@@ -782,6 +796,22 @@ protected:
 	ZombieRushSkillStatus m_SkillStatus = RUSH_IDLE;
 };
 
+class CZombieSkill_ZombieScream : public CZombieSkill_Base
+{
+public:
+	explicit CZombieSkill_ZombieScream(CBasePlayer* player);
+
+public:
+	void Think() override;
+	void Activate() override;
+	void OnSkillEnd() override;
+	float GetDamageRatio() const override;
+
+protected:
+	duration_t GetDurationTime() const;
+	duration_t GetCooldownTime() const;
+
+};
 
 }
 

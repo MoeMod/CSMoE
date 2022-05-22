@@ -346,6 +346,7 @@ void CMod_ZombieScenario::TeamCheck()
 		if (player->m_iTeam == TERRORIST)
 		{
 			player->m_iTeam = CT;
+			player->pev->team = CT;
 			TeamChangeUpdate(player, player->m_iTeam);
 		}
 	}

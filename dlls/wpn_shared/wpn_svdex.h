@@ -62,8 +62,13 @@ public:
 		return FALSE;
 #endif
 	}
-	KnockbackData GetKnockBackData() override { return { 1500.0f, 1000.0f, 1500.0f, 860.0f, 0.8f }; }
+	KnockbackData GetKnockBackData() override { return { 2000.0f, 1250.0f, 1000.0f, 1750.0f, 0.7f }; }
 	const char *GetCSModelName() override { return "models/w_svdex.mdl"; }
+	float GetArmorRatioModifier() override { return 1.4; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_AK47); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
 
 public:
 	void SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

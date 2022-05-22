@@ -2325,8 +2325,8 @@ static void Mod_LoadEntities( const dlump_t *l )
 	char	token[4096] = {0};
 
 	// make sure what we really has terminator
-	loadmodel->entities = (char*)Mem_Alloc( loadmodel->mempool, l->filelen + 1 );
-	Q_memcpy( loadmodel->entities, mod_base + l->fileofs, l->filelen );
+	loadmodel->entities = (char*)Mem_ZeroAlloc( loadmodel->mempool, l->filelen + 1 );
+	Mem_VirtualCopy( loadmodel->entities, mod_base + l->fileofs, l->filelen );
 	if( !world.loading ) return;
 
 	world.entdatasize = l->filelen;

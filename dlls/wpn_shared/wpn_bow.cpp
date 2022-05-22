@@ -218,7 +218,7 @@ void CBow::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_bow");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_BOW;
 	SET_MODEL(ENT(pev), "models/w_bow.mdl");
 	m_flAccuracy = 0.2;
 	m_iShotsFired = 0;
@@ -257,7 +257,7 @@ int CBow::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = -1;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_BOW;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

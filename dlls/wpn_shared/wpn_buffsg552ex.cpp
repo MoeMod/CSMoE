@@ -46,7 +46,7 @@ void CBuffsg552ex::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_buffsg552ex");
 
 	Precache();
-	m_iId = WEAPON_SG552;
+	m_iId = WEAPON_BUFFSG552EX;
 	SET_MODEL(ENT(pev), "models/w_buffsg552ex.mdl");
 
 	m_iDefaultAmmo = 50;
@@ -86,7 +86,7 @@ int CBuffsg552ex::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 50;
 	p->iSlot = 0;
 	p->iPosition = 10;
-	p->iId = m_iId = WEAPON_SG552;
+	p->iId = m_iId = WEAPON_BUFFSG552EX;
 	p->iFlags = 0;
 	p->iWeight = SG552_WEIGHT;
 

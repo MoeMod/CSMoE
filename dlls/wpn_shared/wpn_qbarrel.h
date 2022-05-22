@@ -54,6 +54,12 @@ public:
 	}
 	const char *GetCSModelName() override { return "models/w_qbarrel.mdl"; }
 
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_buckshot" , 65 }; }
+#endif
+	float GetArmorRatioModifier() override { return 1.0; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 9, 4, 0 }; }
+
 public:
 	int m_iShell;
 	int m_iInstantShots;

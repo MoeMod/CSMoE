@@ -1109,6 +1109,9 @@ namespace sv {
                 std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 				std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 				const MoEWeaponBuyInfo_s& info = candidate_list.front();
+				if (iSlot == KNIFE_SLOT) {
+					m_pPlayer->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+				}
 				m_pPlayer->GiveNamedItem(info.pszClassName);
 				GiveSlotAmmo(m_pPlayer, iSlot);
 			}

@@ -99,7 +99,7 @@ public:
 	static constexpr const auto & AccuracyCalc = (N * N * N / 200.0) + 0.35;
 	static constexpr float AccuracyMax = 1.25f;
 	static constexpr float RangeModifier = 0.98;
-	static constexpr auto BulletType = BULLET_PLAYER_762MM;
+	static constexpr auto BulletType = BULLET_PLAYER_556MM;
 	static constexpr int Penetration = 2;
 	static constexpr int Distance = 8192;
 
@@ -115,6 +115,30 @@ public:
 	static constexpr const auto & DoubleMode_ChangeTime = 6.0s;
 
 public:
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "556Nato";
+		p->iMaxAmmo1 = MAX_AMMO_556NATO;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = SG552_MAX_CLIP;
+		p->iSlot = 0;
+		p->iPosition = 10;
+		p->iId = m_iId = WEAPON_XM8CARBINE;
+		p->iFlags = 0;
+		p->iWeight = SG552_WEIGHT;
+
+		return 1;
+	}
+
+	float GetArmorRatioModifier() override { return 1.4; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_SG552); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 5, 3, 140 }; }
+
 	float GetMaxSpeed() override
 	{
 		if (m_pPlayer->m_iFOV == 90)

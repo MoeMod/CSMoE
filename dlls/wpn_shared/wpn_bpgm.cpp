@@ -60,7 +60,6 @@ namespace sv {
 		ANIM_DRAW,
 	};
     static constexpr float PlayerMaxSpeed = 193;
-    static constexpr float ArmorRatioModifier = 1.9f;
     static constexpr int DamageDefault = 115;
     static constexpr int DamageZB = 840;
     static constexpr int DamageZBS = 4000;
@@ -85,12 +84,15 @@ namespace sv {
 		p->iMaxClip = 10;
 		p->iSlot = 0;
 		p->iPosition = 2;
-		p->iId = m_iId = WEAPON_AWP;
+		p->iId = m_iId = WEAPON_BPGM;
 		p->iFlags = 0;
 		p->iWeight = AWP_WEIGHT;
 
 		return 1;
 	}
+
+	float GetArmorRatioModifier() override { return 1.9; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
     	
 	void PrimaryAttack(void)
 	{

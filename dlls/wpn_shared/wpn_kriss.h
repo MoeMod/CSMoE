@@ -13,7 +13,7 @@ namespace sv {
 #define KRISS_RANGE_MODIFER      0.83
 #define KRISS_RANGE_MODIFER_SIL  0.81
 #define KRISS_RELOAD_TIME	3.5s
-#define KRISS_ARMOR_RATIO_MODIFIER	0.8
+#define KRISS_ARMOR_RATIO_MODIFIER	1.2
 #define KRISS_FIRE_RATE	0.088028s
 
 class CKRISS : public CBasePlayerWeapon
@@ -56,6 +56,10 @@ public:
 	KnockbackData GetKnockBackData() override { return { 500.0f, 400.0f, 500.0f, 180.0f, 0.25f }; }
 	float GetArmorRatioModifier() override { return KRISS_ARMOR_RATIO_MODIFIER; }
 	const char *GetCSModelName() override { return "models/w_kriss.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_UMP45); }
+#endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 140 }; }
 
 public:
 	void KRISSFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);

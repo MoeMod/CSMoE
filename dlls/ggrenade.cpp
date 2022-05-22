@@ -1233,11 +1233,11 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
 	pGrenade->pev->dmg = 100.0f;
 
-	CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
+	/*CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
 	if (player)
 	{
 		player->m_pModStrategy->ShootGrenade(vecStart, vecVelocity, time, iTeam, usEvent);
-	}
+	}*/
 	return pGrenade;
 }
 

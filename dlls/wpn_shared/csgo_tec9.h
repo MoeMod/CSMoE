@@ -48,6 +48,11 @@ public:
 	BOOL IsPistol() override { return TRUE; }
 	KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
 	const char* GetCSModelName() override { return "models/w_tec9.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_ELITE); }
+#endif
+	float GetArmorRatioModifier() override { return 1.05; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 5, 3, 0 }; }
 public:
 	void Tec9Fire(float flSpread, duration_t flCycleTime, BOOL fUseSemi);
 	float GetDamage();

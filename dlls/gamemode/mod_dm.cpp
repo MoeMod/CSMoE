@@ -298,6 +298,7 @@ void CMod_DeathMatch::PlayerSpawn(CBasePlayer *pPlayer)
 	pPlayer->pev->armorvalue = 100;
 
 	pPlayer->SpawnProtection_Start(3.0s);
+	pPlayer->ClientCommand("buy");
 }
 
 bool CMod_DeathMatch::CheckWinLimitDM()

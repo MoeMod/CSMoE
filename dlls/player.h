@@ -159,6 +159,8 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_RUSHENTITY			(1<<6)
 #define BUFF_GHOSTHUNTER			(1<<7)
 #define BUFF_MASTERHUNTER			(1<<8)
+#define BUFF_HPBUFF			(1<<9)
+#define BUFF_SHOOTINGDOWN			(1<<10)
 
 #define COUNT_M32VENOM	0
 
@@ -435,6 +437,13 @@ template<> struct PrivateData<class CBasePlayer, CBaseMonster>
 	bool m_bIsZombie;
 	bool m_bIsFemale;
 	TeamName m_iModelTeam;
+	int m_iKnifeID;
+	int m_iGrenadeID;
+	int m_iZombieClass;
+	int m_iNewMenuKeys;
+	int m_iNewMenuID;
+	int m_iNewMenuPage;
+	time_point_t m_iNewMenuExpire;
 };
 
 class CBasePlayer : public CBaseMonster, public PrivateData<class CBasePlayer, CBaseMonster>
@@ -768,7 +777,10 @@ public:
 	time_point_t m_tHealthDecreaseStartTime;
 	float m_flHealthDecreaseAmount;
 	time_point_t m_tHealthDecreaseInterval;
-	time_point_t m_tNextSkillSoundTime;
+	time_point_t m_tHealthBuffTime;
+	time_point_t m_tShootingDownBuffTime;
+	float m_flBuffHealthAmount;
+	float m_flSaveArmorAmount;
 	int m_iHealthDecreaseCount;
 	int m_iHealthDamageType;
 	const char* m_ZombieClass;

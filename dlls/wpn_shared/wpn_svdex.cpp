@@ -275,16 +275,16 @@ void CSVDEX::Precache(void)
 int CSVDEX::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
-	p->pszAmmo1 = "556Nato";
-	p->iMaxAmmo1 = MAX_AMMO_556NATO;
+	p->pszAmmo1 = "762Nato";
+	p->iMaxAmmo1 = MAX_AMMO_762NATO;
 	p->pszAmmo2 = "SVDEXGrenade"; // whatever it is, it can't be bought
 	p->iMaxAmmo2 = 10;
 	p->iMaxClip = 20;
 	p->iSlot = 0;
-	p->iPosition = 6;
-	p->iId = m_iId = WEAPON_M4A1;
+	p->iPosition = 1;
+	p->iId = m_iId = WEAPON_SVDEX;
 	p->iFlags = 0;
-	p->iWeight = M4A1_WEIGHT;
+	p->iWeight = AK47_WEIGHT;
 
 	return 1;
 }

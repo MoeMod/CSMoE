@@ -35,7 +35,7 @@ void CTHOMPSON::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_thompson");
 
 	Precache();
-	m_iId = WEAPON_UMP45;
+	m_iId = WEAPON_THOMPSON;
 	SET_MODEL(ENT(pev), "models/w_thompson.mdl");
 
 	m_iDefaultAmmo = THOMPSON_MAXCLIP;
@@ -71,7 +71,7 @@ int CTHOMPSON::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = THOMPSON_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 15;
-	p->iId = m_iId = WEAPON_UMP45;
+	p->iId = m_iId = WEAPON_THOMPSON;
 	p->iFlags = 0;
 	p->iWeight = UMP45_WEIGHT;
 

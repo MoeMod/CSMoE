@@ -39,7 +39,7 @@ void CBendita::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_bendita");
 
 	Precache();
-	m_iId = WEAPON_SG550;
+	m_iId = WEAPON_BENDITA;
 	SET_MODEL(ENT(pev), "models/w_bendita.mdl");
 
 	m_iDefaultAmmo = BENDITA_MAXCLIP;
@@ -71,7 +71,7 @@ int CBendita::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = BENDITA_MAXCLIP;
 	p->iSlot = 0;
 	p->iPosition = 2;
-	p->iId = m_iId = WEAPON_SG550;
+	p->iId = m_iId = WEAPON_BENDITA;
 	p->iFlags = 0;
 	p->iWeight = SG550_WEIGHT;
 

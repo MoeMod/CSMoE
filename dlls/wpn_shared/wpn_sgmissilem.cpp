@@ -31,7 +31,7 @@ LINK_ENTITY_TO_CLASS(weapon_sgmissilem, CSGMissilem)
 void CSGMissilem::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_SGMISSILEM;
 	SET_MODEL(ENT(pev), "models/w_sgmissilem.mdl");
 	m_iDefaultAmmo2 = 0;
 	m_iDefaultAmmo = 30;
@@ -69,7 +69,7 @@ int CSGMissilem::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 30;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_SGMISSILEM;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

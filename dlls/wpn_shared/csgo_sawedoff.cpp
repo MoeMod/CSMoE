@@ -37,7 +37,7 @@ void CSawedoff::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_sawedoff");
 
 	Precache();
-	m_iId = WEAPON_M3;
+	m_iId = WEAPON_CSGO_SAWEDOFF;
 	SET_MODEL(ENT(pev), "models/w_sawedoff.mdl");
 	m_iDefaultAmmo = SAWEDOFF_MAX_CLIP;
 
@@ -70,7 +70,7 @@ int CSawedoff::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = SAWEDOFF_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_M3;
+	p->iId = m_iId = WEAPON_CSGO_SAWEDOFF;
 	p->iFlags = 0;
 	p->iWeight = M3_WEIGHT;
 

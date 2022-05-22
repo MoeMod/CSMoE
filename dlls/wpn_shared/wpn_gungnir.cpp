@@ -548,9 +548,28 @@ public:
 	bool HasSecondaryAttack() override { return true; }
 	void ItemPostFrame() override;
 
+	float GetArmorRatioModifier() override { return 1.85; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_gungnir" , 200 }; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
+
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "GungnirAmmo";
+		p->iMaxAmmo1 = 100;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 50;
+		p->iSlot = 0;
+		p->iPosition = 1;
+		p->iId = m_iId = WEAPON_GUNGNIR;
+		p->iFlags = 0;
+		p->iWeight = AK47_WEIGHT;
+
+		return 1;
+	}
 
 public:
 	void CreateEffect();

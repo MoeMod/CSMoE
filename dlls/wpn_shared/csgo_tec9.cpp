@@ -37,7 +37,7 @@ void CTec9::Spawn(void)
 	pev->classname = MAKE_STRING("csgo_tec9");
 
 	Precache();
-	m_iId = WEAPON_ELITE;
+	m_iId = WEAPON_CSGO_TEC9;
 	SET_MODEL(ENT(pev), "models/w_tec9.mdl");
 
 	m_iDefaultAmmo = TEC9_MAX_CLIP;
@@ -73,7 +73,7 @@ int CTec9::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = TEC9_MAX_CLIP;
 	p->iSlot = 1;
 	p->iPosition = 5;
-	p->iId = m_iId = WEAPON_ELITE;
+	p->iId = m_iId = WEAPON_CSGO_TEC9;
 	p->iFlags = 0;
 	p->iWeight = ELITE_WEIGHT;
 

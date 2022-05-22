@@ -39,7 +39,7 @@ void CBUFFM249::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_buffm249");
 
 	Precache();
-	m_iId = WEAPON_M249;
+	m_iId = WEAPON_BUFFM249;
 	SET_MODEL(ENT(pev), "models/w_buffm249.mdl");
 	m_tNextPlayEvent = invalid_time_point;
 	m_iDefaultAmmo = BUFFM249_AMMO_GIVE;
@@ -94,7 +94,7 @@ int CBUFFM249::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = BUFFM249_AMMO_GIVE;
 	p->iSlot = 0;
 	p->iPosition = 4;
-	p->iId = m_iId = WEAPON_M249;
+	p->iId = m_iId = WEAPON_BUFFM249;
 	p->iFlags = 0;
 	p->iWeight = M249_WEIGHT;
 

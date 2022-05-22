@@ -59,7 +59,6 @@ namespace sv {
 		ANIM_DRAW,
 	};
     static constexpr float PlayerMaxSpeed = 230;
-    static constexpr float ArmorRatioModifier = 1.92f;
     static constexpr int DamageDefault = 110;
     static constexpr int DamageZB = 230;
     static constexpr int DamageZBS = 120;
@@ -68,6 +67,10 @@ namespace sv {
     static constexpr int Penetration = 2;
 	std::array<float, 3> RecoilPunchAngleDelta = { -3, 0, 0 };
     KnockbackData KnockBack = { 4500.0f, 500.0f, 1200.0f, 800.0f, 0.3f };
+
+	float GetArmorRatioModifier() override { return 1.92; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 3, 140 }; }
+
 
 	void Precache() override
 	{
@@ -84,7 +87,7 @@ namespace sv {
 		p->iMaxClip = 10;
 		p->iSlot = 0;
 		p->iPosition = 2;
-		p->iId = m_iId = WEAPON_AWP;
+		p->iId = m_iId = WEAPON_M82;
 		p->iFlags = 0;
 		p->iWeight = AWP_WEIGHT;
 

@@ -119,9 +119,78 @@ using WeaponTemplateBase_InfinityS = LinkWeaponTemplate< Derived,
 	TGetDamageDefault
 >;
 
-class CInfinitySS : public WeaponTemplateBase_InfinityS<CInfinitySS>, public InfinitySS_WeaponData {};
-class CInfinitySR : public WeaponTemplateBase_InfinityS<CInfinitySR>, public InfinitySR_WeaponData {};
-class CInfinitySB : public WeaponTemplateBase_InfinityS<CInfinitySB>, public InfinitySB_WeaponData {};
+class CInfinitySS : public WeaponTemplateBase_InfinityS<CInfinitySS>, public InfinitySS_WeaponData {
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "45acp";
+		p->iMaxAmmo1 = MAX_AMMO_45ACP;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 8;
+		p->iSlot = 1;
+		p->iPosition = 4;
+		p->iId = m_iId = WEAPON_INFINITYSS;
+		p->iFlags = 0;
+		p->iWeight = USP_WEIGHT;
+
+		return 1;
+	};
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+};
+class CInfinitySR : public WeaponTemplateBase_InfinityS<CInfinitySR>, public InfinitySR_WeaponData {
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "45acp";
+		p->iMaxAmmo1 = MAX_AMMO_45ACP;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 15;
+		p->iSlot = 1;
+		p->iPosition = 4;
+		p->iId = m_iId = WEAPON_INFINITYSR;
+		p->iFlags = 0;
+		p->iWeight = USP_WEIGHT;
+
+		return 1;
+	};
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+};
+class CInfinitySB : public WeaponTemplateBase_InfinityS<CInfinitySB>, public InfinitySB_WeaponData {
+	int GetItemInfo(ItemInfo* p)
+	{
+		p->pszName = STRING(pev->classname);
+		p->pszAmmo1 = "45acp";
+		p->iMaxAmmo1 = MAX_AMMO_45ACP;
+		p->pszAmmo2 = NULL;
+		p->iMaxAmmo2 = -1;
+		p->iMaxClip = 15;
+		p->iSlot = 1;
+		p->iPosition = 4;
+		p->iId = m_iId = WEAPON_INFINITYSB;
+		p->iFlags = 0;
+		p->iWeight = USP_WEIGHT;
+
+		return 1;
+	};
+
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_USP); }
+#endif
+	float GetArmorRatioModifier() override { return 1.5; }
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
+};
 LINK_ENTITY_TO_CLASS(weapon_infinityss, CInfinitySS)
 LINK_ENTITY_TO_CLASS(weapon_infinitysr, CInfinitySR)
 LINK_ENTITY_TO_CLASS(weapon_infinitysb, CInfinitySB)

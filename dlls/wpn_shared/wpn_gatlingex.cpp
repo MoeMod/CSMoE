@@ -246,7 +246,7 @@ LINK_ENTITY_TO_CLASS(weapon_gatlingex, CGatlingex)
 void CGatlingex::Spawn(void)
 {
 	Precache();
-	m_iId = WEAPON_XM1014;
+	m_iId = WEAPON_GATLINGEX;
 	SET_MODEL(ENT(pev), "models/w_gatlingex.mdl");
 
 	m_iDefaultAmmo = GATLING_DEFAULT_GIVE;
@@ -279,13 +279,13 @@ int CGatlingex::GetItemInfo(ItemInfo *p)
 {
 	p->pszName = STRING(pev->classname);
 	p->pszAmmo1 = "12gauge";
-	p->iMaxAmmo1 = 90;
+	p->iMaxAmmo1 = 80;
 	p->pszAmmo2 = "GatlingexProjectile";
 	p->iMaxAmmo2 = 0;
 	p->iMaxClip = GATLING_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 12;
-	p->iId = m_iId = WEAPON_XM1014;
+	p->iId = m_iId = WEAPON_GATLINGEX;
 	p->iFlags = 0;
 	p->iWeight = XM1014_WEIGHT;
 

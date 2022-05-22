@@ -20,6 +20,10 @@
 #include "weapons.h"
 #include "wpn_hegrenade.h"
 
+#ifndef CLIENT_DLL
+#include "player/player_mod_strategy.h"
+#endif
+
 #ifdef CLIENT_DLL
 namespace cl {
 #else
@@ -290,7 +294,9 @@ void CHEGrenade::WeaponIdle(void)
 		auto time = 1.5s;
 		CGrenade::ShootTimed2(m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion);
 
-		
+#ifndef CLIENT_DLL
+		m_pPlayer->m_pModStrategy->ShootGrenade(std::bind(CGrenade::ShootTimed2, m_pPlayer->pev, vecSrc, vecThrow, time, m_pPlayer->m_iTeam, m_usCreateExplosion));
+#endif
 		SetPlayerShieldAnim();
 
 #ifndef CLIENT_DLL

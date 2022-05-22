@@ -345,16 +345,32 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_SG550:
 	case WEAPON_AWP:
 	case WEAPON_G3SG1:
+	case WEAPON_XM8SHARPSHOOTER:
+	case WEAPON_AS50:
+	case WEAPON_AS50G:
+	case WEAPON_BENDITA:
 	case WEAPON_SKULL5:
+	case WEAPON_Z4B_AWPNVIDIA:
+	case WEAPON_M95:
+	case WEAPON_M95XMAS:
+	case WEAPON_WA2000:
+	case WEAPON_Z4B_XM2010PC:
+	case WEAPON_Z4B_M1887SE:
 	case WEAPON_SFSNIPER:
 	case WEAPON_M95TIGER:
-	case WEAPON_M400:
 	case WEAPON_CHEYTACLRRS:
+	case WEAPON_M400:
 	case WEAPON_M82:
-	case WEAPON_M24:
+	case WEAPON_SL8:
+	case WEAPON_SL8G:
+	case WEAPON_SL8EX:
 	case WEAPON_TRG42:
 	case WEAPON_TRG42G:
+	case WEAPON_M24:
 	case WEAPON_AW50:
+	case WEAPON_SPRIFLE:
+	case WEAPON_BPGM:
+	case WEAPON_ZGUN:
 		return true;
 
 	default:
@@ -366,7 +382,23 @@ bool CCSBot::IsUsingAWP() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && (weapon->m_iId == WEAPON_AWP || weapon->m_iId == WEAPON_M95TIGER))
+	if (weapon != NULL && (weapon->m_iId == WEAPON_AWP
+		|| weapon->m_iId == WEAPON_M95TIGER
+		|| weapon->m_iId == WEAPON_Z4B_AWPNVIDIA
+		|| weapon->m_iId == WEAPON_CHEYTACLRRS
+		|| weapon->m_iId == WEAPON_M400
+		|| weapon->m_iId == WEAPON_M82
+		|| weapon->m_iId == WEAPON_TRG42
+		|| weapon->m_iId == WEAPON_TRG42G
+		|| weapon->m_iId == WEAPON_M24
+		|| weapon->m_iId == WEAPON_AW50
+		|| weapon->m_iId == WEAPON_BPGM
+		|| weapon->m_iId == WEAPON_ZGUN
+		|| weapon->m_iId == WEAPON_Z4B_M1887SE
+		|| weapon->m_iId == WEAPON_Z4B_XM2010PC
+		|| weapon->m_iId == WEAPON_M95
+		|| weapon->m_iId == WEAPON_M95XMAS
+		|| weapon->m_iId == WEAPON_SFSNIPER))
 		return true;
 
 	return false;
@@ -438,7 +470,13 @@ bool CCSBot::IsUsingShotgun() const
 	if (weapon == NULL)
 		return false;
 
-	if (weapon->m_iId == WEAPON_XM1014 || weapon->m_iId == WEAPON_M3)
+	/*if (weapon->m_iId == WEAPON_XM1014 || weapon->m_iId == WEAPON_M3)
+		return true;*/
+
+	if (WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_SHOTGUN)
+		return true;
+
+	if (weapon->m_iId == WEAPON_SGDRILL || weapon->m_iId == WEAPON_SGMISSILE || weapon->m_iId == WEAPON_SGMISSILEM || weapon->m_iId == WEAPON_SGMISSILEEX)
 		return true;
 
 	return false;
@@ -450,7 +488,10 @@ bool CCSBot::IsUsingMachinegun() const
 {
 	CBasePlayerWeapon *weapon = GetActiveWeapon();
 
-	if (weapon != NULL && weapon->m_iId == WEAPON_M249)
+	/*if (weapon != NULL && weapon->m_iId == WEAPON_M249)
+		return true;*/
+
+	if (weapon != NULL && WeaponIDToWeaponClass(weapon->m_iId) == WEAPONCLASS_MACHINEGUN)
 		return true;
 
 	return false;

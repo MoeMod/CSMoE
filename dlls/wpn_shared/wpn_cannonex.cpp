@@ -46,7 +46,7 @@ void CCannonEX::Spawn(void)
 	Base::Spawn();
 	m_iClip = WEAPON_NOCLIP;
 	m_iDefaultAmmo = ItemInfoData_t::iMaxAmmo1;
-
+	m_iId = WEAPON_CANNONEX;
 #ifndef CLIENT_DLL
 	m_pDragon = NULL;
 #endif

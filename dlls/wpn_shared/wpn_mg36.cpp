@@ -83,6 +83,29 @@ namespace sv {
     KickBackData KickBackDucking = { 0.6f, 0.15f, 0.15f, 0.01f, 2.0f, 0.8f, 15 };
     KickBackData KickBackDefault = { 1.1f, 0.2f, 0.04f, 0.22f, 2.5f, 2, 8 };
     KnockbackData KnockBack = { 700.0f, 450.0f, 600.0f, 450.0f, 0.4f };
+
+    int GetItemInfo(ItemInfo* p)
+    {
+        p->pszName = STRING(pev->classname);
+        p->pszAmmo1 = "556NatoBox";
+        p->iMaxAmmo1 = MAX_AMMO_556NATOBOX;
+        p->pszAmmo2 = NULL;
+        p->iMaxAmmo2 = -1;
+        p->iMaxClip = M249_MAX_CLIP;
+        p->iSlot = 0;
+        p->iPosition = 4;
+        p->iId = m_iId = WEAPON_MG36;
+        p->iFlags = 0;
+        p->iWeight = M249_WEIGHT;
+
+        return 1;
+    }
+
+#ifndef CLIENT_DLL
+    WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M249); }
+#endif
+    float GetArmorRatioModifier() override { return 1.5; }
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 6, 3, 140 }; }
 };
 LINK_ENTITY_TO_CLASS(weapon_mg36, CMG36)
 }

@@ -45,7 +45,7 @@ public:
 			return { 5000, 900, 1000, 800, 0.16f };
 	}
 	const char *GetCSModelName() override { return "models/w_sfsniper.mdl"; }
-	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 0 }; }
+	float GetArmorRatioModifier() override { return 2.0; }
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_railbeam" , 180 }; }
 #endif

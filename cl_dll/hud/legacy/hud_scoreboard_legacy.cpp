@@ -527,12 +527,12 @@ int CHudScoreBoardLegacy::DrawNewHud(float flTime)
 	}
 	else if (gHUD.m_iModRunning == MOD_ZB1 || gHUD.m_iModRunning == MOD_ZB2 || gHUD.m_iModRunning == MOD_ZB3 || gHUD.m_iModRunning == MOD_ZBZ)
 	{
-		iW = m_iScoreboardBG_ZB3->w();
-		iH = m_iScoreboardBG_ZB3->h();
+		iW = m_iScoreboardBG_GD->w();
+		iH = m_iScoreboardBG_GD->h();
 
 		iX = (ScreenWidth - iW) / 2;
 
-		m_iScoreboardBG_ZB3->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
+		m_iScoreboardBG_GD->Draw2DQuadScaled(iX, iY, iX + iW, iY + iH);
 
 		iY += 10;
 		iX += 105;

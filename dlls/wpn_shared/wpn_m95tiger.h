@@ -56,7 +56,7 @@ public:
 	time_point_t m_flNextCheckHitCount;
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_50bmg" , AMMO_50BMG_PRICE }; }
 #endif
-
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 4, 3, 120 }; }
 public:
 	void M95TigerFire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim);
 	void M95TigerFireNet();

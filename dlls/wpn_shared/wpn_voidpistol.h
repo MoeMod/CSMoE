@@ -75,6 +75,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_voidpistol" , 200 }; }
 #endif
+	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED | ACCURACY_DUCK, 8, 3, 0 }; }
 	const char* GetCSModelName() override { return "models/w_voidpistol.mdl"; }
 	float GetDamage() const;
 	int ExtractAmmo(CBasePlayerWeapon* pWeapon) override;

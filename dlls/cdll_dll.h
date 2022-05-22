@@ -121,7 +121,7 @@
 #define HUD_PRINTTALK			3
 #define HUD_PRINTCENTER			4
 
-#define WEAPON_SUIT			31
+#define WEAPON_SUIT			0
 #define WEAPON_ALLWEAPONS		(~(1 << WEAPON_SUIT))
 
 // custom enum

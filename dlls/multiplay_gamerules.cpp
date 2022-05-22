@@ -21,6 +21,7 @@
 #include "bot_include.h"
 #include "player/player_model.h"
 #include "weapons_moe_buy.h"
+#include "newmenus.h"
 
 namespace sv {
 
@@ -33,6 +34,9 @@ DLL_GLOBAL cvar_t *sv_clienttrace = NULL;
 
 DLL_GLOBAL CCStrikeGameMgrHelper g_GameMgrHelper;
 DLL_GLOBAL CHalfLifeMultiplay *g_pMPGameRules = NULL;
+
+// Menu
+MenuMngr g_MenuMgr;
 
 #ifdef XASH_DEDICATED
 struct _PlayerData
@@ -207,6 +211,150 @@ void SV_CareerMatchLimit_f()
 	}
 }
 
+void SV_AddBanWeapon()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iWeaponID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanWeapon.insert(iWeaponID);
+		vecTemp.push_back(iWeaponID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(11); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+void SV_RemoveBanWeapon()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iWeaponID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanWeapon.erase(iWeaponID);
+		vecTemp.push_back(iWeaponID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(12); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+void SV_AddBanKnife()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iKnifeID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanKnife.insert(iKnifeID);
+		vecTemp.push_back(iKnifeID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(21); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+void SV_RemoveBanKnife()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iKnifeID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanKnife.erase(iKnifeID);
+		vecTemp.push_back(iKnifeID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(22); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+void SV_AddBanGrenade()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iGrenadeID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanGrenade.insert(iGrenadeID);
+		vecTemp.push_back(iGrenadeID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(31); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
+void SV_RemoveBanGrenade()
+{
+	int n = CMD_ARGC();
+	if (n <= 1) return;
+	CHalfLifeMultiplay* mp = g_pGameRules;
+	std::vector<int> vecTemp;
+	for (int i = 1; i < n; ++i)
+	{
+		int iGrenadeID = Q_atoi(CMD_ARGV(i));
+		mp->m_setBanGrenade.erase(iGrenadeID);
+		vecTemp.push_back(iGrenadeID);
+	}
+
+	MESSAGE_BEGIN(MSG_BROADCAST, gmsgMPToCL);
+	WRITE_BYTE(0);
+	WRITE_BYTE(32); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+	WRITE_BYTE(vecTemp.size());
+	for (auto& x : vecTemp)
+	{
+		WRITE_BYTE(x);
+	}
+	MESSAGE_END();
+}
+
 void CHalfLifeMultiplay::SetCareerMatchLimit(int minWins, int winDifference)
 {
 	if (!IsCareer())
@@ -228,6 +376,7 @@ BOOL CHalfLifeMultiplay::IsCareer()
 
 void CHalfLifeMultiplay::ServerDeactivate()
 {
+	g_MenuMgr.clear();
 	if (!IsCareer())
 	{
 		return;
@@ -682,7 +831,6 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 	m_bSkipSpawn = m_bInCareerGame;
 
 	static bool installedCommands = false;
-
 	if (!installedCommands)
 	{
 		if (g_bIsCzeroGame)
@@ -700,7 +848,27 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 #ifdef XASH_DEDICATED
 		ADD_SERVER_COMMAND("update_tips", SV_Update_Tips_f);
 #endif
+		ADD_SERVER_COMMAND("mp_add_ban_weapon", SV_AddBanWeapon);
+		ADD_SERVER_COMMAND("mp_remove_ban_weapon", SV_RemoveBanWeapon);
+		ADD_SERVER_COMMAND("mp_add_ban_knife", SV_AddBanKnife);
+		ADD_SERVER_COMMAND("mp_remove_ban_knife", SV_RemoveBanKnife);
+		ADD_SERVER_COMMAND("mp_add_ban_grenade", SV_AddBanGrenade);
+		ADD_SERVER_COMMAND("mp_remove_ban_grenade", SV_RemoveBanGrenade);
 		installedCommands = true;
+	}
+
+	if (IS_DEDICATED_SERVER())
+	{
+		const char* servercfgfile = CVAR_GET_STRING("servercfgfile");
+
+		if (servercfgfile && *servercfgfile != '\0')
+		{
+			ALERT(at_console, "Executing server config file\n");
+
+			char szCommand[256];
+			Q_sprintf(szCommand, "exec %s\n", servercfgfile);
+			SERVER_COMMAND(szCommand);
+		}
 	}
 
 	m_fCareerRoundMenuTime = invalid_time_point;
@@ -3419,19 +3587,41 @@ void CHalfLifeMultiplay::InitHUD(CBasePlayer *pl)
 	}
 	MESSAGE_END();
 
-	/*MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->edict());
-	WRITE_BYTE(0);
-	WRITE_SHORT(ARRAYSIZE(g_MoEWeaponBuyInfo));
-	for (auto& x : g_MoEWeaponBuyInfo)
-	{
-		WRITE_STRING(x.pszClassName);
-		WRITE_STRING(x.pszDisplayName);
-		WRITE_SHORT(x.iCost);
-		WRITE_BYTE(x.iSlot);
-		WRITE_BYTE(x.iTeam);
-		WRITE_BYTE(x.iMenu);
+	if (m_setBanWeapon.size()) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->edict());
+		WRITE_BYTE(0);
+		WRITE_BYTE(10); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+		WRITE_BYTE(m_setBanWeapon.size());
+		for (auto& x : m_setBanWeapon) // 注意别超过250个，否则会发不出msg
+		{
+			WRITE_BYTE(x);
+		}
+		MESSAGE_END();
 	}
-	MESSAGE_END();*/
+
+	if (m_setBanKnife.size()) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->edict());
+		WRITE_BYTE(0);
+		WRITE_BYTE(20); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+		WRITE_BYTE(m_setBanKnife.size());
+		for (auto& x : m_setBanKnife) // 注意别超过250个，否则会发不出msg
+		{
+			WRITE_BYTE(x);
+		}
+		MESSAGE_END();
+	}
+
+	if (m_setBanGrenade.size()) {
+		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, pl->edict());
+		WRITE_BYTE(0);
+		WRITE_BYTE(30); // [1-wpn,2-knife,3-grenade][0-all, 1-add, 2-remove]
+		WRITE_BYTE(m_setBanGrenade.size());
+		for (auto& x : m_setBanGrenade) // 注意别超过250个，否则会发不出msg
+		{
+			WRITE_BYTE(x);
+		}
+		MESSAGE_END();
+	}
 }
 
 void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)
@@ -4922,7 +5112,7 @@ void SV_Start_VoteMaps()
 
 	ALERT(at_console, "Start voting maps\n");
 	g_pGameRules->m_iVoteMapStatus = 1;
-	g_pGameRules->m_flVoteNextThink = gpGlobals->time + 10s;
+	g_pGameRules->m_flVoteNextThink = gpGlobals->time + 3s;
 }
 
 void CHalfLifeMultiplay::LoadRandomMaps()
@@ -5046,7 +5236,54 @@ void CHalfLifeMultiplay::VoteMapThink()
 		g_pGameRules->m_iVoteMapStatus = 2;
 		g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
 
-		int iKeys = MENU_KEY_0;
+		CBaseEntity* pPlayer = NULL;
+		while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
+		{
+			if (FNullEnt(pPlayer->edict()))
+			{
+				break;
+			}
+
+			if (pPlayer->pev->flags == FL_DORMANT)
+			{
+				continue;
+			}
+
+			CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+			if (player->IsBot())
+			{
+				continue;
+			}
+			PlayerMenu* pMenu = g_MenuMgr.menu_create("请选择下一张地图", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+				if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT) {
+					return;
+				}
+
+				int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+				if (iItem < 0 || iItem >= length) {
+					return;
+				}
+
+				if (g_pGameRules->m_iVoteMapStatus != 2) {
+					return;
+				}
+
+				char szText[128];
+				Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
+				int iClientIndex = pPlayer->entindex();
+				MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+				WRITE_BYTE(iClientIndex);
+				WRITE_STRING(szText);
+				MESSAGE_END();
+				});
+			size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+			for (size_t i = 0; i < length; i++)
+			{
+				pMenu->AddItem(g_pGameRules->m_vecVoteMaps[i].first);
+			}
+			pMenu->Display(player);
+		}
+		/*int iKeys = MENU_KEY_0;
 		char szMenu[512];
 		Q_sprintf(szMenu, "\\y请选择下一张地图:\n\n");
 
@@ -5079,13 +5316,13 @@ void CHalfLifeMultiplay::VoteMapThink()
 
 			ShowMenu(player, iKeys, -1, 0, szMenu);
 			player->m_iMenu = Menu_VoteMap;
-		}
+		}*/
 		break;
 	}
 		// Vote end
 	case 2: {
 		std::sort(m_vecVoteMaps.begin(),
-				  min(m_vecVoteMaps.begin() + MAX_CUSTOM_VOTE_MAPS, m_vecVoteMaps.end()),
+				  min(m_vecVoteMaps.begin() + MAX_CUSTOM_VOTE_MAPS, m_vecVoteMaps.end()), // Need fix crash when m_vecVoteMaps.size() < MAX_CUSTOM_VOTE_MAPS
 				  [](std::pair<std::string, int> a, std::pair<std::string, int> b) {
 					  return b.second < a.second;
 				  });

@@ -18,6 +18,7 @@
 #include <math.h>
 #include "hud.h"
 #include "cl_util.h"
+#include "vgui2/CBaseViewport.h"
 
 #include <string.h>
 
@@ -112,6 +113,22 @@ int CHud :: Redraw( float flTime, int intermission )
 	{
 		gEngfuncs.pfnClientCmd("snapshot\n");
 		m_flShotTime = 0;
+	}
+
+	if (m_iIntermission && !intermission)
+	{
+		m_iIntermission = intermission;
+
+		g_pViewport->HideAllVGUIMenu();
+		//g_pViewport->UpdateSpectatorPanel();
+	}
+	else if (!m_iIntermission && intermission)
+	{
+		m_iIntermission = intermission;
+
+		g_pViewport->HideAllVGUIMenu();
+		//g_pViewport->ShowScoreBoard();
+		//g_pViewport->UpdateSpectatorPanel();
 	}
 
 	m_iIntermission = intermission;

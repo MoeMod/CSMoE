@@ -35,7 +35,7 @@ void CTAR21::Spawn(void)
 	pev->classname = MAKE_STRING("weapon_tar21");
 
 	Precache();
-	m_iId = WEAPON_AUG;
+	m_iId = WEAPON_TAR21;
 	SET_MODEL(ENT(pev), "models/w_tar21.mdl");
 
 	m_iDefaultAmmo = TAR21_MAX_CLIP;
@@ -70,7 +70,7 @@ int CTAR21::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = TAR21_MAX_CLIP;
 	p->iSlot = 0;
 	p->iPosition = 14;
-	p->iId = m_iId = WEAPON_AUG;
+	p->iId = m_iId = WEAPON_TAR21;
 	p->iFlags = 0;
 	p->iWeight = AUG_WEIGHT;
 

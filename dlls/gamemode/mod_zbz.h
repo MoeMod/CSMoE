@@ -76,10 +76,12 @@ public:
 	Vector AdjustFireBullets3Dir(Vector vecDir) override;
 	void ClientPutInServer() override;
 	void Event_OnPickAsZombie(CBasePlayer* who) override;
-	void ShootGrenade(Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent) override;
+	void ShootGrenade(const std::function<void(void)>& f) override;
 	void GrenadeExploded(Vector vecOrigin) override;
 	void ZombiBombExploded(float& flKickRate, float& flRadius, float& flDamage) override;
 	void FlashbangExploded(float& flKickRate, float& flRadius, time_point_t& flFreezeTime) override;
+	void Holster_Post(CBasePlayerWeapon* weapon) override;
+	BOOL DeployWeapon(CBasePlayerItem* item) override;
 
 	virtual void Event_TakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* pevAttacker, float& flDamage, int bitsDamageType);
 	virtual void Event_TraceAttack(CBasePlayer* victim, CBasePlayer* pevAttacker, float& flDamage, const Vector& vecDir, TraceResult* ptr, int bitsDamageType);

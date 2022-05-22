@@ -58,7 +58,6 @@ namespace sv {
         ANIM_SHOOT3,	
 	};
     static constexpr float PlayerMaxSpeed = 236;
-    static constexpr float ArmorRatioModifier = 1.55f;
 	static constexpr float PrimaryAttackWalkingMiniumSpeed = 140;
     static constexpr const auto &SpreadCalcNotOnGround = 0.4*A + 0.04;
     static constexpr const auto &SpreadCalcWalking = 0.04*A + 0.07;
@@ -102,7 +101,7 @@ namespace sv {
         p->iMaxClip = 35;
         p->iSlot = 0;
         p->iPosition = 17;
-        p->iId = m_iId = WEAPON_GALIL;
+        p->iId = m_iId = WEAPON_HEAVYZG;
         p->iFlags = 0;
         p->iWeight = GALIL_WEIGHT;
 
@@ -275,9 +274,12 @@ namespace sv {
         }
     }
 
+    float GetArmorRatioModifier() override { return 1.55; }
 #ifndef CLIENT_DLL
     WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_556lvb" , 30 }; }
 #endif
+    WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 4, 140 }; }
+
     		 	
 };
 LINK_ENTITY_TO_CLASS(weapon_heavyzg, CHeavyZG)

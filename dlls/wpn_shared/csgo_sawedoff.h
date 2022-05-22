@@ -48,6 +48,11 @@ public:
 	}
 	KnockbackData GetKnockBackData() override { return { 1800.0f, 480.0f, 900.0f, 600.0f, 0.3f }; }
 	const char* GetCSModelName() override { return "models/w_sawedoff.mdl"; }
+#ifndef CLIENT_DLL
+	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return ::sv::GetBuyAmmoConfig(WEAPON_M3); }
+#endif
+	float GetArmorRatioModifier() override { return 1.0; }
+	WeaponCrosshairData GetCrosshairData() override { return { 0, 8, 6, 0 }; }
 public:
 	int m_iShell;
 	duration_t m_flPumpTime;
