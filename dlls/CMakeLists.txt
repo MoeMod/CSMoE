@@ -222,6 +222,7 @@ set(HLDLL_SRCS
 	./gamemode/mod_z4e.cpp
 	./sgmissilecannon.cpp
 	./newmenus.cpp
+	./client/admin.cpp
 	./gamemode/zb2/zb2_zclass_siren.cpp
 	)
 

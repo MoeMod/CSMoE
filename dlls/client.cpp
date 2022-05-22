@@ -38,6 +38,7 @@
 
 #include "luash_sv/luash_sv.h"
 #include "newmenus.h"
+#include "client/admin.h"
 
 #include <tuple>
 
@@ -3565,6 +3566,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
+            else if (FStrEq(pcmd, "moe_admin"))
+            {
+                if(!strcmp(CMD_ARGV_(1), "CPlayerModStrategy_ZB3"))
+                    admin::ShowAdminMenu(player);
+            }
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))
