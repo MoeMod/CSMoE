@@ -40,3 +40,6 @@
 [submodule "3rdparty/tbb"]
 	path = 3rdparty/tbb
 	url = https://github.com/wjakob/tbb
+[submodule "3rdparty/opus"]
+	path = 3rdparty/opus
+	url = https://github.com/xiph/opus

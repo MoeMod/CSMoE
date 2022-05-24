@@ -3665,6 +3665,59 @@ void SV_ParseCvarValue2( sv_client_t *cl, sizebuf_t *msg )
 	MsgDev( D_AICONSOLE, "Cvar query response: name:%s, request ID %d, cvar:%s, value:%s\n", cl->name, requestID, name, value );
 }
 
+
+/*
+===================
+SV_ParseVoiceData
+===================
+*/
+void SV_ParseVoiceData( sv_client_t *cl, sizebuf_t *msg )
+{
+    char received[4096];
+    sv_client_t	*cur;
+    int i, client;
+    uint length, size, frames;
+
+    cl->m_bLoopback = BF_ReadByte( msg );
+
+    frames = BF_ReadByte( msg );
+
+    size = BF_ReadShort( msg );
+    client = cl - svs.clients;
+
+    if ( size > sizeof( received ) )
+    {
+        Con_DPrintf( "SV_ParseVoiceData: invalid incoming packet.\n" );
+        SV_DropClient( cl );
+        return;
+    }
+
+    if ( !Cvar_VariableInteger( "sv_voiceenable" ) )
+        return;
+
+    BF_ReadBytes( msg, received, size );
+
+    for( i = 0, cur = svs.clients; i < sv_maxclients->integer; i++, cur++ )
+    {
+        if ( cur->state < cs_connected && cl != cur )
+            continue;
+
+        length = size;
+
+        if ( BF_GetNumBytesLeft( &cur->datagram ) < length + 6 )
+            continue;
+
+        if ( cl == cur && !cur->m_bLoopback )
+            length = 0;
+
+        BF_WriteByte( &cur->datagram, svc_voicedata );
+        BF_WriteByte( &cur->datagram, client );
+        BF_WriteByte( &cur->datagram, frames );
+        BF_WriteShort( &cur->datagram, length );
+        BF_WriteBytes( &cur->datagram, received, length );
+    }
+}
+
 /*
 ===================
 SV_ExecuteClientMessage
@@ -3743,6 +3796,9 @@ void SV_ExecuteClientMessage( sv_client_t *cl, sizebuf_t *msg )
 			if( ++stringCmdCount < 8 ) SV_ExecuteClientCommand( cl, s );
 			if( cl->state == cs_zombie ) return; // disconnect command
 			break;
+        case clc_voicedata:
+            SV_ParseVoiceData( cl, msg );
+            break;
 		case clc_resourcelist:
 			SV_ParseResourceList( cl, msg );
 			break;

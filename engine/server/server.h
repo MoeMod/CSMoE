@@ -240,6 +240,7 @@ typedef struct sv_client_s
 	float		latency;
 	float		ping;
 
+    qboolean		m_bLoopback;		// Does this client want to hear his own voice?
 	int		listeners;		// 32 bits == MAX_CLIENTS (voice listeners)
 
 	edict_t		*edict;			// EDICT_NUM(clientnum+1)

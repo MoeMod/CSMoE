@@ -83,8 +83,8 @@ const char *svc_strings[256] =
 	"svc_unused50",
 	"svc_director",
 	"svc_studiodecal",
-	"svc_unused53",
-	"svc_unused54",
+	"svc_voiceinit",
+	"svc_voicedata",
 	"svc_unused55",
 	"svc_unused56",
 	"svc_querycvarvalue",
@@ -1563,6 +1563,50 @@ void CL_ParseStuffText( sizebuf_t *msg )
 }
 
 /*
+==================
+CL_ParseVoiceInit
+==================
+*/
+void CL_ParseVoiceInit( sizebuf_t *msg )
+{
+    char *pszCodec = BF_ReadString( msg );
+    int quality = BF_ReadByte( msg );
+
+    Voice_Init( pszCodec, quality );
+}
+
+/*
+==================
+CL_ParseVoiceData
+==================
+*/
+void CL_ParseVoiceData( sizebuf_t *msg )
+{
+    int size, idx, frames;
+    unsigned char received[8192];
+
+    idx = BF_ReadByte( msg ) + 1;
+
+    frames = BF_ReadByte( msg );
+
+    size = BF_ReadShort( msg );
+    size = min( size, 8192 );
+
+    BF_ReadBytes( msg, received, size );
+
+    if ( idx <= 0 || idx > cl.maxclients )
+        return;
+
+    if ( idx == cl.playernum + 1 )
+        Voice_LocalPlayerTalkingAck();
+
+    if ( !size )
+        return;
+
+    Voice_AddIncomingData( idx, received, size, frames );
+}
+
+/*
 =====================================================================
 
 ACTION MESSAGES
@@ -1819,6 +1863,12 @@ void CL_ParseServerMessage( sizebuf_t *msg )
 		case svc_studiodecal:
 			CL_ParseStudioDecal( msg );
 			break;
+        case svc_voiceinit:
+            CL_ParseVoiceInit( msg );
+            break;
+        case svc_voicedata:
+            CL_ParseVoiceData( msg );
+            break;
 		case svc_querycvarvalue:
 			CL_ParseCvarValue( msg );
 			break;

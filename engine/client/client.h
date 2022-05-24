@@ -33,6 +33,7 @@ GNU General Public License for more details.
 #include "net_api.h"
 #include "world.h"
 #include "qfont.h"
+#include "voice.h"
 
 #define MAX_DEMOS		32
 #define MAX_MOVIES		8

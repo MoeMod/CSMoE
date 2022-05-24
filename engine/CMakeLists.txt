@@ -253,6 +253,7 @@ set(XASH_ENGINE_CLIENT_SOURCES
    client/s_utils.cpp
    client/s_vox.cpp
    client/vgui/vgui_draw.cpp
+   client/voice.cpp
 )
 
 set(XASH_ENGINE_IMGUI_SOURCES
@@ -519,7 +520,7 @@ if(XASH_TBBMALLOC)
 	target_link_libraries(${XASH_ENGINE} PRIVATE 3rdparty-tbbmalloc)
 endif()
 
-target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container)
+target_link_libraries(${XASH_ENGINE} PRIVATE xorstr_3p qrcode openssl_3p lua54_3p Boost::container 3rdparty-opus)
 
 if(XASH_SAILFISH)
 	add_definitions(-D__SAILFISH__)

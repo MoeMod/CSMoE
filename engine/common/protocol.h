@@ -70,7 +70,8 @@ GNU General Public License for more details.
 
 #define svc_director		51	// <variable sized>
 #define svc_studiodecal		52	// [float*3][float*3][short][short][byte]
-
+#define svc_voiceinit		53	// <see code>
+#define svc_voicedata		54	// [byte][short][...]
 #define svc_querycvarvalue		57	// [string]
 #define svc_querycvarvalue2		58	// [string][long] (context)
 #define svc_lastmsg			64	// start user messages at this point

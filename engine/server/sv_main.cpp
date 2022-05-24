@@ -123,6 +123,8 @@ convar_t	*sv_allow_mouse;
 convar_t	*sv_allow_joystick;
 convar_t	*sv_allow_vr;
 
+convar_t	*sv_voiceenable;
+
 void Master_Shutdown( void );
 
 char localinfo[MAX_LOCALINFO];
@@ -1010,6 +1012,8 @@ void SV_Init( void )
 
 	sv_minclver = Cvar_Get( "sv_minclver", va("%d", Q_buildnum()), CVAR_ARCHIVE, "minimum client version" );
     sv_allow_clos = Cvar_Get( "sv_allow_clos", "wami", CVAR_ARCHIVE, "allow client os" );
+
+    sv_voiceenable = Cvar_Get( "sv_voiceenable", "1", CVAR_ARCHIVE, "enable voice support" );
 
 	Cmd_AddCommand( "download_resources", SV_DownloadResources_f, "try to download missing resources to server");
 

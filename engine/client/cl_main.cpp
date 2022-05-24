@@ -25,6 +25,7 @@ GNU General Public License for more details.
 #include "kbutton.h"
 #include "vgui_draw.h"
 #include "library.h"
+#include "voice.h"
 
 #ifdef XASH_IMGUI
 #include "imgui_impl_xash.h"
@@ -700,6 +701,9 @@ void CL_WritePacket( void )
 
 		// update size counter for netgraph
 		cl.commands[cls.netchan.outgoing_sequence & CL_UPDATE_MASK].sendsize = BF_GetNumBytesWritten( &buf );
+
+        // send voice data to the server
+        CL_AddVoiceToDatagram();
 
 		// composite the rest of the datagram..
 		if( BF_GetNumBitsWritten( &cls.datagram ) <= BF_GetNumBitsLeft( &buf ))
@@ -2284,6 +2288,8 @@ void CL_InitLocal( void )
 
 	Cmd_AddCommand ("precache", CL_Precache_f, "precache specified resource (by index)" );
 	Cmd_AddCommand( "trysaveconfig", CL_TrySaveConfig_f, "schedule config save on disconnected state" );
+
+    Voice_RegisterCvars();
 }
 
 //============================================================================
@@ -2356,6 +2362,9 @@ void Host_ClientFrame( void )
 		// fetch results from server
 		CL_ReadPackets();
 
+        // update voice
+        Voice_Idle( host.frametime );
+
 		VID_CheckChanges();
 
 		// allow sound and video DLL change
@@ -2420,6 +2429,7 @@ void CL_Init( void )
 
 	R_Init();	// init renderer
 	S_Init();	// init sound
+    Voice_Init( "opus", 0 ); // init voice
 
 	// unreliable buffer. unsed for unreliable commands and voice stream
 	BF_Init( &cls.datagram, "cls.datagram", cls.datagram_buf, sizeof( cls.datagram_buf ));

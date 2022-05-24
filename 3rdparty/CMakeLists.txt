@@ -131,3 +131,7 @@ endif()
 add_library(3rdparty-gl4es INTERFACE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/gl4es EXCLUDE_FROM_ALL)
 target_link_libraries(3rdparty-gl4es INTERFACE GL)
+
+add_library(3rdparty-opus INTERFACE)
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/opus EXCLUDE_FROM_ALL)
+target_link_libraries(3rdparty-opus INTERFACE opus)

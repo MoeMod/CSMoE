@@ -596,13 +596,16 @@ qboolean Sys_LoadLibrary( dll_info_t *dll )
 
 	if (!dll->link)
 	{
-#ifdef XASH_WINRT
+#ifdef _WIN32
 		wchar_t buffer[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, dll->name, -1, buffer, MAX_PATH);
-
+#ifdef XASH_WINRT
 		dll->link = LoadPackagedLibrary(buffer, 0); // environment pathes
 #else
-		dll->link = LoadLibrary(dll->name); // environment pathes
+		dll->link = LoadLibraryW(buffer);
+#endif
+#else
+		dll->link = dlopen(dll->name, RTLD_NOW); // environment pathes
 #endif
 	}
 

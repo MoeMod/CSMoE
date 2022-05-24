@@ -1783,6 +1783,33 @@ void S_SoundInfo_f( void )
 }
 
 /*
+ =================
+ S_VoiceRecordStart_f
+ =================
+ */
+void S_VoiceRecordStart_f( void )
+{
+    if( cls.state != ca_active )
+        return;
+
+    Voice_RecordStart();
+}
+
+/*
+=================
+S_VoiceRecordStop_f
+=================
+*/
+void S_VoiceRecordStop_f( void )
+{
+    if( cls.state != ca_active || !Voice_IsRecording() )
+        return;
+
+    CL_AddVoiceToDatagram();
+    Voice_RecordStop();
+}
+
+/*
 ================
 S_Init
 ================
@@ -1824,8 +1851,8 @@ qboolean S_Init( void )
 	Cmd_AddCommand( "music", S_Music_f, "start a background track" );
 	Cmd_AddCommand( "soundlist", S_SoundList_f, "display loaded sounds" );
 	Cmd_AddCommand( "s_info", S_SoundInfo_f, "print sound system information" );
-	Cmd_AddCommand( "+voicerecord", Cmd_Null_f, "start voice recording (non-implemented)" );
-	Cmd_AddCommand( "-voicerecord", Cmd_Null_f, "stop voice recording (non-implemented)" );
+	Cmd_AddCommand( "+voicerecord", S_VoiceRecordStart_f, "start voice recording" );
+	Cmd_AddCommand( "-voicerecord", S_VoiceRecordStop_f, "stop voice recording" );
 	Cmd_AddCommand( "spk", S_SayReliable_f, "reliable play of a specified sentence" );
 	Cmd_AddCommand( "speak", S_Say_f, "play a specified sentence" );
 

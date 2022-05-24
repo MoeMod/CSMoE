@@ -154,5 +154,21 @@ void S_PrintDeviceName( void )
 {
 	Msg( "Audio: No sound backend!\n" );
 }
+
+qboolean VoiceCapture_Init( void )
+{
+    return false;
+}
+
+qboolean VoiceCapture_RecordStart( void )
+{
+    return false;
+}
+
+void VoiceCapture_RecordStop( void )
+{
+    return 0;
+}
+
 #endif
 #endif

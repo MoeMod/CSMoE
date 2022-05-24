@@ -226,6 +226,18 @@ char *SV_EntityScript( void )
 
 /*
 ================
+SV_WriteVoiceCodec
+================
+*/
+void SV_WriteVoiceCodec( sizebuf_t *msg )
+{
+    BF_WriteByte( msg, svc_voiceinit );
+    BF_WriteString( msg, "opus" );
+    BF_WriteByte( msg, 0 );
+}
+
+/*
+================
 SV_CreateBaseline
 
 Entity baselines are used to compress the update messages
@@ -236,7 +248,9 @@ baseline will be transmitted
 void SV_CreateBaseline( void )
 {
 	edict_t	*pEdict;
-	int	e;	
+	int	e;
+
+    SV_WriteVoiceCodec( &sv.signon );
 
 	for( e = 0; e < svgame.numEntities; e++ )
 	{

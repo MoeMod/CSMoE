@@ -438,7 +438,10 @@ void *Com_LoadLibrary( const char *dllname, int build_ordinals_table )
 	strcpy(fullPath, hInst->fullPath);
 	Mem_Free(hInst);
 
-	return LoadLibraryA(fullPath);
+	wchar_t buffer[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, fullPath, -1, buffer, MAX_PATH);
+
+	return LoadLibraryW(buffer);
 }
 
 void Com_FreeLibrary( void *hInstance )
