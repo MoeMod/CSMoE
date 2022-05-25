@@ -206,18 +206,18 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 	}
 
 	// reallocate the buffer if necessary
-	_textLen = (short)wcslen(unicode);
+	_textLen = Q_WStringToUTF32(unicode, nullptr, 0) / sizeof(uchar32);
 	if (_textLen >= _textBufferLen)
 	{
 		delete [] _utext;
 		_textBufferLen = (short)(_textLen + 1);
-		_utext = new wchar_t[_textBufferLen];
+		_utext = new uchar32[_textBufferLen];
 	}
 
 	m_LineBreaks.RemoveAll();
 
 	// store the text as unicode
-	wcscpy(_utext, unicode);
+	Q_WStringToUTF32(unicode, _utext, _textBufferLen * sizeof(uchar32));
 	m_bRecalculateTruncation = true;
 }
 
@@ -226,7 +226,7 @@ void TextImage::SetText(const wchar_t *unicode, bool bClearUnlocalizedSymbol)
 //-----------------------------------------------------------------------------
 void TextImage::GetText(char *buffer, int bufferSize)
 {
-	localize()->ConvertUnicodeToANSI(_utext, buffer, bufferSize);
+	Q_UTF32ToUTF8(_utext, buffer, bufferSize);
 }
 
 //-----------------------------------------------------------------------------
@@ -234,7 +234,7 @@ void TextImage::GetText(char *buffer, int bufferSize)
 //-----------------------------------------------------------------------------
 void TextImage::GetText(wchar_t *buffer, int bufLenInBytes)
 {
-	wcsncpy(buffer, _utext, bufLenInBytes / sizeof(wchar_t));
+	Q_UTF32ToWString(_utext, buffer, bufLenInBytes);
 }
 
 //-----------------------------------------------------------------------------
@@ -323,9 +323,9 @@ void TextImage::Paint()
 
 	int currentLineBreak = 0;
 
-	for (wchar_t *wsz = _utext; *wsz != 0; wsz++)
+	for (auto *wsz = _utext; *wsz != 0; wsz++)
 	{
-		wchar_t ch = wsz[0];
+		auto ch = wsz[0];
 
 		// check for special characters
 		if (ch == '\r')
@@ -396,7 +396,7 @@ void TextImage::GetTextSize(int &wide, int &tall)
 	wide = 0;
 	tall = 0;
 	int maxWide = 0;
-	const wchar_t *text = _utext;
+	const auto *text = _utext;
 
 	HFont font = _font;
 	if ( font == INVALID_FONT )
@@ -409,7 +409,7 @@ void TextImage::GetTextSize(int &wide, int &tall)
 	int fontHeight = surface()->GetFontTall(GetFont());
 	tall = fontHeight;
 
-	int textLen = wcslen(text);
+	int textLen = Q_strlen32(text);
 	for (int i = 0; i < textLen; i++)
 	{
 		// handle stupid special characters, these should be removed
@@ -485,7 +485,7 @@ void TextImage::RecalculateNewLinePositions()
 	int x = 0;
 	
 	//int wordStartIndex = 0;
-	wchar_t *wordStartIndex = _utext;
+	auto *wordStartIndex = _utext;
 	int wordLength = 0;
 	bool hasWord = false;
 	bool justStartedNewLine = true;
@@ -504,9 +504,9 @@ void TextImage::RecalculateNewLinePositions()
 	}
 		
 	// loop through all the characters	
-	for (wchar_t *wsz = &_utext[startChar]; *wsz != 0; wsz++)
+	for (auto *wsz = &_utext[startChar]; *wsz != 0; wsz++)
 	{
-		wchar_t ch = wsz[0];
+		auto ch = wsz[0];
 		
 		// line break only on whitespace characters
 		if (!iswspace(ch))
@@ -587,8 +587,14 @@ void TextImage::RecalculateEllipsesPosition()
 		return;
 
 	// don't truncate strings with newlines
+#ifdef _WIN32
+	for (auto p = _utext; p; ++p)
+		if (*p == '\n')
+			return;
+#else
 	if (wcschr(_utext, '\n') != NULL)
 		return;
+#endif
 
 	if ( _drawWidth == 0 )
 	{
@@ -609,9 +615,9 @@ void TextImage::RecalculateEllipsesPosition()
 		int ellipsesWidth = 3 * surface()->GetCharacterWidth(font, '.');
 		int x = 0;
 
-		for (wchar_t *wsz = _utext; *wsz != 0; wsz++)
+		for (auto *wsz = _utext; *wsz != 0; wsz++)
 		{
-			wchar_t ch = wsz[0];
+			auto ch = wsz[0];
 
 			// check for special characters
 			if (ch == '\r')
@@ -642,7 +648,7 @@ void TextImage::RecalculateEllipsesPosition()
 			{
 				// potential have an ellipses, see if the remaining characters will fit
 				int remainingLength = len;
-				for (const wchar_t *rwsz = wsz + 1; *rwsz != 0; rwsz++)
+				for (const auto *rwsz = wsz + 1; *rwsz != 0; rwsz++)
 				{
 					remainingLength += surface()->GetCharacterWidth(font, *rwsz);
 				}

@@ -106,14 +106,6 @@ int VGUI2_Surface_DrawConsoleString(int x0, int y0, const char* string, byte r, 
 
     auto pszString = VGUI2_Find_String( string );
 
-    for(uchar32 & ch : pszString)
-    {
-        if( !iswprint( ch ) )
-        {
-            ch = L' ';
-        }
-    }
-
     static auto print_segment = [](int x, int y, std::basic_string_view<uchar32> sv, byte r, byte g, byte b, byte a)
     {
         vgui2::surface()->DrawSetTextColor( r * 0.55, g * 0.34, b * 0.11, a );

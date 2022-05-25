@@ -84,7 +84,7 @@ protected:
 private:
 	void RecalculateEllipsesPosition();
 
-	wchar_t *_utext;	// unicode version of the text
+	uchar32 *_utext;	// unicode version of the text
 	short _textBufferLen;	// size of the text buffer
 	short _textLen;		// length of the text string
 	vgui2::HFont _font;	// font of the text string
@@ -93,13 +93,13 @@ private:
 						// if there is not enough room truncate the txt	and add an elipsis
 
 	StringIndex_t _unlocalizedTextSymbol;	// store off the unlocalized text index for build mode
-	wchar_t *m_pwszEllipsesPosition;
+	uchar32 *m_pwszEllipsesPosition;
 
 	bool m_bRecalculateTruncation : 1;
 	bool m_bWrap : 1;
 	bool m_bUseFallbackFont : 1;
 	bool m_bRenderUsingFallbackFont : 1;
-	CUtlVector<wchar_t *>	   m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
+	CUtlVector<uchar32*>	   m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
 };
 
 } // namespace vgui
