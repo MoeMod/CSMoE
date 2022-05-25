@@ -46,3 +46,6 @@
 [submodule "3rdparty/libpng"]
 	path = 3rdparty/libpng
 	url = https://github.com/glennrp/libpng
+[submodule "3rdparty/zlib"]
+	path = 3rdparty/zlib
+	url = https://github.com/madler/zlib
