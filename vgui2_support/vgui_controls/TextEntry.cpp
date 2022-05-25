@@ -339,7 +339,11 @@ void TextEntry::SetText(const uchar32 *wszText)
 {
 	if (!wszText)
 	{
+#ifdef _WIN32
 		wszText = U"";
+#else
+		wszText = L"";
+#endif
 	}
 	int textLen = Q_strlen32(wszText);
 	m_TextStream.RemoveAll();
