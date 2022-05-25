@@ -114,9 +114,15 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 // MoeMod : create emoji
 void CFontManager::AddEmojiFont(HFont font, int tall, int weight, int blur, int scanlines, int flags)
 {
-    font_t *emojiFont = CreateOrFindWin32Font( "AppleColorEmoji", 20, weight, blur, scanlines, flags | vgui2::ISurface::FONTFLAG_EMOJI );
-	if(emojiFont)
-		m_FontAmalgams[font].AddFont(emojiFont, 0x1F300, 0x1F6FF);
+    if(!m_pEmojiFont)
+        m_pEmojiFont = CreateOrFindWin32Font( "AppleColorEmoji", 20, 0, false, false, vgui2::ISurface::FONTFLAG_EMOJI );
+
+	if(m_pEmojiFont)
+		m_FontAmalgams[font].AddFont(m_pEmojiFont, 0x1F000, 0x1F9D0);
+}
+bool CFontManager::IsEmojiChar(uchar32 ch)  const
+{
+    return ch >= 0x1F000 && ch <= 0x1F9D0;
 }
 #endif
 
@@ -335,7 +341,7 @@ const char *CFontManager::GetFontFamilyName( HFont font )
 //-----------------------------------------------------------------------------
 // Purpose: gets the windows font for the particular font in the amalgam
 //-----------------------------------------------------------------------------
-font_t *CFontManager::GetFontForChar(vgui2::HFont font, wchar_t wch)
+font_t *CFontManager::GetFontForChar(vgui2::HFont font, uchar32 wch)
 {
 	return m_FontAmalgams[font].GetFontForChar(wch);
 }
@@ -383,7 +389,7 @@ int CFontManager::GetFontTallRequested(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the ascent of a font
 //-----------------------------------------------------------------------------
-int CFontManager::GetFontAscent(HFont font, wchar_t wch)
+int CFontManager::GetFontAscent(HFont font, uchar32 wch)
 {
 	font_t *winFont = m_FontAmalgams[font].GetFontForChar(wch);
 	if ( winFont )
@@ -430,7 +436,7 @@ int CFontManager::GetCharacterWidth(HFont font, int ch)
 //-----------------------------------------------------------------------------
 // Purpose: returns the area of a text string, including newlines
 //-----------------------------------------------------------------------------
-void CFontManager::GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall)
+void CFontManager::GetTextSize(HFont font, const uchar32 *text, int &wide, int &tall)
 {
 	wide = 0;
 	tall = 0;
@@ -441,11 +447,11 @@ void CFontManager::GetTextSize(HFont font, const wchar_t *text, int &wide, int &
 	tall = GetFontTall(font);
 	
 	float xx = 0;
-	char chBefore = 0;
-	char chAfter = 0;
+    uchar32 chBefore = 0;
+    uchar32 chAfter = 0;
 	for (int i = 0; ; i++)
 	{
-		wchar_t ch = text[i];
+        uchar32 ch = text[i];
 		if (ch == 0)
 		{
 			break;
@@ -650,7 +656,7 @@ bool CFontManager::GetFontUnderlined( HFont font )
 	return m_FontAmalgams[font].GetUnderlined();
 }
 
-void CFontManager::GetKernedCharWidth( vgui2::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA, float &flabcC )
+void CFontManager::GetKernedCharWidth( vgui2::HFont font, uchar32 ch, uchar32 chBefore, uchar32 chAfter, float &wide, float &flabcA, float &flabcC )
 {
 	wide = 0.0f;
 	flabcA = 0.0f;

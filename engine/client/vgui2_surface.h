@@ -15,9 +15,9 @@ GNU General Public License for more details.
 
 #pragma once
 
-int VGUI2_Surface_GetCharWidth(wchar_t ch);
+int VGUI2_Surface_GetCharWidth(int ch);
 int VGUI2_Surface_GetCharHeight();
 int VGUI2_Surface_DrawConsoleString(int x0, int y0, const char* string, byte r, byte g, byte b, byte a);
 void VGUI2_Surface_DrawStringLen(const char* pText, int* length, int* height);
 void VGUI2_Surface_DrawStringLenUnicode(const wchar_t *ch, int* length, int* height);
-int VGUI2_Surface_DrawChar(int x, int y, wchar_t ch, byte r, byte g, byte b, byte a);
+int VGUI2_Surface_DrawChar(int x, int y, int ch, byte r, byte g, byte b, byte a);

@@ -129,9 +129,12 @@ namespace vgui2 {
 		virtual void DrawSetTextPos(int x, int y) = 0;
 		virtual void DrawGetTextPos(int& x, int& y) = 0;
 		//Font draw types aren't used. - Solokiller
+#if defined( _MSC_VER ) || defined( WIN32 )
 		virtual void DrawPrintText(const wchar_t *text, int textLen/*, FontDrawType_t drawType = FONT_DRAW_DEFAULT*/) = 0;
-		virtual void DrawUnicodeChar(wchar_t wch/*, FontDrawType_t drawType = FONT_DRAW_DEFAULT*/) = 0;
-		virtual void DrawUnicodeCharAdd(wchar_t wch) = 0;
+#endif
+        virtual void DrawPrintText(const uchar32 *, int) = 0;
+		virtual void DrawUnicodeChar(uchar32 wch/*, FontDrawType_t drawType = FONT_DRAW_DEFAULT*/) = 0;
+		virtual void DrawUnicodeCharAdd(uchar32 wch) = 0;
 
 		virtual void DrawFlushText() = 0;		// flushes any buffered text (for rendering optimizations)
 		virtual IHTML *CreateHTMLWindow(vgui2::IHTMLEvents *events, VPANEL context) = 0;
@@ -288,7 +291,7 @@ namespace vgui2 {
 		//virtual void DrawTexturedPolyLine( const Vertex_t *p,int n ) = 0; // (Note: this connects the first and last points).
 		//virtual void DrawTexturedSubRect( int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1 ) = 0;
 		virtual void DrawTexturedPolygon(Vertex_t *pVertices, int n) = 0;
-		virtual int GetFontAscent(HFont font, wchar_t wch) = 0;
+		virtual int GetFontAscent(HFont font, uchar32 wch) = 0;
 		//virtual const wchar_t *GetTitle(VPANEL panel) = 0;
 		//virtual bool IsCursorLocked( void ) const = 0;
 		//virtual void SetWorkspaceInsets( int left, int top, int right, int bottom ) = 0;
@@ -371,7 +374,7 @@ namespace vgui2 {
 		//GoldSource doesn't use these, but provide the functions anyway so code is still there. - Solokiller
 
 #ifndef DISABLE_MOE_VGUI2_EXT
-    virtual bool IsEmojiChar(wchar_t ch) = 0;
+    virtual bool IsEmojiChar(uchar32 ch) = 0;
 #endif
 
 	public:
@@ -385,15 +388,15 @@ namespace vgui2 {
 	void DrawTexturedPolygon(int n, Vertex_t *pVertices);
 	void DrawTexturedSubRect(int x0, int y0, int x1, int y1, float texs0, float text0, float texs1, float text1);
 	IImage *GetIconImageForFullPath(char const *pFullPath);
-	void SetBlendEnabled(bool state);
-	void DumpFontTextures(void);
-	int GetCharWidth(HFont font, wchar_t ch);
-	void DrawSetTextureRGB(int id, const unsigned char *rgb, int wide, int tall, int hardwareFilter, bool forceReload);
-	void DrawSetTextureBGR(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload);
-	void DrawSetTextureBGRA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload);
-	void DrawUpdateRegionTextureRGB(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
-	void DrawUpdateRegionTextureRGBA(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
-	void DrawUpdateRegionTextureBGR(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
+	//void SetBlendEnabled(bool state);
+	//void DumpFontTextures(void);
+	//int GetCharWidth(HFont font, wchar_t ch);
+	//void DrawSetTextureRGB(int id, const unsigned char *rgb, int wide, int tall, int hardwareFilter, bool forceReload);
+	//void DrawSetTextureBGR(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload);
+	//void DrawSetTextureBGRA(int id, const unsigned char *rgba, int wide, int tall, int hardwareFilter, bool forceReload);
+	//void DrawUpdateRegionTextureRGB(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
+	//void DrawUpdateRegionTextureRGBA(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
+	//void DrawUpdateRegionTextureBGR(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
 	//void DrawUpdateRegionTextureBGRA(int nTextureID, int x, int y, const unsigned char *pchData, int wide, int tall);
 	//void DeleteTextureByID(int id);
 

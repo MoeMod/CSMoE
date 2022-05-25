@@ -284,8 +284,8 @@ void CHudMessage::MessageDrawScan(std::shared_ptr<client_textmessage_t> pMessage
 		line[m_parms.lineLength] = '\0';
 		int lineHeight;
 		DrawUtils::ConsoleStringSize(line, &m_parms.width, &lineHeight);
-		wchar_t wline[80];
-		Q_UTF8ToUnicode(line, wline, 80, STRINGCONVERT_SKIP);
+		uchar32 wline[80];
+		Q_UTF8ToUTF32(line, wline, sizeof(wline), STRINGCONVERT_SKIP);
 
 		m_parms.x = XPosition( pMessage->x, m_parms.width, m_parms.totalWidth );
 

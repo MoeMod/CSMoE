@@ -108,7 +108,7 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, int& pag
 	return true;
 }
 
-bool CFontTextureCache::GetTextureForChar(vgui2::HFont font, wchar_t wch, int* textureID, float* texCoords)
+bool CFontTextureCache::GetTextureForChar(vgui2::HFont font, uchar32 wch, int* textureID, float* texCoords)
 {
 	auto index = m_CharCache.find(std::make_pair(font, wch));
 

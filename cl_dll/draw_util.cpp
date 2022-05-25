@@ -39,8 +39,10 @@ namespace cl {
 
 #define IsColorString( p )	( p && *( p ) == '^' && *(( p ) + 1) && *(( p ) + 1) >= '0' && *(( p ) + 1 ) <= '9' )
 #define IsColorStringW( p )	( p && *( p ) == L'^' && *(( p ) + 1) && *(( p ) + 1) >= L'0' && *(( p ) + 1 ) <= L'9' )
+#define IsColorStringU32( p )	( p && *( p ) == U'^' && *(( p ) + 1) && *(( p ) + 1) >= U'0' && *(( p ) + 1 ) <= U'9' )
 #define ColorIndex( c )	((( c ) - '0' ) & 7 )
 #define ColorIndexW( c )	((( c ) - L'0' ) & 7 )
+#define ColorIndexU32( c )	((( c ) - U'0' ) & 7 )
 
 // console color typeing
 static byte g_color_table[][4] =
@@ -61,10 +63,10 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 	if (!str)
 		return 1;
 
-	wchar_t wstr[1024];
-	Q_UTF8ToUnicode(str, wstr, 1024, STRINGCONVERT_SKIP);
+	uchar32 wstr[1024];
+	Q_UTF8ToUTF32(str, wstr, sizeof(wstr), STRINGCONVERT_SKIP);
 
-	wchar_t* szIt = wstr;
+    uchar32* szIt = wstr;
 
 	// draw the string until we hit the null character or a newline character
 	for ( ; *szIt != 0 && *szIt != L'\n'; szIt++ )
@@ -91,7 +93,7 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 				continue;
 			}
 		}
-		else if( IsColorStringW( szIt ) )
+		else if( IsColorStringU32( szIt ) )
 		{
 			szIt++;
 			if( gHUD.hud_colored->value )
@@ -112,14 +114,14 @@ int DrawUtils::DrawHudString( int xpos, int ypos, int iMaxX, const char *str, in
 
 int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char * str, int r, int g, int b, float scale, bool drawing )
 {
-	wchar_t wstr[1024];
-    Q_UTF8ToUnicode(str, wstr, 1024, STRINGCONVERT_SKIP);
+    uchar32 wstr[1024];
+    auto bytes = Q_UTF8ToUTF32(str, wstr, sizeof(wstr), STRINGCONVERT_SKIP);
 
 	if (!wstr[0])
 		return 0;
 
 	// iterate throug the string in reverse
-	for ( signed int i = wcslen(wstr); i > 0; i-- )
+	for ( signed int i = bytes / sizeof(uchar32); i > 0; i-- )
 	{
 		if ( i > 1 )
 		{
@@ -144,13 +146,13 @@ int DrawUtils::DrawHudStringReverse( int xpos, int ypos, int iMinX, const char *
 				}
 				continue;
 			}
-			else if( IsColorStringW( wstr - 1 ) )
+			else if( IsColorStringU32( wstr - 1 ) )
 			{
 				if( gHUD.hud_colored->value )
 				{
-					r = g_color_table[ColorIndexW( *wstr )][0];
-					g = g_color_table[ColorIndexW( *wstr )][1];
-					b = g_color_table[ColorIndexW( *wstr )][2];
+					r = g_color_table[ColorIndexU32( *wstr )][0];
+					g = g_color_table[ColorIndexU32( *wstr )][1];
+					b = g_color_table[ColorIndexU32( *wstr )][2];
 				}
 				i--;
 				continue;

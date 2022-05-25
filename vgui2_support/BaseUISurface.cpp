@@ -16,6 +16,7 @@
 #include <tier1/utlbuffer.h>
 
 #include <vector>
+#include <string>
 #include <memory>
 
 //#define USE_IMGUI_SURFACE
@@ -75,6 +76,19 @@ std::vector<vgui2::VPANEL> staticPopupList;
 
 #define VPANEL_NORMAL	((vgui2::SurfacePlat *) NULL)
 #define VPANEL_MINIMIZED ((vgui2::SurfacePlat *) 0x00000001)
+
+#if defined( _MSC_VER ) || defined( WIN32 )
+std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+    auto size_in_bytes = Q_UTF16ToUTF32(in.c_str(), nullptr, 0);
+    std::basic_string<uchar32> out(size_in_bytes / sizeof(uchar32), '\0');
+    Q_UTF16ToUTF32(in.c_str(), out.data(), size_in_bytes);
+    return out;
+}
+#else
+std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+    return in;
+}
+#endif
 
 BaseUISurface::BaseUISurface() {
 	_restrictedPanel = 0;
@@ -362,7 +376,14 @@ void BaseUISurface::DrawGetTextPos(int &x, int &y) {
 	y = _drawTextPos[1];
 }
 
+#if defined( _MSC_VER ) || defined( WIN32 )
 void BaseUISurface::DrawPrintText(const wchar_t *text, int textlen) {
+    std::basic_string<uchar32> out = UnicodeToUTF32(std::wstring(text, text + textlen));
+    return DrawPrintText(out.c_str(), out.size());
+}
+#endif
+
+void BaseUISurface::DrawPrintText(const uchar32 *text, int textlen) {
     if (!text)
         return;
 
@@ -385,7 +406,7 @@ void BaseUISurface::DrawPrintText(const wchar_t *text, int textlen) {
 
     for (int i = 0; i < textlen; ++i)
     {
-        wchar_t ch = text[i];
+        uchar32 ch = text[i];
 
         bool bUnderlined = FontManager().GetFontUnderlined(m_hCurrentFont);
         int abcA, abcB, abcC;
@@ -482,7 +503,7 @@ void BaseUISurface::DrawPrintText(const wchar_t *text, int textlen) {
     stackfree(pQuads);
 }
 
-void BaseUISurface::DrawUnicodeChar(wchar_t ch) {
+void BaseUISurface::DrawUnicodeChar(uchar32 ch) {
     CharRenderInfo info;
     info.additive = false;
 
@@ -490,7 +511,7 @@ void BaseUISurface::DrawUnicodeChar(wchar_t ch) {
         DrawRenderCharFromInfo(info);
 }
 
-void BaseUISurface::DrawUnicodeCharAdd(wchar_t ch) {
+void BaseUISurface::DrawUnicodeCharAdd(uchar32 ch) {
     CharRenderInfo info;
     info.additive = true;
 
@@ -776,7 +797,13 @@ int BaseUISurface::GetCharacterWidth(vgui2::HFont font, int ch) {
     return FontManager().GetCharacterWidth(font, ch);
 }
 
+#if defined( _MSC_VER ) || defined( WIN32 )
 void BaseUISurface::GetTextSize(vgui2::HFont font, const wchar_t *text, int &wide, int &tall) {
+    return GetTextSize(font, UnicodeToUTF32(UnicodeToUTF32).c_str(), wide, tall);
+}
+#endif
+
+void BaseUISurface::GetTextSize(vgui2::HFont font, const uchar32 *text, int &wide, int &tall) {
     return FontManager().GetTextSize(font, text, wide, tall);
 }
 
@@ -1024,7 +1051,7 @@ void BaseUISurface::DrawTexturedPolygon(vgui2::Vertex_t *pVertices, int n) {
     g_api->EnableTexture(true);
 }
 
-int BaseUISurface::GetFontAscent(vgui2::HFont font, wchar_t ch) {
+int BaseUISurface::GetFontAscent(vgui2::HFont font, uchar32 ch) {
 	return FontManager().GetFontAscent(font, ch);
 }
 
@@ -1153,7 +1180,7 @@ void BaseUISurface::DrawSetSubTextureRGBA(int textureID, int drawX, int drawY, c
 	return g_api->UploadTextureBlock(textureID, drawX, drawY, rgba, subTextureWide, subTextureTall);
 }
 
-bool BaseUISurface::DrawGetUnicodeCharRenderInfo(wchar_t ch, CharRenderInfo &info)
+bool BaseUISurface::DrawGetUnicodeCharRenderInfo(uchar32 ch, CharRenderInfo &info)
 {
     info.valid = false;
 
@@ -1379,9 +1406,9 @@ void BaseUISurface::DrawQuadArray(int quadCount, vpoint_t *pVerts, int *pColor)
 #endif
 }
 #ifndef DISABLE_MOE_VGUI2_EXT
-bool BaseUISurface::IsEmojiChar(wchar_t ch)
+bool BaseUISurface::IsEmojiChar(uchar32 ch)
 {
-    return ch >= 0x1F300 && ch <= 0x1F6FF;
+    return FontManager().IsEmojiChar(ch);
 }
 #endif
 

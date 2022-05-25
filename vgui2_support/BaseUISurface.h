@@ -37,7 +37,7 @@ class BaseUISurface : public vgui2::ISurface, public IMouseControl {
     struct CharRenderInfo
     {
         int drawType;
-        wchar_t ch;
+        uchar32 ch;
 
         bool valid;
         bool additive;
@@ -98,9 +98,12 @@ public:
 	bool IsWithin(int, int);	
 	void CreatePopup(vgui2::VPANEL, bool, bool, bool, bool, bool);
 	void Invalidate(vgui2::VPANEL);
-	void DrawPrintText(const wchar_t *, int);	
-	void DrawUnicodeChar(wchar_t);	
-	void DrawUnicodeCharAdd(wchar_t);	
+#if defined( _MSC_VER ) || defined( WIN32 )
+	void DrawPrintText(const wchar_t *, int);
+#endif
+	void DrawPrintText(const uchar32 *, int);
+	void DrawUnicodeChar(uchar32);
+	void DrawUnicodeCharAdd(uchar32);
 	void DrawSetTextFont(vgui2::HFont);
 	void AddPanel(vgui2::VPANEL);
 	void ReleasePanel(vgui2::VPANEL);
@@ -149,10 +152,14 @@ public:
 	vgui2::HFont CreateFont();
 	bool AddGlyphSetToFont(vgui2::HFont, const char *, int, int, int, int, int, int, int);
 	int GetFontTall(vgui2::HFont);
-	int GetFontAscent(vgui2::HFont, wchar_t);
+	int GetFontAscent(vgui2::HFont, uchar32);
 	void GetCharABCwide(vgui2::HFont, int, int &, int &, int &);
 	int GetCharacterWidth(vgui2::HFont, int);
+#if defined( _MSC_VER ) || defined( WIN32 )
 	void GetTextSize(vgui2::HFont, const wchar_t *, int &, int &);
+#else
+    void GetTextSize(vgui2::HFont, const uchar32 *, int &, int &);
+#endif
 	bool AddCustomFontFile(const char *);	
 	void DrawSetSubTextureRGBA(int, int, int, const unsigned char *, int, int);	
 	void SetScreenBounds(int, int, int, int);	
@@ -188,11 +195,11 @@ public:
 	void InternalSchemeSettingsTraverse(vgui2::VPANEL, bool);
 	void DrawSetTextureRGBAWithAlphaChannel(int id, const byte* rgba, int wide, int tall, int hardwareFilter);
 #ifndef DISABLE_MOE_VGUI2_EXT
-    bool IsEmojiChar(wchar_t ch);
+    bool IsEmojiChar(uchar32 ch);
 #endif
 
 protected:
-    bool DrawGetUnicodeCharRenderInfo(wchar_t ch, CharRenderInfo &info);
+    bool DrawGetUnicodeCharRenderInfo(uchar32 ch, CharRenderInfo &info);
     void DrawRenderCharInternal(const CharRenderInfo &info);
     void DrawRenderCharFromInfo(const CharRenderInfo &info);
 

@@ -15,7 +15,7 @@ private:
 	struct cacheentry_t
 	{
 		vgui2::HFont font;
-		wchar_t wch;
+		uchar32 wch;
 		short page;
 		float texCoords[4];
 	};
@@ -36,13 +36,13 @@ public:
 
 	bool AllocatePageForChar(int charWide, int charTall, int& pageIndex, int& drawX, int& drawY, int& twide, int& ttall);
 
-	bool GetTextureForChar(vgui2::HFont font, wchar_t wch, int* textureID, float* texCoords);
+	bool GetTextureForChar(vgui2::HFont font, uchar32 wch, int* textureID, float* texCoords);
 
 private:
 	static bool CacheEntryLessFunc(const cacheentry_t& lhs, const cacheentry_t& rhs);
 
 private:
-	std::map<std::pair<vgui2::HFont, wchar_t>, cacheentry_t> m_CharCache;
+	std::map<std::pair<vgui2::HFont, uchar32>, cacheentry_t> m_CharCache;
 	std::vector<page_t> m_PageList;
 
 private:

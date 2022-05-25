@@ -54,12 +54,12 @@ public:
 	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c);
 	int GetFontTall(HFont font);
 	int GetFontTallRequested(HFont font);
-	int GetFontAscent(HFont font, wchar_t wch);
+	int GetFontAscent(HFont font, uchar32 wch);
 	int GetCharacterWidth(HFont font, int ch);
 	bool GetFontUnderlined( HFont font );
-	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall);
+	void GetTextSize(HFont font, const uchar32 *text, int &wide, int &tall);
 
-	font_t *GetFontForChar(HFont, wchar_t wch);
+	font_t *GetFontForChar(HFont, uchar32 wch);
 	bool IsFontAdditive(HFont font);
 	bool IsBitmapFont(HFont font );
 
@@ -76,9 +76,11 @@ public:
 
 	// used as a hint that intensive TTF operations are finished
 	void ClearTemporaryFontCache();
-	void GetKernedCharWidth( vgui2::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC );
+	void GetKernedCharWidth( vgui2::HFont font, uchar32 ch, uchar32 chBefore, uchar32 chAfter, float &wide, float &abcA, float &abcC );
 #ifndef DISABLE_MOE_VGUI2_EXT
     void AddEmojiFont(HFont font, int tall, int weight, int blur, int scanlines, int flags);
+    bool IsEmojiChar(uchar32 ch) const;
+    font_t *m_pEmojiFont = nullptr;
 #endif
 
 private:

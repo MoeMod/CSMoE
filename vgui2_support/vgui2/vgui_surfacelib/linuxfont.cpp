@@ -342,7 +342,7 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 			// the top of the O and the accent is skipped.  Complete hack here, but we
 			// check for the tallest character we know about (O') and bump up the ascender
 			// value if it is greater than what we've currently got.
-			wchar_t ch = 0xd3;
+            uchar32 ch = 0xd3;
 			error = FT_Load_Char( m_face, ch, FT_LOAD_RENDER | FT_LOAD_COLOR | FT_LOAD_TARGET_NORMAL);
 			if ( !error )
 			{
@@ -565,7 +565,7 @@ char *CLinuxFont::GetFontFileName( const char *windowsFontName, int flags )
 //-----------------------------------------------------------------------------
 // Purpose: writes the char into the specified 32bpp texture
 //-----------------------------------------------------------------------------
-void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *prgba )
+void CLinuxFont::GetCharRGBA( uchar32 ch, int rgbaWide, int rgbaTall, unsigned char *prgba )
 {
 	bool bShouldAntialias = m_bAntiAliased;
 
@@ -691,7 +691,7 @@ void CLinuxFont::GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned c
 	FT_Bitmap_Done( ftLibrary, &bitmap );
 }
 
-void CLinuxFont::GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC )
+void CLinuxFont::GetKernedCharWidth( uchar32 ch, uchar32 chBefore, uchar32 chAfter, float &wide, float &abcA, float &abcC )
 {
 	abcA = abcC = wide = 0.0f;
 
@@ -881,7 +881,7 @@ void *CLinuxFont::SetAsActiveFont( void *cglContext )
 //-----------------------------------------------------------------------------
 // Purpose: returns true if this font has a glyph for the code point.
 //-----------------------------------------------------------------------------
-bool CLinuxFont::HasChar(wchar_t wch)
+bool CLinuxFont::HasChar(uchar32 wch)
 {
     return FT_Get_Char_Index( m_face, wch ) != 0;
 }

@@ -35,7 +35,7 @@ public:
 	virtual bool CreateFromMemory(const char *windowsFontName, void *data, int size, int tall, int weight, int blur, int scanlines, int flags);
 
 	// writes the char into the specified 32bpp texture
-	virtual void GetCharRGBA( wchar_t ch, int rgbaWide, int rgbaTall, unsigned char *rgba);
+	virtual void GetCharRGBA( uchar32 ch, int rgbaWide, int rgbaTall, unsigned char *rgba);
 
 	// returns true if the font is equivalent to that specified
 	virtual bool IsEqualTo(const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags);
@@ -77,10 +77,10 @@ public:
 	// gets the weight of the font
 	virtual int GetWeight() { return m_iWeight; }
 	
-	bool HasChar(wchar_t wch);
+	bool HasChar(uchar32 wch);
 
 	// gets the width of ch given its position around before and after chars
-	virtual void GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA, float &abcC );
+	virtual void GetKernedCharWidth( uchar32 ch, uchar32 chBefore, uchar32 chAfter, float &wide, float &abcA, float &abcC );
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, char *pchName );
@@ -123,12 +123,12 @@ private:
 	// cache for storing asian abc widths (since it's too big too just store them all)
 	struct abc_cache_t
 	{
-		wchar_t wch;
+        uchar32 wch;
 		abc_t abc;
 	};
 
 	
-	std::map<wchar_t, abc_t> m_ExtendedABCWidthsCache;
+	std::map<int, abc_t> m_ExtendedABCWidthsCache;
 
 	// cache for storing asian abc widths (since it's too big too just store them all)
 	struct kernedSize
@@ -136,7 +136,7 @@ private:
 		float wide;
 	};
 
-    std::map<std::tuple<wchar_t, wchar_t, wchar_t>, kernedSize> m_ExtendedKernedABCWidthsCache;
+    std::map<std::tuple<uchar32, uchar32, uchar32>, kernedSize> m_ExtendedKernedABCWidthsCache;
 
 	bool m_faceValid;
 	FT_Face m_face;
