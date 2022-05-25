@@ -31,8 +31,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#if defined( _MSC_VER ) || defined( WIN32 )
 #include <string>
+#if defined( _MSC_VER ) || defined( WIN32 )
 inline std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
 	auto size_in_bytes = Q_UTF16ToUTF32(in.c_str(), nullptr, 0);
 	std::basic_string<uchar32> out(size_in_bytes / sizeof(uchar32), '\0');
@@ -3406,6 +3406,10 @@ void TextEntry::CopySelected()
 	int x0, x1;
 	if (GetSelectedRange(x0, x1))
 	{
+#ifdef _WIN32
+        auto str = UTF32ToUnicode(std::basic_string<uchar32>(m_TextStream.Base() + x0, x1 - x0));
+		system()->SetClipboardText(str.c_str(), str.size());
+#else
 		CUtlVector<wchar_t> buf;
 		for (int i = x0; i < x1; i++)
 		{
@@ -3417,6 +3421,7 @@ void TextEntry::CopySelected()
 		}
 		buf.AddToTail('\0');
 		system()->SetClipboardText(buf.Base(), x1 - x0);
+#endif
 	}
 	
 	// have to request focus if we used the menu
@@ -3455,6 +3460,9 @@ void TextEntry::Paste()
 	SaveUndoState();
 	bool bHaveMovedFocusAwayFromCurrentEntry = false;
 
+#ifdef _WIN32
+    InsertString(UnicodeToUTF32(std::wstring(buf.Base(), buf.Count())).data());
+#else
 	// insert all the characters
 	for (int i = 0; i < len && buf[i] != 0; i++)
 	{
@@ -3481,6 +3489,7 @@ void TextEntry::Paste()
 		// insert the character
 		InsertChar(buf[i]);
 	}
+#endif
 
 	// restore the original clipboard text if neccessary
 	if (m_bAutoProgressOnHittingCharLimit)
