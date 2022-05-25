@@ -719,7 +719,7 @@ void CInputWin32::InternalKeyCodeTyped(vgui2::KeyCode code)
 	}
 }
 
-void CInputWin32::InternalKeyTyped(wchar_t unichar)
+void CInputWin32::InternalKeyTyped(int unichar)
 {
 #if 0
 	// MoeMod : dont worry, no loop here, just for jump out multiple if

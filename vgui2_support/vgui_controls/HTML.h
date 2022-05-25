@@ -88,7 +88,7 @@ public:
 	virtual void OnMouseReleased(MouseCode code);
 	virtual void OnCursorMoved(int x,int y);
 	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	virtual void OnKeyCodeTyped(KeyCode code);
 	virtual void OnKeyCodeReleased(KeyCode code);
 	virtual void PerformLayout();

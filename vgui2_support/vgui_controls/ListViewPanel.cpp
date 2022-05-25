@@ -1005,7 +1005,7 @@ void ListViewPanel::OnKeyCodeTyped( KeyCode code )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListViewPanel::OnKeyTyped(wchar_t unichar)
+void ListViewPanel::OnKeyTyped(uchar32 unichar)
 {
 	if (!iswcntrl(unichar))
 	{

@@ -143,7 +143,7 @@ int VGUI2_Surface_DrawConsoleString(int x0, int y0, const char* string, byte r, 
         vgui2::surface()->DrawUnicodeChar( ch );
     };
 
-    std::wstring_view sv = pszString;
+    std::basic_string_view<uchar32> sv = pszString;
     rgba_t col = {r, g, b, a};
     std::decay<rgba_t>::type last_color = col;
     int x = x0, y = y0;

@@ -136,7 +136,7 @@ protected:
 	virtual void OnMousePressed(MouseCode code);
 	// Respond to Key typing
 	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	// Respond to Key releases
 	virtual void OnKeyCodeReleased(KeyCode code);
 	// Respond to Key focus ticks

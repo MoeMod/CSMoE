@@ -1,5 +1,6 @@
 project(csmoe)
 cmake_minimum_required(VERSION  3.10.2)
+enable_language(C CXX ASM)
 
 # Install custom module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")

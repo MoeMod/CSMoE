@@ -63,7 +63,7 @@ public:
 		TextEntry::OnKeyCodeTyped(code);
 	}
 
-	virtual void OnKeyTyped(wchar_t key)
+	virtual void OnKeyTyped(uchar32 key)
 	{
 		if ( !m_bIgnoreKeyTyped )
 			TextEntry::OnKeyTyped( key );

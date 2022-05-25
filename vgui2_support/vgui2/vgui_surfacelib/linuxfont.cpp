@@ -375,7 +375,7 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 #ifndef DISABLE_MOE_VGUI2_EXT
         if(m_iFlags & vgui2::ISurface::FONTFLAG_EMOJI)
         {
-            int glyph_index = FT_Get_Char_Index( m_face, L'😅' );
+            int glyph_index = FT_Get_Char_Index( m_face, U'😅' );
             error = FT_Load_Glyph( m_face, glyph_index, FT_LOAD_RENDER | FT_LOAD_COLOR );
             if ( !error )
             {

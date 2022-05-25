@@ -36,7 +36,7 @@ public:
 
 protected:
 	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void PerformLayout();
 	virtual void Paint();

@@ -80,7 +80,7 @@ protected:
 	virtual void OnMousePressed( MouseCode code);
 	virtual void OnMouseDoublePressed( MouseCode code);
 	virtual void OnKeyCodeTyped( KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
 	virtual int GetItemsPerColumn();
 

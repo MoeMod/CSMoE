@@ -87,7 +87,7 @@ public:
 	virtual void OnMouseReleased(MouseCode code);
 	virtual void OnCursorMoved(int x,int y);
 	virtual void OnMouseDoublePressed(MouseCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	virtual void OnKeyCodeTyped(KeyCode code);
 	virtual void OnKeyCodeReleased(KeyCode code);
 	virtual void OnMouseWheeled(int delta);
@@ -865,7 +865,7 @@ void HTML::OnMouseDoublePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 // Purpose: passes key presses to the browser (we don't current do this)
 //-----------------------------------------------------------------------------
-void HTML::OnKeyTyped(wchar_t unichar)
+void HTML::OnKeyTyped(uchar32 unichar)
 {
 	m_Serializer->KeyChar( unichar );
 }
@@ -1429,7 +1429,7 @@ void HTMLComboBoxHost::OnMouseDoublePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 // Purpose: passes key presses to the browser (we don't current do this)
 //-----------------------------------------------------------------------------
-void HTMLComboBoxHost::OnKeyTyped(wchar_t unichar)
+void HTMLComboBoxHost::OnKeyTyped(uchar32 unichar)
 {
 	m_pParent->OnKeyTyped(unichar);
 }

@@ -31,6 +31,29 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
+#if defined( _MSC_VER ) || defined( WIN32 )
+#include <string>
+inline std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+	auto size_in_bytes = Q_UTF16ToUTF32(in.c_str(), nullptr, 0);
+	std::basic_string<uchar32> out(size_in_bytes / sizeof(uchar32), '\0');
+	Q_UTF16ToUTF32(in.c_str(), out.data(), size_in_bytes);
+	return out;
+}
+inline std::wstring UTF32ToUnicode(std::basic_string<uchar32> in) {
+	auto size_in_bytes = Q_UTF32ToUTF16(in.c_str(), nullptr, 0);
+	std::wstring out(size_in_bytes / sizeof(wchar_t), '\0');
+	Q_UTF32ToUTF16(in.c_str(), out.data(), size_in_bytes);
+	return out;
+}
+#else
+inline std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+    return in;
+}
+inline std::wstring UTF32ToUnicode(std::basic_string<uchar32> in) {
+	return in;
+}
+#endif
+
 enum
 {
 	// maximum size of text buffer
@@ -266,7 +289,25 @@ void TextEntry::SetText(const char *text)
 		wchar_t *wsz = localize()->Find(text);
 		if (wsz)
 		{
+#ifdef _WIN32
+			size_t len = wcslen(wsz);
+			if (len < 1023)
+			{
+				uchar32 unicode[1024];
+				Q_UTF16ToUTF32(wsz, unicode, sizeof(unicode));
+				SetText(unicode);
+			}
+			else
+			{
+				size_t lenUnicode = (len * sizeof(uchar32) + 4);
+				uchar32* unicode = (uchar32*)malloc(lenUnicode);
+				Q_UTF16ToUTF32(wsz, unicode, lenUnicode);
+				SetText(unicode);
+				free(unicode);
+			}
+#else
 			SetText(wsz);
+#endif
 			return;
 		}
 	}
@@ -274,15 +315,15 @@ void TextEntry::SetText(const char *text)
 	size_t len = strlen( text );
 	if ( len < 1023 )
 	{
-		wchar_t unicode[ 1024 ];
-		localize()->ConvertANSIToUnicode( text, unicode, sizeof( unicode ) );
+		uchar32 unicode[ 1024 ];
+		Q_UTF8ToUTF32( text, unicode, sizeof( unicode ) );
 		SetText( unicode );
 	}
 	else
 	{
-		size_t lenUnicode = ( len * sizeof( wchar_t ) + 4 );
-		wchar_t *unicode = ( wchar_t * ) malloc( lenUnicode );
-			localize()->ConvertANSIToUnicode( text, unicode, lenUnicode );
+		size_t lenUnicode = ( len * sizeof( uchar32 ) + 4 );
+		uchar32 *unicode = ( uchar32 * ) malloc( lenUnicode );
+			Q_UTF8ToUTF32( text, unicode, lenUnicode );
 			SetText( unicode );
 		free( unicode );
 	}
@@ -294,13 +335,13 @@ void TextEntry::SetText(const char *text)
 //          This is because this fxn replaces the contents of the text buffer.
 //          For modifying large buffers use insert functions.
 //-----------------------------------------------------------------------------
-void TextEntry::SetText(const wchar_t *wszText)
+void TextEntry::SetText(const uchar32 *wszText)
 {
 	if (!wszText)
 	{
-		wszText = L"";
+		wszText = U"";
 	}
-	int textLen = wcslen(wszText);
+	int textLen = Q_strlen32(wszText);
 	m_TextStream.RemoveAll();
 	m_TextStream.EnsureCapacity(textLen);
 
@@ -330,10 +371,17 @@ void TextEntry::SetText(const wchar_t *wszText)
 	InvalidateLayout();
 }
 
+#ifdef _WIN32
+void TextEntry::SetText(const wchar_t* wszText)
+{
+	SetText(UnicodeToUTF32(wszText).c_str());
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Sets the value of char at index position.
 //-----------------------------------------------------------------------------
-void TextEntry::SetCharAt(wchar_t ch, int index)
+void TextEntry::SetCharAt(uchar32 ch, int index)
 {
 	if ((ch == '\n') || (ch == '\0')) 
 	{
@@ -379,7 +427,7 @@ void TextEntry::SetTextHidden(bool bHideText)
 //-----------------------------------------------------------------------------
 // Purpose: return character width
 //-----------------------------------------------------------------------------
-int getCharWidth(HFont font, wchar_t ch)
+int getCharWidth(HFont font, uchar32 ch)
 {
 	if (!iswcntrl(ch))
 	{
@@ -406,7 +454,7 @@ void TextEntry::CursorToPixelSpace(int cursorPos, int &cx, int &cy)
 	
 	for (int i = GetStartDrawIndex(lineBreakIndexIndex); i < m_TextStream.Count(); i++)
 	{
-		wchar_t ch = m_TextStream[i];
+		auto ch = m_TextStream[i];
 		if (_hideText)
 		{
 			ch = '*';
@@ -483,7 +531,7 @@ int TextEntry::PixelToCursorSpace(int cx, int cy)
 	int i;
 	for (i = startIndex; i < m_TextStream.Count(); i++)
 	{
-		wchar_t ch = m_TextStream[i];
+		auto ch = m_TextStream[i];
 		if (_hideText)
 		{
 			ch = '*';
@@ -554,7 +602,7 @@ int TextEntry::PixelToCursorSpace(int cx, int cy)
 //			x, y - pixel location to draw char at
 // Output:	returns the width of the character drawn
 //-----------------------------------------------------------------------------
-int TextEntry::DrawChar(wchar_t ch, HFont font, int index, int x, int y)
+int TextEntry::DrawChar(uchar32 ch, HFont font, int index, int x, int y)
 {
 	// add to the current position
 	int charWide = getCharWidth(font, ch);
@@ -758,14 +806,14 @@ void TextEntry::PaintBackground()
 	int nCompEnd = -1;
 
 	// FIXME: Should insert at cursor pos instead
-	bool composing = m_bAllowNonAsciiCharacters && wcslen( m_szComposition ) > 0;
+	bool composing = m_bAllowNonAsciiCharacters && Q_strlen32( m_szComposition ) > 0;
 	bool invertcomposition = input()->GetShouldInvertCompositionString();
 
 	if ( composing )
 	{
 		nCompStart = _cursorPos;
 
-		wchar_t *s = m_szComposition;
+		auto *s = m_szComposition;
 		while ( *s != L'\0' )
 		{
 			m_TextStream.InsertBefore( _cursorPos, *s );
@@ -822,7 +870,7 @@ void TextEntry::PaintBackground()
 		int i;
 		for (i = startIndex; i < endIndex; i++)
 		{
-			wchar_t ch = m_TextStream[i];
+			auto ch = m_TextStream[i];
 			if (_hideText)
 			{
 				ch = '*';
@@ -878,7 +926,7 @@ void TextEntry::PaintBackground()
 		// draw the text
 		for ( int i = startIndex; i < m_TextStream.Count(); i++)
 		{
-			wchar_t ch = m_TextStream[i];
+			auto ch = m_TextStream[i];
 			if (_hideText)
 			{
 				ch = '*';
@@ -1070,7 +1118,7 @@ void TextEntry::RecalculateLineBreaks()
 	int i;
 	for (i = startChar; i < m_TextStream.Count(); ++i)
 	{
-		wchar_t ch = m_TextStream[i];
+		auto ch = m_TextStream[i];
 		
 		// line break only on whitespace characters
 		if (!iswspace(ch))
@@ -1995,7 +2043,7 @@ void TextEntry::OnKeyCodeTyped(KeyCode code)
 // Purpose: Masks which keys get chained up
 //			Maps keyboard input to text window functions.
 //-----------------------------------------------------------------------------
-void TextEntry::OnKeyTyped(wchar_t unichar)
+void TextEntry::OnKeyTyped(uchar32 unichar)
 {
 	_cursorIsAtEnd = _putCursorAtEnd;
 	_putCursorAtEnd=false;
@@ -2410,7 +2458,7 @@ void TextEntry::MoveCursor(int line, int pixelsAcross)
 	int i;
 	for ( i = 0; i < m_TextStream.Count(); i++)
 	{
-		wchar_t ch = m_TextStream[i];
+		auto ch = m_TextStream[i];
 		
 		if (_hideText)
 		{
@@ -2817,7 +2865,7 @@ int TextEntry::GetCurrentLineEnd()
 //-----------------------------------------------------------------------------
 // Purpose: Insert a character into the text buffer
 //-----------------------------------------------------------------------------
-void TextEntry::InsertChar(wchar_t ch)
+void TextEntry::InsertChar(uchar32 ch)
 {
 	// throw away redundant linefeed characters
 	if (ch == '\r')
@@ -3001,11 +3049,11 @@ void TextEntry::CalcBreakIndex()
 // Purpose: Insert a string into the text buffer, this is just a series
 //			of char inserts because we have to check each char is ok to insert
 //-----------------------------------------------------------------------------
-void TextEntry::InsertString(wchar_t *wszText)
+void TextEntry::InsertString(uchar32 *wszText)
 {
 	SaveUndoState();
 
-	for (const wchar_t *ch = wszText; *ch != 0; ++ch)
+	for (const uchar32*ch = wszText; *ch != 0; ++ch)
 	{
 		InsertChar(*ch);
 	}
@@ -3027,14 +3075,32 @@ void TextEntry::InsertString(const char *text)
 		wchar_t *wsz = localize()->Find(text);
 		if (wsz)
 		{
+#ifdef _WIN32
+			size_t len = wcslen(wsz);
+			if (len < 1023)
+			{
+				uchar32 unicode[1024];
+				Q_UTF16ToUTF32(wsz, unicode, sizeof(unicode));
+				InsertString(unicode);
+			}
+			else
+			{
+				size_t lenUnicode = (len * sizeof(uchar32) + 4);
+				uchar32* unicode = (uchar32*)malloc(lenUnicode);
+				Q_UTF16ToUTF32(wsz, unicode, lenUnicode);
+				InsertString(unicode);
+				free(unicode);
+			}
+#else
 			InsertString(wsz);
+#endif
 			return;
 		}
 	}
 
 	// straight convert the ansi to unicode and insert
-	wchar_t unicode[1024];
-	localize()->ConvertANSIToUnicode(text, unicode, sizeof(unicode));
+	uchar32 unicode[1024];
+	Q_UTF8ToUTF32(text, unicode, sizeof(unicode));
 	InsertString(unicode);
 }
 
@@ -3522,7 +3588,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 				for (int i = _currentStartIndex; i < m_TextStream.Count(); i++)
 				{
 					done = false;
-					wchar_t ch = m_TextStream[i];			
+					auto ch = m_TextStream[i];			
 					if (_hideText)
 					{
 						ch = '*';
@@ -3607,8 +3673,8 @@ void TextEntry::GetText(char *buf, int bufLen)
 	if (m_TextStream.Count())
 	{
 		// temporarily null terminate the text stream so we can use the conversion function
-		int nullTerminatorIndex = m_TextStream.AddToTail((wchar_t)0);
-		localize()->ConvertUnicodeToANSI(m_TextStream.Base(), buf, bufLen);
+		int nullTerminatorIndex = m_TextStream.AddToTail((uchar32)0);
+		Q_UTF32ToUTF8(m_TextStream.Base(), buf, bufLen);
 		m_TextStream.FastRemove(nullTerminatorIndex);
 	}
 	else
@@ -3628,8 +3694,12 @@ void TextEntry::GetText(wchar_t *wbuf, int bufLenInBytes)
 	int len = m_TextStream.Count();
 	if (m_TextStream.Count())
 	{
-		int terminator = min(len, (bufLenInBytes / (int)sizeof(wchar_t)) - 1);
+		int terminator = min(len, (bufLenInBytes / (int)sizeof(uchar32)) - 1);
+#ifdef _WIN32
+		Q_UTF32ToUTF16(m_TextStream.Base(), wbuf, bufLenInBytes);
+#else
 		wcsncpy(wbuf, m_TextStream.Base(), terminator);
+#endif
 		wbuf[terminator] = 0;
 	}
 	else
@@ -3642,8 +3712,11 @@ void TextEntry::GetTextRange( wchar_t *buf, int from, int numchars )
 {
 	int len = m_TextStream.Count();
 	int cpChars = max( 0, min( numchars, len - from ) );
-	
+#ifdef _WIN32
+	Q_UTF32ToUTF16(m_TextStream.Base() + max(0, min(len, from)), buf, cpChars + 1);
+#else
 	wcsncpy( buf, m_TextStream.Base() + max( 0, min( len, from ) ), cpChars );
+#endif
 	buf[ cpChars ] = 0;
 }
 
@@ -3652,7 +3725,7 @@ void TextEntry::GetTextRange( char *buf, int from, int numchars )
 	int len = m_TextStream.Count();
 	int cpChars = max( 0, min( numchars, len - from ) );
 
-	localize()->ConvertUnicodeToANSI( m_TextStream.Base() + max( 0, min( len, from ) ), buf, cpChars + 1 );
+	Q_UTF32ToUTF8( m_TextStream.Base() + max( 0, min( len, from ) ), buf, cpChars + 1 );
 	buf[ cpChars ] = 0;
 }
 
@@ -3967,8 +4040,7 @@ void TextEntry::SentenceModeChanged( int handleValue )
 //-----------------------------------------------------------------------------
 void TextEntry::CompositionString( const wchar_t *compstr )
 {
-	wcsncpy( m_szComposition, compstr, sizeof( m_szComposition ) / sizeof( wchar_t ) - 1 );
-	m_szComposition[  sizeof( m_szComposition ) / sizeof( wchar_t ) - 1 ] = L'\0';
+	Q_WStringToUTF32(compstr, m_szComposition, sizeof(m_szComposition));
 }
 
 void TextEntry::ShowIMECandidates()
@@ -4239,15 +4311,17 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 		_dataChanged = true;
 		FireActionSignal();
 	}
-	else if ( !Q_stricmp( cmd, "append" ) )
+	else if (!Q_stricmp(cmd, "append"))
 	{
+		auto wTextStream = UTF32ToUnicode(std::basic_string<uchar32>( m_TextStream.Base(), m_TextStream.Count() ));
+
 		int newLen = wcslen( newText );
-		int curLen = m_TextStream.Count();
+		int curLen = wTextStream.size();
 
 		size_t outsize = sizeof( wchar_t ) * ( newLen + curLen + 1 );
 		wchar_t *out = (wchar_t *)_alloca( outsize );
 		Q_memset( out, 0, outsize );
-		wcsncpy( out, m_TextStream.Base(), curLen );
+		wcsncpy( out, wTextStream.c_str(), curLen );
 		wcsncat( out, newText, wcslen( newText ) );
 		out[ newLen + curLen ] = L'\0';
 		SetText( out );
@@ -4256,14 +4330,16 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 	else if ( !Q_stricmp( cmd, "prepend" ) )
 	{
+		auto wTextStream = UTF32ToUnicode(std::basic_string<uchar32>(m_TextStream.Base(), m_TextStream.Count()));
+
 		int newLen = wcslen( newText );
-		int curLen = m_TextStream.Count();
+		int curLen = wTextStream.size();
 
 		size_t outsize = sizeof( wchar_t ) * ( newLen + curLen + 1 );
 		wchar_t *out = (wchar_t *)_alloca( outsize );
 		Q_memset( out, 0, outsize );
 		wcsncpy( out, newText, wcslen( newText ) );
-		wcsncat( out, m_TextStream.Base(), curLen );
+		wcsncat( out, wTextStream.c_str(), curLen );
 		out[ newLen + curLen ] = L'\0';
 		SetText( out );
 		_dataChanged = true;

@@ -19,7 +19,7 @@ namespace vgui2
 		virtual void InternalMouseWheeled(int delta) = 0;
 		virtual void InternalKeyCodePressed(KeyCode code) = 0;
 		virtual void InternalKeyCodeTyped(KeyCode code) = 0;
-		virtual void InternalKeyTyped(wchar_t unichar) = 0;
+		virtual void InternalKeyTyped(int unichar) = 0;
 		virtual void InternalKeyCodeReleased(KeyCode code) = 0;
 		virtual HInputContext CreateInputContext(void) = 0;
 		virtual void DestroyInputContext(HInputContext context) = 0;

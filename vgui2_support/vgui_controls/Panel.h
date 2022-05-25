@@ -417,7 +417,7 @@ public:
 	// - override to 'swallow' the input
 	virtual void OnKeyCodePressed(KeyCode code);
 	virtual void OnKeyCodeTyped(KeyCode code);
-	virtual void OnKeyTyped(wchar_t unichar);
+	virtual void OnKeyTyped(uchar32 unichar);
 	virtual void OnKeyCodeReleased(KeyCode code);
 	virtual void OnKeyFocusTicked(); // every window gets key ticked events
 

@@ -78,14 +78,14 @@ std::vector<vgui2::VPANEL> staticPopupList;
 #define VPANEL_MINIMIZED ((vgui2::SurfacePlat *) 0x00000001)
 
 #if defined( _MSC_VER ) || defined( WIN32 )
-std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+inline std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
     auto size_in_bytes = Q_UTF16ToUTF32(in.c_str(), nullptr, 0);
     std::basic_string<uchar32> out(size_in_bytes / sizeof(uchar32), '\0');
     Q_UTF16ToUTF32(in.c_str(), out.data(), size_in_bytes);
     return out;
 }
 #else
-std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
+inline std::basic_string<uchar32> UnicodeToUTF32(std::wstring in) {
     return in;
 }
 #endif
@@ -799,7 +799,7 @@ int BaseUISurface::GetCharacterWidth(vgui2::HFont font, int ch) {
 
 #if defined( _MSC_VER ) || defined( WIN32 )
 void BaseUISurface::GetTextSize(vgui2::HFont font, const wchar_t *text, int &wide, int &tall) {
-    return GetTextSize(font, UnicodeToUTF32(UnicodeToUTF32).c_str(), wide, tall);
+    return GetTextSize(font, UnicodeToUTF32(text).c_str(), wide, tall);
 }
 #endif
 

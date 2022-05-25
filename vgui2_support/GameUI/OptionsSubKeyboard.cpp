@@ -938,7 +938,7 @@ void COptionsSubKeyboard::OnKeyCodeTyped(vgui2::KeyCode code)
 //-----------------------------------------------------------------------------
 // Purpose: key input handler
 //-----------------------------------------------------------------------------
-void COptionsSubKeyboard::OnKeyTyped(wchar_t unichar)
+void COptionsSubKeyboard::OnKeyTyped(uchar32 unichar)
 {
 	BaseClass::OnKeyTyped( unichar );
 }

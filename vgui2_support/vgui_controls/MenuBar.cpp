@@ -121,7 +121,7 @@ void MenuBar::OnKeyCodeTyped(KeyCode code)
 // Purpose: Handle key presses, Activate shortcuts
 // Input  : code - 
 //-----------------------------------------------------------------------------
-void MenuBar::OnKeyTyped(wchar_t unichar)
+void MenuBar::OnKeyTyped(uchar32 unichar)
 {
 	if (unichar)
 	{

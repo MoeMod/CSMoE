@@ -781,7 +781,7 @@ void ComboBox::OnKeyCodeTyped(KeyCode code)
 //-----------------------------------------------------------------------------
 // Purpose: handles key input
 //-----------------------------------------------------------------------------
-void ComboBox::OnKeyTyped(wchar_t unichar)
+void ComboBox::OnKeyTyped(uchar32 unichar)
 {
 	if ( IsEditable() ) // don't play with key presses in edit mode
 	{

@@ -14,7 +14,11 @@
 // Structure passed to CWin32Font::GetCharsRGBA
 struct newChar_t
 {
+#ifdef _WIN32
+	char32_t	wch;		// A new character to generate texture data for
+#else
 	wchar_t	wch;		// A new character to generate texture data for
+#endif
 	int		fontWide;	// Texel width of the character
 	int		fontTall;	// Texel height of the character
 	int     offset;		// Offset into the buffer given to GetCharsRGBA

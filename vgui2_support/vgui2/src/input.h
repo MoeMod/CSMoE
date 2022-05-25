@@ -87,7 +87,7 @@ public:
 	void InternalMouseWheeled(int delta) override;
 	void InternalKeyCodePressed(vgui2::KeyCode code) override;
 	void InternalKeyCodeTyped(vgui2::KeyCode code) override;
-	void InternalKeyTyped(wchar_t unichar) override;
+	void InternalKeyTyped(int unichar) override;
 	void InternalKeyCodeReleased(vgui2::KeyCode code) override;
 
 	vgui2::HInputContext CreateInputContext() override;

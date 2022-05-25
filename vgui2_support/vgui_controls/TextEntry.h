@@ -92,7 +92,10 @@ public:
 	TextEntry(Panel *parent, const char *panelName);
 	virtual ~TextEntry();
 
-	virtual void SetText(const wchar_t *wszText);
+	virtual void SetText(const uchar32 *wszText);
+#ifdef _WIN32
+	virtual void SetText(const wchar_t* wszText);
+#endif
 	virtual void SetText(const char *text);
 	virtual void GetText(char *buf, int bufLen);
 	virtual void GetText(wchar_t *buf, int bufLen);
@@ -111,9 +114,9 @@ public:
 	virtual void GotoTextStart();	// go to Start of text buffer
 	virtual void GotoTextEnd();		// go to end of text buffer
 
-	virtual void InsertChar(wchar_t ch);
+	virtual void InsertChar(uchar32 ch);
 	virtual void InsertString(const char *text);
-	virtual void InsertString(wchar_t *wszText);
+	virtual void InsertString(uchar32 *wszText);
 	virtual void Backspace();								   
 	virtual void Delete();
 	virtual void SelectNone();
@@ -239,10 +242,10 @@ protected:
 	virtual void PerformLayout();  // layout the text in the window
 	virtual void ApplySchemeSettings(IScheme *pScheme);
 	virtual void PaintBackground();
-	virtual int  DrawChar(wchar_t ch, HFont font, int index, int x, int y);
+	virtual int  DrawChar(uchar32 ch, HFont font, int index, int x, int y);
 	virtual bool DrawCursor(int x, int y);
 
-	virtual void SetCharAt(wchar_t ch, int index); // set the value of a char in the text buffer
+	virtual void SetCharAt(uchar32 ch, int index); // set the value of a char in the text buffer
 	virtual void ApplySettings( KeyValues *inResourceData );
 	virtual void GetSettings( KeyValues *outResourceData );
 	virtual const char *GetDescription( void );
@@ -259,7 +262,7 @@ protected:
 	virtual void OnKillFocus();
 	virtual void OnMouseWheeled(int delta);	// respond to mouse wheel events
 	virtual void OnKeyCodeTyped(KeyCode code);	//respond to keyboard events
-	virtual	void OnKeyTyped(wchar_t unichar);	//respond to keyboard events
+	virtual	void OnKeyTyped(uchar32 unichar);	//respond to keyboard events
 
 	virtual void OnCursorMoved(int x, int y);  // respond to moving the cursor with mouse button down
 	virtual void OnMousePressed(MouseCode code); // respond to mouse down events
@@ -320,8 +323,8 @@ public:
 
 private:
 
-	CUtlVector<wchar_t> m_TextStream;		// the text in the text window is stored in this buffer
-	CUtlVector<wchar_t> m_UndoTextStream;	// a copy of the text buffer to revert changes
+	CUtlVector<uchar32> m_TextStream;		// the text in the text window is stored in this buffer
+	CUtlVector<uchar32> m_UndoTextStream;	// a copy of the text buffer to revert changes
 	CUtlVector<int>		m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
 
 	int                _cursorPos;		// the position in the text buffer of the blinking cursor
@@ -378,7 +381,7 @@ private:
 		MAX_COMPOSITION_STRING = 256,
 	};
 
-	wchar_t				m_szComposition[ MAX_COMPOSITION_STRING ];
+	uchar32				m_szComposition[ MAX_COMPOSITION_STRING ];
 	Menu				*m_pIMECandidates;
 	int					m_hPreviousIME;
 	bool				m_bDrawLanguageIDAtLeft;

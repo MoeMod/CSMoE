@@ -189,7 +189,7 @@ namespace vgui2
 		virtual void ApplySchemeSettings(IScheme *pScheme);
 
 		// Hotkey handling
-		virtual void OnKeyTyped(wchar_t unichar);
+		virtual void OnKeyTyped(uchar32 unichar);
 		// Menu nagivation etc.
 		virtual void OnKeyCodeTyped(KeyCode code);
 

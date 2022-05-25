@@ -1336,7 +1336,7 @@ void Menu::OnKeyCodeTyped(KeyCode code)
 // Purpose: Handle key presses, Activate shortcuts
 // Input  : code - 
 //-----------------------------------------------------------------------------
-void Menu::OnKeyTyped(wchar_t unichar)
+void Menu::OnKeyTyped(uchar32 unichar)
 {
 	//
 	// NOTE - if hotkeys are ever enabled you need to work out a way to differentiate between

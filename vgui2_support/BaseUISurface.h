@@ -157,9 +157,8 @@ public:
 	int GetCharacterWidth(vgui2::HFont, int);
 #if defined( _MSC_VER ) || defined( WIN32 )
 	void GetTextSize(vgui2::HFont, const wchar_t *, int &, int &);
-#else
-    void GetTextSize(vgui2::HFont, const uchar32 *, int &, int &);
 #endif
+    void GetTextSize(vgui2::HFont, const uchar32 *, int &, int &);
 	bool AddCustomFontFile(const char *);	
 	void DrawSetSubTextureRGBA(int, int, int, const unsigned char *, int, int);	
 	void SetScreenBounds(int, int, int, int);	

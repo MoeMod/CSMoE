@@ -38,7 +38,7 @@ public:
 	virtual void	Finish( int key, int button );
 
 	virtual void	OnKeyCodeTyped( vgui2::KeyCode code );
-	virtual void	OnKeyTyped( wchar_t unichar );
+	virtual void	OnKeyTyped(uchar32 unichar );
 	virtual void	OnMousePressed( vgui2::MouseCode code );
 	virtual void	OnMouseDoublePressed( vgui2::MouseCode code );
 	virtual void	OnMouseWheeled( int delta );

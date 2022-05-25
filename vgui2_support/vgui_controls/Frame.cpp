@@ -2347,7 +2347,7 @@ bool Frame::CanChainKeysToParent() const
 //			Activates any hotkeys / default buttons
 //			Swallows any unhandled input
 //-----------------------------------------------------------------------------
-void Frame::OnKeyTyped(wchar_t unichar)
+void Frame::OnKeyTyped(uchar32 unichar)
 {
 	Panel *panel = GetFocusNavGroup().FindPanelByHotkey(unichar);
 	if (panel)

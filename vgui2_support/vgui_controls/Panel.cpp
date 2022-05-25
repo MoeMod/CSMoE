@@ -2522,7 +2522,7 @@ void Panel::InternalKeyTyped(int unichar)
 			}
 		}
 
-		OnKeyTyped((wchar_t)unichar);
+		OnKeyTyped((uchar32)unichar);
 	}
 	else
 	{
@@ -2773,7 +2773,7 @@ void Panel::OnKeyCodeTyped(KeyCode code)
 	}
 }
 
-void Panel::OnKeyTyped(wchar_t unichar)
+void Panel::OnKeyTyped(uchar32 unichar)
 {
 	CallParentFunction(new KeyValues("KeyTyped", "unichar", unichar));
 }

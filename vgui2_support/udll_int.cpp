@@ -160,8 +160,8 @@ void UI_CharEvent(int utf8)
 	--iCharCounter;
 	if(!iCharCounter)
 	{
-		wchar_t unicode[16] = {};
-		V_UTF8ToUnicode(szInput.c_str(), unicode, 16);
+		uchar32 unicode[16] = {};
+		Q_UTF8ToUTF32(szInput.c_str(), unicode, 16);
 		for(int i = 0; unicode[i]; ++i)
 			g_pInputInternal->InternalKeyTyped(unicode[i]);
         szInput.clear();
