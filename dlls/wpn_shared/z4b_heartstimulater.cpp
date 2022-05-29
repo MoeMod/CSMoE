@@ -67,7 +67,6 @@ public:
 	{
 		Base::Precache();
 
-		PRECACHE_SOUND("CK_WPN/WEAPON/HeartStimulater/Fist_Select.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/HeartStimulater/HeartStimulater_Attack_3.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/HeartStimulater/HeartStimulater_Attack_2.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/HeartStimulater/HeartStimulater_Attack_1.wav");
@@ -258,7 +257,7 @@ void CKnifeHeartStimulater::SecondaryAttack(void)
 	m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.8s;
 #endif
 	SendWeaponAnim(RANDOM_LONG(0, 1)? ANIM_STAB1:ANIM_STAB2, UseDecrement() != FALSE);
-	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/heartstimulater/Hero_ATTACK_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/HeartStimulater/Hero_ATTACK_3.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 	SetThink(&CKnifeHeartStimulater::DelaySecondaryAttack);
 	pev->nextthink = gpGlobals->time + 0.56s;
 
@@ -275,13 +274,13 @@ void CKnifeHeartStimulater::DelayPrimaryAttack()
 	{
 	case HIT_PLAYER:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/heartstimulater/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/heartstimulater/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/heartstimulater/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}
@@ -295,13 +294,13 @@ void CKnifeHeartStimulater::DelaySecondaryAttack()
 	{
 	case HIT_PLAYER:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/heartstimulater/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/heartstimulater/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_Hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_BODY, "CK_WPN/WEAPON/DualKukri/UI_SPECIALKILL2.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	case HIT_WALL:
 	{
-		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/heartstimulater/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/DualKukri/Hero_SWING.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
 		break;
 	}
 	}

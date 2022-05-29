@@ -21,15 +21,16 @@ void CTeleportEntity::Spawn(void)
 	Precache();
 	pev->rendermode = kRenderTransAdd;
 	pev->renderamt = 255;
-	pev->movetype = MOVETYPE_TOSS;
-	pev->solid = SOLID_TRIGGER;
+	pev->movetype = MOVETYPE_BOUNCE;
+	pev->solid = SOLID_BBOX;
 	pev->sequence = 0;
-	pev->framerate = 1.0;
+	pev->framerate = 1.0f;
+	pev->friction = 0.7f;
+	pev->nextthink = gpGlobals->time + 2s;
 	SET_MODEL(ENT(pev), "models/teleport_zombie_mark.mdl");
-	SetTouch(&CTeleportEntity::OnTouch);
-	SetThink(&CTeleportEntity::OnThink);
-
 	UTIL_SetSize(pev, g_vecZero, g_vecZero);
+	SetThink(&CTeleportEntity::OnThink);
+	SetTouch(&CTeleportEntity::OnTouch);
 }
 
 void CTeleportEntity::Precache(void)
@@ -49,16 +50,25 @@ void CTeleportEntity::Kill(void)
 void EXPORT CTeleportEntity::OnThink()
 {
 	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
-	if (!owner->IsAlive() || (owner->m_ZombieClass && stricmp(owner->m_ZombieClass, "teleport")))
+	if (!owner->IsAlive() || (owner->m_ZombieClass && stricmp(owner->m_ZombieClass, "teleport")) || !owner->m_bIsZombie)
+	{
 		Kill();
+		return;
+	}
+	pev->nextthink = gpGlobals->time + 2s;
 }
 
 void EXPORT CTeleportEntity::OnTouch(CBaseEntity* pOther)
 {
-	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
-	pev->movetype = MOVETYPE_PUSHSTEP;
-	if (!owner->IsAlive())
-		Kill();
+	// don't hit the guy that launched this grenade
+	if (pOther->edict() == pev->owner)
+		return;
+
+	if (pev->flags & FL_ONGROUND)
+	{
+		// add a bit of static friction
+		pev->velocity = pev->velocity * 0.5f;
+	}
 }
 
 void CTeleportEntity::Play_EfTeleport()

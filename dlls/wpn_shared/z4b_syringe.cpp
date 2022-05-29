@@ -50,6 +50,9 @@ void CSyringe::Precache(void)
 {
 	PRECACHE_MODEL("models/z4b/v_syringe.mdl");
 	PRECACHE_MODEL("models/z4b/p_syringe.mdl");
+	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Combo1.wav");
+	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Fx.wav");
+	PRECACHE_SOUND("CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Select.wav");
 }
 
 int CSyringe::GetItemInfo(ItemInfo *p)
@@ -311,7 +314,6 @@ int CSyringe::Swing()
 		{
 			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
 			{
-				EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_stab.wav", VOL_NORM, ATTN_NORM);
 				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
 
 				if (!pEntity->IsAlive())

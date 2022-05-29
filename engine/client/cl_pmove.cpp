@@ -366,7 +366,7 @@ void GAME_EXPORT CL_SetSolidPlayers( int playernum )
 			continue; // not solid
 
 #endif
-		if (pPlayer->curstate.playerclass == 2 && pPlayer->curstate.team == ent->curstate.team)
+		if (ent->curstate.playerclass == 1 || ((pPlayer->curstate.playerclass == 2 || ent->curstate.playerclass == 2) && pPlayer->curstate.team == ent->curstate.team))
 			continue;
 
 		pe = &clgame.pmove->physents[clgame.pmove->numphysent];
