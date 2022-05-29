@@ -325,11 +325,6 @@ debug/
 /cmake-build-*
 Xcode-iOS/cmake-build
 CMakeSettings.json
-/3rdparty/nameof
-/3rdparty/LuaJIT
-/3rdparty/SDL2
-/3rdparty/cpuinfo
-/3rdparty/xorstr
 /3rdparty/boost_*
 /SDL2
 msvc/BundleArtifacts/

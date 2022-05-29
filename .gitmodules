@@ -49,3 +49,15 @@
 [submodule "3rdparty/zlib"]
 	path = 3rdparty/zlib
 	url = https://github.com/madler/zlib
+[submodule "3rdparty/SDL2"]
+	path = 3rdparty/SDL2
+	url = https://github.com/libsdl-org/SDL
+[submodule "3rdparty/xorstr"]
+	path = 3rdparty/xorstr
+	url = https://github.com/JustasMasiulis/xorstr
+[submodule "3rdparty/nameof"]
+	path = 3rdparty/nameof
+	url = https://github.com/Neargye/nameof
+[submodule "3rdparty/cpuinfo"]
+	path = 3rdparty/cpuinfo
+	url = https://github.com/pytorch/cpuinfo
