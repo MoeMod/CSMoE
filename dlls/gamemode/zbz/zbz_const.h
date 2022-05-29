@@ -104,6 +104,7 @@ enum ZBZMessageType : byte
 	ZBZ_MESSAGE_CONTACT_INFECTION_RING, // { byte msg_type, byte player }
 	ZBZ_MESSAGE_CLAW, // { byte msg_type, byte player }
 	ZBZ_MESSAGE_WING, // { byte msg_type, byte player }
+	ZBZ_MESSAGE_GHOSTHUNTER, // { byte msg_type, byte player }
 };
 
 #endif

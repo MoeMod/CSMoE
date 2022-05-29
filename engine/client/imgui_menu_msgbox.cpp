@@ -30,12 +30,14 @@ namespace ui {
     static std::string s_msg;
     static std::function<void()> s_command;
     static bool s_next_open = false;
+    static float s_last_update;
 
-    void MsgBox_Open(std::string msg, std::function<void()> command)
+    void MsgBox_Open(std::string msg, std::function<void()> command, float flCloseDelay)
     {
         s_msg = std::move(msg);
         s_command = std::move(command);
         s_next_open = true;
+        s_last_update = ImGui::GetTime() + std::move(flCloseDelay);
     }
 
     void MsgBox_OnGui()
@@ -46,17 +48,20 @@ namespace ui {
         {
             ImGui::Text("%s\n\n", s_msg.c_str());
             ImGui::Separator();
-            if (s_command)
+            if (s_last_update <= ImGui::GetTime())
             {
-                if (ImGui::Button("确认", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { s_command(); }
-                ImGui::SetItemDefaultFocus();
-                ImGui::SameLine();
-                if (ImGui::Button("取消", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
-            }
-            else
-            {
-                ImGui::SetItemDefaultFocus();
-                if (ImGui::Button("确认", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
+                if (s_command)
+                {
+                    if (ImGui::Button("确认", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { s_command(); }
+                    ImGui::SetItemDefaultFocus();
+                    ImGui::SameLine();
+                    if (ImGui::Button("取消", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
+                }
+                else
+                {
+                    ImGui::SetItemDefaultFocus();
+                    if (ImGui::Button("确认", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
+                }
             }
             ImGui::EndPopup();
         }

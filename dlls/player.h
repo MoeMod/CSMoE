@@ -161,6 +161,7 @@ constexpr auto MONEY_BLINK_AMOUNT =		30;
 #define BUFF_MASTERHUNTER			(1<<8)
 #define BUFF_HPBUFF			(1<<9)
 #define BUFF_SHOOTINGDOWN			(1<<10)
+#define BUFF_EMERGENCYESCAPE				(1<<11)
 
 #define COUNT_M32VENOM	0
 
@@ -779,6 +780,9 @@ public:
 	time_point_t m_tHealthDecreaseInterval;
 	time_point_t m_tHealthBuffTime;
 	time_point_t m_tShootingDownBuffTime;
+	time_point_t m_tAvoidInfectBuffTime;
+	time_point_t m_tLockBuffTime;
+
 	float m_flBuffHealthAmount;
 	float m_flSaveArmorAmount;
 	int m_iHealthDecreaseCount;

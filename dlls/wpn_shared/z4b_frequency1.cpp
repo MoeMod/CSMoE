@@ -43,8 +43,8 @@ void CFrequency1::Spawn(void)
 	m_iDefaultAmmo = FREQUENCY1_MAX_CLIP;
 	m_flAccuracy = 0.9;
 	m_iDefaultAmmo2 = 0;
-	m_tAimTime = m_flTimeHostler = invalid_time_point;
-	m_flTimeNextCharge = gpGlobals->time;
+	m_tAimTime = invalid_time_point;
+	m_flTimeHostler = m_flTimeNextCharge = gpGlobals->time;
 	m_iUsingSkill = 0;
 	m_iHolsterAmmo = 0;
 	m_iIndex = 1;

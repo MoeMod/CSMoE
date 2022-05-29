@@ -77,6 +77,7 @@ int CHudSniperScope::VidInit()
 	R_InitTexture(m_iM95TigerScope[1], "sprites/m95tiger_scope_yellow.tga");
 	R_InitTexture(m_iM95TigerScopeCorner, "sprites/m95tiger_scope_corner.tga");
 	R_InitTexture(m_iCheytaclrrsScope, "sprites/scope_m200.tga");
+	R_InitTexture(m_iFreedomScope, "sprites/scope_freedom.astc");
 	//R_InitTexture(m_iSprifleScope, "sprites/scope_circle.tga");
 	
 	left = (TrueWidth - TrueHeight)/2;
@@ -169,16 +170,16 @@ int CHudSniperScope::Draw(float flTime)
 	CBasePlayerWeapon* pActiveBTEWeapon = BTEClientWeapons().GetActiveWeaponEntity();
 	if (pActiveBTEWeapon)
 	{
-		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5)
+		if (pActiveBTEWeapon->m_iId == WEAPON_SKULL5 || pActiveBTEWeapon->m_iId == WEAPON_SKULL6)
 		{
-			if (gHUD.m_iFOV > 80)
+			if (gHUD.m_iFOV == 90)
 				return 1;
 		}
 		else if (pActiveBTEWeapon->m_iId == WEAPON_SFSNIPER)
 		{
 			return 1;
 		}
-		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400)
+		else if (pActiveBTEWeapon->m_iId == WEAPON_M95TIGER || pActiveBTEWeapon->m_iId == WEAPON_CHEYTACLRRS || pActiveBTEWeapon->m_iId == WEAPON_M400 || pActiveBTEWeapon->m_iId == WEAPON_Z4B_FREEDOM)
 		{
 			if (gHUD.m_iFOV > 40)
 				return 1;
@@ -275,6 +276,28 @@ void CHudSniperScope::DrawSpecialScope(int iId, int iType)
 	if (iId == WEAPON_SPRIFLE)
 	{
 
+	}
+	if (iId == WEAPON_Z4B_FREEDOM)
+	{
+		float x, y, w, h;
+
+		float scale = ScreenHeight / 0.85 / m_iFreedomScope->h();
+
+		w = m_iFreedomScope->w() * scale;
+		h = m_iFreedomScope->h() * scale;
+
+		x = ScreenWidth / 2 - w / 2;
+		y = ScreenHeight / 2 - h / 2;
+
+		m_iFreedomScope->Draw2DQuadScaled(x, y, x + w, y + h, 0, 0, 1, 1, 255, 255, 255, 255);
+
+		int LENGTH_SCOPE = w / 2;
+
+		FillRGBABlend(0, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 164, 246, 255, 100);
+		FillRGBABlend(ScreenWidth / 2 + LENGTH_SCOPE, 0, ScreenWidth / 2 - LENGTH_SCOPE, ScreenHeight, 164, 246, 255, 100);
+
+		FillRGBABlend(0, 0, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 164, 246, 255, 100);
+		FillRGBABlend(0, ScreenHeight / 2 + LENGTH_SCOPE, ScreenWidth, ScreenHeight / 2 - LENGTH_SCOPE, 164, 246, 255, 100);
 	}
 
 }

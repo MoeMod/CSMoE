@@ -968,6 +968,7 @@ void CRotDoor::SetToggleState(int state)
 
 void CRotDoor::Precache()
 {
+	CBaseDoor::Precache();
 	const char* pGibName = NULL;
 
 	switch (m_Material)

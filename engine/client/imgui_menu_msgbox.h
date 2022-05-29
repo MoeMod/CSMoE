@@ -18,5 +18,5 @@ GNU General Public License for more details.
 
 namespace ui {
     void MsgBox_OnGui();
-    void MsgBox_Open(std::string msg, std::function<void()> command = {});
+    void MsgBox_Open(std::string msg, std::function<void()> command = {}, float flCloseDelay = 0.0f);
 }

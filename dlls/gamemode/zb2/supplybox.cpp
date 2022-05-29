@@ -10,7 +10,8 @@
 #include "gamemode/mods.h"
 #include "player/player_mod_strategy.h"
 #include "weapons_moe_buy.h"
-
+#include "newmenus.h"
+#include "client/ghosthuntermenu.h"
 #include <utility>
 
 namespace sv {
@@ -119,13 +120,14 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 	if (p->m_iBuff & BUFF_GHOSTHUNTER)
 	{
-		SET_CLIENT_KEY_VALUE(p->entindex(), GET_INFO_BUFFER(p->edict()), "model", "masterhunter");
-
-		p->SetNewPlayerModel("models/player/masterhunter/masterhunter.mdl");
-
-		p->RemoveAllItems(FALSE);
-		p->m_bHasPrimary = false;
-		p->GiveNamedItem("z4b_dualslayer");
+		MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, p->edict());
+		WRITE_BYTE(7);
+		WRITE_BYTE(4);
+		WRITE_BYTE(5);
+		MESSAGE_END();
+		
+		ghosthuntermenu::ShowGhostHunterMenu(p);
+	
 		p->m_iBuff |= BUFF_MASTERHUNTER;
 		pev->effects |= EF_NODRAW;
 		SendPositionMsg();

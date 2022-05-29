@@ -43,7 +43,7 @@ private:
 	CLabeledCommandComboBox* m_pFloatingDamageType;
 	CLabeledCommandComboBox* m_pSiFiAmmoType;
 	CLabeledCommandComboBox* m_pHudStyle;
-	//CLabeledCommandComboBox* m_pTexlru;
+	CLabeledCommandComboBox* m_pTexlru;
 	CLabeledCommandComboBox* m_pHudScale;
 	CCvarSlider* m_pGammaSlider;
 

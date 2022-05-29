@@ -544,7 +544,7 @@ CBasePlayer *CHostageImprov::IsAnyPlayerLookingAtMe(int team, float cosTolerance
 	return NULL;
 }
 
-CBasePlayer *CHostageImprov::GetClosestPlayerByTravelDistance(int team, float *range) const
+CBasePlayer *CHostageImprov::GetClosestPlayerByTravelDistance(int team, float *range)
 {
 	CBasePlayer *close = NULL;
 	float closeRange = 9.9999998e10f;

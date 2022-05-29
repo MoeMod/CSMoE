@@ -106,7 +106,7 @@ public:
 	virtual bool IsVisible(const Vector &pos, bool testFOV = false) const;						// return true if hostage can see position
 	virtual bool IsPlayerLookingAtMe(CBasePlayer *other, float cosTolerance = 0.95f) const;
 	virtual CBasePlayer *IsAnyPlayerLookingAtMe(int team = 0, float cosTolerance = 0.95f) const;
-	virtual CBasePlayer *GetClosestPlayerByTravelDistance(int team = 0, float *range = NULL) const;
+	virtual CBasePlayer *GetClosestPlayerByTravelDistance(int team = 0, float *range = NULL);
 	virtual CNavArea *GetLastKnownArea() const { return m_lastKnownArea; }
 	virtual void OnUpdate(float deltaT);
 	virtual void OnUpkeep(float deltaT);
@@ -169,7 +169,7 @@ public:
 	duration_t GetTimeSinceLastSawPlayer(int team);
 	duration_t GetTimeSinceLastInjury();
 	duration_t GetTimeSinceLastNoise();
-	bool IsTerroristNearby();
+	virtual bool IsTerroristNearby();
 	void Frighten(ScareType scare);
 	bool IsScared() const;
 	ScareType GetScareIntensity() const { return m_scareIntensity; }

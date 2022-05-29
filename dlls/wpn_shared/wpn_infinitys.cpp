@@ -100,6 +100,7 @@ struct InfinitySB_WeaponData : InfinitySS_WeaponData
 	static constexpr int DamageDefault = 44;
 	static constexpr int DamageZB = 79;
 	static constexpr int DamageZBS = 79;
+	static constexpr int MaxClip = 15;
 	static constexpr const auto & SpreadCalcDefault = 0.125 * (1 - A);
 	static constexpr const auto & AccuracyCalc = A - (0.35 - T) * 0.25;
 	static constexpr const auto &CycleTime = 0.225s;

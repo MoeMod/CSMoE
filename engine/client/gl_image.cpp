@@ -2043,8 +2043,14 @@ namespace xe {
 		if(!tex->texlru_extdata)
 			return; // unknown texture
 
-		if(textureCache.contains((GLuint)texnum))
+		if (textureCache.contains((GLuint)texnum)) {
+			// ptexture with same texnum which is from differet model, so it need to update size
+			if (ptexture->width != tex->width) {
+				ptexture->width = tex->width;
+				ptexture->height = tex->height;
+			}
 			return; // already present
+		}
 
 		textureCache.set_capacity(r_texlru->integer);
 

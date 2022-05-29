@@ -71,7 +71,6 @@ public:
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_2.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Attack_3.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_HIT.wav");
-		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_Select.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_STAB.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHero_SWING.wav");
 		PRECACHE_SOUND("CK_WPN/WEAPON/dualslayer/MasterHeroSkill.wav");
@@ -136,7 +135,7 @@ public:
 		float flDamage = 47;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 480 + (g_pGameRules->m_iTotalRoundsPlayed * 50);
+			flDamage = 280 + (g_pGameRules->m_iTotalRoundsPlayed * 50);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -148,7 +147,7 @@ public:
 		float flDamage = 120;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 1105 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1405 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -160,7 +159,7 @@ public:
 		float flDamage = 80;
 #ifndef CLIENT_DLL
 		if (g_pModRunning->DamageTrack() == DT_ZB)
-			flDamage = 740 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
+			flDamage = 1040 + (g_pGameRules->m_iTotalRoundsPlayed * 100);
 		else if (g_pModRunning->DamageTrack() == DT_ZBS)
 			flDamage *= 5.5f;
 #endif
@@ -178,7 +177,7 @@ void CKnifeDualSlayer::Spawn()
 	Precache();
 	SET_MODEL(ENT(pev), "models/w_knife.mdl");
 	m_flTimeHostler = gpGlobals->time;
-	m_iDefaultAmmo = 0;
+	m_iDefaultAmmo = 100;
 	m_iClip = WEAPON_NOCLIP;
 	m_flTimeNextCharge = invalid_time_point;
 	FallInit();
@@ -205,7 +204,7 @@ int CKnifeDualSlayer::ExtractAmmo(CBasePlayerWeapon* pWeapon)
 {
 	if (m_iDefaultAmmo)
 	{
-		m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iDefaultAmmo;
+		m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] = m_iDefaultAmmo;
 		m_iDefaultAmmo = 0;
 	}
 	return CBasePlayerWeapon::ExtractAmmo(pWeapon);
@@ -362,14 +361,6 @@ void CKnifeDualSlayer::DelaySkillAttack()
 
 void CKnifeDualSlayer::DelayPrimaryAttack()
 {
-	BOOL fDidHit = FALSE;
-	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-	Vector vecSrc = m_pPlayer->GetGunPosition();
-	Vector vecEnd = vecSrc + gpGlobals->v_forward * 90;
-
-	TraceResult tr;
-	UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
-
 #ifndef CLIENT_DLL
 	switch (KnifeAttack(GetPrimaryAttackDamage(), 85, 90, DMG_NEVERGIB | DMG_BULLET, this->pev, m_pPlayer))
 	{

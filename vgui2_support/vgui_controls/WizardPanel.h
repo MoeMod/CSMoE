@@ -81,6 +81,8 @@ public:
 	virtual void ShowButtons(bool state);
 	virtual void GetClientArea(int &x, int &y, int &wide, int &tall);
 
+	virtual void ResetCurrentSubPanel();
+
 protected:
 	MESSAGE_FUNC_PTR( InternalActivateNextSubPanel, "ActivateNextSubPanel", panel )
 	{

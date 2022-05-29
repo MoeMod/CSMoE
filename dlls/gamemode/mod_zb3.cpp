@@ -229,8 +229,8 @@ void CPlayerModStrategy_ZB3::Event_OnBecomeHero(CBasePlayer * who)
 	}
 	else {
 		m_pPlayer->GiveNamedItem("weapon_svdex");
-		iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("556Nato", MAX_AMMO_556NATO);
-		m_pPlayer->GiveAmmo(iAmount, "556Nato", iAmount);
+		iAmount = m_pPlayer->m_pModStrategy->ComputeMaxAmmo("762Nato", MAX_AMMO_556NATO);
+		m_pPlayer->GiveAmmo(iAmount, "762Nato", iAmount);
 	}
 
 	DropSecondary(m_pPlayer);
@@ -310,6 +310,57 @@ int CPlayerModStrategy_ZB3::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAt
 
 	if (IsHero() && m_pPlayer->pev->health - flDamage > 0.0f)
 		return 1;
+
+	if (m_pPlayer->m_iBuff & BUFF_EMERGENCYESCAPE)
+	{
+		if (m_pPlayer->pev->health - flDamage <= 0.0f)
+			m_pPlayer->pev->health = 1.0f;
+		else
+			m_pPlayer->pev->health -= flDamage;
+
+		m_pPlayer->m_iBuff |= BUFF_AVOID_INFECT;
+		m_pPlayer->pev->takedamage = DAMAGE_NO;
+		m_pPlayer->m_tAvoidInfectBuffTime = gpGlobals->time + 2.0s;
+		m_pPlayer->m_iBuff &= ~BUFF_EMERGENCYESCAPE;
+
+		m_pPlayer->pev->velocity.z += 1000;
+
+		Vector vecSrc = m_pPlayer->pev->origin;
+		Vector vecEnd;
+		TraceResult tr;
+		CBaseEntity* pEntity = nullptr;
+		while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, 220)) != nullptr) {
+			if (pEntity == m_pPlayer)
+				continue;
+
+			if (pEntity->IsDormant())
+				continue;
+
+			if (!pEntity->IsPlayer())
+				continue;
+
+			if (g_pGameRules->PlayerRelationship(m_pPlayer, pEntity) == GR_TEAMMATE)
+				continue;
+
+			vecEnd = pEntity->BodyTarget(vecSrc);
+
+			UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(m_pPlayer->pev), &tr);
+
+			if (tr.flFraction < 1.0 && tr.pHit != ENT(pEntity->pev))
+				continue;
+
+			Vector vecDir = (pEntity->pev->origin - m_pPlayer->pev->origin);
+			vecDir.z = 0;
+
+			CBasePlayer* player = dynamic_ent_cast<CBasePlayer*>(pEntity);
+			if (player)
+			{
+				ApplyKnockbackData(player, player->Center() - vecSrc, { 1500, 1500, 1500, 1500, 1.0f });
+				player->pev->velocity.z = +400.0f;
+			}
+		}
+		return 0;
+	}
 
 	/*if (~bitsDamageType & DMG_INFECTION)
 		return 1;*/
@@ -587,6 +638,8 @@ bool CMod_ZombieHero::Host_Say(edict_t *pEntity, int teamonly, const char *conte
 						DropPrimary(pPlayer);
 						//pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
 						pPlayer->GiveNamedItem("weapon_sgmissileex");
+						int iAmount = pPlayer->m_pModStrategy->ComputeMaxAmmo("sgdrill_buckshot", 105);
+						pPlayer->GiveAmmo(iAmount, "sgdrill_buckshot", iAmount);
 					}
 				}
 

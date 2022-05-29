@@ -1088,10 +1088,23 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
 
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "weapon_desperado") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gungnir") || !Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m4a1x") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gunkata") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_voidpistol") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_gatlingex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffsg552ex") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_huntbow") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm249") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffm4") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_buffak") || !Q_strcmp(STRING(pWeapon->pev->classname), "weapon_revivegun"))
+				if (pWeapon->m_iId == WEAPON_DESPERADO
+					|| pWeapon->m_iId == WEAPON_GUNGNIR
+					|| pWeapon->m_iId == WEAPON_Z4B_M4A1X
+					|| pWeapon->m_iId == WEAPON_GUNKATA
+					|| pWeapon->m_iId == WEAPON_VOIDPISTOL
+					|| pWeapon->m_iId == WEAPON_GATLINGEX
+					|| pWeapon->m_iId == WEAPON_BUFFSG552EX
+					|| pWeapon->m_iId == WEAPON_HUNTBOW
+					|| pWeapon->m_iId == WEAPON_BUFFM249
+					|| pWeapon->m_iId == WEAPON_BUFFM4
+					|| pWeapon->m_iId == WEAPON_BUFFAK
+					|| pWeapon->m_iId == WEAPON_REVIVEGUN
+					|| pWeapon->m_iId == WEAPON_SGMISSILEEX)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
 				}
+
 				if (!Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m37se") && pWeapon->pev->iuser1 == 1 )
 				{
 					flRatio *= 1.95;
@@ -5393,9 +5406,21 @@ void CBasePlayer::UpdatePlayerSound()
 
 void CBasePlayer::CheckZombieModeBuff(void)
 {
+	if (m_tLockBuffTime > gpGlobals->time)
+	{
+		pev->velocity = g_vecZero;
+	}
+	else
+		m_tLockBuffTime = invalid_time_point;
 	//From CSAE
 	if (!m_bIsZombie)
 	{
+		if (m_tAvoidInfectBuffTime != invalid_time_point && m_tAvoidInfectBuffTime < gpGlobals->time)
+		{
+			pev->takedamage = DAMAGE_YES;
+			m_iBuff &= ~BUFF_AVOID_INFECT;
+			m_tAvoidInfectBuffTime = invalid_time_point;
+		}
 		if (m_tShootingDownBuffTime != invalid_time_point && m_tShootingDownBuffTime < gpGlobals->time)
 		{
 			m_iBuff &= ~BUFF_SHOOTINGDOWN;
@@ -5409,6 +5434,12 @@ void CBasePlayer::CheckZombieModeBuff(void)
 		{
 			m_iBuff &= ~BUFF_SHOOTINGDOWN;
 			m_tShootingDownBuffTime = invalid_time_point;
+		}
+		if (m_iBuff & BUFF_AVOID_INFECT)
+		{
+			pev->takedamage = DAMAGE_YES;
+			m_iBuff &= ~BUFF_AVOID_INFECT;
+			m_tAvoidInfectBuffTime = invalid_time_point;
 		}
 			
 		if (m_tHealthBuffTime != invalid_time_point && m_tHealthBuffTime < gpGlobals->time)
@@ -5444,13 +5475,10 @@ void CBasePlayer::CheckZombieModeBuff(void)
 	}
 	else
 	{
-		m_tShootingDownBuffTime = invalid_time_point;
-		m_tHealthBuffTime = invalid_time_point;
 		m_tHealthDecreaseStartTime = invalid_time_point;
 		m_flHealthDecreaseAmount = 0;
 		m_tHealthDecreaseInterval = invalid_time_point;
 		m_iHealthDecreaseCount = 0;
-		m_flBuffHealthAmount = 0;
 	}
 }
 
@@ -5774,7 +5802,9 @@ void CBasePlayer::Spawn()
 	m_iCustomSequence = -1;
 	m_flCustomSequenceUntilTime = invalid_time_point;
 
-	m_tShootingDownBuffTime == invalid_time_point;
+	m_tLockBuffTime = invalid_time_point;
+	m_tAvoidInfectBuffTime = invalid_time_point;
+	m_tShootingDownBuffTime = invalid_time_point;
 	m_tHealthBuffTime = invalid_time_point;
 	m_flBuffHealthAmount = 0.0f;
 	m_tHealthDecreaseStartTime = invalid_time_point;
@@ -5898,6 +5928,10 @@ void CBasePlayer::Spawn()
 			pev->viewmodel = MAKE_STRING("models/@bpgmiultima_v_pgm.mdl");
 		case WEAPON_ZGUN:
 			pev->viewmodel = MAKE_STRING("models/v_zgun.mdl");
+		case WEAPON_Z4B_BARRETTD:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_freedom.mdl");
+		case WEAPON_Z4B_FREEDOM:
+			pev->viewmodel = MAKE_STRING("models/z4b/v_barrettd.mdl");
 		default:
 			break;
 		}
@@ -8890,6 +8924,7 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_BPGM:
 		case WEAPON_AS50G:
 		case WEAPON_ZGUN:
+		case WEAPON_Z4B_BARRETTD:
 		case WEAPON_BALROG7:
 		case WEAPON_BUFFM249:
 		case WEAPON_JANUS7XMAS:
@@ -8916,6 +8951,12 @@ BOOL CBasePlayer::ShouldDoLargeFlinch(int nHitGroup, int nGunType)
 		case WEAPON_M32VENOM:
 		case WEAPON_CANNONEX:
 		case WEAPON_SPEARGUN:
+		case WEAPON_Z4B_FREEDOM:
+		case WEAPON_Z4B_CSG12SS:
+		case WEAPON_SKULL8:
+		case WEAPON_SKULL4:
+		case WEAPON_SKULL6:
+		case WEAPON_M249EP:
 			return TRUE;
 		}
 	}

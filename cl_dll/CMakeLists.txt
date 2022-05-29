@@ -266,6 +266,17 @@ set (HLWPN_SRCS
 	../dlls/wpn_shared/wpn_trg42g.cpp
 	../dlls/wpn_shared/wpn_sprifle.cpp
 	../dlls/wpn_shared/wpn_spsmg.cpp
+	../dlls/wpn_shared/z4b_holyfist.cpp
+	../dlls/wpn_shared/z4b_dualstinger.cpp
+	../dlls/wpn_shared/z4b_freedom.cpp
+	../dlls/wpn_shared/z4b_csg12ss.cpp
+	../dlls/wpn_shared/wpn_skull8.cpp
+	../dlls/wpn_shared/wpn_skull4.cpp
+	../dlls/wpn_shared/wpn_skull6.cpp
+	../dlls/wpn_shared/wpn_m249ep.cpp
+	../dlls/wpn_shared/z4b_heartstimulater.cpp
+	../dlls/wpn_shared/z4b_syringe.cpp
+	../dlls/wpn_shared/wpn_skull1.cpp
 	)
 
 set (HUD_SRCS
@@ -332,7 +343,7 @@ set (HUD_SRCS
 	./hud/server.cpp
 	./hud/newhud/newhud.cpp
 	./hud/hud_centertips.cpp
-
+	./hud/zbz/zbz_ghosthunter.cpp
 )
 
 set (STUDIORENDER_SRCS

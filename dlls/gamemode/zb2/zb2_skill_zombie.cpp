@@ -645,6 +645,7 @@ namespace sv {
 				}
 				else
 				{
+					player->pev->armortype = ARMOR_TYPE_HELMET;
 					player->pev->armorvalue += 1000;
 					EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/td_buff.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
 				}
@@ -2053,7 +2054,9 @@ namespace sv {
 		m_pPlayer->pev->velocity.y = 0.0;
 		m_pPlayer->pev->body = 1;
 		m_iZombieSkillStatus = SKILL_STATUS_USING;
-		m_pPlayer->m_iBuff |= BUFF_IGNORE_KNOCKBACK;
+		if(!(m_pPlayer->m_iBuff & BUFF_IGNORE_KNOCKBACK))
+			m_pPlayer->m_iBuff |= BUFF_IGNORE_KNOCKBACK;
+		m_pPlayer->pev->takedamage = DAMAGE_NO;
 		m_pPlayer->ResetMaxSpeed();
 		m_flTimeZombieSkillEnd = gpGlobals->time + GetDurationTime();
 		
@@ -2075,6 +2078,7 @@ namespace sv {
 	{
 		m_iZombieSkillStatus = SKILL_STATUS_USED;
 		m_pPlayer->m_iBuff &= ~BUFF_IGNORE_KNOCKBACK;
+		m_pPlayer->pev->takedamage = DAMAGE_YES;
 		m_pPlayer->ResetMaxSpeed();
 		m_pPlayer->pev->body = 0;
 	}
@@ -2890,6 +2894,7 @@ namespace sv {
 		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverArmorValue = 4000.0f; break;
 		}
 
+		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue += fRecoverArmorValue;
 
 		if (m_pPlayer->pev->armorvalue > 5000)
@@ -3720,7 +3725,9 @@ namespace sv {
 
 	float CZombieSkill_ZombieSelfDestruct::GetDamageRatio() const
 	{
-		return 1.2f;
+		if (m_iZombieSkillStatus == SKILL_STATUS_USING)
+			return 1.2f;
+		return 1.0f;
 	}
 
 	//nemesis zombie
@@ -4952,6 +4959,8 @@ namespace sv {
 		m_flTimeZombieSkillNext = gpGlobals->time + GetCooldownTime();
 
 		CLIENT_COMMAND(m_pPlayer->edict(), "spk zombi/siren_scream.wav\n");
+
+		UTIL_MakeVectors(m_pPlayer->pev->angles);
 
 		for (int i = 1; i <= gpGlobals->maxClients; i++)
 		{

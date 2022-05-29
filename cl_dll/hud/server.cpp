@@ -47,12 +47,17 @@ enum
 	ZOMBIE_SKILL_HPBUFF_HEAD,
 	ZOMBIE_SKILL_ARMORRECOVERY_HEAD,
 	HUMAN_DEBUFF_SHOOTINGDOWN_HEAD,
+	HOLYFIST_GLITCH,
+	HOLYFIST_GLITCH_RING,
 };
+TEMPENTITY *iHolyFistRingEffect[33];
 
 void CreateAttachedEntitiesToPlayer(int entity, int type);
 void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
 void CreateFollowEnt(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
 void CreateBalrog11CannonSingleProjectile(TEMPENTITY* prev, vec3_t origin, int iAimingEntity, int iType);
+TEMPENTITY* AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate);
+//void EnableWallHack(int enable, int iTarget);
 
 int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 {
@@ -161,6 +166,20 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 		}
 
 		break;
+	case 16:		
+		arg1 = reader.ReadShort();
+
+		if (iHolyFistRingEffect[arg1])
+		{
+			iHolyFistRingEffect[arg1]->die = gHUD.m_flTime;
+			iHolyFistRingEffect[arg1] = nullptr;
+			break;
+		}
+
+		if(!iHolyFistRingEffect[arg1])
+			iHolyFistRingEffect[arg1] = AttachTentToEntity(arg1, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/terminator_ring.spr"),
+				Vector(0.0, 0.0, 0.0), 5.0, TRUE, FTENT_PERSIST | FTENT_SPRANIMATELOOP, 0.7, kRenderTransAdd, 1.0);
+		break;
 	case 79:	// stop sound
 		arg1 = reader.ReadShort();
 		arg2 = reader.ReadShort();
@@ -171,7 +190,35 @@ int CHud::MsgFunc_MPToCL(const char* pszName, int iSize, void* pbuf)
 	}
 	return 1;
 }
-
+//useless
+//void EnableWallHack(int enable, int iTarget)
+//{
+//	int idx = gEngfuncs.GetLocalPlayer()->index;
+//	cl_entity_t* pPlayer = gEngfuncs.GetEntityByIndex(idx);
+//
+//	if (!enable)
+//	{
+//		for (int i = 1; i < 33; i++)
+//		{
+//			if (i == idx)
+//				continue;
+//
+//			cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(i);
+//			if (!pEnt)
+//				continue;
+//
+//			pEnt->curstate.renderfx = kRenderFxNone;
+//		}
+//	}
+//	else
+//	{
+//		cl_entity_t* pEnt = gEngfuncs.GetEntityByIndex(iTarget);
+//		if (!pEnt)
+//			return;
+//
+//		pEnt->curstate.renderfx = kRenderFxWallHack;
+//	}
+//}
 
 void FollowThink(tempent_s* ent, float frametime, float currenttime)
 {
@@ -381,6 +428,21 @@ void CreateAttachedEntitiesToPlayer(int entity, int type)
 			Vector(0.0, 0.0, 25.0), 5.0, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
 		break;
 	}
+	case HOLYFIST_GLITCH:
+	{
+		flags = FTENT_PERSIST | FTENT_FADEOUT;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
+			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+	case HOLYFIST_GLITCH_RING:
+	{
+		flags = FTENT_PERSIST | FTENT_FADEOUT;
+		R_AttachTentToEntity(entity, gEngfuncs.pEventAPI->EV_FindModelIndex("sprites/ef_lance_hit.spr"),
+			Vector(0.0, 0.0, 0.0), 0.18, TRUE, flags, 1.0, kRenderTransAdd, 10.0);
+		break;
+	}
+
 	default:
 		break;
 	}
@@ -424,6 +486,48 @@ void R_AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life,
 		pTemp->entity.curstate.rendermode = kRenderTransAdd;
 	pTemp->die = gHUD.m_flTime + life;
 
+}
+
+
+TEMPENTITY *AttachTentToEntity(int entity, int modelIndex, vec3_t offset, float life, int additive, int flags, float scale, int rendermode, float framerate)
+{
+	if (!modelIndex)
+	{
+		gEngfuncs.Con_Printf("No model %d!\n", modelIndex);
+		return nullptr;
+	}
+
+	cl_entity_t* pEnity = gEngfuncs.GetEntityByIndex(entity);
+	if (!pEnity)
+	{
+		gEngfuncs.Con_Printf("Couldn't get ClientEntity for %i\n", entity);
+		return nullptr;
+	}
+
+	if (!pEnity->index)	//avoid sent to world origin
+		return nullptr;
+
+	TEMPENTITY* pTemp = gEngfuncs.pEfxAPI->R_DefaultSprite(pEnity->origin + offset, modelIndex, 1.0);
+	if (!pTemp)
+	{
+		gEngfuncs.Con_Printf("No temp ent.\n");
+
+		return nullptr;
+	}
+
+	pTemp->entity.curstate.framerate = framerate;
+	pTemp->entity.baseline.renderamt = pTemp->entity.curstate.renderamt = 255;
+	pTemp->tentOffset = offset;
+	pTemp->flags = FTENT_PLYRATTACHMENT | FTENT_SPRANIMATE | flags;
+	pTemp->clientIndex = entity;
+	pTemp->entity.curstate.renderfx = kRenderFxNoDissipation;
+	pTemp->entity.curstate.scale = scale;
+	pTemp->entity.curstate.rendermode = rendermode;
+	if (additive)
+		pTemp->entity.curstate.rendermode = kRenderTransAdd;
+	pTemp->die = gHUD.m_flTime + life;
+
+	return pTemp;
 }
 
 }

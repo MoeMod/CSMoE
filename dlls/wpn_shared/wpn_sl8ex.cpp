@@ -81,7 +81,7 @@ namespace sv {
 		p->iMaxAmmo1 = MAX_AMMO_556NATO;
 		p->pszAmmo2 = NULL;
 		p->iMaxAmmo2 = -1;
-		p->iMaxClip = SG550_MAX_CLIP;
+		p->iMaxClip = 25;
 		p->iSlot = 0;
 		p->iPosition = 16;
 		p->iId = m_iId = WEAPON_SL8EX;

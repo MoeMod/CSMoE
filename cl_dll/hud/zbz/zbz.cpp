@@ -27,13 +27,14 @@ GNU General Public License for more details.
 
 #include "zbz.h"
 #include "zbz_skill_info.h"
+#include "zbz_ghosthunter.h"
 #include "gamemode/mods_const.h"
 
 namespace cl {
 	extern engine_studio_api_t IEngineStudio;
 
 class CHudZBZ::impl_t
-	: public THudSubDispatcher<CHudZBZ_Skill> {};
+	: public THudSubDispatcher<CHudZBZ_Skill, CHudZBZ_GhostHunter> {};
 
 DECLARE_MESSAGE(m_ZBZ, ZBZMsg)
 
@@ -167,6 +168,13 @@ int CHudZBZ::MsgFunc_ZBZMsg(const char* pszName, int iSize, void* pbuf)
 			}
 		};
 		break;
+	}
+	case ZBZ_MESSAGE_GHOSTHUNTER:
+	{
+		int type = buf.ReadByte();
+		float time = buf.ReadByte();
+		pimpl->get<CHudZBZ_GhostHunter>().SetGhostHunterClass(type);
+		pimpl->get<CHudZBZ_GhostHunter>().SetImageDrawTime(time);
 	}
 	}
 

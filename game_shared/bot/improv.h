@@ -120,7 +120,7 @@ public:
 	virtual bool IsPlayerLookingAtMe(CBasePlayer *other, float cosTolerance = 0.95f) const = 0;		// return true if 'other' is looking right at me
 	virtual CBasePlayer *IsAnyPlayerLookingAtMe(int team = 0, float cosTolerance = 0.95f) const = 0;	// return player on given team that is looking right at me (team == 0 means any team), NULL otherwise
 
-	virtual CBasePlayer *GetClosestPlayerByTravelDistance(int team = 0, float *range = NULL) const = 0;	// return actual travel distance to closest player on given team (team == 0 means any team)
+	virtual CBasePlayer *GetClosestPlayerByTravelDistance(int team = 0, float *range = NULL) = 0;	// return actual travel distance to closest player on given team (team == 0 means any team)
 	virtual CNavArea *GetLastKnownArea() const = 0;
 
 	virtual void OnUpdate(float deltaT) = 0;								// a less frequent, full update 'tick'

@@ -943,11 +943,13 @@ void V_CalcNormalRefdef ( struct ref_params_s *pparams )
 				view->model = NULL;
 		}
 	}	
-	else if (gHUD.m_iFOV <= 80)
+	else if (gHUD.m_iFOV < 90)
 	{
 		if (view->model->name)
 		{
 			if (!strcmp(view->model->name, "models/v_skull5.mdl"))
+				view->model = NULL;
+			else if (!strcmp(view->model->name, "models/v_skull6.mdl"))
 				view->model = NULL;
 		}
 	}

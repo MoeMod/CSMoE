@@ -400,7 +400,7 @@ void CSVDEX::SVDEXFire1(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecDir;
 
-	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_556MM, 490, 0.99, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
+	vecDir = m_pPlayer->FireBullets3(vecSrc, gpGlobals->v_forward, flSpread, 8192, 2, BULLET_PLAYER_762MM, 490, 0.99, m_pPlayer->pev, FALSE, m_pPlayer->random_seed);
 	m_pPlayer->pev->effects |= EF_MUZZLEFLASH;
 
 	int flags;
@@ -480,7 +480,7 @@ void CSVDEX::Reload(void)
 	if (m_iWeaponState & WPNSTATE_M4A1_SILENCED)
 		return;
 
-	if (m_pPlayer->ammo_556nato <= 0)
+	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] <= 0)
 		return;
 
 

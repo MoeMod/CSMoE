@@ -625,7 +625,7 @@ void C556AZAmmo::Precache()
 
 BOOL C556AZAmmo::AddAmmo(CBaseEntity* pOther)
 {
-	if (pOther->GiveAmmo(30, "556az", 120) == -1) {
+	if (pOther->GiveAmmo(30, "556az", 240) == -1) {
 		return FALSE;
 	}
 
@@ -1124,4 +1124,78 @@ BOOL CBuffBulletAmmo::AddAmmo(CBaseEntity* pOther)
 }
 
 LINK_ENTITY_TO_CLASS(ammo_buffbullet, CBuffBulletAmmo);
+
+void C50AEAZAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void C50AEAZAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL C50AEAZAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(AMMO_50AE_BUY, "50AEaz", MAX_AMMO_50AE) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_50aeaz, C50AEAZAmmo);
+
+void CDepletedAlloyAmmo::Spawn()
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_9mmclip.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CDepletedAlloyAmmo::Precache()
+{
+	PRECACHE_MODEL("models/w_9mmclip.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CDepletedAlloyAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(10, "depletedalloy", 40) == -1) {
+		return FALSE;
+	}
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_depletedalloy, CDepletedAlloyAmmo);
+
+void CBuckshotAZAmmo::Spawn(void)
+{
+	Precache();
+	SET_MODEL(ENT(pev), "models/w_shotbox.mdl");
+	CBasePlayerAmmo::Spawn();
+}
+
+void CBuckshotAZAmmo::Precache(void)
+{
+	PRECACHE_MODEL("models/w_shotbox.mdl");
+	PRECACHE_SOUND("items/9mmclip1.wav");
+}
+
+BOOL CBuckshotAZAmmo::AddAmmo(CBaseEntity* pOther)
+{
+	if (pOther->GiveAmmo(20, "sgdrill_buckshot", 40) == -1)
+		return FALSE;
+
+	EMIT_SOUND(ENT(pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
+	return TRUE;
+}
+
+LINK_ENTITY_TO_CLASS(ammo_buckshotaz, CBuckshotAZAmmo);
 }

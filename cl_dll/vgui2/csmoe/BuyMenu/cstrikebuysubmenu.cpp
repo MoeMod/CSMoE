@@ -529,16 +529,16 @@ void CCSBuySubMenu::UpdateFavoriteSetsControls()
 
 	
 
-	fgrenBG->SetImage(m_SelectedItems.nFlashBang ? "gfx/vgui/flash" : "");
-	sgrenBG->SetImage(m_SelectedItems.nSmokeGrenade ? "gfx/vgui/sgren" : "");
-	dfBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/defuser" : "");
-	nvBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/nvgs" : "");
+	fgrenBG->SetImage(m_SelectedItems.nFlashBang ? "gfx/vgui/basket/flash" : "");
+	sgrenBG->SetImage(m_SelectedItems.nSmokeGrenade ? "gfx/vgui/basket/sgren" : "");
+	dfBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/basket/defuser" : "");
+	nvBG->SetImage(m_SelectedItems.bDefuser ? "gfx/vgui/basket/nvgs" : "");
 
 	switch (m_SelectedItems.iKelmet)
 	{
 	case ArmorType::NONE: kevBG->SetImage(""); break;
-	case ArmorType::ARMOR: kevBG->SetImage("gfx/vgui/vest"); break;
-	case ArmorType::ARMOR_HELMET: kevBG->SetImage("gfx/vgui/vesthelm"); break;
+	case ArmorType::ARMOR: kevBG->SetImage("gfx/vgui/basket/vest"); break;
+	case ArmorType::ARMOR_HELMET: kevBG->SetImage("gfx/vgui/basket/vesthelm"); break;
 	}
 }
 
@@ -580,7 +580,10 @@ void CCSBuySubMenu::OnBuySelectedItems()
 			szCommand += wpn;
 			szCommand += ';';
 		}
-	szCommand += "secammo;primammo;vesthelm;defuser";
+	szCommand += "secammo;primammo;vesthelm";
+	if (cl::gHUD.m_iModRunning == MOD_NONE && cl::gHUD.m_FollowIcon.m_iBombTargetsNum > 0) {
+		szCommand += ";defuser";
+	}
 	gEngfuncs.pfnClientCmd(const_cast<char *>(szCommand.c_str()));
 
 	OnCommand("vguicancel");

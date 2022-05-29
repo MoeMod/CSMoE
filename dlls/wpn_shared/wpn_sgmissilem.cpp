@@ -81,6 +81,9 @@ BOOL CSGMissilem::Deploy(void)
 	ResetChargeTimer();
 
 	m_pPlayer->m_rgAmmo[m_iSecondaryAmmoType] = m_iWeaponState;
+#ifndef CLIENT_DLL
+	ItemPreFrame();
+#endif
 
 	if (m_iWeaponState > 0 && m_iWeaponState <= 10)
 	{

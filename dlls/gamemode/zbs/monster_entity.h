@@ -15,6 +15,7 @@ namespace sv {
 
 enum MonsterClass
 {
+	MONSTER_CLASS_RANDOM,
 	MONSTER_CLASS_ZOMBIE,
 	MONSTER_CLASS_ZOMBIEDOG,
 };
@@ -32,6 +33,13 @@ enum MonsterAnim
 	MONSTERANIM_SKILL,
 };
 
+enum MonsterSkillStatus : byte
+{
+	SKILL_STATUS_READY,
+	SKILL_STATUS_USING,
+	SKILL_STATUS_FREEZING
+};
+
 class CMonster;
 
 struct BaseMonsterExtra
@@ -43,6 +51,22 @@ public:
 	CMonster * const m_pMonster;
 };
 
+class IBaseMonsterSkill : public BaseMonsterExtra
+{
+public:
+	IBaseMonsterSkill(CMonster* p) : BaseMonsterExtra(p) {}
+	virtual ~IBaseMonsterSkill() = 0;
+
+	virtual void OnThink() = 0;
+	virtual void OnTouch(CBaseEntity* other) = 0;
+	virtual void OnActivate(CBaseEntity *target) = 0;
+	virtual void OnReset() = 0;
+	virtual void OnKilled(entvars_t *pKiller, int iGib) = 0;
+	virtual MonsterSkillStatus GetStatus() const = 0;
+};
+
+inline IBaseMonsterSkill::~IBaseMonsterSkill() {}
+
 class IBaseMonsterStrategy : public BaseMonsterExtra
 {
 public:
@@ -51,6 +75,7 @@ public:
 
 	virtual void OnSpawn() = 0;
 	virtual void OnThink() = 0;
+	virtual void OnTouch(CBaseEntity* other) = 0;
 	virtual void OnKilled(entvars_t *pKiller, int iGib) = 0;
 
 	virtual void DeathSound() const = 0;
@@ -59,6 +84,61 @@ public:
 
 inline IBaseMonsterStrategy::~IBaseMonsterStrategy() {}
 
+class CBaseMonsterSkill : public IBaseMonsterSkill
+{
+public:
+	explicit CBaseMonsterSkill(CMonster* p) : IBaseMonsterSkill(p), m_iSkillStatus(SKILL_STATUS_READY) {}
+
+	void OnThink() override;
+	void OnTouch(CBaseEntity* other) override {}
+	void OnActivate(CBaseEntity* target) override {}
+	void OnReset() override { m_iSkillStatus = SKILL_STATUS_READY; }
+	void OnKilled(entvars_t* pKiller, int iGib) override {}
+	MonsterSkillStatus GetStatus() const override { return m_iSkillStatus; }
+
+protected:
+	virtual void OnSkillEnd() {}
+	virtual void OnSkillReady() {}
+
+protected:
+	MonsterSkillStatus m_iSkillStatus;
+	EngineClock::time_point m_flTimeSkillEnd;
+	EngineClock::time_point m_flTimeSkillNext;
+};
+
+class IBaseMonsterClass : public BaseMonsterExtra
+{
+public:
+	IBaseMonsterClass(CMonster* p) : BaseMonsterExtra(p) {}
+	virtual ~IBaseMonsterClass() = 0;
+
+	virtual void OnInit() = 0;
+	virtual void OnSpawn() = 0;
+	virtual void OnThink() = 0;
+	virtual void OnTouch(CBaseEntity* other) = 0;
+	virtual void OnKilled(entvars_t* pKiller, int iGib) = 0;
+
+	virtual const Vector GetCenterid() const = 0;
+	virtual void DeathSound() const = 0;
+};
+
+inline IBaseMonsterClass::~IBaseMonsterClass() {}
+
+class CBaseMonsterClass : public IBaseMonsterClass
+{
+public:
+	explicit CBaseMonsterClass(CMonster* p) : IBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void OnSpawn() override {}
+	void OnThink() override {}
+	void OnTouch(CBaseEntity* other) override {}
+	void OnKilled(entvars_t* pKiller, int iGib) override  {}
+
+	const Vector GetCenterid() const override;
+	void DeathSound() const override;
+};
+
 class CMonsterModStrategy_Default : public IBaseMonsterStrategy
 {
 public:
@@ -66,6 +146,7 @@ public:
 
 	void OnSpawn() override;
 	void OnThink() override;
+	void OnTouch(CBaseEntity* other) override;
 	void OnKilled(entvars_t *pKiller, int iGib) override;
 
 	void DeathSound() const override;
@@ -73,6 +154,18 @@ public:
 	{
 		return that->pev->team == TEAM_TERRORIST;
 	}
+
+public:
+	std::shared_ptr<IBaseMonsterClass> m_pClass;
+	std::unique_ptr<IBaseMonsterSkill> m_pSkill;
+	
+public:
+	void SetClass(MonsterClass iClass);
+	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr)
+	{
+		m_pSkill = std::move(ptr);
+	}
+	std::shared_ptr<CBaseMonsterClass> MonsterClassFactory(MonsterClass iClass);
 };
 
 class CMonster : public CHostage
@@ -123,9 +216,11 @@ public:
 	float m_flAttackDamage;
 	int m_iKillBonusMoney;
 	int m_iKillBonusFrags;
-	int m_iClass;
+	MonsterClass m_iClass;
 	EngineClock::time_point m_flTimeLastActive;
 	EngineClock::time_point m_flTargetChange;
+	EngineClock::time_point m_flSkillCheck;
+	EngineClock::time_point m_flStop;
 
 	std::map<std::string, int> m_mapLookupSequenceCache;
 	std::mutex m_mutexSetAnimation;
@@ -133,6 +228,38 @@ public:
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
 	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
+public:
+	void SetClass(MonsterClass iClass);
+	void SetSkill(std::unique_ptr<IBaseMonsterSkill> ptr);
+};
+
+class CMonsterClass_Normal : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Normal(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void DeathSound() const override;
+};
+
+class CMonsterSkill_Dog : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Dog(CMonster* p) : CBaseMonsterSkill(p) {}
+
+	void OnActivate(CBaseEntity* target) override;
+	void OnTouch(CBaseEntity* other) override;
+	void OnSkillEnd() override;
+};
+
+class CMonsterClass_Dog : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Dog(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	const Vector GetCenterid() const override;
+	void DeathSound() const override;
 };
 
 }

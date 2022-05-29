@@ -514,11 +514,13 @@ void CPlayerModStrategy_ZB2::Evolution(ZombieLevel iEvolutionLevel)
 	if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN)
 	{
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 7000.0f;
+		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue = 500.0f;
 	}
 	else if (iEvolutionLevel == ZOMBIE_LEVEL_ORIGIN_LV2)
 	{
 		m_pPlayer->pev->health = m_pPlayer->pev->max_health = 14000.0f;
+		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue = 1000.0f;
 	}
 

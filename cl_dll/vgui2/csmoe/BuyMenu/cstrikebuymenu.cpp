@@ -173,6 +173,7 @@ void CCSBaseBuyMenu::SetTeam(int iTeam)
 void CCSBaseBuyMenu::UpdateGameMode()
 {
 	ResetHistory();
+	ResetCurrentSubPanel();
 	if (m_pMainMenu)
 		m_pMainMenu->DeletePanel();
 

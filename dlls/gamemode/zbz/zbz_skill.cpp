@@ -10,6 +10,7 @@
 #include "gamemode/zbz/zbz_const.h"
 #include "gamemode/zbz/zbz_skill.h"
 #include "weapons/KnifeAttack.h"
+#include "m95tigernet.h"
 
 namespace sv {
 	int g_iKnifeMasterSpr;
@@ -600,13 +601,13 @@ namespace sv {
 			if (m_Status != 2)
 				return;
 
-			data.flFlying = data.flDucking = data.flNotOnGround *= GetKnockbackBonus();
-			data.flVelocityModifier *= GetVelModifiedBonus();
+			data.flOnGround = data.flFlying = data.flDucking = data.flNotOnGround *= GetKnockbackBonus();
+			data.flVelocityModifier = min(data.flVelocityModifier *= GetVelModifiedBonus(), 1.0);
 		}
 	private:
-		float GetBonus() const { return max(0.0f, 1.0f - (0.1f + 0.02f * g_pGameRules->m_iTotalRoundsPlayed)); }
-		float GetKnockbackBonus() const { return max(0.0f, 1.0f - (0.1f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed)); }
-		float GetVelModifiedBonus() const { return max(0.0f, 1.0f - (0.1f + 0.4f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetBonus() const { return max(0.0f, 1.0f - (0.1f + 0.01f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetKnockbackBonus() const { return max(0.0f, 1.0f - (0.1f + 0.025f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetVelModifiedBonus() const { return max(0.0f, 1.0f + (0.1f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed)); }
 		time_point_t m_flTime;
 		byte m_Status;
 	};
@@ -1942,12 +1943,12 @@ namespace sv {
 	public:
 		explicit ZSkill_GoldClip(CBasePlayer* player) : CZombieZSkill_Base(player) {}
 		const char* GetName() const override { return "金色弹夹"; }
-		const char* GetDesc() const override { return "切出当前武器 10s - 回合数 * 0.5s (最短5s) 以后自动装填子弹，该技能只对主武器副武器生效"; }
+		const char* GetDesc() const override { return "切出当前武器 8s - 回合数 * 0.5s (最短3s) 以后自动装填子弹，该技能只对主武器副武器生效"; }
 		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
 
 		void OnHolster_Post(CBasePlayerWeapon* weapon)
 		{
-			weapon->m_flHolsterTime = gpGlobals->time + max(5.0s, (10.0s - g_pGameRules->m_iTotalRoundsPlayed * 0.5s));
+			weapon->m_flHolsterTime = gpGlobals->time + max(3.0s, (8.0s - g_pGameRules->m_iTotalRoundsPlayed * 0.5s));
 		}
 
 		void OnDeployWeapon(CBasePlayerItem* item)
@@ -1959,6 +1960,14 @@ namespace sv {
 			if (pWeapon->m_flHolsterTime != invalid_time_point && pWeapon->m_flHolsterTime < gpGlobals->time)
 			{
 				pWeapon->m_flHolsterTime = invalid_time_point;
+				if (pWeapon->m_iId == WEAPON_CANNON
+					|| pWeapon->m_iId == WEAPON_BOW
+					|| pWeapon->m_iId == WEAPON_Z4B_CANNONPLASMA
+					|| pWeapon->m_iId == WEAPON_Z4B_CANNONTIGER
+					|| pWeapon->m_iId == WEAPON_HUNTBOW
+					|| pWeapon->m_iId == WEAPON_CANNONEX
+					|| pWeapon->m_iId == WEAPON_SPEARGUN)
+					return;
 				switch (pWeapon->iItemSlot())
 				{
 				case PRIMARY_WEAPON_SLOT:
@@ -2027,7 +2036,238 @@ namespace sv {
 		}
 	};
 
+	class ZSkill_NetRound : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_NetRound(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "能量网"; }
+		const char* GetDesc() const override { return "攻击时较低概率自动发射能量网，暂时禁锢敌方行动。"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+		void OnAdjustFireBullets3Dir(Vector& vecDir) override {
+			if (!IsActivate())
+				return;
+			if (!m_pPlayer->m_pActiveItem)
+				return;
+			if (m_pPlayer->m_pActiveItem->iItemSlot() == KNIFE_SLOT)
+				return;
+			if (m_flCooldown > gpGlobals->time)
+				return;
+			if (RANDOM_FLOAT(0, 1) > GetChance())
+				return;
 
+			m_flCooldown = gpGlobals->time + GetCooldown();
+			UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
+
+			Vector vecSrc = m_pPlayer->GetGunPosition();
+			CM95TigerNet* pEnt = static_cast<CM95TigerNet*>(CBaseEntity::Create("m95tiger_net", vecSrc, UTIL_VecToAngles(gpGlobals->v_forward), ENT(m_pPlayer->pev)));
+			if (pEnt)
+			{
+				pEnt->pev->velocity = gpGlobals->v_forward * 2000;
+				pEnt->SetLockTime(1.5s);
+			}
+		}
+	private:
+		duration_t GetCooldown() const { return 5.0s; }
+		float GetChance() const { return 0.01f + 0.015f * g_pGameRules->m_iTotalRoundsPlayed; }
+		time_point_t m_flCooldown;
+	};
+
+	class ZSkill_EmergencyEscape : public CZombieZSkill_Base
+	{
+	public:
+		explicit ZSkill_EmergencyEscape(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+		const char* GetName() const override { return "弹射座椅"; }
+		const char* GetDesc() const override { return "即将被僵尸击败时，弹射到空中并击退周围敌人"; }
+		ZombieZSkillType GetType() const override { return TYPE_HUMAN; }
+
+		void OnSpawn() override {
+			if(!m_pPlayer->m_bIsZombie)
+				m_pPlayer->m_iBuff |= BUFF_EMERGENCYESCAPE;
+		}
+		void OnGetSkill() override {
+			if (!m_pPlayer->m_bIsZombie)
+				m_pPlayer->m_iBuff |= BUFF_EMERGENCYESCAPE;
+		}
+	};
+
+	//class ZSkill_HuntierInstinct : public CZombieZSkill_Base
+	//{bug
+	//public:
+	//	explicit ZSkill_HuntierInstinct(CBasePlayer* player) : CZombieZSkill_Base(player) {}
+	//	const char* GetName() const override { return "狩猎本能"; }
+	//	const char* GetDesc() const override { return "定期将周围敌人指定为目标。大幅增加面对被指定目标的战斗能力。"; } // （5+2*回合数）
+	//	ZombieZSkillType GetType() const override { return TYPE_GENERAL; }
+
+	//	void OnThink() override {
+	//		if (!m_pEnemyList.empty())
+	//		{
+	//			for (CBaseEntity* pEntity : m_pEnemyList)
+	//			{
+	//				if (!pEntity)
+	//					continue;
+
+	//				CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	//				if (!pPlayer)
+	//					continue;
+
+	//				if (m_pPlayer->m_bIsZombie)
+	//				{
+	//					if (DotProduct(pPlayer->pev->velocity.Normalize(), m_pPlayer->pev->velocity.Normalize()) > 0)
+	//					{
+	//						if (!m_bActivate)
+	//						{
+	//							m_bActivate = true;
+	//							m_pPlayer->ResetMaxSpeed();
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//		else
+	//		{
+	//			if (m_pPlayer->m_bIsZombie && m_bActivate)
+	//			{
+	//				m_bActivate = false;
+	//				m_pPlayer->ResetMaxSpeed();
+	//			}
+
+	//	/*		MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	//			WRITE_BYTE(16);
+	//			WRITE_BYTE(0);
+	//			WRITE_SHORT(0);
+	//			MESSAGE_END();*/
+	//		}
+
+	//		if (m_flCooldown > gpGlobals->time)
+	//			return;
+
+	//		m_flCooldown = gpGlobals->time + 15.0s;
+	//		float flRadius = GetRadius();
+	//		m_pEnemyList.clear();
+	//		CBaseEntity* pEntity = NULL;
+	//		while ((pEntity = UTIL_FindEntityInSphere(pEntity, m_pPlayer->pev->origin, flRadius)) != nullptr)
+	//		{
+	//			if (CheckTargetAvailable(pEntity, m_pPlayer->pev->v_angle))
+	//			{
+	//				EHANDLE eh;
+	//				eh.Set(pEntity->edict());
+	//				m_pEnemyList.push_back(eh);
+	//			}
+	//		}
+
+	//		if (!m_pEnemyList.empty())
+	//		{
+	//			for (CBaseEntity* pEntity : m_pEnemyList)
+	//			{
+	//				if (!pEntity)
+	//					continue;
+
+	//				CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	//				if (!pPlayer)
+	//					continue;
+
+	//				//become red
+
+	//				MESSAGE_BEGIN(MSG_ONE, gmsgMPToCL, NULL, m_pPlayer->pev);
+	//				WRITE_BYTE(16);
+	//				WRITE_BYTE(1);
+	//				WRITE_SHORT(pPlayer->entindex());
+	//				MESSAGE_END();
+	//			}
+	//		}
+	//	}
+
+	//	bool CheckTargetAvailable(CBaseEntity* a2, Vector vecAngleDirection)
+	//	{
+	//		if (!a2->IsPlayer())
+	//			return false;
+
+	//		if (!a2->IsAlive())
+	//			return false;
+
+	//		if (g_pGameRules->PlayerRelationship(m_pPlayer, a2) == GR_TEAMMATE)
+	//			return false;
+
+	//		if (a2->pev == m_pPlayer->pev)
+	//			return false;
+
+	//		Vector vecSrc = m_pPlayer->GetGunPosition();
+	//		Vector vecDelta = (a2->Center() - vecSrc).Normalize();
+
+	//		UTIL_MakeVectors(vecAngleDirection);
+
+	//		if (DotProduct(gpGlobals->v_forward, vecDelta) < 0)
+	//			return false;
+	//		
+	//		return true;
+	//	}
+
+	//	void OnResetMaxSpeed() override {
+	//		if (m_bActivate)
+	//			m_pPlayer->pev->maxspeed += GetBonus();
+	//	}
+
+	//	void OnTakeDamage(CBasePlayer* victim, entvars_t* pevInflictor, CBasePlayer* attacker, float& flDamage, int bitsDamageType) override {
+	//		if (attacker != m_pPlayer)
+	//			return;
+	//		if (!IsActivate())
+	//			return;
+	//		if (!m_pPlayer->m_pActiveItem)
+	//			return;
+	//		
+	//		if (m_pEnemyList.empty())
+	//			return;
+
+	//		for (CBaseEntity* pEntity : m_pEnemyList)
+	//		{
+	//			if (!pEntity)
+	//				continue;
+
+	//			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	//			if (!pPlayer)
+	//				continue;
+
+	//			if (pPlayer == victim)
+	//			{
+	//				flDamage += 4 + 2 * g_pGameRules->m_iTotalRoundsPlayed;
+	//				break;
+	//			}
+	//		}			
+	//	}
+
+	//	void OnApplyKnockback(CBasePlayer* attacker, KnockbackData& data) override {
+	//		if (!IsActivate())
+	//			return;
+
+	//		if (m_pEnemyList.empty())
+	//			return;
+
+	//		for (CBaseEntity* pEntity : m_pEnemyList)
+	//		{
+	//			if (!pEntity)
+	//				continue;
+
+	//			CBasePlayer* pPlayer = (CBasePlayer*)pEntity;
+	//			if (!pPlayer)
+	//				continue;
+
+	//			if (pPlayer == attacker)
+	//			{
+	//				data.flOnGround = data.flFlying = data.flDucking = data.flNotOnGround *= GetKnockbackBonus();
+	//				data.flVelocityModifier = min(data.flVelocityModifier += GetVelModifiedBonus(), 1.0);
+	//				break;
+	//			}
+	//		}		
+	//	}
+	//private:
+	//	std::vector<EHANDLE> m_pEnemyList;
+	//	time_point_t m_flCooldown;
+	//	float GetBonus() const { return 4.25f + 2.25f * g_pGameRules->m_iTotalRoundsPlayed; }
+	//	float GetRadius() const { return (12.8 + 0.8 * g_pGameRules->m_iTotalRoundsPlayed) * 39.37; }
+	//	float GetKnockbackBonus() const { return max(0.3f, 1.0f - (0.12f + 0.06f * g_pGameRules->m_iTotalRoundsPlayed)); }
+	//	float GetVelModifiedBonus() const { return (0.025f + 0.006f * g_pGameRules->m_iTotalRoundsPlayed); }
+	//	bool m_bActivate;
+	//};
 
 	template<class T>
 	std::shared_ptr<CZombieZSkill_Base> MakeSkill(CBasePlayer* player)
@@ -2078,6 +2318,7 @@ namespace sv {
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
 		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
 		{ Skill_ZombieS, 50, MakeSkill<ZSkill_ZombieS>},
+
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
 		{ Skill_Adaptability, 100, MakeSkill<ZSkill_Adaptability> },
 		{ Skill_ZombiBombGiveaway, 50, MakeSkill<ZSkill_ZombiBombGiveaway> },
@@ -2088,6 +2329,9 @@ namespace sv {
 		{ Skill_GoldClip, 100, MakeSkill<ZSkill_GoldClip> },
 		{ Skill_QuickChange, 100, MakeSkill<ZSkill_QuickChange> },
 		{ Skill_Penetration, 100, MakeSkill<ZSkill_Penetration> },
+
+		{ Skill_NetRound, 50, MakeSkill<ZSkill_NetRound> },
+		{ Skill_EmergencyEscape, 25, MakeSkill<ZSkill_EmergencyEscape> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

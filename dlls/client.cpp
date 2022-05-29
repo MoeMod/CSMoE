@@ -3566,11 +3566,13 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 			{
 				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
+#ifdef XASH_DEDICATED
             else if (FStrEq(pcmd, "moe_admin"))
             {
                 if(!strcmp(CMD_ARGV_(1), "CPlayerModStrategy_ZB3"))
                     admin::ShowAdminMenu(player);
             }
+#endif
 			else
 			{
 				if (HandleBuyAliasCommands(player, pcmd))

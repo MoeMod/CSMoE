@@ -588,9 +588,12 @@ void TextImage::RecalculateEllipsesPosition()
 
 	// don't truncate strings with newlines
 #ifdef _WIN32
-	for (auto p = _utext; p; ++p)
-		if (*p == '\n')
+	for (auto* p = _utext; *p != 0; ++p)
+	{
+		auto ch = p[0];
+		if (ch == '\n')
 			return;
+	}
 #else
 	if (wcschr(_utext, '\n') != NULL)
 		return;

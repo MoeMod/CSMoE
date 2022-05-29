@@ -3,12 +3,14 @@
 #include "cbase.h"
 
 #include "monster_entity.h"
-
 #include "monster_manager.h"
 
 #include <vector>
 #include <algorithm>
 #include <iterator>
+
+//#define __AUTO_RESIZE__
+#define __MAX_NPC_COUNT 256
 
 namespace sv {
 
@@ -29,6 +31,12 @@ public:
 				[](const std::weak_ptr<CMonster *> &p) { return p.lock(); });
 		vecAvailable.erase(std::remove(vecAvailable.begin(), vecAvailable.end(), nullptr), vecAvailable.end());
 
+		if (vecAvailable.size() <= new_size)
+		{
+			m_vecEntities.assign(vecAvailable.begin(), vecAvailable.end());
+			return;
+		}
+
 		std::nth_element(vecAvailable.begin(), vecAvailable.begin() + new_size, vecAvailable.end(),
 				[](const std::shared_ptr<CMonster *> &a, const std::shared_ptr<CMonster *> &b) { return (*a)->m_flTimeLastActive > (*b)->m_flTimeLastActive; });
 
@@ -40,16 +48,18 @@ public:
 
 	void AutoResizeCheck()
 	{
+#ifdef __AUTO_RESIZE__
 		if (m_vecEntities.size() >= m_iMaxEntitiesNum) {
 			// kills a quarter inactive zombies
 			ResizeEntities(m_iMaxEntitiesNum * m_flAutoGcRatio);
 		}
+#endif // __AUTO_RESIZE__
 	}
 };
 
 CMonsterManager::CMonsterManager() : pimpl(new impl_t())
 {
-	SetMaxNumOfEntity(256);
+	SetMaxNumOfEntity(__MAX_NPC_COUNT);
 	SetAutoGcRatio(0.8f);
 }
 
@@ -67,6 +77,15 @@ void CMonsterManager::OnEntityAdd(std::shared_ptr<CMonster *> &holder)
 
 size_t CMonsterManager::EntityCount()
 {
+	std::vector<std::shared_ptr<CMonster*>> vecAvailable;
+	std::transform(pimpl->m_vecEntities.begin(), pimpl->m_vecEntities.end(), std::back_inserter(vecAvailable),
+		[](const std::weak_ptr<CMonster*>& p) { return p.lock(); });
+	vecAvailable.erase(std::remove(vecAvailable.begin(), vecAvailable.end(), nullptr), vecAvailable.end());
+
+	if (vecAvailable.size() != pimpl->m_vecEntities.size())
+	{
+		pimpl->m_vecEntities.assign(vecAvailable.begin(), vecAvailable.end());
+	}
 	return pimpl->m_vecEntities.size();
 }
 

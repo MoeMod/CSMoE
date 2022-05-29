@@ -371,6 +371,8 @@ bool isSniperRifle(CBasePlayerItem *item)
 	case WEAPON_SPRIFLE:
 	case WEAPON_BPGM:
 	case WEAPON_ZGUN:
+	case WEAPON_Z4B_BARRETTD:
+	case WEAPON_Z4B_FREEDOM:
 		return true;
 
 	default:
@@ -398,7 +400,9 @@ bool CCSBot::IsUsingAWP() const
 		|| weapon->m_iId == WEAPON_Z4B_XM2010PC
 		|| weapon->m_iId == WEAPON_M95
 		|| weapon->m_iId == WEAPON_M95XMAS
-		|| weapon->m_iId == WEAPON_SFSNIPER))
+		|| weapon->m_iId == WEAPON_SFSNIPER
+		|| weapon->m_iId == WEAPON_Z4B_BARRETTD
+		|| weapon->m_iId == WEAPON_Z4B_FREEDOM))
 		return true;
 
 	return false;

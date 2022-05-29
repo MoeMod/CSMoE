@@ -160,6 +160,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("z4b_m37se");
 	UTIL_PrecacheOtherWeapon("weapon_ak47dragon");
 	UTIL_PrecacheOtherWeapon("weapon_stg44");
+	UTIL_PrecacheOther("ammo_792nato");
 	UTIL_PrecacheOtherWeapon("weapon_gatlingex");
 	UTIL_PrecacheOtherWeapon("knife_knifedragon");
 	UTIL_PrecacheOther("ammo_50bmg");
@@ -257,6 +258,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_buffm249");
 	UTIL_PrecacheOther("ammo_762natoboxame");
 	UTIL_PrecacheOtherWeapon("weapon_buffm4");
+	UTIL_PrecacheOther("ammo_buffbullet");
 	UTIL_PrecacheOtherWeapon("knife_stormgiant");
 	UTIL_PrecacheOtherWeapon("weapon_buffak");
 	UTIL_PrecacheOtherWeapon("weapon_bison");
@@ -318,6 +320,7 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sgmissilem");
 	UTIL_PrecacheOtherWeapon("weapon_sgmissileex");
 	UTIL_PrecacheOtherWeapon("weapon_cheytaclrrs");
+	UTIL_PrecacheOther("ammo_408cheytac");
 	UTIL_PrecacheOtherWeapon("weapon_m400");
 	UTIL_PrecacheOtherWeapon("weapon_m82");
 	UTIL_PrecacheOtherWeapon("weapon_m24");
@@ -329,6 +332,20 @@ void W_Precache()
 	UTIL_PrecacheOtherWeapon("weapon_sl8ex");
 	UTIL_PrecacheOtherWeapon("weapon_sprifle");
 	UTIL_PrecacheOtherWeapon("weapon_spsmg");
+	UTIL_PrecacheOtherWeapon("z4b_holyfist");
+	UTIL_PrecacheOtherWeapon("z4b_dualstinger");
+	UTIL_PrecacheOtherWeapon("z4b_freedom");
+	UTIL_PrecacheOtherWeapon("z4b_csg12ss");
+	UTIL_PrecacheOtherWeapon("weapon_skull8");
+	UTIL_PrecacheOtherWeapon("weapon_skull4");
+	UTIL_PrecacheOtherWeapon("weapon_skull6");
+	UTIL_PrecacheOtherWeapon("weapon_m249ep");
+	UTIL_PrecacheOtherWeapon("z4b_heartstimulater");
+	UTIL_PrecacheOtherWeapon("z4b_syringe");
+	UTIL_PrecacheOtherWeapon("weapon_skull1");
+	UTIL_PrecacheOther("ammo_50aeaz");
+	UTIL_PrecacheOther("ammo_depletedalloy");
+	UTIL_PrecacheOther("ammo_buckshotaz");
 
 	if (g_pGameRules->IsDeathmatch())
 	{

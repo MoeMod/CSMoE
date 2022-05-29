@@ -1178,7 +1178,7 @@ int CHudAmmo::Draw(float flTime)
 	}
 	else if( gHUD.m_iFOV > 40 )
 	{
-		if (m_pWeapon && m_pWeapon->iId == WEAPON_SKULL5 && gHUD.m_iFOV <= 80)
+		if (m_pWeapon && (m_pWeapon->iId == WEAPON_SKULL5 || m_pWeapon->iId == WEAPON_SKULL6) && gHUD.m_iFOV < 90)
 		{
 			if (!switchCrosshairType)
 			{

@@ -123,11 +123,14 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 		else
 			improv->Walk();
 
-		const float movedRange = 35.0f;
-		if ((m_lastLeaderPos - m_leader->pev->origin).IsLengthGreaterThan(movedRange))
+		if (!FClassnameIs(improv->GetEntity()->pev, "monster_entity"))
 		{
-			improv->MoveTo(m_leader->pev->origin);
-			m_lastLeaderPos = m_leader->pev->origin;
+			const float movedRange = 35.0f;
+			if ((m_lastLeaderPos - m_leader->pev->origin).IsLengthGreaterThan(movedRange))
+			{
+				improv->MoveTo(m_leader->pev->origin);
+				m_lastLeaderPos = m_leader->pev->origin;
+			}
 		}
 
 		return;
@@ -143,52 +146,56 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 			improv->Chatter(HOSTAGE_CHATTER_IMPATIENT_FOR_RESCUE, false);
 	}
 
-	const float closeRange = 200.0f;
-	if ((m_leader->pev->origin - improv->GetCentroid()).IsLengthLessThan(closeRange))
+	// remove hostage's stuff
+	if (!FClassnameIs(improv->GetEntity()->pev, "monster_entity"))
 	{
-		bool makeWay = false;
-		const float cosTolerance = 0.99f;
-
-		if (improv->IsPlayerLookingAtMe(static_cast<CBasePlayer *>(static_cast<CBaseEntity *>(m_leader)), cosTolerance))
+		const float closeRange = 200.0f;
+		if ((m_leader->pev->origin - improv->GetCentroid()).IsLengthLessThan(closeRange))
 		{
-			if (!m_makeWayTimer.HasStarted())
+			bool makeWay = false;
+			const float cosTolerance = 0.99f;
+
+			if (improv->IsPlayerLookingAtMe(static_cast<CBasePlayer *>(static_cast<CBaseEntity *>(m_leader)), cosTolerance))
 			{
-				m_makeWayTimer.Start(RandomDuration<float>(0.4s, 0.75s));
-			}
-			else if (m_makeWayTimer.IsElapsed())
-			{
-				m_impatientTimer.Invalidate();
-
-				Vector to = (m_leader->pev->origin - improv->GetCentroid());
-				to.NormalizeInPlace();
-
-				Vector cross(-to.y, -to.x, 0);
-				if (cross.x * gpGlobals->v_forward.x - cross.y * gpGlobals->v_forward.y < 0)
-					cross.y = to.x;
-				else
-					cross.x = to.y;
-
-				float ground;
-				float const sideStepSize = 15.0f;
-				Vector sideStepPos = improv->GetFeet() + cross * sideStepSize;
-
-				if (GetGroundHeight(&sideStepPos, &ground))
+				if (!m_makeWayTimer.HasStarted())
 				{
-					if (abs((int)(ground - improv->GetFeet().z)) < 18.0f)
-					{
-						const float push = 20.0f;
-						Vector lat = cross * push;
+					m_makeWayTimer.Start(RandomDuration<float>(0.4s, 0.75s));
+				}
+				else if (m_makeWayTimer.IsElapsed())
+				{
+					m_impatientTimer.Invalidate();
 
-						improv->ApplyForce(lat);
-						improv->MoveTo(sideStepPos);
-						return;
+					Vector to = (m_leader->pev->origin - improv->GetCentroid());
+					to.NormalizeInPlace();
+
+					Vector cross(-to.y, -to.x, 0);
+					if (cross.x * gpGlobals->v_forward.x - cross.y * gpGlobals->v_forward.y < 0)
+						cross.y = to.x;
+					else
+						cross.x = to.y;
+
+					float ground;
+					float const sideStepSize = 15.0f;
+					Vector sideStepPos = improv->GetFeet() + cross * sideStepSize;
+
+					if (GetGroundHeight(&sideStepPos, &ground))
+					{
+						if (abs((int)(ground - improv->GetFeet().z)) < 18.0f)
+						{
+							const float push = 20.0f;
+							Vector lat = cross * push;
+
+							improv->ApplyForce(lat);
+							improv->MoveTo(sideStepPos);
+							return;
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			m_makeWayTimer.Invalidate();
+			else
+			{
+				m_makeWayTimer.Invalidate();
+			}
 		}
 	}
 

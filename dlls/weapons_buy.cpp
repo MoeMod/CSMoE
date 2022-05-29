@@ -123,6 +123,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "csgo_sawedoff",	WEAPON_CSGO_SAWEDOFF },
 	{ "qbarrel",	WEAPON_QBARREL },
 	{ "tbarrel",	WEAPON_TBARREL },
+	{ "csg12ss",	WEAPON_Z4B_CSG12SS },
 
 	{ "csgo_bizon",	WEAPON_CSGO_BIZON },
 	{ "k1a",	WEAPON_K1A },
@@ -163,6 +164,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "lightzg",	WEAPON_LIGHTZG },
 	{ "heavyzg",	WEAPON_HEAVYZG },
 	{ "ak47g",	WEAPON_AK47G },
+	{ "skull4",	WEAPON_SKULL4 },
 
 	{ "as50",	WEAPON_AS50 },
 	{ "as50g",	WEAPON_AS50G },
@@ -190,6 +192,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "bpgm",	WEAPON_BPGM },
 	{ "zgun",	WEAPON_ZGUN },
 	{ "barrettd",	WEAPON_Z4B_BARRETTD },
+	{ "freedom",	WEAPON_Z4B_FREEDOM },
 
 	{ "balrog7",	WEAPON_BALROG7 },
 	{ "buffm249",	WEAPON_BUFFM249 },
@@ -208,6 +211,9 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "hk23",	WEAPON_HK23 },
 	{ "m60",	WEAPON_M60 },
 	{ "mk48",	WEAPON_MK48 },
+	{ "skull8",	WEAPON_SKULL8 },
+	{ "skull6",	WEAPON_SKULL6 },
+	{ "m249ep",	WEAPON_M249EP },
 
 	{ "crossbow",	WEAPON_CROSSBOW },
 	{ "chainsaw",	WEAPON_CHAINSAW },
@@ -227,6 +233,7 @@ DLL_GLOBAL WeaponAliasInfo weaponAliasInfo[] =
 	{ "sgmissile",	WEAPON_SGMISSILE },
 	{ "sgmissilem",	WEAPON_SGMISSILEM },
 	{ "sgmissileex",	WEAPON_SGMISSILEEX },
+	{ "syringe",	WEAPON_Z4B_SYRINGE },
 	
 	{ NULL,		WEAPON_NONE }
 };
@@ -269,7 +276,10 @@ DLL_GLOBAL KnifeAliasInfo knifeInfo[] =
 	{ "knife_mastercombat",	KNIFE_MASTERCOMBAT },
 	{ "knife_hdagger",	KNIFE_HDAGGER },
 	{ "knife_axe",	KNIFE_AXE },
-	{ "knife_hammer",	KNIFE_HAMMER }
+	{ "knife_hammer",	KNIFE_HAMMER },
+	{ "z4b_holyfist",	KNIFE_HOLYFIST },
+	{ "z4b_dualstinger",	KNIFE_DUALSTINGER },
+	{ "z4b_heartstimulater",	KNIFE_HEARTSTIMULATER },
 };
 
 // must same as classname
@@ -374,18 +384,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "rifle",	WEAPONCLASS_RIFLE },
 	{ "sniper",	WEAPONCLASS_SNIPERRIFLE },
 	{ "none",	WEAPONCLASS_NONE },
-	{ "skull5",	WEAPONCLASS_SNIPERRIFLE },
-	{ "sfsniper",	WEAPONCLASS_SNIPERRIFLE },
-	{ "plasmagun",	WEAPONCLASS_RIFLE },
-	{ "zombielaw",	WEAPONCLASS_RIFLE },
-	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
-	{ "cheytaclrrs",	WEAPONCLASS_SNIPERRIFLE },
-	{ "m400",	WEAPONCLASS_SNIPERRIFLE },
-	{ "m82",	WEAPONCLASS_SNIPERRIFLE },
-	{ "m24",	WEAPONCLASS_SNIPERRIFLE },
-	{ "trg42",	WEAPONCLASS_SNIPERRIFLE },
-	{ "aw50",	WEAPONCLASS_SNIPERRIFLE },
-	{ "trg42g",	WEAPONCLASS_SNIPERRIFLE },
+	
 	{ "anaconda",	WEAPONCLASS_PISTOL },
 	{ "deagled",	WEAPONCLASS_PISTOL },
 	{ "desperado",	WEAPONCLASS_PISTOL },
@@ -430,7 +429,9 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bison",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "tmpdragon",	WEAPONCLASS_SUBMACHINEGUN },
 	{ "spsmg",	WEAPONCLASS_SUBMACHINEGUN },
+	{ "csg12ss",	WEAPONCLASS_SUBMACHINEGUN },
 
+	{ "bow",	WEAPONCLASS_RIFLE },
 	{ "ak47dragon",	WEAPONCLASS_RIFLE },
 	{ "ak47l",	WEAPONCLASS_RIFLE },
 	{ "buffsg552ex",	WEAPONCLASS_RIFLE },
@@ -456,6 +457,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "lightzg",	WEAPONCLASS_RIFLE },
 	{ "heavyzg",	WEAPONCLASS_RIFLE },
 	{ "ak47g",	WEAPONCLASS_RIFLE },
+	{ "skull4",	WEAPONCLASS_RIFLE },
 
 	{ "as50",	WEAPONCLASS_SNIPERRIFLE },
 	{ "as50g",	WEAPONCLASS_SNIPERRIFLE },
@@ -483,6 +485,7 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "bpgm",	WEAPONCLASS_SNIPERRIFLE },
 	{ "zgun",	WEAPONCLASS_SNIPERRIFLE },
 	{ "barrettd",	WEAPONCLASS_SNIPERRIFLE },
+	{ "freedom",	WEAPONCLASS_SNIPERRIFLE },
 
 	{ "balrog7",	WEAPONCLASS_MACHINEGUN },
 	{ "buffm249",	WEAPONCLASS_MACHINEGUN },
@@ -501,6 +504,30 @@ DLL_GLOBAL WeaponClassAliasInfo weaponClassAliasInfo[] =
 	{ "hk23",	WEAPONCLASS_MACHINEGUN },
 	{ "m60",	WEAPONCLASS_MACHINEGUN },
 	{ "mk48",	WEAPONCLASS_MACHINEGUN },
+	{ "skull8",	WEAPONCLASS_MACHINEGUN },
+	{ "skull6",	WEAPONCLASS_MACHINEGUN },
+	{ "m249ep",	WEAPONCLASS_MACHINEGUN },
+
+	{ "crossbow",	WEAPONCLASS_EQUIPMENT },
+	{ "chainsaw",	WEAPONCLASS_EQUIPMENT },
+	{ "cannon",	WEAPONCLASS_EQUIPMENT },
+	{ "z4b_cannonplasma",	WEAPONCLASS_EQUIPMENT },
+	{ "z4b_cannontiger",	WEAPONCLASS_EQUIPMENT },
+	{ "gungnir",	WEAPONCLASS_EQUIPMENT },
+	{ "huntbow",	WEAPONCLASS_EQUIPMENT },
+	{ "sgdrill",	WEAPONCLASS_EQUIPMENT },
+	{ "revivegun",	WEAPONCLASS_EQUIPMENT },
+	{ "csgo_zeus",	WEAPONCLASS_EQUIPMENT },
+	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
+	{ "m32venom",	WEAPONCLASS_EQUIPMENT },
+	{ "cannonex",	WEAPONCLASS_EQUIPMENT },
+	{ "speargun",	WEAPONCLASS_EQUIPMENT },
+	{ "sgmissile",	WEAPONCLASS_EQUIPMENT },
+	{ "sgmissilem",	WEAPONCLASS_EQUIPMENT },
+	{ "sgmissileex",	WEAPONCLASS_EQUIPMENT },
+
+	{ "syringe",	WEAPONCLASS_EQUIPMENT },
+	{ "zombielaw",	WEAPONCLASS_EQUIPMENT },
 
 	{ "knife",	WEAPONCLASS_KNIFE },
 	{ NULL,		WEAPONCLASS_NONE }
@@ -738,7 +765,12 @@ bool IsPrimaryWeapon(int id)
 	case WEAPON_SGMISSILE:
 	case WEAPON_SGMISSILEM:
 	case WEAPON_SGMISSILEEX:
-
+	case WEAPON_Z4B_FREEDOM:
+	case WEAPON_Z4B_CSG12SS:
+	case WEAPON_SKULL8:
+	case WEAPON_SKULL4:
+	case WEAPON_SKULL6:
+	case WEAPON_M249EP:
 		return true;
 	default:
 		break;
@@ -778,6 +810,7 @@ bool IsSecondaryWeapon(int id)
 	case WEAPON_VOIDPISTOL:
 	case WEAPON_Y21S1JETGUNMD:
 	case WEAPON_M950:
+	case WEAPON_SKULL1:
 		return true;
 	default:
 		break;

@@ -211,6 +211,23 @@ namespace sv {
                         ShowSelectTargetPlayerMenu(adminid, std::string() + "发武器(" + ii.pszDisplayName + ")", [ii](CBasePlayer *player) {
                             if(player && player->IsAlive())
                             {
+                                switch (ii.iSlot) {
+                                case PRIMARY_WEAPON_SLOT:
+                                    DropPrimary(player);
+                                    break;
+                                case PISTOL_SLOT:
+                                    DropSecondary(player);
+                                    break;
+                                case KNIFE_SLOT:             
+                                    player->RemovePlayerItem(player->m_rgpPlayerItems[KNIFE_SLOT]);
+                                    player->m_iKnifeID = AliasToKnifeType(ii.pszClassName);                  
+                                    break;
+                                case GRENADE_SLOT:
+                                    player->m_iGrenadeID = AliasToGrenadeType(ii.pszClassName);
+                                    break;
+                                default:
+                                    break;
+                                }
                                 player->GiveNamedItem(ii.pszClassName);
                             }
                         });

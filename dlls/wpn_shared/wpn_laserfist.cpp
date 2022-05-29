@@ -71,7 +71,7 @@ int CLaserFist::GetItemInfo(ItemInfo *p)
 	p->iMaxClip = 500;
 	p->iSlot = 0;
 	p->iPosition = 8;
-	p->iId = m_iId = WEAPON_P90;
+	p->iId = m_iId = WEAPON_LASERFIST;
 	p->iFlags = 0;
 	p->iWeight = P90_WEIGHT;
 

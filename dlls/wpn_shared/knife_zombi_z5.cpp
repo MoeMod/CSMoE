@@ -265,7 +265,7 @@ namespace sv {
 			flRange += (m_iState - 2) * 10.0;
 			Vector vecEnd = vecSrc + gpGlobals->v_forward * flRange;
 
-			float flDamage = 1000 + (m_iState - 2) * 300.0;
+			float flDamage = 1500 + (m_iState - 2) * 300.0;
 			m_iState = 0;
 
 			switch (KnifeAttack5(flDamage, flRange, 90, DMG_NEVERGIB | DMG_EXPLOSION, this->pev, m_pPlayer))
@@ -389,7 +389,7 @@ namespace sv {
 			ClearMultiDamage();
 			if (pEntity)
 			{
-				pEntity->TraceAttack(m_pPlayer->pev, 300, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
+				pEntity->TraceAttack(m_pPlayer->pev, 500, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
 			}
 			ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
 

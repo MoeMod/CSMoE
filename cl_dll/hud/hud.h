@@ -817,6 +817,7 @@ private:
 	UniqueTexture m_iM95TigerScope[2];
 	UniqueTexture m_iM95TigerScopeCorner;
 	UniqueTexture m_iCheytaclrrsScope;
+	UniqueTexture m_iFreedomScope;
 };
 
 //

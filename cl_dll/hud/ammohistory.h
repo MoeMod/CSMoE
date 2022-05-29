@@ -41,7 +41,8 @@ public:
 	void Reset( void )
 	{
 		iOldWeaponBits = 0;
-		memset( rgSlots, 0, sizeof rgSlots );
+		// Fix for gmsgResetHUD
+		// memset( rgSlots, 0, sizeof rgSlots );
 		memset( riAmmo, 0, sizeof riAmmo );
 	}
 

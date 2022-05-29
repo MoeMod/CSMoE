@@ -395,7 +395,7 @@ void CKnifeSkullT9::PrimaryAttack(void)
 	SetThink(&CKnifeSkullT9::DelayPrimaryAttack);
 	pev->nextthink = gpGlobals->time + 0.9s;
 
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.3s;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.2s;
 	m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 2s;
 }
 

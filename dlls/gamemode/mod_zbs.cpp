@@ -372,6 +372,10 @@ CZombieSpawn *CMod_ZombieScenario::SelectZombieSpawnPoint()
 
 CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 {
+#ifndef __AUTO_RESIZE__
+	if (MonsterManager().EntityCount() >= MonsterManager().GetMaxNumOfEntity())
+		return nullptr;
+#endif
 	CMonster *monster = GetClassPtr<CMonster>(nullptr);
 
 	if (!monster)
@@ -392,8 +396,9 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 		monster->pev->v_angle = backup_v_angle;
 	}
 
+	monster->m_pMonsterStrategy.reset(new CMonsterModStrategy_ZBS(monster, this));
+	monster->SetClass(MONSTER_CLASS_RANDOM);
 	pent->v.spawnflags |= SF_NORESPAWN;
-	
 	DispatchSpawn(pent);
 
 	// default settings
@@ -401,14 +406,12 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	monster->pev->maxspeed = 100.0f + (m_iNumCTWins / 3) * 15;
 	monster->m_flAttackDamage = (0.2f * m_iNumCTWins + 1) * (0.2f * m_iNumCTWins + 1);
 
-	if (m_iNumCTWins < 5 || RANDOM_LONG(0, 3))
+	/*if (m_iNumCTWins < 5 || RANDOM_LONG(0, 3))
 	{
 		monster->pev->health = monster->pev->max_health = monster->pev->max_health / 2;
 		SET_MODEL(monster->edict(), "models/player/zombi_host/zombi_host.mdl");
 		UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
-	}
-
-	monster->m_pMonsterStrategy.reset(new CMonsterModStrategy_ZBS(monster, this));
+	}*/
 
 	return monster;
 }

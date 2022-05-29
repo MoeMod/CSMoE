@@ -263,6 +263,11 @@ void WizardPanel::ResetHistory()
 	_subPanelStack.RemoveAll();
 }
 
+void WizardPanel::ResetCurrentSubPanel()
+{
+	_currentSubPanel = NULL;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

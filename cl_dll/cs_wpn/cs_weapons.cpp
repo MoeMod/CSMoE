@@ -1469,6 +1469,7 @@ void HUD_WeaponsPostThink( local_state_s *from, local_state_s *to, usercmd_t *cm
 	case WEAPON_KNIFE_HDAGGER:
 	case WEAPON_KNIFE_AXE:
 	case WEAPON_KNIFE_HAMMER:
+	case WEAPON_KNIFE_HOLYFIST:
 		g_bHoldingKnife = true;
 	}
 #endif

@@ -114,7 +114,7 @@ static wavdata_t *S_CreateDefaultSound( void )
 	sc->rate = SOUND_DMA_SPEED;
 	sc->samples = SOUND_DMA_SPEED;
 	sc->size = sc->samples * sc->width * sc->channels;
-	sc->buffer = (byte*)Mem_Alloc( sndpool, sc->size );
+	sc->buffer = (byte*)Mem_ZeroAlloc( sndpool, sc->size );
 
 	return sc;
 }

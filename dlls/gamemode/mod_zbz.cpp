@@ -40,7 +40,7 @@ GNU General Public License for more details.
 }
 
 namespace sv {
-	constexpr int MAX_LEVELS = 35;
+	constexpr int MAX_LEVELS = 40;
 	constexpr int HURT_PER_XP = 10; // 满足累计承受伤害后获得经验值
 	constexpr int HURT_AMOUNT = 400; // 满足累计承受伤害值
 	constexpr int DAMAGE_PER_XP = 10; // 满足累计造成伤害后获得经验值
@@ -651,6 +651,38 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			return;
 		}
 
+		if (m_tNextChangeClass <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
+		{
+			m_iChangeClassTime[1] = -1;
+			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
+			SetHero(true);
+			m_pPlayer->SetScoreboardAttributes();
+			m_pPlayer->pev->max_health = 10000.0f;
+			m_pPlayer->pev->health += 6000.0f;
+			if (m_pPlayer->pev->health >= m_pPlayer->pev->max_health)
+				m_pPlayer->pev->health = m_pPlayer->pev->max_health;
+
+			m_pPlayer->pev->armorvalue = 1000.0f;
+			SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
+			m_pPlayer->SetNewPlayerModel("models/player/ghosthunter/ghosthunter.mdl");
+			m_pPlayer->RemoveAllItems(FALSE);
+			m_pPlayer->m_bHasPrimary = false;
+			m_pPlayer->GiveNamedItem("z4b_dualkukri");
+			m_pPlayer->m_bHolsterDisabled = true;
+			m_pPlayer->m_iBuff |= BUFF_GHOSTHUNTER;
+
+			MESSAGE_BEGIN(MSG_ONE, gmsgZBZMsg, nullptr, m_pPlayer->edict());
+			WRITE_BYTE(ZBZ_MESSAGE_GHOSTHUNTER);
+			WRITE_BYTE(0);
+			WRITE_BYTE(2);
+			MESSAGE_END();
+
+			UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s 成为幽灵猎手", STRING(m_pPlayer->pev->netname));
+
+			EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterappear.wav", VOL_NORM, ATTN_NORM);
+			return;
+		}
+
 		if (m_flSkillDelay <= gpGlobals->time && m_iPoint > 0 && m_pPlayer->IsAlive())
 		{
 			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
@@ -762,32 +794,6 @@ void CPlayerModStrategy_ZBZ::CmdStart(struct usercmd_s* cmd, unsigned int random
 			m_pPlayer->pev->health = flHealth - 3000;
 			return;
 		}
-
-		if (m_tNextChangeClass <= gpGlobals->time && m_pPlayer->IsAlive() && m_iChangeClassTime[1] > 0 && !m_pPlayer->m_bIsZombie && !m_pPlayer->IsBot())
-		{
-			m_iChangeClassTime[1] = -1;
-			m_tNextChangeClass = gpGlobals->time + UPGRADE_SKILL_DELAY;
-			SetHero(true);
-			m_pPlayer->SetScoreboardAttributes();
-			m_pPlayer->pev->max_health = 10000.0f;
-			m_pPlayer->pev->health += 6000.0f;
-			if (m_pPlayer->pev->health >= m_pPlayer->pev->max_health)
-				m_pPlayer->pev->health = m_pPlayer->pev->max_health;
-
-			m_pPlayer->pev->armorvalue = 1000.0f;
-			SET_CLIENT_KEY_VALUE(m_pPlayer->entindex(), GET_INFO_BUFFER(m_pPlayer->edict()), "model", "ghosthunter");
-			m_pPlayer->SetNewPlayerModel("models/player/ghosthunter/ghosthunter.mdl");
-			m_pPlayer->RemoveAllItems(FALSE);
-			m_pPlayer->m_bHasPrimary = false;
-			m_pPlayer->GiveNamedItem("z4b_dualkukri");
-			m_pPlayer->m_bHolsterDisabled = true;
-			m_pPlayer->m_iBuff |= BUFF_GHOSTHUNTER;
-
-			UTIL_ClientPrintAll(HUD_PRINTCENTER, "%s 成为幽灵猎手", STRING(m_pPlayer->pev->netname));
-
-			EMIT_SOUND(m_pPlayer->edict(), CHAN_AUTO, "zombi/ghosthunterappear.wav", VOL_NORM, ATTN_NORM);
-			return;
-		}
 	}
 
 	SKILL_FUNCTION(m_vecSkill, OnButtonEvent, bitsCurButton, bitsOldButton);
@@ -865,7 +871,7 @@ void CMod_ZombieZ::RestartRound()
 
 void CMod_ZombieZ::PlayerKilled(CBasePlayer * pVictim, entvars_t * pKiller, entvars_t * pInflictor)
 {
-	if(pInflictor && (FClassnameIs(pInflictor, "z4b_dualkukri") || FClassnameIs(pInflictor, "z4b_dualslayer")))
+	if(pInflictor && (FClassnameIs(pInflictor, "z4b_dualkukri") || FClassnameIs(pInflictor, "z4b_dualslayer") || FClassnameIs(pInflictor, "z4b_holyfist")))
 		UTIL_BroadcastStuffText("spk \"zombi/KILLNANOCOUNTSND\"\n");
 	return CMod_ZombieHero::PlayerKilled(pVictim, pKiller, pInflictor);
 }

@@ -82,6 +82,7 @@ namespace ui {
 			std::vector<VersionInfo_s> candidate;
 			std::copy_if(all_infos.begin(), all_infos.end(), std::back_inserter(candidate), IsMatch);
 
+			bool bUpdate = false;
 			auto iter = std::max_element(candidate.begin(), candidate.end(), [](const VersionInfo_s &lhs, const VersionInfo_s &rhs){ return lhs.ver < rhs.ver; });
 			if(iter != candidate.end())
 			{
@@ -95,6 +96,18 @@ namespace ui {
 					MsgBox_Open(std::string("发现新版本") + std::to_string(info.ver) + std::string("，更新内容：\n") + info.desc + std::string("\n是否立即更新？"), [info](){
 						Sys_ShellExecute(info.url.c_str(), NULL, true);
 					});
+				}
+			}
+
+			if (!bUpdate) {
+				auto iter = std::find_if(all_infos.begin(), all_infos.end(), [](const VersionInfo_s& info) { return info.ver == 0 && !info.desc.empty(); });
+				if (iter != all_infos.end())
+				{
+					while (ImGui::GetTopMostPopupModal())
+					{
+						co_await boost::asio::post(boost::asio::use_awaitable);
+					}
+					MsgBox_Open(iter->desc, {}, 3.0f);
 				}
 			}
 		} catch(const std::exception &e)

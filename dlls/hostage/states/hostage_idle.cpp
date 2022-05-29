@@ -97,6 +97,12 @@ void HostageIdleState::OnUpdate(CHostageImprov *improv)
 		return;
 	}
 
+	// remove hostage's stuff
+	if (FClassnameIs(improv->GetEntity()->pev, "monster_entity"))
+	{
+		return;
+	}
+
 	CBasePlayer *rescuer = improv->GetClosestVisiblePlayer(CT);
 	CBasePlayer *captor = improv->GetClosestVisiblePlayer(TERRORIST);
 
