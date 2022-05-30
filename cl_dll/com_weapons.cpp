@@ -85,7 +85,7 @@ HUD_SendWeaponAnim
 Change weapon model animation
 =====================
 */
-void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce )
+void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce, float framerate )
 {
 	if( g_runfuncs || iForce )
 	{
@@ -93,7 +93,10 @@ void HUD_SendWeaponAnim( int iAnim, int iWeaponId, int iBody, int iForce )
 		g_currentweapon = iWeaponId;
 
 		// Tell animation system new info
-		gEngfuncs.pfnWeaponAnim( iAnim, iBody );
+		if(framerate == 1.0f)
+			gEngfuncs.pfnWeaponAnim( iAnim, iBody );
+		else
+			gEngfuncs.pfnWeaponAnim2(iAnim, iBody, framerate);
 	}
 }
 

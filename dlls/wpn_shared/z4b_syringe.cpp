@@ -78,7 +78,7 @@ BOOL CSyringe::Deploy(void)
 	m_fMaxSpeed = 250;
 	m_iWeaponState &= ~WPNSTATE_SHIELD_DRAWN;
 	m_pPlayer->m_bShieldDrawn = false;
-
+	EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Select.wav", VOL_NORM, ATTN_NORM, 0, 94);
 	return DefaultDeploy("models/z4b/v_syringe.mdl", "models/z4b/p_syringe.mdl", SYRINGE_DRAW, "dualpistols_2", UseDecrement() != FALSE);
 }
 
@@ -143,14 +143,17 @@ void CSyringe::PrimaryAttack(void)
 	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] > 0)
 	{
 		SendWeaponAnim(SYRINGE_SHOOT, UseDecrement() != FALSE);
+		EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Combo1.wav", VOL_NORM, ATTN_NORM, 0, 94);
 		if (Swing())
 			m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType]--;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.75s;
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.1s;
+		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 1.0s;
 		
 
 		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
 			m_flTimeWeaponIdle = m_flNextSecondaryAttack = m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 0.5s;
+		ResetRunIdle();
 		return;
 	}
 }
@@ -158,6 +161,13 @@ void CSyringe::PrimaryAttack(void)
 int CSyringe::Swing()
 {
 	BOOL fDidHit = FALSE;
+#ifndef CLIENT_DLL
+
+	strcpy(m_pPlayer->m_szCustomSequence, "M-combo1_MedicalGun_Cure");
+	m_pPlayer->pev->frame = 0;
+	m_pPlayer->ResetSequenceInfo();
+	m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.9s;
+
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle);
 	Vector vecSrc = m_pPlayer->GetGunPosition();
 	Vector vecEnd = vecSrc + gpGlobals->v_forward * 32;
@@ -180,43 +190,12 @@ int CSyringe::Swing()
 		}
 	}
 
-	if (tr.flFraction >= 1)
+	if (tr.flFraction < 1)
 	{
-
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1s;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1s;
-
-		if (RANDOM_LONG(0, 1))
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash1.wav", VOL_NORM, ATTN_NORM, 0, 94);
-		else
-			EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_WEAPON, "weapons/knife_slash2.wav", VOL_NORM, ATTN_NORM, 0, 94);
-#ifndef CLIENT_DLL
-		strcpy(m_pPlayer->m_szCustomSequence, "M-combo1_MedicalGun_Cure");
-		m_pPlayer->pev->frame = 0;
-		m_pPlayer->ResetSequenceInfo();
-		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.9s;
-#endif
-		
-	}
-	else
-	{
-		fDidHit = TRUE;
-		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.1s;
-		m_flNextSecondaryAttack = UTIL_WeaponTimeBase() + 1.1s;
-
 		CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
-
-#ifndef CLIENT_DLL
-		strcpy(m_pPlayer->m_szCustomSequence, "M-combo1_MedicalGun_Cure");
-		m_pPlayer->pev->frame = 0;
-		m_pPlayer->ResetSequenceInfo();
-		m_pPlayer->m_flCustomSequenceUntilTime = gpGlobals->time + 0.9s;
-#endif
-		float flDamage = 65.0;
-
-#ifndef CLIENT_DLL
 		if (pEntity && pEntity->IsPlayer())
 		{
+			fDidHit = TRUE;
 			CBasePlayer* player = static_cast<CBasePlayer*>(pEntity);
 
 			if (player->m_bIsZombie)
@@ -271,10 +250,12 @@ int CSyringe::Swing()
 				if (strategy)
 				{
 					strategy->OnSpawn();
-				}			
+				}
 				player->GiveDefaultItems();
 
 				g_pGameRules->CheckWinConditions();
+
+				EMIT_SOUND_DYN(ENT(m_pPlayer->pev), CHAN_ITEM, "CK_WPN/WEAPON/NanoMedicalGun/NanoMedicalGun_Fx.wav", VOL_NORM, ATTN_NORM, 0, 94);
 			}
 			else
 			{
@@ -283,7 +264,7 @@ int CSyringe::Swing()
 				player->pev->health = min(player->pev->health, player->pev->max_health);
 
 				if (flOldHealth >= player->pev->health)
-					player->pev->armorvalue += 1000;			
+					player->pev->armorvalue += 1000;
 
 				EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/td_buff.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
 			}
@@ -299,59 +280,58 @@ int CSyringe::Swing()
 			WRITE_BYTE(3);
 			MESSAGE_END();
 		}
-#endif	
-		UTIL_MakeVectors(m_pPlayer->pev->v_angle);
-		ClearMultiDamage();
-		if (pEntity)
-			pEntity->TraceAttack(m_pPlayer->pev, flDamage, gpGlobals->v_forward, &tr, DMG_NEVERGIB | DMG_BULLET);
-		ApplyMultiDamage(m_pPlayer->pev, m_pPlayer->pev);
-
-		float flVol = 1;
-#ifndef CLIENT_DLL
-		int fHitWorld = TRUE;
-#endif
-		if (pEntity)
-		{
-			if (pEntity->Classify() != CLASS_NONE && pEntity->Classify() != CLASS_MACHINE)
-			{
-				m_pPlayer->m_iWeaponVolume = KNIFE_BODYHIT_VOLUME;
-
-				if (!pEntity->IsAlive())
-					return TRUE;
-
-				flVol = 0.1;
-#ifndef CLIENT_DLL
-				fHitWorld = FALSE;
-#endif
-			}
-		}
-		m_pPlayer->m_iWeaponVolume = flVol * KNIFE_WALLHIT_VOLUME;
 	}
-
+#endif
 	return fDidHit;
 }
 
 void CSyringe::WeaponIdle(void)
 {
-	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
-		return;
-
-	if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+	ResetEmptySound();
+	if (m_flTimeWeaponIdle < UTIL_WeaponTimeBase())
 	{
-		RetireWeapon();
-		return;
+		if (!m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
+		{
+			RetireWeapon();
+			return;
+		}
+
+		if (m_pPlayer->pev->button & (IN_FORWARD | IN_MOVELEFT | IN_MOVERIGHT | IN_BACK))
+		{
+			if (m_flNextRunIdle <= UTIL_WeaponTimeBase())
+			{
+				SendWeaponAnim(SYRINGE_RUN, UseDecrement() != FALSE);
+
+				m_flNextRunIdle = UTIL_WeaponTimeBase() + 0.6s;
+			}
+
+			m_flNextIdle = UTIL_WeaponTimeBase();
+		}
+		else
+		{
+			if (m_flNextIdle <= UTIL_WeaponTimeBase())
+			{
+				SendWeaponAnim(SYRINGE_IDLE, UseDecrement() != FALSE);
+
+				m_flNextIdle = UTIL_WeaponTimeBase() + 20s;
+			}
+
+			m_flNextRunIdle = UTIL_WeaponTimeBase();
+		}
+
+		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 0.1s;
 	}
 
-	if (m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType])
-	{
-		m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + 20.0s;
-		SendWeaponAnim(SYRINGE_IDLE, UseDecrement() != FALSE);
-	}
 }
 
 BOOL CSyringe::CanDeploy(void)
 {
 	return m_pPlayer->m_rgAmmo[m_iPrimaryAmmoType] != 0;
+}
+
+void CSyringe::ResetRunIdle()
+{
+	m_flNextIdle = m_flNextRunIdle = UTIL_WeaponTimeBase();
 }
 
 }

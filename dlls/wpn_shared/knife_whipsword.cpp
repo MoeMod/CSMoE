@@ -53,7 +53,7 @@ namespace sv {
 				pev->rendermode = kRenderTransAdd; // 5;
 				pev->renderamt = 0.0;
 				pev->movetype = MOVETYPE_NONE; // 9
-				
+				m_bPlayHitSound = false;
 				UTIL_SetSize(pev, pev->mins, pev->maxs);				
 
 				pev->nextthink = gpGlobals->time + 0.1s;
@@ -129,6 +129,15 @@ namespace sv {
 				if (pev->iuser1 & (1 << pOther->entindex()))
 					return;
 
+				if (!m_bPlayHitSound)
+				{
+					if (RANDOM_LONG(0, 1))
+						EMIT_SOUND_DYN(pev->owner, CHAN_ITEM, "weapons/dualsword_stab1_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					else
+						EMIT_SOUND_DYN(pev->owner, CHAN_ITEM, "weapons/dualsword_stab2_hit.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+					m_bPlayHitSound = true;
+				}
+
 				CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
 				CBasePlayer* pAttackPlayer = nullptr;
 				if (pAttacker && pAttacker->IsPlayer())
@@ -177,7 +186,7 @@ namespace sv {
 			int m_iModelLight;
 #endif
 			float m_flDamage;
-
+			bool m_bPlayHitSound;
 			time_point_t m_tTimeRemove;
 		};
 

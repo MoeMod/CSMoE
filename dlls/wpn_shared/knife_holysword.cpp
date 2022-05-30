@@ -426,7 +426,7 @@ namespace sv {
 
 		void Spawn(void);
 		void EXPORT OnThink();
-
+		void EXPORT OnTouch(CBaseEntity* pOther);
 		void Init(CBasePlayer* pOwner, CKnifeHolySword* pWeapon);
 
 		void Precache(void)
@@ -439,7 +439,7 @@ namespace sv {
 		void DrawBeam();
 		time_point_t m_flDrawTime;
 #endif
-
+		
 		int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
 
 		int m_iModelLight;
@@ -1202,7 +1202,7 @@ namespace sv {
 		Precache();
 
 		SetThink(&CHolySwordParray::OnThink);
-		
+		SetTouch(&CHolySwordParray::OnTouch);
 		pev->deadflag = DEAD_NO;
 		pev->takedamage = DAMAGE_YES;
 
@@ -1218,6 +1218,51 @@ namespace sv {
 		m_flDrawTime = gpGlobals->time + 0.2s;
 		DrawBeam();
 #endif
+	}
+
+	void EXPORT CHolySwordParray::OnTouch(CBaseEntity* pOther)
+	{
+		if (pev->owner == pOther->edict())
+			return;
+
+		if (m_pOwner)
+		{
+			if (!pOther->IsPlayer())
+				return;
+
+			if (bIsWallBetweenEntity(pOther, m_pOwner))
+				return;
+
+			CBasePlayer* player = (CBasePlayer*)pOther;
+			if (!player)
+				return;
+
+			if (!player->m_bIsZombie)
+				return;
+
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)player->m_pActiveItem;
+			if (pWeapon)
+			{
+				if (pWeapon->iItemSlot() != KNIFE_SLOT)
+					return;
+
+				if (pWeapon->m_flNextPrimaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextPrimaryAttack < 0.1s)
+				{
+					float Damage = 500.0;
+
+					this->TakeDamage(player->pev, player->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+				else if (pWeapon->m_flNextSecondaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextSecondaryAttack < 0.1s)
+				{
+					float Damage = 1000.0;
+
+					this->TakeDamage(player->pev, player->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+			}
+		}
+		
 	}
 
 	void EXPORT CHolySwordParray::OnThink()

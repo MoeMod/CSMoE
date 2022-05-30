@@ -233,6 +233,7 @@ TL_ADD(CM249EP)
 TL_ADD(CKnifeHeartStimulater)
 TL_ADD(CSyringe)
 TL_ADD(CSKULL1)
+TL_ADD(CPumpkin)
 
 #ifndef CLIENT_DLL
 TL_ADD(CAmbientGeneric)
@@ -494,6 +495,9 @@ TL_ADD(CCannonEXDragon)
 TL_ADD(CSpear)
 TL_ADD(CSGMissileCannon)
 TL_ADD(CWhipSwordStabBox)
+TL_ADD(CPumpkinGrenade)
+
+
 #endif
 
 TL_END(AllEntityTypeList)

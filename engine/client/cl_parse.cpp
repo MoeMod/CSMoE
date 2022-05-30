@@ -76,7 +76,7 @@ const char *svc_strings[256] =
 	"svc_resourcelist",
 	"svc_deltamovevars",
 	"svc_customization",
-	"svc_unused46",
+	"svc_weaponanim2",
 	"svc_crosshairangle",
 	"svc_soundfade",
 	"svc_unused49",
@@ -1786,6 +1786,13 @@ void CL_ParseServerMessage( sizebuf_t *msg )
 		case svc_customization:
 			CL_ParseCustomization( msg );
 			break;
+		case svc_weaponanim2: {
+			param1 = BF_ReadByte(msg);	// iAnim
+			param2 = BF_ReadByte(msg);	// body
+			float framerate = (float)(BF_ReadShort(msg) / 256.0f);	// framerate
+			CL_WeaponAnim2(param1, param2, framerate);
+			break;
+		}
 		case svc_centerprint:
 			CL_CenterPrint( BF_ReadString( msg ), 0.25f );
 			break;
@@ -1831,9 +1838,9 @@ void CL_ParseServerMessage( sizebuf_t *msg )
 			Delta_ParseTableField( msg );
 			break;
 		case svc_weaponanim:
-			param1 = BF_ReadByte( msg );	// iAnim
-			param2 = BF_ReadByte( msg );	// body
-			CL_WeaponAnim( param1, param2 );
+			param1 = BF_ReadByte(msg);	// iAnim
+			param2 = BF_ReadByte(msg);	// body
+			CL_WeaponAnim(param1, param2);
 			break;
 		case svc_bspdecal:
 			CL_ParseStaticDecal( msg );

@@ -16,6 +16,7 @@ class CSyringe : public CBasePlayerWeapon
     {
         SYRINGE_IDLE,
         SYRINGE_SHOOT,
+		SYRINGE_RUN,
         SYRINGE_DRAW,
     };
 public:
@@ -39,9 +40,11 @@ public:
 #endif
 	}
 	int Swing();
+	void ResetRunIdle();
 	void FindHullIntersection(const Vector& vecSrc, TraceResult& tr, const vec3_t pflMins, const vec3_t pfkMaxs, edict_t* pEntity);
 public:
-
+	duration_t m_flNextRunIdle;
+	duration_t m_flNextIdle;
 public:
 	unsigned short m_usCreateSmoke;
 };

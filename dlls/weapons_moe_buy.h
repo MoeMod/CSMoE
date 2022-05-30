@@ -248,7 +248,8 @@ constexpr MoEWeaponBuyInfo_s g_MoEWeaponBuyInfo[] = {
     { WEAPON_CHAINSAW, "weapon_chainsaw",         "生命收割者",                  5750, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
     { WEAPON_CANNON, "weapon_cannon",      "黑龙炮",    3800, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_ZOMBIELAW, "weapon_zombielaw",      "test",    100, PRIMARY_WEAPON_SLOT, UNASSIGNED, BUY_EQUIP },
-	//{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_HEGRENADE, "weapon_hegrenade",     "高爆手雷",               300, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
+	{ GRENADE_PUMPKIN, "weapon_pumpkin",     "南瓜手雷",               600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ WEAPON_CSGO_ZEUS, "csgo_zeus",         "电击枪",                  200, KNIFE_SLOT, UNASSIGNED, BUY_EQUIP },
 	//{ GRENADE_HOLYBOMB, "weapon_holybomb",     "圣水手雷",              600, GRENADE_SLOT, UNASSIGNED, BUY_EQUIP },
 };

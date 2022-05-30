@@ -78,7 +78,7 @@ namespace sv {
                 MESSAGE_END();
                 return true;
             }
-         /*   if (context.item("HealHunter", "救赎猎手"))
+            if (context.item("HealHunter", "救赎猎手"))
             {
                 adminid->RemoveAllItems(FALSE);
                 adminid->m_bHasPrimary = false;
@@ -97,7 +97,7 @@ namespace sv {
                 WRITE_BYTE(2);
                 MESSAGE_END();
                 return true;
-            }*/
+            }
             context.end(adminid);
         });
     }

@@ -63,7 +63,7 @@ const char *svc_strings[256] =
 	"svc_resourcelist",
 	"svc_deltamovevars",
 	"svc_customization",
-	"svc_unused46",
+	"svc_weaponanim2",
 	"svc_crosshairangle",
 	"svc_soundfade",
 	"svc_unused49",

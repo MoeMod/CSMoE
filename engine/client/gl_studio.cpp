@@ -3891,7 +3891,6 @@ void R_DrawViewModel( void )
 	
 	RI.currententity->curstate.scale = 1.0f;
 	RI.currententity->curstate.frame = 0;
-	RI.currententity->curstate.framerate = 1.0f;
 	if( !cl.weaponstarttime )
 		cl.weaponstarttime = cl.time;
 	RI.currententity->curstate.animtime = cl.weaponstarttime;

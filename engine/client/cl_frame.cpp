@@ -730,6 +730,44 @@ void GAME_EXPORT CL_WeaponAnim( int iAnim, int body )
 
 /*
 ==================
+CL_WeaponAnim2
+
+Set new weapon animation
+==================
+*/
+void GAME_EXPORT CL_WeaponAnim2(int iAnim, int body, float framerate)
+{
+	cl_entity_t* view = &clgame.viewent;
+	cl.weaponstarttime = 0;
+	cl.weaponseq = iAnim;
+
+	// anim is changed. update latchedvars
+	if (iAnim != view->curstate.sequence)
+	{
+		int	i;
+
+		// save current blends to right lerping from last sequence
+		for (i = 0; i < 2; i++)
+			view->latched.prevseqblending[i] = view->curstate.blending[i];
+		view->latched.prevsequence = view->curstate.sequence; // save old sequence
+
+		// save animtime
+		view->latched.prevanimtime = view->curstate.animtime;
+		view->latched.sequencetime = 0.0f;
+	}
+
+	view->curstate.animtime = cl.time; // start immediately
+	view->curstate.framerate = framerate;
+	view->curstate.sequence = iAnim;
+	view->latched.prevframe = 0.0f;
+	view->curstate.scale = 1.0f;
+	view->curstate.frame = 0.0f;
+	if (body != 2) // fix female hand
+		view->curstate.body = body;
+}
+
+/*
+==================
 CL_UpdateStudioVars
 
 Update studio latched vars so interpolation work properly

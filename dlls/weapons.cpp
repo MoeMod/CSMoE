@@ -1142,7 +1142,7 @@ int CBasePlayerWeapon::UpdateClientData(CBasePlayer *pPlayer)
 	return 1;
 }
 
-void CBasePlayerWeapon::SendWeaponAnim(int iAnim, int skiplocal)
+void CBasePlayerWeapon::SendWeaponAnim(int iAnim, int skiplocal, float framerate)
 {
 	m_pPlayer->pev->weaponanim = iAnim;
 
@@ -1151,9 +1151,18 @@ void CBasePlayerWeapon::SendWeaponAnim(int iAnim, int skiplocal)
 		return;
 #endif // CLIENT_WEAPONS
 
-	MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM, NULL, m_pPlayer->pev);
+	if (framerate == 1.0f) {
+		MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM, NULL, m_pPlayer->pev);
 		WRITE_BYTE(iAnim);	// sequence number
 		WRITE_BYTE(pev->body);		// weaponmodel bodygroup.
+		MESSAGE_END();
+		return;
+	}
+
+	MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM2, NULL, m_pPlayer->pev);
+	WRITE_BYTE(iAnim);	// sequence number
+	WRITE_BYTE(pev->body);		// weaponmodel bodygroup.
+	WRITE_SHORT(FixedUnsigned16(framerate, 1 << 8));		// framerate
 	MESSAGE_END();
 }
 
@@ -1315,11 +1324,10 @@ int CBasePlayerWeapon::DefaultReload(int iClipSize, int iAnim, duration_t fDelay
 		return FALSE;
 	}
 
-	fDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
-	m_pPlayer->m_flNextAttack = fDelay;
-
+	duration_t fNewDelay = m_pPlayer->m_pModStrategy->OnDefaultReload_Pre(this, fDelay);
+	m_pPlayer->m_flNextAttack = fNewDelay;
 	ReloadSound();
-	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0);
+	SendWeaponAnim(iAnim, UseDecrement() ? 1 : 0, fDelay / fNewDelay);
 
 	m_fInReload = TRUE;
 	m_flTimeWeaponIdle = fDelay + 0.5s;

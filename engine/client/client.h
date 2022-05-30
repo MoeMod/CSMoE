@@ -811,6 +811,7 @@ void CL_ClearAllRemaps( void );
 //
 int CL_AddEntity( int entityType, cl_entity_t *pEnt );
 void CL_WeaponAnim( int iAnim, int body );
+void CL_WeaponAnim2( int iAnim, int body, float framerate );
 void CL_ClearEffects( void );
 void CL_ClearEfrags( void );
 void CL_TestLights( void );

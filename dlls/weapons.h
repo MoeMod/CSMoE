@@ -500,7 +500,7 @@ public:
 	}
 	virtual BOOL PlayEmptySound();
 	virtual void ResetEmptySound();
-	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0);
+	virtual void SendWeaponAnim(int iAnim, int skiplocal = 0, float framerate = 1.0f);
 #ifdef CLIENT_DLL
 	virtual BOOL IsUseable(void) { return true; }
 #else

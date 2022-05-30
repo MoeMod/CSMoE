@@ -150,21 +150,23 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 
 		const char* weapon_names_view[5];
 
-		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT })
+		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
 			if (iSlot == KNIFE_SLOT) {
-				p->m_iKnifeID = AliasToKnifeType(info.pszClassName);
+				p->m_iKnifeID = info.iID;
+			} else if (iSlot == GRENADE_SLOT) {
+				p->m_iGrenadeID = info.iID;
 			}
 			p->GiveNamedItem(info.pszClassName);
 			p->m_pModStrategy->GiveSlotAmmo(p, iSlot);
 			weapon_names_view[iSlot] = info.pszDisplayName;
 		}
 
-		p->GiveNamedItem("weapon_hegrenade");
+		//p->GiveNamedItem("weapon_hegrenade");
 		p->GiveNamedItem("weapon_smokegrenade");
 		p->GiveNamedItem("weapon_flashbang");
 		p->GiveNamedItem("weapon_flashbang");

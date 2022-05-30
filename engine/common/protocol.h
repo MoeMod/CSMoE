@@ -65,6 +65,7 @@ GNU General Public License for more details.
 #define svc_resourcelist		43	// [short][...]
 #define svc_deltamovevars		44	// [movevars_t]
 #define svc_customization		45	// <see code>
+#define svc_weaponanim2		46	// [byte]iAnim [byte]body [short]framerate
 #define svc_crosshairangle		47	// [byte][byte]
 #define svc_soundfade		48	// [float*4] sound fade parms
 

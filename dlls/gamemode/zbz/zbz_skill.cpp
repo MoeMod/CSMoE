@@ -2332,6 +2332,7 @@ namespace sv {
 
 		{ Skill_NetRound, 50, MakeSkill<ZSkill_NetRound> },
 		{ Skill_EmergencyEscape, 25, MakeSkill<ZSkill_EmergencyEscape> },
+		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },
 	};
 
 	constexpr auto NUM_SKILLS = std::extent<decltype(g_SkillList)>::value;

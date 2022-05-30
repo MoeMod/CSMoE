@@ -4160,6 +4160,7 @@ static cl_enginefunc_t gEngfuncs =
 	pfnGetAppID,
 	Cmd_AliasGetList,
 	pfnVguiWrap2_GetMouseDelta,
+	CL_WeaponAnim2,
 };
 
 void CL_UnloadProgs( void )

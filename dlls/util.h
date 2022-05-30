@@ -136,6 +136,7 @@ using sv::gpGlobals;
 #define SVC_WEAPONANIM		35
 #define SVC_ROOMTYPE		37
 #define SVC_DIRECTOR		51
+#define SVC_WEAPONANIM2		46
 
 constexpr int SF_TRIG_PUSH_ONCE = 1;
 // func_rotating

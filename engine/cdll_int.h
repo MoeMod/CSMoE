@@ -308,6 +308,7 @@ typedef struct cl_enginefuncs_s
 	int		(*pfnGetAppID)( void );
 	cmdalias_t	*(*pfnGetAliases)( void );
 	void		(*pfnVguiWrap2_GetMouseDelta)( int *x, int *y );
+	void	(*pfnWeaponAnim2)( int iAnim, int body, float framerate );
 } cl_enginefunc_t;
 
 #define CLDLL_INTERFACE_VERSION	7
