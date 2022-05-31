@@ -32,7 +32,15 @@ std::shared_ptr<CBaseMonsterClass> MakeMonsterClass(CMonster* p)
 }
 const std::tuple<MonsterClass, unsigned int, std::shared_ptr<CBaseMonsterClass>(*)(CMonster*)> g_MonsterClassList[] = {
 	{MONSTER_CLASS_ZOMBIE, 100, MakeMonsterClass<CMonsterClass_Normal>},
+	{MONSTER_CLASS_SPEED, 100, MakeMonsterClass<CMonsterClass_Speed>},
+	{MONSTER_CLASS_HEAVY, 100, MakeMonsterClass<CMonsterClass_Heavy>},
+	{MONSTER_CLASS_THROWER, 100, MakeMonsterClass<CMonsterClass_Thrower>},
+	{MONSTER_CLASS_HEAL, 100, MakeMonsterClass<CMonsterClass_Heal>},
 	{MONSTER_CLASS_ZOMBIEDOG, 100, MakeMonsterClass<CMonsterClass_Dog>},
+	{MONSTER_CLASS_BOOMER, 100, MakeMonsterClass<CMonsterClass_Boomer>},
+	{MONSTER_CLASS_RESIDENT, 100, MakeMonsterClass<CMonsterClass_Resident>},
+	{MONSTER_CLASS_DEIMOS, 100, MakeMonsterClass<CMonsterClass_Deimos>},
+	{MONSTER_CLASS_HELMET, 100, MakeMonsterClass<CMonsterClass_Helmet>},
 };
 
 constexpr auto NUM_MONSTERCLASSES = std::extent<decltype(g_MonsterClassList)>::value;
@@ -283,13 +291,13 @@ public:
 		m_vel.x = m_vel.x * speed;
 		m_vel.y = m_vel.y * speed;
 
-		KeepPersonalSpace spacer(this);
+		/*KeepPersonalSpace spacer(this);
 		ForEachPlayer(spacer);
 
 		if (g_pHostages != NULL)
 		{
 			g_pHostages->ForEachHostage(spacer);
-		}
+		}*/
 
 		m_hostage->pev->velocity.x = m_vel.x;
 		m_hostage->pev->velocity.y = m_vel.y;
@@ -462,6 +470,23 @@ public:
 		return close;
 	}
 
+	bool IsFriendInTheWay() const override
+	{
+		CheckAhead check(this);
+		CBaseEntity* pEntity = NULL;
+		while ((pEntity = UTIL_FindEntityByClassname(pEntity, "monster_entity")) != NULL)
+		{
+			auto pMonster = (CMonster*)pEntity;
+			if (pMonster == m_hostage) continue;
+			if (!pMonster->IsAlive()) continue;
+			if(check(pMonster)) continue;
+			break;
+		}
+		ForEachPlayer(check);
+
+		return check.IsBlocked();
+	}
+
 	std::atomic<bool> m_bCalculatingPath;
 	std::future<bool> m_fbCalcPathResult;
 	std::future<float> m_ffCalcDistResult;
@@ -566,8 +591,7 @@ void CMonster::Spawn()
 
 void CMonster::Precache()
 {
-	PRECACHE_SOUND("zombi/zombi_death_1.wav");
-	PRECACHE_SOUND("zombi/zombi_death_2.wav");
+	PRECACHE_SOUND("zombi/zbs_death_1.wav");
 	PRECACHE_SOUND("zombi/zombiedog_death1.wav");
 	PRECACHE_SOUND("zombi/zombiedog_death2.wav");
 	PRECACHE_SOUND("zombi/zombi_hurt_01.wav");
@@ -1256,7 +1280,10 @@ void CMonster::SetAnimation(MonsterAnim anim) // similar to CBasePlayer::SetAnim
 		break;
 	}
 	}
-	
+
+	if (animDesired == -1)
+		animDesired = 0;
+
 	if (pev->sequence != animDesired)
 	{
 		pev->sequence = animDesired;
@@ -1434,11 +1461,7 @@ const Vector CBaseMonsterClass::GetCenterid() const
 
 void CBaseMonsterClass::DeathSound() const
 {
-	switch (RANDOM_LONG(1, 2))
-	{
-	case 1: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
-	}
+	EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zbs_death_1.wav", VOL_NORM, ATTN_NORM);
 }
 
 void CBaseMonsterSkill::OnThink()
@@ -1459,15 +1482,6 @@ void CMonsterClass_Normal::OnInit()
 {
 	SET_MODEL(m_pMonster->edict(), "models/player/zombi_origin/zombi_origin.mdl");
 	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
-}
-
-void CMonsterClass_Normal::DeathSound() const
-{
-	switch (RANDOM_LONG(1, 2))
-	{
-	case 1: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_1.wav", VOL_NORM, ATTN_NORM); break;
-	case 2: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombi_death_2.wav", VOL_NORM, ATTN_NORM); break;
-	}
 }
 
 void CMonsterSkill_Dog::OnActivate(CBaseEntity* target)
@@ -1548,6 +1562,94 @@ void CMonsterClass_Dog::DeathSound() const
 	case 1: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombiedog_death1.wav", VOL_NORM, ATTN_NORM); break;
 	case 2: EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zombiedog_death2.wav", VOL_NORM, ATTN_NORM); break;
 	}
+}
+
+void CMonsterClass_Speed::OnInit()
+{
+	PRECACHE_MODEL("models/player/speed_zombi_host/speed_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/speed_zombi_host/speed_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Speed::DeathSound() const
+{
+	EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zbs_death_female_1.wav", VOL_NORM, ATTN_NORM);
+}
+
+void CMonsterClass_Heavy::OnInit()
+{
+	PRECACHE_MODEL("models/player/heavy_zombi_host/heavy_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/heavy_zombi_host/heavy_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Thrower::OnInit()
+{
+
+	PRECACHE_MODEL("models/player/zombi_host/zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/zombi_host/zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Heal::OnInit()
+{
+	PRECACHE_MODEL("models/player/heal_zombi_host/heal_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/heal_zombi_host/heal_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Boomer::OnInit()
+{
+	PRECACHE_MODEL("models/player/boomer_zombi_host/boomer_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/boomer_zombi_host/boomer_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Boomer::DeathSound() const
+{
+	EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/boomer_death.wav", VOL_NORM, ATTN_NORM);
+}
+
+void CMonsterClass_Resident::OnInit()
+{
+	PRECACHE_MODEL("models/player/resident_zombi_host/resident_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/resident_zombi_host/resident_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Resident::DeathSound() const
+{
+	EMIT_SOUND(ENT(m_pMonster->pev), CHAN_VOICE, "zombi/zbs_death_female_1.wav", VOL_NORM, ATTN_NORM);
+}
+
+void CMonsterClass_Deimos::OnInit()
+{
+	PRECACHE_MODEL("models/player/deimos_zombi_host/deimos_zombi_host.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/player/deimos_zombi_host/deimos_zombi_host.mdl");
+	UTIL_SetSize(m_pMonster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Helmet::OnInit()
+{
+	PRECACHE_MODEL("models/monster/zbs_bosss_jun00.mdl");
+	SET_MODEL(m_pMonster->edict(), "models/monster/zbs_bosss_jun00.mdl");
+	UTIL_SetSize(m_pMonster->pev, Vector(-32.0, -32.0, -36.0), Vector(32.0, 32.0, 100.0));
+	//m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Helmet::OnSpawn()
+{
+	m_pMonster->pev->max_health = 500.0f;
+	m_pMonster->m_flAttackDamage = 50.0f;
+	m_pMonster->m_flAttackRate = 2.0s;
+	m_pMonster->m_flAttackDist = 72.0f;
 }
 
 }

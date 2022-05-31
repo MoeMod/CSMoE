@@ -123,15 +123,15 @@ void HostageFollowState::OnUpdate(CHostageImprov *improv)
 		else
 			improv->Walk();
 
-		if (!FClassnameIs(improv->GetEntity()->pev, "monster_entity"))
-		{
+		//if (!FClassnameIs(improv->GetEntity()->pev, "monster_entity"))
+		//{
 			const float movedRange = 35.0f;
 			if ((m_lastLeaderPos - m_leader->pev->origin).IsLengthGreaterThan(movedRange))
 			{
 				improv->MoveTo(m_leader->pev->origin);
 				m_lastLeaderPos = m_leader->pev->origin;
 			}
-		}
+		//}
 
 		return;
 	}

@@ -392,7 +392,7 @@ namespace sv {
 
 		void Spawn(void);
 		void EXPORT OnThink();
-
+		void EXPORT OnTouch(CBaseEntity* pOther);
 		void Init(CBasePlayer* pOwner, CKnifeY22S1HolySwordMB* pWeapon);
 
 		void Precache(void)
@@ -1139,6 +1139,51 @@ namespace sv {
 		m_flDrawTime = gpGlobals->time + 0.2s;
 		DrawBeam();
 #endif
+	}
+
+	void EXPORT CY22S1HolySwordMBParray::OnTouch(CBaseEntity* pOther)
+	{
+		if (pev->owner == pOther->edict())
+			return;
+
+		if (m_pOwner)
+		{
+			if (!pOther->IsPlayer())
+				return;
+
+			if (bIsWallBetweenEntity(pOther, m_pOwner))
+				return;
+
+			CBasePlayer* player = (CBasePlayer*)pOther;
+			if (!player)
+				return;
+
+			if (!player->m_bIsZombie)
+				return;
+
+			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)player->m_pActiveItem;
+			if (pWeapon)
+			{
+				if (pWeapon->iItemSlot() != KNIFE_SLOT)
+					return;
+
+				if (pWeapon->m_flNextPrimaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextPrimaryAttack < 0.1s)
+				{
+					float Damage = 500.0;
+
+					this->TakeDamage(player->pev, player->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+				else if (pWeapon->m_flNextSecondaryAttack > UTIL_WeaponTimeBase() && pWeapon->m_flNextSecondaryAttack < 0.1s)
+				{
+					float Damage = 1000.0;
+
+					this->TakeDamage(player->pev, player->pev, Damage, DMG_NEVERGIB | DMG_BULLET);
+					return;
+				}
+			}
+		}
+
 	}
 
 	void EXPORT CY22S1HolySwordMBParray::OnThink()

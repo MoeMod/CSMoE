@@ -17,7 +17,15 @@ enum MonsterClass
 {
 	MONSTER_CLASS_RANDOM,
 	MONSTER_CLASS_ZOMBIE,
+	MONSTER_CLASS_SPEED,
+	MONSTER_CLASS_HEAVY,
+	MONSTER_CLASS_THROWER,
+	MONSTER_CLASS_HEAL,
 	MONSTER_CLASS_ZOMBIEDOG,
+	MONSTER_CLASS_BOOMER,
+	MONSTER_CLASS_RESIDENT,
+	MONSTER_CLASS_DEIMOS,
+	MONSTER_CLASS_HELMET,
 };
 
 enum MonsterAnim
@@ -239,7 +247,6 @@ public:
 	CMonsterClass_Normal(CMonster* p) : CBaseMonsterClass(p) {}
 
 	void OnInit() override;
-	void DeathSound() const override;
 };
 
 class CMonsterSkill_Dog : public CBaseMonsterSkill
@@ -260,6 +267,74 @@ public:
 	void OnInit() override;
 	const Vector GetCenterid() const override;
 	void DeathSound() const override;
+};
+
+class CMonsterClass_Speed : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Speed(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void DeathSound() const override;
+};
+
+class CMonsterClass_Heavy : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Heavy(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+};
+
+class CMonsterClass_Thrower : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Thrower(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+};
+
+class CMonsterClass_Heal : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Heal(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+};
+
+class CMonsterClass_Boomer : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Boomer(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void DeathSound() const override;
+};
+
+class CMonsterClass_Resident : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Resident(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void DeathSound() const override;
+};
+
+class CMonsterClass_Deimos : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Deimos(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+};
+
+class CMonsterClass_Helmet : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Helmet(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void OnSpawn() override;
 };
 
 }

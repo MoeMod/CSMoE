@@ -120,7 +120,7 @@ public:
 	enum ScareType { NERVOUS, SCARED, TERRIFIED };
 
 	void FaceOutwards();
-	bool IsFriendInTheWay() const;
+	virtual bool IsFriendInTheWay() const;
 	void SetKnownGoodPosition(const Vector &pos);
 	const Vector &GetKnownGoodPosition() const { return m_knownGoodPos; }
 	void ResetToKnownGoodPosition();

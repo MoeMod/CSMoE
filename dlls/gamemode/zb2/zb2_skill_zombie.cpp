@@ -645,6 +645,7 @@ namespace sv {
 				}
 				else
 				{
+					m_pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 					player->pev->armortype = ARMOR_TYPE_HELMET;
 					player->pev->armorvalue += 1000;
 					EMIT_SOUND_DYN(ENT(player->pev), CHAN_AUTO, "zombi/td_buff.wav", 0.5, ATTN_NORM, 0, PITCH_NORM);
@@ -2894,6 +2895,7 @@ namespace sv {
 		case ZOMBIE_LEVEL_ORIGIN_LV2: fRecoverArmorValue = 4000.0f; break;
 		}
 
+		m_pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 		m_pPlayer->pev->armorvalue += fRecoverArmorValue;
 
