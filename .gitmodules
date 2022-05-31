@@ -61,3 +61,6 @@
 [submodule "3rdparty/cpuinfo"]
 	path = 3rdparty/cpuinfo
 	url = https://github.com/pytorch/cpuinfo
+[submodule "3rdparty/ios-cmake"]
+	path = 3rdparty/ios-cmake
+	url = https://github.com/leetal/ios-cmake
