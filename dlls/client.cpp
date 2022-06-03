@@ -530,6 +530,10 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	pPlayer->m_rebuyString.clear();
 	pPlayer->m_iModelTeam = UNASSIGNED;
 	pPlayer->pev->playerclass = 0; // reset semiclip
+	pPlayer->m_iNewMenuID = -1;
+	pPlayer->m_iNewMenuKeys = 0;
+	pPlayer->m_iNewMenuExpire = invalid_time_point;
+	pPlayer->m_iNewMenuPage = 0;
 
 	SET_CLIENT_MAXSPEED(ENT(pPlayer->pev), 1);
 	SET_MODEL(ENT(pPlayer->pev), "models/player.mdl");

@@ -22,6 +22,11 @@ int CHudZBSRoundClear::VidInit(void)
 	return 1;
 }
 
+void CHudZBSRoundClear::InitHUDData(void)
+{
+	m_pCurTexture = nullptr;
+}
+
 int CHudZBSRoundClear::Draw(float time)
 {
 	if (!m_pCurTexture)

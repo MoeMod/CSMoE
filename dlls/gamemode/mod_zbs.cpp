@@ -23,7 +23,7 @@ namespace sv {
 class PlayerModStrategy_ZBS : public CPlayerModStrategy_Default
 {
 public:
-	PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player)
+	PlayerModStrategy_ZBS(CBasePlayer *player, CMod_ZombieScenario *mp) : CPlayerModStrategy_Default(player), m_HumanLevel(player), m_pModZBS(mp)
 	{
 		m_listenerAdjustDamage = mp->m_eventAdjustDamage.subscribe(
 			[=](CBasePlayer *attacker, float &out) 
@@ -59,10 +59,18 @@ public:
 		return true;
 	}
 
+	void ClientPutInServer() override
+	{
+		m_flSpawnTimeOffset = 0.0f;
+		m_flSpawnTime = invalid_time_point;
+	}
+
 	void OnSpawn() override
 	{
 		m_pPlayer->pev->health += m_HumanLevel.GetHealthBonus();
+		m_pPlayer->SpawnProtection_Start(3.0s);
 	}
+
 	bool ClientCommand(const char *pcmd) override
 	{
 		if (FStrEq(pcmd, "zbs_hp_up"))
@@ -77,16 +85,50 @@ public:
 		}
 		return CPlayerModStrategy_Default::ClientCommand(pcmd);
 	}
+
 	void OnInitHUD() override
 	{
 		m_HumanLevel.UpdateHUD();
+	}
+
+	void OnKilled(entvars_t* pKiller, entvars_t* pInflictor) override
+	{
+		m_flSpawnTime = gpGlobals->time + m_flSpawnTimeOffset * 1s + 5s;
+		m_flSpawnTimeOffset = min(m_flSpawnTimeOffset + 5.0f, 60.0f);
+	}
+
+	void OnThink() override
+	{
+		if (!m_pModZBS->FRoundStarted() || m_pModZBS->m_bRoundTerminating)
+			return;
+
+		if (m_pPlayer->pev->deadflag != DEAD_DEAD && m_pPlayer->pev->deadflag != DEAD_RESPAWNABLE)
+			return;
+
+		if (m_pPlayer->m_iTeam == TEAM_UNASSIGNED || m_pPlayer->m_iTeam == TEAM_SPECTATOR)
+			return;
+
+		if (m_flSpawnTime >= gpGlobals->time)
+		{
+			if (m_flSpawnTips <= gpGlobals->time)
+			{
+				m_flSpawnTips = gpGlobals->time + 1s;
+				ClientPrint(m_pPlayer->pev, HUD_PRINTCENTER, "#CSO_ZBS_AutoRespawnWait", UTIL_dtos1((m_flSpawnTime - gpGlobals->time) / 1s));
+			}
+			return;
+		}
+
+		m_pPlayer->RoundRespawn();
 	}
 
 protected:
 	EventListener m_listenerAdjustDamage;
 	EventListener m_listenerMonsterKilled;
 	PlayerExtraHumanLevel_ZBS m_HumanLevel;
-
+	time_point_t m_flSpawnTips;
+	time_point_t m_flSpawnTime;
+	float m_flSpawnTimeOffset;
+	CMod_ZombieScenario* const m_pModZBS;
 };
 
 class CMonsterModStrategy_ZBS : public CMonsterModStrategy_Default
@@ -169,6 +211,24 @@ void CMod_ZombieScenario::CheckMapConditions()
 
 void CMod_ZombieScenario::RestartRound()
 {
+	if (m_bCompleteReset)
+	{
+		for (int iIndex = 1; iIndex <= gpGlobals->maxClients; ++iIndex)
+		{
+			CBaseEntity* entity = UTIL_PlayerByIndex(iIndex);
+
+			if (!entity)
+				continue;
+
+			CBasePlayer* player = static_cast<CBasePlayer*>(entity);
+			auto strategy = dynamic_cast<PlayerModStrategy_ZBS*>(player->m_pModStrategy.get());
+			if (strategy)
+			{
+				strategy->ClientPutInServer();
+			}
+		}
+	}
+
 	ClearZombieNPC();
 	CHalfLifeMultiplay::RestartRound();
 }
@@ -193,21 +253,21 @@ void CMod_ZombieScenario::Think()
 {
 	TeamCheck();
 
+	if (CheckGameOver())   // someone else quit the game already
+		return;
+	
 	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		if (m_iNumTerroristWins)
 		{
 			if (!CheckCanStartVoteMaps() && !m_iVoteMapStatus)
-				g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
+				GoToIntermission();
 			else
 				RestartRound();
 		}
 		else
 			RestartRound();
 	}
-
-	if (CheckGameOver())   // someone else quit the game already
-		return;
 
 #ifdef XASH_DEDICATED
 	// votemap things
@@ -226,7 +286,7 @@ void CMod_ZombieScenario::Think()
 				iLastCountDown = iCountDown;
 				if (iCountDown > 0 && iCountDown < 20)
 				{
-					UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZBS_StartCount", UTIL_dtos1(iCountDown)); // #CSO_ZBS_StartCount
+					UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZBS_StartCount", UTIL_dtos1(iCountDown));
 				}
 
 				if (iCountDown == 19)
@@ -304,6 +364,8 @@ void CMod_ZombieScenario::CheckWinConditions()
 		return;
 	}
 
+	TeamCheck();
+
 	int NumDeadCT, NumDeadTerrorist, NumAliveTerrorist, NumAliveCT;
 	InitializePlayerCounts(NumAliveTerrorist, NumAliveCT, NumDeadTerrorist, NumDeadCT);
 
@@ -328,7 +390,7 @@ void CMod_ZombieScenario::HumanWin()
 
 	if (m_iMaxRoundsWon && m_iNumCTWins >= m_iMaxRoundsWon)
 	{
-		UTIL_ClientPrintAll(HUD_PRINTCENTER, "Congratulations! You've cleared all the Rounds."); // #CSO_CongAllRoundClear
+		UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_CongAllRoundClear");
 	}
 }
 
@@ -423,13 +485,6 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 		monster->pev->maxspeed = 250;
 	monster->m_flAttackDamage += (0.2f * m_iNumCTWins + 1);
 
-	/*if (m_iNumCTWins < 5 || RANDOM_LONG(0, 3))
-	{
-		monster->pev->health = monster->pev->max_health = monster->pev->max_health / 2;
-		SET_MODEL(monster->edict(), "models/player/zombi_host/zombi_host.mdl");
-		UTIL_SetSize(monster->pev, VEC_HULL_MIN, VEC_HULL_MAX);
-	}*/
-
 	return monster;
 }
 
@@ -440,6 +495,14 @@ void CMod_ZombieScenario::ClearZombieNPC()
 	{
 		npc->Killed(nullptr, GIB_NORMAL);
 	}
+}
+
+BOOL CMod_ZombieScenario::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker)
+{
+	if (!FRoundStarted())
+		return FALSE;
+
+	return CHalfLifeMultiplay::FPlayerCanTakeDamage(pPlayer, pAttacker);
 }
 
 ModConfigData_t CMod_ZombieScenario::QueryModConfig(const char *key, ModConfigData_t defaultValue, CBaseEntity *invoker) {

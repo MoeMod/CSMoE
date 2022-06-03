@@ -5232,7 +5232,7 @@ void ShowMenu_VoteMap(CBasePlayer* player)
 			return;
 		}
 
-		if (g_pGameRules->m_iVoteMapStatus != 2) {
+		if (g_pGameRules->m_iVoteMapStatus != 2 && g_pGameRules->m_iVoteMapStatus != 6) {
 			return;
 		}
 
@@ -5348,26 +5348,34 @@ void CHalfLifeMultiplay::VoteMapThink()
 				[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
 					return b.second < a.second;
 				});
-			m_iVoteMapStatus = 3;
-			auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
-			// delay timelimit
-			g_flResetTime = gpGlobals->time + delay;
-
 			char szText[128];
-			sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+			if (!Q_strcmp(gamemode.string, "zbs"))
+			{
+				m_iVoteMapStatus = 4;
+				m_flVoteNextThink = gpGlobals->time + 3s;
+				sprintf(szText, "投票结束！地图将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+				ALERT(at_console, "Voting Over. Nextmap will be %s\n",
+					m_vecVoteMaps.front().first.c_str());
+			}
+			else
+			{
+				m_iVoteMapStatus = 3;
+				auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
+				g_flResetTime = gpGlobals->time + delay;
+
+				sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+				ALERT(at_console, "Voting Over. Nextmap will be %s after %.2f secs\n",
+					m_vecVoteMaps.front().first.c_str(), delay.count());
+			}
 			MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
 			WRITE_BYTE(0);
 			WRITE_STRING(szText);
 			MESSAGE_END();
-
-			ALERT(at_console, "Voting Over. Nextmap will be %s after %.2f secs\n",
-				m_vecVoteMaps.front().first.c_str(), delay.count());
 		}
 		else {
-			m_iVoteMapStatus = 0;
 			if (m_iVoteOptionCount[0] > m_iVoteOptionCount[1]) {
 				UTIL_SayTextAll("投票结束！开始投票更换地图");
-				g_pGameRules->m_iVoteMapStatus = 2;
+				g_pGameRules->m_iVoteMapStatus = 6;
 				g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
 
 				CBaseEntity* pPlayer = NULL;
@@ -5392,6 +5400,7 @@ void CHalfLifeMultiplay::VoteMapThink()
 				}
 			}
 			else {
+				m_iVoteMapStatus = 0;
 				if (!Q_strcmp(gamemode.string, "zbs"))
 				{
 					SERVER_COMMAND("sv_restart 1\n");
@@ -5432,6 +5441,26 @@ void CHalfLifeMultiplay::VoteMapThink()
 		m_iVoteMapStatus = 5;
 		GoToIntermission();
 		//CHANGE_LEVEL(m_vecVoteMaps.front().first.c_str(), NULL);
+		break;
+	}
+	case 6: {
+		std::sort(m_vecVoteMaps.begin(),
+			m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS) - 1,
+			[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
+				return b.second < a.second;
+			});
+		char szText[128];
+		sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+		WRITE_BYTE(0);
+		WRITE_STRING(szText);
+		MESSAGE_END();
+
+		ALERT(at_console, "Voting Over. Nextmap will be %s\n",
+			m_vecVoteMaps.front().first.c_str());
+
+		m_iVoteMapStatus = 5;
+		GoToIntermission();
 		break;
 	}
 	default:

@@ -42,6 +42,7 @@ public:
 	void HumanWin();
 	void ZombieWin();
 	BOOL FRoundStarted();
+	BOOL FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker) override;
 
 	CZombieSpawn *SelectZombieSpawnPoint();
 	CBaseEntity *MakeZombieNPC();

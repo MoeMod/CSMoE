@@ -6159,11 +6159,6 @@ void CBasePlayer::Spawn()
 	m_bHolsterDisabled = false;
 
 	SetTouch(&CBasePlayer::PlayerTouch);
-
-	m_iNewMenuID = -1;
-	m_iNewMenuKeys = 0;
-	m_iNewMenuExpire = invalid_time_point;
-	m_iNewMenuPage = 0;
 }
 
 void CBasePlayer::Precache()

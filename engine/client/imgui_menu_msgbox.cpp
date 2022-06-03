@@ -56,11 +56,15 @@ namespace ui {
                     ImGui::SetItemDefaultFocus();
                     ImGui::SameLine();
                     if (ImGui::Button("取消", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
+
+                    if (ImGui::IsKeyPressed(ImGuiKey_Enter)) { s_command(); }
+                    else if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { ImGui::CloseCurrentPopup(); }
                 }
                 else
                 {
                     ImGui::SetItemDefaultFocus();
                     if (ImGui::Button("确认", ImGuiUtils::GetScaledSize(ImVec2(120, 0)))) { ImGui::CloseCurrentPopup(); }
+                    if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsKeyPressed(ImGuiKey_Enter)) { ImGui::CloseCurrentPopup(); }
                 }
             }
             ImGui::EndPopup();

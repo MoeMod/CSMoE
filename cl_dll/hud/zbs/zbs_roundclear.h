@@ -11,6 +11,7 @@ class CHudZBSRoundClear : public IBaseHudSub
 public:
 	int VidInit(void) override;
 	int Draw(float time) override;
+	void InitHUDData(void) override;
 
 	void OnRoundClear();
 	void OnRoundFail();
