@@ -891,6 +891,7 @@ CHalfLifeMultiplay::CHalfLifeMultiplay()
 
 	LoadRandomMaps();
 	Q_memset(m_iPlayersOS, OS_Windows, sizeof(m_iPlayersOS));
+	m_iVoteOptionCount[0] = m_iVoteOptionCount[1] = 0;
 
 	g_pMPGameRules = this;
 }
@@ -5077,21 +5078,21 @@ void CHalfLifeMultiplay::ClientUserInfoChanged(CBasePlayer *pPlayer, char *infob
 	pPlayer->SetPrefsFromUserinfo(infobuffer);
 }
 
-bool CHalfLifeMultiplay::CheckCanStartVoteMaps()
+bool CHalfLifeMultiplay::CheckCanStartVoteMaps(bool bAlert)
 {
 #ifdef XASH_DEDICATED
 	if (votemap_enabled.value <= 0.0f) {
-		ALERT(at_console, "votemap is disabled\n");
+		if(bAlert) ALERT(at_console, "votemap is disabled\n");
 		return false;
 	}
 
 	if (m_iVoteMapStatus) {
-		ALERT(at_console, "votemap currently in process\n");
+		if (bAlert) ALERT(at_console, "votemap currently in process\n");
 		return false;
 	}
 
 	if (!m_vecVoteMaps.size()) {
-		ALERT(at_console, "votemap list is empty\n");
+		if (bAlert) ALERT(at_console, "votemap list is empty\n");
 		return false;
 	}
 
@@ -5103,7 +5104,7 @@ bool CHalfLifeMultiplay::CheckCanStartVoteMaps()
 
 void SV_Start_VoteMaps()
 {
-	if (!g_pGameRules->CheckCanStartVoteMaps())
+	if (!g_pGameRules->CheckCanStartVoteMaps(true))
 	{
 		if (!g_pGameRules->m_iVoteMapStatus)
 			g_pGameRules->m_flVoteNextThink = gpGlobals->time + 1s;
@@ -5181,6 +5182,76 @@ void CHalfLifeMultiplay::LoadRandomMaps()
 	std::shuffle(m_vecVoteMaps.begin(), m_vecVoteMaps.end(), std::random_device());
 }
 
+void ShowMenu_VoteExtend(CBasePlayer* player)
+{
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("是该选择了", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT) {
+			return;
+		}
+
+		if (g_pGameRules->m_iVoteMapStatus != 2) {
+			return;
+		}
+
+		char szText[128];
+		if(iItem == 5)
+			Q_sprintf(szText, "%s 选择了^1换图^7 (^2%d票^7)", STRING(pPlayer->pev->netname), ++g_pGameRules->m_iVoteOptionCount[0]);
+		else
+			Q_sprintf(szText, "%s 选择了^1延长^7 (^2%d票^7)", STRING(pPlayer->pev->netname), ++g_pGameRules->m_iVoteOptionCount[1]);
+		int iClientIndex = pPlayer->entindex();
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+		WRITE_BYTE(iClientIndex);
+		WRITE_STRING(szText);
+		MESSAGE_END();
+	});
+
+	for(int i = 0; i < 5; ++i)
+		pMenu->AddBlank();
+
+	pMenu->AddItem("投票更换地图");
+	if (!Q_strcmp(gamemode.string, "zbs"))
+	pMenu->AddItem("重新开始游戏");
+	else if(g_pGameRules->m_iMaxRounds != 0)
+		pMenu->AddItem("延长地图回合");
+	else if(g_pGameRules->m_iMaxRoundsWon != 0)
+		pMenu->AddItem("延长地图胜利");
+	else
+		pMenu->AddItem("延长地图时间");
+	pMenu->Display(player, 0, votemap_tally_delay_time.value * 1s);
+}
+
+void ShowMenu_VoteMap(CBasePlayer* player)
+{
+	PlayerMenu* pMenu = g_MenuMgr.menu_create("请选择下一张地图", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
+		if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT) {
+			return;
+		}
+
+		int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+		if (iItem < 0 || iItem >= length) {
+			return;
+		}
+
+		if (g_pGameRules->m_iVoteMapStatus != 2) {
+			return;
+		}
+
+		char szText[128];
+		Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
+		int iClientIndex = pPlayer->entindex();
+		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+		WRITE_BYTE(iClientIndex);
+		WRITE_STRING(szText);
+		MESSAGE_END();
+	});
+	size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
+	for (size_t i = 0; i < length; i++)
+	{
+		pMenu->AddItem(g_pGameRules->m_vecVoteMaps[i].first);
+	}
+	pMenu->Display(player, 0, votemap_tally_delay_time.value * 1s);
+}
+
 void CHalfLifeMultiplay::VoteMapThink()
 {
 	if (m_flVoteNextThink > gpGlobals->time) {
@@ -5232,7 +5303,12 @@ void CHalfLifeMultiplay::VoteMapThink()
 	{
 		// Vote start
 	case 1: {
-		ALERT(at_console, "Voting maps start\n");
+		if (votemap_type.value <= 0.0f) {
+			ALERT(at_console, "Voting maps start\n");
+		}
+		else {
+			ALERT(at_console, "Voting extend start\n");
+		}
 		g_pGameRules->m_iVoteMapStatus = 2;
 		g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
 
@@ -5254,92 +5330,92 @@ void CHalfLifeMultiplay::VoteMapThink()
 			{
 				continue;
 			}
-			PlayerMenu* pMenu = g_MenuMgr.menu_create("请选择下一张地图", [&](CBasePlayer* pPlayer, PlayerMenu* pCurMenu, int iItem) {
-				if (iItem == MENU_EXIT || iItem == MENU_TIMEOUT) {
-					return;
-				}
-
-				int length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
-				if (iItem < 0 || iItem >= length) {
-					return;
-				}
-
-				if (g_pGameRules->m_iVoteMapStatus != 2) {
-					return;
-				}
-
-				char szText[128];
-				Q_sprintf(szText, "%s 选择了^1%s^7 (^2%d票^7)", STRING(pPlayer->pev->netname), g_pGameRules->m_vecVoteMaps[iItem].first.c_str(), ++g_pGameRules->m_vecVoteMaps[iItem].second);
-				int iClientIndex = pPlayer->entindex();
-				MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
-				WRITE_BYTE(iClientIndex);
-				WRITE_STRING(szText);
-				MESSAGE_END();
-				});
-			size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
-			for (size_t i = 0; i < length; i++)
-			{
-				pMenu->AddItem(g_pGameRules->m_vecVoteMaps[i].first);
+			if (votemap_type.value <= 0.0f) {
+				ShowMenu_VoteMap(player);
 			}
-			pMenu->Display(player);
+			else {
+				m_iVoteOptionCount[0] = m_iVoteOptionCount[1] = 0;
+				ShowMenu_VoteExtend(player);
+			}
 		}
-		/*int iKeys = MENU_KEY_0;
-		char szMenu[512];
-		Q_sprintf(szMenu, "\\y请选择下一张地图:\n\n");
-
-		size_t length = min(MAX_CUSTOM_VOTE_MAPS, g_pGameRules->m_vecVoteMaps.size());
-		for (size_t i = 0; i < length; i++)
-		{
-			iKeys |= (1 << i);
-			Q_sprintf(szMenu, "%s\\w%d.%s\n", szMenu, i + 1, g_pGameRules->m_vecVoteMaps[i].first.c_str());
-		}
-		Q_sprintf(szMenu, "%s\n\\w0.退出", szMenu);
-
-		CBaseEntity* pPlayer = NULL;
-		while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
-		{
-			if (FNullEnt(pPlayer->edict()))
-			{
-				break;
-			}
-
-			if (pPlayer->pev->flags == FL_DORMANT)
-			{
-				continue;
-			}
-
-			CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
-			if (player->IsBot())
-			{
-				continue;
-			}
-
-			ShowMenu(player, iKeys, -1, 0, szMenu);
-			player->m_iMenu = Menu_VoteMap;
-		}*/
 		break;
 	}
 		// Vote end
 	case 2: {
-		std::sort(m_vecVoteMaps.begin(),
-				  min(m_vecVoteMaps.begin() + MAX_CUSTOM_VOTE_MAPS, m_vecVoteMaps.end()), // Need fix crash when m_vecVoteMaps.size() < MAX_CUSTOM_VOTE_MAPS
-				  [](std::pair<std::string, int> a, std::pair<std::string, int> b) {
-					  return b.second < a.second;
-				  });
-		m_iVoteMapStatus = 3;
-		auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
-		// delay timelimit
-		g_flResetTime = gpGlobals->time + delay;
+		if (votemap_type.value <= 0.0f) {
+			std::sort(m_vecVoteMaps.begin(),
+				m_vecVoteMaps.begin() + min(m_vecVoteMaps.size(), MAX_CUSTOM_VOTE_MAPS) - 1,
+				[](std::pair<std::string, int> a, std::pair<std::string, int> b) {
+					return b.second < a.second;
+				});
+			m_iVoteMapStatus = 3;
+			auto delay = (m_bFreezePeriod ? TimeRemaining() + m_iRoundTime : TimeRemaining()) + 2s;
+			// delay timelimit
+			g_flResetTime = gpGlobals->time + delay;
 
-		char szText[128];
-		sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
-		MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
-		WRITE_BYTE(0);
-		WRITE_STRING(szText);
-		MESSAGE_END();
+			char szText[128];
+			sprintf(szText, "投票结束！回合结束后将更换为：^2%s", m_vecVoteMaps.front().first.c_str());
+			MESSAGE_BEGIN(MSG_BROADCAST, gmsgSayText);
+			WRITE_BYTE(0);
+			WRITE_STRING(szText);
+			MESSAGE_END();
 
-		ALERT(at_console, "Voting Over. Nextmap will be %s after %.2f secs\n",
-			  m_vecVoteMaps.front().first.c_str(), delay.count());
+			ALERT(at_console, "Voting Over. Nextmap will be %s after %.2f secs\n",
+				m_vecVoteMaps.front().first.c_str(), delay.count());
+		}
+		else {
+			m_iVoteMapStatus = 0;
+			if (m_iVoteOptionCount[0] > m_iVoteOptionCount[1]) {
+				UTIL_SayTextAll("投票结束！开始投票更换地图");
+				g_pGameRules->m_iVoteMapStatus = 2;
+				g_pGameRules->m_flVoteNextThink = gpGlobals->time + votemap_tally_delay_time.value * 1s;
+
+				CBaseEntity* pPlayer = NULL;
+				while ((pPlayer = UTIL_FindEntityByClassname(pPlayer, "player")) != NULL)
+				{
+					if (FNullEnt(pPlayer->edict()))
+					{
+						break;
+					}
+
+					if (pPlayer->pev->flags == FL_DORMANT)
+					{
+						continue;
+					}
+
+					CBasePlayer* player = GetClassPtr<CBasePlayer>(pPlayer->pev);
+					if (player->IsBot())
+					{
+						continue;
+					}
+					ShowMenu_VoteMap(player);
+				}
+			}
+			else {
+				if (!Q_strcmp(gamemode.string, "zbs"))
+				{
+					SERVER_COMMAND("sv_restart 1\n");
+					UTIL_SayTextAll("投票结束！游戏重新开始");
+				}
+				else if (g_pGameRules->m_iMaxRounds != 0)
+				{
+					g_pGameRules->m_iMaxRounds += 2;
+					CVAR_SET_FLOAT("mp_maxrounds", g_pGameRules->m_iMaxRounds);
+					UTIL_SayTextAll("投票结束！延长^2 2 回合");
+				}
+				else if (g_pGameRules->m_iMaxRoundsWon != 0)
+				{
+					g_pGameRules->m_iMaxRoundsWon += 2;
+					CVAR_SET_FLOAT("mp_winlimit", g_pGameRules->m_iMaxRoundsWon);
+					UTIL_SayTextAll("投票结束！延长^2 2 胜利");
+				}
+				else
+				{
+					g_flResetTime = gpGlobals->time + 15min;
+					UTIL_SayTextAll("投票结束！延长^2 15 分钟");
+				}
+			}
+		}
 		break;
 		// Change map
 	}

@@ -79,6 +79,8 @@ void CZombieClass_ZBS_Deimos2::ResetMaxSpeed() const
 		m_pPlayer->pev->gravity = 0.75f;
 	}
 
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity;
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
 

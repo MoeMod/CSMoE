@@ -1030,6 +1030,28 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 	if (!IsAlive())
 		return 0;
 
+	flRatio += flShieldRatio;	//is 0
+
+	entvars_t* pevAttackFrom = (pevInflictor == NULL || pevInflictor == pevAttacker) ? pevAttacker : pevInflictor;
+
+	if (pevAttackFrom)
+	{
+		CBaseEntity* pAttackFrom = GetClassPtr((CBaseEntity*)pevAttackFrom);
+
+		if (pAttackFrom)
+		{
+			float flArmorRatio = pAttackFrom->GetArmorRatioModifier();
+
+			if (flArmorRatio > 0)
+			{
+				// moved to weapons_data.cpp
+				flRatio *= flArmorRatio;
+				//flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
+			}
+				
+		}
+	}
+
 	pAttacker = GetClassPtr<CBaseEntity>(pevAttacker);
 
 	if (pAttacker->IsPlayer())
@@ -1080,10 +1102,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 
 		if (pAttack->m_pActiveItem)
 		{
-			// moved to weapons_data.cpp
-			flRatio += flShieldRatio;
-			flRatio *= pAttack->m_pActiveItem->GetArmorRatioModifier();
-
 			if (!FNullEnt(ENT(pevInflictor)) && !teamAttack)
 			{
 				CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)pAttack->m_pActiveItem;
@@ -1103,11 +1121,6 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 					|| pWeapon->m_iId == WEAPON_SGMISSILEEX)
 				{
 					PLAYBACK_EVENT_FULL(FEV_HOSTONLY, pAttacker->edict(), PRECACHE_EVENT(1, "events/desperado.sc"), 0.0, 0, 0, 0.0, 0.0, (1 << 7), 0, TRUE, FALSE);
-				}
-
-				if (!Q_strcmp(STRING(pWeapon->pev->classname), "z4b_m37se") && pWeapon->pev->iuser1 == 1 )
-				{
-					flRatio *= 1.95;
 				}
 			}		
 		
@@ -1924,24 +1937,26 @@ void CBasePlayer::Killed(entvars_t *pevAttacker, int iGib)
 		for (int i = 0; i < 5; i++)
 		{
 			MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-			WRITE_BYTE(TE_SPRITE);
+			WRITE_BYTE(TE_TEMPSPRITE);
 			WRITE_COORD(pev->origin.x - 100 + rand() % (100 - (-100) + 1));
 			WRITE_COORD(pev->origin.y - 100 + rand() % (100 - (-100) + 1));
 			WRITE_COORD(z + 60);
 			WRITE_SHORT(g_sModelIndexBoomerSprite);
 			WRITE_BYTE(15);
-			WRITE_BYTE(255);
+			WRITE_BYTE(200);
+			WRITE_BYTE(20);
 			MESSAGE_END();
 		}
 
 		MESSAGE_BEGIN(MSG_BROADCAST, SVC_TEMPENTITY);
-		WRITE_BYTE(TE_SPRITE);
+		WRITE_BYTE(TE_TEMPSPRITE);
 		WRITE_COORD(pev->origin.x);
 		WRITE_COORD(pev->origin.y);
 		WRITE_COORD(pev->origin.z + 60);
 		WRITE_SHORT(g_sModelIndexBoomerEffectEx);
-		WRITE_BYTE(15);
-		WRITE_BYTE(255);
+		WRITE_BYTE(20);
+		WRITE_BYTE(200);
+		WRITE_BYTE(8);
 		MESSAGE_END();
 
 		if (m_iZombieLevel)
@@ -5406,12 +5421,14 @@ void CBasePlayer::UpdatePlayerSound()
 
 void CBasePlayer::CheckZombieModeBuff(void)
 {
-	if (m_tLockBuffTime > gpGlobals->time)
+	if (m_flLockSpeed > 0.0f && m_tLockBuffTime < gpGlobals->time)
 	{
-		pev->velocity = g_vecZero;
-	}
-	else
+		m_flLockSpeed = 0.0f;
+		m_flLockGravity = 0.0f;
 		m_tLockBuffTime = invalid_time_point;
+
+		ResetMaxSpeed();
+	}
 	//From CSAE
 	if (!m_bIsZombie)
 	{
@@ -5742,7 +5759,7 @@ void CBasePlayer::Spawn()
 
 	ResetStamina();
 	pev->friction = 1;
-	pev->gravity = 1;
+	m_flDefaultGravity = pev->gravity = 1;
 
 	SET_PHYSICS_KEY_VALUE(edict(), "slj", "0");
 	SET_PHYSICS_KEY_VALUE(edict(), "hl", "1");
@@ -5803,6 +5820,9 @@ void CBasePlayer::Spawn()
 	m_flCustomSequenceUntilTime = invalid_time_point;
 
 	m_tLockBuffTime = invalid_time_point;
+	m_flLockSpeed = 0.0f;
+	m_flLockGravity = 0.0f;
+
 	m_tAvoidInfectBuffTime = invalid_time_point;
 	m_tShootingDownBuffTime = invalid_time_point;
 	m_tHealthBuffTime = invalid_time_point;
@@ -7669,7 +7689,16 @@ void CBasePlayer::EnableControl(BOOL fControl)
 void CBasePlayer::ResetMaxSpeed()
 {
 	float speed;
-
+	if (m_tLockBuffTime > gpGlobals->time && m_tLockBuffTime != invalid_time_point)
+	{
+		pev->maxspeed = m_flLockSpeed;
+		pev->gravity = m_flLockGravity;
+		return;	
+	}
+	
+	if (pev->gravity != m_flDefaultGravity)	//reset human
+		pev->gravity = m_flDefaultGravity;
+	
 	if (IsObserver())
 	{
 		// Player gets speed bonus in observer mode
@@ -10117,5 +10146,13 @@ bool CBasePlayer::IsUsingPC()
 {
 	int index = entindex();
 	return (g_pGameRules->m_iPlayersOS[index - 1] == OS_Windows);
+}
+
+float CBasePlayer::GetArmorRatioModifier(void)
+{
+	if (m_pActiveItem == NULL)
+		return 0.0f;
+
+	return m_pActiveItem->GetArmorRatioModifier();
 }
 }

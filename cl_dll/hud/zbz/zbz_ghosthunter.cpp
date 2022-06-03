@@ -68,7 +68,7 @@ int CHudZBZ_GhostHunter::Draw(float time)
 	case CLASS_TIMEHUNTER:m_iGhostHunterAppear = R_LoadTextureUnique("resource/zombi/timehunter_appear.tga"); break;
 	case CLASS_ASCETICHERO:m_iGhostHunterAppear = R_LoadTextureUnique("resource/zombi/ascetic_appear.tga"); break;
 	case CLASS_BACKGROUND:m_iGhostHunterAppear = R_LoadTextureUnique("resource/zombi/ghosthunterselect.tga"); break;
-	case CLASS_HEALHUNTER:m_iGhostHunterAppear = R_LoadTextureUnique("resource/zombi/ascetic_appear.tga"); break;
+	case CLASS_HEALHUNTER:m_iGhostHunterAppear = R_LoadTextureUnique("resource/zombi/healhunter_appear.tga"); break;
 	default:
 		break;
 	}

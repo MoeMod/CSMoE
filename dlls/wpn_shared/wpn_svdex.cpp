@@ -31,6 +31,7 @@ namespace sv {
 	class CSVDEXGrenade : public CBaseEntity
 	{
 	public:
+		int GetWeaponsId(void) { return WEAPON_SVDEX; }
 		void Spawn() override
 		{
 			Precache();
@@ -90,7 +91,7 @@ namespace sv {
 
 				ClearMultiDamage();
 				pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				ApplyMultiDamage(this->pev, pAttackePlayer->pev);
 			}
 
 			RadiusDamage();

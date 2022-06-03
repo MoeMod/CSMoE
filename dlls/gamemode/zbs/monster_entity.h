@@ -26,6 +26,7 @@ enum MonsterClass
 	MONSTER_CLASS_RESIDENT,
 	MONSTER_CLASS_DEIMOS,
 	MONSTER_CLASS_HELMET,
+	MONSTER_CLASS_DEIMOS2,
 };
 
 enum MonsterAnim
@@ -233,6 +234,8 @@ public:
 	std::map<std::string, int> m_mapLookupSequenceCache;
 	std::mutex m_mutexSetAnimation;
 
+	time_point_t m_flCustomSequenceUntilTime;
+	int m_iCustomSequence;
 public:
 	std::unique_ptr<IBaseMonsterStrategy> m_pMonsterStrategy;
 	std::shared_ptr<CMonster *> m_pLifeCycleHolder; // auto release with RAII
@@ -278,6 +281,16 @@ public:
 	void DeathSound() const override;
 };
 
+class CMonsterSkill_Heavy : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Heavy(CMonster* p) : CBaseMonsterSkill(p) {}
+
+	void OnActivate(CBaseEntity* target) override;
+	void OnSkillEnd() override;
+	duration_t GetTrapTime();
+};
+
 class CMonsterClass_Heavy : public CBaseMonsterClass
 {
 public:
@@ -294,6 +307,16 @@ public:
 	void OnInit() override;
 };
 
+class CMonsterSkill_Heal : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Heal(CMonster* p) : CBaseMonsterSkill(p) {}
+
+	void OnActivate(CBaseEntity* target) override;
+	void OnSkillEnd() override;
+	float GetHealBonus();
+};
+
 class CMonsterClass_Heal : public CBaseMonsterClass
 {
 public:
@@ -302,6 +325,17 @@ public:
 	void OnInit() override;
 };
 
+class CMonsterSkill_Boomer : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Boomer(CMonster* p) : CBaseMonsterSkill(p) {}
+
+	void OnKilled(entvars_t* pKiller, int iGib) override;
+
+	float GetDamage();
+};
+
+
 class CMonsterClass_Boomer : public CBaseMonsterClass
 {
 public:
@@ -309,6 +343,16 @@ public:
 
 	void OnInit() override;
 	void DeathSound() const override;
+};
+
+class CMonsterSkill_Resident : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Resident(CMonster* p) : CBaseMonsterSkill(p) {}
+
+	void OnActivate(CBaseEntity* target) override;
+	void OnSkillEnd() override;
+	float GetDamage();
 };
 
 class CMonsterClass_Resident : public CBaseMonsterClass
@@ -320,11 +364,24 @@ public:
 	void DeathSound() const override;
 };
 
+class CMonsterSkill_Deimos : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Deimos(CMonster* p) : CBaseMonsterSkill(p) { m_flTimeTriggerZombieSkill = invalid_time_point; }
+
+	void OnThink() override;
+	void OnActivate(CBaseEntity* target) override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+	time_point_t m_flTimeTriggerZombieSkill;
+
+};
+
 class CMonsterClass_Deimos : public CBaseMonsterClass
 {
 public:
 	CMonsterClass_Deimos(CMonster* p) : CBaseMonsterClass(p) {}
-
+	void OnSpawn() override;
 	void OnInit() override;
 };
 
@@ -332,6 +389,30 @@ class CMonsterClass_Helmet : public CBaseMonsterClass
 {
 public:
 	CMonsterClass_Helmet(CMonster* p) : CBaseMonsterClass(p) {}
+
+	void OnInit() override;
+	void OnSpawn() override;
+};
+
+class CMonsterSkill_Deimos2 : public CBaseMonsterSkill
+{
+public:
+	CMonsterSkill_Deimos2(CMonster* p) : CBaseMonsterSkill(p) { m_flTimeTriggerZombieSkill = invalid_time_point; }
+
+	void OnThink() override;
+	void OnActivate(CBaseEntity* target) override;
+	void OnTouch(CBaseEntity* other) override;
+	void OnSkillEnd() override;
+	void FireZombieSkill();
+	float GetDamage();
+	time_point_t m_flTimeTriggerZombieSkill;
+
+};
+
+class CMonsterClass_Deimos2 : public CBaseMonsterClass
+{
+public:
+	CMonsterClass_Deimos2(CMonster* p) : CBaseMonsterClass(p) {}
 
 	void OnInit() override;
 	void OnSpawn() override;

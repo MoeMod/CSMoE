@@ -71,7 +71,7 @@ void CZombieClass_MeatWall::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 170.0;
 
-	m_pPlayer->pev->gravity = 0.7f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.7f;
 
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->ResetMaxSpeed();

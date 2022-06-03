@@ -86,6 +86,8 @@ void CZombieClass_Deimos::ResetMaxSpeed() const
 		m_pPlayer->pev->gravity = 0.7f;
 	}
 
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity;
+
 	if (m_tStunGravityTime > gpGlobals->time)
 	{
 		m_pPlayer->pev->gravity = max(m_flStunGravity, 1.0);

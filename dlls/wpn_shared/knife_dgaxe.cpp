@@ -40,6 +40,8 @@ namespace sv {
 	class CDgaxeSummon : public CBaseEntity
 	{
 	public:
+		float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+		int GetWeaponsId(void) { return WEAPON_KNIFE; }
 		void Spawn() override
 		{
 			Precache();
@@ -55,7 +57,7 @@ namespace sv {
 			pev->movetype = MOVETYPE_FLY; // 9
 			SetThink(&CDgaxeSummon::Skill);
 			pev->nextthink = gpGlobals->time + 0.01s;
-			pev->classname = MAKE_STRING("dgaxe");
+			pev->classname = MAKE_STRING("dgaxe_summon");
 			m_flDamageTime = invalid_time_point;
 			m_flLoopTime = invalid_time_point;
 		}
@@ -218,14 +220,14 @@ namespace sv {
 					if ((bInWater && pEntity->pev->waterlevel == 0) || (!bInWater && pEntity->pev->waterlevel == 3))
 						continue;
 
+					if (g_pGameRules->PlayerRelationship(pAttackPlayer, pEntity) == GR_TEAMMATE)
+						continue;
+
 					if (pEntity->IsPlayer())
 					{
 						CBasePlayer* player = (CBasePlayer*)pEntity;
 
 						if (!player)
-							continue;
-
-						if (pAttackPlayer->m_iTeam == player->m_iTeam)
 							continue;
 
 						vecEnd = player->BodyTarget(pev->origin);
@@ -235,7 +237,7 @@ namespace sv {
 						if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 							continue;
 
-						player->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
+						player->TakeDamage(this->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
 
 						if (player->m_bIsZombie && ~(player->m_iBuff) & BUFF_IGNORE_KNOCKBACK)
 						{
@@ -265,7 +267,7 @@ namespace sv {
 						if (tr.flFraction < 1.0 && tr.pHit != pEntity->edict())
 							continue;
 
-						pEntity->TakeDamage(pAttackPlayer->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
+						pEntity->TakeDamage(this->pev, pAttackPlayer->pev, flDamage, DMG_BULLET | DMG_NEVERGIB);
 					}			
 				}
 			}

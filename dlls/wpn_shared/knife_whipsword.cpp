@@ -41,7 +41,8 @@ namespace sv {
 		{
 		public:
 			KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
-
+			float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+			int GetWeaponsId(void) { return WEAPON_KNIFE; }
 			void Spawn() override
 			{	
 #if DEBUG_DRAWBOX
@@ -57,7 +58,7 @@ namespace sv {
 				UTIL_SetSize(pev, pev->mins, pev->maxs);				
 
 				pev->nextthink = gpGlobals->time + 0.1s;
-				pev->classname = MAKE_STRING("whipsword");
+				pev->classname = MAKE_STRING("whipsword_stabbox");
 			}
 
 			void SetSize(Vector &vecSize, Vector &vecDir)

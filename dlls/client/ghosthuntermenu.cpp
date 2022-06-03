@@ -35,7 +35,6 @@ namespace sv {
                 WRITE_BYTE(1);
                 WRITE_BYTE(2);
                 MESSAGE_END();
-                return true;
             }
             if (context.item("TimeHunter", "时空猎手"))
             {
@@ -55,8 +54,6 @@ namespace sv {
                 WRITE_BYTE(2);
                 WRITE_BYTE(2);
                 MESSAGE_END();
-
-                return true;
             }
             if (context.item("AsceticHero", "圣拳猎手"))
             {
@@ -76,7 +73,6 @@ namespace sv {
                 WRITE_BYTE(3);
                 WRITE_BYTE(2);
                 MESSAGE_END();
-                return true;
             }
             if (context.item("HealHunter", "救赎猎手"))
             {
@@ -96,7 +92,6 @@ namespace sv {
                 WRITE_BYTE(5);
                 WRITE_BYTE(2);
                 MESSAGE_END();
-                return true;
             }
             context.end(adminid);
         });

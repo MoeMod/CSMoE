@@ -75,29 +75,30 @@ void CHudNewHud::InitHUDData(void)
 
 int CHudNewHud::Draw(float flTime)
 {
-	if (gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH)
-		return 1;
+	if (!gHUD.m_pCvarDraw->value)
+		return 0;
 
-	if (gEngfuncs.IsSpectateOnly())
-		return 1;
+	if (gHUD.m_iHideHUDDisplay & HIDEHUD_ALL || gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH)
+		return 0;
 
-	if (gHUD.m_hudstyle->value == 2)
-	{
-		DrawNewHudCharacterBG(flTime);
-		return 1;
-	}
+	if (gHUD.m_iIntermission || gEngfuncs.IsSpectateOnly())
+		return 0;
 
+	if (!(gHUD.m_iWeaponBits & (1 << (WEAPON_SUIT))))
+		return 0;
+
+	if (g_iUser1)
+		return 0;
+
+	if (gHUD.m_hudstyle->value != 2)
+		return 0;
+
+	DrawNewHudCharacterBG(flTime);
 	return 1;
 }
 
 int CHudNewHud::DrawNewHudCharacterBG(float flTime)
 {
-	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH))
-		return 1;
-
-	if(gEngfuncs.IsSpectateOnly())
-		return 1;
-
 	int iX = 0;
 	int iY = ScreenHeight - 5;
 

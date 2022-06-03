@@ -486,9 +486,13 @@ void CMod_Zombi::HumanInfectionByZombie(CBasePlayer *player, CBasePlayer *attack
 {
 	player->m_ZombieClass = "random";
 	player->pev->sequence = 0;
+	player->m_tLockBuffTime = invalid_time_point;
+	player->m_flLockSpeed = 0.0;
+	player->m_flLockGravity = 0.0;
 	player->m_iCustomSequence = -1;
 	MakeZombie(player, ZOMBIE_LEVEL_HOST);
 	player->pev->health = player->pev->max_health = std::max(3000, static_cast<int>(attacker->pev->health * 1.0f)) + 1000.0f;
+	player->m_iKevlar = ARMOR_TYPE_HELMET;
 	player->pev->armorvalue = std::max(100, static_cast<int>(attacker->pev->armorvalue * 1.0f)) + 100.0f;
 
 	InfectionSound();

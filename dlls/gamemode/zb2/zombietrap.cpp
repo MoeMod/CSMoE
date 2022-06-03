@@ -122,14 +122,22 @@ void EXPORT CZombieTrap::OnTouch(CBaseEntity* pOther)
 
 	EMIT_SOUND(ENT(p->pev), CHAN_BODY, p->m_bIsFemale ? "zombi/zombi_trapped_female.wav" : "zombi/zombi_trapped.wav", VOL_NORM, ATTN_NORM);
 
-	auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(p->m_pModStrategy.get());
+	/*auto strategy = dynamic_cast<CPlayerModStrategy_ZB2*>(p->m_pModStrategy.get());
 	if (strategy)
 	{
 		strategy->SetTrappedTime(GetTrappedTime());
-	}
+	}*/
+
+	p->m_tLockBuffTime = gpGlobals->time + GetTrappedTime();
+	p->m_flLockGravity = 10.0f;
+	p->m_flLockSpeed = 1.0f;
+	p->ResetMaxSpeed();
 
 	CBasePlayer* owner = dynamic_cast<CBasePlayer*>(CBasePlayer::Instance(pev->owner));
 	if (!owner)
+		return;
+
+	if (!owner->IsPlayer())
 		return;
 
 	ClientPrint(owner->pev, HUD_PRINTCENTER, "你的陷阱抓住了人类!");

@@ -315,12 +315,13 @@ int CM3Dragon::GetItemInfo(ItemInfo *p)
 
 BOOL CM3Dragon::Deploy(void)
 {
-#ifndef CLIENT_DLL
-	if (m_pPlayer->IsAlive())
-		CheckWeapon(m_pPlayer, this);
-#endif
-	m_NextInspect = gpGlobals->time + 0.75s;
+
 	return DefaultDeploy("models/v_m3dragon.mdl", "models/p_m3dragon.mdl", m3dragon_DRAW, "shotgun", UseDecrement() != FALSE);
+}
+
+void CM3Dragon::SecondaryAttack(void)
+{
+	
 }
 
 void CM3Dragon::PrimaryAttack(void)
@@ -351,7 +352,7 @@ void CM3Dragon::PrimaryAttack(void)
 #ifndef CLIENT_DLL
 	m_pPlayer->SetAnimation(PLAYER_ATTACK1);
 #endif
-	m_NextInspect = gpGlobals->time;
+
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
 	m_pPlayer->FireBullets(9, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.0675, 0.0675, 0), 3000, BULLET_PLAYER_BUCKSHOT, 0);
@@ -468,19 +469,4 @@ void CM3Dragon::WeaponIdle(void)
 	}
 }
 
-void CM3Dragon::Inspect()
-{
-	if (!m_fInSpecialReload)
-	{
-		if (gpGlobals->time > m_NextInspect)
-		{
-#ifndef CLIENT_DLL
-			SendWeaponAnim(7, 0);
-#endif
-			m_NextInspect = gpGlobals->time + GetInspectTime();
-			m_flTimeWeaponIdle = UTIL_WeaponTimeBase() + GetInspectTime();
-		}
-	}
-
-}
 }

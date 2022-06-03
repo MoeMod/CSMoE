@@ -746,6 +746,7 @@ public:
 	void ClearWeapon(bool removeSuit = false);
 	void EXPORT PlayerTouch(CBaseEntity* other);
 	bool IsUsingPC();
+	float GetArmorRatioModifier(void);
 #endif
 
 	void SpawnProtection_Check();
@@ -782,6 +783,9 @@ public:
 	time_point_t m_tShootingDownBuffTime;
 	time_point_t m_tAvoidInfectBuffTime;
 	time_point_t m_tLockBuffTime;
+	float m_flLockGravity;
+	float m_flDefaultGravity;
+	float m_flLockSpeed;
 
 	float m_flBuffHealthAmount;
 	float m_flSaveArmorAmount;

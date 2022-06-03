@@ -371,6 +371,11 @@ void W_Precache()
 	g_sModelIndexBoomerSprite = PRECACHE_MODEL("sprites/spr_boomer.spr");
 	g_sModelIndexPosionEffect = PRECACHE_MODEL("models/ef_poison03.mdl");
 
+	g_sModelIndexEventBombExp = PRECACHE_MODEL("sprites/heart_bombexp.spr");
+	g_sModelIndexEventBombExp2 = PRECACHE_MODEL("sprites/cakeexp.spr");
+	g_sModelIndexMoonCakeExp = PRECACHE_MODEL("sprites/mooncake.spr");
+	g_sModelIndexHolyWater = PRECACHE_MODEL("sprites/ef_hwater.spr");
+
 	g_sModelIndexCTGhost = PRECACHE_MODEL("sprites/b-tele1.spr");
 	g_sModelIndexTGhost = PRECACHE_MODEL("sprites/c-tele1.spr");
 	g_sModelIndexC4Glow = PRECACHE_MODEL("sprites/ledglow.spr");

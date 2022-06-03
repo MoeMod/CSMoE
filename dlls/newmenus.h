@@ -83,6 +83,7 @@ public:
 	size_t GetPageCount();
 	size_t GetItemCount();
 	menuitem* AddItem(std::string name, std::string cmd = "");
+	void AddBlank();
 
 	const char* GetTextString(CBasePlayer* pPlayer, page_t page, int& keys);
 	bool Display(CBasePlayer* pPlayer, page_t page = 0, duration_t menuexpire = 0s);

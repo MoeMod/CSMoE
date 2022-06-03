@@ -44,7 +44,7 @@ void CM32VenomMark::Spawn(void)
 	UTIL_SetSize(pev, g_vecZero, g_vecZero);
 	UTIL_SetOrigin(pev, pev->origin);
 
-	pev->classname = MAKE_STRING("m32venom");
+	pev->classname = MAKE_STRING("m32venom_mark");
 	SetThink(&CM32VenomMark::VenomThink);
 
 	m_flVenomDamageTime = gpGlobals->time + 0.1s;
@@ -172,7 +172,7 @@ void CM32VenomRocket::Spawn(void)
 	UTIL_SetSize(pev, { -8, -8, -2 }, { 8, 8, 1.3 });
 	UTIL_SetOrigin(pev, pev->origin);
 
-	pev->classname = MAKE_STRING("d_m32venom");
+	pev->classname = MAKE_STRING("m32venom_rocket");
 	SetThink(&CM32VenomRocket::IgniteThink);
 	SetTouch(&CM32VenomRocket::RocketTouch);
 

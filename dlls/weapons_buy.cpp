@@ -954,7 +954,7 @@ bool HasPlayerItem(CBasePlayer *pPlayer, const char *pszCheckItem)
 	return false;
 }
 
-bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
+bool MoE_HandleBuyCommands(CBasePlayer* pPlayer, const char* pszCommand)
 {
 	if (!pPlayer->CanPlayerBuy(true))
 		return false;
@@ -964,65 +964,77 @@ bool MoE_HandleBuyCommands(CBasePlayer *pPlayer, const char *pszCommand)
 		return false;
 	}
 
-	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo),
-							 [pszCommand](const MoEWeaponBuyInfo_s &info) {
-								 return !strcmp(info.pszClassName, pszCommand);
-							 });
+#ifndef XASH_DEDICATED
+	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal),
+		[pszCommand](const MoEWeaponBuyInfo_s& info) {
+			return !strcmp(info.pszClassName, pszCommand);
+		});
 
-	if (iter != std::end(g_MoEWeaponBuyInfo)) {
-		if (pPlayer->m_iAccount < iter->iCost) {
-			ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
-			BlinkAccount(pPlayer, 2);
-
-			return false;
-		}
-
-		if (iter->iSlot == GRENADE_SLOT) {
-			if (g_pGameRules->m_setBanGrenade.find(iter->iID) != g_pGameRules->m_setBanGrenade.end())
-				return false;
-		}
-		else if (iter->iSlot == KNIFE_SLOT) {
-			if (g_pGameRules->m_setBanKnife.find(iter->iID) != g_pGameRules->m_setBanKnife.end())
-				return false;
-		}
-		else {
-			if (g_pGameRules->m_setBanWeapon.find(iter->iID) != g_pGameRules->m_setBanWeapon.end())
-				return false;
-		}
-
-		switch (iter->iSlot) {
-			case PRIMARY_WEAPON_SLOT:
-				DropPrimary(pPlayer);
-				break;
-			case PISTOL_SLOT :
-					DropSecondary(pPlayer);
-				break;
-			case KNIFE_SLOT:
-				if (pPlayer->m_rgpPlayerItems[KNIFE_SLOT]) {
-					if (!strcmp(iter->pszClassName, "csgo_zeus"))
-					{
-					}
-					else
-					{
-						pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
-						pPlayer->m_iKnifeID = AliasToKnifeType(iter->pszClassName);
-					}
-				}
-				break;
-			case GRENADE_SLOT:
-				pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
-				break;
-			default:
-				break;
-		}
-
-		pPlayer->GiveNamedItem(iter->pszClassName);
-		pPlayer->AddAccount(-iter->iCost);
-		pPlayer->BuildRebuyStruct();
-
-		return true;
+	if (iter == std::end(g_MoEWeaponBuyInfoLocal)) {
+		return false;
 	}
-	return false;
+#else
+	auto iter = std::find_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo),
+		[pszCommand](const MoEWeaponBuyInfo_s& info) {
+			return !strcmp(info.pszClassName, pszCommand);
+		});
+
+	if (iter == std::end(g_MoEWeaponBuyInfo)) {
+		return false;
+	}
+#endif // !XASH_DEDICATED
+
+	if (pPlayer->m_iAccount < iter->iCost) {
+		ClientPrint(pPlayer->pev, HUD_PRINTCENTER, "#Not_Enough_Money");
+		BlinkAccount(pPlayer, 2);
+
+		return false;
+	}
+
+	if (iter->iSlot == GRENADE_SLOT) {
+		if (g_pGameRules->m_setBanGrenade.find(iter->iID) != g_pGameRules->m_setBanGrenade.end())
+			return false;
+	}
+	else if (iter->iSlot == KNIFE_SLOT) {
+		if (g_pGameRules->m_setBanKnife.find(iter->iID) != g_pGameRules->m_setBanKnife.end())
+			return false;
+	}
+	else {
+		if (g_pGameRules->m_setBanWeapon.find(iter->iID) != g_pGameRules->m_setBanWeapon.end())
+			return false;
+	}
+
+	switch (iter->iSlot) {
+		case PRIMARY_WEAPON_SLOT:
+			DropPrimary(pPlayer);
+			break;
+		case PISTOL_SLOT :
+				DropSecondary(pPlayer);
+			break;
+		case KNIFE_SLOT:
+			if (pPlayer->m_rgpPlayerItems[KNIFE_SLOT]) {
+				if (!strcmp(iter->pszClassName, "csgo_zeus"))
+				{
+				}
+				else
+				{
+					pPlayer->RemovePlayerItem(pPlayer->m_rgpPlayerItems[KNIFE_SLOT]);
+					pPlayer->m_iKnifeID = AliasToKnifeType(iter->pszClassName);
+				}
+			}
+			break;
+		case GRENADE_SLOT:
+			pPlayer->m_iGrenadeID = AliasToGrenadeType(iter->pszClassName);
+			break;
+		default:
+			break;
+	}
+
+	pPlayer->GiveNamedItem(iter->pszClassName);
+	pPlayer->AddAccount(-iter->iCost);
+	pPlayer->BuildRebuyStruct();
+
+	return true;
 }
 
 int AliasToKnifeType(const char* alias)

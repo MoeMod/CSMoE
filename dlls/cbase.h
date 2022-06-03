@@ -260,10 +260,13 @@ public:
 #ifdef CLIENT_DLL
 	virtual BOOL FVisible(CBaseEntity *pEntity) { return FALSE; }
 	virtual BOOL FVisible(const Vector &vecOrigin) { return FALSE; }
+	virtual float GetArmorRatioModifier(void) { return 1.0f; }
 #else
 	virtual BOOL FVisible(CBaseEntity *pEntity);
 	virtual BOOL FVisible(const Vector &vecOrigin);
+	virtual float GetArmorRatioModifier(void) { return 1.0f; }
 #endif
+	virtual int GetWeaponsId(void) { return 0; }
 	virtual void CrowdCallback(CBaseEntity* entityPushing, CBaseEntity* entityBehind) {}
 public:
 #ifdef CLIENT_DLL

@@ -75,7 +75,7 @@ void CZombieClass_DeathKnight::ResetMaxSpeed() const
 	else
 		m_pPlayer->pev->maxspeed = 290.0;
 
-	m_pPlayer->pev->gravity = 0.6f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.6f;
 
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->ResetMaxSpeed();

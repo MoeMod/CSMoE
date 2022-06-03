@@ -978,7 +978,7 @@ namespace sv {
 		Vector vecAngle = m_pPlayer->pev->angles;
 		vecAngle.x = 0;
 
-		m_pParray = static_cast<CY22S1HolySwordMBParray*>(CBaseEntity::Create("y22s1holyswordmb_parray", m_pPlayer->pev->origin + vecForward * 60, vecAngle, ENT(m_pPlayer->pev)));
+		m_pParray = static_cast<CY22S1HolySwordMBParray*>(CBaseEntity::Create("y22s1holyswordmb_parray", m_pPlayer->GetGunPosition() + vecForward * 75, vecAngle, ENT(m_pPlayer->pev)));
 		if (m_pParray)
 		{
 			m_pParray->Init(m_pPlayer, this);
@@ -1130,7 +1130,7 @@ namespace sv {
 		pev->solid = SOLID_SLIDEBOX;
 		pev->movetype = MOVETYPE_NOCLIP;
 
-		UTIL_SetSize(pev, Vector(-15.0, -15.0, -80.0), Vector(50.0, 50.0, 64.0));
+		UTIL_SetSize(pev, Vector(-75.0, -75.0, -80.0), Vector(75.0, 75.0, 64.0));
 
 		m_flRemoveTime = gpGlobals->time + 3.0s;
 		pev->nextthink = gpGlobals->time + 0.1s;
@@ -1199,7 +1199,7 @@ namespace sv {
 		Vector vecForward = gpGlobals->v_forward;
 		vecForward.z = 0;
 		vecForward = vecForward.Normalize();
-		UTIL_SetOrigin(pev, m_pOwner->pev->origin + vecForward * 60);
+		UTIL_SetOrigin(pev, m_pOwner->GetGunPosition() + vecForward * 75);
 
 		pev->angles = m_pOwner->pev->angles;
 		pev->angles.x = 0;

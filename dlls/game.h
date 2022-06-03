@@ -138,6 +138,7 @@ extern cvar_t maxkills;
 
 extern cvar_t votemap_enabled;
 extern cvar_t votemap_tally_delay_time;
+extern cvar_t votemap_type;
 
 void GameDLLInit();
 

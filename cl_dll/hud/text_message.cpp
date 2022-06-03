@@ -149,13 +149,27 @@ bool CHudTextMessage::LookupString2( char *msg, int size )
 		// this is a message name, so look up the real message
 		client_textmessage_t *clmsg = TextMessageGet( msg+1 );
 
-		if ( !clmsg || !(clmsg->pMessage) )
+		if (!clmsg || !(clmsg->pMessage))
+		{
+			auto ret = vgui2::localize()->Find(msg);
+			if (ret)
+			{
+				vgui2::localize()->ConvertUnicodeToANSI(ret, msg, size);
+				return true;
+			}
 			return false; // lookup failed, so return the original string
+		}
 
         strncpy(msg, clmsg->pMessage, size);
-		if (clmsg->pMessage[0] == '#')
-        {
-            vgui2::localize()->ConvertUnicodeToANSI(vgui2::localize()->Find(clmsg->pMessage), msg, size);
+		if (msg[0] == '#')
+		{
+			auto ret = vgui2::localize()->Find(msg);
+			if (ret)
+			{
+				vgui2::localize()->ConvertUnicodeToANSI(ret, msg, size);
+				return true;
+			}
+			return false;
         }
 
 		return true;
@@ -199,16 +213,46 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 	BufferReader reader( pszName, pbuf, iSize );
 
 	int msg_dest = reader.ReadByte();
+	int playerIndex = -1;
+
+	if (msg_dest == HUD_PRINTRADIO)
+	{
+		char* szIndex = reader.ReadString();
+		if (szIndex)
+			playerIndex = atoi(szIndex);
+	}
 
 	static char szBuf[6][MAX_TEXTMSG_STRING];
 	char *msg_text = LookupString( reader.ReadString(), &msg_dest );
-	msg_text = strncpy( szBuf[0], msg_text, MAX_TEXTMSG_STRING );
+	if (msg_text[0] == '#')
+	{
+		StripEndNewlineFromString(msg_text);
+		auto ret = vgui2::localize()->Find(msg_text);
+		if (ret) {
+			vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[5], MAX_TEXTMSG_STRING);
+			strncpy(msg_text, szBuf[5], MAX_TEXTMSG_STRING);
+		}
+	}
+	msg_text = strncpy(szBuf[0], msg_text, MAX_TEXTMSG_STRING);
 
 	// keep reading strings and using C format strings for substituting the strings into the localised text string
-	for(int i = 1; i <=4 ; ++i)
+	for(int i = 1; i <= 4; ++i)
 	{
-		strncpy( szBuf[i], reader.ReadString(), MAX_TEXTMSG_STRING );
-		LookupString2( szBuf[i], MAX_TEXTMSG_STRING );
+		char *szText = LookupString(reader.ReadString());
+		if (szText[0] == '#')
+		{
+			StripEndNewlineFromString(szText);
+			auto ret = vgui2::localize()->Find(szText);
+			if (ret) {
+				vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[i], MAX_TEXTMSG_STRING);
+			} else {
+				strncpy(szBuf[i], szText, MAX_TEXTMSG_STRING);
+			}
+		}
+		else
+		{
+			strncpy(szBuf[i], szText, MAX_TEXTMSG_STRING);
+		}
 	}
 	char *psz = szBuf[5];
 
@@ -256,15 +300,17 @@ int CHudTextMessage::MsgFunc_TextMsg( const char *pszName, int iSize, void *pbuf
 
 	case HUD_PRINTRADIO:
 		// For some reason, HUD_PRINTRADIO always have "1" in msg_text
-		for( int i = 1; i < MAX_PLAYERS; i++ )
+		if (playerIndex != -1)
 		{
-			if( g_PlayerInfoList[i].name && !strncmp(g_PlayerInfoList[i].name, szBuf[2], strlen(szBuf[2])) )
-			{
-				psz[0] = 2;
-				snprintf( psz + 1, MAX_TEXTMSG_STRING-1, szBuf[1], szBuf[2], szBuf[3], szBuf[4] );
-				gHUD.m_SayText.SayTextPrint( ConvertCRtoNL( psz ), 128, i );
-				break;
+			// Location
+			auto ret = vgui2::localize()->Find(szBuf[2]);
+			if (ret) {
+				vgui2::localize()->ConvertUnicodeToANSI(ret, szBuf[2], MAX_TEXTMSG_STRING);
 			}
+
+			psz[0] = 2;
+			snprintf(psz + 1, MAX_TEXTMSG_STRING - 1, msg_text, szBuf[1], szBuf[2], szBuf[3], szBuf[4]);
+			gHUD.m_SayText.SayTextPrint(ConvertCRtoNL(psz), 128, playerIndex);
 		}
 		break;
 	}

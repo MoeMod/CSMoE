@@ -90,17 +90,12 @@ namespace sv {
 				if (pEntity->IsPlayer())
 				{
 					CBasePlayer* player = (CBasePlayer*)pEntity;
-					player->m_tLockBuffTime = gpGlobals->time + m_flLockTime;
+					
 					player->pev->velocity = g_vecZero;
-					if (player->m_bIsZombie)
-					{
-						auto strategy = dynamic_cast<CPlayerModStrategy_ZB1*>(player->m_pModStrategy.get());
-						if (strategy)
-						{
-							strategy->SetStunSpeedTime(m_flLockTime, 1);
-							strategy->SetStunGravityTime(m_flLockTime, 3.0);
-						}
-					}
+					player->m_tLockBuffTime = gpGlobals->time + m_flLockTime;			
+					player->m_flLockGravity = 10.0f;
+					player->m_flLockSpeed = 1.0f;
+					player->ResetMaxSpeed();			
 				}
 
 				PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 23, pEntity->entindex(), TRUE, FALSE);

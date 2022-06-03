@@ -94,6 +94,7 @@ void EV_FireM95Tiger( event_args_t *args )
 				if (g_M95TigerEye)
 				{
 					g_M95TigerEye->die = gHUD.m_flTime;
+					g_M95TigerEye = nullptr;
 				}
 
 				if (!viewent)
@@ -130,14 +131,15 @@ void EV_FireM95Tiger( event_args_t *args )
 				g_M95TigerEye->callback = [](tempent_s* pEnt, float frametime, float currenttime)
 				{
 					cl_entity_t* parent = gEngfuncs.GetEntityByIndex(pEnt->entity.curstate.aiment);
-					if (parent->curstate.fov != 90)
-						pEnt->entity.curstate.effects |= EF_NODRAW;
+					if (gHUD.m_iFOV != 90)
+						pEnt->entity.curstate.renderamt = 0;
 					else
-						pEnt->entity.curstate.effects &= ~EF_NODRAW;
+						pEnt->entity.curstate.renderamt = 255;
 					if (pEnt->entity.curstate.weaponmodel != parent->curstate.weaponmodel)
 					{
 						pEnt->entity.curstate.renderamt = 0;
 						pEnt->die = gHUD.m_flTime;
+						g_M95TigerEye = nullptr;
 					}
 				};
 			}

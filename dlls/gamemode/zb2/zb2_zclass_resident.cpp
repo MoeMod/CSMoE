@@ -86,6 +86,8 @@ void CZombieClass_Resident::ResetMaxSpeed() const
 		m_pPlayer->pev->gravity = 0.6f;
 	}
 
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity;
+
 	if (m_pZombieSkill)
 		m_pZombieSkill->ResetMaxSpeed();
 

@@ -133,7 +133,7 @@ namespace sv {
 
 				float flRatio = 1.0;
 
-				pPlayer->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET);
+				pPlayer->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET | DMG_NEVERGIB);
 			}
 		}
 
@@ -164,7 +164,7 @@ namespace sv {
 			if (flDamage == 0.0)
 				continue;
 
-			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION);
+			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
 
 			if (pEntity->IsPlayer())
 			{

@@ -86,6 +86,8 @@ void CZombieClass_Witch::ResetMaxSpeed() const
 		m_pPlayer->pev->gravity = 0.6f;
 	}
 
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity;
+
 	if (m_pZombieSkill2)
 		m_pZombieSkill2->ResetMaxSpeed();
 

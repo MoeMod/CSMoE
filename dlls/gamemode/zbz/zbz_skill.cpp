@@ -837,7 +837,7 @@ namespace sv {
 	private:
 		float GetKickRateBonus() const { return 1.0f + 0.02f * g_pGameRules->m_iTotalRoundsPlayed; }
 		float GetRadiusBonus() const { return 1.0f + 0.1f * g_pGameRules->m_iTotalRoundsPlayed; }
-		float GetDamageBonus() const { return 1.0f + 0.2f * g_pGameRules->m_iTotalRoundsPlayed; }
+		float GetDamageBonus() const { return 1.0f + 0.5f * g_pGameRules->m_iTotalRoundsPlayed; }
 	};
 
 	class ZSkill_ClawEnhacement : public CZombieZSkill_Base

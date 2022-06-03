@@ -468,7 +468,7 @@ ClientPrint(entvars_t *client, int msg_dest, const char *msg_name, const char *p
             const char *param3 = NULL, const char *param4 = NULL);
 
 //NOXREF void UTIL_SayText(const char *pText, CBaseEntity *pEntity);
-void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity);
+void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity = NULL);
 char *UTIL_dtos1(int d);
 char *UTIL_dtos2(int d);
 //NOXREF char *UTIL_dtos3(int d);

@@ -30,7 +30,7 @@ void CHolySwordCannon::Spawn()
 	UTIL_SetOrigin(pev, pev->origin);
 	UTIL_SetSize(pev, Vector(-4, -4, -4), Vector(4, 4, 4));
 
-	pev->classname = MAKE_STRING("d_holysword");
+	pev->classname = MAKE_STRING("holysword_cannon");
 
 	pev->nextthink = gpGlobals->time + 0.01s;
 }

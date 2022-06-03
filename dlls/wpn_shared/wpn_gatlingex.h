@@ -7,7 +7,7 @@ namespace sv {
 #endif
 
 //xm1014
-#define XM1014_MAX_SPEED	220
+#define XM1014_MAX_SPEED	230
 #define XM1014_CONE_VECTOR	Vector(0.0725, 0.0725, 0.0)	// special shotgun spreads
 #define	GATLING_DEFAULT_GIVE 45
 #define	GATLING_MAX_CLIP 45
@@ -48,7 +48,7 @@ public:
 #ifndef CLIENT_DLL
 	WeaponBuyAmmoConfig GetBuyAmmoConfig() override { return { "ammo_12gauge" , 65 }; }
 #endif
-	float GetArmorRatioModifier() override { return 1.0; }
+	float GetArmorRatioModifier() override { return 1.2; }
 	WeaponCrosshairData GetCrosshairData() override { return { ACCURACY_AIR | ACCURACY_SPEED, 4, 3, 0 }; }
 public:
 	int m_iShell;

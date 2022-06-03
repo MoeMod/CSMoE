@@ -196,13 +196,23 @@ void CMod_ZombieScenario::Think()
 	if (m_fTeamCount != invalid_time_point && m_fTeamCount <= gpGlobals->time)
 	{
 		if (m_iNumTerroristWins)
-			g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
+		{
+			if (!CheckCanStartVoteMaps() && !m_iVoteMapStatus)
+				g_fGameOver = TRUE; // Game over, changelevel in CheckGameOver().
+			else
+				RestartRound();
+		}
 		else
 			RestartRound();
 	}
 
 	if (CheckGameOver())   // someone else quit the game already
 		return;
+
+#ifdef XASH_DEDICATED
+	// votemap things
+	VoteMapThink();
+#endif
 
 	if (IsFreezePeriod())
 	{
@@ -216,7 +226,7 @@ void CMod_ZombieScenario::Think()
 				iLastCountDown = iCountDown;
 				if (iCountDown > 0 && iCountDown < 20)
 				{
-					UTIL_ClientPrintAll(HUD_PRINTCENTER, "Waiting for Round Start: %s1 sec(s)", UTIL_dtos1(iCountDown)); // #CSO_ZBS_StartCount
+					UTIL_ClientPrintAll(HUD_PRINTCENTER, "#CSO_ZBS_StartCount", UTIL_dtos1(iCountDown)); // #CSO_ZBS_StartCount
 				}
 
 				if (iCountDown == 19)
@@ -329,9 +339,13 @@ void CMod_ZombieScenario::ZombieWin()
 	MESSAGE_END();
 
 	TerminateRound(5s, WINSTATUS_TERRORISTS);
-
 	++m_iNumTerroristWins;
 	UpdateTeamScores();
+
+	if (CheckCanStartVoteMaps())
+	{
+		SERVER_COMMAND("start_votemap\n");
+	}
 }
 
 void CMod_ZombieScenario::TeamCheck()
@@ -402,9 +416,12 @@ CBaseEntity *CMod_ZombieScenario::MakeZombieNPC()
 	DispatchSpawn(pent);
 
 	// default settings
-	monster->pev->health = monster->pev->max_health = 100 + m_iNumCTWins * 15;
-	monster->pev->maxspeed = 100.0f + (m_iNumCTWins / 3) * 15;
-	monster->m_flAttackDamage = (0.2f * m_iNumCTWins + 1) * (0.2f * m_iNumCTWins + 1);
+	monster->pev->max_health += m_iNumCTWins * 15;
+	monster->pev->health = monster->pev->max_health;
+	monster->pev->maxspeed += (m_iNumCTWins / 3) * 15;
+	if (monster->pev->maxspeed > 250)
+		monster->pev->maxspeed = 250;
+	monster->m_flAttackDamage += (0.2f * m_iNumCTWins + 1);
 
 	/*if (m_iNumCTWins < 5 || RANDOM_LONG(0, 3))
 	{

@@ -70,6 +70,11 @@ short int g_sModelIndexCTGhost;
 short int g_sModelIndexTGhost;
 short int g_sModelIndexC4Glow;
 
+short g_sModelIndexEventBombExp;
+short g_sModelIndexEventBombExp2;
+short g_sModelIndexMoonCakeExp;
+short g_sModelIndexHolyWater;
+
 short g_sModelIndexBoomerEffect;
 short g_sModelIndexBoomerSprite;
 short g_sModelIndexBoomerEffectEx;

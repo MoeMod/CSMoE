@@ -64,6 +64,8 @@ struct PlasmaGun_WeaponData
 	class CPlasmaGrenade : public CBaseEntity, public PlasmaGun_WeaponData
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.85; }
+		int GetWeaponsId(void) { return WEAPON_PLASMAGUN; }
 		void Spawn() override
 		{
 			Precache();
@@ -89,7 +91,7 @@ struct PlasmaGun_WeaponData
 			UTIL_SetOrigin(pev, pev->origin);
 			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
-			pev->classname = MAKE_STRING("weapon_plasmagun");
+			pev->classname = MAKE_STRING("plasma_grenade");
 		}
 
 		void Precache() override
@@ -139,7 +141,7 @@ struct PlasmaGun_WeaponData
 
 					ClearMultiDamage();
 					pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_GENERIC);
-					ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+					ApplyMultiDamage(this->pev, pAttackePlayer->pev);
 				}
 
 				TraceResult tr;
@@ -224,7 +226,7 @@ struct PlasmaGun_WeaponData
 			m_iType = type;
 		}
 
-		KnockbackData GetKnockBackData() override { return { 85.0f, 100.0f, 100.0f, 80.0f, 0.8f }; }
+		KnockbackData GetKnockBackData() override { return { 500.0f, 250.0f, 450.0f, 300.0f, 0.7f }; }
 
 		int m_fSequenceLoops;
 		time_point_t m_flRemoveTime;

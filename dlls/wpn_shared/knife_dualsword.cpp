@@ -921,7 +921,8 @@ private:
 	//int m_iModelSkillFx2;
 
 public:
-
+	float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
 	KnockbackData KnockBack = { 0.0f, 0.0f, 0.0f, 0.0f, 0.9f };
 	void Precache() override
 	{
@@ -933,7 +934,7 @@ public:
 	{
 		Precache();
 
-		pev->classname = MAKE_STRING("d_dualsword");
+		pev->classname = MAKE_STRING("dualsword_specialeffect");
 		m_iEffectType = 0;
 		m_flNextEffect = gpGlobals->time + 0.65s;
 		pev->nextthink = gpGlobals->time + 0.017s;
@@ -1274,7 +1275,7 @@ void CKnifeDualsword::SpawnEffect()
 void CKnifeDualsword::DestroyEffect()
 {
 	CBaseEntity* pEntity = nullptr;
-	while ((pEntity = UTIL_FindEntityByClassname(pEntity, "d_dualsword")) != nullptr)
+	while ((pEntity = UTIL_FindEntityByClassname(pEntity, "dualsword_specialeffect")) != nullptr)
 	{
 		if (pEntity->pev->owner == m_pPlayer->edict())
 		{

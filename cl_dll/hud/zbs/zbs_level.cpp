@@ -36,23 +36,23 @@ int CHudZBSLevel::Draw(float time)
 
 	const int r = 255, g = 255, b = 255;
 
-	DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "HP", r, g, b, flScale);
-	DrawUtils::DrawHudString(x + 20, y + 50, ScreenWidth, "ATT", r, g, b, flScale);
+	DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "生命力", r, g, b, flScale);
+	DrawUtils::DrawHudString(x + 20, y + 50, ScreenWidth, "攻击力", r, g, b, flScale);
 
 	char szBuffer[64];
 
 	// HP Level
 	if (m_iLevel_HP >= 40)
-		sprintf(szBuffer, "Level MAX");
+		sprintf(szBuffer, "满级");
 	else
-		sprintf(szBuffer, "Level %d", m_iLevel_HP);
+		sprintf(szBuffer, "等级 %d", m_iLevel_HP);
 	DrawUtils::DrawHudString(x + 100, y + 5, ScreenWidth, szBuffer, r, g, b, flScale);
 
 	// ATK Level
 	if (m_iLevel_ATK >= 40)
-		sprintf(szBuffer, "Level MAX");
+		sprintf(szBuffer, "满级");
 	else
-		sprintf(szBuffer, "Level %d", m_iLevel_ATK);
+		sprintf(szBuffer, "等级 %d", m_iLevel_ATK);
 	DrawUtils::DrawHudString(x + 100, y + 40, ScreenWidth, szBuffer, r, g, b, flScale);
 
 	// ATK Value
@@ -70,9 +70,9 @@ int CHudZBSLevel::Draw(float time)
 
 		DrawUtils::DrawHudString(x + 20, y + 5, ScreenWidth, "Durability", r, g, b, flScale);
 		if (m_iLevel_Wall >= 40)
-			sprintf(szBuffer, "Level MAX");
+			sprintf(szBuffer, "满级");
 		else
-			sprintf(szBuffer, "Level %d", m_iLevel_Wall);
+			sprintf(szBuffer, "等级 %d", m_iLevel_Wall);
 		DrawUtils::DrawHudString(x + 100, y + 5, ScreenWidth, szBuffer, r, g, b, flScale);
 	}
 

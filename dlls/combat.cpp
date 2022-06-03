@@ -1013,6 +1013,63 @@ float GetAmountOfPlayerVisible(Vector vecSrc, CBaseEntity *entity)
 	return retval;
 }
 
+
+static float CalculateDamageRate(Vector vecSrc, CBaseEntity* pOther)
+{
+	TraceResult tr;
+	float rate = 0.0;
+
+	if (!pOther->IsPlayer())
+	{
+		UTIL_TraceLine(vecSrc, pOther->pev->origin, ignore_monsters, NULL, &tr);
+
+		return tr.flFraction < 1.0 ? 0.0 : 1.0;
+	}
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin, ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate = 0.4;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 0, 25), ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.2;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 0, FBitSet(pOther->pev->flags, FL_DUCKING) ? -14 : -34), ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.2;
+
+	Vector2D vecDir = pOther->pev->origin.Make2D() - vecSrc.Make2D();
+	float dis2D = vecDir.LengthSquared();
+
+	if (!dis2D)
+	{
+		vecDir.x = 0.0;
+		vecDir.y = 1.0;
+
+		UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(0, 13, 0), ignore_monsters, NULL, &tr);
+	}
+	else
+	{
+		vecDir.x /= dis2D;
+		vecDir.y /= dis2D;
+
+		UTIL_TraceLine(vecSrc, pOther->pev->origin + Vector(-vecDir.y, vecDir.x, 0.0) * 13, ignore_monsters, NULL, &tr);
+	}
+
+	if (tr.flFraction == 1.0)
+		rate += 0.1;
+
+	UTIL_TraceLine(vecSrc, pOther->pev->origin - Vector(-vecDir.y, vecDir.x, 0.0) * 13, ignore_monsters, NULL, &tr);
+
+	if (tr.flFraction == 1.0)
+		rate += 0.1;
+
+	return rate;
+}
+
 void RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius,
                   int iClassIgnore, int bitsDamageType)
 {
@@ -1332,14 +1389,129 @@ void RadiusDamage3(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacke
 	}
 }
 
+bool RadiusDamage4(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	float flAdjustedDamage, falloff;
+	Vector vecSpot;
+
+	if (flRadius)
+	{
+		falloff = flDamage / flRadius;
+
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			falloff *= 0.3;
+	}
+	else
+		falloff = 1;
+
+	int bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+	bool bHit = false;
+
+	vecSrc.z += 1;
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage == DAMAGE_NO)
+			continue;
+
+		if (iClassIgnore != CLASS_NONE && pEntity->Classify() == iClassIgnore)
+			continue;
+
+		if (bInWater && !pEntity->pev->waterlevel)
+			continue;
+
+		if (!bInWater && pEntity->pev->waterlevel == 3)
+			continue;
+
+		if (!pEntity->IsPlayer())
+			break;
+
+		vecSpot = pEntity->BodyTarget(vecSrc);
+		UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+		if (tr.flFraction == 1 || tr.pHit == pEntity->edict())
+		{
+			bool bDamageRate = false;
+			float flDamageRate;
+
+			if ((bitsDamageType & DMG_EXPLOSION) && false /* UTIL_IsGame("czero") */)
+			{
+				bDamageRate = true;
+				flDamageRate = CalculateDamageRate(vecSrc, pEntity);
+			}
+			else
+			{
+				flDamageRate = 1.0;
+			}
+
+			if (bDamageRate)
+			{
+				float dis = flRadius - (vecSrc - pEntity->pev->origin).Length();
+
+				if (!flRadius)
+					flRadius = flDamage;
+
+				if (!flRadius)
+					continue;
+
+				flAdjustedDamage = (dis * dis) * 1.25 / (flRadius * flRadius) * flDamageRate * flDamage * 1.5;
+			}
+			else
+			{
+				flAdjustedDamage = (vecSrc - pEntity->pev->origin).Length() * falloff;
+				flAdjustedDamage = flDamage - flAdjustedDamage;
+			}
+
+			if (flAdjustedDamage < 0.0)
+				continue;
+
+			pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
+
+			if (pEntity->pev->health > 0.0)
+				continue;
+
+			if (pEntity != CBaseEntity::Instance(pevAttacker))
+				bHit = true;
+		}
+	}
+
+	return bHit;
+}
+
 void CBaseMonster::RadiusDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int iClassIgnore,
                                 int bitsDamageType)
 {
+	if (g_pModRunning->DamageTrack() == DT_ZB)
+	{
+		if (flDamage <= 80)
+		{
+			sv::RadiusDamage2(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * RANDOM_FLOAT(0.65, 0.845), iClassIgnore, bitsDamageType);
+		}
+		else
+		{
+			sv::RadiusDamage4(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 0.65, iClassIgnore, bitsDamageType);
+		}
+	}
+
+
 	if (flDamage > 80)
-		::sv::RadiusDamage(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 3.5, iClassIgnore, bitsDamageType);
+		::sv::RadiusDamage(pev->origin, pevInflictor, pevAttacker, flDamage, min(flDamage, 100) * 3.5, iClassIgnore, bitsDamageType);
 	else
-		::sv::RadiusDamage2(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * (RANDOM_FLOAT(0.5, 1.5) + 3),
+		sv::RadiusDamage2(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * (RANDOM_FLOAT(0.5, 1.5) + 3),
 		                iClassIgnore, bitsDamageType);
+}
+
+bool CBaseMonster::RadiusDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType, float flRadius)
+{
+	/*if (FClassnameIs(pevInflictor, "at4rocket"))
+		return ::RadiusDamageAT4Rocket(pev->origin, pevInflictor, pevAttacker, flDamage, iClassIgnore, bitsDamageType, flRadius);
+	else */
+	return ::sv::RadiusDamage4(pev->origin, pevInflictor, pevAttacker, flDamage, flRadius, iClassIgnore, bitsDamageType);
 }
 
 NOXREF void CBaseMonster::RadiusDamage(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage,

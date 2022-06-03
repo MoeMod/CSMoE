@@ -33,10 +33,6 @@ void EV_FirePlasmaGun( event_args_t *args )
 
 	if ( EV_IsLocal( idx ) )
 	{
-		++g_iShotsFired;
-		EV_MuzzleFlash();
-		
-		/*
 		dlight_t *dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
 		if(dl)
 		{
@@ -48,8 +44,7 @@ void EV_FirePlasmaGun( event_args_t *args )
 			dl->color.b = 150;
 			dl->die = gEngfuncs.GetClientTime() + 0.1;
 		}
-		*/
-
+	
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(Com_RandomLong(ANIM_SHOOT1, ANIM_SHOOT3), 2);
 	}
 

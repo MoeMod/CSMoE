@@ -30,6 +30,8 @@
 namespace sv {
 	class CVoidpistolBlackhole : public CBaseEntity
 	{
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_VOIDPISTOL; }
 		enum blackhole_anim
 		{
 			BLACKHOLE_START,

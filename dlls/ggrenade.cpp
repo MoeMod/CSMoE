@@ -347,7 +347,7 @@ void CGrenade::Explode2(TraceResult *pTrace, int bitsDamageType)
 	}
 }
 
-void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
+void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXPLODE_TYPE type, int iRadius)
 {
 	float flRndSound; // sound randomizer
 	//float damage;
@@ -361,7 +361,130 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 		pev->origin = pTrace->vecEndPos + (pTrace->vecPlaneNormal * (pev->dmg - 24.0f) * 0.6f);
 	}
 
-	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+	switch (type)
+	{
+	case EXPTYPE_EVENTBOMB:
+	{
+		if (m_iGrenadeID == GRENADE_HEARTBOMB)
+		{
+			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z + 20.0);
+			WRITE_SHORT(g_sModelIndexEventBombExp);
+			WRITE_BYTE(25);
+			WRITE_BYTE(30);
+			WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+			MESSAGE_END();
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/heartbomb_explosion.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
+		else
+		{
+			MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+			WRITE_BYTE(TE_EXPLOSION);
+			WRITE_COORD(pev->origin.x);
+			WRITE_COORD(pev->origin.y);
+			WRITE_COORD(pev->origin.z + 20.0);
+			WRITE_SHORT(g_sModelIndexEventBombExp2);
+			WRITE_BYTE(25);
+			WRITE_BYTE(30);
+			WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+			MESSAGE_END();
+
+			EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/cakeexp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		}
+
+		break;
+	}
+
+	case EXPTYPE_MOONCAKE:
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.z + RANDOM_FLOAT(30.0, 35.0));
+		WRITE_SHORT(g_sModelIndexMoonCakeExp);
+		WRITE_BYTE(30);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/mooncake_exp.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+
+		break;
+
+	case EXPTYPE_CARTFRAG:
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 20.0);
+		WRITE_SHORT(g_sModelIndexFireball3);
+		WRITE_BYTE(25);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.z + RANDOM_FLOAT(30.0, 35.0));
+		WRITE_SHORT(g_sModelIndexFireball2);
+		WRITE_BYTE(30);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+		EMIT_SOUND_DYN(ENT(pev), CHAN_WEAPON, "weapons/cartfrag.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);
+		break;
+
+	case EXPTYPE_THANATOS5ROCKET:
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 20.0);
+		WRITE_SHORT(g_sModelIndexHolyWater);
+		WRITE_BYTE(25);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NONE);
+		MESSAGE_END();
+
+		break;
+
+	case EXPTYPE_VULCANUS7ROCKET:
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x);
+		WRITE_COORD(pev->origin.y);
+		WRITE_COORD(pev->origin.z + 20.0);
+		WRITE_SHORT(g_sModelIndexFireball3);
+		WRITE_BYTE(25);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NOSOUND);
+		MESSAGE_END();
+
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		WRITE_BYTE(TE_EXPLOSION);
+		WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64.0, 64.0));
+		WRITE_COORD(pev->origin.z + RANDOM_FLOAT(30.0, 35.0));
+		WRITE_SHORT(g_sModelIndexFireball2);
+		WRITE_BYTE(30);
+		WRITE_BYTE(30);
+		WRITE_BYTE(TE_EXPLFLAG_NONE);
+		MESSAGE_END();
+
+		break;
+
+	case EXPTYPE_FGLAUNCHERROCKET:
+		break;
+
+	default:
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
 		WRITE_COORD(pev->origin.x);		// Send to PAS because of the sound
 		WRITE_COORD(pev->origin.y);
@@ -370,9 +493,9 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 		WRITE_BYTE(25);			// scale * 10
 		WRITE_BYTE(30);		// framerate
 		WRITE_BYTE(TE_EXPLFLAG_NONE);	// flags
-	MESSAGE_END();
+		MESSAGE_END();
 
-	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+		MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
 		WRITE_BYTE(TE_EXPLOSION);	// This makes a dynamic light and the explosion sprites/sound
 		WRITE_COORD(pev->origin.x + RANDOM_FLOAT(-64, 64));	// Send to PAS because of the sound
 		WRITE_COORD(pev->origin.y + RANDOM_FLOAT(-64, 64));
@@ -381,7 +504,10 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 		WRITE_BYTE(30);			// scale * 10
 		WRITE_BYTE(30);		// framerate
 		WRITE_BYTE(TE_EXPLFLAG_NONE);	// flags
-	MESSAGE_END();
+		MESSAGE_END();
+
+		break;
+	}
 
 	CSoundEnt::InsertSound(bits_SOUND_COMBAT, pev->origin, NORMAL_EXPLOSION_VOLUME, 3s);
 
@@ -397,7 +523,26 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 	}
 
 	pev->owner = NULL;
-	RadiusDamage(pev, pevOwner, pev->dmg, CLASS_NONE, bitsDamageType);
+	float flDamage = pev->dmg;
+	switch (type)
+	{
+	case EXPTYPE_M79ROCKET:
+	case EXPTYPE_AT4ROCKET:
+	case EXPTYPE_FIRECRACKERROCKET:
+	case EXPTYPE_M32ROCKET:
+		m_bHit = RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType, iRadius);
+
+		break;
+
+	default:
+		
+		if (g_pModRunning->DamageTrack() == DT_ZB)
+			flDamage *= 5.0f;
+
+		RadiusDamage(pev, pevOwner, flDamage, CLASS_NONE, bitsDamageType);
+
+		break;
+	}
 
 	if (RANDOM_FLOAT(0, 1) < 0.5f)
 		UTIL_DecalTrace(pTrace, DECAL_SCORCH1);
@@ -418,6 +563,10 @@ void CGrenade::Explode3(TraceResult *pTrace, int bitsDamageType)
 	SetThink(&CGrenade::Smoke3_C);
 	pev->velocity = g_vecZero;
 	pev->nextthink = gpGlobals->time + 0.55s;
+
+	if (type == EXPTYPE_THANATOS5ROCKET)
+		return;
+
 	int sparkCount = RANDOM_LONG(0, 3);
 
 	for (int i = 0; i < sparkCount; ++i)
@@ -842,7 +991,35 @@ void CGrenade::Detonate3()
 
 	vecSpot = pev->origin + Vector(0, 0, 8);
 	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -40), ignore_monsters, ENT(pev), &tr);
-	Explode3(&tr, DMG_EXPLOSION);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_NORMAL, 0.0);
+}
+
+
+void CGrenade::DetonateCartFrag(void)
+{
+	TraceResult tr;
+	Vector vecStart = pev->origin - Vector(0, 0, 32);
+
+	UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_CARTFRAG, 0.0);
+}
+
+void CGrenade::DetonateEventBomb(void)
+{
+	TraceResult tr;
+	Vector vecStart = pev->origin - Vector(0, 0, 32);
+
+	UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_EVENTBOMB, 0.0);
+}
+
+void CGrenade::DetonateMoonCake(void)
+{
+	TraceResult tr;
+	Vector vecStart = pev->origin - Vector(0, 0, 32);
+
+	UTIL_TraceLine(pev->origin + Vector(0, 0, 8), pev->origin - Vector(0, 0, 32), ignore_monsters, ENT(pev), &tr);
+	Explode3(&tr, DMG_EXPLOSION, EXPTYPE_MOONCAKE, 0.0);
 }
 
 void CGrenade::ZombieBombExplosion()
@@ -954,7 +1131,7 @@ void CGrenade::BounceTouch(CBaseEntity *pOther)
 		++m_iBounceCount;
 	}
 
-	if (pev->dmg != 999)
+	if (!m_bStaticFramerate)
 	{
 		pev->framerate = pev->velocity.Length() / 200.0f;
 
@@ -1016,6 +1193,7 @@ void CGrenade::TumbleThink()
 		return;
 	}
 
+	CalculateFramerate();
 	StudioFrameAdvance();
 	pev->nextthink = gpGlobals->time + 0.1s;
 
@@ -1026,14 +1204,36 @@ void CGrenade::TumbleThink()
 
 	if (pev->dmgtime <= gpGlobals->time)
 	{
-		if (pev->dmg <= 40.0f)
+		if (pev->dmg == 888)
 		{
-			SetThink(&CGrenade::Detonate);
+			pev->dmg = 100;
+
+			SetThink(&CGrenade::DetonateEventBomb);
 		}
-		else if(pev->dmg == 999.0f)
-			SetThink(&CGrenade::Detonate);	//useless
+		else if (pev->dmg == 788)
+		{
+			pev->dmg = 100;
+
+			SetThink(&CGrenade::DetonateMoonCake);
+		}
+		else if (pev->dmg == 788)
+		{
+			pev->dmg = 100;
+
+			SetThink(&CGrenade::DetonateMoonCake);
+		}
+		else if (pev->dmg == 766)
+		{
+			pev->dmg = 100;
+
+			SetThink(&CGrenade::DetonateCartFrag);
+		}
+		else if (pev->dmg > 40.0f)
+		{
+			SetThink(&CGrenade::Detonate3);		
+		}
 		else
-			SetThink(&CGrenade::Detonate3);
+			SetThink(&CGrenade::Detonate);
 	}
 
 	if (pev->waterlevel != 0)
@@ -1160,48 +1360,6 @@ NOXREF CGrenade *CGrenade::ShootContact(entvars_t *pevOwner, Vector vecStart, Ve
 	return pGrenade;
 }
 
-
-CGrenade* CGrenade::ShootTimed3(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, int iType)
-{
-	CGrenade* pGrenade = CreateClassPtr<CGrenade>();
-	pGrenade->Spawn();
-
-	UTIL_SetOrigin(pGrenade->pev, vecStart);
-	pGrenade->pev->velocity = vecVelocity;
-	pGrenade->pev->angles = pevOwner->angles;
-	pGrenade->pev->owner = ENT(pevOwner);
-
-	pGrenade->m_usEvent = usEvent;
-
-	pGrenade->SetTouch(&CGrenade::BounceTouch);
-
-	pGrenade->pev->dmgtime = gpGlobals->time + time;
-	pGrenade->SetThink(&CGrenade::TumbleThink);
-	pGrenade->pev->nextthink = gpGlobals->time + 0.1s;
-
-	pGrenade->pev->sequence = RANDOM_LONG(3, 6);
-	pGrenade->pev->framerate = 1.0f;
-
-	pGrenade->m_bJustBlew = true;
-
-	pGrenade->pev->gravity = 0.55f;
-	pGrenade->pev->friction = 0.7f;
-
-	pGrenade->m_iTeam = iTeam;
-	switch (iType)
-	{
-	case 0:
-		SET_MODEL(ENT(pGrenade->pev), "models/w_zombiebomb.mdl");
-		break;
-	default:
-		SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
-		pGrenade->pev->dmg = 100.0f;
-		break;
-	}
-
-	return pGrenade;
-}
-
 CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent)
 {
 	CGrenade *pGrenade = CreateClassPtr<CGrenade>();
@@ -1229,9 +1387,56 @@ CGrenade *CGrenade::ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vec
 	pGrenade->pev->friction = 0.7f;
 
 	pGrenade->m_iTeam = iTeam;
+	pGrenade->m_bStaticFramerate = false;
+	CBasePlayer* pOwner = (CBasePlayer*)CBaseEntity::Instance(pevOwner);
 
-	SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
-	pGrenade->pev->dmg = 100.0f;
+	pGrenade->m_iGrenadeID = pOwner->m_iGrenadeID;
+	switch (pOwner->m_iGrenadeID)
+	{
+	case GRENADE_M24GRENADE:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_m24grenade.mdl");
+
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 100;
+		break;
+
+	case GRENADE_FGRENADE2:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_fgrenade2.mdl");
+
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 125;
+		break;
+
+	case GRENADE_FIREBOMB:
+		break;
+
+	case GRENADE_HEARTBOMB:
+	case GRENADE_CAKEBOMB:
+		SET_MODEL(ENT(pGrenade->pev), pOwner->m_iGrenadeID == GRENADE_HEARTBOMB ? "models/w_heartbomb.mdl" : "models/w_cake.mdl");
+
+		pGrenade->m_bStaticFramerate = false;
+		pGrenade->pev->dmg = 888;
+		break;
+
+	case GRENADE_MOONCAKE:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_mooncake.mdl");
+
+		pGrenade->m_bStaticFramerate = false;
+		pGrenade->pev->dmg = 788;
+		break;
+
+	case GRENADE_CARTFRAG:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_cartfrag.mdl");
+
+		pGrenade->m_bStaticFramerate = true;
+		pGrenade->pev->dmg = 766;
+		break;
+	default:
+		SET_MODEL(ENT(pGrenade->pev), "models/w_hegrenade.mdl");
+		pGrenade->pev->dmg = 100.0f;
+
+		break;
+	}
 
 	/*CBasePlayer* player = GetClassPtr<CBasePlayer>(pevOwner);
 	if (player)
@@ -1275,7 +1480,7 @@ CGrenade *CGrenade::ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecV
 
 	pGrenade->pev->gravity = 0.5f;
 	pGrenade->pev->friction = 0.8f;
-
+	pGrenade->m_bStaticFramerate = false;
 	SET_MODEL(ENT(pGrenade->pev), "models/w_flashbang.mdl");
 	pGrenade->pev->dmg = 35.0f;
 
@@ -1306,6 +1511,7 @@ CGrenade* CGrenade::ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->health = 100;	//damage
 	pGrenade->pev->fuser1 = 350.0; //kickrate;
 	pGrenade->pev->fuser2 = 250.0; //radius;
+	pGrenade->m_bStaticFramerate = true;
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
 	pGrenade->m_bJustBlew = true;
@@ -1344,6 +1550,7 @@ CGrenade* CGrenade::ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector
 	pGrenade->pev->health = flDamage;
 	pGrenade->pev->fuser1 = 450.0; //kickrate;
 	pGrenade->pev->fuser2 = 250.0; //radius;
+	pGrenade->m_bStaticFramerate = true;
 	UTIL_SetSize(pGrenade->pev, Vector(-4, -4, -4), Vector(4, 4, 4));
 	pGrenade->SetThink(&CGrenade::ZombieBomb_TumbleThink);
 
@@ -1437,7 +1644,7 @@ CGrenade* CGrenade::ShootMolotov(entvars_t* pevOwner, Vector vecStart, Vector ve
 	pGrenade->m_bJustBlew = true;
 	pGrenade->pev->gravity = 0.5f;
 	pGrenade->pev->friction = 0.8f;
-
+	pGrenade->m_bStaticFramerate = false;
 	SET_MODEL(ENT(pGrenade->pev), "models/w_molotov.mdl");
 	pGrenade->pev->dmg = 35.0f;
 
@@ -1807,7 +2014,7 @@ CGrenade *CGrenade::ShootSmokeGrenade(entvars_t *pevOwner, Vector vecStart, Vect
 	pGrenade->pev->gravity = 0.5f;
 	pGrenade->pev->friction = 0.8f;
 	pGrenade->m_SGSmoke = 0;
-
+	pGrenade->m_bStaticFramerate = false;
 	SET_MODEL(ENT(pGrenade->pev), "models/w_smokegrenade.mdl");
 	pGrenade->pev->dmg = 35.0f;
 
@@ -2193,6 +2400,19 @@ NOXREF void CGrenade::UseSatchelCharges(entvars_t *pevOwner, SATCHELCODE code)
 			}
 		}
 		pentFind = FIND_ENTITY_BY_CLASSNAME(pentFind, "grenade");
+	}
+}
+
+void CGrenade::CalculateFramerate(void)
+{
+	if (m_bStaticFramerate)
+	{
+		float flSpeed = pev->velocity.Length();
+
+		if (flSpeed > 100)
+			flSpeed = 100;
+
+		pev->framerate = flSpeed / 25.0;
 	}
 }
 

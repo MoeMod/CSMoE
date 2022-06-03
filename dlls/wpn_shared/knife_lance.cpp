@@ -32,6 +32,8 @@ namespace sv {
 	{
 	public:
 		KnockbackData GetKnockBackData() override { return { 0.0f, 0.0f, 0.0f, 0.0f, 1.0f }; }
+		float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+		int GetWeaponsId(void) { return WEAPON_KNIFE; }
 
 		void Spawn() override
 		{
@@ -192,6 +194,9 @@ namespace sv {
 	class CLanceFountainSpecialAttack : public CBaseEntity
 	{
 	public:
+		float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+		int GetWeaponsId(void) { return WEAPON_KNIFE; }
+
 		void Spawn() override
 		{
 			Precache();

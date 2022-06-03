@@ -50,9 +50,7 @@ namespace sv {
 		PRECACHE_MODEL("models/v_zombibomb.mdl");
 		PRECACHE_MODEL("models/w_zombibomb.mdl");
 		PRECACHE_MODEL("models/p_zombibomb.mdl");
-#ifdef ENABLE_SHIELD
-		PRECACHE_MODEL("models/shield/v_shield_hegrenade.mdl");
-#endif
+
 		PRECACHE_SOUND("zombi/zombi_bomb_deploy.wav");
 		PRECACHE_SOUND("zombi/zombi_bomb_idle_1.wav");
 		PRECACHE_SOUND("zombi/zombi_bomb_idle_2.wav");
@@ -60,6 +58,8 @@ namespace sv {
 		PRECACHE_SOUND("zombi/zombi_bomb_idle_4.wav");
 		PRECACHE_SOUND("zombi/zombi_bomb_pull_1.wav");
 		PRECACHE_SOUND("zombi/zombi_bomb_throw.wav");
+		PRECACHE_SOUND("zombi/zombi_bomb_bounce_1.wav");
+		PRECACHE_SOUND("zombi/zombi_bomb_bounce_2.wav");
 
 		m_usCreateExplosion = PRECACHE_EVENT(1, "events/createexplo.sc");
 	}

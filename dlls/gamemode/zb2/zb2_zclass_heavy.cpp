@@ -95,6 +95,8 @@ void CZombieClass_Heavy::ResetMaxSpeed() const
 		m_pPlayer->pev->maxspeed = min(m_flStunSpeed, 100.0);
 	}
 
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity;
+
 	if (m_pPlayer->pev->velocity.Length2D() < 200.0f)
 		m_pPlayer->pev->maxspeed = 399.0;
 }

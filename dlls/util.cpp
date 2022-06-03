@@ -824,7 +824,10 @@ NOXREF void UTIL_SayText(const char *pText, CBaseEntity *pEntity)
 void UTIL_SayTextAll(const char *pText, CBaseEntity *pEntity)
 {
 	MESSAGE_BEGIN(MSG_ALL, gmsgSayText);
-	WRITE_BYTE(pEntity->entindex());
+	if (pEntity == NULL)
+		WRITE_BYTE(0);
+	else
+		WRITE_BYTE(pEntity->entindex());
 	WRITE_STRING(pText);
 	MESSAGE_END();
 }

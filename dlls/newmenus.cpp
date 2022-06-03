@@ -101,6 +101,12 @@ menuitem* PlayerMenu::AddItem(std::string name, std::string cmd)
 	return pItem;
 }
 
+void PlayerMenu::AddBlank()
+{
+	menuitem* pItem = AddItem("");
+	pItem->isBlank = true;
+}
+
 menuitem* PlayerMenu::GetMenuItem(item_t item)
 {
 	if (item >= m_Items.size())

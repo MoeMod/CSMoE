@@ -39,6 +39,7 @@ public:
 	}
 
 public:
+	const char* GetCSModelName() override { return "models/w_pumpkin.mdl"; }
 	bool ShieldSecondaryFire(int iUpAnim, int iDownAnim);
 	void SetPlayerShieldAnim();
 	void ResetPlayerShieldAnim();
@@ -69,7 +70,7 @@ public:
 
 private:
 	duration_t GetExplosionTime() const { return 1.5s; }
-	float GetRange() const { return 100.0f; }
+	float GetRange() const { return 350.0f; }
 
 private:
 	short m_sModelIndexExp;

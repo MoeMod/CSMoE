@@ -81,24 +81,22 @@ void COptionsSubMoeSettings::InitHudScaleList(CLabeledCommandComboBox* cb)
 
 	cb->Reset();
 
-	cb->AddItem("100%", "hud_scale 1");
-	cb->AddItem("125%", "hud_scale 1.25");
-	cb->AddItem("150%", "hud_scale 1.5");
-	cb->AddItem("175%", "hud_scale 1.75");
-	cb->AddItem("200%", "hud_scale 2");
-	cb->AddItem("225%", "hud_scale 2.25");
-	cb->AddItem("250%", "hud_scale 2.5");
-	cb->AddItem("275%", "hud_scale 2.75");
-	cb->AddItem("300%", "hud_scale 3");
+	const char* value = engine->pfnGetCvarString("hud_scale");
+	const char* optionName[9] = { "100%", "125%", "150%", "175%", "200%", "225%", "250%", "275%", "300%" };
+	const char* optionValue[9] = { "hud_scale 1", "hud_scale 1.25", "hud_scale 1.5", "hud_scale 1.75", "hud_scale 2", "hud_scale 2.25", "hud_scale 2.5", "hud_scale 2.75", "hud_scale 3" };
 
-	auto value = engine->pfnGetCvarString("hud_scale");
+	int iSelected = -1;
+	for (int i = 0; i < 9; i++)
+	{
+		cb->AddItem(optionName[i], optionValue[i]);
+		if (iSelected == -1)
+			if (!Q_strcmp(optionValue[i] + 10, value))
+				iSelected = i;
+	}
+	if (iSelected == -1)
+		iSelected = 0;
 
-	if (!value)
-		return;
-
-	int initialType = atoi(value);
-
-	cb->SetInitialItem(initialType);
+	cb->SetInitialItem(iSelected);
 }
 
 void COptionsSubMoeSettings::InitSiFiAmmoStyleList(CLabeledCommandComboBox* cb)
@@ -157,22 +155,22 @@ void COptionsSubMoeSettings::InitTexlruList(CLabeledCommandComboBox* cb)
 
 	cb->Reset();
 
-	cb->AddItem("#Texture_Unlimited", "r_texlru 0");
-	cb->AddItem("64", "r_texlru 64");
-	cb->AddItem("128", "r_texlru 128");
-	cb->AddItem("256", "r_texlru 256");
-	cb->AddItem("512", "r_texlru 512");
-	cb->AddItem("1024", "r_texlru 1024");
+	const char* value = engine->pfnGetCvarString("r_texlru");
+	const char* optionName[6] = { "#Texture_Unlimited", "64", "128", "256", "512", "1024" };
+	const char* optionValue[6] = { "r_texlru 0", "r_texlru 64", "r_texlru 128", "r_texlru 256", "r_texlru 512", "r_texlru 1024" };
 
+	int iSelected = -1;
+	for (int i = 0; i < 6; i++)
+	{
+		cb->AddItem(optionName[i], optionValue[i]);
+		if (iSelected == -1)
+			if (!Q_strcmp(optionValue[i] + 9, value))
+				iSelected = i;
+	}
+	if (iSelected == -1)
+		iSelected = 0;
 
-	auto value = engine->pfnGetCvarString("r_texlru");
-
-	if (!value)
-		return;
-
-	int initialType = atoi(value);
-
-	cb->SetInitialItem(initialType);
+	cb->SetInitialItem(iSelected);
 }
 
 void COptionsSubMoeSettings::RemapDamage(void)
@@ -199,9 +197,6 @@ void COptionsSubMoeSettings::RemapDamage(void)
 			m_pDamageImage->SetImage(vgui2::scheme()->GetImage(path, false));
 		}
 	}
-
-	
-		
 }
 
 void COptionsSubMoeSettings::OnTextChanged(vgui2::Panel* panel)

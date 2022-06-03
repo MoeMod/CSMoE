@@ -177,8 +177,15 @@ void EXT_FUNC ClientDisconnect(edict_t *pEntity)
 		pEntity->v.solid = SOLID_NOT;
 		pEntity->v.flags = FL_DORMANT;
 
-		if (pPlayer != NULL)
+		if (pPlayer != NULL) {
 			pPlayer->SetThink(NULL);
+			if (pPlayer->m_iNewMenuID != -1) {
+				if (PlayerMenu* pMenu = g_MenuMgr.get_menu_by_id(pPlayer->m_iNewMenuID)) {
+					pMenu->Destroy();
+				}
+				pPlayer->m_iNewMenuID = -1;
+			}
+		}
 
 		UTIL_SetOrigin(&pEntity->v, pEntity->v.origin);
 		g_pGameRules->ClientDisconnected(pEntity);
@@ -3567,11 +3574,11 @@ void EXT_FUNC ClientCommand(edict_t *pEntity)
 				MoE_HandleBuyCommands(player, CMD_ARGV_(1));
 			}
 #ifdef XASH_DEDICATED
-            else if (FStrEq(pcmd, "moe_admin"))
-            {
-                if(!strcmp(CMD_ARGV_(1), "CPlayerModStrategy_ZB3"))
-                    admin::ShowAdminMenu(player);
-            }
+			else if (FStrEq(pcmd, "moe_admin"))
+			{
+				if (!strcmp(CMD_ARGV_(1), "CPlayerModStrategy_ZB3"))
+					admin::ShowAdminMenu(player);
+			}
 #endif
 			else
 			{

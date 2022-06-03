@@ -153,7 +153,11 @@ void CSupplyBox::SupplyboxTouch(CBaseEntity *pOther)
 		for (auto iSlot : { PRIMARY_WEAPON_SLOT, PISTOL_SLOT, KNIFE_SLOT, GRENADE_SLOT })
 		{
 			std::vector<MoEWeaponBuyInfo_s> candidate_list;
+#ifndef XASH_DEDICATED
+			std::copy_if(std::begin(g_MoEWeaponBuyInfoLocal), std::end(g_MoEWeaponBuyInfoLocal), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#else
 			std::copy_if(std::begin(g_MoEWeaponBuyInfo), std::end(g_MoEWeaponBuyInfo), std::back_inserter(candidate_list), [iSlot](const MoEWeaponBuyInfo_s& info) { return info.iSlot == iSlot; });
+#endif // !XASH_DEDICATED
 			std::shuffle(candidate_list.begin(), candidate_list.end(), std::random_device());
 			const MoEWeaponBuyInfo_s& info = candidate_list.front();
 			if (iSlot == KNIFE_SLOT) {

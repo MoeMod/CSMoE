@@ -80,6 +80,8 @@ struct BuffAK47_WeaponData
 	class CBuffAK47Grenade : public CBaseEntity, public BuffAK47_WeaponData
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.6; }
+		int GetWeaponsId(void) { return WEAPON_BUFFAK; }
 		void Spawn() override
 		{
 			Precache();
@@ -105,7 +107,7 @@ struct BuffAK47_WeaponData
 			UTIL_SetOrigin(pev, pev->origin);
 			UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0));
 
-			pev->classname = MAKE_STRING("d_buffak");
+			pev->classname = MAKE_STRING("buffak_grenade");
 		}
 
 		void Precache() override
@@ -153,7 +155,7 @@ struct BuffAK47_WeaponData
 
 					ClearMultiDamage();
 					pOther->TraceAttack(pAttackePlayer->pev, m_flTouchDamage, vecDirection, &tr, DMG_BULLET);
-					ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+					ApplyMultiDamage(pev, pAttackePlayer->pev);
 				}
 
 				TraceResult tr;

@@ -33,8 +33,10 @@ namespace sv {
 #ifndef CLIENT_DLL
 		class CGatlingexProjectile : public CBaseEntity
 		{
+			float GetArmorRatioModifier() { return 1.2; }
+			int GetWeaponsId(void) { return WEAPON_GATLINGEX; }
 		public:
-			KnockbackData GetKnockBackData() override { return { 1000.0f, 1000.0f, 1000.0f, 1000.0f, 0.9f }; }
+			KnockbackData GetKnockBackData() override { return { 1000.0f, 1000.0f, 1000.0f, 1000.0f, 0.3f }; }
 			void Spawn() override
 			{
 				Precache();
@@ -130,6 +132,7 @@ namespace sv {
 			void RadiusDamage(Vector vecAiming, float flDamage, bool IsExp)
 			{
 				float flRadius;
+				int bitsDamageType = DMG_BULLET | DMG_NEVERGIB;
 				if (!IsExp)
 				{
 					flRadius = 40.0f;
@@ -140,17 +143,18 @@ namespace sv {
 				}
 				else
 				{
-					flRadius = 60.0f;
+					flRadius = 150.0f;
 					if (g_pModRunning->DamageTrack() == DT_ZBS)
-						flRadius = 60.0f;
+						flRadius = 150.0f;
 					if (g_pModRunning->DamageTrack() == DT_ZB)
-						flRadius = 60.0f;
+						flRadius = 150.0f;
+					bitsDamageType = DMG_EXPLOSION | DMG_NEVERGIB;
 				}
 
 				const Vector vecSrc = pev->origin;
 				entvars_t* const pevAttacker = VARS(pev->owner);
 				entvars_t* const pevInflictor = this->pev;
-				int bitsDamageType = DMG_BULLET;
+				
 
 				TraceResult tr;
 				const float falloff = flRadius ? flDamage / flRadius : 1;
@@ -186,9 +190,6 @@ namespace sv {
 							float flAdjustedDamage = flDamage - (vecSrc - pEntity->pev->origin).Length() * falloff;
 							flAdjustedDamage = Q_max(0, flAdjustedDamage);
 							pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
-
-							
-
 						}
 					}
 				}
@@ -199,11 +200,10 @@ namespace sv {
 				float flDamage = 300.0f;
 #ifndef CLIENT_DLL
 				if (g_pModRunning->DamageTrack() == DT_ZB)
-					flDamage = 3000.0f;
+					flDamage = 2000.0f;
 				//flDamage = 750.0f;
 				else if (g_pModRunning->DamageTrack() == DT_ZBS)
-					flDamage = 3000.0f;
-				//flDamage = 1500.0f;
+					flDamage = 1000.0f;
 #endif
 				return flDamage;
 			}
@@ -366,7 +366,7 @@ void CGatlingex::PrimaryAttack(void)
 
 	UTIL_MakeVectors(m_pPlayer->pev->v_angle + m_pPlayer->pev->punchangle);
 #ifndef CLIENT_DLL
-	m_pPlayer->FireBullets2(7, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage(), NULL, 1);
+	m_pPlayer->FireBullets2(6, m_pPlayer->GetGunPosition(), gpGlobals->v_forward, Vector(0.03, 0.03, 0.0), 3048, BULLET_PLAYER_BUCKSHOT, 0, GetPrimaryAttackDamage(), NULL, 1);
 #endif
 	int flags;
 #ifdef CLIENT_WEAPONS
@@ -433,9 +433,9 @@ int CGatlingex::GetPrimaryAttackDamage() const
 	int iDamage = 18;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		iDamage = 34;
+		iDamage = 105;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		iDamage = 34;
+		iDamage = 189;
 #endif
 	return iDamage;
 }
@@ -445,11 +445,9 @@ float CGatlingex::FireBallDamage() const
 	float flDamage = 80.0f;
 #ifndef CLIENT_DLL
 	if (g_pModRunning->DamageTrack() == DT_ZB)
-		flDamage = 1100.0f;
-	//flDamage = 375.0f;
+		flDamage = 1000.0f;
 	else if (g_pModRunning->DamageTrack() == DT_ZBS)
-		flDamage = 1100.0f;
-	//flDamage = 750.0f;
+		flDamage = 800.0f;
 #endif
 	return flDamage;
 }

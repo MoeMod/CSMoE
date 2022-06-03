@@ -212,6 +212,23 @@ template<> struct PrivateData<class CGrenade, CBaseMonster>
 class CGrenade: public CBaseMonster, public PrivateData<class CGrenade, CBaseMonster>
 {
 public:
+	enum E_EXPLODE_TYPE
+	{
+		EXPTYPE_NORMAL,
+		EXPTYPE_M79ROCKET,
+		EXPTYPE_EVENTBOMB,
+		EXPTYPE_MOONCAKE,
+		EXPTYPE_CARTFRAG,
+		EXPTYPE_AT4ROCKET,
+		EXPTYPE_FIRECRACKERROCKET,
+		EXPTYPE_M32ROCKET,
+		EXPTYPE_OICWROCKET,
+		EXPTYPE_FGLAUNCHERROCKET,
+		EXPTYPE_SFGRENADE,
+		EXPTYPE_THANATOS5ROCKET,
+		EXPTYPE_VULCANUS7ROCKET,
+	};
+
 	void Spawn() override;
 	int Save(CSave &save) override;
 	int Restore(CRestore &restore) override;
@@ -222,6 +239,7 @@ public:
 	virtual void BounceSound();
 	void KickRate(entvars_t *pevInflictor, entvars_t *pevAttacker, float flKickRate, float flRadius, float flDamage, int flags, float flBoost);
 	void ModStrategy_GrenadeExploded(Vector vecStart);
+	void CalculateFramerate(void);
 public:
 	enum SATCHELCODE
 	{
@@ -232,7 +250,6 @@ public:
 #ifndef CLIENT_DLL
 	static CGrenade *ShootTimed(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time);
 	static CGrenade *ShootTimed2(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
-	static CGrenade* ShootTimed3(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, int iType);
 	static CGrenade* ShootZombieBomb(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent);
 	static CGrenade* ShootZombiBomb2(entvars_t* pevOwner, Vector vecStart, Vector vecVelocity, duration_t time, int iTeam, unsigned short usEvent, float flDamage);
 	static CGrenade *ShootContact(entvars_t *pevOwner, Vector vecStart, Vector vecVelocity);
@@ -252,7 +269,7 @@ public:
 	void Explode(Vector vecSrc, Vector vecAim);
 	void Explode(TraceResult *pTrace, int bitsDamageType);
 	void Explode2(TraceResult *pTrace, int bitsDamageType);
-	void Explode3(TraceResult *pTrace, int bitsDamageType);
+	void Explode3(TraceResult *pTrace, int bitsDamageType, CGrenade::E_EXPLODE_TYPE type, int iRadius);
 	void FB_Explode(TraceResult* pTrace, int bitsDamageType);
 	void ZombieBombKnockback(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flType);
 	NOXREF void SG_Explode(TraceResult *pTrace, int bitsDamageType);
@@ -275,6 +292,9 @@ public:
 	void EXPORT FB_BounceTouch(CBaseEntity* pOther);
 	void EXPORT Detonate2();
 	void EXPORT Detonate3();
+	void EXPORT DetonateCartFrag(void);
+	void EXPORT DetonateEventBomb(void);
+	void EXPORT DetonateMoonCake(void);
 	void EXPORT ZombieBombExplosion();
 	void EXPORT DetonateUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	void EXPORT TumbleThink();
@@ -288,7 +308,9 @@ public:
 	static TYPEDESCRIPTION m_SaveData[15];
 
 public:
+	bool m_bStaticFramerate;
 	int m_iGrenadeID;
+	bool m_bHit;
 };
 
 template<> struct PrivateData<class CBasePlayerItem, CBaseAnimating>
@@ -375,11 +397,10 @@ public:
 	/* CSBTE Added, in weapons_data.cpp */
 	//virtual KnockbackData GetKnockBackData() { return {1.0f, 1.0f, 1.0f, 1.0f, 0.0f}; }
 #ifdef CLIENT_DLL
-	virtual float GetArmorRatioModifier() { return 1.0f; }
 	virtual const char *GetCSModelName() { return ""; }
 	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig() { return {}; }
 #else
-	virtual float GetArmorRatioModifier();
+	float GetArmorRatioModifier();
 	virtual const char *GetCSModelName();
 	virtual WeaponBuyAmmoConfig GetBuyAmmoConfig();
 #endif
@@ -687,7 +708,8 @@ public:
 	void EXPORT FlyThink();
 	void Init(Vector vecVelocity, float flTouchDamage, float flExplodeDamage);
 	void Remove();
-
+	float GetArmorRatioModifier() { return ::sv::GetArmorRatioModifier(WEAPON_KNIFE); }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
 private:
 	time_point_t m_flRemoveTime;
 	float m_flTouchDamage;
@@ -771,6 +793,8 @@ public:
 class CSpear : public CBaseEntity
 {
 public:
+	float GetArmorRatioModifier() { return 1.85; }
+	int GetWeaponsId(void) { return WEAPON_SPEARGUN; }
 	static CSpear* Create(void);
 
 public:
@@ -841,6 +865,8 @@ public:
 class CSummonKnifeCannon : public CSpear
 {
 public:
+	float GetArmorRatioModifier() { return 1.7; }
+	int GetWeaponsId(void) { return WEAPON_KNIFE; }
 	static CSummonKnifeCannon* Create(void);
 
 public:
@@ -927,6 +953,11 @@ extern short g_sModelIndexC4Glow;
 
 extern short g_sModelIndexRadio;
 extern MULTIDAMAGE gMultiDamage;
+
+extern short g_sModelIndexEventBombExp;
+extern short g_sModelIndexEventBombExp2;
+extern short g_sModelIndexMoonCakeExp;
+extern short g_sModelIndexHolyWater;
 
 extern short g_sModelIndexBoomerEffect;
 extern short g_sModelIndexBoomerSprite;

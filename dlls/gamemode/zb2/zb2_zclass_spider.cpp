@@ -69,7 +69,7 @@ void CZombieClass_Spider::InitHUD() const
 void CZombieClass_Spider::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 310;
-	m_pPlayer->pev->gravity = 0.55f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.55f;
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{

@@ -30,7 +30,7 @@ CHuman_ZB1::CHuman_ZB1(CBasePlayer *player) : BasePlayerExtra(player)
 	m_pPlayer->m_bIsZombie = false;
 	// Give Armor
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health= 1000;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.8f;
 	m_pPlayer->m_iKevlar = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 100;
 }
@@ -62,7 +62,7 @@ CZombie_ZB1::CZombie_ZB1(CBasePlayer *player, ZombieLevel iEvolutionLevel) : Bas
 	m_pPlayer->pev->health = m_pPlayer->pev->max_health = 2000;
 	m_pPlayer->pev->armortype = ARMOR_TYPE_HELMET;
 	m_pPlayer->pev->armorvalue = 200;
-	m_pPlayer->pev->gravity = 0.83f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.83f;
 	m_pPlayer->ResetMaxSpeed();
 
 }
@@ -70,7 +70,7 @@ CZombie_ZB1::CZombie_ZB1(CBasePlayer *player, ZombieLevel iEvolutionLevel) : Bas
 void CZombie_ZB1::ResetMaxSpeed() const
 {
 	m_pPlayer->pev->maxspeed = 290;
-	m_pPlayer->pev->gravity = 0.8f;
+	m_pPlayer->m_flDefaultGravity = m_pPlayer->pev->gravity = 0.8f;
 
 	if (m_tStunGravityTime > gpGlobals->time)
 	{

@@ -72,6 +72,7 @@ void ResetStackModel(struct tempent_s* ent, float frametime, float currenttime)
 	{
 		ent->entity.curstate.renderamt = 0;
 		ent->die = gHUD.m_flTime;
+		g_HolySwordStackModel = nullptr;
 	}
 }
 
@@ -220,6 +221,7 @@ void EV_FireHolySword(event_args_t *args)
 				if (g_HolySwordStackModel)
 				{
 					g_HolySwordStackModel->die = gHUD.m_flTime;
+					g_HolySwordStackModel = nullptr;
 				}
 				return;
 			}
@@ -234,6 +236,7 @@ void EV_FireHolySword(event_args_t *args)
 				if (g_HolySwordStackModel)
 				{
 					g_HolySwordStackModel->die = gHUD.m_flTime;
+					g_HolySwordStackModel = nullptr;
 				}
 
 				if (!viewent)

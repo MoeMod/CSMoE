@@ -44,6 +44,8 @@ public:
 		m_flDamageTime = invalid_time_point;
 	}
 
+	float GetArmorRatioModifier() { return 1.99; }
+	int GetWeaponsId(void) { return WEAPON_M95TIGER; }
 	float GetDamage() const
 	{
 		float flDamage = 150.0f;
@@ -93,9 +95,9 @@ public:
 	void RadiusDamage()
 	{
 		CBaseEntity* pAttacker = CBaseEntity::Instance(pev->owner);
-		CBasePlayer* pAttackePlayer = nullptr;
+		CBasePlayer* pAttackPlayer = nullptr;
 		if (pAttacker && pAttacker->IsPlayer())
-			pAttackePlayer = static_cast<CBasePlayer*>(pAttacker);
+			pAttackPlayer = static_cast<CBasePlayer*>(pAttacker);
 
 		TraceResult tr;
 		CBaseEntity* pEntity = NULL;
@@ -110,7 +112,7 @@ public:
 
 			CBasePlayer* target = static_cast<CBasePlayer*>(pEntity);
 
-			if (pAttackePlayer->m_iTeam == target->m_iTeam)
+			if (g_pGameRules->PlayerRelationship(pAttackPlayer, pEntity) == GR_TEAMMATE)
 				continue;
 
 			if (pev->iuser1 & (1 << pEntity->entindex()))
@@ -118,7 +120,7 @@ public:
 
 			pev->iuser1 |= (1 << pEntity->entindex());
 
-			pEntity->TakeDamage(pev, pAttackePlayer->pev, flDamage, DMG_EXPLOSION | DMG_NOMORALE);
+			pEntity->TakeDamage(pev, pAttackPlayer->pev, flDamage, DMG_EXPLOSION | DMG_NOMORALE);
 
 			PLAYBACK_EVENT_FULL(FEV_GLOBAL, this->edict(), PRECACHE_EVENT(1, "events/wpneffects.sc"), 0.0, pEntity->pev->origin, g_vecZero, 0.0, 0.0, 24, pEntity->entindex(), FALSE, FALSE);
 
@@ -214,7 +216,8 @@ void CM95Tiger::Precache(void)
 
 	PRECACHE_MODEL("sprites/muzzleflash80.spr");
 	PRECACHE_MODEL("sprites/muzzleflash59.spr");
-
+	PRECACHE_MODEL("sprites/sprites/ef_m95tiger_eye1.spr");
+	PRECACHE_MODEL("sprites/sprites/ef_m95tiger_eye2.spr");
 	m_iShellId = m_iShell = PRECACHE_MODEL("models/rshell_big.mdl");
 	m_usFireM95Tiger = PRECACHE_EVENT(1, "events/m95tiger.sc");
 }

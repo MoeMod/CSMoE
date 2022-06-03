@@ -23,8 +23,8 @@ public:
 
 private:
 	duration_t GetAliveTime() const { return 4s; }
-	float GetRange() const { return 120.0f; }
-	float GetDamage() const { return 500.0f; }
+	float GetRange() const { return 180.0f; }
+	float GetDamage() const { return 800.0f; }
 	float GetKnockBack() const { return 500.0f; }
 
 	time_point_t m_flRemoveTime;

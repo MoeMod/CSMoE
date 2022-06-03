@@ -348,5 +348,5 @@ namespace sv {
 
 
 };
-LINK_ENTITY_TO_CLASS(z4b_railcannon, CRailCannon)
+LINK_ENTITY_TO_CLASS(weapon_railcannon, CRailCannon)
 }

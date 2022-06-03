@@ -28,7 +28,7 @@ const Color COL_TR = { 216, 182, 183, 255 };
 
 static const char *EQUIPMENT_BUYLIST[] = { "vest","vesthelm","flash","hegrenade","sgren","defuser","nvgs" };
 static const char *EQUIPMENT_BUYLIST_TEXT[] = { "#Cstrike_Kevlar","#Cstrike_Kevlar_Helmet","#Cstrike_Flashbang","#Cstrike_HE_Grenade","#Cstrike_Smoke_Grenade","#Cstrike_Defuser","#Cstrike_NightVision_Button_CT" };
-static const char *EQUIPMENT_BUYLIST_CMD[] = { "vest","vesthelm","flash","VGUI_BuyMenu_BuyWeapon hegrenade","sgren","defuser","nvgs" };
+static const char *EQUIPMENT_BUYLIST_CMD[] = { "vest","vesthelm","flash","VGUI_BuyMenu_BuyWeapon weapon_hegrenade","sgren","defuser","nvgs" };
 
 CCSBuySubMenu::CCSBuySubMenu(vgui2::Panel *parent, const char *name) : CBuySubMenu(parent, name)
 {
@@ -321,7 +321,7 @@ void CCSBuySubMenu::SetupItems(MoEWeaponBuyType type)
 
 			if (type == BUY_EQUIP)
 			{
-				if (!strcmp(name, "flashbang") || !strcmp(name, "hegrenade") || !strcmp(name, "smokegrenade"))
+				if (!strcmp(name, "weapon_flashbang") || !strcmp(name, "weapon_hegrenade") || !strcmp(name, "weapon_smokegrenade"))
 					continue;
 			}
 

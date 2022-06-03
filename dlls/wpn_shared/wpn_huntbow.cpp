@@ -42,6 +42,8 @@ namespace sv {
 	class CHuntbowArrow : public CBaseEntity
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.95; }
+		int GetWeaponsId(void) { return WEAPON_HUNTBOW; }
         Vector Get_Velocity_Angle(CBaseEntity *pEntity, Vector Output)
         {
             pEntity->pev->velocity;
@@ -70,7 +72,7 @@ namespace sv {
 			pev->movetype = MOVETYPE_FLY; // 9
 			m_flStartFllowTime = gpGlobals->time + 2.0s;
 			m_flStartFadeTime = gpGlobals->time + 2.0s;
-			pev->classname = MAKE_STRING("huntbow");
+			pev->classname = MAKE_STRING("huntbow_arrow");
 			m_iPenetration = 3;
 			m_iHitWallExp = 1;
 		}

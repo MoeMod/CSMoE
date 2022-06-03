@@ -144,7 +144,7 @@ namespace sv {
 
 				float flRatio = 1.0;
 
-				pPlayer->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET);
+				pPlayer->TakeDamage(pev, pevOwner, m_flHitDamage * flRatio, DMG_BULLET | DMG_NEVERGIB);
 			}
 		}
 
@@ -176,7 +176,7 @@ namespace sv {
 				flDamage *= m_flOwnerDamageModifier;
 
 
-			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION);
+			pEntity->TakeDamage(pev, pevOwner, flDamage, DMG_EXPLOSION | DMG_NEVERGIB);
 
 			if (pEntity->IsPlayer())
 			{
@@ -297,7 +297,7 @@ namespace sv {
 
 							pPlayer->m_LastHitGroup = HITGROUP_CHEST;
 
-							entityBehind->TakeDamage(pev, pevOwner, m_flCrowdDamage, DMG_BULLET);
+							entityBehind->TakeDamage(pev, pevOwner, m_flCrowdDamage, DMG_BULLET | DMG_NEVERGIB);
 
 							if (gpGlobals->time >= m_flTimeNextBleed)
 							{

@@ -10,6 +10,8 @@ namespace sv {
 	class CM32VenomMark : public CGrenade
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_M32VENOM; }
 		CM32VenomMark()
 		{
 			m_pEnemy = NULL;
@@ -41,6 +43,8 @@ namespace sv {
 	class CM32VenomRocket : public CGrenade
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.5; }
+		int GetWeaponsId(void) { return WEAPON_M32VENOM; }
 		void Spawn(void);
 		void Precache(void);
 		void VenomThink(void);

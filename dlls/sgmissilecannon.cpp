@@ -170,6 +170,7 @@ namespace sv {
 						//MESSAGE_END();
 
 						//if (tr.pHit && (CBaseEntity*)GET_PRIVATE(tr.pHit) == pOther)
+						if(g_pGameRules->PlayerRelationship(pEntityOwner, pOther) != GR_TEAMMATE)
 						{
 							entvars_t* pevOwner = VARS(pev->owner);
 
@@ -179,7 +180,7 @@ namespace sv {
 
 							ApplyMultiDamage(pev, pOwner->pev);
 
-							if (pOther->IsPlayer() && ((CBasePlayer*)pOther)->m_bIsZombie && g_pGameRules->PlayerRelationship(pEntityOwner, pOther) != GR_TEAMMATE)
+							if (pOther->IsPlayer() && ((CBasePlayer*)pOther)->m_bIsZombie)
 							{
 								UTIL_AddKickRateBoost(pOther, (pOther->pev->origin.Make2D() - pOwner->pev->origin.Make2D()).Normalize(), 1.0, m_flDirectForce, 0.0);
 							}
