@@ -492,8 +492,6 @@ void Touch_RemoveAll_f( void )
 {
 	IN_TouchEditClear();
 	Touch_ClearList( &touch.list_user );
-    Touch_ClearList( &touch.list_edit );
-    g_DefaultButtons.clear();
 }
 
 void Touch_SetColor( touchbuttonlist_t *list, const char *name, byte *color )
@@ -745,6 +743,7 @@ void Touch_ResetDefaultButtons( void )
 {
     g_DefaultButtons.clear();
 }
+
 void Touch_AddButton_f( void )
 {
 	rgba_t color;
