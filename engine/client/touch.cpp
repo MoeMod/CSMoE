@@ -1351,7 +1351,7 @@ void IN_TouchEditClear( void )
 static void Touch_EditMove( touchEventType type, int fingerID, float x, float y, float dx, float dy )
 {
     auto button = touch.edit.lock();
-	if( button->finger == fingerID )
+	if( button && button->finger == fingerID )
 	{
 		if( type == event_up ) // shutdown button move
 		{
@@ -1362,14 +1362,16 @@ static void Touch_EditMove( touchEventType type, int fingerID, float x, float y,
 				touch.selection = button;
 
 				// update "hide" editor button
-                auto hidebutton = touch.hidebutton.lock();
-                hidebutton->texture = -1;
-                hidebutton->flags &= ~TOUCH_FL_HIDE;
+				if (auto hidebutton = touch.hidebutton.lock())
+				{
+					hidebutton->texture = -1;
+					hidebutton->flags &= ~TOUCH_FL_HIDE;
 
-				if( button->flags & TOUCH_FL_HIDE )
-					Q_strcpy( hidebutton->texturefile, "touch_default/edit_show.tga" );
-				else
-					Q_strcpy( hidebutton->texturefile, "touch_default/edit_hide.tga" );
+					if (button->flags & TOUCH_FL_HIDE)
+						Q_strcpy(hidebutton->texturefile, "touch_default/edit_show.tga");
+					else
+						Q_strcpy(hidebutton->texturefile, "touch_default/edit_hide.tga");
+				}
 			}
 		}
 		if( type == event_motion ) // shutdown button move
@@ -1398,7 +1400,7 @@ static void Touch_EditMove( touchEventType type, int fingerID, float x, float y,
 		}
 		if( type == event_motion ) // perform resizing
 		{
-			if( touch.resize_finger == fingerID )
+			if( button && touch.resize_finger == fingerID )
 			{
                 button->y2 += dy;
                 button->x2 += dx;
