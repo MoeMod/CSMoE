@@ -70,6 +70,10 @@ add_library(Boost::preprocessor ALIAS Boost::boost)
 add_library(Boost::asio ALIAS Boost::boost)
 add_library(Boost::beast ALIAS Boost::boost)
 
+add_library(3rdparty-boost-mysql INTERFACE)
+target_include_directories(3rdparty-boost-mysql INTERFACE ${CMAKE_SOURCE_DIR}/3rdparty/boost-mysql/include)
+add_library(Boost::mysql ALIAS 3rdparty-boost-mysql)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/openssl-cmake EXCLUDE_FROM_ALL)
 add_library(openssl_3p INTERFACE)
 target_link_libraries(openssl_3p INTERFACE ssl crypto)
@@ -95,13 +99,21 @@ else()
 	target_link_libraries(astcenc_3p INTERFACE astcenc-native-static)
 endif()
 
+# find system zlib first
+find_package(ZLIB)
 add_library(3rdparty-zlib INTERFACE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/zlib EXCLUDE_FROM_ALL)
-target_link_libraries(3rdparty-zlib INTERFACE zlibstatic)
+if(${ZLIB_FOUND})
+	target_link_libraries(3rdparty-zlib INTERFACE ZLIB::ZLIB)
+else()
+	add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty/zlib EXCLUDE_FROM_ALL)
+	target_link_libraries(3rdparty-zlib INTERFACE zlibstatic)
 
-set(ZLIB_FOUND ON CACHE BOOL "" FORCE)
-set(ZLIB_LIBRARIES zlibstatic)
-set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/zlib ${CMAKE_BINARY_DIR}/3rdparty/zlib)
+	set(ZLIB_FOUND ON CACHE BOOL "" FORCE)
+	set(ZLIB_LIBRARIES zlibstatic)
+	set(ZLIB_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/3rdparty/zlib ${CMAKE_BINARY_DIR}/3rdparty/zlib)
+
+	target_include_directories(3rdparty-zlib INTERFACE ${ZLIB_INCLUDE_DIRS})
+endif()
 
 set(PNG_SHARED OFF)
 set(PNG_STATIC ON)
