@@ -29,13 +29,7 @@ namespace sv {
     class CVoidPistolEX : public LinkWeaponTemplate< CVoidPistolEX,
             TGeneralData,
             BuildTGetItemInfoFromCSW<WEAPON_GLOCK18>::template type,
-            TPrecacheEvent,
-            TDeployDefault,
-            TReloadDefault,
-            TPrimaryAttackRifle,
-            TFirePistol,
-			TRecoilKickBack,
-            TWeaponIdleDefault
+            TPrecacheEvent
     >
     {
     public:
@@ -50,12 +44,24 @@ namespace sv {
     static constexpr int MaxClip = 50;
 	enum
 	{
-		ANIM_IDLE1 = 0,
-        ANIM_RELOAD,
-        ANIM_DRAW,
-		ANIM_SHOOT1,
-		ANIM_SHOOT2,
-        ANIM_SHOOT3,
+		VOIDPISTOL_IDLEA,
+		VOIDPISTOL_IDLEB,
+		VOIDPISTOL_IDLEC,
+		VOIDPISTOL_SHOOTA,
+		VOIDPISTOL_SHOOTB,
+		VOIDPISTOL_SHOOTC,
+		VOIDPISTOL_SHOOT_BLACKHOLE_A,
+		VOIDPISTOL_SHOOT_BLACKHOLE_B,
+		VOIDPISTOL_RELOADA,
+		VOIDPISTOL_RELOADB,
+		VOIDPISTOL_RELOADC,
+		VOIDPISTOL_SCANNING_ON,
+		VOIDPISTOL_SCANNING_OFF,
+		VOIDPISTOL_CHANGEAC,
+		VOIDPISTOL_CHANGEBC,
+		VOIDPISTOL_DRAWA,
+		VOIDPISTOL_DRAWB,
+		VOIDPISTOL_DRAWC
 	};
     static constexpr float PlayerMaxSpeed = 250;
     static constexpr float ArmorRatioModifier = 1.0f;
@@ -96,11 +102,29 @@ namespace sv {
 		return 1;
 	}
 
-	BOOL Deploy(void)
+	BOOL Deploy() override
 	{
+		//EMIT_SOUND(ENT(m_pPlayer->pev), CHAN_ITEM, "weapons/skullaxe_draw.wav", 0.3, 2.4);
 
+		m_fMaxSpeed = 250;
+		m_iSwing = 1;
+		m_pPlayer->m_bShieldDrawn = false;
+
+		SetThink(&CDeagleShura::DeployAttack);
+		pev->nextthink = gpGlobals->time + 0.1s;
+
+		BOOL ret = Base::Deploy();
+
+		m_flNextPrimaryAttack = UTIL_WeaponTimeBase() + 1.23s;
+
+		return ret;
 	}
 
+
+	void SecondaryAttack() override
+	{
+	
+	}
 
     void Fire(float flSpread, duration_t flCycleTime, BOOL fUseAutoAim)
     {
@@ -162,6 +186,14 @@ namespace sv {
 		else
 			KickBack(0.6f, 0.35f, 0.3f, 0.05f, 3.25f, 2.0f, 5);
     }
+
+	void ItemPostFrame() override
+	{
+#ifndef CLIENT_DLL
+		return CBasePlayerWeapon::ItemPostFrame();
+#endif
+
+	}
     		 
 	float GetDamage() const
 	{

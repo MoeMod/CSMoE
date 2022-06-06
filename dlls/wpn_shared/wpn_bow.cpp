@@ -54,6 +54,8 @@ namespace sv {
 	class CBowArrow : public CBaseEntity
 	{
 	public:
+		float GetArmorRatioModifier() { return 1.95; }
+		int GetWeaponsId(void) { return WEAPON_BOW; }
         Vector Get_Velocity_Angle(CBaseEntity *pEntity, Vector Output)
         {
             pEntity->pev->velocity;
@@ -124,7 +126,7 @@ namespace sv {
 
 				ClearMultiDamage();
 				pOther->TraceAttack(pAttackePlayer->pev, m_ArrowDamage, vecDirection, &tr, DMG_BULLET | DMG_NEVERGIB);
-				ApplyMultiDamage(pAttackePlayer->pev, pAttackePlayer->pev);
+				ApplyMultiDamage(pev, pAttackePlayer->pev);
 
 				pev->renderamt = 0.0;
 				EMIT_SOUND_DYN(this->edict(), CHAN_AUTO, "weapons/xbow_hitbod1.wav", VOL_NORM, ATTN_NORM, 0, PITCH_NORM);

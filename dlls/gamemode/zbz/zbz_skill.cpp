@@ -514,7 +514,7 @@ namespace sv {
 			if (m_flTime > gpGlobals->time)
 				flDamage = 0.0f;
 
-			if (RANDOM_FLOAT(0, 1) > 0.01f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
+			if (RANDOM_FLOAT(0, 1) > 0.01f + /*0.005f*/ 0.0115 * g_pGameRules->m_iTotalRoundsPlayed)
 				return;
 
 			flDamage = 0.0f;
@@ -542,7 +542,7 @@ namespace sv {
 			}
 				
 
-			if (RANDOM_FLOAT(0, 1) > 0.01f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
+			if (RANDOM_FLOAT(0, 1) > 0.015f + 0.005f * g_pGameRules->m_iTotalRoundsPlayed)
 				return;
 
 			data.flOnGround = data.flFlying = data.flDucking = data.flNotOnGround = -1.0f;
@@ -729,8 +729,35 @@ namespace sv {
 			fDelay *= GetBonus();
 		}
 
+		void OnAttack_Post(CBasePlayerWeapon* weapon, int iClipBeforeAttack, int& iClip, int& iBackAmmo)
+		{
+			if (GetBonus() >= 0.5)
+				return;
+
+			if (iClip < 0)
+				return;
+
+			if (iBackAmmo <= 0)
+				return;
+
+			int iClipDecrease = iClipBeforeAttack - iClip;
+			if (iBackAmmo - iClipDecrease >= 0)
+			{
+				iBackAmmo -= iClipDecrease;
+				iClip += iClipDecrease;
+			}
+			else
+			{
+				iClip += iClipDecrease;
+				iClip -= (iClipDecrease - iBackAmmo);
+				if (iClip < 0)
+					iClip = 0;
+				iBackAmmo = 0;
+			}
+		}
+
 	private:
-		float GetBonus() const { return max(0.0f, 1.0f - (0.32f + 0.022f * g_pGameRules->m_iTotalRoundsPlayed)); }
+		float GetBonus() const { return max(0.0f, 1.0f - (0.32f + 0.03f * g_pGameRules->m_iTotalRoundsPlayed)); }
 	};
 
 	class ZSkill_AmmoReserves : public CZombieZSkill_Base
@@ -1627,7 +1654,7 @@ namespace sv {
 		}
 	};
 
-	class ZSkill_RapidReloaderII : public CZombieZSkill_Base
+	/*class ZSkill_RapidReloaderII : public CZombieZSkill_Base
 	{
 	public:
 		explicit ZSkill_RapidReloaderII(CBasePlayer* player) : CZombieZSkill_Base(player) {}
@@ -1658,7 +1685,7 @@ namespace sv {
 				iBackAmmo = 0;
 			}
 		}
-	};
+	};*/
 
 	class ZSkill_ZombieS : public CZombieZSkill_Base
 	{
@@ -2316,7 +2343,7 @@ namespace sv {
 		{ Skill_RapidFireAmmo, 100, MakeSkill<ZSkill_RapidFireAmmo> },
 		{ Skill_Revenge, 100, MakeSkill<ZSkill_Revenge> },
 		{ Skill_SupportBombardment, 100, MakeSkill<ZSkill_SupportBombardment> },
-		{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
+		//{ Skill_RapidReloaderII, 15, MakeSkill<ZSkill_RapidReloaderII> },
 		{ Skill_ZombieS, 50, MakeSkill<ZSkill_ZombieS>},
 
 		{ Skill_GhostHunter, 50, MakeSkill<ZSkill_GhostHunter> },

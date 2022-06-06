@@ -44,7 +44,7 @@ namespace sv {
 		CSpear* pSpear = (CSpear*)Instance(pent);
 		if (pSpear)
 		{
-			pSpear->pev->classname = MAKE_STRING("speargun");
+			pSpear->pev->classname = MAKE_STRING("spear");
 
 			pSpear->Spawn();
 		}

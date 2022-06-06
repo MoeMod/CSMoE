@@ -12,6 +12,8 @@
 #endif
 
 #include <vgui_controls/PropertyPage.h>
+#include <vector>
+#include <string>
 
 #define TOUCH_FL_HIDE			(1U << 0)
 #define TOUCH_FL_NOEDIT			(1U << 1)
@@ -35,6 +37,8 @@ public:
 	COptionsSubButtonSettings(vgui2::Panel *parent);
 	~COptionsSubButtonSettings();
 	void Com_EscapeCommand(char* newCommand, const char* oldCommand, int len);
+	void UpdateProfileList();
+	void UpdateButtonList();
 
 	virtual void OnResetData();
 	virtual void OnApplyChanges();
@@ -42,7 +46,8 @@ public:
 
 private:
 	MESSAGE_FUNC( OnControlModified, "ControlModified" );
-	MESSAGE_FUNC_PTR(OnTextChanged, "TextChanged", panel);
+	MESSAGE_FUNC_PTR_CHARPTR( OnTextChanged, "TextChanged", panel, text );
+	MESSAGE_FUNC( OnTick, "Tick" );
 	struct
 	{
 		char szName[128];
@@ -51,9 +56,6 @@ private:
 		byte bColors[4];
 		int  iFlags;
 	} buttons[1024];
-
-	char szSelectedName[256];
-	int curflags = 0;
 
 	vgui2::Slider* m_pButtonRSlider;
 	vgui2::Slider* m_pButtonGSlider;
@@ -82,7 +84,7 @@ private:
 	vgui2::ComboBox* m_pButtonList;
 	vgui2::ComboBox* m_pButtonProfileList;
 
-
+	std::vector<std::string> m_vecProfiles;
 };
 
 

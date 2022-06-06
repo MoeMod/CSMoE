@@ -1047,7 +1047,11 @@ namespace sv {
 		Vector vecAngle = m_pPlayer->pev->angles;
 		vecAngle.x = 0;
 
-		m_pParray = static_cast<CHolySwordParray*>(CBaseEntity::Create("holysword_parray", m_pPlayer->GetGunPosition() + vecForward * 75, vecAngle, ENT(m_pPlayer->pev)));
+		Vector vecSrc = m_pPlayer->pev->origin;
+		if (FBitSet(m_pPlayer->pev->flags, FL_DUCKING))
+			vecSrc.z -= 32.0;
+
+		m_pParray = static_cast<CHolySwordParray*>(CBaseEntity::Create("holysword_parray", vecSrc + vecForward * 115, vecAngle, ENT(m_pPlayer->pev)));
 		if (m_pParray)
 		{
 			m_pParray->Init(m_pPlayer, this);
@@ -1205,11 +1209,11 @@ namespace sv {
 		SetTouch(&CHolySwordParray::OnTouch);
 		pev->deadflag = DEAD_NO;
 		pev->takedamage = DAMAGE_YES;
+		pev->classname = MAKE_STRING("holysword_parray");
+		pev->solid = SOLID_TRIGGER;
+		pev->movetype = MOVETYPE_NONE;
 
-		pev->solid = SOLID_SLIDEBOX;
-		pev->movetype = MOVETYPE_NOCLIP;
-
-		UTIL_SetSize(pev, Vector(-75.0, -75.0, -80.0), Vector(75.0, 75.0, 64.0));
+		UTIL_SetSize(pev, Vector(-70.0, -70.0, -80.0), Vector(70.0, 70.0, 64.0));
 
 		m_flRemoveTime = gpGlobals->time + 3.0s;
 		pev->nextthink = gpGlobals->time + 0.1s;
@@ -1230,14 +1234,11 @@ namespace sv {
 			if (!pOther->IsPlayer())
 				return;
 
-			if (bIsWallBetweenEntity(pOther, m_pOwner))
-				return;
-
 			CBasePlayer* player = (CBasePlayer*)pOther;
 			if (!player)
 				return;
 
-			if (!player->m_bIsZombie)
+			if (g_pGameRules->PlayerRelationship(m_pOwner, pOther) == GR_TEAMMATE)
 				return;
 
 			CBasePlayerWeapon* pWeapon = (CBasePlayerWeapon*)player->m_pActiveItem;
@@ -1278,7 +1279,12 @@ namespace sv {
 		Vector vecForward = gpGlobals->v_forward;
 		vecForward.z = 0;
 		vecForward = vecForward.Normalize();
-		UTIL_SetOrigin(pev, m_pOwner->GetGunPosition() + vecForward * 75);
+
+		Vector vecSrc = m_pOwner->pev->origin;
+		if (FBitSet(m_pOwner->pev->flags, FL_DUCKING))
+			vecSrc.z -= 32.0;
+
+		UTIL_SetOrigin(pev, vecSrc + vecForward * 115);
 
 		pev->angles = m_pOwner->pev->angles;
 		pev->angles.x = 0;

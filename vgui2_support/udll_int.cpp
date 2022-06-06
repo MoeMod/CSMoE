@@ -238,7 +238,7 @@ extern "C" EXPORT int GiveTextAPI( ui_textfuncs_t* pTextfuncsFromEngine )
 
 	return TRUE;
 }
-extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags ) {} // TouchButtons.cpp
+extern "C" EXPORT void AddTouchButtonToList( const char *name, const char *texture, const char *command, unsigned char *color, int flags ); // OptionsSubButtonSettings.cpp
 #endif
 
 }

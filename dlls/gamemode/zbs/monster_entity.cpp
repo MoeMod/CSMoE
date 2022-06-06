@@ -63,13 +63,18 @@ std::shared_ptr<CBaseMonsterClass> CMonsterModStrategy_Default::MonsterClassFact
 		std::mt19937 gen(rd());
 		const std::size_t N = std::discrete_distribution<>(MCLASSES_WEIGHT.begin(), MCLASSES_WEIGHT.end())(gen);
 		m_pMonster->m_iClass = std::get<0>(g_MonsterClassList[N]);
+
 		return std::get<2>(g_MonsterClassList[N])(m_pMonster);
 	}
 
 	for (auto&& pr : g_MonsterClassList)
 	{
 		if (iClass == std::get<0>(pr))
+		{
+			m_pMonster->m_iClass = iClass;
 			return std::get<2>(pr)(m_pMonster);
+		}
+			
 	}
 
 	return std::get<2>(g_MonsterClassList[0])(m_pMonster);
@@ -1576,6 +1581,11 @@ void CMonsterClass_Dog::OnInit()
 	SET_MODEL(m_pMonster->edict(), "models/monster/zombiedog.mdl");
 	UTIL_SetSize(m_pMonster->pev, Vector(-10.0, -20.0, 0.0), Vector(10.0, 20.0, 36.0));
 	m_pMonster->SetSkill(std::make_unique<CMonsterSkill_Dog>(m_pMonster));
+}
+
+void CMonsterClass_Dog::OnSpawn()
+{
+	m_pMonster->m_flAttackDist = 45.0f;
 }
 
 const Vector CMonsterClass_Dog::GetCenterid() const

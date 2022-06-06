@@ -44,7 +44,7 @@ namespace sv {
 		CSummonKnifeCannon* pCannon = (CSummonKnifeCannon*)Instance(pent);
 		if (pCannon)
 		{
-			pCannon->pev->classname = MAKE_STRING("summonknife");
+			pCannon->pev->classname = MAKE_STRING("summonknife_cannon");
 
 			pCannon->Spawn();
 		}

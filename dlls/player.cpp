@@ -868,7 +868,7 @@ int CBasePlayer::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, flo
 		
 		CBaseEntity* temp = GetClassPtr<CBaseEntity>(pevInflictor);
 
-		if (!Q_strcmp(STRING(temp->pev->classname), "d_m32venom"))
+		if (!Q_strcmp(STRING(temp->pev->classname), "m32venom_rocket"))
 		{
 			if(~m_iBuff & BUFF_M32VENOM)
 				m_flAccumulateDamage[COUNT_M32VENOM] += flDamage;

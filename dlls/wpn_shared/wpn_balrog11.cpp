@@ -258,6 +258,8 @@ void CBalrog11::SecondaryAttack(void)
 
 	PLAYBACK_EVENT_FULL(0, m_pPlayer->edict(), m_usFireBalrog11, 0, g_vecZero, g_vecZero, 1.0, 0.0735, 7, int(m_vVecAiming.x * 100), TRUE, FALSE);
 
+	SendWeaponAnim(BALROG11_SHOOTBCS, UseDecrement() != FALSE);
+
 	if (m_iClip)
 		m_flPumpTime = UTIL_WeaponTimeBase() + 0.125s;
 

@@ -69,9 +69,12 @@ void EV_FireBalrog11(event_args_s *args)
 	{
 		++g_iShotsFired;
 		EV_MuzzleFlash();
-		if (args->bparam1)
+	/*	if (args->bparam1)
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(BALROG11_SHOOTBCS, 2);
 		else
+			gEngfuncs.pEventAPI->EV_WeaponAnimation(BALROG11_SHOOT1 + Com_RandomLong(0, 1), 2);*/
+
+		if (!args->bparam1)
 			gEngfuncs.pEventAPI->EV_WeaponAnimation(BALROG11_SHOOT1 + Com_RandomLong(0, 1), 2);
 
 		float vecScale[3] = { 22.0, -9.0, -11.0 };

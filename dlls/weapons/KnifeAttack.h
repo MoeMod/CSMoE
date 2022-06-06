@@ -303,8 +303,15 @@ inline bool bIsWallBetweenEntity(CBaseEntity* pEntity, CBasePlayer* pAttackPlaye
 
 		CBaseEntity* pHit = CBaseEntity::Instance(tr.pHit);
 
-		if (pHit && pHit == pEntity)
-			return false;
+		if (pHit)
+		{
+			if(pHit == pEntity)
+				return false;
+
+			if (!Q_strcmp(STRING(pHit->pev->classname), "holysword_parray") || !Q_strcmp(STRING(pHit->pev->classname), "y22s1holyswordmb_parray"))
+				return false;
+		}
+			
 
 		return true;
 	}

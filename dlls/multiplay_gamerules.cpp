@@ -4070,13 +4070,167 @@ void CHalfLifeMultiplay::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, e
 
 				if (pPlayer != NULL && pPlayer->m_pActiveItem != NULL)
 				{
-					killer_weapon_name = pPlayer->m_pActiveItem->pszName();
+					if (pPlayer->m_pActiveItem->m_iId == WEAPON_HEGRENADE)
+					{
+						switch (pPlayer->m_iGrenadeID)
+						{
+						case GRENADE_M24GRENADE:
+							killer_weapon_name = "m24grenade";
+							break;
+
+						case GRENADE_FGRENADE2:
+							killer_weapon_name = "fgrenade2";
+							break;
+
+						case GRENADE_FIREBOMB:
+							killer_weapon_name = "firebomb";
+							break;
+
+						case GRENADE_HEARTBOMB:
+							killer_weapon_name = "heartbomb";
+							break;
+
+						case GRENADE_CAKEBOMB:
+							killer_weapon_name = "cakebomb";
+							break;
+
+						case GRENADE_MOONCAKE:
+							killer_weapon_name = "mooncake";
+							break;
+
+						case GRENADE_PUMPKIN:
+							killer_weapon_name = "pumpkin";
+							break;
+
+						case GRENADE_CARTFRAG:
+							killer_weapon_name = "cartfrag";
+							break;
+
+						case GRENADE_HOLYBOMB:
+							killer_weapon_name = "holybomb";
+							break;
+
+						case GRENADE_SFGRENADE:
+							killer_weapon_name = "sfgrenade";
+							break;
+
+						case GRENADE_CHAINGRENADE:
+							killer_weapon_name = "chaingren";
+							break;
+
+						default:
+							killer_weapon_name = "grenade";
+							break;
+						}
+					}
+					else
+						killer_weapon_name = pPlayer->m_pActiveItem->pszName();
 				}
 			}
 			else
 			{
+				//entity kill
 				// it's just that easy
-				killer_weapon_name = STRING(pevInflictor->classname);
+
+				CBaseEntity* pInflictor = CBaseEntity::Instance(pevInflictor);
+				int iId = pInflictor->GetWeaponsId();
+
+				CGrenade* pGrenade = dynamic_cast<CGrenade*>(pInflictor);
+
+				if (pGrenade && pGrenade->GetWeaponsId() == WEAPON_NONE)
+				{
+					switch (pGrenade->m_iGrenadeID)
+					{
+					case GRENADE_M24GRENADE:
+						killer_weapon_name = "m24grenade";
+						break;
+
+					case GRENADE_FGRENADE2:
+						killer_weapon_name = "fgrenade2";
+						break;
+
+					case GRENADE_FIREBOMB:
+						killer_weapon_name = "firebomb";
+						break;
+
+					case GRENADE_HEARTBOMB:
+						killer_weapon_name = "heartbomb";
+						break;
+
+					case GRENADE_CAKEBOMB:
+						killer_weapon_name = "cakebomb";
+						break;
+
+					case GRENADE_MOONCAKE:
+						killer_weapon_name = "mooncake";
+						break;
+
+					case GRENADE_PUMPKIN:
+						killer_weapon_name = "pumpkin";
+						break;
+
+					case GRENADE_CARTFRAG:
+						killer_weapon_name = "cartfrag";
+						break;
+
+					case GRENADE_HOLYBOMB:
+						killer_weapon_name = "holybomb";
+						break;
+
+					case GRENADE_SFGRENADE:
+						killer_weapon_name = "sfgrenade";
+						break;
+
+					case GRENADE_CHAINGRENADE:
+						killer_weapon_name = "chaingren";
+						break;
+
+					default:
+						killer_weapon_name = "grenade";
+						break;
+					}
+				}
+				else if (iId == WEAPON_KNIFE)
+				{
+					if (!Q_strcmp(killer_weapon_name, "dgaxe_summon"))
+						killer_weapon_name = "dgaxe";
+					else if (!Q_strcmp(killer_weapon_name, "dualsword_specialeffect"))
+						killer_weapon_name = "dualsword";
+					else if (!Q_strcmp(killer_weapon_name, "whipsword_stabbox"))
+						killer_weapon_name = "whipsword";
+					else if (!Q_strcmp(killer_weapon_name, "holysword_cannon"))
+						killer_weapon_name = "holysword";
+					else if (!Q_strcmp(killer_weapon_name, "summonknife_cannon"))
+						killer_weapon_name = "summonknife";
+				}
+				else
+				{
+					if (iId == WEAPON_SPEARGUN)
+						killer_weapon_name = "speargun";
+					else if(iId == WEAPON_BUFFAK)
+						killer_weapon_name = "buffak";
+					else if (iId == WEAPON_M32VENOM)
+						killer_weapon_name = "m32venom";
+					else if (iId == WEAPON_GATLINGEX)
+						killer_weapon_name = "gatlingex";
+					else if (iId == WEAPON_M95TIGER)
+						killer_weapon_name = "m95tiger";
+					else if (iId == WEAPON_HUNTBOW)
+						killer_weapon_name = "huntbow";
+					else if (iId == WEAPON_BOW)
+						killer_weapon_name = "bow";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else if (iId == WEAPON_SVDEX)
+						killer_weapon_name = "svdex";
+					else if (iId == WEAPON_VOIDPISTOL)
+						killer_weapon_name = "voidpistol";
+					else if (iId == WEAPON_PLASMAGUN)
+						killer_weapon_name = "plasmagun";
+					else
+						killer_weapon_name = STRING(pevInflictor->classname);
+				}
+					
 			}
 		}
 	}

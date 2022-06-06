@@ -1496,6 +1496,7 @@ void CBaseMonster::RadiusDamage(entvars_t *pevInflictor, entvars_t *pevAttacker,
 		{
 			sv::RadiusDamage4(pev->origin, pevInflictor, pevAttacker, flDamage, flDamage * 0.65, iClassIgnore, bitsDamageType);
 		}
+		return;
 	}
 
 

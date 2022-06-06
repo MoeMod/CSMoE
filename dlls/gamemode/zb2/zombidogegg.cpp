@@ -90,11 +90,10 @@ void EXPORT CZombiDogEgg::OnTouch(CBaseEntity* pOther)
 
 	edict_t* pent = monster->edict();
 
-	vecOrigin.z += 36;
 	monster->pev->origin = vecOrigin;
 	monster->pev->angles = pev->angles;
-	monster->m_iClass = MONSTER_CLASS_ZOMBIEDOG;
-
+	monster->SetClass(MONSTER_CLASS_ZOMBIEDOG);
+	pent->v.spawnflags |= SF_NORESPAWN;
 	DispatchSpawn(pent);
 
 	// default settings

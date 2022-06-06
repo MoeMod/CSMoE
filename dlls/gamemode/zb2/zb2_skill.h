@@ -40,7 +40,7 @@ public:
 	virtual float GetDamageRatio() const = 0;
 	virtual ZombieSkillStatus GetStatus() const = 0;
 	virtual int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) = 0;
-	
+	virtual void OnTouch(CBaseEntity* other) = 0;
 };
 
 inline IZombieSkill::~IZombieSkill() = default;
@@ -57,6 +57,7 @@ public:
 	float GetDamageRatio() const override { return 1.0f; }
 	ZombieSkillStatus GetStatus() const override {	return m_iZombieSkillStatus; }
 	int AddToFullPack_Post(struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet) override { return 1; }
+	void OnTouch(CBaseEntity* other) override {}
 
 protected:
 	virtual void OnSkillEnd() {}
@@ -793,7 +794,7 @@ protected:
 	EngineClock::time_point m_flTimeBotUseSkill = invalid_time_point;
 	EngineClock::time_point m_flTimeTriggerZombieSkill = invalid_time_point;
 	EngineClock::time_point m_flPlayerAnimTime = invalid_time_point;
-	ZombieRushSkillStatus m_SkillStatus = RUSH_IDLE;
+	ZombieRushSkillStatus m_SkillStatus;
 };
 
 class CZombieSkill_ZombieScream : public CZombieSkill_Base

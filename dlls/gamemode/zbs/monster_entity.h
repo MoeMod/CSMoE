@@ -267,6 +267,7 @@ class CMonsterClass_Dog : public CBaseMonsterClass
 public:
 	CMonsterClass_Dog(CMonster* p) : CBaseMonsterClass(p) {}
 
+	void OnSpawn() override;
 	void OnInit() override;
 	const Vector GetCenterid() const override;
 	void DeathSound() const override;
