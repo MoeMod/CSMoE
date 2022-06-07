@@ -19,7 +19,6 @@ GNU General Public License for more details.
 #include <cmath>
 #include <utility>
 #include <numeric>
-#include <array>
 #include <type_traits>
 
 typedef struct lua_State lua_State;
@@ -43,17 +42,17 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 	constexpr VectorBase_Gen(typename std::type_identity<U>::type ) : VectorBase_Gen((I, NAN)...)
 	{
 	}
-	constexpr VectorBase_Gen(decltype(I, T())...args) : m_data{args...}
+	constexpr VectorBase_Gen(std::initializer_list<T> il) : VectorBase_Gen(il.begin())
 	{
 	}
 	constexpr VectorBase_Gen(const VectorBase_Gen &) = default;
 	template<class InputIter>
-	explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
+	constexpr explicit VectorBase_Gen(InputIter arr, typename std::enable_if<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIter>::iterator_category>::value>::type * = nullptr)
 	{
-		std::copy_n(arr, N, m_data.begin());
+		std::copy_n(arr, N, m_data);
 	}
 
-	alignas(Align) std::array<T, N> m_data;
+	alignas(Align) T m_data[N];
 
 	T &operator[](std::size_t i)
 	{
@@ -65,17 +64,17 @@ struct VectorBase_Gen<T, N, std::index_sequence<I...>, Align>
 	}
 	T *data()
 	{
-		return m_data.data();
+		return m_data;
 	}
 	const T *data() const
 	{
-		return m_data.data();
+		return m_data;
 	}
 
 	template<class OutputIter>
 	void CopyToIter(OutputIter arr) const
 	{
-		std::copy(m_data.begin(), m_data.end(), arr);
+		std::copy(std::begin(m_data), std::end(m_data), arr);
 	}
 	void CopyToArray(T *arr) const
 	{
